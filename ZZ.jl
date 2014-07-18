@@ -434,10 +434,10 @@ function ^(x::ZZ, y::Uint)
 end
 
 function zz_pow(x::ZZ, y::Int)
-    if y<0; throw(DomainError()); end
-    if x== 1; return x; end
-    if x==-1; return isodd(y) ? x : -x; end
-    if y>typemax(Uint); throw(DomainError()); end
+    if y < 0; throw(DomainError()); end
+    if x == 1; return x; end
+    if x == -1; return isodd(y) ? x : -x; end
+    if y > typemax(Uint); throw(DomainError()); end
     return x^uint(y)
 end
 
@@ -461,7 +461,7 @@ function xgcd(a::ZZ, b::ZZ)
         # work around a difference in some versions of GMP
         if a == b
             return g, t, s
-        elseif abs(a)==abs(b)
+        elseif abs(a) == abs(b)
             return g, t, -s
         end
     end
@@ -526,7 +526,7 @@ function invmod(x::ZZ, y::ZZ)
     if y == 1
         return ZZ(0)
     end
-    if (y==0 || ccall((:fmpz_invmod, :libflint), Cint, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y) == 0)
+    if (y == 0 || ccall((:fmpz_invmod, :libflint), Cint, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y) == 0)
         error("no inverse exists")
     end
     return z
@@ -617,7 +617,7 @@ end
 function num_digits_internal(x::ZZ, b::Integer = 10)
     # fmpz_sizeinbase might return an answer 1 too big
     n = int(ccall((:fmpz_sizeinbase, :libflint), Culong, (Ptr{ZZ}, Int32), &x, b))
-    abs(x) < ZZ(b)^(n-1) ? n-1 : n
+    abs(x) < ZZ(b)^(n - 1) ? n - 1 : n
 end
 
 num_digits(x::ZZ, b::Integer = 10) = x == 0 ? 1 : num_digits_internal(x,b)
