@@ -262,7 +262,7 @@ for (fJ, fC) in ((:+, :add), (:-,:sub), (:*, :mul),
     @eval begin
         function ($fJ)(x::ZZ, y::ZZ)
             z = ZZ()
-            ccall(($(string(:fmpz_,fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y)
+            ccall(($(string(:fmpz_, fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y)
             return z
         end
     end
@@ -278,23 +278,23 @@ for (fJ, fC) in ((:+, :add), (:*, :mul), (:&, :and), (:|, :or), (:$, :xor))
     @eval begin
         function ($fJ)(a::ZZ, b::ZZ, c::ZZ)
             z = ZZ()
-            ccall(($(string(:fmpz_,fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &a, &b)
-            ccall(($(string(:fmpz_,fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &z, &c)
+            ccall(($(string(:fmpz_, fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &a, &b)
+            ccall(($(string(:fmpz_, fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &z, &c)
             return z
         end
         function ($fJ)(a::ZZ, b::ZZ, c::ZZ, d::ZZ)
             z = ZZ()
-            ccall(($(string(:fmpz_,fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &a, &b)
-            ccall(($(string(:fmpz_,fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &z, &c)
-            ccall(($(string(:fmpz_,fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &z, &d)
+            ccall(($(string(:fmpz_, fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &a, &b)
+            ccall(($(string(:fmpz_, fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &z, &c)
+            ccall(($(string(:fmpz_, fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &z, &d)
             return z
         end
         function ($fJ)(a::ZZ, b::ZZ, c::ZZ, d::ZZ, e::ZZ)
             z = ZZ()
-            ccall(($(string(:fmpz_,fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &a, &b)
-            ccall(($(string(:fmpz_,fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &z, &c)
-            ccall(($(string(:fmpz_,fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &z, &d)
-            ccall(($(string(:fmpz_,fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &z, &e)
+            ccall(($(string(:fmpz_, fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &a, &b)
+            ccall(($(string(:fmpz_, fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &z, &c)
+            ccall(($(string(:fmpz_, fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &z, &d)
+            ccall(($(string(:fmpz_, fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &z, &e)
             return z
         end
     end
