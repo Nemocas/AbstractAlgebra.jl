@@ -620,5 +620,5 @@ function num_digits_internal(x::ZZ, b::Integer = 10)
     abs(x) < ZZ(b)^(n - 1) ? n - 1 : n
 end
 
-num_digits(x::ZZ, b::Integer = 10) = x == 0 ? 1 : num_digits_internal(x,b)
+num_digits(x::ZZ, b::Integer = 10) = x == 0 ? 1 : num_digits_internal(x, b)
 
