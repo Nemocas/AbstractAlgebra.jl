@@ -402,17 +402,17 @@ function ~(x::ZZ)
     return z
 end
 
-function abs(x::ZZ)
-    z = ZZ()
-    ccall((:fmpz_abs, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}), &z, &x)
-    return z
-end
-
 ###########################################################################################
 #
 #   Arithmetic functions
 #
 ###########################################################################################
+
+function abs(x::ZZ)
+    z = ZZ()
+    ccall((:fmpz_abs, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}), &z, &x)
+    return z
+end
 
 function divrem(x::ZZ, y::ZZ)
     z1 = ZZ()
@@ -448,8 +448,8 @@ end
 ^(x::Int, y::ZZ) = zz_pow(ZZ(x), y)
 
 function xgcd(a::ZZ, b::ZZ)
-    if b == 0 # shortcut this to ensure consistent results with gcdx(a,b)
-        return a < 0 ? (-a,-one(ZZ),zero(ZZ)) : (a,one(ZZ),zero(ZZ))
+    if b == 0 # shortcut this to ensure consistent results with xgcd(a,b)
+        return a < 0 ? (-a, -one(ZZ), zero(ZZ)) : (a, one(ZZ), zero(ZZ))
     end
     g = ZZ()
     s = ZZ()
