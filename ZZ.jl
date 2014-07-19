@@ -119,7 +119,7 @@ ZZ(x::Union(Float16, Float32)) = ZZ(float64(x))
 function ZZ(x::Integer)
     if x < 0
         if typemin(Clong) <= x
-            return ZZ(Base.convert(Clong, x))
+            return ZZ(convert(Clong, x))
         end
         b = ZZ(0)
         shift = 0
@@ -131,7 +131,7 @@ function ZZ(x::Integer)
         return -b - 1
     else
         if x <= typemax(Culong)
-            return ZZ(Base.convert(Culong, x))
+            return ZZ(convert(Culong, x))
         end
         b = ZZ(0)
         shift = 0
@@ -383,6 +383,7 @@ function >>(x::ZZ, c::Int32)
     return z
 end
 
+>>>(x::ZZ, c::Int32) = x >> c
 
 ###########################################################################################
 #
@@ -603,7 +604,7 @@ bin(n::ZZ) = base(n, 2)
 
 oct(n::ZZ) = base(n, 8)
 
-dec(n::ZZ) = base(n, 8)
+dec(n::ZZ) = base(n, 10)
 
 hex(n::ZZ) = base(n, 16)
 
