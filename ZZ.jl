@@ -27,8 +27,9 @@
 
 import Base: convert, promote_rule, show, string, parseint, serialize, deserialize
 
-export fac, binom, isprime, fdiv, div, rem, mod, gcd, xgcd, lcm, invmod, powmod, abs, 
-       divrem, isqrt, popcount, prevpow2, nextpow2, num_digits, dec, bin, oct, hex, base
+export ZZ, fac, binom, isprime, fdiv, div, rem, mod, gcd, xgcd, lcm, invmod, powmod, abs, 
+       divrem, isqrt, popcount, prevpow2, nextpow2, num_digits, dec, bin, oct, hex, base,
+       show
 
 ###########################################################################################
 #
@@ -54,18 +55,19 @@ end
 
 # The ZZ datatype. It is a member of Julia's Integer abstract type
 
-type ZZ <: Integer
+type ZZ <: Ring
     d::Clong
+
     function ZZ()
         b = new(zero(Clong))
-        ccall((:__fmpz_init,:libflint), Void, (Ptr{ZZ},), &b)
+        ccall((:__fmpz_init, :libflint), Void, (Ptr{ZZ},), &b)
         finalizer(b, _fmpz_clear_fn)
         return b
     end
 end
 
 function _fmpz_clear_fn(a::ZZ)
-   ccall((:__fmpz_clear,:libflint), Void, (Ptr{ZZ},), &a)
+   ccall((:__fmpz_clear, :libflint), Void, (Ptr{ZZ},), &a)
 end
 
 ###########################################################################################
@@ -488,6 +490,30 @@ end
 <(x::ZZ, y::ZZ) = cmp(x,y) < 0
 
 >(x::ZZ, y::ZZ) = cmp(x,y) > 0
+
+function cmp(x::ZZ, y::Int)
+    ccall((:fmpz_cmp_si, :libflint), Int32, (Ptr{ZZ}, Int), &x, y)
+end
+
+==(x::ZZ, y::Int) = cmp(x,y) == 0
+
+<=(x::ZZ, y::Int) = cmp(x,y) <= 0
+
+>=(x::ZZ, y::Int) = cmp(x,y) >= 0
+
+<(x::ZZ, y::Int) = cmp(x,y) < 0
+
+>(x::ZZ, y::Int) = cmp(x,y) > 0
+
+==(x::Int, y::ZZ) = cmp(y,x) == 0
+
+<=(x::Int, y::ZZ) = cmp(y,x) >= 0
+
+>=(x::Int, y::ZZ) = cmp(y,x) <= 0
+
+<(x::Int, y::ZZ) = cmp(y,x) > 0
+
+>(x::Int, y::ZZ) = cmp(y,x) < 0
 
 
 ###########################################################################################
