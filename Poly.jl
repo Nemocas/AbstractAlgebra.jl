@@ -132,7 +132,7 @@ function -{T <: Ring, S}(a::Poly{T, S})
    len = a.data.length
    z = Poly{T, S}(Array(T, len))
    for i = 1:len
-      z.data.coeffs[i] = -x.data.coeffs[i]
+      z.data.coeffs[i] = -a.data.coeffs[i]
    end
    z.data.length = len
    return z
