@@ -116,6 +116,30 @@ end
 
 ###########################################################################################
 #
+#   Unary operations
+#
+###########################################################################################
+
+function -{S}(x::Poly{ZZ, S})
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_neg, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
+               &(z.data), &(x.data))
+   return z
+end
+
+function -{T <: Ring, S}(a::Poly{T, S})
+   len = a.data.length
+   z = Poly{T, S}(Array(T, len))
+   for i = 1:len
+      z.data.coeffs[i] = -x.data.coeffs[i]
+   end
+   z.data.length = len
+   return z
+end
+
+###########################################################################################
+#
 #   Binary operations
 #
 ###########################################################################################
@@ -123,6 +147,22 @@ end
 function +{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_add, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
+               &(z.data), &(x.data), &(y.data))
+   return z
+end
+
+function -{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_sub, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
+               &(z.data), &(x.data), &(y.data))
+   return z
+end
+
+function *{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_mul, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
                &(z.data), &(x.data), &(y.data))
    return z
@@ -160,6 +200,42 @@ function +{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    return z
 end
   
+function -{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
+   lena = a.data.length
+   lenb = b.data.length
+   zlen = max(lena, lenb)
+   z = Poly{T, S}(Array(T, zlen))
+   i = 1
+
+   while i <= min(lena, lenb)
+      z.data.coeffs[i] = a.data.coeffs[i] - b.data.coeffs[i]
+      i += 1
+   end
+
+   while i <= lena
+      z.data.coeffs[i] = a.data.coeffs[i]
+      i += 1
+   end
+
+   while i <= lenb
+      z.data.coeffs[i] = -b.data.coeffs[i]
+      i += 1
+   end
+
+   i -= 1
+   while i > 0 && z.data.coeffs[i] == 0
+      i -= 1
+   end
+
+   z.data.length = i
+
+   return z
+end
+
+function -{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
+  error("Not implemented yet")
+end
+  
 ###########################################################################################
 #
 #   Ad hoc binary operators
@@ -185,8 +261,6 @@ function *{T <: Ring, S}(a::Int, b::Poly{T, S})
 end
 
 function +{S}(x::Poly{ZZ, S}, y::Int)
-   len = x.data.length
-   
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_add_si, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), 
@@ -194,7 +268,17 @@ function +{S}(x::Poly{ZZ, S}, y::Int)
    return z
 end
 
+function -{S}(x::Poly{ZZ, S}, y::Int)
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_sub_si, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), 
+               &(z.data), &(x.data), y)
+   return z
+end
+
 +{S}(x::Int, y::Poly{ZZ, S}) = y + x
+
+-{S}(x::Int, y::Poly{ZZ, S}) = -(y - x)
 
 *{S}(x::Poly{ZZ, S}, y::Int) = y*x
 
@@ -278,7 +362,7 @@ function PolynomialRing(T, s)
    Base.convert(::Type{T1}, x::Integer) = T1([convert(T, x)])
    Base.promote_rule{R <: Integer}(::Type{T1}, ::Type{R}) = T1
 
-   /* (Type, gen) */
+   # (Type, gen) 
 
    return (Poly{T, S}, Poly{T, S}([T(0), T(1)]))
 end
