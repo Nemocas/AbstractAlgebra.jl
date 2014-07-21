@@ -1,5 +1,7 @@
 export Poly, PolynomialRing
 
+import Base.convert
+
 ###########################################################################################
 #
 #   Data types and memory management
@@ -82,7 +84,7 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
          bracket = isa(c, Poly) && c.data.length != 1
          if c != 0
             if i != 1
-               print(io, " + ")
+               print(io, "+")
             end
             if c != 1
                if bracket
@@ -105,7 +107,7 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
       bracket = isa(c, Poly) && c.data.length != 1
       if c != 0
          if len != 1
-            print(io, " + ")
+            print(io, "+")
          end
          if bracket
             print(io, "(")
@@ -288,10 +290,31 @@ end
 
 ###########################################################################################
 #
+#   Conversions and promotions
+#
+###########################################################################################
+
+
+###########################################################################################
+#
 #   PolynomialRing constructor
 #
 ###########################################################################################
 
-function PolynomialRing(T::Type, s::String)
-   return (Poly{T, symbol(s)}, Poly{T, symbol(s)}([T(0), T(1)]))
+function PolynomialRing(T, s)
+   S = symbol(s)
+   T1 = Poly{T, S}
+   T2 = T
+   Base.convert(::Type{T1}, x::T) = T1([x])
+   Base.promote_rule(::Type{T1}, ::Type{T}) = T1
+   P = T2.parameters
+   while length(P) > 0
+      T2 = P[1]
+      Base.convert(::Type{T1}, x::T2) = T1([convert(T, x)])
+      Base.promote_rule(::Type{T1}, ::Type{T2}) = T1
+      P = T2.parameters
+   end
+   Base.convert{R <: Integer}(::Type{T1}, x::R) = T1([convert(T, x)])
+   Base.promote_rule{R <: Integer}(::Type{T1}, ::Type{R}) = T1
+   (Poly{T, S}, Poly{T, S}([T(0), T(1)]))
 end

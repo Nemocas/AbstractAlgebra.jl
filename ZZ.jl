@@ -29,7 +29,7 @@ import Base: convert, promote_rule, show, string, parseint, serialize, deseriali
 
 export ZZ, fac, binom, isprime, fdiv, div, rem, mod, gcd, xgcd, lcm, invmod, powmod, abs, 
        divrem, isqrt, popcount, prevpow2, nextpow2, num_digits, dec, bin, oct, hex, base,
-       show
+       show, convert
 
 ###########################################################################################
 #
