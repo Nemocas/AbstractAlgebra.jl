@@ -232,7 +232,7 @@ function -{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    return z
 end
 
-function -{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
+function *{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
   error("Not implemented yet")
 end
   
