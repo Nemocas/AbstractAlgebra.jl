@@ -52,6 +52,15 @@ end
 #
 ###########################################################################################    
    
+
+function normalise{T <: Ring, S}(a::Poly{T, S}, len::Int)
+   while len > 0 && a.data.coeffs[len] == 0
+      len -= 1
+   end
+
+   return len
+end
+
 ###########################################################################################
 #
 #   String I/O
@@ -190,12 +199,7 @@ function +{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
       i += 1
    end
 
-   i -= 1
-   while i > 0 && z.data.coeffs[i] == 0
-      i -= 1
-   end
-
-   z.data.length = i
+   z.data.length = normalise(z, i - 1)
 
    return z
 end
@@ -222,18 +226,39 @@ function -{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
       i += 1
    end
 
-   i -= 1
-   while i > 0 && z.data.coeffs[i] == 0
-      i -= 1
-   end
-
-   z.data.length = i
+   z.data.length = normalise(z, i - 1)
 
    return z
 end
 
 function *{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
-  error("Not implemented yet")
+   lena = a.data.length
+   lenb = b.data.length
+
+   if lena == 0 || lenb == 0
+      return Poly{T, S}()
+   end
+
+   zlen = lena + lenb - 1
+   z = Poly{T, S}(Array(T, zlen))
+
+   for i = 1:lena
+      z.data.coeffs[i] = a.data.coeffs[i]*b.data.coeffs[1]
+   end
+
+   for i = 2:lenb
+      z.data.coeffs[lena + i - 1] = a.data.coeffs[lena]*b.data.coeffs[i]
+   end
+
+   for i = 1:lena - 1
+      for j = 2:lenb
+         z.data.coeffs[i + j - 1] += a.data.coeffs[i]*b.data.coeffs[j]
+      end
+   end
+        
+   z.data.length = normalise(z, zlen)
+
+   return z
 end
   
 ###########################################################################################
