@@ -1,4 +1,5 @@
-export Poly, PolynomialRing, coeff, zero, one, gen, is_zero, is_one, is_gen
+export Poly, PolynomialRing, coeff, zero, one, gen, is_zero, is_one, is_gen, chebyshev_t,
+       chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic
 
 import Base: convert, zero
 
@@ -511,6 +512,57 @@ function =={T<: Ring, S}(x::Poly{T, S}, y::Poly{T, S})
    return true
 end
 
+###########################################################################################
+#
+#   Special polynomials
+#
+###########################################################################################
+
+function chebyshev_t{S}(::Type{Poly{ZZ, S}}, n::Int)
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_chebyshev_t, :libflint), Void, (Ptr{fmpz_poly}, Int), &(z.data), n)
+   return z
+end
+   
+function chebyshev_u{S}(::Type{Poly{ZZ, S}}, n::Int)
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_chebyshev_u, :libflint), Void, (Ptr{fmpz_poly}, Int), &(z.data), n)
+   return z
+end
+   
+function cyclotomic{S}(::Type{Poly{ZZ, S}}, n::Int)
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_cyclotomic, :libflint), Void, (Ptr{fmpz_poly}, Int), &(z.data), n)
+   return z
+end
+   
+function swinnerton_dyer{S}(::Type{Poly{ZZ, S}}, n::Int)
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_swinnerton_dyer, :libflint), Void, 
+                                                    (Ptr{fmpz_poly}, Int), &(z.data), n)
+   return z
+end
+   
+function cos_minpoly{S}(::Type{Poly{ZZ, S}}, n::Int)
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_cos_minpoly, :libflint), Void, (Ptr{fmpz_poly}, Int), &(z.data), n)
+   return z
+end
+   
+function theta_qexp{S}(::Type{Poly{ZZ, S}}, e::Int, n::Int)
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_theta_qexp, :libflint), Void, 
+                                            (Ptr{fmpz_poly}, Int, Int), &(z.data), e, n)
+   return z
+end
+
+function eta_qexp{S}(::Type{Poly{ZZ, S}}, e::Int, n::Int)
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_eta_qexp, :libflint), Void, 
+                                            (Ptr{fmpz_poly}, Int, Int), &(z.data), e, n)
+   return z
+end
+   
 ###########################################################################################
 #
 #   PolynomialRing constructor
