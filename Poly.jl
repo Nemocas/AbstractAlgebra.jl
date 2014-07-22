@@ -41,6 +41,7 @@ type Poly{T <: Ring, Symbol} <: Ring
    Poly(a::Integer) = a == 0 ? Poly{T, Symbol}(Array(T, 0)) : Poly{T, Symbol}([T(a)])
    Poly(a::T) = Poly{T, Symbol}([a])
    Poly(a::Poly{T, Symbol}) = a
+   Poly{R <: Ring}(a::R) = convert(Poly{T, Symbol}, a)
 end
 
 function _fmpz_poly_clear_fn(a :: Poly{ZZ})
@@ -474,8 +475,41 @@ function =={S}(x::Poly{ZZ, S}, y::Int)
    end 
 end
 
+function =={S}(x::Poly{ZZ, S}, y::ZZ) 
+   if x.data.length > 1
+      return false
+   elseif x.data.length == 1 
+      z = ZZ();
+      ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
+                (Ptr{ZZ}, Ptr{fmpz_poly}, Int), 
+               &z, &(x.data), 0)
+      return z == y
+   else
+      return y == 0
+   end 
+end
+
 =={T <: Ring, S}(x::Poly{T, S}, y::Int) = ((x.data.length == 0 && y == 0)
                                         || (x.data.length == 1 && x.data.coeffs[1] == y))
+
+=={T <: Ring, S}(x::Poly{T, S}, y::ZZ) = ((x.data.length == 0 && y == 0)
+                                        || (x.data.length == 1 && x.data.coeffs[1] == y))
+
+=={S}(x::Poly{ZZ, S}, y::Poly{ZZ, S}) = ccall((:fmpz_poly_equal, :libflint), Bool, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}), &(x.data), &(y.data))
+
+function =={T<: Ring, S}(x::Poly{T, S}, y::Poly{T, S})
+   if x.data.length != y.data.length
+      return false
+   else
+      for i = 1:x.data.length
+         if x.data.coeffs[i] != y.data.coeffs[i]
+            return false
+         end
+      end
+   end
+   return true
+end
 
 ###########################################################################################
 #
