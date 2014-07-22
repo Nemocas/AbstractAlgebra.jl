@@ -275,12 +275,30 @@ end
 function *{S}(x::Int, y::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_scalar_mul_si, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly},Int), 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), 
                &(z.data), &(y.data), x)
    return z
 end
 
+function *{S}(x::ZZ, y::Poly{ZZ, S})
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_scalar_mul_fmpz, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{ZZ}), 
+               &(z.data), &(y.data), &x)
+   return z
+end
+
 function *{T <: Ring, S}(a::Int, b::Poly{T, S})
+   len = b.data.length
+   z = Poly{T, S}(Array(T, len))
+   for i = 1:len
+      z.data.coeffs[i] = a*b.data.coeffs[i]
+   end
+   z.data.length = len
+   return z
+end
+
+function *{T <: Ring, S}(a::ZZ, b::Poly{T, S})
    len = b.data.length
    z = Poly{T, S}(Array(T, len))
    for i = 1:len
@@ -298,11 +316,27 @@ function +{S}(x::Poly{ZZ, S}, y::Int)
    return z
 end
 
+function +{S}(x::Poly{ZZ, S}, y::ZZ)
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_add_fmpz, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{ZZ}), 
+               &(z.data), &(x.data), &y)
+   return z
+end
+
 function -{S}(x::Poly{ZZ, S}, y::Int)
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_sub_si, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), 
                &(z.data), &(x.data), y)
+   return z
+end
+
+function -{S}(x::Poly{ZZ, S}, y::ZZ)
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_sub_fmpz, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{ZZ}), 
+               &(z.data), &(x.data), &y)
    return z
 end
 
@@ -314,9 +348,25 @@ function -{S}(x::Int, y::Poly{ZZ, S})
    return z
 end
 
+function -{S}(x::ZZ, y::Poly{ZZ, S})
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_fmpz_sub, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{ZZ}, Ptr{fmpz_poly}), 
+               &(z.data), &x, &(y.data))
+   return z
+end
+
 +{S}(x::Int, y::Poly{ZZ, S}) = y + x
 
++{S}(x::ZZ, y::Poly{ZZ, S}) = y + x
+
 *{S}(x::Poly{ZZ, S}, y::Int) = y*x
+
+*{S}(x::Poly{ZZ, S}, y::ZZ) = y*x
+
+*{T <: Ring, S}(a::Poly{T, S}, b::Int) = b*a
+
+*{T <: Ring, S}(a::Poly{T, S}, b::ZZ) = b*a
 
 ###########################################################################################
 #
