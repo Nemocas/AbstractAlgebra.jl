@@ -123,6 +123,11 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
    end
 end
 
+function show{T <: Ring, S}(io::IO, ::Type{Poly{T, S}})
+   print(io, "Univariate polynomial ring in ", string(S), " over ")
+   show(io, T)
+end
+
 ###########################################################################################
 #
 #   Unary operations
@@ -180,8 +185,8 @@ end
 function +{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    lena = a.data.length
    lenb = b.data.length
-   zlen = max(lena, lenb)
-   z = Poly{T, S}(Array(T, zlen))
+   lenz = max(lena, lenb)
+   z = Poly{T, S}(Array(T, lenz))
    i = 1
 
    while i <= min(lena, lenb)
@@ -207,8 +212,8 @@ end
 function -{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    lena = a.data.length
    lenb = b.data.length
-   zlen = max(lena, lenb)
-   z = Poly{T, S}(Array(T, zlen))
+   lenz = max(lena, lenb)
+   z = Poly{T, S}(Array(T, lenz))
    i = 1
 
    while i <= min(lena, lenb)
@@ -239,8 +244,8 @@ function *{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
       return Poly{T, S}()
    end
 
-   zlen = lena + lenb - 1
-   z = Poly{T, S}(Array(T, zlen))
+   lenz = lena + lenb - 1
+   z = Poly{T, S}(Array(T, lenz))
 
    for i = 1:lena
       z.data.coeffs[i] = a.data.coeffs[i]*b.data.coeffs[1]
@@ -256,7 +261,7 @@ function *{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
       end
    end
         
-   z.data.length = normalise(z, zlen)
+   z.data.length = normalise(z, lenz)
 
    return z
 end
