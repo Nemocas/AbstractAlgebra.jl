@@ -1,6 +1,6 @@
-export Poly, PolynomialRing, coeff
+export Poly, PolynomialRing, coeff, zero, one, gen, is_zero, is_one, is_gen
 
-import Base.convert
+import Base: convert, zero
 
 ###########################################################################################
 #
@@ -40,6 +40,7 @@ type Poly{T <: Ring, Symbol} <: Ring
    Poly() = Poly{T, Symbol}(Array(T, 0))
    Poly(a::Integer) = a == 0 ? Poly{T, Symbol}(Array(T, 0)) : Poly{T, Symbol}([T(a)])
    Poly(a::T) = Poly{T, Symbol}([a])
+   Poly(a::Poly{T, Symbol}) = a
 end
 
 function _fmpz_poly_clear_fn(a :: Poly{ZZ})
@@ -69,6 +70,30 @@ function coeff{S}(x::Poly{ZZ, S}, n::Int)
 end
 
 coeff{T <: Ring, S}(a::Poly{T, S}, n::Int) = n >= a.data.length ? 0 : a.data.coeffs[n + 1]
+
+is_zero{S}(x::Poly{ZZ, S}) = x.data.length == 0
+
+is_zero{T <: Ring, S}(a::Poly{T, S}) = a.data.length == 0
+
+is_one{S}(x::Poly{ZZ, S}) = ccall((:__fmpz_poly_is_one, :libflint), Int, (Ptr{fmpz_poly},), &(x.data))
+
+is_one{T <: Ring, S}(a::Poly{T, S}) = a.data.length == 1 && a.data.coeffs[1] == 1
+
+is_gen{S}(x::Poly{ZZ, S}) = ccall((:__fmpz_poly_is_x, :libflint), Int, (Ptr{fmpz_poly},), &(x.data))
+
+is_gen{T <: Ring, S}(a::Poly{T, S}) = a.data.length == 2 && a.data.coeffs[1] == 0 && a.data.coeffs[2] == 1
+
+zero{S}(::Type{Poly{ZZ, S}}) = Poly{ZZ, S}(0)
+
+zero{T <: Ring, S}(::Type{Poly{T, S}}) = Poly{T, S}(0)
+
+one{S}(::Type{Poly{ZZ, S}}) = Poly{ZZ, S}(1)
+
+one{T <: Ring, S}(::Type{Poly{T, S}}) = Poly{T, S}(1)
+
+gen{S}(::Type{Poly{ZZ, S}}) = Poly{ZZ, S}([ZZ(0), 1])
+
+gen{T <: Ring, S}(::Type{Poly{T, S}}) = Poly{T, S}([T(0), T(1)])
 
 ###########################################################################################
 #

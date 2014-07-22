@@ -29,7 +29,7 @@ import Base: convert, promote_rule, show, string, parseint, serialize, deseriali
 
 export ZZ, fac, binom, isprime, fdiv, div, rem, mod, gcd, xgcd, lcm, invmod, powmod, abs, 
        divrem, isqrt, popcount, prevpow2, nextpow2, num_digits, dec, bin, oct, hex, base,
-       show, convert
+       show, convert, is_one, is_zero, one, zero
 
 ###########################################################################################
 #
@@ -145,6 +145,28 @@ function ZZ(x::Integer)
         return b
     end
 end
+
+###########################################################################################
+#
+#   Basic manipulation
+#
+###########################################################################################
+
+is_one(a::ZZ) = a == 1
+
+is_one(a::Int) = a == 1
+
+is_zero(a::ZZ) = a == 0
+
+is_zero(a::Int) = a == 0
+
+one(::Type{ZZ}) = ZZ(1)
+
+one(::Type{Int}) = 1
+
+Base.zero(::Type{ZZ}) = ZZ(0)
+
+# zero(::Type{Int}) already defined in Base
 
 ###########################################################################################
 #
