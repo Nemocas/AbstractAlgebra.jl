@@ -306,9 +306,15 @@ function -{S}(x::Poly{ZZ, S}, y::Int)
    return z
 end
 
-+{S}(x::Int, y::Poly{ZZ, S}) = y + x
+function -{S}(x::Int, y::Poly{ZZ, S})
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_si_sub, :libflint), Void, 
+                (Ptr{fmpz_poly}, Int, Ptr{fmpz_poly}), 
+               &(z.data), x, &(y.data))
+   return z
+end
 
--{S}(x::Int, y::Poly{ZZ, S}) = -(y - x)
++{S}(x::Int, y::Poly{ZZ, S}) = y + x
 
 *{S}(x::Poly{ZZ, S}, y::Int) = y*x
 
@@ -328,6 +334,7 @@ function ^{S}(x::Poly{ZZ, S}, y::Int)
 end
 
 function ^{T <: Ring, S}(a::Poly{T, S}, b::Int)
+   # special case powers of x for constructing polynomials efficiently
    if a.data.length == 2 && a.data.coeffs[1] == 0 && a.data.coeffs[2] == 1
       z = Poly{T, S}(Array(T, b + 1))
       z.data.coeffs[b + 1] = a.data.coeffs[2]
@@ -336,8 +343,25 @@ function ^{T <: Ring, S}(a::Poly{T, S}, b::Int)
       end
       z.data.length = b + 1
       return z
+   elseif a.data.length == 0
+      return Poly{T, S}()
+   elseif a.data.length == 1
+      return Poly{T, S}([a.data.coeffs[0]^b])
    else
-      error("Not implemented yet")
+      bit = ~((~uint(0)) >> 1)
+      while (int(bit) & b) == 0
+         bit >>= 1
+      end
+      z = a
+      bit >>= 1
+      while bit !=0
+         z = z*z
+         if (int(bit) & b) != 0
+            z *= a
+         end
+         bit >>= 1
+      end
+      return z
    end
 end
    
