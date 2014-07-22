@@ -1,4 +1,4 @@
-export Poly, PolynomialRing
+export Poly, PolynomialRing, coeff
 
 import Base.convert
 
@@ -38,7 +38,7 @@ type Poly{T <: Ring, Symbol} <: Ring
    end   
 
    Poly() = Poly{T, Symbol}(Array(T, 0))
-   Poly(a::Integer) = Poly{T, Symbol}([T(a)])
+   Poly(a::Integer) = a == 0 ? Poly{T, Symbol}(Array(T, 0)) : Poly{T, Symbol}([T(a)])
    Poly(a::T) = Poly{T, Symbol}([a])
 end
 
@@ -52,7 +52,6 @@ end
 #
 ###########################################################################################    
    
-
 function normalise{T <: Ring, S}(a::Poly{T, S}, len::Int)
    while len > 0 && a.data.coeffs[len] == 0
       len -= 1
@@ -61,6 +60,16 @@ function normalise{T <: Ring, S}(a::Poly{T, S}, len::Int)
    return len
 end
 
+# Julia wants "objects" to be immutable, so set_coeff is not provided
+
+function coeff{S}(x::Poly{ZZ, S}, n::Int)
+   z = ZZ()
+   ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, (Ptr{ZZ}, Ptr{fmpz_poly}, Int), &z, &(x.data), n)
+   return z
+end
+
+coeff{T <: Ring, S}(a::Poly{T, S}, n::Int) = n >= a.data.length ? 0 : a.data.coeffs[n + 1]
+
 ###########################################################################################
 #
 #   String I/O
@@ -68,12 +77,16 @@ end
 ###########################################################################################
 
 function show{S}(io::IO, x::Poly{ZZ, S})
-   cstr = ccall((:fmpz_poly_get_str_pretty, :libflint), Ptr{Uint8}, 
+   if x.data.length == 0
+      print(io, "0")
+   else
+      cstr = ccall((:fmpz_poly_get_str_pretty, :libflint), Ptr{Uint8}, 
                 (Ptr{fmpz_poly}, Ptr{Uint8}), &(x.data), bytestring(string(S)))
 
-   print(io, bytestring(cstr))
+      print(io, bytestring(cstr))
 
-   ccall((:flint_free, :libflint), Void, (Ptr{Uint8},), cstr)
+      ccall((:flint_free, :libflint), Void, (Ptr{Uint8},), cstr)
+   end
 end
 
 function show{T <: Ring, S}(io::IO, x::Poly{T, S})
