@@ -519,6 +519,15 @@ end
 #
 ###########################################################################################
 
+function divexact{T <: Ring, S}(a::Poly{T, S}, b::T)
+   z = Poly{T, S}(Array(T, a.data.length))
+   for i = 1:a.data.length
+      z.data.coeffs[i] = divexact(a.data.coeffs[i], b)
+   end
+   z.data.length = a.data.length
+   return z
+end
+
 function divexact{S}(x::Poly{ZZ, S}, y::ZZ)
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_scalar_divexact_fmpz, :libflint), Void, 
@@ -527,17 +536,11 @@ function divexact{S}(x::Poly{ZZ, S}, y::ZZ)
    return z
 end
 
-function divexact{T <: Ring, S}(a::Poly{T, S}, b::T)
-   z = Poly{T, S}(Array(T, a.data.length))
-   for i = 1:a.data.length
-      z.data.coeffs[i] = divexact(a.data.coeffs[i], y)
-   end
-   z.data.length = a.data.length
-   return z
-end
-
 function divexact{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
-   lenq = f.data.length - g.data.length
+   if f == 0
+      return zero(Poly{T, S})
+   end
+   lenq = f.data.length - g.data.length + 1
    q = Poly{T, S}(Array(T, lenq))
    for i = 1:lenq
       q.data.coeffs[i] = zero(T)
@@ -554,13 +557,15 @@ function divexact{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
 end
 
 function divexact{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
+   if x == 0
+      return zero(Poly{ZZ, S})
+   end
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_div, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
                &(z.data),  &(x.data), &(y.data))
    return z
 end
-
 
 ###########################################################################################
 #
@@ -603,15 +608,17 @@ end
 ###########################################################################################
 
 function gcd{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
-   if a.data.length < b.data.length
+   if a.data.length > b.data.length
       (a, b) = (b, a)
    end
    if b == 0
       return a
    end
    g = gcd(content(a), content(b))
+   a = divexact(a, g)
+   b = divexact(b, g)
    while a != 0
-      (a, b) = (pseudo_rem(a, b), a)
+      (a, b) = (pseudo_rem(b, a), a)
    end
    return g*primitive_part(b)
 end
@@ -642,12 +649,7 @@ end
 
 function primitive_part{T <: Ring, S}(a::Poly{T, S})
    d = content(a)
-   z = Poly{T, S}(Array(T, a.data.length))
-   for i = 1:a.data.length
-      z.data.coeffs[i] = divexact(a.data.coeffs[i], d)
-   end
-   z.data.length = a.data.length
-   return z
+   return divexact(a, d)
 end
 
 function primitive_part{S}(x::Poly{ZZ, S})
