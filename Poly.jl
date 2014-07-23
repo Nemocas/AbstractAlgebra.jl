@@ -1,5 +1,6 @@
 export Poly, PolynomialRing, coeff, zero, one, gen, is_zero, is_one, is_gen, chebyshev_t,
-       chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic
+       chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic,
+       pseudo_rem, pseudo_divrem, primitive_part, content, divexact
 
 import Base: convert, zero
 
@@ -510,6 +511,151 @@ function =={T<: Ring, S}(x::Poly{T, S}, y::Poly{T, S})
       end
    end
    return true
+end
+
+###########################################################################################
+#
+#   Division
+#
+###########################################################################################
+
+function divexact{S}(x::Poly{ZZ, S}, y::ZZ)
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_scalar_divexact_fmpz, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{ZZ}), 
+               &(z.data),  &(x.data), &y)
+   return z
+end
+
+function divexact{T <: Ring, S}(a::Poly{T, S}, b::T)
+   z = Poly{T, S}(Array(T, a.data.length))
+   for i = 1:a.data.length
+      z.data.coeffs[i] = divexact(a.data.coeffs[i], y)
+   end
+   z.data.length = a.data.length
+   return z
+end
+
+function divexact{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
+   lenq = f.data.length - g.data.length
+   q = Poly{T, S}(Array(T, lenq))
+   for i = 1:lenq
+      q.data.coeffs[i] = zero(T)
+   end
+   x = gen(Poly{T, S})
+   leng = g.data.length
+   while f.data.length >= leng
+      lenf = f.data.length
+      q.data.coeffs[lenf - leng + 1] = divexact(f.data.coeffs[lenf], g.data.coeffs[leng])
+      f = f - q.data.coeffs[lenf - leng + 1]*g*x^(lenf - leng)
+   end
+   q.data.length = lenq
+   return q
+end
+
+function divexact{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_div, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
+               &(z.data),  &(x.data), &(y.data))
+   return z
+end
+
+
+###########################################################################################
+#
+#   Pseudodivision
+#
+###########################################################################################
+
+function pseudo_rem{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
+   z = Poly{ZZ, S}()
+   d = 0
+   ccall((:fmpz_poly_pseudo_rem, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{Int}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
+               &(z.data), &d, &(x.data), &(y.data))
+   return z
+end
+
+function pseudo_divrem{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
+   q = Poly{ZZ, S}()
+   r = Poly{ZZ, S}()
+   d = 0
+   ccall((:fmpz_poly_pseudo_divrem_divconquer, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{Int}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
+               &(q.data), &(r.data), &d, &(x.data), &(y.data))
+   return (q, r)
+end
+
+function pseudo_rem{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
+   b = g.data.coeffs[g.data.length]
+   x = gen(Poly{T, S})
+   while f.data.length >= g.data.length
+      f = f*b - f.data.coeffs[f.data.length]*g*x^(f.data.length - g.data.length)
+   end
+   return f
+end
+
+###########################################################################################
+#
+#   GCD
+#
+###########################################################################################
+
+function gcd{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
+   if a.data.length < b.data.length
+      (a, b) = (b, a)
+   end
+   if b == 0
+      return a
+   end
+   g = gcd(content(a), content(b))
+   while a != 0
+      (a, b) = (pseudo_rem(a, b), a)
+   end
+   return g*primitive_part(b)
+end
+
+function gcd{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_gcd, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
+               &(z.data), &(x.data), &(y.data))
+   return z
+end
+
+function content{T <: Ring, S}(a::Poly{T, S})
+   z = a.data.coeffs[1]
+   for i = 2:a.data.length
+      z = gcd(z, a.data.coeffs[i])
+   end
+   return z
+end
+
+function content{S}(x::Poly{ZZ, S})
+   z = ZZ()
+   ccall((:fmpz_poly_content, :libflint), Void, 
+                (Ptr{ZZ}, Ptr{fmpz_poly}), 
+               &z, &(x.data))
+   return z
+end
+
+function primitive_part{T <: Ring, S}(a::Poly{T, S})
+   d = content(a)
+   z = Poly{T, S}(Array(T, a.data.length))
+   for i = 1:a.data.length
+      z.data.coeffs[i] = divexact(a.data.coeffs[i], d)
+   end
+   z.data.length = a.data.length
+   return z
+end
+
+function primitive_part{S}(x::Poly{ZZ, S})
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_primitive_part, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
+               &(z.data), &(x.data))
+   return z
 end
 
 ###########################################################################################

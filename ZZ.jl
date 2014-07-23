@@ -29,7 +29,7 @@ import Base: convert, promote_rule, show, string, parseint, serialize, deseriali
 
 export ZZ, fac, binom, isprime, fdiv, div, rem, mod, gcd, xgcd, lcm, invmod, powmod, abs, 
        divrem, isqrt, popcount, prevpow2, nextpow2, num_digits, dec, bin, oct, hex, base,
-       show, convert, is_one, is_zero, one, zero
+       show, convert, is_one, is_zero, one, zero, divexact
 
 ###########################################################################################
 #
@@ -444,6 +444,12 @@ function divrem(x::ZZ, y::ZZ)
     z2 = ZZ()
     ccall((:fmpz_tdiv_qr, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z1, &z2, &x, &y)
     z1, z2
+end
+
+function divexact(x::ZZ, y::ZZ)
+    z = ZZ()
+    ccall((:fmpz_divexact, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y)
+    z
 end
 
 function isqrt(x::ZZ)
