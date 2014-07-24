@@ -1,6 +1,6 @@
 export Poly, PolynomialRing, coeff, zero, one, gen, is_zero, is_one, is_gen, chebyshev_t,
        chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic,
-       pseudo_rem, pseudo_divrem, primitive_part, content, divexact
+       pseudo_rem, pseudo_divrem, primitive_part, content, divexact, subst
 
 import Base: convert, zero
 
@@ -659,6 +659,68 @@ function primitive_part{S}(x::Poly{ZZ, S})
                &(z.data), &(x.data))
    return z
 end
+
+###########################################################################################
+#
+#   Evaluation/composition
+#
+###########################################################################################
+
+function subst{S}(x::Poly{ZZ, S}, y::ZZ)
+   z = ZZ()
+   ccall((:fmpz_poly_evaluate_fmpz, :libflint), Void, 
+                (Ptr{ZZ}, Ptr{fmpz_poly}, Ptr{ZZ}), 
+               &z, &(x.data), &y)
+   return z
+end
+
+function subst{S}(x::Poly{ZZ, S}, y::Int)
+   z = ZZ()
+   ccall((:fmpz_poly_evaluate_fmpz, :libflint), Void, 
+                (Ptr{ZZ}, Ptr{fmpz_poly}, Ptr{ZZ}), 
+               &z, &(x.data), &ZZ(y))
+   return z
+end
+
+function subst{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_compose, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
+               &(z.data), &(x.data), &(y.data))
+   return z
+end
+
+function subst{T <: Ring, S}(a::Poly{T, S}, b::T)
+   i = a.data.length
+   if i == 0
+       return zero(T)
+   end
+   z = a.data.coeffs[i]
+   while i > 1
+      i -= 1
+      z = z*b + a.data.coeffs[i]
+   end
+   return z
+end
+
+function subst{T <: Ring, S}(a::Poly{T, S}, b::Int)
+   return subst(a, convert(T, b))
+end
+
+function subst{T <: Ring, S, R <: Ring}(a::Poly{T, S}, b::R)
+   i = a.data.length
+   if i == 0
+       return zero(T)
+   end
+   z = a.data.coeffs[i]
+   while i > 1
+      i -= 1
+      z = z*b + a.data.coeffs[i]
+   end
+   return z
+end
+
+
 
 ###########################################################################################
 #
