@@ -1,7 +1,7 @@
 export Poly, PolynomialRing, coeff, zero, one, gen, is_zero, is_one, is_gen, chebyshev_t,
        chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic,
        pseudo_rem, pseudo_divrem, primitive_part, content, divexact, subst, deriv,
-       resultant, lead, discriminant
+       resultant, lead, discriminant, bezout
 
 import Base: convert, zero
 
@@ -440,9 +440,11 @@ function ^{T <: Ring, S}(a::Poly{T, S}, b::Int)
       z.data.length = b + 1
       return z
    elseif a.data.length == 0
-      return Poly{T, S}()
+      return zero(Poly{T, S})
    elseif a.data.length == 1
-      return Poly{T, S}([a.data.coeffs[0]^b])
+      return Poly{T, S}([a.data.coeffs[1]^b])
+   elseif b == 0
+      return one(Poly{T, S})
    else
       bit = ~((~uint(0)) >> 1)
       while (int(bit) & b) == 0
@@ -604,6 +606,28 @@ function pseudo_rem{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
       f = f*b - f.data.coeffs[f.data.length]*g*x^(f.data.length - g.data.length)
    end
    return f
+end
+
+function pseudo_divrem{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
+   if f.data.length < g.data.length
+      return zero(Poly{T, S}), f
+   end
+   lenq = f.data.length - g.data.length + 1
+   q = Poly{T, S}(Array(T, lenq))
+   for i = 1:lenq
+      q.data.coeffs[i] = zero(T)
+   end
+   b = g.data.coeffs[g.data.length]
+   x = gen(Poly{T, S})
+   while f.data.length >= g.data.length
+      for i = f.data.length - g.data.length + 2:lenq
+         q.data.coeffs[i] *= b
+      end
+      q.data.coeffs[f.data.length - g.data.length + 1] = f.data.coeffs[f.data.length]
+      f = f*b - f.data.coeffs[f.data.length]*g*x^(f.data.length - g.data.length)
+   end
+   q.data.length = normalise(q, lenq)
+   return q, f
 end
 
 ###########################################################################################
@@ -780,7 +804,7 @@ function resultant{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    lena = a.data.length
    lenb = b.data.length
    if lenb == 1
-      return convert(Poly{T, S}, b.data.coeffs[1]^(lena - 1))
+      return b.data.coeffs[1]^(lena - 1)
    end
    c1 = content(a)
    c2 = content(b)
@@ -832,6 +856,84 @@ function discriminant{T <: Ring, S}(a::Poly{T, S})
    end
    mod4 = (a.data.length + 3)%4 # degree mod 4
    return mod4 == 2 || mod4 == 3 ? -z : z
+end
+
+###########################################################################################
+#
+#   Bezout
+#
+###########################################################################################
+
+function bezout{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
+   z = ZZ()
+   u = Poly{ZZ, S}()
+   v = Poly{ZZ, S}()
+   ccall((:fmpz_poly_xgcd_modular, :libflint), Void, 
+                (Ptr{ZZ}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
+               &z, &(u.data), &(v.data), &(x.data), &(y.data))
+   return (z, u, v)
+end
+
+function bezout{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
+   if a.data.length == 0 || b.data.length == 0
+      return zero(T), zero(Poly{T, S}), zero(Poly{T, S})
+   end
+   sgn = 1
+   swap = false
+   if a.data.length < b.data.length
+      a, b = b, a
+      swap = true
+      if iseven(a.data.length) && iseven(b.data.length)
+         sgn = -sgn
+      end
+   end
+   lena = a.data.length
+   lenb = b.data.length
+   if lenb == 1
+      s1 = zero(T)
+      t1 = one(T)
+      r1 = b.data.coeffs[1]^(lena - 1)
+      if swap
+         s1, t1 = t1, s1
+      end
+      if sgn
+         s1, t1, r1 = -s1, -t1, -r1
+      end
+      return r1, convert(Poly{T, S}, s1), convert(Poly{T, S}, t1)
+   end
+   c1 = content(a)
+   c2 = content(b)
+   A = divexact(a, c1)
+   B = divexact(b, c2)
+   g = one(T)
+   h = one(T)
+   u1, u2 = one(Poly{T, S}), zero(Poly{T, S})
+   v1, v2 = zero(Poly{T, S}), one(Poly{T, S})
+   while lenb > 1
+      d = lena - lenb
+      if iseven(lena) && iseven(lenb)
+         sgn = -sgn
+      end
+      (Q, B), A = pseudo_divrem(A, B), B
+      lena = lenb
+      lenb = B.data.length
+      if lenb == 0
+         return zero(T), zero(Poly{T, S}), zero(Poly{T, S})
+      end
+      s = h^d
+      B = divexact(B, g*s)
+      t = lead(A)^(d + 1)
+      u2, u1 = divexact(u1*t - Q*u2, g*s), u2
+      v2, v1 = divexact(v1*t - Q*v2, g*s), v2 
+      g = lead(A)
+      h = divexact(h*g^d, s)
+   end
+   s = divexact(h*lead(B)^(lena - 1), h^(lena - 1))
+   res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
+   if swap
+      u2, v2 = v2, u2
+   end
+   return res, u2, v2
 end
 
 ###########################################################################################
