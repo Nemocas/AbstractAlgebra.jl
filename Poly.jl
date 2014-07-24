@@ -1,6 +1,7 @@
 export Poly, PolynomialRing, coeff, zero, one, gen, is_zero, is_one, is_gen, chebyshev_t,
        chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic,
-       pseudo_rem, pseudo_divrem, primitive_part, content, divexact, subst
+       pseudo_rem, pseudo_divrem, primitive_part, content, divexact, subst, deriv,
+       resultant, lead
 
 import Base: convert, zero
 
@@ -73,6 +74,10 @@ function coeff{S}(x::Poly{ZZ, S}, n::Int)
 end
 
 coeff{T <: Ring, S}(a::Poly{T, S}, n::Int) = n >= a.data.length ? 0 : a.data.coeffs[n + 1]
+
+lead{S}(x::Poly{ZZ, S}) = x.data.length == 0 ? zero(ZZ) : coeff(x, x.data.length - 1)
+
+lead{T <: Ring, S}(a::Poly{T, S}) = a.data.length == 0 ? zero(T) : a.data.coeffs[a.data.length]
 
 is_zero{S}(x::Poly{ZZ, S}) = x.data.length == 0
 
@@ -720,7 +725,88 @@ function subst{T <: Ring, S, R <: Ring}(a::Poly{T, S}, b::R)
    return z
 end
 
+###########################################################################################
+#
+#   Derivative
+#
+###########################################################################################
 
+function deriv{S}(x::Poly{ZZ, S})
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_derivative, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
+               &(z.data), &(x.data))
+   return z
+end
+
+function deriv{T <: Ring, S}(a::Poly{T, S})
+   if a == 0
+      return zero(Poly{T, S})
+   end
+   len = a.data.length
+   z = Poly{T, S}(Array(T, len - 1))
+   for i = 1:len - 1
+      z.data.coeffs[i] = i*a.data.coeffs[i + 1]
+   end
+   z.data.length = normalise(z, len - 1)
+   return z
+end
+
+###########################################################################################
+#
+#   Resultant
+#
+###########################################################################################
+
+function resultant{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
+   z = ZZ()
+   ccall((:fmpz_poly_resultant, :libflint), Void, 
+                (Ptr{ZZ}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
+               &z, &(x.data), &(y.data))
+   return z
+end
+
+function resultant{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
+   if a.data.length == 0 || b.data.length == 0
+      return zero(T)
+   end
+   sgn = 1
+   if a.data.length < b.data.length
+      a, b = b, a
+      if iseven(a.data.length) && iseven(b.data.length)
+         sgn = -sgn
+      end
+   end
+   lena = a.data.length
+   lenb = b.data.length
+   if lenb == 1
+      return convert(Poly{T, S}, b.data.coeffs[1]^(lena - 1))
+   end
+   c1 = content(a)
+   c2 = content(b)
+   A = divexact(a, c1)
+   B = divexact(b, c2)
+   g = one(T)
+   h = one(T)
+   while lenb > 1
+      d = lena - lenb
+      if iseven(lena) && iseven(lenb)
+         sgn = -sgn
+      end
+      B, A = pseudo_rem(A, B), B
+      lena = lenb
+      lenb = B.data.length
+      if lenb == 0
+         return zero(T) 
+      end
+      s = h^d
+      B = divexact(B, g*s)
+      g = lead(A)
+      h = divexact(h*g^d, s)
+   end
+   s = divexact(h*lead(B)^(lena - 1), h^(lena - 1))
+   res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
+end
 
 ###########################################################################################
 #
