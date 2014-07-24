@@ -1,7 +1,7 @@
 export Poly, PolynomialRing, coeff, zero, one, gen, is_zero, is_one, is_gen, chebyshev_t,
        chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic,
        pseudo_rem, pseudo_divrem, primitive_part, content, divexact, subst, deriv,
-       resultant, lead
+       resultant, lead, discriminant
 
 import Base: convert, zero
 
@@ -806,6 +806,32 @@ function resultant{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    end
    s = divexact(h*lead(B)^(lena - 1), h^(lena - 1))
    res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
+end
+
+###########################################################################################
+#
+#   Discriminant
+#
+###########################################################################################
+
+function discriminant{S}(x::Poly{ZZ, S})
+   z = ZZ()
+   ccall((:fmpz_poly_discriminant, :libflint), Void, 
+                (Ptr{ZZ}, Ptr{fmpz_poly}), 
+               &z, &(x.data))
+   return z
+end
+
+function discriminant{T <: Ring, S}(a::Poly{T, S})
+   d = deriv(a)
+   z = resultant(a, d)
+   if a.data.length - d.data.length == 1
+      z = divexact(z, lead(a))
+   else
+      z = z*lead(a)^(a.data.length - d.data.length - 2)
+   end
+   mod4 = (a.data.length + 3)%4 # degree mod 4
+   return mod4 == 2 || mod4 == 3 ? -z : z
 end
 
 ###########################################################################################
