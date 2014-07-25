@@ -25,11 +25,16 @@
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-import Base: convert, promote_rule, show, string, parseint, serialize, deserialize
+import Base: convert, promote_rule, show, string, parseint, serialize, deserialize,
+             base, bin, dec, oct, hex, gcd, div
 
-export ZZ, fac, binom, isprime, fdiv, div, rem, mod, gcd, xgcd, lcm, invmod, powmod, abs, 
-       divrem, isqrt, popcount, prevpow2, nextpow2, num_digits, dec, bin, oct, hex, base,
-       show, convert, is_one, is_zero, one, zero, divexact
+export ZZ, fac, binom, isprime, fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm, invmod, 
+       powmod, abs, divrem, isqrt, popcount, prevpow2, nextpow2, ndigits, dec, bin, oct, 
+       hex, base, show, convert, one, zero, divexact, fits, sign, bits, deepcopy,
+       tdivpow2, fdivpow2, cdivpow2, flog, clog, cmpabs, clrbit!, setbit!, combit!,
+       crt, divisible, divisorlenstra, fdivrem, tdivrem, fmodpow2, gcdinv, isprobabprime,
+       issquare, jacobi, remove, root, size, isqrtrem, sqrtmod, trailing_zeros, sigma,
+       eulerphi, fib, moebiusmu, primorial, risingfac
 
 ###########################################################################################
 #
@@ -53,7 +58,7 @@ end
 #
 ###########################################################################################
 
-# The ZZ datatype. It is a member of Julia's Integer abstract type
+# The ZZ datatype. It is a member of the Ring abstract type
 
 type ZZ <: Ring
     d::Clong
@@ -82,9 +87,10 @@ ZZ(s::String) = parseint(ZZ, s)
 
 # Turn a string into a ZZ
 
-function parseint_nocheck(::Type{ZZ}, s::String, base::Int)
+function Base.parseint(::Type{ZZ}, s::String, base::Int)
     s = bytestring(s)
-    sgn, base, i = Base.parseint_preamble(true, s, base)
+    sgn = s[1] == '-' ? -1 : 1
+    i = 1 + (sgn == -1)
     z = ZZ()
     err = ccall((:fmpz_set_str, :libflint),
                Int32, (Ptr{ZZ}, Ptr{Uint8}, Int32),
@@ -152,14 +158,12 @@ end
 #
 ###########################################################################################
 
-is_one(a::ZZ) = a == 1
-
-is_one(a::Int) = a == 1
-
-is_zero(a::ZZ) = a == 0
-
-is_zero(a::Int) = a == 0
-
+function deepcopy(a::ZZ)
+   z = ZZ()
+   ccall((:fmpz_set, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}), &z, &a)
+   return z
+end
+ 
 one(::Type{ZZ}) = ZZ(1)
 
 one(::Type{Int}) = 1
@@ -167,6 +171,14 @@ one(::Type{Int}) = 1
 Base.zero(::Type{ZZ}) = ZZ(0)
 
 # zero(::Type{Int}) already defined in Base
+
+sign(a::ZZ) = int(ccall((:fmpz_sgn, :libflint), Cint, (Ptr{ZZ},), &a))
+
+fits(::Type{Int}, a::ZZ) = ccall((:fmpz_fits_si, :libflint), Bool, (Ptr{ZZ},), &a)
+
+fits(::Type{Uint}, a::ZZ) = sign(a) < 0 ? false : ccall((:fmpz_abs_fits_ui, :libflint), Bool, (Ptr{ZZ},), &a)
+
+size(a::ZZ) = int(ccall((:fmpz_size, :libflint), Cint, (Ptr{ZZ},), &a))
 
 ###########################################################################################
 #
@@ -277,10 +289,11 @@ deserialize(s, ::Type{ZZ}) = Base.parseint_nocheck(ZZ, deserialize(s), 62)
 #
 ###########################################################################################
 
-# Metaprogram to define functions +, -, *, fdiv, div, mod, rem, gcd, lcm, &, |, $
+# Metaprogram to define functions +, -, *, %, fdiv, cdiv, tdiv, div, mod, rem, gcd, lcm, 
+#                                 &, |, $
 
 for (fJ, fC) in ((:+, :add), (:-,:sub), (:*, :mul),
-                 (:fdiv, :fdiv_q), (:div, :tdiv_q), (:mod, :mod),
+                 (:fdiv, :fdiv_q), (:cdiv, :cdiv_q), (:tdiv, :tdiv_q), (:div, :tdiv_q), (:mod, :mod),
                  (:gcd, :gcd), (:lcm, :lcm),
                  (:&, :and), (:|, :or), (:$, :xor))
     @eval begin
@@ -291,6 +304,25 @@ for (fJ, fC) in ((:+, :add), (:-,:sub), (:*, :mul),
         end
     end
 end
+
+function flog(x::ZZ, c::ZZ)
+    c <= 0 && throw(DomainError())
+    return ccall((:fmpz_flog, :libflint), Int, (Ptr{ZZ}, Ptr{ZZ}), &x, &c)
+end
+
+function clog(x::ZZ, c::ZZ)
+    c <= 0 && throw(DomainError())
+    return ccall((:fmpz_clog, :libflint), Int, (Ptr{ZZ}, Ptr{ZZ}), &x, &c)
+end
+
+function %(x::ZZ, c::ZZ)
+    c == 0 && return x
+    q = ZZ()
+    r = ZZ()
+    ccall((:fmpz_tdiv_qr, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &q, &r, &x, &c)
+    return r
+end
+
 
 ###########################################################################################
 #
@@ -391,23 +423,28 @@ end
 
 *(c::ClongMax, x::ZZ) = x * convert(Clong, c)
 
-function <<(x::ZZ, c::Int32)
+function <<(x::ZZ, c::Int)
     c < 0 && throw(DomainError())
     c == 0 && return x
     z = ZZ()
-    ccall((:fmpz_mul_2exp, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Culong), &z, &x, c)
+    ccall((:fmpz_mul_2exp, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
     return z
 end
 
-function >>(x::ZZ, c::Int32)
+function >>(x::ZZ, c::Int)
     c < 0 && throw(DomainError())
     c == 0 && return x
     z = ZZ()
-    ccall((:fmpz_fdiv_q_2exp, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Culong), &z, &x, c)
+    ccall((:fmpz_fdiv_q_2exp, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
     return z
 end
 
->>>(x::ZZ, c::Int32) = x >> c
+function %(x::ZZ, c::Int)
+   c < 0 && throw(DomainError())
+   c == 0 && return x
+   r = ccall((:fmpz_tdiv_ui, :libflint), Int, (Ptr{ZZ}, Int), &x, c)
+   return sign(x) < 0 ? -r : r
+end
 
 ###########################################################################################
 #
@@ -433,6 +470,78 @@ end
 #
 ###########################################################################################
 
+function tdivpow2(x::ZZ, c::Int)
+    c < 0 && throw(DomainError())
+    z = ZZ()
+    ccall((:fmpz_tdiv_q_2exp, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
+    return z
+end
+
+function fdivpow2(x::ZZ, c::Int)
+    c < 0 && throw(DomainError())
+    z = ZZ()
+    ccall((:fmpz_fdiv_q_2exp, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
+    return z
+end
+
+function fmodpow2(x::ZZ, c::Int)
+    c < 0 && throw(DomainError())
+    z = ZZ()
+    ccall((:fmpz_fdiv_r_2exp, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
+    return z
+end
+
+function cdivpow2(x::ZZ, c::Int)
+    c < 0 && throw(DomainError())
+    z = ZZ()
+    ccall((:fmpz_cdiv_q_2exp, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
+    return z
+end
+
+function div(x::ZZ, c::Int)
+    c == 0 && return x
+    z = ZZ()
+    ccall((:fmpz_tdiv_q_si, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
+    return z
+end
+
+function tdiv(x::ZZ, c::Int)
+    c == 0 && return x
+    z = ZZ()
+    ccall((:fmpz_tdiv_q_si, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
+    return z
+end
+
+function fdiv(x::ZZ, c::Int)
+    c == 0 && return x
+    z = ZZ()
+    ccall((:fmpz_fdiv_q_si, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
+    return z
+end
+
+function cdiv(x::ZZ, c::Int)
+    c == 0 && return x
+    z = ZZ()
+    ccall((:fmpz_cdiv_si, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
+    return z
+end
+
+function mod(x::ZZ, c::Int)
+    c < 0 && throw(DomainError())
+    c == 0 && return x
+    ccall((:fmpz_fdiv_ui, :libflint), Int, (Ptr{ZZ}, Int), &x, c)
+end
+
+function flog(x::ZZ, c::Int)
+    c <= 0 && throw(DomainError())
+    return ccall((:fmpz_flog_ui, :libflint), Int, (Ptr{ZZ}, Int), &x, c)
+end
+
+function clog(x::ZZ, c::Int)
+    c <= 0 && throw(DomainError())
+    return ccall((:fmpz_clog_ui, :libflint), Int, (Ptr{ZZ}, Int), &x, c)
+end
+
 function abs(x::ZZ)
     z = ZZ()
     ccall((:fmpz_abs, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}), &z, &x)
@@ -446,9 +555,29 @@ function divrem(x::ZZ, y::ZZ)
     z1, z2
 end
 
+function tdivrem(x::ZZ, y::ZZ)
+    z1 = ZZ()
+    z2 = ZZ()
+    ccall((:fmpz_tdiv_qr, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z1, &z2, &x, &y)
+    z1, z2
+end
+
+function fdivrem(x::ZZ, y::ZZ)
+    z1 = ZZ()
+    z2 = ZZ()
+    ccall((:fmpz_fdiv_qr, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z1, &z2, &x, &y)
+    z1, z2
+end
+
 function divexact(x::ZZ, y::ZZ)
     z = ZZ()
     ccall((:fmpz_divexact, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y)
+    z
+end
+
+function divexact(x::ZZ, y::Int)
+    z = ZZ()
+    ccall((:fmpz_divexact_si, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, y)
     z
 end
 
@@ -456,6 +585,13 @@ function isqrt(x::ZZ)
     z = ZZ()
     ccall((:fmpz_sqrt, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}), &z, &x)
     return z
+end
+
+function isqrtrem(x::ZZ)
+    s = ZZ()
+    r = ZZ()
+    ccall((:fmpz_sqrtrem, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &s, &r, &x)
+    return s, r
 end
 
 function ^(x::ZZ, y::Uint)
@@ -499,6 +635,17 @@ function xgcd(a::ZZ, b::ZZ)
     g, s, t
 end
 
+function gcdinv(a::ZZ, b::ZZ)
+   a < 0 && throw(DomainError())
+   b < a && throw(DomainError())
+   g = ZZ()
+   s = ZZ()
+   ccall((:fmpz_gcdinv, :libflint), Void,
+        (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}),
+        &g, &s, &a, &b)
+   return g, s
+end
+
 ###########################################################################################
 #
 #   Comparison
@@ -506,7 +653,7 @@ end
 ###########################################################################################
 
 function cmp(x::ZZ, y::ZZ)
-    ccall((:fmpz_cmp, :libflint), Int32, (Ptr{ZZ}, Ptr{ZZ}), &x, &y)
+    int(ccall((:fmpz_cmp, :libflint), Cint, (Ptr{ZZ}, Ptr{ZZ}), &x, &y))
 end
 
 ==(x::ZZ, y::ZZ) = cmp(x,y) == 0
@@ -520,7 +667,7 @@ end
 >(x::ZZ, y::ZZ) = cmp(x,y) > 0
 
 function cmp(x::ZZ, y::Int)
-    ccall((:fmpz_cmp_si, :libflint), Int32, (Ptr{ZZ}, Int), &x, y)
+    int(ccall((:fmpz_cmp_si, :libflint), Cint, (Ptr{ZZ}, Int), &x, y))
 end
 
 ==(x::ZZ, y::Int) = cmp(x,y) == 0
@@ -543,6 +690,10 @@ end
 
 >(x::Int, y::ZZ) = cmp(y,x) < 0
 
+function cmpabs(x::ZZ, y::ZZ)
+    int(ccall((:fmpz_cmpabs, :libflint), Cint, (Ptr{ZZ}, Ptr{ZZ}), &x, &y))
+end
+
 
 ###########################################################################################
 #
@@ -552,9 +703,32 @@ end
 
 popcount(x::ZZ) = int(ccall((:fmpz_popcnt, :libflint), Culong, (Ptr{ZZ},), &x))
 
-prevpow2(x::ZZ) = x < 0 ? -prevpow2(-x) : (x <= 2 ? x : one(ZZ) << (num_digits(x, 2) - 1))
+prevpow2(x::ZZ) = x < 0 ? -prevpow2(-x) : (x <= 2 ? x : one(ZZ) << (ndigits(x, 2) - 1))
 
-nextpow2(x::ZZ) = x < 0 ? -nextpow2(-x) : (x <= 2 ? x : one(ZZ) << num_digits(x - 1, 2))
+nextpow2(x::ZZ) = x < 0 ? -nextpow2(-x) : (x <= 2 ? x : one(ZZ) << ndigits(x - 1, 2))
+
+trailing_zeros(x::ZZ) = ccall((:fmpz_val2, :libflint), Int, (Ptr{ZZ},), &x)
+
+###########################################################################################
+#
+#   Bitwise operations (unsafe)
+#
+###########################################################################################
+
+function clrbit!(x::ZZ, c::Int)
+    c < 0 && throw(DomainError())
+    ccall((:fmpz_clrbit, :libflint), Void, (Ptr{ZZ}, Int), &x, c)
+end
+
+function setbit!(x::ZZ, c::Int)
+    c < 0 && throw(DomainError())
+    ccall((:fmpz_setbit, :libflint), Void, (Ptr{ZZ}, Int), &x, c)
+end
+
+function combit!(x::ZZ, c::Int)
+    c < 0 && throw(DomainError())
+    ccall((:fmpz_combit, :libflint), Void, (Ptr{ZZ}, Int), &x, c)
+end
 
 ###########################################################################################
 #
@@ -563,30 +737,70 @@ nextpow2(x::ZZ) = x < 0 ? -nextpow2(-x) : (x <= 2 ? x : one(ZZ) << num_digits(x 
 ###########################################################################################
 
 function powmod(x::ZZ, p::ZZ, m::ZZ)
-    p < 0 && throw(DomainError())
+    m <= 0 && throw(DomainError())
+    if p < 0
+       x = invmod(x, m)
+       p = -p
+    end
     r = ZZ()
     ccall((:fmpz_powm, :libflint), Void,
           (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}),
           &r, &x, &p, &m)
-    return m < 0 && r > 0 ? r + m : r # choose sign consistent with mod(x^p, m)
+    return r 
 end
 
-powmod(x::ZZ, p::Integer, m::ZZ) = powmod(x, ZZ(p), m)
-
-powmod(x::ZZ, p::Integer, m::Integer) = powmod(x, ZZ(p), ZZ(m))
+function powmod(x::ZZ, p::Int, m::ZZ)
+    m <= 0 && throw(DomainError())
+    if p < 0
+       x = invmod(x, m)
+       p = -p
+    end
+    r = ZZ()
+    ccall((:fmpz_powm_ui, :libflint), Void,
+          (Ptr{ZZ}, Ptr{ZZ}, Int, Ptr{ZZ}),
+          &r, &x, p, &m)
+    return r 
+end
 
 function invmod(x::ZZ, y::ZZ)
+    y <= 0 && throw(DomainError())
     z = ZZ()
-    y = abs(y)
     if y == 1
         return ZZ(0)
     end
-    if (y == 0 || ccall((:fmpz_invmod, :libflint), Cint, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y) == 0)
+    if (ccall((:fmpz_invmod, :libflint), Cint, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y) == 0)
         error("no inverse exists")
     end
     return z
 end
 
+function sqrtmod(x::ZZ, y::ZZ)
+    y <= 0 && throw(DomainError())
+    z = ZZ()
+    if (ccall((:fmpz_sqrtmod, :libflint), Cint, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y) == 0)
+        error("no inverse exists")
+    end
+    return z
+end
+
+function crt(r1::ZZ, m1::ZZ, r2::ZZ, m2::ZZ, sign::Bool)
+   z = ZZ()
+   ccall((:fmpz_CRT, :libflint), Void,
+          (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Cint),
+          &z, &r1, &m1, &r2, &m2, sign)
+   return z
+end
+
+function crt(r1::ZZ, m1::ZZ, r2::Int, m2::Int, sign::Bool)
+   z = ZZ()
+   r2 < 0 && throw(DomainError())
+   m2 < 0 && throw(DomainError())
+   ccall((:fmpz_CRT_ui, :libflint), Void,
+          (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Int, Int, Cint),
+          &z, &r1, &m1, r2, m2, sign)
+   return z
+end
+    
 ###########################################################################################
 #
 #   Array arithmetic
@@ -619,24 +833,111 @@ end
 #
 ###########################################################################################
 
-function fac(x::Uint)
+function divisible(x::ZZ, y::ZZ)
+   bool(ccall((:fmpz_divisible, :libflint), Cint, (Ptr{ZZ}, Ptr{ZZ}), &x, &y))
+end
+
+function divisible(x::ZZ, y::Int)
+   bool(ccall((:fmpz_divisible_si, :libflint), Cint, (Ptr{ZZ}, Int), &x, y))
+end
+
+function fac(x::Int)
     x < 0 && return ZZ(0)
     z = ZZ()
     ccall((:fmpz_fac_ui, :libflint), Void, (Ptr{ZZ}, Culong), &z, x)
     return z
 end
 
-fac(n::Integer) = n < 0 ? throw(DomainError()) : fac(uint(n))
+function risingfac(x::ZZ, y::Int)
+    x < 0 && throw(DomainError())
+    y < 0 && throw(DomainError())
+    z = ZZ()
+    ccall((:fmpz_rfac_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Culong), &z, &x, y)
+    return z
+end
 
-function binom(n::Uint, k::Uint)
+function risingfac(x::Int, y::Int)
+    x < 0 && throw(DomainError())
+    y < 0 && throw(DomainError())
+    z = ZZ()
+    ccall((:fmpz_rfac_uiui, :libflint), Void, (Ptr{ZZ}, Culong, Culong), &z, x, y)
+    return z
+end
+
+function primorial(x::Int)
+    x < 0 && return ZZ(0)
+    z = ZZ()
+    ccall((:fmpz_primorial, :libflint), Void, (Ptr{ZZ}, Culong), &z, x)
+    return z
+end
+
+function fib(x::Int)
+    x < 0 && throw(DomainError())
+    z = ZZ()
+    ccall((:fmpz_fib_ui, :libflint), Void, (Ptr{ZZ}, Culong), &z, x)
+    return z
+end
+
+function binom(n::Int, k::Int)
+    n < 0 && return ZZ(0)
+    k < 0 && return ZZ(0)
     z = ZZ()
     ccall((:fmpz_bin_uiui, :libflint), Void, (Ptr{ZZ}, Culong, Culong), &z, n, k)
     return z
 end
 
-binom(n::Integer, k::Integer) = k < 0 ? throw(DomainError()) : binom(uint(n), uint(k))
+issquare(x::ZZ) = bool(ccall((:fmpz_is_square, :libflint), Cint, (Ptr{ZZ},), &x))
 
-isprime(x::ZZ) = ccall((:fmpz_is_prime, :libflint), Cint, (Ptr{ZZ},), &x) != 0
+isprime(x::ZZ) = bool(ccall((:fmpz_is_prime, :libflint), Cint, (Ptr{ZZ},), &x))
+
+isprobabprime(x::ZZ) = bool(ccall((:fmpz_is_probabprime, :libflint), Cint, (Ptr{ZZ},), &x))
+
+function divisorlenstra(n::ZZ, r::ZZ, m::ZZ)
+   z = ZZ()
+   if !bool(ccall((:fmpz_divisor_in_residue_class_lenstra, :libflint), 
+       Cint, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &n, &r, &m))
+      z = 0
+   end
+   return z
+end
+
+function jacobi(x::ZZ, y::ZZ) 
+   y <= x && throw(DomainError())
+   x < 0 && throw(DomainError())
+   return int(ccall((:fmpz_jacobi, :libflint), Cint, (Ptr{ZZ}, Ptr{ZZ}), &x, &y))
+end
+
+function moebiusmu(x::ZZ) 
+   x < 0 && throw(DomainError())
+   return int(ccall((:fmpz_moebius_mu, :libflint), Cint, (Ptr{ZZ},), &x))
+end
+
+function remove(x::ZZ, y::ZZ) 
+   y == 0 && throw(DomainError())
+   z = ZZ()
+   num = ccall((:fmpz_remove, :libflint), Int, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y)
+   return num, z
+end
+
+function root(x::ZZ, y::Int) 
+   y <= 0 && throw(DomainError())
+   z = ZZ()
+   ccall((:fmpz_root, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, y)
+   return z
+end
+
+function sigma(x::ZZ, y::Int) 
+   y < 0 && throw(DomainError())
+   z = ZZ()
+   ccall((:fmpz_divisor_sigma, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, y)
+   return z
+end
+
+function eulerphi(x::ZZ) 
+   z = ZZ()
+   ccall((:fmpz_euler_phi, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}), &z, &x)
+   return z
+end
 
 ###########################################################################################
 #
@@ -669,11 +970,14 @@ function base(n::ZZ, b::Integer)
     ASCIIString(pointer_to_array(p,len,true))
 end
 
-function num_digits_internal(x::ZZ, b::Integer = 10)
+function ndigits_internal(x::ZZ, b::Integer = 10)
     # fmpz_sizeinbase might return an answer 1 too big
     n = int(ccall((:fmpz_sizeinbase, :libflint), Culong, (Ptr{ZZ}, Int32), &x, b))
     abs(x) < ZZ(b)^(n - 1) ? n - 1 : n
 end
 
-num_digits(x::ZZ, b::Integer = 10) = x == 0 ? 1 : num_digits_internal(x, b)
+ndigits(x::ZZ, b::Integer = 10) = x == 0 ? 1 : ndigits_internal(x, b)
 
+bits(x::ZZ) = x == 0 ? 0 : ndigits(x, 2)
+
+bits(x::Int) = x == 0 ? 0 : ndigits(x, 2)

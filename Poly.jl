@@ -1,6 +1,6 @@
-export Poly, PolynomialRing, coeff, zero, one, gen, is_zero, is_one, is_gen, chebyshev_t,
+export Poly, PolynomialRing, coeff, zero, one, gen, isgen, chebyshev_t,
        chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic,
-       pseudo_rem, pseudo_divrem, primitive_part, content, divexact, subst, deriv,
+       pseudorem, pseudodivrem, primpart, content, divexact, subst, deriv,
        resultant, lead, discriminant, bezout
 
 import Base: convert, zero
@@ -79,17 +79,9 @@ lead{S}(x::Poly{ZZ, S}) = x.data.length == 0 ? zero(ZZ) : coeff(x, x.data.length
 
 lead{T <: Ring, S}(a::Poly{T, S}) = a.data.length == 0 ? zero(T) : a.data.coeffs[a.data.length]
 
-is_zero{S}(x::Poly{ZZ, S}) = x.data.length == 0
+isgen{S}(x::Poly{ZZ, S}) = ccall((:__fmpz_poly_is_x, :libflint), Int, (Ptr{fmpz_poly},), &(x.data))
 
-is_zero{T <: Ring, S}(a::Poly{T, S}) = a.data.length == 0
-
-is_one{S}(x::Poly{ZZ, S}) = ccall((:__fmpz_poly_is_one, :libflint), Int, (Ptr{fmpz_poly},), &(x.data))
-
-is_one{T <: Ring, S}(a::Poly{T, S}) = a.data.length == 1 && a.data.coeffs[1] == 1
-
-is_gen{S}(x::Poly{ZZ, S}) = ccall((:__fmpz_poly_is_x, :libflint), Int, (Ptr{fmpz_poly},), &(x.data))
-
-is_gen{T <: Ring, S}(a::Poly{T, S}) = a.data.length == 2 && a.data.coeffs[1] == 0 && a.data.coeffs[2] == 1
+isgen{T <: Ring, S}(a::Poly{T, S}) = a.data.length == 2 && a.data.coeffs[1] == 0 && a.data.coeffs[2] == 1
 
 zero{S}(::Type{Poly{ZZ, S}}) = Poly{ZZ, S}(0)
 
@@ -580,7 +572,7 @@ end
 #
 ###########################################################################################
 
-function pseudo_rem{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
+function pseudorem{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    d = 0
    ccall((:fmpz_poly_pseudo_rem, :libflint), Void, 
@@ -589,7 +581,7 @@ function pseudo_rem{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    return z
 end
 
-function pseudo_divrem{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
+function pseudodivrem{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    q = Poly{ZZ, S}()
    r = Poly{ZZ, S}()
    d = 0
@@ -599,7 +591,7 @@ function pseudo_divrem{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    return (q, r)
 end
 
-function pseudo_rem{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
+function pseudorem{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
    b = g.data.coeffs[g.data.length]
    x = gen(Poly{T, S})
    while f.data.length >= g.data.length
@@ -608,7 +600,7 @@ function pseudo_rem{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
    return f
 end
 
-function pseudo_divrem{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
+function pseudodivrem{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
    if f.data.length < g.data.length
       return zero(Poly{T, S}), f
    end
@@ -647,9 +639,9 @@ function gcd{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    a = divexact(a, g)
    b = divexact(b, g)
    while a != 0
-      (a, b) = (pseudo_rem(b, a), a)
+      (a, b) = (pseudorem(b, a), a)
    end
-   return g*primitive_part(b)
+   return g*primpart(b)
 end
 
 function gcd{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
@@ -676,12 +668,12 @@ function content{S}(x::Poly{ZZ, S})
    return z
 end
 
-function primitive_part{T <: Ring, S}(a::Poly{T, S})
+function primpart{T <: Ring, S}(a::Poly{T, S})
    d = content(a)
    return divexact(a, d)
 end
 
-function primitive_part{S}(x::Poly{ZZ, S})
+function primpart{S}(x::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_primitive_part, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
@@ -817,7 +809,7 @@ function resultant{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
       if iseven(lena) && iseven(lenb)
          sgn = -sgn
       end
-      B, A = pseudo_rem(A, B), B
+      B, A = pseudorem(A, B), B
       lena = lenb
       lenb = B.data.length
       if lenb == 0
@@ -914,7 +906,7 @@ function bezout{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
       if iseven(lena) && iseven(lenb)
          sgn = -sgn
       end
-      (Q, B), A = pseudo_divrem(A, B), B
+      (Q, B), A = pseudodivrem(A, B), B
       lena = lenb
       lenb = B.data.length
       if lenb == 0
