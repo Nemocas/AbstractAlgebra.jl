@@ -30,7 +30,7 @@ import Base: convert, promote_rule, show, string, parseint, serialize, deseriali
 
 export ZZ, fac, binom, isprime, fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm, invmod, 
        powmod, abs, divrem, isqrt, popcount, prevpow2, nextpow2, ndigits, dec, bin, oct, 
-       hex, base, show, convert, one, zero, divexact, fits, sign, bits, deepcopy,
+       hex, base, show, convert, one, zero, divexact, fits, sign, nbits, deepcopy,
        tdivpow2, fdivpow2, cdivpow2, flog, clog, cmpabs, clrbit!, setbit!, combit!,
        crt, divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2, gcdinv, isprobabprime,
        issquare, jacobi, remove, root, size, isqrtrem, sqrtmod, trailing_zeros, sigma,
@@ -1002,6 +1002,4 @@ end
 
 ndigits(x::ZZ, b::Integer = 10) = x == 0 ? 1 : ndigits_internal(x, b)
 
-bits(x::ZZ) = x == 0 ? 0 : ndigits(x, 2)
-
-bits(x::Int) = x == 0 ? 0 : ndigits(x, 2)
+nbits(x::ZZ) = x == 0 ? 0 : ndigits(x, 2)

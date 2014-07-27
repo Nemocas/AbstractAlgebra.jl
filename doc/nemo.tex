@@ -1643,4 +1643,64 @@ b = nextpow2(a)
 combit!(a, 2)
 \end{lstlisting}
 
+\subsection{Alternative bases}
+
+\begin{lstlisting}
+base(n::ZZ, b::Int)
+\end{lstlisting}
+
+\desc{Return a string giving the representation of $n$ in the given base $b$. Valid bases
+are $2 \leq b \leq 62$. If an invalid base is applied and error is raised.}
+
+\begin{lstlisting}
+bin(n::ZZ)
+\end{lstlisting}
+
+\desc{Return a string giving the representation of $n$ in binary, i.e. base $2$.}
+
+\begin{lstlisting}
+oct(n::ZZ)
+\end{lstlisting}
+
+\desc{Return a string giving the representation of $n$ in octal, i.e. base $8$.}
+
+\begin{lstlisting}
+bin(n::ZZ)
+\end{lstlisting}
+
+\desc{Return a string giving the representation of $n$ in decimal, i.e. base $10$.}
+
+\begin{lstlisting}
+bin(n::ZZ)
+\end{lstlisting}
+
+\desc{Return a string giving the representation of $n$ in hexadecimal, i.e. base $16$.}
+
+\begin{lstlisting}
+ndigits(n::ZZ, b::Integer = 10)
+\end{lstlisting}
+
+\desc{Return an \code{Int} representing the number of digits required to represent the
+absolute value of $n$ as a string in base $b$. The default is $b = 10$. Note that $0$
+always requires one digit as a string.}
+
+\begin{lstlisting}
+nbits(n::ZZ)
+\end{lstlisting}
+
+\desc{Return an \code{Int} representing the number of bits required to represent the
+absolute value of $n$ in binary. We take the convention that $0$ requires $0$ binary 
+bits.}
+
+Here are some examples of the functions for alternative bases.
+
+\begin{lstlisting}
+a = ZZ(12)
+
+s1 = bin(a)
+s2 = base(a, 13)
+n1 = nbits(a)
+n2 = ndigits(a, 3)
+\end{lstlisting}
+
 \end{document}
