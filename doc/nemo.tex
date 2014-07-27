@@ -1,0 +1,962 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{eucal}
+\usepackage{amscd}
+\usepackage{url}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{textcomp}
+\usepackage{listings}
+\urlstyle{sf}
+
+\addtolength{\oddsidemargin}{-0.75in}
+\addtolength{\evensidemargin}{-0.75in}
+\addtolength{\textwidth}{1.5in}
+
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\HH}{\mathcal{H}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\I}{\mathbb{I}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Pee}{\mathbb{P}}
+\newcommand{\EuO}{\mathcal{O}}
+\newcommand{\Qbar}{\overline{\mathbb{Q}}}
+\newcommand{\fn}{\hfill[Function]}
+\newcommand{\macro}{\hfill[Macro]}
+\newcommand{\gmp}{\hfill[GMP]}
+\newcommand{\code}{\lstinline}
+
+\newcommand{\ljk}[2]{\left(\frac{#1}{#2}\right)}
+\newcommand{\modulo}[1]{\;\left(\mbox{mod}\;#1\right)}
+\newcommand{\fr}{\mathfrak}
+
+\def\notdivides{\mathrel{\kern-3pt\not\!\kern4.5pt\bigm|}}
+\def\nmid{\notdivides}
+\def\nsubseteq{\mathrel{\kern-3pt\not\!\kern2.5pt\subseteq}}
+
+\lstdefinelanguage{julia}
+{
+  keywordsprefix=\@,
+  morekeywords={
+    exit,whos,edit,load,is,isa,isequal,typeof,tuple,ntuple,uid,hash,finalizer,convert,promote,
+    subtype,typemin,typemax,realmin,realmax,sizeof,eps,promote_type,method_exists,applicable,
+    invoke,dlopen,dlsym,system,error,throw,assert,new,Inf,Nan,pi,im,begin,while,for,in,return,
+    break,continue,macro,quote,let,if,elseif,else,try,catch,end,bitstype,ccall,do,using,module,
+    import,export,importall,baremodule,immutable,local,global,const,Bool,Int,Int8,Int16,Int32,
+    Int64,Uint,Uint8,Uint16,Uint32,Uint64,Float32,Float64,Complex64,Complex128,Any,Nothing,None,
+    function,type,typealias,abstract
+  },
+  sensitive=true,
+  morecomment=[l]{\#},
+  morestring=[b]',
+  morestring=[b]" 
+}
+
+\parindent=0pt
+\parskip 4pt plus 2pt minus 2pt
+
+%\email{goodwillhart@googlemail.com}
+
+\title{Nemo : a flint interpreter}
+\author{William B. Hart}
+
+\begin{document}
+\lstset{
+  language=julia,
+  keywordstyle=\bfseries\ttfamily\color[rgb]{0,0.6,0.4},
+  identifierstyle=\ttfamily\color[rgb]{0,0.2,0.8},
+  commentstyle=\color[rgb]{0.8,0.05,1},
+  stringstyle=\color[rgb]{0.8,0.1,0.1},
+  basicstyle=\ttfamily,
+  showstringspaces=false,
+}
+\maketitle
+\tableofcontents
+
+\section{Introduction}
+
+Nemo is, in the first place, an interpreter for the FLINT (Fast Library for Number Theory) project
+(see \url{http://flintlib.org}). It is based on the Julia programming language
+(see \url{http://julialang.org/}).
+
+The scope of Nemo is expected to be computer algebra and number theory. As such, it is my hope that 
+Nemo will eventually provide access to the Pari library (see \url{http://pari.math.u-bordeaux.fr/}),
+parts of the Singular package (see \url{http://www.singular.uni-kl.de/}) and the Gap library
+(see \url{http://www.gap-system.org/}).
+
+Of course, I need to demonstrate that this is all feasible and convince a lot of people that the
+project is worthwhile before that can actually happen.
+
+\section{The Julia programming language}
+
+I spent around four years looking for a suitable high level programming language which
+can interface to the existing flint library, and provide either a flint interpreter, 
+or at least a statically compiled generic layer for flint. 
+
+I looked at a vast number of languages (well over 200), and a few times even got as far as
+starting to write prototype flint wrappers to evaluate some of those languages. Many times
+I also started writing a programming language myself (work continues in that direction).
+
+In short, the perfect language does not yet exist. I believe the language I am looking
+for will exist some time between 2018 and 2024.
+
+Some statically compiled and scripting languages, such as C++, D, Rust and Nimrod provide a 
+reasonable solution if all one wants is a generic layer. But they all have gotchas, (most of
+which will be sorted as the languages mature).
+
+Julia is the first language, to my knowledge, which is sufficiently good to be used as an
+interpreter for flint.
+
+\subsection{In praise of Julia}
+
+Julia started life in 2009. It's main architects are Jeff Bezanson, Stefan Karpinski and
+Viral B. Shah, though there are over 150 contributors to date.
+
+Julia is one of the most sophisticated and technologically advanced programming languages
+available today. Julia and LLVM combined, represent over a million lines of code.
+
+Now, I don't claim Julia is one of the most complex or one of the largest programming
+languages in the world. In fact, it is neither large, nor complex. But in terms of taking 
+advantage of recently available technology (such as the LLVM Jit), and in terms of making 
+significant innovations in programming language design, Julia is very futuristic.
+
+Today, Julia has a good sized community, a very well fleshed out standard library, it is very
+usable, sporting hundreds of contributed libraries, a package manager and even an IPython
+interface.
+
+Hundreds of thousands of lines of code have already been written in Julia. The language is
+already used in production environments, including big data and parallel environments. The
+Julia website gets over 150,000 visits a month. There are Julia users groups worldwide and
+courses taught in Julia in at least Canada and the US.
+
+Most importantly, Julia is designed for mathematicians.
+
+Julia combines a number of important technologies, which I believe will play an important part
+in the future of computer algebra. I outline those technologies below. To my knowledge, Julia
+may be the only usable programming language available today which provides all of those
+technologies. For that reason, Julia provides a great interim solution for the flint project, 
+at least until 2024 rolls around.
+
+\subsubsection{Jit compilation}
+
+Julia uses the LLVM Jit. LLVM is a 14 year old compiler infrastructure which underlies the 
+Clang C/C++ compiler and components of over a dozen other programming languages.
+
+LLVM's chief architect is Chris Lattner, an Apple employee since 2005, now working on Apple's 
+Swift programming language, which uses LLVM heavily. LLVM itself is reported to be used by Apple
+for its IOS tool development. I mention this only to show that LLVM is a serious, mature, 
+industry supported and hardened project, which is in turn supporting a very large ecosystem. In 
+short, it isn't going away any time soon.
+
+The LLVM Jit allows Julia to provide near C (sometimes C beating) performance, in real time.
+
+Various other languages have a Jit with near C performance and have to run in real-time
+environments, such as Javascript, Java and to some extent the Microsoft CLR languages, e.g.
+C\#, F\# and VB.Net (actually, Java and the CLR languages are first statically compiled to 
+bytecode).
+
+Unlike other Jit compilers, LLVM's strategy is to provide a rich type system at the bytecode
+level and to simply compile the bytecode on demand to machine code. All of the usual optimisation
+passes that are available in a modern C compiler (such as Clang), can be applied to produce very
+fast executable code, which can be immediately executed, in real time.
+
+This kind of Jit compilation is ideal for mathematical code, since we generally do not care if
+compilation takes as long as it takes our Enter key to rise up to its resting position after we
+have pressed it. We care only about how fast our very large loops will take to execute, after
+compilation has happened.
+
+This kind of Jit compilation is not so useful for environments like a web browser, where users
+really do care about how long compilation takes. (The Mono project gets around this by combining
+LLVM Jit optimisation with fast code paths that avoid compilation, where this would be slower
+than running interpreted code directly.)
+
+Julia combines LLVM's Jit with dynamic type inference. This is a strategy which allows one to
+combine most of the benefits of a statically typed language (such as C/C++) with the flexibility
+and ease of use of dynamically typed languages (such as Python, Javascript, PHP, Perl and 
+Ruby).
+
+To the greatest extent possible, Julia tries to infer the types for each function. However, it
+allows code to be written without specifying types, if one should so wish. Thus, from the user's
+perspective it is dynamically typed. But in many cases, exactly the same machine code results as
+would come from a C compiler and hand-written C. When all the types can be inferred, no type 
+information needs to be retained at runtime. This results in execution that is often as fast as 
+native C (sometimes faster).
+
+Moreover, Julia infers types dynamically. This means that each time a function is called, type
+inference goes into action, possibly meaning that a statically compiled and optimised version
+can be executed directly, instead of carrying type information along throughout the 
+computation.
+
+Dynamic type inference cannot always infer types, and for this reason I am not a massive fan of
+dynamic type inference. But the results are a good compromise between the flexibility of a 
+dynamically typed language and the performance of statically typed languages.
+
+\subsubsection{Interactive console}
+
+Julia offers an interactive console, similar to Python. It can also be used from IJulia, which
+is a IPython derivative, even on the web, via the IPython notebook!
+
+The Julia console uses readline and offers an online help system.
+
+Most importantly, Julia offers Jit compiled code at the console! You don't have to precompile
+Julia statically to get C-like performance. What you type at the console executes at lightning
+speed, immediately.
+
+The console offers exception handling and recovery, pretty printing of types and values, stack 
+traces, profiling and timing, the ability to disassemble the Jit compiled code, and exposes 
+Julia's type inference machinery, introspection capabilities, interactive loading of modules 
+and libraries (including native code) and all of the Julia language, including sophisticated 
+metaprogramming features. 
+
+\subsubsection{Foreign function interface}
+
+Julia allows direct access to C libraries (and just recently, C++ libraries). This includes
+full access to C structs and arrays.
+
+There is a simple mapping from C types to Julia types, and wrappers do not need to be written.
+Any native dynamic library (such as flint) can be directly accessed from within Julia, so long
+as it is in the current library path.
+
+There is no additional overhead in accessing native C libraries from within Julia than there
+would be from a native C program using that library.
+
+Julia also offers initialisers and finalisers, which allow memory managed C objects to 
+automatically call a C initialiser on creation and a finaliser when they leave scope, similar
+to the way C++ constructors and destructors work.
+
+\subsubsection{Dependent and parametric types}
+
+Few languages in the world sport a proper dependent and parametric type system. If they
+do, it is usually at static compile time only.
+
+The prime example of dependent types for a computer algebraist is when creating a type for
+polynomials over a ring $R$. In Julia, we can provide a type called Poly, which depends on
+another type, $R$ say, specifying the ring you are working over. e.g. $R$ might be the
+integers, or another polynomial ring, or a ring of matrices, etc.
+
+A type can depend on as many types as one would like.
+
+In contrast to dependent types, the prime example of a parametric type arises for a number 
+theorist when working with a number field or in $\Z/n\Z$. Elements of these rings have a
+modulus (e.g. the defining polynomial of the number field, or the modulus $n$ of the residue
+ring $\Z/n\Z$).
+
+In other words, we want the type to depend on a value (here $n$), rather than another
+type. Thus the type for $\Z/n\Z$ is a parametric type.
+
+Julia doesn't quite allow types to be parameterised by arbitrary objects such as a
+polynomial or an bignum integer $n$. But it does allow parameterisation by a machine
+integer or a symbol (a variable name without a value attached), and this is enough.
+
+The usefulness of this is again in performance. If the modulus $n$ is retained as part of
+the type and not part of the object, then it does not have to be carried along at
+runtime. 
+
+Imagine for example a polynomial over $\Z/n\Z$. Each coefficient is an object in $\Z/n\Z$.
+We can represent each such value by a pair of integers, one for the residue, one for the
+modulus $n$. But in a polynomial, every coefficient will carry the same modulus $n$, which
+is somehow redundant.
+
+A more sensible approach is to make the polynomial a value of type Poly$\{\Z/n\Z\}$.
+In this way, the modulus $n$ is attached to the type, not each coefficient of the
+polynomial. The polynomial is then free to be represented by an array of integers, one for
+each residue modulo $n$. The modulus does not need to be recorded for each coefficient of 
+the polynomial. This obviously results in a factor of two space saving.
+
+But there's a further crucial benefit. Julia is polymorphic, meaning that multiple functions
+(and operators) can have the same name. For example, one can overload the $+$ operator
+for polynomials over a ring. But in addition to this, one can write a specialised 
+implementation for addition of polynomials over $\Z/n\Z$.
+
+In most dynamic languages, e.g. Python, one writes a single function add(a, b), say, which
+then needs many lines of code to sort out what it is adding. All of this type decision code
+is executed at runtime. 
+
+In Julia, there is precisely one function for adding polynomials over $\Z/n\Z$, and it can
+be statically compiled for performance. The only time a decision has to be made about whether
+to call this function, or another one called $+$, is at Jit compilation time. Every subsequent
+time it is called (e.g. in a loop), no type decision code needs to be executed. Everything
+is sorted out and compiled to efficient machine code before the loop even begins to iterate.
+
+Needless to say, the performance benefits are great. It also greatly improves clarity
+and readability of code, as specialised versions of generic functions are clearly
+delineated by their type signatures.
+
+One can still write generic, catch-all functions, which work over any ring, say. But
+these do not first need to delegate to a whole bunch of special cases where specialised
+algorithms can be used. The type system and compiler do all of this work automatically 
+for you.
+
+The only thing remaining for the generic function to do is to implement the generic
+algorithm which works over arbitrary rings, say. The generic implementation only gets
+called if no specialised implementation exists for those types.
+
+Finally, with type unions, Julia types representing polynomials over various rings can
+internally use multiple different data representations, even C objects. This means that
+specialised implementations for particular rings can directly call native C functions,
+with practically zero overhead.
+
+\subsection{Problems with Julia}
+
+Julia is by no means perfect, or optimal.
+
+Below I outline some of the issues I've hit so far. Some can be solved and some intrinsically
+belong to the design of Julia itself and likely won't be totally eliminated.
+
+\subsubsection{1-indexed arrays}
+
+All Julia arrays are indexed starting with $1$, i.e. \code{A[1]} is the first entry, not \code{A[0]}.
+
+Most of the computer science community and a good proportion of the computational mathematical
+community use $0$-indexed arrays.
+
+This is nothing more than a nuisance to people who prefer the other convention. 
+
+It can't be changed. One might be tempted to think that a preparser could simply add \code{+1} to
+every array access. But there are other ways to access arrays than the \code{[]} notation.
+
+It also doesn't need to be changed. The Julia language sprang up around people coming from a
+specific mathematical background, and their tools use $1$-indexed arrays.
+
+It should be considered a minor nuisance, nothing more. It is in fact easy to get used to,
+and for example Pari/GP uses $1$-indexed arrays. So it is hardly unprecedented in the
+computational and even number theoretic world. Some programmers struggle with off-by-one errors
+for a few days.
+
+\subsubsection{Garbage collection pauses}
+
+The following simple Julia program illustrates the issue
+
+\begin{lstlisting}
+a = big(1)
+
+for i = 1:100000000
+   if (i % 1000) == 0
+      println(a)
+   end
+   
+   a += 1
+end
+\end{lstlisting}
+
+Every half a second or so, the output pauses for half a second, which is ugly and disconcerting.
+
+The problem is that Julia is creating an object every iteration of the loop, and presumbably the
+pauses are for the garbage collector to stop and clean up these objects.
+
+In comparison, a language I have been writing, which also uses garbage collection and LLVM does
+not have such pauses. 
+
+Replacing the println statement in the above with \code{a += 1}, the Julia code takes 2 minutes.
+
+Replacing the Julia bignum type with the Nemo ZZ type (described below), which uses flint bignums
+instead of GMP bignums, drops the time to 82 seconds.
+
+But my programming language (which also uses flint bignums) only takes 5.5 seconds.
+
+Half of the problem here seems to be the garbage collection. The GC pauses seem to be about half
+a second every second, which is clearly terrible.
+
+But the garbage collector, no matter how much it is improved, is not going to fix this issue.
+
+The problem is in fact that Julia allocates too many heap objects in the first place.
+
+Most high level programming languages fall into one of two camps. Either they use heap allocated
+objects and store pointers to them in variables and arrays, or they use stack allocated structs
+and arrays of structs.
+
+The advantage of the former is that assignment is very cheap. Simply make a copy of the pointer.
+If you really want a copy of the data and not a copy of the reference to the object, you need
+to explicitly call some kind of deep copy method.
+
+However, the disadvantage is that if you modify one object, the other object will be modified too,
+since they both point to the same data on the heap. To mitigate this, objects usually want to be
+immutable so that you can have multiple references to the same object.
+
+Every time an arithmetic operation is carried out, a new object is created to store the result
+of the computation. You cannot simply modify the value of one of the existing objects. Thus,
+operations like \code{+=} are unsafe, since they might alter the value of more than one variable.
+
+Also, since an array will store pointers to objects, it will usually be populated with undefined
+objects when the array is created (if not, you end up initialising objects twice, once when
+creating the array and once again when filling it with values).
+
+The other way to do things is to use structs on the stack to contain objects and arrays of structs.
+
+This saves immediately on cache hits because all the data in an array is in one place, rather than
+a in a multitude of heap allocations. It also saves on object creation, as only one heap allocated
+object is created, namely the array itself.
+
+One disadvantage of this technique is that when assignment occurs, a deep copy of the data needs to
+be made.
+
+Another disadvantage of this technique is that you end up with a C++ style constructor/destructor
+system, along with the complex semantics that go with it, including copy constructors, etc. When
+a function returns, it may need to make a full copy of the object (it might have been allocated
+on the stack), and when calling functions, copies may need to be made. That can be mitigated by
+offering pass by reference, but then a mechanism needs to be provided to pass either by value or
+reference.
+
+Julia uses the first of the two models. And as far as I can tell, this is the reason for the very
+slow performance in this microbenchmark.
+
+Quite obviously, this problem is not going to go away, though the GC pauses themselves might be
+reduced as the GC itself improves.
+
+Neither method above provides an easy way to avoid creating a new object every time an arithmetic 
+operation is performed (unless you use C-style \code{add(a, b, c)} semantics and eschew operator
+overloading). It is possible to solve this problem with complex metaprogramming and delayed
+evaluation, or with severely complex compiler magic which no one has ever mastered.
+
+\subsubsection{Bignum parsing}
+
+Languages that provide bignums have three choices.
+
+Firstly, they can simply not provide access to a machine integer type. They might speed things up
+as flint's fmpz does by smoothly transitioning from a machine integer to a bignum type upon
+overflow. The disadvantage of this is loss of machine integer performance. This techique is still
+around 6 times slower than native machine integer performance when Jit compiled.
+
+Secondly, they can offer machine integers as the default type and ask the programmer to provide an
+annotation when they intend to use a bignum. Julia uses this system.
+
+The benefit is machine integer performance is the default. Also it is convenient when writing real
+world programs, as array indices should be machine integers. Bignums tend to be used mainly by
+number theorists, so it doesn't make sense for general purpose or even mathematical languages to
+use any other convention.
+
+The third option is to make bignums the default and ask the programmer to provide a notation if they
+intend to use a machine integer. This has the advantage of no mathematical surprises. Performance can
+suffer if the programmer forgets to provide the appropriate annotation where a machine integer should
+be used. And things like array indices will usually require an annotation or some sort (expensive)
+automatic conversion.
+
+The problem with Julia is that the only consistent way of specifying a bignum is with a string. The
+cost of converting the string to a bignum isn't the problem. This can be avoided in most programs
+since most constants are small and can be specified in other ways, e.g. by converting from a machine
+integer.
+
+But for large enough constants, the only way to do it is with a string. And the problem this causes
+is that one cannot cut-and-paste the output of a program and use bignum values in subsequent input
+without wrapping each bignum in a notation including string quotes.
+
+This is incredibly tedious if you have a printed polynomial as output with large bignum coefficients.
+
+If you didn't happen to save the output of a computation in a variable, there is no easy way to enter
+it back in again with cut-n-paste. 
+
+This is obviously a severe problem. 
+
+It can conceivably be solved by allowing large constants to be parsed as bignums without annotations,
+e.g. with a thin preparser.
+
+The downside is that one cannot easily tell whether an integer literal will become a bignum or a
+machine integer, without counting its digits or examining its type.
+
+The only sensible solution is to make all constant integers bignums by default and require an
+annotation if a machine word is required. Of course this will be irritating when dealing with array
+indices.
+
+\subsubsection{Type parameters}
+
+Currently when specifying a dependent type in Julia, one might write for example
+
+\begin{lstlisting}
+type mytype{R <: Ring}
+   data :: R
+   length :: Int
+end
+\end{lstlisting}
+
+This creates a new type which depends on a type \code{R} which is a \code{Ring}, e.g. \code{R}  might
+be the integers or a polynomial ring. The new type, called \code{mytype}, contains two fields: one is
+of type \code{R} , the other a machine integer.
+
+The useful thing about this syntax is that the type \code{R}  has a name, which we can use as a handle for
+it, namely \code{R} . We can use that name within the type definition itself, and also use it in any
+constructors we specify for the type.
+
+But things are different if we want the type to depend on an integer value or a symbol.
+
+\begin{lstlisting}
+type mytype{R <: Ring, Symbol}
+   data :: R
+   length :: Int
+end
+\end{lstlisting}
+
+Now the type has two parameters. One is a type \code{R}, which is a \code{Ring}. The other is a \code{Symbol}.
+But it has no handle, by which we can refer to it.
+
+This problem becomes acute when we are defining methods whose signatures don't depend on that
+\code{Symbol}. It seems that Julia won't even allow that type parameter to be mentioned in that case,
+unless you are writing an inner constructor.
+
+This is theoretically correct, but a pain in the neck. One literally has to use type introspection, and
+undocumented runtime type deconstruction to get access to that symbol.
+
+Two simple things would fix this problem.
+
+Firstly, Julia should allow a name to be given to the symbol value which the type is parameterised on, 
+when the signature does include such. 
+
+When the signature does not include such, access should be provided to parameters of types of objects
+via a supported interface, e.g. \code{parameters(typeof(a))}.
+
+For all I know, this problem is already fixed in the latest unstable release of Julia (soon to be stable).
+The Julia authors must surely have hit this themselves, unless there's something I don't understand
+about the Julia type system.
+
+\subsubsection{Supertypes of core types}
+
+Julia has a type \code{Int} which represents a machine integer. This belongs to a hierachy of abstract
+types, e.g. \code{Int <: Integer} and so on. 
+
+Of course, we'd like to have \code{Int <: Ring} so that any code which depends on a type which is a subtype
+of \code{Ring} can be instantiated with \code{Int}, e.g. we could define a polynomial ring over \code{Int}.
+
+This is presumably possible, with rather a lot of rewriting of some Julia modules. But it certainly isn't
+straightforward.
+
+Again, as far as I can tell, Julia does the right thing here. But again, it is a real pain in the neck.
+
+I don't see a simple workaround that I can be sure is efficient.
+
+\section{A short introduction to the Julia language}
+
+For a complete introduction to the Julia language, see the Julia website (\url{http://julialang.org/}).
+
+Here we provide only a very basic overview of the simplest constructs in the Julia language which are
+immediately relevant to Nemo.
+
+For a cheat sheet, see \url{https://github.com/john9631/JuliaDocs/blob/master/JuliaReferenceCard.pdf?raw=true}.
+
+
+\subsection{Code comments}
+
+Code comments in Julia are written as follows
+
+\begin{lstlisting}
+# this is a commment
+\end{lstlisting}
+
+All characters from the hash to the end of the line are ignored.
+
+\subsection{Values and core types}
+
+Two core types of interest are the types for machine integers and double precision floats. We can
+define values of these types as follows
+
+\begin{lstlisting}
+a = 123
+
+b = 1.23
+
+c = 1.23e-23
+\end{lstlisting}
+
+We can determine the type of a value or variable with the \code{typeof} operator. For example
+
+\begin{lstlisting}
+typeof(123)
+\end{lstlisting}
+
+returns either \code{Int32} or \code{Int64}, depending on your machine. You can refer to this type in
+your code as an \code{Int}. This will refer to either \code{Int32} or \code{Int64} depending on your
+machine.
+
+Similarly
+
+\begin{lstlisting}
+typeof(1.23)
+\end{lstlisting}
+
+returns \code{Float64}.
+
+Another important way of creating values of a given type is with a constructor. For the above core
+types, the constructor has the same name as the type, but with lowercase first letter, e.g.
+
+\begin{lstlisting}
+a = int(123)
+\end{lstlisting}
+
+Julia has a built-in bignum type. But we will not use it in Nemo. Instead, we have provided a type
+\code{ZZ} which uses flint bignums. One slight quirk of Julia is that the constructor for \code{ZZ}
+has the same name as the type without the lowercase first letter, e.g. we write for example
+
+\begin{lstlisting}
+a = ZZ(123)
+\end{lstlisting}
+
+Some other types of interest are \code{String} and \code{Int8}.
+
+\begin{lstlisting}
+a = int8(123)
+
+s = "Nemo is awesome"
+\end{lstlisting}
+
+\subsection{Julia operators}
+
+For its numeric values, Julia provides the following arithmetic operators where applicable
+
+\code{+, -, *, /, %, //, div, rem, +=, -=, *=, /=, %=, //=, ^, ^=}
+
+Most of these are self explanatory. Unfortunately the single forward slash returns a floating point
+value when passed two integer operands. The double forward slash results in a rational value. This
+is opposite to the convention algebraists would wish for, and illustrates the numeric bent of Julia's
+designers.
+
+The \code{div} operator provides integer floor division.
+
+The carrot operator is for powering, not xor as in C. This is great for mathematicians, especially
+when creating polynomials.
+
+Julia provides the following comparison operators
+
+\code{==, <, >, <=, >=, !=}
+
+All of the comparison operators return a \code{Bool}, and unlike C an integer cannot stand in for
+a \code{Bool} in a conditional expression. A \code{Bool} has either the value \code{true} or
+\code{false}.
+
+There are the following logical operators in Julia
+
+\code{|, &, $, |=, &=, $=, !}
+
+The only one which may be unfamiliar is the xor operator \code{$}.
+
+\subsection{Control flow}
+
+The following standard control flow statements are available in Julia
+
+\begin{lstlisting}
+if a < 10
+   # do something
+elseif a < 100
+   # do something else
+else
+   # do something totally different
+end
+\end{lstlisting}
+
+We note that \code{if} statements are also expressions if the final line of each block is an expression.
+This allows a more functional style of programming.
+
+\begin{lstlisting}
+while i < 10
+   println(i)
+end
+\end{lstlisting}
+
+I'm not aware of any \code{do...while} like construct in Julia. This is an unfortunate omission.
+
+One can use the keyword \code{break} to break from a loop.
+
+\begin{lstlisting}
+for i = 1:5
+   println(i)
+end
+\end{lstlisting}
+
+Here \code{1:5} is a range, which includes the endpoints.
+
+\begin{lstlisting}
+for s in ["foo","bar","baz"]
+   println(s)
+end
+\end{lstlisting}
+
+This last form can be used with any iterable container. The particular container in the example is
+of course a 3-element array.
+
+\subsection{Arrays}
+
+\code{Array} in Julia is a parameterised type. You can have an array of any other type, and the 
+number of dimensions of the array is an \code{Int} parameter of the type.
+
+For example, the type of a 2-dimensional array of \code{Int}'s in Julia is \code|Array{Int, 2}|.
+
+To create an array of undefined entries, use the \code{Array} constructor.
+
+\begin{lstlisting}
+a = Array(Int, 5, 3)
+\end{lstlisting}
+
+In this example, we create an array of \code{Int}'s with two dimensions, the first is length $5$,
+the second of length $3$. So the type of \code{a} is precisely \code|Array{Int, 2}|.
+
+We can access elements of an array with the usual array syntax
+
+\begin{lstlisting}
+a[1,2] = 4
+\end{lstlisting}
+
+A second way to construct an array is with an array literal
+
+\begin{lstlisting}
+a = [1, 2, 3, 2, 3, 4, 7, 9, 3, 2, 4, 2]
+reshape(a, 4, 3)
+\end{lstlisting}
+
+One can also use ranges
+
+\begin{lstlisting}
+a = reshape(1:9, 3, 3)
+\end{lstlisting}
+
+and comprehensions
+
+\begin{lstlisting}
+a = [i^2 for i = 1:10]
+\end{lstlisting}
+
+\subsection{Functions}
+
+One does not need to provide type declarations when defining a function in Julia. The dynamic
+type inference can often work out the types and no performance is lost.
+
+\begin{lstlisting}
+function factorial(n)
+   if n == 1
+      return 1
+   end
+
+   r = 1
+   
+   for i = 2:n
+     r *= i
+   end
+
+   return r  
+end
+\end{lstlisting}
+
+The \code{return} keyword on the final line of the function is optional. If the final line is 
+an expression, the value of that expression will be returned.
+
+One can also use a more mathematical notation to define functions
+
+\begin{lstlisting}
+f(x) = x^2 + 2x + 1
+\end{lstlisting}
+
+Note that I have optionally omitted the \code{*} operator between the \code{2} and \code{x}.
+
+In either case, application of the function is exactly as expected
+
+\begin{lstlisting}
+f(10)
+\end{lstlisting}
+
+If one does wish to supply types, e.g. when writing specialised versions of a function, one
+can do so.
+
+\begin{lstlisting}
+function factorial(n::Int)
+   if n == 1
+      return 1
+   end
+
+   r = 1
+   
+   for i = 2:n
+     r *= i
+   end
+
+   return r  
+end
+\end{lstlisting}
+
+\subsection{Generic functions}
+
+Sometimes one would like to restrict the types of values that a function will apply to. For
+example, one might like to write a function which works for any kind of \code{Integer}, e.g.
+\code{Int8}, \code{Int16}, \code{Int32}, \code{Int64}, etc.
+
+We can do this by  restricting types to belong to some abstract superclass.
+
+\begin{lstlisting}
+function factorial{R <: Integer}(n::R)
+   if n == 1
+      return 1
+   end
+
+   r = 1
+   
+   for i = 2:n
+     r *= i
+   end
+
+   return r  
+end
+\end{lstlisting}
+
+Now our factorial function will work, so long as it is passed a value whose type \code{R} is
+an \code{Integer} type. The \code{Integer} abstract type does not have any specific
+representation in Julia, it is just an abstract node in the type graph to which all the
+integer-like types are attached.
+
+In Nemo we define an abstract type called \code{Ring}, to which all types that are rings
+are attached. This means we can write generic functions which accept arguments so long as
+their type belongs to the abstract type \code{Ring}. For example, the Nemo bignum type
+\code{ZZ} belongs to the abstract type \code{Ring} as does the \code{Poly} type.
+
+\subsection{User defined types}
+
+You can define your own \code{Ring} types as follows
+
+\begin{lstlisting}
+type mytype{R <: Ring} <: Ring
+   a :: R
+   b :: Int
+   c :: Float64
+end
+\end{lstlisting}
+
+This defines a new parameterised type called \code{mytype}. It depends on another type
+\code{R} which belongs to \code{Ring}. The new type is then also declared to belong to
+\code{Ring}.
+
+The type contains three fields: a field \code{a} of type \code{R}, a field \code{b} of
+type \code{Int} and a field \code{c} of type \code{Float64}.
+
+Note that this really defines a whole family of types, one for each type \code{R}.
+
+Julia automatically creates a constructor for this type (unless you override it). For
+example, since the Nemo type \code{ZZ} is a \code{Ring}, we can create a value of
+type \code|mytype{ZZ}| as follows
+
+\begin{lstlisting}
+s = mytype(ZZ(10), 12, 1.23)
+\end{lstlisting}
+
+Here, Julia has provided the \code{mytype} constructor for free. Simply pass it three
+values, corresponding to the values that should go into the three fields of the 
+\code{mytype}, and it will work out the rest (including that \code{R} should be
+\code{ZZ} in this case).
+
+To access the fields of \code{s} is also easy
+
+\begin{lstlisting}
+println(s.c)
+\end{lstlisting}
+
+will print the value \code{1.23}, since the \code{c} field of \code{s} contains the
+value \code{1.23} after we created it using the constructor.
+
+\subsection{Tuples}
+
+Julia can trivially create tuples
+
+\begin{lstlisting}
+t = (123, ZZ(12))
+\end{lstlisting}
+
+This creates a value of type \code{(Int, ZZ)}.
+
+Importantly, tuples can be returned from and passed as arguments to functions.
+
+Julia also has a neat tuple assignment, which is very useful
+
+\begin{lstlisting}
+a, b = 1, 2
+\end{lstlisting}
+
+Note the omission of the optional parentheses in this example.
+
+Moreover, this can be used to write a very neat swap
+
+\begin{lstlisting}
+a, b = b, a
+\end{lstlisting}
+
+To specify a tuple with only one component, one must append a comma
+
+\begin{lstlisting}
+s = (1,)
+\end{lstlisting}
+
+This is now a tuple of length 1.
+
+Note that tuples may contain inhomogeneous types. 
+
+Arrays can too, in which case the types will be made the generic type \code{Any}. 
+But performance will suffer in the case of arrays, as with any code where Julia infers
+type \code{Any}.
+
+\subsection{Print and println}
+
+The \code{print} function can take a comma separated list of values, which it will
+then print to the console. The \code{println} function will do the same, but append
+a newline character.
+
+\begin{lstlisting}
+a = 12
+
+println("a = ", a)
+\end{lstlisting}
+
+\section{Installing Nemo}
+
+There are currently three steps to installing Nemo: install flint, install Julia and
+clone the Nemo git repository.
+
+Installing flint is described in detail in the flint documentation. Nemo currently
+depends on features of flint only available in the bleeding edge git repository,
+which can be obtained as follows
+
+\begin{verbatim}
+git clone https://github.com/wbhart/flint2
+\end{verbatim}
+
+The other instructions are as per the manual for flint-2.4 on the flint website (see
+\url{http://flintlib.org}. Note that flint-2.4 requires GMP 5 or MPIR 2.7 and MPFR
+3.1.
+
+To install Julia, please refer to the installation instructions on the Julia website
+(\url{http://julialang.org/}).
+
+On Ubuntu, if you have root access, you can simply add a ppa and use apt-get. E.g. on
+my system it was as follows
+
+\begin{verbatim}
+sudo add-apt-repository ppa:staticfloat/juliarelease
+sudo apt-get update
+sudo apt-get install julia
+\end{verbatim}
+
+Then you need to download the Nemo git repository
+
+\begin{verbatim}
+git clone https://github.com/wbhart/nemo
+\end{verbatim}
+
+Finally, edit the nemo script by setting the library directories for GMP/MPIR, MPFR
+and flint appropriately.
+
+To run nemo, just type
+
+\begin{verbatim}
+./nemo
+\end{verbatim}
+
+The Julia prompt will appear. To load the \code{Rings} module into Nemo, type the
+following at the Julia prompt
+
+\begin{verbatim}
+using Rings
+\end{verbatim}
+
+If everything went according to plan, you can now use Julia and Nemo, including all
+of the functionality described in the chapters below.
+
+
+
+
+
+
+\end{document}
