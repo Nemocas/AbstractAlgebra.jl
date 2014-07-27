@@ -32,7 +32,7 @@ export ZZ, fac, binom, isprime, fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm,
        powmod, abs, divrem, isqrt, popcount, prevpow2, nextpow2, ndigits, dec, bin, oct, 
        hex, base, show, convert, one, zero, divexact, fits, sign, bits, deepcopy,
        tdivpow2, fdivpow2, cdivpow2, flog, clog, cmpabs, clrbit!, setbit!, combit!,
-       crt, divisible, divisorlenstra, fdivrem, tdivrem, fmodpow2, gcdinv, isprobabprime,
+       crt, divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2, gcdinv, isprobabprime,
        issquare, jacobi, remove, root, size, isqrtrem, sqrtmod, trailing_zeros, sigma,
        eulerphi, fib, moebiusmu, primorial, risingfac
 
@@ -923,7 +923,7 @@ isprime(x::ZZ) = bool(ccall((:fmpz_is_prime, :libflint), Cint, (Ptr{ZZ},), &x))
 
 isprobabprime(x::ZZ) = bool(ccall((:fmpz_is_probabprime, :libflint), Cint, (Ptr{ZZ},), &x))
 
-function divisorlenstra(n::ZZ, r::ZZ, m::ZZ)
+function divisor_lenstra(n::ZZ, r::ZZ, m::ZZ)
    z = ZZ()
    if !bool(ccall((:fmpz_divisor_in_residue_class_lenstra, :libflint), 
        Cint, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &n, &r, &m))

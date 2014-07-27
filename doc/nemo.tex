@@ -1208,6 +1208,8 @@ s = size(a)
 
 \subsection{Binary operators and functions}
 
+The following standard binary operators are provided for \code{ZZ}.
+
 \begin{lstlisting}
 +(a::ZZ, b::ZZ)
 -(a::ZZ, b::ZZ)
@@ -1380,6 +1382,83 @@ h = fdivpow2(a,2)
 j = a^10
 \end{lstlisting}
 
+\subsection{Comparison operators and functions}
+
+The following standard comparison operators are provided for \code{ZZ}.
+
+\begin{lstlisting}
+==(a::ZZ, b::ZZ)
+>(a::ZZ, b::ZZ)
+<(a::ZZ, b::ZZ)
+<=(a::ZZ, b::ZZ)
+>=(a::ZZ, b::ZZ)
+\end{lstlisting}
+
+Julia automatically provides a \code{!=} operator.
+
+Note that all these comparisons yield a result of type \code{Bool}.
+
+There are also the following functions.
+
+\begin{lstlisting}
+cmp(x::ZZ, y::ZZ)
+\end{lstlisting}
+
+\desc{Return a negative integer if $x < y$, a positive integer if $x > y$ and zero if $x = y$.}
+
+\begin{lstlisting}
+cmpabs(x::ZZ, y::ZZ)
+\end{lstlisting}
+
+\desc{Return a negative integer if $|x| < |y|$, a positive integer if $|x| > |y|$ and zero if 
+$|x| = |y|$, where $|x|$ is the absolute value of $x$.}
+
+Here are some examples of the comparison operators and functions.
+
+\begin{lstlisting}
+a = ZZ(-12)
+b = ZZ(5)
+
+if a < b
+   println("a < b")
+end
+
+if cmpabs(a, b) == 0
+   println("The absolute values of a and b are equal")
+end
+\end{lstlisting}
+
+\subsection{Ad hoc comparison operators}
+
+We overload the comparison operators to more easily deal with values of type \code{Int}.
+
+\begin{lstlisting}
+==(a::ZZ, b::Int)
+==(a::Int, b::ZZ)
+>(a::ZZ, b::Int)
+>(a::Int, b::ZZ)
+<(a::ZZ, b::Int)
+<(a::Int, b::ZZ)
+<=(a::ZZ, b::Int)
+<=(a::Int, b::ZZ)
+>=(a::ZZ, b::Int)
+>=(a::Int, b::ZZ)
+\end{lstlisting}
+
+Here are some examples of the ad hoc comparison operators.
+
+\begin{lstlisting}
+a = ZZ(-12)
+
+if a < 7
+   println("a < 7")
+end
+
+if a == -12
+   println("a == -12")
+end
+\end{lstlisting}
+
 \subsection{Unary operators and functions}
 
 \begin{lstlisting}
@@ -1475,15 +1554,15 @@ xgcd(a::ZZ, b::ZZ)
 \end{lstlisting}
 
 \desc{Return a tuple $(g, s, t)$ consisting of the greatest common divisor of $a$ and $b$
-and values $s$ and $t$ such that $g = as + bt$, with $0 \leq s \leq b$ and 
-$0 \leq t \leq a$.}
+and values $s$ and $t$ such that $g = as + bt$, with $-b \leq s \leq b$ and 
+$-a \leq t \leq a$.}
 
 \begin{lstlisting}
 gcdinv(a::ZZ, b::ZZ)
 \end{lstlisting}
 
 \desc{Return a tuple $(g, s)$ consisting of the greatest common divisor of $a$ and $b$
-and a value $0 \leq s < b$ such that there exists a value $0 \leq t \leq a$ such that 
+and a value $0 \leq s < b$ such that there exists a value $t$ such that 
 $g = as + bt$. If $a < 0$ or $b < a$, a \code{DomainError()} is thrown.}
 
 \textbf{Examples.}
@@ -1495,5 +1574,73 @@ g, s, t = xgcd(ZZ(12), ZZ(5))
 g, s = gcdinv(ZZ(5), ZZ(12))
 \end{lstlisting}
 
+\subsection{Bit twiddling}
+
+Various functions are provided to deal with bignums on a binary bit level.
+
+\begin{lstlisting}
+popcount(x::ZZ)
+\end{lstlisting}
+
+\desc{Return the number of binary ones in the binary representation of $x$. If $x < 0$ the
+function will return $0$. The result that is returned is of type \code{Int}.}
+
+\begin{lstlisting}
+prevpow2(x::ZZ)
+\end{lstlisting}
+
+\desc{Return the largest power of $2$ which does not exceed $x$. If $x < 0$ the result is
+set to \code{-prevpow2(x)}.}
+
+\begin{lstlisting}
+nextpow2(x::ZZ)
+\end{lstlisting}
+
+\desc{Return the smallest power of $2$ which is not less than $x$. If $x < 0$ the result is
+set to \code{-nextpow2(x)}.}
+
+\begin{lstlisting}
+trailing_zeros(x::ZZ)
+\end{lstlisting}
+
+\desc{Return the number of trailing zeros in the binary representation of the absolute
+value of $x$.}
+
+\begin{lstlisting}
+clrbit!(x::ZZ, n::Int)
+\end{lstlisting}
+
+\desc{Set bit $n$ in the binary representation of the absolute value of $x$ to $0$. Bits
+are numbered starting with $n = 0$ for the least significant bit. N.B. this function does
+not return the result, but alters the value of $x$. This is an unsafe operation which will
+change the value of all variables which contain a reference to $x$.}
+
+\begin{lstlisting}
+setbit!(x::ZZ, n::Int)
+\end{lstlisting}
+
+\desc{Set bit $n$ in the binary representation of the absolute value of $x$ to $1$. Bits
+are numbered starting with $n = 0$ for the least significant bit. N.B. this function does
+not return the result, but alters the value of $x$. This is an unsafe operation which will
+change the value of all variables which contain a reference to $x$.}
+
+\begin{lstlisting}
+combit!(x::ZZ, n::Int)
+\end{lstlisting}
+
+\desc{Complement bit $n$ in the binary representation of the absolute value of $x$. Bits
+are numbered starting with $n = 0$ for the least significant bit. N.B. this function does
+not return the result, but alters the value of $x$. This is an unsafe operation which will
+change the value of all variables which contain a reference to $x$.}
+
+Here are some examples of the bit twiddling functions.
+
+\begin{lstlisting}
+a = ZZ(12)
+
+p = popcount(a)
+b = nextpow2(a)
+combit!(a, 2)
+\end{lstlisting}
 
 \end{document}
