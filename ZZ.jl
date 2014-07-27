@@ -625,12 +625,14 @@ end
 ###########################################################################################
 
 function isqrt(x::ZZ)
+    x < 0 && throw(DomainError())
     z = ZZ()
     ccall((:fmpz_sqrt, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}), &z, &x)
     return z
 end
 
 function isqrtrem(x::ZZ)
+    x < 0 && throw(DomainError())
     s = ZZ()
     r = ZZ()
     ccall((:fmpz_sqrtrem, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &s, &r, &x)
@@ -638,6 +640,7 @@ function isqrtrem(x::ZZ)
 end
 
 function root(x::ZZ, y::Int) 
+   x < 0 && iseven(y) && throw(DomainError())
    y <= 0 && throw(DomainError())
    z = ZZ()
    ccall((:fmpz_root, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, y)
@@ -651,7 +654,7 @@ end
 ###########################################################################################
 
 function xgcd(a::ZZ, b::ZZ)
-    if b == 0 # shortcut this to ensure consistent results with xgcd(a,b)
+    if b == 0 # shortcut this to ensure consistent results with gcdx(a,b)
         return a < 0 ? (-a, -one(ZZ), zero(ZZ)) : (a, one(ZZ), zero(ZZ))
     end
     g = ZZ()
@@ -660,14 +663,6 @@ function xgcd(a::ZZ, b::ZZ)
     ccall((:fmpz_xgcd, :libflint), Void,
         (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}),
         &g, &s, &t, &a, &b)
-    if t == 0
-        # work around a difference in some versions of GMP
-        if a == b
-            return g, t, s
-        elseif abs(a) == abs(b)
-            return g, t, -s
-        end
-    end
     g, s, t
 end
 

@@ -28,7 +28,7 @@
 \newcommand{\macro}{\hfill[Macro]}
 \newcommand{\gmp}{\hfill[GMP]}
 \newcommand{\code}{\lstinline}
-\newcommand{\desc}[1]{\vspace{-5mm}\begin{quote}#1\end{quote}}
+\newcommand{\desc}[1]{\vspace{-3mm}\begin{quote}#1\end{quote}}
 
 \newcommand{\ljk}[2]{\left(\frac{#1}{#2}\right)}
 \newcommand{\modulo}[1]{\;\left(\mbox{mod}\;#1\right)}
@@ -1208,8 +1208,6 @@ s = size(a)
 
 \subsection{Binary operators and functions}
 
-We provide the usual binary arithmetic operators for \code{ZZ}.
-
 \begin{lstlisting}
 +(a::ZZ, b::ZZ)
 -(a::ZZ, b::ZZ)
@@ -1384,8 +1382,6 @@ j = a^10
 
 \subsection{Unary operators and functions}
 
-We provide the following unary operators and functions.
-
 \begin{lstlisting}
 -(x::ZZ)
 \end{lstlisting}
@@ -1417,8 +1413,6 @@ c = abs(a)
 
 \subsection{Division with remainder}
 
-The following division with remainder functions are provided.
-
 \begin{lstlisting}
 fdivrem(a::ZZ, b::ZZ)
 tdivrem(a::ZZ, b::ZZ)
@@ -1438,5 +1432,68 @@ Here are some examples of the unary operators and functions.
 q, r = fdivrem(ZZ(12), ZZ(5))
 q, r = tdivrem(ZZ(12), ZZ(5))
 \end{lstlisting}
+
+\subsection{Roots}
+
+\begin{lstlisting}
+isqrt(x::ZZ)
+\end{lstlisting}
+
+\desc{Return the square root of $x$, rounded down to the nearest integer. If $x < 0$
+a \code{DomainError()} is thrown.}
+
+\begin{lstlisting}
+isqrtrem(x::ZZ)
+\end{lstlisting}
+
+\desc{Return a tuple $(s, r)$ consisting of the square root of $x$, rounded down to the 
+nearest integer and the remainder, i.e. $r = x - s^2$. If $x < 0$a \code{DomainError()}
+is thrown.}
+
+\begin{lstlisting}
+root(x::ZZ, n::Int)
+\end{lstlisting}
+
+\desc{Return the $n$-th root of $x$, rounded down to the nearest integer. If $x < 0$ and
+$n$ is even, a \code{DomainError()} is thrown. If $n \leq 0$ a \code{DomainError()} is
+thrown.}
+
+\textbf{Examples.}
+
+Here are some examples of the root taking functions.
+
+\begin{lstlisting}
+s = isqrt(ZZ(12))
+s, r = isqrtrem(ZZ(12))
+r = root(ZZ(1000), 3)
+\end{lstlisting}
+
+\subsection{Extended GCD}
+
+\begin{lstlisting}
+xgcd(a::ZZ, b::ZZ)
+\end{lstlisting}
+
+\desc{Return a tuple $(g, s, t)$ consisting of the greatest common divisor of $a$ and $b$
+and values $s$ and $t$ such that $g = as + bt$, with $0 \leq s \leq b$ and 
+$0 \leq t \leq a$.}
+
+\begin{lstlisting}
+gcdinv(a::ZZ, b::ZZ)
+\end{lstlisting}
+
+\desc{Return a tuple $(g, s)$ consisting of the greatest common divisor of $a$ and $b$
+and a value $0 \leq s < b$ such that there exists a value $0 \leq t \leq a$ such that 
+$g = as + bt$. If $a < 0$ or $b < a$, a \code{DomainError()} is thrown.}
+
+\textbf{Examples.}
+
+Here are some examples of the extended GCD functions.
+
+\begin{lstlisting}
+g, s, t = xgcd(ZZ(12), ZZ(5))
+g, s = gcdinv(ZZ(5), ZZ(12))
+\end{lstlisting}
+
 
 \end{document}
