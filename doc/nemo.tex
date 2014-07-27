@@ -328,6 +328,8 @@ for a few days.
 
 \subsubsection{Garbage collection pauses}
 
+Julia appears to suffer from ugly garbage collection pauses.
+
 The following simple Julia program illustrates the issue
 
 \begin{lstlisting}
@@ -614,10 +616,11 @@ value when passed two integer operands. The double forward slash results in a ra
 is opposite to the convention algebraists would wish for, and illustrates the numeric bent of Julia's
 designers.
 
-The \code{div} operator provides integer floor division.
+The \code{div} operator provides integer division. Unfortunately it uses the C convention of rounding
+towards zero, instead of the floor division one would hope for as an algebraist.
 
-The carrot operator is for powering, not xor as in C. This is great for mathematicians, especially
-when creating polynomials.
+The carrot operator \code{^} is for powering, not xor as in C. This is great for mathematicians, 
+especially when creating polynomials.
 
 Julia provides the following comparison operators
 
@@ -904,6 +907,54 @@ a = 12
 
 println("a = ", a)
 \end{lstlisting}
+
+\subsection{Timing and profiling}
+
+To time how long a statement takes to execute, one can use the \code{@time} macro.
+
+\begin{lstlisting}
+function sumit(n::Int)
+   s = 0
+
+   for i = 1:n
+      s += i
+   end
+
+   return s
+end
+
+@time sumit(1000000000)
+\end{lstlisting}
+
+The result of this call on my computer is
+
+\begin{verbatim}
+julia> @time sumit(1000000000)
+elapsed time: 0.914578447 seconds (78060 bytes allocated)
+500000000500000000
+\end{verbatim}
+
+We can get a breakdown of where Julia spends all its time, function by function,
+using the profile macro.
+
+\begin{lstlisting}
+@profile sumit(1000000000)
+
+Profile.print()
+\end{lstlisting}
+
+This causes Julia to take a number of backtrace samples and count the number of times
+each function is called. It also tells you which files and line numbers the various
+functions are defined on.
+
+\begin{verbatim}
+julia> Profile.print()
+       912 client.jl; _start; line: 429
+        912 client.jl; run_repl; line: 186
+           912 client.jl; eval_user_input; line: 109
+              912 profile.jl; anonymous; line: 14
+               912 none; sumit; line: 5
+\end{verbatim}
 
 \section{Installing Nemo}
 
