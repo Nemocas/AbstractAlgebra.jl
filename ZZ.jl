@@ -152,25 +152,21 @@ function ZZ(x::Integer)
     end
 end
 
-###########################################################################################
-#
-#   Basic manipulation
-#
-###########################################################################################
-
 function deepcopy(a::ZZ)
    z = ZZ()
    ccall((:fmpz_set, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}), &z, &a)
    return z
 end
  
+###########################################################################################
+#
+#   Basic manipulation
+#
+###########################################################################################
+
 one(::Type{ZZ}) = ZZ(1)
 
-one(::Type{Int}) = 1
-
 Base.zero(::Type{ZZ}) = ZZ(0)
-
-# zero(::Type{Int}) already defined in Base
 
 sign(a::ZZ) = int(ccall((:fmpz_sgn, :libflint), Cint, (Ptr{ZZ},), &a))
 
@@ -289,11 +285,10 @@ deserialize(s, ::Type{ZZ}) = Base.parseint_nocheck(ZZ, deserialize(s), 62)
 #
 ###########################################################################################
 
-# Metaprogram to define functions +, -, *, %, fdiv, cdiv, tdiv, div, mod, rem, gcd, lcm, 
+# Metaprogram to define functions +, -, *, gcd, lcm, 
 #                                 &, |, $
 
 for (fJ, fC) in ((:+, :add), (:-,:sub), (:*, :mul),
-                 (:fdiv, :fdiv_q), (:cdiv, :cdiv_q), (:tdiv, :tdiv_q), (:div, :tdiv_q), (:mod, :mod),
                  (:gcd, :gcd), (:lcm, :lcm),
                  (:&, :and), (:|, :or), (:$, :xor))
     @eval begin
@@ -305,24 +300,47 @@ for (fJ, fC) in ((:+, :add), (:-,:sub), (:*, :mul),
     end
 end
 
+# Metaprogram to define functionsfdiv, cdiv, tdiv, div, mod
+
+for (fJ, fC) in ((:fdiv, :fdiv_q), (:cdiv, :cdiv_q), (:tdiv, :tdiv_q), 
+                 (:div, :tdiv_q), (:mod, :mod))
+    @eval begin
+        function ($fJ)(x::ZZ, y::ZZ)
+            y == 0 && throw(DivideError())
+            z = ZZ()
+            ccall(($(string(:fmpz_, fC)), :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y)
+            return z
+        end
+    end
+end
+
+function divexact(x::ZZ, y::ZZ)
+    z = ZZ()
+    ccall((:fmpz_divexact, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y)
+    z
+end
+
 function flog(x::ZZ, c::ZZ)
     c <= 0 && throw(DomainError())
+    x <= 0 && throw(DomainError())
     return ccall((:fmpz_flog, :libflint), Int, (Ptr{ZZ}, Ptr{ZZ}), &x, &c)
 end
 
 function clog(x::ZZ, c::ZZ)
     c <= 0 && throw(DomainError())
+    x <= 0 && throw(DomainError())
     return ccall((:fmpz_clog, :libflint), Int, (Ptr{ZZ}, Ptr{ZZ}), &x, &c)
 end
 
 function %(x::ZZ, c::ZZ)
-    c == 0 && return x
+    c == 0 && throw(DivideError())
     q = ZZ()
     r = ZZ()
     ccall((:fmpz_tdiv_qr, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &q, &r, &x, &c)
     return r
 end
 
+rem(x::ZZ, c::ZZ) = %(x, c)
 
 ###########################################################################################
 #
@@ -358,70 +376,70 @@ end
 
 ###########################################################################################
 #
-#   Specialisations of binary operators when one operand is base type (ad hoc polymorphism)
+#   Binary operators and functions where one operand is base type (ad hoc polymorphism)
 #
 ###########################################################################################
 
-function +(x::ZZ, c::Culong)
+function +(x::ZZ, c::Uint)
     z = ZZ()
-    ccall((:fmpz_add_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Culong), &z, &x, c)
+    ccall((:fmpz_add_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Uint), &z, &x, c)
     return z
 end
 
-+(c::Culong, x::ZZ) = x + c
++(c::Uint, x::ZZ) = x + c
 
-+(c::CulongMax, x::ZZ) = x + convert(Culong, c)
++(c::CulongMax, x::ZZ) = x + convert(Uint, c)
 
-+(x::ZZ, c::CulongMax) = x + convert(Culong, c)
++(x::ZZ, c::CulongMax) = x + convert(Uint, c)
 
-+(x::ZZ, c::ClongMax) = c < 0 ? -(x, convert(Culong, -c)) : x + convert(Culong, c)
++(x::ZZ, c::ClongMax) = c < 0 ? -(x, convert(Uint, -c)) : x + convert(Uint, c)
 
-+(c::ClongMax, x::ZZ) = c < 0 ? -(x, convert(Culong, -c)) : x + convert(Culong, c)
++(c::ClongMax, x::ZZ) = c < 0 ? -(x, convert(Uint, -c)) : x + convert(Uint, c)
 
-function -(x::ZZ, c::Culong)
+function -(x::ZZ, c::Uint)
     z = ZZ()
-    ccall((:fmpz_sub_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Culong), &z, &x, c)
+    ccall((:fmpz_sub_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Uint), &z, &x, c)
     return z
 end
 
-function -(c::Culong, x::ZZ)
+function -(c::Uint, x::ZZ)
     z = ZZ()
-    ccall((:fmpz_sub_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Culong), &z, &x, c)
+    ccall((:fmpz_sub_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Uint), &z, &x, c)
     ccall((:__fmpz_neg, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}), &z, &z)
     return z
 end
 
--(x::ZZ, c::CulongMax) = -(x, convert(Culong, c))
+-(x::ZZ, c::CulongMax) = -(x, convert(Uint, c))
 
--(c::CulongMax, x::ZZ) = -(convert(Culong, c), x)
+-(c::CulongMax, x::ZZ) = -(convert(Uint, c), x)
 
--(x::ZZ, c::ClongMax) = c < 0 ? +(x, convert(Culong, -c)) : -(x, convert(Culong, c))
+-(x::ZZ, c::ClongMax) = c < 0 ? +(x, convert(Uint, -c)) : -(x, convert(Uint, c))
 
--(c::ClongMax, x::ZZ) = c < 0 ? -(x + convert(Culong, -c)) : -(convert(Culong, c), x)
+-(c::ClongMax, x::ZZ) = c < 0 ? -(x + convert(Uint, -c)) : -(convert(Uint, c), x)
 
-function *(x::ZZ, c::Culong)
+function *(x::ZZ, c::Uint)
     z = ZZ()
-    ccall((:fmpz_mul_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Culong), &z, &x, c)
+    ccall((:fmpz_mul_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Uint), &z, &x, c)
     return z
 end
 
-*(c::Culong, x::ZZ) = x * c
+*(c::Uint, x::ZZ) = x * c
 
-*(c::CulongMax, x::ZZ) = x * convert(Culong, c)
+*(c::CulongMax, x::ZZ) = x * convert(Uint, c)
 
-*(x::ZZ, c::CulongMax) = x * convert(Culong, c)
+*(x::ZZ, c::CulongMax) = x * convert(Uint, c)
 
-function *(x::ZZ, c::Clong)
+function *(x::ZZ, c::Int)
     z = ZZ()
-    ccall((:fmpz_mul_si, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Clong), &z, &x, c)
+    ccall((:fmpz_mul_si, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
     return z
 end
 
-*(c::Clong, x::ZZ) = x * c
+*(c::Int, x::ZZ) = x * c
 
-*(x::ZZ, c::ClongMax) = x * convert(Clong, c)
+*(x::ZZ, c::ClongMax) = x * convert(Int, c)
 
-*(c::ClongMax, x::ZZ) = x * convert(Clong, c)
+*(c::ClongMax, x::ZZ) = x * convert(Int, c)
 
 function <<(x::ZZ, c::Int)
     c < 0 && throw(DomainError())
@@ -441,34 +459,12 @@ end
 
 function %(x::ZZ, c::Int)
    c < 0 && throw(DomainError())
-   c == 0 && return x
+   c == 0 && throw(DivideError())
    r = ccall((:fmpz_tdiv_ui, :libflint), Int, (Ptr{ZZ}, Int), &x, c)
    return sign(x) < 0 ? -r : r
 end
 
-###########################################################################################
-#
-#   Unary operators, e.g. -ZZ(12), ~ZZ(12)
-#
-###########################################################################################
-
-function -(x::ZZ)
-    z = ZZ()
-    ccall((:__fmpz_neg, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}), &z, &x)
-    return z
-end
-
-function ~(x::ZZ)
-    z = ZZ()
-    ccall((:fmpz_complement, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}), &z, &x)
-    return z
-end
-
-###########################################################################################
-#
-#   Arithmetic functions
-#
-###########################################################################################
+rem(x::ZZ, c::Int) = %(X, C)
 
 function tdivpow2(x::ZZ, c::Int)
     c < 0 && throw(DomainError())
@@ -532,6 +528,12 @@ function mod(x::ZZ, c::Int)
     ccall((:fmpz_fdiv_ui, :libflint), Int, (Ptr{ZZ}, Int), &x, c)
 end
 
+function divexact(x::ZZ, y::Int)
+    z = ZZ()
+    ccall((:fmpz_divexact_si, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, y)
+    z
+end
+
 function flog(x::ZZ, c::Int)
     c <= 0 && throw(DomainError())
     return ccall((:fmpz_flog_ui, :libflint), Int, (Ptr{ZZ}, Int), &x, c)
@@ -542,11 +544,53 @@ function clog(x::ZZ, c::Int)
     return ccall((:fmpz_clog_ui, :libflint), Int, (Ptr{ZZ}, Int), &x, c)
 end
 
+function ^(x::ZZ, y::Uint)
+    z = ZZ()
+    ccall((:fmpz_pow_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Culong), &z, &x, y)
+    return z
+end
+
+function zz_pow(x::ZZ, y::Int)
+    if y < 0; throw(DomainError()); end
+    if x == 1; return x; end
+    if x == -1; return isodd(y) ? x : -x; end
+    if y > typemax(Uint); throw(DomainError()); end
+    return x^uint(y)
+end
+
+^(x::ZZ, y::Bool) = y ? x : one(x)
+
+^(x::ZZ, y::Int) = zz_pow(x, y)
+
+###########################################################################################
+#
+#   Unary operators and functions, e.g. -ZZ(12), ~ZZ(12)
+#
+###########################################################################################
+
+function -(x::ZZ)
+    z = ZZ()
+    ccall((:__fmpz_neg, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}), &z, &x)
+    return z
+end
+
+function ~(x::ZZ)
+    z = ZZ()
+    ccall((:fmpz_complement, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}), &z, &x)
+    return z
+end
+
 function abs(x::ZZ)
     z = ZZ()
     ccall((:fmpz_abs, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}), &z, &x)
     return z
 end
+
+###########################################################################################
+#
+#   Division with remainder
+#
+###########################################################################################
 
 function divrem(x::ZZ, y::ZZ)
     z1 = ZZ()
@@ -569,17 +613,11 @@ function fdivrem(x::ZZ, y::ZZ)
     z1, z2
 end
 
-function divexact(x::ZZ, y::ZZ)
-    z = ZZ()
-    ccall((:fmpz_divexact, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y)
-    z
-end
-
-function divexact(x::ZZ, y::Int)
-    z = ZZ()
-    ccall((:fmpz_divexact_si, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, y)
-    z
-end
+###########################################################################################
+#
+#   Roots
+#
+###########################################################################################
 
 function isqrt(x::ZZ)
     z = ZZ()
@@ -594,25 +632,18 @@ function isqrtrem(x::ZZ)
     return s, r
 end
 
-function ^(x::ZZ, y::Uint)
-    z = ZZ()
-    ccall((:fmpz_pow_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Culong), &z, &x, y)
-    return z
+function root(x::ZZ, y::Int) 
+   y <= 0 && throw(DomainError())
+   z = ZZ()
+   ccall((:fmpz_root, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, y)
+   return z
 end
 
-function zz_pow(x::ZZ, y::Int)
-    if y < 0; throw(DomainError()); end
-    if x == 1; return x; end
-    if x == -1; return isodd(y) ? x : -x; end
-    if y > typemax(Uint); throw(DomainError()); end
-    return x^uint(y)
-end
-
-^(x::ZZ, y::Bool) = y ? x : one(x)
-
-^(x::ZZ, y::Int) = zz_pow(x, y)
-
-^(x::Int, y::ZZ) = zz_pow(ZZ(x), y)
+###########################################################################################
+#
+#   Extended GCD
+#
+###########################################################################################
 
 function xgcd(a::ZZ, b::ZZ)
     if b == 0 # shortcut this to ensure consistent results with xgcd(a,b)
@@ -917,13 +948,6 @@ function remove(x::ZZ, y::ZZ)
    z = ZZ()
    num = ccall((:fmpz_remove, :libflint), Int, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y)
    return num, z
-end
-
-function root(x::ZZ, y::Int) 
-   y <= 0 && throw(DomainError())
-   z = ZZ()
-   ccall((:fmpz_root, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, y)
-   return z
 end
 
 function sigma(x::ZZ, y::Int) 

@@ -620,7 +620,7 @@ designers.
 The \code{div} operator provides integer division. Unfortunately it uses the C convention of rounding
 towards zero, instead of the floor division one would hope for as an algebraist.
 
-The carrot operator \code{^} is for powering, not xor as in C. This is great for mathematicians, 
+The caret operator \code{^} is for powering, not xor as in C. This is great for mathematicians, 
 especially when creating polynomials.
 
 Julia provides the following comparison operators
@@ -1204,6 +1204,213 @@ if fits(Int, a)
 end
 
 s = size(a)
+\end{lstlisting}
+
+\subsection{Binary operators and functions}
+
+We provide the usual binary arithmetic operators for \code{ZZ}.
+
+\begin{lstlisting}
++(a::ZZ, b::ZZ)
+-(a::ZZ, b::ZZ)
+*(a::ZZ, b::ZZ)
+%(a::ZZ, b::ZZ)
+&(a::ZZ, b::ZZ)
+|(a::ZZ, b::ZZ)
+$(a::ZZ, b::ZZ)
+\end{lstlisting}
+
+Note that \code{%} follows the C (and Julia) convention of rounding the quotient
+towards zero.
+
+Julia automatically provides all of combined assignment operators \code{+=, *=, &=}
+etc.
+
+Various kinds of integer division are provided.
+
+\begin{lstlisting}
+fdiv(a::ZZ, b::ZZ)
+cdiv(a::ZZ, b::ZZ)
+tdiv(a::ZZ, b::ZZ)
+div(a::ZZ, b::ZZ)
+\end{lstlisting}
+
+\desc{Integer division with rounding towards $-\infty$, $+\infty$ and $0$ respectively.
+Note \code{div} is a synonym for \code{tdiv}.}
+
+\begin{lstlisting}
+mod(a::ZZ, b::ZZ)
+rem(a::ZZ, b::ZZ)
+%(a::ZZ, b::ZZ)
+\end{lstlisting}
+
+\desc{Integer remainder after division with rounding towards $-\infty$ and $0$
+respectively. Note that \code{\%} is a synonym for \code{rem}.}
+
+\begin{lstlisting}
+divexact(a::ZZ, b::ZZ)
+\end{lstlisting}
+
+\desc{Exact integer division. This is more efficient than the above division functions,
+but will only return a meaningful result if the division is exact, i.e. if $b$ divides
+$a$.}
+
+\begin{lstlisting}
+gcd(a::ZZ, b::ZZ)
+\end{lstlisting}
+
+\desc{Returns the greatest common divisor of $a$ and $b$. For convenience, 
+gcd$(a, 0) = a$ and gcd$(0, b) = b$. The returned value is always nonnegative.}
+
+\begin{lstlisting}
+lcm(a::ZZ, b::ZZ)
+\end{lstlisting}
+
+\desc{Returns the lowest common multiple of $a$ and $b$, i.e. $ab/\gcd(a, b)$ if
+$a, b > 0$. For convenience, lcm$(a, 0) = 0$ and lcm$(0, b) = 0$. The returned
+value is always nonnegative.}
+
+\begin{lstlisting}
+flog(a::ZZ, b::ZZ)
+\end{lstlisting}
+
+\desc{Returns $\log_b(a)$ rounded towards $0$. Both $a$ and $b$ are required
+to be positive, otherwise a \code{DomainError()} exception is thrown.}
+
+\begin{lstlisting}
+clog(a::ZZ, b::ZZ)
+\end{lstlisting}
+
+\desc{Returns $\log_b(a)$ rounded towards $\infty$. Both $a$ and $b$ are required
+to be positive, otherwise a \code{DomainError()} exception is thrown.}
+
+\textbf{Examples.}
+
+Here are some examples of the binary operators and functions.
+
+\begin{lstlisting}
+a = ZZ(12)
+b = ZZ(26)
+
+c = a + b
+d = a - b
+e = gcd(a, b)
+f = lcm(a, b)
+\end{lstlisting}
+
+\subsection{Ad hoc operators and functions}
+
+Since the Julia types \code{Int} and \code{Uint} cannot be made members of the
+\code{Ring} class, we must define some ad hoc operators, so that values of type
+\code{ZZ} can be more easily combined with \code{Int} and \code{Uint} values.
+
+\begin{lstlisting}
++(x::ZZ, c::Uint)
++(x::ZZ, c::Int)
++(x::Uint, c::ZZ)
++(x::Int, c::ZZ)
+-(x::ZZ, c::Uint)
+-(x::ZZ, c::Int)
+-(x::Uint c::ZZ)
+-(x::Int, c::ZZ)
+*(x::ZZ, c::Uint)
+*(x::ZZ, c::Int)
+*(x::Uint, c::ZZ)
+*(x::Int, c::ZZ)
+\end{lstlisting}
+
+We also define the following, which have the same semantics as the corresponding
+binary operators and functions above.
+
+\begin{lstlisting}
+tdiv(x::ZZ, c::Int)
+fdiv(x::ZZ, c::Int)
+cdiv(x::ZZ, c::Int)
+div(x::ZZ, c::Int)
+rem(x::ZZ, c::Int)
+mod(x::ZZ, c::Int)
+%(x::ZZ, c::Int)
+divexact(x::ZZ, c::Int)
+flog(x::ZZ, c::Int)
+clog(x::ZZ, c::Int)
+\end{lstlisting}
+
+There are also shift operators, which require the shift to be of type \code{Int}.
+
+\begin{lstlisting}
+<<(x::ZZ, c::Int)
+\end{lstlisting}
+
+\desc{Return $2^c x$.}
+
+\begin{lstlisting}
+fdivpow2(x::ZZ, c::Int)
+cdivpow2(x::ZZ, c::Int)
+tdivpow2(x::ZZ, c::Int)
+>>(x::ZZ, c::Int)
+\end{lstlisting}
+
+\desc{Return $x/2^c$ with rounding towards $-\infty$, $+\infty$ and $0$ respectively. 
+Note that \code{>>} is a synonym for \code{fdivpow2}.}
+
+There is also the caret operator, which is used for powering in Julia (and Nemo), in
+line with the mathematical convention.
+
+\begin{lstlisting}
+^(x::ZZ, a::Uint)
+^(x::ZZ, a::Int)
+\end{lstlisting}
+
+\desc{Return $x^a$. Requires $a \geq 0$.}
+
+\textbf{Examples.}
+
+Here are some examples of the ad hoc operators and functions.
+
+\begin{lstlisting}
+a = ZZ(-12)
+
+b = 3 + a
+c = a + 3
+d = a - 3
+e = 5 - a
+f = rem(a, 7)
+g = a >> 3
+h = fdivpow2(a,2)
+j = a^10
+\end{lstlisting}
+
+\subsection{Unary operators and functions}
+
+We provide the following unary operators and functions.
+
+\begin{lstlisting}
+-(x::ZZ)
+\end{lstlisting}
+
+\desc{Return $-x$.}
+
+\begin{lstlisting}
+~(x::ZZ)
+\end{lstlisting}
+
+\desc{Return the bignum corresponding to logical complement of the twos 
+complement representation of x, namely $-x - 1$.}
+
+\begin{lstlisting}
+abs(x::ZZ)
+\end{lstlisting}
+
+\desc{Return the absolute value of $x$, i.e. $x$ if $x >= 0$ and $-x$ otherwise.}
+
+\textbf{Examples.}
+
+Here are some examples of the unary operators and functions.
+
+\begin{lstlisting}
+a = -ZZ(12)
+b = ~ZZ(-5)
+c = abs(a)
 \end{lstlisting}
 
 \end{document}
