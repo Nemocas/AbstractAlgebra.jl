@@ -1720,4 +1720,55 @@ s = string(a)
 println(s[1])
 \end{lstlisting}
 
+\subsection{Modular arithmetic}
+
+\begin{lstlisting}
+powmod(x::ZZ, p::ZZ, m::ZZ)
+\end{lstlisting}
+
+\desc{Return $x^p \pmod{m}$. If $m \leq 0$ a \code{DomainError()} is thrown.}
+
+\begin{lstlisting}
+powmod(x::ZZ, p::Int, m::ZZ)
+\end{lstlisting}
+
+\desc{Return $x^p \pmod{m}$. If $m \leq 0$ a \code{DomainError()} is thrown.}
+
+\begin{lstlisting}
+invmod(x::ZZ, m::ZZ)
+\end{lstlisting}
+
+\desc{Return $x^{-1} \pmod{m}$. If $m \leq 0$ a \code{DomainError()} is thrown.}
+
+\begin{lstlisting}
+sqrtmod(x::ZZ, m::ZZ)
+\end{lstlisting}
+
+\desc{Return the square root of $x$ modulo $m$. If $m \leq 0$ a \code{DomainError()}
+is thrown. If $x$ is not a square modulo $m$, an error is thrown. Requires $m$ to
+be prime. This condition is not checked and an infinite loop may result if $m$ is
+not prime.}
+
+\begin{lstlisting}
+crt(r1::ZZ, m1::ZZ, r2::ZZ, m2::ZZ, sign::Bool)
+crt(r1::ZZ, m1::ZZ, r2::Int, m2::Int, sign::Bool)
+\end{lstlisting}
+
+\desc{Return a value $r$ such that $r \equiv r1 \pmod {m1}$ and $r \equiv r2 \pmod{m2}$.
+If \code{sign = true} the value will be in the range \code{-m1*m2/2 < r <= m1*m2/2}. If
+\code{sign = false} the value will be in the range \code{0 <= r < m1*m2}.}
+
+Here are some examples of modular arithmetic.
+
+\begin{lstlisting}
+a = powmod(ZZ(12), ZZ(110), ZZ(13))
+a = powmod(ZZ(12), 110, ZZ(13))
+b = invmod(ZZ(12), ZZ(13))
+c = sqrtmod(ZZ(12), ZZ(13))
+d = crt(ZZ(5), ZZ(13), ZZ(7), ZZ(37), true)
+\end{lstlisting}
+
+
+
+
 \end{document}

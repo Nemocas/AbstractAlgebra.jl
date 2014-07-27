@@ -809,7 +809,7 @@ function sqrtmod(x::ZZ, y::ZZ)
     y <= 0 && throw(DomainError())
     z = ZZ()
     if (ccall((:fmpz_sqrtmod, :libflint), Cint, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y) == 0)
-        error("no inverse exists")
+        error("no square root exists")
     end
     return z
 end
