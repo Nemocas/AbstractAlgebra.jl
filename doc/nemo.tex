@@ -1039,7 +1039,13 @@ type \code{ZZ} belongs to the type class \code{Ring}, or that \code{ZZ} belongs 
 the \code{Ring} class.
 
 Beware that in Julia, abstract types can belong to other abstract types. E.g. we
-can have \code{QQ <: Field <: Ring}. This is clearly rather convenient.
+can have
+
+\begin{lstlisting}
+QQ <: Field <: Ring
+\end{lstlisting}
+
+This is clearly rather convenient.
 
 Another thing to be aware of is that Julia's parametric type system is invariant,
 not covariant. This means that even if \code{R <: S} we don't automatically have
@@ -1051,7 +1057,7 @@ for one to be a subtype of the other.
 
 Types model categories, but are not formally equivalent to them! In fact, type
 systems are equivalent to formal logic systems (look up the Curry-Howard
-correspondence and lambda cube for more details).
+correspondence and the lambda cube for more details).
 
 \section{Bignum integers}
 
@@ -1143,6 +1149,61 @@ d = ZZ(c)
 e = deepcopy(c)
 \end{lstlisting}
 
+\subsection{Basic manipulation}
 
+Various functions are provided to do basic manipulations in \code{ZZ}.
+
+\begin{lstlisting}
+one(::Type{ZZ})
+\end{lstlisting}
+
+\desc{Create the multiplicative identity element in the ring of integers.}
+
+\begin{lstlisting}
+zero(::Type{ZZ})
+\end{lstlisting}
+
+\desc{Create the additive identity element in the ring of integers.}
+
+\begin{lstlisting}
+sign(a::ZZ)
+\end{lstlisting}
+
+\desc{Return either $-1$, $0$ or $1$ depending on whether the sign of $a$ is negative,
+zero or positive, respectively. The returned value is of type \code{Int}.}
+
+\begin{lstlisting}
+fits(::Type{Int}, a::ZZ)
+fits(::Type{Uint}, a::ZZ)
+\end{lstlisting}
+
+\desc{Return \code{true} if the value $a$ will fit into a variable of the given
+type. Otherwise return \code{false}.}
+
+\begin{lstlisting}
+size(a::ZZ)
+\end{lstlisting}
+
+\desc{Return the number of machine words that make up the bignum $a$. The
+returned value has type \code{Int}.}
+
+\textbf{Examples.}
+
+Here are some examples of the above basic manipulations.
+
+\begin{lstlisting}
+a = one(ZZ)
+b = zero(ZZ)
+
+if sign(a) < 0
+   println("Negative")
+end
+
+if fits(Int, a)
+   println("Fits into an Int")
+end
+
+s = size(a)
+\end{lstlisting}
 
 \end{document}
