@@ -28,6 +28,7 @@
 \newcommand{\macro}{\hfill[Macro]}
 \newcommand{\gmp}{\hfill[GMP]}
 \newcommand{\code}{\lstinline}
+\newcommand{\desc}[1]{\vspace{-5mm}\begin{quote}#1\end{quote}}
 
 \newcommand{\ljk}[2]{\left(\frac{#1}{#2}\right)}
 \newcommand{\modulo}[1]{\;\left(\mbox{mod}\;#1\right)}
@@ -1000,18 +1001,147 @@ To run nemo, just type
 ./nemo
 \end{verbatim}
 
-The Julia prompt will appear. To load the \code{Rings} module into Nemo, type the
-following at the Julia prompt
+The Julia prompt will appear. If everything went according to plan, you can now use 
+Julia, including all of the Nemo functionality described in the chapters below.
 
-\begin{verbatim}
+\section{The Rings module}
+
+Julia has a module system, and we use it to provide access to Nemo modules.
+
+At present there is a single module, called \code{Rings}. To import it and use all
+exported functionality simply type
+
+\begin{lstlisting}
 using Rings
-\end{verbatim}
+\end{lstlisting}
 
-If everything went according to plan, you can now use Julia and Nemo, including all
-of the functionality described in the chapters below.
+The first thing the \code{Rings} module does is define a new abstract type called
+\code{Ring}. Internally, this is the line of code that does this
 
+\begin{lstlisting}
+abstract Ring
+\end{lstlisting}
 
+This provides a new node in the type graph to which we can attach other types. 
 
+You can check (or assert) that a given type belongs to \code{Ring} with the
+\code{<:} operator. For example, we can check that the Nemo type \code{ZZ} belongs
+to \code{Ring}
+
+\begin{lstlisting}
+ZZ <: Ring
+\end{lstlisting}
+
+Nemo will return \code{true}, indicating that \code{ZZ} does belong to \code{Ring}.
+
+For convenience, I will refer to \code{Ring} as a class. So we will say that the 
+type \code{ZZ} belongs to the type class \code{Ring}, or that \code{ZZ} belongs to
+the \code{Ring} class.
+
+Beware that in Julia, abstract types can belong to other abstract types. E.g. we
+can have \code{QQ <: Field <: Ring}. This is clearly rather convenient.
+
+Another thing to be aware of is that Julia's parametric type system is invariant,
+not covariant. This means that even if \code{R <: S} we don't automatically have
+\code|Ring{R} <: Ring{S}|.
+
+The reason for this is that the underlying representation of \code|Ring{R}| may
+differ from that of \code|Ring{S}|. Therefore it makes no sense type theoretically
+for one to be a subtype of the other.
+
+Types model categories, but are not formally equivalent to them! In fact, type
+systems are equivalent to formal logic systems (look up the Curry-Howard
+correspondence and lambda cube for more details).
+
+\section{Bignum integers}
+
+Nemo provides a bignum type \code{ZZ}.
+
+Internally, \code{ZZ} uses the flint \code{fmpz} type. In fact, here is the Nemo
+definition of the \code{ZZ} type
+
+\begin{lstlisting}
+type ZZ <: Ring
+    d::Int
+end
+\end{lstlisting}
+
+Since an \code{fmpz} in flint is just implemented as a 32 or 64 integer, this now 
+provides the same type in Nemo. We can directly call flint functions on objects of
+type \code{ZZ} (fortunately an \code{fmpz_t} is a pointer to an \code{fmpz} in 
+flint, so that Julia's habit of defining objects as heap allocated objects will 
+precisely result in an \code{fmpz_t}).
+
+\subsection{Constructors}
+
+To create a bignum value, Nemo provides various constructors. Space is automatically
+recovered when the created object goes out of scope.
+
+\begin{lstlisting}
+ZZ()
+\end{lstlisting}
+
+\desc{Creates an initialised \code{ZZ}. This function is only useful internally, 
+inside functions that can modify the value in an unsafe way, since the value of the
+created bignum is zero.}
+
+\begin{lstlisting}
+ZZ(n::Int)
+\end{lstlisting}
+
+\desc{Create a bignum with the given signed value $n$.}
+
+\begin{lstlisting}
+ZZ(n::Uint)
+\end{lstlisting}
+
+\desc{Create a bignum with the given unsigned value $n$.}
+
+\begin{lstlisting}
+ZZ(n::Bool)
+\end{lstlisting}
+
+\desc{Create a bignum which is $1$ if $n$ is \code{true} or $0$ if $n$ is 
+\code{false}.}
+
+\begin{lstlisting}
+ZZ(s::String)
+\end{lstlisting}
+
+\desc{Create a bignum whose value is represented (in decimal) by the given string
+$s$. The string should not contain any whitespace, and can optionally begin with
+a $-$ sign.}
+
+\begin{lstlisting}
+ZZ(x::Float64)
+\end{lstlisting}
+
+\desc{If $x$ represents an exact integer, create a bignum with that value. Otherwise
+an \code{InexactError()} exception is thrown.}
+
+\begin{lstlisting}
+ZZ(x::ZZ)
+\end{lstlisting}
+
+\desc{Returns a reference to $x$. No copy of the data is made.}
+
+\begin{lstlisting}
+deepcopy(x::ZZ)
+\end{lstlisting}
+
+\desc{Create a new bignum whose value is arithmetically equal to that of $x$.}
+
+\textbf{Examples.}
+
+Here are some examples of the above constructors.
+
+\begin{lstlisting}
+a = ZZ(-123)
+b = ZZ(12.0)
+c = ZZ("-1234567876545678376545678900000000000000000000000000")
+d = ZZ(c)
+e = deepcopy(c)
+\end{lstlisting}
 
 
 

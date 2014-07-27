@@ -61,10 +61,10 @@ end
 # The ZZ datatype. It is a member of the Ring abstract type
 
 type ZZ <: Ring
-    d::Clong
+    d::Int
 
     function ZZ()
-        b = new(zero(Clong))
+        b = new(zero(Int))
         ccall((:__fmpz_init, :libflint), Void, (Ptr{ZZ},), &b)
         finalizer(b, _fmpz_clear_fn)
         return b
@@ -99,15 +99,15 @@ function Base.parseint(::Type{ZZ}, s::String, base::Int)
     return sgn < 0 ? -z : z
 end
 
-function ZZ(x::Union(Clong, Int32))
+function ZZ(x::Union(Clong, Int))
     z = ZZ()
-    ccall((:__fmpz_set_si, :libflint), Void, (Ptr{ZZ}, Clong), &z, x)
+    ccall((:__fmpz_set_si, :libflint), Void, (Ptr{ZZ}, Int), &z, x)
     return z
 end
 
-function ZZ(x::Union(Culong, Uint32))
+function ZZ(x::Union(Culong, Uint))
     z = ZZ()
-    ccall((:__fmpz_set_ui, :libflint), Void, (Ptr{ZZ}, Culong), &z, x)
+    ccall((:__fmpz_set_ui, :libflint), Void, (Ptr{ZZ}, Uint), &z, x)
     return z
 end
 
