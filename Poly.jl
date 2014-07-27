@@ -79,7 +79,7 @@ lead{S}(x::Poly{ZZ, S}) = x.data.length == 0 ? zero(ZZ) : coeff(x, x.data.length
 
 lead{T <: Ring, S}(a::Poly{T, S}) = a.data.length == 0 ? zero(T) : a.data.coeffs[a.data.length]
 
-isgen{S}(x::Poly{ZZ, S}) = ccall((:__fmpz_poly_is_x, :libflint), Int, (Ptr{fmpz_poly},), &(x.data))
+isgen{S}(x::Poly{ZZ, S}) = bool(ccall((:__fmpz_poly_is_x, :libflint), Int, (Ptr{fmpz_poly},), &(x.data)))
 
 isgen{T <: Ring, S}(a::Poly{T, S}) = a.data.length == 2 && a.data.coeffs[1] == 0 && a.data.coeffs[2] == 1
 
@@ -413,6 +413,8 @@ end
 ###########################################################################################
 
 function truncate{S}(a::Poly{ZZ, S}, n::Int)
+   n < 0 && throw(DomainError())
+   
    if a.data.length <= n
       return a
    end
@@ -426,6 +428,8 @@ function truncate{S}(a::Poly{ZZ, S}, n::Int)
 end
 
 function truncate{T <: Ring, S}(a::Poly{T, S}, n::Int)
+   n < 0 && throw(DomainError())
+   
    lena = a.data.length
 
    if lena <= n
@@ -445,6 +449,8 @@ function truncate{T <: Ring, S}(a::Poly{T, S}, n::Int)
 end
 
 function mullow{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S}, n::Int)
+   n < 0 && throw(DomainError())
+   
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_mullow, :libflint), Void,
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int),
