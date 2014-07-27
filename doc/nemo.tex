@@ -1768,7 +1768,126 @@ c = sqrtmod(ZZ(12), ZZ(13))
 d = crt(ZZ(5), ZZ(13), ZZ(7), ZZ(37), true)
 \end{lstlisting}
 
+\subsection{Number theoretic/combinatorial functions}
 
+\begin{lstlisting}
+divisible(x::ZZ, y::ZZ)
+divisible(x::ZZ, y::Int)
+\end{lstlisting}
 
+\desc{Return \code{true} if $x$ is divisible by $y$, otherwise return \code{false}. If
+$y = 0$ a \code{DivideError()} is raised.}
+
+\begin{lstlisting}
+issquare(x::ZZ)
+\end{lstlisting}
+
+\desc{Return \code{true} if $x$ is perfect square, otherwise return \code{false}.}
+
+\begin{lstlisting}
+isprime(x::ZZ)
+\end{lstlisting}
+
+\desc{Return \code{true} if $x$ is prime, otherwise return \code{false}.}
+
+\begin{lstlisting}
+isprobabprime(x::ZZ)
+\end{lstlisting}
+
+\desc{Return \code{true} if $x$ is very probably prime, otherwise return \code{false}.}
+
+\begin{lstlisting}
+remove(x::ZZ, y::ZZ)
+\end{lstlisting}
+
+\desc{Returns a pair $(n, z)$ where $n$ is an \code{Int} and $z$ a \code{ZZ} such that
+$x = y^nz$ and $z$ is not divisible by $y$. If $y = 0$ a \code{DivideError()} is thrown.}
+
+\begin{lstlisting}
+divisor_lenstra(n::ZZ, r::ZZ, m::ZZ)
+\end{lstlisting}
+
+\desc{If $n$ has a factor which lies in the residue class $r \pmod{m}$ for $0 < r < m < n$,
+this function returns such a factor. Otherwise it returns $0$. This is only efficient if 
+$m$ is at least the cube root of $n$. We require gcd$(r, m) = 1$ and this condition is not
+checked.}
+
+\begin{lstlisting}
+fac(n::Int)
+\end{lstlisting}
+
+\desc{Return as a \code{ZZ} the factorial of $n$, i.e. $n(n - 1)(n - 2)\ldots 1$.
+If $n < 0$ we return $0$.}
+
+\begin{lstlisting}
+risingfac(x::ZZ, n::Int)
+risingfac(x::Int, n::Int)
+\end{lstlisting}
+
+\desc{Return the rising factorial of $x$, i.e. $x(x + 1)(x + 2)\ldots (x + n - 1)$.
+If $x < 0$ or $n < 0$ we throw a \code{DomainError()}.}
+
+\begin{lstlisting}
+primorial(n::Int)
+\end{lstlisting}
+
+\desc{Return as a \code{ZZ} the primorial of $n$, i.e. the product of all primes
+less than or equal to $n$. If $n < 0$ we return $0$.}
+
+\begin{lstlisting}
+fib(n::Int)
+\end{lstlisting}
+
+\desc{Return the $n$-th element of the Fibonacci sequence, starting with 
+\code{fib(1) = 1}, \code{fib(2) = 1} and following the recursion 
+\code{fib(n) = fib(n - 1) + fib(n - 2)} for $n \geq 3$.
+We return fib$(0) = 0$. If $n < 0$ we throw a \code{DomainError()}.}
+
+\begin{lstlisting}
+binom(n::Int, k::Int)
+\end{lstlisting}
+
+\desc{Return as a \code{ZZ} the binomial coefficient $\frac{n!}{(n - k)!k!}$. If
+$n, k < 0$ or $k > n$ we return $0$.}
+
+\begin{lstlisting}
+moebiusmu(x::ZZ)
+\end{lstlisting}
+
+\desc{Returns the M\"{o}bius mu function of $x$ as an \code{Int}. The value returned is
+either $-1$, $0$ or $1$. If $x < 0$ we throw a \code{DomainError()}.}
+
+\begin{lstlisting}
+jacobi(x::ZZ, y::ZZ)
+\end{lstlisting}
+
+\desc{Return the value of the Jacobi symbol $\ljk{x}{y}$. If $y \leq x$ or $x < 0$ we
+throw a \code{DomainError()}.}
+
+\begin{lstlisting}
+sigma(x::ZZ, y::Int)
+\end{lstlisting}
+
+\desc{Return the value of the sigma function, i.e. $\sum_{0 < d \;| x} d^y$. If $y < 0$
+we throw a \code{DomainError()}.}
+
+\begin{lstlisting}
+eulerphi(x::ZZ)
+\end{lstlisting}
+
+\desc{Return the value of the Euler phi function, i.e. the number of $0 < d \leq x$ such
+that gcd$(d, x) = 1$. If $x < 0$ we return $0$.}
+
+Here are some examples of number theoretic and combinatorial functions.
+
+\begin{lstlisting}
+if isprime(ZZ(13))
+   println("13 is prime")
+end
+
+n = fac(100)
+s = sigma(ZZ(128), 10)
+a = eulerphi(ZZ(12480))
+\end{lstlisting}
 
 \end{document}

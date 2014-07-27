@@ -865,11 +865,38 @@ end
 ###########################################################################################
 
 function divisible(x::ZZ, y::ZZ)
+   y == 0 && throw(DivideError())
    bool(ccall((:fmpz_divisible, :libflint), Cint, (Ptr{ZZ}, Ptr{ZZ}), &x, &y))
 end
 
 function divisible(x::ZZ, y::Int)
+   y == 0 && throw(DivideError())
    bool(ccall((:fmpz_divisible_si, :libflint), Cint, (Ptr{ZZ}, Int), &x, y))
+end
+
+issquare(x::ZZ) = bool(ccall((:fmpz_is_square, :libflint), Cint, (Ptr{ZZ},), &x))
+
+isprime(x::ZZ) = bool(ccall((:fmpz_is_prime, :libflint), Cint, (Ptr{ZZ},), &x))
+
+isprobabprime(x::ZZ) = bool(ccall((:fmpz_is_probabprime, :libflint), Cint, (Ptr{ZZ},), &x))
+
+function remove(x::ZZ, y::ZZ) 
+   y == 0 && throw(DivideError())
+   z = ZZ()
+   num = ccall((:fmpz_remove, :libflint), Int, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y)
+   return num, z
+end
+
+function divisor_lenstra(n::ZZ, r::ZZ, m::ZZ)
+   r <= 0 && throw(DomainError())
+   m <= r && throw(DomainError())
+   n <= m && throw(DomainError())
+   z = ZZ()
+   if !bool(ccall((:fmpz_divisor_in_residue_class_lenstra, :libflint), 
+       Cint, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &n, &r, &m))
+      z = 0
+   end
+   return z
 end
 
 function fac(x::Int)
@@ -917,37 +944,15 @@ function binom(n::Int, k::Int)
     return z
 end
 
-issquare(x::ZZ) = bool(ccall((:fmpz_is_square, :libflint), Cint, (Ptr{ZZ},), &x))
-
-isprime(x::ZZ) = bool(ccall((:fmpz_is_prime, :libflint), Cint, (Ptr{ZZ},), &x))
-
-isprobabprime(x::ZZ) = bool(ccall((:fmpz_is_probabprime, :libflint), Cint, (Ptr{ZZ},), &x))
-
-function divisor_lenstra(n::ZZ, r::ZZ, m::ZZ)
-   z = ZZ()
-   if !bool(ccall((:fmpz_divisor_in_residue_class_lenstra, :libflint), 
-       Cint, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &n, &r, &m))
-      z = 0
-   end
-   return z
+function moebiusmu(x::ZZ) 
+   x < 0 && throw(DomainError())
+   return int(ccall((:fmpz_moebius_mu, :libflint), Cint, (Ptr{ZZ},), &x))
 end
 
 function jacobi(x::ZZ, y::ZZ) 
    y <= x && throw(DomainError())
    x < 0 && throw(DomainError())
    return int(ccall((:fmpz_jacobi, :libflint), Cint, (Ptr{ZZ}, Ptr{ZZ}), &x, &y))
-end
-
-function moebiusmu(x::ZZ) 
-   x < 0 && throw(DomainError())
-   return int(ccall((:fmpz_moebius_mu, :libflint), Cint, (Ptr{ZZ},), &x))
-end
-
-function remove(x::ZZ, y::ZZ) 
-   y == 0 && throw(DomainError())
-   z = ZZ()
-   num = ccall((:fmpz_remove, :libflint), Int, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y)
-   return num, z
 end
 
 function sigma(x::ZZ, y::Int) 
