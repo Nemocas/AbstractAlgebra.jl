@@ -1590,14 +1590,14 @@ prevpow2(x::ZZ)
 \end{lstlisting}
 
 \desc{Return the largest power of $2$ which does not exceed $x$. If $x < 0$ the result is
-set to \code{-prevpow2(x)}.}
+set to \code{-prevpow2(-x)}.}
 
 \begin{lstlisting}
 nextpow2(x::ZZ)
 \end{lstlisting}
 
 \desc{Return the smallest power of $2$ which is not less than $x$. If $x < 0$ the result is
-set to \code{-nextpow2(x)}.}
+set to \code{-nextpow2(-x)}.}
 
 \begin{lstlisting}
 trailing_zeros(x::ZZ)
