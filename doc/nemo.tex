@@ -2362,6 +2362,8 @@ divexact{T <: Ring, S}(a::Poly{T, S}, b::T)
 \desc{Return $a$ divided by $b$. The result is only meaningful if the division is
 exact. If $b = 0$ we throw a \code{DivideError()}.}
 
+Then we have division of a polynomial by another.
+
 \begin{lstlisting}
 divexact{S}(a::Poly{ZZ, S}, b::Poly{ZZ, S})
 divexact{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
@@ -2386,6 +2388,178 @@ j = divexact(3*f, ZZ(3))
 k = x*y^2 + (x + 1)*y + 3
 l = (x + 1)*y + (x^3 + 2x + 2)
 m = divexact(k*l, k)
+\end{lstlisting}
+
+\subsection{Pseudodivision}
+
+Given two polynomials $a, b$, pseudodivision computes polynomials $q$ and $r$
+with length$(r) <$ length$(b)$ such that
+$$L^d a = bq + r,$$
+where $d =$ length$(a) -$ length$(b) + 1$ and $L$ is the leading coefficient
+of $b$.
+
+We call $q$ the pseudoquotient and $r$ the pseudoremainder.
+
+\begin{lstlisting}
+pseudorem{S}(a::Poly{ZZ, S}, b::Poly{ZZ, S})
+pseudorem{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return the pseudoremainder of $a$ divided by $b$. If $b = 0$ we throw a 
+\code{DivideError()}.}
+
+\begin{lstlisting}
+pseudodivrem{S}(a::Poly{ZZ, S}, b::Poly{ZZ, S})
+pseudodivrem{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return a tuple $(q, r)$ consisting of the pseudoquotient and pseudoremainder 
+of $a$ divided by $b$. If $b = 0$ we throw a \code{DivideError()}.}
+
+\textbf{Examples.}
+
+Here are some examples of pseudodivision.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x^2 + 2x + 1
+g = x^3 + 3x + 1
+r = pseudorem(f, g)
+q, r = pseudodivrem(f, g)
+
+k = x*y^2 + (x + 1)*y + 3
+l = (x + 1)*y + (x^3 + 2x + 2)
+m = pseudorem(k, l)
+m, n = pseudodivrem(k, l)
+\end{lstlisting}
+
+\subsection{Content, primitive part and GCD}
+
+\begin{lstlisting}
+content{S}(a::Poly{ZZ, S})
+content{T <: Ring, S}(a::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return the content of the polynomial $a$, i.e. the greatest common divisor
+of all its coefficients, if this exists.}
+
+\begin{lstlisting}
+primpart{S}(a::Poly{ZZ, S})
+primpart{T <: Ring, S}(a::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return the primitive part of the polynomial $a$, i.e. the polynomial
+divided by its content, if it exists.}
+
+\begin{lstlisting}
+gcd{S}(a::Poly{ZZ, S}, b::Poly{ZZ, S})
+gcd{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return the greatest common divisor of the polynomials $a$ and $b$ if it exists.}
+
+\textbf{Examples.}
+
+Here are some examples of content, primitive part and GCD.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x^2 + 2x + 1
+g = x^3 + 3x + 1
+h = x + 1
+r = content(3*f)
+s = primpart(3*f)
+t = gcd(f*h, g*h)
+
+k = x*y^2 + (x + 1)*y + 3
+l = (x + 1)*y + (x^3 + 2x + 2)
+m = y^2 + x + 1
+n = content(k)
+p = primpart(k*(x^2 + 1))
+q = gcd(k*m, l*m)
+\end{lstlisting}
+
+\subsection{Evaluation}
+
+\begin{lstlisting}
+evaluate{S}(a::Poly{ZZ, S}, b::Int)
+evaluate{S}(a::Poly{ZZ, S}, b::ZZ)
+evaluate{T <: Ring, S}(a::Poly{T, S}, b::Int)
+evaluate{T <: Ring, S}(a::Poly{T, S}, b::T)
+\end{lstlisting}
+
+\desc{Return the value of the polynomial $a$ evaluated at $b$}.
+
+\textbf{Examples.}
+
+Here are some examples of evaluation.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x^2 + 2x + 1
+g = evaluate(f, 3)
+h = evaluate(f, ZZ(10))
+
+j = x*y^2 + (x + 1)*y + 3
+k = evaluate(j, 3)
+l = evaluate(j, x^2 + 2x + 1)
+\end{lstlisting}
+
+\subsection{Composition}
+
+\begin{lstlisting}
+compose{S}(a::Poly{ZZ, S}, b::Poly{ZZ, S})
+compose{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return the composition of the polynomial $a$ with $b$, i.e. $a \circ b$.}
+
+\textbf{Examples.}
+
+Here are some examples of composition.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x^2 + 2x + 1
+g = x^3 + 3x + 1
+h = compose(f, g)
+
+j = x*y^2 + (x + 1)*y + 3
+k = (x + 1)*y + (x^3 + 2x + 2)
+l = compose(j, k)
+\end{lstlisting}
+
+\subsection{Derivative}
+
+\begin{lstlisting}
+deriv{S}(a::Poly{ZZ, S})
+deriv{T <: Ring, S}(a::Poly{T, S})
+\end{lstlisting}
+
+\desc{Compute the derivative of the polynomial $a$ with respect to its main
+variable.}
+
+\textbf{Examples.}
+
+Here are some examples of computing derivatives.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x^2 + 2x + 1
+g = deriv(f)
+
+h = x*y^2 + (x + 1)*y + 3
+j = deriv(h)
 \end{lstlisting}
 
 

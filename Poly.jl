@@ -1,6 +1,6 @@
 export Poly, PolynomialRing, coeff, zero, one, gen, isgen, chebyshev_t,
        chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic,
-       pseudorem, pseudodivrem, primpart, content, divexact, subst, deriv,
+       pseudorem, pseudodivrem, primpart, content, divexact, evaluate, compose, deriv,
        resultant, lead, discriminant, bezout, truncate, mullow
 
 import Base: convert, zero
@@ -635,6 +635,7 @@ end
 ###########################################################################################
 
 function pseudorem{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
+   y == 0 && throw(DivideError())
    z = Poly{ZZ, S}()
    d = 0
    ccall((:fmpz_poly_pseudo_rem, :libflint), Void, 
@@ -644,6 +645,7 @@ function pseudorem{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
 end
 
 function pseudodivrem{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
+   y == 0 && throw(DivideError())
    q = Poly{ZZ, S}()
    r = Poly{ZZ, S}()
    d = 0
@@ -654,6 +656,7 @@ function pseudodivrem{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
 end
 
 function pseudorem{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
+   g == 0 && throw(DivideError())
    b = g.data.coeffs[g.data.length]
    x = gen(Poly{T, S})
    while f.data.length >= g.data.length
@@ -663,6 +666,7 @@ function pseudorem{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
 end
 
 function pseudodivrem{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
+   g == 0 && throw(DivideError())
    if f.data.length < g.data.length
       return zero(Poly{T, S}), f
    end
@@ -686,7 +690,7 @@ end
 
 ###########################################################################################
 #
-#   GCD
+#   Content, primitive part and GCD
 #
 ###########################################################################################
 
@@ -749,7 +753,7 @@ end
 #
 ###########################################################################################
 
-function subst{S}(x::Poly{ZZ, S}, y::ZZ)
+function evaluate{S}(x::Poly{ZZ, S}, y::ZZ)
    z = ZZ()
    ccall((:fmpz_poly_evaluate_fmpz, :libflint), Void, 
                 (Ptr{ZZ}, Ptr{fmpz_poly}, Ptr{ZZ}), 
@@ -757,7 +761,7 @@ function subst{S}(x::Poly{ZZ, S}, y::ZZ)
    return z
 end
 
-function subst{S}(x::Poly{ZZ, S}, y::Int)
+function evaluate{S}(x::Poly{ZZ, S}, y::Int)
    z = ZZ()
    ccall((:fmpz_poly_evaluate_fmpz, :libflint), Void, 
                 (Ptr{ZZ}, Ptr{fmpz_poly}, Ptr{ZZ}), 
@@ -765,7 +769,7 @@ function subst{S}(x::Poly{ZZ, S}, y::Int)
    return z
 end
 
-function subst{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
+function compose{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_compose, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
@@ -773,7 +777,7 @@ function subst{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    return z
 end
 
-function subst{T <: Ring, S}(a::Poly{T, S}, b::T)
+function evaluate{T <: Ring, S}(a::Poly{T, S}, b::T)
    i = a.data.length
    if i == 0
        return zero(T)
@@ -786,11 +790,11 @@ function subst{T <: Ring, S}(a::Poly{T, S}, b::T)
    return z
 end
 
-function subst{T <: Ring, S}(a::Poly{T, S}, b::Int)
-   return subst(a, convert(T, b))
+function evaluate{T <: Ring, S}(a::Poly{T, S}, b::Int)
+   return evaluate(a, convert(T, b))
 end
 
-function subst{T <: Ring, S, R <: Ring}(a::Poly{T, S}, b::R)
+function compose{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    i = a.data.length
    if i == 0
        return zero(T)
