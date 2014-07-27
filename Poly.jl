@@ -1035,7 +1035,7 @@ end
 #
 ###########################################################################################
 
-function PolynomialRing(T, s)
+function PolynomialRing{T <: Ring}(::Type{T}, s::String)
    S = symbol(s)
    T1 = Poly{T, S}
    T2 = T

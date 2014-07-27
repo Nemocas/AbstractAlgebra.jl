@@ -1413,6 +1413,8 @@ cmpabs(x::ZZ, y::ZZ)
 \desc{Return a negative integer if $|x| < |y|$, a positive integer if $|x| > |y|$ and zero if 
 $|x| = |y|$, where $|x|$ is the absolute value of $x$.}
 
+\textbf{Examples.}
+
 Here are some examples of the comparison operators and functions.
 
 \begin{lstlisting}
@@ -1444,6 +1446,8 @@ We overload the comparison operators to more easily deal with values of type \co
 >=(a::ZZ, b::Int)
 >=(a::Int, b::ZZ)
 \end{lstlisting}
+
+\textbf{Examples.}
 
 Here are some examples of the ad hoc comparison operators.
 
@@ -1633,6 +1637,8 @@ are numbered starting with $n = 0$ for the least significant bit. N.B. this func
 not return the result, but alters the value of $x$. This is an unsafe operation which will
 change the value of all variables which contain a reference to $x$.}
 
+\textbf{Examples.}
+
 Here are some examples of the bit twiddling functions.
 
 \begin{lstlisting}
@@ -1692,6 +1698,8 @@ nbits(n::ZZ)
 absolute value of $n$ in binary. We take the convention that $0$ requires $0$ binary 
 bits.}
 
+\textbf{Examples.}
+
 Here are some examples of the functions for alternative bases.
 
 \begin{lstlisting}
@@ -1711,6 +1719,8 @@ string(x::ZZ)
 
 \desc{Return a unicode string representation of the value of $x$ in decimal, including the sign
 if $x < 0$.}
+
+\textbf{Examples.}
 
 Here is an example of string I/O.
 
@@ -1757,6 +1767,8 @@ crt(r1::ZZ, m1::ZZ, r2::Int, m2::Int, sign::Bool)
 \desc{Return a value $r$ such that $r \equiv r1 \pmod {m1}$ and $r \equiv r2 \pmod{m2}$.
 If \code{sign = true} the value will be in the range \code{-m1*m2/2 < r <= m1*m2/2}. If
 \code{sign = false} the value will be in the range \code{0 <= r < m1*m2}.}
+
+\textbf{Examples.}
 
 Here are some examples of modular arithmetic.
 
@@ -1878,6 +1890,8 @@ eulerphi(x::ZZ)
 \desc{Return the value of the Euler phi function, i.e. the number of $0 < d \leq x$ such
 that gcd$(d, x) = 1$. If $x < 0$ we return $0$.}
 
+\textbf{Examples.}
+
 Here are some examples of number theoretic and combinatorial functions.
 
 \begin{lstlisting}
@@ -1889,5 +1903,155 @@ n = fac(100)
 s = sigma(ZZ(128), 10)
 a = eulerphi(ZZ(12480))
 \end{lstlisting}
+
+\section{Polynomial rings}
+
+Nemo has a parametric polynomial type (called \code{Poly}). There's not any need to deal
+directly with the type, as we provide a function \code{PolynomialRing} for constructing
+it.
+
+For completeness, we describe here how the \code{Poly} type works. The user not interested
+in the ugly internals can skip forward to the section on constructors.
+
+The type takes two parameters, the first a ring $T$ on which it is parameterised, and a
+symbol, representing the variable, e.g. the type of polynomials over the integers in $x$, 
+i.e. the type of $\Z[x]$, is \code|Poly{ZZ, :x}|.
+
+Internally, we specialise the polynomial type to use flint structures where available.
+For example, we define an \code{fmpz_poly} type in Julia to mirror flint's \code{fmpz_poly}.
+
+\begin{lstlisting}
+type fmpz_poly <: Ring
+   coeffs :: Ptr{Void}
+   alloc :: Int
+   length :: Int
+end
+\end{lstlisting}
+
+Fortunately, as Julia will construct an object of this type on the heap, we end up with
+precisely an \code{fmpz_poly_t} which can be passed directly to flint \code{fmpz_poly}
+functions.
+
+For generic polynomials, for which there is no flint type (e.g. polynomials over another
+polynomial ring) we define a general Julia type
+
+\begin{lstlisting}
+type PolyStruct{T <: Ring}
+   coeffs :: Array{T, 1}
+   length :: Int
+end
+\end{lstlisting}
+
+It simply contains an array of coefficients of type $T$, where $T$ is in the \code{Ring}
+class, and a length (degree plus one).
+
+To define our general \code{Poly} type we use a Julia union type to combine the flint
+and generic types.
+
+\begin{lstlisting}
+type Poly{T <: Ring, Symbol} <: Ring
+   data :: Union(fmpz_poly, PolyStruct{T})
+end
+\end{lstlisting}
+
+\subsection{Constructors}
+
+Because dealing with the Julia types directly is somewhat messy, we provide a simple
+function to create the type of a polynomial in Nemo.
+
+\begin{lstlisting}
+PolynomialRing{T <: Ring}(::Type{T}, s::String)
+\end{lstlisting}
+
+\desc{This function takes a type $T$ which belongs to the \code|Ring| class 
+(e.g. \code|T = ZZ|) and a string giving the string representation of a variable (e.g. 
+\code|"x"|) and returns a tuple \code|(R, x)| consisting of the type of the polynomial
+ring being constructed, \code|R|, and the degree $1$ polynomial \code|x| in this ring. 
+Here \code|S| is the symbol corresponding to the string \code|s|.}
+
+This is easier to understand by giving an example
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = (x^2 + 2x + 1)*y^3 + (x - 1)*y + 4x - 1
+\end{lstlisting}
+
+Notice that we can build up polynomials from the degree one polynomials \code{x} and
+\code{y} returned by the calls to \code{PolynomialRing}. 
+
+Another thing to note is that there is no reason why the variable \code{x} has to 
+be the same as the string \code{"x"}. The latter is simply how \code{x} will print
+when we evaluate it. Of course, in most situations it is convenient to use the same 
+letter for the variable and for the string.
+
+Once we have constructed a polynomial type \code|R = Poly{T, S}| as above, we can
+use it to construct polynomials of various kinds.
+
+\begin{lstlisting}
+Poly{T <: Ring, Symbol}()
+\end{lstlisting}
+
+\desc{Construct a polynomial of length $0$ of the given type.}
+
+\begin{lstlisting}
+Poly{T <: Ring, Symbol}(a::Integer)
+\end{lstlisting}
+
+\desc{Construct a polynomial of length $1$ whose constant coefficient is $a$.}
+
+\begin{lstlisting}
+Poly{T <: Ring, Symbol}(a::T)
+\end{lstlisting}
+
+\desc{Construct a polynomial of length $1$ whose constant coefficient is $a$.}
+
+\begin{lstlisting}
+Poly{T <: Ring, Symbol}(a::Array{T, 1})
+\end{lstlisting}
+
+\desc{Construct a polynomial whose coefficients are given by the elements of the array
+\code{a}, starting with the constant coefficient at index $1$.}
+
+\begin{lstlisting}
+Poly{T <: Ring, Symbol}(a::Poly{T, Symbol})
+\end{lstlisting}
+
+\desc{Return a reference to the polynomial \code{a}.}
+
+\begin{lstlisting}
+Poly{T <: Ring, Symbol, R <: Ring}(a::R)
+\end{lstlisting}
+
+\desc{Try to convert the value \code{a} to the polynomial type parameterised by 
+\code{T} and the symbol, if possible, and return the value, else raise an error. 
+This constructor is used to coerce polynomial from subordinate rings up into the
+top polynomial ring.}
+
+\textbf{Examples.}
+
+Here are some examples of these constructors in action. Note that we don't actually
+ever need to deal with the parameterised \code{Poly} type directly.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+T, z = PolynomialRing(S, "z")
+
+f = x^2 + y^3 + z + 1
+
+g = S(2)
+
+h = S(x^2 + 2x + 1)
+
+j = T(x + 2)
+
+k = S([x, x + 2, x^2 + 3x + 1])
+
+l = S(k)
+\end{lstlisting}
+
+
 
 \end{document}
