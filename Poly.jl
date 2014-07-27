@@ -1,7 +1,7 @@
 export Poly, PolynomialRing, coeff, zero, one, gen, isgen, chebyshev_t,
        chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic,
        pseudorem, pseudodivrem, primpart, content, divexact, subst, deriv,
-       resultant, lead, discriminant, bezout
+       resultant, lead, discriminant, bezout, truncate, mullow
 
 import Base: convert, zero
 
@@ -303,7 +303,7 @@ function *{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
 
    return z
 end
-  
+
 ###########################################################################################
 #
 #   Ad hoc binary operators
@@ -405,6 +405,56 @@ end
 *{T <: Ring, S}(a::Poly{T, S}, b::Int) = b*a
 
 *{T <: Ring, S}(a::Poly{T, S}, b::ZZ) = b*a
+
+###########################################################################################
+#
+#   Truncation
+#
+###########################################################################################
+
+function truncate{S}(a::Poly{ZZ, S}, n::Int)
+   if a.data.length <= n
+      return a
+   end
+
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_set_trunc, :libflint), Void,
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int),
+               &(z.data), &(a.data), n)
+
+   return z
+end
+
+function truncate{T <: Ring, S}(a::Poly{T, S}, n::Int)
+   lena = a.data.length
+
+   if lena <= n
+      return a
+   end
+
+   lenz = min(lena, n)
+   z = Poly{T, S}(Array(T, lenz))
+
+   for i = 1:lenz
+      z.data.coeffs[i] = a.data.coeffs[i]
+   end
+
+   z.data.length = normalise(z, lenz)
+
+   return z
+end
+
+function mullow{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S}, n::Int)
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_mullow, :libflint), Void,
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int),
+               &(z.data), &(x.data), &(y.data), n)
+   return z
+end
+
+function mullow{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S}, n::Int)
+   return truncate(a * b, n)
+end
 
 ###########################################################################################
 #
