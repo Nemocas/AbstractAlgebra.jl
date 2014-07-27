@@ -2309,7 +2309,7 @@ throw a \code{DomainError()}.}
 
 \textbf{Examples.}
 
-Here are some examples of truncated operationss.
+Here are some examples of truncated operations.
 
 \begin{lstlisting}
 R, x = PolynomialRing(ZZ, "x")
@@ -2324,6 +2324,68 @@ k = x*y^2 + (x + 1)*y + 3
 l = (x + 1)*y + (x^3 + 2x + 2)
 m = truncate(k, 1)
 n = mullow(k, l, 4)
+\end{lstlisting}
+
+\subsection{Powering}
+
+\begin{lstlisting}
+^{S}(a::Poly{ZZ, S}, n::Int)
+^{T <: Ring, S}(a::Poly{T, S}, n::Int)
+\end{lstlisting}
+
+\desc{Return the polynomial $a^n$. If $n < 0$ we throw a \code{DomainError()}.}
+
+\textbf{Examples.}
+
+Here are some examples of powering.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x^2 + 2x + 1
+g = f^12
+
+k = x*y^2 + (x + 1)*y + 3
+l = k^5
+\end{lstlisting}
+
+\subsection{Exact division}
+
+First we have exact division by a scalar.
+
+\begin{lstlisting}
+divexact{S}(a::Poly{ZZ, S}, b::ZZ)
+divexact{T <: Ring, S}(a::Poly{T, S}, b::T)
+\end{lstlisting}
+
+\desc{Return $a$ divided by $b$. The result is only meaningful if the division is
+exact. If $b = 0$ we throw a \code{DivideError()}.}
+
+\begin{lstlisting}
+divexact{S}(a::Poly{ZZ, S}, b::Poly{ZZ, S})
+divexact{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return $a$ divided by $b$. The result is only meaningful if the division is
+exact. If $b = 0$ we throw a \code{DivideError()}.}
+
+\textbf{Examples.}
+
+Here are some examples of exact division.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x^2 + 2x + 1
+g = x^3 + 3x + 1
+h = divexact(f*g, f)
+j = divexact(3*f, ZZ(3))
+
+k = x*y^2 + (x + 1)*y + 3
+l = (x + 1)*y + (x^3 + 2x + 2)
+m = divexact(k*l, k)
 \end{lstlisting}
 
 

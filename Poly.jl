@@ -470,6 +470,7 @@ end
 
 
 function ^{S}(x::Poly{ZZ, S}, y::Int)
+   y < 0 && throw(DomainError())
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_pow, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), 
@@ -478,6 +479,7 @@ function ^{S}(x::Poly{ZZ, S}, y::Int)
 end
 
 function ^{T <: Ring, S}(a::Poly{T, S}, b::Int)
+   b < 0 && throw(DomainError())
    # special case powers of x for constructing polynomials efficiently
    if a.data.length == 2 && a.data.coeffs[1] == 0 && a.data.coeffs[2] == 1
       z = Poly{T, S}(Array(T, b + 1))
@@ -575,6 +577,7 @@ end
 ###########################################################################################
 
 function divexact{T <: Ring, S}(a::Poly{T, S}, b::T)
+   b == 0 && throw(DivideError())
    z = Poly{T, S}(Array(T, a.data.length))
    for i = 1:a.data.length
       z.data.coeffs[i] = divexact(a.data.coeffs[i], b)
@@ -584,6 +587,7 @@ function divexact{T <: Ring, S}(a::Poly{T, S}, b::T)
 end
 
 function divexact{S}(x::Poly{ZZ, S}, y::ZZ)
+   y == 0 && throw(DivideError())
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_scalar_divexact_fmpz, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{ZZ}), 
@@ -592,6 +596,7 @@ function divexact{S}(x::Poly{ZZ, S}, y::ZZ)
 end
 
 function divexact{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
+   g == 0 && throw(DivideError())
    if f == 0
       return zero(Poly{T, S})
    end
@@ -612,6 +617,7 @@ function divexact{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
 end
 
 function divexact{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
+   y == 0 && throw(DivideError())
    if x == 0
       return zero(Poly{ZZ, S})
    end
