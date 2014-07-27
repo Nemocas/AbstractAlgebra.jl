@@ -197,7 +197,7 @@ dynamically typed language and the performance of statically typed languages.
 \subsubsection{Interactive console}
 
 Julia offers an interactive console, similar to Python. It can also be used from IJulia, which
-is a IPython derivative, even on the web, via the IPython notebook!
+is an IPython derivative, even on the web, via the IPython notebook!
 
 The Julia console uses readline and offers an online help system.
 
@@ -387,7 +387,7 @@ creating the array and once again when filling it with values).
 The other way to do things is to use structs on the stack to contain objects and arrays of structs.
 
 This saves immediately on cache hits because all the data in an array is in one place, rather than
-a in a multitude of heap allocations. It also saves on object creation, as only one heap allocated
+in a multitude of heap allocations. It also saves on object creation, as only one heap allocated
 object is created, namely the array itself.
 
 One disadvantage of this technique is that when assignment occurs, a deep copy of the data needs to
@@ -431,7 +431,7 @@ use any other convention.
 The third option is to make bignums the default and ask the programmer to provide a notation if they
 intend to use a machine integer. This has the advantage of no mathematical surprises. Performance can
 suffer if the programmer forgets to provide the appropriate annotation where a machine integer should
-be used. And things like array indices will usually require an annotation or some sort (expensive)
+be used. And things like array indices will usually require an annotation or some sort of (expensive)
 automatic conversion.
 
 The problem with Julia is that the only consistent way of specifying a bignum is with a string. The
@@ -524,6 +524,10 @@ straightforward.
 Again, as far as I can tell, Julia does the right thing here. But again, it is a real pain in the neck.
 
 I don't see a simple workaround that I can be sure is efficient.
+
+\subsubsection{A trivial complaint}
+
+There is currently no easy way to change the Julia prompt to \code{nemo} instead of \code{julia}.
 
 \section{A short introduction to the Julia language}
 
@@ -884,7 +888,8 @@ This is now a tuple of length 1.
 
 Note that tuples may contain inhomogeneous types. 
 
-Arrays can too, in which case the types will be made the generic type \code{Any}. 
+Arrays can too, in which case the types will be made the generic type \code{Any} (or
+at least some abstract type to which all the types belong). 
 But performance will suffer in the case of arrays, as with any code where Julia infers
 type \code{Any}.
 
@@ -914,7 +919,7 @@ git clone https://github.com/wbhart/flint2
 \end{verbatim}
 
 The other instructions are as per the manual for flint-2.4 on the flint website (see
-\url{http://flintlib.org}. Note that flint-2.4 requires GMP 5 or MPIR 2.7 and MPFR
+\url{http://flintlib.org}). Note that flint-2.4 requires GMP 5 or MPIR 2.7 and MPFR
 3.1.
 
 To install Julia, please refer to the installation instructions on the Julia website
