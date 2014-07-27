@@ -1649,32 +1649,32 @@ combit!(a, 2)
 base(n::ZZ, b::Int)
 \end{lstlisting}
 
-\desc{Return a string giving the representation of $n$ in the given base $b$. Valid bases
-are $2 \leq b \leq 62$. If an invalid base is applied and error is raised.}
+\desc{Return a unicode string giving the representation of $n$ in the given base $b$. Valid
+bases are $2 \leq b \leq 62$. If an invalid base is applied and error is raised.}
 
 \begin{lstlisting}
 bin(n::ZZ)
 \end{lstlisting}
 
-\desc{Return a string giving the representation of $n$ in binary, i.e. base $2$.}
+\desc{Return a unicode string giving the representation of $n$ in binary, i.e. base $2$.}
 
 \begin{lstlisting}
 oct(n::ZZ)
 \end{lstlisting}
 
-\desc{Return a string giving the representation of $n$ in octal, i.e. base $8$.}
+\desc{Return a unicode string giving the representation of $n$ in octal, i.e. base $8$.}
 
 \begin{lstlisting}
 bin(n::ZZ)
 \end{lstlisting}
 
-\desc{Return a string giving the representation of $n$ in decimal, i.e. base $10$.}
+\desc{Return a unicode string giving the representation of $n$ in decimal, i.e. base $10$.}
 
 \begin{lstlisting}
 bin(n::ZZ)
 \end{lstlisting}
 
-\desc{Return a string giving the representation of $n$ in hexadecimal, i.e. base $16$.}
+\desc{Return a unicode string giving the representation of $n$ in hexadecimal, i.e. base $16$.}
 
 \begin{lstlisting}
 ndigits(n::ZZ, b::Integer = 10)
@@ -1701,6 +1701,23 @@ s1 = bin(a)
 s2 = base(a, 13)
 n1 = nbits(a)
 n2 = ndigits(a, 3)
+\end{lstlisting}
+
+\subsection{String I/O}
+
+\begin{lstlisting}
+string(x::ZZ)
+\end{lstlisting}
+
+\desc{Return a unicode string representation of the value of $x$ in decimal, including the sign
+if $x < 0$.}
+
+Here is an example of string I/O.
+
+\begin{lstlisting}
+a = ZZ(12)
+s = string(a)
+println(s[1])
 \end{lstlisting}
 
 \end{document}
