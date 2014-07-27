@@ -1221,7 +1221,7 @@ $(a::ZZ, b::ZZ)
 \end{lstlisting}
 
 Note that \code{%} follows the C (and Julia) convention of rounding the quotient
-towards zero.
+towards zero. If $b = 0$ is passed to \code{%}, a \code{DivideError()} is thrown.
 
 Julia automatically provides all of combined assignment operators \code{+=, *=, &=}
 etc.
@@ -1236,7 +1236,8 @@ div(a::ZZ, b::ZZ)
 \end{lstlisting}
 
 \desc{Integer division with rounding towards $-\infty$, $+\infty$ and $0$ respectively.
-Note \code{div} is a synonym for \code{tdiv}.}
+Note \code{div} is a synonym for \code{tdiv}. If $b = 0$ is passed to any of these
+functions, a \code{DivideError()} is thrown.}
 
 \begin{lstlisting}
 mod(a::ZZ, b::ZZ)
@@ -1245,7 +1246,8 @@ rem(a::ZZ, b::ZZ)
 \end{lstlisting}
 
 \desc{Integer remainder after division with rounding towards $-\infty$ and $0$
-respectively. Note that \code{\%} is a synonym for \code{rem}.}
+respectively. Note that \code{\%} is a synonym for \code{rem}. If $b = 0$ is passed to 
+any of these functions, a \code{DivideError()} is thrown.}
 
 \begin{lstlisting}
 divexact(a::ZZ, b::ZZ)
@@ -1253,7 +1255,7 @@ divexact(a::ZZ, b::ZZ)
 
 \desc{Exact integer division. This is more efficient than the above division functions,
 but will only return a meaningful result if the division is exact, i.e. if $b$ divides
-$a$.}
+$a$. If $b = 0$ is passed to this function, a \code{DivideError()} is thrown.}
 
 \begin{lstlisting}
 gcd(a::ZZ, b::ZZ)
@@ -1411,6 +1413,30 @@ Here are some examples of the unary operators and functions.
 a = -ZZ(12)
 b = ~ZZ(-5)
 c = abs(a)
+\end{lstlisting}
+
+\subsection{Division with remainder}
+
+The following division with remainder functions are provided.
+
+\begin{lstlisting}
+fdivrem(a::ZZ, b::ZZ)
+tdivrem(a::ZZ, b::ZZ)
+divrem(a::ZZ, b::ZZ)
+\end{lstlisting}
+
+\desc{Return a tuple $(q, r)$ consisting of the quotient and remainder after 
+division of $x$ by $y$, with rounding towards $-\infty$ and $0$ respectively. Note 
+that \code{divrem} is a synonym for \code{tdivrem}. If $b = 0$ is passed to any
+of these functions a \code{DivideError()} is thrown.}
+
+\textbf{Examples.}
+
+Here are some examples of the unary operators and functions.
+
+\begin{lstlisting}
+q, r = fdivrem(ZZ(12), ZZ(5))
+q, r = tdivrem(ZZ(12), ZZ(5))
 \end{lstlisting}
 
 \end{document}

@@ -315,6 +315,7 @@ for (fJ, fC) in ((:fdiv, :fdiv_q), (:cdiv, :cdiv_q), (:tdiv, :tdiv_q),
 end
 
 function divexact(x::ZZ, y::ZZ)
+    y == 0 && throw(DivideError())
     z = ZZ()
     ccall((:fmpz_divexact, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y)
     z
@@ -495,28 +496,28 @@ function cdivpow2(x::ZZ, c::Int)
 end
 
 function div(x::ZZ, c::Int)
-    c == 0 && return x
+    c == 0 && throw(DivideError())
     z = ZZ()
     ccall((:fmpz_tdiv_q_si, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
     return z
 end
 
 function tdiv(x::ZZ, c::Int)
-    c == 0 && return x
+    c == 0 && throw(DivideError())
     z = ZZ()
     ccall((:fmpz_tdiv_q_si, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
     return z
 end
 
 function fdiv(x::ZZ, c::Int)
-    c == 0 && return x
+    c == 0 && throw(DivideError())
     z = ZZ()
     ccall((:fmpz_fdiv_q_si, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
     return z
 end
 
 function cdiv(x::ZZ, c::Int)
-    c == 0 && return x
+    c == 0 && throw(DivideError())
     z = ZZ()
     ccall((:fmpz_cdiv_si, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
     return z
@@ -524,11 +525,12 @@ end
 
 function mod(x::ZZ, c::Int)
     c < 0 && throw(DomainError())
-    c == 0 && return x
+    c == 0 && throw(DivideError())
     ccall((:fmpz_fdiv_ui, :libflint), Int, (Ptr{ZZ}, Int), &x, c)
 end
 
 function divexact(x::ZZ, y::Int)
+    y == 0 && throw(DivideError())
     z = ZZ()
     ccall((:fmpz_divexact_si, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, y)
     z
@@ -593,6 +595,7 @@ end
 ###########################################################################################
 
 function divrem(x::ZZ, y::ZZ)
+    y == 0 && throw(DivideError())
     z1 = ZZ()
     z2 = ZZ()
     ccall((:fmpz_tdiv_qr, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z1, &z2, &x, &y)
@@ -600,6 +603,7 @@ function divrem(x::ZZ, y::ZZ)
 end
 
 function tdivrem(x::ZZ, y::ZZ)
+    y == 0 && throw(DivideError())
     z1 = ZZ()
     z2 = ZZ()
     ccall((:fmpz_tdiv_qr, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z1, &z2, &x, &y)
@@ -607,6 +611,7 @@ function tdivrem(x::ZZ, y::ZZ)
 end
 
 function fdivrem(x::ZZ, y::ZZ)
+    y == 0 && throw(DivideError())
     z1 = ZZ()
     z2 = ZZ()
     ccall((:fmpz_fdiv_qr, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z1, &z2, &x, &y)
