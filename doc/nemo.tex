@@ -1656,7 +1656,7 @@ base(n::ZZ, b::Int)
 \end{lstlisting}
 
 \desc{Return a unicode string giving the representation of $n$ in the given base $b$. Valid
-bases are $2 \leq b \leq 62$. If an invalid base is applied and error is raised.}
+bases are $2 \leq b \leq 62$. If an invalid base is applied an error is raised.}
 
 \begin{lstlisting}
 bin(n::ZZ)
@@ -1671,13 +1671,13 @@ oct(n::ZZ)
 \desc{Return a unicode string giving the representation of $n$ in octal, i.e. base $8$.}
 
 \begin{lstlisting}
-bin(n::ZZ)
+dec(n::ZZ)
 \end{lstlisting}
 
 \desc{Return a unicode string giving the representation of $n$ in decimal, i.e. base $10$.}
 
 \begin{lstlisting}
-bin(n::ZZ)
+hex(n::ZZ)
 \end{lstlisting}
 
 \desc{Return a unicode string giving the representation of $n$ in hexadecimal, i.e. base $16$.}
