@@ -916,7 +916,13 @@ end
 function risingfac(x::Int, y::Int)
     y < 0 && throw(DomainError())
     z = ZZ()
-    ccall((:fmpz_rfac_uiui, :libflint), Void, (Ptr{ZZ}, Culong, Culong), &z, x, y)
+    if x < 0
+       if y <= -x # we don't pass zero
+          z = isodd(y) ? -risingfac(-x - y + 1, y) : risingfac(-x - y + 1, y)
+       end
+    else
+       ccall((:fmpz_rfac_uiui, :libflint), Void, (Ptr{ZZ}, Culong, Culong), &z, x, y)
+    end
     return z
 end
 
