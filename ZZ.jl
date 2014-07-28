@@ -900,14 +900,13 @@ function divisor_lenstra(n::ZZ, r::ZZ, m::ZZ)
 end
 
 function fac(x::Int)
-    x < 0 && return ZZ(0)
+    x < 0 && throw(DomainError())
     z = ZZ()
     ccall((:fmpz_fac_ui, :libflint), Void, (Ptr{ZZ}, Culong), &z, x)
     return z
 end
 
 function risingfac(x::ZZ, y::Int)
-    x < 0 && throw(DomainError())
     y < 0 && throw(DomainError())
     z = ZZ()
     ccall((:fmpz_rfac_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Culong), &z, &x, y)
@@ -915,7 +914,6 @@ function risingfac(x::ZZ, y::Int)
 end
 
 function risingfac(x::Int, y::Int)
-    x < 0 && throw(DomainError())
     y < 0 && throw(DomainError())
     z = ZZ()
     ccall((:fmpz_rfac_uiui, :libflint), Void, (Ptr{ZZ}, Culong, Culong), &z, x, y)

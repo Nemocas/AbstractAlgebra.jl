@@ -1829,7 +1829,7 @@ fac(n::Int)
 \end{lstlisting}
 
 \desc{Return as a \code{ZZ} the factorial of $n$, i.e. $n(n - 1)(n - 2)\ldots 1$.
-If $n < 0$ we return $0$.}
+If $n < 0$ we throw a \code{DomainError()}.}
 
 \begin{lstlisting}
 risingfac(x::ZZ, n::Int)
@@ -1837,7 +1837,7 @@ risingfac(x::Int, n::Int)
 \end{lstlisting}
 
 \desc{Return the rising factorial of $x$, i.e. $x(x + 1)(x + 2)\ldots (x + n - 1)$.
-If $x < 0$ or $n < 0$ we throw a \code{DomainError()}.}
+If $n < 0$ we throw a \code{DomainError()}.}
 
 \begin{lstlisting}
 primorial(n::Int)
