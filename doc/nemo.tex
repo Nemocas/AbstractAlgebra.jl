@@ -1794,7 +1794,7 @@ $y = 0$ a \code{DivideError()} is raised.}
 issquare(x::ZZ)
 \end{lstlisting}
 
-\desc{Return \code{true} if $x$ is perfect square, otherwise return \code{false}.}
+\desc{Return \code{true} if $x$ is a perfect square, otherwise return \code{false}.}
 
 \begin{lstlisting}
 isprime(x::ZZ)
@@ -1997,15 +1997,11 @@ Poly{T <: Ring, Symbol}()
 
 \begin{lstlisting}
 Poly{T <: Ring, Symbol}(a::Integer)
-\end{lstlisting}
-
-\desc{Construct a polynomial of length $1$ whose constant coefficient is $a$.}
-
-\begin{lstlisting}
 Poly{T <: Ring, Symbol}(a::T)
 \end{lstlisting}
 
-\desc{Construct a polynomial of length $1$ whose constant coefficient is $a$.}
+\desc{Construct a polynomial of length $1$ whose constant coefficient is $a$ if
+$a \neq 0$, otherwise construct the zero polynomial.}
 
 \begin{lstlisting}
 Poly{T <: Ring, Symbol}(a::Array{T, 1})
@@ -2026,8 +2022,8 @@ Poly{T <: Ring, Symbol, R <: Ring}(a::R)
 
 \desc{Try to convert the value \code{a} to the polynomial type parameterised by 
 \code{T} and the symbol, if possible, and return the value, else raise an error. 
-This constructor is used to coerce polynomial from subordinate rings up into the
-top polynomial ring.}
+This constructor is used to coerce polynomials and coefficients from subordinate rings up
+into the polynomial ring.}
 
 \textbf{Examples.}
 
@@ -2058,8 +2054,8 @@ l = S(k)
 normalise{T <: Ring, S}(a::Poly{T, S}, len::Int)
 \end{lstlisting}
 
-\desc{Return the normalised length of the polynomial $a$ assuming it is currently
-the given length. A polynomial is normalised if it is either length $0$ or its
+\desc{Return the normalised length of the polynomial $a$ assuming its unnormalised
+length is \code{len}. A polynomial is normalised if it is either length $0$ or its
 leading coefficient is nonzero. This function is usually used internally.}
 
 \begin{lstlisting}
@@ -2067,14 +2063,15 @@ coeff{S}(x::Poly{ZZ, S}, n::Int)
 coeff{T <: Ring, S}(a::Poly{T, S}, n::Int)
 \end{lstlisting}
 
-\desc{Return the coefficient of degree $n$ of the polnomial $a$.}
+\desc{Return the coefficient of the degree $n$ term of the polnomial $a$, or zero
+if it has none.}
 
 \begin{lstlisting}
 lead{S}(x::Poly{ZZ, S})
 lead{T <: Ring, S}(a::Poly{T, S})
 \end{lstlisting}
 
-\desc{Return the leading coefficient of polynomial, or zero if the polynomial has
+\desc{Return the leading coefficient of the polynomial $a$, or zero if $a$ has
 length $0$.}
 
 \begin{lstlisting}
@@ -2492,7 +2489,7 @@ evaluate{T <: Ring, S}(a::Poly{T, S}, b::Int)
 evaluate{T <: Ring, S}(a::Poly{T, S}, b::T)
 \end{lstlisting}
 
-\desc{Return the value of the polynomial $a$ evaluated at $b$}.
+\desc{Return the value of the polynomial $a$ evaluated at $b$.}
 
 \textbf{Examples.}
 
@@ -2639,11 +2636,11 @@ S, y = PolynomialRing(R, "y")
 
 f = 5x^2 + 2x + 1
 g = 2x^3 + 3x + 1
-h = bezout(f, g)
+r, s, t = bezout(f, g)
 
 j = 3x*y^2 + (x + 1)*y + 3
 k = 6(x + 1)*y + (x^3 + 2x + 2)
-l = bezout(j, k)
+u, v, w = bezout(j, k)
 \end{lstlisting}
 
 \subsection{Special polynomials}
