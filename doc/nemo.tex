@@ -1844,7 +1844,7 @@ primorial(n::Int)
 \end{lstlisting}
 
 \desc{Return as a \code{ZZ} the primorial of $n$, i.e. the product of all primes
-less than or equal to $n$. If $n < 0$ we return $0$.}
+less than or equal to $n$. If $n < 0$ we throw a \code{DomainError()}.}
 
 \begin{lstlisting}
 fib(n::Int)
@@ -1888,7 +1888,7 @@ eulerphi(x::ZZ)
 \end{lstlisting}
 
 \desc{Return the value of the Euler phi function, i.e. the number of $0 < d \leq x$ such
-that gcd$(d, x) = 1$. If $x < 0$ we return $0$.}
+that gcd$(d, x) = 1$. If $x < 0$ we throw a \code{DomainError()}.}
 
 \textbf{Examples.}
 

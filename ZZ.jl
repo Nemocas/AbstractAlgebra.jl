@@ -927,7 +927,7 @@ function risingfac(x::Int, y::Int)
 end
 
 function primorial(x::Int)
-    x < 0 && return ZZ(0)
+    x < 0 && throw(DomainError()) 
     z = ZZ()
     ccall((:fmpz_primorial, :libflint), Void, (Ptr{ZZ}, Culong), &z, x)
     return z
@@ -967,6 +967,7 @@ function sigma(x::ZZ, y::Int)
 end
 
 function eulerphi(x::ZZ) 
+   x < 0 && throw(DomainError())
    z = ZZ()
    ccall((:fmpz_euler_phi, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}), &z, &x)
    return z
