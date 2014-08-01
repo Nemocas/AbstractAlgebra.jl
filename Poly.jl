@@ -22,7 +22,7 @@ type PolyStruct{T <: Ring}
    length :: Int
 end
 
-type Poly{T <: Ring, Symbol} <: Ring
+type Poly{T <: Ring, S} <: Ring
    data :: Union(fmpz_poly, PolyStruct{T})
    
    function Poly(a :: Array{T, 1})
@@ -40,11 +40,11 @@ type Poly{T <: Ring, Symbol} <: Ring
       return d
    end   
 
-   Poly() = Poly{T, Symbol}(Array(T, 0))
-   Poly(a::Integer) = a == 0 ? Poly{T, Symbol}(Array(T, 0)) : Poly{T, Symbol}([T(a)])
-   Poly(a::T) = Poly{T, Symbol}([a])
-   Poly(a::Poly{T, Symbol}) = a
-   Poly{R <: Ring}(a::R) = convert(Poly{T, Symbol}, a)
+   Poly() = Poly{T, S}(Array(T, 0))
+   Poly(a::Integer) = a == 0 ? Poly{T, S}(Array(T, 0)) : Poly{T, S}([T(a)])
+   Poly(a::T) = Poly{T, S}([a])
+   Poly(a::Poly{T, S}) = a
+   Poly{R <: Ring}(a::R) = convert(Poly{T, S}, a)
 end
 
 function _fmpz_poly_clear_fn(a :: Poly{ZZ})
