@@ -480,8 +480,9 @@ be the integers or a polynomial ring. The new type, called \code{mytype}, contai
 of type \code{R} , the other a machine integer.
 
 The useful thing about this syntax is that the type \code{R}  has a name, which we can use as a handle for
-it, namely \code{R} . We can use that name within the type definition itself, and also use it in any
-constructors we specify for the type.
+it, namely \code{R} and it is restricted to a type class (in this case \code{Ring}). We can use that name 
+within the type definition itself, and also use it in any constructors we specify for the type. And when
+the user tries to use the type, they can only instantiate it if \code{R} is a \code{Ring}.
 
 But things are different if we want the type to depend on an integer value or a symbol.
 
@@ -493,14 +494,16 @@ end
 \end{lstlisting}
 
 Now the type has two parameters. One is a type \code{R}, which is a \code{Ring}. The other, \code{S}, 
-could be a \code{Symbol} for example (there is currently no way to restrict it to be a \code{Symbol}). 
+could be a \code{Symbol} for example. But there is currently no way to restrict it to be a 
+\code{Symbol}). 
 
-There is a slight problem when we are defining methods whose signatures don't depend on that
+There is also a slight problem when we are defining methods whose signatures don't depend on that
 \code{Symbol}. It seems that Julia won't even allow that type parameter to be mentioned in that case,
 unless you are writing an inner constructor.
 
 This is theoretically correct, but a pain in the neck. The problem is, one literally has to use type 
-introspection, and undocumented runtime type deconstruction to get access to that symbol.
+introspection, and undocumented runtime type deconstruction to get access to that symbol, since now
+there is no name by which we can refer to it.
 
 Two simple things would fix this problem.
 
