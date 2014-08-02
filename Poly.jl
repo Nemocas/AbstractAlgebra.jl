@@ -1,4 +1,4 @@
-export Poly, PolynomialRing, coeff, zero, one, gen, isgen, chebyshev_t,
+export Poly, PolynomialRing, coeff, zero, one, gen, isgen, normalise, chebyshev_t,
        chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic,
        pseudorem, pseudodivrem, primpart, content, divexact, evaluate, compose, deriv,
        resultant, lead, discriminant, bezout, truncate, mullow
