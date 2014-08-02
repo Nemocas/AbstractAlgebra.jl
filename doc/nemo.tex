@@ -494,14 +494,13 @@ end
 
 Now the type has two parameters. One is a type \code{R}, which is a \code{Ring}. The other, \code{S}, 
 could be a \code{Symbol} for example (there is currently no way to restrict it to be a \code{Symbol}). 
-But it has no handle, by which we can refer to it.
 
-This problem becomes acute when we are defining methods whose signatures don't depend on that
+There is a slight problem when we are defining methods whose signatures don't depend on that
 \code{Symbol}. It seems that Julia won't even allow that type parameter to be mentioned in that case,
 unless you are writing an inner constructor.
 
-This is theoretically correct, but a pain in the neck. One literally has to use type introspection, and
-undocumented runtime type deconstruction to get access to that symbol.
+This is theoretically correct, but a pain in the neck. The problem is, one literally has to use type 
+introspection, and undocumented runtime type deconstruction to get access to that symbol.
 
 Two simple things would fix this problem.
 
