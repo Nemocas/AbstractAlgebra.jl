@@ -292,7 +292,7 @@ algorithms can be used. The type system and compiler do all of this work automat
 for you.
 
 The only thing remaining for the generic function to do is to implement the generic
-algorithm which works over arbitrary rings, say. The generic implementation only gets
+algorithm which works over arbitrary rings. The generic implementation only gets
 called if no specialised implementation exists for those types.
 
 Finally, with type unions, Julia types representing polynomials over various rings can
@@ -424,7 +424,8 @@ overflow. The disadvantage of this is loss of machine integer performance. This 
 around 6 times slower than native machine integer performance when Jit compiled.
 
 Secondly, they can offer machine integers as the default type and ask the programmer to provide an
-annotation when they intend to use a bignum. Julia uses this system.
+annotation when they intend to use a bignum. Julia 0.2 uses this system (it is apparently going to
+change in 0.3).
 
 The benefit is machine integer performance is the default. Also it is convenient when writing real
 world programs, as array indices should be machine integers. Bignums tend to be used mainly by
@@ -485,13 +486,14 @@ constructors we specify for the type.
 But things are different if we want the type to depend on an integer value or a symbol.
 
 \begin{lstlisting}
-type mytype{R <: Ring, Symbol}
+type mytype{R <: Ring, S}
    data :: R
    length :: Int
 end
 \end{lstlisting}
 
-Now the type has two parameters. One is a type \code{R}, which is a \code{Ring}. The other is a \code{Symbol}.
+Now the type has two parameters. One is a type \code{R}, which is a \code{Ring}. The other, \code{S}, 
+could be a \code{Symbol} for example (there is currently no way to restrict it to be a \code{Symbol}). 
 But it has no handle, by which we can refer to it.
 
 This problem becomes acute when we are defining methods whose signatures don't depend on that
@@ -503,11 +505,10 @@ undocumented runtime type deconstruction to get access to that symbol.
 
 Two simple things would fix this problem.
 
-Firstly, Julia should allow a name to be given to the symbol value which the type is parameterised on, 
-when the signature does include such. 
+Firstly, Julia should allow the type \code{S} to be restricted to a \code{Symbol} or \code{Int}.
 
-When the signature does not include such, access should be provided to parameters of types of objects
-via a supported interface, e.g. \code{parameters(typeof(a))}.
+When the signature does not include the type parameter \code{S}, access should be provided to parameters of
+types of objects via a supported interface, e.g. \code{parameters(typeof(a))}.
 
 For all I know, this problem is already fixed in the latest unstable release of Julia (soon to be stable).
 The Julia authors must surely have hit this themselves, unless there's something I don't understand
@@ -527,6 +528,20 @@ straightforward.
 Again, as far as I can tell, Julia does the right thing here. But again, it is a real pain in the neck.
 
 I don't see a simple workaround that I can be sure is efficient.
+
+\subsection{A real nuisance}
+
+The division functions in Julia seem to be all over the place. Division of integers yields a floating point,
+division of fractions an integer (!) and \code{%} does not correspond in any meaningful way with \code{/}
+and all sorts of other really messy things.
+
+The division functions available in Julia are just depressing for an algebraist. They choose the convention
+they do so that \code{(1/2) * 2 != 0}, which is the Python 3 convention. There is the \code{div} function
+for Euclidean division. But it is defined for fractions!
+
+They should have stuck with either the C convention for \code{/} and \code{%} or decided to go with floating
+point division for \code{/}, not defined \code{%} and then reserved \code{div} and \code{rem} for Euclidean
+division (which should not be defined for rationals!!)
 
 \subsubsection{A trivial complaint}
 
@@ -615,10 +630,14 @@ For its numeric values, Julia provides the following arithmetic operators where 
 Most of these are self explanatory. Unfortunately the single forward slash returns a floating point
 value when passed two integer operands. The double forward slash results in a rational value. This
 is opposite to the convention algebraists would wish for, and illustrates the numeric bent of Julia's
-designers.
+designers. 
+
+We advise not ever using the \code{/} operator in Nemo, but always using \code{div}. This will not
+result in mathematical theorems being false. See the section above complaining about this. 
 
 The \code{div} operator provides integer division. Unfortunately it uses the C convention of rounding
-towards zero, instead of the floor division one would hope for as an algebraist.
+towards zero, instead of the floor division one would hope for as an algebraist. This is tolerable of
+course, just a slight nuisance.
 
 The caret operator \code{^} is for powering, not xor as in C. This is great for mathematicians, 
 especially when creating polynomials.
