@@ -799,9 +799,7 @@ function invmod(x::ZZ, y::ZZ)
     if y == 1
         return ZZ(0)
     end
-    if (ccall((:fmpz_invmod, :libflint), Cint, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y) == 0)
-        error("no inverse exists")
-    end
+    ccall((:fmpz_invmod, :libflint), Cint, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y)
     return z
 end
 

@@ -35,7 +35,11 @@ type Poly{T <: Ring, S} <: Ring
                  &(d.data), i - 1, &a[i])
          end
       else
-         d = new(PolyStruct(a, length(a)))
+         len = length(a)
+         while len > 0 && a[len] == 0
+            len -= 1
+         end
+         d = new(PolyStruct(a, len))
       end
       return d
    end   
@@ -118,7 +122,7 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
    len = x.data.length
 
    if len == 0
-      print(io, "0")
+      print(io, zero(T))
    else
       for i = 1:len - 1
          c = x.data.coeffs[len - i + 1]
