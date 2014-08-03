@@ -332,7 +332,7 @@ function *{T <: Ring, S}(a::Int, b::Poly{T, S})
    for i = 1:len
       z.data.coeffs[i] = a*b.data.coeffs[i]
    end
-   z.data.length = len
+   z.data.length = normalise(z, len)
    return z
 end
 
@@ -342,7 +342,7 @@ function *{T <: Ring, S}(a::ZZ, b::Poly{T, S})
    for i = 1:len
       z.data.coeffs[i] = a*b.data.coeffs[i]
    end
-   z.data.length = len
+   z.data.length = normalise(z, len)
    return z
 end
 

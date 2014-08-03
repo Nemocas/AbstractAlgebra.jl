@@ -1,4 +1,4 @@
-export Residue, ResidueRing, modulus
+export Residue, ResidueRing, modulus, copy
 
 import Base: convert, zero
 
@@ -12,6 +12,7 @@ type Residue{T <: Ring, S} <: Ring
    data::T
    Residue(a::Int) = new(mod(convert(T, a), eval(:($S))))
    Residue(a::T) = new(mod(a, eval(:($S))))
+   Residue(a::Residue{T, S}) = a
 end
 
 ###########################################################################################
@@ -96,6 +97,36 @@ divexact{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S}) = div(a, b)
 *{T <: Ring, S}(a::Residue{T, S}, b::Int) = Residue{T, S}(a.data * b)
 
 *{T <: Ring, S}(a::Int, b::Residue{T, S}) = Residue{T, S}(a * b.data)
+
+*{T <: Ring, S}(a::Residue{T, S}, b::ZZ) = Residue{T, S}(a.data * b)
+
+*{T <: Ring, S}(a::ZZ, b::Residue{T, S}) = Residue{T, S}(a * b.data)
+
++{T <: Ring, S}(a::Residue{T, S}, b::Int) = Residue{T, S}(a.data + b)
+
++{T <: Ring, S}(a::Int, b::Residue{T, S}) = Residue{T, S}(a + b.data)
+
++{T <: Ring, S}(a::Residue{T, S}, b::ZZ) = Residue{T, S}(a.data + b)
+
++{T <: Ring, S}(a::ZZ, b::Residue{T, S}) = Residue{T, S}(a + b.data)
+
+-{T <: Ring, S}(a::Residue{T, S}, b::Int) = Residue{T, S}(a.data - b)
+
+-{T <: Ring, S}(a::Int, b::Residue{T, S}) = Residue{T, S}(a - b.data)
+
+-{T <: Ring, S}(a::Residue{T, S}, b::ZZ) = Residue{T, S}(a.data - b)
+
+-{T <: Ring, S}(a::ZZ, b::Residue{T, S}) = Residue{T, S}(a - b.data)
+
+###########################################################################################
+#
+#   Powering
+#
+###########################################################################################
+
+function ^{T <: Ring, S}(a::Residue{T, S}, b::Int)
+   Residue{T, S}(powmod(a.data, b, eval(:($S))))
+end
 
 ###########################################################################################
 #
