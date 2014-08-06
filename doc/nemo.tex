@@ -2378,6 +2378,35 @@ k = x*y^2 + (x + 1)*y + 3
 l = k^5
 \end{lstlisting}
 
+\subsection{Modular arithmetic}
+
+When \code{T} is a residue ring, we can reduce modulo a polynomial over
+\code{T}. In this way we can do modular arithmetic with polynomials.
+
+\begin{lstlisting}
+mulmod{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S}, d::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return $ab \pmod{d}$.}
+
+\begin{lstlisting}
+powmod{T <: Residue, S}(a::Poly{T, S}, b::Int, d::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return $a^d \pmod{d}$.}
+
+Here are some examples of modular arithmetic.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 487326487)
+S, x = PolynomialRing(R, "x")
+f = 3*x^2 + x + 2
+g = 5*x^2 + 2*x + 1
+h = 3*x^3 + 2*x^2 + x + 7
+mulmod(f, g, h)
+powmod(f, 10, h)
+\end{lstlisting}
+
 \subsection{Exact division}
 
 First we have exact division by a scalar.
