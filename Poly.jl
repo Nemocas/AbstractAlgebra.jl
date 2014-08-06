@@ -1,7 +1,7 @@
 export Poly, PolynomialRing, coeff, zero, one, gen, isgen, normalise, chebyshev_t,
        chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic,
        pseudorem, pseudodivrem, primpart, content, divexact, evaluate, compose, deriv,
-       resultant, lead, discriminant, bezout, truncate, mullow
+       resultant, lead, discriminant, bezout, truncate, mullow, divrem, mulmod, powmod
 
 import Base: convert, zero
 
@@ -122,7 +122,7 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
    else
       for i = 1:len - 1
          c = x.data.coeffs[len - i + 1]
-         bracket = isa(c, Poly) && c.data.length != 1
+         bracket = (isa(c, Poly) && c.data.length != 1) || (isa(c, Residue) && isa(modulus(typeof(c)), Poly))
          if c != 0
             if i != 1
                print(io, "+")
@@ -145,7 +145,7 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
          end
       end
       c = x.data.coeffs[1]
-      bracket = isa(c, Poly) && c.data.length != 1
+      bracket = (isa(c, Poly) && c.data.length != 1) || (isa(c, Residue) && isa(modulus(typeof(c)), Poly))
       if c != 0
          if len != 1
             print(io, "+")
@@ -462,6 +462,10 @@ function mullow{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S}, n::Int)
    return truncate(a * b, n)
 end
 
+function mulmod{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S}, d::Poly{T, S})
+   return mod(a*b, d)
+end
+
 ###########################################################################################
 #
 #   Powering
@@ -513,6 +517,31 @@ function ^{T <: Ring, S}(a::Poly{T, S}, b::Int)
    end
 end
    
+function powmod{T <: Residue, S}(a::Poly{T, S}, b::Int, d::Poly{T, S})
+   b < 0 && throw(DomainError())
+   if a.data.length == 0
+      return zero(Poly{T, S})
+   elseif a.data.length == 1
+      return Poly{T, S}([a.data.coeffs[1]^b])
+   elseif b == 0
+      return one(Poly{T, S})
+   else
+      bit = ~((~uint(0)) >> 1)
+      while (int(bit) & b) == 0
+         bit >>= 1
+      end
+      z = a
+      bit >>= 1
+      while bit !=0
+         z = mulmod(z, z, d)
+         if (int(bit) & b) != 0
+            z = mulmod(z, a, d)
+         end
+         bit >>= 1
+      end
+      return z
+   end
+end
 
 ###########################################################################################
 #
@@ -634,14 +663,43 @@ end
 #
 ###########################################################################################
 
-function rem{T <: Residue, S}(f::Poly{T, S}, g::Poly{T, S})
-   b = g.data.coeffs[g.data.length]
-   g = inv(b)*g
-   x = gen(Poly{T, S})
-   while f.data.length >= g.data.length
-      f -= f.data.coeffs[f.data.length]*g*x^(f.data.length - g.data.length)
+function mod{T <: Residue, S}(f::Poly{T, S}, g::Poly{T, S})
+   if g.data.length == 0
+      raise(DivideError())
+   end
+   if f.data.length >= g.data.length
+      b = g.data.coeffs[g.data.length]
+      g = inv(b)*g
+      x = gen(Poly{T, S})
+      while f.data.length >= g.data.length
+         f -= f.data.coeffs[f.data.length]*g*x^(f.data.length - g.data.length)
+      end
    end
    return f
+end
+
+function divrem{T <: Residue, S}(f::Poly{T, S}, g::Poly{T, S})
+   if g.data.length == 0
+      raise(DivideError())
+   end
+   if f.data.length < g.data.length
+      return zero(Poly{T, S}), f
+   end
+   b = g.data.coeffs[g.data.length]
+   binv = inv(b)
+   g = binv*g
+   x = gen(Poly{T, S})
+   qlen = f.data.length - g.data.length + 1
+   q = Poly{T, S}(Array(T, qlen))
+   for i = 1:qlen
+      q.data.coeffs[i] = zero(T)
+   end
+   while f.data.length >= g.data.length
+      q1 = f.data.coeffs[f.data.length]
+      q.data.coeffs[f.data.length - g.data.length + 1] = q1*binv
+      f -= q1*g*x^(f.data.length - g.data.length)
+   end
+   return q, f
 end
 
 ###########################################################################################
@@ -737,7 +795,7 @@ function gcd{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S})
    a = divexact(a, g)
    b = divexact(b, g)
    while a != 0
-      (a, b) = (rem(b, a), a)
+      (a, b) = (mod(b, a), a)
    end
    return g*b
 end
@@ -1024,6 +1082,83 @@ function bezout{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
       u2, v2 = v2, u2
    end
    return res, u2, v2
+end
+
+function bezout{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S})
+   if a.data.length == 0
+      return b, zero(Poly{T, S}), one(Poly{T, S})
+   end
+   if b.data.length == 0
+      return a, one(Poly{T, S}), zero(Poly{T, S})
+   end
+   swap = false
+   if a.data.length < b.data.length
+      a, b = b, a
+      swap = true
+   end
+   lena = a.data.length
+   lenb = b.data.length
+   c1 = content(a)
+   c2 = content(b)
+   A = divexact(a, c1)
+   B = divexact(b, c2)
+   u1, u2 = inv(c1), zero(Poly{T, S})
+   v1, v2 = zero(Poly{T, S}), inv(c2)
+   while lenb > 0
+      d = lena - lenb
+      (Q, B), A = divrem(A, B), B
+      lena = lenb
+      lenb = B.data.length
+      u2, u1 = u1 - Q*u2, u2
+      v2, v1 = v1 - Q*v2, v2 
+   end
+   if swap
+      u1, v1 = v1, u1
+   end
+   d = gcd(c1, c2)
+   A, u1, v1 = d*A, d*u1, d*v1
+   d = inv(lead(A))
+   return d*A, d*u1, d*v1
+end
+
+function gcdinv{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S})
+   if a.data.length == 0
+      if b.data.length == 0
+         return 0, zero(Poly{T, S})
+      else
+         d = inv(lead(b))
+         return b*d, zero(Poly{T, S})
+      end
+   end
+   if b.data.length == 0
+      d = inv(lead(b))
+      return a*d, d
+   end
+   if a.data.length < b.data.length
+      a, b = b, a
+      u1, u2 = zero(Poly{T, S}), one(Poly{T, S})
+   else
+      u1, u2 = one(Poly{T, S}), zero(Poly{T, S})
+   end
+   lena = a.data.length
+   lenb = b.data.length
+   c1 = content(a)
+   c2 = content(b)
+   A = divexact(a, c1)
+   B = divexact(b, c2)
+   u1 *= inv(c1)
+   u2 *= inv(c2)
+   while lenb > 0
+      d = lena - lenb
+      (Q, B), A = divrem(A, B), B
+      lena = lenb
+      lenb = B.data.length
+      u2, u1 = u1 - Q*u2, u2
+   end
+   d = gcd(c1, c2)
+   A, u1 = d*A, d*u1
+   d = inv(lead(A))
+   return d*A, d*u1
 end
 
 ###########################################################################################

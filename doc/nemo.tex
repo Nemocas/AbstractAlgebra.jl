@@ -2421,6 +2421,25 @@ l = (x + 1)*y + (x^3 + 2x + 2)
 m = divexact(k*l, k)
 \end{lstlisting}
 
+\subsection{Euclidean division}
+
+\begin{lstlisting}
+mod{T <: Residue, S}(f::Poly{T, S}, g::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return the Euclidean remainder of $f$ divided by $g$, i.e. $r$ such 
+that $a = bq + r$ for some polynomial $r$ with deg$(r) <$ deg$(b)$. If 
+$g = 0$ we throw a \code{DivideError()}.}
+
+\begin{lstlisting}
+divrem{T <: Residue, S}(f::Poly{T, S}, g::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return the Euclidean quotient and remainder of $f$ divided by $g$, i.e.
+a tuple \code{(q, r)} such that $a = bq + r$ with deg$(r) <$ deg$(b)$. If 
+$g = 0$ we throw a \code{DivideError()}.}
+
+
 \subsection{Pseudodivision}
 
 Given two polynomials $a, b$, pseudodivision computes polynomials $q$ and $r$

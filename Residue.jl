@@ -1,4 +1,4 @@
-export Residue, ResidueRing, modulus, copy
+export Residue, ResidueRing, modulus, copy, inv
 
 import Base: convert, zero
 
@@ -48,9 +48,9 @@ end
 
 =={T, S}(x::Residue{T, S}, y::Residue{T, S}) = x.data == y.data
 
-=={T, S}(x::Residue{T, S}, y::ZZ) = x.data == convert(T, y)
+=={T, S}(x::Residue{T, S}, y::ZZ) = x.data == T(y)
 
-=={T, S}(x::Residue{T, S}, y::Int) = x.data == convert(T, y)
+=={T, S}(x::Residue{T, S}, y::Int) = x.data == T(y)
 
 ###########################################################################################
 #
