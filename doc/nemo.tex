@@ -1772,6 +1772,14 @@ invmod(x::ZZ, m::ZZ)
 \desc{Return $x^{-1} \pmod{m}$. If $m \leq 0$ a \code{DomainError()} is thrown.}
 
 \begin{lstlisting}
+gcdinv(x::ZZ, m::ZZ)
+\end{lstlisting}
+
+\desc{Returns the pair \code{g, xinv} where $g$ is the greatest common divisor of
+$x$ and $m$ and \code{xinv} is $x^{-1} \pmod{m}$. If $m \leq 0$ a 
+\code{DomainError()} is thrown.}
+
+\begin{lstlisting}
 sqrtmod(x::ZZ, m::ZZ)
 \end{lstlisting}
 
@@ -2390,7 +2398,10 @@ divexact{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
 \end{lstlisting}
 
 \desc{Return $a$ divided by $b$. The result is only meaningful if the division is
-exact. If $b = 0$ we throw a \code{DivideError()}.}
+exact. If $b = 0$ we throw a \code{DivideError()}. 
+
+If \code{T} is a residue ring and the leading coefficient of $b$ is not invertible
+in the \code{T}, an error will be thrown.} 
 
 \textbf{Examples.}
 
@@ -2455,7 +2466,26 @@ m = pseudorem(k, l)
 m, n = pseudodivrem(k, l)
 \end{lstlisting}
 
+Note that pseudodivision is not always useful. In general it computes a
+multiple of the quotient, and for example in the case of polynomials over a
+residue ring, this may lead to meaningless results in the presence of zero
+divisors. For example
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 6)
+S, x = PolynomialRing(R, "x")
+f = 3*x^5 + x^4 + 3*x^2 + 2
+g = 2*x^3 + 5*x^2 + 2*x + 2
+pseudorem(f, g)
+\end{lstlisting}
+
+Here Nemo returns \code{3*x^2}, which happens to be \code{3*g} in this
+ring.
+
 \subsection{Content, primitive part and GCD}
+
+When the base ring provides a \code{gcd} function we can provide numerous
+GCD related functions for polynomials over that ring.
 
 \begin{lstlisting}
 content{S}(a::Poly{ZZ, S})
@@ -2478,7 +2508,12 @@ gcd{S}(a::Poly{ZZ, S}, b::Poly{ZZ, S})
 gcd{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
 \end{lstlisting}
 
-\desc{Return the greatest common divisor of the polynomials $a$ and $b$ if it exists.}
+\desc{Return the greatest common divisor of the polynomials $a$ and $b$ if 
+it exists.}
+
+We allow GCD for polynomials over residue rings, e.g. over $\Z/n\Z$, even when
+the residue ring has zero divisors. However, if an impossible inverse is
+encountered during the computation, due to zero divisors, we throw an error.
 
 \textbf{Examples.}
 

@@ -115,8 +115,8 @@ end
 
 include("ZZ.jl")
 
-include("Poly.jl")
-
 include("Residue.jl")
+
+include("Poly.jl")
 
 end # module

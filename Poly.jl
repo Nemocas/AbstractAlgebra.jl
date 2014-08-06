@@ -572,7 +572,7 @@ end
 
 ###########################################################################################
 #
-#   Division
+#   Exact division
 #
 ###########################################################################################
 
@@ -609,8 +609,8 @@ function divexact{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
    leng = g.data.length
    while f.data.length >= leng
       lenf = f.data.length
-      q.data.coeffs[lenf - leng + 1] = divexact(f.data.coeffs[lenf], g.data.coeffs[leng])
-      f = f - q.data.coeffs[lenf - leng + 1]*g*x^(lenf - leng)
+      q1 = q.data.coeffs[lenf - leng + 1] = divexact(f.data.coeffs[lenf], g.data.coeffs[leng])
+      f = f - q1*g*x^(lenf - leng)
    end
    q.data.length = lenq
    return q
@@ -626,6 +626,22 @@ function divexact{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
                &(z.data),  &(x.data), &(y.data))
    return z
+end
+
+###########################################################################################
+#
+#   Euclidean division
+#
+###########################################################################################
+
+function rem{T <: Residue, S}(f::Poly{T, S}, g::Poly{T, S})
+   b = g.data.coeffs[g.data.length]
+   g = inv(b)*g
+   x = gen(Poly{T, S})
+   while f.data.length >= g.data.length
+      f -= f.data.coeffs[f.data.length]*g*x^(f.data.length - g.data.length)
+   end
+   return f
 end
 
 ###########################################################################################
@@ -708,6 +724,22 @@ function gcd{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
       (a, b) = (pseudorem(b, a), a)
    end
    return g*primpart(b)
+end
+
+function gcd{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S})
+   if a.data.length > b.data.length
+      (a, b) = (b, a)
+   end
+   if b == 0
+      return a
+   end
+   g = gcd(content(a), content(b))
+   a = divexact(a, g)
+   b = divexact(b, g)
+   while a != 0
+      (a, b) = (rem(b, a), a)
+   end
+   return g*b
 end
 
 function gcd{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})

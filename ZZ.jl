@@ -803,6 +803,17 @@ function invmod(x::ZZ, y::ZZ)
     return z
 end
 
+function gcdinv(x::ZZ, y::ZZ)
+    y <= 0 && throw(DomainError())
+    g = ZZ()
+    z = ZZ()
+    if y == 1
+        return ZZ(0), ZZ(0)
+    end
+    ccall((:fmpz_gcdinv, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &g, &z, &x, &y)
+    return g, z
+end
+
 function sqrtmod(x::ZZ, y::ZZ)
     y <= 0 && throw(DomainError())
     z = ZZ()

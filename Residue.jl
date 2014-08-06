@@ -13,6 +13,7 @@ type Residue{T <: Ring, S} <: Ring
    Residue(a::Int) = new(mod(convert(T, a), eval(:($S))))
    Residue(a::T) = new(mod(a, eval(:($S))))
    Residue(a::Residue{T, S}) = a
+   Residue() = new(T(0))
 end
 
 ###########################################################################################
@@ -77,16 +78,15 @@ end
 
 *{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S}) = Residue{T, S}(a.data * b.data)
 
-function div{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
-   d = gcd(a, b)
-   a = Residue{T, S}(div(a.data, d.data))
-   b = Residue{T, S}(div(b.data, d.data))
-   Residue{T, S}(a.data * invmod(b.data, eval(:($S))))
+function divexact{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
+   g, binv = gcdinv(b.data, eval(:($S)))
+   if g != 1
+      error("Impossible inverse in divexact")
+   end
+   Residue{T, S}(a.data * binv)
 end
 
 gcd{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S}) = Residue{T, S}(gcd(a.data, b.data))
-
-divexact{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S}) = div(a, b)
 
 ###########################################################################################
 #
@@ -126,6 +126,20 @@ divexact{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S}) = div(a, b)
 
 function ^{T <: Ring, S}(a::Residue{T, S}, b::Int)
    Residue{T, S}(powmod(a.data, b, eval(:($S))))
+end
+
+###########################################################################################
+#
+#   Inversion
+#
+###########################################################################################
+
+function inv{T <: Ring, S}(a::Residue{T, S})
+   g, ainv = gcdinv(a.data, eval(:($S)))
+   if g != 1
+      error("Impossible inverse in inv")
+   end
+   Residue{T, S}(ainv)
 end
 
 ###########################################################################################
