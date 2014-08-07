@@ -2914,17 +2914,78 @@ class (e.g. \code{T = ZZ}) and an element \code{r} of the ring \code{T} (or
 an integer that can be coerced into \code{T}). It returns the type 
 corresponding to the residue ring $T/(r)$.}
 
+\begin{lstlisting}
+Residue{T <: Ring, S}(a::T)
+Residue{T <: Ring, S}(a::Int)  
+\end{lstlisting}
+
+\desc{Create a residue congruent to $a$. The value $a$ is first reduced
+modulo the modulus of the residue ring.}
+
+\begin{lstlisting}
+Residue{T <: Ring, S}(a::Residue{T, S})  
+\end{lstlisting}
+
+\desc{Return a reference to the residue $a$. No copy of the data is made.}
+
+\begin{lstlisting}
+Residue{T <: Ring, S}()
+\end{lstlisting}
+
+\desc{Create a new residue, which is congruent to $0$.}
+
+\textbf{Examples.}
+
 Here are some examples of constructing residue rings and elements in them.
 
 \begin{lstlisting}
 R = ResidueRing(ZZ, 16453889)
 
 f = R(123)
+g = R(f)
+h = R(ZZ(12))
+k = R()
 
 S, x = PolynomialRing(R, "x")
 T = ResidueRing(S, x^3 + 3x + 1)
 
-g = T(x^4)
+m = T(x^4)
+\end{lstlisting}
+
+\subsection{Basic manipulation}
+
+\begin{lstlisting}
+modulus{T <: Ring, S}(::Type{Residue{T, S}})
+\end{lstlisting}
+
+\desc{Return the modulus of the given residue ring.}
+
+\begin{lstlisting}
+zero{T <: Ring, S}(::Type{Residue{T, S}})
+\end{lstlisting}
+
+\desc{Return the additive identity of the given residue ring.}
+
+\begin{lstlisting}
+one{T <: Ring, S}(::Type{Residue{T, S}})
+\end{lstlisting}
+
+\desc{Return the multiplicative identity of the given residue ring.}
+
+\textbf{Examples.}
+
+Here are some examples of basic manipulation of residue rings.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 16453889)
+
+f = modulus(R)
+g = zero(R)
+
+S, x = PolynomialRing(R, "x")
+T = ResidueRing(S, x^3 + 3x + 1)
+
+h = one(T)
 \end{lstlisting}
 
 
