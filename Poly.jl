@@ -1,7 +1,8 @@
 export Poly, PolynomialRing, coeff, zero, one, gen, isgen, normalise, chebyshev_t,
        chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic,
        pseudorem, pseudodivrem, primpart, content, divexact, evaluate, compose, deriv,
-       resultant, lead, discriminant, bezout, truncate, mullow, divrem, mulmod, powmod
+       resultant, lead, discriminant, bezout, truncate, mullow, divrem, mulmod, powmod,
+       invmod
 
 import Base: convert, zero
 
@@ -462,16 +463,11 @@ function mullow{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S}, n::Int)
    return truncate(a * b, n)
 end
 
-function mulmod{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S}, d::Poly{T, S})
-   return mod(a*b, d)
-end
-
 ###########################################################################################
 #
 #   Powering
 #
 ###########################################################################################
-
 
 function ^{S}(x::Poly{ZZ, S}, y::Int)
    y < 0 && throw(DomainError())
@@ -517,8 +513,17 @@ function ^{T <: Ring, S}(a::Poly{T, S}, b::Int)
    end
 end
    
+###########################################################################################
+#
+#   Modular arithmetic
+#
+###########################################################################################
+
+function mulmod{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S}, d::Poly{T, S})
+   return mod(a*b, d)
+end
+
 function powmod{T <: Residue, S}(a::Poly{T, S}, b::Int, d::Poly{T, S})
-   b < 0 && throw(DomainError())
    if a.data.length == 0
       return zero(Poly{T, S})
    elseif a.data.length == 1
@@ -526,6 +531,10 @@ function powmod{T <: Residue, S}(a::Poly{T, S}, b::Int, d::Poly{T, S})
    elseif b == 0
       return one(Poly{T, S})
    else
+      if b < 0
+         a = invmod(a, d)
+         b = -b
+      end
       bit = ~((~uint(0)) >> 1)
       while (int(bit) & b) == 0
          bit >>= 1
@@ -542,6 +551,15 @@ function powmod{T <: Residue, S}(a::Poly{T, S}, b::Int, d::Poly{T, S})
       return z
    end
 end
+
+function invmod{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S})
+   g, z = gcdinv(a, b)
+   if g != 1
+      error("Impossible inverse in invmod")
+   end
+   return z
+end
+
 
 ###########################################################################################
 #
@@ -797,7 +815,8 @@ function gcd{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S})
    while a != 0
       (a, b) = (mod(b, a), a)
    end
-   return g*b
+   b = g*b
+   return inv(lead(b))*b
 end
 
 function gcd{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
@@ -977,6 +996,43 @@ function resultant{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
       h = divexact(h*g^d, s)
    end
    s = divexact(h*lead(B)^(lena - 1), h^(lena - 1))
+   res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
+end
+
+function resultant{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S})
+   if a.data.length == 0 || b.data.length == 0
+      return zero(T)
+   end
+   sgn = 1
+   if a.data.length < b.data.length
+      a, b = b, a
+      if iseven(a.data.length) && iseven(b.data.length)
+         sgn = -sgn
+      end
+   end
+   lena = a.data.length
+   lenb = b.data.length
+   if lenb == 1
+      return b.data.coeffs[1]^(lena - 1)
+   end
+   c1 = content(a)
+   c2 = content(b)
+   A = divexact(a, c1)
+   B = divexact(b, c2)
+   s = 1
+   while lenb > 1
+      if iseven(lena) && iseven(lenb)
+         sgn = -sgn
+      end
+      B, A = mod(A, B), B
+      s *= lead(A)^(lena - B.data.length)
+      lena = lenb
+      lenb = B.data.length
+      if lenb == 0
+         return zero(T) 
+      end
+   end
+   s *= lead(B)^(lena - 1)
    res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
 end
 
