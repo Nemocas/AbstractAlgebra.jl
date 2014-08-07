@@ -159,6 +159,7 @@ Base.convert{T <: Ring, S}(::Type{Residue{T, S}}, a::Int) = Residue{T, S}(a)
 ###########################################################################################
 
 function ResidueRing{T <: Ring}(::Type{T}, el::T)
+   el == 0 && throw(DivideError())
    S = gensym("residue")
    P = Residue{T, S}
    eval(:($S = $el))
@@ -166,6 +167,7 @@ function ResidueRing{T <: Ring}(::Type{T}, el::T)
 end
 
 function ResidueRing{T <: Ring}(::Type{T}, el::Int)
+   i == 0 && throw(DivideError())
    S = gensym("residue")
    P = Residue{T, S}
    eval(:($S = $T($el)))
