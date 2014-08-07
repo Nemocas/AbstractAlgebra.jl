@@ -2988,5 +2988,106 @@ T = ResidueRing(S, x^3 + 3x + 1)
 h = one(T)
 \end{lstlisting}
 
+\subsection{Unary operations}
+
+\begin{lstlisting}
+-{T <: Ring, S}(a::Residue{T, S})
+\end{lstlisting}
+
+\desc{Return $-a$.}
+
+\textbf{Examples.}
+
+Here are some examples of unary operators.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 16453889)
+
+f = -R(12345)
+
+S, x = PolynomialRing(R, "x")
+T = ResidueRing(S, x^3 + 3x + 1)
+
+h = -T(x^5 + 1)
+\end{lstlisting}
+
+\subsection{Binary operations and functions}
+
+The following binary operators and functions are defined for residue rings.
+
+\begin{lstlisting}
++{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
+\end{lstlisting}
+
+\desc{Return $a + b$.}
+
+\begin{lstlisting}
+-{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
+\end{lstlisting}
+
+\desc{Return $a - b$.}
+
+\begin{lstlisting}
+*{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
+\end{lstlisting}
+
+\desc{Return $ab$.}
+
+\begin{lstlisting}
+divexact{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
+\end{lstlisting}
+
+\desc{Return $a$ divided by $b$. If an impossible inverse is encounted
+an exception is thrown.}
+
+\begin{lstlisting}
+gcd{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
+\end{lstlisting}
+
+\desc{Return the greatest common divisor of $a$ and $b$. 
+
+Recall that $a$ and $b$ are represented by values $a'$ and $b'$ in $T$, 
+say. We define the greatest common divisor of $a$ and $b$ to be the 
+residue class of gcd$($gcd$(a', b'), m)$ when that is defined, where 
+$m$ is the modulus of the residue ring.
+
+This definition does not depend on the choice of representatives of
+$a$ and $b$.}
+
+\textbf{Examples.}
+
+Here are some examples of binary operators and functions.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 12)
+
+f = R(4)
+g = R(6)
+
+h = f + g
+j = f - g
+k = f*g
+l = gcd(f, g)
+
+Q = ResidueRing(ZZ, 7)
+
+a = Q(3)
+b = Q(4)
+
+m = divexact(a*b, a)
+
+S, x = PolynomialRing(Q, "x")
+T = ResidueRing(S, x^3 + 3x + 1)
+
+n = T(x^5 + 1)
+p = T(x^2 + 2x + 1)
+
+q = n + p
+r = n - p
+s = n*p
+t = divexact(n*p, p)
+u = gcd(n, p)
+\end{lstlisting}
+
 
 \end{document}

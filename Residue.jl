@@ -86,7 +86,8 @@ function divexact{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
    Residue{T, S}(a.data * binv)
 end
 
-gcd{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S}) = Residue{T, S}(gcd(a.data, b.data))
+gcd{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S}) = Residue{T, S}(gcd(gcd(a.data, eval(:($S))), b.data))
+
 
 ###########################################################################################
 #
