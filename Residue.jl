@@ -167,7 +167,7 @@ function ResidueRing{T <: Ring}(::Type{T}, el::T)
 end
 
 function ResidueRing{T <: Ring}(::Type{T}, el::Int)
-   i == 0 && throw(DivideError())
+   el == 0 && throw(DivideError())
    S = gensym("residue")
    P = Residue{T, S}
    eval(:($S = $T($el)))

@@ -2899,7 +2899,33 @@ only a single integer for the residue, not an integer for the residue and
 another for the modulus. This results in a factor of two space saving when
 creating arrays of values of type \code{Residue}, for a fixed modulus $n$.
 
+\subsection{Constructors}
 
+To make it easy to deal with the \code{Residue} type in Nemo, we provide a
+function for constructing the type of a residue ring
+
+\begin{lstlisting}
+ResidueRing{T <: Ring}(::Type{T}, r::T)
+ResidueRing{T <: Ring}(::Type{T}, r::Int)
+\end{lstlisting}
+
+\desc{This function takes a type \code{T} which belongs to the \code{Ring}
+class (e.g. \code{T = ZZ}) and an element \code{r} of the ring \code{T} (or
+an integer that can be coerced into \code{T}). It returns the type 
+corresponding to the residue ring $T/(r)$.}
+
+Here are some examples of constructing residue rings and elements in them.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 16453889)
+
+f = R(123)
+
+S, x = PolynomialRing(R, "x")
+T = ResidueRing(S, x^3 + 3x + 1)
+
+g = T(x^4)
+\end{lstlisting}
 
 
 \end{document}
