@@ -3089,5 +3089,70 @@ t = divexact(n*p, p)
 u = gcd(n, p)
 \end{lstlisting}
 
+\subsection{Ad hoc binary operators}
+
+In a residue ring $R$ over a ring $T$, with modulus $m$, it is convenient
+to think of $n \in \Z$ as corresponding to $1$ added to itself $n$ times
+in $T$ then reduced modulo $m$.
+
+This allows us to efficiently define the following ad hoc operators, which
+effectively make the integers $n \in \Z$ a convenient notation for certain
+elements of the residue ring $R$.
+
+\begin{lstlisting}
++{T <: Ring, S}(a::Residue{T, S}, b::Int)
++{T <: Ring, S}(a::Int, b::Residue{T, S})
++{T <: Ring, S}(a::Residue{T, S}, b::ZZ)
++{T <: Ring, S}(a::ZZ, b::Residue{T, S})
+\end{lstlisting}
+
+\desc{Return $a + b$ with the integer operand thought of as an element of 
+the given residue ring.}
+
+\begin{lstlisting}
+-{T <: Ring, S}(a::Residue{T, S}, b::Int)
+-{T <: Ring, S}(a::Int, b::Residue{T, S})
+-{T <: Ring, S}(a::Residue{T, S}, b::ZZ)
+-{T <: Ring, S}(a::ZZ, b::Residue{T, S})
+\end{lstlisting}
+
+\desc{Return $a - b$ with the integer operand thought of as an element of 
+the given residue ring.}
+
+\begin{lstlisting}
+*{T <: Ring, S}(a::Residue{T, S}, b::Int)
+*{T <: Ring, S}(a::Residue{T, S}, b::ZZ)
+\end{lstlisting}
+
+\desc{Return $ab$, i.e. the element $a$ added to itself $b$ times.}
+
+\begin{lstlisting}
+*{T <: Ring, S}(a::Int, b::Residue{T, S})
+*{T <: Ring, S}(a::ZZ, b::Residue{T, S})
+\end{lstlisting}
+
+\desc{Return $ab$, i.e. the element $b$ added to itself $a$ times.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc binary operators.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 7)
+
+a = R(3)
+
+b = a + 3
+c = 3 - a
+d = 5a
+
+S, x = PolynomialRing(R, "x")
+T = ResidueRing(S, x^3 + 3x + 1)
+
+f = T(x^5 + 1)
+g = f + 4
+h = 4 - f
+k = f*5
+\end{lstlisting}
 
 \end{document}
