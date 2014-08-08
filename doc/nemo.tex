@@ -3155,4 +3155,144 @@ h = 4 - f
 k = f*5
 \end{lstlisting}
 
+\subsection{Comparison}
+
+\begin{lstlisting}
+=={T, S}(x::Residue{T, S}, y::Residue{T, S})
+\end{lstlisting}
+
+\desc{Return \code{true} if $x = y$ arithmetically in the given residue ring, 
+otherwise return false.}
+
+Julia automatically defines a \code{!=} operator.
+
+\textbf{Examples.}
+
+Here are some examples of comparisons.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 7)
+
+a = R(3)
+b = a
+c = R(2)
+
+b == a
+c != a
+
+S, x = PolynomialRing(R, "x")
+T = ResidueRing(S, x^3 + 3x + 1)
+
+f = T(x^5 + 1)
+g = 8f
+h = f + g
+
+f == g
+h != g
+\end{lstlisting}
+
+\subsection{Ad hoc comparison}
+
+Thinking of integers as corresponding to elements of a residue ring, we
+can define the following ad hoc comparison operators.
+
+\begin{lstlisting}
+=={T, S}(x::Residue{T, S}, y::Int)
+=={T, S}(x::Residue{T, S}, y::ZZ)
+\end{lstlisting}
+
+\desc{Given $x \in R$ where $R$ is the given residue ring, return \code{true} 
+if $x = y.1$ in $R$, otherwise return \code{false}.}
+
+\begin{lstlisting}
+=={T, S}(x::ZZ, y::Residue{T, S})
+=={T, S}(x::Int, y::Residue{T, S})
+\end{lstlisting}
+
+\desc{Given $y \in R$ where $R$ is the given residue ring, return \code{true} 
+if $x.1 = y$ in $R$, otherwise return \code{false}.}
+
+Julia automatically provides corresponding \code{!=} operators.
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc comparisons.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 7)
+
+a = R(3)
+
+a == 3
+4 != a
+
+S, x = PolynomialRing(R, "x")
+T = ResidueRing(S, x^3 + 3x + 1)
+
+f = T(x^5 + 1)
+
+f != 5
+\end{lstlisting}
+
+\subsection{Powering}
+
+\begin{lstlisting}
+^{T <: Ring, S}(a::Residue{T, S}, b::Int)
+\end{lstlisting}
+
+\desc{Return $a^b$.}
+
+\textbf{Examples.}
+
+Here are some examples of powering.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 7)
+
+a = R(3)
+
+b = a^5
+
+S, x = PolynomialRing(R, "x")
+T = ResidueRing(S, x^3 + 3x + 1)
+
+f = T(x^5 + 1)
+
+g = f^100
+\end{lstlisting}
+
+\subsection{Inversion}
+
+So long as we don't encounter an impossible inverse, we can
+invert an element in a residue ring $R = T/(m)$, if $T$ is a
+Euclidean ring, i.e. if we have a \code{gcd} function in $T$.
+
+\begin{lstlisting}
+inv{T <: Ring, S}(a::Residue{T, S})
+\end{lstlisting}
+
+\desc{Return the multiplicative inverse of $a$ in the given residue
+ring, i.e. return an element $b$ such that $ab = 1$ in the residue ring,
+if such exists. If an impossible inverse is encountered during the
+computation, we throw an exception.}
+
+\textbf{Examples.}
+
+Here are some examples of computing inverses.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 49)
+
+a = R(5)
+
+b = inv(a)
+
+S, x = PolynomialRing(R, "x")
+T = ResidueRing(S, x^3 + 3x + 1)
+
+f = T(x^5 + 1)
+
+g = inv(f)
+\end{lstlisting}
+
 \end{document}

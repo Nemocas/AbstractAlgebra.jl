@@ -52,6 +52,10 @@ end
 
 =={T, S}(x::Residue{T, S}, y::Int) = x.data == T(y)
 
+=={T, S}(x::ZZ, y::Residue{T, S}) = T(x) == y.data
+
+=={T, S}(x::Int, y::Residue{T, S}) = T(x) == y.data
+
 ###########################################################################################
 #
 #   String I/O
