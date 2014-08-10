@@ -113,7 +113,7 @@ interpreter for flint.
 
 \subsection{In praise of Julia}
 
-Julia started life in 2009. Its main architects are Jeff Bezanson, Stefan Karpinski and
+Julia started life in 2009. It's main architects are Jeff Bezanson, Stefan Karpinski and
 Viral B. Shah, though there are over 150 contributors to date.
 
 Julia is one of the most sophisticated and technologically advanced programming languages
@@ -403,11 +403,19 @@ on the stack), and when calling functions, copies may need to be made. That can 
 offering pass by reference, but then a mechanism needs to be provided to pass either by value or
 reference.
 
-Julia uses the first of the two models. And as far as I can tell, this is the reason for the very
-slow performance in this microbenchmark.
+Julia uses the first of the two models when you define your type using the keyword \code{type}. 
+However, it reserves the right to use something like the second model if you use the keyword
+\code{immutable}. Unfortunately, the result is an object that is really immutable. Not only can
+you not have a finaliser for such a type, but you cannot even trick Julia into letting an external
+library change the value (you can change the internals, but not the fields of the struct belonging 
+to the type itself). 
 
-Quite obviously, this problem is not going to go away, though the GC pauses themselves might be
-reduced as the GC itself improves.
+Given these limitations of immutable types in Julia, one is currently obliged to use mutable types,
+and as far as I can tell, this is the reason for the very slow performance in this microbenchmark.
+
+Quite obviously, this problem is not going to go away without some effort, though the GC pauses 
+themselves might be reduced as the GC itself improves. Fortunately, the Julia developers seem
+extemely keen to work on improving bignum performance in Julia.
 
 Neither method above provides an easy way to avoid creating a new object every time an arithmetic 
 operation is performed (unless you use C-style \code{add(a, b, c)} semantics and eschew operator
@@ -460,9 +468,15 @@ e.g. with a thin preparser.
 The downside is that one cannot easily tell whether an integer literal will become a bignum or a
 machine integer, without counting its digits or examining its type.
 
-The only sensible solution is to make all constant integers bignums by default and require an
-annotation if a machine word is required. Of course this will be irritating when dealing with array
-indices.
+The only sensible solution for Nemo (not for Julia) is to make all constant integers bignums by default 
+and require an annotation if a machine word is required. Of course this will be irritating when dealing 
+with array indices and ranges.
+
+In Julia 0.3 the problem has reportedly been compounded by making everything larger than two machine
+words a bigint. This leads to an inconsistent semantics for integer literals.
+
+It is possible to modify the Julia parser to deal with this issue, and someone has already indicated
+how this can be done, by providing an example.
 
 \subsubsection{Type parameters}
 
@@ -509,8 +523,8 @@ Two simple things would fix this problem.
 
 Firstly, Julia should allow the type \code{S} to be restricted to a \code{Symbol} or \code{Int}.
 
-When the signature does not include the type parameter \code{S}, access should be provided to parameters of
-types of objects via a supported interface, e.g. \code{parameters(typeof(a))}.
+Secondly, when the signature does not include the type parameter \code{S}, access should be provided
+to parameters of types of objects via a supported interface, e.g. \code{parameters(typeof(a))}.
 
 For all I know, this problem is already fixed in the latest unstable release of Julia (soon to be stable).
 The Julia authors must surely have hit this themselves, unless there's something I don't understand
@@ -533,17 +547,20 @@ I don't see a simple workaround that I can be sure is efficient.
 
 \subsubsection{A real nuisance}
 
-The division functions in Julia seem to be all over the place. Division of integers yields a floating point,
-division of fractions an integer (!) and \code{%} does not correspond in any meaningful way with \code{/}
-and all sorts of other really messy things.
+The division functions in Julia are geared towards numerical, rather than algebraic, applications.
 
-The division functions available in Julia are just depressing for an algebraist. They choose the convention
-they do so that \code{(1/2) * 2 != 0}, which is the Python 3 convention. There is the \code{div} function
-for Euclidean division. But it is defined for fractions!
+The main division operator \code{/} in Julia returns a floating point number when dividing integers
+and the \code{div} function treats even the rationals as a model of the reals, so that \code{div(a, b)}
+always returns the exact value $a/b$ (in the mathematical sense), truncated to the nearest whole
+number in the direction of zero.
 
-They should have stuck with either the C convention for \code{/} and \code{%} or decided to go with floating
-point division for \code{/}, not defined \code{%} and then reserved \code{div} and \code{rem} for Euclidean
-division (which should not be defined for rationals!!)
+In particular, the \code{div} operator does not perform Euclidean division for rationals as it does
+for the integers (the field of rationals is trivially a Euclidean domain). A similar observation holds
+for \code{div} over the floating point numbers.
+
+The upshot of this is that Julia needs an algebraic number stack to replace the current numeric one.
+
+Fortunately, this is fairly easy to do in Julia, though it will take a substantial effort to implement. 
 
 \subsubsection{A trivial complaint}
 
@@ -2275,6 +2292,9 @@ into one or the other ring.
 =={S}(x::Poly{ZZ, S}, y::ZZ)
 =={T <: Ring, S}(x::Poly{T, S}, y::Int)
 =={T <: Ring, S}(x::Poly{T, S}, y::ZZ)
+=={T<: Ring, S}(x::Int, y::Poly{T, S})
+=={T<: Ring, S}(x::ZZ, y::Poly{T, S})
+=={S, M}(x::Residue{ZZ, M}, y::Poly{Residue{ZZ, M}, S})
 \end{lstlisting}
 
 \textbf{Examples.}
@@ -2810,7 +2830,7 @@ theta_qexp{S}(::Type{Poly{ZZ, S}}, r::Int, n::Int)
 
 \desc{Return the $q$-expansion to length $n$ of the Jacobi theta function raised to 
 the power $r$, i.e. $\vartheta(q)^r$ where 
-$\vartheta(q) = 1 + 2 \sum_{k=1}^{\infty} q^{k^2}$.}
+$\vartheta(q) = 1 + \sum_{k=1}^{\infty} q^{k^2}$.}
 
 \begin{lstlisting}
 eta_qexp{S}(::Type{Poly{ZZ, S}}, r::Int, n::Int)
