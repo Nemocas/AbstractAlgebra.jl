@@ -92,6 +92,19 @@ end
 
 gcd{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S}) = Residue{T, S}(gcd(gcd(a.data, eval(:($S))), b.data))
 
+###########################################################################################
+#
+#   Unsafe operators and functions
+#
+###########################################################################################
+
+function mul!{T <: Ring, S}(c::Residue{T, S}, a::Residue{T, S}, b::Residue{T, S})
+   c.data = mod(a.data*b.data, eval(:($S)))
+end
+
+function addeq!{T <: Ring, S}(c::Residue{T, S}, a::Residue{T, S})
+   c.data = mod(c.data + a.data, eval(:($S)))
+end
 
 ###########################################################################################
 #

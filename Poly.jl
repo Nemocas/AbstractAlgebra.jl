@@ -1112,7 +1112,7 @@ function mod{T <: Residue, S}(f::Poly{T, S}, g::Poly{T, S})
       g = inv(b)*g
       x = gen(Poly{T, S})
       while f.data.length >= g.data.length
-         f -= f.data.coeffs[f.data.length]*g*x^(f.data.length - g.data.length)
+         f -= coeff(f, f.data.length - 1)*g*x^(f.data.length - g.data.length)
       end
    end
    return f
@@ -1134,18 +1134,18 @@ function divrem{T <: Residue, S}(f::Poly{T, S}, g::Poly{T, S})
    if f.data.length < g.data.length
       return zero(Poly{T, S}), f
    end
-   b = g.data.coeffs[g.data.length]
-   binv = inv(b)
+   binv = inv(lead(g))
    g = binv*g
    x = gen(Poly{T, S})
    qlen = f.data.length - g.data.length + 1
-   q = Poly(Poly{T, S}Array(T, qlen))
+   d = Array(T, qlen)
    for i = 1:qlen
-      q.data.coeffs[i] = zero(T)
+      d[i] = zero(T)
    end
+   q = Poly(Poly{T, S}, d)
    while f.data.length >= g.data.length
-      q1 = f.data.coeffs[f.data.length]
-      q.data.coeffs[f.data.length - g.data.length + 1] = q1*binv
+      q1 = coeff(f, f.data.length - 1)
+      setcoeff!(q, f.data.length - g.data.length, q1*binv)
       f -= q1*g*x^(f.data.length - g.data.length)
    end
    return q, f
