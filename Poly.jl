@@ -1166,9 +1166,9 @@ function gcd{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    if b == 0
       return a
    end
-   g = gcd(content(a), content(b))
-   a = divexact(a, g)
-   b = divexact(b, g)
+   c = gcd(content(a), content(b))
+   a = divexact(a, c)
+   b = divexact(b, c)
    g = one(Poly{T, S})
    h = one(Poly{T, S})
    while true
@@ -1189,7 +1189,7 @@ function gcd{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
          h = h^(1 - d)*g^d
       end
    end
-   return g*primpart(b)
+   return c*primpart(b)
 end
 
 function gcd{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S})
