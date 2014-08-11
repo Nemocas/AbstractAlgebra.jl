@@ -67,21 +67,6 @@ type Poly{T <: Ring, S} <: Ring
    Poly{R <: Ring}(a::R) = convert(Poly{T, S}, a)
 end
 
-function Poly{M}(a :: Array{Residue{ZZ, M}, 1})
-   d = new(fmpz_mod_poly(C_NULL, 0, 0, 0))
-         m = modulus(T)
-         ccall((:fmpz_mod_poly_init2, :libflint), Void, (Ptr{fmpz_mod_poly}, Ptr{ZZ}, Int), &(d.data), &m, length(a))
-         finalizer(d, _fmpz_mod_poly_clear_fn)
-         for i = 1:length(a)
-            ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, (Ptr{fmpz_mod_poly}, Int, Ptr{ZZ}),
-               &(d.data), i - 1, &(a[i].data))
-         end
-         return d
-      else
-         new(PolyStruct(a, length(a)))
-      end
-   end   
-
 function _fmpz_poly_clear_fn(a :: Poly{ZZ})
    ccall((:fmpz_poly_clear, :libflint), Void, (Ptr{fmpz_poly},), &(a.data))
 end
@@ -1175,7 +1160,7 @@ end
 ###########################################################################################
 
 function gcd{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
-   if a.data.length > b.data.length
+   if b.data.length > a.data.length
       (a, b) = (b, a)
    end
    if b == 0
@@ -1184,8 +1169,25 @@ function gcd{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    g = gcd(content(a), content(b))
    a = divexact(a, g)
    b = divexact(b, g)
-   while a != 0
-      (a, b) = (pseudorem(b, a), a)
+   g = one(Poly{T, S})
+   h = one(Poly{T, S})
+   while true
+      d = a.data.length - b.data.length
+      r = pseudorem(a, b)
+      if r == 0
+         break
+      end
+      if r.data.length == 1
+         b = one(Poly{T, S})
+         break
+      end
+      (a, b) = (b, divexact(r, g*h^d))
+      g = lead(a)
+      if d > 1
+         h = divexact(g^d, h^(d - 1))
+      else
+         h = h^(1 - d)*g^d
+      end
    end
    return g*primpart(b)
 end
