@@ -733,7 +733,45 @@ function mullow{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S}, n:
 end
 
 function mullow{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S}, n::Int)
-   return truncate(a * b, n)
+   lena = a.data.length
+   lenb = b.data.length
+
+   if lena == 0 || lenb == 0
+      return zero(Poly{T, S})
+   end
+
+   if n < 0
+      n = 0
+   end
+
+   t = T()
+
+   lenz = min(lena + lenb - 1, n)
+
+   z = Poly{T, S}(Array(T, lenz))
+
+   for i = 1:min(lena, lenz)
+      z.data.coeffs[i] = a.data.coeffs[i]*b.data.coeffs[1]
+   end
+
+   if lenz > lena
+      for j = 2:min(lenb, lenz - lena + 1)
+          z.data.coeffs[lena + j - 1] = a.data.coeffs[lena]*b.data.coeffs[j]
+      end
+   end
+
+   for i = 1:lena - 1
+      if lenz > i
+         for j = 2:min(lenb, lenz - i + 1)
+            mul!(t, a.data.coeffs[i], b.data.coeffs[j])
+            addeq!(z.data.coeffs[i + j - 1], t)
+         end
+      end
+   end
+        
+   z.data.length = normalise(z, lenz)
+
+   return z
 end
 
 ###########################################################################################
