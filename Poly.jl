@@ -259,10 +259,11 @@ end
 
 function -{T <: Ring, S}(a::Poly{T, S})
    len = a.data.length
-   z = Poly(Poly{T, S}, Array(T, len))
+   d = Array(T, len)
    for i = 1:len
-      z.data.coeffs[i] = -a.data.coeffs[i]
+      d[i] = -a.data.coeffs[i]
    end
+   z = Poly(Poly{T, S}, d)
    z.data.length = len
    return z
 end
@@ -358,17 +359,17 @@ function -{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    i = 1
 
    while i <= min(lena, lenb)
-      d.data.coeffs[i] = a.data.coeffs[i] - b.data.coeffs[i]
+      d[i] = a.data.coeffs[i] - b.data.coeffs[i]
       i += 1
    end
 
    while i <= lena
-      d.data.coeffs[i] = a.data.coeffs[i]
+      d[i] = a.data.coeffs[i]
       i += 1
    end
 
    while i <= lenb
-      d.data.coeffs[i] = -b.data.coeffs[i]
+      d[i] = -b.data.coeffs[i]
       i += 1
    end
 
@@ -1020,10 +1021,11 @@ end
 
 function divexact{T <: Ring, S}(a::Poly{T, S}, b::T)
    b == 0 && throw(DivideError())
-   z = Poly(Poly{T, S}, Array(T, a.data.length))
+   d = Array(T, a.data.length)
    for i = 1:a.data.length
-      z.data.coeffs[i] = divexact(a.data.coeffs[i], b)
+      d[i] = divexact(a.data.coeffs[i], b)
    end
+   z = Poly(Poly{T, S}, d)
    z.data.length = a.data.length
    return z
 end
@@ -1054,10 +1056,11 @@ function divexact{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
       return zero(Poly{T, S})
    end
    lenq = f.data.length - g.data.length + 1
-   q = Poly(Poly{T, S}, Array(T, lenq))
+   d = Array(T, lenq)
    for i = 1:lenq
-      q.data.coeffs[i] = zero(T)
+      d[i] = zero(T)
    end
+   q = Poly(Poly{T, S}, d)
    x = gen(Poly{T, S})
    leng = g.data.length
    while f.data.length >= leng
@@ -1432,10 +1435,11 @@ function deriv{T <: Ring, S}(a::Poly{T, S})
       return zero(Poly{T, S})
    end
    len = a.data.length
-   z = Poly(Poly{T, S}, Array(T, len - 1))
+   d = Array(T, len - 1)
    for i = 1:len - 1
-      z.data.coeffs[i] = i*a.data.coeffs[i + 1]
+      d[i] = i*a.data.coeffs[i + 1]
    end
+   z = Poly(Poly{T, S}, d)
    z.data.length = normalise(z, len - 1)
    return z
 end
