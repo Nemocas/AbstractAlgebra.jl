@@ -60,25 +60,27 @@ type Poly{T <: Ring, S} <: Ring
       return d
    end   
 
-   function Poly{M}(a :: Array{Residue{ZZ, M}, 1})
-      d = new(fmpz_mod_poly(C_NULL, 0, 0, C_NULL))
-      println("here1")
-      m = ZZ(7)
-      ccall((:fmpz_mod_poly_init2, :libflint), Void, (Ptr{fmpz_mod_poly}, Int), &(d.data), &m, length(a))
-      finalizer(d, _fmpz_mod_poly_clear_fn)
-      for i = 1:length(a)
-         ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, (Ptr{fmpz_mod_poly}, Int, Ptr{ZZ}),
-            &(d.data), i - 1, &(a[i].data))
-      end
-      return d
-   end
-
    Poly() = Poly{T, S}(Array(T, 0))
    Poly(a::Integer) = a == 0 ? Poly{T, S}(Array(T, 0)) : Poly{T, S}([T(a)])
    Poly(a::T) = Poly{T, S}([a])
    Poly(a::Poly{T, S}) = a
    Poly{R <: Ring}(a::R) = convert(Poly{T, S}, a)
 end
+
+function Poly{M}(a :: Array{Residue{ZZ, M}, 1})
+   d = new(fmpz_mod_poly(C_NULL, 0, 0, 0))
+         m = modulus(T)
+         ccall((:fmpz_mod_poly_init2, :libflint), Void, (Ptr{fmpz_mod_poly}, Ptr{ZZ}, Int), &(d.data), &m, length(a))
+         finalizer(d, _fmpz_mod_poly_clear_fn)
+         for i = 1:length(a)
+            ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, (Ptr{fmpz_mod_poly}, Int, Ptr{ZZ}),
+               &(d.data), i - 1, &(a[i].data))
+         end
+         return d
+      else
+         new(PolyStruct(a, length(a)))
+      end
+   end   
 
 function _fmpz_poly_clear_fn(a :: Poly{ZZ})
    ccall((:fmpz_poly_clear, :libflint), Void, (Ptr{fmpz_poly},), &(a.data))

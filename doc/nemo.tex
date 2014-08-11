@@ -511,20 +511,33 @@ Now the type has two parameters. One is a type \code{R}, which is a \code{Ring}.
 could be a \code{Symbol} for example. But there is currently no way to restrict it to be a 
 \code{Symbol}). 
 
-There is also a slight problem when we are defining methods whose signatures don't depend on that
+There is also a problem when we are defining methods whose signatures don't depend on that
 \code{Symbol}. It seems that Julia won't even allow that type parameter to be mentioned in that case,
-unless you are writing an inner constructor.
+unless you are writing an inner constructor. That's a problem if you are trying to write a constructor
+which takes a parameter of one parameterised type and trying to construct from it a value of another
+parameterised type, e.g. you are trying to construct a value of the type given above from an array of
+values whose types don't depend on \code{R} and \code{S}.
 
-This is theoretically correct, but a pain in the neck. The problem is, one literally has to use type 
-introspection, and undocumented runtime type deconstruction to get access to that symbol, since now
-there is no name by which we can refer to it.
+You can't use an outer constructor because the \code{R} and \code{S} can't be mentioned if they don't
+appear in the types for the parameters you are passing. And you can't use an inner constructor because
+currently Julia seems to ignore inner constructors that depend on additional parameters that the type 
+you are constructing doesn't depend on.
 
-Two simple things would fix this problem.
+To work around this, one literally has to use type introspection, and undocumented runtime type 
+deconstruction from a more general inner constructor (if possible) and do different things depending
+on the type parameters you find.
 
-Firstly, Julia should allow the type \code{S} to be restricted to a \code{Symbol} or \code{Int}.
+Two simple things would fix these problems.
 
-Secondly, when the signature does not include the type parameter \code{S}, access should be provided
-to parameters of types of objects via a supported interface, e.g. \code{parameters(typeof(a))}.
+Firstly, Julia should allow a type parameter \code{S} to be restricted to a \code{Symbol} or \code{Int}.
+
+Secondly, either outer constructors should allow the type parameters for the type being constructed to 
+be mentioned, even when they don't appear elsewhere in the prototype, or additional parameters should be 
+allowed for inner constructors that aren't parameters for the type being constructed (and such inner 
+constructors should not be ignored). It's not clear how the former would work, since there are two sets 
+of type parameters here, the type parameters for the type being constructed, and the type parameters for
+the arguments of the constructor. The two need to be separated somehow. The second solution might be
+more practical. 
 
 For all I know, this problem is already fixed in the latest unstable release of Julia (soon to be stable).
 The Julia authors must surely have hit this themselves, unless there's something I don't understand
