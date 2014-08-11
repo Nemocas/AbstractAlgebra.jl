@@ -2068,9 +2068,8 @@ Poly(::Type{Poly{T <: Ring, S}}, a::Array{T, 1})
 \end{lstlisting}
 
 \desc{Construct a polynomial whose coefficients are given by the elements of the array
-\code{a}, starting with the constant coefficient at index $1$. The user is responsible
-for normalising the resulting polynomial after using this constructor, since 
-uninitialised arrays may be passed to the function.}
+\code{a}, starting with the constant coefficient at index $1$. The array must be fully
+initialised, otherwise an exception may result.}
 
 \begin{lstlisting}
 Poly{T <: Ring, S}(a::Poly{T, S})
