@@ -1356,6 +1356,10 @@ function evaluate{T <: Ring, S}(a::Poly{T, S}, b::Int)
    return evaluate(a, convert(T, b))
 end
 
+function evaluate{T <: Ring, S}(a::Poly{T, S}, b::ZZ)
+   return evaluate(a, convert(T, b))
+end
+
 function compose{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_compose, :libflint), Void, 

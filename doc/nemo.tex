@@ -2010,7 +2010,7 @@ and generic types.
 
 \begin{lstlisting}
 type Poly{T <: Ring, S} <: Ring
-   data :: Union(fmpz_poly, PolyStruct{T})
+   data :: Union(fmpz_poly, fmpz_mod_poly, PolyStruct{T})
 end
 \end{lstlisting}
 
@@ -2064,7 +2064,7 @@ Poly{T <: Ring, S}(a::T)
 $a \neq 0$, otherwise construct the zero polynomial.}
 
 \begin{lstlisting}
-Poly{T <: Ring, S}(a::Array{T, 1})
+Poly(::Type{Poly{T <: Ring, S}}, a::Array{T, 1})
 \end{lstlisting}
 
 \desc{Construct a polynomial whose coefficients are given by the elements of the array
@@ -2105,7 +2105,7 @@ h = S(x^2 + 2x + 1)
 
 j = T(x + 2)
 
-k = S([x, x + 2, x^2 + 3x + 1])
+k = Poly(S, [x, x + 2, x^2 + 3x + 1])
 
 l = S(k)
 \end{lstlisting}
@@ -2121,7 +2121,6 @@ length is \code{len}. A polynomial is normalised if it is either length $0$ or i
 leading coefficient is nonzero. This function is usually used internally.}
 
 \begin{lstlisting}
-coeff{S}(x::Poly{ZZ, S}, n::Int)
 coeff{T <: Ring, S}(a::Poly{T, S}, n::Int)
 \end{lstlisting}
 
@@ -2129,7 +2128,6 @@ coeff{T <: Ring, S}(a::Poly{T, S}, n::Int)
 if it has none.}
 
 \begin{lstlisting}
-lead{S}(x::Poly{ZZ, S})
 lead{T <: Ring, S}(a::Poly{T, S})
 \end{lstlisting}
 
@@ -2137,7 +2135,6 @@ lead{T <: Ring, S}(a::Poly{T, S})
 length $0$.}
 
 \begin{lstlisting}
-isgen{S}(a::Poly{ZZ, S})
 isgen{T <: Ring, S}(a::Poly{T, S})
 \end{lstlisting}
 
@@ -2145,21 +2142,18 @@ isgen{T <: Ring, S}(a::Poly{T, S})
 polynomial ring, otherwise return \code{false}.}
 
 \begin{lstlisting}
-zero{S}(::Type{Poly{ZZ, S}})
 zero{T <: Ring, S}(::Type{Poly{T, S}})
 \end{lstlisting}
 
 \desc{Return the additive identity $0$ in the given polynomial ring.}
 
 \begin{lstlisting}
-one{S}(::Type{Poly{ZZ, S}})
 one{T <: Ring, S}(::Type{Poly{T, S}})
 \end{lstlisting}
 
 \desc{Return the multiplicative identity $1$ in the given polynomial ring.}
 
 \begin{lstlisting}
-gen{S}(::Type{Poly{ZZ, S}})
 gen{T <: Ring, S}(::Type{Poly{T, S}})
 \end{lstlisting}
 
@@ -2195,11 +2189,8 @@ if both operands are not in the same polynomial ring, Nemo will try to
 coerce them into one of the two rings before applying the operation.
 
 \begin{lstlisting}
-+{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
 +{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
--{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
 -{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
-*{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
 *{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
 \end{lstlisting}
 
@@ -2230,18 +2221,18 @@ The following ad hoc binary operators are faster than first coercing all
 operands into the polynomial ring.
 
 \begin{lstlisting}
-+{S}(x::Poly{ZZ, S}, y::Int)
-+{S}(x::Poly{ZZ, S}, y::ZZ)
-+{S}(x::Int, y::Poly{ZZ, S})
-+{S}(x::ZZ, y::Poly{ZZ, S})
--{S}(x::Poly{ZZ, S}, y::Int)
--{S}(x::Poly{ZZ, S}, y::ZZ)
--{S}(x::Int, y::Poly{ZZ, S})
--{S}(x::ZZ, y::Poly{ZZ, S})
-*{S}(x::Poly{ZZ, S}, y::Int)
-*{S}(x::Poly{ZZ, S}, y::ZZ)
-*{S}(x::Int, y::Poly{ZZ, S})
-*{S}(x::ZZ, y::Poly{ZZ, S})
++{T <: Ring, S}(x::Poly{T, S}, y::Int)
++{T <: Ring, S}(x::Poly{T, S}, y::ZZ)
++{T <: Ring, S}(x::Int, y::Poly{T, S})
++{T <: Ring, S}(x::ZZ, y::Poly{T, S})
+-{T <: Ring, S}(x::Poly{T, S}, y::Int)
+-{T <: Ring, S}(x::Poly{T, S}, y::ZZ)
+-{T <: Ring, S}(x::Int, y::Poly{T, S})
+-{T <: Ring, S}(x::ZZ, y::Poly{T, S})
+*{T <: Ring, S}(x::Poly{T, S}, y::Int)
+*{T <: Ring, S}(x::Poly{T, S}, y::ZZ)
+*{T <: Ring, S}(x::Int, y::Poly{T, S})
+*{T <: Ring, S}(x::ZZ, y::Poly{T, S})
 \end{lstlisting}
 
 \textbf{Examples.}
@@ -2266,7 +2257,6 @@ n = ZZ(5) - l
 \subsection{Comparison}
 
 \begin{lstlisting}
-=={S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
 =={T<: Ring, S}(x::Poly{T, S}, y::Poly{T, S})
 \end{lstlisting}
 
@@ -2301,13 +2291,10 @@ The following comparison operators are faster than first coercing the arguments
 into one or the other ring.
 
 \begin{lstlisting}
-=={S}(x::Poly{ZZ, S}, y::Int)
-=={S}(x::Poly{ZZ, S}, y::ZZ)
 =={T <: Ring, S}(x::Poly{T, S}, y::Int)
 =={T <: Ring, S}(x::Poly{T, S}, y::ZZ)
 =={T<: Ring, S}(x::Int, y::Poly{T, S})
 =={T<: Ring, S}(x::ZZ, y::Poly{T, S})
-=={S, M}(x::Residue{ZZ, M}, y::Poly{Residue{ZZ, M}, S})
 \end{lstlisting}
 
 \textbf{Examples.}
@@ -2332,7 +2319,6 @@ end
 \subsection{Unary operators}
 
 \begin{lstlisting}
--{S}(x::Poly{ZZ, S})
 -{T <: Ring, S}(a::Poly{T, S})
 \end{lstlisting}
 
@@ -2354,7 +2340,6 @@ j = -h
 \subsection{Truncated operations}
 
 \begin{lstlisting}
-truncate{S}(a::Poly{ZZ, S}, n::Int)
 truncate{T <: Ring, S}(a::Poly{T, S}, n::Int)
 \end{lstlisting}
 
@@ -2362,7 +2347,6 @@ truncate{T <: Ring, S}(a::Poly{T, S}, n::Int)
 \code{DomainError()}.}
 
 \begin{lstlisting}
-mullow{S}(a::Poly{ZZ, S}, b::Poly{ZZ, S}, n::Int)
 mullow{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S}, n::Int)
 \end{lstlisting}
 
@@ -2391,7 +2375,6 @@ n = mullow(k, l, 4)
 \subsection{Powering}
 
 \begin{lstlisting}
-^{S}(a::Poly{ZZ, S}, n::Int)
 ^{T <: Ring, S}(a::Poly{T, S}, n::Int)
 \end{lstlisting}
 
@@ -2456,7 +2439,6 @@ powmod(f, 10, h)
 First we have exact division by a scalar.
 
 \begin{lstlisting}
-divexact{S}(a::Poly{ZZ, S}, b::ZZ)
 divexact{T <: Ring, S}(a::Poly{T, S}, b::T)
 \end{lstlisting}
 
@@ -2466,7 +2448,6 @@ exact. If $b = 0$ we throw a \code{DivideError()}.}
 Then we have division of a polynomial by another.
 
 \begin{lstlisting}
-divexact{S}(a::Poly{ZZ, S}, b::Poly{ZZ, S})
 divexact{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
 \end{lstlisting}
 
@@ -2496,6 +2477,8 @@ m = divexact(k*l, k)
 
 \subsection{Euclidean division}
 
+Over a residue ring we can define Euclidean division.
+
 \begin{lstlisting}
 mod{T <: Residue, S}(f::Poly{T, S}, g::Poly{T, S})
 \end{lstlisting}
@@ -2523,7 +2506,6 @@ of $b$.
 We call $q$ the pseudoquotient and $r$ the pseudoremainder.
 
 \begin{lstlisting}
-pseudorem{S}(a::Poly{ZZ, S}, b::Poly{ZZ, S})
 pseudorem{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
 \end{lstlisting}
 
@@ -2531,7 +2513,6 @@ pseudorem{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
 \code{DivideError()}.}
 
 \begin{lstlisting}
-pseudodivrem{S}(a::Poly{ZZ, S}, b::Poly{ZZ, S})
 pseudodivrem{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
 \end{lstlisting}
 
@@ -2579,7 +2560,6 @@ When the base ring provides a \code{gcd} function we can provide numerous
 GCD related functions for polynomials over that ring.
 
 \begin{lstlisting}
-content{S}(a::Poly{ZZ, S})
 content{T <: Ring, S}(a::Poly{T, S})
 \end{lstlisting}
 
@@ -2587,7 +2567,6 @@ content{T <: Ring, S}(a::Poly{T, S})
 of all its coefficients, if this exists.}
 
 \begin{lstlisting}
-primpart{S}(a::Poly{ZZ, S})
 primpart{T <: Ring, S}(a::Poly{T, S})
 \end{lstlisting}
 
@@ -2595,7 +2574,6 @@ primpart{T <: Ring, S}(a::Poly{T, S})
 divided by its content, if it exists.}
 
 \begin{lstlisting}
-gcd{S}(a::Poly{ZZ, S}, b::Poly{ZZ, S})
 gcd{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
 \end{lstlisting}
 
@@ -2632,9 +2610,8 @@ q = gcd(k*m, l*m)
 \subsection{Evaluation}
 
 \begin{lstlisting}
-evaluate{S}(a::Poly{ZZ, S}, b::Int)
-evaluate{S}(a::Poly{ZZ, S}, b::ZZ)
 evaluate{T <: Ring, S}(a::Poly{T, S}, b::Int)
+evaluate{T <: Ring, S}(a::Poly{T, S}, b::ZZ)
 evaluate{T <: Ring, S}(a::Poly{T, S}, b::T)
 \end{lstlisting}
 
@@ -2660,7 +2637,6 @@ l = evaluate(j, x^2 + 2x + 1)
 \subsection{Composition}
 
 \begin{lstlisting}
-compose{S}(a::Poly{ZZ, S}, b::Poly{ZZ, S})
 compose{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
 \end{lstlisting}
 
@@ -2686,7 +2662,6 @@ l = compose(j, k)
 \subsection{Derivative}
 
 \begin{lstlisting}
-deriv{S}(a::Poly{ZZ, S})
 deriv{T <: Ring, S}(a::Poly{T, S})
 \end{lstlisting}
 
@@ -2711,7 +2686,6 @@ j = deriv(h)
 \subsection{Resultant}
 
 \begin{lstlisting}
-resultant{S}(a::Poly{ZZ, S}, b::Poly{ZZ, S})
 resultant{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
 \end{lstlisting}
 
@@ -2737,7 +2711,6 @@ l = resultant(j, k)
 \subsection{Discriminant}
 
 \begin{lstlisting}
-discriminant{S}(x::Poly{ZZ, S})
 discriminant{T <: Ring, S}(a::Poly{T, S})
 \end{lstlisting}
 
@@ -2768,7 +2741,6 @@ $$sa + bt = r,$$
 where $r$ is the resultant of $a$ and $b$.
 
 \begin{lstlisting}
-bezout{S}(a::Poly{ZZ, S}, b::Poly{ZZ, S})
 bezout{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
 \end{lstlisting}
 
