@@ -16,6 +16,11 @@ type fmpz_poly <: Ring
    coeffs :: Ptr{Void}
    alloc :: Int
    length :: Int
+   function fmpz_poly(coeffs::Ptr{Void}, alloc::Int, length::Int)
+      d = new(coeffs, alloc, length)
+      finalizer(d, _fmpz_poly_clear_fn)
+      return d
+   end
 end
 
 type fmpz_mod_poly <: Ring
@@ -23,6 +28,11 @@ type fmpz_mod_poly <: Ring
    alloc :: Int
    length :: Int
    p :: Int # can't make this a ZZ
+   function fmpz_mod_poly(coeffs::Ptr{Void}, alloc::Int, length::Int, p::Int)
+      d = new(coeffs, alloc, length, p)
+      finalizer(d, _fmpz_mod_poly_clear_fn)
+      return d
+   end  
 end
 
 type PolyStruct{T <: Ring}
@@ -33,46 +43,51 @@ end
 type Poly{T <: Ring, S} <: Ring
    data :: Union(fmpz_poly, fmpz_mod_poly, PolyStruct{T})
    
-   function Poly(a :: Array{T, 1})
-      if T <: Residue && T.parameters[1] == ZZ
-         d = new(fmpz_mod_poly(C_NULL, 0, 0, 0))
-         m = modulus(T)
-         ccall((:fmpz_mod_poly_init2, :libflint), Void, (Ptr{fmpz_mod_poly}, Ptr{ZZ}, Int), &(d.data), &m, length(a))
-         finalizer(d, _fmpz_mod_poly_clear_fn)
-         for i = 1:length(a)
-            ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, (Ptr{fmpz_mod_poly}, Int, Ptr{ZZ}),
-               &(d.data), i - 1, &(a[i].data))
-         end
-         return d
-      else
-         new(PolyStruct(a, length(a)))
-      end
-   end   
+   Poly(a :: PolyStruct{T}) = new(a)   
 
-   function Poly(a :: Array{ZZ, 1})
-      d = new(fmpz_poly(C_NULL, 0, 0))
-      ccall((:fmpz_poly_init2, :libflint), Void, (Ptr{fmpz_poly}, Int), &(d.data), length(a))
-      finalizer(d, _fmpz_poly_clear_fn)
-      for i = 1:length(a)
-         ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, (Ptr{fmpz_poly}, Int, Ptr{ZZ}),
-            &(d.data), i - 1, &a[i])
-      end
-      return d
-   end   
-
-   Poly() = Poly{T, S}(Array(T, 0))
-   Poly(a::Integer) = a == 0 ? Poly{T, S}(Array(T, 0)) : Poly{T, S}([T(a)])
-   Poly(a::T) = Poly{T, S}([a])
+   Poly(a::fmpz_mod_poly) = new(a)
+   
+   Poly(a :: fmpz_poly) = new(a)
+   
+   Poly() = Poly(Poly{T, S}, Array(T, 0))
+   Poly(a::Integer) = a == 0 ? Poly(Poly{T, S}, Array(T, 0)) : Poly(Poly{T, S}, [T(a)])
+   Poly(a::T) = Poly(Poly{T, S}, [a])
    Poly(a::Poly{T, S}) = a
    Poly{R <: Ring}(a::R) = convert(Poly{T, S}, a)
 end
 
-function _fmpz_poly_clear_fn(a :: Poly{ZZ})
-   ccall((:fmpz_poly_clear, :libflint), Void, (Ptr{fmpz_poly},), &(a.data))
+function Poly{T, S}(::Type{Poly{T, S}}, a :: Array{T, 1})
+   z = PolyStruct(a, length(a))
+   return Poly{T, S}(z)
+end
+
+function Poly{S}(::Type{Poly{ZZ, S}}, a :: Array{ZZ, 1})
+   z = fmpz_poly(C_NULL, 0, 0)
+   ccall((:fmpz_poly_init2, :libflint), Void, (Ptr{fmpz_poly}, Int), &z, length(a))
+   for i = 1:length(a)
+      ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, (Ptr{fmpz_poly}, Int, Ptr{ZZ}),
+         &z, i - 1, &a[i])
+   end
+   return Poly{ZZ, S}(z)
+end   
+
+function Poly{M, S}(::Type{Poly{Residue{ZZ, M}, S}}, a :: Array{Residue{ZZ, M}, 1})
+   z = fmpz_mod_poly(C_NULL, 0, 0, 0)
+   m = modulus(Residue{ZZ, M})
+   ccall((:fmpz_mod_poly_init2, :libflint), Void, (Ptr{fmpz_mod_poly}, Ptr{ZZ}, Int), &z, &m, length(a))
+   for i = 1:length(a)
+      ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, (Ptr{fmpz_mod_poly}, Int, Ptr{ZZ}),
+            &z, i - 1, &(a[i].data))
+   end
+   return Poly{Residue{ZZ, M}, S}(z)
+end
+
+function _fmpz_poly_clear_fn(a :: fmpz_poly)
+   ccall((:fmpz_poly_clear, :libflint), Void, (Ptr{fmpz_poly},), &a)
 end
    
-function _fmpz_mod_poly_clear_fn{M}(a :: Poly{Residue{ZZ, M}})
-   ccall((:fmpz_mod_poly_clear, :libflint), Void, (Ptr{fmpz_mod_poly},), &(a.data))
+function _fmpz_mod_poly_clear_fn(a :: fmpz_mod_poly)
+   ccall((:fmpz_mod_poly_clear, :libflint), Void, (Ptr{fmpz_mod_poly},), &a)
 end
    
 ###########################################################################################
@@ -127,11 +142,11 @@ one{S, M}(::Type{Poly{Residue{ZZ, M}, S}}) = Poly{Residue{ZZ, M}, S}(1)
 
 one{T <: Ring, S}(::Type{Poly{T, S}}) = Poly{T, S}(1)
 
-gen{S, M}(::Type{Poly{Residue{ZZ, M}, S}}) = Poly{Residue{ZZ, M}, S}([Residue{ZZ, M}(0), Residue{ZZ, M}(1)])
+gen{S, M}(::Type{Poly{Residue{ZZ, M}, S}}) = Poly(Poly{Residue{ZZ, M}, S}, [Residue{ZZ, M}(0), Residue{ZZ, M}(1)])
 
-gen{S}(::Type{Poly{ZZ, S}}) = Poly{ZZ, S}([ZZ(0), ZZ(1)])
+gen{S}(::Type{Poly{ZZ, S}}) = Poly(Poly{ZZ, S}, [ZZ(0), ZZ(1)])
 
-gen{T <: Ring, S}(::Type{Poly{T, S}}) = Poly{T, S}([T(0), T(1)])
+gen{T <: Ring, S}(::Type{Poly{T, S}}) = Poly(Poly{T, S}, [T(0), T(1)])
 
 ###########################################################################################
 #
@@ -241,7 +256,7 @@ end
 
 function -{T <: Ring, S}(a::Poly{T, S})
    len = a.data.length
-   z = Poly{T, S}(Array(T, len))
+   z = Poly(Poly{T, S}, Array(T, len))
    for i = 1:len
       z.data.coeffs[i] = -a.data.coeffs[i]
    end
@@ -307,7 +322,7 @@ function +{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    lena = a.data.length
    lenb = b.data.length
    lenz = max(lena, lenb)
-   z = Poly{T, S}(Array(T, lenz))
+   z = Poly(Poly{T, S}, Array(T, lenz))
    i = 1
 
    while i <= min(lena, lenb)
@@ -334,7 +349,7 @@ function -{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    lena = a.data.length
    lenb = b.data.length
    lenz = max(lena, lenb)
-   z = Poly{T, S}(Array(T, lenz))
+   z = Poly(Poly{T, S}, Array(T, lenz))
    i = 1
 
    while i <= min(lena, lenb)
@@ -368,7 +383,7 @@ function *{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    t = T()
 
    lenz = lena + lenb - 1
-   z = Poly{T, S}(Array(T, lenz))
+   z = Poly(Poly{T, S}, Array(T, lenz))
 
    for i = 1:lena
       z.data.coeffs[i] = a.data.coeffs[i]*b.data.coeffs[1]
@@ -524,7 +539,7 @@ end
 
 function *{T <: Ring, S}(a::Int, b::Poly{T, S})
    len = b.data.length
-   z = Poly{T, S}(Array(T, len))
+   z = Poly(Poly{T, S}, Array(T, len))
    for i = 1:len
       z.data.coeffs[i] = a*b.data.coeffs[i]
    end
@@ -534,7 +549,7 @@ end
 
 function *{T <: Ring, S}(a::ZZ, b::Poly{T, S})
    len = b.data.length
-   z = Poly{T, S}(Array(T, len))
+   z = Poly(Poly{T, S}, Array(T, len))
    for i = 1:len
       z.data.coeffs[i] = a*b.data.coeffs[i]
    end
@@ -701,7 +716,7 @@ function truncate{T <: Ring, S}(a::Poly{T, S}, n::Int)
    end
 
    lenz = min(lena, n)
-   z = Poly{T, S}(Array(T, lenz))
+   z = Poly(Poly{T, S}, Array(T, lenz))
 
    for i = 1:lenz
       z.data.coeffs[i] = a.data.coeffs[i]
@@ -748,7 +763,7 @@ function mullow{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S}, n::Int)
 
    lenz = min(lena + lenb - 1, n)
 
-   z = Poly{T, S}(Array(T, lenz))
+   z = Poly(Poly{T, S}, Array(T, lenz))
 
    for i = 1:min(lena, lenz)
       z.data.coeffs[i] = a.data.coeffs[i]*b.data.coeffs[1]
@@ -802,7 +817,7 @@ function ^{T <: Ring, S}(a::Poly{T, S}, b::Int)
    b < 0 && throw(DomainError())
    # special case powers of x for constructing polynomials efficiently
    if a.data.length == 2 && a.data.coeffs[1] == 0 && a.data.coeffs[2] == 1
-      z = Poly{T, S}(Array(T, b + 1))
+      z = Poly(Poly{T, S}, Array(T, b + 1))
       z.data.coeffs[b + 1] = a.data.coeffs[2]
       for i = 1:b
          z.data.coeffs[i] = a.data.coeffs[1]
@@ -812,7 +827,7 @@ function ^{T <: Ring, S}(a::Poly{T, S}, b::Int)
    elseif a.data.length == 0
       return zero(Poly{T, S})
    elseif a.data.length == 1
-      return Poly{T, S}([a.data.coeffs[1]^b])
+      return Poly(Poly{T, S}, [a.data.coeffs[1]^b])
    elseif b == 0
       return one(Poly{T, S})
    else
@@ -855,7 +870,7 @@ function powmod{T <: Residue, S}(a::Poly{T, S}, b::Int, d::Poly{T, S})
    if a.data.length == 0
       return zero(Poly{T, S})
    elseif a.data.length == 1
-      return Poly{T, S}([a.data.coeffs[1]^b])
+      return Poly(Poly{T, S}, [a.data.coeffs[1]^b])
    elseif b == 0
       return one(Poly{T, S})
    else
@@ -989,7 +1004,7 @@ end
 
 function divexact{T <: Ring, S}(a::Poly{T, S}, b::T)
    b == 0 && throw(DivideError())
-   z = Poly{T, S}(Array(T, a.data.length))
+   z = Poly(Poly{T, S}, Array(T, a.data.length))
    for i = 1:a.data.length
       z.data.coeffs[i] = divexact(a.data.coeffs[i], b)
    end
@@ -1023,7 +1038,7 @@ function divexact{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
       return zero(Poly{T, S})
    end
    lenq = f.data.length - g.data.length + 1
-   q = Poly{T, S}(Array(T, lenq))
+   q = Poly(Poly{T, S}Array(T, lenq))
    for i = 1:lenq
       q.data.coeffs[i] = zero(T)
    end
@@ -1105,7 +1120,7 @@ function divrem{T <: Residue, S}(f::Poly{T, S}, g::Poly{T, S})
    g = binv*g
    x = gen(Poly{T, S})
    qlen = f.data.length - g.data.length + 1
-   q = Poly{T, S}(Array(T, qlen))
+   q = Poly(Poly{T, S}Array(T, qlen))
    for i = 1:qlen
       q.data.coeffs[i] = zero(T)
    end
@@ -1397,7 +1412,7 @@ function deriv{T <: Ring, S}(a::Poly{T, S})
       return zero(Poly{T, S})
    end
    len = a.data.length
-   z = Poly{T, S}(Array(T, len - 1))
+   z = Poly(Poly{T, S}, Array(T, len - 1))
    for i = 1:len - 1
       z.data.coeffs[i] = i*a.data.coeffs[i + 1]
    end
@@ -1778,21 +1793,21 @@ function PolynomialRing{T <: Ring}(::Type{T}, s::String)
    
    # Conversions and promotions
 
-   Base.convert(::Type{T1}, x::T) = T1([x])
+   Base.convert(::Type{T1}, x::T) = Poly(T1, [x])
    Base.promote_rule(::Type{T1}, ::Type{T}) = T1
 
    P = T2.parameters
    while length(P) > 0
       T2 = P[1]
-      Base.convert(::Type{T1}, x::T2) = T1([convert(T, x)])
+      Base.convert(::Type{T1}, x::T2) = Poly(T1, [convert(T, x)])
       Base.promote_rule(::Type{T1}, ::Type{T2}) = T1
       P = T2.parameters
    end
 
-   Base.convert(::Type{T1}, x::Integer) = T1([convert(T, x)])
+   Base.convert(::Type{T1}, x::Integer) = Poly(T1, [convert(T, x)])
    Base.promote_rule{R <: Integer}(::Type{T1}, ::Type{R}) = T1
 
    # (Type, gen) 
 
-   return (Poly{T, S}, Poly{T, S}([T(0), T(1)]))
+   return (Poly{T, S}, Poly(Poly{T, S}, [T(0), T(1)]))
 end
