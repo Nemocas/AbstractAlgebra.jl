@@ -1238,6 +1238,13 @@ size(a::ZZ)
 \desc{Return the number of machine words that make up the bignum $a$. The
 returned value has type \code{Int}.}
 
+\begin{lstlisting}
+canonical_unit(a::ZZ)
+\end{lstlisting}
+
+\desc{This is used for canonicalising fractions. The function simply returns $-1$
+if $a < 0$, otherwise it returns $1$.}
+
 \textbf{Examples.}
 
 Here are some examples of the above basic manipulations.
@@ -1255,6 +1262,8 @@ if fits(Int, a)
 end
 
 s = size(a)
+
+t = canonical_unit(ZZ(-12))
 \end{lstlisting}
 
 \subsection{Binary operators and functions}
@@ -2158,6 +2167,13 @@ gen{T <: Ring, S}(::Type{Poly{T, S}})
 
 \desc{Return the generator (variable) of the given polynomial ring.}
 
+\begin{lstlisting}
+canonical_unit{T <: Ring, S}(a::Poly{T, S})
+\end{lstlisting}
+
+\desc{Used for canonicalising fractions. The function simply returns
+\code{canonical_unit} of the leading coefficient.}
+
 \textbf{Examples.}
 
 Here are some examples of the basic manipulation functions.
@@ -2179,6 +2195,9 @@ j = coeff(h, 2)
 if isgen(x)
    println(x, " is the generator of the ", typeof(x))
 end
+
+k = canonical_unit(-x + 1)
+m = canonical_unit(-x*y + x + 1)
 \end{lstlisting}
 
 \subsection{Binary operators}
@@ -2998,6 +3017,13 @@ one{T <: Ring, S}(::Type{Residue{T, S}})
 
 \desc{Return the multiplicative identity of the given residue ring.}
 
+\begin{lstlisting}
+canonical_unit{T <: Ring, S}(a::Residue{T, S})
+\end{lstlisting}
+
+\desc{Used for canonicalising fractions. The function simply returns $a$. No
+check is performed to check that $a$ is actually invertible.}
+
 \textbf{Examples.}
 
 Here are some examples of basic manipulation of residue rings.
@@ -3012,6 +3038,9 @@ S, x = PolynomialRing(R, "x")
 T = ResidueRing(S, x^3 + 3x + 1)
 
 h = one(T)
+
+k = canonical_unit(R(11))
+m = canonical_unit(T(x + 1))
 \end{lstlisting}
 
 \subsection{Unary operations}
