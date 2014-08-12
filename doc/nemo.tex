@@ -3573,6 +3573,12 @@ one{T <: Ring}(::Type{Fraction{T}})
 \desc{Return the multiplicative identity of the fraction field of the ring 
 $T$.}
 
+\begin{lstlisting}
+canonical_unit{T}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Used for canonicalising fractions. This function simply returns $a$.}
+
 \textbf{Examples.}
 
 Here are some examples of constructors for fraction fields.
@@ -3586,6 +3592,7 @@ b = den((x + 1)/(-x^2 + 1))
 
 c = zero(R)
 d = one(S)
+f = canonical_unit((x + 1)/(-x^2 + 1))
 \end{lstlisting}
 
 \subsubsection{Unary operators}
