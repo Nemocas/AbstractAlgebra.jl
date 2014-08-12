@@ -2494,6 +2494,28 @@ divrem{T <: Residue, S}(f::Poly{T, S}, g::Poly{T, S})
 a tuple \code{(q, r)} such that $a = bq + r$ with deg$(r) <$ deg$(b)$. If 
 $g = 0$ we throw a \code{DivideError()}.}
 
+\textbf{Examples.}
+
+Here are some examples of Euclidean division.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 7)
+S, x = PolynomialRing(R, "x")
+
+f = x^2 + 2x + 1
+g = x^3 + 3x + 1
+h = mod(g, f)
+q, r = divrem(g, f)
+
+T = ResidueRing(S, x^3 + 3x + 1)
+U, y = PolynomialRing(T, "y")
+
+k = y^3 + x*y^2 + (x + 1)*y + 3
+l = (x + 1)*y^2 + (x^3 + 2x + 2)
+m = mod(k, l)
+q, r = divrem(k, l)
+\end{lstlisting}
+
 \subsection{Pseudodivision}
 
 Given two polynomials $a, b$, pseudodivision computes polynomials $q$ and $r$
