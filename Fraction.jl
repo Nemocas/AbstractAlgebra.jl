@@ -55,8 +55,8 @@ function /{T <: Ring, S}(x::Poly{T, S}, y::Poly{T, S})
    g = gcd(x, y)
    num = divexact(x, g)
    den = divexact(y, g)
-   c = inv(canonical_unit(den))
-   Fraction{Poly{T, S}}(num*c, den*c)
+   c = canonical_unit(den)
+   Fraction{Poly{T, S}}(divexact(num, c), divexact(den, c))
 end
 
 ###########################################################################################
@@ -290,4 +290,8 @@ end
 
 function FractionField{T <: Ring}(::Type{T})
    return Fraction{T}
+end
+
+function FractionField{T <: Fraction}(::Type{T})
+   return T # fraction field of a field is itself
 end

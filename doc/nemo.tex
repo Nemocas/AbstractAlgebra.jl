@@ -1110,7 +1110,7 @@ Types model categories, but are not formally equivalent to them! In fact, type
 systems are equivalent to formal logic systems (look up the Curry-Howard
 correspondence and the lambda cube for more details).
 
-\section{Bignum integers}
+\subsection{Bignum integers}
 
 Nemo provides a bignum type \code{ZZ}.
 
@@ -1129,7 +1129,7 @@ type \code{ZZ} (fortunately an \code{fmpz_t} is a pointer to an \code{fmpz} in
 flint, so that Julia's habit of defining objects as heap allocated objects will 
 precisely result in an \code{fmpz_t}).
 
-\subsection{Constructors}
+\subsubsection{Constructors}
 
 To create a bignum value, Nemo provides various constructors. Space is automatically
 recovered when the created object goes out of scope.
@@ -1200,7 +1200,7 @@ d = ZZ(c)
 e = deepcopy(c)
 \end{lstlisting}
 
-\subsection{Basic manipulation}
+\subsubsection{Basic manipulation}
 
 Various functions are provided to do basic manipulations in \code{ZZ}.
 
@@ -1266,7 +1266,7 @@ s = size(a)
 t = canonical_unit(ZZ(-12))
 \end{lstlisting}
 
-\subsection{Binary operators and functions}
+\subsubsection{Binary operators and functions}
 
 The following standard binary operators are provided for \code{ZZ}.
 
@@ -1360,7 +1360,7 @@ e = gcd(a, b)
 f = lcm(a, b)
 \end{lstlisting}
 
-\subsection{Ad hoc operators and functions}
+\subsubsection{Ad hoc operators and functions}
 
 Since the Julia types \code{Int} and \code{Uint} cannot be made members of the
 \code{Ring} class, we must define some ad hoc operators, so that values of type
@@ -1442,7 +1442,7 @@ h = fdivpow2(a,2)
 j = a^10
 \end{lstlisting}
 
-\subsection{Comparison operators and functions}
+\subsubsection{Comparison operators and functions}
 
 The following standard comparison operators are provided for \code{ZZ}.
 
@@ -1490,7 +1490,7 @@ if cmpabs(a, b) == 0
 end
 \end{lstlisting}
 
-\subsection{Ad hoc comparison operators}
+\subsubsection{Ad hoc comparison operators}
 
 We overload the comparison operators to more easily deal with values of type \code{Int}.
 
@@ -1523,7 +1523,7 @@ if a == -12
 end
 \end{lstlisting}
 
-\subsection{Unary operators and functions}
+\subsubsection{Unary operators and functions}
 
 \begin{lstlisting}
 -(x::ZZ)
@@ -1554,7 +1554,7 @@ b = ~ZZ(-5)
 c = abs(a)
 \end{lstlisting}
 
-\subsection{Division with remainder}
+\subsubsection{Division with remainder}
 
 \begin{lstlisting}
 fdivrem(a::ZZ, b::ZZ)
@@ -1576,7 +1576,7 @@ q, r = fdivrem(ZZ(12), ZZ(5))
 q, r = tdivrem(ZZ(12), ZZ(5))
 \end{lstlisting}
 
-\subsection{Roots}
+\subsubsection{Roots}
 
 \begin{lstlisting}
 isqrt(x::ZZ)
@@ -1611,7 +1611,7 @@ s, r = isqrtrem(ZZ(12))
 r = root(ZZ(1000), 3)
 \end{lstlisting}
 
-\subsection{Extended GCD}
+\subsubsection{Extended GCD}
 
 \begin{lstlisting}
 xgcd(a::ZZ, b::ZZ)
@@ -1638,7 +1638,7 @@ g, s, t = xgcd(ZZ(12), ZZ(5))
 g, s = gcdinv(ZZ(5), ZZ(12))
 \end{lstlisting}
 
-\subsection{Bit twiddling}
+\subsubsection{Bit twiddling}
 
 Various functions are provided to deal with bignums on a binary bit level.
 
@@ -1709,7 +1709,7 @@ b = nextpow2(a)
 combit!(a, 2)
 \end{lstlisting}
 
-\subsection{Alternative bases}
+\subsubsection{Alternative bases}
 
 \begin{lstlisting}
 base(n::ZZ, b::Int)
@@ -1771,7 +1771,7 @@ n1 = nbits(a)
 n2 = ndigits(a, 3)
 \end{lstlisting}
 
-\subsection{String I/O}
+\subsubsection{String I/O}
 
 \begin{lstlisting}
 string(x::ZZ)
@@ -1790,7 +1790,7 @@ s = string(a)
 println(s[1])
 \end{lstlisting}
 
-\subsection{Modular arithmetic}
+\subsubsection{Modular arithmetic}
 
 \begin{lstlisting}
 powmod(x::ZZ, p::ZZ, m::ZZ)
@@ -1849,7 +1849,7 @@ c = sqrtmod(ZZ(12), ZZ(13))
 d = crt(ZZ(5), ZZ(13), ZZ(7), ZZ(37), true)
 \end{lstlisting}
 
-\subsection{Number theoretic/combinatorial functions}
+\subsubsection{Number theoretic/combinatorial functions}
 
 \begin{lstlisting}
 divisible(x::ZZ, y::ZZ)
@@ -1973,7 +1973,7 @@ s = sigma(ZZ(128), 10)
 a = eulerphi(ZZ(12480))
 \end{lstlisting}
 
-\section{Polynomial rings}
+\subsection{Polynomial rings}
 
 Nemo has a parametric polynomial type (called \code{Poly}). There's not any need to deal
 directly with the type, as we provide a function \code{PolynomialRing} for constructing
@@ -2023,7 +2023,7 @@ type Poly{T <: Ring, S} <: Ring
 end
 \end{lstlisting}
 
-\subsection{Constructors}
+\subsubsection{Constructors}
 
 Because dealing with the Julia types directly is somewhat messy, we provide a simple
 function to create the type of a polynomial in Nemo.
@@ -2118,7 +2118,7 @@ k = Poly(S, [x, x + 2, x^2 + 3x + 1])
 l = S(k)
 \end{lstlisting}
 
-\subsection{Basic manipulation}
+\subsubsection{Basic manipulation}
 
 \begin{lstlisting}
 normalise{T <: Ring, S}(a::Poly{T, S}, len::Int)
@@ -2200,7 +2200,7 @@ k = canonical_unit(-x + 1)
 m = canonical_unit(-x*y + x + 1)
 \end{lstlisting}
 
-\subsection{Binary operators}
+\subsubsection{Binary operators}
 
 The following binary operators are provided for polynomials. Note that
 if both operands are not in the same polynomial ring, Nemo will try to
@@ -2233,7 +2233,7 @@ n = k*h
 p = m - g
 \end{lstlisting}
 
-\subsection{Ad hoc binary operators}
+\subsubsection{Ad hoc binary operators}
 
 The following ad hoc binary operators are faster than first coercing all
 operands into the polynomial ring.
@@ -2272,7 +2272,7 @@ m = k - 4
 n = ZZ(5) - l
 \end{lstlisting}
 
-\subsection{Comparison}
+\subsubsection{Comparison}
 
 \begin{lstlisting}
 =={T<: Ring, S}(x::Poly{T, S}, y::Poly{T, S})
@@ -2303,7 +2303,7 @@ if k == l
 end
 \end{lstlisting}
 
-\subsection{Ad hoc comparison}
+\subsubsection{Ad hoc comparison}
 
 The following comparison operators are faster than first coercing the arguments
 into one or the other ring.
@@ -2334,7 +2334,7 @@ if S(1) == ZZ(1)
 end
 \end{lstlisting}
 
-\subsection{Unary operators}
+\subsubsection{Unary operators}
 
 \begin{lstlisting}
 -{T <: Ring, S}(a::Poly{T, S})
@@ -2355,7 +2355,7 @@ h = x*y^2 + (x + 1)*y + 3
 j = -h
 \end{lstlisting}
 
-\subsection{Truncated operations}
+\subsubsection{Truncated operations}
 
 \begin{lstlisting}
 truncate{T <: Ring, S}(a::Poly{T, S}, n::Int)
@@ -2390,7 +2390,7 @@ m = truncate(k, 1)
 n = mullow(k, l, 4)
 \end{lstlisting}
 
-\subsection{Powering}
+\subsubsection{Powering}
 
 \begin{lstlisting}
 ^{T <: Ring, S}(a::Poly{T, S}, n::Int)
@@ -2413,7 +2413,7 @@ k = x*y^2 + (x + 1)*y + 3
 l = k^5
 \end{lstlisting}
 
-\subsection{Modular arithmetic}
+\subsubsection{Modular arithmetic}
 
 When \code{T} is a residue ring, we can reduce modulo a polynomial over
 \code{T}. In this way we can do modular arithmetic with polynomials.
@@ -2452,7 +2452,7 @@ mulmod(f, g, h)
 powmod(f, 10, h)
 \end{lstlisting}
 
-\subsection{Exact division}
+\subsubsection{Exact division}
 
 First we have exact division by a scalar.
 
@@ -2493,7 +2493,7 @@ l = (x + 1)*y + (x^3 + 2x + 2)
 m = divexact(k*l, k)
 \end{lstlisting}
 
-\subsection{Euclidean division}
+\subsubsection{Euclidean division}
 
 Over a residue ring we can define Euclidean division.
 
@@ -2535,7 +2535,7 @@ m = mod(k, l)
 q, r = divrem(k, l)
 \end{lstlisting}
 
-\subsection{Pseudodivision}
+\subsubsection{Pseudodivision}
 
 Given two polynomials $a, b$, pseudodivision computes polynomials $q$ and $r$
 with length$(r) <$ length$(b)$ such that
@@ -2594,7 +2594,7 @@ pseudorem(f, g)
 Here Nemo returns \code{3*x^2}, which happens to be \code{3*g} in this
 ring.
 
-\subsection{Content, primitive part and GCD}
+\subsubsection{Content, primitive part and GCD}
 
 When the base ring provides a \code{gcd} function we can provide numerous
 GCD related functions for polynomials over that ring.
@@ -2647,7 +2647,7 @@ p = primpart(k*(x^2 + 1))
 q = gcd(k*m, l*m)
 \end{lstlisting}
 
-\subsection{Evaluation}
+\subsubsection{Evaluation}
 
 \begin{lstlisting}
 evaluate{T <: Ring, S}(a::Poly{T, S}, b::Int)
@@ -2674,7 +2674,7 @@ k = evaluate(j, 3)
 l = evaluate(j, x^2 + 2x + 1)
 \end{lstlisting}
 
-\subsection{Composition}
+\subsubsection{Composition}
 
 \begin{lstlisting}
 compose{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
@@ -2699,7 +2699,7 @@ k = (x + 1)*y + (x^3 + 2x + 2)
 l = compose(j, k)
 \end{lstlisting}
 
-\subsection{Derivative}
+\subsubsection{Derivative}
 
 \begin{lstlisting}
 deriv{T <: Ring, S}(a::Poly{T, S})
@@ -2723,7 +2723,7 @@ h = x*y^2 + (x + 1)*y + 3
 j = deriv(h)
 \end{lstlisting}
 
-\subsection{Resultant}
+\subsubsection{Resultant}
 
 \begin{lstlisting}
 resultant{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
@@ -2748,7 +2748,7 @@ k = 6(x + 1)*y + (x^3 + 2x + 2)
 l = resultant(j, k)
 \end{lstlisting}
 
-\subsection{Discriminant}
+\subsubsection{Discriminant}
 
 \begin{lstlisting}
 discriminant{T <: Ring, S}(a::Poly{T, S})
@@ -2771,7 +2771,7 @@ h = x*y^2 + (x + 1)*y + 3
 j = discriminant(h)
 \end{lstlisting}
 
-\subsection{Bezout identity}
+\subsubsection{Bezout identity}
 
 The Bezout identity is the equivalent, for polynomials, of the extended GCD
 in the case of the integers.
@@ -2804,7 +2804,7 @@ k = 6(x + 1)*y + (x^3 + 2x + 2)
 u, v, w = bezout(j, k)
 \end{lstlisting}
 
-\subsection{Special polynomials}
+\subsubsection{Special polynomials}
 
 The following functions compute univariate special polynomials over \code{ZZ}.
 
@@ -2885,7 +2885,7 @@ l = theta_qexp(R, 3, 30)
 m = eta_qexp(R, 24, 30)
 \end{lstlisting}
 
-\section{Residue rings}
+\subsection{Residue rings}
 
 Nemo allows the construction of residue rings. 
 
@@ -2944,7 +2944,7 @@ only a single integer for the residue, not an integer for the residue and
 another for the modulus. This results in a factor of two space saving when
 creating arrays of values of type \code{Residue}, for a fixed modulus $n$.
 
-\subsection{Constructors}
+\subsubsection{Constructors}
 
 To make it easy to deal with the \code{Residue} type in Nemo, we provide a
 function for constructing the type of a residue ring
@@ -2997,7 +2997,7 @@ T = ResidueRing(S, x^3 + 3x + 1)
 m = T(x^4)
 \end{lstlisting}
 
-\subsection{Basic manipulation}
+\subsubsection{Basic manipulation}
 
 \begin{lstlisting}
 modulus{T <: Ring, S}(::Type{Residue{T, S}})
@@ -3043,7 +3043,7 @@ k = canonical_unit(R(11))
 m = canonical_unit(T(x + 1))
 \end{lstlisting}
 
-\subsection{Unary operations}
+\subsubsection{Unary operations}
 
 \begin{lstlisting}
 -{T <: Ring, S}(a::Residue{T, S})
@@ -3066,7 +3066,7 @@ T = ResidueRing(S, x^3 + 3x + 1)
 h = -T(x^5 + 1)
 \end{lstlisting}
 
-\subsection{Binary operations and functions}
+\subsubsection{Binary operations and functions}
 
 The following binary operators and functions are defined for residue rings.
 
@@ -3144,7 +3144,7 @@ t = divexact(n*p, p)
 u = gcd(n, p)
 \end{lstlisting}
 
-\subsection{Ad hoc binary operators}
+\subsubsection{Ad hoc binary operators}
 
 In a residue ring $R$ over a ring $T$, with modulus $m$, it is convenient
 to think of $n \in \Z$ as corresponding to $1$ added to itself $n$ times
@@ -3210,7 +3210,7 @@ h = 4 - f
 k = f*5
 \end{lstlisting}
 
-\subsection{Comparison}
+\subsubsection{Comparison}
 
 \begin{lstlisting}
 =={T, S}(x::Residue{T, S}, y::Residue{T, S})
@@ -3246,7 +3246,7 @@ f == g
 h != g
 \end{lstlisting}
 
-\subsection{Ad hoc comparison}
+\subsubsection{Ad hoc comparison}
 
 Thinking of integers as corresponding to elements of a residue ring, we
 can define the following ad hoc comparison operators.
@@ -3289,7 +3289,7 @@ f = T(x^5 + 1)
 f != 5
 \end{lstlisting}
 
-\subsection{Powering}
+\subsubsection{Powering}
 
 \begin{lstlisting}
 ^{T <: Ring, S}(a::Residue{T, S}, b::Int)
@@ -3316,7 +3316,7 @@ f = T(x^5 + 1)
 g = f^100
 \end{lstlisting}
 
-\subsection{Inversion}
+\subsubsection{Inversion}
 
 So long as we don't encounter an impossible inverse, we can
 invert an element in a residue ring $R = T/(m)$, if $T$ is a
@@ -3348,6 +3348,202 @@ T = ResidueRing(S, x^3 + 3x + 1)
 f = T(x^5 + 1)
 
 g = inv(f)
+\end{lstlisting}
+
+\section{The Fields module}
+
+Nemo provides various constructions of fields. To make use of this 
+functionality simply import the \code{Fields} module
+
+\begin{lstlisting}
+using Fields
+\end{lstlisting}
+
+The first thing the \code{Fields} module does is define the abstract
+type \code{Field} like so
+
+\begin{lstlisting}
+abstract Field <: Ring
+\end{lstlisting}
+
+This means fields can be used anywhere that a more general ring can be used
+in Nemo.
+
+Nemo fields provide the \code{/} operator, and genuine fields are closed under
+the action of this operator, except for division by zero.
+
+\subsection{Fraction fields}
+
+We allow the construction of a fraction field over any ring in Nemo. Not all
+such constructions make sense. Typically it only makes sense to construct the
+fraction field of an integral domain. However, so long as zero divisors are
+avoided there is nothing stopping one constructing the fraction field of a
+more general Euclidean ring in Nemo.
+
+Specifically, a ring must provide a \code{gcd} function before we can take its
+fraction field. This is required for canonicalisation.
+
+The type of an element of a fraction field in Nemo is \code{Fraction}. However
+the user need never deal directly with the type, as we provide convenient
+functions for constructing objects of this type.
+
+The reader not interested in the internal details of the \code{Fraction} type
+can skip ahead to the section on constructors.
+
+The definition of the \code{Fraction} type in Julia is very simple
+
+\begin{lstlisting}
+type Fraction{T <: Ring} <: Field
+   num :: T
+   den :: T
+end
+\end{lstlisting}
+
+It is parameterised over a ring type \code{T} and contains a numerator 
+\code{num} and denominator \code{den}, both of type \code{T}.
+
+The inner constructor for the \code{Fraction} type does not try to canonicalise
+the fraction, but all other constructors should produce a canonicalised
+fraction, where possible.
+
+In order to canonicalise we divide both numerator and denominator by their
+greatest common divisor. We also divide by \code{canonical_unit(den)} where
+\code{den} is the denominator. This allows us to easily check equality of
+fractions.
+
+The \code{canonical_unit} function must have the properties
+
+\begin{lstlisting}
+canonical_unit(u) == u
+canonical_unit(a*b) == canonical_unit(a)*canonical_unit(b)
+\end{lstlisting}
+
+for all values $a$ and $b$ in the ring \code{T} and $u$ any invertible element
+in \code{T}. Moreover, \code{canonical_unit} must always return an invertible
+element in the ring \code{T}.
+
+We overload the \code{/} operator in Nemo for rings whose fraction field can
+be taken (e.g. \code{ZZ} and \code|Poly{T, S}|), so that elements of the
+fraction field of a ring can be constructed directly, without first
+constructing the type.
+
+For example if we have
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+
+s = (x + 1)/(x^2 + 1)
+\end{lstlisting}
+
+then the value $s$ belongs to the fraction field of $R$ automatically, even
+though this field has not been constructed yet.
+
+Currently, before \code{Fields} is imported, the default Julia behaviour of
+\code{/} when passed values of type \code{Int} is to perform floating point
+division (this will be changed in a later version of Nemo). However, after 
+\code{Fields} has been imported, we override this so that it constructs an
+element of the fraction field of \code{ZZ}, e.g. \code{1/2} yields a 
+multiprecision fraction, not a floating point value.
+
+The \code{/} operator doubles as a division operator when passed operands
+in a fraction field.
+
+In Nemo, we consider the fraction field of a field to be itself.
+
+\subsubsection{Constructors}
+
+We provide a convenient function for constructing a fraction field of a ring in
+Nemo.
+
+\begin{lstlisting}
+FractionField{T <: Ring}(::Type{T})
+\end{lstlisting}
+
+\desc{Given a type \code{T} in the \code{Ring} class, this function returns a
+type corresponding to its fraction field.}
+
+There are also numerous constructors for generating elements in the fraction
+field.
+
+\begin{lstlisting}
+Fraction{T <: Ring}(a :: T, b :: T)
+\end{lstlisting}
+
+\desc{This is the unadorned inner constructor. It does not try to canonicalise
+or check for division by zero. It is mainly used internally to actually 
+construct the value with $a$ as numerator and $b$ as denominator.}
+
+\begin{lstlisting}
+Fraction{T <: Ring}()
+\end{lstlisting}
+
+\desc{Return the value $0/1$ in the fraction field of the ring $T$.}
+
+\begin{lstlisting}
+Fraction{T <: Ring}(a::Integer)
+\end{lstlisting}
+
+\desc{Return the value $a/1$ in the fraction field of the ring $T$, i.e.
+$1/1$ added to itself $a$ times.}
+
+\begin{lstlisting}
+Fraction{T <: Ring}(a::T)
+\end{lstlisting}
+
+\desc{Return the value $a/1$ in the fraction field of the ring $T$.}
+
+\begin{lstlisting}
+Fraction{T <: Ring}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Return a reference to the value $a$. No copy of the data is made.}
+
+We also provide a simpler way of constructing elements of a fraction field
+without needing to first construct the type of the fraction field. We use
+the division operator.
+
+\begin{lstlisting}
+/(x::Int, y::Int)
+/(x::ZZ, y::ZZ)
+\end{lstlisting}
+
+\desc{Return the value $x/y$ in the fraction field of \code{ZZ}. The fraction
+is canonicalised, i.e. reduced to lowest terms with positive denominator. If
+$y = 0$ we throw a \code{DivideError()}.}
+
+\begin{lstlisting}
+/{T <: Ring, S}(x::Poly{T, S}, y::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return the value $x/y$ in the fraction field of the given polynomial
+ring. The fraction is canonicalised, i.e. reduced to lowest terms with the
+numerator and denominator normalised by dividing both by the
+\code{canonical_unit} of the leading coefficient of the denominator. For
+example, for polynomials over the integers, the denominator will have
+positive leading coefficient. For polynomials over a field, the denominator
+will be a monic polynomial. If $y = 0$ we throw a \code{DivideError()}.}
+
+\textbf{Examples.}
+
+Here are some examples of constructors for fraction fields.
+
+\begin{lstlisting}
+R = FractionField(ZZ)
+
+a = R(ZZ(3), ZZ(2))
+
+S, x = PolynomialRing(ZZ, "x")
+T = FractionField(S)
+
+b = T(3)
+c = T(ZZ(7))
+d = T(x + 2)
+f = T(d)
+g = T()
+
+h = 2/3
+k = ZZ(5)/ZZ(7)
+m = (x + 3)/(x^2 + 2)
 \end{lstlisting}
 
 \end{document}
