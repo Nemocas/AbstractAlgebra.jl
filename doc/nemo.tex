@@ -3608,4 +3608,76 @@ a = -(4/6)
 b = -((x + 1)/(-x^2 + 1))
 \end{lstlisting}
 
+\subsubsection{Comparison operators}
+
+\begin{lstlisting}
+=={T}(x::Fraction{T}, y::Fraction{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the fraction $x$ equals the fraction $y$, else
+return \code{false}.}
+
+\textbf{Examples.}
+
+Here are some examples of comparisons.
+
+\begin{lstlisting}
+R = FractionField(ZZ)
+S, x = PolynomialRing(ZZ, "x")
+
+a = -(4/6)
+b = -((x + 1)/(-x^2 + 1))
+
+a == -2/3
+b == 1/(x - 1)
+\end{lstlisting}
+
+\subsubsection{Ad hoc comparison}
+
+The following comparison operators are faster than first coercing both
+operands into the fraction field.
+
+\begin{lstlisting}
+=={T}(x::Fraction{T}, y::T)
+\end{lstlisting}
+
+\desc{Return \code{true} if the fraction $x$ equals the fraction $y/1$, else
+return \code{false}.}
+
+\begin{lstlisting}
+=={T}(x::T, y::Fraction{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the fraction $y$ equals the fraction $x/1$, else
+return \code{false}.}
+
+\begin{lstlisting}
+=={T <: Ring}(x::Fraction{T}, y::Int)
+=={T <: Ring}(x::Fraction{T}, y::ZZ)
+\end{lstlisting}
+
+\desc{Return \code{true} if the numerator of the fraction $x$ is equal to $y$
+in the ring $T$ and the denominator is $1$, otherwise return \code{false}.}
+
+\begin{lstlisting}
+=={T <: Ring}(x::Int, y::Fraction{T})
+=={T <: Ring}(x::ZZ, y::Fraction{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the numerator of the fraction $y$ is equal to $x$
+in the ring $T$ and the denominator is $1$, otherwise return \code{false}.}
+
+\begin{lstlisting}
+R = FractionField(ZZ)
+S, x = PolynomialRing(ZZ, "x")
+
+a = 1/(x - 1)
+
+1/a == x - 1
+4/2 == 2
+ZZ(3) == 6/2
+1 == one(S)
+\end{lstlisting}
+
+
 \end{document}

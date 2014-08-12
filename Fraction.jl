@@ -79,7 +79,7 @@ one{T <: Ring}(::Type{Fraction{T}}) = Fraction{T}(1)
 
 ###########################################################################################
 #
-#   Unary operations
+#   Unary operators
 #
 ###########################################################################################
 
@@ -93,15 +93,19 @@ end
 #
 ###########################################################################################
 
-=={T}(x::Fraction{T}, y::Fraction{T}) = x.num == y.num && x.den == y.den
+=={T <: Ring}(x::Fraction{T}, y::Fraction{T}) = x.num == y.num && x.den == y.den
 
-=={T}(x::Fraction{T}, y::ZZ) = x.den == 1 && x.num == T(y)
+=={T <: Ring}(x::Fraction{T}, y::T) = x.num == y && x.den == 1
 
-=={T}(x::Fraction{T}, y::Int) = x.den == 1 && x.num == T(y)
+=={T <: Ring}(x::T, y::Fraction{T}) = y.num == x && y.den == 1
 
-=={T}(x::ZZ, y::Fraction{T}) = y.den == 1 && T(x) == y.num
+=={T <: Ring}(x::Fraction{T}, y::ZZ) = x.den == 1 && x.num == T(y)
 
-=={T}(x::Int, y::Fraction{T}) = y.den == 1 && T(x) == y.num
+=={T <: Ring}(x::Fraction{T}, y::Int) = x.den == 1 && x.num == T(y)
+
+=={T <: Ring}(x::ZZ, y::Fraction{T}) = y.den == 1 && T(x) == y.num
+
+=={T <: Ring}(x::Int, y::Fraction{T}) = y.den == 1 && T(x) == y.num
 
 
 ###########################################################################################
@@ -227,6 +231,30 @@ function *{T <: Ring}(a::ZZ, b::Fraction{T})
    c = T(a)
    g = gcd(b.den, c)
    Fraction{T}(b.num*divexact(c, g), divexact(b.den, g))
+end
+
+function /{T <: Ring}(a::Fraction{T}, b::Int)
+   c = T(b)
+   g = gcd(a.num, c)
+   Fraction{T}(divexact(a.num, g), a.den*divexact(c, g))
+end
+
+function /{T <: Ring}(a::Int, b::Fraction{T})
+   c = T(a)
+   g = gcd(b.num, c)
+   Fraction{T}(b.den*divexact(c, g), divexact(b.num, g))
+end
+
+function /{T <: Ring}(a::Fraction{T}, b::ZZ)
+   c = T(b)
+   g = gcd(a.num, c)
+   Fraction{T}(divexact(a.num, g), a.den*divexact(c, g))
+end
+
+function /{T <: Ring}(a::ZZ, b::Fraction{T})
+   c = T(a)
+   g = gcd(b.num, c)
+   Fraction{T}(b.den*divexact(c, g), divexact(b.num, g))
 end
 
 function +{T <: Ring}(a::Fraction{T}, b::Int)
