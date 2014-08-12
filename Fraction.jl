@@ -1,8 +1,9 @@
-export Fraction, FractionField, num, den, zero, one, gcd, divexact, mul!, addeq!, inv
+export Fraction, FractionField, num, den, zero, one, gcd, divexact, mul!, addeq!, inv,
+       canonical_unit
 
 import Base: convert, zero, one, show, gcd
 
-import Rings: divexact, mul!, addeq!, inv
+import Rings: divexact, mul!, addeq!, inv, canonical_unit
 
 ###########################################################################################
 #
@@ -52,7 +53,10 @@ end
 function /{T <: Ring, S}(x::Poly{T, S}, y::Poly{T, S})
    y == 0 && throw(DivideError())
    g = gcd(x, y)
-   Fraction{Poly{T, S}}(divexact(x, g), divexact(y, g))
+   num = divexact(x, g)
+   den = divexact(y, g)
+   c = inv(canonical_unit(den))
+   Fraction{Poly{T, S}}(num*c, den*c)
 end
 
 ###########################################################################################
@@ -137,6 +141,14 @@ end
 Base.convert{T <: Ring}(::Type{Fraction{T}}, a::T) = Fraction{T}(a)
 
 Base.convert{T <: Ring}(::Type{Fraction{T}}, a::Int) = Fraction{T}(a)
+
+###########################################################################################
+#
+#   Canonicalisation
+#
+###########################################################################################
+
+canonical_unit{T}(a::Fraction{T}) = a
 
 ###########################################################################################
 #

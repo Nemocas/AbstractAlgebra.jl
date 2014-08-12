@@ -2,7 +2,7 @@ export Poly, PolynomialRing, coeff, zero, one, gen, isgen, normalise, chebyshev_
        chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic,
        pseudorem, pseudodivrem, primpart, content, divexact, evaluate, compose, deriv,
        resultant, lead, discriminant, bezout, truncate, mullow, divrem, mulmod, powmod,
-       invmod
+       invmod, canonical_unit
 
 import Base: convert, zero
 
@@ -234,6 +234,14 @@ function show{T <: Ring, S}(io::IO, ::Type{Poly{T, S}})
    print(io, "Univariate polynomial ring in ", string(S), " over ")
    show(io, T)
 end
+
+###########################################################################################
+#
+#   Canonicalisation
+#
+###########################################################################################
+
+canonical_unit{T <: Ring, S}(x::Poly{T, S}) = canonical_unit(lead(x))
 
 ###########################################################################################
 #

@@ -1,4 +1,4 @@
-export Residue, ResidueRing, modulus, copy, inv
+export Residue, ResidueRing, modulus, copy, inv, canonical_unit
 
 import Base: convert, zero
 
@@ -69,6 +69,14 @@ end
 function show{T <: Ring, S}(io::IO, a::Type{Residue{T, S}})
    print(io, "Residue ring of ", T, " modulo ", modulus(a))
 end
+
+###########################################################################################
+#
+#   Canonicalisation
+#
+###########################################################################################
+
+canonical_unit{T, S}(a::Residue{T, S}) = a
 
 ###########################################################################################
 #

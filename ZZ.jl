@@ -34,7 +34,7 @@ export ZZ, fac, binom, isprime, fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm,
        tdivpow2, fdivpow2, cdivpow2, flog, clog, cmpabs, clrbit!, setbit!, combit!,
        crt, divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2, gcdinv, isprobabprime,
        issquare, jacobi, remove, root, size, isqrtrem, sqrtmod, trailing_zeros, sigma,
-       eulerphi, fib, moebiusmu, primorial, risingfac
+       eulerphi, fib, moebiusmu, primorial, risingfac, canonical_unit
 
 ###########################################################################################
 #
@@ -278,6 +278,14 @@ function serialize(s, n::ZZ)
 end
 
 deserialize(s, ::Type{ZZ}) = Base.parseint_nocheck(ZZ, deserialize(s), 62)
+
+###########################################################################################
+#
+#   Canonicalisation
+#
+###########################################################################################
+
+canonical_unit(x::ZZ) = x < 0 ? ZZ(-1) : ZZ(1)
 
 ###########################################################################################
 #
