@@ -3546,4 +3546,66 @@ k = ZZ(5)/ZZ(7)
 m = (x + 3)/(x^2 + 2)
 \end{lstlisting}
 
+\subsubsection{Basic manipulation}
+
+\begin{lstlisting}
+num{T <: Ring}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Return the numerator of the fraction $a$.}
+
+\begin{lstlisting}
+den{T <: Ring}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Return the denominator of the fraction $a$.}
+
+\begin{lstlisting}
+zero{T <: Ring}(::Type{Fraction{T}})
+\end{lstlisting}
+
+\desc{Return the additive identity of the fraction field of the ring $T$.}
+
+\begin{lstlisting}
+one{T <: Ring}(::Type{Fraction{T}})
+\end{lstlisting}
+
+\desc{Return the multiplicative identity of the fraction field of the ring 
+$T$.}
+
+\textbf{Examples.}
+
+Here are some examples of constructors for fraction fields.
+
+\begin{lstlisting}
+R = FractionField(ZZ)
+S, x = PolynomialRing(ZZ, "x")
+
+a = num(4/6)
+b = den((x + 1)/(-x^2 + 1))
+
+c = zero(R)
+d = one(S)
+\end{lstlisting}
+
+\subsubsection{Unary operators}
+
+\begin{lstlisting}
+-{T <: Ring}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $-a$.}
+
+\textbf{Examples.}
+
+Here are some examples of unary operators.
+
+\begin{lstlisting}
+R = FractionField(ZZ)
+S, x = PolynomialRing(ZZ, "x")
+
+a = -(4/6)
+b = -((x + 1)/(-x^2 + 1))
+\end{lstlisting}
+
 \end{document}
