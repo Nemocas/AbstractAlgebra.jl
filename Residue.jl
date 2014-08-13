@@ -70,6 +70,10 @@ function show{T <: Ring, S}(io::IO, a::Type{Residue{T, S}})
    print(io, "Residue ring of ", T, " modulo ", modulus(a))
 end
 
+needs_parentheses{T <: Ring, S}(x::Residue{T, S}) = needs_parentheses(x.data)
+
+is_negative{T <: Ring, S}(x::Residue{T, S}) = is_negative(x.data)
+
 ###########################################################################################
 #
 #   Canonicalisation

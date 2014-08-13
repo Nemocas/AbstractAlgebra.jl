@@ -191,12 +191,12 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
    else
       for i = 1:len - 1
          c = x.data.coeffs[len - i + 1]
-         bracket = (isa(c, Poly) && c.data.length != 1) || (isa(c, Residue) && isa(modulus(typeof(c)), Poly))
+         bracket = needs_parentheses(c)
          if c != 0
-            if i != 1
+            if i != 1 && !is_negative(c)
                print(io, "+")
             end
-            if c != 1
+            if c != 1 && c != -1
                if bracket
                   print(io, "(")
                end
@@ -206,6 +206,9 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
                end
                print(io, "*")
             end
+            if c == -1
+               print(io, "-")
+            end
             print(io, string(S))
             if len - i != 1
                print(io, "^")
@@ -214,9 +217,9 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
          end
       end
       c = x.data.coeffs[1]
-      bracket = (isa(c, Poly) && c.data.length != 1) || (isa(c, Residue) && isa(modulus(typeof(c)), Poly))
+      bracket = needs_parentheses(c)
       if c != 0
-         if len != 1
+         if len != 1  && !is_negative(c)
             print(io, "+")
          end
          if bracket
@@ -234,6 +237,10 @@ function show{T <: Ring, S}(io::IO, ::Type{Poly{T, S}})
    print(io, "Univariate polynomial ring in ", string(S), " over ")
    show(io, T)
 end
+
+needs_parentheses{T <: Ring, S}(x::Poly{T, S}) = x.data.length > 1
+
+is_negative{T <: Ring, S}(x::Poly{T, S}) = x.data.length <= 1 && is_negative(coeff(x, 0))
 
 ###########################################################################################
 #
@@ -1111,7 +1118,7 @@ end
 #
 ###########################################################################################
 
-function mod{T <: Residue, S}(f::Poly{T, S}, g::Poly{T, S})
+function mod{T <: Union(Field, Residue), S}(f::Poly{T, S}, g::Poly{T, S})
    if g.data.length == 0
       raise(DivideError())
    end
@@ -1135,7 +1142,7 @@ function mod{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S})
    return r
 end
 
-function divrem{T <: Residue, S}(f::Poly{T, S}, g::Poly{T, S})
+function divrem{T <: Union(Field, Residue), S}(f::Poly{T, S}, g::Poly{T, S})
    if g.data.length == 0
       raise(DivideError())
    end

@@ -1,8 +1,10 @@
 module Rings
 
-export Ring
+export Ring, Field
 
 abstract Ring
+
+abstract Field <: Ring
 
 function +{S <: Ring, T <: Ring}(x::S, y::T) 
    T1 = promote_type(S, T)

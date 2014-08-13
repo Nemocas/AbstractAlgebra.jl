@@ -1,9 +1,10 @@
 export Fraction, FractionField, num, den, zero, one, gcd, divexact, mul!, addeq!, inv,
-       canonical_unit
+       canonical_unit, mod, divrem, needs_parentheses, is_negative
 
 import Base: convert, zero, one, show, gcd
 
-import Rings: divexact, mul!, addeq!, inv, canonical_unit
+import Rings: divexact, mul!, addeq!, inv, canonical_unit, mod, divrem, needs_parentheses,
+              is_negative
 
 ###########################################################################################
 #
@@ -115,12 +116,22 @@ end
 ###########################################################################################
 
 function show{T <: Ring}(io::IO, x::Fraction{T})
-   if x.den != 1
+   if x.den != 1 && needs_parentheses(x.num)
       print(io, "(")
    end
    print(io, x.num)
    if x.den != 1
-      print(io, ")/(", x.den, ")")
+      if needs_parentheses(x.num)
+         print(io, ")")
+      end
+      print(io, "/")
+      if needs_parentheses(x.den)
+         print(io, "(")
+      end
+      print(io, x.den)
+      if needs_parentheses(x.den)
+         print(io, ")")
+      end
    end
 end
 
@@ -135,6 +146,10 @@ function show{T <: Ring}(io::IO, ::Type{Fraction{T}})
    print(io, "Fraction field of ")
    show(io, T)
 end
+
+needs_parentheses{T <: Ring}(x::Fraction{T}) = false
+
+is_negative{T <: Ring}(x::Fraction{T}) = !needs_parentheses(x.num) && is_negative(x.num)
 
 ###########################################################################################
 #

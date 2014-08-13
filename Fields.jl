@@ -2,10 +2,6 @@ module Fields
 
 using Rings
 
-export Field
-
-abstract Field <: Ring
-
 function /{S <: Ring, T <: Ring}(x::S, y::T) 
    T1 = promote_type(S, T)
    if S == T1 || T == T1
