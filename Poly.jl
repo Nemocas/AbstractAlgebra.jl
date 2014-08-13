@@ -196,7 +196,7 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
             if i != 1 && !is_negative(c)
                print(io, "+")
             end
-            if c != 1 && c != -1
+            if c != 1 && (c != -1 || show_minus_one(typeof(c)))
                if bracket
                   print(io, "(")
                end
@@ -241,6 +241,8 @@ end
 needs_parentheses{T <: Ring, S}(x::Poly{T, S}) = x.data.length > 1
 
 is_negative{T <: Ring, S}(x::Poly{T, S}) = x.data.length <= 1 && is_negative(coeff(x, 0))
+
+show_minus_one{T <: Ring, S}(::Type{Poly{T, S}}) = show_minus_one(T)
 
 ###########################################################################################
 #

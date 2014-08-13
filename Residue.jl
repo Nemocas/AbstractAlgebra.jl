@@ -74,6 +74,8 @@ needs_parentheses{T <: Ring, S}(x::Residue{T, S}) = needs_parentheses(x.data)
 
 is_negative{T <: Ring, S}(x::Residue{T, S}) = is_negative(x.data)
 
+show_minus_one{T <: Ring, S}(::Type{Residue{T, S}}) = true
+
 ###########################################################################################
 #
 #   Canonicalisation

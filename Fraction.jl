@@ -1,10 +1,10 @@
 export Fraction, FractionField, num, den, zero, one, gcd, divexact, mul!, addeq!, inv,
-       canonical_unit, mod, divrem, needs_parentheses, is_negative
+       canonical_unit, mod, divrem, needs_parentheses, is_negative, show_minus_one
 
 import Base: convert, zero, one, show, gcd
 
 import Rings: divexact, mul!, addeq!, inv, canonical_unit, mod, divrem, needs_parentheses,
-              is_negative
+              is_negative, show_minus_one
 
 ###########################################################################################
 #
@@ -150,6 +150,8 @@ end
 needs_parentheses{T <: Ring}(x::Fraction{T}) = false
 
 is_negative{T <: Ring}(x::Fraction{T}) = !needs_parentheses(x.num) && is_negative(x.num)
+
+show_minus_one{T <: Ring}(::Type{Fraction{T}}) = show_minus_one(T)
 
 ###########################################################################################
 #

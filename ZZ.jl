@@ -35,7 +35,7 @@ export ZZ, fac, binom, isprime, fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm,
        crt, divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2, gcdinv, isprobabprime,
        issquare, jacobi, remove, root, size, isqrtrem, sqrtmod, trailing_zeros, sigma,
        eulerphi, fib, moebiusmu, primorial, risingfac, canonical_unit, needs_parentheses,
-       is_negative
+       is_negative, show_minus_one
 
 ###########################################################################################
 #
@@ -1006,6 +1006,8 @@ show(io::IO, x::ZZ) = print(io, string(x))
 needs_parentheses(x::ZZ) = false
 
 is_negative(x::ZZ) = x < 0
+
+show_minus_one(::Type{ZZ}) = false
 
 ###########################################################################################
 #
