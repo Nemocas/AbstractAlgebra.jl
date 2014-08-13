@@ -1,10 +1,10 @@
 export Fraction, FractionField, num, den, zero, one, gcd, divexact, mul!, addeq!, inv,
        canonical_unit, mod, divrem, needs_parentheses, is_negative, show_minus_one
 
-import Base: convert, zero, one, show, gcd
+import Base: convert, show, gcd
 
 import Rings: divexact, mul!, addeq!, inv, canonical_unit, mod, divrem, needs_parentheses,
-              is_negative, show_minus_one
+              is_negative, show_minus_one, zero, one
 
 ###########################################################################################
 #

@@ -888,7 +888,7 @@ end
 #
 ###########################################################################################
 
-function mulmod{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S}, d::Poly{T, S})
+function mulmod{T <: Union(Residue, Field), S}(a::Poly{T, S}, b::Poly{T, S}, d::Poly{T, S})
    return mod(a*b, d)
 end
 
@@ -900,7 +900,7 @@ function mulmod{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S}, f:
    return z
 end
 
-function powmod{T <: Residue, S}(a::Poly{T, S}, b::Int, d::Poly{T, S})
+function powmod{T <: Union(Residue, Field), S}(a::Poly{T, S}, b::Int, d::Poly{T, S})
    if a.data.length == 0
       return zero(Poly{T, S})
    elseif a.data.length == 1
@@ -941,7 +941,7 @@ function powmod{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Int, f::Poly{Residue{ZZ, M}
    return z
 end
 
-function invmod{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S})
+function invmod{T <: Union(Residue, Field), S}(a::Poly{T, S}, b::Poly{T, S})
    g, z = gcdinv(a, b)
    if g != 1
       error("Impossible inverse in invmod")
@@ -1281,7 +1281,7 @@ function gcd{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    return c*primpart(b)
 end
 
-function gcd{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S})
+function gcd{T <: Union(Field, Residue), S}(a::Poly{T, S}, b::Poly{T, S})
    if a.data.length > b.data.length
       (a, b) = (b, a)
    end
@@ -1684,7 +1684,7 @@ function bezout{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    return res, u2, v2
 end
 
-function bezout{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S})
+function bezout{T <: Union(Field, Residue), S}(a::Poly{T, S}, b::Poly{T, S})
    if a.data.length == 0
       return b, zero(Poly{T, S}), one(Poly{T, S})
    end
@@ -1721,7 +1721,7 @@ function bezout{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S})
    return d*A, d*u1, d*v1
 end
 
-function gcdinv{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S})
+function gcdinv{T <: Union(Field, Residue), S}(a::Poly{T, S}, b::Poly{T, S})
    if a.data.length == 0
       if b.data.length == 0
          return 0, zero(Poly{T, S})
