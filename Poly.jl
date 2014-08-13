@@ -1787,7 +1787,77 @@ function chebyshev_u{S}(::Type{Poly{ZZ, S}}, n::Int)
    ccall((:fmpz_poly_chebyshev_u, :libflint), Void, (Ptr{fmpz_poly}, Int), &(z.data), n)
    return z
 end
-   
+
+function chebyshev_t_pair{S <: Ring}(n::Int, x::S)
+   if n == 0
+      return one(S), x
+   elseif n == 1
+      return x, one(S)
+   elseif n < 0
+      a, b = chebyshev_t_pair(1-n, x)
+      return b, a
+   elseif iseven(n)
+      a, b = chebyshev_t_pair(n>>1, x)
+      return 2*(a*a) - 1, 2*(a*b) - x
+   else
+      a, b = chebyshev_t_pair((n>>1)+1, x)
+      return 2*(a*b) - x, 2*(b*b) - 1
+   end
+end
+
+function chebyshev_t{S <: Ring}(n::Int, x::S)
+   if n == 0
+      return one(S)
+   elseif n == 1
+      return x
+   elseif n < 0
+      return chebyshev_t(-n, x)
+   elseif iseven(n)
+      a = chebyshev_t(n>>1, x)
+      return 2*(a*a) - 1
+   else
+      a, b = chebyshev_t_pair((n>>1)+1, x)
+      return 2*(a*b) - x
+   end
+end
+
+function chebyshev_u_pair{S <: Ring}(n::Int, x::S)
+   if n == 0
+      return one(S), zero(S)
+   elseif n == 1
+      return 2*x, one(S)
+   elseif n == -1
+      return zero(S), -one(S)
+   elseif n < -1
+      a, b = chebyshev_u_pair(-1-n, x)
+      return -b, -a
+   elseif iseven(n)
+      a, b = chebyshev_u_pair(n>>1, x)
+      return (a+b)*(a-b), 2*b*(a-x*b)
+   else
+      a, b = chebyshev_u_pair(n>>1, x)
+      return 2*a*(x*a-b), (a+b)*(a-b)
+   end
+end
+
+function chebyshev_u{S <: Ring}(n::Int, x::S)
+   if n == 0
+      return one(S)
+   elseif n == 1
+      return 2*x
+   elseif n == -1
+      return zero(S)
+   elseif n < -1
+      return -chebyshev_u(-2-n, x)
+   elseif iseven(n)
+      a, b = chebyshev_u_pair(n>>1, x)
+      return (a+b)*(a-b)
+   else
+      a, b = chebyshev_u_pair(n>>1, x)
+      return 2*a*(x*a-b)
+   end
+end
+
 function cyclotomic{S}(::Type{Poly{ZZ, S}}, n::Int)
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_cyclotomic, :libflint), Void, (Ptr{fmpz_poly}, Int), &(z.data), n)
