@@ -55,8 +55,8 @@ function /{T <: Ring, S}(x::Poly{T, S}, y::Poly{T, S})
    g = gcd(x, y)
    num = divexact(x, g)
    den = divexact(y, g)
-   c = canonical_unit(den)
-   Fraction{Poly{T, S}}(divexact(num, c), divexact(den, c))
+   u = canonical_unit(den)
+   Fraction{Poly{T, S}}(divexact(num, u), divexact(den, u))
 end
 
 ###########################################################################################
@@ -167,13 +167,19 @@ canonical_unit{T}(a::Fraction{T}) = a
 function *{T <: Ring}(a::Fraction{T}, b::Fraction{T})
    g1 = gcd(a.num, b.den)
    g2 = gcd(b.num, a.den)
-   Fraction{T}(divexact(a.num, g1)*divexact(b.num, g2), divexact(a.den, g2)*divexact(b.den, g1))
+   num = divexact(a.num, g1)*divexact(b.num, g2)
+   den = divexact(a.den, g2)*divexact(b.den, g1)
+   u = canonical_unit(den)
+   Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function /{T <: Ring}(a::Fraction{T}, b::Fraction{T})
    g1 = gcd(a.num, b.num)
    g2 = gcd(b.den, a.den)
-   Fraction{T}(divexact(a.num, g1)*divexact(b.den, g2), divexact(a.den, g2)*divexact(b.num, g1))
+   num = divexact(a.num, g1)*divexact(b.den, g2)
+   den = divexact(a.den, g2)*divexact(b.num, g1)
+   u = canonical_unit(den)
+   Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 divexact{T <: Ring}(a::Fraction{T}, b::Fraction{T}) = a/b
@@ -368,6 +374,10 @@ end
 ###########################################################################################
 
 function ^{T <: Ring}(a::Fraction{T}, b::Int)
+   if b < 0
+      a = inv(a)
+      b = -b
+   end
    Fraction{T}(a.num^b, a.den^b)
 end
 
@@ -379,7 +389,10 @@ end
 
 function inv{T <: Ring}(a::Fraction{T})
    a.num == 0 && throw(DivideError())
-   Fraction{T}(a.den, a.num)
+   num = a.den
+   den = a.num
+   u = canonical_unit(den)
+   Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 ###########################################################################################

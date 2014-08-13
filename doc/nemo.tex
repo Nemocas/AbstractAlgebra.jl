@@ -3832,5 +3832,48 @@ f = a/5
 g = (x + 1)/b
 \end{lstlisting}
 
+\subsubsection{Powering}
+
+\begin{lstlisting}
+^{T <: Ring}(a::Fraction{T}, b::Int)
+\end{lstlisting}
+
+\desc{Return $a^b$.}
+
+\textbf{Examples.}
+
+Here are some examples of powering.
+
+\begin{lstlisting}
+S, x = PolynomialRing(ZZ, "x")
+
+a = -2/3
+b = (x + 1)/(-x^2 + 1)
+
+c = a^12
+d = b^-12
+\end{lstlisting}
+
+\subsubsection{Inversion}
+
+\begin{lstlisting}
+inv{T <: Ring}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $1/a$.}
+
+\textbf{Examples.}
+
+Here are some examples of inversion.
+
+\begin{lstlisting}
+S, x = PolynomialRing(ZZ, "x")
+
+a = -2/3
+b = (x + 1)/(-x^2 + 1)
+
+c = inv(a)
+d = inv(b)
+\end{lstlisting}
 
 \end{document}
