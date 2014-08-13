@@ -156,7 +156,7 @@ canonical_unit{T}(a::Fraction{T}) = a
 
 ###########################################################################################
 #
-#   Binary operations and functions
+#   Binary operators and functions
 #
 ###########################################################################################
 
@@ -205,56 +205,112 @@ end
 
 ###########################################################################################
 #
-#   Ad hoc binary operations
+#   Ad hoc binary operators
 #
 ###########################################################################################
 
 function *{T <: Ring}(a::Fraction{T}, b::Int)
    c = T(b)
    g = gcd(a.den, c)
-   Fraction{T}(a.num*divexact(c, g), divexact(a.den, g))
+   num = a.num*divexact(c, g)
+   den = divexact(a.den, g)
+   u = canonical_unit(den)
+   Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function *{T <: Ring}(a::Int, b::Fraction{T})
    c = T(a)
    g = gcd(b.den, c)
-   Fraction{T}(b.num*divexact(c, g), divexact(b.den, g))
+   num = b.num*divexact(c, g)
+   den = divexact(b.den, g)
+   u = canonical_unit(den)
+   Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function *{T <: Ring}(a::Fraction{T}, b::ZZ)
    c = T(b)
    g = gcd(a.den, c)
-   Fraction{T}(a.num*divexact(c, g), divexact(a.den, g))
+   num = a.num*divexact(c, g)
+   den = divexact(a.den, g)
+   u = canonical_unit(den)
+   Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function *{T <: Ring}(a::ZZ, b::Fraction{T})
    c = T(a)
    g = gcd(b.den, c)
-   Fraction{T}(b.num*divexact(c, g), divexact(b.den, g))
+   num = b.num*divexact(c, g)
+   den = divexact(b.den, g)
+   u = canonical_unit(den)
+   Fraction{T}(divexact(num, u), divexact(den, u))
+end
+
+function *{T <: Ring}(a::Fraction{T}, b::T)
+   g = gcd(a.den, b)
+   num = a.num*divexact(b, g)
+   den = divexact(a.den, g)
+   u = canonical_unit(den)
+   Fraction{T}(divexact(num, u), divexact(den, u))
+end
+
+function *{T <: Ring}(a::T, b::Fraction{T})
+   g = gcd(b.den, a)
+   num = b.num*divexact(a, g)
+   den = divexact(b.den, g)
+   u = canonical_unit(den)
+   Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function /{T <: Ring}(a::Fraction{T}, b::Int)
    c = T(b)
    g = gcd(a.num, c)
-   Fraction{T}(divexact(a.num, g), a.den*divexact(c, g))
+   num = divexact(a.num, g)
+   den = a.den*divexact(c, g)
+   u = canonical_unit(den)
+   Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function /{T <: Ring}(a::Int, b::Fraction{T})
    c = T(a)
    g = gcd(b.num, c)
-   Fraction{T}(b.den*divexact(c, g), divexact(b.num, g))
+   num = b.den*divexact(c, g)
+   den = divexact(b.num, g)
+   u = canonical_unit(den)
+   Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function /{T <: Ring}(a::Fraction{T}, b::ZZ)
    c = T(b)
    g = gcd(a.num, c)
-   Fraction{T}(divexact(a.num, g), a.den*divexact(c, g))
+   num = divexact(a.num, g)
+   den = a.den*divexact(c, g)
+   u = canonical_unit(den)
+   Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function /{T <: Ring}(a::ZZ, b::Fraction{T})
    c = T(a)
    g = gcd(b.num, c)
-   Fraction{T}(b.den*divexact(c, g), divexact(b.num, g))
+   num = b.den*divexact(c, g)
+   den = divexact(b.num, g)
+   u = canonical_unit(den)
+   Fraction{T}(divexact(num, u), divexact(den, u))
+end
+
+function /{T <: Ring}(a::Fraction{T}, b::T)
+   g = gcd(a.num, b)
+   num = divexact(a.num, g)
+   den = a.den*divexact(b, g)
+   u = canonical_unit(den)
+   Fraction{T}(divexact(num, u), divexact(den, u))
+end
+
+function /{T <: Ring}(a::T, b::Fraction{T})
+   g = gcd(b.num, a)
+   num = b.den*divexact(a, g)
+   den = divexact(b.num, g)
+   u = canonical_unit(den)
+   Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function +{T <: Ring}(a::Fraction{T}, b::Int)
@@ -273,6 +329,14 @@ function +{T <: Ring}(a::ZZ, b::Fraction{T})
    (a*b.den + b.num)/b.den
 end
 
+function +{T <: Ring}(a::Fraction{T}, b::T)
+   (a.num + a.den*b)/a.den
+end
+
+function +{T <: Ring}(a::T, b::Fraction{T})
+   (a*b.den + b.num)/b.den
+end
+
 function -{T <: Ring}(a::Fraction{T}, b::Int)
    (a.num - a.den*b)/a.den
 end
@@ -286,6 +350,14 @@ function -{T <: Ring}(a::Fraction{T}, b::ZZ)
 end
 
 function -{T <: Ring}(a::ZZ, b::Fraction{T})
+   (a*b.den - b.num)/b.den
+end
+
+function -{T <: Ring}(a::Fraction{T}, b::T)
+   (a.num - a.den*b)/a.den
+end
+
+function -{T <: Ring}(a::T, b::Fraction{T})
    (a*b.den - b.num)/b.den
 end
 

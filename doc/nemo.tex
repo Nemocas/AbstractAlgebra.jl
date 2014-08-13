@@ -3608,7 +3608,6 @@ f = canonical_unit((x + 1)/(-x^2 + 1))
 Here are some examples of unary operators.
 
 \begin{lstlisting}
-R = FractionField(ZZ)
 S, x = PolynomialRing(ZZ, "x")
 
 a = -(4/6)
@@ -3629,7 +3628,6 @@ return \code{false}.}
 Here are some examples of comparisons.
 
 \begin{lstlisting}
-R = FractionField(ZZ)
 S, x = PolynomialRing(ZZ, "x")
 
 a = -(4/6)
@@ -3674,8 +3672,11 @@ in the ring $T$ and the denominator is $1$, otherwise return \code{false}.}
 \desc{Return \code{true} if the numerator of the fraction $y$ is equal to $x$
 in the ring $T$ and the denominator is $1$, otherwise return \code{false}.}
 
+\textbf{Examples.}
+
+Here are some examples of ad hoc comparisons.
+
 \begin{lstlisting}
-R = FractionField(ZZ)
 S, x = PolynomialRing(ZZ, "x")
 
 a = 1/(x - 1)
@@ -3684,6 +3685,151 @@ a = 1/(x - 1)
 4/2 == 2
 ZZ(3) == 6/2
 1 == one(S)
+\end{lstlisting}
+
+\subsubsection{Binary operators and functions}
+
+The following binary operators are available for elements of fraction fields.
+All of the functions canonicalise their outputs.
+
+\begin{lstlisting}
++{T <: Ring}(a::Fraction{T}, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $a + b$.}
+
+\begin{lstlisting}
+-{T <: Ring}(a::Fraction{T}, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $a - b$.}
+
+\desc{Return $a + b$.}
+
+\begin{lstlisting}
+*{T <: Ring}(a::Fraction{T}, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $a*b$.}
+
+\begin{lstlisting}
+/{T <: Ring}(a::Fraction{T}, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $a/b$, in the field of fractions of $T$.}
+
+\begin{lstlisting}
+divexact{T <: Ring}(a::Fraction{T}, b::Fraction{T})
+\end{lstlisting}
+
+\desc{An alias for $a/b$.}
+
+\begin{lstlisting}
+gcd{T <: Ring}(a::Fraction{T}, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $c/d$ where $c$ is the GCD of the numerators of $a$ and $b$ and
+$d$ is the GCD of their denominators.}
+
+\textbf{Examples.}
+
+Here are some examples of binary operators and functions.
+
+\begin{lstlisting}
+S, x = PolynomialRing(ZZ, "x")
+
+a = -2/3 + 3/7
+b = (x + 1)/(-x^2 + 1) - x/(2x + 1)
+c = (5/3)*(7/2)
+d = a/c
+f = gcd(b, (x + 1)/(x - 1))
+\end{lstlisting}
+
+\subsubsection{Ad hoc binary operators}
+
+The following binary operators are more efficient than simply coercing both
+arguments into the fraction field. All functions canonicalise their outputs.
+
+\begin{lstlisting}
++{T <: Ring}(a::Fraction{T}, b::Int)
++{T <: Ring}(a::Fraction{T}, b::ZZ)
++{T <: Ring}(a::Fraction{T}, b::T)
+\end{lstlisting}
+
+\desc{Return $a + b/1$.}
+
+\begin{lstlisting}
++{T <: Ring}(a::Int, b::Fraction{T})
++{T <: Ring}(a::ZZ, b::Fraction{T})
++{T <: Ring}(a::T, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $a/1 + b$.}
+
+\begin{lstlisting}
+-{T <: Ring}(a::Fraction{T}, b::Int)
+-{T <: Ring}(a::Fraction{T}, b::ZZ)
+-{T <: Ring}(a::Fraction{T}, b::T)
+\end{lstlisting}
+
+\desc{Return $a - b/1$.}
+
+\begin{lstlisting}
+-{T <: Ring}(a::Int, b::Fraction{T})
+-{T <: Ring}(a::ZZ, b::Fraction{T})
+-{T <: Ring}(a::T, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $a/1 - b$.}
+
+\begin{lstlisting}
+*{T <: Ring}(a::Fraction{T}, b::Int)
+*{T <: Ring}(a::Fraction{T}, b::ZZ)
+*{T <: Ring}(a::Fraction{T}, b::T)
+\end{lstlisting}
+
+\desc{Return $a * b/1$.}
+
+\begin{lstlisting}
+*{T <: Ring}(a::Int, b::Fraction{T})
+*{T <: Ring}(a::ZZ, b::Fraction{T})
+*{T <: Ring}(a::T, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $a/1 * b$.}
+
+\begin{lstlisting}
+/{T <: Ring}(a::Fraction{T}, b::Int)
+/{T <: Ring}(a::Fraction{T}, b::ZZ)
+/{T <: Ring}(a::Fraction{T}, b::T)
+\end{lstlisting}
+
+\desc{Return $a / (b/1)$.}
+
+\begin{lstlisting}
+/{T <: Ring}(a::Int, b::Fraction{T})
+/{T <: Ring}(a::ZZ, b::Fraction{T})
+/{T <: Ring}(a::T, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $(a/1) / b$.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc binary operators.
+
+\begin{lstlisting}
+S, x = PolynomialRing(ZZ, "x")
+
+a = -2/3
+b = (x + 1)/(-x^2 + 1)
+
+c = a + 2
+d = ZZ(3) - a
+
+e = b*(x + 1)
+f = a/5
+g = (x + 1)/b
 \end{lstlisting}
 
 
