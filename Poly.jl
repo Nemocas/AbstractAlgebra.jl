@@ -4,7 +4,7 @@ export Poly, PolynomialRing, coeff, zero, one, gen, isgen, normalise, chebyshev_
        resultant, lead, discriminant, bezout, truncate, mullow, divrem, mulmod, powmod,
        invmod, canonical_unit
 
-import Base: convert, zero
+import Base: convert, zero, show
 
 ###########################################################################################
 #
@@ -219,7 +219,7 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
       c = x.data.coeffs[1]
       bracket = needs_parentheses(c)
       if c != 0
-         if len != 1  && !is_negative(c)
+         if len != 1 && !is_negative(c)
             print(io, "+")
          end
          if bracket

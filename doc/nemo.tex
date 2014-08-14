@@ -3876,4 +3876,132 @@ c = inv(a)
 d = inv(b)
 \end{lstlisting}
 
+\subsection{The rationals}
+
+The field of rationals in Nemo is \code|Fraction{ZZ}|. For convenience this is
+type aliased with \code{QQ}. Thus for example, one may write
+
+\begin{lstlisting}
+a = QQ(2)
+
+R, x = PolynomialRing(QQ, "x")
+
+f = 3/2*x + 1/2
+\end{lstlisting}
+
+The \code{QQ} type supports all of the functionality of the previous section. In
+this section we describe additional functionality that is provided for \code{QQ}
+but not for general fraction fields.
+
+\subsubsection{Basic manipulation}
+
+\begin{lstlisting}
+height(a::Fraction{ZZ})
+\end{lstlisting}
+
+\desc{Return the height of the fraction $a$, namely the largest of the absolute
+values of the numerator and denominator. The type of the return value is a 
+\code{ZZ}.}
+
+\begin{lstlisting}
+height_bits(a::Fraction{ZZ})
+\end{lstlisting}
+
+\desc{Return the number of bits of the height of the fraction $a$. The type of
+the return value is an \code{Int}.}
+
+\textbf{Examples.}
+
+Here are some examples of basic manipulation.
+
+\begin{lstlisting}
+a = -2/3
+b = 123/234
+
+c = height(a)
+d = height_bits(b)
+\end{lstlisting}
+
+
+\subsubsection{Comparison}
+
+\begin{lstlisting}
+cmp(a::Fraction{ZZ}, b::Fraction{ZZ}) 
+\end{lstlisting}
+
+\desc{Return \code{-1} if $a < b$, \code{0} if $a = b$ and $1$ if $a > b$.}
+
+\begin{lstlisting}
+<(a::Fraction{ZZ}, b::Fraction{ZZ}) 
+\end{lstlisting}
+
+\desc{Return \code{true} if $a < b$, otherwise return \code{false}. Julia
+automatically provides corresponding functions \code{>}, \code{<=} and
+\code{>=}.}
+
+\textbf{Examples.}
+
+Here are some examples of comparison.
+
+\begin{lstlisting}
+a = -2/3
+b = 1/2
+
+a < b
+b >= a
+c = cmp(a, b)
+\end{lstlisting}
+
+\subsubsection{Ad hoc comparison}
+
+The following ad hoc comparison operators are provided for convenience.
+
+\begin{lstlisting}
+<(a::Fraction{ZZ}, b::ZZ) = cmp(a, Fraction{ZZ}(b))
+<(a::Fraction{ZZ}, b::Int) = cmp(a, Fraction{ZZ}(b))
+<(a::ZZ, b::Fraction{ZZ}) = cmp(Fraction{ZZ}(a), b)
+<(a::Int, b::Fraction{ZZ}) = cmp(Fraction{ZZ}(a), b)
+\end{lstlisting}
+
+\desc{Return \code{true} if $a < b$, otherwise return \code{false}. Julia
+automatically provides corresponding functions \code{>}, \code{<=} and
+\code{>=}.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc comparison.
+
+\begin{lstlisting}
+a = -2/3
+b = 1/2
+
+a < 1
+a <= 0
+b >= ZZ(0)
+\end{lstlisting}
+
+\subsubsection{Ad hoc binary operators}
+
+\begin{lstlisting}
+>>(a::Fraction{ZZ}, b::Int)
+\end{lstlisting}
+
+\desc{Return $a/2^b$.}
+
+\begin{lstlisting}
+<<(a::Fraction{ZZ}, b::Int)
+\end{lstlisting}
+
+\desc{Return $a\times 2^b$.}
+
+Here are some examples of ad hoc binary operators.
+
+\begin{lstlisting}
+a = -2/3
+b = 1/2
+
+c = a << 3
+d = b >> 5
+\end{lstlisting}
+
 \end{document}

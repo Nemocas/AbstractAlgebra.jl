@@ -1,5 +1,6 @@
 export Fraction, FractionField, num, den, zero, one, gcd, divexact, mul!, addeq!, inv,
-       canonical_unit, mod, divrem, needs_parentheses, is_negative, show_minus_one
+       canonical_unit, mod, divrem, needs_parentheses, is_negative, show_minus_one, QQ,
+       cmp, height, height_bits
 
 import Base: convert, show, gcd, string
 
@@ -46,6 +47,8 @@ type Fraction{T <: Ring} <: Field
    Fraction(a::Fraction{T}) = a
    Fraction{R <: Ring}(a::R) = Fraction{T}(convert(T, a), one(T))
 end
+
+typealias QQ Fraction{ZZ}
 
 ###########################################################################################
 #
@@ -112,6 +115,16 @@ zero{T <: Ring}(::Type{Fraction{T}}) = Fraction{T}(0)
 
 one{T <: Ring}(::Type{Fraction{T}}) = Fraction{T}(1)
 
+function height(a::Fraction{ZZ})
+   c = ZZ()
+   ccall((:fmpq_height, :libflint), Void, (Ptr{ZZ}, Ptr{fmpq}), &c, &(a.data))
+   return c
+end
+
+function height_bits(a::Fraction{ZZ})
+   return ccall((:fmpq_height_bits, :libflint), Int, (Ptr{fmpq},), &(a.data))
+end
+
 ###########################################################################################
 #
 #   Unary operators
@@ -164,6 +177,20 @@ end
 
 ==(a::Int, b::Fraction{ZZ}) = b == ZZ(a)
 
+function cmp(a::Fraction{ZZ}, b::Fraction{ZZ})
+   return int(ccall((:fmpq_cmp, :libflint), Cint, (Ptr{fmpq}, Ptr{fmpq}), &(a.data), &(b.data)))
+end
+
+<(a::Fraction{ZZ}, b::Fraction{ZZ}) = cmp(a, b) < 0
+
+<(a::Fraction{ZZ}, b::ZZ) = cmp(a, Fraction{ZZ}(b)) < 0
+
+<(a::Fraction{ZZ}, b::Int) = cmp(a, Fraction{ZZ}(b)) < 0
+
+<(a::ZZ, b::Fraction{ZZ}) = cmp(Fraction{ZZ}(a), b) < 0
+
+<(a::Int, b::Fraction{ZZ}) = cmp(Fraction{ZZ}(a), b) < 0
+
 ###########################################################################################
 #
 #   String I/O
@@ -204,6 +231,8 @@ end
 needs_parentheses{T <: Ring}(x::Fraction{T}) = false
 
 is_negative{T <: Ring}(x::Fraction{T}) = !needs_parentheses(x.data.num) && is_negative(x.data.num)
+
+is_negative(x::Fraction{ZZ}) = x < 0
 
 show_minus_one{T <: Ring}(::Type{Fraction{T}}) = show_minus_one(T)
 
@@ -540,6 +569,18 @@ end
 
 function -{T <: Ring}(a::T, b::Fraction{T})
    (a*b.data.den - b.data.num)/b.data.den
+end
+
+function >>(a::Fraction{ZZ}, b::Int)
+   c = Fraction{ZZ}()
+   ccall((:fmpq_div_2exp, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Int), &(c.data), &(a.data), b)
+   return c
+end
+
+function <<(a::Fraction{ZZ}, b::Int)
+   c = Fraction{ZZ}()
+   ccall((:fmpq_mul_2exp, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Int), &(c.data), &(a.data), b)
+   return c
 end
 
 ###########################################################################################
