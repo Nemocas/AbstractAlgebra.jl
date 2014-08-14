@@ -3994,6 +3994,8 @@ b >= ZZ(0)
 
 \desc{Return $a\times 2^b$.}
 
+\textbf{Examples.}
+
 Here are some examples of ad hoc binary operators.
 
 \begin{lstlisting}
@@ -4002,6 +4004,52 @@ b = 1/2
 
 c = a << 3
 d = b >> 5
+\end{lstlisting}
+
+\subsubsection{Modular arithmetic}
+
+\begin{lstlisting}
+mod(a::Fraction{ZZ}, m::Int)
+mod(a::Fraction{ZZ}, m::ZZ)
+\end{lstlisting}
+
+\desc{If $a = p/q$ this function returns $pq^{-1} \pmod{m}$. This is only
+defined if $q$ is invertible modulo $m$. The result is returns as a \code{ZZ}.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc modular arithmetic.
+
+\begin{lstlisting}
+a = -2/3
+b = 1/2
+
+c = mod(a, 7)
+d = mod(b, ZZ(5))
+\end{lstlisting}
+
+\subsubsection{Rational reconstruction}
+
+\begin{lstlisting}
+reconstruct(a::ZZ, m::ZZ)
+reconstruct(a::ZZ, m::Int)
+reconstruct(a::Int, m::ZZ)
+reconstruct(a::Int, m::Int)
+\end{lstlisting}
+
+\desc{Attempt to find a rational number $n/d$ such that 
+$0 \leq |n| \leq \lfloor\sqrt{m/2}\rfloor$ and 
+$0 < d \leq \lfloor\sqrt{m/2}\rfloor$ such that gcd$(n, d) = 1$ and
+$a \equiv nd^{-1} \pmod{m}$. If no solution exists, an exception is thrown.}
+
+\textbf{Examples.}
+
+Here are some examples of rational reconstruction.
+
+\begin{lstlisting}
+a = reconstruct(7, 13)
+b = reconstruct(ZZ(15), 31)
+c = reconstruct(ZZ(123), ZZ(237))
 \end{lstlisting}
 
 \end{document}

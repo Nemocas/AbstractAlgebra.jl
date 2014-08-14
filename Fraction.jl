@@ -1,6 +1,6 @@
 export Fraction, FractionField, num, den, zero, one, gcd, divexact, mul!, addeq!, inv,
        canonical_unit, mod, divrem, needs_parentheses, is_negative, show_minus_one, QQ,
-       cmp, height, height_bits
+       cmp, height, height_bits, reconstruct
 
 import Base: convert, show, gcd, string
 
@@ -603,7 +603,6 @@ function ^(a::Fraction{ZZ}, b::Int)
    return c
 end
 
-
 ###########################################################################################
 #
 #   Inversion
@@ -623,6 +622,47 @@ function inv(a::Fraction{ZZ})
    ccall((:fmpq_inv, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data))
    return c
 end
+
+###########################################################################################
+#
+#   Modular arithmetic
+#
+###########################################################################################
+
+function mod(a::Fraction{ZZ}, b::ZZ)
+   c = ZZ()
+   ccall((:fmpq_mod_fmpz, :libflint), Void, (Ptr{ZZ}, Ptr{fmpq}, Ptr{ZZ}), &c, &(a.data), &b)
+   return c
+end
+
+mod(a::Fraction{ZZ}, b::Int) = mod(a, ZZ(b))
+
+###########################################################################################
+#
+#   Rational reconstruction
+#
+###########################################################################################
+
+function reconstruct(a::ZZ, b::ZZ)
+   c = Fraction{ZZ}()
+   if !bool(ccall((:fmpq_reconstruct_fmpz, :libflint), Cint, (Ptr{fmpq}, Ptr{ZZ}, Ptr{ZZ}), &(c.data), &a, &b))
+      error("Impossible rational reconstruction")
+   end
+   return c
+end
+
+reconstruct(a::ZZ, b::Int) =  reconstruct(a, ZZ(b))
+
+reconstruct(a::Int, b::ZZ) =  reconstruct(ZZ(a), b)
+
+reconstruct(a::Int, b::Int) =  reconstruct(ZZ(a), ZZ(b))
+
+###########################################################################################
+#
+#   Special functions
+#
+###########################################################################################
+
 
 ###########################################################################################
 #
