@@ -1,6 +1,6 @@
 export Fraction, FractionField, num, den, zero, one, gcd, divexact, mul!, addeq!, inv,
        canonical_unit, mod, divrem, needs_parentheses, is_negative, show_minus_one, QQ,
-       cmp, height, height_bits, reconstruct
+       cmp, height, height_bits, reconstruct, harmonic, dedekind_sum
 
 import Base: convert, show, gcd, string
 
@@ -663,6 +663,24 @@ reconstruct(a::Int, b::Int) =  reconstruct(ZZ(a), ZZ(b))
 #
 ###########################################################################################
 
+function harmonic(n::Int)
+   n < 0 && throw(DomainError())
+   c = Fraction{ZZ}()
+   ccall((:fmpq_harmonic_ui, :libflint), Void, (Ptr{fmpq}, Int), &(c.data), n)
+   return c
+end
+
+function dedekind_sum(h::ZZ, k::ZZ)
+   c = Fraction{ZZ}()
+   ccall((:fmpq_dedekind_sum, :libflint), Void, (Ptr{fmpq}, Ptr{ZZ}, Ptr{ZZ}), &(c.data), &h, &k)
+   return c
+end
+
+dedekind_sum(h::ZZ, k::Int) = dedekind_sum(h, ZZ(k))
+
+dedekind_sum(h::Int, k::ZZ) = dedekind_sum(ZZ(h), k)
+
+dedekind_sum(h::Int, k::Int) = dedekind_sum(ZZ(h), ZZ(k))
 
 ###########################################################################################
 #
