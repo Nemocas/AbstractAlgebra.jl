@@ -1,6 +1,7 @@
 export Fraction, FractionField, num, den, zero, one, gcd, divexact, mul!, addeq!, inv,
        canonical_unit, mod, divrem, needs_parentheses, is_negative, show_minus_one, QQ,
-       cmp, height, height_bits, reconstruct, harmonic, dedekind_sum
+       cmp, height, height_bits, reconstruct, harmonic, dedekind_sum, next_minimal,
+       next_signed_minimal, next_calkin_wilf, next_signed_calkin_wilf
 
 import Base: convert, show, gcd, string
 
@@ -656,6 +657,38 @@ reconstruct(a::ZZ, b::Int) =  reconstruct(a, ZZ(b))
 reconstruct(a::Int, b::ZZ) =  reconstruct(ZZ(a), b)
 
 reconstruct(a::Int, b::Int) =  reconstruct(ZZ(a), ZZ(b))
+
+###########################################################################################
+#
+#   Rational enumeration
+#
+###########################################################################################
+
+function next_minimal(a::Fraction{ZZ})
+   a < 0 && throw(DomainError())
+   c = Fraction{ZZ}()
+   ccall((:fmpq_next_minimal, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data))
+   return c
+end
+
+function next_signed_minimal(a::Fraction{ZZ})
+   c = Fraction{ZZ}()
+   ccall((:fmpq_next_signed_minimal, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data))
+   return c
+end
+
+function next_calkin_wilf(a::Fraction{ZZ})
+   a < 0 && throw(DomainError())
+   c = Fraction{ZZ}()
+   ccall((:fmpq_next_calkin_wilf, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data))
+   return c
+end
+
+function next_signed_calkin_wilf(a::Fraction{ZZ})
+   c = Fraction{ZZ}()
+   ccall((:fmpq_next_signed_calkin_wilf, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data))
+   return c
+end
 
 ###########################################################################################
 #
