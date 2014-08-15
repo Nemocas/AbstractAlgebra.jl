@@ -8,7 +8,7 @@ export Poly, PolynomialRing, coeff, zero, one, gen, isgen, normalise, chebyshev_
        chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic,
        pseudorem, pseudodivrem, primpart, content, divexact, evaluate, compose, deriv,
        resultant, lead, discriminant, bezout, truncate, mullow, divrem, mulmod, powmod,
-       invmod, canonical_unit
+       invmod, canonical_unit, integral, lcm
 
 import Base: convert, zero, show
 
@@ -1259,7 +1259,7 @@ end
 
 ###########################################################################################
 #
-#   Content, primitive part and GCD
+#   Content, primitive part, GCD and LCM
 #
 ###########################################################################################
 
@@ -1327,6 +1327,10 @@ function gcd{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S})
                 (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
                &(z.data), &(x.data), &(y.data))
    return z
+end
+
+function lcm{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
+   return a*divexact(b, gcd(a, b))
 end
 
 function content{T <: Ring, S}(a::Poly{T, S})
@@ -1474,6 +1478,24 @@ function deriv{T <: Ring, S}(a::Poly{T, S})
    z = Poly(Poly{T, S}, d)
    z.data.length = normalise(z, len - 1)
    return z
+end
+
+###########################################################################################
+#
+#   Integral
+#
+###########################################################################################
+
+function integral{T <: Union(Field, Residue), S}(x::Poly{T, S})
+   len = x.data.length
+   v = Array(T, len + 1)
+   v[1] = zero(T)
+   for i = 1:len
+      v[i + 1] = divexact(coeff(x, i - 1), T(i))
+   end
+   p = Poly(Poly{T, S}, v)
+   p.data.length = normalise(p, len + 1)
+   return p
 end
 
 ###########################################################################################

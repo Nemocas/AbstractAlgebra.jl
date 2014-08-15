@@ -5,10 +5,11 @@
 ###########################################################################################    
 
 import Rings: Poly, fmpq_poly, coeff, isgen, truncate, mullow, divexact, gcd, content,
-              primpart, mod, divrem, evaluate, compose, deriv, resultant, bezout
+              primpart, mod, divrem, evaluate, compose, deriv, resultant, bezout, integral,
+              lcm
 
 export coeff, isgen, truncate, mullow, divexact, gcd, content, primpart, mod, divrem,
-       evaluate, compose, show, deriv, resultant, bezout
+       evaluate, compose, show, deriv, resultant, bezout, integral, lcm
 
 ###########################################################################################
 #
@@ -385,13 +386,21 @@ end
 
 ###########################################################################################
 #
-#   Content, primitive part and GCD
+#   Content, primitive part, GCD and LCM
 #
 ###########################################################################################
 
 function gcd{S}(x::Poly{QQ, S}, y::Poly{QQ, S})
    z = Poly{QQ, S}()
    ccall((:fmpq_poly_gcd, :libflint), Void, 
+                (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq_poly}), 
+               &(z.data), &(x.data), &(y.data))
+   return z
+end
+
+function lcm{S}(x::Poly{QQ, S}, y::Poly{QQ, S})
+   z = Poly{QQ, S}()
+   ccall((:fmpq_poly_lcm, :libflint), Void, 
                 (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq_poly}), 
                &(z.data), &(x.data), &(y.data))
    return z
@@ -471,6 +480,20 @@ end
 function deriv{S}(x::Poly{QQ, S})
    z = Poly{QQ, S}()
    ccall((:fmpq_poly_derivative, :libflint), Void, 
+                (Ptr{fmpq_poly}, Ptr{fmpq_poly}), 
+               &(z.data), &(x.data))
+   return z
+end
+
+###########################################################################################
+#
+#   Integral
+#
+###########################################################################################
+
+function integral{S}(x::Poly{QQ, S})
+   z = Poly{QQ, S}()
+   ccall((:fmpq_poly_integral, :libflint), Void, 
                 (Ptr{fmpq_poly}, Ptr{fmpq_poly}), 
                &(z.data), &(x.data))
    return z

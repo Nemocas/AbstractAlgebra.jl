@@ -2419,20 +2419,22 @@ When \code{T} is a residue ring, we can reduce modulo a polynomial over
 \code{T}. In this way we can do modular arithmetic with polynomials.
 
 \begin{lstlisting}
-mulmod{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S}, d::Poly{T, S})
+mulmod{T <: Union(Residue, Field), S}(a::Poly{T, S}, 
+                                          b::Poly{T, S}, d::Poly{T, S})
 \end{lstlisting}
 
 \desc{Return $ab \pmod{d}$.}
 
 \begin{lstlisting}
-invmod{T <: Residue, S}(a::Poly{T, S}, d::Poly{T, S})
+invmod{T <: Union(Residue, Field), S}(a::Poly{T, S}, d::Poly{T, S})
 \end{lstlisting}
 
 \desc{Return $a^{-1} \pmod{d}$. If an impossible inverse is encountered, an
 exception is thrown.}
 
 \begin{lstlisting}
-powmod{T <: Residue, S}(a::Poly{T, S}, b::Int, d::Poly{T, S})
+powmod{T <: Union(Residue, Field), S}(a::Poly{T, S}, b::Int, 
+                                                         d::Poly{T, S})
 \end{lstlisting}
 
 \desc{Return $a^b \pmod{d}$.}
@@ -2498,7 +2500,7 @@ m = divexact(k*l, k)
 Over a residue ring we can define Euclidean division.
 
 \begin{lstlisting}
-mod{T <: Residue, S}(f::Poly{T, S}, g::Poly{T, S})
+mod{T <: Union(Residue, Field), S}(f::Poly{T, S}, g::Poly{T, S})
 \end{lstlisting}
 
 \desc{Return the Euclidean remainder of $f$ divided by $g$, i.e. $r$ such 
@@ -2506,7 +2508,7 @@ that $a = bq + r$ for some polynomial $r$ with deg$(r) <$ deg$(b)$. If
 $g = 0$ we throw a \code{DivideError()}.}
 
 \begin{lstlisting}
-divrem{T <: Residue, S}(f::Poly{T, S}, g::Poly{T, S})
+divrem{T <: Union(Residue, Field), S}(f::Poly{T, S}, g::Poly{T, S})
 \end{lstlisting}
 
 \desc{Return the Euclidean quotient and remainder of $f$ divided by $g$, i.e.
@@ -2594,7 +2596,7 @@ pseudorem(f, g)
 Here Nemo returns \code{3*x^2}, which happens to be \code{3*g} in this
 ring.
 
-\subsubsection{Content, primitive part and GCD}
+\subsubsection{Content, primitive part, GCD and LCM}
 
 When the base ring provides a \code{gcd} function we can provide numerous
 GCD related functions for polynomials over that ring.
@@ -2620,9 +2622,25 @@ gcd{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
 \desc{Return the greatest common divisor of the polynomials $a$ and $b$ if 
 it exists.}
 
+\begin{lstlisting}
+lcm{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return the least common multiple of the polynomials $a$ and $b$. We
+define lcm$(a, b) = ab/$gcd$(a, b)$.}
+
+
 We allow GCD for polynomials over residue rings, e.g. over $\Z/n\Z$, even when
 the residue ring has zero divisors. However, if an impossible inverse is
 encountered during the computation, due to zero divisors, we throw an error.
+
+\begin{lstlisting}
+gcdinv{T <: Union(Field, Residue), S}(a::Poly{T, S}, b::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return a tuple $(g, s)$ such that $g$ is the gcd of $a$ and $b$ and $s$
+and $t$ are polynomials such that $g = as + bt$. The value $g$ will be $1$ if
+$a$ is invertible modulo $b$.}
 
 \textbf{Examples.}
 
@@ -2638,6 +2656,7 @@ h = x + 1
 r = content(3*f)
 s = primpart(3*f)
 t = gcd(f*h, g*h)
+u = lcm(f*h, g*h)
 
 k = x*y^2 + (x + 1)*y + 3
 l = (x + 1)*y + (x^3 + 2x + 2)
@@ -2645,6 +2664,14 @@ m = y^2 + x + 1
 n = content(k)
 p = primpart(k*(x^2 + 1))
 q = gcd(k*m, l*m)
+r = lcm(k*m, l*m)
+
+T = ResidueRing(ZZ, 7)
+U, z = PolynomialRing(T, "z")
+
+r = z^3 + 2z + 1
+s = z^5 + 1
+u, v = gcdinv(r, s)
 \end{lstlisting}
 
 \subsubsection{Evaluation}
@@ -2721,6 +2748,27 @@ g = deriv(f)
 
 h = x*y^2 + (x + 1)*y + 3
 j = deriv(h)
+\end{lstlisting}
+
+\subsubsection{Integral}
+
+\begin{lstlisting}
+integral{T <: Union(Field, Residue), S}(f::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return the integral of the polynomial $f$. The constant coefficient of
+the result is taken to be $0$.}
+
+\textbf{Examples.}
+
+Here are some examples of computing integrals.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 7)
+S, x = PolynomialRing(R, "x")
+
+f = x^2 + 2x + 1
+g = integral(f)
 \end{lstlisting}
 
 \subsubsection{Resultant}
