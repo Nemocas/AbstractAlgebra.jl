@@ -1,3 +1,9 @@
+###########################################################################################
+#
+#   Poly.jl : Polynomials over rings
+#
+###########################################################################################    
+
 export Poly, PolynomialRing, coeff, zero, one, gen, isgen, normalise, chebyshev_t,
        chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic,
        pseudorem, pseudodivrem, primpart, content, divexact, evaluate, compose, deriv,
@@ -35,19 +41,33 @@ type fmpz_mod_poly <: Ring
    end  
 end
 
+type fmpq_poly <: Ring
+   coeffs :: Ptr{Void}
+   den :: Int # can't make this a ZZ
+   alloc :: Int
+   length :: Int
+   function fmpq_poly(coeffs::Ptr{Void}, den::Int, alloc::Int, length::Int)
+      d = new(coeffs, den, alloc, length)
+      finalizer(d, _fmpq_poly_clear_fn)
+      return d
+   end  
+end
+
 type PolyStruct{T <: Ring}
    coeffs :: Array{T, 1}
    length :: Int
 end
 
 type Poly{T <: Ring, S} <: Ring
-   data :: Union(fmpz_poly, fmpz_mod_poly, PolyStruct{T})
+   data :: Union(fmpz_poly, fmpz_mod_poly, fmpq_poly, PolyStruct{T})
    
    Poly(a :: PolyStruct{T}) = new(a)   
 
    Poly(a::fmpz_mod_poly) = new(a)
    
    Poly(a :: fmpz_poly) = new(a)
+   
+   Poly(a :: fmpq_poly) = new(a)
    
    Poly() = Poly(Poly{T, S}, Array(T, 0))
    Poly(a::Integer) = a == 0 ? Poly(Poly{T, S}, Array(T, 0)) : Poly(Poly{T, S}, [T(a)])
@@ -93,6 +113,10 @@ function _fmpz_mod_poly_clear_fn(a :: fmpz_mod_poly)
    ccall((:fmpz_mod_poly_clear, :libflint), Void, (Ptr{fmpz_mod_poly},), &a)
 end
    
+function _fmpq_poly_clear_fn(a :: fmpq_poly)
+   ccall((:fmpq_poly_clear, :libflint), Void, (Ptr{fmpq_poly},), &a)
+end
+   
 ###########################################################################################
 #
 #   Basic manipulation
@@ -121,11 +145,7 @@ end
 
 coeff{T <: Ring, S}(a::Poly{T, S}, n::Int) = n >= a.data.length ? 0 : a.data.coeffs[n + 1]
 
-lead{S}(x::Poly{ZZ, S}) = x.data.length == 0 ? zero(ZZ) : coeff(x, x.data.length - 1)
-
-lead{S, M}(x::Poly{Residue{ZZ, M}, S}) = x.data.length == 0 ? zero(Residue{ZZ, M}) : coeff(x, x.data.length - 1)
-
-lead{T <: Ring, S}(a::Poly{T, S}) = a.data.length == 0 ? zero(T) : a.data.coeffs[a.data.length]
+lead{T <: Ring, S}(a::Poly{T, S}) = a.data.length == 0 ? zero(T) : coeff(a, a.data.length - 1)
 
 isgen{S}(x::Poly{ZZ, S}) = bool(ccall((:fmpz_poly_is_x, :libflint), Int, (Ptr{fmpz_poly},), &(x.data)))
 
@@ -133,21 +153,9 @@ isgen{S, M}(x::Poly{Residue{ZZ, M}, S}) = bool(ccall((:fmpz_mod_poly_is_x, :libf
 
 isgen{T <: Ring, S}(a::Poly{T, S}) = a.data.length == 2 && a.data.coeffs[1] == 0 && a.data.coeffs[2] == 1
 
-zero{S}(::Type{Poly{ZZ, S}}) = Poly{ZZ, S}(0)
-
-zero{S, M}(::Type{Poly{Residue{ZZ, M}, S}}) = Poly{Residue{ZZ, M}, S}(0)
-
 zero{T <: Ring, S}(::Type{Poly{T, S}}) = Poly{T, S}(0)
 
-one{S}(::Type{Poly{ZZ, S}}) = Poly{ZZ, S}(1)
-
-one{S, M}(::Type{Poly{Residue{ZZ, M}, S}}) = Poly{Residue{ZZ, M}, S}(1)
-
 one{T <: Ring, S}(::Type{Poly{T, S}}) = Poly{T, S}(1)
-
-gen{S, M}(::Type{Poly{Residue{ZZ, M}, S}}) = Poly(Poly{Residue{ZZ, M}, S}, [Residue{ZZ, M}(0), Residue{ZZ, M}(1)])
-
-gen{S}(::Type{Poly{ZZ, S}}) = Poly(Poly{ZZ, S}, [ZZ(0), ZZ(1)])
 
 gen{T <: Ring, S}(::Type{Poly{T, S}}) = Poly(Poly{T, S}, [T(0), T(1)])
 
@@ -462,7 +470,7 @@ end
 
 function setcoeff!{S}(z::Poly{ZZ, S}, n::Int, x::ZZ)
    ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
-                (Ptr{fmpz_poly}, Int, Ptr{fmpz_poly}), 
+                (Ptr{fmpz_poly}, Int, Ptr{ZZ}), 
                &(z.data), n, &x)
 end
 
@@ -549,6 +557,14 @@ function *{S}(x::Int, y::Poly{ZZ, S})
    ccall((:fmpz_poly_scalar_mul_si, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), 
                &(z.data), &(y.data), x)
+   return z
+end
+
+function *{S}(x::ZZ, y::Poly{ZZ, S})
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_scalar_mul_fmpz, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{ZZ}), 
+               &(z.data), &(y.data), &x)
    return z
 end
 
@@ -1028,7 +1044,6 @@ end
 =={T<: Ring, S}(x::ZZ, y::Poly{T, S}) = y == x
 
 =={S, M}(x::Residue{ZZ, M}, y::Poly{Residue{ZZ, M}, S}) = y == x
-
 
 ###########################################################################################
 #

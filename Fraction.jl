@@ -103,7 +103,7 @@ function num(a::Fraction{ZZ})
 end
 
 function den{T <: Ring}(a::Fraction{T})
-   return a.data.data.den
+   return a.data.den
 end
 
 function den(a::Fraction{ZZ})
@@ -229,7 +229,7 @@ function show{T <: Ring}(io::IO, ::Type{Fraction{T}})
    show(io, T)
 end
 
-needs_parentheses{T <: Ring}(x::Fraction{T}) = false
+needs_parentheses{T <: Ring}(x::Fraction{T}) = x.data.den == 1 && needs_parentheses(x.data.num)
 
 is_negative{T <: Ring}(x::Fraction{T}) = !needs_parentheses(x.data.num) && is_negative(x.data.num)
 

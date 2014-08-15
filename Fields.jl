@@ -31,5 +31,7 @@ end
 
 include("Fraction.jl")
 
+include("Poly2.jl")
+
 end # module
 
