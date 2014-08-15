@@ -310,7 +310,7 @@ end
 divexact{T <: Ring}(a::Fraction{T}, b::Fraction{T}) = a/b
 
 function gcd{T <: Ring}(a::Fraction{T}, b::Fraction{T})
-   Fraction{T}(gcd(a.data.num, b.data.num), gcd(a.data.den, b.data.den))
+   gcd(a.data.num*b.data.den, a.data.den*b.data.num)/(a.data.den*b.data.den)
 end
 
 function gcd(a::Fraction{ZZ}, b::Fraction{ZZ})
