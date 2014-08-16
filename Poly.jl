@@ -8,7 +8,7 @@ export Poly, PolynomialRing, coeff, zero, one, gen, isgen, normalise, chebyshev_
        chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic,
        pseudorem, pseudodivrem, primpart, content, divexact, evaluate, compose, deriv,
        resultant, lead, discriminant, bezout, truncate, mullow, divrem, mulmod, powmod,
-       invmod, canonical_unit, integral, lcm, reverse
+       invmod, canonical_unit, integral, lcm, reverse, shift_left, shift_right
 
 import Base: convert, zero, show
 
@@ -879,6 +879,75 @@ end
 
 ###########################################################################################
 #
+#   Shifting
+#
+###########################################################################################
+
+function shift_left{T <: Ring, S}(x::Poly{T, S}, len::Int)
+   len < 0 && throw(DomainError())
+   xlen = x.data.length
+   v = Array(T, xlen + len)
+   for i = 1:len
+      v[i] = zero(T)
+   end
+   for i = 1:xlen
+      v[i + len] = coeff(x, i - 1)
+   end
+   return Poly(Poly{T, S}, v)
+end
+
+function shift_right{T <: Ring, S}(x::Poly{T, S}, len::Int)
+   len < 0 && throw(DomainError())
+   xlen = x.data.length
+   if len >= xlen
+      return zero(Poly{T, S})
+   end
+   v = Array(T, xlen - len)
+   for i = 1:xlen - len
+      v[i] = coeff(x, i + len - 1)
+   end
+   return Poly(Poly{T, S}, v)
+end
+
+function shift_left{S, M}(x::Poly{Residue{ZZ, M}, S}, len::Int)
+   len < 0 && throw(DomainError())
+   z = Poly{Residue{ZZ, M}, S}()
+   ccall((:fmpz_mod_poly_shift_left, :libflint), Void,
+                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Int),
+               &(z.data), &(x.data), len)
+   return z
+end
+
+function shift_right{S, M}(x::Poly{Residue{ZZ, M}, S}, len::Int)
+   len < 0 && throw(DomainError())
+   z = Poly{Residue{ZZ, M}, S}()
+   ccall((:fmpz_mod_poly_shift_right, :libflint), Void,
+                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Int),
+               &(z.data), &(x.data), len)
+   return z
+end
+
+function shift_left{S}(x::Poly{ZZ, S}, len::Int)
+   len < 0 && throw(DomainError())
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_shift_left, :libflint), Void,
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int),
+               &(z.data), &(x.data), len)
+   return z
+end
+
+function shift_right{S}(x::Poly{ZZ, S}, len::Int)
+   len < 0 && throw(DomainError())
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_shift_right, :libflint), Void,
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int),
+               &(z.data), &(x.data), len)
+   return z
+end
+
+
+###########################################################################################
+#
 #   Powering
 #
 ###########################################################################################
@@ -1101,12 +1170,43 @@ function divexact{T <: Ring, S}(a::Poly{T, S}, b::T)
    return z
 end
 
+function divexact{T <: Ring, S}(a::Poly{T, S}, b::ZZ)
+   b == 0 && throw(DivideError())
+   d = Array(T, a.data.length)
+   for i = 1:a.data.length
+      d[i] = divexact(a.data.coeffs[i], b)
+   end
+   z = Poly(Poly{T, S}, d)
+   z.data.length = a.data.length
+   return z
+end
+
+function divexact{T <: Ring, S}(a::Poly{T, S}, b::Int)
+   b == 0 && throw(DivideError())
+   d = Array(T, a.data.length)
+   for i = 1:a.data.length
+      d[i] = divexact(a.data.coeffs[i], b)
+   end
+   z = Poly(Poly{T, S}, d)
+   z.data.length = a.data.length
+   return z
+end
+
 function divexact{S}(x::Poly{ZZ, S}, y::ZZ)
    y == 0 && throw(DivideError())
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_scalar_divexact_fmpz, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{ZZ}), 
                &(z.data),  &(x.data), &y)
+   return z
+end
+
+function divexact{S}(x::Poly{ZZ, S}, y::Int)
+   y == 0 && throw(DivideError())
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_scalar_divexact_si, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), 
+               &(z.data),  &(x.data), y)
    return z
 end
 
@@ -1118,6 +1218,8 @@ function divexact{S, M}(x::Poly{Residue{ZZ, M}, S}, y::ZZ)
                &(z.data),  &(x.data), &y)
    return z
 end
+
+divexact{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Int) = divexact(x, ZZ(y))
 
 divexact{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Residue{ZZ, M}) = divexact(x, y.data)
 

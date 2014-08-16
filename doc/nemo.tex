@@ -2410,6 +2410,63 @@ reverse{T <: Ring, S}(x::Poly{T, S})
 of $x$ becomes the constant coefficient of the result, etc. The resulting
 polynomial is normalised.}
 
+\textbf{Examples.}
+
+Here are some examples of reversal.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x^2 + 2x + 1
+
+g = reverse(f)
+
+k = x*y^2 + (x + 1)*y + 3
+
+l = reverse(k, 7)
+\end{lstlisting}
+
+\subsubsection{Shifting}
+
+\begin{lstlisting}
+shift_left{T <: Ring, S}(x::Poly{T, S}, n::Int)
+\end{lstlisting}
+
+\desc{Return the polynomial that results from shifting the coefficients of the
+polynomial $x$ to the left by $n$ places, i.e. $f\times x^n$ where $x$ is the
+generator of the polynomial ring that $f$ belongs to. If $n < 0$ we throw a
+\code{DomainError()}.}
+
+\begin{lstlisting}
+shift_right{T <: Ring, S}(x::Poly{T, S}, n::Int)
+\end{lstlisting}
+
+\desc{Return the polynomial that results from shifting the coefficients of the
+polynomial $x$ to the right by $n$ places, i.e. by dividing $f$ by $x^n$ and
+throwing away the remainder. If $n$ is greater than or equal to the length of
+$x$ then the zero polynomial results. If $n < 0$ we throw a 
+\code{DomainError()}.}
+
+\textbf{Examples.}
+
+Here are some examples of shifting.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x^2 + 2x + 1
+
+g = shift_left(f, 3)
+h = shift_right(f, 1)
+
+k = x*y^2 + (x + 1)*y + 3
+
+l = shift_left(k, 7)
+m = shift_right(k, 3)
+\end{lstlisting}
+
 \subsubsection{Powering}
 
 \begin{lstlisting}

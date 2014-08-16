@@ -6,10 +6,11 @@
 
 import Rings: Poly, fmpq_poly, coeff, isgen, truncate, mullow, divexact, gcd, content,
               primpart, mod, divrem, evaluate, compose, deriv, resultant, bezout, integral,
-              lcm, reverse
+              lcm, reverse, shift_left, shift_right
 
 export coeff, isgen, truncate, mullow, divexact, gcd, content, primpart, mod, divrem,
-       evaluate, compose, show, deriv, resultant, bezout, integral, lcm, reverse
+       evaluate, compose, show, deriv, resultant, bezout, integral, lcm, reverse, 
+       shift_left, shift_right
 
 ###########################################################################################
 #
@@ -290,6 +291,30 @@ end
 
 ###########################################################################################
 #
+#   Shifting
+#
+###########################################################################################
+
+function shift_left{S}(x::Poly{QQ, S}, len::Int)
+   len < 0 && throw(DomainError())
+   z = Poly{QQ, S}()
+   ccall((:fmpq_poly_shift_left, :libflint), Void,
+                (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Int),
+               &(z.data), &(x.data), len)
+   return z
+end
+
+function shift_right{S}(x::Poly{QQ, S}, len::Int)
+   len < 0 && throw(DomainError())
+   z = Poly{QQ, S}()
+   ccall((:fmpq_poly_shift_right, :libflint), Void,
+                (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Int),
+               &(z.data), &(x.data), len)
+   return z
+end
+
+###########################################################################################
+#
 #   Powering
 #
 ###########################################################################################
@@ -356,6 +381,24 @@ function divexact{S}(x::Poly{QQ, S}, y::QQ)
    ccall((:fmpq_poly_scalar_div_fmpq, :libflint), Void, 
                 (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq}), 
                &(z.data),  &(x.data), &(y.data))
+   return z
+end
+
+function divexact{S}(x::Poly{QQ, S}, y::ZZ)
+   y == 0 && throw(DivideError())
+   z = Poly{QQ, S}()
+   ccall((:fmpq_poly_scalar_div_fmpz, :libflint), Void, 
+                (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{ZZ}), 
+               &(z.data),  &(x.data), &y)
+   return z
+end
+
+function divexact{S}(x::Poly{QQ, S}, y::Int)
+   y == 0 && throw(DivideError())
+   z = Poly{QQ, S}()
+   ccall((:fmpq_poly_scalar_div_si, :libflint), Void, 
+                (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Int), 
+               &(z.data),  &(x.data), y)
    return z
 end
 
