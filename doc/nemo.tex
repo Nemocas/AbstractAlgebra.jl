@@ -2390,6 +2390,26 @@ m = truncate(k, 1)
 n = mullow(k, l, 4)
 \end{lstlisting}
 
+\subsubsection{Reversal}
+
+\begin{lstlisting}
+reverse{T <: Ring, S}(x::Poly{T, S}, len::Int)
+\end{lstlisting}
+
+\desc{Return the reverse of the polynomial $x$, thought of as a polynomial of
+the given length (the polynomial will be notionally truncated or padded with
+zeroes before the leading term if necessary to match the specified length). 
+The resulting polynomial is normalised. If \code{len} is negative we throw a
+\code{DomainError()}.}
+
+\begin{lstlisting}
+reverse{T <: Ring, S}(x::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return the reverse of the polynomial $x$, i.e. the leading coefficient
+of $x$ becomes the constant coefficient of the result, etc. The resulting
+polynomial is normalised.}
+
 \subsubsection{Powering}
 
 \begin{lstlisting}

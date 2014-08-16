@@ -6,10 +6,10 @@
 
 import Rings: Poly, fmpq_poly, coeff, isgen, truncate, mullow, divexact, gcd, content,
               primpart, mod, divrem, evaluate, compose, deriv, resultant, bezout, integral,
-              lcm
+              lcm, reverse
 
 export coeff, isgen, truncate, mullow, divexact, gcd, content, primpart, mod, divrem,
-       evaluate, compose, show, deriv, resultant, bezout, integral, lcm
+       evaluate, compose, show, deriv, resultant, bezout, integral, lcm, reverse
 
 ###########################################################################################
 #
@@ -270,6 +270,21 @@ function mullow{S}(x::Poly{QQ, S}, y::Poly{QQ, S}, n::Int)
    ccall((:fmpq_poly_mullow, :libflint), Void,
                 (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq_poly}, Int),
                &(z.data), &(x.data), &(y.data), n)
+   return z
+end
+
+###########################################################################################
+#
+#   Reversal
+#
+###########################################################################################
+
+function reverse{S}(x::Poly{QQ, S}, len::Int)
+   len < 0 && throw(DomainError())
+   z = Poly{QQ, S}()
+   ccall((:fmpq_poly_reverse, :libflint), Void,
+                (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Int),
+               &(z.data), &(x.data), len)
    return z
 end
 

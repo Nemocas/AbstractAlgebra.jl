@@ -8,7 +8,7 @@ export Poly, PolynomialRing, coeff, zero, one, gen, isgen, normalise, chebyshev_
        chebyshev_u, theta_qexp, eta_qexp, swinnerton_dyer, cos_minpoly, cyclotomic,
        pseudorem, pseudodivrem, primpart, content, divexact, evaluate, compose, deriv,
        resultant, lead, discriminant, bezout, truncate, mullow, divrem, mulmod, powmod,
-       invmod, canonical_unit, integral, lcm
+       invmod, canonical_unit, integral, lcm, reverse
 
 import Base: convert, zero, show
 
@@ -836,6 +836,45 @@ function mullow{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S}, n::Int)
    z.data.length = normalise(z, lenz)
 
    return z
+end
+
+###########################################################################################
+#
+#   Reversal
+#
+###########################################################################################
+
+function reverse{T <: Ring, S}(x::Poly{T, S}, len::Int)
+   len < 0 && throw(DomainError())
+   v = Array(T, len)
+   for i = 1:len
+      v[i] = coeff(x, len - i)
+   end
+   r = Poly(Poly{T, S}, v)
+   r.data.length = normalise(r, len)
+   return r
+end
+
+function reverse{S}(x::Poly{ZZ, S}, len::Int)
+   len < 0 && throw(DomainError())
+   z = Poly{ZZ, S}()
+   ccall((:fmpz_poly_reverse, :libflint), Void,
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int),
+               &(z.data), &(x.data), len)
+   return z
+end
+
+function reverse{S, M}(x::Poly{Residue{ZZ, M}, S}, len::Int)
+   len < 0 && throw(DomainError())
+   z = Poly{Residue{ZZ, M}, S}()
+   ccall((:fmpz_mod_poly_reverse, :libflint), Void,
+                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Int),
+               &(z.data), &(x.data), len)
+   return z
+end
+
+function reverse{T <: Ring, S}(x::Poly{T, S})
+   reverse(x, x.data.length)
 end
 
 ###########################################################################################
