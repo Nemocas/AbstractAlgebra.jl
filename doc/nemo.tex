@@ -2537,6 +2537,8 @@ First we have exact division by a scalar.
 
 \begin{lstlisting}
 divexact{T <: Ring, S}(a::Poly{T, S}, b::T)
+divexact{T <: Ring, S}(a::Poly{T, S}, b::ZZ)
+divexact{T <: Ring, S}(a::Poly{T, S}, b::Int)
 \end{lstlisting}
 
 \desc{Return $a$ divided by $b$. The result is only meaningful if the division is
@@ -2570,6 +2572,8 @@ j = divexact(3*f, ZZ(3))
 k = x*y^2 + (x + 1)*y + 3
 l = (x + 1)*y + (x^3 + 2x + 2)
 m = divexact(k*l, k)
+n = divexact(3*k, 3)
+p = divexact(x*k, x)
 \end{lstlisting}
 
 \subsubsection{Euclidean division}
