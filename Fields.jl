@@ -31,6 +31,8 @@ end
 
 include("Fraction.jl")
 
+include("FiniteFields.jl")
+
 include("Poly2.jl")
 
 end # module
