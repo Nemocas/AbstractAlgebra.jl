@@ -1,4 +1,5 @@
-export FiniteField, gen, prime, degree, order, convert, promote_rule
+export FiniteField, gen, prime, degree, order, convert, promote_rule, pth_root, trace, norm,
+       frobenius
 
 import Base: convert, promote_rule
 
@@ -292,6 +293,44 @@ function inv{S}(x::FField{S})
    ccall((:fq_inv, :libflint), Void, 
                 (Ptr{FField{S}}, Ptr{FField{S}}, Ptr{fq_ctx}), 
                &z, &x, &eval(:($S)))
+   return z
+end
+
+###########################################################################################
+#
+#   Special functions
+#
+###########################################################################################
+
+function pth_root{S}(x::FField{S})
+   z = FField{S}()
+   ccall((:fq_pth_root, :libflint), Void, 
+                (Ptr{FField{S}}, Ptr{FField{S}}, Ptr{fq_ctx}), 
+               &z, &x, &eval(:($S)))
+   return z
+end
+
+function trace{S}(x::FField{S})
+   z = ZZ()
+   ccall((:fq_trace, :libflint), Void, 
+                (Ptr{ZZ}, Ptr{FField{S}}, Ptr{fq_ctx}), 
+               &z, &x, &eval(:($S)))
+   return FField{S}(z)
+end
+
+function norm{S}(x::FField{S})
+   z = ZZ()
+   ccall((:fq_norm, :libflint), Void, 
+                (Ptr{ZZ}, Ptr{FField{S}}, Ptr{fq_ctx}), 
+               &z, &x, &eval(:($S)))
+   return FField{S}(z)
+end
+
+function frobenius{S}(x::FField{S}, n = 1)
+   z = FField{S}()
+   ccall((:fq_frobenius, :libflint), Void, 
+                (Ptr{FField{S}}, Ptr{FField{S}}, Int, Ptr{fq_ctx}), 
+               &z, &x, n, &eval(:($S)))
    return z
 end
 
