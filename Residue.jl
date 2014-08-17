@@ -11,6 +11,7 @@ import Base: convert, zero
 type Residue{T <: Ring, S} <: Ring
    data::T
    Residue(a::Int) = new(mod(convert(T, a), eval(:($S))))
+   Residue(a::ZZ) = new(mod(convert(T, a), eval(:($S))))
    Residue(a::T) = new(mod(a, eval(:($S))))
    Residue(a::Residue{T, S}) = a
    Residue() = new(T(0))

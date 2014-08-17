@@ -1,4 +1,6 @@
-export FiniteField, gen, prime, degree, order
+export FiniteField, gen, prime, degree, order, convert, promote_rule
+
+import Base: convert, promote_rule
 
 import Rings: gen
 
@@ -31,7 +33,7 @@ function _fq_ctx_clear_fn(a :: fq_ctx)
    ccall((:fq_ctx_clear, :libflint), Void, (Ptr{fq_ctx},), &a)
 end
 
-type FField{S}
+type FField{S} <: Field
    # this is really an fmpz_poly
    coeffs :: Ptr{Void}
    alloc :: Int
@@ -42,6 +44,21 @@ type FField{S}
       finalizer(d, _FField_clear_fn)
       return d
    end
+   function FField(x::Int)
+      z = FField{S}()
+      ccall((:fq_set_si, :libflint), Void, 
+                (Ptr{FField{S}}, Int, Ptr{fq_ctx}), 
+               &z, x, &eval(:($S)))
+      return z
+   end
+   function FField(x::ZZ)
+      z = FField{S}()
+      ccall((:fq_set_fmpz, :libflint), Void, 
+                (Ptr{FField{S}}, Ptr{ZZ}, Ptr{fq_ctx}), 
+               &z, &x, &eval(:($S)))
+      return z
+   end
+   FField(a::FField{S}) = a
 end
 
 function _FField_clear_fn{S}(a :: FField{S})
@@ -118,10 +135,179 @@ show_minus_one{S}(::Type{FField{S}}) = true
 
 ###########################################################################################
 #
+#   Canonicalisation
+#
+###########################################################################################
+
+canonical_unit{S}(x::FField{S}) = x
+
+###########################################################################################
+#
+#   Unary operations
+#
+###########################################################################################
+
+function -{S}(x::FField{S})
+   z = FField{S}()
+   ccall((:fq_neg, :libflint), Void, 
+                (Ptr{FField{S}}, Ptr{FField{S}}, Ptr{fq_ctx}), 
+               &z, &x, &eval(:($S)))
+   return z
+end
+
+###########################################################################################
+#
 #   Binary operators and functions
 #
 ###########################################################################################
 
+function +{S}(x::FField{S}, y::FField{S})
+   z = FField{S}()
+   ccall((:fq_add, :libflint), Void, 
+                (Ptr{FField{S}}, Ptr{FField{S}}, Ptr{FField{S}}, Ptr{fq_ctx}), 
+               &z, &x, &y, &eval(:($S)))
+   return z
+end
+
+function -{S}(x::FField{S}, y::FField{S})
+   z = FField{S}()
+   ccall((:fq_sub, :libflint), Void, 
+                (Ptr{FField{S}}, Ptr{FField{S}}, Ptr{FField{S}}, Ptr{fq_ctx}), 
+               &z, &x, &y, &eval(:($S)))
+   return z
+end
+
+function *{S}(x::FField{S}, y::FField{S})
+   z = FField{S}()
+   ccall((:fq_mul, :libflint), Void, 
+                (Ptr{FField{S}}, Ptr{FField{S}}, Ptr{FField{S}}, Ptr{fq_ctx}), 
+               &z, &x, &y, &eval(:($S)))
+   return z
+end
+
+gcd{S}(x::FField{S}, y::FField{S}) = x == 0 && y == 0 ? FField{S}(0) : FField{S}(1)
+
+###########################################################################################
+#
+#   Unsafe functions
+#
+###########################################################################################
+
+function mul!{S}(z::FField{S}, x::FField{S}, y::FField{S})
+   ccall((:fq_mul, :libflint), Void, 
+                (Ptr{FField{S}}, Ptr{FField{S}}, Ptr{FField{S}}, Ptr{fq_ctx}), 
+               &z, &x, &y)
+end
+
+function addeq!{S}(z::FField{S}, x::FField{S})
+   ccall((:fq_add, :libflint), Void, 
+                (Ptr{FField{S}}, Ptr{FField{S}}, Ptr{FField{S}}, Ptr{fq_ctx}), 
+               &z, &z, &x, &eval(:($S)))
+end
+
+###########################################################################################
+#
+#   Ad hoc binary operators
+#
+###########################################################################################
+
+function *{S}(x::Int, y::FField{S})
+   z = FField{S}()
+   ccall((:fq_mul_si, :libflint), Void, 
+                (Ptr{FField{S}}, Ptr{FField{S}}, Int, Ptr{fq_ctx}), 
+               &z, &y, x, &eval(:($S)))
+   return z
+end
+
+*{S}(x::FField{S}, y::Int) = y*x
+
+function *{S}(x::ZZ, y::FField{S})
+   z = FField{S}()
+   ccall((:fq_mul_fmpz, :libflint), Void, 
+                (Ptr{FField{S}}, Ptr{FField{S}}, Ptr{ZZ}, Ptr{fq_ctx}), 
+               &z, &y, &x, &eval(:($S)))
+   return z
+end
+
+*{S}(x::FField{S}, y::ZZ) = y*x
+
+###########################################################################################
+#
+#   Powering
+#
+###########################################################################################
+
+function ^{S}(x::FField{S}, y::Int)
+   y < 0 && throw(DomainError())
+   z = FField{S}()
+   ccall((:fq_pow_ui, :libflint), Void, 
+                (Ptr{FField{S}}, Ptr{FField{S}}, Int, Ptr{fq_ctx}), 
+               &z, &x, y, &eval(:($S)))
+   return z
+end
+
+function ^{S}(x::FField{S}, y::ZZ)
+   y < 0 && throw(DomainError())
+   z = FField{S}()
+   ccall((:fq_pow, :libflint), Void, 
+                (Ptr{FField{S}}, Ptr{FField{S}}, Ptr{ZZ}, Ptr{fq_ctx}), 
+               &z, &x, &y, &eval(:($S)))
+   return z
+end
+
+###########################################################################################
+#
+#   Comparison
+#
+###########################################################################################
+
+=={S}(x::FField{S}, y::FField{S}) = bool(ccall((:fq_equal, :libflint), Cint, 
+                (Ptr{FField{S}}, Ptr{FField{S}}, Ptr{fq_ctx}), &x, &y, &eval(:($S))))
+
+###########################################################################################
+#
+#   Exact division
+#
+###########################################################################################
+
+function divexact{S}(x::FField{S}, y::FField{S})
+   y == 0 && throw(DivideError())
+   z = FField{S}()
+   ccall((:fq_div, :libflint), Void, 
+                (Ptr{FField{S}}, Ptr{FField{S}}, Ptr{FField{S}}, Ptr{fq_ctx}), 
+               &z, &x, &y, &eval(:($S)))
+   return z
+end
+
+/{S}(x::FField{S}, y::FField{S}) = divexact(x, y)
+
+###########################################################################################
+#
+#   Inversion
+#
+###########################################################################################
+
+function inv{S}(x::FField{S})
+   z = FField{S}()
+   ccall((:fq_inv, :libflint), Void, 
+                (Ptr{FField{S}}, Ptr{FField{S}}, Ptr{fq_ctx}), 
+               &z, &x, &eval(:($S)))
+   return z
+end
+
+###########################################################################################
+#
+#   Conversions and promotions
+#
+###########################################################################################
+
+convert{S}(::Type{FField{S}}, x::Int) = FField{S}(x)
+
+convert{S}(::Type{FField{S}}, x::ZZ) = FField{S}(x)
+
+promote_rule{S}(::Type{FField{S}}, ::Type{Int}) = FField{S}
+
+promote_rule{S}(::Type{FField{S}}, ::Type{ZZ}) = FField{S}
 
 ###########################################################################################
 #
