@@ -197,7 +197,7 @@ gcd{S}(x::FField{S}, y::FField{S}) = x == 0 && y == 0 ? FField{S}(0) : FField{S}
 function mul!{S}(z::FField{S}, x::FField{S}, y::FField{S})
    ccall((:fq_mul, :libflint), Void, 
                 (Ptr{FField{S}}, Ptr{FField{S}}, Ptr{FField{S}}, Ptr{fq_ctx}), 
-               &z, &x, &y)
+               &z, &x, &y, &eval(:($S)))
 end
 
 function addeq!{S}(z::FField{S}, x::FField{S})

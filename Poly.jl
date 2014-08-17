@@ -2088,9 +2088,13 @@ function PolynomialRing{T <: Ring}(::Type{T}, s::String)
    P = T2.parameters
    while length(P) > 0
       T2 = P[1]
-      Base.convert(::Type{T1}, x::T2) = Poly(T1, [convert(T, x)])
-      Base.promote_rule(::Type{T1}, ::Type{T2}) = T1
-      P = T2.parameters
+      if isa(T2, DataType) && T2 <: Ring
+         Base.convert(::Type{T1}, x::T2) = Poly(T1, [convert(T, x)])
+         Base.promote_rule(::Type{T1}, ::Type{T2}) = T1
+         P = T2.parameters
+      else
+         break
+      end
    end
 
    Base.convert(::Type{T1}, x::Integer) = Poly(T1, [convert(T, x)])
