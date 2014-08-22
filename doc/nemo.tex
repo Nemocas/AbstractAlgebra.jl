@@ -21,6 +21,7 @@
 \newcommand{\I}{\mathbb{I}}
 \newcommand{\C}{\mathbb{C}}
 \newcommand{\R}{\mathbb{R}}
+\newcommand{\F}{\mathbb{F}}
 \newcommand{\Pee}{\mathbb{P}}
 \newcommand{\EuO}{\mathcal{O}}
 \newcommand{\Qbar}{\overline{\mathbb{Q}}}
@@ -4351,5 +4352,38 @@ Undefined behaviour, including the possibility of an infinite loop, may result
 otherwise. The degree \code{deg} must be nonnegative. If \code{deg} is 
 negative we throw a \code{DomainError()}.}
 
+We provide various convenient functions for constructing elements of a finite
+field.
+
+\begin{lstlisting}
+FField{S}(a::Int)
+FField{S}(a::ZZ)
+\end{lstlisting}
+
+\desc{Return the element \code{a} of the finite field, considered as an element
+of $\F_p$.}
+
+\begin{lstlisting}
+FField(a::FField{S})
+\end{lstlisting}
+
+\desc{Return a reference to the element \code{a} of the finite field. No copy
+of the data is made by this function.}
+
+\textbf{Examples.}
+
+Here are some examples of constructing finite fields and elements in them.
+
+\begin{lstlisting}
+R, x = FiniteField(7, 5, "x")
+S, y = FiniteField(ZZ(17), 3, "y")
+
+f = 3x^4 + 2x^3 + 4x^2 + x + 1
+g = 2y^2 + 11y + 16
+
+h = R(4)
+k = S(11)
+m = R(h)
+\end{lstlisting}
 
 \end{document}
