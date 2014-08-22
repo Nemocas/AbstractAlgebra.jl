@@ -124,7 +124,7 @@ end
 ###########################################################################################    
    
 function normalise{T <: Ring, S}(a::Poly{T, S}, len::Int)
-   while len > 0 && a.data.coeffs[len] == 0
+   while len > 0 && a.data.coeffs[len] == 0 # cannot use coeff(a, len - 1) here
       len -= 1
    end
 
@@ -1635,7 +1635,10 @@ function integral{T <: Union(Field, Residue), S}(x::Poly{T, S})
       v[i + 1] = divexact(coeff(x, i - 1), T(i))
    end
    p = Poly(Poly{T, S}, v)
-   p.data.length = normalise(p, len + 1)
+   len = len + 1
+   while len > 0 && coeff(p, len - 1) == 0 # cannot use normalise here
+      len -= 1
+   end
    return p
 end
 
