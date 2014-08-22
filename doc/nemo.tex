@@ -4512,5 +4512,86 @@ g = gcd(a, b)
 h = gcd(R(0), R(0))
 \end{lstlisting}
 
+\subsubsection{Ad hoc binary operators}
+
+We provide the following ad hoc binary operators, which are faster than first
+coercing all their arguments into the finite field.
+
+\begin{lstlisting}
+*{S}(x::Int, y::FField{S})
+*{S}(x::ZZ, y::FField{S})
+\end{lstlisting}
+
+\desc{Return $xy$, i.e. $y$ added to itself $x$ times.}
+
+\begin{lstlisting}
+*{S}(x::FField{S}, y::Int)
+*{S}(x::FField{S}, y::ZZ)
+\end{lstlisting}
+
+\desc{Return $xy$, i.e. $x$ added to itself $y$ times.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc binary operators.
+
+\begin{lstlisting}
+R, x = FiniteField(7, 5, "x")
+
+a = x^4 + 3x^2 + 6x + 1
+
+b = 3a
+c = a*ZZ(5)
+\end{lstlisting}
+
+\subsubsection{Powering}
+
+\begin{lstlisting}
+^{S}(a::FField{S}, n::Int)
+^{S}(a::FField{S}, n::ZZ)
+\end{lstlisting}
+
+\desc{Return $a^n$.}
+
+\textbf{Examples.}
+
+Here are some examples of powering of finite field elements.
+
+\begin{lstlisting}
+R, x = FiniteField(7, 5, "x")
+
+a = x^4 + 3x^2 + 6x + 1
+
+b = a^3
+c = a^ZZ(5)
+\end{lstlisting}
+
+\subsection{Comparison}
+
+\begin{lstlisting}
+=={S}(a::FField{S}, b::FField{S})
+\end{lstlisting}
+
+\desc{Return \code{true} if the finite field elements $a$ and $b$ are 
+arithmetically equal, otherwise return \code{false}.}
+
+Julia automatically provides corresponding \code{!=} functionality.
+
+\textbf{Examples.}
+
+Here are some examples of comparison of finite field elements.
+
+\begin{lstlisting}
+R, x = FiniteField(7, 5, "x")
+
+a = x^4 + 3x^2 + 6x + 1
+b = 3x^4 + 2x^2 + 2
+
+b != a
+R(3) == R(3)
+\end{lstlisting}
+
+
+
 
 \end{document}
