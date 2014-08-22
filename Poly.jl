@@ -124,7 +124,7 @@ end
 ###########################################################################################    
    
 function normalise{T <: Ring, S}(a::Poly{T, S}, len::Int)
-   while len > 0 && coeff(a, len - 1) == 0
+   while len > 0 && a.data.coeffs[len] == 0
       len -= 1
    end
 
@@ -425,15 +425,15 @@ function *{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    for i = 2:lenb
       d[lena + i - 1] = a.data.coeffs[lena]*b.data.coeffs[i]
    end
-
-   z = Poly(Poly{T, S}, d)
    
    for i = 1:lena - 1
       for j = 2:lenb
          mul!(t, a.data.coeffs[i], b.data.coeffs[j])
-         addeq!(z.data.coeffs[i + j - 1], t)
+         addeq!(d[i + j - 1], t)
       end
    end
+   
+   z = Poly(Poly{T, S}, d)
         
    z.data.length = normalise(z, lenz)
 
