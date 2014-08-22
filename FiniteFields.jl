@@ -1,4 +1,4 @@
-export FiniteField, gen, prime, degree, order, convert, promote_rule, pth_root, trace, norm,
+export FiniteField, gen, characteristic, degree, order, convert, promote_rule, pth_root, trace, norm,
        frobenius
 
 import Base: convert, promote_rule
@@ -16,7 +16,7 @@ type fq_ctx
    modulus_alloc :: Int
    modulus_length :: Int
    modulus_p :: Int # can't make this a ZZ
-   # this is actually an fmpz_mod_poly_
+   # this is actually an fmpz_mod_poly
    inv_coeffs :: Ptr{Void}
    inv_alloc :: Int
    inv_length :: Int
@@ -90,7 +90,7 @@ function gen{S}(::Type{FField{S}})
    return d
 end
 
-function prime{S}(::Type{FField{S}})
+function characteristic{S}(::Type{FField{S}})
    d = ZZ()
    ccall((:__fq_ctx_prime, :libflint), Void, (Ptr{ZZ}, Ptr{fq_ctx}), &d, &eval(:($S)))
    return d
@@ -125,7 +125,7 @@ function show{S}(io::IO, ::Type{FField{S}})
    print(io, "Finite field of degree ")
    print(io, degree(FField{S}))
    print(io, " over F_")
-   print(io, prime(FField{S}))
+   print(io, characteristic(FField{S}))
 end
 
 needs_parentheses{S}(x::FField{S}) = x.length > 1

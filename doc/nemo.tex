@@ -4386,4 +4386,131 @@ k = S(11)
 m = R(h)
 \end{lstlisting}
 
+\subsubsection{Basic manipulation}
+
+\begin{lstlisting}
+zero{S}(::Type{FField{S}})
+\end{lstlisting}
+
+\desc{Return the additive identity in the finite field, i.e. $0$.}
+
+\begin{lstlisting}
+one{S}(::Type{FField{S}})
+\end{lstlisting}
+
+\desc{Return the multiplicative identity in the finite field, i.e. $1$.}
+
+\begin{lstlisting}
+gen{S}(::Type{FField{S}})
+\end{lstlisting}
+
+\desc{Return a generator of the finite field, namely one whose
+representation is the monomial of degree $1$ modulo the defining
+polynomial of the field. The generator may not be a multiplicative
+generator.}
+
+\begin{lstlisting}
+characteristic{S}(::Type{FField{S}})
+\end{lstlisting}
+
+\desc{Return the prime characteristic $p$ of the finite field as a bignum
+\code{ZZ}.}
+
+\begin{lstlisting}
+order{S}(::Type{FField{S}})
+\end{lstlisting}
+
+\desc{Return the number of elements in the finite field, i.e. $q = p^d$
+where \code{p} is the characteristic and $d$ is the degree.}
+
+\begin{lstlisting}
+degree{S}(::Type{FField{S}})
+\end{lstlisting}
+
+\desc{If the finite field is $\F_q$ where $q = p^d$, where $p$ is the
+prime characteristic of the field, this function returns the degree
+$d$.}
+
+\textbf{Examples.}
+
+Here are some examples of basic manipulations of finite fields.
+
+\begin{lstlisting}
+R, x = FiniteField(7, 5, "x")
+
+a = zero(R)
+b = one(R)
+c = gen(R)
+d = characteristic(R)
+f = order(R)
+g = degree(R)
+\end{lstlisting}
+
+\subsubsection{Unary operators}
+
+\begin{lstlisting}
+-{S}(a::FField{S})
+\end{lstlisting}
+
+\desc{Return $-a$.}
+
+\textbf{Examples.}
+
+Here are some examples of unary operators.
+
+\begin{lstlisting}
+R, x = FiniteField(7, 5, "x")
+
+a = x^4 + 3x^2 + 6x + 1
+b = -a
+\end{lstlisting}
+
+\subsubsection{Binary operators and functions}
+
+We provide the following binary operators and functions for elements of
+finite fields.
+
+\begin{lstlisting}
++{S}(a::FField{S}, b::FField{S})
+\end{lstlisting}
+
+\desc{Return $a + b$.}
+
+\begin{lstlisting}
+-{S}(a::FField{S}, b::FField{S})
+\end{lstlisting}
+
+\desc{Return $a - b$.}
+
+\begin{lstlisting}
+*{S}(a::FField{S}, b::FField{S})
+\end{lstlisting}
+
+\desc{Return $ab$.}
+
+\begin{lstlisting}
+gcd{S}(a::FField{S}, b::FField{S})
+\end{lstlisting}
+
+\desc{Return gcd$(a, b)$. For a finite field this is always $1$ unless both
+$a$ and $b$ are $0$, in which case the gcd is $0$.}
+
+\textbf{Examples.}
+
+Here are some examples of binary operators and functions.
+
+\begin{lstlisting}
+R, x = FiniteField(7, 5, "x")
+
+a = x^4 + 3x^2 + 6x + 1
+b = 3x^4 + 2x^2 + x + 1
+
+c = a + b
+d = a - b
+f = a*b
+g = gcd(a, b)
+h = gcd(R(0), R(0))
+\end{lstlisting}
+
+
 \end{document}
