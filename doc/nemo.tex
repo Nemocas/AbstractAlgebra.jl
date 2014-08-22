@@ -4639,4 +4639,55 @@ b = inv(a)
 b == a^-1
 \end{lstlisting}
 
+\subsubsection{Special functions}
+
+Various special functions with finite field specific behaviour are
+defined.
+
+\begin{lstlisting}
+trace{S}(a::FField{S})
+\end{lstlisting}
+
+\desc{Return the trace of $a$. This is an element of $\F_p$, but the value
+returned is this value embedded in the original finite field.}
+
+\begin{lstlisting}
+norm{S}(a::FField{S})
+\end{lstlisting}
+
+\desc{Return the norm of $a$. This is an element of $\F_p$, but the value
+returned is this value embedded in the original finite field.}
+
+\begin{lstlisting}
+frobenius{S}(a::FField{S}, n = 1)
+\end{lstlisting}
+
+\desc{Return the iterated Frobenius $\sigma_p^n(a)$ where $\sigma_p$ is the 
+Frobenius map sending the element $a$ to $a^p$ in the finite field of 
+characteristic $p$. By default the Frobenius map is applied $n = 1$ times if
+$n$ is not specified.}
+
+\begin{lstlisting}
+pth_root{S}(a::FField{S})
+\end{lstlisting}
+
+\desc{Return the $p$-th root of $a$ in the finite field of characteristic
+$p$. This is the inverse operation to the Frobenius map $\sigma_p$.}
+
+\textbf{Examples.}
+
+Here are some examples of special finite field functionality.
+
+\begin{lstlisting}
+R, x = FiniteField(7, 5, "x")
+
+a = x^4 + 3x^2 + 6x + 1
+
+b = trace(a)
+c = norm(a)
+d = frobenius(a)
+f = frobenius(a, 3)
+g = pth_root(a)
+\end{lstlisting}
+
 \end{document}
