@@ -4563,7 +4563,7 @@ R, x = FiniteField(7, 5, "x")
 a = x^4 + 3x^2 + 6x + 1
 
 b = a^3
-c = a^ZZ(5)
+c = a^ZZ(-5)
 \end{lstlisting}
 
 \subsection{Comparison}
@@ -4591,7 +4591,52 @@ b != a
 R(3) == R(3)
 \end{lstlisting}
 
+\subsubsection{Exact division}
 
+\begin{lstlisting}
+divexact{S}(x::FField{S}, y::FField{S})
+/{S}(x::FField{S}, y::FField{S})
+\end{lstlisting}
 
+\desc{Return $x/y$, which is an exact division in a finite field when defined,
+since every nonzero element is invertible. We throw a \code{DivideError()} if
+$y = 0$. Both forms of exact division are the same, one being a synonym for 
+the other.}
+
+\textbf{Examples.}
+
+Here are some examples of exact division of finite field elements.
+
+\begin{lstlisting}
+R, x = FiniteField(7, 5, "x")
+
+a = x^4 + 3x^2 + 6x + 1
+b = 3x^4 + 2x^2 + 2
+
+c = divexact(a, b)
+d = b/a
+\end{lstlisting}
+
+\subsubsection{Inversion}
+
+\begin{lstlisting}
+inv{S}(a::FField{S})
+\end{lstlisting}
+
+\desc{Return the multiplicative inverse of $a$ in the finite field, i.e. 
+$a^{-1}$ such that $aa^{-1} = 1$ in the finite field.}
+
+\textbf{Examples.}
+
+Here are some examples of inversion of finite field elements.
+
+\begin{lstlisting}
+R, x = FiniteField(7, 5, "x")
+
+a = x^4 + 3x^2 + 6x + 1
+
+b = inv(a)
+b == a^-1
+\end{lstlisting}
 
 \end{document}

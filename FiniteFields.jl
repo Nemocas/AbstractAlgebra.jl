@@ -239,7 +239,10 @@ end
 ###########################################################################################
 
 function ^{S}(x::FField{S}, y::Int)
-   y < 0 && throw(DomainError())
+   if y < 0
+      x = inv(x)
+      y = -y
+   end
    z = FField{S}()
    ccall((:fq_pow_ui, :libflint), Void, 
                 (Ptr{FField{S}}, Ptr{FField{S}}, Int, Ptr{fq_ctx}), 
@@ -248,7 +251,10 @@ function ^{S}(x::FField{S}, y::Int)
 end
 
 function ^{S}(x::FField{S}, y::ZZ)
-   y < 0 && throw(DomainError())
+   if y < 0
+      x = inv(x)
+      y = -y
+   end
    z = FField{S}()
    ccall((:fq_pow, :libflint), Void, 
                 (Ptr{FField{S}}, Ptr{FField{S}}, Ptr{ZZ}, Ptr{fq_ctx}), 
