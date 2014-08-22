@@ -26,7 +26,7 @@
 
 
 import Base: convert, promote_rule, show, string, parseint, serialize, deserialize,
-             base, bin, dec, oct, hex, gcd, div
+             base, bin, dec, oct, hex, gcd, div, size
 
 export ZZ, fac, binom, isprime, fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm, invmod, 
        powmod, abs, divrem, isqrt, popcount, prevpow2, nextpow2, ndigits, dec, bin, oct, 
