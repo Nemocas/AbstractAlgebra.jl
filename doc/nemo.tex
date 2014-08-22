@@ -508,8 +508,12 @@ end
 \end{lstlisting}
 
 Now the type has two parameters. One is a type \code{R}, which is a \code{Ring}. The other, \code{S}, 
-could be a \code{Symbol} for example. But there is currently no way to restrict it to be a 
-\code{Symbol}). 
+could be a \code{Symbol} for example. 
+
+One immediate problem is that in Julia there is currently no way to restrict \code{S} to be a 
+\code{Symbol}. You could have a nonsense type like \code|mytype{ZZ, Poly}|. The code would not
+operate, since none of the code using values of type \code{mytype} seriously expects \code{S} to be
+a polynomial. It expects a symbol. 
 
 There is also a problem when we are defining methods whose signatures don't depend on that
 \code{Symbol}. It seems that Julia won't even allow that type parameter to be mentioned in that case,
@@ -534,10 +538,9 @@ Firstly, Julia should allow a type parameter \code{S} to be restricted to a \cod
 Secondly, either outer constructors should allow the type parameters for the type being constructed to 
 be mentioned, even when they don't appear elsewhere in the prototype, or additional parameters should be 
 allowed for inner constructors that aren't parameters for the type being constructed (and such inner 
-constructors should not be ignored). It's not clear how the former would work, since there are two sets 
+constructors should not be ignored). It's not clear how the latter would work, since there are two sets 
 of type parameters here, the type parameters for the type being constructed, and the type parameters for
-the arguments of the constructor. The two need to be separated somehow. The second solution might be
-more practical. 
+the arguments of the constructor. The two need to be separated somehow. 
 
 For all I know, this problem is already fixed in the latest unstable release of Julia (soon to be stable).
 The Julia authors must surely have hit this themselves, unless there's something I don't understand
@@ -558,7 +561,7 @@ Again, as far as I can tell, Julia does the right thing here. But again, it is a
 
 I don't see a simple workaround that I can be sure is efficient.
 
-\subsubsection{A real nuisance}
+\subsubsection{Division nightmare}
 
 The division functions in Julia are geared towards numerical, rather than algebraic, applications.
 
@@ -569,7 +572,8 @@ number in the direction of zero.
 
 In particular, the \code{div} operator does not perform Euclidean division for rationals as it does
 for the integers (the field of rationals is trivially a Euclidean domain). A similar observation holds
-for \code{div} over the floating point numbers.
+for \code{div} over the floating point numbers. (Actually, ironically, Julia uses Euclid's original
+definition of Euclidean division, even though that is not what happens in a Euclidean domain.)
 
 The upshot of this is that Julia needs an algebraic number stack to replace the current numeric one.
 
@@ -4282,5 +4286,70 @@ a = harmonic(12)
 b = dedekind_sum(12, 13)
 c = dedekind_sum(-120, ZZ(1305))
 \end{lstlisting}
+
+\subsection{Finite fields}
+
+We allow the construction of finite fields of any characteristic and degree in
+Nemo. When a Conway polynomial is known, the field is generated using the 
+Conway polynomial. Otherwise a random irreducible polynomial is used. 
+
+(At this stage we make no attempt to compatibly embed finite fields generated 
+using randomly chosen irreducible polynomials, such as with the 
+Bosma-Cannon-Steel construction. But this may change in a later version of 
+Nemo.) 
+
+The finite field type in Nemo is \code{FField}. The uninterested user can skip
+description of the internals of this type, as we provide functions for 
+constructing the type.
+
+As with the \code{ZZ} type, the \code{FField} type in Nemo simply represents a
+flint type. In fact, the contents are the same as an \code{fmpz_poly}, since
+fundamentally an element of a finite field is a polynomial expression.
+
+Here is the Julia definition of the \code{FField} type.
+
+\begin{lstlisting}
+type FField{S} <: Field
+   coeffs :: Ptr{Void}
+   alloc :: Int
+   length :: Int
+\end{lstlisting}
+
+The \code{FField} type is parameterised by a symbol \code{S} which holds on to
+a flint context object with information such as the polynomial used to
+generate the field, the characteristic and much more besides.
+
+There are no user serviceable parts inside, so we omit details of this 
+\code{fq_ctx} type which stores this context object.
+
+The \code{FField} type belongs to the \code{Field} typeclass, and therefore
+elements of a finite field can be passed to any function which operates on
+field or ring elements.
+
+\subsubsection{Constructors}
+
+We provide the following functions for constructing finite fields in Nemo.
+
+\begin{lstlisting}
+FiniteField(p::ZZ, deg::Int, var::String)
+FiniteField(p::Int, deg::Int, var::String)
+\end{lstlisting}
+
+\desc{Return a tuple \code{(R, x)} consisting of the type \code{R} of a finite
+field of characteristic \code{p} of degree \code{deg} and a generator \code{x}.
+Elements of the finite field \code{R} can be constructed as polynomials of
+degree less than \code{deg} in \code{x}. The generator \code{x} of the field 
+will be printed as the provided string \code{var}.
+
+If a Conway polynomial is known for the given characteristic and degree, it
+will be used to construct the field. Otherwise a random irreducible polynomial
+will be used. We make no attempt to compatibly embed finite fields in the
+latter case.
+
+The characteristic \code{p} must be prime, but we do not check this condition.
+Undefined behaviour, including the possibility of an infinite loop, may result
+otherwise. The degree \code{deg} must be nonnegative. If \code{deg} is 
+negative we throw a \code{DomainError()}.}
+
 
 \end{document}

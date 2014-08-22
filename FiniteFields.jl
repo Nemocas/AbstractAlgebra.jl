@@ -355,6 +355,7 @@ promote_rule{S}(::Type{FField{S}}, ::Type{ZZ}) = FField{S}
 ###########################################################################################
 
 function FiniteField(p::ZZ, deg::Int, var::String)
+   deg < 0 && throw(DomainError())
    S = gensym("finitefield")
    P = FField{S}
    eval(:($S = fq_ctx($p, $deg, $var)))
