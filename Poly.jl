@@ -1411,7 +1411,10 @@ function pseudodivrem{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
       setcoeff!(q, f.data.length - g.data.length, coeff(f, f.data.length - 1))
       f = f*b - coeff(f, f.data.length - 1)*g*x^(f.data.length - g.data.length)
    end
-   q.data.length = normalise(q, lenq)
+   while lenq > 0 && coeff(q, lenq - 1) == 0
+      lenq -= 1
+   end
+   q.data.length = lenq
    return q, f
 end
 

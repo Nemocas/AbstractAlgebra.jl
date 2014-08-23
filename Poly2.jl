@@ -6,11 +6,11 @@
 
 import Rings: Poly, fmpq_poly, fq_poly, coeff, isgen, truncate, mullow, divexact, gcd, 
               content, primpart, mod, divrem, evaluate, compose, deriv, resultant, bezout, 
-              integral, lcm, reverse, shift_left, shift_right
+              integral, lcm, reverse, shift_left, shift_right, setcoeff!
 
 export coeff, isgen, truncate, mullow, divexact, gcd, content, primpart, mod, divrem,
        evaluate, compose, show, deriv, resultant, bezout, integral, lcm, reverse, 
-       shift_left, shift_right
+       shift_left, shift_right, setcoeff!
 
 ###########################################################################################
 #
