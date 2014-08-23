@@ -53,13 +53,24 @@ type fmpq_poly <: Ring
    end  
 end
 
+type fq_poly <: Ring
+   coeffs :: Ptr{Void}
+   alloc :: Int
+   length :: Int
+   function fq_poly(coeffs::Ptr{Void}, alloc::Int, length::Int)
+      d = new(coeffs, alloc, length)
+      finalizer(d, _fq_poly_clear_fn)
+      return d
+   end  
+end
+
 type PolyStruct{T <: Ring}
    coeffs :: Array{T, 1}
    length :: Int
 end
 
 type Poly{T <: Ring, S} <: Ring
-   data :: Union(fmpz_poly, fmpz_mod_poly, fmpq_poly, PolyStruct{T})
+   data :: Union(fmpz_poly, fmpz_mod_poly, fmpq_poly, fq_poly, PolyStruct{T})
    
    Poly(a :: PolyStruct{T}) = new(a)   
 
@@ -68,6 +79,8 @@ type Poly{T <: Ring, S} <: Ring
    Poly(a :: fmpz_poly) = new(a)
    
    Poly(a :: fmpq_poly) = new(a)
+   
+   Poly(a :: fq_poly) = new(a)
    
    Poly() = Poly(Poly{T, S}, Array(T, 0))
    Poly(a::Integer) = a == 0 ? Poly(Poly{T, S}, Array(T, 0)) : Poly(Poly{T, S}, [T(a)])
@@ -115,6 +128,10 @@ end
    
 function _fmpq_poly_clear_fn(a :: fmpq_poly)
    ccall((:fmpq_poly_clear, :libflint), Void, (Ptr{fmpq_poly},), &a)
+end
+   
+function _fq_poly_clear_fn(a :: fq_poly)
+   ccall((:fq_poly_clear, :libflint), Void, (Ptr{fq_poly},), &a)
 end
    
 ###########################################################################################
@@ -1028,7 +1045,7 @@ function powmod{T <: Union(Residue, Field), S}(a::Poly{T, S}, b::Int, d::Poly{T,
    if a.data.length == 0
       return zero(Poly{T, S})
    elseif a.data.length == 1
-      return Poly(Poly{T, S}, [a.data.coeffs[1]^b])
+      return Poly(Poly{T, S}, [coeff(a, 0)^b])
    elseif b == 0
       return one(Poly{T, S})
    else
@@ -1123,10 +1140,10 @@ end
 =={S, M}(x::Poly{Residue{ZZ, M}, S}, y::Residue{ZZ, M}) = x == y.data
 
 =={T <: Ring, S}(x::Poly{T, S}, y::Int) = ((x.data.length == 0 && y == 0)
-                                        || (x.data.length == 1 && x.data.coeffs[1] == y))
+                                        || (x.data.length == 1 && coeff(x, 0) == y))
 
 =={T <: Ring, S}(x::Poly{T, S}, y::ZZ) = ((x.data.length == 0 && y == 0)
-                                        || (x.data.length == 1 && x.data.coeffs[1] == y))
+                                        || (x.data.length == 1 && coeff(x, 0) == y))
 
 =={S}(x::Poly{ZZ, S}, y::Poly{ZZ, S}) = ccall((:fmpz_poly_equal, :libflint), Bool, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}), &(x.data), &(y.data))
@@ -1163,7 +1180,7 @@ function divexact{T <: Ring, S}(a::Poly{T, S}, b::T)
    b == 0 && throw(DivideError())
    d = Array(T, a.data.length)
    for i = 1:a.data.length
-      d[i] = divexact(a.data.coeffs[i], b)
+      d[i] = divexact(coeff(a, i - 1), b)
    end
    z = Poly(Poly{T, S}, d)
    z.data.length = a.data.length
@@ -1174,7 +1191,7 @@ function divexact{T <: Ring, S}(a::Poly{T, S}, b::ZZ)
    b == 0 && throw(DivideError())
    d = Array(T, a.data.length)
    for i = 1:a.data.length
-      d[i] = divexact(a.data.coeffs[i], b)
+      d[i] = divexact(coeff(a, i - 1), b)
    end
    z = Poly(Poly{T, S}, d)
    z.data.length = a.data.length
@@ -1185,7 +1202,7 @@ function divexact{T <: Ring, S}(a::Poly{T, S}, b::Int)
    b == 0 && throw(DivideError())
    d = Array(T, a.data.length)
    for i = 1:a.data.length
-      d[i] = divexact(a.data.coeffs[i], b)
+      d[i] = divexact(coeff(a, i - 1), b)
    end
    z = Poly(Poly{T, S}, d)
    z.data.length = a.data.length
