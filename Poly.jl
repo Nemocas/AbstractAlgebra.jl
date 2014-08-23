@@ -231,7 +231,7 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
                end
                print(io, "*")
             end
-            if c == -1
+            if c == -1 && !show_minus_one(typeof(c))
                print(io, "-")
             end
             print(io, string(S))
