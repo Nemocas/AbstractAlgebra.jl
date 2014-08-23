@@ -6,11 +6,11 @@
 
 import Rings: Poly, fmpq_poly, fq_poly, coeff, isgen, truncate, mullow, divexact, gcd, 
               content, primpart, mod, divrem, evaluate, compose, deriv, resultant, bezout, 
-              integral, lcm, reverse, shift_left, shift_right, setcoeff!
+              integral, lcm, reverse, shift_left, shift_right, setcoeff!, mulmod, powmod
 
 export coeff, isgen, truncate, mullow, divexact, gcd, content, primpart, mod, divrem,
        evaluate, compose, show, deriv, resultant, bezout, integral, lcm, reverse, 
-       shift_left, shift_right, setcoeff!
+       shift_left, shift_right, setcoeff!, mulmod, powmod
 
 ###########################################################################################
 #
@@ -627,6 +627,39 @@ function divrem{S, T}(x::Poly{FField{T}, S}, y::Poly{FField{T}, S})
                 (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_ctx}), 
                &(q.data), &(r.data), &(x.data), &(y.data), &eval(:($T)))
    return q, r
+end
+
+###########################################################################################
+#
+#   Modular arithmetic
+#
+###########################################################################################
+
+function mulmod{S, T}(f::Poly{FField{T}, S}, g::Poly{FField{T}, S}, h::Poly{FField{T}, S})
+   h == 0 && throw(DivideError())
+   r = Poly{FField{T}, S}()
+   ccall((:fq_poly_mulmod, :libflint), Void, 
+                (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_ctx}), 
+               &(r.data), &(f.data), &(g.data), &(h.data), &eval(:($T)))
+   return r
+end
+
+function powmod{S, T}(f::Poly{FField{T}, S}, n::Int, h::Poly{FField{T}, S})
+   h == 0 && throw(DivideError())
+   r = Poly{FField{T}, S}()
+   ccall((:fq_poly_powmod_ui_binexp, :libflint), Void, 
+                (Ptr{fq_poly}, Ptr{fq_poly}, Int, Ptr{fq_poly}, Ptr{fq_ctx}), 
+               &(r.data), &(f.data), n, &(h.data), &eval(:($T)))
+   return r
+end
+
+function powmod{S, T}(f::Poly{FField{T}, S}, n::ZZ, h::Poly{FField{T}, S})
+   h == 0 && throw(DivideError())
+   r = Poly{FField{T}, S}()
+   ccall((:fq_poly_powmod_fmpz_binexp, :libflint), Void, 
+                (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{ZZ}, Ptr{fq_poly}, Ptr{fq_ctx}), 
+               &(r.data), &(f.data), &n, &(h.data), &eval(:($T)))
+   return r
 end
 
 ###########################################################################################
