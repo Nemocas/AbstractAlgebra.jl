@@ -40,6 +40,7 @@ isless(a::Nothing, b::Nothing) = false
 
 +(a::Nothing, b::Nothing) = nothing
 
+-(a::Nothing, b::Int) = nothing
 
 type PowerSeries{T <: Ring, S} <: Ring
    data :: Union(fmpz_poly, fmpz_mod_poly, fmpq_poly, fq_poly, PolyStruct{T})
@@ -446,6 +447,38 @@ end
 *{T <: Ring, S}(a::Poly{T, S}, b::Int) = b*a
 
 *{T <: Ring, S}(a::Poly{T, S}, b::ZZ) = b*a
+
+###########################################################################################
+#
+#   Shifting
+#
+###########################################################################################
+
+function shift_left{T <: Ring, S}(x::PowerSeries{T, S}, len::Int)
+   len < 0 && throw(DomainError())
+   xlen = x.data.length
+   v = Array(T, xlen + len)
+   for i = 1:len
+      v[i] = zero(T)
+   end
+   for i = 1:xlen
+      v[i + len] = coeff(x, i - 1)
+   end
+   return PowerSeries(PowerSeries{T, S}, v, x.prec + len)
+end
+
+function shift_right{T <: Ring, S}(x::PowerSeries{T, S}, len::Int)
+   len < 0 && throw(DomainError())
+   xlen = x.data.length
+   if len >= xlen
+      return PowerSeries(PowerSeries{T, S}, Array(T, 0), max(0, x.prec - len))
+   end
+   v = Array(T, xlen - len)
+   for i = 1:xlen - len
+      v[i] = coeff(x, i + len - 1)
+   end
+   return PowerSeries(PowerSeries{T, S}, v, x.prec - len)
+end
 
 ###########################################################################################
 #

@@ -231,6 +231,8 @@ end
 
 needs_parentheses{T <: Ring}(x::Fraction{T}) = x.data.den == 1 && needs_parentheses(x.data.num)
 
+needs_parentheses(x::Fraction{ZZ}) = false
+
 is_negative{T <: Ring}(x::Fraction{T}) = !needs_parentheses(x.data.num) && is_negative(x.data.num)
 
 is_negative(x::Fraction{ZZ}) = x < 0
