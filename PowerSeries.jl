@@ -74,7 +74,8 @@ end
 
 function O{T, S}(a :: PowerSeries{T, S})
    prec = a.data.length - 1
-   prec < 0 && error("Power series must have nonnegative precision")
+   prec < 0 && throw(DivideError())
+   a.prec != nothing && error("Invalid power series monomial in O()")
    return PowerSeries(PowerSeries{T, S}, Array(T, 0), prec)
 end
 
