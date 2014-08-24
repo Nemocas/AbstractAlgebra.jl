@@ -619,7 +619,11 @@ end
 ###########################################################################################
 
 function inv{T<: Ring, S}(x::PowerSeries{T, S})
-   (!isunit(x) || x.prec == nothing) && error("Unable to invert power series")
+   !isunit(x) && error("Unable to invert infinite precision power series")
+   if x.prec == nothing
+      x.data.length != 1 && error("Unable to invert infinite precision power series")
+      return PowerSeries(PowerSeries{T, S}, [divexact(T(1), coeff(x, 0))], nothing)
+   end
    d = Array(T, x.prec)
    c = coeff(x, 0)
    r = PowerSeries(PowerSeries{T, S}, [one(T)], x.prec)
