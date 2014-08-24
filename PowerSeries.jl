@@ -608,6 +608,15 @@ end
 ###########################################################################################
 
 function divexact{T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
+   y == 0 && throw(DivideError())
+   v2 = valuation(PowerSeries{T, S}, y)
+   if v2 != 0
+      v1 = valuation(PowerSeries{T, S}, x)
+      if v1 >= v2
+         x = shift_right(x, v2)
+         y = shift_right(y, v2)
+      end
+   end
    y = truncate(y, x.prec)
    return x*inv(y)
 end
@@ -619,7 +628,8 @@ end
 ###########################################################################################
 
 function inv{T<: Ring, S}(x::PowerSeries{T, S})
-   !isunit(x) && error("Unable to invert infinite precision power series")
+   x == 0 && throw(DivideError())
+   !isunit(x) && error("Unable to invert power series")
    if x.prec == nothing
       x.data.length != 1 && error("Unable to invert infinite precision power series")
       return PowerSeries(PowerSeries{T, S}, [divexact(T(1), coeff(x, 0))], nothing)
