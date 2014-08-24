@@ -484,6 +484,29 @@ end
 
 ###########################################################################################
 #
+#   Truncation
+#
+###########################################################################################
+
+function truncate{T<: Ring, S}(x::PowerSeries{T, S}, prec::Precision)
+   prec < 0 && throw(DomainError())
+   if x.prec <= prec
+      return x
+   end
+   d = Array(T, prec)
+   for i = 1:min(prec, x.data.length)
+      d[i] = coeff(x, i - 1)
+   end
+   for i = x.data.length + 1:prec
+      d[i] = zero(T)
+   end
+   r = PowerSeries(PowerSeries{T, S}, d, prec)
+   r.data.length = normalise(r, prec)
+   return r
+end
+
+###########################################################################################
+#
 #   Powering
 #
 ###########################################################################################
@@ -577,6 +600,38 @@ end
 =={T<: Ring, S}(x::Int, y::PowerSeries{T, S}) = y == x
 
 =={T<: Ring, S}(x::ZZ, y::PowerSeries{T, S}) = y == x
+
+###########################################################################################
+#
+#   Exact division
+#
+###########################################################################################
+
+function divexact{T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
+   y = truncate(y, x.prec)
+   return x*inv(y)
+end
+
+###########################################################################################
+#
+#   Inversion
+#
+###########################################################################################
+
+function inv{T<: Ring, S}(x::PowerSeries{T, S})
+   (!isunit(x) || x.prec == nothing) && error("Unable to invert power series")
+   d = Array(T, x.prec)
+   c = coeff(x, 0)
+   r = PowerSeries(PowerSeries{T, S}, [one(T)], x.prec)
+   for i = 1:x.prec
+      q = divexact(coeff(r, i - 1), c)
+      d[i] = q
+      r -= q*shift_left(x, i - 1)
+   end
+   xinv = PowerSeries(PowerSeries{T, S}, d, x.prec)
+   xinv.data.length = normalise(xinv, x.prec)
+   return xinv
+end
 
 ###########################################################################################
 #
