@@ -57,16 +57,6 @@ typealias QQ Fraction{ZZ}
 #
 ###########################################################################################
 
-function /(x::Int, y::Int) 
-   y == 0 && throw(DivideError())
-   g = gcd(x, y)
-   if y < 0
-      Fraction{ZZ}(divexact(ZZ(-x), ZZ(g)), divexact(ZZ(-y), ZZ(g)))
-   else
-      Fraction{ZZ}(divexact(ZZ(x), ZZ(g)), divexact(ZZ(y), ZZ(g)))
-   end
-end
-
 function /(x::ZZ, y::ZZ) 
    y == 0 && throw(DivideError())
    g = gcd(x, y)

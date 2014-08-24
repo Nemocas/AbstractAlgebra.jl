@@ -669,8 +669,9 @@ value when passed two integer operands. The double forward slash results in a ra
 is opposite to the convention algebraists would wish for, and illustrates the numeric bent of Julia's
 designers. 
 
-We advise not ever using the \code{/} operator in Nemo, but always using \code{div}. This will not
-result in mathematical theorems being false. See the section above complaining about this. 
+We advise not ever using the \code{/} operator with core Julia types in Nemo, but always using 
+\code{div}. This will not result in mathematical theorems being false. See the section above 
+complaining about this. 
 
 The \code{div} operator provides integer division. Unfortunately it uses the C convention of rounding
 towards zero, instead of the floor division one would hope for as an algebraist. This is tolerable of
@@ -3598,13 +3599,6 @@ s = (x + 1)/(x^2 + 1)
 then the value $s$ belongs to the fraction field of $R$ automatically, even
 though this field has not been constructed yet.
 
-Currently, before \code{Fields} is imported, the default Julia behaviour of
-\code{/} when passed values of type \code{Int} is to perform floating point
-division (this will be changed in a later version of Nemo). However, after 
-\code{Fields} has been imported, we override this so that it constructs an
-element of the fraction field of \code{ZZ}, e.g. \code{1/2} yields a 
-multiprecision fraction, not a floating point value.
-
 The \code{/} operator doubles as a division operator when passed operands
 in a fraction field.
 
@@ -3663,7 +3657,6 @@ without needing to first construct the type of the fraction field. We use
 the division operator.
 
 \begin{lstlisting}
-/(x::Int, y::Int)
 /(x::ZZ, y::ZZ)
 \end{lstlisting}
 
@@ -3701,7 +3694,6 @@ d = T(x + 2)
 f = T(d)
 g = T()
 
-h = 2/3
 k = ZZ(5)/ZZ(7)
 m = (x + 3)/(x^2 + 2)
 \end{lstlisting}
@@ -3754,7 +3746,7 @@ Here are some examples of basic manipulations for fraction fields.
 R = FractionField(ZZ)
 S, x = PolynomialRing(ZZ, "x")
 
-a = num(4/6)
+a = num(ZZ(4)/ZZ(6))
 b = den((x + 1)/(-x^2 + 1))
 
 c = zero(R)
@@ -3778,7 +3770,7 @@ Here are some examples of unary operators.
 \begin{lstlisting}
 S, x = PolynomialRing(ZZ, "x")
 
-a = -(4/6)
+a = -(ZZ(4)/ZZ(6))
 b = -((x + 1)/(-x^2 + 1))
 \end{lstlisting}
 
@@ -3798,10 +3790,10 @@ Here are some examples of comparisons.
 \begin{lstlisting}
 S, x = PolynomialRing(ZZ, "x")
 
-a = -(4/6)
+a = -(ZZ(4)/ZZ(6))
 b = -((x + 1)/(-x^2 + 1))
 
-a == -2/3
+a == -ZZ(2)/ZZ(3)
 b == 1/(x - 1)
 \end{lstlisting}
 
@@ -3850,8 +3842,8 @@ S, x = PolynomialRing(ZZ, "x")
 a = 1/(x - 1)
 
 1/a == x - 1
-4/2 == 2
-ZZ(3) == 6/2
+ZZ(4)/ZZ(2) == 2
+ZZ(3) == ZZ(6)/ZZ(2)
 1 == one(S)
 \end{lstlisting}
 
@@ -3906,9 +3898,9 @@ Here are some examples of binary operators and functions.
 \begin{lstlisting}
 S, x = PolynomialRing(ZZ, "x")
 
-a = -2/3 + 3/7
+a = -ZZ(2)/ZZ(3) + ZZ(3)/ZZ(7)
 b = (x + 1)/(-x^2 + 1) - x/(2x + 1)
-c = (5/3)*(7/2)
+c = (ZZ(5)/ZZ(3))*(ZZ(7)/ZZ(2))
 d = a/c
 f = gcd(b, (x + 1)/(x - 1))
 \end{lstlisting}
@@ -3989,7 +3981,7 @@ Here are some examples of ad hoc binary operators.
 \begin{lstlisting}
 S, x = PolynomialRing(ZZ, "x")
 
-a = -2/3
+a = -ZZ(2)/ZZ(3)
 b = (x + 1)/(-x^2 + 1)
 
 c = a + 2
@@ -4015,7 +4007,7 @@ Here are some examples of powering.
 \begin{lstlisting}
 S, x = PolynomialRing(ZZ, "x")
 
-a = -2/3
+a = -ZZ(2)/ZZ(3)
 b = (x + 1)/(-x^2 + 1)
 
 c = a^12
@@ -4037,7 +4029,7 @@ Here are some examples of inversion.
 \begin{lstlisting}
 S, x = PolynomialRing(ZZ, "x")
 
-a = -2/3
+a = -ZZ(2)/ZZ(3)
 b = (x + 1)/(-x^2 + 1)
 
 c = inv(a)
@@ -4054,7 +4046,7 @@ a = QQ(2)
 
 R, x = PolynomialRing(QQ, "x")
 
-f = 3/2*x + 1/2
+f = ZZ(3)/ZZ(2)*x + ZZ(1)/ZZ(2)
 \end{lstlisting}
 
 The \code{QQ} type supports all of the functionality of the previous section. In
@@ -4083,8 +4075,8 @@ the return value is an \code{Int}.}
 Here are some examples of basic manipulation.
 
 \begin{lstlisting}
-a = -2/3
-b = 123/234
+a = -ZZ(2)/ZZ(3)
+b = ZZ(123)/ZZ(234)
 
 c = height(a)
 d = height_bits(b)
@@ -4111,8 +4103,8 @@ automatically provides corresponding functions \code{>}, \code{<=} and
 Here are some examples of comparison.
 
 \begin{lstlisting}
-a = -2/3
-b = 1/2
+a = -ZZ(2)/ZZ(3)
+b = ZZ(1)/ZZ(2)
 
 a < b
 b >= a
@@ -4139,8 +4131,8 @@ automatically provides corresponding functions \code{>}, \code{<=} and
 Here are some examples of ad hoc comparison.
 
 \begin{lstlisting}
-a = -2/3
-b = 1/2
+a = -ZZ(2)/ZZ(3)
+b = ZZ(1)/ZZ(2)
 
 a < 1
 a <= 0
@@ -4166,8 +4158,8 @@ b >= ZZ(0)
 Here are some examples of ad hoc binary operators.
 
 \begin{lstlisting}
-a = -2/3
-b = 1/2
+a = -ZZ(2)/ZZ(3)
+b = ZZ(1)/ZZ(2)
 
 c = a << 3
 d = b >> 5
@@ -4188,8 +4180,8 @@ defined if $q$ is invertible modulo $m$. The result is returned as a \code{ZZ}.}
 Here are some examples of modular arithmetic.
 
 \begin{lstlisting}
-a = -2/3
-b = 1/2
+a = -ZZ(2)/ZZ(3)
+b = ZZ(1)/ZZ(2)
 
 c = mod(a, 7)
 d = mod(b, ZZ(5))
@@ -4285,10 +4277,10 @@ but not in order of minimal height.}
 Here are some examples of rational enumeration.
 
 \begin{lstlisting}
-next_minimal(2/3)
-next_signed_minimal(-21/31)
-next_calkin_wilf(321/113)
-next_signed_calkin_wilf(-51/17)
+next_minimal(ZZ(2)/ZZ(3))
+next_signed_minimal(-ZZ(21)/ZZ(31))
+next_calkin_wilf(ZZ(321)/ZZ(113))
+next_signed_calkin_wilf(-ZZ(51)/ZZ(17))
 \end{lstlisting}
 
 \subsubsection{Special functions}
