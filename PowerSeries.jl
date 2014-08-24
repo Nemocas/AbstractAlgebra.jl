@@ -4,7 +4,9 @@
 #
 ###########################################################################################    
 
-export PowerSeries, PowerSeriesRing, O
+export PowerSeries, PowerSeriesRing, O, valuation, min, max, isless
+
+import Base: min, max, isless
 
 ###########################################################################################
 #
@@ -12,19 +14,46 @@ export PowerSeries, PowerSeriesRing, O
 #
 ###########################################################################################
 
+typealias Precision Union(Nothing, Int)
+
+max(a::Nothing, b::Int) = nothing
+
+max(a::Int, b::Nothing) = nothing
+
+max(a::Nothing, b::Nothing) = nothing
+
+min(a::Nothing, b::Int) = b
+
+min(a::Int, b::Nothing) = a
+
+min(a::Nothing, b::Nothing) = nothing
+
+isless(a::Nothing, b::Int) = false
+
+isless(a::Int, b::Nothing) = true
+
+isless(a::Nothing, b::Nothing) = false
+
++(a::Nothing, b::Int) = nothing
+
++(a::Int, b::Nothing) = nothing
+
++(a::Nothing, b::Nothing) = nothing
+
+
 type PowerSeries{T <: Ring, S} <: Ring
    data :: Union(fmpz_poly, fmpz_mod_poly, fmpq_poly, fq_poly, PolyStruct{T})
-   prec :: Union(Nothing, Int)
+   prec :: Precision
 
-   PowerSeries(a :: PolyStruct{T}, n :: Union(Nothing, Int)) = new(a, n)   
+   PowerSeries(a :: PolyStruct{T}, n :: Precision) = new(a, n)   
 
-   PowerSeries(a::fmpz_mod_poly, n :: Union(Nothing, Int)) = new(a, n)
+   PowerSeries(a::fmpz_mod_poly, n :: Precision) = new(a, n)
    
-   PowerSeries(a :: fmpz_poly, n :: Union(Nothing, Int)) = new(a, n)
+   PowerSeries(a :: fmpz_poly, n :: Precision) = new(a, n)
    
-   PowerSeries(a :: fmpq_poly, n :: Union(Nothing, Int)) = new(a, n)
+   PowerSeries(a :: fmpq_poly, n :: Precision) = new(a, n)
    
-   PowerSeries(a :: fq_poly, n :: Union(Nothing, Int)) = new(a, n)
+   PowerSeries(a :: fq_poly, n :: Precision) = new(a, n)
    
    PowerSeries() = PowerSeries(PowerSeries{T, S}, Array(T, 0), nothing)
    
@@ -34,7 +63,7 @@ type PowerSeries{T <: Ring, S} <: Ring
    PowerSeries{R <: Ring}(a::R) = convert(PowerSeries{T, S}, a)
 end
 
-function PowerSeries{T, S}(::Type{PowerSeries{T, S}}, a :: Array{T, 1}, n :: Union(Nothing, Int))
+function PowerSeries{T, S}(::Type{PowerSeries{T, S}}, a :: Array{T, 1}, n :: Precision)
    len = length(a)
    d = PolyStruct(a, len)
    z = PowerSeries{T, S}(d, n)
@@ -71,6 +100,18 @@ zero{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries{T, S}(0)
 one{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries{T, S}(1)
 
 gen{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries(PowerSeries{T, S}, [T(0), T(1)], nothing)
+
+function valuation{T <: Ring, S}(::Type{PowerSeries{T, S}}, a::PowerSeries{T, S})
+   if a.data.length == 0
+      return a.prec
+   end
+   for i = 1:a.data.length
+      if a.data.coeffs[i] != 0
+         return i - 1
+      end
+   end
+   error("Power series is not normalised")
+end
 
 ###########################################################################################
 #
@@ -169,17 +210,12 @@ end
 function +{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
    lena = a.data.length
    lenb = b.data.length
-   if a.prec == nothing
-      prec = b.prec
-   elseif b.prec == nothing
-      prec = a.prec
-   else
-      prec = min(a.prec, b.prec)
-   end
-   if prec != nothing
-      lena = min(lena, prec)
-      lenb = min(lenb, prec)
-   end
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
    lenz = max(lena, lenb)
    d = Array(T, lenz)
    i = 1
@@ -209,17 +245,12 @@ end
 function -{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
    lena = a.data.length
    lenb = b.data.length
-   if a.prec == nothing
-      prec = b.prec
-   elseif b.prec == nothing
-      prec = a.prec
-   else
-      prec = min(a.prec, b.prec)
-   end
-   if prec != nothing
-      lena = min(lena, prec)
-      lenb = min(lenb, prec)
-   end
+   
+   prec = min(a.prec, b.prec)
+   
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   
    lenz = max(lena, lenb)
    d = Array(T, lenz)
    i = 1
@@ -249,20 +280,17 @@ end
 function *{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
    lena = a.data.length
    lenb = b.data.length
-   if a.prec == nothing
-      prec = b.prec
-   elseif b.prec == nothing
-      prec = a.prec
-   else
-      prec = min(a.prec, b.prec)
-   end
-   if prec != nothing
-      lena = min(lena, prec)
-      lenb = min(lenb, prec)
-   end
+   
+   aval = valuation(PowerSeries{T, S}, a)
+   bval = valuation(PowerSeries{T, S}, b)
 
+   prec = min(a.prec + bval, b.prec + aval)
+   
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   
    if lena == 0 || lenb == 0
-      return PowerSeries(PowerSeries{T, S}, [], prec)
+      return PowerSeries(PowerSeries{T, S}, Array(T, 0), prec)
    end
 
    t = T()
@@ -329,18 +357,14 @@ function mul!{T <: Ring, S}(c::PowerSeries{T, S}, a::PowerSeries{T, S}, b::Power
    lena = a.data.length
    lenb = b.data.length
 
-   if a.prec == nothing
-      prec = b.prec
-   elseif b.prec == nothing
-      prec = a.prec
-   else
-      prec = min(a.prec, b.prec)
-   end
-   if prec != nothing
-      lena = min(lena, prec)
-      lenb = min(lenb, prec)
-   end
+   aval = valuation(PowerSeries{T, S}, a)
+   bval = valuation(PowerSeries{T, S}, b)
 
+   prec = min(a.prec + bval, b.prec + aval)
+   
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   
    if lena == 0 || lenb == 0
       c.data.length = 0
    else
@@ -376,17 +400,12 @@ end
 function addeq!{T <: Ring, S}(c::PowerSeries{T, S}, a::PowerSeries{T, S})
    lenc = c.data.length
    lena = a.data.length
-   if a.prec == nothing
-      prec = c.prec
-   elseif c.prec == nothing
-      prec = a.prec
-   else
-      prec = min(a.prec, c.prec)
-   end
-   if prec != nothing
-      lena = min(lena, prec)
-      lenc = min(lenc, prec)
-   end
+   
+   prec = min(a.prec, c.prec)
+   
+   lena = min(lena, prec)
+   lenc = min(lenc, prec)
+
    len = max(lenc, lena)
    fit!(c, len)
    for i = 1:lena
@@ -447,11 +466,11 @@ function ^{T <: Ring, S}(a::PowerSeries{T, S}, b::Int)
       z.data.length = b + 1
       return z
    elseif a.data.length == 0
-      return PowerSeries(PowerSeries{T, S}, [], a.prec)
+      return PowerSeries(PowerSeries{T, S}, Array(T, 0), a.prec)
    elseif a.data.length == 1
       return PowerSeries(PowerSeries{T, S}, [a.data.coeffs[1]^b], a.prec)
    elseif b == 0
-      return PowerSeries(PowerSeries{T, S}, [T(1)], a.prec)
+      return PowerSeries(PowerSeries{T, S}, [T(1)], nothing)
    else
       bit = ~((~uint(0)) >> 1)
       while (int(bit) & b) == 0
@@ -469,7 +488,60 @@ function ^{T <: Ring, S}(a::PowerSeries{T, S}, b::Int)
       return z
    end
 end
-   
+
+###########################################################################################
+#
+#   Comparisons
+#
+###########################################################################################
+
+=={T <: Ring, S}(x::PowerSeries{T, S}, y::Int) = x.prec == 0 || ((x.data.length == 0 && y == 0)
+                                        || (x.data.length == 1 && coeff(x, 0) == y))
+
+=={T <: Ring, S}(x::PowerSeries{T, S}, y::ZZ) = x.prec == 0 || ((x.data.length == 0 && y == 0)
+                                        || (x.data.length == 1 && coeff(x, 0) == y))
+
+function =={T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
+   if x.prec == nothing
+      prec = y.prec
+   elseif y.prec == nothing
+      prec = x.nothing
+   else
+      prec = min(x.prec, y.prec)
+   end
+   m1 = min(x.data.length, y.data.length)
+   m2 = max(x.data.length, y.data.length)
+   if prec == nothing
+      prec = max(m1, m2)
+   end
+   m1 = min(m1, prec)
+   m2 = min(m2, prec)
+   if x.data.length >= m2
+      for i = m1 + 1: m2
+         if x.data.coeffs[i] != 0
+            return false
+          end
+      end
+   else
+      for i = m1 + 1: m2
+         if y.data.coeffs[i] != 0
+            return false
+          end
+      end
+   end
+           
+   for i = 1:m1
+      if x.data.coeffs[i] != y.data.coeffs[i]
+         return false
+      end
+   end
+
+   return true
+end
+
+=={T<: Ring, S}(x::Int, y::PowerSeries{T, S}) = y == x
+
+=={T<: Ring, S}(x::ZZ, y::PowerSeries{T, S}) = y == x
 
 ###########################################################################################
 #
