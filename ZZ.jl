@@ -35,7 +35,7 @@ export ZZ, fac, binom, isprime, fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm,
        crt, divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2, gcdinv, isprobabprime,
        issquare, jacobi, remove, root, size, isqrtrem, sqrtmod, trailing_zeros, sigma,
        eulerphi, fib, moebiusmu, primorial, risingfac, canonical_unit, needs_parentheses,
-       is_negative, show_minus_one, parseint, addeq!, mul!
+       is_negative, show_minus_one, parseint, addeq!, mul!, isunit
 
 ###########################################################################################
 #
@@ -176,6 +176,8 @@ fits(::Type{Int}, a::ZZ) = ccall((:fmpz_fits_si, :libflint), Bool, (Ptr{ZZ},), &
 fits(::Type{Uint}, a::ZZ) = sign(a) < 0 ? false : ccall((:fmpz_abs_fits_ui, :libflint), Bool, (Ptr{ZZ},), &a)
 
 size(a::ZZ) = int(ccall((:fmpz_size, :libflint), Cint, (Ptr{ZZ},), &a))
+
+isunit(a::ZZ) = bool(ccall((:fmpz_is_pm1, :libflint), Cint, (Ptr{ZZ},), &a))
 
 ###########################################################################################
 #

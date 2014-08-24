@@ -90,6 +90,8 @@ function gen{S}(::Type{FField{S}})
    return d
 end
 
+isunit{S}(a::FField{S}) = bool(ccall((:fq_is_invertible, :libflint), Cint, (Ptr{FField{S}}, Ptr{fq_ctx}), &a, &eval(:($S))))
+
 function characteristic{S}(::Type{FField{S}})
    d = ZZ()
    ccall((:__fq_ctx_prime, :libflint), Void, (Ptr{ZZ}, Ptr{fq_ctx}), &d, &eval(:($S)))
@@ -295,6 +297,7 @@ end
 ###########################################################################################
 
 function inv{S}(x::FField{S})
+   x == 0 && throw(DivideError())
    z = FField{S}()
    ccall((:fq_inv, :libflint), Void, 
                 (Ptr{FField{S}}, Ptr{FField{S}}, Ptr{fq_ctx}), 

@@ -176,6 +176,8 @@ one{T <: Ring, S}(::Type{Poly{T, S}}) = Poly{T, S}(1)
 
 gen{T <: Ring, S}(::Type{Poly{T, S}}) = Poly(Poly{T, S}, [T(0), T(1)])
 
+isunit{T <: Ring, S}(a::Poly{T, S}) = a.data.length == 1 && isunit(coeff(a, 0))
+
 ###########################################################################################
 #
 #   String I/O

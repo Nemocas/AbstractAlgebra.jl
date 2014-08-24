@@ -102,6 +102,8 @@ one{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries{T, S}(1)
 
 gen{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries(PowerSeries{T, S}, [T(0), T(1)], nothing)
 
+isunit{T <: Ring, S}(a::PowerSeries{T, S}) = isunit(coeff(a, 0))
+
 function valuation{T <: Ring, S}(::Type{PowerSeries{T, S}}, a::PowerSeries{T, S})
    if a.data.length == 0
       return a.prec

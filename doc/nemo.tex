@@ -1250,6 +1250,12 @@ canonical_unit(a::ZZ)
 \desc{This is used for canonicalising fractions. The function simply returns $-1$
 if $a < 0$, otherwise it returns $1$.}
 
+\begin{lstlisting}
+isunit(a::ZZ)
+\end{lstlisting}
+
+\desc{Return \code{true} if $a = 1$ or $a = -1$, otherwise return \code{false}.}
+
 \textbf{Examples.}
 
 Here are some examples of the above basic manipulations.
@@ -1269,6 +1275,8 @@ end
 s = size(a)
 
 t = canonical_unit(ZZ(-12))
+
+u = isunit(ZZ(-1))
 \end{lstlisting}
 
 \subsubsection{Binary operators and functions}
@@ -2155,6 +2163,13 @@ isgen{T <: Ring, S}(a::Poly{T, S})
 polynomial ring, otherwise return \code{false}.}
 
 \begin{lstlisting}
+isunit{T <: Ring, S}(a::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return \code{true} if the polynomial $a$ is invertible, i.e. is of length
+$1$ and has invertible constant coefficient, otherwise return \code{false}.}
+
+\begin{lstlisting}
 zero{T <: Ring, S}(::Type{Poly{T, S}})
 \end{lstlisting}
 
@@ -2190,6 +2205,7 @@ S, y = PolynomialRing(R, "y")
 a = zero(R)
 b = one(S)
 c = gen(S)
+d = isunit(b)
 
 f = x^2 + 2x + 1
 g = lead(f)
@@ -3153,6 +3169,13 @@ one{T <: Ring, S}(::Type{Residue{T, S}})
 \desc{Return the multiplicative identity of the given residue ring.}
 
 \begin{lstlisting}
+isunit{T <: Ring, S}(a::Residue{T, S})
+\end{lstlisting}
+
+\desc{Return \code{true} if the residue $a$ is invertible in the residue ring,
+otherwise return \code{false}.}
+
+\begin{lstlisting}
 canonical_unit{T <: Ring, S}(a::Residue{T, S})
 \end{lstlisting}
 
@@ -3174,8 +3197,10 @@ T = ResidueRing(S, x^3 + 3x + 1)
 
 h = one(T)
 
-k = canonical_unit(R(11))
-m = canonical_unit(T(x + 1))
+k = isunit(h)
+
+m = canonical_unit(R(11))
+n = canonical_unit(T(x + 1))
 \end{lstlisting}
 
 \subsubsection{Unary operations}
@@ -3709,6 +3734,13 @@ one{T <: Ring}(::Type{Fraction{T}})
 $T$.}
 
 \begin{lstlisting}
+isunit{T <: Ring}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the fraction $a$ is invertible, i.e. is not zero,
+otherwise return \code{false}.}
+
+\begin{lstlisting}
 canonical_unit{T}(a::Fraction{T})
 \end{lstlisting}
 
@@ -3716,7 +3748,7 @@ canonical_unit{T}(a::Fraction{T})
 
 \textbf{Examples.}
 
-Here are some examples of constructors for fraction fields.
+Here are some examples of basic manipulations for fraction fields.
 
 \begin{lstlisting}
 R = FractionField(ZZ)
@@ -3728,6 +3760,7 @@ b = den((x + 1)/(-x^2 + 1))
 c = zero(R)
 d = one(S)
 f = canonical_unit((x + 1)/(-x^2 + 1))
+g = isunit((x + 1)/(-x^2 + 1))
 \end{lstlisting}
 
 \subsubsection{Unary operators}
@@ -4410,6 +4443,13 @@ polynomial of the field. The generator may not be a multiplicative
 generator.}
 
 \begin{lstlisting}
+isunit{S}(a::FField{S})
+\end{lstlisting}
+
+\desc{Return \code{true} if the element $a$ is invertible in the finite field,
+i.e. if it is not zero, otherwise return \code{false}.}
+
+\begin{lstlisting}
 characteristic{S}(::Type{FField{S}})
 \end{lstlisting}
 
@@ -4444,6 +4484,7 @@ c = gen(R)
 d = characteristic(R)
 f = order(R)
 g = degree(R)
+isunit(x + 1)
 \end{lstlisting}
 
 \subsubsection{Unary operators}

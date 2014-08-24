@@ -31,6 +31,11 @@ zero{T <: Ring, S}(::Type{Residue{T, S}}) = Residue{T, S}(0)
 
 one{T <: Ring, S}(::Type{Residue{T, S}}) = Residue{T, S}(1)
 
+function isunit{T <: Ring, S}(a::Residue{T, S})
+   g, ainv = gcdinv(a.data, eval(:($S)))
+   return g == 1
+end
+
 ###########################################################################################
 #
 #   Unary operations
