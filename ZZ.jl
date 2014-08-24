@@ -35,7 +35,7 @@ export ZZ, fac, binom, isprime, fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm,
        crt, divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2, gcdinv, isprobabprime,
        issquare, jacobi, remove, root, size, isqrtrem, sqrtmod, trailing_zeros, sigma,
        eulerphi, fib, moebiusmu, primorial, risingfac, canonical_unit, needs_parentheses,
-       is_negative, show_minus_one, parseint
+       is_negative, show_minus_one, parseint, addeq!, mul!
 
 ###########################################################################################
 #
@@ -351,6 +351,20 @@ function %(x::ZZ, c::ZZ)
 end
 
 rem(x::ZZ, c::ZZ) = %(x, c)
+
+###########################################################################################
+#
+#   Unsafe operators
+#
+###########################################################################################
+
+function mul!(z::ZZ, x::ZZ, y::ZZ)
+   ccall((:fmpz_mul, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &x, &y)
+end
+
+function addeq!(z::ZZ, x::ZZ)
+   ccall((:fmpz_add, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Ptr{ZZ}), &z, &z, &x)
+end
 
 ###########################################################################################
 #

@@ -147,4 +147,6 @@ include("Residue.jl")
 
 include("Poly.jl")
 
+include("PowerSeries.jl")
+
 end # module
