@@ -621,24 +621,29 @@ end
 #
 ###########################################################################################
 
-function inv{T<: Ring, S}(x::PowerSeries{T, S})
-   x == 0 && throw(DivideError())
-   !isunit(x) && error("Unable to invert power series")
-   if x.prec == nothing
-      x.data.length != 1 && error("Unable to invert infinite precision power series")
-      return PowerSeries(PowerSeries{T, S}, [divexact(T(1), coeff(x, 0))], nothing)
+function inv{T<: Ring, S}(a::PowerSeries{T, S})
+   a == 0 && throw(DivideError())
+   !isunit(a) && error("Unable to invert power series")
+   a1 = coeff(a, 0)
+   if a.prec == nothing
+      a.data.length != 1 && error("Unable to invert infinite precision power series")
+      return PowerSeries(PowerSeries{T, S}, [divexact(T(1), a1)], nothing)
    end
-   d = Array(T, x.prec)
-   c = coeff(x, 0)
-   r = PowerSeries(PowerSeries{T, S}, [one(T)], x.prec)
-   for i = 1:x.prec
-      q = divexact(coeff(r, i - 1), c)
-      d[i] = q
-      r -= q*shift_left(x, i - 1)
+   d = Array(T, a.prec)
+   if a.prec != 0
+      d[1] = divexact(T(1), a1)
    end
-   xinv = PowerSeries(PowerSeries{T, S}, d, x.prec)
-   xinv.data.length = normalise(xinv, x.prec)
-   return xinv
+   a1 = -a1
+   for n = 2:a.prec
+      s = coeff(a, 1)*d[n - 1]
+      for i = 2:n - 1
+         s += coeff(a, i)*d[n - i]
+      end
+      d[n] = divexact(s, a1)
+   end
+   ainv = PowerSeries(PowerSeries{T, S}, d, a.prec)
+   ainv.data.length = normalise(ainv, a.prec)
+   return ainv
 end
 
 ###########################################################################################
