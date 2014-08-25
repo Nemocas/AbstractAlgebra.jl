@@ -447,22 +447,9 @@ function *{T <: Ring, S}(a::ZZ, b::PowerSeries{T, S})
    return z
 end
 
-function *{T <: Ring, S}(a::T, b::PowerSeries{T, S})
-   len = b.data.length
-   d = Array(T, len)
-   for i = 1:len
-      d[i] = a*coeff(b, i - 1)
-   end
-   z = PowerSeries(PowerSeries{T, S}, d, b.prec)
-   z.data.length = normalise(z, len)
-   return z
-end
-
 *{T <: Ring, S}(a::PowerSeries{T, S}, b::Int) = b*a
 
 *{T <: Ring, S}(a::PowerSeries{T, S}, b::ZZ) = b*a
-
-*{T <: Ring, S}(a::PowerSeries{T, S}, b::T) = b*a
 
 ###########################################################################################
 #
@@ -573,9 +560,6 @@ end
 =={T <: Ring, S}(x::PowerSeries{T, S}, y::ZZ) = x.prec == 0 || ((x.data.length == 0 && y == 0)
                                         || (x.data.length == 1 && coeff(x, 0) == y))
 
-=={T <: Ring, S}(x::PowerSeries{T, S}, y::T) = x.prec == 0 || ((x.data.length == 0 && y == 0)
-                                        || (x.data.length == 1 && coeff(x, 0) == y))
-
 function =={T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
    prec = min(x.prec, y.prec)
    
@@ -610,8 +594,6 @@ end
 =={T<: Ring, S}(x::Int, y::PowerSeries{T, S}) = y == x
 
 =={T<: Ring, S}(x::ZZ, y::PowerSeries{T, S}) = y == x
-
-=={T<: Ring, S}(x::T, y::PowerSeries{T, S}) = y == x
 
 ###########################################################################################
 #

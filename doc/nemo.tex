@@ -3810,7 +3810,6 @@ m = a*d
 \begin{lstlisting}
 *{T <: Ring, S}(a::Int, b::PowerSeries{T, S})
 *{T <: Ring, S}(a::ZZ, b::PowerSeries{T, S})
-*{T <: Ring, S}(a::T, b::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return $ab$. The resulting power series will have the same precision as
@@ -3819,7 +3818,6 @@ $b$.}
 \begin{lstlisting}
 *{T <: Ring, S}(a::Poly{T, S}, b::Int)
 *{T <: Ring, S}(a::Poly{T, S}, b::ZZ)
-*{T <: Ring, S}(a::Poly{T, S}, b::T) 
 \end{lstlisting}
 
 \desc{Return $ab$. The resulting power series will have the same precision as
@@ -3876,7 +3874,6 @@ c != d
 \begin{lstlisting}
 =={T <: Ring, S}(x::PowerSeries{T, S}, y::Int)
 =={T <: Ring, S}(x::PowerSeries{T, S}, y::ZZ)
-=={T <: Ring, S}(x::PowerSeries{T, S}, y::T)
 \end{lstlisting}
 
 \desc{Return \code{true} if the power series \code{x} is equal to \code{y} up
@@ -3886,7 +3883,6 @@ precision $0$.}
 \begin{lstlisting}
 =={T<: Ring, S}(x::Int, y::PowerSeries{T, S})
 =={T<: Ring, S}(x::ZZ, y::PowerSeries{T, S})
-=={T<: Ring, S}(x::T, y::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return \code{true} if the power series \code{y} is equal to \code{x} up
