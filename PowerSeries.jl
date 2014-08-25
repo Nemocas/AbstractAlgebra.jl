@@ -636,7 +636,7 @@ function inv{T<: Ring, S}(a::PowerSeries{T, S})
    a1 = -a1
    for n = 2:a.prec
       s = coeff(a, 1)*d[n - 1]
-      for i = 2:n - 1
+      for i = 2:min(n, a.data.length) - 1
          s += coeff(a, i)*d[n - i]
       end
       d[n] = divexact(s, a1)
