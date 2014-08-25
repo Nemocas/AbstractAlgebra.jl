@@ -3915,19 +3915,164 @@ ZZ(0) != a
 ZZ(1) == c
 \end{lstlisting}
 
+\subsubsection{Powering}
 
+\begin{lstlisting}
+^{T <: Ring, S}(a::PowerSeries{T, S}, b::Int)
+\end{lstlisting}
 
+\desc{Return $a^b$. The result will have precision equal to $b - 1$ times the
+valuation of $a$ plus the precision of $a$. This is the same as if $a$ were
+multiplied by itself $b$ times.}
 
+\textbf{Examples.}
 
+Here are some examples of powering.
 
+\begin{lstlisting}
+R, x = PowerSeriesRing(ZZ, "x")
 
+a = 2x + x^3
+b = O(x^4)
+c = 1 + x + 2x^2 + O(x^5)
+d = 2x + x^3 + O(x^4)
 
+f = a^12
+g = b^12
+h = c^12
+k = d^12
+\end{lstlisting}
 
+\subsubsection{Shifting}
 
+\begin{lstlisting}
+shift_left{T <: Ring, S}(a::PowerSeries{T, S}, n::Int)
+\end{lstlisting}
 
+\desc{Return \code{a*x^n}, where \code{x} is the generator of the power series
+ring and \code{n} is a nonnegative integer. If \code{n} is negative we raise
+a \code{DomainError()}. As \code{x^n} is considered exact, the precision of
+the result will be the precision of \code{a} increased by \code{n}.}
 
+\begin{lstlisting}
+shift_right{T <: Ring, S}(a::PowerSeries{T, S}, n::Int)
+\end{lstlisting}
 
+\desc{Return \code{a/x^n}, discarding the remainder, where \code{x} is the
+generator of the power series ring and \code{n} is a nonnegative integer. If 
+\code{n} is negative we raise a \code{DomainError()}. As \code{x^n} is
+considered exact, the precision of the result will be the precision of \code{a}
+decreased by \code{n}.}
 
+\textbf{Examples.}
+
+Here are some examples of shifting.
+
+\begin{lstlisting}
+R, x = PowerSeriesRing(ZZ, "x")
+
+a = 2x + x^3
+b = O(x^4)
+c = 1 + x + 2x^2 + O(x^5)
+d = 2x + x^3 + O(x^4)
+
+f = shift_left(a, 2)
+g = shift_left(b, 2)
+h = shift_right(c, 1)
+k = shift_right(d, 3)
+\end{lstlisting}
+
+\subsubsection{Truncation}
+
+\begin{lstlisting}
+truncate{T<: Ring, S}(x::PowerSeries{T, S}, prec::Precision)
+\end{lstlisting}
+
+\desc{Return the power series \code{x} truncated to the given precision. If
+\code{x} already has precision less than or equal to \code{prec} this results
+in no change. The precision \code{prec} can be \code{nothing}, representing
+an infinite precision. But this has no effect. If \code{prec} is negative we
+throw a \code{DomainError()}.}
+
+\textbf{Examples.}
+
+Here are some examples of truncation.
+
+\begin{lstlisting}
+R, x = PowerSeriesRing(ZZ, "x")
+
+a = 2x + x^3
+b = O(x^4)
+c = 1 + x + 2x^2 + O(x^5)
+d = 2x + x^3 + O(x^4)
+
+f = truncate(a, 3)
+g = truncate(b, 2)
+h = truncate(c, nothing)
+k = truncate(d, 5)
+\end{lstlisting}
+
+\subsubsection{Exact division}
+
+\begin{lstlisting}
+divexact{T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
+\end{lstlisting}
+
+\desc{Return \code{x/y}. This requires \code{x} to have valuation at least that
+of \code{y}. It also requires the first nonzero coefficient of \code{y} to be
+a unit in the ring \code{T}. If \code{y} is zero, a \code{DivideError()} is
+thrown. 
+
+The precision of the result is equal to the minimum of $p_x - v_y$
+and $p_y - 2v_y + v_x$ where $p_x$, $p_y$ are the precisions of \code{x} and
+\code{y} respectively and $v_x$, $v_y$ are the corresponding valuations.
+
+If the precision of \code{y} is infinite and the result would be a power
+series of infinite length, an exception is thrown.}
+
+\textbf{Examples.}
+
+Here are some examples of exact division.
+
+\begin{lstlisting}
+R, x = PowerSeriesRing(ZZ, "x")
+
+a = x + x^3
+b = O(x^4)
+c = 1 + x + 2x^2 + O(x^5)
+d = x + x^3 + O(x^6)
+
+f = divexact(a, d)
+g = divexact(d, a)
+h = divexact(b, c)
+k = divexact(d, c)
+\end{lstlisting}
+
+\subsubsection{Inversion}
+
+\begin{lstlisting}
+inv{T<: Ring, S}(a::PowerSeries{T, S})
+\end{lstlisting}
+
+\desc{Return $1/a$. A \code{DivideError()} is thrown if \code{a} is zero. An
+exception is thrown if \code{a} isn't invertible or if \code{a} has infinite
+precision and has anything other than a nonzero constant term.
+
+The precision of the result is equal to the precision of \code{a}.}
+
+\textbf{Examples.}
+
+Here are some examples of inversion.
+
+\begin{lstlisting}
+R, x = PowerSeriesRing(ZZ, "x")
+
+a = 1 + x + 2x^2 + O(x^5)
+b = R(-1)
+
+c = inv(a)
+d = inv(b)
+\end{lstlisting}
 
 \section{The Fields module}
 

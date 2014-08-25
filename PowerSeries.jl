@@ -538,7 +538,7 @@ function ^{T <: Ring, S}(a::PowerSeries{T, S}, b::Int)
       z.data.length = b + 1
       return z
    elseif a.data.length == 0
-      return PowerSeries(PowerSeries{T, S}, Array(T, 0), a.prec)
+      return PowerSeries(PowerSeries{T, S}, Array(T, 0), a.prec + (b - 1)*valuation(a))
    elseif a.data.length == 1
       return PowerSeries(PowerSeries{T, S}, [a.data.coeffs[1]^b], a.prec)
    elseif b == 0
@@ -610,6 +610,8 @@ end
 =={T<: Ring, S}(x::Int, y::PowerSeries{T, S}) = y == x
 
 =={T<: Ring, S}(x::ZZ, y::PowerSeries{T, S}) = y == x
+
+=={T<: Ring, S}(x::T, y::PowerSeries{T, S}) = y == x
 
 ###########################################################################################
 #
