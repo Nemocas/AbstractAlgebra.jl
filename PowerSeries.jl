@@ -190,7 +190,7 @@ show_minus_one{T <: Ring, S}(::Type{PowerSeries{T, S}}) = show_minus_one(T)
 
 ###########################################################################################
 #
-#   Unary operations
+#   Unary operators
 #
 ###########################################################################################
 
@@ -207,7 +207,7 @@ end
 
 ###########################################################################################
 #
-#   Binary operations
+#   Binary operators
 #
 ###########################################################################################
 
@@ -447,9 +447,22 @@ function *{T <: Ring, S}(a::ZZ, b::PowerSeries{T, S})
    return z
 end
 
-*{T <: Ring, S}(a::Poly{T, S}, b::Int) = b*a
+function *{T <: Ring, S}(a::T, b::PowerSeries{T, S})
+   len = b.data.length
+   d = Array(T, len)
+   for i = 1:len
+      d[i] = a*coeff(b, i - 1)
+   end
+   z = PowerSeries(PowerSeries{T, S}, d, b.prec)
+   z.data.length = normalise(z, len)
+   return z
+end
 
-*{T <: Ring, S}(a::Poly{T, S}, b::ZZ) = b*a
+*{T <: Ring, S}(a::PowerSeries{T, S}, b::Int) = b*a
+
+*{T <: Ring, S}(a::PowerSeries{T, S}, b::ZZ) = b*a
+
+*{T <: Ring, S}(a::PowerSeries{T, S}, b::T) = b*a
 
 ###########################################################################################
 #

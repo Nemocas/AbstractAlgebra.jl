@@ -3740,6 +3740,119 @@ k = valuation(a)
 m = valuation(b)
 \end{lstlisting}
 
+\subsubsection{Unary operators}
+
+\begin{lstlisting}
+-{T <: Ring, S}(a::PowerSeries{T, S})
+\end{lstlisting}
+
+\desc{Return $-a$.}
+
+\textbf{Examples.}
+
+Here are some examples of unary operators.
+
+\begin{lstlisting}
+R, x = PowerSeriesRing(ZZ, "x")
+
+a = 2x + x^3
+b = 1 + 2x + x^2 + O(x^3)
+
+c = -a
+d = -b
+\end{lstlisting}
+
+\subsubsection{Binary operators}
+
+\begin{lstlisting}
++{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
+\end{lstlisting}
+
+\desc{Return $a + b$. If the two power series have differing precisions, the
+result will be a power series with the lower precision.}
+
+\begin{lstlisting}
+-{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
+\end{lstlisting}
+
+\desc{Return $a - b$. If the two power series have differing precisions, the
+result will be a power series with the lower precision.}
+
+\begin{lstlisting}
+*{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
+\end{lstlisting}
+
+\desc{Return $ab$. The return precision is equal to the least out of the
+product of the precision of \code{a} by the valuation of \code{b} and
+the product of the valuation of \code{a} by the precision of \code{b}.}
+
+\textbf{Examples.}
+
+Here are some examples of binary operators.
+
+\begin{lstlisting}
+R, x = PowerSeriesRing(ZZ, "x")
+
+a = 2x + x^3
+b = O(x^4)
+c = 1 + x + 3x^2 + O(x^5)
+d = x^2 + 3x^3 - x^4
+
+f = a + b
+g = a - c
+h = b*c
+j = a*c
+m = a*d
+\end{lstlisting}
+
+\subsubsection{Ad hoc binary operators}
+
+\begin{lstlisting}
+*{T <: Ring, S}(a::Int, b::PowerSeries{T, S})
+*{T <: Ring, S}(a::ZZ, b::PowerSeries{T, S})
+*{T <: Ring, S}(a::T, b::PowerSeries{T, S})
+\end{lstlisting}
+
+\desc{Return $ab$. The resulting power series will have the same precision as
+$b$.}
+
+\begin{lstlisting}
+*{T <: Ring, S}(a::Poly{T, S}, b::Int)
+*{T <: Ring, S}(a::Poly{T, S}, b::ZZ)
+*{T <: Ring, S}(a::Poly{T, S}, b::T) 
+\end{lstlisting}
+
+\desc{Return $ab$. The resulting power series will have the same precision as
+$b$.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc binary operators.
+
+\begin{lstlisting}
+R, x = PowerSeriesRing(ZZ, "x")
+
+a = 2x + x^3
+b = O(x^4)
+c = 1 + x + 3x^2 + O(x^5)
+d = x^2 + 3x^3 - x^4
+
+f = 2a
+g = ZZ(3)*b
+h = c*2
+j = d*ZZ(3)
+\end{lstlisting}
+
+
+
+
+
+
+
+
+
+
+
 
 
 
