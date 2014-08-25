@@ -3843,7 +3843,77 @@ h = c*2
 j = d*ZZ(3)
 \end{lstlisting}
 
+\subsubsection{Comparison}
 
+\begin{lstlisting}
+=={T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
+\end{lstlisting}
+
+\desc{Return \code{true} if the two power series are the same up to the lesser
+of the precisions of the two series, otherwise return \code{false}.}
+
+Julia automatically defines a corresponding \code{!=} operator.
+
+\textbf{Examples.}
+
+Here are some examples of comparison.
+
+\begin{lstlisting}
+R, x = PowerSeriesRing(ZZ, "x")
+
+a = 2x + x^3
+b = O(x^3)
+c = 1 + x + 3x^2 + O(x^5)
+d = 3x^3 - x^4
+
+a == 2x + x^3
+b == d
+c != d
+\end{lstlisting}
+
+\subsubsection{Ad hoc comparison}
+
+\begin{lstlisting}
+=={T <: Ring, S}(x::PowerSeries{T, S}, y::Int)
+=={T <: Ring, S}(x::PowerSeries{T, S}, y::ZZ)
+=={T <: Ring, S}(x::PowerSeries{T, S}, y::T)
+\end{lstlisting}
+
+\desc{Return \code{true} if the power series \code{x} is equal to \code{y} up
+to the precision it has. Note that this is always true if \code{x} has
+precision $0$.}
+
+\begin{lstlisting}
+=={T<: Ring, S}(x::Int, y::PowerSeries{T, S})
+=={T<: Ring, S}(x::ZZ, y::PowerSeries{T, S})
+=={T<: Ring, S}(x::T, y::PowerSeries{T, S})
+\end{lstlisting}
+
+\desc{Return \code{true} if the power series \code{y} is equal to \code{x} up
+to the precision it has. Note that this is always true if \code{y} has
+precision $0$.}
+
+Julia automatically defines a corresponding \code{!=} operator corresponding to
+the above.
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc comparison.
+
+\begin{lstlisting}
+R, x = PowerSeriesRing(ZZ, "x")
+
+a = 2x + x^3
+b = O(x^0)
+c = 1 + O(x^5)
+d = R(3)
+
+d == 3
+c == ZZ(1)
+ZZ(0) != a
+2 == b
+ZZ(1) == c
+\end{lstlisting}
 
 
 

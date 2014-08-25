@@ -573,19 +573,15 @@ end
 =={T <: Ring, S}(x::PowerSeries{T, S}, y::ZZ) = x.prec == 0 || ((x.data.length == 0 && y == 0)
                                         || (x.data.length == 1 && coeff(x, 0) == y))
 
+=={T <: Ring, S}(x::PowerSeries{T, S}, y::T) = x.prec == 0 || ((x.data.length == 0 && y == 0)
+                                        || (x.data.length == 1 && coeff(x, 0) == y))
+
 function =={T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
-   if x.prec == nothing
-      prec = y.prec
-   elseif y.prec == nothing
-      prec = x.nothing
-   else
-      prec = min(x.prec, y.prec)
-   end
+   prec = min(x.prec, y.prec)
+   
    m1 = min(x.data.length, y.data.length)
    m2 = max(x.data.length, y.data.length)
-   if prec == nothing
-      prec = max(m1, m2)
-   end
+   
    m1 = min(m1, prec)
    m2 = min(m2, prec)
    if x.data.length >= m2
