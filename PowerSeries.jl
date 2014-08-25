@@ -93,9 +93,7 @@ function normalise{T <: Ring, S}(a::PowerSeries{T, S}, len::Int)
    return len
 end
 
-coeff{T <: Ring, S}(a::PowerSeries{T, S}, n::Int) = n >= a.data.length ? 0 : a.data.coeffs[n + 1]
-
-isgen{T <: Ring, S}(a::PowerSeries{T, S}) = a.prec == nothing && a.data.length == 2 && a.data.coeffs[1] == 0 && a.data.coeffs[2] == 1
+coeff{T <: Ring, S}(a::PowerSeries{T, S}, n::Int) = n < 0 || n >= a.data.length ? 0 : a.data.coeffs[n + 1]
 
 zero{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries{T, S}(0)
 
@@ -103,9 +101,11 @@ one{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries{T, S}(1)
 
 gen{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries(PowerSeries{T, S}, [T(0), T(1)], nothing)
 
+isgen{T <: Ring, S}(a::PowerSeries{T, S}) = a.prec == nothing && a.data.length == 2 && a.data.coeffs[1] == 0 && a.data.coeffs[2] == 1
+
 isunit{T <: Ring, S}(a::PowerSeries{T, S}) = isunit(coeff(a, 0))
 
-function valuation{T <: Ring, S}(::Type{PowerSeries{T, S}}, a::PowerSeries{T, S})
+function valuation{T <: Ring, S}(a::PowerSeries{T, S})
    if a.data.length == 0
       return a.prec
    end
@@ -285,8 +285,8 @@ function *{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
    lena = a.data.length
    lenb = b.data.length
    
-   aval = valuation(PowerSeries{T, S}, a)
-   bval = valuation(PowerSeries{T, S}, b)
+   aval = valuation(a)
+   bval = valuation(b)
 
    prec = min(a.prec + bval, b.prec + aval)
    
@@ -361,8 +361,8 @@ function mul!{T <: Ring, S}(c::PowerSeries{T, S}, a::PowerSeries{T, S}, b::Power
    lena = a.data.length
    lenb = b.data.length
 
-   aval = valuation(PowerSeries{T, S}, a)
-   bval = valuation(PowerSeries{T, S}, b)
+   aval = valuation(a)
+   bval = valuation(b)
 
    prec = min(a.prec + bval, b.prec + aval)
    
@@ -610,9 +610,9 @@ end
 
 function divexact{T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
    y == 0 && throw(DivideError())
-   v2 = valuation(PowerSeries{T, S}, y)
+   v2 = valuation(y)
    if v2 != 0
-      v1 = valuation(PowerSeries{T, S}, x)
+      v1 = valuation(x)
       if v1 >= v2
          x = shift_right(x, v2)
          y = shift_right(y, v2)

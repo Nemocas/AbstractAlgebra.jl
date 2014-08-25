@@ -3655,14 +3655,90 @@ h = R(ZZ(2))
 k = R()
 \end{lstlisting}
 
+\subsubsection{Basic manipulation}
+
+\begin{lstlisting}
+normalise{T <: Ring, S}(a::PowerSeries{T, S}, len::Int)
+\end{lstlisting}
+
+\desc{Return the normalised length of the polynomial representing the power
+series \code{a}, assuming that its unnormalised length is \code{len}. The
+polynomial representing \code{a} is normalised if it has either length $0$
+or its leading coefficient is nonzero. This function is mainly used internally
+because all user functions in Nemo normalise the internal polynomial
+representation of power series.}
 
 
+\begin{lstlisting}
+coeff{T <: Ring, S}(a::PowerSeries{T, S}, n::Int)
+\end{lstlisting}
 
+\desc{Return the coefficient of the power series \code{a} with degree 
+\code{n}. If $n < 0$ or greater than or equal to the power series precision
+we return $0$.}
 
+\begin{lstlisting}
+zero{T <: Ring, S}(::Type{PowerSeries{T, S}})
+\end{lstlisting}
 
+\desc{Return the additive identity of the power series ring, i.e. $0$ as an
+infinite precision power series.}
 
+\begin{lstlisting}
+one{T <: Ring, S}(::Type{PowerSeries{T, S}})
+\end{lstlisting}
 
+\desc{Return the multiplicative identity of the power series ring, i.e. $1$ as an
+infinite precision power series.}
 
+\begin{lstlisting}
+gen{T <: Ring, S}(::Type{PowerSeries{T, S}})
+\end{lstlisting}
+
+\desc{Return the degree one, monic monomial generator of the power series ring.}
+
+\begin{lstlisting}
+isgen{T <: Ring, S}(a::PowerSeries{T, S})
+\end{lstlisting}
+
+\desc{Return \code{true} if $a$ is the degree one, monic monomial generator of
+the power series ring. Otherwise, return \code{false}.}
+
+\begin{lstlisting}
+isunit{T <: Ring, S}(a::PowerSeries{T, S})
+\end{lstlisting}
+
+\desc{Return \code{true} if $a$ is an invertible element of the power series
+ring, i.e. if the lead term is degree zero with invertible coefficient.
+Otherwise, return \code{false}.}
+
+\begin{lstlisting}
+valuation{T <: Ring, S}(a::PowerSeries{T, S})
+\end{lstlisting}
+
+\desc{Return the valuation of the power series \code{a} with respect to the
+generator of the power series ring. If the power series is zero to finite
+precision $n$, the valuation is defined to be $n$.}
+
+\textbf{Examples.}
+
+Here are some examples of basic manipulations of power series.
+
+\begin{lstlisting}
+R, x = PowerSeriesRing(ZZ, "x")
+
+a = 2x + x^3
+b = O(x^4)
+
+c = gen(R)
+d = zero(R)
+f = one(R)
+
+g = isgen(c)
+h = isunit(-1 + x + 2x^2)
+k = valuation(a)
+m = valuation(b)
+\end{lstlisting}
 
 
 
