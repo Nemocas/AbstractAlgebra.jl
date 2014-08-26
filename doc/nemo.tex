@@ -4883,31 +4883,31 @@ using randomly chosen irreducible polynomials, such as with the
 Bosma-Cannon-Steel construction. But this may change in a later version of 
 Nemo.) 
 
-The finite field type in Nemo is \code{FField}. The uninterested user can skip
+The finite field type in Nemo is \code{FinFieldElem}. The uninterested user can skip
 description of the internals of this type, as we provide functions for 
 constructing the type.
 
-As with the \code{ZZ} type, the \code{FField} type in Nemo simply represents a
+As with the \code{ZZ} type, the \code{FinFieldElem} type in Nemo simply represents a
 flint type. In fact, the contents are the same as an \code{fmpz_poly}, since
 fundamentally an element of a finite field is a polynomial expression.
 
-Here is the Julia definition of the \code{FField} type.
+Here is the Julia definition of the \code{FinFieldElem} type.
 
 \begin{lstlisting}
-type FField{S} <: Field
+type FinFieldElem{S} <: Field
    coeffs :: Ptr{Void}
    alloc :: Int
    length :: Int
 \end{lstlisting}
 
-The \code{FField} type is parameterised by a symbol \code{S} which holds on to
+The \code{FinFieldElem} type is parameterised by a symbol \code{S} which holds on to
 a flint context object with information such as the polynomial used to
 generate the field, the characteristic and much more besides.
 
 There are no user serviceable parts inside, so we omit details of this 
 \code{fq_ctx} type which stores this context object.
 
-The \code{FField} type belongs to the \code{Field} typeclass, and therefore
+The \code{FinFieldElem} type belongs to the \code{Field} typeclass, and therefore
 elements of a finite field can be passed to any function which operates on
 field or ring elements.
 
@@ -4940,15 +4940,15 @@ We provide various convenient functions for constructing elements of a finite
 field.
 
 \begin{lstlisting}
-FField{S}(a::Int)
-FField{S}(a::ZZ)
+FinFieldElem{S}(a::Int)
+FinFieldElem{S}(a::ZZ)
 \end{lstlisting}
 
 \desc{Return the element \code{a} of the finite field, considered as an element
 of $\F_p$.}
 
 \begin{lstlisting}
-FField{S}(a::FField{S})
+FinFieldElem{S}(a::FinFieldElem{S})
 \end{lstlisting}
 
 \desc{Return a reference to the element \code{a} of the finite field. No copy
@@ -4973,19 +4973,19 @@ m = R(h)
 \subsubsection{Basic manipulation}
 
 \begin{lstlisting}
-zero{S}(::Type{FField{S}})
+zero{S}(::Type{FinFieldElem{S}})
 \end{lstlisting}
 
 \desc{Return the additive identity in the finite field, i.e. $0$.}
 
 \begin{lstlisting}
-one{S}(::Type{FField{S}})
+one{S}(::Type{FinFieldElem{S}})
 \end{lstlisting}
 
 \desc{Return the multiplicative identity in the finite field, i.e. $1$.}
 
 \begin{lstlisting}
-gen{S}(::Type{FField{S}})
+gen{S}(::Type{FinFieldElem{S}})
 \end{lstlisting}
 
 \desc{Return a generator of the finite field, namely one whose
@@ -4994,28 +4994,28 @@ polynomial of the field. The generator may not be a multiplicative
 generator.}
 
 \begin{lstlisting}
-isunit{S}(a::FField{S})
+isunit{S}(a::FinFieldElem{S})
 \end{lstlisting}
 
 \desc{Return \code{true} if the element $a$ is invertible in the finite field,
 i.e. if it is not zero, otherwise return \code{false}.}
 
 \begin{lstlisting}
-characteristic{S}(::Type{FField{S}})
+characteristic{S}(::Type{FinFieldElem{S}})
 \end{lstlisting}
 
 \desc{Return the prime characteristic $p$ of the finite field as a bignum
 \code{ZZ}.}
 
 \begin{lstlisting}
-order{S}(::Type{FField{S}})
+order{S}(::Type{FinFieldElem{S}})
 \end{lstlisting}
 
 \desc{Return the number of elements in the finite field, i.e. $q = p^d$
 where \code{p} is the characteristic and $d$ is the degree.}
 
 \begin{lstlisting}
-degree{S}(::Type{FField{S}})
+degree{S}(::Type{FinFieldElem{S}})
 \end{lstlisting}
 
 \desc{If the finite field is $\F_q$ where $q = p^d$, where $p$ is the
@@ -5041,7 +5041,7 @@ isunit(x + 1)
 \subsubsection{Unary operators}
 
 \begin{lstlisting}
--{S}(a::FField{S})
+-{S}(a::FinFieldElem{S})
 \end{lstlisting}
 
 \desc{Return $-a$.}
@@ -5063,25 +5063,25 @@ We provide the following binary operators and functions for elements of
 finite fields.
 
 \begin{lstlisting}
-+{S}(a::FField{S}, b::FField{S})
++{S}(a::FinFieldElem{S}, b::FinFieldElem{S})
 \end{lstlisting}
 
 \desc{Return $a + b$.}
 
 \begin{lstlisting}
--{S}(a::FField{S}, b::FField{S})
+-{S}(a::FinFieldElem{S}, b::FinFieldElem{S})
 \end{lstlisting}
 
 \desc{Return $a - b$.}
 
 \begin{lstlisting}
-*{S}(a::FField{S}, b::FField{S})
+*{S}(a::FinFieldElem{S}, b::FinFieldElem{S})
 \end{lstlisting}
 
 \desc{Return $ab$.}
 
 \begin{lstlisting}
-gcd{S}(a::FField{S}, b::FField{S})
+gcd{S}(a::FinFieldElem{S}, b::FinFieldElem{S})
 \end{lstlisting}
 
 \desc{Return gcd$(a, b)$. For a finite field this is always $1$ unless both
@@ -5110,15 +5110,15 @@ We provide the following ad hoc binary operators, which are faster than first
 coercing all their arguments into the finite field.
 
 \begin{lstlisting}
-*{S}(x::Int, y::FField{S})
-*{S}(x::ZZ, y::FField{S})
+*{S}(x::Int, y::FinFieldElem{S})
+*{S}(x::ZZ, y::FinFieldElem{S})
 \end{lstlisting}
 
 \desc{Return $xy$, i.e. $y$ added to itself $x$ times.}
 
 \begin{lstlisting}
-*{S}(x::FField{S}, y::Int)
-*{S}(x::FField{S}, y::ZZ)
+*{S}(x::FinFieldElem{S}, y::Int)
+*{S}(x::FinFieldElem{S}, y::ZZ)
 \end{lstlisting}
 
 \desc{Return $xy$, i.e. $x$ added to itself $y$ times.}
@@ -5139,8 +5139,8 @@ c = a*ZZ(5)
 \subsubsection{Powering}
 
 \begin{lstlisting}
-^{S}(a::FField{S}, n::Int)
-^{S}(a::FField{S}, n::ZZ)
+^{S}(a::FinFieldElem{S}, n::Int)
+^{S}(a::FinFieldElem{S}, n::ZZ)
 \end{lstlisting}
 
 \desc{Return $a^n$.}
@@ -5161,7 +5161,7 @@ c = a^ZZ(-5)
 \subsubsection{Comparison}
 
 \begin{lstlisting}
-=={S}(a::FField{S}, b::FField{S})
+=={S}(a::FinFieldElem{S}, b::FinFieldElem{S})
 \end{lstlisting}
 
 \desc{Return \code{true} if the finite field elements $a$ and $b$ are 
@@ -5186,8 +5186,8 @@ R(3) == R(3)
 \subsubsection{Exact division}
 
 \begin{lstlisting}
-divexact{S}(x::FField{S}, y::FField{S})
-/{S}(x::FField{S}, y::FField{S})
+divexact{S}(x::FinFieldElem{S}, y::FinFieldElem{S})
+/{S}(x::FinFieldElem{S}, y::FinFieldElem{S})
 \end{lstlisting}
 
 \desc{Return $x/y$, which is an exact division in a finite field when defined,
@@ -5212,7 +5212,7 @@ d = b/a
 \subsubsection{Inversion}
 
 \begin{lstlisting}
-inv{S}(a::FField{S})
+inv{S}(a::FinFieldElem{S})
 \end{lstlisting}
 
 \desc{Return the multiplicative inverse of $a$ in the finite field, i.e. 
@@ -5237,21 +5237,21 @@ Various special functions with finite field specific behaviour are
 defined.
 
 \begin{lstlisting}
-trace{S}(a::FField{S})
+trace{S}(a::FinFieldElem{S})
 \end{lstlisting}
 
 \desc{Return the trace of $a$. This is an element of $\F_p$, but the value
 returned is this value embedded in the original finite field.}
 
 \begin{lstlisting}
-norm{S}(a::FField{S})
+norm{S}(a::FinFieldElem{S})
 \end{lstlisting}
 
 \desc{Return the norm of $a$. This is an element of $\F_p$, but the value
 returned is this value embedded in the original finite field.}
 
 \begin{lstlisting}
-frobenius{S}(a::FField{S}, n = 1)
+frobenius{S}(a::FinFieldElem{S}, n = 1)
 \end{lstlisting}
 
 \desc{Return the iterated Frobenius $\sigma_p^n(a)$ where $\sigma_p$ is the 
@@ -5260,7 +5260,7 @@ characteristic $p$. By default the Frobenius map is applied $n = 1$ times if
 $n$ is not specified.}
 
 \begin{lstlisting}
-pth_root{S}(a::FField{S})
+pth_root{S}(a::FinFieldElem{S})
 \end{lstlisting}
 
 \desc{Return the $p$-th root of $a$ in the finite field of characteristic

@@ -190,6 +190,8 @@ Base.convert{T <: Ring, S}(::Type{Residue{T, S}}, a::T) = Residue{T, S}(a)
 
 Base.convert{T <: Ring, S}(::Type{Residue{T, S}}, a::Int) = Residue{T, S}(a)
 
+Base.convert{T <: Ring, S}(::Type{Residue{T, S}}, a::ZZ) = Residue{T, S}(a)
+
 ###########################################################################################
 #
 #   ResidueRing constructor
