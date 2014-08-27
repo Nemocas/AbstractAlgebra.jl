@@ -94,7 +94,7 @@ end
 function Poly{S}(::Type{Poly{ZZ, S}}, a :: Array{ZZ, 1})
    z = Poly{ZZ, S}(initpoly2())
    finalizer(z, _fmpz_poly_clear_fn)
-   ccall((:fmpz_poly_initpoly2, :libflint), Void, (Ptr{Poly}, Int), &z, length(a))
+   ccall((:fmpz_poly_init2, :libflint), Void, (Ptr{Poly}, Int), &z, length(a))
    for i = 1:length(a)
       ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, (Ptr{Poly}, Int, Ptr{ZZ}),
          &z, i - 1, &a[i])

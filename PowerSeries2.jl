@@ -297,8 +297,8 @@ end
 function inv{S}(a::PowerSeries{QQ, S})
    a == 0 && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
-   a1 = coeff(a, 0)
    if a.prec == nothing
+      a1 = coeff(a, 0)
       length(a) != 1 && error("Unable to invert infinite precision power series")
       return PowerSeries(PowerSeries{QQ, S}, [divexact(QQ(1), a1)], nothing)
    end
