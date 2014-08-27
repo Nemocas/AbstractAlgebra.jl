@@ -688,6 +688,37 @@ end
 
 ###########################################################################################
 #
+#   Exponential
+#
+###########################################################################################
+
+function exp{T <: Ring}(a::T)
+   a != 0 && error("Exponential of nonzero element")
+   return one(T)
+end
+
+function exp{T<: Ring, S}(a::PowerSeries{T, S})
+   if a == 0
+      return PowerSeries(PowerSeries{T, S}, [one(T)], a.prec)
+   elseif a.prec == nothing
+      error("Unable to compute exponential of infinite precision power series")
+   end
+   d = Array(T, a.prec)
+   d[0+1] = exp(coeff(a, 0))
+   len = length(a)
+   for k = 1 : a.prec-1
+      s = zero(T)
+      for j = 1 : min(k+1, len) - 1
+         s += j * coeff(a, j) * d[k-j+1]
+      end
+      d[k+1] = divexact(s, k)
+   end
+   b = PowerSeries(PowerSeries{T, S}, d, a.prec)
+   return b
+end
+
+###########################################################################################
+#
 #   PowerSeriesRing constructor
 #
 ###########################################################################################
