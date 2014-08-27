@@ -707,7 +707,7 @@ function exp{T<: Ring, S}(a::PowerSeries{T, S})
       for j = 1 : min(k+1, len) - 1
          s += j * coeff(a, j) * d[k-j+1]
       end
-      d[k+1] = s / k
+      d[k+1] = divexact(s, k)
    end
    b = PowerSeries(PowerSeries{T, S}, d, a.prec)
    return b
