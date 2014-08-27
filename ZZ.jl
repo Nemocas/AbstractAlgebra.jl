@@ -66,14 +66,14 @@ type ZZ <: Ring
 
     function ZZ()
         b = new(zero(Int))
-        ccall((:__fmpz_init, :libflint), Void, (Ptr{ZZ},), &b)
+        ccall((:fmpz_init, :libflint), Void, (Ptr{ZZ},), &b)
         finalizer(b, _fmpz_clear_fn)
         return b
     end
 end
 
 function _fmpz_clear_fn(a::ZZ)
-   ccall((:__fmpz_clear, :libflint), Void, (Ptr{ZZ},), &a)
+   ccall((:fmpz_clear, :libflint), Void, (Ptr{ZZ},), &a)
 end
 
 ###########################################################################################

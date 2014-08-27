@@ -9,7 +9,7 @@ export Poly, PolynomialRing, coeff, zero, one, gen, isgen, normalise, chebyshev_
        pseudorem, pseudodivrem, primpart, content, divexact, evaluate, compose, deriv,
        resultant, lead, discriminant, bezout, truncate, mullow, divrem, mulmod, powmod,
        invmod, canonical_unit, integral, lcm, reverse, shift_left, shift_right,
-       fmpz_poly_struct, fmpz_mod_poly_struct
+       fmpz_poly_struct, fmpz_mod_poly_struct, fq_poly_struct, fmpq_poly_struct
 
 import Base: convert, zero, show, length
 
@@ -55,59 +55,27 @@ end
 #
 ###########################################################################################
 
-type fmpz_poly <: Ring
-   data::fmpz_poly_struct
-   function fmpz_poly()
-      d = new(fmpz_poly_struct())
-      finalizer(d, _fmpz_poly_clear_fn)
-      return d
-   end
-end
-
-type fmpz_mod_poly <: Ring
-   data::fmpz_mod_poly_struct
-   function fmpz_mod_poly()
-      d = new(fmpz_mod_poly_struct())
-      finalizer(d, _fmpz_mod_poly_clear_fn)
-      return d
-   end  
-end
-
-type fmpq_poly <: Ring
-   data::fmpq_poly_struct
-   function fmpq_poly()
-      d = new(fmpq_poly_struct())
-      finalizer(d, _fmpq_poly_clear_fn)
-      return d
-   end  
-end
-
-type fq_poly <: Ring
-   data::fq_poly_struct
-   function fq_poly()
-      d = new(fq_poly_struct())
-      finalizer(d, _fq_poly_clear_fn)
-      return d
-   end  
-end
-
 type PolyStruct{T <: Ring}
    coeffs :: Array{T, 1}
    length :: Int
 end
 
 type Poly{T <: Ring, S} <: Ring
-   data :: Union(fmpz_poly, fmpz_mod_poly, fmpq_poly, fq_poly, PolyStruct{T})
+   coeffs::Ptr{Void}
+   len::Int
+   alloc::Int
+   inv::Int
+   data :: PolyStruct{T}
    
-   Poly(a :: PolyStruct{T}) = new(a)   
+   Poly(a :: PolyStruct{T}) = new(C_NULL, 0, 0, 0, a)   
 
-   Poly(a::fmpz_mod_poly) = new(a)
+   Poly(a :: fmpz_mod_poly_struct) = new(C_NULL, 0, 0, 0)
    
-   Poly(a :: fmpz_poly) = new(a)
+   Poly(a :: fmpz_poly_struct) = new(C_NULL, 0, 0)
    
-   Poly(a :: fmpq_poly) = new(a)
+   Poly(a :: fmpq_poly_struct) = new(C_NULL, 0, 0)
    
-   Poly(a :: fq_poly) = new(a)
+   Poly(a :: fq_poly_struct) = new(C_NULL, 0, 0, 0)
    
    Poly() = Poly(Poly{T, S}, Array(T, 0))
    Poly(a::Integer) = a == 0 ? Poly(Poly{T, S}, Array(T, 0)) : Poly(Poly{T, S}, [T(a)])
@@ -125,42 +93,35 @@ function Poly{T, S}(::Type{Poly{T, S}}, a :: Array{T, 1})
 end
 
 function Poly{S}(::Type{Poly{ZZ, S}}, a :: Array{ZZ, 1})
-   z = fmpz_poly()
-   ccall((:fmpz_poly_init2, :libflint), Void, (Ptr{fmpz_poly}, Int), &z, length(a))
+   z = Poly{ZZ, S}(fmpz_poly_struct())
+   finalizer(z, _fmpz_poly_clear_fn)
+   ccall((:fmpz_poly_init2, :libflint), Void, (Ptr{Poly}, Int), &z, length(a))
    for i = 1:length(a)
-      ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, (Ptr{fmpz_poly}, Int, Ptr{ZZ}),
+      ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, (Ptr{Poly}, Int, Ptr{ZZ}),
          &z, i - 1, &a[i])
    end
-   return Poly{ZZ, S}(z)
+   return z
 end   
 
 function Poly{M, S}(::Type{Poly{Residue{ZZ, M}, S}}, a :: Array{Residue{ZZ, M}, 1})
-   z = fmpz_mod_poly()
+   z = Poly{Residue{ZZ, M}, S}(fmpz_mod_poly_struct())
    m = modulus(Residue{ZZ, M})
-   ccall((:fmpz_mod_poly_init2, :libflint), Void, (Ptr{fmpz_mod_poly}, Ptr{ZZ}, Int), &z, &m, length(a))
+   ccall((:fmpz_mod_poly_init2, :libflint), Void, (Ptr{Poly}, Ptr{ZZ}, Int), &z, &m, length(a))
    for i = 1:length(a)
-      ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, (Ptr{fmpz_mod_poly}, Int, Ptr{ZZ}),
+      ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, (Ptr{Poly}, Int, Ptr{ZZ}),
             &z, i - 1, &(a[i].data))
    end
-   return Poly{Residue{ZZ, M}, S}(z)
+   return z
 end
 
-function _fmpz_poly_clear_fn(a :: fmpz_poly)
-   ccall((:fmpz_poly_clear, :libflint), Void, (Ptr{fmpz_poly},), &a)
+function _fmpz_poly_clear_fn{S}(a :: Poly{ZZ, S})
+   ccall((:fmpz_poly_clear, :libflint), Void, (Ptr{Poly},), &a)
 end
    
-function _fmpz_mod_poly_clear_fn(a :: fmpz_mod_poly)
-   ccall((:fmpz_mod_poly_clear, :libflint), Void, (Ptr{fmpz_mod_poly},), &a)
+function _fmpz_mod_poly_clear_fn{M, S}(a :: Poly{Residue{ZZ, M}, S})
+   ccall((:fmpz_mod_poly_clear, :libflint), Void, (Ptr{Poly},), &a)
 end
-   
-function _fmpq_poly_clear_fn(a :: fmpq_poly)
-   ccall((:fmpq_poly_clear, :libflint), Void, (Ptr{fmpq_poly},), &a)
-end
-   
-function _fq_poly_clear_fn(a :: fq_poly)
-   ccall((:fq_poly_clear, :libflint), Void, (Ptr{fq_poly},), &a)
-end
-   
+         
 ###########################################################################################
 #
 #   Basic manipulation
@@ -177,19 +138,19 @@ end
 
 length{T <: Ring, S}(x::Poly{T, S}) = x.data.length
 
-length{S}(x::Poly{ZZ, S}) = ccall((:fmpz_poly_length, :libflint), Int, (Ptr{fmpz_poly},), &(x.data))
+length{S}(x::Poly{ZZ, S}) = ccall((:fmpz_poly_length, :libflint), Int, (Ptr{Poly},), &x)
 
-length{S, M}(x::Poly{Residue{ZZ, M}, S}) = ccall((:fmpz_mod_poly_length, :libflint), Int, (Ptr{fmpz_mod_poly},), &(x.data))
+length{S, M}(x::Poly{Residue{ZZ, M}, S}) = ccall((:fmpz_mod_poly_length, :libflint), Int, (Ptr{Poly},), &x)
 
 function coeff{S}(x::Poly{ZZ, S}, n::Int)
    z = ZZ()
-   ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, (Ptr{ZZ}, Ptr{fmpz_poly}, Int), &z, &(x.data), n)
+   ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, (Ptr{ZZ}, Ptr{Poly}, Int), &z, x, n)
    return z
 end
 
 function coeff{S, M}(x::Poly{Residue{ZZ, M}, S}, n::Int)
    z = ZZ()
-   ccall((:fmpz_mod_poly_get_coeff_fmpz, :libflint), Void, (Ptr{ZZ}, Ptr{fmpz_mod_poly}, Int), &z, &(x.data), n)
+   ccall((:fmpz_mod_poly_get_coeff_fmpz, :libflint), Void, (Ptr{ZZ}, Ptr{Poly}, Int), &z, &x, n)
    return Residue{ZZ, M}(z)
 end
 
@@ -197,9 +158,9 @@ coeff{T <: Ring, S}(a::Poly{T, S}, n::Int) = n >= length(a) ? 0 : a.data.coeffs[
 
 lead{T <: Ring, S}(a::Poly{T, S}) = length(a) == 0 ? zero(T) : coeff(a, length(a) - 1)
 
-isgen{S}(x::Poly{ZZ, S}) = bool(ccall((:fmpz_poly_is_x, :libflint), Int, (Ptr{fmpz_poly},), &(x.data)))
+isgen{S}(x::Poly{ZZ, S}) = bool(ccall((:fmpz_poly_is_x, :libflint), Int, (Ptr{Poly},), &x))
 
-isgen{S, M}(x::Poly{Residue{ZZ, M}, S}) = bool(ccall((:fmpz_mod_poly_is_x, :libflint), Int, (Ptr{fmpz_mod_poly},), &(x.data)))
+isgen{S, M}(x::Poly{Residue{ZZ, M}, S}) = bool(ccall((:fmpz_mod_poly_is_x, :libflint), Int, (Ptr{Poly},), &x))
 
 isgen{T <: Ring, S}(a::Poly{T, S}) = length(a) == 2 && a.data.coeffs[1] == 0 && a.data.coeffs[2] == 1
 
@@ -222,7 +183,7 @@ function show{S}(io::IO, x::Poly{ZZ, S})
       print(io, "0")
    else
       cstr = ccall((:fmpz_poly_get_str_pretty, :libflint), Ptr{Uint8}, 
-                (Ptr{fmpz_poly}, Ptr{Uint8}), &(x.data), bytestring(string(S)))
+                (Ptr{Poly}, Ptr{Uint8}), &x, bytestring(string(S)))
 
       print(io, bytestring(cstr))
 
@@ -235,7 +196,7 @@ function show{S, M}(io::IO, x::Poly{Residue{ZZ, M}, S})
       print(io, "0")
    else
       cstr = ccall((:fmpz_poly_get_str_pretty, :libflint), Ptr{Uint8}, 
-                (Ptr{fmpz_mod_poly}, Ptr{Uint8}), &(x.data), bytestring(string(S)))
+                (Ptr{Poly}, Ptr{Uint8}), &x, bytestring(string(S)))
 
       print(io, bytestring(cstr))
 
@@ -321,16 +282,16 @@ canonical_unit{T <: Ring, S}(x::Poly{T, S}) = canonical_unit(lead(x))
 function -{S}(x::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_neg, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
-               &(z.data), &(x.data))
+                (Ptr{Poly}, Ptr{Poly}), 
+               &z, &x)
    return z
 end
 
 function -{S, M}(x::Poly{Residue{ZZ, M}, S})
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_neg, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-               &(z.data), &(x.data))
+                (Ptr{Poly}, Ptr{Poly}), 
+               &z, &x)
    return z
 end
 
@@ -354,48 +315,48 @@ end
 function +{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_add, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
-               &(z.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly},  Ptr{Poly}), 
+               &z, &x, &y)
    return z
 end
 
 function -{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_sub, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
-               &(z.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &z, &x, &y)
    return z
 end
 
 function *{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_mul, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
-               &(z.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &z, &x, &y)
    return z
 end
 
 function +{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S})
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_add, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-               &(z.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &z, &x, &y)
    return z
 end
 
 function -{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S})
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_sub, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-               &(z.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &z, &x, &y)
    return z
 end
 
 function *{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S})
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_mul, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-               &(z.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &z, &x, &y)
    return z
 end
 
@@ -458,6 +419,9 @@ function -{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
 end
 
 function *{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
+   if T == ZZ
+      println("wha2")
+   end
    lena = length(a)
    lenb = length(b)
 
@@ -469,7 +433,7 @@ function *{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
 
    lenz = lena + lenb - 1
    d = Array(T, lenz)
-
+   
    for i = 1:lena
       d[i] = a.data.coeffs[i]*b.data.coeffs[1]
    end
@@ -522,14 +486,14 @@ end
 
 function setcoeff!{S}(z::Poly{ZZ, S}, n::Int, x::ZZ)
    ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
-                (Ptr{fmpz_poly}, Int, Ptr{ZZ}), 
-               &(z.data), n, &x)
+                (Ptr{Poly}, Int, Ptr{ZZ}), 
+               &z, n, &x)
 end
 
 function setcoeff!{S, M}(z::Poly{Residue{ZZ, M}, S}, n::Int, x::Residue{ZZ, M})
    ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Int, Ptr{ZZ}), 
-               &(z.data), n, &(x.data))
+                (Ptr{Poly}, Int, Ptr{ZZ}), 
+               &z, n, &(x.data))
 end
 
 function mul!{T <: Ring, S}(c::Poly{T, S}, a::Poly{T, S}, b::Poly{T, S})
@@ -576,26 +540,26 @@ end
 
 function mul!{S}(z::Poly{ZZ, S}, x::Poly{ZZ, S}, y::Poly{ZZ, S})
    ccall((:fmpz_poly_mul, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
-               &(z.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &z, &x, &y)
 end
 
 function mul!{S, M}(z::Poly{Residue{ZZ, M}, S}, x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S})
    ccall((:fmpz_mod_poly_mul, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-               &(z.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &z, &x, &y)
 end
 
-function addeq!{S}(z::Poly{ZZ, S}, x::Poly{ZZ, S},)
+function addeq!{S}(z::Poly{ZZ, S}, x::Poly{ZZ, S})
    ccall((:fmpz_poly_add, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
-               &(z.data), &(z.data), &(x.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &z, &z, &x)
 end
 
-function addeq!{S, M}(z::Poly{Residue{ZZ, M}, S}, x::Poly{Residue{ZZ, M}, S},)
+function addeq!{S, M}(z::Poly{Residue{ZZ, M}, S}, x::Poly{Residue{ZZ, M}, S})
    ccall((:fmpz_mod_poly_add, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-               &(z.data), &(z.data), &(x.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &z, &z, &x)
 end
 
 ###########################################################################################
@@ -607,24 +571,24 @@ end
 function *{S}(x::Int, y::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_scalar_mul_si, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), 
-               &(z.data), &(y.data), x)
+                (Ptr{Poly}, Ptr{Poly}, Int), 
+               &z, &y, x)
    return z
 end
 
 function *{S}(x::ZZ, y::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_scalar_mul_fmpz, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{ZZ}), 
-               &(z.data), &(y.data), &x)
+                (Ptr{Poly}, Ptr{Poly}, Ptr{ZZ}), 
+               &z, &y, &x)
    return z
 end
 
 function *{S, M}(x::ZZ, y::Poly{Residue{ZZ, M}, S})
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_scalar_mul_fmpz, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{ZZ}), 
-               &(z.data), &(y.data), &x)
+                (Ptr{Poly}, Ptr{Poly}, Ptr{ZZ}), 
+               &z, &y, &x)
    return z
 end
 
@@ -657,32 +621,32 @@ end
 function +{S}(x::Poly{ZZ, S}, y::Int)
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_add_si, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), 
-               &(z.data), &(x.data), y)
+                (Ptr{Poly}, Ptr{Poly}, Int), 
+               &z, &x, y)
    return z
 end
 
 function +{S}(x::Poly{ZZ, S}, y::ZZ)
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_add_fmpz, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{ZZ}), 
-               &(z.data), &(x.data), &y)
+                (Ptr{Poly}, Ptr{Poly}, Ptr{ZZ}), 
+               &z, &x, &y)
    return z
 end
 
 function +{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Int)
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_add_si, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Int), 
-               &(z.data), &(x.data), y)
+                (Ptr{Poly}, Ptr{Poly}, Int), 
+               &z, &x, y)
    return z
 end
 
 function +{S, M}(x::Poly{Residue{ZZ, M}, S}, y::ZZ)
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_add_fmpz, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{ZZ}), 
-               &(z.data), &(x.data), &y)
+                (Ptr{Poly}, Ptr{Poly}, Ptr{ZZ}), 
+               &z, &x, &y)
    return z
 end
 
@@ -691,32 +655,32 @@ end
 function -{S}(x::Poly{ZZ, S}, y::Int)
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_sub_si, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), 
-               &(z.data), &(x.data), y)
+                (Ptr{Poly}, Ptr{Poly}, Int), 
+               &z, &x, y)
    return z
 end
 
 function -{S}(x::Poly{ZZ, S}, y::ZZ)
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_sub_fmpz, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{ZZ}), 
-               &(z.data), &(x.data), &y)
+                (Ptr{Poly}, Ptr{Poly}, Ptr{ZZ}), 
+               &z, &x, &y)
    return z
 end
 
 function -{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Int)
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_sub_si, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Int), 
-               &(z.data), &(x.data), y)
+                (Ptr{Poly}, Ptr{Poly}, Int), 
+               &z, &x, y)
    return z
 end
 
 function -{S, M}(x::Poly{Residue{ZZ, M}, S}, y::ZZ)
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_sub_fmpz, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{ZZ}), 
-               &(z.data), &(x.data), &y)
+                (Ptr{Poly}, Ptr{Poly}, Ptr{ZZ}), 
+               &z, &x, &y)
    return z
 end
 
@@ -725,32 +689,32 @@ end
 function -{S}(x::Int, y::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_si_sub, :libflint), Void, 
-                (Ptr{fmpz_poly}, Int, Ptr{fmpz_poly}), 
-               &(z.data), x, &(y.data))
+                (Ptr{Poly}, Int, Ptr{Poly}), 
+               &z, x, &y)
    return z
 end
 
 function -{S, M}(x::Int, y::Poly{Residue{ZZ, M}, S})
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_si_sub, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Int, Ptr{fmpz_mod_poly}), 
-               &(z.data), x, &(y.data))
+                (Ptr{Poly}, Int, Ptr{Poly}), 
+               &z, x, &y)
    return z
 end
 
 function -{S}(x::ZZ, y::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_fmpz_sub, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{ZZ}, Ptr{fmpz_poly}), 
-               &(z.data), &x, &(y.data))
+                (Ptr{Poly}, Ptr{ZZ}, Ptr{Poly}), 
+               &z, &x, &y)
    return z
 end
 
 function -{S, M}(x::ZZ, y::Poly{Residue{ZZ, M}, S})
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_fmpz_sub, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{ZZ}, Ptr{fmpz_mod_poly}), 
-               &(z.data), &x, &(y.data))
+                (Ptr{Poly}, Ptr{ZZ}, Ptr{Poly}), 
+               &z, &x, &y)
    return z
 end
 
@@ -783,8 +747,8 @@ function truncate{S}(a::Poly{ZZ, S}, n::Int)
 
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_set_trunc, :libflint), Void,
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int),
-               &(z.data), &(a.data), n)
+                (Ptr{Poly}, Ptr{Poly}, Int),
+               &z, &a, n)
 
    return z
 end
@@ -798,8 +762,8 @@ function truncate{S, M}(a::Poly{Residue{ZZ, M}, S}, n::Int)
 
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_set_trunc, :libflint), Void,
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Int),
-               &(z.data), &(a.data), n)
+                (Ptr{Poly}, Ptr{Poly}, Int),
+               &z, &a, n)
    return z
 end
 
@@ -831,8 +795,8 @@ function mullow{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S}, n::Int)
    
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_mullow, :libflint), Void,
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int),
-               &(z.data), &(x.data), &(y.data), n)
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Int),
+               &z, &x, &y, n)
    return z
 end
 
@@ -841,8 +805,8 @@ function mullow{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S}, n:
    
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_mullow, :libflint), Void,
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Int),
-               &(z.data), &(x.data), &(y.data), n)
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Int),
+               &z, &x, &y, n)
    return z
 end
 
@@ -911,8 +875,8 @@ function reverse{S}(x::Poly{ZZ, S}, len::Int)
    len < 0 && throw(DomainError())
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_reverse, :libflint), Void,
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int),
-               &(z.data), &(x.data), len)
+                (Ptr{Poly}, Ptr{Poly}, Int),
+               &z, &x, len)
    return z
 end
 
@@ -920,8 +884,8 @@ function reverse{S, M}(x::Poly{Residue{ZZ, M}, S}, len::Int)
    len < 0 && throw(DomainError())
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_reverse, :libflint), Void,
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Int),
-               &(z.data), &(x.data), len)
+                (Ptr{Poly}, Ptr{Poly}, Int),
+               &z, &x, len)
    return z
 end
 
@@ -965,8 +929,8 @@ function shift_left{S, M}(x::Poly{Residue{ZZ, M}, S}, len::Int)
    len < 0 && throw(DomainError())
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_shift_left, :libflint), Void,
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Int),
-               &(z.data), &(x.data), len)
+                (Ptr{Poly}, Ptr{Poly}, Int),
+               &z, &x, len)
    return z
 end
 
@@ -974,8 +938,8 @@ function shift_right{S, M}(x::Poly{Residue{ZZ, M}, S}, len::Int)
    len < 0 && throw(DomainError())
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_shift_right, :libflint), Void,
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Int),
-               &(z.data), &(x.data), len)
+                (Ptr{Poly}, Ptr{Poly}, Int),
+               &z, &x, len)
    return z
 end
 
@@ -983,8 +947,8 @@ function shift_left{S}(x::Poly{ZZ, S}, len::Int)
    len < 0 && throw(DomainError())
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_shift_left, :libflint), Void,
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int),
-               &(z.data), &(x.data), len)
+                (Ptr{Poly}, Ptr{Poly}, Int),
+               &z, &x, len)
    return z
 end
 
@@ -992,8 +956,8 @@ function shift_right{S}(x::Poly{ZZ, S}, len::Int)
    len < 0 && throw(DomainError())
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_shift_right, :libflint), Void,
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int),
-               &(z.data), &(x.data), len)
+                (Ptr{Poly}, Ptr{Poly}, Int),
+               &z, &x, len)
    return z
 end
 
@@ -1008,8 +972,8 @@ function ^{S}(x::Poly{ZZ, S}, y::Int)
    y < 0 && throw(DomainError())
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_pow, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), 
-               &(z.data), &(x.data), y)
+                (Ptr{Poly}, Ptr{Poly}, Int), 
+               &z, &x, y)
    return z
 end
 
@@ -1017,8 +981,8 @@ function ^{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Int)
    y < 0 && throw(DomainError())
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_pow, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Int), 
-               &(z.data), &(x.data), y)
+                (Ptr{Poly}, Ptr{Poly}, Int), 
+               &z, &x, y)
    return z
 end
 
@@ -1071,8 +1035,8 @@ end
 function mulmod{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S}, f::Poly{Residue{ZZ, M}, S})
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_mulmod, :libflint), Void,
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}),
-               &(z.data), &(x.data), &(y.data), &(f.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}),
+               &z, &x, &y, &(f.data))
    return z
 end
 
@@ -1112,8 +1076,8 @@ function powmod{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Int, f::Poly{Residue{ZZ, M}
    end
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_powmod_ui_binexp, :libflint), Void,
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Int, Ptr{fmpz_mod_poly}),
-               &(z.data), &(x.data), y, &(f.data))
+                (Ptr{Poly}, Ptr{Poly}, Int, Ptr{Poly}),
+               &z, &x, y, &(f.data))
    return z
 end
 
@@ -1128,8 +1092,8 @@ end
 function invmod{S, M}(x::Poly{Residue{ZZ, M}, S}, f::Poly{Residue{ZZ, M}, S})
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_invmod, :libflint), Void,
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}),
-               &(z.data), &(x.data), &(f.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}),
+               &z, &x, &(f.data))
    return z
 end
 
@@ -1144,10 +1108,10 @@ function =={S}(x::Poly{ZZ, S}, y::ZZ)
    if length(x) > 1
       return false
    elseif length(x) == 1 
-      z = ZZ();
+      z = ZZ()
       ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
-                (Ptr{ZZ}, Ptr{fmpz_poly}, Int), 
-               &z, &(x.data), 0)
+                (Ptr{ZZ}, Ptr{Poly}, Int), 
+               &z, &x, 0)
       return z == y
    else
       return y == 0
@@ -1162,8 +1126,8 @@ function =={S, M}(x::Poly{Residue{ZZ, M}, S}, y::ZZ)
    elseif length(x) == 1 
       z = ZZ();
       ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
-                (Ptr{ZZ}, Ptr{fmpz_mod_poly}, Int), 
-               &z, &(x.data), 0)
+                (Ptr{ZZ}, Ptr{Poly}, Int), 
+               &z, &x, 0)
       return z == y
    else
       return y == 0
@@ -1181,10 +1145,10 @@ end
                                         || (length(x) == 1 && coeff(x, 0) == y))
 
 =={S}(x::Poly{ZZ, S}, y::Poly{ZZ, S}) = ccall((:fmpz_poly_equal, :libflint), Bool, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}), &x, &y)
 
 =={S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S}) = ccall((:fmpz_mod_poly_equal, :libflint), Bool, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}), &x, &y)
 
 function =={T<: Ring, S}(x::Poly{T, S}, y::Poly{T, S})
    if length(x) != length(y)
@@ -1248,8 +1212,8 @@ function divexact{S}(x::Poly{ZZ, S}, y::ZZ)
    y == 0 && throw(DivideError())
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_scalar_divexact_fmpz, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{ZZ}), 
-               &(z.data),  &(x.data), &y)
+                (Ptr{Poly}, Ptr{Poly}, Ptr{ZZ}), 
+               &z,  &x, &y)
    return z
 end
 
@@ -1257,8 +1221,8 @@ function divexact{S}(x::Poly{ZZ, S}, y::Int)
    y == 0 && throw(DivideError())
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_scalar_divexact_si, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), 
-               &(z.data),  &(x.data), y)
+                (Ptr{Poly}, Ptr{Poly}, Int), 
+               &z,  &x, y)
    return z
 end
 
@@ -1266,8 +1230,8 @@ function divexact{S, M}(x::Poly{Residue{ZZ, M}, S}, y::ZZ)
    y == 0 && throw(DivideError())
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_scalar_div_fmpz, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{ZZ}), 
-               &(z.data),  &(x.data), &y)
+                (Ptr{Poly}, Ptr{Poly}, Ptr{ZZ}), 
+               &z,  &x, &y)
    return z
 end
 
@@ -1304,8 +1268,8 @@ function divexact{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    end
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_div, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
-               &(z.data),  &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &z,  &x, &y)
    return z
 end
 
@@ -1317,8 +1281,8 @@ function divexact{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S})
    q = Poly{Residue{ZZ, M}, S}()
    r = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_divrem, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-               &(q.data), &(r.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &q, &r, &x, &y)
    return q
 end
 
@@ -1347,8 +1311,8 @@ function mod{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S})
    y == 0 && throw(DivideError())
    r = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_rem, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-               &(r.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &r, &x, &y)
    return r
 end
 
@@ -1384,8 +1348,8 @@ function divrem{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S})
    q = Poly{Residue{ZZ, M}, S}()
    r = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_divrem, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-               &(q.data), &(r.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &q, &r, &x, &y)
    return q, r
 end
 
@@ -1400,8 +1364,8 @@ function pseudorem{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    d = 0
    ccall((:fmpz_poly_pseudo_rem, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{Int}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
-               &(z.data), &d, &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Int}, Ptr{Poly}, Ptr{Poly}), 
+               &z, &d, &x, &y)
    return z
 end
 
@@ -1411,8 +1375,8 @@ function pseudodivrem{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    r = Poly{ZZ, S}()
    d = 0
    ccall((:fmpz_poly_pseudo_divrem_divconquer, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{Int}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
-               &(q.data), &(r.data), &d, &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Int}, Ptr{Poly}, Ptr{Poly}), 
+               &q, &r, &d, &x, &y)
    return (q, r)
 end
 
@@ -1512,16 +1476,16 @@ end
 function gcd{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_gcd, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
-               &(z.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &z, &x, &y)
    return z
 end
 
 function gcd{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S})
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_gcd, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-               &(z.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &z, &x, &y)
    return z
 end
 
@@ -1540,8 +1504,8 @@ end
 function content{S}(x::Poly{ZZ, S})
    z = ZZ()
    ccall((:fmpz_poly_content, :libflint), Void, 
-                (Ptr{ZZ}, Ptr{fmpz_poly}), 
-               &z, &(x.data))
+                (Ptr{ZZ}, Poly{ZZ, S}), 
+               &z, &x)
    return z
 end
 
@@ -1553,8 +1517,8 @@ end
 function primpart{S}(x::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_primitive_part, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
-               &(z.data), &(x.data))
+                (Ptr{Poly}, Ptr{Poly}), 
+               &z, &x)
    return z
 end
 
@@ -1567,24 +1531,24 @@ end
 function evaluate{S}(x::Poly{ZZ, S}, y::ZZ)
    z = ZZ()
    ccall((:fmpz_poly_evaluate_fmpz, :libflint), Void, 
-                (Ptr{ZZ}, Ptr{fmpz_poly}, Ptr{ZZ}), 
-               &z, &(x.data), &y)
+                (Ptr{ZZ}, Ptr{Poly}, Ptr{ZZ}), 
+               &z, &x, &y)
    return z
 end
 
 function evaluate{S}(x::Poly{ZZ, S}, y::Int)
    z = ZZ()
    ccall((:fmpz_poly_evaluate_fmpz, :libflint), Void, 
-                (Ptr{ZZ}, Ptr{fmpz_poly}, Ptr{ZZ}), 
-               &z, &(x.data), &ZZ(y))
+                (Ptr{ZZ}, Ptr{Poly}, Ptr{ZZ}), 
+               &z, &x, &ZZ(y))
    return z
 end
 
 function evaluate{S, M}(x::Poly{Residue{ZZ, M}, S}, y::ZZ)
    z = ZZ()
    ccall((:fmpz_mod_poly_evaluate_fmpz, :libflint), Void, 
-                (Ptr{ZZ}, Ptr{fmpz_mod_poly}, Ptr{ZZ}), 
-               &z, &(x.data), &y)
+                (Ptr{ZZ}, Ptr{Poly}, Ptr{ZZ}), 
+               &z, &x, &y)
    return z
 end
 
@@ -1614,16 +1578,16 @@ end
 function compose{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_compose, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
-               &(z.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &z, &x, &y)
    return z
 end
 
 function compose{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S})
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_compose, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-               &(z.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &z, &x, &y)
    return z
 end
 
@@ -1649,16 +1613,16 @@ end
 function deriv{S}(x::Poly{ZZ, S})
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_derivative, :libflint), Void, 
-                (Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
-               &(z.data), &(x.data))
+                (Ptr{Poly}, Ptr{Poly}), 
+               &z, &x)
    return z
 end
 
 function deriv{S, M}(x::Poly{Residue{ZZ, M}, S})
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_derivative, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-               &(z.data), &(x.data))
+                (Ptr{Poly}, Ptr{Poly}), 
+               &z, &x)
    return z
 end
 
@@ -1706,8 +1670,8 @@ end
 function resultant{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    z = ZZ()
    ccall((:fmpz_poly_resultant, :libflint), Void, 
-                (Ptr{ZZ}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
-               &z, &(x.data), &(y.data))
+                (Ptr{ZZ}, Ptr{Poly}, Ptr{Poly}), 
+               &z, &x, &y)
    return z
 end
 
@@ -1793,8 +1757,8 @@ end
 function resultant{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S})
    z = ZZ()
    ccall((:fmpz_mod_poly_resultant, :libflint), Void, 
-                (Ptr{ZZ}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-               &z, &(x.data), &(y.data))
+                (Ptr{ZZ}, Ptr{Poly}, Ptr{Poly}), 
+               &z, &x, &y)
    return Residue{ZZ, M}(z)
 end
 
@@ -1807,16 +1771,16 @@ end
 function discriminant{S}(x::Poly{ZZ, S})
    z = ZZ()
    ccall((:fmpz_poly_discriminant, :libflint), Void, 
-                (Ptr{ZZ}, Ptr{fmpz_poly}), 
-               &z, &(x.data))
+                (Ptr{ZZ}, Poly{ZZ, S}), 
+               &z, &x)
    return z
 end
 
 function discriminant{S, M}(x::Poly{Residue{ZZ, M}, S})
    z = ZZ()
    ccall((:fmpz_mod_poly_discriminant, :libflint), Void, 
-                (Ptr{ZZ}, Ptr{fmpz_mod_poly}), 
-               &z, &(x.data))
+                (Ptr{ZZ}, Ptr{Poly}), 
+               &z, &x)
    return Residue{ZZ, M}(z)
 end
 
@@ -1843,8 +1807,8 @@ function bezout{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    u = Poly{ZZ, S}()
    v = Poly{ZZ, S}()
    ccall((:fmpz_poly_xgcd_modular, :libflint), Void, 
-                (Ptr{ZZ}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
-               &z, &(u.data), &(v.data), &(x.data), &(y.data))
+                (Ptr{ZZ}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Poly{ZZ, S}), 
+               &z, &u, &v, &x, &y)
    return (z, u, v)
 end
 
@@ -1853,8 +1817,8 @@ function bezout{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S})
    s = Poly{Residue{ZZ, M}, S}()
    t = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_xgcd, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-               &(g.data), &(s.data), &(t.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &(g.data), &(s.data), &(t.data), &x, &y)
    return (g, s, t)
 end
 
@@ -2001,8 +1965,8 @@ function gcdinv{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S})
    g = Poly{Residue{ZZ, M}, S}()
    s = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_gcdinv, :libflint), Void, 
-                (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-               &(g.data), &(s.data), &(x.data), &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
+               &(g.data), &(s.data), &x, &y)
    return (g, s)
 end
 
@@ -2014,13 +1978,13 @@ end
 
 function chebyshev_t{S}(::Type{Poly{ZZ, S}}, n::Int)
    z = Poly{ZZ, S}()
-   ccall((:fmpz_poly_chebyshev_t, :libflint), Void, (Ptr{fmpz_poly}, Int), &(z.data), n)
+   ccall((:fmpz_poly_chebyshev_t, :libflint), Void, (Ptr{Poly}, Int), &z, n)
    return z
 end
    
 function chebyshev_u{S}(::Type{Poly{ZZ, S}}, n::Int)
    z = Poly{ZZ, S}()
-   ccall((:fmpz_poly_chebyshev_u, :libflint), Void, (Ptr{fmpz_poly}, Int), &(z.data), n)
+   ccall((:fmpz_poly_chebyshev_u, :libflint), Void, (Ptr{Poly}, Int), &z, n)
    return z
 end
 
@@ -2096,34 +2060,34 @@ end
 
 function cyclotomic{S}(::Type{Poly{ZZ, S}}, n::Int)
    z = Poly{ZZ, S}()
-   ccall((:fmpz_poly_cyclotomic, :libflint), Void, (Ptr{fmpz_poly}, Int), &(z.data), n)
+   ccall((:fmpz_poly_cyclotomic, :libflint), Void, (Ptr{Poly}, Int), &z, n)
    return z
 end
    
 function swinnerton_dyer{S}(::Type{Poly{ZZ, S}}, n::Int)
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_swinnerton_dyer, :libflint), Void, 
-                                                    (Ptr{fmpz_poly}, Int), &(z.data), n)
+                                                    (Ptr{Poly}, Int), &z, n)
    return z
 end
    
 function cos_minpoly{S}(::Type{Poly{ZZ, S}}, n::Int)
    z = Poly{ZZ, S}()
-   ccall((:fmpz_poly_cos_minpoly, :libflint), Void, (Ptr{fmpz_poly}, Int), &(z.data), n)
+   ccall((:fmpz_poly_cos_minpoly, :libflint), Void, (Ptr{Poly}, Int), &z, n)
    return z
 end
    
 function theta_qexp{S}(::Type{Poly{ZZ, S}}, e::Int, n::Int)
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_theta_qexp, :libflint), Void, 
-                                            (Ptr{fmpz_poly}, Int, Int), &(z.data), e, n)
+                                            (Ptr{Poly}, Int, Int), &z, e, n)
    return z
 end
 
 function eta_qexp{S}(::Type{Poly{ZZ, S}}, e::Int, n::Int)
    z = Poly{ZZ, S}()
    ccall((:fmpz_poly_eta_qexp, :libflint), Void, 
-                                            (Ptr{fmpz_poly}, Int, Int), &(z.data), e, n)
+                                            (Ptr{Poly}, Int, Int), &z, e, n)
    return z
 end
    
@@ -2163,6 +2127,5 @@ function PolynomialRing{T <: Ring}(::Type{T}, s::String)
    Base.promote_rule{R <: Integer}(::Type{T1}, ::Type{R}) = T1
 
    # (Type, gen) 
-
    return (Poly{T, S}, Poly(Poly{T, S}, [T(0), T(1)]))
 end

@@ -43,19 +43,11 @@ isless(a::Nothing, b::Nothing) = false
 -(a::Nothing, b::Int) = nothing
 
 type PowerSeries{T <: Ring, S} <: Ring
-   data :: Union(fmpz_poly, fmpz_mod_poly, fmpq_poly, fq_poly, PolyStruct{T})
+   data :: PolyStruct{T}
    prec :: Precision
 
    PowerSeries(a :: PolyStruct{T}, n :: Precision) = new(a, n)   
 
-   PowerSeries(a::fmpz_mod_poly, n :: Precision) = new(a, n)
-   
-   PowerSeries(a :: fmpz_poly, n :: Precision) = new(a, n)
-   
-   PowerSeries(a :: fmpq_poly, n :: Precision) = new(a, n)
-   
-   PowerSeries(a :: fq_poly, n :: Precision) = new(a, n)
-   
    PowerSeries() = PowerSeries(PowerSeries{T, S}, Array(T, 0), nothing)
    
    PowerSeries(a::Integer) = a == 0 ? PowerSeries(PowerSeries{T, S}, Array(T, 0), nothing) : PowerSeries(PowerSeries{T, S}, [T(a)], nothing)
