@@ -35,5 +35,7 @@ include("FiniteFields.jl")
 
 include("Poly2.jl")
 
+include("PowerSeries2.jl")
+
 end # module
 

@@ -4,7 +4,7 @@
 #
 ###########################################################################################    
 
-import Rings: Poly, init2, init2, coeff, isgen, truncate, mullow, 
+import Rings: Poly, initpoly2, initpoly3, coeff, isgen, truncate, mullow, 
               divexact, gcd, content, primpart, mod, divrem, evaluate, compose, deriv, 
               resultant, bezout, integral, lcm, reverse, shift_left, shift_right, 
               setcoeff!, mulmod, powmod, length
@@ -20,7 +20,7 @@ export coeff, isgen, truncate, mullow, divexact, gcd, content, primpart, mod, di
 ###########################################################################################
 
 function Poly{S}(::Type{Poly{QQ, S}}, a :: Array{QQ, 1})
-   z = Poly{QQ, S}(init2())
+   z = Poly{QQ, S}(initpoly2())
    ccall((:fmpq_poly_init2, :libflint), Void, (Ptr{Poly}, Int), &z, length(a))
    for i = 1:length(a)
       ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, (Ptr{Poly}, Int, Ptr{fmpq}),
@@ -30,7 +30,7 @@ function Poly{S}(::Type{Poly{QQ, S}}, a :: Array{QQ, 1})
 end
 
 function Poly{S, T}(::Type{Poly{FinFieldElem{T}, S}}, a :: Array{FinFieldElem{T}, 1})
-   z = Poly{FinFieldElem{T}, S}(init2())
+   z = Poly{FinFieldElem{T}, S}(initpoly2())
    ctx = eval(:($T))
    ccall((:fq_poly_init2, :libflint), Void, (Ptr{Poly}, Int, Ptr{fq_ctx}), &z, length(a), &ctx)
    for i = 1:length(a)

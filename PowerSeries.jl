@@ -4,13 +4,13 @@
 #
 ###########################################################################################    
 
-export PowerSeries, PowerSeriesRing, O, valuation, min, max, isless
+export PowerSeries, PowerSeriesRing, O, valuation, min, max, isless, Precision, initps
 
 import Base: min, max, isless
 
 ###########################################################################################
 #
-#   Data types and memory management
+#   Precision type
 #
 ###########################################################################################
 
@@ -42,12 +42,26 @@ isless(a::Nothing, b::Nothing) = false
 
 -(a::Nothing, b::Int) = nothing
 
+###########################################################################################
+#
+#   Data types and memory management
+#
+###########################################################################################
+
+type initps end
+
 type PowerSeries{T <: Ring, S} <: Ring
-   data :: PolyStruct{T}
+   coeffs::Ptr{Void}
+   len::Int
+   alloc::Int
+   inv::Int
    prec :: Precision
+   data :: PolyStruct{T}
+   
+   PowerSeries(a :: PolyStruct{T}, n :: Precision) = new(C_NULL, 0, 0, 0, n, a)   
 
-   PowerSeries(a :: PolyStruct{T}, n :: Precision) = new(a, n)   
-
+   PowerSeries(a :: initps, n :: Precision) = new(C_NULL, 0, 0, 0, n)
+   
    PowerSeries() = PowerSeries(PowerSeries{T, S}, Array(T, 0), nothing)
    
    PowerSeries(a::Integer) = a == 0 ? PowerSeries(PowerSeries{T, S}, Array(T, 0), nothing) : PowerSeries(PowerSeries{T, S}, [T(a)], nothing)
@@ -65,7 +79,7 @@ function PowerSeries{T, S}(::Type{PowerSeries{T, S}}, a :: Array{T, 1}, n :: Pre
 end
 
 function O{T, S}(a :: PowerSeries{T, S})
-   prec = a.data.length - 1
+   prec = length(a) - 1
    prec < 0 && throw(DivideError())
    a.prec != nothing && error("Invalid power series monomial in O()")
    return PowerSeries(PowerSeries{T, S}, Array(T, 0), prec)
@@ -77,6 +91,8 @@ end
 #
 ###########################################################################################    
    
+length{T <: Ring, S}(x::PowerSeries{T, S}) = x.data.length
+
 function normalise{T <: Ring, S}(a::PowerSeries{T, S}, len::Int)
    while len > 0 && a.data.coeffs[len] == 0 # cannot use coeff(a, len - 1) here
       len -= 1
@@ -85,7 +101,7 @@ function normalise{T <: Ring, S}(a::PowerSeries{T, S}, len::Int)
    return len
 end
 
-coeff{T <: Ring, S}(a::PowerSeries{T, S}, n::Int) = n < 0 || n >= a.data.length ? 0 : a.data.coeffs[n + 1]
+coeff{T <: Ring, S}(a::PowerSeries{T, S}, n::Int) = n < 0 || n >= a.data.length ? T(0) : a.data.coeffs[n + 1]
 
 zero{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries{T, S}(0)
 
@@ -93,16 +109,16 @@ one{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries{T, S}(1)
 
 gen{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries(PowerSeries{T, S}, [T(0), T(1)], nothing)
 
-isgen{T <: Ring, S}(a::PowerSeries{T, S}) = a.prec == nothing && a.data.length == 2 && a.data.coeffs[1] == 0 && a.data.coeffs[2] == 1
+isgen{T <: Ring, S}(a::PowerSeries{T, S}) = a.prec == nothing && a.data.length == 2 && coeff(a, 0) == 0 && coeff(a, 1) == 1
 
 isunit{T <: Ring, S}(a::PowerSeries{T, S}) = isunit(coeff(a, 0))
 
 function valuation{T <: Ring, S}(a::PowerSeries{T, S})
-   if a.data.length == 0
+   if length(a) == 0
       return a.prec
    end
-   for i = 1:a.data.length
-      if a.data.coeffs[i] != 0
+   for i = 1:length(a)
+      if coeff(a, i - 1) != 0
          return i - 1
       end
    end
@@ -174,9 +190,9 @@ function show{T <: Ring, S}(io::IO, ::Type{PowerSeries{T, S}})
    show(io, T)
 end
 
-needs_parentheses{T <: Ring, S}(x::PowerSeries{T, S}) = x.data.length > 1
+needs_parentheses{T <: Ring, S}(x::PowerSeries{T, S}) = length(s) > 1
 
-is_negative{T <: Ring, S}(x::PowerSeries{T, S}) = x.data.length <= 1 && is_negative(coeff(x, 0))
+is_negative{T <: Ring, S}(x::PowerSeries{T, S}) = length(x) <= 1 && is_negative(coeff(x, 0))
 
 show_minus_one{T <: Ring, S}(::Type{PowerSeries{T, S}}) = show_minus_one(T)
 
@@ -507,18 +523,16 @@ end
 function ^{T <: Ring, S}(a::PowerSeries{T, S}, b::Int)
    b < 0 && throw(DomainError())
    # special case powers of x for constructing power series efficiently
-   if a.prec == nothing && a.data.length == 2 && a.data.coeffs[1] == 0 && a.data.coeffs[2] == 1
+   if a.prec == nothing && length(a) == 2 && coeff(a, 0) == 0 && coeff(a, 1) == 1
       d = Array(T, b + 1)
-      d[b + 1] = a.data.coeffs[2]
+      d[b + 1] = coeff(a, 1)
       for i = 1:b
-         d[i] = a.data.coeffs[1]
+         d[i] = coeff(a, 0)
       end
-      z = PowerSeries(PowerSeries{T, S}, d, nothing)
-      z.data.length = b + 1
-      return z
-   elseif a.data.length == 0
+      return PowerSeries(PowerSeries{T, S}, d, nothing)
+   elseif length(a) == 0
       return PowerSeries(PowerSeries{T, S}, Array(T, 0), a.prec + (b - 1)*valuation(a))
-   elseif a.data.length == 1
+   elseif length(a) == 1
       return PowerSeries(PowerSeries{T, S}, [a.data.coeffs[1]^b], a.prec)
    elseif b == 0
       return PowerSeries(PowerSeries{T, S}, [T(1)], nothing)
@@ -546,11 +560,11 @@ end
 #
 ###########################################################################################
 
-=={T <: Ring, S}(x::PowerSeries{T, S}, y::Int) = x.prec == 0 || ((x.data.length == 0 && y == 0)
-                                        || (x.data.length == 1 && coeff(x, 0) == y))
+=={T <: Ring, S}(x::PowerSeries{T, S}, y::Int) = x.prec == 0 || ((length(x) == 0 && y == 0)
+                                        || (length(x) == 1 && coeff(x, 0) == y))
 
-=={T <: Ring, S}(x::PowerSeries{T, S}, y::ZZ) = x.prec == 0 || ((x.data.length == 0 && y == 0)
-                                        || (x.data.length == 1 && coeff(x, 0) == y))
+=={T <: Ring, S}(x::PowerSeries{T, S}, y::ZZ) = x.prec == 0 || ((length(x) == 0 && y == 0)
+                                        || (length(x) == 1 && coeff(x, 0) == y))
 
 function =={T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
    prec = min(x.prec, y.prec)
@@ -560,22 +574,22 @@ function =={T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
    
    m1 = min(m1, prec)
    m2 = min(m2, prec)
-   if x.data.length >= m2
+   if length(x) >= m2
       for i = m1 + 1: m2
-         if x.data.coeffs[i] != 0
+         if coeff(x, i - 1) != 0
             return false
           end
       end
    else
       for i = m1 + 1: m2
-         if y.data.coeffs[i] != 0
+         if coeffs(y, i - 1) != 0
             return false
           end
       end
    end
            
    for i = 1:m1
-      if x.data.coeffs[i] != y.data.coeffs[i]
+      if coeff(x, i - 1) != coeff(y, i - 1)
          return false
       end
    end
