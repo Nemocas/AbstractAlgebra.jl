@@ -9,7 +9,8 @@ export Poly, PolynomialRing, coeff, zero, one, gen, isgen, normalise, chebyshev_
        pseudorem, pseudodivrem, primpart, content, divexact, evaluate, compose, deriv,
        resultant, lead, discriminant, bezout, truncate, mullow, divrem, mulmod, powmod,
        invmod, canonical_unit, integral, lcm, reverse, shift_left, shift_right,
-       fmpz_poly_struct, fmpz_mod_poly_struct, fq_poly_struct, fmpq_poly_struct
+       fmpz_poly_struct, fmpz_mod_poly_struct, fq_poly_struct, fmpq_poly_struct,
+       init2, init3
 
 import Base: convert, zero, show, length
 
@@ -55,6 +56,12 @@ end
 #
 ###########################################################################################
 
+type init3
+end
+
+type init2
+end
+
 type PolyStruct{T <: Ring}
    coeffs :: Array{T, 1}
    length :: Int
@@ -69,14 +76,9 @@ type Poly{T <: Ring, S} <: Ring
    
    Poly(a :: PolyStruct{T}) = new(C_NULL, 0, 0, 0, a)   
 
-   Poly(a :: fmpz_mod_poly_struct) = new(C_NULL, 0, 0, 0)
-   
-   Poly(a :: fmpz_poly_struct) = new(C_NULL, 0, 0)
-   
-   Poly(a :: fmpq_poly_struct) = new(C_NULL, 0, 0)
-   
-   Poly(a :: fq_poly_struct) = new(C_NULL, 0, 0, 0)
-   
+   Poly(a :: init3) = new(C_NULL, 0, 0, 0)
+   Poly(a :: init2) = new(C_NULL, 0, 0)
+      
    Poly() = Poly(Poly{T, S}, Array(T, 0))
    Poly(a::Integer) = a == 0 ? Poly(Poly{T, S}, Array(T, 0)) : Poly(Poly{T, S}, [T(a)])
    Poly(a::T) = Poly(Poly{T, S}, [a])
@@ -93,7 +95,7 @@ function Poly{T, S}(::Type{Poly{T, S}}, a :: Array{T, 1})
 end
 
 function Poly{S}(::Type{Poly{ZZ, S}}, a :: Array{ZZ, 1})
-   z = Poly{ZZ, S}(fmpz_poly_struct())
+   z = Poly{ZZ, S}(init2())
    finalizer(z, _fmpz_poly_clear_fn)
    ccall((:fmpz_poly_init2, :libflint), Void, (Ptr{Poly}, Int), &z, length(a))
    for i = 1:length(a)
@@ -104,7 +106,7 @@ function Poly{S}(::Type{Poly{ZZ, S}}, a :: Array{ZZ, 1})
 end   
 
 function Poly{M, S}(::Type{Poly{Residue{ZZ, M}, S}}, a :: Array{Residue{ZZ, M}, 1})
-   z = Poly{Residue{ZZ, M}, S}(fmpz_mod_poly_struct())
+   z = Poly{Residue{ZZ, M}, S}(init3())
    m = modulus(Residue{ZZ, M})
    ccall((:fmpz_mod_poly_init2, :libflint), Void, (Ptr{Poly}, Ptr{ZZ}, Int), &z, &m, length(a))
    for i = 1:length(a)
