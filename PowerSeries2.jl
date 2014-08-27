@@ -260,7 +260,7 @@ function shift_right{S}(x::PowerSeries{QQ, S}, len::Int)
    len < 0 && throw(DomainError())
    xlen = length(x)
    if len >= xlen
-      return PowerSeries(PowerSeries{T, S}, Array(QQ, 0), max(0, x.prec - len))
+      return PowerSeries(PowerSeries{QQ, S}, Array(QQ, 0), max(0, x.prec - len))
    end
    z = PowerSeries{QQ, S}()
    z.prec = x.prec - len
@@ -289,6 +289,68 @@ function truncate{S}(x::PowerSeries{QQ, S}, prec::Precision)
                &z, &x, prec)
    return z
 end
+
+###########################################################################################
+#
+#   Exact division
+#
+###########################################################################################
+
+function divexact{S}(x::PowerSeries{QQ, S}, y::PowerSeries{QQ, S})
+   y == 0 && throw(DivideError())
+   v2 = valuation(y)
+   v1 = valuation(x)
+   if v2 != 0
+      if v1 >= v2
+         x = shift_right(x, v2)
+         y = shift_right(y, v2)
+      end
+   end
+   !isunit(y) && error("Unable to invert power series")
+   prec = min(x.prec, y.prec - 2*v2 + v1)
+   z = PowerSeries{QQ, S}()
+   z.prec = prec
+   ccall((:fmpq_poly_div_series, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &x, &y, prec)
+   return z
+end
+
+function divexact{S}(x::PowerSeries{QQ, S}, y::Int)
+   y == 0 && throw(DivideError())
+   z = PowerSeries{QQ, S}()
+   z.prec = x.prec
+   ccall((:fmpq_poly_scalar_div_si, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &x, y)
+   return z
+end
+
+function divexact{S}(x::PowerSeries{QQ, S}, y::ZZ)
+   y == 0 && throw(DivideError())
+   z = PowerSeries{QQ, S}()
+   z.prec = x.prec
+   ccall((:fmpq_poly_scalar_div_fmpz, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{ZZ}), 
+               &z, &x, &y)
+   return z
+end
+
+function divexact{S}(x::PowerSeries{QQ, S}, y::QQ)
+   y == 0 && throw(DivideError())
+   z = PowerSeries{QQ, S}()
+   z.prec = x.prec
+   ccall((:fmpq_poly_scalar_div_fmpz, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{fmpq}), 
+               &z, &x, &(y.data))
+   return z
+end
+
+/{S}(x::PowerSeries{QQ, S}, y::Int) = divexact(x, y)
+
+/{S}(x::PowerSeries{QQ, S}, y::ZZ) = divexact(x, y)
+
+/{S}(x::PowerSeries{QQ, S}, y::QQ) = divexact(x, y)
 
 ###########################################################################################
 #

@@ -621,6 +621,36 @@ function divexact{T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
    return x*inv(y)
 end
 
+function divexact{T<: Ring, S}(x::PowerSeries{T, S}, y::Int)
+   y == 0 && throw(DivideError())
+   lenx = length(x)
+   d = Array(T, lenx)
+   for i = 1:lenx
+      d[i] = divexact(coeff(x, i - 1), y)
+   end
+   return PowerSeries(PowerSeries{T, S}, d, x.prec)
+end
+
+function divexact{T<: Ring, S}(x::PowerSeries{T, S}, y::ZZ)
+   y == 0 && throw(DivideError())
+   lenx = length(x)
+   d = Array(T, lenx)
+   for i = 1:lenx
+      d[i] = divexact(coeff(x, i - 1), y)
+   end
+   return PowerSeries(PowerSeries{T, S}, d, x.prec)
+end
+
+function divexact{T<: Ring, S}(x::PowerSeries{T, S}, y::T)
+   y == 0 && throw(DivideError())
+   lenx = length(x)
+   d = Array(T, lenx)
+   for i = 1:lenx
+      d[i] = divexact(coeff(x, i - 1), y)
+   end
+   return PowerSeries(PowerSeries{T, S}, d, x.prec)
+end
+
 ###########################################################################################
 #
 #   Inversion

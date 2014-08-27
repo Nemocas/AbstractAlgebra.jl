@@ -92,7 +92,7 @@ length{S, T}(x::Poly{FinFieldElem{T}, S}) = ccall((:fq_poly_length, :libflint), 
 
 function coeff{S}(x::Poly{QQ, S}, n::Int)
    z = QQ()
-   ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, (Ptr{fmpq}, Ptr{Poly}, Int), &z, &x, n)
+   ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, (Ptr{fmpq}, Ptr{Poly}, Int), &(z.data), &x, n)
    return z
 end
 
@@ -509,7 +509,7 @@ function =={S}(x::Poly{QQ, S}, y::ZZ)
       z = QQ();
       ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, 
                 (Ptr{fmpq}, Ptr{Poly}, Int), 
-               &z, &x, 0)
+               &(z.data), &x, 0)
       return num(z) == y && den(z) == 1
    else
       return y == 0
@@ -559,7 +559,7 @@ function divexact{S}(x::Poly{QQ, S}, y::QQ)
    z = Poly{QQ, S}()
    ccall((:fmpq_poly_scalar_div_fmpq, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{fmpq}), 
-               &z,  &x, &y)
+               &z,  &x, &(y.data))
    return z
 end
 
