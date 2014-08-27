@@ -190,7 +190,7 @@ function show{T <: Ring, S}(io::IO, ::Type{PowerSeries{T, S}})
    show(io, T)
 end
 
-needs_parentheses{T <: Ring, S}(x::PowerSeries{T, S}) = length(s) > 1
+needs_parentheses{T <: Ring, S}(x::PowerSeries{T, S}) = length(x) > 1
 
 is_negative{T <: Ring, S}(x::PowerSeries{T, S}) = length(x) <= 1 && is_negative(coeff(x, 0))
 
