@@ -655,8 +655,6 @@ end
 
 /{T<: Ring, S}(x::PowerSeries{T, S}, y::ZZ) = divexact(x, y)
 
-/{T<: Ring, S}(x::PowerSeries{T, S}, y::T) = divexact(x, y)
-
 ###########################################################################################
 #
 #   Inversion
