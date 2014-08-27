@@ -314,6 +314,42 @@ function divexact{S}(x::PowerSeries{QQ, S}, y::PowerSeries{QQ, S})
    return z
 end
 
+function divexact{S}(x::PowerSeries{QQ, S}, y::Int)
+   y == 0 && throw(DivideError())
+   z = PowerSeries{QQ, S}()
+   z.prec = x.prec
+   ccall((:fmpq_poly_scalar_div_si, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &x, y)
+   return z
+end
+
+function divexact{S}(x::PowerSeries{QQ, S}, y::ZZ)
+   y == 0 && throw(DivideError())
+   z = PowerSeries{QQ, S}()
+   z.prec = x.prec
+   ccall((:fmpq_poly_scalar_div_fmpz, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{ZZ}), 
+               &z, &x, &y)
+   return z
+end
+
+function divexact{S}(x::PowerSeries{QQ, S}, y::QQ)
+   y == 0 && throw(DivideError())
+   z = PowerSeries{QQ, S}()
+   z.prec = x.prec
+   ccall((:fmpq_poly_scalar_div_fmpz, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{fmpq}), 
+               &z, &x, &(y.data))
+   return z
+end
+
+/{S}(x::PowerSeries{QQ, S}, y::Int) = divexact(x, y)
+
+/{S}(x::PowerSeries{QQ, S}, y::ZZ) = divexact(x, y)
+
+/{S}(x::PowerSeries{QQ, S}, y::QQ) = divexact(x, y)
+
 ###########################################################################################
 #
 #   Inversion
