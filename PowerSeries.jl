@@ -569,8 +569,8 @@ end
 function =={T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
    prec = min(x.prec, y.prec)
    
-   m1 = min(x.data.length, y.data.length)
-   m2 = max(x.data.length, y.data.length)
+   m1 = min(length(x), length(y))
+   m2 = max(length(x), length(y))
    
    m1 = min(m1, prec)
    m2 = min(m2, prec)
@@ -582,7 +582,7 @@ function =={T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
       end
    else
       for i = m1 + 1: m2
-         if coeffs(y, i - 1) != 0
+         if coeff(y, i - 1) != 0
             return false
           end
       end
