@@ -297,8 +297,8 @@ end
 function divexact{S}(x::PowerSeries{QQ, S}, y::PowerSeries{QQ, S})
    y == 0 && throw(DivideError())
    v2 = valuation(y)
+   v1 = valuation(x)
    if v2 != 0
-      v1 = valuation(x)
       if v1 >= v2
          x = shift_right(x, v2)
          y = shift_right(y, v2)

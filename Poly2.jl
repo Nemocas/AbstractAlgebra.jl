@@ -509,7 +509,7 @@ function =={S}(x::Poly{QQ, S}, y::ZZ)
       z = QQ();
       ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, 
                 (Ptr{fmpq}, Ptr{Poly}, Int), 
-               &z, &x, 0)
+               &(z.data), &x, 0)
       return num(z) == y && den(z) == 1
    else
       return y == 0
