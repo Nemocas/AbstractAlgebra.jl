@@ -4,9 +4,9 @@
 #
 ###########################################################################################    
 
-export PowerSeries, PowerSeriesRing, O, valuation, min, max, isless, Precision, initps, exp
+export PowerSeries, PowerSeriesRing, O, valuation, min, max, isless, Precision, initps
 
-import Base: min, max, isless, exp
+import Base: min, max, isless
 
 ###########################################################################################
 #
@@ -651,6 +651,12 @@ function divexact{T<: Ring, S}(x::PowerSeries{T, S}, y::T)
    return PowerSeries(PowerSeries{T, S}, d, x.prec)
 end
 
+/{T<: Ring, S}(x::PowerSeries{T, S}, y::Int) = divexact(x, y)
+
+/{T<: Ring, S}(x::PowerSeries{T, S}, y::ZZ) = divexact(x, y)
+
+/{T<: Ring, S}(x::PowerSeries{T, S}, y::T) = divexact(x, y)
+
 ###########################################################################################
 #
 #   Inversion
@@ -680,37 +686,6 @@ function inv{T<: Ring, S}(a::PowerSeries{T, S})
    ainv = PowerSeries(PowerSeries{T, S}, d, a.prec)
    ainv.data.length = normalise(ainv, a.prec)
    return ainv
-end
-
-###########################################################################################
-#
-#   Exponential
-#
-###########################################################################################
-
-function exp{T <: Ring}(a::T)
-   a != 0 && error("Exponential of nonzero element")
-   return one(T)
-end
-
-function exp{T<: Ring, S}(a::PowerSeries{T, S})
-   if a == 0
-      return PowerSeries(PowerSeries{T, S}, [one(T)], a.prec)
-   elseif a.prec == nothing
-      error("Unable to compute exponential of infinite precision power series")
-   end
-   d = Array(T, a.prec)
-   d[0+1] = exp(coeff(a, 0))
-   len = length(a)
-   for k = 1 : a.prec-1
-      s = zero(T)
-      for j = 1 : min(k+1, len) - 1
-         s += j * coeff(a, j) * d[k-j+1]
-      end
-      d[k+1] = s / k
-   end
-   b = PowerSeries(PowerSeries{T, S}, d, a.prec)
-   return b
 end
 
 ###########################################################################################
