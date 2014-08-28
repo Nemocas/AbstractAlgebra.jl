@@ -10,7 +10,7 @@ export Poly, PolynomialRing, coeff, zero, one, gen, isgen, normalise, chebyshev_
        resultant, lead, discriminant, bezout, truncate, mullow, divrem, mulmod, powmod,
        invmod, canonical_unit, integral, lcm, reverse, shift_left, shift_right,
        fmpz_poly_struct, fmpz_mod_poly_struct, fq_poly_struct, fmpq_poly_struct,
-       initpoly2, initpoly3
+       initpoly2, initpoly3, iszero, isone
 
 import Base: convert, zero, show, length
 
@@ -128,7 +128,7 @@ end
 ###########################################################################################    
    
 function normalise{T <: Ring, S}(a::Poly{T, S}, len::Int)
-   while len > 0 && a.data.coeffs[len] == 0 # cannot use coeff(a, len - 1) here
+   while len > 0 && iszero(a.data.coeffs[len]) # cannot use coeff(a, len - 1) here
       len -= 1
    end
 
@@ -140,6 +140,8 @@ length{T <: Ring, S}(x::Poly{T, S}) = x.data.length
 length{S}(x::Poly{ZZ, S}) = ccall((:fmpz_poly_length, :libflint), Int, (Ptr{Poly},), &x)
 
 length{S, M}(x::Poly{Residue{ZZ, M}, S}) = ccall((:fmpz_mod_poly_length, :libflint), Int, (Ptr{Poly},), &x)
+
+degree{T <: Ring, S}(x::Poly{T, S}) = length(x) - 1
 
 function coeff{S}(x::Poly{ZZ, S}, n::Int)
    z = ZZ()
@@ -161,11 +163,15 @@ isgen{S}(x::Poly{ZZ, S}) = bool(ccall((:fmpz_poly_is_x, :libflint), Int, (Ptr{Po
 
 isgen{S, M}(x::Poly{Residue{ZZ, M}, S}) = bool(ccall((:fmpz_mod_poly_is_x, :libflint), Int, (Ptr{Poly},), &x))
 
-isgen{T <: Ring, S}(a::Poly{T, S}) = length(a) == 2 && a.data.coeffs[1] == 0 && a.data.coeffs[2] == 1
+isgen{T <: Ring, S}(a::Poly{T, S}) = length(a) == 2 && iszero(a.data.coeffs[1]) && isone(a.data.coeffs[2])
 
 zero{T <: Ring, S}(::Type{Poly{T, S}}) = Poly{T, S}(0)
 
 one{T <: Ring, S}(::Type{Poly{T, S}}) = Poly{T, S}(1)
+
+iszero{T <: Ring, S}(a::Poly{T, S}) = length(a) == 0
+
+isone{T <: Ring, S}(a::Poly{T, S}) = length(a) == 1 && isone(coeff(a, 0))
 
 gen{T <: Ring, S}(::Type{Poly{T, S}}) = Poly(Poly{T, S}, [T(0), T(1)])
 
@@ -988,7 +994,7 @@ end
 function ^{T <: Ring, S}(a::Poly{T, S}, b::Int)
    b < 0 && throw(DomainError())
    # special case powers of x for constructing polynomials efficiently
-   if length(a) == 2 && a.data.coeffs[1] == 0 && a.data.coeffs[2] == 1
+   if isgen(a)
       d = Array(T, b + 1)
       d[b + 1] = a.data.coeffs[2]
       for i = 1:b

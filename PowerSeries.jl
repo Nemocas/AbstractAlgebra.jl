@@ -4,9 +4,9 @@
 #
 ###########################################################################################    
 
-export PowerSeries, PowerSeriesRing, O, valuation, min, max, isless, Precision, initps
+export PowerSeries, PowerSeriesRing, O, valuation, min, max, isless, Precision, initps, exp
 
-import Base: min, max, isless
+import Base: min, max, isless, exp
 
 ###########################################################################################
 #
@@ -93,8 +93,10 @@ end
    
 length{T <: Ring, S}(x::PowerSeries{T, S}) = x.data.length
 
+degree{T <: Ring, S}(x::PowerSeries{T, S}) = length(x) - 1
+
 function normalise{T <: Ring, S}(a::PowerSeries{T, S}, len::Int)
-   while len > 0 && a.data.coeffs[len] == 0 # cannot use coeff(a, len - 1) here
+   while len > 0 && iszero(a.data.coeffs[len]) # cannot use coeff(a, len - 1) here
       len -= 1
    end
 
@@ -107,9 +109,13 @@ zero{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries{T, S}(0)
 
 one{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries{T, S}(1)
 
+iszero{T <: Ring, S}(a::PowerSeries{T, S}) = a.prec == nothing && length(a) == 0
+
+isone{T <: Ring, S}(a::PowerSeries{T, S}) = a.prec == nothing && length(a) == 1 && isone(coeff(a, 0))
+
 gen{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries(PowerSeries{T, S}, [T(0), T(1)], nothing)
 
-isgen{T <: Ring, S}(a::PowerSeries{T, S}) = a.prec == nothing && a.data.length == 2 && coeff(a, 0) == 0 && coeff(a, 1) == 1
+isgen{T <: Ring, S}(a::PowerSeries{T, S}) = a.prec == nothing && a.data.length == 2 && iszero(coeff(a, 0)) && isone(coeff(a, 1))
 
 isunit{T <: Ring, S}(a::PowerSeries{T, S}) = isunit(coeff(a, 0))
 
@@ -523,7 +529,7 @@ end
 function ^{T <: Ring, S}(a::PowerSeries{T, S}, b::Int)
    b < 0 && throw(DomainError())
    # special case powers of x for constructing power series efficiently
-   if a.prec == nothing && length(a) == 2 && coeff(a, 0) == 0 && coeff(a, 1) == 1
+   if a.prec == nothing && isgen(a)
       d = Array(T, b + 1)
       d[b + 1] = coeff(a, 1)
       for i = 1:b
@@ -560,35 +566,18 @@ end
 #
 ###########################################################################################
 
-=={T <: Ring, S}(x::PowerSeries{T, S}, y::Int) = x.prec == 0 || ((length(x) == 0 && y == 0)
+=={T <: Ring, S}(x::PowerSeries{T, S}, y::Int) = x.prec == nothing && ((length(x) == 0 && y == 0)
                                         || (length(x) == 1 && coeff(x, 0) == y))
 
-=={T <: Ring, S}(x::PowerSeries{T, S}, y::ZZ) = x.prec == 0 || ((length(x) == 0 && y == 0)
+=={T <: Ring, S}(x::PowerSeries{T, S}, y::ZZ) = x.prec == nothing && ((length(x) == 0 && y == 0)
                                         || (length(x) == 1 && coeff(x, 0) == y))
 
 function =={T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
-   prec = min(x.prec, y.prec)
-   
-   m1 = min(length(x), length(y))
-   m2 = max(length(x), length(y))
-   
-   m1 = min(m1, prec)
-   m2 = min(m2, prec)
-   if length(x) >= m2
-      for i = m1 + 1: m2
-         if coeff(x, i - 1) != 0
-            return false
-          end
-      end
-   else
-      for i = m1 + 1: m2
-         if coeff(y, i - 1) != 0
-            return false
-          end
-      end
+   if x.prec != y.prec || length(x) != length(y)
+      return false
    end
-           
-   for i = 1:m1
+
+   for i = 1:length(x)
       if coeff(x, i - 1) != coeff(y, i - 1)
          return false
       end

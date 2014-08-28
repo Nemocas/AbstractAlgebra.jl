@@ -31,6 +31,10 @@ zero{T <: Ring, S}(::Type{Residue{T, S}}) = Residue{T, S}(0)
 
 one{T <: Ring, S}(::Type{Residue{T, S}}) = Residue{T, S}(1)
 
+iszero{T <: Ring, S}(a::Residue{T, S}) = iszero(a.data)
+
+isone{T <: Ring, S}(a::Residue{T, S}) = isone(a.data)
+
 function isunit{T <: Ring, S}(a::Residue{T, S})
    g, ainv = gcdinv(a.data, eval(:($S)))
    return g == 1

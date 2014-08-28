@@ -2136,6 +2136,19 @@ l = S(k)
 \subsubsection{Basic manipulation}
 
 \begin{lstlisting}
+degree{T <: Ring, S}(a::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return the degree of the polynomial $a$. We define the degree of the zero
+polynomial to be $-1$.}
+
+\begin{lstlisting}
+length{T <: Ring, S}(a::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return the length of the polynomial $a$, i.e. its degree plus one.}
+
+\begin{lstlisting}
 normalise{T <: Ring, S}(a::Poly{T, S}, len::Int)
 \end{lstlisting}
 
@@ -3656,6 +3669,20 @@ k = R()
 \end{lstlisting}
 
 \subsubsection{Basic manipulation}
+
+\begin{lstlisting}
+degree{T <: Ring, S}(a::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return the degree of the polynomial underlying the power series $a$.
+We define the degree of the zero polynomial to be $-1$.}
+
+\begin{lstlisting}
+length{T <: Ring, S}(a::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return the length of the polynomial underlying the power series $a$, i.e.
+its degree plus one.}
 
 \begin{lstlisting}
 normalise{T <: Ring, S}(a::PowerSeries{T, S}, len::Int)

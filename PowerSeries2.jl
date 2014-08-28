@@ -7,9 +7,7 @@
 import Rings: PowerSeries, PowerSeriesRing, max, min, isless, Precision, valuation, O,
               initps, coeff, truncate
 
-import Base: exp
-
-export PowerSeries, coeff, truncate, exp
+export PowerSeries, coeff, truncate
 
 ###########################################################################################
 #
@@ -241,6 +239,22 @@ end
 
 ###########################################################################################
 #
+#   Comparison
+#
+###########################################################################################
+
+function =={S}(x::PowerSeries{QQ, S}, y::PowerSeries{QQ, S})
+   if c.prec != y.prec || length(x) != length(y)
+      return false
+   end
+   return bool(ccall((:fmpq_poly_equal, :libflint), Cint, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}), 
+               &x, &y))
+
+end
+
+###########################################################################################
+#
 #   Shifting
 #
 ###########################################################################################
@@ -372,23 +386,3 @@ function inv{S}(a::PowerSeries{QQ, S})
                &ainv, &a, a.prec)
    return ainv
 end
-
-###########################################################################################
-#
-#   Exponential
-#
-###########################################################################################
-
-function exp{S}(a::PowerSeries{QQ, S})
-   if a == 0
-      return PowerSeries(PowerSeries{QQ, S}, [QQ(1)], nothing)
-   elseif a.prec == nothing
-      error("Unable to compute exponential of infinite precision power series")
-   end
-   b = PowerSeries(PowerSeries{QQ, S}, Array(QQ, 0), a.prec)
-   ccall((:fmpq_poly_exp_series, :libflint), Void, 
-                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
-               &b, &a, a.prec)
-   return b
-end
-

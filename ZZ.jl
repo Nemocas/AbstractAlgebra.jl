@@ -179,6 +179,10 @@ size(a::ZZ) = int(ccall((:fmpz_size, :libflint), Cint, (Ptr{ZZ},), &a))
 
 isunit(a::ZZ) = bool(ccall((:fmpz_is_pm1, :libflint), Cint, (Ptr{ZZ},), &a))
 
+iszero(a::ZZ) = bool(ccall((:fmpz_is_one, :libflint), Cint, (Ptr{ZZ},), &a))
+
+isone(a::ZZ) = bool(ccall((:fmpz_is_zero, :libflint), Cint, (Ptr{ZZ},), &a))
+
 ###########################################################################################
 #
 #   Conversions to/from other Julia types

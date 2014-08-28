@@ -79,6 +79,10 @@ function gen{S}(::Type{FinFieldElem{S}})
    return d
 end
 
+iszero{S}(a::FinFieldElem{S}) = bool(ccall((:fq_is_zero, :libflint), Cint, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &a, &eval(:($S))))
+
+isone{S}(a::FinFieldElem{S}) = bool(ccall((:fq_is_one, :libflint), Cint, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &a, &eval(:($S))))
+
 isunit{S}(a::FinFieldElem{S}) = bool(ccall((:fq_is_invertible, :libflint), Cint, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &a, &eval(:($S))))
 
 function characteristic{S}(::Type{FinFieldElem{S}})

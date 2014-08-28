@@ -1,12 +1,13 @@
 export Fraction, FractionField, num, den, zero, one, gcd, divexact, mul!, addeq!, inv,
        canonical_unit, mod, divrem, needs_parentheses, is_negative, show_minus_one, QQ,
        cmp, height, height_bits, reconstruct, harmonic, dedekind_sum, next_minimal,
-       next_signed_minimal, next_calkin_wilf, next_signed_calkin_wilf, isunit
+       next_signed_minimal, next_calkin_wilf, next_signed_calkin_wilf, isunit, iszero,
+       isone
 
 import Base: convert, show, gcd, string
 
 import Rings: divexact, mul!, addeq!, inv, canonical_unit, mod, divrem, needs_parentheses,
-              is_negative, show_minus_one, zero, one, isunit
+              is_negative, show_minus_one, zero, one, isunit, iszero, isone
 
 ###########################################################################################
 #
@@ -105,6 +106,10 @@ end
 zero{T <: Ring}(::Type{Fraction{T}}) = Fraction{T}(0)
 
 one{T <: Ring}(::Type{Fraction{T}}) = Fraction{T}(1)
+
+iszero{T <: Ring}(a::Fraction{T}) = iszero(num(a))
+
+isone{T <: Ring}(a::Fraction{T}) = isone(num(a)) && isone(den(a))
 
 isunit{T <: Ring}(a::Fraction{T}) = num(a) != 0
 
