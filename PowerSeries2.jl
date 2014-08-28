@@ -94,12 +94,9 @@ function +{S}(a::PowerSeries{QQ, S}, b::PowerSeries{QQ, S})
    lenz = max(lena, lenb)
    z = PowerSeries{QQ, S}()
    z.prec = prec
-   ccall((:fmpq_poly_add, :libflint), Void, 
-                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}), 
-               &z, &a, &b)
-   ccall((:fmpq_poly_truncate, :libflint), Void, 
-                (Ptr{PowerSeries}, Int), 
-               &z, lenz)
+   ccall((:fmpq_poly_add_series, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &a, &b, lenz)
    return z
 end
 
@@ -115,12 +112,9 @@ function -{S}(a::PowerSeries{QQ, S}, b::PowerSeries{QQ, S})
    lenz = max(lena, lenb)
    z = PowerSeries{QQ, S}()
    z.prec = prec
-   ccall((:fmpq_poly_sub, :libflint), Void, 
-                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}), 
-               &z, &a, &b)
-   ccall((:fmpq_poly_truncate, :libflint), Void, 
-                (Ptr{PowerSeries}, Int), 
-               &z, lenz)
+   ccall((:fmpq_poly_sub_series, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &a, &b, lenz)
    return z
 end
 
@@ -196,12 +190,9 @@ function addeq!{S}(a::PowerSeries{QQ, S}, b::PowerSeries{QQ, S},)
 
    lenz = max(lena, lenb)
    a.prec = prec
-   ccall((:fmpq_poly_add, :libflint), Void, 
-                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}), 
-               &a, &a, &b)
-   ccall((:fmpq_poly_truncate, :libflint), Void, 
-                (Ptr{PowerSeries}, Int), 
-               &a, lenz)
+   ccall((:fmpq_poly_add_series, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &a, &a, &b, lenz)
 end
 
 ###########################################################################################
@@ -235,6 +226,23 @@ function *{S}(x::QQ, y::PowerSeries{QQ, S})
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{fmpq}), 
                &z, &y, &(x.data))
    return z
+end
+
+###########################################################################################
+#
+#   Comparison
+#
+###########################################################################################
+
+function =={S}(x::PowerSeries{QQ, S}, y::PowerSeries{QQ, S})
+   prec = min(x.prec, y.prec)
+   
+   n = max(length(x), length(y))
+   n = min(n, prec)
+   
+   return bool(ccall((:fmpq_poly_equal_trunc, :libflint), Cint, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &x, &y, n))
 end
 
 ###########################################################################################
