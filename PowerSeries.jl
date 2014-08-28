@@ -4,7 +4,7 @@
 #
 ###########################################################################################    
 
-export PowerSeries, PowerSeriesRing, O, valuation, min, max, isless, Precision, initps, exp
+export PowerSeries, PowerSeriesRing, O, valuation, min, max, isless, Precision, exp
 
 import Base: min, max, isless, exp
 
@@ -48,8 +48,6 @@ isless(a::Nothing, b::Nothing) = false
 #
 ###########################################################################################
 
-type initps end
-
 type PowerSeries{T <: Ring, S} <: Ring
    arr::Ptr{Void}
    length::Int
@@ -60,7 +58,7 @@ type PowerSeries{T <: Ring, S} <: Ring
    
    PowerSeries(a :: Array{T, 1}, n :: Precision) = new(C_NULL, 0, 0, 0, n, a)   
 
-   PowerSeries(a :: initps, n :: Precision) = new(C_NULL, 0, 0, 0, n)
+   PowerSeries(::Type{PowerSeries}, n :: Precision) = new(C_NULL, 0, 0, 0, n)
    
    PowerSeries() = PowerSeries(PowerSeries{T, S}, Array(T, 0), nothing)
    

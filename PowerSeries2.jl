@@ -5,7 +5,7 @@
 ###########################################################################################    
 
 import Rings: PowerSeries, PowerSeriesRing, max, min, isless, Precision, valuation, O,
-              initps, coeff, truncate, divexact
+              coeff, truncate, divexact
 
 export PowerSeries, coeff, truncate, divexact
 
@@ -16,7 +16,7 @@ export PowerSeries, coeff, truncate, divexact
 ###########################################################################################
 
 function PowerSeries{S}(::Type{PowerSeries{QQ, S}}, a :: Array{QQ, 1}, n::Precision)
-   z = PowerSeries{QQ, S}(initps(), n)
+   z = PowerSeries{QQ, S}(PowerSeries, n)
    ccall((:fmpq_poly_init2, :libflint), Void, (Ptr{PowerSeries}, Int), &z, length(a))
    for i = 1:length(a)
       ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, (Ptr{PowerSeries}, Int, Ptr{Fraction}),
