@@ -566,18 +566,35 @@ end
 #
 ###########################################################################################
 
-=={T <: Ring, S}(x::PowerSeries{T, S}, y::Int) = x.prec == nothing && ((length(x) == 0 && y == 0)
+=={T <: Ring, S}(x::PowerSeries{T, S}, y::Int) = x.prec == 0 || ((length(x) == 0 && y == 0)
                                         || (length(x) == 1 && coeff(x, 0) == y))
 
-=={T <: Ring, S}(x::PowerSeries{T, S}, y::ZZ) = x.prec == nothing && ((length(x) == 0 && y == 0)
+=={T <: Ring, S}(x::PowerSeries{T, S}, y::ZZ) = x.prec == 0 || ((length(x) == 0 && y == 0)
                                         || (length(x) == 1 && coeff(x, 0) == y))
 
 function =={T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
-   if x.prec != y.prec || length(x) != length(y)
-      return false
+   prec = min(x.prec, y.prec)
+   
+   m1 = min(length(x), length(y))
+   m2 = max(length(x), length(y))
+   
+   m1 = min(m1, prec)
+   m2 = min(m2, prec)
+   if length(x) >= m2
+      for i = m1 + 1: m2
+         if coeff(x, i - 1) != 0
+            return false
+          end
+      end
+   else
+      for i = m1 + 1: m2
+         if coeff(y, i - 1) != 0
+            return false
+          end
+      end
    end
-
-   for i = 1:length(x)
+           
+   for i = 1:m1
       if coeff(x, i - 1) != coeff(y, i - 1)
          return false
       end
