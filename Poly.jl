@@ -59,19 +59,14 @@ end
 type initpoly3 end
 type initpoly2 end
 
-type PolyStruct{T <: Ring}
-   coeffs :: Array{T, 1}
-   length :: Int
-end
-
 type Poly{T <: Ring, S} <: Ring
-   coeffs::Ptr{Void}
-   len::Int
+   arr::Ptr{Void}
+   length::Int
    alloc::Int
    inv::Int
-   data :: PolyStruct{T}
+   coeffs :: Array{T, 1}
    
-   Poly(a :: PolyStruct{T}) = new(C_NULL, 0, 0, 0, a)   
+   Poly(a :: Array{T, 1}) = new(C_NULL, length(a), 0, 0, a)   
 
    Poly(a :: initpoly3) = new(C_NULL, 0, 0, 0)
    Poly(a :: initpoly2) = new(C_NULL, 0, 0)
@@ -84,10 +79,8 @@ type Poly{T <: Ring, S} <: Ring
 end
 
 function Poly{T, S}(::Type{Poly{T, S}}, a :: Array{T, 1})
-   len = length(a)
-   d = PolyStruct(a, len)
-   z = Poly{T, S}(d)
-   z.data.length = normalise(z, len)
+   z = Poly{T, S}(a)
+   z.length = normalise(z, length(a))
    return z
 end
 
@@ -128,14 +121,14 @@ end
 ###########################################################################################    
    
 function normalise{T <: Ring, S}(a::Poly{T, S}, len::Int)
-   while len > 0 && iszero(a.data.coeffs[len]) # cannot use coeff(a, len - 1) here
+   while len > 0 && iszero(a.coeffs[len]) # cannot use coeff(a, len - 1) here
       len -= 1
    end
 
    return len
 end
 
-length{T <: Ring, S}(x::Poly{T, S}) = x.data.length
+length{T <: Ring, S}(x::Poly{T, S}) = x.length
 
 length{S}(x::Poly{ZZ, S}) = ccall((:fmpz_poly_length, :libflint), Int, (Ptr{Poly},), &x)
 
@@ -155,7 +148,7 @@ function coeff{S, M}(x::Poly{Residue{ZZ, M}, S}, n::Int)
    return Residue{ZZ, M}(z)
 end
 
-coeff{T <: Ring, S}(a::Poly{T, S}, n::Int) = n >= length(a) ? 0 : a.data.coeffs[n + 1]
+coeff{T <: Ring, S}(a::Poly{T, S}, n::Int) = n >= length(a) ? 0 : a.coeffs[n + 1]
 
 lead{T <: Ring, S}(a::Poly{T, S}) = length(a) == 0 ? zero(T) : coeff(a, length(a) - 1)
 
@@ -163,7 +156,7 @@ isgen{S}(x::Poly{ZZ, S}) = bool(ccall((:fmpz_poly_is_x, :libflint), Int, (Ptr{Po
 
 isgen{S, M}(x::Poly{Residue{ZZ, M}, S}) = bool(ccall((:fmpz_mod_poly_is_x, :libflint), Int, (Ptr{Poly},), &x))
 
-isgen{T <: Ring, S}(a::Poly{T, S}) = length(a) == 2 && iszero(a.data.coeffs[1]) && isone(a.data.coeffs[2])
+isgen{T <: Ring, S}(a::Poly{T, S}) = length(a) == 2 && iszero(a.coeffs[1]) && isone(a.coeffs[2])
 
 zero{T <: Ring, S}(::Type{Poly{T, S}}) = Poly{T, S}(0)
 
@@ -216,7 +209,7 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
       print(io, zero(T))
    else
       for i = 1:len - 1
-         c = x.data.coeffs[len - i + 1]
+         c = x.coeffs[len - i + 1]
          bracket = needs_parentheses(c)
          if c != 0
             if i != 1 && !is_negative(c)
@@ -242,7 +235,7 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
             end
          end
       end
-      c = x.data.coeffs[1]
+      c = x.coeffs[1]
       bracket = needs_parentheses(c)
       if c != 0
          if len != 1 && !is_negative(c)
@@ -304,10 +297,10 @@ function -{T <: Ring, S}(a::Poly{T, S})
    len = length(a)
    d = Array(T, len)
    for i = 1:len
-      d[i] = -a.data.coeffs[i]
+      d[i] = -a.coeffs[i]
    end
    z = Poly(Poly{T, S}, d)
-   z.data.length = len
+   z.length = len
    return z
 end
 
@@ -373,23 +366,23 @@ function +{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    i = 1
 
    while i <= min(lena, lenb)
-      d[i] = a.data.coeffs[i] + b.data.coeffs[i]
+      d[i] = a.coeffs[i] + b.coeffs[i]
       i += 1
    end
 
    while i <= lena
-      d[i] = a.data.coeffs[i]
+      d[i] = a.coeffs[i]
       i += 1
    end
 
    while i <= lenb
-      d[i] = b.data.coeffs[i]
+      d[i] = b.coeffs[i]
       i += 1
    end
 
    z = Poly(Poly{T, S}, d)
 
-   z.data.length = normalise(z, i - 1)
+   z.length = normalise(z, i - 1)
 
    return z
 end
@@ -402,23 +395,23 @@ function -{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    i = 1
 
    while i <= min(lena, lenb)
-      d[i] = a.data.coeffs[i] - b.data.coeffs[i]
+      d[i] = a.coeffs[i] - b.coeffs[i]
       i += 1
    end
 
    while i <= lena
-      d[i] = a.data.coeffs[i]
+      d[i] = a.coeffs[i]
       i += 1
    end
 
    while i <= lenb
-      d[i] = -b.data.coeffs[i]
+      d[i] = -b.coeffs[i]
       i += 1
    end
 
    z = Poly(Poly{T, S}, d)
 
-   z.data.length = normalise(z, i - 1)
+   z.length = normalise(z, i - 1)
 
    return z
 end
@@ -440,23 +433,23 @@ function *{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    d = Array(T, lenz)
    
    for i = 1:lena
-      d[i] = a.data.coeffs[i]*b.data.coeffs[1]
+      d[i] = a.coeffs[i]*b.coeffs[1]
    end
 
    for i = 2:lenb
-      d[lena + i - 1] = a.data.coeffs[lena]*b.data.coeffs[i]
+      d[lena + i - 1] = a.coeffs[lena]*b.coeffs[i]
    end
    
    for i = 1:lena - 1
       for j = 2:lenb
-         mul!(t, a.data.coeffs[i], b.data.coeffs[j])
+         mul!(t, a.coeffs[i], b.coeffs[j])
          addeq!(d[i + j - 1], t)
       end
    end
    
    z = Poly(Poly{T, S}, d)
         
-   z.data.length = normalise(z, lenz)
+   z.length = normalise(z, lenz)
 
    return z
 end
@@ -469,13 +462,13 @@ end
 
 function fit!{T <: Ring, S}(c::Poly{T, S}, n::Int)
    if length(c) < n
-      t = c.data.coeffs
-      c.data.coeffs = Array(T, n)
+      t = c.coeffs
+      c.coeffs = Array(T, n)
       for i = 1:length(c)
-         c.data.coeffs[i] = t[i]
+         c.coeffs[i] = t[i]
       end
       for i = length(c) + 1:n
-         c.data.coeffs[i] = zero(T)
+         c.coeffs[i] = zero(T)
       end
    end
 end
@@ -483,8 +476,8 @@ end
 function setcoeff!{T <: Ring, S}(c::Poly{T, S}, n::Int, a::T)
    if a != 0 || n + 1 <= length(c)
       fit!(c, n + 1)
-      c.data.coeffs[n + 1] = a
-      c.data.length = max(length(c), n + 1)
+      c.coeffs[n + 1] = a
+      c.length = max(length(c), n + 1)
       # don't normalise
    end
 end
@@ -506,7 +499,7 @@ function mul!{T <: Ring, S}(c::Poly{T, S}, a::Poly{T, S}, b::Poly{T, S})
    lenb = length(b)
 
    if lena == 0 || lenb == 0
-      c.data.length = 0
+      c.length = 0
    else
       t = T()
 
@@ -514,21 +507,21 @@ function mul!{T <: Ring, S}(c::Poly{T, S}, a::Poly{T, S}, b::Poly{T, S})
       fit!(c, lenc)
 
       for i = 1:lena
-         mul!(c.data.coeffs[i], a.data.coeffs[i], b.data.coeffs[1])
+         mul!(c.coeffs[i], a.coeffs[i], b.coeffs[1])
       end
 
       for i = 2:lenb
-         mul!(c.data.coeffs[lena + i - 1], a.data.coeffs[lena], b.data.coeffs[i])
+         mul!(c.coeffs[lena + i - 1], a.coeffs[lena], b.coeffs[i])
       end
 
       for i = 1:lena - 1
          for j = 2:lenb
-            mul!(t, a.data.coeffs[i], b.data.coeffs[j])
-            addeq!(c.data.coeffs[i + j - 1], t)
+            mul!(t, a.coeffs[i], b.coeffs[j])
+            addeq!(c.coeffs[i + j - 1], t)
          end
       end
         
-      c.data.length = normalise(c, lenc)
+      c.length = normalise(c, lenc)
    end
 end
 
@@ -538,9 +531,9 @@ function addeq!{T <: Ring, S}(c::Poly{T, S}, a::Poly{T, S})
    len = max(lenc, lena)
    fit!(c, len)
    for i = 1:lena
-      addeq!(c.data.coeffs[i], a.data.coeffs[i])
+      addeq!(c.coeffs[i], a.coeffs[i])
    end
-   c.data.length = normalise(c, len)
+   c.length = normalise(c, len)
 end
 
 function mul!{S}(z::Poly{ZZ, S}, x::Poly{ZZ, S}, y::Poly{ZZ, S})
@@ -608,7 +601,7 @@ function *{T <: Ring, S}(a::Int, b::Poly{T, S})
       d[i] = a*coeff(b, i - 1)
    end
    z = Poly(Poly{T, S}, d)
-   z.data.length = normalise(z, len)
+   z.length = normalise(z, len)
    return z
 end
 
@@ -619,7 +612,7 @@ function *{T <: Ring, S}(a::ZZ, b::Poly{T, S})
       d[i] = a*coeff(b, i - 1)
    end
    z = Poly(Poly{T, S}, d)
-   z.data.length = normalise(z, len)
+   z.length = normalise(z, len)
    return z
 end
 
@@ -785,12 +778,12 @@ function truncate{T <: Ring, S}(a::Poly{T, S}, n::Int)
    d = Array(T, lenz)
 
    for i = 1:lenz
-      d[i] = a.data.coeffs[i]
+      d[i] = a.coeffs[i]
    end
 
    z = Poly(Poly{T, S}, d)
 
-   z.data.length = normalise(z, lenz)
+   z.length = normalise(z, lenz)
 
    return z
 end
@@ -834,12 +827,12 @@ function mullow{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S}, n::Int)
    d = Array(T, lenz)
 
    for i = 1:min(lena, lenz)
-      d[i] = a.data.coeffs[i]*b.data.coeffs[1]
+      d[i] = a.coeffs[i]*b.coeffs[1]
    end
 
    if lenz > lena
       for j = 2:min(lenb, lenz - lena + 1)
-          d[lena + j - 1] = a.data.coeffs[lena]*b.data.coeffs[j]
+          d[lena + j - 1] = a.coeffs[lena]*b.coeffs[j]
       end
    end
 
@@ -848,13 +841,13 @@ function mullow{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S}, n::Int)
    for i = 1:lena - 1
       if lenz > i
          for j = 2:min(lenb, lenz - i + 1)
-            mul!(t, a.data.coeffs[i], b.data.coeffs[j])
-            addeq!(z.data.coeffs[i + j - 1], t)
+            mul!(t, a.coeffs[i], b.coeffs[j])
+            addeq!(z.coeffs[i + j - 1], t)
          end
       end
    end
         
-   z.data.length = normalise(z, lenz)
+   z.length = normalise(z, lenz)
 
    return z
 end
@@ -872,7 +865,7 @@ function reverse{T <: Ring, S}(x::Poly{T, S}, len::Int)
       v[i] = coeff(x, len - i)
    end
    r = Poly(Poly{T, S}, v)
-   r.data.length = normalise(r, len)
+   r.length = normalise(r, len)
    return r
 end
 
@@ -996,17 +989,17 @@ function ^{T <: Ring, S}(a::Poly{T, S}, b::Int)
    # special case powers of x for constructing polynomials efficiently
    if isgen(a)
       d = Array(T, b + 1)
-      d[b + 1] = a.data.coeffs[2]
+      d[b + 1] = a.coeffs[2]
       for i = 1:b
-         d[i] = a.data.coeffs[1]
+         d[i] = a.coeffs[1]
       end
       z = Poly(Poly{T, S}, d)
-      z.data.length = b + 1
+      z.length = b + 1
       return z
    elseif length(a) == 0
       return zero(Poly{T, S})
    elseif length(a) == 1
-      return Poly(Poly{T, S}, [a.data.coeffs[1]^b])
+      return Poly(Poly{T, S}, [a.coeffs[1]^b])
    elseif b == 0
       return one(Poly{T, S})
    else
@@ -1160,7 +1153,7 @@ function =={T<: Ring, S}(x::Poly{T, S}, y::Poly{T, S})
       return false
    else
       for i = 1:length(x)
-         if x.data.coeffs[i] != y.data.coeffs[i]
+         if x.coeffs[i] != y.coeffs[i]
             return false
          end
       end
@@ -1187,7 +1180,7 @@ function divexact{T <: Ring, S}(a::Poly{T, S}, b::T)
       d[i] = divexact(coeff(a, i - 1), b)
    end
    z = Poly(Poly{T, S}, d)
-   z.data.length = length(a)
+   z.length = length(a)
    return z
 end
 
@@ -1198,7 +1191,7 @@ function divexact{T <: Ring, S}(a::Poly{T, S}, b::ZZ)
       d[i] = divexact(coeff(a, i - 1), b)
    end
    z = Poly(Poly{T, S}, d)
-   z.data.length = length(a)
+   z.length = length(a)
    return z
 end
 
@@ -1209,7 +1202,7 @@ function divexact{T <: Ring, S}(a::Poly{T, S}, b::Int)
       d[i] = divexact(coeff(a, i - 1), b)
    end
    z = Poly(Poly{T, S}, d)
-   z.data.length = length(a)
+   z.length = length(a)
    return z
 end
 
@@ -1259,10 +1252,10 @@ function divexact{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
    leng = length(g)
    while length(f) >= leng
       lenf = length(f)
-      q1 = q.data.coeffs[lenf - leng + 1] = divexact(f.data.coeffs[lenf], g.data.coeffs[leng])
+      q1 = q.coeffs[lenf - leng + 1] = divexact(f.coeffs[lenf], g.coeffs[leng])
       f = f - q1*g*x^(lenf - leng)
    end
-   q.data.length = lenq
+   q.length = lenq
    return q
 end
 
@@ -1302,7 +1295,7 @@ function mod{T <: Union(Field, Residue), S}(f::Poly{T, S}, g::Poly{T, S})
       raise(DivideError())
    end
    if length(f) >= length(g)
-      b = g.data.coeffs[length(g)]
+      b = g.coeffs[length(g)]
       g = inv(b)*g
       x = gen(Poly{T, S})
       while length(f) >= length(g)
@@ -1418,7 +1411,7 @@ function pseudodivrem{T <: Ring, S}(f::Poly{T, S}, g::Poly{T, S})
    while lenq > 0 && coeff(q, lenq - 1) == 0
       lenq -= 1
    end
-   q.data.length = lenq
+   q.length = lenq
    return q, f
 end
 
@@ -1564,10 +1557,10 @@ function evaluate{T <: Ring, S}(a::Poly{T, S}, b::T)
    if i == 0
        return zero(T)
    end
-   z = a.data.coeffs[i]
+   z = a.coeffs[i]
    while i > 1
       i -= 1
-      z = z*b + a.data.coeffs[i]
+      z = z*b + a.coeffs[i]
    end
    return z
 end
@@ -1601,10 +1594,10 @@ function compose{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    if i == 0
        return zero(T)
    end
-   z = a.data.coeffs[i]
+   z = a.coeffs[i]
    while i > 1
       i -= 1
-      z = z*b + a.data.coeffs[i]
+      z = z*b + a.coeffs[i]
    end
    return z
 end
@@ -1638,10 +1631,10 @@ function deriv{T <: Ring, S}(a::Poly{T, S})
    len = length(a)
    d = Array(T, len - 1)
    for i = 1:len - 1
-      d[i] = i*a.data.coeffs[i + 1]
+      d[i] = i*a.coeffs[i + 1]
    end
    z = Poly(Poly{T, S}, d)
-   z.data.length = normalise(z, len - 1)
+   z.length = normalise(z, len - 1)
    return z
 end
 
@@ -1694,7 +1687,7 @@ function resultant{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    lena = length(a)
    lenb = length(b)
    if lenb == 1
-      return b.data.coeffs[1]^(lena - 1)
+      return b.coeffs[1]^(lena - 1)
    end
    c1 = content(a)
    c2 = content(b)
@@ -1736,7 +1729,7 @@ function resultant{T <: Residue, S}(a::Poly{T, S}, b::Poly{T, S})
    lena = length(a)
    lenb = length(b)
    if lenb == 1
-      return b.data.coeffs[1]^(lena - 1)
+      return b.coeffs[1]^(lena - 1)
    end
    c1 = content(a)
    c2 = content(b)
@@ -1845,7 +1838,7 @@ function bezout{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
    if lenb == 1
       s1 = zero(T)
       t1 = one(T)
-      r1 = b.data.coeffs[1]^(lena - 1)
+      r1 = b.coeffs[1]^(lena - 1)
       if swap
          s1, t1 = t1, s1
       end

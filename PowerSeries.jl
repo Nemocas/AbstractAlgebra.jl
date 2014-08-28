@@ -51,14 +51,14 @@ isless(a::Nothing, b::Nothing) = false
 type initps end
 
 type PowerSeries{T <: Ring, S} <: Ring
-   coeffs::Ptr{Void}
-   len::Int
+   arr::Ptr{Void}
+   length::Int
    alloc::Int
    inv::Int
    prec :: Precision
-   data :: PolyStruct{T}
+   coeffs :: Array{T, 1}
    
-   PowerSeries(a :: PolyStruct{T}, n :: Precision) = new(C_NULL, 0, 0, 0, n, a)   
+   PowerSeries(a :: Array{T, 1}, n :: Precision) = new(C_NULL, 0, 0, 0, n, a)   
 
    PowerSeries(a :: initps, n :: Precision) = new(C_NULL, 0, 0, 0, n)
    
@@ -71,10 +71,8 @@ type PowerSeries{T <: Ring, S} <: Ring
 end
 
 function PowerSeries{T, S}(::Type{PowerSeries{T, S}}, a :: Array{T, 1}, n :: Precision)
-   len = length(a)
-   d = PolyStruct(a, len)
-   z = PowerSeries{T, S}(d, n)
-   z.data.length = normalise(z, len)
+   z = PowerSeries{T, S}(a, n)
+   z.length = normalise(z, length(a))
    return z
 end
 
@@ -91,19 +89,19 @@ end
 #
 ###########################################################################################    
    
-length{T <: Ring, S}(x::PowerSeries{T, S}) = x.data.length
+length{T <: Ring, S}(x::PowerSeries{T, S}) = x.length
 
 degree{T <: Ring, S}(x::PowerSeries{T, S}) = length(x) - 1
 
 function normalise{T <: Ring, S}(a::PowerSeries{T, S}, len::Int)
-   while len > 0 && iszero(a.data.coeffs[len]) # cannot use coeff(a, len - 1) here
+   while len > 0 && iszero(a.coeffs[len]) # cannot use coeff(a, len - 1) here
       len -= 1
    end
 
    return len
 end
 
-coeff{T <: Ring, S}(a::PowerSeries{T, S}, n::Int) = n < 0 || n >= a.data.length ? T(0) : a.data.coeffs[n + 1]
+coeff{T <: Ring, S}(a::PowerSeries{T, S}, n::Int) = n < 0 || n >= a.length ? T(0) : a.coeffs[n + 1]
 
 zero{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries{T, S}(0)
 
@@ -138,13 +136,13 @@ end
 ###########################################################################################
 
 function show{T <: Ring, S}(io::IO, x::PowerSeries{T, S})
-   len = x.data.length
+   len = x.length
 
    if len == 0
       print(io, zero(T))
    else
       coeff_printed = false
-      c = x.data.coeffs[1]
+      c = x.coeffs[1]
       bracket = needs_parentheses(c)
       if c != 0
          if bracket
@@ -157,7 +155,7 @@ function show{T <: Ring, S}(io::IO, x::PowerSeries{T, S})
          coeff_printed = true
       end
       for i = 2:len
-         c = x.data.coeffs[i]
+         c = x.coeffs[i]
          bracket = needs_parentheses(c)
          if c != 0
             if coeff_printed && !is_negative(c)
@@ -209,13 +207,13 @@ show_minus_one{T <: Ring, S}(::Type{PowerSeries{T, S}}) = show_minus_one(T)
 ###########################################################################################
 
 function -{T <: Ring, S}(a::PowerSeries{T, S})
-   len = a.data.length
+   len = a.length
    d = Array(T, len)
    for i = 1:len
-      d[i] = -a.data.coeffs[i]
+      d[i] = -a.coeffs[i]
    end
    z = PowerSeries(PowerSeries{T, S}, d, a.prec)
-   z.data.length = len
+   z.length = len
    return z
 end
 
@@ -226,8 +224,8 @@ end
 ###########################################################################################
 
 function +{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
-   lena = a.data.length
-   lenb = b.data.length
+   lena = a.length
+   lenb = b.length
          
    prec = min(a.prec, b.prec)
  
@@ -239,30 +237,30 @@ function +{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
    i = 1
 
    while i <= min(lena, lenb)
-      d[i] = a.data.coeffs[i] + b.data.coeffs[i]
+      d[i] = a.coeffs[i] + b.coeffs[i]
       i += 1
    end
 
    while i <= lena
-      d[i] = a.data.coeffs[i]
+      d[i] = a.coeffs[i]
       i += 1
    end
 
    while i <= lenb
-      d[i] = b.data.coeffs[i]
+      d[i] = b.coeffs[i]
       i += 1
    end
 
    z = PowerSeries(PowerSeries{T, S}, d, prec)
 
-   z.data.length = normalise(z, i - 1)
+   z.length = normalise(z, i - 1)
 
    return z
 end
   
 function -{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
-   lena = a.data.length
-   lenb = b.data.length
+   lena = a.length
+   lenb = b.length
    
    prec = min(a.prec, b.prec)
    
@@ -274,30 +272,30 @@ function -{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
    i = 1
 
    while i <= min(lena, lenb)
-      d[i] = a.data.coeffs[i] - b.data.coeffs[i]
+      d[i] = a.coeffs[i] - b.coeffs[i]
       i += 1
    end
 
    while i <= lena
-      d[i] = a.data.coeffs[i]
+      d[i] = a.coeffs[i]
       i += 1
    end
 
    while i <= lenb
-      d[i] = -b.data.coeffs[i]
+      d[i] = -b.coeffs[i]
       i += 1
    end
 
    z = PowerSeries(PowerSeries{T, S}, d, prec)
 
-   z.data.length = normalise(z, i - 1)
+   z.length = normalise(z, i - 1)
 
    return z
 end
 
 function *{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
-   lena = a.data.length
-   lenb = b.data.length
+   lena = a.length
+   lenb = b.length
    
    aval = valuation(a)
    bval = valuation(b)
@@ -318,12 +316,12 @@ function *{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
    d = Array(T, lenz)
 
    for i = 1:min(lena, lenz)
-      d[i] = a.data.coeffs[i]*b.data.coeffs[1]
+      d[i] = a.coeffs[i]*b.coeffs[1]
    end
 
    if lenz > lena
       for j = 2:min(lenb, lenz - lena + 1)
-          d[lena + j - 1] = a.data.coeffs[lena]*b.data.coeffs[j]
+          d[lena + j - 1] = a.coeffs[lena]*b.coeffs[j]
       end
    end
 
@@ -332,13 +330,13 @@ function *{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
    for i = 1:lena - 1
       if lenz > i
          for j = 2:min(lenb, lenz - i + 1)
-            mul!(t, a.data.coeffs[i], b.data.coeffs[j])
-            addeq!(z.data.coeffs[i + j - 1], t)
+            mul!(t, a.coeffs[i], b.coeffs[j])
+            addeq!(z.coeffs[i + j - 1], t)
          end
       end
    end
         
-   z.data.length = normalise(z, lenz)
+   z.length = normalise(z, lenz)
 
    return z
 end
@@ -350,30 +348,30 @@ end
 ###########################################################################################
 
 function fit!{T <: Ring, S}(c::PowerSeries{T, S}, n::Int)
-   if c.data.length < n
-      t = c.data.coeffs
-      c.data.coeffs = Array(T, n)
-      for i = 1:c.data.length
-         c.data.coeffs[i] = t[i]
+   if c.length < n
+      t = c.coeffs
+      c.coeffs = Array(T, n)
+      for i = 1:c.length
+         c.coeffs[i] = t[i]
       end
-      for i = c.data.length + 1:n
-         c.data.coeffs[i] = zero(T)
+      for i = c.length + 1:n
+         c.coeffs[i] = zero(T)
       end
    end
 end
 
 function setcoeff!{T <: Ring, S}(c::PowerSeries{T, S}, n::Int, a::T)
-   if (a != 0 && (c.prec == nothing || c.prec > n)) || n + 1 <= c.data.length
+   if (a != 0 && (c.prec == nothing || c.prec > n)) || n + 1 <= c.length
       fit!(c, n + 1)
-      c.data.coeffs[n + 1] = a
-      c.data.length = max(c.data.length, n + 1)
+      c.coeffs[n + 1] = a
+      c.length = max(c.length, n + 1)
       # don't normalise
    end
 end
 
 function mul!{T <: Ring, S}(c::PowerSeries{T, S}, a::PowerSeries{T, S}, b::PowerSeries{T, S})
-   lena = a.data.length
-   lenb = b.data.length
+   lena = a.length
+   lenb = b.length
 
    aval = valuation(a)
    bval = valuation(b)
@@ -384,7 +382,7 @@ function mul!{T <: Ring, S}(c::PowerSeries{T, S}, a::PowerSeries{T, S}, b::Power
    lenb = min(lenb, prec)
    
    if lena == 0 || lenb == 0
-      c.data.length = 0
+      c.length = 0
    else
       t = T()
 
@@ -392,32 +390,32 @@ function mul!{T <: Ring, S}(c::PowerSeries{T, S}, a::PowerSeries{T, S}, b::Power
       fit!(c, lenc)
 
       for i = 1:min(lena, lenc)
-         mul!(c.data.coeffs[i], a.data.coeffs[i], b.data.coeffs[1])
+         mul!(c.coeffs[i], a.coeffs[i], b.coeffs[1])
       end
 
       if lenc > lena
          for i = 2:min(lenb, lenc - lena + 1)
-            mul!(c.data.coeffs[lena + i - 1], a.data.coeffs[lena], b.data.coeffs[i])
+            mul!(c.coeffs[lena + i - 1], a.coeffs[lena], b.coeffs[i])
          end
       end
 
       for i = 1:lena - 1
          if lenc > i
             for j = 2:min(lenb, lenc - i + 1)
-               mul!(t, a.data.coeffs[i], b.data.coeffs[j])
-               addeq!(c.data.coeffs[i + j - 1], t)
+               mul!(t, a.coeffs[i], b.coeffs[j])
+               addeq!(c.coeffs[i + j - 1], t)
             end
          end
       end
         
-      c.data.length = normalise(c, lenc)
+      c.length = normalise(c, lenc)
    end
    c.prec = prec
 end
 
 function addeq!{T <: Ring, S}(c::PowerSeries{T, S}, a::PowerSeries{T, S})
-   lenc = c.data.length
-   lena = a.data.length
+   lenc = c.length
+   lena = a.length
    
    prec = min(a.prec, c.prec)
    
@@ -427,9 +425,9 @@ function addeq!{T <: Ring, S}(c::PowerSeries{T, S}, a::PowerSeries{T, S})
    len = max(lenc, lena)
    fit!(c, len)
    for i = 1:lena
-      addeq!(c.data.coeffs[i], a.data.coeffs[i])
+      addeq!(c.coeffs[i], a.coeffs[i])
    end
-   c.data.length = normalise(c, len)
+   c.length = normalise(c, len)
    c.prec = prec
 end
 
@@ -440,24 +438,24 @@ end
 ###########################################################################################
 
 function *{T <: Ring, S}(a::Int, b::PowerSeries{T, S})
-   len = b.data.length
+   len = b.length
    d = Array(T, len)
    for i = 1:len
       d[i] = a*coeff(b, i - 1)
    end
    z = PowerSeries(PowerSeries{T, S}, d, b.prec)
-   z.data.length = normalise(z, len)
+   z.length = normalise(z, len)
    return z
 end
 
 function *{T <: Ring, S}(a::ZZ, b::PowerSeries{T, S})
-   len = b.data.length
+   len = b.length
    d = Array(T, len)
    for i = 1:len
       d[i] = a*coeff(b, i - 1)
    end
    z = PowerSeries(PowerSeries{T, S}, d, b.prec)
-   z.data.length = normalise(z, len)
+   z.length = normalise(z, len)
    return z
 end
 
@@ -473,7 +471,7 @@ end
 
 function shift_left{T <: Ring, S}(x::PowerSeries{T, S}, len::Int)
    len < 0 && throw(DomainError())
-   xlen = x.data.length
+   xlen = x.length
    v = Array(T, xlen + len)
    for i = 1:len
       v[i] = zero(T)
@@ -486,7 +484,7 @@ end
 
 function shift_right{T <: Ring, S}(x::PowerSeries{T, S}, len::Int)
    len < 0 && throw(DomainError())
-   xlen = x.data.length
+   xlen = x.length
    if len >= xlen
       return PowerSeries(PowerSeries{T, S}, Array(T, 0), max(0, x.prec - len))
    end
@@ -509,14 +507,14 @@ function truncate{T<: Ring, S}(x::PowerSeries{T, S}, prec::Precision)
       return x
    end
    d = Array(T, prec)
-   for i = 1:min(prec, x.data.length)
+   for i = 1:min(prec, x.length)
       d[i] = coeff(x, i - 1)
    end
-   for i = x.data.length + 1:prec
+   for i = x.length + 1:prec
       d[i] = zero(T)
    end
    r = PowerSeries(PowerSeries{T, S}, d, prec)
-   r.data.length = normalise(r, prec)
+   r.length = normalise(r, prec)
    return r
 end
 
@@ -539,7 +537,7 @@ function ^{T <: Ring, S}(a::PowerSeries{T, S}, b::Int)
    elseif length(a) == 0
       return PowerSeries(PowerSeries{T, S}, Array(T, 0), a.prec + (b - 1)*valuation(a))
    elseif length(a) == 1
-      return PowerSeries(PowerSeries{T, S}, [a.data.coeffs[1]^b], a.prec)
+      return PowerSeries(PowerSeries{T, S}, [a.coeffs[1]^b], a.prec)
    elseif b == 0
       return PowerSeries(PowerSeries{T, S}, [T(1)], nothing)
    else
@@ -672,7 +670,7 @@ function inv{T<: Ring, S}(a::PowerSeries{T, S})
    !isunit(a) && error("Unable to invert power series")
    a1 = coeff(a, 0)
    if a.prec == nothing
-      a.data.length != 1 && error("Unable to invert infinite precision power series")
+      a.length != 1 && error("Unable to invert infinite precision power series")
       return PowerSeries(PowerSeries{T, S}, [divexact(T(1), a1)], nothing)
    end
    d = Array(T, a.prec)
@@ -682,13 +680,13 @@ function inv{T<: Ring, S}(a::PowerSeries{T, S})
    a1 = -a1
    for n = 2:a.prec
       s = coeff(a, 1)*d[n - 1]
-      for i = 2:min(n, a.data.length) - 1
+      for i = 2:min(n, a.length) - 1
          s += coeff(a, i)*d[n - i]
       end
       d[n] = divexact(s, a1)
    end
    ainv = PowerSeries(PowerSeries{T, S}, d, a.prec)
-   ainv.data.length = normalise(ainv, a.prec)
+   ainv.length = normalise(ainv, a.prec)
    return ainv
 end
 
