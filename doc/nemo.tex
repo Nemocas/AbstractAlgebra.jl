@@ -1223,6 +1223,20 @@ zero(::Type{ZZ})
 \desc{Create the additive identity element in the ring of integers.}
 
 \begin{lstlisting}
+isone(a::ZZ)
+\end{lstlisting}
+
+\desc{Return \code{true} if $a$ is the multiplicative identity $1$, otherewise
+return \code{false}.}
+
+\begin{lstlisting}
+iszero(a::ZZ)
+\end{lstlisting}
+
+\desc{Return \code{true} if $a$ is the additive identity $0$, otherewise
+return \code{false}.}
+
+\begin{lstlisting}
 sign(a::ZZ)
 \end{lstlisting}
 
@@ -1278,6 +1292,8 @@ s = size(a)
 t = canonical_unit(ZZ(-12))
 
 u = isunit(ZZ(-1))
+v = iszero(b)
+w = isone(a)
 \end{lstlisting}
 
 \subsubsection{Binary operators and functions}
@@ -2171,6 +2187,20 @@ lead{T <: Ring, S}(a::Poly{T, S})
 length $0$.}
 
 \begin{lstlisting}
+iszero{T <: Ring, S}(a::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return \code{true} if the polynomial $a$ is the additive identity of the
+polynomial ring, otherwise return \code{false}.}
+
+\begin{lstlisting}
+isone{T <: Ring, S}(a::Poly{T, S})
+\end{lstlisting}
+
+\desc{Return \code{true} if the polynomial $a$ is the multiplicative identity
+of the polynomial ring, otherwise return \code{false}.}
+
+\begin{lstlisting}
 isgen{T <: Ring, S}(a::Poly{T, S})
 \end{lstlisting}
 
@@ -2232,8 +2262,11 @@ if isgen(x)
    println(x, " is the generator of the ", typeof(x))
 end
 
-k = canonical_unit(-x + 1)
-m = canonical_unit(-x*y + x + 1)
+k = isone(b)
+m = iszero(a)
+
+n = canonical_unit(-x + 1)
+p = canonical_unit(-x*y + x + 1)
 \end{lstlisting}
 
 \subsubsection{Binary operators}
@@ -3184,6 +3217,20 @@ one{T <: Ring, S}(::Type{Residue{T, S}})
 \desc{Return the multiplicative identity of the given residue ring.}
 
 \begin{lstlisting}
+iszero{T <: Ring, S}(a::Residue{T, S})
+\end{lstlisting}
+
+\desc{Return \code{true} if the residue $a$ is the additive identity in the
+residue ring, otherwise return \code{false}.}
+
+\begin{lstlisting}
+isone{T <: Ring, S}(a::Residue{T, S})
+\end{lstlisting}
+
+\desc{Return \code{true} if the residue $a$ is the multiplicative identity in
+the residue ring, otherwise return \code{false}.}
+
+\begin{lstlisting}
 isunit{T <: Ring, S}(a::Residue{T, S})
 \end{lstlisting}
 
@@ -3216,6 +3263,9 @@ k = isunit(h)
 
 m = canonical_unit(R(11))
 n = canonical_unit(T(x + 1))
+
+p = isone(h)
+q = iszero(g)
 \end{lstlisting}
 
 \subsubsection{Unary operations}
@@ -3695,7 +3745,6 @@ or its leading coefficient is nonzero. This function is mainly used internally
 because all user functions in Nemo normalise the internal polynomial
 representation of power series.}
 
-
 \begin{lstlisting}
 coeff{T <: Ring, S}(a::PowerSeries{T, S}, n::Int)
 \end{lstlisting}
@@ -3722,7 +3771,26 @@ infinite precision power series.}
 gen{T <: Ring, S}(::Type{PowerSeries{T, S}})
 \end{lstlisting}
 
-\desc{Return the degree one, monic monomial generator of the power series ring.}
+\desc{Return the degree one, monic monomial generator of the power series
+ring.}
+
+\begin{lstlisting}
+iszero{T <: Ring, S}(a::PowerSeries{T, S})
+\end{lstlisting}
+
+\desc{Return \code{true} if $a$ is the additive identity of the power series
+ring. Otherwise, return \code{false}. Note that this is not the same as
+checking \code{a == 0}. The latter does not check that the precision of
+\code{a} is \code{nothing}.}
+
+\begin{lstlisting}
+isone{T <: Ring, S}(a::PowerSeries{T, S})
+\end{lstlisting}
+
+\desc{Return \code{true} if $a$ is the multiplicative identity of the power
+series ring. Otherwise, return \code{false}. Note that this is not the same
+as checking \code{a == 1}. The latter does not check that the precision of
+\code{a} is \code{nothing}.}
 
 \begin{lstlisting}
 isgen{T <: Ring, S}(a::PowerSeries{T, S})
@@ -3761,10 +3829,12 @@ c = gen(R)
 d = zero(R)
 f = one(R)
 
-g = isgen(c)
-h = isunit(-1 + x + 2x^2)
-k = valuation(a)
-m = valuation(b)
+g = iszero(d)
+h = isone(f)
+k = isgen(c)
+m = isunit(-1 + x + 2x^2)
+n = valuation(a)
+p = valuation(b)
 \end{lstlisting}
 
 \subsubsection{Unary operators}
@@ -3870,6 +3940,8 @@ j = d*ZZ(3)
 
 \subsubsection{Comparison}
 
+Note that we take the convention that $1 + x + O(x^4) == 1 + x + O(x^8)$. 
+
 \begin{lstlisting}
 =={T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
 \end{lstlisting}
@@ -3897,6 +3969,8 @@ c != d
 \end{lstlisting}
 
 \subsubsection{Ad hoc comparison}
+
+Note that we take the convention that $0 == 0 + O(x^4)$.
 
 \begin{lstlisting}
 =={T <: Ring, S}(x::PowerSeries{T, S}, y::Int)
@@ -4312,6 +4386,20 @@ one{T <: Ring}(::Type{Fraction{T}})
 $T$.}
 
 \begin{lstlisting}
+iszero{T <: Ring}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the fraction $a$ is the additive identity in the
+fraction field, otherwise return \code{false}.}
+
+\begin{lstlisting}
+isone{T <: Ring}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the fraction $a$ is multiplicative identity in the
+fraction field, otherwise return \code{false}.}
+
+\begin{lstlisting}
 isunit{T <: Ring}(a::Fraction{T})
 \end{lstlisting}
 
@@ -4339,6 +4427,9 @@ c = zero(R)
 d = one(S)
 f = canonical_unit((x + 1)/(-x^2 + 1))
 g = isunit((x + 1)/(-x^2 + 1))
+
+h = iszero(c)
+d = isone(d)
 \end{lstlisting}
 
 \subsubsection{Unary operators}
@@ -5021,6 +5112,20 @@ polynomial of the field. The generator may not be a multiplicative
 generator.}
 
 \begin{lstlisting}
+iszero{S}(a::FinFieldElem{S})
+\end{lstlisting}
+
+\desc{Return \code{true} if the element $a$ is the additive identity in the
+finite field, i.e. if it is $0$, otherwise return \code{false}.}
+
+\begin{lstlisting}
+isone{S}(a::FinFieldElem{S})
+\end{lstlisting}
+
+\desc{Return \code{true} if the element $a$ is the multiplicative identity in
+the finite field, i.e. if it is $1$, otherwise return \code{false}.}
+
+\begin{lstlisting}
 isunit{S}(a::FinFieldElem{S})
 \end{lstlisting}
 
@@ -5062,7 +5167,9 @@ c = gen(R)
 d = characteristic(R)
 f = order(R)
 g = degree(R)
-isunit(x + 1)
+h = iszero(a)
+k = isone(b)
+m = isunit(x + 1)
 \end{lstlisting}
 
 \subsubsection{Unary operators}
