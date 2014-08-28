@@ -115,7 +115,7 @@ isone{T <: Ring, S}(a::PowerSeries{T, S}) = a.prec == nothing && length(a) == 1 
 
 gen{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries(PowerSeries{T, S}, [T(0), T(1)], nothing)
 
-isgen{T <: Ring, S}(a::PowerSeries{T, S}) = a.prec == nothing && a.data.length == 2 && iszero(coeff(a, 0)) && isone(coeff(a, 1))
+isgen{T <: Ring, S}(a::PowerSeries{T, S}) = a.prec == nothing && length(a) == 2 && iszero(coeff(a, 0)) && isone(coeff(a, 1))
 
 isunit{T <: Ring, S}(a::PowerSeries{T, S}) = isunit(coeff(a, 0))
 
@@ -694,14 +694,9 @@ end
 
 ###########################################################################################
 #
-#   Exponential
+#   Special functions
 #
 ###########################################################################################
-
-function exp{T <: Ring}(a::T)
-   a != 0 && error("Exponential of nonzero element")
-   return one(T)
-end
 
 function exp{T<: Ring, S}(a::PowerSeries{T, S})
    if a == 0

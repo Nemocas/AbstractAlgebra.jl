@@ -1,6 +1,8 @@
 module Rings
 
-export Ring, Field
+import Base: exp
+
+export Ring, Field, exp
 
 abstract Ring
 
@@ -139,6 +141,11 @@ function divexact{S <: Integer, T <: Ring}(x::S, y::T)
    else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
+end
+
+function exp{T <: Ring}(a::T)
+   a != 0 && error("Exponential of nonzero element")
+   return one(T)
 end
 
 include("ZZ.jl")

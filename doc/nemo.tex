@@ -4171,6 +4171,30 @@ c = inv(a)
 d = inv(b)
 \end{lstlisting}
 
+\subsubsection{Special functions}
+
+\begin{lstlisting}
+exp{T<: Ring, S}(a::PowerSeries{T, S})
+\end{lstlisting}
+
+\desc{Compute the power series exponential of the given power series \code{a}
+to the same precision as \code{a}. If \code{a} has infinite precision an
+exception is thrown.}
+
+\textbf{Examples.}
+
+Here are some examples of special functions.
+
+\begin{lstlisting}
+using Fields
+
+R, x = PowerSeriesRing(QQ, "x")
+
+a = exp(x + O(x^40))
+b = divexact(x, exp(x + O(x^40)) - 1)
+\end{lstlisting}
+
+
 \section{The Fields module}
 
 Nemo provides various constructions of fields. To make use of this 
