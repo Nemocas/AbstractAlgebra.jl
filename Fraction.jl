@@ -28,26 +28,30 @@ type fmpq
    end
 end
 
-function _fmpq_clear_fn(a::fmpq)
-   ccall((:fmpq_clear, :libflint), Void, (Ptr{fmpq},), &a)
-end
-
-type FractionStruct{T <: Ring}
+type Fraction{T <: Ring} <: Field
+   n :: Int
+   d :: Int
    num :: T
    den :: T
-end
 
-type Fraction{T <: Ring} <: Field
-   data :: Union(FractionStruct, fmpq)
-
-   Fraction(a :: T, b :: T) = new(FractionStruct(a, b))
-   Fraction(a :: ZZ, b :: ZZ) = new(fmpq(a, b))
+   Fraction(a :: T, b :: T) = new(0, 0, a, b)
+   function Fraction(a :: ZZ, b :: ZZ)
+      d = new()
+      ccall((:fmpq_init, :libflint), Void, (Ptr{Fraction},), &d)
+      ccall((:fmpq_set_fmpz_frac, :libflint), Void, (Ptr{Fraction}, Ptr{ZZ}, Ptr{ZZ}), &d, &a, &b)
+      finalizer(d, _fmpq_clear_fn)
+      return d 
+   end
 
    Fraction() = Fraction{T}(zero(T), one(T))
    Fraction(a::Integer) = Fraction{T}(T(a), one(T))
    Fraction(a::T) = Fraction{T}(a, one(T))
    Fraction(a::Fraction{T}) = a
    Fraction{R <: Ring}(a::R) = Fraction{T}(convert(T, a), one(T))
+end
+
+function _fmpq_clear_fn(a::Fraction{ZZ})
+   ccall((:fmpq_clear, :libflint), Void, (Ptr{Fraction},), &a)
 end
 
 typealias QQ Fraction{ZZ}
@@ -84,22 +88,22 @@ end
 ###########################################################################################
 
 function num{T <: Ring}(a::Fraction{T})
-   return a.data.num
+   return a.num
 end
 
 function num(a::Fraction{ZZ})
    c = ZZ()
-   ccall((:fmpq_numerator, :libflint), Void, (Ptr{ZZ}, Ptr{fmpq}), &c, &(a.data))
+   ccall((:fmpq_numerator, :libflint), Void, (Ptr{ZZ}, Ptr{Fraction}), &c, &a)
    return c
 end
 
 function den{T <: Ring}(a::Fraction{T})
-   return a.data.den
+   return a.den
 end
 
 function den(a::Fraction{ZZ})
    c = ZZ()
-   ccall((:fmpq_denominator, :libflint), Void, (Ptr{ZZ}, Ptr{fmpq}), &c, &(a.data))
+   ccall((:fmpq_denominator, :libflint), Void, (Ptr{ZZ}, Ptr{Fraction}), &c, &a)
    return c
 end
 
@@ -115,12 +119,12 @@ isunit{T <: Ring}(a::Fraction{T}) = num(a) != 0
 
 function height(a::Fraction{ZZ})
    c = ZZ()
-   ccall((:fmpq_height, :libflint), Void, (Ptr{ZZ}, Ptr{fmpq}), &c, &(a.data))
+   ccall((:fmpq_height, :libflint), Void, (Ptr{ZZ}, Ptr{Fraction}), &c, &a)
    return c
 end
 
 function height_bits(a::Fraction{ZZ})
-   return ccall((:fmpq_height_bits, :libflint), Int, (Ptr{fmpq},), &(a.data))
+   return ccall((:fmpq_height_bits, :libflint), Int, (Ptr{Fraction},), &a)
 end
 
 ###########################################################################################
@@ -130,12 +134,12 @@ end
 ###########################################################################################
 
 function -{T <: Ring}(a::Fraction{T})
-   Fraction{T}(-a.data.num, a.data.data.den)
+   Fraction{T}(-a.num, a.den)
 end
 
 function -(a::Fraction{ZZ})
    c = Fraction{ZZ}()
-   ccall((:fmpq_neg, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data))
+   ccall((:fmpq_neg, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}), &c, &a)
    return c
 end
 
@@ -145,38 +149,38 @@ end
 #
 ###########################################################################################
 
-=={T <: Ring}(x::Fraction{T}, y::Fraction{T}) = x.data.num == y.data.num && x.data.data.den == y.data.data.den
+=={T <: Ring}(x::Fraction{T}, y::Fraction{T}) = x.num == y.num && x.den == y.den
 
 function ==(a::Fraction{ZZ}, b::Fraction{ZZ})
-   return bool(ccall((:fmpq_equal, :libflint), Cint, (Ptr{fmpq}, Ptr{fmpq}), &(a.data), &(b.data)))
+   return bool(ccall((:fmpq_equal, :libflint), Cint, (Ptr{Fraction}, Ptr{Fraction}), &a, &b))
 end
 
-=={T <: Ring}(x::Fraction{T}, y::T) = x.data.num == y && x.data.den == 1
+=={T <: Ring}(x::Fraction{T}, y::T) = x.num == y && x.den == 1
 
-=={T <: Ring}(x::Fraction{T}, y::ZZ) = x.data.den == 1 && x.data.num == T(y)
+=={T <: Ring}(x::Fraction{T}, y::ZZ) = x.den == 1 && x.num == T(y)
 
-=={T <: Ring}(x::Fraction{T}, y::Int) = x.data.den == 1 && x.data.num == T(y)
+=={T <: Ring}(x::Fraction{T}, y::Int) = x.den == 1 && x.num == T(y)
 
 function ==(a::Fraction{ZZ}, b::ZZ)
-   return bool(ccall((:fmpq_equal_fmpz, :libflint), Cint, (Ptr{fmpq}, Ptr{ZZ}), &(a.data), &b))
+   return bool(ccall((:fmpq_equal_fmpz, :libflint), Cint, (Ptr{Fraction}, Ptr{ZZ}), &a, &b))
 end
 
 function ==(a::Fraction{ZZ}, b::Int)
-   return bool(ccall((:fmpq_equal_si, :libflint), Cint, (Ptr{fmpq}, Int), &(a.data), b))
+   return bool(ccall((:fmpq_equal_si, :libflint), Cint, (Ptr{Fraction}, Int), &a, b))
 end
 
-=={T <: Ring}(x::T, y::Fraction{T}) = y.data.num == x && y.data.den == 1
+=={T <: Ring}(x::T, y::Fraction{T}) = y.num == x && y.den == 1
 
-=={T <: Ring}(x::ZZ, y::Fraction{T}) = y.data.den == 1 && T(x) == y.data.num
+=={T <: Ring}(x::ZZ, y::Fraction{T}) = y.den == 1 && T(x) == y.num
 
-=={T <: Ring}(x::Int, y::Fraction{T}) = y.data.den == 1 && T(x) == y.data.num
+=={T <: Ring}(x::Int, y::Fraction{T}) = y.den == 1 && T(x) == y.num
 
 ==(a::ZZ, b::Fraction{ZZ}) = b == a
 
 ==(a::Int, b::Fraction{ZZ}) = b == ZZ(a)
 
 function cmp(a::Fraction{ZZ}, b::Fraction{ZZ})
-   return int(ccall((:fmpq_cmp, :libflint), Cint, (Ptr{fmpq}, Ptr{fmpq}), &(a.data), &(b.data)))
+   return int(ccall((:fmpq_cmp, :libflint), Cint, (Ptr{Fraction}, Ptr{Fraction}), &a, &b))
 end
 
 <(a::Fraction{ZZ}, b::Fraction{ZZ}) = cmp(a, b) < 0
@@ -196,27 +200,27 @@ end
 ###########################################################################################
 
 function show{T <: Ring}(io::IO, x::Fraction{T})
-   if x.data.den != 1 && needs_parentheses(x.data.num)
+   if x.den != 1 && needs_parentheses(x.num)
       print(io, "(")
    end
-   print(io, x.data.num)
-   if x.data.den != 1
-      if needs_parentheses(x.data.num)
+   print(io, x.num)
+   if x.den != 1
+      if needs_parentheses(x.num)
          print(io, ")")
       end
       print(io, "/")
-      if needs_parentheses(x.data.den)
+      if needs_parentheses(x.den)
          print(io, "(")
       end
-      print(io, x.data.den)
-      if needs_parentheses(x.data.den)
+      print(io, x.den)
+      if needs_parentheses(x.den)
          print(io, ")")
       end
    end
 end
 
 function show(io::IO, a::Fraction{ZZ})
-   p = ccall((:fmpq_get_str,:libflint), Ptr{Uint8}, (Ptr{Uint8}, Int, Ptr{fmpq}), C_NULL, 10, &(a.data))
+   p = ccall((:fmpq_get_str,:libflint), Ptr{Uint8}, (Ptr{Uint8}, Int, Ptr{Fraction}), C_NULL, 10, &a)
    len = int(ccall(:strlen, Csize_t, (Ptr{Uint8},), p))
    print(io, ASCIIString(pointer_to_array(p, len, true)))
 end
@@ -226,11 +230,11 @@ function show{T <: Ring}(io::IO, ::Type{Fraction{T}})
    show(io, T)
 end
 
-needs_parentheses{T <: Ring}(x::Fraction{T}) = x.data.den == 1 && needs_parentheses(x.data.num)
+needs_parentheses{T <: Ring}(x::Fraction{T}) = x.den == 1 && needs_parentheses(x.num)
 
 needs_parentheses(x::Fraction{ZZ}) = false
 
-is_negative{T <: Ring}(x::Fraction{T}) = !needs_parentheses(x.data.num) && is_negative(x.data.num)
+is_negative{T <: Ring}(x::Fraction{T}) = !needs_parentheses(x.num) && is_negative(x.num)
 
 is_negative(x::Fraction{ZZ}) = x < 0
 
@@ -260,61 +264,61 @@ canonical_unit{T}(a::Fraction{T}) = a
 #
 ###########################################################################################
 
-+{T <: Ring}(a::Fraction{T}, b::Fraction{T}) = (a.data.num*b.data.den + b.data.num*a.data.den)/(a.data.den*b.data.den)
++{T <: Ring}(a::Fraction{T}, b::Fraction{T}) = (a.num*b.den + b.num*a.den)/(a.den*b.den)
 
 function +(a::Fraction{ZZ}, b::Fraction{ZZ})
    c = Fraction{ZZ}()
-   ccall((:fmpq_add, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data), &(b.data))
+   ccall((:fmpq_add, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Ptr{Fraction}), &c, &a, &b)
    return c
 end
 
--{T <: Ring}(a::Fraction{T}, b::Fraction{T}) = (a.data.num*b.data.den - b.data.num*a.data.den)/(a.data.den*b.data.den)
+-{T <: Ring}(a::Fraction{T}, b::Fraction{T}) = (a.num*b.den - b.num*a.den)/(a.den*b.den)
 
 function -(a::Fraction{ZZ}, b::Fraction{ZZ})
    c = Fraction{ZZ}()
-   ccall((:fmpq_sub, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data), &(b.data))
+   ccall((:fmpq_sub, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Ptr{Fraction}), &c, &a, &b)
    return c
 end
 
 function *{T <: Ring}(a::Fraction{T}, b::Fraction{T})
-   g1 = gcd(a.data.num, b.data.den)
-   g2 = gcd(b.data.num, a.data.den)
-   num = divexact(a.data.num, g1)*divexact(b.data.num, g2)
-   den = divexact(a.data.den, g2)*divexact(b.data.den, g1)
+   g1 = gcd(a.num, b.den)
+   g2 = gcd(b.num, a.den)
+   num = divexact(a.num, g1)*divexact(b.num, g2)
+   den = divexact(a.den, g2)*divexact(b.den, g1)
    u = canonical_unit(den)
    Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function *(a::Fraction{ZZ}, b::Fraction{ZZ})
    c = Fraction{ZZ}()
-   ccall((:fmpq_mul, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data), &(b.data))
+   ccall((:fmpq_mul, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Ptr{Fraction}), &c, &a, &b)
    return c
 end
 
 function /{T <: Ring}(a::Fraction{T}, b::Fraction{T})
-   g1 = gcd(a.data.num, b.data.num)
-   g2 = gcd(b.data.den, a.data.den)
-   num = divexact(a.data.num, g1)*divexact(b.data.den, g2)
-   den = divexact(a.data.den, g2)*divexact(b.data.num, g1)
+   g1 = gcd(a.num, b.num)
+   g2 = gcd(b.den, a.den)
+   num = divexact(a.num, g1)*divexact(b.den, g2)
+   den = divexact(a.den, g2)*divexact(b.num, g1)
    u = canonical_unit(den)
    Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function /(a::Fraction{ZZ}, b::Fraction{ZZ})
    c = Fraction{ZZ}()
-   ccall((:fmpq_div, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data), &(b.data))
+   ccall((:fmpq_div, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Ptr{Fraction}), &c, &a, &b)
    return c
 end
 
 divexact{T <: Ring}(a::Fraction{T}, b::Fraction{T}) = a/b
 
 function gcd{T <: Ring}(a::Fraction{T}, b::Fraction{T})
-   gcd(a.data.num*b.data.den, a.data.den*b.data.num)/(a.data.den*b.data.den)
+   gcd(a.num*b.den, a.den*b.num)/(a.den*b.den)
 end
 
 function gcd(a::Fraction{ZZ}, b::Fraction{ZZ})
    c = Fraction{ZZ}()
-   ccall((:fmpq_gcd, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data), &(b.data))
+   ccall((:fmpq_gcd, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Ptr{Fraction}), &c, &a, &b)
    return c
 end
 
@@ -325,26 +329,26 @@ end
 ###########################################################################################
 
 function mul!{T <: Ring}(c::Fraction{T}, a::Fraction{T}, b::Fraction{T})
-   g1 = gcd(a.data.num, b.data.den)
-   g2 = gcd(b.data.num, a.data.den)
-   c.data.num = divexact(a.data.num, g1)*divexact(b.data.num, g2)
-   c.data.den = divexact(a.data.den, g2)*divexact(b.data.den, g1)
+   g1 = gcd(a.num, b.den)
+   g2 = gcd(b.num, a.den)
+   c.num = divexact(a.num, g1)*divexact(b.num, g2)
+   c.den = divexact(a.den, g2)*divexact(b.den, g1)
 end
 
 function mul!(c::Fraction{ZZ}, a::Fraction{ZZ}, b::Fraction{ZZ})
-   ccall((:fmpq_mul, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data), &(b.data))
+   ccall((:fmpq_mul, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Ptr{Fraction}), &c, &a, &b)
 end
 
 function addeq!{T <: Ring}(c::Fraction{T}, a::Fraction{T})
-   num = c.data.num*a.data.den + a.data.num*c.data.den
-   den = c.data.den*a.data.den
+   num = c.num*a.den + a.num*c.den
+   den = c.den*a.den
    g = gcd(num, den)
-   c.data.num = divexact(num, g)
-   c.data.den = divexact(den, g)
+   c.num = divexact(num, g)
+   c.den = divexact(den, g)
 end
 
 function addeq!(c::Fraction{ZZ}, a::Fraction{ZZ})
-   ccall((:fmpq_add, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(c.data), &(a.data))
+   ccall((:fmpq_add, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Ptr{Fraction}), &c, &c, &a)
 end
 
 ###########################################################################################
@@ -355,25 +359,25 @@ end
 
 function *{T <: Ring}(a::Fraction{T}, b::Int)
    c = T(b)
-   g = gcd(a.data.den, c)
-   num = a.data.num*divexact(c, g)
-   den = divexact(a.data.den, g)
+   g = gcd(a.den, c)
+   num = a.num*divexact(c, g)
+   den = divexact(a.den, g)
    u = canonical_unit(den)
    Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function *{T <: Ring}(a::Fraction{T}, b::ZZ)
    c = T(b)
-   g = gcd(a.data.den, c)
-   num = a.data.num*divexact(c, g)
-   den = divexact(a.data.den, g)
+   g = gcd(a.den, c)
+   num = a.num*divexact(c, g)
+   den = divexact(a.den, g)
    u = canonical_unit(den)
    Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function *(a::Fraction{ZZ}, b::ZZ)
    c = Fraction{ZZ}()
-   ccall((:fmpq_mul_fmpz, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Ptr{ZZ}), &(c.data), &(a.data), &b)
+   ccall((:fmpq_mul_fmpz, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Ptr{ZZ}), &c, &a, &b)
    return c
 end
 
@@ -381,18 +385,18 @@ end
 
 function *{T <: Ring}(a::Int, b::Fraction{T})
    c = T(a)
-   g = gcd(b.data.den, c)
-   num = b.data.num*divexact(c, g)
-   den = divexact(b.data.den, g)
+   g = gcd(b.den, c)
+   num = b.num*divexact(c, g)
+   den = divexact(b.den, g)
    u = canonical_unit(den)
    Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function *{T <: Ring}(a::ZZ, b::Fraction{T})
    c = T(a)
-   g = gcd(b.data.den, c)
-   num = b.data.num*divexact(c, g)
-   den = divexact(b.data.den, g)
+   g = gcd(b.den, c)
+   num = b.num*divexact(c, g)
+   den = divexact(b.den, g)
    u = canonical_unit(den)
    Fraction{T}(divexact(num, u), divexact(den, u))
 end
@@ -402,42 +406,42 @@ end
 *(a::Int, b::Fraction{ZZ}) = b*ZZ(a)
 
 function *{T <: Ring}(a::Fraction{T}, b::T)
-   g = gcd(a.data.den, b)
-   num = a.data.num*divexact(b, g)
-   den = divexact(a.data.den, g)
+   g = gcd(a.den, b)
+   num = a.num*divexact(b, g)
+   den = divexact(a.den, g)
    u = canonical_unit(den)
    Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function *{T <: Ring}(a::T, b::Fraction{T})
-   g = gcd(b.data.den, a)
-   num = b.data.num*divexact(a, g)
-   den = divexact(b.data.den, g)
+   g = gcd(b.den, a)
+   num = b.num*divexact(a, g)
+   den = divexact(b.den, g)
    u = canonical_unit(den)
    Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function /{T <: Ring}(a::Fraction{T}, b::Int)
    c = T(b)
-   g = gcd(a.data.num, c)
-   num = divexact(a.data.num, g)
-   den = a.data.den*divexact(c, g)
+   g = gcd(a.num, c)
+   num = divexact(a.num, g)
+   den = a.den*divexact(c, g)
    u = canonical_unit(den)
    Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function /{T <: Ring}(a::Fraction{T}, b::ZZ)
    c = T(b)
-   g = gcd(a.data.num, c)
-   num = divexact(a.data.num, g)
-   den = a.data.den*divexact(c, g)
+   g = gcd(a.num, c)
+   num = divexact(a.num, g)
+   den = a.den*divexact(c, g)
    u = canonical_unit(den)
    Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function /(a::Fraction{ZZ}, b::ZZ)
    c = Fraction{ZZ}()
-   ccall((:fmpq_div_fmpz, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Ptr{ZZ}), &(c.data), &(a.data), &b)
+   ccall((:fmpq_div_fmpz, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Ptr{ZZ}), &c, &a, &b)
    return c
 end
 
@@ -445,18 +449,18 @@ end
 
 function /{T <: Ring}(a::ZZ, b::Fraction{T})
    c = T(a)
-   g = gcd(b.data.num, c)
-   num = b.data.den*divexact(c, g)
-   den = divexact(b.data.num, g)
+   g = gcd(b.num, c)
+   num = b.den*divexact(c, g)
+   den = divexact(b.num, g)
    u = canonical_unit(den)
    Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function /{T <: Ring}(a::Int, b::Fraction{T})
    c = T(a)
-   g = gcd(b.data.num, c)
-   num = b.data.den*divexact(c, g)
-   den = divexact(b.data.num, g)
+   g = gcd(b.num, c)
+   num = b.den*divexact(c, g)
+   den = divexact(b.num, g)
    u = canonical_unit(den)
    Fraction{T}(divexact(num, u), divexact(den, u))
 end
@@ -466,47 +470,47 @@ end
 /(a::Int, b::Fraction{ZZ}) = inv(b)*ZZ(a)
 
 function /{T <: Ring}(a::Fraction{T}, b::T)
-   g = gcd(a.data.num, b)
-   num = divexact(a.data.num, g)
-   den = a.data.den*divexact(b, g)
+   g = gcd(a.num, b)
+   num = divexact(a.num, g)
+   den = a.den*divexact(b, g)
    u = canonical_unit(den)
    Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function /{T <: Ring}(a::T, b::Fraction{T})
-   g = gcd(b.data.num, a)
-   num = b.data.den*divexact(a, g)
-   den = divexact(b.data.num, g)
+   g = gcd(b.num, a)
+   num = b.den*divexact(a, g)
+   den = divexact(b.num, g)
    u = canonical_unit(den)
    Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function +{T <: Ring}(a::Fraction{T}, b::Int)
-   (a.data.num + a.data.den*b)/a.data.den
+   (a.num + a.den*b)/a.den
 end
 
 function +{T <: Ring}(a::Fraction{T}, b::ZZ)
-   (a.data.num + a.data.den*b)/a.data.den
+   (a.num + a.den*b)/a.den
 end
 
 function +(a::Fraction{ZZ}, b::Int)
    c = Fraction{ZZ}()
-   ccall((:fmpq_add_si, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Int), &(c.data), &(a.data), b)
+   ccall((:fmpq_add_si, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Int), &c, &a, b)
    return c
 end
 
 function +(a::Fraction{ZZ}, b::ZZ)
    c = Fraction{ZZ}()
-   ccall((:fmpq_add_fmpz, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Ptr{ZZ}), &(c.data), &(a.data), &b)
+   ccall((:fmpq_add_fmpz, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Ptr{ZZ}), &c, &a, &b)
    return c
 end
 
 function +{T <: Ring}(a::Int, b::Fraction{T})
-   (a*b.data.den + b.data.num)/b.data.den
+   (a*b.den + b.num)/b.den
 end
 
 function +{T <: Ring}(a::ZZ, b::Fraction{T})
-   (a*b.data.den + b.data.num)/b.data.den
+   (a*b.den + b.num)/b.den
 end
 
 +(a::ZZ, b::Fraction{ZZ}) = b + a
@@ -514,72 +518,72 @@ end
 +(a::Int, b::Fraction{ZZ}) = b + a
 
 function +{T <: Ring}(a::Fraction{T}, b::T)
-   (a.data.num + a.data.den*b)/a.data.den
+   (a.num + a.den*b)/a.den
 end
 
 function +{T <: Ring}(a::T, b::Fraction{T})
-   (a*b.data.den + b.data.num)/b.data.den
+   (a*b.den + b.num)/b.den
 end
 
 function -{T <: Ring}(a::Fraction{T}, b::Int)
-   (a.data.num - a.data.den*b)/a.data.den
+   (a.num - a.den*b)/a.den
 end
 
 function -{T <: Ring}(a::Fraction{T}, b::ZZ)
-   (a.data.num - a.data.den*b)/a.data.den
+   (a.num - a.den*b)/a.den
 end
 
 function -(a::Fraction{ZZ}, b::Int)
    c = Fraction{ZZ}()
-   ccall((:fmpq_sub_si, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Int), &(c.data), &(a.data), b)
+   ccall((:fmpq_sub_si, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Int), &c, &a, b)
    return c
 end
 
 function -(a::Fraction{ZZ}, b::ZZ)
    c = Fraction{ZZ}()
-   ccall((:fmpq_sub_fmpz, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Ptr{ZZ}), &(c.data), &(a.data), &b)
+   ccall((:fmpq_sub_fmpz, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Ptr{ZZ}), &c, &a, &b)
    return c
 end
 
 function -{T <: Ring}(a::Int, b::Fraction{T})
-   (a*b.data.den - b.data.num)/b.data.den
+   (a*b.den - b.num)/b.den
 end
 
 function -{T <: Ring}(a::ZZ, b::Fraction{T})
-   (a*b.data.den - b.data.num)/b.data.den
+   (a*b.den - b.num)/b.den
 end
 
 function -(a::Int, b::Fraction{ZZ})
    c = Fraction{ZZ}()
-   ccall((:fmpq_sub_si, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Int), &(c.data), &(b.data), a)
-   ccall((:fmpq_neg, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(c.data))
+   ccall((:fmpq_sub_si, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Int), &c, &b, a)
+   ccall((:fmpq_neg, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}), &c, &c)
    return c
 end
 
 function -(a::ZZ, b::Fraction{ZZ})
    c = Fraction{ZZ}()
-   ccall((:fmpq_sub_fmpz, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Ptr{ZZ}), &(c.data), &(b.data), &a)
-   ccall((:fmpq_neg, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(c.data))
+   ccall((:fmpq_sub_fmpz, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Ptr{ZZ}), &c, &b, &a)
+   ccall((:fmpq_neg, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}), &c, &c)
    return c
 end
 
 function -{T <: Ring}(a::Fraction{T}, b::T)
-   (a.data.num - a.data.den*b)/a.data.den
+   (a.num - a.den*b)/a.den
 end
 
 function -{T <: Ring}(a::T, b::Fraction{T})
-   (a*b.data.den - b.data.num)/b.data.den
+   (a*b.den - b.num)/b.den
 end
 
 function >>(a::Fraction{ZZ}, b::Int)
    c = Fraction{ZZ}()
-   ccall((:fmpq_div_2exp, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Int), &(c.data), &(a.data), b)
+   ccall((:fmpq_div_2exp, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Int), &c, &a, b)
    return c
 end
 
 function <<(a::Fraction{ZZ}, b::Int)
    c = Fraction{ZZ}()
-   ccall((:fmpq_mul_2exp, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Int), &(c.data), &(a.data), b)
+   ccall((:fmpq_mul_2exp, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Int), &c, &a, b)
    return c
 end
 
@@ -594,12 +598,12 @@ function ^{T <: Ring}(a::Fraction{T}, b::Int)
       a = inv(a)
       b = -b
    end
-   Fraction{T}(a.data.num^b, a.data.den^b)
+   Fraction{T}(a.num^b, a.den^b)
 end
 
 function ^(a::Fraction{ZZ}, b::Int)
    c = Fraction{ZZ}()
-   ccall((:fmpq_pow_si, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Int), &(c.data), &(a.data), b)
+   ccall((:fmpq_pow_si, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}, Int), &c, &a, b)
    return c
 end
 
@@ -626,16 +630,16 @@ divexact{T <: Ring}(a::Fraction{T}, b::T) = a/b
 ###########################################################################################
 
 function inv{T <: Ring}(a::Fraction{T})
-   a.data.num == 0 && throw(DivideError())
-   num = a.data.den
-   den = a.data.num
+   a.num == 0 && throw(DivideError())
+   num = a.den
+   den = a.num
    u = canonical_unit(den)
    Fraction{T}(divexact(num, u), divexact(den, u))
 end
 
 function inv(a::Fraction{ZZ})
    c = Fraction{ZZ}()
-   ccall((:fmpq_inv, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data))
+   ccall((:fmpq_inv, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}), &c, &a)
    return c
 end
 
@@ -647,7 +651,7 @@ end
 
 function mod(a::Fraction{ZZ}, b::ZZ)
    c = ZZ()
-   ccall((:fmpq_mod_fmpz, :libflint), Void, (Ptr{ZZ}, Ptr{fmpq}, Ptr{ZZ}), &c, &(a.data), &b)
+   ccall((:fmpq_mod_fmpz, :libflint), Void, (Ptr{ZZ}, Ptr{Fraction}, Ptr{ZZ}), &c, &a, &b)
    return c
 end
 
@@ -661,7 +665,7 @@ mod(a::Fraction{ZZ}, b::Int) = mod(a, ZZ(b))
 
 function reconstruct(a::ZZ, b::ZZ)
    c = Fraction{ZZ}()
-   if !bool(ccall((:fmpq_reconstruct_fmpz, :libflint), Cint, (Ptr{fmpq}, Ptr{ZZ}, Ptr{ZZ}), &(c.data), &a, &b))
+   if !bool(ccall((:fmpq_reconstruct_fmpz, :libflint), Cint, (Ptr{Fraction}, Ptr{ZZ}, Ptr{ZZ}), &c, &a, &b))
       error("Impossible rational reconstruction")
    end
    return c
@@ -682,26 +686,26 @@ reconstruct(a::Int, b::Int) =  reconstruct(ZZ(a), ZZ(b))
 function next_minimal(a::Fraction{ZZ})
    a < 0 && throw(DomainError())
    c = Fraction{ZZ}()
-   ccall((:fmpq_next_minimal, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data))
+   ccall((:fmpq_next_minimal, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}), &c, &a)
    return c
 end
 
 function next_signed_minimal(a::Fraction{ZZ})
    c = Fraction{ZZ}()
-   ccall((:fmpq_next_signed_minimal, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data))
+   ccall((:fmpq_next_signed_minimal, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}), &c, &a)
    return c
 end
 
 function next_calkin_wilf(a::Fraction{ZZ})
    a < 0 && throw(DomainError())
    c = Fraction{ZZ}()
-   ccall((:fmpq_next_calkin_wilf, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data))
+   ccall((:fmpq_next_calkin_wilf, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}), &c, &a)
    return c
 end
 
 function next_signed_calkin_wilf(a::Fraction{ZZ})
    c = Fraction{ZZ}()
-   ccall((:fmpq_next_signed_calkin_wilf, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &(c.data), &(a.data))
+   ccall((:fmpq_next_signed_calkin_wilf, :libflint), Void, (Ptr{Fraction}, Ptr{Fraction}), &c, &a)
    return c
 end
 
@@ -714,13 +718,13 @@ end
 function harmonic(n::Int)
    n < 0 && throw(DomainError())
    c = Fraction{ZZ}()
-   ccall((:fmpq_harmonic_ui, :libflint), Void, (Ptr{fmpq}, Int), &(c.data), n)
+   ccall((:fmpq_harmonic_ui, :libflint), Void, (Ptr{Fraction}, Int), &c, n)
    return c
 end
 
 function dedekind_sum(h::ZZ, k::ZZ)
    c = Fraction{ZZ}()
-   ccall((:fmpq_dedekind_sum, :libflint), Void, (Ptr{fmpq}, Ptr{ZZ}, Ptr{ZZ}), &(c.data), &h, &k)
+   ccall((:fmpq_dedekind_sum, :libflint), Void, (Ptr{Fraction}, Ptr{ZZ}, Ptr{ZZ}), &c, &h, &k)
    return c
 end
 

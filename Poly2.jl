@@ -23,8 +23,8 @@ function Poly{S}(::Type{Poly{QQ, S}}, a :: Array{QQ, 1})
    z = Poly{QQ, S}(initpoly2())
    ccall((:fmpq_poly_init2, :libflint), Void, (Ptr{Poly}, Int), &z, length(a))
    for i = 1:length(a)
-      ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, (Ptr{Poly}, Int, Ptr{fmpq}),
-            &z, i - 1, &(a[i].data))
+      ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, (Ptr{Poly}, Int, Ptr{Fraction}),
+            &z, i - 1, &a[i])
    end
    return z
 end
@@ -92,7 +92,7 @@ length{S, T}(x::Poly{FinFieldElem{T}, S}) = ccall((:fq_poly_length, :libflint), 
 
 function coeff{S}(x::Poly{QQ, S}, n::Int)
    z = QQ()
-   ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, (Ptr{fmpq}, Ptr{Poly}, Int), &(z.data), &x, n)
+   ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, (Ptr{Fraction}, Ptr{Poly}, Int), &z, &x, n)
    return z
 end
 
@@ -190,7 +190,7 @@ end
 
 function setcoeff!{S}(z::Poly{QQ, S}, n::Int, x::QQ)
    ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, 
-                (Ptr{Poly}, Int, Ptr{fmpq}), 
+                (Ptr{Poly}, Int, Ptr{Fraction}), 
                &z, n, &x)
 end
 
@@ -249,7 +249,7 @@ end
 function *{S}(x::QQ, y::Poly{QQ, S})
    z = Poly{QQ, S}()
    ccall((:fmpq_poly_scalar_mul_fmpq, :libflint), Void, 
-                (Ptr{Poly}, Ptr{Poly}, Ptr{fmpq}), 
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Fraction}), 
                &z, &y, &x)
    return z
 end
@@ -285,7 +285,7 @@ end
 function +{S}(x::Poly{QQ, S}, y::QQ)
    z = Poly{QQ, S}()
    ccall((:fmpq_poly_add_fmpq, :libflint), Void, 
-                (Ptr{Poly}, Ptr{Poly}, Ptr{fmpq}), 
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Fraction}), 
                &z, &x, &y)
    return z
 end
@@ -309,7 +309,7 @@ end
 function -{S}(x::Poly{QQ, S}, y::QQ)
    z = Poly{QQ, S}()
    ccall((:fmpq_poly_sub_fmpq, :libflint), Void, 
-                (Ptr{Poly}, Ptr{Poly}, Ptr{fmpq}), 
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Fraction}), 
                &z, &x, &y)
    return z
 end
@@ -333,7 +333,7 @@ end
 function -{S}(x::QQ, y::Poly{QQ, S})
    z = Poly{QQ, S}()
    ccall((:fmpq_poly_fmpq_sub, :libflint), Void, 
-                (Ptr{Poly}, Ptr{fmpq}, Ptr{Poly}), 
+                (Ptr{Poly}, Ptr{Fraction}, Ptr{Poly}), 
                &z, &x, &y)
    return z
 end
@@ -508,8 +508,8 @@ function =={S}(x::Poly{QQ, S}, y::ZZ)
    elseif length(x) == 1 
       z = QQ();
       ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, 
-                (Ptr{fmpq}, Ptr{Poly}, Int), 
-               &(z.data), &x, 0)
+                (Ptr{Fraction}, Ptr{Poly}, Int), 
+               &z, &x, 0)
       return num(z) == y && den(z) == 1
    else
       return y == 0
@@ -524,7 +524,7 @@ function =={S}(x::Poly{QQ, S}, y::QQ)
    elseif length(x) == 1 
       z = QQ();
       ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, 
-                (Ptr{fmpq}, Ptr{Poly}, Int), 
+                (Ptr{Fraction}, Ptr{Poly}, Int), 
                &z, &x, 0)
       return z == y
    else
@@ -558,8 +558,8 @@ function divexact{S}(x::Poly{QQ, S}, y::QQ)
    y == 0 && throw(DivideError())
    z = Poly{QQ, S}()
    ccall((:fmpq_poly_scalar_div_fmpq, :libflint), Void, 
-                (Ptr{Poly}, Ptr{Poly}, Ptr{fmpq}), 
-               &z,  &x, &(y.data))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{Fraction}), 
+               &z,  &x, &y)
    return z
 end
 
@@ -734,7 +734,7 @@ end
 function content{S}(x::Poly{QQ, S})
    z = QQ()
    ccall((:fmpq_poly_content, :libflint), Void, 
-                (Ptr{fmpq}, Ptr{Poly}), 
+                (Ptr{Fraction}, Ptr{Poly}), 
                &z, &x)
    return z
 end
@@ -756,7 +756,7 @@ end
 function evaluate{S}(x::Poly{QQ, S}, y::ZZ)
    z = QQ()
    ccall((:fmpq_poly_evaluate_fmpz, :libflint), Void, 
-                (Ptr{fmpq}, Ptr{Poly}, Ptr{ZZ}), 
+                (Ptr{Fraction}, Ptr{Poly}, Ptr{ZZ}), 
                &z, &x, &y)
    return z
 end
@@ -766,7 +766,7 @@ evaluate{S}(x::Poly{QQ, S}, y::Int) = evaluate(x, ZZ(y))
 function evaluate{S}(x::Poly{QQ, S}, y::QQ)
    z = QQ()
    ccall((:fmpq_poly_evaluate_fmpq, :libflint), Void, 
-                (Ptr{fmpq}, Ptr{Poly}, Ptr{fmpq}), 
+                (Ptr{Fraction}, Ptr{Poly}, Ptr{fmpq}), 
                &z, &x, &y)
    return z
 end
@@ -840,7 +840,7 @@ end
 function resultant{S}(x::Poly{QQ, S}, y::Poly{QQ, S})
    z = QQ()
    ccall((:fmpq_poly_resultant, :libflint), Void, 
-                (Ptr{fmpq}, Ptr{Poly}, Ptr{Poly}), 
+                (Ptr{Fraction}, Ptr{Poly}, Ptr{Poly}), 
                &z, &x, &y)
    return z
 end

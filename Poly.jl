@@ -145,7 +145,7 @@ degree{T <: Ring, S}(x::Poly{T, S}) = length(x) - 1
 
 function coeff{S}(x::Poly{ZZ, S}, n::Int)
    z = ZZ()
-   ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, (Ptr{ZZ}, Ptr{Poly}, Int), &z, x, n)
+   ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, (Ptr{ZZ}, Ptr{Poly}, Int), &z, &x, n)
    return z
 end
 

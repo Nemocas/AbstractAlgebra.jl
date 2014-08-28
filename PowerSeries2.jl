@@ -5,9 +5,9 @@
 ###########################################################################################    
 
 import Rings: PowerSeries, PowerSeriesRing, max, min, isless, Precision, valuation, O,
-              initps, coeff, truncate
+              initps, coeff, truncate, divexact
 
-export PowerSeries, coeff, truncate
+export PowerSeries, coeff, truncate, divexact
 
 ###########################################################################################
 #
@@ -19,8 +19,8 @@ function PowerSeries{S}(::Type{PowerSeries{QQ, S}}, a :: Array{QQ, 1}, n::Precis
    z = PowerSeries{QQ, S}(initps(), n)
    ccall((:fmpq_poly_init2, :libflint), Void, (Ptr{PowerSeries}, Int), &z, length(a))
    for i = 1:length(a)
-      ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, (Ptr{PowerSeries}, Int, Ptr{fmpq}),
-            &z, i - 1, &(a[i].data))
+      ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, (Ptr{PowerSeries}, Int, Ptr{Fraction}),
+            &z, i - 1, &a[i])
    end
    return z
 end
@@ -35,7 +35,7 @@ length{S}(x::PowerSeries{QQ, S}) = ccall((:fmpq_poly_length, :libflint), Int, (P
 
 function coeff{S}(x::PowerSeries{QQ, S}, n::Int)
    z = QQ()
-   ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, (Ptr{fmpq}, Ptr{PowerSeries}, Int), &(z.data), &x, n)
+   ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, (Ptr{Fraction}, Ptr{PowerSeries}, Int), &z, &x, n)
    return z
 end
 
@@ -152,8 +152,8 @@ end
 
 function setcoeff!{S}(z::PowerSeries{QQ, S}, n::Int, x::QQ)
    ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, 
-                (Ptr{PowerSeries}, Int, Ptr{fmpq}), 
-               &z, n, &(x.data))
+                (Ptr{PowerSeries}, Int, Ptr{Fraction}), 
+               &z, n, &x)
 end
 
 function mul!{S}(z::PowerSeries{QQ, S}, a::PowerSeries{QQ, S}, b::PowerSeries{QQ, S})
@@ -223,8 +223,8 @@ function *{S}(x::QQ, y::PowerSeries{QQ, S})
    z = PowerSeries{QQ, S}()
    z.prec = y.prec
    ccall((:fmpq_poly_scalar_mul_fmpq, :libflint), Void, 
-                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{fmpq}), 
-               &z, &y, &(x.data))
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{Fraction}), 
+               &z, &y, &x)
    return z
 end
 
@@ -347,8 +347,8 @@ function divexact{S}(x::PowerSeries{QQ, S}, y::QQ)
    z = PowerSeries{QQ, S}()
    z.prec = x.prec
    ccall((:fmpq_poly_scalar_div_fmpz, :libflint), Void, 
-                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{fmpq}), 
-               &z, &x, &(y.data))
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{Fraction}), 
+               &z, &x, &y)
    return z
 end
 
@@ -377,4 +377,23 @@ function inv{S}(a::PowerSeries{QQ, S})
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
                &ainv, &a, a.prec)
    return ainv
+end
+
+###########################################################################################
+#
+#   Special functions
+#
+###########################################################################################
+
+function exp{S}(a::PowerSeries{QQ, S})
+   if a == 0
+      return PowerSeries(PowerSeries{QQ, S}, [QQ(1)], nothing)
+   elseif a.prec == nothing
+      error("Unable to compute exponential of infinite precision power series")
+   end
+   b = PowerSeries(PowerSeries{QQ, S}, Array(QQ, 0), a.prec)
+   ccall((:fmpq_poly_exp_series, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &b, &a, a.prec)
+   return b
 end
