@@ -74,6 +74,16 @@ function PowerSeries{T, S}(::Type{PowerSeries{T, S}}, a :: Array{T, 1}, n :: Pre
    return z
 end
 
+function PowerSeries{S}(::Type{PowerSeries{ZZ, S}}, a :: Array{ZZ, 1}, n::Precision)
+   z = PowerSeries{ZZ, S}(PowerSeries, n)
+   ccall((:fmpz_poly_init2, :libflint), Void, (Ptr{PowerSeries}, Int), &z, length(a))
+   for i = 1:length(a)
+      ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, (Ptr{PowerSeries}, Int, Ptr{ZZ}),
+            &z, i - 1, &a[i])
+   end
+   return z
+end
+
 function O{T, S}(a :: PowerSeries{T, S})
    prec = length(a) - 1
    prec < 0 && throw(DivideError())
@@ -89,6 +99,8 @@ end
    
 length{T <: Ring, S}(x::PowerSeries{T, S}) = x.length
 
+length{S}(x::PowerSeries{ZZ, S}) = ccall((:fmpz_poly_length, :libflint), Int, (Ptr{PowerSeries},), &x)
+
 degree{T <: Ring, S}(x::PowerSeries{T, S}) = length(x) - 1
 
 function normalise{T <: Ring, S}(a::PowerSeries{T, S}, len::Int)
@@ -100,6 +112,12 @@ function normalise{T <: Ring, S}(a::PowerSeries{T, S}, len::Int)
 end
 
 coeff{T <: Ring, S}(a::PowerSeries{T, S}, n::Int) = n < 0 || n >= a.length ? T(0) : a.coeffs[n + 1]
+
+function coeff{S}(x::PowerSeries{ZZ, S}, n::Int)
+   z = ZZ()
+   ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, (Ptr{ZZ}, Ptr{PowerSeries}, Int), &z, &x, n)
+   return z
+end
 
 zero{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries{T, S}(0)
 
@@ -187,6 +205,22 @@ function show{T <: Ring, S}(io::IO, x::PowerSeries{T, S})
    end
 end
 
+function show{S}(io::IO, x::PowerSeries{ZZ, S})
+   if length(x) == 0
+      print(io, "0")
+   else
+      cstr = ccall((:fmpz_poly_get_str_pretty, :libflint), Ptr{Uint8}, 
+                (Ptr{PowerSeries}, Ptr{Uint8}), &x, bytestring(string(S)))
+
+      print(io, bytestring(cstr))
+
+      ccall((:flint_free, :libflint), Void, (Ptr{Uint8},), cstr)
+   end
+   if x.prec != nothing
+      print(io, "+O(", string(S), "^", x.prec, ")")
+   end
+end
+
 function show{T <: Ring, S}(io::IO, ::Type{PowerSeries{T, S}})
    print(io, "Univariate power series ring in ", string(S), " over ")
    show(io, T)
@@ -212,6 +246,15 @@ function -{T <: Ring, S}(a::PowerSeries{T, S})
    end
    z = PowerSeries(PowerSeries{T, S}, d, a.prec)
    z.length = len
+   return z
+end
+
+function -{S}(x::PowerSeries{ZZ, S})
+   z = PowerSeries{ZZ, S}()
+   ccall((:fmpz_poly_neg, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}), 
+               &z, &x)
+   z.prec = x.prec
    return z
 end
 
@@ -256,6 +299,24 @@ function +{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
    return z
 end
   
+function +{S}(a::PowerSeries{ZZ, S}, b::PowerSeries{ZZ, S})
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenz = max(lena, lenb)
+   z = PowerSeries{ZZ, S}()
+   z.prec = prec
+   ccall((:fmpz_poly_add_series, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &a, &b, lenz)
+   return z
+end
+
 function -{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
    lena = a.length
    lenb = b.length
@@ -288,6 +349,24 @@ function -{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
 
    z.length = normalise(z, i - 1)
 
+   return z
+end
+
+function -{S}(a::PowerSeries{ZZ, S}, b::PowerSeries{ZZ, S})
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenz = max(lena, lenb)
+   z = PowerSeries{ZZ, S}()
+   z.prec = prec
+   ccall((:fmpz_poly_sub_series, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &a, &b, lenz)
    return z
 end
 
@@ -339,6 +418,32 @@ function *{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
    return z
 end
 
+function *{S}(a::PowerSeries{ZZ, S}, b::PowerSeries{ZZ, S})
+   lena = length(a)
+   lenb = length(b)
+   
+   aval = valuation(a)
+   bval = valuation(b)
+
+   prec = min(a.prec + bval, b.prec + aval)
+   
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   
+   if lena == 0 || lenb == 0
+      return PowerSeries(PowerSeries{ZZ, S}, Array(ZZ, 0), prec)
+   end
+
+   lenz = prec == nothing ? lena + lenb - 1 : min(lena + lenb - 1, prec)
+
+   z = PowerSeries{ZZ, S}()
+   z.prec = prec
+   ccall((:fmpz_poly_mullow, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &a, &b, lenz)
+   return z
+end
+
 ###########################################################################################
 #
 #   Unsafe functions
@@ -365,6 +470,12 @@ function setcoeff!{T <: Ring, S}(c::PowerSeries{T, S}, n::Int, a::T)
       c.length = max(c.length, n + 1)
       # don't normalise
    end
+end
+
+function setcoeff!{S}(z::PowerSeries{ZZ, S}, n::Int, x::ZZ)
+   ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
+                (Ptr{PowerSeries}, Int, Ptr{ZZ}), 
+               &z, n, &x)
 end
 
 function mul!{T <: Ring, S}(c::PowerSeries{T, S}, a::PowerSeries{T, S}, b::PowerSeries{T, S})
@@ -411,6 +522,29 @@ function mul!{T <: Ring, S}(c::PowerSeries{T, S}, a::PowerSeries{T, S}, b::Power
    c.prec = prec
 end
 
+function mul!{S}(z::PowerSeries{ZZ, S}, a::PowerSeries{ZZ, S}, b::PowerSeries{ZZ, S})
+   lena = length(a)
+   lenb = length(b)
+   
+   aval = valuation(a)
+   bval = valuation(b)
+
+   prec = min(a.prec + bval, b.prec + aval)
+   
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   
+   lenz = prec == nothing ? lena + lenb - 1 : min(lena + lenb - 1, prec)
+   if lenz < 0
+      lenz = 0
+   end
+
+   z.prec = prec
+   ccall((:fmpz_poly_mullow, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &a, &b, lenz)
+end
+
 function addeq!{T <: Ring, S}(c::PowerSeries{T, S}, a::PowerSeries{T, S})
    lenc = c.length
    lena = a.length
@@ -427,6 +561,22 @@ function addeq!{T <: Ring, S}(c::PowerSeries{T, S}, a::PowerSeries{T, S})
    end
    c.length = normalise(c, len)
    c.prec = prec
+end
+
+function addeq!{S}(a::PowerSeries{ZZ, S}, b::PowerSeries{ZZ, S},)
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenz = max(lena, lenb)
+   a.prec = prec
+   ccall((:fmpz_poly_add_series, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &a, &a, &b, lenz)
 end
 
 ###########################################################################################
@@ -454,6 +604,24 @@ function *{T <: Ring, S}(a::ZZ, b::PowerSeries{T, S})
    end
    z = PowerSeries(PowerSeries{T, S}, d, b.prec)
    z.length = normalise(z, len)
+   return z
+end
+
+function *{S}(x::Int, y::PowerSeries{ZZ, S})
+   z = PowerSeries{ZZ, S}()
+   z.prec = y.prec
+   ccall((:fmpz_poly_scalar_mul_si, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &y, x)
+   return z
+end
+
+function *{S}(x::ZZ, y::PowerSeries{ZZ, S})
+   z = PowerSeries{ZZ, S}()
+   z.prec = y.prec
+   ccall((:fmpz_poly_scalar_mul_fmpz, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{ZZ}), 
+               &z, &y, &x)
    return z
 end
 
@@ -556,6 +724,30 @@ function ^{T <: Ring, S}(a::PowerSeries{T, S}, b::Int)
    end
 end
 
+function ^{S}(a::PowerSeries{ZZ, S}, b::Int)
+   b < 0 && throw(DomainError())
+   if length(a) == 0
+      return PowerSeries(PowerSeries{ZZ, S}, Array(ZZ, 0), a.prec + (b - 1)*valuation(a))
+   elseif length(a) == 1
+      return PowerSeries(PowerSeries{ZZ, S}, [coeffs(a, 0)^b], a.prec)
+   elseif b == 0
+      return PowerSeries(PowerSeries{ZZ, S}, [ZZ(1)], nothing)
+   elseif a.prec == nothing
+      z = PowerSeries(PowerSeries{ZZ, S}, Array(ZZ, 0), nothing)
+      ccall((:fmpz_poly_pow, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &a, b)
+      return z
+   else
+      prec = a.prec + (b - 1)*valuation(a)
+      z = PowerSeries(PowerSeries{ZZ, S}, Array(ZZ, 0), prec)
+      ccall((:fmpz_poly_pow_trunc, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int, Int), 
+               &z, &a, b, prec)
+      return z
+   end
+end
+
 ###########################################################################################
 #
 #   Comparisons
@@ -597,6 +789,17 @@ function =={T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
    end
 
    return true
+end
+
+function =={S}(x::PowerSeries{ZZ, S}, y::PowerSeries{ZZ, S})
+   prec = min(x.prec, y.prec)
+   
+   n = max(length(x), length(y))
+   n = min(n, prec)
+   
+   return bool(ccall((:fmpz_poly_equal_trunc, :libflint), Cint, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &x, &y, n))
 end
 
 =={T<: Ring, S}(x::Int, y::PowerSeries{T, S}) = y == x

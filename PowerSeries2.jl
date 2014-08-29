@@ -131,7 +131,7 @@ function *{S}(a::PowerSeries{QQ, S}, b::PowerSeries{QQ, S})
    lenb = min(lenb, prec)
    
    if lena == 0 || lenb == 0
-      return PowerSeries(PowerSeries{T, S}, Array(T, 0), prec)
+      return PowerSeries(PowerSeries{QQ, S}, Array(QQ, 0), prec)
    end
 
    lenz = prec == nothing ? lena + lenb - 1 : min(lena + lenb - 1, prec)
