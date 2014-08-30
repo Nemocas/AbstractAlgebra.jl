@@ -2,12 +2,12 @@ export Fraction, FractionField, num, den, zero, one, gcd, divexact, mul!, addeq!
        canonical_unit, mod, divrem, needs_parentheses, is_negative, show_minus_one, QQ,
        cmp, height, height_bits, reconstruct, harmonic, dedekind_sum, next_minimal,
        next_signed_minimal, next_calkin_wilf, next_signed_calkin_wilf, isunit, iszero,
-       isone
+       isone, degree
 
 import Base: convert, show, gcd, string
 
 import Rings: divexact, mul!, addeq!, inv, canonical_unit, mod, divrem, needs_parentheses,
-              is_negative, show_minus_one, zero, one, isunit, iszero, isone
+              is_negative, show_minus_one, zero, one, isunit, iszero, isone, degree
 
 ###########################################################################################
 #

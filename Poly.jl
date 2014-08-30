@@ -10,7 +10,7 @@ export Poly, PolynomialRing, coeff, zero, one, gen, isgen, normalise, chebyshev_
        resultant, lead, discriminant, bezout, truncate, mullow, divrem, mulmod, powmod,
        invmod, canonical_unit, integral, lcm, reverse, shift_left, shift_right,
        fmpz_poly_struct, fmpz_mod_poly_struct, fq_poly_struct, fmpq_poly_struct,
-       iszero, isone
+       iszero, isone, degree
 
 import Base: convert, zero, show, length
 

@@ -115,6 +115,9 @@ coeff{T <: Ring, S}(a::PowerSeries{T, S}, n::Int) = n < 0 || n >= a.length ? T(0
 
 function coeff{S}(x::PowerSeries{ZZ, S}, n::Int)
    z = ZZ()
+   if n < 0
+      return 0
+   end
    ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, (Ptr{ZZ}, Ptr{PowerSeries}, Int), &z, &x, n)
    return z
 end
@@ -648,6 +651,17 @@ function shift_left{T <: Ring, S}(x::PowerSeries{T, S}, len::Int)
    return PowerSeries(PowerSeries{T, S}, v, x.prec + len)
 end
 
+function shift_left{S}(x::PowerSeries{ZZ, S}, len::Int)
+   len < 0 && throw(DomainError())
+   xlen = length(x)
+   z = PowerSeries{ZZ, S}()
+   z.prec = x.prec + len
+   ccall((:fmpz_poly_shift_left, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &x, len)
+   return z
+end
+
 function shift_right{T <: Ring, S}(x::PowerSeries{T, S}, len::Int)
    len < 0 && throw(DomainError())
    xlen = x.length
@@ -659,6 +673,20 @@ function shift_right{T <: Ring, S}(x::PowerSeries{T, S}, len::Int)
       v[i] = coeff(x, i + len - 1)
    end
    return PowerSeries(PowerSeries{T, S}, v, x.prec - len)
+end
+
+function shift_right{S}(x::PowerSeries{ZZ, S}, len::Int)
+   len < 0 && throw(DomainError())
+   xlen = length(x)
+   if len >= xlen
+      return PowerSeries(PowerSeries{ZZ, S}, Array(ZZ, 0), max(0, x.prec - len))
+   end
+   z = PowerSeries{ZZ, S}()
+   z.prec = x.prec - len
+   ccall((:fmpz_poly_shift_right, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &x, len)
+   return z
 end
 
 ###########################################################################################
@@ -682,6 +710,19 @@ function truncate{T<: Ring, S}(x::PowerSeries{T, S}, prec::Precision)
    r = PowerSeries(PowerSeries{T, S}, d, prec)
    r.length = normalise(r, prec)
    return r
+end
+
+function truncate{S}(x::PowerSeries{ZZ, S}, prec::Precision)
+   prec < 0 && throw(DomainError())
+   if x.prec <= prec
+      return x
+   end
+   z = PowerSeries{ZZ, S}()
+   z.prec = prec
+   ccall((:fmpz_poly_set_trunc, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &x, prec)
+   return z
 end
 
 ###########################################################################################
@@ -826,6 +867,26 @@ function divexact{T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
    return x*inv(y)
 end
 
+function divexact{S}(x::PowerSeries{ZZ, S}, y::PowerSeries{ZZ, S})
+   y == 0 && throw(DivideError())
+   v2 = valuation(y)
+   v1 = valuation(x)
+   if v2 != 0
+      if v1 >= v2
+         x = shift_right(x, v2)
+         y = shift_right(y, v2)
+      end
+   end
+   !isunit(y) && error("Unable to invert power series")
+   prec = min(x.prec, y.prec - 2*v2 + v1)
+   z = PowerSeries{ZZ, S}()
+   z.prec = prec
+   ccall((:fmpz_poly_div_series, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &x, &y, prec)
+   return z
+end
+
 function divexact{T<: Ring, S}(x::PowerSeries{T, S}, y::Int)
    y == 0 && throw(DivideError())
    lenx = length(x)
@@ -854,6 +915,26 @@ function divexact{T<: Ring, S}(x::PowerSeries{T, S}, y::T)
       d[i] = divexact(coeff(x, i - 1), y)
    end
    return PowerSeries(PowerSeries{T, S}, d, x.prec)
+end
+
+function divexact{S}(x::PowerSeries{ZZ, S}, y::Int)
+   y == 0 && throw(DivideError())
+   z = PowerSeries{ZZ, S}()
+   z.prec = x.prec
+   ccall((:fmpz_poly_scalar_divexact_si, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &x, y)
+   return z
+end
+
+function divexact{S}(x::PowerSeries{ZZ, S}, y::ZZ)
+   y == 0 && throw(DivideError())
+   z = PowerSeries{ZZ, S}()
+   z.prec = x.prec
+   ccall((:fmpz_poly_scalar_divexact_fmpz, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{ZZ}), 
+               &z, &x, &y)
+   return z
 end
 
 /{T<: Ring, S}(x::PowerSeries{T, S}, y::Int) = divexact(x, y)
@@ -891,6 +972,21 @@ function inv{T<: Ring, S}(a::PowerSeries{T, S})
    return ainv
 end
 
+function inv{S}(a::PowerSeries{ZZ, S})
+   a == 0 && throw(DivideError())
+   !isunit(a) && error("Unable to invert power series")
+   if a.prec == nothing
+      a1 = coeff(a, 0)
+      length(a) != 1 && error("Unable to invert infinite precision power series")
+      return PowerSeries(PowerSeries{QQ, S}, [divexact(ZZ(1), a1)], nothing)
+   end
+   ainv = PowerSeries(PowerSeries{ZZ, S}, Array(ZZ, 0), a.prec)
+   ccall((:fmpz_poly_inv_series, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &ainv, &a, a.prec)
+   return ainv
+end
+
 ###########################################################################################
 #
 #   Special functions
@@ -904,14 +1000,14 @@ function exp{T<: Ring, S}(a::PowerSeries{T, S})
       error("Unable to compute exponential of infinite precision power series")
    end
    d = Array(T, a.prec)
-   d[0+1] = exp(coeff(a, 0))
+   d[0 + 1] = exp(coeff(a, 0))
    len = length(a)
-   for k = 1 : a.prec-1
+   for k = 1 : a.prec - 1
       s = zero(T)
       for j = 1 : min(k+1, len) - 1
-         s += j * coeff(a, j) * d[k-j+1]
+         s += j * coeff(a, j) * d[k - j + 1]
       end
-      d[k+1] = divexact(s, k)
+      d[k + 1] = divexact(s, k)
    end
    b = PowerSeries(PowerSeries{T, S}, d, a.prec)
    return b
