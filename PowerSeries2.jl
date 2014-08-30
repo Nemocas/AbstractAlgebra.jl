@@ -276,7 +276,6 @@ function shift_right{S}(x::PowerSeries{QQ, S}, len::Int)
    return z
 end
 
-
 ###########################################################################################
 #
 #   Truncation
@@ -313,7 +312,7 @@ function divexact{S}(x::PowerSeries{QQ, S}, y::PowerSeries{QQ, S})
       end
    end
    !isunit(y) && error("Unable to invert power series")
-   prec = min(x.prec, y.prec - 2*v2 + v1)
+   prec = min(x.prec, y.prec - v2 + v1)
    z = PowerSeries{QQ, S}()
    z.prec = prec
    ccall((:fmpq_poly_div_series, :libflint), Void, 

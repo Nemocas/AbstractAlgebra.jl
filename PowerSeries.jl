@@ -84,6 +84,16 @@ function PowerSeries{S}(::Type{PowerSeries{ZZ, S}}, a :: Array{ZZ, 1}, n::Precis
    return z
 end
 
+function PowerSeries{S, M}(::Type{PowerSeries{Residue{ZZ, M}, S}}, a :: Array{Residue{ZZ, M}, 1}, n::Precision)
+   z = PowerSeries{Residue{ZZ, M}, S}(PowerSeries, n)
+   ccall((:fmpz_mod_poly_init2, :libflint), Void, (Ptr{PowerSeries}, Ptr{ZZ}, Int), &z, &eval(:($M)), length(a))
+   for i = 1:length(a)
+      ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, (Ptr{PowerSeries}, Int, Ptr{ZZ}),
+            &z, i - 1, &(a[i].data))
+   end
+   return z
+end
+
 function O{T, S}(a :: PowerSeries{T, S})
    prec = length(a) - 1
    prec < 0 && throw(DivideError())
@@ -100,6 +110,8 @@ end
 length{T <: Ring, S}(x::PowerSeries{T, S}) = x.length
 
 length{S}(x::PowerSeries{ZZ, S}) = ccall((:fmpz_poly_length, :libflint), Int, (Ptr{PowerSeries},), &x)
+
+length{S, M}(x::PowerSeries{Residue{ZZ, M}, S}) = ccall((:fmpz_mod_poly_length, :libflint), Int, (Ptr{PowerSeries},), &x)
 
 degree{T <: Ring, S}(x::PowerSeries{T, S}) = length(x) - 1
 
@@ -120,6 +132,15 @@ function coeff{S}(x::PowerSeries{ZZ, S}, n::Int)
    end
    ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, (Ptr{ZZ}, Ptr{PowerSeries}, Int), &z, &x, n)
    return z
+end
+
+function coeff{S, M}(x::PowerSeries{Residue{ZZ, M}, S}, n::Int)
+   z = ZZ()
+   if n < 0
+      return 0
+   end
+   ccall((:fmpz_mod_poly_get_coeff_fmpz, :libflint), Void, (Ptr{ZZ}, Ptr{PowerSeries}, Int), &z, &x, n)
+   return Residue{ZZ, M}(z)
 end
 
 zero{T <: Ring, S}(::Type{PowerSeries{T, S}}) = PowerSeries{T, S}(0)
@@ -224,6 +245,22 @@ function show{S}(io::IO, x::PowerSeries{ZZ, S})
    end
 end
 
+function show{S, M}(io::IO, x::PowerSeries{Residue{ZZ, M}, S})
+   if length(x) == 0
+      print(io, "0")
+   else
+      cstr = ccall((:fmpz_poly_get_str_pretty, :libflint), Ptr{Uint8}, 
+                (Ptr{PowerSeries}, Ptr{Uint8}), &x, bytestring(string(S)))
+
+      print(io, bytestring(cstr))
+
+      ccall((:flint_free, :libflint), Void, (Ptr{Uint8},), cstr)
+   end
+   if x.prec != nothing
+      print(io, "+O(", string(S), "^", x.prec, ")")
+   end
+end
+
 function show{T <: Ring, S}(io::IO, ::Type{PowerSeries{T, S}})
    print(io, "Univariate power series ring in ", string(S), " over ")
    show(io, T)
@@ -255,6 +292,15 @@ end
 function -{S}(x::PowerSeries{ZZ, S})
    z = PowerSeries{ZZ, S}()
    ccall((:fmpz_poly_neg, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}), 
+               &z, &x)
+   z.prec = x.prec
+   return z
+end
+
+function -{S, M}(x::PowerSeries{Residue{ZZ, M}, S})
+   z = PowerSeries{Residue{ZZ, M}, S}()
+   ccall((:fmpz_mod_poly_neg, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}), 
                &z, &x)
    z.prec = x.prec
@@ -320,6 +366,24 @@ function +{S}(a::PowerSeries{ZZ, S}, b::PowerSeries{ZZ, S})
    return z
 end
 
+function +{S, M}(a::PowerSeries{Residue{ZZ, M}, S}, b::PowerSeries{Residue{ZZ, M}, S})
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenz = max(lena, lenb)
+   z = PowerSeries{Residue{ZZ, M}, S}()
+   z.prec = prec
+   ccall((:fmpz_mod_poly_add_series, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &a, &b, lenz)
+   return z
+end
+
 function -{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
    lena = a.length
    lenb = b.length
@@ -368,6 +432,24 @@ function -{S}(a::PowerSeries{ZZ, S}, b::PowerSeries{ZZ, S})
    z = PowerSeries{ZZ, S}()
    z.prec = prec
    ccall((:fmpz_poly_sub_series, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &a, &b, lenz)
+   return z
+end
+
+function -{S, M}(a::PowerSeries{Residue{ZZ, M}, S}, b::PowerSeries{Residue{ZZ, M}, S})
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenz = max(lena, lenb)
+   z = PowerSeries{Residue{ZZ, M}, S}()
+   z.prec = prec
+   ccall((:fmpz_mod_poly_sub_series, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
                &z, &a, &b, lenz)
    return z
@@ -447,6 +529,32 @@ function *{S}(a::PowerSeries{ZZ, S}, b::PowerSeries{ZZ, S})
    return z
 end
 
+function *{S, M}(a::PowerSeries{Residue{ZZ, M}, S}, b::PowerSeries{Residue{ZZ, M}, S})
+   lena = length(a)
+   lenb = length(b)
+   
+   aval = valuation(a)
+   bval = valuation(b)
+
+   prec = min(a.prec + bval, b.prec + aval)
+   
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   
+   if lena == 0 || lenb == 0
+      return PowerSeries(PowerSeries{Residue{ZZ, M}, S}, Array(Residue{ZZ, M}, 0), prec)
+   end
+
+   lenz = prec == nothing ? lena + lenb - 1 : min(lena + lenb - 1, prec)
+
+   z = PowerSeries{Residue{ZZ, M}, S}()
+   z.prec = prec
+   ccall((:fmpz_mod_poly_mullow, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &a, &b, lenz)
+   return z
+end
+
 ###########################################################################################
 #
 #   Unsafe functions
@@ -479,6 +587,12 @@ function setcoeff!{S}(z::PowerSeries{ZZ, S}, n::Int, x::ZZ)
    ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
                 (Ptr{PowerSeries}, Int, Ptr{ZZ}), 
                &z, n, &x)
+end
+
+function setcoeff!{S, M}(z::PowerSeries{Residue{ZZ, M}, S}, n::Int, x::Residue{ZZ, M})
+   ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
+                (Ptr{PowerSeries}, Int, Ptr{ZZ}), 
+               &z, n, &(x.data))
 end
 
 function mul!{T <: Ring, S}(c::PowerSeries{T, S}, a::PowerSeries{T, S}, b::PowerSeries{T, S})
@@ -548,6 +662,29 @@ function mul!{S}(z::PowerSeries{ZZ, S}, a::PowerSeries{ZZ, S}, b::PowerSeries{ZZ
                &z, &a, &b, lenz)
 end
 
+function mul!{S, M}(z::PowerSeries{Residue{ZZ, M}, S}, a::PowerSeries{Residue{ZZ, M}, S}, b::PowerSeries{Residue{ZZ, M}, S})
+   lena = length(a)
+   lenb = length(b)
+   
+   aval = valuation(a)
+   bval = valuation(b)
+
+   prec = min(a.prec + bval, b.prec + aval)
+   
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   
+   lenz = prec == nothing ? lena + lenb - 1 : min(lena + lenb - 1, prec)
+   if lenz < 0
+      lenz = 0
+   end
+
+   z.prec = prec
+   ccall((:fmpz_mod_poly_mullow, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &a, &b, lenz)
+end
+
 function addeq!{T <: Ring, S}(c::PowerSeries{T, S}, a::PowerSeries{T, S})
    lenc = c.length
    lena = a.length
@@ -578,6 +715,22 @@ function addeq!{S}(a::PowerSeries{ZZ, S}, b::PowerSeries{ZZ, S},)
    lenz = max(lena, lenb)
    a.prec = prec
    ccall((:fmpz_poly_add_series, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &a, &a, &b, lenz)
+end
+
+function addeq!{S, M}(a::PowerSeries{Residue{ZZ, M}, S}, b::PowerSeries{Residue{ZZ, M}, S},)
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenz = max(lena, lenb)
+   a.prec = prec
+   ccall((:fmpz_mod_poly_add_series, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
                &a, &a, &b, lenz)
 end
@@ -628,6 +781,17 @@ function *{S}(x::ZZ, y::PowerSeries{ZZ, S})
    return z
 end
 
+function *{S, M}(x::ZZ, y::PowerSeries{Residue{ZZ, M}, S})
+   z = PowerSeries{Residue{ZZ, M}, S}()
+   z.prec = y.prec
+   ccall((:fmpz_mod_poly_scalar_mul_fmpz, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{ZZ}), 
+               &z, &y, &x)
+   return z
+end
+
+*{S, M}(x::Int, y::PowerSeries{Residue{ZZ, M}, S}) = ZZ(x)*y
+
 *{T <: Ring, S}(a::PowerSeries{T, S}, b::Int) = b*a
 
 *{T <: Ring, S}(a::PowerSeries{T, S}, b::ZZ) = b*a
@@ -662,6 +826,17 @@ function shift_left{S}(x::PowerSeries{ZZ, S}, len::Int)
    return z
 end
 
+function shift_left{S, M}(x::PowerSeries{Residue{ZZ, M}, S}, len::Int)
+   len < 0 && throw(DomainError())
+   xlen = length(x)
+   z = PowerSeries{Residue{ZZ, M}, S}()
+   z.prec = x.prec + len
+   ccall((:fmpz_mod_poly_shift_left, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &x, len)
+   return z
+end
+
 function shift_right{T <: Ring, S}(x::PowerSeries{T, S}, len::Int)
    len < 0 && throw(DomainError())
    xlen = x.length
@@ -684,6 +859,20 @@ function shift_right{S}(x::PowerSeries{ZZ, S}, len::Int)
    z = PowerSeries{ZZ, S}()
    z.prec = x.prec - len
    ccall((:fmpz_poly_shift_right, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &x, len)
+   return z
+end
+
+function shift_right{S, M}(x::PowerSeries{Residue{ZZ, M}, S}, len::Int)
+   len < 0 && throw(DomainError())
+   xlen = length(x)
+   if len >= xlen
+      return PowerSeries(PowerSeries{Residue{ZZ, M}, S}, Array(Residue{ZZ, M}, 0), max(0, x.prec - len))
+   end
+   z = PowerSeries{Residue{ZZ, M}, S}()
+   z.prec = x.prec - len
+   ccall((:fmpz_mod_poly_shift_right, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
                &z, &x, len)
    return z
@@ -720,6 +909,19 @@ function truncate{S}(x::PowerSeries{ZZ, S}, prec::Precision)
    z = PowerSeries{ZZ, S}()
    z.prec = prec
    ccall((:fmpz_poly_set_trunc, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &x, prec)
+   return z
+end
+
+function truncate{S, M}(x::PowerSeries{Residue{ZZ, M}, S}, prec::Precision)
+   prec < 0 && throw(DomainError())
+   if x.prec <= prec
+      return x
+   end
+   z = PowerSeries{Residue{ZZ, M}, S}()
+   z.prec = prec
+   ccall((:fmpz_mod_poly_set_trunc, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
                &z, &x, prec)
    return z
@@ -789,6 +991,30 @@ function ^{S}(a::PowerSeries{ZZ, S}, b::Int)
    end
 end
 
+function ^{S, M}(a::PowerSeries{Residue{ZZ, M}, S}, b::Int)
+   b < 0 && throw(DomainError())
+   if length(a) == 0
+      return PowerSeries(PowerSeries{Residue{ZZ, M}, S}, Array(ZZ, 0), a.prec + (b - 1)*valuation(a))
+   elseif length(a) == 1
+      return PowerSeries(PowerSeries{Residue{ZZ, M}, S}, [coeffs(a, 0)^b], a.prec)
+   elseif b == 0
+      return PowerSeries(PowerSeries{Residue{ZZ, M}, S}, [ZZ(1)], nothing)
+   elseif a.prec == nothing
+      z = PowerSeries(PowerSeries{Residue{ZZ, M}, S}, Array(Residue{ZZ, M}, 0), nothing)
+      ccall((:fmpz_mod_poly_pow, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &a, b)
+      return z
+   else
+      prec = a.prec + (b - 1)*valuation(a)
+      z = PowerSeries(PowerSeries{Residue{ZZ, M}, S}, Array(Residue{ZZ, M}, 0), prec)
+      ccall((:fmpz_mod_poly_pow_trunc, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int, Int), 
+               &z, &a, b, prec)
+      return z
+   end
+end
+
 ###########################################################################################
 #
 #   Comparisons
@@ -843,6 +1069,17 @@ function =={S}(x::PowerSeries{ZZ, S}, y::PowerSeries{ZZ, S})
                &x, &y, n))
 end
 
+function =={S, M}(x::PowerSeries{Residue{ZZ, M}, S}, y::PowerSeries{Residue{ZZ, M}, S})
+   prec = min(x.prec, y.prec)
+   
+   n = max(length(x), length(y))
+   n = min(n, prec)
+   
+   return bool(ccall((:fmpz_mod_poly_equal_trunc, :libflint), Cint, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &x, &y, n))
+end
+
 =={T<: Ring, S}(x::Int, y::PowerSeries{T, S}) = y == x
 
 =={T<: Ring, S}(x::ZZ, y::PowerSeries{T, S}) = y == x
@@ -878,10 +1115,30 @@ function divexact{S}(x::PowerSeries{ZZ, S}, y::PowerSeries{ZZ, S})
       end
    end
    !isunit(y) && error("Unable to invert power series")
-   prec = min(x.prec, y.prec - 2*v2 + v1)
+   prec = min(x.prec, y.prec - v2 + v1)
    z = PowerSeries{ZZ, S}()
    z.prec = prec
    ccall((:fmpz_poly_div_series, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &z, &x, &y, prec)
+   return z
+end
+
+function divexact{S, M}(x::PowerSeries{Residue{ZZ, M}, S}, y::PowerSeries{Residue{ZZ, M}, S})
+   y == 0 && throw(DivideError())
+   v2 = valuation(y)
+   v1 = valuation(x)
+   if v2 != 0
+      if v1 >= v2
+         x = shift_right(x, v2)
+         y = shift_right(y, v2)
+      end
+   end
+   !isunit(y) && error("Unable to invert power series")
+   prec = min(x.prec, y.prec - v2 + v1)
+   z = PowerSeries{Residue{ZZ, M}, S}()
+   z.prec = prec
+   ccall((:fmpz_mod_poly_div_series, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
                &z, &x, &y, prec)
    return z
@@ -937,6 +1194,18 @@ function divexact{S}(x::PowerSeries{ZZ, S}, y::ZZ)
    return z
 end
 
+function divexact{S, M}(x::PowerSeries{Residue{ZZ, M}, S}, y::ZZ)
+   y == 0 && throw(DivideError())
+   z = PowerSeries{Residue{ZZ, M}, S}()
+   z.prec = x.prec
+   ccall((:fmpz_mod_poly_scalar_div_fmpz, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{ZZ}), 
+               &z, &x, &y)
+   return z
+end
+
+divexact{S, M}(x::PowerSeries{Residue{ZZ, M}, S}, y::Int) = divexact(x, ZZ(y))
+
 /{T<: Ring, S}(x::PowerSeries{T, S}, y::Int) = divexact(x, y)
 
 /{T<: Ring, S}(x::PowerSeries{T, S}, y::ZZ) = divexact(x, y)
@@ -978,10 +1247,25 @@ function inv{S}(a::PowerSeries{ZZ, S})
    if a.prec == nothing
       a1 = coeff(a, 0)
       length(a) != 1 && error("Unable to invert infinite precision power series")
-      return PowerSeries(PowerSeries{QQ, S}, [divexact(ZZ(1), a1)], nothing)
+      return PowerSeries(PowerSeries{ZZ, S}, [divexact(ZZ(1), a1)], nothing)
    end
    ainv = PowerSeries(PowerSeries{ZZ, S}, Array(ZZ, 0), a.prec)
    ccall((:fmpz_poly_inv_series, :libflint), Void, 
+                (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
+               &ainv, &a, a.prec)
+   return ainv
+end
+
+function inv{S, M}(a::PowerSeries{Residue{ZZ, M}, S})
+   a == 0 && throw(DivideError())
+   !isunit(a) && error("Unable to invert power series")
+   if a.prec == nothing
+      a1 = coeff(a, 0)
+      length(a) != 1 && error("Unable to invert infinite precision power series")
+      return PowerSeries(PowerSeries{Residue{ZZ, M}, S}, [inv(a1)], nothing)
+   end
+   ainv = PowerSeries(PowerSeries{Residue{ZZ, M}, S}, Array(Residue{ZZ, M}, 0), a.prec)
+   ccall((:fmpz_mod_poly_inv_series, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Int), 
                &ainv, &a, a.prec)
    return ainv
@@ -1004,9 +1288,10 @@ function exp{T<: Ring, S}(a::PowerSeries{T, S})
    len = length(a)
    for k = 1 : a.prec - 1
       s = zero(T)
-      for j = 1 : min(k+1, len) - 1
+      for j = 1 : min(k + 1, len) - 1
          s += j * coeff(a, j) * d[k - j + 1]
       end
+      !isunit(T(k)) && error("Unable to divide in exp")
       d[k + 1] = divexact(s, k)
    end
    b = PowerSeries(PowerSeries{T, S}, d, a.prec)

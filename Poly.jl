@@ -94,7 +94,7 @@ end
 function Poly{M, S}(::Type{Poly{Residue{ZZ, M}, S}}, a :: Array{Residue{ZZ, M}, 1})
    z = Poly{Residue{ZZ, M}, S}(Poly)
    m = modulus(Residue{ZZ, M})
-   ccall((:fmpz_mod_poly_initpoly2, :libflint), Void, (Ptr{Poly}, Ptr{ZZ}, Int), &z, &m, length(a))
+   ccall((:fmpz_mod_poly_init2, :libflint), Void, (Ptr{Poly}, Ptr{ZZ}, Int), &z, &m, length(a))
    for i = 1:length(a)
       ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, (Ptr{Poly}, Int, Ptr{ZZ}),
             &z, i - 1, &(a[i].data))
@@ -1030,7 +1030,7 @@ function mulmod{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S}, f:
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_mulmod, :libflint), Void,
                 (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}),
-               &z, &x, &y, &(f.data))
+               &z, &x, &y, &f)
    return z
 end
 
@@ -1071,7 +1071,7 @@ function powmod{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Int, f::Poly{Residue{ZZ, M}
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_powmod_ui_binexp, :libflint), Void,
                 (Ptr{Poly}, Ptr{Poly}, Int, Ptr{Poly}),
-               &z, &x, y, &(f.data))
+               &z, &x, y, &f)
    return z
 end
 
@@ -1087,7 +1087,7 @@ function invmod{S, M}(x::Poly{Residue{ZZ, M}, S}, f::Poly{Residue{ZZ, M}, S})
    z = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_invmod, :libflint), Void,
                 (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}),
-               &z, &x, &(f.data))
+               &z, &x, &f)
    return z
 end
 
@@ -1812,7 +1812,7 @@ function bezout{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S})
    t = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_xgcd, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
-               &(g.data), &(s.data), &(t.data), &x, &y)
+               &g, &s, &t, &x, &y)
    return (g, s, t)
 end
 
@@ -1960,7 +1960,7 @@ function gcdinv{S, M}(x::Poly{Residue{ZZ, M}, S}, y::Poly{Residue{ZZ, M}, S})
    s = Poly{Residue{ZZ, M}, S}()
    ccall((:fmpz_mod_poly_gcdinv, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
-               &(g.data), &(s.data), &x, &y)
+               &g, &s, &x, &y)
    return (g, s)
 end
 

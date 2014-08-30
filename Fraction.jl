@@ -15,19 +15,6 @@ import Rings: divexact, mul!, addeq!, inv, canonical_unit, mod, divrem, needs_pa
 #
 ###########################################################################################
 
-type fmpq
-   num :: Int # can't make these a ZZ
-   den :: Int
-
-   function fmpq(a::ZZ, b::ZZ)
-      d = new(0, 0)
-      ccall((:fmpq_init, :libflint), Void, (Ptr{fmpq},), &d)
-      ccall((:fmpq_set_fmpz_frac, :libflint), Void, (Ptr{fmpq}, Ptr{ZZ}, Ptr{ZZ}), &d, &a, &b)
-      finalizer(d, _fmpq_clear_fn)
-      return d
-   end
-end
-
 type Fraction{T <: Ring} <: Field
    n :: Int
    d :: Int

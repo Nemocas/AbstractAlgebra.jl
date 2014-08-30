@@ -172,6 +172,36 @@ end
 
 ###########################################################################################
 #
+#   Exact division
+#
+###########################################################################################
+
+function divexact{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
+   g, binv = gcdinv(b.data, eval(:($S)))
+   if g != 1
+      error("Impossible inverse in inv")
+   end
+   return Residue{T, S}(a.data*binv)
+end
+
+function divexact{T <: Ring, S}(a::Residue{T, S}, b::Int)
+   g, binv = gcdinv(T(b), eval(:($S)))
+   if g != 1
+      error("Impossible inverse in inv")
+   end
+   return Residue{T, S}(a.data*binv)
+end
+
+function divexact{T <: Ring, S}(a::Residue{T, S}, b::ZZ)
+   g, binv = gcdinv(T(b), eval(:($S)))
+   if g != 1
+      error("Impossible inverse in inv")
+   end
+   return Residue{T, S}(a.data*binv)
+end
+
+###########################################################################################
+#
 #   Inversion
 #
 ###########################################################################################

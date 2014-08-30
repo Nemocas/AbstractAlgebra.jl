@@ -3541,6 +3541,42 @@ f = T(x^5 + 1)
 g = f^100
 \end{lstlisting}
 
+\subsubsection{Exact division}
+
+So long as we don't encounter an impossible inverse, we can
+divide elements in a residue ring $R = T/(m)$, if $T$ is a
+Euclidean ring, i.e. if we have a \code{gcd} function in $T$.
+
+\begin{lstlisting}
+divexact{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
+\end{lstlisting}
+
+\desc{Return the quotient of $a$ by $b$ in the given residue
+ring, i.e. return an element $c$ such that $ac = b$ in the residue ring,
+if such exists. If an impossible inverse is encountered during the
+computation, we throw an exception.}
+
+\textbf{Examples.}
+
+Here are some examples of exact division.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 49)
+
+a = R(5)
+b = R(3)
+
+c = divexact(a, b)
+
+S, x = PolynomialRing(R, "x")
+T = ResidueRing(S, x^3 + 3x + 1)
+
+f = T(x^5 + 1)
+g = T(x^4 + x + 2)
+
+h = divexact(f, g)
+\end{lstlisting}
+
 \subsubsection{Inversion}
 
 So long as we don't encounter an impossible inverse, we can
