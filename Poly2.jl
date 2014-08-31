@@ -45,7 +45,7 @@ function _fmpq_poly_clear_fn{S}(a :: Poly{QQ, S})
 end
 
 function _fq_poly_clear_fn{T, S}(a :: Poly{FinFieldElem{T}, S})
-   ccall((:fq_poly_clear, :libflint), Void, (Ptr{Poly},), &a)
+   ccall((:fq_poly_clear, :libflint), Void, (Ptr{Poly}, Ptr{fq_ctx}), &a, eval(:($T)))
 end
 
 ###########################################################################################

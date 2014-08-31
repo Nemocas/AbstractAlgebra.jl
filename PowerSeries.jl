@@ -137,7 +137,7 @@ end
 function coeff{S, M}(x::PowerSeries{Residue{ZZ, M}, S}, n::Int)
    z = ZZ()
    if n < 0
-      return 0
+      return Residue{ZZ, M}(0)
    end
    ccall((:fmpz_mod_poly_get_coeff_fmpz, :libflint), Void, (Ptr{ZZ}, Ptr{PowerSeries}, Int), &z, &x, n)
    return Residue{ZZ, M}(z)
@@ -1116,6 +1116,10 @@ function divexact{S}(x::PowerSeries{ZZ, S}, y::PowerSeries{ZZ, S})
    end
    !isunit(y) && error("Unable to invert power series")
    prec = min(x.prec, y.prec - v2 + v1)
+   if prec == nothing
+      length(y) != 1 && error("Unable to invert infinite precision power series")
+      return divexact(x, coeff(y, 0))
+   end
    z = PowerSeries{ZZ, S}()
    z.prec = prec
    ccall((:fmpz_poly_div_series, :libflint), Void, 
@@ -1136,6 +1140,10 @@ function divexact{S, M}(x::PowerSeries{Residue{ZZ, M}, S}, y::PowerSeries{Residu
    end
    !isunit(y) && error("Unable to invert power series")
    prec = min(x.prec, y.prec - v2 + v1)
+   if prec == nothing
+      length(y) != 1 && error("Unable to invert infinite precision power series")
+      return divexact(x, coeff(y, 0))
+   end
    z = PowerSeries{Residue{ZZ, M}, S}()
    z.prec = prec
    ccall((:fmpz_mod_poly_div_series, :libflint), Void, 
