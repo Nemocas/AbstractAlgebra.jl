@@ -33,6 +33,8 @@ include("Fraction.jl")
 
 include("FiniteFields.jl")
 
+include("Padics2.jl")
+
 include("Poly2.jl")
 
 include("PowerSeries2.jl")
