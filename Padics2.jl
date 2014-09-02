@@ -380,6 +380,25 @@ end
 
 ###########################################################################################
 #
+#   Inversion
+#
+###########################################################################################
+
+function inv{S}(a::Padic{S})
+   z = Padic{S}()
+   if a.N < 0
+      z.N = -1
+      repr = bool(ccall((:padic_inv_exact, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}), &z, &a))      
+      !repr && error("Unable to invert infinite precision p-adic")
+   else
+      z.N = a.N - 2*a.v
+      ccall((:padic_inv, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &eval(:($S)))
+   end
+   return z
+end
+
+###########################################################################################
+#
 #   PadicNumberField constructor
 #
 ###########################################################################################
