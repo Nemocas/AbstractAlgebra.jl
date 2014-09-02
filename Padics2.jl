@@ -39,8 +39,9 @@ type Padic{S} <: Field
    u :: Int # can't make this a ZZ
    v :: Int
    N :: Int
+   exact :: Bool
    function Padic()
-      d = new(0, 0, 0)
+      d = new(0, 0, 0, false)
       ccall((:padic_init2, :libflint), Void, (Ptr{Padic}, Int), &d, 0)
       finalizer(d, _Padic_clear_fn)
       return d
@@ -49,7 +50,7 @@ type Padic{S} <: Field
       z = Padic{S}()
       repr = bool(ccall((:padic_set_exact_fmpz, :libflint), Cint, (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), &z, &a, &eval(:($S))))
       !repr && error("Cannot represent negative integer exactly")
-      z.N = -1
+      z.exact = true
       return z
    end
    Padic(a::Int) = Padic{S}(ZZ(a))
@@ -101,12 +102,12 @@ precision{S}(a::Padic{S}) = a.N
 
 valuation{S}(a::Padic{S}) = a.v
 
-isexact{S}(a::Padic{S}) = a.N < 0
+isexact{S}(a::Padic{S}) = a.exact
 
 function zero{S}(::Type{Padic{S}})
    z = Padic{S}()
    ccall((:padic_zero, :libflint), Void, (Ptr{Padic},), &z)
-   z.N = -1
+   z.exact = true
    return z
 end
 
@@ -114,13 +115,13 @@ function one{S}(::Type{Padic{S}})
    z = Padic{S}()
    z.N = 1
    ccall((:padic_one, :libflint), Void, (Ptr{Padic},), &z)
-   z.N = -1
+   z.exact = true
    return z
 end
 
-iszero{S}(a::Padic{S}) = bool(ccall((:padic_is_zero, :libflint), Cint, (Ptr{Padic},), &a)) && a.N == -1
+iszero{S}(a::Padic{S}) = bool(ccall((:padic_is_zero, :libflint), Cint, (Ptr{Padic},), &a)) && a.exact
 
-isone{S}(a::Padic{S}) = bool(ccall((:padic_is_one, :libflint), Cint, (Ptr{Padic},), &a)) && a.N == -1
+isone{S}(a::Padic{S}) = bool(ccall((:padic_is_one, :libflint), Cint, (Ptr{Padic},), &a)) && a.exact
 
 ###########################################################################################
 #
@@ -135,7 +136,7 @@ function show{S}(io::IO, x::Padic{S})
    print(io, bytestring(cstr))
 
    ccall((:flint_free, :libflint), Void, (Ptr{Uint8},), cstr)
-   if x.N >= 0
+   if !x.exact
       print(io, " + O(")
       print(io, prime(Padic{S}))
       print(io, "^$(x.N))")
@@ -156,7 +157,7 @@ function -{S}(x::Padic{S})
    if iszero(x)
       return x
    end
-   x.N < 0 && error("Cannot compute infinite precision p-adic")
+   x.exact && error("Cannot compute infinite precision p-adic")
    z = Padic{S}()
    z.N = x.N
    ccall((:padic_neg, :libflint), Void, 
@@ -173,12 +174,13 @@ end
 
 function +{S}(x::Padic{S}, y::Padic{S})
    z = Padic{S}()
-   z.N = x.N < 0 ? y.N : (y.N < 0 ? x.N : min(x.N, y.N))
-   if z.N < 0
+   if x.exact && y.exact
       ccall((:padic_add_exact, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
                &z, &x, &y, &eval(:($S)))
+      z.exact = true
    else
+      z.N = x.exact ? y.N : (y.exact ? x.N : min(x.N, y.N))
       ccall((:padic_add, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
                &z, &x, &y, &eval(:($S)))
@@ -188,13 +190,14 @@ end
 
 function -{S}(x::Padic{S}, y::Padic{S})
    z = Padic{S}()
-   z.N = x.N < 0 ? y.N : (y.N < 0 ? x.N : min(x.N, y.N))
-   if z.N < 0
+   if x.exact && y.exact
       repr = bool(ccall((:padic_sub_exact, :libflint), Cint, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
                &z, &x, &y, &eval(:($S))))
       !repr && error("Unable to represent exact result of subtraction")
+      z.exact = true
    else
+      z.N = x.exact ? y.N : (y.exact ? x.N : min(x.N, y.N))
       ccall((:padic_sub, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
                &z, &x, &y, &eval(:($S)))
@@ -204,12 +207,13 @@ end
 
 function *{S}(x::Padic{S}, y::Padic{S})
    z = Padic{S}()
-   z.N = x.N < 0 ? (y.N < 0 ? -1 : y.N + x.v) : (y.N < 0 ? x.N + y.v : min(x.N + y.v, y.N + x.v))
-   if z.N < 0
+   if x.exact && y.exact
       ccall((:padic_mul_exact, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
                &z, &x, &y, &eval(:($S)))
+      z.exact = true
    else 
+      z.N = x.exact ? y.N + x.v : (y.exact ? x.N + y.v : min(x.N + y.v, y.N + x.v))
       ccall((:padic_mul, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
                &z, &x, &y, &eval(:($S)))
@@ -228,15 +232,16 @@ function +{S}(x::Padic{S}, y::ZZ)
       return x - (-y)
    end
    z = Padic{S}()
-   z.N = x.N
    ccall((:padic_set_exact_fmpz, :libflint), Void, 
                 (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
                &z, &y, &eval(:($S)))
-   if z.N < 0
+   if x.exact
       ccall((:padic_add_exact, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
                &z, &z, &x, &eval(:($S)))
+      z.exact = true
    else
+      z.N = x.N
       ccall((:padic_add, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
                &z, &z, &x, &eval(:($S)))
@@ -255,16 +260,17 @@ function -{S}(x::Padic{S}, y::ZZ)
       return x + (-y)
    end
    z = Padic{S}()
-   z.N = x.N
    ccall((:padic_set_exact_fmpz, :libflint), Void, 
                 (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
                &z, &y, &eval(:($S)))
-   if z.N < 0
+   if x.exact
       repr = bool(ccall((:padic_sub_exact, :libflint), Cint, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
                &z, &x, &z, &eval(:($S))))
       !repr && error("Unable to represent negative value exactly")
+      z.exact = true
    else
+      z.N = x.N
       ccall((:padic_sub, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
                &z, &x, &z, &eval(:($S)))
@@ -277,16 +283,17 @@ function -{S}(x::ZZ, y::Padic{S})
       return -y + (-x)
    end
    z = Padic{S}()
-   z.N = y.N
    ccall((:padic_set_exact_fmpz, :libflint), Void, 
                 (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
                &z, &x, &eval(:($S)))
-   if z.N < 0
+   if x.exact
       repr = bool(ccall((:padic_sub_exact, :libflint), Cint, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
                &z, &z, &y, &eval(:($S))))
       !repr && error("Unable to represent negative value exactly")
+      z.exact = true
    else
+      z.N = y.N
       ccall((:padic_sub, :libflint), Cint, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
                &z, &z, &y, &eval(:($S)))
@@ -309,8 +316,8 @@ function *{S}(x::Padic{S}, y::ZZ)
    ccall((:padic_set_exact_fmpz, :libflint), Void, 
                 (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
                &z, &y, &eval(:($S)))
-   if x.N < 0
-      z.N = -1
+   if x.exact
+      z.exact = true
       ccall((:padic_mul_exact, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
                &z, &z, &x, &eval(:($S)))
@@ -336,13 +343,12 @@ end
 ###########################################################################################
 
 function =={S}(a::Padic{S}, b::Padic{S})
-   N = a.N < 0 ? b.N : (b.N < 0 ? a.N : min(a.N, b.N))
-   if N < 0
+   if a.exact && b.exact
       return bool(ccall((:padic_equal, :libflint), Cint, 
                 (Ptr{Padic}, Ptr{Padic}), &a, &b))
    else
       z = Padic{S}()
-      z.N = N
+      z.N = a.exact ? b.N : (b.exact ? a.N : min(a.N, b.N))
       ccall((:padic_sub, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
                &z, &a, &b, &eval(:($S)))
@@ -358,7 +364,7 @@ end
 ###########################################################################################
 
 function =={S}(a::Padic{S}, b::ZZ)
-   if a.N == -1
+   if a.exact
       if sign(b) < 0
          return false
       end
@@ -382,6 +388,29 @@ end
 
 ###########################################################################################
 #
+#   Powering
+#
+###########################################################################################
+
+function ^{S}(a::Padic{S}, n::Int)
+   z = Padic{S}()
+   if a.exact
+      repr = bool(ccall((:padic_pow_exact_si, :libflint), Cint, 
+                (Ptr{Padic}, Ptr{Padic}, Int, Ptr{padic_ctx}), 
+               &z, &a, n, &eval(:($S))))
+      !repr && error("Unable to invert p-adic to infinite precision")
+      z.exact = true
+   else
+      z.N = a.N + (n - 1)*a.v
+      ccall((:padic_pow_si, :libflint), Void, 
+                (Ptr{Padic}, Ptr{Padic}, Int, Ptr{padic_ctx}), 
+               &z, &a, n, &eval(:($S)))
+   end
+   return z
+end
+
+###########################################################################################
+#
 #   Exact division
 #
 ###########################################################################################
@@ -389,15 +418,15 @@ end
 function divexact{S}(a::Padic{S}, b::Padic{S})
    b == 0 && throw(DivideError())
    z = Padic{S}()
-   if a.N < 0
-      if b.N < 0
-         z.N = -1
+   if a.exact
+      if b.exact
+         z.exact = true
          repr = bool(ccall((:padic_div_exact, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}), &z, &a, &b))
          !repr && error("Unable to compute quotient of p-adics to infinite precision")
          return z
       end
       z.N = b.N - 2*b.v + a.v
-   elseif b.N < 0
+   elseif b.exact
       z.N = a.N - b.v
    else
       z.N = min(a.N - b.v, b.N - 2*b.v + a.v)
@@ -414,8 +443,8 @@ end
 
 function inv{S}(a::Padic{S})
    z = Padic{S}()
-   if a.N < 0
-      z.N = -1
+   if a.exact
+      z.exact = true
       repr = bool(ccall((:padic_inv_exact, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}), &z, &a))      
       !repr && error("Unable to invert infinite precision p-adic")
    else
@@ -434,10 +463,10 @@ end
 function sqrt{S}(a::Padic{S})
    (a.v % 2) != 0 && error("Unable to take padic square root")
    z = Padic{S}()
-   if a.N < 0
+   if a.exact
       res = bool(ccall((:padic_sqrt_exact, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}), &z, &a))      
       !res && error("Unable to take square root of p-adic to infinite precision")
-      z.N = -1
+      z.exact = true
       return z
    end
    z.N = a.N - div(a.v, 2)
