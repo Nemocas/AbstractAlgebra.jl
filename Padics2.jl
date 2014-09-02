@@ -380,6 +380,32 @@ end
 
 ###########################################################################################
 #
+#   Exact division
+#
+###########################################################################################
+
+function divexact{S}(a::Padic{S}, b::Padic{S})
+   b == 0 && throw(DivideError())
+   z = Padic{S}()
+   if a.N < 0
+      if b.N < 0
+         z.N = -1
+         repr = bool(ccall((:padic_div_exact, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}), &z, &a, &b))
+         !repr && error("Unable to compute quotient of p-adics to infinite precision")
+         return z
+      end
+      z.N = b.N - 2*b.v + a.v
+   elseif b.N < 0
+      z.N = a.N - b.v
+   else
+      z.N = min(a.N - b.v, b.N - 2*b.v + a.v)
+   end
+   ccall((:padic_div, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &b, &eval(:($S)))
+   return z
+end
+
+###########################################################################################
+#
 #   Inversion
 #
 ###########################################################################################
