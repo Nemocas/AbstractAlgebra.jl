@@ -6,7 +6,9 @@
 
 import Rings: O, valuation
 
-export O, PadicNumberField, Padic, valuation, prime, precision, isexact
+import Base: sqrt
+
+export O, PadicNumberField, Padic, valuation, prime, precision, isexact, sqrt
 
 ###########################################################################################
 #
@@ -420,6 +422,27 @@ function inv{S}(a::Padic{S})
       z.N = a.N - 2*a.v
       ccall((:padic_inv, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &eval(:($S)))
    end
+   return z
+end
+
+###########################################################################################
+#
+#   Square root
+#
+###########################################################################################
+
+function sqrt{S}(a::Padic{S})
+   (a.v % 2) != 0 && error("Unable to take padic square root")
+   z = Padic{S}()
+   if a.N < 0
+      res = bool(ccall((:padic_sqrt_exact, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}), &z, &a))      
+      !res && error("Unable to take square root of p-adic to infinite precision")
+      z.N = -1
+      return z
+   end
+   z.N = a.N - div(a.v, 2)
+   res = bool(ccall((:padic_sqrt, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &eval(:($S))))      
+   !res && error("Square root of p-adic does not exist")
    return z
 end
 
