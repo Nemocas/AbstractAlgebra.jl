@@ -6,9 +6,9 @@
 
 import Rings: O, valuation
 
-import Base: sqrt
+import Base: sqrt, exp, log
 
-export O, PadicNumberField, Padic, valuation, prime, precision, isexact, sqrt
+export O, PadicNumberField, Padic, valuation, prime, precision, isexact, sqrt, exp, log
 
 ###########################################################################################
 #
@@ -475,6 +475,42 @@ function sqrt{S}(a::Padic{S})
    return z
 end
 
+###########################################################################################
+#
+#   Special functions
+#
+###########################################################################################
+
+function exp{S}(a::Padic{S}) 
+   a != 0 && a.v <= 0 && throw(DomainError())
+   if a.exact
+      if iszero(a)
+         return one(Padic{S})
+      end
+      error("Unable to compute exponential of infinite precision value")
+   end
+   z = Padic{S}()
+   z.N = a.N
+   res = bool(ccall((:padic_exp, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &eval(:($S))))
+   !res && error("Unable to compute exponential")
+   return z
+end
+
+function log{S}(a::Padic{S}) 
+   (a.v > 0 || a.v < 0 || a == 0) && throw(DomainError())
+   if a.exact
+      if isone(a)
+         return zero(Padic{S})
+      end
+      error("Unable to compute logarithm of infinite precision value")
+   end
+   z = Padic{S}()
+   z.N = a.N
+   res = bool(ccall((:padic_log, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &eval(:($S))))
+   !res && error("Unable to compute logarithm")
+   return z
+end
+  
 ###########################################################################################
 #
 #   PadicNumberField constructor
