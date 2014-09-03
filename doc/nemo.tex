@@ -5698,5 +5698,213 @@ p = prime(R)
 v = valuation(b)
 \end{lstlisting}
 
+\subsubsection{Unary operators}
+
+\begin{lstlisting}
+-{S}(x::Padic{S})
+\end{lstlisting}
+
+\desc{Return $-x$. Note that if $x$ is for example a positive integer
+represented exactly, then $-x$ may not be representable exactly as a $p$-adic.
+In this case an exception is raised.}
+
+\textbf{Examples.}
+
+Here are some examples of unary operators.
+
+\begin{lstlisting}
+R = PadicNumbers(7)
+
+a = 1 + 2*7 + 4*7^2 + O(7^3)
+b = R(0)
+
+c = -a
+d = -b
+\end{lstlisting}
+
+\subsubsection{Binary operators}
+
+\begin{lstlisting}
++{S}(x::Padic{S}, y::Padic{S})
+\end{lstlisting}
+
+\desc{Return $x + y$. The output precision will be the least of the input
+precisions.}
+
+\begin{lstlisting}
+-{S}(x::Padic{S}, y::Padic{S})
+\end{lstlisting}
+
+\desc{Return $x - y$. The output precision will be the least of the input
+precisions. Note that if $x$ and $y$ are exact and $x - y$ cannot be
+represented exactly, an exception will be raised.}
+
+\begin{lstlisting}
+*{S}(x::Padic{S}, y::Padic{S})
+\end{lstlisting}
+
+\desc{Return $xy$. The output precision will be the least of valuation$(x) +$
+precision$(y)$ and precision$(x) +$ valuation$(y)$.}
+
+\textbf{Examples.}
+
+Here are some examples of binary operators for $p$-adics.
+
+\begin{lstlisting}
+R = PadicNumbers(7)
+
+a = 1 + 2*7 + 4*7^2 + O(7^3)
+b = 7^2 + 3*7^3 + O(7^5)
+c = O(7^3)
+d = R(2)
+
+f = a + b
+g = a - b
+h = a*b
+j = b*c
+k = a*d
+\end{lstlisting}
+
+\subsubsection{Ad hoc binary operators}
+
+\begin{lstlisting}
++{S}(x::Padic{S}, y::Int)
++{S}(x::Padic{S}, y::ZZ)
+\end{lstlisting}
+
+\desc{Return $x + y$ where $y$ is interpreted as an exact $p$-adic value. If
+the result is unrepresentable, an exception results.}
+
+\begin{lstlisting}
++{S}(x::Int, y::Padic{S})
++{S}(x::ZZ, y::Padic{S})
+\end{lstlisting}
+
+\desc{Return $x + y$ where $x$ is interpreted as an exact $p$-adic value. If
+the result is unrepresentable, an exception results.}
+
+\begin{lstlisting}
+-{S}(x::Padic{S}, y::Int)
+-{S}(x::Padic{S}, y::ZZ)
+\end{lstlisting}
+
+\desc{Return $x - y$ where $y$ is interpreted as an exact $p$-adic value. If
+the result is unrepresentable, an exception results.}
+
+\begin{lstlisting}
+-{S}(x::Int, y::Padic{S})
+-{S}(x::ZZ, y::Padic{S})
+\end{lstlisting}
+
+\desc{Return $x - y$ where $x$ is interpreted as an exact $p$-adic value. If
+the result is unrepresentable, an exception results.}
+
+\begin{lstlisting}
+*{S}(x::Padic{S}, y::Int)
+*{S}(x::Padic{S}, y::ZZ)
+\end{lstlisting}
+
+\desc{Return $xy$ where $y$ is interpreted as an exact $p$-adic value. If
+the result is unrepresentable, an exception results.}
+
+\begin{lstlisting}
+*{S}(x::Int, y::Padic{S})
+*{S}(x::ZZ, y::Padic{S})
+\end{lstlisting}
+
+\desc{Return $xy$ where $x$ is interpreted as an exact $p$-adic value. If
+the result is unrepresentable, an exception results.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc binary operators.
+
+\begin{lstlisting}
+R = PadicNumbers(7)
+
+a = 1 + 2*7 + 4*7^2 + O(7^3)
+b = 7^2 + 3*7^3 + O(7^5)
+c = O(7^3)
+d = R(2)
+
+f = a + 2
+g = 3 - b
+h = a*ZZ(5)
+j = ZZ(3)*c
+k = 2*d
+l = 2 + d
+m = d - ZZ(2)
+\end{lstlisting}
+
+\subsubsection{Comparison}
+
+\begin{lstlisting}
+=={S}(a::Padic{S}, b::Padic{S})
+\end{lstlisting}
+
+\desc{Compare the given $p$-adic values at the least of the two precisions and
+return \code{true} if they are equal to that precision, otherwise return
+\code{false}. With this definition \code{0 == 0 + O(7^3)} returns
+\code{true}. If one wishes to compare with exact $0$, one should use
+\code{iszero}.}
+
+Julia automatically supplies a corresponding \code{!=} operator.
+
+\textbf{Examples.}
+
+Here are some examples of comparison.
+
+\begin{lstlisting}
+R = PadicNumbers(7)
+
+a = 1 + 2*7 + 4*7^2 + O(7^3)
+b = 3*7^3 + O(7^5)
+c = O(7^3)
+d = R(2)
+
+a == 1 + 2*7 + O(7^2)
+b == c
+c == R(0)
+d == R(2)
+\end{lstlisting}
+
+\subsubsection{Ad hoc comparison}
+
+The following ad hoc comparison operators are provided for convenience. They
+allow comparison with exact values (up to the precision of the $p$-adic value
+supplied).
+
+\begin{lstlisting}
+=={S}(a::Padic{S}, b::Int)
+=={S}(a::Padic{S}, b::ZZ)
+\end{lstlisting}
+
+\desc{Return \code{true} if the exact value $b$ is equal to the $p$-adic 
+value $a$ up to the precision of $a$, otherwise return \code{false}.}
+
+\begin{lstlisting}
+=={S}(a::Int, b::Padic{S})
+=={S}(a::ZZ, b::Padic{S})
+\end{lstlisting}
+
+\desc{Return \code{true} if the exact value $a$ is equal to the $p$-adic 
+value $b$ up to the precision of $b$, otherwise return \code{false}.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc comparison.
+
+\begin{lstlisting}
+R = PadicNumbers(7)
+
+a = 1 + O(7^3)
+b = O(7^5)
+c = R(2)
+
+a == 1
+b == ZZ(0)
+c == 2
+ZZ(2) == c
+\end{lstlisting}
 
 \end{document}

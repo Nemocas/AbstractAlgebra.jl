@@ -287,7 +287,7 @@ function -{S}(x::ZZ, y::Padic{S})
    ccall((:padic_set_exact_fmpz, :libflint), Void, 
                 (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
                &z, &x, &eval(:($S)))
-   if x.exact
+   if y.exact
       repr = bool(ccall((:padic_sub_exact, :libflint), Cint, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
                &z, &z, &y, &eval(:($S))))
