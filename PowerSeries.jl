@@ -184,7 +184,7 @@ function show{T <: Ring, S}(io::IO, x::PowerSeries{T, S})
       coeff_printed = false
       c = x.coeffs[1]
       bracket = needs_parentheses(c)
-      if c != 0
+      if !iszero(c)
          if bracket
             print(io, "(")
          end
@@ -197,11 +197,11 @@ function show{T <: Ring, S}(io::IO, x::PowerSeries{T, S})
       for i = 2:len
          c = x.coeffs[i]
          bracket = needs_parentheses(c)
-         if c != 0
+         if !iszero(c)
             if coeff_printed && !is_negative(c)
                print(io, "+")
             end
-            if c != 1 && (c != -1 || show_minus_one(typeof(c)))
+            if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
                if bracket
                   print(io, "(")
                end

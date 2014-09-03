@@ -207,7 +207,7 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
       for i = 1:len - 1
          c = x.coeffs[len - i + 1]
          bracket = needs_parentheses(c)
-         if c != 0
+         if !iszero(c)
             if i != 1 && !is_negative(c)
                print(io, "+")
             end
@@ -233,7 +233,7 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
       end
       c = x.coeffs[1]
       bracket = needs_parentheses(c)
-      if c != 0
+      if !iszero(c)
          if len != 1 && !is_negative(c)
             print(io, "+")
          end

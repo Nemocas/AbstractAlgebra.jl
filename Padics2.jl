@@ -148,6 +148,20 @@ function show{S}(io::IO, ::Type{Padic{S}})
    print(io, "p-adic number field")
 end
 
+needs_parentheses{S}(x::Padic{S}) = true
+
+is_negative{S}(x::Padic{S}) = false
+
+show_minus_one{S}(::Type{Padic{S}}) = true
+
+###########################################################################################
+#
+#   Canonicalisation
+#
+###########################################################################################
+
+canonical_unit{S}(x::Padic{S}) = x
+
 ###########################################################################################
 #
 #   Unary operators
@@ -220,6 +234,53 @@ function *{S}(x::Padic{S}, y::Padic{S})
                &z, &x, &y, &eval(:($S)))
    end
    return z
+end
+
+function gcd{S}(x::Padic{S}, y::Padic{S})
+   if x == 0 && y == 0 
+      z = Padic{S}()
+      z.N = y.exact ? x.N : (x.exact ? y.N : min(x.N, y.N))
+      if x.exact && y.exact
+         z.exact = true
+      end
+   else
+      z = Padic{S}(1)
+   end
+   return z
+end
+
+###########################################################################################
+#
+#   Unsafe operators
+#
+###########################################################################################
+
+function mul!{S}(z::Padic{S}, x::Padic{S}, y::Padic{S})
+   if x.exact && y.exact
+      ccall((:padic_mul_exact, :libflint), Void, 
+                (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
+               &z, &x, &y, &eval(:($S)))
+      z.exact = true
+   else 
+      z.N = x.exact ? y.N + x.v : (y.exact ? x.N + y.v : min(x.N + y.v, y.N + x.v))
+      ccall((:padic_mul, :libflint), Void, 
+                (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
+               &z, &x, &y, &eval(:($S)))
+   end
+end
+
+function addeq!{S}(x::Padic{S}, y::Padic{S})
+   if x.exact && y.exact
+      ccall((:padic_add_exact, :libflint), Void, 
+                (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
+               &x, &x, &y, &eval(:($S)))
+      x.exact = true
+   else
+      x.N = x.exact ? y.N : (y.exact ? x.N : min(x.N, y.N))
+      ccall((:padic_add, :libflint), Void, 
+                (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
+               &x, &x, &y, &eval(:($S)))
+   end
 end
 
 ###########################################################################################
@@ -527,6 +588,20 @@ function teichmuller{S}(a::Padic{S})
    return z
 end
   
+###########################################################################################
+#
+#   Conversions and promotions
+#
+###########################################################################################
+
+convert{S}(::Type{Padic{S}}, x::Int) = Padic{S}(x)
+
+convert{S}(::Type{Padic{S}}, x::ZZ) = Padic{S}(x)
+
+promote_rule{S}(::Type{Padic{S}}, ::Type{Int}) = Padic{S}
+
+promote_rule{S}(::Type{Padic{S}}, ::Type{ZZ}) = Padic{S}
+
 ###########################################################################################
 #
 #   PadicNumbers constructor
