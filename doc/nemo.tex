@@ -5611,12 +5611,92 @@ a = R()
 b = R(1)
 c = R(ZZ(123))
 
-d = 1 + 2*7 + O(7^3)
+d = 1 + 2*7 + 4*7^2 + O(7^3)
 e = 13 + 357*ZZ(65537) + O(ZZ(65537)^12)
 \end{lstlisting}
 
-Beware that the expression $a + b*p + c*p^2 + O(p^n)$ is actually computed as
+Beware that the expression \code{1 + 2*p + 3*p^2 + O(p^n)} is actually computed as
 a normal Julia expression. Therefore if \code{Int} values are used instead of
 \code{ZZ}'s, overflow may result in evaluating the value.
+
+\subsubsection{Basic manipulation}
+
+\begin{lstlisting}
+prime{S}(::Type{Padic{S}})
+\end{lstlisting}
+
+\desc{Return the prime $p$ on which the $p$-adic type is based. The returned
+value is of type \code{ZZ}.}
+
+\begin{lstlisting}
+precision{S}(a::Padic{S})
+\end{lstlisting}
+
+\desc{Return the precision of the given $p$-adic value, e.g. the precision of
+\code{1 + 7 + 2*7^2 + O(7^3)} is $3$. The precision is meaningless for an
+exact value.}
+
+\begin{lstlisting}
+valuation{S}(a::Padic{S})
+\end{lstlisting}
+
+\desc{Return the $p$-adic valuation of the given $p$-adic value.}
+
+\begin{lstlisting}
+isexact{S}(a::Padic{S})
+\end{lstlisting}
+
+\desc{Return \code{true} if the given $p$-adic value is exact, i.e. infinite
+precision, otherwise return \code{false}.}
+
+\begin{lstlisting}
+zero{S}(::Type{Padic{S}})
+\end{lstlisting}
+
+\desc{Return the additive identity, i.e. exact $0$ in the field of $p$-adic
+numbers.}
+
+\begin{lstlisting}
+one{S}(::Type{Padic{S}})
+\end{lstlisting}
+
+\desc{Return the multiplicative identity, i.e. exact $1$ in the field of
+$p$-adic numbers.}
+
+\begin{lstlisting}
+iszero{S}(a::Padic{S})
+\end{lstlisting}
+
+\desc{Return \code{true} if the given $p$-adic value is the additive identity,
+i.e. exact $0$, otherwise return \code{false}.}
+
+\begin{lstlisting}
+isone{S}(a::Padic{S})
+\end{lstlisting}
+
+\desc{Return \code{true} if the given $p$-adic value is the multiplicative
+identity, i.e. exact $1$, otherwise return \code{false}.}
+
+\textbf{Examples.}
+
+Here are some examples of basic manipulations of $p$-adics.
+
+\begin{lstlisting}
+R = PadicNumbers(7)
+
+a = 1 + 2*7 + 4*7^2 + O(7^3)
+b = 7^2 + 3*7^3 + O(7^5)
+c = R(2)
+
+d = one(R)
+f = zero(R)
+g = isone(d)
+h = iszero(f)
+k = isexact(c)
+n = precision(a)
+p = prime(R)
+v = valuation(b)
+\end{lstlisting}
+
 
 \end{document}
