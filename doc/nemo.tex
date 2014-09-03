@@ -5907,4 +5907,118 @@ c == 2
 ZZ(2) == c
 \end{lstlisting}
 
+\subsubsection{Powering}
+
+\begin{lstlisting}
+^{S}(a::Padic{S}, n::Int)
+\end{lstlisting}
+
+\desc{Return $a^n$. The output precision will be the same as if $a$ had been
+multiplied by itself $n$ times, i.e. precision$(a) + (n - 1)\times$
+valuation$(a)$. If the input is exact and $n \geq 0$ the output will be
+exact. If $n < 0$ and $a$ is exact, it may be that the output is not
+representable. In such cases an exception is raised.}
+
+\textbf{Examples.}
+
+Here are some examples of powering.
+
+\begin{lstlisting}
+R = PadicNumbers(7)
+
+a = 1 + 7 + 2*7^2 + O(7^3)
+b = O(7^5)
+c = R(2)
+
+d = a^5
+f = b^3
+g = c^7
+\end{lstlisting}
+
+\subsubsection{Exact division}
+
+\begin{lstlisting}
+divexact{S}(a::Padic{S}, b::Padic{S})
+\end{lstlisting}
+
+\desc{Return $a/b$. The output precision will be the minimum of 
+precision$(a) -$ valuation$(b)$ and precision$(b) - 2\times$valuation$(b) +$
+valuation$(a)$. If the result is not representable, an exception is
+thrown. If \code{b == 0} a \code{DivideError()} is thrown.}
+
+\textbf{Examples.}
+
+Here are some examples of exact division.
+
+\begin{lstlisting}
+R = PadicNumbers(7)
+
+a = 1 + 7 + 2*7^2 + O(7^3)
+b = 2 + 3*7 + O(7^5)
+c = 7^2 + 2*7^3 + O(7^4)
+d = 7 + 2*7^2 + O(7^5)
+
+f = divexact(a, b)
+g = divexact(c, d)
+h = divexact(d, R(7^3))
+j = divexact(R(34), R(17))
+\end{lstlisting}
+
+\subsubsection{Inversion}
+
+\begin{lstlisting}
+inv{S}(a::Padic{S})
+\end{lstlisting}
+
+\desc{Return the multiplicative inverse of $a$, i.e. $1/a$. If \code{a == 0}
+a \code{DivideError()} is thrown. If the result is not representable, an
+exception is thrown.}
+
+\textbf{Examples.}
+
+Here are some examples of inversion.
+
+\begin{lstlisting}
+R = PadicNumbers(7)
+
+a = 1 + 7 + 2*7^2 + O(7^3)
+b = 2 + 3*7 + O(7^5)
+c = 7^2 + 2*7^3 + O(7^4)
+d = 7 + 2*7^2 + O(7^5)
+
+f = inv(a)
+g = inv(b)
+h = inv(c)
+k = inv(d)
+l = inv(R(1))
+\end{lstlisting}
+
+\subsubsection{Square root}
+
+\begin{lstlisting}
+sqrt{S}(a::Padic{S})
+\end{lstlisting}
+
+\desc{Return the $p$-adic square root of $a$. We define this only when the
+valuation of $a$ is even. The precision of the output will be precision$(a) -$
+valuation$(a)/2$. If the square root does not exist or is unrepresentable, an
+exception is thrown.}
+
+\textbf{Examples.}
+
+Here are some examples of taking a $p$-adic square root.
+
+\begin{lstlisting}
+R = PadicNumbers(7)
+
+a = 1 + 7 + 2*7^2 + O(7^3)
+b = 2 + 3*7 + O(7^5)
+c = 7^2 + 2*7^3 + O(7^4)
+
+d = sqrt(a)
+f = sqrt(b)
+f = sqrt(c)
+g = sqrt(R(121))
+\end{lstlisting}
+
 \end{document}

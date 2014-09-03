@@ -443,6 +443,7 @@ end
 ###########################################################################################
 
 function inv{S}(a::Padic{S})
+   a == 0 && throw(DivideError())
    z = Padic{S}()
    if a.exact
       z.exact = true
