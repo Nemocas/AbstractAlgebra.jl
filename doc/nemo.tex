@@ -5479,4 +5479,144 @@ f = frobenius(a, 3)
 g = pth_root(a)
 \end{lstlisting}
 
+\subsection{The p-adics}
+
+We define a parametric type \code{Padic} to contain elements of the $p$-adic
+numbers in Nemo. As usual, the user need not know the details of the type, as
+we define a function \code{PadicNumbers} for constructing it.
+
+We describe here the internals of the \code{Padic} type, but the reader may
+skip ahead to the section on constructors if so desired.
+
+The \code{Padic} type takes a single parameter \code{S}, which is a symbol.
+This symbol is the name of a variable which contains, amongst other things,
+the prime $p$ for the $p$-adic type, so that there is effectively a different
+type for each prime $p$. 
+
+We name the symbol \code{S} carefully so that if the $p$-adic numbers are
+constructed twice with the same prime $p$, the same type results. This is
+especially important for the $p$-adics, which can be constructed without
+actually constructing the field which they belong to (e.g. they can be
+constructed using the $O(p^n)$ notation). 
+
+In order to define operations on $p$-adic values with the same prime $p$, the
+types of values constructed with the same $p$ must be the same.
+
+The first part of the \code{Padic} type in Nemo mirrors the internals of the
+flint \code{padic_t} type. Here is its definition.
+
+\begin{lstlisting}
+type Padic{S} <: Field
+   u :: Int 
+   v :: Int
+   N :: Int
+   exact :: Bool
+end
+\end{lstlisting}
+
+The \code{u}, \code{v} and \code{N} fields correspond to the $p$-adic unit
+(actually of type \code{fmpz} in flint), the valuation and precision
+respectively. 
+
+There is one additional field, called \code{exact}. We use this to specify
+when a $p$-adic number is exact (i.e. when it exactly represents a rational
+number with denominator a power of $p$). We require this because of the way
+flint handles $p$-adic precision.
+
+The flint $p$-adic interface ignores the precision of inputs to its $p$-adic
+functions and only pays attention to the desired precision as set in the
+output(s). We modify this behaviour in Nemo by computing on-the-fly the best
+possible output precision given the input precisions. We then use this for the
+required output precision when calling flint.
+
+However, the flint $p$-adic type has no way to specify an infinite precision
+output, e.g. when the input precisions are in fact known exactly. The
+additional \code{exact} field in the Nemo type allows us to handle such cases
+specially.
+
+Flint does provide some functions which ignore the specified output precision,
+interpreting the result as exact. We use these in combination with the Nemo
+\code{exact} field to provide operations on infinite precision $p$-adics.
+
+There is also a flint \code{padic_ctx_t} type which is mirrored in a Julia
+\code{padic_ctx} type. As the details are not important we omit the definition
+here. It is this \code{padic_ctx} that is attached to the symbol \code{S} on
+which the Nemo \code{Padic} type is parameterised.
+
+\subsubsection{Constructors}
+
+We provide the following simple function for creating the type of the $p$-adic
+numbers.
+
+\begin{lstlisting}
+PadicNumbers(p::Int)
+PadicNumbers(p::ZZ)
+\end{lstlisting}
+
+\desc{This function returns a type corresponding to the $p$-adic numbers for
+the given prime $p$. We test that $p$ is actually prime before constructing
+the type. If not, an exception is thrown.}
+
+No default precision is used for the $p$-adic type in Nemo. Elements can be
+constructed with any desired precision and the results of computations are
+computed to the best possible output precision given the precision of the
+inputs. 
+
+This includes the possibility of infinite precision in the case of exact
+rational values with a power of the prime $p$ as denominator. Nemo will throw
+an exception if an output value has infinite precision in theory but which
+cannot be represented exactly due to requiring infinite space (e.g. negative
+integers or fractions with something other than a power of $p$ as denominator).
+
+A convenient way of constructing $p$-adic values, without first constructing
+the type using the above function, is with the \code{O} constructor.
+
+\begin{lstlisting}
+O(m::Int)
+O(m::ZZ)
+\end{lstlisting}
+
+\desc{Construct the value $0 + O(p^n)$ given $m = p^n$. Note that $p$ and $n$
+are determined automatically from the value $m$, which is assumed to be a prime
+power. An exception results if $m$ is not found to be a prime power. Note that
+at present we require $n > 0$. This will be extended in a future version of
+Nemo.}
+
+The \code{O(p^n)} construction can be used to construct $p$-adic values of
+precision $n$ by adding it to integer values representing the $p$-adic value
+modulo $p^n$. See the examples below for details.
+
+\begin{lstlisting}
+Padic()
+\end{lstlisting}
+
+\desc{Construct the $p$-adic value $0$ with precision $0$, i.e. $0 + O(p^0)$.}
+
+\begin{lstlisting}
+Padic(a::Int)
+Padic(a::ZZ)
+\end{lstlisting}
+
+\desc{Construct the exact (infinite precision) $p$-adic value representing the
+integer $a$. An exception will result if $a < 0$.}
+
+\textbf{Examples.}
+
+Here are some examples of constructing $p$-adics.
+
+\begin{lstlisting}
+R = PadicNumbers(7)
+
+a = R()
+b = R(1)
+c = R(ZZ(123))
+
+d = 1 + 2*7 + O(7^3)
+e = 13 + 357*ZZ(65537) + O(ZZ(65537)^12)
+\end{lstlisting}
+
+Beware that the expression $a + b*p + c*p^2 + O(p^n)$ is actually computed as
+a normal Julia expression. Therefore if \code{Int} values are used instead of
+\code{ZZ}'s, overflow may result in evaluating the value.
+
 \end{document}
