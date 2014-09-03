@@ -2017,40 +2017,22 @@ symbol, representing the variable, e.g. the type of polynomials over the integer
 i.e. the type of $\Z[x]$, is \code|Poly{ZZ, :x}|.
 
 Internally, we specialise the polynomial type to use flint structures where available.
-For example, we define an \code{fmpz_poly} type in Julia to mirror flint's \code{fmpz_poly}.
-
-\begin{lstlisting}
-type fmpz_poly <: Ring
-   coeffs :: Ptr{Void}
-   alloc :: Int
-   length :: Int
-end
-\end{lstlisting}
-
-Fortunately, as Julia will construct an object of this type on the heap, we end up with
-precisely an \code{fmpz_poly_t} which can be passed directly to flint \code{fmpz_poly}
-functions.
 
 For generic polynomials, for which there is no flint type (e.g. polynomials over another
-polynomial ring) we define a general Julia type
+polynomial ring) we use a Julia \code{Array}, containing coefficients of type $T$, where 
+$T$ is in the \code{Ring} class.
 
-\begin{lstlisting}
-type PolyStruct{T <: Ring}
-   coeffs :: Array{T, 1}
-   length :: Int
-end
-\end{lstlisting}
-
-It simply contains an array of coefficients of type $T$, where $T$ is in the \code{Ring}
-class, and a length (degree plus one).
-
-To define our general \code{Poly} type we use a Julia union type to combine the flint
-and generic types.
+To define our general \code{Poly} type we take a naive union of all the fields of the
+requisite flint types, plus a generic Julia array for generic polynomials. (We could use
+a Julia union type here, but this incurs an additional overhead that we prefer to avoid.)
 
 \begin{lstlisting}
 type Poly{T <: Ring, S} <: Ring
-   data :: Union(fmpz_poly, fmpz_mod_poly, 
-                            fmpq_poly, fq_poly, PolyStruct{T})
+   arr::Ptr{Void}
+   length::Int
+   alloc::Int
+   inv::Int
+   coeffs :: Array{T, 1}
 end
 \end{lstlisting}
 
@@ -3629,9 +3611,12 @@ Here is the definition of the \code{PowerSeries} type in Nemo.
 
 \begin{lstlisting}
 type PowerSeries{T <: Ring, S} <: Ring
-   data :: Union(fmpz_poly, fmpz_mod_poly, 
-                            fmpq_poly, fq_poly, PolyStruct{T})
+   arr::Ptr{Void}
+   length::Int
+   alloc::Int
+   inv::Int
    prec :: Precision
+   coeffs :: Array{T, 1}
 end
 \end{lstlisting}
 
@@ -4271,10 +4256,12 @@ functions for constructing objects of this type.
 The reader not interested in the internal details of the \code{Fraction} type
 can skip ahead to the section on constructors.
 
-The definition of the \code{Fraction} type in Julia is very simple
+The definition of the \code{Fraction} type in Julia is as follows.
 
 \begin{lstlisting}
 type Fraction{T <: Ring} <: Field
+   n :: Int
+   d :: Int
    num :: T
    den :: T
 end
@@ -4282,6 +4269,13 @@ end
 
 It is parameterised over a ring type \code{T} and contains a numerator 
 \code{num} and denominator \code{den}, both of type \code{T}.
+
+For the special case of fractions over the integers, i.e. elements of the
+field of rational numbers, we want to make use of the corresponding flint
+type which consists just of two \code{fmpz} values. In that case we cannot
+use \code{T} as the type (since that would be \code{ZZ}, but must use
+\code{Int}. For this purpose we include a numerator and denominator of the
+correct type, called \code{n} and \code{d} respectively.
 
 The inner constructor for the \code{Fraction} type does not try to canonicalise
 the fraction, but all other constructors should produce a canonicalised
@@ -5069,7 +5063,10 @@ As with the \code{ZZ} type, the \code{FinFieldElem} type in Nemo simply represen
 flint type. In fact, the contents are the same as an \code{fmpz_poly}, since
 fundamentally an element of a finite field is a polynomial expression.
 
-Here is the Julia definition of the \code{FinFieldElem} type.
+The following is essentially what the Julia definition of the Nemo
+\code{FinFieldElem} type looks like. It mirrors the contents of the
+flint \code{fmpz_poly_struct}, which is how finite field elements are stored
+in flint.
 
 \begin{lstlisting}
 type FinFieldElem{S} <: Field
@@ -5078,16 +5075,22 @@ type FinFieldElem{S} <: Field
    length :: Int
 \end{lstlisting}
 
-The \code{FinFieldElem} type is parameterised by a symbol \code{S} which holds on to
-a flint context object with information such as the polynomial used to
+Actually, in practice, we define an immutable type called 
+\code{fmpz_poly_struct} in Julia which contains precisely the fields above. The
+body of the \code{FinFieldElem} type then contains just an
+\code{fmpz_poly_struct}. But this is not an essential detail.
+
+The \code{FinFieldElem} type is parameterised by a symbol \code{S} which holds
+on to a flint context object with information such as the polynomial used to
 generate the field, the characteristic and much more besides.
 
 There are no user serviceable parts inside, so we omit details of this 
-\code{fq_ctx} type which stores this context object.
+\code{fq_ctx} type which stores this context object. Needless to say, it
+contains no more and no less than a flint \code{fq_ctx_t}.
 
-The \code{FinFieldElem} type belongs to the \code{Field} typeclass, and therefore
-elements of a finite field can be passed to any function which operates on
-field or ring elements.
+The \code{FinFieldElem} type belongs to the \code{Field} typeclass, and
+therefore elements of a finite field can be passed to any function which
+operates on field or ring elements.
 
 \subsubsection{Constructors}
 

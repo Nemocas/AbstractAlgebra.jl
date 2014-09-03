@@ -8,7 +8,7 @@ import Rings: O, valuation
 
 import Base: sqrt, exp, log
 
-export O, PadicNumberField, Padic, valuation, prime, precision, isexact, sqrt, exp, log,
+export O, PadicNumbers, Padic, valuation, prime, precision, isexact, sqrt, exp, log,
        teichmuller
 
 ###########################################################################################
@@ -528,11 +528,11 @@ end
   
 ###########################################################################################
 #
-#   PadicNumberField constructor
+#   PadicNumbers constructor
 #
 ###########################################################################################
 
-function PadicNumberField(p::ZZ)
+function PadicNumbers(p::ZZ)
    !isprime(p) && error("Prime base required in PadiCNumberField")
    S = symbol("padic$(string(ZZ(p)))")
    R = Padic{S}
@@ -540,4 +540,4 @@ function PadicNumberField(p::ZZ)
    return R
 end
 
-PadicNumberField(p::Int) = PadicNumberField(ZZ(p))
+PadicNumbers(p::Int) = PadicNumbers(ZZ(p))
