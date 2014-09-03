@@ -6021,4 +6021,52 @@ f = sqrt(c)
 g = sqrt(R(121))
 \end{lstlisting}
 
+\subsubsection{Special functions}
+
+\begin{lstlisting}
+exp{S}(a::Padic{S})
+\end{lstlisting}
+
+\desc{Return the $p$-adic exponential of $a$. We define this only when the
+valuation of $a$ is positive (unless \code{a == 0}). The precision of the
+output will be the same as the precision of the input. If the result is not
+representable an exception is thrown.}
+
+\begin{lstlisting}
+log{S}(a::Padic{S})
+\end{lstlisting}
+
+\desc{Return the $p$-adic logarithm of $a$. We define this only when the
+valuation of $a$ is zero (but not for \code{a == 0}). The precision of the
+output will be the same as the precision of the input. If the result is not
+representable an exception is thrown.}
+
+\begin{lstlisting}
+teichmuller{S}(a::Padic{S})
+\end{lstlisting}
+
+\desc{Return the Teichmuller lift of the $p$-adic value $a$. We require the
+valuation of $a$ to be nonnegative. The precision of the output will be the
+same as the precision of the input. For convenience, if $a$ is congruent to
+zero modulo $p$ we return zero. If the result is not representable an
+exception is thrown.}
+
+\textbf{Examples.}
+
+Here are some examples of special functions.
+
+\begin{lstlisting}
+R = PadicNumbers(7)
+
+a = 1 + 7 + 2*7^2 + O(7^3)
+b = 2 + 5*7 + 3*7^2 + O(7^3)
+c = 3*7 + 2*7^2 + O(7^5)
+
+c = exp(c)
+d = log(a)
+c = exp(R(0))
+d = log(R(1))
+f = teichmuller(b) 
+\end{lstlisting}
+
 \end{document}
