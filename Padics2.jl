@@ -47,6 +47,27 @@ type Padic{S} <: Field
       finalizer(d, _Padic_clear_fn)
       return d
    end
+   function Padic(a::QQ)
+      n = num(a)
+      sign(n) < 0 && error("Cannot create negative p-adic to infinite precision")
+      z = Padic{S}()
+      p = prime(Padic{S})
+      d = den(a)
+      if d == 1
+         v = 0
+      elseif d == p
+         v = 1
+      else
+         v, r = remove(d, p)
+         r != 1 && error("Denominator not a power of p when converting rational to p-adic")
+      end
+      ccall((:padic_set_exact_fmpz, :libflint), Void, 
+                (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
+               &z, &n, &eval(:($S)))
+      z.v -= v
+      z.exact = true
+      return z
+   end
    function Padic(a::ZZ)
       z = Padic{S}()
       repr = bool(ccall((:padic_set_exact_fmpz, :libflint), Cint, (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), &z, &a, &eval(:($S))))
@@ -59,6 +80,26 @@ end
 
 function _Padic_clear_fn{S}(a :: Padic{S})
    ccall((:padic_clear, :libflint), Void, (Ptr{Padic{S}},), &a)
+end
+
+function O{S}(::Type{Padic{S}}, n::QQ)
+   m = den(n)
+   n <= 0 && throw(DomainError())
+   if m == 1
+      return O(Padic{S}, num(n))
+   end
+   num(n) != 1 && error("Not a power of p in p-adic O()")
+   d = Padic{S}()
+   if m == prime(Padic{S})
+      d.N = -1
+      return d
+   else
+     p = prime(Padic{S})
+     s, r = remove(m, p) 
+     d.N = -s
+     r != 1 && error("Not a power of p in p-adic O()")
+   end
+   return d
 end
 
 function O{S}(::Type{Padic{S}}, n::ZZ)
@@ -282,6 +323,45 @@ end
 #
 ###########################################################################################
 
+function +{S}(x::Padic{S}, y::QQ)
+   n = num(y)
+   if sign(n) < 0
+      return x - (-y)
+   end
+   z = Padic{S}()
+   if x.exact
+      p = prime(Padic{S})
+      d = den(y)
+      if d == 1
+         v = 0
+      elseif d == p
+         v = 1
+      else
+         v, r = remove(d, p)
+         r != 1 && error("Denominator not a power of p in expression involving p-adic")
+      end
+      ccall((:padic_set_exact_fmpz, :libflint), Void, 
+                (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
+               &z, &n, &eval(:($S)))
+      z.v -= v
+      ccall((:padic_add_exact, :libflint), Void, 
+                (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
+               &z, &z, &x, &eval(:($S)))
+      z.exact = true
+   else
+      z.N = x.N
+      ccall((:padic_set_fmpq, :libflint), Void, 
+                (Ptr{Padic}, Ptr{Fraction}, Ptr{padic_ctx}), 
+               &z, &y, &eval(:($S)))
+      ccall((:padic_add, :libflint), Void, 
+                (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
+               &z, &z, &x, &eval(:($S)))
+   end
+   return z
+end
+
++{S}(x::QQ, y::Padic{S}) = y + x
+
 function +{S}(x::Padic{S}, y::ZZ)
    if sign(y) < 0
       return x - (-y)
@@ -310,6 +390,43 @@ end
 
 +{S}(x::Int, y::Padic{S}) = y + ZZ(x)
 
+function -{S}(x::Padic{S}, y::QQ)
+   n = num(y)
+   if sign(n) < 0
+      return x - (-y)
+   end
+   z = Padic{S}()
+   if x.exact
+      p = prime(Padic{S})
+      d = den(y)
+      if d == 1
+         v = 0
+      elseif d == p
+         v = 1
+      else
+         v, r = remove(d, p)
+         r != 1 && error("Denominator not a power of p in expression involving p-adic")
+      end
+      ccall((:padic_set_exact_fmpz, :libflint), Void, 
+                (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
+               &z, &n, &eval(:($S)))
+      z.v -= v
+      ccall((:padic_sub_exact, :libflint), Void, 
+                (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
+               &z, &x, &z, &eval(:($S)))
+      z.exact = true
+   else
+      z.N = x.N
+      ccall((:padic_set_fmpq, :libflint), Void, 
+                (Ptr{Padic}, Ptr{QQ}, Ptr{padic_ctx}), 
+               &z, &y, &eval(:($S)))
+      ccall((:padic_sub, :libflint), Void, 
+                (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
+               &z, &x, &z, &eval(:($S)))
+   end
+   return z
+end
+
 function -{S}(x::Padic{S}, y::ZZ)
    if sign(y) < 0
       return x + (-y)
@@ -329,6 +446,44 @@ function -{S}(x::Padic{S}, y::ZZ)
       ccall((:padic_sub, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
                &z, &x, &z, &eval(:($S)))
+   end
+   return z
+end
+
+function -{S}(x::QQ, y::Padic{S})
+   n = num(x)
+   if sign(n) < 0
+      return -y + (-x)
+   end
+   z = Padic{S}()
+   if y.exact
+      p = prime(Padic{S})
+      d = den(x)
+      if d == 1
+         v = 0
+      elseif d == p
+         v = 1
+      else
+         v, r = remove(d, p)
+         r != 1 && error("Denominator not a power of p in expression involving p-adic")
+      end
+      ccall((:padic_set_exact_fmpz, :libflint), Void, 
+                (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
+               &z, &n, &eval(:($S)))
+      z.v -= v
+      repr = bool(ccall((:padic_sub_exact, :libflint), Cint, 
+                (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
+               &z, &z, &y, &eval(:($S))))
+      !repr && error("Unable to represent negative value exactly")
+      z.exact = true
+   else
+      z.N = y.N
+      ccall((:padic_set_fmpq, :libflint), Void, 
+                (Ptr{Padic}, Ptr{Fraction}, Ptr{padic_ctx}), 
+               &z, &x, &eval(:($S)))
+      ccall((:padic_sub, :libflint), Cint, 
+                (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
+               &z, &z, &y, &eval(:($S)))
    end
    return z
 end
@@ -359,6 +514,45 @@ end
 -{S}(x::Padic{S}, y::Int) = x - ZZ(y)
 
 -{S}(x::Int, y::Padic{S}) = ZZ(x) - y
+
+function *{S}(x::Padic{S}, y::QQ)
+   n = num(y)
+   if sign(n) < 0
+      return -(x*(-y))
+   end
+   if y == 0
+      return zero(Padic{S})
+   end
+   z = Padic{S}()
+   d = den(y)
+   if x.exact
+      z.exact = true
+      res = bool(ccall((:padic_div_exact_fmpz, :libflint), Cint, 
+                (Ptr{Padic}, Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
+               &z, &x, &d, &eval(:($S))))
+      !res && error("Unable to multiply by rational to infinite precision")
+      c = Padic{S}()
+      ccall((:padic_set_exact_fmpz, :libflint), Void, 
+                (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
+               &c, &n, &eval(:($S)))
+      ccall((:padic_mul_exact, :libflint), Void, 
+                (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
+               &z, &z, &c, &eval(:($S)))
+   else
+      p = prime(Padic{S})
+      v1, r = remove(n, p)
+      v2, r = remove(d, p)
+      z.N = x.N - x.v + v1 - v2
+      ccall((:padic_set_fmpq, :libflint), Void, 
+                (Ptr{Padic}, Ptr{Fraction}, Ptr{padic_ctx}), 
+               &z, &y, &eval(:($S)))
+      z.N = x.N + z.v
+      ccall((:padic_mul, :libflint), Void, 
+                (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
+               &z, &z, &x, &eval(:($S)))
+   end
+   return z
+end
 
 function *{S}(x::Padic{S}, y::ZZ)
    if sign(y) < 0
@@ -417,6 +611,23 @@ end
 #   Ad hoc comparison
 #
 ###########################################################################################
+
+function =={S}(a::Padic{S}, b::QQ)
+   if a.exact
+      if sign(num(b)) < 0
+         return false
+      end
+      z = Padic{S}(b)
+   else
+      z = Padic{S}()
+      z.N = a.N
+      ccall((:padic_set_fmpq, :libflint), Void, 
+                (Ptr{Padic}, Ptr{Fraction}, Ptr{padic_ctx}), 
+               &z, &b, &eval(:($S)))
+   end
+   return bool(ccall((:padic_equal, :libflint), Cint, 
+                (Ptr{Padic}, Ptr{Padic}), &a, &z))
+end
 
 function =={S}(a::Padic{S}, b::ZZ)
    if a.exact
@@ -591,9 +802,13 @@ convert{S}(::Type{Padic{S}}, x::Int) = Padic{S}(x)
 
 convert{S}(::Type{Padic{S}}, x::ZZ) = Padic{S}(x)
 
+convert{S}(::Type{Padic{S}}, x::QQ) = Padic{S}(x)
+
 promote_rule{S}(::Type{Padic{S}}, ::Type{Int}) = Padic{S}
 
 promote_rule{S}(::Type{Padic{S}}, ::Type{ZZ}) = Padic{S}
+
+promote_rule{S}(::Type{Padic{S}}, ::Type{QQ}) = Padic{S}
 
 ###########################################################################################
 #
