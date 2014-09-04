@@ -5566,12 +5566,11 @@ say).
 \begin{lstlisting}
 O{S}(::Type{Padic{S}}, m::Int)
 O{S}(::Type{Padic{S}}, m::ZZ)
+O{S}(::Type{Padic{S}}, m::QQ)
 \end{lstlisting}
 
 \desc{Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results
-if $m$ is not found to be a power of \code{p = prime(Padic{S})}. Note that
-at present we require $n \geq 0$. This will be extended in a future version of
-Nemo.}
+if $m$ is not found to be a power of \code{p = prime(Padic{S})}.}
 
 The \code{O(p^n)} construction can be used to construct $p$-adic values of
 precision $n$ by adding it to integer values representing the $p$-adic value
@@ -5586,10 +5585,12 @@ Padic{S}()
 \begin{lstlisting}
 Padic{S}(a::Int)
 Padic{S}(a::ZZ)
+Padic{S}(a::QQ)
 \end{lstlisting}
 
 \desc{Construct the exact (infinite precision) $p$-adic value representing the
-integer $a$. An exception will result if $a < 0$.}
+integer or rational $a$. An exception will result if $a < 0$ or if the 
+denominator of $a$ is not a power of $p$.}
 
 \textbf{Examples.}
 
@@ -5602,14 +5603,19 @@ S = PadicNumbers(ZZ(65537))
 a = R()
 b = R(1)
 c = R(ZZ(123))
+d = R(ZZ(1)/7^2)
 
-d = 1 + 2*7 + 4*7^2 + O(R, 7^3)
-e = 13 + 357*ZZ(65537) + O(S, ZZ(65537)^12)
+f = 1 + 2*7 + 4*7^2 + O(R, 7^3)
+g = 13 + 357*ZZ(65537) + O(S, ZZ(65537)^12)
+h = ZZ(1)/7^2 + ZZ(2)/7 + 3 + 4*7 + O(R, 7^2)
 \end{lstlisting}
 
 Beware that the expression \code{1 + 2*p + 3*p^2 + O(R, p^n)} is actually computed as
 a normal Julia expression. Therefore if \code{Int} values are used instead of
 \code{ZZ}'s, overflow may result in evaluating the value.
+
+Also note that one cannot use \code{7^-2} in a $p$-adic expression, since the 
+exponentiation operator must always return an integer, for reasons of type soundness.
 
 \subsubsection{Basic manipulation}
 
@@ -5762,6 +5768,7 @@ k = a*d
 \begin{lstlisting}
 +{S}(x::Padic{S}, y::Int)
 +{S}(x::Padic{S}, y::ZZ)
++{S}(x::Padic{S}, y::QQ)
 \end{lstlisting}
 
 \desc{Return $x + y$ where $y$ is interpreted as an exact $p$-adic value. If
@@ -5770,6 +5777,7 @@ the result is unrepresentable, an exception results.}
 \begin{lstlisting}
 +{S}(x::Int, y::Padic{S})
 +{S}(x::ZZ, y::Padic{S})
++{S}(x::QQ, y::Padic{S})
 \end{lstlisting}
 
 \desc{Return $x + y$ where $x$ is interpreted as an exact $p$-adic value. If
@@ -5778,6 +5786,7 @@ the result is unrepresentable, an exception results.}
 \begin{lstlisting}
 -{S}(x::Padic{S}, y::Int)
 -{S}(x::Padic{S}, y::ZZ)
+-{S}(x::Padic{S}, y::QQ)
 \end{lstlisting}
 
 \desc{Return $x - y$ where $y$ is interpreted as an exact $p$-adic value. If
@@ -5786,6 +5795,7 @@ the result is unrepresentable, an exception results.}
 \begin{lstlisting}
 -{S}(x::Int, y::Padic{S})
 -{S}(x::ZZ, y::Padic{S})
+-{S}(x::QQ, y::Padic{S})
 \end{lstlisting}
 
 \desc{Return $x - y$ where $x$ is interpreted as an exact $p$-adic value. If
@@ -5794,18 +5804,20 @@ the result is unrepresentable, an exception results.}
 \begin{lstlisting}
 *{S}(x::Padic{S}, y::Int)
 *{S}(x::Padic{S}, y::ZZ)
+*{S}(x::Padic{S}, y::QQ)
 \end{lstlisting}
 
-\desc{Return $xy$ where $y$ is interpreted as an exact $p$-adic value. If
-the result is unrepresentable, an exception results.}
+\desc{Return $xy$. If $y$ is negative or the result is not representable, an
+exception results.}
 
 \begin{lstlisting}
 *{S}(x::Int, y::Padic{S})
 *{S}(x::ZZ, y::Padic{S})
+*{S}(x::QQ, y::Padic{S})
 \end{lstlisting}
 
-\desc{Return $xy$ where $x$ is interpreted as an exact $p$-adic value. If
-the result is unrepresentable, an exception results.}
+\desc{Return $xy$. If $x$ is negative or the result is not representable, an 
+exception results.}
 
 \textbf{Examples.}
 
@@ -5826,6 +5838,9 @@ j = ZZ(3)*c
 k = 2*d
 l = 2 + d
 m = d - ZZ(2)
+n = a + ZZ(1)/7^2
+p = (ZZ(12)/11)*b
+c = c*(ZZ(1)/7)
 \end{lstlisting}
 
 \subsubsection{Comparison}
@@ -5869,6 +5884,7 @@ supplied).
 \begin{lstlisting}
 =={S}(a::Padic{S}, b::Int)
 =={S}(a::Padic{S}, b::ZZ)
+=={S}(a::Padic{S}, b::QQ)
 \end{lstlisting}
 
 \desc{Return \code{true} if the exact value $b$ is equal to the $p$-adic 
@@ -5877,6 +5893,7 @@ value $a$ up to the precision of $a$, otherwise return \code{false}.}
 \begin{lstlisting}
 =={S}(a::Int, b::Padic{S})
 =={S}(a::ZZ, b::Padic{S})
+=={S}(a::QQ, b::Padic{S})
 \end{lstlisting}
 
 \desc{Return \code{true} if the exact value $a$ is equal to the $p$-adic 
@@ -5897,6 +5914,7 @@ a == 1
 b == ZZ(0)
 c == 2
 ZZ(2) == c
+a == ZZ(344)/1
 \end{lstlisting}
 
 \subsubsection{Powering}
@@ -5931,12 +5949,40 @@ g = c^7
 
 \begin{lstlisting}
 divexact{S}(a::Padic{S}, b::Padic{S})
+/{S}(a::Padic{S}, b::Padic{S})
 \end{lstlisting}
 
 \desc{Return $a/b$. The output precision will be the minimum of 
 precision$(a) -$ valuation$(b)$ and precision$(b) - 2\times$valuation$(b) +$
 valuation$(a)$. If the result is not representable, an exception is
 thrown. If \code{b == 0} a \code{DivideError()} is thrown.}
+
+\begin{lstlisting}
+divexact{S}(a::Padic{S}, b::Int)
+divexact{S}(a::Padic{S}, b::ZZ)
+divexact{S}(a::Padic{S}, b::QQ)
+/{S}(a::Padic{S}, b::Int)
+/{S}(a::Padic{S}, b::ZZ)
+/{S}(a::Padic{S}, b::QQ)
+\end{lstlisting}
+
+\desc{Return $a/b$. The output precision will be precision$(a) -$ 
+valuation$(b)$. If the result is not representable, an exception is
+thrown. If \code{b == 0} a \code{DivideError()} is thrown.}
+
+\begin{lstlisting}
+divexact{S}(a::Int, b::Padic{S})
+divexact{S}(a::ZZ, b::Padic{S})
+divexact{S}(a::QQ, b::Padic{S})
+/{S}(a::Int, b::Padic{S})
+/{S}(a::ZZ, b::Padic{S})
+/{S}(a::QQ, b::Padic{S})
+\end{lstlisting}
+
+\desc{Return $a/b$. The output precision will be 
+precision$(b) - 2\times$valuation$(b) +$ valuation$(a)$. If the result is not
+representable, an exception is thrown. If \code{b == 0} a \code{DivideError()}
+is thrown.}
 
 \textbf{Examples.}
 
@@ -5954,6 +6000,13 @@ f = divexact(a, b)
 g = divexact(c, d)
 h = divexact(d, R(7^3))
 j = divexact(R(34), R(17))
+
+k = a/2
+l = b/ZZ(7)
+m = c*(ZZ(12)/7^2)
+n = 2/d
+p = R(3)/3
+q = (ZZ(5)/7)/R(5)
 \end{lstlisting}
 
 \subsubsection{Inversion}
