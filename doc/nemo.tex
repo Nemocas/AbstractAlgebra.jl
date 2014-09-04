@@ -5490,17 +5490,7 @@ skip ahead to the section on constructors if so desired.
 
 The \code{Padic} type takes a single parameter \code{S}, which is a symbol.
 This symbol is the name of a variable which contains, amongst other things,
-the prime $p$ for the $p$-adic type, so that there is effectively a different
-type for each prime $p$. 
-
-We name the symbol \code{S} carefully so that if the $p$-adic numbers are
-constructed twice with the same prime $p$, the same type results. This is
-especially important for the $p$-adics, which can be constructed without
-actually constructing the field which they belong to (e.g. they can be
-constructed using the $O(p^n)$ notation). 
-
-In order to define operations on $p$-adic values with the same prime $p$, the
-types of values constructed with the same $p$ must be the same.
+the prime $p$ for the $p$-adic type.
 
 The first part of the \code{Padic} type in Nemo mirrors the internals of the
 flint \code{padic_t} type. Here is its definition.
@@ -5568,18 +5558,19 @@ an exception if an output value has infinite precision in theory but which
 cannot be represented exactly due to requiring infinite space (e.g. negative
 integers or fractions with something other than a power of $p$ as denominator).
 
-A convenient way of constructing $p$-adic values, without first constructing
-the type using the above function, is with the \code{O} constructor.
+To construct values of $p$-adic type we use the \code{O} operator. It requires
+the $p$-adic type as a parameter for reasons of type soundness and so that
+expressions such as $O(7^0)$ can be entered unambiguously (as \code{O(R, 7^0)},
+say).
 
 \begin{lstlisting}
-O(m::Int)
-O(m::ZZ)
+O{S}(::Type{Padic{S}}, m::Int)
+O{S}(::Type{Padic{S}}, m::ZZ)
 \end{lstlisting}
 
-\desc{Construct the value $0 + O(p^n)$ given $m = p^n$. Note that $p$ and $n$
-are determined automatically from the value $m$, which is assumed to be a prime
-power. An exception results if $m$ is not found to be a prime power. Note that
-at present we require $n > 0$. This will be extended in a future version of
+\desc{Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results
+if $m$ is not found to be a power of \code{p = prime(Padic{S})}. Note that
+at present we require $n \geq 0$. This will be extended in a future version of
 Nemo.}
 
 The \code{O(p^n)} construction can be used to construct $p$-adic values of
@@ -5587,14 +5578,14 @@ precision $n$ by adding it to integer values representing the $p$-adic value
 modulo $p^n$. See the examples below for details.
 
 \begin{lstlisting}
-Padic()
+Padic{S}()
 \end{lstlisting}
 
 \desc{Construct the $p$-adic value $0$ with precision $0$, i.e. $0 + O(p^0)$.}
 
 \begin{lstlisting}
-Padic(a::Int)
-Padic(a::ZZ)
+Padic{S}(a::Int)
+Padic{S}(a::ZZ)
 \end{lstlisting}
 
 \desc{Construct the exact (infinite precision) $p$-adic value representing the
@@ -5606,16 +5597,17 @@ Here are some examples of constructing $p$-adics.
 
 \begin{lstlisting}
 R = PadicNumbers(7)
+S = PadicNumbers(ZZ(65537))
 
 a = R()
 b = R(1)
 c = R(ZZ(123))
 
-d = 1 + 2*7 + 4*7^2 + O(7^3)
-e = 13 + 357*ZZ(65537) + O(ZZ(65537)^12)
+d = 1 + 2*7 + 4*7^2 + O(R, 7^3)
+e = 13 + 357*ZZ(65537) + O(S, ZZ(65537)^12)
 \end{lstlisting}
 
-Beware that the expression \code{1 + 2*p + 3*p^2 + O(p^n)} is actually computed as
+Beware that the expression \code{1 + 2*p + 3*p^2 + O(R, p^n)} is actually computed as
 a normal Julia expression. Therefore if \code{Int} values are used instead of
 \code{ZZ}'s, overflow may result in evaluating the value.
 
@@ -5633,7 +5625,7 @@ precision{S}(a::Padic{S})
 \end{lstlisting}
 
 \desc{Return the precision of the given $p$-adic value, e.g. the precision of
-\code{1 + 7 + 2*7^2 + O(7^3)} is $3$. The precision is meaningless for an
+$1 + 7 + 2*7^2 + O(7^3)$ is $3$. The precision is meaningless for an
 exact value.}
 
 \begin{lstlisting}
@@ -5684,8 +5676,8 @@ Here are some examples of basic manipulations of $p$-adics.
 \begin{lstlisting}
 R = PadicNumbers(7)
 
-a = 1 + 2*7 + 4*7^2 + O(7^3)
-b = 7^2 + 3*7^3 + O(7^5)
+a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
+b = 7^2 + 3*7^3 + O(R, 7^5)
 c = R(2)
 
 d = one(R)
@@ -5715,7 +5707,7 @@ Here are some examples of unary operators.
 \begin{lstlisting}
 R = PadicNumbers(7)
 
-a = 1 + 2*7 + 4*7^2 + O(7^3)
+a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 b = R(0)
 
 c = -a
@@ -5753,9 +5745,9 @@ Here are some examples of binary operators for $p$-adics.
 \begin{lstlisting}
 R = PadicNumbers(7)
 
-a = 1 + 2*7 + 4*7^2 + O(7^3)
-b = 7^2 + 3*7^3 + O(7^5)
-c = O(7^3)
+a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
+b = 7^2 + 3*7^3 + O(R, 7^5)
+c = O(R, 7^3)
 d = R(2)
 
 f = a + b
@@ -5822,9 +5814,9 @@ Here are some examples of ad hoc binary operators.
 \begin{lstlisting}
 R = PadicNumbers(7)
 
-a = 1 + 2*7 + 4*7^2 + O(7^3)
-b = 7^2 + 3*7^3 + O(7^5)
-c = O(7^3)
+a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
+b = 7^2 + 3*7^3 + O(R, 7^5)
+c = O(R, 7^3)
 d = R(2)
 
 f = a + 2
@@ -5857,12 +5849,12 @@ Here are some examples of comparison.
 \begin{lstlisting}
 R = PadicNumbers(7)
 
-a = 1 + 2*7 + 4*7^2 + O(7^3)
-b = 3*7^3 + O(7^5)
-c = O(7^3)
+a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
+b = 3*7^3 + O(R, 7^5)
+c = O(R, 7^3)
 d = R(2)
 
-a == 1 + 2*7 + O(7^2)
+a == 1 + 2*7 + O(R, 7^2)
 b == c
 c == R(0)
 d == R(2)
@@ -5897,8 +5889,8 @@ Here are some examples of ad hoc comparison.
 \begin{lstlisting}
 R = PadicNumbers(7)
 
-a = 1 + O(7^3)
-b = O(7^5)
+a = 1 + O(R, 7^3)
+b = O(R, 7^5)
 c = R(2)
 
 a == 1
@@ -5926,8 +5918,8 @@ Here are some examples of powering.
 \begin{lstlisting}
 R = PadicNumbers(7)
 
-a = 1 + 7 + 2*7^2 + O(7^3)
-b = O(7^5)
+a = 1 + 7 + 2*7^2 + O(R, 7^3)
+b = O(R, 7^5)
 c = R(2)
 
 d = a^5
@@ -5953,10 +5945,10 @@ Here are some examples of exact division.
 \begin{lstlisting}
 R = PadicNumbers(7)
 
-a = 1 + 7 + 2*7^2 + O(7^3)
-b = 2 + 3*7 + O(7^5)
-c = 7^2 + 2*7^3 + O(7^4)
-d = 7 + 2*7^2 + O(7^5)
+a = 1 + 7 + 2*7^2 + O(R, 7^3)
+b = 2 + 3*7 + O(R, 7^5)
+c = 7^2 + 2*7^3 + O(R, 7^4)
+d = 7 + 2*7^2 + O(R, 7^5)
 
 f = divexact(a, b)
 g = divexact(c, d)
@@ -5981,10 +5973,10 @@ Here are some examples of inversion.
 \begin{lstlisting}
 R = PadicNumbers(7)
 
-a = 1 + 7 + 2*7^2 + O(7^3)
-b = 2 + 3*7 + O(7^5)
-c = 7^2 + 2*7^3 + O(7^4)
-d = 7 + 2*7^2 + O(7^5)
+a = 1 + 7 + 2*7^2 + O(R, 7^3)
+b = 2 + 3*7 + O(R, 7^5)
+c = 7^2 + 2*7^3 + O(R, 7^4)
+d = 7 + 2*7^2 + O(R, 7^5)
 
 f = inv(a)
 g = inv(b)
@@ -6011,9 +6003,9 @@ Here are some examples of taking a $p$-adic square root.
 \begin{lstlisting}
 R = PadicNumbers(7)
 
-a = 1 + 7 + 2*7^2 + O(7^3)
-b = 2 + 3*7 + O(7^5)
-c = 7^2 + 2*7^3 + O(7^4)
+a = 1 + 7 + 2*7^2 + O(R, 7^3)
+b = 2 + 3*7 + O(R, 7^5)
+c = 7^2 + 2*7^3 + O(R, 7^4)
 
 d = sqrt(a)
 f = sqrt(b)
@@ -6058,9 +6050,9 @@ Here are some examples of special functions.
 \begin{lstlisting}
 R = PadicNumbers(7)
 
-a = 1 + 7 + 2*7^2 + O(7^3)
-b = 2 + 5*7 + 3*7^2 + O(7^3)
-c = 3*7 + 2*7^2 + O(7^5)
+a = 1 + 7 + 2*7^2 + O(R, 7^3)
+b = 2 + 5*7 + 3*7^2 + O(R, 7^3)
+c = 3*7 + 2*7^2 + O(R, 7^5)
 
 c = exp(c)
 d = log(a)
