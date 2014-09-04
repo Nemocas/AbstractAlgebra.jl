@@ -95,9 +95,8 @@ function O{S}(::Type{Padic{S}}, n::QQ)
       return d
    else
      p = prime(Padic{S})
-     s, r = remove(m, p) 
-     d.N = -s
-     r != 1 && error("Not a power of p in p-adic O()")
+     d.N = -flog(m, p) 
+     p^-d.N != m && error("Not a power of p in p-adic O()")
    end
    return d
 end
@@ -112,8 +111,8 @@ function O{S}(::Type{Padic{S}}, n::ZZ)
       return d
    else
      p = prime(Padic{S})
-     d.N, r = remove(n, p) 
-     r != 1 && error("Not a power of p in p-adic O()")
+     d.N = flog(n, p) 
+     p^d.N != n && error("Not a power of p in p-adic O()")
    end
    return d
 end
