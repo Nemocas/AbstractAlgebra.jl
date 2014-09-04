@@ -61,30 +61,29 @@ function _Padic_clear_fn{S}(a :: Padic{S})
    ccall((:padic_clear, :libflint), Void, (Ptr{Padic{S}},), &a)
 end
 
-function O(n::ZZ)
+function O{S}(::Type{Padic{S}}, n::ZZ)
    n <= 0 && throw(DomainError())
-   n == 1 && error("O(p^0) cannot be constructed")
-   if isprime(n)
-      S = symbol("padic$(string(ZZ(n)))")
-      d = Padic{S}()
+   d = Padic{S}()
+   if n == 1
+      d.N = 0
+   elseif isprime(n)
       d.N = 1
-      eval(:($S = $padic_ctx($n)))
       return d
-   end
-   for N = 2:nbits(n) + 1
-      r = root(n, N)
-      if r^N == n && isprime(r)
-         S = symbol("padic$(string(ZZ(r)))")
-         d = Padic{S}()
-         d.N = N
-         eval(:($S = $padic_ctx($r)))
-         return d
+   else
+      foundbase = false
+      for N = 2:nbits(n) + 1
+         r = root(n, N)
+         if r^N == n && isprime(r)
+            d.N = N
+            foundbase = true
+         end
       end
+      !foundbase && error("Unable to determine prime base in O(p^n)")
    end
-   error("Unable to determine prime base in O(p^n)")
+   return d
 end
 
-O(n::Int) = O(ZZ(n))
+O{S}(::Type{Padic{S}}, n::Int) = O(Padic{S}, ZZ(n))
 
 ###########################################################################################
 #
@@ -610,7 +609,7 @@ promote_rule{S}(::Type{Padic{S}}, ::Type{ZZ}) = Padic{S}
 
 function PadicNumbers(p::ZZ)
    !isprime(p) && error("Prime base required in PadiCNumberField")
-   S = symbol("padic$(string(ZZ(p)))")
+   S = gensym("padic")
    R = Padic{S}
    eval(:($S = $padic_ctx($p)))
    return R
