@@ -554,6 +554,8 @@ function *{S}(x::Padic{S}, y::QQ)
    return z
 end
 
+*{S}(x::QQ, y::Padic{S}) = y*x
+
 function *{S}(x::Padic{S}, y::ZZ)
    if sign(y) < 0
       return -(x*(-y))
@@ -700,6 +702,32 @@ function divexact{S}(a::Padic{S}, b::Padic{S})
    ccall((:padic_div, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &b, &eval(:($S)))
    return z
 end
+
+/{S}(a::Padic{S}, b::Padic{S}) = divexact(a, b)
+
+divexact{S}(a::Padic{S}, b::Int) = a*(ZZ(1)/ZZ(b))
+
+divexact{S}(a::Padic{S}, b::ZZ) = a*(1/b)
+
+divexact{S}(a::Padic{S}, b::QQ) = a*inv(b)
+
+/{S}(a::Padic{S}, b::Int) = divexact(a, ZZ(b))
+
+/{S}(a::Padic{S}, b::ZZ) = divexact(a, b)
+
+/{S}(a::Padic{S}, b::QQ) = divexact(a, b)
+
+divexact{S}(a::Int, b::Padic{S}) = ZZ(a)*inv(b)
+
+divexact{S}(a::ZZ, b::Padic{S}) = inv((ZZ(1)/a)*b)
+
+divexact{S}(a::QQ, b::Padic{S}) = inv(inv(a)*b)
+
+/{S}(a::Int, b::Padic{S}) = divexact(ZZ(a), b)
+
+/{S}(a::ZZ, b::Padic{S}) = divexact(a, b)
+
+/{S}(a::QQ, b::Padic{S}) = divexact(a, b)
 
 ###########################################################################################
 #
