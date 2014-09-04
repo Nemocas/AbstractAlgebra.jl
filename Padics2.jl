@@ -66,19 +66,13 @@ function O{S}(::Type{Padic{S}}, n::ZZ)
    d = Padic{S}()
    if n == 1
       d.N = 0
-   elseif isprime(n)
+   elseif n == prime(Padic{S})
       d.N = 1
       return d
    else
-      foundbase = false
-      for N = 2:nbits(n) + 1
-         r = root(n, N)
-         if r^N == n && isprime(r)
-            d.N = N
-            foundbase = true
-         end
-      end
-      !foundbase && error("Unable to determine prime base in O(p^n)")
+     p = prime(Padic{S})
+     d.N, r = remove(n, p) 
+     r != 1 && error("Not a power of p in p-adic O()")
    end
    return d
 end
