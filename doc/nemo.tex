@@ -5549,7 +5549,7 @@ g = pth_root(a)
 
 We define a parametric type \code{Padic} to contain elements of the $p$-adic
 numbers in Nemo. As usual, the user need not know the details of the type, as
-we define a function \code{PadicNumbers} for constructing it.
+we define a function \code{PadicField} for constructing it.
 
 We describe here the internals of the \code{Padic} type, but the reader may
 skip ahead to the section on constructors if so desired.
@@ -5605,8 +5605,8 @@ We provide the following simple function for creating the type of the $p$-adic
 numbers.
 
 \begin{lstlisting}
-PadicNumbers(p::Int)
-PadicNumbers(p::ZZ)
+PadicField(p::Int)
+PadicField(p::ZZ)
 \end{lstlisting}
 
 \desc{This function returns a type corresponding to the $p$-adic numbers for
@@ -5663,8 +5663,8 @@ denominator of $a$ is not a power of $p$.}
 Here are some examples of constructing $p$-adics.
 
 \begin{lstlisting}
-R = PadicNumbers(7)
-S = PadicNumbers(ZZ(65537))
+R = PadicField(7)
+S = PadicField(ZZ(65537))
 
 a = R()
 b = R(1)
@@ -5746,7 +5746,7 @@ identity, i.e. exact $1$, otherwise return \code{false}.}
 Here are some examples of basic manipulations of $p$-adics.
 
 \begin{lstlisting}
-R = PadicNumbers(7)
+R = PadicField(7)
 
 a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 b = 7^2 + 3*7^3 + O(R, 7^5)
@@ -5777,7 +5777,7 @@ In this case an exception is raised.}
 Here are some examples of unary operators.
 
 \begin{lstlisting}
-R = PadicNumbers(7)
+R = PadicField(7)
 
 a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 b = R(0)
@@ -5815,7 +5815,7 @@ precision$(y)$ and precision$(x) +$ valuation$(y)$.}
 Here are some examples of binary operators for $p$-adics.
 
 \begin{lstlisting}
-R = PadicNumbers(7)
+R = PadicField(7)
 
 a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 b = 7^2 + 3*7^3 + O(R, 7^5)
@@ -5890,7 +5890,7 @@ exception results.}
 Here are some examples of ad hoc binary operators.
 
 \begin{lstlisting}
-R = PadicNumbers(7)
+R = PadicField(7)
 
 a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 b = 7^2 + 3*7^3 + O(R, 7^5)
@@ -5928,7 +5928,7 @@ Julia automatically supplies a corresponding \code{!=} operator.
 Here are some examples of comparison.
 
 \begin{lstlisting}
-R = PadicNumbers(7)
+R = PadicField(7)
 
 a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 b = 3*7^3 + O(R, 7^5)
@@ -5970,7 +5970,7 @@ value $b$ up to the precision of $b$, otherwise return \code{false}.}
 Here are some examples of ad hoc comparison.
 
 \begin{lstlisting}
-R = PadicNumbers(7)
+R = PadicField(7)
 
 a = 1 + O(R, 7^3)
 b = O(R, 7^5)
@@ -6000,7 +6000,7 @@ representable. In such cases an exception is raised.}
 Here are some examples of powering.
 
 \begin{lstlisting}
-R = PadicNumbers(7)
+R = PadicField(7)
 
 a = 1 + 7 + 2*7^2 + O(R, 7^3)
 b = O(R, 7^5)
@@ -6055,7 +6055,7 @@ is thrown.}
 Here are some examples of exact division.
 
 \begin{lstlisting}
-R = PadicNumbers(7)
+R = PadicField(7)
 
 a = 1 + 7 + 2*7^2 + O(R, 7^3)
 b = 2 + 3*7 + O(R, 7^5)
@@ -6090,7 +6090,7 @@ exception is thrown.}
 Here are some examples of inversion.
 
 \begin{lstlisting}
-R = PadicNumbers(7)
+R = PadicField(7)
 
 a = 1 + 7 + 2*7^2 + O(R, 7^3)
 b = 2 + 3*7 + O(R, 7^5)
@@ -6120,7 +6120,7 @@ exception is thrown.}
 Here are some examples of taking a $p$-adic square root.
 
 \begin{lstlisting}
-R = PadicNumbers(7)
+R = PadicField(7)
 
 a = 1 + 7 + 2*7^2 + O(R, 7^3)
 b = 2 + 3*7 + O(R, 7^5)
@@ -6167,7 +6167,7 @@ exception is thrown.}
 Here are some examples of special functions.
 
 \begin{lstlisting}
-R = PadicNumbers(7)
+R = PadicField(7)
 
 a = 1 + 7 + 2*7^2 + O(R, 7^3)
 b = 2 + 5*7 + 3*7^2 + O(R, 7^3)

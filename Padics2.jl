@@ -8,7 +8,7 @@ import Rings: O, valuation
 
 import Base: sqrt, exp, log
 
-export O, PadicNumbers, Padic, valuation, prime, precision, isexact, sqrt, exp, log,
+export O, PadicField, Padic, valuation, prime, precision, isexact, sqrt, exp, log,
        teichmuller
 
 ###########################################################################################
@@ -839,11 +839,11 @@ promote_rule{S}(::Type{Padic{S}}, ::Type{QQ}) = Padic{S}
 
 ###########################################################################################
 #
-#   PadicNumbers constructor
+#   PadicField constructor
 #
 ###########################################################################################
 
-function PadicNumbers(p::ZZ)
+function PadicField(p::ZZ)
    !isprime(p) && error("Prime base required in PadiCNumberField")
    S = gensym("padic")
    R = Padic{S}
@@ -851,4 +851,4 @@ function PadicNumbers(p::ZZ)
    return R
 end
 
-PadicNumbers(p::Int) = PadicNumbers(ZZ(p))
+PadicField(p::Int) = PadicField(ZZ(p))
