@@ -1,0 +1,80 @@
+General
+-------
+
+* Implement isequal for strict equality, e.g. isequal(1+O(x), 1+O(x^2)) == false
+
+* Add test code
+
+* change names of shift_left/right
+
+* add deepcopy methods
+
+* fix issues with stack overflow on nonexistent operators
+
+* work out how to add /(a::Poly{T}, a::T) methods, etc, without conflicts
+
+* implement type stable division which doesn't assume exactness
+
+Poly.jl
+-------
+
+* Fix printing of monomials, e.g. y + (x), y + (6)
+
+* Fix efficiently powering of x in flint specialised polynomials cases
+
+* function to convert poly to array
+
+* make special arithmetic polynomial functions take a variable, not a type, so they can be used with generators of other poly rings
+
+* check flint pseudodivision really returns a result with the power of L as defined in the nemo docs
+
+* check the resultant and bezout functions for flint polys work correctly for nonmonic polys
+
+* correct description of bezout for nonmonic polys
+
+* Should mod be defined for polys over ZZ where the divisor is monic?
+
+* implement fmpz_mod_poly_get_str_pretty and use it in show
+
+ZZ.jl
+-----
+
+* defining % automatically defines rem, so remove one from ZZ
+
+Residue.jl
+----------
+
+* Make powering do its own powmod
+
+* implement divexact by an invertible integer, etc
+
+FLINT
+-----
+
+* fix printing of parentheses in polys over finite fields
+
+* fix issue with dll production on Windows
+
+* document and test fq_poly_scalar_div_fq
+
+* add fq_poly_scalar_div_ui/si/fmpz
+
+* implement print_pretty_series (reverse order of coeffs)
+
+* suppress printing of 1 coeffs in fmpq_poly_print_pretty
+
+* fmpq_poly_inv_series can be faster than Sage's power series inversion
+
+* fix isprime bug
+
+* document and test set_exact_fmpz, add_exact, mul_exact, sub_exact, inv_exact, div_exact, sqrt_exact, pow_exact_si, div_exact_fmpz
+
+PowerSeries.jl
+--------------
+
+* allow division by power series with non-invertible leading coeff if division
+can still be performed
+
+* ensure exp is only defined for rings in which division by an integer is
+possible
+
