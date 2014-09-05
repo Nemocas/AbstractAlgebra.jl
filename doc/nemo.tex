@@ -201,7 +201,8 @@ dynamically typed language and the performance of statically typed languages.
 Julia offers an interactive console, similar to Python. It can also be used from IJulia, which
 is an IPython derivative, even on the web, via the IPython notebook!
 
-The Julia console uses readline and offers an online help system.
+Julia has a console which provides Readline like functionality and offers an online help 
+system.
 
 Most importantly, Julia offers Jit compiled code at the console! You don't have to precompile
 Julia statically to get C-like performance. What you type at the console executes at lightning
@@ -216,7 +217,7 @@ metaprogramming features.
 \subsubsection{Foreign function interface}
 
 Julia allows direct access to C libraries (and just recently, C++ libraries). This includes
-full access to C structs and arrays.
+access to C structs and arrays.
 
 There is a simple mapping from C types to Julia types, and wrappers do not need to be written.
 Any native dynamic library (such as flint) can be directly accessed from within Julia, so long
@@ -473,7 +474,7 @@ The only sensible solution for Nemo (not for Julia) is to make all constant inte
 and require an annotation if a machine word is required. Of course this will be irritating when dealing 
 with array indices and ranges.
 
-In Julia 0.3 the problem has reportedly been compounded by making everything larger than two machine
+In Julia 0.3 the problem has been compounded by making everything larger than two machine
 words a bigint. This leads to an inconsistent semantics for integer literals.
 
 It is possible to modify the Julia parser to deal with this issue, and someone has already indicated
@@ -494,10 +495,13 @@ This creates a new type which depends on a type \code{R} which is a \code{Ring},
 be the integers or a polynomial ring. The new type, called \code{mytype}, contains two fields: one is
 of type \code{R} , the other a machine integer.
 
-The useful thing about this syntax is that the type \code{R}  has a name, which we can use as a handle for
-it, namely \code{R} and it is restricted to a type class (in this case \code{Ring}). We can use that name 
-within the type definition itself, and also use it in any constructors we specify for the type. And when
-the user tries to use the type, they can only instantiate it if \code{R} is a \code{Ring}.
+The useful thing about this syntax is that the type parameter \code{R} provides us with a handle which
+we can use within the type definition itself to refer to it. We can also use it in any constructors we
+specify for the type. 
+
+The other useful feature is that when the user tries to use the type, they can only instantiate it if 
+\code{R} belongs to the \code{Ring} typeclass. This gives us control over which types are allowed and
+which are not.
 
 But things are different if we want the type to depend on an integer value or a symbol.
 
@@ -508,29 +512,32 @@ type mytype{R <: Ring, S}
 end
 \end{lstlisting}
 
-Now the type has two parameters. One is a type \code{R}, which is a \code{Ring}. The other, \code{S}, 
-could be a \code{Symbol} for example. 
+Now the type has two parameters. One is a type \code{R}, which is a \code{Ring}, as before. The other,
+\code{S}, could be a \code{Symbol} for example, but could really be anything, as we have not 
+constrained it to a typeclass.
 
-One immediate problem is that in Julia there is currently no way to restrict \code{S} to be a 
-\code{Symbol}. You could have a nonsense type like \code|mytype{ZZ, Poly}|. The code would not
-operate, since none of the code using values of type \code{mytype} seriously expects \code{S} to be
-a polynomial. It expects a symbol. 
+The most obvious problem is that in Julia there is currently no way to restrict \code{S} to be a 
+\code{Symbol}. In fact, there is nothing stopping the user supplying a nonsense type like 
+\code|mytype{ZZ, Poly}| for \code{S}. The code would of course not operate as expected, since none of
+the code using values of type \code{mytype} seriously expects \code{S} to be a polynomial. It expects
+a symbol. 
 
 There is also a problem when we are defining methods whose signatures don't depend on that
 \code{Symbol}. It seems that Julia won't even allow that type parameter to be mentioned in that case,
 unless you are writing an inner constructor. That's a problem if you are trying to write a constructor
 which takes a parameter of one parameterised type and trying to construct from it a value of another
 parameterised type, e.g. you are trying to construct a value of the type given above from an array of
-values whose types don't depend on \code{R} and \code{S}.
+values whose type doesn't depend on \code{R} or \code{S}.
 
 You can't use an outer constructor because the \code{R} and \code{S} can't be mentioned if they don't
 appear in the types for the parameters you are passing. And you can't use an inner constructor because
 currently Julia seems to ignore inner constructors that depend on additional parameters that the type 
 you are constructing doesn't depend on.
 
-To work around this, one literally has to use type introspection, and undocumented runtime type 
+To work around this, one either has to use type introspection, and undocumented runtime type 
 deconstruction from a more general inner constructor (if possible) and do different things depending
-on the type parameters you find.
+on the type parameters you find at runtime, or implement a weird mix of inner and outer constructors
+that bounce around between each other to satisfy all the rules.
 
 Two simple things would fix these problems.
 
@@ -542,10 +549,6 @@ allowed for inner constructors that aren't parameters for the type being constru
 constructors should not be ignored). It's not clear how the latter would work, since there are two sets 
 of type parameters here, the type parameters for the type being constructed, and the type parameters for
 the arguments of the constructor. The two need to be separated somehow. 
-
-For all I know, this problem is already fixed in the latest unstable release of Julia (soon to be stable).
-The Julia authors must surely have hit this themselves, unless there's something I don't understand
-about the Julia type system.
 
 \subsubsection{Supertypes of core types}
 
@@ -571,14 +574,72 @@ and the \code{div} function treats even the rationals as a model of the reals, s
 always returns the exact value $a/b$ (in the mathematical sense), truncated to the nearest whole
 number in the direction of zero.
 
-In particular, the \code{div} operator does not perform Euclidean division for rationals as it does
-for the integers (the field of rationals is trivially a Euclidean domain). A similar observation holds
-for \code{div} over the floating point numbers. (Actually, ironically, Julia uses Euclid's original
-definition of Euclidean division, even though that is not what happens in a Euclidean domain.)
+Actually, the \code{div} operator implements division according to Euclid's original definition of
+Euclidean division. But this is not what actually happens in a Euclidean domain. Some computer algebra
+systems actually use this original definition, but it makes it hard to offer a consistent semantics
+with regard to functions that expect to be able to apply the commutative algebra definition of Euclidean
+division if the inputs belong to a Euclidean domain (e.g. any field is trivially a Euclidean domain).
 
 The upshot of this is that Julia needs an algebraic number stack to replace the current numeric one.
 
-Fortunately, this is fairly easy to do in Julia, though it will take a substantial effort to implement. 
+Fortunately, this is made quite possible by Julia, but there is rather a lot of code to write and so
+this will take a substantial effort to implement. 
+
+\subsubsection{C structs}
+
+Julia does support converting Julia types to C (struct based) objects for easy foreign function
+interface. This is also highly efficient.
+
+However, there is no equivalent in Julia of a C struct proper. This means that in C libraries that
+include structs inside other structs (rather than pointers to such structs), the matching Julia types
+need to be written out in full, expanding out all the various structs within structs that occur in
+the interface. This can be tedious and looks extremely ugly.
+
+The lack of a struct type (as opposed to an object, or pointer to a struct) is also at the heart of
+the bignum performance issue mentioned above. Back in 2011 the Julia developers fully intended to
+introduce a C struct type which would be like an immutable type in Julia, but without being actually
+immutable. This was a correct direction, and I hope that they will revisit it in a coming version of
+Julia.
+
+That is not to say that implementing such a type is trivial. There are very complex C++ style
+semantics that come along with such types, including the ability to pass them by reference or value.
+
+Perhaps the Julia developers will come up with an even better way to do things. However, at this
+stage, I consider this to be the most important thing missing from Julia, for my purposes.
+
+\subsubsection{Multiple inheritance}
+
+The abstract type hierarchy in Julia is one of its best features. It really makes the language
+flexible and powerful.
+
+However, at present it is only possible for a given type to belong to one abstract type.
+
+This can be quite restricting. For example, consider a system in which you have the abstract types
+
+\begin{lstlisting}
+Field <: EuclideanDomain <: IntegralDomain <: CommutativeRing <: Ring
+\end{lstlisting}
+
+At some point you realise that some algorithms for Euclidean domains also work for rings that are
+not integral domains, so long as they support a Euclidean structure. You would make these types
+belong to \code{EuclideanRing <: CommutativeRing}. 
+
+The problem is, every Euclidean domain is a Euclidean ring, but not every integral domain is.
+
+At present, there is no way to denote this in the Julia type hierarchy.
+
+Another example comes from algorithms that work for rings where elements have exact
+representations like the integers or polynomials over the integers or rationals, but not for rings
+which don't, such as power series, $p$-adics, real numbers, complex numbers, etc.
+
+There's no way to introduce an \code{ExactRing} and \code{InexactRing} into the type hierarchy
+and still have types belong to one of the existing type classes (such as \code{IntegralDomain})
+and also belong to one or other of the new abstract types \code{ExactRing} or \code{InexactRing}.
+
+I understand that this is roughly equivalent to Julia being single inheritance, rather than
+multiple inheritance.
+
+I simply don't know how technically involved it would be to address this issue in Julia. 
 
 \subsubsection{A trivial complaint}
 
@@ -711,6 +772,8 @@ end
 We note that \code{if} statements are also expressions if the final line of each block is an expression.
 This allows a more functional style of programming.
 
+There are two main loop constructs in Julia. The first is the familiar \code{while} construct.
+
 \begin{lstlisting}
 while i < 10
    println(i)
@@ -719,7 +782,7 @@ end
 
 I'm not aware of any \code{do...while} like construct in Julia. This is an unfortunate omission.
 
-One can use the keyword \code{break} to break from a loop.
+The second loop construct in Julia is the \code{for} loop.
 
 \begin{lstlisting}
 for i = 1:5
@@ -737,6 +800,9 @@ end
 
 This last form can be used with any iterable container. The particular container in the example is
 of course a 3-element array.
+
+One can use the keyword \code{break} to break from a loop and \code{continue} to skip to the next
+loop iteration in Julia.
 
 \subsection{Arrays}
 
