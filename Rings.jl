@@ -156,4 +156,6 @@ include("Poly.jl")
 
 include("PowerSeries.jl")
 
+include("Rings-test.jl")
+
 end # module
