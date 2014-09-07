@@ -494,7 +494,7 @@ function %(x::ZZ, c::Int)
    return sign(x) < 0 ? -r : r
 end
 
-rem(x::ZZ, c::Int) = %(X, C)
+rem(x::ZZ, c::Int) = %(x, c)
 
 function tdivpow2(x::ZZ, c::Int)
     c < 0 && throw(DomainError())

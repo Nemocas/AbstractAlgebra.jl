@@ -1,4 +1,4 @@
-function test_constructors()
+function test_poly_constructors()
    print("Poly.constructors...")
  
    R, x = PolynomialRing(ZZ, "x")
@@ -46,7 +46,7 @@ function test_constructors()
    println("PASS")
 end
 
-function test_manipulation()
+function test_poly_manipulation()
    print("Poly.manipulation...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -75,7 +75,7 @@ function test_manipulation()
    println("PASS")
 end
 
-function test_binary_ops()
+function test_poly_binary_ops()
    print("Poly.binary_ops...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -100,7 +100,7 @@ function test_binary_ops()
    println("PASS")
 end
 
-function test_adhoc_binary()
+function test_poly_adhoc_binary()
    print("Poly.adhoc_binary...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -123,7 +123,7 @@ function test_adhoc_binary()
    println("PASS")
 end
 
-function test_comparison()
+function test_poly_comparison()
    print("Poly.comparison...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -142,7 +142,7 @@ function test_comparison()
    println("PASS")
 end
 
-function test_adhoc_comparison()
+function test_poly_adhoc_comparison()
    print("Poly.adhoc_comparison...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -157,7 +157,7 @@ function test_adhoc_comparison()
    println("PASS")
 end
 
-function test_unary_ops()
+function test_poly_unary_ops()
    print("Poly.unary_ops...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -174,7 +174,7 @@ function test_unary_ops()
    println("PASS")
 end
 
-function test_truncation()
+function test_poly_truncation()
    print("Poly.truncation...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -197,7 +197,7 @@ function test_truncation()
    println("PASS")
 end
 
-function test_reverse()
+function test_poly_reverse()
    print("Poly.reverse...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -214,7 +214,7 @@ function test_reverse()
    println("PASS")
 end
 
-function test_shift()
+function test_poly_shift()
    print("Poly.shift...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -235,7 +235,7 @@ function test_shift()
    println("PASS")
 end
 
-function test_powering()
+function test_poly_powering()
    print("Poly.powering...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -252,7 +252,7 @@ function test_powering()
    println("PASS")
 end
 
-function test_modular_arithmetic()
+function test_poly_modular_arithmetic()
    print("Poly.modular_arithmetic...")
 
    R = ResidueRing(ZZ, 487326487)
@@ -271,7 +271,7 @@ function test_modular_arithmetic()
    println("PASS")
 end
 
-function test_exact_division()
+function test_poly_exact_division()
    print("Poly.exact_division...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -296,7 +296,7 @@ function test_exact_division()
    println("PASS")
 end
 
-function test_euclidean_division()
+function test_poly_euclidean_division()
    print("Poly.euclidean_division...")
 
    R = ResidueRing(ZZ, 7)
@@ -322,7 +322,7 @@ function test_euclidean_division()
    println("PASS")
 end
 
-function test_pseudodivision()
+function test_poly_pseudodivision()
    print("Poly.pseudodivision...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -345,7 +345,7 @@ function test_pseudodivision()
    println("PASS")
 end
 
-function test_content_primpart_gcd()
+function test_poly_content_primpart_gcd()
    print("Poly.content_primpart_gcd...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -386,7 +386,7 @@ function test_content_primpart_gcd()
    println("PASS")
 end
 
-function test_evaluation()
+function test_poly_evaluation()
    print("Poly.evaluation...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -407,7 +407,7 @@ function test_evaluation()
    println("PASS")
 end
 
-function test_composition()
+function test_poly_composition()
    print("Poly.composition...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -426,7 +426,7 @@ function test_composition()
    println("PASS")
 end
 
-function test_derivative()
+function test_poly_derivative()
    print("Poly.derivative...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -443,7 +443,7 @@ function test_derivative()
    println("PASS")
 end
 
-function test_integral()
+function test_poly_integral()
    print("Poly.integral...")
 
    R = ResidueRing(ZZ, 7)
@@ -456,7 +456,7 @@ function test_integral()
    println("PASS")
 end
 
-function test_resultant()
+function test_poly_resultant()
    print("Poly.resultant...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -475,7 +475,7 @@ function test_resultant()
    println("PASS")
 end
 
-function test_discriminant()
+function test_poly_discriminant()
    print("Poly.discriminant...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -492,7 +492,7 @@ function test_discriminant()
    println("PASS")
 end
 
-function test_bezout()
+function test_poly_bezout()
    print("Poly.bezout...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -511,7 +511,7 @@ function test_bezout()
    println("PASS")
 end
 
-function test_special()
+function test_poly_special()
    print("Poly.special...")
 
    R, x = PolynomialRing(ZZ, "x")
@@ -534,28 +534,30 @@ function test_special()
 end
 
 function test_poly()
-   test_constructors()
-   test_manipulation()
-   test_binary_ops()
-   test_adhoc_binary()
-   test_comparison()
-   test_adhoc_comparison()
-   test_unary_ops()
-   test_truncation()
-   test_reverse()
-   test_shift()
-   test_powering()
-   test_modular_arithmetic()
-   test_exact_division()
-   test_euclidean_division()
-   test_pseudodivision()
-   test_content_primpart_gcd()
-   test_evaluation()
-   test_composition()
-   test_derivative()
-   test_integral()
-   test_resultant()
-   test_discriminant()
-   test_bezout()
-   test_special()
+   test_poly_constructors()
+   test_poly_manipulation()
+   test_poly_binary_ops()
+   test_poly_adhoc_binary()
+   test_poly_comparison()
+   test_poly_adhoc_comparison()
+   test_poly_unary_ops()
+   test_poly_truncation()
+   test_poly_reverse()
+   test_poly_shift()
+   test_poly_powering()
+   test_poly_modular_arithmetic()
+   test_poly_exact_division()
+   test_poly_euclidean_division()
+   test_poly_pseudodivision()
+   test_poly_content_primpart_gcd()
+   test_poly_evaluation()
+   test_poly_composition()
+   test_poly_derivative()
+   test_poly_integral()
+   test_poly_resultant()
+   test_poly_discriminant()
+   test_poly_bezout()
+   test_poly_special()
+
+   println("")
 end
