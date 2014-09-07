@@ -10,9 +10,9 @@ export Poly, PolynomialRing, coeff, zero, one, gen, isgen, normalise, chebyshev_
        resultant, lead, discriminant, bezout, truncate, mullow, divrem, mulmod, powmod,
        invmod, canonical_unit, integral, lcm, reverse, shift_left, shift_right,
        fmpz_poly_struct, fmpz_mod_poly_struct, fq_poly_struct, fmpq_poly_struct,
-       iszero, isone, degree
+       iszero, isone, degree, convert, promote_rule
 
-import Base: convert, zero, show, length
+import Base: promote_rule, zero, show, length
 
 ###########################################################################################
 #
@@ -211,7 +211,7 @@ function show{T <: Ring, S}(io::IO, x::Poly{T, S})
             if i != 1 && !is_negative(c)
                print(io, "+")
             end
-            if c != 1 && (c != -1 || show_minus_one(typeof(c)))
+            if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
                if bracket
                   print(io, "(")
                end
@@ -1498,7 +1498,7 @@ end
 function content{S}(x::Poly{ZZ, S})
    z = ZZ()
    ccall((:fmpz_poly_content, :libflint), Void, 
-                (Ptr{ZZ}, Poly{ZZ, S}), 
+                (Ptr{ZZ}, Ptr{Poly}), 
                &z, &x)
    return z
 end
@@ -1765,7 +1765,7 @@ end
 function discriminant{S}(x::Poly{ZZ, S})
    z = ZZ()
    ccall((:fmpz_poly_discriminant, :libflint), Void, 
-                (Ptr{ZZ}, Poly{ZZ, S}), 
+                (Ptr{ZZ}, Ptr{Poly}), 
                &z, &x)
    return z
 end
@@ -1801,7 +1801,7 @@ function bezout{S}(x::Poly{ZZ, S}, y::Poly{ZZ, S})
    u = Poly{ZZ, S}()
    v = Poly{ZZ, S}()
    ccall((:fmpz_poly_xgcd_modular, :libflint), Void, 
-                (Ptr{ZZ}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Poly{ZZ, S}), 
+                (Ptr{ZZ}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}), 
                &z, &u, &v, &x, &y)
    return (z, u, v)
 end
@@ -2098,15 +2098,15 @@ function PolynomialRing{T <: Ring}(::Type{T}, s::String)
    
    # Conversions and promotions
 
-   Base.convert(::Type{T1}, x::T) = Poly(T1, [x])
-   Base.promote_rule(::Type{T1}, ::Type{T}) = T1
+   eval(:(Base.convert(::Type{$T1}, x::$T) = Poly($T1, [x])))
+   eval(:(Base.promote_rule(::Type{$T1}, ::Type{$T}) = $T1))
 
    P = T2.parameters
    while length(P) > 0
       T2 = P[1]
       if isa(T2, DataType) && T2 <: Ring
-         Base.convert(::Type{T1}, x::T2) = Poly(T1, [convert(T, x)])
-         Base.promote_rule(::Type{T1}, ::Type{T2}) = T1
+         eval(:(Base.convert(::Type{$T1}, x::$T2) = Poly($T1, [convert($T, x)])))
+         eval(:(Base.promote_rule(::Type{$T1}, ::Type{$T2}) = $T1))
          P = T2.parameters
       else
          break
@@ -2114,11 +2114,11 @@ function PolynomialRing{T <: Ring}(::Type{T}, s::String)
    end
 
    if T != ZZ
-      Base.convert(::Type{T1}, x::ZZ) = Poly(T1, [convert(T, x)])
-      Base.promote_rule(::Type{T1}, ::Type{ZZ}) = T1
+      eval(:(Base.convert(::Type{$T1}, x::ZZ) = Poly($T1, [convert($T, x)])))
+      eval(:(Base.promote_rule(::Type{$T1}, ::Type{ZZ}) = $T1))
    end
-   Base.convert(::Type{T1}, x::Integer) = Poly(T1, [convert(T, x)])
-   Base.promote_rule{R <: Integer}(::Type{T1}, ::Type{R}) = T1
+   eval(:(Base.convert(::Type{$T1}, x::Integer) = Poly($T1, [convert($T, x)])))
+   eval(:(Base.promote_rule{R <: Integer}(::Type{$T1}, ::Type{R}) = $T1))
 
    # (Type, gen) 
    return (Poly{T, S}, Poly(Poly{T, S}, [T(0), T(1)]))

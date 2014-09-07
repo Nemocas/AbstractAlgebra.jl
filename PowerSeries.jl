@@ -1319,23 +1319,23 @@ function PowerSeriesRing{T <: Ring}(::Type{T}, s::String)
    
    # Conversions and promotions
 
-   Base.convert(::Type{T1}, x::T) = PowerSeries(T1, [x], nothing)
-   Base.promote_rule(::Type{T1}, ::Type{T}) = T1
+   eval(:(Base.convert(::Type{$T1}, x::$T) = PowerSeries($T1, [x], nothing)))
+   eval(:(Base.promote_rule(::Type{$T1}, ::Type{$T}) = $T1))
 
    P = T2.parameters
    while length(P) > 0
       T2 = P[1]
       if isa(T2, DataType) && T2 <: Ring
-         Base.convert(::Type{T1}, x::T2) = PowerSeries(T1, [convert(T, x)], nothing)
-         Base.promote_rule(::Type{T1}, ::Type{T2}) = T1
+         eval(:(Base.convert(::Type{$T1}, x::$T2) = PowerSeries($T1, [convert($T, x)], nothing)))
+         eval(:(Base.promote_rule(::Type{$T1}, ::Type{$T2}) = $T1))
          P = T2.parameters
       else
          break
       end
    end
 
-   Base.convert(::Type{T1}, x::Integer) = PowerSeries(T1, [convert(T, x)], nothing)
-   Base.promote_rule{R <: Integer}(::Type{T1}, ::Type{R}) = T1
+   eval(:(Base.convert(::Type{$T1}, x::Integer) = PowerSeries($T1, [convert($T, x)], nothing)))
+   eval(:(Base.promote_rule{R <: Integer}(::Type{$T1}, ::Type{R}) = $T1))
 
    # (Type, gen) 
 
