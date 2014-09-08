@@ -93,6 +93,7 @@ end
 
 function Poly{M, S}(::Type{Poly{Residue{ZZ, M}, S}}, a :: Array{Residue{ZZ, M}, 1})
    z = Poly{Residue{ZZ, M}, S}(Poly)
+   finalizer(z, _fmpz_mod_poly_clear_fn)
    m = modulus(Residue{ZZ, M})
    ccall((:fmpz_mod_poly_init2, :libflint), Void, (Ptr{Poly}, Ptr{ZZ}, Int), &z, &m, length(a))
    for i = 1:length(a)
