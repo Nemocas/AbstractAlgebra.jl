@@ -76,6 +76,7 @@ end
 
 function PowerSeries{S}(::Type{PowerSeries{ZZ, S}}, a :: Array{ZZ, 1}, n::Precision)
    z = PowerSeries{ZZ, S}(PowerSeries, n)
+   finalizer(z, _fmpz_poly_clear_fn)
    ccall((:fmpz_poly_init2, :libflint), Void, (Ptr{PowerSeries}, Int), &z, length(a))
    for i = 1:length(a)
       ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, (Ptr{PowerSeries}, Int, Ptr{ZZ}),
@@ -86,6 +87,7 @@ end
 
 function PowerSeries{S, M}(::Type{PowerSeries{Residue{ZZ, M}, S}}, a :: Array{Residue{ZZ, M}, 1}, n::Precision)
    z = PowerSeries{Residue{ZZ, M}, S}(PowerSeries, n)
+   finalizer(z, _fmpz_mod_poly_clear_fn)
    ccall((:fmpz_mod_poly_init2, :libflint), Void, (Ptr{PowerSeries}, Ptr{ZZ}, Int), &z, &eval(:($M)), length(a))
    for i = 1:length(a)
       ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, (Ptr{PowerSeries}, Int, Ptr{ZZ}),
@@ -93,6 +95,15 @@ function PowerSeries{S, M}(::Type{PowerSeries{Residue{ZZ, M}, S}}, a :: Array{Re
    end
    return z
 end
+
+function _fmpz_poly_clear_fn{S}(a :: PowerSeries{ZZ, S})
+   ccall((:fmpz_poly_clear, :libflint), Void, (Ptr{PowerSeries},), &a)
+end
+   
+function _fmpz_mod_poly_clear_fn{M, S}(a :: PowerSeries{Residue{ZZ, M}, S})
+   ccall((:fmpz_mod_poly_clear, :libflint), Void, (Ptr{PowerSeries},), &a)
+end
+
 
 function O{T, S}(a :: PowerSeries{T, S})
    prec = length(a) - 1
