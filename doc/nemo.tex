@@ -1127,6 +1127,35 @@ To run nemo, just type
 The Julia prompt will appear. If everything went according to plan, you can now use 
 Julia, including all of the Nemo functionality described in the chapters below.
 
+\section{Running the test suite}
+
+Nemo comes equipped with a test suite. Each module defines a function which you can
+call to run the tests for that module.
+
+For example, for the \code{Rings} module, type
+
+\begin{lstlisting}
+using Rings
+
+Rings.Test.test_all()
+\end{lstlisting}
+
+For the \code{Fields} module, type
+
+\begin{lstlisting}
+using Fields
+
+Fields.Test.test_all()
+\end{lstlisting}
+
+The tests should only take a few seconds to a minute to run per module, depending on
+the speed of your machine. However, they will run faster on a second run due to not
+needing to be compiled by the Jit the second time.
+
+If you encounter bugs in Nemo, please report them to the flint-devel Google group.
+Note that Nemo currently requires the latest trunk version of flint from out GitHub
+repository, or flint-2.5 (when available).
+
 \section{The Rings module}
 
 Julia has a module system, and we use it to provide access to Nemo modules.
@@ -5949,7 +5978,7 @@ l = 2 + d
 m = d - ZZ(2)
 n = a + ZZ(1)/7^2
 p = (ZZ(12)/11)*b
-c = c*(ZZ(1)/7)
+q = c*(ZZ(1)/7)
 \end{lstlisting}
 
 \subsubsection{Comparison}
