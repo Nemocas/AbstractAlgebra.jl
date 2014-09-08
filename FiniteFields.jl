@@ -1,5 +1,5 @@
-export FiniteField, gen, characteristic, degree, order, convert, promote_rule, pth_root, trace, norm,
-       frobenius
+export FiniteField, FinFieldElem, gen, characteristic, degree, order, convert, promote_rule, pth_root, 
+       trace, norm, frobenius
 
 import Base: convert, promote_rule
 
