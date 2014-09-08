@@ -1084,6 +1084,18 @@ end
 
 =={T<: Ring, S}(x::ZZ, y::PowerSeries{T, S}) = y == x
 
+function isequal{T <: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
+   if x.prec != y.prec || length(x) != length(y)
+      return false
+   end
+   for i = 1:length(x)
+      if !isequal(coeff(x, i - 1), coeff(y, i - 1))
+         return false
+      end
+   end
+   return true
+end
+
 ###########################################################################################
 #
 #   Exact division

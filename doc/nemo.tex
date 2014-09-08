@@ -1557,6 +1557,12 @@ Note that all these comparisons yield a result of type \code{Bool}.
 There are also the following functions.
 
 \begin{lstlisting}
+isequal(x::ZZ, y::ZZ)
+\end{lstlisting}
+
+\desc{For \code{ZZ} this is just an alias for the \code{==} operator.}
+
+\begin{lstlisting}
 cmp(x::ZZ, y::ZZ)
 \end{lstlisting}
 
@@ -2396,6 +2402,14 @@ n = ZZ(5) - l
 \end{lstlisting}
 
 Julia automatically provides a \code{!=} operator.
+
+\begin{lstlisting}
+isequal(x::Poly{T, S}, y::Poly{T, S})
+\end{lstlisting}
+
+\desc{Returns \code{true} if \code{x == y} and if each coefficient of \code{x}
+matches the corresponding coefficient of \code{y} according to \code{isequal},
+when applied recursively, otherwise return \code{false}.}
 
 \textbf{Examples.}
 
@@ -3493,6 +3507,13 @@ otherwise return false.}
 
 Julia automatically defines a \code{!=} operator.
 
+\begin{lstlisting}
+isequal(x::Residue{T, S}, y::Residue{T, S})
+\end{lstlisting}
+
+\desc{Returns \code{true} if the residues (as elements of \code{T}) compare
+equal recursively according to \code{isequal}, otherwise return \code{false}.}
+
 \textbf{Examples.}
 
 Here are some examples of comparisons.
@@ -4037,6 +4058,15 @@ of the precisions of the two series, otherwise return \code{false}.}
 
 Julia automatically defines a corresponding \code{!=} operator.
 
+\begin{lstlisting}
+isequal(x::PowerSeries{T, S}, y::PowerSeries{T, S})
+\end{lstlisting}
+
+\desc{Returns \code{true} if the $x == y$, the precisions of $x$ and $y$ are
+the same and if each coefficient of $x$ recursively compares equal to the
+corresponding coefficient of $y$ according to \code{isequal}, otherwise return
+\code{false}.}
+
 \textbf{Examples.}
 
 Here are some examples of comparison.
@@ -4279,7 +4309,6 @@ R, x = PowerSeriesRing(QQ, "x")
 a = exp(x + O(x^40))
 b = divexact(x, exp(x + O(x^40)) - 1)
 \end{lstlisting}
-
 
 \section{The Fields module}
 
@@ -4578,6 +4607,14 @@ b = -((x + 1)/(-x^2 + 1))
 
 \desc{Return \code{true} if the fraction $x$ equals the fraction $y$, else
 return \code{false}.}
+
+\begin{lstlisting}
+isequal{T}(x::Fraction{T}, y::Fraction{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the numerators of \code{x} and \code{y} compare
+equal recursively according to \code{isequal} and similarly for the
+denominators, else return \code{false}.}
 
 \textbf{Examples.}
 
@@ -5431,6 +5468,13 @@ arithmetically equal, otherwise return \code{false}.}
 
 Julia automatically provides corresponding \code{!=} functionality.
 
+\begin{lstlisting}
+isequal{S}(a::FinFieldElem{S}, b::FinFieldElem{S})
+\end{lstlisting}
+
+\desc{For finite fields the \code{isequal} function is simply an alias for
+the \code{==} operator.}
+
 \textbf{Examples.}
 
 Here are some examples of comparison of finite field elements.
@@ -5921,6 +5965,13 @@ return \code{true} if they are equal to that precision, otherwise return
 \code{iszero}.}
 
 Julia automatically supplies a corresponding \code{!=} operator.
+
+\begin{lstlisting}
+isequal{S}(a::Padic{S}, b::Padic{S})
+\end{lstlisting}
+
+\desc{Return \code{true} if \code{a == b} and if they are either both exact or
+if the precisions are the same, otherwise return \code{false}.}
 
 \textbf{Examples.}
 

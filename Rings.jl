@@ -116,6 +116,8 @@ function =={S <: Integer, T <: Ring}(x::S, y::T)
    end
 end
 
+isequal{T <: Ring}(a::T, b::T) = a == b
+
 function divexact{S <: Ring, T <: Ring}(x::S, y::T) 
    T1 = promote_type(S, T)
    if S == T1 || T == T1

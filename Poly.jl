@@ -10,7 +10,7 @@ export Poly, PolynomialRing, coeff, zero, one, gen, isgen, normalise, chebyshev_
        resultant, lead, discriminant, bezout, truncate, mullow, divrem, mulmod, powmod,
        invmod, canonical_unit, integral, lcm, reverse, shift_left, shift_right,
        fmpz_poly_struct, fmpz_mod_poly_struct, fq_poly_struct, fmpq_poly_struct,
-       iszero, isone, degree, convert, promote_rule
+       iszero, isone, degree, convert, promote_rule, isequal
 
 import Base: promote_rule, zero, show, length
 
@@ -1162,6 +1162,18 @@ end
 =={T<: Ring, S}(x::ZZ, y::Poly{T, S}) = y == x
 
 =={S, M}(x::Residue{ZZ, M}, y::Poly{Residue{ZZ, M}, S}) = y == x
+
+function isequal{T <: Ring, S}(x::Poly{T, S}, y::Poly{T, S})
+   if length(x) != length(y)
+      return false
+   end
+   for i = 1:length(x)
+      if !isequal(coeff(x, i - 1), coeff(y, i - 1))
+         return false
+      end
+   end
+   return true
+end
 
 ###########################################################################################
 #

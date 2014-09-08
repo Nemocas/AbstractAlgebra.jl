@@ -66,6 +66,8 @@ end
 
 =={T, S}(x::Int, y::Residue{T, S}) = T(x) == y.data
 
+isequal{T, S}(x::Residue{T, S}, y::Residue{T, S}) = isequal(x.data, y.data)
+
 ###########################################################################################
 #
 #   String I/O

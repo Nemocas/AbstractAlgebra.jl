@@ -4,12 +4,12 @@
 #
 ###########################################################################################    
 
-import Rings: O, valuation
+import Rings: O, valuation, isequal
 
 import Base: sqrt, exp, log
 
 export O, PadicField, Padic, valuation, prime, precision, isexact, sqrt, exp, log,
-       teichmuller
+       teichmuller, isequal
 
 ###########################################################################################
 #
@@ -604,6 +604,17 @@ function =={S}(a::Padic{S}, b::Padic{S})
                &z, &a, &b, &eval(:($S)))
       return bool(ccall((:padic_is_zero, :libflint), Cint, 
                 (Ptr{Padic},), &z))
+   end
+end
+
+function isequal{S}(a::Padic{S}, b::Padic{S})
+   if a.exact != b.exact
+      return false
+   end
+   if a.exact == true
+      return a == b
+   else
+      return a.N == b.N && a == b
    end
 end
 
