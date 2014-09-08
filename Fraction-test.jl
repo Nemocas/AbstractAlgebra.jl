@@ -166,6 +166,123 @@ function test_fraction_inversion()
    println("PASS")
 end
 
+function test_qq_constructors()
+   print("Fraction.QQ.constructors()...")
+
+   @test QQ <: Fraction
+
+   @test isa(QQ(2), QQ)
+
+   println("PASS")
+end
+
+function test_qq_manipulation()
+   print("Fraction.QQ.manipulation()...")
+
+   a = -ZZ(2)/ZZ(3)
+   b = ZZ(123)/ZZ(234)
+
+   @test height(a) == 3
+
+   @test height_bits(b) == 7
+
+   println("PASS")
+end
+
+function test_qq_comparison()
+   print("Fraction.QQ.comparison()...")
+
+   a = -ZZ(2)/ZZ(3)
+   b = ZZ(1)/ZZ(2)
+
+   @test a < b
+
+   @test b >= a
+
+   @test cmp(a, b) < 0
+
+   println("PASS")
+end
+
+function test_qq_adhoc_comparison()
+   print("Fraction.QQ.adhoc_comparison()...")
+
+   a = -ZZ(2)/ZZ(3)
+   b = ZZ(1)/ZZ(2)
+
+   @test a < 1
+
+   @test a <= 0
+
+   @test b >= ZZ(0)
+   
+   println("PASS")
+end
+
+function test_qq_adhoc_binary()
+   print("Fraction.QQ.adhoc_binary()...")
+
+   a = -ZZ(2)/ZZ(3)
+   b = ZZ(1)/ZZ(2)
+
+   @test a << 3 == -ZZ(16)/3
+
+   @test b >> 5 == ZZ(1)/64
+   
+   println("PASS")
+end
+
+function test_qq_modular_arithmetic()
+   print("Fraction.QQ.modular_arithmetic()...")
+
+   a = -ZZ(2)/ZZ(3)
+   b = ZZ(1)/ZZ(2)
+
+   @test mod(a, 7) == 4
+
+   @test mod(b, ZZ(5)) == 3
+   
+   println("PASS")
+end
+
+function test_qq_rational_reconstruction()
+   print("Fraction.QQ.rational_reconstruction()...")
+
+   @test reconstruct(7, 13) == ZZ(1)/2
+   
+   @test reconstruct(ZZ(15), 31) == -ZZ(1)/2
+   
+   @test reconstruct(ZZ(123), ZZ(237)) == ZZ(9)/2
+   
+   println("PASS")
+end
+
+function test_qq_rational_enumeration()
+   print("Fraction.QQ.rational_enumeration()...")
+
+   @test next_minimal(ZZ(2)/ZZ(3)) == ZZ(3)/2
+
+   @test next_signed_minimal(-ZZ(21)/ZZ(31)) == ZZ(31)/21
+
+   @test next_calkin_wilf(ZZ(321)/ZZ(113)) == ZZ(113)/244
+
+   @test next_signed_calkin_wilf(-ZZ(51)/ZZ(17)) == ZZ(1)/4
+   
+   println("PASS")
+end
+
+function test_qq_special_functions()
+   print("Fraction.QQ.special_functions()...")
+
+   @test harmonic(12) == ZZ(86021)/27720
+
+   @test dedekind_sum(12, 13) == -ZZ(11)/13
+
+   @test dedekind_sum(-120, ZZ(1305)) == -ZZ(575)/522
+   
+   println("PASS")
+end
+
 function test_fraction()
    test_fraction_constructors()
    test_fraction_manipulation()
@@ -176,6 +293,18 @@ function test_fraction()
    test_fraction_adhoc_binary()
    test_fraction_powering()
    test_fraction_inversion()
+
+   println("")
+
+   test_qq_constructors()
+   test_qq_manipulation()
+   test_qq_comparison()
+   test_qq_adhoc_comparison()
+   test_qq_adhoc_binary()
+   test_qq_modular_arithmetic()
+   test_qq_rational_reconstruction()
+   test_qq_rational_enumeration()
+   test_qq_special_functions()
 
    println("")
 end
