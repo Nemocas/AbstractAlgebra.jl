@@ -82,24 +82,24 @@ end
 
 function Poly{S}(::Type{Poly{ZZ, S}}, a :: Array{ZZ, 1})
    z = Poly{ZZ, S}(Poly)
-   finalizer(z, _fmpz_poly_clear_fn)
    ccall((:fmpz_poly_init2, :libflint), Void, (Ptr{Poly}, Int), &z, length(a))
    for i = 1:length(a)
       ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, (Ptr{Poly}, Int, Ptr{ZZ}),
          &z, i - 1, &a[i])
    end
+   finalizer(z, _fmpz_poly_clear_fn)
    return z
 end   
 
 function Poly{M, S}(::Type{Poly{Residue{ZZ, M}, S}}, a :: Array{Residue{ZZ, M}, 1})
    z = Poly{Residue{ZZ, M}, S}(Poly)
-   finalizer(z, _fmpz_mod_poly_clear_fn)
    m = modulus(Residue{ZZ, M})
    ccall((:fmpz_mod_poly_init2, :libflint), Void, (Ptr{Poly}, Ptr{ZZ}, Int), &z, &m, length(a))
    for i = 1:length(a)
       ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, (Ptr{Poly}, Int, Ptr{ZZ}),
             &z, i - 1, &(a[i].data))
    end
+   finalizer(z, _fmpz_mod_poly_clear_fn)
    return z
 end
 

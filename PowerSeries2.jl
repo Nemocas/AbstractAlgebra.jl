@@ -17,24 +17,24 @@ export PowerSeries, coeff, truncate, divexact
 
 function PowerSeries{S}(::Type{PowerSeries{QQ, S}}, a :: Array{QQ, 1}, n::Precision)
    z = PowerSeries{QQ, S}(PowerSeries, n)
-   finalizer(z, _fmpq_poly_clear_fn)
    ccall((:fmpq_poly_init2, :libflint), Void, (Ptr{PowerSeries}, Int), &z, length(a))
    for i = 1:length(a)
       ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, (Ptr{PowerSeries}, Int, Ptr{Fraction}),
             &z, i - 1, &a[i])
    end
+   finalizer(z, _fmpq_poly_clear_fn)
    return z
 end
 
 function PowerSeries{S, T}(::Type{PowerSeries{FinFieldElem{T}, S}}, a :: Array{FinFieldElem{T}, 1}, n::Precision)
    z = PowerSeries{FinFieldElem{T}, S}(PowerSeries, n)
-   finalizer(z, _fq_poly_clear_fn)
    ctx = eval(:($T))
    ccall((:fq_poly_init2, :libflint), Void, (Ptr{PowerSeries}, Int, Ptr{fq_ctx}), &z, length(a), &ctx)
    for i = 1:length(a)
       ccall((:fq_poly_set_coeff, :libflint), Void, (Ptr{PowerSeries}, Int, Ptr{FinFieldElem}, Ptr{fq_ctx}),
             &z, i - 1, &a[i], &ctx)
    end
+   finalizer(z, _fq_poly_clear_fn)
    return z
 end
 
@@ -43,7 +43,7 @@ function _fmpq_poly_clear_fn{S}(a :: PowerSeries{QQ, S})
 end
 
 function _fq_poly_clear_fn{T, S}(a :: PowerSeries{FinFieldElem{T}, S})
-   ccall((:fq_poly_clear, :libflint), Void, (Ptr{PowerSeries}, Ptr{fq_ctx}), &a, eval(:($T)))
+   ccall((:fq_poly_clear, :libflint), Void, (Ptr{PowerSeries},), &a) # clear function doesn't use ctx
 end
 
 ###########################################################################################

@@ -21,24 +21,24 @@ export coeff, isgen, truncate, mullow, divexact, gcd, content, primpart, mod, di
 
 function Poly{S}(::Type{Poly{QQ, S}}, a :: Array{QQ, 1})
    z = Poly{QQ, S}(Poly)
-   finalizer(z, _fmpq_poly_clear_fn)
    ccall((:fmpq_poly_init2, :libflint), Void, (Ptr{Poly}, Int), &z, length(a))
    for i = 1:length(a)
       ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, (Ptr{Poly}, Int, Ptr{Fraction}),
             &z, i - 1, &a[i])
    end
+   finalizer(z, _fmpq_poly_clear_fn)
    return z
 end
 
 function Poly{S, T}(::Type{Poly{FinFieldElem{T}, S}}, a :: Array{FinFieldElem{T}, 1})
    z = Poly{FinFieldElem{T}, S}(Poly)
-   finalizer(z, _fq_poly_clear_fn)
    ctx = eval(:($T))
    ccall((:fq_poly_init2, :libflint), Void, (Ptr{Poly}, Int, Ptr{fq_ctx}), &z, length(a), &ctx)
    for i = 1:length(a)
       ccall((:fq_poly_set_coeff, :libflint), Void, (Ptr{Poly}, Int, Ptr{FinFieldElem{T}}, Ptr{fq_ctx}),
             &z, i - 1, &a[i], &ctx)
    end
+   finalizer(z, _fq_poly_clear_fn)
    return z
 end
 
@@ -47,7 +47,7 @@ function _fmpq_poly_clear_fn{S}(a :: Poly{QQ, S})
 end
 
 function _fq_poly_clear_fn{T, S}(a :: Poly{FinFieldElem{T}, S})
-   ccall((:fq_poly_clear, :libflint), Void, (Ptr{Poly}, Ptr{fq_ctx}), &a, eval(:($T)))
+   ccall((:fq_poly_clear, :libflint), Void, (Ptr{Poly},), &a) # clear function doesn't use ctx
 end
 
 ###########################################################################################
