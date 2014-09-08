@@ -2827,7 +2827,6 @@ lcm{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
 \desc{Return the least common multiple of the polynomials $a$ and $b$. We
 define lcm$(a, b) = ab/$gcd$(a, b)$.}
 
-
 We allow GCD for polynomials over residue rings, e.g. over $\Z/n\Z$, even when
 the residue ring has zero divisors. However, if an impossible inverse is
 encountered during the computation, due to zero divisors, we throw an error.

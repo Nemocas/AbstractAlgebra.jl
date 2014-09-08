@@ -231,7 +231,7 @@ function test_residue_exact_division()
 end
 
 function test_residue_inversion()
-   print("Residue.exact_inversion...")
+   print("Residue.inversion...")
  
    R = ResidueRing(ZZ, 49)
 
