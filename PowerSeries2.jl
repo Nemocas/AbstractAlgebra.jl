@@ -28,7 +28,7 @@ end
 
 function PowerSeries{S, T}(::Type{PowerSeries{FinFieldElem{T}, S}}, a :: Array{FinFieldElem{T}, 1}, n::Precision)
    z = PowerSeries{FinFieldElem{T}, S}(PowerSeries, n)
-   ctx = FinFieldCtx[T]
+   ctx = FinFieldCtx[T]::fq_ctx
    ccall((:fq_poly_init2, :libflint), Void, (Ptr{PowerSeries}, Int, Ptr{fq_ctx}), &z, length(a), &ctx)
    for i = 1:length(a)
       ccall((:fq_poly_set_coeff, :libflint), Void, (Ptr{PowerSeries}, Int, Ptr{FinFieldElem}, Ptr{fq_ctx}),
@@ -54,7 +54,7 @@ end
    
 length{S}(x::PowerSeries{QQ, S}) = ccall((:fmpq_poly_length, :libflint), Int, (Ptr{PowerSeries},), &x)
 
-length{S, T}(x::PowerSeries{FinFieldElem{T}, S}) = ccall((:fq_poly_length, :libflint), Int, (Ptr{PowerSeries}, Ptr{fq_ctx}), &x, &FinFieldCtx[T])
+length{S, T}(x::PowerSeries{FinFieldElem{T}, S}) = ccall((:fq_poly_length, :libflint), Int, (Ptr{PowerSeries}, Ptr{fq_ctx}), &x, &(FinFieldCtx[T]::fq_ctx))
 
 function coeff{S}(x::PowerSeries{QQ, S}, n::Int)
    if n < 0
@@ -70,7 +70,7 @@ function coeff{S, T}(x::PowerSeries{FinFieldElem{T}, S}, n::Int)
       return FinFieldElem{T}(0)
    end
    z = FinFieldElem{T}()
-   ccall((:fq_poly_get_coeff, :libflint), Void, (Ptr{FinFieldElem}, Ptr{PowerSeries}, Int, Ptr{fq_ctx}), &z, &x, n, &FinFieldCtx[T])
+   ccall((:fq_poly_get_coeff, :libflint), Void, (Ptr{FinFieldElem}, Ptr{PowerSeries}, Int, Ptr{fq_ctx}), &z, &x, n, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -101,7 +101,7 @@ function show{S, T}(io::IO, x::PowerSeries{FinFieldElem{T}, S})
       print(io, "0")
    else
       cstr = ccall((:fq_poly_get_str_pretty, :libflint), Ptr{Uint8}, 
-                (Ptr{PowerSeries}, Ptr{Uint8}, Ptr{fq_ctx}), &x, bytestring(string(S)), &FinFieldCtx[T])
+                (Ptr{PowerSeries}, Ptr{Uint8}, Ptr{fq_ctx}), &x, bytestring(string(S)), &(FinFieldCtx[T]::fq_ctx))
 
       print(io, bytestring(cstr))
 
@@ -131,7 +131,7 @@ function -{S, T}(x::PowerSeries{FinFieldElem{T}, S})
    z = PowerSeries{FinFieldElem{T}, S}()
    ccall((:fq_poly_neg, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{fq_ctx}), 
-               &z, &x, &FinFieldCtx[T])
+               &z, &x, &(FinFieldCtx[T]::fq_ctx))
    z.prec = x.prec
    return z
 end
@@ -174,7 +174,7 @@ function +{S, T}(a::PowerSeries{FinFieldElem{T}, S}, b::PowerSeries{FinFieldElem
    z.prec = prec
    ccall((:fq_poly_add_series, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int, Ptr{fq_ctx}), 
-               &z, &a, &b, lenz, &FinFieldCtx[T])
+               &z, &a, &b, lenz, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -210,7 +210,7 @@ function -{S, T}(a::PowerSeries{FinFieldElem{T}, S}, b::PowerSeries{FinFieldElem
    z.prec = prec
    ccall((:fq_poly_sub_series, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int, Ptr{fq_ctx}), 
-               &z, &a, &b, lenz, &FinFieldCtx[T])
+               &z, &a, &b, lenz, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -262,7 +262,7 @@ function *{S, T}(a::PowerSeries{FinFieldElem{T}, S}, b::PowerSeries{FinFieldElem
    z.prec = prec
    ccall((:fq_poly_mullow, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int, Ptr{fq_ctx}), 
-               &z, &a, &b, lenz, &FinFieldCtx[T])
+               &z, &a, &b, lenz, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -281,7 +281,7 @@ end
 function setcoeff!{S, T}(z::PowerSeries{FinFieldElem{T}, S}, n::Int, x::FinFieldElem{T})
    ccall((:fq_poly_set_coeff, :libflint), Void, 
                 (Ptr{PowerSeries}, Int, Ptr{FinFieldElem{T}}, Ptr{fq_ctx}), 
-               &z, n, &x, &FinFieldCtx[T])
+               &z, n, &x, &(FinFieldCtx[T]::fq_ctx))
 end
 
 function mul!{S}(z::PowerSeries{QQ, S}, a::PowerSeries{QQ, S}, b::PowerSeries{QQ, S})
@@ -327,7 +327,7 @@ function mul!{S, T}(z::PowerSeries{FinFieldElem{T}, S}, a::PowerSeries{FinFieldE
    z.prec = prec
    ccall((:fq_poly_mullow, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int, Ptr{fq_ctx}), 
-               &z, &a, &b, lenz, &FinFieldCtx[T])
+               &z, &a, &b, lenz, &(FinFieldCtx[T]::fq_ctx))
 end
 
 function addeq!{S}(a::PowerSeries{QQ, S}, b::PowerSeries{QQ, S})
@@ -359,7 +359,7 @@ function addeq!{S, T}(a::PowerSeries{FinFieldElem{T}, S}, b::PowerSeries{FinFiel
    a.prec = prec
    ccall((:fq_poly_add_series, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int, Ptr{fq_ctx}), 
-               &a, &a, &b, lenz, &FinFieldCtx[T])
+               &a, &a, &b, lenz, &(FinFieldCtx[T]::fq_ctx))
 end
 
 ###########################################################################################
@@ -400,7 +400,7 @@ function *{S, T}(x::FinFieldElem{T}, y::PowerSeries{FinFieldElem{T}, S})
    z.prec = y.prec
    ccall((:fq_poly_scalar_mul_fq, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{FinFieldElem{T}}, Ptr{fq_ctx}), 
-               &z, &y, &x, &FinFieldCtx[T])
+               &z, &y, &x, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -433,7 +433,7 @@ function =={S, T}(x::PowerSeries{FinFieldElem{T}, S}, y::PowerSeries{FinFieldEle
    
    return bool(ccall((:fq_poly_equal_trunc, :libflint), Cint, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Int, Ptr{fq_ctx}), 
-               &x, &y, n, &FinFieldCtx[T]))
+               &x, &y, n, &(FinFieldCtx[T]::fq_ctx)))
 end
 
 ###########################################################################################
@@ -460,7 +460,7 @@ function shift_left{S, T}(x::PowerSeries{FinFieldElem{T}, S}, len::Int)
    z.prec = x.prec + len
    ccall((:fq_poly_shift_left, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Int, Ptr{fq_ctx}), 
-               &z, &x, len, &FinFieldCtx[T])
+               &z, &x, len, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -488,7 +488,7 @@ function shift_right{S, T}(x::PowerSeries{FinFieldElem{T}, S}, len::Int)
    z.prec = x.prec - len
    ccall((:fq_poly_shift_right, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Int, Ptr{fq_ctx}), 
-               &z, &x, len, &FinFieldCtx[T])
+               &z, &x, len, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -520,7 +520,7 @@ function truncate{S, T}(x::PowerSeries{FinFieldElem{T}, S}, prec::Precision)
    z.prec = prec
    ccall((:fq_poly_set_trunc, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Int, Ptr{fq_ctx}), 
-               &z, &x, prec, &FinFieldCtx[T])
+               &z, &x, prec, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -574,7 +574,7 @@ function divexact{S, T}(x::PowerSeries{FinFieldElem{T}, S}, y::PowerSeries{FinFi
    z.prec = prec
    ccall((:fq_poly_div_series, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{PowerSeries}, Int, Ptr{fq_ctx}), 
-               &z, &x, &y, prec, &FinFieldCtx[T])
+               &z, &x, &y, prec, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -614,7 +614,7 @@ function divexact{S, T}(x::PowerSeries{FinFieldElem{T}, S}, y::FinFieldElem{T})
    z.prec = x.prec
    ccall((:fq_poly_scalar_div_fq, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Ptr{FinFieldElem}, Ptr{fq_ctx}), 
-               &z, &x, &y, &FinFieldCtx[T])
+               &z, &x, &y, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -666,7 +666,7 @@ function inv{S, T}(a::PowerSeries{FinFieldElem{T}, S})
    ainv = PowerSeries(PowerSeries{FinFieldElem{T}, S}, Array(FinFieldElem{T}, 0), a.prec)
    ccall((:fq_poly_inv_series, :libflint), Void, 
                 (Ptr{PowerSeries}, Ptr{PowerSeries}, Int, Ptr{fq_ctx}), 
-               &ainv, &a, a.prec, &FinFieldCtx[T])
+               &ainv, &a, a.prec, &(FinFieldCtx[T]::fq_ctx))
    return ainv
 end
 

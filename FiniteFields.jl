@@ -32,7 +32,7 @@ type FinFieldElem{S} <: Field
    data::fmpz_poly_struct
    function FinFieldElem()
       d = new(fmpz_poly_struct())
-      ccall((:fq_init2, :libflint), Void, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &d, &FinFieldCtx[S])
+      ccall((:fq_init2, :libflint), Void, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &d, &(FinFieldCtx[S]::fq_ctx))
       finalizer(d, _FinFieldElem_clear_fn)
       return d
    end
@@ -40,21 +40,21 @@ type FinFieldElem{S} <: Field
       z = FinFieldElem{S}()
       ccall((:fq_set_si, :libflint), Void, 
                 (Ptr{FinFieldElem{S}}, Int, Ptr{fq_ctx}), 
-               &z, x, &FinFieldCtx[S])
+               &z, x, &(FinFieldCtx[S]::fq_ctx))
       return z
    end
    function FinFieldElem(x::ZZ)
       z = FinFieldElem{S}()
       ccall((:fq_set_fmpz, :libflint), Void, 
                 (Ptr{FinFieldElem{S}}, Ptr{ZZ}, Ptr{fq_ctx}), 
-               &z, &x, &FinFieldCtx[S])
+               &z, &x, &(FinFieldCtx[S]::fq_ctx))
       return z
    end
    FinFieldElem(a::FinFieldElem{S}) = a
 end
 
 function _FinFieldElem_clear_fn{S}(a :: FinFieldElem{S})
-   ccall((:fq_clear, :libflint), Void, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &a, &FinFieldCtx[S])
+   ccall((:fq_clear, :libflint), Void, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &a, &(FinFieldCtx[S]::fq_ctx))
 end
 
 ###########################################################################################
@@ -65,42 +65,42 @@ end
 
 function zero{S}(::Type{FinFieldElem{S}})
    d = FinFieldElem{S}()
-   ccall((:fq_zero, :libflint), Void, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &d, &FinFieldCtx[S])
+   ccall((:fq_zero, :libflint), Void, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &d, &(FinFieldCtx[S]::fq_ctx))
    return d
 end
    
 function one{S}(::Type{FinFieldElem{S}})
    d = FinFieldElem{S}()
-   ccall((:fq_one, :libflint), Void, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &d, &FinFieldCtx[S])
+   ccall((:fq_one, :libflint), Void, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &d, &(FinFieldCtx[S]::fq_ctx))
    return d
 end
    
 function gen{S}(::Type{FinFieldElem{S}})
    d = FinFieldElem{S}()
-   ccall((:fq_gen, :libflint), Void, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &d, &FinFieldCtx[S])
+   ccall((:fq_gen, :libflint), Void, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &d, &(FinFieldCtx[S]::fq_ctx))
    return d
 end
 
-iszero{S}(a::FinFieldElem{S}) = bool(ccall((:fq_is_zero, :libflint), Cint, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &a, &FinFieldCtx[S]))
+iszero{S}(a::FinFieldElem{S}) = bool(ccall((:fq_is_zero, :libflint), Cint, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &a, &(FinFieldCtx[S]::fq_ctx)))
 
-isone{S}(a::FinFieldElem{S}) = bool(ccall((:fq_is_one, :libflint), Cint, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &a, &FinFieldCtx[S]))
+isone{S}(a::FinFieldElem{S}) = bool(ccall((:fq_is_one, :libflint), Cint, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &a, &(FinFieldCtx[S]::fq_ctx)))
 
-isunit{S}(a::FinFieldElem{S}) = bool(ccall((:fq_is_invertible, :libflint), Cint, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &a, &FinFieldCtx[S]))
+isunit{S}(a::FinFieldElem{S}) = bool(ccall((:fq_is_invertible, :libflint), Cint, (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &a, &(FinFieldCtx[S]::fq_ctx)))
 
 function characteristic{S}(::Type{FinFieldElem{S}})
    d = ZZ()
-   ccall((:__fq_ctx_prime, :libflint), Void, (Ptr{ZZ}, Ptr{fq_ctx}), &d, &FinFieldCtx[S])
+   ccall((:__fq_ctx_prime, :libflint), Void, (Ptr{ZZ}, Ptr{fq_ctx}), &d, &(FinFieldCtx[S]::fq_ctx))
    return d
 end
    
 function order{S}(::Type{FinFieldElem{S}})
    d = ZZ()
-   ccall((:fq_ctx_order, :libflint), Void, (Ptr{ZZ}, Ptr{fq_ctx}), &d, &FinFieldCtx[S])
+   ccall((:fq_ctx_order, :libflint), Void, (Ptr{ZZ}, Ptr{fq_ctx}), &d, &(FinFieldCtx[S]::fq_ctx))
    return d
 end
    
 function degree{S}(::Type{FinFieldElem{S}})
-   return ccall((:fq_ctx_degree, :libflint), Int, (Ptr{fq_ctx}, ), &FinFieldCtx[S])
+   return ccall((:fq_ctx_degree, :libflint), Int, (Ptr{fq_ctx}, ), &(FinFieldCtx[S]::fq_ctx))
 end
    
 ###########################################################################################
@@ -111,7 +111,7 @@ end
 
 function show{S}(io::IO, x::FinFieldElem{S})
    cstr = ccall((:fq_get_str_pretty, :libflint), Ptr{Uint8}, 
-                (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &x, &FinFieldCtx[S])
+                (Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &x, &(FinFieldCtx[S]::fq_ctx))
 
    print(io, bytestring(cstr))
 
@@ -149,7 +149,7 @@ function -{S}(x::FinFieldElem{S})
    z = FinFieldElem{S}()
    ccall((:fq_neg, :libflint), Void, 
                 (Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), 
-               &z, &x, &FinFieldCtx[S])
+               &z, &x, &(FinFieldCtx[S]::fq_ctx))
    return z
 end
 
@@ -163,7 +163,7 @@ function +{S}(x::FinFieldElem{S}, y::FinFieldElem{S})
    z = FinFieldElem{S}()
    ccall((:fq_add, :libflint), Void, 
                 (Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), 
-               &z, &x, &y, &FinFieldCtx[S])
+               &z, &x, &y, &(FinFieldCtx[S]::fq_ctx))
    return z
 end
 
@@ -171,7 +171,7 @@ function -{S}(x::FinFieldElem{S}, y::FinFieldElem{S})
    z = FinFieldElem{S}()
    ccall((:fq_sub, :libflint), Void, 
                 (Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), 
-               &z, &x, &y, &FinFieldCtx[S])
+               &z, &x, &y, &(FinFieldCtx[S]::fq_ctx))
    return z
 end
 
@@ -179,7 +179,7 @@ function *{S}(x::FinFieldElem{S}, y::FinFieldElem{S})
    z = FinFieldElem{S}()
    ccall((:fq_mul, :libflint), Void, 
                 (Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), 
-               &z, &x, &y, &FinFieldCtx[S])
+               &z, &x, &y, &(FinFieldCtx[S]::fq_ctx))
    return z
 end
 
@@ -194,13 +194,13 @@ gcd{S}(x::FinFieldElem{S}, y::FinFieldElem{S}) = x == 0 && y == 0 ? FinFieldElem
 function mul!{S}(z::FinFieldElem{S}, x::FinFieldElem{S}, y::FinFieldElem{S})
    ccall((:fq_mul, :libflint), Void, 
                 (Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), 
-               &z, &x, &y, &FinFieldCtx[S])
+               &z, &x, &y, &(FinFieldCtx[S]::fq_ctx))
 end
 
 function addeq!{S}(z::FinFieldElem{S}, x::FinFieldElem{S})
    ccall((:fq_add, :libflint), Void, 
                 (Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), 
-               &z, &z, &x, &FinFieldCtx[S])
+               &z, &z, &x, &(FinFieldCtx[S]::fq_ctx))
 end
 
 ###########################################################################################
@@ -213,7 +213,7 @@ function *{S}(x::Int, y::FinFieldElem{S})
    z = FinFieldElem{S}()
    ccall((:fq_mul_si, :libflint), Void, 
                 (Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Int, Ptr{fq_ctx}), 
-               &z, &y, x, &FinFieldCtx[S])
+               &z, &y, x, &(FinFieldCtx[S]::fq_ctx))
    return z
 end
 
@@ -223,7 +223,7 @@ function *{S}(x::ZZ, y::FinFieldElem{S})
    z = FinFieldElem{S}()
    ccall((:fq_mul_fmpz, :libflint), Void, 
                 (Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{ZZ}, Ptr{fq_ctx}), 
-               &z, &y, &x, &FinFieldCtx[S])
+               &z, &y, &x, &(FinFieldCtx[S]::fq_ctx))
    return z
 end
 
@@ -243,7 +243,7 @@ function ^{S}(x::FinFieldElem{S}, y::Int)
    z = FinFieldElem{S}()
    ccall((:fq_pow_ui, :libflint), Void, 
                 (Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Int, Ptr{fq_ctx}), 
-               &z, &x, y, &FinFieldCtx[S])
+               &z, &x, y, &(FinFieldCtx[S]::fq_ctx))
    return z
 end
 
@@ -255,7 +255,7 @@ function ^{S}(x::FinFieldElem{S}, y::ZZ)
    z = FinFieldElem{S}()
    ccall((:fq_pow, :libflint), Void, 
                 (Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{ZZ}, Ptr{fq_ctx}), 
-               &z, &x, &y, &FinFieldCtx[S])
+               &z, &x, &y, &(FinFieldCtx[S]::fq_ctx))
    return z
 end
 
@@ -266,7 +266,7 @@ end
 ###########################################################################################
 
 =={S}(x::FinFieldElem{S}, y::FinFieldElem{S}) = bool(ccall((:fq_equal, :libflint), Cint, 
-                (Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &x, &y, &FinFieldCtx[S]))
+                (Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), &x, &y, &(FinFieldCtx[S]::fq_ctx)))
 
 ###########################################################################################
 #
@@ -279,7 +279,7 @@ function divexact{S}(x::FinFieldElem{S}, y::FinFieldElem{S})
    z = FinFieldElem{S}()
    ccall((:fq_div, :libflint), Void, 
                 (Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), 
-               &z, &x, &y, &FinFieldCtx[S])
+               &z, &x, &y, &(FinFieldCtx[S]::fq_ctx))
    return z
 end
 
@@ -296,7 +296,7 @@ function inv{S}(x::FinFieldElem{S})
    z = FinFieldElem{S}()
    ccall((:fq_inv, :libflint), Void, 
                 (Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), 
-               &z, &x, &FinFieldCtx[S])
+               &z, &x, &(FinFieldCtx[S]::fq_ctx))
    return z
 end
 
@@ -310,7 +310,7 @@ function pth_root{S}(x::FinFieldElem{S})
    z = FinFieldElem{S}()
    ccall((:fq_pth_root, :libflint), Void, 
                 (Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), 
-               &z, &x, &FinFieldCtx[S])
+               &z, &x, &(FinFieldCtx[S]::fq_ctx))
    return z
 end
 
@@ -318,7 +318,7 @@ function trace{S}(x::FinFieldElem{S})
    z = ZZ()
    ccall((:fq_trace, :libflint), Void, 
                 (Ptr{ZZ}, Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), 
-               &z, &x, &FinFieldCtx[S])
+               &z, &x, &(FinFieldCtx[S]::fq_ctx))
    return FinFieldElem{S}(z)
 end
 
@@ -326,7 +326,7 @@ function norm{S}(x::FinFieldElem{S})
    z = ZZ()
    ccall((:fq_norm, :libflint), Void, 
                 (Ptr{ZZ}, Ptr{FinFieldElem{S}}, Ptr{fq_ctx}), 
-               &z, &x, &FinFieldCtx[S])
+               &z, &x, &(FinFieldCtx[S]::fq_ctx))
    return FinFieldElem{S}(z)
 end
 
@@ -334,7 +334,7 @@ function frobenius{S}(x::FinFieldElem{S}, n = 1)
    z = FinFieldElem{S}()
    ccall((:fq_frobenius, :libflint), Void, 
                 (Ptr{FinFieldElem{S}}, Ptr{FinFieldElem{S}}, Int, Ptr{fq_ctx}), 
-               &z, &x, n, &FinFieldCtx[S])
+               &z, &x, n, &(FinFieldCtx[S]::fq_ctx))
    return z
 end
 

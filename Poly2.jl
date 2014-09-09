@@ -32,7 +32,7 @@ end
 
 function Poly{S, T}(::Type{Poly{FinFieldElem{T}, S}}, a :: Array{FinFieldElem{T}, 1})
    z = Poly{FinFieldElem{T}, S}(Poly)
-   ctx = FinFieldCtx[T]
+   ctx = FinFieldCtx[T]::fq_ctx
    ccall((:fq_poly_init2, :libflint), Void, (Ptr{Poly}, Int, Ptr{fq_ctx}), &z, length(a), &ctx)
    for i = 1:length(a)
       ccall((:fq_poly_set_coeff, :libflint), Void, (Ptr{Poly}, Int, Ptr{FinFieldElem{T}}, Ptr{fq_ctx}),
@@ -74,7 +74,7 @@ function show{S, T}(io::IO, x::Poly{FinFieldElem{T}, S})
       print(io, "0")
    else
       cstr = ccall((:fq_poly_get_str_pretty, :libflint), Ptr{Uint8}, 
-                (Ptr{Poly}, Ptr{Uint8}, Ptr{fq_ctx}), &x, bytestring(string(S)), &FinFieldCtx[T])
+                (Ptr{Poly}, Ptr{Uint8}, Ptr{fq_ctx}), &x, bytestring(string(S)), &(FinFieldCtx[T]::fq_ctx))
 
       print(io, bytestring(cstr))
 
@@ -90,7 +90,7 @@ end
 
 length{S}(x::Poly{QQ, S}) = ccall((:fmpq_poly_length, :libflint), Int, (Ptr{Poly},), &x)
 
-length{S, T}(x::Poly{FinFieldElem{T}, S}) = ccall((:fq_poly_length, :libflint), Int, (Ptr{Poly}, Ptr{fq_ctx}), &x, &FinFieldCtx[T])
+length{S, T}(x::Poly{FinFieldElem{T}, S}) = ccall((:fq_poly_length, :libflint), Int, (Ptr{Poly}, Ptr{fq_ctx}), &x, &(FinFieldCtx[T]::fq_ctx))
 
 function coeff{S}(x::Poly{QQ, S}, n::Int)
    z = QQ()
@@ -100,13 +100,13 @@ end
 
 function coeff{S, T}(x::Poly{FinFieldElem{T}, S}, n::Int)
    z = FinFieldElem{T}()
-   ccall((:fq_poly_get_coeff, :libflint), Void, (Ptr{FinFieldElem{T}}, Ptr{Poly}, Int, Ptr{fq_ctx}), &z, &x, n, &FinFieldCtx[T])
+   ccall((:fq_poly_get_coeff, :libflint), Void, (Ptr{FinFieldElem{T}}, Ptr{Poly}, Int, Ptr{fq_ctx}), &z, &x, n, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
 isgen{S}(x::Poly{QQ, S}) = bool(ccall((:fmpq_poly_is_x, :libflint), Int, (Ptr{Poly},), &x))
 
-isgen{S, T}(x::Poly{FinFieldElem{T}, S}) = bool(ccall((:fq_poly_is_x, :libflint), Int, (Ptr{Poly}, Ptr{fq_ctx}), &x, &FinFieldCtx[T]))
+isgen{S, T}(x::Poly{FinFieldElem{T}, S}) = bool(ccall((:fq_poly_is_x, :libflint), Int, (Ptr{Poly}, Ptr{fq_ctx}), &x, &(FinFieldCtx[T]::fq_ctx)))
 
 ###########################################################################################
 #
@@ -126,7 +126,7 @@ function -{S, T}(x::Poly{FinFieldElem{T}, S})
    z = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_neg, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{fq_ctx}), 
-               &z, &x, &FinFieldCtx[T])
+               &z, &x, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -148,7 +148,7 @@ function +{S, T}(x::Poly{FinFieldElem{T}, S}, y::Poly{FinFieldElem{T}, S})
    z = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_add, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{fq_ctx}), 
-               &z, &x, &y, &FinFieldCtx[T])
+               &z, &x, &y, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -164,7 +164,7 @@ function -{S, T}(x::Poly{FinFieldElem{T}, S}, y::Poly{FinFieldElem{T}, S})
    z = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_sub, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{fq_ctx}), 
-               &z, &x, &y, &FinFieldCtx[T])
+               &z, &x, &y, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -180,7 +180,7 @@ function *{S, T}(x::Poly{FinFieldElem{T}, S}, y::Poly{FinFieldElem{T}, S})
    z = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_mul, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{fq_ctx}), 
-               &z, &x, &y, &FinFieldCtx[T])
+               &z, &x, &y, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -199,7 +199,7 @@ end
 function setcoeff!{S, T}(z::Poly{FinFieldElem{T}, S}, n::Int, x::FinFieldElem{T})
    ccall((:fq_poly_set_coeff, :libflint), Void, 
                 (Ptr{Poly}, Int, Ptr{FinFieldElem{T}}, Ptr{fq_ctx}), 
-               &z, n, &x, &FinFieldCtx[T])
+               &z, n, &x, &(FinFieldCtx[T]::fq_ctx))
 end
 
 function mul!{S}(z::Poly{QQ, S}, x::Poly{QQ, S}, y::Poly{QQ, S})
@@ -211,7 +211,7 @@ end
 function mul!{S, T}(z::Poly{FinFieldElem{T}, S}, x::Poly{FinFieldElem{T}, S}, y::Poly{FinFieldElem{T}, S})
    ccall((:fq_poly_mul, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{fq_ctx}), 
-               &z, &x, &y, &FinFieldCtx[T])
+               &z, &x, &y, &(FinFieldCtx[T]::fq_ctx))
 end
 
 function addeq!{S}(z::Poly{QQ, S}, x::Poly{QQ, S},)
@@ -223,7 +223,7 @@ end
 function addeq!{S, T}(z::Poly{FinFieldElem{T}, S}, x::Poly{FinFieldElem{T}, S},)
    ccall((:fq_poly_add, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{fq_ctx}), 
-               &z, &z, &x, &FinFieldCtx[T])
+               &z, &z, &x, &(FinFieldCtx[T]::fq_ctx))
 end
 
 ###########################################################################################
@@ -260,7 +260,7 @@ function *{S, T}(x::FinFieldElem{T}, y::Poly{FinFieldElem{T}, S})
    z = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_scalar_mul_fq, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{FinFieldElem{T}}, Ptr{fq_ctx}), 
-               &z, &y, &x, &FinFieldCtx[T])
+               &z, &y, &x, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -383,7 +383,7 @@ function truncate{S, T}(a::Poly{FinFieldElem{T}, S}, n::Int)
    z = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_set_trunc, :libflint), Void,
                 (Ptr{Poly}, Ptr{Poly}, Int, Ptr{fq_ctx}),
-               &z, &a, n, &FinFieldCtx[T])
+               &z, &a, n, &(FinFieldCtx[T]::fq_ctx))
 
    return z
 end
@@ -404,7 +404,7 @@ function mullow{S, T}(x::Poly{FinFieldElem{T}, S}, y::Poly{FinFieldElem{T}, S}, 
    z = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_mullow, :libflint), Void,
                 (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Int, Ptr{fq_ctx}),
-               &z, &x, &y, n, &FinFieldCtx[T])
+               &z, &x, &y, n, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -428,7 +428,7 @@ function reverse{S, T}(x::Poly{FinFieldElem{T}, S}, len::Int)
    z = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_reverse, :libflint), Void,
                 (Ptr{Poly}, Ptr{Poly}, Int, Ptr{fq_ctx}),
-               &z, &x, len, &FinFieldCtx[T])
+               &z, &x, len, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -452,7 +452,7 @@ function shift_left{S, T}(x::Poly{FinFieldElem{T}, S}, len::Int)
    z = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_shift_left, :libflint), Void,
                 (Ptr{Poly}, Ptr{Poly}, Int, Ptr{fq_ctx}),
-               &z, &x, len, &FinFieldCtx[T])
+               &z, &x, len, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -470,7 +470,7 @@ function shift_right{S, T}(x::Poly{FinFieldElem{T}, S}, len::Int)
    z = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_shift_right, :libflint), Void,
                 (Ptr{Poly}, Ptr{Poly}, Int, Ptr{fq_ctx}),
-               &z, &x, len, &FinFieldCtx[T])
+               &z, &x, len, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -494,7 +494,7 @@ function ^{S, T}(x::Poly{FinFieldElem{T}, S}, y::Int)
    z = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_pow, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Int, Ptr{fq_ctx}), 
-               &z, &x, y, &FinFieldCtx[T])
+               &z, &x, y, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -539,7 +539,7 @@ end
 function =={S, T}(x::Poly{FinFieldElem{T}, S}, y::FinFieldElem{T}) 
    return bool(ccall((:fq_poly_equal_fq, :libflint), Cint, 
                 (Ptr{Poly}, Ptr{FinFieldElem{T}}, Ptr{fq_ctx}), 
-               &x, &y, &FinFieldCtx[T]))
+               &x, &y, &(FinFieldCtx[T]::fq_ctx)))
 end
 
 =={S, T}(x::FinFieldElem{T}, y::Poly{FinFieldElem{T}, S}) = y == x
@@ -548,7 +548,7 @@ end
                 (Ptr{Poly}, Ptr{Poly}), &x, &y)
 
 =={S, T}(x::Poly{FinFieldElem{T}, S}, y::Poly{FinFieldElem{T}, S}) = bool(ccall((:fq_poly_equal, :libflint), Cint, 
-                (Ptr{Poly}, Ptr{Poly}, Ptr{fq_ctx}), &x, &y, &FinFieldCtx[T]))
+                (Ptr{Poly}, Ptr{Poly}, Ptr{fq_ctx}), &x, &y, &(FinFieldCtx[T]::fq_ctx)))
 
 ###########################################################################################
 #
@@ -600,7 +600,7 @@ function divexact{S, T}(x::Poly{FinFieldElem{T}, S}, y::FinFieldElem{T})
    z = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_scalar_div_fq, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{FinFieldElem{T}}, Ptr{fq_ctx}), 
-               &z,  &x, &y, &FinFieldCtx[T])
+               &z,  &x, &y, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -629,7 +629,7 @@ function mod{S, T}(x::Poly{FinFieldElem{T}, S}, y::Poly{FinFieldElem{T}, S})
    r = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_rem, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{fq_ctx}), 
-               &r, &x, &y, &FinFieldCtx[T])
+               &r, &x, &y, &(FinFieldCtx[T]::fq_ctx))
    return r
 end
 
@@ -649,7 +649,7 @@ function divrem{S, T}(x::Poly{FinFieldElem{T}, S}, y::Poly{FinFieldElem{T}, S})
    r = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_divrem, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{fq_ctx}), 
-               &q, &r, &x, &y, &FinFieldCtx[T])
+               &q, &r, &x, &y, &(FinFieldCtx[T]::fq_ctx))
    return q, r
 end
 
@@ -664,7 +664,7 @@ function mulmod{S, T}(f::Poly{FinFieldElem{T}, S}, g::Poly{FinFieldElem{T}, S}, 
    r = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_mulmod, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{fq_ctx}), 
-               &r, &f, &g, &h, &FinFieldCtx[T])
+               &r, &f, &g, &h, &(FinFieldCtx[T]::fq_ctx))
    return r
 end
 
@@ -673,7 +673,7 @@ function powmod{S, T}(f::Poly{FinFieldElem{T}, S}, n::Int, h::Poly{FinFieldElem{
    r = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_powmod_ui_binexp, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Int, Ptr{Poly}, Ptr{fq_ctx}), 
-               &r, &f, n, &h, &FinFieldCtx[T])
+               &r, &f, n, &h, &(FinFieldCtx[T]::fq_ctx))
    return r
 end
 
@@ -682,7 +682,7 @@ function powmod{S, T}(f::Poly{FinFieldElem{T}, S}, n::ZZ, h::Poly{FinFieldElem{T
    r = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_powmod_fmpz_binexp, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{ZZ}, Ptr{Poly}, Ptr{fq_ctx}), 
-               &r, &f, &n, &h, &FinFieldCtx[T])
+               &r, &f, &n, &h, &(FinFieldCtx[T]::fq_ctx))
    return r
 end
 
@@ -704,7 +704,7 @@ function gcd{S, T}(x::Poly{FinFieldElem{T}, S}, y::Poly{FinFieldElem{T}, S})
    z = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_gcd, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{fq_ctx}), 
-               &z, &x, &y, &FinFieldCtx[T])
+               &z, &x, &y, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -777,7 +777,7 @@ function evaluate{S, T}(x::Poly{FinFieldElem{T}, S}, y::FinFieldElem{T})
    z = FinFieldElem{T}()
    ccall((:fq_poly_evaluate_fq, :libflint), Void, 
                 (Ptr{FinFieldElem{T}}, Ptr{Poly}, Ptr{FinFieldElem{T}}, Ptr{fq_ctx}), 
-               &z, &x, &y, &FinFieldCtx[T])
+               &z, &x, &y, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -793,7 +793,7 @@ function compose{S, T}(x::Poly{FinFieldElem{T}, S}, y::Poly{FinFieldElem{T}, S})
    z = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_compose, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{fq_ctx}), 
-               &z, &x, &y, &FinFieldCtx[T])
+               &z, &x, &y, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -815,7 +815,7 @@ function deriv{S, T}(x::Poly{FinFieldElem{T}, S})
    z = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_derivative, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{fq_ctx}), 
-               &z, &x, &FinFieldCtx[T])
+               &z, &x, &(FinFieldCtx[T]::fq_ctx))
    return z
 end
 
@@ -869,7 +869,7 @@ function bezout{S, T}(x::Poly{FinFieldElem{T}, S}, y::Poly{FinFieldElem{T}, S})
    v = Poly{FinFieldElem{T}, S}()
    ccall((:fq_poly_xgcd, :libflint), Void, 
                 (Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{Poly}, Ptr{fq_ctx}), 
-               &z, &u, &v, &x, &y, &FinFieldCtx[T])
+               &z, &u, &v, &x, &y, &(FinFieldCtx[T]::fq_ctx))
    return (z, u, v)
 end
 

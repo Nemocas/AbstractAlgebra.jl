@@ -65,14 +65,14 @@ type Padic{S} <: Field
       end
       ccall((:padic_set_exact_fmpz, :libflint), Void, 
                 (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
-               &z, &n, &PadicBase[S])
+               &z, &n, &(PadicBase[S]::padic_ctx))
       z.v -= v
       z.exact = true
       return z
    end
    function Padic(a::ZZ)
       z = Padic{S}()
-      repr = bool(ccall((:padic_set_exact_fmpz, :libflint), Cint, (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), &z, &a, &PadicBase[S]))
+      repr = bool(ccall((:padic_set_exact_fmpz, :libflint), Cint, (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), &z, &a, &(PadicBase[S]::padic_ctx)))
       !repr && error("Cannot represent negative integer exactly")
       z.exact = true
       return z
@@ -128,7 +128,7 @@ O{S}(::Type{Padic{S}}, n::Int) = O(Padic{S}, ZZ(n))
 ###########################################################################################
 
 function prime{S}(::Type{Padic{S}})
-   ctx = PadicBase[S]
+   ctx = PadicBase[S]::padic_ctx
    z = ZZ()
    ccall((:padic_ctx_pow_ui, :libflint), Void, (Ptr{ZZ}, Int, Ptr{padic_ctx}), &z, 1, &ctx)
    return z 
@@ -167,7 +167,7 @@ isone{S}(a::Padic{S}) = bool(ccall((:padic_is_one, :libflint), Cint, (Ptr{Padic}
 
 function show{S}(io::IO, x::Padic{S})
    cstr = ccall((:padic_get_str, :libflint), Ptr{Uint8}, 
-               (Ptr{Void}, Ptr{Padic}, Ptr{padic_ctx}), C_NULL, &x, &PadicBase[S])
+               (Ptr{Void}, Ptr{Padic}, Ptr{padic_ctx}), C_NULL, &x, &(PadicBase[S]::padic_ctx))
 
    print(io, bytestring(cstr))
 
@@ -212,7 +212,7 @@ function -{S}(x::Padic{S})
    z.N = x.N
    ccall((:padic_neg, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &x, &PadicBase[S])
+               &z, &x, &(PadicBase[S]::padic_ctx))
    return z
 end
 
@@ -227,13 +227,13 @@ function +{S}(x::Padic{S}, y::Padic{S})
    if x.exact && y.exact
       ccall((:padic_add_exact, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &x, &y, &PadicBase[S])
+               &z, &x, &y, &(PadicBase[S]::padic_ctx))
       z.exact = true
    else
       z.N = x.exact ? y.N : (y.exact ? x.N : min(x.N, y.N))
       ccall((:padic_add, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &x, &y, &PadicBase[S])
+               &z, &x, &y, &(PadicBase[S]::padic_ctx))
    end
    return z
 end
@@ -243,14 +243,14 @@ function -{S}(x::Padic{S}, y::Padic{S})
    if x.exact && y.exact
       repr = bool(ccall((:padic_sub_exact, :libflint), Cint, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &x, &y, &PadicBase[S]))
+               &z, &x, &y, &(PadicBase[S]::padic_ctx)))
       !repr && error("Unable to represent exact result of subtraction")
       z.exact = true
    else
       z.N = x.exact ? y.N : (y.exact ? x.N : min(x.N, y.N))
       ccall((:padic_sub, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &x, &y, &PadicBase[S])
+               &z, &x, &y, &(PadicBase[S]::padic_ctx))
    end
    return z
 end
@@ -260,13 +260,13 @@ function *{S}(x::Padic{S}, y::Padic{S})
    if x.exact && y.exact
       ccall((:padic_mul_exact, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &x, &y, &PadicBase[S])
+               &z, &x, &y, &(PadicBase[S]::padic_ctx))
       z.exact = true
    else 
       z.N = x.exact ? y.N + x.v : (y.exact ? x.N + y.v : min(x.N + y.v, y.N + x.v))
       ccall((:padic_mul, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &x, &y, &PadicBase[S])
+               &z, &x, &y, &(PadicBase[S]::padic_ctx))
    end
    return z
 end
@@ -294,13 +294,13 @@ function mul!{S}(z::Padic{S}, x::Padic{S}, y::Padic{S})
    if x.exact && y.exact
       ccall((:padic_mul_exact, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &x, &y, &PadicBase[S])
+               &z, &x, &y, &(PadicBase[S]::padic_ctx))
       z.exact = true
    else 
       z.N = x.exact ? y.N + x.v : (y.exact ? x.N + y.v : min(x.N + y.v, y.N + x.v))
       ccall((:padic_mul, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &x, &y, &PadicBase[S])
+               &z, &x, &y, &(PadicBase[S]::padic_ctx))
    end
 end
 
@@ -308,13 +308,13 @@ function addeq!{S}(x::Padic{S}, y::Padic{S})
    if x.exact && y.exact
       ccall((:padic_add_exact, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &x, &x, &y, &PadicBase[S])
+               &x, &x, &y, &(PadicBase[S]::padic_ctx))
       x.exact = true
    else
       x.N = x.exact ? y.N : (y.exact ? x.N : min(x.N, y.N))
       ccall((:padic_add, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &x, &x, &y, &PadicBase[S])
+               &x, &x, &y, &(PadicBase[S]::padic_ctx))
    end
 end
 
@@ -343,20 +343,20 @@ function +{S}(x::Padic{S}, y::QQ)
       end
       ccall((:padic_set_exact_fmpz, :libflint), Void, 
                 (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
-               &z, &n, &PadicBase[S])
+               &z, &n, &(PadicBase[S]::padic_ctx))
       z.v -= v
       ccall((:padic_add_exact, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &z, &x, &PadicBase[S])
+               &z, &z, &x, &(PadicBase[S]::padic_ctx))
       z.exact = true
    else
       z.N = x.N
       ccall((:padic_set_fmpq, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Fraction}, Ptr{padic_ctx}), 
-               &z, &y, &PadicBase[S])
+               &z, &y, &(PadicBase[S]::padic_ctx))
       ccall((:padic_add, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &z, &x, &PadicBase[S])
+               &z, &z, &x, &(PadicBase[S]::padic_ctx))
    end
    return z
 end
@@ -370,17 +370,17 @@ function +{S}(x::Padic{S}, y::ZZ)
    z = Padic{S}()
    ccall((:padic_set_exact_fmpz, :libflint), Void, 
                 (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
-               &z, &y, &PadicBase[S])
+               &z, &y, &(PadicBase[S]::padic_ctx))
    if x.exact
       ccall((:padic_add_exact, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &z, &x, &PadicBase[S])
+               &z, &z, &x, &(PadicBase[S]::padic_ctx))
       z.exact = true
    else
       z.N = x.N
       ccall((:padic_add, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &z, &x, &PadicBase[S])
+               &z, &z, &x, &(PadicBase[S]::padic_ctx))
    end
    return z
 end
@@ -410,20 +410,20 @@ function -{S}(x::Padic{S}, y::QQ)
       end
       ccall((:padic_set_exact_fmpz, :libflint), Void, 
                 (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
-               &z, &n, &PadicBase[S])
+               &z, &n, &(PadicBase[S]::padic_ctx))
       z.v -= v
       ccall((:padic_sub_exact, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &x, &z, &PadicBase[S])
+               &z, &x, &z, &(PadicBase[S]::padic_ctx))
       z.exact = true
    else
       z.N = x.N
       ccall((:padic_set_fmpq, :libflint), Void, 
                 (Ptr{Padic}, Ptr{QQ}, Ptr{padic_ctx}), 
-               &z, &y, &PadicBase[S])
+               &z, &y, &(PadicBase[S]::padic_ctx))
       ccall((:padic_sub, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &x, &z, &PadicBase[S])
+               &z, &x, &z, &(PadicBase[S]::padic_ctx))
    end
    return z
 end
@@ -435,18 +435,18 @@ function -{S}(x::Padic{S}, y::ZZ)
    z = Padic{S}()
    ccall((:padic_set_exact_fmpz, :libflint), Void, 
                 (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
-               &z, &y, &PadicBase[S])
+               &z, &y, &(PadicBase[S]::padic_ctx))
    if x.exact
       repr = bool(ccall((:padic_sub_exact, :libflint), Cint, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &x, &z, &PadicBase[S]))
+               &z, &x, &z, &(PadicBase[S]::padic_ctx)))
       !repr && error("Unable to represent negative value exactly")
       z.exact = true
    else
       z.N = x.N
       ccall((:padic_sub, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &x, &z, &PadicBase[S])
+               &z, &x, &z, &(PadicBase[S]::padic_ctx))
    end
    return z
 end
@@ -470,21 +470,21 @@ function -{S}(x::QQ, y::Padic{S})
       end
       ccall((:padic_set_exact_fmpz, :libflint), Void, 
                 (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
-               &z, &n, &PadicBase[S])
+               &z, &n, &(PadicBase[S]::padic_ctx))
       z.v -= v
       repr = bool(ccall((:padic_sub_exact, :libflint), Cint, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &z, &y, &PadicBase[S]))
+               &z, &z, &y, &(PadicBase[S]::padic_ctx)))
       !repr && error("Unable to represent negative value exactly")
       z.exact = true
    else
       z.N = y.N
       ccall((:padic_set_fmpq, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Fraction}, Ptr{padic_ctx}), 
-               &z, &x, &PadicBase[S])
+               &z, &x, &(PadicBase[S]::padic_ctx))
       ccall((:padic_sub, :libflint), Cint, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &z, &y, &PadicBase[S])
+               &z, &z, &y, &(PadicBase[S]::padic_ctx))
    end
    return z
 end
@@ -496,18 +496,18 @@ function -{S}(x::ZZ, y::Padic{S})
    z = Padic{S}()
    ccall((:padic_set_exact_fmpz, :libflint), Void, 
                 (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
-               &z, &x, &PadicBase[S])
+               &z, &x, &(PadicBase[S]::padic_ctx))
    if y.exact
       repr = bool(ccall((:padic_sub_exact, :libflint), Cint, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &z, &y, &PadicBase[S]))
+               &z, &z, &y, &(PadicBase[S]::padic_ctx)))
       !repr && error("Unable to represent negative value exactly")
       z.exact = true
    else
       z.N = y.N
       ccall((:padic_sub, :libflint), Cint, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &z, &y, &PadicBase[S])
+               &z, &z, &y, &(PadicBase[S]::padic_ctx))
    end
    return z
 end
@@ -530,15 +530,15 @@ function *{S}(x::Padic{S}, y::QQ)
       z.exact = true
       res = bool(ccall((:padic_div_exact_fmpz, :libflint), Cint, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
-               &z, &x, &d, &PadicBase[S]))
+               &z, &x, &d, &(PadicBase[S]::padic_ctx)))
       !res && error("Unable to multiply by rational to infinite precision")
       c = Padic{S}()
       ccall((:padic_set_exact_fmpz, :libflint), Void, 
                 (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
-               &c, &n, &PadicBase[S])
+               &c, &n, &(PadicBase[S]::padic_ctx))
       ccall((:padic_mul_exact, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &z, &c, &PadicBase[S])
+               &z, &z, &c, &(PadicBase[S]::padic_ctx))
    else
       p = prime(Padic{S})
       v1, r = remove(n, p)
@@ -546,11 +546,11 @@ function *{S}(x::Padic{S}, y::QQ)
       z.N = x.N - x.v + v1 - v2
       ccall((:padic_set_fmpq, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Fraction}, Ptr{padic_ctx}), 
-               &z, &y, &PadicBase[S])
+               &z, &y, &(PadicBase[S]::padic_ctx))
       z.N = x.N + z.v
       ccall((:padic_mul, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &z, &x, &PadicBase[S])
+               &z, &z, &x, &(PadicBase[S]::padic_ctx))
    end
    return z
 end
@@ -567,17 +567,17 @@ function *{S}(x::Padic{S}, y::ZZ)
    z = Padic{S}()
    ccall((:padic_set_exact_fmpz, :libflint), Void, 
                 (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
-               &z, &y, &PadicBase[S])
+               &z, &y, &(PadicBase[S]::padic_ctx))
    if x.exact
       z.exact = true
       ccall((:padic_mul_exact, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &z, &x, &PadicBase[S])
+               &z, &z, &x, &(PadicBase[S]::padic_ctx))
    else
       z.N = x.N + z.v
       ccall((:padic_mul, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &z, &x, &PadicBase[S])
+               &z, &z, &x, &(PadicBase[S]::padic_ctx))
    end
    return z
 end
@@ -603,7 +603,7 @@ function =={S}(a::Padic{S}, b::Padic{S})
       z.N = a.exact ? b.N : (b.exact ? a.N : min(a.N, b.N))
       ccall((:padic_sub, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), 
-               &z, &a, &b, &PadicBase[S])
+               &z, &a, &b, &(PadicBase[S]::padic_ctx))
       return bool(ccall((:padic_is_zero, :libflint), Cint, 
                 (Ptr{Padic},), &z))
    end
@@ -637,7 +637,7 @@ function =={S}(a::Padic{S}, b::QQ)
       z.N = a.N
       ccall((:padic_set_fmpq, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Fraction}, Ptr{padic_ctx}), 
-               &z, &b, &PadicBase[S])
+               &z, &b, &(PadicBase[S]::padic_ctx))
    end
    return bool(ccall((:padic_equal, :libflint), Cint, 
                 (Ptr{Padic}, Ptr{Padic}), &a, &z))
@@ -654,7 +654,7 @@ function =={S}(a::Padic{S}, b::ZZ)
       z.N = a.N
       ccall((:padic_set_fmpz, :libflint), Void, 
                 (Ptr{Padic}, Ptr{ZZ}, Ptr{padic_ctx}), 
-               &z, &b, &PadicBase[S])
+               &z, &b, &(PadicBase[S]::padic_ctx))
    end
    return bool(ccall((:padic_equal, :libflint), Cint, 
                 (Ptr{Padic}, Ptr{Padic}), &a, &z))
@@ -677,14 +677,14 @@ function ^{S}(a::Padic{S}, n::Int)
    if a.exact
       repr = bool(ccall((:padic_pow_exact_si, :libflint), Cint, 
                 (Ptr{Padic}, Ptr{Padic}, Int, Ptr{padic_ctx}), 
-               &z, &a, n, &PadicBase[S]))
+               &z, &a, n, &(PadicBase[S]::padic_ctx)))
       !repr && error("Unable to invert p-adic to infinite precision")
       z.exact = true
    else
       z.N = a.N + (n - 1)*a.v
       ccall((:padic_pow_si, :libflint), Void, 
                 (Ptr{Padic}, Ptr{Padic}, Int, Ptr{padic_ctx}), 
-               &z, &a, n, &PadicBase[S])
+               &z, &a, n, &(PadicBase[S]::padic_ctx))
    end
    return z
 end
@@ -711,7 +711,7 @@ function divexact{S}(a::Padic{S}, b::Padic{S})
    else
       z.N = min(a.N - b.v, b.N - 2*b.v + a.v)
    end
-   ccall((:padic_div, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &b, &PadicBase[S])
+   ccall((:padic_div, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &b, &(PadicBase[S]::padic_ctx))
    return z
 end
 
@@ -756,7 +756,7 @@ function inv{S}(a::Padic{S})
       !repr && error("Unable to invert infinite precision p-adic")
    else
       z.N = a.N - 2*a.v
-      ccall((:padic_inv, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &PadicBase[S])
+      ccall((:padic_inv, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &(PadicBase[S]::padic_ctx))
    end
    return z
 end
@@ -777,7 +777,7 @@ function sqrt{S}(a::Padic{S})
       return z
    end
    z.N = a.N - div(a.v, 2)
-   res = bool(ccall((:padic_sqrt, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &PadicBase[S]))      
+   res = bool(ccall((:padic_sqrt, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &(PadicBase[S]::padic_ctx)))      
    !res && error("Square root of p-adic does not exist")
    return z
 end
@@ -798,7 +798,7 @@ function exp{S}(a::Padic{S})
    end
    z = Padic{S}()
    z.N = a.N
-   res = bool(ccall((:padic_exp, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &PadicBase[S]))
+   res = bool(ccall((:padic_exp, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &(PadicBase[S]::padic_ctx)))
    !res && error("Unable to compute exponential")
    return z
 end
@@ -813,7 +813,7 @@ function log{S}(a::Padic{S})
    end
    z = Padic{S}()
    z.N = a.N
-   res = bool(ccall((:padic_log, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &PadicBase[S]))
+   res = bool(ccall((:padic_log, :libflint), Cint, (Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &(PadicBase[S]::padic_ctx)))
    !res && error("Unable to compute logarithm")
    return z
 end
@@ -828,7 +828,7 @@ function teichmuller{S}(a::Padic{S})
    end
    z = Padic{S}()
    z.N = a.N
-   ccall((:padic_teichmuller, :libflint), Void, (Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &PadicBase[S])
+   ccall((:padic_teichmuller, :libflint), Void, (Ptr{Padic}, Ptr{Padic}, Ptr{padic_ctx}), &z, &a, &(PadicBase[S]::padic_ctx))
    return z
 end
   
