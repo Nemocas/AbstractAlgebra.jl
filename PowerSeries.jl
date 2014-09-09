@@ -87,7 +87,7 @@ end
 
 function PowerSeries{S, M}(::Type{PowerSeries{Residue{ZZ, M}, S}}, a :: Array{Residue{ZZ, M}, 1}, n::Precision)
    z = PowerSeries{Residue{ZZ, M}, S}(PowerSeries, n)
-   ccall((:fmpz_mod_poly_init2, :libflint), Void, (Ptr{PowerSeries}, Ptr{ZZ}, Int), &z, &eval(:($M)), length(a))
+   ccall((:fmpz_mod_poly_init2, :libflint), Void, (Ptr{PowerSeries}, Ptr{ZZ}, Int), &z, &ResidueModulus[M], length(a))
    for i = 1:length(a)
       ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, (Ptr{PowerSeries}, Int, Ptr{ZZ}),
             &z, i - 1, &(a[i].data))

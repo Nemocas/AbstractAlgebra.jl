@@ -1,6 +1,8 @@
-export Residue, ResidueRing, modulus, copy, inv, canonical_unit
+export Residue, ResidueRing, modulus, copy, inv, canonical_unit, ResidueModulus
 
 import Base: convert, zero
+
+ResidueModulus = ObjectIdDict()
 
 ###########################################################################################
 #
@@ -10,9 +12,9 @@ import Base: convert, zero
 
 type Residue{T <: Ring, S} <: Ring
    data::T
-   Residue(a::Int) = new(mod(convert(T, a), eval(:($S))))
-   Residue(a::ZZ) = new(mod(convert(T, a), eval(:($S))))
-   Residue(a::T) = new(mod(a, eval(:($S))))
+   Residue(a::Int) = new(mod(convert(T, a), ResidueModulus[S]))
+   Residue(a::ZZ) = new(mod(convert(T, a), ResidueModulus[S]))
+   Residue(a::T) = new(mod(a, ResidueModulus[S]))
    Residue(a::Residue{T, S}) = a
    Residue() = new(T(0))
 end
@@ -24,7 +26,7 @@ end
 ###########################################################################################
 
 function modulus{T <: Ring, S}(::Type{Residue{T, S}})
-   return eval(:($S))
+   return ResidueModulus[S]
 end
 
 zero{T <: Ring, S}(::Type{Residue{T, S}}) = Residue{T, S}(0)
@@ -36,7 +38,7 @@ iszero{T <: Ring, S}(a::Residue{T, S}) = iszero(a.data)
 isone{T <: Ring, S}(a::Residue{T, S}) = isone(a.data)
 
 function isunit{T <: Ring, S}(a::Residue{T, S})
-   g, ainv = gcdinv(a.data, eval(:($S)))
+   g, ainv = gcdinv(a.data, ResidueModulus[S])
    return g == 1
 end
 
@@ -109,14 +111,14 @@ canonical_unit{T, S}(a::Residue{T, S}) = a
 *{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S}) = Residue{T, S}(a.data * b.data)
 
 function divexact{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
-   g, binv = gcdinv(b.data, eval(:($S)))
+   g, binv = gcdinv(b.data, ResidueModulus[S])
    if g != 1
       error("Impossible inverse in divexact")
    end
    Residue{T, S}(a.data * binv)
 end
 
-gcd{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S}) = Residue{T, S}(gcd(gcd(a.data, eval(:($S))), b.data))
+gcd{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S}) = Residue{T, S}(gcd(gcd(a.data, ResidueModulus[S]), b.data))
 
 ###########################################################################################
 #
@@ -125,11 +127,11 @@ gcd{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S}) = Residue{T, S}(gcd(gcd(a.
 ###########################################################################################
 
 function mul!{T <: Ring, S}(c::Residue{T, S}, a::Residue{T, S}, b::Residue{T, S})
-   c.data = mod(a.data*b.data, eval(:($S)))
+   c.data = mod(a.data*b.data, ResidueModulus[S])
 end
 
 function addeq!{T <: Ring, S}(c::Residue{T, S}, a::Residue{T, S})
-   c.data = mod(c.data + a.data, eval(:($S)))
+   c.data = mod(c.data + a.data, ResidueModulus[S])
 end
 
 ###########################################################################################
@@ -169,7 +171,7 @@ end
 ###########################################################################################
 
 function ^{T <: Ring, S}(a::Residue{T, S}, b::Int)
-   Residue{T, S}(powmod(a.data, b, eval(:($S))))
+   Residue{T, S}(powmod(a.data, b, ResidueModulus[S]))
 end
 
 ###########################################################################################
@@ -179,7 +181,7 @@ end
 ###########################################################################################
 
 function divexact{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
-   g, binv = gcdinv(b.data, eval(:($S)))
+   g, binv = gcdinv(b.data, ResidueModulus[S])
    if g != 1
       error("Impossible inverse in inv")
    end
@@ -187,7 +189,7 @@ function divexact{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
 end
 
 function divexact{T <: Ring, S}(a::Residue{T, S}, b::Int)
-   g, binv = gcdinv(T(b), eval(:($S)))
+   g, binv = gcdinv(T(b), ResidueModulus[S])
    if g != 1
       error("Impossible inverse in inv")
    end
@@ -195,7 +197,7 @@ function divexact{T <: Ring, S}(a::Residue{T, S}, b::Int)
 end
 
 function divexact{T <: Ring, S}(a::Residue{T, S}, b::ZZ)
-   g, binv = gcdinv(T(b), eval(:($S)))
+   g, binv = gcdinv(T(b), ResidueModulus[S])
    if g != 1
       error("Impossible inverse in inv")
    end
@@ -209,7 +211,7 @@ end
 ###########################################################################################
 
 function inv{T <: Ring, S}(a::Residue{T, S})
-   g, ainv = gcdinv(a.data, eval(:($S)))
+   g, ainv = gcdinv(a.data, ResidueModulus[S])
    if g != 1
       error("Impossible inverse in inv")
    end
@@ -238,7 +240,7 @@ function ResidueRing{T <: Ring}(::Type{T}, el::T)
    el == 0 && throw(DivideError())
    S = gensym("residue")
    P = Residue{T, S}
-   eval(:($S = $el))
+   ResidueModulus[S] = el
    return P
 end
 
@@ -246,6 +248,6 @@ function ResidueRing{T <: Ring}(::Type{T}, el::Int)
    el == 0 && throw(DivideError())
    S = gensym("residue")
    P = Residue{T, S}
-   eval(:($S = $T($el)))
+   ResidueModulus[S] = T(el)
    return P
 end
