@@ -78,3 +78,14 @@ can still be performed
 * ensure exp is only defined for rings in which division by an integer is
 possible
 
+Julia bugs??
+============
+
+* Julia cleans up fq_ctx before it is passed to C function fq_poly_clear
+
+* Overloading / for poly/coeff causes ambiguity
+
+* Stack overflow when using the catchall in Rings.jl
+
+* functions defined inside functions (e.g. convert in PolynomialRing) cause crashes if function is called multiple times with different types, because the same lines of code correspond to different functions
+
