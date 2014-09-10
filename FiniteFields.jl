@@ -1,5 +1,5 @@
 export FiniteField, FinFieldElem, gen, characteristic, degree, order, convert, promote_rule, pth_root, 
-       trace, norm, frobenius, FinFieldCtx
+       trace, norm, frobenius, FinFieldCtx, count_ff
 
 import Base: convert, promote_rule
 
@@ -17,7 +17,7 @@ type fq_ctx
    inv::fmpz_mod_poly_struct
    var :: Ptr{Void}
    function fq_ctx(p::ZZ, deg::Int, var::String) 
-      d = new(0, 0, C_NULL, C_NULL, 0, fmpz_mod_poly_struct(), fmpz_mod_poly_struct(), C_NULL)
+      d = new()
       finalizer(d, _fq_ctx_clear_fn)
       ccall((:fq_ctx_init, :libflint), Void, (Ptr{fq_ctx}, Ptr{ZZ}, Int, Ptr{Uint8}), &d, &p, deg, bytestring(var))
       return d
@@ -28,6 +28,8 @@ function _fq_ctx_clear_fn(a :: fq_ctx)
    ccall((:fq_ctx_clear, :libflint), Void, (Ptr{fq_ctx},), &a)
 end
 
+FFCache = Array(Any, 0)
+   
 type FinFieldElem{S} <: Field
    data::fmpz_poly_struct
    function FinFieldElem()

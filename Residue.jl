@@ -230,6 +230,12 @@ Base.convert{T <: Ring, S}(::Type{Residue{T, S}}, a::Int) = Residue{T, S}(a)
 
 Base.convert{T <: Ring, S}(::Type{Residue{T, S}}, a::ZZ) = Residue{T, S}(a)
 
+Base.promote_rule{T <: Ring, S}(::Type{Residue{T, S}}, ::Type{T}) = Residue{T, S}
+
+Base.promote_rule{T <: Ring, S}(::Type{Residue{T, S}}, ::Int) = Residue{T, S}
+
+Base.promote_rule{T <: Ring, S}(::Type{Residue{T, S}}, ::ZZ) = Residue{T, S}
+
 ###########################################################################################
 #
 #   ResidueRing constructor
