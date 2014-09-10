@@ -1,4 +1,4 @@
-The Nemo.jl package is licensed under the Simplified "2-clause" BSD License:
+The individual .jl files in the Nemo.jl package are licensed under the Simplified "2-clause" BSD License:
 
 > Copyright (c) 2014: William Hart.
 >
@@ -23,3 +23,11 @@ The Nemo.jl package is licensed under the Simplified "2-clause" BSD License:
 > THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 > (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 > OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+External libraries, if used, include their own licenses:
+
+- [GMP](http://gmplib.org/manual/Copying.html#Copying)
+- [MPFR](http://www.mpfr.org/mpfr-current/mpfr.html#Copying)
+- [MPIR](http://mpir.org/)
+- [FLINT](http://flintlib.org/)
+
