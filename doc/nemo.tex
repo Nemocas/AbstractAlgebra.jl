@@ -232,31 +232,34 @@ to the way C++ constructors and destructors work.
 
 \subsubsection{Dependent and parametric types}
 
-Few languages in the world sport a proper dependent and parametric type system. If they
+Few languages in the world sport a decent dependent and parametric type system. If they
 do, it is usually at static compile time only.
 
-The prime example of dependent types for a computer algebraist is when creating a type for
+The prime example of parametric types for a computer algebraist is when creating a type for
 polynomials over a ring $R$. In Julia, we can provide a type called Poly, which depends on
 another type, $R$ say, specifying the ring you are working over. e.g. $R$ might be the
 integers, or another polynomial ring, or a ring of matrices, etc.
 
 A type can depend on as many types as one would like.
 
-In contrast to dependent types, the prime example of a parametric type arises for a number 
+In contrast to parametric types, the prime example of a dependent type arises for a number 
 theorist when working with a number field or in $\Z/n\Z$. Elements of these rings have a
 modulus (e.g. the defining polynomial of the number field, or the modulus $n$ of the residue
 ring $\Z/n\Z$).
 
 In other words, we want the type to depend on a value (here $n$), rather than another
-type. Thus the type for $\Z/n\Z$ is a parametric type.
+type. Thus the type for $\Z/n\Z$ is a dependent type.
 
 Julia doesn't quite allow types to be parameterised by arbitrary objects such as a
 polynomial or an bignum integer $n$. But it does allow parameterisation by a machine
 integer or a symbol (a variable name without a value attached), and this is enough.
 
-The usefulness of this is again in performance. If the modulus $n$ is retained as part of
-the type and not part of the object, then it does not have to be carried along at
-runtime. 
+We might refer to this as static dependent typing versus dynamic dependent typing. Julia
+has the former because it can be highly optimised. 
+
+The usefulness of dependent types for Nemo is in performance. If the modulus $n$ can be
+retained as part of the type and not part of the object, then it does not have to be carried
+along at runtime. 
 
 Imagine for example a polynomial over $\Z/n\Z$. Each coefficient is an object in $\Z/n\Z$.
 We can represent each such value by a pair of integers, one for the residue, one for the
@@ -297,10 +300,19 @@ The only thing remaining for the generic function to do is to implement the gene
 algorithm which works over arbitrary rings. The generic implementation only gets
 called if no specialised implementation exists for those types.
 
-Finally, with type unions, Julia types representing polynomials over various rings can
-internally use multiple different data representations, even C objects. This means that
-specialised implementations for particular rings can directly call native C functions,
-with practically zero overhead.
+Finally, with specialised implementations of functions for particular rings Julia can 
+directly call native C functions that implement the operations over those rings, with 
+practically zero overhead.
+
+The static dependent typing approach has some limitations. One cannot expect to generate
+many dependent types programmatically, e.g. $\Z/p\Z$ for lots of values $p$, since the way
+the optimiser works is to compile the same function once for each different type, i.e.
+for each value of $p$ that is actually used in the program.
+
+For this reason, one should not expect to implement multimodular algorithms, for example,
+with $\Z/p\Z$ represented using a dependent type. Instead, one should implement such
+algorithms over $\Z$ directly, interpreting the values as residues modulo the current
+prime $p$, i.e. such algorithms have to be implemented the old-fashioned way.
 
 \subsection{Problems with Julia}
 
