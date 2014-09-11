@@ -1,6 +1,6 @@
 module Test
 
-using Base.Test, Rings, Fields
+using Base.Test, Nemo.Rings, Nemo.Fields
 
 export test_all
 
