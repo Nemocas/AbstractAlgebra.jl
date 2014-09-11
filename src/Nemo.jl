@@ -1,6 +1,6 @@
 module Nemo
 
-include("../deps/deps.jl")
+include("../deps/build.jl")
 
 # Deliberately empty module for packaging. 
 # So how do we import all symbols from a bunch of other modules
