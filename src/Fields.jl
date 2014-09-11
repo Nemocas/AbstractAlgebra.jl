@@ -39,7 +39,7 @@ include("Poly2.jl")
 
 include("PowerSeries2.jl")
 
-include("Fields-test.jl")
+include("../test/Fields-test.jl")
 
 end # module
 

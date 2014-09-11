@@ -158,6 +158,6 @@ include("Poly.jl")
 
 include("PowerSeries.jl")
 
-include("Rings-test.jl")
+include("../test/Rings-test.jl")
 
 end # module

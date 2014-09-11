@@ -2,4 +2,12 @@ using Nemo
 using Base.Test
 
 # write your own tests here
-@test 1 == 1
+
+using Rings
+
+Rings.Test.test_all()
+
+using Fields
+
+Fields.Test.test_all()
+
