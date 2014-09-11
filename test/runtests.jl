@@ -2,9 +2,7 @@ using Base.Test
 
 # write your own tests here
 
-using Nemo
+Nemo.Rings.Test.test_all()
 
-Rings.Test.test_all()
-
-Fields.Test.test_all()
+Nemo.Fields.Test.test_all()
 
