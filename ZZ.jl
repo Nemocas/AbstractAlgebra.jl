@@ -37,21 +37,6 @@ export ZZ, fac, binom, isprime, fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm,
        eulerphi, fib, moebiusmu, primorial, risingfac, canonical_unit, needs_parentheses,
        is_negative, show_minus_one, parseint, addeq!, mul!, isunit
 
-###########################################################################################
-#
-#   Helper macros/aliases
-#
-###########################################################################################
-
-# We define unions of integer types to save defining functions for each type in the union
-
-if Clong == Int32
-    typealias ClongMax Union(Int8, Int16, Int32)
-    typealias CulongMax Union(Uint8, Uint16, Uint32)
-else
-    typealias ClongMax Union(Int8, Int16, Int32, Int64)
-    typealias CulongMax Union(Uint8, Uint16, Uint32, Uint64)
-end
 
 ###########################################################################################
 #
@@ -65,7 +50,7 @@ type ZZ <: Ring
     d::Int
 
     function ZZ()
-        b = new(zero(Int))
+        b = new()
         ccall((:fmpz_init, :libflint), Void, (Ptr{ZZ},), &b)
         finalizer(b, _fmpz_clear_fn)
         return b
@@ -100,19 +85,11 @@ function parseint(::Type{ZZ}, s::String, base::Int = 10)
     return sgn < 0 ? -z : z
 end
 
-function ZZ(x::Union(Clong, Int))
+function ZZ(x::Int)
     z = ZZ()
     ccall((:__fmpz_set_si, :libflint), Void, (Ptr{ZZ}, Int), &z, x)
     return z
 end
-
-function ZZ(x::Union(Culong, Uint))
-    z = ZZ()
-    ccall((:__fmpz_set_ui, :libflint), Void, (Ptr{ZZ}, Uint), &z, x)
-    return z
-end
-
-ZZ(x::Bool) = ZZ(uint(x))
 
 function ZZ(x::Float64)
     !isinteger(x) && throw(InexactError())
@@ -121,37 +98,9 @@ function ZZ(x::Float64)
     return z
 end
 
-ZZ(x::Union(Float16, Float32)) = ZZ(float64(x))
+ZZ(x::Float16) = ZZ(float64(x))
 
-# Any other kind of Integer will be taken 32 bits at a time
-
-function ZZ(x::Integer)
-    if x < 0
-        if typemin(Clong) <= x
-            return ZZ(convert(Clong, x))
-        end
-        b = ZZ(0)
-        shift = 0
-        while x < -1
-            b += ZZ(~uint32(x & 0xffffffff)) << shift
-            x >>= 32
-            shift += 32
-        end
-        return -b - 1
-    else
-        if x <= typemax(Culong)
-            return ZZ(convert(Culong, x))
-        end
-        b = ZZ(0)
-        shift = 0
-        while x > 0
-            b += ZZ(uint32(x & 0xffffffff)) << shift
-            x >>>= 32
-            shift += 32
-        end
-        return b
-    end
-end
+ZZ(x::Float32) = ZZ(float64(x))
 
 function deepcopy(a::ZZ)
    z = ZZ()
@@ -410,54 +359,38 @@ end
 #
 ###########################################################################################
 
-function +(x::ZZ, c::Uint)
+function +(x::ZZ, c::Int)
     z = ZZ()
-    ccall((:fmpz_add_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Uint), &z, &x, c)
+    if c >= 0
+       ccall((:fmpz_add_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
+    else
+       ccall((:fmpz_sub_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, -c)
+    end
     return z
 end
 
-+(c::Uint, x::ZZ) = x + c
++(c::Int, x::ZZ) = x + c
 
-+(c::CulongMax, x::ZZ) = x + convert(Uint, c)
-
-+(x::ZZ, c::CulongMax) = x + convert(Uint, c)
-
-+(x::ZZ, c::ClongMax) = c < 0 ? -(x, convert(Uint, -c)) : x + convert(Uint, c)
-
-+(c::ClongMax, x::ZZ) = c < 0 ? -(x, convert(Uint, -c)) : x + convert(Uint, c)
-
-function -(x::ZZ, c::Uint)
+function -(x::ZZ, c::Int)
     z = ZZ()
-    ccall((:fmpz_sub_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Uint), &z, &x, c)
+    if c >= 0
+       ccall((:fmpz_sub_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
+    else
+       ccall((:fmpz_add_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, -c)
+    end
     return z
 end
 
-function -(c::Uint, x::ZZ)
+function -(c::Int, x::ZZ)
     z = ZZ()
-    ccall((:fmpz_sub_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Uint), &z, &x, c)
+    if c >= 0
+       ccall((:fmpz_sub_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, c)
+    else
+       ccall((:fmpz_add_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Int), &z, &x, -c)
+    end
     ccall((:__fmpz_neg, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}), &z, &z)
     return z
 end
-
--(x::ZZ, c::CulongMax) = -(x, convert(Uint, c))
-
--(c::CulongMax, x::ZZ) = -(convert(Uint, c), x)
-
--(x::ZZ, c::ClongMax) = c < 0 ? +(x, convert(Uint, -c)) : -(x, convert(Uint, c))
-
--(c::ClongMax, x::ZZ) = c < 0 ? -(x + convert(Uint, -c)) : -(convert(Uint, c), x)
-
-function *(x::ZZ, c::Uint)
-    z = ZZ()
-    ccall((:fmpz_mul_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Uint), &z, &x, c)
-    return z
-end
-
-*(c::Uint, x::ZZ) = x * c
-
-*(c::CulongMax, x::ZZ) = x * convert(Uint, c)
-
-*(x::ZZ, c::CulongMax) = x * convert(Uint, c)
 
 function *(x::ZZ, c::Int)
     z = ZZ()
@@ -466,10 +399,6 @@ function *(x::ZZ, c::Int)
 end
 
 *(c::Int, x::ZZ) = x * c
-
-*(x::ZZ, c::ClongMax) = x * convert(Int, c)
-
-*(c::ClongMax, x::ZZ) = x * convert(Int, c)
 
 function <<(x::ZZ, c::Int)
     c < 0 && throw(DomainError())
@@ -575,23 +504,14 @@ function clog(x::ZZ, c::Int)
     return ccall((:fmpz_clog_ui, :libflint), Int, (Ptr{ZZ}, Int), &x, c)
 end
 
-function ^(x::ZZ, y::Uint)
-    z = ZZ()
-    ccall((:fmpz_pow_ui, :libflint), Void, (Ptr{ZZ}, Ptr{ZZ}, Culong), &z, &x, y)
-    return z
-end
 
-function zz_pow(x::ZZ, y::Int)
+function ^(x::ZZ, y::Int)
     if y < 0; throw(DomainError()); end
     if x == 1; return x; end
     if x == -1; return isodd(y) ? x : -x; end
     if y > typemax(Uint); throw(DomainError()); end
     return x^uint(y)
 end
-
-^(x::ZZ, y::Bool) = y ? x : one(x)
-
-^(x::ZZ, y::Int) = zz_pow(x, y)
 
 ###########################################################################################
 #
