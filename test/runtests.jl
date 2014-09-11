@@ -1,4 +1,4 @@
-using Base.Test
+using Base.Test, Nemo
 
 # write your own tests here
 
