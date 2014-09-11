@@ -1,6 +1,6 @@
 module Fields
 
-using Rings
+using Nemo.Rings
 
 function /{S <: Ring, T <: Ring}(x::S, y::T) 
    T1 = promote_type(S, T)
@@ -38,8 +38,6 @@ include("Padics2.jl")
 include("Poly2.jl")
 
 include("PowerSeries2.jl")
-
-include("../test/Fields-test.jl")
 
 end # module
 

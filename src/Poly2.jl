@@ -4,7 +4,7 @@
 #
 ###########################################################################################    
 
-import Rings: Poly, coeff, isgen, truncate, mullow, 
+import Nemo.Rings: Poly, coeff, isgen, truncate, mullow, 
               divexact, gcd, content, primpart, mod, divrem, evaluate, compose, deriv, 
               resultant, bezout, integral, lcm, reverse, shift_left, shift_right, 
               setcoeff!, mulmod, powmod, length

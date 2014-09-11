@@ -6,7 +6,7 @@ export Fraction, FractionField, num, den, zero, one, gcd, divexact, mul!, addeq!
 
 import Base: convert, show, gcd, string
 
-import Rings: divexact, mul!, addeq!, inv, canonical_unit, mod, divrem, needs_parentheses,
+import Nemo.Rings: divexact, mul!, addeq!, inv, canonical_unit, mod, divrem, needs_parentheses,
               is_negative, show_minus_one, zero, one, isunit, iszero, isone, degree,
               isequal
 

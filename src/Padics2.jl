@@ -4,7 +4,7 @@
 #
 ###########################################################################################    
 
-import Rings: O, valuation, isequal
+import Nemo.Rings: O, valuation, isequal
 
 import Base: sqrt, exp, log
 

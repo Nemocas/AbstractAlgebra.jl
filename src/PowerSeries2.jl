@@ -4,7 +4,7 @@
 #
 ###########################################################################################    
 
-import Rings: PowerSeries, PowerSeriesRing, max, min, isless, Precision, valuation, O,
+import Nemo.Rings: PowerSeries, PowerSeriesRing, max, min, isless, Precision, valuation, O,
               coeff, truncate, divexact
 
 export PowerSeries, coeff, truncate, divexact

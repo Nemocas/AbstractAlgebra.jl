@@ -3,7 +3,7 @@ export FiniteField, FinFieldElem, gen, characteristic, degree, order, convert, p
 
 import Base: convert, promote_rule
 
-import Rings: gen
+import Nemo.Rings: gen
 
 FinFieldCtx = ObjectIdDict()
 
