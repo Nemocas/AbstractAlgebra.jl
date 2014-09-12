@@ -15,7 +15,11 @@ run(`rm mpir-2.7.0-alpha10.tar.bz2`)
 cd("$pwd/mpir-2.7.0")
 
 if on_windows
-   run(`sh configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared`)
+   if Int == Int32
+      run(`sh configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared ABI=32`)
+   else
+      run(`sh configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared ABI=64`)
+   end
 else
    run(`./configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared`)
 end
@@ -48,7 +52,7 @@ cd("$pwd/flint2")
 
 if on_windows
    if Int == Int32
-      run(`sh configure --prefix=$pwd --disable-static --enable-shared --with-mpir=$pwd --with-mpfr=$pwd`)
+      run(`sh configure --prefix=$pwd --disable-static --enable-shared --with-mpir=$pwd --with-mpfr=$pwd ABI=32`)
    else
       run(`sh configure --prefix=$pwd --disable-static --enable-shared --with-mpir=$pwd --with-mpfr=$pwd ABI=64`)
    end
