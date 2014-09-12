@@ -1,5 +1,9 @@
+oldpwd = chomp(readall(`pwd`))
+
 pkgdir = Pkg.dir("Nemo") 
 pwd = "$pkgdir/src"
+
+cd(pwd)
 
 # install MPIR
 
@@ -33,4 +37,6 @@ run(`make install`)
 cd(pwd)
 
 push!(DL_LOAD_PATH, "$pwd/lib")
+
+cd(oldpwd)
 
