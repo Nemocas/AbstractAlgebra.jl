@@ -1,6 +1,7 @@
 module Nemo
 
-pwd = chomp(readall(`pwd`))
+pkgdir = Pkg.dir("Nemo")
+pwd = "$pkgdir/src"
 push!(DL_LOAD_PATH, "$pwd/lib")
 
 include("Rings.jl")

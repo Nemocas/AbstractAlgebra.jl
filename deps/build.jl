@@ -1,4 +1,5 @@
-pwd = chomp(readall(`pwd`))
+pkgdir = Pkg.dir("Nemo") 
+pwd = "$pkgdir/src"
 
 # install MPIR
 
