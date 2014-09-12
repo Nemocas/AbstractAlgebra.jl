@@ -1094,20 +1094,8 @@ julia> Profile.print()
 
 \section{Installing Nemo}
 
-There are currently three steps to installing Nemo: install flint, install Julia and
-clone the Nemo git repository.
-
-Installing flint is described in detail in the flint documentation. Nemo currently
-depends on features of flint only available in the bleeding edge git repository,
-which can be obtained as follows
-
-\begin{verbatim}
-git clone https://github.com/wbhart/flint2
-\end{verbatim}
-
-The other instructions are as per the manual for flint-2.4 on the flint website (see
-\url{http://flintlib.org}). Note that flint-2.4 requires GMP 5 or MPIR 2.7 and MPFR
-3.1.
+There are currently two steps to installing Nemo: install Julia-0.3 and use the Julia
+package system to install Nemo.
 
 To install Julia, please refer to the installation instructions on the Julia website
 (\url{http://julialang.org/}).
@@ -1121,44 +1109,16 @@ sudo apt-get update
 sudo apt-get install julia
 \end{verbatim}
 
-Then you need to download the Nemo git repository
+Once Julia-0.3 is installed, start up Julia (type \code{julia} at the command 
+line/shell prompt).
+
+Now you can clone, build and test Nemo as follows:
 
 \begin{verbatim}
-git clone https://github.com/wbhart/nemo
+Pkg.clone("https://github.com/wbhart/Nemo.git")
+Pkg.build()
+Pkg.test("Nemo")
 \end{verbatim}
-
-Finally, edit the nemo script by setting the library directories for GMP/MPIR, MPFR
-and flint appropriately.
-
-To run nemo, just type
-
-\begin{verbatim}
-./nemo
-\end{verbatim}
-
-The Julia prompt will appear. If everything went according to plan, you can now use 
-Julia, including all of the Nemo functionality described in the chapters below.
-
-\section{Running the test suite}
-
-Nemo comes equipped with a test suite. Each module defines a function which you can
-call to run the tests for that module.
-
-For example, for the \code{Rings} module, type
-
-\begin{lstlisting}
-using Rings
-
-Rings.Test.test_all()
-\end{lstlisting}
-
-For the \code{Fields} module, type
-
-\begin{lstlisting}
-using Fields
-
-Fields.Test.test_all()
-\end{lstlisting}
 
 The tests should only take a few seconds to a minute to run per module, depending on
 the speed of your machine. However, they will run faster on a second run due to not
@@ -1176,7 +1136,7 @@ At present there is a single module, called \code{Rings}. To import it and use a
 exported functionality simply type
 
 \begin{lstlisting}
-using Rings
+using Nemo.Rings
 \end{lstlisting}
 
 The first thing the \code{Rings} module does is define a new abstract type called
@@ -4343,7 +4303,7 @@ exception is thrown.}
 Here are some examples of special functions.
 
 \begin{lstlisting}
-using Fields
+using Nemo.Fields
 
 R, x = PowerSeriesRing(QQ, "x")
 
@@ -4357,7 +4317,7 @@ Nemo provides various constructions of fields. To make use of this
 functionality simply import the \code{Fields} module
 
 \begin{lstlisting}
-using Fields
+using Nemo.Fields
 \end{lstlisting}
 
 The first thing the \code{Fields} module does is define the abstract
