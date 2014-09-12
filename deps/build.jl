@@ -9,9 +9,9 @@ on_windows = @windows ? true : false
 
 if on_windows
    if Int == Int32
-      run(`set MSYSTEM=MINGW32`)
+      ENV["MSYSTEM"]="MINGW32"
    else
-      run(`set MSYSTEM=MINGW64`)
+      ENV["MSYSTEM"]="MINGW64"
    end
 end
 
