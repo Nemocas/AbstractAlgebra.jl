@@ -23,6 +23,7 @@ run(`rm mpir-2.7.0-alpha10.tar.bz2`)
 cd("$pwd/mpir-2.7.0")
 
 if on_windows
+   run(`sed -i 's/data.rel.ro.local,"aw",@progbits/data.rel.ro.local,"aw"/g' $pwd/mpir-2.7.0/mpn/x86_64/x86_64-defs.m4`)
    if Int == Int32
       run(`bash configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared ABI=32`)
    else
