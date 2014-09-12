@@ -31,8 +31,8 @@ if on_windows
    else
       run(`$start /e:4096 /c sh configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared ABI=64`)
    end
-   run(`$start /e:4096 /c sh make -j4`)
-   run(`$start /e:4096 /c sh make install`)
+   run(`$start /e:4096 /c make -j`)
+   run(`$start /e:4096 /c make install`)
 else
    run(`./configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared`)
    run(`make -j4`)
@@ -50,8 +50,8 @@ cd("$pwd/mpfr-3.1.2")
 
 if on_windows
    run(`$start /e:4096 /c sh configure --prefix=$pwd --with-gmp=$pwd --disable-static --enable-shared`)
-   run(`$start /e:4096 /c sh make -j4`)
-   run(`$start /e:4096 /c sh make install`)
+   run(`$start /e:4096 /c make -j`)
+   run(`$start /e:4096 /c make install`)
 else
    run(`./configure --prefix=$pwd --with-gmp=$pwd --disable-static --enable-shared`)
    run(`make -j4`)
@@ -71,8 +71,8 @@ if on_windows
    else
       run(`$start /e:4096 /c sh sh configure --prefix=$pwd --disable-static --enable-shared --with-mpir=$pwd --with-mpfr=$pwd ABI=64`)
    end
-   run(`$start /e:4096 /c sh make -j4`)
-   run(`$start /e:4096 /c sh make install`)
+   run(`$start /e:4096 /c make -j`)
+   run(`$start /e:4096 /c make install`)
 else
    run(`./configure --prefix=$pwd --disable-static --enable-shared --with-mpir=$pwd --with-mpfr=$pwd`)
    run(`make -j4`)
