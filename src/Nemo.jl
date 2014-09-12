@@ -1,8 +1,12 @@
 module Nemo
 
 pkgdir = Pkg.dir("Nemo")
-pwd = "$pkgdir/src"
-push!(DL_LOAD_PATH, "$pwd/lib")
+
+if on_windows
+   push!(DL_LOAD_PATH, "$pkdir\\src\\lib")
+else
+   push!(DL_LOAD_PATH, "$pkdir/src/lib")
+end
 
 include("Rings.jl")
 include("Fields.jl")

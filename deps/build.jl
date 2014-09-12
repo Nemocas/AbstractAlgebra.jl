@@ -60,7 +60,11 @@ run(`make -j4`)
 run(`make install`)
 cd(pwd)
 
-push!(DL_LOAD_PATH, "$pwd/lib")
+if on_windows
+   push!(DL_LOAD_PATH, "$pkdir\\src\\lib")
+else
+   push!(DL_LOAD_PATH, "$pkdir/src/lib")
+end
 
 cd(oldpwd)
 
