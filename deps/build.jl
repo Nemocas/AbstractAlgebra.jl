@@ -7,6 +7,14 @@ cd(pwd)
 
 on_windows = @windows ? true : false
 
+if on_windows
+   if Int == Int32
+      run(`set MSYSTEM=MINGW32`)
+   else
+      run(`set MSYSTEM=MINGW64`)
+   end
+end
+
 # install MPIR
 
 run(`wget http://mpir.org/mpir-2.7.0-alpha10.tar.bz2`)
@@ -16,9 +24,9 @@ cd("$pwd/mpir-2.7.0")
 
 if on_windows
    if Int == Int32
-      run(`sh configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared ABI=32`)
+      run(`bash configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared ABI=32`)
    else
-      run(`sh configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared ABI=64`)
+      run(`bash configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared ABI=64`)
    end
 else
    run(`./configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared`)
@@ -36,7 +44,7 @@ run(`rm mpfr-3.1.2.tar.bz2`)
 cd("$pwd/mpfr-3.1.2")
 
 if on_windows
-   run(`sh configure --prefix=$pwd --with-gmp=$pwd --disable-static --enable-shared`)
+   run(`bash configure --prefix=$pwd --with-gmp=$pwd --disable-static --enable-shared`)
 else
    run(`./configure --prefix=$pwd --with-gmp=$pwd --disable-static --enable-shared`)
 end
@@ -52,9 +60,9 @@ cd("$pwd/flint2")
 
 if on_windows
    if Int == Int32
-      run(`sh configure --prefix=$pwd --disable-static --enable-shared --with-mpir=$pwd --with-mpfr=$pwd ABI=32`)
+      run(`bash configure --prefix=$pwd --disable-static --enable-shared --with-mpir=$pwd --with-mpfr=$pwd ABI=32`)
    else
-      run(`sh configure --prefix=$pwd --disable-static --enable-shared --with-mpir=$pwd --with-mpfr=$pwd ABI=64`)
+      run(`bash configure --prefix=$pwd --disable-static --enable-shared --with-mpir=$pwd --with-mpfr=$pwd ABI=64`)
    end
 else
    run(`./configure --prefix=$pwd --disable-static --enable-shared --with-mpir=$pwd --with-mpfr=$pwd`)
