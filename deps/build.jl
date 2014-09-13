@@ -9,7 +9,10 @@ on_windows = @windows ? true : false
 
 if on_windows
    oldpth = ENV["PATH"]
-   pth = join(shift!(shift!(split(oldpth, ";"))))
+   pth = split(oldpth, ";")
+   shift!(pth)
+   shift!(pth)
+   pth = join(pth)
 
    if Int == Int32
       ENV["MSYSTEM"]="MINGW32"
