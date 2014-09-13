@@ -14,6 +14,8 @@ if on_windows
    shift!(pth)
    pth = join(pth)
 
+   start = ENV["COMSPEC"]
+
    if Int == Int32
       ENV["MSYSTEM"]="MINGW32"
    else
@@ -32,12 +34,12 @@ if on_windows
    # run(`sed -i 's/data.rel.ro.local,"aw",@progbits/data.rel.ro.local,"aw"/g' $pwd/mpir-2.7.0/mpn/x86_64/x86_64-defs.m4`)
    ENV["PATH"] = pth
    if Int == Int32
-      run(`sh configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared ABI=32`)
+      run(`$start /e:4096 /c sh configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared ABI=32`)
    else
-      run(`sh configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared ABI=64`)
+      run(`$start /e:4096 /c sh configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared ABI=64`)
    end
-   run(`sh -c make -j`)
-   run(`sh -c make install`)
+   run(`$start /e:4096 /c sh -c make -j`)
+   run(`$start /e:4096 /c sh -c make install`)
    ENV["PATH"] = oldpth
 else
    run(`./configure --prefix=$pwd --enable-gmpcompat --disable-static --enable-shared`)
@@ -56,9 +58,9 @@ cd("$pwd/mpfr-3.1.2")
 
 if on_windows
    ENV["PATH"] = pth
-   run(`sh configure --prefix=$pwd --with-gmp=$pwd --disable-static --enable-shared`)
-   run(`sh -c make -j`)
-   run(`sh -c make install`)
+   run(`$start /e:4096 /c sh configure --prefix=$pwd --with-gmp=$pwd --disable-static --enable-shared`)
+   run(`$start /e:4096 /c sh -c make -j`)
+   run(`$start /e:4096 /c sh -c make install`)
    ENV["PATH"] = oldpth
 else
    run(`./configure --prefix=$pwd --with-gmp=$pwd --disable-static --enable-shared`)
@@ -76,12 +78,12 @@ cd("$pwd/flint2")
 if on_windows
    ENV["PATH"] = pth
    if Int == Int32
-      run(`sh configure --prefix=$pwd --disable-static --enable-shared --with-mpir=$pwd --with-mpfr=$pwd ABI=32`)
+      run(`$start /e:4096 /c sh configure --prefix=$pwd --disable-static --enable-shared --with-mpir=$pwd --with-mpfr=$pwd ABI=32`)
    else
-      run(`sh configure --prefix=$pwd --disable-static --enable-shared --with-mpir=$pwd --with-mpfr=$pwd ABI=64`)
+      run(`$start /e:4096 /c sh configure --prefix=$pwd --disable-static --enable-shared --with-mpir=$pwd --with-mpfr=$pwd ABI=64`)
    end
-   run(`sh -c make -j`)
-   run(`sh -c make install`)
+   run(`$start /e:4096 /c sh -c make -j`)
+   run(`$start /e:4096 /c sh -c make install`)
    ENV["PATH"] = oldpth
 else
    run(`./configure --prefix=$pwd --disable-static --enable-shared --with-mpir=$pwd --with-mpfr=$pwd`)
