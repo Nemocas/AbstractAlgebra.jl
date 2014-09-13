@@ -12,7 +12,7 @@ if on_windows
    pth = split(oldpth, ";")
    shift!(pth)
    shift!(pth)
-   pth = join(pth)
+   pth = join(pth, ";")
 
    start = ENV["COMSPEC"]
 
