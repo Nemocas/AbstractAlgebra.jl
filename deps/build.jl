@@ -49,6 +49,7 @@ if on_windows
    end
    run(`$start /e:4096 /c sh -c "make -j"`)
    run(`$start /e:4096 /c sh -c "make install"`) # naturally autotools fails to do this correctly
+   run(`$start /e:4096 /c sh -c "cp .libs/libgmp*.dll $wdir2/lib"`)  # so we do it ourselves
    run(`$start /e:4096 /c sh -c "cp .libs/libmpir*.dll $wdir2/lib"`)  # so we do it ourselves
    ENV["PATH"] = oldpth
 else
