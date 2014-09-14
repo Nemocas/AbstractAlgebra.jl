@@ -35,13 +35,12 @@ end
 
 # install MPIR
 
-run(`wget http://mpir.org/mpir-2.7.0-alpha10.tar.bz2`)
-run(`tar -xvf mpir-2.7.0-alpha10.tar.bz2`)
-run(`rm mpir-2.7.0-alpha10.tar.bz2`)
+run(`wget http://mpir.org/mpir-2.7.0-alpha11.tar.bz2`)
+run(`tar -xvf mpir-2.7.0-alpha11.tar.bz2`)
+run(`rm mpir-2.7.0-alpha11.tar.bz2`)
 cd("$wdir/mpir-2.7.0")
 
 if on_windows
-   run(`sed -i 's/data.rel.ro.local,"aw",@progbits/data.rel.ro.local,"aw"/g' $wdir2/mpir-2.7.0/mpn/x86_64/x86_64-defs.m4`)
    ENV["PATH"] = pth
    if Int == Int32
       run(`$start /e:4096 /c sh configure --prefix=$wdir2 --enable-gmpcompat --disable-static --enable-shared ABI=32`)
