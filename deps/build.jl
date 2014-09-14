@@ -48,8 +48,8 @@ if on_windows
    else
       run(`$start /e:4096 /c sh configure --prefix=$wdir2 --enable-gmpcompat --disable-static --enable-shared ABI=64`)
    end
-   run(`$start /e:4096 /c sh -c make -j`)
-   run(`$start /e:4096 /c sh -c make install`)
+   run(`$start /e:4096 /c sh -c "make -j"`)
+   run(`$start /e:4096 /c sh -c "make install"`)
    ENV["PATH"] = oldpth
 else
    run(`./configure --prefix=$wdir --enable-gmpcompat --disable-static --enable-shared`)
@@ -69,8 +69,8 @@ cd("$wdir/mpfr-3.1.2")
 if on_windows
    ENV["PATH"] = pth
    run(`$start /e:4096 /c sh configure --prefix=$wdir2 --with-gmp=$wdir2 --disable-static --enable-shared`)
-   run(`$start /e:4096 /c sh -c make -j`)
-   run(`$start /e:4096 /c sh -c make install`)
+   run(`$start /e:4096 /c sh -c "make -j"`)
+   run(`$start /e:4096 /c sh -c "make install"`)
    ENV["PATH"] = oldpth
 else
    run(`./configure --prefix=$wdir --with-gmp=$wdir --disable-static --enable-shared`)
@@ -92,8 +92,8 @@ if on_windows
    else
       run(`$start /e:4096 /c sh configure --prefix=$wdir2 --disable-static --enable-shared --with-mpir=$wdir2 --with-mpfr=$wdir2 ABI=64`)
    end
-   run(`$start /e:4096 /c sh -c make -j`)
-   run(`$start /e:4096 /c sh -c make install`)
+   run(`$start /e:4096 /c sh -c "make -j"`)
+   run(`$start /e:4096 /c sh -c "make install"`)
    ENV["PATH"] = oldpth
 else
    run(`./configure --prefix=$wdir --disable-static --enable-shared --with-mpir=$wdir --with-mpfr=$wdir`)
