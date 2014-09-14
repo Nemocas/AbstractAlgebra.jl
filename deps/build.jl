@@ -1,6 +1,6 @@
 on_windows = @windows ? true : false
 
-oldwdir = chomp(readall(`pwd`))
+oldwdir = pwd()
 
 pkgdir = Pkg.dir("Nemo") 
 
@@ -83,9 +83,9 @@ cd(wdir)
 # install FLINT
 
 run(`git clone https://github.com/wbhart/flint2.git`)
-cd("$wdir/flint2")
 
 if on_windows
+   cd("$wdir\\flint2")
    ENV["PATH"] = pth
    if Int == Int32
       run(`$start /e:4096 /c sh configure --prefix=$wdir2 --disable-static --enable-shared --with-mpir=$wdir2 --with-mpfr=$wdir2 ABI=32`)
@@ -96,6 +96,7 @@ if on_windows
    run(`$start /e:4096 /c sh -c "make install"`)
    ENV["PATH"] = oldpth
 else
+   cd("$wdir/flint2")
    run(`./configure --prefix=$wdir --disable-static --enable-shared --with-mpir=$wdir --with-mpfr=$wdir`)
    run(`make -j4`)
    run(`make install`)
