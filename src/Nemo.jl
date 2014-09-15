@@ -18,6 +18,7 @@ function __init__()
    println("Welcome to Nemo version 0.1")
    println("")
    println("Nemo comes with absolutely no warranty whatsoever")
+   println("")
 end
 
 end # module
