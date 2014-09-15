@@ -9,7 +9,7 @@ include("FiniteFields-test.jl")
 include("Padics2-test.jl")
 
 function test_fields_resultant()
-   print("Poly.fields.resultant...")
+   print("Fields.resultant...")
 
    R, x = FiniteField(7, 11, "x")
    S, y = PolynomialRing(R, "y")
