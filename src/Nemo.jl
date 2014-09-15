@@ -13,4 +13,11 @@ end
 include("Rings.jl")
 include("Fields.jl")
 
+function __init__()
+   println("")
+   println("Welcome to Nemo version 0.1")
+   println("")
+   println("Nemo comes with absolutely no warranty whatsoever")
+end
+
 end # module
