@@ -768,7 +768,7 @@ evaluate{S}(x::Poly{QQ, S}, y::Int) = evaluate(x, ZZ(y))
 function evaluate{S}(x::Poly{QQ, S}, y::QQ)
    z = QQ()
    ccall((:fmpq_poly_evaluate_fmpq, :libflint), Void, 
-                (Ptr{Fraction}, Ptr{Poly}, Ptr{fmpq}), 
+                (Ptr{Fraction}, Ptr{Poly}, Ptr{QQ}), 
                &z, &x, &y)
    return z
 end
