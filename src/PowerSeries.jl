@@ -962,14 +962,14 @@ function ^{T <: Ring, S}(a::PowerSeries{T, S}, b::Int)
       return PowerSeries(PowerSeries{T, S}, [T(1)], nothing)
    else
       bit = ~((~uint(0)) >> 1)
-      while (int(bit) & b) == 0
+      while (uint(bit) & b) == 0
          bit >>= 1
       end
       z = a
       bit >>= 1
       while bit !=0
          z = z*z
-         if (int(bit) & b) != 0
+         if (uint(bit) & b) != 0
             z *= a
          end
          bit >>= 1

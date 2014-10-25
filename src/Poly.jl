@@ -1001,14 +1001,14 @@ function ^{T <: Ring, S}(a::Poly{T, S}, b::Int)
       return one(Poly{T, S})
    else
       bit = ~((~uint(0)) >> 1)
-      while (int(bit) & b) == 0
+      while (uint(bit) & b) == 0
          bit >>= 1
       end
       z = a
       bit >>= 1
       while bit !=0
          z = z*z
-         if (int(bit) & b) != 0
+         if (uint(bit) & b) != 0
             z *= a
          end
          bit >>= 1
@@ -1048,14 +1048,14 @@ function powmod{T <: Union(Residue, Field), S}(a::Poly{T, S}, b::Int, d::Poly{T,
          b = -b
       end
       bit = ~((~uint(0)) >> 1)
-      while (int(bit) & b) == 0
+      while (uint(bit) & b) == 0
          bit >>= 1
       end
       z = a
       bit >>= 1
       while bit !=0
          z = mulmod(z, z, d)
-         if (int(bit) & b) != 0
+         if (uint(bit) & b) != 0
             z = mulmod(z, a, d)
          end
          bit >>= 1
