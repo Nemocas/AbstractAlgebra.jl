@@ -229,17 +229,17 @@ end
 
 *(x::fmpz_poly, y::BigInt) = y*x
 
-+(x::Int128, y::fmpz_poly) = y + BigInt(x)
++(x::Integer, y::fmpz_poly) = y + BigInt(x)
 
--(x::Int128, y::fmpz_poly) = BigInt(x) - y
+-(x::Integer, y::fmpz_poly) = BigInt(x) - y
 
-*(x::Int128, y::fmpz_poly) = BigInt(x)*y
+*(x::Integer, y::fmpz_poly) = BigInt(x)*y
 
-+(x::fmpz_poly, y::Int128) = x + BigInt(y)
++(x::fmpz_poly, y::Integer) = x + BigInt(y)
 
--(x::fmpz_poly, y::Int128) = x - BigInt(y)
+-(x::fmpz_poly, y::Integer) = x - BigInt(y)
 
-*(x::fmpz_poly, y::Int128) = BigInt(y)*x
+*(x::fmpz_poly, y::Integer) = BigInt(y)*x
 
 ###########################################################################################
 #
@@ -289,9 +289,7 @@ function ==(x::fmpz_poly, y::BigInt)
    end 
 end
 
-==(x::fmpz_poly, y::Int) = x == BigInt(y)
-
-==(x::fmpz_poly, y::Int128) = x == BigInt(y)
+==(x::fmpz_poly, y::Integer) = x == BigInt(y)
 
 ###########################################################################################
 #
@@ -394,7 +392,7 @@ function divexact{S}(x::fmpz_poly{S}, y::Int)
    return z
 end
 
-divexact(x::fmpz_poly, y::Int128) = divexact(x, BigInt(y)) 
+divexact(x::fmpz_poly, y::Integer) = divexact(x, BigInt(y)) 
 
 ###########################################################################################
 #
@@ -479,9 +477,7 @@ function evaluate(x::fmpz_poly, y::BigInt)
    return res
 end
 
-evaluate(x::fmpz_poly, y::Int) = evaluate(x, BigInt(y))
-
-evaluate(x::fmpz_poly, y::Int128) = evaluate(x, BigInt(y))
+evaluate(x::fmpz_poly, y::Integer) = evaluate(x, BigInt(y))
 
 ###########################################################################################
 #
@@ -595,7 +591,7 @@ function PolynomialRing(R::IntegerRing, s::String)
 
    eval(:(Base.call(a::$P) = $T()))
    eval(:(Base.call(a::$P, x::Int) = $T(x)))
-   eval(:(Base.call(a::$P, x::Int128) = $T(BigInt(x))))
+   eval(:(Base.call(a::$P, x::Integer) = $T(BigInt(x))))
    eval(:(Base.call(a::$P, x::BigInt) = $T(x)))
    eval(:(Base.call(a::$P, x::$T) = x))
 

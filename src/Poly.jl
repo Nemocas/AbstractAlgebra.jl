@@ -46,17 +46,7 @@ type Poly{T <: RingElem, S} <: PolyElem
       return a == 0 ? new(Array(T, 0), 0, par) : new([a], 1, par)
    end
 
-   function Poly(R::Ring, a::BigInt)
-      par = PolyRing{Poly{T, S}, S}(R)
-      return a == 0 ? new(Array(T, 0), 0, par) : new([R(a)], 1, par)
-   end
-
-   function Poly(R::Ring, a::Int128)
-      par = PolyRing{Poly{T, S}, S}(R)
-      return a == 0 ? new(Array(T, 0), 0, par) : new([R(a)], 1, par)
-   end
-
-   function Poly(R::Ring, a::Int)
+   function Poly(R::Ring, a::Integer)
       par = PolyRing{Poly{T, S}, S}(R)
       return a == 0 ? new(Array(T, 0), 0, par) : new([R(a)], 1, par)
    end
@@ -183,16 +173,13 @@ function PolynomialRing(R::Ring, s::String)
       eval(:(Base.promote_rule(::Type{$T}, ::Type{BigInt}) = $T))
    end
 
-   eval(:(Base.convert(::Type{$T}, x::Int128) = $T(x)))
-   eval(:(Base.promote_rule(::Type{$T}, ::Type{Int128}) = $T))
-
-   eval(:(Base.convert(::Type{$T}, x::Int) = $T(x)))
-   eval(:(Base.promote_rule(::Type{$T}, ::Type{Int}) = $T))
+   eval(:(Base.convert(::Type{$T}, x::Integer) = $T(x)))
+   eval(:(Base.promote_rule{Tint <: Integer}(::Type{$T}, ::Type{Tint}) = $T))
 
    # overload parent call for all of the above
    eval(:(Base.call(a::$P) = $T($R))) 
    eval(:(Base.call(a::$P, x::Int) = $T($R, x)))
-   eval(:(Base.call(a::$P, x::Int128) = $T($R, BigInt(x))))
+   eval(:(Base.call(a::$P, x::Integer) = $T($R, BigInt(x))))
    eval(:(Base.call(a::$P, x::BigInt) = $T($R, x)))
    eval(:(Base.call(a::$P, x::$T2) = $T($R, x)))
    eval(:(Base.call(a::$P, x::$T) = x))

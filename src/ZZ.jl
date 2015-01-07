@@ -5,9 +5,7 @@ import Base.show
 type IntegerRing <: Ring
 end
 
-call(::IntegerRing, a :: Int) = BigInt(a)
-
-call(::IntegerRing, a :: Int128) = BigInt(a)
+call(::IntegerRing, a :: Integer) = BigInt(a)
 
 call(::IntegerRing, a :: String) = BigInt(a)
 
