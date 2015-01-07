@@ -43,7 +43,7 @@ else
    run(`tar -xvf m4-1.4.17.tar.bz2`)
    run(`rm m4-1.4.17.tar.bz2`)
    cd("$wdir/m4-1.4.17")
-   run(`configure --prefix=$wdir`)
+   run(`./configure --prefix=$wdir`)
    run(`make`)
    run(`make install`)
    cd(wdir)
