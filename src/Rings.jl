@@ -1,163 +1,39 @@
-module Rings
+import Base: length, call, exp
 
-import Base: exp
+export Ring, Field, RingElem, exp
 
-export Ring, Field, exp
+export Poly, PolyRing, PolynomialRing, coeff, isgen, truncate, mullow, reverse,
+       shift_left, shift_right, divexact, pseudorem, pseudodivrem, gcd, content, primpart,
+       evaluate, compose, derivative, resultant, discriminant, bezout
 
 abstract Ring
 
 abstract Field <: Ring
 
-function +{S <: Ring, T <: Ring}(x::S, y::T) 
-   T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      +(promote(x, y)...)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
+abstract RingElem
+
+abstract Poly <: RingElem
+
+###########################################################################################
+#
+#   Data types and memory management
+#
+###########################################################################################
+
+PolyID = ObjectIdDict()
+
+type PolyRing{P <: Poly, S} <: Ring
+   base_ring :: Ring
+
+   function PolyRing(R::Ring)
+      try
+         PolyID[R, S]
+      catch
+         PolyID[R, S] = new(R)
+      end
    end
-end
-
-function +{S <: Ring, T <: Integer}(x::S, y::T) 
-   T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      +(promote(x, y)...)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function +{S <: Integer, T <: Ring}(x::S, y::T) 
-   T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      +(promote(x, y)...)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function -{S <: Ring, T <: Ring}(x::S, y::T) 
-   T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      -(promote(x, y)...)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function -{S <: Ring, T <: Integer}(x::S, y::T) 
-   T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      -(promote(x, y)...)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function -{S <: Integer, T <: Ring}(x::S, y::T) 
-   T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      -(promote(x, y)...)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function *{S <: Ring, T <: Ring}(x::S, y::T) 
-   T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      *(promote(x, y)...)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function *{S <: Ring, T <: Integer}(x::S, y::T) 
-   T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      *(promote(x, y)...)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function *{S <: Integer, T <: Ring}(x::S, y::T) 
-   T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      *(promote(x, y)...)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function =={S <: Ring, T <: Ring}(x::S, y::T) 
-   T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      ==(promote(x, y)...)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function =={S <: Ring, T <: Integer}(x::S, y::T) 
-   T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      ==(promote(x, y)...)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function =={S <: Integer, T <: Ring}(x::S, y::T) 
-   T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      ==(promote(x, y)...)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-isequal{T <: Ring}(a::T, b::T) = a == b
-
-function divexact{S <: Ring, T <: Ring}(x::S, y::T) 
-   T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      divexact(promote(x, y)...)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function divexact{S <: Ring, T <: Integer}(x::S, y::T) 
-   T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      divexact(promote(x, y)...)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function divexact{S <: Integer, T <: Ring}(x::S, y::T) 
-   T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      divexact(promote(x, y)...)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
-
-function exp{T <: Ring}(a::T)
-   a != 0 && error("Exponential of nonzero element")
-   return one(T)
 end
 
 include("ZZ.jl")
 
-include("Residue.jl")
-
-include("Poly.jl")
-
-include("PowerSeries.jl")
-
-include("../test/Rings-test.jl")
-
-end # module
+include("fmpz_poly.jl")
