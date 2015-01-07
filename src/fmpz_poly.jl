@@ -106,7 +106,7 @@ function show{S}(io::IO, x::fmpz_poly{S})
    end
 end
 
-show_minus_one(::Type{fmpz_poly}) = show_minus_one(BigInt)
+show_minus_one{S}(::Type{fmpz_poly{S}}) = show_minus_one(BigInt)
 
 ###########################################################################################
 #

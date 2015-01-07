@@ -1,5 +1,5 @@
 export ZZ, IntegerRing, parent, show, fmpz, needs_parentheses, is_negative, show_minus_one,
-       zero, one
+       zero, one, isunit, iszero, isone
 
 type IntegerRing <: Ring
 end
@@ -31,6 +31,8 @@ one(a::IntegerRing) = BigInt(1)
 isone(a::BigInt) = a == 1
 
 iszero(a::BigInt) = a == 0
+
+isunit(a::BigInt) = a == 1 || a == -1
 
 ###########################################################################################
 #

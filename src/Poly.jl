@@ -7,7 +7,7 @@
 export Poly, PolyRing, PolynomialRing, coeff, isgen, truncate, mullow, reverse, shift_left,
        shift_right, divexact, pseudorem, pseudodivrem, gcd, content, primpart, evaluate,
        compose, derivative, resultant, discriminant, bezout, zero, one, gen, length,
-       iszero, normalise, isone
+       iszero, normalise, isone, isunit
 
 ###########################################################################################
 #
@@ -93,6 +93,8 @@ isone(a::PolyElem) = length(a) == 1 && isone(coeff(a, 0))
 
 isgen(a::PolyElem) = length(a) == 2 && iszero(coeff(a, 0)) && isone(coeff(a, 1))
 
+isunit(a::PolyElem) = length(a) == 1 && isunit(coeff(a, 0))
+
 ###########################################################################################
 #
 #   String I/O
@@ -161,6 +163,23 @@ needs_parentheses(x::PolyElem) = length(x) > 1
 is_negative(x::PolyElem) = length(x) <= 1 && is_negative(coeff(x, 0))
 
 show_minus_one{T <: RingElem, S}(::Type{Poly{T, S}}) = show_minus_one(T)
+
+###########################################################################################
+#
+#   Unary operations
+#
+###########################################################################################
+
+function -{T <: RingElem, S}(a::Poly{T, S})
+   len = length(a)
+   d = Array(T, len)
+   for i = 1:len
+      d[i] = -a.coeffs[i]
+   end
+   z = parent(a)(d)
+   z.length = len
+   return z
+end
 
 ###########################################################################################
 #
