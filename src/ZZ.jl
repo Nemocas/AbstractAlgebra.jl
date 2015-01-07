@@ -1,4 +1,4 @@
-export ZZ, IntegerRing, parent, show, fmpz
+export ZZ, IntegerRing, parent, show, fmpz, needs_parentheses, is_negative, show_minus_one
 
 import Base.show
 
@@ -17,9 +17,33 @@ function parent(a :: BigInt)
     return ZZ
 end
 
+elem_type(::IntegerRing) = BigInt
+
+base(a::IntegerRing) = None
+
+###########################################################################################
+#
+#   Basic manipulation
+#
+###########################################################################################
+
+isone(a::BigInt) = a == 1
+
+###########################################################################################
+#
+#   String I/O
+#
+###########################################################################################
+
 function show(io :: IO, a :: IntegerRing)
    print(io, "Integer Ring")
 end
+
+needs_parentheses(x::BigInt) = false
+
+is_negative(x::BigInt) = x < 0
+
+show_minus_one(::Type{BigInt}) = false
 
 ###########################################################################################
 #

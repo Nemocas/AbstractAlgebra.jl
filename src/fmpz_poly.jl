@@ -17,7 +17,7 @@ export fmpz_poly
 #
 ###########################################################################################
 
-type fmpz_poly{S} <: Poly
+type fmpz_poly{S} <: PolyElem
    coeffs :: Ptr{Void}
    alloc :: Int
    length :: Int
@@ -103,7 +103,7 @@ function show{S}(io::IO, x::fmpz_poly{S})
       print(io, "0")
    else
       cstr = ccall((:fmpz_poly_get_str_pretty, :libflint), Ptr{Uint8}, 
-                (Ptr{Poly}, Ptr{Uint8}), &x, bytestring(string(S)))
+                (Ptr{fmpz_poly}, Ptr{Uint8}), &x, bytestring(string(S)))
 
       print(io, bytestring(cstr))
 
@@ -111,12 +111,7 @@ function show{S}(io::IO, x::fmpz_poly{S})
    end
 end
 
-function show{P <: Poly, S}(io::IO, p::PolyRing{P, S})
-   print(io, "Univariate Polynomial Ring in ")
-   print(io, string(S))
-   print(io, " over ")
-   show(io, p.base_ring)
-end
+show_minus_one(::Type{fmpz_poly}) = show_minus_one(BigInt)
 
 ###########################################################################################
 #
@@ -284,7 +279,7 @@ function ==(x::fmpz_poly, y::BigInt)
       init(z)
       temp = fmpz_readonly(y)
       ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
-                       (Ptr{fmpz}, Ptr{Poly}, Int), &z, &x, 0)
+                       (Ptr{fmpz}, Ptr{fmpz_poly}, Int), &z, &x, 0)
       res = ccall((:fmpz_equal, :libflint), Bool, 
                (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &temp, 0)
       clear(z)
@@ -413,7 +408,7 @@ function pseudorem{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
    r = fmpz_poly{S}()
    d = Array(Int, 1)
    ccall((:fmpz_poly_pseudo_rem, :libflint), Void, 
-        (Ptr{Poly}, Ptr{Int}, Ptr{Poly}, Ptr{Poly}), &r, d, &x, &y)
+        (Ptr{fmpz_poly}, Ptr{Int}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &r, d, &x, &y)
    if (diff > d[1])
       return coeff(y, length(y) - 1)^(diff - d[1])*r
    else
@@ -596,7 +591,7 @@ end
 function PolynomialRing(R::IntegerRing, s::String)
    S = symbol(s)
    T = fmpz_poly{S}
-   P = PolyRing{fmpz_poly, S}
+   P = PolyRing{T, S}
 
    eval(:(Base.call(a::$P) = $T()))
    eval(:(Base.call(a::$P, x::Int) = $T(x)))
