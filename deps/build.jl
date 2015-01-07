@@ -31,6 +31,23 @@ if on_windows
    else
       ENV["MSYSTEM"]="MINGW64"
    end
+else
+   # install M4
+   if ENV["PATH"] != ""
+      ENV["PATH"]=join([wdir, ":", ENV["PATH"]])
+   else
+      ENV["PATH"]="$wdir/bin"
+   end
+
+   run(`wget http://ftp.gnu.org/gnu/m4/m4-1.4.17.tar.bz2`)
+   run(`tar -xvf m4-1.4.17.tar.bz2`)
+   run(`rm m4-1.4.17.tar.bz2`)
+   cd("$wdir/m4-1.4.17")
+   run(`configure --prefix=$wdir`)
+   run(`make`)
+   run(`make install`)
+   cd(wdir)
+   run(`rm -rf m4-1.4.17`)
 end
 
 # install MPIR
@@ -56,6 +73,9 @@ else
    run(`./configure --prefix=$wdir --enable-gmpcompat --disable-static --enable-shared`)
    run(`make -j4`)
    run(`make install`)
+   cd(wdir)
+   run(`rm -rf mpir-2.7.0`)
+   run(`rm -rf bin`)
 end
 
 cd(wdir)
@@ -78,6 +98,8 @@ else
    run(`./configure --prefix=$wdir --with-gmp=$wdir --disable-static --enable-shared`)
    run(`make -j4`)
    run(`make install`)
+   cd(wdir)
+   run(`rm -rf mpfr-3.1.2`)
 end
 
 cd(wdir)
@@ -102,6 +124,8 @@ else
    run(`./configure --prefix=$wdir --disable-static --enable-shared --with-mpir=$wdir --with-mpfr=$wdir`)
    run(`make -j4`)
    run(`make install`)
+   cd(wdir)
+   run(`rm -rf flint2`)
 end
 
 cd(wdir)
