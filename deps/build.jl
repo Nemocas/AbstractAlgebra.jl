@@ -33,12 +33,6 @@ if on_windows
    end
 else
    # install M4
-   if ENV["PATH"] != ""
-      ENV["PATH"]=join([wdir, ":", ENV["PATH"]])
-   else
-      ENV["PATH"]="$wdir/bin"
-   end
-
    run(`wget http://ftp.gnu.org/gnu/m4/m4-1.4.17.tar.bz2`)
    run(`tar -xvf m4-1.4.17.tar.bz2`)
    run(`rm m4-1.4.17.tar.bz2`)
@@ -70,7 +64,7 @@ if on_windows
    run(`$start /e:4096 /c sh -c "cp .libs/libmpir*.dll $wdir2/lib"`)  # so we do it ourselves
    ENV["PATH"] = oldpth
 else
-   run(`./configure --prefix=$wdir --enable-gmpcompat --disable-static --enable-shared`)
+   run(`./configure --prefix=$wdir M4=$wdir/bin/m4 --enable-gmpcompat --disable-static --enable-shared`)
    run(`make -j4`)
    run(`make install`)
    cd(wdir)
