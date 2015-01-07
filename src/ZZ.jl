@@ -1,6 +1,5 @@
-export ZZ, IntegerRing, parent, show, fmpz, needs_parentheses, is_negative, show_minus_one
-
-import Base.show
+export ZZ, IntegerRing, parent, show, fmpz, needs_parentheses, is_negative, show_minus_one,
+       zero, one
 
 type IntegerRing <: Ring
 end
@@ -25,7 +24,13 @@ base(a::IntegerRing) = None
 #
 ###########################################################################################
 
+zero(a::IntegerRing) = BigInt(0)
+
+one(a::IntegerRing) = BigInt(1)
+
 isone(a::BigInt) = a == 1
+
+iszero(a::BigInt) = a == 0
 
 ###########################################################################################
 #

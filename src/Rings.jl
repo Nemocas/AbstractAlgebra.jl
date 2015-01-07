@@ -1,4 +1,4 @@
-import Base: length, call, exp, promote_rule, zero, show
+import Base: length, call, exp, promote_rule, zero, one, show
 
 export Ring, Field, RingElem
 

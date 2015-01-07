@@ -6,7 +6,8 @@
 
 export Poly, PolyRing, PolynomialRing, coeff, isgen, truncate, mullow, reverse, shift_left,
        shift_right, divexact, pseudorem, pseudodivrem, gcd, content, primpart, evaluate,
-       compose, derivative, resultant, discriminant, bezout, zero, length, iszero
+       compose, derivative, resultant, discriminant, bezout, zero, one, gen, length,
+       iszero, normalise, isone
 
 ###########################################################################################
 #
@@ -28,10 +29,6 @@ type PolyRing{P <: PolyElem, S} <: Ring
    end
 end
 
-elem_type{P <: PolyElem, S}(::PolyRing{P, S}) = P
-
-base(a::PolyRing) = a.base_ring
-
 type Poly{T <: RingElem, S} <: PolyElem
    coeffs::Array{T, 1}
    length::Int
@@ -52,21 +49,49 @@ type Poly{T <: RingElem, S} <: PolyElem
    end
 end
 
+elem_type{P <: PolyElem, S}(::PolyRing{P, S}) = P
+
+base(a::PolyRing) = a.base_ring
+
+base(a::PolyElem) = base(parent(a))
+
+function parent(a::PolyElem)
+   return a.parent
+end
+
 ###########################################################################################
 #
 #   Basic manipulation
 #
 ###########################################################################################    
-   
+
+function normalise(a::PolyElem, len::Int)
+   while len > 0 && iszero(a.coeffs[len]) # cannot use coeff(a, len - 1)
+      len -= 1
+   end
+
+   return len
+end
+
 length(x::PolyElem) = x.length
 
-coeff(a::PolyElem, n::Int) = n >= length(a) ? 0 : a.coeffs[n + 1]
+degree(x::PolyElem) = length(x) - 1
 
-zero(a::Type{Poly}) = a(0)
+coeff(a::PolyElem, n::Int) = n >= length(a) ? base(a)(0) : a.coeffs[n + 1]
+
+lead(a::PolyElem) = length(a) == 0 ? base(a)(0) : coeff(a, length(a) - 1)
+
+zero(a::PolyRing) = a(0)
+
+one(a::PolyRing) = a(1)
+
+gen{T <: RingElem, S}(a::PolyRing{T, S}) = elem_type(a)(base(a), [zero(base(a)), one(base(a))])
 
 iszero(a::PolyElem) = length(a) == 0
 
 isone(a::PolyElem) = length(a) == 1 && isone(coeff(a, 0))
+
+isgen(a::PolyElem) = length(a) == 2 && iszero(coeff(a, 0)) && isone(coeff(a, 1))
 
 ###########################################################################################
 #
@@ -78,7 +103,7 @@ function show{T <: RingElem, S}(io::IO, x::Poly{T, S})
    len = length(x)
 
    if len == 0
-      print(io, zero(T))
+      print(io, base(x)(0))
    else
       for i = 1:len - 1
          c = x.coeffs[len - i + 1]

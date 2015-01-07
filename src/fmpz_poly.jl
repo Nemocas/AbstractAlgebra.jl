@@ -4,7 +4,6 @@
 #
 ###########################################################################################
 
-## FIXME : use lead() in pseudo_rem/divrem
 ## FIXME : add clear_readonly and fmpz initialiser/finalizer and use instead of init/clear
 ## FIXME : make function names conform to Julia standard
 ## FIXME : put special polynomials back in
@@ -67,10 +66,6 @@ function _fmpz_poly_clear_fn(a::fmpz_poly)
    ccall((:fmpz_poly_clear, :libflint), Void, (Ptr{fmpz_poly},), &a)
 end
 
-function parent(a::fmpz_poly)
-   return a.parent
-end
-
 ###########################################################################################
 #
 #   Basic manipulation
@@ -89,6 +84,8 @@ function coeff(x::fmpz_poly, n::Int)
    clear(temp)
    return z
 end
+
+gen{S}(a::PolyRing{fmpz_poly{S}, S}) = fmpz_poly{S}([zero(base(a)), one(base(a))])
 
 isgen(x::fmpz_poly) = ccall((:fmpz_poly_is_x, :libflint), Bool, (Ptr{fmpz_poly},), &x)
 
@@ -408,7 +405,7 @@ function pseudorem{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
    ccall((:fmpz_poly_pseudo_rem, :libflint), Void, 
         (Ptr{fmpz_poly}, Ptr{Int}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &r, d, &x, &y)
    if (diff > d[1])
-      return coeff(y, length(y) - 1)^(diff - d[1])*r
+      return lead(y)^(diff - d[1])*r
    else
       return r
    end
@@ -424,7 +421,7 @@ function pseudodivrem{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{Int}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
                &q, &r, d, &x, &y)
    if (diff > d[1])
-      m = coeff(y, length(y) - 1)^(diff - d[1])
+      m = lead(y)^(diff - d[1])
       return m*q, m*r
    else
       return q, r
