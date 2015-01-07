@@ -85,8 +85,6 @@ function coeff(x::fmpz_poly, n::Int)
    return z
 end
 
-gen{S}(a::PolyRing{fmpz_poly{S}, S}) = fmpz_poly{S}([zero(base(a)), one(base(a))])
-
 isgen(x::fmpz_poly) = ccall((:fmpz_poly_is_x, :libflint), Bool, (Ptr{fmpz_poly},), &x)
 
 ###########################################################################################
@@ -591,6 +589,7 @@ function PolynomialRing(R::IntegerRing, s::String)
    eval(:(Base.call(a::$P, x::Integer) = $T(BigInt(x))))
    eval(:(Base.call(a::$P, x::BigInt) = $T(x)))
    eval(:(Base.call(a::$P, x::$T) = x))
+   eval(:(Base.call(a::$P, x::Array{BigInt, 1}) = $T(x)))
 
    return P(R), T([ZZ(0), ZZ(1)])
 end

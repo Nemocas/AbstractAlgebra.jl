@@ -85,7 +85,7 @@ zero(a::PolyRing) = a(0)
 
 one(a::PolyRing) = a(1)
 
-gen{T <: RingElem, S}(a::PolyRing{T, S}) = elem_type(a)(base(a), [zero(base(a)), one(base(a))])
+gen(a::PolyRing) = a([zero(base(a)), one(base(a))])
 
 iszero(a::PolyElem) = length(a) == 0
 
@@ -194,11 +194,11 @@ function PolynomialRing(R::Ring, s::String)
 
    # conversion from Integer types
    if R != ZZ
-      eval(:(Base.convert(::Type{$T}, x::BigInt) = $T(x)))
+      eval(:(Base.convert(::Type{$T}, x::BigInt) = $T($R, x)))
       eval(:(Base.promote_rule(::Type{$T}, ::Type{BigInt}) = $T))
    end
 
-   eval(:(Base.convert(::Type{$T}, x::Integer) = $T(x)))
+   eval(:(Base.convert(::Type{$T}, x::Integer) = $T($R, x)))
    eval(:(Base.promote_rule{Tint <: Integer}(::Type{$T}, ::Type{Tint}) = $T))
 
    # overload parent call for all of the above
@@ -208,6 +208,7 @@ function PolynomialRing(R::Ring, s::String)
    eval(:(Base.call(a::$P, x::BigInt) = $T($R, x)))
    eval(:(Base.call(a::$P, x::$T2) = $T($R, x)))
    eval(:(Base.call(a::$P, x::$T) = x))
+   eval(:(Base.call(a::$P, x::Array{$T2, 1}) = $T($R, x)))
 
    return P(R), T(R, [C0, C1])
 end
