@@ -7,7 +7,8 @@
 export Poly, PolyRing, PolynomialRing, coeff, isgen, truncate, mullow, reverse, shift_left,
        shift_right, divexact, pseudorem, pseudodivrem, gcd, content, primpart, evaluate,
        compose, derivative, resultant, discriminant, bezout, zero, one, gen, length,
-       iszero, normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!
+       iszero, normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod,
+       invmod, lcm, divrem, mod, gcdinv
 
 ###########################################################################################
 #
@@ -17,7 +18,7 @@ export Poly, PolyRing, PolynomialRing, coeff, isgen, truncate, mullow, reverse, 
 
 PolyID = ObjectIdDict()
 
-type PolyRing{T, S} <: Ring
+type PolyRing{T <: Union(RingElem, BigInt), S} <: Ring
    base_ring :: Ring
 
    function PolyRing(R::Ring)
@@ -346,6 +347,763 @@ function ^{T <: RingElem, S}(a::Poly{T, S}, b::Int)
       end
       return z
    end
+end
+
+###########################################################################################
+#
+#   Comparisons
+#
+###########################################################################################
+
+function ==(x::Poly, y::Poly)
+   if length(x) != length(y)
+      return false
+   else
+      for i = 1:length(x)
+         if x.coeffs[i] != y.coeffs[i]
+            return false
+         end
+      end
+   end
+   return true
+end
+
+function isequal(x::Poly, y::Poly)
+   if length(x) != length(y)
+      return false
+   end
+   for i = 1:length(x)
+      if !isequal(coeff(x, i - 1), coeff(y, i - 1))
+         return false
+      end
+   end
+   return true
+end
+
+###########################################################################################
+#
+#   Ad hoc comparisons
+#
+###########################################################################################
+
+==(x::Poly, y::Integer) = ((length(x) == 0 && y == 0)
+                        || (length(x) == 1 && coeff(x, 0) == y))
+
+==(x::Integer, y::Poly) = y == x
+
+###########################################################################################
+#
+#   Truncation
+#
+###########################################################################################
+
+function truncate{T <: RingElem, S}(a::Poly{T, S}, n::Int)
+   n < 0 && throw(DomainError())
+   
+   lena = length(a)
+
+   if lena <= n
+      return a
+   end
+
+   lenz = min(lena, n)
+   d = Array(T, lenz)
+
+   for i = 1:lenz
+      d[i] = a.coeffs[i]
+   end
+
+   z = parent(a)(d)
+
+   z.length = normalise(z, lenz)
+
+   return z
+end
+
+function mullow{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S}, n::Int)
+   lena = length(a)
+   lenb = length(b)
+
+   if lena == 0 || lenb == 0
+      return zero(Poly{T, S})
+   end
+
+   if n < 0
+      n = 0
+   end
+
+   t = T()
+
+   lenz = min(lena + lenb - 1, n)
+
+   d = Array(T, lenz)
+
+   for i = 1:min(lena, lenz)
+      d[i] = a.coeffs[i]*b.coeffs[1]
+   end
+
+   if lenz > lena
+      for j = 2:min(lenb, lenz - lena + 1)
+          d[lena + j - 1] = a.coeffs[lena]*b.coeffs[j]
+      end
+   end
+
+   z = parent(a)(d)
+
+   for i = 1:lena - 1
+      if lenz > i
+         for j = 2:min(lenb, lenz - i + 1)
+            mul!(t, a.coeffs[i], b.coeffs[j])
+            addeq!(z.coeffs[i + j - 1], t)
+         end
+      end
+   end
+        
+   z.length = normalise(z, lenz)
+
+   return z
+end
+
+###########################################################################################
+#
+#   Reversal
+#
+###########################################################################################
+
+function reverse{T <: RingElem, S}(x::Poly{T, S}, len::Int)
+   len < 0 && throw(DomainError())
+   v = Array(T, len)
+   for i = 1:len
+      v[i] = coeff(x, len - i)
+   end
+   r = parent(x)(v)
+   r.length = normalise(r, len)
+   return r
+end
+
+function reverse(x::Poly)
+   reverse(x, length(x))
+end
+
+###########################################################################################
+#
+#   Shifting
+#
+###########################################################################################
+
+function shift_left{T <: RingElem, S}(x::Poly{T, S}, len::Int)
+   len < 0 && throw(DomainError())
+   xlen = length(x)
+   v = Array(T, xlen + len)
+   for i = 1:len
+      v[i] = zero(T)
+   end
+   for i = 1:xlen
+      v[i + len] = coeff(x, i - 1)
+   end
+   return parent(x)(v)
+end
+
+function shift_right{T <: RingElem, S}(x::Poly{T, S}, len::Int)
+   len < 0 && throw(DomainError())
+   xlen = length(x)
+   if len >= xlen
+      return zero(Poly{T, S})
+   end
+   v = Array(T, xlen - len)
+   for i = 1:xlen - len
+      v[i] = coeff(x, i + len - 1)
+   end
+   return parent(x)(v)
+end
+
+###########################################################################################
+#
+#   Modular arithmetic
+#
+###########################################################################################
+
+function mulmod{T <: Union(Residue, FieldElem), S}(a::Poly{T, S}, b::Poly{T, S}, d::Poly{T, S})
+   return mod(a*b, d)
+end
+
+function powmod{T <: Union(Residue, FieldElem), S}(a::Poly{T, S}, b::Int, d::Poly{T, S})
+   if length(a) == 0
+      return zero(parent(a))
+   elseif length(a) == 1
+      return parent(a)(coeff(a, 0)^b)
+   elseif b == 0
+      return one(parent(a))
+   else
+      if b < 0
+         a = invmod(a, d)
+         b = -b
+      end
+      bit = ~((~uint(0)) >> 1)
+      while (uint(bit) & b) == 0
+         bit >>= 1
+      end
+      z = a
+      bit >>= 1
+      while bit !=0
+         z = mulmod(z, z, d)
+         if (uint(bit) & b) != 0
+            z = mulmod(z, a, d)
+         end
+         bit >>= 1
+      end
+      return z
+   end
+end
+
+function invmod{T <: Union(Residue, FieldElem), S}(a::Poly{T, S}, b::Poly{T, S})
+   g, z = gcdinv(a, b)
+   if g != 1
+      error("Impossible inverse in invmod")
+   end
+   return z
+end
+
+###########################################################################################
+#
+#   Exact division
+#
+###########################################################################################
+
+function divexact{T <: RingElem, S}(f::Poly{T, S}, g::Poly{T, S})
+   g == 0 && throw(DivideError())
+   if f == 0
+      return zero(parent(a))
+   end
+   lenq = length(f) - length(g) + 1
+   d = Array(T, lenq)
+   for i = 1:lenq
+      d[i] = zero(base(a))
+   end
+   q = parent(a)(d)
+   x = gen(parent(a))
+   leng = length(g)
+   while length(f) >= leng
+      lenf = length(f)
+      q1 = q.coeffs[lenf - leng + 1] = divexact(f.coeffs[lenf], g.coeffs[leng])
+      f = f - q1*g*x^(lenf - leng)
+   end
+   q.length = lenq
+   return q
+end
+
+###########################################################################################
+#
+#   Ad hoc exact division
+#
+###########################################################################################
+
+function divexact{T <: RingElem, S}(a::Poly{T, S}, b::T)
+   b == 0 && throw(DivideError())
+   d = Array(T, length(a))
+   for i = 1:length(a)
+      d[i] = divexact(coeff(a, i - 1), b)
+   end
+   z = parent(a)(d)
+   z.length = length(a)
+   return z
+end
+
+function divexact{T <: RingElem, S}(a::Poly{T, S}, b::Integer)
+   b == 0 && throw(DivideError())
+   d = Array(T, length(a))
+   for i = 1:length(a)
+      d[i] = divexact(coeff(a, i - 1), b)
+   end
+   z = parent(a)(d)
+   z.length = length(a)
+   return z
+end
+
+###########################################################################################
+#
+#   Euclidean division
+#
+###########################################################################################
+
+function mod{T <: Union(FieldElem, Residue), S}(f::Poly{T, S}, g::Poly{T, S})
+   if length(g) == 0
+      raise(DivideError())
+   end
+   if length(f) >= length(g)
+      b = g.coeffs[length(g)]
+      g = inv(b)*g
+      x = gen(parent(f))
+      while length(f) >= length(g)
+         f -= coeff(f, length(f) - 1)*g*x^(length(f) - length(g))
+      end
+   end
+   return f
+end
+
+function divrem{T <: Union(FieldElem, Residue), S}(f::Poly{T, S}, g::Poly{T, S})
+   if length(g) == 0
+      raise(DivideError())
+   end
+   if length(f) < length(g)
+      return zero(parent(f)), f
+   end
+   binv = inv(lead(g))
+   g = binv*g
+   x = gen(Poly{T, S})
+   qlen = length(f) - length(g) + 1
+   d = Array(T, qlen)
+   for i = 1:qlen
+      d[i] = zero(T)
+   end
+   q = parent(f)(d)
+   while length(f) >= length(g)
+      q1 = coeff(f, length(f) - 1)
+      setcoeff!(q, length(f) - length(g), q1*binv)
+      f -= q1*g*x^(length(f) - length(g))
+   end
+   return q, f
+end
+
+###########################################################################################
+#
+#   Pseudodivision
+#
+###########################################################################################
+
+function pseudorem(f::Poly, g::Poly)
+   g == 0 && throw(DivideError())
+   b = coeff(g, length(g) - 1)
+   x = gen(parent(f))
+   while length(f) >= length(g)
+      f = f*b - coeff(f, length(f) - 1)*g*x^(length(f) - length(g))
+   end
+   return f
+end
+
+function pseudodivrem{T <: RingElem, S}(f::Poly{T, S}, g::Poly{T, S})
+   g == 0 && throw(DivideError())
+   if length(f) < length(g)
+      return zero(parent(f)), f
+   end
+   lenq = length(f) - length(g) + 1
+   v = Array(T, lenq)
+   for i = 1:lenq
+      v[i] = zero(T)
+   end
+   q = parent(f)(v)
+   b = coeff(g, length(g) - 1)
+   x = gen(parent(f))
+   while length(f) >= length(g)
+      for i = length(f) - length(g) + 2:lenq
+         setcoeff!(q, i - 1, coeff(q, i - 1) * b)
+      end
+      setcoeff!(q, length(f) - length(g), coeff(f, length(f) - 1))
+      f = f*b - coeff(f, length(f) - 1)*g*x^(length(f) - length(g))
+   end
+   while lenq > 0 && coeff(q, lenq - 1) == 0
+      lenq -= 1
+   end
+   q.length = lenq
+   return q, f
+end
+
+###########################################################################################
+#
+#   Content, primitive part, GCD and LCM
+#
+###########################################################################################
+
+function gcd(a::Poly, b::Poly)
+   if length(b) > length(a)
+      (a, b) = (b, a)
+   end
+   if b == 0
+      return a
+   end
+   c = gcd(content(a), content(b))
+   a = divexact(a, c)
+   b = divexact(b, c)
+   g = one(parent(a))
+   h = one(parent(a))
+   while true
+      d = length(a) - length(b)
+      r = pseudorem(a, b)
+      if r == 0
+         break
+      end
+      if length(r) == 1
+         b = one(parent(a))
+         break
+      end
+      (a, b) = (b, divexact(r, g*h^d))
+      g = lead(a)
+      if d > 1
+         h = divexact(g^d, h^(d - 1))
+      else
+         h = h^(1 - d)*g^d
+      end
+   end
+   return c*primpart(b)
+end
+
+function gcd{T <: Union(FieldElem, Residue), S}(a::Poly{T, S}, b::Poly{T, S})
+   if length(a) > length(b)
+      (a, b) = (b, a)
+   end
+   if b == 0
+      return a
+   end
+   g = gcd(content(a), content(b))
+   a = divexact(a, g)
+   b = divexact(b, g)
+   while a != 0
+      (a, b) = (mod(b, a), a)
+   end
+   b = g*b
+   return inv(lead(b))*b
+end
+
+function lcm(a::Poly, b::Poly)
+   return a*divexact(b, gcd(a, b))
+end
+
+function content(a::Poly)
+   z = coeff(a, 0)
+   for i = 2:length(a)
+      z = gcd(z, coeff(a, i - 1))
+   end
+   return z
+end
+
+function primpart(a::Poly)
+   d = content(a)
+   return divexact(a, d)
+end
+
+###########################################################################################
+#
+#   Evaluation/composition
+#
+###########################################################################################
+
+function evaluate{T <: RingElem, S}(a::Poly{T, S}, b::T)
+   i = length(a)
+   if i == 0
+       return zero(base_ring(a))
+   end
+   z = a.coeffs[i]
+   while i > 1
+      i -= 1
+      z = z*b + a.coeffs[i]
+   end
+   return z
+end
+
+function evaluate{T <: RingElem, S}(a::Poly{T, S}, b::Integer)
+   return evaluate(a, base_ring(a)(b))
+end
+
+function compose(a::Poly, b::Poly)
+   i = length(a)
+   if i == 0
+       return zero(base_ring(a))
+   end
+   z = a.coeffs[i]
+   while i > 1
+      i -= 1
+      z = z*b + a.coeffs[i]
+   end
+   return z
+end
+
+###########################################################################################
+#
+#   Derivative
+#
+###########################################################################################
+
+function derivative{T <: RingElem, S}(a::Poly{T, S})
+   if a == 0
+      return zero(parent(a))
+   end
+   len = length(a)
+   d = Array(T, len - 1)
+   for i = 1:len - 1
+      d[i] = i*a.coeffs[i + 1]
+   end
+   z = parent(a)(d)
+   z.length = normalise(z, len - 1)
+   return z
+end
+
+###########################################################################################
+#
+#   Integral
+#
+###########################################################################################
+
+function integral{T <: Union(FieldElem, Residue), S}(x::Poly{T, S})
+   len = length(x)
+   v = Array(T, len + 1)
+   v[1] = zero(base_ring(x))
+   for i = 1:len
+      v[i + 1] = divexact(coeff(x, i - 1), T(i))
+   end
+   p = parent(x)(v)
+   len = len + 1
+   while len > 0 && coeff(p, len - 1) == 0 # cannot use normalise here
+      len -= 1
+   end
+   return p
+end
+
+###########################################################################################
+#
+#   Resultant
+#
+###########################################################################################
+
+function resultant(a::Poly, b::Poly)
+   if length(a) == 0 || length(b) == 0
+      return zero(base_ring(a))
+   end
+   sgn = 1
+   if length(a) < length(b)
+      a, b = b, a
+      if iseven(length(a)) && iseven(length(b))
+         sgn = -sgn
+      end
+   end
+   lena = length(a)
+   lenb = length(b)
+   if lenb == 1
+      return b.coeffs[1]^(lena - 1)
+   end
+   c1 = content(a)
+   c2 = content(b)
+   A = divexact(a, c1)
+   B = divexact(b, c2)
+   g = one(base_ring(a))
+   h = one(base_ring(a))
+   while lenb > 1
+      d = lena - lenb
+      if iseven(lena) && iseven(lenb)
+         sgn = -sgn
+      end
+      B, A = pseudorem(A, B), B
+      lena = lenb
+      lenb = length(B)
+      if lenb == 0
+         return zero(base_ring(a)) 
+      end
+      s = h^d
+      B = divexact(B, g*s)
+      g = lead(A)
+      h = divexact(h*g^d, s)
+   end
+   s = divexact(h*lead(B)^(lena - 1), h^(lena - 1))
+   res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
+end
+
+function resultant{T <: Union(FieldElem, Residue), S}(a::Poly{T, S}, b::Poly{T, S})
+   if length(a) == 0 || length(b) == 0
+      return zero(base_ring(a))
+   end
+   sgn = 1
+   if length(a) < length(b)
+      a, b = b, a
+      if iseven(length(a)) && iseven(length(b))
+         sgn = -sgn
+      end
+   end
+   lena = length(a)
+   lenb = length(b)
+   if lenb == 1
+      return b.coeffs[1]^(lena - 1)
+   end
+   c1 = content(a)
+   c2 = content(b)
+   A = divexact(a, c1)
+   B = divexact(b, c2)
+   s = 1
+   while lenb > 1
+      if iseven(lena) && iseven(lenb)
+         sgn = -sgn
+      end
+      B, A = mod(A, B), B
+      s *= lead(A)^(lena - length(B))
+      lena = lenb
+      lenb = length(B)
+      if lenb == 0
+         return zero(base_ring(a)) 
+      end
+   end
+   s *= lead(B)^(lena - 1)
+   res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
+end
+
+###########################################################################################
+#
+#   Discriminant
+#
+###########################################################################################
+
+function discriminant(a::Poly)
+   d = deriv(a)
+   z = resultant(a, d)
+   if length(a) - length(d) == 1
+      z = divexact(z, lead(a))
+   else
+      z = z*lead(a)^(length(a) - length(d) - 2)
+   end
+   mod4 = (length(a) + 3)%4 # degree mod 4
+   return mod4 == 2 || mod4 == 3 ? -z : z
+end
+
+###########################################################################################
+#
+#   Bezout
+#
+###########################################################################################
+
+function bezout{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S})
+   if length(a) == 0 || length(b) == 0
+      return zero(base_ring(a)), zero(parent(a)), zero(parent(a))
+   end
+   sgn = 1
+   swap = false
+   if length(a) < length(b)
+      a, b = b, a
+      swap = true
+      if iseven(length(a)) && iseven(length(b))
+         sgn = -sgn
+      end
+   end
+   lena = length(a)
+   lenb = length(b)
+   if lenb == 1
+      s1 = zero(base_ring(a))
+      t1 = one(base_ring(a))
+      r1 = b.coeffs[1]^(lena - 1)
+      if swap
+         s1, t1 = t1, s1
+      end
+      if sgn
+         s1, t1, r1 = -s1, -t1, -r1
+      end
+      return r1, parent(a)(s1), parent(a)(t1)
+   end
+   c1 = content(a)
+   c2 = content(b)
+   A = divexact(a, c1)
+   B = divexact(b, c2)
+   g = one(base_ring(a))
+   h = one(base_ring(a))
+   u1, u2 = one(parent(a)), zero(parent(a))
+   v1, v2 = zero(parent(a)), one(parent(a))
+   while lenb > 1
+      d = lena - lenb
+      if iseven(lena) && iseven(lenb)
+         sgn = -sgn
+      end
+      (Q, B), A = pseudodivrem(A, B), B
+      lena = lenb
+      lenb = length(B)
+      if lenb == 0
+         return zero(base_ring(a)), zero(parent(a)), zero(parent(a))
+      end
+      s = h^d
+      B = divexact(B, g*s)
+      t = lead(A)^(d + 1)
+      u2, u1 = divexact(u1*t - Q*u2, g*s), u2
+      v2, v1 = divexact(v1*t - Q*v2, g*s), v2 
+      g = lead(A)
+      h = divexact(h*g^d, s)
+   end
+   s = divexact(h*lead(B)^(lena - 1), h^(lena - 1))
+   res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
+   if swap
+      u2, v2 = v2, u2
+   end
+   return res, u2, v2
+end
+
+function bezout{T <: Union(FieldElem, Residue), S}(a::Poly{T, S}, b::Poly{T, S})
+   if length(a) == 0
+      return b, zero(parent(a)), one(parent(a))
+   end
+   if length(b) == 0
+      return a, one(parent(a)), zero(parent(a))
+   end
+   swap = false
+   if length(a) < length(b)
+      a, b = b, a
+      swap = true
+   end
+   lena = length(a)
+   lenb = length(b)
+   c1 = content(a)
+   c2 = content(b)
+   A = divexact(a, c1)
+   B = divexact(b, c2)
+   u1, u2 = inv(c1), zero(parent(a))
+   v1, v2 = zero(parent(a)), inv(c2)
+   while lenb > 0
+      d = lena - lenb
+      (Q, B), A = divrem(A, B), B
+      lena = lenb
+      lenb = length(B)
+      u2, u1 = u1 - Q*u2, u2
+      v2, v1 = v1 - Q*v2, v2 
+   end
+   if swap
+      u1, v1 = v1, u1
+   end
+   d = gcd(c1, c2)
+   A, u1, v1 = d*A, d*u1, d*v1
+   d = inv(lead(A))
+   return d*A, d*u1, d*v1
+end
+
+function gcdinv{T <: Union(FieldElem, Residue), S}(a::Poly{T, S}, b::Poly{T, S})
+   if length(a) == 0
+      if length(b) == 0
+         return 0, zero(parent(a))
+      else
+         d = inv(lead(b))
+         return b*d, zero(parent(a))
+      end
+   end
+   if length(b) == 0
+      d = inv(lead(b))
+      return a*d, d
+   end
+   if length(a) < length(b)
+      a, b = b, a
+      u1, u2 = zero(parent(a)), one(parent(a))
+   else
+      u1, u2 = one(parent(a)), zero(parent(a))
+   end
+   lena = length(a)
+   lenb = length(b)
+   c1 = content(a)
+   c2 = content(b)
+   A = divexact(a, c1)
+   B = divexact(b, c2)
+   u1 *= inv(c1)
+   u2 *= inv(c2)
+   while lenb > 0
+      d = lena - lenb
+      (Q, B), A = divrem(A, B), B
+      lena = lenb
+      lenb = length(B)
+      u2, u1 = u1 - Q*u2, u2
+   end
+   d = gcd(c1, c2)
+   A, u1 = d*A, d*u1
+   d = inv(lead(A))
+   return d*A, d*u1
 end
 
 ###########################################################################################

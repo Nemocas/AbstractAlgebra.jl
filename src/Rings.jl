@@ -1,4 +1,4 @@
-import Base: length, call, exp, promote_rule, zero, one, show
+import Base: length, call, exp, promote_rule, zero, one, show, divrem, mod
 
 export Ring, Field, RingElem
 
@@ -10,7 +10,11 @@ abstract Field <: Ring
 
 abstract RingElem
 
+abstract FieldElem <: RingElem
+
 abstract PolyElem <: RingElem
+
+abstract Residue <: RingElem
 
 function +{S <: RingElem, T <: RingElem}(x::S, y::T) 
    T1 = promote_type(S, T)
