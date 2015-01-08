@@ -16,7 +16,7 @@ end
 
 elem_type(::IntegerRing) = BigInt
 
-base(a::IntegerRing) = None
+base_ring(a::IntegerRing) = None
 
 ###########################################################################################
 #

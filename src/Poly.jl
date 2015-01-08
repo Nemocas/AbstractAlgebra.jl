@@ -17,7 +17,7 @@ export Poly, PolyRing, PolynomialRing, coeff, isgen, truncate, mullow, reverse, 
 
 PolyID = ObjectIdDict()
 
-type PolyRing{P <: PolyElem, S} <: Ring
+type PolyRing{T, S} <: Ring
    base_ring :: Ring
 
    function PolyRing(R::Ring)
@@ -32,7 +32,7 @@ end
 type Poly{T <: RingElem, S} <: PolyElem
    coeffs::Array{T, 1}
    length::Int
-   parent::PolyRing
+   parent::PolyRing{T, S}
 
    Poly(R::Ring) = new(Array(T, 0), 0)
    
@@ -43,11 +43,11 @@ type Poly{T <: RingElem, S} <: PolyElem
    Poly(R::Ring, a::Integer) = a == 0 ? new(Array(T, 0), 0) : new([R(a)], 1)
 end
 
-elem_type{P <: PolyElem, S}(::PolyRing{P, S}) = P
+elem_type{T <: RingElem, S}(::PolyRing{T, S}) = Poly{T, S}
 
-base(a::PolyRing) = a.base_ring
+base_ring(a::PolyRing) = a.base_ring
 
-base(a::PolyElem) = base(parent(a))
+base_ring(a::PolyElem) = base_ring(parent(a))
 
 function parent(a::PolyElem)
    return a.parent
@@ -71,15 +71,15 @@ length(x::PolyElem) = x.length
 
 degree(x::PolyElem) = length(x) - 1
 
-coeff(a::PolyElem, n::Int) = n >= length(a) ? base(a)(0) : a.coeffs[n + 1]
+coeff(a::PolyElem, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
-lead(a::PolyElem) = length(a) == 0 ? base(a)(0) : coeff(a, length(a) - 1)
+lead(a::PolyElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
 
 zero(a::PolyRing) = a(0)
 
 one(a::PolyRing) = a(1)
 
-gen(a::PolyRing) = a([zero(base(a)), one(base(a))])
+gen(a::PolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
 iszero(a::PolyElem) = length(a) == 0
 
@@ -99,7 +99,7 @@ function show{T <: RingElem, S}(io::IO, x::Poly{T, S})
    len = length(x)
 
    if len == 0
-      print(io, base(x)(0))
+      print(io, base_ring(x)(0))
    else
       for i = 1:len - 1
          c = x.coeffs[len - i + 1]
@@ -145,7 +145,7 @@ function show{T <: RingElem, S}(io::IO, x::Poly{T, S})
    end
 end
 
-function show{P <: PolyElem, S}(io::IO, p::PolyRing{P, S})
+function show{T <: RingElem, S}(io::IO, p::PolyRing{T, S})
    print(io, "Univariate Polynomial Ring in ")
    print(io, string(S))
    print(io, " over ")
@@ -247,7 +247,7 @@ function *{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S})
       return parent(a)()
    end
 
-   t = base(a)()
+   t = base_ring(a)()
 
    lenz = lena + lenb - 1
    d = Array(T, lenz)
@@ -362,7 +362,7 @@ function fit!{T <: RingElem, S}(c::Poly{T, S}, n::Int)
          c.coeffs[i] = t[i]
       end
       for i = length(c) + 1:n
-         c.coeffs[i] = zero(base(c))
+         c.coeffs[i] = zero(base_ring(c))
       end
    end
 end
@@ -383,7 +383,7 @@ function mul!(c::Poly, a::Poly, b::Poly)
    if lena == 0 || lenb == 0
       c.length = 0
    else
-      t = base(a)()
+      t = base_ring(a)()
 
       lenc = lena + lenb - 1
       fit!(c, lenc)
@@ -428,44 +428,46 @@ function PolynomialRing(R::Ring, s::String)
    S = symbol(s)
    C0 = R(0)
    C1 = R(1)
-   T2 = elem_type(R)
-   T = Poly{T2, S}
-   P = PolyRing{T, S}
-   par = P(R)
+   T_base = elem_type(R)
+   T_poly = Poly{T_base, S}
+   T_parent = PolyRing{T_base, S}
+   parent_obj = T_parent(R)
    
    # Conversions and promotions
 
    # conversion from base type
-   eval(:(Base.convert(::Type{$T}, x::$T2) = $par(x)))
-   eval(:(Base.promote_rule(::Type{$T}, ::Type{$T2}) = $T))
+   eval(:(Base.convert(::Type{$T_poly}, x::$T_base) = $parent_obj(x)))
+   eval(:(Base.promote_rule(::Type{$T_poly}, ::Type{$T_base}) = $T_poly))
 
    # conversion from base type of base_rings, recursively
    R2 = R
-   while base(R2) != None
-      R2 = base(R2)
-      T3 = elem_type(R2)
-      eval(:(Base.convert(::Type{$T}, x::$T3) = $par(convert($T2, x))))
-      eval(:(Base.promote_rule(::Type{$T}, ::Type{$T3}) = $T))
-      eval(:(Base.call(a::$P, x::$T3) = begin z = $par(convert($T2, x)); z.parent = $par; return z; end))
+   while base_ring(R2) != None
+      R2 = base_ring(R2)
+      T_base2 = elem_type(R2)
+      eval(:(Base.convert(::Type{$T_poly}, x::$T_base2) = $parent_obj(convert($T_base, x))))
+      eval(:(Base.promote_rule(::Type{$T_poly}, ::Type{$T_base2}) = $T_poly))
+      eval(:(Base.call(a::$T_parent, x::$T_base2) = $parent_obj(convert($T_base, x))))
    end
 
    # conversion from Integer types
-   if R != ZZ
-      eval(:(Base.convert(::Type{$T}, x::BigInt) = $par(x)))
-      eval(:(Base.promote_rule(::Type{$T}, ::Type{BigInt}) = $T))
+   if R2 != ZZ
+      eval(:(Base.convert(::Type{$T_poly}, x::BigInt) = $parent_obj(x)))
+      eval(:(Base.promote_rule(::Type{$T_poly}, ::Type{BigInt}) = $T_poly))
    end
 
-   eval(:(Base.convert(::Type{$T}, x::Integer) = $par(x)))
-   eval(:(Base.promote_rule{Tint <: Integer}(::Type{$T}, ::Type{Tint}) = $T))
+   eval(:(Base.convert(::Type{$T_poly}, x::Integer) = $parent_obj(x)))
+   eval(:(Base.promote_rule{T <: Integer}(::Type{$T_poly}, ::Type{T}) = $T_poly))
 
    # overload parent call for all of the above
-   eval(:(Base.call(a::$P) = begin z = $T($R); z.parent = $par; return z; end)) 
-   eval(:(Base.call(a::$P, x::Int) = begin z = $T($R, x); z.parent = $par; return z; end))
-   eval(:(Base.call(a::$P, x::Integer) = begin z = $T($R, BigInt(x)); z.parent = $par; return z; end))
-   eval(:(Base.call(a::$P, x::BigInt) = begin z = $T($R, x); z.parent = $par; return z; end))
-   eval(:(Base.call(a::$P, x::$T2) = begin z = $T($R, x); z.parent = $par; return z; end))
-   eval(:(Base.call(a::$P, x::$T) = begin z = x; z.parent = $par; return z; end))
-   eval(:(Base.call(a::$P, x::Array{$T2, 1}) = begin z = $T($R, x); z.parent = $par; return z; end))
+   eval(:(Base.call(a::$T_parent) = begin z = $T_poly($R); z.parent = a; return z; end)) 
+   eval(:(Base.call(a::$T_parent, x::Int) = begin z = $T_poly($R, x); z.parent = a; return z; end))
+   eval(:(Base.call(a::$T_parent, x::Integer) = begin z = $T_poly($R, BigInt(x)); z.parent = a; return z; end))
+   if R2 != ZZ
+      eval(:(Base.call(a::$T_parent, x::BigInt) = begin z = $T_poly($R, x); z.parent = a; return z; end))
+   end
+   eval(:(Base.call(a::$T_parent, x::$T_base) = begin z = $T_poly($R, x); z.parent = a; return z; end))
+   eval(:(Base.call(a::$T_parent, x::$T_parent) = x))
+   eval(:(Base.call(a::$T_parent, x::Array{$T_base, 1}) = begin z = $T_poly($R, x); z.parent = a; return z; end))
 
-   return P(R), P(R)([C0, C1])
+   return parent_obj, parent_obj([C0, C1])
 end

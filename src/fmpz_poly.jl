@@ -20,7 +20,7 @@ type fmpz_poly{S} <: PolyElem
    coeffs :: Ptr{Void}
    alloc :: Int
    length :: Int
-   parent :: PolyRing
+   parent :: PolyRing{BigInt, S}
 
    function fmpz_poly()
       z = new()
@@ -58,9 +58,11 @@ type fmpz_poly{S} <: PolyElem
    end
 end
 
-function _fmpz_poly_clear_fn{S}(a::fmpz_poly{S})
-   ccall((:fmpz_poly_clear, :libflint), Void, (Ptr{fmpz_poly{S}},), &a)
+function _fmpz_poly_clear_fn(a::fmpz_poly)
+   ccall((:fmpz_poly_clear, :libflint), Void, (Ptr{fmpz_poly},), &a)
 end
+
+elem_type{S}(::PolyRing{BigInt, S}) = fmpz_poly{S}
 
 ###########################################################################################
 #
@@ -68,20 +70,20 @@ end
 #
 ###########################################################################################    
    
-length{S}(x::fmpz_poly{S}) = ccall((:fmpz_poly_length, :libflint), Int, (Ptr{fmpz_poly{S}},), &x)
+length(x::fmpz_poly) = ccall((:fmpz_poly_length, :libflint), Int, (Ptr{fmpz_poly},), &x)
 
-function coeff{S}(x::fmpz_poly{S}, n::Int)
+function coeff(x::fmpz_poly, n::Int)
    n < 0 && throw(DomainError())
    temp = fmpz()
    init(temp)
    ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
-               (Ptr{fmpz}, Ptr{fmpz_poly{S}}, Int), &temp, &x, n)
+               (Ptr{fmpz}, Ptr{fmpz_poly}, Int), &temp, &x, n)
    z = BigInt(temp)
    clear(temp)
    return z
 end
 
-isgen{S}(x::fmpz_poly{S}) = ccall((:fmpz_poly_is_x, :libflint), Bool, (Ptr{fmpz_poly{S}},), &x)
+isgen(x::fmpz_poly) = ccall((:fmpz_poly_is_x, :libflint), Bool, (Ptr{fmpz_poly},), &x)
 
 ###########################################################################################
 #
@@ -102,7 +104,14 @@ function show{S}(io::IO, x::fmpz_poly{S})
    end
 end
 
-show_minus_one{S}(::Type{fmpz_poly{S}}) = show_minus_one(BigInt)
+function show{S}(io::IO, p::PolyRing{BigInt, S})
+   print(io, "Univariate Polynomial Ring in ")
+   print(io, string(S))
+   print(io, " over ")
+   show(io, p.base_ring)
+end
+
+show_minus_one(::Type{fmpz_poly}) = show_minus_one(BigInt)
 
 ###########################################################################################
 #
@@ -110,9 +119,9 @@ show_minus_one{S}(::Type{fmpz_poly{S}}) = show_minus_one(BigInt)
 #
 ###########################################################################################
 
-function -{S}(x::fmpz_poly{S})
+function -(x::fmpz_poly)
    z = parent(x)()
-   ccall((:fmpz_poly_neg, :libflint), Void, (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}), &z, &x)
+   ccall((:fmpz_poly_neg, :libflint), Void, (Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x)
    return z
 end
 
@@ -122,26 +131,26 @@ end
 #
 ###########################################################################################
 
-function +{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
+function +(x::fmpz_poly, y::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_add, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}},  Ptr{fmpz_poly{S}}), 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly},  Ptr{fmpz_poly}), 
                &z, &x, &y)
    return z
 end
 
-function -{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
+function -(x::fmpz_poly, y::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_sub, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}},  Ptr{fmpz_poly{S}}), 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly},  Ptr{fmpz_poly}), 
                &z, &x, &y)
    return z
 end
 
-function *{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
+function *(x::fmpz_poly, y::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_mul, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}},  Ptr{fmpz_poly{S}}), 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly},  Ptr{fmpz_poly}), 
                &z, &x, &y)
    return z
 end
@@ -152,63 +161,63 @@ end
 #
 ###########################################################################################
 
-function *{S}(x::Int, y::fmpz_poly{S})
+function *(x::Int, y::fmpz_poly)
    z = parent(y)()
    ccall((:fmpz_poly_scalar_mul_si, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Int), &z, &y, x)
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), &z, &y, x)
    return z
 end
 
-function *{S}(x::BigInt, y::fmpz_poly{S})
+function *(x::BigInt, y::fmpz_poly)
    z = parent(y)()
    temp = fmpz_readonly(x)
    ccall((:fmpz_poly_scalar_mul_fmpz, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Ptr{fmpz}), &z, &y, &temp)
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz}), &z, &y, &temp)
    return z
 end
 
-function +{S}(x::fmpz_poly{S}, y::Int)
+function +(x::fmpz_poly, y::Int)
    z = parent(x)()
    ccall((:fmpz_poly_add_si, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Int), &z, &x, y)
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), &z, &x, y)
    return z
 end
 
-function +{S}(x::fmpz_poly{S}, y::BigInt)
+function +(x::fmpz_poly, y::BigInt)
    z = parent(x)()
    temp = fmpz_readonly(y)
    ccall((:fmpz_poly_add_fmpz, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Ptr{fmpz}), &z, &x, &temp)
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz}), &z, &x, &temp)
    return z
 end
 
-function -{S}(x::fmpz_poly{S}, y::Int)
+function -(x::fmpz_poly, y::Int)
    z = parent(x)()
    ccall((:fmpz_poly_sub_si, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Int), &z, &x, y)
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), &z, &x, y)
    return z
 end
 
-function -{S}(x::fmpz_poly{S}, y::BigInt)
+function -(x::fmpz_poly, y::BigInt)
    z = parent(x)()
    temp = fmpz_readonly(y)
    ccall((:fmpz_poly_sub_fmpz, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Ptr{fmpz}), &z, &x, &temp)
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz}), &z, &x, &temp)
    return z
 end
 
-function -{S}(x::Int, y::fmpz_poly{S})
+function -(x::Int, y::fmpz_poly)
    z = parent(y)()
    ccall((:fmpz_poly_si_sub, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Int, Ptr{fmpz_poly{S}}), &z, x, &y)
+                (Ptr{fmpz_poly}, Int, Ptr{fmpz_poly}), &z, x, &y)
    return z
 end
 
-function -{S}(x::BigInt, y::fmpz_poly{S})
+function -(x::BigInt, y::fmpz_poly)
    z =parent(y)()
    temp = fmpz_readonly(x)
    ccall((:fmpz_poly_fmpz_sub, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz}, Ptr{fmpz_poly{S}}), &z, &temp, &y)
+                (Ptr{fmpz_poly}, Ptr{fmpz}, Ptr{fmpz_poly}), &z, &temp, &y)
    return z
 end
 
@@ -238,11 +247,11 @@ end
 #
 ###########################################################################################
 
-function ^{S}(x::fmpz_poly{S}, y::Int)
+function ^(x::fmpz_poly, y::Int)
    y < 0 && throw(DomainError())
    z = parent(x)()
    ccall((:fmpz_poly_pow, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Int), 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), 
                &z, &x, y)
    return z
 end
@@ -253,8 +262,8 @@ end
 #
 ###########################################################################################
 
-=={S}(x::fmpz_poly{S}, y::fmpz_poly{S}) = ccall((:fmpz_poly_equal, :libflint), Bool, 
-                                       (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}), &x, &y)
+==(x::fmpz_poly, y::fmpz_poly) = ccall((:fmpz_poly_equal, :libflint), Bool, 
+                                       (Ptr{fmpz_poly}, Ptr{fmpz_poly}), &x, &y)
 
 ###########################################################################################
 #
@@ -262,7 +271,7 @@ end
 #
 ###########################################################################################
 
-function =={S}(x::fmpz_poly{S}, y::BigInt) 
+function ==(x::fmpz_poly, y::BigInt) 
    if length(x) > 1
       return false
    elseif length(x) == 1 
@@ -270,7 +279,7 @@ function =={S}(x::fmpz_poly{S}, y::BigInt)
       init(z)
       temp = fmpz_readonly(y)
       ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
-                       (Ptr{fmpz}, Ptr{fmpz_poly{S}}, Int), &z, &x, 0)
+                       (Ptr{fmpz}, Ptr{fmpz_poly}, Int), &z, &x, 0)
       res = ccall((:fmpz_equal, :libflint), Bool, 
                (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &temp, 0)
       clear(z)
@@ -288,7 +297,7 @@ end
 #
 ###########################################################################################
 
-function truncate{S}(a::fmpz_poly{S}, n::Int)
+function truncate(a::fmpz_poly, n::Int)
    n < 0 && throw(DomainError())
    
    if length(a) <= n
@@ -297,16 +306,16 @@ function truncate{S}(a::fmpz_poly{S}, n::Int)
 
    z = parent(a)()
    ccall((:fmpz_poly_set_trunc, :libflint), Void,
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Int), &z, &a, n)
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), &z, &a, n)
    return z
 end
 
-function mullow{S}(x::fmpz_poly{S}, y::fmpz_poly{S}, n::Int)
+function mullow(x::fmpz_poly, y::fmpz_poly, n::Int)
    n < 0 && throw(DomainError())
    
    z = parent(x)()
    ccall((:fmpz_poly_mullow, :libflint), Void,
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Int), &z, &x, &y, n)
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), &z, &x, &y, n)
    return z
 end
 
@@ -316,11 +325,11 @@ end
 #
 ###########################################################################################
 
-function reverse{S}(x::fmpz_poly{S}, len::Int)
+function reverse(x::fmpz_poly, len::Int)
    len < 0 && throw(DomainError())
    z = parent(x)()
    ccall((:fmpz_poly_reverse, :libflint), Void,
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Int), &z, &x, len)
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), &z, &x, len)
    return z
 end
 
@@ -330,19 +339,19 @@ end
 #
 ###########################################################################################
 
-function shift_left{S}(x::fmpz_poly{S}, len::Int)
+function shift_left(x::fmpz_poly, len::Int)
    len < 0 && throw(DomainError())
    z = parent(x)()
    ccall((:fmpz_poly_shift_left, :libflint), Void,
-      (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Int), &z, &x, len)
+      (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), &z, &x, len)
    return z
 end
 
-function shift_right{S}(x::fmpz_poly{S}, len::Int)
+function shift_right(x::fmpz_poly, len::Int)
    len < 0 && throw(DomainError())
    z = parent(x)()
    ccall((:fmpz_poly_shift_right, :libflint), Void,
-       (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Int), &z, &x, len)
+       (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), &z, &x, len)
    return z
 end
 
@@ -352,11 +361,11 @@ end
 #
 ###########################################################################################
 
-function divexact{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
+function divexact(x::fmpz_poly, y::fmpz_poly)
    y == 0 && throw(DivideError())
    z = parent(x)()
    ccall((:fmpz_poly_div, :libflint), Void, 
-            (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}), &z, &x, &y)
+            (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y)
    return z
 end
 
@@ -366,20 +375,20 @@ end
 #
 ###########################################################################################
 
-function divexact{S}(x::fmpz_poly{S}, y::BigInt)
+function divexact(x::fmpz_poly, y::BigInt)
    y == 0 && throw(DivideError())
    z = parent(x)()
    temp = fmpz_readonly(y)
    ccall((:fmpz_poly_scalar_divexact_fmpz, :libflint), Void, 
-          (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Ptr{fmpz}), &z, &x, &temp)
+          (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz}), &z, &x, &temp)
    return z
 end
 
-function divexact{S}(x::fmpz_poly{S}, y::Int)
+function divexact(x::fmpz_poly, y::Int)
    y == 0 && throw(DivideError())
    z = parent(x)()
    ccall((:fmpz_poly_scalar_divexact_si, :libflint), Void, 
-                        (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Int), &z, &x, y)
+                        (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Int), &z, &x, y)
    return z
 end
 
@@ -391,13 +400,13 @@ divexact(x::fmpz_poly, y::Integer) = divexact(x, BigInt(y))
 #
 ###########################################################################################
 
-function pseudorem{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
+function pseudorem(x::fmpz_poly, y::fmpz_poly)
    y == 0 && throw(DivideError())
    diff = length(x) - length(y)
    r = parent(x)()
    d = Array(Int, 1)
    ccall((:fmpz_poly_pseudo_rem, :libflint), Void, 
-        (Ptr{fmpz_poly{S}}, Ptr{Int}, Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}), &r, d, &x, &y)
+        (Ptr{fmpz_poly}, Ptr{Int}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &r, d, &x, &y)
    if (diff > d[1])
       return lead(y)^(diff - d[1])*r
    else
@@ -405,14 +414,14 @@ function pseudorem{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
    end
 end
 
-function pseudodivrem{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
+function pseudodivrem(x::fmpz_poly, y::fmpz_poly)
    y == 0 && throw(DivideError())
    diff = length(x) - length(y)
    q = parent(x)()
    r = parent(x)()
    d = Array(Int, 1)
    ccall((:fmpz_poly_pseudo_divrem_divconquer, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Ptr{Int}, Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}), 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{Int}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
                &q, &r, d, &x, &y)
    if (diff > d[1])
       m = lead(y)^(diff - d[1])
@@ -428,26 +437,26 @@ end
 #
 ###########################################################################################
 
-function gcd{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
+function gcd(x::fmpz_poly, y::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_gcd, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}), &z, &x, &y)
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y)
    return z
 end
 
-function content{S}(x::fmpz_poly{S})
+function content(x::fmpz_poly)
    temp = fmpz()
    init(temp)
-   ccall((:fmpz_poly_content, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz_poly{S}}), &temp, &x)
+   ccall((:fmpz_poly_content, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz_poly}), &temp, &x)
    res = BigInt(temp)
    clear(temp)
    return res
 end
 
-function primpart{S}(x::fmpz_poly{S})
+function primpart(x::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_primitive_part, :libflint), Void, 
-         (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}), &z, &x)
+         (Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x)
    return z
 end
 
@@ -457,12 +466,12 @@ end
 #
 ###########################################################################################
 
-function evaluate{S}(x::fmpz_poly{S}, y::BigInt)
+function evaluate(x::fmpz_poly, y::BigInt)
    z = fmpz()
    init(z)
    temp = fmpz_readonly(y)
    ccall((:fmpz_poly_evaluate_fmpz, :libflint), Void, 
-                (Ptr{fmpz}, Ptr{fmpz_poly{S}}, Ptr{fmpz}), &z, &x, &temp)
+                (Ptr{fmpz}, Ptr{fmpz_poly}, Ptr{fmpz}), &z, &x, &temp)
    res = BigInt(z)
    clear(z)
    return res
@@ -476,10 +485,10 @@ evaluate(x::fmpz_poly, y::Integer) = evaluate(x, BigInt(y))
 #
 ###########################################################################################
 
-function compose{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
+function compose(x::fmpz_poly, y::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_compose, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}), &z, &x, &y)
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y)
    return z
 end
 
@@ -489,10 +498,10 @@ end
 #
 ###########################################################################################
 
-function derivative{S}(x::fmpz_poly{S})
+function derivative(x::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_derivative, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}), &z, &x)
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x)
    return z
 end
 
@@ -502,11 +511,11 @@ end
 #
 ###########################################################################################
 
-function resultant{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
+function resultant(x::fmpz_poly, y::fmpz_poly)
    temp = fmpz()
    init(temp)
    ccall((:fmpz_poly_resultant, :libflint), Void, 
-                (Ptr{fmpz}, Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}), &temp, &x, &y)
+                (Ptr{fmpz}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &temp, &x, &y)
    res = BigInt(temp)
    clear(temp)
    return res
@@ -518,11 +527,11 @@ end
 #
 ###########################################################################################
 
-function discriminant{S}(x::fmpz_poly{S})
+function discriminant(x::fmpz_poly)
    temp = fmpz()
    init(temp)
    ccall((:fmpz_poly_discriminant, :libflint), Void, 
-                (Ptr{fmpz}, Ptr{fmpz_poly{S}}), &temp, &x)
+                (Ptr{fmpz}, Ptr{fmpz_poly}), &temp, &x)
    res = BigInt(temp)
    clear(temp)
    return res
@@ -534,13 +543,13 @@ end
 #
 ###########################################################################################
 
-function bezout{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
+function bezout(x::fmpz_poly, y::fmpz_poly)
    temp = fmpz()
    init(temp)
    u = parent(x)()
    v = parent(x)()
    ccall((:fmpz_poly_xgcd_modular, :libflint), Void, 
-        (Ptr{fmpz}, Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}), 
+        (Ptr{fmpz}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
             &temp, &u, &v, &x, &y)
    z = BigInt(temp)
    clear(temp)
@@ -553,20 +562,20 @@ end
 #
 ###########################################################################################
 
-function setcoeff!{S}(z::fmpz_poly{S}, n::Int, x::BigInt)
+function setcoeff!(z::fmpz_poly, n::Int, x::BigInt)
    temp = fmpz_readonly(x)
    ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
                     (Ptr{fmpz_poly}, Int, Ptr{fmpz}), &z, n, &temp)
 end
 
-function mul!{S}(z::fmpz_poly{S}, x::fmpz_poly{S}, y::fmpz_poly{S})
+function mul!(z::fmpz_poly, x::fmpz_poly, y::fmpz_poly)
    ccall((:fmpz_poly_mul, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}), &z, &x, &y)
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y)
 end
 
-function addeq!{S}(z::fmpz_poly{S}, x::fmpz_poly{S})
+function addeq!(z::fmpz_poly, x::fmpz_poly)
    ccall((:fmpz_poly_add, :libflint), Void, 
-                (Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}, Ptr{fmpz_poly{S}}), &z, &z, &x)
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &z, &x)
 end
 
 ###########################################################################################
@@ -577,16 +586,16 @@ end
 
 function PolynomialRing(R::IntegerRing, s::String)
    S = symbol(s)
-   T = fmpz_poly{S}
-   P = PolyRing{T, S}
-   par = P(R)
+   T_poly = fmpz_poly{S}
+   T_parent = PolyRing{BigInt, S}
+   parent_obj = T_parent(R)
 
-   eval(:(Base.call(a::$P) = begin z = $T(); z.parent = $par; return z; end))
-   eval(:(Base.call(a::$P, x::Int) = begin z = $T(x); z.parent = $par; return z; end))
-   eval(:(Base.call(a::$P, x::Integer) = begin z = $T(BigInt(x)); z.parent = $par; return z; end))
-   eval(:(Base.call(a::$P, x::BigInt) = begin z = $T(x); z.parent = $par; return z; end))
-   eval(:(Base.call(a::$P, x::$T) = begin z = x; z.parent = $par; return z; end))
-   eval(:(Base.call(a::$P, x::Array{BigInt, 1}) = begin z = $T(x); z.parent = $par; return z; end))
+   eval(:(Base.call(a::$T_parent) = begin z = $T_poly(); z.parent = a; return z; end))
+   eval(:(Base.call(a::$T_parent, x::Int) = begin z = $T_poly(x); z.parent = a; return z; end))
+   eval(:(Base.call(a::$T_parent, x::Integer) = begin z = $T_poly(BigInt(x)); z.parent = a; return z; end))
+   eval(:(Base.call(a::$T_parent, x::BigInt) = begin z = $T_poly(x); z.parent = a; return z; end))
+   eval(:(Base.call(a::$T_parent, x::$T_poly) = x))
+   eval(:(Base.call(a::$T_parent, x::Array{BigInt, 1}) = begin z = $T_poly(x); z.parent = a; return z; end))
 
-   return P(R), P(R)([ZZ(0), ZZ(1)])
+   return parent_obj, parent_obj([ZZ(0), ZZ(1)])
 end
