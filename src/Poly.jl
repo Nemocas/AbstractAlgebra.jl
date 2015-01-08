@@ -425,7 +425,7 @@ function mullow{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S}, n::Int)
    lenb = length(b)
 
    if lena == 0 || lenb == 0
-      return zero(Poly{T, S})
+      return zero(parent(a))
    end
 
    if n < 0
@@ -496,7 +496,7 @@ function shift_left{T <: RingElem, S}(x::Poly{T, S}, len::Int)
    xlen = length(x)
    v = Array(T, xlen + len)
    for i = 1:len
-      v[i] = zero(T)
+      v[i] = zero(base_ring(x))
    end
    for i = 1:xlen
       v[i + len] = coeff(x, i - 1)
@@ -508,7 +508,7 @@ function shift_right{T <: RingElem, S}(x::Poly{T, S}, len::Int)
    len < 0 && throw(DomainError())
    xlen = length(x)
    if len >= xlen
-      return zero(Poly{T, S})
+      return zero(parent(x))
    end
    v = Array(T, xlen - len)
    for i = 1:xlen - len
@@ -578,7 +578,7 @@ function divexact{T <: RingElem, S}(f::Poly{T, S}, g::Poly{T, S})
    lenq = length(f) - length(g) + 1
    d = Array(T, lenq)
    for i = 1:lenq
-      d[i] = zero(base(a))
+      d[i] = zero(base_ring(a))
    end
    q = parent(a)(d)
    x = gen(parent(a))
@@ -654,7 +654,7 @@ function divrem{T <: Union(FieldElem, Residue), S}(f::Poly{T, S}, g::Poly{T, S})
    qlen = length(f) - length(g) + 1
    d = Array(T, qlen)
    for i = 1:qlen
-      d[i] = zero(T)
+      d[i] = zero(base_ring(f))
    end
    q = parent(f)(d)
    while length(f) >= length(g)
@@ -689,7 +689,7 @@ function pseudodivrem{T <: RingElem, S}(f::Poly{T, S}, g::Poly{T, S})
    lenq = length(f) - length(g) + 1
    v = Array(T, lenq)
    for i = 1:lenq
-      v[i] = zero(T)
+      v[i] = zero(base_ring(f))
    end
    q = parent(f)(v)
    b = coeff(g, length(g) - 1)
@@ -807,7 +807,7 @@ end
 function compose(a::Poly, b::Poly)
    i = length(a)
    if i == 0
-       return zero(base_ring(a))
+       return zero(parent(a))
    end
    z = a.coeffs[i]
    while i > 1
@@ -1069,7 +1069,7 @@ end
 function gcdinv{T <: Union(FieldElem, Residue), S}(a::Poly{T, S}, b::Poly{T, S})
    if length(a) == 0
       if length(b) == 0
-         return 0, zero(parent(a))
+         return zero(base_ring(a)), zero(parent(a))
       else
          d = inv(lead(b))
          return b*d, zero(parent(a))
