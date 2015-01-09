@@ -8,7 +8,7 @@ export Poly, PolyRing, PolynomialRing, coeff, isgen, truncate, mullow, reverse, 
        shift_right, divexact, pseudorem, pseudodivrem, gcd, content, primpart, evaluate,
        compose, derivative, resultant, discriminant, bezout, zero, one, gen, length,
        iszero, normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod,
-       invmod, lcm, divrem, mod, gcdinv
+       invmod, lcm, divrem, mod, gcdinv, hash, canonical_unit
 
 ###########################################################################################
 #
@@ -50,15 +50,22 @@ base_ring(a::PolyRing) = a.base_ring
 
 base_ring(a::PolyElem) = base_ring(parent(a))
 
-function parent(a::PolyElem)
-   return a.parent
-end
+parent(a::PolyElem) = a.parent
 
 ###########################################################################################
 #
 #   Basic manipulation
 #
 ###########################################################################################    
+
+function hash(a::PolyElem)
+   h = 0x53dd43cd511044d1
+   for i in 0:length(a) - 1
+      h $= hash(coeff(a, i))
+      h = (h << 1) | (h >> (sizeof(Int)*8 - 1))
+   end
+   return h
+end
 
 function normalise(a::PolyElem, len::Int)
    while len > 0 && iszero(a.coeffs[len]) # cannot use coeff(a, len - 1)
@@ -89,6 +96,14 @@ isone(a::PolyElem) = length(a) == 1 && isone(coeff(a, 0))
 isgen(a::PolyElem) = length(a) == 2 && iszero(coeff(a, 0)) && isone(coeff(a, 1))
 
 isunit(a::PolyElem) = length(a) == 1 && isunit(coeff(a, 0))
+
+###########################################################################################
+#
+#   Canonicalisation
+#
+###########################################################################################
+
+canonical_unit{T <: RingElem, S}(x::Poly{T, S}) = canonical_unit(lead(x))
 
 ###########################################################################################
 #
@@ -355,7 +370,7 @@ end
 #
 ###########################################################################################
 
-function ==(x::Poly, y::Poly)
+function =={T <: RingElem, S}(x::Poly{T, S}, y::Poly{T, S})
    if length(x) != length(y)
       return false
    else
@@ -368,7 +383,7 @@ function ==(x::Poly, y::Poly)
    return true
 end
 
-function isequal(x::Poly, y::Poly)
+function isequal{T <: RingElem, S}(x::Poly{T, S}, y::Poly{T, S})
    if length(x) != length(y)
       return false
    end
@@ -626,7 +641,7 @@ end
 #
 ###########################################################################################
 
-function mod{T <: Union(FieldElem, Residue), S}(f::Poly{T, S}, g::Poly{T, S})
+function mod{T <: Union(Residue, FieldElem), S}(f::Poly{T, S}, g::Poly{T, S})
    if length(g) == 0
       raise(DivideError())
    end
@@ -671,7 +686,7 @@ end
 #
 ###########################################################################################
 
-function pseudorem(f::Poly, g::Poly)
+function pseudorem{T <: RingElem, S}(f::Poly{T, S}, g::Poly{T, S})
    g == 0 && throw(DivideError())
    b = coeff(g, length(g) - 1)
    x = gen(parent(f))
@@ -714,7 +729,7 @@ end
 #
 ###########################################################################################
 
-function gcd(a::Poly, b::Poly)
+function gcd{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S})
    if length(b) > length(a)
       (a, b) = (b, a)
    end
@@ -764,7 +779,7 @@ function gcd{T <: Union(FieldElem, Residue), S}(a::Poly{T, S}, b::Poly{T, S})
    return inv(lead(b))*b
 end
 
-function lcm(a::Poly, b::Poly)
+function lcm{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S})
    return a*divexact(b, gcd(a, b))
 end
 
@@ -864,7 +879,7 @@ end
 #
 ###########################################################################################
 
-function resultant(a::Poly, b::Poly)
+function resultant{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S})
    if length(a) == 0 || length(b) == 0
       return zero(base_ring(a))
    end
@@ -1134,7 +1149,7 @@ function setcoeff!{T <: RingElem, S}(c::Poly{T, S}, n::Int, a::T)
    end
 end
 
-function mul!(c::Poly, a::Poly, b::Poly)
+function mul!{T <: RingElem, S}(c::Poly{T, S}, a::Poly{T, S}, b::Poly{T, S})
    lena = length(a)
    lenb = length(b)
 
@@ -1165,7 +1180,7 @@ function mul!(c::Poly, a::Poly, b::Poly)
    end
 end
 
-function addeq!(c::Poly, a::Poly)
+function addeq!{T <: RingElem, S}(c::Poly{T, S}, a::Poly{T, S})
    lenc = length(c)
    lena = length(a)
    len = max(lenc, lena)
@@ -1182,6 +1197,8 @@ end
 #
 ###########################################################################################
 
+Base.promote_rule{S, T <: RingElem, U <: Integer}(::Type{Poly{T, S}}, ::Type{U}) = Poly{T, S}
+
 function PolynomialRing(R::Ring, s::String)
    S = symbol(s)
    C0 = R(0)
@@ -1194,35 +1211,22 @@ function PolynomialRing(R::Ring, s::String)
    # Conversions and promotions
 
    # conversion from base type
-   eval(:(Base.convert(::Type{$T_poly}, x::$T_base) = $parent_obj(x)))
    eval(:(Base.promote_rule(::Type{$T_poly}, ::Type{$T_base}) = $T_poly))
 
    # conversion from base type of base_rings, recursively
    R2 = R
-   while base_ring(R2) != None
+   while base_ring(R2) != None && base_ring(R2) != ZZ
       R2 = base_ring(R2)
       T_base2 = elem_type(R2)
-      eval(:(Base.convert(::Type{$T_poly}, x::$T_base2) = $parent_obj(convert($T_base, x))))
       eval(:(Base.promote_rule(::Type{$T_poly}, ::Type{$T_base2}) = $T_poly))
       eval(:(Base.call(a::$T_parent, x::$T_base2) = $parent_obj(convert($T_base, x))))
    end
-
-   # conversion from Integer types
-   if R2 != ZZ
-      eval(:(Base.convert(::Type{$T_poly}, x::BigInt) = $parent_obj(x)))
-      eval(:(Base.promote_rule(::Type{$T_poly}, ::Type{BigInt}) = $T_poly))
-   end
-
-   eval(:(Base.convert(::Type{$T_poly}, x::Integer) = $parent_obj(x)))
-   eval(:(Base.promote_rule{T <: Integer}(::Type{$T_poly}, ::Type{T}) = $T_poly))
 
    # overload parent call for all of the above
    eval(:(Base.call(a::$T_parent) = begin z = $T_poly($R); z.parent = a; return z; end)) 
    eval(:(Base.call(a::$T_parent, x::Int) = begin z = $T_poly($R, x); z.parent = a; return z; end))
    eval(:(Base.call(a::$T_parent, x::Integer) = begin z = $T_poly($R, BigInt(x)); z.parent = a; return z; end))
-   if R2 != ZZ
-      eval(:(Base.call(a::$T_parent, x::BigInt) = begin z = $T_poly($R, x); z.parent = a; return z; end))
-   end
+   eval(:(Base.call(a::$T_parent, x::BigInt) = begin z = $T_poly($R, x); z.parent = a; return z; end))
    eval(:(Base.call(a::$T_parent, x::$T_base) = begin z = $T_poly($R, x); z.parent = a; return z; end))
    eval(:(Base.call(a::$T_parent, x::$T_parent) = x))
    eval(:(Base.call(a::$T_parent, x::Array{$T_base, 1}) = begin z = $T_poly($R, x); z.parent = a; return z; end))

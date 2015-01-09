@@ -1,8 +1,10 @@
 export ZZ, IntegerRing, parent, show, fmpz, needs_parentheses, is_negative, show_minus_one,
-       zero, one, isunit, iszero, isone
+       zero, one, isunit, iszero, isone, invmod, powmod
 
 type IntegerRing <: Ring
 end
+
+call(::IntegerRing) = BigInt()
 
 call(::IntegerRing, a :: Integer) = BigInt(a)
 
@@ -49,6 +51,49 @@ needs_parentheses(x::BigInt) = false
 is_negative(x::BigInt) = x < 0
 
 show_minus_one(::Type{BigInt}) = false
+
+###########################################################################################
+#
+#   Modular arithmetic
+#
+###########################################################################################
+
+function powmod(x::BigInt, p::BigInt, m::BigInt)
+    m <= 0 && throw(DomainError())
+    if p < 0
+       x = invmod(x, m)
+       p = -p
+    end
+    r = ZZ()
+    ccall((:__gmpz_powm, :libgmp), Void,
+          (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &r, &x, &p, &m)
+    return r 
+end
+
+function powmod(x::BigInt, p::Int, m::BigInt)
+    m <= 0 && throw(DomainError())
+    if p < 0
+       x = invmod(x, m)
+       p = -p
+    end
+    r = ZZ()
+    ccall((:__gmpz_powm_ui, :libgmp), Void,
+          (Ptr{BigInt}, Ptr{BigInt}, Int, Ptr{BigInt}), &r, &x, p, &m)
+    return r 
+end
+
+function invmod(x::BigInt, y::BigInt)
+    y <= 0 && throw(DomainError())
+    z = ZZ()
+    if y == 1
+        return zero(parent(x))
+    end
+    if !ccall((:__gmpz_invert, :libgmp), Bool, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &z, &x, &y)
+       error("Impossible inverse in invmod")
+    end
+    return z
+end
+
 
 ###########################################################################################
 #

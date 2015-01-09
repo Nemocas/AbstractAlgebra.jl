@@ -7,6 +7,7 @@
 ## FIXME : add clear_readonly and fmpz initialiser/finalizer and use instead of init/clear
 ## FIXME : make function names conform to Julia standard
 ## FIXME : put special polynomials back in
+## FIXME : don't use isequal; in Julia it's for objects that hash to the same value
 
 export fmpz_poly
 
@@ -131,7 +132,7 @@ end
 #
 ###########################################################################################
 
-function +(x::fmpz_poly, y::fmpz_poly)
+function +{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
    z = parent(x)()
    ccall((:fmpz_poly_add, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly},  Ptr{fmpz_poly}), 
@@ -139,7 +140,7 @@ function +(x::fmpz_poly, y::fmpz_poly)
    return z
 end
 
-function -(x::fmpz_poly, y::fmpz_poly)
+function -{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
    z = parent(x)()
    ccall((:fmpz_poly_sub, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly},  Ptr{fmpz_poly}), 
@@ -147,7 +148,7 @@ function -(x::fmpz_poly, y::fmpz_poly)
    return z
 end
 
-function *(x::fmpz_poly, y::fmpz_poly)
+function *{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
    z = parent(x)()
    ccall((:fmpz_poly_mul, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly},  Ptr{fmpz_poly}), 
@@ -262,7 +263,7 @@ end
 #
 ###########################################################################################
 
-==(x::fmpz_poly, y::fmpz_poly) = ccall((:fmpz_poly_equal, :libflint), Bool, 
+=={S}(x::fmpz_poly{S}, y::fmpz_poly{S}) = ccall((:fmpz_poly_equal, :libflint), Bool, 
                                        (Ptr{fmpz_poly}, Ptr{fmpz_poly}), &x, &y)
 
 ###########################################################################################
@@ -310,7 +311,7 @@ function truncate(a::fmpz_poly, n::Int)
    return z
 end
 
-function mullow(x::fmpz_poly, y::fmpz_poly, n::Int)
+function mullow{S}(x::fmpz_poly{S}, y::fmpz_poly{S}, n::Int)
    n < 0 && throw(DomainError())
    
    z = parent(x)()
@@ -361,7 +362,7 @@ end
 #
 ###########################################################################################
 
-function divexact(x::fmpz_poly, y::fmpz_poly)
+function divexact{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
    y == 0 && throw(DivideError())
    z = parent(x)()
    ccall((:fmpz_poly_div, :libflint), Void, 
@@ -400,7 +401,7 @@ divexact(x::fmpz_poly, y::Integer) = divexact(x, BigInt(y))
 #
 ###########################################################################################
 
-function pseudorem(x::fmpz_poly, y::fmpz_poly)
+function pseudorem{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
    y == 0 && throw(DivideError())
    diff = length(x) - length(y)
    r = parent(x)()
@@ -414,7 +415,7 @@ function pseudorem(x::fmpz_poly, y::fmpz_poly)
    end
 end
 
-function pseudodivrem(x::fmpz_poly, y::fmpz_poly)
+function pseudodivrem{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
    y == 0 && throw(DivideError())
    diff = length(x) - length(y)
    q = parent(x)()
@@ -437,7 +438,7 @@ end
 #
 ###########################################################################################
 
-function gcd(x::fmpz_poly, y::fmpz_poly)
+function gcd{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
    z = parent(x)()
    ccall((:fmpz_poly_gcd, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y)
@@ -485,7 +486,7 @@ evaluate(x::fmpz_poly, y::Integer) = evaluate(x, BigInt(y))
 #
 ###########################################################################################
 
-function compose(x::fmpz_poly, y::fmpz_poly)
+function compose{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
    z = parent(x)()
    ccall((:fmpz_poly_compose, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y)
@@ -511,7 +512,7 @@ end
 #
 ###########################################################################################
 
-function resultant(x::fmpz_poly, y::fmpz_poly)
+function resultant{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
    temp = fmpz()
    init(temp)
    ccall((:fmpz_poly_resultant, :libflint), Void, 
@@ -543,7 +544,7 @@ end
 #
 ###########################################################################################
 
-function bezout(x::fmpz_poly, y::fmpz_poly)
+function bezout{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
    temp = fmpz()
    init(temp)
    u = parent(x)()
@@ -568,12 +569,12 @@ function setcoeff!(z::fmpz_poly, n::Int, x::BigInt)
                     (Ptr{fmpz_poly}, Int, Ptr{fmpz}), &z, n, &temp)
 end
 
-function mul!(z::fmpz_poly, x::fmpz_poly, y::fmpz_poly)
+function mul!{S}(z::fmpz_poly{S}, x::fmpz_poly{S}, y::fmpz_poly{S})
    ccall((:fmpz_poly_mul, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y)
 end
 
-function addeq!(z::fmpz_poly, x::fmpz_poly)
+function addeq!{S}(z::fmpz_poly{S}, x::fmpz_poly{S})
    ccall((:fmpz_poly_add, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &z, &x)
 end
