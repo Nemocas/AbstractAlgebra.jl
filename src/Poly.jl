@@ -4,7 +4,7 @@
 #
 ###########################################################################################
 
-export Poly, PolyRing, PolynomialRing, coeff, isgen, truncate, mullow, reverse, shift_left,
+export Poly, PolynomialRing, coeff, isgen, truncate, mullow, reverse, shift_left,
        shift_right, divexact, pseudorem, pseudodivrem, gcd, content, primpart, evaluate,
        compose, derivative, resultant, discriminant, bezout, zero, one, gen, length,
        iszero, normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod,
@@ -18,10 +18,10 @@ export Poly, PolyRing, PolynomialRing, coeff, isgen, truncate, mullow, reverse, 
 
 PolyID = ObjectIdDict()
 
-type PolyRing{T <: Union(RingElem, BigInt), S} <: Ring
+type PolynomialRing{T <: Union(RingElem, BigInt), S} <: Ring
    base_ring :: Ring
 
-   function PolyRing(R::Ring)
+   function PolynomialRing(R::Ring)
       return try
          PolyID[R, S]
       catch
@@ -33,7 +33,7 @@ end
 type Poly{T <: RingElem, S} <: PolyElem
    coeffs::Array{T, 1}
    length::Int
-   parent::PolyRing{T, S}
+   parent::PolynomialRing{T, S}
 
    Poly(R::Ring) = new(Array(T, 0), 0)
    
@@ -44,9 +44,9 @@ type Poly{T <: RingElem, S} <: PolyElem
    Poly(R::Ring, a::Integer) = a == 0 ? new(Array(T, 0), 0) : new([R(a)], 1)
 end
 
-elem_type{T <: RingElem, S}(::PolyRing{T, S}) = Poly{T, S}
+elem_type{T <: RingElem, S}(::PolynomialRing{T, S}) = Poly{T, S}
 
-base_ring(a::PolyRing) = a.base_ring
+base_ring(a::PolynomialRing) = a.base_ring
 
 base_ring(a::PolyElem) = base_ring(parent(a))
 
@@ -83,11 +83,11 @@ coeff(a::PolyElem, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
 lead(a::PolyElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
 
-zero(a::PolyRing) = a(0)
+zero(a::PolynomialRing) = a(0)
 
-one(a::PolyRing) = a(1)
+one(a::PolynomialRing) = a(1)
 
-gen(a::PolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
+gen(a::PolynomialRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
 iszero(a::PolyElem) = length(a) == 0
 
@@ -161,7 +161,7 @@ function show{T <: RingElem, S}(io::IO, x::Poly{T, S})
    end
 end
 
-function show{T <: RingElem, S}(io::IO, p::PolyRing{T, S})
+function show{T <: RingElem, S}(io::IO, p::PolynomialRing{T, S})
    print(io, "Univariate Polynomial Ring in ")
    print(io, string(S))
    print(io, " over ")
@@ -1207,49 +1207,49 @@ Base.promote_rule{T <: RingElem, S}(::Type{Poly{T, S}}, ::Type{T}) = Poly{T, S}
 #
 ###########################################################################################
 
-function Base.call{T <: RingElem, S}(a::PolyRing{T, S}, b::RingElem)
+function Base.call{T <: RingElem, S}(a::PolynomialRing{T, S}, b::RingElem)
    return a(base_ring(a)(b))
 end
 
-function Base.call{T <: RingElem, S}(a::PolyRing{T, S})
+function Base.call{T <: RingElem, S}(a::PolynomialRing{T, S})
    z = Poly{T, S}(base_ring(a))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem, S}(a::PolyRing{T, S}, b::Int)
+function Base.call{T <: RingElem, S}(a::PolynomialRing{T, S}, b::Int)
    z = Poly{T, S}(base_ring(a), b)
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem, S}(a::PolyRing{T, S}, b::Integer)
+function Base.call{T <: RingElem, S}(a::PolynomialRing{T, S}, b::Integer)
    z = Poly{T, S}(base_ring(a), BigInt(b))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem, S}(a::PolyRing{T, S}, b::BigInt)
+function Base.call{T <: RingElem, S}(a::PolynomialRing{T, S}, b::BigInt)
    z = Poly{T, S}(base_ring(a), b)
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem, S}(a::PolyRing{T, S}, b::T)
+function Base.call{T <: RingElem, S}(a::PolynomialRing{T, S}, b::T)
    parent(b) != base_ring(a) && error("Unable to coerce element to polynomial")
    z = Poly{T, S}(base_ring(a), b)
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem, S}(a::PolyRing{T, S}, b::Poly{T, S})
+function Base.call{T <: RingElem, S}(a::PolynomialRing{T, S}, b::Poly{T, S})
    parent(b) != a && error("Unable to coerce polynomial")
    z = Poly{T, S}(base_ring(a), b)
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem, S}(a::PolyRing{T, S}, b::Array{T, 1})
+function Base.call{T <: RingElem, S}(a::PolynomialRing{T, S}, b::Array{T, 1})
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce element to polynomial")
    end
@@ -1267,7 +1267,7 @@ end
 function PolynomialRing(R::Ring, s::String)
    S = symbol(s)
    T = elem_type(R)
-   parent_obj = PolyRing{T, S}(R)
+   parent_obj = PolynomialRing{T, S}(R)
    
    return parent_obj, parent_obj([R(0), R(1)])
 end
