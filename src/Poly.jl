@@ -1207,7 +1207,7 @@ Base.promote_rule{T <: RingElem, S}(::Type{Poly{T, S}}, ::Type{T}) = Poly{T, S}
 #
 ###########################################################################################
 
-function Base.call{T <: RingElem, S}(a::PolyRing{T, S}, b::Any)
+function Base.call{T <: RingElem, S}(a::PolyRing{T, S}, b::RingElem)
    return a(base_ring(a)(b))
 end
 
