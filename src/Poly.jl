@@ -1193,43 +1193,81 @@ end
 
 ###########################################################################################
 #
+#   Promotion rules
+#
+###########################################################################################
+
+Base.promote_rule{T <: RingElem, S, V <: Integer}(::Type{Poly{T, S}}, ::Type{V}) = Poly{T, S}
+
+Base.promote_rule{T <: RingElem, S}(::Type{Poly{T, S}}, ::Type{T}) = Poly{T, S}
+
+###########################################################################################
+#
+#   Parent object call overload
+#
+###########################################################################################
+
+function Base.call{T <: RingElem, S}(a::PolyRing{T, S}, b::Any)
+   return a(base_ring(a)(b))
+end
+
+function Base.call{T <: RingElem, S}(a::PolyRing{T, S})
+   z = Poly{T, S}(base_ring(a))
+   z.parent = a
+   return z
+end
+
+function Base.call{T <: RingElem, S}(a::PolyRing{T, S}, b::Int)
+   z = Poly{T, S}(base_ring(a), b)
+   z.parent = a
+   return z
+end
+
+function Base.call{T <: RingElem, S}(a::PolyRing{T, S}, b::Integer)
+   z = Poly{T, S}(base_ring(a), BigInt(b))
+   z.parent = a
+   return z
+end
+
+function Base.call{T <: RingElem, S}(a::PolyRing{T, S}, b::BigInt)
+   z = Poly{T, S}(base_ring(a), b)
+   z.parent = a
+   return z
+end
+
+function Base.call{T <: RingElem, S}(a::PolyRing{T, S}, b::T)
+   parent(b) != base_ring(a) && error("Unable to coerce element to polynomial")
+   z = Poly{T, S}(base_ring(a), b)
+   z.parent = a
+   return z
+end
+
+function Base.call{T <: RingElem, S}(a::PolyRing{T, S}, b::Poly{T, S})
+   parent(b) != a && error("Unable to coerce polynomial")
+   z = Poly{T, S}(base_ring(a), b)
+   z.parent = a
+   return z
+end
+
+function Base.call{T <: RingElem, S}(a::PolyRing{T, S}, b::Array{T, 1})
+   if length(b) > 0
+      parent(b[1]) != base_ring(a) && error("Unable to coerce element to polynomial")
+   end
+   z = Poly{T, S}(base_ring(a), b)
+   z.parent = a
+   return z
+end
+
+###########################################################################################
+#
 #   PolynomialRing constructor
 #
 ###########################################################################################
 
-Base.promote_rule{S, T <: RingElem, U <: Integer}(::Type{Poly{T, S}}, ::Type{U}) = Poly{T, S}
-
 function PolynomialRing(R::Ring, s::String)
    S = symbol(s)
-   C0 = R(0)
-   C1 = R(1)
-   T_base = elem_type(R)
-   T_poly = Poly{T_base, S}
-   T_parent = PolyRing{T_base, S}
-   parent_obj = T_parent(R)
+   T = elem_type(R)
+   parent_obj = PolyRing{T, S}(R)
    
-   # Conversions and promotions
-
-   # conversion from base type
-   eval(:(Base.promote_rule(::Type{$T_poly}, ::Type{$T_base}) = $T_poly))
-
-   # conversion from base type of base_rings, recursively
-   R2 = R
-   while base_ring(R2) != None && base_ring(R2) != ZZ
-      R2 = base_ring(R2)
-      T_base2 = elem_type(R2)
-      eval(:(Base.promote_rule(::Type{$T_poly}, ::Type{$T_base2}) = $T_poly))
-      eval(:(Base.call(a::$T_parent, x::$T_base2) = $parent_obj($R(x))))
-   end
-
-   # overload parent call for all of the above
-   eval(:(Base.call(a::$T_parent) = begin z = $T_poly($R); z.parent = a; return z; end)) 
-   eval(:(Base.call(a::$T_parent, x::Int) = begin z = $T_poly($R, x); z.parent = a; return z; end))
-   eval(:(Base.call(a::$T_parent, x::Integer) = begin z = $T_poly($R, BigInt(x)); z.parent = a; return z; end))
-   eval(:(Base.call(a::$T_parent, x::BigInt) = begin z = $T_poly($R, x); z.parent = a; return z; end))
-   eval(:(Base.call(a::$T_parent, x::$T_base) = begin z = $T_poly($R, x); z.parent = a; return z; end))
-   eval(:(Base.call(a::$T_parent, x::$T_parent) = x))
-   eval(:(Base.call(a::$T_parent, x::Array{$T_base, 1}) = begin z = $T_poly($R, x); z.parent = a; return z; end))
-
-   return parent_obj, parent_obj([C0, C1])
+   return parent_obj, parent_obj([R(0), R(1)])
 end

@@ -581,22 +581,51 @@ end
 
 ###########################################################################################
 #
+#   Parent object call overloads
+#
+###########################################################################################
+
+function Base.call{S}(a::PolyRing{BigInt, S})
+   z = fmpz_poly{S}();
+   z.parent = a;
+   return z
+end
+
+function Base.call{S}(a::PolyRing{BigInt, S}, b::Int)
+   z = fmpz_poly{S}(b);
+   z.parent = a;
+   return z
+end
+
+function Base.call{S}(a::PolyRing{BigInt, S}, b::Integer)
+   z = fmpz_poly{S}(BigInt(b));
+   z.parent = a;
+   return z
+end
+
+function Base.call{S}(a::PolyRing{BigInt, S}, b::BigInt)
+   z = fmpz_poly{S}(b);
+   z.parent = a;
+   return z
+end
+
+function Base.call{S}(a::PolyRing{BigInt, S}, b::Array{BigInt, 1})
+   z = fmpz_poly{S}(b);
+   z.parent = a;
+   return z
+end
+
+Base.call{S}(a::PolyRing{BigInt, S}, b::fmpz_poly{S}) = b
+
+###########################################################################################
+#
 #   PolynomialRing constructor
 #
 ###########################################################################################
 
 function PolynomialRing(R::IntegerRing, s::String)
    S = symbol(s)
-   T_poly = fmpz_poly{S}
-   T_parent = PolyRing{BigInt, S}
-   parent_obj = T_parent(R)
-
-   eval(:(Base.call(a::$T_parent) = begin z = $T_poly(); z.parent = a; return z; end))
-   eval(:(Base.call(a::$T_parent, x::Int) = begin z = $T_poly(x); z.parent = a; return z; end))
-   eval(:(Base.call(a::$T_parent, x::Integer) = begin z = $T_poly(BigInt(x)); z.parent = a; return z; end))
-   eval(:(Base.call(a::$T_parent, x::BigInt) = begin z = $T_poly(x); z.parent = a; return z; end))
-   eval(:(Base.call(a::$T_parent, x::$T_poly) = x))
-   eval(:(Base.call(a::$T_parent, x::Array{BigInt, 1}) = begin z = $T_poly(x); z.parent = a; return z; end))
+   parent_obj = PolyRing{BigInt, S}(R)
 
    return parent_obj, parent_obj([ZZ(0), ZZ(1)])
 end
