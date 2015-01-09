@@ -52,6 +52,11 @@ end
 #
 ###########################################################################################
 
+function hash(a::Residue)
+   h = 0x539c1c8715c1adc2
+   return h $ hash(a.data)
+end
+
 function modulus(R::ResRing)
    return R.modulus
 end
