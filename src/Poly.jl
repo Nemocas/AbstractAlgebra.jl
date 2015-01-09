@@ -22,7 +22,7 @@ type PolyRing{T <: Union(RingElem, BigInt), S} <: Ring
    base_ring :: Ring
 
    function PolyRing(R::Ring)
-      try
+      return try
          PolyID[R, S]
       catch
          PolyID[R, S] = new(R)
@@ -1219,7 +1219,7 @@ function PolynomialRing(R::Ring, s::String)
       R2 = base_ring(R2)
       T_base2 = elem_type(R2)
       eval(:(Base.promote_rule(::Type{$T_poly}, ::Type{$T_base2}) = $T_poly))
-      eval(:(Base.call(a::$T_parent, x::$T_base2) = $parent_obj(convert($T_base, x))))
+      eval(:(Base.call(a::$T_parent, x::$T_base2) = $parent_obj($R(x))))
    end
 
    # overload parent call for all of the above

@@ -19,7 +19,7 @@ type ResRing{T <: Union(RingElem, BigInt)} <: Ring
    modulus::T
 
    function ResRing(R::Ring, modulus::T)
-      try
+      return try
          ModulusDict[modulus]
       catch
          ModulusDict[modulus] = new(R, modulus)
