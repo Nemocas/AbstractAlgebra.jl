@@ -216,7 +216,7 @@ end
 
 ###########################################################################################
 #
-#   ResidueRing constructor
+#   Promotion rules
 #
 ###########################################################################################
 
@@ -226,36 +226,65 @@ Base.promote_rule{T <: RingElem, U <: Integer}(::Type{Residue{T}}, ::Type{U}) = 
 
 Base.promote_rule{T <: Integer}(::Type{Residue{BigInt}}, ::Type{T}) = Residue{BigInt}
 
+###########################################################################################
+#
+#   Parent object call overloading
+#
+###########################################################################################
+
+function Base.call{T <: RingElem}(a::ResRing{T})
+   z = Residue{T}(zero(base_ring(a)))
+   z.parent = a
+   return z
+end
+
+function Base.call{T <: RingElem}(a::ResRing{T}, b::Integer)
+   z = Residue{T}(mod(base_ring(a)(b), modulus(a)))
+   z.parent = a
+   return z
+end
+
+function Base.call{T <: RingElem}(a::ResRing{T}, b::T)
+   check_parent(base_ring(a), b)
+   z = Residue{T}(mod(b, modulus(a)))
+   z.parent = a
+   return z
+end
+
+function Base.call{T <: RingElem}(a::ResRing{T}, b::ResRing{T})
+   check_parent(a, b)
+   return b
+end
+
+function Base.call(a::ResRing{BigInt})
+   z = Residue{BigInt}(ZZ())
+   z.parent = a
+   return z
+end
+
+function Base.call(a::ResRing{BigInt}, b::Integer)
+   z = Residue{BigInt}(mod(ZZ(b), modulus(a)))
+   z.parent = a
+   return z
+end
+
+Base.call(a::ResRing{BigInt}, b::Residue{BigInt}) = b
+
+###########################################################################################
+#
+#   ResidueRing constructor
+#
+###########################################################################################
+
 function ResidueRing{T <: RingElem}(R::Ring, el::T)
-   T != elem_type(R) && error("Modulus is not an element of the specified ring")
+   parent(el) != R && error("Modulus is not an element of the specified ring")
    el == 0 && throw(DivideError())
    
-   T_base = elem_type(R)
-   T_parent = ResRing{T_base}
-   T_res = Residue{T_base}
-   parent_obj = ResRing{T}(R, el)
-   zero_obj = zero(R)
-   
-   eval(:(Base.call(a::$T_parent) = begin z = $T_res($zero_obj); z.parent = a; return z; end))
-   eval(:(Base.call(a::$T_parent, b::Integer) = begin z = $T_res(mod($R(b), $parent_obj.modulus)); z.parent = a; return z; end))
-   eval(:(Base.call(a::$T_parent, b::$T_base) = begin z = $T_res(mod(b, $parent_obj.modulus)); z.parent = a; return z; end))
-   eval(:(Base.call(a::$T_parent, b::$T_res) = b))
-   
-   return parent_obj
+   return ResRing{T}(R, el)
 end
 
 function ResidueRing(R::IntegerRing, el::Integer)
    el == 0 && throw(DivideError())
    
-   T_base = elem_type(R)
-   T_parent = ResRing{T_base}
-   T_res = Residue{T_base}
-   parent_obj = ResRing{BigInt}(R, R(el))
-   zero_obj = zero(R)
-   
-   eval(:(Base.call(a::$T_parent) = begin z = $T_res($zero_obj); z.parent = a; return z; end))
-   eval(:(Base.call(a::$T_parent, b::Integer) = begin z = $T_res(mod($R(b), $parent_obj.modulus)); z.parent = a; return z; end))
-   eval(:(Base.call(a::$T_parent, b::$T_res) = b))
-   
-   return parent_obj
+   return ResRing{BigInt}(R, R(el))
 end
