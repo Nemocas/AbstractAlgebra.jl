@@ -1,3 +1,9 @@
+###########################################################################################
+#
+#   Rings.jl : Generic rings
+#
+###########################################################################################
+
 import Base: length, call, exp, promote_rule, zero, one, show, divrem, mod, hash
 
 export Ring, Field, RingElem

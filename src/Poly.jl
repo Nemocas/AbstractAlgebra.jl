@@ -18,7 +18,7 @@ export Poly, PolynomialRing, coeff, isgen, truncate, mullow, reverse, shift_left
 
 PolyID = ObjectIdDict()
 
-type PolynomialRing{T <: Union(RingElem, BigInt), S} <: Ring
+type PolynomialRing{T <: RingElem, S} <: Ring
    base_ring :: Ring
 
    function PolynomialRing(R::Ring)

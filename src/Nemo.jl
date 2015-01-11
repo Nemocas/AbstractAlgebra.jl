@@ -11,7 +11,7 @@ else
 end
 
 include("Rings.jl")
-# include("Fields.jl")
+include("Fields.jl")
 
 function __init__()
    println("")

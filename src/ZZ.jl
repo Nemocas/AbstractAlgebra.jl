@@ -94,6 +94,19 @@ function invmod(x::BigInt, y::BigInt)
     return z
 end
 
+###########################################################################################
+#
+#   Unsafe functions
+#
+###########################################################################################
+
+function mul!(a::BigInt, b::BigInt, c::BigInt)
+   ccall((:__gmpz_mul, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &b, &c)
+end
+
+function addeq!(a::BigInt, b::BigInt)
+   ccall((:__gmpz_add, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &a, &b)
+end
 
 ###########################################################################################
 #
