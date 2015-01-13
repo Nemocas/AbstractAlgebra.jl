@@ -6,9 +6,16 @@ on_windows = @windows ? true : false
 
 if on_windows
    push!(DL_LOAD_PATH, "$pkgdir\\src\\lib")
-else
-   push!(DL_LOAD_PATH, "$pkgdir/src/lib")
-end
+else                                                                               try                                                                                if ENV["HOSTNAME"] == "juliabox"
+         push!(DL_LOAD_PATH, "/usr/local/lib")
+         dlopen("/usr/local/lib/libgmp.so")
+         dlopen("/usr/local/lib/libmpfr.so")
+         dlopen("/usr/local/lib/libflint.so")
+      else
+         push!(DL_LOAD_PATH, "$pkgdir/src/lib")
+   catch
+      push!(DL_LOAD_PATH, "$pkgdir/src/lib")
+   end                                                                          end     
 
 include("Rings.jl")
 include("Fields.jl")
