@@ -16,6 +16,8 @@ abstract FiniteFieldElem <: FieldElem
 
 include("fq.jl")
 
+include("fq_nmod.jl")
+
 ###########################################################################################
 #
 #   GCD
