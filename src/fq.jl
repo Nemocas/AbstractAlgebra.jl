@@ -70,6 +70,7 @@ type fq{S} <: FiniteFieldElem
                 (Ptr{fq}, Int, Ptr{FqFiniteField}), &d, x, &ctx)
       return d
    end
+
    function fq(ctx::FqFiniteField, x::BigInt)
       d = new()
       ccall((:fq_init2, :libflint), Void, (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
@@ -182,7 +183,7 @@ needs_parentheses(x::fq) = x.length > 1
 
 is_negative(x::fq) = false
 
-show_minus_one(::Type{fq}) = true
+show_minus_one{S}(::Type{fq{S}}) = true
 
 ###########################################################################################
 #
@@ -233,12 +234,14 @@ end
 #
 ###########################################################################################
 
-function *(x::Integer, y::fq)
+function *(x::Int, y::fq)
    z = parent(y)()
    ccall((:fq_mul_si, :libflint), Void, 
          (Ptr{fq}, Ptr{fq}, Int, Ptr{FqFiniteField}), &z, &y, x, &y.parent)
    return z
 end
+
+*(x::Integer, y::fq) = BigInt(x)*y
 
 *(x::fq, y::Integer) = y*x
 
@@ -384,9 +387,9 @@ end
 #
 ###########################################################################################
 
-promote_rule{S}(::Type{fq{S}}, ::Type{Integer}) = fq{S}
+Base.promote_rule{S, T <: Integer}(::Type{fq{S}}, ::Type{T}) = fq{S}
 
-promote_rule{S}(::Type{fq{S}}, ::Type{BigInt}) = fq{S}
+Base.promote_rule{S}(::Type{fq{S}}, ::Type{BigInt}) = fq{S}
 
 ###########################################################################################
 #
@@ -399,6 +402,8 @@ function Base.call{S}(a::FqFiniteField{S})
    z.parent = a
    return z
 end
+
+Base.call{S}(a::FqFiniteField{S}, b::Integer) = a(BigInt(b))
 
 function Base.call{S}(a::FqFiniteField{S}, b::Int)
    z = fq{S}(a, b)

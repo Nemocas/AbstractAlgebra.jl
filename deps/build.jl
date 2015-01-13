@@ -106,6 +106,21 @@ end
 
 cd(wdir)
 
+# install PARI
+
+run(`git clone http://pari.math.u-bordeaux.fr/git/pari.git`)
+
+if on_windows
+else
+   cd("$wdir/pari")
+   run(`./Configure --prefix=$wdir --mt=pthread`)
+   run(`make -j4 gp`)
+   run(`make doc`)
+   run(`make install`)
+end
+
+cd(wdir)
+
 if on_windows
    push!(DL_LOAD_PATH, "$pkgdir\\src\\lib")
 else

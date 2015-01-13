@@ -588,15 +588,15 @@ end
 function divexact{T <: RingElem, S}(f::Poly{T, S}, g::Poly{T, S})
    g == 0 && throw(DivideError())
    if f == 0
-      return zero(parent(a))
+      return zero(parent(f))
    end
    lenq = length(f) - length(g) + 1
    d = Array(T, lenq)
    for i = 1:lenq
-      d[i] = zero(base_ring(a))
+      d[i] = zero(base_ring(f))
    end
-   q = parent(a)(d)
-   x = gen(parent(a))
+   q = parent(f)(d)
+   x = gen(parent(f))
    leng = length(g)
    while length(f) >= leng
       lenf = length(f)
@@ -665,7 +665,7 @@ function divrem{T <: Union(FieldElem, Residue), S}(f::Poly{T, S}, g::Poly{T, S})
    end
    binv = inv(lead(g))
    g = binv*g
-   x = gen(Poly{T, S})
+   x = gen(parent(f))
    qlen = length(f) - length(g) + 1
    d = Array(T, qlen)
    for i = 1:qlen
@@ -1268,6 +1268,15 @@ function PolynomialRing(R::Ring, s::String)
    S = symbol(s)
    T = elem_type(R)
    parent_obj = PolynomialRing{T, S}(R)
-   
+
+   base = base_ring(R)
+   R2 = R
+   parent_type = Poly{T, S}
+   while base_ring(R2) != None
+      R2 = base_ring(R2)
+      T2 = elem_type(R2)
+      eval(:(Base.promote_rule(::Type{$parent_type}, ::Type{$T2}) = $parent_type))
+   end
+
    return parent_obj, parent_obj([R(0), R(1)])
 end

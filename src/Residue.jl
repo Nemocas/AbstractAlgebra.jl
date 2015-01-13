@@ -117,14 +117,14 @@ function +{T <: Union(RingElem, BigInt)}(a::Residue{T}, b::Residue{T})
    return parent(a)(a.data + b.data)
 end
 
-function +{T <: Union(RingElem, BigInt)}(a::Residue{T}, b::Residue{T})
+function -{T <: Union(RingElem, BigInt)}(a::Residue{T}, b::Residue{T})
    check_parent(a, b)
-   return parent(a)(a.data + b.data)
+   return parent(a)(a.data - b.data)
 end
 
-function +{T <: Union(RingElem, BigInt)}(a::Residue{T}, b::Residue{T})
+function *{T <: Union(RingElem, BigInt)}(a::Residue{T}, b::Residue{T})
    check_parent(a, b)
-   return parent(a)(a.data + b.data)
+   return parent(a)(a.data * b.data)
 end
 
 ###########################################################################################
@@ -153,6 +153,17 @@ end
 
 function ^{T <: Union(RingElem, BigInt)}(a::Residue{T}, b::Int)
    parent(a)(powmod(a.data, b, modulus(a)))
+end
+
+###########################################################################################
+#
+#   Comparison
+#
+###########################################################################################
+
+function =={T <: Union(RingElem, BigInt)}(a::Residue{T}, b::Residue{T})
+   check_parent(a, b)
+   return a.data == b.data
 end
 
 ###########################################################################################
@@ -232,6 +243,10 @@ Base.promote_rule{T <: Integer}(::Type{Residue{BigInt}}, ::Type{T}) = Residue{Bi
 #
 ###########################################################################################
 
+function Base.call{T <: RingElem}(a::ResidueRing{T}, b::RingElem)
+   return a(base_ring(a)(b))
+end
+
 function Base.call{T <: RingElem}(a::ResidueRing{T})
    z = Residue{T}(zero(base_ring(a)))
    z.parent = a
@@ -245,14 +260,14 @@ function Base.call{T <: RingElem}(a::ResidueRing{T}, b::Integer)
 end
 
 function Base.call{T <: RingElem}(a::ResidueRing{T}, b::T)
-   check_parent(base_ring(a), b)
+   base_ring(a) != parent(b) && error("Operation on incompatible objects")
    z = Residue{T}(mod(b, modulus(a)))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::ResidueRing{T}, b::ResidueRing{T})
-   check_parent(a, b)
+function Base.call{T <: RingElem}(a::ResidueRing{T}, b::Residue{T})
+   a != parent(b) && error("Operation on incompatible objects")
    return b
 end
 
@@ -280,6 +295,15 @@ function ResidueRing{T <: RingElem}(R::Ring, el::T)
    parent(el) != R && error("Modulus is not an element of the specified ring")
    el == 0 && throw(DivideError())
    
+   base = base_ring(R)
+   R2 = R
+   parent_type = Residue{T}
+   while base_ring(R2) != None
+      R2 = base_ring(R2)
+      T2 = elem_type(R2)
+      eval(:(Base.promote_rule(::Type{$parent_type}, ::Type{$T2}) = $parent_type))
+   end
+
    return ResidueRing{T}(R, el)
 end
 
