@@ -585,6 +585,11 @@ end
 #
 ###########################################################################################
 
+function fit!(z::fmpz_poly, n::Int)
+   ccall((:fmpz_poly_fit_length, :libflint), Void, 
+                    (Ptr{fmpz_poly}, Int), &z, n)
+end
+
 function setcoeff!(z::fmpz_poly, n::Int, x::BigInt)
    temp = fmpz_readonly(x)
    ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 

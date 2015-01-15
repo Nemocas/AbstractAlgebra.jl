@@ -1,0 +1,128 @@
+###########################################################################################
+#
+#   pari_poly.jl : functions for Pari t_POL objects
+#
+###########################################################################################
+
+###########################################################################################
+#
+#   Constructors
+#
+###########################################################################################
+
+PariPolyID = ObjectIdDict()
+
+type PariPolyRing{T <: Ring, S} <: PariRing
+   base_ring::PariRing
+
+   function PariPolyRing(R::PariRing)
+      return try
+         PariPolyID[S]
+      catch
+         PariPolyID[S] = new(R)
+      end
+   end
+end
+
+type pari_poly{T <: PariRing, S} <: RingElem
+   d::Ptr{Int}
+   parent::PariPolyRing{T, S}
+
+   function pari_poly(s::Int)
+      g = new(ccall((:pari_malloc, :libpari), Ptr{Int}, (Int,), s*BITS_IN_WORD))
+      finalizer(g, _pari_poly_clear_fn)
+      return g
+   end
+end
+
+_pari_poly_clear_fn(g::pari_poly) = ccall((:pari_free, :libpari), Void, (Ptr{Uint},), g.d)
+
+parent{T <: PariRing, S}(a::pari_poly{T, S}) = a.parent
+
+###########################################################################################
+#
+#   String I/O
+#
+###########################################################################################
+
+function show(io::IO, x::pari_poly)
+   cstr = ccall((:GENtostr, :libpari), Ptr{Uint8}, 
+                (Ptr{Int},), x.d)
+
+   print(io, bytestring(cstr))
+
+   ccall((:pari_free, :libpari), Void, (Ptr{Uint8},), cstr)
+end
+
+function show{S}(io::IO, p::PariPolyRing{PariIntegerRing, S})
+   print(io, "Univariate Polynomial Ring in ")
+   print(io, string(S))
+   print(io, " over ")
+   show(io, p.base_ring)
+end
+
+###########################################################################################
+#
+#   Conversions to from Poly{BigInt, S}
+#
+###########################################################################################
+
+function gensize(a::fmpz_poly)
+   if a.length == 0
+      return 5
+   end
+   
+   coeffs = a.coeffs
+   total = 0
+   for i = 0:a.length - 1
+      total += ccall((:fmpz_size, :libflint), Int, (Ptr{Int},), coeffs + i*sizeof(Int))
+   end
+   return total + 2*a.length + 2
+end
+
+function pari!(x::Ptr{Int}, a::fmpz_poly, s::Int)
+   unsafe_store!(x, evaltyp(t_POL) | a.length + 2, 1) 
+   unsafe_store!(x, signe(Int(a.length != 0)) | evalvarn(0), 2)
+   if a.length == 0
+      unsafe_store!(x, x + sizeof(Int)*3, 3)
+      pari!(x + sizeof(Int)*3, ZZ(0), 2)
+      s = 5
+   else
+      s = a.length + 2
+      for i = 0:a.length - 1
+         z = coeff(a, i)
+         unsafe_store!(x, x + sizeof(Int)*s, i + 3)
+         s += pari!(x + sizeof(Int)*s, z, gensize(z))
+      end
+   end
+   return s
+end
+
+function pari{S}(a::fmpz_poly{S})
+   s = gensize(a)
+   g = pari_poly{PariIntegerRing, S}(s)
+   g.parent = PariPolyRing{PariIntegerRing, S}(PariZZ)
+   pari!(reinterpret(Ptr{Int}, g.d), a, s)
+   return g
+end
+
+function fmpz_poly!(z::fmpz_poly, g::Ptr{Int})
+   length = (unsafe_load(g, 1) & LGBITS) - 2
+   fit!(z, length)
+   z.length = length
+   if length == 0
+      return
+   end
+   c = BigInt()
+   for i = 0:length - 1
+      ZZ!(c, reinterpret(Ptr{Int}, unsafe_load(g, 3 + i)))
+      setcoeff!(z, i, c)
+   end
+end
+
+function Base.call{S}(a::FmpzPolyRing{BigInt, S}, g::pari_poly{PariIntegerRing, S})
+   z = fmpz_poly{S}()
+   z.parent = a
+   fmpz_poly!(z, g.d)
+   return z
+end

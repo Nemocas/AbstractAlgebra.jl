@@ -1,5 +1,5 @@
 export ZZ, IntegerRing, parent, show, fmpz, needs_parentheses, is_negative, show_minus_one,
-       zero, one, isunit, iszero, isone, invmod, powmod
+       zero, one, isunit, iszero, isone, invmod, powmod, words
 
 type IntegerRing <: Ring
 end
@@ -35,6 +35,8 @@ isone(a::BigInt) = a == 1
 iszero(a::BigInt) = a == 0
 
 isunit(a::BigInt) = a == 1 || a == -1
+
+words(a::BigInt) = a == 0 ? 0 : div(ndigits(a, 2) + 8*sizeof(Int) - 1, 8*sizeof(Int))
 
 ###########################################################################################
 #

@@ -133,3 +133,6 @@ include("Poly.jl")
 
 include("fmpz_poly.jl")
 
+include("PariRings.jl")
+
+
