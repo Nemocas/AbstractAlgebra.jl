@@ -6,7 +6,7 @@
 
 import Base: sign
 
-export pari
+export pari, debug
 
 abstract PariRing <: Ring
 
@@ -85,6 +85,14 @@ varn(x::Ptr{Int}) = (unsafe_load(x, 2) & VARNBITS) >> VARNSHIFT
 setvarn(x, s) = unsafe_store(x, (unsafe_load(x, 2) & ~VARNBITS) | evalvarn(s), 2)
 
 signe(s::Int) = (s >> SIGNSHIFT)
+
+###########################################################################################
+#
+#   Debugging
+#
+###########################################################################################
+
+debug(a::Ptr{Int}) = ccall((:dbgGEN, :libpari), Void, (Ptr{Int}, Int), a, -1)
 
 include("pari_int.jl")
 

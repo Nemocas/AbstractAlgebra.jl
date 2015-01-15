@@ -82,7 +82,7 @@ end
 
 function pari!(x::Ptr{Int}, a::fmpz_poly, s::Int)
    unsafe_store!(x, evaltyp(t_POL) | a.length + 2, 1) 
-   unsafe_store!(x, signe(Int(a.length != 0)) | evalvarn(0), 2)
+   unsafe_store!(x, evalsigne(Int(a.length != 0)) | evalvarn(0), 2)
    if a.length == 0
       unsafe_store!(x, x + sizeof(Int)*3, 3)
       pari!(x + sizeof(Int)*3, ZZ(0), 2)
