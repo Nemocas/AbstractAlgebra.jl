@@ -14,15 +14,24 @@ PariPolyID = ObjectIdDict()
 
 type PariPolyRing{T <: Ring, S} <: PariRing
    base_ring::PariRing
+   pol_0::Ptr{Int}
 
    function PariPolyRing(R::PariRing)
-      return try
-         PariPolyID[S]
+      z = ccall((:pari_malloc, :libpari), Ptr{Int}, (Int,), 2*BITS_IN_WORD)
+      unsafe_store!(z, evaltyp(t_POL) | 2, 1) 
+      unsafe_store!(z, evalsigne(0) | evalvarn(0), 2)
+      try
+         return PariPolyID[S]
       catch
-         PariPolyID[S] = new(R)
+         r = PariPolyID[S] = new(R, z)
+         finalizer(r, _pari_poly_zero_clear_fn)
+         return r
       end
+      
    end
 end
+
+_pari_poly_zero_clear_fn(p::PariPolyRing) = ccall((:pari_free, :libpari), Void, (Ptr{Int},), p.pol_0)
 
 type pari_poly{T <: PariRing, S} <: RingElem
    d::Ptr{Int}
