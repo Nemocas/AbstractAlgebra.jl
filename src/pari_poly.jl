@@ -68,10 +68,6 @@ end
 ###########################################################################################
 
 function gensize(a::fmpz_poly)
-   if a.length == 0
-      return 5
-   end
-   
    coeffs = a.coeffs
    total = 0
    for i = 0:a.length - 1
@@ -83,14 +79,12 @@ end
 function pari!(x::Ptr{Int}, a::fmpz_poly, s::Int)
    unsafe_store!(x, evaltyp(t_POL) | a.length + 2, 1) 
    unsafe_store!(x, evalsigne(Int(a.length != 0)) | evalvarn(0), 2)
-   if a.length == 0
-      unsafe_store!(x, x + sizeof(Int)*3, 3)
-      pari!(x + sizeof(Int)*3, ZZ(0), 2)
-      s = 5
-   else
-      s = a.length + 2
-      for i = 0:a.length - 1
-         z = coeff(a, i)
+   s = a.length + 2
+   for i = 0:a.length - 1
+      z = coeff(a, i)
+      if z == 0
+         unsafe_store!(x, unsafe_load(gen_0), i + 3)
+      else
          unsafe_store!(x, x + sizeof(Int)*s, i + 3)
          s += pari!(x + sizeof(Int)*s, z, gensize(z))
       end

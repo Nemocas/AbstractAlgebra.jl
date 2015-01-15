@@ -82,6 +82,10 @@ end
 
 cd(wdir)
 
+# install ANTIC
+
+run(`git clone https://github.com/wbhart/antic.git`)
+
 # install FLINT
 
 run(`git clone https://github.com/wbhart/flint2.git`)
@@ -90,16 +94,16 @@ if on_windows
    cd("$wdir\\flint2")
    ENV["PATH"] = pth
    if Int == Int32
-      run(`$start /e:4096 /c sh configure --prefix=$wdir2 --disable-static --enable-shared --with-mpir=$wdir2 --with-mpfr=$wdir2 ABI=32`)
+      run(`$start /e:4096 /c sh configure --extensions="$wdir2\antic" --prefix=$wdir2 --disable-static --enable-shared --with-mpir=$wdir2 --with-mpfr=$wdir2 ABI=32`)
    else
-      run(`$start /e:4096 /c sh configure --prefix=$wdir2 --disable-static --enable-shared --with-mpir=$wdir2 --with-mpfr=$wdir2 ABI=64`)
+      run(`$start /e:4096 /c sh configure --extensions="$wdir2\antic" --prefix=$wdir2 --disable-static --enable-shared --with-mpir=$wdir2 --with-mpfr=$wdir2 ABI=64`)
    end
    run(`$start /e:4096 /c sh -c "make -j"`)
    run(`$start /e:4096 /c sh -c "make install"`)
    ENV["PATH"] = oldpth
 else
    cd("$wdir/flint2")
-   run(`./configure --prefix=$wdir --disable-static --enable-shared --with-mpir=$wdir --with-mpfr=$wdir`)
+   run(`./configure --prefix=$wdir --extensions="$wdir/antic" --disable-static --enable-shared --with-mpir=$wdir --with-mpfr=$wdir`)
    run(`make -j4`)
    run(`make install`)
 end
