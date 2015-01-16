@@ -1,20 +1,28 @@
+###########################################################################################
+#
+#   ZZ.jl : BigInts
+#
+###########################################################################################
+
 export ZZ, IntegerRing, parent, show, fmpz, needs_parentheses, is_negative, show_minus_one,
        zero, one, isunit, iszero, isone, invmod, powmod, words
+
+import Base: gcd
 
 type IntegerRing <: Ring
 end
 
 call(::IntegerRing) = BigInt()
 
-call(::IntegerRing, a :: Integer) = BigInt(a)
+call(::IntegerRing, a::Integer) = BigInt(a)
 
-call(::IntegerRing, a :: String) = BigInt(a)
+call(::IntegerRing, a::String) = BigInt(a)
+
+call(::IntegerRing, a::BigInt) = a
 
 ZZ = IntegerRing()
 
-function parent(a :: BigInt)
-    return ZZ
-end
+parent(a::BigInt) = ZZ
 
 elem_type(::IntegerRing) = BigInt
 
@@ -44,7 +52,7 @@ words(a::BigInt) = a == 0 ? 0 : div(ndigits(a, 2) + 8*sizeof(Int) - 1, 8*sizeof(
 #
 ###########################################################################################
 
-function show(io :: IO, a :: IntegerRing)
+function show(io::IO, a::IntegerRing)
    print(io, "Integer Ring")
 end
 
@@ -90,7 +98,8 @@ function invmod(x::BigInt, y::BigInt)
     if y == 1
         return zero(parent(x))
     end
-    if !ccall((:__gmpz_invert, :libgmp), Bool, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &z, &x, &y)
+    if !ccall((:__gmpz_invert, :libgmp), Bool, 
+              (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &z, &x, &y)
        error("Impossible inverse in invmod")
     end
     return z
@@ -116,26 +125,31 @@ end
 #
 ###########################################################################################
 
+type fmpz_readonly
+   data :: Int
+
+   function fmpz_readonly(x::BigInt)
+      r = new()
+      ccall((:fmpz_init_set_readonly, :libflint), Void, 
+            (Ptr{fmpz_readonly}, Ptr{BigInt}), &r, &x)
+      return r
+   end
+end
+
 type fmpz
    data :: Int
 
-   fmpz() = new()
+   function fmpz()
+      r = new(0)
+      finalizer(r, _fmpz_clear_fn)
+      return r
+   end
 end
 
-function init(z::fmpz)
-   z.data = 0
-end
-
-function clear(z::fmpz)
+function _fmpz_clear_fn(z::fmpz)
    ccall((:fmpz_clear, :libflint), Void, (Ptr{fmpz},), &z)
 end
 
-function fmpz_readonly(x::BigInt)
-   temp = fmpz()
-   ccall((:fmpz_init_set_readonly, :libflint), Void, (Ptr{fmpz}, Ptr{BigInt}), &temp, &x)
-   return temp
-end
-   
 function BigInt(z::fmpz)
    r = BigInt()
    ccall((:fmpz_get_mpz, :libflint), Void, (Ptr{BigInt}, Ptr{fmpz}), &r, &z)

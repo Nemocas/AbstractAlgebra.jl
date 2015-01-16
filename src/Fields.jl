@@ -4,6 +4,8 @@
 #
 ###########################################################################################
 
+include("QQ.jl")
+
 include("FiniteFields.jl")
 
 include("NumberFields.jl")
