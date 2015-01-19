@@ -9,6 +9,10 @@
 ## FIXME : put special polynomials back in
 ## FIXME : don't use isequal; in Julia it's for objects that hash to the same value
 ## FIXME : rename primpart to primitive_part
+## FIXME : figure out why length{S}(x::fmpq_poly{S}) requires the {S} when called from
+##         Base.call{S}(a::NfNumberField{S}, pol::fmpq_poly) in nf.jl
+## FIXME : fix needs_parentheses and is_negative in nf.jl
+## FIXME : add hashing for all types
 
 export fmpz_poly
 
@@ -586,6 +590,14 @@ function addeq!{S}(z::fmpz_poly{S}, x::fmpz_poly{S})
    ccall((:fmpz_poly_add, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &z, &x)
 end
+
+###########################################################################################
+#
+#   Promotions
+#
+###########################################################################################
+
+Base.promote_rule{S, T <: Integer}(::Type{fmpz_poly{S}}, ::Type{T}) = fmpz_poly{S}
 
 ###########################################################################################
 #

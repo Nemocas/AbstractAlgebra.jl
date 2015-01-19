@@ -99,7 +99,8 @@ base_ring(a::FmpqPolyRing) = a.base_ring
 #
 ###########################################################################################    
    
-length(x::fmpq_poly) = ccall((:fmpq_poly_length, :libflint), Int, (Ptr{fmpq_poly},), &x)
+length(x::fmpq_poly) = ccall((:fmpq_poly_length, :libflint), Int, 
+                                   (Ptr{fmpq_poly},), &x)
 
 function coeff(x::fmpq_poly, n::Int)
    n < 0 && throw(DomainError())
@@ -422,6 +423,31 @@ end
 
 ###########################################################################################
 #
+#   Euclidean division
+#
+###########################################################################################
+
+function mod(x::fmpq_poly, y::fmpq_poly)
+   y == 0 && throw(DivideError())
+   r = parent(x)()
+   ccall((:fmpq_poly_rem, :libflint), Void, 
+                (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq_poly}), 
+               &r, &x, &y)
+   return r
+end
+
+function divrem(x::fmpq_poly, y::fmpq_poly)
+   y == 0 && throw(DivideError())
+   q = parent(x)()
+   r = parent(x)()
+   ccall((:fmpq_poly_divrem, :libflint), Void, 
+                (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq_poly}), 
+               &q, &r, &x, &y)
+   return q, r
+end
+
+###########################################################################################
+#
 #   Exact division
 #
 ###########################################################################################
@@ -618,6 +644,14 @@ function addeq!{S}(z::fmpq_poly{S}, x::fmpq_poly{S})
    ccall((:fmpq_poly_add, :libflint), Void, 
                 (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq_poly}), &z, &z, &x)
 end
+
+###########################################################################################
+#
+#   Promotions
+#
+###########################################################################################
+
+Base.promote_rule{S, T <: Integer}(::Type{fmpq_poly{S}}, ::Type{T}) = fmpq_poly{S}
 
 ###########################################################################################
 #
