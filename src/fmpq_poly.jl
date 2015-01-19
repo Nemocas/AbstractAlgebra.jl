@@ -76,6 +76,13 @@ type fmpq_poly{S} <: PolyElem
       finalizer(z, _fmpq_poly_clear_fn)
       return z
    end
+
+   function fmpq_poly(a::fmpz_poly)
+      z = new()
+      ccall((:fmpq_poly_init, :libflint), Void, (Ptr{fmpq_poly},), &z)
+      ccall((:fmpq_poly_set_fmpz_poly, :libflint), Void, (Ptr{fmpq_poly}, Ptr{fmpz_poly}), &z, &a)
+      return z
+   end
 end
 
 function _fmpq_poly_clear_fn(a::fmpq_poly)

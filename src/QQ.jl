@@ -166,6 +166,7 @@ type fmpq
    function fmpq()
       a = new(0, 1)
       finalizer(a, _fmpq_clear_fn)
+      return a
    end
 end
 
@@ -174,7 +175,7 @@ function _fmpq_clear_fn(z::fmpq)
 end
    
 function Rational(z::fmpq)
-   r = Rational{BigInt}()
+   r = QQ()
    ccall((:fmpq_get_mpz_frac, :libflint), Void, 
          (Ptr{BigInt}, Ptr{BigInt}, Ptr{fmpq}), &r.num, &r.den, &z)
    return r
