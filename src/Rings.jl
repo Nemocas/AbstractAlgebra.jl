@@ -135,11 +135,15 @@ include("fmpz_poly.jl")
 
 include("PariRings.jl")
 
-include("MaximalOrders.jl")
-
 include("Fields.jl")
+
+include("PariFields.jl")
 
 include("Poly2.jl")
 
+include("pari_poly2.jl")
+
 include("NumberFields.jl")
+
+include("MaximalOrders.jl")
 

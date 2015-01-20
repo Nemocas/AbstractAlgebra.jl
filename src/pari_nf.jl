@@ -4,7 +4,7 @@
 #
 ###########################################################################################
 
-export PariMaximalOrder
+export MaximalOrder
 
 ###########################################################################################
 #
@@ -12,13 +12,13 @@ export PariMaximalOrder
 #
 ###########################################################################################
 
-PariMaximalOrderID = Dict{fmpz_poly, Ring}()
+PariMaximalOrderID = Dict{fmpq_poly, Ring}()
 
 type PariMaximalOrder <: Ring
    nf::Ptr{Int}
-   pol::fmpz_poly
+   pol::fmpq_poly
 
-   function PariMaximalOrder(pol::fmpz_poly)
+   function PariMaximalOrder(pol::fmpq_poly)
       try
          return PariMaximalOrderID[pol]
       catch
@@ -36,11 +36,23 @@ end
 ###########################################################################################
 
 function show(io::IO, nf::PariMaximalOrder)
-   println(io, "Maximal order of Number Field over Rational Field with defining polynomial ", nf.pol)
+   print(io, "Maximal order of Number Field over Rational Field with defining polynomial ")
+   print(nf.pol, " with Z-basis ")
    cstr = ccall((:GENtostr, :libpari), Ptr{Uint8}, 
-                (Ptr{Int},), nf.nf)
+                (Ptr{Int},), reinterpret(Ptr{Int}, unsafe_load(nf.nf + 7*sizeof(Int))))
 
    print(io, bytestring(cstr))
 
    ccall((:pari_free, :libpari), Void, (Ptr{Uint8},), cstr)
 end
+
+###########################################################################################
+#
+#   MaximalOrder constructor
+#
+###########################################################################################
+
+function MaximalOrder(nf::NfNumberField)
+   return PariMaximalOrder(nf.pol)
+end
+

@@ -10,6 +10,8 @@ export pari, debug
 
 abstract PariRing <: Ring
 
+abstract PariField <: PariRing
+
 ###########################################################################################
 #
 #   Pari GEN constants
@@ -82,6 +84,8 @@ settyp(x::Ptr{Int}, s::Int) = unsafe_store!(x, ((unsafe_load(x, 1)
 
 varn(x::Ptr{Int}) = (unsafe_load(x, 2) & VARNBITS) >> VARNSHIFT
 
+typ(x::Ptr{Int}) = reinterpret(Int, reinterpret(Uint, unsafe_load(x, 1)) >> TYPSHIFT)
+
 setvarn(x, s) = unsafe_store(x, (unsafe_load(x, 2) & ~VARNBITS) | evalvarn(s), 2)
 
 signe(s::Int) = (s >> SIGNSHIFT)
@@ -107,3 +111,5 @@ include("pari_poly.jl")
 avma = cglobal((:avma, :libpari), Ptr{Ptr{Int}})
 
 gen_0 = cglobal((:gen_0, :libpari), Ptr{Ptr{Int}})
+
+gen_1 = cglobal((:gen_1, :libpari), Ptr{Ptr{Int}})

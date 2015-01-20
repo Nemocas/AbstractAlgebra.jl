@@ -63,7 +63,7 @@ function show(io::IO, x::pari_poly)
    ccall((:pari_free, :libpari), Void, (Ptr{Uint8},), cstr)
 end
 
-function show{S}(io::IO, p::PariPolyRing{PariIntegerRing, S})
+function show{T <: Ring, S}(io::IO, p::PariPolyRing{T, S})
    print(io, "Univariate Polynomial Ring in ")
    print(io, string(S))
    print(io, " over ")
@@ -129,3 +129,4 @@ function Base.call{S}(a::FmpzPolyRing{BigInt, S}, g::pari_poly{PariIntegerRing, 
    fmpz_poly!(z, g.d)
    return z
 end
+

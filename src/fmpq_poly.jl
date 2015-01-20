@@ -27,8 +27,8 @@ type FmpqPolyRing{T <: Rational{BigInt}, S} <: Ring
 end
 
 type fmpq_poly{S} <: PolyElem
-   coeffs::Ptr{Void}
-   den::Ptr{Int}
+   coeffs::Ptr{Int}
+   den::Int # really an fmpz
    alloc::Int
    length::Int
    parent::FmpqPolyRing{Rational{BigInt}, S}
@@ -107,7 +107,7 @@ function coeff(x::fmpq_poly, n::Int)
    temp = fmpq()
    ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, 
                (Ptr{fmpq}, Ptr{fmpq_poly}, Int), &temp, &x, n)
-   return BigInt(temp)
+   return Rational(temp)
 end
 
 zero(a::FmpzPolyRing) = a(0)
@@ -632,7 +632,7 @@ end
 function setcoeff!(z::fmpq_poly, n::Int, x::Rational{BigInt})
    temp = fmpq_readonly(x)
    ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, 
-                    (Ptr{fmpq_poly}, Int, Ptr{fmpz}), &z, n, &temp)
+                    (Ptr{fmpq_poly}, Int, Ptr{fmpq_readonly}), &z, n, &temp)
 end
 
 function mul!{S}(z::fmpq_poly{S}, x::fmpq_poly{S}, y::fmpq_poly{S})
