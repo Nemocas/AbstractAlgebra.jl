@@ -6,7 +6,7 @@
 
 import Base: sign
 
-export pari, debug
+export pari, debug, gclone
 
 abstract PariRing <: Ring
 
@@ -63,6 +63,14 @@ const TYPBITS  = ~((1 << TYPSHIFT) - 1)
 const LGBITS = (1 << LGnumBITS) - 1
 
 const CLONEBIT = 1<<LGnumBITS
+
+###########################################################################################
+#
+#   Cloning
+#
+###########################################################################################
+
+gclone(gen::Ptr{Int}) = ccall((:gclone, :libpari), Ptr{Int}, (Ptr{Int},), gen)
 
 ###########################################################################################
 #
