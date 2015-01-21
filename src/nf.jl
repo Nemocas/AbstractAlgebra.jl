@@ -65,7 +65,7 @@ type nf_elem{S, T} <: NumberFieldElem
 end
 
 _nf_elem_clear_fn(a::nf_elem) = ccall((:nf_elem_clear, :libflint), Void, 
-                                      (Ptr{nf_elem},), &a)
+                                      (Ptr{nf_elem}, Ptr{NfNumberField}), &a, &a.parent)
 
 parent(a::nf_elem) = a.parent
 

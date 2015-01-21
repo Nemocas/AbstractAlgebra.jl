@@ -17,7 +17,7 @@ type PariPolyRing{T <: Ring, S} <: PariRing
    pol_0::Ptr{Int}
 
    function PariPolyRing(R::PariRing)
-      z = ccall((:pari_malloc, :libpari), Ptr{Int}, (Int,), 2*BITS_IN_WORD)
+      z = ccall((:pari_malloc, :libpari), Ptr{Int}, (Int,), 2*sizeof(Int))
       unsafe_store!(z, evaltyp(t_POL) | 2, 1) 
       unsafe_store!(z, evalsigne(0) | evalvarn(0), 2)
       try
@@ -38,7 +38,7 @@ type pari_poly{T <: PariRing, S} <: RingElem
    parent::PariPolyRing{T, S}
 
    function pari_poly(s::Int)
-      g = new(ccall((:pari_malloc, :libpari), Ptr{Int}, (Int,), s*BITS_IN_WORD))
+      g = new(ccall((:pari_malloc, :libpari), Ptr{Int}, (Int,), s*sizeof(Int)))
       finalizer(g, _pari_poly_clear_fn)
       return g
    end

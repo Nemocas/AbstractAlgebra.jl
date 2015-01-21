@@ -21,17 +21,17 @@ function gensize(a::fmpq_poly)
 end
 
 function pari!(x::Ptr{Int}, a::fmpq_poly)
-   unsafe_store!(x, evaltyp(t_POL) | a.length + 2, 1) 
+   unsafe_store!(x, evaltyp(t_POL) | (a.length + 2), 1) 
    unsafe_store!(x, evalsigne(Int(a.length != 0)) | evalvarn(0), 2)
    s = a.length + 2
    for i = 0:a.length - 1
       z = coeff(a, i)
-      if z == 0
-         unsafe_store!(x, unsafe_load(gen_0), i + 3)
-      else
+      #if z == 0
+      #   unsafe_store!(x, unsafe_load(gen_0), i + 3)
+      #else
          unsafe_store!(x, x + sizeof(Int)*s, i + 3)
          s += pari!(x + sizeof(Int)*s, z)
-      end
+      #end
    end
    return s
 end
@@ -40,7 +40,7 @@ function pari{S}(a::fmpq_poly{S})
    s = gensize(a)
    g = pari_poly{PariRationalField, S}(s)
    g.parent = PariPolyRing{PariRationalField, S}(PariQQ)
-   pari!(reinterpret(Ptr{Int}, g.d), a)
+   pari!(g.d, a)
    return g
 end
 

@@ -23,17 +23,34 @@ type PariMaximalOrder <: Ring
          return PariMaximalOrderID[pol]
       catch
          av = unsafe_load(avma, 1)
+         p = pari(pol)
          nf = gclone(ccall((:nfinit, :libpari), Ptr{Int}, 
-                           (Ptr{Int}, Int, Int), pari(pol).d, 0, 4))
+                           (Ptr{Int}, Int), p.d, 5))
          unsafe_store!(avma, av, 1)
-         return PariMaximalOrderID[pol] = new(nf, pol)
+         ord = new(nf, pol)
+         finalizer(ord, _pari_nf_clear_fn)
+         return PariMaximalOrderID[pol] = ord
       end
    end
+end
+
+function _pari_nf_clear_fn(a::PariMaximalOrder)
+   ccall((:gunclone, :libpari), Void, (Ptr{Int},), a.nf)
 end
 
 type PariIdeal <: RingElem
    ideal::Ptr{Int}
    parent::PariMaximalOrder
+
+   function PariIdeal(a::Ptr{Int})
+      r = new(a)
+      finaliser(r, _pari_ideal_clear_fn)
+      return r
+   end
+end
+
+function _pari_ideal_clear_fn(a::PariIdeal)
+   ccall((:gunclone, :libpari), Void, (Ptr{Int},), a.ideal)
 end
 
 ###########################################################################################
@@ -54,9 +71,13 @@ function show(io::IO, nf::PariMaximalOrder)
 end
 
 function show(io::IO, id::PariIdeal)
+   av = unsafe_load(avma, 1)
+   id2 = ccall((:idealtwoelt, :libpari), Ptr{Int}, 
+               (Ptr{Int}, Ptr{Int}), id.parent.nf, id.ideal)
    cstr = ccall((:GENtostr, :libpari), Ptr{Uint8}, 
-                (Ptr{Int},), id.ideal)
-
+                (Ptr{Int},), id2)
+   unsafe_store!(avma, av, 1)
+   
    print(io, bytestring(cstr))
 
    ccall((:pari_free, :libpari), Void, (Ptr{Uint8},), cstr)
@@ -92,7 +113,7 @@ end
 
 function Base.call(ord::PariMaximalOrder, b::fmpq_poly)
    av = unsafe_load(avma, 1)
-   ideal = gclone(ccall((:idealtwoelt, :libpari), Ptr{Int}, 
+   ideal = gclone(ccall((:idealhnf, :libpari), Ptr{Int}, 
                  (Ptr{Int}, Ptr{Int}), ord.nf, pari(b).d))
    unsafe_store!(avma, av, 1)
    return PariIdeal(ideal, ord)
