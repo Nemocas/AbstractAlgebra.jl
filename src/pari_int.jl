@@ -49,14 +49,7 @@ function show(io :: IO, a :: PariIntegerRing)
    print(io, "Integer Ring")
 end
 
-function show(io::IO, x::pari_int)
-   cstr = ccall((:GENtostr, :libpari), Ptr{Uint8}, 
-                (Ptr{Int},), x.d)
-
-   print(io, bytestring(cstr))
-
-   ccall((:pari_free, :libpari), Void, (Ptr{Uint8},), cstr)
-end
+show(io::IO, x::pari_int) = pari_print(io, x.d)
 
 ###########################################################################################
 #

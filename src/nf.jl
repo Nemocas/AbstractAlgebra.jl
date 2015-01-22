@@ -467,6 +467,13 @@ function Base.call{S, T}(a::NfNumberField{S, T}, pol::fmpq_poly)
    return z
 end
 
+function Base.call(a::FmpqPolyRing, b::nf_elem)
+   b.parent.pol.parent != a && error("Cannot coerce from number field to polynomial ring")
+   r = a()
+   ccall((:fmpq_poly_set, :libflint), Void, (Ptr{fmpq_poly}, Ptr{nf_elem}), &r, &b)
+   return r
+end
+
 ###########################################################################################
 #
 #   NumberField constructor

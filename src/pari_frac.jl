@@ -31,32 +31,13 @@ parent(a::pari_rat) = PariQQ
 
 ###########################################################################################
 #
-#   Basic manipulation
-#
-###########################################################################################
-
-# size(a::pari_int) = (unsafe_load(a.d, 1) & LGBITS) - 2
-
-# sign(a::pari_int) = signe(unsafe_load(a.d, 2))
-
-###########################################################################################
-#
 #   String I/O
 #
 ###########################################################################################
 
-function show(io :: IO, a::PariRationalField)
-   print(io, "Rational Field")
-end
+show(io :: IO, a::PariRationalField) = print(io, "Rational Field")
 
-function show(io::IO, x::pari_rat)
-   cstr = ccall((:GENtostr, :libpari), Ptr{Uint8}, 
-                (Ptr{Int},), x.d)
-
-   print(io, bytestring(cstr))
-
-   ccall((:pari_free, :libpari), Void, (Ptr{Uint8},), cstr)
-end
+show(io::IO, x::pari_rat) = pari_print(io, x.d)
 
 ###########################################################################################
 #

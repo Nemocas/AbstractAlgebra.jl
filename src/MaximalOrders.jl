@@ -14,5 +14,5 @@ export MaximalOrder
 
 abstract MaximalOrderElem <: RingElem
 
-include("pari_nf.jl")
+include("PariMaximalOrder.jl")
 

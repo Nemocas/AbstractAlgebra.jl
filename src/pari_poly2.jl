@@ -26,12 +26,12 @@ function pari!(x::Ptr{Int}, a::fmpq_poly)
    s = a.length + 2
    for i = 0:a.length - 1
       z = coeff(a, i)
-      #if z == 0
-      #   unsafe_store!(x, unsafe_load(gen_0), i + 3)
-      #else
+      if z == 0
+         unsafe_store!(x, unsafe_load(gen_0), i + 3)
+      else
          unsafe_store!(x, x + sizeof(Int)*s, i + 3)
          s += pari!(x + sizeof(Int)*s, z)
-      #end
+      end
    end
    return s
 end

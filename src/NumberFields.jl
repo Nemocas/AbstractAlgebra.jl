@@ -15,3 +15,4 @@ export NumberField
 abstract NumberFieldElem <: FieldElem
 
 include("nf.jl")
+include("pari_nf.jl")

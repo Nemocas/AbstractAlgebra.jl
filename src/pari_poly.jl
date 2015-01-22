@@ -12,7 +12,7 @@
 
 PariPolyID = ObjectIdDict()
 
-type PariPolyRing{T <: Ring, S} <: PariRing
+type PariPolyRing{T <: PariRing, S} <: PariRing
    base_ring::PariRing
    pol_0::Ptr{Int}
 
@@ -31,11 +31,19 @@ type PariPolyRing{T <: Ring, S} <: PariRing
    end
 end
 
-_pari_poly_zero_clear_fn(p::PariPolyRing) = ccall((:pari_free, :libpari), Void, (Ptr{Int},), p.pol_0)
+function _pari_poly_zero_clear_fn(p::PariPolyRing)
+   ccall((:pari_free, :libpari), Void, (Ptr{Int},), p.pol_0)
+end
 
 type pari_poly{T <: PariRing, S} <: RingElem
    d::Ptr{Int}
    parent::PariPolyRing{T, S}
+
+   function pari_poly(data::Ptr{Int})
+      g = new(gclone(data))
+      finalizer(g, _pari_poly_unclone)
+      return g
+   end
 
    function pari_poly(s::Int)
       g = new(ccall((:pari_malloc, :libpari), Ptr{Int}, (Int,), s*sizeof(Int)))
@@ -46,6 +54,8 @@ end
 
 _pari_poly_clear_fn(g::pari_poly) = ccall((:pari_free, :libpari), Void, (Ptr{Uint},), g.d)
 
+_pari_poly_unclone(g::pari_poly) = gunclone(g.d)
+
 parent{T <: PariRing, S}(a::pari_poly{T, S}) = a.parent
 
 ###########################################################################################
@@ -54,14 +64,7 @@ parent{T <: PariRing, S}(a::pari_poly{T, S}) = a.parent
 #
 ###########################################################################################
 
-function show(io::IO, x::pari_poly)
-   cstr = ccall((:GENtostr, :libpari), Ptr{Uint8}, 
-                (Ptr{Int},), x.d)
-
-   print(io, bytestring(cstr))
-
-   ccall((:pari_free, :libpari), Void, (Ptr{Uint8},), cstr)
-end
+show(io::IO, x::pari_poly) = pari_print(io, x.d)
 
 function show{T <: Ring, S}(io::IO, p::PariPolyRing{T, S})
    print(io, "Univariate Polynomial Ring in ")

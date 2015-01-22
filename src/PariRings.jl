@@ -72,6 +72,8 @@ const CLONEBIT = 1<<LGnumBITS
 
 gclone(gen::Ptr{Int}) = ccall((:gclone, :libpari), Ptr{Int}, (Ptr{Int},), gen)
 
+gunclone(gen::Ptr{Int}) = ccall((:gunclone, :libpari), Ptr{Int}, (Ptr{Int},), gen)
+
 ###########################################################################################
 #
 #   Basic manipulation
@@ -110,6 +112,28 @@ include("pari_int.jl")
 
 include("pari_poly.jl")
 
+include("pari_polmod.jl")
+
+include("pari_vec.jl")
+
+###########################################################################################
+#
+#   Printing
+#
+###########################################################################################
+
+function pari_print(a::Ptr{Int})
+   cstr = ccall((:GENtostr, :libpari), Ptr{Uint8}, (Ptr{Int},), a)
+   print(bytestring(cstr))
+   ccall((:pari_free, :libpari), Void, (Ptr{Uint8},), cstr)
+end
+   
+function pari_print(io::IO, a::Ptr{Int})
+   cstr = ccall((:GENtostr, :libpari), Ptr{Uint8}, (Ptr{Int},), a)
+   print(io, bytestring(cstr))
+   ccall((:pari_free, :libpari), Void, (Ptr{Uint8},), cstr)
+end
+   
 ###########################################################################################
 #
 #   Pari globals
