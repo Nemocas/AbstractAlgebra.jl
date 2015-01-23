@@ -76,6 +76,8 @@ function pari(a::BigInt)
    return g
 end
 
+pari(a::Integer) = pari(ZZ(a))
+
 function ZZ!(z::BigInt, g::Ptr{Int})
    s = (unsafe_load(g, 1) & LGBITS) - 2
    sgn = signe(g + sizeof(Int))
@@ -86,11 +88,36 @@ function ZZ!(z::BigInt, g::Ptr{Int})
       unsafe_store!(z.d, reinterpret(UInt, unsafe_load(g, i + 2)), i)
    end
    z.size = sgn < 0 ? -s : s
+   return z
 end
 
 function call(::IntegerRing, g::pari_int)
    z = BigInt()
    ZZ!(z, g.d)
    return z
+end
+
+###########################################################################################
+#
+#   Factorisation
+#
+###########################################################################################
+
+function factor(n::pari_int)
+   av = unsafe_load(avma, 1)
+   f = ccall((:factorint, :libpari), Ptr{Int}, (Ptr{Int}, Int), n.d, 0)
+   fac = PariFactor{PariIntegerRing}(f, PariZZ)
+   unsafe_store!(avma, av, 1)
+   return fac
+end
+
+###########################################################################################
+#
+#   Parent object call overloads
+#
+###########################################################################################
+
+function Base.call(ord::PariIntegerRing, n::Ptr{Int})
+   return ZZ!(ZZ(), n)
 end
 
