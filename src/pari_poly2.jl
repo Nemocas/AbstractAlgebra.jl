@@ -64,6 +64,18 @@ function fmpq_poly!(z::fmpq_poly, g::Ptr{Int})
    return z
 end
 
+###########################################################################################
+#
+#   Parent object call overloads
+#
+###########################################################################################
+
+function Base.call{S}(ord::PariPolyRing{PariRationalField, S}, n::Ptr{Int})
+   pol = pari_poly{PariRationalField, S}(n)
+   pol.parent = PariPolyRing{PariRationalField, S}(PariQQ)
+   return pol
+end
+
 function Base.call{S}(a::FmpqPolyRing{S}, g::pari_poly{PariRationalField, S})
    z = fmpq_poly{S}()
    z.parent = a

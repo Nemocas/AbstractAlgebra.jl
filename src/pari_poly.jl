@@ -127,6 +127,33 @@ function fmpz_poly!(z::fmpz_poly, g::Ptr{Int})
    return z
 end
 
+###########################################################################################
+#
+#   Factorisation
+#
+###########################################################################################
+
+function factor{T <: PariRing, S}(pol::pari_poly{T, S})
+   av = unsafe_load(avma, 1)
+   f = ccall((:factor, :libpari), Ptr{Int}, (Ptr{Int},), pol.d)
+   fac = PariFactor{PariPolyRing{T, S}}(f, pol.parent)
+   unsafe_store!(avma, av, 1)
+   return fac
+end
+
+###########################################################################################
+#
+#   Parent object call overloads
+#
+###########################################################################################
+
+function Base.call{S}(ord::PariPolyRing{PariIntegerRing, S}, n::Ptr{Int})
+   pol = pari_poly{PariIntegerRing, S}(n)
+   pol.parent = PariPolyRing{PariIntegerRing, S}(PariZZ)
+   return pol
+end
+
+
 function Base.call{S}(a::FmpzPolyRing{S}, g::pari_poly{PariIntegerRing, S})
    z = fmpz_poly{S}()
    z.parent = a
