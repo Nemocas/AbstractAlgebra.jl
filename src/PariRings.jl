@@ -96,9 +96,11 @@ varn(x::Ptr{Int}) = (unsafe_load(x, 2) & VARNBITS) >> VARNSHIFT
 
 typ(x::Ptr{Int}) = reinterpret(Int, reinterpret(Uint, unsafe_load(x, 1)) >> TYPSHIFT)
 
-setvarn(x, s) = unsafe_store(x, (unsafe_load(x, 2) & ~VARNBITS) | evalvarn(s), 2)
+setvarn(x::Ptr{Int}, s::Int) = unsafe_store(x, (unsafe_load(x, 2) & ~VARNBITS) | evalvarn(s), 2)
 
-signe(s::Int) = (s >> SIGNSHIFT)
+signe(x::Ptr{Int}) = (unsafe_load(x) >> SIGNSHIFT)
+
+lg(x::Ptr{Int}) = unsafe_load(x) & LGBITS
 
 ###########################################################################################
 #
@@ -145,3 +147,22 @@ avma = cglobal((:avma, :libpari), Ptr{Ptr{Int}})
 gen_0 = cglobal((:gen_0, :libpari), Ptr{Ptr{Int}})
 
 gen_1 = cglobal((:gen_1, :libpari), Ptr{Ptr{Int}})
+
+###########################################################################################
+#
+#   Factorization
+#
+###########################################################################################
+
+type PariFactor{T <: PariRing}
+   p::Ptr{Int}
+   n::BigInt
+
+   function PariFactor(p::Ptr{Int}, n::BigInt)
+      r = new(gclone(p), n)
+      finalizer(r, _PariFactor_unclone)
+      return r
+   end
+end
+
+_PariFactor_unclone(f::PariFactor) = gunclone(f.p)

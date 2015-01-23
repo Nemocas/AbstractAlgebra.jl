@@ -78,7 +78,7 @@ end
 
 function ZZ!(z::BigInt, g::Ptr{Int})
    s = (unsafe_load(g, 1) & LGBITS) - 2
-   sgn = signe(unsafe_load(g, 2))
+   sgn = signe(g + sizeof(Int))
    if s > z.alloc
       ccall((:__gmpz_realloc2, :libgmp), Void, (Ptr{BigInt}, Int), &z, s*BITS_IN_WORD)
    end

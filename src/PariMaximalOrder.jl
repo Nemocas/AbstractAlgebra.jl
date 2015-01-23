@@ -4,7 +4,10 @@
 #
 ###########################################################################################
 
-export PariMaximalOrder, approx, coprime_multiplier, intersect
+# FIXME: functions (e.g. bezout) should not make Julia objects until very end
+
+export PariMaximalOrder, approx, coprime_multiplier, intersect, bounded_ideals,
+       numden, prime_decomposition, LLL_reduce, valuation, factor
 
 ###########################################################################################
 #
@@ -28,6 +31,28 @@ type PariIdeal{S, T} <: RingElem
 end
 
 _pari_ideal_clear_fn(a::PariIdeal) = gunclone(a.ideal)
+
+type PariIdealFactorisation{S, T}
+   data::Array{PariFactor{PariMaximalOrder{S, T}}, 1}
+   len::Int
+   parent::PariMaximalOrder{S, T}
+end
+
+function getindex(a::PariIdealFactorisation, i::Int)
+   i > a.len && throw(IndexError())
+   return a.parent(a.data[i].p), a.data[i].n
+end
+
+function show(io::IO, a::PariIdealFactorisation)
+   print(io, "[")
+   for i = 1:a.len
+      print(io, a[i])
+      if i != a.len
+         print(io, ", ")
+      end
+   end
+   print(io, "]")
+end
 
 ###########################################################################################
 #
@@ -54,6 +79,50 @@ end
 
 ###########################################################################################
 #
+#   Ideals of bounded norm
+#
+###########################################################################################
+
+function bounded_ideals{S, T}(ord::PariMaximalOrder{S, T}, bound::Int)
+   av = unsafe_load(avma, 1)
+   vec = ccall((:ideallist0, :libpari), Ptr{Int},
+               (Ptr{Int}, Int, Int), ord.pari_nf.data, bound, 4)
+   vec_type = pari_vec{PariMaximalOrder{S, T}}
+   A = Array(vec_type, bound)
+   for i = 1:bound
+      A[i] = vec_type(reinterpret(Ptr{Int}, unsafe_load(vec, i + 1)), ord)
+   end
+   unsafe_store!(avma, av, 1)
+   return A
+end
+
+###########################################################################################
+#
+#   Prime decomposition
+#
+###########################################################################################
+
+function prime_decomposition{S, T}(ord::PariMaximalOrder{S, T}, p::BigInt)
+   av = unsafe_load(avma, 1)
+   pr = pari(p)
+   vec = ccall((:idealprimedec, :libpari), Ptr{Int},
+               (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pr.d)
+   vec_type = PariIdeal{S, T}
+   A = Array(vec_type, lg(vec) - 1)
+   for i = 1:lg(vec) - 1
+      v = reinterpret(Ptr{Int}, unsafe_load(vec, i + 1))
+      A[i] = ord(v)
+   end
+   unsafe_store!(avma, av, 1)
+   return A
+end
+
+function prime_decomposition{S, T}(ord::PariMaximalOrder{S, T}, p::Integer)
+   return prime_decomposition(ord, BigInt(p))
+end
+
+###########################################################################################
+#
 #   String I/O
 #
 ###########################################################################################
@@ -74,6 +143,22 @@ end
 
 ###########################################################################################
 #
+#   Ideal norm
+#
+###########################################################################################
+
+function norm{S, T}(a::PariIdeal{S, T})
+   av = unsafe_load(avma, 1)
+   n = ccall((:idealnorm, :libpari), Ptr{Int}, 
+             (Ptr{Int}, Ptr{Int}), a.parent.pari_nf.data, a.ideal)
+   unsafe_store!(avma, av, 1)
+   r = QQ()
+   QQ!(r, n)
+   return r
+end
+
+###########################################################################################
+#
 #   Binary operations
 #
 ###########################################################################################
@@ -90,6 +175,20 @@ function +{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
    av = unsafe_load(avma, 1)
    r = ccall((:idealadd, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), a.parent.pari_nf.data, a.ideal, b.ideal)
+   unsafe_store!(avma, av, 1)
+   return PariIdeal{S, T}(r, a.parent)
+end
+
+###########################################################################################
+#
+#   Powering
+#
+###########################################################################################
+
+function ^{S, T}(a::PariIdeal{S, T}, n::Int)
+   av = unsafe_load(avma, 1)
+   r = ccall((:idealpows, :libpari), Ptr{Int}, 
+             (Ptr{Int}, Ptr{Int}, Int), a.parent.pari_nf.data, a.ideal, n)
    unsafe_store!(avma, av, 1)
    return PariIdeal{S, T}(r, a.parent)
 end
@@ -138,6 +237,20 @@ end
 
 ###########################################################################################
 #
+#   LLL reduction
+#
+###########################################################################################
+
+function LLL_reduce{S, T}(a::PariIdeal{S, T})
+   av = unsafe_load(avma, 1)
+   r = ccall((:idealred0, :libpari), Ptr{Int}, 
+             (Ptr{Int}, Ptr{Int}, Ptr{Void}), a.parent.pari_nf.data, a.ideal, C_NULL)
+   unsafe_store!(avma, av, 1)
+   return PariIdeal{S, T}(r, a.parent)
+end
+
+###########################################################################################
+#
 #   Bezout
 #
 ###########################################################################################
@@ -149,6 +262,62 @@ function bezout{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), pari_nf.data, a.ideal, b.ideal), a.parent)
    unsafe_store!(avma, av, 1)
    return alg(r[1]), alg(r[2])
+end
+
+###########################################################################################
+#
+#   Numerator/denominator
+#
+###########################################################################################
+
+function numden{S, T}(a::PariIdeal{S, T})
+   pari_nf = a.parent.pari_nf
+   av = unsafe_load(avma, 1)
+   r = pari_vec{PariMaximalOrder{S, T}}(ccall((:idealnumden, :libpari), Ptr{Int}, 
+             (Ptr{Int}, Ptr{Int}), pari_nf.data, a.ideal), a.parent)
+   unsafe_store!(avma, av, 1)
+   return r[1], r[2]
+end
+
+###########################################################################################
+#
+#   Valuation
+#
+###########################################################################################
+
+function valuation{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
+   pari_nf = a.parent.pari_nf
+   par = a.parent
+   av = unsafe_load(avma, 1)
+   r = ccall((:idealval, :libpari), Int, 
+             (Ptr{Int}, Ptr{Int}, Ptr{Int}), pari_nf.data, a.ideal, b.ideal)
+   unsafe_store!(avma, av, 1)
+   return r
+end
+
+###########################################################################################
+#
+#   Ideal factorisation
+#
+###########################################################################################
+
+function factor{S, T}(a::PariIdeal{S, T})
+   av = unsafe_load(avma, 1)
+   r = ccall((:idealfactor, :libpari), Ptr{Int}, 
+             (Ptr{Int}, Ptr{Int}), a.parent.pari_nf.data, a.ideal)
+   unsafe_store!(avma, av, 1)
+   par_type = PariMaximalOrder{S, T}
+   colf = reinterpret(Ptr{Int}, unsafe_load(r, 2))
+   coln = reinterpret(Ptr{Int}, unsafe_load(r, 3))
+   len = lg(colf) - 1
+   R = Array(PariFactor{par_type}, len)
+   for i = 1:len
+      f = reinterpret(Ptr{Int}, unsafe_load(colf, i + 1))
+      n = ZZ()
+      ZZ!(n, reinterpret(Ptr{Int}, unsafe_load(coln, i + 1)))
+      R[i] = PariFactor{par_type}(f, n)
+   end
+   return PariIdealFactorisation(R, len, a.parent)
 end
 
 ###########################################################################################
