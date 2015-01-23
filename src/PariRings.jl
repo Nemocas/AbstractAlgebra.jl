@@ -102,6 +102,8 @@ signe(x::Ptr{Int}) = (unsafe_load(x) >> SIGNSHIFT)
 
 lg(x::Ptr{Int}) = unsafe_load(x) & LGBITS
 
+pari_load(x::Ptr{Int}, n::Int) = reinterpret(Ptr{Int}, unsafe_load(x, n))
+
 ###########################################################################################
 #
 #   Debugging

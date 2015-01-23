@@ -4,8 +4,6 @@
 #
 ###########################################################################################
 
-# FIXME: functions (e.g. bezout) should not make Julia objects until very end
-
 export PariMaximalOrder, approx, coprime_multiplier, intersect, bounded_ideals,
        numden, prime_decomposition, LLL_reduce, valuation, factor
 
@@ -34,25 +32,35 @@ _pari_ideal_clear_fn(a::PariIdeal) = gunclone(a.ideal)
 
 ###########################################################################################
 #
+#   Untyped low-level Pari functions
+#
+###########################################################################################
+
+residue(data::Ptr{Int}) = pari_load(data, 3)
+
+modulus(data::Ptr{Int}) = pari_load(data, 2)
+   
+function basistoalg(nf::Ptr{Int}, data::Ptr{Int})
+   return ccall((:basistoalg, :libpari), Ptr{Int}, (Ptr{Int}, Ptr{Int}), nf, data)
+end
+
+function alg(nf::Ptr{Int}, data::Ptr{Int})
+   s = basistoalg(nf, data)
+   mods = residue(s)
+   return mods
+end
+
+###########################################################################################
+#
 #   Basic manipulation
 #
 ###########################################################################################
 
 function basis{S, T}(ord::PariMaximalOrder{S, T})
-   data = reinterpret(Ptr{Int}, unsafe_load(ord.pari_nf.data + 7*sizeof(Int)))
+   data = pari_load(ord.pari_nf.data, 8)
    pol_type = PariPolyRing{PariRationalField, T}
    par = pol_type(PariQQ)
    return pari_vec{pol_type}(data, par)
-end
-
-function alg{S, T}(a::PariIdeal{S, T})
-   pari_nf = a.parent.pari_nf
-   av = unsafe_load(avma, 1)
-   s = ccall((:basistoalg, :libpari), Ptr{Int}, 
-             (Ptr{Int}, Ptr{Int}), pari_nf.data, a.ideal)
-   mods = pari_polmod{PariRationalField, T}(s)
-   unsafe_store!(avma, av, 1)
-   return residue(mods)
 end
 
 ###########################################################################################
@@ -68,7 +76,7 @@ function bounded_ideals{S, T}(ord::PariMaximalOrder{S, T}, bound::Int)
    vec_type = pari_vec{PariMaximalOrder{S, T}}
    A = Array(vec_type, bound)
    for i = 1:bound
-      A[i] = vec_type(reinterpret(Ptr{Int}, unsafe_load(vec, i + 1)), ord)
+      A[i] = vec_type(pari_load(vec, i + 1), ord)
    end
    unsafe_store!(avma, av, 1)
    return A
@@ -85,14 +93,7 @@ function prime_decomposition{S, T}(ord::PariMaximalOrder{S, T}, p::BigInt)
    pr = pari(p)
    vec = ccall((:idealprimedec, :libpari), Ptr{Int},
                (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pr.d)
-   vec_type = PariIdeal{S, T}
-   A = Array(vec_type, lg(vec) - 1)
-   for i = 1:lg(vec) - 1
-      v = reinterpret(Ptr{Int}, unsafe_load(vec, i + 1))
-      A[i] = ord(v)
-   end
-   unsafe_store!(avma, av, 1)
-   return A
+   return pari_vec{PariMaximalOrder{S, T}}(vec, ord)
 end
 
 function prime_decomposition{S, T}(ord::PariMaximalOrder{S, T}, p::Integer)
@@ -234,12 +235,19 @@ end
 ###########################################################################################
 
 function bezout{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
-   pari_nf = a.parent.pari_nf
+   pari_nf = a.parent.pari_nf.data
    av = unsafe_load(avma, 1)
-   r = pari_vec{PariMaximalOrder{S, T}}(ccall((:idealaddtoone, :libpari), Ptr{Int}, 
-             (Ptr{Int}, Ptr{Int}, Ptr{Int}), pari_nf.data, a.ideal, b.ideal), a.parent)
+   st = ccall((:idealaddtoone, :libpari), Ptr{Int}, 
+             (Ptr{Int}, Ptr{Int}, Ptr{Int}), pari_nf, a.ideal, b.ideal)
+   s = alg(pari_nf, pari_load(st, 2))
+   t = alg(pari_nf, pari_load(st, 3))
+   par = FmpqPolyRing{Rational{BigInt}, T}(QQ)
+   pols = par()
+   polt = par()
+   fmpq_poly!(pols, s)
+   fmpq_poly!(polt, t)
    unsafe_store!(avma, av, 1)
-   return alg(r[1]), alg(r[2])
+   return pols, polt
 end
 
 ###########################################################################################
@@ -251,10 +259,12 @@ end
 function numden{S, T}(a::PariIdeal{S, T})
    pari_nf = a.parent.pari_nf
    av = unsafe_load(avma, 1)
-   r = pari_vec{PariMaximalOrder{S, T}}(ccall((:idealnumden, :libpari), Ptr{Int}, 
-             (Ptr{Int}, Ptr{Int}), pari_nf.data, a.ideal), a.parent)
+   nd = ccall((:idealnumden, :libpari), Ptr{Int}, 
+             (Ptr{Int}, Ptr{Int}), pari_nf.data, a.ideal)
+   num = a.parent(pari_load(nd, 2))
+   den = a.parent(pari_load(nd, 3))
    unsafe_store!(avma, av, 1)
-   return r[1], r[2]
+   return num, den
 end
 
 ###########################################################################################
@@ -265,7 +275,6 @@ end
 
 function valuation{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
    pari_nf = a.parent.pari_nf
-   par = a.parent
    av = unsafe_load(avma, 1)
    r = ccall((:idealval, :libpari), Int, 
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), pari_nf.data, a.ideal, b.ideal)
@@ -281,10 +290,11 @@ end
 
 function factor{S, T}(a::PariIdeal{S, T})
    av = unsafe_load(avma, 1)
-   r = ccall((:idealfactor, :libpari), Ptr{Int}, 
+   pari_fac = ccall((:idealfactor, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}), a.parent.pari_nf.data, a.ideal)
+   fac = PariFactor{PariMaximalOrder{S, T}}(pari_fac, a.parent)
    unsafe_store!(avma, av, 1)
-   return PariFactor{PariMaximalOrder{S, T}}(r, a.parent)
+   return fac
 end
 
 ###########################################################################################
@@ -294,13 +304,17 @@ end
 ###########################################################################################
 
 function approx{S, T}(a::PariIdeal{S, T})
-   pari_nf = a.parent.pari_nf
+   pari_nf = a.parent.pari_nf.data
    par = a.parent
    av = unsafe_load(avma, 1)
-   r = par(ccall((:idealappr, :libpari), Ptr{Int}, 
-             (Ptr{Int}, Ptr{Int}), pari_nf.data, a.ideal))
+   a = ccall((:idealappr, :libpari), Ptr{Int}, 
+             (Ptr{Int}, Ptr{Int}), pari_nf, a.ideal)
+   r = alg(pari_nf, a)
+   par = FmpqPolyRing{Rational{BigInt}, T}(QQ)
+   pol = par()
+   fmpq_poly!(pol, r)
    unsafe_store!(avma, av, 1)
-   return alg(r)
+   return pol
 end
 
 ###########################################################################################
@@ -310,13 +324,17 @@ end
 ###########################################################################################
 
 function coprime_multiplier{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
-   pari_nf = a.parent.pari_nf
+   pari_nf = a.parent.pari_nf.data
    par = a.parent
    av = unsafe_load(avma, 1)
-   r = par(ccall((:idealcoprime, :libpari), Ptr{Int}, 
-             (Ptr{Int}, Ptr{Int}, Ptr{Int}), pari_nf.data, a.ideal, b.ideal))
+   m = ccall((:idealcoprime, :libpari), Ptr{Int}, 
+             (Ptr{Int}, Ptr{Int}, Ptr{Int}), pari_nf, a.ideal, b.ideal)
+   r = alg(pari_nf, m)
+   par = FmpqPolyRing{Rational{BigInt}, T}(QQ)
+   pol = par()
+   fmpq_poly!(pol, r)
    unsafe_store!(avma, av, 1)
-   return alg(r)
+   return pol
 end
 
 ###########################################################################################
