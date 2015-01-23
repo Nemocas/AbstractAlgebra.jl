@@ -24,7 +24,7 @@ export fmpz_poly
 
 FmpzPolyID = ObjectIdDict()
 
-type FmpzPolyRing{BigInt, S} <: Ring
+type FmpzPolyRing{S} <: Ring
    base_ring::Ring
 
    function FmpzPolyRing(R::IntegerRing)
@@ -40,7 +40,7 @@ type fmpz_poly{S} <: PolyElem
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
-   parent::FmpzPolyRing{BigInt, S}
+   parent::FmpzPolyRing{S}
 
    function fmpz_poly()
       z = new()
@@ -82,7 +82,7 @@ function _fmpz_poly_clear_fn(a::fmpz_poly)
    ccall((:fmpz_poly_clear, :libflint), Void, (Ptr{fmpz_poly},), &a)
 end
 
-elem_type{S}(::FmpzPolyRing{BigInt, S}) = fmpz_poly{S}
+elem_type{S}(::FmpzPolyRing{S}) = fmpz_poly{S}
 
 base_ring(a::FmpzPolyRing) = a.base_ring
 
@@ -129,7 +129,7 @@ function show{S}(io::IO, x::fmpz_poly{S})
    end
 end
 
-function show{S}(io::IO, p::FmpzPolyRing{BigInt, S})
+function show{S}(io::IO, p::FmpzPolyRing{S})
    print(io, "Univariate Polynomial Ring in ")
    print(io, string(S))
    print(io, " over ")
@@ -605,37 +605,37 @@ Base.promote_rule{S, T <: Integer}(::Type{fmpz_poly{S}}, ::Type{T}) = fmpz_poly{
 #
 ###########################################################################################
 
-function Base.call{S}(a::FmpzPolyRing{BigInt, S})
+function Base.call{S}(a::FmpzPolyRing{S})
    z = fmpz_poly{S}()
    z.parent = a
    return z
 end
 
-function Base.call{S}(a::FmpzPolyRing{BigInt, S}, b::Int)
+function Base.call{S}(a::FmpzPolyRing{S}, b::Int)
    z = fmpz_poly{S}(b)
    z.parent = a
    return z
 end
 
-function Base.call{S}(a::FmpzPolyRing{BigInt, S}, b::Integer)
+function Base.call{S}(a::FmpzPolyRing{S}, b::Integer)
    z = fmpz_poly{S}(BigInt(b))
    z.parent = a
    return z
 end
 
-function Base.call{S}(a::FmpzPolyRing{BigInt, S}, b::BigInt)
+function Base.call{S}(a::FmpzPolyRing{S}, b::BigInt)
    z = fmpz_poly{S}(b)
    z.parent = a
    return z
 end
 
-function Base.call{S}(a::FmpzPolyRing{BigInt, S}, b::Array{BigInt, 1})
+function Base.call{S}(a::FmpzPolyRing{S}, b::Array{BigInt, 1})
    z = fmpz_poly{S}(b)
    z.parent = a
    return z
 end
 
-Base.call{S}(a::FmpzPolyRing{BigInt, S}, b::fmpz_poly{S}) = b
+Base.call{S}(a::FmpzPolyRing{S}, b::fmpz_poly{S}) = b
 
 ###########################################################################################
 #
@@ -646,7 +646,7 @@ Base.call{S}(a::FmpzPolyRing{BigInt, S}, b::fmpz_poly{S}) = b
 function PolynomialRing(R::IntegerRing, s::String)
    S = symbol(s)
 
-   parent_obj = FmpzPolyRing{BigInt, S}(R)
+   parent_obj = FmpzPolyRing{S}(R)
    
    return parent_obj, parent_obj([ZZ(0), ZZ(1)])
 end

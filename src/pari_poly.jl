@@ -124,9 +124,10 @@ function fmpz_poly!(z::fmpz_poly, g::Ptr{Int})
       ZZ!(c, reinterpret(Ptr{Int}, unsafe_load(g, 3 + i)))
       setcoeff!(z, i, c)
    end
+   return z
 end
 
-function Base.call{S}(a::FmpzPolyRing{BigInt, S}, g::pari_poly{PariIntegerRing, S})
+function Base.call{S}(a::FmpzPolyRing{S}, g::pari_poly{PariIntegerRing, S})
    z = fmpz_poly{S}()
    z.parent = a
    fmpz_poly!(z, g.d)

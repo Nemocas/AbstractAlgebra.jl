@@ -5,7 +5,7 @@
 ###########################################################################################
 
 export PariMaximalOrder, approx, coprime_multiplier, intersect, bounded_ideals,
-       numden, prime_decomposition, LLL_reduce, valuation, factor
+       numden, prime_decomposition, LLL_reduce, valuation, factor, factor_mul
 
 ###########################################################################################
 #
@@ -241,11 +241,9 @@ function bezout{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), pari_nf, a.ideal, b.ideal)
    s = alg(pari_nf, pari_load(st, 2))
    t = alg(pari_nf, pari_load(st, 3))
-   par = FmpqPolyRing{Rational{BigInt}, T}(QQ)
-   pols = par()
-   polt = par()
-   fmpq_poly!(pols, s)
-   fmpq_poly!(polt, t)
+   par = FmpqPolyRing{T}(QQ)
+   pols = fmpq_poly!(par(), s)
+   polt = fmpq_poly!(par(), t)
    unsafe_store!(avma, av, 1)
    return pols, polt
 end
@@ -297,6 +295,15 @@ function factor{S, T}(a::PariIdeal{S, T})
    return fac
 end
 
+function factor_mul{S, T}(a::PariFactor{PariMaximalOrder{S, T}})
+   av = unsafe_load(avma, 1)
+   p = ccall((:idealfactorback, :libpari), Ptr{Int}, 
+             (Ptr{Int}, Ptr{Int}, Ptr{Void}, Int), a.parent.pari_nf.data, a.data, C_NULL, 0)
+   r = a.parent(p)
+   unsafe_store!(avma, av, 1)
+   return r
+end
+
 ###########################################################################################
 #
 #   Approximation
@@ -310,8 +317,7 @@ function approx{S, T}(a::PariIdeal{S, T})
    a = ccall((:idealappr, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}), pari_nf, a.ideal)
    r = alg(pari_nf, a)
-   par = FmpqPolyRing{Rational{BigInt}, T}(QQ)
-   pol = par()
+   pol = FmpqPolyRing{T}(QQ)()
    fmpq_poly!(pol, r)
    unsafe_store!(avma, av, 1)
    return pol
@@ -330,8 +336,7 @@ function coprime_multiplier{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
    m = ccall((:idealcoprime, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), pari_nf, a.ideal, b.ideal)
    r = alg(pari_nf, m)
-   par = FmpqPolyRing{Rational{BigInt}, T}(QQ)
-   pol = par()
+   pol = FmpqPolyRing{T}(QQ)()
    fmpq_poly!(pol, r)
    unsafe_store!(avma, av, 1)
    return pol

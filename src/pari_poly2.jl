@@ -61,9 +61,10 @@ function fmpq_poly!(z::fmpq_poly, g::Ptr{Int})
       end
       setcoeff!(z, i, c)
    end
+   return z
 end
 
-function Base.call{S}(a::FmpqPolyRing{Rational{BigInt}, S}, g::pari_poly{PariRationalField, S})
+function Base.call{S}(a::FmpqPolyRing{S}, g::pari_poly{PariRationalField, S})
    z = fmpq_poly{S}()
    z.parent = a
    fmpq_poly!(z, g.d)

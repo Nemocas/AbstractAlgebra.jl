@@ -14,7 +14,7 @@ export fmpq_poly
 
 FmpqPolyID = ObjectIdDict()
 
-type FmpqPolyRing{T <: Rational{BigInt}, S} <: Ring
+type FmpqPolyRing{S} <: Ring
    base_ring::Field
 
    function FmpqPolyRing(R::RationalField)
@@ -31,7 +31,7 @@ type fmpq_poly{S} <: PolyElem
    den::Int # really an fmpz
    alloc::Int
    length::Int
-   parent::FmpqPolyRing{Rational{BigInt}, S}
+   parent::FmpqPolyRing{S}
 
    function fmpq_poly()
       z = new()
@@ -89,7 +89,7 @@ function _fmpq_poly_clear_fn(a::fmpq_poly)
    ccall((:fmpq_poly_clear, :libflint), Void, (Ptr{fmpq_poly},), &a)
 end
 
-elem_type{S}(::FmpqPolyRing{Rational{BigInt}, S}) = fmpq_poly{S}
+elem_type{S}(::FmpqPolyRing{S}) = fmpq_poly{S}
 
 base_ring(a::FmpqPolyRing) = a.base_ring
 
@@ -137,7 +137,7 @@ function show{S}(io::IO, x::fmpq_poly{S})
    end
 end
 
-function show{S}(io::IO, p::FmpqPolyRing{Rational{BigInt}, S})
+function show{S}(io::IO, p::FmpqPolyRing{S})
    print(io, "Univariate Polynomial Ring in ")
    print(io, string(S))
    print(io, " over ")
@@ -659,43 +659,43 @@ Base.promote_rule{S, T <: Integer}(::Type{fmpq_poly{S}}, ::Type{T}) = fmpq_poly{
 #
 ###########################################################################################
 
-function Base.call{S}(a::FmpqPolyRing{Rational{BigInt}, S})
+function Base.call{S}(a::FmpqPolyRing{S})
    z = fmpq_poly{S}()
    z.parent = a
    return z
 end
 
-function Base.call{S}(a::FmpqPolyRing{Rational{BigInt}, S}, b::Int)
+function Base.call{S}(a::FmpqPolyRing{S}, b::Int)
    z = fmpq_poly{S}(b)
    z.parent = a
    return z
 end
 
-function Base.call{S}(a::FmpqPolyRing{Rational{BigInt}, S}, b::Integer)
+function Base.call{S}(a::FmpqPolyRing{S}, b::Integer)
    z = fmpq_poly{S}(BigInt(b))
    z.parent = a
    return z
 end
 
-function Base.call{S}(a::FmpqPolyRing{Rational{BigInt}, S}, b::BigInt)
+function Base.call{S}(a::FmpqPolyRing{S}, b::BigInt)
    z = fmpq_poly{S}(b)
    z.parent = a
    return z
 end
 
-function Base.call{S}(a::FmpqPolyRing{Rational{BigInt}, S}, b::Rational{BigInt})
+function Base.call{S}(a::FmpqPolyRing{S}, b::Rational{BigInt})
    z = fmpq_poly{S}(b)
    z.parent = a
    return z
 end
 
-function Base.call{S}(a::FmpqPolyRing{Rational{BigInt}, S}, b::Array{Rational{BigInt}, 1})
+function Base.call{S}(a::FmpqPolyRing{S}, b::Array{Rational{BigInt}, 1})
    z = fmpq_poly{S}(b)
    z.parent = a
    return z
 end
 
-Base.call{S}(a::FmpqPolyRing{Rational{BigInt}, S}, b::fmpq_poly{S}) = b
+Base.call{S}(a::FmpqPolyRing{S}, b::fmpq_poly{S}) = b
 
 ###########################################################################################
 #
@@ -706,7 +706,7 @@ Base.call{S}(a::FmpqPolyRing{Rational{BigInt}, S}, b::fmpq_poly{S}) = b
 function PolynomialRing(R::RationalField, s::String)
    S = symbol(s)
 
-   parent_obj = FmpqPolyRing{Rational{BigInt}, S}(R)
+   parent_obj = FmpqPolyRing{S}(R)
    
    return parent_obj, parent_obj([QQ(0), QQ(1)])
 end
