@@ -32,28 +32,6 @@ end
 
 _pari_ideal_clear_fn(a::PariIdeal) = gunclone(a.ideal)
 
-type PariIdealFactorisation{S, T}
-   data::Array{PariFactor{PariMaximalOrder{S, T}}, 1}
-   len::Int
-   parent::PariMaximalOrder{S, T}
-end
-
-function getindex(a::PariIdealFactorisation, i::Int)
-   i > a.len && throw(IndexError())
-   return a.parent(a.data[i].p), a.data[i].n
-end
-
-function show(io::IO, a::PariIdealFactorisation)
-   print(io, "[")
-   for i = 1:a.len
-      print(io, a[i])
-      if i != a.len
-         print(io, ", ")
-      end
-   end
-   print(io, "]")
-end
-
 ###########################################################################################
 #
 #   Basic manipulation
@@ -306,18 +284,7 @@ function factor{S, T}(a::PariIdeal{S, T})
    r = ccall((:idealfactor, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}), a.parent.pari_nf.data, a.ideal)
    unsafe_store!(avma, av, 1)
-   par_type = PariMaximalOrder{S, T}
-   colf = reinterpret(Ptr{Int}, unsafe_load(r, 2))
-   coln = reinterpret(Ptr{Int}, unsafe_load(r, 3))
-   len = lg(colf) - 1
-   R = Array(PariFactor{par_type}, len)
-   for i = 1:len
-      f = reinterpret(Ptr{Int}, unsafe_load(colf, i + 1))
-      n = ZZ()
-      ZZ!(n, reinterpret(Ptr{Int}, unsafe_load(coln, i + 1)))
-      R[i] = PariFactor{par_type}(f, n)
-   end
-   return PariIdealFactorisation(R, len, a.parent)
+   return PariFactor{PariMaximalOrder{S, T}}(r, a.parent)
 end
 
 ###########################################################################################
