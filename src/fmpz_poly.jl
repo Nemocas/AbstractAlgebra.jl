@@ -13,6 +13,7 @@
 ##         Base.call{S}(a::NfNumberField{S}, pol::fmpq_poly) in nf.jl
 ## FIXME : fix needs_parentheses and is_negative in nf.jl
 ## FIXME : add hashing for all types
+## FIXME : bezout should allow constant inputs that have coprime contents (also in Poly.jl)
 
 export fmpz_poly
 
@@ -553,14 +554,51 @@ end
 #
 ###########################################################################################
 
-function bezout{S}(x::fmpz_poly{S}, y::fmpz_poly{S})
+function bezout{S}(a::fmpz_poly{S}, b::fmpz_poly{S})
+   if length(a) == 0 || length(b) == 0
+      return zero(base_ring(a)), zero(parent(a)), zero(parent(a))
+   end
    temp = fmpz()
-   u = parent(x)()
-   v = parent(x)()
+   u = parent(a)()
+   v = parent(a)()
+   lena = length(a)
+   lenb = length(b)
+   if lenb == 1
+      if lena == 1
+         if isunit(coeff(a, 0))
+            s = coeff(a, 0)
+            t = zero(base_ring(a))
+            r = one(base_ring(a))
+         elseif isunit(coeff(b, 0))
+            s = zero(base_ring(a))
+            t = coeff(b, 0)
+            r = one(base_ring(a))
+         else
+            error("Bezout relation cannot be computed for constant polynomials with nontrivial content")
+         end
+      else
+         s = zero(base_ring(a))
+         t = one(base_ring(a))
+         r = coeff(b, 0)^(lena - 1)
+      end
+      return r, parent(a)(s), parent(a)(t)
+   end
+   if lena == 1
+      s = one(base_ring(a))
+      t = zero(base_ring(a))
+      r = coeff(a, 0)^(lenb - 1)
+      return r, parent(a)(s), parent(a)(t)
+   end
+   c = content(a)
+   d = content(b)
+   x = divexact(a, c)
+   y = divexact(b, c)
    ccall((:fmpz_poly_xgcd_modular, :libflint), Void, 
         (Ptr{fmpz}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
             &temp, &u, &v, &x, &y)
-   z = BigInt(temp)
+   z = BigInt(temp)*c1^(len2 - 1)*c2^(len1 - 1)
+   u *= c1^(len2 - 2)*c2^(len1 - 1)
+   v *= c1^(len2 - 1)*c2^(len1 - 2)   
    return (z, u, v)
 end
 
