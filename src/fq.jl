@@ -38,7 +38,7 @@ type FqFiniteField{S} <: Field
          finalizer(d, _FqFiniteField_clear_fn)
          temp = fmpz_readonly(char)
          ccall((:fq_ctx_init, :libflint), Void, 
-               (Ptr{FqFiniteField}, Ptr{fmpz}, Int, Ptr{Uint8}), 
+               (Ptr{FqFiniteField}, Ptr{fmpz_readonly}, Int, Ptr{Uint8}), 
 			    &d, &temp, deg, bytestring(string(S)))
          return d
       end
@@ -77,7 +77,7 @@ type fq{S} <: FiniteFieldElem
       finalizer(d, _fq_clear_fn)
       temp = fmpz_readonly(x)
       ccall((:fq_set_fmpz, :libflint), Void, 
-                (Ptr{fq}, Ptr{fmpz}, Ptr{FqFiniteField}), &d, &temp, &ctx)
+                (Ptr{fq}, Ptr{fmpz_readonly}, Ptr{FqFiniteField}), &d, &temp, &ctx)
       return d
    end
 end
@@ -133,19 +133,15 @@ isunit(a::fq) = ccall((:fq_is_invertible, :libflint), Bool,
 
 function characteristic(a::FqFiniteField)
    d = fmpz()
-   init(d)
    ccall((:__fq_ctx_prime, :libflint), Void, (Ptr{fmpz}, Ptr{FqFiniteField}), &d, &a)
    r = BigInt(d)
-   clear(d)
    return r
 end
    
 function order(a::FqFiniteField)
    d = fmpz()
-   init(d)
    ccall((:fq_ctx_order, :libflint), Void, (Ptr{fmpz}, Ptr{FqFiniteField}), &d, &a)
    r = BigInt(d)
-   clear(d)
    return r
 end
    
@@ -249,7 +245,7 @@ function *(x::BigInt, y::fq)
    z = parent(y)()
    temp = fmpz_readonly(x)
    ccall((:fq_mul_fmpz, :libflint), Void, 
-         (Ptr{fq}, Ptr{fq}, Ptr{fmpz}, Ptr{FqFiniteField}), &z, &y, &temp, &y.parent)
+         (Ptr{fq}, Ptr{fq}, Ptr{fmpz_readonly}, Ptr{FqFiniteField}), &z, &y, &temp, &y.parent)
    return z
 end
 
@@ -280,7 +276,7 @@ function ^(x::fq, y::BigInt)
    z = parent(x)()
    temp = fmpz_readonly(y)
    ccall((:fq_pow, :libflint), Void, 
-         (Ptr{fq}, Ptr{fq}, Ptr{fmpz}, Ptr{FqFiniteField}), &z, &x, &temp, &x.parent)
+         (Ptr{fq}, Ptr{fq}, Ptr{fmpz_readonly}, Ptr{FqFiniteField}), &z, &x, &temp, &x.parent)
    return z
 end
 

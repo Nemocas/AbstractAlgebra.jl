@@ -45,7 +45,7 @@ type FqNmodFiniteField{S} <: Field
          finalizer(d, _FqNmodFiniteField_clear_fn)
          temp = fmpz_readonly(char)
          ccall((:fq_nmod_ctx_init, :libflint), Void, 
-               (Ptr{FqNmodFiniteField}, Ptr{fmpz}, Int, Ptr{Uint8}), 
+               (Ptr{FqNmodFiniteField}, Ptr{fmpz_readonly}, Int, Ptr{Uint8}), 
 			    &d, &temp, deg, bytestring(string(S)))
          return d
       end
@@ -87,7 +87,7 @@ type fq_nmod{S} <: FiniteFieldElem
       finalizer(d, _fq_nmod_clear_fn)
       temp = fmpz_readonly(x)
       ccall((:fq_nmod_set_fmpz, :libflint), Void, 
-                (Ptr{fq_nmod}, Ptr{fmpz}, Ptr{FqNmodFiniteField}), &d, &temp, &ctx)
+                (Ptr{fq_nmod}, Ptr{fmpz_readonly}, Ptr{FqNmodFiniteField}), &d, &temp, &ctx)
       return d
    end
 end
@@ -143,19 +143,15 @@ isunit(a::fq_nmod) = ccall((:fq_nmod_is_invertible, :libflint), Bool,
 
 function characteristic(a::FqNmodFiniteField)
    d = fmpz()
-   init(d)
    ccall((:__fq_nmod_ctx_prime, :libflint), Void, (Ptr{fmpz}, Ptr{FqNmodFiniteField}), &d, &a)
    r = BigInt(d)
-   clear(d)
    return r
 end
    
 function order(a::FqNmodFiniteField)
    d = fmpz()
-   init(d)
    ccall((:fq_nmod_ctx_order, :libflint), Void, (Ptr{fmpz}, Ptr{FqNmodFiniteField}), &d, &a)
    r = BigInt(d)
-   clear(d)
    return r
 end
    
@@ -259,7 +255,7 @@ function *(x::BigInt, y::fq_nmod)
    z = parent(y)()
    temp = fmpz_readonly(x)
    ccall((:fq_nmod_mul_fmpz, :libflint), Void, 
-         (Ptr{fq_nmod}, Ptr{fq_nmod}, Ptr{fmpz}, Ptr{FqNmodFiniteField}), &z, &y, &temp, &y.parent)
+         (Ptr{fq_nmod}, Ptr{fq_nmod}, Ptr{fmpz_readonly}, Ptr{FqNmodFiniteField}), &z, &y, &temp, &y.parent)
    return z
 end
 
@@ -290,7 +286,7 @@ function ^(x::fq_nmod, y::BigInt)
    z = parent(x)()
    temp = fmpz_readonly(y)
    ccall((:fq_nmod_pow, :libflint), Void, 
-         (Ptr{fq_nmod}, Ptr{fq_nmod}, Ptr{fmpz}, Ptr{FqNmodFiniteField}), &z, &x, &temp, &x.parent)
+         (Ptr{fq_nmod}, Ptr{fq_nmod}, Ptr{fmpz_readonly}, Ptr{FqNmodFiniteField}), &z, &x, &temp, &x.parent)
    return z
 end
 
