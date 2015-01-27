@@ -983,9 +983,6 @@ end
 ###########################################################################################
 
 function bezout{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S})
-   if length(a) == 0 || length(b) == 0
-      return zero(base_ring(a)), zero(parent(a)), zero(parent(a))
-   end
    sgn = 1
    swap = false
    if length(a) < length(b)
@@ -997,32 +994,7 @@ function bezout{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S})
    end
    lena = length(a)
    lenb = length(b)
-   if lenb == 1
-      if lena == 1
-         if isunit(coeff(a, 0))
-            s1 = coeff(a, 0)
-            t1 = zero(base_ring(a))
-            r1 = one(base_ring(a))
-         elseif isunit(coeff(b, 0))
-            s1 = zero(base_ring(a))
-            t1 = coeff(b, 0)
-            r1 = one(base_ring(a))
-         else
-            error("Bezout relation cannot be computed for constant polynomials with nontrivial content")
-         end
-      else
-         s1 = zero(base_ring(a))
-         t1 = one(base_ring(a))
-         r1 = b.coeffs[1]^(lena - 1)
-      end
-      if swap
-         s1, t1 = t1, s1
-      end
-      if sgn
-         s1, t1, r1 = -s1, -t1, -r1
-      end
-      return r1, parent(a)(s1), parent(a)(t1)
-   end
+   (lena <= 1 || lenb <= 1) && error("Constant polynomial in bezout")  
    c1 = content(a)
    c2 = content(b)
    A = divexact(a, c1)
