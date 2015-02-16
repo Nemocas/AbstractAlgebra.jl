@@ -13,6 +13,8 @@
 ##         Base.call{S}(a::NfNumberField{S}, pol::fmpq_poly) in nf.jl
 ## FIXME : fix needs_parentheses and is_negative in nf.jl
 ## FIXME : add hashing for all types
+## FIXME : canonical_unit for fractions is odd for (1//(x^2+1))//(2//(x+1)) over rationals
+## FIXME : should Fraction only use canonical_unit when printing?
 
 export fmpz_poly
 
@@ -109,6 +111,14 @@ one(a::FmpzPolyRing) = a(1)
 gen(a::FmpzPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
 isgen(x::fmpz_poly) = ccall((:fmpz_poly_is_x, :libflint), Bool, (Ptr{fmpz_poly},), &x)
+
+###########################################################################################
+#
+#   Canonicalisation
+#
+###########################################################################################
+
+canonical_unit(a::fmpz_poly) = canonical_unit(lead(a))
 
 ###########################################################################################
 #
@@ -560,16 +570,16 @@ function bezout{S}(a::fmpz_poly{S}, b::fmpz_poly{S})
    temp = fmpz()
    u = parent(a)()
    v = parent(a)()
-   c = content(a)
-   d = content(b)
-   x = divexact(a, c)
-   y = divexact(b, c)
+   c1 = content(a)
+   c2 = content(b)
+   x = divexact(a, c1)
+   y = divexact(b, c2)
    ccall((:fmpz_poly_xgcd_modular, :libflint), Void, 
         (Ptr{fmpz}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
             &temp, &u, &v, &x, &y)
-   z = BigInt(temp)*c1^(len2 - 1)*c2^(len1 - 1)
-   u *= c1^(len2 - 2)*c2^(len1 - 1)
-   v *= c1^(len2 - 1)*c2^(len1 - 2)   
+   z = BigInt(temp)*c1^(lenb - 1)*c2^(lena - 1)
+   u *= c1^(lenb - 2)*c2^(lena - 1)
+   v *= c1^(lenb - 1)*c2^(lena - 2)   
    return (z, u, v)
 end
 

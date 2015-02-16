@@ -4,8 +4,13 @@
 #
 ###########################################################################################
 
+include("Fraction.jl")
+
 include("QQ.jl")
 
 include("FiniteFields.jl")
+
+//{T <: FieldElem}(a::T, b::T) = divexact(a, b)
+
 
 

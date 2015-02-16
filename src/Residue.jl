@@ -295,7 +295,6 @@ function ResidueRing{T <: RingElem}(R::Ring, el::T)
    parent(el) != R && error("Modulus is not an element of the specified ring")
    el == 0 && throw(DivideError())
    
-   base = base_ring(R)
    R2 = R
    parent_type = Residue{T}
    while base_ring(R2) != None

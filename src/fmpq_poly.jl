@@ -110,13 +110,21 @@ function coeff(x::fmpq_poly, n::Int)
    return Rational(temp)
 end
 
-zero(a::FmpzPolyRing) = a(0)
+zero(a::FmpqPolyRing) = a(0)
 
-one(a::FmpzPolyRing) = a(1)
+one(a::FmpqPolyRing) = a(1)
 
-gen(a::FmpzPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
+gen(a::FmpqPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
-isgen(x::fmpz_poly) = ccall((:fmpz_poly_is_x, :libflint), Bool, (Ptr{fmpz_poly},), &x)
+isgen(x::fmpq_poly) = ccall((:fmpq_poly_is_x, :libflint), Bool, (Ptr{fmpq_poly},), &x)
+
+###########################################################################################
+#
+#   Canonicalisation
+#
+###########################################################################################
+
+canonical_unit(a::fmpq_poly) = canonical_unit(lead(a))
 
 ###########################################################################################
 #
