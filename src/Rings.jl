@@ -20,6 +20,9 @@ abstract FieldElem <: RingElem
 
 abstract PolyElem <: RingElem
 
+# not always mathematical ring elements
+abstract MatElem <: RingElem
+
 function +{S <: RingElem, T <: RingElem}(x::S, y::T) 
    T1 = promote_type(S, T)
    if S == T1
@@ -128,6 +131,8 @@ end
 include("ZZ.jl")
 
 include("Residue.jl")
+
+include("fmpz_mat.jl")
 
 include("Poly.jl")
 
