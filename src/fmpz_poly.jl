@@ -29,11 +29,11 @@ FmpzPolyID = ObjectIdDict()
 type FmpzPolyRing{S} <: Ring
    base_ring::Ring
 
-   function FmpzPolyRing(R::IntegerRing)
+   function FmpzPolyRing()
       return try
          FmpzPolyID[S]
       catch
-         FmpzPolyID[S] = new(R)
+         FmpzPolyID[S] = new(ZZ)
       end
    end
 end
@@ -665,7 +665,7 @@ Base.call{S}(a::FmpzPolyRing{S}, b::fmpz_poly{S}) = b
 function PolynomialRing(R::IntegerRing, s::String)
    S = symbol(s)
 
-   parent_obj = FmpzPolyRing{S}(R)
+   parent_obj = FmpzPolyRing{S}()
    
    return parent_obj, parent_obj([ZZ(0), ZZ(1)])
 end
