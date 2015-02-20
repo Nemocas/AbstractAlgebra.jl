@@ -132,11 +132,11 @@ include("ZZ.jl")
 
 include("Residue.jl")
 
-include("fmpz_mat.jl")
-
 include("Poly.jl")
 
 include("fmpz_poly.jl")
+
+include("fmpz_mat.jl")
 
 include("PariRings.jl")
 

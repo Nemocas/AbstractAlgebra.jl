@@ -6,7 +6,10 @@
 
 import Base: getindex, setindex!
 
-export fmpz_mat, MatrixSpace, getindex, setindex!, rows, cols
+export fmpz_mat, MatrixSpace, getindex, setindex!, rows, cols, charpoly, determinant,
+       determinant_divisor, determinant_given_divisor, gram, hadamard, is_hadamard, hnf,
+       is_hnf, hnf_with_transform, hnf_modular, lll, lll_with_transform, lll_with_removal,
+       lll_with_removal_transform
 
 ###########################################################################################
 #
@@ -353,7 +356,7 @@ function inv(x::fmpz_mat)
    if d1 == -1
       return -z
    end
-   error("Unable to invert matrix")
+   error("Matrix not invertible")
 end
 
 ###########################################################################################
@@ -386,6 +389,206 @@ function divexact(x::fmpz_mat, y::BigInt)
 end
 
 divexact(x::fmpz_mat, y::Integer) = divexact(x, BigInt(y))
+
+###########################################################################################
+#
+#   Characteristic polynomial
+#
+###########################################################################################
+
+function charpoly(R::FmpzPolyRing, x::fmpz_mat)
+   rows(x) != cols(x) && error("Non-square")
+   z = R()
+   ccall((:fmpz_mat_charpoly, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_mat}), &z, &x)
+   return z
+end
+
+###########################################################################################
+#
+#   Determinant
+#
+###########################################################################################
+
+function determinant(x::fmpz_mat)
+   rows(x) != cols(x) && error("Non-square matrix")
+   z = fmpz()
+   ccall((:fmpz_mat_det, :libflint), Void, 
+                (Ptr{fmpz}, Ptr{fmpz_mat}), &z, &x)
+   return BigInt(z)
+end
+
+function determinant_divisor(x::fmpz_mat)
+   rows(x) != cols(x) && error("Non-square matrix")
+   z = fmpz()
+   ccall((:fmpz_mat_det_divisor, :libflint), Void, 
+                (Ptr{fmpz}, Ptr{fmpz_mat}), &z, &x)
+   return BigInt(z)
+end
+
+function determinant_given_divisor(x::fmpz_mat, d::BigInt, proved=true)
+   rows(x) != cols(x) && error("Non-square")
+   z = fmpz()
+   d1 = fmpz_readonly(d)
+   ccall((:fmpz_mat_det_modular_given_divisor, :libflint), Void, 
+                (Ptr{fmpz}, Ptr{fmpz_mat}, Ptr{fmpz_readonly}, Cint), &z, &x, &d1, proved)
+   return BigInt(z)
+end
+
+function determinant_given_divisor(x::fmpz_mat, d::Integer, proved=true)
+   return determinant_given_divisor(x, BigInt(d), proved)
+end
+
+###########################################################################################
+#
+#   Gram matrix
+#
+###########################################################################################
+
+function gram(x::fmpz_mat)
+   if rows(x) == cols(x)
+      parz = parent(x)
+   else
+      parz = FmpzMatSpace(rows(x), rows(x))
+   end
+   z = parz()   
+   ccall((:fmpz_mat_gram, :libflint), Void, 
+                (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &x)
+   return z
+end
+
+###########################################################################################
+#
+#   Hadamard matrix
+#
+###########################################################################################
+
+function hadamard(R::FmpzMatSpace)
+   R.rows != R.cols && error("Unable to create Hadamard matrix")
+   z = R()
+   success = ccall((:fmpz_mat_hadamard, :libflint), Bool, 
+                   (Ptr{fmpz_mat},), &z)
+   !success && error("Unable to create Hadamard matrix")
+   return z
+end
+
+function is_hadamard(x::fmpz_mat)
+   return ccall((:fmpz_mat_is_hadamard, :libflint), Bool, 
+                   (Ptr{fmpz_mat},), &x)
+end
+
+###########################################################################################
+#
+#   Hermite normal form
+#
+###########################################################################################
+
+function hnf(x::fmpz_mat)
+   z = parent(x)()
+   ccall((:fmpz_mat_hnf, :libflint), Void, 
+                (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &x)
+   return z
+end
+
+function hnf_with_transform(x::fmpz_mat)
+   z = parent(x)()
+   if rows(x) == cols(x)
+      parz = parent(x)
+   else
+      parz = FmpzMatSpace(rows(x), rows(x))
+   end
+   u = parz()
+   ccall((:fmpz_mat_hnf_transform, :libflint), Void, 
+                (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &u, &x)
+   return z, u
+end
+
+function hnf_modular(x::fmpz_mat, d::BigInt)
+   z = parent(x)()
+   d1 = fmpz_readonly(d)
+   ccall((:fmpz_mat_hnf_modular, :libflint), Void, 
+                (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_readonly}), &z, &x, &d1)
+   return z
+end
+
+function is_hnf(x::fmpz_mat)
+   return ccall((:fmpz_mat_is_in_hnf, :libflint), Bool, 
+                   (Ptr{fmpz_mat},), &x)
+end
+
+###########################################################################################
+#
+#   LLL
+#
+###########################################################################################
+
+type lll_ctx
+   delta::Float64
+   eta::Float64
+   rep_type::Int
+   gram_type::Int
+
+   function lll_ctx(delta::Float64, eta::Float64, rep=:zbasis, gram=:approx) 
+      rt = rep == :zbasis ? 1 : 0
+      gt = gram == :approx ? 0 : 1
+      return new(delta, eta, rt, gt)
+   end
+end
+
+
+function lll_with_transform(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51))
+   z = parent(x)(x)
+   if rows(x) == cols(x)
+      parz = parent(x)
+   else
+      parz = FmpzMatSpace(rows(x), rows(x))
+   end
+   u = parz(1)
+   ccall((:fmpz_lll, :libflint), Void, 
+         (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{lll_ctx}), &z, &u, &ctx)
+   return z, u
+end
+
+function lll(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51))
+   z = parent(x)(x)
+   if rows(x) == cols(x)
+      parz = parent(x)
+   else
+      parz = FmpzMatSpace(rows(x), rows(x))
+   end
+   u = parz(1)
+   ccall((:fmpz_lll, :libflint), Void, 
+         (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{lll_ctx}), &z, &u, &ctx)
+   return z
+end
+
+function lll_with_removal_transform(x::fmpz_mat, b::BigInt, ctx=lll_ctx(0.99, 0.51))
+   z = parent(x)(x)
+   if rows(x) == cols(x)
+      parz = parent(x)
+   else
+      parz = FmpzMatSpace(rows(x), rows(x))
+   end
+   u = parz(1)
+   b1 = fmpz_readonly(b)
+   d = Int(ccall((:fmpz_lll_with_removal, :libflint), Cint, 
+      (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_readonly}, Ptr{lll_ctx}), &z, &u, &b1, &ctx))
+   return d, z, u
+end
+
+function lll_with_removal(x::fmpz_mat, b::BigInt, ctx=lll_ctx(0.99, 0.51))
+   z = parent(x)(x)
+   if rows(x) == cols(x)
+      parz = parent(x)
+   else
+      parz = FmpzMatSpace(rows(x), rows(x))
+   end
+   u = parz(1)
+   b1 = fmpz_readonly(b)
+   d = Int(ccall((:fmpz_lll_with_removal, :libflint), Cint, 
+      (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_readonly}, Ptr{lll_ctx}), &z, &u, &b1, &ctx))
+   return d, z
+end
 
 ###########################################################################################
 #
