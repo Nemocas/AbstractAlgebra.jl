@@ -4,12 +4,13 @@
 #
 ###########################################################################################
 
-import Base: getindex, setindex!
+import Base: getindex, setindex!, transpose
 
 export fmpz_mat, MatrixSpace, getindex, setindex!, rows, cols, charpoly, determinant,
        determinant_divisor, determinant_given_divisor, gram, hadamard, is_hadamard, hnf,
        is_hnf, hnf_with_transform, hnf_modular, lll, lll_with_transform, lll_with_removal,
-       lll_with_removal_transform
+       lll_with_removal_transform, nullspace, rank, rref, reduce_mod, snf, snf_diagonal,
+       is_snf, solve, solve_dixon, trace, transpose
 
 ###########################################################################################
 #
@@ -196,6 +197,12 @@ function -(x::fmpz_mat)
    return z
 end
 
+function transpose(x::fmpz_mat)
+   z = parent(x)()
+   ccall((:fmpz_mat_transpose, :libflint), Void, (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &x)
+   return z
+end
+
 ###########################################################################################
 #
 #   Binary operations
@@ -286,6 +293,30 @@ function -(x::Integer, y::fmpz_mat)
    for i = 1:min(rows(y), cols(y))
       z[i, i] = x - z[i, i]
    end
+   return z
+end
+
+###########################################################################################
+#
+#   Scaling
+#
+###########################################################################################
+
+function <<(x::fmpz_mat, y::Int)
+   y < 0 && throw(DomainError())
+   z = parent(x)()
+   ccall((:fmpz_mat_scalar_mul_2exp, :libflint), Void, 
+                (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Int), 
+               &z, &x, y)
+   return z
+end
+
+function >>(x::fmpz_mat, y::Int)
+   y < 0 && throw(DomainError())
+   z = parent(x)()
+   ccall((:fmpz_mat_scalar_tdiv_q_2exp, :libflint), Void, 
+                (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Int), 
+               &z, &x, y)
    return z
 end
 
@@ -389,6 +420,22 @@ function divexact(x::fmpz_mat, y::BigInt)
 end
 
 divexact(x::fmpz_mat, y::Integer) = divexact(x, BigInt(y))
+
+###########################################################################################
+#
+#   Modular reduction
+#
+###########################################################################################
+
+function reduce_mod(x::fmpz_mat, y::BigInt)
+   z = parent(x)()
+   temp = fmpz_readonly(y)
+   ccall((:fmpz_mat_scalar_mod_fmpz, :libflint), Void, 
+                (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_readonly}), &z, &x, &temp)
+   return z
+end
+
+reduce_mod(x::fmpz_mat, y::Integer) = reduce_mod(x, BigInt(y))
 
 ###########################################################################################
 #
@@ -588,6 +635,116 @@ function lll_with_removal(x::fmpz_mat, b::BigInt, ctx=lll_ctx(0.99, 0.51))
    d = Int(ccall((:fmpz_lll_with_removal, :libflint), Cint, 
       (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_readonly}, Ptr{lll_ctx}), &z, &u, &b1, &ctx))
    return d, z
+end
+
+###########################################################################################
+#
+#   Nullspace
+#
+###########################################################################################
+
+function nullspace(x::fmpz_mat)
+   z = parent(x)()
+   if rows(x) == cols(x)
+      parz = parent(x)
+   else
+      parz = FmpzMatSpace(cols(x), cols(x))
+   end
+   u = parz()
+   rank = ccall((:fmpz_mat_nullspace, :libflint), Cint, 
+                (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &u, &x)
+   return u, rank
+end
+
+###########################################################################################
+#
+#   Rank
+#
+###########################################################################################
+
+function rank(x::fmpz_mat)
+   return ccall((:fmpz_mat_rank, :libflint), Int, 
+                (Ptr{fmpz_mat},), &x)
+end
+
+###########################################################################################
+#
+#   Reduced row echelon form
+#
+###########################################################################################
+
+function rref(x::fmpz_mat)
+   z = parent(x)()
+   d = fmpz()
+   ccall((:fmpz_mat_rref, :libflint), Void,
+         (Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{fmpz_mat}), &z, &d, &x)
+   return z, BigInt(d)
+end
+
+###########################################################################################
+#
+#   Smith normal form
+#
+###########################################################################################
+
+function snf(x::fmpz_mat)
+   z = parent(x)()
+   ccall((:fmpz_mat_snf, :libflint), Void, 
+                (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &x)
+   return z
+end
+
+function snf_diagonal(x::fmpz_mat)
+   z = parent(x)()
+   ccall((:fmpz_mat_snf_diagonal, :libflint), Void, 
+                (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &x)
+   return z
+end
+
+function is_snf(x::fmpz_mat)
+   return ccall((:fmpz_mat_is_in_snf, :libflint), Bool, 
+                   (Ptr{fmpz_mat},), &x)
+end
+
+###########################################################################################
+#
+#   Linear solving
+#
+###########################################################################################
+
+function solve(a::fmpz_mat, b::fmpz_mat)
+   rows(a) != cols(a) && error("Not a square matrix in solve")
+   rows(b) != rows(a) || cols(b) != 1 && ("Not a column vector in solve")
+   z = parent(b)()
+   d = fmpz()
+   nonsing = ccall((:fmpz_mat_solve, :libflint), Bool,
+         (Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &d, &a, &b)
+   !nonsing && error("Singular matrix in solve")
+   return z, BigInt(d)
+end
+
+function solve_dixon(a::fmpz_mat, b::fmpz_mat)
+   rows(a) != cols(a) && error("Not a square matrix in solve")
+   rows(b) != rows(a) || cols(b) != 1 && ("Not a column vector in solve")
+   z = parent(b)()
+   d = fmpz()
+   nonsing = ccall((:fmpz_mat_solve_dixon, :libflint), Bool,
+         (Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &d, &a, &b)
+   !nonsing && error("Singular matrix in solve")
+   return z, BigInt(d)
+end
+
+###########################################################################################
+#
+#   Trace
+#
+###########################################################################################
+
+function trace(x::fmpz_mat)
+   d = fmpz()
+   return ccall((:fmpz_mat_trace, :libflint), Int, 
+                (Ptr{fmpz}, Ptr{fmpz_mat}), &d, &x)
+   return BigInt(d)
 end
 
 ###########################################################################################

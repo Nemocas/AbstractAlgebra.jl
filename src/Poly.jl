@@ -353,7 +353,7 @@ function ^{T <: RingElem, S}(a::Poly{T, S}, b::Int)
       end
       z = a
       bit >>= 1
-      while bit !=0
+      while bit != 0
          z = z*z
          if (uint(bit) & b) != 0
             z *= a
