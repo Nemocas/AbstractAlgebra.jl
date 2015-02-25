@@ -13,11 +13,11 @@ export approx, coprime_multiplier, intersect, bounded_ideals,
 #
 ###########################################################################################
 
-type PariIdealSet{S, T}
+type PariIdealSet{S, T} <: PariSet
    order::PariMaximalOrder{S, T}
 end
 
-type PariIdeal{S, T}
+type PariIdeal{S, T} <: PariSet
    ideal::Ptr{Int}
    parent::PariIdealSet{S, T}
 
@@ -42,10 +42,10 @@ function bounded_ideals{S, T}(ord::PariMaximalOrder{S, T}, bound::Int)
    av = unsafe_load(avma, 1)
    vec = ccall((:ideallist0, :libpari), Ptr{Int},
                (Ptr{Int}, Int, Int), ord.pari_nf.data, bound, 4)
-   vec_type = pari_vec{PariMaximalOrder{S, T}}
+   vec_type = pari_vec{PariIdeal{S, T}}
    A = Array(vec_type, bound)
    for i = 1:bound
-      A[i] = vec_type(pari_load(vec, i + 1), ord)
+      A[i] = vec_type(pari_load(vec, i + 1), PariIdealSet{S, T}(ord))
    end
    unsafe_store!(avma, av, 1)
    return A
@@ -62,7 +62,7 @@ function prime_decomposition{S, T}(ord::PariMaximalOrder{S, T}, p::BigInt)
    pr = pari(p)
    vec = ccall((:idealprimedec, :libpari), Ptr{Int},
                (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pr.d)
-   return pari_vec{PariMaximalOrder{S, T}}(vec, ord)
+   return pari_vec{PariIdeal{S, T}}(vec, PariIdealSet{S, T}(ord))
 end
 
 function prime_decomposition{S, T}(ord::PariMaximalOrder{S, T}, p::Integer)
@@ -316,10 +316,6 @@ end
 #
 ###########################################################################################
 
-function ideal{S, T}(ord::PariMaximalOrder{S, T}, id::Ptr{Int})
-   return PariIdeal{S, T}(id, PariIdealSet(ord))
-end
-
 function ideal{S, T}(ord::PariMaximalOrder{S, T}, b::fmpq_poly, args::fmpq_poly...)
    av = unsafe_load(avma, 1)
    id1 = ccall((:idealhnf, :libpari), Ptr{Int}, 
@@ -389,5 +385,15 @@ function ideal{S, T}(ord::PariMaximalOrder{S, T}, b::Integer, args::Integer...)
    end
    unsafe_store!(avma, av, 1)
    return PariIdeal{S, T}(id1, PariIdealSet(ord))
+end
+
+###########################################################################################
+#
+#   Parent object overloads
+#
+###########################################################################################
+
+function Base.call{S, T}(ord::PariIdealSet{S, T}, id::Ptr{Int})
+   return PariIdeal{S, T}(id, PariIdealSet(ord))
 end
 

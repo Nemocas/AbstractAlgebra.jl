@@ -1,12 +1,12 @@
-type PariVector{T <: PariRing}
-   base_ring::PariRing
+type PariVector{T <: Union(PariRing, PariSet)}
+   base_ring::Union(PariRing, PariSet)
 end
 
-type pari_vec{T <: PariRing}
+type pari_vec{T <: Union(PariRing, PariSet)}
    data::Ptr{Int}
    parent::PariVector{T}
 
-   function pari_vec{R <: PariRing}(v::Ptr{Int}, par::R)
+   function pari_vec{R <: Union(PariRing, PariSet)}(v::Ptr{Int}, par::R)
       r = new(gclone(v), PariVector{T}(par))
       finalizer(r, _pari_vec_unclone)
       return r
