@@ -152,6 +152,8 @@ include("NumberFields.jl")
 
 include("MaximalOrders.jl")
 
+include("PariIdeal.jl")
+
 ###########################################################################################
 #
 #   Factorisation
