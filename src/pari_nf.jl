@@ -16,6 +16,7 @@ PariNumberFieldID = Dict{fmpq_poly, PariRing}()
 
 type PariNumberField{S, T} <: PariRing
    data::Ptr{Int}
+   nf::NfNumberField
    
    function PariNumberField(nf::NfNumberField)
       try
@@ -26,7 +27,7 @@ type PariNumberField{S, T} <: PariRing
          d = gclone(ccall((:nfinit, :libpari), Ptr{Int}, 
                            (Ptr{Int}, Int), p.d, 5))
          unsafe_store!(avma, av, 1)
-         ord = new(d)
+         ord = new(d, nf)
          finalizer(ord, _pari_nf_unclone)
          return PariNumberFieldID[nf.pol] = ord
       end
@@ -54,7 +55,7 @@ end
 
 function show(io::IO, nf::PariNumberField)
    print(io, "Maximal order of Number Field over Rational Field with defining polynomial ")
-   print(nf.nf.pol,)
+   print(io, nf.nf.pol)
 end
 
 

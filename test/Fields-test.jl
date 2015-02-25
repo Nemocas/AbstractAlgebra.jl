@@ -1,12 +1,6 @@
-module Test
-
-using Base.Test, Nemo.Rings, Nemo.Fields
-
-export test_all
-
 include("Fraction-test.jl")
 include("FiniteFields-test.jl")
-include("Padics2-test.jl")
+#include("Padics2-test.jl")
 
 function test_fields_resultant()
    print("Fields.resultant...")
@@ -29,12 +23,10 @@ function test_fields_resultant()
    println("PASS")
 end
 
-function test_all()
+function test_fields()
    test_fraction()
    test_ffield()
-   test_padics2()
+#   test_padics2()
 
    test_fields_resultant()
 end
-
-end # module

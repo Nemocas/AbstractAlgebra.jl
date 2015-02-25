@@ -205,3 +205,6 @@ function factor{S}(g::fmpq_poly{S})
    f = factor(pari(g))
    return Factor{FmpqPolyRing{S}}(f, f.len, g.parent)
 end
+
+include("../test/Rings-test.jl")
+

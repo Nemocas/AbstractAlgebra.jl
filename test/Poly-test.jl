@@ -3,19 +3,19 @@ function test_poly_constructors()
  
    R, x = PolynomialRing(ZZ, "x")
 
-   @test R <: Poly
+   @test typeof(R) <: FmpzPolyRing
 
    @test isa(x, Poly)
 
    S, y = PolynomialRing(R, "y")
 
-   @test S <: Poly
+   @test typeof(S) <: PolyRing
 
    @test isa(y, Poly)
 
    T, z = PolynomialRing(S, "z")
 
-   @test T <: Poly
+   @test typeof(T) <: PolyRing
 
    @test isa(z, Poly)
 
