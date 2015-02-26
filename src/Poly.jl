@@ -4,11 +4,11 @@
 #
 ###########################################################################################
 
-export Poly, PolynomialRing, coeff, isgen, truncate, mullow, reverse, shift_left,
+export Poly, PolynomialRing, coeff, isgen, lead, truncate, mullow, reverse, shift_left,
        shift_right, divexact, pseudorem, pseudodivrem, gcd, content, primpart, evaluate,
-       compose, derivative, resultant, discriminant, bezout, zero, one, gen, length,
-       iszero, normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod,
-       invmod, lcm, divrem, mod, gcdinv, hash, canonical_unit
+       compose, derivative, integral, resultant, discriminant, bezout, zero, one, gen,
+       length, iszero, normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod,
+       powmod, invmod, lcm, divrem, mod, gcdinv, hash, canonical_unit
 
 ###########################################################################################
 #
@@ -198,6 +198,7 @@ end
 ###########################################################################################
 
 function +{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S})
+   println("here")
    lena = length(a)
    lenb = length(b)
    lenz = max(lena, lenb)
@@ -496,7 +497,7 @@ function reverse{T <: RingElem, S}(x::Poly{T, S}, len::Int)
    return r
 end
 
-function reverse(x::Poly)
+function reverse(x::PolyElem)
    reverse(x, length(x))
 end
 
@@ -779,7 +780,7 @@ function gcd{T <: Union(FieldElem, Residue), S}(a::Poly{T, S}, b::Poly{T, S})
    return inv(lead(b))*b
 end
 
-function lcm{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S})
+function lcm(a::PolyElem, b::PolyElem)
    return a*divexact(b, gcd(a, b))
 end
 
@@ -863,10 +864,10 @@ function integral{T <: Union(FieldElem, Residue), S}(x::Poly{T, S})
    v = Array(T, len + 1)
    v[1] = zero(base_ring(x))
    for i = 1:len
-      v[i + 1] = divexact(coeff(x, i - 1), T(i))
+      v[i + 1] = divexact(coeff(x, i - 1), base_ring(x)(i))
    end
    p = parent(x)(v)
-   len = len + 1
+   len += 1
    while len > 0 && coeff(p, len - 1) == 0 # cannot use normalise here
       len -= 1
    end
@@ -965,7 +966,7 @@ end
 ###########################################################################################
 
 function discriminant(a::Poly)
-   d = deriv(a)
+   d = derivative(a)
    z = resultant(a, d)
    if length(a) - length(d) == 1
       z = divexact(z, lead(a))
@@ -1023,9 +1024,9 @@ function bezout{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S})
       h = divexact(h*g^d, s)
    end
    s = divexact(h*lead(B)^(lena - 1), h^(lena - 1))
-   res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
-   u2 *= c1^(lenb - 2)*c2^(lena - 1)
-   v2 *= c1^(lenb - 1)*c2^(lena - 2)
+   res = c1^(length(b) - 1)*c2^(length(a) - 1)*s*sgn
+   u2 *= c1^(length(b) - 2)*c2^(length(a) - 1)
+   v2 *= c1^(length(b) - 1)*c2^(length(a) - 2)
    if swap
       u2, v2 = v2, u2
    end
@@ -1232,9 +1233,7 @@ end
 
 function Base.call{T <: RingElem, S}(a::PolynomialRing{T, S}, b::Poly{T, S})
    parent(b) != a && error("Unable to coerce polynomial")
-   z = Poly{T, S}(base_ring(a), b)
-   z.parent = a
-   return z
+   return b
 end
 
 function Base.call{T <: RingElem, S}(a::PolynomialRing{T, S}, b::Array{T, 1})

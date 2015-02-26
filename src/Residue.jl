@@ -34,7 +34,7 @@ type Residue{T <: Union(RingElem, BigInt)} <: RingElem
    Residue(a::T) = new(a)
 end
 
-elem_type{T <: RingElem}(::ResidueRing{T}) = Residue{T}
+elem_type{T <: Union(RingElem, BigInt)}(::ResidueRing{T}) = Residue{T}
 
 base_ring(a::ResidueRing) = a.base_ring
 
@@ -105,6 +105,16 @@ needs_parentheses(x::Residue) = needs_parentheses(x.data)
 is_negative(x::Residue) = is_negative(x.data)
 
 show_minus_one{T <: Union(RingElem, BigInt)}(::Type{Residue{T}}) = true
+
+###########################################################################################
+#
+#   Unary operations
+#
+###########################################################################################
+
+function -{T <: Union(RingElem, BigInt)}(a::Residue{T})
+   parent(a)(-a.data)
+end
 
 ###########################################################################################
 #
