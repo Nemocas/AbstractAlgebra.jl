@@ -198,7 +198,6 @@ end
 ###########################################################################################
 
 function +{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S})
-   println("here")
    lena = length(a)
    lenb = length(b)
    lenz = max(lena, lenb)
