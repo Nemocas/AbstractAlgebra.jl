@@ -5,9 +5,9 @@
 ###########################################################################################
 
 export ZZ, IntegerRing, parent, show, fmpz, needs_parentheses, is_negative, show_minus_one,
-       zero, one, isunit, iszero, isone, invmod, powmod, words, gcdinv
+       zero, one, isunit, iszero, isone, invmod, powmod, words, gcdinv, lcm
 
-import Base: gcd
+import Base: gcd, lcm
 
 type IntegerRing <: Ring
 end
