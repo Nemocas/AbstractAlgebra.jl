@@ -106,7 +106,7 @@ end
 #
 ###########################################################################################    
    
-length(x::fmpq_poly) = ccall((:fmpq_poly_length, :libflint), Int, 
+length{S}(x::fmpq_poly{S}) = ccall((:fmpq_poly_length, :libflint), Int, 
                                    (Ptr{fmpq_poly},), &x)
 
 function coeff(x::fmpq_poly, n::Int)
