@@ -84,11 +84,18 @@ cd(wdir)
 
 # install ANTIC
 
-run(`git clone https://github.com/wbhart/antic.git`)
+try
+  run(`git clone https://github.com/wbhart/antic.git`)
+except
+  run(`cd antic ; git pull`)
+end          
 
 # install FLINT
-
-run(`git clone https://github.com/wbhart/flint2.git`)
+try
+  run(`git clone https://github.com/wbhart/flint2.git`)
+except
+  run(`cd flint2 ; git pull`)
+end          
 
 if on_windows
    cd("$wdir\\flint2")
@@ -112,7 +119,11 @@ cd(wdir)
 
 # install PARI
 
-run(`git clone http://pari.math.u-bordeaux.fr/git/pari.git`)
+try
+  run(`git clone http://pari.math.u-bordeaux.fr/git/pari.git`)
+except
+  run(`cd pari ; git pull`)
+end  
 
 if on_windows
 else
