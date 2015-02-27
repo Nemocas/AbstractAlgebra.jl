@@ -4,7 +4,7 @@
 #
 ###########################################################################################
 
-export fmpq_poly
+export fmpq_poly, denominator
 
 ###########################################################################################
 #
@@ -92,6 +92,13 @@ end
 elem_type{S}(::FmpqPolyRing{S}) = fmpq_poly{S}
 
 base_ring(a::FmpqPolyRing) = a.base_ring
+
+function denominator(a::fmpq_poly)
+   z = fmpz()
+   ccall((:fmpq_poly_get_denominator, :libflint), Void,
+         (Ptr{fmpz}, Ptr{fmpq_poly}), &z, &a)
+   return BigInt(z)
+end
 
 ###########################################################################################
 #
