@@ -524,7 +524,7 @@ end
 #
 ###########################################################################################
 
-function derivative(x::fmpz_poly)
+function derivative{S}(x::fmpz_poly{S})
    z = parent(x)()
    ccall((:fmpz_poly_derivative, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x)
