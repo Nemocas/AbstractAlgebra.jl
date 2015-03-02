@@ -336,7 +336,7 @@ end
 #
 ###########################################################################################
 
-function inv(a::nf_elem)
+function inv{S, T}(a::nf_elem{S, T})
    r = a.parent()
    ccall((:nf_elem_inv, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{NfNumberField}),
@@ -396,7 +396,7 @@ end
 #
 ###########################################################################################
 
-function norm(a::nf_elem)
+function norm{S,T}(a::nf_elem{S, T})
    temp = fmpq()
    ccall((:nf_elem_norm, :libflint), Void,
          (Ptr{fmpq}, Ptr{nf_elem}, Ptr{NfNumberField}),
@@ -404,7 +404,7 @@ function norm(a::nf_elem)
    return Rational(temp)
 end
 
-function trace(a::nf_elem)
+function trace{S, T}(a::nf_elem{S, T})
    temp = fmpq()
    ccall((:nf_elem_trace, :libflint), Void,
          (Ptr{fmpq}, Ptr{nf_elem}, Ptr{NfNumberField}),
