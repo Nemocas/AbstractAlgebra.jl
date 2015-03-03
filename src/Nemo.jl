@@ -10,7 +10,7 @@ else
    push!(DL_LOAD_PATH, "$pkgdir/src/lib")
 end
 
-ccall((:pari_init, :libpari), Void, (Int, Int), 100000000, 10000)
+ccall((:pari_init, :libpari), Void, (Int, Int), 1000000000, 10000)
 
 include("Rings.jl")
 
