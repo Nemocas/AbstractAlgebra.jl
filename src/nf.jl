@@ -172,7 +172,7 @@ function -(a::nf_elem, b::nf_elem)
    return r
 end
 
-function *(a::nf_elem, b::nf_elem)
+function *{S, T}(a::nf_elem{S, T}, b::nf_elem{S, T})
    r = a.parent()
    ccall((:nf_elem_mul, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{NfNumberField}),
