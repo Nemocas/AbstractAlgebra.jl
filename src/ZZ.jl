@@ -5,7 +5,7 @@
 ###########################################################################################
 
 export ZZ, IntegerRing, parent, show, fmpz, needs_parentheses, is_negative, show_minus_one,
-       zero, one, isunit, iszero, isone, invmod, powmod, words, gcdinv, lcm
+       zero, one, isunit, iszero, isone, invmod, powmod, words, gcdinv, lcm, gcdext
 
 import Base: gcd, lcm
 
@@ -102,10 +102,10 @@ end
 
 function invmod(x::BigInt, y::BigInt)
     y <= 0 && throw(DomainError())
-    z = ZZ()
     if y == 1
         return zero(parent(x))
     end
+    z = ZZ()
     if !ccall((:__gmpz_invert, :libgmp), Bool, 
               (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &z, &x, &y)
        error("Impossible inverse in invmod")
@@ -127,6 +127,17 @@ function gcdinv(x::BigInt, y::BigInt)
                &g1, &s1, &x1, &y1)
     return BigInt(g1), BigInt(s1)
 end
+
+function gcdx(x::BigInt, y::BigInt)
+    g1 = ZZ()
+    s1 = ZZ()
+    t1 = ZZ()
+    ccall((:__gmpz_gcdext, :libgmp), Void, 
+             (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), 
+               &g1, &s1, &t1, &x, &y)
+    return g1, s1, t1
+end
+
 
 ###########################################################################################
 #
