@@ -563,10 +563,10 @@ end
 #
 ###########################################################################################
 
-function bezout{S}(a::fmpz_poly{S}, b::fmpz_poly{S})
+function gcdx{S}(a::fmpz_poly{S}, b::fmpz_poly{S})
    lena = length(a)
    lenb = length(b)
-   (lena <= 1 || lenb <= 1) && error("Constant polynomial in bezout")  
+   (lena <= 1 || lenb <= 1) && error("Constant polynomial in gcdx")  
    temp = fmpz()
    u = parent(a)()
    v = parent(a)()

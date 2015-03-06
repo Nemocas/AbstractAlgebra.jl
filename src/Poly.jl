@@ -6,7 +6,7 @@
 
 export Poly, PolynomialRing, coeff, isgen, lead, truncate, mullow, reverse, shift_left,
        shift_right, divexact, pseudorem, pseudodivrem, gcd, content, primpart, evaluate,
-       compose, derivative, integral, resultant, discriminant, bezout, zero, one, gen,
+       compose, derivative, integral, resultant, discriminant, gcdx, zero, one, gen,
        length, iszero, normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod,
        powmod, invmod, lcm, divrem, mod, gcdinv, hash, canonical_unit
 
@@ -982,7 +982,7 @@ end
 #
 ###########################################################################################
 
-function bezout{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S})
+function gcdx{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S})
    sgn = 1
    swap = false
    if length(a) < length(b)
@@ -994,7 +994,7 @@ function bezout{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S})
    end
    lena = length(a)
    lenb = length(b)
-   (lena <= 1 || lenb <= 1) && error("Constant polynomial in bezout")  
+   (lena <= 1 || lenb <= 1) && error("Constant polynomial in gcdx")  
    c1 = content(a)
    c2 = content(b)
    A = divexact(a, c1)
@@ -1032,7 +1032,7 @@ function bezout{T <: RingElem, S}(a::Poly{T, S}, b::Poly{T, S})
    return res, u2, v2
 end
 
-function bezout{T <: Union(FieldElem, Residue), S}(a::Poly{T, S}, b::Poly{T, S})
+function gcdx{T <: Union(FieldElem, Residue), S}(a::Poly{T, S}, b::Poly{T, S})
    if length(a) == 0
       return b, zero(parent(a)), one(parent(a))
    end
