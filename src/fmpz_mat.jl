@@ -10,7 +10,7 @@ export fmpz_mat, MatrixSpace, getindex, setindex!, rows, cols, charpoly, determi
        determinant_divisor, determinant_given_divisor, gram, hadamard, is_hadamard, hnf,
        is_hnf, hnf_with_transform, hnf_modular, lll, lll_with_transform, lll_with_removal,
        lll_with_removal_transform, nullspace, rank, rref, reduce_mod, snf, snf_diagonal,
-       is_snf, solve, solve_dixon, trace, transpose
+       is_snf, solve, solve_dixon, trace, transpose, content, hcat, vcat
 
 ###########################################################################################
 #
@@ -741,10 +741,43 @@ end
 ###########################################################################################
 
 function trace(x::fmpz_mat)
+   rows(x) != cols(x) && error("Not a square matrix in trace")
    d = fmpz()
-   return ccall((:fmpz_mat_trace, :libflint), Int, 
+   ccall((:fmpz_mat_trace, :libflint), Int, 
                 (Ptr{fmpz}, Ptr{fmpz_mat}), &d, &x)
    return BigInt(d)
+end
+
+###########################################################################################
+#
+#   Content
+#
+###########################################################################################
+
+function content(x::fmpz_mat)
+  d = fmpz()
+  ccall((:fmpz_mat_content, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz_mat}), &d, &x)
+  return BigInt(d)
+end
+
+###########################################################################################
+#
+#   Concatenation
+#
+###########################################################################################
+
+function hcat(a::fmpz_mat, b::fmpz_mat)
+  rows(a) != rows(b) && error("Matrices need to have the same number of rows")
+  c =MatrixSpace(ZZ, rows(a), cols(a)+cols(b))()
+  ccall((:fmpz_mat_concat_horizontal, :libflint), Void, (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &c, &a, &b)
+  return c
+end
+
+function vcat(a::fmpz_mat, b::fmpz_mat)
+  cols(a) != cols(b) && error("Matrices need to have the same number of columns")
+  c =MatrixSpace(ZZ, rows(a)+rows(b), cols(a))()
+  ccall((:fmpz_mat_concat_vertical, :libflint), Void, (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &c, &a, &b)
+  return c
 end
 
 ###########################################################################################
