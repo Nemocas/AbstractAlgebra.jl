@@ -178,7 +178,7 @@ function show(io::IO, a::fmpz_mat)
       end
       print(io, "]")
       if i != rows
-         println("")
+         println(io, "")
       end
    end
 end
