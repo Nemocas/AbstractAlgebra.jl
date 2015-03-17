@@ -6,11 +6,13 @@
 
 import Base: getindex, setindex!, transpose
 
-export fmpz_mat, MatrixSpace, getindex, setindex!, rows, cols, charpoly, determinant,
-       determinant_divisor, determinant_given_divisor, gram, hadamard, is_hadamard, hnf,
-       is_hnf, hnf_with_transform, hnf_modular, lll, lll_with_transform, lll_with_removal,
-       lll_with_removal_transform, nullspace, rank, rref, reduce_mod, snf, snf_diagonal,
-       is_snf, solve, solve_dixon, trace, transpose, content, hcat, vcat
+export fmpz_mat, MatrixSpace, getindex, setindex!, rows, cols, charpoly,
+       determinant, determinant_divisor, determinant_given_divisor, gram,
+       hadamard, is_hadamard, hnf, is_hnf, hnf_with_transform, hnf_modular,
+       lll, lll_gram, lll_with_transform, lll_gram_with_transform, 
+       lll_with_removal, lll_with_removal_transform,
+       nullspace, rank, rref, reduce_mod, snf, snf_diagonal, is_snf, solve,
+       solve_dixon, trace, transpose, content, hcat, vcat, addmul!, zero!
 
 ###########################################################################################
 #
@@ -134,9 +136,9 @@ end
 
 setindex!(a::fmpz_mat, d::Integer, r::Int, c::Int) = setindex!(a, ZZ(d), r, c)
 
-rows(a::fmpz_mat) = a.parent.rows
+rows(a::fmpz_mat) = a.r
 
-cols(a::fmpz_mat) = a.parent.cols
+cols(a::fmpz_mat) = a.c
 
 zero(a::FmpzMatSpace) = a()
 
@@ -198,7 +200,7 @@ function -(x::fmpz_mat)
 end
 
 function transpose(x::fmpz_mat)
-   z = parent(x)()
+   z = MatrixSpace(ZZ, cols(x), rows(x))()
    ccall((:fmpz_mat_transpose, :libflint), Void, (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &x)
    return z
 end
@@ -609,6 +611,32 @@ function lll(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51))
    return z
 end
 
+function lll_gram_with_transform(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51, :gram))
+   z = parent(x)(x)
+   if rows(x) == cols(x)
+      parz = parent(x)
+   else
+      parz = FmpzMatSpace(rows(x), rows(x))
+   end
+   u = parz(1)
+   ccall((:fmpz_lll, :libflint), Void, 
+         (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{lll_ctx}), &z, &u, &ctx)
+   return z, u
+end
+
+function lll_gram(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51, :gram))
+   z = parent(x)(x)
+   if rows(x) == cols(x)
+      parz = parent(x)
+   else
+      parz = FmpzMatSpace(rows(x), rows(x))
+   end
+   u = parz(1)
+   ccall((:fmpz_lll, :libflint), Void, 
+         (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{lll_ctx}), &z, &u, &ctx)
+   return z
+end
+
 function lll_with_removal_transform(x::fmpz_mat, b::BigInt, ctx=lll_ctx(0.99, 0.51))
    z = parent(x)(x)
    if rows(x) == cols(x)
@@ -791,10 +819,41 @@ function mul!(z::fmpz_mat, x::fmpz_mat, y::fmpz_mat)
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &x, &y)
 end
 
+function mul!(y::fmpz_mat, x::Int)
+   ccall((:fmpz_mat_scalar_mul_si, :libflint), Void, 
+                (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Int), &y, &y, x)
+   return y
+end
+
+function mul!(y::fmpz_mat, x::BigInt)
+   temp = fmpz_readonly(x)
+   ccall((:fmpz_mat_scalar_mul_fmpz, :libflint), Void, 
+                (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_readonly}), &y, &y, &temp)
+   return y
+end
+
+function addmul!(y::fmpz_mat, x::BigInt, z::fmpz_mat)
+   temp = fmpz_readonly(x)
+   ccall((:fmpz_mat_scalar_addmul_fmpz, :libflint), Void, 
+                (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_readonly}), &z, &y, &temp)
+   return y
+end
+
+function addmul!(y::fmpz_mat, x::Int, z::fmpz_mat)
+   ccall((:fmpz_mat_scalar_addmul_si, :libflint), Void, 
+                (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_readonly}), &z, &y, &temp)
+   return y
+end
+
 function addeq!(z::fmpz_mat, x::fmpz_mat)
    ccall((:fmpz_mat_add, :libflint), Void, 
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &z, &x)
 end
+
+function zero!(z::fmpz_mat)
+   ccall((:fmpz_mat_zero, :libflint), Void, 
+                (Ptr{fmpz_mat},), &z)
+end                
 
 ###########################################################################################
 #
