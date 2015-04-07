@@ -202,7 +202,7 @@ end
 #
 ###########################################################################################
 
-function bezout{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
+function gcdx{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
    pari_nf = a.parent.order.pari_nf.data
    av = unsafe_load(avma, 1)
    st = ccall((:idealaddtoone, :libpari), Ptr{Int}, 

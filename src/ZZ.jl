@@ -5,9 +5,9 @@
 ###########################################################################################
 
 export ZZ, IntegerRing, parent, show, fmpz, needs_parentheses, is_negative, show_minus_one,
-       zero, one, isunit, iszero, isone, invmod, powmod, words, gcdinv, lcm, gcdext
+       zero, one, isunit, iszero, isone, invmod, powmod, words, gcdinv, lcm
 
-import Base: gcd, lcm
+import Base: gcd, gcdx, lcm
 
 type IntegerRing <: Ring
 end
@@ -127,17 +127,6 @@ function gcdinv(x::BigInt, y::BigInt)
                &g1, &s1, &x1, &y1)
     return BigInt(g1), BigInt(s1)
 end
-
-function gcdx(x::BigInt, y::BigInt)
-    g1 = ZZ()
-    s1 = ZZ()
-    t1 = ZZ()
-    ccall((:__gmpz_gcdext, :libgmp), Void, 
-             (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), 
-               &g1, &s1, &t1, &x, &y)
-    return g1, s1, t1
-end
-
 
 ###########################################################################################
 #

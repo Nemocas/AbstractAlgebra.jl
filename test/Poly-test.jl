@@ -492,8 +492,8 @@ function test_poly_discriminant()
    println("PASS")
 end
 
-function test_poly_bezout()
-   print("Poly.bezout...")
+function test_poly_gcdx()
+   print("Poly.gcdx...")
 
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
@@ -501,12 +501,12 @@ function test_poly_bezout()
    f = 5x^2 + 2x + 1
    g = 2x^3 + 3x + 1
 
-   @test bezout(f, g) == (212, 146*x^2-58*x+213, -365*x-1)
+   @test gcdx(f, g) == (212, 146*x^2-58*x+213, -365*x-1)
 
    j = 3x*y^2 + (x + 1)*y + 3
    k = 6(x + 1)*y + (x^3 + 2x + 2)
 
-   @test bezout(j, k) == (3*x^7+6*x^5-6*x^3+96*x^2+192*x+96, (36*x^2+72*x+36), (-18*x^2-18*x)*y+(3*x^4-6*x-6))
+   @test gcdx(j, k) == (3*x^7+6*x^5-6*x^3+96*x^2+192*x+96, (36*x^2+72*x+36), (-18*x^2-18*x)*y+(3*x^4-6*x-6))
 
    println("PASS")
 end
@@ -592,7 +592,7 @@ function test_poly()
    test_poly_integral()
    test_poly_resultant()
    test_poly_discriminant()
-   test_poly_bezout()
+   test_poly_gcdx()
    test_poly_special()
    test_poly_fateman()
    test_poly_pearce()

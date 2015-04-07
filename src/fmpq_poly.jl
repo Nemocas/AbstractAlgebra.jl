@@ -617,7 +617,7 @@ end
 #
 ###########################################################################################
 
-function bezout{S}(x::fmpq_poly{S}, y::fmpq_poly{S})
+function gcdx{S}(x::fmpq_poly{S}, y::fmpq_poly{S})
    z = parent(x)()
    u = parent(x)()
    v = parent(x)()
