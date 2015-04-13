@@ -191,7 +191,7 @@ include("ZZ.jl")
 
 include("Residue.jl")
 
-# include("Poly.jl")
+include("Poly.jl")
 
 include("fmpz_poly.jl")
 

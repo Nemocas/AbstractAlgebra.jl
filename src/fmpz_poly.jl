@@ -98,11 +98,6 @@ parent(a::fmpz_poly) = a.parent
 
 var(a::FmpzPolyRing) = a.S
 
-function check_parent(a::fmpz_poly, b::fmpz_poly)
-   parent(a) != parent(b) && 
-                error("Incompatible polynomial rings in polynomial operation")
-end
-
 ###############################################################################
 #
 #   Basic manipulation
