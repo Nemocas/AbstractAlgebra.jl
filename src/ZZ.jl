@@ -33,12 +33,12 @@
 
 import Base: convert, promote_rule, show, string, parseint, serialize,
              deserialize, base, bin, dec, oct, hex, gcd, gcdx, lcm, div, size,
-             zero, one, sign
+             zero, one, sign, hash
 
-export ZZ, IntegerRing, parent, show, convert, fac, binom, isprime, fdiv, cdiv,
-       tdiv, div, rem, mod, gcd, xgcd, lcm, invmod, powmod, abs, divrem, isqrt,
-       popcount, prevpow2, nextpow2, ndigits, dec, bin, oct, hex, base, one,
-       zero, divexact, fits, sign, nbits, deepcopy, tdivpow2, fdivpow2,
+export ZZ, IntegerRing, parent, show, convert, hash, fac, binom, isprime, fdiv,
+       cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm, invmod, powmod, abs, divrem,
+       isqrt, popcount, prevpow2, nextpow2, ndigits, dec, bin, oct, hex, base,
+       one, zero, divexact, fits, sign, nbits, deepcopy, tdivpow2, fdivpow2,
        cdivpow2, flog, clog, cmpabs, clrbit!, setbit!, combit!, crt, divisible,
        divisor_lenstra, fdivrem, tdivrem, fmodpow2, gcdinv, isprobabprime, 
        issquare, jacobi, remove, root, size, isqrtrem, sqrtmod, trailing_zeros,
@@ -94,6 +94,8 @@ parent(a::fmpz) = ZZ
 elem_type(::IntegerRing) = fmpz
 
 base_ring(a::IntegerRing) = None
+
+hash(a::fmpz) = hash(BigInt(a))
 
 ###############################################################################
 #
