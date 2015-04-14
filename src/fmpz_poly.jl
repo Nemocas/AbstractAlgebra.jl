@@ -19,6 +19,7 @@
 ## FIXME : canonical_unit for fractions is odd for (1//(x^2+1))//(2//(x+1)) 
 ##         over rationals
 ## FIXME : should Fraction only use canonical_unit when printing?
+## FIXME : Pari integer conversion from fmpz is not efficient
 
 export fmpz_poly
 

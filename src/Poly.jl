@@ -9,7 +9,7 @@ export Poly, PolynomialRing, coeff, isgen, lead, truncate, mullow, reverse,
        content, primpart, evaluate, compose, derivative, integral, resultant,
        discriminant, gcdx, zero, one, gen, length, iszero, normalise, isone,
        isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod, invmod, lcm,
-       divrem, mod, gcdinv, hash, canonical_unit
+       divrem, mod, gcdinv, hash, canonical_unit, var
 
 ###############################################################################
 #

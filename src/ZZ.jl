@@ -44,7 +44,7 @@ export ZZ, IntegerRing, parent, show, convert, hash, fac, binom, isprime, fdiv,
        issquare, jacobi, remove, root, size, isqrtrem, sqrtmod, trailing_zeros,
        sigma, eulerphi, fib, moebiusmu, primorial, risingfac, canonical_unit,
        needs_parentheses, is_negative, show_minus_one, parseint, addeq!, mul!,
-       isunit
+       isunit, words
 
 ###############################################################################
 #
@@ -128,6 +128,10 @@ isunit(a::fmpz) = ccall((:fmpz_is_pm1, :libflint), Bool, (Ptr{fmpz},), &a)
 iszero(a::fmpz) = ccall((:fmpz_is_zero, :libflint), Bool, (Ptr{fmpz},), &a)
 
 isone(a::fmpz) = ccall((:fmpz_is_one, :libflint), Bool, (Ptr{fmpz},), &a)
+
+function words(a::fmpz)
+   return a == 0 ? 0 : div(ndigits(a, 2) + 8*sizeof(Int) - 1, 8*sizeof(Int))
+end
 
 ###############################################################################
 #
@@ -419,6 +423,8 @@ function ^(x::fmpz, y::Int)
     if x == 1; return x; end
     if x == -1; return isodd(y) ? x : -x; end
     if y > typemax(Uint); throw(DomainError()); end
+    if y == 0; return one(ZZ); end
+    if y == 1; return x; end
     return x^uint(y)
 end
 

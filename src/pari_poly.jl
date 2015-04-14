@@ -12,18 +12,19 @@
 
 PariPolyID = ObjectIdDict()
 
-type PariPolyRing{T <: PariRing, S} <: PariRing
+type PariPolyRing{T <: PariRing} <: PariRing
    base_ring::PariRing
    pol_0::Ptr{Int}
+   S::Symbol
 
-   function PariPolyRing(R::PariRing)
+   function PariPolyRing(R::PariRing, s::Symbol)
       z = ccall((:pari_malloc, :libpari), Ptr{Int}, (Int,), 2*sizeof(Int))
       unsafe_store!(z, evaltyp(t_POL) | 2, 1) 
       unsafe_store!(z, evalsigne(0) | evalvarn(0), 2)
       try
-         return PariPolyID[S]
+         return PariPolyID[s]
       catch
-         r = PariPolyID[S] = new(R, z)
+         r = PariPolyID[s] = new(R, z, s)
          finalizer(r, _pari_poly_zero_clear_fn)
          return r
       end
@@ -35,9 +36,9 @@ function _pari_poly_zero_clear_fn(p::PariPolyRing)
    ccall((:pari_free, :libpari), Void, (Ptr{Int},), p.pol_0)
 end
 
-type pari_poly{T <: PariRing, S} <: RingElem
+type pari_poly{T <: PariRing} <: RingElem
    d::Ptr{Int}
-   parent::PariPolyRing{T, S}
+   parent::PariPolyRing{T}
 
    function pari_poly(data::Ptr{Int})
       g = new(gclone(data))
@@ -56,7 +57,9 @@ _pari_poly_clear_fn(g::pari_poly) = ccall((:pari_free, :libpari), Void, (Ptr{Uin
 
 _pari_poly_unclone(g::pari_poly) = gunclone(g.d)
 
-parent{T <: PariRing, S}(a::pari_poly{T, S}) = a.parent
+parent{T <: PariRing}(a::pari_poly{T}) = a.parent
+
+var(p::PariPolyRing) = p.S
 
 ###########################################################################################
 #
@@ -66,33 +69,33 @@ parent{T <: PariRing, S}(a::pari_poly{T, S}) = a.parent
 
 show(io::IO, x::pari_poly) = pari_print(io, x.d)
 
-function show{T <: Ring, S}(io::IO, p::PariPolyRing{T, S})
+function show{T <: Ring}(io::IO, p::PariPolyRing{T})
    print(io, "Univariate Polynomial Ring in ")
-   print(io, string(S))
+   print(io, string(var(p)))
    print(io, " over ")
    show(io, p.base_ring)
 end
 
 ###########################################################################################
 #
-#   Conversions to from Poly{BigInt, S}
+#   Conversions to from fmpz_poly
 #
 ###########################################################################################
 
 function gensize(a::fmpz_poly)
    coeffs = a.coeffs
    total = 0
-   for i = 0:a.length - 1
+   for i = 0:length(a) - 1
       total += ccall((:fmpz_size, :libflint), Int, (Ptr{Int},), coeffs + i*sizeof(Int))
    end
-   return total + 2*a.length + 2
+   return total + 3*length(a) + 2
 end
 
 function pari!(x::Ptr{Int}, a::fmpz_poly, s::Int)
-   unsafe_store!(x, evaltyp(t_POL) | a.length + 2, 1) 
-   unsafe_store!(x, evalsigne(Int(a.length != 0)) | evalvarn(0), 2)
-   s = a.length + 2
-   for i = 0:a.length - 1
+   unsafe_store!(x, evaltyp(t_POL) | length(a) + 2, 1) 
+   unsafe_store!(x, evalsigne(Int(length(a) != 0)) | evalvarn(0), 2)
+   s = length(a) + 2
+   for i = 0:length(a) - 1
       z = coeff(a, i)
       if z == 0
          unsafe_store!(x, unsafe_load(gen_0), i + 3)
@@ -104,10 +107,10 @@ function pari!(x::Ptr{Int}, a::fmpz_poly, s::Int)
    return s
 end
 
-function pari{S}(a::fmpz_poly{S})
+function pari(a::fmpz_poly)
    s = gensize(a)
-   g = pari_poly{PariIntegerRing, S}(s)
-   g.parent = PariPolyRing{PariIntegerRing, S}(PariZZ)
+   g = pari_poly{PariIntegerRing}(s)
+   g.parent = PariPolyRing{PariIntegerRing}(PariZZ, var(parent(a)))
    pari!(reinterpret(Ptr{Int}, g.d), a, s)
    return g
 end
@@ -119,7 +122,7 @@ function fmpz_poly!(z::fmpz_poly, g::Ptr{Int})
    if length == 0
       return
    end
-   c = BigInt()
+   c = ZZ()
    for i = 0:length - 1
       ZZ!(c, reinterpret(Ptr{Int}, unsafe_load(g, 3 + i)))
       setcoeff!(z, i, c)
@@ -133,10 +136,10 @@ end
 #
 ###########################################################################################
 
-function factor{T <: PariRing, S}(pol::pari_poly{T, S})
+function factor{T <: PariRing}(pol::pari_poly{T})
    av = unsafe_load(avma, 1)
    f = ccall((:factor, :libpari), Ptr{Int}, (Ptr{Int},), pol.d)
-   fac = PariFactor{PariPolyRing{T, S}}(f, pol.parent)
+   fac = PariFactor{PariPolyRing{T}}(f, pol.parent)
    unsafe_store!(avma, av, 1)
    return fac
 end
@@ -147,15 +150,15 @@ end
 #
 ###########################################################################################
 
-function Base.call{S}(ord::PariPolyRing{PariIntegerRing, S}, n::Ptr{Int})
-   pol = pari_poly{PariIntegerRing, S}(n)
-   pol.parent = PariPolyRing{PariIntegerRing, S}(PariZZ)
+function Base.call(ord::PariPolyRing{PariIntegerRing}, n::Ptr{Int})
+   pol = pari_poly{PariIntegerRing}(n)
+   pol.parent = PariPolyRing{PariIntegerRing}(PariZZ)
    return pol
 end
 
 
-function Base.call{S}(a::FmpzPolyRing{S}, g::pari_poly{PariIntegerRing, S})
-   z = fmpz_poly{S}()
+function Base.call(a::FmpzPolyRing, g::pari_poly{PariIntegerRing})
+   z = fmpz_poly()
    z.parent = a
    fmpz_poly!(z, g.d)
    return z
