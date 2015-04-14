@@ -84,6 +84,15 @@ type fmpz_poly <: PolyElem
       finalizer(z, _fmpz_poly_clear_fn)
       return z
    end
+
+   function fmpz_poly(a::fmpz_poly)
+      z = new()
+      ccall((:fmpz_poly_init, :libflint), Void, (Ptr{fmpz_poly},), &z)
+      ccall((:fmpz_poly_set, :libflint), Void, 
+            (Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &a)
+      finalizer(z, _fmpz_poly_clear_fn)
+      return z
+   end
 end
 
 function _fmpz_poly_clear_fn(a::fmpz_poly)
@@ -123,6 +132,12 @@ gen(a::FmpzPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
 isgen(x::fmpz_poly) = ccall((:fmpz_poly_is_x, :libflint), Bool, 
                             (Ptr{fmpz_poly},), &x)
+
+function deepcopy(a::fmpz_poly)
+   z = fmpz_poly(a)
+   z.parent = a.parent
+   return z
+end
 
 ###############################################################################
 #

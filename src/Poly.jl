@@ -37,13 +37,11 @@ type Poly{T <: RingElem} <: PolyElem
    length::Int
    parent::PolynomialRing{T}
 
-   Poly(R::Ring) = new(Array(T, 0), 0)
+   Poly() = new(Array(T, 0), 0)
    
-   Poly(R::Ring, a::Array{T, 1}) = new(a, length(a))
+   Poly(a::Array{T, 1}) = new(a, length(a))
 
-   Poly(R::Ring, a::T) = a == 0 ? new(Array(T, 0), 0) : new([a], 1)
-
-   Poly(R::Ring, a::Integer) = a == 0 ? new(Array(T, 0), 0) : new([R(a)], 1)
+   Poly(a::T) = a == 0 ? new(Array(T, 0), 0) : new([a], 1)
 end
 
 elem_type{T <: RingElem}(::PolynomialRing{T}) = Poly{T}
@@ -107,6 +105,14 @@ function isgen(a::PolyElem)
 end
 
 isunit(a::PolyElem) = length(a) == 1 && isunit(coeff(a, 0))
+
+function deepcopy{T <: RingElem}(a::Poly{T})
+   coeffs = Array(T, length(a))
+   for i = 1:length(a)
+      coeffs[i] = deepcopy(coeff(a, i - 1))
+   end
+   return parent(a)(coeffs)
+end
 
 ###############################################################################
 #
@@ -1235,32 +1241,20 @@ function Base.call{T <: RingElem}(a::PolynomialRing{T}, b::RingElem)
 end
 
 function Base.call{T <: RingElem}(a::PolynomialRing{T})
-   z = Poly{T}(base_ring(a))
-   z.parent = a
-   return z
-end
-
-function Base.call{T <: RingElem}(a::PolynomialRing{T}, b::Int)
-   z = Poly{T}(base_ring(a), b)
+   z = Poly{T}()
    z.parent = a
    return z
 end
 
 function Base.call{T <: RingElem}(a::PolynomialRing{T}, b::Integer)
-   z = Poly{T}(base_ring(a), fmpz(b))
-   z.parent = a
-   return z
-end
-
-function Base.call{T <: RingElem}(a::PolynomialRing{T}, b::fmpz)
-   z = Poly{T}(base_ring(a), b)
+   z = Poly{T}(base_ring(a)(b))
    z.parent = a
    return z
 end
 
 function Base.call{T <: RingElem}(a::PolynomialRing{T}, b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
-   z = Poly{T}(base_ring(a), b)
+   z = Poly{T}(b)
    z.parent = a
    return z
 end
@@ -1274,7 +1268,7 @@ function Base.call{T <: RingElem}(a::PolynomialRing{T}, b::Array{T, 1})
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end
-   z = Poly{T}(base_ring(a), b)
+   z = Poly{T}(b)
    z.parent = a
    return z
 end
