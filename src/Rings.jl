@@ -199,7 +199,7 @@ include("fmpz_mat.jl")
 
 include("PariRings.jl")
 
-# include("Fields.jl")
+include("Fields.jl")
 
 # include("PariFields.jl")
 

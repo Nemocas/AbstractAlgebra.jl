@@ -1,12 +1,12 @@
 ###########################################################################################
 #
-#   QQ.jl : BigInt rationals
+#   QQ.jl : Rationals
 #
 ###########################################################################################
 
-import Base: gcd
+import Base: gcd, Rational, isless
 
-export QQ, FractionField, height, height_bits
+export QQ, FractionField, Rational, height, height_bits, isless
 
 ###########################################################################################
 #
@@ -17,19 +17,56 @@ export QQ, FractionField, height, height_bits
 type RationalField <: Field
 end
 
-call(::RationalField) = Rational(0, BigInt(1))
-
-call(::RationalField, a :: Integer) = Rational(a, BigInt(1))
-
-call(::RationalField, a::Rational{BigInt}) = a
-
 QQ = RationalField()
 
-parent(a::Rational{BigInt}) = QQ
+type fmpq <: FieldElem
+   num::Int
+   den::Int
 
-elem_type(::RationalField) = Rational{BigInt}
+   function fmpq(a::fmpz, b::fmpz)
+      z = new()
+      ccall((:fmpq_init, :libflint), Void, (Ptr{fmpq},), &z)
+      ccall((:fmpq_set_fmpz_frac, :libflint), Void,
+            (Ptr{fmpq}, Ptr{fmpz}, Ptr{fmpz}), &z, &a, &b)
+      finalizer(z, _fmpq_clear_fn)
+      return z
+   end
+
+   function fmpq(a::Int, b::Int)
+      z = new()
+      ccall((:fmpq_init, :libflint), Void, (Ptr{fmpq},), &z)
+      ccall((:fmpq_set_si, :libflint), Void,
+            (Ptr{fmpq}, Int, Int), &z, a, b)
+      finalizer(z, _fmpq_clear_fn)
+      return z
+   end
+end
+
+_fmpq_clear_fn(a::fmpq) = ccall((:fmpq_clear, :libflint), Void, (Ptr{fmpq},), &a)
+
+parent(a::fmpq) = QQ
+
+elem_type(::RationalField) = fmpq
 
 base_ring(a::RationalField) = ZZ
+
+base_ring(a::fmpq) = ZZ
+
+###########################################################################################
+#
+#   Constructors
+#
+###########################################################################################
+
+function //(x::fmpz, y::fmpz)
+   y == 0 && throw(DivideError())
+   g = gcd(x, y)
+   return QQ(divexact(x, g), divexact(y, g))
+end
+
+//(x::fmpz, y::Integer) = x//ZZ(y)
+
+//(x::Integer, y::fmpz) = ZZ(x)//y
 
 ###########################################################################################
 #
@@ -37,27 +74,60 @@ base_ring(a::RationalField) = ZZ
 #
 ###########################################################################################
 
-zero(a::RationalField) = Rational(0, BigInt(1))
-
-one(a::RationalField) = Rational(1, BigInt(1))
-
-isone(a::Rational{BigInt}) = a == 1
-
-iszero(a::Rational{BigInt}) = a == 0
-
-isunit(a::Rational{BigInt}) = a != 0
-
-function height(a::Rational{BigInt})
-   temp = fmpq_readonly(a)
-   temp2 = fmpz()
-   ccall((:fmpq_height, :libflint), Void, (Ptr{fmpz}, Ptr{fmpq_readonly}), &temp2, &temp)
-   return BigInt(temp2)
+function hash(a::fmpz)
+   h = 0x8a30b0d963237dd5
+   return h $ hash(num(a)) $ hash(den(a))
 end
 
-function height_bits(a::Rational{BigInt})
-   temp = fmpq_readonly(a)
-   return ccall((:fmpq_height_bits, :libflint), Int, (Ptr{fmpq_readonly},), &temp)
+zero(a::RationalField) = QQ(0, 1)
+
+one(a::RationalField) = QQ(1, 1)
+
+function num(a::fmpq)
+   z = ZZ()
+   ccall((:fmpq_numerator, :libflint), Void, (Ptr{fmpz}, Ptr{fmpq}), &z, &a)
+   return z
 end
+
+function den(a::fmpq)
+   z = ZZ()
+   ccall((:fmpq_denominator, :libflint), Void, (Ptr{fmpz}, Ptr{fmpq}), &z, &a)
+   return z
+end
+
+zero(a::RationalField) = QQ(0)
+
+one(a::RationalField) = QQ(1)
+
+isone(a::fmpq) = a == 1
+
+iszero(a::fmpq) = a == 0
+
+isunit(a::fmpq) = a != 0
+
+function height(a::fmpq)
+   temp = ZZ()
+   ccall((:fmpq_height, :libflint), Void, (Ptr{fmpz}, Ptr{fmpq}), &temp, &a)
+   return temp
+end
+
+function height_bits(a::fmpq)
+   return ccall((:fmpq_height_bits, :libflint), Int, (Ptr{fmpq},), &a)
+end
+
+function deepcopy(a::fmpq)
+   z = QQ()
+   ccall((:fmpq_set, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &z, &a)
+   return z
+end
+
+###########################################################################################
+#
+#   Canonicalisation
+#
+###########################################################################################
+
+canonical_unit(a::fmpq) = a
 
 ###########################################################################################
 #
@@ -69,19 +139,155 @@ function show(io::IO, a::RationalField)
    print(io, "Rational Field")
 end
 
-needs_parentheses(x::Rational{BigInt}) = false
+function show(io::IO, a::fmpq)
+   print(io, num(a))
+   if den(a) != 1
+      print("//", den(a))
+   end
+end
 
-is_negative(x::Rational{BigInt}) = x < 0
+needs_parentheses(x::fmpq) = false
 
-show_minus_one(::Type{Rational{BigInt}}) = false
+is_negative(x::fmpq) = x < 0
+
+show_minus_one(::Type{fmpq}) = false
+
+###############################################################################
+#
+#   Unary operators
+#
+###############################################################################
+
+function -(a::fmpq)
+   z = QQ()
+   ccall((:fmpq_neg, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &z, &a)
+   return z
+end
+
+###############################################################################
+#
+#   Binary operators
+#
+###############################################################################
+
+function +(a::fmpq, b::fmpq)
+   z = QQ()
+   ccall((:fmpq_add, :libflint), Void, 
+         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
+   return z
+end
+
+function -(a::fmpq, b::fmpq)
+   z = QQ()
+   ccall((:fmpq_sub, :libflint), Void, 
+         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
+   return z
+end
+
+function *(a::fmpq, b::fmpq)
+   z = QQ()
+   ccall((:fmpq_mul, :libflint), Void, 
+         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
+   return z
+end
+
+###############################################################################
+#
+#   Ad hoc binary operators
+#
+###############################################################################
+
+function +(a::fmpq, b::Int)
+   z = QQ()
+   ccall((:fmpq_add_si, :libflint), Void, 
+         (Ptr{fmpq}, Ptr{fmpq}, Int), &z, &a, b)
+   return z
+end
+
+function +(a::fmpq, b::fmpz)
+   z = QQ()
+   ccall((:fmpq_add_fmpz, :libflint), Void, 
+         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpz}), &z, &a, &b)
+   return z
+end
+
++(a::Int, b::fmpq) = b + a
+
++(a::fmpz, b::fmpq) = b + a
+
+function -(a::fmpq, b::Int)
+   z = QQ()
+   ccall((:fmpq_sub_si, :libflint), Void, 
+         (Ptr{fmpq}, Ptr{fmpq}, Int), &z, &a, b)
+   return z
+end
+
+function -(a::fmpq, b::fmpz)
+   z = QQ()
+   ccall((:fmpq_sub_fmpz, :libflint), Void, 
+         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpz}), &z, &a, &b)
+   return z
+end
+
+function *(a::fmpq, b::fmpz)
+   z = QQ()
+   ccall((:fmpq_mul_fmpz, :libflint), Void, 
+         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpz}), &z, &a, &b)
+   return z
+end
+
+*(a::fmpz, b::fmpq) = b + a
 
 ###########################################################################################
 #
-#   Canonicalisation
+#   Comparison
 #
 ###########################################################################################
 
-canonical_unit(a::Rational{BigInt}) = a
+function ==(a::fmpq, b::fmpq)
+   return ccall((:fmpq_equal, :libflint), Bool, (Ptr{fmpq}, Ptr{fmpq}), &a, &b)
+end
+
+function isless(a::fmpq, b::fmpq)
+   return ccall((:fmpq_cmp, :libflint), Cint, (Ptr{fmpq}, Ptr{fmpq}), &a, &b) < 0
+end
+
+###########################################################################################
+#
+#   Ad hoc comparison
+#
+###########################################################################################
+
+function ==(a::fmpq, b::Int)
+   return ccall((:fmpq_equal_si, :libflint), Bool, (Ptr{fmpq}, Int), &a, b)
+end
+
+==(a::Int, b::fmpq) = b == a
+
+function ==(a::fmpq, b::fmpz)
+   return ccall((:fmpq_equal_fmpz, :libflint), Bool, (Ptr{fmpq}, Ptr{fmpz}), &a, &b)
+end
+
+==(a::fmpz, b::fmpq) = b == a
+
+function isless(a::fmpq, b::Int)
+   z = QQ(b)
+   return ccall((:fmpq_cmp, :libflint), Cint, (Ptr{fmpq}, Ptr{fmpq}), &a, &z) < 0
+end
+
+###########################################################################################
+#
+#   Powering
+#
+###########################################################################################
+
+function ^(a::fmpq, b::Int)
+   b < 0 && throw(DomainError())
+   temp = QQ()
+   ccall((:fmpq_pow_si, :libflint), Void, 
+         (Ptr{fmpq}, Ptr{fmpq}, Int), &temp, &a, b)
+   return temp
+end
 
 ###########################################################################################
 #
@@ -89,20 +295,18 @@ canonical_unit(a::Rational{BigInt}) = a
 #
 ###########################################################################################
 
-function >>(a::Rational{BigInt}, b::Int)
-   temp1 = fmpq_readonly(a)
-   temp2 = fmpq()
+function >>(a::fmpq, b::Int)
+   temp = QQ()
    ccall((:fmpq_div_2exp, :libflint), Void, 
-         (Ptr{fmpq}, Ptr{fmpq_readonly}, Int), &temp2, &temp1, b)
-   return Rational(temp2)
+         (Ptr{fmpq}, Ptr{fmpq}, Int), &temp, &a, b)
+   return temp
 end
 
-function <<(a::Rational{BigInt}, b::Int)
-   temp1 = fmpq_readonly(a)
-   temp2 = fmpq()
+function <<(a::fmpq, b::Int)
+   temp = QQ()
    ccall((:fmpq_mul_2exp, :libflint), Void, 
-         (Ptr{fmpq}, Ptr{fmpq_readonly}, Int), &temp2, &temp1, b)
-   return Rational(temp2)
+         (Ptr{fmpq}, Ptr{fmpq}, Int), &temp, &a, b)
+   return temp2
 end
 
 ###########################################################################################
@@ -111,7 +315,11 @@ end
 #
 ###########################################################################################
 
-divexact(a::Rational{BigInt}, b::Rational{BigInt}) = a/b
+function divexact(a::fmpq, b::fmpq)
+   z = QQ()
+   ccall((:fmpq_div, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
+   return z
+end
 
 ###########################################################################################
 #
@@ -119,11 +327,10 @@ divexact(a::Rational{BigInt}, b::Rational{BigInt}) = a/b
 #
 ###########################################################################################
 
-function inv(a::Rational{BigInt})
-   temp1 = fmpq_readonly(a)
-   temp2 = fmpq()
-   ccall((:fmpq_inv, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq_readonly}), &temp2, &temp1)
-   return Rational(temp2)
+function inv(a::fmpq)
+   z = QQ()
+   ccall((:fmpq_inv, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &z, &a)
+   return z
 end
 
 ###########################################################################################
@@ -132,13 +339,27 @@ end
 #
 ###########################################################################################
 
-function gcd(a::Rational{BigInt}, b::Rational{BigInt})
-   temp1 = fmpq_readonly(a)
-   temp2 = fmpq_readonly(b)
-   temp3 = fmpq()
+function gcd(a::fmpq, b::fmpq)
+   z = QQ()
    ccall((:fmpq_gcd, :libflint), Void, 
-         (Ptr{fmpq}, Ptr{fmpq_readonly}, Ptr{fmpq_readonly}), &temp3, &temp1, &temp2)
-   return Rational(temp3)
+         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
+   return z
+end
+
+###############################################################################
+#
+#   Unsafe operators and functions
+#
+###############################################################################
+
+function mul!(c::fmpq, a::fmpq, b::fmpq)
+   ccall((:fmpq_mul, :libflint), Void,
+         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &c, &a, &b)
+end
+
+function addeq!(c::fmpq, a::fmpq)
+   ccall((:fmpq_add, :libflint), Void,
+         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &c, &c, &a)
 end
 
 ###########################################################################################
@@ -146,40 +367,59 @@ end
 #   Conversions to/from flint fmpq
 #
 ###########################################################################################
-
-type fmpq_readonly
-   num::Int
-   den::Int
-
-   function fmpq_readonly(x::Rational{BigInt})
-      r = new()
-      ccall((:fmpq_init_set_mpz_frac_readonly, :libflint), Void, 
-            (Ptr{fmpq_readonly}, Ptr{BigInt}, Ptr{BigInt}), &r, &x.num, &x.den)
-      return r
-   end
-end
-
-type fmpq
-   num::Int
-   den::Int
-
-   function fmpq()
-      a = new(0, 1)
-      finalizer(a, _fmpq_clear_fn)
-      return a
-   end
-end
-
-function _fmpq_clear_fn(z::fmpq)
-   ccall((:fmpq_clear, :libflint), Void, (Ptr{fmpq},), &z)
-end
    
 function Rational(z::fmpq)
-   r = QQ()
+   r = Rational{BigInt}(0)
    ccall((:fmpq_get_mpz_frac, :libflint), Void, 
          (Ptr{BigInt}, Ptr{BigInt}, Ptr{fmpq}), &r.num, &r.den, &z)
    return r
 end
+
+function Rational(z::fmpz)
+   return Rational{BigInt}(BigInt(z))
+end
+
+###########################################################################################
+#
+#   Parent object call overloads
+#
+###########################################################################################
+
+call(a::RationalField) = fmpq(ZZ(0), ZZ(1))
+
+call(a::RationalField, b::Rational{BigInt}) = fmpq(ZZ(b.num), ZZ(b.den)) 
+
+call(a::RationalField, b::Integer) = fmpq(ZZ(b), ZZ(1))
+
+call(a::RationalField, b::Int, c::Int) = fmpq(b, c)
+
+call(a::RationalField, b::fmpz) = fmpq(b, ZZ(1))
+
+call(a::RationalField, b::Integer, c::Integer) = fmpq(ZZ(b), ZZ(c))
+
+call(a::RationalField, b::fmpz, c::Integer) = fmpq(b, ZZ(c))
+
+call(a::RationalField, b::Integer, c::fmpz) = fmpq(ZZ(b), c)
+
+call(a::RationalField, b::fmpz, c::fmpz) = fmpq(b, c)
+
+call(a::RationalField, b::fmpq) = b
+
+###############################################################################
+#
+#   Conversions and promotions
+#
+###############################################################################
+
+convert(::Type{fmpq}, a::Integer) = QQ(a)
+
+convert(::Type{fmpq}, a::fmpz) = QQ(a)
+
+Base.promote_rule{T <: Integer}(::Type{fmpq}, ::Type{T}) = fmpq
+
+Base.promote_rule(::Type{fmpq}, ::Type{fmpz}) = fmpq
+
+convert(::Type{Rational{BigInt}}, a::fmpq) = Rational(a)
 
 ###########################################################################################
 #

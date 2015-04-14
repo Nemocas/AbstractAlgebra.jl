@@ -1003,7 +1003,7 @@ fmpz(z::Integer) = ZZ(BigInt(z))
 
 convert(::Type{fmpz}, a::Integer) = ZZ(a)
 
-promote_rule(::Type{fmpz}, ::Type{Integer}) = fmpz
+Base.promote_rule{T <: Integer}(::Type{fmpz}, ::Type{T}) = fmpz
 
 function BigInt(z::fmpz)
    r = BigInt()

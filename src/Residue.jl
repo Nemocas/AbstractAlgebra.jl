@@ -78,7 +78,7 @@ function isunit(a::Residue)
    return g == 1
 end
 
-deepcopy{T <: RingElem}(a::Residue{T}) = parent(a)(deepcopy(a.data))
+deepcopy(a::Residue) = parent(a)(deepcopy(a.data))
 
 ###############################################################################
 #
