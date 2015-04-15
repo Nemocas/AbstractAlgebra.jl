@@ -1,45 +1,46 @@
-###########################################################################################
+###############################################################################
 #
 #   fq.jl : Flint finite fields
 #
-###########################################################################################
+###############################################################################
 
 export fq, FqFiniteField
 
-###########################################################################################
+###############################################################################
 #
 #   Types and memory management
 #
-###########################################################################################
+###############################################################################
 
-FqFiniteFieldID = Dict{(BigInt, Int, Symbol), Field}()
+FqFiniteFieldID = Dict{(fmpz, Int, Symbol), Field}()
 
-type FqFiniteField{S} <: Field
-   p :: Int # fmpz
-   sparse_modulus :: Int
-   a :: Ptr{Void}
-   j :: Ptr{Void}
-   len :: Int
-   mod_coeffs :: Ptr{Void}
-   mod_alloc :: Int
-   mod_length :: Int
-   mod_p :: Int # fmpz
-   inv_coeffs :: Ptr{Void}
-   inv_alloc :: Int
-   inv_length :: Int
-   inv_p :: Int # fmpz
-   var :: Ptr{Void}
+type FqFiniteField <: Field
+   p::Int # fmpz
+   sparse_modulus::Int
+   a::Ptr{Void}
+   j::Ptr{Void}
+   len::Int
+   mod_coeffs::Ptr{Void}
+   mod_alloc::Int
+   mod_length::Int
+   mod_p::Int # fmpz
+   inv_coeffs::Ptr{Void}
+   inv_alloc::Int
+   inv_length::Int
+   inv_p::Int # fmpz
+   var::Ptr{Void}
+   S::Symbol
 
-   function FqFiniteField(char::BigInt, deg::Int)
+   function FqFiniteField(char::fmpz, deg::Int, s::Symbol)
       try
-         return FqFiniteFieldID[char, deg, S]
+         return FqFiniteFieldID[char, deg, s]
       catch
-         d = FqFiniteFieldID[char, deg, S] = new()
+         d = FqFiniteFieldID[char, deg, s] = new()
          finalizer(d, _FqFiniteField_clear_fn)
-         temp = fmpz_readonly(char)
          ccall((:fq_ctx_init, :libflint), Void, 
-               (Ptr{FqFiniteField}, Ptr{fmpz_readonly}, Int, Ptr{Uint8}), 
-			    &d, &temp, deg, bytestring(string(S)))
+               (Ptr{FqFiniteField}, Ptr{fmpz}, Int, Ptr{Uint8}), 
+			            &d, &char, deg, bytestring(string(s)))
+         d.S = s
          return d
       end
    end
@@ -49,44 +50,57 @@ function _FqFiniteField_clear_fn(a :: FqFiniteField)
    ccall((:fq_ctx_clear, :libflint), Void, (Ptr{FqFiniteField},), &a)
 end
 
-type fq{S} <: FiniteFieldElem
+type fq <: FiniteFieldElem
    coeffs :: Ptr{Void}
    alloc :: Int
    length :: Int
-   parent::FqFiniteField{S}
+   parent::FqFiniteField
 
    function fq(ctx::FqFiniteField)
       d = new()
-      ccall((:fq_init2, :libflint), Void, (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
+      ccall((:fq_init2, :libflint), Void, 
+            (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
       finalizer(d, _fq_clear_fn)
       return d
    end
 
    function fq(ctx::FqFiniteField, x::Int)
       d = new()
-      ccall((:fq_init2, :libflint), Void, (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
+      ccall((:fq_init2, :libflint), Void, 
+            (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
       finalizer(d, _fq_clear_fn)
       ccall((:fq_set_si, :libflint), Void, 
                 (Ptr{fq}, Int, Ptr{FqFiniteField}), &d, x, &ctx)
       return d
    end
 
-   function fq(ctx::FqFiniteField, x::BigInt)
+   function fq(ctx::FqFiniteField, x::fmpz)
       d = new()
-      ccall((:fq_init2, :libflint), Void, (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
+      ccall((:fq_init2, :libflint), Void, 
+            (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
       finalizer(d, _fq_clear_fn)
-      temp = fmpz_readonly(x)
       ccall((:fq_set_fmpz, :libflint), Void, 
-                (Ptr{fq}, Ptr{fmpz_readonly}, Ptr{FqFiniteField}), &d, &temp, &ctx)
+            (Ptr{fq}, Ptr{fmpz}, Ptr{FqFiniteField}), &d, &x, &ctx)
+      return d
+   end
+
+   function fq(ctx::FqFiniteField, x::fq)
+      d = new()
+      ccall((:fq_init2, :libflint), Void, 
+            (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
+      finalizer(d, _fq_clear_fn)
+      ccall((:fq_set, :libflint), Void, 
+            (Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &d, &x, &ctx)
       return d
    end
 end
 
 function _fq_clear_fn(a::fq)
-   ccall((:fq_clear, :libflint), Void, (Ptr{fq}, Ptr{FqFiniteField}), &a, &a.parent)
+   ccall((:fq_clear, :libflint), Void, 
+         (Ptr{fq}, Ptr{FqFiniteField}), &a, &a.parent)
 end
 
-elem_type{S}(::FqFiniteField{S}) = fq{S}
+elem_type(::FqFiniteField) = fq
 
 base_ring(a::FqFiniteField) = None
 
@@ -98,25 +112,42 @@ function check_parent(a::fq, b::fq)
    a.parent != b.parent && error("Operations on distinct finite fields not supported")
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Basic manipulation
 #
-###########################################################################################
+###############################################################################
 
-function zero{S}(a::FqFiniteField{S})
+function hash(a::fq)
+   h = 0xb310fb6ea97e1f1a
+   for i in 1:degree(parent(a)) + 1
+         h $= hash(coeff(a, i))
+         h = (h << 1) | (h >> (sizeof(Int)*8 - 1))
+   end
+   return h
+end
+
+function coeff(x::fq, n::Int)
+   n < 0 && throw(DomainError())
+   temp = ZZ()
+   ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
+               (Ptr{fmpz}, Ptr{fq}, Int), &temp, &x, n)
+   return fmpz(temp)
+end
+
+function zero(a::FqFiniteField)
    d = a()
    ccall((:fq_zero, :libflint), Void, (Ptr{fq}, Ptr{FqFiniteField}), &d, &a)
    return d
 end
    
-function one{S}(a::FqFiniteField{S})
+function one(a::FqFiniteField)
    d = a()
    ccall((:fq_one, :libflint), Void, (Ptr{fq}, Ptr{FqFiniteField}), &d, &a)
    return d
 end
    
-function gen{S}(a::FqFiniteField{S})
+function gen(a::FqFiniteField)
    d = a()
    ccall((:fq_gen, :libflint), Void, (Ptr{fq}, Ptr{FqFiniteField}), &d, &a)
    return d
@@ -132,35 +163,42 @@ isunit(a::fq) = ccall((:fq_is_invertible, :libflint), Bool,
                      (Ptr{fq}, Ptr{FqFiniteField}), &a, &a.parent)
 
 function characteristic(a::FqFiniteField)
-   d = fmpz()
-   ccall((:__fq_ctx_prime, :libflint), Void, (Ptr{fmpz}, Ptr{FqFiniteField}), &d, &a)
-   r = BigInt(d)
-   return r
+   d = ZZ()
+   ccall((:__fq_ctx_prime, :libflint), Void, 
+         (Ptr{fmpz}, Ptr{FqFiniteField}), &d, &a)
+   return d
 end
    
 function order(a::FqFiniteField)
-   d = fmpz()
-   ccall((:fq_ctx_order, :libflint), Void, (Ptr{fmpz}, Ptr{FqFiniteField}), &d, &a)
-   r = BigInt(d)
-   return r
+   d = ZZ()
+   ccall((:fq_ctx_order, :libflint), Void, 
+         (Ptr{fmpz}, Ptr{FqFiniteField}), &d, &a)
+   return d
 end
    
 function degree(a::FqFiniteField)
    return ccall((:fq_ctx_degree, :libflint), Int, (Ptr{FqFiniteField},), &a)
 end
-###########################################################################################
+
+function deepcopy(d::fq)
+   z = fq(parent(d), d)
+   z.parent = parent(d)
+   return z
+end
+
+###############################################################################
 #
 #   Canonicalisation
 #
-###########################################################################################
+###############################################################################
 
 canonical_unit(x::fq) = x
 
-###########################################################################################
+###############################################################################
 #
 #   String I/O
 #
-###########################################################################################
+###############################################################################
 
 function show(io::IO, x::fq)
    cstr = ccall((:fq_get_str_pretty, :libflint), Ptr{Uint8}, 
@@ -172,20 +210,21 @@ function show(io::IO, x::fq)
 end
 
 function show(io::IO, a::FqFiniteField)
-   print(io, "Finite field of degree ", degree(a), " over F_", characteristic(a))
+   print(io, "Finite field of degree ", degree(a))
+   print(io, " over F_", characteristic(a))
 end
 
 needs_parentheses(x::fq) = x.length > 1
 
 is_negative(x::fq) = false
 
-show_minus_one{S}(::Type{fq{S}}) = true
+show_minus_one(::Type{fq}) = true
 
-###########################################################################################
+###############################################################################
 #
 #   Unary operations
 #
-###########################################################################################
+###############################################################################
 
 function -(x::fq)
    z = parent(x)()
@@ -194,41 +233,41 @@ function -(x::fq)
    return z
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Binary operations
 #
-###########################################################################################
+###############################################################################
 
-function +{S}(x::fq{S}, y::fq{S})
+function +(x::fq, y::fq)
    check_parent(x, y)
    z = parent(y)()
    ccall((:fq_add, :libflint), Void, 
-         (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &x, &y, &y.parent)
+        (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &x, &y, &y.parent)
    return z
 end
 
-function -{S}(x::fq{S}, y::fq{S})
+function -(x::fq, y::fq)
    check_parent(x, y)
    z = parent(y)()
    ccall((:fq_sub, :libflint), Void, 
-         (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &x, &y, &y.parent)
+        (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &x, &y, &y.parent)
    return z
 end
 
-function *{S}(x::fq{S}, y::fq{S})
+function *(x::fq, y::fq)
    check_parent(x, y)
    z = parent(y)()
    ccall((:fq_mul, :libflint), Void, 
-         (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &x, &y, &y.parent)
+        (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &x, &y, &y.parent)
    return z
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Ad hoc binary operators
 #
-###########################################################################################
+###############################################################################
 
 function *(x::Int, y::fq)
    z = parent(y)()
@@ -237,25 +276,25 @@ function *(x::Int, y::fq)
    return z
 end
 
-*(x::Integer, y::fq) = BigInt(x)*y
+*(x::Integer, y::fq) = ZZ(x)*y
 
 *(x::fq, y::Integer) = y*x
 
-function *(x::BigInt, y::fq)
+function *(x::fmpz, y::fq)
    z = parent(y)()
-   temp = fmpz_readonly(x)
    ccall((:fq_mul_fmpz, :libflint), Void, 
-         (Ptr{fq}, Ptr{fq}, Ptr{fmpz_readonly}, Ptr{FqFiniteField}), &z, &y, &temp, &y.parent)
+         (Ptr{fq}, Ptr{fq}, Ptr{fmpz}, Ptr{FqFiniteField}), 
+                                            &z, &y, &x, &y.parent)
    return z
 end
 
-*(x::fq, y::BigInt) = y*x
+*(x::fq, y::fmpz) = y*x
 
-###########################################################################################
+###############################################################################
 #
 #   Powering
 #
-###########################################################################################
+###############################################################################
 
 function ^(x::fq, y::Int)
    if y < 0
@@ -268,50 +307,50 @@ function ^(x::fq, y::Int)
    return z
 end
 
-function ^(x::fq, y::BigInt)
+function ^(x::fq, y::fmpz)
    if y < 0
       x = inv(x)
       y = -y
    end
    z = parent(x)()
-   temp = fmpz_readonly(y)
    ccall((:fq_pow, :libflint), Void, 
-         (Ptr{fq}, Ptr{fq}, Ptr{fmpz_readonly}, Ptr{FqFiniteField}), &z, &x, &temp, &x.parent)
+         (Ptr{fq}, Ptr{fq}, Ptr{fmpz}, Ptr{FqFiniteField}),
+                                            &z, &x, &y, &x.parent)
    return z
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Comparison
 #
-###########################################################################################
+###############################################################################
 
-function =={S}(x::fq{S}, y::fq{S}) 
+function ==(x::fq, y::fq) 
    check_parent(x, y)
    ccall((:fq_equal, :libflint), Bool, 
          (Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &x, &y, &y.parent)
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Exact division
 #
-###########################################################################################
+###############################################################################
 
-function divexact{S}(x::fq{S}, y::fq{S})
+function divexact(x::fq, y::fq)
    check_parent(x, y)
    iszero(y) && throw(DivideError())
    z = parent(y)()
    ccall((:fq_div, :libflint), Void, 
-         (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &x, &y, &y.parent)
+        (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &x, &y, &y.parent)
    return z
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Inversion
 #
-###########################################################################################
+###############################################################################
 
 function inv(x::fq)
    iszero(x) && throw(DivideError())
@@ -321,11 +360,11 @@ function inv(x::fq)
    return z
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Special functions
 #
-###########################################################################################
+###############################################################################
 
 function pth_root(x::fq)
    z = parent(x)()
@@ -335,23 +374,17 @@ function pth_root(x::fq)
 end
 
 function trace(x::fq)
-   z = fmpz()
-   init(z)
+   z = ZZ()
    ccall((:fq_trace, :libflint), Void, 
          (Ptr{fmpz}, Ptr{fq}, Ptr{FqFiniteField}), &z, &x, &x.parent)
-   r = BigInt(z)
-   clear(z)
-   return parent(x)(r)
+   return parent(x)(z)
 end
 
 function norm(x::fq)
-   z = fmpz()
-   init(z)
+   z = ZZ()
    ccall((:fq_norm, :libflint), Void, 
          (Ptr{fmpz}, Ptr{fq}, Ptr{FqFiniteField}), &z, &x, &x.parent)
-   r = BigInt(z)
-   clear(z)
-   return parent(x)(r)
+   return parent(x)(z)
 end
 
 function frobenius(x::fq, n = 1)
@@ -361,74 +394,76 @@ function frobenius(x::fq, n = 1)
    return z
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Unsafe functions
 #
-###########################################################################################
+###############################################################################
 
 function mul!(z::fq, x::fq, y::fq)
    ccall((:fq_mul, :libflint), Void, 
-         (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &x, &y, &y.parent)
+        (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &x, &y, &y.parent)
 end
 
 function addeq!(z::fq, x::fq)
    ccall((:fq_add, :libflint), Void, 
-         (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &z, &x, &x.parent)
+        (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &z, &x, &x.parent)
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Promotions
 #
-###########################################################################################
+###############################################################################
 
-Base.promote_rule{S, T <: Integer}(::Type{fq{S}}, ::Type{T}) = fq{S}
+Base.promote_rule{T <: Integer}(::Type{fq}, ::Type{T}) = fq
 
-Base.promote_rule{S}(::Type{fq{S}}, ::Type{BigInt}) = fq{S}
+Base.promote_rule(::Type{fq}, ::Type{fmpz}) = fq
 
-###########################################################################################
+###############################################################################
 #
 #   Parent object call overload
 #
-###########################################################################################
+###############################################################################
 
-function Base.call{S}(a::FqFiniteField{S})
-   z = fq{S}(a)
+function Base.call(a::FqFiniteField)
+   z = fq(a)
    z.parent = a
    return z
 end
 
-Base.call{S}(a::FqFiniteField{S}, b::Integer) = a(BigInt(b))
+Base.call(a::FqFiniteField, b::Integer) = a(ZZ(b))
 
-function Base.call{S}(a::FqFiniteField{S}, b::Int)
-   z = fq{S}(a, b)
+function Base.call(a::FqFiniteField, b::Int)
+   z = fq(a, b)
    z.parent = a
    return z
 end
 
-function Base.call{S}(a::FqFiniteField{S}, b::BigInt)
-   z = fq{S}(a, b)
+function Base.call(a::FqFiniteField, b::fmpz)
+   z = fq(a, b)
    z.parent = a
    return z
 end
 
-function Base.call{S}(a::FqFiniteField{S}, b::fq{S})
+function Base.call(a::FqFiniteField, b::fq)
    parent(b) != a && error("Coercion between finite fields not implemented")
    return b
 end
 
-###########################################################################################
+###############################################################################
 #
 #   FiniteField constructor
 #
-###########################################################################################
+###############################################################################
 
-function FiniteField(char::BigInt, deg::Int, s::String)
+function FiniteField(char::fmpz, deg::Int, s::String)
    S = symbol(s)
-   parent_obj = FqFiniteField{S}(char, deg)
+   parent_obj = FqFiniteField(char, deg, S)
 
    return parent_obj, gen(parent_obj) 
 end
 
-FiniteField(char::Integer, deg::Int, s::String) = FiniteField(BigInt(char), deg, s)
+function FiniteField(char::Integer, deg::Int, s::String)
+   return FiniteField(ZZ(char), deg, s)
+end

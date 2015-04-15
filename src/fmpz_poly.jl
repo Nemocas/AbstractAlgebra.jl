@@ -119,10 +119,10 @@ length(x::fmpz_poly) = ccall((:fmpz_poly_length, :libflint), Int,
 
 function coeff(x::fmpz_poly, n::Int)
    n < 0 && throw(DomainError())
-   temp = ZZ()
+   a = ZZ()
    ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
-               (Ptr{fmpz}, Ptr{fmpz_poly}, Int), &temp, &x, n)
-   return fmpz(temp)
+               (Ptr{fmpz}, Ptr{fmpz_poly}, Int), &z, &x, n)
+   return z
 end
 
 zero(a::FmpzPolyRing) = a(0)
@@ -292,17 +292,17 @@ end
 
 *(x::fmpz_poly, y::fmpz) = y*x
 
-+(x::Integer, y::fmpz_poly) = y + fmpz(x)
++(x::Integer, y::fmpz_poly) = y + ZZ(x)
 
--(x::Integer, y::fmpz_poly) = fmpz(x) - y
+-(x::Integer, y::fmpz_poly) = ZZ(x) - y
 
-*(x::Integer, y::fmpz_poly) = fmpz(x)*y
+*(x::Integer, y::fmpz_poly) = ZZ(x)*y
 
-+(x::fmpz_poly, y::Integer) = x + fmpz(y)
++(x::fmpz_poly, y::Integer) = x + ZZ(y)
 
--(x::fmpz_poly, y::Integer) = x - fmpz(y)
+-(x::fmpz_poly, y::Integer) = x - ZZ(y)
 
-*(x::fmpz_poly, y::Integer) = fmpz(y)*x
+*(x::fmpz_poly, y::Integer) = ZZ(y)*x
 
 ###############################################################################
 #
@@ -351,7 +351,7 @@ function ==(x::fmpz_poly, y::fmpz)
    end 
 end
 
-==(x::fmpz_poly, y::Integer) = x == fmpz(y)
+==(x::fmpz_poly, y::Integer) = x == ZZ(y)
 
 ###############################################################################
 #
@@ -455,7 +455,7 @@ function divexact(x::fmpz_poly, y::Int)
    return z
 end
 
-divexact(x::fmpz_poly, y::Integer) = divexact(x, fmpz(y)) 
+divexact(x::fmpz_poly, y::Integer) = divexact(x, ZZ(y)) 
 
 ###############################################################################
 #
@@ -511,10 +511,10 @@ function gcd(x::fmpz_poly, y::fmpz_poly)
 end
 
 function content(x::fmpz_poly)
-   temp = ZZ()
+   z = ZZ()
    ccall((:fmpz_poly_content, :libflint), Void,
-         (Ptr{fmpz}, Ptr{fmpz_poly}), &temp, &x)
-   return fmpz(temp)
+         (Ptr{fmpz}, Ptr{fmpz_poly}), &z, &x)
+   return z
 end
 
 function primpart(x::fmpz_poly)
@@ -534,10 +534,10 @@ function evaluate(x::fmpz_poly, y::fmpz)
    z = ZZ()
    ccall((:fmpz_poly_evaluate_fmpz, :libflint), Void, 
         (Ptr{fmpz}, Ptr{fmpz_poly}, Ptr{fmpz}), &z, &x, &y)
-   return fmpz(z)
+   return z
 end
 
-evaluate(x::fmpz_poly, y::Integer) = evaluate(x, fmpz(y))
+evaluate(x::fmpz_poly, y::Integer) = evaluate(x, ZZ(y))
 
 ###############################################################################
 #
@@ -574,10 +574,10 @@ end
 
 function resultant(x::fmpz_poly, y::fmpz_poly)
    check_parent(x, y)
-   temp = ZZ()
+   z = ZZ()
    ccall((:fmpz_poly_resultant, :libflint), Void, 
-                (Ptr{fmpz}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &temp, &x, &y)
-   return fmpz(temp)
+                (Ptr{fmpz}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y)
+   return z
 end
 
 ###############################################################################
@@ -587,10 +587,10 @@ end
 ###############################################################################
 
 function discriminant(x::fmpz_poly)
-   temp = ZZ()
+   z = ZZ()
    ccall((:fmpz_poly_discriminant, :libflint), Void, 
-                (Ptr{fmpz}, Ptr{fmpz_poly}), &temp, &x)
-   return fmpz(temp)
+                (Ptr{fmpz}, Ptr{fmpz_poly}), &z, &x)
+   return z
 end
 
 ###############################################################################
@@ -604,7 +604,7 @@ function gcdx(a::fmpz_poly, b::fmpz_poly)
    lena = length(a)
    lenb = length(b)
    (lena <= 1 || lenb <= 1) && error("Constant polynomial in gcdx")  
-   temp = ZZ()
+   z = ZZ()
    u = parent(a)()
    v = parent(a)()
    c1 = content(a)
@@ -613,11 +613,11 @@ function gcdx(a::fmpz_poly, b::fmpz_poly)
    y = divexact(b, c2)
    ccall((:fmpz_poly_xgcd_modular, :libflint), Void, 
    (Ptr{fmpz}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), 
-            &temp, &u, &v, &x, &y)
-   z = fmpz(temp)*c1^(lenb - 1)*c2^(lena - 1)
+            &z, &u, &v, &x, &y)
+   r = z*c1^(lenb - 1)*c2^(lena - 1)
    u *= c1^(lenb - 2)*c2^(lena - 1)
    v *= c1^(lenb - 1)*c2^(lena - 2)   
-   return (z, u, v)
+   return (r, u, v)
 end
 
 ###############################################################################
@@ -673,7 +673,7 @@ function Base.call(a::FmpzPolyRing, b::Int)
 end
 
 function Base.call(a::FmpzPolyRing, b::Integer)
-   z = fmpz_poly(fmpz(b))
+   z = fmpz_poly(ZZ(b))
    z.parent = a
    return z
 end
