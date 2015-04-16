@@ -20,6 +20,8 @@
 ##         over rationals
 ## FIXME : should Fraction only use canonical_unit when printing?
 ## FIXME : Pari integer conversion from fmpz is not efficient
+## FIXME : ZZ! in pari_frac.jl should not be needed, call ZZ! in pari_int 
+##         once Julia supports it
 
 export fmpz_poly
 

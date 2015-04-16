@@ -961,15 +961,15 @@ function ^{T <: Ring, S}(a::PowerSeries{T, S}, b::Int)
    elseif b == 0
       return PowerSeries(PowerSeries{T, S}, [T(1)], nothing)
    else
-      bit = ~((~uint(0)) >> 1)
-      while (uint(bit) & b) == 0
+      bit = ~((~Uint(0)) >> 1)
+      while (Uint(bit) & b) == 0
          bit >>= 1
       end
       z = a
       bit >>= 1
       while bit !=0
          z = z*z
-         if (uint(bit) & b) != 0
+         if (Uint(bit) & b) != 0
             z *= a
          end
          bit >>= 1

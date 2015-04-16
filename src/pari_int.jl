@@ -1,14 +1,14 @@
-###########################################################################################
+###############################################################################
 #
 #   pari_int.jl : functions for t_INT objects
 #
-###########################################################################################
+###############################################################################
 
-###########################################################################################
+###############################################################################
 #
 #   Constructors
 #
-###########################################################################################
+###############################################################################
 
 type PariIntegerRing <: PariRing
 end
@@ -19,31 +19,34 @@ type pari_int <: RingElem
    d::Ptr{Int}
 
    function pari_int(s::Int)
-      g = new(ccall((:pari_malloc, :libpari), Ptr{Int}, (Int,), s*BITS_IN_WORD))
+      g = new(ccall((:pari_malloc, :libpari), Ptr{Int}, 
+                    (Int,), s*BITS_IN_WORD))
       finalizer(g, _pari_int_clear_fn)
       return g
    end
 end
 
-_pari_int_clear_fn(g::pari_int) = ccall((:pari_free, :libpari), Void, (Ptr{Uint},), g.d)
+function _pari_int_clear_fn(g::pari_int)
+   ccall((:pari_free, :libpari), Void, (Ptr{Uint},), g.d)
+end
 
 parent(a::pari_int) = PariZZ
 
-###########################################################################################
+###############################################################################
 #
 #   Basic manipulation
 #
-###########################################################################################
+###############################################################################
 
 size(a::pari_int) = (unsafe_load(a.d, 1) & LGBITS) - 2
 
 sign(a::pari_int) = signe(unsafe_load(a.d, 2))
 
-###########################################################################################
+###############################################################################
 #
 #   String I/O
 #
-###########################################################################################
+###############################################################################
 
 function show(io :: IO, a :: PariIntegerRing)
    print(io, "Integer Ring")
@@ -51,11 +54,11 @@ end
 
 show(io::IO, x::pari_int) = pari_print(io, x.d)
 
-###########################################################################################
+###############################################################################
 #
 #   Conversions to from BigInt
 #
-###########################################################################################
+###############################################################################
 
 gensize(a::fmpz) = words(a) + 2
 
@@ -86,12 +89,15 @@ function ZZ!(z::fmpz, g::Ptr{Int})
    if s == 0
       ccall((:fmpz_zero, :libflint), Void, (Ptr{fmpz},), &z)
    elseif s == 1
-      ccall((:fmpz_set_ui, :libflint), Void, (Ptr{fmpz}, Int), &z, unsafe_load(g, 3))
+      ccall((:fmpz_set_ui, :libflint), Void, 
+            (Ptr{fmpz}, Int), &z, unsafe_load(g, 3))
    else
       a = ccall((:_fmpz_promote, :libflint), Ptr{BigInt}, (Ptr{fmpz},), &z)
-      ccall((:__gmpz_realloc2, :libgmp), Void, (Ptr{BigInt}, Int), a, s*BITS_IN_WORD)
+      ccall((:__gmpz_realloc2, :libgmp), Void, 
+            (Ptr{BigInt}, Int), a, s*BITS_IN_WORD)
       for i in 1:s
-         unsafe_store!(reinterpret(Ptr{UInt}, unsafe_load(reinterpret(Ptr{Int}, a), data_offset)), 
+         unsafe_store!(reinterpret(Ptr{UInt}, 
+                       unsafe_load(reinterpret(Ptr{Int}, a), data_offset)), 
                        reinterpret(UInt, unsafe_load(g, i + 2)), i)
       end
       unsafe_store!(reinterpret(Ptr{Cint}, a), Cint(s), 2)
@@ -107,11 +113,11 @@ function call(::IntegerRing, g::pari_int)
    return z
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Factorisation
 #
-###########################################################################################
+###############################################################################
 
 function factor(n::pari_int)
    av = unsafe_load(avma, 1)
@@ -121,11 +127,11 @@ function factor(n::pari_int)
    return fac
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Parent object call overloads
 #
-###########################################################################################
+###############################################################################
 
 function Base.call(ord::PariIntegerRing, n::Ptr{Int})
    return ZZ!(ZZ(), n)

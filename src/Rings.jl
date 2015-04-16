@@ -201,7 +201,7 @@ include("PariRings.jl")
 
 include("Fields.jl")
 
-# include("PariFields.jl")
+include("PariFields.jl")
 
 # include("Poly2.jl")
 

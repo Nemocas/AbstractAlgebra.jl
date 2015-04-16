@@ -113,7 +113,7 @@ one(::IntegerRing) = ZZ(1)
 
 zero(::IntegerRing) = ZZ(0)
 
-sign(a::fmpz) = int(ccall((:fmpz_sgn, :libflint), Cint, (Ptr{fmpz},), &a))
+sign(a::fmpz) = Int(ccall((:fmpz_sgn, :libflint), Cint, (Ptr{fmpz},), &a))
 
 fits(::Type{Int}, a::fmpz) = ccall((:fmpz_fits_si, :libflint), Bool, 
                                    (Ptr{fmpz},), &a)
@@ -121,7 +121,7 @@ fits(::Type{Int}, a::fmpz) = ccall((:fmpz_fits_si, :libflint), Bool,
 fits(::Type{Uint}, a::fmpz) = sign(a) < 0 ? false : 
               ccall((:fmpz_abs_fits_ui, :libflint), Bool, (Ptr{fmpz},), &a)
 
-size(a::fmpz) = int(ccall((:fmpz_size, :libflint), Cint, (Ptr{fmpz},), &a))
+size(a::fmpz) = Int(ccall((:fmpz_size, :libflint), Cint, (Ptr{fmpz},), &a))
 
 isunit(a::fmpz) = ccall((:fmpz_is_pm1, :libflint), Bool, (Ptr{fmpz},), &a)
 
@@ -425,7 +425,7 @@ function ^(x::fmpz, y::Int)
     if y > typemax(Uint); throw(DomainError()); end
     if y == 0; return one(ZZ); end
     if y == 1; return x; end
-    return x^uint(y)
+    return x^Uint(y)
 end
 
 ###############################################################################
@@ -607,7 +607,7 @@ end
 ###############################################################################
 
 function cmp(x::fmpz, y::fmpz)
-    int(ccall((:fmpz_cmp, :libflint), Cint, 
+    Int(ccall((:fmpz_cmp, :libflint), Cint, 
               (Ptr{fmpz}, Ptr{fmpz}), &x, &y))
 end
 
@@ -622,7 +622,7 @@ end
 >(x::fmpz, y::fmpz) = cmp(x,y) > 0
 
 function cmpabs(x::fmpz, y::fmpz)
-    int(ccall((:fmpz_cmpabs, :libflint), Cint, 
+    Int(ccall((:fmpz_cmpabs, :libflint), Cint, 
               (Ptr{fmpz}, Ptr{fmpz}), &x, &y))
 end
 
@@ -633,7 +633,7 @@ end
 ###############################################################################
 
 function cmp(x::fmpz, y::Int)
-    int(ccall((:fmpz_cmp_si, :libflint), Cint, (Ptr{fmpz}, Int), &x, y))
+    Int(ccall((:fmpz_cmp_si, :libflint), Cint, (Ptr{fmpz}, Int), &x, y))
 end
 
 ==(x::fmpz, y::Int) = cmp(x,y) == 0
@@ -662,7 +662,7 @@ end
 #
 ###############################################################################
 
-popcount(x::fmpz) = int(ccall((:fmpz_popcnt, :libflint), Culong, 
+popcount(x::fmpz) = Int(ccall((:fmpz_popcnt, :libflint), Culong, 
                               (Ptr{fmpz},), &x))
 
 prevpow2(x::fmpz) = x < 0 ? -prevpow2(-x) :
@@ -875,14 +875,14 @@ end
 
 function moebiusmu(x::fmpz) 
    x < 0 && throw(DomainError())
-   return int(ccall((:fmpz_moebius_mu, :libflint), Cint, 
+   return Int(ccall((:fmpz_moebius_mu, :libflint), Cint, 
                     (Ptr{fmpz},), &x))
 end
 
 function jacobi(x::fmpz, y::fmpz) 
    y <= x && throw(DomainError())
    x < 0 && throw(DomainError())
-   return int(ccall((:fmpz_jacobi, :libflint), Cint, 
+   return Int(ccall((:fmpz_jacobi, :libflint), Cint, 
                     (Ptr{fmpz}, Ptr{fmpz}), &x, &y))
 end
 
@@ -938,13 +938,13 @@ function base(n::fmpz, b::Integer)
     2 <= b <= 62 || error("invalid base: $b")
     p = ccall((:fmpz_get_str,:libflint), Ptr{Uint8}, 
               (Ptr{Uint8}, Cint, Ptr{fmpz}), C_NULL, b, &n)
-    len = int(ccall(:strlen, Csize_t, (Ptr{Uint8},), p))
+    len = Int(ccall(:strlen, Csize_t, (Ptr{Uint8},), p))
     ASCIIString(pointer_to_array(p, len, true))
 end
 
 function ndigits_internal(x::fmpz, b::Integer = 10)
     # fmpz_sizeinbase might return an answer 1 too big
-    n = int(ccall((:fmpz_sizeinbase, :libflint), Culong, 
+    n = Int(ccall((:fmpz_sizeinbase, :libflint), Culong, 
                   (Ptr{fmpz}, Int32), &x, b))
     abs(x) < ZZ(b)^(n - 1) ? n - 1 : n
 end
