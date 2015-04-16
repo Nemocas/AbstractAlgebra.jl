@@ -138,7 +138,7 @@ isgen(x::fmpz_poly) = ccall((:fmpz_poly_is_x, :libflint), Bool,
 
 function deepcopy(a::fmpz_poly)
    z = fmpz_poly(a)
-   z.parent = a.parent
+   z.parent = parent(a)
    return z
 end
 
