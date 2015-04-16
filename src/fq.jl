@@ -129,10 +129,10 @@ end
 
 function coeff(x::fq, n::Int)
    n < 0 && throw(DomainError())
-   temp = ZZ()
+   z = ZZ()
    ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
-               (Ptr{fmpz}, Ptr{fq}, Int), &temp, &x, n)
-   return fmpz(temp)
+               (Ptr{fmpz}, Ptr{fq}, Int), &z, &x, n)
+   return z
 end
 
 function zero(a::FqFiniteField)
