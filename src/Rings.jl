@@ -205,7 +205,7 @@ include("PariFields.jl")
 
 include("Poly2.jl")
 
-# include("pari_poly2.jl")
+include("pari_poly2.jl")
 
 # include("NumberFields.jl")
 
