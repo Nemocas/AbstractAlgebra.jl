@@ -211,7 +211,7 @@ include("NumberFields.jl")
 
 include("MaximalOrders.jl")
 
-# include("PariIdeal.jl")
+include("PariIdeal.jl")
 
 include("Factor.jl")
 

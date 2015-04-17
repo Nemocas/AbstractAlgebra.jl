@@ -29,6 +29,8 @@ end
 
 _pari_maximal_order_elem_clear_fn(a::PariMaximalOrderElem) = gunclone(a.data)
 
+parent(a::PariMaximalOrderElem) = a.parent
+
 ###############################################################################
 #
 #   Untyped low-level Pari functions
