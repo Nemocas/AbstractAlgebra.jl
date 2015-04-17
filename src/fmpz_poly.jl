@@ -22,6 +22,11 @@
 ## FIXME : Pari integer conversion from fmpz is not efficient
 ## FIXME : ZZ! in pari_frac.jl should not be needed, call ZZ! in pari_int 
 ##         once Julia supports it
+## FIXME : The following doesn't work: 
+##            R, x = PolynomialRing(ZZ, "x")
+##            pari(x)
+##            R, x = PolynomialRing(QQ, "x")
+##            pari(x)
 
 export fmpz_poly
 
@@ -121,7 +126,7 @@ length(x::fmpz_poly) = ccall((:fmpz_poly_length, :libflint), Int,
 
 function coeff(x::fmpz_poly, n::Int)
    n < 0 && throw(DomainError())
-   a = ZZ()
+   z = ZZ()
    ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
                (Ptr{fmpz}, Ptr{fmpz_poly}, Int), &z, &x, n)
    return z

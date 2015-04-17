@@ -72,7 +72,7 @@ end
 
 function Base.call(ord::PariPolyRing{PariRationalField}, n::Ptr{Int})
    pol = pari_poly{PariRationalField}(n)
-   pol.parent = PariPolyRing{PariRationalField}(PariQQ)
+   pol.parent = PariPolyRing{PariRationalField}(PariQQ, var(ord))
    return pol
 end
 

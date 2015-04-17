@@ -105,6 +105,7 @@ function ZZ!(z::fmpz, g::Ptr{Int})
    if sgn < 0
       ccall((:fmpz_neg, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), &z, &z)
    end
+   return z
 end
 
 function call(::IntegerRing, g::pari_int)

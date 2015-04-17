@@ -15,12 +15,12 @@ function getindex(a::Factor{IntegerRing}, i::Int)
    return ZZ(p), n
 end
 
-function getindex{S}(a::Factor{FmpzPolyRing{S}}, i::Int)
+function getindex(a::Factor{FmpzPolyRing}, i::Int)
    p, n = a.d[i]
    return a.parent(p), n
 end
 
-function getindex{S}(a::Factor{FmpqPolyRing{S}}, i::Int)
+function getindex(a::Factor{FmpqPolyRing}, i::Int)
    p, n = a.d[i]
    return a.parent(p), n
 end
@@ -36,17 +36,20 @@ function show(io::IO, a::Factor)
    print(io, "]")
 end
 
-function factor(n::BigInt)
+function factor(n::fmpz)
    f = factor(pari(n))
    return Factor{IntegerRing}(f, f.len, ZZ)
 end
 
-function factor{S}(g::fmpz_poly{S})
-   f = factor(pari(g))
-   return Factor{FmpzPolyRing{S}}(f, f.len, g.parent)
+function factor(g::fmpz_poly)
+   h = pari(g)
+   f = factor(h)
+   return Factor{FmpzPolyRing}(f, f.len, g.parent)
 end
-function factor{S}(g::fmpq_poly{S})
-   f = factor(pari(g))
-   return Factor{FmpqPolyRing{S}}(f, f.len, g.parent)
+
+function factor(g::fmpq_poly)
+   h = pari(g)
+   f = factor(h)
+   return Factor{FmpqPolyRing}(f, f.len, g.parent)
 end
 

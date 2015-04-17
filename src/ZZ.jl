@@ -1012,3 +1012,6 @@ function BigInt(z::fmpz)
 end
 
 convert(::Type{BigInt}, a::fmpz) = BigInt(a)
+
+Int(a::fmpz) = ccall((:fmpz_get_si, :libflint), Int, (Ptr{fmpz},), &a)
+

@@ -155,7 +155,7 @@ end
 
 function Base.call(ord::PariPolyRing{PariIntegerRing}, n::Ptr{Int})
    pol = pari_poly{PariIntegerRing}(n)
-   pol.parent = PariPolyRing{PariIntegerRing}(PariZZ)
+   pol.parent = PariPolyRing{PariIntegerRing}(PariZZ, var(ord))
    return pol
 end
 

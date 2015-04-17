@@ -213,7 +213,7 @@ include("NumberFields.jl")
 
 # include("PariIdeal.jl")
 
-# include("Factor.jl")
+include("Factor.jl")
 
 ###############################################################################
 #
