@@ -5,9 +5,9 @@ pkgdir = Pkg.dir("Nemo")
 on_windows = @windows ? true : false
 
 if on_windows
-   push!(DL_LOAD_PATH, "$pkgdir\\src\\lib")
+   push!(Libdl.DL_LOAD_PATH, "$pkgdir\\src\\lib")
 else
-   push!(DL_LOAD_PATH, "$pkgdir/src/lib")
+   push!(Libdl.DL_LOAD_PATH, "$pkgdir/src/lib")
 end
 
 ccall((:pari_init, :libpari), Void, (Int, Int), 1000000000, 10000)

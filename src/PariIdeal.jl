@@ -1,25 +1,35 @@
-###########################################################################################
+###############################################################################
 #
 #   PariIdeal.jl : Pari ideals in the maximal order (for now)
 #
-###########################################################################################
+###############################################################################
 
-export approx, coprime_multiplier, intersect, bounded_ideals,
-       numden, prime_decomposition, LLL_reduce, valuation, factor, factor_mul, ideal
+export approx, coprime_multiplier, intersect, bounded_ideals, numden, 
+       prime_decomposition, LLL_reduce, valuation, factor, factor_mul, ideal
 
-###########################################################################################
+###############################################################################
 #
 #   Types and memory management
 #
-###########################################################################################
+###############################################################################
 
-type PariIdealSet{S, T} <: PariSet
-   order::PariMaximalOrder{S, T}
+PariIdealSetID = ObjectIdDict()
+
+type PariIdealSet <: PariSet
+   order::PariMaximalOrder
+
+   function PariIdealSet(ord::PariMaximalOrder)
+      return try
+         PariIdealSetID[ord]
+      catch
+         PariIdealSetID[ord] = new(ord)
+      end
+   end
 end
 
-type PariIdeal{S, T} <: PariSet
+type PariIdeal <: PariSet
    ideal::Ptr{Int}
-   parent::PariIdealSet{S, T}
+   parent::PariIdealSet
 
    function PariIdeal(a::Ptr{Int}, par::PariIdealSet)
       r = new(gclone(a), par)
@@ -32,48 +42,52 @@ _pari_ideal_clear_fn(a::PariIdeal) = gunclone(a.ideal)
 
 parent(a::PariIdeal) = a.parent
 
-###########################################################################################
+function check_parent(a::PariIdeal, b::PariIdeal) 
+   a.parent != b.parent && error("Incompatible ideals in ideal operation")
+end
+
+###############################################################################
 #
 #   Ideals of bounded norm
 #
-###########################################################################################
+###############################################################################
 
-function bounded_ideals{S, T}(ord::PariMaximalOrder{S, T}, bound::Int)
+function bounded_ideals(ord::PariMaximalOrder, bound::Int)
    av = unsafe_load(avma, 1)
    vec = ccall((:ideallist0, :libpari), Ptr{Int},
                (Ptr{Int}, Int, Int), ord.pari_nf.data, bound, 4)
-   vec_type = pari_vec{PariIdeal{S, T}}
+   vec_type = pari_vec{PariIdeal}
    A = Array(vec_type, bound)
    for i = 1:bound
-      A[i] = vec_type(pari_load(vec, i + 1), PariIdealSet{S, T}(ord))
+      A[i] = vec_type(pari_load(vec, i + 1), PariIdealSet(ord))
    end
    unsafe_store!(avma, av, 1)
    return A
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Prime decomposition
 #
-###########################################################################################
+###############################################################################
 
-function prime_decomposition{S, T}(ord::PariMaximalOrder{S, T}, p::BigInt)
+function prime_decomposition(ord::PariMaximalOrder, p::fmpz)
    av = unsafe_load(avma, 1)
    pr = pari(p)
    vec = ccall((:idealprimedec, :libpari), Ptr{Int},
                (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pr.d)
-   return pari_vec{PariIdeal{S, T}}(vec, PariIdealSet{S, T}(ord))
+   return pari_vec{PariIdeal}(vec, PariIdealSet(ord))
 end
 
-function prime_decomposition{S, T}(ord::PariMaximalOrder{S, T}, p::Integer)
-   return prime_decomposition(ord, BigInt(p))
+function prime_decomposition(ord::PariMaximalOrder, p::Integer)
+   return prime_decomposition(ord, ZZ(p))
 end
 
-###########################################################################################
+###############################################################################
 #
 #   String I/O
 #
-###########################################################################################
+###############################################################################
 
 function show(io::IO, s::PariIdealSet)
    print(io, "Set of ideals of ")
@@ -88,13 +102,13 @@ function show(io::IO, id::PariIdeal)
    unsafe_store!(avma, av, 1)
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Ideal norm
 #
-###########################################################################################
+###############################################################################
 
-function norm{S, T}(a::PariIdeal{S, T})
+function norm(a::PariIdeal)
    av = unsafe_load(avma, 1)
    n = ccall((:idealnorm, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}), a.parent.order.pari_nf.data, a.ideal)
@@ -104,105 +118,116 @@ function norm{S, T}(a::PariIdeal{S, T})
    return r
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Binary operations
 #
-###########################################################################################
+###############################################################################
 
-function *{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
+function *(a::PariIdeal, b::PariIdeal)
+   check_parent(a, b)
    av = unsafe_load(avma, 1)
    r = ccall((:idealmul, :libpari), Ptr{Int}, 
-             (Ptr{Int}, Ptr{Int}, Ptr{Int}), a.parent.order.pari_nf.data, a.ideal, b.ideal)
+             (Ptr{Int}, Ptr{Int}, Ptr{Int}), 
+                   a.parent.order.pari_nf.data, a.ideal, b.ideal)
    unsafe_store!(avma, av, 1)
-   return PariIdeal{S, T}(r, a.parent)
+   return PariIdeal(r, a.parent)
 end
 
-function +{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
+function +(a::PariIdeal, b::PariIdeal)
+   check_parent(a, b)
    av = unsafe_load(avma, 1)
    r = ccall((:idealadd, :libpari), Ptr{Int}, 
-             (Ptr{Int}, Ptr{Int}, Ptr{Int}), a.parent.order.pari_nf.data, a.ideal, b.ideal)
+             (Ptr{Int}, Ptr{Int}, Ptr{Int}), 
+                   a.parent.order.pari_nf.data, a.ideal, b.ideal)
    unsafe_store!(avma, av, 1)
-   return PariIdeal{S, T}(r, a.parent)
+   return PariIdeal(r, a.parent)
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Powering
 #
-###########################################################################################
+###############################################################################
 
-function ^{S, T}(a::PariIdeal{S, T}, n::Int)
+function ^(a::PariIdeal, n::Int)
    av = unsafe_load(avma, 1)
    r = ccall((:idealpows, :libpari), Ptr{Int}, 
-             (Ptr{Int}, Ptr{Int}, Int), a.parent.order.pari_nf.data, a.ideal, n)
+             (Ptr{Int}, Ptr{Int}, Int), 
+                   a.parent.order.pari_nf.data, a.ideal, n)
    unsafe_store!(avma, av, 1)
-   return PariIdeal{S, T}(r, a.parent)
+   return PariIdeal(r, a.parent)
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Ideal intersection
 #
-###########################################################################################
+###############################################################################
 
-function intersect{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
+function intersect(a::PariIdeal, b::PariIdeal)
+   check_parent(a, b)
    av = unsafe_load(avma, 1)
    r = ccall((:idealintersect, :libpari), Ptr{Int}, 
-             (Ptr{Int}, Ptr{Int}, Ptr{Int}), a.parent.order.pari_nf.data, a.ideal, b.ideal)
+             (Ptr{Int}, Ptr{Int}, Ptr{Int}), 
+                   a.parent.order.pari_nf.data, a.ideal, b.ideal)
    unsafe_store!(avma, av, 1)
-   return PariIdeal{S, T}(r, a.parent)
+   return PariIdeal(r, a.parent)
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Exact division
 #
-###########################################################################################
+###############################################################################
 
-function divexact{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
+function divexact(a::PariIdeal, b::PariIdeal)
+   check_parent(a, b)
    av = unsafe_load(avma, 1)
    r = ccall((:idealdiv, :libpari), Ptr{Int}, 
-             (Ptr{Int}, Ptr{Int}, Ptr{Int}), a.parent.order.pari_nf.data, a.ideal, b.ideal)
+             (Ptr{Int}, Ptr{Int}, Ptr{Int}), 
+                a.parent.order.pari_nf.data, a.ideal, b.ideal)
    unsafe_store!(avma, av, 1)
-   return PariIdeal{S, T}(r, a.parent)
+   return PariIdeal(r, a.parent)
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Inverse
 #
-###########################################################################################
+###############################################################################
 
-function inv{S, T}(a::PariIdeal{S, T})
+function inv(a::PariIdeal)
    av = unsafe_load(avma, 1)
    r = ccall((:idealinv, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}), a.parent.order.pari_nf.data, a.ideal)
    unsafe_store!(avma, av, 1)
-   return PariIdeal{S, T}(r, a.parent)
+   return PariIdeal(r, a.parent)
 end
 
-###########################################################################################
+###############################################################################
 #
 #   LLL reduction
 #
-###########################################################################################
+###############################################################################
 
-function LLL_reduce{S, T}(a::PariIdeal{S, T})
+function LLL_reduce(a::PariIdeal)
    av = unsafe_load(avma, 1)
    r = ccall((:idealred0, :libpari), Ptr{Int}, 
-             (Ptr{Int}, Ptr{Int}, Ptr{Void}), a.parent.order.pari_nf.data, a.ideal, C_NULL)
+             (Ptr{Int}, Ptr{Int}, Ptr{Void}), 
+                    a.parent.order.pari_nf.data, a.ideal, C_NULL)
    unsafe_store!(avma, av, 1)
-   return PariIdeal{S, T}(r, a.parent)
+   return PariIdeal(r, a.parent)
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Bezout
 #
-###########################################################################################
+###############################################################################
 
-function gcdx{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
+function gcdx(a::PariIdeal, b::PariIdeal)
+   check_parent(a, b)
    pari_nf = a.parent.order.pari_nf.data
    av = unsafe_load(avma, 1)
    st = ccall((:idealaddtoone, :libpari), Ptr{Int}, 
@@ -216,13 +241,13 @@ function gcdx{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
    return pols, polt
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Numerator/denominator
 #
-###########################################################################################
+###############################################################################
 
-function numden{S, T}(a::PariIdeal{S, T})
+function numden(a::PariIdeal)
    pari_nf = a.parent.order.pari_nf
    av = unsafe_load(avma, 1)
    nd = ccall((:idealnumden, :libpari), Ptr{Int}, 
@@ -233,13 +258,14 @@ function numden{S, T}(a::PariIdeal{S, T})
    return num, den
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Valuation
 #
-###########################################################################################
+###############################################################################
 
-function valuation{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
+function valuation(a::PariIdeal, b::PariIdeal)
+   check_parent(a, b)
    pari_nf = a.parent.order.pari_nf
    av = unsafe_load(avma, 1)
    r = ccall((:idealval, :libpari), Int, 
@@ -248,37 +274,38 @@ function valuation{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
    return r
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Ideal factorisation
 #
-###########################################################################################
+###############################################################################
 
-function factor{S, T}(a::PariIdeal{S, T})
+function factor(a::PariIdeal)
    av = unsafe_load(avma, 1)
    pari_fac = ccall((:idealfactor, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}), a.parent.order.pari_nf.data, a.ideal)
-   fac = PariFactor{PariMaximalOrder{S, T}}(pari_fac, a.parent)
+   fac = PariFactor{PariMaximalOrder}(pari_fac, a.parent)
    unsafe_store!(avma, av, 1)
    return fac
 end
 
-function factor_mul{S, T}(a::PariFactor{PariMaximalOrder{S, T}})
+function factor_mul(a::PariFactor{PariMaximalOrder})
    av = unsafe_load(avma, 1)
    p = ccall((:idealfactorback, :libpari), Ptr{Int}, 
-             (Ptr{Int}, Ptr{Int}, Ptr{Void}, Int), a.parent.order.pari_nf.data, a.data, C_NULL, 0)
+             (Ptr{Int}, Ptr{Int}, Ptr{Void}, Int), 
+                    a.parent.order.pari_nf.data, a.data, C_NULL, 0)
    r = a.parent(p)
    unsafe_store!(avma, av, 1)
    return r
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Approximation
 #
-###########################################################################################
+###############################################################################
 
-function approx{S, T}(a::PariIdeal{S, T})
+function approx(a::PariIdeal)
    pari_nf = a.parent.order.pari_nf.data
    par = a.parent
    av = unsafe_load(avma, 1)
@@ -291,13 +318,14 @@ function approx{S, T}(a::PariIdeal{S, T})
    return pol
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Coprime ideal construction
 #
-###########################################################################################
+###############################################################################
 
-function coprime_multiplier{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
+function coprime_multiplier(a::PariIdeal, b::PariIdeal)
+   check_parent(a, b)
    pari_nf = a.parent.order.pari_nf.data
    par = a.parent
    av = unsafe_load(avma, 1)
@@ -310,13 +338,14 @@ function coprime_multiplier{S, T}(a::PariIdeal{S, T}, b::PariIdeal{S, T})
    return pol
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Ideal creation functions
 #
-###########################################################################################
+###############################################################################
 
-function ideal{S, T}(ord::PariMaximalOrder{S, T}, b::fmpq_poly, args::fmpq_poly...)
+function ideal(ord::PariMaximalOrder, b::fmpq_poly, args::fmpq_poly...)
+   ord.pari_nf.nf.pol.parent != parent(b) && error("Incompatible maximal order and polynomial")
    av = unsafe_load(avma, 1)
    id1 = ccall((:idealhnf, :libpari), Ptr{Int}, 
                  (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(b).d)
@@ -327,26 +356,29 @@ function ideal{S, T}(ord::PariMaximalOrder{S, T}, b::fmpq_poly, args::fmpq_poly.
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), ord.pari_nf.data, id1, id2)
    end
    unsafe_store!(avma, av, 1)
-   return PariIdeal{S, T}(id1, PariIdealSet(ord))
+   return PariIdeal(id1, PariIdealSet(ord))
 end
 
-function ideal{S, T}(ord::PariMaximalOrder{S, T}, b::PariMaximalOrderElem, args::PariMaximalOrderElem...)
+function ideal(ord::PariMaximalOrder, b::PariMaximalOrderElem, args::PariMaximalOrderElem...)
+   parent(b) != ord && error("Unable to coerce maximal order element")
    av = unsafe_load(avma, 1)
    id1 = ccall((:idealhnf, :libpari), Ptr{Int}, 
                  (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, b.data)
    for el in args
+      parent(el) != ord && error("Unable to coerce maximal order element")
       id2 = ccall((:idealhnf, :libpari), Ptr{Int}, 
                  (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, el.data)
       id1 = ccall((:idealadd, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), ord.pari_nf.data, id1, id2)
    end
    unsafe_store!(avma, av, 1)
-   return PariIdeal{S, T}(id1, PariIdealSet(ord))
+   return PariIdeal(id1, PariIdealSet(ord))
 end
 
-function ideal{S, T}(ord::PariMaximalOrder{S, T}, b::nf_elem, args::nf_elem...)
+function ideal(ord::PariMaximalOrder, b::nf_elem, args::nf_elem...)
+   ord.pari_nf.nf != parent(b) && error("Incompatible maximal order and number field element")
    av = unsafe_load(avma, 1)
-   par = b.parent.order.pol.parent
+   par = b.parent.pol.parent
    id1 = ccall((:idealhnf, :libpari), Ptr{Int}, 
                  (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(par(b)).d)
    for el in args
@@ -356,10 +388,10 @@ function ideal{S, T}(ord::PariMaximalOrder{S, T}, b::nf_elem, args::nf_elem...)
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), ord.pari_nf.data, id1, id2)
    end
    unsafe_store!(avma, av, 1)
-   return PariIdeal{S, T}(id1, PariIdealSet(ord))
+   return PariIdeal(id1, PariIdealSet(ord))
 end
 
-function ideal{S, T}(ord::PariMaximalOrder{S, T}, b::BigInt, args::BigInt...)
+function ideal(ord::PariMaximalOrder, b::fmpz, args::fmpz...)
    av = unsafe_load(avma, 1)
    id1 = ccall((:idealhnf, :libpari), Ptr{Int}, 
                  (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(b).d)
@@ -370,30 +402,30 @@ function ideal{S, T}(ord::PariMaximalOrder{S, T}, b::BigInt, args::BigInt...)
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), ord.pari_nf.data, id1, id2)
    end
    unsafe_store!(avma, av, 1)
-   return PariIdeal{S, T}(id1, PariIdealSet(ord))
+   return PariIdeal(id1, PariIdealSet(ord))
 end
 
-function ideal{S, T}(ord::PariMaximalOrder{S, T}, b::Integer, args::Integer...)
+function ideal(ord::PariMaximalOrder, b::Integer, args::Integer...)
    av = unsafe_load(avma, 1)
    id1 = ccall((:idealhnf, :libpari), Ptr{Int}, 
-                 (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(BigInt(b)).d)
+                 (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(ZZ(b)).d)
    for c in args
       id2 = ccall((:idealhnf, :libpari), Ptr{Int}, 
-                 (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(BigInt(c)).d)
+                 (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(ZZ(c)).d)
       id1 = ccall((:idealadd, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), ord.pari_nf.data, id1, id2)
    end
    unsafe_store!(avma, av, 1)
-   return PariIdeal{S, T}(id1, PariIdealSet(ord))
+   return PariIdeal(id1, PariIdealSet(ord))
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Parent object overloads
 #
-###########################################################################################
+###############################################################################
 
-function Base.call{S, T}(ord::PariIdealSet{S, T}, id::Ptr{Int})
-   return PariIdeal{S, T}(id, PariIdealSet(ord))
+function Base.call(ord::PariIdealSet, id::Ptr{Int})
+   return PariIdeal(id, PariIdealSet(ord))
 end
 

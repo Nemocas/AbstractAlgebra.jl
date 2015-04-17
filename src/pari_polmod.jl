@@ -12,23 +12,24 @@
 
 PariPolModID = Dict{(DataType, Symbol), PariRing}()
 
-type PariPolModRing{S <: PariRing, T} <: PariRing
+type PariPolModRing{S <: PariRing} <: PariRing
+   T::Symbol
 
-   function PariPolModRing()
+   function PariPolModRing(t::Symbol)
       try
-         return PariPolModID[S, T]
+         return PariPolModID[S, t]
       catch
-         return PariPolModID[S, T] = new()
+         return PariPolModID[S, t] = new(t)
       end
    end
 end
 
-type pari_polmod{S <: PariRing, T} <: RingElem
+type pari_polmod{S <: PariRing} <: RingElem
    data::Ptr{Int}
-   parent::PariPolModRing{S, T}
+   parent::PariPolModRing{S}
 
    function pari_polmod(data::Ptr{Int})
-      r = new(gclone(data), PariPolModRing{S, T}())
+      r = new(gclone(data))
       finalizer(r, _pari_polmod_unclone)
       return r
    end
@@ -42,12 +43,12 @@ _pari_polmod_unclone(a::pari_polmod) = gunclone(a.data)
 #
 ###########################################################################################
 
-function residue{S <: PariRing, T}(a::pari_polmod{S, T})
-   return pari_poly{S, T}(reinterpret(Ptr{Int}, unsafe_load(a.data, 3)))
+function residue{S <: PariRing}(a::pari_polmod{S})
+   return pari_poly{S}(reinterpret(Ptr{Int}, unsafe_load(a.data, 3)))
 end
 
-function modulus{S <: PariRing, T}(a::pari_polmod{S, T})
-   return pari_poly{S, T}(reinterpret(Ptr{Int}, unsafe_load(a.data, 2)))
+function modulus{S <: PariRing}(a::pari_polmod{S})
+   return pari_poly{S}(reinterpret(Ptr{Int}, unsafe_load(a.data, 2)))
 end
 
 ###########################################################################################
@@ -56,6 +57,8 @@ end
 #
 ###########################################################################################
 
-function Base.call{S <: PariRing, T}(ord::PariPolModRing{S, T}, b::Ptr{Int})
-   return pari_polmod{S, T}(b)
+function Base.call{S <: PariRing}(ord::PariPolModRing{S}, b::Ptr{Int})
+   z = pari_polmod{S}(b)
+   z.parent = ord
+   return z
 end
