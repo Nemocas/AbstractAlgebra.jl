@@ -61,6 +61,7 @@ type fq <: FiniteFieldElem
       ccall((:fq_init2, :libflint), Void, 
             (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
       finalizer(d, _fq_clear_fn)
+      d.parent = ctx
       return d
    end
 
@@ -71,6 +72,7 @@ type fq <: FiniteFieldElem
       finalizer(d, _fq_clear_fn)
       ccall((:fq_set_si, :libflint), Void, 
                 (Ptr{fq}, Int, Ptr{FqFiniteField}), &d, x, &ctx)
+      d.parent = ctx
       return d
    end
 
@@ -81,6 +83,7 @@ type fq <: FiniteFieldElem
       finalizer(d, _fq_clear_fn)
       ccall((:fq_set_fmpz, :libflint), Void, 
             (Ptr{fq}, Ptr{fmpz}, Ptr{FqFiniteField}), &d, &x, &ctx)
+      d.parent = ctx
       return d
    end
 
@@ -91,6 +94,7 @@ type fq <: FiniteFieldElem
       finalizer(d, _fq_clear_fn)
       ccall((:fq_set, :libflint), Void, 
             (Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &d, &x, &ctx)
+      d.parent = ctx
       return d
    end
 end
@@ -182,7 +186,6 @@ end
 
 function deepcopy(d::fq)
    z = fq(parent(d), d)
-   z.parent = parent(d)
    return z
 end
 
@@ -428,7 +431,6 @@ Base.promote_rule(::Type{fq}, ::Type{fmpz}) = fq
 
 function Base.call(a::FqFiniteField)
    z = fq(a)
-   z.parent = a
    return z
 end
 
@@ -436,13 +438,11 @@ Base.call(a::FqFiniteField, b::Integer) = a(ZZ(b))
 
 function Base.call(a::FqFiniteField, b::Int)
    z = fq(a, b)
-   z.parent = a
    return z
 end
 
 function Base.call(a::FqFiniteField, b::fmpz)
    z = fq(a, b)
-   z.parent = a
    return z
 end
 
