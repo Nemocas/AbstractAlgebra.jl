@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   pari_nf.jl : Pari nf objects (used for maximal orders)
+#   pari_nf.jl : Pari nf objects
 #
 ###############################################################################
 
@@ -54,7 +54,7 @@ end
 ###############################################################################
 
 function show(io::IO, nf::PariNumberField)
-   print(io, "Maximal order of Number Field over Rational Field")
+   print(io, "Number Field over Rational Field")
    print(io, " with defining polynomial ", nf.nf.pol)
 end
 

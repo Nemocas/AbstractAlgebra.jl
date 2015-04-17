@@ -209,7 +209,7 @@ include("pari_poly2.jl")
 
 include("NumberFields.jl")
 
-# include("MaximalOrders.jl")
+include("MaximalOrders.jl")
 
 # include("PariIdeal.jl")
 
