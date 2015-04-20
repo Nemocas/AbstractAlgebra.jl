@@ -74,7 +74,7 @@ end
 #
 ###########################################################################################
 
-function hash(a::fmpz)
+function hash(a::fmpq)
    h = 0x8a30b0d963237dd5
    return h $ hash(num(a)) $ hash(den(a))
 end

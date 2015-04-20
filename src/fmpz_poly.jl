@@ -4,7 +4,8 @@
 #
 ###############################################################################
 
-export fmpz_poly
+export fmpz_poly, cyclotomic, theta_qexp, eta_qexp, cos_minpoly,
+       swinnerton_dyer
 
 ###############################################################################
 #
@@ -63,7 +64,7 @@ type fmpz_poly <: PolyElem
    function fmpz_poly(a::fmpz)
       z = new()
       ccall((:fmpz_poly_init, :libflint), Void, (Ptr{fmpz_poly},), &z)
-      ccall((:fmpz_poly_set_mpz, :libflint), Void, 
+      ccall((:fmpz_poly_set_fmpz, :libflint), Void, 
             (Ptr{fmpz_poly}, Ptr{fmpz}), &z, &a)
       finalizer(z, _fmpz_poly_clear_fn)
       return z
@@ -583,7 +584,7 @@ end
 ###############################################################################
 
 function gcdx(a::fmpz_poly, b::fmpz_poly)
-   check_parent(x, y)
+   check_parent(a, b)
    lena = length(a)
    lenb = length(b)
    (lena <= 1 || lenb <= 1) && error("Constant polynomial in gcdx")  
@@ -601,6 +602,61 @@ function gcdx(a::fmpz_poly, b::fmpz_poly)
    u *= c1^(lenb - 2)*c2^(lena - 1)
    v *= c1^(lenb - 1)*c2^(lena - 2)   
    return (r, u, v)
+end
+
+###############################################################################
+#
+#   Special polynomials
+#
+###############################################################################
+
+function chebyshev_t(n::Int, x::fmpz_poly)
+   z = parent(x)()
+   ccall((:fmpz_poly_chebyshev_t, :libflint), Void, 
+                                                  (Ptr{fmpz_poly}, Int), &z, n)
+   return z
+end
+   
+function chebyshev_u(n::Int, x::fmpz_poly)
+   z = parent(x)()
+   ccall((:fmpz_poly_chebyshev_u, :libflint), Void, 
+                                                  (Ptr{fmpz_poly}, Int), &z, n)
+   return z
+end
+
+function cyclotomic(n::Int, x::fmpz_poly)
+   z = parent(x)()
+   ccall((:fmpz_poly_cyclotomic, :libflint), Void, 
+                                                  (Ptr{fmpz_poly}, Int), &z, n)
+   return z
+end
+   
+function swinnerton_dyer(n::Int, x::fmpz_poly)
+   z = parent(x)()
+   ccall((:fmpz_poly_swinnerton_dyer, :libflint), Void, 
+                                                  (Ptr{fmpz_poly}, Int), &z, n)
+   return z
+end
+   
+function cos_minpoly(n::Int, x::fmpz_poly)
+   z = parent(x)()
+   ccall((:fmpz_poly_cos_minpoly, :libflint), Void, 
+                                                  (Ptr{fmpz_poly}, Int), &z, n)
+   return z
+end
+   
+function theta_qexp(e::Int, n::Int, x::fmpz_poly)
+   z = parent(x)()
+   ccall((:fmpz_poly_theta_qexp, :libflint), Void, 
+                                          (Ptr{fmpz_poly}, Int, Int), &z, e, n)
+   return z
+end
+
+function eta_qexp(e::Int, n::Int, x::fmpz_poly)
+   z = parent(x)()
+   ccall((:fmpz_poly_eta_qexp, :libflint), Void, 
+                                          (Ptr{fmpz_poly}, Int, Int), &z, e, n)
+   return z
 end
 
 ###############################################################################

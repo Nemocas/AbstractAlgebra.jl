@@ -25,15 +25,11 @@ General
 Poly.jl/fmpz_poly.jl
 --------------------
 
-* put special polynomials back in
-
 * Fix printing of monomials, e.g. y + (x), y + (6)
 
 * Fix efficient powering of x in flint specialised polynomials cases
 
 * function to convert poly to array
-
-* make special arithmetic polynomial functions take a variable, not a type, so they can be used with generators of other poly rings
 
 * check flint pseudodivision really returns a result with the power of L as defined in the nemo docs
 
@@ -49,6 +45,8 @@ ZZ.jl
 -----
 
 * defining % automatically defines rem, so remove one from ZZ
+
+* hashing of fmpz's is inefficient
 
 Residue.jl
 ----------

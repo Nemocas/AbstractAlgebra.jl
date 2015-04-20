@@ -9,7 +9,8 @@ export Poly, PolynomialRing, coeff, isgen, lead, truncate, mullow, reverse,
        content, primpart, evaluate, compose, derivative, integral, resultant,
        discriminant, gcdx, zero, one, gen, length, iszero, normalise, isone,
        isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod, invmod, lcm,
-       divrem, mod, gcdinv, hash, canonical_unit, var
+       divrem, mod, gcdinv, hash, canonical_unit, var, chebyshev_t,
+       chebyshev_u
 
 ###############################################################################
 #
@@ -1148,6 +1149,82 @@ function gcdinv{T <: Union(FieldElem, Residue)}(a::Poly{T}, b::Poly{T})
    A, u1 = d*A, d*u1
    d = inv(lead(A))
    return d*A, d*u1
+end
+
+###############################################################################
+#
+#   Special functions
+#
+###############################################################################
+
+function chebyshev_t_pair{S <: PolyElem}(n::Int, x::S)
+   if n == 0
+      return one(parent(x)), x
+   elseif n == 1
+      return x, one(parent(x))
+   elseif n < 0
+      a, b = chebyshev_t_pair(1 - n, x)
+      return b, a
+   elseif iseven(n)
+      a, b = chebyshev_t_pair(n >> 1, x)
+      return 2*(a*a) - 1, 2*(a*b) - x
+   else
+      a, b = chebyshev_t_pair((n >> 1) + 1, x)
+      return 2*(a*b) - x, 2*(b*b) - 1
+   end
+end
+
+function chebyshev_t{S <: PolyElem}(n::Int, x::S)
+   if n == 0
+      return one(parent(x))
+   elseif n == 1
+      return x
+   elseif n < 0
+      return chebyshev_t(-n, x)
+   elseif iseven(n)
+      a = chebyshev_t(n >> 1, x)
+      return 2*(a*a) - 1
+   else
+      a, b = chebyshev_t_pair((n >> 1) + 1, x)
+      return 2*(a*b) - x
+   end
+end
+
+function chebyshev_u_pair{S <: PolyElem}(n::Int, x::S)
+   if n == 0
+      return one(parent(x)), zero(parent(x))
+   elseif n == 1
+      return 2*x, one(parent(x))
+   elseif n == -1
+      return zero(parent(x)), -one(parent(x))
+   elseif n < -1
+      a, b = chebyshev_u_pair(-1 - n, x)
+      return -b, -a
+   elseif iseven(n)
+      a, b = chebyshev_u_pair(n >> 1, x)
+      return (a+b)*(a - b), 2*b*(a-x*b)
+   else
+      a, b = chebyshev_u_pair(n >> 1, x)
+      return 2*a*(x*a - b), (a + b)*(a - b)
+   end
+end
+
+function chebyshev_u{S <: PolyElem}(n::Int, x::S)
+   if n == 0
+      return one(parent(x))
+   elseif n == 1
+      return 2*x
+   elseif n == -1
+      return zero(parent(x))
+   elseif n < -1
+      return -chebyshev_u(-2 - n, x)
+   elseif iseven(n)
+      a, b = chebyshev_u_pair(n >> 1, x)
+      return (a + b)*(a - b)
+   else
+      a, b = chebyshev_u_pair(n >> 1, x)
+      return 2*a*(x*a - b)
+   end
 end
 
 ###############################################################################
