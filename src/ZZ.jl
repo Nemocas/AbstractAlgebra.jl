@@ -967,6 +967,17 @@ call(::IntegerRing, a::String) = fmpz(a)
 
 call(::IntegerRing, a::fmpz) = a
 
+function call(::IntegerRing, a::Float64)
+    !isinteger(a) && throw(InexactError())
+    z = ZZ()
+    ccall((:fmpz_set_d, :libflint), Void, (Ptr{fmpz}, Cdouble), &z, a)
+    return z
+end
+
+call(::IntegerRing, a::Float16) = ZZ(Float64(a))
+
+call(::IntegerRing, a::Float32) = ZZ(Float64(a))
+
 ###############################################################################
 #
 #   String parser
@@ -1003,15 +1014,23 @@ fmpz(z::Integer) = ZZ(BigInt(z))
 
 convert(::Type{fmpz}, a::Integer) = ZZ(a)
 
-Base.promote_rule{T <: Integer}(::Type{fmpz}, ::Type{T}) = fmpz
-
-function BigInt(z::fmpz)
+function convert(::Type{BigInt}, a::fmpz)
    r = BigInt()
-   ccall((:fmpz_get_mpz, :libflint), Void, (Ptr{BigInt}, Ptr{fmpz}), &r, &z)
+   ccall((:fmpz_get_mpz, :libflint), Void, (Ptr{BigInt}, Ptr{fmpz}), &r, &a)
    return r
 end
 
-convert(::Type{BigInt}, a::fmpz) = BigInt(a)
+function convert(::Type{Int}, a::fmpz) 
+   return ccall((:fmpz_get_si, :libflint), Int, (Ptr{fmpz},), &a)
+end
 
-Int(a::fmpz) = ccall((:fmpz_get_si, :libflint), Int, (Ptr{fmpz},), &a)
+function convert(::Type{Float64}, n::fmpz)
+    # rounds to zero
+    ccall((:fmpz_get_d, :libflint), Float64, (Ptr{fmpz},), &n)
+end
 
+convert(::Type{Float32}, n::fmpz) = Float32(Float64(n))
+
+convert(::Type{Float16}, n::fmpz) = Float16(Float64(n))
+
+Base.promote_rule{T <: Integer}(::Type{fmpz}, ::Type{T}) = fmpz
