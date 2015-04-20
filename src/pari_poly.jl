@@ -22,9 +22,9 @@ type PariPolyRing{T <: PariRing} <: PariRing
       unsafe_store!(z, evaltyp(t_POL) | 2, 1) 
       unsafe_store!(z, evalsigne(0) | evalvarn(0), 2)
       try
-         return PariPolyID[s]
+         return PariPolyID[R, s]
       catch
-         r = PariPolyID[s] = new(R, z, s)
+         r = PariPolyID[R, s] = new(R, z, s)
          finalizer(r, _pari_poly_zero_clear_fn)
          return r
       end

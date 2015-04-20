@@ -125,9 +125,3 @@ Julia bugs??
 
 * ccall needs {S} when functions containing them are called from within other
   functions
-
-* The following doesn't work: 
-        R, x = PolynomialRing(ZZ, "x")
-        pari(x)
-        R, x = PolynomialRing(QQ, "x")
-        pari(x)
