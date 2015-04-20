@@ -33,18 +33,18 @@
 
 import Base: convert, promote_rule, show, string, parseint, serialize,
              deserialize, base, bin, dec, oct, hex, gcd, gcdx, lcm, div, size,
-             zero, one, sign, hash
+             zero, one, sign, hash, abs
 
-export ZZ, IntegerRing, parent, show, convert, hash, fac, binom, isprime, fdiv,
-       cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm, invmod, powmod, abs, divrem,
-       isqrt, popcount, prevpow2, nextpow2, ndigits, dec, bin, oct, hex, base,
-       one, zero, divexact, fits, sign, nbits, deepcopy, tdivpow2, fdivpow2,
-       cdivpow2, flog, clog, cmpabs, clrbit!, setbit!, combit!, crt, divisible,
-       divisor_lenstra, fdivrem, tdivrem, fmodpow2, gcdinv, isprobabprime, 
-       issquare, jacobi, remove, root, size, isqrtrem, sqrtmod, trailing_zeros,
-       sigma, eulerphi, fib, moebiusmu, primorial, risingfac, canonical_unit,
-       needs_parentheses, is_negative, show_minus_one, parseint, addeq!, mul!,
-       isunit, words
+export fmpz, ZZ, IntegerRing, parent, show, convert, hash, fac, binom, isprime,
+       fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm, invmod, powmod, abs,
+       divrem, isqrt, popcount, prevpow2, nextpow2, ndigits, dec, bin, oct,
+       hex, base, one, zero, divexact, fits, sign, nbits, deepcopy, tdivpow2,
+       fdivpow2, cdivpow2, flog, clog, cmpabs, clrbit!, setbit!, combit!, crt,
+       divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2, gcdinv,
+       isprobabprime, issquare, jacobi, remove, root, size, isqrtrem, sqrtmod,
+       trailing_zeros, sigma, eulerphi, fib, moebiusmu, primorial, risingfac,
+       canonical_unit, needs_parentheses, is_negative, show_minus_one, 
+       parseint, addeq!, mul!, isunit, words
 
 ###############################################################################
 #
@@ -778,24 +778,24 @@ end
 
 function divisible(x::fmpz, y::fmpz)
    y == 0 && throw(DivideError())
-   bool(ccall((:fmpz_divisible, :libflint), Cint, 
+   Bool(ccall((:fmpz_divisible, :libflint), Cint, 
               (Ptr{fmpz}, Ptr{fmpz}), &x, &y))
 end
 
 function divisible(x::fmpz, y::Int)
    y == 0 && throw(DivideError())
-   bool(ccall((:fmpz_divisible_si, :libflint), Cint, 
+   Bool(ccall((:fmpz_divisible_si, :libflint), Cint, 
               (Ptr{fmpz}, Int), &x, y))
 end
 
-issquare(x::fmpz) = bool(ccall((:fmpz_is_square, :libflint), Cint, 
+issquare(x::fmpz) = Bool(ccall((:fmpz_is_square, :libflint), Cint, 
                                (Ptr{fmpz},), &x))
 
 # flint's fmpz_is_prime doesn't work yet
-isprime(x::fmpz) = bool(ccall((:fmpz_is_probabprime, :libflint), Cint, 
+isprime(x::fmpz) = Bool(ccall((:fmpz_is_probabprime, :libflint), Cint, 
                               (Ptr{fmpz},), &x))
 
-isprobabprime(x::fmpz) = bool(ccall((:fmpz_is_probabprime, :libflint), Cint, 
+isprobabprime(x::fmpz) = Bool(ccall((:fmpz_is_probabprime, :libflint), Cint, 
                                     (Ptr{fmpz},), &x))
 
 function remove(x::fmpz, y::fmpz) 
@@ -811,7 +811,7 @@ function divisor_lenstra(n::fmpz, r::fmpz, m::fmpz)
    m <= r && throw(DomainError())
    n <= m && throw(DomainError())
    z = ZZ()
-   if !bool(ccall((:fmpz_divisor_in_residue_class_lenstra, :libflint), 
+   if !Bool(ccall((:fmpz_divisor_in_residue_class_lenstra, :libflint), 
        Cint, (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &n, &r, &m))
       z = 0
    end
@@ -991,7 +991,7 @@ function parseint(::Type{fmpz}, s::String, base::Int = 10)
     z = ZZ()
     err = ccall((:fmpz_set_str, :libflint),
                Int32, (Ptr{fmpz}, Ptr{Uint8}, Int32),
-               &z, convert(Ptr{Uint8},SubString(s,i)), base)
+               &z, bytestring(SubString(s, i)), base)
     err == 0 || error("Invalid big integer: $(repr(s))")
     return sgn < 0 ? -z : z
 end
