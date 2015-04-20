@@ -4,30 +4,6 @@
 #
 ###############################################################################
 
-## FIXME : add clear_readonly and fmpz initialiser/finalizer and use instead of 
-##         init/clear
-## FIXME : make function names conform to Julia standard
-## FIXME : put special polynomials back in
-## FIXME : don't use isequal; in Julia it's for objects that hash to the same 
-##         value
-## FIXME : rename primpart to primitive_part
-## FIXME : figure out why length{S}(x::fmpq_poly{S}) requires the {S} when 
-##         called from Base.call{S}(a::NfNumberField{S}, pol::fmpq_poly) in 
-##         nf.jl
-## FIXME : fix needs_parentheses and is_negative in nf.jl
-## FIXME : add hashing for all types
-## FIXME : canonical_unit for fractions is odd for (1//(x^2+1))//(2//(x+1)) 
-##         over rationals
-## FIXME : should Fraction only use canonical_unit when printing?
-## FIXME : Pari integer conversion from fmpz is not efficient
-## FIXME : ZZ! in pari_frac.jl should not be needed, call ZZ! in pari_int 
-##         once Julia supports it
-## FIXME : The following doesn't work: 
-##            R, x = PolynomialRing(ZZ, "x")
-##            pari(x)
-##            R, x = PolynomialRing(QQ, "x")
-##            pari(x)
-
 export fmpz_poly
 
 ###############################################################################

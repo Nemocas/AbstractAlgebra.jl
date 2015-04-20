@@ -1,7 +1,8 @@
 General
 -------
 
-* Implement isequal for strict equality, e.g. isequal(1+O(x), 1+O(x^2)) == false
+* Implement strict equality, e.g. isidentical(1+O(x), 1+O(x^2)) == false;
+  don't use isequal; in Julia it's for objects that hash to the same value
 
 * Add test code
 
@@ -15,12 +16,20 @@ General
 
 * implement type stable division which doesn't assume exactness
 
-Poly.jl
--------
+* make function names conform to Julia standard
+
+* rename primpart to primitive_part
+
+* add hashing for all types
+
+Poly.jl/fmpz_poly.jl
+--------------------
+
+* put special polynomials back in
 
 * Fix printing of monomials, e.g. y + (x), y + (6)
 
-* Fix efficiently powering of x in flint specialised polynomials cases
+* Fix efficient powering of x in flint specialised polynomials cases
 
 * function to convert poly to array
 
@@ -67,7 +76,8 @@ FLINT
 
 * fix isprime bug
 
-* document and test set_exact_fmpz, add_exact, mul_exact, sub_exact, inv_exact, div_exact, sqrt_exact, pow_exact_si, div_exact_fmpz
+* document and test set_exact_fmpz, add_exact, mul_exact, sub_exact, inv_exact,
+  div_exact, sqrt_exact, pow_exact_si, div_exact_fmpz
 
 PowerSeries.jl
 --------------
@@ -78,6 +88,30 @@ can still be performed
 * ensure exp is only defined for rings in which division by an integer is
 possible
 
+Fraction.jl
+-----------
+
+* should Fraction only use canonical_unit when printing?
+
+* canonical_unit for fractions is odd for (1//(x^2+1))//(2//(x+1)) over
+  rationals
+
+nf.jl
+-----
+
+* fix needs_parentheses and is_negative
+
+pari_int.jl
+-----------
+
+* Pari integer conversion from fmpz is not efficient
+
+pari_frac.jl
+------------
+
+* ZZ! in pari_frac.jl should not be needed, call ZZ! in pari_int 
+  once Julia supports doing so
+
 Julia bugs??
 ============
 
@@ -87,5 +121,15 @@ Julia bugs??
 
 * Stack overflow when using the catchall in Rings.jl
 
-* functions defined inside functions (e.g. convert in PolynomialRing) cause crashes if function is called multiple times with different types, because the same lines of code correspond to different functions
+* functions defined inside functions (e.g. convert in PolynomialRing) cause crashes
+  if function is called multiple times with different types, because the same lines
+  of code correspond to different functions
 
+* ccall needs {S} when functions containing them are called from within other
+  functions
+
+* The following doesn't work: 
+        R, x = PolynomialRing(ZZ, "x")
+        pari(x)
+        R, x = PolynomialRing(QQ, "x")
+        pari(x)
