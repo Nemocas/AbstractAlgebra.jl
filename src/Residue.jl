@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export ResidueRing, Residue, inv
+export ResidueRing, Residue, inv, modulus
 
 ###############################################################################
 #
@@ -12,7 +12,7 @@ export ResidueRing, Residue, inv
 #
 ###############################################################################
 
-ModulusDict = Dict{RingElem, Ring}()
+ModulusDict = ObjectIdDict()
 
 type ResidueRing{T <: RingElem} <: Ring
    base_ring::Ring
@@ -20,9 +20,9 @@ type ResidueRing{T <: RingElem} <: Ring
 
    function ResidueRing(modulus::T)
       return try
-         ModulusDict[modulus]
+         ModulusDictmodulus[parent(modulus), modulus]
       catch
-         ModulusDict[modulus] = new(parent(modulus), modulus)
+         ModulusDict[parent(modulus), modulus] = new(parent(modulus), modulus)
       end
    end
 end

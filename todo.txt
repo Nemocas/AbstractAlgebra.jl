@@ -22,6 +22,9 @@ General
 
 * add hashing for all types
 
+* put underscore before den and num type fields, to prevent a.num instead
+  of num(a)
+
 Poly.jl/fmpz_poly.jl
 --------------------
 
