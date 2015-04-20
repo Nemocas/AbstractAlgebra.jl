@@ -70,6 +70,13 @@ end
 
 //{T <: RingElem}(x::Integer, y::T) = parent(y)(x)//y
 
+# disambiguation
+//{T <: RingElem}(x::Fraction{T}, y::Fraction{T}) = divexact(x, y)
+
+//{T <: RingElem}(x::T, y::Fraction{T}) = parent(y)(x)//y
+
+//{T <: RingElem}(x::Fraction{T}, y::T) = x//parent(x)(y)
+
 ###############################################################################
 #
 #   Basic manipulation

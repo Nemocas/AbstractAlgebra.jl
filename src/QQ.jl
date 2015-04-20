@@ -6,7 +6,7 @@
 
 import Base: gcd, Rational, isless
 
-export QQ, FractionField, Rational, height, height_bits, isless
+export QQ, fmpq, FractionField, Rational, RationalField, height, height_bits, isless
 
 ###########################################################################################
 #
@@ -270,9 +270,24 @@ end
 
 ==(a::fmpz, b::fmpq) = b == a
 
-function isless(a::fmpq, b::Int)
+function isless(a::fmpq, b::Integer)
    z = QQ(b)
    return ccall((:fmpq_cmp, :libflint), Cint, (Ptr{fmpq}, Ptr{fmpq}), &a, &z) < 0
+end
+
+function isless(a::Integer, b::fmpq)
+   z = QQ(a)
+   return ccall((:fmpq_cmp, :libflint), Cint, (Ptr{fmpq}, Ptr{fmpq}), &z, &b) < 0
+end
+
+function isless(a::fmpq, b::fmpz)
+   z = QQ(b)
+   return ccall((:fmpq_cmp, :libflint), Cint, (Ptr{fmpq}, Ptr{fmpq}), &a, &z) < 0
+end
+
+function isless(a::fmpz, b::fmpq)
+   z = QQ(a)
+   return ccall((:fmpq_cmp, :libflint), Cint, (Ptr{fmpq}, Ptr{fmpq}), &z, &b) < 0
 end
 
 ###########################################################################################
@@ -296,17 +311,17 @@ end
 ###########################################################################################
 
 function >>(a::fmpq, b::Int)
-   temp = QQ()
+   z = QQ()
    ccall((:fmpq_div_2exp, :libflint), Void, 
-         (Ptr{fmpq}, Ptr{fmpq}, Int), &temp, &a, b)
-   return temp
+         (Ptr{fmpq}, Ptr{fmpq}, Int), &z, &a, b)
+   return z
 end
 
 function <<(a::fmpq, b::Int)
-   temp = QQ()
+   z = QQ()
    ccall((:fmpq_mul_2exp, :libflint), Void, 
-         (Ptr{fmpq}, Ptr{fmpq}, Int), &temp, &a, b)
-   return temp2
+         (Ptr{fmpq}, Ptr{fmpq}, Int), &z, &a, b)
+   return z
 end
 
 ###########################################################################################
@@ -332,6 +347,20 @@ function inv(a::fmpq)
    ccall((:fmpq_inv, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &z, &a)
    return z
 end
+
+###########################################################################################
+#
+#   Modular arithmetic
+#
+###########################################################################################
+
+function mod(a::fmpq, b::fmpz)
+   z = ZZ()
+   ccall((:fmpq_mod_fmpz, :libflint), Void, (Ptr{fmpz}, Ptr{fmpq}, Ptr{fmpz}), &z, &a, &b)
+   return z
+end
+
+mod(a::fmpq, b::Integer) = mod(a, ZZ(b))
 
 ###########################################################################################
 #
