@@ -6,7 +6,9 @@
 
 import Base: gcd, Rational, isless
 
-export QQ, fmpq, FractionField, Rational, RationalField, height, height_bits, isless
+export QQ, fmpq, FractionField, Rational, RationalField, height, height_bits, isless,
+       reconstruct, next_minimal, next_signed_minimal, next_calkin_wilf, 
+       next_signed_calkin_wilf, dedekind_sum, harmonic
 
 ###########################################################################################
 #
@@ -374,6 +376,88 @@ function gcd(a::fmpq, b::fmpq)
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
    return z
 end
+
+###########################################################################################
+#
+#   Rational reconstruction
+#
+###########################################################################################
+
+function reconstruct(a::fmpz, b::fmpz)
+   c = QQ()
+   if !Bool(ccall((:fmpq_reconstruct_fmpz, :libflint), Cint, 
+                  (Ptr{fmpq}, Ptr{fmpz}, Ptr{fmpz}), &c, &a, &b))
+      error("Impossible rational reconstruction")
+   end
+   return c
+end
+
+reconstruct(a::fmpz, b::Integer) =  reconstruct(a, ZZ(b))
+
+reconstruct(a::Integer, b::fmpz) =  reconstruct(ZZ(a), b)
+
+reconstruct(a::Integer, b::Integer) =  reconstruct(ZZ(a), ZZ(b))
+
+###############################################################################
+#
+#   Rational enumeration
+#
+###############################################################################
+
+function next_minimal(a::fmpq)
+   a < 0 && throw(DomainError())
+   c = QQ()
+   ccall((:fmpq_next_minimal, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &c, &a)
+   return c
+end
+
+function next_signed_minimal(a::fmpq)
+   c = QQ()
+   ccall((:fmpq_next_signed_minimal, :libflint), Void, 
+         (Ptr{fmpq}, Ptr{fmpq}), &c, &a)
+   return c
+end
+
+function next_calkin_wilf(a::fmpq)
+   a < 0 && throw(DomainError())
+   c = QQ()
+   ccall((:fmpq_next_calkin_wilf, :libflint), Void, 
+         (Ptr{fmpq}, Ptr{fmpq}), &c, &a)
+   return c
+end
+
+function next_signed_calkin_wilf(a::fmpq)
+   c = QQ()
+   ccall((:fmpq_next_signed_calkin_wilf, :libflint), Void, 
+         (Ptr{fmpq}, Ptr{fmpq}), &c, &a)
+   return c
+end
+
+###############################################################################
+#
+#   Special functions
+#
+###############################################################################
+
+function harmonic(n::Int)
+   n < 0 && throw(DomainError())
+   c = QQ()
+   ccall((:fmpq_harmonic_ui, :libflint), Void, (Ptr{fmpq}, Int), &c, n)
+   return c
+end
+
+function dedekind_sum(h::fmpz, k::fmpz)
+   c = QQ()
+   ccall((:fmpq_dedekind_sum, :libflint), Void, 
+         (Ptr{fmpq}, Ptr{fmpz}, Ptr{fmpz}), &c, &h, &k)
+   return c
+end
+
+dedekind_sum(h::fmpz, k::Integer) = dedekind_sum(h, ZZ(k))
+
+dedekind_sum(h::Integer, k::fmpz) = dedekind_sum(ZZ(h), k)
+
+dedekind_sum(h::Integer, k::Integer) = dedekind_sum(ZZ(h), ZZ(k))
 
 ###############################################################################
 #
