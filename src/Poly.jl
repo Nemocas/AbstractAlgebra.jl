@@ -4,12 +4,12 @@
 #
 ###############################################################################
 
-export Poly, PolynomialRing, coeff, isgen, lead, truncate, mullow, reverse, 
-       shift_left, shift_right, divexact, pseudorem, pseudodivrem, gcd,
-       content, primpart, evaluate, compose, derivative, integral, resultant,
-       discriminant, gcdx, zero, one, gen, length, iszero, normalise, isone,
-       isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod, invmod, lcm,
-       divrem, mod, gcdinv, hash, canonical_unit, var, chebyshev_t,
+export Poly, PolynomialRing, hash, coeff, isgen, lead, truncate, mullow, 
+       reverse, shift_left, shift_right, divexact, pseudorem, pseudodivrem, 
+       gcd, degree, content, primpart, evaluate, compose, derivative, integral, 
+       resultant, discriminant, gcdx, zero, one, gen, length, iszero, 
+       normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod, 
+       invmod, lcm, divrem, mod, gcdinv, canonical_unit, var, chebyshev_t,
        chebyshev_u
 
 ###############################################################################
