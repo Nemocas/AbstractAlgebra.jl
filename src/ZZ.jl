@@ -33,7 +33,7 @@
 
 import Base: convert, promote_rule, show, string, parseint, serialize,
              deserialize, base, bin, dec, oct, hex, gcd, gcdx, lcm, div, size,
-             zero, one, sign, hash, abs
+             zero, one, sign, hash, abs, deepcopy, rem, mod
 
 export fmpz, ZZ, IntegerRing, parent, show, convert, hash, fac, binom, isprime,
        fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm, invmod, powmod, abs,
