@@ -183,6 +183,17 @@ end
 
 ###############################################################################
 #
+#   Exponential function for generic rings
+#
+###############################################################################
+
+function exp{T <: RingElem}(a::T)
+   a != 0 && error("Exponential of nonzero element")
+   return one(parent(a))
+end
+
+###############################################################################
+#
 #   Generic and specific rings and fields
 #
 ###############################################################################
@@ -194,6 +205,8 @@ include("Residue.jl")
 include("Poly.jl")
 
 include("fmpz_poly.jl")
+
+include("PowerSeries.jl")
 
 include("fmpz_mat.jl")
 
