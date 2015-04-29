@@ -67,6 +67,12 @@ Residue.jl
 
 * implement divexact by an invertible integer, etc
 
+* Hashing of tuples doesn't do what we want, e.g.
+   R = ResidueRing(ZZ, ZZ(2))
+   S = ResidueRing(ZZ, ZZ(2))
+   R == S
+   returns false
+
 FLINT
 -----
 
