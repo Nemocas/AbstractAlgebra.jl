@@ -213,7 +213,7 @@ function clog(x::fmpz, c::fmpz)
                  (Ptr{fmpz}, Ptr{fmpz}), &x, &c)
 end
 
-function %(x::fmpz, c::fmpz)
+function rem(x::fmpz, c::fmpz)
     c == 0 && throw(DivideError())
     q = ZZ()
     r = ZZ()
@@ -221,8 +221,6 @@ function %(x::fmpz, c::fmpz)
           (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &q, &r, &x, &c)
     return r
 end
-
-rem(x::fmpz, c::fmpz) = %(x, c)
 
 ###############################################################################
 #
@@ -325,14 +323,12 @@ end
 #
 ###############################################################################
 
-function %(x::fmpz, c::Int)
+function rem(x::fmpz, c::Int)
    c < 0 && throw(DomainError())
    c == 0 && throw(DivideError())
    r = ccall((:fmpz_tdiv_ui, :libflint), Int, (Ptr{fmpz}, Int), &x, c)
    return sign(x) < 0 ? -r : r
 end
-
-rem(x::fmpz, c::Int) = %(x, c)
 
 function tdivpow2(x::fmpz, c::Int)
     c < 0 && throw(DomainError())

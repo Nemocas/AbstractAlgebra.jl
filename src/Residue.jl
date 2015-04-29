@@ -20,7 +20,7 @@ type ResidueRing{T <: RingElem} <: Ring
 
    function ResidueRing(modulus::T)
       return try
-         ModulusDictmodulus[parent(modulus), modulus]
+         ModulusDict[parent(modulus), modulus]
       catch
          ModulusDict[parent(modulus), modulus] = new(parent(modulus), modulus)
       end
