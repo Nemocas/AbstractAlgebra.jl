@@ -1,3 +1,12 @@
+Build
+-----
+
+* Building on Windows should use binaries (building 64 bit Pari is not supported)
+
+* Pari doesn't find libgmp.so even when told explicitly where to look because
+LD_LIBRARY_PATH needs to be set. We can get around this by having Pari statically
+link against libgmp.a on Linux.
+
 General
 -------
 
