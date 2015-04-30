@@ -12,7 +12,7 @@ export ResidueRing, Residue, inv, modulus
 #
 ###############################################################################
 
-ModulusDict = ObjectIdDict()
+ModulusDict = Dict{(Ring, RingElem), Ring}()
 
 type ResidueRing{T <: RingElem} <: Ring
    base_ring::Ring
