@@ -224,6 +224,8 @@ include("PowerSeries.jl")
 
 include("fmpz_series.jl")
 
+include("fmpz_mod_series.jl")
+
 include("fmpz_mat.jl")
 
 include("PariRings.jl")
