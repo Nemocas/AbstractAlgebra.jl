@@ -3,22 +3,22 @@ function test_series_constructors()
 
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
-   @test isa(R, PowerSeriesRing)
+   @test isa(R, FmpzSeriesRing)
 
    a = x^3 + 2x + 1
    b = x^2 + 3x + O(x^4)
 
-   @test isa(R(a), PowerSeries)
+   @test isa(R(a), PowerSeriesElem)
 
-   @test isa(R([ZZ(1), ZZ(2), ZZ(3)], 3, 5), PowerSeries)
+   @test isa(R([ZZ(1), ZZ(2), ZZ(3)], 3, 5), PowerSeriesElem)
 
-   @test isa(R([ZZ(1), ZZ(2), ZZ(3)], 3, 3), PowerSeries)
+   @test isa(R([ZZ(1), ZZ(2), ZZ(3)], 3, 3), PowerSeriesElem)
 
-   @test isa(R(1), PowerSeries)
+   @test isa(R(1), PowerSeriesElem)
 
-   @test isa(R(ZZ(2)), PowerSeries)
+   @test isa(R(ZZ(2)), PowerSeriesElem)
 
-   @test isa(R(), PowerSeries)
+   @test isa(R(), PowerSeriesElem)
 
    println("PASS")
 end

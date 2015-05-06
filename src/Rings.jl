@@ -9,7 +9,7 @@ import Base: length, call, exp, promote_rule, zero, one, show, divrem, mod,
 
 export Ring, Field, RingElem
 
-export PolyElem
+export PolyElem, PowerSeriesElem
 
 ###############################################################################
 #
