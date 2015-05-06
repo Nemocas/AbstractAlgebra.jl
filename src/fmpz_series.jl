@@ -375,9 +375,9 @@ function ^(a::fmpz_series, b::Int)
       z = parent(a)()
       z.prec = a.prec + (b - 1)*valuation(a)
    elseif length(a) == 1
-      return fmpz_series([coeff(a, 0)^b], 1, a.prec)
+      return parent(a)(p, [coeff(a, 0)^b], 1, a.prec)
    elseif b == 0
-      return fmpz_series([ZZ(1)], 1, parent(a).prec_max)
+      return parent(a)(p, [ZZ(1)], 1, parent(a).prec_max)
    else
       z = parent(a)()
       z.prec = a.prec + (b - 1)*valuation(a)
