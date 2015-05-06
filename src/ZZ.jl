@@ -1020,6 +1020,10 @@ function convert(::Type{Int}, a::fmpz)
    return ccall((:fmpz_get_si, :libflint), Int, (Ptr{fmpz},), &a)
 end
 
+function convert(::Type{UInt64}, x::fmpz)
+   return ccall((:fmpz_get_ui, :libflint), UInt64, (Ptr{fmpz}, ), &x)
+end
+
 function convert(::Type{Float64}, n::fmpz)
     # rounds to zero
     ccall((:fmpz_get_d, :libflint), Float64, (Ptr{fmpz},), &n)

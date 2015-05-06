@@ -689,11 +689,3 @@ function MatrixSpace(R::ResidueRing{fmpz}, r::Int, c::Int)
   end
 end
 
-################################################################################
-#
-#  Helper functions, should go into ZZ.jl
-#
-################################################################################
-
-convert(::Type{UInt64}, x::fmpz) =
-        ccall((:fmpz_get_ui, :libflint), UInt64, (Ptr{fmpz}, ), &x)
