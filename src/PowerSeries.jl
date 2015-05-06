@@ -31,7 +31,7 @@ type PowerSeriesRing{T <: RingElem} <: Ring
    end
 end
 
-type PowerSeries{T <: RingElem} <: RingElem
+type PowerSeries{T <: RingElem} <: PowerSeriesElem
    coeffs::Array{T, 1}
    length::Int
    prec::Int
@@ -49,17 +49,17 @@ function O{T}(a::PowerSeries{T})
    return z
 end
 
-parent(a::PowerSeries) = a.parent
+parent(a::PowerSeriesElem) = a.parent
 
 elem_type{T <: RingElem}(::PowerSeriesRing{T}) = PowerSeries{T}
 
 base_ring(R::PowerSeriesRing) = R.base_ring
 
-base_ring(a::PowerSeries) = base_ring(parent(a))
+base_ring(a::PowerSeriesElem) = base_ring(parent(a))
 
 var(a::PowerSeriesRing) = a.S
 
-function check_parent(a::PowerSeries, b::PowerSeries)
+function check_parent(a::PowerSeriesElem, b::PowerSeriesElem)
    parent(a) != parent(b) && 
              error("Incompatible power series rings in power series operation")
 end
@@ -70,9 +70,18 @@ end
 #
 ###############################################################################    
    
-length(x::PowerSeries) = x.length
+function hash(a::PowerSeriesElem)
+   h = 0xb44d6896204881f3
+   for i in 0:length(a) - 1
+      h $= hash(coeff(a, i))
+      h = (h << 1) | (h >> (sizeof(Int)*8 - 1))
+   end
+   return h
+end
 
-precision(x::PowerSeries) = x.prec
+length(x::PowerSeriesElem) = x.length
+
+precision(x::PowerSeriesElem) = x.prec
 
 max_precision(R::PowerSeriesRing) = R.prec_max
 
@@ -100,21 +109,21 @@ function gen{T}(R::PowerSeriesRing{T})
    return z
 end
 
-iszero(a::PowerSeries) = length(a) == 0
+iszero(a::PowerSeriesElem) = length(a) == 0
 
-function isone(a::PowerSeries)
+function isone(a::PowerSeriesElem)
    return length(a) == 1 && isone(coeff(a, 0))
 end
 
-function isgen(a::PowerSeries)
+function isgen(a::PowerSeriesElem)
    return length(a) == 2 && iszero(coeff(a, 0)) && isone(coeff(a, 1))
 end
 
-isunit(a::PowerSeries) = isunit(coeff(a, 0))
+isunit(a::PowerSeriesElem) = isunit(coeff(a, 0))
 
-function valuation(a::PowerSeries)
+function valuation(a::PowerSeriesElem)
    if length(a) == 0
-      return a.prec
+      return precision(a)
    end
    for i = 1:length(a)
       if coeff(a, i - 1) != 0
@@ -122,6 +131,14 @@ function valuation(a::PowerSeries)
       end
    end
    error("Power series is not normalised")
+end
+
+function deepcopy{T <: RingElem}(a::PowerSeries{T})
+   coeffs = Array(T, length(a))
+   for i = 1:length(a)
+      coeffs[i] = deepcopy(coeff(a, i - 1))
+   end
+   return parent(a)(coeffs)
 end
 
 ###############################################################################
@@ -186,9 +203,9 @@ function show{T <: RingElem}(io::IO, a::PowerSeriesRing{T})
    show(io, base_ring(a))
 end
 
-needs_parentheses(x::PowerSeries) = length(x) > 1
+needs_parentheses(x::PowerSeriesElem) = length(x) > 1
 
-is_negative(x::PowerSeries) = length(x) <= 1 && is_negative(coeff(x, 0))
+is_negative(x::PowerSeriesElem) = length(x) <= 1 && is_negative(coeff(x, 0))
 
 show_minus_one{T <: RingElem}(::Type{PowerSeries{T}}) = show_minus_one(T)
 
@@ -452,9 +469,9 @@ function *{T <: RingElem}(a::fmpz, b::PowerSeries{T})
    return z
 end
 
-*(a::PowerSeries, b::Int) = b*a
+*(a::PowerSeriesElem, b::Int) = b*a
 
-*(a::PowerSeries, b::fmpz) = b*a
+*(a::PowerSeriesElem, b::fmpz) = b*a
 
 ###############################################################################
 #
@@ -612,15 +629,15 @@ end
 #
 ###############################################################################
 
-==(x::PowerSeries, y::Int) = x.prec == 0 || ((length(x) == 0 && y == 0)
+==(x::PowerSeriesElem, y::Int) = x.prec == 0 || ((length(x) == 0 && y == 0)
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
-==(x::PowerSeries, y::fmpz) = x.prec == 0 || ((length(x) == 0 && y == 0)
+==(x::PowerSeriesElem, y::fmpz) = x.prec == 0 || ((length(x) == 0 && y == 0)
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
-==(x::Int, y::PowerSeries) = y == x
+==(x::Int, y::PowerSeriesElem) = y == x
 
-==(x::fmpz, y::PowerSeries) = y == x
+==(x::fmpz, y::PowerSeriesElem) = y == x
 
 ###############################################################################
 #

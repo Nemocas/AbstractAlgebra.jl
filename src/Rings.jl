@@ -27,6 +27,8 @@ abstract FieldElem <: RingElem
 
 abstract PolyElem <: RingElem
 
+abstract PowerSeriesElem <: RingElem
+
 # not always mathematical ring elements
 abstract MatElem <: RingElem
 
@@ -219,6 +221,8 @@ include("Poly.jl")
 include("fmpz_poly.jl")
 
 include("PowerSeries.jl")
+
+include("fmpz_series.jl")
 
 include("fmpz_mat.jl")
 
