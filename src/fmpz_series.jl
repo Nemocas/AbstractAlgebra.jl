@@ -56,7 +56,7 @@ type fmpz_series <: PowerSeriesElem
       return z
    end
    
-   function fmpz_poly(a::fmpz_series)
+   function fmpz_series(a::fmpz_series)
       z = new()
       ccall((:fmpz_poly_init, :libflint), Void, (Ptr{fmpz_series},), &z)
       ccall((:fmpz_poly_set, :libflint), Void, 
