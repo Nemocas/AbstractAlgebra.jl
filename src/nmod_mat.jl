@@ -78,7 +78,7 @@ type nmod_mat <: MatElem
     finalizer(z, _nmod_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        ccall((:_nmod_mat_set_entry, :libflint), Void,
+        ccall((:nmod_mat_set_entry, :libflint), Void,
                 (Ptr{nmod_mat}, Int, Int, UInt),
                 &z, i-1, j-1, arr[i,j] % n)
       ## I am not sure if argument must be already reduced
@@ -101,7 +101,7 @@ type nmod_mat <: MatElem
         ccall((:fmpz_mod_ui, :libflint), UInt,
                 (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &arr[i,j], n)
         tt = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &t)
-        ccall((:_nmod_mat_set_entry, :libflint), Void,
+        ccall((:nmod_mat_set_entry, :libflint), Void,
                 (Ptr{nmod_mat}, Int, Int, UInt),
                 &z, i-1, j-1, tt)
       end
@@ -128,7 +128,7 @@ type nmod_mat <: MatElem
         ccall((:fmpz_mod_ui, :libflint), UInt,
                 (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &arr[i,j].data, n)
         tt = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &t)
-        ccall((:_nmod_mat_set_entry, :libflint), Void,
+        ccall((:nmod_mat_set_entry, :libflint), Void,
                 (Ptr{nmod_mat}, Int, Int, UInt),
                 &z, i-1, j-1, tt)
       end
@@ -166,7 +166,7 @@ end
 function getindex(a::nmod_mat, i::Int, j::Int)
   checkbounds(a.r, i)
   checkbounds(a.c, j)
-  u = ccall((:_nmod_mat_get_entry, :libflint), UInt,
+  u = ccall((:nmod_mat_get_entry, :libflint), UInt,
               (Ptr{nmod_mat}, Int, Int), &a, i - 1 , j - 1)
   return base_ring(a)(u)
 end
@@ -174,7 +174,7 @@ end
 function setindex!(a::nmod_mat, u::UInt, i::Int, j::Int)
   checkbounds(a.r, i)
   checkbounds(a.c, j)
-  ccall((:_nmod_mat_set_entry, :libflint), Void,
+  ccall((:nmod_mat_set_entry, :libflint), Void,
           (Ptr{nmod_mat}, Int, Int, UInt), &a, i-1, j-1, u)
 end
 
@@ -581,7 +581,7 @@ function Array(b::nmod_mat)
   a = Array(Residue{fmpz}, b.r, b.c)
   for i = 1:b.r
     for j = 1:b.c
-      a[i,j] = base_ring(b)(ccall((:_nmod_mat_get_entry, :libflint), UInt,
+      a[i,j] = base_ring(b)(ccall((:nmod_mat_get_entry, :libflint), UInt,
               (Ptr{nmod_mat}, Int, Int), &b, i-1, j-1))
     end
   end

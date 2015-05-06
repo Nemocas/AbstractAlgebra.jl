@@ -10,6 +10,8 @@ link against libgmp.a on Linux.
 General
 -------
 
+* Use macro for check_parent instead of function (throughout)
+
 * Implement strict equality, e.g. isidentical(1+O(x), 1+O(x^2)) == false;
   don't use isequal; in Julia it's for objects that hash to the same value
 
