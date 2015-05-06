@@ -228,6 +228,8 @@ include("fmpz_mod_series.jl")
 
 include("fmpz_mat.jl")
 
+include("nmod_mat.jl")
+
 include("PariRings.jl")
 
 include("Fields.jl")
