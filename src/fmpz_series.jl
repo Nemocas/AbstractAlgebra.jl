@@ -45,7 +45,7 @@ type fmpz_series <: PowerSeriesElem
    
    function fmpz_series(a::Array{fmpz, 1}, len::Int, prec::Int)
       z = new()
-      ccall((:fmpz_poly_init, :libflint), Void, 
+      ccall((:fmpz_poly_init2, :libflint), Void, 
             (Ptr{fmpz_series}, Int), &z, len)
       for i = 1:len
          ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
