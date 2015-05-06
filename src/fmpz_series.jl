@@ -541,9 +541,6 @@ function Base.call(a::FmpzSeriesRing, b::fmpz_series)
 end
 
 function Base.call(a::FmpzSeriesRing, b::Array{fmpz, 1}, len::Int, prec::Int)
-   if length(b) > 0
-      parent(b[1]) != base_ring(a) && error("Unable to coerce to power series")
-   end
    z = fmpz_series(b, len, prec)
    z.parent = a
    return z
