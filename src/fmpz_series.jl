@@ -92,6 +92,23 @@ var(a::FmpzSeriesRing) = a.S
    
 max_precision(R::FmpzSeriesRing) = R.prec_max
 
+function normalise(a::fmpz_series, len::Int)
+   if len > 0
+      c = ZZ()
+      ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
+         (Ptr{fmpz}, Ptr{fmpz_series}, Int), &c, &a, len - 1)
+   end
+   while len > 0 && iszero(c)
+      len -= 1
+      if len > 0
+         ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
+            (Ptr{fmpz}, Ptr{fmpz_series}, Int), &c, &a, len - 1)
+      end
+   end
+
+   return len
+end
+
 function coeff(x::fmpz_series, n::Int)
    if n < 0
       return ZZ(0)
