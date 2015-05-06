@@ -523,7 +523,6 @@ function Base.call(a::FmpzSeriesRing, b::Integer)
 end
 
 function Base.call(a::FmpzSeriesRing, b::fmpz)
-   base_ring(a) != ZZ && error("Unable to coerce to power series")
    if b == 0
       z = fmpz_series()
       z.prec = a.prec_max
