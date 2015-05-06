@@ -95,6 +95,9 @@ FLINT
 * document and test set_exact_fmpz, add_exact, mul_exact, sub_exact, inv_exact,
   div_exact, sqrt_exact, pow_exact_si, div_exact_fmpz
 
+* handle monomials and binomials optimally in powering, composition, division
+  etc. in polynomial/power series functions (over Z, Z/nZ, Q, Fq)
+
 PowerSeries.jl
 --------------
 
