@@ -197,7 +197,6 @@ function -(a::fmpz_series, b::fmpz_series)
    lenb = min(lenb, prec)
 
    lenz = max(lena, lenb)
-   z = fmpz_series()
    z = parent(a)()
    z.prec = prec
    ccall((:fmpz_poly_sub_series, :libflint), Void, 
