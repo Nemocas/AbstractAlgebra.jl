@@ -4,7 +4,11 @@
 #
 ###############################################################################
 
-export fmpq_series, FmpqSeriesRing
+import Base: tan, tanh, sinh, sin, cosh, cos, asin, asinh, atan, atanh, sqrt,
+             log
+
+export fmpq_series, FmpqSeriesRing, tan, tanh, sin, sinh, asin, asinh, atan,
+       atanh, sqrt, log
 
 ###############################################################################
 #
@@ -541,13 +545,166 @@ end
 ###############################################################################
 
 function exp(a::fmpq_series)
-   if a == 0
+   coeff(a, 0) != 0 && error("Constant term not zero in exp")
+   if length(a) == 0 || a.prec == 1
       return parent(a)([QQ(1)], 1, a.prec)
    end
-   coeff(a, 0) != 0 && error("Constant term not zero in exp")
    z = parent(a)()
    z.prec = a.prec
    ccall((:fmpq_poly_exp_series, :libflint), Void, 
+                (Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
+               &z, &a, a.prec)
+   return z
+end
+
+function log(a::fmpq_series)
+   coeff(a, 0) != 1 && error("Constant term not one in log")
+   if length(a) == 1 || a.prec < 2
+      return parent(a)()
+   end
+   z = parent(a)()
+   z.prec = a.prec
+   ccall((:fmpq_poly_log_series, :libflint), Void, 
+                (Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
+               &z, &a, a.prec)
+   return z
+end
+
+function tan(a::fmpq_series)
+   coeff(a, 0) != 0 && error("Constant term not zero in tan")
+   if a == 0 || a.prec < 2
+      return parent(a)()
+   end
+   z = parent(a)()
+   z.prec = a.prec
+   ccall((:fmpq_poly_tan_series, :libflint), Void, 
+                (Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
+               &z, &a, a.prec)
+   return z
+end
+
+function tanh(a::fmpq_series)
+   coeff(a, 0) != 0 && error("Constant term not zero in tanh")
+   if a == 0 || a.prec < 2
+      return parent(a)()
+   end
+   z = parent(a)()
+   z.prec = a.prec
+   ccall((:fmpq_poly_tanh_series, :libflint), Void, 
+                (Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
+               &z, &a, a.prec)
+   return z
+end
+
+function sin(a::fmpq_series)
+   coeff(a, 0) != 0 && error("Constant term not zero in sin")
+   if a == 0 || a.prec < 2
+      return parent(a)()
+   end
+   z = parent(a)()
+   z.prec = a.prec
+   ccall((:fmpq_poly_sin_series, :libflint), Void, 
+                (Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
+               &z, &a, a.prec)
+   return z
+end
+
+function sinh(a::fmpq_series)
+   coeff(a, 0) != 0 && error("Constant term not zero in sinh")
+   if a == 0 || a.prec < 2
+      return parent(a)()
+   end
+   z = parent(a)()
+   z.prec = a.prec
+   ccall((:fmpq_poly_sinh_series, :libflint), Void, 
+                (Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
+               &z, &a, a.prec)
+   return z
+end
+
+function cos(a::fmpq_series)
+   coeff(a, 0) != 0 && error("Constant term not zero in cos")
+   if length(a) == 0 || a.prec == 1
+      return one(parent(a))
+   end
+   z = parent(a)()
+   z.prec = a.prec
+   ccall((:fmpq_poly_cos_series, :libflint), Void, 
+                (Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
+               &z, &a, a.prec)
+   return z
+end
+
+function cosh(a::fmpq_series)
+   coeff(a, 0) != 0 && error("Constant term not zero in cosh")
+   if length(a) == 0 || a.prec == 1
+      return one(parent(a))
+   end
+   z = parent(a)()
+   z.prec = a.prec
+   ccall((:fmpq_poly_cosh_series, :libflint), Void, 
+                (Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
+               &z, &a, a.prec)
+   return z
+end
+
+function asin(a::fmpq_series)
+   coeff(a, 0) != 0 && error("Constant term not zero in asin")
+   if a == 0 || a.prec < 2
+      return parent(a)()
+   end
+   z = parent(a)()
+   z.prec = a.prec
+   ccall((:fmpq_poly_asin_series, :libflint), Void, 
+                (Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
+               &z, &a, a.prec)
+   return z
+end
+
+function asinh(a::fmpq_series)
+   coeff(a, 0) != 0 && error("Constant term not zero in asinh")
+   if a == 0 || a.prec < 2
+      return parent(a)()
+   end
+   z = parent(a)()
+   z.prec = a.prec
+   ccall((:fmpq_poly_asinh_series, :libflint), Void, 
+                (Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
+               &z, &a, a.prec)
+   return z
+end
+
+function atan(a::fmpq_series)
+   coeff(a, 0) != 0 && error("Constant term not zero in atan")
+   if a == 0 || a.prec < 2
+      return parent(a)()
+   end
+   z = parent(a)()
+   z.prec = a.prec
+   ccall((:fmpq_poly_atan_series, :libflint), Void, 
+                (Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
+               &z, &a, a.prec)
+   return z
+end
+
+function atanh(a::fmpq_series)
+   coeff(a, 0) != 0 && error("Constant term not zero in atanh")
+   if a == 0 || a.prec < 2
+      return parent(a)()
+   end
+   z = parent(a)()
+   z.prec = a.prec
+   ccall((:fmpq_poly_atanh_series, :libflint), Void, 
+                (Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
+               &z, &a, a.prec)
+   return z
+end
+
+function sqrt(a::fmpq_series)
+   coeff(a, 0) != 1 && error("Constant term not one in sqrt")
+   z = parent(a)()
+   z.prec = a.prec
+   ccall((:fmpq_poly_sqrt_series, :libflint), Void, 
                 (Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
                &z, &a, a.prec)
    return z
