@@ -82,6 +82,8 @@ Residue.jl
 FLINT
 -----
 
+* allow fmpq_sqrt_series to take square constant coefficient
+
 * fix printing of parentheses in polys over finite fields
 
 * fix issue with dll production on Windows
