@@ -6,23 +6,10 @@
 
 export nmod_mat, NmodMatSpace
 
-export @check_parent
-
-export getindex, setindex!, deepcopy, rows, cols, parent, base_ring, zero, one,
-       issquare, show, ==, transpose, transpose!, -, +, *, ^, rref, rref!,
-       trace, determinant, rank, inv, solve, lufact, sub, window, hcat, vcat,
-       Array, lift, lift!, MatrixSpace
-
-################################################################################
-#
-#  Macro for parent checking
-#
-################################################################################
-
-macro check_parent(x,y)
-  return :(parent($x) == parent($y) ? nothing :
-                      error("Arguments have different parents"))
-end
+export getindex, setindex!, set_entry!, deepcopy, rows, cols, parent, base_ring,
+       zero, one, issquare, show, ==, transpose, transpose!, -, +, *, ^, rref,
+       rref!, trace, determinant, rank, inv, solve, lufact, sub, window, hcat,
+       vcat, Array, lift, lift!, MatrixSpace, check_parent
 
 ################################################################################
 #
@@ -45,7 +32,7 @@ type NmodMatSpace <: Ring
     try
       return NmodMatID[R, r, c]
     catch
-      NmodMatID[R, r, c] = new(R, UInt(BigInt(abs(R.modulus))), r, c)
+      NmodMatID[R, r, c] = new(R, UInt(R.modulus), r, c)
     end
   end
 end
@@ -78,10 +65,7 @@ type nmod_mat <: MatElem
     finalizer(z, _nmod_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        ccall((:nmod_mat_set_entry, :libflint), Void,
-                (Ptr{nmod_mat}, Int, Int, UInt),
-                &z, i-1, j-1, arr[i,j] % n)
-      ## I am not sure if argument must be already reduced
+        set_entry!(z, i, j, arr[i,j])
       end
     end
     return z
@@ -98,12 +82,7 @@ type nmod_mat <: MatElem
     finalizer(z, _nmod_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        ccall((:fmpz_mod_ui, :libflint), UInt,
-                (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &arr[i,j], n)
-        tt = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &t)
-        ccall((:nmod_mat_set_entry, :libflint), Void,
-                (Ptr{nmod_mat}, Int, Int, UInt),
-                &z, i-1, j-1, tt)
+        set_entry!(z, i, j, arr[i,j])
       end
     end
     return z
@@ -125,12 +104,7 @@ type nmod_mat <: MatElem
     finalizer(z, _nmod_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        ccall((:fmpz_mod_ui, :libflint), UInt,
-                (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &arr[i,j].data, n)
-        tt = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &t)
-        ccall((:nmod_mat_set_entry, :libflint), Void,
-                (Ptr{nmod_mat}, Int, Int, UInt),
-                &z, i-1, j-1, tt)
+        set_entry!(z, i, j, arr[i,j])
       end
     end
     return z
@@ -174,31 +148,41 @@ end
 function setindex!(a::nmod_mat, u::UInt, i::Int, j::Int)
   checkbounds(a.r, i)
   checkbounds(a.c, j)
-  ccall((:nmod_mat_set_entry, :libflint), Void,
-          (Ptr{nmod_mat}, Int, Int, UInt), &a, i-1, j-1, u)
+  set_entry!(a, i, j, u)
 end
 
 function setindex!(a::nmod_mat, u::fmpz, i::Int, j::Int)
   checkbounds(a.r, i)
   checkbounds(a.c, j)
-  t = ZZ()
-  ccall((:fmpz_mod_ui, :libflint), UInt,
-          (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &u, a._n)
-  tt = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &t)
-  setindex!(a,tt,i,j)
+  set_entry!(a, i, j, u)
 end
 
 function setindex!(a::nmod_mat, u::Residue{fmpz}, i::Int, j::Int)
   checkbounds(a.r, i)
   checkbounds(a.c, j)
   (base_ring(a) != parent(u)) && error("Parent objects must coincide") 
-  setindex!(a, u.data, i, j)
+  set_entry!(a, i, j, u)
 end
 
 setindex!(a::nmod_mat, u::Integer, i::Int, j::Int) =
         setindex!(a, fmpz(u), i, j)
 
+function set_entry!(a::nmod_mat, i::Int, j::Int, u::UInt)
+  ccall((:nmod_mat_set_entry, :libflint), Void,
+          (Ptr{nmod_mat}, Int, Int, UInt), &a, i-1, j-1, u)
+end
 
+function set_entry!(a::nmod_mat, i::Int, j::Int, u::fmpz)
+  t = ZZ()
+  ccall((:fmpz_mod_ui, :libflint), UInt,
+          (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &u, a._n)
+  tt = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &t)
+  set_entry!(a, i, j, tt)
+end
+
+set_entry!(a::nmod_mat, i::Int, j::Int, u::Residue{fmpz}) =
+        set_entry!(a, i, j, u.data)
+ 
 function deepcopy(a::nmod_mat)
   z = nmod_mat(rows(a), cols(a), a._n)
   if isdefined(a, :parent)
@@ -316,7 +300,7 @@ function -(x::nmod_mat)
 end
 
 function +(x::nmod_mat, y::nmod_mat)
-  @check_parent(x,y)
+  check_parent(x,y)
   z = parent(x)()
   ccall((:nmod_mat_add, :libflint), Void,
           (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &z, &x, &y)
@@ -324,7 +308,7 @@ function +(x::nmod_mat, y::nmod_mat)
 end
 
 function -(x::nmod_mat, y::nmod_mat)
-  @check_parent(x,y)
+  check_parent(x,y)
   z = parent(x)()
   ccall((:nmod_mat_sub, :libflint), Void,
           (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &z, &x, &y)
@@ -410,7 +394,7 @@ end
 
 ################################################################################
 #
-#  Trace and Determinant
+#  Trace and determinant
 #
 ################################################################################
 
@@ -581,8 +565,7 @@ function Array(b::nmod_mat)
   a = Array(Residue{fmpz}, b.r, b.c)
   for i = 1:b.r
     for j = 1:b.c
-      a[i,j] = base_ring(b)(ccall((:nmod_mat_get_entry, :libflint), UInt,
-              (Ptr{nmod_mat}, Int, Int), &b, i-1, j-1))
+      a[i,j] = b[i,j]
     end
   end
   return a
@@ -689,3 +672,15 @@ function MatrixSpace(R::ResidueRing{fmpz}, r::Int, c::Int)
   end
 end
 
+################################################################################
+#
+#  Parent check
+#
+################################################################################
+
+function check_parent(x::nmod_mat, y::nmod_mat)
+  base_ring(x) != base_ring(y) && error("Residue rings must be equal")
+  (cols(x) != cols(y)) && (rows(x) != rows(y)) &&
+          error("Matrices have wrong dimensions")
+  return nothing
+end
