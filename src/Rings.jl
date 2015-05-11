@@ -240,6 +240,8 @@ include("fmpq_series.jl")
 
 include("fq_series.jl")
 
+include("fq_nmod_series.jl")
+
 include("pari_poly2.jl")
 
 include("NumberFields.jl")
