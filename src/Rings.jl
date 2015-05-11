@@ -238,6 +238,8 @@ include("Poly2.jl")
 
 include("fmpq_series.jl")
 
+include("fq_series.jl")
+
 include("pari_poly2.jl")
 
 include("NumberFields.jl")
