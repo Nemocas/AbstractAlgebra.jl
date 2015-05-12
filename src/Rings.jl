@@ -236,6 +236,8 @@ include("PariFields.jl")
 
 include("Poly2.jl")
 
+include("padic.jl")
+
 include("fmpq_series.jl")
 
 include("fq_series.jl")
