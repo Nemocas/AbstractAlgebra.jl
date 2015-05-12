@@ -1,6 +1,6 @@
 include("Fraction-test.jl")
 include("FiniteFields-test.jl")
-#include("Padics2-test.jl")
+include("Padics-test.jl")
 
 function test_fields_resultant()
    print("Fields.resultant...")
@@ -26,7 +26,7 @@ end
 function test_fields()
    test_fraction()
    test_ffield()
-#   test_padics2()
+   test_padics()
 
    test_fields_resultant()
 end

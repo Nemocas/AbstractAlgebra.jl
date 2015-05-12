@@ -6,7 +6,7 @@
 
 import Base: log, sqrt
 
-export PadicField, Padic, prime, teichmuller, log, sqrt
+export PadicField, padic, prime, teichmuller, log, sqrt
 
 ###############################################################################
 #
