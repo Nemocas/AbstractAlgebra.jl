@@ -790,6 +790,6 @@ function PowerSeriesRing(R::RationalField, prec::Int, s::String)
 
    parent_obj = FmpqSeriesRing(prec, S)
    
-   return parent_obj, parent_obj([QQ(0), QQ(1)], 2, prec)
+   return parent_obj, parent_obj([QQ(0), QQ(1)], 2, prec + 1)
 end
 

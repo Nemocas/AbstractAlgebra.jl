@@ -605,6 +605,6 @@ function PowerSeriesRing(R::FqFiniteField, prec::Int, s::String)
 
    parent_obj = FqSeriesRing(R, prec, S)
 
-   return parent_obj, parent_obj([R(0), R(1)], 2, prec)
+   return parent_obj, parent_obj([R(0), R(1)], 2, prec + 1)
 end
 

@@ -598,6 +598,6 @@ function PowerSeriesRing(R::ResidueRing{fmpz}, prec::Int, s::String)
 
    parent_obj = FmpzModSeriesRing(R, prec, S)
 
-   return parent_obj, parent_obj([ZZ(0), ZZ(1)], 2, prec)
+   return parent_obj, parent_obj([ZZ(0), ZZ(1)], 2, prec + 1)
 end
 

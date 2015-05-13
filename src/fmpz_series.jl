@@ -572,6 +572,6 @@ function PowerSeriesRing(R::IntegerRing, prec::Int, s::String)
 
    parent_obj = FmpzSeriesRing(prec, S)
    
-   return parent_obj, parent_obj([ZZ(0), ZZ(1)], 2, prec)
+   return parent_obj, parent_obj([ZZ(0), ZZ(1)], 2, prec + 1)
 end
 
