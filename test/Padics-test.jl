@@ -1,11 +1,11 @@
 function test_padics_constructors()
    print("Padics.constructors()...")  
 
-   R = PadicField(30, 7)
+   R = PadicField(7, 30)
    
    @test isa(R, PadicField)
 
-   S = PadicField(30, ZZ(65537))
+   S = PadicField(ZZ(65537), 30)
 
    @test isa(S, PadicField)
 
@@ -29,7 +29,7 @@ end
 function test_padics_manipulation()
    print("Padics.manipulation()...")  
 
-   R = PadicField(30, 7)
+   R = PadicField(7, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
    b = 7^2 + 3*7^3 + O(R, 7^5)
@@ -51,7 +51,7 @@ end
 function test_padics_unary_ops()
    print("Padics.unary_ops()...")  
 
-   R = PadicField(30, 7)
+   R = PadicField(7, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
    b = R(0)
@@ -66,7 +66,7 @@ end
 function test_padics_binary_ops()
    print("Padics.binary_ops()...")  
 
-   R = PadicField(30, 7)
+   R = PadicField(7, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
    b = 7^2 + 3*7^3 + O(R, 7^5)
@@ -89,7 +89,7 @@ end
 function test_padics_adhoc_binary()
    print("Padics.adhoc_binary()...")  
 
-   R = PadicField(30, 7)
+   R = PadicField(7, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
    b = 7^2 + 3*7^3 + O(R, 7^5)
@@ -122,7 +122,7 @@ end
 function test_padics_comparison()
    print("Padics.comparison()...")  
 
-   R = PadicField(30, 7)
+   R = PadicField(7, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
    b = 3*7^3 + O(R, 7^5)
@@ -143,7 +143,7 @@ end
 function test_padics_adhoc_comparison()
    print("Padics.adhoc_comparison()...")  
 
-   R = PadicField(30, 7)
+   R = PadicField(7, 30)
 
    a = 1 + O(R, 7^3)
    b = O(R, 7^5)
@@ -165,7 +165,7 @@ end
 function test_padics_powering()
    print("Padics.powering()...")  
 
-   R = PadicField(30, 7)
+   R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
    b = O(R, 7^5)
@@ -183,7 +183,7 @@ end
 function test_padics_exact_division()
    print("Padics.exact_division()...")  
 
-   R = PadicField(30, 7)
+   R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
    b = 2 + 3*7 + O(R, 7^5)
@@ -216,7 +216,7 @@ end
 function test_padics_inversion()
    print("Padics.inversion()...")  
 
-   R = PadicField(30, 7)
+   R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
    b = 2 + 3*7 + O(R, 7^5)
@@ -239,7 +239,7 @@ end
 function test_padics_square_root()
    print("Padics.square_root()...")  
 
-   R = PadicField(30, 7)
+   R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
    b = 2 + 3*7 + O(R, 7^5)
@@ -259,7 +259,7 @@ end
 function test_padics_special_functions()
    print("Padics.special_functions()...")  
 
-   R = PadicField(30, 7)
+   R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
    b = 2 + 5*7 + 3*7^2 + O(R, 7^3)

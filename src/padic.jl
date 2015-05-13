@@ -25,7 +25,7 @@ type PadicField <: Field
    mode::Int
    prec_max::Int
 
-   function PadicField(prec::Int, p::fmpz)
+   function PadicField(p::fmpz, prec::Int)
       !isprime(p) && error("Prime base required in PadicField")
       d = new()
       ccall((:padic_ctx_init, :libflint), Void, 
@@ -485,6 +485,6 @@ Base.call(R::PadicField, n::Integer) = R(ZZ(n))
 
 # inner constructor is also used directly
 
-function PadicField(prec::Int, p::Integer)
-   return PadicField(prec, ZZ(p))
+function PadicField(p::Integer, prec::Int)
+   return PadicField(ZZ(p), prec)
 end
