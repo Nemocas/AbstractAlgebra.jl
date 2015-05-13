@@ -467,7 +467,6 @@ function Base.call(R::PadicField, n::fmpq)
       N = -1
    else
      N = -flog(m, p) 
-     p^(-N) != m && error("Not a power of p in denominator of p-adic coercion")
    end
    z = padic(N + R.prec_max)
    ccall((:padic_set_fmpq, :libflint), Void, 

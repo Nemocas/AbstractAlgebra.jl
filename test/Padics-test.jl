@@ -112,7 +112,7 @@ function test_padics_adhoc_binary()
 
    @test a + ZZ(1)//7^2 == ZZ(1)//7^2 + 1 + 2*7^1 + 4*7^2 + O(R, 7^3)
 
-#   @test (ZZ(12)//11)*b == 3*7^2 + 3*7^3 + O(R, 7^5)
+   @test (ZZ(12)//11)*b == 3*7^2 + 3*7^3 + O(R, 7^5)
 
    @test c*(ZZ(1)//7) == O(R, 7^2)
 
@@ -198,17 +198,17 @@ function test_padics_exact_division()
 
    @test divexact(R(34), R(17)) == 2
 
-#   @test divexact(a, 2) == 4 + 1*7^2 + O(R, 7^3)
+   @test divexact(a, 2) == 4 + 1*7^2 + O(R, 7^3)
 
    @test divexact(b, ZZ(7)) == ZZ(2)//7 + 3 + O(R, 7^4)
 
-#   @test divexact(c, ZZ(12)//7^2) == 3*7^4 + 5*7^5 + O(R, 7^6)
+   @test divexact(c, ZZ(12)//7^2) == 3*7^4 + 5*7^5 + O(R, 7^6)
 
    @test divexact(2, d) == ZZ(2)//7 + 3 + 6*7^2 + O(R, 7^3)
 
-#   @test divexact(R(3), 3) == 1
+   @test divexact(R(3), 3) == 1
 
-#   @test divexact(ZZ(5)//7, R(5)) == ZZ(1)//7
+   @test divexact(ZZ(5)//7, R(5)) == ZZ(1)//7
 
    println("PASS")
 end
