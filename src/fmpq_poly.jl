@@ -29,7 +29,7 @@ end
 
 type fmpq_poly <: PolyElem
    coeffs::Ptr{Int}
-   den::Int # really an fmpz
+   den::Int 
    alloc::Int
    length::Int
    parent::FmpqPolyRing

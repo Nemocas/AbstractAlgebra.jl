@@ -236,7 +236,7 @@ include("Fields.jl")
 
 include("PariFields.jl")
 
-include("Poly2.jl")
+include("fmpq_poly.jl")
 
 include("padic.jl")
 
