@@ -10,6 +10,8 @@ link against libgmp.a on Linux.
 General
 -------
 
+* Nemo uses num/den, but for polys we are using numerator/denominator
+
 * entry/coeff, set_entry!/set_coeff! for Residue{fmpz} entries but 
   entry_data/coeff_data, set_entry!/set_coeff! (overloaded) for Int/fmpz
   entries
