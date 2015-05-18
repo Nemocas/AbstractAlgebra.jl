@@ -736,6 +736,12 @@ end
 
 Base.call(a::FmpqPolyRing, b::fmpq_poly) = b
 
+function Base.call(a::FmpqPolyRing, b::fmpz_poly)
+   z = fmpq_poly(b)
+   z.parent = a
+   return z
+end
+
 ###############################################################################
 #
 #   PolynomialRing constructor
