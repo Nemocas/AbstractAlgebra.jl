@@ -9,7 +9,8 @@
 # 
 # https://github.com/JuliaLang/julia/contributors
 #
-# Copyright (C) 2014, William Hart
+# Copyright (C) 2014, 2015 William Hart
+# Copyright (C) 2015, Claus Fieker
 # 
 # Permission is hereby granted, free of charge, to any person obtaining
 # a copy of this software and associated documentation files (the
@@ -131,6 +132,14 @@ isone(a::fmpz) = ccall((:fmpz_is_one, :libflint), Bool, (Ptr{fmpz},), &a)
 
 function words(a::fmpz)
    return a == 0 ? 0 : div(ndigits(a, 2) + 8*sizeof(Int) - 1, 8*sizeof(Int))
+end
+
+function den(a::fmpz)
+  return ZZ(1)
+end
+
+function num(a::fmpz)
+  return a
 end
 
 ###############################################################################
