@@ -97,6 +97,12 @@ function den(a::fmpq)
    return z
 end
 
+function abs(a::fmpq)
+   z = QQ()
+   ccall((:fmpq_abs, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &z, &a)
+   return z
+end
+
 zero(a::RationalField) = QQ(0)
 
 one(a::RationalField) = QQ(1)
