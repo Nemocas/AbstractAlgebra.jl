@@ -256,6 +256,8 @@ include("PariIdeal.jl")
 
 include("Factor.jl")
 
+include("nmod_poly.jl")
+
 ###############################################################################
 #
 #   Test code
