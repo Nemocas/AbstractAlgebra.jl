@@ -161,15 +161,15 @@ elem_type(::NmodPolyRing) = nmod_poly
 #
 ################################################################################
 
-length(x::nmod_poly) = ccall((:_nmod_poly_length, :libflint), Int,
+length(x::nmod_poly) = ccall((:nmod_poly_length, :libflint), Int,
                                (Ptr{nmod_poly}, ), &x)
 
-degree(x::nmod_poly) = ccall((:_nmod_poly_degree, :libflint), Int,
+degree(x::nmod_poly) = ccall((:nmod_poly_degree, :libflint), Int,
                                (Ptr{nmod_poly}, ), &x)
 
 function coeff(x::nmod_poly, n::Int)
   (n < 0 || n > degree(x)) && throw(DomainError())
-  return base_ring(x)(ccall((:_nmod_poly_get_coeff_ui, :libflint), UInt64,
+  return base_ring(x)(ccall((:nmod_poly_get_coeff_ui, :libflint), UInt64,
           (Ptr{nmod_poly}, Int), &x, n))
 end
 
@@ -819,7 +819,7 @@ function factor(x::nmod_poly)
   res = Array(Tuple{nmod_poly,Int}, fac._num)
   for i in 1:fac._num
     f = parent(x)()
-    ccall((:_nmod_poly_factor_get_nmod_poly, :libflint), Void,
+    ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
     e = unsafe_load(fac.exp,i)
     res[i] = (f,e)
@@ -834,7 +834,7 @@ function factor_squarefree(x::nmod_poly)
   res = Array(Tuple{nmod_poly,Int}, fac._num)
   for i in 1:fac._num
     f = parent(x)()
-    ccall((:_nmod_poly_factor_get_nmod_poly, :libflint), Void,
+    ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
     e = unsafe_load(fac.exp,i)
     res[i] = (f,e)
@@ -853,7 +853,7 @@ function factor_distinct_deg(x::nmod_poly)
   res = Array(Tuple{nmod_poly,Int}, fac._num)
   for i in 1:fac._num
     f = parent(x)()
-    ccall((:_nmod_poly_factor_get_nmod_poly, :libflint), Void,
+    ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
     res[i] = (f,degs[i])
   end
@@ -936,7 +936,7 @@ function _factor(x::nmod_poly)
   res = Array(Tuple{nmod_poly,Int}, fac._num)
   for i in 1:fac._num
     f = nmod_poly(x._mod_n)
-    ccall((:_nmod_poly_factor_get_nmod_poly, :libflint), Void,
+    ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
     e = unsafe_load(fac.exp,i)
     res[i] = (f,e)
