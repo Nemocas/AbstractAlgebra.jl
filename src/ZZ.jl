@@ -34,7 +34,7 @@
 
 import Base: convert, promote_rule, show, string, parseint, serialize,
              deserialize, base, bin, dec, oct, hex, gcd, gcdx, lcm, div, size,
-             zero, one, sign, hash, abs, deepcopy, rem, mod, isequal
+             zero, one, sign, hash, abs, deepcopy, rem, mod, isequal, num, den
 
 export fmpz, ZZ, IntegerRing, parent, show, convert, hash, fac, binom, isprime,
        fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm, invmod, powmod, abs,
@@ -45,7 +45,7 @@ export fmpz, ZZ, IntegerRing, parent, show, convert, hash, fac, binom, isprime,
        isprobabprime, issquare, jacobi, remove, root, size, isqrtrem, sqrtmod,
        trailing_zeros, sigma, eulerphi, fib, moebiusmu, primorial, risingfac,
        canonical_unit, needs_parentheses, is_negative, show_minus_one, 
-       parseint, addeq!, mul!, isunit, words, isequal
+       parseint, addeq!, mul!, isunit, words, isequal, num, den
 
 ###############################################################################
 #
