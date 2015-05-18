@@ -12,7 +12,7 @@ export fq_nmod, FqNmodFiniteField
 #
 ###############################################################################
 
-FqNmodFiniteFieldID = Dict{(fmpz, Int, Symbol), Field}()
+FqNmodFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, Field}()
 
 type FqNmodFiniteField <: Field
    p :: Int # fmpz

@@ -10,7 +10,7 @@
 #
 ###########################################################################################
 
-PariPolModID = Dict{(DataType, Symbol), PariRing}()
+PariPolModID = Dict{Tuple{DataType, Symbol}, PariRing}()
 
 type PariPolModRing{S <: PariRing} <: PariRing
    T::Symbol

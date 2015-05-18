@@ -12,7 +12,7 @@ export fq, FqFiniteField, frobenius, pth_root, trace, norm
 #
 ###############################################################################
 
-FqFiniteFieldID = Dict{(fmpz, Int, Symbol), Field}()
+FqFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, Field}()
 
 type FqFiniteField <: Field
    p::Int # fmpz

@@ -12,7 +12,7 @@ export norm, trace
 #
 ###############################################################################
 
-NfNumberFieldID = Dict{(fmpq_poly, Symbol), Field}()
+NfNumberFieldID = Dict{Tuple{fmpq_poly, Symbol}, Field}()
 
 type NfNumberField <: Field
    pol_coeffs::Ptr{Void}
