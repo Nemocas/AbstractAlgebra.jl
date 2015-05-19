@@ -42,6 +42,11 @@ General
 * put underscore before den and num type fields, to prevent a.num instead
   of num(a)
 
+fmpz_mod_poly.jl
+----------------
+
+* Write it
+
 Poly.jl/fmpz_poly.jl
 --------------------
 
@@ -140,6 +145,12 @@ pari_frac.jl
 
 * ZZ! in pari_frac.jl should not be needed, call ZZ! in pari_int 
   once Julia supports doing so
+
+fq.jl
+-----
+
+* Allow creation of a finite field from an fmpz_mod_poly as modulus as we've
+  done in fq_nmod.jl for an nmod_poly modulus
 
 Julia bugs??
 ============
