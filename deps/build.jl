@@ -33,6 +33,20 @@ if on_windows
    end
 end
 
+# install M4
+
+if !on_windows
+   run(`wget http://ftp.gnu.org/gnu/m4/m4-1.4.17.tar.bz2`)
+   run(`tar -xvf m4-1.4.17.tar.bz2`)
+   run(`rm m4-1.4.17.tar.bz2`)
+   cd("$wdir/m4-1.4.17")
+   run(`./configure --prefix=$wdir`)
+   run(`make`)
+   run(`make install`)
+end
+
+cd(wdir)
+
 # install MPIR
 
 run(`wget http://mpir.org/mpir-2.7.0-alpha11.tar.bz2`)
@@ -53,7 +67,7 @@ if on_windows
    run(`$start /e:4096 /c sh -c "cp .libs/libmpir*.dll $wdir2/lib"`)  # so we do it ourselves
    ENV["PATH"] = oldpth
 else
-   run(`./configure --prefix=$wdir --enable-gmpcompat --disable-static --enable-shared`)
+   run(`./configure --prefix=$wdir M4=$wdir/bin/m4 --enable-gmpcompat --disable-static --enable-shared`)
    run(`make -j4`)
    run(`make install`)
 end
@@ -117,6 +131,23 @@ end
 
 cd(wdir)
 
+# INSTALL ARB 
+
+try
+  run(`git clone -b julia https://github.com/thofma/arb.git`)
+except
+  run(`cd arb ; git pull`)
+end          
+ 
+if on_windows
+else
+   cd("$wdir/arb")
+   run(`./configure --prefix=$wdir --disable-static --enable-shared --with-mpir=$wdir --with-mpfr=$wdir --with-flint=$wdir`)
+   run(`make -j4`)
+   run(`make install`)
+   cd(wdir)
+end
+
 # install PARI
 
 try
@@ -128,7 +159,11 @@ end
 if on_windows
 else
    cd("$wdir/pari")
-   run(`./Configure --prefix=$wdir --mt=pthread`)
+   env_copy = copy(ENV)
+   env_copy["LD_LIBRARY_PATH"] = "$wdir/lib"
+   config_str = `./Configure --prefix=$wdir --with-gmp=$wdir --mt=pthread`
+   config_str = setenv(config_str, env_copy)
+   run(config_str)
    run(`make -j4 gp`)
    run(`make doc`)
    run(`make install`)
@@ -137,9 +172,9 @@ end
 cd(wdir)
 
 if on_windows
-   push!(DL_LOAD_PATH, "$pkgdir\\src\\lib")
+   push!(Libdl.DL_LOAD_PATH, "$pkgdir\\src\\lib")
 else
-   push!(DL_LOAD_PATH, "$pkgdir/src/lib")
+   push!(Libdl.DL_LOAD_PATH, "$pkgdir/src/lib")
 end
 
 cd(oldwdir)
