@@ -50,6 +50,15 @@ type FqNmodFiniteField <: Field
          return d
       end
    end
+
+   function FqNmodFiniteField(f::nmod_poly, s::Symbol)
+      z = new()
+      ccall((:fq_nmod_ctx_init_modulus, :libflint), Void, 
+            (Ptr{FqNmodFiniteField}, Ptr{nmod_poly}, Ptr{Uint8}), 
+	      &z, &f, bytestring(string(s)))
+      finalizer(z, _FqNmodFiniteField_clear_fn)
+      return z
+   end
 end
 
 function _FqNmodFiniteField_clear_fn(a :: FqNmodFiniteField)
@@ -480,6 +489,13 @@ end
 function FiniteField(char::Int, deg::Int, s::String)
    S = symbol(s)
    parent_obj = FqNmodFiniteField(ZZ(char), deg, S)
+
+   return parent_obj, gen(parent_obj) 
+end
+
+function FiniteField(pol::nmod_poly, s::String)
+   S = symbol(s)
+   parent_obj = FqNmodFiniteField(pol, S)
 
    return parent_obj, gen(parent_obj) 
 end
