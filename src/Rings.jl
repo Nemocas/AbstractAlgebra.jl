@@ -220,6 +220,8 @@ include("Poly.jl")
 
 include("fmpz_poly.jl")
 
+include("nmod_poly.jl")
+
 include("PowerSeries.jl")
 
 include("fmpz_series.jl")
@@ -255,8 +257,6 @@ include("MaximalOrders.jl")
 include("PariIdeal.jl")
 
 include("Factor.jl")
-
-include("nmod_poly.jl")
 
 ###############################################################################
 #
