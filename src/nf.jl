@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export norm, trace
+export norm, trace, CyclotomicField, MaximalRealSubfield, add!, sub!, mul!
 
 ###############################################################################
 #
@@ -476,6 +476,104 @@ function addeq!(z::nf_elem, x::nf_elem)
                                                   &z, &z, &x, &parent(x))
 end
 
+function add!(a::nf_elem, b::nf_elem, c::nf_elem)
+   ccall((:nf_elem_add, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{NfNumberField}),
+         &c, &a, &b, &a.parent)
+end
+
+function mul!(a::nf_elem, b::nf_elem, c::nf_elem)
+   ccall((:nf_elem_mul, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{NfNumberField}),
+         &c, &a, &b, &a.parent)
+end
+
+###############################################################################
+#
+#   Ad hoc unsafe functions
+#
+###############################################################################
+
+function add!(c::nf_elem, a::nf_elem, b::fmpq)
+   ccall((:nf_elem_add_fmpq, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpq}, Ptr{NfNumberField}),
+         &c, &a, &b, &a.parent)
+end
+
+function add!(c::nf_elem, a::nf_elem, b::fmpz)
+   ccall((:nf_elem_add_fmpz, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpz}, Ptr{NfNumberField}),
+         &c, &a, &b, &a.parent)
+end
+
+function add!(c::nf_elem, a::nf_elem, b::Int)
+   ccall((:nf_elem_add_si, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{nf_elem}, Int, Ptr{NfNumberField}),
+         &c, &a, &b, &a.parent)
+end
+
+add!(c::nf_elem, a::nf_elem, b::Integer) = add!(c, a, ZZ(b))
+
+function sub!(c::nf_elem, a::nf_elem, b::fmpq)
+   ccall((:nf_elem_sub_fmpq, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpq}, Ptr{NfNumberField}),
+         &c, &a, &b, &a.parent)
+end
+
+function sub!(c::nf_elem, a::nf_elem, b::fmpz)
+   ccall((:nf_elem_sub_fmpz, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpz}, Ptr{NfNumberField}),
+         &c, &a, &b, &a.parent)
+end
+
+function sub!(c::nf_elem, a::nf_elem, b::Int)
+   ccall((:nf_elem_sub_si, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{nf_elem}, Int, Ptr{NfNumberField}),
+         &c, &a, &b, &a.parent)
+end
+
+sub!(c::nf_elem, a::nf_elem, b::Integer) = sub!(c, a, ZZ(b))
+
+function sub!(c::nf_elem, a::fmpq, b::nf_elem)
+   ccall((:nf_elem_fmpq_sub, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{fmpq}, Ptr{nf_elem}, Ptr{NfNumberField}),
+         &c, &a, &b, &a.parent)
+end
+
+function sub!(c::nf_elem, a::fmpz, b::nf_elem)
+   ccall((:nf_elem_fmpz_sub, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{fmpz}, Ptr{nf_elem}, Ptr{NfNumberField}),
+         &c, &a, &b, &a.parent)
+end
+
+function sub!(c::nf_elem, a::Int, b::nf_elem)
+   ccall((:nf_elem_si_sub, :libflint), Void,
+         (Ptr{nf_elem}, Int, Ptr{nf_elem}, Ptr{NfNumberField}),
+         &c, &a, &b, &a.parent)
+end
+
+sub!(c::nf_elem, a::Integer, b::nf_elem) = sub!(c, ZZ(a), b)
+
+function mul!(c::nf_elem, a::nf_elem, b::fmpq)
+   ccall((:nf_elem_scalar_mul_fmpq, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpq}, Ptr{NfNumberField}),
+         &c, &a, &b, &a.parent)
+end
+
+function mul!(c::nf_elem, a::nf_elem, b::fmpz)
+   ccall((:nf_elem_scalar_mul_fmpz, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpz}, Ptr{NfNumberField}),
+         &c, &a, &b, &a.parent)
+end
+
+function mul!(c::nf_elem, a::nf_elem, b::Int) 
+   ccall((:nf_elem_scalar_mul_si, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{nf_elem}, Int, Ptr{NfNumberField}),
+         &c, &a, b, &a.parent)
+end
+
+mul!(c::nf_elem, a::nf_elem, b::Integer) = mul!(c, a, ZZ(b))
+
 ###############################################################################
 #
 #   Promotions
@@ -553,4 +651,16 @@ function NumberField(pol::fmpq_poly, s::String)
    return parent_obj, gen(parent_obj) 
 end
 
+function CyclotomicField(n::Int, s::String, t = "\$")
+   Zx, x = PolynomialRing(ZZ, string(gensym()))
+   Qx, = PolynomialRing(QQ, t)
+   f = cyclotomic(n, x)
+   return NumberField(Qx(f), s)
+end
 
+function MaximalRealSubfield(n::Int, s::String, t = "\$")
+   Zx, x = PolynomialRing(ZZ, string(gensym()))
+   Qx, = PolynomialRing(QQ, t)
+   f = cos_minpoly(n, x)
+   return NumberField(Qx(f), s)
+end

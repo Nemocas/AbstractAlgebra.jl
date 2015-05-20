@@ -139,6 +139,10 @@ nf.jl
 
 * fix needs_parentheses and is_negative
 
+* find way of allowing NumberField to take a polynomial over Z instead of
+  over Q, and yet allow all the coercions from that ring into number fields
+  maximal orders, ideals, etc., without making it inefficient
+
 pari_int.jl
 -----------
 
