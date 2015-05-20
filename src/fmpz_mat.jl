@@ -6,13 +6,14 @@
 
 import Base: getindex, setindex!, transpose
 
-export fmpz_mat, MatrixSpace, getindex, setindex!, rows, cols,
+export fmpz_mat, MatrixSpace, getindex, getindex!, setindex!, rows, cols,
        charpoly, determinant, determinant_divisor, determinant_given_divisor,
        gram, hadamard, is_hadamard, hnf, is_hnf, hnf_with_transform,
        hnf_modular, lll, lll_gram, lll_with_transform, lll_gram_with_transform,
        lll_with_removal, lll_with_removal_transform,
        nullspace, rank, rref, reduce_mod, snf, snf_diagonal, is_snf, solve,
-       solve_dixon, trace, transpose, content, hcat, vcat, addmul!, zero!
+       solve_dixon, trace, transpose, content, hcat, vcat, addmul!, zero!,
+       window
 
 ###############################################################################
 #
@@ -42,7 +43,12 @@ type fmpz_mat <: MatElem
    r::Int
    c::Int
    rows::Ptr{Void}
-   parent
+   parent::Ring
+
+   # used by windows, not finalised!!
+   function fmpz_mat()
+      return new() 
+   end
 
    function fmpz_mat(r::Int, c::Int)
       z = new()
@@ -123,6 +129,35 @@ end
 
 ###############################################################################
 #
+#   Windows - handle with care!!!
+#
+###############################################################################
+
+function window(x::fmpz_mat, r1::Int, c1::Int, r2::Int, c2::Int)
+  checkbounds(x.r, r1)
+  checkbounds(x.r, r2)
+  checkbounds(x.c, c1)
+  checkbounds(x.c, c2)
+  (r1 > r2 || c1 > c2) && error("Invalid parameters")  
+  b = fmpz_mat()
+  b.parent = MatrixSpace(parent(x).base_ring, r2 - r1 + 1, c2 - c1 + 1)
+  ccall((:fmpz_mat_window_init, :libflint), Void, 
+        (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Int, Int, Int, Int),
+            &b, &x, r1-1, c1-1, r2, c2)
+  finalizer(b, _fmpz_mat_window_clear_fn)
+  return b
+end
+
+function window(x::fmpz_mat, r::UnitRange{Int}, c::UnitRange{Int})
+  return window(x, r.start, c.start, r.stop, c.stop)
+end
+
+function _fmpz_mat_window_clear_fn(a::fmpz_mat)
+   ccall((:fmpz_mat_window_clear, :libflint), Void, (Ptr{fmpz_mat},), &a)
+end
+
+###############################################################################
+#
 #   Basic manipulation
 #
 ###############################################################################
@@ -138,8 +173,15 @@ function hash(a::fmpz_mat)
    return h
 end
 
+function getindex!(v::fmpz, a::fmpz_mat, r::Int, c::Int)
+   z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
+             (Ptr{fmpz_mat}, Int, Int), &a, r - 1, c - 1)
+   ccall((:fmpz_set, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), &v, z)
+end
+ 
 function getindex(a::fmpz_mat, r::Int, c::Int)
-   (r > a.parent.rows || c > a.parent.cols) && throw(BoundsError())
+   checkbounds(a.parent.rows, r)
+   checkbounds(a.parent.cols, c)
    v = ZZ()
    z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ptr{fmpz_mat}, Int, Int), &a, r - 1, c - 1)
@@ -148,7 +190,6 @@ function getindex(a::fmpz_mat, r::Int, c::Int)
 end
  
 function setindex!(a::fmpz_mat, d::fmpz, r::Int, c::Int)
-   (r > a.parent.rows || c > a.parent.cols) && throw(BoundsError())
    z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ptr{fmpz_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpz_set, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), z, &d)
@@ -157,10 +198,11 @@ end
 setindex!(a::fmpz_mat, d::Integer, r::Int, c::Int) = setindex!(a, ZZ(d), r, c)
 
 function setindex!(a::fmpz_mat, d::Int, r::Int, c::Int)
-   (r > a.parent.rows || c > a.parent.cols) && throw(BoundsError())
+   checkbounds(a.parent.rows, r)
+   checkbounds(a.parent.cols, c)
    z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ptr{fmpz_mat}, Int, Int), &a, r - 1, c - 1)
-   ccall((:fmpz_set_si, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), z, d)
+   ccall((:fmpz_set_si, :libflint), Void, (Ptr{fmpz}, Int), z, d)
 end
 
 rows(a::fmpz_mat) = a.r
@@ -310,7 +352,7 @@ end
 *(x::fmpz_mat, y::Integer) = ZZ(y)*x
 
 function +(x::fmpz_mat, y::Integer)
-   z = parent(x)(x)
+   z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
       z[i, i] += y
    end
@@ -320,7 +362,7 @@ end
 +(x::Integer, y::fmpz_mat) = y + x
 
 function -(x::fmpz_mat, y::Integer)
-   z = parent(x)(x)
+   z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
       z[i, i] -= y
    end
@@ -328,7 +370,7 @@ function -(x::fmpz_mat, y::Integer)
 end
 
 function -(x::Integer, y::fmpz_mat)
-   z = parent(y)(y)
+   z = deepcopy(y)
    for i = 1:min(rows(y), cols(y))
       z[i, i] = x - z[i, i]
    end
@@ -624,7 +666,7 @@ end
 
 
 function lll_with_transform(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51))
-   z = parent(x)(x)
+   z = deepcopy(x)
    if rows(x) == cols(x)
       parz = parent(x)
    else
@@ -637,7 +679,7 @@ function lll_with_transform(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51))
 end
 
 function lll(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51))
-   z = parent(x)(x)
+   z = deepcopy(x)
    if rows(x) == cols(x)
       parz = parent(x)
    else
@@ -650,7 +692,7 @@ function lll(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51))
 end
 
 function lll_gram_with_transform(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51, :gram))
-   z = parent(x)(x)
+   z = deepcopy(x)
    if rows(x) == cols(x)
       parz = parent(x)
    else
@@ -663,7 +705,7 @@ function lll_gram_with_transform(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51, :gram))
 end
 
 function lll_gram(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51, :gram))
-   z = parent(x)(x)
+   z = deepcopy(x)
    if rows(x) == cols(x)
       parz = parent(x)
    else
@@ -676,7 +718,7 @@ function lll_gram(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51, :gram))
 end
 
 function lll_with_removal_transform(x::fmpz_mat, b::fmpz, ctx=lll_ctx(0.99, 0.51))
-   z = parent(x)(x)
+   z = deepcopy(x)
    if rows(x) == cols(x)
       parz = parent(x)
    else
@@ -689,7 +731,7 @@ function lll_with_removal_transform(x::fmpz_mat, b::fmpz, ctx=lll_ctx(0.99, 0.51
 end
 
 function lll_with_removal(x::fmpz_mat, b::fmpz, ctx=lll_ctx(0.99, 0.51))
-   z = parent(x)(x)
+   z = deepcopy(x)
    if rows(x) == cols(x)
       parz = parent(x)
    else
