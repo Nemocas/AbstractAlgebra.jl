@@ -1,16 +1,7 @@
 ###########################################################################################
 #
-#   Fields.jl : generic fields
+#   PariRings.jl : functions for Pari fields
 #
 ###########################################################################################
 
-include("Fraction.jl")
-
-include("QQ.jl")
-
-include("FiniteFields.jl")
-
-//{T <: FieldElem}(a::T, b::T) = divexact(a, b)
-
-
-
+include("pari_frac.jl")

@@ -1,259 +1,304 @@
-export Residue, ResidueRing, modulus, copy, inv, canonical_unit, ResidueModulus
+###############################################################################
+#
+#   Residue.jl : generic residue rings (modulo a principal ideal)
+#
+###############################################################################
 
-import Base: convert, zero
+export ResidueRing, Residue, inv, modulus
 
-ResidueModulus = ObjectIdDict()
-
-###########################################################################################
+###############################################################################
 #
 #   Data types and memory management
 #
-###########################################################################################
+###############################################################################
 
-type Residue{T <: Ring, S} <: Ring
-   data::T
-   Residue(a::Int) = new(mod(convert(T, a), ResidueModulus[S]))
-   Residue(a::ZZ) = new(mod(convert(T, a), ResidueModulus[S]))
-   Residue(a::T) = new(mod(a, ResidueModulus[S]))
-   Residue(a::Residue{T, S}) = a
-   Residue() = new(T(0))
+ModulusDict = Dict{Tuple{Ring, RingElem}, Ring}()
+
+type ResidueRing{T <: RingElem} <: Ring
+   base_ring::Ring
+   modulus::T
+
+   function ResidueRing(modulus::T)
+      return try
+         ModulusDict[parent(modulus), modulus]
+      catch
+         ModulusDict[parent(modulus), modulus] = new(parent(modulus), modulus)
+      end
+   end
 end
 
-###########################################################################################
+type Residue{T <: RingElem} <: RingElem
+   data::T
+   parent::ResidueRing
+
+   Residue(a::T) = new(a)
+end
+
+elem_type{T <: RingElem}(::ResidueRing{T}) = Residue{T}
+
+base_ring(a::ResidueRing) = a.base_ring
+
+base_ring(a::Residue) = base_ring(parent(a))
+
+parent(a::Residue) = a.parent
+
+function check_parent(a::Residue, b::Residue)
+   parent(a) != parent(b) && error("Incompatible moduli in residue operation")
+end
+
+###############################################################################
 #
 #   Basic manipulation
 #
-###########################################################################################
+###############################################################################
 
-function modulus{T <: Ring, S}(::Type{Residue{T, S}})
-   return ResidueModulus[S]::T
+function hash(a::Residue)
+   h = 0x539c1c8715c1adc2
+   return h $ hash(a.data)
 end
 
-zero{T <: Ring, S}(::Type{Residue{T, S}}) = Residue{T, S}(0)
+function modulus(R::ResidueRing)
+   return R.modulus
+end
 
-one{T <: Ring, S}(::Type{Residue{T, S}}) = Residue{T, S}(1)
+function modulus(a::Residue)
+   return modulus(parent(a))
+end
 
-iszero{T <: Ring, S}(a::Residue{T, S}) = iszero(a.data)
+zero(R::ResidueRing) = R(0)
 
-isone{T <: Ring, S}(a::Residue{T, S}) = isone(a.data)
+one(R::ResidueRing) = R(1)
 
-function isunit{T <: Ring, S}(a::Residue{T, S})
-   g, ainv = gcdinv(a.data, ResidueModulus[S]::T)
+iszero(a::Residue) = iszero(a.data)
+
+isone(a::Residue) = isone(a.data)
+
+function isunit(a::Residue)
+   g, ainv = gcdinv(a.data, modulus(a))
    return g == 1
 end
 
-###########################################################################################
-#
-#   Unary operations
-#
-###########################################################################################
+deepcopy(a::Residue) = parent(a)(deepcopy(a.data))
 
-function -{T <: Ring, S}(a::Residue{T, S})
-   Residue{T, S}(-a.data)
-end
-
-###########################################################################################
-#
-#   Comparisons
-#
-###########################################################################################
-
-=={T, S}(x::Residue{T, S}, y::Residue{T, S}) = x.data == y.data
-
-=={T, S}(x::Residue{T, S}, y::ZZ) = x.data == T(y)
-
-=={T, S}(x::Residue{T, S}, y::Int) = x.data == T(y)
-
-=={T, S}(x::ZZ, y::Residue{T, S}) = T(x) == y.data
-
-=={T, S}(x::Int, y::Residue{T, S}) = T(x) == y.data
-
-isequal{T, S}(x::Residue{T, S}, y::Residue{T, S}) = isequal(x.data, y.data)
-
-###########################################################################################
-#
-#   String I/O
-#
-###########################################################################################
-
-function show{T <: Ring, S}(io::IO, x::Residue{T, S})
-   print(io, x.data)
-end
-
-function show{T <: Ring, S}(io::IO, a::Type{Residue{T, S}})
-   print(io, "Residue ring of ", T, " modulo ", modulus(a))
-end
-
-needs_parentheses{T <: Ring, S}(x::Residue{T, S}) = needs_parentheses(x.data)
-
-is_negative{T <: Ring, S}(x::Residue{T, S}) = is_negative(x.data)
-
-show_minus_one{T <: Ring, S}(::Type{Residue{T, S}}) = true
-
-###########################################################################################
+###############################################################################
 #
 #   Canonicalisation
 #
-###########################################################################################
+###############################################################################
 
-canonical_unit{T, S}(a::Residue{T, S}) = a
+canonical_unit(a::Residue) = a
 
-###########################################################################################
+###############################################################################
 #
-#   Binary operations and functions
+#   String I/O
 #
-###########################################################################################
+###############################################################################
 
-+{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S}) = Residue{T, S}(a.data + b.data)
-
--{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S}) = Residue{T, S}(a.data - b.data)
-
-*{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S}) = Residue{T, S}(a.data * b.data)
-
-function divexact{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
-   g, binv = gcdinv(b.data, ResidueModulus[S]::T)
-   if g != 1
-      error("Impossible inverse in divexact")
-   end
-   Residue{T, S}(a.data * binv)
+function show(io::IO, x::Residue)
+   print(io, x.data)
 end
 
-gcd{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S}) = Residue{T, S}(gcd(gcd(a.data, ResidueModulus[S]::T), b.data))
-
-###########################################################################################
-#
-#   Unsafe operators and functions
-#
-###########################################################################################
-
-function mul!{T <: Ring, S}(c::Residue{T, S}, a::Residue{T, S}, b::Residue{T, S})
-   c.data = mod(a.data*b.data, ResidueModulus[S]::T)
+function show(io::IO, a::ResidueRing)
+   print(io, "Residue ring of ", base_ring(a), " modulo ", modulus(a))
 end
 
-function addeq!{T <: Ring, S}(c::Residue{T, S}, a::Residue{T, S})
-   c.data = mod(c.data + a.data, ResidueModulus[S]::T)
+needs_parentheses(x::Residue) = needs_parentheses(x.data)
+
+is_negative(x::Residue) = is_negative(x.data)
+
+show_minus_one{T <: RingElem}(::Type{Residue{T}}) = true
+
+###############################################################################
+#
+#   Unary operations
+#
+###############################################################################
+
+function -{T <: RingElem}(a::Residue{T})
+   parent(a)(-a.data)
 end
 
-###########################################################################################
+###############################################################################
+#
+#   Binary operators
+#
+###############################################################################
+
+function +{T <: RingElem}(a::Residue{T}, b::Residue{T})
+   check_parent(a, b)
+   return parent(a)(a.data + b.data)
+end
+
+function -{T <: RingElem}(a::Residue{T}, b::Residue{T})
+   check_parent(a, b)
+   return parent(a)(a.data - b.data)
+end
+
+function *{T <: RingElem}(a::Residue{T}, b::Residue{T})
+   check_parent(a, b)
+   return parent(a)(a.data * b.data)
+end
+
+###############################################################################
 #
 #   Ad hoc binary operations
 #
-###########################################################################################
+###############################################################################
 
-*{T <: Ring, S}(a::Residue{T, S}, b::Int) = Residue{T, S}(a.data * b)
+*{T <: RingElem}(a::Residue{T}, b::Integer) = parent(a)(a.data * b)
 
-*{T <: Ring, S}(a::Int, b::Residue{T, S}) = Residue{T, S}(a * b.data)
+*{T <: RingElem}(a::Integer, b::Residue{T}) = parent(b)(a * b.data)
 
-*{T <: Ring, S}(a::Residue{T, S}, b::ZZ) = Residue{T, S}(a.data * b)
++{T <: RingElem}(a::Residue{T}, b::Integer) = parent(a)(a.data + b)
 
-*{T <: Ring, S}(a::ZZ, b::Residue{T, S}) = Residue{T, S}(a * b.data)
++{T <: RingElem}(a::Integer, b::Residue{T}) = parent(b)(a + b.data)
 
-+{T <: Ring, S}(a::Residue{T, S}, b::Int) = Residue{T, S}(a.data + b)
+-{T <: RingElem}(a::Residue{T}, b::Integer) = parent(a)(a.data - b)
 
-+{T <: Ring, S}(a::Int, b::Residue{T, S}) = Residue{T, S}(a + b.data)
+-{T <: RingElem}(a::Integer, b::Residue{T}) = parent(b)(a - b.data)
 
-+{T <: Ring, S}(a::Residue{T, S}, b::ZZ) = Residue{T, S}(a.data + b)
-
-+{T <: Ring, S}(a::ZZ, b::Residue{T, S}) = Residue{T, S}(a + b.data)
-
--{T <: Ring, S}(a::Residue{T, S}, b::Int) = Residue{T, S}(a.data - b)
-
--{T <: Ring, S}(a::Int, b::Residue{T, S}) = Residue{T, S}(a - b.data)
-
--{T <: Ring, S}(a::Residue{T, S}, b::ZZ) = Residue{T, S}(a.data - b)
-
--{T <: Ring, S}(a::ZZ, b::Residue{T, S}) = Residue{T, S}(a - b.data)
-
-###########################################################################################
+###############################################################################
 #
 #   Powering
 #
-###########################################################################################
+###############################################################################
 
-function ^{T <: Ring, S}(a::Residue{T, S}, b::Int)
-   Residue{T, S}(powmod(a.data, b, ResidueModulus[S]::T))
+function ^{T <: RingElem}(a::Residue{T}, b::Int)
+   parent(a)(powmod(a.data, b, modulus(a)))
 end
 
-###########################################################################################
+###############################################################################
 #
-#   Exact division
+#   Comparison
 #
-###########################################################################################
+###############################################################################
 
-function divexact{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
-   g, binv = gcdinv(b.data, ResidueModulus[S]::T)
-   if g != 1
-      error("Impossible inverse in inv")
-   end
-   return Residue{T, S}(a.data*binv)
+function =={T <: RingElem}(a::Residue{T}, b::Residue{T})
+   check_parent(a, b)
+   return a.data == b.data
 end
 
-function divexact{T <: Ring, S}(a::Residue{T, S}, b::Int)
-   g, binv = gcdinv(T(b), ResidueModulus[S]::T)
-   if g != 1
-      error("Impossible inverse in inv")
-   end
-   return Residue{T, S}(a.data*binv)
-end
-
-function divexact{T <: Ring, S}(a::Residue{T, S}, b::ZZ)
-   g, binv = gcdinv(T(b), ResidueModulus[S]::T)
-   if g != 1
-      error("Impossible inverse in inv")
-   end
-   return Residue{T, S}(a.data*binv)
-end
-
-###########################################################################################
+###############################################################################
 #
 #   Inversion
 #
-###########################################################################################
+###############################################################################
 
-function inv{T <: Ring, S}(a::Residue{T, S})
-   g, ainv = gcdinv(a.data, ResidueModulus[S]::T)
+function inv{T <: RingElem}(a::Residue{T})
+   g, ainv = gcdinv(a.data, modulus(a))
    if g != 1
       error("Impossible inverse in inv")
    end
-   Residue{T, S}(ainv)
+   return parent(a)(ainv)
 end
 
-###########################################################################################
+###############################################################################
 #
-#   Conversions
+#   Exact division
 #
-###########################################################################################
+###############################################################################
 
-Base.convert{T <: Ring, S}(::Type{Residue{T, S}}, a::T) = Residue{T, S}(a)
+function divexact{T <: RingElem}(a::Residue{T}, b::Residue{T})
+   check_parent(a, b)
+   g, binv = gcdinv(b.data, modulus(b))
+   if g != 1
+      error("Impossible inverse in divexact")
+   end
+   return parent(a)(a.data * binv)
+end
 
-Base.convert{T <: Ring, S}(::Type{Residue{T, S}}, a::Int) = Residue{T, S}(a)
+###############################################################################
+#
+#   GCD
+#
+###############################################################################
 
-Base.convert{T <: Ring, S}(::Type{Residue{T, S}}, a::ZZ) = Residue{T, S}(a)
+function gcd{T <: RingElem}(a::Residue{T}, b::Residue{T})
+   check_parent(a, b)
+   return parent(a)(gcd(gcd(a.data, modulus(a)), b.data))
+end
 
-Base.promote_rule{T <: Ring, S}(::Type{Residue{T, S}}, ::Type{T}) = Residue{T, S}
+###############################################################################
+#
+#   Unsafe functions
+#
+###############################################################################
 
-Base.promote_rule{T <: Ring, S}(::Type{Residue{T, S}}, ::Int) = Residue{T, S}
+function mul!{T <: RingElem}(c::Residue{T}, a::Residue{T}, b::Residue{T})
+   c.data = mod(a.data*b.data, modulus(a))
+end
 
-Base.promote_rule{T <: Ring, S}(::Type{Residue{T, S}}, ::ZZ) = Residue{T, S}
+function addeq!{T <: RingElem}(c::Residue{T}, a::Residue{T})
+   c.data = mod(c.data + a.data, modulus(a))
+end
 
-###########################################################################################
+###############################################################################
+#
+#   Promotion rules
+#
+###############################################################################
+
+Base.promote_rule{T <: RingElem}(::Type{Residue{T}}, ::Type{T}) = Residue{T}
+
+Base.promote_rule{T <: RingElem, U <: Integer}(::Type{Residue{T}}, ::Type{U}) = Residue{T}
+
+###############################################################################
+#
+#   Parent object call overloading
+#
+###############################################################################
+
+function Base.call{T <: RingElem}(a::ResidueRing{T}, b::RingElem)
+   return a(base_ring(a)(b))
+end
+
+function Base.call{T <: RingElem}(a::ResidueRing{T})
+   z = Residue{T}(zero(base_ring(a)))
+   z.parent = a
+   return z
+end
+
+function Base.call{T <: RingElem}(a::ResidueRing{T}, b::Integer)
+   z = Residue{T}(mod(base_ring(a)(b), modulus(a)))
+   z.parent = a
+   return z
+end
+
+function Base.call{T <: RingElem}(a::ResidueRing{T}, b::T)
+   base_ring(a) != parent(b) && error("Operation on incompatible objects")
+   z = Residue{T}(mod(b, modulus(a)))
+   z.parent = a
+   return z
+end
+
+function Base.call{T <: RingElem}(a::ResidueRing{T}, b::Residue{T})
+   a != parent(b) && error("Operation on incompatible objects")
+   return b
+end
+
+###############################################################################
 #
 #   ResidueRing constructor
 #
-###########################################################################################
+###############################################################################
 
-function ResidueRing{T <: Ring}(::Type{T}, el::T)
+function ResidueRing{T <: RingElem}(R::Ring, el::T)
+   parent(el) != R && error("Modulus is not an element of the specified ring")
    el == 0 && throw(DivideError())
-   S = gensym("residue")
-   P = Residue{T, S}
-   ResidueModulus[S] = el
-   return P
+   
+   R2 = R
+   parent_type = Residue{T}
+   while base_ring(R2) != None
+      R2 = base_ring(R2)
+      T2 = elem_type(R2)
+      eval(:(Base.promote_rule(::Type{$parent_type}, ::Type{$T2}) = $parent_type))
+   end
+
+   return ResidueRing{T}(el)
 end
 
-function ResidueRing{T <: Ring}(::Type{T}, el::Int)
+function ResidueRing(R::IntegerRing, el::Integer)
    el == 0 && throw(DivideError())
-   S = gensym("residue")
-   P = Residue{T, S}
-   ResidueModulus[S] = T(el)
-   return P
+   
+   return ResidueRing{fmpz}(R(el))
 end

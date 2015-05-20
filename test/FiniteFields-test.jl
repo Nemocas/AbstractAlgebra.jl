@@ -3,23 +3,23 @@ function test_ffield_constructors()
 
    R, x = FiniteField(7, 5, "x")
 
-   @test R <: FinFieldElem
+   @test isa(R, FqNmodFiniteField)
 
    S, y = FiniteField(ZZ(17), 3, "y")
 
-   @test S <: FinFieldElem
+   @test isa(S, FqFiniteField)
 
-   @test isa(3x^4 + 2x^3 + 4x^2 + x + 1, FinFieldElem)
+   @test isa(3x^4 + 2x^3 + 4x^2 + x + 1, fq_nmod)
 
-   @test isa(2y^2 + 11y + 16, FinFieldElem)
+   @test isa(2y^2 + 11y + 16, fq)
 
    h = R(4)
 
-   @test isa(h, FinFieldElem)
+   @test isa(h, fq_nmod)
 
-   @test isa(S(11), FinFieldElem)
+   @test isa(S(11), fq)
 
-   @test isa(R(h), FinFieldElem)
+   @test isa(R(h), fq_nmod)
 
    println("PASS")
 end
@@ -131,7 +131,7 @@ function test_ffield_exact_division()
 
    @test divexact(a, b) == 3*x^4+2*x^3+2*x^2+5*x
 
-   @test b/a == 4*x^2+6*x+5
+   @test b//a == 4*x^2+6*x+5
 
    println("PASS")
 end

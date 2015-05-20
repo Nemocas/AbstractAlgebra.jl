@@ -44,6 +44,20 @@ else
    run(`rm -rf m4-1.4.17`)
 end
 
+# install M4
+
+if !on_windows
+   run(`wget http://ftp.gnu.org/gnu/m4/m4-1.4.17.tar.bz2`)
+   run(`tar -xvf m4-1.4.17.tar.bz2`)
+   run(`rm m4-1.4.17.tar.bz2`)
+   cd("$wdir/m4-1.4.17")
+   run(`./configure --prefix=$wdir`)
+   run(`make`)
+   run(`make install`)
+end
+
+cd(wdir)
+
 # install MPIR
 
 run(`wget http://mpir.org/mpir-2.7.0-alpha11.tar.bz2`)
@@ -98,36 +112,85 @@ end
 
 cd(wdir)
 
-# install FLINT
+# install ANTIC
 
-run(`git clone https://github.com/wbhart/flint2.git`)
+try
+  run(`git clone https://github.com/wbhart/antic.git`)
+except
+  run(`cd antic ; git pull`)
+end          
+
+# install FLINT
+try
+  run(`git clone https://github.com/wbhart/flint2.git`)
+except
+  run(`cd flint2 ; git pull`)
+end          
 
 if on_windows
    cd("$wdir\\flint2")
    ENV["PATH"] = pth
    if Int == Int32
-      run(`$start /e:4096 /c sh configure --prefix=$wdir2 --disable-static --enable-shared --with-mpir=$wdir2 --with-mpfr=$wdir2 ABI=32`)
+      run(`$start /e:4096 /c sh configure --extensions="$wdir2\antic" --prefix=$wdir2 --disable-static --enable-shared --with-mpir=$wdir2 --with-mpfr=$wdir2 ABI=32`)
    else
-      run(`$start /e:4096 /c sh configure --prefix=$wdir2 --disable-static --enable-shared --with-mpir=$wdir2 --with-mpfr=$wdir2 ABI=64`)
+      run(`$start /e:4096 /c sh configure --extensions="$wdir2\antic" --prefix=$wdir2 --disable-static --enable-shared --with-mpir=$wdir2 --with-mpfr=$wdir2 ABI=64`)
    end
    run(`$start /e:4096 /c sh -c "make -j"`)
    run(`$start /e:4096 /c sh -c "make install"`)
    ENV["PATH"] = oldpth
 else
    cd("$wdir/flint2")
-   run(`./configure --prefix=$wdir --disable-static --enable-shared --with-mpir=$wdir --with-mpfr=$wdir`)
+   run(`./configure --prefix=$wdir --extensions="$wdir/antic" --disable-static --enable-shared --with-mpir=$wdir --with-mpfr=$wdir`)
+   run(`make -j4`)
+   run(`make install`)
+end
+
+cd(wdir)
+
+# INSTALL ARB 
+
+try
+  run(`git clone -b julia https://github.com/thofma/arb.git`)
+except
+  run(`cd arb ; git pull`)
+end          
+ 
+if on_windows
+else
+   cd("$wdir/arb")
+   run(`./configure --prefix=$wdir --disable-static --enable-shared --with-mpir=$wdir --with-mpfr=$wdir --with-flint=$wdir`)
    run(`make -j4`)
    run(`make install`)
    cd(wdir)
-   run(`rm -rf flint2`)
+end
+
+# install PARI
+
+try
+  run(`git clone http://pari.math.u-bordeaux.fr/git/pari.git`)
+except
+  run(`cd pari ; git pull`)
+end  
+
+if on_windows
+else
+   cd("$wdir/pari")
+   env_copy = copy(ENV)
+   env_copy["LD_LIBRARY_PATH"] = "$wdir/lib"
+   config_str = `./Configure --prefix=$wdir --with-gmp=$wdir --mt=pthread`
+   config_str = setenv(config_str, env_copy)
+   run(config_str)
+   run(`make -j4 gp`)
+   run(`make doc`)
+   run(`make install`)
 end
 
 cd(wdir)
 
 if on_windows
-   push!(DL_LOAD_PATH, "$pkgdir\\src\\lib")
+   push!(Libdl.DL_LOAD_PATH, "$pkgdir\\src\\lib")
 else
-   push!(DL_LOAD_PATH, "$pkgdir/src/lib")
+   push!(Libdl.DL_LOAD_PATH, "$pkgdir/src/lib")
 end
 
 cd(oldwdir)

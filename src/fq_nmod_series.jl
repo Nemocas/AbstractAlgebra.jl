@@ -1,0 +1,610 @@
+###############################################################################
+#
+#   fq_nmod_series.jl : Power series over flint finite fields
+#
+###############################################################################
+
+export fq_nmod_series, FqNmodSeriesRing
+
+###############################################################################
+#
+#   Data types and memory management
+#
+###############################################################################
+
+FqSeriesID = ObjectIdDict()
+
+type FqNmodSeriesRing <: Ring
+   base_ring::Ring
+   prec_max::Int
+   S::Symbol
+
+   function FqNmodSeriesRing(R::Ring, prec::Int, s::Symbol)
+      return try
+         FqSeriesID[R, prec, s]
+      catch
+         FqSeriesID[R, prec, s] = new(R, prec, s)
+      end
+   end
+end
+
+type fq_nmod_series <: PowerSeriesElem
+   coeffs::Ptr{Void}
+   alloc::Int
+   length::Int
+   prec :: Int
+   parent::FqNmodSeriesRing
+
+   function fq_nmod_series(ctx::FqNmodFiniteField)
+      z = new()
+      ccall((:fq_nmod_poly_init, :libflint), Void, 
+            (Ptr{fq_nmod_series}, Ptr{FqNmodFiniteField}), &z, &ctx)
+      finalizer(z, _fq_nmod_series_clear_fn)
+      return z
+   end
+   
+   function fq_nmod_series(ctx::FqNmodFiniteField, a::Array{fq_nmod, 1}, len::Int, prec::Int)
+      z = new()
+      ccall((:fq_nmod_poly_init2, :libflint), Void, 
+            (Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}), &z, len, &ctx)
+      for i = 1:len
+         ccall((:fq_nmod_poly_set_coeff, :libflint), Void, 
+               (Ptr{fq_nmod_series}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}),
+                                               &z, i - 1, &a[i], &ctx)
+      end
+      z.prec = prec
+      finalizer(z, _fq_nmod_series_clear_fn)
+      return z
+   end
+   
+   function fq_nmod_series(ctx::FqNmodFiniteField, a::fq_nmod_series)
+      z = new()
+      ccall((:fq_nmod_poly_init, :libflint), Void, 
+            (Ptr{fq_nmod_series}, Ptr{FqNmodFiniteField}), &z, &ctx)
+      ccall((:fq_nmod_poly_set, :libflint), Void, 
+            (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Ptr{FqNmodFiniteField}), &z, &a, &ctx)
+      finalizer(z, _fq_nmod_series_clear_fn)
+      return z
+   end
+end
+
+function _fq_nmod_series_clear_fn(a::fq_nmod_series)
+   ctx = base_ring(a)
+   ccall((:fq_nmod_poly_clear, :libflint), Void,
+         (Ptr{fq_nmod_series}, Ptr{FqNmodFiniteField}), &a, &ctx)
+end
+
+function O(a::fq_nmod_series)
+   prec = length(a) - 1
+   prec < 0 && throw(DomainError())
+   z = fq_nmod_series(base_ring(a), Array(fq_nmod, 0), 0, prec)
+   z.parent = parent(a)
+   return z
+end
+
+elem_type(::FqNmodSeriesRing) = fq_nmod_series
+
+base_ring(R::FqNmodSeriesRing) = R.base_ring
+
+var(a::FqNmodSeriesRing) = a.S
+
+###############################################################################
+#
+#   Basic manipulation
+#
+###############################################################################    
+   
+max_precision(R::FqNmodSeriesRing) = R.prec_max
+
+function normalise(a::fq_nmod_series, len::Int)
+   ctx = base_ring(a)
+   if len > 0
+      c = ctx()
+      ccall((:fq_nmod_poly_get_coeff, :libflint), Void, 
+         (Ptr{fq_nmod}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}), 
+                                           &c, &a, len - 1, &ctx)
+   end
+   while len > 0 && iszero(c)
+      len -= 1
+      if len > 0
+         ccall((:fq_nmod_poly_get_coeff, :libflint), Void, 
+            (Ptr{fq_nmod}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}), 
+                                           &c, &a, len - 1, &ctx)
+      end
+   end
+
+   return len
+end
+
+function coeff(x::fq_nmod_series, n::Int)
+   ctx = base_ring(x)
+   if n < 0
+      return ctx()
+   end
+   z = ctx()
+   ccall((:fq_nmod_poly_get_coeff, :libflint), Void, 
+         (Ptr{fq_nmod}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}), &z, &x, n, &ctx)
+   return z
+end
+
+zero(R::FqNmodSeriesRing) = R(0)
+
+one(R::FqNmodSeriesRing) = R(1)
+
+function gen(R::FqNmodSeriesRing)
+   ctx = base_ring(R)
+   z = fq_nmod_series(ctx, [ctx(0), ctx(1)], 2, max_precision(R) + 1)
+   z.parent = R
+   return z
+end
+
+function deepcopy(a::fq_nmod_series)
+   z = fq_nmod_series(base_ring(a), a)
+   z.prec = a.prec
+   z.parent = parent(a)
+   return z
+end
+
+###############################################################################
+#
+#   String I/O
+#
+###############################################################################
+
+function show(io::IO, x::fq_nmod_series)
+   if length(x) == 0
+      print(io, "0")
+   else
+      ctx = base_ring(x)
+      cstr = ccall((:fq_nmod_poly_get_str_pretty, :libflint), Ptr{Uint8}, 
+        (Ptr{fq_nmod_series}, Ptr{Uint8}, Ptr{FqNmodFiniteField}), 
+                     &x, bytestring(string(var(parent(x)))), &ctx)
+
+      print(io, bytestring(cstr))
+
+      ccall((:flint_free, :libflint), Void, (Ptr{Uint8},), cstr)
+   end
+   print(io, "+O(", string(var(parent(x))), "^", x.prec, ")")
+end
+
+function show(io::IO, a::FqNmodSeriesRing)
+   print(io, "Univariate power series ring in ", var(a), " over ")
+   show(io, base_ring(a))
+end
+
+show_minus_one(::Type{fq_nmod_series}) = show_minus_one(fq_nmod)
+
+###############################################################################
+#
+#   Unary operators
+#
+###############################################################################
+
+function -(x::fq_nmod_series)
+   ctx = base_ring(x)
+   z = parent(x)()
+   ccall((:fq_nmod_poly_neg, :libflint), Void, 
+                (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Ptr{FqNmodFiniteField}), 
+               &z, &x, &ctx)
+   z.prec = x.prec
+   return z
+end
+
+###############################################################################
+#
+#   Binary operators
+#
+###############################################################################
+
+function +(a::fq_nmod_series, b::fq_nmod_series)
+   check_parent(a, b)
+   ctx = base_ring(a)
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenz = max(lena, lenb)
+   z = parent(a)()
+   z.prec = prec
+   ccall((:fq_nmod_poly_add_series, :libflint), Void, 
+     (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}), 
+               &z, &a, &b, lenz, &ctx)
+   return z
+end
+
+function -(a::fq_nmod_series, b::fq_nmod_series)
+   check_parent(a, b)
+   ctx = base_ring(a)
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenz = max(lena, lenb)
+   z = parent(a)()
+   z.prec = prec
+   ccall((:fq_nmod_poly_sub_series, :libflint), Void, 
+     (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}), 
+               &z, &a, &b, lenz, &ctx)
+   return z
+end
+
+function *(a::fq_nmod_series, b::fq_nmod_series)
+   check_parent(a, b)
+   ctx = base_ring(a)
+   lena = length(a)
+   lenb = length(b)
+   
+   aval = valuation(a)
+   bval = valuation(b)
+
+   prec = min(a.prec + bval, b.prec + aval)
+   
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   
+   z = parent(a)()
+   z.prec = prec
+      
+   if lena == 0 || lenb == 0
+      return z
+   end
+
+   lenz = min(lena + lenb - 1, prec)
+
+   ccall((:fq_nmod_poly_mullow, :libflint), Void, 
+     (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}),
+               &z, &a, &b, lenz, &ctx)
+   return z
+end
+
+###############################################################################
+#
+#   Unsafe functions
+#
+###############################################################################
+
+function setcoeff!(z::fq_nmod_series, n::Int, x::fq_nmod)
+   ctx = base_ring(z)
+   ccall((:fq_nmod_poly_set_coeff, :libflint), Void, 
+                (Ptr{fq_nmod_series}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), 
+               &z, n, &x, &ctx)
+end
+
+function mul!(z::fq_nmod_series, a::fq_nmod_series, b::fq_nmod_series)
+   ctx = base_ring(z)
+   lena = length(a)
+   lenb = length(b)
+   
+   aval = valuation(a)
+   bval = valuation(b)
+
+   prec = min(a.prec + bval, b.prec + aval)
+   
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   
+   lenz = min(lena + lenb - 1, prec)
+   if lenz < 0
+      lenz = 0
+   end
+
+   z.prec = prec
+   ccall((:fq_nmod_poly_mullow, :libflint), Void, 
+     (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}),
+               &z, &a, &b, lenz, &ctx)
+end
+
+function addeq!(a::fq_nmod_series, b::fq_nmod_series)
+   ctx = base_ring(a)
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenz = max(lena, lenb)
+   a.prec = prec
+   ccall((:fq_nmod_poly_add_series, :libflint), Void, 
+     (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}),
+               &a, &a, &b, lenz, &ctx)
+end
+
+###############################################################################
+#
+#   Ad hoc binary operators
+#
+###############################################################################
+
+function *(x::fq_nmod, y::fq_nmod_series)
+   ctx = base_ring(y)
+   z = parent(y)()
+   z.prec = y.prec
+   ccall((:fq_nmod_poly_scalar_mul_fq_nmod, :libflint), Void, 
+         (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), 
+               &z, &y, &x, &ctx)
+   return z
+end
+
+###############################################################################
+#
+#   Shifting
+#
+###############################################################################
+
+function shift_left(x::fq_nmod_series, len::Int)
+   len < 0 && throw(DomainError())
+   ctx = base_ring(x)
+   xlen = length(x)
+   z = parent(x)()
+   z.prec = x.prec + len
+   ccall((:fq_nmod_poly_shift_left, :libflint), Void, 
+                (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}), 
+               &z, &x, len, &ctx)
+   return z
+end
+
+function shift_right(x::fq_nmod_series, len::Int)
+   len < 0 && throw(DomainError())
+   ctx = base_ring(x)
+   xlen = length(x)
+   z = parent(x)()
+   if len >= xlen
+      z.prec = max(0, x.prec - len)
+   else
+      z.prec = x.prec - len
+      ccall((:fq_nmod_poly_shift_right, :libflint), Void, 
+                (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}), 
+               &z, &x, len, &ctx)
+   end
+   return z
+end
+
+###############################################################################
+#
+#   Truncation
+#
+###############################################################################
+
+function truncate(x::fq_nmod_series, prec::Int)
+   prec < 0 && throw(DomainError())
+   if x.prec <= prec
+      return x
+   end
+   ctx = base_ring(x)
+   z = parent(x)()
+   z.prec = prec
+   ccall((:fq_nmod_poly_set_trunc, :libflint), Void, 
+                (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}), 
+               &z, &x, prec, &ctx)
+   return z
+end
+
+###############################################################################
+#
+#   Powering
+#
+###############################################################################
+
+function ^(a::fq_nmod_series, b::Int)
+   b < 0 && throw(DomainError())
+   ctx = base_ring(a)
+   if isgen(a)
+      z = parent(a)()
+      setcoeff!(z, b, ctx(1))
+      z.prec = a.prec + b - 1
+   elseif length(a) == 0
+      z = parent(a)()
+      z.prec = a.prec + (b - 1)*valuation(a)
+   elseif length(a) == 1
+      return parent(a)([coeff(a, 0)^b], 1, a.prec)
+   elseif b == 0
+      return parent(a)([ctx(1)], 1, parent(a).prec_max)
+   else
+      bit = ~((~UInt(0)) >> 1)
+      while (UInt(bit) & b) == 0
+         bit >>= 1
+      end
+      z = a
+      bit >>= 1
+      while bit !=0
+         z = z*z
+         if (UInt(bit) & b) != 0
+            z *= a
+         end
+         bit >>= 1
+      end
+   end
+   return z
+end
+
+###############################################################################
+#
+#   Comparison
+#
+###############################################################################
+
+function ==(x::fq_nmod_series, y::fq_nmod_series)
+   check_parent(x, y)
+   ctx = base_ring(x)
+   prec = min(x.prec, y.prec)
+   
+   n = max(length(x), length(y))
+   n = min(n, prec)
+   
+   return Bool(ccall((:fq_nmod_poly_equal_trunc, :libflint), Cint, 
+                (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}), 
+               &x, &y, n, &ctx))
+end
+
+function isequal(x::fq_nmod_series, y::fq_nmod_series)
+   check_parent(x, y)
+   ctx = base_ring(x)
+   if x.prec != y.prec || length(x) != length(y)
+      return false
+   end
+   return Bool(ccall((:fq_nmod_poly_equal, :libflint), Cint, 
+                (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}), 
+               &x, &y, length(x), &ctx))
+end
+
+###############################################################################
+#
+#   Exact division
+#
+###############################################################################
+
+function divexact(x::fq_nmod_series, y::fq_nmod_series)
+   check_parent(x, y)
+   ctx = base_ring(x)
+   y == 0 && throw(DivideError())
+   v2 = valuation(y)
+   v1 = valuation(x)
+   if v2 != 0
+      if v1 >= v2
+         x = shift_right(x, v2)
+         y = shift_right(y, v2)
+      end
+   end
+   !isunit(y) && error("Unable to invert power series")
+   prec = min(x.prec, y.prec - v2 + v1)
+   z = parent(x)()
+   z.prec = prec
+   ccall((:fq_nmod_poly_div_series, :libflint), Void, 
+     (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}),
+               &z, &x, &y, prec, &ctx)
+   return z
+end
+
+###############################################################################
+#
+#   Ad hoc exact division
+#
+###############################################################################
+
+function divexact(x::fq_nmod_series, y::fq_nmod)
+   y == 0 && throw(DivideError())
+   ctx = base_ring(x)
+   z = parent(x)()
+   z.prec = x.prec
+   ccall((:fq_nmod_poly_scalar_div_fq_nmod, :libflint), Void, 
+                (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), 
+               &z, &x, &y, &ctx)
+   return z
+end
+
+###############################################################################
+#
+#   Inversion
+#
+###############################################################################
+
+function inv(a::fq_nmod_series)
+   a == 0 && throw(DivideError())
+   !isunit(a) && error("Unable to invert power series")
+   ctx = base_ring(a)
+   ainv = parent(a)()
+   ainv.prec = a.prec
+   ccall((:fq_nmod_poly_inv_series, :libflint), Void, 
+                (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}), 
+               &ainv, &a, a.prec, &ctx)
+   return ainv
+end
+
+###############################################################################
+#
+#   Promotion rules
+#
+###############################################################################
+
+Base.promote_rule{T <: Integer}(::Type{fq_nmod_series}, ::Type{T}) = fq_nmod_series
+
+Base.promote_rule(::Type{fq_nmod_series}, ::Type{fmpz}) = fq_nmod_series
+
+Base.promote_rule(::Type{fq_nmod_series}, ::Type{fq_nmod}) = fq_nmod_series
+
+###############################################################################
+#
+#   Parent object call overload
+#
+###############################################################################
+
+function Base.call(a::FqNmodSeriesRing)
+   ctx = base_ring(a)
+   z = fq_nmod_series(ctx)
+   z.prec = a.prec_max
+   z.parent = a
+   return z
+end
+
+function Base.call(a::FqNmodSeriesRing, b::Integer)
+   ctx = base_ring(a)
+   if b == 0
+      z = fq_nmod_series(ctx)
+      z.prec = a.prec_max
+   else
+      z = fq_nmod_series(ctx, [ctx(b)], 1, a.prec_max)
+   end
+   z.parent = a
+   return z
+end
+
+function Base.call(a::FqNmodSeriesRing, b::fmpz)
+   ctx = base_ring(a)
+   if b == 0
+      z = fq_nmod_series(ctx)
+      z.prec = a.prec_max
+   else
+      z = fq_nmod_series(ctx, [ctx(b)], 1, a.prec_max)
+   end
+   z.parent = a
+   return z
+end
+
+function Base.call(a::FqNmodSeriesRing, b::fq_nmod)
+   ctx = base_ring(a)
+   if b == 0
+      z = fq_nmod_series(ctx)
+      z.prec = a.prec_max
+   else
+      z = fq_nmod_series(ctx, [b], 1, a.prec_max)
+   end
+   z.parent = a
+   return z
+end
+
+function Base.call(a::FqNmodSeriesRing, b::fq_nmod_series)
+   parent(b) != a && error("Unable to coerce power series")
+   return b
+end
+
+function Base.call(a::FqNmodSeriesRing, b::Array{fq_nmod, 1}, len::Int, prec::Int)
+   ctx = base_ring(a)
+   z = fq_nmod_series(ctx, b, len, prec)
+   z.parent = a
+   return z
+end
+
+###############################################################################
+#
+#   PowerSeriesRing constructor
+#
+###############################################################################
+
+function PowerSeriesRing(R::FqNmodFiniteField, prec::Int, s::String)
+   S = symbol(s)
+
+   parent_obj = FqNmodSeriesRing(R, prec, S)
+
+   return parent_obj, parent_obj([R(0), R(1)], 2, prec + 1)
+end
+

@@ -3,19 +3,19 @@ function test_poly_constructors()
  
    R, x = PolynomialRing(ZZ, "x")
 
-   @test R <: Poly
+   @test typeof(R) <: Nemo.FmpzPolyRing
 
-   @test isa(x, Poly)
+   @test isa(x, fmpz_poly)
 
    S, y = PolynomialRing(R, "y")
 
-   @test S <: Poly
+   @test typeof(S) <: Nemo.PolynomialRing
 
    @test isa(y, Poly)
 
    T, z = PolynomialRing(S, "z")
 
-   @test T <: Poly
+   @test typeof(T) <: Nemo.PolynomialRing
 
    @test isa(z, Poly)
 
@@ -35,7 +35,7 @@ function test_poly_constructors()
 
    @test isa(j, Poly)
 
-   k = Poly(S, [x, x + 2, x^2 + 3x + 1])
+   k = S([x, x + 2, x^2 + 3x + 1])
 
    @test isa(k, Poly)
 
@@ -434,11 +434,11 @@ function test_poly_derivative()
 
    f = x^2 + 2x + 1
 
-   @test deriv(f) == 2x + 2
+   @test derivative(f) == 2x + 2
 
    h = x*y^2 + (x + 1)*y + 3
 
-   @test deriv(h) == 2x*y + x + 1
+   @test derivative(h) == 2x*y + x + 1
 
    println("PASS")
 end
@@ -492,8 +492,8 @@ function test_poly_discriminant()
    println("PASS")
 end
 
-function test_poly_bezout()
-   print("Poly.bezout...")
+function test_poly_gcdx()
+   print("Poly.gcdx...")
 
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
@@ -501,12 +501,12 @@ function test_poly_bezout()
    f = 5x^2 + 2x + 1
    g = 2x^3 + 3x + 1
 
-   @test bezout(f, g) == (212, 146*x^2-58*x+213, -365*x-1)
+   @test gcdx(f, g) == (212, 146*x^2-58*x+213, -365*x-1)
 
    j = 3x*y^2 + (x + 1)*y + 3
    k = 6(x + 1)*y + (x^3 + 2x + 2)
 
-   @test bezout(j, k) == (3*x^7+6*x^5-6*x^3+96*x^2+192*x+96, (36*x^2+72*x+36), (-18*x^2-18*x)*y+(3*x^4-6*x-6))
+   @test gcdx(j, k) == (3*x^7+6*x^5-6*x^3+96*x^2+192*x+96, (36*x^2+72*x+36), (-18*x^2-18*x)*y+(3*x^4-6*x-6))
 
    println("PASS")
 end
@@ -516,19 +516,25 @@ function test_poly_special()
 
    R, x = PolynomialRing(ZZ, "x")
 
-   @test chebyshev_t(R, 20) == 524288*x^20-2621440*x^18+5570560*x^16-6553600*x^14+4659200*x^12-2050048*x^10+549120*x^8-84480*x^6+6600*x^4-200*x^2+1
+   @test chebyshev_t(20, x) == 524288*x^20-2621440*x^18+5570560*x^16-6553600*x^14+4659200*x^12-2050048*x^10+549120*x^8-84480*x^6+6600*x^4-200*x^2+1
 
-   @test chebyshev_u(R, 15) == 32768*x^15-114688*x^13+159744*x^11-112640*x^9+42240*x^7-8064*x^5+672*x^3-16*x
+   @test chebyshev_u(15, x) == 32768*x^15-114688*x^13+159744*x^11-112640*x^9+42240*x^7-8064*x^5+672*x^3-16*x
    
-   @test cyclotomic(R, 120) == x^32+x^28-x^20-x^16-x^12+x^4+1
+   @test cyclotomic(120, x) == x^32+x^28-x^20-x^16-x^12+x^4+1
 
-   @test swinnerton_dyer(R, 5) == x^32-448*x^30+84864*x^28-9028096*x^26+602397952*x^24-26625650688*x^22+801918722048*x^20-16665641517056*x^18+239210760462336*x^16-2349014746136576*x^14+15459151516270592*x^12-65892492886671360*x^10+172580952324702208*x^8-255690851718529024*x^6+183876928237731840*x^4-44660812492570624*x^2+2000989041197056
+   @test swinnerton_dyer(5, x) == x^32-448*x^30+84864*x^28-9028096*x^26+602397952*x^24-26625650688*x^22+801918722048*x^20-16665641517056*x^18+239210760462336*x^16-2349014746136576*x^14+15459151516270592*x^12-65892492886671360*x^10+172580952324702208*x^8-255690851718529024*x^6+183876928237731840*x^4-44660812492570624*x^2+2000989041197056
 
-   @test cos_minpoly(R, 30) == x^4+x^3-4*x^2-4*x+1
+   @test cos_minpoly(30, x) == x^4+x^3-4*x^2-4*x+1
 
-   @test theta_qexp(R, 3, 30) == 72*x^29+32*x^27+72*x^26+30*x^25+24*x^24+24*x^22+48*x^21+24*x^20+24*x^19+36*x^18+48*x^17+6*x^16+48*x^14+24*x^13+8*x^12+24*x^11+24*x^10+30*x^9+12*x^8+24*x^6+24*x^5+6*x^4+8*x^3+12*x^2+6*x+1
+   @test theta_qexp(3, 30, x) == 72*x^29+32*x^27+72*x^26+30*x^25+24*x^24+24*x^22+48*x^21+24*x^20+24*x^19+36*x^18+48*x^17+6*x^16+48*x^14+24*x^13+8*x^12+24*x^11+24*x^10+30*x^9+12*x^8+24*x^6+24*x^5+6*x^4+8*x^3+12*x^2+6*x+1
 
-   @test eta_qexp(R, 24, 30) == -29211840*x^29+128406630*x^28+24647168*x^27-73279080*x^26+13865712*x^25-25499225*x^24+21288960*x^23+18643272*x^22-12830688*x^21-4219488*x^20-7109760*x^19+10661420*x^18+2727432*x^17-6905934*x^16+987136*x^15+1217160*x^14+401856*x^13-577738*x^12-370944*x^11+534612*x^10-115920*x^9-113643*x^8+84480*x^7-16744*x^6-6048*x^5+4830*x^4-1472*x^3+252*x^2-24*x+1
+   @test eta_qexp(24, 30, x) == -29211840*x^29+128406630*x^28+24647168*x^27-73279080*x^26+13865712*x^25-25499225*x^24+21288960*x^23+18643272*x^22-12830688*x^21-4219488*x^20-7109760*x^19+10661420*x^18+2727432*x^17-6905934*x^16+987136*x^15+1217160*x^14+401856*x^13-577738*x^12-370944*x^11+534612*x^10-115920*x^9-113643*x^8+84480*x^7-16744*x^6-6048*x^5+4830*x^4-1472*x^3+252*x^2-24*x+1
+
+   S, y = PolynomialRing(R, "y")
+
+   @test chebyshev_t(20, y) == 524288*y^20-2621440*y^18+5570560*y^16-6553600*y^14+4659200*y^12-2050048*y^10+549120*y^8-84480*y^6+6600*y^4-200*y^2+1
+
+   @test chebyshev_u(15, y) == 32768*y^15-114688*y^13+159744*y^11-112640*y^9+42240*y^7-8064*y^5+672*y^3-16*y
 
    println("PASS")
 end
@@ -592,7 +598,7 @@ function test_poly()
    test_poly_integral()
    test_poly_resultant()
    test_poly_discriminant()
-   test_poly_bezout()
+   test_poly_gcdx()
    test_poly_special()
    test_poly_fateman()
    test_poly_pearce()

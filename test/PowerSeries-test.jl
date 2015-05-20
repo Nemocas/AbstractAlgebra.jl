@@ -1,24 +1,24 @@
 function test_series_constructors()
    print("PowerSeries.constructors...")
 
-   R, x = PowerSeriesRing(ZZ, "x")
+   R, x = PowerSeriesRing(ZZ, 30, "x")
 
-   @test R <: PowerSeries
+   @test isa(R, FmpzSeriesRing)
 
    a = x^3 + 2x + 1
    b = x^2 + 3x + O(x^4)
 
-   @test isa(R(a), PowerSeries)
+   @test isa(R(a), PowerSeriesElem)
 
-   @test isa(PowerSeries(R, [ZZ(1), ZZ(2), ZZ(3)], 5), PowerSeries)
+   @test isa(R([ZZ(1), ZZ(2), ZZ(3)], 3, 5), PowerSeriesElem)
 
-   @test isa(PowerSeries(R, [ZZ(1), ZZ(2), ZZ(3)], nothing), PowerSeries)
+   @test isa(R([ZZ(1), ZZ(2), ZZ(3)], 3, 3), PowerSeriesElem)
 
-   @test isa(R(1), PowerSeries)
+   @test isa(R(1), PowerSeriesElem)
 
-   @test isa(R(ZZ(2)), PowerSeries)
+   @test isa(R(ZZ(2)), PowerSeriesElem)
 
-   @test isa(R(), PowerSeries)
+   @test isa(R(), PowerSeriesElem)
 
    println("PASS")
 end
@@ -26,7 +26,7 @@ end
 function test_series_manipulation()
    print("PowerSeries.manipulation...")
 
-   R, x = PowerSeriesRing(ZZ, "x")
+   R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -49,7 +49,7 @@ end
 function test_series_unary_ops()
    print("PowerSeries.unary_ops...")
 
-   R, x = PowerSeriesRing(ZZ, "x")
+   R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
    b = 1 + 2x + x^2 + O(x^3)
@@ -64,7 +64,7 @@ end
 function test_series_binary_ops()
    print("PowerSeries.binary_ops...")
 
-   R, x = PowerSeriesRing(ZZ, "x")
+   R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -87,7 +87,7 @@ end
 function test_series_adhoc_binary_ops()
    print("PowerSeries.adhoc_binary_ops...")
 
-   R, x = PowerSeriesRing(ZZ, "x")
+   R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -108,7 +108,7 @@ end
 function test_series_comparison()
    print("PowerSeries.comparison...")
 
-   R, x = PowerSeriesRing(ZZ, "x")
+   R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
    b = O(x^3)
@@ -127,7 +127,7 @@ end
 function test_series_adhoc_comparison()
    print("PowerSeries.adhoc_comparison...")
 
-   R, x = PowerSeriesRing(ZZ, "x")
+   R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
    b = O(x^0)
@@ -150,7 +150,7 @@ end
 function test_series_powering()
    print("PowerSeries.powering...")
 
-   R, x = PowerSeriesRing(ZZ, "x")
+   R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -171,7 +171,7 @@ end
 function test_series_shift()
    print("PowerSeries.shift...")
 
-   R, x = PowerSeriesRing(ZZ, "x")
+   R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -192,7 +192,7 @@ end
 function test_series_truncation()
    print("PowerSeries.truncation...")
 
-   R, x = PowerSeriesRing(ZZ, "x")
+   R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 2x + x^3
    b = O(x^4)
@@ -203,7 +203,7 @@ function test_series_truncation()
 
    @test truncate(b, 2) == O(x^2)
 
-   @test truncate(c, nothing) == 2*x^2+x+1+O(x^5)
+   @test truncate(c, 5) == 2*x^2+x+1+O(x^5)
 
    @test truncate(d, 5) == x^3+2*x+O(x^4)
 
@@ -213,7 +213,7 @@ end
 function test_series_exact_division()
    print("PowerSeries.exact_division...")
 
-   R, x = PowerSeriesRing(ZZ, "x")
+   R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = x + x^3
    b = O(x^4)
@@ -234,7 +234,7 @@ end
 function test_series_inversion()
    print("PowerSeries.inversion...")
 
-   R, x = PowerSeriesRing(ZZ, "x")
+   R, x = PowerSeriesRing(ZZ, 30, "x")
 
    a = 1 + x + 2x^2 + O(x^5)
    b = R(-1)
@@ -250,7 +250,7 @@ function test_series_special_functions()
    print("PowerSeries.special_functions...")
 
    R = ResidueRing(ZZ, 17)
-   S, x = PowerSeriesRing(R, "x")
+   S, x = PowerSeriesRing(R, 30, "x")
 
    @test exp(x + O(x^10)) == 8*x^9+4*x^8+15*x^7+3*x^6+x^5+5*x^4+3*x^3+9*x^2+x+1+O(x^10)
 
