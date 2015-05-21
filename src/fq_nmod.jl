@@ -13,9 +13,10 @@ export fq_nmod, FqNmodFiniteField
 ###############################################################################
 
 FqNmodFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, Field}()
+FqNmodFiniteFieldIDPol = Dict{Tuple{nmod_poly, Symbol}, Field}()
 
 type FqNmodFiniteField <: Field
-   p :: Int # fmpz
+   p :: Int 
    n :: Int
    ninv :: Int
    norm :: Int
@@ -36,28 +37,33 @@ type FqNmodFiniteField <: Field
    inv_ninv :: Int
    inv_norm :: Int
    var :: Ptr{Void}
-   S::Symbol
 
-   function FqNmodFiniteField(char::fmpz, deg::Int, s::Symbol)
+   function FqNmodFiniteField(c::fmpz, deg::Int, s::Symbol)
       try
-         return FqNmodFiniteFieldID[char, deg, s]
+        return FqNmodFiniteFieldID[char, deg, s]
       catch
-         d = FqNmodFiniteFieldID[char, deg, s] = new()
-         finalizer(d, _FqNmodFiniteField_clear_fn)
+         d = new()
          ccall((:fq_nmod_ctx_init, :libflint), Void, 
                (Ptr{FqNmodFiniteField}, Ptr{fmpz}, Int, Ptr{Uint8}), 
-			    &d, &char, deg, bytestring(string(s)))
+			    &d, &c, deg, bytestring(string(s)))
+         FqNmodFiniteFieldID[c, deg, s] = d
+         finalizer(d, _FqNmodFiniteField_clear_fn)
          return d
       end
    end
 
    function FqNmodFiniteField(f::nmod_poly, s::Symbol)
-      z = new()
-      ccall((:fq_nmod_ctx_init_modulus, :libflint), Void, 
+      try
+         return FqNmodFiniteFieldIDPol[f, s]
+      catch
+         z = new()
+         ccall((:fq_nmod_ctx_init_modulus, :libflint), Void, 
             (Ptr{FqNmodFiniteField}, Ptr{nmod_poly}, Ptr{Uint8}), 
 	      &z, &f, bytestring(string(s)))
-      finalizer(z, _FqNmodFiniteField_clear_fn)
-      return z
+         FqNmodFiniteFieldIDPol[f, s] = z
+         finalizer(z, _FqNmodFiniteField_clear_fn)
+         return z
+      end
    end
 end
 

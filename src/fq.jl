@@ -29,8 +29,7 @@ type FqFiniteField <: Field
    inv_length::Int
    inv_p::Int # fmpz
    var::Ptr{Void}
-   S::Symbol
-
+ 
    function FqFiniteField(char::fmpz, deg::Int, s::Symbol)
       try
          return FqFiniteFieldID[char, deg, s]
@@ -40,7 +39,6 @@ type FqFiniteField <: Field
          ccall((:fq_ctx_init, :libflint), Void, 
                (Ptr{FqFiniteField}, Ptr{fmpz}, Int, Ptr{Uint8}), 
 			            &d, &char, deg, bytestring(string(s)))
-         d.S = s
          return d
       end
    end
