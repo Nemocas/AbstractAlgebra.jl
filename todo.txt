@@ -20,8 +20,6 @@ General
   entry_data/coeff_data, set_entry!/set_coeff! (overloaded) for Int/fmpz
   entries
 
-* Use macro for check_parent instead of function (throughout)
-
 * Implement strict equality, e.g. isidentical(1+O(x), 1+O(x^2)) == false;
   don't use isequal; in Julia it's for objects that hash to the same value
 
@@ -46,10 +44,19 @@ General
 * put underscore before den and num type fields, to prevent a.num instead
   of num(a)
 
+* Optimise for monomials in polynomial modules, especially powering
+
+nmod_poly.jl
+------------
+
+* Add constructor for array of ints
+
+* Use Int throughout instead of UInt and allow modulus only up to typemax(Int)
+
 fmpz_mod_poly.jl
 ----------------
 
-* Write it
+* Add constructor for array of ints 
 
 Poly.jl/fmpz_poly.jl
 --------------------
