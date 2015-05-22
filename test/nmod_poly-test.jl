@@ -10,8 +10,6 @@ function test_nmod_poly_constructors()
   RRx, xx = PolynomialRing(R, "x")
   RRRx, xxx = PolynomialRing(ResidueRing(ZZ, 17), "xx")
 
-  @test_throws ErrorException PolynomialRing(ResidueRing(ZZ, ZZ(2)^200), "z")
-
   @test var(Rx) == Symbol("x")
 
   @test RRx != RRRx
@@ -43,9 +41,9 @@ function test_nmod_poly_constructors()
   @test isa(d, Nemo.nmod_poly)
   @test parent(d) == Rx
 
-  e = Rx([1, 2, 3])
+  e = Rx([UInt(1), UInt(2), UInt(3)])
 
-  @test isa(d, Nemo.nmod_poly)
+  @test isa(e, Nemo.nmod_poly)
   @test parent(e) == Rx
 
   f = Rx([ZZ(1), ZZ(2), ZZ(3)])
@@ -74,10 +72,6 @@ function test_nmod_poly_constructors()
   @test f == g
   @test g == h
   @test h == i
-
-  @test_throws ErrorException Rx(Array(Int,0))
-  @test_throws ErrorException Rx(Array(fmpz,0))
-  @test_throws ErrorException Rx(Array(Residue{fmpz},0))
   
   println("PASS")
 end
@@ -194,8 +188,6 @@ function test_nmod_poly_powering()
 
   @test_throws DomainError f^(-1)
 
-  @test f^ZZ(3) == f^3
-
   println("PASS")
 end
 
@@ -207,7 +199,7 @@ function test_nmod_poly_comparison()
   Ry, y = PolynomialRing(R, "y")
 
   @test x^2 + x == x^2 + x
-  @test x^2 + x != y^2 + y
+  @test_throws ErrorException x^2 + x != y^2 + y
 
   println("PASS")
 end
@@ -347,7 +339,7 @@ function test_nmod_poly_gcd()
   @test parent(k) == parent(x)
   @test k == x
 
-  k,s,t = xgcd(f,g)
+  k, s, t = gcdx(f,g)
 
   @test k == s*f + t*g
 

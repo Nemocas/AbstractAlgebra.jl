@@ -5,7 +5,8 @@
 ###############################################################################
 
 import Base: length, call, exp, promote_rule, zero, one, show, divrem, mod, 
-             hash, factor
+             hash, factor, transpose!, rank, inv, lufact, truncate, reverse,
+             isqrt, nextpow2, ndigits, invmod, isprime, sub
 
 export Ring, Field, RingElem
 
@@ -221,6 +222,8 @@ include("Poly.jl")
 include("fmpz_poly.jl")
 
 include("nmod_poly.jl")
+
+include("fmpz_mod_poly.jl")
 
 include("PowerSeries.jl")
 

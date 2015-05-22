@@ -909,6 +909,7 @@ function integral{T <: Union(FieldElem, Residue)}(x::Poly{T})
    while len > 0 && coeff(p, len - 1) == 0 # cannot use normalise here
       len -= 1
    end
+   p.length = len
    return p
 end
 

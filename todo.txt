@@ -117,6 +117,14 @@ FLINT
 * handle monomials and binomials optimally in powering, composition, division
   etc. in polynomial/power series functions (over Z, Z/nZ, Q, Fq)
 
+* Print pretty for fmpz_mod_poly
+
+* Inflate/deflate for fmpz_mod_poly
+
+* Interpolate for fmpz_mod_poly
+
+* factor_get_fmpz_mod_poly for fmpz_mod_poly (inlines.c)
+
 PowerSeries.jl
 --------------
 
