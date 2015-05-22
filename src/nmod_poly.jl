@@ -329,7 +329,7 @@ function +(x::nmod_poly, y::UInt)
   return z
 end
 
-+(x::UInt, y::nmod_poly) = +(y,x)
++(x::UInt, y::nmod_poly) = y + x
 
 function +(x::nmod_poly, y::fmpz)
   z = parent(x)()
@@ -341,11 +341,11 @@ function +(x::nmod_poly, y::fmpz)
   return +(x,tt)
 end
 
-+(x::fmpz, y::nmod_poly) = +(y,x)
++(x::fmpz, y::nmod_poly) = y + x
 
-+(x::nmod_poly, y::Integer) = +(x,ZZ(y))
++(x::nmod_poly, y::Integer) = x + ZZ(y)
 
-+(x::Integer, y::nmod_poly) = +(y,x) 
++(x::Integer, y::nmod_poly) = y + x 
 
 function +(x::nmod_poly, y::Residue{fmpz})
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
@@ -361,7 +361,7 @@ function -(x::nmod_poly, y::UInt)
   return z
 end
 
--(x::UInt, y::nmod_poly) = -(-(y,x))
+-(x::UInt, y::nmod_poly) = -(y - x)
 
 function -(x::nmod_poly, y::fmpz)
   z = parent(x)()
@@ -373,18 +373,18 @@ function -(x::nmod_poly, y::fmpz)
   return -(x,tt)
 end
 
--(x::fmpz, y::nmod_poly) = -(-(y,x))
+-(x::fmpz, y::nmod_poly) = -(y - x)
 
--(x::nmod_poly, y::Integer) = -(x,ZZ(y))
+-(x::nmod_poly, y::Integer) = x - ZZ(y)
 
--(x::Integer, y::nmod_poly) = -(-(y,x))
+-(x::Integer, y::nmod_poly) = -(y - x)
 
 function -(x::nmod_poly, y::Residue{fmpz})
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
   return -(x,y.data)
 end
 
--(x::Residue{fmpz}, y::nmod_poly) = -(-(y,x))
+-(x::Residue{fmpz}, y::nmod_poly) = -(y - x)
 
 ################################################################################
 #
@@ -519,7 +519,7 @@ end
 function divexact(x::nmod_poly, y::Residue{fmpz})
   base_ring(x) != parent(y) && error("Elements must have same parent")
   iszero(y) && throw(DivideError())
-  return divexact(x,parent(x)(y))
+  return divexact(x, parent(x)(y))
 end
 
 ################################################################################
@@ -898,6 +898,11 @@ end
 function add!(z::nmod_poly, x::nmod_poly, y::nmod_poly)
   ccall((:nmod_poly_add, :libflint), Void, 
           (Ptr{nmod_poly}, Ptr{nmod_poly},  Ptr{nmod_poly}), &z, &x, &y)
+end
+
+function addeq!(z::nmod_poly, y::nmod_poly)
+  ccall((:nmod_poly_add, :libflint), Void, 
+          (Ptr{nmod_poly}, Ptr{nmod_poly},  Ptr{nmod_poly}), &z, &z, &y)
 end
 
 function sub!(z::nmod_poly, x::nmod_poly, y::nmod_poly)
