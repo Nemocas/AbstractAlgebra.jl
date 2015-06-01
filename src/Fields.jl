@@ -6,7 +6,7 @@
 
 include("Fraction.jl")
 
-include("QQ.jl")
+include("fmpq.jl")
 
 include("FiniteFields.jl")
 

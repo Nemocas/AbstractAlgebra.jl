@@ -4,7 +4,7 @@ using Base.Test, Nemo
 
 export test_all
 
-include("ZZ-test.jl")
+include("fmpz-test.jl")
 include("Poly-test.jl")
 include("Residue-test.jl")
 include("PowerSeries-test.jl")
