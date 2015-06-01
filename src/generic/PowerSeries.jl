@@ -11,35 +11,9 @@ import Base: exp, precision
 
 ###############################################################################
 #
-#   Data types and memory management
+#   Data type and parent object methods
 #
 ###############################################################################
-
-PowerSeriesID = ObjectIdDict()
-
-type PowerSeriesRing{T <: RingElem} <: Ring
-   base_ring::Ring
-   prec_max::Int
-   S::Symbol
-
-   function PowerSeriesRing(R::Ring, prec::Int, s::Symbol)
-      return try
-         PowerSeriesID[R, prec, s]
-      catch
-         PowerSeriesID[R, prec, s] = new(R, prec, s)
-      end
-   end
-end
-
-type PowerSeries{T <: RingElem} <: PowerSeriesElem
-   coeffs::Array{T, 1}
-   length::Int
-   prec::Int
-   parent::PowerSeriesRing{T}
-
-   PowerSeries(a::Array{T, 1}, length::Int, prec::Int) = new(a, length, prec)   
-   PowerSeries(a::PowerSeries{T}) = a
-end
 
 function O{T}(a::PowerSeries{T})
    prec = length(a) - 1

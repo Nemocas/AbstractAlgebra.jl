@@ -16,36 +16,9 @@ export Poly, PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow,
 
 ###############################################################################
 #
-#   Data types and memory management
+#   Data type and parent object methods
 #
 ###############################################################################
-
-PolyID = ObjectIdDict()
-
-type PolynomialRing{T <: RingElem} <: Ring
-   base_ring :: Ring
-   S::Symbol
-
-   function PolynomialRing(R::Ring, s::Symbol)
-      return try
-         PolyID[R, s]
-      catch
-         PolyID[R, s] = new(R, s)
-      end
-   end
-end
-
-type Poly{T <: RingElem} <: PolyElem
-   coeffs::Array{T, 1}
-   length::Int
-   parent::PolynomialRing{T}
-
-   Poly() = new(Array(T, 0), 0)
-   
-   Poly(a::Array{T, 1}) = new(a, length(a))
-
-   Poly(a::T) = a == 0 ? new(Array(T, 0), 0) : new([a], 1)
-end
 
 elem_type{T <: RingElem}(::PolynomialRing{T}) = Poly{T}
 

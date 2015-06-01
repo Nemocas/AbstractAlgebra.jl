@@ -12,39 +12,11 @@ export QQ, fmpq, FractionField, Rational, RationalField, height, height_bits, is
 
 #########################################################################################
 #
-#   Types and memory management
+#   Data type and parent methods
 #
 #########################################################################################
 
-type RationalField <: Field
-end
-
 QQ = RationalField()
-
-type fmpq <: FieldElem
-   num::Int
-   den::Int
-
-   function fmpq(a::fmpz, b::fmpz)
-      z = new()
-      ccall((:fmpq_init, :libflint), Void, (Ptr{fmpq},), &z)
-      ccall((:fmpq_set_fmpz_frac, :libflint), Void,
-            (Ptr{fmpq}, Ptr{fmpz}, Ptr{fmpz}), &z, &a, &b)
-      finalizer(z, _fmpq_clear_fn)
-      return z
-   end
-
-   function fmpq(a::Int, b::Int)
-      z = new()
-      ccall((:fmpq_init, :libflint), Void, (Ptr{fmpq},), &z)
-      ccall((:fmpq_set_si, :libflint), Void,
-            (Ptr{fmpq}, Int, Int), &z, a, b)
-      finalizer(z, _fmpq_clear_fn)
-      return z
-   end
-end
-
-_fmpq_clear_fn(a::fmpq) = ccall((:fmpq_clear, :libflint), Void, (Ptr{fmpq},), &a)
 
 parent(a::fmpq) = QQ
 

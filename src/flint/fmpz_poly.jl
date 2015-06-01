@@ -9,80 +9,9 @@ export fmpz_poly, cyclotomic, theta_qexp, eta_qexp, cos_minpoly,
 
 ###############################################################################
 #
-#   Data types and memory management
+#   Data type and parent methods
 #
 ###############################################################################
-
-FmpzPolyID = ObjectIdDict()
-
-type FmpzPolyRing <: Ring
-   base_ring::Ring
-   S::Symbol
-
-   function FmpzPolyRing(s::Symbol)
-      return try
-         FmpzPolyID[s]
-      catch
-         FmpzPolyID[s] = new(ZZ, s)
-      end
-   end
-end
-
-type fmpz_poly <: PolyElem
-   coeffs::Ptr{Void}
-   alloc::Int
-   length::Int
-   parent::FmpzPolyRing
-
-   function fmpz_poly()
-      z = new()
-      ccall((:fmpz_poly_init, :libflint), Void, (Ptr{fmpz_poly},), &z)
-      finalizer(z, _fmpz_poly_clear_fn)
-      return z
-   end
-
-   function fmpz_poly(a::Array{fmpz, 1})
-      z = new()
-      ccall((:fmpz_poly_init2, :libflint), Void, 
-            (Ptr{fmpz_poly}, Int), &z, length(a))
-      for i = 1:length(a)
-         ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
-                     (Ptr{fmpz_poly}, Int, Ptr{fmpz}), &z, i - 1, &a[i])
-      end
-      finalizer(z, _fmpz_poly_clear_fn)
-      return z
-   end
-
-   function fmpz_poly(a::Int)
-      z = new()
-      ccall((:fmpz_poly_init, :libflint), Void, (Ptr{fmpz_poly},), &z)
-      ccall((:fmpz_poly_set_si, :libflint), Void, (Ptr{fmpz_poly}, Int), &z, a)
-      finalizer(z, _fmpz_poly_clear_fn)
-      return z
-   end
-
-   function fmpz_poly(a::fmpz)
-      z = new()
-      ccall((:fmpz_poly_init, :libflint), Void, (Ptr{fmpz_poly},), &z)
-      ccall((:fmpz_poly_set_fmpz, :libflint), Void, 
-            (Ptr{fmpz_poly}, Ptr{fmpz}), &z, &a)
-      finalizer(z, _fmpz_poly_clear_fn)
-      return z
-   end
-
-   function fmpz_poly(a::fmpz_poly)
-      z = new()
-      ccall((:fmpz_poly_init, :libflint), Void, (Ptr{fmpz_poly},), &z)
-      ccall((:fmpz_poly_set, :libflint), Void, 
-            (Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &a)
-      finalizer(z, _fmpz_poly_clear_fn)
-      return z
-   end
-end
-
-function _fmpz_poly_clear_fn(a::fmpz_poly)
-   ccall((:fmpz_poly_clear, :libflint), Void, (Ptr{fmpz_poly},), &a)
-end
 
 elem_type(::FmpzPolyRing) = fmpz_poly
 

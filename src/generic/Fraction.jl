@@ -10,31 +10,9 @@ export FractionField, Fraction, num, den
 
 ###############################################################################
 #
-#   Data types and memory management
+#   Data type and parent object methods
 #
 ###############################################################################
-
-FractionDict = ObjectIdDict()
-
-type FractionField{T <:RingElem} <: Field
-   base_ring::Ring
-
-   function FractionField(R::Ring)
-      return try
-         FractionDict[R]
-      catch
-         FractionDict[R] = new(R)
-      end
-   end
-end
-
-type Fraction{T <: RingElem} <: FieldElem
-   num::T
-   den::T
-   parent::FractionField{T}
-
-   Fraction(num::T, den::T) = new(num, den) 
-end
 
 elem_type{T <: RingElem}(::FractionField{T}) = Fraction{T}
 

@@ -8,71 +8,9 @@ export fq_series, FqSeriesRing
 
 ###############################################################################
 #
-#   Data types and memory management
+#   Data type and parent object methods
 #
 ###############################################################################
-
-FqSeriesID = ObjectIdDict()
-
-type FqSeriesRing <: Ring
-   base_ring::Ring
-   prec_max::Int
-   S::Symbol
-
-   function FqSeriesRing(R::Ring, prec::Int, s::Symbol)
-      return try
-         FqSeriesID[R, prec, s]
-      catch
-         FqSeriesID[R, prec, s] = new(R, prec, s)
-      end
-   end
-end
-
-type fq_series <: PowerSeriesElem
-   coeffs::Ptr{Void}
-   alloc::Int
-   length::Int
-   prec :: Int
-   parent::FqSeriesRing
-
-   function fq_series(ctx::FqFiniteField)
-      z = new()
-      ccall((:fq_poly_init, :libflint), Void, 
-            (Ptr{fq_series}, Ptr{FqFiniteField}), &z, &ctx)
-      finalizer(z, _fq_series_clear_fn)
-      return z
-   end
-   
-   function fq_series(ctx::FqFiniteField, a::Array{fq, 1}, len::Int, prec::Int)
-      z = new()
-      ccall((:fq_poly_init2, :libflint), Void, 
-            (Ptr{fq_series}, Int, Ptr{FqFiniteField}), &z, len, &ctx)
-      for i = 1:len
-         ccall((:fq_poly_set_coeff, :libflint), Void, 
-               (Ptr{fq_series}, Int, Ptr{fq}, Ptr{FqFiniteField}),
-                                               &z, i - 1, &a[i], &ctx)
-      end
-      z.prec = prec
-      finalizer(z, _fq_series_clear_fn)
-      return z
-   end
-   
-   function fq_series(ctx::FqFiniteField, a::fq_series)
-      z = new()
-      ccall((:fq_poly_init, :libflint), Void, 
-            (Ptr{fq_series}, Ptr{FqFiniteField}), &z, &ctx)
-      ccall((:fq_poly_set, :libflint), Void, 
-            (Ptr{fq_series}, Ptr{fq_series}, Ptr{FqFiniteField}), &z, &a, &ctx)
-      finalizer(z, _fq_series_clear_fn)
-      return z
-   end
-end
-
-function _fq_series_clear_fn(a::fq_series)
-   ctx = base_ring(a)
-   ccall((:fq_poly_clear, :libflint), Void,
-         (Ptr{fq_series}, Ptr{FqFiniteField}), &a, &ctx)
-end
 
 function O(a::fq_series)
    prec = length(a) - 1

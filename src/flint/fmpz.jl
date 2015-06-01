@@ -50,44 +50,9 @@ export fmpz, ZZ, IntegerRing, parent, show, convert, hash, fac, binom, isprime,
 
 ###############################################################################
 #
-#   Data type and memory management
+#   Data type and parent methods
 #
 ###############################################################################
-
-type IntegerRing <: Ring
-end
-
-type fmpz <: RingElem
-    d::Int
-
-    function fmpz()
-        z = new()
-        ccall((:fmpz_init, :libflint), Void, (Ptr{fmpz},), &z)
-        finalizer(z, _fmpz_clear_fn)
-        return z
-    end
-
-    function fmpz(x::Int)
-        z = new()
-        ccall((:fmpz_init_set_si, :libflint), Void, (Ptr{fmpz}, Int), &z, x)
-        finalizer(z, _fmpz_clear_fn)
-        return z
-    end
-
-    function fmpz(x::BigInt)
-        z = new()
-        ccall((:fmpz_init, :libflint), Void, (Ptr{fmpz},), &z)
-        ccall((:fmpz_set_mpz, :libflint), Void, (Ptr{fmpz}, Ptr{BigInt}), &z, &x)
-        finalizer(z, _fmpz_clear_fn)
-        return z
-    end
-
-    fmpz(x::fmpz) = x
-end
-
-function _fmpz_clear_fn(a::fmpz)
-   ccall((:fmpz_clear, :libflint), Void, (Ptr{fmpz},), &a)
-end
 
 ZZ = IntegerRing()
 

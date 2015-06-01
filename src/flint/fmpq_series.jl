@@ -12,68 +12,9 @@ export fmpq_series, FmpqSeriesRing, tan, tanh, sin, sinh, asin, asinh, atan,
 
 ###############################################################################
 #
-#   Data types and memory management
+#   Data type and parent object methods
 #
 ###############################################################################
-
-FmpqSeriesID = ObjectIdDict()
-
-type FmpqSeriesRing <: Ring
-   base_ring::Ring
-   prec_max::Int
-   S::Symbol
-
-   function FmpqSeriesRing(prec::Int, s::Symbol)
-      return try
-         FmpqSeriesID[prec, s]
-      catch
-         FmpqSeriesID[prec, s] = new(QQ, prec, s)
-      end
-   end
-end
-
-type fmpq_series <: PowerSeriesElem
-   coeffs::Ptr{Void}
-   den::Int
-   alloc::Int
-   length::Int
-   prec :: Int
-   parent::FmpqSeriesRing
-
-   function fmpq_series()
-      z = new()
-      ccall((:fmpq_poly_init, :libflint), Void, 
-            (Ptr{fmpq_series},), &z)
-      finalizer(z, _fmpq_series_clear_fn)
-      return z
-   end
-   
-   function fmpq_series(a::Array{fmpq, 1}, len::Int, prec::Int)
-      z = new()
-      ccall((:fmpq_poly_init2, :libflint), Void, 
-            (Ptr{fmpq_series}, Int), &z, len)
-      for i = 1:len
-         ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, 
-                     (Ptr{fmpq_series}, Int, Ptr{fmpq}), &z, i - 1, &a[i])
-      end
-      z.prec = prec
-      finalizer(z, _fmpq_series_clear_fn)
-      return z
-   end
-   
-   function fmpq_series(a::fmpq_series)
-      z = new()
-      ccall((:fmpq_poly_init, :libflint), Void, (Ptr{fmpq_series},), &z)
-      ccall((:fmpq_poly_set, :libflint), Void, 
-            (Ptr{fmpq_series}, Ptr{fmpq_series}), &z, &a)
-      finalizer(z, _fmpq_series_clear_fn)
-      return z
-   end
-end
-
-function _fmpq_series_clear_fn(a::fmpq_series)
-   ccall((:fmpq_poly_clear, :libflint), Void, (Ptr{fmpq_series},), &a)
-end
 
 function O(a::fmpq_series)
    prec = length(a) - 1

@@ -8,67 +8,9 @@ export fmpz_series, FmpzSeriesRing
 
 ###############################################################################
 #
-#   Data types and memory management
+#   Data type and parent object methods
 #
 ###############################################################################
-
-FmpzSeriesID = ObjectIdDict()
-
-type FmpzSeriesRing <: Ring
-   base_ring::Ring
-   prec_max::Int
-   S::Symbol
-
-   function FmpzSeriesRing(prec::Int, s::Symbol)
-      return try
-         FmpzSeriesID[prec, s]
-      catch
-         FmpzSeriesID[prec, s] = new(ZZ, prec, s)
-      end
-   end
-end
-
-type fmpz_series <: PowerSeriesElem
-   coeffs::Ptr{Void}
-   alloc::Int
-   length::Int
-   prec :: Int
-   parent::FmpzSeriesRing
-
-   function fmpz_series()
-      z = new()
-      ccall((:fmpz_poly_init, :libflint), Void, 
-            (Ptr{fmpz_series},), &z)
-      finalizer(z, _fmpz_series_clear_fn)
-      return z
-   end
-   
-   function fmpz_series(a::Array{fmpz, 1}, len::Int, prec::Int)
-      z = new()
-      ccall((:fmpz_poly_init2, :libflint), Void, 
-            (Ptr{fmpz_series}, Int), &z, len)
-      for i = 1:len
-         ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
-                     (Ptr{fmpz_series}, Int, Ptr{fmpz}), &z, i - 1, &a[i])
-      end
-      z.prec = prec
-      finalizer(z, _fmpz_series_clear_fn)
-      return z
-   end
-   
-   function fmpz_series(a::fmpz_series)
-      z = new()
-      ccall((:fmpz_poly_init, :libflint), Void, (Ptr{fmpz_series},), &z)
-      ccall((:fmpz_poly_set, :libflint), Void, 
-            (Ptr{fmpz_series}, Ptr{fmpz_series}), &z, &a)
-      finalizer(z, _fmpz_series_clear_fn)
-      return z
-   end
-end
-
-function _fmpz_series_clear_fn(a::fmpz_series)
-   ccall((:fmpz_poly_clear, :libflint), Void, (Ptr{fmpz_series},), &a)
-end
 
 function O(a::fmpz_series)
    prec = length(a) - 1

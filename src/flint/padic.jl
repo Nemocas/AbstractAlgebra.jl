@@ -10,54 +10,9 @@ export PadicField, padic, prime, teichmuller, log, sqrt
 
 ###############################################################################
 #
-#   Data types and memory management
+#   Data type and parent object methods
 #
 ###############################################################################
-
-PadicBase = ObjectIdDict()
-
-type PadicField <: Field
-   p::Int 
-   pinv::Float64
-   pow::Ptr{Void}
-   minpre::Int
-   maxpre::Int
-   mode::Int
-   prec_max::Int
-
-   function PadicField(p::fmpz, prec::Int)
-      !isprime(p) && error("Prime base required in PadicField")
-      d = new()
-      ccall((:padic_ctx_init, :libflint), Void, 
-           (Ptr{PadicField}, Ptr{fmpz}, Int, Int, Cint), 
-                                     &d, &p, 0, 0, 1)
-      finalizer(d, _padic_ctx_clear_fn)
-      d.prec_max = prec
-      return d
-   end
-end
-
-function _padic_ctx_clear_fn(a::PadicField)
-   ccall((:padic_ctx_clear, :libflint), Void, (Ptr{PadicField},), &a)
-end
-
-type padic <: FieldElem
-   u :: Int
-   v :: Int
-   N :: Int
-   parent::PadicField
-
-   function padic(prec::Int)
-      d = new()
-      ccall((:padic_init2, :libflint), Void, (Ptr{padic}, Int), &d, prec)
-      finalizer(d, _padic_clear_fn)
-      return d
-   end
-end
-
-function _padic_clear_fn(a::padic)
-   ccall((:padic_clear, :libflint), Void, (Ptr{padic},), &a)
-end
 
 function O(R::PadicField, n::fmpz)
    if n == 1

@@ -8,31 +8,9 @@ export ResidueRing, Residue, inv, modulus
 
 ###############################################################################
 #
-#   Data types and memory management
+#   Data type and parent object methods
 #
 ###############################################################################
-
-ModulusDict = Dict{Tuple{Ring, RingElem}, Ring}()
-
-type ResidueRing{T <: RingElem} <: Ring
-   base_ring::Ring
-   modulus::T
-
-   function ResidueRing(modulus::T)
-      return try
-         ModulusDict[parent(modulus), modulus]
-      catch
-         ModulusDict[parent(modulus), modulus] = new(parent(modulus), modulus)
-      end
-   end
-end
-
-type Residue{T <: RingElem} <: RingElem
-   data::T
-   parent::ResidueRing
-
-   Residue(a::T) = new(a)
-end
 
 elem_type{T <: RingElem}(::ResidueRing{T}) = Residue{T}
 

@@ -8,71 +8,9 @@ export fq_nmod_series, FqNmodSeriesRing
 
 ###############################################################################
 #
-#   Data types and memory management
+#   Data type and parent object methods
 #
 ###############################################################################
-
-FqSeriesID = ObjectIdDict()
-
-type FqNmodSeriesRing <: Ring
-   base_ring::Ring
-   prec_max::Int
-   S::Symbol
-
-   function FqNmodSeriesRing(R::Ring, prec::Int, s::Symbol)
-      return try
-         FqSeriesID[R, prec, s]
-      catch
-         FqSeriesID[R, prec, s] = new(R, prec, s)
-      end
-   end
-end
-
-type fq_nmod_series <: PowerSeriesElem
-   coeffs::Ptr{Void}
-   alloc::Int
-   length::Int
-   prec :: Int
-   parent::FqNmodSeriesRing
-
-   function fq_nmod_series(ctx::FqNmodFiniteField)
-      z = new()
-      ccall((:fq_nmod_poly_init, :libflint), Void, 
-            (Ptr{fq_nmod_series}, Ptr{FqNmodFiniteField}), &z, &ctx)
-      finalizer(z, _fq_nmod_series_clear_fn)
-      return z
-   end
-   
-   function fq_nmod_series(ctx::FqNmodFiniteField, a::Array{fq_nmod, 1}, len::Int, prec::Int)
-      z = new()
-      ccall((:fq_nmod_poly_init2, :libflint), Void, 
-            (Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}), &z, len, &ctx)
-      for i = 1:len
-         ccall((:fq_nmod_poly_set_coeff, :libflint), Void, 
-               (Ptr{fq_nmod_series}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}),
-                                               &z, i - 1, &a[i], &ctx)
-      end
-      z.prec = prec
-      finalizer(z, _fq_nmod_series_clear_fn)
-      return z
-   end
-   
-   function fq_nmod_series(ctx::FqNmodFiniteField, a::fq_nmod_series)
-      z = new()
-      ccall((:fq_nmod_poly_init, :libflint), Void, 
-            (Ptr{fq_nmod_series}, Ptr{FqNmodFiniteField}), &z, &ctx)
-      ccall((:fq_nmod_poly_set, :libflint), Void, 
-            (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Ptr{FqNmodFiniteField}), &z, &a, &ctx)
-      finalizer(z, _fq_nmod_series_clear_fn)
-      return z
-   end
-end
-
-function _fq_nmod_series_clear_fn(a::fq_nmod_series)
-   ctx = base_ring(a)
-   ccall((:fq_nmod_poly_clear, :libflint), Void,
-         (Ptr{fq_nmod_series}, Ptr{FqNmodFiniteField}), &a, &ctx)
-end
 
 function O(a::fq_nmod_series)
    prec = length(a) - 1
