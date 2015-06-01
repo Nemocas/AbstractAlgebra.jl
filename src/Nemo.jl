@@ -6,21 +6,21 @@ on_windows = @windows ? true : false
 on_linux = @linux ? true : false
 
 if on_windows
-   push!(Libdl.DL_LOAD_PATH, "$pkgdir\\src\\lib")
+   push!(Libdl.DL_LOAD_PATH, "$pkgdir\\local\\lib")
 else
    try
       if "HOSTNAME" in ENV && ENV["HOSTNAME"] == "juliabox"
          push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
       elseif on_linux
-         push!(Libdl.DL_LOAD_PATH, "$pkgdir/src/lib")
-         Libdl.dlopen("$pkgdir/src/lib/libgmp")
-         Libdl.dlopen("$pkgdir/src/lib/libmpfr")
-         Libdl.dlopen("$pkgdir/src/lib/libflint")
+         push!(Libdl.DL_LOAD_PATH, "$pkgdir/local/lib")
+         Libdl.dlopen("$pkgdir/local/lib/libgmp")
+         Libdl.dlopen("$pkgdir/local/lib/libmpfr")
+         Libdl.dlopen("$pkgdir/local/lib/libflint")
       else
-         push!(Libdl.DL_LOAD_PATH, "$pkgdir/src/lib")
+         push!(Libdl.DL_LOAD_PATH, "$pkgdir/local/lib")
       end
    catch
-      push!(Libdl.DL_LOAD_PATH, "$pkgdir/src/lib")
+      push!(Libdl.DL_LOAD_PATH, "$pkgdir/local/lib")
    end
 end
 

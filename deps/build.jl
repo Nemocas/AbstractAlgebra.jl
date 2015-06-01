@@ -5,14 +5,21 @@ oldwdir = pwd()
 pkgdir = Pkg.dir("Nemo") 
 
 if on_windows
-   wdir = "$pkgdir\\src"
+   wdir = "$pkgdir\\deps"
+   vdir = "$pkgdir\\local"
    wdir2 = split(wdir, "\\")
    s = lowercase(shift!(wdir2)[1])
    unshift!(wdir2, string(s))
    unshift!(wdir2, "")
    wdir2 = join(wdir2, "/") 
+   vdir2 = split(vdir, "\\")
+   s = lowercase(shift!(vdir2)[1])
+   unshift!(vdir2, string(s))
+   unshift!(vdir2, "")
+   vdir2 = join(vdir2, "/") 
 else
-   wdir = "$pkgdir/src"
+   wdir = "$pkgdir/deps"
+   vdir = "$pkgdir/local"
 end
 
 cd(wdir)
@@ -31,17 +38,6 @@ if on_windows
    else
       ENV["MSYSTEM"]="MINGW64"
    end
-else
-   # install M4
-   run(`wget http://ftp.gnu.org/gnu/m4/m4-1.4.17.tar.bz2`)
-   run(`tar -xvf m4-1.4.17.tar.bz2`)
-   run(`rm m4-1.4.17.tar.bz2`)
-   cd("$wdir/m4-1.4.17")
-   run(`./configure --prefix=$wdir`)
-   run(`make`)
-   run(`make install`)
-   cd(wdir)
-   run(`rm -rf m4-1.4.17`)
 end
 
 # install M4
@@ -51,7 +47,7 @@ if !on_windows
    run(`tar -xvf m4-1.4.17.tar.bz2`)
    run(`rm m4-1.4.17.tar.bz2`)
    cd("$wdir/m4-1.4.17")
-   run(`./configure --prefix=$wdir`)
+   run(`./configure --prefix=$vdir`)
    run(`make`)
    run(`make install`)
 end
@@ -68,17 +64,17 @@ cd("$wdir/mpir-2.7.0")
 if on_windows
    ENV["PATH"] = pth
    if Int == Int32
-      run(`$start /e:4096 /c sh configure --prefix=$wdir2 --enable-gmpcompat --disable-static --enable-shared ABI=32`)
+      run(`$start /e:4096 /c sh configure --prefix=$vdir2 --enable-gmpcompat --disable-static --enable-shared ABI=32`)
    else
-      run(`$start /e:4096 /c sh configure --prefix=$wdir2 --enable-gmpcompat --disable-static --enable-shared ABI=64`)
+      run(`$start /e:4096 /c sh configure --prefix=$vdir2 --enable-gmpcompat --disable-static --enable-shared ABI=64`)
    end
    run(`$start /e:4096 /c sh -c "make -j"`)
    run(`$start /e:4096 /c sh -c "make install"`) # naturally autotools fails to do this correctly
-   run(`$start /e:4096 /c sh -c "cp .libs/libgmp*.dll $wdir2/lib"`)  # so we do it ourselves
-   run(`$start /e:4096 /c sh -c "cp .libs/libmpir*.dll $wdir2/lib"`)  # so we do it ourselves
+   run(`$start /e:4096 /c sh -c "cp .libs/libgmp*.dll $vdir2/lib"`)  # so we do it ourselves
+   run(`$start /e:4096 /c sh -c "cp .libs/libmpir*.dll $vdir2/lib"`) 
    ENV["PATH"] = oldpth
 else
-   run(`./configure --prefix=$wdir M4=$wdir/bin/m4 --enable-gmpcompat --disable-static --enable-shared`)
+   run(`./configure --prefix=$vdir M4=$vdir/bin/m4 --enable-gmpcompat --disable-static --enable-shared`)
    run(`make -j4`)
    run(`make install`)
    cd(wdir)
@@ -97,13 +93,13 @@ cd("$wdir/mpfr-3.1.2")
 
 if on_windows
    ENV["PATH"] = pth
-   run(`$start /e:4096 /c sh configure --prefix=$wdir2 --with-gmp=$wdir2 --disable-static --enable-shared`)
+   run(`$start /e:4096 /c sh configure --prefix=$vdir2 --with-gmp=$vdir2 --disable-static --enable-shared`)
    run(`$start /e:4096 /c sh -c "make -j"`)
    run(`$start /e:4096 /c sh -c "make install"`) # naturally autotools fails to do this correctly
-   run(`$start /e:4096 /c sh -c "cp src/.libs/libmpfr*.dll $wdir2/lib"`)  # so we do it ourselves
+   run(`$start /e:4096 /c sh -c "cp src/.libs/libmpfr*.dll $vdir2/lib"`)  # so we do it ourselves
    ENV["PATH"] = oldpth
 else
-   run(`./configure --prefix=$wdir --with-gmp=$wdir --disable-static --enable-shared`)
+   run(`./configure --prefix=$vdir --with-gmp=$vdir --disable-static --enable-shared`)
    run(`make -j4`)
    run(`make install`)
    cd(wdir)
@@ -131,16 +127,16 @@ if on_windows
    cd("$wdir\\flint2")
    ENV["PATH"] = pth
    if Int == Int32
-      run(`$start /e:4096 /c sh configure --extensions="$wdir2\antic" --prefix=$wdir2 --disable-static --enable-shared --with-mpir=$wdir2 --with-mpfr=$wdir2 ABI=32`)
+      run(`$start /e:4096 /c sh configure --extensions="$wdir2\antic" --prefix=$vdir2 --disable-static --enable-shared --with-mpir=$vdir2 --with-mpfr=$vdir2 ABI=32`)
    else
-      run(`$start /e:4096 /c sh configure --extensions="$wdir2\antic" --prefix=$wdir2 --disable-static --enable-shared --with-mpir=$wdir2 --with-mpfr=$wdir2 ABI=64`)
+      run(`$start /e:4096 /c sh configure --extensions="$wdir2\antic" --prefix=$vdir2 --disable-static --enable-shared --with-mpir=$vdir2 --with-mpfr=$vdir2 ABI=64`)
    end
    run(`$start /e:4096 /c sh -c "make -j"`)
    run(`$start /e:4096 /c sh -c "make install"`)
    ENV["PATH"] = oldpth
 else
    cd("$wdir/flint2")
-   run(`./configure --prefix=$wdir --extensions="$wdir/antic" --disable-static --enable-shared --with-mpir=$wdir --with-mpfr=$wdir`)
+   run(`./configure --prefix=$vdir --extensions="$wdir/antic" --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir`)
    run(`make -j4`)
    run(`make install`)
 end
@@ -158,7 +154,7 @@ end
 if on_windows
 else
    cd("$wdir/arb")
-   run(`./configure --prefix=$wdir --disable-static --enable-shared --with-mpir=$wdir --with-mpfr=$wdir --with-flint=$wdir`)
+   run(`./configure --prefix=$vdir --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir --with-flint=$vdir`)
    run(`make -j4`)
    run(`make install`)
    cd(wdir)
@@ -176,8 +172,8 @@ if on_windows
 else
    cd("$wdir/pari")
    env_copy = copy(ENV)
-   env_copy["LD_LIBRARY_PATH"] = "$wdir/lib"
-   config_str = `./Configure --prefix=$wdir --with-gmp=$wdir --mt=pthread`
+   env_copy["LD_LIBRARY_PATH"] = "$vdir/lib"
+   config_str = `./Configure --prefix=$vdir --with-gmp=$vdir --mt=pthread`
    config_str = setenv(config_str, env_copy)
    run(config_str)
    run(`make -j4 gp`)
@@ -188,9 +184,9 @@ end
 cd(wdir)
 
 if on_windows
-   push!(Libdl.DL_LOAD_PATH, "$pkgdir\\src\\lib")
+   push!(Libdl.DL_LOAD_PATH, "$pkgdir\\local\\lib")
 else
-   push!(Libdl.DL_LOAD_PATH, "$pkgdir/src/lib")
+   push!(Libdl.DL_LOAD_PATH, "$pkgdir/local/lib")
 end
 
 cd(oldwdir)
