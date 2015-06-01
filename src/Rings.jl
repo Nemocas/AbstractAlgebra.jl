@@ -33,6 +33,12 @@ abstract PowerSeriesElem <: RingElem
 # not always mathematical ring elements
 abstract MatElem <: RingElem
 
+abstract FiniteFieldElem <: FieldElem
+
+abstract NumberFieldElem <: FieldElem
+
+abstract MaximalOrderElem <: RingElem
+
 ###############################################################################
 #
 #   Hashing (needed for hashing tuples)
@@ -213,51 +219,53 @@ end
 #
 ###############################################################################
 
-include("fmpz.jl")
+include("flint/fmpz.jl")
 
-include("Residue.jl")
+include("generic/Residue.jl")
 
-include("Poly.jl")
+include("generic/Poly.jl")
 
-include("fmpz_poly.jl")
+include("flint/fmpz_poly.jl")
 
-include("nmod_poly.jl")
+include("flint/nmod_poly.jl")
 
-include("fmpz_mod_poly.jl")
+include("flint/fmpz_mod_poly.jl")
 
-include("PowerSeries.jl")
+include("generic/PowerSeries.jl")
 
-include("fmpz_series.jl")
+include("flint/fmpz_series.jl")
 
-include("fmpz_mod_series.jl")
+include("flint/fmpz_mod_series.jl")
 
-include("fmpz_mat.jl")
+include("flint/fmpz_mat.jl")
 
-include("nmod_mat.jl")
+include("flint/nmod_mat.jl")
 
-include("PariRings.jl")
+include("pari/PariRings.jl")
 
 include("Fields.jl")
 
-include("PariFields.jl")
+include("pari/PariFields.jl")
 
-include("fmpq_poly.jl")
+include("flint/fmpq_poly.jl")
 
-include("padic.jl")
+include("flint/padic.jl")
 
-include("fmpq_series.jl")
+include("flint/fmpq_series.jl")
 
-include("fq_series.jl")
+include("flint/fq_series.jl")
 
-include("fq_nmod_series.jl")
+include("flint/fq_nmod_series.jl")
 
-include("pari_poly2.jl")
+include("pari/pari_poly2.jl")
 
-include("NumberFields.jl")
+include("antic/nf.jl")
 
-include("MaximalOrders.jl")
+include("pari/pari_nf.jl")
 
-include("PariIdeal.jl")
+include("pari/PariMaximalOrder.jl")
+
+include("pari/PariIdeal.jl")
 
 include("Factor.jl")
 

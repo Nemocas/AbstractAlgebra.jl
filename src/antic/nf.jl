@@ -4,7 +4,8 @@
 #
 ###############################################################################
 
-export norm, trace, CyclotomicField, MaximalRealSubfield, add!, sub!, mul!
+export NumberField, norm, trace, CyclotomicField, MaximalRealSubfield, add!,
+       sub!, mul!
 
 ###############################################################################
 #

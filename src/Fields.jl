@@ -4,13 +4,20 @@
 #
 ###########################################################################################
 
-include("Fraction.jl")
+include("generic/Fraction.jl")
 
-include("fmpq.jl")
+include("flint/fmpq.jl")
 
-include("FiniteFields.jl")
+include("flint/fq.jl")
+
+include("flint/fq_nmod.jl")
 
 //{T <: FieldElem}(a::T, b::T) = divexact(a, b)
+
+function gcd{T <: FieldElem}(x::T, y::T)
+   check_parent(x, y)
+   return iszero(x) && iszero(y) ? zero(parent(y)) : one(parent(y))
+end
 
 
 

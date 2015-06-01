@@ -4,7 +4,8 @@
 #
 ###############################################################################
 
-export fq, FqFiniteField, frobenius, pth_root, trace, norm
+export FiniteField, characteristic, order, fq, FqFiniteField, frobenius,
+       pth_root, trace, norm
 
 ###############################################################################
 #
