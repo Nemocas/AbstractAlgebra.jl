@@ -1,5 +1,21 @@
 module Nemo
 
+import Base: length, call, exp, promote_rule, zero, one, show, divrem, mod, 
+             hash, factor, transpose!, rank, inv, lufact, truncate, reverse,
+             isqrt, nextpow2, ndigits, invmod, isprime, sub
+
+export Ring, Field, RingElem
+
+export PolyElem, PowerSeriesElem
+
+include("AbstractTypes.jl")
+
+###############################################################################
+#
+#   Set up environment / load libraries
+#
+###############################################################################
+
 pkgdir = Pkg.dir("Nemo")
 
 on_windows = @windows ? true : false
@@ -26,7 +42,19 @@ end
 
 ccall((:pari_init, :libpari), Void, (Int, Int), 3000000000, 10000)
 
+###############################################################################
+#
+#   Load Nemo Rings/Fields/etc
+#
+###############################################################################
+
 include("Rings.jl")
+
+###############################################################################
+#
+#   Library initialisation message
+#
+###############################################################################
 
 function __init__()
    println("")
@@ -35,5 +63,13 @@ function __init__()
    println("Nemo comes with absolutely no warranty whatsoever")
    println("")
 end
+
+###############################################################################
+#
+#   Test code
+#
+###############################################################################
+
+include("../test/Rings-test.jl")
 
 end # module

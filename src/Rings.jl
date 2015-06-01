@@ -4,41 +4,6 @@
 #
 ###############################################################################
 
-import Base: length, call, exp, promote_rule, zero, one, show, divrem, mod, 
-             hash, factor, transpose!, rank, inv, lufact, truncate, reverse,
-             isqrt, nextpow2, ndigits, invmod, isprime, sub
-
-export Ring, Field, RingElem
-
-export PolyElem, PowerSeriesElem
-
-###############################################################################
-#
-#   Abstract types
-#
-###############################################################################
-
-abstract Ring
-
-abstract Field <: Ring
-
-abstract RingElem
-
-abstract FieldElem <: RingElem
-
-abstract PolyElem <: RingElem
-
-abstract PowerSeriesElem <: RingElem
-
-# not always mathematical ring elements
-abstract MatElem <: RingElem
-
-abstract FiniteFieldElem <: FieldElem
-
-abstract NumberFieldElem <: FieldElem
-
-abstract MaximalOrderElem <: RingElem
-
 ###############################################################################
 #
 #   Hashing (needed for hashing tuples)
@@ -268,12 +233,4 @@ include("pari/PariMaximalOrder.jl")
 include("pari/PariIdeal.jl")
 
 include("Factor.jl")
-
-###############################################################################
-#
-#   Test code
-#
-###############################################################################
-
-include("../test/Rings-test.jl")
 
