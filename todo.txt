@@ -46,6 +46,15 @@ General
 
 * Optimise for monomials in polynomial modules, especially powering
 
+fq_poly.jl / fq_nmod_poly.jl
+----------------------------
+
+* divexact is missing along with numerous other things provided by generic Poly
+
+* division is currently using basecase instead of divide and conquer
+
+* write test code
+
 nmod_poly.jl
 ------------
 
@@ -131,6 +140,8 @@ FLINT
 * Interpolate for fmpz_mod_poly
 
 * factor_get_fmpz_mod_poly for fmpz_mod_poly (inlines.c)
+
+* gcdinv doesn't exist for fq_poly and fq_nmod_poly
 
 PowerSeries.jl
 --------------
