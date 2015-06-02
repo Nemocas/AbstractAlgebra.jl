@@ -644,13 +644,13 @@ end
 #
 ###############################################################################
 
-function mod{T <: Union(Residue, FieldElem)}(f::Poly{T}, g::Poly{T})
+function mod{T <: Union(Residue, FieldElem)}(f::PolyElem{T}, g::PolyElem{T})
    check_parent(f, g)
    if length(g) == 0
       raise(DivideError())
    end
    if length(f) >= length(g)
-      b = g.coeffs[length(g)]
+      b = coeff(g, length(g) - 1)
       g = inv(b)*g
       x = gen(parent(f))
       while length(f) >= length(g)

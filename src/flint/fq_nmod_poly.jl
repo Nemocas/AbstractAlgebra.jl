@@ -163,25 +163,25 @@ end
 ################################################################################
 
 function *(x::fq_nmod, y::fq_nmod_poly)
-   x.parent == base_ring(parent(y)) &&
+   parent(x) != base_ring(parent(y)) &&
          error("Coefficient rings must be equal")
    z = parent(y)()
    ccall((:fq_nmod_poly_scalar_mul_fq_nmod, :libflint), Void,
          (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly},
          Ptr{fq_nmod}, Ptr{FqNmodFiniteField}),
-         &z, &y, &x, &base_ring(parent(x)))
+         &z, &y, &x, &parent(x))
   return z
 end
 
 *(x::fq_nmod_poly, y::fq_nmod) = y*x
 
-*(x::fmpz, y::fq_nmod) = base_ring(parent(y))(x) * y
+*(x::fmpz, y::fq_nmod_poly) = base_ring(parent(y))(x) * y
 
-*(x::fq_nmod, y::fmpz) = y*x
+*(x::fq_nmod_poly, y::fmpz) = y*x
 
-*(x::Integer, y::fq_nmod) = ZZ(x)*y
+*(x::Integer, y::fq_nmod_poly) = ZZ(x)*y
 
-*(x::fq_nmod, y::Integer) = y*x
+*(x::fq_nmod_poly, y::Integer) = y*x
 
 +(x::fq_nmod, y::fq_nmod_poly) = parent(y)(x) + y
 
@@ -235,9 +235,9 @@ function ==(x::fq_nmod_poly, y::fq_nmod)
    if length(x) > 1
       return false
    elseif length(x) == 1 
-      r = ccall((:fq_nmod_poly_equal_fq, :libflint), Cint, 
-                (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, Ptr{FqNmodFiniteField}),
-                &z, &temp, &base_ring(parent(x)))
+      r = ccall((:fq_nmod_poly_equal_fq_nmod, :libflint), Cint, 
+                (Ptr{fq_nmod_poly}, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}),
+                &x, &y, &base_ring(parent(x)))
       return Bool(r)
    else
       return y == 0
@@ -346,6 +346,8 @@ function rem(x::fq_nmod_poly, y::fq_nmod_poly)
   return z
 end
 
+mod(x::fq_nmod_poly, y::fq_nmod_poly) = rem(x, y)
+
 function divrem(x::fq_nmod_poly, y::fq_nmod_poly)
    check_parent(x,y)
    z = parent(x)()
@@ -354,6 +356,21 @@ function divrem(x::fq_nmod_poly, y::fq_nmod_poly)
          Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly},
          Ptr{FqNmodFiniteField}), &z, &r, &x, &y, &base_ring(parent(x)))
    return z,r
+end
+
+################################################################################
+#
+#   Modular arithmetic
+#
+################################################################################
+
+function powmod(x::fq_nmod_poly, n::Int, y::fq_nmod_poly)
+   check_parent(x,y)
+   z = parent(x)()
+   ccall((:fq_nmod_poly_powmod_ui_binexp, :libflint), Void,
+         (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, Int, Ptr{fq_nmod_poly},
+         Ptr{FqNmodFiniteField}), &z, &x, n, &y, &base_ring(parent(x)))
+  return z
 end
 
 ################################################################################
@@ -369,6 +386,30 @@ function gcd(x::fq_nmod_poly, y::fq_nmod_poly)
          (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly},
          Ptr{FqNmodFiniteField}), &z, &x, &y, &base_ring(parent(x)))
    return z
+end
+
+function gcdinv(x::fq_nmod_poly, y::fq_nmod_poly)
+   check_parent(x,y)
+   z = parent(x)()
+   s = parent(x)()
+   t = parent(x)()
+   ccall((:fq_nmod_poly_xgcd, :libflint), Void,
+         (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, 
+          Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly},
+           Ptr{FqNmodFiniteField}), &z, &s, &t, &x, &y, &base_ring(parent(x)))
+   return z, s
+end
+
+function gcdx(x::fq_nmod_poly, y::fq_nmod_poly)
+   check_parent(x,y)
+   z = parent(x)()
+   s = parent(x)()
+   t = parent(x)()
+   ccall((:fq_nmod_poly_xgcd, :libflint), Void,
+         (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, 
+          Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly},
+           Ptr{FqNmodFiniteField}), &z, &s, &t, &x, &y, &base_ring(parent(x)))
+   return z, t
 end
 
 ################################################################################
