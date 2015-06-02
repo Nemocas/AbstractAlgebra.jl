@@ -8,70 +8,9 @@ export fmpz_mod_series, FmpzModSeriesRing
 
 ###############################################################################
 #
-#   Data types and memory management
+#   Data type and parent object methods
 #
 ###############################################################################
-
-FmpzModSeriesID = ObjectIdDict()
-
-type FmpzModSeriesRing <: Ring
-   base_ring::Ring
-   prec_max::Int
-   S::Symbol
-
-   function FmpzModSeriesRing(R::Ring, prec::Int, s::Symbol)
-      return try
-         FmpzModSeriesID[R, prec, s]
-      catch
-         FmpzModSeriesID[R, prec, s] = new(R, prec, s)
-      end
-   end
-end
-
-type fmpz_mod_series <: PowerSeriesElem
-   coeffs::Ptr{Void}
-   alloc::Int
-   length::Int
-   p::Int
-   prec :: Int
-   parent::FmpzModSeriesRing
-
-   function fmpz_mod_series(p::fmpz)
-      z = new()
-      ccall((:fmpz_mod_poly_init, :libflint), Void, 
-            (Ptr{fmpz_mod_series}, Ptr{fmpz}), &z, &p)
-      finalizer(z, _fmpz_mod_series_clear_fn)
-      return z
-   end
-   
-   function fmpz_mod_series(p::fmpz, a::Array{fmpz, 1}, len::Int, prec::Int)
-      z = new()
-      ccall((:fmpz_mod_poly_init2, :libflint), Void, 
-            (Ptr{fmpz_mod_series}, Ptr{fmpz}, Int), &z, &p, len)
-      for i = 1:len
-         ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
-                     (Ptr{fmpz_mod_series}, Int, Ptr{fmpz}), &z, i - 1, &a[i])
-      end
-      z.prec = prec
-      finalizer(z, _fmpz_mod_series_clear_fn)
-      return z
-   end
-   
-   function fmpz_mod_series(a::fmpz_mod_series)
-      z = new()
-      p = modulus(base_ring(parent(a)))
-      ccall((:fmpz_mod_poly_init, :libflint), Void, 
-            (Ptr{fmpz_mod_series}, Ptr{fmpz}), &z, &p)
-      ccall((:fmpz_mod_poly_set, :libflint), Void, 
-            (Ptr{fmpz_mod_series}, Ptr{fmpz_mod_series}), &z, &a)
-      finalizer(z, _fmpz_mod_series_clear_fn)
-      return z
-   end
-end
-
-function _fmpz_mod_series_clear_fn(a::fmpz_mod_series)
-   ccall((:fmpz_mod_poly_clear, :libflint), Void, (Ptr{fmpz_mod_series},), &a)
-end
 
 function O(a::fmpz_mod_series)
    prec = length(a) - 1
