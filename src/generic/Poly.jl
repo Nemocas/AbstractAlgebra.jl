@@ -4,8 +4,6 @@
 #
 ###############################################################################
 
-import Base: var
-
 export Poly, PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow, 
        reverse, shift_left, shift_right, divexact, pseudorem, pseudodivrem, 
        gcd, degree, content, primpart, evaluate, compose, derivative, integral, 

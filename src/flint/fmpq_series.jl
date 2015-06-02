@@ -4,9 +4,6 @@
 #
 ###############################################################################
 
-import Base: tan, tanh, sinh, sin, cosh, cos, asin, asinh, atan, atanh, sqrt,
-             log
-
 export fmpq_series, FmpqSeriesRing, tan, tanh, sin, sinh, asin, asinh, atan,
        atanh, sqrt, log
 

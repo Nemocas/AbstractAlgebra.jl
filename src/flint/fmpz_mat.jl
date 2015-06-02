@@ -4,8 +4,6 @@
 #
 ###############################################################################
 
-import Base: getindex, setindex!, transpose
-
 export fmpz_mat, MatrixSpace, getindex, getindex!, setindex!, rows, cols,
        charpoly, determinant, determinant_divisor, determinant_given_divisor,
        gram, hadamard, is_hadamard, hnf, is_hnf, hnf_with_transform,

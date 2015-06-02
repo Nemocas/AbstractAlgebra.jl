@@ -4,8 +4,6 @@
 #
 #########################################################################################
 
-import Base: gcd, Rational, isless
-
 export QQ, fmpq, FractionField, Rational, RationalField, height, height_bits, isless,
        reconstruct, next_minimal, next_signed_minimal, next_calkin_wilf, 
        next_signed_calkin_wilf, dedekind_sum, harmonic

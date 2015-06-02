@@ -4,10 +4,8 @@
 #
 ################################################################################
 
-export NmodPolyRing, nmod_poly
-
-export parent, base_ring, elem_type, length, zero, one, gen, isgen, iszero,
-       var, deepcopy, show, truncate, mullow, reverse,
+export NmodPolyRing, nmod_poly, parent, base_ring, elem_type, length, zero, 
+       one, gen, isgen, iszero, var, deepcopy, show, truncate, mullow, reverse,
        shift_left, shift_right, divexact, divrem, rem, gcd, xgcd, resultant,
        evaluate, derivative, compose, interpolate, inflate, deflate, lift,
        isirreducible, issquarefree, factor, factor_squarefree,

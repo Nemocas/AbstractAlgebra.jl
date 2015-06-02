@@ -7,8 +7,6 @@
 export PowerSeries, PowerSeriesRing, O, valuation, exp, precision,
        max_precision
 
-import Base: exp, precision
-
 ###############################################################################
 #
 #   Data type and parent object methods

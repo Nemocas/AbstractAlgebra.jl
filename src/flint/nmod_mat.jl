@@ -4,12 +4,10 @@
 #
 ################################################################################
 
-export nmod_mat, NmodMatSpace
-
-export getindex, setindex!, set_entry!, deepcopy, rows, cols, parent, base_ring,
-       zero, one, issquare, show, ==, transpose, transpose!, -, +, *, ^, rref,
-       rref!, trace, determinant, rank, inv, solve, lufact, sub, window, hcat,
-       vcat, Array, lift, lift!, MatrixSpace, check_parent
+export nmod_mat, NmodMatSpace, getindex, setindex!, set_entry!, deepcopy, rows, 
+       cols, parent, base_ring, zero, one, issquare, show, transpose,
+       transpose!, rref, rref!, trace, determinant, rank, inv, solve, lufact,
+       sub, window, hcat, vcat, Array, lift, lift!, MatrixSpace, check_parent
 
 ################################################################################
 #

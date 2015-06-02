@@ -1,8 +1,13 @@
 module Nemo
 
-import Base: length, call, exp, promote_rule, zero, one, show, divrem, mod, 
-             hash, factor, transpose!, rank, inv, lufact, truncate, reverse,
-             isqrt, nextpow2, ndigits, invmod, isprime, sub
+import Base: abs, asin, asinh, atan, atanh, base, bin, call, convert, cos,
+             cosh, dec, deepcopy, den, deserialize, div, divrem, exp, factor,
+             gcd, gcdx, getindex, hash, hex, inv, invmod, isequal, isless,
+             isprime, isqrt, lcm, length, log, lufact, mod, ndigits, nextpow2,
+             norm, num, oct, one, parent, parseint, precision, promote_rule,
+             rank, Rational, rem, reverse, serialize, setindex!, show, sign,
+             sin, size, sqrt, string, sub, tan, tanh, trace, transpose,
+             transpose!, truncate, var, zero
 
 export Ring, Field, RingElem
 
