@@ -1370,7 +1370,7 @@ type FqPolyRing <: Ring
    end
 end
 
-type fq_poly <: PolyElem
+type fq_poly <: PolyElem{fq}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -1504,7 +1504,7 @@ type FqNmodPolyRing <: Ring
    end
 end
 
-type fq_nmod_poly <: PolyElem
+type fq_nmod_poly <: PolyElem{fq_nmod}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
