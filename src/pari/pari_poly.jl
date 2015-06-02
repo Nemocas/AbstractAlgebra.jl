@@ -6,58 +6,9 @@
 
 ###############################################################################
 #
-#   Constructors
+#   Type and parent object methods
 #
 ###############################################################################
-
-PariPolyID = ObjectIdDict()
-
-type PariPolyRing{T <: PariRing} <: PariRing
-   base_ring::PariRing
-   pol_0::Ptr{Int}
-   S::Symbol
-
-   function PariPolyRing(R::PariRing, s::Symbol)
-      z = ccall((:pari_malloc, :libpari), Ptr{Int}, (Int,), 2*sizeof(Int))
-      unsafe_store!(z, evaltyp(t_POL) | 2, 1) 
-      unsafe_store!(z, evalsigne(0) | evalvarn(0), 2)
-      try
-         return PariPolyID[R, s]
-      catch
-         r = PariPolyID[R, s] = new(R, z, s)
-         finalizer(r, _pari_poly_zero_clear_fn)
-         return r
-      end
-      
-   end
-end
-
-function _pari_poly_zero_clear_fn(p::PariPolyRing)
-   ccall((:pari_free, :libpari), Void, (Ptr{Int},), p.pol_0)
-end
-
-type pari_poly{T <: PariRing} <: RingElem
-   d::Ptr{Int}
-   parent::PariPolyRing{T}
-
-   function pari_poly(data::Ptr{Int})
-      g = new(gclone(data))
-      finalizer(g, _pari_poly_unclone)
-      return g
-   end
-
-   function pari_poly(s::Int)
-      g = new(ccall((:pari_malloc, :libpari), Ptr{Int}, (Int,), s*sizeof(Int)))
-      finalizer(g, _pari_poly_clear_fn)
-      return g
-   end
-end
-
-function _pari_poly_clear_fn(g::pari_poly)
-   ccall((:pari_free, :libpari), Void, (Ptr{Uint},), g.d)
-end
-
-_pari_poly_unclone(g::pari_poly) = gunclone(g.d)
 
 parent{T <: PariRing}(a::pari_poly{T}) = a.parent
 

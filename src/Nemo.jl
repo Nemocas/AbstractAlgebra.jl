@@ -10,6 +10,8 @@ export PolyElem, PowerSeriesElem
 
 include("AbstractTypes.jl")
 
+include("pari/PariAbstractTypes.jl")
+
 ###############################################################################
 #
 #   Set up environment / load libraries
@@ -51,6 +53,10 @@ ccall((:pari_init, :libpari), Void, (Int, Int), 3000000000, 10000)
 include("generic/GenericTypes.jl")
 
 include("flint/FlintTypes.jl")
+
+include("antic/AnticTypes.jl")
+
+include("pari/PariTypes.jl")
 
 include("Rings.jl")
 

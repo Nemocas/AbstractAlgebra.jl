@@ -1,41 +1,8 @@
 ###########################################################################################
 #
-#   pari_polmod.jl : Maximal orders via Pari nf objects
+#   pari_polmod.jl : Residue rings for polynomials in Pari
 #
 ###########################################################################################
-
-###########################################################################################
-#
-#   Types and memory management
-#
-###########################################################################################
-
-PariPolModID = Dict{Tuple{DataType, Symbol}, PariRing}()
-
-type PariPolModRing{S <: PariRing} <: PariRing
-   T::Symbol
-
-   function PariPolModRing(t::Symbol)
-      try
-         return PariPolModID[S, t]
-      catch
-         return PariPolModID[S, t] = new(t)
-      end
-   end
-end
-
-type pari_polmod{S <: PariRing} <: RingElem
-   data::Ptr{Int}
-   parent::PariPolModRing{S}
-
-   function pari_polmod(data::Ptr{Int})
-      r = new(gclone(data))
-      finalizer(r, _pari_polmod_unclone)
-      return r
-   end
-end
-
-_pari_polmod_unclone(a::pari_polmod) = gunclone(a.data)
 
 ###########################################################################################
 #

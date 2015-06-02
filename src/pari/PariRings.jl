@@ -8,12 +8,6 @@ import Base: sign
 
 export pari, debug, gclone
 
-abstract PariSet
-
-abstract PariRing <: Ring
-
-abstract PariField <: PariRing
-
 ###########################################################################################
 #
 #   Pari GEN constants

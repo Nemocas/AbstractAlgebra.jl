@@ -1,33 +1,16 @@
 ###############################################################################
 #
-#   pari_frac.jl : fractions in Pari
+#   pari_frac.jl : rationals and fractions in Pari
 #
 ###############################################################################
 
 ###############################################################################
 #
-#   Constructors
+#   Type and parent object methods
 #
 ###############################################################################
-
-type PariRationalField <: PariField
-end
 
 PariQQ = PariRationalField()
-
-type pari_rat <: RingElem
-   d::Ptr{Int}
-
-   function pari_rat(s::Int)
-      g = new(ccall((:pari_malloc, :libpari), Ptr{Int}, 
-                    (Int,), s*BITS_IN_WORD))
-      finalizer(g, _pari_rat_clear_fn)
-      return g
-   end
-end
-
-_pari_rat_clear_fn(g::pari_rat) = ccall((:pari_free, :libpari), Void, 
-                                        (Ptr{Uint},), g.d)
 
 parent(a::pari_rat) = PariQQ
 

@@ -8,26 +8,9 @@ export MaximalOrder, PariMaximalOrder
 
 ###############################################################################
 #
-#   Types and memory management
+#   Type and parent object methods
 #
 ###############################################################################
-
-type PariMaximalOrder <: PariRing
-   pari_nf::PariNumberField
-end
-
-type PariMaximalOrderElem <: RingElem
-   data::Ptr{Int}
-   parent::PariMaximalOrder
-
-   function PariMaximalOrderElem(a::Ptr{Int}, par::PariMaximalOrder)
-      r = new(gclone(a), par)
-      finalizer(r, _pari_maximal_order_elem_clear_fn)
-      return r
-   end
-end
-
-_pari_maximal_order_elem_clear_fn(a::PariMaximalOrderElem) = gunclone(a.data)
 
 parent(a::PariMaximalOrderElem) = a.parent
 

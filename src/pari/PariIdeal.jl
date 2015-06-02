@@ -9,36 +9,9 @@ export approx, coprime_multiplier, intersect, bounded_ideals, numden,
 
 ###############################################################################
 #
-#   Types and memory management
+#   Type and parent object methods
 #
 ###############################################################################
-
-PariIdealSetID = ObjectIdDict()
-
-type PariIdealSet <: PariSet
-   order::PariMaximalOrder
-
-   function PariIdealSet(ord::PariMaximalOrder)
-      return try
-         PariIdealSetID[ord]
-      catch
-         PariIdealSetID[ord] = new(ord)
-      end
-   end
-end
-
-type PariIdeal <: PariSet
-   ideal::Ptr{Int}
-   parent::PariIdealSet
-
-   function PariIdeal(a::Ptr{Int}, par::PariIdealSet)
-      r = new(gclone(a), par)
-      finalizer(r, _pari_ideal_clear_fn)
-      return r
-   end
-end
-
-_pari_ideal_clear_fn(a::PariIdeal) = gunclone(a.ideal)
 
 parent(a::PariIdeal) = a.parent
 

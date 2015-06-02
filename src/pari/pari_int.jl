@@ -6,29 +6,11 @@
 
 ###############################################################################
 #
-#   Constructors
+#   Type and parent object methods
 #
 ###############################################################################
 
-type PariIntegerRing <: PariRing
-end
-
 PariZZ = PariIntegerRing()
-
-type pari_int <: RingElem
-   d::Ptr{Int}
-
-   function pari_int(s::Int)
-      g = new(ccall((:pari_malloc, :libpari), Ptr{Int}, 
-                    (Int,), s*BITS_IN_WORD))
-      finalizer(g, _pari_int_clear_fn)
-      return g
-   end
-end
-
-function _pari_int_clear_fn(g::pari_int)
-   ccall((:pari_free, :libpari), Void, (Ptr{Uint},), g.d)
-end
 
 parent(a::pari_int) = PariZZ
 
