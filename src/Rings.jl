@@ -222,6 +222,10 @@ include("flint/fq_series.jl")
 
 include("flint/fq_nmod_series.jl")
 
+include("flint/fq_poly.jl")
+
+include("flint/fq_nmod_poly.jl")
+
 include("pari/pari_poly2.jl")
 
 include("antic/nf.jl")
