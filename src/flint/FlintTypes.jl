@@ -1346,3 +1346,272 @@ end
 function _nmod_mat_clear_fn(mat::nmod_mat)
   ccall((:nmod_mat_clear, :libflint), Void, (Ptr{nmod_mat}, ), &mat)
 end
+
+###############################################################################
+#
+#   FqPolyRing / fq_poly
+#
+###############################################################################
+
+FqPolyID = ObjectIdDict()
+
+type FqPolyRing <: Ring
+   base_ring::Ring
+   S::Symbol
+
+   function FqPolyRing(R::FqFiniteField, s::Symbol)
+      if haskey(FqPolyID, (R, s))
+         return FqPolyID[(R,s)]
+      else
+         z = new(R,s)
+         FqPolyID[(R,s)] = z
+         return z
+      end
+   end
+end
+
+type fq_poly <: PolyElem
+   coeffs::Ptr{Void}
+   alloc::Int
+   length::Int
+   parent::FqPolyRing
+
+   function fq_poly()
+      z = new()
+      ccall((:fq_poly_init, :libflint), Void, (Ptr{fq_poly},), &z)   
+      finalizer(z, _fq_poly_clear_fn)
+      return z
+   end
+
+   function fq_poly(a::fq_poly)
+      z = new()
+      ctx = base_ring(parent(a))
+      ccall((:fq_poly_init, :libflint), Void,
+            (Ptr{fq_poly}, Ptr{FqFiniteField}), &z, &ctx)
+      call((:fq_poly_set, :libflint),
+            (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{FqNmodPolyFiniteField}),
+            &z, &a, &ctx)
+      finalizer(z, _fq_poly_clear_fn)
+      return z
+   end
+
+   function fq_poly(a::fq)
+      z = new()
+      ctx = parent(a)
+      ccall((:fq_poly_init, :libflint), Void,
+            (Ptr{fq_poly}, Ptr{FqFiniteField}), &z, &ctx)
+      ccall((:fq_poly_set_fq, :libflint), Void,
+            (Ptr{fq_poly}, Ptr{fq}, Ptr{FqFiniteField}),
+            &z, &a, &ctx)
+      finalizer(z, _fq_poly_clear_fn)
+      return z
+   end
+
+   function fq_poly(a::Array{fq, 1})
+      z = new()
+      ctx = parent(a[1])
+      ccall((:fq_poly_init2, :libflint), Void,
+            (Ptr{fq_poly}, Int, Ptr{FqFiniteField}),
+            &z, length(a), &ctx)
+      for i = 1:length(a)
+         ccall((:fq_poly_set_coeff, :libflint), Void, 
+               (Ptr{fq_poly}, Int, Ptr{fq}, Ptr{FqFiniteField}),
+               &z, i - 1, &a[i], &ctx)
+      end
+      finalizer(z, _fq_poly_clear_fn)
+      return z
+   end
+
+   function fq_poly(a::Array{fmpz, 1}, ctx::FqFiniteField)
+      z = new()
+      temp = ctx()
+      ccall((:fq_poly_init2, :libflint), Void,
+            (Ptr{fq_poly}, Int, Ptr{FqFiniteField}),
+            &z, length(a), &ctx)
+      for i =1:length(a)
+         temp = ctx(a[i])
+         ccall((:fq_poly_set_coeff, :libflint), Void,
+               (Ptr{fq_poly}, Int, Ptr{fq}, Ptr{FqFiniteField}),
+               &z, i - 1, &temp, &ctx)
+      end
+      finalizer(z, _fq_poly_clear_fn)
+      return z
+   end
+
+   function fq_poly(a::fmpz_poly, ctx::FqFiniteField)
+      z = new()
+      ccall((:fq_poly_init2, :libflint), Void,
+            (Ptr{fq_poly}, Int, Ptr{FqFiniteField}),
+            &z, length(a), &ctx)
+      for i =1:length(a)
+         temp = ctx(coeff(a,i-1))
+         ccall((:fq_poly_set_coeff, :libflint), Void,
+               (Ptr{fq_poly}, Int, Ptr{fq}, Ptr{FqFiniteField}),
+               &z, i - 1, &temp, &ctx)
+      end
+      finalizer(z, _fq_poly_clear_fn)
+      return z
+   end
+end
+
+function _fq_poly_clear_fn(a::fq_poly)
+   ccall((:fq_poly_clear, :libflint), Void, (Ptr{fq_poly},), &a)
+end
+
+type fq_poly_factor
+  poly::Ptr{fq_poly}
+  exp::Ptr{Clong} 
+  num::Clong
+  alloc::Clong
+  base_field::FqFiniteField
+    
+  function fq_poly_factor(ctx::FqFiniteField)
+    z = new()
+    ccall((:fq_poly_factor_init, :libflint), Void,
+         (Ptr{fq_poly_factor}, Ptr{FqFiniteField}), &z, &ctx)
+    z.base_field = ctx
+    finalizer(z, _fq_poly_factor_clear_fn)
+    return z
+  end
+end
+
+function _fq_poly_factor_clear_fn(a::fq_poly_factor)
+   ccall((:fq_poly_factor_clear, :libflint), Void,
+         (Ptr{fq_poly_factor}, Ptr{FqFiniteField}),
+         &a, &(a.base_field))
+end
+
+###############################################################################
+#
+#   FqNmodPolyRing / fq_nmod_poly
+#
+###############################################################################
+
+FqNmodPolyID = ObjectIdDict()
+
+type FqNmodPolyRing <: Ring
+   base_ring::Ring
+   S::Symbol
+
+   function FqNmodPolyRing(R::FqNmodFiniteField, s::Symbol)
+      if haskey(FqNmodPolyID, (R, s))
+         return FqNmodPolyID[(R,s)]
+      else
+         z = new(R,s)
+         FqNmodPolyID[(R,s)] = z
+         return z
+      end
+   end
+end
+
+type fq_nmod_poly <: PolyElem
+   coeffs::Ptr{Void}
+   alloc::Int
+   length::Int
+   parent::FqNmodPolyRing
+
+   function fq_nmod_poly()
+      z = new()
+      ccall((:fq_nmod_poly_init, :libflint), Void, (Ptr{fq_nmod_poly},), &z)   
+      finalizer(z, _fq_nmod_poly_clear_fn)
+      return z
+   end
+
+   function fq_nmod_poly(a::fq_nmod_poly)
+      z = new()
+      ctx = base_ring(parent(a))
+      ccall((:fq_nmod_poly_init, :libflint), Void,
+            (Ptr{fq_nmod_poly}, Ptr{FqNmodFiniteField}), &z, &ctx)
+      call((:fq_nmod_poly_set, :libflint),
+            (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, Ptr{FqNmodPolyFiniteField}),
+            &z, &a, &ctx)
+      finalizer(z, _fq_nmod_poly_clear_fn)
+      return z
+   end
+
+   function fq_nmod_poly(a::fq_nmod)
+      z = new()
+      ctx = parent(a)
+      ccall((:fq_nmod_poly_init, :libflint), Void,
+            (Ptr{fq_nmod_poly}, Ptr{FqNmodFiniteField}), &z, &ctx)
+      ccall((:fq_nmod_poly_set_fq_nmod, :libflint), Void,
+            (Ptr{fq_nmod_poly}, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}),
+            &z, &a, &ctx)
+      finalizer(z, _fq_nmod_poly_clear_fn)
+      return z
+   end
+
+   function fq_nmod_poly(a::Array{fq_nmod, 1})
+      z = new()
+      ctx = parent(a[1])
+      ccall((:fq_nmod_poly_init2, :libflint), Void,
+            (Ptr{fq_nmod_poly}, Int, Ptr{FqNmodFiniteField}),
+            &z, length(a), &ctx)
+      for i = 1:length(a)
+         ccall((:fq_nmod_poly_set_coeff, :libflint), Void, 
+               (Ptr{fq_nmod_poly}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}),
+               &z, i - 1, &a[i], &ctx)
+      end
+      finalizer(z, _fq_nmod_poly_clear_fn)
+      return z
+   end
+
+   function fq_nmod_poly(a::Array{fmpz, 1}, ctx::FqNmodFiniteField)
+      z = new()
+      temp = ctx()
+      ccall((:fq_nmod_poly_init2, :libflint), Void,
+            (Ptr{fq_nmod_poly}, Int, Ptr{FqNmodFiniteField}),
+            &z, length(a), &ctx)
+      for i =1:length(a)
+         temp = ctx(a[i])
+         ccall((:fq_nmod_poly_set_coeff, :libflint), Void,
+               (Ptr{fq_nmod_poly}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}),
+               &z, i - 1, &temp, &ctx)
+      end
+      finalizer(z, _fq_nmod_poly_clear_fn)
+      return z
+   end
+
+   function fq_nmod_poly(a::fmpz_poly, ctx::FqNmodFiniteField)
+      z = new()
+      ccall((:fq_nmod_poly_init2, :libflint), Void,
+            (Ptr{fq_nmod_poly}, Int, Ptr{FqNmodFiniteField}),
+            &z, length(a), &ctx)
+      for i =1:length(a)
+         temp = ctx(coeff(a,i-1))
+         ccall((:fq_nmod_poly_set_coeff, :libflint), Void,
+               (Ptr{fq_nmod_poly}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}),
+               &z, i - 1, &temp, &ctx)
+      end
+      finalizer(z, _fq_nmod_poly_clear_fn)
+      return z
+   end
+end
+
+function _fq_nmod_poly_clear_fn(a::fq_nmod_poly)
+   ccall((:fq_nmod_poly_clear, :libflint), Void, (Ptr{fq_nmod_poly},), &a)
+end
+
+type fq_nmod_poly_factor
+  poly::Ptr{fq_nmod_poly}
+  exp::Ptr{Clong} 
+  num::Clong
+  alloc::Clong
+  base_field::FqNmodFiniteField
+    
+  function fq_nmod_poly_factor(ctx::FqNmodFiniteField)
+    z = new()
+    ccall((:fq_nmod_poly_factor_init, :libflint), Void,
+         (Ptr{fq_nmod_poly_factor}, Ptr{FqNmodFiniteField}), &z, &ctx)
+    z.base_field = ctx
+    finalizer(z, _fq_nmod_poly_factor_clear_fn)
+    return z
+  end
+end
+
+function _fq_nmod_poly_factor_clear_fn(a::fq_nmod_poly_factor)
+   ccall((:fq_nmod_poly_factor_clear, :libflint), Void,
+         (Ptr{fq_nmod_poly_factor}, Ptr{FqNmodFiniteField}),
+         &a, &(a.base_field))
+end
+
