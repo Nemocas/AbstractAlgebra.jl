@@ -1,163 +1,236 @@
-module Rings
+###############################################################################
+#
+#   Rings.jl : Generic rings
+#
+###############################################################################
 
-import Base: exp
+###############################################################################
+#
+#   Hashing (needed for hashing tuples)
+#
+###############################################################################
 
-export Ring, Field, exp
+function hash(a::RingElem, b::UInt)
+   h = hash(a) $ hash(b)
+   h = (h << 1) | (h >> (sizeof(Int)*8 - 1))
+   return h
+end
 
-abstract Ring
+###############################################################################
+#
+#   Generic catchall functions
+#
+###############################################################################
 
-abstract Field <: Ring
-
-function +{S <: Ring, T <: Ring}(x::S, y::T) 
+function +{S <: RingElem, T <: RingElem}(x::S, y::T) 
    T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      +(promote(x, y)...)
+   if S == T1
+      +(x, parent(x)(y))
+   elseif T == T1
+      +(parent(y)(x), y)
    else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function +{S <: Ring, T <: Integer}(x::S, y::T) 
+function +{S <: RingElem, T <: Integer}(x::S, y::T) 
    T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      +(promote(x, y)...)
+   if S == T1
+      +(x, parent(x)(y))
    else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function +{S <: Integer, T <: Ring}(x::S, y::T) 
+function +{S <: Integer, T <: RingElem}(x::S, y::T) 
    T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      +(promote(x, y)...)
+   if T == T1
+      +(parent(y)(x), y)
    else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function -{S <: Ring, T <: Ring}(x::S, y::T) 
+function -{S <: RingElem, T <: RingElem}(x::S, y::T) 
    T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      -(promote(x, y)...)
+   if S == T1
+      -(x, parent(x)(y))
+   elseif T == T1
+      -(parent(y)(x), y)
    else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function -{S <: Ring, T <: Integer}(x::S, y::T) 
+function -{S <: RingElem, T <: Integer}(x::S, y::T) 
    T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      -(promote(x, y)...)
+   if S == T1
+      -(x, parent(x)(y))
    else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function -{S <: Integer, T <: Ring}(x::S, y::T) 
+function -{S <: Integer, T <: RingElem}(x::S, y::T) 
    T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      -(promote(x, y)...)
+   if T == T1
+      -(parent(y)(x), y)
    else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function *{S <: Ring, T <: Ring}(x::S, y::T) 
+function *{S <: RingElem, T <: RingElem}(x::S, y::T) 
    T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      *(promote(x, y)...)
+   if S == T1
+      *(x, parent(x)(y))
+   elseif T == T1
+      *(parent(y)(x), y)
    else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function *{S <: Ring, T <: Integer}(x::S, y::T) 
+function *{S <: RingElem, T <: Integer}(x::S, y::T) 
    T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      *(promote(x, y)...)
+   if S == T1
+      *(x, parent(x)(y))
    else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function *{S <: Integer, T <: Ring}(x::S, y::T) 
+function *{S <: Integer, T <: RingElem}(x::S, y::T) 
    T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      *(promote(x, y)...)
+   if T == T1
+      *(parent(y)(x), y)
    else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function =={S <: Ring, T <: Ring}(x::S, y::T) 
+function divexact{S <: RingElem, T <: RingElem}(x::S, y::T) 
    T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      ==(promote(x, y)...)
+   if S == T1
+      divexact(x, parent(x)(y))
+   elseif T == T1
+      divexact(parent(y)(x), y)
    else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function =={S <: Ring, T <: Integer}(x::S, y::T) 
+function divexact{S <: RingElem, T <: Integer}(x::S, y::T) 
    T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      ==(promote(x, y)...)
+   if S == T1
+      divexact(x, parent(x)(y))
    else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function =={S <: Integer, T <: Ring}(x::S, y::T) 
+function divexact{S <: Integer, T <: RingElem}(x::S, y::T) 
    T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      ==(promote(x, y)...)
+   if T == T1
+      divexact(parent(y)(x), y)
    else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-isequal{T <: Ring}(a::T, b::T) = a == b
-
-function divexact{S <: Ring, T <: Ring}(x::S, y::T) 
+function =={S <: RingElem, T <: RingElem}(x::S, y::T) 
    T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      divexact(promote(x, y)...)
+   if S == T1
+      ==(x, parent(x)(y))
+   elseif T == T1
+      ==(parent(y)(x), y)
    else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function divexact{S <: Ring, T <: Integer}(x::S, y::T) 
+function =={S <: RingElem, T <: Integer}(x::S, y::T) 
    T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      divexact(promote(x, y)...)
+   if S == T1
+      ==(x, parent(x)(y))
    else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function divexact{S <: Integer, T <: Ring}(x::S, y::T) 
+function =={S <: Integer, T <: RingElem}(x::S, y::T) 
    T1 = promote_type(S, T)
-   if S == T1 || T == T1
-      divexact(promote(x, y)...)
+   if T == T1
+      ==(parent(y)(x), y)
    else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function exp{T <: Ring}(a::T)
+###############################################################################
+#
+#   Exponential function for generic rings
+#
+###############################################################################
+
+function exp{T <: RingElem}(a::T)
    a != 0 && error("Exponential of nonzero element")
-   return one(T)
+   return one(parent(a))
 end
 
-include("ZZ.jl")
+###############################################################################
+#
+#   Generic and specific rings and fields
+#
+###############################################################################
 
-include("Residue.jl")
+include("flint/fmpz.jl")
 
-include("Poly.jl")
+include("generic/Residue.jl")
 
-include("PowerSeries.jl")
+include("generic/Poly.jl")
 
-include("../test/Rings-test.jl")
+include("flint/fmpz_poly.jl")
 
-end # module
+include("flint/nmod_poly.jl")
+
+include("flint/fmpz_mod_poly.jl")
+
+include("generic/PowerSeries.jl")
+
+include("flint/fmpz_series.jl")
+
+include("flint/fmpz_mod_series.jl")
+
+include("flint/fmpz_mat.jl")
+
+include("flint/nmod_mat.jl")
+
+include("pari/PariRings.jl")
+
+include("Fields.jl")
+
+include("pari/PariFields.jl")
+
+include("flint/fmpq_poly.jl")
+
+include("flint/padic.jl")
+
+include("flint/fmpq_series.jl")
+
+include("flint/fq_series.jl")
+
+include("flint/fq_nmod_series.jl")
+
+include("pari/pari_poly2.jl")
+
+include("antic/nf.jl")
+
+include("pari/pari_nf.jl")
+
+include("pari/PariMaximalOrder.jl")
+
+include("pari/PariIdeal.jl")
+
+include("Factor.jl")
+

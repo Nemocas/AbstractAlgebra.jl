@@ -1,35 +1,35 @@
-function test_padics2_constructors()
-   print("Padics2.constructors()...")  
+function test_padics_constructors()
+   print("Padics.constructors()...")  
 
-   R = PadicField(7)
+   R = PadicField(7, 30)
    
-   @test R <: Padic
+   @test isa(R, PadicField)
 
-   S = PadicField(ZZ(65537))
+   S = PadicField(ZZ(65537), 30)
 
-   @test S <: Padic
+   @test isa(S, PadicField)
 
-   @test isa(R(), Padic)
+   @test isa(R(), padic)
 
-   @test isa(R(1), Padic)
+   @test isa(R(1), padic)
 
-   @test isa(R(ZZ(123)), Padic)
+   @test isa(R(ZZ(123)), padic)
 
-   @test isa(R(ZZ(1)/7^2), Padic)
+   @test isa(R(ZZ(1)//7^2), padic)
 
-   @test isa(1 + 2*7 + 4*7^2 + O(R, 7^3), Padic)
+   @test isa(1 + 2*7 + 4*7^2 + O(R, 7^3), padic)
 
-   @test isa(13 + 357*ZZ(65537) + O(S, ZZ(65537)^12), Padic)
+   @test isa(13 + 357*ZZ(65537) + O(S, ZZ(65537)^12), padic)
 
-   @test isa(ZZ(1)/7^2 + ZZ(2)/7 + 3 + 4*7 + O(R, 7^2), Padic)
+   @test isa(ZZ(1)//7^2 + ZZ(2)//7 + 3 + 4*7 + O(R, 7^2), padic)
 
    println("PASS")
 end
 
-function test_padics2_manipulation()
-   print("Padics2.manipulation()...")  
+function test_padics_manipulation()
+   print("Padics.manipulation()...")  
 
-   R = PadicField(7)
+   R = PadicField(7, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
    b = 7^2 + 3*7^3 + O(R, 7^5)
@@ -38,8 +38,6 @@ function test_padics2_manipulation()
    @test isone(one(R))
 
    @test iszero(zero(R))
-
-   @test isexact(c)
 
    @test precision(a) == 3
 
@@ -50,10 +48,10 @@ function test_padics2_manipulation()
    println("PASS")
 end
 
-function test_padics2_unary_ops()
-   print("Padics2.unary_ops()...")  
+function test_padics_unary_ops()
+   print("Padics.unary_ops()...")  
 
-   R = PadicField(7)
+   R = PadicField(7, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
    b = R(0)
@@ -65,10 +63,10 @@ function test_padics2_unary_ops()
    println("PASS")
 end
 
-function test_padics2_binary_ops()
-   print("Padics2.binary_ops()...")  
+function test_padics_binary_ops()
+   print("Padics.binary_ops()...")  
 
-   R = PadicField(7)
+   R = PadicField(7, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
    b = 7^2 + 3*7^3 + O(R, 7^5)
@@ -88,10 +86,10 @@ function test_padics2_binary_ops()
    println("PASS")
 end
 
-function test_padics2_adhoc_binary()
-   print("Padics2.adhoc_binary()...")  
+function test_padics_adhoc_binary()
+   print("Padics.adhoc_binary()...")  
 
-   R = PadicField(7)
+   R = PadicField(7, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
    b = 7^2 + 3*7^3 + O(R, 7^5)
@@ -112,19 +110,19 @@ function test_padics2_adhoc_binary()
 
    @test iszero(d - ZZ(2))
 
-   @test a + ZZ(1)/7^2 == ZZ(1)/7^2 + 1 + 2*7^1 + 4*7^2 + O(R, 7^3)
+   @test a + ZZ(1)//7^2 == ZZ(1)//7^2 + 1 + 2*7^1 + 4*7^2 + O(R, 7^3)
 
-   @test (ZZ(12)/11)*b == 3*7^2 + 3*7^3 + O(R, 7^5)
+   @test (ZZ(12)//11)*b == 3*7^2 + 3*7^3 + O(R, 7^5)
 
-   @test c*(ZZ(1)/7) == O(R, 7^2)
+   @test c*(ZZ(1)//7) == O(R, 7^2)
 
    println("PASS")
 end
 
-function test_padics2_comparison()
-   print("Padics2.comparison()...")  
+function test_padics_comparison()
+   print("Padics.comparison()...")  
 
-   R = PadicField(7)
+   R = PadicField(7, 30)
 
    a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
    b = 3*7^3 + O(R, 7^5)
@@ -142,10 +140,10 @@ function test_padics2_comparison()
    println("PASS")
 end
 
-function test_padics2_adhoc_comparison()
-   print("Padics2.adhoc_comparison()...")  
+function test_padics_adhoc_comparison()
+   print("Padics.adhoc_comparison()...")  
 
-   R = PadicField(7)
+   R = PadicField(7, 30)
 
    a = 1 + O(R, 7^3)
    b = O(R, 7^5)
@@ -159,15 +157,15 @@ function test_padics2_adhoc_comparison()
 
    @test ZZ(2) == c
 
-   @test a == ZZ(344)/1
+   @test a == ZZ(344)//1
 
    println("PASS")
 end
 
-function test_padics2_powering()
-   print("Padics2.powering()...")  
+function test_padics_powering()
+   print("Padics.powering()...")  
 
-   R = PadicField(7)
+   R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
    b = O(R, 7^5)
@@ -182,10 +180,10 @@ function test_padics2_powering()
    println("PASS")
 end
 
-function test_padics2_exact_division()
-   print("Padics2.exact_division()...")  
+function test_padics_exact_division()
+   print("Padics.exact_division()...")  
 
-   R = PadicField(7)
+   R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
    b = 2 + 3*7 + O(R, 7^5)
@@ -196,29 +194,29 @@ function test_padics2_exact_division()
 
    @test divexact(c, d) == 1*7^1 + O(R, 7^3)
 
-   @test divexact(d, R(7^3)) == ZZ(1)/7^2 + ZZ(2)/7 + O(R, 7^2)
+   @test divexact(d, R(7^3)) == ZZ(1)//7^2 + ZZ(2)//7 + O(R, 7^2)
 
    @test divexact(R(34), R(17)) == 2
 
-   @test a/2 == 4 + 1*7^2 + O(R, 7^3)
+   @test divexact(a, 2) == 4 + 1*7^2 + O(R, 7^3)
 
-   @test b/ZZ(7) == ZZ(2)/7 + 3 + O(R, 7^4)
+   @test divexact(b, ZZ(7)) == ZZ(2)//7 + 3 + O(R, 7^4)
 
-   @test c/(ZZ(12)/7^2) == 3*7^4 + 5*7^5 + O(R, 7^6)
+   @test divexact(c, ZZ(12)//7^2) == 3*7^4 + 5*7^5 + O(R, 7^6)
 
-   @test 2/d == ZZ(2)/7 + 3 + 6*7^2 + O(R, 7^3)
+   @test divexact(2, d) == ZZ(2)//7 + 3 + 6*7^2 + O(R, 7^3)
 
-   @test R(3)/3 == 1
+   @test divexact(R(3), 3) == 1
 
-   @test (ZZ(5)/7)/R(5) == ZZ(1)/7
+   @test divexact(ZZ(5)//7, R(5)) == ZZ(1)//7
 
    println("PASS")
 end
 
-function test_padics2_inversion()
-   print("Padics2.inversion()...")  
+function test_padics_inversion()
+   print("Padics.inversion()...")  
 
-   R = PadicField(7)
+   R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
    b = 2 + 3*7 + O(R, 7^5)
@@ -229,19 +227,19 @@ function test_padics2_inversion()
 
    @test inv(b) == 4 + 4*7^1 + 3*7^2 + 1*7^3 + 1*7^4 + O(R, 7^5)
 
-   @test inv(c) == ZZ(1)/7^2 + ZZ(5)/7 + O(R, 7^0)
+   @test inv(c) == ZZ(1)//7^2 + ZZ(5)//7 + O(R, 7^0)
 
-   @test inv(d) == ZZ(1)/7 + 5 + 3*7^1 + 6*7^2 + O(R, 7^3)
+   @test inv(d) == ZZ(1)//7 + 5 + 3*7^1 + 6*7^2 + O(R, 7^3)
 
    @test inv(R(1)) == 1
 
    println("PASS")
 end
 
-function test_padics2_square_root()
-   print("Padics2.square_root()...")  
+function test_padics_square_root()
+   print("Padics.square_root()...")  
 
-   R = PadicField(7)
+   R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
    b = 2 + 3*7 + O(R, 7^5)
@@ -253,15 +251,15 @@ function test_padics2_square_root()
 
    @test sqrt(c) == 1*7^1 + 1*7^2 + O(R, 7^3)
 
-   @test sqrt(R(121)) == 4 + 1*7^1
+   @test sqrt(R(121)) == 3 + 5*7^1 + 6*7^2 + 6*7^3 + 6*7^4 + 6*7^5 + O(R, 7^6)
 
    println("PASS")
 end
 
-function test_padics2_special_functions()
-   print("Padics2.special_functions()...")  
+function test_padics_special_functions()
+   print("Padics.special_functions()...")  
 
-   R = PadicField(7)
+   R = PadicField(7, 30)
 
    a = 1 + 7 + 2*7^2 + O(R, 7^3)
    b = 2 + 5*7 + 3*7^2 + O(R, 7^3)
@@ -280,19 +278,19 @@ function test_padics2_special_functions()
    println("PASS")
 end
 
-function test_padics2()
-   test_padics2_constructors()
-   test_padics2_manipulation()
-   test_padics2_unary_ops()
-   test_padics2_binary_ops()
-   test_padics2_adhoc_binary()
-   test_padics2_comparison()
-   test_padics2_adhoc_comparison()
-   test_padics2_powering()
-   test_padics2_exact_division()
-   test_padics2_inversion()
-   test_padics2_square_root()
-   test_padics2_special_functions()
+function test_padics()
+   test_padics_constructors()
+   test_padics_manipulation()
+   test_padics_unary_ops()
+   test_padics_binary_ops()
+   test_padics_adhoc_binary()
+   test_padics_comparison()
+   test_padics_adhoc_comparison()
+   test_padics_powering()
+   test_padics_exact_division()
+   test_padics_inversion()
+   test_padics_square_root()
+   test_padics_special_functions()
 
    println("")
 end

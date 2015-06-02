@@ -3,7 +3,7 @@ function test_residue_constructors()
  
    R = ResidueRing(ZZ, 16453889)
 
-   @test R <: Residue
+   @test isa(R, ResidueRing)
 
    a = R(123)
 
@@ -24,7 +24,7 @@ function test_residue_constructors()
    S, x = PolynomialRing(R, "x")
    T = ResidueRing(S, x^3 + 3x + 1)
 
-   @test T <: Residue
+   @test isa(T, ResidueRing)
 
    f = T(x^4)
 

@@ -2,19 +2,19 @@ function test_zz_constructors()
    print("ZZ.constructors...")
 
    a = ZZ(-123)
-   @test isa(a, ZZ)
+   @test isa(a, fmpz)
 
    b = ZZ(12.0)
-   @test isa(b, ZZ)
+   @test isa(b, fmpz)
 
    c = ZZ("-1234567876545678376545678900000000000000000000000000")
-   @test isa(c, ZZ)
+   @test isa(c, fmpz)
 
    d = ZZ(c)
-   @test isa(d, ZZ)
+   @test isa(d, fmpz)
 
    e = deepcopy(c)
-   @test isa(e, ZZ)
+   @test isa(e, fmpz)
    
    println("PASS")
 end
@@ -25,9 +25,9 @@ function test_zz_manipulation()
    a = one(ZZ)
    b = zero(ZZ)
 
-   @test isa(a, ZZ)
+   @test isa(a, fmpz)
    
-   @test isa(b, ZZ)
+   @test isa(b, fmpz)
 
    @test sign(a) > 0
 
@@ -173,7 +173,7 @@ end
 function test_zz_extended_gcd()
    print("ZZ.extended_gcd...")
 
-   @test xgcd(ZZ(12), ZZ(5)) == (1, -2, 5)
+   @test gcdx(ZZ(12), ZZ(5)) == (1, -2, 5)
 
    @test gcdinv(ZZ(5), ZZ(12)) == (1, 5)
 
@@ -203,7 +203,7 @@ function test_zz_bases()
 
    @test bin(a) == "1100"
 
-   @test base(a, 13) == "c"
+   @test base(a, 13) == "c"  #### Genuine failure
 
    @test nbits(a) == 4
 
