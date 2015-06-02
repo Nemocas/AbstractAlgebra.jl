@@ -43,7 +43,7 @@ end
 
 function basis(ord::PariMaximalOrder)
    data = pari_load(ord.pari_nf.data, 8)
-   pol_type = PariPolyRing{PariRationalField}
+   pol_type = PariPolyRing{pari_rat}
    par = pol_type(PariQQ, var(parent(ord.pari_nf.nf.pol)))
    return pari_vec{pol_type}(data, par)
 end

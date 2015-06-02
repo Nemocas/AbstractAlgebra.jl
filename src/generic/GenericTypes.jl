@@ -12,7 +12,7 @@
 
 PolyID = ObjectIdDict()
 
-type PolynomialRing{T <: RingElem} <: Ring
+type PolynomialRing{T <: RingElem} <: Ring{Generic}
    base_ring :: Ring
    S::Symbol
 
@@ -45,7 +45,7 @@ end
 
 ModulusDict = Dict{Tuple{Ring, RingElem}, Ring}()
 
-type ResidueRing{T <: RingElem} <: Ring
+type ResidueRing{T <: RingElem} <: Ring{Generic}
    base_ring::Ring
    modulus::T
 
@@ -73,7 +73,7 @@ end
 
 PowerSeriesID = ObjectIdDict()
 
-type PowerSeriesRing{T <: RingElem} <: Ring
+type PowerSeriesRing{T <: RingElem} <: Ring{Generic}
    base_ring::Ring
    prec_max::Int
    S::Symbol
@@ -105,7 +105,7 @@ end
 
 FractionDict = ObjectIdDict()
 
-type FractionField{T <:RingElem} <: Field
+type FractionField{T <:RingElem} <: Field{Generic}
    base_ring::Ring
 
    function FractionField(R::Ring)

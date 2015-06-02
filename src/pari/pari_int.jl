@@ -105,7 +105,7 @@ end
 function factor(n::pari_int)
    av = unsafe_load(avma, 1)
    f = ccall((:factorint, :libpari), Ptr{Int}, (Ptr{Int}, Int), n.d, 0)
-   fac = PariFactor{PariIntegerRing}(f, PariZZ)
+   fac = PariFactor{pari_int}(f, PariZZ)
    unsafe_store!(avma, av, 1)
    return fac
 end

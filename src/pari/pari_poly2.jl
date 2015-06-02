@@ -1,20 +1,21 @@
-###########################################################################################
+###############################################################################
 #
 #   pari_poly2.jl : functions for Pari t_POL objects over fields
 #
-###########################################################################################
+###############################################################################
 
-###########################################################################################
+###############################################################################
 #
 #   Conversions to/from Poly{fmpq}
 #
-###########################################################################################
+###############################################################################
 
 function gensize(a::fmpq_poly)
    coeffs = a.coeffs
    total = 0
    for i = 0:a.length - 1
-      total += ccall((:fmpz_size, :libflint), Int, (Ptr{Int},), coeffs + i*sizeof(Int))
+      total += ccall((:fmpz_size, :libflint), Int, 
+                     (Ptr{Int},), coeffs + i*sizeof(Int))
    end
    densize = ccall((:fmpz_size, :libflint), Int, (Ptr{Int},), &a.den)
    return total + densize*a.length + 8*a.length + 2
@@ -38,8 +39,8 @@ end
 
 function pari(a::fmpq_poly)
    s = gensize(a)
-   g = pari_poly{PariRationalField}(s)
-   g.parent = PariPolyRing{PariRationalField}(PariQQ, var(parent(a)))
+   g = pari_poly{pari_rat}(s)
+   g.parent = PariPolyRing{pari_rat}(PariQQ, var(parent(a)))
    pari!(g.d, a)
    return g
 end
@@ -64,19 +65,19 @@ function fmpq_poly!(z::fmpq_poly, g::Ptr{Int})
    return z
 end
 
-###########################################################################################
+###############################################################################
 #
 #   Parent object call overloads
 #
-###########################################################################################
+###############################################################################
 
-function Base.call(ord::PariPolyRing{PariRationalField}, n::Ptr{Int})
-   pol = pari_poly{PariRationalField}(n)
-   pol.parent = PariPolyRing{PariRationalField}(PariQQ, var(ord))
+function Base.call(ord::PariPolyRing{pari_rat}, n::Ptr{Int})
+   pol = pari_poly{pari_rat}(n)
+   pol.parent = PariPolyRing{pari_rat}(PariQQ, var(ord))
    return pol
 end
 
-function Base.call(a::FmpqPolyRing, g::pari_poly{PariRationalField})
+function Base.call(a::FmpqPolyRing, g::pari_poly{pari_rat})
    z = fmpq_poly()
    z.parent = a
    fmpq_poly!(z, g.d)

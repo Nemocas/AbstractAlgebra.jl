@@ -46,6 +46,12 @@ General
 
 * Optimise for monomials in polynomial modules, especially powering
 
+Factor.jl
+---------
+
+* Factorisation of integer, polys over Z and polys over Z/nZ return different
+  formats for the factorisation object, which differ from the Julia factor type
+
 fq_poly.jl / fq_nmod_poly.jl
 ----------------------------
 

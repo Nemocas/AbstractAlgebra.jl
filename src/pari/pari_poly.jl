@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-parent{T <: PariRing}(a::pari_poly{T}) = a.parent
+parent{T <: RingElem}(a::pari_poly{T}) = a.parent
 
 var(p::PariPolyRing) = p.S
 
@@ -22,7 +22,7 @@ var(p::PariPolyRing) = p.S
 
 show(io::IO, x::pari_poly) = pari_print(io, x.d)
 
-function show{T <: Ring}(io::IO, p::PariPolyRing{T})
+function show{T <: RingElem}(io::IO, p::PariPolyRing{T})
    print(io, "Univariate Polynomial Ring in ")
    print(io, string(var(p)))
    print(io, " over ")
@@ -63,8 +63,8 @@ end
 
 function pari(a::fmpz_poly)
    s = gensize(a)
-   g = pari_poly{PariIntegerRing}(s)
-   g.parent = PariPolyRing{PariIntegerRing}(PariZZ, var(parent(a)))
+   g = pari_poly{pari_int}(s)
+   g.parent = PariPolyRing{pari_int}(PariZZ, var(parent(a)))
    pari!(reinterpret(Ptr{Int}, g.d), a, s)
    return g
 end
@@ -90,10 +90,10 @@ end
 #
 ###############################################################################
 
-function factor{T <: PariRing}(pol::pari_poly{T})
+function factor{T <: RingElem}(pol::pari_poly{T})
    av = unsafe_load(avma, 1)
    f = ccall((:factor, :libpari), Ptr{Int}, (Ptr{Int},), pol.d)
-   fac = PariFactor{PariPolyRing{T}}(f, pol.parent)
+   fac = PariFactor{pari_poly{T}}(f, pol.parent)
    unsafe_store!(avma, av, 1)
    return fac
 end
@@ -104,14 +104,14 @@ end
 #
 ###############################################################################
 
-function Base.call(ord::PariPolyRing{PariIntegerRing}, n::Ptr{Int})
-   pol = pari_poly{PariIntegerRing}(n)
-   pol.parent = PariPolyRing{PariIntegerRing}(PariZZ, var(ord))
+function Base.call(ord::PariPolyRing{pari_int}, n::Ptr{Int})
+   pol = pari_poly{pari_int}(n)
+   pol.parent = PariPolyRing{pari_int}(PariZZ, var(ord))
    return pol
 end
 
 
-function Base.call(a::FmpzPolyRing, g::pari_poly{PariIntegerRing})
+function Base.call(a::FmpzPolyRing, g::pari_poly{pari_int})
    z = fmpz_poly()
    z.parent = a
    fmpz_poly!(z, g.d)

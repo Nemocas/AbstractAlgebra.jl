@@ -150,21 +150,6 @@ gen_1 = cglobal((:gen_1, :libpari), Ptr{Ptr{Int}})
 #
 ###########################################################################################
 
-type PariFactor{T <: PariRing}
-   data::Ptr{Int}
-   len::Int
-   parent::T
-
-   function PariFactor(p::Ptr{Int}, par::T)
-      col = reinterpret(Ptr{Int}, unsafe_load(p, 2))
-      r = new(gclone(p), lg(col) - 1, par)
-      finalizer(r, _PariFactor_unclone)
-      return r
-   end
-end
-
-_PariFactor_unclone(f::PariFactor) = gunclone(f.data)
-
 function getindex(a::PariFactor, i::Int)
    i > a.len && throw(IndexError())
    colf = reinterpret(Ptr{Int}, unsafe_load(a.data, 2))

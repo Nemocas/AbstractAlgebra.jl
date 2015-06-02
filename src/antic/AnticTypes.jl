@@ -12,7 +12,7 @@
 
 NfNumberFieldID = Dict{Tuple{fmpq_poly, Symbol}, Field}()
 
-type NfNumberField <: Field
+type NfNumberField <: Field{Antic}
    pol_coeffs::Ptr{Void}
    pol_den::Int
    pol_alloc::Int

@@ -10,11 +10,11 @@
 #
 ###########################################################################################
 
-function residue{S <: PariRing}(a::pari_polmod{S})
+function residue{S <: RingElem}(a::pari_polmod{S})
    return pari_poly{S}(reinterpret(Ptr{Int}, unsafe_load(a.data, 3)))
 end
 
-function modulus{S <: PariRing}(a::pari_polmod{S})
+function modulus{S <: RingElem}(a::pari_polmod{S})
    return pari_poly{S}(reinterpret(Ptr{Int}, unsafe_load(a.data, 2)))
 end
 
@@ -24,7 +24,7 @@ end
 #
 ###########################################################################################
 
-function Base.call{S <: PariRing}(ord::PariPolModRing{S}, b::Ptr{Int})
+function Base.call{S <: RingElem}(ord::PariPolModRing{S}, b::Ptr{Int})
    z = pari_polmod{S}(b)
    z.parent = ord
    return z

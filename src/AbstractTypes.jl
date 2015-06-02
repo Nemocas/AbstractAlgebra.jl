@@ -4,9 +4,19 @@
 #
 ###############################################################################
 
-abstract Ring
+abstract Pari
 
-abstract Field <: Ring
+abstract Flint
+
+abstract Antic
+
+abstract Generic
+
+abstract Set{T}
+
+abstract Ring{T} <: Set{T}
+
+abstract Field{T} <: Ring{T}
 
 abstract RingElem
 

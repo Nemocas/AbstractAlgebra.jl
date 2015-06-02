@@ -15,8 +15,6 @@ export PolyElem, PowerSeriesElem
 
 include("AbstractTypes.jl")
 
-include("pari/PariAbstractTypes.jl")
-
 ###############################################################################
 #
 #   Set up environment / load libraries

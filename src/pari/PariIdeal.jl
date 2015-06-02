@@ -262,7 +262,7 @@ function factor(a::PariIdeal)
    return fac
 end
 
-function factor_mul(a::PariFactor{PariMaximalOrder})
+function factor_mul(a::PariFactor{PariMaximalOrderElem})
    av = unsafe_load(avma, 1)
    p = ccall((:idealfactorback, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}, Ptr{Void}, Int), 

@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-type IntegerRing <: Ring
+type IntegerRing <: Ring{Flint}
 end
 
 type fmpz <: RingElem
@@ -51,7 +51,7 @@ end
 #
 ###############################################################################
 
-type RationalField <: Field
+type RationalField <: Field{Flint}
 end
 
 type fmpq <: FieldElem
@@ -87,7 +87,7 @@ _fmpq_clear_fn(a::fmpq) = ccall((:fmpq_clear, :libflint), Void, (Ptr{fmpq},), &a
 
 FqFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, Field}()
 
-type FqFiniteField <: Field
+type FqFiniteField <: Field{Flint}
    p::Int # fmpz
    sparse_modulus::Int
    a::Ptr{Void}
@@ -183,7 +183,7 @@ end
 
 FmpzPolyID = ObjectIdDict()
 
-type FmpzPolyRing <: Ring
+type FmpzPolyRing <: Ring{Flint}
    base_ring::Ring
    S::Symbol
 
@@ -260,7 +260,7 @@ end
 
 FmpqPolyID = ObjectIdDict()
 
-type FmpqPolyRing <: Ring
+type FmpqPolyRing <: Ring{Flint}
    base_ring::Field
    S::Symbol
 
@@ -356,8 +356,8 @@ end
 
 NmodPolyRingID = ObjectIdDict()
 
-type NmodPolyRing <: Ring
-  base_ring::ResidueRing{fmpz}
+type NmodPolyRing <: Ring{Flint}
+  base_ring::ResidueRing
   S::Symbol
   _n::UInt
 
@@ -497,8 +497,8 @@ end
 
 FmpzModPolyRingID = ObjectIdDict()
 
-type FmpzModPolyRing <: Ring
-  base_ring::ResidueRing{fmpz}
+type FmpzModPolyRing <: Ring{Flint}
+  base_ring::ResidueRing
   S::Symbol
   _n::fmpz
 
@@ -627,7 +627,7 @@ end
 FqNmodFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, Field}()
 FqNmodFiniteFieldIDPol = Dict{Tuple{nmod_poly, Symbol}, Field}()
 
-type FqNmodFiniteField <: Field
+type FqNmodFiniteField <: Field{Flint}
    p :: Int 
    n :: Int
    ninv :: Int
@@ -744,7 +744,7 @@ end
 
 PadicBase = ObjectIdDict()
 
-type PadicField <: Field
+type PadicField <: Field{Flint}
    p::Int 
    pinv::Float64
    pow::Ptr{Void}
@@ -795,7 +795,7 @@ end
 
 FmpzSeriesID = ObjectIdDict()
 
-type FmpzSeriesRing <: Ring
+type FmpzSeriesRing <: Ring{Flint}
    base_ring::Ring
    prec_max::Int
    S::Symbol
@@ -859,7 +859,7 @@ end
 
 FmpqSeriesID = ObjectIdDict()
 
-type FmpqSeriesRing <: Ring
+type FmpqSeriesRing <: Ring{Flint}
    base_ring::Ring
    prec_max::Int
    S::Symbol
@@ -924,8 +924,8 @@ end
 
 FmpzModSeriesID = ObjectIdDict()
 
-type FmpzModSeriesRing <: Ring
-   base_ring::Ring
+type FmpzModSeriesRing <: Ring{Flint}
+   base_ring::ResidueRing
    prec_max::Int
    S::Symbol
 
@@ -991,8 +991,8 @@ end
 
 FqSeriesID = ObjectIdDict()
 
-type FqSeriesRing <: Ring
-   base_ring::Ring
+type FqSeriesRing <: Ring{Flint}
+   base_ring::Field
    prec_max::Int
    S::Symbol
 
@@ -1059,12 +1059,12 @@ end
 
 FqSeriesID = ObjectIdDict()
 
-type FqNmodSeriesRing <: Ring
-   base_ring::Ring
+type FqNmodSeriesRing <: Ring{Flint}
+   base_ring::Field
    prec_max::Int
    S::Symbol
 
-   function FqNmodSeriesRing(R::Ring, prec::Int, s::Symbol)
+   function FqNmodSeriesRing(R::Ring{Flint}, prec::Int, s::Symbol)
       return try
          FqSeriesID[R, prec, s]
       catch
@@ -1128,7 +1128,7 @@ end
 FmpzMatID = ObjectIdDict()
 
 # not really a mathematical ring
-type FmpzMatSpace <: Ring
+type FmpzMatSpace <: Ring{Flint}
    rows::Int
    cols::Int
    base_ring::IntegerRing
@@ -1147,7 +1147,7 @@ type fmpz_mat <: MatElem
    r::Int
    c::Int
    rows::Ptr{Void}
-   parent::Ring
+   parent::Ring{Flint}
 
    # used by windows, not finalised!!
    function fmpz_mat()
@@ -1229,8 +1229,8 @@ end
 
 NmodMatID = ObjectIdDict()
 
-type NmodMatSpace <: Ring
-  base_ring::ResidueRing{fmpz}
+type NmodMatSpace <: Ring{Flint}
+  base_ring::ResidueRing
   _n::UInt
   rows::Int
   cols::Int
@@ -1355,8 +1355,8 @@ end
 
 FqPolyID = ObjectIdDict()
 
-type FqPolyRing <: Ring
-   base_ring::Ring
+type FqPolyRing <: Ring{Flint}
+   base_ring::Field
    S::Symbol
 
    function FqPolyRing(R::FqFiniteField, s::Symbol)
@@ -1489,8 +1489,8 @@ end
 
 FqNmodPolyID = ObjectIdDict()
 
-type FqNmodPolyRing <: Ring
-   base_ring::Ring
+type FqNmodPolyRing <: Ring{Flint}
+   base_ring::Field
    S::Symbol
 
    function FqNmodPolyRing(R::FqNmodFiniteField, s::Symbol)

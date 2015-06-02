@@ -14,7 +14,7 @@ export PariNumberField
 
 function pol(nf::PariNumberField)
    data = reinterpret(Ptr{Int}, unsafe_load(nf.data + sizeof(Int)))
-   return pari_poly{PariIntegerRing}(data)
+   return pari_poly{pari_int}(data)
 end
 
 ###############################################################################

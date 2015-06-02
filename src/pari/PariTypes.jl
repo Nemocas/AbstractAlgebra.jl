@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-type PariIntegerRing <: PariRing
+type PariIntegerRing <: Ring{Pari}
 end
 
 type pari_int <: RingElem
@@ -34,7 +34,7 @@ end
 #
 ###############################################################################
 
-type PariRationalField <: PariField
+type PariRationalField <: Field{Pari}
 end
 
 type pari_rat <: RingElem
@@ -57,15 +57,15 @@ _pari_rat_clear_fn(g::pari_rat) = ccall((:pari_free, :libpari), Void,
 #
 ###############################################################################
 
-type PariVector{T <: Union(PariRing, PariSet)}
-   base_ring::Union(PariRing, PariSet)
+type PariVector{T <: Union(Ring{Pari}, Set{Pari})}
+   base_ring::Union(Ring{Pari}, Set{Pari})
 end
 
-type pari_vec{T <: Union(PariRing, PariSet)}
+type pari_vec{T <: Union(Ring{Pari}, Set{Pari})}
    data::Ptr{Int}
    parent::PariVector{T}
 
-   function pari_vec{R <: Union(PariRing, PariSet)}(v::Ptr{Int}, par::R)
+   function pari_vec{R <: Union(Ring{Pari}, Set{Pari})}(v::Ptr{Int}, par::R)
       r = new(gclone(v), PariVector{T}(par))
       finalizer(r, _pari_vec_unclone)
       return r
@@ -82,12 +82,12 @@ _pari_vec_unclone(a::pari_vec) = gunclone(a.data)
 
 PariPolyID = ObjectIdDict()
 
-type PariPolyRing{T <: PariRing} <: PariRing
-   base_ring::PariRing
+type PariPolyRing{T <: RingElem} <: Ring{Pari}
+   base_ring::Ring
    pol_0::Ptr{Int}
    S::Symbol
 
-   function PariPolyRing(R::PariRing, s::Symbol)
+   function PariPolyRing(R::Ring, s::Symbol)
       z = ccall((:pari_malloc, :libpari), Ptr{Int}, (Int,), 2*sizeof(Int))
       unsafe_store!(z, evaltyp(t_POL) | 2, 1) 
       unsafe_store!(z, evalsigne(0) | evalvarn(0), 2)
@@ -106,7 +106,7 @@ function _pari_poly_zero_clear_fn(p::PariPolyRing)
    ccall((:pari_free, :libpari), Void, (Ptr{Int},), p.pol_0)
 end
 
-type pari_poly{T <: PariRing} <: PolyElem{T}
+type pari_poly{T <: RingElem} <: PolyElem{T}
    d::Ptr{Int}
    parent::PariPolyRing{T}
 
@@ -135,9 +135,9 @@ _pari_poly_unclone(g::pari_poly) = gunclone(g.d)
 #
 ###############################################################################
 
-PariPolModID = Dict{Tuple{DataType, Symbol}, PariRing}()
+PariPolModID = Dict{Tuple{DataType, Symbol}, Ring}()
 
-type PariPolModRing{S <: PariRing} <: PariRing
+type PariPolModRing{S <: RingElem} <: Ring{Pari}
    T::Symbol
 
    function PariPolModRing(t::Symbol)
@@ -149,7 +149,7 @@ type PariPolModRing{S <: PariRing} <: PariRing
    end
 end
 
-type pari_polmod{S <: PariRing} <: PolyElem{S}
+type pari_polmod{S <: RingElem} <: PolyElem{S}
    data::Ptr{Int}
    parent::PariPolModRing{S}
 
@@ -168,9 +168,9 @@ _pari_polmod_unclone(a::pari_polmod) = gunclone(a.data)
 #
 ###############################################################################
 
-PariNumberFieldID = Dict{fmpq_poly, PariRing}()
+PariNumberFieldID = Dict{fmpq_poly, Ring}()
 
-type PariNumberField <: PariRing
+type PariNumberField <: Ring{Pari}
    data::Ptr{Int}
    nf::NfNumberField
    
@@ -198,7 +198,7 @@ _pari_nf_unclone(a::PariNumberField) = gunclone(a.data)
 #
 ###############################################################################
 
-type PariMaximalOrder <: PariRing
+type PariMaximalOrder <: Ring{Pari}
    pari_nf::PariNumberField
 end
 
@@ -223,7 +223,7 @@ _pari_maximal_order_elem_clear_fn(a::PariMaximalOrderElem) = gunclone(a.data)
 
 PariIdealSetID = ObjectIdDict()
 
-type PariIdealSet <: PariSet
+type PariIdealSet <: Set{Pari}
    order::PariMaximalOrder
 
    function PariIdealSet(ord::PariMaximalOrder)
@@ -235,7 +235,7 @@ type PariIdealSet <: PariSet
    end
 end
 
-type PariIdeal <: PariSet
+type PariIdeal <: Set{Pari}
    ideal::Ptr{Int}
    parent::PariIdealSet
 
@@ -247,3 +247,25 @@ type PariIdeal <: PariSet
 end
 
 _pari_ideal_clear_fn(a::PariIdeal) = gunclone(a.ideal)
+
+###############################################################################
+#
+#   PariFactor
+#
+###############################################################################
+
+type PariFactor{T <: RingElem}
+   data::Ptr{Int}
+   len::Int
+   parent::Ring
+
+   function PariFactor(p::Ptr{Int}, par::Ring)
+      col = reinterpret(Ptr{Int}, unsafe_load(p, 2))
+      r = new(gclone(p), lg(col) - 1, par)
+      finalizer(r, _PariFactor_unclone)
+      return r
+   end
+end
+
+_PariFactor_unclone(f::PariFactor) = gunclone(f.data)
+
