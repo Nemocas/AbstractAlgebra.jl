@@ -196,7 +196,7 @@ type FmpzPolyRing <: Ring
    end
 end
 
-type fmpz_poly <: PolyElem
+type fmpz_poly <: PolyElem{fmpz}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -273,7 +273,7 @@ type FmpqPolyRing <: Ring
    end
 end
 
-type fmpq_poly <: PolyElem
+type fmpq_poly <: PolyElem{fmpq}
    coeffs::Ptr{Int}
    den::Int 
    alloc::Int
@@ -371,7 +371,7 @@ type NmodPolyRing <: Ring
   end
 end
 
-type nmod_poly <: PolyElem
+type nmod_poly <: PolyElem{Residue{fmpz}}
    _coeffs::Ptr{Void}
    _alloc::Int
    _length::Int
@@ -512,7 +512,7 @@ type FmpzModPolyRing <: Ring
   end
 end
 
-type fmpz_mod_poly <: PolyElem
+type fmpz_mod_poly <: PolyElem{Residue{fmpz}}
    _coeffs::Ptr{Void}
    _alloc::Int
    _length::Int

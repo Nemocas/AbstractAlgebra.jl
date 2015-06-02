@@ -106,7 +106,7 @@ function _pari_poly_zero_clear_fn(p::PariPolyRing)
    ccall((:pari_free, :libpari), Void, (Ptr{Int},), p.pol_0)
 end
 
-type pari_poly{T <: PariRing} <: RingElem
+type pari_poly{T <: PariRing} <: PolyElem{T}
    d::Ptr{Int}
    parent::PariPolyRing{T}
 
@@ -149,7 +149,7 @@ type PariPolModRing{S <: PariRing} <: PariRing
    end
 end
 
-type pari_polmod{S <: PariRing} <: RingElem
+type pari_polmod{S <: PariRing} <: PolyElem{S}
    data::Ptr{Int}
    parent::PariPolModRing{S}
 

@@ -12,7 +12,7 @@ abstract RingElem
 
 abstract FieldElem <: RingElem
 
-abstract PolyElem <: RingElem
+abstract PolyElem{T} <: RingElem
 
 abstract PowerSeriesElem <: RingElem
 

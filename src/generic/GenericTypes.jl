@@ -25,7 +25,7 @@ type PolynomialRing{T <: RingElem} <: Ring
    end
 end
 
-type Poly{T <: RingElem} <: PolyElem
+type Poly{T <: RingElem} <: PolyElem{T}
    coeffs::Array{T, 1}
    length::Int
    parent::PolynomialRing{T}
