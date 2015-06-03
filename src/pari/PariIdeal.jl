@@ -5,7 +5,8 @@
 ###############################################################################
 
 export approx, coprime_multiplier, intersect, bounded_ideals, numden, 
-       prime_decomposition, LLL_reduce, valuation, factor, factor_mul, ideal
+       prime_decomposition, LLL_reduce, valuation, factor, factor_mul, ideal,
+       PariIdealSet, PariIdeal
 
 ###############################################################################
 #
@@ -195,7 +196,7 @@ end
 
 ###############################################################################
 #
-#   Bezout
+#   GCDX
 #
 ###############################################################################
 

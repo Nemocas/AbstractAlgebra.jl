@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export MaximalOrder, PariMaximalOrder
+export MaximalOrder, PariMaximalOrder, basistoalg, alg, basis
 
 ###############################################################################
 #
@@ -43,9 +43,10 @@ end
 
 function basis(ord::PariMaximalOrder)
    data = pari_load(ord.pari_nf.data, 8)
-   pol_type = PariPolyRing{pari_rat}
-   par = pol_type(PariQQ, var(parent(ord.pari_nf.nf.pol)))
-   return pari_vec{pol_type}(data, par)
+   poly_type = pari_poly{pari_rat}
+   polyring = PariPolyRing{pari_rat}
+   par = polyring(PariQQ, var(parent(ord.pari_nf.nf.pol)))
+   return pari_vec{poly_type}(data, par)
 end
 
 ###############################################################################

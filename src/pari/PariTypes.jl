@@ -57,11 +57,11 @@ _pari_rat_clear_fn(g::pari_rat) = ccall((:pari_free, :libpari), Void,
 #
 ###############################################################################
 
-type PariVector{T}
+type PariVector{T <: RingElem}
    base_ring::Set{Pari}
 end
 
-type pari_vec{T}
+type pari_vec{T <: RingElem}
    data::Ptr{Int}
    parent::PariVector{T}
 
