@@ -94,7 +94,7 @@ end
 #
 ###############################################################################
 
-canonical_unit{T <: RingElem}(x::Poly{T}) = canonical_unit(lead(x))
+canonical_unit{T <: RingElem}(x::PolyElem{T}) = canonical_unit(lead(x))
 
 ###############################################################################
 #
@@ -102,7 +102,7 @@ canonical_unit{T <: RingElem}(x::Poly{T}) = canonical_unit(lead(x))
 #
 ###############################################################################
 
-function show{T <: RingElem}(io::IO, x::Poly{T})
+function show{T <: RingElem}(io::IO, x::PolyElem{T})
    len = length(x)
    S = var(parent(x))
 
@@ -110,7 +110,7 @@ function show{T <: RingElem}(io::IO, x::Poly{T})
       print(io, base_ring(x)(0))
    else
       for i = 1:len - 1
-         c = x.coeffs[len - i + 1]
+         c = coeff(x, len - i)
          bracket = needs_parentheses(c)
          if !iszero(c)
             if i != 1 && !is_negative(c)
@@ -136,7 +136,7 @@ function show{T <: RingElem}(io::IO, x::Poly{T})
             end
          end
       end
-      c = x.coeffs[1]
+      c = coeff(x, 0)
       bracket = needs_parentheses(c)
       if !iszero(c)
          if len != 1 && !is_negative(c)
@@ -164,7 +164,7 @@ needs_parentheses(x::PolyElem) = length(x) > 1
 
 is_negative(x::PolyElem) = length(x) <= 1 && is_negative(coeff(x, 0))
 
-show_minus_one{T <: RingElem}(::Type{Poly{T}}) = show_minus_one(T)
+show_minus_one{T <: RingElem}(::Type{PolyElem{T}}) = show_minus_one(T)
 
 ###############################################################################
 #
@@ -176,7 +176,7 @@ function -{T <: RingElem}(a::Poly{T})
    len = length(a)
    d = Array(T, len)
    for i = 1:len
-      d[i] = -a.coeffs[i]
+      d[i] = -coeff(a, i - 1)
    end
    z = parent(a)(d)
    z.length = len
@@ -198,17 +198,17 @@ function +{T <: RingElem}(a::Poly{T}, b::Poly{T})
    i = 1
 
    while i <= min(lena, lenb)
-      d[i] = a.coeffs[i] + b.coeffs[i]
+      d[i] = coeff(a, i - 1) + coeff(b, i - 1)
       i += 1
    end
 
    while i <= lena
-      d[i] = a.coeffs[i]
+      d[i] = coeff(a, i - 1)
       i += 1
    end
 
    while i <= lenb
-      d[i] = b.coeffs[i]
+      d[i] = coeff(b, i - 1)
       i += 1
    end
 
@@ -228,17 +228,17 @@ function -{T <: RingElem}(a::Poly{T}, b::Poly{T})
    i = 1
 
    while i <= min(lena, lenb)
-      d[i] = a.coeffs[i] - b.coeffs[i]
+      d[i] = coeff(a, i - 1) - coeff(b, i - 1)
       i += 1
    end
 
    while i <= lena
-      d[i] = a.coeffs[i]
+      d[i] = coeff(a, i - 1)
       i += 1
    end
 
    while i <= lenb
-      d[i] = -b.coeffs[i]
+      d[i] = -coeff(b, i - 1)
       i += 1
    end
 
@@ -264,16 +264,16 @@ function *{T <: RingElem}(a::Poly{T}, b::Poly{T})
    d = Array(T, lenz)
    
    for i = 1:lena
-      d[i] = a.coeffs[i]*b.coeffs[1]
+      d[i] = coeff(a, i - 1)*coeff(b, 0)
    end
 
    for i = 2:lenb
-      d[lena + i - 1] = a.coeffs[lena]*b.coeffs[i]
+      d[lena + i - 1] = a.coeffs[lena]*coeff(b, i - 1)
    end
    
    for i = 1:lena - 1
       for j = 2:lenb
-         mul!(t, a.coeffs[i], b.coeffs[j])
+         mul!(t, coeff(a, i - 1), b.coeffs[j])
          addeq!(d[i + j - 1], t)
       end
    end
@@ -323,14 +323,14 @@ end
 #
 ###############################################################################
 
-function ^{T <: RingElem}(a::Poly{T}, b::Int)
+function ^{T <: RingElem}(a::PolyElem{T}, b::Int)
    b < 0 && throw(DomainError())
    # special case powers of x for constructing polynomials efficiently
    if isgen(a)
       d = Array(T, b + 1)
-      d[b + 1] = a.coeffs[2]
+      d[b + 1] = coeff(a, 1)
       for i = 1:b
-         d[i] = a.coeffs[1]
+         d[i] = coeff(a, 0)
       end
       z = parent(a)(d)
       z.length = b + 1
@@ -338,7 +338,7 @@ function ^{T <: RingElem}(a::Poly{T}, b::Int)
    elseif length(a) == 0
       return zero(parent(a))
    elseif length(a) == 1
-      return parent(a)(a.coeffs[1]^b)
+      return parent(a)(coeff(a, 0)^b)
    elseif b == 0
       return one(parent(a))
    else
@@ -365,13 +365,13 @@ end
 #
 ###############################################################################
 
-function =={T <: RingElem}(x::Poly{T}, y::Poly{T})
+function =={T <: RingElem}(x::PolyElem{T}, y::PolyElem{T})
    check_parent(x, y)
    if length(x) != length(y)
       return false
    else
       for i = 1:length(x)
-         if x.coeffs[i] != y.coeffs[i]
+         if coeff(x, i - 1) != coeff(y, i - 1)
             return false
          end
       end
@@ -379,7 +379,7 @@ function =={T <: RingElem}(x::Poly{T}, y::Poly{T})
    return true
 end
 
-function isequal{T <: RingElem}(x::Poly{T}, y::Poly{T})
+function isequal{T <: RingElem}(x::PolyElem{T}, y::PolyElem{T})
    check_parent(x, y)
    if length(x) != length(y)
       return false
@@ -398,10 +398,10 @@ end
 #
 ###############################################################################
 
-==(x::Poly, y::Integer) = ((length(x) == 0 && y == 0)
+==(x::PolyElem, y::Integer) = ((length(x) == 0 && y == 0)
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-==(x::Integer, y::Poly) = y == x
+==(x::Integer, y::PolyElem) = y == x
 
 ###############################################################################
 #
@@ -409,7 +409,7 @@ end
 #
 ###############################################################################
 
-function truncate{T <: RingElem}(a::Poly{T}, n::Int)
+function truncate{T <: RingElem}(a::PolyElem{T}, n::Int)
    n < 0 && throw(DomainError())
    
    lena = length(a)
@@ -422,7 +422,7 @@ function truncate{T <: RingElem}(a::Poly{T}, n::Int)
    d = Array(T, lenz)
 
    for i = 1:lenz
-      d[i] = a.coeffs[i]
+      d[i] = coeff(a, i - 1)
    end
 
    z = parent(a)(d)
@@ -432,7 +432,7 @@ function truncate{T <: RingElem}(a::Poly{T}, n::Int)
    return z
 end
 
-function mullow{T <: RingElem}(a::Poly{T}, b::Poly{T}, n::Int)
+function mullow{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, n::Int)
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -452,26 +452,26 @@ function mullow{T <: RingElem}(a::Poly{T}, b::Poly{T}, n::Int)
    d = Array(T, lenz)
 
    for i = 1:min(lena, lenz)
-      d[i] = a.coeffs[i]*b.coeffs[1]
+      d[i] = coeff(a, i - 1)*coeff(b, 0)
    end
 
    if lenz > lena
       for j = 2:min(lenb, lenz - lena + 1)
-          d[lena + j - 1] = a.coeffs[lena]*b.coeffs[j]
+          d[lena + j - 1] = coeff(a, lena - 1)*coeff(b, j - 1)
       end
    end
-
-   z = parent(a)(d)
 
    for i = 1:lena - 1
       if lenz > i
          for j = 2:min(lenb, lenz - i + 1)
-            mul!(t, a.coeffs[i], b.coeffs[j])
-            addeq!(z.coeffs[i + j - 1], t)
+            mul!(t, coeff(a, i - 1), b.coeffs[j])
+            addeq!(d[i + j - 1], t)
          end
       end
    end
-        
+     
+   z = parent(a)(d)
+   
    z.length = normalise(z, lenz)
 
    return z
@@ -483,7 +483,7 @@ end
 #
 ###############################################################################
 
-function reverse{T <: RingElem}(x::Poly{T}, len::Int)
+function reverse{T <: RingElem}(x::PolyElem{T}, len::Int)
    len < 0 && throw(DomainError())
    v = Array(T, len)
    for i = 1:len
@@ -504,7 +504,7 @@ end
 #
 ###############################################################################
 
-function shift_left{T <: RingElem}(x::Poly{T}, len::Int)
+function shift_left{T <: RingElem}(x::PolyElem{T}, len::Int)
    len < 0 && throw(DomainError())
    xlen = length(x)
    v = Array(T, xlen + len)
@@ -517,7 +517,7 @@ function shift_left{T <: RingElem}(x::Poly{T}, len::Int)
    return parent(x)(v)
 end
 
-function shift_right{T <: RingElem}(x::Poly{T}, len::Int)
+function shift_right{T <: RingElem}(x::PolyElem{T}, len::Int)
    len < 0 && throw(DomainError())
    xlen = length(x)
    if len >= xlen
@@ -536,13 +536,13 @@ end
 #
 ###############################################################################
 
-function mulmod{T <: Union(Residue, FieldElem)}(a::Poly{T}, b::Poly{T}, d::Poly{T})
+function mulmod{T <: Union(Residue, FieldElem)}(a::PolyElem{T}, b::PolyElem{T}, d::PolyElem{T})
    check_parent(a, b)
    check_parent(a, d)
    return mod(a*b, d)
 end
 
-function powmod{T <: Union(Residue, FieldElem)}(a::Poly{T}, b::Int, d::Poly{T})
+function powmod{T <: Union(Residue, FieldElem)}(a::PolyElem{T}, b::Int, d::PolyElem{T})
    check_parent(a, d)
    if length(a) == 0
       return zero(parent(a))
@@ -572,7 +572,7 @@ function powmod{T <: Union(Residue, FieldElem)}(a::Poly{T}, b::Int, d::Poly{T})
    end
 end
 
-function invmod{T <: Union(Residue, FieldElem)}(a::Poly{T}, b::Poly{T})
+function invmod{T <: Union(Residue, FieldElem)}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    g, z = gcdinv(a, b)
    if g != 1
@@ -587,7 +587,7 @@ end
 #
 ###############################################################################
 
-function divexact{T <: RingElem}(f::Poly{T}, g::Poly{T})
+function divexact{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    check_parent(f, g)
    g == 0 && throw(DivideError())
    if f == 0
@@ -598,14 +598,14 @@ function divexact{T <: RingElem}(f::Poly{T}, g::Poly{T})
    for i = 1:lenq
       d[i] = zero(base_ring(f))
    end
-   q = parent(f)(d)
    x = gen(parent(f))
    leng = length(g)
    while length(f) >= leng
       lenf = length(f)
-      q1 = q.coeffs[lenf - leng + 1] = divexact(f.coeffs[lenf], g.coeffs[leng])
+      q1 = d[lenf - leng + 1] = divexact(coeff(f, lenf - 1), coeff(g, leng - 1))
       f = f - q1*g*x^(lenf - leng)
    end
+   q = parent(f)(d)
    q.length = lenq
    return q
 end
@@ -616,7 +616,7 @@ end
 #
 ###############################################################################
 
-function divexact{T <: RingElem}(a::Poly{T}, b::T)
+function divexact{T <: RingElem}(a::PolyElem{T}, b::T)
    b == 0 && throw(DivideError())
    d = Array(T, length(a))
    for i = 1:length(a)
@@ -627,7 +627,7 @@ function divexact{T <: RingElem}(a::Poly{T}, b::T)
    return z
 end
 
-function divexact{T <: RingElem}(a::Poly{T}, b::Integer)
+function divexact{T <: RingElem}(a::PolyElem{T}, b::Integer)
    b == 0 && throw(DivideError())
    d = Array(T, length(a))
    for i = 1:length(a)
@@ -660,7 +660,7 @@ function mod{T <: Union(Residue, FieldElem)}(f::PolyElem{T}, g::PolyElem{T})
    return f
 end
 
-function divrem{T <: Union(FieldElem, Residue)}(f::Poly{T}, g::Poly{T})
+function divrem{T <: Union(FieldElem, Residue)}(f::PolyElem{T}, g::PolyElem{T})
    check_parent(f, g)
    if length(g) == 0
       raise(DivideError())
@@ -691,7 +691,7 @@ end
 #
 ###############################################################################
 
-function pseudorem{T <: RingElem}(f::Poly{T}, g::Poly{T})
+function pseudorem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    check_parent(f, g)
    g == 0 && throw(DivideError())
    b = coeff(g, length(g) - 1)
@@ -702,7 +702,7 @@ function pseudorem{T <: RingElem}(f::Poly{T}, g::Poly{T})
    return f
 end
 
-function pseudodivrem{T <: RingElem}(f::Poly{T}, g::Poly{T})
+function pseudodivrem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    check_parent(f, g)
    g == 0 && throw(DivideError())
    if length(f) < length(g)
@@ -736,7 +736,7 @@ end
 #
 ###############################################################################
 
-function gcd{T <: RingElem}(a::Poly{T}, b::Poly{T})
+function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    if length(b) > length(a)
       (a, b) = (b, a)
@@ -770,7 +770,7 @@ function gcd{T <: RingElem}(a::Poly{T}, b::Poly{T})
    return c*primpart(b)
 end
 
-function gcd{T <: Union(FieldElem, Residue)}(a::Poly{T}, b::Poly{T})
+function gcd{T <: Union(FieldElem, Residue)}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    if length(a) > length(b)
       (a, b) = (b, a)
@@ -793,7 +793,7 @@ function lcm(a::PolyElem, b::PolyElem)
    return a*divexact(b, gcd(a, b))
 end
 
-function content(a::Poly)
+function content(a::PolyElem)
    z = coeff(a, 0)
    for i = 2:length(a)
       z = gcd(z, coeff(a, i - 1))
@@ -801,7 +801,7 @@ function content(a::Poly)
    return z
 end
 
-function primpart(a::Poly)
+function primpart(a::PolyElem)
    d = content(a)
    return divexact(a, d)
 end
@@ -812,20 +812,20 @@ end
 #
 ###############################################################################
 
-function evaluate{T <: RingElem}(a::Poly{T}, b::T)
+function evaluate{T <: RingElem}(a::PolyElem{T}, b::T)
    i = length(a)
    if i == 0
        return zero(base_ring(a))
    end
-   z = a.coeffs[i]
+   z = coeff(a, i - 1)
    while i > 1
       i -= 1
-      z = z*b + a.coeffs[i]
+      z = z*b + coeff(a, i - 1)
    end
    return z
 end
 
-function evaluate{T <: RingElem}(a::Poly{T}, b::Integer)
+function evaluate{T <: RingElem}(a::PolyElem{T}, b::Integer)
    return evaluate(a, base_ring(a)(b))
 end
 
@@ -834,10 +834,10 @@ function compose(a::Poly, b::Poly)
    if i == 0
        return zero(parent(a))
    end
-   z = a.coeffs[i]
+   z = coeff(a, i - 1)
    while i > 1
       i -= 1
-      z = z*b + a.coeffs[i]
+      z = z*b + coeff(a, i - 1)
    end
    return z
 end
@@ -848,14 +848,14 @@ end
 #
 ###############################################################################
 
-function derivative{T <: RingElem}(a::Poly{T})
+function derivative{T <: RingElem}(a::PolyElem{T})
    if a == 0
       return zero(parent(a))
    end
    len = length(a)
    d = Array(T, len - 1)
    for i = 1:len - 1
-      d[i] = i*a.coeffs[i + 1]
+      d[i] = i*coeff(a, i)
    end
    z = parent(a)(d)
    z.length = normalise(z, len - 1)
@@ -868,7 +868,7 @@ end
 #
 ###############################################################################
 
-function integral{T <: Union(FieldElem, Residue)}(x::Poly{T})
+function integral{T <: Union(FieldElem, Residue)}(x::PolyElem{T})
    len = length(x)
    v = Array(T, len + 1)
    v[1] = zero(base_ring(x))
@@ -890,7 +890,7 @@ end
 #
 ###############################################################################
 
-function resultant{T <: RingElem}(a::Poly{T}, b::Poly{T})
+function resultant{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    if length(a) == 0 || length(b) == 0
       return zero(base_ring(a))
@@ -905,7 +905,7 @@ function resultant{T <: RingElem}(a::Poly{T}, b::Poly{T})
    lena = length(a)
    lenb = length(b)
    if lenb == 1
-      return b.coeffs[1]^(lena - 1)
+      return coeff(b, 0)^(lena - 1)
    end
    c1 = content(a)
    c2 = content(b)
@@ -933,7 +933,7 @@ function resultant{T <: RingElem}(a::Poly{T}, b::Poly{T})
    res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
 end
 
-function resultant{T <: Union(FieldElem, Residue)}(a::Poly{T}, b::Poly{T})
+function resultant{T <: Union(FieldElem, Residue)}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    if length(a) == 0 || length(b) == 0
       return zero(base_ring(a))
@@ -948,7 +948,7 @@ function resultant{T <: Union(FieldElem, Residue)}(a::Poly{T}, b::Poly{T})
    lena = length(a)
    lenb = length(b)
    if lenb == 1
-      return b.coeffs[1]^(lena - 1)
+      return coeff(b, 0)^(lena - 1)
    end
    c1 = content(a)
    c2 = content(b)
@@ -977,7 +977,7 @@ end
 #
 ###############################################################################
 
-function discriminant(a::Poly)
+function discriminant(a::PolyElem)
    d = derivative(a)
    z = resultant(a, d)
    if length(a) - length(d) == 1
@@ -985,7 +985,7 @@ function discriminant(a::Poly)
    else
       z = z*lead(a)^(length(a) - length(d) - 2)
    end
-   mod4 = (length(a) + 3)%4 # degree mod 4
+   mod4 = (length(a) + 3) % 4 # degree mod 4
    return mod4 == 2 || mod4 == 3 ? -z : z
 end
 
@@ -995,7 +995,7 @@ end
 #
 ###############################################################################
 
-function gcdx{T <: RingElem}(a::Poly{T}, b::Poly{T})
+function gcdx{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    sgn = 1
    swap = false
@@ -1046,7 +1046,7 @@ function gcdx{T <: RingElem}(a::Poly{T}, b::Poly{T})
    return res, u2, v2
 end
 
-function gcdx{T <: Union(FieldElem, Residue)}(a::Poly{T}, b::Poly{T})
+function gcdx{T <: Union(FieldElem, Residue)}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    if length(a) == 0
       return b, zero(parent(a)), one(parent(a))
@@ -1084,7 +1084,7 @@ function gcdx{T <: Union(FieldElem, Residue)}(a::Poly{T}, b::Poly{T})
    return d*A, d*u1, d*v1
 end
 
-function gcdinv{T <: Union(FieldElem, Residue)}(a::Poly{T}, b::Poly{T})
+function gcdinv{T <: Union(FieldElem, Residue)}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    if length(a) == 0
       if length(b) == 0
@@ -1242,16 +1242,16 @@ function mul!{T <: RingElem}(c::Poly{T}, a::Poly{T}, b::Poly{T})
       fit!(c, lenc)
 
       for i = 1:lena
-         mul!(c.coeffs[i], a.coeffs[i], b.coeffs[1])
+         mul!(c.coeffs[i], coeff(a, i - 1), coeff(b, 0))
       end
 
       for i = 2:lenb
-         mul!(c.coeffs[lena + i - 1], a.coeffs[lena], b.coeffs[i])
+         mul!(c.coeffs[lena + i - 1], a.coeffs[lena], coeff(b, i - 1))
       end
 
       for i = 1:lena - 1
          for j = 2:lenb
-            mul!(t, a.coeffs[i], b.coeffs[j])
+            mul!(t, coeff(a, i - 1), b.coeffs[j])
             addeq!(c.coeffs[i + j - 1], t)
          end
       end
@@ -1266,7 +1266,7 @@ function addeq!{T <: RingElem}(c::Poly{T}, a::Poly{T})
    len = max(lenc, lena)
    fit!(c, len)
    for i = 1:lena
-      addeq!(c.coeffs[i], a.coeffs[i])
+      addeq!(c.coeffs[i], coeff(a, i - 1))
    end
    c.length = normalise(c, len)
 end
