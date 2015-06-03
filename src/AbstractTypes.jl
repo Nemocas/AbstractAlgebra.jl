@@ -26,6 +26,8 @@ abstract FieldElem <: RingElem
 
 abstract PolyElem{T} <: RingElem
 
+abstract ResidueElem{T} <: RingElem
+
 abstract PowerSeriesElem <: RingElem
 
 # not always mathematical ring elements

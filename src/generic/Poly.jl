@@ -536,13 +536,13 @@ end
 #
 ###############################################################################
 
-function mulmod{T <: Union(Residue, FieldElem)}(a::PolyElem{T}, b::PolyElem{T}, d::PolyElem{T})
+function mulmod{T <: Union(ResidueElem, FieldElem)}(a::PolyElem{T}, b::PolyElem{T}, d::PolyElem{T})
    check_parent(a, b)
    check_parent(a, d)
    return mod(a*b, d)
 end
 
-function powmod{T <: Union(Residue, FieldElem)}(a::PolyElem{T}, b::Int, d::PolyElem{T})
+function powmod{T <: Union(ResidueElem, FieldElem)}(a::PolyElem{T}, b::Int, d::PolyElem{T})
    check_parent(a, d)
    if length(a) == 0
       return zero(parent(a))
@@ -572,7 +572,7 @@ function powmod{T <: Union(Residue, FieldElem)}(a::PolyElem{T}, b::Int, d::PolyE
    end
 end
 
-function invmod{T <: Union(Residue, FieldElem)}(a::PolyElem{T}, b::PolyElem{T})
+function invmod{T <: Union(ResidueElem, FieldElem)}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    g, z = gcdinv(a, b)
    if g != 1
@@ -644,7 +644,7 @@ end
 #
 ###############################################################################
 
-function mod{T <: Union(Residue, FieldElem)}(f::PolyElem{T}, g::PolyElem{T})
+function mod{T <: Union(ResidueElem, FieldElem)}(f::PolyElem{T}, g::PolyElem{T})
    check_parent(f, g)
    if length(g) == 0
       raise(DivideError())
@@ -660,7 +660,7 @@ function mod{T <: Union(Residue, FieldElem)}(f::PolyElem{T}, g::PolyElem{T})
    return f
 end
 
-function divrem{T <: Union(FieldElem, Residue)}(f::PolyElem{T}, g::PolyElem{T})
+function divrem{T <: Union(ResidueElem, FieldElem)}(f::PolyElem{T}, g::PolyElem{T})
    check_parent(f, g)
    if length(g) == 0
       raise(DivideError())
@@ -770,7 +770,7 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    return c*primpart(b)
 end
 
-function gcd{T <: Union(FieldElem, Residue)}(a::PolyElem{T}, b::PolyElem{T})
+function gcd{T <: Union(ResidueElem, FieldElem)}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    if length(a) > length(b)
       (a, b) = (b, a)
@@ -868,7 +868,7 @@ end
 #
 ###############################################################################
 
-function integral{T <: Union(FieldElem, Residue)}(x::PolyElem{T})
+function integral{T <: Union(ResidueElem, FieldElem)}(x::PolyElem{T})
    len = length(x)
    v = Array(T, len + 1)
    v[1] = zero(base_ring(x))
@@ -933,7 +933,7 @@ function resultant{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
 end
 
-function resultant{T <: Union(FieldElem, Residue)}(a::PolyElem{T}, b::PolyElem{T})
+function resultant{T <: Union(ResidueElem, FieldElem)}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    if length(a) == 0 || length(b) == 0
       return zero(base_ring(a))
@@ -1046,7 +1046,7 @@ function gcdx{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    return res, u2, v2
 end
 
-function gcdx{T <: Union(FieldElem, Residue)}(a::PolyElem{T}, b::PolyElem{T})
+function gcdx{T <: Union(ResidueElem, FieldElem)}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    if length(a) == 0
       return b, zero(parent(a)), one(parent(a))
@@ -1084,7 +1084,7 @@ function gcdx{T <: Union(FieldElem, Residue)}(a::PolyElem{T}, b::PolyElem{T})
    return d*A, d*u1, d*v1
 end
 
-function gcdinv{T <: Union(FieldElem, Residue)}(a::PolyElem{T}, b::PolyElem{T})
+function gcdinv{T <: Union(ResidueElem, FieldElem)}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    if length(a) == 0
       if length(b) == 0

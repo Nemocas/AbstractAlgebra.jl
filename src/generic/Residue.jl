@@ -16,11 +16,11 @@ elem_type{T <: RingElem}(::ResidueRing{T}) = Residue{T}
 
 base_ring(a::ResidueRing) = a.base_ring
 
-base_ring(a::Residue) = base_ring(parent(a))
+base_ring(a::ResidueElem) = base_ring(parent(a))
 
-parent(a::Residue) = a.parent
+parent(a::ResidueElem) = a.parent
 
-function check_parent(a::Residue, b::Residue)
+function check_parent(a::ResidueElem, b::ResidueElem)
    parent(a) != parent(b) && error("Incompatible moduli in residue operation")
 end
 
@@ -30,7 +30,7 @@ end
 #
 ###############################################################################
 
-function hash(a::Residue)
+function hash(a::ResidueElem)
    h = 0x539c1c8715c1adc2
    return h $ hash(a.data)
 end
@@ -39,24 +39,26 @@ function modulus(R::ResidueRing)
    return R.modulus
 end
 
-function modulus(a::Residue)
+function modulus(a::ResidueElem)
    return modulus(parent(a))
 end
+
+data(a::Residue) = a.data
 
 zero(R::ResidueRing) = R(0)
 
 one(R::ResidueRing) = R(1)
 
-iszero(a::Residue) = iszero(a.data)
+iszero(a::ResidueElem) = iszero(data(a))
 
-isone(a::Residue) = isone(a.data)
+isone(a::ResidueElem) = isone(data(a))
 
-function isunit(a::Residue)
-   g, ainv = gcdinv(a.data, modulus(a))
+function isunit(a::ResidueElem)
+   g, ainv = gcdinv(data(a), modulus(a))
    return g == 1
 end
 
-deepcopy(a::Residue) = parent(a)(deepcopy(a.data))
+deepcopy(a::ResidueElem) = parent(a)(deepcopy(data(a)))
 
 ###############################################################################
 #
@@ -72,19 +74,19 @@ canonical_unit(a::Residue) = a
 #
 ###############################################################################
 
-function show(io::IO, x::Residue)
-   print(io, x.data)
+function show(io::IO, x::ResidueElem)
+   print(io, data(x))
 end
 
 function show(io::IO, a::ResidueRing)
    print(io, "Residue ring of ", base_ring(a), " modulo ", modulus(a))
 end
 
-needs_parentheses(x::Residue) = needs_parentheses(x.data)
+needs_parentheses(x::ResidueElem) = needs_parentheses(x.data)
 
-is_negative(x::Residue) = is_negative(x.data)
+is_negative(x::ResidueElem) = is_negative(x.data)
 
-show_minus_one{T <: RingElem}(::Type{Residue{T}}) = true
+show_minus_one{T <: RingElem}(::Type{ResidueElem{T}}) = true
 
 ###############################################################################
 #
@@ -92,8 +94,8 @@ show_minus_one{T <: RingElem}(::Type{Residue{T}}) = true
 #
 ###############################################################################
 
-function -{T <: RingElem}(a::Residue{T})
-   parent(a)(-a.data)
+function -{T <: RingElem}(a::ResidueElem{T})
+   parent(a)(-data(a))
 end
 
 ###############################################################################
@@ -104,17 +106,17 @@ end
 
 function +{T <: RingElem}(a::Residue{T}, b::Residue{T})
    check_parent(a, b)
-   return parent(a)(a.data + b.data)
+   return parent(a)(data(a) + data(b))
 end
 
 function -{T <: RingElem}(a::Residue{T}, b::Residue{T})
    check_parent(a, b)
-   return parent(a)(a.data - b.data)
+   return parent(a)(data(a) - data(b))
 end
 
 function *{T <: RingElem}(a::Residue{T}, b::Residue{T})
    check_parent(a, b)
-   return parent(a)(a.data * b.data)
+   return parent(a)(data(a) * data(b))
 end
 
 ###############################################################################
@@ -123,17 +125,17 @@ end
 #
 ###############################################################################
 
-*{T <: RingElem}(a::Residue{T}, b::Integer) = parent(a)(a.data * b)
+*{T <: RingElem}(a::Residue{T}, b::Integer) = parent(a)(data(a) * b)
 
-*{T <: RingElem}(a::Integer, b::Residue{T}) = parent(b)(a * b.data)
+*{T <: RingElem}(a::Integer, b::Residue{T}) = parent(b)(a * data(b))
 
-+{T <: RingElem}(a::Residue{T}, b::Integer) = parent(a)(a.data + b)
++{T <: RingElem}(a::Residue{T}, b::Integer) = parent(a)(data(a) + b)
 
-+{T <: RingElem}(a::Integer, b::Residue{T}) = parent(b)(a + b.data)
++{T <: RingElem}(a::Integer, b::Residue{T}) = parent(b)(a + data(b))
 
--{T <: RingElem}(a::Residue{T}, b::Integer) = parent(a)(a.data - b)
+-{T <: RingElem}(a::Residue{T}, b::Integer) = parent(a)(data(a) - b)
 
--{T <: RingElem}(a::Integer, b::Residue{T}) = parent(b)(a - b.data)
+-{T <: RingElem}(a::Integer, b::Residue{T}) = parent(b)(a - data(b))
 
 ###############################################################################
 #
@@ -142,7 +144,7 @@ end
 ###############################################################################
 
 function ^{T <: RingElem}(a::Residue{T}, b::Int)
-   parent(a)(powmod(a.data, b, modulus(a)))
+   parent(a)(powmod(data(a), b, modulus(a)))
 end
 
 ###############################################################################
@@ -151,9 +153,9 @@ end
 #
 ###############################################################################
 
-function =={T <: RingElem}(a::Residue{T}, b::Residue{T})
+function =={T <: RingElem}(a::ResidueElem{T}, b::ResidueElem{T})
    check_parent(a, b)
-   return a.data == b.data
+   return data(a) == data(b)
 end
 
 ###############################################################################
@@ -162,8 +164,8 @@ end
 #
 ###############################################################################
 
-function inv{T <: RingElem}(a::Residue{T})
-   g, ainv = gcdinv(a.data, modulus(a))
+function inv{T <: RingElem}(a::ResidueElem{T})
+   g, ainv = gcdinv(data(a), modulus(a))
    if g != 1
       error("Impossible inverse in inv")
    end
@@ -176,13 +178,13 @@ end
 #
 ###############################################################################
 
-function divexact{T <: RingElem}(a::Residue{T}, b::Residue{T})
+function divexact{T <: RingElem}(a::ResidueElem{T}, b::ResidueElem{T})
    check_parent(a, b)
-   g, binv = gcdinv(b.data, modulus(b))
+   g, binv = gcdinv(data(b), modulus(b))
    if g != 1
       error("Impossible inverse in divexact")
    end
-   return parent(a)(a.data * binv)
+   return parent(a)(data(a) * binv)
 end
 
 ###############################################################################
@@ -191,9 +193,9 @@ end
 #
 ###############################################################################
 
-function gcd{T <: RingElem}(a::Residue{T}, b::Residue{T})
+function gcd{T <: RingElem}(a::ResidueElem{T}, b::ResidueElem{T})
    check_parent(a, b)
-   return parent(a)(gcd(gcd(a.data, modulus(a)), b.data))
+   return parent(a)(gcd(gcd(data(a), modulus(a)), data(b)))
 end
 
 ###############################################################################
@@ -203,11 +205,11 @@ end
 ###############################################################################
 
 function mul!{T <: RingElem}(c::Residue{T}, a::Residue{T}, b::Residue{T})
-   c.data = mod(a.data*b.data, modulus(a))
+   c.data = mod(data(a)*data(b), modulus(a))
 end
 
 function addeq!{T <: RingElem}(c::Residue{T}, a::Residue{T})
-   c.data = mod(c.data + a.data, modulus(a))
+   c.data = mod(c.data + data(a), modulus(a))
 end
 
 ###############################################################################

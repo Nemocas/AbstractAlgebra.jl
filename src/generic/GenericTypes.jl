@@ -58,7 +58,7 @@ type ResidueRing{T <: RingElem} <: Ring{Generic}
    end
 end
 
-type Residue{T <: RingElem} <: RingElem
+type Residue{T <: RingElem} <: ResidueElem{T}
    data::T
    parent::ResidueRing
 
