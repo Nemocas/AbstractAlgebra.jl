@@ -9,7 +9,7 @@ import Base: abs, asin, asinh, atan, atanh, base, bin, call, convert, cos,
              sin, size, sqrt, string, sub, tan, tanh, trace, transpose,
              transpose!, truncate, var, zero
 
-export Ring, Field, RingElem
+export Ring, Field, RingElem, Pari, Flint, Antic, Generic
 
 export PolyElem, PowerSeriesElem
 
