@@ -57,15 +57,15 @@ _pari_rat_clear_fn(g::pari_rat) = ccall((:pari_free, :libpari), Void,
 #
 ###############################################################################
 
-type PariVector{T <: RingElem}
+type PariVector{T <: SetElem}
    base_ring::Set{Pari}
 end
 
-type pari_vec{T <: RingElem}
+type pari_vec{T <: SetElem}
    data::Ptr{Int}
    parent::PariVector{T}
 
-   function pari_vec{R <: Union(Ring{Pari}, Set{Pari})}(v::Ptr{Int}, par::R)
+   function pari_vec{R <: Set{Pari}}(v::Ptr{Int}, par::R)
       r = new(gclone(v), PariVector{T}(par))
       finalizer(r, _pari_vec_unclone)
       return r
@@ -235,7 +235,7 @@ type PariIdealSet <: Set{Pari}
    end
 end
 
-type PariIdeal <: Set{Pari}
+type PariIdeal <: SetElem
    ideal::Ptr{Int}
    parent::PariIdealSet
 

@@ -18,7 +18,9 @@ abstract Ring{T} <: Set{T}
 
 abstract Field{T} <: Ring{T}
 
-abstract RingElem
+abstract SetElem
+
+abstract RingElem <: SetElem
 
 abstract FieldElem <: RingElem
 
