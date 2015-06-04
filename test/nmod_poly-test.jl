@@ -19,53 +19,53 @@ function test_nmod_poly_constructors()
   @test S != R
 
   @test isa(Rx, Ring)
-  @test isa(x, Nemo.nmod_poly)
+  @test isa(x, PolyElem)
 
   a = Rx()
 
-  @test isa(a, Nemo.nmod_poly)
+  @test isa(a, PolyElem)
   @test parent(a) == Rx
 
   b = Rx(2)
   
-  @test isa(b, Nemo.nmod_poly)
+  @test isa(b, PolyElem)
   @test parent(b) == Rx
 
   c = Rx(ZZ(3))
   
-  @test isa(c, Nemo.nmod_poly)
+  @test isa(c, PolyElem)
   @test parent(c) == Rx
 
   d = Rx(R(16))
 
-  @test isa(d, Nemo.nmod_poly)
+  @test isa(d, PolyElem)
   @test parent(d) == Rx
 
   e = Rx([UInt(1), UInt(2), UInt(3)])
 
-  @test isa(e, Nemo.nmod_poly)
+  @test isa(e, PolyElem)
   @test parent(e) == Rx
 
   f = Rx([ZZ(1), ZZ(2), ZZ(3)])
 
-  @test isa(d, Nemo.nmod_poly)
+  @test isa(d, PolyElem)
   @test parent(f) == Rx
 
   g = Rx([R(1), R(2), R(3)])
   
-  @test isa(g, Nemo.nmod_poly)
+  @test isa(g, PolyElem)
   @test parent(g) == Rx
 
   _a = PolynomialRing(ZZ, "y")[1]([ZZ(1),ZZ(2),ZZ(3)])
   
   h = Rx(_a)
 
-  @test isa(h, Nemo.nmod_poly)
+  @test isa(h, PolyElem)
   @test parent(h) == Rx
 
   i = x^2 + x^2 + x^2 + x^1 + x^1 + R(1) 
 
-  @test isa(i, Nemo.nmod_poly)
+  @test isa(i, PolyElem)
   @test parent(i) == Rx
 
   @test e == f

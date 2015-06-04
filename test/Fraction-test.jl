@@ -10,19 +10,19 @@ function test_fraction_constructors()
    S, x = PolynomialRing(ZZ, "x")
    T = FractionField(S)
 
-   @test isa(T(3), Fraction)
+   @test isa(T(3), FractionElem)
 
-   @test isa(T(ZZ(7)), Fraction)
+   @test isa(T(ZZ(7)), FractionElem)
 
-   @test isa(T(x + 2), Fraction)
+   @test isa(T(x + 2), FractionElem)
 
-   @test isa(T(T(x + 2)), Fraction)
+   @test isa(T(T(x + 2)), FractionElem)
 
-   @test isa(T(), Fraction)
+   @test isa(T(), FractionElem)
 
-   @test isa(ZZ(5)//ZZ(7), fmpq)
+   @test isa(ZZ(5)//ZZ(7), FractionElem)
 
-   @test isa((x + 3)//(x^2 + 2), Fraction)
+   @test isa((x + 3)//(x^2 + 2), FractionElem)
 
    println("PASS")
 end
@@ -171,7 +171,7 @@ function test_qq_constructors()
 
    @test isa(QQ, RationalField)
 
-   @test isa(QQ(2), fmpq)
+   @test isa(QQ(2), FractionElem)
 
    println("PASS")
 end

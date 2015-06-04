@@ -5,43 +5,43 @@ function test_poly_constructors()
 
    @test typeof(R) <: Nemo.FmpzPolyRing
 
-   @test isa(x, fmpz_poly)
+   @test isa(x, PolyElem)
 
    S, y = PolynomialRing(R, "y")
 
    @test typeof(S) <: Nemo.PolynomialRing
 
-   @test isa(y, Poly)
+   @test isa(y, PolyElem)
 
    T, z = PolynomialRing(S, "z")
 
    @test typeof(T) <: Nemo.PolynomialRing
 
-   @test isa(z, Poly)
+   @test isa(z, PolyElem)
 
    f = x^2 + y^3 + z + 1
 
-   @test isa(f, Poly)
+   @test isa(f, PolyElem)
 
    g = S(2)
 
-   @test isa(g, Poly)
+   @test isa(g, PolyElem)
 
    h = S(x^2 + 2x + 1)
 
-   @test isa(h, Poly)
+   @test isa(h, PolyElem)
 
    j = T(x + 2)
 
-   @test isa(j, Poly)
+   @test isa(j, PolyElem)
 
    k = S([x, x + 2, x^2 + 3x + 1])
 
-   @test isa(k, Poly)
+   @test isa(k, PolyElem)
 
    l = S(k)
 
-   @test isa(l, Poly)
+   @test isa(l, PolyElem)
 
    println("PASS")
 end

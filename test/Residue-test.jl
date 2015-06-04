@@ -7,19 +7,19 @@ function test_residue_constructors()
 
    a = R(123)
 
-   @test isa(a, Residue)
+   @test isa(a, ResidueElem)
 
    b = R(a)
 
-   @test isa(b, Residue)
+   @test isa(b, ResidueElem)
 
    c = R(ZZ(12))
 
-   @test isa(c, Residue)
+   @test isa(c, ResidueElem)
 
    d = R()
 
-   @test isa(d, Residue)
+   @test isa(d, ResidueElem)
 
    S, x = PolynomialRing(R, "x")
    T = ResidueRing(S, x^3 + 3x + 1)
@@ -28,7 +28,7 @@ function test_residue_constructors()
 
    f = T(x^4)
 
-   @test isa(f, Residue)
+   @test isa(f, ResidueElem)
 
    println("PASS")
 end
