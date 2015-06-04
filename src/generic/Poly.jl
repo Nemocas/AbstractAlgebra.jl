@@ -398,10 +398,10 @@ end
 #
 ###############################################################################
 
-==(x::PolyElem, y::Integer) = ((length(x) == 0 && y == 0)
+==(x::Poly, y::Integer) = ((length(x) == 0 && y == 0)
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-==(x::Integer, y::PolyElem) = y == x
+==(x::Integer, y::Poly) = y == x
 
 ###############################################################################
 #
@@ -616,7 +616,7 @@ end
 #
 ###############################################################################
 
-function divexact{T <: RingElem}(a::PolyElem{T}, b::T)
+function divexact{T <: RingElem}(a::Poly{T}, b::T)
    b == 0 && throw(DivideError())
    d = Array(T, length(a))
    for i = 1:length(a)
@@ -627,7 +627,7 @@ function divexact{T <: RingElem}(a::PolyElem{T}, b::T)
    return z
 end
 
-function divexact{T <: RingElem}(a::PolyElem{T}, b::Integer)
+function divexact{T <: RingElem}(a::Poly{T}, b::Integer)
    b == 0 && throw(DivideError())
    d = Array(T, length(a))
    for i = 1:length(a)

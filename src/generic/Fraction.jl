@@ -306,17 +306,17 @@ end
 #
 ###############################################################################
 
-function ==(x::FractionElem, y::Integer)
+function ==(x::Fraction, y::Integer)
    return (den(x) == 1 && num(x) == y) || (num(x) == den(x)*y)
 end
 
-==(x::Integer, y::FractionElem) = y == x
+==(x::Integer, y::Fraction) = y == x
 
-function =={T <: RingElem}(x::FractionElem{T}, y::T)
+function =={T <: RingElem}(x::Fraction{T}, y::T)
    return (den(x) == 1 && num(x) == y) || (num(x) == den(x)*y)
 end
 
-=={T <: RingElem}(x::T, y::FractionElem{T}) = y == x
+=={T <: RingElem}(x::T, y::Fraction{T}) = y == x
 
 
 ###############################################################################
@@ -355,7 +355,7 @@ end
 #
 ###############################################################################
 
-function divexact{T <: RingElem}(a::FractionElem{T}, b::Integer)
+function divexact{T <: RingElem}(a::Fraction{T}, b::Integer)
    b == 0 && throw(DivideError())
    c = base_ring(a)(b)
    g = gcd(num(a), c)
@@ -366,7 +366,7 @@ function divexact{T <: RingElem}(a::FractionElem{T}, b::Integer)
    return z
 end
 
-function divexact{T <: RingElem}(a::Integer, b::FractionElem{T})
+function divexact{T <: RingElem}(a::Integer, b::Fraction{T})
    b == 0 && throw(DivideError())
    c = base_ring(b)(a)
    g = gcd(num(b), c)
@@ -378,12 +378,12 @@ function divexact{T <: RingElem}(a::Integer, b::FractionElem{T})
 end
 
 # remove ambiguity
-divexact{T <: RingElem}(a::FractionElem{T}, b::Poly{T}) = error("Not supported")
+divexact{T <: RingElem}(a::Fraction{T}, b::Poly{T}) = error("Not supported")
 
 # remove ambiguity
-divexact{T <: RingElem}(a::Poly{T}, b::FractionElem{T}) = error("Not supported")
+divexact{T <: RingElem}(a::Poly{T}, b::Fraction{T}) = error("Not supported")
 
-function divexact{T <: RingElem}(a::FractionElem{T}, b::T)
+function divexact{T <: RingElem}(a::Fraction{T}, b::T)
    b == 0 && throw(DivideError())
    g = gcd(num(a), b)
    n = divexact(num(a), g)
@@ -393,7 +393,7 @@ function divexact{T <: RingElem}(a::FractionElem{T}, b::T)
    return z
 end
 
-function divexact{T <: RingElem}(a::T, b::FractionElem{T})
+function divexact{T <: RingElem}(a::T, b::Fraction{T})
    b == 0 && throw(DivideError())
    g = gcd(num(b), a)
    n = den(b)*divexact(a, g)
