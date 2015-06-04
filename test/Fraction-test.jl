@@ -110,7 +110,7 @@ function test_fraction_binary_ops()
 
    @test a//c == -ZZ(2)//49
 
-   @test gcd(b, (x + 1)//(x - 1)) == -1//(2*x^2-x-1)
+   @test gcd(b, (x + 1)//(x - 1)) == 1//(2*x^2-x-1)
 
    println("PASS")
 end

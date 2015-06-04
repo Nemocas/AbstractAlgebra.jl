@@ -21,17 +21,17 @@ function O{T}(a::PowerSeries{T})
    return z
 end
 
-parent(a::PowerSeriesElem) = a.parent
+parent(a::SeriesElem) = a.parent
 
 elem_type{T <: RingElem}(::PowerSeriesRing{T}) = PowerSeries{T}
 
 base_ring(R::PowerSeriesRing) = R.base_ring
 
-base_ring(a::PowerSeriesElem) = base_ring(parent(a))
+base_ring(a::SeriesElem) = base_ring(parent(a))
 
 var(a::PowerSeriesRing) = a.S
 
-function check_parent(a::PowerSeriesElem, b::PowerSeriesElem)
+function check_parent(a::SeriesElem, b::SeriesElem)
    parent(a) != parent(b) && 
              error("Incompatible power series rings in power series operation")
 end
@@ -42,7 +42,7 @@ end
 #
 ###############################################################################    
    
-function hash(a::PowerSeriesElem)
+function hash(a::SeriesElem)
    h = 0xb44d6896204881f3
    for i in 0:length(a) - 1
       h $= hash(coeff(a, i))
@@ -51,9 +51,9 @@ function hash(a::PowerSeriesElem)
    return h
 end
 
-length(x::PowerSeriesElem) = x.length
+length(x::SeriesElem) = x.length
 
-precision(x::PowerSeriesElem) = x.prec
+precision(x::SeriesElem) = x.prec
 
 max_precision(R::PowerSeriesRing) = R.prec_max
 
@@ -81,19 +81,19 @@ function gen{T}(R::PowerSeriesRing{T})
    return z
 end
 
-iszero(a::PowerSeriesElem) = length(a) == 0
+iszero(a::SeriesElem) = length(a) == 0
 
-function isone(a::PowerSeriesElem)
+function isone(a::SeriesElem)
    return length(a) == 1 && isone(coeff(a, 0))
 end
 
-function isgen(a::PowerSeriesElem)
+function isgen(a::SeriesElem)
    return length(a) == 2 && iszero(coeff(a, 0)) && isone(coeff(a, 1))
 end
 
-isunit(a::PowerSeriesElem) = isunit(coeff(a, 0))
+isunit(a::SeriesElem) = isunit(coeff(a, 0))
 
-function valuation(a::PowerSeriesElem)
+function valuation(a::SeriesElem)
    if length(a) == 0
       return precision(a)
    end
@@ -119,7 +119,7 @@ end
 #
 ###############################################################################
 
-function show{T <: RingElem}(io::IO, x::PowerSeries{T})
+function show{T <: RingElem}(io::IO, x::SeriesElem{T})
    len = length(x)
 
    if len == 0
@@ -167,7 +167,7 @@ function show{T <: RingElem}(io::IO, x::PowerSeries{T})
          end
       end
    end
-   print(io, "+O(", string(var(parent(x))), "^", x.prec, ")")
+   print(io, "+O(", string(var(parent(x))), "^", precision(x), ")")
 end
 
 function show{T <: RingElem}(io::IO, a::PowerSeriesRing{T})
@@ -175,11 +175,11 @@ function show{T <: RingElem}(io::IO, a::PowerSeriesRing{T})
    show(io, base_ring(a))
 end
 
-needs_parentheses(x::PowerSeriesElem) = length(x) > 1
+needs_parentheses(x::SeriesElem) = length(x) > 1
 
-is_negative(x::PowerSeriesElem) = length(x) <= 1 && is_negative(coeff(x, 0))
+is_negative(x::SeriesElem) = length(x) <= 1 && is_negative(coeff(x, 0))
 
-show_minus_one{T <: RingElem}(::Type{PowerSeries{T}}) = show_minus_one(T)
+show_minus_one{T <: RingElem}(::Type{SeriesElem{T}}) = show_minus_one(T)
 
 ###############################################################################
 #
@@ -193,7 +193,7 @@ function -{T <: RingElem}(a::PowerSeries{T})
    for i = 1:len
       d[i] = -coeff(a, i - 1)
    end
-   return parent(a)(d, len, a.prec)
+   return parent(a)(d, len, precision(a))
 end
 
 ###############################################################################
@@ -207,7 +207,7 @@ function +{T <: RingElem}(a::PowerSeries{T}, b::PowerSeries{T})
    lena = a.length
    lenb = b.length
          
-   prec = min(a.prec, b.prec)
+   prec = min(precision(a), precision(b))
  
    lena = min(lena, prec)
    lenb = min(lenb, prec)
@@ -243,7 +243,7 @@ function -{T <: RingElem}(a::PowerSeries{T}, b::PowerSeries{T})
    lena = length(a)
    lenb = length(b)
    
-   prec = min(a.prec, b.prec)
+   prec = min(precision(a), precision(b))
    
    lena = min(lena, prec)
    lenb = min(lenb, prec)
@@ -282,7 +282,7 @@ function *{T <: RingElem}(a::PowerSeries{T}, b::PowerSeries{T})
    aval = valuation(a)
    bval = valuation(b)
 
-   prec = min(a.prec + bval, b.prec + aval)
+   prec = min(precision(a) + bval, precision(b) + aval)
    
    lena = min(lena, prec)
    lenb = min(lenb, prec)
@@ -307,20 +307,328 @@ function *{T <: RingElem}(a::PowerSeries{T}, b::PowerSeries{T})
       end
    end
 
-   z = parent(a)(d, lenz, prec)
-
    for i = 1:lena - 1
       if lenz > i
          for j = 2:min(lenb, lenz - i + 1)
             mul!(t, coeff(a, i - 1), coeff(b, j - 1))
-            addeq!(z.coeffs[i + j - 1], t)
+            addeq!(d[i + j - 1], t)
          end
       end
    end
         
+   z = parent(a)(d, lenz, prec)
+
    z.length = normalise(z, lenz)
 
    return z
+end
+
+###############################################################################
+#
+#   Ad hoc binary operators
+#
+###############################################################################
+
+function *{T <: RingElem}(a::Int, b::PowerSeries{T})
+   len = length(b)
+   d = Array(T, len)
+   for i = 1:len
+      d[i] = a*coeff(b, i - 1)
+   end
+   z = parent(b)(d, len, precision(b))
+   z.length = normalise(z, len)
+   return z
+end
+
+function *{T <: RingElem}(a::fmpz, b::PowerSeries{T})
+   len = length(b)
+   d = Array(T, len)
+   for i = 1:len
+      d[i] = a*coeff(b, i - 1)
+   end
+   z = parent(b)(d, len, precision(b))
+   z.length = normalise(z, len)
+   return z
+end
+
+*(a::PowerSeries, b::Int) = b*a
+
+*(a::PowerSeries, b::fmpz) = b*a
+
+###############################################################################
+#
+#   Shifting
+#
+###############################################################################
+
+function shift_left{T <: RingElem}(x::SeriesElem{T}, len::Int)
+   len < 0 && throw(DomainError())
+   xlen = length(x)
+   if xlen == 0
+      return parent(x)(Array(T, 0), 0, precision(x) + len)
+   end
+   v = Array(T, xlen + len)
+   for i = 1:len
+      v[i] = zero(base_ring(x))
+   end
+   for i = 1:xlen
+      v[i + len] = coeff(x, i - 1)
+   end
+   return parent(x)(v, xlen + len, precision(x) + len)
+end
+
+function shift_right{T <: RingElem}(x::SeriesElem{T}, len::Int)
+   len < 0 && throw(DomainError())
+   xlen = length(x)
+   if len >= xlen
+      return parent(x)(Array(T, 0), 0, max(0, precision(x) - len))
+   end
+   v = Array(T, xlen - len)
+   for i = 1:xlen - len
+      v[i] = coeff(x, i + len - 1)
+   end
+   return parent(x)(v, xlen - len, precision(x) - len)
+end
+
+###############################################################################
+#
+#   Truncation
+#
+###############################################################################
+
+function truncate{T <: RingElem}(x::SeriesElem{T}, prec::Int)
+   prec < 0 && throw(DomainError())
+   len = length(x)
+   if precision(x) <= prec
+      return x
+   end
+   d = Array(T, prec)
+   for i = 1:min(prec, len)
+      d[i] = coeff(x, i - 1)
+   end
+   for i = len + 1:prec
+      d[i] = zero(base_ring(x))
+   end
+   z = parent(x)(d, prec, prec)
+   z.length = normalise(z, prec)
+   return z
+end
+
+###############################################################################
+#
+#   Powering
+#
+###############################################################################
+
+function ^{T <: RingElem}(a::SeriesElem{T}, b::Int)
+   b < 0 && throw(DomainError())
+   # special case powers of x for constructing power series efficiently
+   if isgen(a)
+      d = Array(T, b + 1)
+      d[b + 1] = coeff(a, 1)
+      for i = 1:b
+         d[i] = coeff(a, 0)
+      end
+      return parent(a)(d, b + 1, precision(a) + b - 1)
+   elseif length(a) == 0
+      return parent(a)(Array(T, 0), 0, precision(a) + (b - 1)*valuation(a))
+   elseif length(a) == 1
+      return parent(a)([coeff(a, 0)^b], 1, precision(a))
+   elseif b == 0
+      return parent(a)([one(base_ring(a))], 1, precision(a))
+   else
+      bit = ~((~UInt(0)) >> 1)
+      while (UInt(bit) & b) == 0
+         bit >>= 1
+      end
+      z = a
+      bit >>= 1
+      while bit !=0
+         z = z*z
+         if (UInt(bit) & b) != 0
+            z *= a
+         end
+         bit >>= 1
+      end
+      return z
+   end
+end
+
+###############################################################################
+#
+#   Comparison
+#
+###############################################################################
+
+function =={T <: RingElem}(x::SeriesElem{T}, y::SeriesElem{T})
+   check_parent(x, y)
+   prec = min(precision(x), precision(y))
+   
+   m1 = min(length(x), length(y))
+   m2 = max(length(x), length(y))
+   
+   m1 = min(m1, prec)
+   m2 = min(m2, prec)
+   if length(x) >= m2
+      for i = m1 + 1: m2
+         if coeff(x, i - 1) != 0
+            return false
+          end
+      end
+   else
+      for i = m1 + 1: m2
+         if coeff(y, i - 1) != 0
+            return false
+          end
+      end
+   end
+           
+   for i = 1:m1
+      if coeff(x, i - 1) != coeff(y, i - 1)
+         return false
+      end
+   end
+
+   return true
+end
+
+function isequal{T <: RingElem}(x::SeriesElem{T}, y::SeriesElem{T})
+   check_parent(x, y)
+   if precision(x) != precision(y) || length(x) != length(y)
+      return false
+   end
+   for i = 1:length(x)
+      if !isequal(coeff(x, i - 1), coeff(y, i - 1))
+         return false
+      end
+   end
+   return true
+end
+
+###############################################################################
+#
+#   Ad hoc comparison
+#
+###############################################################################
+
+==(x::PowerSeries, y::Int) = precision(x) == 0 || ((length(x) == 0 && y == 0)
+                                       || (length(x) == 1 && coeff(x, 0) == y))
+
+==(x::PowerSeries, y::fmpz) = precision(x) == 0 || ((length(x) == 0 && y == 0)
+                                       || (length(x) == 1 && coeff(x, 0) == y))
+
+==(x::Int, y::PowerSeries) = y == x
+
+==(x::fmpz, y::PowerSeries) = y == x
+
+###############################################################################
+#
+#   Exact division
+#
+###############################################################################
+
+function divexact{T <: RingElem}(x::SeriesElem{T}, y::SeriesElem{T})
+   check_parent(x, y)
+   y == 0 && throw(DivideError())
+   v2 = valuation(y)
+   if v2 != 0
+      v1 = valuation(x)
+      if v1 >= v2
+         x = shift_right(x, v2)
+         y = shift_right(y, v2)
+      end
+   end
+   y = truncate(y, precision(x))
+   return x*inv(y)
+end
+
+###############################################################################
+#
+#   Ad hoc exact division
+#
+###############################################################################
+
+function divexact{T <: RingElem}(x::PowerSeries{T}, y::Int)
+   y == 0 && throw(DivideError())
+   lenx = length(x)
+   d = Array(T, lenx)
+   for i = 1:lenx
+      d[i] = divexact(coeff(x, i - 1), y)
+   end
+   return parent(x)(d, lenx, precision(x))
+end
+
+function divexact{T <: RingElem}(x::PowerSeries{T}, y::fmpz)
+   y == 0 && throw(DivideError())
+   lenx = length(x)
+   d = Array(T, lenx)
+   for i = 1:lenx
+      d[i] = divexact(coeff(x, i - 1), y)
+   end
+   return parent(x)(d, lenx, precision(x))
+end
+
+function divexact{T <: RingElem}(x::PowerSeries{T}, y::T)
+   y == 0 && throw(DivideError())
+   lenx = length(x)
+   d = Array(T, lenx)
+   for i = 1:lenx
+      d[i] = divexact(coeff(x, i - 1), y)
+   end
+   return parent(x)(d, lenx, precision(x))
+end
+
+###############################################################################
+#
+#   Inversion
+#
+###############################################################################
+
+function inv{T <: RingElem}(a::SeriesElem{T})
+   a == 0 && throw(DivideError())
+   !isunit(a) && error("Unable to invert power series")
+   a1 = coeff(a, 0)
+   d = Array(T, precision(a))
+   if precision(a) != 0
+      d[1] = divexact(one(base_ring(a)), a1)
+   end
+   a1 = -a1
+   for n = 2:precision(a)
+      s = coeff(a, 1)*d[n - 1]
+      for i = 2:min(n, a.length) - 1
+         s += coeff(a, i)*d[n - i]
+      end
+      d[n] = divexact(s, a1)
+   end
+   ainv = parent(a)(d, precision(a), precision(a))
+   ainv.length = normalise(ainv, precision(a))
+   return ainv
+end
+
+###############################################################################
+#
+#   Special functions
+#
+###############################################################################
+
+function exp{T <: RingElem}(a::SeriesElem{T})
+   if a == 0
+      return parent(a)([one(base_ring(a))], 1, precision(a))
+   end
+   d = Array(T, precision(a))
+   d[0 + 1] = exp(coeff(a, 0))
+   len = length(a)
+   for k = 1 : precision(a) - 1
+      s = zero(base_ring(a))
+      for j = 1 : min(k + 1, len) - 1
+         s += j * coeff(a, j) * d[k - j + 1]
+      end
+      !isunit(base_ring(a)(k)) && error("Unable to divide in exp")
+      d[k + 1] = divexact(s, k)
+   end
+   b = parent(a)(d, precision(a), precision(a))
+   b.length = normalise(b, precision(a))
+   return b
 end
 
 ###############################################################################
@@ -343,7 +651,7 @@ function fit!{T <: RingElem}(c::PowerSeries{T}, n::Int)
 end
 
 function setcoeff!{T <: RingElem}(c::PowerSeries{T}, n::Int, a::T)
-   if (a != 0 && c.prec > n) || n + 1 <= c.length
+   if (a != 0 && precision(c) > n) || n + 1 <= c.length
       fit!(c, n + 1)
       c.coeffs[n + 1] = a
       c.length = max(length(c), n + 1)
@@ -358,7 +666,7 @@ function mul!{T <: RingElem}(c::PowerSeries{T}, a::PowerSeries{T}, b::PowerSerie
    aval = valuation(a)
    bval = valuation(b)
 
-   prec = min(a.prec + bval, b.prec + aval)
+   prec = min(precision(a) + bval, precision(b) + aval)
    
    lena = min(lena, prec)
    lenb = min(lenb, prec)
@@ -399,7 +707,7 @@ function addeq!{T <: RingElem}(c::PowerSeries{T}, a::PowerSeries{T})
    lenc = length(c)
    lena = length(a)
    
-   prec = min(a.prec, c.prec)
+   prec = min(precision(a), precision(c))
    
    lena = min(lena, prec)
    lenc = min(lenc, prec)
@@ -411,314 +719,6 @@ function addeq!{T <: RingElem}(c::PowerSeries{T}, a::PowerSeries{T})
    end
    c.length = normalise(c, len)
    c.prec = prec
-end
-
-###############################################################################
-#
-#   Ad hoc binary operators
-#
-###############################################################################
-
-function *{T <: RingElem}(a::Int, b::PowerSeries{T})
-   len = length(b)
-   d = Array(T, len)
-   for i = 1:len
-      d[i] = a*coeff(b, i - 1)
-   end
-   z = parent(b)(d, len, b.prec)
-   z.length = normalise(z, len)
-   return z
-end
-
-function *{T <: RingElem}(a::fmpz, b::PowerSeries{T})
-   len = length(b)
-   d = Array(T, len)
-   for i = 1:len
-      d[i] = a*coeff(b, i - 1)
-   end
-   z = parent(b)(d, len, b.prec)
-   z.length = normalise(z, len)
-   return z
-end
-
-*(a::PowerSeriesElem, b::Int) = b*a
-
-*(a::PowerSeriesElem, b::fmpz) = b*a
-
-###############################################################################
-#
-#   Shifting
-#
-###############################################################################
-
-function shift_left{T <: RingElem}(x::PowerSeries{T}, len::Int)
-   len < 0 && throw(DomainError())
-   xlen = length(x)
-   if xlen == 0
-      return parent(x)(Array(T, 0), 0, x.prec + len)
-   end
-   v = Array(T, xlen + len)
-   for i = 1:len
-      v[i] = zero(base_ring(x))
-   end
-   for i = 1:xlen
-      v[i + len] = coeff(x, i - 1)
-   end
-   return parent(x)(v, xlen + len, x.prec + len)
-end
-
-function shift_right{T <: RingElem}(x::PowerSeries{T}, len::Int)
-   len < 0 && throw(DomainError())
-   xlen = length(x)
-   if len >= xlen
-      return parent(x)(Array(T, 0), 0, max(0, x.prec - len))
-   end
-   v = Array(T, xlen - len)
-   for i = 1:xlen - len
-      v[i] = coeff(x, i + len - 1)
-   end
-   return parent(x)(v, xlen - len, x.prec - len)
-end
-
-###############################################################################
-#
-#   Truncation
-#
-###############################################################################
-
-function truncate{T <: RingElem}(x::PowerSeries{T}, prec::Int)
-   prec < 0 && throw(DomainError())
-   len = length(x)
-   if x.prec <= prec
-      return x
-   end
-   d = Array(T, prec)
-   for i = 1:min(prec, len)
-      d[i] = coeff(x, i - 1)
-   end
-   for i = len + 1:prec
-      d[i] = zero(base_ring(x))
-   end
-   z = parent(x)(d, prec, prec)
-   z.length = normalise(z, prec)
-   return z
-end
-
-###############################################################################
-#
-#   Powering
-#
-###############################################################################
-
-function ^{T <: RingElem}(a::PowerSeries{T}, b::Int)
-   b < 0 && throw(DomainError())
-   # special case powers of x for constructing power series efficiently
-   if isgen(a)
-      d = Array(T, b + 1)
-      d[b + 1] = coeff(a, 1)
-      for i = 1:b
-         d[i] = coeff(a, 0)
-      end
-      return parent(a)(d, b + 1, a.prec + b - 1)
-   elseif length(a) == 0
-      return parent(a)(Array(T, 0), 0, a.prec + (b - 1)*valuation(a))
-   elseif length(a) == 1
-      return parent(a)([a.coeffs[1]^b], 1, a.prec)
-   elseif b == 0
-      return parent(a)([one(base_ring(a))], 1, a.prec)
-   else
-      bit = ~((~UInt(0)) >> 1)
-      while (UInt(bit) & b) == 0
-         bit >>= 1
-      end
-      z = a
-      bit >>= 1
-      while bit !=0
-         z = z*z
-         if (UInt(bit) & b) != 0
-            z *= a
-         end
-         bit >>= 1
-      end
-      return z
-   end
-end
-
-###############################################################################
-#
-#   Comparison
-#
-###############################################################################
-
-function =={T <: RingElem}(x::PowerSeries{T}, y::PowerSeries{T})
-   check_parent(x, y)
-   prec = min(x.prec, y.prec)
-   
-   m1 = min(length(x), length(y))
-   m2 = max(length(x), length(y))
-   
-   m1 = min(m1, prec)
-   m2 = min(m2, prec)
-   if length(x) >= m2
-      for i = m1 + 1: m2
-         if coeff(x, i - 1) != 0
-            return false
-          end
-      end
-   else
-      for i = m1 + 1: m2
-         if coeff(y, i - 1) != 0
-            return false
-          end
-      end
-   end
-           
-   for i = 1:m1
-      if coeff(x, i - 1) != coeff(y, i - 1)
-         return false
-      end
-   end
-
-   return true
-end
-
-function isequal{T <: RingElem}(x::PowerSeries{T}, y::PowerSeries{T})
-   check_parent(x, y)
-   if x.prec != y.prec || length(x) != length(y)
-      return false
-   end
-   for i = 1:length(x)
-      if !isequal(coeff(x, i - 1), coeff(y, i - 1))
-         return false
-      end
-   end
-   return true
-end
-
-###############################################################################
-#
-#   Ad hoc comparison
-#
-###############################################################################
-
-==(x::PowerSeriesElem, y::Int) = x.prec == 0 || ((length(x) == 0 && y == 0)
-                                       || (length(x) == 1 && coeff(x, 0) == y))
-
-==(x::PowerSeriesElem, y::fmpz) = x.prec == 0 || ((length(x) == 0 && y == 0)
-                                       || (length(x) == 1 && coeff(x, 0) == y))
-
-==(x::Int, y::PowerSeriesElem) = y == x
-
-==(x::fmpz, y::PowerSeriesElem) = y == x
-
-###############################################################################
-#
-#   Exact division
-#
-###############################################################################
-
-function divexact{T <: RingElem}(x::PowerSeries{T}, y::PowerSeries{T})
-   check_parent(x, y)
-   y == 0 && throw(DivideError())
-   v2 = valuation(y)
-   if v2 != 0
-      v1 = valuation(x)
-      if v1 >= v2
-         x = shift_right(x, v2)
-         y = shift_right(y, v2)
-      end
-   end
-   y = truncate(y, x.prec)
-   return x*inv(y)
-end
-
-###############################################################################
-#
-#   Ad hoc exact division
-#
-###############################################################################
-
-function divexact{T <: RingElem}(x::PowerSeries{T}, y::Int)
-   y == 0 && throw(DivideError())
-   lenx = length(x)
-   d = Array(T, lenx)
-   for i = 1:lenx
-      d[i] = divexact(coeff(x, i - 1), y)
-   end
-   return parent(x)(d, lenx, x.prec)
-end
-
-function divexact{T <: RingElem}(x::PowerSeries{T}, y::fmpz)
-   y == 0 && throw(DivideError())
-   lenx = length(x)
-   d = Array(T, lenx)
-   for i = 1:lenx
-      d[i] = divexact(coeff(x, i - 1), y)
-   end
-   return parent(x)(d, lenx, x.prec)
-end
-
-function divexact{T <: RingElem}(x::PowerSeries{T}, y::T)
-   y == 0 && throw(DivideError())
-   lenx = length(x)
-   d = Array(T, lenx)
-   for i = 1:lenx
-      d[i] = divexact(coeff(x, i - 1), y)
-   end
-   return parent(x)(d, lenx, x.prec)
-end
-
-###############################################################################
-#
-#   Inversion
-#
-###############################################################################
-
-function inv{T <: RingElem}(a::PowerSeries{T})
-   a == 0 && throw(DivideError())
-   !isunit(a) && error("Unable to invert power series")
-   a1 = coeff(a, 0)
-   d = Array(T, a.prec)
-   if a.prec != 0
-      d[1] = divexact(one(base_ring(a)), a1)
-   end
-   a1 = -a1
-   for n = 2:a.prec
-      s = coeff(a, 1)*d[n - 1]
-      for i = 2:min(n, a.length) - 1
-         s += coeff(a, i)*d[n - i]
-      end
-      d[n] = divexact(s, a1)
-   end
-   ainv = parent(a)(d, a.prec, a.prec)
-   ainv.length = normalise(ainv, a.prec)
-   return ainv
-end
-
-###############################################################################
-#
-#   Special functions
-#
-###############################################################################
-
-function exp{T <: RingElem}(a::PowerSeries{T})
-   if a == 0
-      return parent(a)([one(base_ring(a))], 1, a.prec)
-   end
-   d = Array(T, a.prec)
-   d[0 + 1] = exp(coeff(a, 0))
-   len = length(a)
-   for k = 1 : a.prec - 1
-      s = zero(base_ring(a))
-      for j = 1 : min(k + 1, len) - 1
-         s += j * coeff(a, j) * d[k - j + 1]
-      end
-      !isunit(base_ring(a)(k)) && error("Unable to divide in exp")
-      d[k + 1] = divexact(s, k)
-   end
-   b = parent(a)(d, a.prec, a.prec)
-   b.length = normalise(b, a.prec)
-   return b
 end
 
 ###############################################################################

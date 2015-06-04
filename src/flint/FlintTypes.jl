@@ -54,7 +54,7 @@ end
 type RationalField <: Field{Flint}
 end
 
-type fmpq <: FieldElem
+type fmpq <: FractionElem{fmpz}
    num::Int
    den::Int
 
@@ -809,7 +809,7 @@ type FmpzSeriesRing <: Ring{Flint}
    end
 end
 
-type fmpz_series <: PowerSeriesElem
+type fmpz_series <: SeriesElem{fmpz}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -873,7 +873,7 @@ type FmpqSeriesRing <: Ring{Flint}
    end
 end
 
-type fmpq_series <: PowerSeriesElem
+type fmpq_series <: SeriesElem{fmpq}
    coeffs::Ptr{Void}
    den::Int
    alloc::Int
@@ -938,7 +938,7 @@ type FmpzModSeriesRing <: Ring{Flint}
    end
 end
 
-type fmpz_mod_series <: PowerSeriesElem
+type fmpz_mod_series <: SeriesElem{Residue{fmpz}}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -1005,7 +1005,7 @@ type FqSeriesRing <: Ring{Flint}
    end
 end
 
-type fq_series <: PowerSeriesElem
+type fq_series <: SeriesElem{fq}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -1073,7 +1073,7 @@ type FqNmodSeriesRing <: Ring{Flint}
    end
 end
 
-type fq_nmod_series <: PowerSeriesElem
+type fq_nmod_series <: SeriesElem{fq_nmod}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int

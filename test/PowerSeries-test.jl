@@ -8,17 +8,17 @@ function test_series_constructors()
    a = x^3 + 2x + 1
    b = x^2 + 3x + O(x^4)
 
-   @test isa(R(a), PowerSeriesElem)
+   @test isa(R(a), SeriesElem)
 
-   @test isa(R([ZZ(1), ZZ(2), ZZ(3)], 3, 5), PowerSeriesElem)
+   @test isa(R([ZZ(1), ZZ(2), ZZ(3)], 3, 5), SeriesElem)
 
-   @test isa(R([ZZ(1), ZZ(2), ZZ(3)], 3, 3), PowerSeriesElem)
+   @test isa(R([ZZ(1), ZZ(2), ZZ(3)], 3, 3), SeriesElem)
 
-   @test isa(R(1), PowerSeriesElem)
+   @test isa(R(1), SeriesElem)
 
-   @test isa(R(ZZ(2)), PowerSeriesElem)
+   @test isa(R(ZZ(2)), SeriesElem)
 
-   @test isa(R(), PowerSeriesElem)
+   @test isa(R(), SeriesElem)
 
    println("PASS")
 end

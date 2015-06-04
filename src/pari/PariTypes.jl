@@ -37,7 +37,7 @@ end
 type PariRationalField <: Field{Pari}
 end
 
-type pari_rat <: RingElem
+type pari_rat <: FractionElem
    d::Ptr{Int}
 
    function pari_rat(s::Int)

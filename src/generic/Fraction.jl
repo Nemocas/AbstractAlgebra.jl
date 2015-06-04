@@ -16,11 +16,11 @@ elem_type{T <: RingElem}(::FractionField{T}) = Fraction{T}
 
 base_ring(a::FractionField) = a.base_ring
 
-base_ring(a::Fraction) = base_ring(parent(a))
+base_ring(a::FractionElem) = base_ring(parent(a))
 
-parent(a::Fraction) = a.parent
+parent(a::FractionElem) = a.parent
 
-function check_parent(a::Fraction, b::Fraction)
+function check_parent(a::FractionElem, b::FractionElem)
    parent(a) != parent(b) && error("Incompatible rings in fraction field operation")
 end
 
@@ -59,9 +59,9 @@ end
 #
 ###############################################################################
 
-function hash(a::Fraction)
+function hash(a::FractionElem)
    h = 0x8a30b0d963237dd5
-   return h $ hash(a.num) $ hash(a.den)
+   return h $ hash(num(a)) $ hash(den(a))
 end
 
 function num(a::Fraction)
@@ -78,11 +78,11 @@ zero(a::FractionField) = parent(a)(0)
 
 one(a::FractionField) = parent(a)(1)
 
-iszero(a::Fraction) = iszero(num(a))
+iszero(a::FractionElem) = iszero(num(a))
 
-isone(a::Fraction) = num(a) == den(a)
+isone(a::FractionElem) = num(a) == den(a)
 
-isunit(a::Fraction) = num(a) != 0
+isunit(a::FractionElem) = num(a) != 0
 
 function deepcopy{T <: RingElem}(a::Fraction{T})
    v = Fraction{T}(deepcopy(num(a)), deepcopy(den(a)))
@@ -96,7 +96,7 @@ end
 #
 ###############################################################################
 
-canonical_unit(a::Fraction) = a
+canonical_unit(a::FractionElem) = a
 
 ###############################################################################
 #
@@ -104,24 +104,24 @@ canonical_unit(a::Fraction) = a
 #
 ###############################################################################
 
-function show(io::IO, x::Fraction)
-   u = canonical_unit(x.den)
-   num = divexact(x.num, u)
-   den = divexact(x.den, u);
-   if den != 1 && needs_parentheses(num)
+function show(io::IO, x::FractionElem)
+   u = canonical_unit(den(x))
+   n = divexact(num(x), u)
+   d = divexact(den(x), u);
+   if d != 1 && needs_parentheses(n)
       print(io, "(")
    end
-   print(io, num)
+   print(io, n)
    if den != 1
-      if needs_parentheses(num)
+      if needs_parentheses(n)
          print(io, ")")
       end
       print(io, "//")
-      if needs_parentheses(den)
+      if needs_parentheses(d)
          print(io, "(")
       end
-      print(io, den)
-      if needs_parentheses(den)
+      print(io, d)
+      if needs_parentheses(d)
          print(io, ")")
       end
    end
@@ -131,11 +131,11 @@ function show(io::IO, a::FractionField)
    print(io, "Fraction field of ", base_ring(a))
 end
 
-needs_parentheses(x::Fraction) = x.den == 1 && needs_parentheses(x.num)
+needs_parentheses(x::FractionElem) = den(x) == 1 && needs_parentheses(num(x))
 
-is_negative(x::Fraction) = !needs_parentheses(x.num) && is_negative(x.num)
+is_negative(x::FractionElem) = !needs_parentheses(num(x)) && is_negative(num(x))
 
-show_minus_one{T <: RingElem}(::Type{Fraction{T}}) = show_minus_one(T)
+show_minus_one{T <: RingElem}(::Type{FractionElem{T}}) = show_minus_one(T)
 
 ###############################################################################
 #
@@ -144,7 +144,7 @@ show_minus_one{T <: RingElem}(::Type{Fraction{T}}) = show_minus_one(T)
 ###############################################################################
 
 function -{T <: RingElem}(a::Fraction{T})
-   z = Fraction{T}(-a.num, a.den)
+   z = Fraction{T}(-num(a), den(a))
    z.parent = parent(a)
    return z
 end
@@ -157,31 +157,31 @@ end
 
 function +{T <: RingElem}(a::Fraction{T}, b::Fraction{T})
    check_parent(a, b)
-   num = a.num*b.den + b.num*a.den
-   den = a.den*b.den
-   g = gcd(num, den)
-   z = Fraction{T}(divexact(num, g), divexact(den, g))
+   n = num(a)*den(b) + num(b)*den(a)
+   d = den(a)*den(b)
+   g = gcd(n, d)
+   z = Fraction{T}(divexact(n, g), divexact(d, g))
    z.parent = parent(a)
    return z
 end
 
 function -{T <: RingElem}(a::Fraction{T}, b::Fraction{T})
    check_parent(a, b)
-   num = a.num*b.den - b.num*a.den
-   den = a.den*b.den
-   g = gcd(num, den)
-   z = Fraction{T}(divexact(num, g), divexact(den, g))
+   n = num(a)*den(b) - num(b)*den(a)
+   d = den(a)*den(b)
+   g = gcd(n, d)
+   z = Fraction{T}(divexact(n, g), divexact(d, g))
    z.parent = parent(a)
    return z
 end
 
 function *{T <: RingElem}(a::Fraction{T}, b::Fraction{T})
    check_parent(a, b)
-   g1 = gcd(a.num, b.den)
-   g2 = gcd(b.num, a.den)
-   num = divexact(a.num, g1)*divexact(b.num, g2)
-   den = divexact(a.den, g2)*divexact(b.den, g1)
-   z = Fraction{T}(num, den)
+   g1 = gcd(num(a), den(b))
+   g2 = gcd(num(b), den(a))
+   n = divexact(num(a), g1)*divexact(num(b), g2)
+   d = divexact(den(a), g2)*divexact(den(b), g1)
+   z = Fraction{T}(n, d)
    z.parent = parent(a)
    return z
 end
@@ -194,57 +194,57 @@ end
 
 function *{T <: RingElem}(a::Fraction{T}, b::Integer)
    c = base_ring(a)(b)
-   g = gcd(a.den, c)
-   num = a.num*divexact(c, g)
-   den = divexact(a.den, g)
-   z = Fraction{T}(num, den)
+   g = gcd(den(a), c)
+   n = num(a)*divexact(c, g)
+   d = divexact(den(a), g)
+   z = Fraction{T}(n, d)
    z.parent = parent(a)
    return z
 end
 
 function *{T <: RingElem}(a::Integer, b::Fraction{T})
    c = base_ring(b)(a)
-   g = gcd(b.den, c)
-   num = b.num*divexact(c, g)
-   den = divexact(b.den, g)
-   z = Fraction{T}(num, den)
+   g = gcd(den(b), c)
+   n = num(b)*divexact(c, g)
+   d = divexact(den(b), g)
+   z = Fraction{T}(n, d)
    z.parent = parent(b)
    return z
 end
 
 function *{T <: RingElem}(a::Fraction{T}, b::T)
-   g = gcd(a.den, b)
-   num = a.num*divexact(b, g)
-   den = divexact(a.den, g)
-   z = Fraction{T}(num, den)
+   g = gcd(den(a), b)
+   n = num(a)*divexact(b, g)
+   d = divexact(den(a), g)
+   z = Fraction{T}(n, d)
    z.parent = parent(a)
    return z
 
 end
 
 function *{T <: RingElem}(a::T, b::Fraction{T})
-   g = gcd(b.den, a)
-   num = b.num*divexact(a, g)
-   den = divexact(b.den, g)
-   z = Fraction{T}(num, den)
+   g = gcd(den(b), a)
+   n = num(b)*divexact(a, g)
+   d = divexact(den(b), g)
+   z = Fraction{T}(n, d)
    z.parent = parent(b)
    return z
 end
 
 function +{T <: RingElem}(a::Fraction{T}, b::Integer)
-   num = a.num + a.den*b
-   den = a.den
-   g = gcd(num, den)
-   z = Fraction{T}(divexact(num, g), divexact(den, g))
+   n = num(a) + den(a)*b
+   d = den(a)
+   g = gcd(n, d)
+   z = Fraction{T}(divexact(n, g), divexact(d, g))
    z.parent = parent(a)
    return z
 end
 
 function -{T <: RingElem}(a::Fraction{T}, b::Integer)
-   num = a.num - a.den*b
-   den = a.den
-   g = gcd(num, den)
-   z = Fraction{T}(divexact(num, g), divexact(den, g))
+   n = num(a) - den(a)*b
+   d = den(a)
+   g = gcd(n, d)
+   z = Fraction{T}(divexact(n, g), divexact(d, g))
    z.parent = parent(a)
    return z
 end
@@ -252,28 +252,28 @@ end
 +{T <: RingElem}(a::Integer, b::Fraction{T}) = b + a
 
 function -{T <: RingElem}(a::Integer, b::Fraction{T})
-   num = a*b.den - b.num
-   den = b.den
-   g = gcd(num, den)
-   z = Fraction{T}(divexact(num, g), divexact(den, g))
+   n = a*den(b) - num(b)
+   d = den(b)
+   g = gcd(n, d)
+   z = Fraction{T}(divexact(n, g), divexact(d, g))
    z.parent = parent(b)
    return z
 end
 
 function +{T <: RingElem}(a::Fraction{T}, b::T)
-   num = a.num + a.den*b
-   den = a.den
-   g = gcd(num, den)
-   z = Fraction{T}(divexact(num, g), divexact(den, g))
+   n = num(a) + den(a)*b
+   d = den(a)
+   g = gcd(n, d)
+   z = Fraction{T}(divexact(n, g), divexact(d, g))
    z.parent = parent(a)
    return z
 end
 
 function -{T <: RingElem}(a::Fraction{T}, b::T)
-   num = a.num - a.den*b
-   den = a.den
-   g = gcd(num, den)
-   z = Fraction{T}(divexact(num, g), divexact(den, g))
+   n = num(a) - den(a)*b
+   d = den(a)
+   g = gcd(n, d)
+   z = Fraction{T}(divexact(n, g), divexact(d, g))
    z.parent = parent(a)
    return z
 end
@@ -281,10 +281,10 @@ end
 +{T <: RingElem}(a::T, b::Fraction{T}) = b + a
 
 function -{T <: RingElem}(a::T, b::Fraction{T})
-   num = a*b.den - b.num
-   den = b.den
-   g = gcd(num, den)
-   z = Fraction{T}(divexact(num, g), divexact(den, g))
+   n = a*den(b) - num(b)
+   d = den(b)
+   g = gcd(n, d)
+   z = Fraction{T}(divexact(n, g), divexact(d, g))
    z.parent = parent(b)
    return z
 end
@@ -295,9 +295,9 @@ end
 #
 ###############################################################################
 
-function =={T <: RingElem}(x::Fraction{T}, y::Fraction{T})
+function =={T <: RingElem}(x::FractionElem{T}, y::FractionElem{T})
    check_parent(x, y)
-   return (x.den == y.den && x.num == y.num) || (x.num*y.den == x.den*y.num)
+   return (den(x) == den(y) && num(x) == num(y)) || (num(x)*den(y) == den(x)*num(y))
 end
 
 ###############################################################################
@@ -306,17 +306,17 @@ end
 #
 ###############################################################################
 
-function ==(x::Fraction, y::Integer)
-   return (x.den == 1 && x.num == y) || (x.num == x.den*y)
+function ==(x::FractionElem, y::Integer)
+   return (den(x) == 1 && num(x) == y) || (num(x) == den(x)*y)
 end
 
-==(x::Integer, y::Fraction) = y == x
+==(x::Integer, y::FractionElem) = y == x
 
-function =={T <: RingElem}(x::Fraction{T}, y::T)
-   return (x.den == 1 && x.num == y) || (x.num == x.den*y)
+function =={T <: RingElem}(x::FractionElem{T}, y::T)
+   return (den(x) == 1 && num(x) == y) || (num(x) == den(x)*y)
 end
 
-=={T <: RingElem}(x::T, y::Fraction{T}) = y == x
+=={T <: RingElem}(x::T, y::FractionElem{T}) = y == x
 
 
 ###############################################################################
@@ -325,9 +325,9 @@ end
 #
 ###############################################################################
 
-function inv{T <: RingElem}(a::Fraction{T})
-   a.num == 0 && throw(DivideError())
-   z = Fraction{T}(a.den, a.num)
+function inv{T <: RingElem}(a::FractionElem{T})
+   num(a) == 0 && throw(DivideError())
+   z = Fraction{T}(den(a), num(a))
    z.parent = parent(a)
    return z
 end
@@ -338,13 +338,13 @@ end
 #
 ###############################################################################
 
-function divexact{T <: RingElem}(a::Fraction{T}, b::Fraction{T})
+function divexact{T <: RingElem}(a::FractionElem{T}, b::FractionElem{T})
    check_parent(a, b)
-   g1 = gcd(a.num, b.num)
-   g2 = gcd(b.den, a.den)
-   num = divexact(a.num, g1)*divexact(b.den, g2)
-   den = divexact(a.den, g2)*divexact(b.num, g1)
-   z = Fraction{T}(num, den)
+   g1 = gcd(num(a), num(b))
+   g2 = gcd(den(b), den(a))
+   n = divexact(num(a), g1)*divexact(den(b), g2)
+   d = divexact(den(a), g2)*divexact(num(b), g1)
+   z = Fraction{T}(n, d)
    z.parent = parent(a)
    return z
 end
@@ -355,50 +355,50 @@ end
 #
 ###############################################################################
 
-function divexact{T <: RingElem}(a::Fraction{T}, b::Integer)
+function divexact{T <: RingElem}(a::FractionElem{T}, b::Integer)
    b == 0 && throw(DivideError())
    c = base_ring(a)(b)
-   g = gcd(a.num, c)
-   num = divexact(a.num, g)
-   den = a.den*divexact(c, g)
-   z = Fraction{T}(num, den)
+   g = gcd(num(a), c)
+   n = divexact(num(a), g)
+   d = den(a)*divexact(c, g)
+   z = Fraction{T}(n, d)
    z.parent = parent(a)
    return z
 end
 
-function divexact{T <: RingElem}(a::Integer, b::Fraction{T})
+function divexact{T <: RingElem}(a::Integer, b::FractionElem{T})
    b == 0 && throw(DivideError())
    c = base_ring(b)(a)
-   g = gcd(b.num, c)
-   num = b.den*divexact(c, g)
-   den = divexact(b.num, g)
-   z = Fraction{T}(num, den)
+   g = gcd(num(b), c)
+   n = den(b)*divexact(c, g)
+   d = divexact(num(b), g)
+   z = Fraction{T}(n, d)
    z.parent = parent(b)
    return z
 end
 
 # remove ambiguity
-divexact{T <: RingElem}(a::Fraction{T}, b::Poly{T}) = error("Not supported")
+divexact{T <: RingElem}(a::FractionElem{T}, b::Poly{T}) = error("Not supported")
 
 # remove ambiguity
-divexact{T <: RingElem}(a::Poly{T}, b::Fraction{T}) = error("Not supported")
+divexact{T <: RingElem}(a::Poly{T}, b::FractionElem{T}) = error("Not supported")
 
-function divexact{T <: RingElem}(a::Fraction{T}, b::T)
+function divexact{T <: RingElem}(a::FractionElem{T}, b::T)
    b == 0 && throw(DivideError())
-   g = gcd(a.num, b)
-   num = divexact(a.num, g)
-   den = a.den*divexact(b, g)
-   z = Fraction{T}(num, den)
+   g = gcd(num(a), b)
+   n = divexact(num(a), g)
+   d = den(a)*divexact(b, g)
+   z = Fraction{T}(n, d)
    z.parent = parent(a)
    return z
 end
 
-function divexact{T <: RingElem}(a::T, b::Fraction{T})
+function divexact{T <: RingElem}(a::T, b::FractionElem{T})
    b == 0 && throw(DivideError())
-   g = gcd(b.num, a)
-   num = b.den*divexact(a, g)
-   den = divexact(b.num, g)
-   z = Fraction{T}(num, den)
+   g = gcd(num(b), a)
+   n = den(b)*divexact(a, g)
+   d = divexact(num(b), g)
+   z = Fraction{T}(n, d)
    z.parent = parent(b)
    return z
 end
@@ -409,12 +409,12 @@ end
 #
 ###############################################################################
 
-function ^{T <: RingElem}(a::Fraction{T}, b::Int)
+function ^{T <: RingElem}(a::FractionElem{T}, b::Int)
    if b < 0
       a = inv(a)
       b = -b
    end
-   z = Fraction{T}(a.num^b, a.den^b)
+   z = Fraction{T}(num(a)^b, den(a)^b)
    z.parent = parent(a)
    return z
 end
@@ -425,12 +425,12 @@ end
 #
 ###############################################################################
 
-function gcd{T <: RingElem}(a::Fraction{T}, b::Fraction{T})
+function gcd{T <: RingElem}(a::FractionElem{T}, b::FractionElem{T})
    check_parent(a, b)
-   num = gcd(a.num*b.den, a.den*b.num)
-   den = a.den*b.den
-   g = gcd(num, den)
-   z = Fraction{T}(divexact(num, g), divexact(den, g))
+   n = gcd(num(a)*den(b), den(a)*num(b))
+   d = den(a)*den(b)
+   g = gcd(n, d)
+   z = Fraction{T}(divexact(n, g), divexact(d, g))
    z.parent = parent(a)
    return z
 end
@@ -442,18 +442,18 @@ end
 ###############################################################################
 
 function mul!{T <: RingElem}(c::Fraction{T}, a::Fraction{T}, b::Fraction{T})
-   g1 = gcd(a.num, b.den)
-   g2 = gcd(b.num, a.den)
-   c.num = divexact(a.num, g1)*divexact(b.num, g2)
-   c.den = divexact(a.den, g2)*divexact(b.den, g1)
+   g1 = gcd(num(a), den(b))
+   g2 = gcd(num(b), den(a))
+   c.num = divexact(num(a), g1)*divexact(num(b), g2)
+   c.den = divexact(den(a), g2)*divexact(den(b), g1)
 end
 
 function addeq!{T <: RingElem}(c::Fraction{T}, a::Fraction{T})
-   num = c.num*a.den + a.num*c.den
-   den = c.den*a.den
-   g = gcd(num, den)
-   c.num = divexact(num, g)
-   c.den = divexact(den, g)
+   n = c.num*den(a) + num(a)*c.den
+   d = c.den*den(a)
+   g = gcd(n, d)
+   c.num = divexact(n, g)
+   c.den = divexact(d, g)
 end
 
 ###############################################################################

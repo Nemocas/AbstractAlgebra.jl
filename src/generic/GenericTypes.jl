@@ -87,7 +87,7 @@ type PowerSeriesRing{T <: RingElem} <: Ring{Generic}
    end
 end
 
-type PowerSeries{T <: RingElem} <: PowerSeriesElem
+type PowerSeries{T <: RingElem} <: SeriesElem{T}
    coeffs::Array{T, 1}
    length::Int
    prec::Int
@@ -117,7 +117,7 @@ type FractionField{T <:RingElem} <: Field{Generic}
    end
 end
 
-type Fraction{T <: RingElem} <: FieldElem
+type Fraction{T <: RingElem} <: FractionElem{T}
    num::T
    den::T
    parent::FractionField{T}

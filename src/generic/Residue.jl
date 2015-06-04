@@ -143,7 +143,7 @@ end
 #
 ###############################################################################
 
-function ^{T <: RingElem}(a::Residue{T}, b::Int)
+function ^{T <: RingElem}(a::ResidueElem{T}, b::Int)
    parent(a)(powmod(data(a), b, modulus(a)))
 end
 

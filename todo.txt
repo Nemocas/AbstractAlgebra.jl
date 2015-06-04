@@ -92,6 +92,10 @@ Poly.jl/fmpz_poly.jl
 
 * implement fmpz_mod_poly_get_str_pretty and use it in show
 
+* Use set_length in Poly.jl instead of setting poly length field directly,
+  otherwise generic functions can't act as catchall for poly types that don't
+  have a length field
+
 ZZ.jl
 -----
 
@@ -158,6 +162,10 @@ can still be performed
 * ensure exp is only defined for rings in which division by an integer is
 possible
 
+* Use set_length in instead of setting power series length field directly,
+  otherwise generic functions can't act as catchall for series types that don't
+  have a length field
+
 Fraction.jl
 -----------
 
@@ -165,6 +173,10 @@ Fraction.jl
 
 * canonical_unit for fractions is odd for (1//(x^2+1))//(2//(x+1)) over
   rationals
+
+* Fraction functions shouldn't set the parent, but should use the parent call
+  objects instead, otherwise the generic fraction functions can't act as
+  catchalls for fraction fields that don't have a parent field
 
 nf.jl
 -----
