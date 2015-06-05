@@ -47,7 +47,7 @@ function O(R::PadicField, n::fmpq)
    return d
 end
 
-O(R::PadicField, n::Integer) = O(R, ZZ(n))
+O(R::PadicField, n::Integer) = O(R, fmpz(n))
 
 elem_type(::PadicField) = padic
 
@@ -69,7 +69,7 @@ end
 ###############################################################################
 
 function prime(R::PadicField)
-   z = ZZ()
+   z = fmpz()
    ccall((:padic_ctx_pow_ui, :libflint), Void, 
          (Ptr{fmpz}, Int, Ptr{PadicField}), &z, 1, &R)
    return z 
@@ -273,15 +273,15 @@ function divexact(a::padic, b::padic)
    return z
 end
 
-divexact(a::padic, b::Int) = a*(ZZ(1)//ZZ(b))
+divexact(a::padic, b::Int) = a*(fmpz(1)//fmpz(b))
 
 divexact(a::padic, b::fmpz) = a*(1//b)
 
 divexact(a::padic, b::fmpq) = a*inv(b)
 
-divexact(a::Int, b::padic) = ZZ(a)*inv(b)
+divexact(a::Int, b::padic) = fmpz(a)*inv(b)
 
-divexact(a::fmpz, b::padic) = inv((ZZ(1)//a)*b)
+divexact(a::fmpz, b::padic) = inv((fmpz(1)//a)*b)
 
 divexact(a::fmpq, b::padic) = inv(inv(a)*b)
 
@@ -428,7 +428,7 @@ function Base.call(R::PadicField, n::fmpq)
    return z
 end
 
-Base.call(R::PadicField, n::Integer) = R(ZZ(n))
+Base.call(R::PadicField, n::Integer) = R(fmpz(n))
 
 ###############################################################################
 #
@@ -439,5 +439,5 @@ Base.call(R::PadicField, n::Integer) = R(ZZ(n))
 # inner constructor is also used directly
 
 function PadicField(p::Integer, prec::Int)
-   return PadicField(ZZ(p), prec)
+   return PadicField(fmpz(p), prec)
 end

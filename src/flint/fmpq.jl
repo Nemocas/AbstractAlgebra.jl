@@ -20,9 +20,9 @@ parent(a::fmpq) = QQ
 
 elem_type(::FlintRationalField) = fmpq
 
-base_ring(a::FlintRationalField) = ZZ
+base_ring(a::FlintRationalField) = flintZZ
 
-base_ring(a::fmpq) = ZZ
+base_ring(a::fmpq) = flintZZ
 
 #########################################################################################
 #
@@ -36,9 +36,9 @@ function //(x::fmpz, y::fmpz)
    return QQ(divexact(x, g), divexact(y, g))
 end
 
-//(x::fmpz, y::Integer) = x//ZZ(y)
+//(x::fmpz, y::Integer) = x//fmpz(y)
 
-//(x::Integer, y::fmpz) = ZZ(x)//y
+//(x::Integer, y::fmpz) = fmpz(x)//y
 
 #########################################################################################
 #
@@ -56,13 +56,13 @@ zero(a::FlintRationalField) = QQ(0, 1)
 one(a::FlintRationalField) = QQ(1, 1)
 
 function num(a::fmpq)
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpq_numerator, :libflint), Void, (Ptr{fmpz}, Ptr{fmpq}), &z, &a)
    return z
 end
 
 function den(a::fmpq)
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpq_denominator, :libflint), Void, (Ptr{fmpz}, Ptr{fmpq}), &z, &a)
    return z
 end
@@ -84,7 +84,7 @@ iszero(a::fmpq) = a == 0
 isunit(a::fmpq) = a != 0
 
 function height(a::fmpq)
-   temp = ZZ()
+   temp = fmpz()
    ccall((:fmpq_height, :libflint), Void, (Ptr{fmpz}, Ptr{fmpq}), &temp, &a)
    return temp
 end
@@ -333,12 +333,12 @@ end
 #########################################################################################
 
 function mod(a::fmpq, b::fmpz)
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpq_mod_fmpz, :libflint), Void, (Ptr{fmpz}, Ptr{fmpq}, Ptr{fmpz}), &z, &a, &b)
    return z
 end
 
-mod(a::fmpq, b::Integer) = mod(a, ZZ(b))
+mod(a::fmpq, b::Integer) = mod(a, fmpz(b))
 
 #########################################################################################
 #
@@ -368,11 +368,11 @@ function reconstruct(a::fmpz, b::fmpz)
    return c
 end
 
-reconstruct(a::fmpz, b::Integer) =  reconstruct(a, ZZ(b))
+reconstruct(a::fmpz, b::Integer) =  reconstruct(a, fmpz(b))
 
-reconstruct(a::Integer, b::fmpz) =  reconstruct(ZZ(a), b)
+reconstruct(a::Integer, b::fmpz) =  reconstruct(fmpz(a), b)
 
-reconstruct(a::Integer, b::Integer) =  reconstruct(ZZ(a), ZZ(b))
+reconstruct(a::Integer, b::Integer) =  reconstruct(fmpz(a), fmpz(b))
 
 ###############################################################################
 #
@@ -429,11 +429,11 @@ function dedekind_sum(h::fmpz, k::fmpz)
    return c
 end
 
-dedekind_sum(h::fmpz, k::Integer) = dedekind_sum(h, ZZ(k))
+dedekind_sum(h::fmpz, k::Integer) = dedekind_sum(h, fmpz(k))
 
-dedekind_sum(h::Integer, k::fmpz) = dedekind_sum(ZZ(h), k)
+dedekind_sum(h::Integer, k::fmpz) = dedekind_sum(fmpz(h), k)
 
-dedekind_sum(h::Integer, k::Integer) = dedekind_sum(ZZ(h), ZZ(k))
+dedekind_sum(h::Integer, k::Integer) = dedekind_sum(fmpz(h), fmpz(k))
 
 ###############################################################################
 #
@@ -474,21 +474,21 @@ end
 #
 #########################################################################################
 
-call(a::FlintRationalField) = fmpq(ZZ(0), ZZ(1))
+call(a::FlintRationalField) = fmpq(fmpz(0), fmpz(1))
 
-call(a::FlintRationalField, b::Rational{BigInt}) = fmpq(ZZ(b.num), ZZ(b.den)) 
+call(a::FlintRationalField, b::Rational{BigInt}) = fmpq(fmpz(b.num), fmpz(b.den)) 
 
-call(a::FlintRationalField, b::Integer) = fmpq(ZZ(b), ZZ(1))
+call(a::FlintRationalField, b::Integer) = fmpq(fmpz(b), fmpz(1))
 
 call(a::FlintRationalField, b::Int, c::Int) = fmpq(b, c)
 
-call(a::FlintRationalField, b::fmpz) = fmpq(b, ZZ(1))
+call(a::FlintRationalField, b::fmpz) = fmpq(b, fmpz(1))
 
-call(a::FlintRationalField, b::Integer, c::Integer) = fmpq(ZZ(b), ZZ(c))
+call(a::FlintRationalField, b::Integer, c::Integer) = fmpq(fmpz(b), fmpz(c))
 
-call(a::FlintRationalField, b::fmpz, c::Integer) = fmpq(b, ZZ(c))
+call(a::FlintRationalField, b::fmpz, c::Integer) = fmpq(b, fmpz(c))
 
-call(a::FlintRationalField, b::Integer, c::fmpz) = fmpq(ZZ(b), c)
+call(a::FlintRationalField, b::Integer, c::fmpz) = fmpq(fmpz(b), c)
 
 call(a::FlintRationalField, b::fmpz, c::fmpz) = fmpq(b, c)
 

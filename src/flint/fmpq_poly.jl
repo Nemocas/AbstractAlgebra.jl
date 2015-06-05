@@ -17,7 +17,7 @@ elem_type(::FmpqPolyRing) = fmpq_poly
 base_ring(a::FmpqPolyRing) = a.base_ring
 
 function denominator(a::fmpq_poly)
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpq_poly_get_denominator, :libflint), Void,
          (Ptr{fmpz}, Ptr{fmpq_poly}), &z, &a)
    return z
@@ -241,17 +241,17 @@ end
 
 *(x::fmpq_poly, y::fmpq) = y*x
 
-+(x::Integer, y::fmpq_poly) = y + ZZ(x)
++(x::Integer, y::fmpq_poly) = y + fmpz(x)
 
--(x::Integer, y::fmpq_poly) = ZZ(x) - y
+-(x::Integer, y::fmpq_poly) = fmpz(x) - y
 
-*(x::Integer, y::fmpq_poly) = ZZ(x)*y
+*(x::Integer, y::fmpq_poly) = fmpz(x)*y
 
-+(x::fmpq_poly, y::Integer) = x + ZZ(y)
++(x::fmpq_poly, y::Integer) = x + fmpz(y)
 
--(x::fmpq_poly, y::Integer) = x - ZZ(y)
+-(x::fmpq_poly, y::Integer) = x - fmpz(y)
 
-*(x::fmpq_poly, y::Integer) = ZZ(y)*x
+*(x::fmpq_poly, y::Integer) = fmpz(y)*x
 
 ###############################################################################
 #
@@ -300,7 +300,7 @@ function ==(x::fmpq_poly, y::fmpq)
    end 
 end
 
-==(x::fmpz_poly, y::Integer) = x == ZZ(y)
+==(x::fmpz_poly, y::Integer) = x == fmpz(y)
 
 ###############################################################################
 #
@@ -439,7 +439,7 @@ function divexact(x::fmpq_poly, y::Int)
    return z
 end
 
-divexact(x::fmpq_poly, y::Integer) = divexact(x, ZZ(y)) 
+divexact(x::fmpq_poly, y::Integer) = divexact(x, fmpz(y)) 
 
 ###############################################################################
 #
@@ -489,7 +489,7 @@ function evaluate(x::fmpq_poly, y::fmpq)
    return z
 end
 
-evaluate(x::fmpq_poly, y::Integer) = evaluate(x, ZZ(y))
+evaluate(x::fmpq_poly, y::Integer) = evaluate(x, fmpz(y))
 
 ###############################################################################
 #
@@ -620,7 +620,7 @@ function Base.call(a::FmpqPolyRing, b::Int)
 end
 
 function Base.call(a::FmpqPolyRing, b::Integer)
-   z = fmpq_poly(ZZ(b))
+   z = fmpq_poly(fmpz(b))
    z.parent = a
    return z
 end

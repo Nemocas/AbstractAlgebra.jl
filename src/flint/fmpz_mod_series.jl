@@ -36,7 +36,7 @@ max_precision(R::FmpzModSeriesRing) = R.prec_max
 
 function normalise(a::fmpz_mod_series, len::Int)
    if len > 0
-      c = ZZ()
+      c = fmpz()
       ccall((:fmpz_mod_poly_get_coeff_fmpz, :libflint), Void, 
          (Ptr{fmpz}, Ptr{fmpz_mod_series}, Int), &c, &a, len - 1)
    end
@@ -56,7 +56,7 @@ function coeff(x::fmpz_mod_series, n::Int)
    if n < 0
       return B(0)
    end
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpz_mod_poly_get_coeff_fmpz, :libflint), Void, 
          (Ptr{fmpz}, Ptr{fmpz_mod_series}, Int), &z, &x, n)
    return B(z)
@@ -74,7 +74,7 @@ zero(R::FmpzModSeriesRing) = R(0)
 one(R::FmpzModSeriesRing) = R(1)
 
 function gen(R::FmpzModSeriesRing)
-   z = fmpz_mod_series(modulus(base_ring(R)), [ZZ(0), ZZ(1)], 2, max_precision(R) + 1)
+   z = fmpz_mod_series(modulus(base_ring(R)), [fmpz(0), fmpz(1)], 2, max_precision(R) + 1)
    z.parent = R
    return z
 end
@@ -266,7 +266,7 @@ function *(x::fmpz, y::fmpz_mod_series)
    return z
 end
 
-*(x::Integer, y::fmpz_mod_series) = ZZ(x)*y
+*(x::Integer, y::fmpz_mod_series) = fmpz(x)*y
 
 ###############################################################################
 #
@@ -329,7 +329,7 @@ function ^(a::fmpz_mod_series, b::Int)
    b < 0 && throw(DomainError())
    if isgen(a)
       z = parent(a)()
-      setcoeff!(z, b, ZZ(1))
+      setcoeff!(z, b, fmpz(1))
       z.prec = a.prec + b - 1
    elseif length(a) == 0
       z = parent(a)()
@@ -337,7 +337,7 @@ function ^(a::fmpz_mod_series, b::Int)
    elseif length(a) == 1
       return parent(a)([coeff(a, 0).data^b], 1, a.prec)
    elseif b == 0
-      return parent(a)([ZZ(1)], 1, parent(a).prec_max)
+      return parent(a)([fmpz(1)], 1, parent(a).prec_max)
    else
       z = parent(a)()
       z.prec = a.prec + (b - 1)*valuation(a)
@@ -419,7 +419,7 @@ function divexact(x::fmpz_mod_series, y::fmpz)
    return z
 end
 
-divexact(x::fmpz_mod_series, y::Integer) = divexact(x, ZZ(y))
+divexact(x::fmpz_mod_series, y::Integer) = divexact(x, fmpz(y))
 
 ###############################################################################
 #
@@ -446,13 +446,13 @@ end
 
 function exp(a::fmpz_mod_series)
    if a == 0
-      return parent(a)([ZZ(1)], 1, a.prec)
+      return parent(a)([fmpz(1)], 1, a.prec)
    end
    d = Array(fmpz, a.prec)
    d[0 + 1] = exp(coeff(a, 0)).data
    len = length(a)
    for k = 1 : a.prec - 1
-      s = ZZ()
+      s = fmpz()
       for j = 1 : min(k + 1, len) - 1
          s += j * coeff(a, j).data * d[k - j + 1]
       end
@@ -494,7 +494,7 @@ function Base.call(a::FmpzModSeriesRing, b::Integer)
       z = fmpz_mod_series(modulus(base_ring(a)))
       z.prec = a.prec_max
    else
-      z = fmpz_mod_series(modulus(base_ring(a)), [ZZ(b)], 1, a.prec_max)
+      z = fmpz_mod_series(modulus(base_ring(a)), [fmpz(b)], 1, a.prec_max)
    end
    z.parent = a
    return z
@@ -544,6 +544,6 @@ function PowerSeriesRing(R::ResidueRing{fmpz}, prec::Int, s::String)
 
    parent_obj = FmpzModSeriesRing(R, prec, S)
 
-   return parent_obj, parent_obj([ZZ(0), ZZ(1)], 2, prec + 1)
+   return parent_obj, parent_obj([fmpz(0), fmpz(1)], 2, prec + 1)
 end
 

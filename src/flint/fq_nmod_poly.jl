@@ -179,7 +179,7 @@ end
 
 *(x::fq_nmod_poly, y::fmpz) = y*x
 
-*(x::Integer, y::fq_nmod_poly) = ZZ(x)*y
+*(x::Integer, y::fq_nmod_poly) = fmpz(x)*y
 
 *(x::fq_nmod_poly, y::Integer) = y*x
 
@@ -191,7 +191,7 @@ end
 
 +(x::fq_nmod_poly, y::fmpz) = y + x
 
-+(x::fq_nmod_poly, y::Integer) = x + ZZ(y)
++(x::fq_nmod_poly, y::Integer) = x + fmpz(y)
 
 +(x::Integer, y::fq_nmod_poly) = y + x
 
@@ -250,7 +250,7 @@ end
 
 ==(x::fmpz, y::fq_nmod_poly) = y == x
 
-==(x::fq_nmod_poly, y::Integer) = x == ZZ(y)
+==(x::fq_nmod_poly, y::Integer) = x == fmpz(y)
 
 ==(x::Integer, y::fq_nmod_poly) = y == x
 
@@ -593,7 +593,7 @@ function Base.call(R::FqNmodPolyRing, x::fmpz)
 end
 
 function Base.call(R::FqNmodPolyRing, x::Integer)
-   return R(ZZ(x))
+   return R(fmpz(x))
 end
 
 function Base.call(R::FqNmodPolyRing, x::Array{fq_nmod, 1})
@@ -613,7 +613,7 @@ end
 
 function Base.call{T <: Integer}(R::FqNmodPolyRing, x::Array{T, 1})
    length(x) == 0 && error("Array must be non-empty")
-   return R(map(ZZ, x))
+   return R(map(fmpz, x))
 end
 
 function Base.call(R::FqNmodPolyRing, x::fmpz_poly)

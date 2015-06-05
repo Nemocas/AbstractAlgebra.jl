@@ -14,6 +14,8 @@ export Collection, Ring, Field, CollectionElem, RingElem, FieldElem, Pari,
 
 export PolyElem, SeriesElem, ResidueElem, FractionElem, MatElem
 
+export ZZ
+
 include("AbstractTypes.jl")
 
 ###############################################################################
@@ -77,6 +79,14 @@ function __init__()
    println("Nemo comes with absolutely no warranty whatsoever")
    println("")
 end
+
+###############################################################################
+#
+#   Set domain to flint
+#
+###############################################################################
+
+ZZ = flintZZ
 
 ###############################################################################
 #

@@ -241,11 +241,11 @@ function -(a::fmpq, b::nf_elem)
    return r
 end
 
-+(a::nf_elem, b::Integer) = a + ZZ(b)
++(a::nf_elem, b::Integer) = a + fmpz(b)
 
--(a::nf_elem, b::Integer) = a - ZZ(b)
+-(a::nf_elem, b::Integer) = a - fmpz(b)
 
--(a::Integer, b::nf_elem) = ZZ(a) - b
+-(a::Integer, b::nf_elem) = fmpz(a) - b
 
 +(a::Integer, b::nf_elem) = b + a
 
@@ -441,7 +441,7 @@ function add!(c::nf_elem, a::nf_elem, b::Int)
          &c, &a, &b, &a.parent)
 end
 
-add!(c::nf_elem, a::nf_elem, b::Integer) = add!(c, a, ZZ(b))
+add!(c::nf_elem, a::nf_elem, b::Integer) = add!(c, a, fmpz(b))
 
 function sub!(c::nf_elem, a::nf_elem, b::fmpq)
    ccall((:nf_elem_sub_fmpq, :libflint), Void,
@@ -461,7 +461,7 @@ function sub!(c::nf_elem, a::nf_elem, b::Int)
          &c, &a, &b, &a.parent)
 end
 
-sub!(c::nf_elem, a::nf_elem, b::Integer) = sub!(c, a, ZZ(b))
+sub!(c::nf_elem, a::nf_elem, b::Integer) = sub!(c, a, fmpz(b))
 
 function sub!(c::nf_elem, a::fmpq, b::nf_elem)
    ccall((:nf_elem_fmpq_sub, :libflint), Void,
@@ -481,7 +481,7 @@ function sub!(c::nf_elem, a::Int, b::nf_elem)
          &c, &a, &b, &a.parent)
 end
 
-sub!(c::nf_elem, a::Integer, b::nf_elem) = sub!(c, ZZ(a), b)
+sub!(c::nf_elem, a::Integer, b::nf_elem) = sub!(c, fmpz(a), b)
 
 function mul!(c::nf_elem, a::nf_elem, b::fmpq)
    ccall((:nf_elem_scalar_mul_fmpq, :libflint), Void,
@@ -501,7 +501,7 @@ function mul!(c::nf_elem, a::nf_elem, b::Int)
          &c, &a, b, &a.parent)
 end
 
-mul!(c::nf_elem, a::nf_elem, b::Integer) = mul!(c, a, ZZ(b))
+mul!(c::nf_elem, a::nf_elem, b::Integer) = mul!(c, a, fmpz(b))
 
 ###############################################################################
 #
@@ -581,14 +581,14 @@ function NumberField(pol::fmpq_poly, s::String)
 end
 
 function CyclotomicField(n::Int, s::String, t = "\$")
-   Zx, x = PolynomialRing(ZZ, string(gensym()))
+   Zx, x = PolynomialRing(flintZZ, string(gensym()))
    Qx, = PolynomialRing(QQ, t)
    f = cyclotomic(n, x)
    return NumberField(Qx(f), s)
 end
 
 function MaximalRealSubfield(n::Int, s::String, t = "\$")
-   Zx, x = PolynomialRing(ZZ, string(gensym()))
+   Zx, x = PolynomialRing(flintZZ, string(gensym()))
    Qx, = PolynomialRing(QQ, t)
    f = cos_minpoly(n, x)
    return NumberField(Qx(f), s)

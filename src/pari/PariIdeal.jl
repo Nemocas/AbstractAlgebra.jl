@@ -54,7 +54,7 @@ function prime_decomposition(ord::PariMaximalOrder, p::fmpz)
 end
 
 function prime_decomposition(ord::PariMaximalOrder, p::Integer)
-   return prime_decomposition(ord, ZZ(p))
+   return prime_decomposition(ord, fmpz(p))
 end
 
 ###############################################################################
@@ -382,10 +382,10 @@ end
 function ideal(ord::PariMaximalOrder, b::Integer, args::Integer...)
    av = unsafe_load(avma, 1)
    id1 = ccall((:idealhnf, :libpari), Ptr{Int}, 
-                 (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(ZZ(b)).d)
+                 (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(fmpz(b)).d)
    for c in args
       id2 = ccall((:idealhnf, :libpari), Ptr{Int}, 
-                 (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(ZZ(c)).d)
+                 (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(fmpz(c)).d)
       id1 = ccall((:idealadd, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), ord.pari_nf.data, id1, id2)
    end

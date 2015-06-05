@@ -78,9 +78,9 @@ function fmpz_poly!(z::fmpz_poly, g::Ptr{Int})
    if length == 0
       return
    end
-   c = ZZ()
+   c = fmpz()
    for i = 0:length - 1
-      ZZ!(c, reinterpret(Ptr{Int}, unsafe_load(g, 3 + i)))
+      fmpz!(c, reinterpret(Ptr{Int}, unsafe_load(g, 3 + i)))
       setcoeff!(z, i, c)
    end
    return z

@@ -163,8 +163,8 @@ function getindex(a::PariFactor, i::Int)
    colf = reinterpret(Ptr{Int}, unsafe_load(a.data, 2))
    coln = reinterpret(Ptr{Int}, unsafe_load(a.data, 3))
    f = reinterpret(Ptr{Int}, unsafe_load(colf, i + 1))
-   n = ZZ()
-   ZZ!(n, reinterpret(Ptr{Int}, unsafe_load(coln, i + 1)))
+   n = fmpz()
+   fmpz!(n, reinterpret(Ptr{Int}, unsafe_load(coln, i + 1)))
    return a.parent(f), Int(n)
 end
 

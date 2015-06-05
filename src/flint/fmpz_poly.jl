@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   fmpz_poly.jl : Flint polynomials over ZZ
+#   fmpz_poly.jl : Flint polynomials over fmpz
 #
 ###############################################################################
 
@@ -32,7 +32,7 @@ length(x::fmpz_poly) = ccall((:fmpz_poly_length, :libflint), Int,
 
 function coeff(x::fmpz_poly, n::Int)
    n < 0 && throw(DomainError())
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
                (Ptr{fmpz}, Ptr{fmpz_poly}, Int), &z, &x, n)
    return z
@@ -205,17 +205,17 @@ end
 
 *(x::fmpz_poly, y::fmpz) = y*x
 
-+(x::Integer, y::fmpz_poly) = y + ZZ(x)
++(x::Integer, y::fmpz_poly) = y + fmpz(x)
 
--(x::Integer, y::fmpz_poly) = ZZ(x) - y
+-(x::Integer, y::fmpz_poly) = fmpz(x) - y
 
-*(x::Integer, y::fmpz_poly) = ZZ(x)*y
+*(x::Integer, y::fmpz_poly) = fmpz(x)*y
 
-+(x::fmpz_poly, y::Integer) = x + ZZ(y)
++(x::fmpz_poly, y::Integer) = x + fmpz(y)
 
--(x::fmpz_poly, y::Integer) = x - ZZ(y)
+-(x::fmpz_poly, y::Integer) = x - fmpz(y)
 
-*(x::fmpz_poly, y::Integer) = ZZ(y)*x
+*(x::fmpz_poly, y::Integer) = fmpz(y)*x
 
 ###############################################################################
 #
@@ -254,7 +254,7 @@ function ==(x::fmpz_poly, y::fmpz)
    if length(x) > 1
       return false
    elseif length(x) == 1 
-      z = ZZ()
+      z = fmpz()
       ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
                        (Ptr{fmpz}, Ptr{fmpz_poly}, Int), &z, &x, 0)
       return ccall((:fmpz_equal, :libflint), Bool, 
@@ -264,7 +264,7 @@ function ==(x::fmpz_poly, y::fmpz)
    end 
 end
 
-==(x::fmpz_poly, y::Integer) = x == ZZ(y)
+==(x::fmpz_poly, y::Integer) = x == fmpz(y)
 
 ###############################################################################
 #
@@ -368,7 +368,7 @@ function divexact(x::fmpz_poly, y::Int)
    return z
 end
 
-divexact(x::fmpz_poly, y::Integer) = divexact(x, ZZ(y)) 
+divexact(x::fmpz_poly, y::Integer) = divexact(x, fmpz(y)) 
 
 ###############################################################################
 #
@@ -424,7 +424,7 @@ function gcd(x::fmpz_poly, y::fmpz_poly)
 end
 
 function content(x::fmpz_poly)
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpz_poly_content, :libflint), Void,
          (Ptr{fmpz}, Ptr{fmpz_poly}), &z, &x)
    return z
@@ -444,13 +444,13 @@ end
 ###############################################################################
 
 function evaluate(x::fmpz_poly, y::fmpz)
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpz_poly_evaluate_fmpz, :libflint), Void, 
         (Ptr{fmpz}, Ptr{fmpz_poly}, Ptr{fmpz}), &z, &x, &y)
    return z
 end
 
-evaluate(x::fmpz_poly, y::Integer) = evaluate(x, ZZ(y))
+evaluate(x::fmpz_poly, y::Integer) = evaluate(x, fmpz(y))
 
 ###############################################################################
 #
@@ -487,7 +487,7 @@ end
 
 function resultant(x::fmpz_poly, y::fmpz_poly)
    check_parent(x, y)
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpz_poly_resultant, :libflint), Void, 
                 (Ptr{fmpz}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y)
    return z
@@ -500,7 +500,7 @@ end
 ###############################################################################
 
 function discriminant(x::fmpz_poly)
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpz_poly_discriminant, :libflint), Void, 
                 (Ptr{fmpz}, Ptr{fmpz_poly}), &z, &x)
    return z
@@ -517,7 +517,7 @@ function gcdx(a::fmpz_poly, b::fmpz_poly)
    lena = length(a)
    lenb = length(b)
    (lena <= 1 || lenb <= 1) && error("Constant polynomial in gcdx")  
-   z = ZZ()
+   z = fmpz()
    u = parent(a)()
    v = parent(a)()
    c1 = content(a)
@@ -643,7 +643,7 @@ function Base.call(a::FmpzPolyRing, b::Int)
 end
 
 function Base.call(a::FmpzPolyRing, b::Integer)
-   z = fmpz_poly(ZZ(b))
+   z = fmpz_poly(fmpz(b))
    z.parent = a
    return z
 end
@@ -673,5 +673,5 @@ function PolynomialRing(R::FlintIntegerRing, s::String)
 
    parent_obj = FmpzPolyRing(S)
    
-   return parent_obj, parent_obj([ZZ(0), ZZ(1)])
+   return parent_obj, parent_obj([fmpz(0), fmpz(1)])
 end

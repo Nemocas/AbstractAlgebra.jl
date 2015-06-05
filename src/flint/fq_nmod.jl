@@ -76,14 +76,14 @@ isunit(a::fq_nmod) = ccall((:fq_nmod_is_invertible, :libflint), Bool,
                      (Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), &a, &a.parent)
 
 function characteristic(a::FqNmodFiniteField)
-   d = ZZ()
+   d = fmpz()
    ccall((:__fq_nmod_ctx_prime, :libflint), Void, 
          (Ptr{fmpz}, Ptr{FqNmodFiniteField}), &d, &a)
    return d
 end
    
 function order(a::FqNmodFiniteField)
-   d = ZZ()
+   d = fmpz()
    ccall((:fq_nmod_ctx_order, :libflint), Void, 
          (Ptr{fmpz}, Ptr{FqNmodFiniteField}), &d, &a)
    return d
@@ -194,7 +194,7 @@ function *(x::Int, y::fq_nmod)
    return z
 end
 
-*(x::Integer, y::fq_nmod) = ZZ(x)*y
+*(x::Integer, y::fq_nmod) = fmpz(x)*y
 
 *(x::fq_nmod, y::Integer) = y*x
 
@@ -294,14 +294,14 @@ function pth_root(x::fq_nmod)
 end
 
 function trace(x::fq_nmod)
-   z = ZZ()
+   z = fmpz()
    ccall((:fq_nmod_trace, :libflint), Void, 
          (Ptr{fmpz}, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), &z, &x, &x.parent)
    return parent(x)(z)
 end
 
 function norm(x::fq_nmod)
-   z = ZZ()
+   z = fmpz()
    ccall((:fq_nmod_norm, :libflint), Void, 
          (Ptr{fmpz}, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), &z, &x, &x.parent)
    return parent(x)(z)
@@ -355,7 +355,7 @@ function Base.call(a::FqNmodFiniteField)
    return z
 end
 
-Base.call(a::FqNmodFiniteField, b::Integer) = a(ZZ(b))
+Base.call(a::FqNmodFiniteField, b::Integer) = a(fmpz(b))
 
 function Base.call(a::FqNmodFiniteField, b::Int)
    z = fq_nmod(a, b)
@@ -382,7 +382,7 @@ end
 
 function FiniteField(char::Int, deg::Int, s::String)
    S = symbol(s)
-   parent_obj = FqNmodFiniteField(ZZ(char), deg, S)
+   parent_obj = FqNmodFiniteField(fmpz(char), deg, S)
 
    return parent_obj, gen(parent_obj) 
 end

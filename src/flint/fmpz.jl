@@ -31,16 +31,16 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export fmpz, ZZ, FlintIntegerRing, parent, show, convert, hash, fac, binom, isprime,
-       fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm, invmod, powmod, abs,
-       divrem, isqrt, popcount, prevpow2, nextpow2, ndigits, dec, bin, oct,
-       hex, base, one, zero, divexact, fits, sign, nbits, deepcopy, tdivpow2,
-       fdivpow2, cdivpow2, flog, clog, cmpabs, clrbit!, setbit!, combit!, crt,
-       divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2, gcdinv,
-       isprobabprime, issquare, jacobi, remove, root, size, isqrtrem, sqrtmod,
-       trailing_zeros, sigma, eulerphi, fib, moebiusmu, primorial, risingfac,
-       canonical_unit, needs_parentheses, is_negative, show_minus_one, 
-       parseint, addeq!, mul!, isunit, words, isequal, num, den
+export fmpz, flintZZ, FlintIntegerRing, parent, show, convert, hash, fac,
+       binom, isprime, fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm, invmod,
+       powmod, abs, divrem, isqrt, popcount, prevpow2, nextpow2, ndigits, dec,
+       bin, oct, hex, base, one, zero, divexact, fits, sign, nbits, deepcopy,
+       tdivpow2, fdivpow2, cdivpow2, flog, clog, cmpabs, clrbit!, setbit!,
+       combit!, crt, divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2,
+       gcdinv, isprobabprime, issquare, jacobi, remove, root, size, isqrtrem,
+       sqrtmod, trailing_zeros, sigma, eulerphi, fib, moebiusmu, primorial,
+       risingfac, canonical_unit, needs_parentheses, is_negative,
+       show_minus_one, parseint, addeq!, mul!, isunit, words, isequal, num, den
 
 ###############################################################################
 #
@@ -48,9 +48,7 @@ export fmpz, ZZ, FlintIntegerRing, parent, show, convert, hash, fac, binom, ispr
 #
 ###############################################################################
 
-ZZ = FlintIntegerRing()
-
-parent(a::fmpz) = ZZ
+parent(a::fmpz) = flintZZ
 
 elem_type(::FlintIntegerRing) = fmpz
 
@@ -65,14 +63,14 @@ hash(a::fmpz) = hash(BigInt(a))
 ###############################################################################
 
 function deepcopy(a::fmpz)
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpz_set, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), &z, &a)
    return z
 end
 
-one(::FlintIntegerRing) = ZZ(1)
+one(::FlintIntegerRing) = fmpz(1)
 
-zero(::FlintIntegerRing) = ZZ(0)
+zero(::FlintIntegerRing) = fmpz(0)
 
 sign(a::fmpz) = Int(ccall((:fmpz_sgn, :libflint), Cint, (Ptr{fmpz},), &a))
 
@@ -95,7 +93,7 @@ function words(a::fmpz)
 end
 
 function den(a::fmpz)
-  return ZZ(1)
+  return fmpz(1)
 end
 
 function num(a::fmpz)
@@ -113,7 +111,7 @@ function serialize(s, n::fmpz)
     serialize(s, base(62, n))
 end
 
-deserialize(s, ::Type{fmpz}) = Base.parseint_nocheck(ZZ, deserialize(s), 62)
+deserialize(s, ::Type{fmpz}) = Base.parseint_nocheck(flintZZ, deserialize(s), 62)
 
 ###############################################################################
 #
@@ -121,7 +119,7 @@ deserialize(s, ::Type{fmpz}) = Base.parseint_nocheck(ZZ, deserialize(s), 62)
 #
 ###############################################################################
 
-canonical_unit(x::fmpz) = x < 0 ? ZZ(-1) : ZZ(1)
+canonical_unit(x::fmpz) = x < 0 ? fmpz(-1) : fmpz(1)
 
 ###############################################################################
 #
@@ -137,7 +135,7 @@ for (fJ, fC) in ((:+, :add), (:-,:sub), (:*, :mul),
                  (:&, :and), (:|, :or), (:$, :xor))
     @eval begin
         function ($fJ)(x::fmpz, y::fmpz)
-            z = ZZ()
+            z = fmpz()
             ccall(($(string(:fmpz_, fC)), :libflint), Void, 
                   (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x, &y)
             return z
@@ -152,7 +150,7 @@ for (fJ, fC) in ((:fdiv, :fdiv_q), (:cdiv, :cdiv_q), (:tdiv, :tdiv_q),
     @eval begin
         function ($fJ)(x::fmpz, y::fmpz)
             y == 0 && throw(DivideError())
-            z = ZZ()
+            z = fmpz()
             ccall(($(string(:fmpz_, fC)), :libflint), Void, 
                   (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x, &y)
             return z
@@ -162,7 +160,7 @@ end
 
 function divexact(x::fmpz, y::fmpz)
     y == 0 && throw(DivideError())
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_divexact, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x, &y)
     z
@@ -184,8 +182,8 @@ end
 
 function rem(x::fmpz, c::fmpz)
     c == 0 && throw(DivideError())
-    q = ZZ()
-    r = ZZ()
+    q = fmpz()
+    r = fmpz()
     ccall((:fmpz_tdiv_qr, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &q, &r, &x, &c)
     return r
@@ -214,7 +212,7 @@ end
 ###############################################################################
 
 function +(x::fmpz, c::Int)
-    z = ZZ()
+    z = fmpz()
     if c >= 0
        ccall((:fmpz_add_ui, :libflint), Void, 
              (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, c)
@@ -228,7 +226,7 @@ end
 +(c::Int, x::fmpz) = x + c
 
 function -(x::fmpz, c::Int)
-    z = ZZ()
+    z = fmpz()
     if c >= 0
        ccall((:fmpz_sub_ui, :libflint), Void, 
              (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, c)
@@ -240,7 +238,7 @@ function -(x::fmpz, c::Int)
 end
 
 function -(c::Int, x::fmpz)
-    z = ZZ()
+    z = fmpz()
     if c >= 0
        ccall((:fmpz_sub_ui, :libflint), Void, 
              (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, c)
@@ -254,7 +252,7 @@ function -(c::Int, x::fmpz)
 end
 
 function *(x::fmpz, c::Int)
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_mul_si, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, c)
     return z
@@ -271,7 +269,7 @@ end
 function <<(x::fmpz, c::Int)
     c < 0 && throw(DomainError())
     c == 0 && return x
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_mul_2exp, :libflint), Void,
           (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, c)
     return z
@@ -280,7 +278,7 @@ end
 function >>(x::fmpz, c::Int)
     c < 0 && throw(DomainError())
     c == 0 && return x
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_fdiv_q_2exp, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, c)
     return z
@@ -301,7 +299,7 @@ end
 
 function tdivpow2(x::fmpz, c::Int)
     c < 0 && throw(DomainError())
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_tdiv_q_2exp, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, c)
     return z
@@ -309,7 +307,7 @@ end
 
 function fdivpow2(x::fmpz, c::Int)
     c < 0 && throw(DomainError())
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_fdiv_q_2exp, :libflint), Void,
           (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, c)
     return z
@@ -317,7 +315,7 @@ end
 
 function fmodpow2(x::fmpz, c::Int)
     c < 0 && throw(DomainError())
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_fdiv_r_2exp, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, c)
     return z
@@ -325,7 +323,7 @@ end
 
 function cdivpow2(x::fmpz, c::Int)
     c < 0 && throw(DomainError())
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_cdiv_q_2exp, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, c)
     return z
@@ -333,7 +331,7 @@ end
 
 function div(x::fmpz, c::Int)
     c == 0 && throw(DivideError())
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_tdiv_q_si, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, c)
     return z
@@ -341,7 +339,7 @@ end
 
 function tdiv(x::fmpz, c::Int)
     c == 0 && throw(DivideError())
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_tdiv_q_si, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, c)
     return z
@@ -349,7 +347,7 @@ end
 
 function fdiv(x::fmpz, c::Int)
     c == 0 && throw(DivideError())
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_fdiv_q_si, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, c)
     return z
@@ -357,7 +355,7 @@ end
 
 function cdiv(x::fmpz, c::Int)
     c == 0 && throw(DivideError())
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_cdiv_si, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, c)
     return z
@@ -371,7 +369,7 @@ end
 
 function divexact(x::fmpz, y::Int)
     y == 0 && throw(DivideError())
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_divexact_si, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, y)
     z
@@ -388,31 +386,31 @@ function ^(x::fmpz, y::Int)
     if x == 1; return x; end
     if x == -1; return isodd(y) ? x : -x; end
     if y > typemax(Uint); throw(DomainError()); end
-    if y == 0; return one(ZZ); end
+    if y == 0; return one(flintZZ); end
     if y == 1; return x; end
     return x^Uint(y)
 end
 
 ###############################################################################
 #
-#   Unary operators and functions, e.g. -ZZ(12), ~ZZ(12)
+#   Unary operators and functions, e.g. -fmpz(12), ~fmpz(12)
 #
 ###############################################################################
 
 function -(x::fmpz)
-    z = ZZ()
+    z = fmpz()
     ccall((:__fmpz_neg, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), &z, &x)
     return z
 end
 
 function ~(x::fmpz)
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_complement, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), &z, &x)
     return z
 end
 
 function abs(x::fmpz)
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_abs, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), &z, &x)
     return z
 end
@@ -425,8 +423,8 @@ end
 
 function divrem(x::fmpz, y::fmpz)
     y == 0 && throw(DivideError())
-    z1 = ZZ()
-    z2 = ZZ()
+    z1 = fmpz()
+    z2 = fmpz()
     ccall((:fmpz_tdiv_qr, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z1, &z2, &x, &y)
     z1, z2
@@ -434,8 +432,8 @@ end
 
 function tdivrem(x::fmpz, y::fmpz)
     y == 0 && throw(DivideError())
-    z1 = ZZ()
-    z2 = ZZ()
+    z1 = fmpz()
+    z2 = fmpz()
     ccall((:fmpz_tdiv_qr, :libflint), Void,
           (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z1, &z2, &x, &y)
     z1, z2
@@ -443,8 +441,8 @@ end
 
 function fdivrem(x::fmpz, y::fmpz)
     y == 0 && throw(DivideError())
-    z1 = ZZ()
-    z2 = ZZ()
+    z1 = fmpz()
+    z2 = fmpz()
     ccall((:fmpz_fdiv_qr, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z1, &z2, &x, &y)
     z1, z2
@@ -462,7 +460,7 @@ function powmod(x::fmpz, p::fmpz, m::fmpz)
        x = invmod(x, m)
        p = -p
     end
-    r = ZZ()
+    r = fmpz()
     ccall((:fmpz_powm, :libflint), Void,
           (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}),
           &r, &x, &p, &m)
@@ -475,7 +473,7 @@ function powmod(x::fmpz, p::Int, m::fmpz)
        x = invmod(x, m)
        p = -p
     end
-    r = ZZ()
+    r = fmpz()
     ccall((:fmpz_powm_ui, :libflint), Void,
           (Ptr{fmpz}, Ptr{fmpz}, Int, Ptr{fmpz}),
           &r, &x, p, &m)
@@ -484,9 +482,9 @@ end
 
 function invmod(x::fmpz, y::fmpz)
     y <= 0 && throw(DomainError())
-    z = ZZ()
+    z = fmpz()
     if y == 1
-        return ZZ(0)
+        return fmpz(0)
     end
     if ccall((:fmpz_invmod, :libflint), Cint, 
              (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x, &y) == 0
@@ -497,10 +495,10 @@ end
 
 function gcdinv(x::fmpz, y::fmpz)
     y <= 0 && throw(DomainError())
-    g = ZZ()
-    z = ZZ()
+    g = fmpz()
+    z = fmpz()
     if y == 1
-        return ZZ(0), ZZ(0)
+        return fmpz(0), fmpz(0)
     end
     ccall((:fmpz_gcdinv, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &g, &z, &x, &y)
@@ -509,7 +507,7 @@ end
 
 function sqrtmod(x::fmpz, y::fmpz)
     y <= 0 && throw(DomainError())
-    z = ZZ()
+    z = fmpz()
     if (ccall((:fmpz_sqrtmod, :libflint), Cint, 
               (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x, &y) == 0)
         error("no square root exists")
@@ -518,7 +516,7 @@ function sqrtmod(x::fmpz, y::fmpz)
 end
 
 function crt(r1::fmpz, m1::fmpz, r2::fmpz, m2::fmpz, signed=false)
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpz_CRT, :libflint), Void,
           (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}, Cint),
           &z, &r1, &m1, &r2, &m2, signed)
@@ -526,7 +524,7 @@ function crt(r1::fmpz, m1::fmpz, r2::fmpz, m2::fmpz, signed=false)
 end
 
 function crt(r1::fmpz, m1::fmpz, r2::Int, m2::Int, signed=false)
-   z = ZZ()
+   z = fmpz()
    r2 < 0 && throw(DomainError())
    m2 < 0 && throw(DomainError())
    ccall((:fmpz_CRT_ui, :libflint), Void,
@@ -543,11 +541,11 @@ end
 
 function gcdx(a::fmpz, b::fmpz)
     if b == 0 # shortcut this to ensure consistent results with gcdx(a,b)
-        return a < 0 ? (-a, -one(ZZ), zero(ZZ)) : (a, one(ZZ), zero(ZZ))
+        return a < 0 ? (-a, -one(flintZZ), zero(flintZZ)) : (a, one(flintZZ), zero(flintZZ))
     end
-    g = ZZ()
-    s = ZZ()
-    t = ZZ()
+    g = fmpz()
+    s = fmpz()
+    t = fmpz()
     ccall((:fmpz_xgcd, :libflint), Void,
         (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}),
         &g, &s, &t, &a, &b)
@@ -557,8 +555,8 @@ end
 function gcdinv(a::fmpz, b::fmpz)
    a < 0 && throw(DomainError())
    b < a && throw(DomainError())
-   g = ZZ()
-   s = ZZ()
+   g = fmpz()
+   s = fmpz()
    ccall((:fmpz_gcdinv, :libflint), Void,
         (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}),
         &g, &s, &a, &b)
@@ -631,10 +629,10 @@ popcount(x::fmpz) = Int(ccall((:fmpz_popcnt, :libflint), Culong,
                               (Ptr{fmpz},), &x))
 
 prevpow2(x::fmpz) = x < 0 ? -prevpow2(-x) :
-                            (x <= 2 ? x : one(ZZ) << (ndigits(x, 2) - 1))
+                            (x <= 2 ? x : one(flintZZ) << (ndigits(x, 2) - 1))
 
 nextpow2(x::fmpz) = x < 0 ? -nextpow2(-x) : 
-                            (x <= 2 ? x : one(ZZ) << ndigits(x - 1, 2))
+                            (x <= 2 ? x : one(flintZZ) << ndigits(x - 1, 2))
 
 trailing_zeros(x::fmpz) = ccall((:fmpz_val2, :libflint), Int, 
                                 (Ptr{fmpz},), &x)
@@ -668,15 +666,15 @@ end
 
 function isqrt(x::fmpz)
     x < 0 && throw(DomainError())
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_sqrt, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), &z, &x)
     return z
 end
 
 function isqrtrem(x::fmpz)
     x < 0 && throw(DomainError())
-    s = ZZ()
-    r = ZZ()
+    s = fmpz()
+    r = fmpz()
     ccall((:fmpz_sqrtrem, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &s, &r, &x)
     return s, r
@@ -685,7 +683,7 @@ end
 function root(x::fmpz, y::Int) 
    x < 0 && iseven(y) && throw(DomainError())
    y <= 0 && throw(DomainError())
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpz_root, :libflint), Void,
          (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, y)
    return z
@@ -716,7 +714,7 @@ end
 ###############################################################################
 
 function sum(arr::AbstractArray{fmpz})
-    n = ZZ(0)
+    n = fmpz(0)
     for i in arr
         ccall((:fmpz_add, :libflint), Void,
             (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}),
@@ -726,7 +724,7 @@ function sum(arr::AbstractArray{fmpz})
 end
 
 function prod(arr::AbstractArray{fmpz})
-    n = ZZ(1)
+    n = fmpz(1)
     for i in arr
         ccall((:fmpz_mul, :libflint), Void,
             (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}),
@@ -765,7 +763,7 @@ isprobabprime(x::fmpz) = Bool(ccall((:fmpz_is_probabprime, :libflint), Cint,
 
 function remove(x::fmpz, y::fmpz) 
    y == 0 && throw(DivideError())
-   z = ZZ()
+   z = fmpz()
    num = ccall((:fmpz_remove, :libflint), Int, 
                (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x, &y)
    return num, z
@@ -775,7 +773,7 @@ function divisor_lenstra(n::fmpz, r::fmpz, m::fmpz)
    r <= 0 && throw(DomainError())
    m <= r && throw(DomainError())
    n <= m && throw(DomainError())
-   z = ZZ()
+   z = fmpz()
    if !Bool(ccall((:fmpz_divisor_in_residue_class_lenstra, :libflint), 
        Cint, (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &n, &r, &m))
       z = 0
@@ -785,14 +783,14 @@ end
 
 function fac(x::Int)
     x < 0 && throw(DomainError())
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_fac_ui, :libflint), Void, (Ptr{fmpz}, Culong), &z, x)
     return z
 end
 
 function risingfac(x::fmpz, y::Int)
     y < 0 && throw(DomainError())
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_rfac_ui, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Culong), &z, &x, y)
     return z
@@ -800,7 +798,7 @@ end
 
 function risingfac(x::Int, y::Int)
     y < 0 && throw(DomainError())
-    z = ZZ()
+    z = fmpz()
     if x < 0
        if y <= -x # we don't pass zero
           z = isodd(y) ? -risingfac(-x - y + 1, y) : 
@@ -815,7 +813,7 @@ end
 
 function primorial(x::Int)
     x < 0 && throw(DomainError()) 
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_primorial, :libflint), Void, 
           (Ptr{fmpz}, Culong), &z, x)
     return z
@@ -823,16 +821,16 @@ end
 
 function fib(x::Int)
     x < 0 && throw(DomainError())
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_fib_ui, :libflint), Void, 
           (Ptr{fmpz}, Culong), &z, x)
     return z
 end
 
 function binom(n::Int, k::Int)
-    n < 0 && return ZZ(0)
-    k < 0 && return ZZ(0)
-    z = ZZ()
+    n < 0 && return fmpz(0)
+    k < 0 && return fmpz(0)
+    z = fmpz()
     ccall((:fmpz_bin_uiui, :libflint), Void, 
           (Ptr{fmpz}, Culong, Culong), &z, n, k)
     return z
@@ -853,7 +851,7 @@ end
 
 function sigma(x::fmpz, y::Int) 
    y < 0 && throw(DomainError())
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpz_divisor_sigma, :libflint), Void, 
          (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, y)
    return z
@@ -861,7 +859,7 @@ end
 
 function eulerphi(x::fmpz) 
    x < 0 && throw(DomainError())
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpz_euler_phi, :libflint), Void, 
          (Ptr{fmpz}, Ptr{fmpz}), &z, &x)
    return z
@@ -911,7 +909,7 @@ function ndigits_internal(x::fmpz, b::Integer = 10)
     # fmpz_sizeinbase might return an answer 1 too big
     n = Int(ccall((:fmpz_sizeinbase, :libflint), Culong, 
                   (Ptr{fmpz}, Int32), &x, b))
-    abs(x) < ZZ(b)^(n - 1) ? n - 1 : n
+    abs(x) < fmpz(b)^(n - 1) ? n - 1 : n
 end
 
 ndigits(x::fmpz, b::Integer = 10) = x == 0 ? 1 : ndigits_internal(x, b)
@@ -934,14 +932,14 @@ call(::FlintIntegerRing, a::fmpz) = a
 
 function call(::FlintIntegerRing, a::Float64)
     !isinteger(a) && throw(InexactError())
-    z = ZZ()
+    z = fmpz()
     ccall((:fmpz_set_d, :libflint), Void, (Ptr{fmpz}, Cdouble), &z, a)
     return z
 end
 
-call(::FlintIntegerRing, a::Float16) = ZZ(Float64(a))
+call(::FlintIntegerRing, a::Float16) = fmpz(Float64(a))
 
-call(::FlintIntegerRing, a::Float32) = ZZ(Float64(a))
+call(::FlintIntegerRing, a::Float32) = fmpz(Float64(a))
 
 ###############################################################################
 #
@@ -953,7 +951,7 @@ function parseint(::Type{fmpz}, s::String, base::Int = 10)
     s = bytestring(s)
     sgn = s[1] == '-' ? -1 : 1
     i = 1 + (sgn == -1)
-    z = ZZ()
+    z = fmpz()
     err = ccall((:fmpz_set_str, :libflint),
                Int32, (Ptr{fmpz}, Ptr{Uint8}, Int32),
                &z, bytestring(SubString(s, i)), base)
@@ -969,7 +967,7 @@ end
 
 fmpz(s::String) = parseint(fmpz, s)
 
-fmpz(z::Integer) = ZZ(BigInt(z))
+fmpz(z::Integer) = fmpz(BigInt(z))
 
 ###############################################################################
 #
@@ -977,7 +975,7 @@ fmpz(z::Integer) = ZZ(BigInt(z))
 #
 ###############################################################################
 
-convert(::Type{fmpz}, a::Integer) = ZZ(a)
+convert(::Type{fmpz}, a::Integer) = fmpz(a)
 
 function convert(::Type{BigInt}, a::fmpz)
    r = BigInt()

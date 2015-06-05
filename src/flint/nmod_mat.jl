@@ -51,7 +51,7 @@ function set_entry!(a::nmod_mat, i::Int, j::Int, u::UInt)
 end
 
 function set_entry!(a::nmod_mat, i::Int, j::Int, u::fmpz)
-  t = ZZ()
+  t = fmpz()
   ccall((:fmpz_mod_ui, :libflint), UInt,
           (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &u, a._n)
   tt = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &t)
@@ -212,7 +212,7 @@ end
 *(x::UInt, y::nmod_mat) = y*x
 
 function *(x::nmod_mat, y::fmpz)
-  t = ZZ()
+  t = fmpz()
   ccall((:fmpz_mod_ui, :libflint), UInt,
           (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &y, parent(x)._n)
   tt = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &t)
@@ -248,8 +248,8 @@ end
 
 function ^(x::nmod_mat, y::fmpz)
   ( y < 0 ) && error("Exponent must be positive")
-  ( y > ZZ(typemax(UInt))) &&
-          error("Exponent must be smaller then ", ZZ(typemax(UInt)))
+  ( y > fmpz(typemax(UInt))) &&
+          error("Exponent must be smaller then ", fmpz(typemax(UInt)))
   return x^(UInt(y))
 end
 
@@ -450,7 +450,7 @@ function Array(b::nmod_mat)
 end
 
 function lift(a::nmod_mat)
-  z = MatrixSpace(ZZ, rows(a), cols(a))()
+  z = MatrixSpace(flintZZ, rows(a), cols(a))()
   ccall((:fmpz_mat_set_nmod_mat, :libflint), Void,
           (Ptr{fmpz_mat}, Ptr{nmod_mat}), &z, &a)
   return z 

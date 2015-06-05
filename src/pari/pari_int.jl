@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export PariZZ, pari, ZZ!, factor, PariIntegerRing, pari_int
+export PariZZ, pari, fmpz!, factor, PariIntegerRing, pari_int
 
 ###############################################################################
 #
@@ -64,9 +64,9 @@ function pari(a::fmpz)
    return g
 end
 
-pari(a::Integer) = pari(ZZ(a))
+pari(a::Integer) = pari(fmpz(a))
 
-function ZZ!(z::fmpz, g::Ptr{Int})
+function fmpz!(z::fmpz, g::Ptr{Int})
    const data_offset = 1 + div(2*sizeof(Cint), sizeof(Int))
    s = (unsafe_load(g, 1) & LGBITS) - 2
    sgn = signe(g + sizeof(Int))
@@ -93,8 +93,8 @@ function ZZ!(z::fmpz, g::Ptr{Int})
 end
 
 function call(::FlintIntegerRing, g::pari_int)
-   z = ZZ()
-   ZZ!(z, g.d)
+   z = fmpz()
+   fmpz!(z, g.d)
    return z
 end
 
@@ -119,6 +119,6 @@ end
 ###############################################################################
 
 function Base.call(ord::PariIntegerRing, n::Ptr{Int})
-   return ZZ!(ZZ(), n)
+   return fmpz!(fmpz(), n)
 end
 

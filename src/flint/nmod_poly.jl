@@ -164,7 +164,7 @@ end
 
 function *(x::nmod_poly, y::fmpz)
   z = parent(x)()
-  t = ZZ()
+  t = fmpz()
   tt = UInt(0)
   ccall((:fmpz_mod_ui, :libflint), UInt,
                 (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &y, parent(x)._n)
@@ -174,7 +174,7 @@ end
 
 *(x::fmpz, y::nmod_poly) = y*x
 
-*(x::nmod_poly, y::Integer) = x*ZZ(y)
+*(x::nmod_poly, y::Integer) = x*fmpz(y)
 
 *(x::Integer, y::nmod_poly) = y*x
 
@@ -196,7 +196,7 @@ end
 
 function +(x::nmod_poly, y::fmpz)
   z = parent(x)()
-  t = ZZ()
+  t = fmpz()
   tt = UInt(0)
   ccall((:fmpz_mod_ui, :libflint), UInt,
                 (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &y, parent(x)._n)
@@ -206,7 +206,7 @@ end
 
 +(x::fmpz, y::nmod_poly) = y + x
 
-+(x::nmod_poly, y::Integer) = x + ZZ(y)
++(x::nmod_poly, y::Integer) = x + fmpz(y)
 
 +(x::Integer, y::nmod_poly) = y + x 
 
@@ -228,7 +228,7 @@ end
 
 function -(x::nmod_poly, y::fmpz)
   z = parent(x)()
-  t = ZZ()
+  t = fmpz()
   tt = UInt(0)
   ccall((:fmpz_mod_ui, :libflint), UInt,
                 (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &y, parent(x)._n)
@@ -238,7 +238,7 @@ end
 
 -(x::fmpz, y::nmod_poly) = -(y - x)
 
--(x::nmod_poly, y::Integer) = x - ZZ(y)
+-(x::nmod_poly, y::Integer) = x - fmpz(y)
 
 -(x::Integer, y::nmod_poly) = -(y - x)
 
@@ -573,7 +573,7 @@ function interpolate(R::NmodPolyRing, x::Array{Residue{fmpz}, 1},
   ax = Array(UInt, length(x))
   ay = Array(UInt, length(y))
 
-  t = ZZ()
+  t = fmpz()
 
   for i in 1:length(x)
     ccall((:fmpz_mod_ui, :libflint), Void,
@@ -752,7 +752,7 @@ function setcoeff!(x::nmod_poly, n::Int, y::fmpz)
                    (Ptr{nmod_poly}, Int, UInt), &x, n, r)
 end
   
-setcoeff!(x::nmod_poly, n::Int, y::Integer) = setcoeff!(x, n, ZZ(y))
+setcoeff!(x::nmod_poly, n::Int, y::Integer) = setcoeff!(x, n, fmpz(y))
   
 function setcoeff!(x::nmod_poly, n::Int, y::Residue{fmpz})
   setcoeff!(x, n, UInt(y.data))

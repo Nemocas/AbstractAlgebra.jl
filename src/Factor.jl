@@ -12,7 +12,7 @@ end
 
 function getindex(a::Factor{FlintIntegerRing}, i::Int)
    p, n = a.d[i]
-   return ZZ(p), n
+   return fmpz(p), n
 end
 
 function getindex(a::Factor{FmpzPolyRing}, i::Int)
@@ -38,7 +38,7 @@ end
 
 function factor(n::fmpz)
    f = factor(pari(n))
-   return Factor{FlintIntegerRing}(f, f.len, ZZ)
+   return Factor{FlintIntegerRing}(f, f.len, flintZZ)
 end
 
 function factor(g::fmpz_poly)

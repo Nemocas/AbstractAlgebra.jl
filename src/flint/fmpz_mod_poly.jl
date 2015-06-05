@@ -41,7 +41,7 @@ degree(x::fmpz_mod_poly) = ccall((:fmpz_mod_poly_degree, :libflint), Int,
 
 function coeff(x::fmpz_mod_poly, n::Int)
   (n < 0 || n > degree(x)) && throw(DomainError())
-  z = ZZ()
+  z = fmpz()
   ccall((:fmpz_mod_poly_get_coeff_fmpz, :libflint), Void,
         (Ptr{fmpz}, Ptr{fmpz_mod_poly}, Int), &z, &x, n)
   return base_ring(x)(z)
@@ -51,7 +51,7 @@ zero(R::FmpzModPolyRing) = R(0)
 
 one(R::FmpzModPolyRing) = R(1)
 
-gen(R::FmpzModPolyRing) = R([ZZ(0), ZZ(1)])
+gen(R::FmpzModPolyRing) = R([fmpz(0), fmpz(1)])
 
 isgen(a::fmpz_mod_poly) = (degree(a) == 1 &&
                               iszero(coeff(a,0)) && isone(coeff(a,1)))
@@ -200,7 +200,7 @@ end
 
 *(x::fmpz, y::fmpz_mod_poly) = y*x
 
-*(x::fmpz_mod_poly, y::Integer) = x*ZZ(y)
+*(x::fmpz_mod_poly, y::Integer) = x*fmpz(y)
 
 *(x::Integer, y::fmpz_mod_poly) = y*x
 
@@ -229,9 +229,9 @@ end
 
 +(x::fmpz, y::fmpz_mod_poly) = y + x
 
-+(x::fmpz_mod_poly, y::Integer) = x + ZZ(y)
++(x::fmpz_mod_poly, y::Integer) = x + fmpz(y)
 
-+(x::Integer, y::fmpz_mod_poly) = ZZ(y) + x 
++(x::Integer, y::fmpz_mod_poly) = fmpz(y) + x 
 
 function +(x::fmpz_mod_poly, y::Residue{fmpz})
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
@@ -268,9 +268,9 @@ function -(x::fmpz, y::fmpz_mod_poly)
   return z
 end
 
--(x::fmpz_mod_poly, y::Integer) = x - ZZ(y)
+-(x::fmpz_mod_poly, y::Integer) = x - fmpz(y)
 
--(x::Integer, y::fmpz_mod_poly) = ZZ(x) - y
+-(x::Integer, y::fmpz_mod_poly) = fmpz(x) - y
 
 function -(x::fmpz_mod_poly, y::Residue{fmpz})
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
@@ -555,7 +555,7 @@ end
 function resultant(x::fmpz_mod_poly, y::fmpz_mod_poly)
   check_parent(x,y)
   z = parent(x)()
-  r = ZZ()
+  r = fmpz()
   ccall((:fmpz_mod_poly_resultant, :libflint), Void,
           (Ptr{fmpz}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), &r, &x, &y)
   return base_ring(x)(r)
@@ -569,7 +569,7 @@ end
 
 function evaluate(x::fmpz_mod_poly, y::Residue{fmpz})
   base_ring(x) != parent(y) && error("Elements must have same parent")
-  z = ZZ()
+  z = fmpz()
   ccall((:fmpz_mod_poly_evaluate_fmpz, :libflint), Void,
               (Ptr{fmpz}, Ptr{fmpz_mod_poly}, Ptr{fmpz}), &z, &x, &(y.data))
   return parent(y)(z)
@@ -756,7 +756,7 @@ function setcoeff!(x::fmpz_mod_poly, n::Int, y::fmpz)
 end
 
 function setcoeff!(x::fmpz_mod_poly, n::Int, y::Integer)
-  setcoeff!(x, n, ZZ(y))
+  setcoeff!(x, n, fmpz(y))
 end
   
 function setcoeff!(x::fmpz_mod_poly, n::Int, y::Residue{fmpz})
@@ -812,7 +812,7 @@ function Base.call(R::FmpzModPolyRing, x::fmpz)
 end
 
 function Base.call(R::FmpzModPolyRing, x::Integer)
-  z = fmpz_mod_poly(R._n, ZZ(x))
+  z = fmpz_mod_poly(R._n, fmpz(x))
   z.parent = R
   return z
 end
@@ -852,7 +852,7 @@ end
 ################################################################################
 
 function PolynomialRing(R::ResidueRing{fmpz}, s::String)
-   if modulus(R) <= ZZ(typemax(UInt))
+   if modulus(R) <= fmpz(typemax(UInt))
       parent_obj = NmodPolyRing(R, symbol(s))
    else
       parent_obj = FmpzModPolyRing(R, symbol(s))

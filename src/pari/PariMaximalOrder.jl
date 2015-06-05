@@ -102,7 +102,7 @@ end
 function Base.call(ord::PariMaximalOrder, b::Integer)
    av = unsafe_load(avma, 1)
    data = ccall((:algtobasis, :libpari), Ptr{Int}, 
-                 (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(ZZ(b)).d)
+                 (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(fmpz(b)).d)
    unsafe_store!(avma, av, 1)
    return PariMaximalOrderElem(data, ord)
 end

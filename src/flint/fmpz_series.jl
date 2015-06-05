@@ -36,7 +36,7 @@ max_precision(R::FmpzSeriesRing) = R.prec_max
 
 function normalise(a::fmpz_series, len::Int)
    if len > 0
-      c = ZZ()
+      c = fmpz()
       ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
          (Ptr{fmpz}, Ptr{fmpz_series}, Int), &c, &a, len - 1)
    end
@@ -59,9 +59,9 @@ precision(x::fmpz_series) = x.prec
 
 function coeff(x::fmpz_series, n::Int)
    if n < 0
-      return ZZ(0)
+      return fmpz(0)
    end
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpz_poly_get_coeff_fmpz, :libflint), Void, 
          (Ptr{fmpz}, Ptr{fmpz_series}, Int), &z, &x, n)
    return z
@@ -72,7 +72,7 @@ zero(R::FmpzSeriesRing) = R(0)
 one(R::FmpzSeriesRing) = R(1)
 
 function gen(R::FmpzSeriesRing)
-   z = fmpz_series([ZZ(0), ZZ(1)], 2, max_precision(R) + 1)
+   z = fmpz_series([fmpz(0), fmpz(1)], 2, max_precision(R) + 1)
    z.parent = R
    return z
 end
@@ -334,7 +334,7 @@ function ^(a::fmpz_series, b::Int)
    b < 0 && throw(DomainError())
    if isgen(a)
       z = parent(a)()
-      setcoeff!(z, b, ZZ(1))
+      setcoeff!(z, b, fmpz(1))
       z.prec = a.prec + b - 1
    elseif length(a) == 0
       z = parent(a)()
@@ -342,7 +342,7 @@ function ^(a::fmpz_series, b::Int)
    elseif length(a) == 1
       return parent(a)([coeff(a, 0)^b], 1, a.prec)
    elseif b == 0
-      return parent(a)([ZZ(1)], 1, parent(a).prec_max)
+      return parent(a)([fmpz(1)], 1, parent(a).prec_max)
    else
       z = parent(a)()
       z.prec = a.prec + (b - 1)*valuation(a)
@@ -434,7 +434,7 @@ function divexact(x::fmpz_series, y::fmpz)
    return z
 end
 
-divexact(x::fmpz_series, y::Integer) = divexact(x, ZZ(y))
+divexact(x::fmpz_series, y::Integer) = divexact(x, fmpz(y))
 
 ###############################################################################
 #
@@ -481,7 +481,7 @@ function Base.call(a::FmpzSeriesRing, b::Integer)
       z = fmpz_series()
       z.prec = a.prec_max
    else
-      z = fmpz_series([ZZ(b)], 1, a.prec_max)
+      z = fmpz_series([fmpz(b)], 1, a.prec_max)
    end
    z.parent = a
    return z
@@ -520,6 +520,6 @@ function PowerSeriesRing(R::FlintIntegerRing, prec::Int, s::String)
 
    parent_obj = FmpzSeriesRing(prec, S)
    
-   return parent_obj, parent_obj([ZZ(0), ZZ(1)], 2, prec + 1)
+   return parent_obj, parent_obj([fmpz(0), fmpz(1)], 2, prec + 1)
 end
 

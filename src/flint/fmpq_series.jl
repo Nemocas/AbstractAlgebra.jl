@@ -463,7 +463,7 @@ function divexact(x::fmpq_series, y::fmpq)
    return z
 end
 
-divexact(x::fmpq_series, y::Integer) = divexact(x, ZZ(y))
+divexact(x::fmpq_series, y::Integer) = divexact(x, fmpz(y))
 
 ###############################################################################
 #

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   fmpz_mat.jl : Flint matrices over ZZ
+#   fmpz_mat.jl : Flint matrices over fmpz
 #
 ###############################################################################
 
@@ -84,7 +84,7 @@ end
 function getindex(a::fmpz_mat, r::Int, c::Int)
    checkbounds(a.parent.rows, r)
    checkbounds(a.parent.cols, c)
-   v = ZZ()
+   v = fmpz()
    z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ptr{fmpz_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpz_set, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), &v, z)
@@ -97,7 +97,7 @@ function setindex!(a::fmpz_mat, d::fmpz, r::Int, c::Int)
    ccall((:fmpz_set, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), z, &d)
 end
 
-setindex!(a::fmpz_mat, d::Integer, r::Int, c::Int) = setindex!(a, ZZ(d), r, c)
+setindex!(a::fmpz_mat, d::Integer, r::Int, c::Int) = setindex!(a, fmpz(d), r, c)
 
 function setindex!(a::fmpz_mat, d::Int, r::Int, c::Int)
    checkbounds(a.parent.rows, r)
@@ -181,7 +181,7 @@ function -(x::fmpz_mat)
 end
 
 function transpose(x::fmpz_mat)
-   z = MatrixSpace(ZZ, cols(x), rows(x))()
+   z = MatrixSpace(flintZZ, cols(x), rows(x))()
    ccall((:fmpz_mat_transpose, :libflint), Void,
          (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &x)
    return z
@@ -249,9 +249,9 @@ end
 
 *(x::fmpz_mat, y::fmpz) = y*x
 
-*(x::Integer, y::fmpz_mat) = ZZ(x)*y
+*(x::Integer, y::fmpz_mat) = fmpz(x)*y
 
-*(x::fmpz_mat, y::Integer) = ZZ(y)*x
+*(x::fmpz_mat, y::Integer) = fmpz(y)*x
 
 function +(x::fmpz_mat, y::Integer)
    z = deepcopy(x)
@@ -363,7 +363,7 @@ end
 
 function inv(x::fmpz_mat)
    z = parent(x)()
-   d = ZZ()
+   d = fmpz()
    ccall((:fmpz_mat_inv, :libflint), Void, 
          (Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{fmpz_mat}), &z, &d, &x)
    if d == 1
@@ -406,7 +406,7 @@ function divexact(x::fmpz_mat, y::fmpz)
    return z
 end
 
-divexact(x::fmpz_mat, y::Integer) = divexact(x, ZZ(y))
+divexact(x::fmpz_mat, y::Integer) = divexact(x, fmpz(y))
 
 ###############################################################################
 #
@@ -421,7 +421,7 @@ function reduce_mod(x::fmpz_mat, y::fmpz)
    return z
 end
 
-reduce_mod(x::fmpz_mat, y::Integer) = reduce_mod(x, ZZ(y))
+reduce_mod(x::fmpz_mat, y::Integer) = reduce_mod(x, fmpz(y))
 
 ###############################################################################
 #
@@ -445,7 +445,7 @@ end
 
 function determinant(x::fmpz_mat)
    rows(x) != cols(x) && error("Non-square matrix")
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpz_mat_det, :libflint), Void, 
                 (Ptr{fmpz}, Ptr{fmpz_mat}), &z, &x)
    return z
@@ -453,7 +453,7 @@ end
 
 function determinant_divisor(x::fmpz_mat)
    rows(x) != cols(x) && error("Non-square matrix")
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpz_mat_det_divisor, :libflint), Void, 
                 (Ptr{fmpz}, Ptr{fmpz_mat}), &z, &x)
    return z
@@ -461,14 +461,14 @@ end
 
 function determinant_given_divisor(x::fmpz_mat, d::fmpz, proved=true)
    rows(x) != cols(x) && error("Non-square")
-   z = ZZ()
+   z = fmpz()
    ccall((:fmpz_mat_det_modular_given_divisor, :libflint), Void, 
                (Ptr{fmpz}, Ptr{fmpz_mat}, Ptr{fmpz}, Cint), &z, &x, &d, proved)
    return z
 end
 
 function determinant_given_divisor(x::fmpz_mat, d::Integer, proved=true)
-   return determinant_given_divisor(x, ZZ(d), proved)
+   return determinant_given_divisor(x, fmpz(d), proved)
 end
 
 ###############################################################################
@@ -683,7 +683,7 @@ end
 
 function rref(x::fmpz_mat)
    z = parent(x)()
-   d = ZZ()
+   d = fmpz()
    ccall((:fmpz_mat_rref, :libflint), Void,
          (Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{fmpz_mat}), &z, &d, &x)
    return z, d
@@ -724,7 +724,7 @@ function solve(a::fmpz_mat, b::fmpz_mat)
    rows(a) != cols(a) && error("Not a square matrix in solve")
    rows(b) != rows(a) || cols(b) != 1 && ("Not a column vector in solve")
    z = parent(b)()
-   d = ZZ()
+   d = fmpz()
    nonsing = ccall((:fmpz_mat_solve, :libflint), Bool,
       (Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &d, &a, &b)
    !nonsing && error("Singular matrix in solve")
@@ -735,7 +735,7 @@ function solve_dixon(a::fmpz_mat, b::fmpz_mat)
    rows(a) != cols(a) && error("Not a square matrix in solve")
    rows(b) != rows(a) || cols(b) != 1 && ("Not a column vector in solve")
    z = parent(b)()
-   d = ZZ()
+   d = fmpz()
    nonsing = ccall((:fmpz_mat_solve_dixon, :libflint), Bool,
       (Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &d, &a, &b)
    !nonsing && error("Singular matrix in solve")
@@ -750,7 +750,7 @@ end
 
 function trace(x::fmpz_mat)
    rows(x) != cols(x) && error("Not a square matrix in trace")
-   d = ZZ()
+   d = fmpz()
    ccall((:fmpz_mat_trace, :libflint), Int, 
                 (Ptr{fmpz}, Ptr{fmpz_mat}), &d, &x)
    return d
@@ -763,7 +763,7 @@ end
 ###############################################################################
 
 function content(x::fmpz_mat)
-  d = ZZ()
+  d = fmpz()
   ccall((:fmpz_mat_content, :libflint), Void, 
         (Ptr{fmpz}, Ptr{fmpz_mat}), &d, &x)
   return d
@@ -777,7 +777,7 @@ end
 
 function hcat(a::fmpz_mat, b::fmpz_mat)
   rows(a) != rows(b) && error("Incompatible number of rows in hcat")
-  c = MatrixSpace(ZZ, rows(a), cols(a) + cols(b))()
+  c = MatrixSpace(flintZZ, rows(a), cols(a) + cols(b))()
   ccall((:fmpz_mat_concat_horizontal, :libflint), Void, 
         (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &c, &a, &b)
   return c
@@ -785,7 +785,7 @@ end
 
 function vcat(a::fmpz_mat, b::fmpz_mat)
   cols(a) != cols(b) && error("Incompatible number of columns in vcat")
-  c = MatrixSpace(ZZ, rows(a) + rows(b), cols(a))()
+  c = MatrixSpace(flintZZ, rows(a) + rows(b), cols(a))()
   ccall((:fmpz_mat_concat_vertical, :libflint), Void, 
         (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &c, &a, &b)
   return c
@@ -871,7 +871,7 @@ function Base.call(a::FmpzMatSpace, d::fmpz)
 end
 
 function Base.call(a::FmpzMatSpace, d::Integer)
-   z = fmpz_mat(a.rows, a.cols, ZZ(d))
+   z = fmpz_mat(a.rows, a.cols, fmpz(d))
    z.parent = a
    return z
 end
