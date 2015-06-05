@@ -6,14 +6,14 @@
 
 ###############################################################################
 #
-#   IntegerRing / fmpz
+#   FlintIntegerRing / fmpz
 #
 ###############################################################################
 
-type IntegerRing <: Ring{Flint}
+type FlintIntegerRing <: Ring{Flint}
 end
 
-type fmpz <: RingElem
+type fmpz <: IntegerRingElem
     d::Int
 
     function fmpz()
@@ -769,7 +769,7 @@ function _padic_ctx_clear_fn(a::PadicField)
    ccall((:padic_ctx_clear, :libflint), Void, (Ptr{PadicField},), &a)
 end
 
-type padic <: FieldElem
+type padic <: PadicFieldElem
    u :: Int
    v :: Int
    N :: Int
@@ -1131,7 +1131,7 @@ FmpzMatID = ObjectIdDict()
 type FmpzMatSpace <: Ring{Flint}
    rows::Int
    cols::Int
-   base_ring::IntegerRing
+   base_ring::FlintIntegerRing
 
    function FmpzMatSpace(r::Int, c::Int)
       return try

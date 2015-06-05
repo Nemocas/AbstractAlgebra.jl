@@ -92,7 +92,7 @@ function ZZ!(z::fmpz, g::Ptr{Int})
    return z
 end
 
-function call(::IntegerRing, g::pari_int)
+function call(::FlintIntegerRing, g::pari_int)
    z = ZZ()
    ZZ!(z, g.d)
    return z

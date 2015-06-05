@@ -31,7 +31,7 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export fmpz, ZZ, IntegerRing, parent, show, convert, hash, fac, binom, isprime,
+export fmpz, ZZ, FlintIntegerRing, parent, show, convert, hash, fac, binom, isprime,
        fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm, invmod, powmod, abs,
        divrem, isqrt, popcount, prevpow2, nextpow2, ndigits, dec, bin, oct,
        hex, base, one, zero, divexact, fits, sign, nbits, deepcopy, tdivpow2,
@@ -48,13 +48,13 @@ export fmpz, ZZ, IntegerRing, parent, show, convert, hash, fac, binom, isprime,
 #
 ###############################################################################
 
-ZZ = IntegerRing()
+ZZ = FlintIntegerRing()
 
 parent(a::fmpz) = ZZ
 
-elem_type(::IntegerRing) = fmpz
+elem_type(::FlintIntegerRing) = fmpz
 
-base_ring(a::IntegerRing) = None
+base_ring(a::FlintIntegerRing) = None
 
 hash(a::fmpz) = hash(BigInt(a))
 
@@ -70,9 +70,9 @@ function deepcopy(a::fmpz)
    return z
 end
 
-one(::IntegerRing) = ZZ(1)
+one(::FlintIntegerRing) = ZZ(1)
 
-zero(::IntegerRing) = ZZ(0)
+zero(::FlintIntegerRing) = ZZ(0)
 
 sign(a::fmpz) = Int(ccall((:fmpz_sgn, :libflint), Cint, (Ptr{fmpz},), &a))
 
@@ -877,7 +877,7 @@ string(x::fmpz) = dec(x)
 
 show(io::IO, x::fmpz) = print(io, string(x))
 
-show(io::IO, a::IntegerRing) = print(io, "Integer Ring")
+show(io::IO, a::FlintIntegerRing) = print(io, "Integer Ring")
 
 needs_parentheses(x::fmpz) = false
 
@@ -924,24 +924,24 @@ nbits(x::fmpz) = x == 0 ? 0 : ndigits(x, 2)
 #
 ###############################################################################
 
-call(::IntegerRing) = fmpz()
+call(::FlintIntegerRing) = fmpz()
 
-call(::IntegerRing, a::Integer) = fmpz(a)
+call(::FlintIntegerRing, a::Integer) = fmpz(a)
 
-call(::IntegerRing, a::String) = fmpz(a)
+call(::FlintIntegerRing, a::String) = fmpz(a)
 
-call(::IntegerRing, a::fmpz) = a
+call(::FlintIntegerRing, a::fmpz) = a
 
-function call(::IntegerRing, a::Float64)
+function call(::FlintIntegerRing, a::Float64)
     !isinteger(a) && throw(InexactError())
     z = ZZ()
     ccall((:fmpz_set_d, :libflint), Void, (Ptr{fmpz}, Cdouble), &z, a)
     return z
 end
 
-call(::IntegerRing, a::Float16) = ZZ(Float64(a))
+call(::FlintIntegerRing, a::Float16) = ZZ(Float64(a))
 
-call(::IntegerRing, a::Float32) = ZZ(Float64(a))
+call(::FlintIntegerRing, a::Float32) = ZZ(Float64(a))
 
 ###############################################################################
 #

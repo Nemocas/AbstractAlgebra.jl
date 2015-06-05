@@ -33,6 +33,8 @@ abstract Generic
 
 # mathematical objects parameterised by an element type
 # these are the type classes of mathematical objects
+# that have some kind of base ring, and a generic 
+# implementation is meaningful over that base ring
 
    abstract PolyElem{T} <: RingElem
 
@@ -48,6 +50,7 @@ abstract Generic
 
 # leaf objects, with no parameterisation
 # these are also type classes of mathematical objects
+# usually provided by a C library and not by generic
 
    abstract IntegerRingElem <: RingElem
 
@@ -56,4 +59,6 @@ abstract Generic
    abstract NumberFieldElem <: FieldElem
 
    abstract MaximalOrderElem <: RingElem
+
+   abstract PadicFieldElem <: FieldElem
 

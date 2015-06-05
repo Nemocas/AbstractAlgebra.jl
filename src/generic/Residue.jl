@@ -277,7 +277,7 @@ function ResidueRing{T <: RingElem}(R::Ring, el::T)
    return ResidueRing{T}(el)
 end
 
-function ResidueRing(R::IntegerRing, el::Integer)
+function ResidueRing(R::FlintIntegerRing, el::Integer)
    el == 0 && throw(DivideError())
    
    return ResidueRing{fmpz}(R(el))

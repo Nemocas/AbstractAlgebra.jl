@@ -515,7 +515,7 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::IntegerRing, prec::Int, s::String)
+function PowerSeriesRing(R::FlintIntegerRing, prec::Int, s::String)
    S = symbol(s)
 
    parent_obj = FmpzSeriesRing(prec, S)

@@ -13,7 +13,7 @@
 type PariIntegerRing <: Ring{Pari}
 end
 
-type pari_int <: RingElem
+type pari_int <: IntegerRingElem
    d::Ptr{Int}
 
    function pari_int(s::Int)
@@ -37,7 +37,7 @@ end
 type PariRationalField <: Field{Pari}
 end
 
-type pari_rat <: FractionElem
+type pari_rat <: FractionElem{pari_int}
    d::Ptr{Int}
 
    function pari_rat(s::Int)
@@ -137,7 +137,7 @@ _pari_poly_unclone(g::pari_poly) = gunclone(g.d)
 
 PariPolModID = Dict{Tuple{DataType, Symbol}, Ring}()
 
-type PariPolModRing{S <: RingElem} <: Ring{Pari}
+type PariPolModRing{S <: PolyElem} <: Ring{Pari}
    T::Symbol
 
    function PariPolModRing(t::Symbol)
@@ -149,7 +149,7 @@ type PariPolModRing{S <: RingElem} <: Ring{Pari}
    end
 end
 
-type pari_polmod{S <: RingElem} <: PolyElem{S}
+type pari_polmod{S <: PolyElem} <: ResidueElem{S}
    data::Ptr{Int}
    parent::PariPolModRing{S}
 
@@ -202,7 +202,7 @@ type PariMaximalOrder <: Ring{Pari}
    pari_nf::PariNumberField
 end
 
-type PariMaximalOrderElem <: RingElem
+type PariMaximalOrderElem <: MaximalOrderElem
    data::Ptr{Int}
    parent::PariMaximalOrder
 

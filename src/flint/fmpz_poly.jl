@@ -668,7 +668,7 @@ Base.call(a::FmpzPolyRing, b::fmpz_poly) = b
 #
 ###############################################################################
 
-function PolynomialRing(R::IntegerRing, s::String)
+function PolynomialRing(R::FlintIntegerRing, s::String)
    S = symbol(s)
 
    parent_obj = FmpzPolyRing(S)

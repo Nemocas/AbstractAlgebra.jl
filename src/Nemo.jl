@@ -12,7 +12,7 @@ import Base: abs, asin, asinh, atan, atanh, base, bin, call, convert, cos,
 export Collection, Ring, Field, CollectionElem, RingElem, FieldElem, Pari,
        Flint, Antic, Generic
 
-export PolyElem, SeriesElem, ResidueElem, FractionElem
+export PolyElem, SeriesElem, ResidueElem, FractionElem, MatElem
 
 include("AbstractTypes.jl")
 

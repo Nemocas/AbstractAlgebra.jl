@@ -516,5 +516,5 @@ convert(::Type{Rational{BigInt}}, a::fmpq) = Rational(a)
 #
 #########################################################################################
 
-FractionField(base::IntegerRing) = QQ 
+FractionField(base::FlintIntegerRing) = QQ 
 

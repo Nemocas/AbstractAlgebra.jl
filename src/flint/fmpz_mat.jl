@@ -892,6 +892,6 @@ Base.promote_rule{T <: Integer}(::Type{fmpz_mat}, ::Type{T}) = fmpz_mat
 #
 ###############################################################################
 
-function MatrixSpace(R::IntegerRing, r::Int, c::Int)
+function MatrixSpace(R::FlintIntegerRing, r::Int, c::Int)
    return FmpzMatSpace(r, c)
 end
