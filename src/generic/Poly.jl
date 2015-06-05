@@ -10,7 +10,7 @@ export Poly, PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow,
        resultant, discriminant, gcdx, zero, one, gen, length, iszero, 
        normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod, 
        invmod, lcm, divrem, mod, gcdinv, canonical_unit, var, chebyshev_t,
-       chebyshev_u
+       chebyshev_u, set_length!
 
 ###############################################################################
 #
@@ -48,19 +48,23 @@ function hash(a::PolyElem)
    return h
 end
 
-function normalise(a::PolyElem, len::Int)
-   while len > 0 && iszero(a.coeffs[len]) # cannot use coeff(a, len - 1)
+function normalise(a::Poly, len::Int)
+   while len > 0 && iszero(a.coeffs[len]) 
       len -= 1
    end
 
    return len
 end
 
+function set_length!(a::Poly, len::Int)
+   a.length = len
+end
+
 length(x::PolyElem) = x.length
 
 degree(x::PolyElem) = length(x) - 1
 
-coeff(a::PolyElem, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
+coeff(a::Poly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
 lead(a::PolyElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
 
@@ -179,7 +183,7 @@ function -{T <: RingElem}(a::Poly{T})
       d[i] = -coeff(a, i - 1)
    end
    z = parent(a)(d)
-   z.length = len
+   set_length!(z, len)
    return z
 end
 
@@ -214,7 +218,7 @@ function +{T <: RingElem}(a::Poly{T}, b::Poly{T})
 
    z = parent(a)(d)
 
-   z.length = normalise(z, i - 1)
+   set_length!(z, normalise(z, i - 1))
 
    return z
 end
@@ -244,7 +248,7 @@ function -{T <: RingElem}(a::Poly{T}, b::Poly{T})
 
    z = parent(a)(d)
 
-   z.length = normalise(z, i - 1)
+   set_length!(z, normalise(z, i - 1))
 
    return z
 end
@@ -280,7 +284,7 @@ function *{T <: RingElem}(a::Poly{T}, b::Poly{T})
    
    z = parent(a)(d)
         
-   z.length = normalise(z, lenz)
+   set_length!(z, normalise(z, lenz))
 
    return z
 end
@@ -298,7 +302,7 @@ function *{T <: RingElem}(a::Int, b::Poly{T})
       d[i] = a*coeff(b, i - 1)
    end
    z = parent(b)(d)
-   z.length = normalise(z, len)
+   set_length!(z, normalise(z, len))
    return z
 end
 
@@ -309,7 +313,7 @@ function *{T <: RingElem}(a::fmpz, b::Poly{T})
       d[i] = a*coeff(b, i - 1)
    end
    z = parent(b)(d)
-   z.length = normalise(z, len)
+   set_length!(z, normalise(z, len))
    return z
 end
 
@@ -333,7 +337,7 @@ function ^{T <: RingElem}(a::PolyElem{T}, b::Int)
          d[i] = coeff(a, 0)
       end
       z = parent(a)(d)
-      z.length = b + 1
+      set_length!(z, b + 1)
       return z
    elseif length(a) == 0
       return zero(parent(a))
@@ -427,7 +431,7 @@ function truncate{T <: RingElem}(a::PolyElem{T}, n::Int)
 
    z = parent(a)(d)
 
-   z.length = normalise(z, lenz)
+   set_length!(z, normalise(z, lenz))
 
    return z
 end
@@ -472,7 +476,7 @@ function mullow{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, n::Int)
      
    z = parent(a)(d)
    
-   z.length = normalise(z, lenz)
+   set_length!(z, normalise(z, lenz))
 
    return z
 end
@@ -490,7 +494,7 @@ function reverse{T <: RingElem}(x::PolyElem{T}, len::Int)
       v[i] = coeff(x, len - i)
    end
    r = parent(x)(v)
-   r.length = normalise(r, len)
+   set_length!(r, normalise(r, len))
    return r
 end
 
@@ -606,7 +610,7 @@ function divexact{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
       f = f - q1*g*x^(lenf - leng)
    end
    q = parent(f)(d)
-   q.length = lenq
+   set_length!(q, lenq)
    return q
 end
 
@@ -623,7 +627,7 @@ function divexact{T <: RingElem}(a::Poly{T}, b::T)
       d[i] = divexact(coeff(a, i - 1), b)
    end
    z = parent(a)(d)
-   z.length = length(a)
+   set_length!(z, length(a))
    return z
 end
 
@@ -634,7 +638,7 @@ function divexact{T <: RingElem}(a::Poly{T}, b::Integer)
       d[i] = divexact(coeff(a, i - 1), b)
    end
    z = parent(a)(d)
-   z.length = length(a)
+   set_length!(z, length(a))
    return z
 end
 
@@ -726,7 +730,7 @@ function pseudodivrem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    while lenq > 0 && coeff(q, lenq - 1) == 0
       lenq -= 1
    end
-   q.length = lenq
+   set_length!(q, lenq)
    return q, f
 end
 
@@ -858,7 +862,7 @@ function derivative{T <: RingElem}(a::PolyElem{T})
       d[i] = i*coeff(a, i)
    end
    z = parent(a)(d)
-   z.length = normalise(z, len - 1)
+   set_length!(z, normalise(z, len - 1))
    return z
 end
 
@@ -880,7 +884,7 @@ function integral{T <: Union(ResidueElem, FieldElem)}(x::PolyElem{T})
    while len > 0 && coeff(p, len - 1) == 0 # cannot use normalise here
       len -= 1
    end
-   p.length = len
+   set_length!(p, len)
    return p
 end
 

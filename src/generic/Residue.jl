@@ -32,7 +32,7 @@ end
 
 function hash(a::ResidueElem)
    h = 0x539c1c8715c1adc2
-   return h $ hash(a.data)
+   return h $ hash(data(a))
 end
 
 function modulus(R::ResidueRing)
@@ -82,9 +82,9 @@ function show(io::IO, a::ResidueRing)
    print(io, "Residue ring of ", base_ring(a), " modulo ", modulus(a))
 end
 
-needs_parentheses(x::ResidueElem) = needs_parentheses(x.data)
+needs_parentheses(x::ResidueElem) = needs_parentheses(data(x))
 
-is_negative(x::ResidueElem) = is_negative(x.data)
+is_negative(x::ResidueElem) = is_negative(data(x))
 
 show_minus_one{T <: RingElem}(::Type{ResidueElem{T}}) = true
 

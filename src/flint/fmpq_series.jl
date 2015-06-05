@@ -63,6 +63,12 @@ function coeff(x::fmpq_series, n::Int)
    return z
 end
 
+function length(x::fmpq_series)
+   return ccall((:fmpq_poly_length, :libflint), Int, (Ptr{fmpq_series},), &x)
+end
+
+precision(x::fmpq_series) = x.prec
+
 zero(R::FmpqSeriesRing) = R(0)
 
 one(R::FmpqSeriesRing) = R(1)

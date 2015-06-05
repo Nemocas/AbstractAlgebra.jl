@@ -62,6 +62,13 @@ function coeff(x::fmpz_mod_series, n::Int)
    return B(z)
 end
 
+function length(x::fmpz_mod_series)
+   return ccall((:fmpz_mod_poly_length, :libflint), Int, 
+                (Ptr{fmpz_mod_series},), &x)
+end
+
+precision(x::fmpz_mod_series) = x.prec
+
 zero(R::FmpzModSeriesRing) = R(0)
 
 one(R::FmpzModSeriesRing) = R(1)

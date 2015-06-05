@@ -5,7 +5,7 @@
 ###############################################################################    
 
 export PowerSeries, PowerSeriesRing, O, valuation, exp, precision,
-       max_precision
+       max_precision, set_prec!
 
 ###############################################################################
 #
@@ -51,9 +51,9 @@ function hash(a::SeriesElem)
    return h
 end
 
-length(x::SeriesElem) = x.length
+length(x::PowerSeries) = x.length
 
-precision(x::SeriesElem) = x.prec
+precision(x::PowerSeries) = x.prec
 
 max_precision(R::PowerSeriesRing) = R.prec_max
 
@@ -63,6 +63,14 @@ function normalise(a::PowerSeries, len::Int)
    end
 
    return len
+end
+
+function set_length!(a::PowerSeries, len::Int)
+   a.length = len
+end
+
+function set_prec!(a::PowerSeries, prec::Int)
+   a.prec = prec
 end
 
 function coeff(a::PowerSeries, n::Int)
@@ -204,8 +212,8 @@ end
 
 function +{T <: RingElem}(a::PowerSeries{T}, b::PowerSeries{T})
    check_parent(a, b)
-   lena = a.length
-   lenb = b.length
+   lena = length(a)
+   lenb = length(b)
          
    prec = min(precision(a), precision(b))
  
@@ -233,7 +241,7 @@ function +{T <: RingElem}(a::PowerSeries{T}, b::PowerSeries{T})
 
    z = parent(a)(d, i - 1, prec)
 
-   z.length = normalise(z, i - 1)
+   set_length!(z, normalise(z, i - 1))
 
    return z
 end
@@ -269,7 +277,7 @@ function -{T <: RingElem}(a::PowerSeries{T}, b::PowerSeries{T})
 
    z = parent(a)(d, i - 1, prec)
 
-   z.length = normalise(z, i - 1)
+   set_length!(z, normalise(z, i - 1))
 
    return z
 end
@@ -318,7 +326,7 @@ function *{T <: RingElem}(a::PowerSeries{T}, b::PowerSeries{T})
         
    z = parent(a)(d, lenz, prec)
 
-   z.length = normalise(z, lenz)
+   set_length!(z, normalise(z, lenz))
 
    return z
 end
@@ -336,7 +344,7 @@ function *{T <: RingElem}(a::Int, b::PowerSeries{T})
       d[i] = a*coeff(b, i - 1)
    end
    z = parent(b)(d, len, precision(b))
-   z.length = normalise(z, len)
+   set_length!(z, normalise(z, len))
    return z
 end
 
@@ -347,7 +355,7 @@ function *{T <: RingElem}(a::fmpz, b::PowerSeries{T})
       d[i] = a*coeff(b, i - 1)
    end
    z = parent(b)(d, len, precision(b))
-   z.length = normalise(z, len)
+   set_length!(z, normalise(z, len))
    return z
 end
 
@@ -410,7 +418,7 @@ function truncate{T <: RingElem}(x::SeriesElem{T}, prec::Int)
       d[i] = zero(base_ring(x))
    end
    z = parent(x)(d, prec, prec)
-   z.length = normalise(z, prec)
+   set_length!(z, normalise(z, prec))
    return z
 end
 
@@ -595,13 +603,13 @@ function inv{T <: RingElem}(a::SeriesElem{T})
    a1 = -a1
    for n = 2:precision(a)
       s = coeff(a, 1)*d[n - 1]
-      for i = 2:min(n, a.length) - 1
+      for i = 2:min(n, length(a)) - 1
          s += coeff(a, i)*d[n - i]
       end
       d[n] = divexact(s, a1)
    end
    ainv = parent(a)(d, precision(a), precision(a))
-   ainv.length = normalise(ainv, precision(a))
+   set_length!(ainv, normalise(ainv, precision(a)))
    return ainv
 end
 
@@ -627,7 +635,7 @@ function exp{T <: RingElem}(a::SeriesElem{T})
       d[k + 1] = divexact(s, k)
    end
    b = parent(a)(d, precision(a), precision(a))
-   b.length = normalise(b, precision(a))
+   set_length!(b, normalise(b, precision(a)))
    return b
 end
 

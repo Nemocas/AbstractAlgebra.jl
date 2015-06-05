@@ -61,9 +61,17 @@ function coeff(x::fq_nmod_series, n::Int)
    end
    z = ctx()
    ccall((:fq_nmod_poly_get_coeff, :libflint), Void, 
-         (Ptr{fq_nmod}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}), &z, &x, n, &ctx)
+         (Ptr{fq_nmod}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}), 
+             &z, &x, n, &ctx)
    return z
 end
+
+function length(x::fq_nmod_series)
+   return ccall((:fq_nmod_poly_length, :libflint), Int, 
+                (Ptr{fq_nmod_series},), &x)
+end
+
+precision(x::fq_nmod_series) = x.prec
 
 zero(R::FqNmodSeriesRing) = R(0)
 

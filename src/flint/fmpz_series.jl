@@ -51,6 +51,12 @@ function normalise(a::fmpz_series, len::Int)
    return len
 end
 
+function length(x::fmpz_series)
+   return ccall((:fmpz_poly_length, :libflint), Int, (Ptr{fmpz_series},), &x)
+end
+
+precision(x::fmpz_series) = x.prec
+
 function coeff(x::fmpz_series, n::Int)
    if n < 0
       return ZZ(0)
