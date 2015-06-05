@@ -376,18 +376,18 @@ end
 
 ###############################################################################
 #
-#   FiniteField constructor
+#   FlintFiniteField constructor
 #
 ###############################################################################
 
-function FiniteField(char::Int, deg::Int, s::String)
+function FlintFiniteField(char::Int, deg::Int, s::String)
    S = symbol(s)
    parent_obj = FqNmodFiniteField(fmpz(char), deg, S)
 
    return parent_obj, gen(parent_obj) 
 end
 
-function FiniteField(pol::nmod_poly, s::String)
+function FlintFiniteField(pol::nmod_poly, s::String)
    S = symbol(s)
    parent_obj = FqNmodFiniteField(pol, S)
 

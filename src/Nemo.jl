@@ -14,7 +14,8 @@ export Collection, Ring, Field, CollectionElem, RingElem, FieldElem, Pari,
 
 export PolyElem, SeriesElem, ResidueElem, FractionElem, MatElem
 
-export ZZ, QQ, PadicField
+export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
+       MaximalRealSubfield
 
 include("AbstractTypes.jl")
 
@@ -82,13 +83,24 @@ end
 
 ###############################################################################
 #
-#   Set domain to flint
+#   Set domain for ZZ, QQ, PadicField, FiniteField to Flint
 #
 ###############################################################################
 
 ZZ = FlintZZ
 QQ = FlintQQ
 PadicField = FlintPadicField
+FiniteField = FlintFiniteField
+
+###############################################################################
+#
+#   Set domain for NumberField to Antic
+#
+###############################################################################
+
+NumberField = AnticNumberField
+CyclotomicField = AnticCyclotomicField
+MaximalRealSubfield = AnticMaximalRealSubfield
 
 ###############################################################################
 #

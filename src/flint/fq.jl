@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export FiniteField, characteristic, order, fq, FqFiniteField, frobenius,
+export FlintFiniteField, characteristic, order, fq, FqFiniteField, frobenius,
        pth_root, trace, norm
 
 ###############################################################################
@@ -362,17 +362,17 @@ end
 
 ###############################################################################
 #
-#   FiniteField constructor
+#   FlintFiniteField constructor
 #
 ###############################################################################
 
-function FiniteField(char::fmpz, deg::Int, s::String)
+function FlintFiniteField(char::fmpz, deg::Int, s::String)
    S = symbol(s)
    parent_obj = FqFiniteField(char, deg, S)
 
    return parent_obj, gen(parent_obj) 
 end
 
-function FiniteField(char::Integer, deg::Int, s::String)
-   return FiniteField(fmpz(char), deg, s)
+function FlintFiniteField(char::Integer, deg::Int, s::String)
+   return FlintFiniteField(fmpz(char), deg, s)
 end

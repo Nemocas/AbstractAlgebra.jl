@@ -4,8 +4,8 @@
 #
 ###############################################################################
 
-export NumberField, norm, trace, CyclotomicField, MaximalRealSubfield, add!,
-       sub!, mul!
+export AnticNumberField, norm, trace, CyclotomicField, MaximalRealSubfield,
+       add!, sub!, mul!
 
 ###############################################################################
 #
@@ -569,27 +569,27 @@ end
 
 ###############################################################################
 #
-#   NumberField constructor
+#   AnticNumberField constructor
 #
 ###############################################################################
 
-function NumberField(pol::fmpq_poly, s::String)
+function AnticNumberField(pol::fmpq_poly, s::String)
    S = symbol(s)
    parent_obj = NfNumberField(pol, S)
 
    return parent_obj, gen(parent_obj) 
 end
 
-function CyclotomicField(n::Int, s::String, t = "\$")
+function AnticCyclotomicField(n::Int, s::String, t = "\$")
    Zx, x = PolynomialRing(FlintZZ, string(gensym()))
    Qx, = PolynomialRing(FlintQQ, t)
    f = cyclotomic(n, x)
-   return NumberField(Qx(f), s)
+   return AnticNumberField(Qx(f), s)
 end
 
-function MaximalRealSubfield(n::Int, s::String, t = "\$")
+function AnticMaximalRealSubfield(n::Int, s::String, t = "\$")
    Zx, x = PolynomialRing(FlintZZ, string(gensym()))
    Qx, = PolynomialRing(FlintQQ, t)
    f = cos_minpoly(n, x)
-   return NumberField(Qx(f), s)
+   return AnticNumberField(Qx(f), s)
 end
