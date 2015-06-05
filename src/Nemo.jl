@@ -15,7 +15,7 @@ export Collection, Ring, Field, CollectionElem, RingElem, FieldElem, Pari,
 export PolyElem, SeriesElem, ResidueElem, FractionElem, MatElem
 
 export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
-       MaximalRealSubfield
+       MaximalRealSubfield, MaximalOrder
 
 include("AbstractTypes.jl")
 
@@ -101,6 +101,14 @@ FiniteField = FlintFiniteField
 NumberField = AnticNumberField
 CyclotomicField = AnticCyclotomicField
 MaximalRealSubfield = AnticMaximalRealSubfield
+
+###############################################################################
+#
+#   Set domain for MaximalOrder to Pari
+#
+###############################################################################
+
+MaximalOrder = PariMaximalOrder
 
 ###############################################################################
 #

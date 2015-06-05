@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export MaximalOrder, PariMaximalOrder, basistoalg, alg, basis
+export PariMaximalOrder, basistoalg, alg, basis
 
 ###############################################################################
 #
@@ -109,10 +109,10 @@ end
 
 ###############################################################################
 #
-#   MaximalOrder constructor
+#   PariMaximalOrder constructor
 #
 ###############################################################################
 
-function MaximalOrder(nf::NfNumberField)
+function PariMaximalOrder(nf::NfNumberField)
    return PariMaximalOrder(PariNumberField(nf))
 end
