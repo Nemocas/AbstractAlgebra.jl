@@ -1142,7 +1142,7 @@ type FmpzMatSpace <: Ring{Flint}
    end
 end
 
-type fmpz_mat <: MatElem
+type fmpz_mat <: MatElem{fmpz}
    entries::Ptr{Void}
    r::Int
    c::Int
@@ -1247,7 +1247,7 @@ type NmodMatSpace <: Ring{Flint}
   end
 end
 
-type nmod_mat <: MatElem
+type nmod_mat <: MatElem{Residue{fmpz}}
   entries::Ptr{Void}
   r::Int                  # Clong
   c::Int                  # Clong

@@ -4,6 +4,8 @@
 #
 ###############################################################################
 
+# libraries
+
 abstract Pari
 
 abstract Flint
@@ -12,32 +14,46 @@ abstract Antic
 
 abstract Generic
 
-abstract Collection{T}
+# mathematical domains, parameterised by a library
+# these are the type classes of parent objects
 
-abstract Ring{T} <: Collection{T}
+   abstract Collection{T}
 
-abstract Field{T} <: Ring{T}
+   abstract Ring{T} <: Collection{T}
 
-abstract CollectionElem
+   abstract Field{T} <: Ring{T}
 
-abstract RingElem <: CollectionElem
+# elements of mathematical domains
 
-abstract FieldElem <: RingElem
+   abstract CollectionElem
 
-abstract PolyElem{T} <: RingElem
+   abstract RingElem <: CollectionElem
 
-abstract ResidueElem{T} <: RingElem
+   abstract FieldElem <: RingElem
 
-abstract FractionElem{T} <: FieldElem
+# mathematical objects parameterised by an element type
+# these are the type classes of mathematical objects
 
-abstract SeriesElem{T} <: RingElem
+   abstract PolyElem{T} <: RingElem
 
-# not always mathematical ring elements
-abstract MatElem <: RingElem
+   abstract ResidueElem{T} <: RingElem
 
-abstract FiniteFieldElem <: FieldElem
+   abstract FractionElem{T} <: FieldElem
 
-abstract NumberFieldElem <: FieldElem
+   abstract SeriesElem{T} <: RingElem
 
-abstract MaximalOrderElem <: RingElem
+   # not always mathematical ring elements
+   # later we'll maybe distinguish MatAlgebraElem, MatModuleElem
+   abstract MatElem{T} <: RingElem
+
+# leaf objects, with no parameterisation
+# these are also type classes of mathematical objects
+
+   abstract IntegerRingElem <: RingElem
+
+   abstract FiniteFieldElem <: FieldElem
+
+   abstract NumberFieldElem <: FieldElem
+
+   abstract MaximalOrderElem <: RingElem
 
