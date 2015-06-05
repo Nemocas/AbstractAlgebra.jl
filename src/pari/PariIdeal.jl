@@ -6,7 +6,7 @@
 
 export approx, coprime_multiplier, intersect, bounded_ideals, numden, 
        prime_decomposition, LLL_reduce, valuation, factor, factor_mul, ideal,
-       PariIdealSet, PariIdeal
+       PariIdealCollection, PariIdeal
 
 ###############################################################################
 #
@@ -33,7 +33,7 @@ function bounded_ideals(ord::PariMaximalOrder, bound::Int)
    vec_type = pari_vec{PariIdeal}
    A = Array(vec_type, bound)
    for i = 1:bound
-      A[i] = vec_type(pari_load(vec, i + 1), PariIdealSet(ord))
+      A[i] = vec_type(pari_load(vec, i + 1), PariIdealCollection(ord))
    end
    unsafe_store!(avma, av, 1)
    return A
@@ -50,7 +50,7 @@ function prime_decomposition(ord::PariMaximalOrder, p::fmpz)
    pr = pari(p)
    vec = ccall((:idealprimedec, :libpari), Ptr{Int},
                (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pr.d)
-   return pari_vec{PariIdeal}(vec, PariIdealSet(ord))
+   return pari_vec{PariIdeal}(vec, PariIdealCollection(ord))
 end
 
 function prime_decomposition(ord::PariMaximalOrder, p::Integer)
@@ -63,8 +63,8 @@ end
 #
 ###############################################################################
 
-function show(io::IO, s::PariIdealSet)
-   print(io, "Set of ideals of ")
+function show(io::IO, s::PariIdealCollection)
+   print(io, "Collection of ideals of ")
    print(io, s.order)
 end
 
@@ -330,7 +330,7 @@ function ideal(ord::PariMaximalOrder, b::fmpq_poly, args::fmpq_poly...)
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), ord.pari_nf.data, id1, id2)
    end
    unsafe_store!(avma, av, 1)
-   return PariIdeal(id1, PariIdealSet(ord))
+   return PariIdeal(id1, PariIdealCollection(ord))
 end
 
 function ideal(ord::PariMaximalOrder, b::PariMaximalOrderElem, args::PariMaximalOrderElem...)
@@ -346,7 +346,7 @@ function ideal(ord::PariMaximalOrder, b::PariMaximalOrderElem, args::PariMaximal
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), ord.pari_nf.data, id1, id2)
    end
    unsafe_store!(avma, av, 1)
-   return PariIdeal(id1, PariIdealSet(ord))
+   return PariIdeal(id1, PariIdealCollection(ord))
 end
 
 function ideal(ord::PariMaximalOrder, b::nf_elem, args::nf_elem...)
@@ -362,7 +362,7 @@ function ideal(ord::PariMaximalOrder, b::nf_elem, args::nf_elem...)
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), ord.pari_nf.data, id1, id2)
    end
    unsafe_store!(avma, av, 1)
-   return PariIdeal(id1, PariIdealSet(ord))
+   return PariIdeal(id1, PariIdealCollection(ord))
 end
 
 function ideal(ord::PariMaximalOrder, b::fmpz, args::fmpz...)
@@ -376,7 +376,7 @@ function ideal(ord::PariMaximalOrder, b::fmpz, args::fmpz...)
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), ord.pari_nf.data, id1, id2)
    end
    unsafe_store!(avma, av, 1)
-   return PariIdeal(id1, PariIdealSet(ord))
+   return PariIdeal(id1, PariIdealCollection(ord))
 end
 
 function ideal(ord::PariMaximalOrder, b::Integer, args::Integer...)
@@ -390,7 +390,7 @@ function ideal(ord::PariMaximalOrder, b::Integer, args::Integer...)
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), ord.pari_nf.data, id1, id2)
    end
    unsafe_store!(avma, av, 1)
-   return PariIdeal(id1, PariIdealSet(ord))
+   return PariIdeal(id1, PariIdealCollection(ord))
 end
 
 ###############################################################################
@@ -399,7 +399,7 @@ end
 #
 ###############################################################################
 
-function Base.call(ord::PariIdealSet, id::Ptr{Int})
-   return PariIdeal(id, PariIdealSet(ord))
+function Base.call(ord::PariIdealCollection, id::Ptr{Int})
+   return PariIdeal(id, PariIdealCollection(ord))
 end
 

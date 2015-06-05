@@ -12,15 +12,15 @@ abstract Antic
 
 abstract Generic
 
-abstract Set{T}
+abstract Collection{T}
 
-abstract Ring{T} <: Set{T}
+abstract Ring{T} <: Collection{T}
 
 abstract Field{T} <: Ring{T}
 
-abstract SetElem
+abstract CollectionElem
 
-abstract RingElem <: SetElem
+abstract RingElem <: CollectionElem
 
 abstract FieldElem <: RingElem
 

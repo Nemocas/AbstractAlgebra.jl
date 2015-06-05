@@ -57,15 +57,15 @@ _pari_rat_clear_fn(g::pari_rat) = ccall((:pari_free, :libpari), Void,
 #
 ###############################################################################
 
-type PariVector{T <: SetElem}
-   base_ring::Set{Pari}
+type PariVector{T <: CollectionElem}
+   base_ring::Collection{Pari}
 end
 
-type pari_vec{T <: SetElem}
+type pari_vec{T <: CollectionElem}
    data::Ptr{Int}
    parent::PariVector{T}
 
-   function pari_vec{R <: Set{Pari}}(v::Ptr{Int}, par::R)
+   function pari_vec{R <: Collection{Pari}}(v::Ptr{Int}, par::R)
       r = new(gclone(v), PariVector{T}(par))
       finalizer(r, _pari_vec_unclone)
       return r
@@ -217,29 +217,29 @@ _pari_maximal_order_elem_clear_fn(a::PariMaximalOrderElem) = gunclone(a.data)
 
 ###############################################################################
 #
-#   PariIdealSet / PariIdeal
+#   PariIdealCollection / PariIdeal
 #
 ###############################################################################
 
-PariIdealSetID = ObjectIdDict()
+PariIdealCollectionID = ObjectIdDict()
 
-type PariIdealSet <: Set{Pari}
+type PariIdealCollection <: Collection{Pari}
    order::PariMaximalOrder
 
-   function PariIdealSet(ord::PariMaximalOrder)
+   function PariIdealCollection(ord::PariMaximalOrder)
       return try
-         PariIdealSetID[ord]
+         PariIdealCollectionID[ord]
       catch
-         PariIdealSetID[ord] = new(ord)
+         PariIdealCollectionID[ord] = new(ord)
       end
    end
 end
 
-type PariIdeal <: SetElem
+type PariIdeal <: CollectionElem
    ideal::Ptr{Int}
-   parent::PariIdealSet
+   parent::PariIdealCollection
 
-   function PariIdeal(a::Ptr{Int}, par::PariIdealSet)
+   function PariIdeal(a::Ptr{Int}, par::PariIdealCollection)
       r = new(gclone(a), par)
       finalizer(r, _pari_ideal_clear_fn)
       return r
