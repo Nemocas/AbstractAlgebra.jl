@@ -269,3 +269,5 @@ end
 
 _PariFactor_unclone(f::PariFactor) = gunclone(f.data)
 
+include("code_words.jl")
+

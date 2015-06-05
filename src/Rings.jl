@@ -206,11 +206,19 @@ include("flint/fmpz_mat.jl")
 
 include("flint/nmod_mat.jl")
 
-include("pari/PariRings.jl")
+include("pari/pari_int.jl")
+
+include("pari/pari_poly.jl")
+
+include("pari/pari_polmod.jl")
+
+include("pari/pari_vec.jl")
+
+include("pari/PariFactor.jl")
 
 include("Fields.jl")
 
-include("pari/PariFields.jl")
+include("pari/pari_frac.jl")
 
 include("flint/fmpq_poly.jl")
 

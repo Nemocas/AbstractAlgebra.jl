@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   PariRings.jl : functions for Pari rings
+#   code_words.jl : functions for low level access to Pari types 
 #
 ###############################################################################
 
@@ -114,14 +114,6 @@ pari_load(x::Ptr{Int}, n::Int) = reinterpret(Ptr{Int}, unsafe_load(x, n))
 
 debug(a::Ptr{Int}) = ccall((:dbgGEN, :libpari), Void, (Ptr{Int}, Int), a, -1)
 
-include("pari_int.jl")
-
-include("pari_poly.jl")
-
-include("pari_polmod.jl")
-
-include("pari_vec.jl")
-
 ###############################################################################
 #
 #   Printing
@@ -151,30 +143,3 @@ avma = cglobal((:avma, :libpari), Ptr{Ptr{Int}})
 gen_0 = cglobal((:gen_0, :libpari), Ptr{Ptr{Int}})
 
 gen_1 = cglobal((:gen_1, :libpari), Ptr{Ptr{Int}})
-
-###############################################################################
-#
-#   Factorization
-#
-###############################################################################
-
-function getindex(a::PariFactor, i::Int)
-   i > a.len && throw(IndexError())
-   colf = reinterpret(Ptr{Int}, unsafe_load(a.data, 2))
-   coln = reinterpret(Ptr{Int}, unsafe_load(a.data, 3))
-   f = reinterpret(Ptr{Int}, unsafe_load(colf, i + 1))
-   n = fmpz()
-   fmpz!(n, reinterpret(Ptr{Int}, unsafe_load(coln, i + 1)))
-   return a.parent(f), Int(n)
-end
-
-function show(io::IO, a::PariFactor)
-   print(io, "[")
-   for i = 1:a.len
-      print(io, a[i])
-      if i != a.len
-         print(io, ", ")
-      end
-   end
-   print(io, "]")
-end
