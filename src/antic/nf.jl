@@ -42,7 +42,7 @@ end
 
 function coeff(x::nf_elem, n::Int)
    n < 0 && throw(DomainError())
-   z = QQ()
+   z = fmpq()
    ccall((:nf_elem_get_coeff_fmpq, :libflint), Void, 
      (Ptr{fmpq}, Ptr{nf_elem}, Int, Ptr{NfNumberField}), &z, &x, n, &parent(x))
    return z
@@ -372,7 +372,7 @@ end
 ###############################################################################
 
 function norm(a::nf_elem)
-   z = QQ()
+   z = fmpq()
    ccall((:nf_elem_norm, :libflint), Void,
          (Ptr{fmpq}, Ptr{nf_elem}, Ptr{NfNumberField}),
          &z, &a, &a.parent)
@@ -380,7 +380,7 @@ function norm(a::nf_elem)
 end
 
 function trace(a::nf_elem)
-   z = QQ()
+   z = fmpq()
    ccall((:nf_elem_trace, :libflint), Void,
          (Ptr{fmpq}, Ptr{nf_elem}, Ptr{NfNumberField}),
          &z, &a, &a.parent)
@@ -582,14 +582,14 @@ end
 
 function CyclotomicField(n::Int, s::String, t = "\$")
    Zx, x = PolynomialRing(flintZZ, string(gensym()))
-   Qx, = PolynomialRing(QQ, t)
+   Qx, = PolynomialRing(flintQQ, t)
    f = cyclotomic(n, x)
    return NumberField(Qx(f), s)
 end
 
 function MaximalRealSubfield(n::Int, s::String, t = "\$")
    Zx, x = PolynomialRing(flintZZ, string(gensym()))
-   Qx, = PolynomialRing(QQ, t)
+   Qx, = PolynomialRing(flintQQ, t)
    f = cos_minpoly(n, x)
    return NumberField(Qx(f), s)
 end

@@ -38,7 +38,7 @@ max_precision(R::FmpqSeriesRing) = R.prec_max
 
 function normalise(a::fmpq_series, len::Int)
    if len > 0
-      c = QQ()
+      c = fmpq()
       ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, 
          (Ptr{fmpq}, Ptr{fmpq_series}, Int), &c, &a, len - 1)
    end
@@ -55,9 +55,9 @@ end
 
 function coeff(x::fmpq_series, n::Int)
    if n < 0
-      return QQ(0)
+      return fmpq(0)
    end
-   z = QQ()
+   z = fmpq()
    ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void, 
          (Ptr{fmpq}, Ptr{fmpq_series}, Int), &z, &x, n)
    return z
@@ -74,7 +74,7 @@ zero(R::FmpqSeriesRing) = R(0)
 one(R::FmpqSeriesRing) = R(1)
 
 function gen(R::FmpqSeriesRing)
-   z = fmpq_series([QQ(0), QQ(1)], 2, max_precision(R) + 1)
+   z = fmpq_series([fmpq(0), fmpq(1)], 2, max_precision(R) + 1)
    z.parent = R
    return z
 end
@@ -345,7 +345,7 @@ function ^(a::fmpq_series, b::Int)
    b < 0 && throw(DomainError())
    if isgen(a)
       z = parent(a)()
-      setcoeff!(z, b, QQ(1))
+      setcoeff!(z, b, fmpq(1))
       z.prec = a.prec + b - 1
    elseif length(a) == 0
       z = parent(a)()
@@ -353,7 +353,7 @@ function ^(a::fmpq_series, b::Int)
    elseif length(a) == 1
       return parent(a)([coeff(a, 0)^b], 1, a.prec)
    elseif b == 0
-      return parent(a)([QQ(1)], 1, parent(a).prec_max)
+      return parent(a)([fmpq(1)], 1, parent(a).prec_max)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0
@@ -491,7 +491,7 @@ end
 function exp(a::fmpq_series)
    coeff(a, 0) != 0 && error("Constant term not zero in exp")
    if length(a) == 0 || a.prec == 1
-      return parent(a)([QQ(1)], 1, a.prec)
+      return parent(a)([fmpq(1)], 1, a.prec)
    end
    z = parent(a)()
    z.prec = a.prec
@@ -684,7 +684,7 @@ function Base.call(a::FmpqSeriesRing, b::Integer)
       z = fmpq_series()
       z.prec = a.prec_max
    else
-      z = fmpq_series([QQ(b)], 1, a.prec_max)
+      z = fmpq_series([fmpq(b)], 1, a.prec_max)
    end
    z.parent = a
    return z
@@ -695,7 +695,7 @@ function Base.call(a::FmpqSeriesRing, b::fmpz)
       z = fmpq_series()
       z.prec = a.prec_max
    else
-      z = fmpq_series([QQ(b)], 1, a.prec_max)
+      z = fmpq_series([fmpq(b)], 1, a.prec_max)
    end
    z.parent = a
    return z
@@ -734,6 +734,6 @@ function PowerSeriesRing(R::FlintRationalField, prec::Int, s::String)
 
    parent_obj = FmpqSeriesRing(prec, S)
    
-   return parent_obj, parent_obj([QQ(0), QQ(1)], 2, prec + 1)
+   return parent_obj, parent_obj([fmpq(0), fmpq(1)], 2, prec + 1)
 end
 

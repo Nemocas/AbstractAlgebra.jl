@@ -87,8 +87,8 @@ function norm(a::PariIdeal)
    n = ccall((:idealnorm, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}), a.parent.order.pari_nf.data, a.ideal)
    unsafe_store!(avma, av, 1)
-   r = QQ()
-   QQ!(r, n)
+   r = fmpq()
+   fmpq!(r, n)
    return r
 end
 
@@ -208,7 +208,7 @@ function gcdx(a::PariIdeal, b::PariIdeal)
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), pari_nf, a.ideal, b.ideal)
    s = alg(pari_nf, pari_load(st, 2))
    t = alg(pari_nf, pari_load(st, 3))
-   par = FmpqPolyRing{T}(QQ)
+   par = FmpqPolyRing{T}(flintQQ)
    pols = fmpq_poly!(par(), s)
    polt = fmpq_poly!(par(), t)
    unsafe_store!(avma, av, 1)
@@ -286,7 +286,7 @@ function approx(a::PariIdeal)
    a = ccall((:idealappr, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}), pari_nf, a.ideal)
    r = alg(pari_nf, a)
-   pol = FmpqPolyRing{T}(QQ)()
+   pol = FmpqPolyRing{T}(flintQQ)()
    fmpq_poly!(pol, r)
    unsafe_store!(avma, av, 1)
    return pol
@@ -306,7 +306,7 @@ function coprime_multiplier(a::PariIdeal, b::PariIdeal)
    m = ccall((:idealcoprime, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), pari_nf, a.ideal, b.ideal)
    r = alg(pari_nf, m)
-   pol = FmpqPolyRing{T}(QQ)()
+   pol = FmpqPolyRing{T}(flintQQ)()
    fmpq_poly!(pol, r)
    unsafe_store!(avma, av, 1)
    return pol

@@ -54,13 +54,13 @@ function fmpq_poly!(z::fmpq_poly, g::Ptr{Int})
    if length == 0
       return
    end
-   c = QQ()
+   c = fmpq()
    for i = 0:length - 1
       c_ptr = unsafe_load(g, 3 + i)
       if reinterpret(Ptr{Int}, c_ptr) == reinterpret(Ptr{Int}, unsafe_load(gen_0))
-         c = zero(QQ)
+         c = zero(flintQQ)
       else
-         QQ!(c, reinterpret(Ptr{Int}, c_ptr))
+         fmpq!(c, reinterpret(Ptr{Int}, c_ptr))
       end
       setcoeff!(z, i, c)
    end

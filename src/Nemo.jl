@@ -14,7 +14,7 @@ export Collection, Ring, Field, CollectionElem, RingElem, FieldElem, Pari,
 
 export PolyElem, SeriesElem, ResidueElem, FractionElem, MatElem
 
-export ZZ
+export ZZ, QQ
 
 include("AbstractTypes.jl")
 
@@ -87,6 +87,7 @@ end
 ###############################################################################
 
 ZZ = flintZZ
+QQ = flintQQ
 
 ###############################################################################
 #

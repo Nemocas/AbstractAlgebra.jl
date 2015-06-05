@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export PariRationalField, pari_rat, PariQQ, QQ!
+export PariRationalField, pari_rat, PariQQ, fmpq!
 
 ###############################################################################
 #
@@ -80,7 +80,7 @@ function fmpz!(z::Ptr{fmpz}, g::Ptr{Int})
    end
 end
 
-function QQ!(z::fmpq, g::Ptr{Int})
+function fmpq!(z::fmpq, g::Ptr{Int})
    num = ccall((:fmpq_numerator_ptr, :libflint), Ptr{fmpz}, (Ptr{fmpq},), &z)
    den = ccall((:fmpq_denominator_ptr, :libflint), Ptr{fmpz}, (Ptr{fmpq},), &z)
    if typ(g) == t_INT
@@ -93,7 +93,7 @@ function QQ!(z::fmpq, g::Ptr{Int})
 end
 
 function call(::FlintRationalField, g::pari_rat)
-   r = QQ()
-   QQ!(r, g.d)
+   r = fmpq()
+   fmpq!(r, g.d)
    return r
 end

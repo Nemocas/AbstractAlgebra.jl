@@ -56,13 +56,32 @@ end
 type FlintRationalField <: Field{Flint}
 end
 
+flintQQ = FlintRationalField()
+
 type fmpq <: FractionElem{fmpz}
    num::Int
    den::Int
 
+   function fmpq()
+      z = new()
+      ccall((:fmpq_init, :libflint), Void, (Ptr{fmpq},), &z)
+      finalizer(z, _fmpq_clear_fn)
+      return z
+   end
+
    function fmpq(a::fmpz, b::fmpz)
       z = new()
       ccall((:fmpq_init, :libflint), Void, (Ptr{fmpq},), &z)
+      ccall((:fmpq_set_fmpz_frac, :libflint), Void,
+            (Ptr{fmpq}, Ptr{fmpz}, Ptr{fmpz}), &z, &a, &b)
+      finalizer(z, _fmpq_clear_fn)
+      return z
+   end
+
+   function fmpq(a::fmpz)
+      z = new()
+      ccall((:fmpq_init, :libflint), Void, (Ptr{fmpq},), &z)
+      b = fmpz(1)
       ccall((:fmpq_set_fmpz_frac, :libflint), Void,
             (Ptr{fmpq}, Ptr{fmpz}, Ptr{fmpz}), &z, &a, &b)
       finalizer(z, _fmpq_clear_fn)
@@ -74,6 +93,15 @@ type fmpq <: FractionElem{fmpz}
       ccall((:fmpq_init, :libflint), Void, (Ptr{fmpq},), &z)
       ccall((:fmpq_set_si, :libflint), Void,
             (Ptr{fmpq}, Int, Int), &z, a, b)
+      finalizer(z, _fmpq_clear_fn)
+      return z
+   end
+
+   function fmpq(a::Int)
+      z = new()
+      ccall((:fmpq_init, :libflint), Void, (Ptr{fmpq},), &z)
+      ccall((:fmpq_set_si, :libflint), Void,
+            (Ptr{fmpq}, Int, Int), &z, a, 1)
       finalizer(z, _fmpq_clear_fn)
       return z
    end
@@ -870,7 +898,7 @@ type FmpqSeriesRing <: Ring{Flint}
       return try
          FmpqSeriesID[prec, s]
       catch
-         FmpqSeriesID[prec, s] = new(QQ, prec, s)
+         FmpqSeriesID[prec, s] = new(flintQQ, prec, s)
       end
    end
 end
