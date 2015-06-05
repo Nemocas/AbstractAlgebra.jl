@@ -38,7 +38,7 @@ end
 
 function factor(n::fmpz)
    f = factor(pari(n))
-   return Factor{FlintIntegerRing}(f, f.len, flintZZ)
+   return Factor{FlintIntegerRing}(f, f.len, FlintZZ)
 end
 
 function factor(g::fmpz_poly)

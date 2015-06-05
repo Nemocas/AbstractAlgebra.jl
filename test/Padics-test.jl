@@ -3,11 +3,11 @@ function test_padics_constructors()
 
    R = PadicField(7, 30)
    
-   @test isa(R, PadicField)
+   @test isa(R, FlintPadicField)
 
    S = PadicField(ZZ(65537), 30)
 
-   @test isa(S, PadicField)
+   @test isa(S, FlintPadicField)
 
    @test isa(R(), padic)
 

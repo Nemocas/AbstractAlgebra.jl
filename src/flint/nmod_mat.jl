@@ -450,7 +450,7 @@ function Array(b::nmod_mat)
 end
 
 function lift(a::nmod_mat)
-  z = MatrixSpace(flintZZ, rows(a), cols(a))()
+  z = MatrixSpace(FlintZZ, rows(a), cols(a))()
   ccall((:fmpz_mat_set_nmod_mat, :libflint), Void,
           (Ptr{fmpz_mat}, Ptr{nmod_mat}), &z, &a)
   return z 

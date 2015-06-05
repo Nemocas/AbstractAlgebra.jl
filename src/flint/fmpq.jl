@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export fmpq, flintQQ, FractionField, Rational, FlintRationalField, height,
+export fmpq, FlintQQ, FractionField, Rational, FlintRationalField, height,
        height_bits, isless, reconstruct, next_minimal, next_signed_minimal,
        next_calkin_wilf, next_signed_calkin_wilf, dedekind_sum, harmonic
 
@@ -14,13 +14,13 @@ export fmpq, flintQQ, FractionField, Rational, FlintRationalField, height,
 #
 ###############################################################################
 
-parent(a::fmpq) = flintQQ
+parent(a::fmpq) = FlintQQ
 
 elem_type(::FlintRationalField) = fmpq
 
-base_ring(a::FlintRationalField) = flintZZ
+base_ring(a::FlintRationalField) = FlintZZ
 
-base_ring(a::fmpq) = flintZZ
+base_ring(a::fmpq) = FlintZZ
 
 ###############################################################################
 #
@@ -523,5 +523,5 @@ convert(::Type{Rational{BigInt}}, a::fmpq) = Rational(a)
 #
 ###############################################################################
 
-FractionField(base::FlintIntegerRing) = flintQQ
+FractionField(base::FlintIntegerRing) = FlintQQ
 

@@ -181,7 +181,7 @@ function -(x::fmpz_mat)
 end
 
 function transpose(x::fmpz_mat)
-   z = MatrixSpace(flintZZ, cols(x), rows(x))()
+   z = MatrixSpace(FlintZZ, cols(x), rows(x))()
    ccall((:fmpz_mat_transpose, :libflint), Void,
          (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &x)
    return z
@@ -777,7 +777,7 @@ end
 
 function hcat(a::fmpz_mat, b::fmpz_mat)
   rows(a) != rows(b) && error("Incompatible number of rows in hcat")
-  c = MatrixSpace(flintZZ, rows(a), cols(a) + cols(b))()
+  c = MatrixSpace(FlintZZ, rows(a), cols(a) + cols(b))()
   ccall((:fmpz_mat_concat_horizontal, :libflint), Void, 
         (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &c, &a, &b)
   return c
@@ -785,7 +785,7 @@ end
 
 function vcat(a::fmpz_mat, b::fmpz_mat)
   cols(a) != cols(b) && error("Incompatible number of columns in vcat")
-  c = MatrixSpace(flintZZ, rows(a) + rows(b), cols(a))()
+  c = MatrixSpace(FlintZZ, rows(a) + rows(b), cols(a))()
   ccall((:fmpz_mat_concat_vertical, :libflint), Void, 
         (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &c, &a, &b)
   return c

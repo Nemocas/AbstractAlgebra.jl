@@ -13,7 +13,7 @@
 type FlintIntegerRing <: Ring{Flint}
 end
 
-flintZZ = FlintIntegerRing()
+FlintZZ = FlintIntegerRing()
 
 type fmpz <: IntegerRingElem
     d::Int
@@ -56,7 +56,7 @@ end
 type FlintRationalField <: Field{Flint}
 end
 
-flintQQ = FlintRationalField()
+FlintQQ = FlintRationalField()
 
 type fmpq <: FractionElem{fmpz}
    num::Int
@@ -221,7 +221,7 @@ type FmpzPolyRing <: Ring{Flint}
       return try
          FmpzPolyID[s]
       catch
-         FmpzPolyID[s] = new(flintZZ, s)
+         FmpzPolyID[s] = new(FlintZZ, s)
       end
    end
 end
@@ -768,13 +768,13 @@ end
 
 ###############################################################################
 #
-#   PadicField / padic
+#   FlintPadicField / padic
 #
 ###############################################################################
 
 PadicBase = ObjectIdDict()
 
-type PadicField <: Field{Flint}
+type FlintPadicField <: Field{Flint}
    p::Int 
    pinv::Float64
    pow::Ptr{Void}
@@ -783,11 +783,11 @@ type PadicField <: Field{Flint}
    mode::Int
    prec_max::Int
 
-   function PadicField(p::fmpz, prec::Int)
-      !isprime(p) && error("Prime base required in PadicField")
+   function FlintPadicField(p::fmpz, prec::Int)
+      !isprime(p) && error("Prime base required in FlintPadicField")
       d = new()
       ccall((:padic_ctx_init, :libflint), Void, 
-           (Ptr{PadicField}, Ptr{fmpz}, Int, Int, Cint), 
+           (Ptr{FlintPadicField}, Ptr{fmpz}, Int, Int, Cint), 
                                      &d, &p, 0, 0, 1)
       finalizer(d, _padic_ctx_clear_fn)
       d.prec_max = prec
@@ -795,15 +795,15 @@ type PadicField <: Field{Flint}
    end
 end
 
-function _padic_ctx_clear_fn(a::PadicField)
-   ccall((:padic_ctx_clear, :libflint), Void, (Ptr{PadicField},), &a)
+function _padic_ctx_clear_fn(a::FlintPadicField)
+   ccall((:padic_ctx_clear, :libflint), Void, (Ptr{FlintPadicField},), &a)
 end
 
 type padic <: PadicFieldElem
    u :: Int
    v :: Int
    N :: Int
-   parent::PadicField
+   parent::FlintPadicField
 
    function padic(prec::Int)
       d = new()
@@ -834,7 +834,7 @@ type FmpzSeriesRing <: Ring{Flint}
       return try
          FmpzSeriesID[prec, s]
       catch
-         FmpzSeriesID[prec, s] = new(flintZZ, prec, s)
+         FmpzSeriesID[prec, s] = new(FlintZZ, prec, s)
       end
    end
 end
@@ -898,7 +898,7 @@ type FmpqSeriesRing <: Ring{Flint}
       return try
          FmpqSeriesID[prec, s]
       catch
-         FmpqSeriesID[prec, s] = new(flintQQ, prec, s)
+         FmpqSeriesID[prec, s] = new(FlintQQ, prec, s)
       end
    end
 end
@@ -1167,7 +1167,7 @@ type FmpzMatSpace <: Ring{Flint}
       return try
          FmpzMatID[r, c]
       catch
-         FmpzMatID[r, c] = new(r, c, flintZZ)
+         FmpzMatID[r, c] = new(r, c, FlintZZ)
       end
    end
 end

@@ -58,7 +58,7 @@ function fmpq_poly!(z::fmpq_poly, g::Ptr{Int})
    for i = 0:length - 1
       c_ptr = unsafe_load(g, 3 + i)
       if reinterpret(Ptr{Int}, c_ptr) == reinterpret(Ptr{Int}, unsafe_load(gen_0))
-         c = zero(flintQQ)
+         c = zero(FlintQQ)
       else
          fmpq!(c, reinterpret(Ptr{Int}, c_ptr))
       end

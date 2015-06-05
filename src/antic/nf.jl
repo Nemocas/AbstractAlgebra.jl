@@ -581,15 +581,15 @@ function NumberField(pol::fmpq_poly, s::String)
 end
 
 function CyclotomicField(n::Int, s::String, t = "\$")
-   Zx, x = PolynomialRing(flintZZ, string(gensym()))
-   Qx, = PolynomialRing(flintQQ, t)
+   Zx, x = PolynomialRing(FlintZZ, string(gensym()))
+   Qx, = PolynomialRing(FlintQQ, t)
    f = cyclotomic(n, x)
    return NumberField(Qx(f), s)
 end
 
 function MaximalRealSubfield(n::Int, s::String, t = "\$")
-   Zx, x = PolynomialRing(flintZZ, string(gensym()))
-   Qx, = PolynomialRing(flintQQ, t)
+   Zx, x = PolynomialRing(FlintZZ, string(gensym()))
+   Qx, = PolynomialRing(FlintQQ, t)
    f = cos_minpoly(n, x)
    return NumberField(Qx(f), s)
 end

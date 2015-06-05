@@ -31,7 +31,7 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export fmpz, flintZZ, FlintIntegerRing, parent, show, convert, hash, fac,
+export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, fac,
        binom, isprime, fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm, invmod,
        powmod, abs, divrem, isqrt, popcount, prevpow2, nextpow2, ndigits, dec,
        bin, oct, hex, base, one, zero, divexact, fits, sign, nbits, deepcopy,
@@ -48,7 +48,7 @@ export fmpz, flintZZ, FlintIntegerRing, parent, show, convert, hash, fac,
 #
 ###############################################################################
 
-parent(a::fmpz) = flintZZ
+parent(a::fmpz) = FlintZZ
 
 elem_type(::FlintIntegerRing) = fmpz
 
@@ -111,7 +111,7 @@ function serialize(s, n::fmpz)
     serialize(s, base(62, n))
 end
 
-deserialize(s, ::Type{fmpz}) = Base.parseint_nocheck(flintZZ, deserialize(s), 62)
+deserialize(s, ::Type{fmpz}) = Base.parseint_nocheck(FlintZZ, deserialize(s), 62)
 
 ###############################################################################
 #
@@ -386,7 +386,7 @@ function ^(x::fmpz, y::Int)
     if x == 1; return x; end
     if x == -1; return isodd(y) ? x : -x; end
     if y > typemax(Uint); throw(DomainError()); end
-    if y == 0; return one(flintZZ); end
+    if y == 0; return one(FlintZZ); end
     if y == 1; return x; end
     return x^Uint(y)
 end
@@ -541,7 +541,7 @@ end
 
 function gcdx(a::fmpz, b::fmpz)
     if b == 0 # shortcut this to ensure consistent results with gcdx(a,b)
-        return a < 0 ? (-a, -one(flintZZ), zero(flintZZ)) : (a, one(flintZZ), zero(flintZZ))
+        return a < 0 ? (-a, -one(FlintZZ), zero(FlintZZ)) : (a, one(FlintZZ), zero(FlintZZ))
     end
     g = fmpz()
     s = fmpz()
@@ -629,10 +629,10 @@ popcount(x::fmpz) = Int(ccall((:fmpz_popcnt, :libflint), Culong,
                               (Ptr{fmpz},), &x))
 
 prevpow2(x::fmpz) = x < 0 ? -prevpow2(-x) :
-                            (x <= 2 ? x : one(flintZZ) << (ndigits(x, 2) - 1))
+                            (x <= 2 ? x : one(FlintZZ) << (ndigits(x, 2) - 1))
 
 nextpow2(x::fmpz) = x < 0 ? -nextpow2(-x) : 
-                            (x <= 2 ? x : one(flintZZ) << ndigits(x - 1, 2))
+                            (x <= 2 ? x : one(FlintZZ) << ndigits(x - 1, 2))
 
 trailing_zeros(x::fmpz) = ccall((:fmpz_val2, :libflint), Int, 
                                 (Ptr{fmpz},), &x)

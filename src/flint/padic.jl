@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export PadicField, padic, prime, teichmuller, log, sqrt
+export FlintPadicField, padic, prime, teichmuller, log, sqrt
 
 ###############################################################################
 #
@@ -12,7 +12,7 @@ export PadicField, padic, prime, teichmuller, log, sqrt
 #
 ###############################################################################
 
-function O(R::PadicField, n::fmpz)
+function O(R::FlintPadicField, n::fmpz)
    if n == 1
       N = 0
    else
@@ -29,7 +29,7 @@ function O(R::PadicField, n::fmpz)
    return d
 end
 
-function O(R::PadicField, n::fmpq)
+function O(R::FlintPadicField, n::fmpq)
    m = den(n)
    if m == 1
       return O(R, num(n))
@@ -47,11 +47,11 @@ function O(R::PadicField, n::fmpq)
    return d
 end
 
-O(R::PadicField, n::Integer) = O(R, fmpz(n))
+O(R::FlintPadicField, n::Integer) = O(R, fmpz(n))
 
-elem_type(::PadicField) = padic
+elem_type(::FlintPadicField) = padic
 
-base_ring(a::PadicField) = None
+base_ring(a::FlintPadicField) = None
 
 base_ring(a::padic) = None
 
@@ -68,10 +68,10 @@ end
 #
 ###############################################################################
 
-function prime(R::PadicField)
+function prime(R::FlintPadicField)
    z = fmpz()
    ccall((:padic_ctx_pow_ui, :libflint), Void, 
-         (Ptr{fmpz}, Int, Ptr{PadicField}), &z, 1, &R)
+         (Ptr{fmpz}, Int, Ptr{FlintPadicField}), &z, 1, &R)
    return z 
 end
 
@@ -79,14 +79,14 @@ precision(a::padic) = a.N
 
 valuation(a::padic) = a.v
 
-function zero(R::PadicField)
+function zero(R::FlintPadicField)
    z = padic(R.prec_max)
    ccall((:padic_zero, :libflint), Void, (Ptr{padic},), &z)
    z.parent = R
    return z
 end
 
-function one(R::PadicField)
+function one(R::FlintPadicField)
    z = padic(R.prec_max)
    ccall((:padic_one, :libflint), Void, (Ptr{padic},), &z)
    z.parent = R
@@ -108,7 +108,7 @@ isone(a::padic) = Bool(ccall((:padic_is_one, :libflint), Cint,
 function show(io::IO, x::padic)
    ctx = parent(x)
    cstr = ccall((:padic_get_str, :libflint), Ptr{Uint8}, 
-               (Ptr{Void}, Ptr{padic}, Ptr{PadicField}),
+               (Ptr{Void}, Ptr{padic}, Ptr{FlintPadicField}),
                    C_NULL, &x, &ctx)
 
    print(io, bytestring(cstr))
@@ -119,7 +119,7 @@ function show(io::IO, x::padic)
    print(io, "^$(x.N))")
 end
 
-function show(io::IO, R::PadicField)
+function show(io::IO, R::FlintPadicField)
    print(io, "Field of ", prime(R), "-adic numbers")
 end
 
@@ -127,7 +127,7 @@ needs_parentheses(x::padic) = true
 
 is_negative(x::padic) = false
 
-show_minus_one(::PadicField) = true
+show_minus_one(::FlintPadicField) = true
 
 ###############################################################################
 #
@@ -150,7 +150,7 @@ function -(x::padic)
    ctx = parent(x)
    z = padic(x.N)
    ccall((:padic_neg, :libflint), Void, 
-         (Ptr{padic}, Ptr{padic}, Ptr{PadicField}), 
+         (Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), 
                      &z, &x, &ctx)
    z.parent = ctx
    return z
@@ -168,7 +168,7 @@ function +(x::padic, y::padic)
    z = padic(min(x.N, y.N))
    z.parent = ctx
    ccall((:padic_add, :libflint), Void, 
-         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{PadicField}), 
+         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), 
                &z, &x, &y, &ctx)
    return z
 end
@@ -179,7 +179,7 @@ function -(x::padic, y::padic)
    z = padic(min(x.N, y.N))
    z.parent = ctx
    ccall((:padic_sub, :libflint), Void, 
-         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{PadicField}), 
+         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), 
                   &z, &x, &y, &ctx)
    return z
 end
@@ -190,7 +190,7 @@ function *(x::padic, y::padic)
    z = padic(min(x.N + y.v, y.N + x.v))
    z.parent = ctx
    ccall((:padic_mul, :libflint), Void, 
-         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{PadicField}), 
+         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), 
                &z, &x, &y, &ctx)
    return z
 end
@@ -205,7 +205,7 @@ function mul!(z::padic, x::padic, y::padic)
    z.N = min(x.N + y.v, y.N + x.v)
    ctx = parent(x)
    ccall((:padic_mul, :libflint), Void, 
-         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{PadicField}), 
+         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), 
                &z, &x, &y, &ctx)
 end
 
@@ -213,7 +213,7 @@ function addeq!(x::padic, y::padic)
    x.N = min(x.N, y.N)
    ctx = parent(x)
    ccall((:padic_add, :libflint), Void, 
-         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{PadicField}), 
+         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), 
                &x, &x, &y, &ctx)
 end
 
@@ -228,7 +228,7 @@ function ==(a::padic, b::padic)
    ctx = parent(a)
    z = padic(min(a.N, b.N))
    ccall((:padic_sub, :libflint), Void, 
-         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{PadicField}), 
+         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), 
                &z, &a, &b, &ctx)
    return Bool(ccall((:padic_is_zero, :libflint), Cint, 
                 (Ptr{padic},), &z))
@@ -250,7 +250,7 @@ function ^(a::padic, n::Int)
    z = padic(a.N + (n - 1)*a.v)
    z.parent = ctx
    ccall((:padic_pow_si, :libflint), Void, 
-                (Ptr{padic}, Ptr{padic}, Int, Ptr{PadicField}), 
+                (Ptr{padic}, Ptr{padic}, Int, Ptr{FlintPadicField}), 
                &z, &a, n, &ctx)
    return z
 end
@@ -268,7 +268,7 @@ function divexact(a::padic, b::padic)
    z = padic(min(a.N - b.v, b.N - 2*b.v + a.v))
    z.parent = ctx
    ccall((:padic_div, :libflint), Cint, 
-         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{PadicField}),
+         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}),
                &z, &a, &b, &ctx)
    return z
 end
@@ -297,7 +297,7 @@ function inv(a::padic)
    z = padic(a.N - 2*a.v)
    z.parent = ctx
    ccall((:padic_inv, :libflint), Cint, 
-         (Ptr{padic}, Ptr{padic}, Ptr{PadicField}), &z, &a, &ctx)
+         (Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), &z, &a, &ctx)
    return z
 end
 
@@ -329,7 +329,7 @@ function sqrt(a::padic)
    z = padic(a.N - div(a.v, 2))
    z.parent = ctx
    res = Bool(ccall((:padic_sqrt, :libflint), Cint, 
-                    (Ptr{padic}, Ptr{padic}, Ptr{PadicField}), &z, &a, &ctx))      
+                    (Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), &z, &a, &ctx))      
    !res && error("Square root of p-adic does not exist")
    return z
 end
@@ -346,7 +346,7 @@ function exp(a::padic)
    z = padic(a.N)
    z.parent = ctx
    res = Bool(ccall((:padic_exp, :libflint), Cint, 
-                    (Ptr{padic}, Ptr{padic}, Ptr{PadicField}), &z, &a, &ctx))
+                    (Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), &z, &a, &ctx))
    !res && error("Unable to compute exponential")
    return z
 end
@@ -357,7 +357,7 @@ function log(a::padic)
    z = padic(a.N)
    z.parent = ctx
    res = Bool(ccall((:padic_log, :libflint), Cint,
-                    (Ptr{padic}, Ptr{padic}, Ptr{PadicField}), &z, &a, &ctx))
+                    (Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), &z, &a, &ctx))
    !res && error("Unable to compute logarithm")
    return z
 end
@@ -368,7 +368,7 @@ function teichmuller(a::padic)
    z = padic(a.N)
    z.parent = ctx
    ccall((:padic_teichmuller, :libflint), Void,
-         (Ptr{padic}, Ptr{padic}, Ptr{PadicField}), &z, &a, &ctx)
+         (Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), &z, &a, &ctx)
    return z
 end
   
@@ -390,13 +390,13 @@ promote_rule(::Type{padic}, ::Type{fmpq}) = padic
 #
 ###############################################################################
 
-function Base.call(R::PadicField)
+function Base.call(R::FlintPadicField)
    z = padic(R.prec_max)
    z.parent = R
    return z
 end
 
-function Base.call(R::PadicField, n::fmpz)
+function Base.call(R::FlintPadicField, n::fmpz)
    if n == 1
       N = 0
    else
@@ -405,12 +405,12 @@ function Base.call(R::PadicField, n::fmpz)
    end
    z = padic(N + R.prec_max)
    ccall((:padic_set_fmpz, :libflint), Void, 
-         (Ptr{padic}, Ptr{fmpz}, Ptr{PadicField}), &z, &n, &R)
+         (Ptr{padic}, Ptr{fmpz}, Ptr{FlintPadicField}), &z, &n, &R)
    z.parent = R
    return z
 end
 
-function Base.call(R::PadicField, n::fmpq)
+function Base.call(R::FlintPadicField, n::fmpq)
    m = den(n)
    if m == 1
       return R(num(n))
@@ -423,21 +423,21 @@ function Base.call(R::PadicField, n::fmpq)
    end
    z = padic(N + R.prec_max)
    ccall((:padic_set_fmpq, :libflint), Void, 
-         (Ptr{padic}, Ptr{fmpq}, Ptr{PadicField}), &z, &n, &R)
+         (Ptr{padic}, Ptr{fmpq}, Ptr{FlintPadicField}), &z, &n, &R)
    z.parent = R
    return z
 end
 
-Base.call(R::PadicField, n::Integer) = R(fmpz(n))
+Base.call(R::FlintPadicField, n::Integer) = R(fmpz(n))
 
 ###############################################################################
 #
-#   PadicField constructor
+#   FlintPadicField constructor
 #
 ###############################################################################
 
 # inner constructor is also used directly
 
-function PadicField(p::Integer, prec::Int)
-   return PadicField(fmpz(p), prec)
+function FlintPadicField(p::Integer, prec::Int)
+   return FlintPadicField(fmpz(p), prec)
 end
