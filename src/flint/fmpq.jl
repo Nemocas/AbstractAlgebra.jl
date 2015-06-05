@@ -4,7 +4,7 @@
 #
 #########################################################################################
 
-export QQ, fmpq, FractionField, Rational, RationalField, height, height_bits, isless,
+export QQ, fmpq, FractionField, Rational, FlintRationalField, height, height_bits, isless,
        reconstruct, next_minimal, next_signed_minimal, next_calkin_wilf, 
        next_signed_calkin_wilf, dedekind_sum, harmonic
 
@@ -14,13 +14,13 @@ export QQ, fmpq, FractionField, Rational, RationalField, height, height_bits, is
 #
 #########################################################################################
 
-QQ = RationalField()
+QQ = FlintRationalField()
 
 parent(a::fmpq) = QQ
 
-elem_type(::RationalField) = fmpq
+elem_type(::FlintRationalField) = fmpq
 
-base_ring(a::RationalField) = ZZ
+base_ring(a::FlintRationalField) = ZZ
 
 base_ring(a::fmpq) = ZZ
 
@@ -51,9 +51,9 @@ function hash(a::fmpq)
    return h $ hash(num(a)) $ hash(den(a))
 end
 
-zero(a::RationalField) = QQ(0, 1)
+zero(a::FlintRationalField) = QQ(0, 1)
 
-one(a::RationalField) = QQ(1, 1)
+one(a::FlintRationalField) = QQ(1, 1)
 
 function num(a::fmpq)
    z = ZZ()
@@ -73,9 +73,9 @@ function abs(a::fmpq)
    return z
 end
 
-zero(a::RationalField) = QQ(0)
+zero(a::FlintRationalField) = QQ(0)
 
-one(a::RationalField) = QQ(1)
+one(a::FlintRationalField) = QQ(1)
 
 isone(a::fmpq) = a == 1
 
@@ -113,7 +113,7 @@ canonical_unit(a::fmpq) = a
 #
 #########################################################################################
 
-function show(io::IO, a::RationalField)
+function show(io::IO, a::FlintRationalField)
    print(io, "Rational Field")
 end
 
@@ -474,25 +474,25 @@ end
 #
 #########################################################################################
 
-call(a::RationalField) = fmpq(ZZ(0), ZZ(1))
+call(a::FlintRationalField) = fmpq(ZZ(0), ZZ(1))
 
-call(a::RationalField, b::Rational{BigInt}) = fmpq(ZZ(b.num), ZZ(b.den)) 
+call(a::FlintRationalField, b::Rational{BigInt}) = fmpq(ZZ(b.num), ZZ(b.den)) 
 
-call(a::RationalField, b::Integer) = fmpq(ZZ(b), ZZ(1))
+call(a::FlintRationalField, b::Integer) = fmpq(ZZ(b), ZZ(1))
 
-call(a::RationalField, b::Int, c::Int) = fmpq(b, c)
+call(a::FlintRationalField, b::Int, c::Int) = fmpq(b, c)
 
-call(a::RationalField, b::fmpz) = fmpq(b, ZZ(1))
+call(a::FlintRationalField, b::fmpz) = fmpq(b, ZZ(1))
 
-call(a::RationalField, b::Integer, c::Integer) = fmpq(ZZ(b), ZZ(c))
+call(a::FlintRationalField, b::Integer, c::Integer) = fmpq(ZZ(b), ZZ(c))
 
-call(a::RationalField, b::fmpz, c::Integer) = fmpq(b, ZZ(c))
+call(a::FlintRationalField, b::fmpz, c::Integer) = fmpq(b, ZZ(c))
 
-call(a::RationalField, b::Integer, c::fmpz) = fmpq(ZZ(b), c)
+call(a::FlintRationalField, b::Integer, c::fmpz) = fmpq(ZZ(b), c)
 
-call(a::RationalField, b::fmpz, c::fmpz) = fmpq(b, c)
+call(a::FlintRationalField, b::fmpz, c::fmpz) = fmpq(b, c)
 
-call(a::RationalField, b::fmpq) = b
+call(a::FlintRationalField, b::fmpq) = b
 
 ###############################################################################
 #
@@ -512,9 +512,9 @@ convert(::Type{Rational{BigInt}}, a::fmpq) = Rational(a)
 
 #########################################################################################
 #
-#   RationalField constructor
+#   FractionField constructor
 #
 #########################################################################################
 
-FractionField(base::FlintIntegerRing) = QQ 
+FractionField(base::FlintIntegerRing) = QQ
 

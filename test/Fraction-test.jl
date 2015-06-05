@@ -3,7 +3,7 @@ function test_fraction_constructors()
 
    R = FractionField(ZZ)
 
-   @test isa(R, RationalField)
+   @test isa(R, FlintRationalField)
 
    @test isa(R(ZZ(3), ZZ(2)), fmpq)
 
@@ -169,7 +169,7 @@ end
 function test_qq_constructors()
    print("Fraction.QQ.constructors()...")
 
-   @test isa(QQ, RationalField)
+   @test isa(QQ, FlintRationalField)
 
    @test isa(QQ(2), FractionElem)
 

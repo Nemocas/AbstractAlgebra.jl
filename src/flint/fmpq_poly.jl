@@ -91,7 +91,7 @@ function show(io::IO, p::FmpqPolyRing)
    show(io, p.base_ring)
 end
 
-show_minus_one(::Type{fmpq_poly}) = show_minus_one(RationalField)
+show_minus_one(::Type{fmpq_poly}) = show_minus_one(FlintRationalField)
 
 ###############################################################################
 #
@@ -657,7 +657,7 @@ end
 #
 ###############################################################################
 
-function PolynomialRing(R::RationalField, s::String)
+function PolynomialRing(R::FlintRationalField, s::String)
    S = symbol(s)
 
    parent_obj = FmpqPolyRing(R, S)

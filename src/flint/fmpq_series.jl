@@ -729,7 +729,7 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::RationalField, prec::Int, s::String)
+function PowerSeriesRing(R::FlintRationalField, prec::Int, s::String)
    S = symbol(s)
 
    parent_obj = FmpqSeriesRing(prec, S)

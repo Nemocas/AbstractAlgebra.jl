@@ -47,11 +47,11 @@ end
 
 ###############################################################################
 #
-#   RationalField / fmpq
+#   FlintRationalField / fmpq
 #
 ###############################################################################
 
-type RationalField <: Field{Flint}
+type FlintRationalField <: Field{Flint}
 end
 
 type fmpq <: FractionElem{fmpz}
@@ -264,7 +264,7 @@ type FmpqPolyRing <: Ring{Flint}
    base_ring::Field
    S::Symbol
 
-   function FmpqPolyRing(R::RationalField, s::Symbol)
+   function FmpqPolyRing(R::FlintRationalField, s::Symbol)
       return try
          FmpqPolyID[s]
       catch
