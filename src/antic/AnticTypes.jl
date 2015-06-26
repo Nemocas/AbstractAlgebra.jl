@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-NfNumberFieldID = Dict{Tuple{fmpq_poly, Symbol}, Field}()
+const NfNumberFieldID = Dict{Tuple{fmpq_poly, Symbol}, Field}()
 
 type NfNumberField <: Field{Antic}
    pol_coeffs::Ptr{Void}

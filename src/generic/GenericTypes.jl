@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-PolyID = ObjectIdDict()
+const PolyID = ObjectIdDict()
 
 type PolynomialRing{T <: RingElem} <: Ring{Generic}
    base_ring :: Ring
@@ -43,7 +43,7 @@ end
 #
 ###############################################################################
 
-ModulusDict = Dict{Tuple{Ring, RingElem}, Ring}()
+const ModulusDict = Dict{Tuple{Ring, RingElem}, Ring}()
 
 type ResidueRing{T <: RingElem} <: Ring{Generic}
    base_ring::Ring
@@ -71,7 +71,7 @@ end
 #
 ###############################################################################
 
-PowerSeriesID = ObjectIdDict()
+const PowerSeriesID = ObjectIdDict()
 
 type PowerSeriesRing{T <: RingElem} <: Ring{Generic}
    base_ring::Ring
@@ -103,7 +103,7 @@ end
 #
 ###############################################################################
 
-FractionDict = ObjectIdDict()
+const FractionDict = ObjectIdDict()
 
 type FractionField{T <:RingElem} <: Field{Generic}
    base_ring::Ring

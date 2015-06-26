@@ -140,6 +140,6 @@ end
 
 avma = cglobal((:avma, :libpari), Ptr{Ptr{Int}})
 
-gen_0 = cglobal((:gen_0, :libpari), Ptr{Ptr{Int}})
+const gen_0 = cglobal((:gen_0, :libpari), Ptr{Ptr{Int}})
 
-gen_1 = cglobal((:gen_1, :libpari), Ptr{Ptr{Int}})
+const gen_1 = cglobal((:gen_1, :libpari), Ptr{Ptr{Int}})

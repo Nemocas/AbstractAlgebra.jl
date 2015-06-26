@@ -80,7 +80,7 @@ _pari_vec_unclone(a::pari_vec) = gunclone(a.data)
 #
 ###############################################################################
 
-PariPolyID = ObjectIdDict()
+const PariPolyID = ObjectIdDict()
 
 type PariPolyRing{T <: RingElem} <: Ring{Pari}
    base_ring::Ring
@@ -135,7 +135,7 @@ _pari_poly_unclone(g::pari_poly) = gunclone(g.d)
 #
 ###############################################################################
 
-PariPolModID = Dict{Tuple{DataType, Symbol}, Ring}()
+const PariPolModID = Dict{Tuple{DataType, Symbol}, Ring}()
 
 type PariPolModRing{S <: PolyElem} <: Ring{Pari}
    T::Symbol
@@ -168,7 +168,7 @@ _pari_polmod_unclone(a::pari_polmod) = gunclone(a.data)
 #
 ###############################################################################
 
-PariNumberFieldID = Dict{fmpq_poly, Ring}()
+const PariNumberFieldID = Dict{fmpq_poly, Ring}()
 
 type PariNumberField <: Ring{Pari}
    data::Ptr{Int}
@@ -221,7 +221,7 @@ _pari_maximal_order_elem_clear_fn(a::PariMaximalOrderElem) = gunclone(a.data)
 #
 ###############################################################################
 
-PariIdealCollectionID = ObjectIdDict()
+const PariIdealCollectionID = ObjectIdDict()
 
 type PariIdealCollection <: Collection{Pari}
    order::PariMaximalOrder
