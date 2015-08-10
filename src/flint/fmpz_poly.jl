@@ -5,7 +5,7 @@
 ###############################################################################
 
 export fmpz_poly, cyclotomic, theta_qexp, eta_qexp, cos_minpoly,
-       swinnerton_dyer
+       swinnerton_dyer, signature
 
 ###############################################################################
 #
@@ -531,6 +531,20 @@ function gcdx(a::fmpz_poly, b::fmpz_poly)
    u *= c1^(lenb - 2)*c2^(lena - 1)
    v *= c1^(lenb - 1)*c2^(lena - 2)   
    return (r, u, v)
+end
+
+###############################################################################
+#
+#   Signature
+#
+###############################################################################
+
+function signature(f::fmpz_poly)
+   r = Array(Int, 1)
+   s = Array(Int, 1)
+   ccall((:fmpz_poly_signature, :libflint), Void,
+         (Ptr{Int}, Ptr{Int}, Ptr{fmpz_poly}), r, s, &f)
+   return (r[1], s[1])
 end
 
 ###############################################################################
