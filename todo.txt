@@ -14,6 +14,9 @@ link against libgmp.a on Linux.
 General
 -------
 
+* Julia uses column major format whereas Flint uses row major. We have to
+decide on which convention to use for Nemo
+
 * Nemo uses num/den, but for polys we are using numerator/denominator
 
 * entry/coeff, set_entry!/set_coeff! for Residue{fmpz} entries but 
@@ -75,6 +78,8 @@ fmpz_mod_poly.jl
 
 Poly.jl/fmpz_poly.jl
 --------------------
+
+* The generic Nemo Poly type is conflicting with the generic Julia Poly type
 
 * Fix printing of monomials, e.g. y + (x), y + (6)
 
