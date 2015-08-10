@@ -86,10 +86,10 @@ cd(wdir)
 
 # install MPFR
 
-run(`wget http://www.mpfr.org/mpfr-current/mpfr-3.1.2.tar.bz2`)
-run(`tar -xvf mpfr-3.1.2.tar.bz2`)
-run(`rm mpfr-3.1.2.tar.bz2`)
-cd("$wdir/mpfr-3.1.2")
+run(`wget http://www.mpfr.org/mpfr-current/mpfr-3.1.3.tar.bz2`)
+run(`tar -xvf mpfr-3.1.3.tar.bz2`)
+run(`rm mpfr-3.1.3.tar.bz2`)
+cd("$wdir/mpfr-3.1.3")
 
 if on_windows
    ENV["PATH"] = pth
@@ -103,7 +103,7 @@ else
    run(`make -j4`)
    run(`make install`)
    cd(wdir)
-   run(`rm -rf mpfr-3.1.2`)
+   run(`rm -rf mpfr-3.1.3`)
 end
 
 cd(wdir)
