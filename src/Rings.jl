@@ -202,6 +202,8 @@ include("flint/fmpz_series.jl")
 
 include("flint/fmpz_mod_series.jl")
 
+include("generic/Matrix.jl")
+
 include("flint/fmpz_mat.jl")
 
 include("flint/nmod_mat.jl")

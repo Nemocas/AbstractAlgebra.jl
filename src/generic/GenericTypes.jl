@@ -105,7 +105,7 @@ end
 
 const FractionDict = ObjectIdDict()
 
-type FractionField{T <:RingElem} <: Field{Generic}
+type FractionField{T <: RingElem} <: Field{Generic}
    base_ring::Ring
 
    function FractionField(R::Ring)
@@ -123,4 +123,34 @@ type Fraction{T <: RingElem} <: FractionElem{T}
    parent::FractionField{T}
 
    Fraction(num::T, den::T) = new(num, den) 
+end
+
+###############################################################################
+#
+#   MatrixSpace / Matrix
+#
+###############################################################################
+
+const MatrixDict = ObjectIdDict()
+
+# not really a mathematical ring
+type MatrixSpace{T <: RingElem} <: Ring{Generic}
+   rows::Int
+   cols::Int
+   base_ring::Ring
+
+   function MatrixSpace(R::Ring, r::Int, c::Int)
+      return try
+         MatrixDict[R, r, c]
+      catch
+         MatrixDict[R, r, c] = new(r, c, R)
+      end
+   end
+end
+
+type Mat{T <: RingElem} <: MatElem{T}
+   entries::Array{T, 2}
+   parent::MatrixSpace{T}
+
+   Mat(a::Array{T, 2}) = new(a) 
 end
