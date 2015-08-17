@@ -138,6 +138,244 @@ show_minus_one{T <: RingElem}(::Type{Mat{T}}) = false
 
 ###############################################################################
 #
+#   Unary operations
+#
+###############################################################################
+
+function -(x::MatElem)
+   par = parent(x)
+   return par(-x.entries)
+end
+
+function transpose(x::MatElem)
+   par = parent(x)
+   return par(x.entries')
+end
+
+###############################################################################
+#
+#   Binary operations
+#
+###############################################################################
+
+function +{T <: RingElem}(x::Mat{T}, y::Mat{T})
+   check_parent(x, y)
+   parz = parent(x)
+   return parz(x.entries + y.entries)
+end
+
+function -{T <: RingElem}(x::Mat{T}, y::Mat{T})
+   check_parent(x, y)
+   parz = parent(x)
+   return parz(x.entries - y.entries)
+end
+
+function *{T <: RingElem}(x::Mat{T}, y::Mat{T})
+   cols(x) != rows(y) && error("Incompatible matrix dimensions")
+   if rows(x) == cols(y) && rows(x) == cols(x)
+      parz = parent(x)
+   else
+      parz = FmpzMatSpace(rows(x), cols(y))
+   end
+   return parz(x.entries*y.entries)
+end
+
+###############################################################################
+#
+#   Ad hoc binary operators
+#
+###############################################################################
+
+function *{T <: RingElem}(x::Integer, y::Mat{T})
+   z = similar(y.entries)
+   parz = parent(y)
+   for i = 1:rows(y)
+      for j = 1:cols(y)
+         z[i, j] = x*y[i, j]
+      end
+   end
+   return parz(z)
+end
+
+function *{T <: RingElem}(x::fmpz, y::Mat{T})
+   z = similar(y.entries)
+   parz = parent(y)
+   for i = 1:rows(y)
+      for j = 1:cols(y)
+         z[i, j] = x*y[i, j]
+      end
+   end
+   return parz(z)
+end
+
+function *{T <: RingElem}(x::T, y::Mat{T})
+   z = similar(y.entries)
+   parz = parent(y)
+   for i = 1:rows(y)
+      for j = 1:cols(y)
+         z[i, j] = x*y[i, j]
+      end
+   end
+   return parz(z)
+end
+
+*{T <: RingElem}(x::Mat{T}, y::Integer) = y*x
+
+*{T <: RingElem}(x::Mat{T}, y::fmpz) = y*x
+
+*{T <: RingElem}(x::Mat{T}, y::T) = y*x
+
+function +{T <: RingElem}(x::Integer, y::Mat{T})
+   z = similar(y.entries)
+   parz = parent(y)
+   R = base_ring(y)
+   for i = 1:rows(y)
+      for j = 1:cols(y)
+         if i != j
+            z[i, j] = deepcopy(y[i, j])
+         else
+            z[i, j] = y[i, j] + R(x)
+         end
+      end
+   end
+   return parz(z)
+end
+
++{T <: RingElem}(x::Mat{T}, y::Integer) = y + x
+
+function +{T <: RingElem}(x::fmpz, y::Mat{T})
+   z = similar(y.entries)
+   parz = parent(y)
+   R = base_ring(y)
+   for i = 1:rows(y)
+      for j = 1:cols(y)
+         if i != j
+            z[i, j] = deepcopy(y[i, j])
+         else
+            z[i, j] = y[i, j] + R(x)
+         end
+      end
+   end
+   return parz(z)
+end
+
++{T <: RingElem}(x::Mat{T}, y::fmpz) = y + x
+
+function +{T <: RingElem}(x::T, y::Mat{T})
+   z = similar(y.entries)
+   parz = parent(y)
+   for i = 1:rows(y)
+      for j = 1:cols(y)
+         if i != j
+            z[i, j] = deepcopy(y[i, j])
+         else
+            z[i, j] = y[i, j] + x
+         end
+      end
+   end
+   return parz(z)
+end
+
++{T <: RingElem}(x::Mat{T}, y::T) = y + x
+
+function -{T <: RingElem}(x::Integer, y::Mat{T})
+   z = similar(y.entries)
+   parz = parent(y)
+   R = base_ring(y)
+   for i = 1:rows(y)
+      for j = 1:cols(y)
+         if i != j
+            z[i, j] = -y[i, j]
+         else
+            z[i, j] = R(x) - y[i, j] 
+         end
+      end
+   end
+   return parz(z)
+end
+
+function -{T <: RingElem}(x::Mat{T}, y::Integer) 
+   z = similar(x.entries)
+   parz = parent(x)
+   R = base_ring(x)
+   for i = 1:rows(x)
+      for j = 1:cols(x)
+         if i != j
+            z[i, j] = deepcopy(x[i, j])
+         else
+            z[i, j] = x[i, j] - R(y)
+         end
+      end
+   end
+   return parz(z)
+end
+
+function -{T <: RingElem}(x::fmpz, y::Mat{T})
+   z = similar(y.entries)
+   parz = parent(y)
+   R = base_ring(y)
+   for i = 1:rows(y)
+      for j = 1:cols(y)
+         if i != j
+            z[i, j] = -y[i, j]
+         else
+            z[i, j] = R(x) - y[i, j] 
+         end
+      end
+   end
+   return parz(z)
+end
+
+function -{T <: RingElem}(x::Mat{T}, y::fmpz) 
+   z = similar(x.entries)
+   parz = parent(x)
+   R = base_ring(x)
+   for i = 1:rows(x)
+      for j = 1:cols(x)
+         if i != j
+            z[i, j] = deepcopy(x[i, j])
+         else
+            z[i, j] = x[i, j] - R(y)
+         end
+      end
+   end
+   return parz(z)
+end
+
+function -{T <: RingElem}(x::T, y::Mat{T})
+   z = similar(y.entries)
+   parz = parent(y)
+   R = base_ring(y)
+   for i = 1:rows(y)
+      for j = 1:cols(y)
+         if i != j
+            z[i, j] = -y[i, j]
+         else
+            z[i, j] = x - y[i, j] 
+         end
+      end
+   end
+   return parz(z)
+end
+
+function -{T <: RingElem}(x::Mat{T}, y::T) 
+   z = similar(x.entries)
+   parz = parent(x)
+   R = base_ring(x)
+   for i = 1:rows(x)
+      for j = 1:cols(x)
+         if i != j
+            z[i, j] = deepcopy(x[i, j])
+         else
+            z[i, j] = x[i, j] - y
+         end
+      end
+   end
+   return parz(z)
+end
+
+###############################################################################
+#
 #   Promotion rules
 #
 ###############################################################################
