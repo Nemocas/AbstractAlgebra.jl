@@ -54,6 +54,38 @@ function setindex!{T <: RingElem}(a::Mat{T}, d::T, r::Int, c::Int)
    a.entries[r, c] = d
 end
 
+zero(a::MatrixSpace) = a()
+
+one(a::MatrixSpace) = a(1)
+
+function iszero(a::MatElem)
+   for i = 1:rows(a)
+      for j = 1:cols(a)
+         if !iszero(a[i, j])
+            return false
+         end
+      end
+  end
+  return true
+end
+
+function isone(a::MatElem)
+   for i = 1:rows(a)
+      for j = 1:cols(a)
+         if i == j
+            if !isone(a[i, j])
+               return false
+            end
+         else
+            if !iszero(a[i, j])
+               return false
+            end
+         end
+      end
+  end
+  return true
+end
+
 function deepcopy{T <: RingElem}(d::Mat{T})
    entries = Array(T, rows(d), cols(d))
    for i = 1:rows(d)
@@ -63,6 +95,46 @@ function deepcopy{T <: RingElem}(d::Mat{T})
    end
    return parent(d)(entries)
 end
+
+###############################################################################
+#
+#   Canonicalisation
+#
+###############################################################################
+
+canonical_unit(a::MatElem) = canonical_unit(a[1, 1])
+
+###############################################################################
+#
+#   String I/O
+#
+###############################################################################
+
+function show(io::IO, a::MatrixSpace)
+   print(io, "Matrix Space of ")
+   print(io, a.rows, " rows and ", a.cols, " columns over ")
+   print(io, base_ring(a))
+end
+
+function show(io::IO, a::MatElem)
+   rows = a.parent.rows
+   cols = a.parent.cols
+   for i = 1:rows
+      print(io, "[")
+      for j = 1:cols
+         print(io, a[i, j])
+         if j != cols
+            print(io, " ")
+         end
+      end
+      print(io, "]")
+      if i != rows
+         println(io, "")
+      end
+   end
+end
+
+show_minus_one{T <: RingElem}(::Type{Mat{T}}) = false
 
 ###############################################################################
 #
