@@ -175,7 +175,7 @@ function *{T <: RingElem}(x::Mat{T}, y::Mat{T})
    if rows(x) == cols(y) && rows(x) == cols(x)
       parz = parent(x)
    else
-      parz = FmpzMatSpace(rows(x), cols(y))
+      parz = MatrixSpace(base_ring(x), rows(x), cols(y))
    end
    return parz(x.entries*y.entries)
 end
@@ -372,6 +372,195 @@ function -{T <: RingElem}(x::Mat{T}, y::T)
       end
    end
    return parz(z)
+end
+
+###############################################################################
+#
+#   Powering
+#
+###############################################################################
+
+function ^{T <: RingElem}(a::Mat{T}, b::Int)
+   b < 0 && throw(DomainError())
+   rows(a) != cols(a) && error("Incompatible matrix dimensions in power")
+   # special case powers of x for constructing polynomials efficiently
+   if b == 0
+      return one(parent(a))
+   elseif b == 1
+      return deepcopy(a)
+   else
+      bit = ~((~Uint(0)) >> 1)
+      while (Uint(bit) & b) == 0
+         bit >>= 1
+      end
+      z = a
+      bit >>= 1
+      while bit != 0
+         z = z*z
+         if (Uint(bit) & b) != 0
+            z *= a
+         end
+         bit >>= 1
+      end
+      return z
+   end
+end
+
+###############################################################################
+#
+#   Comparisons
+#
+###############################################################################
+
+function =={T <: RingElem}(x::Mat{T}, y::Mat{T})
+   check_parent(x, y)
+   for i = 1:rows(x)
+      for j = 1:cols(x)
+         if x[i, j] != y[i, j]
+            return false
+         end
+      end
+   end
+   return true
+end
+
+###############################################################################
+#
+#   Ad hoc comparisons
+#
+###############################################################################
+
+function =={T <: RingElem}(x::Mat{T}, y::Integer) 
+   for i = 1:min(rows(x), cols(x))
+      if x[i, i] != y
+         return false
+      end
+   end
+   for i = 1:rows(x)
+      for j = 1:cols(x)
+         if i != j && x[i, j] != 0
+            return false
+         end
+      end
+   end
+   return true
+end
+
+=={T <: RingElem}(x::Integer, y::Mat{T}) = y == x
+
+function =={T <: RingElem}(x::Mat{T}, y::fmpz) 
+   for i = 1:min(rows(x), cols(x))
+      if x[i, i] != y
+         return false
+      end
+   end
+   for i = 1:rows(x)
+      for j = 1:cols(x)
+         if i != j && x[i, j] != 0
+            return false
+         end
+      end
+   end
+   return true
+end
+
+=={T <: RingElem}(x::fmpz, y::Mat{T}) = y == x
+
+###############################################################################
+#
+#   Ad hoc exact division
+#
+###############################################################################
+
+function divexact{T <: RingElem}(x::Mat{T}, y::Integer)
+   z = similar(x.entries)
+   parz = parent(x)
+   for i = 1:rows(x)
+      for j = 1:cols(x)
+         z[i, j] = divexact(x[i, j], y)
+      end
+   end
+   return parz(z)
+end
+
+function divexact{T <: RingElem}(x::Mat{T}, y::fmpz)
+   z = similar(x.entries)
+   parz = parent(x)
+   for i = 1:rows(x)
+      for j = 1:cols(x)
+         z[i, j] = divexact(x[i, j], y)
+      end
+   end
+   return parz(z)
+end
+
+function divexact{T <: RingElem}(x::Mat{T}, y::T)
+   z = similar(x.entries)
+   parz = parent(x)
+   for i = 1:rows(x)
+      for j = 1:cols(x)
+         z[i, j] = divexact(x[i, j], y)
+      end
+   end
+   return parz(z)
+end
+
+###############################################################################
+#
+#   Gram matrix
+#
+###############################################################################
+
+function gram{T <: RingElem}(x::Mat{T})
+   if rows(x) == cols(x)
+      parz = parent(x)
+   else
+      parz = MatrixSpace(base_ring(x), rows(x), rows(x))
+   end
+   z = parz()   
+   for i = 1:rows(x)
+      for j = 1:rows(x)
+         z[i, j] = zero(base_ring(x))
+         for k = 1:cols(x)
+            z[i, j] += x[i, k]*x[j, k]
+         end
+      end
+   end
+   return z
+end
+
+###############################################################################
+#
+#   Trace
+#
+###############################################################################
+
+function trace{T <: RingElem}(x::Mat{T})
+   rows(x) != cols(x) && error("Not a square matrix in trace")
+   d = zero(base_ring(x))
+   for i = 1:rows(x)
+      d += x[i, i]
+   end
+   return d
+end
+
+###############################################################################
+#
+#   Content
+#
+###############################################################################
+
+function content{T <: RingElem}(x::Mat{T})
+  d = zero(base_ring(x))
+  for i = 1:rows(x)
+     for j = 1:cols(x)
+        d = gcd(d, x[i, j])
+        if isone(d)
+           return d
+        end
+     end
+  end
+  return d
 end
 
 ###############################################################################
