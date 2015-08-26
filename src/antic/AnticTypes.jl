@@ -29,6 +29,7 @@ type NfNumberField <: Field{Antic}
    flag::Uint
    pol::fmpq_poly
    S::Symbol
+   auxilliary_data::Array{Any, 1}
 
    function NfNumberField(pol::fmpq_poly, s::Symbol)
       try
@@ -40,6 +41,7 @@ type NfNumberField <: Field{Antic}
             (Ptr{NfNumberField}, Ptr{fmpq_poly}), &nf, &pol)
          finalizer(nf, _NfNumberField_clear_fn)
          nf.S = s
+         nf.auxilliary_data = Array(Any, 5)
          return nf
       end
    end

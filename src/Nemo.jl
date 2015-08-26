@@ -17,6 +17,8 @@ export PolyElem, SeriesElem, ResidueElem, FractionElem, MatElem
 export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
        MaximalRealSubfield, MaximalOrder
 
+export create_accessors, get_handle
+
 include("AbstractTypes.jl")
 
 ###############################################################################
@@ -66,6 +68,42 @@ include("antic/AnticTypes.jl")
 include("pari/PariTypes.jl")
 
 include("Rings.jl")
+
+###########################################################
+#
+#   Package handle creation
+#
+###########################################################
+
+begin
+   handle = 1
+
+   function get_handle()
+      handle += 1
+      return handle - 1
+   end
+end
+
+###############################################################################
+#
+#   Auxilliary data accessors
+#
+###############################################################################
+
+function create_accessors(T, S, handle)
+   accessor_name = gensym()
+   @eval begin
+      function $(symbol(:get, accessor_name))(a::$T)
+         return a.auxilliary_data[$handle]::$S
+      end,
+      function $(symbol(:set, accessor_name))(a::$T, b::$S)
+         if $handle > length(a.auxilliary_data)
+            resize(a.auxilliary_data, $handle)
+         end
+         a.auxilliary_data[$handle] = b
+      end
+   end
+end
 
 ###############################################################################
 #
