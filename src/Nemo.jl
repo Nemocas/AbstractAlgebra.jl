@@ -17,7 +17,7 @@ export PolyElem, SeriesElem, ResidueElem, FractionElem, MatElem
 export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
        MaximalRealSubfield, MaximalOrder
 
-export create_accessors, get_handle
+export create_accessors, get_handle, package_handle
 
 include("AbstractTypes.jl")
 
@@ -75,13 +75,11 @@ include("Rings.jl")
 #
 ###########################################################
 
-begin
-   handle = 1
+const package_handle = [1]
 
-   function get_handle()
-      handle += 1
-      return handle - 1
-   end
+function get_handle()
+   package_handle[1] += 1
+   return package_handle[1] - 1
 end
 
 ###############################################################################
