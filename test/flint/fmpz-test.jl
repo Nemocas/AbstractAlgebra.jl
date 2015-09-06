@@ -35,6 +35,23 @@ function test_fmpz_constructors()
    println("PASS")
 end
 
+function test_fmpz_convert()
+   print("fmpz.convert...")
+
+   a = fmpz(-123)
+   b = fmpz(12)
+
+   @test Int(a) == -123
+   @test UInt(b) == UInt(12)
+   @test BigInt(a) == BigInt(-123)
+   @test Float64(a) == Float64(-123)
+   @test Float32(a) == Float32(-123)
+   @test Float16(a) == Float16(-123)
+   @test BigFloat(a) == BigFloat(-123)
+
+   println("PASS")
+end
+
 function test_fmpz_manipulation()
    print("fmpz.manipulation...")
 
@@ -459,6 +476,7 @@ end
 function test_fmpz()
    test_fmpz_abstract_types()
    test_fmpz_constructors()
+   test_fmpz_convert()
    test_fmpz_manipulation()
    test_fmpz_binary_ops()
    test_fmpz_division()

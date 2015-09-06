@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export fmpz_poly, cyclotomic, theta_qexp, eta_qexp, cos_minpoly,
+export FmpzPolyRing, fmpz_poly, cyclotomic, theta_qexp, eta_qexp, cos_minpoly,
        swinnerton_dyer, signature
 
 ###############################################################################

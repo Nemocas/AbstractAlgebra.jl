@@ -521,7 +521,7 @@ reflects the fact that Antic is very new and currently doesn't perform such comp
 Below we discuss each of the parent types and object types available in Nemo and list all the functions
 available for each, with examples.
 
-\section{Rings}
+\section{Generic rings}
 
 Internally, Nemo defines an abstract type for rings, with the following line of code:
 
@@ -551,6 +551,970 @@ For example the following code will return true:
 \begin{lstlisting}
 typeof(ZZ(1)) <: RingElem
 \end{lstlisting}
+
+\subsection{Generic polynomials ($T[x]$)}
+
+Nemo has a parametric polynomial type (called \code{Poly}) for generic polynomials over
+a ring $T$. There's not any need to deal directly with the \code{Poly} type, as we
+provide a function \code{PolynomialRing} for constructing it.
+
+The \code{Poly} type takes a parameter, namely the type of ring element that the
+coefficients will have, e.g. if there was no special type for Flint polynomials over the
+integers, the type of polynomials over the integers would be \code|Poly{fmpz}|.
+
+Generic polynomials have parent \code{PolynomialRing}, which is also parameterised by the
+type of the ring element of the polynomial coefficients, the same as the \code{Poly}
+type is.
+
+We have that \code{PolynomialRing} belongs to the \code{Ring} type class and \code{Poly}
+belongs to the \code{PolyElem} type class which in turn belongs to the \code{RingElem}
+type class.
+
+To get the parent object for the coefficient ring we can call the \code{base_ring}
+function. It accepts either a polynomial or a polynomial parent object.
+
+We can also get a symbol representing the name of the variable (as it will print) of
+a polynomial ring.
+
+For example we have:
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+base_ring(S) == R
+var(S) == :y
+\end{lstlisting}
+
+\subsubsection{Constructors}
+
+Because dealing with the Julia types directly is somewhat messy, we provide a simple
+function to create the parent of a polynomial in Nemo.
+
+\begin{lstlisting}
+PolynomialRing{T <: Ring}(::T, s::String)
+\end{lstlisting}
+
+\desc{This function takes a parent object which belongs to the \code|Ring| class 
+(e.g. \code|T = ZZ|), specifying the ring that the polynomial coefficients are to 
+belong to, and a \code{String} giving the string representation of a variable (e.g. 
+\code|"x"|). It returns a tuple \code|(R, x)| consisting of the parent of the polynomial
+ring being constructed, \code|R|, and the degree $1$ polynomial \code|x| in this ring.}
+
+This is easier to understand by giving an example
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = (x^2 + 2x + 1)*y^3 + (x - 1)*y + 4x - 1
+\end{lstlisting}
+
+Notice that we can build up polynomials from the degree one polynomials \code{x} and
+\code{y} returned by the calls to \code{PolynomialRing}. 
+
+Another thing to note is that there is no reason why the variable name \code{x} has
+to be the same as the string \code{"x"}. The latter is simply how \code{x} will print
+when we evaluate it. Of course, in most situations it is convenient to use the same 
+letter for the variable and for the string.
+
+Once we have constructed a polynomial ring as above, we can use it to construct
+polynomials of various kinds.
+
+This is achieved by making the parent object of the polynomial ring callable. In the
+following we assume that \code{S} is a parent object of a polynomial ring, e.g.
+created by the following:
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+\end{lstlisting}
+
+The parent object \code{S} is made callable in Nemo by overloading the Julia
+\code{call} operator for polynomial ring parent objects. The type \code{T}
+below will refer to the type of the polynomial coefficients.
+
+\begin{lstlisting}
+S()
+\end{lstlisting}
+
+\desc{Construct a polynomial of length $0$ in the given polynomial ring.}
+
+\begin{lstlisting}
+S(a::Integer)
+S(a::T)
+\end{lstlisting}
+
+\desc{Construct a polynomial of length $1$ whose constant coefficient is $a$ if
+$a \neq 0$, otherwise construct the zero polynomial.}
+
+\begin{lstlisting}
+S(a::Array{T, 1})
+\end{lstlisting}
+
+\desc{Construct a polynomial whose coefficients are given by the elements of the array
+\code{a}, starting with the constant coefficient at index $1$. The array must be fully
+initialised, otherwise an exception may result.}
+
+\begin{lstlisting}
+S(a::Poly{T})
+\end{lstlisting}
+
+\desc{Return a reference to the polynomial \code{a}.}
+
+\begin{lstlisting}
+S{R <: Ring}(a::R)
+\end{lstlisting}
+
+\desc{Try to convert the value \code{a} to the polynomial type parameterised by 
+\code{T} and the symbol, if possible, and return the value, else raise an error. 
+This constructor is used to coerce polynomials and coefficients from subordinate rings
+up into the polynomial ring.}
+
+\textbf{Examples.}
+
+Here are some examples of these constructors in action. Note that we don't actually
+ever need to deal with the parameterised \code{Poly} type directly.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+T, z = PolynomialRing(S, "z")
+
+f = x^2 + y^3 + z + 1
+
+g = S(2)
+
+h = S(x^2 + 2x + 1)
+
+j = T(x + 2)
+
+k = S([x, x + 2, x^2 + 3x + 1])
+
+l = S(k)
+\end{lstlisting}
+
+\subsubsection{Basic manipulation}
+
+\begin{lstlisting}
+degree{T <: RingElem}(a::Poly{T})
+\end{lstlisting}
+
+\desc{Return the degree of the polynomial $a$. We define the degree of the zero
+polynomial to be $-1$.}
+
+\begin{lstlisting}
+length{T <: RingElem}(a::Poly{T})
+\end{lstlisting}
+
+\desc{Return the length of the polynomial $a$, i.e. its degree plus one.}
+
+\begin{lstlisting}
+normalise{T <: RingElem}(a::Poly{T}, len::Int)
+\end{lstlisting}
+
+\desc{Return the normalised length of the polynomial $a$ assuming its unnormalised
+length is \code{len}. A polynomial is normalised if it is either length $0$ or its
+leading coefficient is nonzero. This function is usually used internally.}
+
+\begin{lstlisting}
+coeff{T <: RingElem}(a::Poly{T}, n::Int)
+\end{lstlisting}
+
+\desc{Return the coefficient of the degree $n$ term of the polnomial $a$, or zero
+if it has none.}
+
+\begin{lstlisting}
+lead{T <: RingElem}(a::Poly{T})
+\end{lstlisting}
+
+\desc{Return the leading coefficient of the polynomial $a$, or zero if $a$ has
+length $0$.}
+
+\begin{lstlisting}
+iszero{T <: Ring}(a::Poly{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the polynomial $a$ is the additive identity of the
+polynomial ring, otherwise return \code{false}.}
+
+\begin{lstlisting}
+isone{T <: Ring}(a::Poly{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the polynomial $a$ is the multiplicative identity
+of the polynomial ring, otherwise return \code{false}.}
+
+\begin{lstlisting}
+isgen{T <: Ring}(a::Poly{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the polynomial $a$ is the generator (variable) of the
+polynomial ring, otherwise return \code{false}.}
+
+\begin{lstlisting}
+isunit{T <: Ring}(a::Poly{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the polynomial $a$ is invertible, i.e. is of length
+$1$ and has invertible constant coefficient, otherwise return \code{false}.}
+
+\begin{lstlisting}
+zero{T <: Ring}(::Type{Poly{T}})
+\end{lstlisting}
+
+\desc{Return the additive identity $0$ in the given polynomial ring.}
+
+\begin{lstlisting}
+one{T <: Ring}(::Type{Poly{T}})
+\end{lstlisting}
+
+\desc{Return the multiplicative identity $1$ in the given polynomial ring.}
+
+\begin{lstlisting}
+gen{T <: Ring}(::Type{Poly{T}})
+\end{lstlisting}
+
+\desc{Return the generator (variable) of the given polynomial ring.}
+
+\begin{lstlisting}
+canonical_unit{T <: Ring}(a::Poly{T})
+\end{lstlisting}
+
+\desc{Used for canonicalising fractions. The function simply returns
+\code{canonical_unit} of the leading coefficient.}
+
+\begin{lstlisting}
+deepcopy{T <: Ring}(a::Poly{T})
+\end{lstlisting}
+
+\desc{Make a new polynomial which is arithmetically equal to $a$.}
+
+\textbf{Examples.}
+
+Here are some examples of the basic manipulation functions.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+a = zero(S)
+b = one(S)
+c = gen(S)
+d = isunit(b)
+
+f = x^2*y + 2x + 1
+g = lead(f)
+
+h = x*y^2 + (x + 1)*y + 3
+j = coeff(h, 2)
+
+if isgen(y)
+   println(y, " is the generator of the ", parent(y))
+end
+
+k = isone(b)
+m = iszero(a)
+
+n = canonical_unit(-x*y + x + 1)
+\end{lstlisting}
+
+\subsubsection{Binary operators}
+
+The following binary operators are provided for polynomials. Note that
+if both operands are not in the same polynomial ring, Nemo will try to
+coerce them into one of the two rings before applying the operation.
+
+\begin{lstlisting}
++{T <: RingElem}(a::Poly{T}, b::Poly{T})
+-{T <: RingElem}(a::Poly{T}, b::Poly{T})
+*{T <: RingElem}(a::Poly{T}, b::Poly{T})
+\end{lstlisting}
+
+\textbf{Examples.}
+
+Here are some examples of the binary operators.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x*y^2 + (x + 1)*y + 3
+g = (x + 1)*y + (x^3 + 2x + 2)
+
+h = f - g
+n = f*g
+p = f + g
+\end{lstlisting}
+
+\subsubsection{Ad hoc binary operators}
+
+The following ad hoc binary operators are faster than first coercing all
+operands into the polynomial ring.
+
+\begin{lstlisting}
+*{T <: RingElem}(x::Poly{T}, y::Int)
+*{T <: RingElem}(x::Poly{T}, y::fmpz)
+*{T <: RingElem}(x::Int, y::Poly{T})
+*{T <: RingElem}(x::fmpz, y::Poly{T})
+\end{lstlisting}
+
+\textbf{Examples.}
+
+Here are some examples of the ad hoc binary operators.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x*y^2 + (x + 1)*y + 3
+g = (x + 1)*y + (x^3 + 2x + 2)
+h = g - 4
+k = fmpz(5) - g
+l = f*7
+\end{lstlisting}
+
+\subsubsection{Comparison}
+
+\begin{lstlisting}
+=={T <: RingElem}(x::Poly{T}, y::Poly{T})
+\end{lstlisting}
+
+Julia automatically provides a \code{!=} operator.
+
+\begin{lstlisting}
+isequal(x::Poly{T}, y::Poly{T})
+\end{lstlisting}
+
+\desc{Returns \code{true} if \code{x == y} and if each coefficient of \code{x}
+matches the corresponding coefficient of \code{y} according to \code{isequal},
+when applied recursively, otherwise return \code{false}.}
+
+\textbf{Examples.}
+
+Here are some examples of comparison.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x*y^2 + (x + 1)*y + 3
+g = x*y^2 + (x + 1)*y + 3
+
+if f == g
+   println("f is equal to g")
+end
+\end{lstlisting}
+
+\subsubsection{Ad hoc comparison}
+
+The following comparison operators are faster than first coercing the arguments
+into one or the other ring.
+
+\begin{lstlisting}
+=={T <: RingElem}(x::Poly{T}, y::Integer)
+=={T <: RingElem}(x::Integer, y::Poly{T})
+\end{lstlisting}
+
+\textbf{Examples.}
+
+Here is an example of ad hoc comparison.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+if S(1) == 1
+   println("S(1) is equal to ZZ(1)")
+end
+\end{lstlisting}
+
+\subsubsection{Unary operators}
+
+\begin{lstlisting}
+-{T <: RingElem}(a::Poly{T})
+\end{lstlisting}
+
+\textbf{Examples.}
+
+Here are some examples of unary operators.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x*y^2 + (x + 1)*y + 3
+g = -f
+\end{lstlisting}
+
+\subsubsection{Truncation}
+
+\begin{lstlisting}
+truncate{T <: RingElem}(a::Poly{T}, n::Int)
+\end{lstlisting}
+
+\desc{Return the polynomial $a$ truncated to length $n$. If $n < 0$ we throw a
+\code{DomainError()}.}
+
+\begin{lstlisting}
+mullow{T <: RingElem}(a::Poly{T}, b::Poly{T}, n::Int)
+\end{lstlisting}
+
+\desc{Return the polynomial \code{a*b} truncated to length $n$. If $n < 0$ we
+throw a \code{DomainError()}.}
+
+\textbf{Examples.}
+
+Here are some examples of truncated operations.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x*y^2 + (x + 1)*y + 3
+g = (x + 1)*y + (x^3 + 2x + 2)
+
+h = truncate(f, 1)
+k = mullow(f, g, 4)
+\end{lstlisting}
+
+\subsubsection{Reversal}
+
+\begin{lstlisting}
+reverse{T <: RingElem}(x::Poly{T}, len::Int)
+\end{lstlisting}
+
+\desc{Return the reverse of the polynomial $x$, thought of as a polynomial of
+the given length (the polynomial will be notionally truncated or padded with
+zeroes before the leading term if necessary to match the specified length). 
+The resulting polynomial is normalised. If \code{len} is negative we throw a
+\code{DomainError()}.}
+
+\begin{lstlisting}
+reverse{T <: RingElem}(x::Poly{T})
+\end{lstlisting}
+
+\desc{Return the reverse of the polynomial $x$, i.e. the leading coefficient
+of $x$ becomes the constant coefficient of the result, etc. The resulting
+polynomial is normalised.}
+
+\textbf{Examples.}
+
+Here are some examples of reversal.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x*y^2 + (x + 1)*y + 3
+
+g = reverse(f, 7)
+\end{lstlisting}
+
+\subsubsection{Shifting}
+
+\begin{lstlisting}
+shift_left{T <: RingElem}(x::Poly{T}, n::Int)
+\end{lstlisting}
+
+\desc{Return the polynomial that results from shifting the coefficients of the
+polynomial $x$ to the left by $n$ places, i.e. $f\times x^n$ where $x$ is the
+generator of the polynomial ring that $f$ belongs to. If $n < 0$ we throw a
+\code{DomainError()}.}
+
+\begin{lstlisting}
+shift_right{T <: RingElem}(x::Poly{T}, n::Int)
+\end{lstlisting}
+
+\desc{Return the polynomial that results from shifting the coefficients of the
+polynomial $x$ to the right by $n$ places, i.e. by dividing $f$ by $x^n$ and
+throwing away the remainder. If $n$ is greater than or equal to the length of
+$x$ then the zero polynomial results. If $n < 0$ we throw a 
+\code{DomainError()}.}
+
+\textbf{Examples.}
+
+Here are some examples of shifting.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x*y^2 + (x + 1)*y + 3
+
+g = shift_left(f, 7)
+h = shift_right(f, 2)
+\end{lstlisting}
+
+\subsubsection{Powering}
+
+\begin{lstlisting}
+^{T <: RingElem}(a::Poly{T}, n::Int)
+\end{lstlisting}
+
+\desc{Return the polynomial $a^n$. If $n < 0$ we throw a \code{DomainError()}.}
+
+\textbf{Examples.}
+
+Here are some examples of powering.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x*y^2 + (x + 1)*y + 3
+g = f^5
+\end{lstlisting}
+
+\subsubsection{Modular arithmetic}
+
+When we have polynomials over residue rings or fields, we can reduce modulo
+a polynomial over the base ring. In this way we can do modular arithmetic with
+polynomials.
+
+\begin{lstlisting}
+mulmod{T <: Union(ResidueElem, FieldElem)}(a::Poly{T}, 
+                                          b::Poly{T}, d::Poly{T})
+\end{lstlisting}
+
+\desc{Return $ab \pmod{d}$.}
+
+\begin{lstlisting}
+invmod{T <: Union(ResidueElem, FieldElem)}(a::Poly{T}, d::Poly{T})
+\end{lstlisting}
+
+\desc{Return $a^{-1} \pmod{d}$. If an impossible inverse is encountered, an
+exception is thrown.}
+
+\begin{lstlisting}
+powmod{T <: Union(ResidueElem, FieldElem)}(a::Poly{T}, b::Int, 
+                                                         d::Poly{T})
+\end{lstlisting}
+
+\desc{Return $a^b \pmod{d}$.}
+
+Here are some examples of modular arithmetic.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+S = ResidueRing(R, x^3 + 3x + 1)
+T, y = PolynomialRing(S, "y")
+
+f = (3*x^2 + x + 2)*y + x^2 + 1
+g = (5*x^2 + 2*x + 1)*y^2 + 2x*y + x + 1
+h = (3*x^3 + 2*x^2 + x + 7)*y^5 + 2x*y + 1
+
+invmod(f, g)
+mulmod(f, g, h)
+powmod(f, 3, h)
+\end{lstlisting}
+
+\subsubsection{Exact division}
+
+\begin{lstlisting}
+divexact{T <: RingElem}(a::Poly{T}, b::Poly{T})
+\end{lstlisting}
+
+\desc{Return $a$ divided by $b$. The result is only meaningful if the division is
+exact. If $b = 0$ we throw a \code{DivideError()}. 
+
+If \code{T} is a residue ring and the leading coefficient of $b$ is not invertible
+in the \code{T}, an error will be thrown.} 
+
+\textbf{Examples.}
+
+Here is an example of exact division.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x*y^2 + (x + 1)*y + 3
+g = (x + 1)*y + (x^3 + 2x + 2)
+
+h = divexact(f*g, f)
+\end{lstlisting}
+
+\subsubsection{Ad hoc exact division}
+
+\begin{lstlisting}
+divexact{T <: RingElem}(a::Poly{T}, b::T)
+divexact{T <: RingElem}(a::Poly{T}, b::Integer)
+\end{lstlisting}
+
+\desc{Return $a$ divided by $b$. The result is only meaningful if the division is
+exact. If $b = 0$ we throw a \code{DivideError()}.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc exact division.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x*y^2 + (x + 1)*y + 3
+g = (x + 1)*y + (x^3 + 2x + 2)
+
+h = divexact(3*f, 3)
+k = divexact(x*g, x)
+\end{lstlisting}
+
+\subsubsection{Euclidean division}
+
+Over a residue ring we can define Euclidean division.
+
+\begin{lstlisting}
+mod{T <: Union(ResidueElem, FieldElem)}(f::Poly{T}, g::Poly{T})
+\end{lstlisting}
+
+\desc{Return the Euclidean remainder of $f$ divided by $g$, i.e. $r$ such 
+that $a = bq + r$ for some polynomial $r$ with deg$(r) <$ deg$(b)$. If 
+$g = 0$ we throw a \code{DivideError()}.}
+
+\begin{lstlisting}
+divrem{T <: Union(ResidueElem, FieldElem)}(f::Poly{T}, g::Poly{T})
+\end{lstlisting}
+
+\desc{Return the Euclidean quotient and remainder of $f$ divided by $g$, i.e.
+a tuple \code{(q, r)} such that $a = bq + r$ with deg$(r) <$ deg$(b)$. If 
+$g = 0$ we throw a \code{DivideError()}.}
+
+\textbf{Examples.}
+
+Here are some examples of Euclidean division.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 7)
+S, x = PolynomialRing(R, "x")
+T = ResidueRing(S, x^3 + 3x + 1)
+U, y = PolynomialRing(T, "y")
+
+f = y^3 + x*y^2 + (x + 1)*y + 3
+g = (x + 1)*y^2 + (x^3 + 2x + 2)
+
+h = mod(f, g)
+q, r = divrem(f, g)
+\end{lstlisting}
+
+\subsubsection{Pseudodivision}
+
+Given two polynomials $a, b$, pseudodivision computes polynomials $q$ and $r$
+with length$(r) <$ length$(b)$ such that
+$$L^d a = bq + r,$$
+where $d =$ length$(a) -$ length$(b) + 1$ and $L$ is the leading coefficient
+of $b$.
+
+We call $q$ the pseudoquotient and $r$ the pseudoremainder.
+
+\begin{lstlisting}
+pseudorem{T <: RingElem}(a::Poly{T}, b::Poly{T})
+\end{lstlisting}
+
+\desc{Return the pseudoremainder of $a$ divided by $b$. If $b = 0$ we throw a 
+\code{DivideError()}.}
+
+\begin{lstlisting}
+pseudodivrem{T <: RingElem}(a::Poly{T}, b::Poly{T})
+\end{lstlisting}
+
+\desc{Return a tuple $(q, r)$ consisting of the pseudoquotient and pseudoremainder 
+of $a$ divided by $b$. If $b = 0$ we throw a \code{DivideError()}.}
+
+\textbf{Examples.}
+
+Here are some examples of pseudodivision.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x*y^2 + (x + 1)*y + 3
+g = (x + 1)*y + (x^3 + 2x + 2)
+
+h = pseudorem(f, g)
+q, r = pseudodivrem(f, g)
+\end{lstlisting}
+
+Note that pseudodivision is not always useful. In general it computes a
+multiple of the quotient, and for example in the case of polynomials over a
+residue ring, this may lead to meaningless results in the presence of zero
+divisors. For example
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 6)
+S, x = PolynomialRing(R, "x")
+
+f = 3*x^5 + x^4 + 3*x^2 + 2
+g = 2*x^3 + 5*x^2 + 2*x + 2
+
+pseudorem(f, g)
+\end{lstlisting}
+
+Here Nemo returns \code{3*x^2}, which happens to be \code{3*g} in this
+ring.
+
+\subsubsection{Content, primitive part, GCD and LCM}
+
+When the base ring provides a \code{gcd} function we can provide numerous
+GCD related functions for polynomials over that ring.
+
+\begin{lstlisting}
+content{T <: RingElem}(a::Poly{T})
+\end{lstlisting}
+
+\desc{Return the content of the polynomial $a$, i.e. the greatest common divisor
+of all its coefficients, if this exists.}
+
+\begin{lstlisting}
+primpart{T <: RingElem}(a::Poly{T})
+\end{lstlisting}
+
+\desc{Return the primitive part of the polynomial $a$, i.e. the polynomial
+divided by its content, if it exists.}
+
+\begin{lstlisting}
+gcd{T <: RingElem}(a::Poly{T}, b::Poly{T})
+\end{lstlisting}
+
+\desc{Return the greatest common divisor of the polynomials $a$ and $b$ if 
+it exists.}
+
+\begin{lstlisting}
+lcm{T <: RingElem}(a::Poly{T}, b::Poly{T})
+\end{lstlisting}
+
+\desc{Return the least common multiple of the polynomials $a$ and $b$. We
+define lcm$(a, b) = ab/$gcd$(a, b)$.}
+
+We allow GCD for polynomials over residue rings, e.g. over $\Z/n\Z$, even when
+the residue ring has zero divisors. However, if an impossible inverse is
+encountered during the computation, due to zero divisors, we throw an error.
+
+\begin{lstlisting}
+gcdinv{T <: Union(Field, Residue), S}(a::Poly{T}, b::Poly{T})
+\end{lstlisting}
+
+\desc{Return a tuple $(g, s)$ such that $g$ is the gcd of $a$ and $b$ and $s$
+and $t$ are polynomials such that $g = as + bt$. The value $g$ will be $1$ if
+$a$ is invertible modulo $b$.}
+
+\textbf{Examples.}
+
+Here are some examples of content, primitive part and GCD.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+k = x*y^2 + (x + 1)*y + 3
+l = (x + 1)*y + (x^3 + 2x + 2)
+m = y^2 + x + 1
+
+n = content(k)
+p = primpart(k*(x^2 + 1))
+q = gcd(k*m, l*m)
+r = lcm(k*m, l*m)
+
+R, x = PolynomialRing(QQ, "x")
+T = ResidueRing(R, x^3 + 3x + 1)
+U, z = PolynomialRing(T, "z")
+
+r = z^3 + 2z + 1
+s = z^5 + 1
+u, v = gcdinv(r, s)
+\end{lstlisting}
+
+\subsubsection{Evaluation}
+
+\begin{lstlisting}
+evaluate{T <: RingElem}(a::Poly{T}, b::T)
+evaluate{T <: RingElem}(a::Poly{T}, b::Integer)
+\end{lstlisting}
+
+\desc{Return the value of the polynomial $a$ evaluated at $b$.}
+
+\textbf{Examples.}
+
+Here are some examples of evaluation.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x*y^2 + (x + 1)*y + 3
+g = evaluate(f, 3)
+h = evaluate(f, x^2 + 2x + 1)
+\end{lstlisting}
+
+\subsubsection{Composition}
+
+\begin{lstlisting}
+compose{T <: RingElem}(a::Poly{T}, b::Poly{T})
+\end{lstlisting}
+
+\desc{Return the composition of the polynomial $a$ with $b$, i.e. $a \circ b$.}
+
+\textbf{Examples.}
+
+Here are some examples of composition.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x*y^2 + (x + 1)*y + 3
+g = (x + 1)*y + (x^3 + 2x + 2)
+h = compose(f, g)
+\end{lstlisting}
+
+\subsubsection{Derivative}
+
+\begin{lstlisting}
+derivative{T <: RingElem}(a::Poly{T})
+\end{lstlisting}
+
+\desc{Return the derivative of the polynomial $a$ with respect to its main
+variable.}
+
+\textbf{Examples.}
+
+Here are some examples of computing derivatives.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+h = x*y^2 + (x + 1)*y + 3
+j = derivative(h)
+\end{lstlisting}
+
+\subsubsection{Integral}
+
+\begin{lstlisting}
+integral{T <: Union(ResidueElem, FieldElem)}(f::Poly{T})
+\end{lstlisting}
+
+\desc{Return the integral of the polynomial $f$. The constant coefficient of
+the result is taken to be $0$.}
+
+\textbf{Examples.}
+
+Here are some examples of computing integrals.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+S = ResidueRing(R, x^3 + 3x + 1)
+T, y = PolynomialRing(S, "y")
+
+f = (x^2 + 2x + 1)*y^2 + (x + 1)*y - 2x + 4
+
+g = integral(f)   
+\end{lstlisting}
+
+\subsubsection{Resultant}
+
+\begin{lstlisting}
+resultant{T <: RingElem}(a::Poly{T}, b::Poly{T})
+\end{lstlisting}
+
+\desc{Return the resultant of the polynomials $a$ and $b$.}
+
+\textbf{Examples.}
+
+Here are some examples of computing resultants.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = 3x*y^2 + (x + 1)*y + 3
+g = 6(x + 1)*y + (x^3 + 2x + 2)
+h = resultant(f, g)
+\end{lstlisting}
+
+\subsubsection{Discriminant}
+
+\begin{lstlisting}
+discriminant{T <: RingElem}(a::Poly{T})
+\end{lstlisting}
+
+\desc{Compute the discriminant of the polynomial $a$.}
+
+\textbf{Examples.}
+
+Here are some examples of computing discriminants.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = x*y^2 + (x + 1)*y + 3
+g = discriminant(f)
+\end{lstlisting}
+
+\subsubsection{Bezout identity}
+
+The Bezout identity is the equivalent, for polynomials, of the extended GCD
+in the case of the integers.
+
+Given polynomials $a, b$, we can find polynomials $s, t$ such that
+$$sa + bt = r,$$
+where $r$ is the resultant of $a$ and $b$.
+
+\begin{lstlisting}
+bezout{T <: RingElem}(a::Poly{T}, b::Poly{T})
+\end{lstlisting}
+
+\desc{Return a tuple $(r, s, t)$ such that $r$ is the resultant of $a$ and $b$
+and with polynomials $s, t$ such that $r = as + bt$.}
+
+\textbf{Examples.}
+
+Here are some examples of computing the Bezout identity.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = 3x*y^2 + (x + 1)*y + 3
+g = 6(x + 1)*y + (x^3 + 2x + 2)
+r, s, t = gcdx(f, g)
+\end{lstlisting}
+
+\subsubsection{Special polynomials}
+
+The following functions compute univariate special polynomials. It is expected
+that the final argument in each of these function is the generator of the polynomial ring.
+
+\begin{lstlisting}
+chebyshev_t(n::Int, x::fmpz_poly)
+\end{lstlisting}
+
+\desc{Return the Chebyshev polynomial of the first kind $T_n(x)$, defined by 
+$T_n(x) = \cos(n \cos^{-1}(x))$.}
+
+\begin{lstlisting}
+chebyshev_u(n::Int, x::fmpz_poly)
+\end{lstlisting}
+
+\desc{Return the Chebyshev polynomial of the first kind $U_n(x)$, defined by 
+$(n+1) U_n(x) = T'_{n+1}(x)$.}
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = chebyshev_t(20, y)
+g = chebyshev_u(15, y)
+\end{lstlisting}
+
+\section{Flint rings}
+
+Flint provides implementations of various explicit rings. These are used instead of generic
+implementations where available.
+
+We only describe the details that differ from the generic implementations above.
 
 \subsection{Integers : Flint fmpz}
 
@@ -670,6 +1634,38 @@ d = fmpz(BigFloat(10)^100)
 e = fmpz(c)
 f = deepcopy(c)
 \end{lstlisting}
+
+\subsubsection{Conversions}
+
+It is possible to convert \code{fmpz} values to a variety of other types. This is
+achieved by overloading Julia's \code{convert} function.
+
+\begin{lstlisting}
+Int(x::fmpz)
+UInt(x::fmpz)
+BigInt(x::fmpz)
+Float64(x::fmpz)
+Float32(x::fmpz)
+Float16(x::fmpz)
+BigFloat(x::fmpz)
+\end{lstlisting}
+
+\desc{Convert the \code{fmpz} $x$ to the given type.}
+
+\textbf{Examples.}
+
+Here are some examples of the above constructors.
+
+\begin{lstlisting}
+a = fmpz(-123)
+b = fmpz(12)
+
+c = Int(a)
+d = UInt(b)
+f = Float64(a)
+g = BigFloat(a)
+\end{lstlisting}
+
 
 \subsubsection{Basic manipulation}
 
@@ -1585,1010 +2581,180 @@ s = sigma(fmpz(128), 10)
 a = eulerphi(fmpz(12480))
 \end{lstlisting}
 
-\subsection{Polynomials : generic}
+\subsection{Flint integer polynomials ($\Z[x]$): fmpz_poly}
 
-Nemo has a parametric polynomial type (called \code{Poly}). There's not any need to deal
-directly with the type, as we provide a function \code{PolynomialRing} for constructing
-it.
-
-The type takes a parameter, namely the type of ring element that the coefficients will
-have, e.g. if there was no special type for Flint polynomials over the integers, the
-type of polynomials over the integers would be \code|Poly{fmpz}|.
-
-Generic polynomials have parent \code{PolynomialRing}, which is also parameterised by the
-type of the ring element of the polynomial coefficients, just as for the \code{Poly} type.
-
-We have that \code{PolynomialRing} belongs to the \code{Ring} type class and \code{Poly}
-belongs to the \code{RingElem} type class.
-
-\subsubsection{Constructors}
-
-Because dealing with the Julia types directly is somewhat messy, we provide a simple
-function to create the type of a polynomial in Nemo.
-
-\begin{lstlisting}
-PolynomialRing{T <: Ring}(::T, s::String)
-\end{lstlisting}
-
-\desc{This function takes a parent object which belongs to the \code|Ring| class 
-(e.g. \code|T = ZZ|), specifying the ring that the polynomial coefficients are to 
-belong to, and a \code{String} giving the string representation of a variable (e.g. 
-\code|"x"|). It returns a tuple \code|(R, x)| consisting of the parent of the polynomial
-ring being constructed, \code|R|, and the degree $1$ polynomial \code|x| in this ring.}
-
-This is easier to understand by giving an example
+The Flint integer polynomial type is \code{fmpz_poly}. Polynomials of this type are created
+using the \code{PolynomialRing} constructor.
 
 \begin{lstlisting}
 R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-
-f = (x^2 + 2x + 1)*y^3 + (x - 1)*y + 4x - 1
 \end{lstlisting}
 
-Notice that we can build up polynomials from the degree one polynomials \code{x} and
-\code{y} returned by the calls to \code{PolynomialRing}. 
+Polynomials in this ring have parent of type \code{FmpzPolyRing}.
 
-Another thing to note is that there is no reason why the variable \code{x} has to 
-be the same as the string \code{"x"}. The latter is simply how \code{x} will print
-when we evaluate it. Of course, in most situations it is convenient to use the same 
-letter for the variable and for the string.
-
-Once we have constructed a polynomial ring as above, we can use it to construct
-polynomials of various kinds.
-
-This is achieved by making the parent object of the ring callable. In the following
-we assume that \code{S} is a parent object of a polynomial ring, e.g. created by
-the following:
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-\end{lstlisting}
-
-The parent object \code{S} is made callable in Nemo by overloading the Julia
-\code{call} operator for polynomial ring parent objects. The type \code{T}
-below will refer to the type of the polynomial coefficients.
-
-\begin{lstlisting}
-S()
-\end{lstlisting}
-
-\desc{Construct a polynomial of length $0$ in the given polynomial ring.}
-
-\begin{lstlisting}
-S(a::Integer)
-S(a::T)
-\end{lstlisting}
-
-\desc{Construct a polynomial of length $1$ whose constant coefficient is $a$ if
-$a \neq 0$, otherwise construct the zero polynomial.}
-
-\begin{lstlisting}
-S(a::Array{T, 1})
-\end{lstlisting}
-
-\desc{Construct a polynomial whose coefficients are given by the elements of the array
-\code{a}, starting with the constant coefficient at index $1$. The array must be fully
-initialised, otherwise an exception may result.}
-
-\begin{lstlisting}
-S(a::Poly{T})
-\end{lstlisting}
-
-\desc{Return a reference to the polynomial \code{a}.}
-
-\begin{lstlisting}
-S{R <: Ring}(a::R)
-\end{lstlisting}
-
-\desc{Try to convert the value \code{a} to the polynomial type parameterised by 
-\code{T} and the symbol, if possible, and return the value, else raise an error. 
-This constructor is used to coerce polynomials and coefficients from subordinate rings up
-into the polynomial ring.}
-
-\textbf{Examples.}
-
-Here are some examples of these constructors in action. Note that we don't actually
-ever need to deal with the parameterised \code{Poly} type directly.
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-T, z = PolynomialRing(S, "z")
-
-f = x^2 + y^3 + z + 1
-
-g = S(2)
-
-h = S(x^2 + 2x + 1)
-
-j = T(x + 2)
-
-k = S([x, x + 2, x^2 + 3x + 1])
-
-l = S(k)
-\end{lstlisting}
-
-\subsubsection{Basic manipulation}
-
-\begin{lstlisting}
-degree{T <: Ring, S}(a::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return the degree of the polynomial $a$. We define the degree of the zero
-polynomial to be $-1$.}
-
-\begin{lstlisting}
-length{T <: Ring, S}(a::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return the length of the polynomial $a$, i.e. its degree plus one.}
-
-\begin{lstlisting}
-normalise{T <: Ring, S}(a::Poly{T, S}, len::Int)
-\end{lstlisting}
-
-\desc{Return the normalised length of the polynomial $a$ assuming its unnormalised
-length is \code{len}. A polynomial is normalised if it is either length $0$ or its
-leading coefficient is nonzero. This function is usually used internally.}
-
-\begin{lstlisting}
-coeff{T <: Ring, S}(a::Poly{T, S}, n::Int)
-\end{lstlisting}
-
-\desc{Return the coefficient of the degree $n$ term of the polnomial $a$, or zero
-if it has none.}
-
-\begin{lstlisting}
-lead{T <: Ring, S}(a::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return the leading coefficient of the polynomial $a$, or zero if $a$ has
-length $0$.}
-
-\begin{lstlisting}
-iszero{T <: Ring, S}(a::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return \code{true} if the polynomial $a$ is the additive identity of the
-polynomial ring, otherwise return \code{false}.}
-
-\begin{lstlisting}
-isone{T <: Ring, S}(a::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return \code{true} if the polynomial $a$ is the multiplicative identity
-of the polynomial ring, otherwise return \code{false}.}
-
-\begin{lstlisting}
-isgen{T <: Ring, S}(a::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return \code{true} if the polynomial $a$ is the generator (variable) of the
-polynomial ring, otherwise return \code{false}.}
-
-\begin{lstlisting}
-isunit{T <: Ring, S}(a::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return \code{true} if the polynomial $a$ is invertible, i.e. is of length
-$1$ and has invertible constant coefficient, otherwise return \code{false}.}
-
-\begin{lstlisting}
-zero{T <: Ring, S}(::Type{Poly{T, S}})
-\end{lstlisting}
-
-\desc{Return the additive identity $0$ in the given polynomial ring.}
-
-\begin{lstlisting}
-one{T <: Ring, S}(::Type{Poly{T, S}})
-\end{lstlisting}
-
-\desc{Return the multiplicative identity $1$ in the given polynomial ring.}
-
-\begin{lstlisting}
-gen{T <: Ring, S}(::Type{Poly{T, S}})
-\end{lstlisting}
-
-\desc{Return the generator (variable) of the given polynomial ring.}
-
-\begin{lstlisting}
-canonical_unit{T <: Ring, S}(a::Poly{T, S})
-\end{lstlisting}
-
-\desc{Used for canonicalising fractions. The function simply returns
-\code{canonical_unit} of the leading coefficient.}
-
-\textbf{Examples.}
-
-Here are some examples of the basic manipulation functions.
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-
-a = zero(R)
-b = one(S)
-c = gen(S)
-d = isunit(b)
-
-f = x^2 + 2x + 1
-g = lead(f)
-
-h = x*y^2 + (x + 1)*y + 3
-j = coeff(h, 2)
-
-if isgen(x)
-   println(x, " is the generator of the ", typeof(x))
-end
-
-k = isone(b)
-m = iszero(a)
-
-n = canonical_unit(-x + 1)
-p = canonical_unit(-x*y + x + 1)
-\end{lstlisting}
-
-\subsubsection{Binary operators}
-
-The following binary operators are provided for polynomials. Note that
-if both operands are not in the same polynomial ring, Nemo will try to
-coerce them into one of the two rings before applying the operation.
-
-\begin{lstlisting}
-+{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
--{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
-*{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
-\end{lstlisting}
-
-\textbf{Examples.}
-
-Here are some examples of the binary operators.
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-
-f = x^2 + 2x + 1
-g = x^3 + 3x + 2
-h = f + g
-j = f*g
-
-k = x*y^2 + (x + 1)*y + 3
-l = (x + 1)*y + (x^3 + 2x + 2)
-m = k - l
-
-n = k*h
-p = m - g
-\end{lstlisting}
+We describe functions for \code{fmpz_poly} only where they differ from the functions
+available for generic polynomials.
 
 \subsubsection{Ad hoc binary operators}
 
-The following ad hoc binary operators are faster than first coercing all
-operands into the polynomial ring.
+The following ad hoc binary operators are provided, as these are faster than first coercing
+to a common ring and then applying the operator.
 
 \begin{lstlisting}
-+{T <: Ring, S}(x::Poly{T, S}, y::Int)
-+{T <: Ring, S}(x::Poly{T, S}, y::ZZ)
-+{T <: Ring, S}(x::Int, y::Poly{T, S})
-+{T <: Ring, S}(x::ZZ, y::Poly{T, S})
--{T <: Ring, S}(x::Poly{T, S}, y::Int)
--{T <: Ring, S}(x::Poly{T, S}, y::ZZ)
--{T <: Ring, S}(x::Int, y::Poly{T, S})
--{T <: Ring, S}(x::ZZ, y::Poly{T, S})
-*{T <: Ring, S}(x::Poly{T, S}, y::Int)
-*{T <: Ring, S}(x::Poly{T, S}, y::ZZ)
-*{T <: Ring, S}(x::Int, y::Poly{T, S})
-*{T <: Ring, S}(x::ZZ, y::Poly{T, S})
++(x::fmpz_poly, y::Int)
++(x::fmpz_poly, y::fmpz)
++(x::Int, y::fmpz_poly)
++(x::fmpz, y::fmpz_poly)
 \end{lstlisting}
+
+\desc{Return the polynomial $x + y$.}
+
+\begin{lstlisting}
+-(x::fmpz_poly, y::Int)
+-(x::fmpz_poly, y::fmpz)
+-(x::Int, y::fmpz_poly)
+-(x::fmpz, y::fmpz_poly)
+\end{lstlisting}
+
+\desc{Return the polynomial $x - y$.}
 
 \textbf{Examples.}
 
-Here are some examples of the ad hoc binary operators.
+Here are some examples of ad hoc binary operators.
 
 \begin{lstlisting}
 R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
 
-f = x^2 + 2x + 1
-g = x^3 + 3x + 2
-h = f + 12
-j = ZZ(3)*g
+f = x^3 + 2x + 1
+g = x^2 - 7x + 4
 
-k = x*y^2 + (x + 1)*y + 3
-l = (x + 1)*y + (x^3 + 2x + 2)
-m = k - 4
-n = ZZ(5) - l
+h = f + 7
+k = g - 7
+l = fmpz(3) + f
 \end{lstlisting}
 
-\subsubsection{Comparison}
+\subsubsection{Ad hoc comparisons}
 
 \begin{lstlisting}
-=={T<: Ring, S}(x::Poly{T, S}, y::Poly{T, S})
+==(x::fmpz_poly, y::fmpz)
+==(x::fmpz, y::fmpz_poly)
 \end{lstlisting}
 
-Julia automatically provides a \code{!=} operator.
-
-\begin{lstlisting}
-isequal(x::Poly{T, S}, y::Poly{T, S})
-\end{lstlisting}
-
-\desc{Returns \code{true} if \code{x == y} and if each coefficient of \code{x}
-matches the corresponding coefficient of \code{y} according to \code{isequal},
-when applied recursively, otherwise return \code{false}.}
+\desc{Return \code{true} if $x == y$, otherwise return \code{false}.}
 
 \textbf{Examples.}
 
-Here are some examples of comparison.
+Here are some examples of ad hoc comparisons.
 
 \begin{lstlisting}
 R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
 
-f = x^2 + 2x + 1
-g = x^3 + 3x + 1
+f = x^3 + 2x + 1
 
-if f != g
-   println("f and g are not equal")
-end
-
-k = x*y^2 + (x + 1)*y + 3
-l = x*y^2 + (x + 1)*y + 3
-
-if k == l
-   println("k is equal to l")
-end
+f != fmpz(6)
+fmpz(7) == R(7)
 \end{lstlisting}
 
-\subsubsection{Ad hoc comparison}
-
-The following comparison operators are faster than first coercing the arguments
-into one or the other ring.
+\subsubsection{Ad hoc exact division}
 
 \begin{lstlisting}
-=={T <: Ring, S}(x::Poly{T, S}, y::Int)
-=={T <: Ring, S}(x::Poly{T, S}, y::ZZ)
-=={T<: Ring, S}(x::Int, y::Poly{T, S})
-=={T<: Ring, S}(x::ZZ, y::Poly{T, S})
+divexact(x::fmpz_poly, y::Int)
 \end{lstlisting}
+
+\desc{Return the quotient of $x$ by $y$, assuming the division is exact.}
 
 \textbf{Examples.}
 
-Here are some examples of ad hoc comparison.
+Here is an example of ad hoc division.
 
 \begin{lstlisting}
 R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
 
-f = x^2 + 2x + 1
+f = x^3 + 2x + 1
 
-if f != 1
-   println("f is not equal to 1")
-end
-
-if S(1) == ZZ(1)
-   println("S(1) is equal to ZZ(1)")
-end
+g = divexact(f*3, 3)
 \end{lstlisting}
 
-\subsubsection{Unary operators}
+\subsubsection{Content, primitive part and GCD}
 
 \begin{lstlisting}
--{T <: Ring, S}(a::Poly{T, S})
+content(f::fmpz_poly)
 \end{lstlisting}
+
+\desc{Return the content of the polynomial $f$, i.e. the greatest common divisor of its
+coefficients.}
+
+\begin{lstlisting}
+primpart(f::fmpz_poly)
+\end{lstlisting}
+
+\desc{Return the primitive part of the polynomial $f$, i.e. the polynomial divided by
+its content.}
+
+\begin{lstlisting}
+gcd(f::fmpz_poly, g::fmpz_poly)
+\end{lstlisting}
+
+\desc{Return the greatest common divisor of the polynomials $f$ and $g$.}
 
 \textbf{Examples.}
 
-Here are some examples of unary operators.
+Here is an example of ad hoc division.
 
 \begin{lstlisting}
 R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-
-f = x^2 + 2x + 1
-g = -f
-
-h = x*y^2 + (x + 1)*y + 3
-j = -h
-\end{lstlisting}
-
-\subsubsection{Truncated operations}
-
-\begin{lstlisting}
-truncate{T <: Ring, S}(a::Poly{T, S}, n::Int)
-\end{lstlisting}
-
-\desc{Return the polynomial $a$ truncated to length $n$. If $n < 0$ we throw a
-\code{DomainError()}.}
-
-\begin{lstlisting}
-mullow{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S}, n::Int)
-\end{lstlisting}
-
-\desc{Return the polynomial \code{a*b} truncated to length $n$. If $n < 0$ we
-throw a \code{DomainError()}.}
-
-\textbf{Examples.}
-
-Here are some examples of truncated operations.
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-
-f = x^2 + 2x + 1
-g = x^3 + 3x + 1
-h = truncate(f, 2)
-j = mullow(f, g, 3)
-
-k = x*y^2 + (x + 1)*y + 3
-l = (x + 1)*y + (x^3 + 2x + 2)
-m = truncate(k, 1)
-n = mullow(k, l, 4)
-\end{lstlisting}
-
-\subsubsection{Reversal}
-
-\begin{lstlisting}
-reverse{T <: Ring, S}(x::Poly{T, S}, len::Int)
-\end{lstlisting}
-
-\desc{Return the reverse of the polynomial $x$, thought of as a polynomial of
-the given length (the polynomial will be notionally truncated or padded with
-zeroes before the leading term if necessary to match the specified length). 
-The resulting polynomial is normalised. If \code{len} is negative we throw a
-\code{DomainError()}.}
-
-\begin{lstlisting}
-reverse{T <: Ring, S}(x::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return the reverse of the polynomial $x$, i.e. the leading coefficient
-of $x$ becomes the constant coefficient of the result, etc. The resulting
-polynomial is normalised.}
-
-\textbf{Examples.}
-
-Here are some examples of reversal.
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-
-f = x^2 + 2x + 1
-
-g = reverse(f)
-
-k = x*y^2 + (x + 1)*y + 3
-
-l = reverse(k, 7)
-\end{lstlisting}
-
-\subsubsection{Shifting}
-
-\begin{lstlisting}
-shift_left{T <: Ring, S}(x::Poly{T, S}, n::Int)
-\end{lstlisting}
-
-\desc{Return the polynomial that results from shifting the coefficients of the
-polynomial $x$ to the left by $n$ places, i.e. $f\times x^n$ where $x$ is the
-generator of the polynomial ring that $f$ belongs to. If $n < 0$ we throw a
-\code{DomainError()}.}
-
-\begin{lstlisting}
-shift_right{T <: Ring, S}(x::Poly{T, S}, n::Int)
-\end{lstlisting}
-
-\desc{Return the polynomial that results from shifting the coefficients of the
-polynomial $x$ to the right by $n$ places, i.e. by dividing $f$ by $x^n$ and
-throwing away the remainder. If $n$ is greater than or equal to the length of
-$x$ then the zero polynomial results. If $n < 0$ we throw a 
-\code{DomainError()}.}
-
-\textbf{Examples.}
-
-Here are some examples of shifting.
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-
-f = x^2 + 2x + 1
-
-g = shift_left(f, 3)
-h = shift_right(f, 1)
-
-k = x*y^2 + (x + 1)*y + 3
-
-l = shift_left(k, 7)
-m = shift_right(k, 3)
-\end{lstlisting}
-
-\subsubsection{Powering}
-
-\begin{lstlisting}
-^{T <: Ring, S}(a::Poly{T, S}, n::Int)
-\end{lstlisting}
-
-\desc{Return the polynomial $a^n$. If $n < 0$ we throw a \code{DomainError()}.}
-
-\textbf{Examples.}
-
-Here are some examples of powering.
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-
-f = x^2 + 2x + 1
-g = f^12
-
-k = x*y^2 + (x + 1)*y + 3
-l = k^5
-\end{lstlisting}
-
-\subsubsection{Modular arithmetic}
-
-When \code{T} is a residue ring, we can reduce modulo a polynomial over
-\code{T}. In this way we can do modular arithmetic with polynomials.
-
-\begin{lstlisting}
-mulmod{T <: Union(Residue, Field), S}(a::Poly{T, S}, 
-                                          b::Poly{T, S}, d::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return $ab \pmod{d}$.}
-
-\begin{lstlisting}
-invmod{T <: Union(Residue, Field), S}(a::Poly{T, S}, d::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return $a^{-1} \pmod{d}$. If an impossible inverse is encountered, an
-exception is thrown.}
-
-\begin{lstlisting}
-powmod{T <: Union(Residue, Field), S}(a::Poly{T, S}, b::Int, 
-                                                         d::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return $a^b \pmod{d}$.}
-
-Here are some examples of modular arithmetic.
-
-\begin{lstlisting}
-R = ResidueRing(ZZ, 487326487)
-S, x = PolynomialRing(R, "x")
-
-f = 3*x^2 + x + 2
-g = 5*x^2 + 2*x + 1
-h = 3*x^3 + 2*x^2 + x + 7
-
-invmod(f, h)
-mulmod(f, g, h)
-powmod(f, 10, h)
-\end{lstlisting}
-
-\subsubsection{Exact division}
-
-First we have exact division by a scalar.
-
-\begin{lstlisting}
-divexact{T <: Ring, S}(a::Poly{T, S}, b::T)
-divexact{T <: Ring, S}(a::Poly{T, S}, b::ZZ)
-divexact{T <: Ring, S}(a::Poly{T, S}, b::Int)
-\end{lstlisting}
-
-\desc{Return $a$ divided by $b$. The result is only meaningful if the division is
-exact. If $b = 0$ we throw a \code{DivideError()}.}
-
-Then we have division of a polynomial by another.
-
-\begin{lstlisting}
-divexact{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return $a$ divided by $b$. The result is only meaningful if the division is
-exact. If $b = 0$ we throw a \code{DivideError()}. 
-
-If \code{T} is a residue ring and the leading coefficient of $b$ is not invertible
-in the \code{T}, an error will be thrown.} 
-
-\textbf{Examples.}
-
-Here are some examples of exact division.
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-
-f = x^2 + 2x + 1
-g = x^3 + 3x + 1
-h = divexact(f*g, f)
-j = divexact(3*f, ZZ(3))
-
-k = x*y^2 + (x + 1)*y + 3
-l = (x + 1)*y + (x^3 + 2x + 2)
-m = divexact(k*l, k)
-n = divexact(3*k, 3)
-p = divexact(x*k, x)
-\end{lstlisting}
-
-\subsubsection{Euclidean division}
-
-Over a residue ring we can define Euclidean division.
-
-\begin{lstlisting}
-mod{T <: Union(Residue, Field), S}(f::Poly{T, S}, g::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return the Euclidean remainder of $f$ divided by $g$, i.e. $r$ such 
-that $a = bq + r$ for some polynomial $r$ with deg$(r) <$ deg$(b)$. If 
-$g = 0$ we throw a \code{DivideError()}.}
-
-\begin{lstlisting}
-divrem{T <: Union(Residue, Field), S}(f::Poly{T, S}, g::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return the Euclidean quotient and remainder of $f$ divided by $g$, i.e.
-a tuple \code{(q, r)} such that $a = bq + r$ with deg$(r) <$ deg$(b)$. If 
-$g = 0$ we throw a \code{DivideError()}.}
-
-\textbf{Examples.}
-
-Here are some examples of Euclidean division.
-
-\begin{lstlisting}
-R = ResidueRing(ZZ, 7)
-S, x = PolynomialRing(R, "x")
-
-f = x^2 + 2x + 1
-g = x^3 + 3x + 1
-h = mod(g, f)
-q, r = divrem(g, f)
-
-T = ResidueRing(S, x^3 + 3x + 1)
-U, y = PolynomialRing(T, "y")
-
-k = y^3 + x*y^2 + (x + 1)*y + 3
-l = (x + 1)*y^2 + (x^3 + 2x + 2)
-m = mod(k, l)
-q, r = divrem(k, l)
-\end{lstlisting}
-
-\subsubsection{Pseudodivision}
-
-Given two polynomials $a, b$, pseudodivision computes polynomials $q$ and $r$
-with length$(r) <$ length$(b)$ such that
-$$L^d a = bq + r,$$
-where $d =$ length$(a) -$ length$(b) + 1$ and $L$ is the leading coefficient
-of $b$.
-
-We call $q$ the pseudoquotient and $r$ the pseudoremainder.
-
-\begin{lstlisting}
-pseudorem{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return the pseudoremainder of $a$ divided by $b$. If $b = 0$ we throw a 
-\code{DivideError()}.}
-
-\begin{lstlisting}
-pseudodivrem{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return a tuple $(q, r)$ consisting of the pseudoquotient and pseudoremainder 
-of $a$ divided by $b$. If $b = 0$ we throw a \code{DivideError()}.}
-
-\textbf{Examples.}
-
-Here are some examples of pseudodivision.
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-
-f = x^2 + 2x + 1
-g = x^3 + 3x + 1
-r = pseudorem(f, g)
-q, r = pseudodivrem(f, g)
-
-k = x*y^2 + (x + 1)*y + 3
-l = (x + 1)*y + (x^3 + 2x + 2)
-m = pseudorem(k, l)
-m, n = pseudodivrem(k, l)
-\end{lstlisting}
-
-Note that pseudodivision is not always useful. In general it computes a
-multiple of the quotient, and for example in the case of polynomials over a
-residue ring, this may lead to meaningless results in the presence of zero
-divisors. For example
-
-\begin{lstlisting}
-R = ResidueRing(ZZ, 6)
-S, x = PolynomialRing(R, "x")
-f = 3*x^5 + x^4 + 3*x^2 + 2
-g = 2*x^3 + 5*x^2 + 2*x + 2
-pseudorem(f, g)
-\end{lstlisting}
-
-Here Nemo returns \code{3*x^2}, which happens to be \code{3*g} in this
-ring.
-
-\subsubsection{Content, primitive part, GCD and LCM}
-
-When the base ring provides a \code{gcd} function we can provide numerous
-GCD related functions for polynomials over that ring.
-
-\begin{lstlisting}
-content{T <: Ring, S}(a::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return the content of the polynomial $a$, i.e. the greatest common divisor
-of all its coefficients, if this exists.}
-
-\begin{lstlisting}
-primpart{T <: Ring, S}(a::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return the primitive part of the polynomial $a$, i.e. the polynomial
-divided by its content, if it exists.}
-
-\begin{lstlisting}
-gcd{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return the greatest common divisor of the polynomials $a$ and $b$ if 
-it exists.}
-
-\begin{lstlisting}
-lcm{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return the least common multiple of the polynomials $a$ and $b$. We
-define lcm$(a, b) = ab/$gcd$(a, b)$.}
-
-We allow GCD for polynomials over residue rings, e.g. over $\Z/n\Z$, even when
-the residue ring has zero divisors. However, if an impossible inverse is
-encountered during the computation, due to zero divisors, we throw an error.
-
-\begin{lstlisting}
-gcdinv{T <: Union(Field, Residue), S}(a::Poly{T, S}, b::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return a tuple $(g, s)$ such that $g$ is the gcd of $a$ and $b$ and $s$
-and $t$ are polynomials such that $g = as + bt$. The value $g$ will be $1$ if
-$a$ is invertible modulo $b$.}
-
-\textbf{Examples.}
-
-Here are some examples of content, primitive part and GCD.
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
 
 f = x^2 + 2x + 1
 g = x^3 + 3x + 1
 h = x + 1
-r = content(3*f)
-s = primpart(3*f)
-t = gcd(f*h, g*h)
-u = lcm(f*h, g*h)
 
-k = x*y^2 + (x + 1)*y + 3
-l = (x + 1)*y + (x^3 + 2x + 2)
-m = y^2 + x + 1
-n = content(k)
-p = primpart(k*(x^2 + 1))
-q = gcd(k*m, l*m)
-r = lcm(k*m, l*m)
-
-T = ResidueRing(ZZ, 7)
-U, z = PolynomialRing(T, "z")
-
-r = z^3 + 2z + 1
-s = z^5 + 1
-u, v = gcdinv(r, s)
+k = content(3*f)
+l = primpart(3*f)
+m = gcd(f*h, g*h)
 \end{lstlisting}
 
-\subsubsection{Evaluation}
+\subsubsection{Signature}
 
 \begin{lstlisting}
-evaluate{T <: Ring, S}(a::Poly{T, S}, b::Int)
-evaluate{T <: Ring, S}(a::Poly{T, S}, b::ZZ)
-evaluate{T <: Ring, S}(a::Poly{T, S}, b::T)
+signature(f::fmpz_poly)
 \end{lstlisting}
 
-\desc{Return the value of the polynomial $a$ evaluated at $b$.}
+\desc{Computes the signature of the polynomial $f$, i.e. a tuple $(r, s)$ where $r$ is
+the number of real roots and $s$ is half the number of complex roots.}
 
 \textbf{Examples.}
 
-Here are some examples of evaluation.
+Here is an example of signature.
 
 \begin{lstlisting}
 R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
 
-f = x^2 + 2x + 1
-g = evaluate(f, 3)
-h = evaluate(f, ZZ(10))
+f = x^3 + 3x + 1
 
-j = x*y^2 + (x + 1)*y + 3
-k = evaluate(j, 3)
-l = evaluate(j, x^2 + 2x + 1)
-\end{lstlisting}
-
-\subsubsection{Composition}
-
-\begin{lstlisting}
-compose{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return the composition of the polynomial $a$ with $b$, i.e. $a \circ b$.}
-
-\textbf{Examples.}
-
-Here are some examples of composition.
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-
-f = x^2 + 2x + 1
-g = x^3 + 3x + 1
-h = compose(f, g)
-
-j = x*y^2 + (x + 1)*y + 3
-k = (x + 1)*y + (x^3 + 2x + 2)
-l = compose(j, k)
-\end{lstlisting}
-
-\subsubsection{Derivative}
-
-\begin{lstlisting}
-deriv{T <: Ring, S}(a::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return the derivative of the polynomial $a$ with respect to its main
-variable.}
-
-\textbf{Examples.}
-
-Here are some examples of computing derivatives.
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-
-f = x^2 + 2x + 1
-g = deriv(f)
-
-h = x*y^2 + (x + 1)*y + 3
-j = deriv(h)
-\end{lstlisting}
-
-\subsubsection{Integral}
-
-\begin{lstlisting}
-integral{T <: Union(Field, Residue), S}(f::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return the integral of the polynomial $f$. The constant coefficient of
-the result is taken to be $0$.}
-
-\textbf{Examples.}
-
-Here are some examples of computing integrals.
-
-\begin{lstlisting}
-R = ResidueRing(ZZ, 7)
-S, x = PolynomialRing(R, "x")
-
-f = x^2 + 2x + 1
-g = integral(f)
-\end{lstlisting}
-
-\subsubsection{Resultant}
-
-\begin{lstlisting}
-resultant{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return the resultant of the polynomials $a$ and $b$.}
-
-\textbf{Examples.}
-
-Here are some examples of computing resultants.
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-
-f = 5x^2 + 2x + 1
-g = 2x^3 + 3x + 1
-h = resultant(f, g)
-
-j = 3x*y^2 + (x + 1)*y + 3
-k = 6(x + 1)*y + (x^3 + 2x + 2)
-l = resultant(j, k)
-\end{lstlisting}
-
-\subsubsection{Discriminant}
-
-\begin{lstlisting}
-discriminant{T <: Ring, S}(a::Poly{T, S})
-\end{lstlisting}
-
-\desc{Compute the discriminant of the polynomial $a$.}
-
-\textbf{Examples.}
-
-Here are some examples of computing discriminants.
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-
-f = x^2 + 2x + 1
-g = discriminant(f)
-
-h = x*y^2 + (x + 1)*y + 3
-j = discriminant(h)
-\end{lstlisting}
-
-\subsubsection{Bezout identity}
-
-The Bezout identity is the equivalent, for polynomials, of the extended GCD
-in the case of the integers.
-
-Given polynomials $a, b$, we can find polynomials $s, t$ such that
-$$sa + bt = r,$$
-where $r$ is the resultant of $a$ and $b$.
-
-\begin{lstlisting}
-bezout{T <: Ring, S}(a::Poly{T, S}, b::Poly{T, S})
-\end{lstlisting}
-
-\desc{Return a tuple $(r, s, t)$ such that $r$ is the resultant of $a$ and $b$
-and with polynomials $s, t$ such that $r = as + bt$.}
-
-\textbf{Examples.}
-
-Here are some examples of computing the Bezout identity.
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-S, y = PolynomialRing(R, "y")
-
-f = 5x^2 + 2x + 1
-g = 2x^3 + 3x + 1
-r, s, t = bezout(f, g)
-
-j = 3x*y^2 + (x + 1)*y + 3
-k = 6(x + 1)*y + (x^3 + 2x + 2)
-u, v, w = bezout(j, k)
+(r, s) = signature(f)
 \end{lstlisting}
 
 \subsubsection{Special polynomials}
 
-The following functions compute univariate special polynomials over \code{ZZ}.
+The following functions compute univariate special polynomials over \code{fmpz}. It is expected
+that the final argument in each of these function is the generator of the polynomial ring.
 
 \begin{lstlisting}
-chebyshev_t{S}(::Type{Poly{ZZ, S}}, n::Int)
+chebyshev_t(n::Int, x::fmpz_poly)
 \end{lstlisting}
 
 \desc{Return the Chebyshev polynomial of the first kind $T_n(x)$, defined by 
 $T_n(x) = \cos(n \cos^{-1}(x))$.}
 
 \begin{lstlisting}
-chebyshev_u{S}(::Type{Poly{ZZ, S}}, n::Int)
+chebyshev_u(n::Int, x::fmpz_poly)
 \end{lstlisting}
 
 \desc{Return the Chebyshev polynomial of the first kind $U_n(x)$, defined by 
 $(n+1) U_n(x) = T'_{n+1}(x)$.}
 
 \begin{lstlisting}
-cyclotomic{S}(::Type{Poly{ZZ, S}}, n::Int)
+cyclotomic(n::Int, x::fmpz_poly)
 \end{lstlisting}
 
 \desc{Return the $n$th cyclotomic polynomial, defined as
@@ -2596,7 +2762,7 @@ $$\Phi_n(x) = \prod_{\omega} (x-\omega),$$ where $\omega$ runs over all the
 $n$th primitive roots of unity.}
 
 \begin{lstlisting}
-swinnerton_dyer{S}(::Type{Poly{ZZ, S}}, n::Int)
+swinnerton_dyer(n::Int, x::fmpz_poly)
 \end{lstlisting}
 
 \desc{Return the Swinnerton-Dyer polynomial $S_n$, defined as the integer 
@@ -2607,7 +2773,7 @@ and is irreducible over the integers (it is the minimal polynomial of
 $\sqrt{2} + \ldots + \sqrt{p_n}$)}
 
 \begin{lstlisting}
-cos_minpoly{S}(::Type{Poly{ZZ, S}}, n::Int)
+cos_minpoly{S}(n::Int, x::fmpz_poly)
 \end{lstlisting}
 
 \desc{Return the minimal polynomial of $2 \cos(2 \pi / n)$. For suitable choice of 
@@ -2615,7 +2781,7 @@ $n$, this gives the minimal polynomial of $2 \cos(a \pi)$ or $2 \sin(a \pi)$ for
 rational $a$.}
 
 \begin{lstlisting}
-theta_qexp{S}(::Type{Poly{ZZ, S}}, r::Int, n::Int)
+theta_qexp{S}(r::Int, n::Int, x::fmpz_poly)
 \end{lstlisting}
 
 \desc{Return the $q$-expansion to length $n$ of the Jacobi theta function raised to 
@@ -2623,7 +2789,7 @@ the power $r$, i.e. $\vartheta(q)^r$ where
 $\vartheta(q) = 1 + \sum_{k=1}^{\infty} q^{k^2}$.}
 
 \begin{lstlisting}
-eta_qexp{S}(::Type{Poly{ZZ, S}}, r::Int, n::Int)
+eta_qexp{S}(r::Int, n::Int, x::fmpz_poly)
 \end{lstlisting}
 
 \desc{Return the $q$-expansion to length $n$ of the Dedekind eta function (without 
@@ -2641,13 +2807,13 @@ Here are some examples of computing special polynomials.
 \begin{lstlisting}
 R, x = PolynomialRing(ZZ, "x")
 
-f = chebyshev_t(R, 20)
-g = chebyshev_u(R, 15)
-h = cyclotomic(R, 120)
-j = swinnerton_dyer(R, 5)
-k = cos_minpoly(R, 30)
-l = theta_qexp(R, 3, 30)
-m = eta_qexp(R, 24, 30)
+f = chebyshev_t(20, x)
+g = chebyshev_u(15, x)
+h = cyclotomic(120, x)
+j = swinnerton_dyer(5, x)
+k = cos_minpoly(30, x)
+l = theta_qexp(3, 30, x)
+m = eta_qexp(24, 30, x)
 \end{lstlisting}
 
 \subsection{Residue rings}
@@ -2694,7 +2860,7 @@ hidden variable \code{##residue#418} contains the bignum integer $n$.
 Here is the actual Julia type definition
 
 \begin{lstlisting}
-type Residue{T <: Ring, S} <: Ring
+type Residue{T <: RingElem} <: Ring
    data::T
 end
 \end{lstlisting}
@@ -2725,22 +2891,22 @@ an integer that can be coerced into \code{T}). It returns the type
 corresponding to the residue ring $T/(r)$.}
 
 \begin{lstlisting}
-Residue{T <: Ring, S}(a::T)
-Residue{T <: Ring, S}(a::Int)  
-Residue{T <: Ring, S}(a::ZZ)  
+Residue{T <: RingElem}(a::T)
+Residue{T <: RingElem}(a::Int)  
+Residue{T <: RingElem}(a::ZZ)  
 \end{lstlisting}
 
 \desc{Create a residue congruent to $a$. The value $a$ is first reduced
 modulo the modulus of the residue ring.}
 
 \begin{lstlisting}
-Residue{T <: Ring, S}(a::Residue{T, S})  
+Residue{T <: RingElem}(a::Residue{T, S})  
 \end{lstlisting}
 
 \desc{Return a reference to the residue $a$. No copy of the data is made.}
 
 \begin{lstlisting}
-Residue{T <: Ring, S}()
+Residue{T <: RingElem}()
 \end{lstlisting}
 
 \desc{Create a new residue, which is congruent to $0$.}
@@ -2766,46 +2932,46 @@ m = T(x^4)
 \subsubsection{Basic manipulation}
 
 \begin{lstlisting}
-modulus{T <: Ring, S}(::Type{Residue{T, S}})
+modulus{T <: RingElem}(::Type{Residue{T, S}})
 \end{lstlisting}
 
 \desc{Return the modulus of the given residue ring.}
 
 \begin{lstlisting}
-zero{T <: Ring, S}(::Type{Residue{T, S}})
+zero{T <: RingElem}(::Type{Residue{T, S}})
 \end{lstlisting}
 
 \desc{Return the additive identity of the given residue ring.}
 
 \begin{lstlisting}
-one{T <: Ring, S}(::Type{Residue{T, S}})
+one{T <: RingElem}(::Type{Residue{T, S}})
 \end{lstlisting}
 
 \desc{Return the multiplicative identity of the given residue ring.}
 
 \begin{lstlisting}
-iszero{T <: Ring, S}(a::Residue{T, S})
+iszero{T <: RingElem}(a::Residue{T, S})
 \end{lstlisting}
 
 \desc{Return \code{true} if the residue $a$ is the additive identity in the
 residue ring, otherwise return \code{false}.}
 
 \begin{lstlisting}
-isone{T <: Ring, S}(a::Residue{T, S})
+isone{T <: RingElem}(a::Residue{T, S})
 \end{lstlisting}
 
 \desc{Return \code{true} if the residue $a$ is the multiplicative identity in
 the residue ring, otherwise return \code{false}.}
 
 \begin{lstlisting}
-isunit{T <: Ring, S}(a::Residue{T, S})
+isunit{T <: RingElem}(a::Residue{T, S})
 \end{lstlisting}
 
 \desc{Return \code{true} if the residue $a$ is invertible in the residue ring,
 otherwise return \code{false}.}
 
 \begin{lstlisting}
-canonical_unit{T <: Ring, S}(a::Residue{T, S})
+canonical_unit{T <: RingElem}(a::Residue{T, S})
 \end{lstlisting}
 
 \desc{Used for canonicalising fractions. The function simply returns $a$. No
@@ -2838,7 +3004,7 @@ q = iszero(g)
 \subsubsection{Unary operations}
 
 \begin{lstlisting}
--{T <: Ring, S}(a::Residue{T, S})
+-{T <: RingElem}(a::Residue{T, S})
 \end{lstlisting}
 
 \desc{Return $-a$.}
@@ -2863,32 +3029,32 @@ h = -T(x^5 + 1)
 The following binary operators and functions are defined for residue rings.
 
 \begin{lstlisting}
-+{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
++{T <: RingElem}(a::Residue{T, S}, b::Residue{T, S})
 \end{lstlisting}
 
 \desc{Return $a + b$.}
 
 \begin{lstlisting}
--{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
+-{T <: RingElem}(a::Residue{T, S}, b::Residue{T, S})
 \end{lstlisting}
 
 \desc{Return $a - b$.}
 
 \begin{lstlisting}
-*{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
+*{T <: RingElem}(a::Residue{T, S}, b::Residue{T, S})
 \end{lstlisting}
 
 \desc{Return $ab$.}
 
 \begin{lstlisting}
-divexact{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
+divexact{T <: RingElem}(a::Residue{T, S}, b::Residue{T, S})
 \end{lstlisting}
 
 \desc{Return $a$ divided by $b$. If an impossible inverse is encounted
 an exception is thrown.}
 
 \begin{lstlisting}
-gcd{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
+gcd{T <: RingElem}(a::Residue{T, S}, b::Residue{T, S})
 \end{lstlisting}
 
 \desc{Return the greatest common divisor of $a$ and $b$. 
@@ -2947,35 +3113,35 @@ effectively make the integers $n \in \Z$ a convenient notation for certain
 elements of the residue ring $R$.
 
 \begin{lstlisting}
-+{T <: Ring, S}(a::Residue{T, S}, b::Int)
-+{T <: Ring, S}(a::Int, b::Residue{T, S})
-+{T <: Ring, S}(a::Residue{T, S}, b::ZZ)
-+{T <: Ring, S}(a::ZZ, b::Residue{T, S})
++{T <: RingElem}(a::Residue{T, S}, b::Int)
++{T <: RingElem}(a::Int, b::Residue{T, S})
++{T <: RingElem}(a::Residue{T, S}, b::ZZ)
++{T <: RingElem}(a::ZZ, b::Residue{T, S})
 \end{lstlisting}
 
 \desc{Return $a + b$ with the integer operand thought of as an element of 
 the given residue ring.}
 
 \begin{lstlisting}
--{T <: Ring, S}(a::Residue{T, S}, b::Int)
--{T <: Ring, S}(a::Int, b::Residue{T, S})
--{T <: Ring, S}(a::Residue{T, S}, b::ZZ)
--{T <: Ring, S}(a::ZZ, b::Residue{T, S})
+-{T <: RingElem}(a::Residue{T, S}, b::Int)
+-{T <: RingElem}(a::Int, b::Residue{T, S})
+-{T <: RingElem}(a::Residue{T, S}, b::ZZ)
+-{T <: RingElem}(a::ZZ, b::Residue{T, S})
 \end{lstlisting}
 
 \desc{Return $a - b$ with the integer operand thought of as an element of 
 the given residue ring.}
 
 \begin{lstlisting}
-*{T <: Ring, S}(a::Residue{T, S}, b::Int)
-*{T <: Ring, S}(a::Residue{T, S}, b::ZZ)
+*{T <: RingElem}(a::Residue{T, S}, b::Int)
+*{T <: RingElem}(a::Residue{T, S}, b::ZZ)
 \end{lstlisting}
 
 \desc{Return $ab$, i.e. the element $a$ added to itself $b$ times.}
 
 \begin{lstlisting}
-*{T <: Ring, S}(a::Int, b::Residue{T, S})
-*{T <: Ring, S}(a::ZZ, b::Residue{T, S})
+*{T <: RingElem}(a::Int, b::Residue{T, S})
+*{T <: RingElem}(a::ZZ, b::Residue{T, S})
 \end{lstlisting}
 
 \desc{Return $ab$, i.e. the element $b$ added to itself $a$ times.}
@@ -3091,7 +3257,7 @@ f != 5
 \subsubsection{Powering}
 
 \begin{lstlisting}
-^{T <: Ring, S}(a::Residue{T, S}, b::Int)
+^{T <: RingElem}(a::Residue{T, S}, b::Int)
 \end{lstlisting}
 
 \desc{Return $a^b$.}
@@ -3122,7 +3288,7 @@ divide elements in a residue ring $R = T/(m)$, if $T$ is a
 Euclidean ring, i.e. if we have a \code{gcd} function in $T$.
 
 \begin{lstlisting}
-divexact{T <: Ring, S}(a::Residue{T, S}, b::Residue{T, S})
+divexact{T <: RingElem}(a::Residue{T, S}, b::Residue{T, S})
 \end{lstlisting}
 
 \desc{Return the quotient of $a$ by $b$ in the given residue
@@ -3158,7 +3324,7 @@ invert an element in a residue ring $R = T/(m)$, if $T$ is a
 Euclidean ring, i.e. if we have a \code{gcd} function in $T$.
 
 \begin{lstlisting}
-inv{T <: Ring, S}(a::Residue{T, S})
+inv{T <: RingElem}(a::Residue{T, S})
 \end{lstlisting}
 
 \desc{Return the multiplicative inverse of $a$ in the given residue
@@ -3202,7 +3368,7 @@ a power series ring $\Z[[x]]$ would be denoted \code|PowerSeries{ZZ, :x}|.
 Here is the definition of the \code{PowerSeries} type in Nemo.
 
 \begin{lstlisting}
-type PowerSeries{T <: Ring, S} <: Ring
+type PowerSeries{T <: RingElem} <: Ring
    arr::Ptr{Void}
    length::Int
    alloc::Int
@@ -3260,22 +3426,22 @@ We also provide various constructors for creating elements of a power series
 ring.
 
 \begin{lstlisting}
-PowerSeries{T <: Ring, S}()
+PowerSeries{T <: RingElem}()
 \end{lstlisting}
 
 \desc{Create the infinite precision power series $0$ in the given power series
 ring.}
 
 \begin{lstlisting}
-PowerSeries{T <: Ring, S}(a::Integer)
-PowerSeries{T <: Ring, S}(a::T)
+PowerSeries{T <: RingElem}(a::Integer)
+PowerSeries{T <: RingElem}(a::T)
 \end{lstlisting}
 
 \desc{Create the infinite precision power series $a$ in the given power series
 ring.}
 
 \begin{lstlisting}
-PowerSeries{T <: Ring, S}(a::PowerSeries{T, S})
+PowerSeries{T <: RingElem}(a::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return a reference to the power series \code{a}. No copy of the data is
@@ -3334,21 +3500,21 @@ k = R()
 \subsubsection{Basic manipulation}
 
 \begin{lstlisting}
-degree{T <: Ring, S}(a::Poly{T, S})
+degree{T <: RingElem}(a::Poly{T})
 \end{lstlisting}
 
 \desc{Return the degree of the polynomial underlying the power series $a$.
 We define the degree of the zero polynomial to be $-1$.}
 
 \begin{lstlisting}
-length{T <: Ring, S}(a::Poly{T, S})
+length{T <: RingElem}(a::Poly{T})
 \end{lstlisting}
 
 \desc{Return the length of the polynomial underlying the power series $a$, i.e.
 its degree plus one.}
 
 \begin{lstlisting}
-normalise{T <: Ring, S}(a::PowerSeries{T, S}, len::Int)
+normalise{T <: RingElem}(a::PowerSeries{T, S}, len::Int)
 \end{lstlisting}
 
 \desc{Return the normalised length of the polynomial representing the power
@@ -3359,7 +3525,7 @@ because all user functions in Nemo normalise the internal polynomial
 representation of power series.}
 
 \begin{lstlisting}
-coeff{T <: Ring, S}(a::PowerSeries{T, S}, n::Int)
+coeff{T <: RingElem}(a::PowerSeries{T, S}, n::Int)
 \end{lstlisting}
 
 \desc{Return the coefficient of the power series \code{a} with degree 
@@ -3367,28 +3533,28 @@ coeff{T <: Ring, S}(a::PowerSeries{T, S}, n::Int)
 we return $0$.}
 
 \begin{lstlisting}
-zero{T <: Ring, S}(::Type{PowerSeries{T, S}})
+zero{T <: RingElem}(::Type{PowerSeries{T, S}})
 \end{lstlisting}
 
 \desc{Return the additive identity of the power series ring, i.e. $0$ as an
 infinite precision power series.}
 
 \begin{lstlisting}
-one{T <: Ring, S}(::Type{PowerSeries{T, S}})
+one{T <: RingElem}(::Type{PowerSeries{T, S}})
 \end{lstlisting}
 
 \desc{Return the multiplicative identity of the power series ring, i.e. $1$ as an
 infinite precision power series.}
 
 \begin{lstlisting}
-gen{T <: Ring, S}(::Type{PowerSeries{T, S}})
+gen{T <: RingElem}(::Type{PowerSeries{T, S}})
 \end{lstlisting}
 
 \desc{Return the degree one, monic monomial generator of the power series
 ring.}
 
 \begin{lstlisting}
-iszero{T <: Ring, S}(a::PowerSeries{T, S})
+iszero{T <: RingElem}(a::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return \code{true} if $a$ is the additive identity of the power series
@@ -3397,7 +3563,7 @@ checking \code{a == 0}. The latter does not check that the precision of
 \code{a} is \code{nothing}.}
 
 \begin{lstlisting}
-isone{T <: Ring, S}(a::PowerSeries{T, S})
+isone{T <: RingElem}(a::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return \code{true} if $a$ is the multiplicative identity of the power
@@ -3406,14 +3572,14 @@ as checking \code{a == 1}. The latter does not check that the precision of
 \code{a} is \code{nothing}.}
 
 \begin{lstlisting}
-isgen{T <: Ring, S}(a::PowerSeries{T, S})
+isgen{T <: RingElem}(a::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return \code{true} if $a$ is the degree one, monic monomial generator of
 the power series ring. Otherwise, return \code{false}.}
 
 \begin{lstlisting}
-isunit{T <: Ring, S}(a::PowerSeries{T, S})
+isunit{T <: RingElem}(a::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return \code{true} if $a$ is an invertible element of the power series
@@ -3421,7 +3587,7 @@ ring, i.e. if the lead term is degree zero with invertible coefficient.
 Otherwise, return \code{false}.}
 
 \begin{lstlisting}
-valuation{T <: Ring, S}(a::PowerSeries{T, S})
+valuation{T <: RingElem}(a::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return the valuation of the power series \code{a} with respect to the
@@ -3453,7 +3619,7 @@ p = valuation(b)
 \subsubsection{Unary operators}
 
 \begin{lstlisting}
--{T <: Ring, S}(a::PowerSeries{T, S})
+-{T <: RingElem}(a::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return $-a$.}
@@ -3475,21 +3641,21 @@ d = -b
 \subsubsection{Binary operators}
 
 \begin{lstlisting}
-+{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
++{T <: RingElem}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return $a + b$. If the two power series have differing precisions, the
 result will be a power series with the lower precision.}
 
 \begin{lstlisting}
--{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
+-{T <: RingElem}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return $a - b$. If the two power series have differing precisions, the
 result will be a power series with the lower precision.}
 
 \begin{lstlisting}
-*{T <: Ring, S}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
+*{T <: RingElem}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return $ab$. The return precision is equal to the least out of the
@@ -3518,16 +3684,16 @@ m = a*d
 \subsubsection{Ad hoc binary operators}
 
 \begin{lstlisting}
-*{T <: Ring, S}(a::Int, b::PowerSeries{T, S})
-*{T <: Ring, S}(a::ZZ, b::PowerSeries{T, S})
+*{T <: RingElem}(a::Int, b::PowerSeries{T, S})
+*{T <: RingElem}(a::ZZ, b::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return $ab$. The resulting power series will have the same precision as
 $b$.}
 
 \begin{lstlisting}
-*{T <: Ring, S}(a::Poly{T, S}, b::Int)
-*{T <: Ring, S}(a::Poly{T, S}, b::ZZ)
+*{T <: RingElem}(a::Poly{T}, b::Int)
+*{T <: RingElem}(a::Poly{T}, b::ZZ)
 \end{lstlisting}
 
 \desc{Return $ab$. The resulting power series will have the same precision as
@@ -3556,7 +3722,7 @@ j = d*ZZ(3)
 Note that we take the convention that $1 + x + O(x^4) == 1 + x + O(x^8)$. 
 
 \begin{lstlisting}
-=={T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
+=={T <: RingElem}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return \code{true} if the two power series are the same up to the lesser
@@ -3595,8 +3761,8 @@ c != d
 Note that we take the convention that $0 == 0 + O(x^4)$.
 
 \begin{lstlisting}
-=={T <: Ring, S}(x::PowerSeries{T, S}, y::Int)
-=={T <: Ring, S}(x::PowerSeries{T, S}, y::ZZ)
+=={T <: RingElem}(x::PowerSeries{T, S}, y::Int)
+=={T <: RingElem}(x::PowerSeries{T, S}, y::ZZ)
 \end{lstlisting}
 
 \desc{Return \code{true} if the power series \code{x} is equal to \code{y} up
@@ -3604,8 +3770,8 @@ to the precision it has. Note that this is always true if \code{x} has
 precision $0$.}
 
 \begin{lstlisting}
-=={T<: Ring, S}(x::Int, y::PowerSeries{T, S})
-=={T<: Ring, S}(x::ZZ, y::PowerSeries{T, S})
+=={T <: RingElem}(x::Int, y::PowerSeries{T, S})
+=={T <: RingElem}(x::ZZ, y::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return \code{true} if the power series \code{y} is equal to \code{x} up
@@ -3637,7 +3803,7 @@ ZZ(1) == c
 \subsubsection{Powering}
 
 \begin{lstlisting}
-^{T <: Ring, S}(a::PowerSeries{T, S}, b::Int)
+^{T <: RingElem}(a::PowerSeries{T, S}, b::Int)
 \end{lstlisting}
 
 \desc{Return $a^b$. The result will have precision equal to $b - 1$ times the
@@ -3665,7 +3831,7 @@ k = d^12
 \subsubsection{Shifting}
 
 \begin{lstlisting}
-shift_left{T <: Ring, S}(a::PowerSeries{T, S}, n::Int)
+shift_left{T <: RingElem}(a::PowerSeries{T, S}, n::Int)
 \end{lstlisting}
 
 \desc{Return \code{a*x^n}, where \code{x} is the generator of the power series
@@ -3674,7 +3840,7 @@ a \code{DomainError()}. As \code{x^n} is considered exact, the precision of
 the result will be the precision of \code{a} increased by \code{n}.}
 
 \begin{lstlisting}
-shift_right{T <: Ring, S}(a::PowerSeries{T, S}, n::Int)
+shift_right{T <: RingElem}(a::PowerSeries{T, S}, n::Int)
 \end{lstlisting}
 
 \desc{Return \code{a/x^n}, discarding the remainder, where \code{x} is the
@@ -3704,7 +3870,7 @@ k = shift_right(d, 3)
 \subsubsection{Truncation}
 
 \begin{lstlisting}
-truncate{T<: Ring, S}(x::PowerSeries{T, S}, prec::Precision)
+truncate{T <: RingElem}(x::PowerSeries{T, S}, prec::Precision)
 \end{lstlisting}
 
 \desc{Return the power series \code{x} truncated to the given precision. If
@@ -3734,7 +3900,7 @@ k = truncate(d, 5)
 \subsubsection{Exact division}
 
 \begin{lstlisting}
-divexact{T<: Ring, S}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
+divexact{T <: RingElem}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return \code{x/y}. This requires \code{x} to have valuation at least that
@@ -3770,7 +3936,7 @@ k = divexact(d, c)
 \subsubsection{Inversion}
 
 \begin{lstlisting}
-inv{T<: Ring, S}(a::PowerSeries{T, S})
+inv{T <: RingElem}(a::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Return $1/a$. A \code{DivideError()} is thrown if \code{a} is zero. An
@@ -3796,7 +3962,7 @@ d = inv(b)
 \subsubsection{Special functions}
 
 \begin{lstlisting}
-exp{T<: Ring, S}(a::PowerSeries{T, S})
+exp{T <: RingElem}(a::PowerSeries{T, S})
 \end{lstlisting}
 
 \desc{Compute the power series exponential of the given power series \code{a}
@@ -3898,7 +4064,7 @@ in \code{T}. Moreover, \code{canonical_unit} must always return an invertible
 element in the ring \code{T}.
 
 We overload the \code{/} operator in Nemo for rings whose fraction field can
-be taken (e.g. \code{ZZ} and \code|Poly{T, S}|), so that elements of the
+be taken (e.g. \code{ZZ} and \code|Poly{T}|), so that elements of the
 fraction field of a ring can be constructed directly, without first
 constructing the type.
 
@@ -3979,7 +4145,7 @@ is canonicalised, i.e. reduced to lowest terms with positive denominator. If
 $y = 0$ we throw a \code{DivideError()}.}
 
 \begin{lstlisting}
-/{T <: Ring, S}(x::Poly{T, S}, y::Poly{T, S})
+/{T <: RingElem}(x::Poly{T}, y::Poly{T})
 \end{lstlisting}
 
 \desc{Return the value $x/y$ in the fraction field of the given polynomial
