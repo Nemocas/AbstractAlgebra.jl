@@ -62,7 +62,7 @@
 
 %\email{goodwillhart@googlemail.com}
 
-\title{Nemo : a flint interpreter}
+\title{Nemo: A computer algebra package for Julia}
 \author{William B. Hart}
 
 \begin{document}
@@ -80,53 +80,51 @@
 
 \section{Introduction}
 
-Nemo is, in the first place, an interpreter for the FLINT (Fast Library for Number Theory) project
-(see \url{http://flintlib.org}). It is based on the Julia programming language
-(see \url{http://julialang.org/}).
+Nemo is a computer algebra package for the Julia programming language (\url{http://julialang.org/}).
 
-The scope of Nemo is expected to be computer algebra and number theory. As such, it is my hope that 
-Nemo will eventually provide access to the Pari library (see \url{http://pari.math.u-bordeaux.fr/}),
-parts of the Singular package (see \url{http://www.singular.uni-kl.de/}) and the Gap library
-(see \url{http://www.gap-system.org/}).
+Nemo is based on the C libraries:
 
-Of course, I need to demonstrate that this is all feasible and convince a lot of people that the
-project is worthwhile before that can actually happen.
+\begin{enumerate}
+\item FLINT (Fast Library for Number Theory) -- \url{http://flintlib.org/}
+\item ANTIC (Algebraic Number Theory in Code) -- \url{http://github.com/wbhart/antic/}
+\item Pari -- \url{http://pari.math.u-bordeaux.fr/}
+\item Singular -- \url{http://www.singular.uni-kl.de/}
+\end{enumerate}
+
+The scope of Nemo is computer algebra in the limited sense of the term, and number theory. 
+
+We hope that Nemo will eventually also provide access to the Gap library -- 
+\url{http://www.gap-system.org/}.
 
 \section{The Julia programming language}
 
-I spent around four years looking for a suitable high level programming language which
-can interface to the existing flint library, and provide either a flint interpreter, 
-or at least a statically compiled generic layer for flint. 
+Over two hundred programming languages were examined before settling on Julia as our choice for the
+Nemo project.
 
-I looked at a vast number of languages (well over 200), and a few times even got as far as
-starting to write prototype flint wrappers to evaluate some of those languages. Many times
-I also started writing a programming language myself (work continues in that direction).
+Some statically compiled languages such as C++, D, Rust and Nimrod could have been reasonable solutions
+up to a point. Languages such as Scala, Aldor and various others also have strong points.
 
-In short, the perfect language does not yet exist. I believe the language I am looking
-for will exist some time between 2018 and 2024.
+But Julia is the only language which met all our design criteria.
 
-Some statically compiled and scripting languages, such as C++, D, Rust and Nimrod provide a 
-reasonable solution if all one wants is a generic layer. But they all have gotchas, (most of
-which will be sorted as the languages mature).
+\begin{enumerate}
+\item Interactive REPL
+\item Jit compiled
+\item Fast native C/C++ interop
+\item Dependent type system
+\item Familiar imperative syntax
+\item Open source implementation
+\item Regular releases
+\item Decent sized community
+\item Portable to OSX, Windows, Linux, BSD 
+\end{enumerate}
 
-Julia is the first language, to my knowledge, which is sufficiently good to be used as an
-interpreter for flint.
+Julia started life in 2009 with a first public release in 2012. It's main architects are Jeff Bezanson,
+Stefan Karpinski and Viral B. Shah, though there are well over 150 contributors to date.
 
-\subsection{In praise of Julia}
+Julia is based on the lightning fast LLVM compiler back end and just-in-time compiler. It is capable of
+producing code which runs as fast as native C code.
 
-Julia started life in 2009. It's main architects are Jeff Bezanson, Stefan Karpinski and
-Viral B. Shah, though there are over 150 contributors to date.
-
-Julia is one of the most sophisticated and technologically advanced programming languages
-available today. Julia and LLVM combined, represent over a million lines of code.
-
-Now, I don't claim Julia is one of the most complex or one of the largest programming
-languages in the world. In fact, it is neither large, nor complex. But in terms of taking 
-advantage of recently available technology (such as the LLVM Jit), and in terms of making 
-significant innovations in programming language design, Julia is very futuristic.
-
-Today, Julia has a good sized community, a very well fleshed out standard library, it is very
-usable, sporting hundreds of contributed libraries, a package manager and even an IPython
+Julia sports hundreds of contributed libraries, a package manager and even a Jupyter based graphical
 interface.
 
 Hundreds of thousands of lines of code have already been written in Julia. The language is
@@ -134,46 +132,26 @@ already used in production environments, including big data and parallel environ
 Julia website gets over 150,000 visits a month. There are Julia users groups worldwide and
 courses taught in Julia in at least Canada and the US.
 
-Most importantly, Julia is designed for mathematicians.
+Most importantly, Julia is designed by mathematicians for mathematicians.
 
-Julia combines a number of important technologies, which I believe will play an important part
-in the future of computer algebra. I outline those technologies below. To my knowledge, Julia
-may be the only usable programming language available today which provides all of those
-technologies. For that reason, Julia provides a great interim solution for the flint project, 
-at least until 2024 rolls around.
+Some of the key features of Julia are briefly discussed below.
 
 \subsubsection{Jit compilation}
 
-Julia uses the LLVM Jit. LLVM is a 14 year old compiler infrastructure which underlies the 
-Clang C/C++ compiler and components of over a dozen other programming languages.
+Julia uses just-in-time (JIT) compilation, which allows it to achieve C-like performance in real time
+without a separate compilation cycle. Jit compilation is achieved through use of the LLVM compiler
+back end.
+
+LLVM is the 15 year old compiler infrastructure which underlies the Clang C/C++ compiler and components
+of over a dozen other programming languages.
 
 LLVM's chief architect is Chris Lattner, an Apple employee since 2005, now working on Apple's 
 Swift programming language, which uses LLVM heavily. LLVM itself is reported to be used by Apple
-for its IOS tool development. I mention this only to show that LLVM is a serious, mature, 
-industry supported and hardened project, which is in turn supporting a very large ecosystem. In 
-short, it isn't going away any time soon.
+for its IOS tool development. 
 
-The LLVM Jit allows Julia to provide near C (sometimes C beating) performance, in real time.
-
-Various other languages have a Jit with near C performance and have to run in real-time
-environments, such as Javascript, Java and to some extent the Microsoft CLR languages, e.g.
-C\#, F\# and VB.Net (actually, Java and the CLR languages are first statically compiled to 
-bytecode).
-
-Unlike other Jit compilers, LLVM's strategy is to provide a rich type system at the bytecode
-level and to simply compile the bytecode on demand to machine code. All of the usual optimisation
-passes that are available in a modern C compiler (such as Clang), can be applied to produce very
-fast executable code, which can be immediately executed, in real time.
-
-This kind of Jit compilation is ideal for mathematical code, since we generally do not care if
-compilation takes as long as it takes our Enter key to rise up to its resting position after we
-have pressed it. We care only about how fast our very large loops will take to execute, after
-compilation has happened.
-
-This kind of Jit compilation is not so useful for environments like a web browser, where users
-really do care about how long compilation takes. (The Mono project gets around this by combining
-LLVM Jit optimisation with fast code paths that avoid compilation, where this would be slower
-than running interpreted code directly.)
+Jit compilation is ideal for mathematical code, since we generally do not care if there is a very short
+delay for incremental compilation after we hit our Enter key. We care only about how fast our very large
+loops will take to execute, after jit compilation has happened.
 
 Julia combines LLVM's Jit with dynamic type inference. This is a strategy which allows one to
 combine most of the benefits of a statically typed language (such as C/C++) with the flexibility
@@ -183,23 +161,12 @@ Ruby).
 To the greatest extent possible, Julia tries to infer the types for each function. However, it
 allows code to be written without specifying types, if one should so wish. Thus, from the user's
 perspective it is dynamically typed. But in many cases, exactly the same machine code results as
-would come from a C compiler and hand-written C. When all the types can be inferred, no type 
-information needs to be retained at runtime. This results in execution that is often as fast as 
-native C (sometimes faster).
-
-Moreover, Julia infers types dynamically. This means that each time a function is called, type
-inference goes into action, possibly meaning that a statically compiled and optimised version
-can be executed directly, instead of carrying type information along throughout the 
-computation.
-
-Dynamic type inference cannot always infer types, and for this reason I am not a massive fan of
-dynamic type inference. But the results are a good compromise between the flexibility of a 
-dynamically typed language and the performance of statically typed languages.
+would come from a C compiler and hand-written C. 
 
 \subsubsection{Interactive console}
 
-Julia offers an interactive console, similar to Python. It can also be used from IJulia, which
-is an IPython derivative, even on the web, via the IPython notebook!
+Julia offers an interactive console, similar to Python. It can also be used from a Jupyter derivative
+known as IJulia. This can be used on the web or even natively on Windows!
 
 Julia has a console which provides Readline like functionality and offers an online help 
 system.
@@ -216,19 +183,14 @@ metaprogramming features.
 
 \subsubsection{Foreign function interface}
 
-Julia allows direct access to C libraries (and just recently, C++ libraries). This includes
-access to C structs and arrays.
+Julia allows direct access to C/C++ libraries. There is also a simple mapping from C types to Julia
+types, and thus complex and costly wrappers are not needed.
 
-There is a simple mapping from C types to Julia types, and wrappers do not need to be written.
 Any native dynamic library (such as flint) can be directly accessed from within Julia, so long
 as it is in the current library path.
 
 There is no additional overhead in accessing native C libraries from within Julia than there
 would be from a native C program using that library.
-
-Julia also offers initialisers and finalisers, which allow memory managed C objects to 
-automatically call a C initialiser on creation and a finaliser when they leave scope, similar
-to the way C++ constructors and destructors work.
 
 \subsubsection{Dependent and parametric types}
 
@@ -240,249 +202,127 @@ polynomials over a ring $R$. In Julia, we can provide a type called Poly, which 
 another type, $R$ say, specifying the ring you are working over. e.g. $R$ might be the
 integers, or another polynomial ring, or a ring of matrices, etc.
 
-A type can depend on as many types as one would like.
+Mathematics, especially algebra, is inherently dependent, meaning that Julia's dependent type system
+is ideal for computer algebra.
 
-In contrast to parametric types, the prime example of a dependent type arises for a number 
-theorist when working with a number field or in $\Z/n\Z$. Elements of these rings have a
-modulus (e.g. the defining polynomial of the number field, or the modulus $n$ of the residue
-ring $\Z/n\Z$).
+\subsubsection{Polymorphism}
+ 
+Julia is polymorphic, meaning that multiple functions (and operators) can have the same name. For
+example, one can write separate versions of the determinant function for matrices over a ring versus
+matrices over a field.
 
-In other words, we want the type to depend on a value (here $n$), rather than another
-type. Thus the type for $\Z/n\Z$ is a dependent type.
+In most dynamic languages, e.g. Python, one writes a single function det(M), say, which
+may then need many lines of code to sort out what kind of object we are taking the determinant of. All
+of this decision code is executed at runtime and places an additional burden on the programmer. 
 
-Julia doesn't quite allow types to be parameterised by arbitrary objects such as a
-polynomial or an bignum integer $n$. But it does allow parameterisation by a machine
-integer or a symbol (a variable name without a value attached), and this is enough.
-
-We might refer to this as static dependent typing versus dynamic dependent typing. Julia
-has the former because it can be highly optimised. 
-
-The usefulness of dependent types for Nemo is in performance. If the modulus $n$ can be
-retained as part of the type and not part of the object, then it does not have to be carried
-along at runtime. 
-
-Imagine for example a polynomial over $\Z/n\Z$. Each coefficient is an object in $\Z/n\Z$.
-We can represent each such value by a pair of integers, one for the residue, one for the
-modulus $n$. But in a polynomial, every coefficient will carry the same modulus $n$, which
-is somehow redundant.
-
-A more sensible approach is to make the polynomial a value of type Poly$\{\Z/n\Z\}$.
-In this way, the modulus $n$ is attached to the type, not each coefficient of the
-polynomial. The polynomial is then free to be represented by an array of integers, one for
-each residue modulo $n$. The modulus does not need to be recorded for each coefficient of 
-the polynomial. This obviously results in a factor of two space saving.
-
-But there's a further crucial benefit. Julia is polymorphic, meaning that multiple functions
-(and operators) can have the same name. For example, one can overload the $+$ operator
-for polynomials over a ring. But in addition to this, one can write a specialised 
-implementation for addition of polynomials over $\Z/n\Z$.
-
-In most dynamic languages, e.g. Python, one writes a single function add(a, b), say, which
-then needs many lines of code to sort out what it is adding. All of this type decision code
-is executed at runtime. 
-
-In Julia, there is precisely one function for adding polynomials over $\Z/n\Z$, and it can
-be statically compiled for performance. The only time a decision has to be made about whether
-to call this function, or another one called $+$, is at Jit compilation time. Every subsequent
-time it is called (e.g. in a loop), no type decision code needs to be executed. Everything
-is sorted out and compiled to efficient machine code before the loop even begins to iterate.
-
-Needless to say, the performance benefits are great. It also greatly improves clarity
-and readability of code, as specialised versions of generic functions are clearly
-delineated by their type signatures.
+The Julia dispatch mechanism, on the other hand, does all of this automatically, alleviating the need
+to write such decision code.
 
 One can still write generic, catch-all functions, which work over any ring, say. But
 these do not first need to delegate to a whole bunch of special cases where specialised
-algorithms can be used. The type system and compiler do all of this work automatically 
-for you.
+algorithms can be used. 
 
-The only thing remaining for the generic function to do is to implement the generic
-algorithm which works over arbitrary rings. The generic implementation only gets
-called if no specialised implementation exists for those types.
+This greatly improves clarity and readability of code, as specialised versions of generic functions are
+clearly delineated by their type signatures.
 
-Finally, with specialised implementations of functions for particular rings Julia can 
-directly call native C functions that implement the operations over those rings, with 
-practically zero overhead.
+In addition to this, Julia allows functions to not only be overloaded by other Julia functions of the
+same name when certain types of rings are passed as parameters, but one can also overload functions
+and operators with highly specialised C/C++ implementations via the Julia native code interface.
 
-The static dependent typing approach has some limitations. One cannot expect to generate
-many dependent types programmatically, e.g. $\Z/p\Z$ for lots of values $p$, since the way
-the optimiser works is to compile the same function once for each different type, i.e.
-for each value of $p$ that is actually used in the program.
+\subsubsection{Abstract types and genericity}
 
-For this reason, one should not expect to implement multimodular algorithms, for example,
-with $\Z/p\Z$ represented using a dependent type. Instead, one should implement such
-algorithms over $\Z$ directly, interpreting the values as residues modulo the current
-prime $p$, i.e. such algorithms have to be implemented the old-fashioned way.
+Julia doesn't provide classes a la C++. As such, it is not possible to inherit data types. Instead
+Julia achieves genericity by inheriting behaviour.
 
-\subsection{Problems with Julia}
+This is achieved by providing abstract types (also known as type classes).
 
-Julia is by no means perfect, or optimal.
+Each type belongs to an \emph{abstract type}, which can be thought of as a collection of types that
+have some common behaviour. For example, all the different native integer types in Julia belong to a
+common \code{Integer} type class. Arithmetic operations and greatest common divisor functions
+make sense for all of these integer types, for example.
 
-Below I outline some of the issues I've hit so far. Some can be solved and some intrinsically
-belong to the design of Julia itself and likely won't be totally eliminated.
+Making all the native integer types belong to a single abstract \code{Integer} type class means that it
+is possible to write a function that accepts any native integer type as input simply by specifying that
+the given parameter is an \code{Integer}. That function will then accept any values whose type belongs
+to \code{Integer}.
+
+Abstract types can also belong to one another. For example, the \code{Integer} abstract type belongs to
+the \code{Real} abstract type in Julia. 
+
+To Julia this means that any type which belongs to \code{Integer} is more specific than a type which
+belongs to \code{Real} but not to \code{Integer}.
+
+This gives Julia a very powerful means of providing genericity. One can provide two versions of a
+function, one which works only with an \code{Integer} and one which works with any \code{Real}.
+
+If a machine integer is passed to such a generic function, Julia will determine the most specific
+version of the function that applies. In this case the \code{Integer} version would be called.
+
+If some other number is passed, which is not an integer, Julia falls back to the less specific version,
+namely the \code{Real} version of the function.
+
+Of course, one can also provide an even more specific implementation which only works for one specific
+type, as opposed to an entire type class. Julia will take this as being even more specific and will call
+this preferentially over the less specific versions of the function, if it applies.
+
+\subsection{Gotchas with Julia}
+
+Like all languages, Julia has some design decisions and gotchas that new users should be aware of. We
+provide an incomplete list of these below.
 
 \subsubsection{1-indexed arrays}
 
 All Julia arrays are indexed starting with $1$, i.e. \code{A[1]} is the first entry, not \code{A[0]}.
 
-Most of the computer science community and a good proportion of the computational mathematical
-community use $0$-indexed arrays.
+This is a deliberate, long standing design decision in Julia. Many mathematical papers make use of
+1-based indexing for matrices and the like. 
 
-This is nothing more than a nuisance to people who prefer the other convention. 
+Some other computer algebra packages, such as Pari/GP make use of the same convention as Julia. 
 
-It can't be changed. One might be tempted to think that a preparser could simply add \code{+1} to
-every array access. But there are other ways to access arrays than the \code{[]} notation.
+Experience shows that it rarely takes more than a couple of days to get used to when coming from a
+language that uses the other convention.
 
-It also doesn't need to be changed. The Julia language sprang up around people coming from a
-specific mathematical background, and their tools use $1$-indexed arrays.
+\subsubsection{Bignums}
 
-It should be considered a minor nuisance, nothing more. It is in fact easy to get used to,
-and for example Pari/GP uses $1$-indexed arrays. So it is hardly unprecedented in the
-computational and even number theoretic world. Some programmers struggle with off-by-one errors
-for a few days.
+Julia provides a built-in multiple precision integer type (using GMP). However for performance it also
+provided native integer types.
 
-\subsubsection{Bignum parsing}
+In order to maximise performance, Julia doesn't automatically switch from native integers to bignums on
+overflow. This means that if one starts off with native integers, the computation will only switch to
+bignums if the programmer does that explicitly.
 
-Languages that provide bignums have three choices.
+The main place this causes an issue is when using constant integers at the REPL. If the integers are
+small enough to fit in a native machine word, then that is what will be used. If they are too large
+an \code{Int128} will be used if that is big enough, otherwise a multiple precision \code{BigInt}
+will be used. 
 
-Firstly, they can simply not provide access to a machine integer type. They might speed things up
-as flint's fmpz does by smoothly transitioning from a machine integer to a bignum type upon
-overflow. The disadvantage of this is loss of machine integer performance. This techique is still
-around 6 times slower than native machine integer performance when Jit compiled.
-
-Secondly, they can offer machine integers as the default type and ask the programmer to provide an
-annotation when they intend to use a bignum. Julia 0.2 uses this system (it is apparently going to
-change in 0.3).
-
-The benefit is machine integer performance is the default. Also it is convenient when writing real
-world programs, as array indices should be machine integers. Bignums tend to be used mainly by
-number theorists, so it doesn't make sense for general purpose or even mathematical languages to
-use any other convention.
-
-The third option is to make bignums the default and ask the programmer to provide a notation if they
-intend to use a machine integer. This has the advantage of no mathematical surprises. Performance can
-suffer if the programmer forgets to provide the appropriate annotation where a machine integer should
-be used. And things like array indices will usually require an annotation or some sort of (expensive)
-automatic conversion.
-
-The problem with Julia is that the only consistent way of specifying a bignum is with a string. The
-cost of converting the string to a bignum isn't the problem. This can be avoided in most programs
-since most constants are small and can be specified in other ways, e.g. by converting from a machine
-integer.
-
-But for large enough constants, the only way to do it is with a string. And the problem this causes
-is that one cannot cut-and-paste the output of a program and use bignum values in subsequent input
-without wrapping each bignum in a notation including string quotes.
-
-This is incredibly tedious if you have a printed polynomial as output with large bignum coefficients.
-
-If you didn't happen to save the output of a computation in a variable, there is no easy way to enter
-it back in again with cut-n-paste. 
-
-This is obviously a severe problem. 
-
-It can conceivably be solved by allowing large constants to be parsed as bignums without annotations,
-e.g. with a thin preparser.
-
-The downside is that one cannot easily tell whether an integer literal will become a bignum or a
-machine integer, without counting its digits or examining its type.
-
-The only sensible solution for Nemo (not for Julia) is to make all constant integers bignums by default 
-and require an annotation if a machine word is required. Of course this will be irritating when dealing 
-with array indices and ranges.
-
-In Julia 0.3 the problem has been compounded by making everything larger than two machine
-words a bigint. This leads to an inconsistent semantics for integer literals.
-
-It is possible to modify the Julia parser to deal with this issue, and someone has already indicated
-how this can be done, by providing an example.
-
-\subsubsection{Type parameters}
-
-Currently when specifying a dependent type in Julia, one might write for example
-
-\begin{lstlisting}
-type mytype{R <: Ring}
-   data :: R
-   length :: Int
-end
-\end{lstlisting}
-
-This creates a new type which depends on a type \code{R} which is a \code{Ring}, e.g. \code{R}  might
-be the integers or a polynomial ring. The new type, called \code{mytype}, contains two fields: one is
-of type \code{R} , the other a machine integer.
-
-The useful thing about this syntax is that the type parameter \code{R} provides us with a handle which
-we can use within the type definition itself to refer to it. We can also use it in any constructors we
-specify for the type. 
-
-The other useful feature is that when the user tries to use the type, they can only instantiate it if 
-\code{R} belongs to the \code{Ring} typeclass. This gives us control over which types are allowed and
-which are not.
-
-But things are different if we want the type to depend on an integer value or a symbol.
-
-\begin{lstlisting}
-type mytype{R <: Ring, S}
-   data :: R
-   length :: Int
-end
-\end{lstlisting}
-
-Now the type has two parameters. One is a type \code{R}, which is a \code{Ring}, as before. The other,
-\code{S}, could be a \code{Symbol} for example, but could really be anything, as we have not 
-constrained it to a typeclass.
-
-The most obvious problem is that in Julia there is currently no way to restrict \code{S} to be a 
-\code{Symbol}. In fact, there is nothing stopping the user supplying a nonsense type like 
-\code|mytype{ZZ, Poly}| for \code{S}. The code would of course not operate as expected, since none of
-the code using values of type \code{mytype} seriously expects \code{S} to be a polynomial. It expects
-a symbol. 
-
-There is also a problem when we are defining methods whose signatures don't depend on that
-\code{Symbol}. It seems that Julia won't even allow that type parameter to be mentioned in that case,
-unless you are writing an inner constructor. That's a problem if you are trying to write a constructor
-which takes a parameter of one parameterised type and trying to construct from it a value of another
-parameterised type, e.g. you are trying to construct a value of the type given above from an array of
-values whose type doesn't depend on \code{R} or \code{S}.
-
-You can't use an outer constructor because the \code{R} and \code{S} can't be mentioned if they don't
-appear in the types for the parameters you are passing. And you can't use an inner constructor because
-currently Julia seems to ignore inner constructors that depend on additional parameters that the type 
-you are constructing doesn't depend on.
-
-To work around this, one either has to use type introspection, and undocumented runtime type 
-deconstruction from a more general inner constructor (if possible) and do different things depending
-on the type parameters you find at runtime, or implement a weird mix of inner and outer constructors
-that bounce around between each other to satisfy all the rules.
-
-Two simple things would fix these problems.
-
-Firstly, Julia should allow a type parameter \code{S} to be restricted to a \code{Symbol} or \code{Int}.
-
-Secondly, either outer constructors should allow the type parameters for the type being constructed to 
-be mentioned, even when they don't appear elsewhere in the prototype, or additional parameters should be 
-allowed for inner constructors that aren't parameters for the type being constructed (and such inner 
-constructors should not be ignored). It's not clear how the latter would work, since there are two sets 
-of type parameters here, the type parameters for the type being constructed, and the type parameters for
-the arguments of the constructor. The two need to be separated somehow. 
+This means that one must tell Julia explicitly what kind of integer one wants, if the default is not
+desired. This is similar to just about any statically typed language which provides bigints. The only
+ways around it would be for Julia to only provide bigints and no native types, or to require type
+annotation of all variables, either of which is not desirable.
 
 \subsubsection{Supertypes of core types}
 
-Julia has a type \code{Int} which represents a machine integer. This belongs to a hierachy of abstract
-types, e.g. \code{Int <: Integer} and so on. 
+As we explained above, Julia provides native integer types, e.g. \code{Int} which belong to a single
+type class \code{Integer}.
 
-Of course, we'd like to have \code{Int <: Ring} so that any code which depends on a type which is a subtype
-of \code{Ring} can be instantiated with \code{Int}, e.g. we could define a polynomial ring over \code{Int}.
+In a computer algebra system, we'd really like \code{Integer} to then belong to some more general
+abstract type class, \code{RingElem} say.
 
-This is presumably possible, with rather a lot of rewriting of some Julia modules. But it certainly isn't
-straightforward.
+Unfortunately, it is not possible to change the abstract type that Julia's own types and abstract types
+belong to.
 
-Again, as far as I can tell, Julia does the right thing here. But again, it is a real pain in the neck.
+This will be a gotcha for users of Nemo: Julia integers do not belong to Nemo's \code{RingElem} abstract
+type.
 
-I don't see a simple workaround that I can be sure is efficient.
+One way around this is to allow types to belong to a union type, \code{Union(Integer, RingElem)}. The
+other way around it is simply to implement two versions of a function, one which accepts an
+\code{Integer}, the other which accepts a \emph{RingElem}.
 
-\subsubsection{Division nightmare}
+Fortunately, one often wants to treat integers much more specially than general ring elements, so this
+doesn't cause too much of a problem in practice.
+
+\subsubsection{Division operators}
 
 The division functions in Julia are geared towards numerical, rather than algebraic, applications.
 
@@ -491,515 +331,61 @@ and the \code{div} function treats even the rationals as a model of the reals, s
 always returns the exact value $a/b$ (in the mathematical sense), truncated to the nearest whole
 number in the direction of zero.
 
-Actually, the \code{div} operator implements division according to Euclid's original definition of
-Euclidean division. But this is not what actually happens in a Euclidean domain. Some computer algebra
-systems actually use this original definition, but it makes it hard to offer a consistent semantics
-with regard to functions that expect to be able to apply the commutative algebra definition of Euclidean
-division if the inputs belong to a Euclidean domain (e.g. any field is trivially a Euclidean domain).
+Julia also provides \code{//} for creating fraction objects, e.g. for creating rational fractions from
+integers.
 
-The upshot of this is that Julia needs an algebraic number stack to replace the current numeric one.
-
-Fortunately, this is made quite possible by Julia, but there is rather a lot of code to write and so
-this will take a substantial effort to implement. 
-
-\subsubsection{C structs}
-
-Julia does support converting Julia types to C (struct based) objects for easy foreign function
-interface. This is also highly efficient.
-
-However, there is no equivalent in Julia of a C struct proper. This means that in C libraries that
-include structs inside other structs (rather than pointers to such structs), the matching Julia types
-need to be written out in full, expanding out all the various structs within structs that occur in
-the interface. This can be tedious and looks extremely ugly.
-
-The lack of a struct type (as opposed to an object, or pointer to a struct) is also at the heart of
-the bignum performance issue mentioned above. Back in 2011 the Julia developers fully intended to
-introduce a C struct type which would be like an immutable type in Julia, but without being actually
-immutable. This was a correct direction, and I hope that they will revisit it in a coming version of
-Julia.
-
-That is not to say that implementing such a type is trivial. There are very complex C++ style
-semantics that come along with such types, including the ability to pass them by reference or value.
-
-Perhaps the Julia developers will come up with an even better way to do things. However, at this
-stage, I consider this to be the most important thing missing from Julia, for my purposes.
+For algebraic operations, Nemo introduces an additional \code{divexact} function, which assumes you are
+performing an exact division of two elements of a ring. We recommend using it exclusively, unless one
+knows that one wants precisely the Julia behaviour.
 
 \subsubsection{Multiple inheritance}
 
 The abstract type hierarchy in Julia is one of its best features. It really makes the language
 flexible and powerful.
 
-However, at present it is only possible for a given type to belong to one abstract type.
+However, at present it is only possible for a given type to belong to one abstract type (and
+transitively to any abstract types that it in turn belongs to).
 
-This can be quite restricting. For example, consider a system in which you have the abstract types
+There are cases where it would be useful if types could belong to multiple abstract types, e.g.
+\code{Inexact} and \code{RingElem} for elements that belong to inexact rings as opposed to exact 
+rings.
 
-\begin{lstlisting}
-Field <: EuclideanDomain <: IntegralDomain <: CommutativeRing <: Ring
-\end{lstlisting}
+There's currently no way around this in Julia, and so the abstract type hierarchy used by Nemo is
+pretty basic.
 
-At some point you realise that some algorithms for Euclidean domains also work for rings that are
-not integral domains, so long as they support a Euclidean structure. You would make these types
-belong to \code{EuclideanRing <: CommutativeRing}. 
+Instead of having a multitude of abstract types, we rely on the existence of functions for specific
+rings to determine what can be done with them.
 
-The problem is, every Euclidean domain is a Euclidean ring, but not every integral domain is.
+For example, instead of having a \code{EuclideanDomainElem} abstract class for elements of a Euclidean
+domain, we rely on the existence of the \code{gcd} function for specific rings that happen to be
+Euclidean domains. If the \code{gcd} function doesn't exist, Julia will throw an exception if you
+try to call a function on that ring that requires a greatest common divisor to be defined. This 
+(mostly) works well in practice.
 
-At present, there is no way to denote this in the Julia type hierarchy.
+\subsubsection{Performance gotchas}
 
-Another example comes from algorithms that work for rings where elements have exact
-representations like the integers or polynomials over the integers or rationals, but not for rings
-which don't, such as power series, $p$-adics, real numbers, complex numbers, etc.
+There are a number of cases where Julia will provide very poor performance, which often catch new
+implementors unawares.
 
-There's no way to introduce an \code{ExactRing} and \code{InexactRing} into the type hierarchy
-and still have types belong to one of the existing type classes (such as \code{IntegralDomain})
-and also belong to one or other of the new abstract types \code{ExactRing} or \code{InexactRing}.
+Firstly, Julia doesn't do jit compilation at the top level. If you simply type a series of isolated
+statements into the REPL they will be interpreted, not jit compiled.
 
-I understand that this is roughly equivalent to Julia being single inheritance, rather than
-multiple inheritance.
+If you want to get good performance, you should put your code inside a function and call it. The jit
+compilation happens at the function boundary and so if your code is inside a function it will
+execute quickly.
 
-I simply don't know how technically involved it would be to address this issue in Julia. 
+Top level variables are also very slow to access in Julia. This is because they could change type at
+any time and Julia can have no way to predict this. Therefore they aren't as fast as local variables
+in functions. Type inference can guarantee that local variables always have the same type meaning that
+faster code can result.
 
-\subsubsection{A trivial complaint}
-
-There is currently no easy way to change the Julia prompt to \code{nemo} instead of \code{julia}.
-
-\section{A short introduction to the Julia language}
-
-For a complete introduction to the Julia language, see the Julia website (\url{http://julialang.org/}).
-
-Here we provide only a very basic overview of the simplest constructs in the Julia language which are
-immediately relevant to Nemo.
-
-For a cheat sheet, see \url{https://github.com/john9631/JuliaDocs/blob/master/JuliaReferenceCard.pdf?raw=true}.
-
-
-\subsection{Code comments}
-
-Code comments in Julia are written as follows
-
-\begin{lstlisting}
-# this is a commment
-\end{lstlisting}
-
-All characters from the hash to the end of the line are ignored.
-
-\subsection{Values and core types}
-
-Two core types of interest are the types for machine integers and double precision floats. We can
-define values of these types as follows
-
-\begin{lstlisting}
-a = 123
-
-b = 1.23
-
-c = 1.23e-23
-\end{lstlisting}
-
-We can determine the type of a value or variable with the \code{typeof} operator. For example
-
-\begin{lstlisting}
-typeof(123)
-\end{lstlisting}
-
-returns either \code{Int32} or \code{Int64}, depending on your machine. You can refer to this type in
-your code as an \code{Int}. This will refer to either \code{Int32} or \code{Int64} depending on your
-machine.
-
-Similarly
-
-\begin{lstlisting}
-typeof(1.23)
-\end{lstlisting}
-
-returns \code{Float64}.
-
-Another important way of creating values of a given type is with a constructor. For the above core
-types, the constructor has the same name as the type, but with lowercase first letter, e.g.
-
-\begin{lstlisting}
-a = int(123)
-\end{lstlisting}
-
-Julia has a built-in bignum type. But we will not use it in Nemo. Instead, we have provided a type
-\code{ZZ} which uses flint bignums. One slight quirk of Julia is that the constructor for \code{ZZ}
-has the same name as the type without the lowercase first letter, e.g. we write for example
-
-\begin{lstlisting}
-a = ZZ(123)
-\end{lstlisting}
-
-Some other types of interest are \code{String} and \code{Int8}.
-
-\begin{lstlisting}
-a = int8(123)
-
-s = "Nemo is awesome"
-\end{lstlisting}
-
-\subsection{Julia operators}
-
-For its numeric values, Julia provides the following arithmetic operators where applicable
-
-\code{+, -, *, /, %, //, div, rem, +=, -=, *=, /=, %=, //=, ^, ^=}
-
-Most of these are self explanatory. Unfortunately the single forward slash returns a floating point
-value when passed two integer operands. The double forward slash results in a rational value. This
-is opposite to the convention algebraists would wish for, and illustrates the numeric bent of Julia's
-designers. 
-
-We advise not ever using the \code{/} operator with core Julia types in Nemo, but always using 
-\code{div}. This will not result in mathematical theorems being false. See the section above 
-complaining about this. 
-
-The \code{div} operator provides integer division. Unfortunately it uses the C convention of rounding
-towards zero, instead of the floor division one would hope for as an algebraist. This is tolerable of
-course, just a slight nuisance.
-
-The caret operator \code{^} is for powering, not xor as in C. This is great for mathematicians, 
-especially when creating polynomials.
-
-Julia provides the following comparison operators
-
-\code{==, <, >, <=, >=, !=}
-
-All of the comparison operators return a \code{Bool}, and unlike C an integer cannot stand in for
-a \code{Bool} in a conditional expression. A \code{Bool} has either the value \code{true} or
-\code{false}.
-
-There are the following logical operators in Julia
-
-\code{|, &, $, |=, &=, $=, !}
-
-The only one which may be unfamiliar is the xor operator \code{$}.
-
-\subsection{Control flow}
-
-The following standard control flow statements are available in Julia
-
-\begin{lstlisting}
-if a < 10
-   # do something
-elseif a < 100
-   # do something else
-else
-   # do something totally different
-end
-\end{lstlisting}
-
-We note that \code{if} statements are also expressions if the final line of each block is an expression.
-This allows a more functional style of programming.
-
-There are two main loop constructs in Julia. The first is the familiar \code{while} construct.
-
-\begin{lstlisting}
-while i < 10
-   println(i)
-end
-\end{lstlisting}
-
-I'm not aware of any \code{do...while} like construct in Julia. This is an unfortunate omission.
-
-The second loop construct in Julia is the \code{for} loop.
-
-\begin{lstlisting}
-for i = 1:5
-   println(i)
-end
-\end{lstlisting}
-
-Here \code{1:5} is a range, which includes the endpoints.
-
-\begin{lstlisting}
-for s in ["foo","bar","baz"]
-   println(s)
-end
-\end{lstlisting}
-
-This last form can be used with any iterable container. The particular container in the example is
-of course a 3-element array.
-
-One can use the keyword \code{break} to break from a loop and \code{continue} to skip to the next
-loop iteration in Julia.
-
-\subsection{Arrays}
-
-\code{Array} in Julia is a parameterised type. You can have an array of any other type, and the 
-number of dimensions of the array is an \code{Int} parameter of the type.
-
-For example, the type of a 2-dimensional array of \code{Int}'s in Julia is \code|Array{Int, 2}|.
-
-To create an array of undefined entries, use the \code{Array} constructor.
-
-\begin{lstlisting}
-a = Array(Int, 5, 3)
-\end{lstlisting}
-
-In this example, we create an array of \code{Int}'s with two dimensions, the first is length $5$,
-the second of length $3$. So the type of \code{a} is precisely \code|Array{Int, 2}|.
-
-We can access elements of an array with the usual array syntax
-
-\begin{lstlisting}
-a[1,2] = 4
-\end{lstlisting}
-
-A second way to construct an array is with an array literal
-
-\begin{lstlisting}
-a = [1, 2, 3, 2, 3, 4, 7, 9, 3, 2, 4, 2]
-reshape(a, 4, 3)
-\end{lstlisting}
-
-One can also use ranges
-
-\begin{lstlisting}
-a = reshape(1:9, 3, 3)
-\end{lstlisting}
-
-and comprehensions
-
-\begin{lstlisting}
-a = [i^2 for i = 1:10]
-\end{lstlisting}
-
-\subsection{Functions}
-
-One does not need to provide type declarations when defining a function in Julia. The dynamic
-type inference can often work out the types and no performance is lost.
-
-\begin{lstlisting}
-function factorial(n)
-   if n == 1
-      return 1
-   end
-
-   r = 1
-   
-   for i = 2:n
-     r *= i
-   end
-
-   return r  
-end
-\end{lstlisting}
-
-The \code{return} keyword on the final line of the function is optional. If the final line is 
-an expression, the value of that expression will be returned.
-
-One can also use a more mathematical notation to define functions
-
-\begin{lstlisting}
-f(x) = x^2 + 2x + 1
-\end{lstlisting}
-
-Note that I have optionally omitted the \code{*} operator between the \code{2} and \code{x}.
-
-In either case, application of the function is exactly as expected
-
-\begin{lstlisting}
-f(10)
-\end{lstlisting}
-
-If one does wish to supply types, e.g. when writing specialised versions of a function, one
-can do so.
-
-\begin{lstlisting}
-function factorial(n::Int)
-   if n == 1
-      return 1
-   end
-
-   r = 1
-   
-   for i = 2:n
-     r *= i
-   end
-
-   return r  
-end
-\end{lstlisting}
-
-\subsection{Generic functions}
-
-Sometimes one would like to restrict the types of values that a function will apply to. For
-example, one might like to write a function which works for any kind of \code{Integer}, e.g.
-\code{Int8}, \code{Int16}, \code{Int32}, \code{Int64}, etc.
-
-We can do this by  restricting types to belong to some abstract superclass.
-
-\begin{lstlisting}
-function factorial{R <: Integer}(n::R)
-   if n == 1
-      return 1
-   end
-
-   r = 1
-   
-   for i = 2:n
-     r *= i
-   end
-
-   return r  
-end
-\end{lstlisting}
-
-Now our factorial function will work, so long as it is passed a value whose type \code{R} is
-an \code{Integer} type. The \code{Integer} abstract type does not have any specific
-representation in Julia, it is just an abstract node in the type graph to which all the
-integer-like types are attached.
-
-In Nemo we define an abstract type called \code{Ring}, to which all types that are rings
-are attached. This means we can write generic functions which accept arguments so long as
-their type belongs to the abstract type \code{Ring}. For example, the Nemo bignum type
-\code{ZZ} belongs to the abstract type \code{Ring} as does the \code{Poly} type.
-
-\subsection{User defined types}
-
-You can define your own \code{Ring} types as follows
-
-\begin{lstlisting}
-type mytype{R <: Ring} <: Ring
-   a :: R
-   b :: Int
-   c :: Float64
-end
-\end{lstlisting}
-
-This defines a new parameterised type called \code{mytype}. It depends on another type
-\code{R} which belongs to \code{Ring}. The new type is then also declared to belong to
-\code{Ring}.
-
-The type contains three fields: a field \code{a} of type \code{R}, a field \code{b} of
-type \code{Int} and a field \code{c} of type \code{Float64}.
-
-Note that this really defines a whole family of types, one for each type \code{R}.
-
-Julia automatically creates a constructor for this type (unless you override it). For
-example, since the Nemo type \code{ZZ} is a \code{Ring}, we can create a value of
-type \code|mytype{ZZ}| as follows
-
-\begin{lstlisting}
-s = mytype(ZZ(10), 12, 1.23)
-\end{lstlisting}
-
-Here, Julia has provided the \code{mytype} constructor for free. Simply pass it three
-values, corresponding to the values that should go into the three fields of the 
-\code{mytype}, and it will work out the rest (including that \code{R} should be
-\code{ZZ} in this case).
-
-To access the fields of \code{s} is also easy
-
-\begin{lstlisting}
-println(s.c)
-\end{lstlisting}
-
-will print the value \code{1.23}, since the \code{c} field of \code{s} contains the
-value \code{1.23} after we created it using the constructor.
-
-\subsection{Tuples}
-
-Julia can trivially create tuples
-
-\begin{lstlisting}
-t = (123, ZZ(12))
-\end{lstlisting}
-
-This creates a value of type \code{(Int, ZZ)}.
-
-Importantly, tuples can be returned from and passed as arguments to functions.
-
-Julia also has a neat tuple assignment, which is very useful
-
-\begin{lstlisting}
-a, b = 1, 2
-\end{lstlisting}
-
-Note the omission of the optional parentheses in this example.
-
-Moreover, this can be used to write a very neat swap
-
-\begin{lstlisting}
-a, b = b, a
-\end{lstlisting}
-
-To specify a tuple with only one component, one must append a comma
-
-\begin{lstlisting}
-s = (1,)
-\end{lstlisting}
-
-This is now a tuple of length 1.
-
-Note that tuples may contain inhomogeneous types. 
-
-Arrays can too, in which case the types will be made the generic type \code{Any} (or
-at least some abstract type to which all the types belong). 
-But performance will suffer in the case of arrays, as with any code where Julia infers
-type \code{Any}.
-
-\subsection{Print and println}
-
-The \code{print} function can take a comma separated list of values, which it will
-then print to the console. The \code{println} function will do the same, but append
-a newline character.
-
-\begin{lstlisting}
-a = 12
-
-println("a = ", a)
-\end{lstlisting}
-
-\subsection{Timing and profiling}
-
-To time how long a statement takes to execute, one can use the \code{@time} macro.
-
-\begin{lstlisting}
-function sumit(n::Int)
-   s = 0
-
-   for i = 1:n
-      s += i
-   end
-
-   return s
-end
-
-@time sumit(1000000000)
-\end{lstlisting}
-
-The result of this call on my computer is
-
-\begin{verbatim}
-julia> @time sumit(1000000000)
-elapsed time: 0.914578447 seconds (78060 bytes allocated)
-500000000500000000
-\end{verbatim}
-
-We can get a breakdown of where Julia spends all its time, function by function,
-using the profile macro.
-
-\begin{lstlisting}
-@profile sumit(1000000000)
-
-Profile.print()
-\end{lstlisting}
-
-This causes Julia to take a number of backtrace samples and count the number of times
-each function is called. It also tells you which files and line numbers the various
-functions are defined on.
-
-\begin{verbatim}
-julia> Profile.print()
-       912 client.jl; _start; line: 429
-        912 client.jl; run_repl; line: 186
-           912 client.jl; eval_user_input; line: 109
-              912 profile.jl; anonymous; line: 14
-               912 none; sumit; line: 5
-\end{verbatim}
+Julia provides the keyword \code{const} for top level constants. The value of such constants can't
+subsequently be changed, but Julia can then rely on them having the same type (and value), and they do
+not suffer from the same performance issues as top level variables.
 
 \section{Installing Nemo}
 
-There are currently two steps to installing Nemo: install Julia-0.3 and use the Julia
+There are currently two steps to installing Nemo: install Julia-0.4 and use the Julia
 package system to install Nemo.
 
 To install Julia, please refer to the installation instructions on the Julia website
@@ -1014,7 +400,7 @@ sudo apt-get update
 sudo apt-get install julia
 \end{verbatim}
 
-Once Julia-0.3 is installed, start up Julia (type \code{julia} at the command 
+Once Julia-0.4 is installed, start up Julia (type \code{julia} at the command 
 line/shell prompt).
 
 Now you can clone, build and test Nemo as follows:
@@ -1026,230 +412,349 @@ Pkg.test("Nemo")
 \end{verbatim}
 
 The tests should only take a few seconds to a minute to run per module, depending on
-the speed of your machine. However, they will run faster on a second run due to not
-needing to be compiled by the Jit the second time.
+the speed of your machine. 
 
-If you encounter bugs in Nemo, please report them to the flint-devel Google group.
-Note that Nemo currently requires the latest trunk version of flint from out GitHub
-repository, or flint-2.5 (when available).
+If you encounter bugs in Nemo, please report them to \url{nemo-devel@googlegroups.com}.
 
-\section{The Rings module}
+\section{Using Nemo}
 
-Julia has a module system, and we use it to provide access to Nemo modules.
+Julia has a module system, and we use it to provide access to Nemo.
 
-At present there is a single module, called \code{Rings}. To import it and use all
+At present there is a single module, called \code{Nemo}. To import it and use all
 exported functionality simply type
 
 \begin{lstlisting}
-using Nemo.Rings
+using Nemo
 \end{lstlisting}
 
-The first thing the \code{Rings} module does is define a new abstract type called
-\code{Ring}. Internally, this is the line of code that does this
+\section{Nemo fundamentals}
+
+Nemo provides both generic algorithms and types, and wrappers of implementations and native types
+provided by various C/C++ libraries, such as Flint, Pari, Antic, etc.
+
+For example, there are Flint polynomial types, Pari polynomials types, etc., but also a generic
+polynomial type whose coefficients can be in any Nemo ring (e.g. another polynomial ring, or a residue
+ring, etc.).
+
+Many of the generic algorithms in Nemo are specialised for working over fields. For example, different
+algorithms are used when computing greatest common divisors of polynomials over more general rings 
+(where it makes sense) and polynomials over fields.
+ 
+Some Nemo objects don't belong to either rings or fields, e.g. general $m\times n$ matrices belong to
+matrix spaces, which are neither rings nor fields.
+
+\subsection{Parent objects and Nemo type classes}
+
+We call the ring or field or space that a Nemo arithmetic object belongs to, its \emph{parent}.
+
+Parents are implemented in Nemo as objects. For example, there is an object corresponding to the ring
+of integers as implemented by Flint, namely the unique parent object of type \code{FlintIntegerRing}.
+
+A function named \code{parent} can be used to determine the parent of any arithmetic object in Nemo. In
+many cases, the arithmetic objects themselves contain pointers to their parent object.
+
+A parent can be thought of as a kind of \emph{mathematical type}. For example, elements of $\Z/5/Z$ and
+elements of $\Z/7\Z$ have the same Julia type but different parents. The Julia type only encodes the
+fact that we are working in a residue ring of the integers, but the parents encode the fact that we are
+working in two different rings $\Z/5\Z$ and $\Z/7\Z$. One of the parent objects will contain the modulus
+$5$, the other will contain the modulus $7$.
+
+Both Nemo arithmetic objects and parent objects have types, and these types belong to various abstract
+types defined by Nemo.
+
+At the highest level of the Nemo type hierarchy are the abstract types for the parent objects, namely
+\code{Collection}, \code{Ring} and \code{Field}. Corresponding to these are the abstract types for the
+corresponding arithmetic objects themselves: \code{CollectionElem}, \code{RingElem}, \code{FieldElem}.
+
+Thus, a polynomial would have a type that belonged to \code{RingElem} and its parent would have a type
+that belonged to \code{Ring}.
+
+Actually, the abstract type hierarchy is a bit richer than this. In fact we have a number of more
+refined abstract types: \code{PolyElem}, \code{SeriesElem} and \code{ResidueElem} are abstract types
+that all belong to \code{RingElem}; \code{FractionElem} is an abstract type that belongs to
+\code{FieldElem}; and \code{MatElem} belongs to \code{CollectionElem}.
+
+So in fact, polynomials have types that belong to \code{PolyElem} which in turn belongs to
+\code{RingElem}.
+
+\subsection{Basic integer and rational rings}
+
+Before one can build generic rings over other rings, one needs a starting point on which to build.
+
+For this purpose, Nemo provides wrappers of various C libraries, such as Flint and Pari, which have
+implementations of basic rings such as the integers and rationals.
+
+Nemo provides some convenient names for the parent objects for these basic rings. Thus, \code{ZZ} is
+the name of the parent object for the ring of integers and \code{QQ} is the parent object for the
+rationals.
+
+Parent objects are callable in Nemo. They can be used to create objects with that parent. For example,
+\code{ZZ(2)} creates the integer $2$ and \code{QQ(2, 3)} creates the rational $2/3$.
+
+By default, Nemo makes \code{ZZ} an alias for the unique parent object of type \code{FlintIntegerRing}
+and \code{QQ} is an alias for the unique parent object of type \code{FlintRationalField}.
+
+Once we have these basic rings we can build up more generic rings with these as base.
+
+Flint also provides other basic rings such as padic rings and finite fields. 
+
+\subsection{Nemo domains}
+
+As \code{ZZ} and \code{QQ} are just variables, they can be reassigned by the user. Therefore one can
+change \code{ZZ} to be the unique object of type \code{PariIntegerRing} or \code{QQ} to be the unique
+object of type \code{PariRationalField}. If one then builds up a generic ring over \code{ZZ} for
+example, it would then be implemented using Pari integers instead of Flint integers.
+
+In Nemo we call the underlying system that is used to implement the basic rings the \code{domain}. One
+might select a different domain to the default one for performance reasons or because of the available
+functionality for that domain, or maybe because one wishes to work predominantly with one package
+instead of another. 
+
+This system of domains gives the user good control over the implementation used and allows the user to
+more easily tell which external library is responsible for the underlying implementation of their code.
+This allows the user to more easily credit (or blame) external implementations.
+
+Currently, for ease of use, we do allow maximal orders of number fields to be built from Antic number
+fields, even though Pari provides the underlying implementation of maximal orders and their ideals. This
+reflects the fact that Antic is very new and currently doesn't perform such computations.
+
+Below we discuss each of the parent types and object types available in Nemo and list all the functions
+available for each, with examples.
+
+\section{Rings}
+
+Internally, Nemo defines an abstract type for rings, with the following line of code:
 
 \begin{lstlisting}
 abstract Ring
 \end{lstlisting}
 
-This provides a new node in the type graph to which we can attach other types. 
-
 You can check (or assert) that a given type belongs to \code{Ring} with the
-\code{<:} operator. For example, we can check that the Nemo type \code{ZZ} belongs
+\code{<:} operator. For example, we can check that the type of Nemo's \code{ZZ} parent object belongs
 to \code{Ring}
 
 \begin{lstlisting}
-ZZ <: Ring
+typeof(ZZ) <: Ring
 \end{lstlisting}
 
-Nemo will return \code{true}, indicating that \code{ZZ} does belong to \code{Ring}.
+Nemo will return \code{true}, indicating that the type of \code{ZZ} does belong to \code{Ring}.
 
-For convenience, I will refer to \code{Ring} as a class. So we will say that the 
-type \code{ZZ} belongs to the type class \code{Ring}, or that \code{ZZ} belongs to
-the \code{Ring} class.
+Note that \code{<:} can only be used to determine if a type (or abstract type) belongs to an abstract
+type. Thus \code{ZZ} does not belong to \code{Ring} since \code{ZZ} is not a type but a mathematical
+parent object.
 
-Beware that in Julia, abstract types can belong to other abstract types. E.g. we
-can have
+An element of a ring has a type that belongs to \code{RingElem}. For example, polynomials and integers
+have types that belong to \code{RingElem}.
+
+For example the following code will return true:
 
 \begin{lstlisting}
-QQ <: Field <: Ring
+typeof(ZZ(1)) <: RingElem
 \end{lstlisting}
 
-This is clearly rather convenient.
+\subsection{Integers : Flint fmpz}
 
-Another thing to be aware of is that Julia's parametric type system is invariant,
-not covariant. This means that even if \code{R <: S} we don't automatically have
-\code|Ring{R} <: Ring{S}|.
-
-The reason for this is that the underlying representation of \code|Ring{R}| may
-differ from that of \code|Ring{S}|. Therefore it makes no sense type theoretically
-for one to be a subtype of the other.
-
-Types model categories, but are not formally equivalent to them! In fact, type
-systems are equivalent to formal logic systems (look up the Curry-Howard
-correspondence and the lambda cube for more details).
-
-\subsection{The integers}
-
-Nemo provides a type \code{ZZ} for (multi-precision) integers.
-
-Internally, \code{ZZ} uses the flint \code{fmpz} type. In fact, here is the Nemo
-definition of the \code{ZZ} type
+Multi-precision integers can be created in Nemo using \code{ZZ}. For example, to create the integer
+$123$ one can write:
 
 \begin{lstlisting}
-type ZZ <: Ring
-    d::Int
-end
+ZZ(123)
 \end{lstlisting}
 
-Since an \code{fmpz} in flint is just implemented as a 32 or 64 integer, this now 
-provides the same type in Nemo. We can directly call flint functions on objects of
-type \code{ZZ} (fortunately an \code{fmpz_t} is a pointer to an \code{fmpz} in 
-flint, so that Julia's habit of defining objects as heap allocated objects will 
-precisely result in an \code{fmpz_t}).
+By default, \code{ZZ} creates objects of the Flint \code{fmpz} type. This is achieved internally by
+setting \code{ZZ = FlintIntegerRing()}, which makes \code{ZZ} the unique object of type
+\code{FlintIntegerRing}.
+
+One can also create Flint integers using the \code{fmpz} constructor directly:
+
+\begin{lstlisting}
+fmpz(123)
+\end{lstlisting}
+
+In Nemo library code we use \code{fmpz} rather than \code{ZZ} since the latter is defined only for the
+convenience of the user and its definition may be changed by the user. It is also slightly more
+efficient to call \code{fmpz} directly, since \code{ZZ} is a global variable.
+
+The type of an \code{fmpz} object is \code{fmpz}. Thus the following returns \code{Nemo.fmpz}:
+
+\begin{lstlisting}
+typeof(fmpz(123))
+\end{lstlisting}
+
+An object of this type corresponds directly to the Flint \code{fmpz} C type.
+
+The parent of an \code{fmpz} object is the unique object of type \code{FlintIntegerRing}. Thus the
+following returns ``Integer Ring'':
+
+\begin{lstlisting}
+parent(fmpz(123))
+\end{lstlisting}
+
+The \code{FlintIntegerRing} type belongs to the \code{Ring} type class and the \code{fmpz} type
+belongs to the \code{RingElem} type class. Thus both of the following return true:
+
+\begin{lstlisting}
+fmpz <: RingElem
+FlintIntegerRing <: Ring
+\end{lstlisting}
 
 \subsubsection{Constructors}
 
-To create a bignum value, Nemo provides various constructors. Space is automatically
+Nemo provides various constructors for the \code{fmpz} type. Space is automatically
 recovered when the created object goes out of scope.
 
 \begin{lstlisting}
-ZZ()
+fmpz()
 \end{lstlisting}
 
-\desc{Creates an initialised \code{ZZ}. This function is only useful internally, 
-inside functions that can modify the value in an unsafe way, since the value of the
-created bignum is zero.}
+\desc{Creates an initialised \code{fmpz}. Its value will be $0$.}
 
 \begin{lstlisting}
-ZZ(n::Int)
+fmpz(n::Int)
 \end{lstlisting}
 
-\desc{Create a bignum with the given signed value $n$.}
+\desc{Create an \code{fmpz} with the given signed machine word value $n$.}
 
 \begin{lstlisting}
-ZZ(n::Uint)
+fmpz(n::BigInt)
 \end{lstlisting}
 
-\desc{Create a bignum with the given unsigned value $n$.}
+\desc{Create an \code{fmpz} with the given Julia \code{BigInt} value $n$.}
 
 \begin{lstlisting}
-ZZ(n::Bool)
+fmpz(n::Integer)
 \end{lstlisting}
 
-\desc{Create a bignum which is $1$ if $n$ is \code{true} or $0$ if $n$ is 
-\code{false}.}
+\desc{Create an \code{fmpz} with the given value $n$, where $n$ has any type belonging to the Julia
+\code{Integer} type class.}
 
 \begin{lstlisting}
-ZZ(s::String)
+fmpz(n::Float16)
+fmpz(n::Float32)
+fmpz(n::Float64)
+fmpz(n::BigFloat)
 \end{lstlisting}
 
-\desc{Create a bignum whose value is represented (in decimal) by the given string
+\desc{If $n$ is an exact integer, return the \code{fmpz} with the value $n$, otherwise raise an
+\code{InexactError}.}
+
+\begin{lstlisting}
+fmpz(s::String)
+\end{lstlisting}
+
+\desc{Create an \code{fmpz} whose value is represented (in decimal) by the given string
 $s$. The string should not contain any whitespace, and can optionally begin with
 a $-$ sign.}
 
 \begin{lstlisting}
-ZZ(x::Float64)
-\end{lstlisting}
-
-\desc{If $x$ represents an exact integer, create a bignum with that value. Otherwise
-an \code{InexactError()} exception is thrown.}
-
-\begin{lstlisting}
-ZZ(x::ZZ)
+fmpz(x::fmpz)
 \end{lstlisting}
 
 \desc{Returns a reference to $x$. No copy of the data is made.}
 
 \begin{lstlisting}
-deepcopy(x::ZZ)
+deepcopy(x::fmpz)
 \end{lstlisting}
 
-\desc{Create a new bignum whose value is arithmetically equal to that of $x$.}
+\desc{Create a new \code{fmpz} whose value is arithmetically equal to that of $x$.}
 
 \textbf{Examples.}
 
 Here are some examples of the above constructors.
 
 \begin{lstlisting}
-a = ZZ(-123)
-b = ZZ(12.0)
-c = ZZ("-1234567876545678376545678900000000000000000000000000")
-d = ZZ(c)
-e = deepcopy(c)
+a = fmpz(-123)
+b = fmpz(12.0)
+c = fmpz("-1234567876545678376545678900000000000000000000000000")
+d = fmpz(BigFloat(10)^100)
+e = fmpz(c)
+f = deepcopy(c)
 \end{lstlisting}
 
 \subsubsection{Basic manipulation}
 
-Various functions are provided to do basic manipulations in \code{ZZ}.
+Various functions are provided to do basic manipulations of \code{fmpz}'s.
 
 \begin{lstlisting}
-one(::Type{ZZ})
+one(::FlintIntegerRing)
 \end{lstlisting}
 
 \desc{Create the multiplicative identity element in the ring of integers.}
 
 \begin{lstlisting}
-zero(::Type{ZZ})
+zero(::FlintIntegerRing)
 \end{lstlisting}
 
 \desc{Create the additive identity element in the ring of integers.}
 
 \begin{lstlisting}
-isone(a::ZZ)
+isone(a::fmpz)
 \end{lstlisting}
 
-\desc{Return \code{true} if $a$ is the multiplicative identity $1$, otherewise
+\desc{Return \code{true} if $a$ is the multiplicative identity $1$, otherwise
 return \code{false}.}
 
 \begin{lstlisting}
-iszero(a::ZZ)
+iszero(a::fmpz)
 \end{lstlisting}
 
-\desc{Return \code{true} if $a$ is the additive identity $0$, otherewise
+\desc{Return \code{true} if $a$ is the additive identity $0$, otherwise
 return \code{false}.}
 
 \begin{lstlisting}
-sign(a::ZZ)
+isunit(a::fmpz)
+\end{lstlisting}
+
+\desc{Return \code{true} if $a = 1$ or $a = -1$, otherwise return \code{false}.}
+
+\begin{lstlisting}
+sign(a::fmpz)
 \end{lstlisting}
 
 \desc{Return either $-1$, $0$ or $1$ depending on whether the sign of $a$ is negative,
 zero or positive, respectively. The returned value is of type \code{Int}.}
 
 \begin{lstlisting}
-fits(::Type{Int}, a::ZZ)
-fits(::Type{Uint}, a::ZZ)
+fits(::Type{Int}, a::fmpz)
+fits(::Type{Uint}, a::fmpz)
 \end{lstlisting}
 
 \desc{Return \code{true} if the value $a$ will fit into a variable of the given
 type. Otherwise return \code{false}.}
 
 \begin{lstlisting}
-size(a::ZZ)
+size(a::fmpz)
 \end{lstlisting}
 
 \desc{Return the number of machine words that make up the bignum $a$. The
 returned value has type \code{Int}.}
 
 \begin{lstlisting}
-canonical_unit(a::ZZ)
+canonical_unit(a::fmpz)
 \end{lstlisting}
 
 \desc{This is used for canonicalising fractions. The function simply returns $-1$
 if $a < 0$, otherwise it returns $1$.}
 
 \begin{lstlisting}
-isunit(a::ZZ)
+num(a::fmpz)
 \end{lstlisting}
 
-\desc{Return \code{true} if $a = 1$ or $a = -1$, otherwise return \code{false}.}
+\desc{For convenience when working with rationals. Simply returns the value of \code{a}.}
+
+\begin{lstlisting}
+den(a::fmpz)
+\end{lstlisting}
+
+\desc{For convenience when working with rationals. Always returns \code{fmpz(1)}.}
 
 \textbf{Examples.}
 
 Here are some examples of the above basic manipulations.
 
 \begin{lstlisting}
-a = one(ZZ)
-b = zero(ZZ)
+a = one(FlintIntegerRing()) # by default one(ZZ) is the same thing 
+b = zero(FlintIntegerRing()) # by default zero(ZZ) is the same thing 
 
 if sign(a) < 0
    println("Negative")
@@ -1261,25 +766,26 @@ end
 
 s = size(a)
 
-t = canonical_unit(ZZ(-12))
+t = canonical_unit(fmpz(-12))
 
-u = isunit(ZZ(-1))
+u = isunit(fmpz(-1))
 v = iszero(b)
 w = isone(a)
 \end{lstlisting}
 
-\subsubsection{Binary operators and functions}
+\subsubsection{Binary operators}
 
-The following standard binary operators are provided for \code{ZZ}.
+The following standard binary operators are provided for \code{fmpz}. Note that \code{$} is Julia's
+xor operator.
 
 \begin{lstlisting}
-+(a::ZZ, b::ZZ)
--(a::ZZ, b::ZZ)
-*(a::ZZ, b::ZZ)
-%(a::ZZ, b::ZZ)
-&(a::ZZ, b::ZZ)
-|(a::ZZ, b::ZZ)
-$(a::ZZ, b::ZZ)
++(a::fmpz, b::fmpz)
+-(a::fmpz, b::fmpz)
+*(a::fmpz, b::fmpz)
+%(a::fmpz, b::fmpz)
+&(a::fmpz, b::fmpz)
+|(a::fmpz, b::fmpz)
+$(a::fmpz, b::fmpz)
 \end{lstlisting}
 
 Note that \code{%} follows the C (and Julia) convention of rounding the quotient
@@ -1288,61 +794,125 @@ towards zero. If $b = 0$ is passed to \code{%}, a \code{DivideError()} is thrown
 Julia automatically provides all of the combined assignment operators \code{+=, *=, &=}
 etc.
 
+Here are some examples of binary operators.
+
+\begin{lstlisting}
+a = fmpz(12)
+b = fmpz(26)
+
+c = a + b
+d = a - b
+\end{lstlisting}
+
+\subsubsection{Integer division}
+
 Various kinds of integer division are provided.
 
 \begin{lstlisting}
-fdiv(a::ZZ, b::ZZ)
-cdiv(a::ZZ, b::ZZ)
-tdiv(a::ZZ, b::ZZ)
-div(a::ZZ, b::ZZ)
+fdiv(a::fmpz, b::fmpz)
+cdiv(a::fmpz, b::fmpz)
+tdiv(a::fmpz, b::fmpz)
+div(a::fmpz, b::fmpz)
 \end{lstlisting}
 
 \desc{Integer division with rounding towards $-\infty$, $+\infty$ and $0$ respectively.
 Note \code{div} is a synonym for \code{tdiv}. If $b = 0$ is passed to any of these
 functions, a \code{DivideError()} is thrown.}
 
+Here are some examples of integer division.
+
 \begin{lstlisting}
-mod(a::ZZ, b::ZZ)
-rem(a::ZZ, b::ZZ)
-%(a::ZZ, b::ZZ)
+a = fmpz(12)
+b = fmpz(5)
+
+c = cdiv(a, b)
+d = fdiv(a, b)
+\end{lstlisting}
+
+\subsubsection{Remainder}
+
+\begin{lstlisting}
+mod(a::fmpz, b::fmpz)
+mod(x::fmpz, c::Int)
+rem(a::fmpz, b::fmpz)
+rem(x::fmpz, c::Int)
 \end{lstlisting}
 
 \desc{Integer remainder after division with rounding towards $-\infty$ and $0$
 respectively. Note that \code{\%} is a synonym for \code{rem}. If $b = 0$ is passed to 
 any of these functions, a \code{DivideError()} is thrown.}
 
+Here are some examples of the remainder functions.
+
 \begin{lstlisting}
-divexact(a::ZZ, b::ZZ)
+a = fmpz(12)
+b = fmpz(5)
+
+c = mod(a, b)
+d = rem(a, 3)
+\end{lstlisting}
+
+\subsubsection{Exact division}
+
+\begin{lstlisting}
+divexact(a::fmpz, b::fmpz)
+divexact(x::fmpz, c::Int)
 \end{lstlisting}
 
 \desc{Exact integer division. This is more efficient than the above division functions,
 but will only return a meaningful result if the division is exact, i.e. if $b$ divides
 $a$. If $b = 0$ is passed to this function, a \code{DivideError()} is thrown.}
 
+Here is an example of exact division.
+
 \begin{lstlisting}
-gcd(a::ZZ, b::ZZ)
+a = fmpz(12)
+b = fmpz(6)
+
+c = divexact(a, b)
+c = divexact(a, 2)
+\end{lstlisting}
+
+\subsubsection{GCD and LCM}
+
+\begin{lstlisting}
+gcd(a::fmpz, b::fmpz)
 \end{lstlisting}
 
 \desc{Returns the greatest common divisor of $a$ and $b$. For convenience, 
 gcd$(a, 0) = a$ and gcd$(0, b) = b$. The returned value is always nonnegative.}
 
 \begin{lstlisting}
-lcm(a::ZZ, b::ZZ)
+lcm(a::fmpz, b::fmpz)
 \end{lstlisting}
 
 \desc{Returns the lowest common multiple of $a$ and $b$, i.e. $ab/\gcd(a, b)$ if
 $a, b > 0$. For convenience, lcm$(a, 0) = 0$ and lcm$(0, b) = 0$. The returned
 value is always nonnegative.}
 
+Here are some examples of GCD and LCM.
+
 \begin{lstlisting}
-flog(a::ZZ, b::ZZ)
+a = fmpz(12)
+b = fmpz(15)
+
+c = gcd(a, b)
+d = lcm(a, b)
+\end{lstlisting}
+
+\subsubsection{Integer logarithms}
+
+\begin{lstlisting}
+flog(a::fmpz, b::fmpz)
+flog(a::fmpz, b::Int)
 \end{lstlisting}
 
 \desc{Returns $\log_b(a)$ rounded towards $0$. Both $a$ and $b$ are required
 to be positive, otherwise a \code{DomainError()} exception is thrown.}
 
 \begin{lstlisting}
-clog(a::ZZ, b::ZZ)
+clog(a::fmpz, b::fmpz)
+clog(a::fmpz, b::Int)
 \end{lstlisting}
 
 \desc{Returns $\log_b(a)$ rounded towards $\infty$. Both $a$ and $b$ are required
@@ -1350,110 +920,134 @@ to be positive, otherwise a \code{DomainError()} exception is thrown.}
 
 \textbf{Examples.}
 
-Here are some examples of the binary operators and functions.
+Here are some examples of integer logarithms.
 
 \begin{lstlisting}
-a = ZZ(12)
-b = ZZ(26)
+a = fmpz(12)
+b = fmpz(3)
 
-c = a + b
-d = a - b
-e = gcd(a, b)
-f = lcm(a, b)
+c = clog(a, b)
+d = flog(a, 2)
 \end{lstlisting}
 
-\subsubsection{Ad hoc operators and functions}
+\subsubsection{Ad hoc operators}
 
 Since the Julia types \code{Int} and \code{Uint} cannot be made members of the
 \code{Ring} class, we must define some ad hoc operators, so that values of type
-\code{ZZ} can be more easily combined with \code{Int} and \code{Uint} values.
+\code{fmpz} can be more easily combined with \code{Int} and \code{Uint} values.
 
 \begin{lstlisting}
-+(x::ZZ, c::Uint)
-+(x::ZZ, c::Int)
-+(x::Uint, c::ZZ)
-+(x::Int, c::ZZ)
--(x::ZZ, c::Uint)
--(x::ZZ, c::Int)
--(x::Uint c::ZZ)
--(x::Int, c::ZZ)
-*(x::ZZ, c::Uint)
-*(x::ZZ, c::Int)
-*(x::Uint, c::ZZ)
-*(x::Int, c::ZZ)
++(x::fmpz, c::Integer)
++(x::fmpz, c::Int)
++(x::Integer, c::fmpz)
++(x::Int, c::fmpz)
+-(x::fmpz, c::Integer)
+-(x::fmpz, c::Int)
+-(x::Integer c::fmpz)
+-(x::Int, c::fmpz)
+*(x::fmpz, c::Integer)
+*(x::fmpz, c::Int)
+*(x::Integer, c::fmpz)
+*(x::Int, c::fmpz)
+%(x::fmpz, c::Int)
 \end{lstlisting}
 
-We also define the following, which have the same semantics as the corresponding
-binary operators and functions above.
+Here are some examples of the ad hoc operators.
 
 \begin{lstlisting}
-tdiv(x::ZZ, c::Int)
-fdiv(x::ZZ, c::Int)
-cdiv(x::ZZ, c::Int)
-div(x::ZZ, c::Int)
-rem(x::ZZ, c::Int)
-mod(x::ZZ, c::Int)
-%(x::ZZ, c::Int)
-divexact(x::ZZ, c::Int)
-flog(x::ZZ, c::Int)
-clog(x::ZZ, c::Int)
+a = fmpz(-12)
+
+b = 3 + a
+c = a + 3
+d = a - 3
+e = 5 - a
+f = a % 7
 \end{lstlisting}
+
+\subsubsection{Ad hoc division}
+
+We also define the following, which have the same semantics as the corresponding functions above.
+
+\begin{lstlisting}
+tdiv(x::fmpz, c::Int)
+fdiv(x::fmpz, c::Int)
+cdiv(x::fmpz, c::Int)
+div(x::fmpz, c::Int)
+\end{lstlisting}
+
+Here are some examples of ad hoc division.
+
+\begin{lstlisting}
+a = fmpz(-12)
+
+b = tdiv(a, 5)
+c = cdiv(a, 3)
+\end{lstlisting}
+
+\subsubsection{Binary shifting}
+
+We also define the following, which have the same semantics as the corresponding functions above.
 
 There are also shift operators, which require the shift to be of type \code{Int}.
 
 \begin{lstlisting}
-<<(x::ZZ, c::Int)
+<<(x::fmpz, c::Int)
 \end{lstlisting}
 
 \desc{Return $2^c x$.}
 
 \begin{lstlisting}
-fdivpow2(x::ZZ, c::Int)
-cdivpow2(x::ZZ, c::Int)
-tdivpow2(x::ZZ, c::Int)
->>(x::ZZ, c::Int)
+fdivpow2(x::fmpz, c::Int)
+cdivpow2(x::fmpz, c::Int)
+tdivpow2(x::fmpz, c::Int)
+>>(x::fmpz, c::Int)
 \end{lstlisting}
 
 \desc{Return $x/2^c$ with rounding towards $-\infty$, $+\infty$ and $0$ respectively. 
 Note that \code{>>} is a synonym for \code{fdivpow2}.}
 
+Here are some examples of binary shifting.
+
+\begin{lstlisting}
+a = fmpz(-12)
+
+b = a << 3
+c = a >> 1
+d = fdivpow2(a, 2)
+\end{lstlisting}
+
+\subsubsection{Powering}
+
 There is also the caret operator, which is used for powering in Julia (and Nemo), in
 line with the mathematical convention.
 
 \begin{lstlisting}
-^(x::ZZ, a::Uint)
-^(x::ZZ, a::Int)
+^(x::fmpz, a::Uint)
+^(x::fmpz, a::Int)
 \end{lstlisting}
 
 \desc{Return $x^a$. Requires $a \geq 0$.}
 
 \textbf{Examples.}
 
-Here are some examples of the ad hoc operators and functions.
+Here is an example of the caret operator.
 
 \begin{lstlisting}
-a = ZZ(-12)
+a = fmpz(-12)
 
-b = 3 + a
-c = a + 3
-d = a - 3
-e = 5 - a
-f = rem(a, 7)
-g = a >> 3
-h = fdivpow2(a,2)
-j = a^10
+b = a^10
 \end{lstlisting}
 
 \subsubsection{Comparison operators and functions}
 
-The following standard comparison operators are provided for \code{ZZ}.
+The following standard comparison operators are provided for \code{fmpz}.
 
 \begin{lstlisting}
-==(a::ZZ, b::ZZ)
->(a::ZZ, b::ZZ)
-<(a::ZZ, b::ZZ)
-<=(a::ZZ, b::ZZ)
->=(a::ZZ, b::ZZ)
+==(a::fmpz, b::fmpz)
+>(a::fmpz, b::fmpz)
+<(a::fmpz, b::fmpz)
+<=(a::fmpz, b::fmpz)
+>=(a::fmpz, b::fmpz)
 \end{lstlisting}
 
 Julia automatically provides a \code{!=} operator.
@@ -1463,22 +1057,22 @@ Note that all these comparisons yield a result of type \code{Bool}.
 There are also the following functions.
 
 \begin{lstlisting}
-isequal(x::ZZ, y::ZZ)
+isequal(x::fmpz, y::fmpz)
 \end{lstlisting}
 
-\desc{For \code{ZZ} this is just an alias for the \code{==} operator.}
+\desc{For \code{fmpz} this is just an alias for the \code{==} operator.}
 
 \begin{lstlisting}
-cmp(x::ZZ, y::ZZ)
+cmp(x::fmpz, y::fmpz)
 \end{lstlisting}
 
-\desc{Return a negative integer if $x < y$, a positive integer if $x > y$ and zero if $x = y$.}
+\desc{Return $-1$ if $x < y$, $1$ if $x > y$ and $0$ if $x = y$.}
 
 \begin{lstlisting}
-cmpabs(x::ZZ, y::ZZ)
+cmpabs(x::fmpz, y::fmpz)
 \end{lstlisting}
 
-\desc{Return a negative integer if $|x| < |y|$, a positive integer if $|x| > |y|$ and zero if 
+\desc{Return $-1$ if $|x| < |y|$, $1$ if $|x| > |y|$ and $0$ if 
 $|x| = |y|$, where $|x|$ is the absolute value of $x$.}
 
 \textbf{Examples.}
@@ -1486,8 +1080,8 @@ $|x| = |y|$, where $|x|$ is the absolute value of $x$.}
 Here are some examples of the comparison operators and functions.
 
 \begin{lstlisting}
-a = ZZ(-12)
-b = ZZ(5)
+a = fmpz(-12)
+b = fmpz(5)
 
 if a < b
    println("a < b")
@@ -1503,16 +1097,16 @@ end
 We overload the comparison operators to more easily deal with values of type \code{Int}.
 
 \begin{lstlisting}
-==(a::ZZ, b::Int)
-==(a::Int, b::ZZ)
->(a::ZZ, b::Int)
->(a::Int, b::ZZ)
-<(a::ZZ, b::Int)
-<(a::Int, b::ZZ)
-<=(a::ZZ, b::Int)
-<=(a::Int, b::ZZ)
->=(a::ZZ, b::Int)
->=(a::Int, b::ZZ)
+==(a::fmpz, b::Int)
+==(a::Int, b::fmpz)
+>(a::fmpz, b::Int)
+>(a::Int, b::fmpz)
+<(a::fmpz, b::Int)
+<(a::Int, b::fmpz)
+<=(a::fmpz, b::Int)
+<=(a::Int, b::fmpz)
+>=(a::fmpz, b::Int)
+>=(a::Int, b::fmpz)
 \end{lstlisting}
 
 \textbf{Examples.}
@@ -1520,7 +1114,7 @@ We overload the comparison operators to more easily deal with values of type \co
 Here are some examples of the ad hoc comparison operators.
 
 \begin{lstlisting}
-a = ZZ(-12)
+a = fmpz(-12)
 
 if a < 7
    println("a < 7")
@@ -1531,43 +1125,52 @@ if a == -12
 end
 \end{lstlisting}
 
-\subsubsection{Unary operators and functions}
+\subsubsection{Unary operators}
 
 \begin{lstlisting}
--(x::ZZ)
+-(x::fmpz)
 \end{lstlisting}
 
 \desc{Return $-x$.}
 
 \begin{lstlisting}
-~(x::ZZ)
+~(x::fmpz)
 \end{lstlisting}
 
 \desc{Return the bignum corresponding to logical complement of the twos 
 complement representation of x, namely $-x - 1$.}
 
+Here are some examples of the unary operators.
+
 \begin{lstlisting}
-abs(x::ZZ)
+a = -fmpz(12)
+b = ~fmpz(-5)
+\end{lstlisting}
+
+\subsubsection{Absolute value}
+
+\begin{lstlisting}
+abs(x::fmpz)
 \end{lstlisting}
 
 \desc{Return the absolute value of $x$, i.e. $x$ if $x >= 0$ and $-x$ otherwise.}
 
 \textbf{Examples.}
 
-Here are some examples of the unary operators and functions.
+Here is an example of the absolute value function.
 
 \begin{lstlisting}
-a = -ZZ(12)
-b = ~ZZ(-5)
-c = abs(a)
+a = fmpz(-12)
+
+b = abs(a)
 \end{lstlisting}
 
 \subsubsection{Division with remainder}
 
 \begin{lstlisting}
-fdivrem(a::ZZ, b::ZZ)
-tdivrem(a::ZZ, b::ZZ)
-divrem(a::ZZ, b::ZZ)
+fdivrem(a::fmpz, b::fmpz)
+tdivrem(a::fmpz, b::fmpz)
+divrem(a::fmpz, b::fmpz)
 \end{lstlisting}
 
 \desc{Return a tuple $(q, r)$ consisting of the quotient and remainder after 
@@ -1577,24 +1180,24 @@ of these functions a \code{DivideError()} is thrown.}
 
 \textbf{Examples.}
 
-Here are some examples of the unary operators and functions.
+Here are some examples of the division with remainder functions.
 
 \begin{lstlisting}
-q, r = fdivrem(ZZ(12), ZZ(5))
-q, r = tdivrem(ZZ(12), ZZ(5))
+q, r = fdivrem(fmpz(12), fmpz(5))
+q, r = tdivrem(fmpz(12), fmpz(5))
 \end{lstlisting}
 
 \subsubsection{Roots}
 
 \begin{lstlisting}
-isqrt(x::ZZ)
+isqrt(x::fmpz)
 \end{lstlisting}
 
 \desc{Return the square root of $x$, rounded down to the nearest integer. If $x < 0$
 a \code{DomainError()} is thrown.}
 
 \begin{lstlisting}
-isqrtrem(x::ZZ)
+isqrtrem(x::fmpz)
 \end{lstlisting}
 
 \desc{Return a tuple $(s, r)$ consisting of the square root of $x$, rounded down to the 
@@ -1602,7 +1205,7 @@ nearest integer and the remainder, i.e. $r = x - s^2$. If $x < 0$ a \code{Domain
 is thrown.}
 
 \begin{lstlisting}
-root(x::ZZ, n::Int)
+root(x::fmpz, n::Int)
 \end{lstlisting}
 
 \desc{Return the $n$-th root of $x$, rounded down to the nearest integer. If $x < 0$ and
@@ -1614,15 +1217,15 @@ thrown.}
 Here are some examples of the root taking functions.
 
 \begin{lstlisting}
-s = isqrt(ZZ(12))
-s, r = isqrtrem(ZZ(12))
-r = root(ZZ(1000), 3)
+s = isqrt(fmpz(12))
+s, r = isqrtrem(fmpz(12))
+r = root(fmpz(1000), 3)
 \end{lstlisting}
 
 \subsubsection{Extended GCD}
 
 \begin{lstlisting}
-xgcd(a::ZZ, b::ZZ)
+gcdx(a::fmpz, b::fmpz)
 \end{lstlisting}
 
 \desc{Return a tuple $(g, s, t)$ consisting of the greatest common divisor of $a$ and $b$
@@ -1630,7 +1233,7 @@ and values $s$ and $t$ such that $g = as + bt$, with $-b \leq s \leq b$ and
 $-a \leq t \leq a$.}
 
 \begin{lstlisting}
-gcdinv(a::ZZ, b::ZZ)
+gcdinv(a::fmpz, b::fmpz)
 \end{lstlisting}
 
 \desc{Return a tuple $(g, s)$ consisting of the greatest common divisor of $a$ and $b$
@@ -1642,8 +1245,8 @@ $g = as + bt$. If $a < 0$ or $b < a$, a \code{DomainError()} is thrown.}
 Here are some examples of the extended GCD functions.
 
 \begin{lstlisting}
-g, s, t = xgcd(ZZ(12), ZZ(5))
-g, s = gcdinv(ZZ(5), ZZ(12))
+g, s, t = gcdx(fmpz(12), fmpz(5))
+g, s = gcdinv(fmpz(5), fmpz(12))
 \end{lstlisting}
 
 \subsubsection{Bit twiddling}
@@ -1651,35 +1254,35 @@ g, s = gcdinv(ZZ(5), ZZ(12))
 Various functions are provided to deal with bignums on a binary bit level.
 
 \begin{lstlisting}
-popcount(x::ZZ)
+popcount(x::fmpz)
 \end{lstlisting}
 
 \desc{Return the number of binary ones in the binary representation of $x$. If $x < 0$ the
 function will return $0$. The result that is returned is of type \code{Int}.}
 
 \begin{lstlisting}
-prevpow2(x::ZZ)
+prevpow2(x::fmpz)
 \end{lstlisting}
 
 \desc{Return the largest power of $2$ which does not exceed $x$. If $x < 0$ the result is
 set to \code{-prevpow2(-x)}.}
 
 \begin{lstlisting}
-nextpow2(x::ZZ)
+nextpow2(x::fmpz)
 \end{lstlisting}
 
 \desc{Return the smallest power of $2$ which is not less than $x$. If $x < 0$ the result is
 set to \code{-nextpow2(-x)}.}
 
 \begin{lstlisting}
-trailing_zeros(x::ZZ)
+trailing_zeros(x::fmpz)
 \end{lstlisting}
 
 \desc{Return the number of trailing zeros in the binary representation of the absolute
 value of $x$.}
 
 \begin{lstlisting}
-clrbit!(x::ZZ, n::Int)
+clrbit!(x::fmpz, n::Int)
 \end{lstlisting}
 
 \desc{Set bit $n$ in the binary representation of the absolute value of $x$ to $0$. Bits
@@ -1688,7 +1291,7 @@ not return the result, but alters the value of $x$. This is an unsafe operation 
 change the value of all variables which contain a reference to $x$.}
 
 \begin{lstlisting}
-setbit!(x::ZZ, n::Int)
+setbit!(x::fmpz, n::Int)
 \end{lstlisting}
 
 \desc{Set bit $n$ in the binary representation of the absolute value of $x$ to $1$. Bits
@@ -1697,7 +1300,7 @@ not return the result, but alters the value of $x$. This is an unsafe operation 
 change the value of all variables which contain a reference to $x$.}
 
 \begin{lstlisting}
-combit!(x::ZZ, n::Int)
+combit!(x::fmpz, n::Int)
 \end{lstlisting}
 
 \desc{Complement bit $n$ in the binary representation of the absolute value of $x$. Bits
@@ -1710,7 +1313,7 @@ change the value of all variables which contain a reference to $x$.}
 Here are some examples of the bit twiddling functions.
 
 \begin{lstlisting}
-a = ZZ(12)
+a = fmpz(12)
 
 p = popcount(a)
 b = nextpow2(a)
@@ -1720,38 +1323,38 @@ combit!(a, 2)
 \subsubsection{Alternative bases}
 
 \begin{lstlisting}
-base(n::ZZ, b::Int)
+base(n::fmpz, b::Int)
 \end{lstlisting}
 
 \desc{Return a unicode string giving the representation of $n$ in the given base $b$. Valid
 bases are $2 \leq b \leq 62$. If an invalid base is applied an error is raised.}
 
 \begin{lstlisting}
-bin(n::ZZ)
+bin(n::fmpz)
 \end{lstlisting}
 
 \desc{Return a unicode string giving the representation of $n$ in binary, i.e. base $2$.}
 
 \begin{lstlisting}
-oct(n::ZZ)
+oct(n::fmpz)
 \end{lstlisting}
 
 \desc{Return a unicode string giving the representation of $n$ in octal, i.e. base $8$.}
 
 \begin{lstlisting}
-dec(n::ZZ)
+dec(n::fmpz)
 \end{lstlisting}
 
 \desc{Return a unicode string giving the representation of $n$ in decimal, i.e. base $10$.}
 
 \begin{lstlisting}
-hex(n::ZZ)
+hex(n::fmpz)
 \end{lstlisting}
 
 \desc{Return a unicode string giving the representation of $n$ in hexadecimal, i.e. base $16$.}
 
 \begin{lstlisting}
-ndigits(n::ZZ, b::Integer = 10)
+ndigits(n::fmpz, b::Integer = 10)
 \end{lstlisting}
 
 \desc{Return an \code{Int} representing the number of digits required to represent the
@@ -1759,7 +1362,7 @@ absolute value of $n$ as a string in base $b$. The default is $b = 10$. Note tha
 always requires one digit as a string.}
 
 \begin{lstlisting}
-nbits(n::ZZ)
+nbits(n::fmpz)
 \end{lstlisting}
 
 \desc{Return an \code{Int} representing the number of bits required to represent the
@@ -1771,7 +1374,7 @@ bits.}
 Here are some examples of the functions for alternative bases.
 
 \begin{lstlisting}
-a = ZZ(12)
+a = fmpz(12)
 
 s1 = bin(a)
 s2 = base(a, 13)
@@ -1782,7 +1385,7 @@ n2 = ndigits(a, 3)
 \subsubsection{String I/O}
 
 \begin{lstlisting}
-string(x::ZZ)
+string(x::fmpz)
 \end{lstlisting}
 
 \desc{Return a unicode string representation of the value of $x$ in decimal, including the sign
@@ -1793,34 +1396,35 @@ if $x < 0$.}
 Here is an example of string I/O.
 
 \begin{lstlisting}
-a = ZZ(12)
-s = string(a)
-println(s[1])
+a = fmpz(12)
+
+string(a)
 \end{lstlisting}
 
 \subsubsection{Modular arithmetic}
 
 \begin{lstlisting}
-powmod(x::ZZ, p::ZZ, m::ZZ)
+mod(x::fmpz, y::fmpz)
+\end{lstlisting}
+
+\desc{Return the Euclidean remainder of $a$ by $b$. If $m = 0$ a \code{DivideError()} is thrown.}
+
+\begin{lstlisting}
+powmod(x::fmpz, p::Int, m::fmpz)
+powmod(x::fmpz, p::fmpz, m::fmpz)
 \end{lstlisting}
 
 \desc{Return $x^p \pmod{m}$. If $m \leq 0$ a \code{DomainError()} is thrown.}
 
 \begin{lstlisting}
-powmod(x::ZZ, p::Int, m::ZZ)
-\end{lstlisting}
-
-\desc{Return $x^p \pmod{m}$. If $m \leq 0$ a \code{DomainError()} is thrown.}
-
-\begin{lstlisting}
-invmod(x::ZZ, m::ZZ)
+invmod(x::fmpz, m::fmpz)
 \end{lstlisting}
 
 \desc{Return $x^{-1} \pmod{m}$. If $m \leq 0$ a \code{DomainError()} is thrown. If
 an impossible inverse is encountered, an exception is thrown.}
 
 \begin{lstlisting}
-gcdinv(x::ZZ, m::ZZ)
+gcdinv(x::fmpz, m::fmpz)
 \end{lstlisting}
 
 \desc{Returns the pair \code{g, xinv} where $g$ is the greatest common divisor of
@@ -1828,7 +1432,7 @@ $x$ and $m$ and \code{xinv} is $x^{-1} \pmod{m}$. If $m \leq 0$ a
 \code{DomainError()} is thrown.}
 
 \begin{lstlisting}
-sqrtmod(x::ZZ, m::ZZ)
+sqrtmod(x::fmpz, m::fmpz)
 \end{lstlisting}
 
 \desc{Return the square root of $x$ modulo $m$. If $m \leq 0$ a \code{DomainError()}
@@ -1837,8 +1441,8 @@ be prime. This condition is not checked and an infinite loop may result if $m$ i
 not prime.}
 
 \begin{lstlisting}
-crt(r1::ZZ, m1::ZZ, r2::ZZ, m2::ZZ, sign::Bool)
-crt(r1::ZZ, m1::ZZ, r2::Int, m2::Int, sign::Bool)
+crt(r1::fmpz, m1::fmpz, r2::fmpz, m2::fmpz, sign = false)
+crt(r1::fmpz, m1::fmpz, r2::Int, m2::Int, sign = false)
 \end{lstlisting}
 
 \desc{Return a value $r$ such that $r \equiv r1 \pmod {m1}$ and $r \equiv r2 \pmod{m2}$.
@@ -1850,50 +1454,50 @@ If \code{sign = true} the value will be in the range \code{-m1*m2/2 < r <= m1*m2
 Here are some examples of modular arithmetic.
 
 \begin{lstlisting}
-a = powmod(ZZ(12), ZZ(110), ZZ(13))
-a = powmod(ZZ(12), 110, ZZ(13))
-b = invmod(ZZ(12), ZZ(13))
-c = sqrtmod(ZZ(12), ZZ(13))
-d = crt(ZZ(5), ZZ(13), ZZ(7), ZZ(37), true)
+a = powmod(fmpz(12), fmpz(110), fmpz(13))
+a = powmod(fmpz(12), 110, fmpz(13))
+b = invmod(fmpz(12), fmpz(13))
+c = sqrtmod(fmpz(12), fmpz(13))
+d = crt(fmpz(5), fmpz(13), fmpz(7), fmpz(37), true)
 \end{lstlisting}
 
 \subsubsection{Number theoretic/combinatorial functions}
 
 \begin{lstlisting}
-divisible(x::ZZ, y::ZZ)
-divisible(x::ZZ, y::Int)
+divisible(x::fmpz, y::fmpz)
+divisible(x::fmpz, y::Int)
 \end{lstlisting}
 
 \desc{Return \code{true} if $x$ is divisible by $y$, otherwise return \code{false}. If
 $y = 0$ a \code{DivideError()} is raised.}
 
 \begin{lstlisting}
-issquare(x::ZZ)
+issquare(x::fmpz)
 \end{lstlisting}
 
 \desc{Return \code{true} if $x$ is a perfect square, otherwise return \code{false}.}
 
 \begin{lstlisting}
-isprime(x::ZZ)
+isprime(x::fmpz)
 \end{lstlisting}
 
 \desc{Return \code{true} if $x$ is prime, otherwise return \code{false}.}
 
 \begin{lstlisting}
-isprobabprime(x::ZZ)
+isprobabprime(x::fmpz)
 \end{lstlisting}
 
 \desc{Return \code{true} if $x$ is very probably prime, otherwise return \code{false}.}
 
 \begin{lstlisting}
-remove(x::ZZ, y::ZZ)
+remove(x::fmpz, y::fmpz)
 \end{lstlisting}
 
-\desc{Returns a pair $(n, z)$ where $n$ is an \code{Int} and $z$ a \code{ZZ} such that
+\desc{Returns a pair $(n, z)$ where $n$ is an \code{Int} and $z$ a \code{fmpz} such that
 $x = y^nz$ and $z$ is not divisible by $y$. If $y = 0$ a \code{DivideError()} is thrown.}
 
 \begin{lstlisting}
-divisor_lenstra(n::ZZ, r::ZZ, m::ZZ)
+divisor_lenstra(n::fmpz, r::fmpz, m::fmpz)
 \end{lstlisting}
 
 \desc{If $n$ has a factor which lies in the residue class $r \pmod{m}$ for $0 < r < m < n$,
@@ -1905,11 +1509,11 @@ checked.}
 fac(n::Int)
 \end{lstlisting}
 
-\desc{Return as a \code{ZZ} the factorial of $n$, i.e. $n(n - 1)(n - 2)\ldots 1$.
+\desc{Return as a \code{fmpz} the factorial of $n$, i.e. $n(n - 1)(n - 2)\ldots 1$.
 If $n < 0$ we throw a \code{DomainError()}.}
 
 \begin{lstlisting}
-risingfac(x::ZZ, n::Int)
+risingfac(x::fmpz, n::Int)
 risingfac(x::Int, n::Int)
 \end{lstlisting}
 
@@ -1920,7 +1524,7 @@ If $n < 0$ we throw a \code{DomainError()}.}
 primorial(n::Int)
 \end{lstlisting}
 
-\desc{Return as a \code{ZZ} the primorial of $n$, i.e. the product of all primes
+\desc{Return as a \code{fmpz} the primorial of $n$, i.e. the product of all primes
 less than or equal to $n$. If $n < 0$ we throw a \code{DomainError()}.}
 
 \begin{lstlisting}
@@ -1936,32 +1540,32 @@ We return fib$(0) = 0$. If $n < 0$ we throw a \code{DomainError()}.}
 binom(n::Int, k::Int)
 \end{lstlisting}
 
-\desc{Return as a \code{ZZ} the binomial coefficient $\frac{n!}{(n - k)!k!}$. If
+\desc{Return as a \code{fmpz} the binomial coefficient $\frac{n!}{(n - k)!k!}$. If
 $n, k < 0$ or $k > n$ we return $0$.}
 
 \begin{lstlisting}
-moebiusmu(x::ZZ)
+moebiusmu(x::fmpz)
 \end{lstlisting}
 
 \desc{Returns the M\"{o}bius mu function of $x$ as an \code{Int}. The value returned is
 either $-1$, $0$ or $1$. If $x < 0$ we throw a \code{DomainError()}.}
 
 \begin{lstlisting}
-jacobi(x::ZZ, y::ZZ)
+jacobi(x::fmpz, y::fmpz)
 \end{lstlisting}
 
 \desc{Return the value of the Jacobi symbol $\ljk{x}{y}$. If $y \leq x$ or $x < 0$ we
 throw a \code{DomainError()}.}
 
 \begin{lstlisting}
-sigma(x::ZZ, y::Int)
+sigma(x::fmpz, y::Int)
 \end{lstlisting}
 
 \desc{Return the value of the sigma function, i.e. $\sum_{0 < d \;| x} d^y$. If $y < 0$
 we throw a \code{DomainError()}.}
 
 \begin{lstlisting}
-eulerphi(x::ZZ)
+eulerphi(x::fmpz)
 \end{lstlisting}
 
 \desc{Return the value of the Euler phi function, i.e. the number of $0 < d \leq x$ such
@@ -1972,47 +1576,30 @@ that gcd$(d, x) = 1$. If $x < 0$ we throw a \code{DomainError()}.}
 Here are some examples of number theoretic and combinatorial functions.
 
 \begin{lstlisting}
-if isprime(ZZ(13))
+if isprime(fmpz(13))
    println("13 is prime")
 end
 
 n = fac(100)
-s = sigma(ZZ(128), 10)
-a = eulerphi(ZZ(12480))
+s = sigma(fmpz(128), 10)
+a = eulerphi(fmpz(12480))
 \end{lstlisting}
 
-\subsection{Polynomial rings}
+\subsection{Polynomials : generic}
 
 Nemo has a parametric polynomial type (called \code{Poly}). There's not any need to deal
 directly with the type, as we provide a function \code{PolynomialRing} for constructing
 it.
 
-For completeness, we describe here how the \code{Poly} type works. The user not interested
-in the ugly internals can skip forward to the section on constructors.
+The type takes a parameter, namely the type of ring element that the coefficients will
+have, e.g. if there was no special type for Flint polynomials over the integers, the
+type of polynomials over the integers would be \code|Poly{fmpz}|.
 
-The type takes two parameters, the first a ring $T$ on which it is parameterised, and a
-symbol, representing the variable, e.g. the type of polynomials over the integers in $x$, 
-i.e. the type of $\Z[x]$, is \code|Poly{ZZ, :x}|.
+Generic polynomials have parent \code{PolynomialRing}, which is also parameterised by the
+type of the ring element of the polynomial coefficients, just as for the \code{Poly} type.
 
-Internally, we specialise the polynomial type to use flint structures where available.
-
-For generic polynomials, for which there is no flint type (e.g. polynomials over another
-polynomial ring) we use a Julia \code{Array}, containing coefficients of type $T$, where 
-$T$ is in the \code{Ring} class.
-
-To define our general \code{Poly} type we take a naive union of all the fields of the
-requisite flint types, plus a generic Julia array for generic polynomials. (We could use
-a Julia union type here, but this incurs an additional overhead that we prefer to avoid.)
-
-\begin{lstlisting}
-type Poly{T <: Ring, S} <: Ring
-   arr::Ptr{Void}
-   length::Int
-   alloc::Int
-   inv::Int
-   coeffs :: Array{T, 1}
-end
-\end{lstlisting}
+We have that \code{PolynomialRing} belongs to the \code{Ring} type class and \code{Poly}
+belongs to the \code{RingElem} type class.
 
 \subsubsection{Constructors}
 
@@ -2020,14 +1607,14 @@ Because dealing with the Julia types directly is somewhat messy, we provide a si
 function to create the type of a polynomial in Nemo.
 
 \begin{lstlisting}
-PolynomialRing{T <: Ring}(::Type{T}, s::String)
+PolynomialRing{T <: Ring}(::T, s::String)
 \end{lstlisting}
 
-\desc{This function takes a type $T$ which belongs to the \code|Ring| class 
-(e.g. \code|T = ZZ|) and a string giving the string representation of a variable (e.g. 
-\code|"x"|) and returns a tuple \code|(R, x)| consisting of the type of the polynomial
-ring being constructed, \code|R|, and the degree $1$ polynomial \code|x| in this ring. 
-Here \code|S| is the symbol corresponding to the string \code|s|.}
+\desc{This function takes a parent object which belongs to the \code|Ring| class 
+(e.g. \code|T = ZZ|), specifying the ring that the polynomial coefficients are to 
+belong to, and a \code{String} giving the string representation of a variable (e.g. 
+\code|"x"|). It returns a tuple \code|(R, x)| consisting of the parent of the polynomial
+ring being constructed, \code|R|, and the degree $1$ polynomial \code|x| in this ring.}
 
 This is easier to understand by giving an example
 
@@ -2046,25 +1633,38 @@ be the same as the string \code{"x"}. The latter is simply how \code{x} will pri
 when we evaluate it. Of course, in most situations it is convenient to use the same 
 letter for the variable and for the string.
 
-Once we have constructed a polynomial type \code|R = Poly{T, S}| as above, we can
-use it to construct polynomials of various kinds.
+Once we have constructed a polynomial ring as above, we can use it to construct
+polynomials of various kinds.
+
+This is achieved by making the parent object of the ring callable. In the following
+we assume that \code{S} is a parent object of a polynomial ring, e.g. created by
+the following:
 
 \begin{lstlisting}
-Poly{T <: Ring, S}()
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
 \end{lstlisting}
 
-\desc{Construct a polynomial of length $0$ of the given type.}
+The parent object \code{S} is made callable in Nemo by overloading the Julia
+\code{call} operator for polynomial ring parent objects. The type \code{T}
+below will refer to the type of the polynomial coefficients.
 
 \begin{lstlisting}
-Poly{T <: Ring, S}(a::Integer)
-Poly{T <: Ring, S}(a::T)
+S()
+\end{lstlisting}
+
+\desc{Construct a polynomial of length $0$ in the given polynomial ring.}
+
+\begin{lstlisting}
+S(a::Integer)
+S(a::T)
 \end{lstlisting}
 
 \desc{Construct a polynomial of length $1$ whose constant coefficient is $a$ if
 $a \neq 0$, otherwise construct the zero polynomial.}
 
 \begin{lstlisting}
-Poly(::Type{Poly{T <: Ring, S}}, a::Array{T, 1})
+S(a::Array{T, 1})
 \end{lstlisting}
 
 \desc{Construct a polynomial whose coefficients are given by the elements of the array
@@ -2072,13 +1672,13 @@ Poly(::Type{Poly{T <: Ring, S}}, a::Array{T, 1})
 initialised, otherwise an exception may result.}
 
 \begin{lstlisting}
-Poly{T <: Ring, S}(a::Poly{T, S})
+S(a::Poly{T})
 \end{lstlisting}
 
 \desc{Return a reference to the polynomial \code{a}.}
 
 \begin{lstlisting}
-Poly{T <: Ring, S, R <: Ring}(a::R)
+S{R <: Ring}(a::R)
 \end{lstlisting}
 
 \desc{Try to convert the value \code{a} to the polynomial type parameterised by 
@@ -2104,7 +1704,7 @@ h = S(x^2 + 2x + 1)
 
 j = T(x + 2)
 
-k = Poly(S, [x, x + 2, x^2 + 3x + 1])
+k = S([x, x + 2, x^2 + 3x + 1])
 
 l = S(k)
 \end{lstlisting}

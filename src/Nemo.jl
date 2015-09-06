@@ -1,13 +1,13 @@
 module Nemo
 
-import Base: abs, asin, asinh, atan, atanh, base, bin, call, convert, cos,
-             cosh, dec, deepcopy, den, deserialize, div, divrem, exp, factor,
-             gcd, gcdx, getindex, hash, hex, inv, invmod, isequal, isless,
-             isprime, isqrt, lcm, length, log, lufact, mod, ndigits, nextpow2,
-             norm, num, oct, one, parent, parseint, precision, promote_rule,
-             rank, Rational, rem, reverse, serialize, setindex!, show, sign,
-             sin, size, sqrt, string, sub, tan, tanh, trace, transpose,
-             transpose!, truncate, var, zero
+import Base: abs, asin, asinh, atan, atanh, base, bin, call, convert, cmp, 
+             cos, cosh, dec, deepcopy, den, deserialize, div, divrem, exp,
+             factor, gcd, gcdx, getindex, hash, hex, inv, invmod, isequal,
+             isless, isprime, isqrt, lcm, length, log, lufact, mod, ndigits,
+             nextpow2, norm, num, oct, one, parent, parseint, precision,
+             prevpow2, promote_rule, rank, Rational, rem, reverse, serialize,
+             setindex!, show, sign, sin, size, sqrt, string, sub, tan, tanh,
+             trace, trailing_zeros, transpose, transpose!, truncate, var, zero
 
 export Collection, Ring, Field, CollectionElem, RingElem, FieldElem, Pari,
        Flint, Antic, Generic

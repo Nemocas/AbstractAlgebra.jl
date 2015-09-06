@@ -40,6 +40,14 @@ type fmpz <: IntegerRingElem
         return z
     end
 
+    function fmpz(x::Float64)
+        !isinteger(x) && throw(InexactError())
+        z = new()
+        ccall((:fmpz_set_d, :libflint), Void, (Ptr{fmpz}, Cdouble), &z, x)
+        finalizer(z, _fmpz_clear_fn)
+        return z
+    end
+
     fmpz(x::fmpz) = x
 end
 

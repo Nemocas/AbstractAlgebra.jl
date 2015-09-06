@@ -39,8 +39,8 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, fac,
        combit!, crt, divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2,
        gcdinv, isprobabprime, issquare, jacobi, remove, root, size, isqrtrem,
        sqrtmod, trailing_zeros, sigma, eulerphi, fib, moebiusmu, primorial,
-       risingfac, canonical_unit, needs_parentheses, is_negative,
-       show_minus_one, parseint, addeq!, mul!, isunit, words, isequal, num, den
+       risingfac, canonical_unit, needs_parentheses, is_negative, isless,
+       show_minus_one, parseint, addeq!, mul!, isunit, isequal, num, den
 
 ###############################################################################
 #
@@ -87,10 +87,6 @@ isunit(a::fmpz) = ccall((:fmpz_is_pm1, :libflint), Bool, (Ptr{fmpz},), &a)
 iszero(a::fmpz) = ccall((:fmpz_is_zero, :libflint), Bool, (Ptr{fmpz},), &a)
 
 isone(a::fmpz) = ccall((:fmpz_is_one, :libflint), Bool, (Ptr{fmpz},), &a)
-
-function words(a::fmpz)
-   return a == 0 ? 0 : div(ndigits(a, 2) + 8*sizeof(Int) - 1, 8*sizeof(Int))
-end
 
 function den(a::fmpz)
   return fmpz(1)
@@ -356,7 +352,7 @@ end
 function cdiv(x::fmpz, c::Int)
     c == 0 && throw(DivideError())
     z = fmpz()
-    ccall((:fmpz_cdiv_si, :libflint), Void, 
+    ccall((:fmpz_cdiv_q_si, :libflint), Void, 
           (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, c)
     return z
 end
@@ -569,9 +565,9 @@ end
 #
 ###############################################################################
 
-function cmp(x::fmpz, y::fmpz)
+function isless(x::fmpz, y::fmpz)
     Int(ccall((:fmpz_cmp, :libflint), Cint, 
-              (Ptr{fmpz}, Ptr{fmpz}), &x, &y))
+              (Ptr{fmpz}, Ptr{fmpz}), &x, &y)) < 0
 end
 
 ==(x::fmpz, y::fmpz) = cmp(x,y) == 0
@@ -930,16 +926,13 @@ call(::FlintIntegerRing, a::String) = fmpz(a)
 
 call(::FlintIntegerRing, a::fmpz) = a
 
-function call(::FlintIntegerRing, a::Float64)
-    !isinteger(a) && throw(InexactError())
-    z = fmpz()
-    ccall((:fmpz_set_d, :libflint), Void, (Ptr{fmpz}, Cdouble), &z, a)
-    return z
-end
+call(::FlintIntegerRing, a::Float64) = fmpz(a)
+
+call(::FlintIntegerRing, a::Float32) = fmpz(Float64(a))
 
 call(::FlintIntegerRing, a::Float16) = fmpz(Float64(a))
 
-call(::FlintIntegerRing, a::Float32) = fmpz(Float64(a))
+call(::FlintIntegerRing, a::BigFloat) = fmpz(BigInt(a))
 
 ###############################################################################
 #
@@ -968,6 +961,12 @@ end
 fmpz(s::String) = parseint(fmpz, s)
 
 fmpz(z::Integer) = fmpz(BigInt(z))
+
+fmpz(z::Float16) = fmpz(Float64(z))
+
+fmpz(z::Float32) = fmpz(Float64(z))
+
+fmpz(z::BigFloat) = fmpz(BigInt(z))
 
 ###############################################################################
 #
@@ -999,5 +998,7 @@ end
 convert(::Type{Float32}, n::fmpz) = Float32(Float64(n))
 
 convert(::Type{Float16}, n::fmpz) = Float16(Float64(n))
+
+convert(::Type{BigFloat}, n::fmpz) = BigFloat(BigInt(n))
 
 Base.promote_rule{T <: Integer}(::Type{fmpz}, ::Type{T}) = fmpz
