@@ -833,6 +833,10 @@ function evaluate{T <: RingElem}(a::PolyElem{T}, b::Integer)
    return evaluate(a, base_ring(a)(b))
 end
 
+function evaluate{T <: RingElem}(a::PolyElem{T}, b::fmpz)
+   return evaluate(a, base_ring(a)(b))
+end
+
 function compose(a::Poly, b::Poly)
    i = length(a)
    if i == 0

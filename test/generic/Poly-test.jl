@@ -335,6 +335,8 @@ function test_poly_evaluation()
 
    @test evaluate(g, 3) == 12x + 6
 
+   @test evaluate(g, fmpz(3)) == 12x + 6
+
    @test evaluate(g, f) == x^5+4*x^4+7*x^3+7*x^2+4*x+4
 
    println("PASS")

@@ -317,11 +317,12 @@ end
 function ==(x::fmpz_mod_poly, y::Residue{fmpz})
   base_ring(x) != parent(y) && error("Incompatible base rings in comparison")
   if length(x) > 1
-    return false
+     return false
   elseif length(x) == 1 
-    ccall((:fmpz_mod_poly_get_coeff_fmpz, :libflint), Void, 
+     u = fmpz()
+     ccall((:fmpz_mod_poly_get_coeff_fmpz, :libflint), Void, 
             (Ptr{fmpz}, Ptr{fmpz_mod_poly}, Int), &u, &x, 0)
-    return u == y
+     return u == y
   else
     return y == 0
   end 
@@ -843,6 +844,11 @@ function Base.call(R::FmpzModPolyRing, x::fmpz_poly)
   z = fmpz_mod_poly(R._n, x)
   z.parent = R
   return z
+end
+
+function Base.call(R::FmpzModPolyRing, f::fmpz_mod_poly)
+   parent(f) != R && error("Unable to coerce polynomial")
+   return f
 end
 
 ################################################################################

@@ -552,7 +552,7 @@ For example the following code will return true:
 typeof(ZZ(1)) <: RingElem
 \end{lstlisting}
 
-\subsection{Generic polynomials ($T[x]$)}
+\subsection{Generic polynomials ($T[x]$) : \code|Poly\{T\}|}
 
 Nemo has a parametric polynomial type (called \code{Poly}) for generic polynomials over
 a ring $T$. There's not any need to deal directly with the \code{Poly} type, as we
@@ -1292,7 +1292,7 @@ the residue ring has zero divisors. However, if an impossible inverse is
 encountered during the computation, due to zero divisors, we throw an error.
 
 \begin{lstlisting}
-gcdinv{T <: Union(Field, Residue), S}(a::Poly{T}, b::Poly{T})
+gcdinv{T <: Union(ResidueElem, FieldElem)}(a::Poly{T}, b::Poly{T})
 \end{lstlisting}
 
 \desc{Return a tuple $(g, s)$ such that $g$ is the gcd of $a$ and $b$ and $s$
@@ -1330,6 +1330,7 @@ u, v = gcdinv(r, s)
 \begin{lstlisting}
 evaluate{T <: RingElem}(a::Poly{T}, b::T)
 evaluate{T <: RingElem}(a::Poly{T}, b::Integer)
+evaluate{T <: RingElem}(a::Poly{T}, b::fmpz)
 \end{lstlisting}
 
 \desc{Return the value of the polynomial $a$ evaluated at $b$.}
@@ -1488,18 +1489,22 @@ The following functions compute univariate special polynomials. It is expected
 that the final argument in each of these function is the generator of the polynomial ring.
 
 \begin{lstlisting}
-chebyshev_t(n::Int, x::fmpz_poly)
+chebyshev_t{T <: RingElem}(n::Int, x::Poly{T})
 \end{lstlisting}
 
 \desc{Return the Chebyshev polynomial of the first kind $T_n(x)$, defined by 
 $T_n(x) = \cos(n \cos^{-1}(x))$.}
 
 \begin{lstlisting}
-chebyshev_u(n::Int, x::fmpz_poly)
+chebyshev_u{T <: RingElem}(n::Int, x::Poly{T})
 \end{lstlisting}
 
 \desc{Return the Chebyshev polynomial of the first kind $U_n(x)$, defined by 
 $(n+1) U_n(x) = T'_{n+1}(x)$.}
+
+\textbf{Examples.}
+
+Here are some examples of special polynomials.
 
 \begin{lstlisting}
 R, x = PolynomialRing(ZZ, "x")
@@ -1516,7 +1521,7 @@ implementations where available.
 
 We only describe the details that differ from the generic implementations above.
 
-\subsection{Integers : Flint fmpz}
+\subsection{Flint integers ($\Z$): \code{fmpz}}
 
 Multi-precision integers can be created in Nemo using \code{ZZ}. For example, to create the integer
 $123$ one can write:
@@ -2581,7 +2586,7 @@ s = sigma(fmpz(128), 10)
 a = eulerphi(fmpz(12480))
 \end{lstlisting}
 
-\subsection{Flint integer polynomials ($\Z[x]$): fmpz_poly}
+\subsection{Flint polynomials over $\Z$: \code{fmpz_poly}}
 
 The Flint integer polynomial type is \code{fmpz_poly}. Polynomials of this type are created
 using the \code{PolynomialRing} constructor.
@@ -2815,6 +2820,267 @@ k = cos_minpoly(30, x)
 l = theta_qexp(3, 30, x)
 m = eta_qexp(24, 30, x)
 \end{lstlisting}
+
+\subsection{Flint polynomials over $\Z/n\Z$ (multiprecision $n$): \code{fmpz_mod_poly}}
+
+The Flint type for polynomials over $\Z/n\Z$ is \code{fmpz_poly}. Polynomials of this type are created
+using the \code{PolynomialRing} constructor. They are automatically created if the modulus $n$ doesn't
+fit into a \code{UInt}.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 123456789012345678901)
+S, x = PolynomialRing(R, "x")
+\end{lstlisting}
+
+Polynomials in this ring have parent of type \code{FmpzModPolyRing}.
+
+We describe functions for \code{fmpz_mod_poly} only where they differ from the functions
+available for generic polynomials.
+
+\subsubsection{Constructors}
+
+In the constructors below $S$ is assumed to be a \code{FmpzModPolyRing} as constructed above.
+
+\begin{lstlisting}
+S(arr::Array{fmpz, 1})
+\end{lstlisting}
+
+\desc{Construct the polynomial whose coefficients are those in the array, reduced modulo the
+modulus of the base ring of $S$.}
+
+\begin{lstlisting}
+S(a::fmpz)
+\end{lstlisting}
+
+\desc{Construct the polynomial of degree $0$ whose coefficient is the given integer reduced
+modulo the modulus of the base ring of $S$ (or the zero polynomial if $a$ is zero when
+reduced modulo the modulus).}
+
+\begin{lstlisting}
+S(p::fmpz_poly)
+\end{lstlisting}
+
+\desc{Construct the polynomial whose coefficients are those of the given polynomial, but
+reduced modulo the modulus of the base ring of $S$.}
+
+\textbf{Examples.}
+
+Here are some examples of constructors.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 123456789012345678901)
+S, x = PolynomialRing(R, "x")
+
+a = S()
+b = S(x + 1)
+c = S([R(1), R(0), R(2)])
+d = S(c)
+\end{lstlisting}
+
+\subsubsection{Ad hoc binary operators}
+
+\begin{lstlisting}
+*(x::fmpz_mod_poly, y::Residue{fmpz})
+*(x::Residue{fmpz}, y::fmpz_mod_poly)
+\end{lstlisting}
+
+\desc{Return the polynomial $xy$.}
+
+\begin{lstlisting}
++(x::fmpz_mod_poly, y::Residue{fmpz})
++(x::Residue{fmpz}, y::fmpz_mod_poly)
+\end{lstlisting}
+
+\desc{Return the polynomial $x + y$.}
+
+\begin{lstlisting}
+-(x::fmpz_mod_poly, y::Residue{fmpz})
+-(x::Residue{fmpz}, y::fmpz_mod_poly)
+\end{lstlisting}
+
+\desc{Return the polynomial $x - y$.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc binary operators.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 123456789012345678949)
+   S, x = PolynomialRing(R, "x")
+
+   f = x^2 + 2x + 1
+   g = x^3 + 3x + 2
+
+   a = R(12) + g
+   b = f - R(12)
+   c = f*R(12)
+\end{lstlisting}
+
+\subsubsection{Ad hoc comparison}
+
+\begin{lstlisting}
+==(x::fmpz_mod_poly, y::Residue{fmpz})
+==(x::Residue{fmpz}, y::fmpz_mod_poly)
+\end{lstlisting}
+
+\desc{Return \code{true} if $x$ and $y$ are equal, otherwise return \code{false}.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc comparison.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 123456789012345678949)
+   S, x = PolynomialRing(R, "x")
+
+   f = x^2 + 2x + 1
+   g = x^3 + 3x + 2
+
+   S(7) == R(7)
+   R(7) != x + 1
+\end{lstlisting}
+
+\subsubsection{Ad hoc exact division}
+
+\begin{lstlisting}
+divexact(x::fmpz_mod_poly, y::Residue{fmpz})
+\end{lstlisting}
+
+\desc{Divide the polynomial $x$ by the residue $y$, assuming the division is exact.}
+
+\textbf{Examples.}
+
+Here is an example of ad hoc exact division.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 123456789012345678949)
+   S, x = PolynomialRing(R, "x")
+
+   f = x^2 + 2x + 1
+   
+   a = divexact(R(7)*f, R(7)) 
+\end{lstlisting}
+
+\subsubsection{Modular arithmetic}
+
+\begin{lstlisting}
+powmod(x::fmpz_mod_poly, e::fmpz, y::fmpz_mod_poly)
+\end{lstlisting}
+
+\desc{Return $x^e \pmod{y}$.}
+
+\textbf{Examples.}
+
+Here is an example of modular arithmetic.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 123456789012345678949)
+   S, x = PolynomialRing(R, "x")
+
+   f = x^2 + 2x + 1
+   g = x^3 + 3x + 1
+   
+   a = powmod(f, fmpz(7), g) 
+\end{lstlisting}
+
+\subsubsection{Lifting}
+
+\begin{lstlisting}
+lift(x::FmpzPolyRing, y::fmpz_mod_poly)
+\end{lstlisting}
+
+\desc{Lift the polynomial $y$ over $\Z/n\Z$ to a polynomial over $\Z$ in the given ring.}
+
+\textbf{Examples.}
+
+Here is an example of lifting.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 123456789012345678949)
+   S, x = PolynomialRing(R, "x")
+
+   T, y = PolynomialRing(ZZ, "y")
+
+   f = x^2 + 2x + 1
+
+   a = lift(T, f) 
+\end{lstlisting}
+
+\subsubsection{Irreducibility testing}
+
+\begin{lstlisting}
+isirreducible(x::fmpz_mod_poly)
+\end{lstlisting}
+
+\desc{Return \code{true} if the polynomial $x$ is irreducible, otherwise return \code{false}.}
+
+\textbf{Examples.}
+
+Here is an example of lifting.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 123456789012345678949)
+   S, x = PolynomialRing(R, "x")
+
+   f = x^2 + 2x + 1
+
+   isirreducible(f) == false
+\end{lstlisting}
+
+\subsubsection{Squarefree testing}
+
+\begin{lstlisting}
+issquarefree(x::fmpz_mod_poly)
+\end{lstlisting}
+
+\desc{Return \code{true} if the polynomial $x$ is squarefree, otherwise return \code{false}.}
+
+\textbf{Examples.}
+
+Here is an example of lifting.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 123456789012345678949)
+   S, x = PolynomialRing(R, "x")
+
+   f = x^2 + 2x + 1
+
+   issquarefree(f) == false
+\end{lstlisting}
+
+\subsubsection{Factorisation}
+
+\begin{lstlisting}
+factor(x::fmpz_mod_poly)
+\end{lstlisting}
+
+\desc{Return an array containing the factorisation of the given polynomial. The entries in
+the array are tuples $(p, e)$ consisting of irreducible polynomials $p$ and their exponent
+$e$ in the factorisation.}
+
+\begin{lstlisting}
+factor_squarefree(x::fmpz_mod_poly)
+\end{lstlisting}
+
+\desc{Return an array containing the squarefree factorisation of the given polynomial. The
+entries in the array are tuples $(p, e)$ consisting of squarefree polynomials $p$ and their
+exponent $e$ in the factorisation.}
+
+\begin{lstlisting}
+factor_distinct_deg(x::fmpz_mod_poly)
+\end{lstlisting}
+
+\desc{Return an array containing the distinct degree factorisation of the given polynomial.
+The entries in the array are tuples $(p, e)$ consisting of polynomials $p$ which are the
+products of all the irreducible polynomials of the given degree $e$ in the factorisation.}
+
+\begin{lstlisting}
+factor_shape(x::fmpz_mod_poly)
+\end{lstlisting}
+
+\desc{Return an array containing the shape of the factorisation of the given polynomial.
+The entries in the array are tuples $(d, e)$ consisting of the degrees $d$ of the
+irreducible polynomials and their exponents $e$ in the factorisation.}
 
 \subsection{Residue rings}
 

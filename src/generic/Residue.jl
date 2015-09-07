@@ -86,7 +86,7 @@ needs_parentheses(x::ResidueElem) = needs_parentheses(data(x))
 
 is_negative(x::ResidueElem) = is_negative(data(x))
 
-show_minus_one{T <: RingElem}(::Type{ResidueElem{T}}) = true
+show_minus_one{T <: RingElem}(::Type{Residue{T}}) = true
 
 ###############################################################################
 #
