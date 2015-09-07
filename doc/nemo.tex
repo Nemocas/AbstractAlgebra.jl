@@ -2823,9 +2823,9 @@ m = eta_qexp(24, 30, x)
 
 \subsection{Flint polynomials over $\Z/n\Z$ (multiprecision $n$): \code{fmpz_mod_poly}}
 
-The Flint type for polynomials over $\Z/n\Z$ is \code{fmpz_poly}. Polynomials of this type are created
-using the \code{PolynomialRing} constructor. They are automatically created if the modulus $n$ doesn't
-fit into a \code{UInt}.
+The Flint type for polynomials over $\Z/n\Z$ for multiprecision $n$ is \code{fmpz_mod_poly}.
+Polynomials of this type are created using the \code{PolynomialRing} constructor. They are
+automatically created if the modulus $n$ doesn't fit into a \code{UInt}.
 
 \begin{lstlisting}
 R = ResidueRing(ZZ, 123456789012345678901)
@@ -2839,7 +2839,7 @@ available for generic polynomials.
 
 \subsubsection{Constructors}
 
-In the constructors below $S$ is assumed to be a \code{FmpzModPolyRing} as constructed above.
+In the constructors below $S$ is assumed to be an \code{FmpzModPolyRing} as constructed above.
 
 \begin{lstlisting}
 S(arr::Array{fmpz, 1})
@@ -3081,6 +3081,345 @@ factor_shape(x::fmpz_mod_poly)
 \desc{Return an array containing the shape of the factorisation of the given polynomial.
 The entries in the array are tuples $(d, e)$ consisting of the degrees $d$ of the
 irreducible polynomials and their exponents $e$ in the factorisation.}
+
+\textbf{Examples.}
+
+Here are some examples of factoring.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 123456789012345678949)
+   S, x = PolynomialRing(R, "x")
+
+   f = x^2 + 2x + 1
+   g = x^3 + 3x + 1
+
+   R = factor(f*g)
+   S = factor_squarefree(f*g)
+   T = factor_distinct_deg((x + 1)*g*(x^5+x+1))
+   U = factor_shape(f*g)
+\end{lstlisting}
+
+\subsection{Flint polynomials over $\Z/n\Z$ (small $n$): \code{nmod_poly}}
+
+The Flint type for polynomials over $\Z/n\Z$ for small $n$ is \code{nmod_poly}. Polynomials
+of this type are created using the \code{PolynomialRing} constructor. They are automatically
+created if the modulus $n$ fits into a \code{UInt}.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 7)
+S, x = PolynomialRing(R, "x")
+\end{lstlisting}
+
+Polynomials in this ring have parent of type \code{NmodPolyRing}.
+
+We describe functions for \code{nmod_poly} only where they differ from the functions
+available for generic polynomials.
+
+\subsubsection{Constructors}
+
+In the constructors below $S$ is assumed to be an \code{NmodPolyRing} as constructed above.
+
+\begin{lstlisting}
+S(arr::Array{UInt, 1})
+\end{lstlisting}
+
+\desc{Construct the polynomial whose coefficients are those in the array.}
+
+\begin{lstlisting}
+S(arr::Array{fmpz, 1})
+\end{lstlisting}
+
+\desc{Construct the polynomial whose coefficients are those in the array, reduced modulo the
+modulus of the base ring of $S$.}
+
+\begin{lstlisting}
+S(a::UInt)
+\end{lstlisting}
+
+\desc{Construct the polynomial of degree $0$ whose coefficient is the given integer (or the
+zero polynomial if $a$ is zero).}
+
+\begin{lstlisting}
+S(a::fmpz)
+\end{lstlisting}
+
+\desc{Construct the polynomial of degree $0$ whose coefficient is the given integer reduced
+modulo the modulus of the base ring of $S$ (or the zero polynomial if $a$ is zero when
+reduced modulo the modulus).}
+
+\begin{lstlisting}
+S(p::fmpz_poly)
+\end{lstlisting}
+
+\desc{Construct the polynomial whose coefficients are those of the given polynomial, but
+reduced modulo the modulus of the base ring of $S$.}
+
+\textbf{Examples.}
+
+Here are some examples of constructors.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 7)
+S, x = PolynomialRing(R, "x")
+
+a = S()
+b = S(x + 1)
+c = S([R(1), R(0), R(2)])
+d = S(c)
+\end{lstlisting}
+
+\subsubsection{Ad hoc binary operators}
+
+\begin{lstlisting}
+*(x::nmod_poly, y::Residue{fmpz})
+*(x::Residue{fmpz}, y::nmod_poly)
+\end{lstlisting}
+
+\desc{Return the polynomial $xy$.}
+
+\begin{lstlisting}
++(x::nmod_poly, y::Residue{fmpz})
++(x::Residue{fmpz}, y::nmod_poly)
+\end{lstlisting}
+
+\desc{Return the polynomial $x + y$.}
+
+\begin{lstlisting}
+-(x::nmod_poly, y::Residue{fmpz})
+-(x::Residue{fmpz}, y::nmod_poly)
+\end{lstlisting}
+
+\desc{Return the polynomial $x - y$.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc binary operators.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S, x = PolynomialRing(R, "x")
+
+   f = x^2 + 2x + 1
+   g = x^3 + 3x + 2
+
+   a = R(12) + g
+   b = f - R(12)
+   c = f*R(12)
+\end{lstlisting}
+
+\subsubsection{Ad hoc comparison}
+
+\begin{lstlisting}
+==(x::nmod_poly, y::Residue{fmpz})
+==(x::Residue{fmpz}, y::nmod_poly)
+\end{lstlisting}
+
+\desc{Return \code{true} if $x$ and $y$ are equal, otherwise return \code{false}.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc comparison.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 13)
+   S, x = PolynomialRing(R, "x")
+
+   f = x^2 + 2x + 1
+   g = x^3 + 3x + 2
+
+   S(7) == R(7)
+   R(7) != x + 1
+\end{lstlisting}
+
+\subsubsection{Ad hoc exact division}
+
+\begin{lstlisting}
+divexact(x::nmod_poly, y::Residue{fmpz})
+\end{lstlisting}
+
+\desc{Divide the polynomial $x$ by the residue $y$, assuming the division is exact.}
+
+\textbf{Examples.}
+
+Here is an example of ad hoc exact division.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 23)
+   S, x = PolynomialRing(R, "x")
+
+   f = x^2 + 2x + 1
+   
+   a = divexact(R(7)*f, R(7)) 
+\end{lstlisting}
+
+\subsubsection{Interpolation}
+
+\begin{lstlisting}
+divexact(R::NmodPolyRing, xval::Array{Residue{fmpz}, 1}, yval::Array{Residue{fmpz}, 1})
+\end{lstlisting}
+
+\desc{Returns the unique polynomial in the given ring $R$ of degree at most equal to the
+length of the two supplied arrays, which interpolates the values in the array \code{yval}
+at the values in the array \code{xval}.}
+
+\textbf{Examples.}
+
+Here is an example of interpolation.
+
+\begin{lstlisting}
+  R = ResidueRing(ZZ, 23)
+  S, x = PolynomialRing(R, "x")
+
+  xval = [ R(0), R(1), R(2), R(3) ]
+
+  yval = [ R(0), R(1), R(4), R(9) ] 
+
+  f = interpolate(S, xval, yval)
+\end{lstlisting}
+
+\subsubsection{Inflation and deflation}
+
+\begin{lstlisting}
+inflate(f::nmod_poly, n::Int)
+\end{lstlisting}
+
+\desc{Given a polynomial $f(x)$, returns $f(x^n)$.}
+
+\begin{lstlisting}
+deflate(f::nmod_poly, n::Int)
+\end{lstlisting}
+
+\desc{Given a polynomial $f(x^n)$, returns $f(x)$.}
+
+\textbf{Examples.}
+
+Here is an example of inflation and deflation.
+
+\begin{lstlisting}
+  R = ResidueRing(ZZ, 23)
+  S, x = PolynomialRing(R, "x")
+
+  f = x^6 + x^4 + 2 *x^2 
+
+  g = inflate(f, 2)
+  h = deflate(g, 2)
+\end{lstlisting}
+
+\subsubsection{Lifting}
+
+\begin{lstlisting}
+lift(x::FmpzPolyRing, y::nmod_poly)
+\end{lstlisting}
+
+\desc{Lift the polynomial $y$ over $\Z/n\Z$ to a polynomial over $\Z$ in the given ring.}
+
+\textbf{Examples.}
+
+Here is an example of lifting.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 23)
+   S, x = PolynomialRing(R, "x")
+
+   T, y = PolynomialRing(ZZ, "y")
+
+   f = x^2 + 2x + 1
+
+   a = lift(T, f) 
+\end{lstlisting}
+
+\subsubsection{Irreducibility testing}
+
+\begin{lstlisting}
+isirreducible(x::nmod_poly)
+\end{lstlisting}
+
+\desc{Return \code{true} if the polynomial $x$ is irreducible, otherwise return \code{false}.}
+
+\textbf{Examples.}
+
+Here is an example of lifting.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 23)
+   S, x = PolynomialRing(R, "x")
+
+   f = x^2 + 2x + 1
+
+   isirreducible(f) == false
+\end{lstlisting}
+
+\subsubsection{Squarefree testing}
+
+\begin{lstlisting}
+issquarefree(x::nmod_poly)
+\end{lstlisting}
+
+\desc{Return \code{true} if the polynomial $x$ is squarefree, otherwise return \code{false}.}
+
+\textbf{Examples.}
+
+Here is an example of lifting.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 23)
+   S, x = PolynomialRing(R, "x")
+
+   f = x^2 + 2x + 1
+
+   issquarefree(f) == false
+\end{lstlisting}
+
+\subsubsection{Factorisation}
+
+\begin{lstlisting}
+factor(x::nmod_poly)
+\end{lstlisting}
+
+\desc{Return an array containing the factorisation of the given polynomial. The entries in
+the array are tuples $(p, e)$ consisting of irreducible polynomials $p$ and their exponent
+$e$ in the factorisation.}
+
+\begin{lstlisting}
+factor_squarefree(x::nmod_poly)
+\end{lstlisting}
+
+\desc{Return an array containing the squarefree factorisation of the given polynomial. The
+entries in the array are tuples $(p, e)$ consisting of squarefree polynomials $p$ and their
+exponent $e$ in the factorisation.}
+
+\begin{lstlisting}
+factor_distinct_deg(x::nmod_poly)
+\end{lstlisting}
+
+\desc{Return an array containing the distinct degree factorisation of the given polynomial.
+The entries in the array are tuples $(p, e)$ consisting of polynomials $p$ which are the
+products of all the irreducible polynomials of the given degree $e$ in the factorisation.}
+
+\begin{lstlisting}
+factor_shape(x::nmod_poly)
+\end{lstlisting}
+
+\desc{Return an array containing the shape of the factorisation of the given polynomial.
+The entries in the array are tuples $(d, e)$ consisting of the degrees $d$ of the
+irreducible polynomials and their exponents $e$ in the factorisation.}
+
+\textbf{Examples.}
+
+Here are some examples of factoring.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 23)
+   S, x = PolynomialRing(R, "x")
+
+   f = x^2 + 2x + 1
+   g = x^3 + 3x + 1
+
+   R = factor(f*g)
+   S = factor_squarefree(f*g)
+   T = factor_distinct_deg((x + 1)*g*(x^5+x^3+x+1))
+   U = factor_shape(f*g)
+\end{lstlisting}
 
 \subsection{Residue rings}
 

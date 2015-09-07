@@ -274,7 +274,7 @@ function test_fmpz_mod_poly_adhoc_exact_division()
 
    f = x^2 + 2x + 1
    
-   @test divexact(3*f, ZZ(3)) == f
+   @test divexact(3*f, fmpz(3)) == f
 
    @test divexact(3*f, 3) == f
 
@@ -361,6 +361,8 @@ function test_fmpz_mod_poly_evaluation()
    @test evaluate(f, 3) == 16
    
    @test evaluate(f, fmpz(10)) == 121
+
+   @test evaluate(f, R(10)) == 121
 
    println("PASS")
 end
