@@ -218,7 +218,7 @@ function test_nmod_poly_comparison()
 end
 
 function test_nmod_poly_adhoc_comparison()
-   print("fmpz_npoly.adhoc_comparison...")
+   print("nmod_poly.adhoc_comparison...")
 
    R = ResidueRing(ZZ, 7)
    S, x = PolynomialRing(R, "x")

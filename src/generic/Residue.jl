@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export ResidueRing, Residue, inv, modulus
+export ResidueRing, Residue, inv, modulus, data
 
 ###############################################################################
 #
@@ -156,6 +156,22 @@ end
 function =={T <: RingElem}(a::ResidueElem{T}, b::ResidueElem{T})
    check_parent(a, b)
    return data(a) == data(b)
+end
+
+###############################################################################
+#
+#   Ad hoc comparison
+#
+###############################################################################
+
+function =={T <: RingElem}(a::ResidueElem{T}, b::Integer)
+   z = base_ring(a)(b)
+   return data(a) == mod(z, modulus(a))
+end
+
+function =={T <: RingElem}(a::Integer, b::ResidueElem{T})
+   z = base_ring(b)(a)
+   return data(b) == mod(z, modulus(b))
 end
 
 ###############################################################################

@@ -13,7 +13,7 @@ function test_residue_constructors()
 
    @test isa(b, ResidueElem)
 
-   c = R(ZZ(12))
+   c = R(fmpz(12))
 
    @test isa(c, ResidueElem)
 
@@ -30,6 +30,10 @@ function test_residue_constructors()
 
    @test isa(f, ResidueElem)
 
+   g = T(f)
+
+   @test isa(g, ResidueElem)
+
    println("PASS")
 end
 
@@ -44,6 +48,8 @@ function test_residue_manipulation()
 
    @test iszero(g)
 
+   @test modulus(g) == 16453889
+
    S, x = PolynomialRing(R, "x")
    T = ResidueRing(S, x^3 + 3x + 1)
 
@@ -53,9 +59,13 @@ function test_residue_manipulation()
 
    @test isone(h)
 
+   @test data(h) == 1
+
    @test canonical_unit(R(11)) == R(11)
    
    @test canonical_unit(T(x + 1)) == T(x + 1)
+
+   @test deepcopy(h) == h
 
    println("PASS")
 end
@@ -89,8 +99,25 @@ function test_residue_binary_ops()
 
    @test f*g == R(0)
 
-   @test gcd(f, g) == R(2)
+   Q = ResidueRing(ZZ, 7)
+   S, x = PolynomialRing(Q, "x")
+   T = ResidueRing(S, x^3 + 3x + 1)
 
+   n = T(x^5 + 1)
+   p = T(x^2 + 2x + 1)
+
+   @test n + p == T(4x + 5)
+
+   @test n - p == T(5x^2 + 3)
+
+   @test n*p == T(3x^2 + 4x + 4)
+
+   println("PASS")
+end
+
+function test_residue_exact_division()
+   print("Residue.exact_division...")
+ 
    Q = ResidueRing(ZZ, 7)
 
    a = Q(3)
@@ -104,13 +131,27 @@ function test_residue_binary_ops()
    n = T(x^5 + 1)
    p = T(x^2 + 2x + 1)
 
-   @test n + p == T(4x + 5)
-
-   @test n - p == T(5x^2 + 3)
-
-   @test n*p == T(3x^2 + 4x + 4)
-
    @test divexact(n*p, p) == n
+
+   println("PASS")
+end
+
+function test_residue_gcd()
+   print("Residue.gcd...")
+ 
+   R = ResidueRing(ZZ, 12)
+
+   f = R(4)
+   g = R(6)
+
+   @test gcd(f, g) == R(2)
+
+   Q = ResidueRing(ZZ, 7)
+   S, x = PolynomialRing(Q, "x")
+   T = ResidueRing(S, x^3 + 3x + 1)
+
+   n = T(x^5 + 1)
+   p = T(x^2 + 2x + 1)
 
    @test gcd(n, p) == 1
 
@@ -155,6 +196,8 @@ function test_residue_comparison()
 
    @test b == a
 
+   @test isequal(b, a)
+
    @test c != a
 
    S, x = PolynomialRing(R, "x")
@@ -166,6 +209,8 @@ function test_residue_comparison()
 
    @test f == g
    @test h != g
+
+   @test isequal(f, g)
 
    println("PASS")
 end
@@ -209,6 +254,25 @@ function test_residue_powering()
    println("PASS")
 end
 
+function test_residue_inversion()
+   print("Residue.inversion...")
+ 
+   R = ResidueRing(ZZ, 49)
+
+   a = R(5)
+
+   @test inv(a) == 10
+
+   S, x = PolynomialRing(R, "x")
+   T = ResidueRing(S, x^3 + 3x + 1)
+
+   f = T(x^5 + 1)
+
+   @test inv(f) == T(37*x^2+34*x+26)
+
+   println("PASS")
+end
+
 function test_residue_exact_division()
    print("Residue.exact_division...")
  
@@ -230,36 +294,19 @@ function test_residue_exact_division()
    println("PASS")
 end
 
-function test_residue_inversion()
-   print("Residue.inversion...")
- 
-   R = ResidueRing(ZZ, 49)
-
-   a = R(5)
-
-   @test inv(a) == 10
-
-   S, x = PolynomialRing(R, "x")
-   T = ResidueRing(S, x^3 + 3x + 1)
-
-   f = T(x^5 + 1)
-
-   @test inv(f) == T(37*x^2+34*x+26)
-
-   println("PASS")
-end
-
 function test_residue()
    test_residue_constructors()
    test_residue_manipulation()
    test_residue_unary_ops()
    test_residue_binary_ops()
+   test_residue_exact_division()
+   test_residue_gcd()
    test_residue_adhoc_binary()
    test_residue_comparison()
    test_residue_adhoc_comparison()
    test_residue_powering()
-   test_residue_exact_division()
    test_residue_inversion()
+   test_residue_exact_division()
 
    println("")
 end
