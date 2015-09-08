@@ -4757,6 +4757,53 @@ Power series in this ring have parent of type \code{FmpzSeriesRing}.
 Currently the \code{fmpz_series} module provides nothing additional on top of
 the functionality that is described for generic power series.
 
+\subsection{Flint power series over $\Z/n\Z$ (multiprecision $n$): \code{fmpz_mod_series}}
+
+Flint doesn't have a module for power series over $\Z/n\Z$, but the \code{fmpz_mod_poly}
+module contains code for power series operations. In Nemo, for the purposes of
+simplicity, we deal with Flint as though it has a module called \code{fmpz_mod_series}.
+
+The power series type in Nemo for polynomials treated as power series is
+\code{fmpz_mod_series}. 
+
+Power series of this type are created using the \code{PowerSeriesRing} constructor.
+It takes a maximim (relative) precision and a variable name as a string.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 123456789012345678949)
+S, x = PowerSeriesRing(R, 30, "x")
+\end{lstlisting}
+
+Power series in this ring have parent of type \code{FmpzModSeriesRing}.
+
+We list only the functionality that the \code{fmpz_mod_series} module provides on top of
+the functionality that is described for generic power series.
+
+\subsubsection{Constructors}
+
+In the following we assume that $S$ is a power series ring parent object as created
+by the construction above, for example.
+
+\begin{lstlisting}
+S(a::Array{Residue{fmpz}, 1}, n::Int, p::Int)
+\end{lstlisting}
+
+\desc{Create the power series in the ring $S$ whose coefficients are the entries in
+the array $a$, reduced modulo the modulus of the residue ring. The length of the
+array is specified by $n$, though $n$ can be less than this (remaining entries in the
+array are ignored) and $p$ gives the precision of the power series created.}
+
+\textbf{Examples.}
+
+Here are some examples of power series constructors.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 123456789012345678949)
+   S, x = PowerSeriesRing(R, 30, "x")
+
+   f = S([R(0), R(3), R(1)], 3, 5)
+\end{lstlisting}
+
 \section{The Fields module}
 
 Nemo provides various constructions of fields. To make use of this 
