@@ -2754,6 +2754,8 @@ k = divexact(d, c)
 \begin{lstlisting}
 divexact{T <: RingElem}(x::PowerSeries{T}, y::Int)
 divexact{T <: RingElem}(x::PowerSeries{T}, y::fmpz)
+divexact{T <: RingElem}(x::PowerSeries{T}, y::T)
+divexact{T <: RingElem}(x::PowerSeries{T}, y::Integer)
 \end{lstlisting}
 
 \desc{Return the quotient of $x$ by $y$. If \code{y} is zero, a
@@ -4733,6 +4735,27 @@ Here are some examples of factoring.
    T = factor_distinct_deg((x + 1)*g*(x^5+x^3+x+1))
    U = factor_shape(f*g)
 \end{lstlisting}
+
+\subsection{Flint power series over $\Z$: \code{fmpz_series}}
+
+Flint doesn't have a module for power series over $\Z$, but the \code{fmpz_poly}
+module contains code for power series operations. In Nemo, for the purposes of
+simplicity, we deal with Flint as though it has a module called \code{fmpz_series}.
+
+The power series type in Nemo for polynomials treated as power series is
+\code{fmpz_series}. 
+
+Power series of this type are created using the \code{PowerSeriesRing} constructor.
+It takes a maximim (relative) precision and a variable name as a string.
+
+\begin{lstlisting}
+R, x = PowerSeriesRing(ZZ, 30, "x")
+\end{lstlisting}
+
+Power series in this ring have parent of type \code{FmpzSeriesRing}.
+
+Currently the \code{fmpz_series} module provides nothing additional on top of
+the functionality that is described for generic power series.
 
 \section{The Fields module}
 

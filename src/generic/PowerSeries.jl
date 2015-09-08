@@ -586,6 +586,8 @@ function divexact{T <: RingElem}(x::PowerSeries{T}, y::T)
    return parent(x)(d, lenx, precision(x))
 end
 
+divexact{T <: RingElem}(x::PowerSeries{T}, y::Integer) = divexact(x, fmpz(y))
+
 ###############################################################################
 #
 #   Inversion

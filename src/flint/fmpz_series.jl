@@ -200,57 +200,6 @@ end
 
 ###############################################################################
 #
-#   Unsafe functions
-#
-###############################################################################
-
-function setcoeff!(z::fmpz_series, n::Int, x::fmpz)
-   ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
-                (Ptr{fmpz_series}, Int, Ptr{fmpz}), 
-               &z, n, &x)
-end
-
-function mul!(z::fmpz_series, a::fmpz_series, b::fmpz_series)
-   lena = length(a)
-   lenb = length(b)
-   
-   aval = valuation(a)
-   bval = valuation(b)
-
-   prec = min(a.prec + bval, b.prec + aval)
-   
-   lena = min(lena, prec)
-   lenb = min(lenb, prec)
-   
-   lenz = min(lena + lenb - 1, prec)
-   if lenz < 0
-      lenz = 0
-   end
-
-   z.prec = prec
-   ccall((:fmpz_poly_mullow, :libflint), Void, 
-                (Ptr{fmpz_series}, Ptr{fmpz_series}, Ptr{fmpz_series}, Int), 
-               &z, &a, &b, lenz)
-end
-
-function addeq!(a::fmpz_series, b::fmpz_series)
-   lena = length(a)
-   lenb = length(b)
-         
-   prec = min(a.prec, b.prec)
- 
-   lena = min(lena, prec)
-   lenb = min(lenb, prec)
-
-   lenz = max(lena, lenb)
-   a.prec = prec
-   ccall((:fmpz_poly_add_series, :libflint), Void, 
-                (Ptr{fmpz_series}, Ptr{fmpz_series}, Ptr{fmpz_series}, Int), 
-               &a, &a, &b, lenz)
-end
-
-###############################################################################
-#
 #   Ad hoc binary operators
 #
 ###############################################################################
@@ -451,6 +400,57 @@ function inv(a::fmpz_series)
                 (Ptr{fmpz_series}, Ptr{fmpz_series}, Int), 
                &ainv, &a, a.prec)
    return ainv
+end
+
+###############################################################################
+#
+#   Unsafe functions
+#
+###############################################################################
+
+function setcoeff!(z::fmpz_series, n::Int, x::fmpz)
+   ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
+                (Ptr{fmpz_series}, Int, Ptr{fmpz}), 
+               &z, n, &x)
+end
+
+function mul!(z::fmpz_series, a::fmpz_series, b::fmpz_series)
+   lena = length(a)
+   lenb = length(b)
+   
+   aval = valuation(a)
+   bval = valuation(b)
+
+   prec = min(a.prec + bval, b.prec + aval)
+   
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   
+   lenz = min(lena + lenb - 1, prec)
+   if lenz < 0
+      lenz = 0
+   end
+
+   z.prec = prec
+   ccall((:fmpz_poly_mullow, :libflint), Void, 
+                (Ptr{fmpz_series}, Ptr{fmpz_series}, Ptr{fmpz_series}, Int), 
+               &z, &a, &b, lenz)
+end
+
+function addeq!(a::fmpz_series, b::fmpz_series)
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenz = max(lena, lenb)
+   a.prec = prec
+   ccall((:fmpz_poly_add_series, :libflint), Void, 
+                (Ptr{fmpz_series}, Ptr{fmpz_series}, Ptr{fmpz_series}, Int), 
+               &a, &a, &b, lenz)
 end
 
 ###############################################################################

@@ -231,6 +231,29 @@ function test_fmpz_series_exact_division()
    println("PASS")
 end
 
+function test_fmpz_series_adhoc_exact_division()
+   print("fmpz_series.adhoc_exact_division...")
+
+   R, x = PolynomialRing(ZZ, "x")
+   
+   a = x + x^3
+   b = O(x^4)
+   c = 1 + x + 2x^2 + O(x^5)
+   d = x + x^3 + O(x^6)
+
+   @test isequal(divexact(7a, 7), a)
+
+   @test isequal(divexact(11b, fmpz(11)), b)
+
+   @test isequal(divexact(2c, fmpz(2)), c)
+
+   @test isequal(divexact(9d, 9), d)
+
+   @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
+
+   println("PASS")
+end
+
 function test_fmpz_series_inversion()
    print("fmpz_series.inversion...")
 
@@ -245,20 +268,6 @@ function test_fmpz_series_inversion()
 
    println("PASS")
 end
-
-function test_fmpz_series_special_functions()
-   print("fmpz_series.special_functions...")
-
-   R = ResidueRing(ZZ, 17)
-   S, x = PowerSeriesRing(R, 30, "x")
-
-   @test exp(x + O(x^10)) == 8*x^9+4*x^8+15*x^7+3*x^6+x^5+5*x^4+3*x^3+9*x^2+x+1+O(x^10)
-
-   @test divexact(x, exp(x + O(x^10)) - 1) == x^8+11*x^6+14*x^4+10*x^2+8*x+1+O(x^9)
-
-   println("PASS")
-end
-
 function test_fmpz_series()
    test_fmpz_series_constructors()
    test_fmpz_series_manipulation()
@@ -272,7 +281,6 @@ function test_fmpz_series()
    test_fmpz_series_truncation()
    test_fmpz_series_exact_division()
    test_fmpz_series_inversion()
-   test_fmpz_series_special_functions()
 
    println("")
 end

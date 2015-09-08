@@ -310,6 +310,10 @@ function test_series_adhoc_exact_division()
 
    @test isequal(divexact(d, 9), fmpz(1)//9*x+fmpz(1)//9*x^3+O(x^6))
 
+   @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
+
+   @test isequal(divexact((t + 1)*a, t + 1), a)
+
    println("PASS")
 end
 
