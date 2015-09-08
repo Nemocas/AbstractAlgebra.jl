@@ -91,7 +91,7 @@ function show(io::IO, p::FmpqPolyRing)
    show(io, p.base_ring)
 end
 
-show_minus_one(::Type{fmpq_poly}) = show_minus_one(FlintRationalField)
+show_minus_one(::Type{fmpq_poly}) = show_minus_one(FractionElem{fmpz})
 
 ###############################################################################
 #
@@ -600,6 +600,10 @@ end
 ###############################################################################
 
 Base.promote_rule{T <: Integer}(::Type{fmpq_poly}, ::Type{T}) = fmpq_poly
+
+Base.promote_rule(::Type{fmpq_poly}, ::Type{fmpz}) = fmpq_poly
+
+Base.promote_rule(::Type{fmpq_poly}, ::Type{fmpq}) = fmpq_poly
 
 ###############################################################################
 #

@@ -118,7 +118,7 @@ function deepcopy{T <: RingElem}(a::PowerSeries{T})
    for i = 1:length(a)
       coeffs[i] = deepcopy(coeff(a, i - 1))
    end
-   return parent(a)(coeffs)
+   return parent(a)(coeffs, length(a), precision(a))
 end
 
 ###############################################################################
@@ -814,5 +814,5 @@ function PowerSeriesRing(R::Ring, prec::Int, s::String)
       eval(:(Base.promote_rule(::Type{$parent_type}, ::Type{$T2}) = $parent_type))
    end
 
-   return parent_obj, parent_obj([R(0), R(1)], 2, prec)
+   return parent_obj, parent_obj([R(0), R(1)], 2, prec + 1)
 end

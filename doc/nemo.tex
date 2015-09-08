@@ -552,7 +552,7 @@ For example the following code will return true:
 typeof(ZZ(1)) <: RingElem
 \end{lstlisting}
 
-\subsection{Generic polynomials ($T[x]$) : \code|Poly\{T\}|}
+\subsection{Generic polynomial rings ($R[x]$) : \code|Poly\{T\}|}
 
 Nemo has a parametric polynomial type (called \code{Poly}) for generic polynomials over
 a ring $T$. There's not any need to deal directly with the \code{Poly} type, as we
@@ -2089,6 +2089,742 @@ f = T(x^5 + 1)
 g = T(x^4 + x + 2)
 
 h = divexact(f, g)
+\end{lstlisting}
+
+\subsection{Generic power series rings $R[[x]]$: \code|PowerSeries\{T\}|}
+
+In Nemo we provide univariate power series rings. The type of a parent object for
+a power series ring is a \code{PowerSeriesRing} which belongs to the \code{Ring}
+type class. Power series elements are of type \code{PowerSeries} which belongs to
+the \code{SeriesElem} type class, which in turn belongs to \code{RingElem}.
+
+There's no need to deal directly with these types, as we provide a function
+\code{PowerSeriesRing} for constructing the ring parent objects and various
+constructors to create power series element objects.
+
+As for the \code{Poly} type, the \code{PowerSeries} and \code{PowerSeriesRing}
+types take as parameters the type \code{T} of the elements in the base ring
+over which the power series ring is constructed.
+
+For example, if there wasn't a special Flint type for power series, the type of
+a power series ring $\Z[[x]]$ over the Flint integers would be denoted
+\code|PowerSeriesRing{fmpz}| and elements of the ring would have type
+\code|PowerSeries{fmpz}|.
+
+Power series differ from polynomials in Nemo primarily in that they have a
+precision attached to them. Each power series object has its own precision,
+stored in a field \code{prec} and each power series parent object has a
+maximum precision, stored in \code{prec_max}.
+
+The precision is always a non-negative integer.
+
+By default, power series in Nemo use a \emph{capped relative} precision model.
+This means that the precision of a power series in a given ring is capped at
+the precision given by \code{prec_max}. Moreover, the precision of each 
+individual power series is relative, meaning that if the leading term of
+a nonzero power series element is $c_ax^a$ and the precision is $b$ then the
+power series is of the form $c_ax^a + c_{a+1}x^{a+1} + \ldots + O(x^{a + b})$.
+
+The zero power series is simply taken to be $0 + O(x^b)$.
+
+(Another commonly seen model of power series is the \emph{capped absolute}
+model. In that case a precision $b$ would indicate that all power series are
+of the form $c_0x^0 + c_1x + \ldots + O(x^b)$, where $c_0$ need not be
+nonzero. Currently Nemo doesn't provide an implementation of the capped
+absolute model.)
+
+The capped relative model has the advantage that power series are stable
+multiplicatively. In other words, for nonzero power series $f$ and $g$ we
+have that \code{divexact(f*g), g) == f}.
+
+However, capped relative power series are not additively stable, i.e. we
+do not always have $(f + g) - g = f$.
+
+In the capped relative model we say that two power series are equal if they
+agree up to the \emph{absolute} precision of the two power series. Thus, for
+example, $x^5 + O(x^10) == 0 + O(x^5)$, since the minimum absolute precision
+is $5$.
+
+During computations, it is possible for power series to ``lose'' precision
+due to cancellation. For example if $f = x^3 + x^5 + O(x^8)$ and
+$g = x^3 + x^6 + O(x^8)$ then $f - g = x^5 - x^6 + O(x^8)$ which now has
+relative precision $3$ instead of relative precision $5$.
+
+Amongst other things, this means that equality is not transitive. For example
+$x^6 + O(x^11) == 0 + O(x^5)$ and $x^7 + O(x^12) == 0 + O(x^5)$ but
+$x^6 + O(x^11) \neq x^7 + O(x^12)$.
+
+Sometimes it is necessary to compare power series not just for arithmetic
+equality, as above, but to see if they have precisely the same precision and
+terms. For this purpose we introduce the \code{isequal} function.
+
+For example, if $f = x^2 + O(x^7)$ and $g = x^2 + O(x^8)$ and $h = 0 + O(x^2)$
+then $f == g$, $f == h$ and $g == h$, but \code{isequal(f, g)},
+\code{isequal(f, h)} and \code{isequal(g, h)} would all return \code{false}.
+However, if $k = x^2 + O(x^7)$ then \code{isequal(f, k)} would return
+\code{true}.
+
+There are further difficulties if we construct polynomial over power series.
+For example, consider the polynomial in $y$ over the power series ring in $x$
+over the rationals. Normalisation of such polynomials is problematic. For
+instance, what is the leading coefficient of $(0 + O(x^10))y + (1 + O(x^10))$?
+
+If one takes it to be $(0 + O(x^10))$ then some functions may not terminate
+due to the fact that algorithms may require the degree of polynomials to
+decrease with each iteration. Instead, the degree may remain constant and
+simply accumulate leading terms which are arithmetically zero but not
+identically zero.
+
+On the other hand, when constructing power series over other power series, if
+we simply throw away terms which are arithmetically equal to zero, our
+computations may have different output depending on the order in which
+power series are added!
+
+One should be aware of these difficulties when working with power series.
+Power series, as represented on a computer, simply don't satisfy the axioms
+of a ring. They must be used with care in order to approximate operations in
+a mathematical power series ring.
+
+Simply increasing the precision will not necessarily give a ``more correct''
+answer and some computations may not even terminate due to the presence of
+arithmetic zeroes!
+
+Note that power series in Nemo are currently \emph{stored} in absolute 
+rather than relative format. Thus $x^10 + O(x^30)$ has a length $11$
+polynomial underlying it, rather than a length $1$ polynomial. This may
+change in a later version of Nemo.
+
+\subsubsection{Constructors}
+
+We define the following function for constructing the parent object of a
+power series ring.
+
+\begin{lstlisting}
+PowerSeriesRing(R::Ring, p::Int, s::String)
+\end{lstlisting}
+
+\desc{Returns a tuple \code{(S, x + O(x^p))} consisting of the parent \code{S} 
+corresponding to the power series ring over the ring \code{R} and the generator
+\code{x + O(x^p)} of that power series ring, where $p$ is the maximum precision
+of elements of the power series ring.
+
+The generator \code{x + O(x^p)} will be printed as per the supplied string
+\code{s}, which specifies the variable for the power series. This need not be the
+same as the variable name used to store the generator \code{x}, but it is usually
+convenient to make it to be so.}
+
+We also provide various constructors for creating elements of a power series
+ring. Below we assume that $S$ is a power series ring parent object, created
+for example by the following code:
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+\end{lstlisting}
+
+We will also let $p$ stand for the maximum precision, e.g. $p = 30$ in the case of
+$S$ as we just defined it, and $x$ to be the variable of the power series. We let
+$T$ stand for the type of the coefficients of the power series.
+
+\begin{lstlisting}
+S()
+\end{lstlisting}
+
+\desc{Create the power series $0 + O(x^p)$.}
+
+\begin{lstlisting}
+S(a::Integer)
+S(a::T)
+\end{lstlisting}
+
+\desc{Create the power series $a + O(x^p)$.}
+
+\begin{lstlisting}
+S(a::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return a reference to the power series \code{a}. No copy of the data is
+made by this function.}
+
+\begin{lstlisting}
+S(a::Array{T, 1}, n::Int p::Int)
+\end{lstlisting}
+
+\desc{Create a power series with precision \code{p} and with coefficients given
+by the array \code{a}. The constant coefficient of the power series will be the
+first element in the array. The length \code{n} must be a nonnegative integer
+and may not exceed the number of elements in the array, though it may be less
+(this is useful so that one does not have to create a new array if the array
+has trailing zeros). All but the first \code{n} terms of the array are ignored.}
+
+\begin{lstlisting}
+S(a::RingElem)
+\end{lstlisting}
+
+\desc{Try to coerce $a$ into the base ring of the power series ring and then
+construct the power series $a + O(x^p)$.}
+
+\begin{lstlisting}
+O(a::PowerSeries{T})
+\end{lstlisting}
+
+\desc{The power series $a$ should be of the form \code{x^n} for some nonnegative
+\code{n}. The function then returns $0 + O(x^n)$ with the same parent as the
+supplied power series.
+
+If the power series $0$ is passed to this function we throw a \code{DomainError()}. 
+
+Note that whilst we do not disallow it, we do not give any special meaning to
+expressions like $O(x - 1)$. Only the highest degree of the nonzero terms is
+observed.}
+
+\textbf{Examples.}
+
+Here are some examples of power series constructors.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+
+a = x^3 + 2x + 1
+b = (t^2 + 1)*x^2 + (t + 3)x + O(x^4)
+
+c = S(a)
+d = S([t + 1, t, R(1)], 3, 5)
+
+g = S(1)
+h = S(fmpz(2))
+k = S()
+\end{lstlisting}
+
+\subsubsection{Basic manipulation}
+
+\begin{lstlisting}
+length{T <: RingElem}(a::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return the length of the polynomial underlying the power series $a$, i.e.
+its degree plus one. Recall that power series in Nemo are stored in absolute
+format, not relative format, so the length of the underlying polynomial may be
+much bigger than the precision due to leading zeros.}
+
+\begin{lstlisting}
+normalise{T <: RingElem}(a::PowerSeries{T}, len::Int)
+\end{lstlisting}
+
+\desc{Return the normalised length of the polynomial representing the power
+series \code{a}, assuming that its unnormalised length is \code{len}. The
+polynomial representing \code{a} is normalised if it has either length $0$
+or its leading coefficient is nonzero. This function is mainly used internally
+because all user functions in Nemo normalise the internal polynomial
+representation of power series.}
+
+\begin{lstlisting}
+coeff{T <: RingElem}(a::PowerSeries{T}, n::Int)
+\end{lstlisting}
+
+\desc{Return the coefficient of the power series \code{a} with degree 
+\code{n}. If $n < 0$ we throw a \code{DomainError()} and if $n$ is greater
+than or equal to the power series precision we return $0$.}
+
+\begin{lstlisting}
+zero{T <: RingElem}(R::PowerSeriesRing{T})
+\end{lstlisting}
+
+\desc{Return $0 + O(x^p)$ where $p$ is the maximum precision for the
+given power series ring and where $x$ is its variable.}
+
+\begin{lstlisting}
+one{T <: RingElem}(::Type{PowerSeries{T}})
+\end{lstlisting}
+
+\desc{Return $1 + O(x^p)$ where $p$ is the maximum precision for the
+given power series ring and where $x$ is its variable.}
+
+\begin{lstlisting}
+gen{T <: RingElem}(::Type{PowerSeries{T}})
+\end{lstlisting}
+
+\desc{Return $x + O(x^{p+1})$ where $p$ is the maximum precision for the
+given power series ring and where $x$ is its variable.}
+
+\begin{lstlisting}
+iszero{T <: RingElem}(a::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if $a$ is arithmetically equal to $0$ in the
+power series ring up to the precision of $a$.}
+
+\begin{lstlisting}
+isone{T <: RingElem}(a::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if $a$ is arithmetically equal to $1$ in the
+power series ring up to the precision of $a$.}
+
+\begin{lstlisting}
+isgen{T <: RingElem}(a::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if $a$ is arithmetically equal to $x$ in the
+power series ring up to the precision of $a$.}
+
+\begin{lstlisting}
+isunit{T <: RingElem}(a::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if $a$ is an invertible element of the power series
+ring, i.e. if the lead term is degree zero with invertible coefficient.
+Otherwise, return \code{false}.}
+
+\begin{lstlisting}
+valuation{T <: RingElem}(a::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return the valuation of the power series \code{a} with respect to the
+generator of the power series ring. If the power series is zero to finite
+precision $n$, the valuation is defined to be $n$.}
+
+\begin{lstlisting}
+precision{T <: RingElem}(a::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return the (absolute) precision of the power series \code{a}.}
+
+\begin{lstlisting}
+max_precision{T <: RingElem}(R::PowerSeriesRing{T})
+\end{lstlisting}
+
+\desc{Return the maximum precision for the given power series ring. Recall
+that this is a relative precision.}
+
+\begin{lstlisting}
+deepcopy{T <: RingElem}(a::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Create a new power series object which is precisely equal to the
+supplied power series, i.e. with the same coefficients and precision.}
+
+\textbf{Examples.}
+
+Here are some examples of basic manipulations of power series.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+
+a = O(x^4)
+b = (t^2 + 1)*x^2 + (t + 3)x + O(x^4)
+
+c = gen(R)
+d = zero(R)
+f = one(R)
+
+g = iszero(d)
+h = isone(f)
+k = isgen(c)
+m = isunit(-1 + x + 2x^2)
+n = valuation(a)
+p = valuation(b)
+q = deepcopy(a)
+\end{lstlisting}
+
+\subsubsection{Unary operators}
+
+\begin{lstlisting}
+-{T <: RingElem}(a::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return $-a$.}
+
+\textbf{Examples.}
+
+Here are some examples of unary operators.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+
+a = 2x + x^3
+b = 1 + 2x + x^2 + O(x^3)
+
+c = -a
+d = -b
+\end{lstlisting}
+
+\subsubsection{Binary operators}
+
+\begin{lstlisting}
++{T <: RingElem}(a::PowerSeries{T}, b::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return $a + b$. If the two power series have differing absolute
+precisions, the result will be a power series with the lower precision.}
+
+\begin{lstlisting}
+-{T <: RingElem}(a::PowerSeries{T}, b::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return $a - b$. If the two power series have differing absolute
+precisions, the result will be a power series with the lower precision.}
+
+\begin{lstlisting}
+*{T <: RingElem}(a::PowerSeries{T}, b::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return $ab$. The return precision is equal to the least out of the
+sum of the precision of \code{a} and the valuation of \code{b} and
+the sum of the valuation of \code{a} and the precision of \code{b}.}
+
+\textbf{Examples.}
+
+Here are some examples of binary operators.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+
+a = 2x + x^3
+b = O(x^4)
+c = 1 + x + 3x^2 + O(x^5)
+d = x^2 + 3x^3 - x^4
+
+f = a + b
+g = a - c
+h = b*c
+j = a*c
+m = a*d
+\end{lstlisting}
+
+\subsubsection{Ad hoc binary operators}
+
+\begin{lstlisting}
+*{T <: RingElem}(a::Int, b::PowerSeries{T})
+*{T <: RingElem}(a::fmpz, b::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return $ab$. The resulting power series will have the same precision as
+$b$.}
+
+\begin{lstlisting}
+*{T <: RingElem}(a::Poly{T}, b::Int)
+*{T <: RingElem}(a::Poly{T}, b::fmpz)
+\end{lstlisting}
+
+\desc{Return $ab$. The resulting power series will have the same precision as
+$a$.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc binary operators.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+
+a = 2x + x^3
+b = O(x^4)
+c = 1 + x + 3x^2 + O(x^5)
+d = x^2 + 3x^3 - x^4
+
+f = 2a
+g = fmpz(3)*b
+h = c*2
+j = d*fmpz(3)
+\end{lstlisting}
+
+\subsubsection{Comparison}
+
+Note that we take the convention that $1 + x + O(x^4) == 1 + x + O(x^8)$. 
+
+\begin{lstlisting}
+=={T <: RingElem}(x::PowerSeries{T}, y::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the two power series are the same up to the lesser
+of the precisions of the two series, otherwise return \code{false}.}
+
+Julia automatically defines a corresponding \code{!=} operator.
+
+\begin{lstlisting}
+isequal(x::PowerSeries{T}, y::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Returns \code{true} if the $x == y$, the precisions of $x$ and $y$ are
+the same and if each coefficient of $x$ recursively compares equal to the
+corresponding coefficient of $y$ according to \code{isequal}, otherwise return
+\code{false}.}
+
+\textbf{Examples.}
+
+Here are some examples of comparison.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+
+a = 2x + x^3
+b = O(x^3)
+c = 1 + x + 3x^2 + O(x^5)
+d = 3x^3 - x^4
+
+a == 2x + x^3
+b == d
+c != d
+isequal(b, d) == false
+\end{lstlisting}
+
+\subsubsection{Ad hoc comparison}
+
+Note that we take the convention that $0 == 0 + O(x^4)$.
+
+\begin{lstlisting}
+=={T <: RingElem}(x::PowerSeries{T}, y::Int)
+=={T <: RingElem}(x::PowerSeries{T}, y::fmpz)
+\end{lstlisting}
+
+\desc{Return \code{true} if the power series \code{x} is equal to \code{y} up
+to the precision it has. Note that this is always true if \code{x} has
+precision $0$.}
+
+\begin{lstlisting}
+=={T <: RingElem}(x::Int, y::PowerSeries{T})
+=={T <: RingElem}(x::fmpz, y::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the power series \code{y} is equal to \code{x} up
+to the precision it has. Note that this is always true if \code{y} has
+precision $0$.}
+
+Julia automatically defines a corresponding \code{!=} operator corresponding to
+the above.
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc comparison.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+
+a = 2x + x^3
+b = O(x^0)
+c = 1 + O(x^5)
+d = S(3)
+
+d == 3
+c == fmpz(1)
+fmpz(0) != a
+2 == b
+fmpz(1) == c
+\end{lstlisting}
+
+\subsubsection{Powering}
+
+\begin{lstlisting}
+^{T <: RingElem}(a::PowerSeries{T}, b::Int)
+\end{lstlisting}
+
+\desc{Return $a^b$. The result will have precision equal to $b - 1$ times the
+valuation of $a$ plus the precision of $a$. This is the same as if $a$ were
+multiplied by itself $b$ times.}
+
+\textbf{Examples.}
+
+Here are some examples of powering.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+
+a = 2x + x^3
+b = O(x^4)
+c = 1 + x + 2x^2 + O(x^5)
+d = 2x + x^3 + O(x^4)
+
+f = a^12
+g = b^12
+h = c^12
+k = d^12
+\end{lstlisting}
+
+\subsubsection{Shifting}
+
+\begin{lstlisting}
+shift_left{T <: RingElem}(a::PowerSeries{T}, n::Int)
+\end{lstlisting}
+
+\desc{Return \code{a*x^n}, where \code{x} is the generator of the power series
+ring and \code{n} is a nonnegative integer. If \code{n} is negative we raise
+a \code{DomainError()}.}
+
+\begin{lstlisting}
+shift_right{T <: RingElem}(a::PowerSeries{T}, n::Int)
+\end{lstlisting}
+
+\desc{Return \code{a/x^n}, discarding the remainder, where \code{x} is the
+generator of the power series ring and \code{n} is a nonnegative integer. If 
+\code{n} is negative we raise a \code{DomainError()}.}
+
+\textbf{Examples.}
+
+Here are some examples of shifting.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+
+a = 2x + x^3
+b = O(x^4)
+c = 1 + x + 2x^2 + O(x^5)
+d = 2x + x^3 + O(x^4)
+
+f = shift_left(a, 2)
+g = shift_left(b, 2)
+h = shift_right(c, 1)
+k = shift_right(d, 3)
+\end{lstlisting}
+
+\subsubsection{Truncation}
+
+\begin{lstlisting}
+truncate{T <: RingElem}(a::PowerSeries{T}, prec::Int)
+\end{lstlisting}
+
+\desc{Return the power series \code{a} truncated to the given (absolute)
+precision. If \code{a} already has precision less than or equal to \code{prec}
+this results in no change. If \code{prec} is negative we throw a
+\code{DomainError()}.}
+
+\textbf{Examples.}
+
+Here are some examples of truncation.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+
+a = 2x + x^3
+b = O(x^4)
+c = 1 + x + 2x^2 + O(x^5)
+d = 2x + x^3 + O(x^4)
+
+f = truncate(a, 3)
+g = truncate(b, 2)
+h = truncate(c, 7)
+k = truncate(d, 5)
+\end{lstlisting}
+
+\subsubsection{Exact division}
+
+\begin{lstlisting}
+divexact{T <: RingElem}(x::PowerSeries{T}, y::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return the quotient of $x$ by $y$. This requires \code{x} to have
+valuation at least that of \code{y}. It also requires the first nonzero
+coefficient of \code{y} to be a unit in the ring \code{T}. If \code{y}
+is zero, a \code{DivideError()} is thrown. 
+
+The precision of the result is equal to the minimum of $p_x - v_y$
+and $p_y - 2v_y + v_x$ where $p_x$, $p_y$ are the precisions of \code{x} and
+\code{y} respectively and $v_x$, $v_y$ are the corresponding valuations.}
+
+\textbf{Examples.}
+
+Here are some examples of exact division.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+
+a = x + x^3
+b = O(x^4)
+c = 1 + x + 2x^2 + O(x^5)
+d = x + x^3 + O(x^6)
+
+f = divexact(a, d)
+g = divexact(d, a)
+h = divexact(b, c)
+k = divexact(d, c)
+\end{lstlisting}
+
+\subsubsection{Ad hoc exact division}
+
+\begin{lstlisting}
+divexact{T <: RingElem}(x::PowerSeries{T}, y::Int)
+divexact{T <: RingElem}(x::PowerSeries{T}, y::fmpz)
+\end{lstlisting}
+
+\desc{Return the quotient of $x$ by $y$. If \code{y} is zero, a
+\code{DivideError()} is thrown. 
+
+The precision of the result is equal to that of $x$.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc exact division.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+
+a = x + x^3
+b = O(x^4)
+c = 1 + x + 2x^2 + O(x^5)
+d = x + x^3 + O(x^6)
+
+f = divexact(a, 7)
+g = divexact(b, fmpz(11))
+h = divexact(c, fmpz(2))
+k = divexact(d, 9)
+\end{lstlisting}
+
+\subsubsection{Inversion}
+
+\begin{lstlisting}
+inv{T <: RingElem}(a::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Return the power series inverse of $a$. A \code{DivideError()} is thrown 
+if \code{a} is zero. An exception is thrown if \code{a} isn't invertible.
+
+The precision of the result is equal to the precision of \code{a}.}
+
+\textbf{Examples.}
+
+Here are some examples of inversion.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+
+a = 1 + x + 2x^2 + O(x^5)
+b = S(-1)
+
+c = inv(a)
+d = inv(b)
+\end{lstlisting}
+
+\subsubsection{Special functions}
+
+\begin{lstlisting}
+exp{T <: RingElem}(a::PowerSeries{T})
+\end{lstlisting}
+
+\desc{Compute the power series exponential of the given power series \code{a}
+to the same precision as \code{a}. The valuation of \code{a} must be nonzero.}
+
+\textbf{Examples.}
+
+Here are some examples of special functions.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+
+a = exp(x + O(x^40))
+b = divexact(x, exp(x + O(x^40)) - 1)
 \end{lstlisting}
 
 \section{Flint rings}
@@ -3996,637 +4732,6 @@ Here are some examples of factoring.
    S = factor_squarefree(f*g)
    T = factor_distinct_deg((x + 1)*g*(x^5+x^3+x+1))
    U = factor_shape(f*g)
-\end{lstlisting}
-
-\subsection{Power series rings}
-
-In Nemo we provide a parametric type \code{PowerSeries} for univariate power
-series over a ring. There's no need to deal directly with the type, as we
-provide a function \code{PowerSeriesRing} for constructing it.
-
-We will describe how the \code{PowerSeries} type works, but the uninterested
-user can skip to the section on constructors.
-
-As for the \code{Poly} type, the \code{PowerSeries} type takes two parameters:
-a type \code{T} in the \code{Ring} class and a parameter \code{S} for a symbol
-representing the variable of the power series ring. For example, the type of
-a power series ring $\Z[[x]]$ would be denoted \code|PowerSeries{ZZ, :x}|.
-
-Here is the definition of the \code{PowerSeries} type in Nemo.
-
-\begin{lstlisting}
-type PowerSeries{T <: RingElem} <: Ring
-   arr::Ptr{Void}
-   length::Int
-   alloc::Int
-   inv::Int
-   prec :: Precision
-   coeffs :: Array{T, 1}
-end
-\end{lstlisting}
-
-This is identical to the definition for the \code{Poly} type, except for the
-\code{prec} field.
-
-The precision of each power series is retained with the element, rather than
-the ring itself. This means that operations can be applied to power series
-with different precisions.
-
-The precision can be either a non-negative integer or infinite precision. To
-denote the latter, we use the Julia \code{nothing} value.
-
-\begin{lstlisting}
-typealias Precision Union(Nothing, Int)
-\end{lstlisting}
-
-Thus when a power series has a precision which is of type \code{Int} it
-represents a finite precision power series. If it has a precision which is
-set to \code{nothing} then it is infinite precision (exact), obviously
-with all zero coefficients from some point onwards!
-
-We define precision such that the power series $1 + x + O(x^3)$ has
-precision $3$ and $1 + x$ has precision \code{nothing}.
-
-We overload arithmetic and comparison between operands of type \code{Int}
-and \code{Nothing} so that one can add and subtract precisions (where this
-is defined) and compare precisions. An infinite precision power series
-always has greater precision than a finite precision power series. We also
-allow taking \code{max} and \code{min} of two values of type \code{Precision}.
-
-\subsubsection{Constructors}
-
-We define the following function for constructing the type of a power series
-ring.
-
-\begin{lstlisting}
-PowerSeriesRing{T <: Ring}(::Type{T}, s::String)
-\end{lstlisting}
-
-\desc{Returns a tuple \code{(R, x)} consisting of the type \code{R} 
-corresponding to the power series ring over the ring \code{T} and the generator
-\code{x} of that power series ring. The generator \code{x} will be printed as
-per the supplied string \code{s}. This need not be the same as the variable
-name used to store the generator \code{x}, but it is usually convenient to make
-it so.}
-
-We also provide various constructors for creating elements of a power series
-ring.
-
-\begin{lstlisting}
-PowerSeries{T <: RingElem}()
-\end{lstlisting}
-
-\desc{Create the infinite precision power series $0$ in the given power series
-ring.}
-
-\begin{lstlisting}
-PowerSeries{T <: RingElem}(a::Integer)
-PowerSeries{T <: RingElem}(a::T)
-\end{lstlisting}
-
-\desc{Create the infinite precision power series $a$ in the given power series
-ring.}
-
-\begin{lstlisting}
-PowerSeries{T <: RingElem}(a::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Return a reference to the power series \code{a}. No copy of the data is
-made by this function.}
-
-\begin{lstlisting}
-PowerSeries{T, S}(::Type{PowerSeries{T, S}}, 
-                          a :: Array{T, 1}, n :: Precision)
-\end{lstlisting}
-
-\desc{Create a power series in the given power series ring with precision
-\code{n} and with coefficients given by the array \code{a}. The constant 
-coefficient of the power series will be the first element in the array. Note
-that the precision \code{n} can be any nonnegative integer, or the special
-value \code{nothing}, which corresponds to an infinite precision power series.
-The array may have trailing zeroes, but these are ignored (i.e. normalisation
-of the underlying polynomial data occurs automatically).}
-
-\begin{lstlisting}
-O{T, S}(a :: PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{This function should only be passed a power series of the form \code{x^n}
-for some nonnegative \code{n}. It then returns $0 + O(x^n)$, which is useful
-for adding to infinite precision power series to turn them into finite 
-precision ones. 
-
-If the power series $0$ is passed to this function we throw a 
-\code{DivideError()}. We also throw an exception if a power series with finite
-precision is passed to this function.
-
-Note that whilst we do not disallow it, we do not give any special meaning to
-expressions like $O(x - 1)$. If a general infinite precision power series is
-passed to this function, only the highest degree of the nonzero terms is
-observed.}
-
-\textbf{Examples.}
-
-Here are some examples of power series constructors.
-
-\begin{lstlisting}
-R, x = PowerSeriesRing(ZZ, "x")
-
-a = x^3 + 2x + 1
-b = x^2 + 3x + O(x^4)
-
-c = R(a)
-d = PowerSeries(R, [ZZ(1), ZZ(2), ZZ(3)], 5)
-f = PowerSeries(R, [ZZ(1), ZZ(2), ZZ(3)], nothing)
-
-g = R(1)
-h = R(ZZ(2))
-k = R()
-\end{lstlisting}
-
-\subsubsection{Basic manipulation}
-
-\begin{lstlisting}
-degree{T <: RingElem}(a::Poly{T})
-\end{lstlisting}
-
-\desc{Return the degree of the polynomial underlying the power series $a$.
-We define the degree of the zero polynomial to be $-1$.}
-
-\begin{lstlisting}
-length{T <: RingElem}(a::Poly{T})
-\end{lstlisting}
-
-\desc{Return the length of the polynomial underlying the power series $a$, i.e.
-its degree plus one.}
-
-\begin{lstlisting}
-normalise{T <: RingElem}(a::PowerSeries{T, S}, len::Int)
-\end{lstlisting}
-
-\desc{Return the normalised length of the polynomial representing the power
-series \code{a}, assuming that its unnormalised length is \code{len}. The
-polynomial representing \code{a} is normalised if it has either length $0$
-or its leading coefficient is nonzero. This function is mainly used internally
-because all user functions in Nemo normalise the internal polynomial
-representation of power series.}
-
-\begin{lstlisting}
-coeff{T <: RingElem}(a::PowerSeries{T, S}, n::Int)
-\end{lstlisting}
-
-\desc{Return the coefficient of the power series \code{a} with degree 
-\code{n}. If $n < 0$ or greater than or equal to the power series precision
-we return $0$.}
-
-\begin{lstlisting}
-zero{T <: RingElem}(::Type{PowerSeries{T, S}})
-\end{lstlisting}
-
-\desc{Return the additive identity of the power series ring, i.e. $0$ as an
-infinite precision power series.}
-
-\begin{lstlisting}
-one{T <: RingElem}(::Type{PowerSeries{T, S}})
-\end{lstlisting}
-
-\desc{Return the multiplicative identity of the power series ring, i.e. $1$ as an
-infinite precision power series.}
-
-\begin{lstlisting}
-gen{T <: RingElem}(::Type{PowerSeries{T, S}})
-\end{lstlisting}
-
-\desc{Return the degree one, monic monomial generator of the power series
-ring.}
-
-\begin{lstlisting}
-iszero{T <: RingElem}(a::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Return \code{true} if $a$ is the additive identity of the power series
-ring. Otherwise, return \code{false}. Note that this is not the same as
-checking \code{a == 0}. The latter does not check that the precision of
-\code{a} is \code{nothing}.}
-
-\begin{lstlisting}
-isone{T <: RingElem}(a::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Return \code{true} if $a$ is the multiplicative identity of the power
-series ring. Otherwise, return \code{false}. Note that this is not the same
-as checking \code{a == 1}. The latter does not check that the precision of
-\code{a} is \code{nothing}.}
-
-\begin{lstlisting}
-isgen{T <: RingElem}(a::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Return \code{true} if $a$ is the degree one, monic monomial generator of
-the power series ring. Otherwise, return \code{false}.}
-
-\begin{lstlisting}
-isunit{T <: RingElem}(a::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Return \code{true} if $a$ is an invertible element of the power series
-ring, i.e. if the lead term is degree zero with invertible coefficient.
-Otherwise, return \code{false}.}
-
-\begin{lstlisting}
-valuation{T <: RingElem}(a::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Return the valuation of the power series \code{a} with respect to the
-generator of the power series ring. If the power series is zero to finite
-precision $n$, the valuation is defined to be $n$.}
-
-\textbf{Examples.}
-
-Here are some examples of basic manipulations of power series.
-
-\begin{lstlisting}
-R, x = PowerSeriesRing(ZZ, "x")
-
-a = 2x + x^3
-b = O(x^4)
-
-c = gen(R)
-d = zero(R)
-f = one(R)
-
-g = iszero(d)
-h = isone(f)
-k = isgen(c)
-m = isunit(-1 + x + 2x^2)
-n = valuation(a)
-p = valuation(b)
-\end{lstlisting}
-
-\subsubsection{Unary operators}
-
-\begin{lstlisting}
--{T <: RingElem}(a::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Return $-a$.}
-
-\textbf{Examples.}
-
-Here are some examples of unary operators.
-
-\begin{lstlisting}
-R, x = PowerSeriesRing(ZZ, "x")
-
-a = 2x + x^3
-b = 1 + 2x + x^2 + O(x^3)
-
-c = -a
-d = -b
-\end{lstlisting}
-
-\subsubsection{Binary operators}
-
-\begin{lstlisting}
-+{T <: RingElem}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Return $a + b$. If the two power series have differing precisions, the
-result will be a power series with the lower precision.}
-
-\begin{lstlisting}
--{T <: RingElem}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Return $a - b$. If the two power series have differing precisions, the
-result will be a power series with the lower precision.}
-
-\begin{lstlisting}
-*{T <: RingElem}(a::PowerSeries{T, S}, b::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Return $ab$. The return precision is equal to the least out of the
-product of the precision of \code{a} by the valuation of \code{b} and
-the product of the valuation of \code{a} by the precision of \code{b}.}
-
-\textbf{Examples.}
-
-Here are some examples of binary operators.
-
-\begin{lstlisting}
-R, x = PowerSeriesRing(ZZ, "x")
-
-a = 2x + x^3
-b = O(x^4)
-c = 1 + x + 3x^2 + O(x^5)
-d = x^2 + 3x^3 - x^4
-
-f = a + b
-g = a - c
-h = b*c
-j = a*c
-m = a*d
-\end{lstlisting}
-
-\subsubsection{Ad hoc binary operators}
-
-\begin{lstlisting}
-*{T <: RingElem}(a::Int, b::PowerSeries{T, S})
-*{T <: RingElem}(a::ZZ, b::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Return $ab$. The resulting power series will have the same precision as
-$b$.}
-
-\begin{lstlisting}
-*{T <: RingElem}(a::Poly{T}, b::Int)
-*{T <: RingElem}(a::Poly{T}, b::ZZ)
-\end{lstlisting}
-
-\desc{Return $ab$. The resulting power series will have the same precision as
-$b$.}
-
-\textbf{Examples.}
-
-Here are some examples of ad hoc binary operators.
-
-\begin{lstlisting}
-R, x = PowerSeriesRing(ZZ, "x")
-
-a = 2x + x^3
-b = O(x^4)
-c = 1 + x + 3x^2 + O(x^5)
-d = x^2 + 3x^3 - x^4
-
-f = 2a
-g = ZZ(3)*b
-h = c*2
-j = d*ZZ(3)
-\end{lstlisting}
-
-\subsubsection{Comparison}
-
-Note that we take the convention that $1 + x + O(x^4) == 1 + x + O(x^8)$. 
-
-\begin{lstlisting}
-=={T <: RingElem}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Return \code{true} if the two power series are the same up to the lesser
-of the precisions of the two series, otherwise return \code{false}.}
-
-Julia automatically defines a corresponding \code{!=} operator.
-
-\begin{lstlisting}
-isequal(x::PowerSeries{T, S}, y::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Returns \code{true} if the $x == y$, the precisions of $x$ and $y$ are
-the same and if each coefficient of $x$ recursively compares equal to the
-corresponding coefficient of $y$ according to \code{isequal}, otherwise return
-\code{false}.}
-
-\textbf{Examples.}
-
-Here are some examples of comparison.
-
-\begin{lstlisting}
-R, x = PowerSeriesRing(ZZ, "x")
-
-a = 2x + x^3
-b = O(x^3)
-c = 1 + x + 3x^2 + O(x^5)
-d = 3x^3 - x^4
-
-a == 2x + x^3
-b == d
-c != d
-\end{lstlisting}
-
-\subsubsection{Ad hoc comparison}
-
-Note that we take the convention that $0 == 0 + O(x^4)$.
-
-\begin{lstlisting}
-=={T <: RingElem}(x::PowerSeries{T, S}, y::Int)
-=={T <: RingElem}(x::PowerSeries{T, S}, y::ZZ)
-\end{lstlisting}
-
-\desc{Return \code{true} if the power series \code{x} is equal to \code{y} up
-to the precision it has. Note that this is always true if \code{x} has
-precision $0$.}
-
-\begin{lstlisting}
-=={T <: RingElem}(x::Int, y::PowerSeries{T, S})
-=={T <: RingElem}(x::ZZ, y::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Return \code{true} if the power series \code{y} is equal to \code{x} up
-to the precision it has. Note that this is always true if \code{y} has
-precision $0$.}
-
-Julia automatically defines a corresponding \code{!=} operator corresponding to
-the above.
-
-\textbf{Examples.}
-
-Here are some examples of ad hoc comparison.
-
-\begin{lstlisting}
-R, x = PowerSeriesRing(ZZ, "x")
-
-a = 2x + x^3
-b = O(x^0)
-c = 1 + O(x^5)
-d = R(3)
-
-d == 3
-c == ZZ(1)
-ZZ(0) != a
-2 == b
-ZZ(1) == c
-\end{lstlisting}
-
-\subsubsection{Powering}
-
-\begin{lstlisting}
-^{T <: RingElem}(a::PowerSeries{T, S}, b::Int)
-\end{lstlisting}
-
-\desc{Return $a^b$. The result will have precision equal to $b - 1$ times the
-valuation of $a$ plus the precision of $a$. This is the same as if $a$ were
-multiplied by itself $b$ times.}
-
-\textbf{Examples.}
-
-Here are some examples of powering.
-
-\begin{lstlisting}
-R, x = PowerSeriesRing(ZZ, "x")
-
-a = 2x + x^3
-b = O(x^4)
-c = 1 + x + 2x^2 + O(x^5)
-d = 2x + x^3 + O(x^4)
-
-f = a^12
-g = b^12
-h = c^12
-k = d^12
-\end{lstlisting}
-
-\subsubsection{Shifting}
-
-\begin{lstlisting}
-shift_left{T <: RingElem}(a::PowerSeries{T, S}, n::Int)
-\end{lstlisting}
-
-\desc{Return \code{a*x^n}, where \code{x} is the generator of the power series
-ring and \code{n} is a nonnegative integer. If \code{n} is negative we raise
-a \code{DomainError()}. As \code{x^n} is considered exact, the precision of
-the result will be the precision of \code{a} increased by \code{n}.}
-
-\begin{lstlisting}
-shift_right{T <: RingElem}(a::PowerSeries{T, S}, n::Int)
-\end{lstlisting}
-
-\desc{Return \code{a/x^n}, discarding the remainder, where \code{x} is the
-generator of the power series ring and \code{n} is a nonnegative integer. If 
-\code{n} is negative we raise a \code{DomainError()}. As \code{x^n} is
-considered exact, the precision of the result will be the precision of \code{a}
-decreased by \code{n}.}
-
-\textbf{Examples.}
-
-Here are some examples of shifting.
-
-\begin{lstlisting}
-R, x = PowerSeriesRing(ZZ, "x")
-
-a = 2x + x^3
-b = O(x^4)
-c = 1 + x + 2x^2 + O(x^5)
-d = 2x + x^3 + O(x^4)
-
-f = shift_left(a, 2)
-g = shift_left(b, 2)
-h = shift_right(c, 1)
-k = shift_right(d, 3)
-\end{lstlisting}
-
-\subsubsection{Truncation}
-
-\begin{lstlisting}
-truncate{T <: RingElem}(x::PowerSeries{T, S}, prec::Precision)
-\end{lstlisting}
-
-\desc{Return the power series \code{x} truncated to the given precision. If
-\code{x} already has precision less than or equal to \code{prec} this results
-in no change. The precision \code{prec} can be \code{nothing}, representing
-an infinite precision. But this has no effect. If \code{prec} is negative we
-throw a \code{DomainError()}.}
-
-\textbf{Examples.}
-
-Here are some examples of truncation.
-
-\begin{lstlisting}
-R, x = PowerSeriesRing(ZZ, "x")
-
-a = 2x + x^3
-b = O(x^4)
-c = 1 + x + 2x^2 + O(x^5)
-d = 2x + x^3 + O(x^4)
-
-f = truncate(a, 3)
-g = truncate(b, 2)
-h = truncate(c, nothing)
-k = truncate(d, 5)
-\end{lstlisting}
-
-\subsubsection{Exact division}
-
-\begin{lstlisting}
-divexact{T <: RingElem}(x::PowerSeries{T, S}, y::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Return \code{x/y}. This requires \code{x} to have valuation at least that
-of \code{y}. It also requires the first nonzero coefficient of \code{y} to be
-a unit in the ring \code{T}. If \code{y} is zero, a \code{DivideError()} is
-thrown. 
-
-The precision of the result is equal to the minimum of $p_x - v_y$
-and $p_y - 2v_y + v_x$ where $p_x$, $p_y$ are the precisions of \code{x} and
-\code{y} respectively and $v_x$, $v_y$ are the corresponding valuations.
-
-If the precision of \code{y} is infinite and the result would be a power
-series of infinite length, an exception is thrown.}
-
-\textbf{Examples.}
-
-Here are some examples of exact division.
-
-\begin{lstlisting}
-R, x = PowerSeriesRing(ZZ, "x")
-
-a = x + x^3
-b = O(x^4)
-c = 1 + x + 2x^2 + O(x^5)
-d = x + x^3 + O(x^6)
-
-f = divexact(a, d)
-g = divexact(d, a)
-h = divexact(b, c)
-k = divexact(d, c)
-\end{lstlisting}
-
-\subsubsection{Inversion}
-
-\begin{lstlisting}
-inv{T <: RingElem}(a::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Return $1/a$. A \code{DivideError()} is thrown if \code{a} is zero. An
-exception is thrown if \code{a} isn't invertible or if \code{a} has infinite
-precision and has anything other than a nonzero constant term.
-
-The precision of the result is equal to the precision of \code{a}.}
-
-\textbf{Examples.}
-
-Here are some examples of inversion.
-
-\begin{lstlisting}
-R, x = PowerSeriesRing(ZZ, "x")
-
-a = 1 + x + 2x^2 + O(x^5)
-b = R(-1)
-
-c = inv(a)
-d = inv(b)
-\end{lstlisting}
-
-\subsubsection{Special functions}
-
-\begin{lstlisting}
-exp{T <: RingElem}(a::PowerSeries{T, S})
-\end{lstlisting}
-
-\desc{Compute the power series exponential of the given power series \code{a}
-to the same precision as \code{a}. If \code{a} has infinite precision an
-exception is thrown.}
-
-\textbf{Examples.}
-
-Here are some examples of special functions.
-
-\begin{lstlisting}
-using Nemo.Fields
-
-R, x = PowerSeriesRing(QQ, "x")
-
-a = exp(x + O(x^40))
-b = divexact(x, exp(x + O(x^40)) - 1)
 \end{lstlisting}
 
 \section{The Fields module}

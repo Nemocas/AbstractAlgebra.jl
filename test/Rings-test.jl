@@ -11,9 +11,10 @@ include("flint/nmod_poly-test.jl")
 
 include("generic/Poly-test.jl")
 include("generic/Residue-test.jl")
+include("generic/PowerSeries-test.jl")
 
-include("PowerSeries-test.jl")
 include("nmod_mat-test.jl")
+include("fmpz_series-test.jl")
 include("Fields-test.jl")
 
 function test_rings()
@@ -24,9 +25,10 @@ function test_rings()
 
    test_poly()
    test_residue()
-
    test_series()
+
    test_nmod_mat()
+   test_fmpz_series()
 end
 
 function test_all()
