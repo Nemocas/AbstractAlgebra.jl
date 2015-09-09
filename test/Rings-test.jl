@@ -16,6 +16,7 @@ include("generic/Residue-test.jl")
 include("generic/PowerSeries-test.jl")
 
 include("nmod_mat-test.jl")
+
 include("Fields-test.jl")
 
 function test_rings()

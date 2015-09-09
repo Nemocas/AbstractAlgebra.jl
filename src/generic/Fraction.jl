@@ -112,7 +112,7 @@ function show(io::IO, x::FractionElem)
       print(io, "(")
    end
    print(io, n)
-   if den != 1
+   if d != 1
       if needs_parentheses(n)
          print(io, ")")
       end
@@ -271,6 +271,11 @@ function =={T <: RingElem}(x::FractionElem{T}, y::FractionElem{T})
    return (den(x) == den(y) && num(x) == num(y)) || (num(x)*den(y) == den(x)*num(y))
 end
 
+function isequal{T <: RingElem}(x::FractionElem{T}, y::FractionElem{T})
+   check_parent(x, y)
+   return isequal(num(x)*den(y), den(x)*num(y))
+end
+
 ###############################################################################
 #
 #   Ad hoc comparisons
@@ -288,7 +293,6 @@ function =={T <: RingElem}(x::Fraction{T}, y::T)
 end
 
 =={T <: RingElem}(x::T, y::Fraction{T}) = y == x
-
 
 ###############################################################################
 #

@@ -2836,6 +2836,575 @@ implementations where available.
 
 We only describe the details that differ from the generic implementations above.
 
+\section{Generic fields}
+
+Nemo provides various constructions of fields. 
+
+Nemo defines the abstract type \code{Field} like so:
+
+\begin{lstlisting}
+abstract Field <: Ring
+\end{lstlisting}
+
+This means fields can be used anywhere that a more general ring can be used
+in Nemo.
+
+Division in a field can be performed with \code{divexact}. Of course all
+divisions in a field are exact, except division by zero which will raise
+a \code{DivideError()}.
+
+The \code{//} operator doubles as a division operator when passed operands
+in a field. It is an alias for \code{divexact}.
+
+\subsection{Fraction fields}
+
+We allow the construction of a fraction field over any ring in Nemo. Not all
+such constructions make sense. Typically it only makes sense to construct the
+fraction field of an integral domain. However, so long as zero divisors are
+avoided there is nothing stopping one constructing the fraction field of a
+more general Euclidean ring in Nemo.
+
+Specifically, a ring must provide a \code{gcd} function before we can take its
+fraction field. This is required for canonicalisation.
+
+The type of an element of a fraction field in Nemo is \code{Fraction} which
+belongs to the type class \code{FractionElem} which in turn belongs to
+\code{FieldElem}. The type of a fraction field parent object is
+\code{FractionField} which belongs to \code{Field}.
+
+The user need never deal directly with these types, as we provide convenient
+functions for constructing objects of those types.
+
+The types of \code{FractionField} parent objects and \code{Fraction} elements
+are parameterised by the type \code{T} of elements of the base ring of the
+fraction field.
+
+The generic \code{Fraction} objects contain a numerator and denominator, both
+of type \code{T}, and a pointer to the parent fraction field object.
+
+The fraction field parent objects can be used to construct fractions in the
+given fraction field.
+
+The fractions in Nemo are canonicalised, which means that we divide both
+numerator and denominator by their greatest common divisor. We also divide
+by \code{canonical_unit(d)} where \code{d} is the denominator when needed,
+e.g. when printing fractions or taking their numerator or denominator, etc.
+We also use this to easily check equality of fractions.
+
+The \code{canonical_unit} function must have the properties
+
+\begin{lstlisting}
+canonical_unit(u) == u
+canonical_unit(a*b) == canonical_unit(a)*canonical_unit(b)
+\end{lstlisting}
+
+for all values $a$ and $b$ in the base ring and $u$ any invertible element in 
+the base ring. Moreover, \code{canonical_unit} must always return an invertible
+element in the base ring.
+
+We overload the \code{//} operator in Nemo for rings whose fraction field can
+be taken (e.g. \code{fmpz} and \code|Poly{T}|), so that elements of the
+fraction field of a ring can be constructed directly, without first
+constructing the type.
+
+For example if we have
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+
+s = (x + 1)//(x^2 + 1)
+\end{lstlisting}
+
+then the value $s$ belongs to the fraction field of $R$ automatically, even
+though this field has not been constructed yet.
+
+In Nemo, we consider the fraction field of a field to be itself.
+
+\subsubsection{Constructors}
+
+We provide a convenient function for constructing a fraction field of a ring in
+Nemo.
+
+\begin{lstlisting}
+FractionField(R::Ring)
+\end{lstlisting}
+
+\desc{Construct the fraction field of the given ring.}
+
+There are also numerous constructors for generating elements in the fraction
+field. In the constructor below, we assume $S$ is the fraction field of a ring,
+e.g. as constructed by the following:
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S = FractionField(R)
+\end{lstlisting}
+
+We assume $T$ represents the type of elements of the base ring.
+
+\begin{lstlisting}
+S(a::T)
+\end{lstlisting}
+
+\desc{Construct the canonicalised fraction \code{a//1} in the fraction field.}
+
+\begin{lstlisting}
+S(a::Integer)
+S(a::T)
+\end{lstlisting}
+
+\desc{Return the value $a//1$ in the fraction field.}
+
+\begin{lstlisting}
+S(a::Integer, b::Integer)
+S(a::T, b::T)
+\end{lstlisting}
+
+\desc{Construct the canonicalised fraction \code{a//b} in the fraction field. If
+$b = 0$ we throw a \code{DivideError()} and an exception is raised in general
+if $b$ is not invertible.}
+
+\begin{lstlisting}
+S()
+\end{lstlisting}
+
+\desc{Return the value $0/1$ in the fraction field.}
+
+\begin{lstlisting}
+S(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Return a reference to the value $a$. No copy of the data is made.}
+
+\begin{lstlisting}
+S(b::RingElem)
+\end{lstlisting}
+
+\desc{Coerce $b$ into the base ring of the fraction field and construct the
+fraction $b//1$.}
+
+We also provide a simpler way of constructing elements of a fraction field
+without needing to first construct the type of the fraction field. 
+
+\begin{lstlisting}
+//(x::T, y::T)
+//(x::T, y::Integer)
+//(x::Integer, y::T)
+\end{lstlisting}
+
+\desc{Return the canonicalised value $x//y$ in the fraction field. In the cases
+where one argument is an integer, it is first coerced into the base ring. If
+$y = 0$ we throw a \code{DivideError()} and an exception is raised in general
+if $y$ is not invertible.}
+
+\textbf{Examples.}
+
+Here are some examples of constructors for fraction fields.
+
+\begin{lstlisting}
+S, x = PolynomialRing(ZZ, "x")
+T = FractionField(S)
+
+b = T(3)
+c = T(fmpz(7))
+d = T(x + 2)
+f = T(d)
+g = T()
+h = T(x + 1, x + 2)
+
+k = (x + 3)//(x^2 + 2)
+\end{lstlisting}
+
+\subsubsection{Basic manipulation}
+
+\begin{lstlisting}
+num{T <: RingElem}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Return the numerator of the fraction $a$.}
+
+\begin{lstlisting}
+den{T <: RingElem}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Return the denominator of the fraction $a$.}
+
+\begin{lstlisting}
+zero{T <: RingElem}(R::FractionField{T}})
+\end{lstlisting}
+
+\desc{Return the additive identity of the fraction field of the ring $T$.}
+
+\begin{lstlisting}
+one{T <: RingElem}(R::Type{FractionField{T}})
+\end{lstlisting}
+
+\desc{Return the multiplicative identity of the fraction field of the ring 
+$T$.}
+
+\begin{lstlisting}
+iszero{T <: RingElem}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the fraction $a$ is the additive identity in the
+fraction field, otherwise return \code{false}.}
+
+\begin{lstlisting}
+isone{T <: RingElem}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the fraction $a$ is multiplicative identity in the
+fraction field, otherwise return \code{false}.}
+
+\begin{lstlisting}
+isunit{T <: RingElem}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the fraction $a$ is invertible, i.e. is not zero,
+otherwise return \code{false}.}
+
+\begin{lstlisting}
+canonical_unit{T}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Used for canonicalising fractions. This function simply returns $a$.}
+
+\begin{lstlisting}
+deepcopy{T}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Creates a new fraction object arithmetically equal to $a$.}
+
+\textbf{Examples.}
+
+Here are some examples of basic manipulations for fraction fields.
+
+\begin{lstlisting}
+S, x = PolynomialRing(ZZ, "x")
+
+a = den((x + 1)//(-x^2 + 1))
+
+c = zero(S)
+d = one(S)
+f = canonical_unit((x + 1)//(-x^2 + 1))
+g = isunit((x + 1)//(-x^2 + 1))
+
+h = iszero(c)
+d = isone(d)
+f = deepcopy(d)
+\end{lstlisting}
+
+\subsubsection{Unary operators}
+
+\begin{lstlisting}
+-{T <: RingElem}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $-a$.}
+
+\textbf{Examples.}
+
+Here is an example of a unary operator.
+
+\begin{lstlisting}
+S, x = PolynomialRing(ZZ, "x")
+
+a = -((x + 1)//(-x^2 + 1))
+\end{lstlisting}
+
+\subsubsection{Binary operators and functions}
+
+The following binary operators are available for elements of fraction fields.
+All of the functions canonicalise their outputs.
+
+\begin{lstlisting}
++{T <: RingElem}(a::Fraction{T}, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $a + b$.}
+
+\begin{lstlisting}
+-{T <: RingElem}(a::Fraction{T}, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $a - b$.}
+
+\begin{lstlisting}
+*{T <: RingElem}(a::Fraction{T}, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $a*b$.}
+
+\textbf{Examples.}
+
+Here are some examples of binary operators.
+
+\begin{lstlisting}
+S, x = PolynomialRing(ZZ, "x")
+
+a = -(x + 3)//(x + 1) + (2x + 3)//(x^2 + 4)
+b = (x + 1)//(-x^2 + 1) - x//(2x + 1)
+c = ((x^2 + 3x)//(5x))*((x + 1)//(2x^2 + 2))
+\end{lstlisting}
+
+\subsubsection{Ad hoc binary operators}
+
+The following binary operators are more efficient than simply coercing both
+arguments into the fraction field. All functions canonicalise their outputs.
+
+\begin{lstlisting}
++{T <: RingElem}(a::Fraction{T}, b::Integer)
++{T <: RingElem}(a::Fraction{T}, b::T)
+\end{lstlisting}
+
+\desc{Return $a + b/1$.}
+
+\begin{lstlisting}
++{T <: RingElem}(a::Integer, b::Fraction{T})
++{T <: RingElem}(a::T, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $a/1 + b$.}
+
+\begin{lstlisting}
+-{T <: RingElem}(a::Fraction{T}, b::Integer)
+-{T <: RingElem}(a::Fraction{T}, b::T)
+\end{lstlisting}
+
+\desc{Return $a - b/1$.}
+
+\begin{lstlisting}
+-{T <: RingElem}(a::Integer, b::Fraction{T})
+-{T <: RingElem}(a::T, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $a/1 - b$.}
+
+\begin{lstlisting}
+*{T <: RingElem}(a::Fraction{T}, b::Integer)
+*{T <: RingElem}(a::Fraction{T}, b::T)
+\end{lstlisting}
+
+\desc{Return $a * b/1$.}
+
+\begin{lstlisting}
+*{T <: RingElem}(a::Integer, b::Fraction{T})
+*{T <: RingElem}(a::T, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $a/1 * b$.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc binary operators.
+
+\begin{lstlisting}
+S, x = PolynomialRing(ZZ, "x")
+
+a = (x + 1)//(-x^2 + 1)
+
+c = a + 2
+d = 3 - a
+e = b*(x + 1)
+\end{lstlisting}
+
+\subsubsection{Comparison operators}
+
+\begin{lstlisting}
+=={T}(x::Fraction{T}, y::Fraction{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the fraction $x$ equals the fraction $y$, else
+return \code{false}.}
+
+\begin{lstlisting}
+isequal{T}(x::Fraction{T}, y::Fraction{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the numerators of \code{x} times the denominator
+of \code{y} compares equal recursively according to \code{isequal} with the
+denominator of \code{x} times the numerator of \code{y}, else return
+\code{false}.}
+
+\textbf{Examples.}
+
+Here are some examples of comparisons.
+
+\begin{lstlisting}
+S, x = PolynomialRing(ZZ, "x")
+
+a = -(ZZ(4)/ZZ(6))
+b = -((x + 1)/(-x^2 + 1))
+
+a == -ZZ(2)/ZZ(3)
+b == 1/(x - 1)
+\end{lstlisting}
+
+\subsubsection{Ad hoc comparison}
+
+The following comparison operators are faster than first coercing both
+operands into the fraction field.
+
+\begin{lstlisting}
+=={T}(x::Fraction{T}, y::T)
+\end{lstlisting}
+
+\desc{Return \code{true} if the fraction $x$ equals the fraction $y/1$, else
+return \code{false}.}
+
+\begin{lstlisting}
+=={T}(x::T, y::Fraction{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the fraction $y$ equals the fraction $x/1$, else
+return \code{false}.}
+
+\begin{lstlisting}
+=={T <: RingElem}(x::Fraction{T}, y::Integer)
+\end{lstlisting}
+
+\desc{Return \code{true} if the numerator of the fraction $x$ is equal to $y$
+in the ring $T$ and the denominator is $1$, otherwise return \code{false}.}
+
+\begin{lstlisting}
+=={T <: RingElem}(x::Integer, y::Fraction{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the numerator of the fraction $y$ is equal to $x$
+in the ring $T$ and the denominator is $1$, otherwise return \code{false}.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc comparisons.
+
+\begin{lstlisting}
+S, x = PolynomialRing(ZZ, "x")
+
+a = 1//(x - 1)
+
+1//a == x - 1
+1 == one(S)
+\end{lstlisting}
+
+\subsubsection{Powering}
+
+\begin{lstlisting}
+^{T <: RingElem}(a::Fraction{T}, b::Int)
+\end{lstlisting}
+
+\desc{Return $a^b$. The exponent may be negative.}
+
+\textbf{Examples.}
+
+Here are some examples of powering.
+
+\begin{lstlisting}
+S, x = PolynomialRing(ZZ, "x")
+
+a = (x + 1)//(-x^2 + 1)
+
+c = a^(-12)
+\end{lstlisting}
+
+\subsubsection{Inversion}
+
+\begin{lstlisting}
+inv{T <: RingElem}(a::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $1/a$.}
+
+\textbf{Examples.}
+
+Here is an example of inversion.
+
+\begin{lstlisting}
+S, x = PolynomialRing(ZZ, "x")
+
+a = (x + 1)//(-x^2 + 1)
+
+b = inv(a)
+\end{lstlisting}
+
+\subsubsection{Exact division}
+
+\begin{lstlisting}
+//{T <: RingElem}(a::Fraction{T}, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return the $a*inv(b)$.}
+
+\begin{lstlisting}
+divexact{T <: RingElem}(a::Fraction{T}, b::Fraction{T})
+\end{lstlisting}
+
+\desc{An alias for \code{a//b}.}
+
+\textbf{Examples.}
+
+Here are an example of exact division.
+
+\begin{lstlisting}
+S, x = PolynomialRing(ZZ, "x")
+
+a = (x + 1)//(-x^2 + 1) 
+b = -x//(2x + 1)
+
+c = a/c
+\end{lstlisting}
+
+\subsubsection{Ad hoc exact division}
+
+\begin{lstlisting}
+//{T <: RingElem}(a::Fraction{T}, b::Integer)
+//{T <: RingElem}(a::Fraction{T}, b::T)
+\end{lstlisting}
+
+\desc{Return $a / (b/1)$.}
+
+\begin{lstlisting}
+//{T <: RingElem}(a::Integer, b::Fraction{T})
+//{T <: RingElem}(a::T, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $(a/1) / b$.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc binary operators.
+
+\begin{lstlisting}
+S, x = PolynomialRing(ZZ, "x")
+
+a = (x^2)//(2x + 1)
+b = (x + 1)//(-x^2 + 1)
+
+f = a//5
+g = (x + 1)//b
+h = 3//b
+\end{lstlisting}
+
+\subsubsection{GCD}
+
+\begin{lstlisting}
+gcd{T <: RingElem}(a::Fraction{T}, b::Fraction{T})
+\end{lstlisting}
+
+\desc{Return $c/d$ where $c$ is the GCD of the numerators of $a$ and $b$ and
+$d$ is the GCD of their denominators.}
+
+\textbf{Examples.}
+
+Here are some examples of binary operators and functions.
+
+\begin{lstlisting}
+S, x = PolynomialRing(ZZ, "x")
+
+a = -x//(2x + 1)
+
+f = gcd(a, (x + 1)/(x - 1))
+\end{lstlisting}
+
 \subsection{Flint integers ($\Z$): \code{fmpz}}
 
 Multi-precision integers can be created in Nemo using \code{ZZ}. For example, to create the integer
@@ -4802,565 +5371,6 @@ Here are some examples of power series constructors.
    S, x = PowerSeriesRing(R, 30, "x")
 
    f = S([R(0), R(3), R(1)], 3, 5)
-\end{lstlisting}
-
-\section{The Fields module}
-
-Nemo provides various constructions of fields. To make use of this 
-functionality simply import the \code{Fields} module
-
-\begin{lstlisting}
-using Nemo.Fields
-\end{lstlisting}
-
-The first thing the \code{Fields} module does is define the abstract
-type \code{Field} like so
-
-\begin{lstlisting}
-abstract Field <: Ring
-\end{lstlisting}
-
-This means fields can be used anywhere that a more general ring can be used
-in Nemo.
-
-Nemo fields provide the \code{/} operator, and genuine fields are closed under
-the action of this operator, except for division by zero.
-
-\subsection{Fraction fields}
-
-We allow the construction of a fraction field over any ring in Nemo. Not all
-such constructions make sense. Typically it only makes sense to construct the
-fraction field of an integral domain. However, so long as zero divisors are
-avoided there is nothing stopping one constructing the fraction field of a
-more general Euclidean ring in Nemo.
-
-Specifically, a ring must provide a \code{gcd} function before we can take its
-fraction field. This is required for canonicalisation.
-
-The type of an element of a fraction field in Nemo is \code{Fraction}. However
-the user need never deal directly with the type, as we provide convenient
-functions for constructing objects of this type.
-
-The reader not interested in the internal details of the \code{Fraction} type
-can skip ahead to the section on constructors.
-
-The definition of the \code{Fraction} type in Julia is as follows.
-
-\begin{lstlisting}
-type Fraction{T <: Ring} <: Field
-   n :: Int
-   d :: Int
-   num :: T
-   den :: T
-end
-\end{lstlisting}
-
-It is parameterised over a ring type \code{T} and contains a numerator 
-\code{num} and denominator \code{den}, both of type \code{T}.
-
-For the special case of fractions over the integers, i.e. elements of the
-field of rational numbers, we want to make use of the corresponding flint
-type which consists just of two \code{fmpz} values. In that case we cannot
-use \code{T} as the type (since that would be \code{ZZ}, but must use
-\code{Int}. For this purpose we include a numerator and denominator of the
-correct type, called \code{n} and \code{d} respectively.
-
-The inner constructor for the \code{Fraction} type does not try to canonicalise
-the fraction, but all other constructors should produce a canonicalised
-fraction, where possible.
-
-In order to canonicalise we divide both numerator and denominator by their
-greatest common divisor. We also divide by \code{canonical_unit(den)} where
-\code{den} is the denominator. This allows us to easily check equality of
-fractions.
-
-The \code{canonical_unit} function must have the properties
-
-\begin{lstlisting}
-canonical_unit(u) == u
-canonical_unit(a*b) == canonical_unit(a)*canonical_unit(b)
-\end{lstlisting}
-
-for all values $a$ and $b$ in the ring \code{T} and $u$ any invertible element
-in \code{T}. Moreover, \code{canonical_unit} must always return an invertible
-element in the ring \code{T}.
-
-We overload the \code{/} operator in Nemo for rings whose fraction field can
-be taken (e.g. \code{ZZ} and \code|Poly{T}|), so that elements of the
-fraction field of a ring can be constructed directly, without first
-constructing the type.
-
-For example if we have
-
-\begin{lstlisting}
-R, x = PolynomialRing(ZZ, "x")
-
-s = (x + 1)/(x^2 + 1)
-\end{lstlisting}
-
-then the value $s$ belongs to the fraction field of $R$ automatically, even
-though this field has not been constructed yet.
-
-The \code{/} operator doubles as a division operator when passed operands
-in a fraction field.
-
-In Nemo, we consider the fraction field of a field to be itself.
-
-\subsubsection{Constructors}
-
-We provide a convenient function for constructing a fraction field of a ring in
-Nemo.
-
-\begin{lstlisting}
-FractionField{T <: Ring}(::Type{T})
-\end{lstlisting}
-
-\desc{Given a type \code{T} in the \code{Ring} class, this function returns a
-type corresponding to its fraction field.}
-
-There are also numerous constructors for generating elements in the fraction
-field.
-
-\begin{lstlisting}
-Fraction{T <: Ring}(a :: T, b :: T)
-\end{lstlisting}
-
-\desc{This is the unadorned inner constructor. It does not try to canonicalise
-or check for division by zero. It is mainly used internally to actually 
-construct the value with $a$ as numerator and $b$ as denominator.}
-
-\begin{lstlisting}
-Fraction{T <: Ring}()
-\end{lstlisting}
-
-\desc{Return the value $0/1$ in the fraction field of the ring $T$.}
-
-\begin{lstlisting}
-Fraction{T <: Ring}(a::Integer)
-\end{lstlisting}
-
-\desc{Return the value $a/1$ in the fraction field of the ring $T$, i.e.
-$1/1$ added to itself $a$ times.}
-
-\begin{lstlisting}
-Fraction{T <: Ring}(a::T)
-\end{lstlisting}
-
-\desc{Return the value $a/1$ in the fraction field of the ring $T$.}
-
-\begin{lstlisting}
-Fraction{T <: Ring}(a::Fraction{T})
-\end{lstlisting}
-
-\desc{Return a reference to the value $a$. No copy of the data is made.}
-
-We also provide a simpler way of constructing elements of a fraction field
-without needing to first construct the type of the fraction field. We use
-the division operator.
-
-\begin{lstlisting}
-/(x::ZZ, y::ZZ)
-\end{lstlisting}
-
-\desc{Return the value $x/y$ in the fraction field of \code{ZZ}. The fraction
-is canonicalised, i.e. reduced to lowest terms with positive denominator. If
-$y = 0$ we throw a \code{DivideError()}.}
-
-\begin{lstlisting}
-/{T <: RingElem}(x::Poly{T}, y::Poly{T})
-\end{lstlisting}
-
-\desc{Return the value $x/y$ in the fraction field of the given polynomial
-ring. The fraction is canonicalised, i.e. reduced to lowest terms with the
-numerator and denominator normalised by dividing both by the
-\code{canonical_unit} of the leading coefficient of the denominator. For
-example, for polynomials over the integers, the denominator will have
-positive leading coefficient. For polynomials over a field, the denominator
-will be a monic polynomial. If $y = 0$ we throw a \code{DivideError()}.}
-
-\textbf{Examples.}
-
-Here are some examples of constructors for fraction fields.
-
-\begin{lstlisting}
-R = FractionField(ZZ)
-
-a = R(ZZ(3), ZZ(2))
-
-S, x = PolynomialRing(ZZ, "x")
-T = FractionField(S)
-
-b = T(3)
-c = T(ZZ(7))
-d = T(x + 2)
-f = T(d)
-g = T()
-
-k = ZZ(5)/ZZ(7)
-m = (x + 3)/(x^2 + 2)
-\end{lstlisting}
-
-\subsubsection{Basic manipulation}
-
-\begin{lstlisting}
-num{T <: Ring}(a::Fraction{T})
-\end{lstlisting}
-
-\desc{Return the numerator of the fraction $a$.}
-
-\begin{lstlisting}
-den{T <: Ring}(a::Fraction{T})
-\end{lstlisting}
-
-\desc{Return the denominator of the fraction $a$.}
-
-\begin{lstlisting}
-zero{T <: Ring}(::Type{Fraction{T}})
-\end{lstlisting}
-
-\desc{Return the additive identity of the fraction field of the ring $T$.}
-
-\begin{lstlisting}
-one{T <: Ring}(::Type{Fraction{T}})
-\end{lstlisting}
-
-\desc{Return the multiplicative identity of the fraction field of the ring 
-$T$.}
-
-\begin{lstlisting}
-iszero{T <: Ring}(a::Fraction{T})
-\end{lstlisting}
-
-\desc{Return \code{true} if the fraction $a$ is the additive identity in the
-fraction field, otherwise return \code{false}.}
-
-\begin{lstlisting}
-isone{T <: Ring}(a::Fraction{T})
-\end{lstlisting}
-
-\desc{Return \code{true} if the fraction $a$ is multiplicative identity in the
-fraction field, otherwise return \code{false}.}
-
-\begin{lstlisting}
-isunit{T <: Ring}(a::Fraction{T})
-\end{lstlisting}
-
-\desc{Return \code{true} if the fraction $a$ is invertible, i.e. is not zero,
-otherwise return \code{false}.}
-
-\begin{lstlisting}
-canonical_unit{T}(a::Fraction{T})
-\end{lstlisting}
-
-\desc{Used for canonicalising fractions. This function simply returns $a$.}
-
-\textbf{Examples.}
-
-Here are some examples of basic manipulations for fraction fields.
-
-\begin{lstlisting}
-R = FractionField(ZZ)
-S, x = PolynomialRing(ZZ, "x")
-
-a = num(ZZ(4)/ZZ(6))
-b = den((x + 1)/(-x^2 + 1))
-
-c = zero(R)
-d = one(S)
-f = canonical_unit((x + 1)/(-x^2 + 1))
-g = isunit((x + 1)/(-x^2 + 1))
-
-h = iszero(c)
-d = isone(d)
-\end{lstlisting}
-
-\subsubsection{Unary operators}
-
-\begin{lstlisting}
--{T <: Ring}(a::Fraction{T})
-\end{lstlisting}
-
-\desc{Return $-a$.}
-
-\textbf{Examples.}
-
-Here are some examples of unary operators.
-
-\begin{lstlisting}
-S, x = PolynomialRing(ZZ, "x")
-
-a = -(ZZ(4)/ZZ(6))
-b = -((x + 1)/(-x^2 + 1))
-\end{lstlisting}
-
-\subsubsection{Comparison operators}
-
-\begin{lstlisting}
-=={T}(x::Fraction{T}, y::Fraction{T})
-\end{lstlisting}
-
-\desc{Return \code{true} if the fraction $x$ equals the fraction $y$, else
-return \code{false}.}
-
-\begin{lstlisting}
-isequal{T}(x::Fraction{T}, y::Fraction{T})
-\end{lstlisting}
-
-\desc{Return \code{true} if the numerators of \code{x} and \code{y} compare
-equal recursively according to \code{isequal} and similarly for the
-denominators, else return \code{false}.}
-
-\textbf{Examples.}
-
-Here are some examples of comparisons.
-
-\begin{lstlisting}
-S, x = PolynomialRing(ZZ, "x")
-
-a = -(ZZ(4)/ZZ(6))
-b = -((x + 1)/(-x^2 + 1))
-
-a == -ZZ(2)/ZZ(3)
-b == 1/(x - 1)
-\end{lstlisting}
-
-\subsubsection{Ad hoc comparison}
-
-The following comparison operators are faster than first coercing both
-operands into the fraction field.
-
-\begin{lstlisting}
-=={T}(x::Fraction{T}, y::T)
-\end{lstlisting}
-
-\desc{Return \code{true} if the fraction $x$ equals the fraction $y/1$, else
-return \code{false}.}
-
-\begin{lstlisting}
-=={T}(x::T, y::Fraction{T})
-\end{lstlisting}
-
-\desc{Return \code{true} if the fraction $y$ equals the fraction $x/1$, else
-return \code{false}.}
-
-\begin{lstlisting}
-=={T <: Ring}(x::Fraction{T}, y::Int)
-=={T <: Ring}(x::Fraction{T}, y::ZZ)
-\end{lstlisting}
-
-\desc{Return \code{true} if the numerator of the fraction $x$ is equal to $y$
-in the ring $T$ and the denominator is $1$, otherwise return \code{false}.}
-
-\begin{lstlisting}
-=={T <: Ring}(x::Int, y::Fraction{T})
-=={T <: Ring}(x::ZZ, y::Fraction{T})
-\end{lstlisting}
-
-\desc{Return \code{true} if the numerator of the fraction $y$ is equal to $x$
-in the ring $T$ and the denominator is $1$, otherwise return \code{false}.}
-
-\textbf{Examples.}
-
-Here are some examples of ad hoc comparisons.
-
-\begin{lstlisting}
-S, x = PolynomialRing(ZZ, "x")
-
-a = 1/(x - 1)
-
-1/a == x - 1
-ZZ(4)/ZZ(2) == 2
-ZZ(3) == ZZ(6)/ZZ(2)
-1 == one(S)
-\end{lstlisting}
-
-\subsubsection{Binary operators and functions}
-
-The following binary operators are available for elements of fraction fields.
-All of the functions canonicalise their outputs.
-
-\begin{lstlisting}
-+{T <: Ring}(a::Fraction{T}, b::Fraction{T})
-\end{lstlisting}
-
-\desc{Return $a + b$.}
-
-\begin{lstlisting}
--{T <: Ring}(a::Fraction{T}, b::Fraction{T})
-\end{lstlisting}
-
-\desc{Return $a - b$.}
-
-\desc{Return $a + b$.}
-
-\begin{lstlisting}
-*{T <: Ring}(a::Fraction{T}, b::Fraction{T})
-\end{lstlisting}
-
-\desc{Return $a*b$.}
-
-\begin{lstlisting}
-/{T <: Ring}(a::Fraction{T}, b::Fraction{T})
-\end{lstlisting}
-
-\desc{Return $a/b$, in the field of fractions of $T$.}
-
-\begin{lstlisting}
-divexact{T <: Ring}(a::Fraction{T}, b::Fraction{T})
-\end{lstlisting}
-
-\desc{An alias for $a/b$.}
-
-\begin{lstlisting}
-gcd{T <: Ring}(a::Fraction{T}, b::Fraction{T})
-\end{lstlisting}
-
-\desc{Return $c/d$ where $c$ is the GCD of the numerators of $a$ and $b$ and
-$d$ is the GCD of their denominators.}
-
-\textbf{Examples.}
-
-Here are some examples of binary operators and functions.
-
-\begin{lstlisting}
-S, x = PolynomialRing(ZZ, "x")
-
-a = -ZZ(2)/ZZ(3) + ZZ(3)/ZZ(7)
-b = (x + 1)/(-x^2 + 1) - x/(2x + 1)
-c = (ZZ(5)/ZZ(3))*(ZZ(7)/ZZ(2))
-d = a/c
-f = gcd(b, (x + 1)/(x - 1))
-\end{lstlisting}
-
-\subsubsection{Ad hoc binary operators}
-
-The following binary operators are more efficient than simply coercing both
-arguments into the fraction field. All functions canonicalise their outputs.
-
-\begin{lstlisting}
-+{T <: Ring}(a::Fraction{T}, b::Int)
-+{T <: Ring}(a::Fraction{T}, b::ZZ)
-+{T <: Ring}(a::Fraction{T}, b::T)
-\end{lstlisting}
-
-\desc{Return $a + b/1$.}
-
-\begin{lstlisting}
-+{T <: Ring}(a::Int, b::Fraction{T})
-+{T <: Ring}(a::ZZ, b::Fraction{T})
-+{T <: Ring}(a::T, b::Fraction{T})
-\end{lstlisting}
-
-\desc{Return $a/1 + b$.}
-
-\begin{lstlisting}
--{T <: Ring}(a::Fraction{T}, b::Int)
--{T <: Ring}(a::Fraction{T}, b::ZZ)
--{T <: Ring}(a::Fraction{T}, b::T)
-\end{lstlisting}
-
-\desc{Return $a - b/1$.}
-
-\begin{lstlisting}
--{T <: Ring}(a::Int, b::Fraction{T})
--{T <: Ring}(a::ZZ, b::Fraction{T})
--{T <: Ring}(a::T, b::Fraction{T})
-\end{lstlisting}
-
-\desc{Return $a/1 - b$.}
-
-\begin{lstlisting}
-*{T <: Ring}(a::Fraction{T}, b::Int)
-*{T <: Ring}(a::Fraction{T}, b::ZZ)
-*{T <: Ring}(a::Fraction{T}, b::T)
-\end{lstlisting}
-
-\desc{Return $a * b/1$.}
-
-\begin{lstlisting}
-*{T <: Ring}(a::Int, b::Fraction{T})
-*{T <: Ring}(a::ZZ, b::Fraction{T})
-*{T <: Ring}(a::T, b::Fraction{T})
-\end{lstlisting}
-
-\desc{Return $a/1 * b$.}
-
-\begin{lstlisting}
-/{T <: Ring}(a::Fraction{T}, b::Int)
-/{T <: Ring}(a::Fraction{T}, b::ZZ)
-/{T <: Ring}(a::Fraction{T}, b::T)
-\end{lstlisting}
-
-\desc{Return $a / (b/1)$.}
-
-\begin{lstlisting}
-/{T <: Ring}(a::Int, b::Fraction{T})
-/{T <: Ring}(a::ZZ, b::Fraction{T})
-/{T <: Ring}(a::T, b::Fraction{T})
-\end{lstlisting}
-
-\desc{Return $(a/1) / b$.}
-
-\textbf{Examples.}
-
-Here are some examples of ad hoc binary operators.
-
-\begin{lstlisting}
-S, x = PolynomialRing(ZZ, "x")
-
-a = -ZZ(2)/ZZ(3)
-b = (x + 1)/(-x^2 + 1)
-
-c = a + 2
-d = ZZ(3) - a
-
-e = b*(x + 1)
-f = a/5
-g = (x + 1)/b
-\end{lstlisting}
-
-\subsubsection{Powering}
-
-\begin{lstlisting}
-^{T <: Ring}(a::Fraction{T}, b::Int)
-\end{lstlisting}
-
-\desc{Return $a^b$.}
-
-\textbf{Examples.}
-
-Here are some examples of powering.
-
-\begin{lstlisting}
-S, x = PolynomialRing(ZZ, "x")
-
-a = -ZZ(2)/ZZ(3)
-b = (x + 1)/(-x^2 + 1)
-
-c = a^12
-d = b^-12
-\end{lstlisting}
-
-\subsubsection{Inversion}
-
-\begin{lstlisting}
-inv{T <: Ring}(a::Fraction{T})
-\end{lstlisting}
-
-\desc{Return $1/a$.}
-
-\textbf{Examples.}
-
-Here are some examples of inversion.
-
-\begin{lstlisting}
-S, x = PolynomialRing(ZZ, "x")
-
-a = -ZZ(2)/ZZ(3)
-b = (x + 1)/(-x^2 + 1)
-
-c = inv(a)
-d = inv(b)
 \end{lstlisting}
 
 \subsection{The rationals}

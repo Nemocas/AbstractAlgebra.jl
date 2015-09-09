@@ -1,6 +1,8 @@
-include("Fraction-test.jl")
+include("generic/Fraction-test.jl")
+
 include("FiniteFields-test.jl")
 include("Padics-test.jl")
+include("fmpq-test.jl")
 
 function test_fields_resultant()
    print("Fields.resultant...")
@@ -25,8 +27,10 @@ end
 
 function test_fields()
    test_fraction()
+
    test_ffield()
    test_padics()
+   test_fmpq()
 
    test_fields_resultant()
 end
