@@ -2091,7 +2091,7 @@ g = T(x^4 + x + 2)
 h = divexact(f, g)
 \end{lstlisting}
 
-\subsection{Generic power series rings $R[[x]]$: \code|PowerSeries\{T\}|}
+\subsection{Generic power series rings ($R[[x]]$): \code|PowerSeries\{T\}|}
 
 In Nemo we provide univariate power series rings. The type of a parent object for
 a power series ring is a \code{PowerSeriesRing} which belongs to the \code{Ring}
@@ -2951,6 +2951,8 @@ S(a::T)
 \begin{lstlisting}
 S(a::Integer, b::Integer)
 S(a::T, b::T)
+S(a::T, b::Integer)
+S(a::Integer, b::T)
 \end{lstlisting}
 
 \desc{Construct the canonicalised fraction \code{a//b} in the fraction field. If
@@ -3343,21 +3345,21 @@ S, x = PolynomialRing(ZZ, "x")
 a = (x + 1)//(-x^2 + 1) 
 b = -x//(2x + 1)
 
-c = a/c
+c = a//c
 \end{lstlisting}
 
 \subsubsection{Ad hoc exact division}
 
 \begin{lstlisting}
-//{T <: RingElem}(a::Fraction{T}, b::Integer)
-//{T <: RingElem}(a::Fraction{T}, b::T)
+divexact{T <: RingElem}(a::Fraction{T}, b::Integer)
+divexact{T <: RingElem}(a::Fraction{T}, b::T)
 \end{lstlisting}
 
 \desc{Return $a / (b/1)$.}
 
 \begin{lstlisting}
-//{T <: RingElem}(a::Integer, b::Fraction{T})
-//{T <: RingElem}(a::T, b::Fraction{T})
+divexact{T <: RingElem}(a::Integer, b::Fraction{T})
+divexact{T <: RingElem}(a::T, b::Fraction{T})
 \end{lstlisting}
 
 \desc{Return $(a/1) / b$.}
@@ -5372,27 +5374,89 @@ Here are some examples of power series constructors.
    f = S([R(0), R(3), R(1)], 3, 5)
 \end{lstlisting}
 
-\subsection{The rationals}
+\section{Flint fields}
 
-The field of rationals in Nemo is \code|Fraction{ZZ}|. For convenience this is
-type aliased with \code{QQ}. Thus for example, one may write
+Flint provides implementations of various explicit fields. We describe their
+Nemo wrappers here.
+
+\subsection{Flint rationals ($\Q$): \code|fmpq|}
+
+Flint provides the module \code{fmpq} for rational numbers. The type of Flint rationals
+in Nemo is also given the name \code{fmpq}.
+
+The parent object for Flint rationals is of type \code{FlintRationalField}, which
+belongs to the \code{Field} type class. Rational number objects have type \code{fmpq}
+which belongs to the \code{FractionElem} type class, which in turn belongs to 
+\code{FieldElem}.
+
+The parent object for the rationals can be constructed using the \code{FractionField}
+function. For example:
 
 \begin{lstlisting}
-a = QQ(2)
-
-R, x = PolynomialRing(QQ, "x")
-
-f = ZZ(3)/ZZ(2)*x + ZZ(1)/ZZ(2)
+R = FractionField(ZZ)
 \end{lstlisting}
 
-The \code{QQ} type supports all of the functionality of the previous section. In
-this section we describe additional functionality that is provided for \code{QQ}
-but not for general fraction fields.
+By default, Nemo makes \code{QQ = FractionField(ZZ)}, though the user can change this
+assignment.
+
+The \code{fmpq} type supports all of the functionality of the generic fraction field
+section. In this section we describe additional functionality that is provided for
+Flint rationals but not for general fraction fields.
+
+\subsubsection{Constructors}
+
+In the constructors below we assume $R$ is a Flint rational field parent object.
+
+\begin{lstlisting}
+R(a::Rational{BigInt})
+\end{lstlisting}
+
+\desc{Construct an \code{fmpq} from a Julia big rational $a$.}
+
+One can also construct Flint rationals directly using the \code{fmpq} constructors.
+
+\textbf{Examples.}
+
+Here is an example of some constructors.
+
+\begin{lstlisting}
+R = FractionField(ZZ)
+
+a = R(BigInt(1)//2)
+b = fmpq(BigInt(1)//2)
+\end{lstlisting}
+
+\subsubsection{Conversions}
+
+We provide the means to convert Flint \code{fmpz} and \code{fmpq} values to Julia
+rationals.
+
+\begin{lstlisting}
+Rational(a::fmpq)
+Rational(a::fmpz)
+\end{lstlisting}
+
+\desc{Return $a$ as a Julia big rational.}
+
+\textbf{Examples.}
+
+Here is an example of some conversions.
+
+\begin{lstlisting}
+a = Rational(fmpz(12))
+b = Rational(fmpq(3, 7))
+\end{lstlisting}
 
 \subsubsection{Basic manipulation}
 
 \begin{lstlisting}
-height(a::Fraction{ZZ})
+abs(a::fmpq)
+\end{lstlisting}
+
+\desc{Return the absolute value of the rational number $a$.}
+
+\begin{lstlisting}
+height(a::fmpq)
 \end{lstlisting}
 
 \desc{Return the height of the fraction $a$, namely the largest of the absolute
@@ -5400,7 +5464,7 @@ values of the numerator and denominator. The type of the return value is a
 \code{ZZ}.}
 
 \begin{lstlisting}
-height_bits(a::Fraction{ZZ})
+height_bits(a::fmpq)
 \end{lstlisting}
 
 \desc{Return the number of bits of the height of the fraction $a$. The type of
@@ -5411,40 +5475,33 @@ the return value is an \code{Int}.}
 Here are some examples of basic manipulation.
 
 \begin{lstlisting}
-a = -ZZ(2)/ZZ(3)
-b = ZZ(123)/ZZ(234)
+a = -fmpz(2)//3
+b = fmpz(123)//234
 
-c = height(a)
-d = height_bits(b)
+c = abs(a)
+d = height(a)
+e = height_bits(b)
 \end{lstlisting}
 
 \subsubsection{Comparison}
 
 \begin{lstlisting}
-cmp(a::Fraction{ZZ}, b::Fraction{ZZ}) 
-\end{lstlisting}
-
-\desc{Return \code{-1} if $a < b$, \code{0} if $a = b$ and $1$ if $a > b$.}
-
-\begin{lstlisting}
-<(a::Fraction{ZZ}, b::Fraction{ZZ}) 
+isless(a::fmpq, b::fmpq) 
 \end{lstlisting}
 
 \desc{Return \code{true} if $a < b$, otherwise return \code{false}. Julia
-automatically provides corresponding functions \code{>}, \code{<=} and
-\code{>=}.}
+supplies operators $<$, $>$, $\leq$ and $\geq$ from this automatically.}
 
 \textbf{Examples.}
 
 Here are some examples of comparison.
 
 \begin{lstlisting}
-a = -ZZ(2)/ZZ(3)
-b = ZZ(1)/ZZ(2)
+a = -fmpz(2)//3
+b = fmpz(1)//2
 
 a < b
 b >= a
-c = cmp(a, b)
 \end{lstlisting}
 
 \subsubsection{Ad hoc comparison}
@@ -5452,10 +5509,18 @@ c = cmp(a, b)
 The following ad hoc comparison operators are provided for convenience.
 
 \begin{lstlisting}
-<(a::Fraction{ZZ}, b::ZZ)
-<(a::Fraction{ZZ}, b::Int)
-<(a::ZZ, b::Fraction{ZZ})
-<(a::Int, b::Fraction{ZZ})
+==(a::fmpq, b::Int)
+==(a::Int, b::fmpq)
+\end{lstlisting}
+
+\desc{Return \code{true} if $a$ is equal to $b$, otherwise return \code{false}. Julia
+automatically provides \code{!=} from this.}
+
+\begin{lstlisting}
+isless(a::fmpq, b::fmpz)
+isless(a::fmpq, b::Integer)
+isless(a::fmpz, b::fmpq)
+isless(a::Integer, b::fmpq)
 \end{lstlisting}
 
 \desc{Return \code{true} if $a < b$, otherwise return \code{false}. Julia
@@ -5467,35 +5532,35 @@ automatically provides corresponding functions \code{>}, \code{<=} and
 Here are some examples of ad hoc comparison.
 
 \begin{lstlisting}
-a = -ZZ(2)/ZZ(3)
-b = ZZ(1)/ZZ(2)
+a = -fmpz(2)//3
+b = fmpz(1)//2
 
 a < 1
 a <= 0
-b >= ZZ(0)
+b >= fmpz(0)
 \end{lstlisting}
 
-\subsubsection{Ad hoc binary operators}
+\subsubsection{Shifting}
 
 \begin{lstlisting}
->>(a::Fraction{ZZ}, b::Int)
-\end{lstlisting}
-
-\desc{Return $a/2^b$.}
-
-\begin{lstlisting}
-<<(a::Fraction{ZZ}, b::Int)
+<<(a::fmpq, b::Int)
 \end{lstlisting}
 
 \desc{Return $a\times 2^b$.}
+
+\begin{lstlisting}
+>>(a::fmpq, b::Int)
+\end{lstlisting}
+
+\desc{Return $a/2^b$.}
 
 \textbf{Examples.}
 
 Here are some examples of ad hoc binary operators.
 
 \begin{lstlisting}
-a = -ZZ(2)/ZZ(3)
-b = ZZ(1)/ZZ(2)
+a = -fmpz(2)//3
+b = fmpq(1, 2)
 
 c = a << 3
 d = b >> 5
@@ -5504,32 +5569,43 @@ d = b >> 5
 \subsubsection{Modular arithmetic}
 
 \begin{lstlisting}
-mod(a::Fraction{ZZ}, m::Int)
-mod(a::Fraction{ZZ}, m::ZZ)
+mod(a::fmpq, m::Integer)
+mod(a::fmpq, m::fmpz)
 \end{lstlisting}
 
 \desc{If $a = p/q$ this function returns $pq^{-1} \pmod{m}$. This is only
-defined if $q$ is invertible modulo $m$. The result is returned as a \code{ZZ}.}
+defined if $q$ is invertible modulo $m$. The result is returned as an \code{fmpz}.}
 
 \textbf{Examples.}
 
 Here are some examples of modular arithmetic.
 
 \begin{lstlisting}
-a = -ZZ(2)/ZZ(3)
-b = ZZ(1)/ZZ(2)
+a = -fmpz(2)//3
+b = fmpz(1)//2
 
 c = mod(a, 7)
-d = mod(b, ZZ(5))
+d = mod(b, fmpz(5))
 \end{lstlisting}
+
+\subsubsection{GCD}
+
+Nemo defines the greatest common divisor of two rationals as the greatest rational $r$
+such that both the rationals are integer multiples of $r$.
+
+\begin{lstlisting}
+gcd(a::fmpq, b::fmpq)
+\end{lstlisting}
+
+\desc{Return the greatest common divisor of $a$ and $b$.}
 
 \subsubsection{Rational reconstruction}
 
 \begin{lstlisting}
-reconstruct(a::ZZ, m::ZZ)
-reconstruct(a::ZZ, m::Int)
-reconstruct(a::Int, m::ZZ)
-reconstruct(a::Int, m::Int)
+reconstruct(a::fmpz, m::fmpz)
+reconstruct(a::fmpz, m::Integer)
+reconstruct(a::Integer, m::fmpz)
+reconstruct(a::Integer, m::Integer)
 \end{lstlisting}
 
 \desc{Attempt to find a rational number $n/d$ such that 
@@ -5543,14 +5619,14 @@ Here are some examples of rational reconstruction.
 
 \begin{lstlisting}
 a = reconstruct(7, 13)
-b = reconstruct(ZZ(15), 31)
-c = reconstruct(ZZ(123), ZZ(237))
+b = reconstruct(fmpz(15), 31)
+c = reconstruct(fmpz(123), fmpz(237))
 \end{lstlisting}
 
 \subsubsection{Rational enumeration}
 
 \begin{lstlisting}
-next_minimal(x::Fraction{ZZ})
+next_minimal(x::fmpq)
 \end{lstlisting}
 
 \desc{Given $x$, returns the next rational number in the sequence obtained by
@@ -5569,7 +5645,7 @@ Calkin-Wilf enumeration.
 If $x < 0$ we throw a \code{DomainError()}.}
 
 \begin{lstlisting}
-next_signed_minimal(x::Fraction{ZZ})
+next_signed_minimal(x::fmpq)
 \end{lstlisting}
 
 \desc{Given a signed rational number $x$ assumed to be in canonical form, 
@@ -5582,7 +5658,7 @@ Starting with zero, this generates every rational number once and only once,
 in order of minimal height.}
 
 \begin{lstlisting}
-next_calkin_wilf(x::Fraction{ZZ})
+next_calkin_wilf(x::fmpq)
 \end{lstlisting}
 
 \desc{Given $x$ return the next number in the breadth-first traversal of the
@@ -5597,7 +5673,7 @@ will appear late in the sequence. This order has the advantage of being faster
 to produce than the minimal-height order.}
 
 \begin{lstlisting}
-next_signed_calkin_wilf(x::Fraction{ZZ})
+next_signed_calkin_wilf(x::fmpq)
 \end{lstlisting}
 
 \desc{Given a signed rational number $x$ returns the next element in the
@@ -5613,10 +5689,10 @@ but not in order of minimal height.}
 Here are some examples of rational enumeration.
 
 \begin{lstlisting}
-next_minimal(ZZ(2)/ZZ(3))
-next_signed_minimal(-ZZ(21)/ZZ(31))
-next_calkin_wilf(ZZ(321)/ZZ(113))
-next_signed_calkin_wilf(-ZZ(51)/ZZ(17))
+next_minimal(fmpz(2)//3)
+next_signed_minimal(-fmpz(21)//31)
+next_calkin_wilf(fmpz(321)//113)
+next_signed_calkin_wilf(-fmpz(51)//(17))
 \end{lstlisting}
 
 \subsubsection{Special functions}
@@ -5630,10 +5706,10 @@ Table lookup is used for $H_n$ whose numerator and denominator
 fit in a single limb. For larger $n$, a divide and conquer strategy is used.}
 
 \begin{lstlisting}
-dedekind_sum(h::ZZ, k::ZZ)
-dedekind_sum(h::ZZ, k::Int)
-dedekind_sum(h::Int, k::ZZ)
-dedekind_sum(h::Int, k::Int)
+dedekind_sum(h::fmpz, k::fmpz)
+dedekind_sum(h::fmpz, k::Integer)
+dedekind_sum(h::Integer, k::fmpz)
+dedekind_sum(h::Integer, k::Integer)
 \end{lstlisting}
 
 \desc{Computes the Dedekind sum $s(h,k)$ for arbitrary $h$ and $k$.}
@@ -5646,7 +5722,7 @@ Here are some examples of special functions.
 a = harmonic(12)
 
 b = dedekind_sum(12, 13)
-c = dedekind_sum(-120, ZZ(1305))
+c = dedekind_sum(-120, fmpz(1305))
 \end{lstlisting}
 
 \subsection{Finite fields}

@@ -456,6 +456,20 @@ function Base.call{T <: RingElem}(a::FractionField{T}, b::T, c::T)
    return z
 end
 
+function Base.call{T <: RingElem}(a::FractionField{T}, b::T, c::Integer)
+   parent(b) != base_ring(a) && error("Could not coerce to fraction")
+   z = Fraction{T}(b, base_ring(a)(c))
+   z.parent = a
+   return z
+end
+
+function Base.call{T <: RingElem}(a::FractionField{T}, b::Integer, c::T)
+   parent(c) != base_ring(a) && error("Could not coerce to fraction")
+   z = Fraction{T}(base_ring(a)(b), c)
+   z.parent = a
+   return z
+end
+
 function Base.call{T <: RingElem}(a::FractionField{T}, b::Integer)
    z = Fraction{T}(base_ring(a)(b), one(base_ring(a)))
    z.parent = a

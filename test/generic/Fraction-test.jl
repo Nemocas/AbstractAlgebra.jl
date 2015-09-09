@@ -16,6 +16,10 @@ function test_fraction_constructors()
 
    @test isa(T(x + 2, x + 1), FractionElem)
 
+   @test isa(T(x + 2, 4), FractionElem)
+
+   @test isa(T(3, x + 1), FractionElem)
+
    @test isa(T(T(x + 2)), FractionElem)
 
    @test isa(T(), FractionElem)

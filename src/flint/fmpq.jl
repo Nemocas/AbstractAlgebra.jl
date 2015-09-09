@@ -14,6 +14,18 @@ export fmpq, FlintQQ, FractionField, Rational, FlintRationalField, height,
 #
 ###############################################################################
 
+fmpq(a::Rational{BigInt}) = fmpq(fmpz(a.num), fmpz(a.den))
+
+fmpq(a::Integer) = fmpq(fmpz(a), fmpz(1))
+
+fmpq(a::fmpz) = fmpq(a, fmpz(1))
+
+fmpq(a::Integer, b::Integer) = fmpq(fmpz(a), fmpz(b))
+
+fmpq(a::fmpz, b::Integer) = fmpq(a, fmpz(b))
+
+fmpq(a::Integer, b::fmpz) = fmpq(fmpz(a), b)
+
 parent(a::fmpq) = FlintQQ
 
 elem_type(::FlintRationalField) = fmpq
@@ -280,7 +292,6 @@ end
 ###############################################################################
 
 function ^(a::fmpq, b::Int)
-   b < 0 && throw(DomainError())
    temp = fmpq()
    ccall((:fmpq_pow_si, :libflint), Void, 
          (Ptr{fmpq}, Ptr{fmpq}, Int), &temp, &a, b)
@@ -309,6 +320,18 @@ end
 
 ###############################################################################
 #
+#   Inversion
+#
+###############################################################################
+
+function inv(a::fmpq)
+   z = fmpq()
+   ccall((:fmpq_inv, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &z, &a)
+   return z
+end
+
+###############################################################################
+#
 #   Exact division
 #
 ###############################################################################
@@ -322,15 +345,22 @@ end
 
 ###############################################################################
 #
-#   Inversion
+#   Ad hoc exact division
 #
 ###############################################################################
 
-function inv(a::fmpq)
+function divexact(a::fmpq, b::fmpz)
    z = fmpq()
-   ccall((:fmpq_inv, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &z, &a)
+   ccall((:fmpq_div_fmpz, :libflint), Void,
+         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpz}), &z, &a, &b)
    return z
 end
+
+divexact(a::fmpz, b::fmpq) = inv(b)*a
+
+divexact(a::fmpq, b::Integer) = divexact(a, fmpz(b))
+
+divexact(a::Integer, b::fmpq) = inv(b)*a
 
 ###############################################################################
 #
@@ -460,7 +490,7 @@ end
 
 ###############################################################################
 #
-#   Conversions to/from flint fmpq
+#   Conversions to/from flint Julia rationals
 #
 ###############################################################################
    
@@ -483,19 +513,19 @@ end
 
 call(a::FlintRationalField) = fmpq(fmpz(0), fmpz(1))
 
-call(a::FlintRationalField, b::Rational{BigInt}) = fmpq(fmpz(b.num), fmpz(b.den)) 
+call(a::FlintRationalField, b::Rational{BigInt}) = fmpq(b) 
 
-call(a::FlintRationalField, b::Integer) = fmpq(fmpz(b), fmpz(1))
+call(a::FlintRationalField, b::Integer) = fmpq(b)
 
 call(a::FlintRationalField, b::Int, c::Int) = fmpq(b, c)
 
-call(a::FlintRationalField, b::fmpz) = fmpq(b, fmpz(1))
+call(a::FlintRationalField, b::fmpz) = fmpq(b)
 
-call(a::FlintRationalField, b::Integer, c::Integer) = fmpq(fmpz(b), fmpz(c))
+call(a::FlintRationalField, b::Integer, c::Integer) = fmpq(b, c)
 
-call(a::FlintRationalField, b::fmpz, c::Integer) = fmpq(b, fmpz(c))
+call(a::FlintRationalField, b::fmpz, c::Integer) = fmpq(b, c)
 
-call(a::FlintRationalField, b::Integer, c::fmpz) = fmpq(fmpz(b), c)
+call(a::FlintRationalField, b::Integer, c::fmpz) = fmpq(b, c)
 
 call(a::FlintRationalField, b::fmpz, c::fmpz) = fmpq(b, c)
 
