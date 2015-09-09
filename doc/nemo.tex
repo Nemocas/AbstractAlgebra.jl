@@ -2829,13 +2829,6 @@ a = exp(x + O(x^40))
 b = divexact(x, exp(x + O(x^40)) - 1)
 \end{lstlisting}
 
-\section{Flint rings}
-
-Flint provides implementations of various explicit rings. These are used instead of generic
-implementations where available.
-
-We only describe the details that differ from the generic implementations above.
-
 \section{Generic fields}
 
 Nemo provides various constructions of fields. 
@@ -2856,7 +2849,7 @@ a \code{DivideError()}.
 The \code{//} operator doubles as a division operator when passed operands
 in a field. It is an alias for \code{divexact}.
 
-\subsection{Fraction fields}
+\subsection{Fraction fields (Frac$(R)$): \code|Fraction\{T\}|}
 
 We allow the construction of a fraction field over any ring in Nemo. Not all
 such constructions make sense. Typically it only makes sense to construct the
@@ -3404,6 +3397,13 @@ a = -x//(2x + 1)
 
 f = gcd(a, (x + 1)/(x - 1))
 \end{lstlisting}
+
+\section{Flint rings}
+
+Flint provides implementations of various explicit rings. These are used instead of generic
+implementations where available.
+
+We only describe the details that differ from the generic implementations above.
 
 \subsection{Flint integers ($\Z$): \code{fmpz}}
 
