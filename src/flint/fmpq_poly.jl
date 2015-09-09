@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export fmpq_poly, denominator
+export FmpqPolyRing, fmpq_poly
 
 ###############################################################################
 #
@@ -16,13 +16,6 @@ elem_type(::FmpqPolyRing) = fmpq_poly
 
 base_ring(a::FmpqPolyRing) = a.base_ring
 
-function denominator(a::fmpq_poly)
-   z = fmpz()
-   ccall((:fmpq_poly_get_denominator, :libflint), Void,
-         (Ptr{fmpz}, Ptr{fmpq_poly}), &z, &a)
-   return z
-end
-
 var(a::FmpqPolyRing) = a.S
 
 ###############################################################################
@@ -30,9 +23,19 @@ var(a::FmpqPolyRing) = a.S
 #   Basic manipulation
 #
 ###############################################################################    
-   
+  
+function den(a::fmpq_poly)
+   z = fmpz()
+   ccall((:fmpq_poly_get_denominator, :libflint), Void,
+         (Ptr{fmpz}, Ptr{fmpq_poly}), &z, &a)
+   return z
+end
+ 
 length(x::fmpq_poly) = ccall((:fmpq_poly_length, :libflint), Int, 
                                    (Ptr{fmpq_poly},), &x)
+
+set_length!(x::fmpq_poly, n::Int) = ccall((:_fmpq_poly_set_length, :libflint), Void,
+                                   (Ptr{fmpq_poly}, Int), &x, n)
 
 function coeff(x::fmpq_poly, n::Int)
    n < 0 && throw(DomainError())
@@ -300,7 +303,7 @@ function ==(x::fmpq_poly, y::fmpq)
    end 
 end
 
-==(x::fmpz_poly, y::Integer) = x == fmpz(y)
+==(x::fmpq, y::fmpq_poly) = y == x
 
 ###############################################################################
 #
@@ -529,19 +532,6 @@ function resultant(x::fmpq_poly, y::fmpq_poly)
    z = fmpq()
    ccall((:fmpq_poly_resultant, :libflint), Void, 
                 (Ptr{fmpq}, Ptr{fmpq_poly}, Ptr{fmpq_poly}), &z, &x, &y)
-   return z
-end
-
-###############################################################################
-#
-#   Discriminant
-#
-###############################################################################
-
-function discriminant(x::fmpq_poly)
-   z = fmpq()
-   ccall((:fmpq_poly_discriminant, :libflint), Void, 
-                (Ptr{fmpq}, Ptr{fmpq_poly}), &z, &x)
    return z
 end
 

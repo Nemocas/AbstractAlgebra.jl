@@ -5306,6 +5306,172 @@ Here are some examples of factoring.
    U = factor_shape(f*g)
 \end{lstlisting}
 
+\subsection{Flint polynomials over $\Q$: \code{fmpq_poly}}
+
+The Flint type for polynomials over $\Q$ is \code{fmpq_poly}.
+Polynomials of this type are created using the \code{PolynomialRing} constructor with
+\code{FlintRationalField()} as an argument (the same as \code{QQ}, by default).  
+
+\begin{lstlisting}
+S, x = PolynomialRing(QQ, "x")
+\end{lstlisting}
+
+Polynomials in this ring have parent of type \code{FmpqPolyRing}.
+
+We describe functions for \code{fmpq_poly} only where they differ from the functions
+available for generic polynomials.
+
+\subsubsection{Constructors}
+
+In the following constructors we assume that $S$ is an \code{FmpqPolyRing} parent 
+object, as created by the above construction for example.
+
+\begin{lstlisting}
+S(a::Int)
+S(a::fmpz)
+\end{lstlisting}
+
+\desc{Construct the polynomial of degree $0$ with $a$ as its only coefficient (or
+the zero polynomial if $a = 0$.}
+
+\begin{lstlisting}
+S(a::fmpz_poly)
+\end{lstlisting}
+
+\desc{Coerce the given polynomial into the ring $S$, i.e. coerce its coefficients
+into $\Q$ and change the variable to that of $S$.}
+
+\textbf{Examples.}
+
+Here are some examples of constructors.
+
+\begin{lstlisting}
+   S, x = PolynomialRing(QQ, "x")
+
+   a = S(12)
+   b = S(fmpz(12))
+   
+   R, y = PolynomialRing(ZZ, "y")
+
+   c = S(3y^3 + 2y + 1)
+\end{lstlisting}
+
+\subsubsection{Basic manipulation}
+
+Internally, Flint stores \code{fmpq_poly}'s as an array of integers and a single
+common denominator.
+
+\begin{lstlisting}
+den(a::fmpq_poly)
+\end{lstlisting}
+
+\desc{Return the common denominator of the coefficients of the polynomial $a$.}
+
+\textbf{Examples.}
+
+Here is an example of basic manipulation.
+
+\begin{lstlisting}
+   S, x = PolynomialRing(QQ, "x")
+
+   a = den(-fmpz(12)//7*x + 1)
+\end{lstlisting}
+
+\subsubsection{Ad hoc binary operators}
+
+The following ad hoc binary operators are provided over and above the basic ones
+for performance reasons.
+
+\begin{lstlisting}
+*(a::fmpq_poly, b::fmpq)
+*(a::fmpq, b::fmpq_poly)
+\end{lstlisting}
+
+\desc{Return $ab$.}
+
+\begin{lstlisting}
++(a::fmpq_poly, b::Int)
++(a::Int, b::fmpq_poly)
++(a::fmpq_poly, b::fmpz)
++(a::fmpz, b::fmpq_poly)
++(a::fmpq_poly, b::fmpq)
++(a::fmpq, b::fmpq_poly)
+\end{lstlisting}
+
+\desc{Return $a + b$.}
+
+\begin{lstlisting}
+-(a::fmpq_poly, b::Int)
+-(a::Int, b::fmpq_poly)
+-(a::fmpq_poly, b::fmpz)
+-(a::fmpz, b::fmpq_poly)
+-(a::fmpq_poly, b::fmpq)
+-(a::fmpq, b::fmpq_poly)
+\end{lstlisting}
+
+\desc{Return $a - b$.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc binary operators.
+
+\begin{lstlisting}
+   S, x = PolynomialRing(QQ, "x")
+
+   a = 7y^2 + 3y + 2
+
+   b = a + 7
+   c = fmpz(7) - a
+   d = fmpq(2, 3)*a
+\end{lstlisting}
+
+\subsubsection{Ad hoc comparisons}
+
+The following ad hoc binary comparisons are provided over and above the basic ones
+for performance reasons.
+
+\begin{lstlisting}
+==(a::fmpq_poly, b::fmpq)
+==(a::fmpq, b::fmpq_poly)
+\end{lstlisting}
+
+\desc{Return \code{true} if $a$ is equal to $b$, otherwise return \code{false}.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc comparisons.
+
+\begin{lstlisting}
+   S, x = PolynomialRing(QQ, "x")
+
+   a = 7y^2 + 3y + 2
+
+   a != fmpq(2, 3)
+   fmpq(2, 3) == S(fmpq(2, 3))
+\end{lstlisting}
+
+\subsubsection{Ad hoc exact division}
+
+\begin{lstlisting}
+divexact(a::fmpq_poly, b::Int)
+divexact(a::fmpq_poly, b::fmpz)
+\end{lstlisting}
+
+\desc{Return the quotient of $a$ by $b$. A \code{DivideError()} is raised if $b = 0$.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc exact division.
+
+\begin{lstlisting}
+   S, x = PolynomialRing(QQ, "x")
+
+   a = 7y^2 + 3y + 2
+
+   b = divexact(a, 7)
+   c = divexact(a, fmpz(11))
+\end{lstlisting}
+
 \subsection{Flint power series over $\Z$: \code{fmpz_series}}
 
 Flint doesn't have a module for power series over $\Z$, but the \code{fmpz_poly}
