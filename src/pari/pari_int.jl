@@ -44,10 +44,10 @@ show(io::IO, x::pari_int) = pari_print(io, x.d)
 #
 ###############################################################################
 
-gensize(a::fmpz) = words(a) + 2
+gensize(a::fmpz) = size(a) + 2
 
 function pari!(x::Ptr{Int}, a::fmpz, s::Int)
-   siz = words(a)
+   siz = size(a)
    unsafe_store!(x, evaltyp(t_INT) | s, 1) 
    unsafe_store!(x, evalsigne(sign(a)) | s, 2) 
    z = BigInt(a)

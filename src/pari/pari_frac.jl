@@ -32,7 +32,7 @@ show(io::IO, x::pari_rat) = pari_print(io, x.d)
 #
 ###############################################################################
 
-gensize(a::fmpq) = words(num(a)) + words(den(a)) + 7
+gensize(a::fmpq) = size(num(a)) + size(den(a)) + 7
 
 function pari!(x::Ptr{Int}, a::fmpq)
    if den(a) == 1 # we have an integer
