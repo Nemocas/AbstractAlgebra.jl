@@ -200,56 +200,6 @@ function *(a::fmpq_series, b::fmpq_series)
    return z
 end
 
-###############################################################################
-#
-#   Unsafe functions
-#
-###############################################################################
-
-function setcoeff!(z::fmpq_series, n::Int, x::fmpq)
-   ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, 
-                (Ptr{fmpq_series}, Int, Ptr{fmpq}), 
-               &z, n, &x)
-end
-
-function mul!(z::fmpq_series, a::fmpq_series, b::fmpq_series)
-   lena = length(a)
-   lenb = length(b)
-   
-   aval = valuation(a)
-   bval = valuation(b)
-
-   prec = min(a.prec + bval, b.prec + aval)
-   
-   lena = min(lena, prec)
-   lenb = min(lenb, prec)
-   
-   lenz = min(lena + lenb - 1, prec)
-   if lenz < 0
-      lenz = 0
-   end
-
-   z.prec = prec
-   ccall((:fmpq_poly_mullow, :libflint), Void, 
-                (Ptr{fmpq_series}, Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
-               &z, &a, &b, lenz)
-end
-
-function addeq!(a::fmpq_series, b::fmpq_series)
-   lena = length(a)
-   lenb = length(b)
-         
-   prec = min(a.prec, b.prec)
- 
-   lena = min(lena, prec)
-   lenb = min(lenb, prec)
-
-   lenz = max(lena, lenb)
-   a.prec = prec
-   ccall((:fmpq_poly_add_series, :libflint), Void, 
-                (Ptr{fmpq_series}, Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
-               &a, &a, &b, lenz)
-end
 
 ###############################################################################
 #
@@ -283,6 +233,12 @@ function *(x::fmpq, y::fmpq_series)
                &z, &y, &x)
    return z
 end
+
+*(x::fmpq_series, y::Int) = y*x
+
+*(x::fmpq_series, y::fmpz) = y*x
+
+*(x::fmpq_series, y::fmpq) = y*x
 
 ###############################################################################
 #
@@ -652,6 +608,57 @@ function sqrt(a::fmpq_series)
                 (Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
                &z, &a, a.prec)
    return z
+end
+
+###############################################################################
+#
+#   Unsafe functions
+#
+###############################################################################
+
+function setcoeff!(z::fmpq_series, n::Int, x::fmpq)
+   ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, 
+                (Ptr{fmpq_series}, Int, Ptr{fmpq}), 
+               &z, n, &x)
+end
+
+function mul!(z::fmpq_series, a::fmpq_series, b::fmpq_series)
+   lena = length(a)
+   lenb = length(b)
+   
+   aval = valuation(a)
+   bval = valuation(b)
+
+   prec = min(a.prec + bval, b.prec + aval)
+   
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   
+   lenz = min(lena + lenb - 1, prec)
+   if lenz < 0
+      lenz = 0
+   end
+
+   z.prec = prec
+   ccall((:fmpq_poly_mullow, :libflint), Void, 
+                (Ptr{fmpq_series}, Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
+               &z, &a, &b, lenz)
+end
+
+function addeq!(a::fmpq_series, b::fmpq_series)
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenz = max(lena, lenb)
+   a.prec = prec
+   ccall((:fmpq_poly_add_series, :libflint), Void, 
+                (Ptr{fmpq_series}, Ptr{fmpq_series}, Ptr{fmpq_series}, Int), 
+               &a, &a, &b, lenz)
 end
 
 ###############################################################################

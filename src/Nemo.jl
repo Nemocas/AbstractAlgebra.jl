@@ -6,8 +6,9 @@ import Base: abs, asin, asinh, atan, atanh, base, bin, call, convert, cmp,
              isless, isprime, isqrt, lcm, length, log, lufact, mod, ndigits,
              nextpow2, norm, num, oct, one, parent, parseint, precision,
              prevpow2, promote_rule, rank, Rational, rem, reverse, serialize,
-             setindex!, show, sign, sin, size, sqrt, string, sub, tan, tanh,
-             trace, trailing_zeros, transpose, transpose!, truncate, var, zero
+             setindex!, show, sign, sin, sinh, size, sqrt, string, sub, tan,
+             tanh, trace, trailing_zeros, transpose, transpose!, truncate,
+             var, zero
 
 export Collection, Ring, Field, CollectionElem, RingElem, FieldElem, Pari,
        Flint, Antic, Generic
