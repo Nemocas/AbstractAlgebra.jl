@@ -5673,6 +5673,207 @@ Here are some examples of factoring.
    B = factor_distinct_deg((y + 1)*g*(y^5+y^3+y+1))
 \end{lstlisting}
 
+\subsection{Flint polynomials over $\F_{p^k}$ (small $p$): \code{fq_nmod_poly}}
+
+The Flint type for polynomials over $\F_{p^k}$ for $p$ that fits in an \code{Int} is
+\code{fq_poly}. Polynomials of this type are created using the \code{PolynomialRing}
+constructor with an \code{FqNmodFiniteField} parent object as parameter. For example
+
+\begin{lstlisting}
+R, x = FiniteField(23, 5, "x")
+S, y = PolynomialRing(R, "y")
+\end{lstlisting}
+
+Polynomials in this ring have parent of type \code{FqNmodPolyRing}.
+
+We describe functions for \code{fq_nmod_poly} only where they differ from the functions
+available for generic polynomials.
+
+\subsubsection{Constructors}
+
+In the following constructors we assume that $S$ is an \code{FqNmodPolyRing} parent 
+object, as created by the above construction for example.
+
+\begin{lstlisting}
+S(a::fmpz)
+\end{lstlisting}
+
+\desc{Construct the polynomial of degree $0$ with $a$ as its only coefficient (or
+the zero polynomial if $a = 0$).}
+
+\begin{lstlisting}
+S(a::Array{fmpz, 1})
+S{T <: Integer}(a::Array{T, 1})
+\end{lstlisting}
+
+\desc{Construct the polynomial whose coefficients are the integers in the given
+array (thought of as elements of the finite field).}
+
+\begin{lstlisting}
+S(a::fmpz_poly)
+\end{lstlisting}
+
+\desc{Coerce the given polynomial into the ring $S$, i.e. coerce its coefficients
+into the finite field and change the variable to that of $S$.}
+
+\textbf{Examples.}
+
+Here are some examples of constructors.
+
+\begin{lstlisting}
+   R, x = FiniteField(23, 5, "x")
+   S, y = PolynomialRing(R, "y")
+
+   a = S(fmpz(12))
+   b = S([1, 2, 3])
+   c = S(3y^3 + 2y + 1)
+\end{lstlisting}
+
+\subsubsection{Ad hoc binary operators}
+
+The following ad hoc binary operators are provided over and above the basic ones
+for performance reasons.
+
+\begin{lstlisting}
+*(a::fq_nmod_poly, b::fq_nmod)
+*(a::fq_nmod, b::fq_poly_nmod)
+*(a::fq_nmod_poly, b::Integer)
+*(a::Integer, b::fq_nmod_poly)
+\end{lstlisting}
+
+\desc{Return $ab$.}
+
+\begin{lstlisting}
++(a::fq_nmod_poly, b::Int)
++(a::Int, b::fq_nmod_poly)
++(a::fq_nmod_poly, b::Integer)
++(a::Integer, b::fq_nmod_poly)
++(a::fq_nmod_poly, b::fmpz)
++(a::fmpz, b::fq_nmod_poly)
++(a::fq_nmod_poly, b::fq_nmod)
++(a::fq_nmod, b::fq_nmod_poly)
+\end{lstlisting}
+
+\desc{Return $a + b$.}
+
+\begin{lstlisting}
+-(a::fq_nmod_poly, b::Int)
+-(a::Int, b::fq_nmod_poly)
+-(a::fq_nmod_poly, b::Integer)
+-(a::Integer, b::fq_nmod_poly)
+-(a::fq_nmod_poly, b::fmpz)
+-(a::fmpz, b::fq_nmod_poly)
+-(a::fq_nmod_poly, b::fq_nmod)
+-(a::fq_nmod, b::fq_nmod_poly)
+\end{lstlisting}
+
+\desc{Return $a - b$.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc binary operators.
+
+\begin{lstlisting}
+   R, x = FiniteField(23, 5, "x")
+   S, y = PolynomialRing(R, "y")
+
+   a = 7y^2 + 3y + 2
+
+   b = a + 7
+   c = fmpz(7) - a
+   d = (x + 1)*a
+\end{lstlisting}
+
+\subsubsection{Ad hoc comparisons}
+
+The following ad hoc binary comparisons are provided over and above the basic ones
+for performance reasons.
+
+\begin{lstlisting}
+==(a::fq_nmod_poly, b::fq_nmod)
+==(a::fq_nmod, b::fq_nmod_poly)
+==(a::fq_nmod_poly, b::fmpz)
+==(a::fmpz, b::fq_nmod_poly)
+\end{lstlisting}
+
+\desc{Return \code{true} if $a$ is equal to $b$, otherwise return \code{false}.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc comparisons.
+
+\begin{lstlisting}
+   R, x = FiniteField(23, 5, "x")
+   S, y = PolynomialRing(R, "y")
+
+   a = 7y^2 + 3y + 2
+
+   a != x + 1
+   x + 1 == S(x + 1)
+   a != fmpz(11)
+\end{lstlisting}
+
+\subsubsection{Inflation and deflation}
+
+\begin{lstlisting}
+inflate(f::fq_nmod_poly, n::Int)
+\end{lstlisting}
+
+\desc{Given a polynomial $f(x)$, returns $f(x^n)$.}
+
+\begin{lstlisting}
+deflate(f::fq_nmod_poly, n::Int)
+\end{lstlisting}
+
+\desc{Given a polynomial $f(x^n)$, returns $f(x)$.}
+
+\textbf{Examples.}
+
+Here is an example of inflation and deflation.
+
+\begin{lstlisting}
+  R, x = FiniteField(23, 5, "x")
+  S, y = PolynomialRing(R, "y")
+
+  a = 7y^2 + 3y + 2
+
+  g = inflate(f, 2)
+  h = deflate(g, 2)
+\end{lstlisting}
+
+\subsubsection{Factorisation}
+
+\begin{lstlisting}
+factor(x::fq_nmod_poly)
+\end{lstlisting}
+
+\desc{Return an array containing the factorisation of the given polynomial. The entries in
+the array are tuples $(p, e)$ consisting of irreducible polynomials $p$ and their exponent
+$e$ in the factorisation.}
+
+\begin{lstlisting}
+factor_distinct_deg(x::fq_nmod_poly)
+\end{lstlisting}
+
+\desc{Return an array containing the distinct degree factorisation of the given polynomial.
+The entries in the array are tuples $(p, e)$ consisting of polynomials $p$ which are the
+products of all the irreducible polynomials of the given degree $e$ in the factorisation.}
+
+\textbf{Examples.}
+
+Here are some examples of factoring.
+
+\begin{lstlisting}
+   R, x = FiniteField(23, 5, "x")
+   S, y = PolynomialRing(R, "y")
+
+   f = 7y^2 + 3y + 2
+   g = 11y^3 - 2y^2 + 5
+
+   A = factor(f*g)
+   B = factor_distinct_deg((y + 1)*g*(y^5+y^3+y+1))
+\end{lstlisting}
+
 \subsection{Flint power series over $\Z$: \code{fmpz_series}}
 
 Flint doesn't have a module for power series over $\Z$, but the \code{fmpz_poly}

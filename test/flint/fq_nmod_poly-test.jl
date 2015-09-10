@@ -1,10 +1,10 @@
-function test_fq_poly_constructors()
-   print("fq_poly.constructors...")
+function test_fq_nmod_poly_constructors()
+   print("fq_nmod_poly.constructors...")
  
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
-   @test typeof(S) <: FqPolyRing
+   @test typeof(S) <: FqNmodPolyRing
 
    @test isa(y, PolyElem)
 
@@ -55,10 +55,10 @@ function test_fq_poly_constructors()
    println("PASS")
 end
 
-function test_fq_poly_manipulation()
-   print("fq_poly.manipulation...")
+function test_fq_nmod_poly_manipulation()
+   print("fq_nmod_poly.manipulation...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    @test iszero(zero(S))
@@ -88,10 +88,10 @@ function test_fq_poly_manipulation()
    println("PASS")
 end
 
-function test_fq_poly_binary_ops()
-   print("fq_poly.binary_ops...")
+function test_fq_nmod_poly_binary_ops()
+   print("fq_nmod_poly.binary_ops...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -106,10 +106,10 @@ function test_fq_poly_binary_ops()
    println("PASS")
 end
 
-function test_fq_poly_adhoc_binary()
-   print("fq_poly.adhoc_binary...")
+function test_fq_nmod_poly_adhoc_binary()
+   print("fq_nmod_poly.adhoc_binary...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -146,10 +146,10 @@ function test_fq_poly_adhoc_binary()
    println("PASS")
 end
 
-function test_fq_poly_comparison()
-   print("fq_poly.comparison...")
+function test_fq_nmod_poly_comparison()
+   print("fq_nmod_poly.comparison...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -162,10 +162,10 @@ function test_fq_poly_comparison()
    println("PASS")
 end
 
-function test_fq_poly_adhoc_comparison()
-   print("fq_poly.adhoc_comparison...")
+function test_fq_nmod_poly_adhoc_comparison()
+   print("fq_nmod_poly.adhoc_comparison...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    @test S(1) == 1 
@@ -183,10 +183,10 @@ function test_fq_poly_adhoc_comparison()
    println("PASS")
 end
 
-function test_fq_poly_unary_ops()
-   print("fq_poly.unary_ops...")
+function test_fq_nmod_poly_unary_ops()
+   print("fq_nmod_poly.unary_ops...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -196,10 +196,10 @@ function test_fq_poly_unary_ops()
    println("PASS")
 end
 
-function test_fq_poly_truncation()
-   print("fq_poly.truncation...")
+function test_fq_nmod_poly_truncation()
+   print("fq_nmod_poly.truncation...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -212,10 +212,10 @@ function test_fq_poly_truncation()
    println("PASS")
 end
 
-function test_fq_poly_reverse()
-   print("fq_poly.reverse...")
+function test_fq_nmod_poly_reverse()
+   print("fq_nmod_poly.reverse...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -225,10 +225,10 @@ function test_fq_poly_reverse()
    println("PASS")
 end
 
-function test_fq_poly_shift()
-   print("fq_poly.shift...")
+function test_fq_nmod_poly_shift()
+   print("fq_nmod_poly.shift...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -240,10 +240,10 @@ function test_fq_poly_shift()
    println("PASS")
 end
 
-function test_fq_poly_powering()
-   print("fq_poly.powering...")
+function test_fq_nmod_poly_powering()
+   print("fq_nmod_poly.powering...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -253,10 +253,10 @@ function test_fq_poly_powering()
    println("PASS")
 end
 
-function test_fq_poly_modular_arithmetic()
-   print("fq_poly.modular_arithmetic...")
+function test_fq_nmod_poly_modular_arithmetic()
+   print("fq_nmod_poly.modular_arithmetic...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = (3*x^2 + x + 2)*y + x^2 + 1
@@ -272,10 +272,10 @@ function test_fq_poly_modular_arithmetic()
    println("PASS")
 end
 
-function test_fq_poly_exact_division()
-   print("fq_poly.exact_division...")
+function test_fq_nmod_poly_exact_division()
+   print("fq_nmod_poly.exact_division...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -286,10 +286,10 @@ function test_fq_poly_exact_division()
    println("PASS")
 end
 
-function test_fq_poly_adhoc_exact_division()
-   print("fq_poly.adhoc_exact_division...")
+function test_fq_nmod_poly_adhoc_exact_division()
+   print("fq_nmod_poly.adhoc_exact_division...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -301,10 +301,10 @@ function test_fq_poly_adhoc_exact_division()
    println("PASS")
 end
 
-function test_fq_poly_euclidean_division()
-   print("fq_poly.euclidean_division...")
+function test_fq_nmod_poly_euclidean_division()
+   print("fq_nmod_poly.euclidean_division...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    k = y^3 + x*y^2 + (x + 1)*y + 3
@@ -317,10 +317,10 @@ function test_fq_poly_euclidean_division()
    println("PASS")
 end
 
-function test_fq_poly_content_primpart_gcd()
-   print("fq_poly.content_primpart_gcd...")
+function test_fq_nmod_poly_content_primpart_gcd()
+   print("fq_nmod_poly.content_primpart_gcd...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    k = x*y^2 + (x + 1)*y + 3
@@ -343,10 +343,10 @@ function test_fq_poly_content_primpart_gcd()
    println("PASS")
 end
 
-function test_fq_poly_evaluation()
-   print("fq_poly.evaluation...")
+function test_fq_nmod_poly_evaluation()
+   print("fq_nmod_poly.evaluation...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = x^2 + 2x + 1
@@ -361,10 +361,10 @@ function test_fq_poly_evaluation()
    println("PASS")
 end
 
-function test_fq_poly_composition()
-   print("fq_poly.composition...")
+function test_fq_nmod_poly_composition()
+   print("fq_nmod_poly.composition...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -375,10 +375,10 @@ function test_fq_poly_composition()
    println("PASS")
 end
 
-function test_fq_poly_derivative()
-   print("fq_poly.derivative...")
+function test_fq_nmod_poly_derivative()
+   print("fq_nmod_poly.derivative...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    h = x*y^2 + (x + 1)*y + 3
@@ -388,10 +388,10 @@ function test_fq_poly_derivative()
    println("PASS")
 end
 
-function test_fq_poly_integral()
-   print("fq_poly.integral...")
+function test_fq_nmod_poly_integral()
+   print("fq_nmod_poly.integral...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = (x^2 + 2x + 1)*y^2 + (x + 1)*y - 2x + 4
@@ -401,10 +401,10 @@ function test_fq_poly_integral()
    println("PASS")
 end
 
-function test_fq_poly_resultant()
-   print("fq_poly.resultant...")
+function test_fq_nmod_poly_resultant()
+   print("fq_nmod_poly.resultant...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = 3x*y^2 + (x + 1)*y + 3
@@ -415,10 +415,10 @@ function test_fq_poly_resultant()
    println("PASS")
 end
 
-function test_fq_poly_discriminant()
-   print("fq_poly.discriminant...")
+function test_fq_nmod_poly_discriminant()
+   print("fq_nmod_poly.discriminant...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = x*y^2 + (x + 1)*y + 3
@@ -428,10 +428,10 @@ function test_fq_poly_discriminant()
    println("PASS")
 end
 
-function test_fq_poly_gcdx()
-   print("fq_poly.gcdx...")
+function test_fq_nmod_poly_gcdx()
+   print("fq_nmod_poly.gcdx...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = 3x*y^2 + (x + 1)*y + 3
@@ -442,10 +442,10 @@ function test_fq_poly_gcdx()
    println("PASS")
 end
 
-function test_fq_poly_special()
-   print("fq_poly.special...")
+function test_fq_nmod_poly_special()
+   print("fq_nmod_poly.special...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    @test chebyshev_t(20, y) == 524288*y^20-2621440*y^18+5570560*y^16-6553600*y^14+4659200*y^12-2050048*y^10+549120*y^8-84480*y^6+6600*y^4-200*y^2+1
@@ -455,10 +455,10 @@ function test_fq_poly_special()
    println("PASS")
 end
 
-function test_fq_poly_inflation_deflation()
-   print("fq_poly.inflation_deflation()...")
+function test_fq_nmod_poly_inflation_deflation()
+   print("fq_nmod_poly.inflation_deflation()...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = (x + 1)*y^2 + 2x*y + x + 3
@@ -468,10 +468,10 @@ function test_fq_poly_inflation_deflation()
    println("PASS")
 end
 
-function test_fq_poly_factor()
-   print("fq_poly.factor()...")
+function test_fq_nmod_poly_factor()
+   print("fq_nmod_poly.factor()...")
 
-   R, x = FiniteField(fmpz(23), 5, "x")
+   R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
    f = 7y^2 + 3y + 2
@@ -494,33 +494,33 @@ function test_fq_poly_factor()
    println("PASS")
 end
 
-function test_fq_poly()
-   test_fq_poly_constructors()
-   test_fq_poly_manipulation()
-   test_fq_poly_binary_ops()
-   test_fq_poly_adhoc_binary()
-   test_fq_poly_comparison()
-   test_fq_poly_adhoc_comparison()
-   test_fq_poly_unary_ops()
-   test_fq_poly_truncation()
-   test_fq_poly_reverse()
-   test_fq_poly_shift()
-   test_fq_poly_powering()
-   test_fq_poly_modular_arithmetic()
-   test_fq_poly_exact_division()
-   test_fq_poly_adhoc_exact_division()
-   test_fq_poly_euclidean_division()
-   test_fq_poly_content_primpart_gcd()
-   test_fq_poly_evaluation()
-   test_fq_poly_composition()
-   test_fq_poly_derivative()
-   test_fq_poly_integral()
-   test_fq_poly_resultant()
-   test_fq_poly_discriminant()
-   test_fq_poly_gcdx()
-   test_fq_poly_special()
-   test_fq_poly_inflation_deflation()
-   test_fq_poly_factor()
+function test_fq_nmod_poly()
+   test_fq_nmod_poly_constructors()
+   test_fq_nmod_poly_manipulation()
+   test_fq_nmod_poly_binary_ops()
+   test_fq_nmod_poly_adhoc_binary()
+   test_fq_nmod_poly_comparison()
+   test_fq_nmod_poly_adhoc_comparison()
+   test_fq_nmod_poly_unary_ops()
+   test_fq_nmod_poly_truncation()
+   test_fq_nmod_poly_reverse()
+   test_fq_nmod_poly_shift()
+   test_fq_nmod_poly_powering()
+   test_fq_nmod_poly_modular_arithmetic()
+   test_fq_nmod_poly_exact_division()
+   test_fq_nmod_poly_adhoc_exact_division()
+   test_fq_nmod_poly_euclidean_division()
+   test_fq_nmod_poly_content_primpart_gcd()
+   test_fq_nmod_poly_evaluation()
+   test_fq_nmod_poly_composition()
+   test_fq_nmod_poly_derivative()
+   test_fq_nmod_poly_integral()
+   test_fq_nmod_poly_resultant()
+   test_fq_nmod_poly_discriminant()
+   test_fq_nmod_poly_gcdx()
+   test_fq_nmod_poly_special()
+   test_fq_nmod_poly_inflation_deflation()
+   test_fq_nmod_poly_factor()
 
    println("")
 end

@@ -34,6 +34,9 @@ end
 length(x::fq_nmod_poly) = ccall((:fq_nmod_poly_length, :libflint), Int,
                                 (Ptr{fq_nmod_poly},), &x)
 
+set_length!(x::fq_nmod_poly, n::Int) = ccall((:_fq_nmod_poly_set_length, :libflint), Void,
+                              (Ptr{fq_nmod_poly}, Int), &x, n)
+
 function coeff(x::fq_nmod_poly, n::Int)
    n < 0 && throw(DomainError())
    F = (x.parent).base_ring
@@ -195,9 +198,9 @@ end
 
 +(x::Integer, y::fq_nmod_poly) = y + x
 
--(x::fq, y::fq_nmod_poly) = parent(y)(x) - y
+-(x::fq_nmod, y::fq_nmod_poly) = parent(y)(x) - y
 
--(x::fq_nmod_poly, y::fq) = x - parent(x)(y)
+-(x::fq_nmod_poly, y::fq_nmod) = x - parent(x)(y)
 
 -(x::fmpz, y::fq_nmod_poly) = base_ring(parent(y))(x) - y
 
@@ -421,7 +424,7 @@ function gcdx(x::fq_nmod_poly, y::fq_nmod_poly)
          (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, 
           Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly},
            Ptr{FqNmodFiniteField}), &z, &s, &t, &x, &y, &base_ring(parent(x)))
-   return z, t
+   return z, s, t
 end
 
 ################################################################################
