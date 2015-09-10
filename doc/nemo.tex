@@ -2891,9 +2891,9 @@ canonical_unit(u) == u
 canonical_unit(a*b) == canonical_unit(a)*canonical_unit(b)
 \end{lstlisting}
 
-for all values $a$ and $b$ in the base ring and $u$ any invertible element in 
-the base ring. Moreover, \code{canonical_unit} must always return an invertible
-element in the base ring.
+for all nonzero values $a$ and $b$ in the base ring and $u$ any invertible element
+in the base ring. Moreover, \code{canonical_unit} must always return an invertible
+element in the base ring for nonzero elements of the ring.
 
 We overload the \code{//} operator in Nemo for rings whose fraction field can
 be taken (e.g. \code{fmpz} and \code|Poly{T}|), so that elements of the
@@ -5996,92 +5996,79 @@ b = dedekind_sum(12, 13)
 c = dedekind_sum(-120, fmpz(1305))
 \end{lstlisting}
 
-\subsection{Finite fields}
+\subsection{Flint finite fields $\F_{p^k}$ (multiprecision $p$): \code|fq|}
 
 We allow the construction of finite fields of any characteristic and degree in
 Nemo. When a Conway polynomial is known, the field is generated using the 
-Conway polynomial. Otherwise a random irreducible polynomial is used. 
+Conway polynomial. Otherwise a random sparse, irreducible polynomial is used. 
 
 (At this stage we make no attempt to compatibly embed finite fields generated 
 using randomly chosen irreducible polynomials, such as with the 
 Bosma-Cannon-Steel construction. But this may change in a later version of 
-Nemo.) 
+Flint/Nemo.) 
 
-The finite field type in Nemo is \code{FinFieldElem}. The uninterested user can skip
-description of the internals of this type, as we provide functions for 
-constructing the type.
+\subsection{Flint finite fields $\F_{p^k}$ (small $p$): \code|fq_nmod|}
 
-As with the \code{ZZ} type, the \code{FinFieldElem} type in Nemo simply represents a
-flint type. In fact, the contents are the same as an \code{fmpz_poly}, since
-fundamentally an element of a finite field is a polynomial expression.
+The Flint type for finite fields $\F_{p^k}$ for $p$ that fits in a single machine
+word is \code{fq_nmod}.
 
-The following is essentially what the Julia definition of the Nemo
-\code{FinFieldElem} type looks like. It mirrors the contents of the
-flint \code{fmpz_poly_struct}, which is how finite field elements are stored
-in flint.
+When a Conway polynomial is known, such a field is generated using the 
+Conway polynomial. Otherwise a random sparse, irreducible polynomial is used. 
 
-\begin{lstlisting}
-type FinFieldElem{S} <: Field
-   coeffs :: Ptr{Void}
-   alloc :: Int
-   length :: Int
-\end{lstlisting}
+The type of elements of Flint \code{fq_nmod} fields in Nemo is \code{fq_nmod}.
+This type belongs to the \code{FiniteFieldElem} type class, which in turn belongs
+to the \code{FieldElem} class. The type of the parent object for such fields is
+\code{FqNmodFiniteField} which belongs to the \code{Field} type class.
 
-Actually, in practice, we define an immutable type called 
-\code{fmpz_poly_struct} in Julia which contains precisely the fields above. The
-body of the \code{FinFieldElem} type then contains just an
-\code{fmpz_poly_struct}. But this is not an essential detail.
-
-The \code{FinFieldElem} type is parameterised by a symbol \code{S} which holds
-on to a flint context object with information such as the polynomial used to
-generate the field, the characteristic and much more besides.
-
-There are no user serviceable parts inside, so we omit details of this 
-\code{fq_ctx} type which stores this context object. Needless to say, it
-contains no more and no less than a flint \code{fq_ctx_t}.
-
-The \code{FinFieldElem} type belongs to the \code{Field} typeclass, and
-therefore elements of a finite field can be passed to any function which
-operates on field or ring elements.
-
-\subsubsection{Constructors}
-
-We provide the following functions for constructing finite fields in Nemo.
+The parent object for such a field is created using the \code{FiniteField}
+function, e.g.
 
 \begin{lstlisting}
-FiniteField(p::ZZ, deg::Int, var::String)
 FiniteField(p::Int, deg::Int, var::String)
 \end{lstlisting}
 
-\desc{Return a tuple \code{(R, x)} consisting of the type \code{R} of a finite
-field of characteristic \code{p} of degree \code{deg} and a generator \code{x}.
-Elements of the finite field \code{R} can be constructed as polynomials of
-degree less than \code{deg} in \code{x}. The generator \code{x} of the field 
-will be printed as the provided string \code{var}.
+\desc{Return a tuple \code{(R, x)} consisting of the parent object \code{R} of
+a finite field of characteristic \code{p} of degree \code{deg}, and a
+generator \code{x}. 
 
-If a Conway polynomial is known for the given characteristic and degree, it
-will be used to construct the field. Otherwise a random irreducible polynomial
-will be used. We make no attempt to compatibly embed finite fields in the
-latter case.
+The generator \code{x} of the field will be printed as the provided string
+\code{var}. The characteristic \code{p} must be prime, but we do not check this
+condition. The degree \code{deg} must be nonnegative. If \code{deg} is negative
+we throw a \code{DomainError()}.}
 
-The characteristic \code{p} must be prime, but we do not check this condition.
-Undefined behaviour, including the possibility of an infinite loop, may result
-otherwise. The degree \code{deg} must be nonnegative. If \code{deg} is 
-negative we throw a \code{DomainError()}.}
-
-We provide various convenient functions for constructing elements of a finite
-field.
+For example, the following code generates a parent object for the finite field
+of characteristic $7$ and degree $5$ (defined by a Conway polynomial).
 
 \begin{lstlisting}
-FinFieldElem{S}(a::Int)
-FinFieldElem{S}(a::ZZ)
+S, x = FiniteField(7, 5, "x")
 \end{lstlisting}
 
-\desc{Return the element \code{a} of the finite field, considered as an element
-of $\F_p$.}
+\subsubsection{Constructors}
+
+Elements of the finite field \code{R} can be constructed as polynomials of
+degree less than \code{deg} in \code{x}. As usual we overload the parent object
+for the finite field to construct elements of the field.
+
+In the constructors below, we take $S$ to be a parent object of a finite field
+as given by the construction above, for example.
 
 \begin{lstlisting}
-FinFieldElem{S}(a::FinFieldElem{S})
+S()
+\end{lstlisting}
+
+\desc{Return the element $0$ of the finite field.}
+
+\begin{lstlisting}
+S(a::Int)
+S(a::Integer)
+S(a::fmpz)
+\end{lstlisting}
+
+\desc{Return the element \code{a} of the finite field, where $a$ is considered 
+an element of $\F_p$.}
+
+\begin{lstlisting}
+S(a::fq_nmod)
 \end{lstlisting}
 
 \desc{Return a reference to the element \code{a} of the finite field. No copy
@@ -6092,82 +6079,108 @@ of the data is made by this function.}
 Here are some examples of constructing finite fields and elements in them.
 
 \begin{lstlisting}
-R, x = FiniteField(7, 5, "x")
-S, y = FiniteField(ZZ(17), 3, "y")
+S, y = FiniteField(17, 3, "y")
 
-f = 3x^4 + 2x^3 + 4x^2 + x + 1
-g = 2y^2 + 11y + 16
+f = 2y^2 + 11y + 16
 
-h = R(4)
-k = S(11)
-m = R(h)
+g = S(4)
+h = S()
+k = S(g)
 \end{lstlisting}
 
 \subsubsection{Basic manipulation}
 
 \begin{lstlisting}
-zero{S}(::Type{FinFieldElem{S}})
+zero(::Type{fq_nmod})
 \end{lstlisting}
 
 \desc{Return the additive identity in the finite field, i.e. $0$.}
 
 \begin{lstlisting}
-one{S}(::Type{FinFieldElem{S}})
+one(::Type{fq_nmod})
 \end{lstlisting}
 
 \desc{Return the multiplicative identity in the finite field, i.e. $1$.}
 
 \begin{lstlisting}
-gen{S}(::Type{FinFieldElem{S}})
+gen(::Type{fq_nmod})
 \end{lstlisting}
 
 \desc{Return a generator of the finite field, namely one whose
 representation is the monomial of degree $1$ modulo the defining
-polynomial of the field. The generator may not be a multiplicative
-generator.}
+polynomial of the field. The generator is guaranteed to be a multiplicative 
+generator only if the field is generated by a Conway polynomial.}
 
 \begin{lstlisting}
-iszero{S}(a::FinFieldElem{S})
+iszero(a::fq_nmod)
 \end{lstlisting}
 
 \desc{Return \code{true} if the element $a$ is the additive identity in the
 finite field, i.e. if it is $0$, otherwise return \code{false}.}
 
 \begin{lstlisting}
-isone{S}(a::FinFieldElem{S})
+isone(a::fq_nmod)
 \end{lstlisting}
 
 \desc{Return \code{true} if the element $a$ is the multiplicative identity in
 the finite field, i.e. if it is $1$, otherwise return \code{false}.}
 
 \begin{lstlisting}
-isunit{S}(a::FinFieldElem{S})
+isgen(a::fq_nmod)
+\end{lstlisting}
+
+\desc{Return \code{true} if the element $a$ is the generator of the finite field,
+otherwise return \code{false}.}
+
+\begin{lstlisting}
+isunit(a::fq_nmod)
 \end{lstlisting}
 
 \desc{Return \code{true} if the element $a$ is invertible in the finite field,
 i.e. if it is not zero, otherwise return \code{false}.}
 
 \begin{lstlisting}
-characteristic{S}(::Type{FinFieldElem{S}})
+characteristic(R::FqNmodFiniteField)
 \end{lstlisting}
 
 \desc{Return the prime characteristic $p$ of the finite field as a bignum
 \code{ZZ}.}
 
 \begin{lstlisting}
-order{S}(::Type{FinFieldElem{S}})
+order(R::FqNmodFiniteField)
 \end{lstlisting}
 
 \desc{Return the number of elements in the finite field, i.e. $q = p^d$
 where \code{p} is the characteristic and $d$ is the degree.}
 
 \begin{lstlisting}
-degree{S}(::Type{FinFieldElem{S}})
+degree(R::FqNmodFiniteField)
 \end{lstlisting}
 
 \desc{If the finite field is $\F_q$ where $q = p^d$, where $p$ is the
 prime characteristic of the field, this function returns the degree
 $d$.}
+
+\begin{lstlisting}
+coeff(a::fq_nmod, n::Int)
+\end{lstlisting}
+
+\desc{Return the coefficient of degree $n$ in the polynomial representation
+of the element $a$ of the finite field. If $n < 0$ we throw a
+\code{DomainError()}.}
+
+\begin{lstlisting}
+deepcopy(a::fq_nmod)
+\end{lstlisting}
+
+\desc{Return a new finite field element which is arithmetically equal to
+the given element.}
+
+\begin{lstlisting}
+canonical_unit(a::fq_nmod)
+\end{lstlisting}
+
+\desc{Used for canonicalising fractions. Simply returns $a$.}
 
 \textbf{Examples.}
 
@@ -6185,12 +6198,13 @@ g = degree(R)
 h = iszero(a)
 k = isone(b)
 m = isunit(x + 1)
+n = deepcopy(c)
 \end{lstlisting}
 
 \subsubsection{Unary operators}
 
 \begin{lstlisting}
--{S}(a::FinFieldElem{S})
+-(a::fq_nmod)
 \end{lstlisting}
 
 \desc{Return $-a$.}
@@ -6206,39 +6220,32 @@ a = x^4 + 3x^2 + 6x + 1
 b = -a
 \end{lstlisting}
 
-\subsubsection{Binary operators and functions}
+\subsubsection{Binary operators}
 
-We provide the following binary operators and functions for elements of
+We provide the following binary operators for elements of
 finite fields.
 
 \begin{lstlisting}
-+{S}(a::FinFieldElem{S}, b::FinFieldElem{S})
++(a::fq_nmod, b::fq_nmod)
 \end{lstlisting}
 
 \desc{Return $a + b$.}
 
 \begin{lstlisting}
--{S}(a::FinFieldElem{S}, b::FinFieldElem{S})
+-(a::fq_nmod, b::fq_nmod)
 \end{lstlisting}
 
 \desc{Return $a - b$.}
 
 \begin{lstlisting}
-*{S}(a::FinFieldElem{S}, b::FinFieldElem{S})
+*(a::fq_nmod, b::fq_nmod)
 \end{lstlisting}
 
 \desc{Return $ab$.}
 
-\begin{lstlisting}
-gcd{S}(a::FinFieldElem{S}, b::FinFieldElem{S})
-\end{lstlisting}
-
-\desc{Return gcd$(a, b)$. For a finite field this is always $1$ unless both
-$a$ and $b$ are $0$, in which case the gcd is $0$.}
-
 \textbf{Examples.}
 
-Here are some examples of binary operators and functions.
+Here are some examples of binary operators.
 
 \begin{lstlisting}
 R, x = FiniteField(7, 5, "x")
@@ -6249,8 +6256,6 @@ b = 3x^4 + 2x^2 + x + 1
 c = a + b
 d = a - b
 f = a*b
-g = gcd(a, b)
-h = gcd(R(0), R(0))
 \end{lstlisting}
 
 \subsubsection{Ad hoc binary operators}
@@ -6259,15 +6264,17 @@ We provide the following ad hoc binary operators, which are faster than first
 coercing all their arguments into the finite field.
 
 \begin{lstlisting}
-*{S}(x::Int, y::FinFieldElem{S})
-*{S}(x::ZZ, y::FinFieldElem{S})
+*(x::Int, y::fq_nmod)
+*(x::Integer, y::fq_nmod)
+*(x::fmpz, y::fq_nmod)
 \end{lstlisting}
 
 \desc{Return $xy$, i.e. $y$ added to itself $x$ times.}
 
 \begin{lstlisting}
-*{S}(x::FinFieldElem{S}, y::Int)
-*{S}(x::FinFieldElem{S}, y::ZZ)
+*(x::fq_nmod, y::Int)
+*(x::fq_nmod, y::Integer)
+*(x::fq_nmod, y::fmpz)
 \end{lstlisting}
 
 \desc{Return $xy$, i.e. $x$ added to itself $y$ times.}
@@ -6282,14 +6289,14 @@ R, x = FiniteField(7, 5, "x")
 a = x^4 + 3x^2 + 6x + 1
 
 b = 3a
-c = a*ZZ(5)
+c = a*fmpz(5)
 \end{lstlisting}
 
 \subsubsection{Powering}
 
 \begin{lstlisting}
-^{S}(a::FinFieldElem{S}, n::Int)
-^{S}(a::FinFieldElem{S}, n::ZZ)
+^(a::fq_nmod, n::Int)
+^(a::fq_nmod, n::fmpz)
 \end{lstlisting}
 
 \desc{Return $a^n$.}
@@ -6304,26 +6311,19 @@ R, x = FiniteField(7, 5, "x")
 a = x^4 + 3x^2 + 6x + 1
 
 b = a^3
-c = a^ZZ(-5)
+c = a^fmpz(-5)
 \end{lstlisting}
 
 \subsubsection{Comparison}
 
 \begin{lstlisting}
-=={S}(a::FinFieldElem{S}, b::FinFieldElem{S})
+==(a::fq_nmod, b::fq_nmod)
 \end{lstlisting}
 
 \desc{Return \code{true} if the finite field elements $a$ and $b$ are 
 arithmetically equal, otherwise return \code{false}.}
 
 Julia automatically provides corresponding \code{!=} functionality.
-
-\begin{lstlisting}
-isequal{S}(a::FinFieldElem{S}, b::FinFieldElem{S})
-\end{lstlisting}
-
-\desc{For finite fields the \code{isequal} function is simply an alias for
-the \code{==} operator.}
 
 \textbf{Examples.}
 
@@ -6339,36 +6339,10 @@ b != a
 R(3) == R(3)
 \end{lstlisting}
 
-\subsubsection{Exact division}
-
-\begin{lstlisting}
-divexact{S}(x::FinFieldElem{S}, y::FinFieldElem{S})
-/{S}(x::FinFieldElem{S}, y::FinFieldElem{S})
-\end{lstlisting}
-
-\desc{Return $x/y$, which is an exact division in a finite field when defined,
-since every nonzero element is invertible. We throw a \code{DivideError()} if
-$y = 0$. Both forms of exact division are the same, one being a synonym for 
-the other.}
-
-\textbf{Examples.}
-
-Here are some examples of exact division of finite field elements.
-
-\begin{lstlisting}
-R, x = FiniteField(7, 5, "x")
-
-a = x^4 + 3x^2 + 6x + 1
-b = 3x^4 + 2x^2 + 2
-
-c = divexact(a, b)
-d = b/a
-\end{lstlisting}
-
 \subsubsection{Inversion}
 
 \begin{lstlisting}
-inv{S}(a::FinFieldElem{S})
+inv(a::fq_nmod)
 \end{lstlisting}
 
 \desc{Return the multiplicative inverse of $a$ in the finite field, i.e. 
@@ -6387,27 +6361,76 @@ b = inv(a)
 b == a^-1
 \end{lstlisting}
 
+\subsubsection{Exact division}
+
+\begin{lstlisting}
+divexact(x::fq_nmod, y::fq_nmod)
+//(x::fq_nmod, y::fq_nmod)
+\end{lstlisting}
+
+\desc{Return $x/y$, which is an exact division in a finite field when defined,
+since every nonzero element is invertible. We throw a \code{DivideError()} if
+$y = 0$. Both forms of exact division are the same, one being a synonym for 
+the other.}
+
+\textbf{Examples.}
+
+Here are some examples of exact division of finite field elements.
+
+\begin{lstlisting}
+R, x = FiniteField(7, 5, "x")
+
+a = x^4 + 3x^2 + 6x + 1
+b = 3x^4 + 2x^2 + 2
+
+c = divexact(a, b)
+d = b//a
+\end{lstlisting}
+
+\subsubsection{GCD}
+
+\begin{lstlisting}
+gcd(a::fq_nmod, b::fq_nmod)
+\end{lstlisting}
+
+\desc{Return gcd$(a, b)$. For a finite field this is always $1$ unless both
+$a$ and $b$ are $0$, in which case the gcd is $0$.}
+
+\textbf{Examples.}
+
+Here are some examples of GCD.
+
+\begin{lstlisting}
+R, x = FiniteField(7, 5, "x")
+
+a = x^4 + 3x^2 + 6x + 1
+b = 3x^4 + 2x^2 + x + 1
+
+c = gcd(a, b)
+d = gcd(R(0), R(0))
+\end{lstlisting}
+
 \subsubsection{Special functions}
 
 Various special functions with finite field specific behaviour are
 defined.
 
 \begin{lstlisting}
-trace{S}(a::FinFieldElem{S})
+trace(a::fq_nmod)
 \end{lstlisting}
 
 \desc{Return the trace of $a$. This is an element of $\F_p$, but the value
 returned is this value embedded in the original finite field.}
 
 \begin{lstlisting}
-norm{S}(a::FinFieldElem{S})
+norm(a::fq_nmod)
 \end{lstlisting}
 
 \desc{Return the norm of $a$. This is an element of $\F_p$, but the value
 returned is this value embedded in the original finite field.}
 
 \begin{lstlisting}
-frobenius{S}(a::FinFieldElem{S}, n = 1)
+frobenius(a::fq_nmod, n = 1)
 \end{lstlisting}
 
 \desc{Return the iterated Frobenius $\sigma_p^n(a)$ where $\sigma_p$ is the 
@@ -6416,7 +6439,7 @@ characteristic $p$. By default the Frobenius map is applied $n = 1$ times if
 $n$ is not specified.}
 
 \begin{lstlisting}
-pth_root{S}(a::FinFieldElem{S})
+pth_root(a::fq_nmod)
 \end{lstlisting}
 
 \desc{Return the $p$-th root of $a$ in the finite field of characteristic

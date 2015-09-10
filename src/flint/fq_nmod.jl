@@ -72,6 +72,8 @@ iszero(a::fq_nmod) = ccall((:fq_nmod_is_zero, :libflint), Bool,
 isone(a::fq_nmod) = ccall((:fq_nmod_is_one, :libflint), Bool,
                     (Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), &a, &a.parent)
 
+isgen(a::fq_nmod) = a == gen(parent(a)) # there is no isgen in flint
+
 isunit(a::fq_nmod) = ccall((:fq_nmod_is_invertible, :libflint), Bool, 
                      (Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), &a, &a.parent)
 
@@ -194,6 +196,8 @@ function *(x::Int, y::fq_nmod)
    return z
 end
 
+*(x::fq_nmod, y::Int) = y*x
+
 *(x::Integer, y::fq_nmod) = fmpz(x)*y
 
 *(x::fq_nmod, y::Integer) = y*x
@@ -252,6 +256,20 @@ end
 
 ###############################################################################
 #
+#   Inversion
+#
+###############################################################################
+
+function inv(x::fq_nmod)
+   iszero(x) && throw(DivideError())
+   z = parent(x)()
+   ccall((:fq_nmod_inv, :libflint), Void, 
+       (Ptr{fq_nmod}, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), &z, &x, &x.parent)
+   return z
+end
+
+###############################################################################
+#
 #   Exact division
 #
 ###############################################################################
@@ -263,20 +281,6 @@ function divexact(x::fq_nmod, y::fq_nmod)
    ccall((:fq_nmod_div, :libflint), Void, 
          (Ptr{fq_nmod}, Ptr{fq_nmod}, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), 
                                                        &z, &x, &y, &y.parent)
-   return z
-end
-
-###############################################################################
-#
-#   Inversion
-#
-###############################################################################
-
-function inv(x::fq_nmod)
-   iszero(x) && throw(DivideError())
-   z = parent(x)()
-   ccall((:fq_nmod_inv, :libflint), Void, 
-       (Ptr{fq_nmod}, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), &z, &x, &x.parent)
    return z
 end
 

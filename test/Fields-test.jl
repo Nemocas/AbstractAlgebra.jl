@@ -1,8 +1,8 @@
 include("generic/Fraction-test.jl")
 
 include("flint/fmpq-test.jl")
+include("flint/fq_nmod-test.jl")
 
-include("FiniteFields-test.jl")
 include("Padics-test.jl")
 
 function test_fields_resultant()
@@ -30,8 +30,8 @@ function test_fields()
    test_fraction()
 
    test_fmpq()
-
-   test_ffield()
+   test_fq_nmod()
+   
    test_padics()
    
    test_fields_resultant()
