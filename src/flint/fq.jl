@@ -72,6 +72,8 @@ iszero(a::fq) = ccall((:fq_is_zero, :libflint), Bool,
 isone(a::fq) = ccall((:fq_is_one, :libflint), Bool,
                     (Ptr{fq}, Ptr{FqFiniteField}), &a, &a.parent)
 
+isgen(a::fq) = a == gen(parent(a))
+
 isunit(a::fq) = ccall((:fq_is_invertible, :libflint), Bool, 
                      (Ptr{fq}, Ptr{FqFiniteField}), &a, &a.parent)
 
