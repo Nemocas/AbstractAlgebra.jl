@@ -6,14 +6,6 @@
 
 export fq_poly, FqPolyRing
 
-export elem_type, base_ring, parent, var, check_parent, length, coeff, zero,
-       one, gen, isgen, degree, deepcopy, canonical_unit, show, show_minus_one,
-       +, -, *, ^, ==, truncate, mullow, reverse, shift_left, shift_right, div,
-       rem, divrem, gcd, evaluate, compose, derivative, inflate, deflate,
-       factor, factor_distinct_deg, fit!, setcoeff!, mul!, add!, sub!, addeq!,
-       Polynomial
-
-
 ################################################################################
 #
 #  Type and parent object methods
@@ -47,10 +39,17 @@ function coeff(x::fq_poly, n::Int)
    F = (x.parent).base_ring
    temp = F(1)
    ccall((:fq_poly_get_coeff, :libflint), Void, 
-         (Ptr{fq}, Ptr{fq_poly}, Clong, Ptr{FqFiniteField}),
+         (Ptr{fq}, Ptr{fq_poly}, Int, Ptr{FqFiniteField}),
          &temp, &x, n, &F)
    return temp
 end
+
+set_length!(x::fq_poly, n::Int) = ccall((:_fq_poly_set_length, :libflint), Void,
+                              (Ptr{fq_poly}, Int), &x, n)
+
+iszero(x::fq_poly) = ccall((:fq_poly_is_zero, :libflint), Bool,
+                              (Ptr{fq_poly}, Ptr{FqFiniteField}),
+                              &x, &base_ring(x.parent))
 
 zero(a::FqPolyRing) = a(zero(base_ring(a)))
 
@@ -59,6 +58,14 @@ one(a::FqPolyRing) = a(one(base_ring(a)))
 gen(a::FqPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
 isgen(x::fq_poly) = ccall((:fq_poly_is_gen, :libflint), Bool,
+                              (Ptr{fq_poly}, Ptr{FqFiniteField}),
+                              &x, &base_ring(x.parent))
+
+iszero(x::fq_poly) = ccall((:fq_poly_is_zero, :libflint), Bool,
+                              (Ptr{fq_poly}, Ptr{FqFiniteField}),
+                              &x, &base_ring(x.parent))
+
+isone(x::fq_poly) = ccall((:fq_poly_is_one, :libflint), Bool,
                               (Ptr{fq_poly}, Ptr{FqFiniteField}),
                               &x, &base_ring(x.parent))
 
@@ -108,7 +115,7 @@ show_minus_one(::Type{fq_poly}) = show_minus_one(fq)
 
 ################################################################################
 #
-#  Uary operations
+#  Unary operations
 #
 ################################################################################
 
@@ -195,17 +202,29 @@ end
 
 +(x::Integer, y::fq_poly) = y + x
 
+-(x::fq, y::fq_poly) = parent(y)(x) - y
+
+-(x::fq_poly, y::fq) = x - parent(x)(y)
+
+-(x::fmpz, y::fq_poly) = base_ring(parent(y))(x) - y
+
+-(x::fq_poly, y::fmpz) = x - base_ring(parent(x))(y)
+
+-(x::fq_poly, y::Integer) = x - fmpz(y)
+
+-(x::Integer, y::fq_poly) = fmpz(x) - y
+
 ################################################################################
 #
 #   Powering
 #
 ################################################################################
 
-function ^(x::fq_poly, y::Clong)
+function ^(x::fq_poly, y::Int)
    y < 0 && throw(DomainError())
    z = parent(x)()
    ccall((:fq_poly_pow, :libflint), Void,
-         (Ptr{fq_poly}, Ptr{fq_poly}, Clong, Ptr{FqFiniteField}), 
+         (Ptr{fq_poly}, Ptr{fq_poly}, Int, Ptr{FqFiniteField}), 
          &z, &x, y, &base_ring(parent(x)))
    return z
 end
@@ -260,7 +279,7 @@ end
 #
 ################################################################################
 
-function truncate(x::fq_poly, n::Clong)
+function truncate(x::fq_poly, n::Int)
    n < 0 && throw(DomainError())
    if length(x) <= n
       return x
@@ -272,13 +291,13 @@ function truncate(x::fq_poly, n::Clong)
    return z
 end
 
-function mullow(x::fq_poly, y::fq_poly, n::Clong)
+function mullow(x::fq_poly, y::fq_poly, n::Int)
    check_parent(x,y)
    n < 0 && throw(DomainError())
    z = parent(x)()
    ccall((:fq_poly_mullow, :libflint), Void,
          (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly},
-         Clong, Ptr{FqFiniteField}),
+         Int, Ptr{FqFiniteField}),
          &z, &x, &y, n, &base_ring(parent(x)))
    return z
 end
@@ -289,11 +308,11 @@ end
 #
 ################################################################################
 
-function reverse(x::fq_poly, len::Clong)
+function reverse(x::fq_poly, len::Int)
    len < 0 && throw(DomainError())
    z = parent(x)()
    ccall((:fq_poly_reverse, :libflint), Void,
-         (Ptr{fq_poly}, Ptr{fq_poly}, Clong, Ptr{FqFiniteField}),
+         (Ptr{fq_poly}, Ptr{fq_poly}, Int, Ptr{FqFiniteField}),
          &z, &x, len, &base_ring(parent(x)))
    return z
 end
@@ -308,16 +327,16 @@ function shift_left(x::fq_poly, len::Int)
    len < 0 && throw(DomainError())
    z = parent(x)()
    ccall((:fq_poly_shift_left, :libflint), Void,
-         (Ptr{fq_poly}, Ptr{fq_poly}, Clong, Ptr{FqFiniteField}),
+         (Ptr{fq_poly}, Ptr{fq_poly}, Int, Ptr{FqFiniteField}),
          &z, &x, len, &base_ring(parent(x)))
    return z
 end
 
-function shift_right(x::fq_poly, len::Clong)
+function shift_right(x::fq_poly, len::Int)
    len < 0 && throw(DomainError())
    z = parent(x)()
    ccall((:fq_poly_shift_right, :libflint), Void,
-         (Ptr{fq_poly}, Ptr{fq_poly}, Clong, Ptr{FqFiniteField}),
+         (Ptr{fq_poly}, Ptr{fq_poly}, Int, Ptr{FqFiniteField}),
          &z, &x, len, &base_ring(parent(x)))
    return z
 end
@@ -490,11 +509,11 @@ function factor(x::fq_poly)
    ccall((:fq_poly_factor, :libflint), Void, (Ptr{fq_poly_factor},
          Ptr{fq}, Ptr{fq_poly}, Ptr{FqFiniteField}),
          &fac, &a, &x, &F)
-   res = Array(Tuple{fq_poly,Clong},fac.num)
+   res = Array(Tuple{fq_poly,Int},fac.num)
    for i in 1:fac.num
       f = R()
       ccall((:fq_poly_factor_get_poly, :libflint), Void,
-            (Ptr{fq_poly}, Ptr{fq_poly_factor}, Clong,
+            (Ptr{fq_poly}, Ptr{fq_poly_factor}, Int,
             Ptr{FqFiniteField}), &f, &fac, i-1, &F)
       e = unsafe_load(fac.exp,i)
       res[i] = (f,e)
@@ -508,16 +527,16 @@ function factor_distinct_deg(x::fq_poly)
    fac = fq_poly_factor(F)
    tmp = fq_poly_factor(F)
    ccall((:fq_poly_factor_fit_length, :libflint), Void,
-         (Ptr{fq_poly_factor}, Clong, Ptr{FqFiniteField}),
+         (Ptr{fq_poly_factor}, Int, Ptr{FqFiniteField}),
          &tmp, degree(x), &F)
    ccall((:fq_poly_factor_distinct_deg, :libflint), Void, 
-         (Ptr{fq_poly_factor}, Ptr{fq_poly}, Ptr{Clong},
+         (Ptr{fq_poly_factor}, Ptr{fq_poly}, Ptr{Int},
          Ptr{FqFiniteField}), &fac, &x, &tmp.exp, &F)
-   res = Array(Tuple{fq_poly, Clong}, fac.num)
+   res = Array(Tuple{fq_poly, Int}, fac.num)
    for i in 1:fac.num
       f = R()
       ccall((:fq_poly_factor_get_poly, :libflint), Void,
-            (Ptr{fq_poly}, Ptr{fq_poly_factor}, Clong,
+            (Ptr{fq_poly}, Ptr{fq_poly_factor}, Int,
             Ptr{FqFiniteField}), &f, &fac, i-1, &F)
       d = unsafe_load(tmp.exp,i)
       res[i] = (f,d)
@@ -531,9 +550,9 @@ end
 #
 ################################################################################
 
-function fit!(z::fq_poly, n::Clong)
+function fit!(z::fq_poly, n::Int)
    ccall((:fq_poly_fit_length, :libflint), Void, 
-         (Ptr{fq_poly}, Clong, Ptr{FqFiniteField}),
+         (Ptr{fq_poly}, Int, Ptr{FqFiniteField}),
          &z, n, &base_ring(parent(x)))
 end
 
@@ -567,6 +586,18 @@ function addeq!(z::fq_poly, x::fq_poly)
          (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly},
          Ptr{FqFiniteField}), &z, &z, &x, &base_ring(parent(x)))
 end
+
+################################################################################
+#
+#  Promotion rules
+#
+################################################################################
+
+Base.promote_rule{V <: Integer}(::Type{fq_poly}, ::Type{V}) = fq_poly
+
+Base.promote_rule(::Type{fq_poly}, ::Type{fmpz}) = fq_poly
+
+Base.promote_rule(::Type{fq_poly}, ::Type{fq}) = fq_poly
 
 ################################################################################
 #
@@ -618,6 +649,11 @@ function Base.call(R::FqPolyRing, x::fmpz_poly)
    z = fq_poly(x, base_ring(R))
    z.parent = R
    return z
+end
+
+function Base.call(R::FqPolyRing, x::fq_poly)
+  parent(x) != R && error("Unable to coerce to polynomial")
+  return x
 end
 
 ################################################################################

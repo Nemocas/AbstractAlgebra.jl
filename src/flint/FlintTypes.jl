@@ -1300,8 +1300,8 @@ end
 
 type nmod_mat <: MatElem{Residue{fmpz}}
   entries::Ptr{Void}
-  r::Int                  # Clong
-  c::Int                  # Clong
+  r::Int                  # Int
+  c::Int                  # Int
   rows::Ptr{Void}
   _n::UInt                # mp_limb_t / Culong
   _ninv::UInt             # mp_limb_t / Culong
@@ -1435,8 +1435,8 @@ type fq_poly <: PolyElem{fq}
       ctx = base_ring(parent(a))
       ccall((:fq_poly_init, :libflint), Void,
             (Ptr{fq_poly}, Ptr{FqFiniteField}), &z, &ctx)
-      call((:fq_poly_set, :libflint),
-            (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{FqNmodPolyFiniteField}),
+      ccall((:fq_poly_set, :libflint), Void,
+            (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{FqFiniteField}),
             &z, &a, &ctx)
       finalizer(z, _fq_poly_clear_fn)
       return z
@@ -1475,7 +1475,7 @@ type fq_poly <: PolyElem{fq}
       ccall((:fq_poly_init2, :libflint), Void,
             (Ptr{fq_poly}, Int, Ptr{FqFiniteField}),
             &z, length(a), &ctx)
-      for i =1:length(a)
+      for i = 1:length(a)
          temp = ctx(a[i])
          ccall((:fq_poly_set_coeff, :libflint), Void,
                (Ptr{fq_poly}, Int, Ptr{fq}, Ptr{FqFiniteField}),
@@ -1490,8 +1490,8 @@ type fq_poly <: PolyElem{fq}
       ccall((:fq_poly_init2, :libflint), Void,
             (Ptr{fq_poly}, Int, Ptr{FqFiniteField}),
             &z, length(a), &ctx)
-      for i =1:length(a)
-         temp = ctx(coeff(a,i-1))
+      for i = 1:length(a)
+         temp = ctx(coeff(a, i-1))
          ccall((:fq_poly_set_coeff, :libflint), Void,
                (Ptr{fq_poly}, Int, Ptr{fq}, Ptr{FqFiniteField}),
                &z, i - 1, &temp, &ctx)
@@ -1507,9 +1507,9 @@ end
 
 type fq_poly_factor
   poly::Ptr{fq_poly}
-  exp::Ptr{Clong} 
-  num::Clong
-  alloc::Clong
+  exp::Ptr{Int} 
+  num::Int
+  alloc::Int
   base_field::FqFiniteField
     
   function fq_poly_factor(ctx::FqFiniteField)
@@ -1569,8 +1569,8 @@ type fq_nmod_poly <: PolyElem{fq_nmod}
       ctx = base_ring(parent(a))
       ccall((:fq_nmod_poly_init, :libflint), Void,
             (Ptr{fq_nmod_poly}, Ptr{FqNmodFiniteField}), &z, &ctx)
-      call((:fq_nmod_poly_set, :libflint),
-            (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, Ptr{FqNmodPolyFiniteField}),
+      ccall((:fq_nmod_poly_set, :libflint), Void,
+            (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, Ptr{FqNmodFiniteField}),
             &z, &a, &ctx)
       finalizer(z, _fq_nmod_poly_clear_fn)
       return z
@@ -1609,7 +1609,7 @@ type fq_nmod_poly <: PolyElem{fq_nmod}
       ccall((:fq_nmod_poly_init2, :libflint), Void,
             (Ptr{fq_nmod_poly}, Int, Ptr{FqNmodFiniteField}),
             &z, length(a), &ctx)
-      for i =1:length(a)
+      for i = 1:length(a)
          temp = ctx(a[i])
          ccall((:fq_nmod_poly_set_coeff, :libflint), Void,
                (Ptr{fq_nmod_poly}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}),
@@ -1624,7 +1624,7 @@ type fq_nmod_poly <: PolyElem{fq_nmod}
       ccall((:fq_nmod_poly_init2, :libflint), Void,
             (Ptr{fq_nmod_poly}, Int, Ptr{FqNmodFiniteField}),
             &z, length(a), &ctx)
-      for i =1:length(a)
+      for i = 1:length(a)
          temp = ctx(coeff(a,i-1))
          ccall((:fq_nmod_poly_set_coeff, :libflint), Void,
                (Ptr{fq_nmod_poly}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}),
@@ -1641,9 +1641,9 @@ end
 
 type fq_nmod_poly_factor
   poly::Ptr{fq_nmod_poly}
-  exp::Ptr{Clong} 
-  num::Clong
-  alloc::Clong
+  exp::Ptr{Int} 
+  num::Int
+  alloc::Int
   base_field::FqNmodFiniteField
     
   function fq_nmod_poly_factor(ctx::FqNmodFiniteField)
