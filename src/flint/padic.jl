@@ -197,28 +197,6 @@ end
 
 ###############################################################################
 #
-#   Unsafe operators
-#
-###############################################################################
-
-function mul!(z::padic, x::padic, y::padic)
-   z.N = min(x.N + y.v, y.N + x.v)
-   ctx = parent(x)
-   ccall((:padic_mul, :libflint), Void, 
-         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), 
-               &z, &x, &y, &ctx)
-end
-
-function addeq!(x::padic, y::padic)
-   x.N = min(x.N, y.N)
-   ctx = parent(x)
-   ccall((:padic_add, :libflint), Void, 
-         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), 
-               &x, &x, &y, &ctx)
-end
-
-###############################################################################
-#
 #   Comparison
 #
 ###############################################################################
@@ -272,6 +250,12 @@ function divexact(a::padic, b::padic)
                &z, &a, &b, &ctx)
    return z
 end
+
+###############################################################################
+#
+#   Ad hoc exact division
+#
+###############################################################################
 
 divexact(a::padic, b::Int) = a*(fmpz(1)//fmpz(b))
 
@@ -372,6 +356,28 @@ function teichmuller(a::padic)
    return z
 end
   
+###############################################################################
+#
+#   Unsafe operators
+#
+###############################################################################
+
+function mul!(z::padic, x::padic, y::padic)
+   z.N = min(x.N + y.v, y.N + x.v)
+   ctx = parent(x)
+   ccall((:padic_mul, :libflint), Void, 
+         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), 
+               &z, &x, &y, &ctx)
+end
+
+function addeq!(x::padic, y::padic)
+   x.N = min(x.N, y.N)
+   ctx = parent(x)
+   ccall((:padic_add, :libflint), Void, 
+         (Ptr{padic}, Ptr{padic}, Ptr{padic}, Ptr{FlintPadicField}), 
+               &x, &x, &y, &ctx)
+end
+
 ###############################################################################
 #
 #   Conversions and promotions
