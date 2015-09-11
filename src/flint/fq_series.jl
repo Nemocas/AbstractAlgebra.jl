@@ -54,6 +54,11 @@ function normalise(a::fq_series, len::Int)
    return len
 end
 
+function set_length!(a::fq_series, len::Int)
+   ccall((:_fq_poly_set_length, :libflint), Void,
+      (Ptr{fq_series}, Int), &a, len)
+end
+
 function coeff(x::fq_series, n::Int)
    ctx = base_ring(x)
    if n < 0
@@ -212,60 +217,6 @@ end
 
 ###############################################################################
 #
-#   Unsafe functions
-#
-###############################################################################
-
-function setcoeff!(z::fq_series, n::Int, x::fq)
-   ctx = base_ring(z)
-   ccall((:fq_poly_set_coeff, :libflint), Void, 
-                (Ptr{fq_series}, Int, Ptr{fq}, Ptr{FqFiniteField}), 
-               &z, n, &x, &ctx)
-end
-
-function mul!(z::fq_series, a::fq_series, b::fq_series)
-   ctx = base_ring(z)
-   lena = length(a)
-   lenb = length(b)
-   
-   aval = valuation(a)
-   bval = valuation(b)
-
-   prec = min(a.prec + bval, b.prec + aval)
-   
-   lena = min(lena, prec)
-   lenb = min(lenb, prec)
-   
-   lenz = min(lena + lenb - 1, prec)
-   if lenz < 0
-      lenz = 0
-   end
-
-   z.prec = prec
-   ccall((:fq_poly_mullow, :libflint), Void, 
-     (Ptr{fq_series}, Ptr{fq_series}, Ptr{fq_series}, Int, Ptr{FqFiniteField}),
-               &z, &a, &b, lenz, &ctx)
-end
-
-function addeq!(a::fq_series, b::fq_series)
-   ctx = base_ring(a)
-   lena = length(a)
-   lenb = length(b)
-         
-   prec = min(a.prec, b.prec)
- 
-   lena = min(lena, prec)
-   lenb = min(lenb, prec)
-
-   lenz = max(lena, lenb)
-   a.prec = prec
-   ccall((:fq_poly_add_series, :libflint), Void, 
-     (Ptr{fq_series}, Ptr{fq_series}, Ptr{fq_series}, Int, Ptr{FqFiniteField}),
-               &a, &a, &b, lenz, &ctx)
-end
-
-###############################################################################
-#
 #   Ad hoc binary operators
 #
 ###############################################################################
@@ -279,6 +230,8 @@ function *(x::fq, y::fq_series)
                &z, &y, &x, &ctx)
    return z
 end
+
+*(x::fq_series, y::fq) = y*x
 
 ###############################################################################
 #
@@ -463,6 +416,60 @@ function inv(a::fq_series)
                 (Ptr{fq_series}, Ptr{fq_series}, Int, Ptr{FqFiniteField}), 
                &ainv, &a, a.prec, &ctx)
    return ainv
+end
+
+###############################################################################
+#
+#   Unsafe functions
+#
+###############################################################################
+
+function setcoeff!(z::fq_series, n::Int, x::fq)
+   ctx = base_ring(z)
+   ccall((:fq_poly_set_coeff, :libflint), Void, 
+                (Ptr{fq_series}, Int, Ptr{fq}, Ptr{FqFiniteField}), 
+               &z, n, &x, &ctx)
+end
+
+function mul!(z::fq_series, a::fq_series, b::fq_series)
+   ctx = base_ring(z)
+   lena = length(a)
+   lenb = length(b)
+   
+   aval = valuation(a)
+   bval = valuation(b)
+
+   prec = min(a.prec + bval, b.prec + aval)
+   
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   
+   lenz = min(lena + lenb - 1, prec)
+   if lenz < 0
+      lenz = 0
+   end
+
+   z.prec = prec
+   ccall((:fq_poly_mullow, :libflint), Void, 
+     (Ptr{fq_series}, Ptr{fq_series}, Ptr{fq_series}, Int, Ptr{FqFiniteField}),
+               &z, &a, &b, lenz, &ctx)
+end
+
+function addeq!(a::fq_series, b::fq_series)
+   ctx = base_ring(a)
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenz = max(lena, lenb)
+   a.prec = prec
+   ccall((:fq_poly_add_series, :libflint), Void, 
+     (Ptr{fq_series}, Ptr{fq_series}, Ptr{fq_series}, Int, Ptr{FqFiniteField}),
+               &a, &a, &b, lenz, &ctx)
 end
 
 ###############################################################################

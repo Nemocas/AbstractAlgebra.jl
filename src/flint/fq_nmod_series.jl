@@ -54,6 +54,11 @@ function normalise(a::fq_nmod_series, len::Int)
    return len
 end
 
+function set_length!(a::fq_nmod_series, len::Int)
+   ccall((:_fq_nmod_poly_set_length, :libflint), Void,
+      (Ptr{fq_nmod_series}, Int), &a, len)
+end
+
 function coeff(x::fq_nmod_series, n::Int)
    ctx = base_ring(x)
    if n < 0
@@ -213,60 +218,6 @@ end
 
 ###############################################################################
 #
-#   Unsafe functions
-#
-###############################################################################
-
-function setcoeff!(z::fq_nmod_series, n::Int, x::fq_nmod)
-   ctx = base_ring(z)
-   ccall((:fq_nmod_poly_set_coeff, :libflint), Void, 
-                (Ptr{fq_nmod_series}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), 
-               &z, n, &x, &ctx)
-end
-
-function mul!(z::fq_nmod_series, a::fq_nmod_series, b::fq_nmod_series)
-   ctx = base_ring(z)
-   lena = length(a)
-   lenb = length(b)
-   
-   aval = valuation(a)
-   bval = valuation(b)
-
-   prec = min(a.prec + bval, b.prec + aval)
-   
-   lena = min(lena, prec)
-   lenb = min(lenb, prec)
-   
-   lenz = min(lena + lenb - 1, prec)
-   if lenz < 0
-      lenz = 0
-   end
-
-   z.prec = prec
-   ccall((:fq_nmod_poly_mullow, :libflint), Void, 
-     (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}),
-               &z, &a, &b, lenz, &ctx)
-end
-
-function addeq!(a::fq_nmod_series, b::fq_nmod_series)
-   ctx = base_ring(a)
-   lena = length(a)
-   lenb = length(b)
-         
-   prec = min(a.prec, b.prec)
- 
-   lena = min(lena, prec)
-   lenb = min(lenb, prec)
-
-   lenz = max(lena, lenb)
-   a.prec = prec
-   ccall((:fq_nmod_poly_add_series, :libflint), Void, 
-     (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}),
-               &a, &a, &b, lenz, &ctx)
-end
-
-###############################################################################
-#
 #   Ad hoc binary operators
 #
 ###############################################################################
@@ -280,6 +231,8 @@ function *(x::fq_nmod, y::fq_nmod_series)
                &z, &y, &x, &ctx)
    return z
 end
+
+*(x::fq_nmod_series, y::fq_nmod) = y*x
 
 ###############################################################################
 #
@@ -464,6 +417,60 @@ function inv(a::fq_nmod_series)
                 (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}), 
                &ainv, &a, a.prec, &ctx)
    return ainv
+end
+
+###############################################################################
+#
+#   Unsafe functions
+#
+###############################################################################
+
+function setcoeff!(z::fq_nmod_series, n::Int, x::fq_nmod)
+   ctx = base_ring(z)
+   ccall((:fq_nmod_poly_set_coeff, :libflint), Void, 
+                (Ptr{fq_nmod_series}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), 
+               &z, n, &x, &ctx)
+end
+
+function mul!(z::fq_nmod_series, a::fq_nmod_series, b::fq_nmod_series)
+   ctx = base_ring(z)
+   lena = length(a)
+   lenb = length(b)
+   
+   aval = valuation(a)
+   bval = valuation(b)
+
+   prec = min(a.prec + bval, b.prec + aval)
+   
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   
+   lenz = min(lena + lenb - 1, prec)
+   if lenz < 0
+      lenz = 0
+   end
+
+   z.prec = prec
+   ccall((:fq_nmod_poly_mullow, :libflint), Void, 
+     (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}),
+               &z, &a, &b, lenz, &ctx)
+end
+
+function addeq!(a::fq_nmod_series, b::fq_nmod_series)
+   ctx = base_ring(a)
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenz = max(lena, lenb)
+   a.prec = prec
+   ccall((:fq_nmod_poly_add_series, :libflint), Void, 
+     (Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Ptr{fq_nmod_series}, Int, Ptr{FqNmodFiniteField}),
+               &a, &a, &b, lenz, &ctx)
 end
 
 ###############################################################################

@@ -2507,8 +2507,8 @@ m = a*d
 $b$.}
 
 \begin{lstlisting}
-*{T <: RingElem}(a::Poly{T}, b::Int)
-*{T <: RingElem}(a::Poly{T}, b::fmpz)
+*{T <: RingElem}(a::PowerSeries{T}, b::Int)
+*{T <: RingElem}(a::PowerSeries{T}, b::fmpz)
 \end{lstlisting}
 
 \desc{Return $ab$. The resulting power series will have the same precision as
@@ -6045,7 +6045,96 @@ Here are some examples of ad hoc binary operators.
    h = atanh(b)   
 \end{lstlisting}
 
+\subsection{Flint power series over $\F_{p^k}$ (multiprecision $p$): \code{fq_series}}
 
+Flint doesn't have a module for power series over $\F_{p^k}$, but the \code{fq_poly}
+module contains code for power series operations. In Nemo, for the purposes of
+simplicity, we deal with Flint as though it has a module called \code{fq_series}.
+
+The power series type in Nemo for polynomials treated as power series is
+\code{fq_series}. 
+
+Power series of this type are created using the \code{PowerSeriesRing} constructor when
+it is passed an \code{FqFiniteField} parent object as argument. The function also takes a
+maximum (relative) precision and a variable name as a string.
+
+\begin{lstlisting}
+R, t = FiniteField(fmpz(23), 5, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+\end{lstlisting}
+
+Power series in this ring have parent of type \code{FqSeriesRing}.
+
+We describe only the functions which are different to those described for generic
+power series.
+
+\subsubsection{Constructors}
+
+In the constructor below we assume $S$ is an \code{FqSeriesRing} parent object, as
+constructed above for example. We assume the maximum precision of the power series
+for this object to be $k$.
+
+\begin{lstlisting}
+S(a::fmpz)
+\end{lstlisting}
+
+\desc{Construct the power series $a + O(x^k)$.}
+
+\textbf{Examples.}
+
+Here is an example of a constructor.
+
+\begin{lstlisting}
+   R, t = FiniteField(fmpz(23), 5, "t")
+   S, x = PowerSeriesRing(R, 30, "x")
+
+   a = S(fmpz(12))
+\end{lstlisting}
+
+\subsubsection{Ad hoc binary operators}
+
+\begin{lstlisting}
+*(x::fq_series, y::fq)
+*(x::fq, y::fq_series)
+\end{lstlisting}
+
+\desc{Return $xy$.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc binary operators.
+
+\begin{lstlisting}
+   R, t = FiniteField(fmpz(23), 5, "t")
+   S, x = PowerSeriesRing(R, 30, "x")
+
+   a = 1 + x + 3x^2 + O(x^5)
+   
+   b = a*(t^2 + 1)
+
+   c = 2t*a
+\end{lstlisting}
+
+\subsubsection{Ad hoc exact division}
+
+\begin{lstlisting}
+divexact(x::fq_series, y::fq)
+\end{lstlisting}
+
+\desc{Return $x/y$. If $y = 0$ this raises a \code{DivideError()}.}
+
+\textbf{Examples.}
+
+Here is an example of ad hoc exact division.
+
+\begin{lstlisting}
+   R, t = FiniteField(fmpz(23), 5, "t")
+   S, x = PowerSeriesRing(R, 30, "x")
+
+   a = 1 + x + 3x^2 + O(x^5)
+   
+   b = divexact(a, t^2 + 1)
+\end{lstlisting}
 
 \section{Flint fields}
 
