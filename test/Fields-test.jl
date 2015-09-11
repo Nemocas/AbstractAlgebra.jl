@@ -3,8 +3,7 @@ include("generic/Fraction-test.jl")
 include("flint/fmpq-test.jl")
 include("flint/fq-test.jl")
 include("flint/fq_nmod-test.jl")
-
-include("Padics-test.jl")
+include("flint/padic-test.jl")
 
 function test_fields_resultant()
    print("Fields.resultant...")
@@ -33,8 +32,7 @@ function test_fields()
    test_fmpq()
    test_fq()
    test_fq_nmod()
-   
-   test_padics()
+   test_padic()
    
    test_fields_resultant()
 end

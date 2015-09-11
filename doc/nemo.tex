@@ -7482,59 +7482,24 @@ f = frobenius(a, 3)
 g = pth_root(a)
 \end{lstlisting}
 
-\subsection{The p-adics}
+\subsection{Flint $p$-adics $\Q_p$: \code{padic}}
 
-We define a parametric type \code{Padic} to contain elements of the $p$-adic
-numbers in Nemo. As usual, the user need not know the details of the type, as
-we define a function \code{PadicField} for constructing it.
+The Flint type for $p$-adic numbers is \code{padic}. In Nemo elements of a
+$p$-adic field are of type \code{padic}. These belong to a \code{PadicFieldElem}
+type class, which in turn belongs to \code{FieldElem}. The parent objects for 
+the $p$-adic fields are of type \code{FlintPadicField} which belongs to the
+\code{Field} type class.
 
-We describe here the internals of the \code{Padic} type, but the reader may
-skip ahead to the section on constructors if so desired.
+As usual, the user need not deal directly with the types, as we define a function
+\code{FlintPadicField} for constructing parent objects for $p$-adic fields.
 
-The \code{Padic} type takes a single parameter \code{S}, which is a symbol.
-This symbol is the name of a variable which contains, amongst other things,
-the prime $p$ for the $p$-adic type.
+By default, the global variable \code{PadicField} is defined to be
+\code{FlintPadicField} so that \code{PadicField} also constructs parent objects
+for $p$-adic fields.
 
-The first part of the \code{Padic} type in Nemo mirrors the internals of the
-flint \code{padic_t} type. Here is its definition.
-
-\begin{lstlisting}
-type Padic{S} <: Field
-   u :: Int 
-   v :: Int
-   N :: Int
-   exact :: Bool
-end
-\end{lstlisting}
-
-The \code{u}, \code{v} and \code{N} fields correspond to the $p$-adic unit
-(actually of type \code{fmpz} in flint), the valuation and precision
-respectively. 
-
-There is one additional field, called \code{exact}. We use this to specify
-when a $p$-adic number is exact (i.e. when it exactly represents a rational
-number with denominator a power of $p$). We require this because of the way
-flint handles $p$-adic precision.
-
-The flint $p$-adic interface ignores the precision of inputs to its $p$-adic
-functions and only pays attention to the desired precision as set in the
-output(s). We modify this behaviour in Nemo by computing on-the-fly the best
-possible output precision given the input precisions. We then use this for the
-required output precision when calling flint.
-
-However, the flint $p$-adic type has no way to specify an infinite precision
-output, e.g. when the input precisions are in fact known exactly. The
-additional \code{exact} field in the Nemo type allows us to handle such cases
-specially.
-
-Flint does provide some functions which ignore the specified output precision,
-interpreting the result as exact. We use these in combination with the Nemo
-\code{exact} field to provide operations on infinite precision $p$-adics.
-
-There is also a flint \code{padic_ctx_t} type which is mirrored in a Julia
-\code{padic_ctx} type. As the details are not important we omit the definition
-here. It is this \code{padic_ctx} that is attached to the symbol \code{S} on
-which the Nemo \code{Padic} type is parameterised.
+The $p$-adics implement a capped relative precision model. This has consistent
+behaviour for multiplicative operations on $p$-adics, but not for additive
+operations, where cancellation can occur.
 
 \subsubsection{Constructors}
 
@@ -7542,24 +7507,14 @@ We provide the following simple function for creating the type of the $p$-adic
 numbers.
 
 \begin{lstlisting}
-PadicField(p::Int)
-PadicField(p::ZZ)
+PadicField(p::Int, prec::Int)
+PadicField(p::ZZ, prec::Int)
 \end{lstlisting}
 
 \desc{This function returns a type corresponding to the $p$-adic numbers for
 the given prime $p$. We test that $p$ is actually prime before constructing
-the type. If not, an exception is thrown.}
-
-No default precision is used for the $p$-adic type in Nemo. Elements can be
-constructed with any desired precision and the results of computations are
-computed to the best possible output precision given the precision of the
-inputs. 
-
-This includes the possibility of infinite precision in the case of exact
-rational values with a power of the prime $p$ as denominator. Nemo will throw
-an exception if an output value has infinite precision in theory but which
-cannot be represented exactly due to requiring infinite space (e.g. negative
-integers or fractions with something other than a power of $p$ as denominator).
+the type. If not, an exception is thrown. The second argument is a default
+(absolute) precision for elements in this field.}
 
 To construct values of $p$-adic type we use the \code{O} operator. It requires
 the $p$-adic type as a parameter for reasons of type soundness and so that
@@ -7567,55 +7522,65 @@ expressions such as $O(7^0)$ can be entered unambiguously (as \code{O(R, 7^0)},
 say).
 
 \begin{lstlisting}
-O{S}(::Type{Padic{S}}, m::Int)
-O{S}(::Type{Padic{S}}, m::ZZ)
-O{S}(::Type{Padic{S}}, m::QQ)
+O(R::FlintPadicField, m::Int)
+O(R::FlintPadicField m::fmpz)
+O(R::FlintPadicField, m::fmpq)
 \end{lstlisting}
 
 \desc{Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results
-if $m$ is not found to be a power of \code{p = prime(Padic{S})}.}
+if $m$ is not found to be a power of \code{p = prime(R)}.}
 
 The \code{O(p^n)} construction can be used to construct $p$-adic values of
 precision $n$ by adding it to integer values representing the $p$-adic value
 modulo $p^n$. See the examples below for details.
 
-\begin{lstlisting}
-Padic{S}()
-\end{lstlisting}
-
-\desc{Construct the $p$-adic value $0$ with precision $0$, i.e. $0 + O(p^0)$.}
+In the constructors below, we assume $S$ is a $p$-adic field parent object,
+constructed using the \code{PadicField} function, for example:
 
 \begin{lstlisting}
-Padic{S}(a::Int)
-Padic{S}(a::ZZ)
-Padic{S}(a::QQ)
+S = PadicField(17, 30)
 \end{lstlisting}
 
-\desc{Construct the exact (infinite precision) $p$-adic value representing the
-integer or rational $a$. An exception will result if $a < 0$ or if the 
-denominator of $a$ is not a power of $p$.}
+We also assume below that $p$ is the prime passed to the \code{PadicField}
+constructor, e.g. $p = 17$ in the above and that $k$ is the default precision,
+e.g. $k = 30$ in the above.
+
+\begin{lstlisting}
+S()
+\end{lstlisting}
+
+\desc{Construct the $p$-adic value $0$ with default precision, i.e. $0 + O(p^k)$.}
+
+\begin{lstlisting}
+S(a::Int)
+S(a::fmpz)
+S(a::fmpq)
+\end{lstlisting}
+
+\desc{Construct the $p$-adic value representing the integer or rational $a$ to
+precision $k$.}
 
 \textbf{Examples.}
 
 Here are some examples of constructing $p$-adics.
 
 \begin{lstlisting}
-R = PadicField(7)
-S = PadicField(ZZ(65537))
+R = PadicField(7, 30)
+S = PadicField(fmpz(65537), 30)
 
 a = R()
 b = R(1)
-c = R(ZZ(123))
-d = R(ZZ(1)/7^2)
+c = R(fmpz(123))
+d = R(fmpz(1)//7^2)
 
 f = 1 + 2*7 + 4*7^2 + O(R, 7^3)
-g = 13 + 357*ZZ(65537) + O(S, ZZ(65537)^12)
-h = ZZ(1)/7^2 + ZZ(2)/7 + 3 + 4*7 + O(R, 7^2)
+g = 13 + 357*fmpz(65537) + O(S, fmpz(65537)^12)
+h = fmpz(1)//7^2 + fmpz(2)//7 + 3 + 4*7 + O(R, 7^2)
 \end{lstlisting}
 
 Beware that the expression \code{1 + 2*p + 3*p^2 + O(R, p^n)} is actually computed as
 a normal Julia expression. Therefore if \code{Int} values are used instead of
-\code{ZZ}'s, overflow may result in evaluating the value.
+\code{fmpz}'s, overflow may result in evaluating the value.
 
 Also note that one cannot use \code{7^-2} in a $p$-adic expression, since the 
 exponentiation operator must always return an integer, for reasons of type soundness.
@@ -7623,67 +7588,59 @@ exponentiation operator must always return an integer, for reasons of type sound
 \subsubsection{Basic manipulation}
 
 \begin{lstlisting}
-prime{S}(::Type{Padic{S}})
+prime(R::PadicField)
 \end{lstlisting}
 
 \desc{Return the prime $p$ on which the $p$-adic type is based. The returned
-value is of type \code{ZZ}.}
+value is of type \code{fmpz}.}
 
 \begin{lstlisting}
-precision{S}(a::Padic{S})
+precision(a::padic)
 \end{lstlisting}
 
 \desc{Return the precision of the given $p$-adic value, e.g. the precision of
-$1 + 7 + 2*7^2 + O(7^3)$ is $3$. The precision is meaningless for an
-exact value.}
+$1 + 7 + 2*7^2 + O(7^3)$ is $3$.}
 
 \begin{lstlisting}
-valuation{S}(a::Padic{S})
+valuation(a::padic)
 \end{lstlisting}
 
 \desc{Return the $p$-adic valuation of the given $p$-adic value.}
 
 \begin{lstlisting}
-isexact{S}(a::Padic{S})
+zero(R::PadicField)
 \end{lstlisting}
 
-\desc{Return \code{true} if the given $p$-adic value is exact, i.e. infinite
-precision, otherwise return \code{false}.}
+\desc{Return the additive identity, i.e. $0$ in the field of $p$-adic
+numbers to the default precision.}
 
 \begin{lstlisting}
-zero{S}(::Type{Padic{S}})
+one(R::PadicField)
 \end{lstlisting}
 
-\desc{Return the additive identity, i.e. exact $0$ in the field of $p$-adic
-numbers.}
+\desc{Return the multiplicative identity, i.e. $1$ in the field of
+$p$-adic numbers to the default precision.}
 
 \begin{lstlisting}
-one{S}(::Type{Padic{S}})
+iszero(a::padic)
 \end{lstlisting}
 
-\desc{Return the multiplicative identity, i.e. exact $1$ in the field of
-$p$-adic numbers.}
+\desc{Return \code{true} if the given $p$-adic value is equal to the additive identity,
+i.e. $0$, otherwise return \code{false}.}
 
 \begin{lstlisting}
-iszero{S}(a::Padic{S})
+isone(a::padic)
 \end{lstlisting}
 
-\desc{Return \code{true} if the given $p$-adic value is the additive identity,
-i.e. exact $0$, otherwise return \code{false}.}
-
-\begin{lstlisting}
-isone{S}(a::Padic{S})
-\end{lstlisting}
-
-\desc{Return \code{true} if the given $p$-adic value is the multiplicative
-identity, i.e. exact $1$, otherwise return \code{false}.}
+\desc{Return \code{true} if the given $p$-adic value is equal to the multiplicative
+identity, i.e. $1$, otherwise return \code{false}.}
 
 \textbf{Examples.}
 
 Here are some examples of basic manipulations of $p$-adics.
 
 \begin{lstlisting}
-R = PadicField(7)
+R = PadicField(7, 30)
 
 a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 b = 7^2 + 3*7^3 + O(R, 7^5)
@@ -7693,28 +7650,25 @@ d = one(R)
 f = zero(R)
 g = isone(d)
 h = iszero(f)
-k = isexact(c)
-n = precision(a)
-p = prime(R)
-v = valuation(b)
+k = precision(a)
+m = prime(R)
+n = valuation(b)
 \end{lstlisting}
 
 \subsubsection{Unary operators}
 
 \begin{lstlisting}
--{S}(x::Padic{S})
+-(x::padic)
 \end{lstlisting}
 
-\desc{Return $-x$. Note that if $x$ is for example a positive integer
-represented exactly, then $-x$ may not be representable exactly as a $p$-adic.
-In this case an exception is raised.}
+\desc{Return $-x$.}
 
 \textbf{Examples.}
 
 Here are some examples of unary operators.
 
 \begin{lstlisting}
-R = PadicField(7)
+R = PadicField(7, 30)
 
 a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 b = R(0)
@@ -7726,22 +7680,21 @@ d = -b
 \subsubsection{Binary operators}
 
 \begin{lstlisting}
-+{S}(x::Padic{S}, y::Padic{S})
++(x::padic, y::padic)
 \end{lstlisting}
 
 \desc{Return $x + y$. The output precision will be the least of the input
 precisions.}
 
 \begin{lstlisting}
--{S}(x::Padic{S}, y::Padic{S})
+-(x::padic, y::padic)
 \end{lstlisting}
 
 \desc{Return $x - y$. The output precision will be the least of the input
-precisions. Note that if $x$ and $y$ are exact and $x - y$ cannot be
-represented exactly, an exception will be raised.}
+precisions.}
 
 \begin{lstlisting}
-*{S}(x::Padic{S}, y::Padic{S})
+*(x::padic, y::padic)
 \end{lstlisting}
 
 \desc{Return $xy$. The output precision will be the least of valuation$(x) +$
@@ -7752,7 +7705,7 @@ precision$(y)$ and precision$(x) +$ valuation$(y)$.}
 Here are some examples of binary operators for $p$-adics.
 
 \begin{lstlisting}
-R = PadicField(7)
+R = PadicField(7, 30)
 
 a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 b = 7^2 + 3*7^3 + O(R, 7^5)
@@ -7769,65 +7722,63 @@ k = a*d
 \subsubsection{Ad hoc binary operators}
 
 \begin{lstlisting}
-+{S}(x::Padic{S}, y::Int)
-+{S}(x::Padic{S}, y::ZZ)
-+{S}(x::Padic{S}, y::QQ)
++(x::padic, y::Int)
++(x::padic, y::fmpz)
++(x::padic, y::fmpq)
 \end{lstlisting}
 
-\desc{Return $x + y$ where $y$ is interpreted as an exact $p$-adic value. If
-the result is unrepresentable, an exception results.}
+\desc{Return $x + y$ where $y$ is interpreted as a $p$-adic value to the default
+precision.}
 
 \begin{lstlisting}
-+{S}(x::Int, y::Padic{S})
-+{S}(x::ZZ, y::Padic{S})
-+{S}(x::QQ, y::Padic{S})
++(x::Int, y::padic)
++(x::fmpz, y::padic)
++(x::fmpq, y::padic)
 \end{lstlisting}
 
-\desc{Return $x + y$ where $x$ is interpreted as an exact $p$-adic value. If
-the result is unrepresentable, an exception results.}
+\desc{Return $x + y$ where $x$ is interpreted as a $p$-adic value to the default
+precision.}
 
 \begin{lstlisting}
--{S}(x::Padic{S}, y::Int)
--{S}(x::Padic{S}, y::ZZ)
--{S}(x::Padic{S}, y::QQ)
+-(x::padic, y::Int)
+-(x::padic, y::fmpz)
+-(x::padic, y::fmpq)
 \end{lstlisting}
 
-\desc{Return $x - y$ where $y$ is interpreted as an exact $p$-adic value. If
-the result is unrepresentable, an exception results.}
+\desc{Return $x - y$ where $y$ is interpreted as a $p$-adic value to the default
+precision.}
 
 \begin{lstlisting}
--{S}(x::Int, y::Padic{S})
--{S}(x::ZZ, y::Padic{S})
--{S}(x::QQ, y::Padic{S})
+-(x::Int, y::padic)
+-(x::fmpz, y::padic)
+-(x::fmpq, y::padic)
 \end{lstlisting}
 
-\desc{Return $x - y$ where $x$ is interpreted as an exact $p$-adic value. If
-the result is unrepresentable, an exception results.}
+\desc{Return $x - y$ where $x$ is interpreted as a $p$-adic value to the default
+precision.}
 
 \begin{lstlisting}
-*{S}(x::Padic{S}, y::Int)
-*{S}(x::Padic{S}, y::ZZ)
-*{S}(x::Padic{S}, y::QQ)
+*(x::padic, y::Int)
+*(x::padic, y::fmpz)
+*(x::padic, y::fmpq)
 \end{lstlisting}
 
-\desc{Return $xy$. If $y$ is negative or the result is not representable, an
-exception results.}
+\desc{Return $xy$.}
 
 \begin{lstlisting}
-*{S}(x::Int, y::Padic{S})
-*{S}(x::ZZ, y::Padic{S})
-*{S}(x::QQ, y::Padic{S})
+*(x::Int, y::padic)
+*(x::fmpz, y::padic)
+*(x::fmpq, y::padic)
 \end{lstlisting}
 
-\desc{Return $xy$. If $x$ is negative or the result is not representable, an 
-exception results.}
+\desc{Return $xy$.}
 
 \textbf{Examples.}
 
 Here are some examples of ad hoc binary operators.
 
 \begin{lstlisting}
-R = PadicField(7)
+R = PadicField(7, 30)
 
 a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 b = 7^2 + 3*7^3 + O(R, 7^5)
@@ -7836,43 +7787,41 @@ d = R(2)
 
 f = a + 2
 g = 3 - b
-h = a*ZZ(5)
-j = ZZ(3)*c
+h = a*fmpz(5)
+j = fmpz(3)*c
 k = 2*d
 l = 2 + d
-m = d - ZZ(2)
-n = a + ZZ(1)/7^2
-p = (ZZ(12)/11)*b
-q = c*(ZZ(1)/7)
+m = d - fmpz(2)
+n = a + fmpz(1)//7^2
+p = (fmpz(12)//11)*b
+q = c*(fmpz(1)//7)
 \end{lstlisting}
 
 \subsubsection{Comparison}
 
 \begin{lstlisting}
-=={S}(a::Padic{S}, b::Padic{S})
+==(a::padic, b::padic)
 \end{lstlisting}
 
 \desc{Compare the given $p$-adic values at the least of the two precisions and
 return \code{true} if they are equal to that precision, otherwise return
-\code{false}. With this definition \code{0 == 0 + O(7^3)} returns
-\code{true}. If one wishes to compare with exact $0$, one should use
-\code{iszero}.}
+\code{false}.}
 
 Julia automatically supplies a corresponding \code{!=} operator.
 
 \begin{lstlisting}
-isequal{S}(a::Padic{S}, b::Padic{S})
+isequal(a::padic, b::padic)
 \end{lstlisting}
 
-\desc{Return \code{true} if \code{a == b} and if they are either both exact or
-if the precisions are the same, otherwise return \code{false}.}
+\desc{Return \code{true} if \code{a == b} and their precisions are the same,
+otherwise return \code{false}.}
 
 \textbf{Examples.}
 
 Here are some examples of comparison.
 
 \begin{lstlisting}
-R = PadicField(7)
+R = PadicField(7, 30)
 
 a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
 b = 3*7^3 + O(R, 7^5)
@@ -7883,30 +7832,29 @@ a == 1 + 2*7 + O(R, 7^2)
 b == c
 c == R(0)
 d == R(2)
+isequal(b, c) == false
 \end{lstlisting}
 
 \subsubsection{Ad hoc comparison}
 
-The following ad hoc comparison operators are provided for convenience. They
-allow comparison with exact values (up to the precision of the $p$-adic value
-supplied).
+The following ad hoc comparison operators are provided for convenience. 
 
 \begin{lstlisting}
-=={S}(a::Padic{S}, b::Int)
-=={S}(a::Padic{S}, b::ZZ)
-=={S}(a::Padic{S}, b::QQ)
+==(a::padic, b::Int)
+==(a::padic, b::fmpz)
+==(a::padic, b::fmpq)
 \end{lstlisting}
 
-\desc{Return \code{true} if the exact value $b$ is equal to the $p$-adic 
+\desc{Return \code{true} if the value $b$ is equal to the $p$-adic 
 value $a$ up to the precision of $a$, otherwise return \code{false}.}
 
 \begin{lstlisting}
-=={S}(a::Int, b::Padic{S})
-=={S}(a::ZZ, b::Padic{S})
-=={S}(a::QQ, b::Padic{S})
+==(a::Int, b::padic)
+==(a::fmpz, b::padic)
+==(a::fmpq, b::padic)
 \end{lstlisting}
 
-\desc{Return \code{true} if the exact value $a$ is equal to the $p$-adic 
+\desc{Return \code{true} if the value $a$ is equal to the $p$-adic 
 value $b$ up to the precision of $b$, otherwise return \code{false}.}
 
 \textbf{Examples.}
@@ -7914,37 +7862,35 @@ value $b$ up to the precision of $b$, otherwise return \code{false}.}
 Here are some examples of ad hoc comparison.
 
 \begin{lstlisting}
-R = PadicField(7)
+R = PadicField(7, 30)
 
 a = 1 + O(R, 7^3)
 b = O(R, 7^5)
 c = R(2)
 
 a == 1
-b == ZZ(0)
+b == fmpz(0)
 c == 2
-ZZ(2) == c
-a == ZZ(344)/1
+fmpz(2) == c
+a == fmpz(344)//1
 \end{lstlisting}
 
 \subsubsection{Powering}
 
 \begin{lstlisting}
-^{S}(a::Padic{S}, n::Int)
+^(a::padic, n::Int)
 \end{lstlisting}
 
 \desc{Return $a^n$. The output precision will be the same as if $a$ had been
 multiplied by itself $n$ times, i.e. precision$(a) + (n - 1)\times$
-valuation$(a)$. If the input is exact and $n \geq 0$ the output will be
-exact. If $n < 0$ and $a$ is exact, it may be that the output is not
-representable. In such cases an exception is raised.}
+valuation$(a)$.}
 
 \textbf{Examples.}
 
 Here are some examples of powering.
 
 \begin{lstlisting}
-R = PadicField(7)
+R = PadicField(7, 30)
 
 a = 1 + 7 + 2*7^2 + O(R, 7^3)
 b = O(R, 7^5)
@@ -7955,86 +7901,21 @@ f = b^3
 g = c^7
 \end{lstlisting}
 
-\subsubsection{Exact division}
-
-\begin{lstlisting}
-divexact{S}(a::Padic{S}, b::Padic{S})
-/{S}(a::Padic{S}, b::Padic{S})
-\end{lstlisting}
-
-\desc{Return $a/b$. The output precision will be the minimum of 
-precision$(a) -$ valuation$(b)$ and precision$(b) - 2\times$valuation$(b) +$
-valuation$(a)$. If the result is not representable, an exception is
-thrown. If \code{b == 0} a \code{DivideError()} is thrown.}
-
-\begin{lstlisting}
-divexact{S}(a::Padic{S}, b::Int)
-divexact{S}(a::Padic{S}, b::ZZ)
-divexact{S}(a::Padic{S}, b::QQ)
-/{S}(a::Padic{S}, b::Int)
-/{S}(a::Padic{S}, b::ZZ)
-/{S}(a::Padic{S}, b::QQ)
-\end{lstlisting}
-
-\desc{Return $a/b$. The output precision will be precision$(a) -$ 
-valuation$(b)$. If the result is not representable, an exception is
-thrown. If \code{b == 0} a \code{DivideError()} is thrown.}
-
-\begin{lstlisting}
-divexact{S}(a::Int, b::Padic{S})
-divexact{S}(a::ZZ, b::Padic{S})
-divexact{S}(a::QQ, b::Padic{S})
-/{S}(a::Int, b::Padic{S})
-/{S}(a::ZZ, b::Padic{S})
-/{S}(a::QQ, b::Padic{S})
-\end{lstlisting}
-
-\desc{Return $a/b$. The output precision will be 
-precision$(b) - 2\times$valuation$(b) +$ valuation$(a)$. If the result is not
-representable, an exception is thrown. If \code{b == 0} a \code{DivideError()}
-is thrown.}
-
-\textbf{Examples.}
-
-Here are some examples of exact division.
-
-\begin{lstlisting}
-R = PadicField(7)
-
-a = 1 + 7 + 2*7^2 + O(R, 7^3)
-b = 2 + 3*7 + O(R, 7^5)
-c = 7^2 + 2*7^3 + O(R, 7^4)
-d = 7 + 2*7^2 + O(R, 7^5)
-
-f = divexact(a, b)
-g = divexact(c, d)
-h = divexact(d, R(7^3))
-j = divexact(R(34), R(17))
-
-k = a/2
-l = b/ZZ(7)
-m = c/(ZZ(12)/7^2)
-n = 2/d
-p = R(3)/3
-q = (ZZ(5)/7)/R(5)
-\end{lstlisting}
-
 \subsubsection{Inversion}
 
 \begin{lstlisting}
-inv{S}(a::Padic{S})
+inv(a::padic)
 \end{lstlisting}
 
 \desc{Return the multiplicative inverse of $a$, i.e. $1/a$. If \code{a == 0}
-a \code{DivideError()} is thrown. If the result is not representable, an
-exception is thrown.}
+a \code{DivideError()} is thrown.}
 
 \textbf{Examples.}
 
 Here are some examples of inversion.
 
 \begin{lstlisting}
-R = PadicField(7)
+R = PadicField(7, 30)
 
 a = 1 + 7 + 2*7^2 + O(R, 7^3)
 b = 2 + 3*7 + O(R, 7^5)
@@ -8048,23 +7929,121 @@ k = inv(d)
 l = inv(R(1))
 \end{lstlisting}
 
+\subsubsection{Exact division}
+
+\begin{lstlisting}
+divexact(a::padic, b::padic)
+//(a::padic, b::padic)
+\end{lstlisting}
+
+\desc{Return $a/b$. The output precision will be the minimum of 
+precision$(a) -$ valuation$(b)$ and precision$(b) - 2\times$valuation$(b) +$
+valuation$(a)$. If \code{b == 0} a \code{DivideError()} is thrown.}
+
+\textbf{Examples.}
+
+Here are some examples of exact division.
+
+\begin{lstlisting}
+R = PadicField(7, 30)
+
+a = 1 + 7 + 2*7^2 + O(R, 7^3)
+b = 2 + 3*7 + O(R, 7^5)
+c = 7^2 + 2*7^3 + O(R, 7^4)
+d = 7 + 2*7^2 + O(R, 7^5)
+
+f = divexact(a, b)
+g = divexact(c, d)
+h = divexact(d, R(7^3))
+j = divexact(R(34), R(17))
+\end{lstlisting}
+
+
+\subsubsection{Ad hoc exact division}
+
+\begin{lstlisting}
+divexact(a::padic, b::Int)
+divexact(a::padic, b::fmpz)
+divexact(a::padic, b::fmpq)
+//(a::padic, b::Int)
+//(a::padic, b::fmpz)
+//(a::padic, b::fmpq)
+\end{lstlisting}
+
+\desc{Return $a/b$. The output precision will be precision$(a) -$ 
+valuation$(b)$. If \code{b == 0} a \code{DivideError()} is thrown.}
+
+\begin{lstlisting}
+divexact(a::Int, b::padic)
+divexact(a::fmpz, b::padic)
+divexact(a::fmpq, b::padic)
+//(a::Int, b::padic)
+//(a::fmpz, b::padic)
+//(a::fmpq, b::padic)
+\end{lstlisting}
+
+\desc{Return $a/b$. The output precision will be 
+precision$(b) - 2\times$valuation$(b) +$ valuation$(a)$. If \code{b == 0}
+a \code{DivideError()} is thrown.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc exact division.
+
+\begin{lstlisting}
+R = PadicField(7, 30)
+
+a = 1 + 7 + 2*7^2 + O(R, 7^3)
+b = 2 + 3*7 + O(R, 7^5)
+c = 7^2 + 2*7^3 + O(R, 7^4)
+d = 7 + 2*7^2 + O(R, 7^5)
+
+f = a//2
+g = b//fmpz(7)
+h = c//(fmpz(12)//7^2)
+k = 2//d
+l = R(3)//3
+m = (fmpz(5)//7)//R(5)
+\end{lstlisting}
+
+\subsubsection{GCD}
+
+\begin{lstlisting}
+gcd(a::padic, b::padic)
+\end{lstlisting}
+
+\desc{Returns $1$ unless both $a$ and $b$ are $0$, in which case it returns $0$.}
+
+\textbf{Examples.}
+
+Here are some examples of GCD.
+
+\begin{lstlisting}
+R = PadicField(7, 30)
+
+a = 1 + 7 + 2*7^2 + O(R, 7^3)
+b = 2 + 3*7 + O(R, 7^5)
+
+d = gcd(a, b)
+f = gcd(R(0), R(0))
+\end{lstlisting}
+
 \subsubsection{Square root}
 
 \begin{lstlisting}
-sqrt{S}(a::Padic{S})
+sqrt(a::padic)
 \end{lstlisting}
 
 \desc{Return the $p$-adic square root of $a$. We define this only when the
 valuation of $a$ is even. The precision of the output will be precision$(a) -$
-valuation$(a)/2$. If the square root does not exist or is unrepresentable, an
-exception is thrown.}
+valuation$(a)/2$. If the square root does not exist, an exception is thrown.}
 
 \textbf{Examples.}
 
 Here are some examples of taking a $p$-adic square root.
 
 \begin{lstlisting}
-R = PadicField(7)
+R = PadicField(7, 30)
 
 a = 1 + 7 + 2*7^2 + O(R, 7^3)
 b = 2 + 3*7 + O(R, 7^5)
@@ -8079,39 +8058,39 @@ g = sqrt(R(121))
 \subsubsection{Special functions}
 
 \begin{lstlisting}
-exp{S}(a::Padic{S})
+exp(a::padic)
 \end{lstlisting}
 
 \desc{Return the $p$-adic exponential of $a$. We define this only when the
 valuation of $a$ is positive (unless \code{a == 0}). The precision of the
-output will be the same as the precision of the input. If the result is not
-representable an exception is thrown.}
+output will be the same as the precision of the input. If the input is not
+valid an exception is thrown.}
 
 \begin{lstlisting}
-log{S}(a::Padic{S})
+log(a::padic)
 \end{lstlisting}
 
 \desc{Return the $p$-adic logarithm of $a$. We define this only when the
 valuation of $a$ is zero (but not for \code{a == 0}). The precision of the
-output will be the same as the precision of the input. If the result is not
-representable an exception is thrown.}
+output will be the same as the precision of the input. If the input is not
+valid an exception is thrown.}
 
 \begin{lstlisting}
-teichmuller{S}(a::Padic{S})
+teichmuller(a::padic)
 \end{lstlisting}
 
 \desc{Return the Teichmuller lift of the $p$-adic value $a$. We require the
 valuation of $a$ to be nonnegative. The precision of the output will be the
 same as the precision of the input. For convenience, if $a$ is congruent to
-zero modulo $p$ we return zero. If the result is not representable an
-exception is thrown.}
+zero modulo $p$ we return zero. If the input is not valid an exception is
+thrown.}
 
 \textbf{Examples.}
 
 Here are some examples of special functions.
 
 \begin{lstlisting}
-R = PadicField(7)
+R = PadicField(7, 30)
 
 a = 1 + 7 + 2*7^2 + O(R, 7^3)
 b = 2 + 5*7 + 3*7^2 + O(R, 7^3)
