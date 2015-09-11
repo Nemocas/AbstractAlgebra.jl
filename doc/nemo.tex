@@ -6136,6 +6136,98 @@ Here is an example of ad hoc exact division.
    b = divexact(a, t^2 + 1)
 \end{lstlisting}
 
+\subsection{Flint power series over $\F_{p^k}$ (small $p$): \code{fq_nmod_series}}
+
+Flint doesn't have a module for power series over $\F_{p^k}$ for small $p$, but the
+\code{fq_nmod_poly} module contains code for power series operations. In Nemo, for the
+purposes of simplicity, we deal with Flint as though it has a module called
+\code{fq_nmod_series}.
+
+The power series type in Nemo for polynomials treated as power series is
+\code{fq_nmod_series}. 
+
+Power series of this type are created using the \code{PowerSeriesRing} constructor when
+it is passed an \code{FqNmodFiniteField} parent object as argument. The function also
+takes a maximum (relative) precision and a variable name as a string.
+
+\begin{lstlisting}
+R, t = FiniteField(23, 5, "t")
+S, x = PowerSeriesRing(R, 30, "x")
+\end{lstlisting}
+
+Power series in this ring have parent of type \code{FqNmodSeriesRing}.
+
+We describe only the functions which are different to those described for generic
+power series.
+
+\subsubsection{Constructors}
+
+In the constructor below we assume $S$ is an \code{FqNmodSeriesRing} parent object, as
+constructed above for example. We assume the maximum precision of the power series
+for this object to be $k$.
+
+\begin{lstlisting}
+S(a::fmpz)
+\end{lstlisting}
+
+\desc{Construct the power series $a + O(x^k)$.}
+
+\textbf{Examples.}
+
+Here is an example of a constructor.
+
+\begin{lstlisting}
+   R, t = FiniteField(23, 5, "t")
+   S, x = PowerSeriesRing(R, 30, "x")
+
+   a = S(fmpz(12))
+\end{lstlisting}
+
+\subsubsection{Ad hoc binary operators}
+
+\begin{lstlisting}
+*(x::fq_nmod_series, y::fq_nmod)
+*(x::fq_nmod, y::fq_nmod_series)
+\end{lstlisting}
+
+\desc{Return $xy$.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc binary operators.
+
+\begin{lstlisting}
+   R, t = FiniteField(23, 5, "t")
+   S, x = PowerSeriesRing(R, 30, "x")
+
+   a = 1 + x + 3x^2 + O(x^5)
+   
+   b = a*(t^2 + 1)
+
+   c = 2t*a
+\end{lstlisting}
+
+\subsubsection{Ad hoc exact division}
+
+\begin{lstlisting}
+divexact(x::fq_nmod_series, y::fq_nmod)
+\end{lstlisting}
+
+\desc{Return $x/y$. If $y = 0$ this raises a \code{DivideError()}.}
+
+\textbf{Examples.}
+
+Here is an example of ad hoc exact division.
+
+\begin{lstlisting}
+   R, t = FiniteField(23, 5, "t")
+   S, x = PowerSeriesRing(R, 30, "x")
+
+   a = 1 + x + 3x^2 + O(x^5)
+   
+   b = divexact(a, t^2 + 1)
+\end{lstlisting}
+
 \section{Flint fields}
 
 Flint provides implementations of various explicit fields. We describe their
