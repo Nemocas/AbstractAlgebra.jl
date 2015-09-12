@@ -6910,7 +6910,7 @@ Here is an example of inversion.
 \subsubsection{Linear solving}
 
 \begin{lstlisting}
-inv(a::nmod_mat, b::nmod_mat)
+solve(a::nmod_mat, b::nmod_mat)
 \end{lstlisting}
 
 \desc{Return the column vector $x$ such that $ax = b$ where $x$ and $b$ are column
@@ -6998,29 +6998,6 @@ Array(a::nmod_mat)
 
 \textbf{Examples.}
 
-Here is an example conversion.
-
-\begin{lstlisting}
-   R = ResidueRing(ZZ, 7)
-   S = MatrixSpace(R, 3, 3)
-   T = MatrixSpace(R, 3, 1)
-
-   a = S([4 5 6; 7 3 2; 1 4 5])
-  
-   A = Array(a)
-\end{lstlisting}
-
-\subsubsection{Conversions}
-
-\begin{lstlisting}
-Array(a::nmod_mat)
-\end{lstlisting}
-
-\desc{Return a two dimensional Julia array with entries that are of type
-\code|Residue{fmpz}| containing the entries of the matrix $a$.} 
-
-\textbf{Examples.}
-
 Here is an example of conversion.
 
 \begin{lstlisting}
@@ -7054,6 +7031,458 @@ Here is an example of lifting.
    a = S([4 5 6; 7 3 2; 1 4 5])
   
    b = lift(a)
+\end{lstlisting}
+
+\subsection{Flint matrices over $\Z$: \code{fmpz_mat}}
+
+The Flint type for matrices over $\Z$ is \code{fmpz_mat}. Matrices
+of this type are created using the \code{MatrixSpace} constructor in Nemo. 
+
+\begin{lstlisting}
+S = MatrixSpace(ZZ, 3, 3)
+\end{lstlisting}
+
+Matrices in this matrix space have parent of type \code{FmpzMatSpace}.
+
+We describe functions for \code{fmpz_mat} only where they differ from the functions
+available for generic matrices.
+
+\subsubsection{Row echelon form}
+
+\begin{lstlisting}
+rref(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Return a tuple $(R, d)$ where $R/d$ is the row echelon form of $a$ over $\Q$.
+Here $R$ is a matrix over $\Z$ and $d$ is an \code{fmpz} denominator.}
+
+\textbf{Examples.}
+
+Here is an example of row echelon form.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+
+   A = S([fmpz(2) 3 5; 1 4 7; 4 1 1])
+   
+   rref(A)
+\end{lstlisting}
+
+\subsubsection{Determinant}
+
+\begin{lstlisting}
+determinant(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Return the determinant of $a$.}
+
+\textbf{Examples.}
+
+Here is an example of determinant.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+
+   a = S([4 5 6; 7 3 2; 1 4 5])
+
+   b = determinant(a)
+\end{lstlisting}
+
+\subsubsection{Rank}
+
+\begin{lstlisting}
+rank(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Return the rank of $a$.}
+
+\textbf{Examples.}
+
+Here is an example of computing the rank.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+
+   a = S([4 5 6; 7 3 2; 1 4 5])
+
+   b = rank(a)
+\end{lstlisting}
+
+\subsubsection{Inversion}
+
+\begin{lstlisting}
+inv(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Return the matrix inverse of $a$. Note the matrix must be must be square and
+invertible, otherwise an exception is thrown.}
+
+\textbf{Examples.}
+
+Here is an example of inversion.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+
+   A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])
+  
+   B = inv(A)
+\end{lstlisting}
+
+\subsubsection{Linear solving}
+
+\begin{lstlisting}
+solve(a::fmpz_mat, b::fmpz_mat)
+\end{lstlisting}
+
+\desc{Return a tuple $(x, d)$ consisting of the column vector $x$ such that $ax/d = b$
+where $x$ and $b$ are column vectors with the same number of rows as the $a$ and $d$ is
+a denominator. Note that $a$ must be a square matrix. If these conditions are not met,
+an exception is raised.}
+
+\begin{lstlisting}
+solve_dixon(a::fmpz_mat, b::fmpz_mat)
+\end{lstlisting}
+
+\desc{Return a tuple $(x, m)$ consisting of the column vector $x$ such that
+$ax = b \pmod{m}$ where $x$ and $b$ are column vectors with the same number of rows as
+the $a$. Note that $a$ must be a square matrix. If these conditions are not met, an
+exception is raised.}
+
+\textbf{Examples.}
+
+Here is an example of linear solving.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+   T = MatrixSpace(ZZ, 3, 1)
+
+   A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])   
+   B = T([fmpz(4), 5, 7])
+
+   X, d = solve(A, B)
+   X, m = solve_dixon(A, B)
+\end{lstlisting}
+
+\subsubsection{Matrix concatenation}
+
+\begin{lstlisting}
+hcat(a::fmpz_mat, b::fmpz_mat)
+\end{lstlisting}
+
+\desc{Return the matrix that is the horizontal concatenation of $a$ and $b$.
+Both $a$ and $b$ must have the same number of rows, else an exception is raised.}
+
+\begin{lstlisting}
+vcat(a::fmpz_mat, b::fmpz_mat)
+\end{lstlisting}
+
+\desc{Return the matrix that is the vertical concatenation of $a$ and $b$.
+Both $a$ and $b$ must have the same number of columns, else an exception is raised.}
+
+\textbf{Examples.}
+
+Here are some examples of concatenation.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+   T = MatrixSpace(ZZ, 3, 6)
+   U = MatrixSpace(ZZ, 6, 3)
+
+   A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
+   B = S([fmpz(1) 4 7; 9 6 7; 4 3 3])
+
+   C = hcat(A, B)
+   D = vcat(A, B)
+\end{lstlisting}
+
+\subsubsection{Transpose}
+
+\begin{lstlisting}
+transpose(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Return the transpose of the matrix $a$.}
+
+\textbf{Examples.}
+
+Here is an example of transposing a matrix.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+
+   A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
+ 
+   B = transpose(A)
+\end{lstlisting}
+
+\subsubsection{scaling}
+
+\begin{lstlisting}
+<<(a::fmpz_mat, n::Int)
+\end{lstlisting}
+
+\desc{Return the matrix whose entries are those of $a$ multiplied by $2^n$.}
+
+\begin{lstlisting}
+>>(a::fmpz_mat, n::Int)
+\end{lstlisting}
+
+\desc{Return the matrix whose entries are those of $a$ divided by $2^n$, where
+any remainders are discarded. Rounding is towards zero.}
+
+\textbf{Examples.}
+
+Here are some examples of scaling.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+
+   A = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
+ 
+   B = A<<5
+   C = B>>2
+\end{lstlisting}
+
+\subsubsection{Exact division}
+
+\begin{lstlisting}
+divexact(a::fmpz_mat, b::fmpz_mat)
+\end{lstlisting}
+
+\desc{Return $a$ times the inverse of $b$. The matrix $b$ must be square and
+invertible, otherwise an exception is raised.}
+
+\textbf{Examples.}
+
+Here is an example of exact division.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+
+   A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])
+   B = S([2 3 4; 7 9 1; 5 4 5])
+ 
+   divexact(B, A)
+\end{lstlisting}
+
+\subsubsection{Modular reduction}
+
+\begin{lstlisting}
+reduce_mod(a::fmpz_mat, m::Int)
+reduce_mod(a::fmpz_mat, m::fmpz)
+\end{lstlisting}
+
+\desc{Return the matrix whose entries are those of $a$ reduced modulo $m$.}
+
+\textbf{Examples.}
+
+Here is an example of modular reduction.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+
+   A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])
+   
+   reduce_mod(A, 5)
+   reduce_mod(A, 2)
+\end{lstlisting}
+
+\subsubsection{Hadamard matrix}
+
+\begin{lstlisting}
+hadamard(S::FmpzMatSpace)
+\end{lstlisting}
+
+\desc{Return the Hadamard matrix for the given matrix space. The number of rows must
+equal the number of columns. It is not always possible to create a Hadamard matrix.
+If the algorithm fails, an exception is raised.}
+
+\begin{lstlisting}
+is_hadamard(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Return true if the matrix $a$ is a Hadamard matrix. The matrix must be square
+or an exception is raised.}
+
+\textbf{Examples.}
+
+Here is an example of computing the Hadamard matrix.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+
+   A = hadamard(S)
+   is_hadamard(A) == true
+\end{lstlisting}
+
+\subsubsection{Nullspace}
+
+\begin{lstlisting}
+nullspace(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Return a tuple $(N, n)$ consisting of the nullity $n$ and a matrix $N$ with
+$c$ rows and $c$ columns, where $c$ is the number of columns of $a$, such that 
+the first $n$ columns of $N$ are a basis for the nullspace of $a$.}
+
+\textbf{Examples.}
+
+Here is an example of computing the nullspace.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+
+   A = S([fmpz(2) 3 5; 1 4 7; 4 1 1])
+   
+   N, r = nullspace(A)
+\end{lstlisting}
+
+\subsubsection{Hermite normal form}
+
+\begin{lstlisting}
+hnf(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Compute the Hermite normal form of $a$.}
+
+\begin{lstlisting}
+hnf_with_transform(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Compute a tuple $(H, T)$ where $H$ is the Hermite normal form of $a$
+and $T$ is a transformation matrix so that $H = TA$.}
+
+\begin{lstlisting}
+hnf_modular(a::fmpz_mat, m::fmpz)
+\end{lstlisting}
+
+\desc{Compute the Hermite normal form of $a$ given that $m$ is a multiple of
+the determinant of the nonzero rows of $a$.}
+
+\begin{lstlisting}
+is_hnf(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Return \code{true} if the matrix $a$ is in Hermite normal form, otherwise
+return false.}
+
+\textbf{Examples.}
+
+Here are some examples of computing the Hermite normal form.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+
+   A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
+   
+   B = hnf(A)
+   H, T = hnf_with_transform(A)
+   M = hnf_modular(A, fmpz(27))
+   is_hnf(M) == true
+\end{lstlisting}
+
+\subsubsection{LLL reduction}
+
+\begin{lstlisting}
+lll(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Compute the LLL reduction of $a$.}
+
+\begin{lstlisting}
+lll_with_transform(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Compute a tuple $(L, T)$ where $L$ is the LLL reduction of $a$
+and $T$ is a transformation matrix so that $L = TA$.}
+
+\begin{lstlisting}
+lll_gram(g::fmpz_mat)
+\end{lstlisting}
+
+\desc{Given the Gram matrix $g$ of a matrix $a$, compute the Gram matrix of
+the LLL reduction of $a$.}
+
+\begin{lstlisting}
+lll_gram_with_transform(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Given the Gram matrix $g$ of a matrix $a$, compute a tuple $(L, T)$ where
+$G$ is the gram matrix $L$ of the LLL reduction of $a$ and $T$ is a transformation
+matrix so that $L = TA$.}
+
+\begin{lstlisting}
+lll_with_removal(a::fmpz_mat, b::fmpz)
+\end{lstlisting}
+
+\desc{Compute the LLL reduction of $a$ and throw away rows whose norm exceeds
+the given bound $b$. Return a tuple $(r, L)$ where the first $r$ rows of $L$
+are the rows remaining after removal.}
+
+\begin{lstlisting}
+lll_with_removal_transform(a::fmpz_mat, b::fmpz)
+\end{lstlisting}
+
+\desc{Compute a tuple $(r, L, T)$ where the first $r$ rows of $L$ are those
+remaining from the LLL reduction after removal of vectors with norm exceeding
+the bound $b$ and $T$ is a transformation matrix so that $L = TA$.}
+
+\textbf{Examples.}
+
+Here are some examples of computing the LLL reduction.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+
+   A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
+   
+   L = lll(A)
+   L, T = lll_with_transform(A)
+
+   G == lll_gram(gram(A))
+   G, T = lll_gram_with_transform(gram(A))
+
+   r, L = lll_with_removal(A, fmpz(100))
+   r, L, T = lll_with_removal_transform(A, fmpz(100))
+\end{lstlisting}
+
+\subsubsection{Smith normal form}
+
+\begin{lstlisting}
+snf(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Compute the Smith normal form of $a$.}
+
+\begin{lstlisting}
+is_snf(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Return \code{true} if $a$ is in Smith normal form, otherwise return
+\code{false}.}
+
+\begin{lstlisting}
+snf_diagonal(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Given a diagonal matrix $a$ compute the Smith normal form of $a$.}
+
+\textbf{Examples.}
+
+Here are some examples of computing the Smith normal form.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+
+   A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
+   
+   B = snf(A)
+   is_snf(B) == true
+
+   B = S([fmpz(2) 0 0; 0 4 0; 0 0 7])
+
+   C = snf_diagonal(B)
 \end{lstlisting}
 
 \section{Flint fields}

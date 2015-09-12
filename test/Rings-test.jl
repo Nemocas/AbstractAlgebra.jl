@@ -17,6 +17,7 @@ include("flint/fmpz_mod_series-test.jl")
 include("flint/fq_series-test.jl")
 include("flint/fq_nmod_series-test.jl")
 include("flint/nmod_mat-test.jl")
+include("flint/fmpz_mat-test.jl")
 
 include("generic/Poly-test.jl")
 include("generic/Residue-test.jl")
@@ -44,6 +45,7 @@ function test_rings()
    test_series()
    test_matrix()
    test_nmod_mat()
+   test_fmpz_mat()
 end
 
 function test_all()

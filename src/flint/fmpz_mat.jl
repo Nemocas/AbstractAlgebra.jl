@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export fmpz_mat, MatrixSpace, getindex, getindex!, setindex!, rows, cols,
+export fmpz_mat, FmpzMatSpace, getindex, getindex!, setindex!, rows, cols,
        charpoly, determinant, determinant_divisor, determinant_given_divisor,
        gram, hadamard, is_hadamard, hnf, is_hnf, hnf_with_transform,
        hnf_modular, lll, lll_gram, lll_with_transform, lll_gram_with_transform,
@@ -184,6 +184,12 @@ function -(x::fmpz_mat)
    return z
 end
 
+###############################################################################
+#
+#   transpose
+#
+###############################################################################
+
 function transpose(x::fmpz_mat)
    z = MatrixSpace(FlintZZ, cols(x), rows(x))()
    ccall((:fmpz_mat_transpose, :libflint), Void,
@@ -276,9 +282,9 @@ function -(x::fmpz_mat, y::Integer)
 end
 
 function -(x::Integer, y::fmpz_mat)
-   z = deepcopy(y)
+   z = -y
    for i = 1:min(rows(y), cols(y))
-      z[i, i] = x - z[i, i]
+      z[i, i] += x
    end
    return z
 end
@@ -889,6 +895,8 @@ Base.call(a::FmpzMatSpace, d::fmpz_mat) = d
 ###############################################################################
 
 Base.promote_rule{T <: Integer}(::Type{fmpz_mat}, ::Type{T}) = fmpz_mat
+
+Base.promote_rule(::Type{fmpz_mat}, ::Type{fmpz}) = fmpz_mat
 
 ###############################################################################
 #
