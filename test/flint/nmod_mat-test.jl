@@ -1,23 +1,23 @@
 function test_nmod_mat_constructors()
-  print("nmod_mat.constructors ... ")
+  print("nmod_mat.constructors...")
   
   Z2 = ResidueRing(ZZ, 2)
   Z3 = ResidueRing(ZZ, 3)
   
   R = NmodMatSpace(Z2, 2, 2)
 
-  @test isa(R, Ring)
+  @test isa(R, NmodMatSpace)
 
   @test base_ring(R) == Z2
 
   S = NmodMatSpace(Z3, 2, 2)
 
-  @test isa(S, Ring)
+  @test isa(S, NmodMatSpace)
 
   RR = NmodMatSpace(Z2, 2, 2)
   
-  @test isa(RR, Ring)
-  
+  @test isa(RR, NmodMatSpace)
+
   @test R == RR
 
   @test_throws ErrorException NmodMatSpace(Z2, 2, -1)
@@ -87,6 +87,12 @@ function test_nmod_mat_constructors()
   @test f == R([Z2(1), Z2(1), Z2(1), Z2(1)])
   @test_throws ErrorException R([ Z2(1), Z2(1), Z2(1), Z2(1), Z2(1)])
 
+  @test isa(S(1), nmod_mat)
+  
+  @test isa(S(fmpz(1)), nmod_mat)
+  
+  @test isa(S(Z3(1)), nmod_mat)
+  
   g = deepcopy(e)
 
   @test b == c
@@ -99,7 +105,7 @@ function test_nmod_mat_constructors()
 end
 
 function test_nmod_mat_manipulation()
-  print("nmod_mat.manipulation ... ")
+  print("nmod_mat.manipulation...")
   Z10 = ResidueRing(ZZ, 10)
   R = NmodMatSpace(Z10, 2, 2)
   Z20 = ResidueRing(ZZ, 20)
@@ -173,8 +179,8 @@ function test_nmod_mat_manipulation()
   println("PASS")
 end
 
-function test_nmod_mat_arithmetic()
-  print("nmod_mat.arithmetic ... ")
+function test_nmod_mat_unary_ops()
+  print("nmod_mat.unary_ops...")
 
   Z17 = ResidueRing(ZZ,17)
 
@@ -193,6 +199,22 @@ function test_nmod_mat_arithmetic()
 
   @test d == R([ 15 16 0 16; 0 0 0 0; 0 16 15 0])
 
+  println("PASS")
+end
+
+function test_nmod_mat_binary_ops()
+  print("nmod_mat.binary_ops...")
+
+  Z17 = ResidueRing(ZZ,17)
+
+  R = MatrixSpace(Z17, 3, 4)
+ 
+  a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+
+  b = R([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+
+  c = R()
+
   d = a + b
 
   @test d == R([3 3 3 2; 3 2 1 2; 1 4 4 0])
@@ -209,6 +231,22 @@ function test_nmod_mat_arithmetic()
 
   @test d == MatrixSpace(Z17, 4, 4)([11 11 8 7; 11 0 14 6; 8 14 14 5; 7 6 5 5])
 
+  println("PASS")
+end
+
+function test_nmod_mat_adhoc_binary()
+  print("nmod_mat.adhoc_binary...")
+
+  Z17 = ResidueRing(ZZ,17)
+
+  R = MatrixSpace(Z17, 3, 4)
+  Z2 = ResidueRing(ZZ,2)
+  
+  a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+
+  b = R([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
+
+  c = R()
   d = UInt(2)*a
   dd = a*UInt(2)
 
@@ -236,6 +274,54 @@ function test_nmod_mat_arithmetic()
 
   @test_throws ErrorException Z2(1)*a
 
+  println("PASS")
+end
+
+function test_nmod_mat_comparison()
+  print("nmod_mat.comparison...")
+
+  Z17 = ResidueRing(ZZ,17)
+
+  R = MatrixSpace(Z17, 3, 4)
+  
+  a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+
+  @test a == a
+
+  @test deepcopy(a) == a
+
+  @test a != R([0 1 3 1; 2 1 4 2; 1 1 1 1])
+
+  println("PASS")
+end
+
+function test_nmod_mat_adhoc_comparison()
+  print("nmod_mat.comparison...")
+
+  Z17 = ResidueRing(ZZ,17)
+
+  R = MatrixSpace(Z17, 3, 4)
+  
+  @test R(5) == 5
+  @test R(5) == fmpz(5)
+  @test R(5) == Z17(5)
+
+  @test 5 == R(5)
+  @test fmpz(5) == R(5)
+  @test Z17(5) == R(5)
+
+  println("PASS")
+end
+
+function test_nmod_mat_powering()
+  print("nmod_mat.powering...")
+
+  Z17 = ResidueRing(ZZ,17)
+
+  R = MatrixSpace(Z17, 3, 4)
+  
+  a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+
   f = a*transpose(a)
 
   g = f^1000
@@ -246,18 +332,13 @@ function test_nmod_mat_arithmetic()
 
   @test g == MatrixSpace(Z17, 3, 3)([1 2 2; 2 13 12; 2 12 15])
 
-
   @test_throws ErrorException f^(ZZ(2)^1000)
-
-  @test_throws ErrorException trace(a)
-
-  @test_throws ErrorException determinant(a)
 
   println("PASS")
 end
 
 function test_nmod_mat_row_echelon_form()
-  print("nmod_mat.row_echelon_form ... ")
+  print("nmod_mat.row_echelon_form...")
 
   Z17 = ResidueRing(ZZ,17)
   R = MatrixSpace(Z17, 3, 4)
@@ -289,7 +370,7 @@ function test_nmod_mat_row_echelon_form()
 end
 
 function test_nmod_mat_trace_determinant()
-  print("nmod_mat.trace_determinant ... ")
+  print("nmod_mat.trace_determinant...")
 
   Z17 = ResidueRing(ZZ,17)
   R = MatrixSpace(Z17, 3, 4)
@@ -321,11 +402,13 @@ function test_nmod_mat_trace_determinant()
 
   @test c == Z17(13)
 
+  a = R([ 1 2 3 1; 3 2 1 2; 1 3 2 0])
+
   println("PASS")
 end
 
 function test_nmod_mat_rank()
-  print("nmod_mat.rank ... ")
+  print("nmod_mat.rank...")
 
   Z17 = ResidueRing(ZZ,17)
   R = MatrixSpace(Z17, 3, 4)
@@ -355,7 +438,7 @@ function test_nmod_mat_rank()
 end
 
 function test_nmod_mat_inv()
-  print("nmod_mat.inv ... ")
+  print("nmod_mat.inv...")
 
   Z17 = ResidueRing(ZZ,17)
   R = MatrixSpace(Z17, 3, 4)
@@ -381,7 +464,7 @@ function test_nmod_mat_inv()
 end
  
 function test_nmod_mat_solve()
-  print("nmod_mat.solve ... ")
+  print("nmod_mat.solve...")
 
   Z17 = ResidueRing(ZZ,17)
   R = MatrixSpace(Z17, 3, 3)
@@ -405,7 +488,7 @@ function test_nmod_mat_solve()
 end
 
 function test_nmod_mat_lu()
-  print("nmod_mat.lu ... ")
+  print("nmod_mat.lu...")
   
   
   Z17 = ResidueRing(ZZ,17)
@@ -428,7 +511,7 @@ function test_nmod_mat_lu()
 end
 
 function test_nmod_mat_window()
-  print("nmod_mat.window ... ")
+  print("nmod_mat.window...")
 
   Z17 = ResidueRing(ZZ,17)
   R = MatrixSpace(Z17, 3, 3)
@@ -466,7 +549,7 @@ function test_nmod_mat_window()
 end
 
 function test_nmod_mat_concatenation()
-  print("nmod_mat.concatenation ... ")
+  print("nmod_mat.concatenation...")
 
   Z17 = ResidueRing(ZZ,17)
   R = MatrixSpace(Z17, 3, 3)
@@ -506,7 +589,7 @@ function test_nmod_mat_concatenation()
 end
 
 function test_nmod_mat_conversion()
-  print("nmod_mat.conversion ... ")
+  print("nmod_mat.conversion...")
 
   Z17 = ResidueRing(ZZ, 17)
   R = MatrixSpace(Z17, 3, 3)
@@ -535,7 +618,12 @@ end
 function test_nmod_mat()
   test_nmod_mat_constructors()
   test_nmod_mat_manipulation()
-  test_nmod_mat_arithmetic()
+  test_nmod_mat_unary_ops()
+  test_nmod_mat_binary_ops()
+  test_nmod_mat_adhoc_binary()
+  test_nmod_mat_comparison()
+  test_nmod_mat_adhoc_comparison()
+  test_nmod_mat_powering()
   test_nmod_mat_row_echelon_form()
   test_nmod_mat_trace_determinant()
   test_nmod_mat_rank()

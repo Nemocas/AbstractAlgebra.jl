@@ -31,11 +31,24 @@ function checkbounds(A, I::Int, J::Int)
   (_checkbounds(size(A,1), I) && _checkbounds(size(A,2), J)) || (@_noinline_meta; throw(BoundsError(A, I)))
 end
 
-### TODO: move the following to appropriate source file
+function check_parent(x::nmod_mat, y::nmod_mat)
+  base_ring(x) != base_ring(y) && error("Residue rings must be equal")
+  (cols(x) != cols(y)) && (rows(x) != rows(y)) &&
+          error("Matrices have wrong dimensions")
+  return nothing
+end
+
 size(x::nmod_mat) = tuple(x.parent.rows, x.parent.cols)
 
 size(t::nmod_mat, d) = d <= 2 ? size(t)[d] : 1
 
+issquare(a::nmod_mat) = (rows(a) == cols(a))
+
+################################################################################
+#
+#  Manipulation
+#
+################################################################################
 
 function getindex(a::nmod_mat, i::Int, j::Int)
   checkbounds(a, i, j)
@@ -108,14 +121,6 @@ function one(a::NmodMatSpace)
   return z
 end
 
-################################################################################
-#
-#  Predicates
-#
-################################################################################
-
-issquare(a::nmod_mat) = (rows(a) == cols(a))
-
 function iszero(a::nmod_mat)
   r = ccall((:nmod_mat_is_zero, :libflint), Cint, (Ptr{nmod_mat}, ), &a)
   return Bool(r)
@@ -167,8 +172,6 @@ end
 #
 ################################################################################
 
-# are we allowing non-square matrices?!
-
 function transpose(a::nmod_mat)
   z = NmodMatSpace(base_ring(a), parent(a).cols, parent(a).rows)()
   ccall((:nmod_mat_transpose, :libflint), Void,
@@ -184,7 +187,7 @@ end
 
 ################################################################################
 #
-#  Arithmetic
+#  Unary operators
 #
 ################################################################################
 
@@ -194,6 +197,12 @@ function -(x::nmod_mat)
           (Ptr{nmod_mat}, Ptr{nmod_mat}), &z, &x)
   return z
 end
+
+################################################################################
+#
+#  Binary operators
+#
+################################################################################
 
 function +(x::nmod_mat, y::nmod_mat)
   check_parent(x,y)
@@ -219,6 +228,12 @@ function *(x::nmod_mat, y::nmod_mat)
           (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &z, &x, &y)
   return z
 end
+
+################################################################################
+#
+#  Ad hoc binary operators
+#
+################################################################################
 
 function *(x::nmod_mat, y::UInt)
   z = parent(x)()
@@ -251,6 +266,12 @@ function *(x::nmod_mat, y::Residue{fmpz})
 end
 
 *(x::Residue{fmpz}, y::nmod_mat) = y*x
+
+################################################################################
+#
+#  Powering
+#
+################################################################################
 
 function ^(x::nmod_mat, y::UInt)
   z = parent(x)()
@@ -290,7 +311,7 @@ end
 
 ################################################################################
 #
-#  Trace and determinant
+#  Trace
 #
 ################################################################################
 
@@ -299,6 +320,12 @@ function trace(a::nmod_mat)
   r = ccall((:nmod_mat_trace, :libflint), UInt, (Ptr{nmod_mat}, ), &a)
   return base_ring(a)(r)
 end
+
+################################################################################
+#
+#  Determinant
+#
+################################################################################
 
 function determinant(a::nmod_mat)
   !issquare(a) && error("Matrix must be a square matrix")
@@ -399,7 +426,7 @@ end
 
 ################################################################################
 #
-#  Windowing !!! Not documented, but useful, flint functions
+#  Windowing
 #
 ################################################################################
 
@@ -427,7 +454,7 @@ sub(x::nmod_mat, r::UnitRange{Int}, c::UnitRange{Int}) = window(x, r, c)
   
 ################################################################################
 #
-#  Concatenation !!! Not documented, but useful, flint functions
+#  Concatenation
 #
 ################################################################################
 
@@ -465,6 +492,12 @@ function Array(b::nmod_mat)
   return a
 end
 
+################################################################################
+#
+#  Lifting
+#
+################################################################################
+
 function lift(a::nmod_mat)
   z = MatrixSpace(FlintZZ, rows(a), cols(a))()
   ccall((:fmpz_mat_set_nmod_mat, :libflint), Void,
@@ -478,6 +511,18 @@ function lift!(z::fmpz_mat, a::nmod_mat)
   return z 
 end
 
+###############################################################################
+#
+#   Promotion rules
+#
+###############################################################################
+
+Base.promote_rule{V <: Integer}(::Type{nmod_mat}, ::Type{V}) = nmod_mat
+
+Base.promote_rule(::Type{nmod_mat}, ::Type{Residue{fmpz}}) = nmod_mat
+
+Base.promote_rule(::Type{nmod_mat}, ::Type{fmpz}) = nmod_mat
+
 ################################################################################
 #
 #  Parent object overloading
@@ -488,6 +533,49 @@ function Base.call(a::NmodMatSpace)
   z = nmod_mat(a.rows, a.cols, a._n)
   z.parent = a
   return z
+end
+
+function Base.call(a::NmodMatSpace, b::Integer)
+   M = a()
+   for i = 1:a.rows
+      for j = 1:a.cols
+         if i != j
+            M[i, j] = zero(base_ring(a))
+         else
+            M[i, j] = base_ring(a)(b)
+         end
+      end
+   end
+   return M
+end
+
+function Base.call(a::NmodMatSpace, b::fmpz)
+   M = a()
+   for i = 1:a.rows
+      for j = 1:a.cols
+         if i != j
+            M[i, j] = zero(base_ring(a))
+         else
+            M[i, j] = base_ring(a)(b)
+         end
+      end
+   end
+   return M
+end
+
+function Base.call(a::NmodMatSpace, b::Residue{fmpz})
+   parent(b) != base_ring(a) && error("Unable to coerce to matrix")
+   M = a()
+   for i = 1:a.rows
+      for j = 1:a.cols
+         if i != j
+            M[i, j] = zero(base_ring(a))
+         else
+            M[i, j] = deepcopy(b)
+         end
+      end
+   end
+   return M
 end
 
 function Base.call(a::NmodMatSpace, arr::Array{BigInt, 2})
@@ -566,15 +654,3 @@ function MatrixSpace(R::ResidueRing{fmpz}, r::Int, c::Int)
   end
 end
 
-################################################################################
-#
-#  Parent check
-#
-################################################################################
-
-function check_parent(x::nmod_mat, y::nmod_mat)
-  base_ring(x) != base_ring(y) && error("Residue rings must be equal")
-  (cols(x) != cols(y)) && (rows(x) != rows(y)) &&
-          error("Matrices have wrong dimensions")
-  return nothing
-end

@@ -6734,6 +6734,328 @@ Here is an example of ad hoc exact division.
    b = divexact(a, t^2 + 1)
 \end{lstlisting}
 
+\subsection{Flint matrices over $\Z/n\Z$ (small $n$): \code{nmod_mat}}
+
+The Flint type for matrices over $\Z/n\Z$ for small $n$ is \code{nmod_mat}. Matrices
+of this type are created using the \code{MatrixSpace} constructor in Nemo. They are
+automatically created if the modulus $n$ fits into a \code{UInt}.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 7)
+S = MatrixSpace(R, 3, 3)
+\end{lstlisting}
+
+Matrices in this matrix space have parent of type \code{NmodMatSpace}.
+
+We describe functions for \code{nmod_mat} only where they differ from the functions
+available for generic matrices.
+
+\subsubsection{Constructors}
+
+In the constructors below $S$ is assumed to be an \code{NmodMatSpace} as constructed above.
+We assume that $r$ is the number of rows and $c$ the number of columns for matrices in this
+space, e.g. $r = 3$ and $c = 3$ in the example above.
+
+\begin{lstlisting}
+S(a::Array{BigInt, 2})
+\end{lstlisting}
+
+\desc{Construct the $r\times c$ matrix with entries given by the Julia array $a$, viewed
+as elements of the base ring.}
+
+\begin{lstlisting}
+S(arr::Array{Int, 1})
+S(arr::Array{BigInt, 1})
+S(arr::Array{fmpz, 1})
+S(arr::Array{Residue{fmpz}, 1})
+\end{lstlisting}
+
+\desc{Given a one dimensional Julia array of length $rc$, construct the matrix with $r$
+rows and $c$ columns with the array entries as matrix entries. The entries are specified
+one row after the other.}
+
+\textbf{Examples.}
+
+Here are some examples of constructors.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 3, 3)
+
+   a = S([BigInt(4) 5 6; 7 3 2; 1 4 5])
+   b = S([4, 5, 6, 7, 3, 2, 1, 4, 5])
+   c = S([R(4), R(5), R(6), R(7), R(3), R(2), R(1), R(4), R(5)])
+\end{lstlisting}
+
+\subsubsection{Ad hoc binary operators}
+
+\begin{lstlisting}
+*(a::nmod_mat, b::UInt)
+\end{lstlisting}
+
+\desc{Return $ab$, i.e. the matrix whose entries are those of $a$ multiplied by $b$.}
+
+\begin{lstlisting}
+*(a::UInt, b::nmod_mat)
+\end{lstlisting}
+
+\desc{Return $ab$, i.e. the matrix whose entries are $a$ multiplied by the entries
+of $b$.}
+
+\textbf{Examples.}
+
+Here is an example of ad hoc binary operators.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 3, 3)
+
+   a = S([4 5 6; 7 3 2; 1 4 5])
+
+   b = UInt(5)*a
+\end{lstlisting}
+
+\subsubsection{Row echelon form}
+
+\begin{lstlisting}
+rref(a::nmod_mat)
+\end{lstlisting}
+
+\desc{Return the row echelon form of $a$.}
+
+\begin{lstlisting}
+rref!(a::nmod_mat)
+\end{lstlisting}
+
+\desc{Compute the row echelon form of $a$ in-place. It is the users responsibility
+to ensure this matrix is not aliased elsewhere.}
+
+\textbf{Examples.}
+
+Here is an example of row echelon form.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 3, 3)
+
+   a = S([4 5 6; 7 3 2; 1 4 5])
+
+   b = rref(a)
+\end{lstlisting}
+
+\subsubsection{Determinant}
+
+\begin{lstlisting}
+determinant(a::nmod_mat)
+\end{lstlisting}
+
+\desc{Return the determinant of $a$ as an \code|Residue{fmpz}|.}
+
+\textbf{Examples.}
+
+Here is an example of determinant.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 3, 3)
+
+   a = S([4 5 6; 7 3 2; 1 4 5])
+
+   b = determinant(a)
+\end{lstlisting}
+
+\subsubsection{Rank}
+
+\begin{lstlisting}
+rank(a::nmod_mat)
+\end{lstlisting}
+
+\desc{Return the rank of $a$.}
+
+\textbf{Examples.}
+
+Here is an example of computing the rank.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 3, 3)
+
+   a = S([4 5 6; 7 3 2; 1 4 5])
+
+   b = rank(a)
+\end{lstlisting}
+
+\subsubsection{Inversion}
+
+\begin{lstlisting}
+inv(a::nmod_mat)
+\end{lstlisting}
+
+\desc{Return the matrix inverse of $a$. Note the matrix must be must be square and
+invertible, otherwise an exception is thrown.}
+
+\textbf{Examples.}
+
+Here is an example of inversion.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 3, 3)
+
+   a = S([BigInt(4) 5 6; 7 3 2; 1 4 5])
+
+   b = inv(a)
+\end{lstlisting}
+
+\subsubsection{Linear solving}
+
+\begin{lstlisting}
+inv(a::nmod_mat, b::nmod_mat)
+\end{lstlisting}
+
+\desc{Return the column vector $x$ such that $ax = b$ where $x$ and $b$ are column
+vectors with the same number of rows as the $a$. Note that $a$ must be a square
+matrix. If these conditions are not met, an exception is raised.}
+
+\textbf{Examples.}
+
+Here is an example of linear solving.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 3, 3)
+   T = MatrixSpace(R, 3, 1)
+
+   a = S([4 5 6; 7 3 2; 1 4 5])
+   b = T([5, 3, 2])
+
+   x = solve(a, b)
+\end{lstlisting}
+
+\subsubsection{LU decomposition}
+
+\begin{lstlisting}
+lufact(a::nmod_mat)
+\end{lstlisting}
+
+\desc{Compute a tuple of matrices $(l, u, p)$ such that $pa = lu$ where $l$ is a
+lower triangular matrix, $u$ is upper triangular and $p$ is a permutation matrix.}
+
+\textbf{Examples.}
+
+Here is an example of LU decomposition.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 3, 3)
+   T = MatrixSpace(R, 3, 1)
+
+   a = S([4 5 6; 7 3 2; 1 4 5])
+  
+   l, u, p = lufact(a)
+\end{lstlisting}
+
+\subsubsection{Matrix concatenation}
+
+\begin{lstlisting}
+hcat(a::nmod_mat, b::nmod_mat)
+\end{lstlisting}
+
+\desc{Return the matrix that is the horizontal concatenation of $a$ and $b$.
+Both $a$ and $b$ must have the same number of rows, else an exception is raised.}
+
+\begin{lstlisting}
+vcat(a::nmod_mat, b::nmod_mat)
+\end{lstlisting}
+
+\desc{Return the matrix that is the vertical concatenation of $a$ and $b$.
+Both $a$ and $b$ must have the same number of columns, else an exception is raised.}
+
+\textbf{Examples.}
+
+Here are some examples of concatenation.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 3, 3)
+   T = MatrixSpace(R, 3, 1)
+
+   a = S([4 5 6; 7 3 2; 1 4 5])
+   b = S([9 5 3; 2 7 1; 0 6 9])
+  
+   c = hcat(a, b)
+   d = vcat(a, b)
+\end{lstlisting}
+
+\subsubsection{Conversions}
+
+\begin{lstlisting}
+Array(a::nmod_mat)
+\end{lstlisting}
+
+\desc{Return a two dimensional Julia array with entries that are of type
+\code|Residue{fmpz}| containing the entries of the matrix $a$.} 
+
+\textbf{Examples.}
+
+Here is an example conversion.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 3, 3)
+   T = MatrixSpace(R, 3, 1)
+
+   a = S([4 5 6; 7 3 2; 1 4 5])
+  
+   A = Array(a)
+\end{lstlisting}
+
+\subsubsection{Conversions}
+
+\begin{lstlisting}
+Array(a::nmod_mat)
+\end{lstlisting}
+
+\desc{Return a two dimensional Julia array with entries that are of type
+\code|Residue{fmpz}| containing the entries of the matrix $a$.} 
+
+\textbf{Examples.}
+
+Here is an example of conversion.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 3, 3)
+   T = MatrixSpace(R, 3, 1)
+
+   a = S([4 5 6; 7 3 2; 1 4 5])
+  
+   A = Array(a)
+\end{lstlisting}
+
+\subsubsection{Lifting}
+
+\begin{lstlisting}
+lift(a::nmod_mat)
+\end{lstlisting}
+
+\desc{Return a lift of the matrix $a$ to a matrix over $\Z$, i.e. where the
+entries of the returned matrix are those of $a$ lifted to $\Z$.}
+
+\textbf{Examples.}
+
+Here is an example of lifting.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 3, 3)
+   T = MatrixSpace(R, 3, 1)
+
+   a = S([4 5 6; 7 3 2; 1 4 5])
+  
+   b = lift(a)
+\end{lstlisting}
+
 \section{Flint fields}
 
 Flint provides implementations of various explicit fields. We describe their

@@ -573,6 +573,8 @@ Base.promote_rule{T <: RingElem, V <: Integer}(::Type{Mat{T}}, ::Type{V}) = Mat{
 
 Base.promote_rule{T <: RingElem}(::Type{Mat{T}}, ::Type{T}) = Mat{T}
 
+Base.promote_rule{T <: RingElem}(::Type{Mat{T}}, ::Type{fmpz}) = Mat{T}
+
 ###############################################################################
 #
 #   Parent object call overload
