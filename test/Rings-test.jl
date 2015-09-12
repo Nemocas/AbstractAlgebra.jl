@@ -20,6 +20,7 @@ include("flint/fq_nmod_series-test.jl")
 include("generic/Poly-test.jl")
 include("generic/Residue-test.jl")
 include("generic/PowerSeries-test.jl")
+include("generic/Matrix-test.jl")
 
 include("nmod_mat-test.jl")
 
@@ -42,6 +43,7 @@ function test_rings()
    test_poly()
    test_residue()
    test_series()
+   test_matrix()
 
    test_nmod_mat()
 end

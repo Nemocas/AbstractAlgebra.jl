@@ -2829,6 +2829,512 @@ a = exp(x + O(x^40))
 b = divexact(x, exp(x + O(x^40)) - 1)
 \end{lstlisting}
 
+\subsection{Generic matrices (Mat$(R)$): \code|Mat\{T\}|}
+
+In Nemo we provide generic matric spaces for $m\times n$ matrices over a ring $R$.
+Note that $m\times n$ matrices do not form a ring.
+
+The type of a parent object for a matrix space is a \code{MatrixSpace}. Currently
+this belongs to the \code{Ring} type class to accomodate the special case when
+working with $n\times n$ matrices. However this will change in a later version
+of Nemo when matrix algebras are provided.
+
+Matrix elements are of type \code{Mat} which belongs to the \code{MatElem} type
+class, which in turn belongs to \code{RingElem}. Again, this is temporary to
+accomodate the special case where matrices happen to be square, forming an actual
+mathematical ring.
+
+There's no need to deal directly with these types, as we provide a function
+\code{MatrixSpace} for constructing the matrix space parent objects and various
+constructors to create matrix objects.
+
+As for other generic types, the \code{Mat} and \code{MatrixSpace}
+types take as parameters the type \code{T} of the elements in the base ring
+over which the matrix space is constructed.
+
+For example, if there wasn't a special Flint type for matrices, the type of
+a matrix space $Mat_{m, n}(\Z)$ over the Flint integers would be denoted
+\code|MatrixSpace{fmpz}| and elements of the matrix space would have type
+\code|Mat{fmpz}|.
+
+\subsubsection{Constructors}
+
+We define the following function for constructing the parent object of a
+matrix space.
+
+\begin{lstlisting}
+MatrixSpace(R::Ring, r::Int, c::Int)
+\end{lstlisting}
+
+\desc{Returns a parent object \code{S} corresponding to the space of $r\times c$
+matrices over the ring \code{R}}.
+
+We also provide various constructors for creating elements of a matrix space. Below
+we assume that $S$ is a matrix space parent object, created for example by the
+following code:
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S = MatrixSpace(R, 3, 3)
+\end{lstlisting}
+
+In the following we will also let $r$ stand for the number of rows and $c$ for the
+number of columns, e.g. $r = 3$ and $c = 3$ in the case of $S$ as we just defined it.
+We let $T$ stand for the type of the entries of the matrices.
+
+\begin{lstlisting}
+S()
+\end{lstlisting}
+
+\desc{Create the $r\times c$ matrix with all entries zero.}
+
+\begin{lstlisting}
+S(a::Integer)
+S(a::T)
+\end{lstlisting}
+
+\desc{Create the $r\times c$ diagonal matrix, with diagonal entries equal to
+$a$ (viewed as an element of the base ring).}
+
+\begin{lstlisting}
+S(a::Mat{T})
+\end{lstlisting}
+
+\desc{Return a reference to the matrix \code{a}. No copy of the data is
+made by this function.}
+
+\begin{lstlisting}
+S(a::Array{T, 2})
+\end{lstlisting}
+
+\desc{Create an $r\times c$ given by the entries of the $r\times c$ Julia array
+$a$.}
+
+\begin{lstlisting}
+S(a::RingElem)
+\end{lstlisting}
+
+\desc{Try to coerce $a$ into the base ring of the matrix space and then construct
+the diagonal $r\times c$ matrix with diagonal entries equal to $a$.}
+
+\textbf{Examples.}
+
+Here are some examples of power series constructors.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S = MatrixSpace(R, 3, 3)
+
+A = S()
+B = S(12)
+C = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+D = S(c)
+F = S(R(11))
+\end{lstlisting}
+
+\subsubsection{Basic manipulation}
+
+To access entries of a matrix we overload Julia's \code{getindex} and \code{setindex}
+methods. For example, if $A$ is a \code|Mat{T}|as defined in the example above
+we have the following matrix notation.
+
+\begin{lstlisting}
+A[i::Int, j::Int]
+\end{lstlisting}
+
+\desc{When assigned to, this allows the entry at row $i$ and column $j$ to be assigned
+to. When used in an expression, this allows the entry at row $i$ and column $j$ of
+the matrix to be used in an expression. Note that Julia arrays and Nemo matrices are
+$1$-indexed, i.e. the top left entry is $A[1, 1]$.}
+
+\begin{lstlisting}
+rows{T <: RingElem}(a::Mat{T})
+\end{lstlisting}
+
+\desc{Return the number of rows of the given matrix.}
+
+\begin{lstlisting}
+cols{T <: RingElem}(a::Mat{T})
+\end{lstlisting}
+
+\desc{Return the number of rows of the given matrix.}
+
+\begin{lstlisting}
+zero{T <: RingElem}(R::MatrixSpace{T})
+\end{lstlisting}
+
+\desc{Return the $0$ matrix in the matrix space, i.e. the matrix with all entries
+equal to $0$ in the base ring.}
+
+\begin{lstlisting}
+one{T <: RingElem}(::Type{MatrixSpace{T}})
+\end{lstlisting}
+
+\desc{Return $1$ diagonal matrix in the matrix space, i.e. the matrix with all
+diagonal entries equal to $1$ in the base ring.}
+
+\begin{lstlisting}
+iszero{T <: RingElem}(a::Mat{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if $a$ is arithmetically equal to the $0$ matrix.}
+
+\begin{lstlisting}
+isone{T <: RingElem}(a::Mat{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if $a$ is arithmetically equal to the $1$ diagonal
+matrix.}
+
+\begin{lstlisting}
+deepcopy{T <: RingElem}(a::Mat{T})
+\end{lstlisting}
+
+\desc{Create a new matrix object which is equal to the supplied matrix, i.e.
+with the same entries.}
+
+\textbf{Examples.}
+
+Here are some examples of basic manipulation of matrices.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S = MatrixSpace(R, 3, 3)
+
+A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+B = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])
+
+C = zero(S)
+D = one(S)
+
+f = iszero(C)
+g = isone(D)
+h = A[1, 2]
+B[1, 1] = R(3)
+r = rows(B)
+c = cols(B)
+k = deepcopy(A)
+\end{lstlisting}
+
+\subsubsection{Unary operators}
+
+\begin{lstlisting}
+-{T <: RingElem}(a::Mat{T})
+\end{lstlisting}
+
+\desc{Return $-a$, i.e. the matrix with all entries negated.}
+
+\textbf{Examples.}
+
+Here is an example of unary operators.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S = MatrixSpace(R, 3, 3)
+
+A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+B = -A
+\end{lstlisting}
+
+\subsubsection{Binary operators}
+
+\begin{lstlisting}
++{T <: RingElem}(a::Mat{T}, b::Mat{T})
+\end{lstlisting}
+
+\desc{Return $a + b$. The matrices must have the same dimensions otherwise
+an exception is thrown.}
+
+\begin{lstlisting}
+-{T <: RingElem}(a::Mat{T}, b::Mat{T})
+\end{lstlisting}
+
+\desc{Return $a - b$. The matrices must have the same dimensions otherwise
+an exception is thrown.}
+
+\begin{lstlisting}
+-{T <: RingElem}(a::Mat{T}, b::Mat{T})
+\end{lstlisting}
+
+\desc{Return $a - b$. The matrices must have the same dimensions otherwise
+an exception is thrown.}
+
+\begin{lstlisting}
+*{T <: RingElem}(a::Mat{T}, b::Mat{T})
+\end{lstlisting}
+
+\desc{Return $a - b$. The number of columns of $a$ must equal the number of
+rows of $b$, otherwise an exception is thrown.}
+
+\textbf{Examples.}
+
+Here is an example of unary operators.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S = MatrixSpace(R, 3, 3)
+
+A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+B = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])
+
+C = A + B
+D = A - B
+F = A*B
+\end{lstlisting}
+
+\subsubsection{Ad hoc binary operators}
+
+\begin{lstlisting}
++{T <: RingElem}(a::Mat{T}, b::Integer)
++{T <: RingElem}(a::Mat{T}, b::fmpz)
++{T <: RingElem}(a::Mat{T}, b::T)
+\end{lstlisting}
+
+\desc{Return the sum of $a$ and the diagonal matrix with $b$ for the diagonal
+entries.}
+
+\begin{lstlisting}
++{T <: RingElem}(a::Integer, b::Mat{T})
++{T <: RingElem}(a::fmpz, b::Mat{T})
++{T <: RingElem}(a::T, b::Mat{T})
+\end{lstlisting}
+
+\desc{Return the sum of the diagonal matrix with $a$ for the diagonal
+entries and the matrix $b$.}
+
+\begin{lstlisting}
+-{T <: RingElem}(a::Mat{T}, b::Integer)
+-{T <: RingElem}(a::Mat{T}, b::fmpz)
+-{T <: RingElem}(a::Mat{T}, b::T)
+\end{lstlisting}
+
+\desc{Return the difference of $a$ and the diagonal matrix with $b$ for the diagonal
+entries.}
+
+\begin{lstlisting}
+-{T <: RingElem}(a::Integer, b::Mat{T})
+-{T <: RingElem}(a::fmpz, b::Mat{T})
+-{T <: RingElem}(a::T, b::Mat{T})
+\end{lstlisting}
+
+\desc{Return the difference of the diagonal matrix with $a$ for the diagonal
+entries and the matrix $b$.}
+
+\begin{lstlisting}
+*{T <: RingElem}(a::Mat{T}, b::Integer)
+*{T <: RingElem}(a::Mat{T}, b::fmpz)
+*{T <: RingElem}(a::Mat{T}, b::T)
+\end{lstlisting}
+
+\desc{Return the matrix whose entries are those of $a$ multiplied by $b$.}
+
+\begin{lstlisting}
+*{T <: RingElem}(a::Integer, b::Mat{T})
+*{T <: RingElem}(a::fmpz, b::Mat{T})
+*{T <: RingElem}(a::T, b::Mat{T})
+\end{lstlisting}
+
+\desc{Return the matrix whose entries are $a$ multiplied by the entries of
+$b$.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc binary operators.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S = MatrixSpace(R, 3, 3)
+
+A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+B = A + 12
+C = fmpz(11) + A
+D = A - (t + 1)
+F = A*3
+G = fmpz(7)*A
+H = (t - 1)*A
+\end{lstlisting}
+
+\subsubsection{Powering}
+
+\begin{lstlisting}
+^{T <: RingElem}(a::Mat{T}, n::Int)
+\end{lstlisting}
+
+\desc{Return the matrix $a$ raised to the power of $n$, i.e. multiplied by
+itself $n$ times. For generic matrices over a ring, binary exponentiation is
+used. If the exponent is $0$ the $1$ diagonal matrix is returned. Currently
+negative powers are not supported and a \code{DomainError()} is raised in
+this case. Note that the matrix must be square for this operation to be
+performed, otherwise an exception is raised.}
+
+\textbf{Examples.}
+
+Here is an example of powering.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S = MatrixSpace(R, 3, 3)
+
+A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+B = A^12
+\end{lstlisting}
+
+\subsubsection{Comparisons}
+
+\begin{lstlisting}
+=={T <: RingElem}(a::Mat{T}, b::Mat{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the two matrices are equal, i.e. if corresponding
+entries are equal, otherwise return \code{false}. The matrices must have the
+same dimensions, otherwise an exception is raised.}
+
+\textbf{Examples.}
+
+Here are some examples of comparison.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S = MatrixSpace(R, 3, 3)
+
+A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+B = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])
+
+A != B
+A == deepcopy(A)
+\end{lstlisting}
+
+\subsubsection{Ad hoc comparisons}
+
+\begin{lstlisting}
+=={T <: RingElem}(a::Mat{T}, b::Integer)
+=={T <: RingElem}(a::Mat{T}, b::fmpz)
+\end{lstlisting}
+
+\desc{Return \code{true} if the matrix $a$ is equal to the diagonal matrix
+of the same dimensions with $b$ for the diagonal entries, otherwise
+return \code{false}.}
+
+\begin{lstlisting}
+=={T <: RingElem}(a::Integer, b::Mat{T})
+=={T <: RingElem}(a::fmpz, b::Mat{T})
+\end{lstlisting}
+
+\desc{Return \code{true} if the diagonal matrix of the same dimensions as $b$,
+with $a$ for the diagonal entries is equal to the matrix $b$, otherwise
+return \code{false}.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc comparison.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S = MatrixSpace(R, 3, 3)
+
+A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+A != 12
+fmpz(11) != A
+S(11) == 11
+\end{lstlisting}
+
+\subsubsection{Ad hoc exact division}
+
+\begin{lstlisting}
+divexact{T <: RingElem}(a::Mat{T}, b::Integer)
+divexact{T <: RingElem}(a::Mat{T}, b::fmpz)
+divexact{T <: RingElem}(a::Mat{T}, b::T)
+\end{lstlisting}
+
+\desc{Return $a/b$, i.e. the matrix whose entries are those of $a$ divided
+by $b$. It is assumed that each such division is exact.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc exact division.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S = MatrixSpace(R, 3, 3)
+
+A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+B = divexact(A, -1)
+C = divexact(12*A, fmpz(3))
+D = divexact((t^2 - 1)*A, t + 1)
+\end{lstlisting}
+
+\subsubsection{Gram matrix}
+
+\begin{lstlisting}
+gram{T <: RingElem}(a::Mat{T})
+\end{lstlisting}
+
+\desc{Return the Gram matrix of $a$, i.e. if $a$ is an $r\times c$ matrix
+return the $r\times r$ matrix whose entries $i, j$ are the dot products
+of the $i$-th and $j$-th rows, respectively.}
+
+\textbf{Examples.}
+
+Here is an example of computing the Gram matrix.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S = MatrixSpace(R, 3, 3)
+
+A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+B = gram(A)
+\end{lstlisting}
+
+\subsubsection{Trace}
+
+\begin{lstlisting}
+trace{T <: RingElem}(a::Mat{T})
+\end{lstlisting}
+
+\desc{Return the trace of the matrix $a$, i.e. the sum of the diagonal
+elementst. We require the matrix to be square.}
+
+\textbf{Examples.}
+
+Here is an example of computing the trace of a matrix.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S = MatrixSpace(R, 3, 3)
+
+A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+b = trace(A)
+\end{lstlisting}
+
+\subsubsection{Content}
+
+\begin{lstlisting}
+content{T <: RingElem}(a::Mat{T})
+\end{lstlisting}
+
+\desc{Return the content of the matrix $a$, i.e. the greatest common
+divisor of all its entries, assuming it exists.}
+
+\textbf{Examples.}
+
+Here is an example of computing the content of a matrix.
+
+\begin{lstlisting}
+R, t = PolynomialRing(QQ, "t")
+S = MatrixSpace(R, 3, 3)
+
+A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+b = content(A)
+\end{lstlisting}
+
 \section{Generic fields}
 
 Nemo provides various constructions of fields. 
@@ -3025,13 +3531,13 @@ den{T <: RingElem}(a::Fraction{T})
 \desc{Return the denominator of the fraction $a$.}
 
 \begin{lstlisting}
-zero{T <: RingElem}(R::FractionField{T}})
+zero{T <: RingElem}(R::FractionField{T})
 \end{lstlisting}
 
 \desc{Return the additive identity of the fraction field of the ring $T$.}
 
 \begin{lstlisting}
-one{T <: RingElem}(R::Type{FractionField{T}})
+one{T <: RingElem}(R::Type{FractionField{T})
 \end{lstlisting}
 
 \desc{Return the multiplicative identity of the fraction field of the ring 
