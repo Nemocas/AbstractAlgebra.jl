@@ -62,7 +62,8 @@ iszero(a::fmpz_mod_poly) = Bool(ccall((:fmpz_mod_poly_is_zero, :libflint), Int32
 var(R::FmpzModPolyRing) = R.S
 
 function deepcopy(a::fmpz_mod_poly)
-  z = fmpz_mod_poly(a)
+  n = parent(a)._n
+  z = fmpz_mod_poly(n, a)
   z.parent = a.parent
   return z
 end

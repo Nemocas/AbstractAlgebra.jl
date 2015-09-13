@@ -620,9 +620,9 @@ type fmpz_mod_poly <: PolyElem{Residue{fmpz}}
       return z
    end
 
-   function fmpz_mod_poly(f::fmpz_mod_poly)
+   function fmpz_mod_poly(n::fmpz, f::fmpz_mod_poly)
       z = new()
-      ccall((:fmpz_mod_poly_init, :libflint), Void, (Ptr{fmpz_mod_poly}, ), &z)
+      ccall((:fmpz_mod_poly_init, :libflint), Void, (Ptr{fmpz_mod_poly}, Ptr{fmpz}), &z, &n)
       ccall((:fmpz_mod_poly_set, :libflint), Void,
             (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), &z, &f)
       finalizer(z, _fmpz_mod_poly_clear_fn)
