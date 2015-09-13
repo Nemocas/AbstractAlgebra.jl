@@ -9822,4 +9822,127 @@ norm(c)
 trace(c)
 \end{lstlisting}
 
+\section{Pari rings}
+
+Pari is a library for algebraic number theory, maintained in Bordeaux, France.
+We currently use Pari to provide arithmetic in maximal orders (rings of integers)
+of number fields and ideals of number fields.
+
+Pari is dynamically typed, though on a lower level it has specific types for a
+range of rings and fields. Many Pari objects are however represented not by
+special objects, but simply by their low level representation in terms of vectors
+of lower level objects, etc.
+
+We give Nemo types to Pari objects where they have none in Pari.
+
+\subsection{Pari maximal orders: \code|pari_maximal_order_elem|}
+
+Pari has no specific type for an element of a maximal order. In Nemo a maximal
+order parent object has type \code{PariMaximalOrder}, which belongs to the
+\code{Ring} type class. Elements of a maximal order are given the type
+\code{pari_maximal_order_elem} which belongs to the \code{MaximalOrderElem}
+type class, which in turn belongs to \code{RingElem}.
+
+The user need not deal with the types directly since we provide a function
+\code{PariMaximalOrder} to create parent objects for Pari maximal orders and we
+also provide various constructors to create elements of such orders.
+
+By default, the global variable \code{MaximalOrder} is set equal to
+\code{PariMaximalOrder} which means that the following code can be used to
+create maximal order parent objects in Nemo.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+O = MaximalOrder(K)
+\end{lstlisting}
+
+Here, $x^3 + 3x + 1$ is the irreducible polynomial over $\Q$ giving the minimum
+polynomial of the generator $a$ of the number field $K$ (though it need not be
+a monic polynomial).
+
+Note that at the present time, Pari maximal orders are constructed from Antic
+number fields. This may change in a later version of Nemo.
+
+\subsubsection{Constructors}
+
+Various constructors are provided to create elements of a Pari maximal order.
+In the constructors below we assume that $O$ is the parent object of such a maximal
+order, for example created by the construction above.
+
+\begin{lstlisting}
+O()
+\end{lstlisting}
+
+\desc{Create the element $0$ of the number field.}
+
+\begin{lstlisting}
+O(d::Integer)
+O(d::fmpz)
+\end{lstlisting}
+
+\desc{Create the element of the maximal order which results from mapping the
+integer $d$ into the maximal order via the embedding of the integers into the
+order.}
+
+\begin{lstlisting}
+O(d::fmpq_poly)
+\end{lstlisting}
+
+\desc{Given a polynomial $d$, consider the polynomial to be an element of the
+number field $K$ and embed it into the maximal order $O$. The element is
+represented in terms of a basis for $O$.}
+
+\begin{lstlisting}
+O(d::nf_elem)
+\end{lstlisting}
+
+\desc{Embed the number field element $d$ into the maximal order $O$. The element
+is represented in terms of a basis for $O$.}
+
+\begin{lstlisting}
+O(d::pari_maximal_order_elem)
+\end{lstlisting}
+
+\desc{Return a reference to the maximal order element $d$. No copy of the data is
+made.}
+
+\textbf{Examples.}
+
+Here are some examples of constructors.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+O = MaximalOrder(K)
+
+k = O()
+l = O(123)
+m = O(fmpz(12))
+n = O(x^2 + 2x - 7)
+p = O(a^2 + 2a - 7)
+q = O(n)
+\end{lstlisting}
+
+\subsubsection{Basic manipulation}
+
+\begin{lstlisting}
+basis(O::PariMaximalOrder)
+\end{lstlisting}
+
+\desc{Return the basis of the maximal order $O$. This is a vector of Pari
+polynomials representing the basis elements. They can be accessed using
+array notation and coerced into the ring of Flint polynomials over the
+rationals.}
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+O = MaximalOrder(K)
+
+B = basis(O)
+b3 = B[3]
+c = R(b3)
+\end{lstlisting}
+
 \end{document}

@@ -263,7 +263,7 @@ function factor(a::PariIdeal)
    return fac
 end
 
-function factor_mul(a::PariFactor{PariMaximalOrderElem})
+function factor_mul(a::PariFactor{pari_maximal_order_elem})
    av = unsafe_load(avma, 1)
    p = ccall((:idealfactorback, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}, Ptr{Void}, Int), 
@@ -333,7 +333,7 @@ function ideal(ord::PariMaximalOrder, b::fmpq_poly, args::fmpq_poly...)
    return PariIdeal(id1, PariIdealCollection(ord))
 end
 
-function ideal(ord::PariMaximalOrder, b::PariMaximalOrderElem, args::PariMaximalOrderElem...)
+function ideal(ord::PariMaximalOrder, b::pari_maximal_order_elem, args::pari_maximal_order_elem...)
    parent(b) != ord && error("Unable to coerce maximal order element")
    av = unsafe_load(avma, 1)
    id1 = ccall((:idealhnf, :libpari), Ptr{Int}, 

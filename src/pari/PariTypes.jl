@@ -194,7 +194,7 @@ _pari_nf_unclone(a::PariNumberField) = gunclone(a.data)
 
 ###############################################################################
 #
-#   PariMaximalOrder / PariMaximalOrderElem
+#   PariMaximalOrder / pari_maximal_order_elem
 #
 ###############################################################################
 
@@ -202,18 +202,18 @@ type PariMaximalOrder <: Ring{Pari}
    pari_nf::PariNumberField
 end
 
-type PariMaximalOrderElem <: MaximalOrderElem
+type pari_maximal_order_elem <: MaximalOrderElem
    data::Ptr{Int}
    parent::PariMaximalOrder
 
-   function PariMaximalOrderElem(a::Ptr{Int}, par::PariMaximalOrder)
+   function pari_maximal_order_elem(a::Ptr{Int}, par::PariMaximalOrder)
       r = new(gclone(a), par)
       finalizer(r, _pari_maximal_order_elem_clear_fn)
       return r
    end
 end
 
-_pari_maximal_order_elem_clear_fn(a::PariMaximalOrderElem) = gunclone(a.data)
+_pari_maximal_order_elem_clear_fn(a::pari_maximal_order_elem) = gunclone(a.data)
 
 ###############################################################################
 #
