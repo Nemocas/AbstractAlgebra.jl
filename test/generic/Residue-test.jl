@@ -115,27 +115,6 @@ function test_residue_binary_ops()
    println("PASS")
 end
 
-function test_residue_exact_division()
-   print("Residue.exact_division...")
- 
-   Q = ResidueRing(ZZ, 7)
-
-   a = Q(3)
-   b = Q(4)
-
-   @test divexact(a*b, a) == b
-
-   S, x = PolynomialRing(Q, "x")
-   T = ResidueRing(S, x^3 + 3x + 1)
-
-   n = T(x^5 + 1)
-   p = T(x^2 + 2x + 1)
-
-   @test divexact(n*p, p) == n
-
-   println("PASS")
-end
-
 function test_residue_gcd()
    print("Residue.gcd...")
  
@@ -299,7 +278,6 @@ function test_residue()
    test_residue_manipulation()
    test_residue_unary_ops()
    test_residue_binary_ops()
-   test_residue_exact_division()
    test_residue_gcd()
    test_residue_adhoc_binary()
    test_residue_comparison()

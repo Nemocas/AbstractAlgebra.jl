@@ -172,9 +172,9 @@ const PariNumberFieldID = Dict{fmpq_poly, Ring}()
 
 type PariNumberField <: Ring{Pari}
    data::Ptr{Int}
-   nf::NfNumberField
+   nf::AnticNumberField
    
-   function PariNumberField(nf::NfNumberField)
+   function PariNumberField(nf::AnticNumberField)
       try
          return PariNumberFieldID[nf.pol]
       catch

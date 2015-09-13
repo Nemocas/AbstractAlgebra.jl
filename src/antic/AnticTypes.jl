@@ -6,13 +6,13 @@
 
 ###############################################################################
 #
-#   NfNumberField / nf_elem
+#   AnticNumberField / nf_elem
 #
 ###############################################################################
 
-const NfNumberFieldID = Dict{Tuple{fmpq_poly, Symbol}, Field}()
+const AnticNumberFieldID = Dict{Tuple{fmpq_poly, Symbol}, Field}()
 
-type NfNumberField <: Field{Antic}
+type AnticNumberField <: Field{Antic}
    pol_coeffs::Ptr{Void}
    pol_den::Int
    pol_alloc::Int
@@ -31,15 +31,15 @@ type NfNumberField <: Field{Antic}
    S::Symbol
    auxilliary_data::Array{Any, 1}
 
-   function NfNumberField(pol::fmpq_poly, s::Symbol)
+   function AnticNumberField(pol::fmpq_poly, s::Symbol)
       try
-         return NfNumberFieldID[pol, s]
+         return AnticNumberFieldID[pol, s]
       catch
-         nf = NfNumberFieldID[pol, s] = new()
+         nf = AnticNumberFieldID[pol, s] = new()
          nf.pol = pol
          ccall((:nf_init, :libflint), Void, 
-            (Ptr{NfNumberField}, Ptr{fmpq_poly}), &nf, &pol)
-         finalizer(nf, _NfNumberField_clear_fn)
+            (Ptr{AnticNumberField}, Ptr{fmpq_poly}), &nf, &pol)
+         finalizer(nf, _AnticNumberField_clear_fn)
          nf.S = s
          nf.auxilliary_data = Array(Any, 5)
          return nf
@@ -47,8 +47,8 @@ type NfNumberField <: Field{Antic}
    end
 end
 
-function _NfNumberField_clear_fn(a::NfNumberField)
-   ccall((:nf_clear, :libflint), Void, (Ptr{NfNumberField},), &a)
+function _AnticNumberField_clear_fn(a::AnticNumberField)
+   ccall((:nf_clear, :libflint), Void, (Ptr{AnticNumberField},), &a)
 end
 
 type nf_elem <: NumberFieldElem
@@ -56,23 +56,23 @@ type nf_elem <: NumberFieldElem
    elem_den::Int
    elem_alloc::Int
    elem_length::Int
-   parent::NfNumberField
+   parent::AnticNumberField
 
-   function nf_elem(p::NfNumberField)
+   function nf_elem(p::AnticNumberField)
       r = new()
       ccall((:nf_elem_init, :libflint), Void, 
-            (Ptr{nf_elem}, Ptr{NfNumberField}), &r, &p)
+            (Ptr{nf_elem}, Ptr{AnticNumberField}), &r, &p)
       r.parent = p
       finalizer(r, _nf_elem_clear_fn)
       return r
    end
 
-   function nf_elem(p::NfNumberField, a::nf_elem)
+   function nf_elem(p::AnticNumberField, a::nf_elem)
       r = new()
       ccall((:nf_elem_init, :libflint), Void, 
-            (Ptr{nf_elem}, Ptr{NfNumberField}), &r, &p)
+            (Ptr{nf_elem}, Ptr{AnticNumberField}), &r, &p)
       ccall((:nf_elem_set, :libflint), Void,
-            (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{NfNumberField}), &r, &a, &p)
+            (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}), &r, &a, &p)
       r.parent = p
       finalizer(r, _nf_elem_clear_fn)
       return r
@@ -81,5 +81,5 @@ end
 
 function _nf_elem_clear_fn(a::nf_elem)
    ccall((:nf_elem_clear, :libflint), Void, 
-         (Ptr{nf_elem}, Ptr{NfNumberField}), &a, &a.parent)
+         (Ptr{nf_elem}, Ptr{AnticNumberField}), &a, &a.parent)
 end

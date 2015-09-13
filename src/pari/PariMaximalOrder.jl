@@ -113,6 +113,6 @@ end
 #
 ###############################################################################
 
-function PariMaximalOrder(nf::NfNumberField)
+function PariMaximalOrder(nf::AnticNumberField)
    return PariMaximalOrder(PariNumberField(nf))
 end

@@ -9360,4 +9360,466 @@ d = log(R(1))
 f = teichmuller(b) 
 \end{lstlisting}
 
+\section{Antic fields}
+
+Antic is a library for number fields, built on top of Flint. For now it provides us
+with number field arithmetic.
+
+\subsection{Antic number fields $\Q[x]/(f)$: \code|nf_elem|}
+
+Number fields in Antic are represented by an irreducible polynomial $f$ over $\Q$,
+with special code to deal with the case where $f$ happens to be defined over $\Z$
+and monic.
+
+Antic has a type \code{nf_elem} for elements of a number field.
+
+In Nemo the parent object of a number field has type \code{AnticNumberField} which
+belongs to the \code{Field} type class. Elements of a number field are of type
+\code{nf_elem} which belongs to the \code{NumberFieldElem} type class, which belongs
+to code{FieldElem}.
+
+The user need not deal with the types directly since we provide a function
+\code{AnticNumberField} to create parent objects for number fields and we also
+provide various constructors to create elements of a number field.
+
+By default, the global variable \code{NumberField} is set equal to
+\code{AnticNumberField} which means that the following code can be used to
+create number field objects in Nemo.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+\end{lstlisting}
+
+Here, $x^3 + 3x + 1$ is the irreducible polynomial over $\Q$ giving the minimum
+polynomial of the generator $a$ of the number field $K$ (though it need not be
+a monic polynomial).
+
+\subsubsection{Constructors}
+
+Various constructors are provided to create elements of a number field in Nemo.
+In the constructors below we assume that $K$ is the parent object of a number field,
+for example created by the construction above.
+
+\begin{lstlisting}
+K()
+\end{lstlisting}
+
+\desc{Create the element $0$ of the number field.}
+
+\begin{lstlisting}
+K(a::Int)
+K(a::fmpz)
+K(a::fmpq)
+\end{lstlisting}
+
+\desc{Create the element of the number field represented by the degree $0$
+polynomial with constant coefficient $a$.}
+
+\begin{lstlisting}
+K(g::fmpq_poly)
+\end{lstlisting}
+
+\desc{Create the element of the number field represented by the polynomial
+$g$. The polynomial is first reduced modulo the defining polynomial $f$ of
+the number field, thus they must both belong to the same polynomial ring.}
+
+\begin{lstlisting}
+K(d::nf_elem)
+\end{lstlisting}
+
+\desc{Return a reference to the number field element $d$. No copy is made
+of the data.}
+
+\textbf{Examples.}
+
+Here are some examples of constructors.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+
+k = K()
+l = K(123)
+m = K(fmpz(12))
+n = K(x^2 + 2x - 7)
+p = K(n)
+\end{lstlisting}
+
+\subsubsection{Conversions}
+
+If $R$ is the parent object of the polynomial ring to which the defining
+polynomial $f$ of the number field belongs, we can coerce the polynomial
+representation $g$ of a number field element $d$ into the polynomial ring
+defined by $R$. This allows us to retrieve the polynomial representation
+of number field elements as a polynomial.
+
+\begin{lstlisting}
+R(d::nf_elem)
+\end{lstlisting}
+
+\desc{Return the polynomial representation of the number field element $d$
+in the polynomial ring $R$ which was used to define the number field.}
+
+\textbf{Examples.}
+
+Here is an example of a conversion.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+
+k = K(x^2 + 2x - 7)
+l = R(k)
+\end{lstlisting}
+
+\subsubsection{Basic manipulation}
+
+\begin{lstlisting}
+zero(R::AnticNumberField)
+\end{lstlisting}
+
+\desc{Return the element $0$ of the number field with parent object $R$.}
+
+\begin{lstlisting}
+one(R::AnticNumberField)
+\end{lstlisting}
+
+\desc{Return the element $1$ of the number field with parent object $R$.}
+
+\begin{lstlisting}
+gen(R::AnticNumberField)
+\end{lstlisting}
+
+\desc{Return the generator of the number field with parent object $R$.}
+
+\begin{lstlisting}
+degree(R::AnticNumberField)
+\end{lstlisting}
+
+\desc{Return the degree of the number field.}
+
+\begin{lstlisting}
+iszero(d::nf_elem)
+\end{lstlisting}
+
+\desc{Return \code{true} if the given element $d$ is equal to $0$, else return
+\code{false}.}
+
+\begin{lstlisting}
+isone(d::nf_elem)
+\end{lstlisting}
+
+\desc{Return \code{true} if the given element $d$ is equal to $1$, else return
+\code{false}.}
+
+\begin{lstlisting}
+isgen(d::nf_elem)
+\end{lstlisting}
+
+\desc{Return \code{true} if the given element $d$ is the generator of the
+number field it belongs to, else return \code{false}.}
+
+\begin{lstlisting}
+coeff(d::nf_elem, n::int)
+\end{lstlisting}
+
+\desc{Return the coefficient of degree $n$ of the polynomial representation
+of the number field element $d$. If $n < 0$ we throw a \code{DomainError()}.
+If $n$ is bigger than the degree of the element $d$ we return $0$.}
+
+\begin{lstlisting}
+deepcopy(d::nf_elem)
+\end{lstlisting}
+
+\desc{Return a new number field element arithmetically equal to $d$.}
+
+\textbf{Examples.}
+
+Here are some examples of basic manipulation.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+
+d = a^2 + 2a - 7
+
+k = zero(K)
+l = one(K)
+m = gen(K)
+n = deepcopy(d)
+p = coeff(d, 1)
+isgen(m) == true
+isone(l) == true
+q = degree(K)
+\end{lstlisting}
+
+\subsubsection{Unary operators}
+
+\begin{lstlisting}
+-(d::nf_elem)
+\end{lstlisting}
+
+\desc{Return $-d$.}
+
+\textbf{Examples.}
+
+Here is an example of unary operators.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+
+d = a^2 + 2a - 7
+
+f = -d
+\end{lstlisting}
+
+\subsubsection{Binary operators}
+
+\begin{lstlisting}
++(c::nf_elem, d::nf_elem)
+\end{lstlisting}
+
+\desc{Return $c + d$.}
+
+\begin{lstlisting}
+-(c::nf_elem, d::nf_elem)
+\end{lstlisting}
+
+\desc{Return $c - d$.}
+
+\begin{lstlisting}
+*(c::nf_elem, d::nf_elem)
+\end{lstlisting}
+
+\desc{Return $cd$.}
+
+\textbf{Examples.}
+
+Here are some examples of binary operators.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+
+c = a^2 + 2a - 7
+d = 3a^2 - a + 1
+
+f = c + d
+g = c - d
+h = c*d
+\end{lstlisting}
+
+\subsubsection{Ad hoc binary operators}
+
+\begin{lstlisting}
++(c::nf_elem, d::Int)
++(c::nf_elem, d::fmpz)
++(c::nf_elem, d::fmpq)
+\end{lstlisting}
+
+\desc{Return $c + d$ where $d$ is coerced into the number field.}
+
+\begin{lstlisting}
++(c::Int, d::nf_elem)
++(c::fmpz, d::nf_elem)
++(c::fmpq, d::nf_elem)
+\end{lstlisting}
+
+\desc{Return $c + d$ where $c$ is coerced into the number field.}
+
+\begin{lstlisting}
+-(c::nf_elem, d::Int)
+-(c::nf_elem, d::fmpz)
+-(c::nf_elem, d::fmpq)
+\end{lstlisting}
+
+\desc{Return $c - d$ where $d$ is coerced into the number field.}
+
+\begin{lstlisting}
+-(c::Int, d::nf_elem)
+-(c::fmpz, d::nf_elem)
+-(c::fmpq, d::nf_elem)
+\end{lstlisting}
+
+\desc{Return $c - d$ where $c$ is coerced into the number field.}
+
+\begin{lstlisting}
+*(c::nf_elem, d::Int)
+*(c::nf_elem, d::fmpz)
+*(c::nf_elem, d::fmpq)
+\end{lstlisting}
+
+\desc{Return $cd$ where $d$ is coerced into the number field.}
+
+\begin{lstlisting}
+*(c::Int, d::nf_elem)
+*(c::fmpz, d::nf_elem)
+*(c::fmpq, d::nf_elem)
+\end{lstlisting}
+
+\desc{Return $cd$ where $c$ is coerced into the number field.}
+
+\textbf{Examples.}
+
+Here is an example of ad hoc binary operators.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+
+d = a^2 + 2a - 7
+
+f = d + 21
+g = fmpz(3) + d
+h = d - fmpq(2, 3)
+k = fmpq(2, 7)*d
+l = d*fmpz(5)
+\end{lstlisting}
+
+\subsubsection{Powering}
+
+\begin{lstlisting}
+^(d::nf_elem, n::Int)
+\end{lstlisting}
+
+\desc{Return $d^n$.}
+
+\textbf{Examples.}
+
+Here are some examples of powering.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+
+d = a^2 + 2a - 7
+
+f = d^5
+g = d^(-2)
+h = d^0
+\end{lstlisting}
+
+\subsubsection{Comparison}
+
+\begin{lstlisting}
+==(c::nf_elem, d::nf_elem)
+\end{lstlisting}
+
+\desc{Return \code{true} if $c$ is equal to $d$ in the number field.}
+
+\textbf{Examples.}
+
+Here are some examples of comparison.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+
+c = 3a^2 - a + 1
+d = a^2 + 2a - 7
+
+c != d
+c == 3a^2 - a + 1
+\end{lstlisting}
+
+\subsubsection{Inversion}
+
+\begin{lstlisting}
+inv(c::nf_elem)
+\end{lstlisting}
+
+\desc{Return the multiplicative inverse of $c$ in the number field. If $c = 0$
+we throw a \code{DivideError()}.}
+
+\textbf{Examples.}
+
+Here is an example of inversion.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+
+c = 3a^2 - a + 1
+
+c*inv(c) == 1
+\end{lstlisting}
+
+\subsubsection{Exact division}
+
+\begin{lstlisting}
+divexact(c::nf_elem, d::nf_elem)
+\end{lstlisting}
+
+\desc{Return $c$ times the inverse of $d$ in the number field. If $d = 0$ we
+throw a \code{DivideError()}.}
+
+\textbf{Examples.}
+
+Here are some examples of exact division.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+
+c = 3a^2 - a + 1
+d = a^2 + 2a - 7
+
+divexact(c, d) == c*inv(d)
+\end{lstlisting}
+
+\subsubsection{Ad hoc exact division}
+
+\begin{lstlisting}
+divexact(c::nf_elem, d::Int)
+divexact(c::nf_elem, d::fmpz)
+divexact(c::nf_elem, d::fmpq)
+\end{lstlisting}
+
+\desc{Return $c$ divided by $d$ in the number field. If $d = 0$ we
+throw a \code{DivideError()}.}
+
+\textbf{Examples.}
+
+Here are some examples of ad hoc exact division.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+
+c = 3a^2 - a + 1
+
+divexact(7c, 7) == c
+divexact(fmpq(2, 3)*c, fmpq(2, 3)) == c
+\end{lstlisting}
+
+\subsubsection{Norm and trace}
+
+\begin{lstlisting}
+norm(c::nf_elem)
+\end{lstlisting}
+
+\desc{Return the norm of the given number field element $c$ as an \code{fmpq}.}
+
+\begin{lstlisting}
+trace(c::nf_elem)
+\end{lstlisting}
+
+\desc{Return the trace of the given number field element $c$ as an \code{fmpq}.}
+
+\textbf{Examples.}
+
+Here are some examples of norm and trace.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+
+c = 3a^2 - a + 1
+
+norm(c)
+trace(c)
+\end{lstlisting}
+
 \end{document}
