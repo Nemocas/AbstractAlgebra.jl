@@ -24,11 +24,19 @@ macro _noinline_meta()
     Expr(:meta, :noinline)
 end
 
-_checkbounds(sz, i::Int) = 1 <= i <= sz
+function checkbounds{T}(A::AbstractArray{T, 2}, I::Int, J::Int)
+  @_inline_meta
+  (checkbounds(size(A, 1), I) && checkbounds(size(A, 2), J)) || (@_noinline_meta; throw(BoundsError(A, I)))
+end
+
+function checkbounds(A::AbstractArray, I::Int, J::Int)
+  @_inline_meta
+  (checkbounds(size(A, 1), I) && checkbounds(size(A, 2), J)) || (@_noinline_meta; throw(BoundsError(A, I)))
+end
 
 function checkbounds(A, I::Int, J::Int)
   @_inline_meta
-  (_checkbounds(size(A,1), I) && _checkbounds(size(A,2), J)) || (@_noinline_meta; throw(BoundsError(A, I)))
+  (checkbounds(size(A, 1), I) && checkbounds(size(A, 2), J)) || (@_noinline_meta; throw(BoundsError(A, I)))
 end
 
 function check_parent(x::nmod_mat, y::nmod_mat)
