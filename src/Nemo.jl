@@ -1,14 +1,14 @@
 module Nemo
 
-import Base: abs, asin, asinh, atan, atanh, base, bin, call, convert, cmp, 
-             cos, cosh, dec, deepcopy, den, deserialize, div, divrem, exp,
-             factor, gcd, gcdx, getindex, hash, hex, inv, invmod, isequal,
-             isless, isprime, isqrt, lcm, length, log, lufact, mod, ndigits,
-             nextpow2, norm, nullspace, num, oct, one, parent, parseint,
-             precision, prevpow2, promote_rule, rank, Rational, rem, reverse,
-             serialize, setindex!, show, sign, sin, sinh, size, sqrt, string,
-             sub, tan, tanh, trace, trailing_zeros, transpose, transpose!,
-             truncate, var, zero
+import Base: abs, asin, asinh, atan, atanh, base, bin, call, checkbounds,
+             convert, cmp, cos, cosh, dec, deepcopy, den, deserialize, div,
+             divrem, exp, factor, gcd, gcdx, getindex, hash, hex, inv, invmod,
+             isequal, isless, isprime, isqrt, lcm, length, log, lufact, mod,
+             ndigits, nextpow2, norm, nullspace, num, oct, one, parent,
+             parseint, precision, prevpow2, promote_rule, rank, Rational, rem,
+             reverse, serialize, setindex!, show, sign, sin, sinh, size, sqrt,
+             string, sub, tan, tanh, trace, trailing_zeros, transpose,
+             transpose!, truncate, var, zero
 
 export Collection, Ring, Field, CollectionElem, RingElem, FieldElem, Pari,
        Flint, Antic, Generic
@@ -17,7 +17,7 @@ export PolyElem, SeriesElem, ResidueElem, FractionElem, MatElem,
        NumberFieldElem
 
 export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
-       MaximalRealSubfield, MaximalOrder
+       MaximalRealSubfield, MaximalOrder, Ideal
 
 export create_accessors, get_handle, package_handle
 
@@ -142,11 +142,12 @@ MaximalRealSubfield = AnticMaximalRealSubfield
 
 ###############################################################################
 #
-#   Set domain for MaximalOrder to Pari
+#   Set domain for MaximalOrder and Ideal to Pari
 #
 ###############################################################################
 
 MaximalOrder = PariMaximalOrder
+Ideal = PariIdeal
 
 ###############################################################################
 #

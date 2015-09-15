@@ -5,7 +5,7 @@
 ###############################################################################
 
 export approx, coprime_multiplier, intersect, bounded_ideals, numden, 
-       prime_decomposition, LLL_reduce, valuation, factor, factor_mul, ideal,
+       prime_decomposition, LLL_reduce, valuation, factor, factor_mul,
        PariIdealCollection, PariIdeal
 
 ###############################################################################
@@ -318,7 +318,7 @@ end
 #
 ###############################################################################
 
-function ideal(ord::PariMaximalOrder, b::fmpq_poly, args::fmpq_poly...)
+function PariIdeal(ord::PariMaximalOrder, b::fmpq_poly, args::fmpq_poly...)
    ord.pari_nf.nf.pol.parent != parent(b) && error("Incompatible maximal order and polynomial")
    av = unsafe_load(avma, 1)
    id1 = ccall((:idealhnf, :libpari), Ptr{Int}, 
@@ -333,7 +333,7 @@ function ideal(ord::PariMaximalOrder, b::fmpq_poly, args::fmpq_poly...)
    return PariIdeal(id1, PariIdealCollection(ord))
 end
 
-function ideal(ord::PariMaximalOrder, b::pari_maximal_order_elem, args::pari_maximal_order_elem...)
+function PariIdeal(ord::PariMaximalOrder, b::pari_maximal_order_elem, args::pari_maximal_order_elem...)
    parent(b) != ord && error("Unable to coerce maximal order element")
    av = unsafe_load(avma, 1)
    id1 = ccall((:idealhnf, :libpari), Ptr{Int}, 
@@ -349,7 +349,7 @@ function ideal(ord::PariMaximalOrder, b::pari_maximal_order_elem, args::pari_max
    return PariIdeal(id1, PariIdealCollection(ord))
 end
 
-function ideal(ord::PariMaximalOrder, b::nf_elem, args::nf_elem...)
+function PariIdeal(ord::PariMaximalOrder, b::nf_elem, args::nf_elem...)
    ord.pari_nf.nf != parent(b) && error("Incompatible maximal order and number field element")
    av = unsafe_load(avma, 1)
    par = b.parent.pol.parent
@@ -365,7 +365,7 @@ function ideal(ord::PariMaximalOrder, b::nf_elem, args::nf_elem...)
    return PariIdeal(id1, PariIdealCollection(ord))
 end
 
-function ideal(ord::PariMaximalOrder, b::fmpz, args::fmpz...)
+function PariIdeal(ord::PariMaximalOrder, b::fmpz, args::fmpz...)
    av = unsafe_load(avma, 1)
    id1 = ccall((:idealhnf, :libpari), Ptr{Int}, 
                  (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(b).d)
@@ -379,7 +379,7 @@ function ideal(ord::PariMaximalOrder, b::fmpz, args::fmpz...)
    return PariIdeal(id1, PariIdealCollection(ord))
 end
 
-function ideal(ord::PariMaximalOrder, b::Integer, args::Integer...)
+function PariIdeal(ord::PariMaximalOrder, b::Integer, args::Integer...)
    av = unsafe_load(avma, 1)
    id1 = ccall((:idealhnf, :libpari), Ptr{Int}, 
                  (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(fmpz(b)).d)

@@ -20,6 +20,7 @@ include("flint/nmod_mat-test.jl")
 include("flint/fmpz_mat-test.jl")
 
 include("pari/pari_maximal_order_elem-test.jl")
+include("pari/PariIdeal-test.jl")
 
 include("generic/Poly-test.jl")
 include("generic/Residue-test.jl")
@@ -43,6 +44,7 @@ function test_rings()
    test_fq_nmod_series()
 
    test_pari_maximal_order_elem()
+   test_PariIdeal()
 
    test_poly()
    test_residue()
