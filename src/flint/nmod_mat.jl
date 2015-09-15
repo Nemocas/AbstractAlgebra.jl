@@ -15,28 +15,12 @@ export nmod_mat, NmodMatSpace, getindex, setindex!, set_entry!, deepcopy, rows,
 #
 ################################################################################
 
-### the following bounds-checking is due to julia/base/abstractarray.jl
-macro _inline_meta()
-    Expr(:meta, :inline)
+function _checkbounds(I::Int, J::Int)
+   J >= 1 && J <= I
 end
 
-macro _noinline_meta()
-    Expr(:meta, :noinline)
-end
-
-function checkbounds{T}(A::AbstractArray{T, 2}, I::Int, J::Int)
-  @_inline_meta
-  (checkbounds(size(A, 1), I) && checkbounds(size(A, 2), J)) || (@_noinline_meta; throw(BoundsError(A, I)))
-end
-
-function checkbounds(A::AbstractArray, I::Int, J::Int)
-  @_inline_meta
-  (checkbounds(size(A, 1), I) && checkbounds(size(A, 2), J)) || (@_noinline_meta; throw(BoundsError(A, I)))
-end
-
-function checkbounds(A, I::Int, J::Int)
-  @_inline_meta
-  (checkbounds(size(A, 1), I) && checkbounds(size(A, 2), J)) || (@_noinline_meta; throw(BoundsError(A, I)))
+function _checkbounds(A, I::Int, J::Int)
+  (_checkbounds(size(A, 1), I) && _checkbounds(size(A, 2), J)) || (throw(BoundsError(A, I)))
 end
 
 function check_parent(x::nmod_mat, y::nmod_mat)
@@ -59,24 +43,24 @@ issquare(a::nmod_mat) = (rows(a) == cols(a))
 ################################################################################
 
 function getindex(a::nmod_mat, i::Int, j::Int)
-  checkbounds(a, i, j)
+  _checkbounds(a, i, j)
   u = ccall((:nmod_mat_get_entry, :libflint), UInt,
               (Ptr{nmod_mat}, Int, Int), &a, i - 1 , j - 1)
   return base_ring(a)(u)
 end
 
 function setindex!(a::nmod_mat, u::UInt, i::Int, j::Int)
-  checkbounds(a, i, j)
+  _checkbounds(a, i, j)
   set_entry!(a, i, j, u)
 end
 
 function setindex!(a::nmod_mat, u::fmpz, i::Int, j::Int)
-  checkbounds(a, i, j)
+  _checkbounds(a, i, j)
   set_entry!(a, i, j, u)
 end
 
 function setindex!(a::nmod_mat, u::Residue{fmpz}, i::Int, j::Int)
-  checkbounds(a, i, j)
+  _checkbounds(a, i, j)
   (base_ring(a) != parent(u)) && error("Parent objects must coincide") 
   set_entry!(a, i, j, u)
 end
@@ -439,8 +423,8 @@ end
 ################################################################################
 
 function window(x::nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int)
-  checkbounds(x, r1, c1)
-  checkbounds(x, r2, c2)
+  _checkbounds(x, r1, c1)
+  _checkbounds(x, r2, c2)
   (r1 > r2 || c1 > c2) && error("Invalid parameters")
   temp = MatrixSpace(parent(x).base_ring, r2 - r1 + 1, c2 - c1 + 1)()
   ccall((:nmod_mat_window_init, :libflint), Void,

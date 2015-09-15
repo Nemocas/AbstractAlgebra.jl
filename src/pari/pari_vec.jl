@@ -13,7 +13,7 @@ export PariVector, pari_vec
 ###############################################################################
 
 function getindex(a::pari_vec, n::Int)
-   checkbounds(length(a), n)
+   _checkbounds(length(a), n) || throw(BoundsError())
    a.parent.base_ring(reinterpret(Ptr{Int}, 
                       unsafe_load(a.data + n*sizeof(Int))))
 end

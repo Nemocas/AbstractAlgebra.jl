@@ -8,7 +8,8 @@ import Base: abs, asin, asinh, atan, atanh, base, bin, call, checkbounds,
              parseint, precision, prevpow2, promote_rule, rank, Rational, rem,
              reverse, serialize, setindex!, show, sign, sin, sinh, size, sqrt,
              string, sub, tan, tanh, trace, trailing_zeros, transpose,
-             transpose!, truncate, var, zero
+             transpose!, truncate, var, zero, +, -, *, ==, ^, &, |, $, <<,
+             >>, ~, <=, >=, <, >, hcat, vcat, //
 
 export Collection, Ring, Field, CollectionElem, RingElem, FieldElem, Pari,
        Flint, Antic, Generic
@@ -38,7 +39,7 @@ if on_windows
    push!(Libdl.DL_LOAD_PATH, "$pkgdir\\local\\lib")
 else
    try
-      if "HOSTNAME" in ENV && ENV["HOSTNAME"] == "juliabox"
+      if "HOSTNAME" in keys(ENV) && ENV["HOSTNAME"] == "juliabox"
          push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
       elseif on_linux
          push!(Libdl.DL_LOAD_PATH, "$pkgdir/local/lib")
