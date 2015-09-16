@@ -415,13 +415,7 @@ end
 function add!(a::nf_elem, b::nf_elem, c::nf_elem)
    ccall((:nf_elem_add, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
-         &c, &a, &b, &a.parent)
-end
-
-function mul!(a::nf_elem, b::nf_elem, c::nf_elem)
-   ccall((:nf_elem_mul, :libflint), Void,
-         (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
-         &c, &a, &b, &a.parent)
+         &a, &b, &c, &a.parent)
 end
 
 ###############################################################################
