@@ -425,7 +425,7 @@ function add!(a::nf_elem, b::nf_elem, c::nf_elem)
 end
 
 function reduce!(x::nf_elem)
-   ccall((:nf_elem_reduce, :libflint), Void, 
+   ccall((:nf_elem_canonicalise, :libflint), Void, 
          (Ptr{nf_elem}, Ptr{AnticNumberField}), &x, &parent(x))
 end
 
