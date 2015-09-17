@@ -533,7 +533,7 @@ function *(a::Poly{nf_elem}, b::Poly{nf_elem})
    t = base_ring(a)()
 
    lenz = lena + lenb - 1
-   d = Array(T, lenz)
+   d = Array(nf_elem, lenz)
    
    for i = 1:lena
       d[i] = base_ring(a)()
