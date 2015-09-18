@@ -1,3 +1,5 @@
+VERSION >= v"0.4.0-dev+6521" && __precompile__()
+
 module Nemo
 
 import Base: abs, asin, asinh, atan, atanh, base, bin, call, checkbounds,
@@ -23,38 +25,6 @@ export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
 export create_accessors, get_handle, package_handle
 
 include("AbstractTypes.jl")
-
-###############################################################################
-#
-#   Set up environment / load libraries
-#
-###############################################################################
-
-pkgdir = Pkg.dir("Nemo")
-
-on_windows = @windows ? true : false
-on_linux = @linux ? true : false
-
-if on_windows
-   push!(Libdl.DL_LOAD_PATH, "$pkgdir\\local\\lib")
-else
-   try
-      if "HOSTNAME" in keys(ENV) && ENV["HOSTNAME"] == "juliabox"
-         push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
-      elseif on_linux
-         push!(Libdl.DL_LOAD_PATH, "$pkgdir/local/lib")
-         Libdl.dlopen("$pkgdir/local/lib/libgmp")
-         Libdl.dlopen("$pkgdir/local/lib/libmpfr")
-         Libdl.dlopen("$pkgdir/local/lib/libflint")
-      else
-         push!(Libdl.DL_LOAD_PATH, "$pkgdir/local/lib")
-      end
-   catch
-      push!(Libdl.DL_LOAD_PATH, "$pkgdir/local/lib")
-   end
-end
-
-ccall((:pari_init, :libpari), Void, (Int, Int), 3000000000, 10000)
 
 ###############################################################################
 #
@@ -108,11 +78,44 @@ end
 
 ###############################################################################
 #
-#   Library initialisation message
+#   Library initialisation
 #
 ###############################################################################
 
 function __init__()
+
+   pkgdir = Pkg.dir("Nemo")
+
+   on_windows = @windows ? true : false
+   on_linux = @linux ? true : false
+
+   if on_windows
+      push!(Libdl.DL_LOAD_PATH, "$pkgdir\\local\\lib")
+   else
+      try
+         if "HOSTNAME" in keys(ENV) && ENV["HOSTNAME"] == "juliabox"
+            push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
+         elseif on_linux
+            push!(Libdl.DL_LOAD_PATH, "$pkgdir/local/lib")
+            Libdl.dlopen("$pkgdir/local/lib/libgmp")
+            Libdl.dlopen("$pkgdir/local/lib/libmpfr")
+            Libdl.dlopen("$pkgdir/local/lib/libflint")
+         else
+            push!(Libdl.DL_LOAD_PATH, "$pkgdir/local/lib")
+         end
+      catch
+         push!(Libdl.DL_LOAD_PATH, "$pkgdir/local/lib")
+      end
+   end
+
+   ccall((:pari_init, :libpari), Void, (Csize_t, Culong), 2000000000, 0x10000)
+   
+   global avma = cglobal((:avma, :libpari), Ptr{Ptr{Int}})
+
+   global const gen_0 = cglobal((:gen_0, :libpari), Ptr{Ptr{Int}})
+
+   global const gen_1 = cglobal((:gen_1, :libpari), Ptr{Ptr{Int}})
+
    println("")
    println("Welcome to Nemo version 0.2")
    println("")
