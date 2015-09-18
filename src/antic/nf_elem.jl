@@ -521,6 +521,41 @@ mul!(c::nf_elem, a::nf_elem, b::Integer) = mul!(c, a, fmpz(b))
 #
 ###############################################################################
 
+function sqr(a::Poly{nf_elem})
+   lena = length(a)
+   
+   t = base_ring(a)()
+
+   lenz = 2*lena - 1
+   d = Array(nf_elem, lenz)
+   
+   for i = 1:lena - 1
+      d[2i - 1] = base_ring(a)()
+      d[2i] = base_ring(a)()
+      mul_red!(d[2i - 1], coeff(a, i - 1), coeff(a, i - 1), false)
+   end
+   d[2*lena - 1] = base_ring(a)()
+   mul_red!(d[2*lena - 1], coeff(a, lena - 1), coeff(a, lena - 1), false)
+
+   for i = 1:lena
+      for j = i + 1:lena
+         mul_red!(t, coeff(a, i - 1), coeff(a, j - 1), false)
+         addeq!(d[i + j - 1], t)
+         addeq!(d[i + j - 1], t)
+      end
+   end
+   
+   for i = 1:lenz
+      reduce!(d[i])
+   end
+
+   z = parent(a)(d)
+        
+   set_length!(z, normalise(z, lenz))
+
+   return z
+end
+
 function *(a::Poly{nf_elem}, b::Poly{nf_elem})
    check_parent(a, b)
    lena = length(a)
@@ -528,6 +563,14 @@ function *(a::Poly{nf_elem}, b::Poly{nf_elem})
 
    if lena == 0 || lenb == 0
       return parent(a)()
+   end
+
+   if min(lena, lenb) > 10 # karatsuba crossover
+      return mul_karatsuba(a, b)
+   end
+
+   if a == b
+       return sqr(a)
    end
 
    t = base_ring(a)()
