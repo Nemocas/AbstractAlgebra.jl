@@ -131,15 +131,3 @@ function pari_print(io::IO, a::Ptr{Int})
    print(io, bytestring(cstr))
    ccall((:pari_free, :libpari), Void, (Ptr{Uint8},), cstr)
 end
-   
-###############################################################################
-#
-#   Pari globals
-#
-###############################################################################
-
-avma = cglobal((:avma, :libpari), Ptr{Ptr{Int}})
-
-const gen_0 = cglobal((:gen_0, :libpari), Ptr{Ptr{Int}})
-
-const gen_1 = cglobal((:gen_1, :libpari), Ptr{Ptr{Int}})

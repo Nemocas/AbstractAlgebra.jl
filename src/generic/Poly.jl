@@ -253,6 +253,35 @@ function -{T <: RingElem}(a::Poly{T}, b::Poly{T})
    return z
 end
 
+function mul_karatsuba{T <: RingElem}(a::Poly{T}, b::Poly{T})
+   # we assume len(a) != 0 != lenb and parent(a) == parent(b)
+
+   lena = length(a)
+   lenb = length(b)
+
+   m = div(max(lena, lenb), 2)
+
+   if m < lena
+      a1 = shift_right(a, m)
+      a0 = truncate(a, m)
+   else
+      return a*truncate(b, m) + shift_left(a*shift_right(b, m), m)
+   end
+
+   if m < lenb
+      b1 = shift_right(b, m)
+      b0 = truncate(b, m)
+   else
+      return b*truncate(a, m) + shift_left(b*shift_right(a, m), m)
+   end
+
+   z0 = a0*b0
+   z2 = a1*b1
+   z1 = (a1 + a0)*(b1 + b0) - z2 - z0
+
+   return z0 + shift_left(z1, m) + shift_left(z2, 2*m)
+end
+
 function *{T <: RingElem}(a::Poly{T}, b::Poly{T})
    check_parent(a, b)
    lena = length(a)
@@ -260,6 +289,10 @@ function *{T <: RingElem}(a::Poly{T}, b::Poly{T})
 
    if lena == 0 || lenb == 0
       return parent(a)()
+   end
+
+   if min(lena, lenb) > 40 # karatsuba crossover
+      return mul_karatsuba(a, b)
    end
 
    t = base_ring(a)()
