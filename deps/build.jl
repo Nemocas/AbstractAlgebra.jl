@@ -25,11 +25,11 @@ end
 cd(wdir)
 
 f = open("../deps/deps.jl", "w")
-write(f, "const libdir = \"$pkgdir/local/lib\"")
-write(f, "const libgmp = \"$pkgdir/local/lib/libgmp\"")
-write(f, "const libmpfr = \"$pkgdir/local/lib/libmpfr\"")
-write(f, "const libflint = \"$pkgdir/local/lib/libflint\"")
-write(f, "const libpari = \"$pkgdir/local/lib/libpari\"")
+write(f, "const libdir = \"$pkgdir/local/lib\"\n")
+write(f, "const libgmp = \"$pkgdir/local/lib/libgmp\"\n")
+write(f, "const libmpfr = \"$pkgdir/local/lib/libmpfr\"\n")
+write(f, "const libflint = \"$pkgdir/local/lib/libflint\"\n")
+write(f, "const libpari = \"$pkgdir/local/lib/libpari\"\n")
 close(f)
 
 if on_windows
