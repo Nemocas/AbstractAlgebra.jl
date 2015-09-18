@@ -24,6 +24,14 @@ end
 
 cd(wdir)
 
+f = open("../deps/deps.jl", "w")
+write(f, "const libdir = \"$pkgdir/local/lib\"")
+write(f, "const libgmp = \"$pkgdir/local/lib/libgmp\"")
+write(f, "const libmpfr = \"$pkgdir/local/lib/libmpfr\"")
+write(f, "const libflint = \"$pkgdir/local/lib/libflint\"")
+write(f, "const libpari = \"$pkgdir/local/lib/libpari\"")
+close(f)
+
 if on_windows
    oldpth = ENV["PATH"]
    pth = split(oldpth, ";")
@@ -173,6 +181,7 @@ else
    cd("$wdir/pari")
    env_copy = copy(ENV)
    env_copy["LD_LIBRARY_PATH"] = "$vdir/lib"
+   env_copy["CFLAGS"] = "-Wl,-rpath,$vdir/lib"
    config_str = `./Configure --prefix=$vdir --with-gmp=$vdir --mt=pthread`
    config_str = setenv(config_str, env_copy)
    run(config_str)

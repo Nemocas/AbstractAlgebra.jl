@@ -131,4 +131,3 @@ function pari_print(io::IO, a::Ptr{Int})
    print(io, bytestring(cstr))
    ccall((:pari_free, :libpari), Void, (Ptr{Uint8},), cstr)
 end
-   
