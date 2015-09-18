@@ -36,7 +36,13 @@ pkgdir = Pkg.dir("Nemo")
 
 cd("$pkgdir/deps")
 
-include("../deps/deps.jl")
+on_windows = @windows ? true : false
+
+if on_windows
+   include(realpath("..\\deps\\deps.jl"))
+else
+   include("../deps/deps.jl")
+end
 
 function __init__()
 
