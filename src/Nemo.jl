@@ -32,17 +32,12 @@ include("AbstractTypes.jl")
 #
 ###############################################################################
 
-pkgdir = Pkg.dir("Nemo")
-
-cd("$pkgdir/deps")
-
-on_windows = @windows ? true : false
-
-if on_windows
-   include(realpath("..\\deps\\deps.jl"))
-else
-   include("../deps/deps.jl")
-end
+const pkgdir = Pkg.dir("Nemo")
+const libdir = Pkg.dir("Nemo", "local", "lib")
+const libgmp = Pkg.dir("Nemo", "local", "lib", "libgmp")
+const libmpfr = Pkg.dir("Nemo", "local", "lib", "libmpfr")
+const libflint = Pkg.dir("Nemo", "local", "lib", "libflint")
+const libpari = Pkg.dir("Nemo", "local", "lib", "libpari")
 
 function __init__()
 

@@ -24,23 +24,6 @@ end
 
 cd(wdir)
 
-f = open("../deps/deps.jl", "w")
-if on_windows
-pd=join(split(pkgdir, "\\"), "\\\\")
-write(f, "const libdir = \"$pd\\\\local\\\\lib\"\n")
-write(f, "const libgmp = \"$pd\\\\local\\\\lib\\\\libgmp\"\n")
-write(f, "const libmpfr = \"$pd\\\\local\\\\lib\\\\libmpfr\"\n")
-write(f, "const libflint = \"$pd\\\\local\\\\lib\\\\libflint\"\n")
-write(f, "const libpari = \"$pd\\\\local\\\\lib\\\\libpari\"\n")
-else
-write(f, "const libdir = \"$pkgdir/local/lib\"\n")
-write(f, "const libgmp = \"$pkgdir/local/lib/libgmp\"\n")
-write(f, "const libmpfr = \"$pkgdir/local/lib/libmpfr\"\n")
-write(f, "const libflint = \"$pkgdir/local/lib/libflint\"\n")
-write(f, "const libpari = \"$pkgdir/local/lib/libpari\"\n")
-end
-close(f)
-
 if on_windows
    oldpth = ENV["PATH"]
    pth = split(oldpth, ";")

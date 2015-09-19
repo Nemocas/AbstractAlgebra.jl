@@ -320,6 +320,10 @@ function *{T <: RingElem}(a::Poly{T}, b::Poly{T})
       return parent(a)()
    end
 
+   if min(lena, lenb) > 30
+      return mul_karatsuba(a, b)
+   end
+
    t = base_ring(a)()
 
    lenz = lena + lenb - 1
