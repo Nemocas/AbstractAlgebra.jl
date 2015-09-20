@@ -14,6 +14,9 @@ link against libgmp.a on Linux.
 General
 -------
 
+* Make Benchmarks test with pearce monaghan and resultant (and other) benchmarks
+in it, instead of throughout the test code.
+
 * replace Culong with UInt and Clong with Int throughout, esp. fmpz.jl
 
 * Implement more generic ad hoc operators so we can remove all the documentation
