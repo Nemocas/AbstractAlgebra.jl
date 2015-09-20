@@ -257,9 +257,9 @@ _pari_ideal_clear_fn(a::PariIdeal) = gunclone(a.ideal)
 type PariFactor{T <: RingElem}
    data::Ptr{Int}
    len::Int
-   parent::Ring
+   parent::Collection
 
-   function PariFactor(p::Ptr{Int}, par::Ring)
+   function PariFactor(p::Ptr{Int}, par::Collection)
       col = reinterpret(Ptr{Int}, unsafe_load(p, 2))
       r = new(gclone(p), lg(col) - 1, par)
       finalizer(r, _PariFactor_unclone)

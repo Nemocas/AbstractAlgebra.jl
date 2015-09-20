@@ -10071,6 +10071,294 @@ a = S[2]
 b = T[97][1]
 \end{lstlisting}
 
+\subsubsection{Basic manipulation}
+
+\begin{lstlisting}
+numden(a::PariIdeal)
+\end{lstlisting}
+
+\desc{Return a pair $(n, d)$ consisting of the numerator and denominator
+of the given ideal (as ideals).}
+
+\begin{lstlisting}
+valuation(a::PariIdeal, p::PariIdeal)
+\end{lstlisting}
+
+\desc{Given a prime ideal $p$ as returned by \code{prime_decomposition}, return
+the valuation of $a$ at $p$.}
+
+\textbf{Examples.}
+
+Here are some examples of basic manipulation.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+O = MaximalOrder(K)
+
+S = Ideal(O, x + 1)
+T = Ideal(O, fmpq(2, 3)*x + 1)
+A = prime_decomposition(O, 3)
+
+valuation(S, A[1])
+(n, d) = numden(T)
+\end{lstlisting}
+
+\subsubsection{Ideal norm}
+
+\begin{lstlisting}
+norm(a::PariIdeal)
+\end{lstlisting}
+
+\desc{Return the norm of the ideal as an \code{fmpz} integer.}
+
+\textbf{Examples.}
+
+Here is an example of ideal norm.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+O = MaximalOrder(K)
+
+S = Ideal(O, x + 1)
+
+a = norm(S)
+\end{lstlisting}
+
+\subsubsection{Binary operators}
+
+\begin{lstlisting}
++(a::PariIdeal, b::PariIdeal)
+\end{lstlisting}
+
+\desc{Return the sum of the given ideals.}
+
+\begin{lstlisting}
+*(a::PariIdeal, b::PariIdeal)
+\end{lstlisting}
+
+\desc{Return the product of the given ideals.}
+
+\begin{lstlisting}
+intersect(a::PariIdeal, b::PariIdeal)
+\end{lstlisting}
+
+\desc{Return the intersection of the given ideals.}
+
+\textbf{Examples.}
+
+Here are some examples of binary operators.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+O = MaximalOrder(K)
+
+S = Ideal(O, x + 1)
+T = Ideal(O, 3)
+
+A = S + T
+B = S*T
+C = intersect(S, T)
+\end{lstlisting}
+
+\subsubsection{Comparison}
+
+\begin{lstlisting}
+==(a::PariIdeal, b::PariIdeal)
+\end{lstlisting}
+
+\desc{Return \code{true} if the ideals are arithmetically the same ideal.}
+
+\textbf{Examples.}
+
+Here are some examples of comparison.
+
+\begin{lstlisting}
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   O = MaximalOrder(K)
+
+   S = Ideal(O, x + 1)
+   T = Ideal(O, 3)
+
+   S == S
+   S != T
+\end{lstlisting}
+
+\subsubsection{Powering}
+
+\begin{lstlisting}
+^(a::PariIdeal, n::Int)
+\end{lstlisting}
+
+\desc{Return $a^n$.}
+
+\textbf{Examples.}
+
+Here is an example of powering.
+
+\begin{lstlisting}
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   O = MaximalOrder(K)
+
+   S = Ideal(O, x + 1)
+   
+   T = S^3
+\end{lstlisting}
+
+\subsubsection{Exact division}
+
+\begin{lstlisting}
+divexact(a::PariIdeal, b::PariIdeal)
+\end{lstlisting}
+
+\desc{Return the exact quotient of the ideals $a$ and $b$.}
+
+\textbf{Examples.}
+
+Here is an example of exact division.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+O = MaximalOrder(K)
+
+S = Ideal(O, x + 1)
+T = Ideal(O, 3)
+
+divexact(S*T, T)
+\end{lstlisting}
+
+\subsubsection{Inverse}
+
+\begin{lstlisting}
+inv(a::PariIdeal)
+\end{lstlisting}
+
+\desc{Return the inverse of the given ideal.}
+
+\textbf{Examples.}
+
+Here is an example of inversion.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+O = MaximalOrder(K)
+
+S = Ideal(O, x + 1)
+
+inv(S)
+\end{lstlisting}
+
+\subsubsection{Extended GCD}
+
+\begin{lstlisting}
+gcdx(a::PariIdeal, b::PariIdeal)
+\end{lstlisting}
+
+\desc{Given two coprime integer ideals $a$ and $b$ return a pair of values $(s, t)$,
+with $s \in a$ and $t \in b$ such that $s + t = 1$. The values $s$ and $t$ will be
+returned as \code{fmpq_poly}'s.}
+
+\textbf{Examples.}
+
+Here is an example of extended GCD.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+O = MaximalOrder(K)
+
+S = Ideal(O, x + 1)
+T = Ideal(O, 2x)
+
+(s, t) = gcdx(S, T)
+\end{lstlisting}
+
+\subsubsection{Ideal factorisation}
+
+\begin{lstlisting}
+factor(a::PariIdeal)
+\end{lstlisting}
+
+\desc{Return the prime factorisation of the given ideal. This is given as a Julia
+array of tuples $(P, n)$ consisting of a prime ideal $P$ and its exponent in the
+factorisation of $a$.}
+
+\begin{lstlisting}
+factor_mul(a::PariFactor{pari_maximal_order_elem})
+\end{lstlisting}
+
+\desc{Given a factorisation of an ideal $a$ into prime factors as returned by
+\code{factor}, this function retrieves the original ideal $a$.}
+
+\textbf{Examples.}
+
+Here is an example of ideal factorisation.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+O = MaximalOrder(K)
+
+S = Ideal(O, 3)
+
+A = factor(S)
+T = factor_mul(A)
+\end{lstlisting}
+
+\subsubsection{Ideal approximation}
+
+\begin{lstlisting}
+approx(a::PariIdeal)
+\end{lstlisting}
+
+\desc{Return an element of the given ideal which approximates the ideal, in the
+sense that the valuation at all prime ideals dividing $a$ is the same, and the
+valuation at all other prime ideals is non-negative.}
+
+\textbf{Examples.}
+
+Here is an example of ideal factorisation.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+O = MaximalOrder(K)
+
+S = Ideal(O, 3)
+
+f = approx(S)
+\end{lstlisting}
+
+\subsubsection{Coprime ideal construction}
+
+\begin{lstlisting}
+coprime_multiplier(x::PariIdeal, y::PariIdeal)
+\end{lstlisting}
+
+\desc{Return an element of the number field $b$ such that $bx$ is an integral
+ideal coprime to the ideal $y$.}
+
+\textbf{Examples.}
+
+Here is an example of coprime ideal construction.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+K, a = NumberField(x^3 + 3x + 1, "a")
+O = MaximalOrder(K)
+
+S = Ideal(O, 3)
+T = Ideal(O, x + 1)
+
+f = coprime_multiplier(S, T)
+\end{lstlisting}
+
 
 
 

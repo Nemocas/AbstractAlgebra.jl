@@ -5,8 +5,8 @@
 ###############################################################################
 
 export approx, coprime_multiplier, intersect, bounded_ideals, numden, 
-       prime_decomposition, LLL_reduce, valuation, factor, factor_mul,
-       PariIdealCollection, PariIdeal
+       prime_decomposition, valuation, factor, factor_mul,
+       PariIdealCollection, PariIdeal, PariFactor
 
 ###############################################################################
 #
@@ -120,6 +120,27 @@ end
 
 ###############################################################################
 #
+#   Comparison
+#
+###############################################################################
+
+function ==(a::PariIdeal, b::PariIdeal)
+   check_parent(a, b)
+   av = unsafe_load(avma, 1)
+   r1 = ccall((:idealhnf, :libpari), Ptr{Int}, 
+             (Ptr{Int}, Ptr{Int}), 
+                   a.parent.order.pari_nf.data, a.ideal)
+   r2 = ccall((:idealhnf, :libpari), Ptr{Int}, 
+             (Ptr{Int}, Ptr{Int}), 
+                   a.parent.order.pari_nf.data, b.ideal)
+   r = Bool(ccall((:gequal, :libpari), Int, 
+                  (Ptr{Int}, Ptr{Int}), r1, r2))
+   unsafe_store!(avma, av, 1)
+   return r
+end
+
+###############################################################################
+#
 #   Powering
 #
 ###############################################################################
@@ -181,21 +202,6 @@ end
 
 ###############################################################################
 #
-#   LLL reduction
-#
-###############################################################################
-
-function LLL_reduce(a::PariIdeal)
-   av = unsafe_load(avma, 1)
-   r = ccall((:idealred0, :libpari), Ptr{Int}, 
-             (Ptr{Int}, Ptr{Int}, Ptr{Void}), 
-                    a.parent.order.pari_nf.data, a.ideal, C_NULL)
-   unsafe_store!(avma, av, 1)
-   return PariIdeal(r, a.parent)
-end
-
-###############################################################################
-#
 #   GCDX
 #
 ###############################################################################
@@ -208,7 +214,7 @@ function gcdx(a::PariIdeal, b::PariIdeal)
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), pari_nf, a.ideal, b.ideal)
    s = alg(pari_nf, pari_load(st, 2))
    t = alg(pari_nf, pari_load(st, 3))
-   par = FmpqPolyRing{T}(FlintQQ)
+   par = FmpqPolyRing(var(a.parent.order.pari_nf.nf.pol.parent))
    pols = fmpq_poly!(par(), s)
    polt = fmpq_poly!(par(), t)
    unsafe_store!(avma, av, 1)
@@ -258,7 +264,7 @@ function factor(a::PariIdeal)
    av = unsafe_load(avma, 1)
    pari_fac = ccall((:idealfactor, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}), a.parent.order.pari_nf.data, a.ideal)
-   fac = PariFactor{PariMaximalOrder}(pari_fac, a.parent)
+   fac = PariFactor{pari_maximal_order_elem}(pari_fac, a.parent)
    unsafe_store!(avma, av, 1)
    return fac
 end
@@ -283,10 +289,10 @@ function approx(a::PariIdeal)
    pari_nf = a.parent.order.pari_nf.data
    par = a.parent
    av = unsafe_load(avma, 1)
-   a = ccall((:idealappr, :libpari), Ptr{Int}, 
+   a1 = ccall((:idealappr, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}), pari_nf, a.ideal)
-   r = alg(pari_nf, a)
-   pol = FmpqPolyRing{T}(FlintQQ)()
+   r = alg(pari_nf, a1)
+   pol = FmpqPolyRing(FlintQQ, var(a.parent.order.pari_nf.nf.pol.parent))()
    fmpq_poly!(pol, r)
    unsafe_store!(avma, av, 1)
    return pol
@@ -306,7 +312,7 @@ function coprime_multiplier(a::PariIdeal, b::PariIdeal)
    m = ccall((:idealcoprime, :libpari), Ptr{Int}, 
              (Ptr{Int}, Ptr{Int}, Ptr{Int}), pari_nf, a.ideal, b.ideal)
    r = alg(pari_nf, m)
-   pol = FmpqPolyRing{T}(FlintQQ)()
+   pol = FmpqPolyRing(FlintQQ, var(a.parent.order.pari_nf.nf.pol.parent))()
    fmpq_poly!(pol, r)
    unsafe_store!(avma, av, 1)
    return pol
