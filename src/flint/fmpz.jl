@@ -608,7 +608,7 @@ end
 #
 ###############################################################################
 
-popcount(x::fmpz) = Int(ccall((:fmpz_popcnt, :libflint), Culong, 
+popcount(x::fmpz) = Int(ccall((:fmpz_popcnt, :libflint), UInt, 
                               (Ptr{fmpz},), &x))
 
 prevpow2(x::fmpz) = x < 0 ? -prevpow2(-x) :
@@ -767,7 +767,7 @@ end
 function fac(x::Int)
     x < 0 && throw(DomainError())
     z = fmpz()
-    ccall((:fmpz_fac_ui, :libflint), Void, (Ptr{fmpz}, Culong), &z, x)
+    ccall((:fmpz_fac_ui, :libflint), Void, (Ptr{fmpz}, UInt), &z, x)
     return z
 end
 
@@ -775,7 +775,7 @@ function risingfac(x::fmpz, y::Int)
     y < 0 && throw(DomainError())
     z = fmpz()
     ccall((:fmpz_rfac_ui, :libflint), Void, 
-          (Ptr{fmpz}, Ptr{fmpz}, Culong), &z, &x, y)
+          (Ptr{fmpz}, Ptr{fmpz}, UInt), &z, &x, y)
     return z
 end
 
@@ -789,7 +789,7 @@ function risingfac(x::Int, y::Int)
        end
     else
        ccall((:fmpz_rfac_uiui, :libflint), Void, 
-             (Ptr{fmpz}, Culong, Culong), &z, x, y)
+             (Ptr{fmpz}, UInt, UInt), &z, x, y)
     end
     return z
 end
@@ -798,7 +798,7 @@ function primorial(x::Int)
     x < 0 && throw(DomainError()) 
     z = fmpz()
     ccall((:fmpz_primorial, :libflint), Void, 
-          (Ptr{fmpz}, Culong), &z, x)
+          (Ptr{fmpz}, UInt), &z, x)
     return z
 end
 
@@ -806,7 +806,7 @@ function fib(x::Int)
     x < 0 && throw(DomainError())
     z = fmpz()
     ccall((:fmpz_fib_ui, :libflint), Void, 
-          (Ptr{fmpz}, Culong), &z, x)
+          (Ptr{fmpz}, UInt), &z, x)
     return z
 end
 
@@ -815,7 +815,7 @@ function binom(n::Int, k::Int)
     k < 0 && return fmpz(0)
     z = fmpz()
     ccall((:fmpz_bin_uiui, :libflint), Void, 
-          (Ptr{fmpz}, Culong, Culong), &z, n, k)
+          (Ptr{fmpz}, UInt, UInt), &z, n, k)
     return z
 end
 
@@ -852,7 +852,7 @@ function numpart(x::Int)
    x < 0 && throw(DomainError())
    z = fmpz()
    ccall((:partitions_fmpz_ui, :libarb), Void, 
-         (Ptr{fmpz}, Culong), &z, x)
+         (Ptr{fmpz}, UInt), &z, x)
    return z
 end
 
@@ -906,7 +906,7 @@ end
 
 function ndigits_internal(x::fmpz, b::Integer = 10)
     # fmpz_sizeinbase might return an answer 1 too big
-    n = Int(ccall((:fmpz_sizeinbase, :libflint), Culong, 
+    n = Int(ccall((:fmpz_sizeinbase, :libflint), UInt, 
                   (Ptr{fmpz}, Int32), &x, b))
     abs(x) < fmpz(b)^(n - 1) ? n - 1 : n
 end
