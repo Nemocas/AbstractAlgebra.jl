@@ -74,26 +74,18 @@ function __init__()
    on_windows = @windows ? true : false
    on_linux = @linux ? true : false
 
-   if on_windows
-      push!(Libdl.DL_LOAD_PATH, "$pkgdir\\local\\lib")
+   if "HOSTNAME" in keys(ENV) && ENV["HOSTNAME"] == "juliabox"
+       push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
+   elseif on_linux
+       push!(Libdl.DL_LOAD_PATH, libdir)
+       Libdl.dlopen(libgmp)
+       Libdl.dlopen(libmpfr)
+       Libdl.dlopen(libflint)
+       Libdl.dlopen(libpari)
    else
-      try
-         if "HOSTNAME" in keys(ENV) && ENV["HOSTNAME"] == "juliabox"
-            push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
-         elseif on_linux
-            push!(Libdl.DL_LOAD_PATH, libdir)
-            Libdl.dlopen(libgmp)
-            Libdl.dlopen(libmpfr)
-            Libdl.dlopen(libflint)
-            Libdl.dlopen(libpari)
-         else
-            push!(Libdl.DL_LOAD_PATH, libdir)
-         end
-      catch
-         push!(Libdl.DL_LOAD_PATH, libdir)
-      end
+      push!(Libdl.DL_LOAD_PATH, libdir)
    end
-
+ 
    ccall((:pari_init, libpari), Void, (Int, Int), pari_stack_size[1], 10000)
 
    global avma = cglobal((:avma, libpari), Ptr{Ptr{Int}})
