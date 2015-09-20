@@ -22,7 +22,7 @@ export PolyElem, SeriesElem, ResidueElem, FractionElem, MatElem,
 export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
        MaximalRealSubfield, MaximalOrder, Ideal
 
-export create_accessors, get_handle, package_handle
+export create_accessors, get_handle, package_handle, allocatemem
 
 include("AbstractTypes.jl")
 
@@ -39,8 +39,33 @@ const libmpfr = Pkg.dir("Nemo", "local", "lib", "libmpfr")
 const libflint = Pkg.dir("Nemo", "local", "lib", "libflint")
 const libpari = Pkg.dir("Nemo", "local", "lib", "libpari")
 
+pari_stack_size = [10000000]
+   
+function allocatemem(bytes::Int)
+   pari_stack_size[1] = bytes
+   newsize = pari(fmpz(bytes)).d
+   ccall((:gp_allocatemem, :libpari), Void, (Ptr{Int},), newsize)
+end
+
 function pari_sigint_handler()
    error("User interrupt")
+   return
+end
+
+function pari_error_handler(err::Cint)
+   if err == -1
+      return convert(Cint, 1)::Cint
+   end
+   if err == 17
+      pari_stack_size[1] *= 2
+      ccall((:gp_allocatemem, :libpari), Void, (Ptr{Void},), C_NULL)
+      error("Retry your computation or call allocatemem(bytes::Int)")
+   end
+   error("Pari encountered a bug. Please report to nemo-devel.")
+   return convert(Cint, 1)::Cint
+end
+
+function pari_error_recover(err::Cint)
    return
 end
 
@@ -69,7 +94,7 @@ function __init__()
       end
    end
 
-   ccall((:pari_init, libpari), Void, (Int, Int), 3000000000, 10000)
+   ccall((:pari_init, libpari), Void, (Int, Int), pari_stack_size[1], 10000)
 
    global avma = cglobal((:avma, libpari), Ptr{Ptr{Int}})
 
@@ -79,7 +104,15 @@ function __init__()
 
    global cb_pari_sigint = cglobal((:cb_pari_sigint, libpari), Ptr{Ptr{Void}})
 
+   global cb_pari_handle_exception = cglobal((:cb_pari_handle_exception, libpari), Ptr{Ptr{Void}})
+
+   global cb_pari_err_recover = cglobal((:cb_pari_err_recover, libpari), Ptr{Ptr{Void}})
+
    unsafe_store!(cb_pari_sigint, cfunction(pari_sigint_handler, Void, ()), 1)
+
+   unsafe_store!(cb_pari_handle_exception, cfunction(pari_error_handler, Cint, (Cint,)), 1)
+
+   unsafe_store!(cb_pari_err_recover, cfunction(pari_error_recover, Void, (Cint,)), 1)
 
    println("")
    println("Welcome to Nemo version 0.3")
