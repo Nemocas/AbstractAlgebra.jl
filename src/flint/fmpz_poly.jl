@@ -557,49 +557,49 @@ function chebyshev_t(n::Int, x::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_chebyshev_t, :libflint), Void, 
                                                   (Ptr{fmpz_poly}, Int), &z, n)
-   return z
+   return isgen(x) ? z : compose(z, x)
 end
    
 function chebyshev_u(n::Int, x::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_chebyshev_u, :libflint), Void, 
                                                   (Ptr{fmpz_poly}, Int), &z, n)
-   return z
+   return isgen(x) ? z : compose(z, x)
 end
 
 function cyclotomic(n::Int, x::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_cyclotomic, :libflint), Void, 
                                                   (Ptr{fmpz_poly}, Int), &z, n)
-   return z
+   return isgen(x) ? z : compose(z, x)
 end
    
 function swinnerton_dyer(n::Int, x::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_swinnerton_dyer, :libflint), Void, 
                                                   (Ptr{fmpz_poly}, Int), &z, n)
-   return z
+   return isgen(x) ? z : compose(z, x)
 end
    
 function cos_minpoly(n::Int, x::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_cos_minpoly, :libflint), Void, 
                                                   (Ptr{fmpz_poly}, Int), &z, n)
-   return z
+   return isgen(x) ? z : compose(z, x)
 end
    
 function theta_qexp(e::Int, n::Int, x::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_theta_qexp, :libflint), Void, 
                                           (Ptr{fmpz_poly}, Int, Int), &z, e, n)
-   return z
+   return isgen(x) ? z : compose(z, x)
 end
 
 function eta_qexp(e::Int, n::Int, x::fmpz_poly)
    z = parent(x)()
    ccall((:fmpz_poly_eta_qexp, :libflint), Void, 
                                           (Ptr{fmpz_poly}, Int, Int), &z, e, n)
-   return z
+   return isgen(x) ? z : compose(z, x)
 end
 
 ###############################################################################

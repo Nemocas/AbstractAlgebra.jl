@@ -5166,7 +5166,7 @@ f = x^3 + 3x + 1
 \subsubsection{Special polynomials}
 
 The following functions compute univariate special polynomials over \code{fmpz}. It is expected
-that the final argument in each of these function is the generator of the polynomial ring.
+that the final argument in each of these function is an element of the polynomial ring.
 
 \begin{lstlisting}
 chebyshev_t(n::Int, x::fmpz_poly)
@@ -5243,6 +5243,7 @@ j = swinnerton_dyer(5, x)
 k = cos_minpoly(30, x)
 l = theta_qexp(3, 30, x)
 m = eta_qexp(24, 30, x)
+o = cyclotomic(10, 1+x+x^2)
 \end{lstlisting}
 
 \subsection{Flint polynomials over $\Z/n\Z$ (multiprecision $n$): \code{fmpz_mod_poly}}
