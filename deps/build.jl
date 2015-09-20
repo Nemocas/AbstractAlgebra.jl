@@ -6,9 +6,8 @@ pkgdir = Pkg.dir("Nemo")
 wdir = Pkg.dir("Nemo", "deps")
 vdir = Pkg.dir("Nemo", "local")
 
-cd(pkgdir)
-mkdir("local")
-mkdir("lib")
+mkdir(Pkg.dir("Nemo", "local"))
+mkdir(Pkg.dir("Nemo", "local", "lib"))
 
 cd(wdir)
 
