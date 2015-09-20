@@ -39,6 +39,11 @@ const libmpfr = Pkg.dir("Nemo", "local", "lib", "libmpfr")
 const libflint = Pkg.dir("Nemo", "local", "lib", "libflint")
 const libpari = Pkg.dir("Nemo", "local", "lib", "libpari")
 
+function pari_sigint_handler()
+   error("User interrupt")
+   return
+end
+
 function __init__()
 
    on_windows = @windows ? true : false
@@ -71,6 +76,10 @@ function __init__()
    global gen_0 = cglobal((:gen_0, libpari), Ptr{Ptr{Int}})
 
    global gen_1 = cglobal((:gen_1, libpari), Ptr{Ptr{Int}})
+
+   global cb_pari_sigint = cglobal((:cb_pari_sigint, libpari), Ptr{Ptr{Void}})
+
+   unsafe_store!(cb_pari_sigint, cfunction(pari_sigint_handler, Void, ()), 1)
 
    println("")
    println("Welcome to Nemo version 0.3")
