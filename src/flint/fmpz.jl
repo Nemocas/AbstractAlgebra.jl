@@ -52,7 +52,7 @@ parent(a::fmpz) = FlintZZ
 
 elem_type(::FlintIntegerRing) = fmpz
 
-base_ring(a::FlintIntegerRing) = None
+base_ring(a::FlintIntegerRing) = Union{}
 
 hash(a::fmpz) = hash(BigInt(a))
 

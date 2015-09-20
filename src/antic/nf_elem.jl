@@ -17,7 +17,7 @@ parent(a::nf_elem) = a.parent
 
 elem_type(::AnticNumberField) = nf_elem
 
-base_ring(a::AnticNumberField) = None
+base_ring(a::AnticNumberField) = Union{}
 
 var(a::AnticNumberField) = a.S
 

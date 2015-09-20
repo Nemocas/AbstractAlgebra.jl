@@ -1408,7 +1408,7 @@ function PolynomialRing(R::Ring, s::String)
    base = base_ring(R)
    R2 = R
    parent_type = Poly{T}
-   while base_ring(R2) != None
+   while base_ring(R2) != Union{}
       R2 = base_ring(R2)
       T2 = elem_type(R2)
       eval(:(Base.promote_rule(::Type{$parent_type}, ::Type{$T2}) = $parent_type))

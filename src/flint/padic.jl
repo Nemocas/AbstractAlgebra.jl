@@ -51,9 +51,9 @@ O(R::FlintPadicField, n::Integer) = O(R, fmpz(n))
 
 elem_type(::FlintPadicField) = padic
 
-base_ring(a::FlintPadicField) = None
+base_ring(a::FlintPadicField) = Union{}
 
-base_ring(a::padic) = None
+base_ring(a::padic) = Union{}
 
 parent(a::padic) = a.parent
 

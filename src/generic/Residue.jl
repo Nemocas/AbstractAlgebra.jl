@@ -284,7 +284,7 @@ function ResidueRing{T <: RingElem}(R::Ring, el::T)
    
    R2 = R
    parent_type = Residue{T}
-   while base_ring(R2) != None
+   while base_ring(R2) != Union{}
       R2 = base_ring(R2)
       T2 = elem_type(R2)
       eval(:(Base.promote_rule(::Type{$parent_type}, ::Type{$T2}) = $parent_type))

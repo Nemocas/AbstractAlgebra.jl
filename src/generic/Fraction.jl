@@ -497,7 +497,7 @@ function FractionField(R::Ring)
    R2 = R
    T = elem_type(R)
    parent_type = Fraction{T}
-   while base_ring(R2) != None
+   while base_ring(R2) != Union{}
       R2 = base_ring(R2)
       T2 = elem_type(R2)
       eval(:(Base.promote_rule(::Type{$parent_type}, ::Type{$T2}) = $parent_type))
