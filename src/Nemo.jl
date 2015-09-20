@@ -24,8 +24,6 @@ export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
 
 export create_accessors, get_handle, package_handle, allocatemem
 
-export flint_cleanup, flint_set_num_threads
-
 include("AbstractTypes.jl")
 
 ###############################################################################
@@ -40,6 +38,7 @@ const libgmp = Pkg.dir("Nemo", "local", "lib", "libgmp")
 const libmpfr = Pkg.dir("Nemo", "local", "lib", "libmpfr")
 const libflint = Pkg.dir("Nemo", "local", "lib", "libflint")
 const libpari = Pkg.dir("Nemo", "local", "lib", "libpari")
+const libarb = Pkg.dir("Nemo", "local", "lib", "libarb")
 
 pari_stack_size = [10000000]
    
@@ -84,6 +83,7 @@ function __init__()
        Libdl.dlopen(libmpfr)
        Libdl.dlopen(libflint)
        Libdl.dlopen(libpari)
+       Libdl.dlopen(libarb)
    else
       push!(Libdl.DL_LOAD_PATH, libdir)
    end
@@ -113,14 +113,6 @@ function __init__()
    println("")
    println("Nemo comes with absolutely no warranty whatsoever")
    println("")
-end
-
-function flint_set_num_threads(a::Int)
-   ccall((:flint_set_num_threads, :libflint), Void, (Int,), a)
-end
-
-function flint_cleanup()
-   ccall((:flint_cleanup, :libflint), Void, ())
 end
 
 ###############################################################################
