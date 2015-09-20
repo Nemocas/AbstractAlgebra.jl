@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-function hash(a::RingElem, b::UInt)
+function hash(a::RingElem, b::UInt64)
    h = hash(a) $ hash(b)
    h = (h << 1) | (h >> (sizeof(Int)*8 - 1))
    return h
