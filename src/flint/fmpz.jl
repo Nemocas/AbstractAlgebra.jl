@@ -39,8 +39,8 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, fac,
        combit!, crt, divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2,
        gcdinv, isprobabprime, issquare, jacobi, remove, root, size, isqrtrem,
        sqrtmod, trailing_zeros, sigma, eulerphi, fib, moebiusmu, primorial,
-       risingfac, canonical_unit, needs_parentheses, is_negative, isless,
-       show_minus_one, parseint, addeq!, mul!, isunit, isequal, num, den
+       risingfac, numpart, canonical_unit, needs_parentheses, is_negative,
+       isless, show_minus_one, parseint, addeq!, mul!, isunit, isequal, num, den
 
 ###############################################################################
 #
@@ -845,6 +845,22 @@ function eulerphi(x::fmpz)
    z = fmpz()
    ccall((:fmpz_euler_phi, :libflint), Void, 
          (Ptr{fmpz}, Ptr{fmpz}), &z, &x)
+   return z
+end
+
+function numpart(x::Int) 
+   x < 0 && throw(DomainError())
+   z = fmpz()
+   ccall((:partitions_fmpz_ui, :libarb), Void, 
+         (Ptr{fmpz}, Culong), &z, x)
+   return z
+end
+
+function numpart(x::fmpz) 
+   x < 0 && throw(DomainError())
+   z = fmpz()
+   ccall((:partitions_fmpz_fmpz, :libarb), Void, 
+         (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, 0)
    return z
 end
 

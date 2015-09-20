@@ -3913,6 +3913,27 @@ implementations where available.
 
 We only describe the details that differ from the generic implementations above.
 
+\subsection{General Flint functions}
+
+\begin{lstlisting}
+flint_cleanup()
+\end{lstlisting}
+
+\desc{Free any internal caches used by Flint, Arb and Antic.
+Examples of cached data include \code{mpz} integers used internally
+to speed up allocation of bignums,
+prime numbers, and high-precision values of mathematical constants.
+Normally, these caches should not take up too much memory, but there may
+be extreme circumstances where the user needs to free them manually.
+This function is safe to call at any time.}
+
+\begin{lstlisting}
+flint_set_num_threads(n::Int)
+\end{lstlisting}
+
+\desc{Set the number of threads that Flint may use internally (the default
+value is 1). Most functions are currently unaffected by this setting.}
+
 \subsection{Flint integers ($\Z$): \code{fmpz}}
 
 Multi-precision integers can be created in Nemo using \code{ZZ}. For example, to create the integer
@@ -4963,6 +4984,16 @@ eulerphi(x::fmpz)
 \desc{Return the value of the Euler phi function, i.e. the number of $0 < d \leq x$ such
 that gcd$(d, x) = 1$. If $x < 0$ we throw a \code{DomainError()}.}
 
+\begin{lstlisting}
+numpart(x::fmpz)
+numpart(x::Int)
+\end{lstlisting}
+
+\desc{Return the number of partitions of $x$, i.e. $p(x)$. Since $p(x)$
+has $O(\sqrt{x})$ digits, this function can only be computed up to
+about $x = 10^{19}$. For large $x$, the result is computed faster if one
+sets \code{flint_num_threads(2)}.}
+
 \textbf{Examples.}
 
 Here are some examples of number theoretic and combinatorial functions.
@@ -4975,6 +5006,8 @@ end
 n = fac(100)
 s = sigma(fmpz(128), 10)
 a = eulerphi(fmpz(12480))
+
+p = numpart(1000)
 \end{lstlisting}
 
 \subsection{Flint polynomials over $\Z$: \code{fmpz_poly}}
