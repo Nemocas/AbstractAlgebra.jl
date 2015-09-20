@@ -16,10 +16,12 @@ function hash(a::RingElem, b::UInt)
    return h
 end
 
-function hash(a::Ring, b::UInt64)
-   h = hash(a) $ hash(b)
-   h = (h << 1) | (h >> 63)
-   return h
+if (@windows? true : false) && Int == Int32
+   function hash(a::Ring, b::UInt64)
+      h = hash(a) $ hash(b)
+      h = (h << 1) | (h >> (sizeof(Int)*8 - 1))
+      return h
+   end
 end
 
 ###############################################################################
