@@ -70,7 +70,7 @@ end
 
 ################################################################################
 #
-#  String I/O
+#  AbstractString{} I/O
 #
 ################################################################################
 
@@ -858,7 +858,7 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::ResidueRing{fmpz}, s::String)
+function PolynomialRing(R::ResidueRing{fmpz}, s::AbstractString{})
    if modulus(R) <= fmpz(typemax(UInt))
       parent_obj = NmodPolyRing(R, symbol(s))
    else

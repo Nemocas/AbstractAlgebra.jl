@@ -123,7 +123,7 @@ end
 
 ###############################################################################
 #
-#   String I/O
+#   AbstractString{} I/O
 #
 ###############################################################################
 
@@ -802,7 +802,7 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::Ring, prec::Int, s::String)
+function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{})
    S = symbol(s)
    T = elem_type(R)
    parent_obj = PowerSeriesRing{T}(R, prec, S)

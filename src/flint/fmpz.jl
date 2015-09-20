@@ -866,7 +866,7 @@ end
 
 ###############################################################################
 #
-#   String I/O
+#   AbstractString{} I/O
 #
 ###############################################################################
 
@@ -901,7 +901,7 @@ function base(n::fmpz, b::Integer)
     p = ccall((:fmpz_get_str,:libflint), Ptr{UInt8}, 
               (Ptr{UInt8}, Cint, Ptr{fmpz}), C_NULL, b, &n)
     len = Int(ccall(:strlen, Csize_t, (Ptr{UInt8},), p))
-    ASCIIString(pointer_to_array(p, len, true))
+    ASCIIAbstractString{}(pointer_to_array(p, len, true))
 end
 
 function ndigits_internal(x::fmpz, b::Integer = 10)
@@ -925,7 +925,7 @@ call(::FlintIntegerRing) = fmpz()
 
 call(::FlintIntegerRing, a::Integer) = fmpz(a)
 
-call(::FlintIntegerRing, a::String) = fmpz(a)
+call(::FlintIntegerRing, a::AbstractString{}) = fmpz(a)
 
 call(::FlintIntegerRing, a::fmpz) = a
 
@@ -939,18 +939,18 @@ call(::FlintIntegerRing, a::BigFloat) = fmpz(BigInt(a))
 
 ###############################################################################
 #
-#   String parser
+#   AbstractString{} parser
 #
 ###############################################################################
 
-function parseint(::Type{fmpz}, s::String, base::Int = 10)
+function parseint(::Type{fmpz}, s::AbstractString{}, base::Int = 10)
     s = bytestring(s)
     sgn = s[1] == '-' ? -1 : 1
     i = 1 + (sgn == -1)
     z = fmpz()
     err = ccall((:fmpz_set_str, :libflint),
                Int32, (Ptr{fmpz}, Ptr{UInt8}, Int32),
-               &z, bytestring(SubString(s, i)), base)
+               &z, bytestring(SubAbstractString{}(s, i)), base)
     err == 0 || error("Invalid big integer: $(repr(s))")
     return sgn < 0 ? -z : z
 end
@@ -961,7 +961,7 @@ end
 #
 ###############################################################################
 
-fmpz(s::String) = parseint(fmpz, s)
+fmpz(s::AbstractString{}) = parseint(fmpz, s)
 
 fmpz(z::Integer) = fmpz(BigInt(z))
 

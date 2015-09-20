@@ -86,7 +86,7 @@ end
 
 ###############################################################################
 #
-#   String I/O
+#   AbstractString{} I/O
 #
 ###############################################################################
 
@@ -515,7 +515,7 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::FlintIntegerRing, prec::Int, s::String)
+function PowerSeriesRing(R::FlintIntegerRing, prec::Int, s::AbstractString{})
    S = symbol(s)
 
    parent_obj = FmpzSeriesRing(prec, S)

@@ -88,7 +88,7 @@ end
 
 ###############################################################################
 #
-#   String I/O
+#   AbstractString{} I/O
 #
 ###############################################################################
 
@@ -736,7 +736,7 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::FlintRationalField, prec::Int, s::String)
+function PowerSeriesRing(R::FlintRationalField, prec::Int, s::AbstractString{})
    S = symbol(s)
 
    parent_obj = FmpqSeriesRing(prec, S)

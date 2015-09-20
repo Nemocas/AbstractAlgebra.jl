@@ -70,7 +70,7 @@ canonical_unit(a::fmpq_poly) = canonical_unit(lead(a))
 
 ###############################################################################
 #
-#   String I/O
+#   AbstractString{} I/O
 #
 ###############################################################################
 
@@ -651,7 +651,7 @@ end
 #
 ###############################################################################
 
-function PolynomialRing(R::FlintRationalField, s::String)
+function PolynomialRing(R::FlintRationalField, s::AbstractString{})
    S = symbol(s)
 
    parent_obj = FmpqPolyRing(R, S)

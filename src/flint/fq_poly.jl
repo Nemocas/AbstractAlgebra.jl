@@ -87,7 +87,7 @@ canonical_unit(a::fq_poly) = canonical_unit(lead(a))
   
 ################################################################################
 #
-#  String I/O
+#  AbstractString{} I/O
 #
 ################################################################################
 
@@ -662,7 +662,7 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::FqFiniteField, s::String)
+function PolynomialRing(R::FqFiniteField, s::AbstractString{})
    S = symbol(s)
    parent_obj = FqPolyRing(R, S)
    return parent_obj, parent_obj([R(0), R(1)])

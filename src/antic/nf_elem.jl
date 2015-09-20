@@ -93,7 +93,7 @@ end
 
 ###############################################################################
 #
-#   String I/O
+#   AbstractString{} I/O
 #
 ###############################################################################
 
@@ -682,21 +682,21 @@ end
 #
 ###############################################################################
 
-function AnticNumberField(pol::fmpq_poly, s::String)
+function AnticNumberField(pol::fmpq_poly, s::AbstractString{})
    S = symbol(s)
    parent_obj = AnticNumberField(pol, S)
 
    return parent_obj, gen(parent_obj) 
 end
 
-function AnticCyclotomicField(n::Int, s::String, t = "\$")
+function AnticCyclotomicField(n::Int, s::AbstractString{}, t = "\$")
    Zx, x = PolynomialRing(FlintZZ, string(gensym()))
    Qx, = PolynomialRing(FlintQQ, t)
    f = cyclotomic(n, x)
    return AnticNumberField(Qx(f), s)
 end
 
-function AnticMaximalRealSubfield(n::Int, s::String, t = "\$")
+function AnticMaximalRealSubfield(n::Int, s::AbstractString{}, t = "\$")
    Zx, x = PolynomialRing(FlintZZ, string(gensym()))
    Qx, = PolynomialRing(FlintQQ, t)
    f = cos_minpoly(n, x)

@@ -102,7 +102,7 @@ canonical_unit{T <: RingElem}(x::PolyElem{T}) = canonical_unit(lead(x))
 
 ###############################################################################
 #
-#   String I/O
+#   AbstractString{} I/O
 #
 ###############################################################################
 
@@ -1400,7 +1400,7 @@ end
 #
 ###############################################################################
 
-function PolynomialRing(R::Ring, s::String)
+function PolynomialRing(R::Ring, s::AbstractString{})
    S = symbol(s)
    T = elem_type(R)
    parent_obj = PolynomialRing{T}(R, S)

@@ -112,7 +112,7 @@ canonical_unit(x::fq_nmod) = x
 
 ###############################################################################
 #
-#   String I/O
+#   AbstractString{} I/O
 #
 ###############################################################################
 
@@ -384,14 +384,14 @@ end
 #
 ###############################################################################
 
-function FlintFiniteField(char::Int, deg::Int, s::String)
+function FlintFiniteField(char::Int, deg::Int, s::AbstractString{})
    S = symbol(s)
    parent_obj = FqNmodFiniteField(fmpz(char), deg, S)
 
    return parent_obj, gen(parent_obj) 
 end
 
-function FlintFiniteField(pol::nmod_poly, s::String)
+function FlintFiniteField(pol::nmod_poly, s::AbstractString{})
    S = symbol(s)
    parent_obj = FqNmodFiniteField(pol, S)
 

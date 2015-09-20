@@ -110,7 +110,7 @@ canonical_unit(x::fq) = x
 
 ###############################################################################
 #
-#   String I/O
+#   AbstractString{} I/O
 #
 ###############################################################################
 
@@ -368,13 +368,13 @@ end
 #
 ###############################################################################
 
-function FlintFiniteField(char::fmpz, deg::Int, s::String)
+function FlintFiniteField(char::fmpz, deg::Int, s::AbstractString{})
    S = symbol(s)
    parent_obj = FqFiniteField(char, deg, S)
 
    return parent_obj, gen(parent_obj) 
 end
 
-function FlintFiniteField(char::Integer, deg::Int, s::String)
+function FlintFiniteField(char::Integer, deg::Int, s::AbstractString{})
    return FlintFiniteField(fmpz(char), deg, s)
 end

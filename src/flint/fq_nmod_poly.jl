@@ -83,7 +83,7 @@ canonical_unit(a::fq_nmod_poly) = canonical_unit(lead(a))
   
 ################################################################################
 #
-#  String I/O
+#  AbstractString{} I/O
 #
 ################################################################################
 
@@ -660,7 +660,7 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::FqNmodFiniteField, s::String)
+function PolynomialRing(R::FqNmodFiniteField, s::AbstractString{})
    S = symbol(s)
    parent_obj = FqNmodPolyRing(R, S)
    return parent_obj, parent_obj([R(0), R(1)])
