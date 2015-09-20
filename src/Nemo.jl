@@ -24,6 +24,8 @@ export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
 
 export create_accessors, get_handle, package_handle, allocatemem
 
+export flint_cleanup, flint_set_num_threads
+
 include("AbstractTypes.jl")
 
 ###############################################################################
@@ -113,6 +115,14 @@ function __init__()
    println("")
    println("Nemo comes with absolutely no warranty whatsoever")
    println("")
+end
+
+function flint_set_num_threads(a::Int)
+   ccall((:flint_set_num_threads, :libflint), Void, (Int,), a)
+end
+
+function flint_cleanup()
+   ccall((:flint_cleanup, :libflint), Void, ())
 end
 
 ###############################################################################
