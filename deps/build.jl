@@ -6,8 +6,12 @@ pkgdir = Pkg.dir("Nemo")
 wdir = Pkg.dir("Nemo", "deps")
 vdir = Pkg.dir("Nemo", "local")
 
-mkdir(Pkg.dir("Nemo", "local"))
-mkdir(Pkg.dir("Nemo", "local", "lib"))
+if !ispath(Pkg.dir("Nemo", "local"))
+    mkdir(Pkg.dir("Nemo", "local"))
+end
+if !ispath(Pkg.dir("Nemo", "local", "lib"))
+    mkdir(Pkg.dir("Nemo", "local", "lib"))
+end
 
 cd(wdir)
 
