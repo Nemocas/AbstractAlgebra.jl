@@ -18,7 +18,11 @@ cd(wdir)
 #install libpthreads
 
 if on_windows
-   download("http://nemocas.org/binaries/w64-libwinpthread-1.dll", joinpath(vdir, "lib", "libwinpthread-1.dll"))
+   if Int == Int32
+      download("http://nemocas.org/binaries/w32-libwinpthread-1.dll", joinpath(vdir, "lib", "libwinpthread-1.dll"))
+   else
+      download("http://nemocas.org/binaries/w64-libwinpthread-1.dll", joinpath(vdir, "lib", "libwinpthread-1.dll"))
+   end
 end
 
 cd(wdir)
@@ -51,7 +55,11 @@ else
 end
 
 if on_windows
-   download("http://nemocas.org/binaries/w64-libgmp-10.dll", joinpath(vdir, "lib", "libgmp-10.dll"))
+   if Int == Int32
+      download("http://nemocas.org/binaries/w32-libgmp-10.dll", joinpath(vdir, "lib", "libgmp-10.dll"))
+   else
+      download("http://nemocas.org/binaries/w64-libgmp-10.dll", joinpath(vdir, "lib", "libgmp-10.dll"))
+   end
 else
    run(`./configure --prefix=$vdir M4=$vdir/bin/m4 --enable-gmpcompat --disable-static --enable-shared`)
    run(`make -j4`)
@@ -77,7 +85,11 @@ else
 end
 
 if on_windows
-   download("http://nemocas.org/binaries/w64-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
+   if Int == Int32
+      download("http://nemocas.org/binaries/w32-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
+   else
+      download("http://nemocas.org/binaries/w64-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
+   end
 else
    run(`./configure --prefix=$vdir --with-gmp=$vdir --disable-static --enable-shared`)
    run(`make -j4`)
@@ -104,7 +116,11 @@ except
 end          
 
 if on_windows
-   download("http://nemocas.org/binaries/w64-libflint.dll", joinpath(vdir, "lib", "libflint.dll"))
+   if Int == Int32
+      download("http://nemocas.org/binaries/w32-libflint.dll", joinpath(vdir, "lib", "libflint.dll"))
+   else
+      download("http://nemocas.org/binaries/w64-libflint.dll", joinpath(vdir, "lib", "libflint.dll"))
+   end
 else
    cd("$wdir/flint2")
    run(`./configure --prefix=$vdir --extensions="$wdir/antic" --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir`)
@@ -147,7 +163,11 @@ else
 end  
 
 if on_windows
-   download("http://nemocas.org/binaries/w64-libpari.dll", joinpath(vdir, "lib", "libpari.dll"))
+   if Int == Int32
+      download("http://nemocas.org/binaries/w32-libpari.dll", joinpath(vdir, "lib", "libpari.dll"))
+   else
+      download("http://nemocas.org/binaries/w64-libpari.dll", joinpath(vdir, "lib", "libpari.dll"))
+   end
 else
    cd("$wdir/pari")
    env_copy = copy(ENV)
