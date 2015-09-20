@@ -125,10 +125,17 @@ end
 
 # install PARI
 
-try
-  run(`git clone http://pari.math.u-bordeaux.fr/git/pari.git`)
-except
-  run(`cd pari ; git pull`)
+if on_windows
+   # git clone pari doesn't seem to work on Windows
+   download("http://pari.math.u-bordeaux.fr/pub/pari/unix/pari-2.7.4.tar.gz", joinpath(wdir, "pari-2.7.4.tar.gz"))
+   run(`tar -xvf pari-2.7.4.tar.gz`)
+   run(`rm pari-2.7.4.tar.gz`)
+else
+   try
+      run(`git clone http://pari.math.u-bordeaux.fr/git/pari.git`)
+   except
+      run(`cd pari ; git pull`)
+   end
 end  
 
 if on_windows
