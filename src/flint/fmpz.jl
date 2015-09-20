@@ -849,6 +849,9 @@ function eulerphi(x::fmpz)
 end
 
 function numpart(x::Int) 
+   if (@windows? true : false) && Int == Int64
+      error("not yet supported on win64")
+   end
    x < 0 && throw(DomainError())
    z = fmpz()
    ccall((:partitions_fmpz_ui, :libarb), Void, 
@@ -857,6 +860,9 @@ function numpart(x::Int)
 end
 
 function numpart(x::fmpz) 
+   if (@windows? true : false) && Int == Int64
+      error("not yet supported on win64")
+   end
    x < 0 && throw(DomainError())
    z = fmpz()
    ccall((:partitions_fmpz_fmpz, :libarb), Void, 
