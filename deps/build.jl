@@ -104,7 +104,7 @@ except
 end          
 
 if on_windows
-   download("http://nemocas.org/binaries/w64-libflint-13.dll", joinpath(vdir, "lib", "libflint-13.dll"))
+   download("http://nemocas.org/binaries/w64-libflint.dll", joinpath(vdir, "lib", "libflint.dll"))
 else
    cd("$wdir/flint2")
    run(`./configure --prefix=$vdir --extensions="$wdir/antic" --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir`)
