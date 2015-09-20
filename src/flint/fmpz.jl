@@ -950,7 +950,7 @@ function parseint(::Type{fmpz}, s::AbstractString{}, base::Int = 10)
     z = fmpz()
     err = ccall((:fmpz_set_str, :libflint),
                Int32, (Ptr{fmpz}, Ptr{UInt8}, Int32),
-               &z, bytestring(SubAbstractString{}(s, i)), base)
+               &z, bytestring(SubString{}{}(s, i)), base)
     err == 0 || error("Invalid big integer: $(repr(s))")
     return sgn < 0 ? -z : z
 end
