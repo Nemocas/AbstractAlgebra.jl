@@ -480,16 +480,22 @@ function test_fq_poly_factor()
    A = factor(f*g)
 
    @test length(A) == 3
-   @test A[1] == (y+(16), 1)
-   @test A[2] == (y^2+(11)*y+(8), 1)
-   @test A[3] == (y^2+(7)*y+(20), 1)
+  
+   (a1, n1) = A[1]
+   (a2, n2) = A[2]
+   (a3, n3) = A[3]
+
+   @test a1^n1*a2^n2*a3^n3 == 3*f*g
 
    B = factor_distinct_deg((y + 1)*g*(y^5+y^3+y+1))
 
    @test length(B) == 3
-   @test B[1] == (y^4+(7)*y^3+(4)*y^2+(5)*y+(13), 4)
-   @test B[2] == (y^3+(10)*y^2+(12)*y+(3), 1)
-   @test B[3] == (y^2+(11)*y+(8), 2)
+   
+   (b1, n1) = B[1]
+   (b2, n2) = B[2]
+   (b3, n3) = B[3]
+
+   @test  b1*b2*b3 == 21*((y + 1)*g*(y^5+y^3+y+1))
 
    println("PASS")
 end
