@@ -135,6 +135,8 @@ include("flint/FlintTypes.jl")
 
 include("antic/AnticTypes.jl")
 
+include("arb/ArbTypes.jl")
+
 include("pari/PariTypes.jl")
 
 include("Rings.jl")
