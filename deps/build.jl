@@ -139,6 +139,9 @@ except
 end          
  
 if on_windows
+   if Int == Int32
+      download("http://nemocas.org/binaries/w32-libarb.dll", joinpath(vdir, "lib", "libarb.dll"))
+   end
 else
    cd("$wdir/arb")
    run(`./configure --prefix=$vdir --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir --with-flint=$vdir`)
