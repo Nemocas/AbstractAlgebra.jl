@@ -14,6 +14,8 @@ link against libgmp.a on Linux.
 General
 -------
 
+* replace Culong with UInt and Clong with Int throughout, esp. fmpz.jl
+
 * Implement more generic ad hoc operators so we can remove all the documentation
 of ad hoc operators for other types
 
