@@ -60,6 +60,16 @@ type arb <: FieldElem
     return z
   end
 
+  function arb(s::String, p::Int)
+    s = bytestring(s)
+    z = new()
+    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
+    err = ccall((:arb_set_str, :libarb), Int32, (Ptr{arb}, Ptr{Uint8}, Int), &z, s, p)
+    finalizer(z, _arb_clear_fn)
+    err == 0 || error("Invalid real string: $(repr(s))")
+    return z
+  end
+
   function arb(x::Int)
     z = new()
     ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
@@ -166,6 +176,12 @@ end
 #end
 
 function call(r::ArbField, x::arb)
+  z = arb(x, r.prec)
+  z.parent = r
+  return z
+end
+
+function call(r::ArbField, x::String)
   z = arb(x, r.prec)
   z.parent = r
   return z
