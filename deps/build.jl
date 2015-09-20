@@ -15,6 +15,14 @@ end
 
 cd(wdir)
 
+#install libpthreads
+
+if on_windows
+   download("http://nemocas.org/binaries/w64-libwinpthread-1.dll", joinpath(vdir, "lib", "libwinpthread-1.dll"))
+end
+
+cd(wdir)
+
 # install M4
 
 if !on_windows
