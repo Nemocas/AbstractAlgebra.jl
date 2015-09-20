@@ -3934,6 +3934,18 @@ flint_set_num_threads(n::Int)
 \desc{Set the number of threads that Flint may use internally (the default
 value is 1). Most functions are currently unaffected by this setting.}
 
+\textbf{Examples.}
+
+Here are some examples of the above functions.
+
+\begin{lstlisting}
+flint_cleanup()
+
+flint_set_num_threads(2)
+
+flint_set_num_threads(1)
+\end{lstlisting}
+
 \subsection{Flint integers ($\Z$): \code{fmpz}}
 
 Multi-precision integers can be created in Nemo using \code{ZZ}. For example, to create the integer
