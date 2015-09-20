@@ -107,13 +107,13 @@ function show(io::IO, x::fq_nmod_series)
       print(io, "0")
    else
       ctx = base_ring(x)
-      cstr = ccall((:fq_nmod_poly_get_str_pretty, :libflint), Ptr{Uint8}, 
-        (Ptr{fq_nmod_series}, Ptr{Uint8}, Ptr{FqNmodFiniteField}), 
+      cstr = ccall((:fq_nmod_poly_get_str_pretty, :libflint), Ptr{UInt8}, 
+        (Ptr{fq_nmod_series}, Ptr{UInt8}, Ptr{FqNmodFiniteField}), 
                      &x, bytestring(string(var(parent(x)))), &ctx)
 
       print(io, bytestring(cstr))
 
-      ccall((:flint_free, :libflint), Void, (Ptr{Uint8},), cstr)
+      ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
    end
    print(io, "+O(", string(var(parent(x))), "^", x.prec, ")")
 end

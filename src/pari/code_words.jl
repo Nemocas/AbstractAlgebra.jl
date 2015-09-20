@@ -93,7 +93,7 @@ settyp(x::Ptr{Int}, s::Int) = unsafe_store!(x, ((unsafe_load(x, 1)
 varn(x::Ptr{Int}) = (unsafe_load(x, 2) & VARNBITS) >> VARNSHIFT
 
 function typ(x::Ptr{Int})
-   return reinterpret(Int, reinterpret(Uint, unsafe_load(x, 1)) >> TYPSHIFT)
+   return reinterpret(Int, reinterpret(UInt, unsafe_load(x, 1)) >> TYPSHIFT)
 end
 
 function setvarn(x::Ptr{Int}, s::Int)
@@ -121,13 +121,13 @@ debug(a::Ptr{Int}) = ccall((:dbgGEN, :libpari), Void, (Ptr{Int}, Int), a, -1)
 ###############################################################################
 
 function pari_print(a::Ptr{Int})
-   cstr = ccall((:GENtostr, :libpari), Ptr{Uint8}, (Ptr{Int},), a)
+   cstr = ccall((:GENtostr, :libpari), Ptr{UInt8}, (Ptr{Int},), a)
    print(bytestring(cstr))
-   ccall((:pari_free, :libpari), Void, (Ptr{Uint8},), cstr)
+   ccall((:pari_free, :libpari), Void, (Ptr{UInt8},), cstr)
 end
    
 function pari_print(io::IO, a::Ptr{Int})
-   cstr = ccall((:GENtostr, :libpari), Ptr{Uint8}, (Ptr{Int},), a)
+   cstr = ccall((:GENtostr, :libpari), Ptr{UInt8}, (Ptr{Int},), a)
    print(io, bytestring(cstr))
-   ccall((:pari_free, :libpari), Void, (Ptr{Uint8},), cstr)
+   ccall((:pari_free, :libpari), Void, (Ptr{UInt8},), cstr)
 end

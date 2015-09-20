@@ -82,10 +82,10 @@ function show(io::IO, x::nmod_poly)
   if length(x) == 0
     print(io, "0")
   else
-    cstr = ccall((:nmod_poly_get_str_pretty, :libflint), Ptr{Uint8},
-            (Ptr{nmod_poly}, Ptr{Uint8}), &x, bytestring(string(var(parent(x)))))
+    cstr = ccall((:nmod_poly_get_str_pretty, :libflint), Ptr{UInt8},
+            (Ptr{nmod_poly}, Ptr{UInt8}), &x, bytestring(string(var(parent(x)))))
     print(io, bytestring(cstr))
-    ccall((:flint_free, :libflint), Void, (Ptr{Uint8}, ), cstr)
+    ccall((:flint_free, :libflint), Void, (Ptr{UInt8}, ), cstr)
   end
 end
 

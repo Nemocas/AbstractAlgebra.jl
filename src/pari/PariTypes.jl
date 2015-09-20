@@ -25,7 +25,7 @@ type pari_int <: IntegerRingElem
 end
 
 function _pari_int_clear_fn(g::pari_int)
-   ccall((:pari_free, :libpari), Void, (Ptr{Uint},), g.d)
+   ccall((:pari_free, :libpari), Void, (Ptr{UInt},), g.d)
 end
 
 ###############################################################################
@@ -49,7 +49,7 @@ type pari_rat <: FractionElem{pari_int}
 end
 
 _pari_rat_clear_fn(g::pari_rat) = ccall((:pari_free, :libpari), Void, 
-                                        (Ptr{Uint},), g.d)
+                                        (Ptr{UInt},), g.d)
 
 ###############################################################################
 #
@@ -124,7 +124,7 @@ type pari_poly{T <: RingElem} <: PolyElem{T}
 end
 
 function _pari_poly_clear_fn(g::pari_poly)
-   ccall((:pari_free, :libpari), Void, (Ptr{Uint},), g.d)
+   ccall((:pari_free, :libpari), Void, (Ptr{UInt},), g.d)
 end
 
 _pari_poly_unclone(g::pari_poly) = gunclone(g.d)

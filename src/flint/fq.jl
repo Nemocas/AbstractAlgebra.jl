@@ -115,12 +115,12 @@ canonical_unit(x::fq) = x
 ###############################################################################
 
 function show(io::IO, x::fq)
-   cstr = ccall((:fq_get_str_pretty, :libflint), Ptr{Uint8}, 
+   cstr = ccall((:fq_get_str_pretty, :libflint), Ptr{UInt8}, 
                 (Ptr{fq}, Ptr{FqFiniteField}), &x, &x.parent)
 
    print(io, bytestring(cstr))
 
-   ccall((:flint_free, :libflint), Void, (Ptr{Uint8},), cstr)
+   ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
 end
 
 function show(io::IO, a::FqFiniteField)

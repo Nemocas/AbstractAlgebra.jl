@@ -26,7 +26,7 @@ type AnticNumberField <: Field{Antic}
    traces_den::Int
    traces_alloc::Int
    traces_length::Int
-   flag::Uint
+   flag::UInt
    pol::fmpq_poly
    S::Symbol
    auxilliary_data::Array{Any, 1}

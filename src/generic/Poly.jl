@@ -408,15 +408,15 @@ function ^{T <: RingElem}(a::PolyElem{T}, b::Int)
    elseif b == 0
       return one(parent(a))
    else
-      bit = ~((~Uint(0)) >> 1)
-      while (Uint(bit) & b) == 0
+      bit = ~((~UInt(0)) >> 1)
+      while (UInt(bit) & b) == 0
          bit >>= 1
       end
       z = a
       bit >>= 1
       while bit != 0
          z = z*z
-         if (Uint(bit) & b) != 0
+         if (UInt(bit) & b) != 0
             z *= a
          end
          bit >>= 1
@@ -621,15 +621,15 @@ function powmod{T <: Union(ResidueElem, FieldElem)}(a::PolyElem{T}, b::Int, d::P
          a = invmod(a, d)
          b = -b
       end
-      bit = ~((~Uint(0)) >> 1)
-      while (Uint(bit) & b) == 0
+      bit = ~((~UInt(0)) >> 1)
+      while (UInt(bit) & b) == 0
          bit >>= 1
       end
       z = a
       bit >>= 1
       while bit !=0
          z = mulmod(z, z, d)
-         if (Uint(bit) & b) != 0
+         if (UInt(bit) & b) != 0
             z = mulmod(z, a, d)
          end
          bit >>= 1

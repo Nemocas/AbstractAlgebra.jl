@@ -103,13 +103,13 @@ function show(io::IO, a::AnticNumberField)
 end
 
 function show(io::IO, x::nf_elem)
-   cstr = ccall((:nf_elem_get_str_pretty, :libflint), Ptr{Uint8}, 
-                (Ptr{nf_elem}, Ptr{Uint8}, Ptr{AnticNumberField}), 
+   cstr = ccall((:nf_elem_get_str_pretty, :libflint), Ptr{UInt8}, 
+                (Ptr{nf_elem}, Ptr{UInt8}, Ptr{AnticNumberField}), 
                  &x, bytestring(string(var(parent(x)))), &parent(x))
 
    print(io, bytestring(cstr))
 
-   ccall((:flint_free, :libflint), Void, (Ptr{Uint8},), cstr)
+   ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
 end
 
 needs_parentheses(::Nemo.nf_elem) = true
