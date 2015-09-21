@@ -850,9 +850,9 @@ function polylog(s::arb, a::arb)
 end
 
 function polylog(s::Int, a::arb)
-  z = parent(s)()
+  z = parent(a)()
   ccall((:arb_polylog_si, :libarb), Void,
-              (Ptr{arb}, Int, Ptr{arb}, Int), &z, s, &a, parent(s).prec)
+              (Ptr{arb}, Int, Ptr{arb}, Int), &z, s, &a, parent(a).prec)
   return z
 end
 
