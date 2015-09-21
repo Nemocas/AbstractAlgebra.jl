@@ -133,7 +133,16 @@ type arb <: FieldElem
     finalizer(z, _arb_clear_fn)
     return z
   end
- 
+
+  function arb(mid::arb, rad::arb)
+    z = new()
+    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
+    ccall((:arb_set, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &mid)
+    ccall((:arb_add_error, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &rad)
+    finalizer(z, _arb_clear_fn)
+    return z
+  end
+
   #function arb(x::arf)
   #  z = new()
   #  ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
@@ -199,6 +208,12 @@ end
 
 function call(r::ArbField, x::arb)
   z = arb(x, r.prec)
+  z.parent = r
+  return z
+end
+
+function call(r::ArbField, midrad::Tuple{arb, arb})
+  z = arb(midrad[1], midrad[2])
   z.parent = r
   return z
 end
