@@ -466,6 +466,8 @@ function test_fmpz_number_theoretic()
 
    @test binom(12, 5) == 792
 
+   @test bell(12) == 4213597
+
    @test moebiusmu(fmpz(13)) == -1
 
    @test jacobi(fmpz(2), fmpz(5)) == -1

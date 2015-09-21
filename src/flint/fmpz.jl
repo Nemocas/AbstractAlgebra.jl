@@ -31,7 +31,7 @@
 # OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 # WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, fac,
+export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, fac, bell,
        binom, isprime, fdiv, cdiv, tdiv, div, rem, mod, gcd, xgcd, lcm, invmod,
        powmod, abs, divrem, isqrt, popcount, prevpow2, nextpow2, ndigits, dec,
        bin, oct, hex, base, one, zero, divexact, fits, sign, nbits, deepcopy,
@@ -806,6 +806,14 @@ function fib(x::Int)
     x < 0 && throw(DomainError())
     z = fmpz()
     ccall((:fmpz_fib_ui, :libflint), Void, 
+          (Ptr{fmpz}, UInt), &z, x)
+    return z
+end
+
+function bell(x::Int)
+    x < 0 && throw(DomainError())
+    z = fmpz()
+    ccall((:arith_bell_number, :libflint), Void, 
           (Ptr{fmpz}, UInt), &z, x)
     return z
 end
