@@ -673,14 +673,14 @@ end
 function sinpi(x::fmpq, r::ArbField)
   z = r()
   ccall((:arb_sin_pi_fmpq, :libarb), Void,
-        (Ptr{arb}, Int), &s, &x, prec(r))
+        (Ptr{arb}, Ptr{fmpq}, Int), &s, &x, prec(r))
   return z
 end
 
 function cospi(x::fmpq, r::ArbField)
   z = r()
   ccall((:arb_cos_pi_fmpq, :libarb), Void,
-        (Ptr{arb}, Int), &s, &x, prec(r))
+        (Ptr{arb}, Ptr{fmpq}, Int), &s, &x, prec(r))
   return z
 end
 
@@ -688,7 +688,7 @@ function sincospi(x::fmpq, r::ArbField)
   s = r()
   c = r()
   ccall((:arb_sin_cos_pi_fmpq, :libarb), Void,
-        (Ptr{arb}, Ptr{arb}, Int), &s, &c, &x, prec(r))
+        (Ptr{arb}, Ptr{arb}, Ptr{fmpq}, Int), &s, &c, &x, prec(r))
   return (s, c)
 end
 
@@ -778,7 +778,7 @@ end
 function fib(n::UInt, r::ArbField)
   z = r()
   ccall((:arb_fib_ui, :libarb), Void,
-              (Ptr{arb}, UInt, Int), &z, &n, r.prec)
+              (Ptr{arb}, UInt, Int), &z, n, r.prec)
   return z
 end
 
@@ -801,7 +801,7 @@ end
 function zeta(n::UInt, r::ArbField)
   z = r()
   ccall((:arb_zeta_ui, :libarb), Void,
-              (Ptr{arb}, UInt, Int), &z, &n, r.prec)
+              (Ptr{arb}, UInt, Int), &z, n, r.prec)
   return z
 end
 
@@ -810,11 +810,11 @@ zeta(n::Int, r::ArbField) = n >= 0 ? zeta(UInt(n), r) : zeta(r(n))
 function bernoulli(n::UInt, r::ArbField)
   z = r()
   ccall((:arb_bernoulli_ui, :libarb), Void,
-              (Ptr{arb}, UInt, Int), &z, &n, r.prec)
+              (Ptr{arb}, UInt, Int), &z, n, r.prec)
   return z
 end
 
-bernoulli(n::Int, r::ArbField) = n >= 0 ? zeta(UInt(n), r) : zeta(r(n))
+bernoulli(n::Int, r::ArbField) = n >= 0 ? bernoulli(UInt(n), r) : throw(DomainError)
 
 function risingfac(x::arb, n::UInt)
   z = parent(x)()
