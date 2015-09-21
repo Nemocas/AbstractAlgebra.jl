@@ -7,6 +7,8 @@ include("flint/padic-test.jl")
 
 include("antic/nf_elem-test.jl")
 
+include("arb/arb-test.jl")
+
 function test_fields_resultant()
    print("Fields.resultant...")
 
@@ -29,6 +31,7 @@ function test_fields_resultant()
 end
 
 function test_fields()
+   test_arb()
    test_fraction()
 
    test_fmpq()

@@ -3,7 +3,8 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 module Nemo
 
 import Base: abs, asin, asinh, atan, atanh, base, bin, call, checkbounds,
-             convert, cmp, cos, cosh, dec, deepcopy, den, deserialize, div,
+             convert, cmp, contains, cos, cosh, dec, deepcopy, den, deserialize,
+             div,
              divrem, exp, factor, gcd, gcdx, getindex, hash, hex, intersect,
              inv, invmod, isequal, isless, isprime, isqrt, lcm, length, log,
              lufact, mod, ndigits, nextpow2, norm, nullspace, num, oct, one, 

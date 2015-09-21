@@ -10,7 +10,7 @@ export radius, midpoint, zeropminf, indeterminate, contains, contains_zero,
        contains_negative, contains_positive, contains_nonnegative,
        contains_nonpositive, isnonzero, isexact, isint, ispositive,
        isnonnegative, isnegative, isnonpositive, sin, cos, tan, add!, mul!,
-       sub!, div!, strongequal, prec
+       sub!, div!, strongequal, prec, overlaps
 
 ################################################################################
 #
@@ -34,6 +34,28 @@ type ArbField <: Field
 end
 
 prec(x::ArbField) = x.prec
+
+# these may be used for shallow operations
+type arf_struct
+  exp::Int # fmpz
+  size::UInt64 # mp_size_t
+  d1::Int64 # mantissa_struct
+  d2::Int64
+end
+
+type mag_struct
+  exp::Int # fmpz
+  man::UInt64 # mp_limb_t
+end
+
+type arb_struct
+  mid_exp::Int # fmpz
+  mid_size::UInt64 # mp_size_t
+  mid_d1::Int64 # mantissa_struct
+  mid_d2::Int64
+  rad_exp::Int # fmpz
+  rad_man::UInt64
+end
 
 type arb <: FieldElem
   mid_exp::Int # fmpz
@@ -275,6 +297,64 @@ for (s,f) in (("contains_zero", "arb_contains_zero"),
   end
 end
 
+###############################################################################
+#
+#   Comparison
+#
+###############################################################################
+
+function ==(x::arb, y::arb)
+    return Bool(ccall((:arb_eq, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y))
+end
+
+function !=(x::arb, y::arb)
+    return Bool(ccall((:arb_ne, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y))
+end
+
+function >(x::arb, y::arb)
+    return Bool(ccall((:arb_gt, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y))
+end
+
+function >=(x::arb, y::arb)
+    return Bool(ccall((:arb_ge, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y))
+end
+
+function <(x::arb, y::arb)
+    return Bool(ccall((:arb_lt, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y))
+end
+
+function <=(x::arb, y::arb)
+    return Bool(ccall((:arb_le, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y))
+end
+
+==(x::arb, y::Int) = x == arb(y)
+!=(x::arb, y::Int) = x != arb(y)
+<=(x::arb, y::Int) = x <= arb(y)
+>=(x::arb, y::Int) = x >= arb(y)
+<(x::arb, y::Int) = x < arb(y)
+>(x::arb, y::Int) = x > arb(y)
+
+==(x::Int, y::arb) = arb(x) == y
+!=(x::Int, y::arb) = arb(x) != y
+<=(x::Int, y::arb) = arb(x) <= y
+>=(x::Int, y::arb) = arb(x) >= y
+<(x::Int, y::arb) = arb(x) < y
+>(x::Int, y::arb) = arb(x) > y
+
+==(x::arb, y::fmpz) = x == arb(y)
+!=(x::arb, y::fmpz) = x != arb(y)
+<=(x::arb, y::fmpz) = x <= arb(y)
+>=(x::arb, y::fmpz) = x >= arb(y)
+<(x::arb, y::fmpz) = x < arb(y)
+>(x::arb, y::fmpz) = x > arb(y)
+
+==(x::fmpz, y::arb) = arb(x) == y
+!=(x::fmpz, y::arb) = arb(x) != y
+<=(x::fmpz, y::arb) = arb(x) <= y
+>=(x::fmpz, y::arb) = arb(x) >= y
+<(x::fmpz, y::arb) = arb(x) < y
+>(x::fmpz, y::arb) = arb(x) > y
+
 ################################################################################
 #
 #  Predicates
@@ -300,21 +380,27 @@ for (s,f) in (("iszero", "arb_is_zero"),
 end
 
 function radius(x::arb)
-  error("not implemented")
-
-  #r = ccall((:arb_get_rad, :libarb), Ptr{mag}, (Ptr{arb}, ), &x)
-  #z = mag()
-  #ccall((:mag_set, :libarb), Void, (Ptr{mag}, Ptr{mag}), &z, r)
-  #return z
+  t = mag_struct(x.rad_exp, x.rad_man)
+  u = arf_struct(0, 0, 0, 0)
+  z = parent(x)()
+  ccall((:arf_set_mag, :libarb), Void, (Ptr{arf_struct}, Ptr{mag_struct}), &u, &t)
+  z.mid_exp = u.exp
+  z.mid_size = u.size
+  z.mid_d1 = u.d1
+  z.mid_d2 = u.d2
+  return z
 end
 
 function midpoint(x::arb)
-  error("not implemented")
-  #r = ccall((:arb_get_mid, :libarb), Ptr{arf}, (Ptr{arb},), &x)
-  #z = arf()
-  #z.parent = ArfField(parent(x).prec)
-  #ccall((:arf_set, :libarb), Void, (Ptr{arf}, Ptr{arf}), &z, r)
-  #return z
+  t = arf_struct(x.mid_exp, x.mid_size, x.mid_d1, x.mid_d2)
+  u = arf_struct(0, 0, 0, 0)
+  z = parent(x)()
+  ccall((:arf_set, :libarb), Void, (Ptr{arf_struct}, Ptr{arf_struct}), &u, &t)
+  z.mid_exp = u.exp
+  z.mid_size = u.size
+  z.mid_d1 = u.d1
+  z.mid_d2 = u.d2
+  return z
 end
 
 for (s,f) in (("iszero", "arb_is_zero"), ("isnonzero", "arb_is_nonzero"),
@@ -565,7 +651,7 @@ end
 
 function tan(x::arb)
   z = parent(x)()
-  ccall((:arban, :libarb), Void,
+  ccall((:arb_tan, :libarb), Void,
               (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
   return z
 end
