@@ -6,12 +6,6 @@
 
 export ArbField, arb
 
-export radius, midpoint, zeropminf, indeterminate, contains, contains_zero,
-       contains_negative, contains_positive, contains_nonnegative,
-       contains_nonpositive, isnonzero, isexact, isint, ispositive,
-       isnonnegative, isnegative, isnonpositive, sin, cos, tan, add!, mul!,
-       sub!, div!, strongequal, prec, overlaps
-
 ################################################################################
 #
 #  Types and memory management

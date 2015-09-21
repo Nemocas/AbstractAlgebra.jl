@@ -14,6 +14,12 @@ import Base: abs, asin, asinh, atan, atanh, base, bin, call, checkbounds,
              transpose, transpose!, truncate, var, zero, +, -, *, ==, ^, &, |,
              $, <<, >>, ~, <=, >=, <, >, hcat, vcat, //
 
+import Base: floor, ceil, hypot, sqrt,
+             log, log1p, exp, expm1, sin, cos, sinpi, cospi, tan, cot,
+             sinh, cosh, tanh, coth, atan, asin, acos,
+             atanh, asinh, acosh, gamma, lgamma, digamma, zeta,
+             sinpi, cospi, atan2
+
 export Collection, Ring, Field, CollectionElem, RingElem, FieldElem, Pari,
        Flint, Antic, Generic
 
