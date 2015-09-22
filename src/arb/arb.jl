@@ -235,6 +235,20 @@ end
 <(x::fmpz, y::arb) = arb(x) < y
 >(x::fmpz, y::arb) = arb(x) > y
 
+==(x::arb, y::Float64) = x == arb(y)
+!=(x::arb, y::Float64) = x != arb(y)
+<=(x::arb, y::Float64) = x <= arb(y)
+>=(x::arb, y::Float64) = x >= arb(y)
+<(x::arb, y::Float64) = x < arb(y)
+>(x::arb, y::Float64) = x > arb(y)
+
+==(x::Float64, y::arb) = arb(x) == y
+!=(x::Float64, y::arb) = arb(x) != y
+<=(x::Float64, y::arb) = arb(x) <= y
+>=(x::Float64, y::arb) = arb(x) >= y
+<(x::Float64, y::arb) = arb(x) < y
+>(x::Float64, y::arb) = arb(x) > y
+
 ################################################################################
 #
 #  Predicates
@@ -290,15 +304,34 @@ end
 
 ################################################################################
 #
-#  Binary operations
+#  Unary operations
 #
 ################################################################################
 
 function -(x::arb)
   z = parent(x)()
-  ccall((:arb_neg_round, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &x)
+  ccall((:arb_neg, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &x)
   return z
 end
+
+function abs(x::arb)
+  z = parent(x)()
+  ccall((:arb_abs, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &x)
+  return z
+end
+
+function inv(x::arb)
+  z = parent(x)()
+  ccall((:arb_inv, :libarb), Void,
+              (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+  return parent(x)(z)
+end
+
+################################################################################
+#
+#  Binary operations
+#
+################################################################################
 
 for (s,f) in ((:+,"arb_add"), (:*,"arb_mul"), (:/, "arb_div"), (:-,"arb_sub"))
   @eval begin
@@ -420,6 +453,29 @@ function /(x::arb, y::fmpz)
   return z
 end
 
+function /(x::UInt, y::arb)
+  z = parent(y)()
+  ccall((:arb_ui_div, :libarb), Void,
+              (Ptr{arb}, UInt, Ptr{arb}, Int), &z, x, &y, parent(y).prec)
+  return z
+end
+
+function /(x::Int, y::arb)
+  z = parent(y)()
+  t = arb(x)
+  ccall((:arb_div, :libarb), Void,
+              (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int), &z, &t, &y, parent(y).prec)
+  return z
+end
+
+function /(x::fmpz, y::arb)
+  z = parent(y)()
+  t = arb(x)
+  ccall((:arb_div, :libarb), Void,
+              (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int), &z, &t, &y, parent(y).prec)
+  return z
+end
+
 function ^(x::arb, y::arb)
   z = parent(x)()
   ccall((:arb_pow, :libarb), Void,
@@ -450,13 +506,6 @@ function ^(x::arb, y::fmpq)
               (Ptr{arb}, Ptr{arb}, Ptr{fmpq}, Int),
               &z, &x, &y, parent(x).prec)
   return z
-end
-
-function inv(x::arb)
-  z = parent(x)()
-  ccall((:arb_inv, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
-  return parent(x)(z)
 end
 
 ################################################################################
@@ -584,12 +633,6 @@ end
 #  Real valued functions
 #
 ################################################################################
-
-function abs(x::arb)
-  z = parent(x)()
-  ccall((:arb_abs, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &x)
-  return z
-end
 
 # real - real functions
 for (s,f) in (("floor", "arb_floor"),
