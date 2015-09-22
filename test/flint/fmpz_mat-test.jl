@@ -238,6 +238,22 @@ function test_fmpz_mat_inversion()
    println("PASS")
 end
 
+function test_fmpz_mat_pseudo_inversion()
+   print("fmpz_mat.pseudo_inversion...")
+
+   S = MatrixSpace(ZZ, 3, 3)
+
+   A = S([1 2 3; 1 2 3; 1 2 3])
+   B = S([1 0 1; 2 3 1; 5 6 7])
+
+   @test_throws ErrorException pseudo_inv(A)
+
+   C, d = pseudo_inv(B)
+   @test B*C == S(d)
+
+   println("PASS")
+end
+
 function test_fmpz_mat_exact_division()
    print("fmpz_mat.exact_division...")
 
@@ -460,6 +476,7 @@ function test_fmpz_mat()
    test_fmpz_mat_transpose()
    test_fmpz_mat_scaling()
    test_fmpz_mat_inversion()
+   test_fmpz_mat_pseudo_inversion()
    test_fmpz_mat_exact_division()
    test_fmpz_mat_modular_reduction()
    test_fmpz_mat_determinant()
