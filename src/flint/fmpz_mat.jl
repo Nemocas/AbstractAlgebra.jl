@@ -11,7 +11,7 @@ export fmpz_mat, FmpzMatSpace, getindex, getindex!, setindex!, rows, cols,
        lll_with_removal, lll_with_removal_transform,
        nullspace, rank, rref, reduce_mod, snf, snf_diagonal, is_snf, solve,
        solve_dixon, trace, transpose, content, hcat, vcat, addmul!, zero!,
-       window
+       window, pseudo_inv
 
 ###############################################################################
 #
@@ -383,6 +383,23 @@ function inv(x::fmpz_mat)
       return -z
    end
    error("Matrix not invertible")
+end
+
+###############################################################################
+#
+#   Pseudo inversion
+#
+###############################################################################
+
+function pseudo_inv(x::fmpz_mat)
+   z = parent(x)()
+   d = fmpz()
+   ccall((:fmpz_mat_inv, :libflint), Void, 
+         (Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{fmpz_mat}), &z, &d, &x)
+   if !iszero(d)
+      return (z, d)
+   end
+   error("Matrix is singular")
 end
 
 ###############################################################################

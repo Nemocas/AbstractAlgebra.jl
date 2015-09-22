@@ -7175,6 +7175,28 @@ Here is an example of inversion.
    B = inv(A)
 \end{lstlisting}
 
+\subsubsection{Pseudo inversion}
+
+\begin{lstlisting}
+pseudo_inv(a::fmpz_mat)
+\end{lstlisting}
+
+\desc{Return a tuple $(R, d)$ where $R/d$ is the inverse of $a$ over $\Q$.
+Here $R$ is a matrix over $\Z$ and $d$ is an \code{fmpz} denominator.
+Note that the matrix must be square and and non-singular, otherwise an exception is thrown.}
+
+\textbf{Examples.}
+
+Here is an example of inversion.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+
+   A = S([1 0 1; 2 3 1; 5 6 7])
+  
+   B, d = pseudo_inv(A)
+\end{lstlisting}
+
 \subsubsection{Linear solving}
 
 \begin{lstlisting}
