@@ -9894,11 +9894,18 @@ used for operations on interval midpoints. The precision used for
 interval radii is a fixed implementation-defined constant (30 bits).
 
 The following creates a parent object \code{RR} representing
-the field of real numbers with 64-bit precision:
+the field of real numbers with 64-bit precision, and elements
+\code{x}, \code{y} representing the rational numbers 1/4 and 1/10:
 
 \begin{lstlisting}
 RR = ArbField(64)
+x = RR("0.25")
+y = RR("0.1")
 \end{lstlisting}
+
+Since interval midpoints are binary floating-point numbers with
+finite precision, one has
+\code{isexact(x) == true} and \code{isexact(y) == false} in this example.
 
 \section{Pari rings}
 
