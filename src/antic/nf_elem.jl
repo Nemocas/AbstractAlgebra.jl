@@ -84,6 +84,31 @@ function iszero(a::nf_elem)
                 (Ptr{nf_elem}, Ptr{AnticNumberField}), &a, &a.parent)
 end
 
+function den(a::nf_elem)
+   z = fmpz()
+   ccall((:nf_elem_get_den, :libflint), Void,
+         (Ptr{fmpz}, Ptr{nf_elem}, Ptr{AnticNumberField}),
+         &z, &a, &a.parent)
+   return z
+end
+
+function elem_from_mat_row(a::AnticNumberField, b::fmpz_mat, i::Int, d::fmpz)
+   _checkbounds(b.parent.rows, i) || throw(BoundsError())
+   b.parent.cols == degree(a) || error("Wrong number of columns")
+   z = a()
+   ccall((:nf_elem_set_fmpz_mat_row, :libflint), Void,
+        (Ptr{nf_elem}, Ptr{fmpz_mat}, Cint, Ptr{fmpz}, Ptr{AnticNumberField}),
+        &z, &b, i - 1, &d, &a)
+   return z
+end
+
+function elem_to_mat_row!(a::fmpz_mat, i::Int, d::fmpz, b::nf_elem)
+   ccall((:nf_elem_get_fmpz_mat_row, :libflint), Void,
+         (Ptr{fmpz_mat}, Cint, Ptr{fmpz}, Ptr{nf_elem}, Ptr{AnticNumberField}),
+         &a, i - 1, &d, &b, &b.parent)
+   nothing
+ end
+
 degree(a::AnticNumberField) = degree(a.pol)
 
 function deepcopy(d::nf_elem)
@@ -278,6 +303,14 @@ end
 *(a::Integer, b::nf_elem) = b * a
 
 *(a::fmpq, b::nf_elem) = b * a
+
+//(a::nf_elem, b::Int) = divexact(a, b)
+
+//(a::nf_elem, b::fmpz) = divexact(a, b)
+
+//(a::nf_elem, b::Integer) = a//fmpz(b)
+
+//(a::nf_elem, b::fmpq) = divexact(a, b)
 
 ###############################################################################
 #

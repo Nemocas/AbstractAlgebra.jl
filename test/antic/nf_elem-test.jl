@@ -33,6 +33,43 @@ function test_nf_elem_constructors()
    println("PASS")
 end
 
+function test_nf_elem_fmpz_mat_conversions()
+   print("nf_elem.fmpz_mat_conversions...")
+
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   M = MatrixSpace(FlintZZ, 1, 3)(0)
+
+   M[1, 1] = 1
+   M[1, 2] = 2
+   M[1, 3] = 3
+   
+   @test Nemo.elem_from_mat_row(K, M, 1, fmpz(5)) == (1 + 2*a + 3*a^2)//5
+
+   b = (1 + a + 5*a^2)//3
+   d = fmpz()
+
+   Nemo.elem_to_mat_row!(M, 1, d, b)
+
+   @test d == 3
+   @test M == MatrixSpace(FlintZZ, 1, 3)([1 1 5])
+
+   println("PASS")
+end
+
+function test_nf_elem_denominator()
+   print("nf_elem.denominator...")
+
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+
+   b = a//5
+
+   @test den(b) == 5
+
+   println("PASS")
+end
+
 function test_nf_elem_conversions()
    print("nf_elem.conversions...")
  
@@ -227,6 +264,8 @@ end
 
 function test_nf_elem()
    test_nf_elem_constructors()
+   test_nf_elem_fmpz_mat_conversions()
+   test_nf_elem_denominator()
    test_nf_elem_conversions()
    test_nf_elem_manipulation()
    test_nf_elem_unary_ops()
