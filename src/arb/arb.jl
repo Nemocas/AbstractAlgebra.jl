@@ -28,9 +28,9 @@ export radius, midpoint, zeropminf, indeterminate, contains, contains_zero,
 #
 ###############################################################################
 
-zero(R::ArbField) = a(0)
+zero(R::ArbField) = R(0)
 
-one(R::ArbField) = a(1)
+one(R::ArbField) = R(1)
 
 ################################################################################
 #
@@ -154,7 +154,7 @@ function contains(x::arb, y::fmpz)
 end
 
 function contains(x::arb, y::Int)
-  r = ccall((:arb_contains_si, :libarb), Cint, (Ptr{arb}, Ptr{fmpz}), &x, y)
+  r = ccall((:arb_contains_si, :libarb), Cint, (Ptr{arb}, Int), &x, y)
   return Bool(r)
 end
 
