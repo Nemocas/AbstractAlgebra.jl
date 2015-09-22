@@ -6,9 +6,10 @@
 
 import Base: ceil
 
-export radius, midpoint, zeropminf, indeterminate, contains, contains_zero,
+export radius, midpoint, contains, contains_zero,
        contains_negative, contains_positive, contains_nonnegative,
-       contains_nonpositive, isnonzero, isexact, isint, ispositive,
+       contains_nonpositive, iszero,
+       isnonzero, isexact, isint, ispositive, isfinite,
        isnonnegative, isnegative, isnonpositive, add!, mul!,
        sub!, div!, strongequal, prec, overlaps, unique_integer,
        accuracy_bits, trim, ldexp, setunion,
@@ -182,12 +183,6 @@ for (s,f) in (("contains_zero", "arb_contains_zero"),
   end
 end
 
-###############################################################################
-#
-#   Comparison
-#
-###############################################################################
-
 function ==(x::arb, y::arb)
     return Bool(ccall((:arb_eq, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y))
 end
@@ -258,11 +253,16 @@ for (s,f) in (("iszero", "arb_is_zero"),
               ("isnonpositive", "arb_is_nonpositive"))
   @eval begin
     function($(symbol(s)))(x::arb)
-      i = ccall(($f, :libarb), Cint, (Ptr{arb},), &x)
-      return Bool(i)
+      return Bool(ccall(($f, :libarb), Cint, (Ptr{arb},), &x))
     end
   end
 end
+
+################################################################################
+#
+#  Parts of numbers
+#
+################################################################################
 
 function radius(x::arb)
   t = mag_struct(x.rad_exp, x.rad_man)
@@ -285,32 +285,6 @@ function midpoint(x::arb)
   z.mid_size = u.size
   z.mid_d1 = u.d1
   z.mid_d2 = u.d2
-  return z
-end
-
-for (s,f) in (("iszero", "arb_is_zero"), ("isnonzero", "arb_is_nonzero"),
-              ("isone", "arb_is_one"), ("isfinite", "arb_is_finite"),
-              ("isexact", "arb_is_exact"), ("isint", "arb_is_int"),
-              ("ispositive", "arb_is_positive"),
-              ("isnonnegative", "arb_is_nonnegative"),
-              ("isnegative", "arb_is_negative"),
-              ("isnonnegative", "arb_is_nonnegative"))
-  @eval begin
-    function($(symbol(s)))(x::arb)
-      return Bool(ccall(($f, :libarb), Cint, (Ptr{arb}, ), &x))
-    end
-  end
-end
-
-################################################################################
-#
-#  Unary operations
-#
-################################################################################
-
-function abs(x::arb)
-  z = parent(x)()
-  ccall((:arb_abs, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &x)
   return z
 end
 
@@ -610,6 +584,12 @@ end
 #  Real valued functions
 #
 ################################################################################
+
+function abs(x::arb)
+  z = parent(x)()
+  ccall((:arb_abs, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &x)
+  return z
+end
 
 # real - real functions
 for (s,f) in (("floor", "arb_floor"),

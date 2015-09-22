@@ -134,10 +134,50 @@ function test_arb_adhoc_comparison()
    println("PASS")
 end
 
+function test_arb_predicates()
+   print("arb.predicates()...")
+
+   @test iszero(RR(0))
+   @test !iszero(RR(1))
+   @test !iszero(RR("0 +/- 0.01"))
+
+   @test !isnonzero(RR(0))
+   @test isnonzero(RR(1))
+   @test !isnonzero(RR("0 +/- 0.01"))
+
+   @test isone(RR(1))
+   @test !isone(RR(0))
+
+   @test isfinite(RR(3))
+   @test !isfinite(RR("0 +/- inf"))
+   @test !isfinite(RR("nan"))
+
+   @test isexact(RR(3))
+   @test !isexact(RR("3 +/- 0.01"))
+   @test isexact(RR(QQ(1,4)))
+   @test !isexact(RR(QQ(1,3)))
+
+   @test isint(RR(3))
+   @test !isint(RR("3 +/- 0.01"))
+
+   @test ispositive(RR(3))
+   @test isnonnegative(RR(3))
+   @test isnegative(RR(-3))
+   @test isnonpositive(RR(-3))
+
+   @test !ispositive(RR(0))
+   @test isnonnegative(RR(0))
+   @test !isnegative(RR(0))
+   @test isnonpositive(RR(0))
+
+   println("PASS")
+end
+
 function test_arb()
    test_arb_constructors()
    test_arb_basic_ops()
    test_arb_comparison()
+   test_arb_predicates()
 
    println("")
 end
