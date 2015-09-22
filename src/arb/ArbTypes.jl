@@ -12,12 +12,15 @@ export ArbField, arb
 #
 ################################################################################
 
+arb_check_prec(p::Int) = (p >= 2 && p < (typemax(Int) >> 4)) || throw(ArgumentError("invalid precision"))
+
 const ArbFieldID = ObjectIdDict()
 
 type ArbField <: Field
   prec::Int
   
   function ArbField(p::Int = 256)
+    arb_check_prec(p)
     try
       return ArbFieldID[p]::ArbField
     catch

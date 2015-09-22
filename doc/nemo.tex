@@ -87,6 +87,7 @@ Nemo is based on the C libraries:
 \begin{enumerate}
 \item FLINT (Fast Library for Number Theory) -- \url{http://flintlib.org/}
 \item ANTIC (Algebraic Number Theory in Code) -- \url{http://github.com/wbhart/antic/}
+\item Arb -- \url{http://fredrikj.net/arb/}
 \item Pari -- \url{http://pari.math.u-bordeaux.fr/}
 \item Singular -- \url{http://www.singular.uni-kl.de/}
 \end{enumerate}
@@ -5010,7 +5011,7 @@ numpart(x::Int)
 \desc{Return the number of partitions of $x$, i.e. $p(x)$. Since $p(x)$
 has $O(\sqrt{x})$ digits, this function can only be computed up to
 about $x = 10^{19}$. For large $x$, the result is computed faster if one
-sets \code{flint_num_threads(2)}.}
+sets \code{flint_set_num_threads(2)}.}
 
 \textbf{Examples.}
 
@@ -9872,6 +9873,31 @@ c = 3a^2 - a + 1
 
 norm(c)
 trace(c)
+\end{lstlisting}
+
+\section{Arb rings}
+
+Arb is a library for real and complex numbers implemented using
+a ball (mid-rad) representation which tracks error bounds rigorously.
+
+\subsection{Arb real numbers ($\R$): \code|arb|}
+
+Arb provides the module \code{arb} for real numbers represented
+in mid-rad interval form $[m \pm r] = [m-r, m+r]$. The type of Arb real
+numbers in Nemo is also given the name \code{arb}.
+
+The parent object for Arb reals is of type \code{ArbField}, which
+belongs to the \code{Field} type class.
+
+The \code{ArbField} parent is initialised with the precision in bits (\code{prec})
+used for operations on interval midpoints. The precision used for
+interval radii is a fixed implementation-defined constant (30 bits).
+
+The following creates a parent object \code{RR} representing
+the field of real numbers with 64-bit precision:
+
+\begin{lstlisting}
+RR = ArbField(64)
 \end{lstlisting}
 
 \section{Pari rings}
