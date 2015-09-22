@@ -14,7 +14,7 @@ export radius, midpoint, contains, contains_zero,
        sub!, div!, strongequal, prec, overlaps, unique_integer,
        accuracy_bits, trim, ldexp, setunion,
        const_pi, const_e, const_log2, const_log10, const_euler,
-       const_catalan, const_khinchin, const_glaisher, const_apery,
+       const_catalan, const_khinchin, const_glaisher,
        floor, ceil, hypot, sqrt, rsqrt, sqrt1pm1, root,
        log, log1p, exp, expm1, sin, cos, sinpi, cospi, tan, cot,
        tanpi, cotpi, sinh, cosh, tanh, coth, atan, asin, acos,
@@ -622,12 +622,6 @@ function const_glaisher(r::ArbField)
   return z
 end
 
-function const_apery(r::ArbField)
-  z = r()
-  ccall((:arb_const_apery, :libarb), Void, (Ptr{arb}, Int), &z, prec(r))
-  return z
-end
-
 ################################################################################
 #
 #  Real valued functions
@@ -696,14 +690,14 @@ end
 function sinpi(x::fmpq, r::ArbField)
   z = r()
   ccall((:arb_sin_pi_fmpq, :libarb), Void,
-        (Ptr{arb}, Ptr{fmpq}, Int), &s, &x, prec(r))
+        (Ptr{arb}, Ptr{fmpq}, Int), &z, &x, prec(r))
   return z
 end
 
 function cospi(x::fmpq, r::ArbField)
   z = r()
   ccall((:arb_cos_pi_fmpq, :libarb), Void,
-        (Ptr{arb}, Ptr{fmpq}, Int), &s, &x, prec(r))
+        (Ptr{arb}, Ptr{fmpq}, Int), &z, &x, prec(r))
   return z
 end
 
@@ -760,6 +754,13 @@ end
 
 root(x::arb, n::Int) = x < 0 ? throw(DomainError()) : root(x, UInt(n))
 
+function root(x::arb, n::UInt)
+  z = parent(x)()
+  ccall((:arb_root, :libarb), Void,
+              (Ptr{arb}, Ptr{arb}, UInt, Int), &z, &x, n, parent(x).prec)
+  return z
+end
+
 fac(x::arb) = gamma(x+1)
 
 function fac(n::UInt, r::ArbField)
@@ -769,13 +770,6 @@ function fac(n::UInt, r::ArbField)
 end
 
 fac(n::Int, r::ArbField) = n < 0 ? fac(r(n)) : fac(UInt(n), r)
-
-function root(x::arb, n::UInt)
-  z = parent(x)()
-  ccall((:arb_root, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, UInt, Int), &z, &x, n, parent(x).prec)
-  return z
-end
 
 function binom(x::arb, n::UInt)
   z = parent(x)()
@@ -850,12 +844,12 @@ risingfac(x::arb, n::Int) = n < 0 ? throw(DomainError()) : risingfac(x, UInt(n))
 
 function risingfac(x::fmpq, n::UInt, r::ArbField)
   z = r()
-  ccall((:arb_rising_fmpq, :libarb), Void,
+  ccall((:arb_rising_fmpq_ui, :libarb), Void,
               (Ptr{arb}, Ptr{fmpq}, UInt, Int), &z, &x, n, r.prec)
   return z
 end
 
-risingfac(x::fmpq, n::Int) = n < 0 ? throw(DomainError()) : risingfac(x, UInt(n))
+risingfac(x::fmpq, n::Int, r::ArbField) = n < 0 ? throw(DomainError()) : risingfac(x, UInt(n), r)
 
 function risingfac2(x::arb, n::UInt)
   z = parent(x)()
@@ -864,6 +858,8 @@ function risingfac2(x::arb, n::UInt)
               (Ptr{arb}, Ptr{arb}, Ptr{arb}, UInt, Int), &z, &w, &x, n, parent(x).prec)
   return (z, w)
 end
+
+risingfac2(x::arb, n::Int) = n < 0 ? throw(DomainError()) : risingfac2(x, UInt(n))
 
 function polylog(s::arb, a::arb)
   z = parent(s)()
@@ -898,7 +894,7 @@ function chebyshev_t2(n::UInt, x::arb)
   w = parent(x)()
   ccall((:arb_chebyshev_t2_ui, :libarb), Void,
               (Ptr{arb}, Ptr{arb}, UInt, Ptr{arb}, Int), &z, &w, n, &x, parent(x).prec)
-  return z
+  return z, w
 end
 
 function chebyshev_u2(n::UInt, x::arb)
@@ -906,7 +902,7 @@ function chebyshev_u2(n::UInt, x::arb)
   w = parent(x)()
   ccall((:arb_chebyshev_u2_ui, :libarb), Void,
               (Ptr{arb}, Ptr{arb}, UInt, Ptr{arb}, Int), &z, &w, n, &x, parent(x).prec)
-  return z
+  return z, w
 end
 
 chebyshev_t(n::Int, x::arb) = n < 0 ? throw(DomainError()) : chebyshev_t(UInt(n), x)
