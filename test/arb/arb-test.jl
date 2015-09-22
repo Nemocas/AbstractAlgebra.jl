@@ -6,6 +6,9 @@ function test_arb_constructors()
    @test isa(RR, ArbField)
    @test isa(RR(2), FieldElem)
 
+   @test elem_type(RR) == arb
+   @test base_ring(RR) == None
+
    println("PASS")
 end
 

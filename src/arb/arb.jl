@@ -29,6 +29,10 @@ export radius, midpoint, contains, contains_zero,
 #
 ###############################################################################
 
+elem_type(::ArbField) = arb
+
+base_ring(R::ArbField) = None
+
 zero(R::ArbField) = R(0)
 
 one(R::ArbField) = R(1)
@@ -753,13 +757,6 @@ function root(x::arb, n::UInt)
 end
 
 root(x::arb, n::Int) = x < 0 ? throw(DomainError()) : root(x, UInt(n))
-
-function root(x::arb, n::UInt)
-  z = parent(x)()
-  ccall((:arb_root, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, UInt, Int), &z, &x, n, parent(x).prec)
-  return z
-end
 
 fac(x::arb) = gamma(x+1)
 
