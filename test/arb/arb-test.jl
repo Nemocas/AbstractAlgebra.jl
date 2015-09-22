@@ -302,6 +302,52 @@ function test_arb_binary_ops()
    println("PASS")
 end
 
+function test_arb_misc_ops()
+   print("arb.misc_ops()...")
+
+   @test ldexp(RR(3), 2) == 12
+   @test ldexp(RR(3), ZZ(2)) == 12
+   @test contains(trim(RR("1.1 +/- 0.001")), RR("1.1"))
+
+   @test accuracy_bits(RR(0)) == typemax(Int)
+   @test accuracy_bits(RR("+/- inf")) == -typemax(Int)
+   @test accuracy_bits(RR("0.1")) > prec(RR) - 4
+
+   uniq, n = unique_integer(RR("3 +/- 0.001"))
+   @test uniq
+   @test n == 3
+
+   uniq, n = unique_integer(RR("3 +/- 1.001"))
+   @test !uniq
+
+   @test contains(setunion(RR(3), RR(4)), 3)
+   @test contains(setunion(RR(3), RR(4)), 4)
+
+   println("PASS")
+end
+
+function test_arb_unsafe_ops()
+   print("arb.unsafe_ops()...")
+
+   z = RR(1)
+   x = RR(2)
+   y = RR(3)
+
+   add!(z, x, y)
+   @test z == 5
+
+   sub!(z, x, y)
+   @test z == -1
+
+   mul!(z, x, y)
+   @test z == 6
+
+   div!(z, y, x)
+   @test z == 1.5
+
+   println("PASS")
+end
+
 function test_arb()
    test_arb_constructors()
    test_arb_basic_ops()
@@ -311,6 +357,8 @@ function test_arb()
    test_arb_parts()
    test_arb_unary_ops()
    test_arb_binary_ops()
+   test_arb_misc_ops()
+   test_arb_unsafe_ops()
 
    println("")
 end
