@@ -311,17 +311,83 @@ function mul_karatsuba{T <: RingElem}(a::Poly{T}, b::Poly{T})
    return r
 end
 
-function *{T <: RingElem}(a::Poly{T}, b::Poly{T})
+function mul_ks{T <: PolyElem}(a::Poly{T}, b::Poly{T})
+   lena = length(a)
+   lenb = length(b)
+   if lena == 0 || lenb == 0
+      return parent(a)()
+   end
+   maxa = 0
+   nza = 0
+   for i = 1:lena
+      lenc = length(coeff(a, i - 1))
+      maxa = max(lenc, maxa)
+      nza += (lenc == 0 ? 0 : 1)
+   end
+   if a !== b
+      maxb = 0
+      nzb = 0
+      for i = 1:lenb
+         lenc = length(coeff(b, i - 1))
+         maxb = max(lenc, maxb)
+         nzb += (lenc == 0 ? 0 : 1)
+      end
+   else
+      maxb = maxa
+      nzb = nza
+   end
+   if nza*nzb < max(lena, lenb)
+      return mul_classical(a, b)
+   end
+   m = maxa + maxb - 1
+   ksa = base_ring(a)()
+   fit!(ksa, m*lena)
+   z = base_ring(base_ring(a))()
+   for i = 1:lena
+      c = coeff(a, i - 1)
+      for j = 1:length(c)
+         setcoeff!(ksa, (i - 1)*m + j - 1, coeff(c, j - 1))
+      end
+      for j = length(c) + 1:m
+         setcoeff!(ksa, (i - 1)*m + j - 1, z)
+      end
+   end
+   if a !== b
+      ksb = base_ring(b)()
+      fit!(ksb, m*lenb)
+      for i = 1:lenb
+         c = coeff(b, i - 1)
+         for j = 1:length(c)
+            setcoeff!(ksb, (i - 1)*m + j - 1, coeff(c, j - 1))
+         end
+         for j = length(c) + 1:m
+            setcoeff!(ksb, (i - 1)*m + j - 1, z)
+         end
+      end
+   else
+      ksb = ksa
+   end
+   p = ksa*ksb
+   r = parent(a)()
+   lenr = lena + lenb - 1
+   fit!(r, lenr)
+   for i = 1:lenr
+      fit!(r.coeffs[i], m)
+      for j = 1:m
+         setcoeff!(r.coeffs[i], j - 1, coeff(p, (i - 1)*m + j - 1))
+      end
+   end
+   set_length!(r, normalise(r, lenr))
+   return r
+end
+
+function mul_classical{T <: RingElem}(a::Poly{T}, b::Poly{T})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
 
    if lena == 0 || lenb == 0
       return parent(a)()
-   end
-
-   if min(lena, lenb) > 30
-      return mul_karatsuba(a, b)
    end
 
    t = base_ring(a)()
@@ -349,6 +415,11 @@ function *{T <: RingElem}(a::Poly{T}, b::Poly{T})
    set_length!(z, normalise(z, lenz))
 
    return z
+end
+
+function *{T <: RingElem}(a::Poly{T}, b::Poly{T})
+   check_parent(a, b)
+   return mul_classical(a, b)
 end
 
 ###############################################################################
@@ -1268,6 +1339,30 @@ function chebyshev_u{S <: PolyElem}(n::Int, x::S)
    else
       a, b = chebyshev_u_pair(n >> 1, x)
       return 2*a*(x*a - b)
+   end
+end
+
+###############################################################################
+#
+#   Speedups for specific rings
+#
+###############################################################################
+
+function *(a::Poly{fmpq_poly}, b::Poly{fmpq_poly})
+   check_parent(a, b)
+   if min(length(a), length(b)) < 100
+      return mul_classical(a, b)
+   else
+      return mul_ks(a, b)
+   end
+end
+
+function *(a::Poly{fmpz_poly}, b::Poly{fmpz_poly})
+   check_parent(a, b)
+   if min(length(a), length(b)) < 100
+      return mul_classical(a, b)
+   else
+      return mul_ks(a, b)
    end
 end
 

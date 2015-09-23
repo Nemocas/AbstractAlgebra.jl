@@ -591,17 +591,13 @@ function sqr(a::Poly{nf_elem})
    return z
 end
 
-function *(a::Poly{nf_elem}, b::Poly{nf_elem})
+function mul_classical(a::Poly{nf_elem}, b::Poly{nf_elem})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
 
    if lena == 0 || lenb == 0
       return parent(a)()
-   end
-
-   if min(lena, lenb) > 10 # karatsuba crossover
-      return mul_karatsuba(a, b)
    end
 
    if a == b
@@ -639,6 +635,51 @@ function *(a::Poly{nf_elem}, b::Poly{nf_elem})
    set_length!(z, normalise(z, lenz))
 
    return z
+end
+
+function *(a::Poly{nf_elem}, b::Poly{nf_elem})
+   check_parent(a, b)
+   lena = length(a)
+   lenb = length(b)
+   if min(lena, lenb) < 20
+      return mul_classical(a, b)
+   end
+   lenr = lena + lenb - 1
+   r = parent(a)()
+   if lena == 0 || lenb == 0
+      return r
+   end
+   pol = base_ring(a).pol
+   K = base_ring(a)
+   R = parent(pol)
+   T = elem_type(R)
+   S = PolynomialRing{T}(R, :y)
+   f = S()
+   fit!(f, lena)
+   for i = 1:lena
+      setcoeff!(f, i - 1, R(coeff(a, i - 1)))
+   end
+   set_length!(f, lena)
+   if a !== b
+      g = S()
+      fit!(g, lenb)
+      for i = 1:lenb
+         setcoeff!(g, i - 1, R(coeff(b, i - 1)))
+      end
+      set_length!(g, lenb)
+   else
+      g = f
+   end
+   p = f*g
+   fit!(r, lenr)
+   for i = 1:lenr
+      p.coeffs[i] = mod(p.coeffs[i], pol)
+   end
+   for i = 1:lenr
+      r.coeffs[i] = K(p.coeffs[i])
+   end
+   set_length!(r, normalise(r, lenr))
+   return r
 end
 
 ###############################################################################
