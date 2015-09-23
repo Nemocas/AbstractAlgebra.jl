@@ -6024,6 +6024,27 @@ Here are some examples of ad hoc exact division.
    c = divexact(a, fmpz(11))
 \end{lstlisting}
 
+\subsubsection{Signature}
+
+\begin{lstlisting}
+signature(f::fmpq_poly)
+\end{lstlisting}
+
+\desc{Computes the signature of the polynomial $f$, i.e. a tuple $(r, s)$ where $r$ is
+the number of real roots and $s$ is half the number of complex roots.}
+
+\textbf{Examples.}
+
+Here is an example of signature.
+
+\begin{lstlisting}
+R, x = PolynomialRing(QQ, "x")
+
+f = (x^3 + 3x + QQ(2)//QQ(3))
+
+(r, s) = signature(f)
+\end{lstlisting}
+
 \subsection{Flint polynomials over $\F_{p^k}$ (multiprecision $p$): \code{fq_poly}}
 
 The Flint type for polynomials over $\F_{p^k}$ for multiprecision $p$ is \code{fq_poly}.
@@ -9568,6 +9589,13 @@ degree(R::AnticNumberField)
 \desc{Return the degree of the number field.}
 
 \begin{lstlisting}
+signature(R::AnticNumberField)
+\end{lstlisting}
+
+\desc{Returns the signature of the number field, i.e. a tuple $(r, s)$ where $r$ is
+the number of complex embeddings of $R$ and $s$ is half the number of complex embeddings of $R$.}
+
+\begin{lstlisting}
 iszero(d::nf_elem)
 \end{lstlisting}
 
@@ -9620,6 +9648,7 @@ p = coeff(d, 1)
 isgen(m) == true
 isone(l) == true
 q = degree(K)
+(r, s) = signature(K)
 \end{lstlisting}
 
 \subsubsection{Unary operators}
