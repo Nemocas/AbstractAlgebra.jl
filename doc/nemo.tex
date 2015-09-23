@@ -7870,6 +7870,21 @@ Table lookup is used for $H_n$ whose numerator and denominator
 fit in a single limb. For larger $n$, a divide and conquer strategy is used.}
 
 \begin{lstlisting}
+bernoulli(n::Int)
+\end{lstlisting}
+
+\desc{Computes the Bernoulli number $B_n$ for nonnegative $n$.}
+
+\begin{lstlisting}
+bernoulli_cache(n::Int)
+\end{lstlisting}
+
+\desc{Precomputes and caches all the Bernoulli numbers up to $B_n$.
+This is much faster than repeatedly calling \code{bernoulli(k)}.
+Once cached, subsequent calls to \code{bernoulli(k)} for any $k \le n$
+will read from the cache, making them virtually free.}
+
+\begin{lstlisting}
 dedekind_sum(h::fmpz, k::fmpz)
 dedekind_sum(h::fmpz, k::Integer)
 dedekind_sum(h::Integer, k::fmpz)
@@ -7887,6 +7902,11 @@ a = harmonic(12)
 
 b = dedekind_sum(12, 13)
 c = dedekind_sum(-120, fmpz(1305))
+
+d = bernoulli(12)
+
+bernoulli_cache(100)
+e = bernoulli(100)
 \end{lstlisting}
 
 \subsection{Flint finite fields $\F_{p^k}$ (multiprecision $p$): \code|fq|}
