@@ -383,7 +383,6 @@ function mul_ks{T <: PolyElem}(a::Poly{T}, b::Poly{T})
 end
 
 function mul_classical{T <: RingElem}(a::Poly{T}, b::Poly{T})
-   check_parent(a, b)
    lena = length(a)
    lenb = length(b)
 
