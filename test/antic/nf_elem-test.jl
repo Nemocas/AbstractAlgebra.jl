@@ -102,6 +102,8 @@ function test_nf_elem_manipulation()
 
    @test degree(K) == 3
 
+   @test signature(K) == (1, 1)
+
    println("PASS")
 end
 

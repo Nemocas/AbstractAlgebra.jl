@@ -420,6 +420,18 @@ function test_fmpq_poly_gcdx()
    println("PASS")
 end
 
+function test_fmpq_poly_signature()
+   print("fmpq_poly.signature...")
+
+   R, x = PolynomialRing(QQ, "x")
+
+   f = (x^3 + 3x + QQ(2)//QQ(3))
+
+   @test signature(f) == (1, 1)
+
+   println("PASS")
+end
+
 function test_fmpq_poly_special()
    print("fmpq_poly.special...")
 
@@ -456,6 +468,7 @@ function test_fmpq_poly()
    test_fmpq_poly_resultant()
    test_fmpq_poly_discriminant()
    test_fmpq_poly_gcdx()
+   test_fmpq_poly_signature()
    test_fmpq_poly_special()
 
    println("")
