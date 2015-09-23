@@ -9924,7 +9924,7 @@ RR(x::arb)
 \desc{Constructs an \code{arb} element from the given value.}
 
 \begin{lstlisting}
-RR(midrad::Tuple{arb, arb})
+ball(m::arb, r::arb)
 \end{lstlisting}
 
 \desc{Constructs an \code{arb} enclosing the range $[m-|r|, m+|r|]$ given
@@ -9945,7 +9945,7 @@ or \code{"[m +/- r]"}}
 x = RR(3)
 y = RR(QQ(2,3))
 
-z = RR(RR(3), RR("0.0001"))
+z = ball(RR(3), RR("0.0001"))
 
 s = RR("3 +/- 0.0001")
 t = RR("-1.24e+12345")

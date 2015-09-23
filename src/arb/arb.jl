@@ -6,7 +6,7 @@
 
 import Base: ceil
 
-export radius, midpoint, contains, contains_zero,
+export ball, radius, midpoint, contains, contains_zero,
        contains_negative, contains_positive, contains_nonnegative,
        contains_nonpositive, iszero,
        isnonzero, isexact, isint, ispositive, isfinite,
@@ -87,12 +87,6 @@ end
 
 function call(r::ArbField, x::arb)
   z = arb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, midrad::Tuple{arb, arb})
-  z = arb(midrad[1], midrad[2])
   z.parent = r
   return z
 end
@@ -281,6 +275,12 @@ end
 #  Parts of numbers
 #
 ################################################################################
+
+function ball(mid::arb, rad::arb)
+  z = parent(mid)()
+  z = arb(mid, rad)
+  return z
+end
 
 function radius(x::arb)
   t = mag_struct(x.rad_exp, x.rad_man)
