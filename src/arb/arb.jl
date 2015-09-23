@@ -283,26 +283,14 @@ function ball(mid::arb, rad::arb)
 end
 
 function radius(x::arb)
-  t = mag_struct(x.rad_exp, x.rad_man)
-  u = arf_struct(0, 0, 0, 0)
   z = parent(x)()
-  ccall((:arf_set_mag, :libarb), Void, (Ptr{arf_struct}, Ptr{mag_struct}), &u, &t)
-  z.mid_exp = u.exp
-  z.mid_size = u.size
-  z.mid_d1 = u.d1
-  z.mid_d2 = u.d2
+  ccall((:arb_get_rad_arb, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &x)
   return z
 end
 
 function midpoint(x::arb)
-  t = arf_struct(x.mid_exp, x.mid_size, x.mid_d1, x.mid_d2)
-  u = arf_struct(0, 0, 0, 0)
   z = parent(x)()
-  ccall((:arf_set, :libarb), Void, (Ptr{arf_struct}, Ptr{arf_struct}), &u, &t)
-  z.mid_exp = u.exp
-  z.mid_size = u.size
-  z.mid_d1 = u.d1
-  z.mid_d2 = u.d2
+  ccall((:arb_get_mid_arb, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &x)
   return z
 end
 
