@@ -340,30 +340,30 @@ function mul_ks{T <: PolyElem}(a::Poly{T}, b::Poly{T})
       return mul_classical(a, b)
    end
    m = maxa + maxb - 1
-   ksa = base_ring(a)()
-   fit!(ksa, m*lena)
    z = base_ring(base_ring(a))()
+   A1 = Array(elem_type(base_ring(base_ring(a))), m*lena)
    for i = 1:lena
       c = coeff(a, i - 1)
       for j = 1:length(c)
-         setcoeff!(ksa, (i - 1)*m + j - 1, coeff(c, j - 1))
+         A1[(i - 1)*m + j] = coeff(c, j - 1)
       end
       for j = length(c) + 1:m
-         setcoeff!(ksa, (i - 1)*m + j - 1, z)
+         A1[(i - 1)*m + j] = z
       end
    end
+   ksa = base_ring(a)(A1)
    if a !== b
-      ksb = base_ring(b)()
-      fit!(ksb, m*lenb)
+      A2 = Array(elem_type(base_ring(base_ring(a))), m*lenb)
       for i = 1:lenb
          c = coeff(b, i - 1)
          for j = 1:length(c)
-            setcoeff!(ksb, (i - 1)*m + j - 1, coeff(c, j - 1))
+            A2[(i - 1)*m + j] = coeff(c, j - 1)
          end
          for j = length(c) + 1:m
-            setcoeff!(ksb, (i - 1)*m + j - 1, z)
+            A2[(i - 1)*m + j] = z
          end
       end
+      ksb = base_ring(b)(A2)
    else
       ksb = ksa
    end
@@ -377,7 +377,6 @@ function mul_ks{T <: PolyElem}(a::Poly{T}, b::Poly{T})
          setcoeff!(r.coeffs[i], j - 1, coeff(p, (i - 1)*m + j - 1))
       end
    end
-   set_length!(r, normalise(r, lenr))
    return r
 end
 

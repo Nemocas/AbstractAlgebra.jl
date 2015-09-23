@@ -673,9 +673,6 @@ function *(a::Poly{nf_elem}, b::Poly{nf_elem})
    p = f*g
    fit!(r, lenr)
    for i = 1:lenr
-      p.coeffs[i] = mod(p.coeffs[i], pol)
-   end
-   for i = 1:lenr
       r.coeffs[i] = K(p.coeffs[i])
    end
    set_length!(r, normalise(r, lenr))
