@@ -10,7 +10,8 @@ export Poly, PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow,
        resultant, discriminant, gcdx, zero, one, gen, length, iszero, 
        normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod, 
        invmod, lcm, divrem, mod, gcdinv, canonical_unit, var, chebyshev_t,
-       chebyshev_u, set_length!
+       chebyshev_u, set_length!, mul_classical, sqr_classical, mul_ks,
+       mul_karatsuba
 
 ###############################################################################
 #
@@ -377,6 +378,7 @@ function mul_ks{T <: PolyElem}(a::Poly{T}, b::Poly{T})
          setcoeff!(r.coeffs[i], j - 1, coeff(p, (i - 1)*m + j - 1))
       end
    end
+   set_length!(r, normalise(r, lenr))
    return r
 end
 
@@ -1338,30 +1340,6 @@ function chebyshev_u{S <: PolyElem}(n::Int, x::S)
    else
       a, b = chebyshev_u_pair(n >> 1, x)
       return 2*a*(x*a - b)
-   end
-end
-
-###############################################################################
-#
-#   Speedups for specific rings
-#
-###############################################################################
-
-function *(a::Poly{fmpq_poly}, b::Poly{fmpq_poly})
-   check_parent(a, b)
-   if min(length(a), length(b)) < 100
-      return mul_classical(a, b)
-   else
-      return mul_ks(a, b)
-   end
-end
-
-function *(a::Poly{fmpz_poly}, b::Poly{fmpz_poly})
-   check_parent(a, b)
-   if min(length(a), length(b)) < 100
-      return mul_classical(a, b)
-   else
-      return mul_ks(a, b)
    end
 end
 

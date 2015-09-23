@@ -556,7 +556,7 @@ mul!(c::nf_elem, a::nf_elem, b::Integer) = mul!(c, a, fmpz(b))
 #
 ###############################################################################
 
-function sqr(a::Poly{nf_elem})
+function sqr_classical(a::Poly{nf_elem})
    lena = length(a)
    
    t = base_ring(a)()
@@ -601,7 +601,7 @@ function mul_classical(a::Poly{nf_elem}, b::Poly{nf_elem})
    end
 
    if a == b
-       return sqr(a)
+       return sqr_classical(a)
    end
 
    t = base_ring(a)()

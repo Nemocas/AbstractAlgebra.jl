@@ -473,6 +473,36 @@ function test_poly_pearce()
    println("PASS")
 end
 
+function test_poly_mul_karatsuba()
+   print("Poly.mul_karatsuba...")
+
+   R, x = PolynomialRing(ZZ, "x")
+   S, y = PolynomialRing(R, "y")
+   T, z = PolynomialRing(S, "z")
+   
+   f = x + y + 2z^2 + 1
+   
+   @test mul_karatsuba(f^10, f^10) == mul_classical(f^10, f^10)
+   @test mul_karatsuba(f^10, f^30) == mul_classical(f^10, f^30)
+
+   println("PASS")
+end
+
+function test_poly_mul_ks()
+   print("Poly.mul_ks...")
+
+   R, x = PolynomialRing(ZZ, "x")
+   S, y = PolynomialRing(R, "y")
+   T, z = PolynomialRing(S, "z")
+   
+   f = x + y + 2z^2 + 1
+   
+   @test mul_ks(f^10, f^10) == mul_classical(f^10, f^10)
+   @test mul_ks(f^10, f^30) == mul_classical(f^10, f^30)
+
+   println("PASS")
+end
+
 function test_poly()
    test_poly_constructors()
    test_poly_manipulation()
@@ -501,6 +531,8 @@ function test_poly()
    test_poly_special()
    test_poly_fateman()
    test_poly_pearce()
+   test_poly_mul_karatsuba()
+   test_poly_mul_ks()
 
    println("")
 end
