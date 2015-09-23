@@ -437,42 +437,6 @@ function test_poly_special()
    println("PASS")
 end
 
-function test_poly_fateman()
-   print("Poly.fateman...")
-
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-   T, z = PolynomialRing(S, "z")
-   U, t = PolynomialRing(T, "t")
-
-   p = (x + y + z + t + 1)^20
-   
-   q = p*(p + 1)
-
-   @test length(q) == 41
-
-   println("PASS")
-end
-
-function test_poly_pearce()
-   print("Poly.pearce...")
-
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-   T, z = PolynomialRing(S, "z")
-   U, t = PolynomialRing(T, "t")
-   V, u = PolynomialRing(U, "u")
-
-   f = (x + y + 2z^2 + 3t^3 + 5u^5 + 1)^10
-   g = (u + t + 2z^2 + 3y^3 + 5x^5 + 1)^10
-   
-   q = f*g
-
-   @test length(q) == 61
-
-   println("PASS")
-end
-
 function test_poly_mul_karatsuba()
    print("Poly.mul_karatsuba...")
 
@@ -529,8 +493,6 @@ function test_poly()
    test_poly_discriminant()
    test_poly_gcdx()
    test_poly_special()
-   test_poly_fateman()
-   test_poly_pearce()
    test_poly_mul_karatsuba()
    test_poly_mul_ks()
 
