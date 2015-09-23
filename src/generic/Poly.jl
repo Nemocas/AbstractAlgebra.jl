@@ -337,7 +337,7 @@ function mul_ks{T <: PolyElem}(a::Poly{T}, b::Poly{T})
       maxb = maxa
       nzb = nza
    end
-   if nza*nzb < max(lena, lenb)
+   if nza*nzb < 4*max(lena, lenb)
       return mul_classical(a, b)
    end
    m = maxa + maxb - 1

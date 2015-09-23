@@ -575,7 +575,7 @@ end
 
 function *(a::Poly{fmpq_poly}, b::Poly{fmpq_poly})
    check_parent(a, b)
-   if min(length(a), length(b)) < 100
+   if min(length(a), length(b)) < 40
       return mul_classical(a, b)
    else
       return mul_ks(a, b)
