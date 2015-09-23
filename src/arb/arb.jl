@@ -337,7 +337,7 @@ end
 #
 ################################################################################
 
-for (s,f) in ((:+,"arb_add"), (:*,"arb_mul"), (:/, "arb_div"), (:-,"arb_sub"))
+for (s,f) in ((:+,"arb_add"), (:*,"arb_mul"), (://, "arb_div"), (:-,"arb_sub"))
   @eval begin
     function ($s)(x::arb, y::arb)
       z = parent(x)()
@@ -428,28 +428,28 @@ end
 
 -(x::fmpz, y::arb) = -(y-x)
 
-#function /(x::arb, y::arf)
+#function //(x::arb, y::arf)
 #  z = parent(x)()
 #  ccall((:arb_div_arf, :libarb), Void,
 #              (Ptr{arb}, Ptr{arb}, Ptr{arf}, Int), &z, &x, &y, parent(x).prec)
 #  return z
 #end
 
-function /(x::arb, y::UInt)
+function //(x::arb, y::UInt)
   z = parent(x)()
   ccall((:arb_div_ui, :libarb), Void,
               (Ptr{arb}, Ptr{arb}, UInt, Int), &z, &x, y, parent(x).prec)
   return z
 end
 
-function /(x::arb, y::Int)
+function //(x::arb, y::Int)
   z = parent(x)()
   ccall((:arb_div_si, :libarb), Void,
               (Ptr{arb}, Ptr{arb}, Int, Int), &z, &x, y, parent(x).prec)
   return z
 end
 
-function /(x::arb, y::fmpz)
+function //(x::arb, y::fmpz)
   z = parent(x)()
   ccall((:arb_div_fmpz, :libarb), Void,
               (Ptr{arb}, Ptr{arb}, Ptr{fmpz}, Int),
@@ -457,14 +457,14 @@ function /(x::arb, y::fmpz)
   return z
 end
 
-function /(x::UInt, y::arb)
+function //(x::UInt, y::arb)
   z = parent(y)()
   ccall((:arb_ui_div, :libarb), Void,
               (Ptr{arb}, UInt, Ptr{arb}, Int), &z, x, &y, parent(y).prec)
   return z
 end
 
-function /(x::Int, y::arb)
+function //(x::Int, y::arb)
   z = parent(y)()
   t = arb(x)
   ccall((:arb_div, :libarb), Void,
@@ -472,7 +472,7 @@ function /(x::Int, y::arb)
   return z
 end
 
-function /(x::fmpz, y::arb)
+function //(x::fmpz, y::arb)
   z = parent(y)()
   t = arb(x)
   ccall((:arb_div, :libarb), Void,

@@ -10130,37 +10130,37 @@ inv(x::arb)
 +(x::arb, y::arb)
 -(x::arb, y::arb)
 *(x::arb, y::arb)
-/(x::arb, y::arb)
+//(x::arb, y::arb)
 
 +(x::arb, y::UInt)
 -(x::arb, y::UInt)
 *(x::arb, y::UInt)
-/(x::arb, y::UInt)
+//(x::arb, y::UInt)
 
 +(x::UInt, y::arb)
 -(x::UInt, y::arb)
 *(x::UInt, y::arb)
-/(x::UInt, y::arb)
+//(x::UInt, y::arb)
 
 +(x::arb, y::Int)
 -(x::arb, y::Int)
 *(x::arb, y::Int)
-/(x::arb, y::Int)
+//(x::arb, y::Int)
 
 +(x::Int, y::arb)
 -(x::Int, y::arb)
 *(x::Int, y::arb)
-/(x::Int, y::arb)
+//(x::Int, y::arb)
 
 +(x::arb, y::fmpz)
 -(x::arb, y::fmpz)
 *(x::arb, y::fmpz)
-/(x::arb, y::fmpz)
+//(x::arb, y::fmpz)
 
 +(x::fmpz, y::arb)
 -(x::fmpz, y::arb)
 *(x::fmpz, y::arb)
-/(x::fmpz, y::arb)
+//(x::fmpz, y::arb)
 
 ^(x::arb, y::arb)
 ^(x::arb, y::fmpz)
@@ -10181,7 +10181,7 @@ x + y
 
 inv(y) - x
 
-3 * x + ZZ(100) / y
+3 * x + ZZ(100) // y
 
 (x^2 + y^2) ^ QQ(1,2)
 \end{lstlisting}

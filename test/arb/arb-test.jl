@@ -267,34 +267,34 @@ function test_arb_binary_ops()
    @test x + y == 6
    @test x - y == -2
    @test x * y == 8
-   @test x / y == 0.5
+   @test x // y == 0.5
 
    @test x + UInt(4) == 6
    @test x - UInt(4) == -2
    @test x * UInt(4) == 8
-   @test x / UInt(4) == 0.5
+   @test x // UInt(4) == 0.5
    @test UInt(2) + y == 6
    @test UInt(2) - y == -2
    @test UInt(2) * y == 8
-   @test UInt(2) / y == 0.5
+   @test UInt(2) // y == 0.5
 
    @test x + Int(4) == 6
    @test x - Int(4) == -2
    @test x * Int(4) == 8
-   @test x / Int(4) == 0.5
+   @test x // Int(4) == 0.5
    @test Int(2) + y == 6
    @test Int(2) - y == -2
    @test Int(2) * y == 8
-   @test Int(2) / y == 0.5
+   @test Int(2) // y == 0.5
 
    @test x + ZZ(4) == 6
    @test x - ZZ(4) == -2
    @test x * ZZ(4) == 8
-   @test x / ZZ(4) == 0.5
+   @test x // ZZ(4) == 0.5
    @test ZZ(2) + y == 6
    @test ZZ(2) - y == -2
    @test ZZ(2) * y == 8
-   @test ZZ(2) / y == 0.5
+   @test ZZ(2) // y == 0.5
 
    @test x ^ y == 16
    @test x ^ ZZ(4) == 16
