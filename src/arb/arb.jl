@@ -2,6 +2,9 @@
 #
 #   arb.jl : Arb real numbers
 #
+#   Copyright (C) 2015 Tommy Hofmann
+#   Copyright (C) 2015 Fredrik Johansson
+#
 ###############################################################################
 
 import Base: ceil

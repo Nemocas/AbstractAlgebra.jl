@@ -2,17 +2,20 @@
 #
 #   ArbTypes.jl : Parent and object types for Arb
 #
+#   Copyright (C) 2015 Tommy Hofmann
+#   Copyright (C) 2015 Fredrik Johansson
+#
 ###############################################################################
 
-export ArbField, arb
-
-################################################################################
-#
-#  Types and memory management
-#
-################################################################################
+export ArbField, arb, AcbField, acb
 
 arb_check_prec(p::Int) = (p >= 2 && p < (typemax(Int) >> 4)) || throw(ArgumentError("invalid precision"))
+
+################################################################################
+#
+#  Types and memory management for ArbField
+#
+################################################################################
 
 const ArbFieldID = ObjectIdDict()
 
@@ -174,4 +177,144 @@ elem_type(x::ArbField) = arb
 
 parent(x::arb) = x.parent
 
+function deepcopy(a::arb)
+  b = parent(a)()
+  ccall((:arb_set, :libarb), Void, (Ptr{arb}, Ptr{arb}), &b, &a)
+  return b
+end
+
+################################################################################
+#
+#  Types and memory management for AcbField
+#
+################################################################################
+
+const AcbFieldID = ObjectIdDict()
+
+type AcbField <: Field
+  prec::Clong
+  
+  function AcbField(p::Clong = 256)
+    arb_check_prec(p)
+    try
+      return AcbFieldID[p]::AcbField
+    catch
+      AcbFieldID[p] = new(p)::AcbField
+    end
+  end
+end
+
+type acb <: FieldElem
+  real_mid_exp::Int     # fmpz
+  real_mid_size::UInt64 # mp_size_t
+  real_mid_d1::Int64    # mantissa_struct
+  real_mid_d2::Int64
+  real_rad_exp::Int     # fmpz
+  real_rad_man::UInt64
+  imag_mid_exp::Int     # fmpz
+  imag_mid_size::UInt64 # mp_size_t
+  imag_mid_d1::Int64    # mantissa_struct
+  imag_mid_d2::Int64
+  imag_rad_exp::Int     # fmpz
+  imag_rad_man::UInt64
+  parent::AcbField
+
+  function acb()
+    z = new()
+    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
+    finalizer(z, _acb_clear_fn)
+    return z
+  end
+
+  function acb(x::Clong)
+    z = new()
+    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
+    ccall((:acb_set_si, :libarb), Void, (Ptr{acb}, Clong), &z, x)
+    finalizer(z, _acb_clear_fn)
+    return z
+  end
+  
+  function acb(i::Culong)
+    z = new()
+    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
+    ccall((:acb_set_ui, :libarb), Void, (Ptr{acb}, Culong), &z, i)
+    finalizer(z, _acb_clear_fn)
+    return z
+  end
+
+  function acb(x::fmpz)
+    z = new()
+    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
+    ccall((:acb_set_fmpz, :libarb), Void, (Ptr{acb}, Ptr{fmpz}), &z, &x)
+    finalizer(z, _acb_clear_fn)
+    return z
+  end
+
+  function acb(x::arb)
+    z = new()
+    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
+    ccall((:acb_set_arb, :libarb), Void, (Ptr{acb}, Ptr{arb}), &z, &x)
+    finalizer(z, _acb_clear_fn)
+    return z
+  end
+
+  function acb(x::acb, p::Clong)
+    z = new()
+    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
+    ccall((:acb_set_round, :libarb), Void,
+                (Ptr{acb}, Ptr{acb}, Clong), &z, &x, p)
+    finalizer(z, _acb_clear_fn)
+    return z
+  end
+
+  function acb(x::fmpz, p::Clong)
+    z = new()
+    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
+    ccall((:acb_set_round_fmpz, :libarb), Void,
+                (Ptr{acb}, Ptr{fmpz}, Clong), &z, &x, p)
+    finalizer(z, _acb_clear_fn)
+    return z
+  end
+
+  function acb(x::fmpq, p::Clong)
+    z = new()
+    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
+    ccall((:acb_set_fmpq, :libarb), Void,
+                (Ptr{acb}, Ptr{fmpq}, Clong), &z, &x, p)
+    finalizer(z, _acb_clear_fn)
+    return z
+  end
+
+  function acb(x::arb, p::Clong)
+    z = new()
+    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
+    ccall((:acb_set_round_arb, :libarb), Void,
+                (Ptr{acb}, Ptr{arb}, Clong), &z, &x, p)
+    finalizer(z, _acb_clear_fn)
+    return z
+  end
+
+  function acb(x::arb, y::arb, p::Clong)
+    z = new()
+    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
+    ccall((:acb_set_arb_arb, :libarb), Void,
+                (Ptr{acb}, Ptr{arb}, Ptr{arb}, Clong), &z, &x, &y, p)
+    ccall((:acb_set_round, :libarb), Void,
+                (Ptr{acb}, Ptr{acb}, Clong), &z, &z, p)
+    finalizer(z, _acb_clear_fn)
+    return z
+  end
+end
+
+function _acb_clear_fn(x::acb)
+  ccall((:acb_clear, :libarb), Void, (Ptr{acb}, ), &x)
+end
+
+parent(x::acb) = x.parent
+
+function deepcopy(a::acb)
+  b = parent(a)()
+  ccall((:acb_set, :libarb), Void, (Ptr{acb}, Ptr{acb}), &b, &a)
+  return b
+end
 

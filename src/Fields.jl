@@ -18,6 +18,8 @@ include("pari/pari_nf.jl")
 
 include("arb/arb.jl")
 
+include("arb/acb.jl")
+
 //{T <: FieldElem}(a::T, b::T) = divexact(a, b)
 
 function gcd{T <: FieldElem}(x::T, y::T)
