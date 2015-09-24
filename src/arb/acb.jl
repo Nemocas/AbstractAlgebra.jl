@@ -96,12 +96,12 @@ function call(r::AcbField, x::Int, y::Int)
   return z
 end
 
-function call(r::AcbField, x::String)
+function call(r::AcbField, x::AbstractString)
   R = ArbField(r.prec)
   return r(R(x))
 end
 
-function call(r::AcbField, x::String, y::String)
+function call(r::AcbField, x::AbstractString, y::AbstractString)
   R = ArbField(r.prec)
   return r(R(x), R(y))
 end
