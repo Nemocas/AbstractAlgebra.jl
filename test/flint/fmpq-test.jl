@@ -309,23 +309,7 @@ function test_fmpq_special_functions()
    print("fmpq.special_functions()...")
 
    @test harmonic(12) == fmpz(86021)//27720
-
-   if !on_windows64
-
-     @test bernoulli(10) == fmpz(5)//66
-
-     b = bernoulli(100)
-
-     bernoulli_cache(100)
-
-     @test bernoulli(100) == b
-
-     flint_cleanup()
-
-     @test den(bernoulli(100)) == 33330
-
-   end
-
+   
    @test dedekind_sum(12, 13) == -fmpz(11)//13
 
    @test dedekind_sum(fmpz(12), fmpz(13)) == -fmpz(11)//13

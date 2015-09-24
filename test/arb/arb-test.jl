@@ -502,6 +502,24 @@ function test_arb_functions()
    println("PASS")
 end
 
+function test_fmpq_arb_special_functions()
+   print("fmpq.arb_special_functions()...")
+
+   @test bernoulli(10) == fmpz(5)//66
+
+   b = bernoulli(100)
+
+   bernoulli_cache(100)
+
+   @test bernoulli(100) == b
+
+   flint_cleanup()
+
+   @test den(bernoulli(100)) == 33330
+
+   println("PASS")
+end
+
 function test_arb()
    test_arb_constructors()
    test_arb_basic_ops()
@@ -515,6 +533,7 @@ function test_arb()
    test_arb_unsafe_ops()
    test_arb_constants()
    test_arb_functions()
+   test_fmpq_arb_special_functions()
 
    println("")
 end
