@@ -138,7 +138,7 @@ cd(wdir)
 # INSTALL ARB 
 
 try
-  run(`git clone -b julia https://github.com/fredrik-johansson/arb.git`)
+  run(`git clone https://github.com/fredrik-johansson/arb.git`)
 except
   run(`cd arb ; git pull`)
 end          
