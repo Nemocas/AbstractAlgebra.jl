@@ -87,6 +87,7 @@ Nemo is based on the C libraries:
 \begin{enumerate}
 \item FLINT (Fast Library for Number Theory) -- \url{http://flintlib.org/}
 \item ANTIC (Algebraic Number Theory in Code) -- \url{http://github.com/wbhart/antic/}
+\item Arb -- \url{http://fredrikj.net/arb/}
 \item Pari -- \url{http://pari.math.u-bordeaux.fr/}
 \item Singular -- \url{http://www.singular.uni-kl.de/}
 \end{enumerate}
@@ -4997,6 +4998,12 @@ eulerphi(x::fmpz)
 that gcd$(d, x) = 1$. If $x < 0$ we throw a \code{DomainError()}.}
 
 \begin{lstlisting}
+bell(x::Int)
+\end{lstlisting}
+
+\desc{Return the Bell number $B_n$.}
+
+\begin{lstlisting}
 numpart(x::fmpz)
 numpart(x::Int)
 \end{lstlisting}
@@ -5004,7 +5011,7 @@ numpart(x::Int)
 \desc{Return the number of partitions of $x$, i.e. $p(x)$. Since $p(x)$
 has $O(\sqrt{x})$ digits, this function can only be computed up to
 about $x = 10^{19}$. For large $x$, the result is computed faster if one
-sets \code{flint_num_threads(2)}.}
+sets \code{flint_set_num_threads(2)}.}
 
 \textbf{Examples.}
 
@@ -7906,6 +7913,21 @@ Table lookup is used for $H_n$ whose numerator and denominator
 fit in a single limb. For larger $n$, a divide and conquer strategy is used.}
 
 \begin{lstlisting}
+bernoulli(n::Int)
+\end{lstlisting}
+
+\desc{Computes the Bernoulli number $B_n$ for nonnegative $n$.}
+
+\begin{lstlisting}
+bernoulli_cache(n::Int)
+\end{lstlisting}
+
+\desc{Precomputes and caches all the Bernoulli numbers up to $B_n$.
+This is much faster than repeatedly calling \code{bernoulli(k)}.
+Once cached, subsequent calls to \code{bernoulli(k)} for any $k \le n$
+will read from the cache, making them virtually free.}
+
+\begin{lstlisting}
 dedekind_sum(h::fmpz, k::fmpz)
 dedekind_sum(h::fmpz, k::Integer)
 dedekind_sum(h::Integer, k::fmpz)
@@ -7923,6 +7945,11 @@ a = harmonic(12)
 
 b = dedekind_sum(12, 13)
 c = dedekind_sum(-120, fmpz(1305))
+
+d = bernoulli(12)
+
+bernoulli_cache(100)
+e = bernoulli(100)
 \end{lstlisting}
 
 \subsection{Flint finite fields $\F_{p^k}$ (multiprecision $p$): \code|fq|}
@@ -9917,6 +9944,725 @@ c = 3a^2 - a + 1
 
 norm(c)
 trace(c)
+\end{lstlisting}
+
+\section{Arb rings}
+
+Arb is a library for real and complex numbers implemented using
+a ball (mid-rad) representation which tracks error bounds rigorously.
+
+\subsection{Arb real numbers ($\R$): \code|arb|}
+
+Arb provides the module \code{arb} for real numbers represented
+in mid-rad interval form $[m \pm r] = [m-r, m+r]$. The type of Arb real
+numbers in Nemo is also given the name \code{arb}.
+
+The parent object for Arb reals is of type \code{ArbField}, which
+belongs to the \code{Field} type class.
+
+The \code{ArbField} parent is initialised with the precision in bits (\code{prec})
+used for operations on interval midpoints. The precision used for
+interval radii is a fixed implementation-defined constant (30 bits).
+
+The following creates a parent object \code{RR} representing
+the field of real numbers with 64-bit precision, and elements
+\code{x}, \code{y} representing the rational numbers 1/4 and 1/10:
+
+\begin{lstlisting}
+RR = ArbField(64)
+x = RR("0.25")
+y = RR("0.1")
+\end{lstlisting}
+
+Since interval midpoints are binary floating-point numbers with
+finite precision, one has
+\code{isexact(x) == true} and \code{isexact(y) == false} in this example.
+
+In the following, we will assume that \code{RR} is an \code{ArbField}
+instance as above.
+
+\subsubsection{Constructors}
+
+\begin{lstlisting}
+RR(x::Float64)
+RR(x::Int)
+RR(x::UInt)
+RR(x::fmpz)
+RR(x::fmpq)
+RR(x::arb)
+\end{lstlisting}
+
+\desc{Constructs an \code{arb} element from the given value.}
+
+\begin{lstlisting}
+ball(m::arb, r::arb)
+\end{lstlisting}
+
+\desc{Constructs an \code{arb} enclosing the range $[m-|r|, m+|r|]$ given
+the pair $(m, r)$.}
+
+\begin{lstlisting}
+RR(x::String)
+\end{lstlisting}
+
+\desc{Constructs an \code{arb} element from a string representation.
+Valid strings include integer and floating-point literals. Midpoint-radius
+pairs of such literals may also be given in the form \code{"m +/- r"}
+or \code{"[m +/- r]"}}
+
+\textbf{Examples.}
+
+\begin{lstlisting}
+x = RR(3)
+y = RR(QQ(2,3))
+
+z = ball(RR(3), RR("0.0001"))
+
+s = RR("3 +/- 0.0001")
+t = RR("-1.24e+12345")
+
+u = RR("nan +/- inf")
+\end{lstlisting}
+
+\subsubsection{Parts of numbers}
+
+\begin{lstlisting}
+midpoint(x::arb)
+
+radius(x::arb)
+\end{lstlisting}
+
+\desc{Return the midpoint and the radius of the interval $x$, respectively.
+The output is a point-valued \text{arb} instance, having radius zero.}
+
+\textbf{Examples.}
+
+\begin{lstlisting}
+x = RR(QQ(2,3))
+
+midpoint(x)
+
+radius(x)
+\end{lstlisting}
+
+\subsubsection{Comparisons and predicates}
+
+Boolean-valued functions defined on intervals must be used carefully.
+
+In general, we extend predicates defined on point values (such as
+the usual comparisons $=, \ne, \le, \ldots$ defined on pairs of real numbers)
+to intervals as follows: we return
+\texttt{true} if the predicate holds for all choices of points
+in the input intervals, and therefore certainly is true.
+We return \texttt{false} otherwise, i.e.\ both if the predicate
+either certainly is false or if truth cannot be determined.
+
+For example, we certainly have $[0 \pm 0.1] \ne 1$, but both the
+comparisons $[0 \pm 0.1] \ne 0$ and $[0 \pm 0.1] = 0$
+return \texttt{false}.
+
+\begin{lstlisting}
+iszero(x::arb)
+isnonzero(x::arb)
+isone(x::arb)
+isfinite(x::arb)
+isexact(x::arb)
+isint(x::arb)
+ispositive(x::arb)
+isnonnegative(x::arb)
+isnegative(x::arb)
+isnonpositive(x::arb)
+\end{lstlisting}
+
+\desc{Return whether $x$ certainly is, respectively, equal to zero,
+not equal to zero, equal to 1, finite (having finite midpoint and radius),
+exact (having zero radius), an exact integer, positive, nonnegative,
+negative, or nonpositive.}
+
+\begin{lstlisting}
+overlaps(x::arb, y::arb)
+\end{lstlisting}
+
+\desc{Return whether $x$ and $y$ have any point in common.}
+
+\begin{lstlisting}
+contains(x::arb, y::fmpq)
+contains(x::arb, y::fmpz)
+contains(x::arb, y::Int)
+contains(x::arb, y::BigFloat)
+contains(x::arb, y::arb)
+\end{lstlisting}
+
+\desc{Return whether the interval $x$ contains the point $y$,
+or entirely contains $y$ when this is an interval.}
+
+\begin{lstlisting}
+contains_zero(x::arb)
+contains_positive(x::arb)
+contains_negative(x::arb)
+contains_nonpositive(x::arb)
+contains_nonnegative(x::arb)
+\end{lstlisting}
+
+\desc{Return whether the interval $x$ respectively contains the
+point $x$, any positive point, any negative point, any nonnegative point,
+or any nonnegative point.}
+
+\begin{lstlisting}
+==(x::arb, y::arb)
+!=(x::arb, y::arb)
+>(x::arb, y::arb)
+>=(x::arb, y::arb)
+<(x::arb, y::arb)
+<=(x::arb, y::arb)
+\end{lstlisting}
+
+\desc{Compare two intervals.}
+
+\begin{lstlisting}
+==(x::arb, y::Int)
+!=(x::arb, y::Int)
+<=(x::arb, y::Int)
+>=(x::arb, y::Int)
+<(x::arb, y::Int)
+>(x::arb, y::Int)
+
+==(x::Int, y::arb)
+!=(x::Int, y::arb)
+<=(x::Int, y::arb)
+>=(x::Int, y::arb)
+<(x::Int, y::arb)
+>(x::Int, y::arb)
+
+==(x::arb, y::fmpz)
+!=(x::arb, y::fmpz)
+<=(x::arb, y::fmpz)
+>=(x::arb, y::fmpz)
+<(x::arb, y::fmpz)
+>(x::arb, y::fmpz)
+
+==(x::fmpz, y::arb)
+!=(x::fmpz, y::arb)
+<=(x::fmpz, y::arb)
+>=(x::fmpz, y::arb)
+<(x::fmpz, y::arb)
+>(x::fmpz, y::arb)
+
+==(x::arb, y::Float64)
+!=(x::arb, y::Float64)
+<=(x::arb, y::Float64)
+>=(x::arb, y::Float64)
+<(x::arb, y::Float64)
+>(x::arb, y::Float64)
+
+==(x::Float64, y::arb)
+!=(x::Float64, y::arb)
+<=(x::Float64, y::arb)
+>=(x::Float64, y::arb)
+<(x::Float64, y::arb)
+>(x::Float64, y::arb)
+\end{lstlisting}
+
+\desc{Compare an interval with a quantity of another type.}
+
+\begin{lstlisting}
+strongequal(x::arb, y::arb)
+\end{lstlisting}
+
+\desc{Returns whether $x$ and $y$ are identical as intervals, that is,
+have identical components midpoints and radii. Note that this is
+not the same as testing mathematical equality of real numbers,
+as implemented by the \code{==} operator.}
+
+\textbf{Examples.}
+
+\begin{lstlisting}
+x = RR("1 +/- 0.001")
+y = RR("3")
+z = RR("4")
+
+!isexact(x)
+
+isint(y)
+
+x <= z
+
+x == 3
+
+\end{lstlisting}
+
+\subsubsection{Arithmetic operations}
+
+\begin{lstlisting}
+-(x::arb)
+abs(x::arb)
+inv(x::arb)
+
++(x::arb, y::arb)
+-(x::arb, y::arb)
+*(x::arb, y::arb)
+//(x::arb, y::arb)
+
++(x::arb, y::UInt)
+-(x::arb, y::UInt)
+*(x::arb, y::UInt)
+//(x::arb, y::UInt)
+
++(x::UInt, y::arb)
+-(x::UInt, y::arb)
+*(x::UInt, y::arb)
+//(x::UInt, y::arb)
+
++(x::arb, y::Int)
+-(x::arb, y::Int)
+*(x::arb, y::Int)
+//(x::arb, y::Int)
+
++(x::Int, y::arb)
+-(x::Int, y::arb)
+*(x::Int, y::arb)
+//(x::Int, y::arb)
+
++(x::arb, y::fmpz)
+-(x::arb, y::fmpz)
+*(x::arb, y::fmpz)
+//(x::arb, y::fmpz)
+
++(x::fmpz, y::arb)
+-(x::fmpz, y::arb)
+*(x::fmpz, y::arb)
+//(x::fmpz, y::arb)
+
+^(x::arb, y::arb)
+^(x::arb, y::fmpz)
+^(x::arb, y::Int)
+^(x::arb, y::UInt)
+^(x::arb, y::fmpq)
+\end{lstlisting}
+
+\desc{Perform the respective arithmetic involving real numbers.}
+
+\textbf{Examples.}
+
+\begin{lstlisting}
+x = RR(3)
+y = RR(QQ(2,3))
+
+x + y
+
+inv(y) - x
+
+3 * x + ZZ(100) // y
+
+(x^2 + y^2) ^ QQ(1,2)
+\end{lstlisting}
+
+\subsubsection{Miscellaneous operations}
+
+\begin{lstlisting}
+ldexp(x::arb, y::Int)
+
+ldexp(x::arb, y::fmpz)
+\end{lstlisting}
+
+\desc{Return $x$ multiplyed by $2^y$ exactly.}
+
+\begin{lstlisting}
+trim(x::arb)
+\end{lstlisting}
+
+\desc{Return an \code{arb} interval containing $x$ but which may be more economical,
+by rounding off insignificant bits from the midpoint.}
+
+\begin{lstlisting}
+accuracy_bits(x::arb)
+\end{lstlisting}
+
+\desc{Return the relative accuracy of $x$ measured in bits, capped
+between \code{typemax(Int)} and \code{-typemax(Int)}.}
+
+\begin{lstlisting}
+unique_integer(x::arb)
+\end{lstlisting}
+
+\desc{Return a pair where the first value is a boolean and the second
+is a \code{fmpz} integer. The boolean indicates whether the interval $x$
+contains a unique integer. If this is the case, the second return
+value is set to this unique integer.}
+
+\begin{lstlisting}
+setunion(x::arb, y::arb)
+\end{lstlisting}
+
+\desc{Return an \code{arb} containing the union of the intervals
+represented by \code{x} and \code{y}.}
+
+\textbf{Examples.}
+
+\begin{lstlisting}
+x = RR("1 +/- 0.0001")
+y = RR("2")
+
+ldexp(x, 100)
+
+accuracy_bits(x)
+accuracy_bits(y)
+
+unique_integer(y)
+
+setunion(x, y)
+\end{lstlisting}
+
+\subsubsection{Mathematical constants}
+
+\begin{lstlisting}
+const_pi(r::ArbField)
+\end{lstlisting}
+
+\desc{Return $\pi = 3.14159\ldots$ as an element of $r$.}
+
+\begin{lstlisting}
+const_e(r::ArbField)
+\end{lstlisting}
+
+\desc{Return $e = 2.71828\ldots$ as an element of $r$.}
+
+\begin{lstlisting}
+const_log2(r::ArbField)
+\end{lstlisting}
+
+\desc{Return $\log(2) = 0.69314\ldots$ as an element of $r$.}
+
+\begin{lstlisting}
+const_log10(r::ArbField)
+\end{lstlisting}
+
+\desc{Return $\log(10) = 2.302585\ldots$ as an element of $r$.}
+
+\begin{lstlisting}
+const_euler(r::ArbField)
+\end{lstlisting}
+
+\desc{Return Euler's constant $\gamma = 0.577215\ldots$ as an element of $r$.}
+
+\begin{lstlisting}
+const_catalan(r::ArbField)
+\end{lstlisting}
+
+\desc{Return Catalan's constant $C = 0.915965\ldots$ as an element of $r$.}
+
+\begin{lstlisting}
+const_khinchin(r::ArbField)
+\end{lstlisting}
+
+\desc{Return Khinchin's constant $K = 2.685452\ldots$ as an element of $r$.}
+
+\begin{lstlisting}
+const_glaisher(r::ArbField)
+\end{lstlisting}
+
+\desc{Return Glaisher's constant $A = 1.282427\ldots$ as an element of $r$.}
+
+\textbf{Examples.}
+
+\begin{lstlisting}
+x = const_pi(RR)
+
+y = const_pi(ArbField(3323))
+
+g = const_euler(R)
+\end{lstlisting}
+
+\subsubsection{Mathematical functions}
+
+\begin{lstlisting}
+floor(x::arb)
+ceil(x::arb)
+\end{lstlisting}
+
+\desc{Return the floor and ceiling functions $\lfloor x \rfloor$ and
+$\lceil x \rceil$ respectively.}
+
+\begin{lstlisting}
+sqrt(x::arb)
+\end{lstlisting}
+
+\desc{Return $\sqrt{x}$.}
+
+\begin{lstlisting}
+rsqrt(x::arb)
+\end{lstlisting}
+
+\desc{Return $1 / \sqrt{x}$.}
+
+\begin{lstlisting}
+sqrt1pm1(x::arb)
+\end{lstlisting}
+
+\desc{Return $\sqrt{1+x}-1$, evaluated accurately for small $x$.}
+
+\begin{lstlisting}
+hypot(x::arb, y::arb)
+\end{lstlisting}
+
+\desc{Return $\sqrt{x^2 + y^2}$.}
+
+\begin{lstlisting}
+root(x::arb, n::UInt)
+root(x::arb, n::Int)
+\end{lstlisting}
+
+\desc{Return the principal branch of $x^{1/n}$. Require that $n > 0$.}
+
+\begin{lstlisting}
+log(x::arb)
+\end{lstlisting}
+
+\desc{Return the principal branch of $\log(x)$.}
+
+\begin{lstlisting}
+log1p(x::arb)
+\end{lstlisting}
+
+\desc{Return $\log(1+x)$, evaluated accurately for small $x$.}
+
+\begin{lstlisting}
+exp(x::arb)
+\end{lstlisting}
+
+\desc{Return $\exp(x)$.}
+
+\begin{lstlisting}
+expm1(x::arb)
+\end{lstlisting}
+
+\desc{Return $\exp(x)-1$, evaluated accurately for small $x$.}
+
+\begin{lstlisting}
+sin(x::arb)
+cos(x::arb)
+tan(x::arb)
+cot(x::arb)
+\end{lstlisting}
+
+\desc{Return the respective trigonometric function $\sin(x)$, etc.}
+
+\begin{lstlisting}
+sinpi(x::arb)
+cospi(x::arb)
+tanpi(x::arb)
+cotpi(x::arb)
+\end{lstlisting}
+
+\desc{Return the respective trigonometric function $\sin(\pi x)$, etc.}
+
+\begin{lstlisting}
+sincos(x::arb)
+sincospi(x::arb)
+\end{lstlisting}
+
+\desc{Return a pair containing both the sine and cosine computed simultaneously.}
+
+\begin{lstlisting}
+sinpi(x::fmpq, r::ArbField)
+cospi(x::fmpq, r::ArbField)
+sincospi(x::fmpq, r::ArbField)
+\end{lstlisting}
+
+\desc{Return the sine and/or cosine of argument $\pi x$ as an element of $r$.}
+
+\begin{lstlisting}
+sinh(x::arb)
+cosh(x::arb)
+tanh(x::arb)
+coth(x::arb)
+sinhcosh(x::arb)
+\end{lstlisting}
+
+\desc{Return the respective hyperbolic function $\sinh(x)$, etc.}
+
+\begin{lstlisting}
+atan(x::arb)
+asin(x::arb)
+acos(x::arb)
+atanh(x::arb)
+asinh(x::arb)
+acosh(x::arb)
+\end{lstlisting}
+
+\desc{Return the respective inverse trigonometric or hyperbolic function
+$\operatorname{atan}(x)$, etc.}
+
+\begin{lstlisting}
+atan2(b::arb, a::arb)
+\end{lstlisting}
+
+\desc{Return $\operatorname{atan2}(b,a) = \arg(a+bi)$.}
+
+\begin{lstlisting}
+gamma(x::arb)
+\end{lstlisting}
+
+\desc{Return the gamma function $\Gamma(x)$.}
+
+\begin{lstlisting}
+gamma(x::fmpz, r::ArbField)
+gamma(x::fmpq, r::ArbField)
+\end{lstlisting}
+
+\desc{Return the gamma function of $x$ as an element of $r$.}
+
+\begin{lstlisting}
+lgamma(x::arb)
+\end{lstlisting}
+
+\desc{Return the logarithm of the gamma function, $\log \Gamma(x)$.}
+
+\begin{lstlisting}
+rgamma(x::arb)
+\end{lstlisting}
+
+\desc{Return the reciprocal of the gamma function, $1 / \Gamma(x)$.}
+
+\begin{lstlisting}
+digamma(x::arb)
+\end{lstlisting}
+
+\desc{Return the logarithmic derivative of the gamma function, $\psi(x)$.}
+
+\begin{lstlisting}
+fac(x::arb)
+\end{lstlisting}
+
+\desc{Return the factorial $x! = \Gamma(x+1)$.}
+
+\begin{lstlisting}
+fac(n::UInt, r::ArbField)
+fac(n::Int, r::ArbField)
+\end{lstlisting}
+
+\desc{Return the factorial $n!$ as an element of $r$.}
+
+\begin{lstlisting}
+risingfac(x::arb, n::UInt)
+risingfac(x::arb, n::Int)
+\end{lstlisting}
+
+\desc{Return the rising factorial $x (x+1) \cdots (x+n-1)$.}
+
+\begin{lstlisting}
+risingfac2(x::arb, n::UInt)
+risingfac2(x::arb, n::Int)
+\end{lstlisting}
+
+\desc{Return a tuple containing the rising factorial and its derivative.}
+
+\begin{lstlisting}
+risingfac(x::fmpq, n::UInt, r::ArbField)
+risingfac(x::fmpq, n::Int, r::ArbField)
+\end{lstlisting}
+
+\desc{Return the rising factorial $x (x+1) \cdots (x+n-1)$ as an element of $r$.}
+
+\begin{lstlisting}
+binom(x::arb, k::UInt)
+\end{lstlisting}
+
+\desc{Return the binomial coefficient ${x \choose k}$.}
+
+\begin{lstlisting}
+binom(n::UInt, k::UInt, r::ArbField)
+\end{lstlisting}
+
+\desc{Return the binomial coefficient ${n \choose k}$ as an element of $r$.}
+
+\begin{lstlisting}
+fib(n::fmpz, r::ArbField)
+fib(n::UInt, r::ArbField)
+fib(n::Int, r::ArbField)
+\end{lstlisting}
+
+\desc{Return the Fibonacci number $F_n$ as an element of $r$.}
+
+\begin{lstlisting}
+bell(n::fmpz, r::ArbField)
+bell(n::Int, r::ArbField)
+\end{lstlisting}
+
+\desc{Return the Bell number $B_n$ as an element of $r$.}
+
+\begin{lstlisting}
+bernoulli(n::UInt, r::ArbField)
+bernoulli(n::Int, r::ArbField)
+\end{lstlisting}
+
+\desc{Return the Bernoulli number $B_n$ as an element of $r$.}
+
+\begin{lstlisting}
+chebyshev_t(n::UInt, x::arb)
+chebyshev_u(n::UInt, x::arb)
+chebyshev_t(n::Int, x::arb)
+chebyshev_u(n::Int, x::arb)
+\end{lstlisting}
+
+\desc{Return the value of the Chebyshev polynomial $T_n(x)$ or $U_n(x)$ respectively.}
+
+\begin{lstlisting}
+chebyshev_t2(n::UInt, x::arb)
+chebyshev_u2(n::UInt, x::arb)
+chebyshev_t2(n::Int, x::arb)
+chebyshev_u2(n::Int, x::arb)
+\end{lstlisting}
+
+\desc{Return the tuple $(T_{n}(x), T_{n-1}(x))$ or $(U_{n}(x), U_{n-1}(x))$,
+both values computed simultaneously.}
+
+\begin{lstlisting}
+zeta(s::arb)
+\end{lstlisting}
+
+\desc{Return the Riemann zeta function $\zeta(s)$.}
+
+\begin{lstlisting}
+zeta(n::UInt, r::ArbField)
+zeta(n::Int, r::ArbField)
+\end{lstlisting}
+
+\desc{Return the Riemann zeta function $\zeta(n)$ as an element of $r$.}
+
+\begin{lstlisting}
+zeta(s::arb, a::arb)
+\end{lstlisting}
+
+\desc{Return the Hurwitz zeta function $\zeta(s,a)$.}
+
+\begin{lstlisting}
+polylog(s::arb, z::arb)
+polylog(s::Int, z::arb)
+\end{lstlisting}
+
+\desc{Return the polylogarithm $\operatorname{Li}_s(z)$.}
+
+\begin{lstlisting}
+agm(x::arb, y::arb)
+\end{lstlisting}
+
+\desc{Return the arithmetic-geometric mean of $x$ and $y$.}
+
+\textbf{Examples.}
+
+\begin{lstlisting}
+
+x = floor(exp(RR(1)))
+
+x = sinpi(QQ(5,6), RR)
+
+y = gamma(QQ(1,3), ArbField(256))
+
+z = bernoulli(1000, ArbField(53))
+
+w = polylog(3, RR(-10))
+
 \end{lstlisting}
 
 \section{Pari rings}

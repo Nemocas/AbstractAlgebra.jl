@@ -7,7 +7,13 @@ include("flint/padic-test.jl")
 
 include("antic/nf_elem-test.jl")
 
+include("arb/arb-test.jl")
+
 function test_fields()
+   if !on_windows64
+     test_arb()
+   end
+
    test_fraction()
 
    test_fmpq()
