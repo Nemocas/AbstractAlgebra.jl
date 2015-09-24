@@ -10,7 +10,7 @@ function test_acb_constructors()
    @test isa(CC(2), FieldElem)
 
    @test elem_type(CC) == acb
-   @test base_ring(CC) == None
+   @test base_ring(CC) == Union{} 
 
    println("PASS")
 end
