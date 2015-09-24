@@ -701,6 +701,8 @@ Base.promote_rule(::Type{nf_elem}, ::Type{fmpq_poly}) = nf_elem
 
 function Base.call(a::AnticNumberField)
    z = nf_elem(a)
+   ccall((:nf_elem_set_si, :libflint), Void, 
+         (Ptr{nf_elem}, Int, Ptr{AnticNumberField}), &z, 0, &a)
    return z
 end
 
