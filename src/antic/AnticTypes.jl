@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-const AnticNumberFieldID = Dict{Tuple{fmpq_poly, Symbol}, Field}()
+const AnticNumberFieldID = Dict{Tuple{FmpqPolyRing, fmpq_poly, Symbol}, Field}()
 
 type AnticNumberField <: Field{Antic}
    pol_coeffs::Ptr{Void}
@@ -33,9 +33,9 @@ type AnticNumberField <: Field{Antic}
 
    function AnticNumberField(pol::fmpq_poly, s::Symbol)
       try
-         return AnticNumberFieldID[pol, s]
+         return AnticNumberFieldID[parent(pol), pol, s]
       catch
-         nf = AnticNumberFieldID[pol, s] = new()
+         nf = AnticNumberFieldID[parent(pol), pol, s] = new()
          nf.pol = pol
          ccall((:nf_init, :libflint), Void, 
             (Ptr{AnticNumberField}, Ptr{fmpq_poly}), &nf, &pol)
