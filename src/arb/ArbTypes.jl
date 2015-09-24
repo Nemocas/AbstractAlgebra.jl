@@ -82,11 +82,11 @@ type arb <: FieldElem
     return z
   end
 
-  function arb(s::String, p::Int)
+  function arb(s::AbstractString, p::Int)
     s = bytestring(s)
     z = new()
     ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    err = ccall((:arb_set_str, :libarb), Int32, (Ptr{arb}, Ptr{Uint8}, Int), &z, s, p)
+    err = ccall((:arb_set_str, :libarb), Int32, (Ptr{arb}, Ptr{UInt8}, Int), &z, s, p)
     finalizer(z, _arb_clear_fn)
     err == 0 || error("Invalid real string: $(repr(s))")
     return z

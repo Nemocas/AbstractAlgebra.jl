@@ -34,7 +34,7 @@ export ball, radius, midpoint, contains, contains_zero,
 
 elem_type(::ArbField) = arb
 
-base_ring(R::ArbField) = None
+base_ring(R::ArbField) = Union{} 
 
 zero(R::ArbField) = R(0)
 
@@ -94,13 +94,13 @@ function call(r::ArbField, x::arb)
   return z
 end
 
-function call(r::ArbField, x::String)
+function call(r::ArbField, x::AbstractString)
   z = arb(x, r.prec)
   z.parent = r
   return z
 end
 
-function call(r::ArbField, x::MathConst)
+function call(r::ArbField, x::Irrational)
   if x == pi
     return const_pi(r)
   elseif x == e
