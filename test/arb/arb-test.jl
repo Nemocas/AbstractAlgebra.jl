@@ -1,3 +1,5 @@
+if !on_windows64
+
 RR = ArbField(64)
 
 function test_arb_constructors()
@@ -516,3 +518,5 @@ function test_arb()
 
    println("")
 end
+
+end # on_windows64

@@ -33,6 +33,8 @@ export create_accessors, get_handle, package_handle, allocatemem
 
 export flint_cleanup, flint_set_num_threads
 
+export on_windows64
+
 include("AbstractTypes.jl")
 
 ###############################################################################
@@ -77,6 +79,8 @@ end
 function pari_error_recover(err::Cint)
    return
 end
+
+on_windows64 = (@windows ? true : false) && (Int == Int64)
 
 function __init__()
 
@@ -142,7 +146,9 @@ include("flint/FlintTypes.jl")
 
 include("antic/AnticTypes.jl")
 
-include("arb/ArbTypes.jl")
+if !on_windows64
+  include("arb/ArbTypes.jl")
+end
 
 include("pari/PariTypes.jl")
 

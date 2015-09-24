@@ -31,7 +31,10 @@ function test_fields_resultant()
 end
 
 function test_fields()
-   test_arb()
+   if !on_windows64
+     test_arb()
+   end
+
    test_fraction()
 
    test_fmpq()
