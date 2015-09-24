@@ -9,7 +9,7 @@ function test_arb_constructors()
    @test isa(RR(2), FieldElem)
 
    @test elem_type(RR) == arb
-   @test base_ring(RR) == None
+   @test base_ring(RR) == Union{} 
 
    println("PASS")
 end
