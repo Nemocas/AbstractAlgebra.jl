@@ -79,10 +79,31 @@ function call(r::AcbField, x::arb)
   return z
 end
 
+function call(r::AcbField, x::Float64)
+  R = ArbField(r.prec)
+  return r(R(x))
+end
+
 function call(r::AcbField, x::arb, y::arb)
   z = acb(x, y, r.prec)
   z.parent = r
   return z
+end
+
+function call(r::AcbField, x::Int, y::Int)
+  z = acb(x, y, r.prec)
+  z.parent = r
+  return z
+end
+
+function call(r::AcbField, x::String)
+  R = ArbField(r.prec)
+  return r(R(x))
+end
+
+function call(r::AcbField, x::String, y::String)
+  R = ArbField(r.prec)
+  return r(R(x), R(y))
 end
 
 ################################################################################
@@ -164,8 +185,43 @@ function !=(x::acb, y::acb)
   return Bool(r)
 end
 
+==(x::acb,y::Int) = (x == parent(x)(y))
+==(x::Int,y::acb) = (y == parent(y)(x))
+
+==(x::acb,y::arb) = (x == parent(x)(y))
+==(x::arb,y::acb) = (y == parent(y)(x))
+
+==(x::acb,y::fmpz) = (x == parent(x)(y))
+==(x::fmpz,y::acb) = (y == parent(y)(x))
+
+==(x::acb,y::arb) = (x == parent(x)(y))
+==(x::arb,y::acb) = (y == parent(y)(x))
+
+==(x::acb,y::Float64) = (x == parent(x)(y))
+==(x::Float64,y::acb) = (y == parent(y)(x))
+
+!=(x::acb,y::Int) = (x != parent(x)(y))
+!=(x::Int,y::acb) = (y != parent(y)(x))
+
+!=(x::acb,y::arb) = (x != parent(x)(y))
+!=(x::arb,y::acb) = (y != parent(y)(x))
+
+!=(x::acb,y::fmpz) = (x != parent(x)(y))
+!=(x::fmpz,y::acb) = (y != parent(y)(x))
+
+!=(x::acb,y::arb) = (x != parent(x)(y))
+!=(x::arb,y::acb) = (y != parent(y)(x))
+
+!=(x::acb,y::Float64) = (x != parent(x)(y))
+!=(x::Float64,y::acb) = (y != parent(y)(x))
+
 function overlaps(x::acb, y::acb)
   r = ccall((:acb_overlaps, :libarb), Cint, (Ptr{acb}, Ptr{acb}), &x, &y)
+  return Bool(r)
+end
+
+function contains(x::acb, y::acb)
+  r = ccall((:acb_contains, :libarb), Cint, (Ptr{acb}, Ptr{acb}), &x, &y)
   return Bool(r)
 end
 
@@ -176,6 +232,12 @@ end
 
 function contains(x::acb, y::fmpz)
   r = ccall((:acb_contains_fmpz, :libarb), Cint, (Ptr{acb}, Ptr{fmpz}), &x, &y)
+  return Bool(r)
+end
+
+function contains(x::acb, y::Int)
+  v = fmpz(y)
+  r = ccall((:acb_contains_fmpz, :libarb), Cint, (Ptr{acb}, Ptr{fmpz}), &x, &v)
   return Bool(r)
 end
 
@@ -220,7 +282,8 @@ function trim(x::acb)
 end
 
 function accuracy_bits(x::acb)
-  return ccall((:acb_rel_accuracy_bits, :libarb), Int, (Ptr{acb},), &x)
+  # bug in acb.h: rel_accuracy_bits is not in the library
+  return -ccall((:acb_rel_error_bits, :libarb), Int, (Ptr{acb},), &x)
 end
 
 function unique_integer(x::acb)
@@ -326,28 +389,28 @@ end
 
 function -(x::UInt, y::acb)
   z = parent(y)()
-  ccall((:acb_sub_ui, :libarb), Void, (Ptr{acb}, Ptr{acb}, UInt, Int), &z, &y, x, parent(x).prec)
+  ccall((:acb_sub_ui, :libarb), Void, (Ptr{acb}, Ptr{acb}, UInt, Int), &z, &y, x, parent(y).prec)
   ccall((:acb_neg, :libarb), Void, (Ptr{acb}, Ptr{acb}), &z, &z)
   return z
 end
 
 function -(x::Int, y::acb)
   z = parent(y)()
-  ccall((:acb_sub_si, :libarb), Void, (Ptr{acb}, Ptr{acb}, Int, Int), &z, &y, x, parent(x).prec)
+  ccall((:acb_sub_si, :libarb), Void, (Ptr{acb}, Ptr{acb}, Int, Int), &z, &y, x, parent(y).prec)
   ccall((:acb_neg, :libarb), Void, (Ptr{acb}, Ptr{acb}), &z, &z)
   return z
 end
 
 function -(x::fmpz, y::acb)
   z = parent(y)()
-  ccall((:acb_sub_fmpz, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{fmpz}, Int), &z, &y, &x, parent(x).prec)
+  ccall((:acb_sub_fmpz, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{fmpz}, Int), &z, &y, &x, parent(y).prec)
   ccall((:acb_neg, :libarb), Void, (Ptr{acb}, Ptr{acb}), &z, &z)
   return z
 end
 
 function -(x::arb, y::acb)
   z = parent(y)()
-  ccall((:acb_sub_arb, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{arb}, Int), &z, &y, &x, parent(x).prec)
+  ccall((:acb_sub_arb, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{arb}, Int), &z, &y, &x, parent(y).prec)
   ccall((:acb_neg, :libarb), Void, (Ptr{acb}, Ptr{acb}), &z, &z)
   return z
 end
