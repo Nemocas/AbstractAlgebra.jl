@@ -152,8 +152,9 @@ else
    run(`./configure --prefix=$vdir --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir --with-flint=$vdir`)
    run(`make -j4`)
    run(`make install`)
-   cd(wdir)
 end
+
+cd(wdir)
 
 # install PARI
 
