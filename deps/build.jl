@@ -104,14 +104,14 @@ cd(wdir)
 
 try
   run(`git clone https://github.com/wbhart/antic.git`)
-except
+catch
   run(`cd antic ; git pull`)
 end          
 
 # install FLINT
 try
   run(`git clone https://github.com/wbhart/flint2.git`)
-except
+catch
   run(`cd flint2 ; git pull`)
 end          
 
@@ -123,7 +123,7 @@ if on_windows
    end
    try
       run(`ln -s $vdir\\lib\\libflint.dll $vdir\\lib\\libflint-13.dll`)
-   except
+   catch
       # ignore error
    end
 else
@@ -139,7 +139,7 @@ cd(wdir)
 
 try
   run(`git clone https://github.com/fredrik-johansson/arb.git`)
-except
+catch
   run(`cd arb ; git pull`)
 end          
  
@@ -166,7 +166,7 @@ if on_windows
 else
    try
       run(`git clone http://pari.math.u-bordeaux.fr/git/pari.git`)
-   except
+   catch
       run(`cd pari ; git pull`)
    end
 end  
