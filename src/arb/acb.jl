@@ -537,7 +537,6 @@ for (s,f) in (
               ("modj", "acb_modular_j"),
               ("modlambda", "acb_modular_lambda"),
               ("moddelta", "acb_modular_delta"),
-              ("ellipwp", "acb_modular_elliptic_p"),
               ("ellipk", "acb_modular_elliptic_k"),
               ("ellipe", "acb_modular_elliptic_e"),
              )
@@ -707,6 +706,13 @@ function jtheta(z::acb, tau::acb)
               (Ptr{acb}, Ptr{acb}, Ptr{acb}, Ptr{acb}, Ptr{acb}, Ptr{acb}, Int),
                 &t1, &t2, &t3, &t4, &z, &tau, parent(z).prec)
   return (t1, t2, t3, t4)
+end
+
+function ellipwp(z::acb, tau::acb)
+  r = parent(z)()
+  ccall((:acb_modular_elliptic_p, :libarb), Void,
+              (Ptr{acb}, Ptr{acb}, Ptr{acb}, Int), &r, &z, &tau, parent(z).prec)
+  return r
 end
 
 function agm(x::acb, y::acb)
