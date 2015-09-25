@@ -10024,6 +10024,22 @@ t = RR("-1.24e+12345")
 u = RR("nan +/- inf")
 \end{lstlisting}
 
+\subsubsection{Conversions}
+
+\begin{lstlisting}
+Float64(x::arb)
+\end{lstlisting}
+
+\desc{Return the midpoint of $x$ rounded down to a machine double.}
+
+\textbf{Examples.}
+
+\begin{lstlisting}
+x = RR(QQ(2,3))
+
+Float64(x)
+\end{lstlisting}
+
 \subsubsection{Parts of numbers}
 
 \begin{lstlisting}
