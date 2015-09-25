@@ -37,77 +37,6 @@ base_ring(R::AcbField) = Union{}
 
 ################################################################################
 #
-#  Parent object overload
-#
-################################################################################
-
-function call(r::AcbField)
-  z = acb()
-  z.parent = r
-  return z
-end
-
-function call(r::AcbField, x::Int)
-  z = acb(x)
-  z = acb(z, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::AcbField, x::UInt)
-  z = acb(x)
-  z = acb(z, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::AcbField, x::fmpz)
-  z = acb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::AcbField, x::fmpq)
-  z = acb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::AcbField, x::arb)
-  z = acb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::AcbField, x::Float64)
-  R = ArbField(r.prec)
-  return r(R(x))
-end
-
-function call(r::AcbField, x::arb, y::arb)
-  z = acb(x, y, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::AcbField, x::Int, y::Int)
-  z = acb(x, y, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::AcbField, x::AbstractString)
-  R = ArbField(r.prec)
-  return r(R(x))
-end
-
-function call(r::AcbField, x::AbstractString, y::AbstractString)
-  R = ArbField(r.prec)
-  return r(R(x), R(y))
-end
-
-################################################################################
-#
 #  Real and imaginary part
 #
 ################################################################################
@@ -429,28 +358,6 @@ end
 
 ################################################################################
 #
-#  Unsafe arithmetic
-#
-################################################################################
-
-function add!(z::acb, x::acb, y::acb)
-  ccall((:acb_add, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}), &z, &x, &y)
-end
-
-function sub!(z::acb, x::acb, y::acb)
-  ccall((:acb_sub, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}), &z, &x, &y)
-end
-
-function mul!(z::acb, x::acb, y::acb)
-  ccall((:acb_mul, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}), &z, &x, &y)
-end
-
-function div!(z::acb, x::acb, y::acb)
-  ccall((:acb_div, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}), &z, &x, &y)
-end
- 
-################################################################################
-#
 #  Basic functions
 #
 ###############################################################################
@@ -724,4 +631,98 @@ function agm(x::acb, y::acb)
     return agm(y * v) * x
   end
 end
+
+################################################################################
+#
+#  Unsafe arithmetic
+#
+################################################################################
+
+function add!(z::acb, x::acb, y::acb)
+  ccall((:acb_add, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}), &z, &x, &y)
+end
+
+function sub!(z::acb, x::acb, y::acb)
+  ccall((:acb_sub, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}), &z, &x, &y)
+end
+
+function mul!(z::acb, x::acb, y::acb)
+  ccall((:acb_mul, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}), &z, &x, &y)
+end
+
+function div!(z::acb, x::acb, y::acb)
+  ccall((:acb_div, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}), &z, &x, &y)
+end
+ 
+################################################################################
+#
+#  Parent object overload
+#
+################################################################################
+
+function call(r::AcbField)
+  z = acb()
+  z.parent = r
+  return z
+end
+
+function call(r::AcbField, x::Int)
+  z = acb(x)
+  z = acb(z, r.prec)
+  z.parent = r
+  return z
+end
+
+function call(r::AcbField, x::UInt)
+  z = acb(x)
+  z = acb(z, r.prec)
+  z.parent = r
+  return z
+end
+
+function call(r::AcbField, x::fmpz)
+  z = acb(x, r.prec)
+  z.parent = r
+  return z
+end
+
+function call(r::AcbField, x::fmpq)
+  z = acb(x, r.prec)
+  z.parent = r
+  return z
+end
+
+function call(r::AcbField, x::arb)
+  z = acb(x, r.prec)
+  z.parent = r
+  return z
+end
+
+function call(r::AcbField, x::Float64)
+  R = ArbField(r.prec)
+  return r(R(x))
+end
+
+function call(r::AcbField, x::arb, y::arb)
+  z = acb(x, y, r.prec)
+  z.parent = r
+  return z
+end
+
+function call(r::AcbField, x::Int, y::Int)
+  z = acb(x, y, r.prec)
+  z.parent = r
+  return z
+end
+
+function call(r::AcbField, x::AbstractString)
+  R = ArbField(r.prec)
+  return r(R(x))
+end
+
+function call(r::AcbField, x::AbstractString, y::AbstractString)
+  R = ArbField(r.prec)
+  return r(R(x), R(y))
+end
+
 

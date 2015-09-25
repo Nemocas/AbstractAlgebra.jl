@@ -316,7 +316,9 @@ function ==(x::fmpz_mod_series, y::fmpz_mod_series)
 end
 
 function isequal(x::fmpz_mod_series, y::fmpz_mod_series)
-   check_parent(x, y)
+   if parent(x) != parent(y)
+      return false
+   end
    if x.prec != y.prec || length(x) != length(y)
       return false
    end

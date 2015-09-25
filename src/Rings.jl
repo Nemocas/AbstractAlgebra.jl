@@ -24,6 +24,10 @@ if (@windows? true : false) && Int == Int32
    end
 end
 
+function isequal(a::RingElem, b::RingElem)
+   return parent(a) == parent(b) && a == b
+end
+
 ###############################################################################
 #
 #   Generic catchall functions

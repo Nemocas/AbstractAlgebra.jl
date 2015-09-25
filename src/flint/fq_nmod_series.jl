@@ -346,7 +346,9 @@ function ==(x::fq_nmod_series, y::fq_nmod_series)
 end
 
 function isequal(x::fq_nmod_series, y::fq_nmod_series)
-   check_parent(x, y)
+   if parent(x) != parent(y)
+      return false
+   end
    ctx = base_ring(x)
    if x.prec != y.prec || length(x) != length(y)
       return false

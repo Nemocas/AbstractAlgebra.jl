@@ -42,76 +42,6 @@ one(R::ArbField) = R(1)
 
 ################################################################################
 #
-#  Parent object overloading
-#
-################################################################################
-
-function call(r::ArbField)
-  z = arb()
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::Int)
-  z = arb(fmpz(x), r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::UInt)
-  z = arb(fmpz(x), r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::fmpz)
-  z = arb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::fmpq)
-  z = arb(x, r.prec)
-  z.parent = r
-  return z
-end
-  
-#function call(r::ArbField, x::arf)
-#  z = arb(arb(x), r.prec)
-#  z.parent = r
-#  return z
-#end
-
-function call(r::ArbField, x::Float64)
-  z = arb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::arb)
-  z = arb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::AbstractString)
-  z = arb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::Irrational)
-  if x == pi
-    return const_pi(r)
-  elseif x == e
-    return const_e(r.prec)
-  else
-    error("constant not supported")
-  end
-end
-
-################################################################################
-#
 #  String I/O
 #
 ################################################################################
@@ -549,22 +479,6 @@ end
 
 ################################################################################
 #
-#  Unsafe binary operations
-#
-################################################################################
-
-for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
-              ("sub!","arb_sub"))
-  @eval begin
-    function ($(symbol(s)))(z::arb, x::arb, y::arb)
-      ccall(($f, :libarb), Void, (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int),
-                           &z, &x, &y, parent(x).prec)
-    end
-  end
-end
-
-################################################################################
-#
 #  Constants
 #
 ################################################################################
@@ -906,4 +820,90 @@ function bell(n::fmpz, r::ArbField)
 end
 
 bell(n::Int, r::ArbField) = bell(fmpz(n), r)
+
+################################################################################
+#
+#  Unsafe binary operations
+#
+################################################################################
+
+for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
+              ("sub!","arb_sub"))
+  @eval begin
+    function ($(symbol(s)))(z::arb, x::arb, y::arb)
+      ccall(($f, :libarb), Void, (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int),
+                           &z, &x, &y, parent(x).prec)
+    end
+  end
+end
+
+################################################################################
+#
+#  Parent object overloading
+#
+################################################################################
+
+function call(r::ArbField)
+  z = arb()
+  z.parent = r
+  return z
+end
+
+function call(r::ArbField, x::Int)
+  z = arb(fmpz(x), r.prec)
+  z.parent = r
+  return z
+end
+
+function call(r::ArbField, x::UInt)
+  z = arb(fmpz(x), r.prec)
+  z.parent = r
+  return z
+end
+
+function call(r::ArbField, x::fmpz)
+  z = arb(x, r.prec)
+  z.parent = r
+  return z
+end
+
+function call(r::ArbField, x::fmpq)
+  z = arb(x, r.prec)
+  z.parent = r
+  return z
+end
+  
+#function call(r::ArbField, x::arf)
+#  z = arb(arb(x), r.prec)
+#  z.parent = r
+#  return z
+#end
+
+function call(r::ArbField, x::Float64)
+  z = arb(x, r.prec)
+  z.parent = r
+  return z
+end
+
+function call(r::ArbField, x::arb)
+  z = arb(x, r.prec)
+  z.parent = r
+  return z
+end
+
+function call(r::ArbField, x::AbstractString)
+  z = arb(x, r.prec)
+  z.parent = r
+  return z
+end
+
+function call(r::ArbField, x::Irrational)
+  if x == pi
+    return const_pi(r)
+  elseif x == e
+    return const_e(r.prec)
+  else
+    error("constant not supported")
+  end
+end
 
