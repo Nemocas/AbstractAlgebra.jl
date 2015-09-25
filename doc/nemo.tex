@@ -10935,10 +10935,57 @@ z^2 + w ^ QQ(1,2) + z^w
 3*z + 4*w + 5*real(z)
 \end{lstlisting}
 
+\subsubsection{Miscellaneous operations}
+
+\begin{lstlisting}
+ldexp(x::acb, y::Int)
+
+ldexp(x::acb, y::fmpz)
+\end{lstlisting}
+
+\desc{Return $x$ multiplyed by $2^y$ exactly.}
+
+\begin{lstlisting}
+trim(x::acb)
+\end{lstlisting}
+
+\desc{Return an \code{acb} interval containing $x$ but which may be more economical,
+by rounding off insignificant bits from the midpoints.}
+
+\begin{lstlisting}
+accuracy_bits(x::acb)
+\end{lstlisting}
+
+\desc{Return the relative accuracy of $x$ measured in bits, capped
+between \code{typemax(Int)} and \code{-typemax(Int)}.}
+
+\begin{lstlisting}
+unique_integer(x::acb)
+\end{lstlisting}
+
+\desc{Return a pair where the first value is a boolean and the second
+is a \code{fmpz} integer. The boolean indicates whether the interval $x$
+contains a unique integer. If this is the case, the second return
+value is set to this unique integer.}
+
+\textbf{Examples.}
+
+\begin{lstlisting}
+x = CC("1 +/- 0.0001", "0 +/- 1e-30")
+y = CC("2")
+
+ldexp(x, 100)
+
+accuracy_bits(x)
+accuracy_bits(y)
+
+unique_integer(y)
+\end{lstlisting}
+
 \subsubsection{Mathematical constants}
 
 \begin{lstlisting}
-const_pi(r::ArbField)
+const_pi(r::AcbField)
 \end{lstlisting}
 
 \desc{Return $\pi = 3.14159\ldots$ as an element of $r$.}
