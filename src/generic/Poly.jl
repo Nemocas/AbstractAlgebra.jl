@@ -517,7 +517,9 @@ function =={T <: RingElem}(x::PolyElem{T}, y::PolyElem{T})
 end
 
 function isequal{T <: RingElem}(x::PolyElem{T}, y::PolyElem{T})
-   check_parent(x, y)
+   if parent(x) != parent(y)
+      return false
+   end
    if length(x) != length(y)
       return false
    end
