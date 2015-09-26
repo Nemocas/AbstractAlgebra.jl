@@ -1,4 +1,5 @@
 on_windows = @windows ? true : false
+on_osx = @osx ? true : false
 
 oldwdir = pwd()
 
@@ -29,8 +30,10 @@ cd(wdir)
 
 # install M4
 
-if !on_windows
-   run(`wget http://ftp.gnu.org/gnu/m4/m4-1.4.17.tar.bz2`)
+try
+   run(`m4 --version`)
+catch
+   download("http://ftp.gnu.org/gnu/m4/m4-1.4.17.tar.bz2", joinpath(wdir, "m4-1.4.17.tar.bz2"))
    run(`tar -xvf m4-1.4.17.tar.bz2`)
    run(`rm m4-1.4.17.tar.bz2`)
    cd("$wdir/m4-1.4.17")
@@ -48,9 +51,11 @@ if on_windows
    run(`tar -xvf gmp-6.0.0a.tar.bz2`)
    run(`rm gmp-6.0.0a.tar.bz2`)
 else
-   run(`wget http://mpir.org/mpir-2.7.0.tar.bz2`)
-   run(`tar -xvf mpir-2.7.0.tar.bz2`)
-   run(`rm mpir-2.7.0.tar.bz2`)
+   if !ispath(Pkg.dir("Nemo", "local", "mpir-2.7.0"))
+      download("http://mpir.org/mpir-2.7.0.tar.bz2", joinpath(wdir, "mpir-2.7.0.tar.bz2"))
+      run(`tar -xvf mpir-2.7.0.tar.bz2`)
+      run(`rm mpir-2.7.0.tar.bz2`)
+   end
    cd("$wdir/mpir-2.7.0")
 end
 
@@ -61,7 +66,12 @@ if on_windows
       download("http://nemocas.org/binaries/w64-libgmp-10.dll", joinpath(vdir, "lib", "libgmp-10.dll"))
    end
 else
-   run(`./configure --prefix=$vdir M4=$vdir/bin/m4 --enable-gmpcompat --disable-static --enable-shared`)
+   try
+      run(`m4 --version`)
+      run(`./configure --prefix=$vdir --enable-gmpcompat --disable-static --enable-shared`)
+   catch
+      run(`./configure --prefix=$vdir M4=$vdir/bin/m4 --enable-gmpcompat --disable-static --enable-shared`)
+   end
    run(`make -j4`)
    run(`make install`)
    cd(wdir)
@@ -73,15 +83,10 @@ cd(wdir)
 
 # install MPFR
 
-if on_windows
+if !ispath(Pkg.dir("Nemo", "local", "mpfr-3.1.3"))
    download("http://www.mpfr.org/mpfr-current/mpfr-3.1.3.tar.bz2", joinpath(wdir, "mpfr-3.1.3.tar.bz2"))
    run(`tar -xvf mpfr-3.1.3.tar.bz2`)
    run(`rm mpfr-3.1.3.tar.bz2`)
-else
-   run(`wget http://www.mpfr.org/mpfr-current/mpfr-3.1.3.tar.bz2`)
-   run(`tar -xvf mpfr-3.1.3.tar.bz2`)
-   run(`rm mpfr-3.1.3.tar.bz2`)
-   cd("$wdir/mpfr-3.1.3")
 end
 
 if on_windows
@@ -91,6 +96,7 @@ if on_windows
       download("http://nemocas.org/binaries/w64-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
    end
 else
+   cd("$wdir/mpfr-3.1.3")
    run(`./configure --prefix=$vdir --with-gmp=$vdir --disable-static --enable-shared`)
    run(`make -j4`)
    run(`make install`)
@@ -105,14 +111,18 @@ cd(wdir)
 try
   run(`git clone https://github.com/wbhart/antic.git`)
 catch
-  run(`cd antic ; git pull`)
+  cd("$wdir/antic")
+  run(`git pull`)
 end          
+
+cd(wdir)
 
 # install FLINT
 try
   run(`git clone https://github.com/wbhart/flint2.git`)
 catch
-  run(`cd flint2 ; git pull`)
+  cd("$wdir/flint2")
+  run(`git pull`)
 end          
 
 if on_windows
@@ -123,8 +133,6 @@ if on_windows
    end
    try
       run(`ln -s $vdir\\lib\\libflint.dll $vdir\\lib\\libflint-13.dll`)
-   catch
-      # ignore error
    end
 else
    cd("$wdir/flint2")
@@ -140,7 +148,9 @@ cd(wdir)
 try
   run(`git clone https://github.com/fredrik-johansson/arb.git`)
 catch
-  run(`cd arb ; git pull`)
+  cd("$wdir/arb")
+  run(`git pull`)
+  cd(wdir)
 end          
  
 if on_windows
@@ -158,18 +168,15 @@ cd(wdir)
 
 # install PARI
 
-if on_windows
+if !ispath(Pkg.dir("Nemo", "deps", "pari-2.7.4"))
    # git clone pari doesn't seem to work on Windows
+   # bison is too old on OSX for pari git
+   # so we use the 2.7.4 tarball
+
    download("http://pari.math.u-bordeaux.fr/pub/pari/unix/pari-2.7.4.tar.gz", joinpath(wdir, "pari-2.7.4.tar.gz"))
    run(`tar -xvf pari-2.7.4.tar.gz`)
    run(`rm pari-2.7.4.tar.gz`)
-else
-   try
-      run(`git clone http://pari.math.u-bordeaux.fr/git/pari.git`)
-   catch
-      run(`cd pari ; git pull`)
-   end
-end  
+end
 
 if on_windows
    if Int == Int32
@@ -178,7 +185,7 @@ if on_windows
       download("http://nemocas.org/binaries/w64-libpari.dll", joinpath(vdir, "lib", "libpari.dll"))
    end
 else
-   cd("$wdir/pari")
+   cd("$wdir/pari-2.7.4")
    env_copy = copy(ENV)
    env_copy["LD_LIBRARY_PATH"] = "$vdir/lib"
    env_copy["CFLAGS"] = "-Wl,-rpath,$vdir/lib"
@@ -186,7 +193,6 @@ else
    config_str = setenv(config_str, env_copy)
    run(config_str)
    run(`make -j4 gp`)
-   run(`make doc`)
    run(`make install`)
 end
 
