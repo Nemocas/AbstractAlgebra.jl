@@ -3,9 +3,15 @@ function test_fq_nmod_constructors()
 
    R, x = FiniteField(7, 5, "x")
 
+   Sy, y = PolynomialRing(ResidueRing(FlintZZ, 3), "y")
+
+   T, z = FiniteField(y^2 + 1, "z")
+
    @test isa(R, FqNmodFiniteField)
+   @test isa(T, FqNmodFiniteField)
 
    @test isa(3x^4 + 2x^3 + 4x^2 + x + 1, fq_nmod)
+   @test isa(z^2 + z + 1, fq_nmod)
 
    a = R()
    

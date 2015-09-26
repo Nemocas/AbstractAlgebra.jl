@@ -2,10 +2,16 @@ function test_fq_constructors()
    print("fq.constructors()...")
 
    R, x = FiniteField(fmpz(7), 5, "x")
+   
+   Sy, y = PolynomialRing(ResidueRing(FlintZZ, 36893488147419103363), "y")
+
+   T, z = FiniteField(y^2 + 1, "z")
 
    @test isa(R, FqFiniteField)
+   @test isa(T, FqFiniteField)
 
    @test isa(3x^4 + 2x^3 + 4x^2 + x + 1, fq)
+   @test isa(z^2 + z + 1, fq)
 
    a = R()
    
