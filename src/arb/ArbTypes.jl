@@ -38,32 +38,32 @@ prec(x::ArbField) = x.prec
 # these may be used for shallow operations
 type arf_struct
   exp::Int # fmpz
-  size::UInt64 # mp_size_t
-  d1::Int64 # mantissa_struct
-  d2::Int64
+  size::UInt # mp_size_t
+  d1::Int # mantissa_struct
+  d2::Int
 end
 
 type mag_struct
   exp::Int # fmpz
-  man::UInt64 # mp_limb_t
+  man::UInt # mp_limb_t
 end
 
 type arb_struct
   mid_exp::Int # fmpz
-  mid_size::UInt64 # mp_size_t
-  mid_d1::Int64 # mantissa_struct
-  mid_d2::Int64
+  mid_size::UInt # mp_size_t
+  mid_d1::Int # mantissa_struct
+  mid_d2::Int
   rad_exp::Int # fmpz
-  rad_man::UInt64
+  rad_man::UInt
 end
 
 type arb <: FieldElem
   mid_exp::Int # fmpz
-  mid_size::UInt64 # mp_size_t
-  mid_d1::Int64 # mantissa_struct
-  mid_d2::Int64
+  mid_size::UInt # mp_size_t
+  mid_d1::Int # mantissa_struct
+  mid_d2::Int
   rad_exp::Int # fmpz
-  rad_man::UInt64
+  rad_man::UInt
   parent::ArbField
 
   function arb()
@@ -208,17 +208,17 @@ prec(x::AcbField) = x.prec
 
 type acb <: FieldElem
   real_mid_exp::Int     # fmpz
-  real_mid_size::UInt64 # mp_size_t
-  real_mid_d1::Int64    # mantissa_struct
-  real_mid_d2::Int64
+  real_mid_size::UInt # mp_size_t
+  real_mid_d1::Int    # mantissa_struct
+  real_mid_d2::Int
   real_rad_exp::Int     # fmpz
-  real_rad_man::UInt64
+  real_rad_man::UInt
   imag_mid_exp::Int     # fmpz
-  imag_mid_size::UInt64 # mp_size_t
-  imag_mid_d1::Int64    # mantissa_struct
-  imag_mid_d2::Int64
+  imag_mid_size::UInt # mp_size_t
+  imag_mid_d1::Int    # mantissa_struct
+  imag_mid_d2::Int
   imag_rad_exp::Int     # fmpz
-  imag_rad_man::UInt64
+  imag_rad_man::UInt
   parent::AcbField
 
   function acb()
