@@ -94,7 +94,7 @@ function __init__()
    unsafe_store!(pari_sigint, cfunction(pari_sigint_handler, Void, ()), 1)
 
    println("")
-   println("Welcome to Nemo version 0.3")
+   println("Welcome to Nemo version 0.3.1")
    println("")
    println("Nemo comes with absolutely no warranty whatsoever")
    println("")
