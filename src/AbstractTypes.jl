@@ -12,6 +12,8 @@ abstract Flint
 
 abstract Antic
 
+abstract Arb
+
 abstract Generic
 
 # mathematical domains, parameterised by a library

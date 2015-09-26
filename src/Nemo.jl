@@ -3,7 +3,8 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 module Nemo
 
 import Base: abs, asin, asinh, atan, atanh, base, bin, call, checkbounds,
-             convert, cmp, cos, cosh, dec, deepcopy, den, deserialize, div,
+             convert, cmp, contains, cos, cosh, dec, deepcopy, den, deserialize,
+             div,
              divrem, exp, factor, gcd, gcdx, getindex, hash, hex, intersect,
              inv, invmod, isequal, isless, isprime, isqrt, lcm, length, log,
              lufact, mod, ndigits, nextpow2, norm, nullspace, num, oct, one, 
@@ -11,7 +12,13 @@ import Base: abs, asin, asinh, atan, atanh, base, bin, call, checkbounds,
              Rational, rem, reverse, serialize, setindex!, show, sign, sin,
              sinh, size, sqrt, string, sub, tan, tanh, trace, trailing_zeros,
              transpose, transpose!, truncate, var, zero, +, -, *, ==, ^, &, |,
-             $, <<, >>, ~, <=, >=, <, >, hcat, vcat, //
+             $, <<, >>, ~, <=, >=, <, >, hcat, vcat, //, /, !=, isfinite, ldexp
+
+import Base: floor, ceil, hypot, sqrt,
+             log, log1p, exp, expm1, sin, cos, sinpi, cospi, tan, cot,
+             sinh, cosh, tanh, coth, atan, asin, acos,
+             atanh, asinh, acosh, gamma, lgamma, digamma, zeta,
+             sinpi, cospi, atan2
 
 export Collection, Ring, Field, CollectionElem, RingElem, FieldElem, Pari,
        Flint, Antic, Generic
@@ -25,6 +32,8 @@ export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
 export create_accessors, get_handle, package_handle, allocatemem
 
 export flint_cleanup, flint_set_num_threads
+
+export on_windows64
 
 include("AbstractTypes.jl")
 
@@ -51,6 +60,8 @@ function pari_sigint_handler()
    error("User interrupt")
    return
 end
+
+on_windows64 = (@windows ? true : false) && (Int == Int64)
 
 function __init__()
 
@@ -108,6 +119,10 @@ include("generic/GenericTypes.jl")
 include("flint/FlintTypes.jl")
 
 include("antic/AnticTypes.jl")
+
+if !on_windows64
+  include("arb/ArbTypes.jl")
+end
 
 include("pari/PariTypes.jl")
 

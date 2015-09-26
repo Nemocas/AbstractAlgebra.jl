@@ -16,6 +16,12 @@ include("antic/nf_elem.jl")
 
 include("pari/pari_nf.jl")
 
+if !on_windows64
+   include("arb/arb.jl")
+
+   include("arb/acb.jl")
+end
+
 //{T <: FieldElem}(a::T, b::T) = divexact(a, b)
 
 function gcd{T <: FieldElem}(x::T, y::T)

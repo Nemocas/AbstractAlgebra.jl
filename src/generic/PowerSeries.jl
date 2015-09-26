@@ -501,7 +501,9 @@ function =={T <: RingElem}(x::SeriesElem{T}, y::SeriesElem{T})
 end
 
 function isequal{T <: RingElem}(x::SeriesElem{T}, y::SeriesElem{T})
-   check_parent(x, y)
+   if parent(x) != parent(y)
+      return false
+   end
    if precision(x) != precision(y) || length(x) != length(y)
       return false
    end

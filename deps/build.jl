@@ -138,7 +138,7 @@ cd(wdir)
 # INSTALL ARB 
 
 try
-  run(`git clone -b julia https://github.com/thofma/arb.git`)
+  run(`git clone https://github.com/fredrik-johansson/arb.git`)
 except
   run(`cd arb ; git pull`)
 end          
@@ -152,8 +152,9 @@ else
    run(`./configure --prefix=$vdir --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir --with-flint=$vdir`)
    run(`make -j4`)
    run(`make install`)
-   cd(wdir)
 end
+
+cd(wdir)
 
 # install PARI
 

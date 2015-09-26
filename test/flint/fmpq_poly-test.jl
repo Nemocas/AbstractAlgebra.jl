@@ -444,6 +444,19 @@ function test_fmpq_poly_special()
    println("PASS")
 end
 
+function test_fmpq_poly_Polynomials()
+   print("fmpq_poly.Polynomials...")
+
+   R, x = PolynomialRing(QQ, "x")
+   S, y = PolynomialRing(R, "y")
+
+   f = (3x^2 + 2x + 1)*y^3 + (2x^2 + 4)*y^2 + 4x*y + (2x^2 - x + 1)
+
+   @test f^40*f^60 == f^50*f^50
+
+   println("PASS")
+end
+
 function test_fmpq_poly()
    test_fmpq_poly_constructors()
    test_fmpq_poly_manipulation()
@@ -470,6 +483,7 @@ function test_fmpq_poly()
    test_fmpq_poly_gcdx()
    test_fmpq_poly_signature()
    test_fmpq_poly_special()
+   test_fmpq_poly_Polynomials()
 
    println("")
 end

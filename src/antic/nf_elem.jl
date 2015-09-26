@@ -556,7 +556,7 @@ mul!(c::nf_elem, a::nf_elem, b::Integer) = mul!(c, a, fmpz(b))
 #
 ###############################################################################
 
-function sqr(a::Poly{nf_elem})
+function sqr_classical(a::Poly{nf_elem})
    lena = length(a)
    
    t = base_ring(a)()
@@ -591,7 +591,7 @@ function sqr(a::Poly{nf_elem})
    return z
 end
 
-function *(a::Poly{nf_elem}, b::Poly{nf_elem})
+function mul_classical(a::Poly{nf_elem}, b::Poly{nf_elem})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -600,12 +600,8 @@ function *(a::Poly{nf_elem}, b::Poly{nf_elem})
       return parent(a)()
    end
 
-   if min(lena, lenb) > 10 # karatsuba crossover
-      return mul_karatsuba(a, b)
-   end
-
    if a == b
-       return sqr(a)
+       return sqr_classical(a)
    end
 
    t = base_ring(a)()
@@ -641,6 +637,48 @@ function *(a::Poly{nf_elem}, b::Poly{nf_elem})
    return z
 end
 
+function *(a::Poly{nf_elem}, b::Poly{nf_elem})
+   check_parent(a, b)
+   lena = length(a)
+   lenb = length(b)
+   if min(lena, lenb) < 20
+      return mul_classical(a, b)
+   end
+   lenr = lena + lenb - 1
+   r = parent(a)()
+   if lena == 0 || lenb == 0
+      return r
+   end
+   pol = base_ring(a).pol
+   K = base_ring(a)
+   R = parent(pol)
+   T = elem_type(R)
+   S = PolynomialRing{T}(R, :y)
+   f = S()
+   fit!(f, lena)
+   for i = 1:lena
+      setcoeff!(f, i - 1, R(coeff(a, i - 1)))
+   end
+   set_length!(f, lena)
+   if a !== b
+      g = S()
+      fit!(g, lenb)
+      for i = 1:lenb
+         setcoeff!(g, i - 1, R(coeff(b, i - 1)))
+      end
+      set_length!(g, lenb)
+   else
+      g = f
+   end
+   p = f*g
+   fit!(r, lenr)
+   for i = 1:lenr
+      r.coeffs[i] = K(p.coeffs[i])
+   end
+   set_length!(r, normalise(r, lenr))
+   return r
+end
+
 ###############################################################################
 #
 #   Promotions
@@ -663,6 +701,8 @@ Base.promote_rule(::Type{nf_elem}, ::Type{fmpq_poly}) = nf_elem
 
 function Base.call(a::AnticNumberField)
    z = nf_elem(a)
+   ccall((:nf_elem_set_si, :libflint), Void, 
+         (Ptr{nf_elem}, Int, Ptr{AnticNumberField}), &z, 0, &a)
    return z
 end
 

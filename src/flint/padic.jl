@@ -213,7 +213,9 @@ function ==(a::padic, b::padic)
 end
 
 function isequal(a::padic, b::padic)
-   check_parent(a, b)
+   if parent(a) != parent(b)
+      return false
+   end
    return a.N == b.N && a == b
 end
 

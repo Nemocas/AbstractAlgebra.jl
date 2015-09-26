@@ -272,7 +272,9 @@ function =={T <: RingElem}(x::FractionElem{T}, y::FractionElem{T})
 end
 
 function isequal{T <: RingElem}(x::FractionElem{T}, y::FractionElem{T})
-   check_parent(x, y)
+   if parent(x) != parent(y)
+      return false
+   end
    return isequal(num(x)*den(y), den(x)*num(y))
 end
 

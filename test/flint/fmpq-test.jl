@@ -309,7 +309,7 @@ function test_fmpq_special_functions()
    print("fmpq.special_functions()...")
 
    @test harmonic(12) == fmpz(86021)//27720
-
+   
    @test dedekind_sum(12, 13) == -fmpz(11)//13
 
    @test dedekind_sum(fmpz(12), fmpz(13)) == -fmpz(11)//13

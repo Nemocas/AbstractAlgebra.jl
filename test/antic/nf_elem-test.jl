@@ -264,6 +264,36 @@ function test_nf_elem_norm_trace()
    println("PASS")
 end
 
+function test_nf_elem_norm_trace()
+   print("nf_elem.norm_trace...")
+ 
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+
+   c = 3a^2 - a + 1
+   
+   @test norm(c) == 113
+   @test trace(c) == -15
+  
+   println("PASS")
+end
+
+function test_nf_elem_Polynomials()
+   print("nf_elem.Polynomials...")
+ 
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   S, y = PolynomialRing(K, "y")
+
+   f = (3a^2 - a + 1)*y^2 + (3a - 1)*y + (2a^2 - a - 2)
+   
+   @test f^20*f^30 == f^25*f^25
+   @test f^20*f^30 == mul_classical(f^20, f^30)
+   @test f^20*f^30 == sqr_classical(f^25)
+  
+   println("PASS")
+end
+
 function test_nf_elem()
    test_nf_elem_constructors()
    test_nf_elem_fmpz_mat_conversions()
@@ -280,6 +310,7 @@ function test_nf_elem()
    test_nf_elem_exact_division()
    test_nf_elem_adhoc_exact_division()
    test_nf_elem_norm_trace()
+   test_nf_elem_Polynomials()
 
    println("")
 end

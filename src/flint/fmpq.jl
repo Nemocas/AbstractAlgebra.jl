@@ -6,7 +6,8 @@
 
 export fmpq, FlintQQ, FractionField, Rational, FlintRationalField, height,
        height_bits, isless, reconstruct, next_minimal, next_signed_minimal,
-       next_calkin_wilf, next_signed_calkin_wilf, dedekind_sum, harmonic
+       next_calkin_wilf, next_signed_calkin_wilf, dedekind_sum, harmonic,
+       bernoulli, bernoulli_cache
 
 ###############################################################################
 #
@@ -457,6 +458,19 @@ function harmonic(n::Int)
    c = fmpq()
    ccall((:fmpq_harmonic_ui, :libflint), Void, (Ptr{fmpq}, Int), &c, n)
    return c
+end
+
+function bernoulli(n::Int)
+   n < 0 && throw(DomainError())
+   c = fmpq()
+   ccall((:bernoulli_fmpq_ui, :libarb), Void, (Ptr{fmpq}, Int), &c, n)
+   return c
+end
+
+function bernoulli_cache(n::Int)
+   n = n + 1
+   n < 0 && throw(DomainError())
+   ccall((:bernoulli_cache_compute, :libarb), Void, (Int,), n)
 end
 
 function dedekind_sum(h::fmpz, k::fmpz)

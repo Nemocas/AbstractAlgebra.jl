@@ -567,7 +567,7 @@ end
 ###############################################################################
 
 const FqNmodFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, Field}()
-const FqNmodFiniteFieldIDPol = Dict{Tuple{nmod_poly, Symbol}, Field}()
+const FqNmodFiniteFieldIDPol = Dict{Tuple{NmodPolyRing, nmod_poly, Symbol}, Field}()
 
 type FqNmodFiniteField <: Field{Flint}
    p :: Int 
@@ -608,13 +608,13 @@ type FqNmodFiniteField <: Field{Flint}
 
    function FqNmodFiniteField(f::nmod_poly, s::Symbol)
       try
-         return FqNmodFiniteFieldIDPol[f, s]
+         return FqNmodFiniteFieldIDPol[parent(f), f, s]
       catch
          z = new()
          ccall((:fq_nmod_ctx_init_modulus, :libflint), Void, 
             (Ptr{FqNmodFiniteField}, Ptr{nmod_poly}, Ptr{UInt8}), 
 	      &z, &f, bytestring(string(s)))
-         FqNmodFiniteFieldIDPol[f, s] = z
+         FqNmodFiniteFieldIDPol[parent(f), f, s] = z
          finalizer(z, _FqNmodFiniteField_clear_fn)
          return z
       end

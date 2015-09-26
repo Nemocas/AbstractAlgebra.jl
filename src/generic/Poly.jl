@@ -10,7 +10,8 @@ export Poly, PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow,
        resultant, discriminant, gcdx, zero, one, gen, length, iszero, 
        normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod, 
        invmod, lcm, divrem, mod, gcdinv, canonical_unit, var, chebyshev_t,
-       chebyshev_u, set_length!
+       chebyshev_u, set_length!, mul_classical, sqr_classical, mul_ks,
+       mul_karatsuba
 
 ###############################################################################
 #
@@ -311,17 +312,82 @@ function mul_karatsuba{T <: RingElem}(a::Poly{T}, b::Poly{T})
    return r
 end
 
-function *{T <: RingElem}(a::Poly{T}, b::Poly{T})
-   check_parent(a, b)
+function mul_ks{T <: PolyElem}(a::Poly{T}, b::Poly{T})
+   lena = length(a)
+   lenb = length(b)
+   if lena == 0 || lenb == 0
+      return parent(a)()
+   end
+   maxa = 0
+   nza = 0
+   for i = 1:lena
+      lenc = length(coeff(a, i - 1))
+      maxa = max(lenc, maxa)
+      nza += (lenc == 0 ? 0 : 1)
+   end
+   if a !== b
+      maxb = 0
+      nzb = 0
+      for i = 1:lenb
+         lenc = length(coeff(b, i - 1))
+         maxb = max(lenc, maxb)
+         nzb += (lenc == 0 ? 0 : 1)
+      end
+   else
+      maxb = maxa
+      nzb = nza
+   end
+   if nza*nzb < 4*max(lena, lenb)
+      return mul_classical(a, b)
+   end
+   m = maxa + maxb - 1
+   z = base_ring(base_ring(a))()
+   A1 = Array(elem_type(base_ring(base_ring(a))), m*lena)
+   for i = 1:lena
+      c = coeff(a, i - 1)
+      for j = 1:length(c)
+         A1[(i - 1)*m + j] = coeff(c, j - 1)
+      end
+      for j = length(c) + 1:m
+         A1[(i - 1)*m + j] = z
+      end
+   end
+   ksa = base_ring(a)(A1)
+   if a !== b
+      A2 = Array(elem_type(base_ring(base_ring(a))), m*lenb)
+      for i = 1:lenb
+         c = coeff(b, i - 1)
+         for j = 1:length(c)
+            A2[(i - 1)*m + j] = coeff(c, j - 1)
+         end
+         for j = length(c) + 1:m
+            A2[(i - 1)*m + j] = z
+         end
+      end
+      ksb = base_ring(b)(A2)
+   else
+      ksb = ksa
+   end
+   p = ksa*ksb
+   r = parent(a)()
+   lenr = lena + lenb - 1
+   fit!(r, lenr)
+   for i = 1:lenr
+      fit!(r.coeffs[i], m)
+      for j = 1:m
+         setcoeff!(r.coeffs[i], j - 1, coeff(p, (i - 1)*m + j - 1))
+      end
+   end
+   set_length!(r, normalise(r, lenr))
+   return r
+end
+
+function mul_classical{T <: RingElem}(a::Poly{T}, b::Poly{T})
    lena = length(a)
    lenb = length(b)
 
    if lena == 0 || lenb == 0
       return parent(a)()
-   end
-
-   if min(lena, lenb) > 30
-      return mul_karatsuba(a, b)
    end
 
    t = base_ring(a)()
@@ -349,6 +415,11 @@ function *{T <: RingElem}(a::Poly{T}, b::Poly{T})
    set_length!(z, normalise(z, lenz))
 
    return z
+end
+
+function *{T <: RingElem}(a::Poly{T}, b::Poly{T})
+   check_parent(a, b)
+   return mul_classical(a, b)
 end
 
 ###############################################################################
@@ -446,7 +517,9 @@ function =={T <: RingElem}(x::PolyElem{T}, y::PolyElem{T})
 end
 
 function isequal{T <: RingElem}(x::PolyElem{T}, y::PolyElem{T})
-   check_parent(x, y)
+   if parent(x) != parent(y)
+      return false
+   end
    if length(x) != length(y)
       return false
    end
