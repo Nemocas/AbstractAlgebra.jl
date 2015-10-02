@@ -48,7 +48,8 @@ one(R::ArbField) = R(1)
 
 function convert(::Type{Float64}, x::arb)
     t = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), &x)
-    return ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), t, 0)
+    # 4 == round to nearest
+    return ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), t, 4)
 end
 
 ################################################################################

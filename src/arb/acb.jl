@@ -46,8 +46,9 @@ function convert(::Type{Complex128}, x::acb)
     im = ccall((:acb_imag_ptr, :libarb), Ptr{arb_struct}, (Ptr{acb}, ), &x)
     t = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), re)
     u = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), im)
-    v = ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), t, 0)
-    w = ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), u, 0)
+    # 4 == round to nearest
+    v = ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), t, 4)
+    w = ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), u, 4)
     return complex(v, w)
 end
 
@@ -736,7 +737,7 @@ end
 
 function call(r::AcbField, x::Union{Complex{Float64},Complex{Int}})
   R = ArbField(r.prec)
-  z = acb(real(x), real(y), r.prec)
+  z = acb(real(x), imag(x), r.prec)
   z.parent = r
   return z
 end
