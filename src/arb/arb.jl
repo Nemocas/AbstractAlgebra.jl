@@ -47,13 +47,8 @@ one(R::ArbField) = R(1)
 ################################################################################
 
 function convert(::Type{Float64}, x::arb)
-    t = arf_struct(0, 0, 0, 0)
-    t.exp = x.mid_exp
-    t.size = x.mid_size
-    t.d1 = x.mid_d1
-    t.d2 = x.mid_d2
-    # rounds to zero
-    return ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), &t, 0)
+    t = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), &x)
+    return ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), t, 0)
 end
 
 ################################################################################
@@ -154,47 +149,19 @@ function <=(x::arb, y::arb)
     return Bool(ccall((:arb_le, :libarb), Cint, (Ptr{arb}, Ptr{arb}), &x, &y))
 end
 
-==(x::arb, y::Int) = x == arb(y)
-!=(x::arb, y::Int) = x != arb(y)
-<=(x::arb, y::Int) = x <= arb(y)
->=(x::arb, y::Int) = x >= arb(y)
-<(x::arb, y::Int) = x < arb(y)
->(x::arb, y::Int) = x > arb(y)
+==(x::arb, y::Union{Int,Float64,fmpz,fmpq}) = x == parent(x)(y)
+!=(x::arb, y::Union{Int,Float64,fmpz,fmpq}) = x != parent(x)(y)
+<=(x::arb, y::Union{Int,Float64,fmpz,fmpq}) = x <= parent(x)(y)
+>=(x::arb, y::Union{Int,Float64,fmpz,fmpq}) = x >= parent(x)(y)
+<(x::arb, y::Union{Int,Float64,fmpz,fmpq}) = x < parent(x)(y)
+>(x::arb, y::Union{Int,Float64,fmpz,fmpq}) = x > parent(x)(y)
 
-==(x::Int, y::arb) = arb(x) == y
-!=(x::Int, y::arb) = arb(x) != y
-<=(x::Int, y::arb) = arb(x) <= y
->=(x::Int, y::arb) = arb(x) >= y
-<(x::Int, y::arb) = arb(x) < y
->(x::Int, y::arb) = arb(x) > y
-
-==(x::arb, y::fmpz) = x == arb(y)
-!=(x::arb, y::fmpz) = x != arb(y)
-<=(x::arb, y::fmpz) = x <= arb(y)
->=(x::arb, y::fmpz) = x >= arb(y)
-<(x::arb, y::fmpz) = x < arb(y)
->(x::arb, y::fmpz) = x > arb(y)
-
-==(x::fmpz, y::arb) = arb(x) == y
-!=(x::fmpz, y::arb) = arb(x) != y
-<=(x::fmpz, y::arb) = arb(x) <= y
->=(x::fmpz, y::arb) = arb(x) >= y
-<(x::fmpz, y::arb) = arb(x) < y
->(x::fmpz, y::arb) = arb(x) > y
-
-==(x::arb, y::Float64) = x == arb(y)
-!=(x::arb, y::Float64) = x != arb(y)
-<=(x::arb, y::Float64) = x <= arb(y)
->=(x::arb, y::Float64) = x >= arb(y)
-<(x::arb, y::Float64) = x < arb(y)
->(x::arb, y::Float64) = x > arb(y)
-
-==(x::Float64, y::arb) = arb(x) == y
-!=(x::Float64, y::arb) = arb(x) != y
-<=(x::Float64, y::arb) = arb(x) <= y
->=(x::Float64, y::arb) = arb(x) >= y
-<(x::Float64, y::arb) = arb(x) < y
->(x::Float64, y::arb) = arb(x) > y
+==(x::Union{Int,Float64,fmpz,fmpq}, y::arb) = parent(y)(x) == y
+!=(x::Union{Int,Float64,fmpz,fmpq}, y::arb) = parent(y)(x) != y
+<=(x::Union{Int,Float64,fmpz,fmpq}, y::arb) = parent(y)(x) <= y
+>=(x::Union{Int,Float64,fmpz,fmpq}, y::arb) = parent(y)(x) >= y
+<(x::Union{Int,Float64,fmpz,fmpq}, y::arb) = parent(y)(x) < y
+>(x::Union{Int,Float64,fmpz,fmpq}, y::arb) = parent(y)(x) > y
 
 ################################################################################
 #

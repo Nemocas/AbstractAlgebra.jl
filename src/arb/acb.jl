@@ -37,6 +37,26 @@ base_ring(R::AcbField) = Union{}
 
 ################################################################################
 #
+#  Conversions
+#
+################################################################################
+
+function convert(::Type{Complex128}, x::acb)
+    re = ccall((:acb_real_ptr, :libarb), Ptr{arb_struct}, (Ptr{acb}, ), &x)
+    im = ccall((:acb_imag_ptr, :libarb), Ptr{arb_struct}, (Ptr{acb}, ), &x)
+    t = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), re)
+    u = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), im)
+    v = ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), t, 0)
+    w = ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), u, 0)
+    return complex(v, w)
+end
+
+#function convert(::Type{Complex128}, x::acb)
+#    return complex(Float64(real(x)), Float64(imag(x)))
+#end
+
+################################################################################
+#
 #  Real and imaginary part
 #
 ################################################################################
@@ -703,10 +723,9 @@ function call(r::AcbField, x::Float64)
   return r(R(x))
 end
 
-function call(r::AcbField, x::arb, y::arb)
-  z = acb(x, y, r.prec)
-  z.parent = r
-  return z
+function call(r::AcbField, x::AbstractString)
+  R = ArbField(r.prec)
+  return r(R(x))
 end
 
 function call(r::AcbField, x::Int, y::Int)
@@ -715,14 +734,22 @@ function call(r::AcbField, x::Int, y::Int)
   return z
 end
 
-function call(r::AcbField, x::AbstractString)
+function call(r::AcbField, x::Union{Complex{Float64},Complex{Int}})
   R = ArbField(r.prec)
-  return r(R(x))
+  z = acb(real(x), real(y), r.prec)
+  z.parent = r
+  return z
 end
 
-function call(r::AcbField, x::AbstractString, y::AbstractString)
+function call(r::AcbField, x::Union{Int,Float64,fmpz,fmpq,arb,AbstractString},
+                           y::Union{Int,Float64,fmpz,fmpq,arb,AbstractString})
   R = ArbField(r.prec)
   return r(R(x), R(y))
 end
 
+function call(r::AcbField, x::arb, y::arb)
+  z = acb(x, y, r.prec)
+  z.parent = r
+  return z
+end
 

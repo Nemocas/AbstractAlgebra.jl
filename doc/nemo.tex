@@ -10136,47 +10136,19 @@ or any nonnegative point.}
 \desc{Compare two intervals.}
 
 \begin{lstlisting}
-==(x::arb, y::Int)
-!=(x::arb, y::Int)
-<=(x::arb, y::Int)
->=(x::arb, y::Int)
-<(x::arb, y::Int)
->(x::arb, y::Int)
+==(x::arb, y::Union{Int,Float64,fmpz,fmpq})
+!=(x::arb, y::Union{Int,Float64,fmpz,fmpq})
+<=(x::arb, y::Union{Int,Float64,fmpz,fmpq})
+>=(x::arb, y::Union{Int,Float64,fmpz,fmpq})
+<(x::arb, y::Union{Int,Float64,fmpz,fmpq})
+>(x::arb, y::Union{Int,Float64,fmpz,fmpq})
 
-==(x::Int, y::arb)
-!=(x::Int, y::arb)
-<=(x::Int, y::arb)
->=(x::Int, y::arb)
-<(x::Int, y::arb)
->(x::Int, y::arb)
-
-==(x::arb, y::fmpz)
-!=(x::arb, y::fmpz)
-<=(x::arb, y::fmpz)
->=(x::arb, y::fmpz)
-<(x::arb, y::fmpz)
->(x::arb, y::fmpz)
-
-==(x::fmpz, y::arb)
-!=(x::fmpz, y::arb)
-<=(x::fmpz, y::arb)
->=(x::fmpz, y::arb)
-<(x::fmpz, y::arb)
->(x::fmpz, y::arb)
-
-==(x::arb, y::Float64)
-!=(x::arb, y::Float64)
-<=(x::arb, y::Float64)
->=(x::arb, y::Float64)
-<(x::arb, y::Float64)
->(x::arb, y::Float64)
-
-==(x::Float64, y::arb)
-!=(x::Float64, y::arb)
-<=(x::Float64, y::arb)
->=(x::Float64, y::arb)
-<(x::Float64, y::arb)
->(x::Float64, y::arb)
+==(x::Union{Int,Float64,fmpz,fmpq}, y::arb)
+!=(x::Union{Int,Float64,fmpz,fmpq}, y::arb)
+<=(x::Union{Int,Float64,fmpz,fmpq}, y::arb)
+>=(x::Union{Int,Float64,fmpz,fmpq}, y::arb)
+<(x::Union{Int,Float64,fmpz,fmpq}, y::arb)
+>(x::Union{Int,Float64,fmpz,fmpq}, y::arb)
 \end{lstlisting}
 
 \desc{Compare an interval with a quantity of another type.}
@@ -10716,14 +10688,17 @@ CC(x::fmpz)
 CC(x::fmpq)
 CC(x::arb)
 CC(x::Float64)
+CC(x::AbstractString)
+CC(x::Union{Complex{Float64},Complex{Int}})
 CC(x::arb, y::arb)
 CC(x::Int, y::Int)
-CC(x::AbstractString)
-CC(x::AbstractString, y::AbstractString)
+CC(x::Union{Int,Float64,fmpz,fmpq,arb,AbstractString},
++  y::Union{Int,Float64,fmpz,fmpq,arb,AbstractString})
 \end{lstlisting}
 
-\desc{Constructs an \code{acb} element from the given real number or
-pair of real numbers.}
+
+\desc{Constructs an \code{acb} element from the given real number,
+complex number, or pair of real numbers.}
 
 \begin{lstlisting}
 zero(r::AcbField)
