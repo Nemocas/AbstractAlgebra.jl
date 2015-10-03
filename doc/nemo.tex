@@ -7955,13 +7955,12 @@ e = bernoulli(100)
 \subsection{Flint finite fields $\F_{p^k}$ (multiprecision $p$): \code|fq|}
 
 We allow the construction of finite fields of any characteristic and degree in
-Nemo. When a Conway polynomial is known, the field is generated using the 
-Conway polynomial. Otherwise a random sparse, irreducible polynomial is used. 
+Nemo.
 
 (At this stage we make no attempt to compatibly embed finite fields generated 
 using randomly chosen irreducible polynomials, such as with the 
 Bosma-Cannon-Steel construction. But this may change in a later version of 
-Flint/Nemo.) 
+Flint/Nemo.)
 
 The Flint type for finite fields $\F_{p^k}$ for multiprecision $p$ is
 \code{fq}.
@@ -7980,7 +7979,10 @@ FiniteField(p::fmpz, deg::Int, var::String)
 
 \desc{Return a tuple \code{(R, x)} consisting of the parent object \code{R} of
 a finite field of characteristic \code{p} of degree \code{deg}, and a
-generator \code{x}. 
+generator \code{x}.
+
+When a Conway polynomial is known, the field is generated using the
+Conway polynomial. Otherwise a random sparse, irreducible polynomial is used.
 
 The generator \code{x} of the field will be printed as the provided string
 \code{var}. The characteristic \code{p} must be prime, but we do not check this
@@ -7992,6 +7994,25 @@ of characteristic $7$ and degree $5$ (defined by a Conway polynomial).
 
 \begin{lstlisting}
 S, x = FiniteField(fmpz(7), 5, "x")
+\end{lstlisting}
+
+The parent object for such a field can also be created by specifying
+an irreducible polynomial of type $\code{fmpz_mod_poly}$, e.g.
+
+\begin{lstlisting}
+FiniteField(f::fmpz_mod_poly, var::String)
+\end{lstlisting}
+
+\desc{Return a tuple \code{(R, x)} consisting of the parent object \code{R} of
+the finite field $\F_p[t]/(f)$, and a generator \code{x}.
+
+The generator \code{x} of the field will be printed as the provided string
+\code{var}. The polynomial \code{f} must be irreducible, but we do not check this
+condition.}
+
+\begin{lstlisting}
+R, t = PolynomialRing(ResidueRing(ZZ, 12431351431561), "t")
+S, x = FiniteField(t^2 + 7, "x")
 \end{lstlisting}
 
 \subsubsection{Constructors}
@@ -8417,16 +8438,13 @@ g = pth_root(a)
 The Flint type for finite fields $\F_{p^k}$ for $p$ that fits in a single machine
 word is \code{fq_nmod}.
 
-When a Conway polynomial is known, such a field is generated using the 
-Conway polynomial. Otherwise a random sparse, irreducible polynomial is used. 
-
 The type of elements of Flint \code{fq_nmod} fields in Nemo is \code{fq_nmod}.
 This type belongs to the \code{FiniteFieldElem} type class, which in turn belongs
 to the \code{FieldElem} class. The type of the parent object for such fields is
 \code{FqNmodFiniteField} which belongs to the \code{Field} type class.
 
-The parent object for such a field is created using the \code{FiniteField}
-function, e.g.
+The parent object for such a field can be created using the \code{FiniteField}
+function by specifying $p$ and $k$, e.g.
 
 \begin{lstlisting}
 FiniteField(p::Int, deg::Int, var::String)
@@ -8434,7 +8452,10 @@ FiniteField(p::Int, deg::Int, var::String)
 
 \desc{Return a tuple \code{(R, x)} consisting of the parent object \code{R} of
 a finite field of characteristic \code{p} of degree \code{deg}, and a
-generator \code{x}. 
+generator \code{x}.
+
+When a Conway polynomial is known, such a field is generated using the
+Conway polynomial. Otherwise a random sparse, irreducible polynomial is used.
 
 The generator \code{x} of the field will be printed as the provided string
 \code{var}. The characteristic \code{p} must be prime, but we do not check this
@@ -8445,7 +8466,27 @@ For example, the following code generates a parent object for the finite field
 of characteristic $7$ and degree $5$ (defined by a Conway polynomial).
 
 \begin{lstlisting}
-S, x = FiniteField(7, 5, "x")\end{lstlisting}
+S, x = FiniteField(7, 5, "x")
+\end{lstlisting}
+
+The parent object for such a field can also be created by specifying
+an irreducible polynomial of type $\code{nmod_poly}$, e.g.
+
+\begin{lstlisting}
+FiniteField(f::nmod_poly, var::String)
+\end{lstlisting}
+
+\desc{Return a tuple \code{(R, x)} consisting of the parent object \code{R} of
+the finite field $\F_p[t]/(f)$, and a generator \code{x}.
+
+The generator \code{x} of the field will be printed as the provided string
+\code{var}. The polynomial \code{f} must be irreducible, but we do not check this
+condition.}
+
+\begin{lstlisting}
+R, t = PolynomialRing(ResidueRing(ZZ, 3), "t")
+S, x = FiniteField(t^2 + 1, "x")
+\end{lstlisting}
 
 \subsubsection{Constructors}
 

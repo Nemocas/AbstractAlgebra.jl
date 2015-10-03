@@ -119,102 +119,6 @@ _fmpq_clear_fn(a::fmpq) = ccall((:fmpq_clear, :libflint), Void, (Ptr{fmpq},), &a
 
 ###############################################################################
 #
-#   FqFiniteField / fq
-#
-###############################################################################
-
-const FqFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, Field}()
-
-type FqFiniteField <: Field{Flint}
-   p::Int # fmpz
-   sparse_modulus::Int
-   a::Ptr{Void}
-   j::Ptr{Void}
-   len::Int
-   mod_coeffs::Ptr{Void}
-   mod_alloc::Int
-   mod_length::Int
-   mod_p::Int # fmpz
-   inv_coeffs::Ptr{Void}
-   inv_alloc::Int
-   inv_length::Int
-   inv_p::Int # fmpz
-   var::Ptr{Void}
- 
-   function FqFiniteField(char::fmpz, deg::Int, s::Symbol)
-      try
-         return FqFiniteFieldID[char, deg, s]
-      catch
-         d = FqFiniteFieldID[char, deg, s] = new()
-         finalizer(d, _FqFiniteField_clear_fn)
-         ccall((:fq_ctx_init, :libflint), Void, 
-               (Ptr{FqFiniteField}, Ptr{fmpz}, Int, Ptr{UInt8}), 
-			            &d, &char, deg, bytestring(string(s)))
-         return d
-      end
-   end
-end
-
-function _FqFiniteField_clear_fn(a :: FqFiniteField)
-   ccall((:fq_ctx_clear, :libflint), Void, (Ptr{FqFiniteField},), &a)
-end
-
-type fq <: FiniteFieldElem
-   coeffs :: Ptr{Void}
-   alloc :: Int
-   length :: Int
-   parent::FqFiniteField
-
-   function fq(ctx::FqFiniteField)
-      d = new()
-      ccall((:fq_init2, :libflint), Void, 
-            (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
-      finalizer(d, _fq_clear_fn)
-      d.parent = ctx
-      return d
-   end
-
-   function fq(ctx::FqFiniteField, x::Int)
-      d = new()
-      ccall((:fq_init2, :libflint), Void, 
-            (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
-      finalizer(d, _fq_clear_fn)
-      ccall((:fq_set_si, :libflint), Void, 
-                (Ptr{fq}, Int, Ptr{FqFiniteField}), &d, x, &ctx)
-      d.parent = ctx
-      return d
-   end
-
-   function fq(ctx::FqFiniteField, x::fmpz)
-      d = new()
-      ccall((:fq_init2, :libflint), Void, 
-            (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
-      finalizer(d, _fq_clear_fn)
-      ccall((:fq_set_fmpz, :libflint), Void, 
-            (Ptr{fq}, Ptr{fmpz}, Ptr{FqFiniteField}), &d, &x, &ctx)
-      d.parent = ctx
-      return d
-   end
-
-   function fq(ctx::FqFiniteField, x::fq)
-      d = new()
-      ccall((:fq_init2, :libflint), Void, 
-            (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
-      finalizer(d, _fq_clear_fn)
-      ccall((:fq_set, :libflint), Void, 
-            (Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &d, &x, &ctx)
-      d.parent = ctx
-      return d
-   end
-end
-
-function _fq_clear_fn(a::fq)
-   ccall((:fq_clear, :libflint), Void, 
-         (Ptr{fq}, Ptr{FqFiniteField}), &a, &a.parent)
-end
-
-###############################################################################
-#
 #   FmpzPolyRing / fmpz_poly
 #
 ###############################################################################
@@ -772,6 +676,118 @@ end
 function _fq_nmod_clear_fn(a::fq_nmod)
    ccall((:fq_nmod_clear, :libflint), Void, 
          (Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), &a, &a.parent)
+end
+
+###############################################################################
+#
+#   FqFiniteField / fq
+#
+###############################################################################
+
+const FqFiniteFieldID = Dict{Tuple{fmpz, Int, Symbol}, Field}()
+
+const FqFiniteFieldIDPol = Dict{Tuple{fmpz_mod_poly, Symbol}, Field}()
+
+type FqFiniteField <: Field{Flint}
+   p::Int # fmpz
+   sparse_modulus::Int
+   a::Ptr{Void}
+   j::Ptr{Void}
+   len::Int
+   mod_coeffs::Ptr{Void}
+   mod_alloc::Int
+   mod_length::Int
+   mod_p::Int # fmpz
+   inv_coeffs::Ptr{Void}
+   inv_alloc::Int
+   inv_length::Int
+   inv_p::Int # fmpz
+   var::Ptr{Void}
+
+   function FqFiniteField(char::fmpz, deg::Int, s::Symbol)
+      try
+         return FqFiniteFieldID[char, deg, s]
+      catch
+         d = FqFiniteFieldID[char, deg, s] = new()
+         finalizer(d, _FqFiniteField_clear_fn)
+         ccall((:fq_ctx_init, :libflint), Void,
+               (Ptr{FqFiniteField}, Ptr{fmpz}, Int, Ptr{UInt8}),
+                  &d, &char, deg, bytestring(string(s)))
+         return d
+      end
+   end
+   
+   function FqFiniteField(f::fmpz_mod_poly, s::Symbol)
+      try
+         return FqFiniteFieldIDPol[f, s]
+      catch
+         z = new()
+         ccall((:fq_ctx_init_modulus, :libflint), Void,
+               (Ptr{FqFiniteField}, Ptr{fmpz_mod_poly}, Ptr{UInt8}),
+                  &z, &f, bytestring(string(s)))
+         FqFiniteFieldIDPol[f, s] = z
+         finalizer(z, _FqFiniteField_clear_fn)
+         return z
+      end
+   end
+end
+
+function _FqFiniteField_clear_fn(a :: FqFiniteField)
+   ccall((:fq_ctx_clear, :libflint), Void, (Ptr{FqFiniteField},), &a)
+end
+
+type fq <: FiniteFieldElem
+   coeffs :: Ptr{Void}
+   alloc :: Int
+   length :: Int
+   parent::FqFiniteField
+
+   function fq(ctx::FqFiniteField)
+      d = new()
+      ccall((:fq_init2, :libflint), Void, 
+            (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
+      finalizer(d, _fq_clear_fn)
+      d.parent = ctx
+      return d
+   end
+
+   function fq(ctx::FqFiniteField, x::Int)
+      d = new()
+      ccall((:fq_init2, :libflint), Void, 
+            (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
+      finalizer(d, _fq_clear_fn)
+      ccall((:fq_set_si, :libflint), Void, 
+                (Ptr{fq}, Int, Ptr{FqFiniteField}), &d, x, &ctx)
+      d.parent = ctx
+      return d
+   end
+
+   function fq(ctx::FqFiniteField, x::fmpz)
+      d = new()
+      ccall((:fq_init2, :libflint), Void, 
+            (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
+      finalizer(d, _fq_clear_fn)
+      ccall((:fq_set_fmpz, :libflint), Void, 
+            (Ptr{fq}, Ptr{fmpz}, Ptr{FqFiniteField}), &d, &x, &ctx)
+      d.parent = ctx
+      return d
+   end
+
+   function fq(ctx::FqFiniteField, x::fq)
+      d = new()
+      ccall((:fq_init2, :libflint), Void, 
+            (Ptr{fq}, Ptr{FqFiniteField}), &d, &ctx)
+      finalizer(d, _fq_clear_fn)
+      ccall((:fq_set, :libflint), Void, 
+            (Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &d, &x, &ctx)
+      d.parent = ctx
+      return d
+   end
+end
+
+function _fq_clear_fn(a::fq)
+   ccall((:fq_clear, :libflint), Void, 
+         (Ptr{fq}, Ptr{FqFiniteField}), &a, &a.parent)
 end
 
 ###############################################################################
