@@ -177,7 +177,18 @@ function *{T <: RingElem}(x::Mat{T}, y::Mat{T})
    else
       parz = MatrixSpace(base_ring(x), rows(x), cols(y))
    end
-   return parz(x.entries*y.entries)
+   A = Array(T, rows(x), cols(y))
+   C = base_ring(x)()
+   for i = 1:rows(x)
+      for j = 1:cols(y)
+         A[i, j] = base_ring(x)()
+         for k = 1:cols(x)
+            mul!(C, x[i, k], y[k, j])
+            addeq!(A[i, j], C)
+         end
+      end
+   end
+   return parz(A)
 end
 
 ###############################################################################
