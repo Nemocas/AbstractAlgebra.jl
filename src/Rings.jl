@@ -248,6 +248,8 @@ include("flint/fq_poly.jl")
 
 include("flint/fq_nmod_poly.jl")
 
+include("arb/arb_poly.jl")
+
 include("pari/pari_poly2.jl")
 
 include("pari/pari_maximal_order_elem.jl")

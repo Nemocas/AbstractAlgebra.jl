@@ -7,7 +7,9 @@
 #
 ###############################################################################
 
-export ArbField, arb, AcbField, acb
+export ArbField, arb
+export AcbField, acb
+export ArbPolyRing, arb_poly
 
 arb_check_prec(p::Int) = (p >= 2 && p < (typemax(Int) >> 4)) || throw(ArgumentError("invalid precision"))
 
@@ -330,4 +332,101 @@ function deepcopy(a::acb)
   ccall((:acb_set, :libarb), Void, (Ptr{acb}, Ptr{acb}), &b, &a)
   return b
 end
+
+################################################################################
+#
+#  Types and memory management for ArbPolyRing
+#
+################################################################################
+
+const ArbPolyRingID = ObjectIdDict()
+
+type ArbPolyRing <: Ring
+  base_ring::ArbField
+  S::Symbol
+
+  function ArbPolyRing(R::ArbField, S::Symbol)
+    try
+      return ArbPolyRingID[R, S]::ArbPolyRing
+    catch
+      ArbPolyRingID[R, S] = new(R,S)
+      return ArbPolyRingID[R, S]::ArbPolyRing
+    end
+  end
+end
+
+type arb_poly
+  coeffs::Ptr{Void}
+  length::Int
+  alloc::Int
+  parent::ArbPolyRing
+
+  function arb_poly()
+    z = new()
+    ccall((:arb_poly_init, :libarb), Void, (Ptr{arb_poly}, ), &z)
+    finalizer(z, _arb_poly_clear_fn)
+    return z
+  end
+
+  function arb_poly(x::arb, p::Int)
+    z = new() 
+    ccall((:arb_poly_init, :libarb), Void, (Ptr{arb_poly}, ), &z)
+    ccall((:arb_poly_set_coeff_arb, :libarb), Void,
+                (Ptr{arb_poly}, Int, Ptr{arb}), &z, 0, &x)
+    finalizer(z, _arb_poly_clear_fn)
+    return z
+  end
+
+  function arb_poly(x::Array{arb, 1}, p::Int)
+    z = new() 
+    ccall((:arb_poly_init, :libarb), Void, (Ptr{arb_poly}, ), &z)
+    for i = 1:length(x)
+        ccall((:arb_poly_set_coeff_arb, :libarb), Void,
+                (Ptr{arb_poly}, Int, Ptr{arb}), &z, i - 1, &x[i])
+    end
+    finalizer(z, _arb_poly_clear_fn)
+    return z
+  end
+
+  function arb_poly(x::arb_poly, p::Int)
+    z = new() 
+    ccall((:arb_poly_init, :libarb), Void, (Ptr{arb_poly}, ), &z)
+    ccall((:arb_poly_set_round, :libarb), Void,
+                (Ptr{arb_poly}, Ptr{arb_poly}, Int), &z, &x, p)
+    finalizer(z, _arb_poly_clear_fn)
+    return z
+  end
+
+  function arb_poly(x::fmpz_poly, p::Int)
+    z = new() 
+    ccall((:arb_poly_init, :libarb), Void, (Ptr{arb_poly}, ), &z)
+    ccall((:arb_poly_set_fmpz_poly, :libarb), Void,
+                (Ptr{arb_poly}, Ptr{fmpz_poly}, Int), &z, &x, p)
+    finalizer(z, _arb_poly_clear_fn)
+    return z
+  end
+
+  function arb_poly(x::fmpq_poly, p::Int)
+    z = new() 
+    ccall((:arb_poly_init, :libarb), Void, (Ptr{arb_poly}, ), &z)
+    ccall((:arb_poly_set_fmpq_poly, :libarb), Void,
+                (Ptr{arb_poly}, Ptr{fmpq_poly}, Int), &z, &x, p)
+    finalizer(z, _arb_poly_clear_fn)
+    return z
+  end
+end
+
+function _arb_poly_clear_fn(x::arb_poly)
+  ccall((:arb_poly_clear, :libarb), Void, (Ptr{arb_poly}, ), &x)
+end
+
+parent(x::arb_poly) = x.parent
+
+elem_type(x::ArbPolyRing) = arb_poly
+
+var(x::ArbPolyRing) = x.S
+
+prec(x::ArbPolyRing) = prec(x.base_ring)
+
+base_ring(a::ArbPolyRing) = a.base_ring
 

@@ -238,7 +238,8 @@ end
 
 function unique_integer(x::acb)
   z = fmpz()
-  unique = ccall((:arb_get_unique_fmpz, :libarb), Int,
+  # needs test for complex value
+  unique = ccall((:acb_get_unique_fmpz, :libarb), Int,
     (Ptr{fmpz}, Ptr{acb}), &z, &x)
   return (unique != 0, z)
 end
@@ -620,8 +621,9 @@ end
 
 function hyperu(a::acb, b::acb, x::acb)
   z = parent(x)()
+  # needs test
   ccall((:acb_hypgeom_u, :libarb), Void,
-              (Ptr{acb}, Ptr{acb}, Ptr{acb}, Ptr{acb}, Int, Int), &z, &a, &b, &x, parent(x).prec)
+              (Ptr{acb}, Ptr{acb}, Ptr{acb}, Ptr{acb}, Int), &z, &a, &b, &x, parent(x).prec)
   return z
 end
 

@@ -1,0 +1,574 @@
+###############################################################################
+#
+#   arb_poly.jl : Polynomials over arb
+#
+###############################################################################
+
+export ArbPolyRing, arb_poly, strongequal, derivative, integral, evaluate,
+       evaluate2, compose, fromroots, evaluate_iter, evaluate_fast,
+       interpolate_newton, interpolate_barycentric, interpolate_fast
+
+###############################################################################
+#
+#   Basic manipulation
+#
+###############################################################################    
+  
+length(x::arb_poly) = ccall((:arb_poly_length, :libarb), Int, 
+                                   (Ptr{arb_poly},), &x)
+
+set_length!(x::arb_poly, n::Int) = ccall((:_arb_poly_set_length, :libarb), Void,
+                                   (Ptr{arb_poly}, Int), &x, n)
+
+degree(x::arb_poly) = length(x) - 1
+
+function coeff(a::arb_poly, n::Int)
+  n < 0 && throw(DomainError())
+  t = parent(a).base_ring()
+  ccall((:arb_poly_get_coeff_arb, :libarb), Void,
+              (Ptr{arb}, Ptr{arb_poly}, Int), &t, &a, n)
+  return t
+end
+
+zero(a::ArbPolyRing) = a(0)
+
+one(a::ArbPolyRing) = a(1)
+
+gen(a::ArbPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
+
+#isgen(x::arb_poly) = ccall((:arb_poly_is_x, :libarb), Bool, 
+#                            (Ptr{arb_poly},), &x)
+
+function deepcopy(a::arb_poly)
+   z = arb_poly(a)
+   z.parent = parent(a)
+   return z
+end
+
+###############################################################################
+#
+#   AbstractString{} I/O
+#
+###############################################################################
+
+function show(io::IO, x::ArbPolyRing)
+  print(io, "Univariate Polynomial Ring in ")
+  print(io, string(var(x)))
+  print(io, " over ")
+  show(io, x.base_ring)
+end
+
+function show(io::IO, f::arb_poly)
+  if length(f) == 0
+    print(io, "0")
+  else
+    print(io, "[ ")
+    for i in 0:degree(f)-1
+      show(io, coeff(f,i))
+      print(io, ", ")
+    end
+    show(coeff(f,degree(f)))
+    print(io, " ]")
+  end
+end
+
+###############################################################################
+#
+#   Comparisons
+#
+###############################################################################
+
+function strongequal(x::arb_poly, y::arb_poly)
+   return ccall((:arb_poly_equal, :libarb), Bool, 
+                                      (Ptr{arb_poly}, Ptr{arb_poly}), &x, &y)
+end
+
+function overlaps(x::arb_poly, y::arb_poly)
+   return ccall((:arb_poly_overlaps, :libarb), Bool, 
+                                      (Ptr{arb_poly}, Ptr{arb_poly}), &x, &y)
+end
+
+function contains(x::arb_poly, y::arb_poly)
+   return ccall((:arb_poly_contains, :libarb), Bool, 
+                                      (Ptr{arb_poly}, Ptr{arb_poly}), &x, &y)
+end
+
+function contains(x::arb_poly, y::fmpz_poly)
+   return ccall((:arb_poly_contains_fmpz_poly, :libarb), Bool, 
+                                      (Ptr{arb_poly}, Ptr{fmpz_poly}), &x, &y)
+end
+
+function contains(x::arb_poly, y::fmpq_poly)
+   return ccall((:arb_poly_contains_fmpq_poly, :libarb), Bool, 
+                                      (Ptr{arb_poly}, Ptr{fmpq_poly}), &x, &y)
+end
+
+function ==(x::arb_poly, y::arb_poly)
+    if length(x) != length(y)
+        return false
+    end
+    for i = 0:degree(x)
+        if !(coeff(x, i) == coeff(y, i))
+            return false
+        end
+    end
+    return true
+end
+
+function !=(x::arb_poly, y::arb_poly)
+    for i = 0:max(degree(x), degree(y))
+        if coeff(x, i) != coeff(y, i)
+            return true
+        end
+    end
+    return false
+end
+
+function unique_integer(x::arb_poly)
+  z = FmpzPolyRing(var(parent(x)))()
+  unique = ccall((:arb_poly_get_unique_fmpz_poly, :libarb), Int,
+    (Ptr{fmpz_poly}, Ptr{arb_poly}), &z, &x)
+  return (unique != 0, z)
+end
+
+###############################################################################
+#
+#   Shifting
+#
+###############################################################################
+
+function shift_left(x::arb_poly, len::Int)
+   len < 0 && throw(DomainError())
+   z = parent(x)()
+   ccall((:arb_poly_shift_left, :libarb), Void,
+      (Ptr{arb_poly}, Ptr{arb_poly}, Int), &z, &x, len)
+   return z
+end
+
+function shift_right(x::arb_poly, len::Int)
+   len < 0 && throw(DomainError())
+   z = parent(x)()
+   ccall((:arb_poly_shift_right, :libarb), Void,
+       (Ptr{arb_poly}, Ptr{arb_poly}, Int), &z, &x, len)
+   return z
+end
+
+################################################################################
+#
+#  Unary operations
+#
+################################################################################
+
+function -(x::arb_poly)
+  z = parent(x)()
+  ccall((:arb_poly_neg, :libarb), Void, (Ptr{arb_poly}, Ptr{arb_poly}), &x, &z)
+  return z
+end
+
+################################################################################
+#
+#  Binary operations
+#
+################################################################################
+
+function +(x::arb_poly, y::arb_poly)
+  z = parent(x)()
+  ccall((:arb_poly_add, :libarb), Void,
+              (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int),
+              &z, &x, &y, prec(parent(x)))
+  return z
+end
+
+function *(x::arb_poly, y::arb_poly)
+  z = parent(x)()
+  ccall((:arb_poly_mul, :libarb), Void,
+              (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int),
+              &z, &x, &y, prec(parent(x)))
+  return z
+end
+
+function -(x::arb_poly, y::arb_poly)
+  z = parent(x)()
+  ccall((:arb_poly_sub, :libarb), Void,
+              (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int),
+              &z, &x, &y, prec(parent(x)))
+  return z
+end
+
+function ^(x::arb_poly, y::Int)
+  y < 0 && throw(DomainError())
+  z = parent(x)()
+  ccall((:arb_poly_pow_ui, :libarb), Void,
+              (Ptr{arb_poly}, Ptr{arb_poly}, UInt, Int),
+              &z, &x, y, prec(parent(x)))
+  return z
+end
+
+###############################################################################
+#
+#   Ad hoc binary operators
+#
+###############################################################################
+
+function +(x::arb_poly, y::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly})
+    return x + parent(x)(y)
+end
+
+function -(x::arb_poly, y::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly})
+    return x - parent(x)(y)
+end
+
+function *(x::arb_poly, y::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly})
+    return x * parent(x)(y)
+end
+
+function +(x::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly}, y::arb_poly)
+    return parent(y)(x) + y
+end
+
+function -(x::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly}, y::arb_poly)
+    return parent(y)(x) - y
+end
+
+function *(x::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly}, y::arb_poly)
+    return parent(y)(x) * y
+end
+
+###############################################################################
+#
+#   Scalar division
+#
+###############################################################################
+
+function divexact(x::arb_poly, y::Union{Int,fmpz,fmpq,Float64,arb})
+    return x * inv(base_ring(parent(x))(y))
+end
+
+//(x::arb_poly, y::Union{Int,fmpz,fmpq,Float64,arb}) = divexact(x, y)
+
+###############################################################################
+#
+#   Euclidean division
+#
+###############################################################################
+
+function divrem(x::arb_poly, y::arb_poly)
+   y == 0 && throw(DivideError())
+   q = parent(x)()
+   r = parent(x)()
+   if ccall((:arb_poly_divrem, :libarb), Int, 
+         (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int), 
+               &q, &r, &x, &y, prec(parent(x))) == 1
+      return q, r
+   else
+      throw(DivideError())
+   end
+end
+
+function mod(x::arb_poly, y::arb_poly)
+   return divrem(x, y)[1]
+end
+
+function divexact(x::arb_poly, y::arb_poly)
+   return divrem(x, y)[2]
+end
+
+###############################################################################
+#
+#   Truncation
+#
+###############################################################################
+
+function truncate(a::arb_poly, n::Int)
+   n < 0 && throw(DomainError())
+   if length(a) <= n
+      return a
+   end
+   # todo: implement set_trunc in arb
+   z = deepcopy(a)
+   ccall((:arb_poly_truncate, :libarb), Void,
+                (Ptr{arb_poly}, Int), &z, n)
+   return z
+end
+
+function mullow(x::arb_poly, y::arb_poly, n::Int)
+   n < 0 && throw(DomainError())
+   z = parent(x)()
+   ccall((:arb_poly_mullow, :libarb), Void,
+         (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int, Int),
+            &z, &x, &y, n, prec(parent(x)))
+   return z
+end
+
+###############################################################################
+#
+#   Reversal
+#
+###############################################################################
+
+function reverse(x::arb_poly, len::Int)
+   len < 0 && throw(DomainError())
+   z = parent(x)()
+   ccall((:arb_poly_reverse, :libarb), Void,
+                (Ptr{arb_poly}, Ptr{arb_poly}, Int), &z, &x, len)
+   return z
+end
+
+###############################################################################
+#
+#   Evaluation
+#
+###############################################################################
+
+function evaluate(x::arb_poly, y::arb)
+   z = parent(y)()
+   ccall((:arb_poly_evaluate, :libarb), Void, 
+                (Ptr{arb}, Ptr{arb_poly}, Ptr{arb}, Int),
+                &z, &x, &y, prec(parent(y)))
+   return z
+end
+
+function evaluate2(x::arb_poly, y::arb)
+   z = parent(y)()
+   w = parent(y)()
+   ccall((:arb_poly_evaluate2, :libarb), Void, 
+                (Ptr{arb}, Ptr{arb}, Ptr{arb_poly}, Ptr{arb}, Int),
+                &z, &w, &x, &y, prec(parent(y)))
+   return z
+end
+
+function evaluate(x::arb_poly, y::acb)
+   z = parent(y)()
+   ccall((:arb_poly_evaluate_acb, :libarb), Void, 
+                (Ptr{acb}, Ptr{arb_poly}, Ptr{acb}, Int),
+                &z, &x, &y, prec(parent(y)))
+   return z
+end
+
+function evaluate2(x::arb_poly, y::acb)
+   z = parent(y)()
+   w = parent(y)()
+   ccall((:arb_poly_evaluate2_acb, :libarb), Void, 
+                (Ptr{acb}, Ptr{acb}, Ptr{arb_poly}, Ptr{acb}, Int),
+                &z, &w, &x, &y, prec(parent(y)))
+   return z
+end
+
+function evaluate(x::arb_poly, y::Union{Int,Float64,fmpz,fmpq})
+    return evaluate(x, base_ring(parent(x))(y))
+end
+
+###############################################################################
+#
+#   Composition
+#
+###############################################################################
+
+function compose(x::arb_poly, y::arb_poly)
+   z = parent(x)()
+   ccall((:arb_poly_compose, :libarb), Void, 
+                (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int),
+                &z, &x, &y, prec(parent(x)))
+   return z
+end
+
+###############################################################################
+#
+#   Derivative and integral
+#
+###############################################################################
+
+function derivative(x::arb_poly)
+   z = parent(x)()
+   ccall((:arb_poly_derivative, :libarb), Void, 
+                (Ptr{arb_poly}, Ptr{arb_poly}, Int), &z, &x, prec(parent(x)))
+   return z
+end
+
+function integral(x::arb_poly)
+   z = parent(x)()
+   ccall((:arb_poly_integral, :libarb), Void, 
+                (Ptr{arb_poly}, Ptr{arb_poly}, Int), &z, &x, prec(parent(x)))
+   return z
+end
+
+###############################################################################
+#
+#   Multipoint evaluation and interpolation
+#
+###############################################################################
+
+function arb_vec(n::Int)
+   return ccall((:_arb_vec_init, :libarb), Ptr{arb_struct}, (Int,), n)
+end
+
+function arb_vec(b::Array{arb, 1})
+   v = ccall((:_arb_vec_init, :libarb), Ptr{arb_struct}, (Int,), length(b))
+   for i=1:length(b)
+       ccall((:arb_set, :libarb), Void, (Ptr{arb_struct}, Ptr{arb}),
+           v + (i-1)*sizeof(arb_struct), &b[i])
+   end
+   return v
+end
+
+function array(R::ArbField, v::Ptr{arb_struct}, n::Int)
+   r = Array(arb, n)
+   for i=1:n
+       r[i] = R()
+       ccall((:arb_set, :libarb), Void, (Ptr{arb}, Ptr{arb_struct}),
+           &r[i], v + (i-1)*sizeof(arb_struct))
+   end
+   return r
+end
+
+function arb_vec_clear(v::Ptr{arb_struct}, n::Int)
+   ccall((:_arb_vec_clear, :libarb), Void, (Ptr{arb_struct}, Int), v, n)
+end
+
+function fromroots(R::ArbPolyRing, b::Array{arb, 1})
+   z = R()
+   tmp = arb_vec(b)
+   ccall((:arb_poly_product_roots, :libarb), Void, 
+                (Ptr{arb_poly}, Ptr{arb_struct}, Int, Int), &z, tmp, length(b), prec(R))
+   arb_vec_clear(tmp, length(b))
+   return z
+end
+
+function evaluate_iter(x::arb_poly, b::Array{arb, 1})
+   return arb[evaluate(x, b[i]) for i=1:length(b)]
+end
+
+function evaluate_fast(x::arb_poly, b::Array{arb, 1})
+   tmp = arb_vec(b)
+   ccall((:arb_poly_evaluate_vec_fast, :libarb), Void, 
+                (Ptr{arb_struct}, Ptr{arb_poly}, Ptr{arb_struct}, Int, Int),
+            tmp, &x, tmp, length(b), prec(parent(x)))
+   res = array(base_ring(parent(x)), tmp, length(b))
+   arb_vec_clear(tmp, length(b))
+   return res
+end
+
+function interpolate_newton(R::ArbPolyRing, xs::Array{arb, 1}, ys::Array{arb, 1})
+   length(xs) != length(ys) && error()
+   z = R()
+   xsv = arb_vec(xs)
+   ysv = arb_vec(ys)
+   ccall((:arb_poly_interpolate_newton, :libarb), Void, 
+                (Ptr{arb_poly}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
+            &z, xsv, ysv, length(xs), prec(R))
+   arb_vec_clear(xsv, length(xs))
+   arb_vec_clear(ysv, length(ys))
+   return z
+end
+
+function interpolate_barycentric(R::ArbPolyRing, xs::Array{arb, 1}, ys::Array{arb, 1})
+   length(xs) != length(ys) && error()
+   z = R()
+   xsv = arb_vec(xs)
+   ysv = arb_vec(ys)
+   ccall((:arb_poly_interpolate_barycentric, :libarb), Void, 
+                (Ptr{arb_poly}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
+            &z, xsv, ysv, length(xs), prec(R))
+   arb_vec_clear(xsv, length(xs))
+   arb_vec_clear(ysv, length(ys))
+   return z
+end
+
+function interpolate_fast(R::ArbPolyRing, xs::Array{arb, 1}, ys::Array{arb, 1})
+   length(xs) != length(ys) && error()
+   z = R()
+   xsv = arb_vec(xs)
+   ysv = arb_vec(ys)
+   ccall((:arb_poly_interpolate_fast, :libarb), Void, 
+                (Ptr{arb_poly}, Ptr{arb_struct}, Ptr{arb_struct}, Int, Int),
+            &z, xsv, ysv, length(xs), prec(R))
+   arb_vec_clear(xsv, length(xs))
+   arb_vec_clear(ysv, length(ys))
+   return z
+end
+
+###############################################################################
+#
+#   Unsafe functions
+#
+###############################################################################
+
+function fit!(z::arb_poly, n::Int)
+   ccall((:arb_poly_fit_length, :libarb), Void, 
+                    (Ptr{arb_poly}, Int), &z, n)
+end
+
+function setcoeff!(z::arb_poly, n::Int, x::fmpz)
+   ccall((:arb_poly_set_coeff_fmpz, :libarb), Void, 
+                    (Ptr{arb_poly}, Int, Ptr{fmpz}), &z, n, &x)
+end
+
+function setcoeff!(z::arb_poly, n::Int, x::arb)
+   ccall((:arb_poly_set_coeff_arb, :libarb), Void, 
+                    (Ptr{arb_poly}, Int, Ptr{arb}), &z, n, &x)
+end
+
+function mul!(z::arb_poly, x::arb_poly, y::arb_poly)
+   ccall((:arb_poly_mul, :libarb), Void, 
+                (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}), &z, &x, &y)
+end
+
+function addeq!(z::arb_poly, x::arb_poly)
+   ccall((:arb_poly_add, :libarb), Void, 
+                (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}), &z, &z, &x)
+end
+
+################################################################################
+#
+#  Parent object call overloads
+#
+################################################################################
+
+function Base.call(a::ArbPolyRing)
+   z = arb_poly()
+   z.parent = a
+   return z
+end
+
+function Base.call(a::ArbPolyRing, b::Union{Int,fmpz,fmpq,Float64,arb})
+   z = arb_poly(base_ring(a)(b), a.base_ring.prec)
+   z.parent = a
+   return z
+end
+
+function Base.call(a::ArbPolyRing, b::Array{arb, 1})
+   z = arb_poly(b, a.base_ring.prec)
+   z.parent = a
+   return z
+end
+
+function Base.call(a::ArbPolyRing, b::fmpz_poly)
+   z = arb_poly(b, a.base_ring.prec)
+   z.parent = a
+   return z
+end
+
+function Base.call(a::ArbPolyRing, b::fmpq_poly)
+   z = arb_poly(b, a.base_ring.prec)
+   z.parent = a
+   return z
+end
+
+function Base.call(a::ArbPolyRing, b::arb_poly)
+   z = arb_poly(b, a.base_ring.prec)
+   z.parent = a
+   return z
+end
+
+################################################################################
+#
+#  PolynomialRing constructor
+#
+################################################################################
+
+function PolynomialRing(R::ArbField, s::String)
+  S = symbol(s)
+  parent_obj = ArbPolyRing(R, S)
+  return parent_obj, parent_obj(fmpz_poly([fmpz(0), fmpz(1)]))
+end
+
