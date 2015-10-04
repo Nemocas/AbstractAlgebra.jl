@@ -11,7 +11,7 @@ export Poly, PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow,
        normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod, 
        invmod, lcm, divrem, mod, gcdinv, canonical_unit, var, chebyshev_t,
        chebyshev_u, set_length!, mul_classical, sqr_classical, mul_ks,
-       mul_karatsuba
+       mul_karatsuba, pow_multinomial
 
 ###############################################################################
 #
@@ -460,6 +460,32 @@ end
 #
 ###############################################################################
 
+function pow_multinomial{T <: RingElem}(a::PolyElem{T}, e::Int)
+   e < 0 && throw(DomainError())
+   lena = length(a)
+   lenz = (lena - 1) * e + 1
+   res = Array(T, lenz)
+   for k = 1:lenz
+      res[k] = base_ring(a)()
+   end
+   d = base_ring(a)()
+   first = coeff(a, 0)
+   res[1] = first ^ e
+   for k = 1 : lenz - 1
+      u = -k
+      for i = 1 : min(k, lena - 1)
+         t = coeff(a, i) * res[(k - i) + 1]
+         u += e + 1
+         addeq!(res[k + 1], t * u)
+      end
+      addeq!(d, first)
+      res[k + 1] = divexact(res[k + 1], d)
+   end
+   z = parent(a)(res)
+   set_length!(z, normalise(z, lenz))
+   return z
+end
+
 function ^{T <: RingElem}(a::PolyElem{T}, b::Int)
    b < 0 && throw(DomainError())
    # special case powers of x for constructing polynomials efficiently
@@ -479,6 +505,16 @@ function ^{T <: RingElem}(a::PolyElem{T}, b::Int)
    elseif b == 0
       return one(parent(a))
    else
+      if T <: FieldElem
+         zn = 0
+         while iszero(coeff(a, zn))
+            zn += 1
+         end
+         if length(a) - zn < 8
+             f = shift_right(a, zn)
+             return shift_left(pow_multinomial(f, b), zn*b) 
+         end
+      end
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0
          bit >>= 1
@@ -645,6 +681,9 @@ end
 
 function shift_left{T <: RingElem}(x::PolyElem{T}, len::Int)
    len < 0 && throw(DomainError())
+   if len == 0
+      return x
+   end
    xlen = length(x)
    v = Array(T, xlen + len)
    for i = 1:len
@@ -661,6 +700,9 @@ function shift_right{T <: RingElem}(x::PolyElem{T}, len::Int)
    xlen = length(x)
    if len >= xlen
       return zero(parent(x))
+   end
+   if len == 0
+      return x
    end
    v = Array(T, xlen - len)
    for i = 1:xlen - len
