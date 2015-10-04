@@ -636,7 +636,7 @@ function charpoly{T <: RingElem}(V::PolynomialRing{T}, Y::Mat{T})
    base_ring(V) != base_ring(Y) && error("Cannot coerce into polynomial ring")
    n = rows(Y)
    if n == 0
-      return V(1)
+      return V()
    end
    F = Array(elem_type(R), n)
    A = Array(elem_type(R), n)

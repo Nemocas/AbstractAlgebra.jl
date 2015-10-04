@@ -214,6 +214,42 @@ function test_matrix_content()
    println("PASS")
 end
 
+function test_matrix_determinant()
+   print("Matrix.determinant...")
+
+   S, x = PolynomialRing(ResidueRing(ZZ, 1009*2003), "x")
+
+   function randpoly(d::Int, n::Int)
+      r = S()
+      x = gen(S)
+      for i = 0:rand(0:d)
+         r += rand(-n:n)*x^i
+      end
+      return r
+   end
+
+   function randmat(R, d::Int, n::Int)
+      m = R.rows
+      r = R()
+      for i = 1:m
+         for j = 1:m
+            r[i, j] = randpoly(d, n)
+         end
+      end
+      return r
+   end
+
+   for dim = 0:10
+      R = MatrixSpace(S, dim, dim)
+
+      M = randmat(R, 5, 100);
+
+      @test determinant(M) == Nemo.determinant_clow(M)
+   end
+
+   println("PASS")
+end
+
 function test_matrix()
    test_matrix_constructors()
    test_matrix_manipulation()
@@ -227,6 +263,7 @@ function test_matrix()
    test_matrix_gram()
    test_matrix_trace()
    test_matrix_content()
+   test_matrix_determinant()
 
    println("")
 end
