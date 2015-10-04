@@ -630,7 +630,7 @@ function determinant_clow{T <: RingElem}(M::Mat{T})
    return isodd(n) ? -D : D
 end
 
-function charpoly{T <: RingElem}(V::Ring, Y::Mat{T})
+function charpoly{T <: RingElem}(V::PolynomialRing{T}, Y::Mat{T})
    rows(Y) != cols(Y) && error("Dimensions don't match in determinant")
    R = base_ring(Y)
    base_ring(V) != base_ring(Y) && error("Cannot coerce into polynomial ring")
