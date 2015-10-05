@@ -355,7 +355,7 @@ type ArbPolyRing <: Ring{Arb}
   end
 end
 
-type arb_poly #<: PolyElem{arb}
+type arb_poly <: PolyElem{Arb}
   coeffs::Ptr{Void}
   length::Int
   alloc::Int
@@ -384,6 +384,23 @@ type arb_poly #<: PolyElem{arb}
         ccall((:arb_poly_set_coeff_arb, :libarb), Void,
                 (Ptr{arb_poly}, Int, Ptr{arb}), &z, i - 1, &x[i])
     end
+    finalizer(z, _arb_poly_clear_fn)
+    return z
+  end
+
+  function arb_poly(x::arb_poly)
+    z = new() 
+    ccall((:arb_poly_init, :libarb), Void, (Ptr{arb_poly}, ), &z)
+    ccall((:arb_poly_set, :libarb), Void,
+                (Ptr{arb_poly}, Ptr{arb_poly}, Int), &z, &x, p)
+    finalizer(z, _arb_poly_clear_fn)
+    return z
+  end
+
+  function arb_poly(x::arb_poly)
+    z = new() 
+    ccall((:arb_poly_init, :libarb), Void, (Ptr{arb_poly}, ), &z)
+    ccall((:arb_poly_set, :libarb), Void, (Ptr{arb_poly}, Ptr{arb_poly}), &z, &x)
     finalizer(z, _arb_poly_clear_fn)
     return z
   end

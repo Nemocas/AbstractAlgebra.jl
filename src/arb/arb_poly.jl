@@ -5,8 +5,8 @@
 ###############################################################################
 
 export ArbPolyRing, arb_poly, strongequal, derivative, integral, evaluate,
-       evaluate2, compose, fromroots, evaluate_iter, evaluate_fast,
-       interpolate_newton, interpolate_barycentric, interpolate_fast
+       evaluate2, compose, from_roots, evaluate_iter, evaluate_fast, evaluate,
+       interpolate_newton, interpolate_barycentric, interpolate_fast, interpolate
 
 ###############################################################################
 #
@@ -46,6 +46,14 @@ end
 function isgen(a::arb_poly)
    return strongequal(a, gen(parent(a)))
 end
+
+#function iszero(a::arb_poly)
+#   return length(a) == 0
+#end
+
+#function isone(a::arb_poly)
+#   return strongequal(a, one(parent(a)))
+#end
 
 function deepcopy(a::arb_poly)
    z = arb_poly(a)
@@ -218,29 +226,29 @@ end
 #
 ###############################################################################
 
-function +(x::arb_poly, y::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly})
-    return x + parent(x)(y)
-end
+#function +(x::arb_poly, y::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly})
+#    return x + parent(x)(y)
+#end
 
-function -(x::arb_poly, y::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly})
-    return x - parent(x)(y)
-end
+#function -(x::arb_poly, y::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly})
+#    return x - parent(x)(y)
+#end
 
-function *(x::arb_poly, y::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly})
-    return x * parent(x)(y)
-end
+#function *(x::arb_poly, y::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly})
+#    return x * parent(x)(y)
+#end
 
-function +(x::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly}, y::arb_poly)
-    return parent(y)(x) + y
-end
+#function +(x::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly}, y::arb_poly)
+#    return parent(y)(x) + y
+#end
 
-function -(x::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly}, y::arb_poly)
-    return parent(y)(x) - y
-end
+#function -(x::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly}, y::arb_poly)
+#    return parent(y)(x) - y
+#end
 
-function *(x::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly}, y::arb_poly)
-    return parent(y)(x) * y
-end
+#function *(x::Union{Int,fmpz,fmpq,Float64,arb,fmpz_poly,fmpq_poly}, y::arb_poly)
+#    return parent(y)(x) * y
+#end
 
 ###############################################################################
 #
@@ -261,24 +269,24 @@ end
 ###############################################################################
 
 function divrem(x::arb_poly, y::arb_poly)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    q = parent(x)()
    r = parent(x)()
-   if ccall((:arb_poly_divrem, :libarb), Int, 
+   if (ccall((:arb_poly_divrem, :libarb), Int, 
          (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int), 
-               &q, &r, &x, &y, prec(parent(x))) == 1
-      return q, r
+               &q, &r, &x, &y, prec(parent(x))) == 1)
+      return (q, r)
    else
       throw(DivideError())
    end
 end
 
 function mod(x::arb_poly, y::arb_poly)
-   return divrem(x, y)[1]
+   return divrem(x, y)[2]
 end
 
 function divexact(x::arb_poly, y::arb_poly)
-   return divrem(x, y)[2]
+   return divrem(x, y)[1]
 end
 
 ###############################################################################
@@ -314,13 +322,13 @@ end
 #
 ###############################################################################
 
-function reverse(x::arb_poly, len::Int)
-   len < 0 && throw(DomainError())
-   z = parent(x)()
-   ccall((:arb_poly_reverse, :libarb), Void,
-                (Ptr{arb_poly}, Ptr{arb_poly}, Int), &z, &x, len)
-   return z
-end
+#function reverse(x::arb_poly, len::Int)
+#   len < 0 && throw(DomainError())
+#   z = parent(x)()
+#   ccall((:arb_poly_reverse, :libarb), Void,
+#                (Ptr{arb_poly}, Ptr{arb_poly}, Int), &z, &x, len)
+#   return z
+#end
 
 ###############################################################################
 #
@@ -342,7 +350,7 @@ function evaluate2(x::arb_poly, y::arb)
    ccall((:arb_poly_evaluate2, :libarb), Void, 
                 (Ptr{arb}, Ptr{arb}, Ptr{arb_poly}, Ptr{arb}, Int),
                 &z, &w, &x, &y, prec(parent(y)))
-   return z
+   return z, w
 end
 
 function evaluate(x::arb_poly, y::acb)
@@ -359,11 +367,15 @@ function evaluate2(x::arb_poly, y::acb)
    ccall((:arb_poly_evaluate2_acb, :libarb), Void, 
                 (Ptr{acb}, Ptr{acb}, Ptr{arb_poly}, Ptr{acb}, Int),
                 &z, &w, &x, &y, prec(parent(y)))
-   return z
+   return z, w
 end
 
 function evaluate(x::arb_poly, y::Union{Int,Float64,fmpz,fmpq})
     return evaluate(x, base_ring(parent(x))(y))
+end
+
+function evaluate2(x::arb_poly, y::Union{Int,Float64,fmpz,fmpq})
+    return evaluate2(x, base_ring(parent(x))(y))
 end
 
 ###############################################################################
@@ -433,7 +445,7 @@ function arb_vec_clear(v::Ptr{arb_struct}, n::Int)
    ccall((:_arb_vec_clear, :libarb), Void, (Ptr{arb_struct}, Int), v, n)
 end
 
-function fromroots(R::ArbPolyRing, b::Array{arb, 1})
+function from_roots(R::ArbPolyRing, b::Array{arb, 1})
    z = R()
    tmp = arb_vec(b)
    ccall((:arb_poly_product_roots, :libarb), Void, 
@@ -493,6 +505,16 @@ function interpolate_fast(R::ArbPolyRing, xs::Array{arb, 1}, ys::Array{arb, 1})
    arb_vec_clear(xsv, length(xs))
    arb_vec_clear(ysv, length(ys))
    return z
+end
+
+# todo: cutoffs for fast algorithm
+function interpolate(R::ArbPolyRing, xs::Array{arb, 1}, ys::Array{arb, 1})
+   return interpolate_newton(R, xs, ys)
+end
+
+# todo: cutoffs for fast algorithm
+function evaluate(x::arb_poly, b::Array{arb, 1})
+   return evaluate_iter(x, b)
 end
 
 ###############################################################################
