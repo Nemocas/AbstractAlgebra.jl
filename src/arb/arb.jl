@@ -58,6 +58,12 @@ end
 #
 ################################################################################
 
+function show(io::IO, x::ArbField)
+  print(io, "Real Field with ")
+  print(io, prec(x))
+  print(io, " bits of precision and error bounds")
+end
+
 function show(io::IO, x::arb)
   d = ceil(parent(x).prec * 0.30102999566398119521)
   cstr = ccall((:arb_get_str, :libarb), Ptr{UInt8}, (Ptr{arb}, Int, UInt),

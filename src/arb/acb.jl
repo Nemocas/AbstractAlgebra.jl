@@ -82,6 +82,12 @@ end
 #
 ################################################################################
 
+function show(io::IO, x::AcbField)
+  print(io, "Complex Field with ")
+  print(io, prec(x))
+  print(io, " bits of precision and error bounds")
+end
+
 function show(io::IO, x::acb)
   show(io, real(x))
   print(io, " + i*")
@@ -621,7 +627,6 @@ end
 
 function hyperu(a::acb, b::acb, x::acb)
   z = parent(x)()
-  # needs test
   ccall((:acb_hypgeom_u, :libarb), Void,
               (Ptr{acb}, Ptr{acb}, Ptr{acb}, Ptr{acb}, Int), &z, &a, &b, &x, parent(x).prec)
   return z

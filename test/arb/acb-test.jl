@@ -199,6 +199,9 @@ function test_acb_misc_ops()
    uniq, n = unique_integer(CC("3 +/- 1.001"))
    @test !uniq
 
+   uniq, n = unique_integer(CC("3", "0.1"))
+   @test !uniq
+
    println("PASS")
 end
 
@@ -380,6 +383,8 @@ function test_acb_functions()
                               "0.283048286141523623477498 +/- 6.79e-25"))
    @test overlaps(hyp1f1r(a,b,z), CC("0.38425089179721272011261 +/- 4.66e-24",
                               "0.86691422812428398524918 +/- 1.89e-24"))
+   @test overlaps(hyperu(a,b,z), CC("1.21934210138907906272586 +/- 8.19e-24",
+                            "-0.00184089966759759298894 +/- 8.42e-24"))
 
    t1, t2, t3, t4 = jtheta(z,a)
    @test overlaps(t1, CC("1.15342827918495425546807 +/- 7.18e-24",

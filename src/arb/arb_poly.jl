@@ -34,10 +34,18 @@ zero(a::ArbPolyRing) = a(0)
 
 one(a::ArbPolyRing) = a(1)
 
-gen(a::ArbPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
+function gen(a::ArbPolyRing)
+   z = arb_poly()
+   ccall((:arb_poly_set_coeff_si, :libarb), Void,
+        (Ptr{arb_poly}, Int, Int), &z, 1, 1)
+   z.parent = a
+   return z
+end
 
-#isgen(x::arb_poly) = ccall((:arb_poly_is_x, :libarb), Bool, 
-#                            (Ptr{arb_poly},), &x)
+# todo: write a C function for this
+function isgen(a::arb_poly)
+   return strongequal(a, gen(parent(a)))
+end
 
 function deepcopy(a::arb_poly)
    z = arb_poly(a)
@@ -161,7 +169,7 @@ end
 
 function -(x::arb_poly)
   z = parent(x)()
-  ccall((:arb_poly_neg, :libarb), Void, (Ptr{arb_poly}, Ptr{arb_poly}), &x, &z)
+  ccall((:arb_poly_neg, :libarb), Void, (Ptr{arb_poly}, Ptr{arb_poly}), &z, &x)
   return z
 end
 
@@ -510,13 +518,35 @@ end
 
 function mul!(z::arb_poly, x::arb_poly, y::arb_poly)
    ccall((:arb_poly_mul, :libarb), Void, 
-                (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}), &z, &x, &y)
+                (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int),
+                    &z, &x, &y, prec(parent(z)))
 end
 
 function addeq!(z::arb_poly, x::arb_poly)
    ccall((:arb_poly_add, :libarb), Void, 
-                (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}), &z, &z, &x)
+                (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int),
+                    &z, &z, &x, prec(parent(z)))
 end
+
+###############################################################################
+#
+#   Promotions
+#
+###############################################################################
+
+Base.promote_rule(::Type{arb_poly}, ::Type{Float64}) = arb_poly
+
+Base.promote_rule(::Type{arb_poly}, ::Type{Int}) = arb_poly
+
+Base.promote_rule(::Type{arb_poly}, ::Type{fmpz}) = arb_poly
+
+Base.promote_rule(::Type{arb_poly}, ::Type{fmpq}) = arb_poly
+
+Base.promote_rule(::Type{arb_poly}, ::Type{arb}) = arb_poly
+
+Base.promote_rule(::Type{arb_poly}, ::Type{fmpz_poly}) = arb_poly
+
+Base.promote_rule(::Type{arb_poly}, ::Type{fmpq_poly}) = arb_poly
 
 ################################################################################
 #

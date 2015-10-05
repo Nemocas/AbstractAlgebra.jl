@@ -341,7 +341,7 @@ end
 
 const ArbPolyRingID = ObjectIdDict()
 
-type ArbPolyRing <: Ring
+type ArbPolyRing <: Ring{Arb}
   base_ring::ArbField
   S::Symbol
 
@@ -355,7 +355,7 @@ type ArbPolyRing <: Ring
   end
 end
 
-type arb_poly
+type arb_poly #<: PolyElem{arb}
   coeffs::Ptr{Void}
   length::Int
   alloc::Int
