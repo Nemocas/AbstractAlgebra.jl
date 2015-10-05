@@ -510,7 +510,7 @@ function ^{T <: RingElem}(a::PolyElem{T}, b::Int)
          while iszero(coeff(a, zn))
             zn += 1
          end
-         if length(a) - zn < 8
+         if length(a) - zn < 8 && b > 4
              f = shift_right(a, zn)
              return shift_left(pow_multinomial(f, b), zn*b) 
          end
