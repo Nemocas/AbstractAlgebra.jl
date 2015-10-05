@@ -370,7 +370,11 @@ function evaluate2(x::arb_poly, y::acb)
    return z, w
 end
 
-function evaluate(x::arb_poly, y::Union{Int,Float64,fmpz,fmpq})
+function evaluate(x::arb_poly, y::Union{Int,Float64,fmpq})
+    return evaluate(x, base_ring(parent(x))(y))
+end
+
+function evaluate(x::arb_poly, y::fmpz)
     return evaluate(x, base_ring(parent(x))(y))
 end
 

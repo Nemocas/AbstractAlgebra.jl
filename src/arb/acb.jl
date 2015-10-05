@@ -726,6 +726,12 @@ function call(r::AcbField, x::arb)
   return z
 end
 
+function call(r::AcbField, x::acb)
+  z = acb(x, r.prec)
+  z.parent = r
+  return z
+end
+
 function call(r::AcbField, x::Float64)
   R = ArbField(r.prec)
   return r(R(x))
