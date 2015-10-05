@@ -849,7 +849,7 @@ function divrem{T <: Union{ResidueElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{
    if length(f) < length(g)
       return zero(parent(f)), f
    end
-   binv = inv(lead(g))
+   binv = inv(lead(g)) 
    g = binv*g
    x = gen(parent(f))
    qlen = length(f) - length(g) + 1
@@ -1144,6 +1144,7 @@ function resultant{T <: Union{ResidueElem, FieldElem}}(a::PolyElem{T}, b::PolyEl
       if iseven(lena) && iseven(lenb)
          sgn = -sgn
       end
+      inv(lead(B)) # ensure leading coefficient is invertible
       B, A = mod(A, B), B
       s *= lead(A)^(lena - length(B))
       lena = lenb
