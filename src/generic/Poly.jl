@@ -784,7 +784,7 @@ function divexact{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    while length(f) >= leng
       lenf = length(f)
       q1 = d[lenf - leng + 1] = divexact(coeff(f, lenf - 1), coeff(g, leng - 1))
-      f = f - q1*g*x^(lenf - leng)
+      f = f - shift_left(q1*g, lenf - leng)
    end
    q = parent(f)(d)
    set_length!(q, lenq)
@@ -1132,12 +1132,30 @@ function resultant{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
 end
 
-function res_lehmer{T <: Union{ResidueElem, FieldElem}}(A::PolyElem{T}, B::PolyElem{T})
+function resultant_lehmer{T <: Union{ResidueElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
    const crossover = 40
-   R = base_ring(A)
+   R = base_ring(a)
+   check_parent(a, b)
+   if length(a) == 0 || length(b) == 0
+      return zero(base_ring(a))
+   end
+   sgn = 1
+   if length(a) < length(b)
+      a, b = b, a
+      if iseven(length(a)) && iseven(length(b))
+         sgn = -sgn
+      end
+   end
+   lenA = length(a)
+   lenB = length(b)
+   if lenB == 1
+      return coeff(b, 0)^(lenA - 1)
+   end
+   c1 = content(a)
+   c2 = content(b)
+   A = divexact(a, c1)
+   B = divexact(b, c2)
    s = R(1)
-   lenA = length(A)
-   lenB = length(B)
    while lenB > crossover/2 + 1
       shift = max(lenA - crossover, 0)
       a = shift_right(A, shift)
@@ -1174,7 +1192,20 @@ function res_lehmer{T <: Union{ResidueElem, FieldElem}}(A::PolyElem{T}, B::PolyE
          return zero(base_ring(a)), parent(A)(1), parent(A)(1)
       end
    end
-   return s, A, B
+   while lenB > 1
+      if iseven(lenA) && iseven(lenB)
+         sgn = -sgn
+      end
+      B, A = mod(A, B), B
+      s *= lead(A)^(lenA - length(B))
+      lenA = lenB
+      lenB = length(B)
+      if lenB == 0
+         return zero(base_ring(A)) 
+      end
+   end
+   s *= lead(B)^(lenA - 1)
+   return c1^(lenB - 1)*c2^(lenA - 1)*s*sgn
 end
 
 function resultant{T <: Union{ResidueElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
@@ -1198,7 +1229,7 @@ function resultant{T <: Union{ResidueElem, FieldElem}}(a::PolyElem{T}, b::PolyEl
    c2 = content(b)
    A = divexact(a, c1)
    B = divexact(b, c2)
-   s, A, B = res_lehmer(A, B)
+   s = base_ring(A)(1)
    lena = length(A)
    lenb = length(B)
    while lenb > 1
@@ -1214,7 +1245,7 @@ function resultant{T <: Union{ResidueElem, FieldElem}}(a::PolyElem{T}, b::PolyEl
       end
    end
    s *= lead(B)^(lena - 1)
-   res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
+   return c1^(lenb - 1)*c2^(lena - 1)*s*sgn
 end
 
 ###############################################################################
