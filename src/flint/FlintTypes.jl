@@ -1710,7 +1710,12 @@ type perm <: PermElem
    end
 
    function perm(a::Array{Int, 1})
-      return new(a)
+      n = length(a)
+      d = Array(Int, n)
+      for i = 1:n
+         d[i] = a[i] - 1
+      end
+      return new(d)
    end
 end
 

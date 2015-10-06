@@ -28,6 +28,14 @@ function parity(a::perm)
                     (Ref{Int}, Int), a.d, R.n))
 end
 
+function getindex(a::perm, n::Int)
+   return a.d[n] + 1
+end
+ 
+function setindex!(a::perm, d::Int, n::Int)
+   a.entries[n] = d - 1
+end
+
 ###############################################################################
 #
 #   String I/O
@@ -44,7 +52,7 @@ function show(io::IO, x::perm)
    print(io, "[")
    n = parent(x).n
    for i = 1:n
-      print(io, x.d[i])
+      print(io, x[i])
       if i != n
          print(io, ", ")
       end

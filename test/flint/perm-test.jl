@@ -14,7 +14,7 @@ function test_perm_constructors()
    R = PermutationGroup(10)
 
    a = R()
-   b = R([2, 3, 5, 4, 6, 7, 1, 9, 0, 8])
+   b = R([2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
    c = R(a)
 
    @test isa(a, PermElem)
@@ -72,7 +72,7 @@ function test_perm_inversion()
    R = PermutationGroup(10)
 
    a = R()
-   b = R([2, 3, 5, 4, 6, 7, 1, 9, 0, 8])
+   b = R([2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
 
    @test a == inv(a)
    @test a == b*inv(b)
