@@ -1,9 +1,3 @@
-module Test
-
-using Base.Test, Nemo
-
-export test_all
-
 include("flint/fmpz-test.jl")
 include("flint/fmpz_poly-test.jl")
 include("flint/fmpz_mod_poly-test.jl")
@@ -26,9 +20,6 @@ include("generic/Poly-test.jl")
 include("generic/Residue-test.jl")
 include("generic/PowerSeries-test.jl")
 include("generic/Matrix-test.jl")
-
-include("Fields-test.jl")
-include("Benchmark-test.jl")
 
 function test_rings()
    test_fmpz()
@@ -55,10 +46,3 @@ function test_rings()
    test_fmpz_mat()
 end
 
-function test_all()
-   test_rings()
-   test_fields()
-   test_benchmarks()
-end
-
-end # module

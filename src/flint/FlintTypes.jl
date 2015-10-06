@@ -1678,3 +1678,40 @@ function _fq_nmod_poly_factor_clear_fn(a::fq_nmod_poly_factor)
          &a, &(a.base_field))
 end
 
+###############################################################################
+#
+#   FlintPermGroup / perm
+#
+###############################################################################
+
+const FlintPermID = ObjectIdDict()
+
+type FlintPermGroup <: Group{Flint}
+   n::Int
+
+   function FlintPermGroup(n::Int)
+      return try
+         FlintPermID[n]
+      catch
+         FlintPermID[n] = new(n)
+      end
+   end
+end
+
+type perm <: PermElem
+   d::Array{Int, 1}
+   parent::Group
+
+   function perm(n::Int)
+      p = new(Array(Int, n))
+      ccall((:_perm_set_one, :libflint), Void,
+            (Ref{Int}, Int), p.d, length(p.d))
+      return p
+   end
+
+   function perm(a::Array{Int, 1})
+      return new(a)
+   end
+end
+
+   

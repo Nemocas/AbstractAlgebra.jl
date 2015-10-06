@@ -21,7 +21,9 @@ abstract Generic
 
    abstract Collection{T}
 
-   abstract Ring{T} <: Collection{T}
+   abstract Group{T} <: Collection{T}
+
+   abstract Ring{T} <: Group{T}
 
    abstract Field{T} <: Ring{T}
 
@@ -29,7 +31,9 @@ abstract Generic
 
    abstract CollectionElem
 
-   abstract RingElem <: CollectionElem
+   abstract GroupElem <: CollectionElem
+
+   abstract RingElem <: GroupElem
 
    abstract FieldElem <: RingElem
 
@@ -53,6 +57,8 @@ abstract Generic
 # leaf objects, with no parameterisation
 # these are also type classes of mathematical objects
 # usually provided by a C library and not by generic
+
+   abstract PermElem <: GroupElem
 
    abstract IntegerRingElem <: RingElem
 

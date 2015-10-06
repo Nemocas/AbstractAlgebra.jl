@@ -87,7 +87,7 @@ canonical_unit(a::fq_poly) = canonical_unit(lead(a))
   
 ################################################################################
 #
-#  AbstractString{} I/O
+#  String I/O
 #
 ################################################################################
 
@@ -105,10 +105,10 @@ function show(io::IO, x::fq_poly)
 end
 
 function show(io::IO, R::FqPolyRing)
-  print(io, "Univariate Polynomial Ring in ")
-  print(io, string(var(R)))
-  print(io, " over ")
-  show(io, base_ring(R))
+   print(io, "Univariate Polynomial Ring in ")
+   print(io, string(var(R)))
+   print(io, " over ")
+   show(io, base_ring(R))
 end
 
 show_minus_one(::Type{fq_poly}) = show_minus_one(fq)
