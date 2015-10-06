@@ -868,8 +868,9 @@ function divrem{T <: Union{ResidueElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{
    q = parent(f)(d)
    c = base_ring(f)()
    while length(f) >= length(g)
-      l = -lead(f)
-      setcoeff!(q, length(f) - length(g), l*binv)
+      q1 = lead(f)
+      l = -q1
+      setcoeff!(q, length(f) - length(g), q1*binv)
       for i = 1:length(g)
          mul!(c, g.coeffs[i], l)
          addeq!(f.coeffs[i + length(f) - length(g)], c)
