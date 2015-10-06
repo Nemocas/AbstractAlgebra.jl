@@ -831,11 +831,18 @@ function mod{T <: Union{ResidueElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{T})
       raise(DivideError())
    end
    if length(f) >= length(g)
-      b = coeff(g, length(g) - 1)
+      f = deepcopy(f)
+      b = lead(g)
       g = inv(b)*g
       x = gen(parent(f))
+      c = base_ring(f)()
       while length(f) >= length(g)
-         f -= coeff(f, length(f) - 1)*g*x^(length(f) - length(g))
+         l = -lead(f)
+         for i = 1:length(g)
+            mul!(c, g.coeffs[i], l)
+            addeq!(f.coeffs[i + length(f) - length(g)], c)
+         end
+         set_length!(f, normalise(f, length(f)))
       end
    end
    return f
@@ -849,6 +856,7 @@ function divrem{T <: Union{ResidueElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{
    if length(f) < length(g)
       return zero(parent(f)), f
    end
+   f = deepcopy(f)
    binv = inv(lead(g)) 
    g = binv*g
    x = gen(parent(f))
@@ -858,10 +866,15 @@ function divrem{T <: Union{ResidueElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{
       d[i] = zero(base_ring(f))
    end
    q = parent(f)(d)
+   c = base_ring(f)()
    while length(f) >= length(g)
-      q1 = coeff(f, length(f) - 1)
-      setcoeff!(q, length(f) - length(g), q1*binv)
-      f -= q1*g*x^(length(f) - length(g))
+      l = -lead(f)
+      setcoeff!(q, length(f) - length(g), l*binv)
+      for i = 1:length(g)
+         mul!(c, g.coeffs[i], l)
+         addeq!(f.coeffs[i + length(f) - length(g)], c)
+      end
+      set_length!(f, normalise(f, length(f)))
    end
    return q, f
 end
@@ -878,7 +891,7 @@ function pseudorem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    b = coeff(g, length(g) - 1)
    x = gen(parent(f))
    while length(f) >= length(g)
-      f = f*b - coeff(f, length(f) - 1)*g*x^(length(f) - length(g))
+      f = f*b - shift_left(coeff(f, length(f) - 1)*g, length(f) - length(g))
    end
    return f
 end
@@ -902,7 +915,7 @@ function pseudodivrem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
          setcoeff!(q, i - 1, coeff(q, i - 1) * b)
       end
       setcoeff!(q, length(f) - length(g), coeff(f, length(f) - 1))
-      f = f*b - coeff(f, length(f) - 1)*g*x^(length(f) - length(g))
+      f = f*b - shift_left(coeff(f, length(f) - 1)*g, length(f) - length(g))
    end
    while lenq > 0 && coeff(q, lenq - 1) == 0
       lenq -= 1
@@ -1118,6 +1131,51 @@ function resultant{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
 end
 
+function res_lehmer{T <: Union{ResidueElem, FieldElem}}(A::PolyElem{T}, B::PolyElem{T})
+   const crossover = 40
+   R = base_ring(A)
+   s = R(1)
+   lenA = length(A)
+   lenB = length(B)
+   while lenB > crossover/2 + 1
+      shift = max(lenA - crossover, 0)
+      a = shift_right(A, shift)
+      b = shift_right(B, shift)
+      u1, v1 = R(1), R(0)
+      u2, v2 = R(0), R(1)
+      lena = lenA - shift
+      lenb = lenB - shift
+      if lenb > crossover/2 + 1
+         A = truncate(A, shift)
+         B = truncate(B, shift)
+         while lenb > crossover/2 + 1
+            if iseven(lena + shift) && iseven(lenb + shift)
+               sgn = -sgn
+            end
+            (q, b), a = divrem(a, b), b
+            u1, u2 = u2, u1 - q*u2
+            v1, v2 = v2, v1 - q*v2
+            s *= lead(a)^(lena - length(b))
+            lena = lenb
+            lenb = length(b)
+         end
+         A, B = u1*A + v1*B + shift_left(a, shift), u2*A + v2*B + shift_left(b, shift)
+      else
+         if iseven(lenA) && iseven(lenB)
+               sgn = -sgn
+         end
+         B, A = mod(A, B), B
+         s *= lead(A)^(lenA - length(B))
+      end
+      lenA = length(A)
+      lenB = length(B)
+      if lenB == 0
+         return zero(base_ring(a)), parent(A)(1), parent(A)(1)
+      end
+   end
+   return s, A, B
+end
+
 function resultant{T <: Union{ResidueElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    if length(a) == 0 || length(b) == 0
@@ -1139,7 +1197,9 @@ function resultant{T <: Union{ResidueElem, FieldElem}}(a::PolyElem{T}, b::PolyEl
    c2 = content(b)
    A = divexact(a, c1)
    B = divexact(b, c2)
-   s = 1
+   s, A, B = res_lehmer(A, B)
+   lena = length(A)
+   lenb = length(B)
    while lenb > 1
       if iseven(lena) && iseven(lenb)
          sgn = -sgn
