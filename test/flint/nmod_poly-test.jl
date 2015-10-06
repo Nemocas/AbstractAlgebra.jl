@@ -18,7 +18,7 @@ function test_nmod_poly_constructors()
 
   @test S != R
 
-  @test isa(Rx, Ring)
+  @test isa(Rx, NmodPolyRing)
   @test isa(x, PolyElem)
 
   a = Rx()

@@ -19,9 +19,9 @@ abstract Generic
 # mathematical domains, parameterised by a library
 # these are the type classes of parent objects
 
-   abstract Collection{T}
+   abstract Set{T}
 
-   abstract Group{T} <: Collection{T}
+   abstract Group{T} <: Set{T}
 
    abstract Ring{T} <: Group{T}
 
@@ -29,9 +29,9 @@ abstract Generic
 
 # elements of mathematical domains
 
-   abstract CollectionElem
+   abstract SetElem
 
-   abstract GroupElem <: CollectionElem
+   abstract GroupElem <: SetElem
 
    abstract RingElem <: GroupElem
 

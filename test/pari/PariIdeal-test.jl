@@ -7,7 +7,7 @@ function test_PariIdeal_constructors()
 
    S = parent(Ideal(O, 2, 3))
 
-   @test isa(S, PariIdealCollection)
+   @test isa(S, PariIdealSet)
 
    @test isa(Ideal(O, 2, 3), PariIdeal)
 

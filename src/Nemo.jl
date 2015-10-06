@@ -20,8 +20,8 @@ import Base: floor, ceil, hypot, sqrt,
              atanh, asinh, acosh, gamma, lgamma, digamma, zeta,
              sinpi, cospi, atan2
 
-export Collection, Group, Ring, Field, CollectionElem, GroupElem, RingElem,
-       FieldElem, Pari, Flint, Antic, Generic
+export SetElem, GroupElem, RingElem, FieldElem, Pari, Flint, Antic,
+       Generic
 
 export PolyElem, SeriesElem, ResidueElem, FractionElem, MatElem,
        NumberFieldElem, PermElem

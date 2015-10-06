@@ -57,15 +57,15 @@ _pari_rat_clear_fn(g::pari_rat) = ccall((:pari_free, :libpari), Void,
 #
 ###############################################################################
 
-type PariVector{T <: CollectionElem}
-   base_ring::Collection{Pari}
+type PariVector{T <: SetElem}
+   base_ring::Set{Pari}
 end
 
-type pari_vec{T <: CollectionElem}
+type pari_vec{T <: SetElem}
    data::Ptr{Int}
    parent::PariVector{T}
 
-   function pari_vec{R <: Collection{Pari}}(v::Ptr{Int}, par::R)
+   function pari_vec{R <: Set{Pari}}(v::Ptr{Int}, par::R)
       r = new(gclone(v), PariVector{T}(par))
       finalizer(r, _pari_vec_unclone)
       return r
@@ -217,29 +217,29 @@ _pari_maximal_order_elem_clear_fn(a::pari_maximal_order_elem) = gunclone(a.data)
 
 ###############################################################################
 #
-#   PariIdealCollection / PariIdeal
+#   PariIdealSet / PariIdeal
 #
 ###############################################################################
 
-const PariIdealCollectionID = ObjectIdDict()
+const PariIdealSetID = ObjectIdDict()
 
-type PariIdealCollection <: Collection{Pari}
+type PariIdealSet <: Set{Pari}
    order::PariMaximalOrder
 
-   function PariIdealCollection(ord::PariMaximalOrder)
+   function PariIdealSet(ord::PariMaximalOrder)
       return try
-         PariIdealCollectionID[ord]
+         PariIdealSetID[ord]
       catch
-         PariIdealCollectionID[ord] = new(ord)
+         PariIdealSetID[ord] = new(ord)
       end
    end
 end
 
-type PariIdeal <: CollectionElem
+type PariIdeal <: SetElem
    ideal::Ptr{Int}
-   parent::PariIdealCollection
+   parent::PariIdealSet
 
-   function PariIdeal(a::Ptr{Int}, par::PariIdealCollection)
+   function PariIdeal(a::Ptr{Int}, par::PariIdealSet)
       r = new(gclone(a), par)
       finalizer(r, _pari_ideal_clear_fn)
       return r
@@ -257,9 +257,9 @@ _pari_ideal_clear_fn(a::PariIdeal) = gunclone(a.ideal)
 type PariFactor{T <: RingElem}
    data::Ptr{Int}
    len::Int
-   parent::Collection
+   parent::Set
 
-   function PariFactor(p::Ptr{Int}, par::Collection)
+   function PariFactor(p::Ptr{Int}, par::Set)
       col = reinterpret(Ptr{Int}, unsafe_load(p, 2))
       r = new(gclone(p), lg(col) - 1, par)
       finalizer(r, _PariFactor_unclone)
