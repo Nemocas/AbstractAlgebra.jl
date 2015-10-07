@@ -576,6 +576,97 @@ end
 
 ###############################################################################
 #
+#   Permutation
+#
+###############################################################################
+
+function *{T <: RingElem}(P::perm, x::Mat{T})
+   z = parent(x)()
+   m = rows(x)
+   n = cols(x)
+   for i = 1:m
+      for j = 1:n
+         z[P[i], j] = x[i, j]
+      end
+   end
+   return z
+end
+
+###############################################################################
+#
+#   LU factorisation
+#
+###############################################################################
+
+function lufact!{T <: FieldElem}(P::perm, A::Mat{T})
+   m = rows(A)
+   n = cols(A)
+   rank = 0
+   r = 1
+   c = 1
+   R = base_ring(A)
+   t = R()
+   while r <= m && c <= n
+      if A[r, c] == 0
+         i = r + 1
+         while i <= m
+            if A[i, c] != 0
+               for j = 1:n
+                  A.entries[i, j], A.entries[r, j] = A.entries[r, j], A.entries[i, j]
+               end
+               P[r], P[i] = P[i], P[r]
+               break
+            end
+            i += 1
+         end
+         if i > m
+            c += 1
+            continue
+         end
+      end
+      rank += 1
+      d = -inv(A[r, c])
+      for i = r + 1:m
+         q = A[i, c]*d
+         for j = c + 1:n
+            mul!(t, A.entries[r, j], q)
+            addeq!(A.entries[i, j], t)
+         end
+         A[i, c] = R()
+         A[i, rank] = -q
+      end
+      r += 1
+      c += 1
+   end
+   return rank
+end
+
+function lufact{T <: FieldElem}(P::perm, A::Mat{T})
+   parent(P).n != rows(A) && error("Permutation does not match matrix")
+   S = parent(A)
+   R = base_ring(A)
+   U = deepcopy(A)
+   m = rows(A)
+   n = cols(A)
+   L = S()
+   rank = lufact!(P, U)
+   for i = 1:m
+      for j = 1:n
+         if i > j
+            L[i, j] = U[i, j]
+            U[i, j] = R()
+         elseif i == j
+            L[i, j] = R(1)
+         else
+            L[i, j] = R()
+         end
+      end
+   end
+   return rank, L, U
+end
+
+###############################################################################
+#
 #   Determinant
 #
 ###############################################################################

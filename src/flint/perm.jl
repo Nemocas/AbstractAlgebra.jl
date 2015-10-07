@@ -33,7 +33,7 @@ function getindex(a::perm, n::Int)
 end
  
 function setindex!(a::perm, d::Int, n::Int)
-   a.entries[n] = d - 1
+   a.d[n] = d - 1
 end
 
 ###############################################################################
