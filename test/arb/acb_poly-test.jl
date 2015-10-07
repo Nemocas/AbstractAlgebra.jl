@@ -149,45 +149,6 @@ function test_acb_poly_adhoc_binary()
    println("PASS")
 end
 
-function test_fmpz_poly_evaluation()
-   print("fmpz_poly.evaluation...")
-
-   R, x = PolynomialRing(ZZ, "x")
-   
-   f = x^2 + 2x + 1
-
-   @test evaluate(f, 3) == 16
-   
-   @test evaluate(f, fmpz(10)) == 121
-
-   println("PASS")
-end
-
-function test_fmpz_poly_composition()
-   print("fmpz_poly.composition...")
-
-   R, x = PolynomialRing(ZZ, "x")
-   
-   f = x^2 + 2x + 1
-   g = x^3 + 3x + 1
-
-   @test compose(f, g) == x^6+6*x^4+4*x^3+9*x^2+12*x+4
-
-   println("PASS")
-end
-
-function test_fmpz_poly_derivative()
-   print("fmpz_poly.derivative...")
-
-   R, x = PolynomialRing(ZZ, "x")
-   
-   f = x^2 + 2x + 1
-
-   @test derivative(f) == 2x + 2
-
-   println("PASS")
-end
-
 function test_acb_poly_comparison()
    print("acb_poly.comparison...")
 

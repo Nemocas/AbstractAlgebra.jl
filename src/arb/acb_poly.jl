@@ -4,9 +4,10 @@
 #
 ###############################################################################
 
-export AcbPolyRing, acb_poly, strongequal, derivative, integral, evaluate,
+export AcbPolyRing, acb_poly, isreal, strongequal, derivative, integral, evaluate,
        evaluate2, compose, from_roots, evaluate_iter, evaluate_fast, evaluate,
-       interpolate_newton, interpolate_barycentric, interpolate_fast, interpolate
+       interpolate_newton, interpolate_barycentric, interpolate_fast, interpolate,
+       roots
 
 ###############################################################################
 #
@@ -145,6 +146,10 @@ function unique_integer(x::acb_poly)
   unique = ccall((:acb_poly_get_unique_fmpz_poly, :libarb), Int,
     (Ptr{fmpz_poly}, Ptr{acb_poly}), &z, &x)
   return (unique != 0, z)
+end
+
+function isreal(x::acb_poly)
+  return ccall((:acb_poly_is_real, :libarb), Cint, (Ptr{acb_poly}, ), &x) != 0
 end
 
 ###############################################################################
@@ -502,6 +507,89 @@ end
 # todo: cutoffs for fast algorithm
 function evaluate(x::acb_poly, b::Array{acb, 1})
    return evaluate_iter(x, b)
+end
+
+function roots(x::acb_poly; target=0, isolate_real=false, initial_prec=0, max_prec=0, max_iter=0)
+    deg = degree(x)
+    if deg <= 0
+        return Array(acb, 0)
+    end
+
+    initial_prec = (initial_prec >= 2) ? initial_prec : 32
+    max_prec = (max_prec >= 2) ? max_prec : 3 * prec(parent(x))
+
+    isolated = 0
+    wp = initial_prec
+    roots = acb_vec(deg)
+
+    while true
+        in_roots = (wp == initial_prec) ? C_NULL : roots
+        step_max_iter = (max_iter >= 1) ? max_iter : min(max(deg, 32), wp)
+        isolated = ccall((:acb_poly_find_roots, :libarb), Int,
+            (Ptr{acb_struct}, Ptr{acb_poly}, Ptr{acb_struct}, Int, Int),
+                roots, &x, in_roots, step_max_iter, wp)
+
+        wp = wp * 2
+
+        if isolated == deg
+            ok = true
+            if target > 0
+                for i = 0 : deg-1
+                    re = ccall((:acb_real_ptr, :libarb), Ptr{arb_struct},
+                        (Ptr{acb}, ), roots + i * sizeof(acb_struct))
+                    im = ccall((:acb_imag_ptr, :libarb), Ptr{arb_struct},
+                        (Ptr{acb}, ), roots + i * sizeof(acb_struct))
+                    t = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (Ptr{arb}, ), re)
+                    u = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (Ptr{arb}, ), im)
+                    ok = ok && (ccall((:mag_cmp_2exp_si, :libarb), Cint,
+                        (Ptr{mag_struct}, Int), t, -target) <= 0)
+                    ok = ok && (ccall((:mag_cmp_2exp_si, :libarb), Cint,
+                        (Ptr{mag_struct}, Int), u, -target) <= 0)
+                end
+            end
+
+            if isreal(x)
+                real_ok = ccall((:acb_poly_validate_real_roots, :libarb),
+                    Bool, (Ptr{acb_struct}, Ptr{acb_poly}, Int), roots, &x, wp)
+
+                if isolate_real && !real_ok
+                    ok = false
+                end
+
+                if real_ok
+                    for i = 0 : deg - 1
+                        im = ccall((:acb_imag_ptr, :libarb), Ptr{arb_struct},
+                            (Ptr{acb}, ), roots + i * sizeof(acb_struct))
+                        if ccall((:arb_contains_zero, :libarb), Bool, (Ptr{arb_struct}, ), im)
+                            ccall((:arb_zero, :libarb), Void, (Ptr{arb_struct}, ), im)
+                        end
+                    end
+                end
+            end
+
+            if ok
+                break
+            end
+        end
+
+        if wp > max_prec
+            break
+        end
+    end
+
+    if isolated == deg
+        ccall((:_acb_vec_sort_pretty, :libarb), Void,
+            (Ptr{acb_struct}, Int), roots, deg)
+        res = array(base_ring(parent(x)), roots, deg)
+    end
+
+    acb_vec_clear(roots, deg)
+
+    if isolated == deg
+        return res
+    else
+        error("unable to isolate all roots (insufficient precision, or there is a multiple root)")
+    end
 end
 
 ###############################################################################
