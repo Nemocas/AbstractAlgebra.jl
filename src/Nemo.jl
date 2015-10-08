@@ -191,8 +191,6 @@ FiniteField = FlintFiniteField
 
 RealField = ArbField
 ComplexField = AcbField
-RR = RealField(64)
-CC = ComplexField(64)
 
 ###############################################################################
 #
