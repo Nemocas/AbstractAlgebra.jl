@@ -132,6 +132,8 @@ function show(io::IO, R::FmpzModPolyRing)
   print(io, base_ring(R))
 end
 
+show_minus_one(::Type{fmpz_mod_poly}) = true
+
 ################################################################################
 #
 #  Canonicalization

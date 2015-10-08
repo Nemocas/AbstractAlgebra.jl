@@ -177,7 +177,18 @@ function *{T <: RingElem}(x::Mat{T}, y::Mat{T})
    else
       parz = MatrixSpace(base_ring(x), rows(x), cols(y))
    end
-   return parz(x.entries*y.entries)
+   A = Array(T, rows(x), cols(y))
+   C = base_ring(x)()
+   for i = 1:rows(x)
+      for j = 1:cols(y)
+         A[i, j] = base_ring(x)()
+         for k = 1:cols(x)
+            mul!(C, x[i, k], y[k, j])
+            addeq!(A[i, j], C)
+         end
+      end
+   end
+   return parz(A)
 end
 
 ###############################################################################
@@ -561,6 +572,215 @@ function content{T <: RingElem}(x::Mat{T})
      end
   end
   return d
+end
+
+###############################################################################
+#
+#   Permutation
+#
+###############################################################################
+
+function *{T <: RingElem}(P::perm, x::Mat{T})
+   z = parent(x)()
+   m = rows(x)
+   n = cols(x)
+   for i = 1:m
+      for j = 1:n
+         z[P[i], j] = x[i, j]
+      end
+   end
+   return z
+end
+
+###############################################################################
+#
+#   LU factorisation
+#
+###############################################################################
+
+function lufact!{T <: FieldElem}(P::perm, A::Mat{T})
+   m = rows(A)
+   n = cols(A)
+   rank = 0
+   r = 1
+   c = 1
+   R = base_ring(A)
+   t = R()
+   while r <= m && c <= n
+      if A[r, c] == 0
+         i = r + 1
+         while i <= m
+            if A[i, c] != 0
+               for j = 1:n
+                  A.entries[i, j], A.entries[r, j] = A.entries[r, j], A.entries[i, j]
+               end
+               P[r], P[i] = P[i], P[r]
+               break
+            end
+            i += 1
+         end
+         if i > m
+            c += 1
+            continue
+         end
+      end
+      rank += 1
+      d = -inv(A[r, c])
+      for i = r + 1:m
+         q = A[i, c]*d
+         for j = c + 1:n
+            mul!(t, A.entries[r, j], q)
+            addeq!(A.entries[i, j], t)
+         end
+         A[i, c] = R()
+         A[i, rank] = -q
+      end
+      r += 1
+      c += 1
+   end
+   return rank
+end
+
+function lufact{T <: FieldElem}(P::perm, A::Mat{T})
+   parent(P).n != rows(A) && error("Permutation does not match matrix")
+   S = parent(A)
+   R = base_ring(A)
+   U = deepcopy(A)
+   m = rows(A)
+   n = cols(A)
+   L = S()
+   rank = lufact!(P, U)
+   for i = 1:m
+      for j = 1:n
+         if i > j
+            L[i, j] = U[i, j]
+            U[i, j] = R()
+         elseif i == j
+            L[i, j] = R(1)
+         else
+            L[i, j] = R()
+         end
+      end
+   end
+   return rank, L, U
+end
+
+###############################################################################
+#
+#   Determinant
+#
+###############################################################################
+
+function determinant_clow{T <: RingElem}(M::Mat{T})
+   rows(M) != cols(M) && error("Dimensions don't match in determinant")
+   R = base_ring(M)
+   n = rows(M)
+   A = Array(T, n, n)
+   B = Array(T, n, n)
+   C = R()
+   for i = 1:n
+      for j = 1:n
+         A[i, j] = i == j ? R(1) : R(0)
+         B[i, j] = R()
+      end
+   end
+   for k = 1:n-1
+      for i = 1:n
+         for j = 1:i
+            if !iszero(A[i, j])
+               for m = j + 1:n
+                  mul!(C, A[i, j], M[i, m])
+                  addeq!(B[m, j], C)
+               end
+               for m = j + 1:n
+                  mul!(C, A[i, j], M[i, j])
+                  addeq!(B[m, m], -C)
+               end
+            end
+         end
+      end
+      Temp = A
+      A = B
+      B = Temp
+      if k != n - 1
+         for i = 1:n
+            for j = 1:i
+               B[i, j] = R()
+            end
+         end
+      end
+   end
+   D = R()
+   for i = 1:n
+      for j = 1:i
+         if !iszero(A[i, j])
+            D -= A[i, j]*M[i, j]
+         end
+      end
+   end
+   return isodd(n) ? -D : D
+end
+
+function charpoly{T <: RingElem}(V::PolynomialRing{T}, Y::Mat{T})
+   rows(Y) != cols(Y) && error("Dimensions don't match in determinant")
+   R = base_ring(Y)
+   base_ring(V) != base_ring(Y) && error("Cannot coerce into polynomial ring")
+   n = rows(Y)
+   if n == 0
+      return V()
+   end
+   F = Array(elem_type(R), n)
+   A = Array(elem_type(R), n)
+   M = Array(elem_type(R), n - 1, n)
+   F[1] = -Y[1, 1]
+   for i = 2:n
+      F[i] = R()
+      for j = 1:i
+         M[1, j] = Y[j, i]
+      end
+      A[1] = Y[i, i]
+      p = R()
+      for j = 2:i - 1
+         for k = 1:i
+            s = R()
+            for l = 1:i
+               mul!(p, Y[k, l], M[j - 1, l])
+               addeq!(s, p)
+            end
+            M[j, k] = s
+         end
+         A[j] = M[j, i]
+      end 
+      s = R()
+      for j = 1:i
+         mul!(p, Y[i, j], M[i - 1, j])
+         addeq!(s, p)
+      end
+      A[i] = s
+      for j = 1:i
+         s = -F[j]
+         for k = 1:j - 1
+            mul!(p, A[k], F[j - k])
+            addeq!(s, p)
+         end
+         F[j] = -s - A[j]
+     end
+   end
+   z = gen(V)
+   f = z^n
+   for i = 1:n
+      setcoeff!(f, n - i, F[i])
+   end
+   return f
+end
+
+function determinant{T <: RingElem}(M::Mat{T})
+   R = base_ring(M)
+   S, z = PolynomialRing(R, "z")
+   n = rows(M)
+   p = charpoly(S, M)
+   d = coeff(p, 0)
+   return isodd(n) ? -d : d
 end
 
 ###############################################################################

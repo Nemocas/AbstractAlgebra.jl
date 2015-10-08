@@ -11,7 +11,7 @@ export Poly, PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow,
        normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod, 
        invmod, lcm, divrem, mod, gcdinv, canonical_unit, var, chebyshev_t,
        chebyshev_u, set_length!, mul_classical, sqr_classical, mul_ks,
-       mul_karatsuba
+       mul_karatsuba, pow_multinomial
 
 ###############################################################################
 #
@@ -460,6 +460,32 @@ end
 #
 ###############################################################################
 
+function pow_multinomial{T <: RingElem}(a::PolyElem{T}, e::Int)
+   e < 0 && throw(DomainError())
+   lena = length(a)
+   lenz = (lena - 1) * e + 1
+   res = Array(T, lenz)
+   for k = 1:lenz
+      res[k] = base_ring(a)()
+   end
+   d = base_ring(a)()
+   first = coeff(a, 0)
+   res[1] = first ^ e
+   for k = 1 : lenz - 1
+      u = -k
+      for i = 1 : min(k, lena - 1)
+         t = coeff(a, i) * res[(k - i) + 1]
+         u += e + 1
+         addeq!(res[k + 1], t * u)
+      end
+      addeq!(d, first)
+      res[k + 1] = divexact(res[k + 1], d)
+   end
+   z = parent(a)(res)
+   set_length!(z, normalise(z, lenz))
+   return z
+end
+
 function ^{T <: RingElem}(a::PolyElem{T}, b::Int)
    b < 0 && throw(DomainError())
    # special case powers of x for constructing polynomials efficiently
@@ -479,6 +505,16 @@ function ^{T <: RingElem}(a::PolyElem{T}, b::Int)
    elseif b == 0
       return one(parent(a))
    else
+      if T <: FieldElem
+         zn = 0
+         while iszero(coeff(a, zn))
+            zn += 1
+         end
+         if length(a) - zn < 8 && b > 4
+             f = shift_right(a, zn)
+             return shift_left(pow_multinomial(f, b), zn*b) 
+         end
+      end
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0
          bit >>= 1
@@ -645,6 +681,9 @@ end
 
 function shift_left{T <: RingElem}(x::PolyElem{T}, len::Int)
    len < 0 && throw(DomainError())
+   if len == 0
+      return x
+   end
    xlen = length(x)
    v = Array(T, xlen + len)
    for i = 1:len
@@ -661,6 +700,9 @@ function shift_right{T <: RingElem}(x::PolyElem{T}, len::Int)
    xlen = length(x)
    if len >= xlen
       return zero(parent(x))
+   end
+   if len == 0
+      return x
    end
    v = Array(T, xlen - len)
    for i = 1:xlen - len
@@ -742,7 +784,7 @@ function divexact{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    while length(f) >= leng
       lenf = length(f)
       q1 = d[lenf - leng + 1] = divexact(coeff(f, lenf - 1), coeff(g, leng - 1))
-      f = f - q1*g*x^(lenf - leng)
+      f = f - shift_left(q1*g, lenf - leng)
    end
    q = parent(f)(d)
    set_length!(q, lenq)
@@ -789,11 +831,18 @@ function mod{T <: Union{ResidueElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{T})
       raise(DivideError())
    end
    if length(f) >= length(g)
-      b = coeff(g, length(g) - 1)
+      f = deepcopy(f)
+      b = lead(g)
       g = inv(b)*g
       x = gen(parent(f))
+      c = base_ring(f)()
       while length(f) >= length(g)
-         f -= coeff(f, length(f) - 1)*g*x^(length(f) - length(g))
+         l = -lead(f)
+         for i = 1:length(g)
+            mul!(c, g.coeffs[i], l)
+            addeq!(f.coeffs[i + length(f) - length(g)], c)
+         end
+         set_length!(f, normalise(f, length(f)))
       end
    end
    return f
@@ -807,7 +856,8 @@ function divrem{T <: Union{ResidueElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{
    if length(f) < length(g)
       return zero(parent(f)), f
    end
-   binv = inv(lead(g))
+   f = deepcopy(f)
+   binv = inv(lead(g)) 
    g = binv*g
    x = gen(parent(f))
    qlen = length(f) - length(g) + 1
@@ -816,10 +866,16 @@ function divrem{T <: Union{ResidueElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{
       d[i] = zero(base_ring(f))
    end
    q = parent(f)(d)
+   c = base_ring(f)()
    while length(f) >= length(g)
-      q1 = coeff(f, length(f) - 1)
+      q1 = lead(f)
+      l = -q1
       setcoeff!(q, length(f) - length(g), q1*binv)
-      f -= q1*g*x^(length(f) - length(g))
+      for i = 1:length(g)
+         mul!(c, g.coeffs[i], l)
+         addeq!(f.coeffs[i + length(f) - length(g)], c)
+      end
+      set_length!(f, normalise(f, length(f)))
    end
    return q, f
 end
@@ -836,7 +892,7 @@ function pseudorem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    b = coeff(g, length(g) - 1)
    x = gen(parent(f))
    while length(f) >= length(g)
-      f = f*b - coeff(f, length(f) - 1)*g*x^(length(f) - length(g))
+      f = f*b - shift_left(coeff(f, length(f) - 1)*g, length(f) - length(g))
    end
    return f
 end
@@ -860,7 +916,7 @@ function pseudodivrem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
          setcoeff!(q, i - 1, coeff(q, i - 1) * b)
       end
       setcoeff!(q, length(f) - length(g), coeff(f, length(f) - 1))
-      f = f*b - coeff(f, length(f) - 1)*g*x^(length(f) - length(g))
+      f = f*b - shift_left(coeff(f, length(f) - 1)*g, length(f) - length(g))
    end
    while lenq > 0 && coeff(q, lenq - 1) == 0
       lenq -= 1
@@ -1076,6 +1132,82 @@ function resultant{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
 end
 
+function resultant_lehmer{T <: Union{ResidueElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
+   const crossover = 40
+   R = base_ring(a)
+   check_parent(a, b)
+   if length(a) == 0 || length(b) == 0
+      return zero(base_ring(a))
+   end
+   sgn = 1
+   if length(a) < length(b)
+      a, b = b, a
+      if iseven(length(a)) && iseven(length(b))
+         sgn = -sgn
+      end
+   end
+   lenA = length(a)
+   lenB = length(b)
+   if lenB == 1
+      return coeff(b, 0)^(lenA - 1)
+   end
+   c1 = content(a)
+   c2 = content(b)
+   A = divexact(a, c1)
+   B = divexact(b, c2)
+   s = R(1)
+   while lenB > crossover/2 + 1
+      shift = max(lenA - crossover, 0)
+      a = shift_right(A, shift)
+      b = shift_right(B, shift)
+      u1, v1 = R(1), R(0)
+      u2, v2 = R(0), R(1)
+      lena = lenA - shift
+      lenb = lenB - shift
+      if lenb > crossover/2 + 1
+         A = truncate(A, shift)
+         B = truncate(B, shift)
+         while lenb > crossover/2 + 1
+            if iseven(lena + shift) && iseven(lenb + shift)
+               sgn = -sgn
+            end
+            (q, b), a = divrem(a, b), b
+            u1, u2 = u2, u1 - q*u2
+            v1, v2 = v2, v1 - q*v2
+            s *= lead(a)^(lena - length(b))
+            lena = lenb
+            lenb = length(b)
+         end
+         A, B = u1*A + v1*B + shift_left(a, shift), u2*A + v2*B + shift_left(b, shift)
+      else
+         if iseven(lenA) && iseven(lenB)
+               sgn = -sgn
+         end
+         B, A = mod(A, B), B
+         s *= lead(A)^(lenA - length(B))
+      end
+      lenA = length(A)
+      lenB = length(B)
+      if lenB == 0
+         return zero(base_ring(a)), parent(A)(1), parent(A)(1)
+      end
+   end
+   while lenB > 1
+      if iseven(lenA) && iseven(lenB)
+         sgn = -sgn
+      end
+      B, A = mod(A, B), B
+      s *= lead(A)^(lenA - length(B))
+      lenA = lenB
+      lenB = length(B)
+      if lenB == 0
+         return zero(base_ring(A)) 
+      end
+   end
+   s *= lead(B)^(lenA - 1)
+   return c1^(lenB - 1)*c2^(lenA - 1)*s*sgn
+end
+
 function resultant{T <: Union{ResidueElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
    if length(a) == 0 || length(b) == 0
@@ -1097,7 +1229,9 @@ function resultant{T <: Union{ResidueElem, FieldElem}}(a::PolyElem{T}, b::PolyEl
    c2 = content(b)
    A = divexact(a, c1)
    B = divexact(b, c2)
-   s = 1
+   s = base_ring(A)(1)
+   lena = length(A)
+   lenb = length(B)
    while lenb > 1
       if iseven(lena) && iseven(lenb)
          sgn = -sgn
@@ -1111,7 +1245,7 @@ function resultant{T <: Union{ResidueElem, FieldElem}}(a::PolyElem{T}, b::PolyEl
       end
    end
    s *= lead(B)^(lena - 1)
-   res = c1^(lenb - 1)*c2^(lena - 1)*s*sgn
+   return c1^(lenb - 1)*c2^(lena - 1)*s*sgn
 end
 
 ###############################################################################

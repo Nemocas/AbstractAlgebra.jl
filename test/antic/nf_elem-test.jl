@@ -57,6 +57,25 @@ function test_nf_elem_fmpz_mat_conversions()
    println("PASS")
 end
 
+function test_nf_elem_fmpq_poly_conversion()
+   print("nf_elem.fmpq_poly_conversion...")
+
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+
+   @test R(a^2 + a) == x^2 + x
+
+   K, a = NumberField(x^2 - 7, "a")
+
+   @test R(a + 1) == x + 1
+
+   K, a = NumberField(x - 7, "a")
+
+   @test R(a) == R(7)
+
+   println("PASS")
+end
+
 function test_nf_elem_denominator()
    print("nf_elem.denominator...")
 
@@ -297,6 +316,7 @@ end
 function test_nf_elem()
    test_nf_elem_constructors()
    test_nf_elem_fmpz_mat_conversions()
+   test_nf_elem_fmpq_poly_conversion()
    test_nf_elem_denominator()
    test_nf_elem_conversions()
    test_nf_elem_manipulation()

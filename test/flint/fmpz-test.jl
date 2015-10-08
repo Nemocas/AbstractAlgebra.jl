@@ -3,7 +3,7 @@ function test_fmpz_abstract_types()
 
    @test fmpz <: RingElem
 
-   @test FlintIntegerRing <: Ring
+   @test FlintIntegerRing <: Nemo.Ring
 
    println("PASS")
 end

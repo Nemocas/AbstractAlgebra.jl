@@ -19,17 +19,21 @@ abstract Generic
 # mathematical domains, parameterised by a library
 # these are the type classes of parent objects
 
-   abstract Collection{T}
+   abstract Set{T}
 
-   abstract Ring{T} <: Collection{T}
+   abstract Group{T} <: Set{T}
+
+   abstract Ring{T} <: Group{T}
 
    abstract Field{T} <: Ring{T}
 
 # elements of mathematical domains
 
-   abstract CollectionElem
+   abstract SetElem
 
-   abstract RingElem <: CollectionElem
+   abstract GroupElem <: SetElem
+
+   abstract RingElem <: GroupElem
 
    abstract FieldElem <: RingElem
 
@@ -53,6 +57,8 @@ abstract Generic
 # leaf objects, with no parameterisation
 # these are also type classes of mathematical objects
 # usually provided by a C library and not by generic
+
+   abstract PermElem <: GroupElem
 
    abstract IntegerRingElem <: RingElem
 
