@@ -188,7 +188,7 @@ else
    cd("$wdir/pari-2.7.4")
    env_copy = copy(ENV)
    env_copy["LD_LIBRARY_PATH"] = "$vdir/lib"
-   env_copy["CFLAGS"] = "-Wl,-rpath,$vdir/lib"
+   env_copy["CFLAGS"] = "-Wl,-rpath,$vdir/lib -Wl,-rpath,\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/Nemo/local/lib"
    config_str = `./Configure --prefix=$vdir --with-gmp=$vdir --mt=pthread`
    config_str = setenv(config_str, env_copy)
    run(config_str)
