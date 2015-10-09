@@ -74,9 +74,9 @@ function den(a::Fraction)
    return divexact(a.den, u)
 end
 
-zero(a::FractionField) = parent(a)(0)
+zero(R::FractionField) = R(0)
 
-one(a::FractionField) = parent(a)(1)
+one(R::FractionField) = R(1)
 
 iszero(a::FractionElem) = iszero(num(a))
 
