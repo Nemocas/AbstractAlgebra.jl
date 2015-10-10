@@ -144,21 +144,6 @@ end
 
 prec(x::AcbField) = x.prec
 
-type acb_struct
-  real_mid_exp::Int     # fmpz
-  real_mid_size::UInt64 # mp_size_t
-  real_mid_d1::Int64    # mantissa_struct
-  real_mid_d2::Int64
-  real_rad_exp::Int     # fmpz
-  real_rad_man::UInt64
-  imag_mid_exp::Int     # fmpz
-  imag_mid_size::UInt64 # mp_size_t
-  imag_mid_d1::Int64    # mantissa_struct
-  imag_mid_d2::Int64
-  imag_rad_exp::Int     # fmpz
-  imag_rad_man::UInt64
-end
-
 type acb <: FieldElem
   real_mid_exp::Int     # fmpz
   real_mid_size::UInt # mp_size_t
