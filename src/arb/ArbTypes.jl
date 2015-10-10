@@ -73,63 +73,18 @@ type arb <: FieldElem
     return z
   end
 
-  function arb(x::arb, p::Int)
+  function arb(x::Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, AbstractString, arb}, p::Int)
     z = new()
     ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set_round, :libarb), Void,
-                (Ptr{arb}, Ptr{arb}, Int), &z, &x, p)
+    _arb_set(z, x, p)
     finalizer(z, _arb_clear_fn)
     return z
   end
 
-  function arb(s::AbstractString, p::Int)
-    s = bytestring(s)
+  function arb(x::Union{Int, UInt, Float64, fmpz, BigFloat, arb})
     z = new()
     ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    err = ccall((:arb_set_str, :libarb), Int32, (Ptr{arb}, Ptr{UInt8}, Int), &z, s, p)
-    finalizer(z, _arb_clear_fn)
-    err == 0 || error("Invalid real string: $(repr(s))")
-    return z
-  end
-
-  function arb(x::Int)
-    z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set_si, :libarb), Void, (Ptr{arb}, Int), &z, x)
-    finalizer(z, _arb_clear_fn)
-    return z
-  end
- 
-  function arb(i::UInt)
-    z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set_ui, :libarb), Void, (Ptr{arb}, UInt), &z, i)
-    finalizer(z, _arb_clear_fn)
-    return z
-  end
-
-  function arb(x::fmpz)
-    z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set_fmpz, :libarb), Void, (Ptr{arb}, Ptr{fmpz}), &z, &x)
-    finalizer(z, _arb_clear_fn)
-    return z
-  end
- 
-  function arb(x::fmpz, p::Int)
-    z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set_round_fmpz, :libarb), Void,
-                (Ptr{arb}, Ptr{fmpz}, Int), &z, &x, p)
-    finalizer(z, _arb_clear_fn)
-    return z
-  end
- 
-  function arb(x::fmpq, p::Int)
-    z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set_fmpq, :libarb), Void,
-                (Ptr{arb}, Ptr{fmpq}, Int), &z, &x, p)
+    _arb_set(z, x)
     finalizer(z, _arb_clear_fn)
     return z
   end
@@ -139,23 +94,6 @@ type arb <: FieldElem
     ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
     ccall((:arb_set, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &mid)
     ccall((:arb_add_error, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &rad)
-    finalizer(z, _arb_clear_fn)
-    return z
-  end
-
-  function arb(x::Float64)
-    z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set_d, :libarb), Void, (Ptr{arb}, Float64), &z, x)
-    finalizer(z, _arb_clear_fn)
-    return z
-  end
-
-  function arb(x::Float64, p::Int)
-    z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set_d, :libarb), Void, (Ptr{arb}, Float64), &z, x)
-    ccall((:arb_set_round, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &z, p)
     finalizer(z, _arb_clear_fn)
     return z
   end
@@ -205,6 +143,21 @@ type AcbField <: Field
 end
 
 prec(x::AcbField) = x.prec
+
+type acb_struct
+  real_mid_exp::Int     # fmpz
+  real_mid_size::UInt64 # mp_size_t
+  real_mid_d1::Int64    # mantissa_struct
+  real_mid_d2::Int64
+  real_rad_exp::Int     # fmpz
+  real_rad_man::UInt64
+  imag_mid_exp::Int     # fmpz
+  imag_mid_size::UInt64 # mp_size_t
+  imag_mid_d1::Int64    # mantissa_struct
+  imag_mid_d2::Int64
+  imag_rad_exp::Int     # fmpz
+  imag_rad_man::UInt64
+end
 
 type acb <: FieldElem
   real_mid_exp::Int     # fmpz
