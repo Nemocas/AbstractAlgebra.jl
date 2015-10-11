@@ -942,60 +942,61 @@ for (typeofx, passtoc) in ((arb, Ref{arb}), (Ptr{arb}, Ptr{arb}))
         ccall((:arb_set_round, :libarb), Void,
                     (($passtoc), ($passtoc), Int), x, x, p)
       end
+    end
+  end
 
-      function _arb_set(x::($typeofx), y::fmpz)
-        ccall((:arb_set_fmpz, :libarb), Void, (($passtoc), Ptr{fmpz}), x, &y)
-      end
+  @eval begin
+    function _arb_set(x::($typeofx), y::fmpz)
+      ccall((:arb_set_fmpz, :libarb), Void, (($passtoc), Ptr{fmpz}), x, &y)
+    end
 
-      function _arb_set(x::($typeofx), y::fmpz, p::Int)
-        ccall((:arb_set_round_fmpz, :libarb), Void,
-                    (($passtoc), Ptr{fmpz}, Int), x, &y, p)
-      end
+    function _arb_set(x::($typeofx), y::fmpz, p::Int)
+      ccall((:arb_set_round_fmpz, :libarb), Void,
+                  (($passtoc), Ptr{fmpz}, Int), x, &y, p)
+    end
 
-      function _arb_set(x::($typeofx), y::fmpq, p::Int)
-        ccall((:arb_set_fmpq, :libarb), Void,
-                    (($passtoc), Ptr{fmpq}, Int), x, &y, p)
-      end
+    function _arb_set(x::($typeofx), y::fmpq, p::Int)
+      ccall((:arb_set_fmpq, :libarb), Void,
+                  (($passtoc), Ptr{fmpq}, Int), x, &y, p)
+    end
 
-      function _arb_set(x::($typeofx), y::arb)
-        ccall((:arb_set, :libarb), Void, (($passtoc), Ptr{arb}, Int), x, &y)
-      end
+    function _arb_set(x::($typeofx), y::arb)
+      ccall((:arb_set, :libarb), Void, (($passtoc), Ptr{arb}, Int), x, &y)
+    end
 
-      function _arb_set(x::($typeofx), y::arb, p::Int)
-        ccall((:arb_set_round, :libarb), Void,
-                    (($passtoc), Ptr{arb}, Int), x, &y, p)
-      end
+    function _arb_set(x::($typeofx), y::arb, p::Int)
+      ccall((:arb_set_round, :libarb), Void,
+                  (($passtoc), Ptr{arb}, Int), x, &y, p)
+    end
 
-      function _arb_set(x::($typeofx), y::AbstractString, p::Int)
-        s = bytestring(y)
-        err = ccall((:arb_set_str, :libarb), Int32,
-                    (($passtoc), Ptr{UInt8}, Int), x, s, p)
-        err == 0 || error("Invalid real string: $(repr(s))")
-      end
+    function _arb_set(x::($typeofx), y::AbstractString, p::Int)
+      s = bytestring(y)
+      err = ccall((:arb_set_str, :libarb), Int32,
+                  (($passtoc), Ptr{UInt8}, Int), x, s, p)
+      err == 0 || error("Invalid real string: $(repr(s))")
+    end
 
-      function _arb_set(x::($typeofx), y::BigFloat)
-        m = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct},
-                    (($passtoc), ), x)
-        r = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct},
-                    (($passtoc), ), x)
-        ccall((:arf_set_mpfr, :libarb), Void,
-                    (Ptr{arf_struct}, Ptr{BigFloat}), m, &y)
-        ccall((:mag_zero, :libarb), Void, (Ptr{mag_struct}, ), r)
-      end
+    function _arb_set(x::($typeofx), y::BigFloat)
+      m = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct},
+                  (($passtoc), ), x)
+      r = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct},
+                  (($passtoc), ), x)
+      ccall((:arf_set_mpfr, :libarb), Void,
+                  (Ptr{arf_struct}, Ptr{BigFloat}), m, &y)
+      ccall((:mag_zero, :libarb), Void, (Ptr{mag_struct}, ), r)
+    end
 
-      function _arb_set(x::($typeofx), y::BigFloat, p::Int)
-        m = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (($passtoc), ), x)
-        r = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (($passtoc), ), x)
-        ccall((:arf_set_mpfr, :libarb), Void,
-                    (Ptr{arf_struct}, Ptr{BigFloat}), m, &y)
-        ccall((:mag_zero, :libarb), Void, (Ptr{mag_struct}, ), r)
-        ccall((:arb_set_round, :libarb), Void,
-                    (($passtoc), ($passtoc), Int), x, x, p)
-      end
+    function _arb_set(x::($typeofx), y::BigFloat, p::Int)
+      m = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (($passtoc), ), x)
+      r = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (($passtoc), ), x)
+      ccall((:arf_set_mpfr, :libarb), Void,
+                  (Ptr{arf_struct}, Ptr{BigFloat}), m, &y)
+      ccall((:mag_zero, :libarb), Void, (Ptr{mag_struct}, ), r)
+      ccall((:arb_set_round, :libarb), Void,
+                  (($passtoc), ($passtoc), Int), x, x, p)
     end
   end
 end
-  
 
 ################################################################################
 #
@@ -1009,49 +1010,8 @@ function call(r::ArbField)
   return z
 end
 
-function call(r::ArbField, x::Int)
-  z = arb(fmpz(x), r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::UInt)
-  z = arb(fmpz(x), r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::fmpz)
-  z = arb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::fmpq)
-  z = arb(x, r.prec)
-  z.parent = r
-  return z
-end
-  
-#function call(r::ArbField, x::arf)
-#  z = arb(arb(x), r.prec)
-#  z.parent = r
-#  return z
-#end
-
-function call(r::ArbField, x::Float64)
-  z = arb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::arb)
-  z = arb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::AbstractString)
+function call(r::ArbField, x::Union{Int, UInt, fmpz, fmpq, Float64, arb,
+                                    AbstractString, BigFloat})
   z = arb(x, r.prec)
   z.parent = r
   return z

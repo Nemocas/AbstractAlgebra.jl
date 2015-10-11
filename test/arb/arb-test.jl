@@ -30,6 +30,7 @@ function test_arb_basic_ops()
    @test RR("1.0") == a
    @test RR("1.0 +/- 0") == a
    @test RR("+1.00000e+0") == a
+   @test RR(BigFloat(1)) == a
 
    @test contains(ball(RR(1), RR(0.0001)), 1)
 
