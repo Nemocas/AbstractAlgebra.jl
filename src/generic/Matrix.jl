@@ -597,7 +597,7 @@ end
 #   LU factorisation
 #
 ###############################################################################
-
+         
 function lufact!{T <: FieldElem}(P::perm, A::Mat{T})
    m = rows(A)
    n = cols(A)
@@ -607,6 +607,7 @@ function lufact!{T <: FieldElem}(P::perm, A::Mat{T})
    R = base_ring(A)
    t = R()
    while r <= m && c <= n
+      reduce!(A.entries[r, c])
       if A[r, c] == 0
          i = r + 1
          while i <= m
@@ -641,15 +642,16 @@ function lufact!{T <: FieldElem}(P::perm, A::Mat{T})
    return rank
 end
 
-function lufact{T <: FieldElem}(P::perm, A::Mat{T})
-   parent(P).n != rows(A) && error("Permutation does not match matrix")
+function lufact{T <: FieldElem}(A::Mat{T}, P = FlintPermGroup(rows(A)))
+   P.n != rows(A) && error("Permutation does not match matrix")
+   p = P()
    S = parent(A)
    R = base_ring(A)
    U = deepcopy(A)
    m = rows(A)
    n = cols(A)
    L = S()
-   rank = lufact!(P, U)
+   rank = lufact!(p, U)
    for i = 1:m
       for j = 1:n
          if i > j
@@ -662,7 +664,7 @@ function lufact{T <: FieldElem}(P::perm, A::Mat{T})
          end
       end
    end
-   return rank, L, U
+   return rank, p, L, U
 end
 
 ###############################################################################
@@ -721,6 +723,60 @@ function determinant_clow{T <: RingElem}(M::Mat{T})
    return isodd(n) ? -D : D
 end
 
+function determinant{T <: RingElem}(M::Mat{T})
+   R = base_ring(M)
+   S, z = PolynomialRing(R, "z")
+   n = rows(M)
+   p = charpoly(S, M)
+   d = coeff(p, 0)
+   return isodd(n) ? -d : d
+end
+
+function determinant{T <: FieldElem}(M::Mat{T})
+   rows(M) != cols(M) && error("Not a square matrix in determinant")
+   n = rows(M)
+   if n == 0
+      return base_ring(M)()
+   end
+   A = deepcopy(M)
+   R = base_ring(A)
+   t = R()
+   for i = 1:n - 1
+      d = -A.entries[i, i]
+      for j = i + 1:n
+         for k = i + 1:n
+            mul!(A.entries[j, k], d, A.entries[j, k])
+            mul!(t, A.entries[j, i], A.entries[i, k])
+            addeq!(A.entries[j, k], t)
+         end
+      end
+      if i > 1
+         if A.entries[i - 1, i - 1] == 0
+            return base_ring(A)()
+         end
+         d = -inv(A.entries[i - 1, i - 1])
+         for j = i + 1:n
+            for k = i + 1:n
+               mul!(A.entries[j, k], A.entries[j, k], d)
+            end
+         end
+      else
+         for j = i + 1:n
+            for k = i + 1:n
+               A.entries[j, k] = -A.entries[j, k]
+            end
+         end
+      end
+   end
+   return A.entries[n, n]
+end
+
+###############################################################################
+#
+#   Characteristic polynomial
+#
+###############################################################################
+
 function charpoly{T <: RingElem}(V::PolynomialRing{T}, Y::Mat{T})
    rows(Y) != cols(Y) && error("Dimensions don't match in determinant")
    R = base_ring(Y)
@@ -772,15 +828,6 @@ function charpoly{T <: RingElem}(V::PolynomialRing{T}, Y::Mat{T})
       setcoeff!(f, n - i, F[i])
    end
    return f
-end
-
-function determinant{T <: RingElem}(M::Mat{T})
-   R = base_ring(M)
-   S, z = PolynomialRing(R, "z")
-   n = rows(M)
-   p = charpoly(S, M)
-   d = coeff(p, 0)
-   return isodd(n) ? -d : d
 end
 
 ###############################################################################

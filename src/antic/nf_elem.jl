@@ -746,8 +746,8 @@ end
 function Base.call(a::FmpqPolyRing, b::nf_elem)
    parent(parent(b).pol) != a && error("Cannot coerce from number field to polynomial ring")
    r = a()
-   ccall((:nf_elem_get_fmpq_poly, :libflint), Void, 
-         (Ptr{fmpq_poly}, Ptr{nf_elem}, Ptr{AnticNumberField}), &r, &b, &parent(b))
+   ccall((:fmpq_poly_set, :libflint), Void, 
+         (Ptr{fmpq_poly}, Ptr{nf_elem}), &r, &b)
    return r
 end
 
