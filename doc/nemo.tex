@@ -3336,6 +3336,69 @@ A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 b = content(A)
 \end{lstlisting}
 
+\subsubsection{LU factorisation}
+
+\begin{lstlisting}
+lufact{T <: FieldElem}(A::Mat{T}, P = FlintPermGroup(rows(a)))
+\end{lstlisting}
+
+\desc{Return a tuple $r, p, L, U$ consisting of the rank of $A$, a permutation
+$p$ of $A$ belonging to $P$, a lower triangular matrix $L$ and an upper
+triangular matrix $U$ such that $p(A) = LU$, where $p(A)$ stands for the
+matrix whose rows are the given permutation $p$ of the rows of $A$.}
+
+\begin{lstlisting}
+lufact{T <: FieldElem}(A::Mat{T}, P = FlintPermGroup(rows(a)))
+\end{lstlisting}
+
+\desc{Return a tuple $r, d, p, L, U$ consisting of the rank of $A$, a
+denominator $d$, a permutation $p$ of $A$ belonging to $P$, a lower triangular
+matrix $L$ and an upper triangular matrix $U$ such that $p(A) = LD^1U$, where
+$p(A)$ stands for the matrix whose rows are the given permutation $p$ of the
+rows of $A$ and such that $D$ is the diagonal matrix
+diag$(p_1, p_1p_2, \ldots, p_{n-2}p_{n-1}, p_{n-1}$ where the $p_i$ are the
+inverses of the diagonal entries of $U$. The denominator $d$ is set to
+$\pm \mbox{det}(S)$ where $S$ is an appropriate submatrix of $A$ ($S = A$ if
+$A$ is square) and the sign is decided by the parity of the permutation.}
+
+\textbf{Examples.}
+
+Here are some examples of LU factorisation.
+
+\begin{lstlisting}
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   S = MatrixSpace(K, 3, 3)
+   
+   A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 - 2 a - 1 2a])
+
+   r, P, L, U = lufact(A)
+   r, d, P, L, U = fflu(A)
+\end{lstlisting}
+
+\subsubsection{Determinant}
+
+\begin{lstlisting}
+determinant{T <: RingElem}(A::Mat{T})
+\end{lstlisting}
+
+\desc{Return the determinant of the matrix $A$. The matrix must be square,
+otherwise an exception is raised.}
+
+\textbf{Examples.}
+
+Here is an example of computing the determinant.
+
+\begin{lstlisting}
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   S = MatrixSpace(K, 3, 3)
+   
+   A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+
+   d = determinant(A)
+\end{lstlisting}
+
 \section{Generic fields}
 
 Nemo provides various constructions of fields. 

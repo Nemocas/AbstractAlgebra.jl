@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export Mat, MatrixSpace
+export Mat, MatrixSpace, fflu!, fflu
 
 ###############################################################################
 #
@@ -607,7 +607,6 @@ function lufact!{T <: FieldElem}(P::perm, A::Mat{T})
    R = base_ring(A)
    t = R()
    while r <= m && c <= n
-      reduce!(A.entries[r, c])
       if A[r, c] == 0
          i = r + 1
          while i <= m
@@ -643,14 +642,17 @@ function lufact!{T <: FieldElem}(P::perm, A::Mat{T})
 end
 
 function lufact{T <: FieldElem}(A::Mat{T}, P = FlintPermGroup(rows(A)))
-   P.n != rows(A) && error("Permutation does not match matrix")
-   p = P()
-   S = parent(A)
-   R = base_ring(A)
-   U = deepcopy(A)
    m = rows(A)
    n = cols(A)
-   L = S()
+   P.n != m && error("Permutation does not match matrix")
+   p = P()
+   R = base_ring(A)
+   U = deepcopy(A)
+   if m == n
+      L = parent(A)()
+   else
+      L = MatrixSpace(R, m, m)()
+   end
    rank = lufact!(p, U)
    for i = 1:m
       for j = 1:n
@@ -659,12 +661,94 @@ function lufact{T <: FieldElem}(A::Mat{T}, P = FlintPermGroup(rows(A)))
             U[i, j] = R()
          elseif i == j
             L[i, j] = R(1)
-         else
+         elseif j <= m
             L[i, j] = R()
          end
       end
    end
    return rank, p, L, U
+end
+
+function fflu!{T <: FieldElem}(P::perm, A::Mat{T})
+   m = rows(A)
+   n = cols(A)
+   rank = 0
+   r = 1
+   c = 1
+   R = base_ring(A)
+   d = R(1)
+   if m == 0 || n == 0
+      return 0, d
+   end
+   t = R()
+   while r <= m && c <= n
+      if A[r, c] == 0
+         i = r + 1
+         while i <= m
+            if A[i, c] != 0
+               for j = 1:n
+                  A.entries[i, j], A.entries[r, j] = A.entries[r, j], A.entries[i, j]
+               end
+               P[r], P[i] = P[i], P[r]
+               break
+            end
+            i += 1
+         end
+         if i > m
+            c += 1
+            continue
+         end
+      end
+      rank += 1
+      q = -A.entries[r, c]
+      for i = r + 1:m
+         for j = c + 1:n
+            mul!(A.entries[i, j], A.entries[i, j], q)
+            mul!(t, A.entries[i, c], A.entries[r, j])
+            addeq!(A.entries[i, j], t)
+            if r > 1
+               mul!(A.entries[i, j], A.entries[i, j], d)
+            else
+               A.entries[i, j] = -A.entries[i, j]
+            end
+         end
+      end
+      d = -inv(A.entries[r, c])
+      r += 1
+      c += 1
+   end
+   return rank, A.entries[r - 1, c - 1]
+end
+
+function fflu{T <: FieldElem}(A::Mat{T}, P = FlintPermGroup(rows(A)))
+   m = rows(A)
+   n = cols(A)
+   P.n != m && error("Permutation does not match matrix")
+   p = P()
+   R = base_ring(A)
+   U = deepcopy(A)
+   if m == n
+      L = parent(A)()
+   else
+      L = MatrixSpace(R, m, m)()
+   end
+   rank, d = fflu!(p, U)
+   for i = 1:m
+      for j = 1:n
+         if i > j
+            L[i, j] = U[i, j]
+            U[i, j] = R()
+         elseif i == j
+            L[i, j] = U[i, j]
+         elseif j <= m
+            L[i, j] = R()
+         end
+      end
+   end
+   if m > 0
+      L[m, m] = R(1)
+   end
+   return rank, d, p, L, U
 end
 
 ###############################################################################
@@ -739,36 +823,9 @@ function determinant{T <: FieldElem}(M::Mat{T})
       return base_ring(M)()
    end
    A = deepcopy(M)
-   R = base_ring(A)
-   t = R()
-   for i = 1:n - 1
-      d = -A.entries[i, i]
-      for j = i + 1:n
-         for k = i + 1:n
-            mul!(A.entries[j, k], d, A.entries[j, k])
-            mul!(t, A.entries[j, i], A.entries[i, k])
-            addeq!(A.entries[j, k], t)
-         end
-      end
-      if i > 1
-         if A.entries[i - 1, i - 1] == 0
-            return base_ring(A)()
-         end
-         d = -inv(A.entries[i - 1, i - 1])
-         for j = i + 1:n
-            for k = i + 1:n
-               mul!(A.entries[j, k], A.entries[j, k], d)
-            end
-         end
-      else
-         for j = i + 1:n
-            for k = i + 1:n
-               A.entries[j, k] = -A.entries[j, k]
-            end
-         end
-      end
-   end
-   return A.entries[n, n]
+   P = FlintPermGroup(n)()
+   r, d = fflu!(P, A)
+   return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
 end
 
 ###############################################################################
