@@ -896,6 +896,40 @@ function determinant{T <: RingElem}(M::Mat{T})
    end
 end
 
+function determinant(M::Mat{fmpz_poly})
+   rows(M) != cols(M) && error("Not a square matrix in determinant")
+   n = rows(M)
+   R = base_ring(M)
+   if n == 0
+      return R()
+   end  
+   maxlen = 0
+   for i = 1:n
+      for j = 1:n
+         maxlen = max(maxlen, length(M[i, j]))
+      end
+   end
+   if maxlen == 0
+      return R()
+   end
+   bound = n*(maxlen - 1) + 1
+   x = Array{elem_type(base_ring(R))}(bound)
+   d = Array{elem_type(base_ring(R))}(bound)
+   S = MatrixSpace(base_ring(R), n, n)
+   X = S()
+   b2 = div(bound, 2)
+   for i = 1:bound
+      x[i] = base_ring(R)(i - b2)
+      for j = 1:n
+         for k = 1:n
+            X[j, k] = evaluate(M[j, k], x[i])
+         end
+      end
+      d[i] = determinant(X)
+   end
+   return interpolate(R, x, d)
+end
+
 ###############################################################################
 #
 #   Characteristic polynomial
