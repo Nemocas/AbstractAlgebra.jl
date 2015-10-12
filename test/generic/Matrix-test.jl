@@ -312,7 +312,7 @@ function test_matrix_determinant()
 
    S, x = PolynomialRing(ResidueRing(ZZ, 1009*2003), "x")
 
-   function randpoly(d::Int, n::Int)
+   function randpoly(S, d::Int, n::Int)
       r = S()
       x = gen(S)
       for i = 0:rand(0:d)
@@ -326,7 +326,7 @@ function test_matrix_determinant()
       r = R()
       for i = 1:m
          for j = 1:m
-            r[i, j] = randpoly(d, n)
+            r[i, j] = randpoly(base_ring(R), d, n)
          end
       end
       return r
@@ -336,6 +336,16 @@ function test_matrix_determinant()
       R = MatrixSpace(S, dim, dim)
 
       M = randmat(R, 5, 100);
+
+      @test determinant(M) == Nemo.determinant_clow(M)
+   end
+
+   S, x = PolynomialRing(ZZ, "z")
+
+   for dim = 0:10
+      R = MatrixSpace(S, dim, dim)
+
+      M = randmat(R, 3, 20);
 
       @test determinant(M) == Nemo.determinant_clow(M)
    end
