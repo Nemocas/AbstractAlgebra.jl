@@ -5408,6 +5408,34 @@ c = S([R(1), R(0), R(2)])
 d = S(c)
 \end{lstlisting}
 
+\subsubsection{Basic manipulation}
+
+\begin{lstlisting}
+modulus(x::fmpz_mod_poly)
+\end{lstlisting}
+
+\desc{Return the modulus of the polynomial $x$.}
+
+\begin{lstlisting}
+modulus(R::FmpzModPolyRing)
+\end{lstlisting}
+
+\desc{Return the modulus of the polynomials in the ring $R$.}
+
+\textbf{Examples.}
+
+Here are some examples of basic manipulation.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 123456789012345678949)
+S, x = PolynomialRing(R, "x")
+
+a = x + 1
+
+m = modulus(a)
+n = modulus(S)
+\end{lstlisting}
+
 \subsubsection{Ad hoc binary operators}
 
 \begin{lstlisting}
@@ -5697,6 +5725,34 @@ a = S()
 b = S(x + 1)
 c = S([R(1), R(0), R(2)])
 d = S(c)
+\end{lstlisting}
+
+\subsubsection{Basic manipulation}
+
+\begin{lstlisting}
+modulus(x::nmod_poly)
+\end{lstlisting}
+
+\desc{Return the modulus of the polynomial $x$.}
+
+\begin{lstlisting}
+modulus(R::NmodPolyRing)
+\end{lstlisting}
+
+\desc{Return the modulus of the polynomials in the ring $R$.}
+
+\textbf{Examples.}
+
+Here are some examples of basic manipulation.
+
+\begin{lstlisting}
+R = ResidueRing(ZZ, 7)
+S, x = PolynomialRing(R, "x")
+
+a = x + 1
+
+m = modulus(a)
+n = modulus(S)
 \end{lstlisting}
 
 \subsubsection{Ad hoc binary operators}

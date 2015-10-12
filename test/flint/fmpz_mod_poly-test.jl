@@ -74,6 +74,10 @@ function test_fmpz_mod_poly_manipulation()
 
    @test deepcopy(f) == f
 
+  @test modulus(x) == 123456789012345678949
+
+  @test modulus(R) == 123456789012345678949
+
    println("PASS")
 end
 

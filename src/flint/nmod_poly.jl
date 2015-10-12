@@ -64,10 +64,14 @@ isgen(a::nmod_poly) = (degree(a) == 1 &&
 iszero(a::nmod_poly) = Bool(ccall((:nmod_poly_is_zero, :libflint), Int32,
                               (Ptr{nmod_poly}, ), &a))
 
+modulus(a::nmod_poly) = a.parent._n
+
+modulus(R::NmodPolyRing) = a._n
+
 var(R::NmodPolyRing) = R.S
 
 function deepcopy(a::nmod_poly)
-  z = nmod_poly(a.parent._n, a)
+  z = nmod_poly(modulus(a), a)
   z.parent = a.parent
   return z
 end
@@ -369,6 +373,8 @@ end
 function divexact(x::nmod_poly, y::nmod_poly)
   check_parent(x, y)
   iszero(y) && throw(DivideError())
+  d = gcd(UInt(data(lead(y))), modulus(x))
+  d != 1 && error("Impossible inverse in divexact")
   z = parent(x)()
   ccall((:nmod_poly_div, :libflint), Void, 
           (Ptr{nmod_poly}, Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &x, &y)

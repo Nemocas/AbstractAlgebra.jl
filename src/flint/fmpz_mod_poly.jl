@@ -61,9 +61,12 @@ iszero(a::fmpz_mod_poly) = Bool(ccall((:fmpz_mod_poly_is_zero, :libflint), Int32
 
 var(R::FmpzModPolyRing) = R.S
 
+modulus(a::fmpz_mod_poly) = a.parent._n
+
+modulus(R::FmpzModPolyRing) = a._n
+
 function deepcopy(a::fmpz_mod_poly)
-  n = parent(a)._n
-  z = fmpz_mod_poly(n, a)
+  z = fmpz_mod_poly(modulus(a), a)
   z.parent = a.parent
   return z
 end
@@ -409,11 +412,13 @@ end
 function divexact(x::fmpz_mod_poly, y::fmpz_mod_poly)
   check_parent(x, y)
   iszero(y) && throw(DivideError())
+  d = fmpz()
   q = parent(x)()
   r = parent(x)()
-  ccall((:fmpz_mod_poly_divrem, :libflint), Void, 
-        (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-               &q, &r, &x, &y)
+  ccall((:fmpz_mod_poly_divrem_f, :libflint), Void, 
+        (Ptr{fmpz}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
+               &d, &q, &r, &x, &y)
+  d != 1 && error("Impossible inverse in divexact")
   return q
 end
 

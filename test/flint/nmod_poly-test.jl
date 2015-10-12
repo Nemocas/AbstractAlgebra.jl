@@ -109,6 +109,10 @@ function test_nmod_poly_manipulation()
 
   @test var(Rx) == :x
 
+  @test modulus(x) == 17
+
+  @test modulus(R) == 17
+
   println("PASS")
 end
 
