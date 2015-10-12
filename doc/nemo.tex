@@ -5245,6 +5245,30 @@ f = x^3 + 3x + 1
 (r, s) = signature(f)
 \end{lstlisting}
 
+\subsubsection{Interpolation}
+
+\begin{lstlisting}
+interpolate(R::FmpzPolyRing, xval::Array{fmpz, 1}, yval::Array{fmpz, 1})
+\end{lstlisting}
+
+\desc{Returns the unique polynomial in the given ring $R$ of degree at most equal to the
+length of the two supplied arrays, which interpolates the values in the array \code{yval}
+at the values in the array \code{xval}.}
+
+\textbf{Examples.}
+
+Here is an example of interpolation.
+
+\begin{lstlisting}
+  S, x = PolynomialRing(ZZ, "x")
+
+  xval = [ ZZ(0), ZZ(1), ZZ(2), ZZ(3) ]
+
+  yval = [ ZZ(0), ZZ(1), ZZ(4), ZZ(9) ] 
+
+  f = interpolate(S, xval, yval)
+\end{lstlisting}
+
 \subsubsection{Special polynomials}
 
 The following functions compute univariate special polynomials over \code{fmpz}. It is expected
