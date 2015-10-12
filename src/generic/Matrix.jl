@@ -669,6 +669,57 @@ function lufact{T <: FieldElem}(A::Mat{T}, P = FlintPermGroup(rows(A)))
    return rank, p, L, U
 end
 
+function fflu!{T <: RingElem}(P::perm, A::Mat{T})
+   m = rows(A)
+   n = cols(A)
+   rank = 0
+   r = 1
+   c = 1
+   R = base_ring(A)
+   d = R(1)
+   if m == 0 || n == 0
+      return 0, d
+   end
+   t = R()
+   while r <= m && c <= n
+      if A[r, c] == 0
+         i = r + 1
+         while i <= m
+            if A[i, c] != 0
+               for j = 1:n
+                  A.entries[i, j], A.entries[r, j] = A.entries[r, j], A.entries[i, j]
+               end
+               P[r], P[i] = P[i], P[r]
+               break
+            end
+            i += 1
+         end
+         if i > m
+            c += 1
+            continue
+         end
+      end
+      rank += 1
+      q = -A.entries[r, c]
+      for i = r + 1:m
+         for j = c + 1:n
+            mul!(A.entries[i, j], A.entries[i, j], q)
+            mul!(t, A.entries[i, c], A.entries[r, j])
+            addeq!(A.entries[i, j], t)
+            if r > 1
+               A.entries[i, j] = divexact(A.entries[i, j], d)
+            else
+               A.entries[i, j] = -A.entries[i, j]
+            end
+         end
+      end
+      d = -A.entries[r, c]
+      r += 1
+      c += 1
+   end
+   return rank, A.entries[r - 1, c - 1]
+end
+
 function fflu!{T <: FieldElem}(P::perm, A::Mat{T})
    m = rows(A)
    n = cols(A)
@@ -720,7 +771,7 @@ function fflu!{T <: FieldElem}(P::perm, A::Mat{T})
    return rank, A.entries[r - 1, c - 1]
 end
 
-function fflu{T <: FieldElem}(A::Mat{T}, P = FlintPermGroup(rows(A)))
+function fflu{T <: RingElem}(A::Mat{T}, P = FlintPermGroup(rows(A)))
    m = rows(A)
    n = cols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -807,7 +858,7 @@ function determinant_clow{T <: RingElem}(M::Mat{T})
    return isodd(n) ? -D : D
 end
 
-function determinant{T <: RingElem}(M::Mat{T})
+function determinant_df{T <: RingElem}(M::Mat{T})
    R = base_ring(M)
    S, z = PolynomialRing(R, "z")
    n = rows(M)
@@ -826,6 +877,23 @@ function determinant{T <: FieldElem}(M::Mat{T})
    P = FlintPermGroup(n)()
    r, d = fflu!(P, A)
    return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
+end
+
+function determinant{T <: RingElem}(M::Mat{T})
+   rows(M) != cols(M) && error("Not a square matrix in determinant")
+   n = rows(M)
+   R = base_ring(M)
+   if n == 0
+      return R()
+   end       
+   try
+      A = deepcopy(M)
+      P = FlintPermGroup(n)()
+      r, d = fflu!(P, A)
+      return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
+   catch
+      return determinant_df(M)
+   end
 end
 
 ###############################################################################
