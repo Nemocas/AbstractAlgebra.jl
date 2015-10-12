@@ -67,7 +67,7 @@ iszero(a::nmod_poly) = Bool(ccall((:nmod_poly_is_zero, :libflint), Int32,
 var(R::NmodPolyRing) = R.S
 
 function deepcopy(a::nmod_poly)
-  z = nmod_poly(a)
+  z = nmod_poly(a.parent._n, a)
   z.parent = a.parent
   return z
 end

@@ -388,16 +388,17 @@ type nmod_poly <: PolyElem{Residue{fmpz}}
    function nmod_poly(n::UInt, f::fmpz_poly)
       z = new()
       ccall((:nmod_poly_init2, :libflint), Void,
-            (Ptr{nmod_poly}, UInt, Int), &z, n, degree(f))
+            (Ptr{nmod_poly}, UInt, Int), &z, n, length(f))
       ccall((:fmpz_poly_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{fmpz_poly}), &z, &f)
       finalizer(z, _nmod_poly_clear_fn)
       return z
    end
 
-   function nmod_poly(f::nmod_poly)
+   function nmod_poly(n::UInt, f::nmod_poly)
       z = new()
-      ccall((:nmod_poly_init, :libflint), Void, (Ptr{nmod_poly}, ), &z)
+      ccall((:nmod_poly_init2, :libflint), Void, 
+            (Ptr{nmod_poly}, UInt, Int), &z, n, length(f))
       ccall((:nmod_poly_set, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &f)
       finalizer(z, _nmod_poly_clear_fn)
@@ -517,7 +518,7 @@ type fmpz_mod_poly <: PolyElem{Residue{fmpz}}
    function fmpz_mod_poly(n::fmpz, f::fmpz_poly)
       z = new()
       ccall((:fmpz_mod_poly_init2, :libflint), Void,
-            (Ptr{fmpz_mod_poly}, Ptr{fmpz}, Int), &z, &n, degree(f))
+            (Ptr{fmpz_mod_poly}, Ptr{fmpz}, Int), &z, &n, length(f))
       ccall((:fmpz_mod_poly_set_fmpz_poly, :libflint), Void,
             (Ptr{fmpz_mod_poly}, Ptr{fmpz_poly}), &z, &f)
       finalizer(z, _fmpz_mod_poly_clear_fn)
@@ -526,7 +527,8 @@ type fmpz_mod_poly <: PolyElem{Residue{fmpz}}
 
    function fmpz_mod_poly(n::fmpz, f::fmpz_mod_poly)
       z = new()
-      ccall((:fmpz_mod_poly_init, :libflint), Void, (Ptr{fmpz_mod_poly}, Ptr{fmpz}), &z, &n)
+      ccall((:fmpz_mod_poly_init2, :libflint), Void,
+            (Ptr{fmpz_mod_poly}, Ptr{fmpz}, Int), &z, &n, length(f))
       ccall((:fmpz_mod_poly_set, :libflint), Void,
             (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), &z, &f)
       finalizer(z, _fmpz_mod_poly_clear_fn)
