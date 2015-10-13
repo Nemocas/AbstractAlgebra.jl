@@ -921,7 +921,7 @@ function determinant_interpolation{T <: RingElem}(M::Mat{Poly{T}})
    pt1 = base_ring(R)(1 - b2)
    for i = 1:bound
       x[i] = base_ring(R)(i - b2)
-      x[i] == pt1 && i != 1 error("Not enough interpolation points in ring")
+      (x[i] == pt1 && i != 1) && error("Not enough interpolation points in ring")
       for j = 1:n
          for k = 1:n
             X[j, k] = evaluate(M[j, k], x[i])
