@@ -45,13 +45,13 @@ include("AbstractTypes.jl")
 #
 ###############################################################################
 
-const pkgdir = Pkg.dir("Nemo")
-const libdir = Pkg.dir("Nemo", "local", "lib")
-const libgmp = Pkg.dir("Nemo", "local", "lib", "libgmp")
-const libmpfr = Pkg.dir("Nemo", "local", "lib", "libmpfr")
-const libflint = Pkg.dir("Nemo", "local", "lib", "libflint")
-const libpari = Pkg.dir("Nemo", "local", "lib", "libpari")
-const libarb = Pkg.dir("Nemo", "local", "lib", "libarb")
+const pkgdir = joinpath(dirname(@__FILE__), "..")
+const libdir = joinpath(pkgdir, "local", "lib")
+const libgmp = joinpath(pkgdir, "local", "lib", "libgmp")
+const libmpfr = joinpath(pkgdir, "local", "lib", "libmpfr")
+const libflint = joinpath(pkgdir, "local", "lib", "libflint")
+const libpari = joinpath(pkgdir, "local", "lib", "libpari")
+const libarb = joinpath(pkgdir, "local", "lib", "libarb")
   
 function allocatemem(bytes::Int)
    newsize = pari(fmpz(bytes)).d

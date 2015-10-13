@@ -64,14 +64,14 @@ end
 
 function real(x::acb)
   z = arb()
-  r = ccall((:acb_get_real, :libarb), Void, (Ptr{arb}, Ptr{acb}), &z, &x)
+  ccall((:acb_get_real, :libarb), Void, (Ptr{arb}, Ptr{acb}), &z, &x)
   z.parent = ArbField(parent(x).prec)
   return z
 end
 
 function imag(x::acb)
   z = arb()
-  r = ccall((:acb_get_imag, :libarb), Void, (Ptr{arb}, Ptr{acb}), &z, &x)
+  ccall((:acb_get_imag, :libarb), Void, (Ptr{arb}, Ptr{acb}), &z, &x)
   z.parent = ArbField(parent(x).prec)
   return z
 end
@@ -681,7 +681,159 @@ end
 function div!(z::acb, x::acb, y::acb)
   ccall((:acb_div, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}), &z, &x, &y)
 end
- 
+
+################################################################################
+#
+#  Unsafe setting
+#
+################################################################################
+
+for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
+  for (f,t) in (("acb_set_si", Int), ("acb_set_ui", UInt),
+                ("acb_set_d", Float64))
+    @eval begin
+      function _acb_set(x::($typeofx), y::($t))
+        ccall(($f, :libarb), Void, (($passtoc), ($t)), x, y)
+      end
+
+      function _acb_set(x::($typeofx), y::($t), p::Int)
+        _acb_set(x, y)
+        ccall((:acb_set_round, :libarb), Void,
+                    (($passtoc), ($passtoc), Int), x, x, p)
+      end
+    end
+  end
+
+  @eval begin
+    function _acb_set(x::($typeofx), y::fmpz)
+      ccall((:acb_set_fmpz, :libarb), Void, (($passtoc), Ptr{fmpz}), x, &y)
+    end
+
+    function _acb_set(x::($typeofx), y::fmpz, p::Int)
+      ccall((:acb_set_round_fmpz, :libarb), Void,
+                  (($passtoc), Ptr{fmpz}, Int), x, &y, p)
+    end
+
+    function _acb_set(x::($typeofx), y::fmpq, p::Int)
+      ccall((:acb_set_fmpq, :libarb), Void,
+                  (($passtoc), Ptr{fmpq}, Int), x, &y, p)
+    end
+
+    function _acb_set(x::($typeofx), y::arb)
+      ccall((:acb_set_arb, :libarb), Void, (($passtoc), Ptr{arb}), x, &y)
+    end
+
+    function _acb_set(x::($typeofx), y::arb, p::Int)
+      _acb_set(x, y)
+      ccall((:acb_set_round, :libarb), Void,
+                  (($passtoc), ($passtoc), Int), x, x, p)
+    end
+
+    function _acb_set(x::($typeofx), y::acb)
+      ccall((:acb_set, :libarb), Void, (($passtoc), Ptr{acb}, Int), x, &y)
+    end
+
+    function _acb_set(x::($typeofx), y::acb, p::Int)
+      ccall((:acb_set_round, :libarb), Void,
+                  (($passtoc), Ptr{acb}, Int), x, &y, p)
+    end
+
+    function _acb_set(x::($typeofx), y::AbstractString, p::Int)
+      r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+      _arb_set(r, y, p)
+      i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+      ccall((:arb_zero, :libarb), Void, (Ptr{arb}, ), i)
+    end
+
+    function _acb_set(x::($typeofx), y::BigFloat)
+      r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+      _arb_set(r, y)
+      i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+      ccall((:arb_zero, :libarb), Void, (Ptr{arb}, ), i)
+    end
+
+    function _acb_set(x::($typeofx), y::BigFloat, p::Int)
+      r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+      _arb_set(r, y, p)
+      i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+      ccall((:arb_zero, :libarb), Void, (Ptr{arb}, ), i)
+    end
+
+    function _acb_set(x::($typeofx), y::Int, z::Int, p::Int)
+      ccall((:acb_set_si_si, :libarb), Void,
+                  (($passtoc), Int, Int), x, y, z)
+      ccall((:acb_set_round, :libarb), Void,
+                  (($passtoc), ($passtoc), Int), x, x, p)
+    end
+
+    function _acb_set(x::($typeofx), y::fmpz, z::fmpz)
+      ccall((:acb_set_fmpz_fmpz, :libarb), Void,
+                  (($passtoc), ptr{fmpz}, ptr{fmpq}), x, &y, &z)
+    end
+
+    function _acb_set(x::($typeofx), y::fmpz, z::fmpz, p::Int)
+      _acb_set(x, y, z)
+      ccall((:acb_set_round, :libarb), Void,
+                  (($passtoc), ($passtoc), int), x, x, p)
+    end
+
+    function _acb_set(x::($typeofx), y::Float64, z::Float64)
+      ccall((:acb_set_d_d, :libarb), Void,
+                  (($passtoc), Float64, Float64), x, y, z)
+    end
+
+    function _acb_set(x::($typeofx), y::Float64, z::Float64, p::Int)
+      _acb_set(x, y, z)
+      ccall((:acb_set_round, :libarb), Void,
+                  (($passtoc), ($passtoc), int), x, x, p)
+    end
+
+    function _acb_set(x::($typeofx), y::arb, z::arb)
+      ccall((:acb_set_arb_arb, :libarb), Void,
+                  (($passtoc), Ptr{arb}, Ptr{arb}), x, &y, &z)
+    end
+
+    function _acb_set(x::($typeofx), y::arb, z::arb, p::Int)
+      _acb_set(x, y, z)
+      ccall((:acb_set_round, :libarb), Void,
+                  (($passtoc), ($passtoc), Int), x, x, p)
+    end
+
+    function _acb_set(x::($typeofx), y::fmpq, z::fmpq, p::Int)
+      r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+      _arb_set(r, y, p)
+      i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+      _arb_set(i, z, p)
+    end
+    
+    function _acb_set{T <: AbstractString}(x::($typeofx), y::T, z::T, p::Int)
+      r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+      _arb_set(r, y, p)
+      i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+      _arb_set(i, z, p)
+    end
+
+  end
+
+  for T in (Float64, BigFloat, UInt, fmpz)
+    @eval begin
+      function _acb_set(x::($typeofx), y::($T), z::($T))
+        r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+        _arb_set(r, y)
+        i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+        _arb_set(i, z)
+      end
+      
+      function _acb_set(x::($typeofx), y::($T), z::($T), p::Int)
+        r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+        _arb_set(r, y, p)
+        i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+        _arb_set(i, z, p)
+      end
+    end
+  end
+end
+
 ################################################################################
 #
 #  Parent object overload
@@ -694,74 +846,13 @@ function call(r::AcbField)
   return z
 end
 
-function call(r::AcbField, x::Int)
-  z = acb(x)
-  z = acb(z, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::AcbField, x::UInt)
-  z = acb(x)
-  z = acb(z, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::AcbField, x::fmpz)
+function call(r::AcbField, x::Union{Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString})
   z = acb(x, r.prec)
   z.parent = r
   return z
 end
 
-function call(r::AcbField, x::fmpq)
-  z = acb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::AcbField, x::arb)
-  z = acb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::AcbField, x::acb)
-  z = acb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::AcbField, x::Float64)
-  R = ArbField(r.prec)
-  return r(R(x))
-end
-
-function call(r::AcbField, x::AbstractString)
-  R = ArbField(r.prec)
-  return r(R(x))
-end
-
-function call(r::AcbField, x::Int, y::Int)
-  z = acb(x, y, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::AcbField, x::Union{Complex{Float64},Complex{Int}})
-  R = ArbField(r.prec)
-  z = acb(real(x), imag(x), r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::AcbField, x::Union{Int,Float64,fmpz,fmpq,arb,AbstractString},
-                           y::Union{Int,Float64,fmpz,fmpq,arb,AbstractString})
-  R = ArbField(r.prec)
-  return r(R(x), R(y))
-end
-
-function call(r::AcbField, x::arb, y::arb)
+function call{T <: Union{Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString}}(r::AcbField, x::T, y::T)
   z = acb(x, y, r.prec)
   z.parent = r
   return z

@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export Mat, MatrixSpace
+export Mat, MatrixSpace, fflu!, fflu
 
 ###############################################################################
 #
@@ -597,7 +597,7 @@ end
 #   LU factorisation
 #
 ###############################################################################
-
+         
 function lufact!{T <: FieldElem}(P::perm, A::Mat{T})
    m = rows(A)
    n = cols(A)
@@ -641,15 +641,19 @@ function lufact!{T <: FieldElem}(P::perm, A::Mat{T})
    return rank
 end
 
-function lufact{T <: FieldElem}(P::perm, A::Mat{T})
-   parent(P).n != rows(A) && error("Permutation does not match matrix")
-   S = parent(A)
-   R = base_ring(A)
-   U = deepcopy(A)
+function lufact{T <: FieldElem}(A::Mat{T}, P = FlintPermGroup(rows(A)))
    m = rows(A)
    n = cols(A)
-   L = S()
-   rank = lufact!(P, U)
+   P.n != m && error("Permutation does not match matrix")
+   p = P()
+   R = base_ring(A)
+   U = deepcopy(A)
+   if m == n
+      L = parent(A)()
+   else
+      L = MatrixSpace(R, m, m)()
+   end
+   rank = lufact!(p, U)
    for i = 1:m
       for j = 1:n
          if i > j
@@ -657,12 +661,145 @@ function lufact{T <: FieldElem}(P::perm, A::Mat{T})
             U[i, j] = R()
          elseif i == j
             L[i, j] = R(1)
-         else
+         elseif j <= m
             L[i, j] = R()
          end
       end
    end
-   return rank, L, U
+   return rank, p, L, U
+end
+
+function fflu!{T <: RingElem}(P::perm, A::Mat{T})
+   m = rows(A)
+   n = cols(A)
+   rank = 0
+   r = 1
+   c = 1
+   R = base_ring(A)
+   d = R(1)
+   if m == 0 || n == 0
+      return 0, d
+   end
+   t = R()
+   while r <= m && c <= n
+      if A[r, c] == 0
+         i = r + 1
+         while i <= m
+            if A[i, c] != 0
+               for j = 1:n
+                  A.entries[i, j], A.entries[r, j] = A.entries[r, j], A.entries[i, j]
+               end
+               P[r], P[i] = P[i], P[r]
+               break
+            end
+            i += 1
+         end
+         if i > m
+            c += 1
+            continue
+         end
+      end
+      rank += 1
+      q = -A.entries[r, c]
+      for i = r + 1:m
+         for j = c + 1:n
+            mul!(A.entries[i, j], A.entries[i, j], q)
+            mul!(t, A.entries[i, c], A.entries[r, j])
+            addeq!(A.entries[i, j], t)
+            if r > 1
+               A.entries[i, j] = divexact(A.entries[i, j], d)
+            else
+               A.entries[i, j] = -A.entries[i, j]
+            end
+         end
+      end
+      d = -A.entries[r, c]
+      r += 1
+      c += 1
+   end
+   return rank, A.entries[r - 1, c - 1]
+end
+
+function fflu!{T <: FieldElem}(P::perm, A::Mat{T})
+   m = rows(A)
+   n = cols(A)
+   rank = 0
+   r = 1
+   c = 1
+   R = base_ring(A)
+   d = R(1)
+   if m == 0 || n == 0
+      return 0, d
+   end
+   t = R()
+   while r <= m && c <= n
+      if A[r, c] == 0
+         i = r + 1
+         while i <= m
+            if A[i, c] != 0
+               for j = 1:n
+                  A.entries[i, j], A.entries[r, j] = A.entries[r, j], A.entries[i, j]
+               end
+               P[r], P[i] = P[i], P[r]
+               break
+            end
+            i += 1
+         end
+         if i > m
+            c += 1
+            continue
+         end
+      end
+      rank += 1
+      q = -A.entries[r, c]
+      for i = r + 1:m
+         for j = c + 1:n
+            mul!(A.entries[i, j], A.entries[i, j], q)
+            mul!(t, A.entries[i, c], A.entries[r, j])
+            addeq!(A.entries[i, j], t)
+            if r > 1
+               mul!(A.entries[i, j], A.entries[i, j], d)
+            else
+               A.entries[i, j] = -A.entries[i, j]
+            end
+         end
+      end
+      d = -inv(A.entries[r, c])
+      r += 1
+      c += 1
+   end
+   return rank, A.entries[r - 1, c - 1]
+end
+
+function fflu{T <: RingElem}(A::Mat{T}, P = FlintPermGroup(rows(A)))
+   m = rows(A)
+   n = cols(A)
+   P.n != m && error("Permutation does not match matrix")
+   p = P()
+   R = base_ring(A)
+   U = deepcopy(A)
+   if m == n
+      L = parent(A)()
+   else
+      L = MatrixSpace(R, m, m)()
+   end
+   rank, d = fflu!(p, U)
+   for i = 1:m
+      for j = 1:n
+         if i > j
+            L[i, j] = U[i, j]
+            U[i, j] = R()
+         elseif i == j
+            L[i, j] = U[i, j]
+         elseif j <= m
+            L[i, j] = R()
+         end
+      end
+   end
+   if m > 0
+      L[m, m] = R(1)
+   end
+   return rank, d, p, L, U
 end
 
 ###############################################################################
@@ -721,6 +858,84 @@ function determinant_clow{T <: RingElem}(M::Mat{T})
    return isodd(n) ? -D : D
 end
 
+function determinant_df{T <: RingElem}(M::Mat{T})
+   R = base_ring(M)
+   S, z = PolynomialRing(R, "z")
+   n = rows(M)
+   p = charpoly(S, M)
+   d = coeff(p, 0)
+   return isodd(n) ? -d : d
+end
+
+function determinant{T <: FieldElem}(M::Mat{T})
+   rows(M) != cols(M) && error("Not a square matrix in determinant")
+   n = rows(M)
+   if n == 0
+      return base_ring(M)()
+   end
+   A = deepcopy(M)
+   P = FlintPermGroup(n)()
+   r, d = fflu!(P, A)
+   return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
+end
+
+function determinant{T <: RingElem}(M::Mat{T})
+   rows(M) != cols(M) && error("Not a square matrix in determinant")
+   n = rows(M)
+   R = base_ring(M)
+   if n == 0
+      return R()
+   end       
+   try
+      A = deepcopy(M)
+      P = FlintPermGroup(n)()
+      r, d = fflu!(P, A)
+      return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
+   catch
+      return determinant_df(M)
+   end
+end
+
+function determinant(M::Mat{fmpz_poly})
+   rows(M) != cols(M) && error("Not a square matrix in determinant")
+   n = rows(M)
+   R = base_ring(M)
+   if n == 0
+      return R()
+   end  
+   maxlen = 0
+   for i = 1:n
+      for j = 1:n
+         maxlen = max(maxlen, length(M[i, j]))
+      end
+   end
+   if maxlen == 0
+      return R()
+   end
+   bound = n*(maxlen - 1) + 1
+   x = Array{elem_type(base_ring(R))}(bound)
+   d = Array{elem_type(base_ring(R))}(bound)
+   S = MatrixSpace(base_ring(R), n, n)
+   X = S()
+   b2 = div(bound, 2)
+   for i = 1:bound
+      x[i] = base_ring(R)(i - b2)
+      for j = 1:n
+         for k = 1:n
+            X[j, k] = evaluate(M[j, k], x[i])
+         end
+      end
+      d[i] = determinant(X)
+   end
+   return interpolate(R, x, d)
+end
+
+###############################################################################
+#
+#   Characteristic polynomial
+#
+###############################################################################
+
 function charpoly{T <: RingElem}(V::PolynomialRing{T}, Y::Mat{T})
    rows(Y) != cols(Y) && error("Dimensions don't match in determinant")
    R = base_ring(Y)
@@ -772,15 +987,6 @@ function charpoly{T <: RingElem}(V::PolynomialRing{T}, Y::Mat{T})
       setcoeff!(f, n - i, F[i])
    end
    return f
-end
-
-function determinant{T <: RingElem}(M::Mat{T})
-   R = base_ring(M)
-   S, z = PolynomialRing(R, "z")
-   n = rows(M)
-   p = charpoly(S, M)
-   d = coeff(p, 0)
-   return isodd(n) ? -d : d
 end
 
 ###############################################################################

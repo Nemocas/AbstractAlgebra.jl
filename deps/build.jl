@@ -14,6 +14,8 @@ if !ispath(Pkg.dir("Nemo", "local", "lib"))
     mkdir(Pkg.dir("Nemo", "local", "lib"))
 end
 
+LDFLAGS = "-Wl,-rpath,$vdir/lib -Wl,-rpath,\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/Nemo/local/lib"
+
 cd(wdir)
 
 #install libpthreads
@@ -97,7 +99,8 @@ if on_windows
    end
 else
    cd("$wdir/mpfr-3.1.3")
-   run(`./configure --prefix=$vdir --with-gmp=$vdir --disable-static --enable-shared`)
+   withenv(()->run(`./configure --prefix=$vdir --with-gmp=$vdir --disable-static --enable-shared`), 
+                           "LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS)
    run(`make -j4`)
    run(`make install`)
    cd(wdir)
@@ -132,11 +135,12 @@ if on_windows
       download("http://nemocas.org/binaries/w64-libflint.dll", joinpath(vdir, "lib", "libflint.dll"))
    end
    try
-      run(`ln -s $vdir\\lib\\libflint.dll $vdir\\lib\\libflint-13.dll`)
+      run(`ln -sf $vdir\\lib\\libflint.dll $vdir\\lib\\libflint-13.dll`)
    end
 else
    cd("$wdir/flint2")
-   run(`./configure --prefix=$vdir --extensions="$wdir/antic" --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir`)
+   withenv(()->run(`./configure --prefix=$vdir --extensions="$wdir/antic" --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir`), 
+                           "LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS)
    run(`make -j4`)
    run(`make install`)
 end
@@ -159,7 +163,8 @@ if on_windows
    end
 else
    cd("$wdir/arb")
-   run(`./configure --prefix=$vdir --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir --with-flint=$vdir`)
+   withenv(()->run(`./configure --prefix=$vdir --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir --with-flint=$vdir`), 
+                           "LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS)
    run(`make -j4`)
    run(`make install`)
 end
@@ -186,12 +191,13 @@ if on_windows
    end
 else
    cd("$wdir/pari-2.7.4")
-   env_copy = copy(ENV)
-   env_copy["LD_LIBRARY_PATH"] = "$vdir/lib"
-   env_copy["CFLAGS"] = "-Wl,-rpath,$vdir/lib"
-   config_str = `./Configure --prefix=$vdir --with-gmp=$vdir --mt=pthread`
-   config_str = setenv(config_str, env_copy)
-   run(config_str)
+   #env_copy = copy(ENV)
+   #env_copy["LD_LIBRARY_PATH"] = "$vdir/lib"
+   #env_copy["CFLAGS"] = 
+   withenv(()->run(`./Configure --prefix=$vdir --with-gmp=$vdir --mt=pthread`), 
+                           "LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS)
+   #config_str = setenv(config_str, env_copy)
+   #run(config_str)
    run(`make -j4 gp`)
    run(`make install`)
 end

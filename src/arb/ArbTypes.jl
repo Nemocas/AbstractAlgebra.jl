@@ -91,63 +91,19 @@ type arb <: FieldElem
     return z
   end
 
-  function arb(x::arb, p::Int)
+  function arb(x::Union{Int, UInt, Float64, fmpz, fmpq,
+                        BigFloat, AbstractString, arb}, p::Int)
     z = new()
     ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set_round, :libarb), Void,
-                (Ptr{arb}, Ptr{arb}, Int), &z, &x, p)
+    _arb_set(z, x, p)
     finalizer(z, _arb_clear_fn)
     return z
   end
 
-  function arb(s::AbstractString, p::Int)
-    s = bytestring(s)
+  function arb(x::Union{Int, UInt, Float64, fmpz, BigFloat, arb})
     z = new()
     ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    err = ccall((:arb_set_str, :libarb), Int32, (Ptr{arb}, Ptr{UInt8}, Int), &z, s, p)
-    finalizer(z, _arb_clear_fn)
-    err == 0 || error("Invalid real string: $(repr(s))")
-    return z
-  end
-
-  function arb(x::Int)
-    z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set_si, :libarb), Void, (Ptr{arb}, Int), &z, x)
-    finalizer(z, _arb_clear_fn)
-    return z
-  end
- 
-  function arb(i::UInt)
-    z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set_ui, :libarb), Void, (Ptr{arb}, UInt), &z, i)
-    finalizer(z, _arb_clear_fn)
-    return z
-  end
-
-  function arb(x::fmpz)
-    z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set_fmpz, :libarb), Void, (Ptr{arb}, Ptr{fmpz}), &z, &x)
-    finalizer(z, _arb_clear_fn)
-    return z
-  end
- 
-  function arb(x::fmpz, p::Int)
-    z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set_round_fmpz, :libarb), Void,
-                (Ptr{arb}, Ptr{fmpz}, Int), &z, &x, p)
-    finalizer(z, _arb_clear_fn)
-    return z
-  end
- 
-  function arb(x::fmpq, p::Int)
-    z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set_fmpq, :libarb), Void,
-                (Ptr{arb}, Ptr{fmpq}, Int), &z, &x, p)
+    _arb_set(z, x)
     finalizer(z, _arb_clear_fn)
     return z
   end
@@ -157,23 +113,6 @@ type arb <: FieldElem
     ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
     ccall((:arb_set, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &mid)
     ccall((:arb_add_error, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &rad)
-    finalizer(z, _arb_clear_fn)
-    return z
-  end
-
-  function arb(x::Float64)
-    z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set_d, :libarb), Void, (Ptr{arb}, Float64), &z, x)
-    finalizer(z, _arb_clear_fn)
-    return z
-  end
-
-  function arb(x::Float64, p::Int)
-    z = new()
-    ccall((:arb_init, :libarb), Void, (Ptr{arb}, ), &z)
-    ccall((:arb_set_d, :libarb), Void, (Ptr{arb}, Float64), &z, x)
-    ccall((:arb_set_round, :libarb), Void, (Ptr{arb}, Ptr{arb}, Int), &z, &z, p)
     finalizer(z, _arb_clear_fn)
     return z
   end
@@ -246,92 +185,36 @@ type acb <: FieldElem
     return z
   end
 
-  function acb(x::Int)
+  function acb(x::Union{Int, UInt, Float64, fmpz, BigFloat, arb, acb})
     z = new()
     ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
-    ccall((:acb_set_si, :libarb), Void, (Ptr{acb}, Int), &z, x)
-    finalizer(z, _acb_clear_fn)
-    return z
-  end
-  
-  function acb(i::UInt)
-    z = new()
-    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
-    ccall((:acb_set_ui, :libarb), Void, (Ptr{acb}, UInt), &z, i)
+    _acb_set(z, x)
     finalizer(z, _acb_clear_fn)
     return z
   end
 
-  function acb(x::fmpz)
+  function acb(x::Union{Int, UInt, Float64, fmpz, fmpq,
+                        BigFloat, arb, acb, AbstractString}, p::Int)
     z = new()
     ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
-    ccall((:acb_set_fmpz, :libarb), Void, (Ptr{acb}, Ptr{fmpz}), &z, &x)
+    _acb_set(z, x, p)
     finalizer(z, _acb_clear_fn)
     return z
   end
 
-  function acb(x::arb)
+  function acb{T <: Union{Int, UInt, Float64, fmpz, BigFloat, arb}}(x::T, y::T)
     z = new()
     ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
-    ccall((:acb_set_arb, :libarb), Void, (Ptr{acb}, Ptr{arb}), &z, &x)
+    _acb_set(z, x, y)
     finalizer(z, _acb_clear_fn)
     return z
   end
-
-  function acb(x::acb, p::Int)
+   
+  function acb{T <: Union{Int, UInt, Float64, fmpz, fmpq,
+                          BigFloat, AbstractString, arb}}(x::T, y::T, p::Int)
     z = new()
     ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
-    ccall((:acb_set_round, :libarb), Void,
-                (Ptr{acb}, Ptr{acb}, Int), &z, &x, p)
-    finalizer(z, _acb_clear_fn)
-    return z
-  end
-
-  function acb(x::fmpz, p::Int)
-    z = new()
-    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
-    ccall((:acb_set_round_fmpz, :libarb), Void,
-                (Ptr{acb}, Ptr{fmpz}, Int), &z, &x, p)
-    finalizer(z, _acb_clear_fn)
-    return z
-  end
-
-  function acb(x::fmpq, p::Int)
-    z = new()
-    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
-    ccall((:acb_set_fmpq, :libarb), Void,
-                (Ptr{acb}, Ptr{fmpq}, Int), &z, &x, p)
-    finalizer(z, _acb_clear_fn)
-    return z
-  end
-
-  function acb(x::arb, p::Int)
-    z = new()
-    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
-    ccall((:acb_set_round_arb, :libarb), Void,
-                (Ptr{acb}, Ptr{arb}, Int), &z, &x, p)
-    finalizer(z, _acb_clear_fn)
-    return z
-  end
-
-  function acb(x::Int, y::Int, p::Int)
-    z = new()
-    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
-    ccall((:acb_set_si_si, :libarb), Void,
-                (Ptr{acb}, Int, Int, Int), &z, x, y, p)
-    ccall((:acb_set_round, :libarb), Void,
-                (Ptr{acb}, Ptr{acb}, Int), &z, &z, p)
-    finalizer(z, _acb_clear_fn)
-    return z
-  end
-
-  function acb(x::arb, y::arb, p::Int)
-    z = new()
-    ccall((:acb_init, :libarb), Void, (Ptr{acb}, ), &z)
-    ccall((:acb_set_arb_arb, :libarb), Void,
-                (Ptr{acb}, Ptr{arb}, Ptr{arb}, Int), &z, &x, &y, p)
-    ccall((:acb_set_round, :libarb), Void,
-                (Ptr{acb}, Ptr{acb}, Int), &z, &z, p)
+    _acb_set(z, x, y, p)
     finalizer(z, _acb_clear_fn)
     return z
   end

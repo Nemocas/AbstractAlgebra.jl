@@ -31,10 +31,14 @@ function test_acb_basic_ops()
    @test CC("1.0") == a
    @test CC("1.0 +/- 0") == a
    @test CC("+1.00000e+0") == a
+   @test CC(BigFloat(1)) == a
 
    b = CC(2,3)
    @test CC("2","3") == b
    @test CC(RR(2),RR(3)) == b
+   @test CC(UInt(2), UInt(3)) == b
+   @test CC(2.0, 3.0) == b
+   @test CC(BigFloat(2), BigFloat(3)) == b
    @test real(b) == 2
    @test imag(b) == 3
 

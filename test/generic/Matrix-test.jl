@@ -236,31 +236,73 @@ function test_matrix_lufact()
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixSpace(K, 3, 3)
-   T = PermutationGroup(3)
-
+   
    A = S([a + 1 2a + 3 a^2 + 1; 2a^2 - 1 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 
-   P = T()
-   r, L, U = lufact(P, A)
+   r, P, L, U = lufact(A)
 
    @test r == 3
    @test P*A == L*U
 
    A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 
-   P = T()
-   r, L, U = lufact(P, A)
+   r, P, L, U = lufact(A)
 
    @test r == 3
    @test P*A == L*U
 
    A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 - 2 a - 1 2a])
 
-   P = T()
-   r, L, U = lufact(P, A)
+   r, P, L, U = lufact(A)
 
    @test r == 2
    @test P*A == L*U
+
+   println("PASS")
+end
+
+function test_matrix_fflu()
+   print("Matrix.fflu...")
+
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   S = MatrixSpace(K, 3, 3)
+   
+   A = S([a + 1 2a + 3 a^2 + 1; 2a^2 - 1 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+
+   r, d, P, L, U = fflu(A)
+
+   D = S()
+   D[1, 1] = inv(U[1, 1])
+   D[2, 2] = inv(U[1, 1]*U[2, 2])
+   D[3, 3] = inv(U[2, 2])
+   
+   @test r == 3
+   @test P*A == L*D*U
+
+   A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+
+   r, d, P, L, U = fflu(A)
+
+   D = S()
+   D[1, 1] = inv(U[1, 1])
+   D[2, 2] = inv(U[1, 1]*U[2, 2])
+   D[3, 3] = inv(U[2, 2])
+   
+   @test r == 3
+   @test P*A == L*D*U
+
+   A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 - 2 a - 1 2a])
+
+   r, d, P, L, U = fflu(A)
+
+   D = S()
+   D[1, 1] = inv(U[1, 1])
+   D[2, 2] = inv(U[1, 1]*U[2, 2])
+   D[3, 3] = inv(U[2, 2])
+   
+   @test r == 2
+   @test P*A == L*D*U
 
    println("PASS")
 end
@@ -270,7 +312,7 @@ function test_matrix_determinant()
 
    S, x = PolynomialRing(ResidueRing(ZZ, 1009*2003), "x")
 
-   function randpoly(d::Int, n::Int)
+   function randpoly(S, d::Int, n::Int)
       r = S()
       x = gen(S)
       for i = 0:rand(0:d)
@@ -279,12 +321,12 @@ function test_matrix_determinant()
       return r
    end
 
-   function randmat(R, d::Int, n::Int)
+   function randmat{T <: RingElem}(R::MatrixSpace{T}, d::Int, n::Int)
       m = R.rows
       r = R()
       for i = 1:m
          for j = 1:m
-            r[i, j] = randpoly(d, n)
+            r[i, j] = randpoly(base_ring(R), d, n)
          end
       end
       return r
@@ -294,6 +336,46 @@ function test_matrix_determinant()
       R = MatrixSpace(S, dim, dim)
 
       M = randmat(R, 5, 100);
+
+      @test determinant(M) == Nemo.determinant_clow(M)
+   end
+
+   S, x = PolynomialRing(ZZ, "z")
+
+   for dim = 0:10
+      R = MatrixSpace(S, dim, dim)
+
+      M = randmat(R, 3, 20);
+
+      @test determinant(M) == Nemo.determinant_clow(M)
+   end
+
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+
+   function randelem(n)
+      s = K(0)
+      for i = 1:3
+         s += rand(-n:n)*a^(i-1)
+      end
+      return s
+   end
+
+   function randmat{T <: FieldElem}(S::MatrixSpace{T}, n::Int)
+      M = S()
+      d = rows(M)
+      for i = 1:d
+         for j = 1:d
+            M[i, j] = randelem(n)
+         end
+      end
+      return M
+   end
+   
+   for dim = 0:10
+      S = MatrixSpace(K, dim, dim)
+
+      M = randmat(S, 100);
 
       @test determinant(M) == Nemo.determinant_clow(M)
    end
@@ -316,6 +398,7 @@ function test_matrix()
    test_matrix_trace()
    test_matrix_content()
    test_matrix_lufact()
+   test_matrix_fflu()
    test_matrix_determinant()
 
    println("")

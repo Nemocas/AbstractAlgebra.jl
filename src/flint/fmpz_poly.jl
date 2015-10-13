@@ -547,6 +547,32 @@ function signature(f::fmpz_poly)
    return (r[1], s[1])
 end
 
+################################################################################
+#
+#  Interpolation
+#
+################################################################################
+
+function interpolate(R::FmpzPolyRing, x::Array{fmpz, 1},
+                                      y::Array{fmpz, 1})
+  z = R()
+
+  ax = Array(Int, length(x))
+  ay = Array(Int, length(y))
+
+  t = fmpz()
+
+  for i in 1:length(x)
+    ax[i] = x[i].d
+    ay[i] = y[i].d
+  end
+
+  ccall((:fmpz_poly_interpolate_fmpz_vec, :libflint), Void,
+          (Ptr{fmpz_poly}, Ptr{Int}, Ptr{Int}, Int),
+          &z, ax, ay, length(x))
+  return z
+end
+
 ###############################################################################
 #
 #   Special polynomials
