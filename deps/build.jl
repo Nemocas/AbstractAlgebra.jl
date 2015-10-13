@@ -135,7 +135,7 @@ if on_windows
       download("http://nemocas.org/binaries/w64-libflint.dll", joinpath(vdir, "lib", "libflint.dll"))
    end
    try
-      run(`ln -s $vdir\\lib\\libflint.dll $vdir\\lib\\libflint-13.dll`)
+      run(`ln -sf $vdir\\lib\\libflint.dll $vdir\\lib\\libflint-13.dll`)
    end
 else
    cd("$wdir/flint2")
