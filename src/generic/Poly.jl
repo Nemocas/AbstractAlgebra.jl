@@ -11,7 +11,7 @@ export Poly, PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow,
        normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod, 
        invmod, lcm, divrem, mod, gcdinv, canonical_unit, var, chebyshev_t,
        chebyshev_u, set_length!, mul_classical, sqr_classical, mul_ks,
-       mul_karatsuba, pow_multinomial
+       mul_karatsuba, pow_multinomial, monomial_to_newton!, newton_to_monomial!
 
 ###############################################################################
 #
@@ -53,7 +53,6 @@ function normalise(a::Poly, len::Int)
    while len > 0 && iszero(a.coeffs[len]) 
       len -= 1
    end
-
    return len
 end
 
@@ -1404,6 +1403,78 @@ end
 
 ###############################################################################
 #
+#   Newton representation
+#
+###############################################################################
+
+function monomial_to_newton!{T <: RingElem}(P::Array{T}, roots::Array{T})
+   n = length(roots)
+   if n > 0
+      R = parent(roots[1])
+      t = R()
+      for i = 1:n - 1
+         for j = n - 1:-1:i
+            mul!(t, P[j + 1], roots[i])
+            addeq!(P[j], t)
+         end
+      end
+   end
+   return
+end
+
+function newton_to_monomial!{T <: RingElem}(P::Array{T}, roots::Array{T})
+   n = length(roots)
+   if n > 0
+      R = parent(roots[1])
+      t = R()
+      for i = n - 1:-1:1
+         d = -roots[i]
+         for j = i:n - 1
+            mul!(t, P[j + 1], d)
+            addeq!(P[j], t)
+         end
+      end
+   end
+   return
+end
+
+###############################################################################
+#
+#   Interpolation
+#
+###############################################################################
+
+function interpolate{T <: RingElem}(S::PolynomialRing, x::Array{T}, y::Array{T})
+   length(x) != length(y) && error("Array lengths don't match in interpolate")
+   n = length(x)
+   if n == 0
+      return S()
+   elseif n == 1
+      return S(y[1])
+   end
+   R = base_ring(S)
+   parent(y[1]) != R && error("Polynomial ring does not match inputs")
+   P = Array{T}(n)
+   for i = 1:n
+      P[i] = deepcopy(y[i])
+   end
+   for i = 2:n
+      t = P[i - 1]
+      for j = i:n
+         p = P[j] - t
+         q = x[j] - x[j - i + 1]
+         t = P[j]
+         P[j] = divexact(p, q)
+      end
+   end
+   newton_to_monomial!(P, x)
+   r = S(P)
+   set_length!(r, normalise(r, n))
+   return r
+end
+
+###############################################################################
+#
 #   Special functions
 #
 ###############################################################################
@@ -1513,6 +1584,13 @@ function mul!{T <: RingElem}(c::Poly{T}, a::Poly{T}, b::Poly{T})
    if lena == 0 || lenb == 0
       c.length = 0
    else
+      if a === c
+         a = deepcopy(a)
+      end
+      if b === c
+         b = deepcopy(b)
+      end
+
       t = base_ring(a)()
 
       lenc = lena + lenb - 1

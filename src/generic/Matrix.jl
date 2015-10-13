@@ -896,7 +896,7 @@ function determinant{T <: RingElem}(M::Mat{T})
    end
 end
 
-function determinant(M::Mat{fmpz_poly})
+function determinant_interpolation{T <: RingElem}(M::Mat{Poly{T}})
    rows(M) != cols(M) && error("Not a square matrix in determinant")
    n = rows(M)
    R = base_ring(M)
@@ -918,8 +918,10 @@ function determinant(M::Mat{fmpz_poly})
    S = MatrixSpace(base_ring(R), n, n)
    X = S()
    b2 = div(bound, 2)
+   pt1 = base_ring(R)(1 - b2)
    for i = 1:bound
       x[i] = base_ring(R)(i - b2)
+      if x[i] == pt1 && i != 1 error("Not enough interpolation points in ring")
       for j = 1:n
          for k = 1:n
             X[j, k] = evaluate(M[j, k], x[i])
@@ -928,6 +930,14 @@ function determinant(M::Mat{fmpz_poly})
       d[i] = determinant(X)
    end
    return interpolate(R, x, d)
+end
+
+function determinant{T <: RingElem}(M::Mat{Poly{T}})
+   try
+      return determinant_interpolation(M)
+   catch
+      return determinant_df(M)
+   end
 end
 
 ###############################################################################
