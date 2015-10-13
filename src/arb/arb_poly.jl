@@ -622,7 +622,7 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::ArbField, s::String)
+function PolynomialRing(R::ArbField, s::AbstractString)
   S = symbol(s)
   parent_obj = ArbPolyRing(R, S)
   return parent_obj, parent_obj(fmpz_poly([fmpz(0), fmpz(1)]))
