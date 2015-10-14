@@ -809,7 +809,6 @@ end
 ###############################################################################
 
 function determinant_clow{T <: RingElem}(M::Mat{T})
-   rows(M) != cols(M) && error("Dimensions don't match in determinant")
    R = base_ring(M)
    n = rows(M)
    A = Array(T, n, n)
@@ -821,7 +820,7 @@ function determinant_clow{T <: RingElem}(M::Mat{T})
          B[i, j] = R()
       end
    end
-   for k = 1:n-1
+   for k = 1:n - 1
       for i = 1:n
          for j = 1:i
             if !iszero(A[i, j])
@@ -867,8 +866,7 @@ function determinant_df{T <: RingElem}(M::Mat{T})
    return isodd(n) ? -d : d
 end
 
-function determinant{T <: FieldElem}(M::Mat{T})
-   rows(M) != cols(M) && error("Not a square matrix in determinant")
+function determinant_fflu{T <: RingElem}(M::Mat{T})
    n = rows(M)
    if n == 0
       return base_ring(M)()
@@ -879,25 +877,20 @@ function determinant{T <: FieldElem}(M::Mat{T})
    return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
 end
 
-function determinant{T <: RingElem}(M::Mat{T})
+function determinant{T <: FieldElem}(M::Mat{T})
    rows(M) != cols(M) && error("Not a square matrix in determinant")
-   n = rows(M)
-   R = base_ring(M)
-   if n == 0
-      return R()
-   end       
+   return determinant_fflu(M)
+end
+
+function determinant{T <: RingElem}(M::Mat{T})
    try
-      A = deepcopy(M)
-      P = FlintPermGroup(n)()
-      r, d = fflu!(P, A)
-      return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
+      return determinant_fflu(M)
    catch
       return determinant_df(M)
    end
 end
 
 function determinant_interpolation{T <: RingElem}(M::Mat{Poly{T}})
-   rows(M) != cols(M) && error("Not a square matrix in determinant")
    n = rows(M)
    R = base_ring(M)
    if n == 0
@@ -933,9 +926,12 @@ function determinant_interpolation{T <: RingElem}(M::Mat{Poly{T}})
 end
 
 function determinant{T <: RingElem}(M::Mat{Poly{T}})
+   rows(M) != cols(M) && error("Not a square matrix in determinant")
    try
       return determinant_interpolation(M)
    catch
+      # no point trying fflu, since it probably fails
+      # for same reason as determinant_interpolation
       return determinant_df(M)
    end
 end
