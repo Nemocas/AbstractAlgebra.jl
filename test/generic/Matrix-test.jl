@@ -353,7 +353,7 @@ function test_matrix_determinant()
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
-   function randelem(n)
+   function randelem(K::AnticNumberField, n)
       s = K(0)
       for i = 1:3
          s += rand(-n:n)*a^(i-1)
@@ -361,12 +361,12 @@ function test_matrix_determinant()
       return s
    end
 
-   function randmat{T <: FieldElem}(S::MatrixSpace{T}, n::Int)
+   function randmat{T <: RingElem}(S::MatrixSpace{T}, n::Int)
       M = S()
       d = rows(M)
       for i = 1:d
          for j = 1:d
-            M[i, j] = randelem(n)
+            M[i, j] = randelem(base_ring(S), n)
          end
       end
       return M
@@ -377,6 +377,34 @@ function test_matrix_determinant()
 
       M = randmat(S, 100);
 
+      @test determinant(M) == Nemo.determinant_clow(M)
+   end
+
+   R, x = PolynomialRing(ZZ, "x")
+   S, y = PolynomialRing(R, "y")
+   
+   function randelem(R::FmpzPolyRing, n)
+      s = R(0)
+      x = gen(R)
+      for i = 1:3
+         s += rand(-n:n)*x^(i-1)
+      end
+      return s
+   end
+
+   function randelem(R, n)
+      s = R(0)
+      x = gen(R)
+      for i = 1:3
+         s += randelem(base_ring(R), n)*x^(i-1)
+      end
+      return s
+   end
+
+   for dim = 0:10
+      T = MatrixSpace(S, dim, dim)
+      M = randmat(T, 20)
+      
       @test determinant(M) == Nemo.determinant_clow(M)
    end
 
