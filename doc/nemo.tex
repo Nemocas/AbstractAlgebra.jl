@@ -1484,6 +1484,48 @@ g = 6(x + 1)*y + (x^3 + 2x + 2)
 r, s, t = gcdx(f, g)
 \end{lstlisting}
 
+\subsubsection{Newton basis}
+
+\begin{lstlisting}
+monomial_to_newton!{T <: RingElem}(p::Array{T, 1}, roots::Array{T, 1})
+\end{lstlisting}
+
+\desc{Converts a polynomial $p$, given as an array of coefficients, in-place
+from its coefficients given in the standard monomial basis to the Newton basis
+for the roots $r_0, r_1, \ldots, r_{n-2}$. In other words, this determines
+output coefficients $c_i$ such that
+$$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots +
+        c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$$
+is equal to the input polynomial.}
+
+\begin{lstlisting}
+newton_to_monomial!{T <: RingElem}(p::Array{T, 1}, roots::Array{T, 1})
+\end{lstlisting}
+
+\desc{Converts a polynomial $p$, given as an array of coefficients, in-place
+from its coefficients given in the Newton basis for the roots
+$r_0, r_1, \ldots, r_{n-2}$ to the standard monomial basis. In other words,
+this evaluates
+$$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots +
+        c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$$
+where $c_i$ are the input coefficients given by $p$.}
+
+\textbf{Examples.}
+
+Here is an example of converting to and from a Newton basis.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = 3x*y^2 + (x + 1)*y + 3
+g = deepcopy(f)
+roots = [R(1), R(2), R(3)]
+
+monomial_to_newton!(g.coeffs, roots)
+newton_to_monomial!(g.coeffs, roots)
+\end{lstlisting}
+
 \subsubsection{Special polynomials}
 
 The following functions compute univariate special polynomials. It is expected

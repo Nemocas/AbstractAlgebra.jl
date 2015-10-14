@@ -1407,7 +1407,7 @@ end
 #
 ###############################################################################
 
-function monomial_to_newton!{T <: RingElem}(P::Array{T}, roots::Array{T})
+function monomial_to_newton!{T <: RingElem}(P::Array{T, 1}, roots::Array{T, 1})
    n = length(roots)
    if n > 0
       R = parent(roots[1])
@@ -1422,7 +1422,7 @@ function monomial_to_newton!{T <: RingElem}(P::Array{T}, roots::Array{T})
    return
 end
 
-function newton_to_monomial!{T <: RingElem}(P::Array{T}, roots::Array{T})
+function newton_to_monomial!{T <: RingElem}(P::Array{T, 1}, roots::Array{T, 1})
    n = length(roots)
    if n > 0
       R = parent(roots[1])
