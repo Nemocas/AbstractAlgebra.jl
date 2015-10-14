@@ -446,6 +446,22 @@ function test_poly_newton_representation()
    println("PASS")
 end
 
+function test_poly_interpolation()
+   print("Poly.interpolation...")
+
+   R, x = PolynomialRing(ZZ, "x")
+   S, y = PolynomialRing(R, "y")
+
+   xs = [R(1), R(2), R(3), R(4)]
+   ys = [R(1), R(4), R(9), R(16)]
+
+   f = interpolate(S, xs, ys)
+
+   @test f == y^2
+
+   println("PASS")
+end
+
 function test_poly_special()
    print("Poly.special...")
 
@@ -515,6 +531,7 @@ function test_poly()
    test_poly_discriminant()
    test_poly_gcdx()
    test_poly_newton_representation()
+   test_poly_interpolation()
    test_poly_special()
    test_poly_mul_karatsuba()
    test_poly_mul_ks()

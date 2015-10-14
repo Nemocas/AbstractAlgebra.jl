@@ -1444,7 +1444,7 @@ end
 #
 ###############################################################################
 
-function interpolate{T <: RingElem}(S::PolynomialRing, x::Array{T}, y::Array{T})
+function interpolate{T <: RingElem}(S::PolynomialRing, x::Array{T, 1}, y::Array{T, 1})
    length(x) != length(y) && error("Array lengths don't match in interpolate")
    n = length(x)
    if n == 0

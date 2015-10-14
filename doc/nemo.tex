@@ -1526,6 +1526,31 @@ monomial_to_newton!(g.coeffs, roots)
 newton_to_monomial!(g.coeffs, roots)
 \end{lstlisting}
 
+\subsubsection{Interpolation}
+
+\begin{lstlisting}
+interpolate{T <: RingElem}(R::PolynomialRing, xs::Array{T, 1}, ys::Array{T, 1})
+\end{lstlisting}
+
+\desc{Given two arrays of values $xs$ and $ys$ of the same length $n$, find
+the polynomial $f$ in the polynomial ring $R$ of length at most $n$ such that
+$f$ has the value $ys$ at the points $xs$. The values in the arrays $xs$ and
+$ys$ must belong to the base ring of the polynomial ring $R$.}
+
+\textbf{Examples.}
+
+Here is an example of interpolation.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+xs = [R(1), R(2), R(3), R(4)]
+ys = [R(1), R(4), R(9), R(16)]
+
+f = interpolate(S, xs, ys)
+\end{lstlisting}
+ 
 \subsubsection{Special polynomials}
 
 The following functions compute univariate special polynomials. It is expected
