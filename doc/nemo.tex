@@ -3476,6 +3476,29 @@ Here is an example of computing the determinant.
    d = determinant(A)
 \end{lstlisting}
 
+\subsubsection{Rank}
+
+\begin{lstlisting}
+rank{T <: RingElem}(A::Mat{T})
+\end{lstlisting}
+
+\desc{Return the rank of the matrix $A$. For an integral domain, we define this
+to be the rank over the fraction field.}
+
+\textbf{Examples.}
+
+Here is an example of computing the rank.
+
+\begin{lstlisting}
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   S = MatrixSpace(K, 3, 3)
+   
+   A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+
+   d = rank(A)
+\end{lstlisting}
+
 \section{Generic fields}
 
 Nemo provides various constructions of fields. 

@@ -938,6 +938,33 @@ end
 
 ###############################################################################
 #
+#   Rank
+#
+###############################################################################
+
+function rank{T <: RingElem}(M::Mat{T})
+   n = rows(M)
+   if n == 0
+      return 0
+   end
+   A = deepcopy(M)
+   P = FlintPermGroup(n)()
+   r, d = fflu!(P, A)
+   return r
+end
+
+function rank{T <: FieldElem}(M::Mat{T})
+   n = rows(M)
+   if n == 0
+      return 0
+   end
+   A = deepcopy(M)
+   P = FlintPermGroup(n)()
+   return lufact!(P, A)   
+end
+
+###############################################################################
+#
 #   Characteristic polynomial
 #
 ###############################################################################

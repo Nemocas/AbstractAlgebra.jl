@@ -1703,4 +1703,6 @@ function PolynomialRing(R::Ring, s::AbstractString{})
 end
 
 # S, x = R["x"] syntax
-getindex(R::Nemo.Ring, s::ASCIIString) = PolynomialRing(R, s)
+getindex(R::Ring, s::ASCIIString) = PolynomialRing(R, s)
+
+getindex{T}(R::Tuple{Ring,T}, s::ASCIIString) = PolynomialRing(R[1], s)
