@@ -43,7 +43,7 @@ include("AbstractTypes.jl")
 #
 ###############################################################################
 
-const pkgdir = joinpath(dirname(@__FILE__), "..")
+const pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
 const libdir = joinpath(pkgdir, "local", "lib")
 const libgmp = joinpath(pkgdir, "local", "lib", "libgmp")
 const libmpfr = joinpath(pkgdir, "local", "lib", "libmpfr")
