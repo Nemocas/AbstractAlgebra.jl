@@ -1701,3 +1701,6 @@ function PolynomialRing(R::Ring, s::AbstractString{})
 
    return parent_obj, parent_obj([R(0), R(1)])
 end
+
+# S, x = R["x"] syntax
+getindex(R::Nemo.Ring, s::ASCIIString) = PolynomialRing(R, s)

@@ -1,6 +1,14 @@
 function test_poly_constructors()
    print("Poly.constructors...")
  
+   R, x = ZZ["x"]
+   S, y = R["y"]
+
+   @test typeof(R) <: Nemo.Ring
+   @test typeof(S) <: PolynomialRing
+
+   @test isa(y, PolyElem)
+
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 

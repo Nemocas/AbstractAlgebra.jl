@@ -619,6 +619,16 @@ to be the same as the string \code{"x"}. The latter is simply how \code{x} will 
 when we evaluate it. Of course, in most situations it is convenient to use the same 
 letter for the variable and for the string.
 
+We also provide an alternative syntax for constructing polynomial rings.
+This is best demonstrated with an example.
+
+\begin{lstlisting}
+R, x = ZZ["x"]
+S, y = R["y"]
+
+f = (x^2 + 2x + 1)*y^3 + (x - 1)*y + 4x - 1
+\end{lstlisting}
+
 Once we have constructed a polynomial ring as above, we can use it to construct
 polynomials of various kinds.
 
