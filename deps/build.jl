@@ -195,7 +195,7 @@ else
    #env_copy["LD_LIBRARY_PATH"] = "$vdir/lib"
    #env_copy["CFLAGS"] = 
    withenv(()->run(`./Configure --prefix=$vdir --with-gmp=$vdir --mt=pthread`), 
-                           "LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS)
+                           "CFLAGS"=>LDFLAGS, "LD_LIBRARY_PATH"=>"$vdir/lib")
    #config_str = setenv(config_str, env_copy)
    #run(config_str)
    run(`make -j4 gp`)
