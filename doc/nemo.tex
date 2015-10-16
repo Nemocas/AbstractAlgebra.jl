@@ -3499,6 +3499,51 @@ Here is an example of computing the rank.
    d = rank(A)
 \end{lstlisting}
 
+\subsubsection{Linear solving}
+
+\begin{lstlisting}
+solve{T <: RingElem}(A::Mat{T}, b::Mat{T})
+\end{lstlisting}
+
+\desc{Given a non-singular $n\times n$ matrix over a ring and an $n\times 1$
+column vector over the same ring, return a tuple $x, d$ consisting of an
+$n\times 1$ column vector $x$ and a denominator $d$ such that $Ax = db$. The
+denominator will be the determinant of $A$ up to sign. If $A$ is singular an
+exception is raised.}
+
+\begin{lstlisting}
+solve{T <: FieldElem}(A::Mat{T}, b::Mat{T})
+\end{lstlisting}
+
+\desc{Given a non-singular $n\times n$ matrix over a field and an $n\times 1$
+column vector over the same field, return an $n\times 1$ column vector $x$
+such that $Ax = b$. If $A$ is singular an exception is raised.}
+
+\textbf{Examples.}
+
+Here are some examples of linear solving.
+
+\begin{lstlisting}
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   S = MatrixSpace(K, 3, 3)
+   U = MatrixSpace(K, 3, 1)
+
+   A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+   b = U([2a a + 1 (-a - 1)]')
+
+   x = solve(A, b)
+
+   R, x = PolynomialRing(ZZ, "x")
+   S = MatrixSpace(R, 3, 3)
+   U = MatrixSpace(R, 3, 1)
+
+   A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
+   b = U([2x x + 1 (-x - 1)]')
+
+   x, d = solve(A, b)
+\end{lstlisting}
+
 \section{Generic fields}
 
 Nemo provides various constructions of fields. 

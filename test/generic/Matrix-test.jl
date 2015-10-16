@@ -1,3 +1,63 @@
+function randpoly(S, d::Int, n::Int)
+   r = S()
+   x = gen(S)
+   for i = 0:rand(0:d)
+      r += rand(-n:n)*x^i
+   end
+   return r
+end
+
+function randmat{T <: RingElem}(R::MatrixSpace{T}, d::Int, c::Int)
+   m = R.rows
+   n = R.cols
+   r = R()
+   for i = 1:m
+      for j = 1:n
+         r[i, j] = randpoly(base_ring(R), d, c)
+      end
+   end
+   return r
+end
+
+function randelem(K::AnticNumberField, n)
+   s = K(0)
+   a = gen(K)
+   for i = 1:3
+      s += rand(-n:n)*a^(i-1)
+   end
+   return s
+end
+
+function randmat{T <: RingElem}(S::MatrixSpace{T}, c::Int)
+   M = S()
+   m = rows(M)
+   n = cols(M)
+   for i = 1:m
+      for j = 1:n
+         M[i, j] = randelem(base_ring(S), c)
+      end
+   end
+   return M
+end
+
+function randelem(R::FmpzPolyRing, n)
+   s = R(0)
+   x = gen(R)
+   for i = 1:3
+      s += rand(-n:n)*x^(i-1)
+   end
+   return s
+end
+
+function randelem(R, n)
+   s = R(0)
+   x = gen(R)
+   for i = 1:3
+      s += randelem(base_ring(R), n)*x^(i-1)
+   end
+   return s
+end
+
 function test_matrix_constructors()
    print("Matrix.constructors...")
  
@@ -312,26 +372,6 @@ function test_matrix_determinant()
 
    S, x = PolynomialRing(ResidueRing(ZZ, 1009*2003), "x")
 
-   function randpoly(S, d::Int, n::Int)
-      r = S()
-      x = gen(S)
-      for i = 0:rand(0:d)
-         r += rand(-n:n)*x^i
-      end
-      return r
-   end
-
-   function randmat{T <: RingElem}(R::MatrixSpace{T}, d::Int, n::Int)
-      m = R.rows
-      r = R()
-      for i = 1:m
-         for j = 1:m
-            r[i, j] = randpoly(base_ring(R), d, n)
-         end
-      end
-      return r
-   end
-
    for dim = 0:10
       R = MatrixSpace(S, dim, dim)
 
@@ -352,25 +392,6 @@ function test_matrix_determinant()
 
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
-
-   function randelem(K::AnticNumberField, n)
-      s = K(0)
-      for i = 1:3
-         s += rand(-n:n)*a^(i-1)
-      end
-      return s
-   end
-
-   function randmat{T <: RingElem}(S::MatrixSpace{T}, n::Int)
-      M = S()
-      d = rows(M)
-      for i = 1:d
-         for j = 1:d
-            M[i, j] = randelem(base_ring(S), n)
-         end
-      end
-      return M
-   end
    
    for dim = 0:10
       S = MatrixSpace(K, dim, dim)
@@ -383,24 +404,6 @@ function test_matrix_determinant()
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
    
-   function randelem(R::FmpzPolyRing, n)
-      s = R(0)
-      x = gen(R)
-      for i = 1:3
-         s += rand(-n:n)*x^(i-1)
-      end
-      return s
-   end
-
-   function randelem(R, n)
-      s = R(0)
-      x = gen(R)
-      for i = 1:3
-         s += randelem(base_ring(R), n)*x^(i-1)
-      end
-      return s
-   end
-
    for dim = 0:10
       T = MatrixSpace(S, dim, dim)
       M = randmat(T, 20)
@@ -449,6 +452,70 @@ function test_matrix_rank()
    println("PASS")   
 end
 
+function test_matrix_solve()
+   print("Matrix.solve...")
+
+   S, x = PolynomialRing(ResidueRing(ZZ, 1009*2003), "x")
+
+   for dim = 0:10
+      R = MatrixSpace(S, dim, dim)
+      U = MatrixSpace(S, dim, 1)
+
+      M = randmat(R, 5, 100);
+      b = randmat(U, 5, 100);
+
+      x, d = solve(M, b)
+
+      @test M*x == d*b
+   end
+
+   S, x = PolynomialRing(ZZ, "z")
+
+   for dim = 0:10
+      R = MatrixSpace(S, dim, dim)
+      U = MatrixSpace(S, dim, 1)
+
+      M = randmat(R, 3, 20);
+      b = randmat(U, 3, 20);
+
+      x, d = solve(M, b)
+
+      @test M*x == d*b
+   end
+
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   
+   for dim = 0:10
+      S = MatrixSpace(K, dim, dim)
+      U = MatrixSpace(K, dim, 1)
+
+      M = randmat(S, 100);
+      b = randmat(U, 100);
+
+      x = solve(M, b)
+
+      @test M*x == b
+   end
+
+   R, x = PolynomialRing(ZZ, "x")
+   S, y = PolynomialRing(R, "y")
+   
+   for dim = 0:10
+      T = MatrixSpace(S, dim, dim)
+      U = MatrixSpace(S, dim, 1)
+     
+      M = randmat(T, 20)
+      b = randmat(U, 20)
+ 
+      x, d = solve(M, b)
+
+      @test M*x == d*b
+   end
+
+   println("PASS")
+end
+
 function test_matrix()
    test_matrix_constructors()
    test_matrix_manipulation()
@@ -467,6 +534,7 @@ function test_matrix()
    test_matrix_fflu()
    test_matrix_determinant()
    test_matrix_rank()
+   test_matrix_solve()
 
    println("")
 end

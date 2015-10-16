@@ -965,6 +965,176 @@ end
 
 ###############################################################################
 #
+#   Linear solving
+#
+###############################################################################
+
+function backsolve!{T <: FieldElem}(A::Mat{T}, b::Mat{T})
+   m = rows(A)
+   R = base_ring(A)
+   t = R()
+   for i = m:-1:1
+      b.entries[i] = -b.entries[i]
+      for j = i + 1:m
+         mul!(t, A.entries[i, j], b.entries[j])
+         addeq!(b.entries[i], t)
+      end
+      mul!(b.entries[i], b.entries[i], -inv(A.entries[i, i])) 
+   end
+end
+
+function solve!{T <: FieldElem}(A::Mat{T}, b::Mat{T})
+   m = rows(A)
+   n = cols(A)
+   r = 1
+   c = 1
+   R = base_ring(A)
+   d = R(1)
+   if m == 0 || n == 0
+      return
+   end
+   t = R()
+   while r <= m && c <= n
+      if A[r, c] == 0
+         i = r + 1
+         while i <= m
+            if A[i, c] != 0
+               for j = 1:n
+                  A.entries[i, j], A.entries[r, j] = A.entries[r, j], A.entries[i, j]
+               end
+               b.entries[i], b.entries[r] = b.entries[r], b.entries[i]
+               break
+            end
+            i += 1
+         end
+         i > m && error("Matrix is singular in solve")
+      end
+      q = -A.entries[r, c]
+      for i = r + 1:m
+         mul!(t, A.entries[i, c], b.entries[r])
+         mul!(b.entries[i], b.entries[i], A.entries[r, c])
+         addeq!(b.entries[i], -t) 
+         for j = c + 1:n
+            mul!(A.entries[i, j], A.entries[i, j], q)
+            mul!(t, A.entries[i, c], A.entries[r, j])
+            addeq!(A.entries[i, j], t)
+            if r > 1
+               mul!(A.entries[i, j], A.entries[i, j], d)
+            else
+               A.entries[i, j] = -A.entries[i, j]
+            end
+         end
+         if r > 1
+            mul!(b.entries[i], b.entries[i], -d)
+         end
+      end
+      d = -inv(A.entries[r, c])
+      r += 1
+      c += 1
+   end
+   backsolve!(A, b)
+end
+
+function solve{T <: FieldElem}(M::Mat{T}, b::Mat{T})
+   base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
+   rows(M) != cols(M) && error("Non-square matrix in solve")
+   rows(M) != rows(b) && error("Dimensions don't match in solve")
+   m = rows(M)
+   A = deepcopy(M)
+   x = deepcopy(b)
+   solve!(A, x)
+   return x
+end
+
+function backsolve!{T <: RingElem}(A::Mat{T}, b::Mat{T})
+   m = rows(A)
+   R = base_ring(A)
+   t = R()
+   d = A[m, m]
+   b.entries[m] = -b.entries[m]
+   for i = m - 1:-1:1
+      mul!(b.entries[i], b.entries[i], d)
+      for j = i + 1:m
+         mul!(t, A.entries[i, j], b.entries[j])
+         addeq!(b.entries[i], t)
+      end
+      b.entries[i] = divexact(b.entries[i], -A.entries[i, i]) 
+   end
+   for i = 1:m
+      b.entries[i] = -b.entries[i]
+   end
+   return d
+end
+
+function solve!{T <: RingElem}(A::Mat{T}, b::Mat{T})
+   m = rows(A)
+   n = cols(A)
+   r = 1
+   c = 1
+   R = base_ring(A)
+   d = R(1)
+   if m == 0 || n == 0
+      return
+   end
+   t = R()
+   while r <= m && c <= n
+      if A[r, c] == 0
+         i = r + 1
+         while i <= m
+            if A[i, c] != 0
+               for j = 1:n
+                  A.entries[i, j], A.entries[r, j] = A.entries[r, j], A.entries[i, j]
+               end
+               b.entries[i], b.entries[r] = b.entries[r], b.entries[i]
+               break
+            end
+            i += 1
+         end
+         i > m && error("Matrix is singular in solve")
+      end
+      q = -A.entries[r, c]
+      for i = r + 1:m
+         mul!(t, A.entries[i, c], b.entries[r])
+         mul!(b.entries[i], b.entries[i], A.entries[r, c])
+         addeq!(b.entries[i], -t) 
+         for j = c + 1:n
+            mul!(A.entries[i, j], A.entries[i, j], q)
+            mul!(t, A.entries[i, c], A.entries[r, j])
+            addeq!(A.entries[i, j], t)
+            if r > 1
+               A.entries[i, j] = divexact(A.entries[i, j], d)
+            else
+               A.entries[i, j] = -A.entries[i, j]
+            end
+         end
+         if r > 1
+            b.entries[i] = divexact(b.entries[i], -d)
+         end
+      end
+      d = -A.entries[r, c]
+      r += 1
+      c += 1
+   end
+   return backsolve!(A, b)
+end
+
+function solve{T <: RingElem}(M::Mat{T}, b::Mat{T})
+   base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
+   rows(M) != cols(M) && error("Non-square matrix in solve")
+   rows(M) != rows(b) && error("Dimensions don't match in solve")
+   m = rows(M)
+   n = cols(M)
+   if m == 0 || n == 0
+      return b, base_ring(M)()
+   end
+   A = deepcopy(M)
+   x = deepcopy(b)
+   d = solve!(A, x)
+   return x, d
+end
+
+###############################################################################
+#
 #   Characteristic polynomial
 #
 ###############################################################################
