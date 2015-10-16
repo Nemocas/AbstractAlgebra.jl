@@ -3505,9 +3505,9 @@ Here is an example of computing the rank.
 solve{T <: RingElem}(A::Mat{T}, b::Mat{T})
 \end{lstlisting}
 
-\desc{Given a non-singular $n\times n$ matrix over a ring and an $n\times 1$
-column vector over the same ring, return a tuple $x, d$ consisting of an
-$n\times 1$ column vector $x$ and a denominator $d$ such that $Ax = db$. The
+\desc{Given a non-singular $n\times n$ matrix over a ring and an $n\times m$
+matrix over the same ring, return a tuple $x, d$ consisting of an
+$n\times m$ matrix $x$ and a denominator $d$ such that $Ax = db$. The
 denominator will be the determinant of $A$ up to sign. If $A$ is singular an
 exception is raised.}
 
@@ -3515,8 +3515,8 @@ exception is raised.}
 solve{T <: FieldElem}(A::Mat{T}, b::Mat{T})
 \end{lstlisting}
 
-\desc{Given a non-singular $n\times n$ matrix over a field and an $n\times 1$
-column vector over the same field, return an $n\times 1$ column vector $x$
+\desc{Given a non-singular $n\times n$ matrix over a field and an $n\times m$
+matrix over the same field, return an $n\times m$ matrix $x$
 such that $Ax = b$. If $A$ is singular an exception is raised.}
 
 \textbf{Examples.}
@@ -3536,10 +3536,10 @@ Here are some examples of linear solving.
 
    R, x = PolynomialRing(ZZ, "x")
    S = MatrixSpace(R, 3, 3)
-   U = MatrixSpace(R, 3, 1)
+   U = MatrixSpace(R, 3, 2)
 
    A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
-   b = U([2x x + 1 (-x - 1)]')
+   b = U([2x x + 1 (-x - 1); x + 1 (-x) x^2]')
 
    x, d = solve(A, b)
 \end{lstlisting}

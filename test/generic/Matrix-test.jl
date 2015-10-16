@@ -459,7 +459,7 @@ function test_matrix_solve()
 
    for dim = 0:10
       R = MatrixSpace(S, dim, dim)
-      U = MatrixSpace(S, dim, 1)
+      U = MatrixSpace(S, dim, rand(1:5))
 
       M = randmat(R, 5, 100);
       b = randmat(U, 5, 100);
@@ -473,7 +473,7 @@ function test_matrix_solve()
 
    for dim = 0:10
       R = MatrixSpace(S, dim, dim)
-      U = MatrixSpace(S, dim, 1)
+      U = MatrixSpace(S, dim, rand(1:5))
 
       M = randmat(R, 3, 20);
       b = randmat(U, 3, 20);
@@ -488,7 +488,7 @@ function test_matrix_solve()
    
    for dim = 0:10
       S = MatrixSpace(K, dim, dim)
-      U = MatrixSpace(K, dim, 1)
+      U = MatrixSpace(K, dim, rand(1:5))
 
       M = randmat(S, 100);
       b = randmat(U, 100);
@@ -503,7 +503,7 @@ function test_matrix_solve()
    
    for dim = 0:10
       T = MatrixSpace(S, dim, dim)
-      U = MatrixSpace(S, dim, 1)
+      U = MatrixSpace(S, dim, rand(1:5))
      
       M = randmat(T, 20)
       b = randmat(U, 20)
@@ -512,6 +512,19 @@ function test_matrix_solve()
 
       @test M*x == d*b
    end
+
+   R, t = PolynomialRing(QQ, "t")
+   K, a = NumberField(t^3 + 3t + 1, "a")
+   S, y = PolynomialRing(K, "y")
+   T = MatrixSpace(S, 3, 3)
+   U = MatrixSpace(S, 3, 1)
+
+   M = T([3y*a^2 + (y + 1)*a + 2y (5y+1)*a^2 + 2a + y - 1 a^2 + (-a) + 2y; (y + 1)*a^2 + 2y - 4 3y*a^2 + (2y - 1)*a + y (4y - 1)*a^2 + (y - 1)*a + 5; 2a + y + 1 (2y + 2)*a^2 + 3y*a + 3y a^2 + (-y-1)*a + (-y - 3)])
+   b = U([4y*a^2 + 4y*a + 2y + 1 5y*a^2 + (2y + 1)*a + 6y + 1 (y + 1)*a^2 + 3y*a + 2y + 4]')
+
+   x, d = solve(M, b)
+
+   @test M*x == d*b
 
    println("PASS")
 end

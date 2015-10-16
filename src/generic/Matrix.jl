@@ -971,21 +971,26 @@ end
 
 function backsolve!{T <: FieldElem}(A::Mat{T}, b::Mat{T})
    m = rows(A)
+   h = cols(b)
    R = base_ring(A)
    t = R()
    for i = m:-1:1
-      b.entries[i] = -b.entries[i]
-      for j = i + 1:m
-         mul!(t, A.entries[i, j], b.entries[j])
-         addeq!(b.entries[i], t)
-      end
-      mul!(b.entries[i], b.entries[i], -inv(A.entries[i, i])) 
+      d = -inv(A.entries[i, i])
+      for k = 1:h
+         b.entries[i, k] = -b.entries[i, k]
+         for j = i + 1:m
+            mul!(t, A.entries[i, j], b.entries[j, k])
+            addeq!(b.entries[i, k], t)
+         end
+         mul!(b.entries[i, k], b.entries[i, k], d)
+      end 
    end
 end
 
 function solve!{T <: FieldElem}(A::Mat{T}, b::Mat{T})
    m = rows(A)
    n = cols(A)
+   h = cols(b)
    r = 1
    c = 1
    R = base_ring(A)
@@ -1002,7 +1007,9 @@ function solve!{T <: FieldElem}(A::Mat{T}, b::Mat{T})
                for j = 1:n
                   A.entries[i, j], A.entries[r, j] = A.entries[r, j], A.entries[i, j]
                end
-               b.entries[i], b.entries[r] = b.entries[r], b.entries[i]
+               for j = 1:h
+                  b.entries[i, j], b.entries[r, j] = b.entries[r, j], b.entries[i, j]
+               end
                break
             end
             i += 1
@@ -1011,9 +1018,11 @@ function solve!{T <: FieldElem}(A::Mat{T}, b::Mat{T})
       end
       q = -A.entries[r, c]
       for i = r + 1:m
-         mul!(t, A.entries[i, c], b.entries[r])
-         mul!(b.entries[i], b.entries[i], A.entries[r, c])
-         addeq!(b.entries[i], -t) 
+         for j = 1:h
+            mul!(t, A.entries[i, c], b.entries[r, j])
+            mul!(b.entries[i, j], b.entries[i, j], A.entries[r, c])
+            addeq!(b.entries[i, j], -t) 
+         end
          for j = c + 1:n
             mul!(A.entries[i, j], A.entries[i, j], q)
             mul!(t, A.entries[i, c], A.entries[r, j])
@@ -1025,7 +1034,9 @@ function solve!{T <: FieldElem}(A::Mat{T}, b::Mat{T})
             end
          end
          if r > 1
-            mul!(b.entries[i], b.entries[i], -d)
+            for j = 1:h
+               mul!(b.entries[i, j], b.entries[i, j], -d)
+            end
          end
       end
       d = -inv(A.entries[r, c])
@@ -1035,7 +1046,7 @@ function solve!{T <: FieldElem}(A::Mat{T}, b::Mat{T})
    backsolve!(A, b)
 end
 
-function solve{T <: FieldElem}(M::Mat{T}, b::Mat{T})
+function solve_ff{T <: FieldElem}(M::Mat{T}, b::Mat{T})
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
    rows(M) != cols(M) && error("Non-square matrix in solve")
    rows(M) != rows(b) && error("Dimensions don't match in solve")
@@ -1046,22 +1057,49 @@ function solve{T <: FieldElem}(M::Mat{T}, b::Mat{T})
    return x
 end
 
+function solve_with_det{T <: FieldElem}(M::Mat{T}, b::Mat{T})
+   m = rows(M)
+   h = cols(b)
+   A = deepcopy(M)
+   x = deepcopy(b)
+   solve!(A, x)
+   d = A[m, m]
+   for i = 1:m
+      for j = 1:h
+         mul!(x.entries[i, j], x.entries[i, j], d)
+      end
+   end   
+   return x, d
+end
+
+function solve_with_det{T <: RingElem}(M::Mat{T}, b::Mat{T})
+   return solve(M, b)
+end
+
 function backsolve!{T <: RingElem}(A::Mat{T}, b::Mat{T})
    m = rows(A)
+   h = cols(b)
    R = base_ring(A)
    t = R()
    d = A[m, m]
-   b.entries[m] = -b.entries[m]
+   for k = 1:h
+      b.entries[m, k] = -b.entries[m, k]
+   end
    for i = m - 1:-1:1
-      mul!(b.entries[i], b.entries[i], d)
-      for j = i + 1:m
-         mul!(t, A.entries[i, j], b.entries[j])
-         addeq!(b.entries[i], t)
-      end
-      b.entries[i] = divexact(b.entries[i], -A.entries[i, i]) 
+      q = -A.entries[i, i]
+      for k = 1:h
+         mul!(b.entries[i, k], b.entries[i, k], d)
+         for j = i + 1:m
+            mul!(t, A.entries[i, j], b.entries[j, k])
+            addeq!(b.entries[i, k], t)
+         end
+         b.entries[i, k] = divexact(b.entries[i, k], q)
+      end 
    end
    for i = 1:m
-      b.entries[i] = -b.entries[i]
+      for k = 1:h
+         b.entries[i, k] = -b.entries[i, k]
+      end
    end
    return d
 end
@@ -1069,6 +1107,7 @@ end
 function solve!{T <: RingElem}(A::Mat{T}, b::Mat{T})
    m = rows(A)
    n = cols(A)
+   h = cols(b)
    r = 1
    c = 1
    R = base_ring(A)
@@ -1085,7 +1124,9 @@ function solve!{T <: RingElem}(A::Mat{T}, b::Mat{T})
                for j = 1:n
                   A.entries[i, j], A.entries[r, j] = A.entries[r, j], A.entries[i, j]
                end
-               b.entries[i], b.entries[r] = b.entries[r], b.entries[i]
+               for j = 1:h
+                  b.entries[i, j], b.entries[r, j] = b.entries[r, j], b.entries[i, j]
+               end
                break
             end
             i += 1
@@ -1094,9 +1135,11 @@ function solve!{T <: RingElem}(A::Mat{T}, b::Mat{T})
       end
       q = -A.entries[r, c]
       for i = r + 1:m
-         mul!(t, A.entries[i, c], b.entries[r])
-         mul!(b.entries[i], b.entries[i], A.entries[r, c])
-         addeq!(b.entries[i], -t) 
+         for j = 1:h
+            mul!(t, A.entries[i, c], b.entries[r, j])
+            mul!(b.entries[i, j], b.entries[i, j], A.entries[r, c])
+            addeq!(b.entries[i, j], -t)
+         end 
          for j = c + 1:n
             mul!(A.entries[i, j], A.entries[i, j], q)
             mul!(t, A.entries[i, c], A.entries[r, j])
@@ -1108,7 +1151,9 @@ function solve!{T <: RingElem}(A::Mat{T}, b::Mat{T})
             end
          end
          if r > 1
-            b.entries[i] = divexact(b.entries[i], -d)
+            for j = 1:h
+               b.entries[i, j] = divexact(b.entries[i, j], -d)
+            end
          end
       end
       d = -A.entries[r, c]
@@ -1118,10 +1163,7 @@ function solve!{T <: RingElem}(A::Mat{T}, b::Mat{T})
    return backsolve!(A, b)
 end
 
-function solve{T <: RingElem}(M::Mat{T}, b::Mat{T})
-   base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
-   rows(M) != cols(M) && error("Non-square matrix in solve")
-   rows(M) != rows(b) && error("Dimensions don't match in solve")
+function solve_ff{T <: RingElem}(M::Mat{T}, b::Mat{T})
    m = rows(M)
    n = cols(M)
    if m == 0 || n == 0
@@ -1131,6 +1173,81 @@ function solve{T <: RingElem}(M::Mat{T}, b::Mat{T})
    x = deepcopy(b)
    d = solve!(A, x)
    return x, d
+end
+
+function solve_interpolation{T <: RingElem}(M::Mat{Poly{T}}, b::Mat{Poly{T}})
+   m = rows(M)
+   h = cols(b)
+   if m == 0
+      return b, base_ring(M)()
+   end  
+   R = base_ring(M)
+   S = MatrixSpace(base_ring(R), m, m)
+   U = MatrixSpace(base_ring(R), m, h)
+   maxlen = 0
+   for i = 1:m
+      for j = 1:m
+         maxlen = max(maxlen, length(M[i, j]))
+      end
+   end
+   maxlen == 0 && error("Matrix is singular in solve")
+   maxlenb = 0
+   for i = 1:m
+      for j = 1:h
+         maxlenb = max(maxlenb, length(b[i, j]))
+      end
+   end
+   # bound from xd = (M*)b where d is the determinant
+   bound = (maxlen - 1)*(m - 1) + max(maxlenb, maxlen)
+   V = Array(elem_type(U), bound)
+   d = Array(elem_type(base_ring(R)), bound)
+   y = Array(elem_type(base_ring(R)), bound)
+   bj = Array(elem_type(base_ring(R)), bound)
+   X = S()
+   Y = U()
+   x = parent(b)()
+   b2 = div(bound, 2)
+   pt1 = base_ring(R)(1 - b2)
+   for i = 1:bound
+      y[i] = base_ring(R)(i - b2)
+      (y[i] == pt1 && i != 1) && error("Not enough interpolation points in ring")
+      for j = 1:m
+         for k = 1:m
+            X[j, k] = evaluate(M[j, k], y[i])
+         end
+         for k = 1:h
+            Y[j, k] = evaluate(b[j, k], y[i])
+         end
+      end
+      V[i], d[i] = solve_with_det(X, Y)
+   end
+   for k = 1:h
+      for i = 1:m
+         for j = 1:bound
+            bj[j] = V[j][i, k]
+         end
+         x[i, k] = interpolate(R, y, bj)
+      end
+   end
+   return x, interpolate(R, y, d)
+end
+
+function solve{T <: RingElem}(M::Mat{T}, b::Mat{T})
+   base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
+   rows(M) != cols(M) && error("Non-square matrix in solve")
+   rows(M) != rows(b) && error("Dimensions don't match in solve")
+   return solve_ff(M, b)
+end
+
+function solve{T <: RingElem}(M::Mat{Poly{T}}, b::Mat{Poly{T}})
+   base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
+   rows(M) != cols(M) && error("Non-square matrix in solve")
+   rows(M) != rows(b) && error("Dimensions don't match in solve")
+   try
+      return solve_interpolation(M, b)
+   catch
+      return solve_ff(M, b)
+   end
 end
 
 ###############################################################################
