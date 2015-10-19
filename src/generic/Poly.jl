@@ -838,8 +838,10 @@ function mod{T <: Union{ResidueElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{T})
       while length(f) >= length(g)
          l = -lead(f)
          for i = 1:length(g)
-            mul!(c, g.coeffs[i], l)
-            addeq!(f.coeffs[i + length(f) - length(g)], c)
+            mul!(c, coeff(g, i - 1), l)
+            u = coeff(f, i + length(f) - length(g) - 1)
+            addeq!(u, c)
+            setcoeff!(f, i + length(f) - length(g) - 1, u)
          end
          set_length!(f, normalise(f, length(f)))
       end
@@ -871,8 +873,10 @@ function divrem{T <: Union{ResidueElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{
       l = -q1
       setcoeff!(q, length(f) - length(g), q1*binv)
       for i = 1:length(g)
-         mul!(c, g.coeffs[i], l)
-         addeq!(f.coeffs[i + length(f) - length(g)], c)
+         mul!(c, coeff(g, i - 1), l)
+         u = coeff(f, i + length(f) - length(g) - 1)
+         addeq!(u, c)
+         setcoeff!(f, i + length(f) - length(g) - 1, u)
       end
       set_length!(f, normalise(f, length(f)))
    end
