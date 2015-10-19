@@ -3519,6 +3519,16 @@ solve{T <: FieldElem}(A::Mat{T}, b::Mat{T})
 matrix over the same field, return an $n\times m$ matrix $x$
 such that $Ax = b$. If $A$ is singular an exception is raised.}
 
+\begin{lstlisting}
+solve{T <: FieldElem}(U::Mat{T}, b::Mat{T}, unit=false)
+\end{lstlisting}
+
+\desc{Given a non-singular $n\times n$ matrix over a field which is upper
+triangular, and an $n\times m$ matrix over the same field, return an
+$n\times m$ matrix $x$ such that $Ax = b$. If $A$ is singular an exception
+is raised. If unit is true then $U$ is assumed to have ones on its
+diagonal, and the diagonal will not be read.}
+
 \textbf{Examples.}
 
 Here are some examples of linear solving.
@@ -3534,6 +3544,11 @@ Here are some examples of linear solving.
 
    x = solve(A, b)
 
+   A = S([a + 1 2a + 3 a^2 + 1; K(0) a^2 - 1 2a; K(0) K(0) a])
+   b = U([2a a + 1 (-a - 1)]')
+
+   x = solve_triu(A, b, false)
+
    R, x = PolynomialRing(ZZ, "x")
    S = MatrixSpace(R, 3, 3)
    U = MatrixSpace(R, 3, 2)
@@ -3542,6 +3557,73 @@ Here are some examples of linear solving.
    b = U([2x x + 1 (-x - 1); x + 1 (-x) x^2]')
 
    x, d = solve(A, b)
+\end{lstlisting}
+
+\subsubsection{Reduced row echelon form}
+
+\begin{lstlisting}
+rref{T <: RingElem}(M::Mat{T})
+\end{lstlisting}
+
+\desc{Returns a tuple $(r, d, A)$ consisting of the rank $r$ of $M$ and a
+denominator $d$ in the base ring of $M$ and a matrix $A$ such that $A/d$ is
+the reduced row echelon form of $M$. Note that the denominator is not
+usually minimal.}
+
+\begin{lstlisting}
+rref{T <: FieldElem}(M::Mat{T})
+\end{lstlisting}
+
+\desc{Returns a tuple $(r, A)$ consisting of the rank $r$ of $M$ and a
+reduced row echelon form $A$ of $M$.}
+
+\textbf{Examples.}
+
+Here are some examples of computing the reduced row echelon form.
+
+\begin{lstlisting}
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   S = MatrixSpace(K, 3, 3)
+   
+   M = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+   
+   r, d, A = rref(M)
+
+   R, x = PolynomialRing(ZZ, "x")
+   S = MatrixSpace(R, 3, 3)
+   U = MatrixSpace(R, 3, 2)
+
+   M = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
+   
+   r, A = rref(M)
+\end{lstlisting}
+
+\subsubsection{Nullspace}
+
+\begin{lstlisting}
+rref{T <: RingElem}(M::Mat{T})
+\end{lstlisting}
+
+\desc{Returns a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
+a basis $N$ (consisting of column vectors) for the right nullspace of $M$,
+i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix
+$N$ will be an $n\times \nu$ matrix.}
+
+\textbf{Examples.}
+
+Here is an example of computing the nullspace.
+
+\begin{lstlisting}
+   R, x = PolynomialRing(ZZ, "x")
+   S = MatrixSpace(R, 4, 4)
+   
+   M = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;
+          -8*x^2+8*x+16 -16*x^2+38*x-20 90*x^2-82*x-44 60*x^2+54*x-34;
+          -4*x^2+4*x+8 -8*x^2+13*x-10 35*x^2-31*x-14 22*x^2+21*x-15;
+          -10*x^2+10*x+20 -20*x^2+70*x-25 150*x^2-140*x-85 105*x^2+90*x-50])
+   
+   n, N = nullspace(M)
 \end{lstlisting}
 
 \section{Generic fields}

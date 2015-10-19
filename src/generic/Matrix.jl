@@ -1463,7 +1463,7 @@ end
 #
 ###############################################################################
 
-function solve_triu{T <: FieldElem}(U::MatElem{T}, b::MatElem{T}, unit::Bool)
+function solve_triu{T <: FieldElem}(U::MatElem{T}, b::MatElem{T}, unit=false)
    n = rows(U)
    m = cols(b)
    R = base_ring(U)
