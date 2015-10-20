@@ -1501,6 +1501,30 @@ end
 
 ###############################################################################
 #
+#   Inverse
+#
+###############################################################################
+
+function inv{T <: RingElem}(M::MatElem{T})
+   cols(M) != rows(M) && error("Matrix not square in invert")
+   n = cols(M)
+   X = one(parent(M))
+   A = deepcopy(M)
+   d = solve!(A, X)
+   return X, d
+end
+
+function inv{T <: FieldElem}(M::MatElem{T})
+   cols(M) != rows(M) && error("Matrix not square in invert")
+   n = cols(M)
+   X = one(parent(M))
+   A = deepcopy(M)
+   solve!(A, X)
+   return X
+end
+
+###############################################################################
+#
 #   Nullspace
 #
 ###############################################################################

@@ -805,6 +805,62 @@ function test_matrix_nullspace()
    println("PASS")   
 end
 
+function test_matrix_inversion()
+   print("Matrix.inversion...")
+
+   S, x = PolynomialRing(ResidueRing(ZZ, 20011*10007), "x")
+
+   for dim = 1:10
+      R = MatrixSpace(S, dim, dim)
+      
+      M = randmat_with_rank(R, 5, 100, dim);
+      
+      X, d = inv(M)
+
+      @test M*X == d*one(R)
+   end
+
+   S, z = PolynomialRing(ZZ, "z")
+
+   for dim = 1:10
+      R = MatrixSpace(S, dim, dim)
+      
+      M = randmat_with_rank(R, 3, 20, dim);
+      
+      X, d = inv(M)
+
+      @test M*X == d*one(R)
+   end
+
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   
+   for dim = 1:10
+      S = MatrixSpace(K, dim, dim)
+
+      M = randmat_with_rank(S, 100, dim);
+
+      X = inv(M)
+
+      @test isone(M*X)
+   end
+
+   R, x = PolynomialRing(ZZ, "x")
+   S, y = PolynomialRing(R, "y")
+   
+   for dim = 1:10
+      T = MatrixSpace(S, dim, dim)
+     
+      M = randmat_with_rank(T, 20, dim)
+  
+      X, d = inv(M)
+
+      @test M*X == d*one(T)
+   end
+
+   println("PASS")   
+end
+
 function test_matrix()
    test_matrix_constructors()
    test_matrix_manipulation()
@@ -827,6 +883,7 @@ function test_matrix()
    test_matrix_solve_triu()
    test_matrix_rref()
    test_matrix_nullspace()
+   test_matrix_inversion()
 
    println("")
 end

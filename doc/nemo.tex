@@ -3520,7 +3520,7 @@ matrix over the same field, return an $n\times m$ matrix $x$
 such that $Ax = b$. If $A$ is singular an exception is raised.}
 
 \begin{lstlisting}
-solve{T <: FieldElem}(U::Mat{T}, b::Mat{T}, unit=false)
+solve_triu{T <: FieldElem}(U::Mat{T}, b::Mat{T}, unit=false)
 \end{lstlisting}
 
 \desc{Given a non-singular $n\times n$ matrix over a field which is upper
@@ -3557,6 +3557,47 @@ Here are some examples of linear solving.
    b = U([2x x + 1 (-x - 1); x + 1 (-x) x^2]')
 
    x, d = solve(A, b)
+\end{lstlisting}
+
+\subsubsection{Inversion}
+
+\begin{lstlisting}
+inv{T <: RingElem}(A::Mat{T})
+\end{lstlisting}
+
+\desc{Given a non-singular $n\times n$ matrix over a ring the tuple $X, d$
+consisting of an $n\times n$ matrix $X$ and a denominator $d$ such that
+$AX = dI_n$, where $I_n$ is the $n\times n$ identity matrix. The denominator
+will be the determinant of $A$ up to sign. If $A$ is singular an exception 
+is raised.}
+
+\begin{lstlisting}
+inv{T <: FieldElem}(A::Mat{T})
+\end{lstlisting}
+
+\desc{Given a non-singular $n\times n$ matrix over a field, return an
+$n\times n$ matrix $X$ such that $AX = I_n$ where $I_n$ is the $n\times n$
+identity matrix. If $A$ is singular an exception is raised.}
+
+\textbf{Examples.}
+
+Here are some examples of inversion.
+
+\begin{lstlisting}
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   S = MatrixSpace(K, 3, 3)
+
+   A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+
+   X = inv(A)
+
+   R, x = PolynomialRing(ZZ, "x")
+   S = MatrixSpace(R, 3, 3)
+
+   A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
+    
+   X, d = inv(A)
 \end{lstlisting}
 
 \subsubsection{Reduced row echelon form}
