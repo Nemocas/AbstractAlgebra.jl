@@ -1613,7 +1613,7 @@ end
 #
 ###############################################################################
 
-function charpoly{T <: RingElem}(V::PolynomialRing{T}, Y::MatElem{T})
+function charpoly{T <: RingElem}(V::Ring, Y::MatElem{T})
    rows(Y) != cols(Y) && error("Dimensions don't match in determinant")
    R = base_ring(Y)
    base_ring(V) != base_ring(Y) && error("Cannot coerce into polynomial ring")
