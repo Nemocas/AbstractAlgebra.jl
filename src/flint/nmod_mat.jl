@@ -321,8 +321,16 @@ end
 
 function determinant(a::nmod_mat)
   !issquare(a) && error("Matrix must be a square matrix")
-  r = ccall((:nmod_mat_det, :libflint), UInt, (Ptr{nmod_mat}, ), &a)
-  return base_ring(a)(r)
+  if isprime(modulus(base_ring(a)))
+     r = ccall((:nmod_mat_det, :libflint), UInt, (Ptr{nmod_mat}, ), &a)
+     return base_ring(a)(r)
+  else
+     try
+        return determinant_fflu(a)
+     catch
+        return determinant_df(a)
+     end
+  end
 end
 
 ################################################################################

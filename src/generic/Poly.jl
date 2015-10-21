@@ -168,7 +168,7 @@ needs_parentheses(x::PolyElem) = length(x) > 1
 
 is_negative(x::PolyElem) = length(x) <= 1 && is_negative(coeff(x, 0))
 
-show_minus_one{T <: RingElem}(::Type{PolyElem{T}}) = show_minus_one(T)
+show_minus_one{T <: RingElem}(::Type{Poly{T}}) = show_minus_one(T)
 
 ###############################################################################
 #

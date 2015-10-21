@@ -740,6 +740,21 @@ end
 
 ################################################################################
 #
+#  Speedups for rings over nmod_poly
+#
+################################################################################
+
+function determinant(M::Mat{nmod_poly})
+   rows(M) != cols(M) && error("Not a square matrix in determinant")
+   try
+      return determinant_fflu(M)
+   catch
+      return determinant_df(M)
+   end
+end 
+
+################################################################################
+#
 #  Unsafe functions
 #
 ################################################################################
