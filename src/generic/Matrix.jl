@@ -1084,7 +1084,7 @@ function determinant{T <: RingElem}(M::MatElem{T})
    end
 end
 
-function determinant_interpolation{T <: RingElem}(M::MatElem{Poly{T}})
+function determinant_interpolation{T <: PolyElem}(M::MatElem{T})
    n = rows(M)
    R = base_ring(M)
    if n == 0
@@ -1119,7 +1119,7 @@ function determinant_interpolation{T <: RingElem}(M::MatElem{Poly{T}})
    return interpolate(R, x, d)
 end
 
-function determinant{T <: RingElem}(M::MatElem{Poly{T}})
+function determinant{T <: PolyElem}(M::MatElem{T})
    rows(M) != cols(M) && error("Not a square matrix in determinant")
    try
       return determinant_interpolation(M)
