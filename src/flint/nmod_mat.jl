@@ -650,7 +650,8 @@ function MatrixSpace(R::ResidueRing{fmpz}, r::Int, c::Int)
   return try
     NmodMatSpace(R, r, c)
   catch
-    error("Not yet implemented")
+    T = elem_type(R)
+    return MatrixSpace{T}(R, r, c)
   end
 end
 

@@ -749,6 +749,11 @@ end
 #
 ################################################################################
 
+function fit!(x::fmpz_mod_poly, n::Int)
+  ccall((:fmpz_mod_poly_fit_length, :libflint), Void, 
+                   (Ptr{fmpz_mod_poly}, Int), &x, n)
+end
+
 function setcoeff!(x::fmpz_mod_poly, n::Int, y::UInt)
   ccall((:fmpz_mod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{fmpz_mod_poly}, Int, UInt), &x, n, y)

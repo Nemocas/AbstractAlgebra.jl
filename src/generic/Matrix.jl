@@ -4,7 +4,8 @@
 #
 ###############################################################################
 
-export Mat, MatrixSpace, fflu!, fflu, solve_triu, is_rref
+export Mat, MatrixSpace, fflu!, fflu, solve_triu, is_rref,
+       charpoly_danilevsky!, charpoly_danilevsky_ff!
 
 ###############################################################################
 #
@@ -1612,6 +1613,228 @@ end
 #   Characteristic polynomial
 #
 ###############################################################################
+
+function charpoly_danilevsky_ff!{T <: RingElem}(S::Ring, A::MatElem{T})
+   rows(A) != cols(A) && error("Dimensions don't match in charpoly")
+   R = base_ring(A)
+   base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
+   n = rows(A)
+   if n == 0
+      return S()
+   end
+   if n == 1
+      return gen(S) - A[1, 1]
+   end
+   d = R(1)
+   t = R()
+   V = Array(T, n)
+   W = Array(T, n)
+   pol = S(1)
+   i = 1
+   while i < n
+      h = A[n - i + 1, n - i]
+      while h == 0
+         k = 1
+         while k < n - i && A[n - i + 1, n - i - k] == 0
+            k += 1
+         end
+         if k == n - i
+            b = S()
+            fit!(b, i + 1)
+            setcoeff!(b, i, R(1))
+            for k = 1:i
+               setcoeff!(b, k - 1, -A[n - i + 1, n - k + 1]*d)
+            end
+            pol *= b
+            n -= i
+            i = 1
+            if n == 1
+               pol *= (gen(S) - A[1, 1]*d)
+               return pol
+            end
+         else
+            for j = 1:n
+               A[n - i - k, j], A[n - i, j] = A[n - i, j], A[n - i - k, j]
+            end
+            for j = 1:n - i + 1
+               A[j, n - i - k], A[j, n - i] = A[j, n - i], A[j, n - i - k]
+            end
+         end
+         h = A[n - i + 1, n - i]
+      end
+      for j = 1:n
+         V[j] = -A[n - i + 1, j]
+         W[j] = deepcopy(A[n - i + 1, j])
+      end
+      for j = 1:n - i
+         for k = 1:n - i - 1
+            mul!(t, A[j, n - i], V[k])
+            u = A[j, k]*h
+            addeq!(u, t)
+            A[j, k] = u
+         end
+         for k = n - i + 1:n
+            mul!(t, A[j, n - i], V[k])
+            u = A[j, k]*h
+            addeq!(u, t)
+            A[j, k] = u
+         end
+      end
+      for k = 1:n
+         A[n - i + 1, k] = R()
+      end
+      for j = 1:n - i
+         for k = 1:n - i - 1
+            mul!(A[j, k], A[j, k], d)
+         end
+         for k = n - i + 1:n
+            mul!(A[j, k], A[j, k], d)
+         end
+      end
+      A[n - i + 1, n - i] = deepcopy(h)
+      for j = 1:n - i - 1
+         s = R()
+         for k = 1:n - i
+            mul!(t, A[k, j], W[k])
+            addeq!(s, t)
+         end
+         A[n - i, j] = s
+      end
+      for j = n - i:n - 1
+         s = R()
+         for k = 1:n - i
+            mul!(t, A[k, j], W[k])
+            addeq!(s, t)
+         end
+         mul!(t, h, W[j + 1])
+         addeq!(s, t)
+         A[n - i, j] = s
+      end
+      s = R()
+      for k = 1:n - i
+         mul!(t, A[k, n], W[k])
+         addeq!(s, t)
+      end
+      A[n - i, n] = s
+      for k = 1:n
+         mul!(A[n - i, k], A[n - i, k], d)
+      end
+      d = inv(h)
+      i += 1
+   end
+   b = S()
+   fit!(b, n + 1)
+   setcoeff!(b, n, R(1))
+   for i = 1:n
+      setcoeff!(b, i - 1, -A[1, n - i + 1]*d)
+   end
+   return pol*b
+end
+
+function charpoly_danilevsky!{T <: RingElem}(S::Ring, A::MatElem{T})
+   rows(A) != cols(A) && error("Dimensions don't match in charpoly")
+   R = base_ring(A)
+   base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
+   n = rows(A)
+   if n == 0
+      return S()
+   end
+   if n == 1
+      return gen(S) - A[1, 1]
+   end
+   d = R(1)
+   t = R()
+   V = Array(T, n)
+   W = Array(T, n)
+   pol = S(1)
+   i = 1
+   while i < n
+      h = A[n - i + 1, n - i]
+      while h == 0
+         k = 1
+         while k < n - i && A[n - i + 1, n - i - k] == 0
+            k += 1
+         end
+         if k == n - i
+            b = S()
+            fit!(b, i + 1)
+            setcoeff!(b, i, R(1))
+            for k = 1:i
+               setcoeff!(b, k - 1, -A[n - i + 1, n - k + 1])
+            end
+            pol *= b
+            n -= i
+            i = 1
+            if n == 1
+               pol *= (gen(S) - A[1, 1])
+               return pol
+            end
+         else
+            for j = 1:n
+               A[n - i - k, j], A[n - i, j] = A[n - i, j], A[n - i - k, j]
+            end
+            for j = 1:n - i + 1
+               A[j, n - i - k], A[j, n - i] = A[j, n - i], A[j, n - i - k]
+            end
+         end
+         h = A[n - i + 1, n - i]
+      end
+      h = -inv(h)
+      for j = 1:n
+         V[j] = A[n - i + 1, j]*h
+         W[j] = deepcopy(A[n - i + 1, j])
+      end
+      h = -h
+      for j = 1:n - i
+         for k = 1:n - i - 1
+            mul!(t, A[j, n - i], V[k])
+            u = A[j, k]
+            addeq!(u, t)
+            A[j, k] = u
+         end
+         for k = n - i + 1:n
+            mul!(t, A[j, n - i], V[k])
+            u = A[j, k]
+            addeq!(u, t)
+            A[j, k] = u
+         end
+         u = A[j, n - i]
+         mul!(u, u, h)
+         A[j, n - i] = u
+      end
+      for j = 1:n - i - 1
+         s = R()
+         for k = 1:n - i
+            mul!(t, A[k, j], W[k])
+            addeq!(s, t)
+         end
+         A[n - i, j] = s
+      end
+      for j = n - i:n - 1
+         s = R()
+         for k = 1:n - i
+            mul!(t, A[k, j], W[k])
+            addeq!(s, t)
+         end
+         addeq!(s, W[j + 1])
+         A[n - i, j] = s
+      end
+      s = R()
+      for k = 1:n - i
+         mul!(t, A[k, n], W[k])
+         addeq!(s, t)
+      end
+      A[n - i, n] = s
+      i += 1
+   end
+   b = S()
+   fit!(b, n + 1)
+   setcoeff!(b, n, R(1))
+   for i = 1:n
+      setcoeff!(b, i - 1, -A[1, n - i + 1])
+   end
+   return pol*b
+end
 
 function charpoly{T <: RingElem}(V::Ring, Y::MatElem{T})
    rows(Y) != cols(Y) && error("Dimensions don't match in determinant")
