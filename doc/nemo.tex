@@ -3643,13 +3643,16 @@ Here are some examples of computing the reduced row echelon form.
 \subsubsection{Nullspace}
 
 \begin{lstlisting}
-rref{T <: RingElem}(M::Mat{T})
+nullspace{T <: RingElem}(M::Mat{T})
 \end{lstlisting}
 
 \desc{Returns a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
 a basis $N$ (consisting of column vectors) for the right nullspace of $M$,
 i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix
-$N$ will be an $n\times \nu$ matrix.}
+$N$ will be an $n\times \nu$ matrix. Note that the nullspace is taken to be
+the vector space kernel over the fraction field of the base ring if the
+latter is not a field. In Nemo we use the name ``kernel'' for a function to
+compute an integral kernel.}
 
 \textbf{Examples.}
 
@@ -3665,6 +3668,63 @@ Here is an example of computing the nullspace.
           -10*x^2+10*x+20 -20*x^2+70*x-25 150*x^2-140*x-85 105*x^2+90*x-50])
    
    n, N = nullspace(M)
+\end{lstlisting}
+
+\subsubsection{Hessenberg form}
+
+\begin{lstlisting}
+hessenberg{T <: FieldElem}(M::Mat{T})
+\end{lstlisting}
+
+\desc{Returns the Hessenberg form of $M$, i.e. an upper Hessenberg matrix
+which is similar to $M$. The upper Hessenberg form has nonzero entries
+above and on the diagonal and in the diagonal line immediately below the
+diagonal.}
+
+\begin{lstlisting}
+is_hessenberg{T <: FieldElem}(M::Mat{T})
+\end{lstlisting}
+
+\desc{Returns \code{true} if $M$ is in Hessenberg form, otherwise returns
+false.}
+
+\textbf{Examples.}
+
+Here is an example of computing the Hessenberg form.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 4, 4)
+   
+   M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
+          R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
+   
+   A = hessenberg(M)
+   is_hessenberg(A) == true
+\end{lstlisting}
+
+\subsubsection{Characteristic polynomial}
+
+\begin{lstlisting}
+charpoly{T <: RingElem}(R::Ring, M::Mat{T})
+\end{lstlisting}
+
+\desc{Returns the characteristic polynomial $p$ of the matrix $M$. The
+polynomial ring $R$ of the resulting polynomial must be supplied.}
+
+\textbf{Examples.}
+
+Here is an example of computing the characteristic polynomial.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 4, 4)
+   T, x = PolynomialRing(R, "x")
+
+   M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
+          R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
+   
+   A = charpoly(T, M)
 \end{lstlisting}
 
 \section{Generic fields}

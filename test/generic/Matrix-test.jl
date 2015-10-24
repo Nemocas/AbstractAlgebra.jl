@@ -865,6 +865,27 @@ function test_matrix_inversion()
    println("PASS")   
 end
 
+function test_matrix_hessenberg()
+   print("Matrix.hessenberg...")
+
+   R = ResidueRing(ZZ, 18446744073709551629)
+
+   for dim = 0:5
+      S = MatrixSpace(R, dim, dim)
+      U, x = PolynomialRing(R, "x")
+
+      for i = 1:10
+         M = randmat(S, 5)
+
+         A = hessenberg(M)
+
+         @test is_hessenberg(A)
+      end
+   end
+
+   println("PASS")   
+end
+
 function test_matrix_charpoly()
    print("Matrix.charpoly...")
 
@@ -888,6 +909,15 @@ function test_matrix_charpoly()
 
          p1 = charpoly(U, M)
          p2 = charpoly_danilevsky_ff!(U, M)
+
+         @test p1 == p2
+      end
+
+      for i = 1:10
+         M = randmat(S, 5)
+
+         p1 = charpoly(U, M)
+         p2 = charpoly_hessenberg!(U, M)
 
          @test p1 == p2
       end
@@ -919,6 +949,7 @@ function test_matrix()
    test_matrix_rref()
    test_matrix_nullspace()
    test_matrix_inversion()
+   test_matrix_hessenberg()
    test_matrix_charpoly()
 
    println("")

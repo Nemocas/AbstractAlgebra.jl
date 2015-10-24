@@ -5,7 +5,8 @@
 ###############################################################################
 
 export Mat, MatrixSpace, fflu!, fflu, solve_triu, is_rref,
-       charpoly_danilevsky!, charpoly_danilevsky_ff!
+       charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
+       is_hessenberg, charpoly_hessenberg!
 
 ###############################################################################
 #
@@ -1610,9 +1611,107 @@ end
 
 ###############################################################################
 #
+#   Hessenberg form
+#
+###############################################################################
+
+function hessenberg!{T <: RingElem}(A::MatElem{T})
+   rows(A) != cols(A) && error("Dimensions don't match in hessenberg")
+   R = base_ring(A)
+   n = rows(A)
+   u = R()
+   t = R()
+   for m = 2:n - 1
+      i = m + 1
+      while i <= n && A[i, m - 1] == 0
+         i += 1
+      end
+      if i != n + 1
+         if A[m, m - 1] != 0
+            i = m
+         end
+         h = -inv(A[i, m - 1])
+         if i > m
+            for j = m - 1:n
+               A[i, j], A[m, j] = A[m, j], A[i, j]
+            end
+            for j = 1:n
+               A[j, i], A[j, m] = A[j, m], A[j, i]
+            end
+         end
+         for i = m + 1:n
+            if A[i, m - 1] != 0
+               mul!(u, A[i, m - 1], h)
+               for j = m:n
+                  mul!(t, u, A[m, j])
+                  s = A[i, j]
+                  addeq!(s, t)
+                  A[i, j] = s
+               end
+               u = -u
+               for j = 1:n
+                  mul!(t, u, A[j, i])
+                  s = A[j, m]
+                  addeq!(s, t)
+                  A[j, m] = s
+               end
+               A[i, m - 1] = R()
+            end
+         end
+      end
+   end
+end
+
+function hessenberg{T <: RingElem}(A::MatElem{T})
+   rows(A) != cols(A) && error("Dimensions don't match in hessenberg")
+   M = deepcopy(A)
+   hessenberg!(M)
+   return M
+end
+
+function is_hessenberg{T <: RingElem}(A::MatElem{T})
+   n = rows(A)
+   for i = 3:n
+      for j = 1:i - 2
+         if A[i, j] != 0
+            return false
+         end
+      end
+   end
+   return true
+end
+
+###############################################################################
+#
 #   Characteristic polynomial
 #
 ###############################################################################
+
+function charpoly_hessenberg!{T <: RingElem}(S::Ring, A::MatElem{T})
+   rows(A) != cols(A) && error("Dimensions don't match in charpoly")
+   R = base_ring(A)
+   base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
+   n = rows(A)
+   if n == 0
+      return S()
+   end
+   if n == 1
+      return gen(S) - A[1, 1]
+   end
+   hessenberg!(A)
+   P = Array(elem_type(S), n + 1)
+   P[1] = S(1)
+   x = gen(S)
+   for m = 1:n
+      P[m + 1] = (x - A[m, m])*P[m]
+      t = R(1)
+      for i = 1:m - 1
+         mul!(t, t, A[m - i + 1, m - i])
+         P[m + 1] -= t*A[m - i, m]*P[m - i]
+      end
+   end
+   return P[n + 1]
+end
 
 function charpoly_danilevsky_ff!{T <: RingElem}(S::Ring, A::MatElem{T})
    rows(A) != cols(A) && error("Dimensions don't match in charpoly")
