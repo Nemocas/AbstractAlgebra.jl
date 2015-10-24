@@ -759,6 +759,11 @@ end
 #
 ################################################################################
 
+function fit!(x::nmod_poly, n::Int)
+  ccall((:nmod_poly_fit_length, :libflint), Void, 
+                   (Ptr{nmod_poly}, Int), &x, n)
+end
+
 function setcoeff!(x::nmod_poly, n::Int, y::UInt)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{nmod_poly}, Int, UInt), &x, n, y)
