@@ -1841,7 +1841,6 @@ function charpoly_danilevsky!{T <: RingElem}(S::Ring, A::MatElem{T})
    if n == 1
       return gen(S) - A[1, 1]
    end
-   d = R(1)
    t = R()
    V = Array(T, n)
    W = Array(T, n)

@@ -511,6 +511,20 @@ function lift!(z::fmpz_mat, a::nmod_mat)
   return z 
 end
 
+################################################################################
+#
+#  Charpoly
+#
+################################################################################
+
+function charpoly(R::NmodPolyRing, a::nmod_mat)
+  m = deepcopy(a)
+  p = R()
+  ccall((:nmod_mat_charpoly, :libflint), Void,
+          (Ptr{nmod_poly}, Ptr{nmod_mat}), &p, &m)
+  return p
+end
+
 ###############################################################################
 #
 #   Promotion rules
