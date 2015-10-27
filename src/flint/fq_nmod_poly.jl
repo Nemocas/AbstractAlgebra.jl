@@ -551,13 +551,13 @@ end
 function fit!(z::fq_nmod_poly, n::Int)
    ccall((:fq_nmod_poly_fit_length, :libflint), Void, 
          (Ptr{fq_nmod_poly}, Int, Ptr{FqNmodFiniteField}),
-         &z, n, &base_ring(parent(x)))
+         &z, n, &base_ring(parent(z)))
 end
 
-function setcoeff!(z::fq_nmod_poly, n::Int, x::fq)
-   ccall((:fq_nmod_poly_set_coeff_fmpz, :libflint), Void, 
+function setcoeff!(z::fq_nmod_poly, n::Int, x::fq_nmod)
+   ccall((:fq_nmod_poly_set_coeff, :libflint), Void, 
          (Ptr{fq_nmod_poly}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}),
-         &z, n, &temp, &base_ring(parent(x)))
+         &z, n, &x, &base_ring(parent(z)))
 end
 
 function mul!(z::fq_nmod_poly, x::fq_nmod_poly, y::fq_nmod_poly)
