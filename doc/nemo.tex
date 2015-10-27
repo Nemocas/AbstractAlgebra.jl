@@ -3727,6 +3727,30 @@ Here is an example of computing the characteristic polynomial.
    A = charpoly(T, M)
 \end{lstlisting}
 
+\subsubsection{Minimal polynomial}
+
+\begin{lstlisting}
+minpoly{T <: RingElem}(R::Ring, M::Mat{T})
+\end{lstlisting}
+
+\desc{Returns the minimal polynomial $p$ of the matrix $M$. The
+polynomial ring $R$ of the resulting polynomial must be supplied.}
+
+\textbf{Examples.}
+
+Here is an example of computing the minimal polynomial.
+
+\begin{lstlisting}
+   R, x = FiniteField(13, 1, "x")
+   T, y = PolynomialRing(R, "y")
+   
+   M = R[7 6 1;
+         7 7 5;
+         8 12 5]
+
+   A = minpoly(T, M)
+\end{lstlisting}
+
 \section{Generic fields}
 
 Nemo provides various constructions of fields. 

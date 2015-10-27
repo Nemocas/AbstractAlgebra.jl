@@ -6,7 +6,7 @@
 
 export Mat, MatrixSpace, fflu!, fflu, solve_triu, is_rref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
-       is_hessenberg, charpoly_hessenberg!
+       is_hessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat
 
 ###############################################################################
 #
@@ -998,6 +998,49 @@ function is_rref{T <: FieldElem}(M::MatElem{T})
    return true
 end
 
+# Reduce row n of the matrix A, assuming the first n - 1 rows are in Gauss
+# form. However those rows may not be in order. The i-th entry of the array
+# P is the row of A which has a pivot in the i-th column. If no such row
+# exists, the entry of P will be 0. The function returns the column in which
+# the n-th row has a pivot after reduction. This will always be chosen to be
+# the first available column for a pivot from the left. This information is
+# also updated in P. The i-th entry of the array L contains the last column
+# of A for which the row i is nonzero. This speeds up reduction in the case
+# that A is chambered on the right. Otherwise the entries can all be set to
+# the number of columns of A. The entries of L must be monotonic increasing.
+
+function reduce_row!{T <: FieldElem}(A::MatElem{T}, P::Array{Int}, L::Array{Int}, m::Int)
+   R = base_ring(A)
+   n = cols(A)
+   t = R()
+   for i = 1:n
+      if A[m, i] != 0
+         h = -A[m, i]
+         r = P[i]
+         if r != 0
+            A[m, i] = R()
+            for j = i + 1:L[r]
+               mul!(t, A[r, j], h)
+               s = A[m, j]
+               addeq!(s, t)
+               A[m, j] = s
+            end 
+         else
+            h = inv(A[m, i])
+            A[m, i] = R(1)
+            for j = i + 1:L[m]
+               s = A[m, j]
+               mul!(s, s, h)
+               A[m, j] = s
+            end
+            P[i] = m
+            return i
+         end
+      end
+   end
+   return 0
+end
+
 ###############################################################################
 #
 #   Determinant
@@ -1693,7 +1736,7 @@ function charpoly_hessenberg!{T <: RingElem}(S::Ring, A::MatElem{T})
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
    n = rows(A)
    if n == 0
-      return S()
+      return S(1)
    end
    if n == 1
       return gen(S) - A[1, 1]
@@ -1719,7 +1762,7 @@ function charpoly_danilevsky_ff!{T <: RingElem}(S::Ring, A::MatElem{T})
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
    n = rows(A)
    if n == 0
-      return S()
+      return S(1)
    end
    if n == 1
       return gen(S) - A[1, 1]
@@ -1836,7 +1879,7 @@ function charpoly_danilevsky!{T <: RingElem}(S::Ring, A::MatElem{T})
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
    n = rows(A)
    if n == 0
-      return S()
+      return S(1)
    end
    if n == 1
       return gen(S) - A[1, 1]
@@ -1940,7 +1983,7 @@ function charpoly{T <: RingElem}(V::Ring, Y::MatElem{T})
    base_ring(V) != base_ring(Y) && error("Cannot coerce into polynomial ring")
    n = rows(Y)
    if n == 0
-      return V()
+      return V(1)
    end
    F = Array(elem_type(R), n)
    A = Array(elem_type(R), n)
@@ -1985,6 +2028,119 @@ function charpoly{T <: RingElem}(V::Ring, Y::MatElem{T})
       setcoeff!(f, n - i, F[i])
    end
    return f
+end
+
+###############################################################################
+#
+#   Minimum polynomial
+#
+###############################################################################
+
+# We let the rows of A be the Krylov sequence v, Mv, M^2v, ... where v
+# is a standard basis vector. We find a minimum polynomial P_v by finding
+# a linear relation amongst the rows (rows are added one at a time until
+# a relation is found). We then append the rows from A to B and row reduce
+# by all the rows already in B. We then look for a new standard basis vector
+# v not in the span of the rows in B and repeat the above. The arrays P1 and
+# P2 are because we can't efficiently swap rows. The i-th entry encodes the
+# row of A (in the case of P1) or B (in the case of P2) which has a pivot in
+# column i. The arrays L1 and L2 encode the number of columns that contain
+# nonzero entries for each row of A and B respectively. These are required
+# by the reduce_row! function. If charpoly_only is set to true, the function
+# will return just the polynomial obtained from the first Krylov subspace.
+# If the charpoly is the minpoly, this returned polynomial will be the
+# charpoly iff it has degree n. Otherwise it is meaningless (but it is
+# extremely fast to compute over some fields).
+
+function minpoly{T <: FieldElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
+   rows(M) != cols(M) && error("Not a square matrix in minpoly")
+   base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
+   n = rows(M)
+   if n == 0
+      return S(1)
+   end
+   R = base_ring(M)
+   p = S(1)
+   A = MatrixSpace(R, n + 1, 2n + 1)()
+   B = MatrixSpace(R, n, n)()
+   U = MatrixSpace(R, n, 1)
+   L1 = [n + i for i in 1:n + 1]
+   L2 = [n for i in 1:n]
+   P2 = zeros(Int, n)
+   P2[1] = 1
+   c2 = 1
+   r2 = 1
+   first_poly = true
+   while r2 <= n
+      P1 = [0 for i in 1:2n + 1]
+      v = zero(U)
+      for j = 1:n
+         B[r2, j] = v[j, 1]
+         A[1, j] = R()
+      end
+      P1[c2] = 1
+      P2[c2] = r2
+      v[c2, 1] = R(1)
+      B[r2, c2] = v[c2, 1]
+      A[1, c2] = R(1)
+      A[1, n + 1] = R(1)
+      indep = true
+      r1 = 1
+      c1 = 0
+      while c1 <= n && r1 <= n
+         r1 += 1
+         r2 = indep ? r2 + 1 : r2
+         v = M*v
+         for j = 1:n
+            A[r1, j] = deepcopy(v[j, 1])
+         end
+         for j = n + 1:n + r1 - 1
+            A[r1, j] = R(0)
+         end
+         A[r1, n + r1] = R(1)
+         c1 = reduce_row!(A, P1, L1, r1)
+         if indep && r2 <= n && !first_poly
+            for j = 1:n
+               B[r2, j] = deepcopy(v[j, 1])
+            end
+            c = reduce_row!(B, P2, L2, r2)
+            indep = c != 0
+         end
+      end
+      if first_poly
+         for j = 1:n
+            P2[j] = P1[j]
+         end
+         r2 = r1
+      end
+      c = 0 
+      for j = c2 + 1:n
+         if P2[j] == 0
+            c = j
+            break
+         end
+      end
+      c2 = c
+      b = S()
+      fit!(b, r1)
+      h = inv(A[r1, n + r1])
+      for i = 1:r1
+         setcoeff!(b, i - 1, A[r1, n + i]*h)
+      end
+      p = lcm(p, b)
+      if charpoly_only == true
+         return p
+      end
+      if first_poly && r2 <= n
+         for j = 1:r1 - 1
+            for k = 1:n
+               B[j, k] = A[j, k]
+            end
+         end
+      end
+      first_poly = false
+   end
+   return p
 end
 
 ###############################################################################
@@ -2079,3 +2235,28 @@ function MatrixSpace(R::Ring, r::Int, c::Int)
    return MatrixSpace{T}(R, r, c)
 end
 
+function typed_hvcat(R::Ring, dims, d...)
+   T = elem_type(R)
+   r = length(dims)
+   c = dims[1]
+   A = Array(T, r, c)
+   for i = 1:r
+      dims[i] != c && throw(ArgumentError("row $i has mismatched number of columns (expected $c, got $(dims[i]))"))
+      for j = 1:c
+         A[i, j] = R(d[(i - 1)*c + j])
+      end
+   end 
+   S = MatrixSpace(R, r, c)
+   return S(A)
+end
+
+function typed_hcat(R::Ring, d...)
+   T = elem_type(R)
+   r = length(d)
+   A = Array(T, r, 1)
+   for i = 1:r
+      A[i, 1] = R(d[i])
+   end
+   S = MatrixSpace(R, r, 1)
+   return S(A)
+end

@@ -926,6 +926,75 @@ function test_matrix_charpoly()
    println("PASS")   
 end
 
+function test_matrix_minpoly()
+   print("Matrix.minpoly...")
+
+   R, x = FiniteField(103, 1, "x")
+   T, y = PolynomialRing(R, "y")
+
+   M = R[92 97 8;
+          0 5 13;
+          0 16 2]
+
+   @test minpoly(T, M) == y^2+96*y+8
+
+   R, x = FiniteField(3, 1, "x")
+   T, y = PolynomialRing(R, "y")
+
+   M = R[1 2 0 2;
+         1 2 1 0;
+         1 2 2 1;
+         2 1 2 0]
+
+   @test minpoly(T, M) == y^2 + 2y
+
+   R, x = FiniteField(13, 1, "x")
+   T, y = PolynomialRing(R, "y")
+
+   M = R[7 6 1;
+         7 7 5;
+         8 12 5]
+
+   @test minpoly(T, M) == y^2+10*y
+
+   M = R[4 0 9 5;
+         1 0 1 9;
+         0 0 7 6;
+         0 0 3 10]
+
+   @test minpoly(T, M) == y^2 + 9y
+
+   M = R[2 7 0 0 0 0;
+         1 0 0 0 0 0;
+         0 0 2 7 0 0;
+         0 0 1 0 0 0;
+         0 0 0 0 4 3;
+         0 0 0 0 1 0]
+
+   @test minpoly(T, M) == (y^2+9*y+10)*(y^2+11*y+6)
+
+   M = R[2 7 0 0 0 0;
+         1 0 1 0 0 0;
+         0 0 2 7 0 0;
+         0 0 1 0 0 0;
+         0 0 0 0 4 3;
+         0 0 0 0 1 0]
+
+   @test minpoly(T, M) == (y^2+9*y+10)*(y^2+11*y+6)^2
+
+   S = MatrixSpace(R, 1, 1)
+   M = S()
+
+   @test minpoly(T, M) == y
+
+   S = MatrixSpace(R, 0, 0)
+   M = S()
+
+   @test minpoly(T, M) == 1
+
+   println("PASS")   
+end
+
 function test_matrix()
    test_matrix_constructors()
    test_matrix_manipulation()
@@ -951,6 +1020,7 @@ function test_matrix()
    test_matrix_inversion()
    test_matrix_hessenberg()
    test_matrix_charpoly()
+   test_matrix_minpoly()
 
    println("")
 end
