@@ -1067,7 +1067,7 @@ function reduce_row!{T <: RingElem}(A::MatElem{T}, P::Array{Int}, L::Array{Int},
    R = base_ring(A)
    n = cols(A)
    t = R()
-   first = true
+   c = R(1)
    for i = 1:n
       if A[m, i] != 0
          h = -A[m, i]
@@ -1087,13 +1087,10 @@ function reduce_row!{T <: RingElem}(A::MatElem{T}, P::Array{Int}, L::Array{Int},
                mul!(s, s, d)
                A[m, j] = s
             end
-            if !first
-               first = false
-               c = A[P[i - 1], i - 1]
-               for j = i + 1:L[m]
-                  A[m, j] = divexact(A[m, j], c)
-               end
+            for j = i + 1:L[m]
+               A[m, j] = divexact(A[m, j], c)
             end
+            c = d
          else
             P[i] = m
             return i
