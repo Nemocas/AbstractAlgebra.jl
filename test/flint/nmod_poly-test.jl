@@ -461,6 +461,12 @@ function test_nmod_poly_evaluate()
 
   @test t == R(14)
 
+  @test f(R(20)) == R(14)
+
+  @test f(20) == R(14)
+
+  @test f(fmpz(20)) == R(14)
+
   println("PASS")
 end
 

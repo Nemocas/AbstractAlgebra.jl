@@ -6,7 +6,8 @@
 
 export Mat, MatrixSpace, fflu!, fflu, solve_triu, is_rref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
-       is_hessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat
+       is_hessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
+       powers
 
 ###############################################################################
 #
@@ -150,7 +151,11 @@ function -(x::Mat)
 end
 
 function transpose(x::Mat)
-   par = parent(x)
+   if rows(x) == cols(x)
+      par = parent(x)
+   else
+      par = MatrixSpace(base_ring(x), cols(x), rows(x))
+   end
    return par(x.entries')
 end
 
@@ -417,6 +422,37 @@ function ^{T <: RingElem}(a::MatElem{T}, b::Int)
       end
       return z
    end
+end
+
+function powers{T <: RingElem}(a::MatElem{T}, b::Int)
+   rows(a) != cols(a) && error("Dimensions do not match in powers")
+   b <= 0 && throw(DomainError())
+   S = parent(a)
+   d1 = isqrt(b)
+   d2 = div(b, d1)
+   A = Array(MatElem{T}, d1 + 1)
+   B = Array(MatElem{T}, d2 + 1)
+   A[1] = one(S)
+   c = A[1]
+   if d1 > 1
+      c = a
+      A[2] = a
+      for i = 2:d1 - 1
+         c *= a
+         A[i + 1] = c
+      end
+   end
+   B[1] = one(S)
+   if d2 > 0
+      c *= a
+      B[2] = c
+      d = c
+      for i = 2:d2
+         d *= c
+         B[i + 1] = d
+      end
+   end
+   return A, B
 end
 
 ###############################################################################
@@ -2253,10 +2289,10 @@ end
 function typed_hcat(R::Ring, d...)
    T = elem_type(R)
    r = length(d)
-   A = Array(T, r, 1)
+   A = Array(T, 1, r)
    for i = 1:r
-      A[i, 1] = R(d[i])
+      A[1, i] = R(d[i])
    end
-   S = MatrixSpace(R, r, 1)
+   S = MatrixSpace(R, 1, r)
    return S(A)
 end

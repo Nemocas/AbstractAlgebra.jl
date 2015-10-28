@@ -807,6 +807,19 @@ Base.promote_rule{V <: Integer}(::Type{fmpz_mod_poly}, ::Type{V}) = fmpz_mod_pol
 
 Base.promote_rule(::Type{fmpz_mod_poly}, ::Type{fmpz}) = fmpz_mod_poly
 
+###############################################################################
+#
+#   Polynomial substitution
+#
+###############################################################################
+
+function Base.call(f::fmpz_mod_poly, a::Residue{fmpz})
+   if parent(a) != base_ring(f)
+      return subst(f, a)
+   end
+   return evaluate(f, a)
+end
+
 ################################################################################
 #
 #  Parent object call overloads

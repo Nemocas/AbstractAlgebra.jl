@@ -10,7 +10,7 @@ export Poly, PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow,
        resultant, discriminant, gcdx, zero, one, gen, length, iszero, 
        normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod, 
        invmod, lcm, divrem, mod, gcdinv, canonical_unit, var, chebyshev_t,
-       chebyshev_u, set_length!, mul_classical, sqr_classical, mul_ks,
+       chebyshev_u, set_length!, mul_classical, sqr_classical, mul_ks, subst,
        mul_karatsuba, pow_multinomial, monomial_to_newton!, newton_to_monomial!
 
 ###############################################################################
@@ -1015,6 +1015,9 @@ function evaluate{T <: RingElem}(a::PolyElem{T}, b::T)
    if i == 0
        return zero(base_ring(a))
    end
+   if i > 25
+      return subst(a, b)
+   end
    z = coeff(a, i - 1)
    while i > 1
       i -= 1
@@ -1035,6 +1038,9 @@ function compose(a::Poly, b::Poly)
    i = length(a)
    if i == 0
        return zero(parent(a))
+   end
+   if i*length(b) > 25
+      return subst(a, b)
    end
    z = coeff(a, i - 1)
    while i > 1
@@ -1642,16 +1648,61 @@ Base.promote_rule{T <: RingElem}(::Type{Poly{T}}, ::Type{T}) = Poly{T}
 
 ###############################################################################
 #
-#   Polynomial evaluation
+#   Polynomial substitution
 #
 ###############################################################################
 
-function Base.call{T <: RingElem}(f::PolyElem{T}, a)
-   s = parent(a)(1)
-   for i = 1:degree(f)
-      s = a*s + coeff(f, degree(f) - i)
+function subst{T <: RingElem}(f::PolyElem{T}, a)
+   S = parent(a)
+   n = degree(f)
+   if n < 0
+      return S()
+   elseif n == 0
+      return coeff(f, 0)*S(1)
+   elseif n == 1
+      return coeff(f, 0)*S(1) + coeff(f, 1)*a
+   end
+   A, B = powers(a, n)
+   d1 = isqrt(n)
+   d2 = div(n, d1)
+   s = coeff(f, 0)*A[1]
+   for j = 1:min(n, d1 - 1)
+      c = coeff(f, j)
+      if c != 0
+         s += c*A[j + 1]
+      end
+   end
+   for i = 1:d2
+      t = coeff(f, i*d1)*A[1]
+      for j = 1:min(n - i*d1, d1 - 1)
+         c = coeff(f, i*d1 + j)
+         if c != 0
+            t += c*A[j + 1]
+         end
+      end
+      s += t*B[i + 1]
    end
    return s
+end
+
+call{T <: RingElem}(f::PolyElem{T}, a) = subst(f, a)
+
+function Base.call{T <: RingElem}(f::PolyElem{T}, a::PolyElem{T})
+   if parent(f) != parent(a)
+      return subst(f, a)
+   end
+   return compose(f, a)
+end
+
+Base.call{T <: RingElem}(f::PolyElem{T}, a::Integer) = evaluate(f, a)
+
+Base.call{T <: RingElem}(f::PolyElem{T}, a::fmpz) = evaluate(f, a)
+
+function Base.call{T <: RingElem}(f::PolyElem{T}, a::T)
+   if parent(a) != base_ring(f)
+      return subst(f, a)
+   end
+   return evaluate(f, a)
 end
 
 ###############################################################################

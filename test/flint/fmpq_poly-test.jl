@@ -338,9 +338,15 @@ function test_fmpq_poly_evaluation()
 
    @test evaluate(g, 3) == 63
 
+   @test g(3) == 63
+
    @test evaluate(g, fmpz(3)) == 63
 
+   @test g(fmpz(3)) == 63
+
    @test evaluate(g, f) == fmpz(1503)//49
+
+   @test g(f) == fmpz(1503)//49
 
    println("PASS")
 end

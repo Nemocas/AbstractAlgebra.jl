@@ -597,6 +597,19 @@ Base.promote_rule(::Type{fq_nmod_poly}, ::Type{fmpz}) = fq_nmod_poly
 
 Base.promote_rule(::Type{fq_nmod_poly}, ::Type{fq_nmod}) = fq_nmod_poly
 
+###############################################################################
+#
+#   Polynomial substitution
+#
+###############################################################################
+
+function Base.call(f::fq_nmod_poly, a::fq_nmod)
+   if parent(a) != base_ring(f)
+      return subst(f, a)
+   end
+   return evaluate(f, a)
+end
+
 ################################################################################
 #
 #   Parent object call overloads

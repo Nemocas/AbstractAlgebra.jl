@@ -1380,6 +1380,38 @@ g = (x + 1)*y + (x^3 + 2x + 2)
 h = compose(f, g)
 \end{lstlisting}
 
+\subsubsection{Substitution}
+
+\begin{lstlisting}
+subst{T <: RingElem}(f::Poly{T}, c)
+\end{lstlisting}
+
+\desc{Return the value of the polynomial $f$ at $c$, i.e. return the value
+$f(c)$. The value can live in any ring or be any object for which (associative)
+addition and multiplication and scalar multiplication by the coefficients of
+$f$ are defined.}
+
+In order to make evaluation of polynomials at arbitrary values more convenient
+we also overload the call operator for polynomial objects so that the
+expression $f(c)$ will return the value of $f$ at $c$. For efficiency,
+polynomial evaluation and composition are called instead when evaluating at
+polynomials or scalars in the coefficient ring.
+
+Here are some examples of substitution.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+M = R[x + 1 2x; x - 3 2x - 1]
+
+f = x*y^2 + (x + 1)*y + 3
+
+g = subst(f, M)
+h = f(M)
+k = f(23)
+\end{lstlisting}
+
 \subsubsection{Derivative}
 
 \begin{lstlisting}
@@ -2995,9 +3027,30 @@ S(a::RingElem)
 \desc{Try to coerce $a$ into the base ring of the matrix space and then construct
 the diagonal $r\times c$ matrix with diagonal entries equal to $a$.}
 
+We also allow arrays to be constructed by passing an explicit list of rows or an
+explicit list of entries for a row vector, as for arrays and row vectors of
+Julia types. Each entry is coerced into the given base ring.
+
+\begin{lstlisting}
+R[a b c...;...]
+\end{lstlisting}
+
+\desc{Create the matrix with entries in $R$ consisting of the given rows
+(separated by semicolons). Each entry is coerced into $R$ automatically.}
+
+\begin{lstlisting}
+R[a b c...]
+\end{lstlisting}
+
+\desc{Create the row vector with entries in $R$ consisting of the given
+entries (separated by spaces). Each entry is coerced into $R$ automatically.}
+
+To create a column vector, one can transpose a row vector using the \code{'}
+operator.
+
 \textbf{Examples.}
 
-Here are some examples of power series constructors.
+Here are some examples of matrix constructors.
 
 \begin{lstlisting}
 R, t = PolynomialRing(QQ, "t")
@@ -3006,8 +3059,12 @@ S = MatrixSpace(R, 3, 3)
 A = S()
 B = S(12)
 C = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-D = S(c)
+D = S(C)
 F = S(R(11))
+
+G = R[t + 1 1; t^2 0]
+H = R[t + 1 2 t]
+K = R[1 2 t]'
 \end{lstlisting}
 
 \subsubsection{Basic manipulation}
@@ -4320,6 +4377,36 @@ S, x = PolynomialRing(ZZ, "x")
 a = -x//(2x + 1)
 
 f = gcd(a, (x + 1)/(x - 1))
+\end{lstlisting}
+
+\section{Top level types and functions}
+
+Not all Nemo functions and constructors can be classified as Set, Group, Ring or Field
+operations. We introduce here some additional top level types and functions defined
+thereon.
+
+\subsection{Arrays}
+
+Given a Nemo parent object $R$ we can construct Julia arrays of such objects.
+
+\begin{lstlisting}
+Array(R, dims...)
+\end{lstlisting}
+
+\desc{Construct an array of objects with the given dimensions.}
+
+\begin{lstlisting}
+zeros(R, dims...)
+\end{lstlisting}
+
+\desc{Construct an array of objects with the given dimensions and initialise each
+entry to the zero of the given ring.}
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+
+A = Array(R, 2, 3)
+B = zeros(R, 2, 3)
 \end{lstlisting}
 
 \section{Flint rings}
