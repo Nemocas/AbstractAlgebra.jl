@@ -992,6 +992,23 @@ function test_matrix_minpoly()
 
    @test minpoly(T, M) == 1
 
+   R, x = PolynomialRing(ZZ, "x")
+   S, y = PolynomialRing(R, "y")
+   U, z = PolynomialRing(S, "z")
+   T = MatrixSpace(S, 6, 6)
+
+   M = T()
+   for i = 1:3
+      for j = 1:3
+         M[i, j] = randelem(S, 10)
+         M[i + 3, j + 3] = deepcopy(M[i, j])
+      end
+   end
+
+   f = minpoly(U, M)
+
+   @test degree(f) <= 3
+
    println("PASS")   
 end
 

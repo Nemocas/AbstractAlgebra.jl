@@ -1077,6 +1077,46 @@ function reduce_row!{T <: FieldElem}(A::MatElem{T}, P::Array{Int}, L::Array{Int}
    return 0
 end
 
+function reduce_row!{T <: RingElem}(A::MatElem{T}, P::Array{Int}, L::Array{Int}, m::Int)
+   R = base_ring(A)
+   n = cols(A)
+   t = R()
+   first = true
+   for i = 1:n
+      if A[m, i] != 0
+         h = -A[m, i]
+         r = P[i]
+         if r != 0
+            d = A[r, i]
+            A[m, i] = R()
+            for j = i + 1:L[r]
+               mul!(t, A[r, j], h)
+               s = A[m, j]
+               mul!(s, s, d)
+               addeq!(s, t)
+               A[m, j] = s
+            end 
+            for j = L[r] + 1:L[m]
+               s = A[m, j]
+               mul!(s, s, d)
+               A[m, j] = s
+            end
+            if !first
+               first = false
+               c = A[P[i - 1], i - 1]
+               for j = i + 1:L[m]
+                  A[m, j] = divexact(A[m, j], c)
+               end
+            end
+         else
+            P[i] = m
+            return i
+         end
+      end
+   end
+   return 0
+end
+
 ###############################################################################
 #
 #   Determinant
@@ -2163,6 +2203,99 @@ function minpoly{T <: FieldElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
       for i = 1:r1
          setcoeff!(b, i - 1, A[r1, n + i]*h)
       end
+      p = lcm(p, b)
+      if charpoly_only == true
+         return p
+      end
+      if first_poly && r2 <= n
+         for j = 1:r1 - 1
+            for k = 1:n
+               B[j, k] = A[j, k]
+            end
+         end
+      end
+      first_poly = false
+   end
+   return p
+end
+
+function minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
+   rows(M) != cols(M) && error("Not a square matrix in minpoly")
+   base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
+   n = rows(M)
+   if n == 0
+      return S(1)
+   end
+   R = base_ring(M)
+   p = S(1)
+   A = MatrixSpace(R, n + 1, 2n + 1)()
+   B = MatrixSpace(R, n, n)()
+   U = MatrixSpace(R, n, 1)
+   L1 = [n + i for i in 1:n + 1]
+   L2 = [n for i in 1:n]
+   P2 = zeros(Int, n)
+   P2[1] = 1
+   c2 = 1
+   r2 = 1
+   first_poly = true
+   while r2 <= n
+      P1 = [0 for i in 1:2n + 1]
+      v = zero(U)
+      for j = 1:n
+         B[r2, j] = v[j, 1]
+         A[1, j] = R()
+      end
+      P1[c2] = 1
+      P2[c2] = r2
+      v[c2, 1] = R(1)
+      B[r2, c2] = v[c2, 1]
+      A[1, c2] = R(1)
+      A[1, n + 1] = R(1)
+      indep = true
+      r1 = 1
+      c1 = 0
+      while c1 <= n && r1 <= n
+         r1 += 1
+         r2 = indep ? r2 + 1 : r2
+         v = M*v
+         for j = 1:n
+            A[r1, j] = deepcopy(v[j, 1])
+         end
+         for j = n + 1:n + r1 - 1
+            A[r1, j] = R(0)
+         end
+         A[r1, n + r1] = R(1)
+         c1 = reduce_row!(A, P1, L1, r1)
+         if indep && r2 <= n && !first_poly
+            for j = 1:n
+               B[r2, j] = deepcopy(v[j, 1])
+            end
+            c = reduce_row!(B, P2, L2, r2)
+            indep = c != 0
+         end
+      end
+      if first_poly
+         for j = 1:n
+            P2[j] = P1[j]
+         end
+         r2 = r1
+      end
+      c = 0 
+      for j = c2 + 1:n
+         if P2[j] == 0
+            c = j
+            break
+         end
+      end
+      c2 = c
+      b = S()
+      fit!(b, r1)
+      for i = 1:r1
+         setcoeff!(b, i - 1, A[r1, n + i])
+      end
+      b = reverse(b, length(b))
+      b = primpart(b)
+      b = reverse(b, length(b))
       p = lcm(p, b)
       if charpoly_only == true
          return p

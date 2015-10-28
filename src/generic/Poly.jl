@@ -942,6 +942,9 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    if b == 0
       return a
    end
+   if b == 1
+      return b
+   end
    c = gcd(content(a), content(b))
    a = divexact(a, c)
    b = divexact(b, c)
