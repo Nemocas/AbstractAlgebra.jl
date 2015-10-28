@@ -1665,25 +1665,25 @@ function subst{T <: RingElem}(f::PolyElem{T}, a)
    elseif n == 1
       return coeff(f, 0)*S(1) + coeff(f, 1)*a
    end
-   A, B = powers(a, n)
    d1 = isqrt(n)
-   d2 = div(n, d1)
-   s = coeff(f, 0)*A[1]
-   for j = 1:min(n, d1 - 1)
-      c = coeff(f, j)
+   d = div(n, d1)
+   A = powers(a, d)
+   s = coeff(f, d1*d)*A[1]
+   for j = 1:min(n - d1*d, d - 1)
+      c = coeff(f, d1*d + j)
       if c != 0
          s += c*A[j + 1]
       end
    end
-   for i = 1:d2
-      t = coeff(f, i*d1)*A[1]
-      for j = 1:min(n - i*d1, d1 - 1)
-         c = coeff(f, i*d1 + j)
+   for i = 1:d1
+      s *= A[d + 1]
+      s += coeff(f, (d1 - i)*d)*A[1]
+      for j = 1:min(n - (d1 - i)*d, d - 1)
+         c = coeff(f, (d1 - i)*d + j)
          if c != 0
-            t += c*A[j + 1]
+            s += c*A[j + 1]
          end
       end
-      s += t*B[i + 1]
    end
    return s
 end

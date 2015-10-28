@@ -424,35 +424,21 @@ function ^{T <: RingElem}(a::MatElem{T}, b::Int)
    end
 end
 
-function powers{T <: RingElem}(a::MatElem{T}, b::Int)
+function powers{T <: RingElem}(a::MatElem{T}, d::Int)
    rows(a) != cols(a) && error("Dimensions do not match in powers")
-   b <= 0 && throw(DomainError())
+   d <= 0 && throw(DomainError())
    S = parent(a)
-   d1 = isqrt(b)
-   d2 = div(b, d1)
-   A = Array(MatElem{T}, d1 + 1)
-   B = Array(MatElem{T}, d2 + 1)
+   A = Array(MatElem{T}, d + 1)
    A[1] = one(S)
-   c = A[1]
-   if d1 > 1
+   if d > 1
       c = a
       A[2] = a
-      for i = 2:d1 - 1
+      for i = 2:d
          c *= a
          A[i + 1] = c
       end
    end
-   B[1] = one(S)
-   if d2 > 0
-      c *= a
-      B[2] = c
-      d = c
-      for i = 2:d2
-         d *= c
-         B[i + 1] = d
-      end
-   end
-   return A, B
+   return A
 end
 
 ###############################################################################
