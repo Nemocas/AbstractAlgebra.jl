@@ -7,7 +7,7 @@
 export Mat, MatrixSpace, fflu!, fflu, solve_triu, is_rref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
        is_hessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
-       powers
+       powers, similarity!
 
 ###############################################################################
 #
@@ -2276,9 +2276,9 @@ function minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
       for i = 1:r1
          setcoeff!(b, i - 1, A[r1, n + i])
       end
-      b = reverse(b, length(b))
+      b = reverse(b, r1)
       b = primpart(b)
-      b = reverse(b, length(b))
+      b = reverse(b, r1)
       p = lcm(p, b)
       if charpoly_only == true
          return p
@@ -2293,6 +2293,44 @@ function minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
       first_poly = false
    end
    return p
+end
+
+###############################################################################
+#
+#   Transforms
+#
+###############################################################################
+
+function similarity!{T <: RingElem}(A::MatElem{T}, r::Int, d::T)
+   n = rows(A)
+   t = base_ring(A)()
+   for i = 1:n
+      for j = 1:r - 1
+         mul!(t, A[i, r], d)
+         s = A[i, j]
+         addeq!(s, t)
+         A[i, j] = s
+      end
+      for j = r + 1:n
+         mul!(t, A[i, r], d)
+         s = A[i, j]
+         addeq!(s, t)
+         A[i, j] = s
+      end
+   end
+   d = -d
+   for i = 1:n
+      s = A[r, i]
+      for j = 1:r - 1
+         mul!(t, A[j, i], d)
+         addeq!(s, t)
+      end
+      for j = r + 1:n
+         mul!(t, A[j, i], d)
+         addeq!(s, t)
+      end
+      A[r, i] = s
+   end
 end
 
 ###############################################################################

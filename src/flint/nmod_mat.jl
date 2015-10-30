@@ -513,7 +513,7 @@ end
 
 ################################################################################
 #
-#  Charpoly
+#  Characteristic polynomial
 #
 ################################################################################
 
@@ -522,6 +522,19 @@ function charpoly(R::NmodPolyRing, a::nmod_mat)
   p = R()
   ccall((:nmod_mat_charpoly, :libflint), Void,
           (Ptr{nmod_poly}, Ptr{nmod_mat}), &p, &m)
+  return p
+end
+
+################################################################################
+#
+#  Minimal polynomial
+#
+################################################################################
+
+function minpoly(R::NmodPolyRing, a::nmod_mat)
+  p = R()
+  ccall((:nmod_mat_minpoly, :libflint), Void,
+          (Ptr{nmod_poly}, Ptr{nmod_mat}), &p, &a)
   return p
 end
 
