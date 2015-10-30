@@ -3760,6 +3760,32 @@ Here is an example of computing the Hessenberg form.
    is_hessenberg(A) == true
 \end{lstlisting}
 
+\subsubsection{Similarity transform}
+
+\begin{lstlisting}
+similarity!{T <: RingElem}(M::MatElem{T}, r::Int, d::T)
+\end{lstlisting}
+
+\desc{Applies a similarity transform to the $n\times n$ matrix $M$ in-place.
+Let $P$ be the $n\times n$ identity matrix that has had all nonzero entries
+of row $r$ replaced with $d$, then the transform applied is equivalent to
+$M = P^{-1}MP$. We require $M$ to be a square matrix. A similarity transform
+preserves the minimal and characteristic polynomials of a matrix.}
+
+\textbf{Examples.}
+
+Here is an example of applying a similarity transform.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 4, 4)
+   
+   M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
+          R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
+   
+   similarity!(M, 1, R(3))
+\end{lstlisting}
+
 \subsubsection{Characteristic polynomial}
 
 \begin{lstlisting}
