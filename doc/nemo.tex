@@ -3767,7 +3767,7 @@ similarity!{T <: RingElem}(M::MatElem{T}, r::Int, d::T)
 \end{lstlisting}
 
 \desc{Applies a similarity transform to the $n\times n$ matrix $M$ in-place.
-Let $P$ be the $n\times n$ identity matrix that has had all nonzero entries
+Let $P$ be the $n\times n$ identity matrix that has had all zero entries
 of row $r$ replaced with $d$, then the transform applied is equivalent to
 $M = P^{-1}MP$. We require $M$ to be a square matrix. A similarity transform
 preserves the minimal and characteristic polynomials of a matrix.}
