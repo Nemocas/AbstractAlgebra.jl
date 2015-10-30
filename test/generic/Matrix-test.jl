@@ -923,6 +923,28 @@ function test_matrix_charpoly()
       end
    end
 
+   R, x = PolynomialRing(ZZ, "x")
+   U, z = PolynomialRing(R, "z")
+   T = MatrixSpace(R, 6, 6)
+
+   M = T()
+   for i = 1:3
+      for j = 1:3
+         M[i, j] = randelem(R, 10)
+         M[i + 3, j + 3] = deepcopy(M[i, j])
+      end
+   end
+
+   p1 = charpoly(U, M)
+
+   for i = 1:10
+      similarity!(M, rand(1:6), R(randelem(R, 3)))
+   end
+
+   p2 = charpoly(U, M)
+
+   @test p1 == p2
+
    println("PASS")   
 end
 
@@ -1008,6 +1030,28 @@ function test_matrix_minpoly()
    f = minpoly(U, M)
 
    @test degree(f) <= 3
+
+   R, x = PolynomialRing(ZZ, "x")
+   U, z = PolynomialRing(R, "z")
+   T = MatrixSpace(R, 6, 6)
+
+   M = T()
+   for i = 1:3
+      for j = 1:3
+         M[i, j] = randelem(R, 10)
+         M[i + 3, j + 3] = deepcopy(M[i, j])
+      end
+   end
+
+   p1 = minpoly(U, M)
+
+   for i = 1:10
+      similarity!(M, rand(1:6), R(randelem(R, 3)))
+   end
+
+   p2 = minpoly(U, M)
+
+   @test p1 == p2
 
    println("PASS")   
 end
