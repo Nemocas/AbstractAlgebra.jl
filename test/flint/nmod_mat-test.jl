@@ -511,11 +511,11 @@ function test_nmod_mat_lu()
 
   b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
-  l,u,p = lufact(a)
+  r, P, l, u = lufact(a)
 
   @test l*u == a
 
-  l,u,p = lufact(b)
+  r, P, l, u = lufact(b)
 
   @test l*u == S([ 2 1 0 1; 0 1 2 0; 0 0 0 0])
 
