@@ -1068,6 +1068,7 @@ function reduce_row!{T <: RingElem}(A::MatElem{T}, P::Array{Int}, L::Array{Int},
    n = cols(A)
    t = R()
    c = R(1)
+   c1 = 0
    for i = 1:n
       if A[m, i] != 0
          h = -A[m, i]
@@ -1087,13 +1088,25 @@ function reduce_row!{T <: RingElem}(A::MatElem{T}, P::Array{Int}, L::Array{Int},
                mul!(s, s, d)
                A[m, j] = s
             end
-            for j = i + 1:L[m]
-               A[m, j] = divexact(A[m, j], c)
+            if c1 > 0 && P[c1] < P[i]
+               for j = i + 1:L[m]
+                  A[m, j] = divexact(A[m, j], c)
+               end
             end
+            c1 = i
             c = d
          else
             P[i] = m
             return i
+         end
+      else
+         r = P[i]
+         if r != 0
+            for j = i + 1:L[m]
+               s = A[m, j]
+               mul!(s, s, A[r, i])
+               A[m, j] = s
+            end
          end
       end
    end
@@ -2281,7 +2294,7 @@ function minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
       b = reverse(b, r1)
       p = lcm(p, b)
       if charpoly_only == true
-         return p
+         return divexact(p, canonical_unit(p))
       end
       if first_poly && r2 <= n
          for j = 1:r1 - 1
@@ -2292,7 +2305,7 @@ function minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
       end
       first_poly = false
    end
-   return p
+   return divexact(p, canonical_unit(p))
 end
 
 ###############################################################################
