@@ -749,6 +749,11 @@ end
 #
 ################################################################################
 
+function fit!(x::fmpz_mod_poly, n::Int)
+  ccall((:fmpz_mod_poly_fit_length, :libflint), Void, 
+                   (Ptr{fmpz_mod_poly}, Int), &x, n)
+end
+
 function setcoeff!(x::fmpz_mod_poly, n::Int, y::UInt)
   ccall((:fmpz_mod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{fmpz_mod_poly}, Int, UInt), &x, n, y)
@@ -801,6 +806,19 @@ end
 Base.promote_rule{V <: Integer}(::Type{fmpz_mod_poly}, ::Type{V}) = fmpz_mod_poly
 
 Base.promote_rule(::Type{fmpz_mod_poly}, ::Type{fmpz}) = fmpz_mod_poly
+
+###############################################################################
+#
+#   Polynomial substitution
+#
+###############################################################################
+
+function Base.call(f::fmpz_mod_poly, a::Residue{fmpz})
+   if parent(a) != base_ring(f)
+      return subst(f, a)
+   end
+   return evaluate(f, a)
+end
 
 ################################################################################
 #

@@ -78,6 +78,7 @@ type fmpq <: FractionElem{fmpz}
    end
 
    function fmpq(a::fmpz, b::fmpz)
+      b == 0 && throw(DivideError())
       z = new()
       ccall((:fmpq_init, :libflint), Void, (Ptr{fmpq},), &z)
       ccall((:fmpq_set_fmpz_frac, :libflint), Void,
@@ -97,6 +98,7 @@ type fmpq <: FractionElem{fmpz}
    end
 
    function fmpq(a::Int, b::Int)
+      b == 0 && throw(DivideError())
       z = new()
       ccall((:fmpq_init, :libflint), Void, (Ptr{fmpq},), &z)
       ccall((:fmpq_set_si, :libflint), Void,

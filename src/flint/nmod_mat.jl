@@ -321,8 +321,16 @@ end
 
 function determinant(a::nmod_mat)
   !issquare(a) && error("Matrix must be a square matrix")
-  r = ccall((:nmod_mat_det, :libflint), UInt, (Ptr{nmod_mat}, ), &a)
-  return base_ring(a)(r)
+  if isprime(modulus(base_ring(a)))
+     r = ccall((:nmod_mat_det, :libflint), UInt, (Ptr{nmod_mat}, ), &a)
+     return base_ring(a)(r)
+  else
+     try
+        return determinant_fflu(a)
+     catch
+        return determinant_df(a)
+     end
+  end
 end
 
 ################################################################################
@@ -503,6 +511,33 @@ function lift!(z::fmpz_mat, a::nmod_mat)
   return z 
 end
 
+################################################################################
+#
+#  Characteristic polynomial
+#
+################################################################################
+
+function charpoly(R::NmodPolyRing, a::nmod_mat)
+  m = deepcopy(a)
+  p = R()
+  ccall((:nmod_mat_charpoly, :libflint), Void,
+          (Ptr{nmod_poly}, Ptr{nmod_mat}), &p, &m)
+  return p
+end
+
+################################################################################
+#
+#  Minimal polynomial
+#
+################################################################################
+
+function minpoly(R::NmodPolyRing, a::nmod_mat)
+  p = R()
+  ccall((:nmod_mat_minpoly, :libflint), Void,
+          (Ptr{nmod_poly}, Ptr{nmod_mat}), &p, &a)
+  return p
+end
+
 ###############################################################################
 #
 #   Promotion rules
@@ -642,7 +677,8 @@ function MatrixSpace(R::ResidueRing{fmpz}, r::Int, c::Int)
   return try
     NmodMatSpace(R, r, c)
   catch
-    error("Not yet implemented")
+    T = elem_type(R)
+    return MatrixSpace{T}(R, r, c)
   end
 end
 

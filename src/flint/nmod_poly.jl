@@ -740,9 +740,29 @@ end
 
 ################################################################################
 #
+#  Speedups for rings over nmod_poly
+#
+################################################################################
+
+function determinant(M::Mat{nmod_poly})
+   rows(M) != cols(M) && error("Not a square matrix in determinant")
+   try
+      return determinant_fflu(M)
+   catch
+      return determinant_df(M)
+   end
+end 
+
+################################################################################
+#
 #  Unsafe functions
 #
 ################################################################################
+
+function fit!(x::nmod_poly, n::Int)
+  ccall((:nmod_poly_fit_length, :libflint), Void, 
+                   (Ptr{nmod_poly}, Int), &x, n)
+end
 
 function setcoeff!(x::nmod_poly, n::Int, y::UInt)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
@@ -795,6 +815,19 @@ end
 Base.promote_rule{V <: Integer}(::Type{nmod_poly}, ::Type{V}) = nmod_poly
 
 Base.promote_rule(::Type{nmod_poly}, ::Type{fmpz}) = nmod_poly
+
+###############################################################################
+#
+#   Polynomial substitution
+#
+###############################################################################
+
+function Base.call(f::nmod_poly, a::Residue{fmpz})
+   if parent(a) != base_ring(f)
+      return subst(f, a)
+   end
+   return evaluate(f, a)
+end
 
 ################################################################################
 #

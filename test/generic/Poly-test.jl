@@ -1,6 +1,14 @@
 function test_poly_constructors()
    print("Poly.constructors...")
  
+   R, x = ZZ["x"]
+   S, y = R["y"]
+
+   @test typeof(R) <: Nemo.Ring
+   @test typeof(S) <: PolynomialRing
+
+   @test isa(y, PolyElem)
+
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
@@ -505,6 +513,33 @@ function test_poly_mul_ks()
    println("PASS")
 end
 
+function test_poly_generic_eval()
+   print("Poly.generic_eval...")
+
+   R, x = PolynomialRing(ZZ, "x")
+   S, y = PolynomialRing(R, "y")
+
+   f = 3x*y^2 + (x + 1)*y + 3
+   g = 6(x + 1)*y + (x^3 + 2x + 2)
+
+   @test f(g) == (108*x^3+216*x^2+108*x)*y^2+(36*x^5+36*x^4+72*x^3+150*x^2+84*x+6)*y+(3*x^7+12*x^5+13*x^4+13*x^3+26*x^2+16*x+5)
+
+   @test f(x + 1) == 3*x^3+7*x^2+5*x+4
+
+   @test f(123) == 45510*x+126
+
+   @test f(fmpz(123)) == 45510*x + 126
+
+   R, x = PolynomialRing(ZZ, "x")
+   T, y = FiniteField(103, 1, "y")
+
+   f = x^5 + 3x^3 + 2x^2 + x + 1
+
+   @test f(T(13)) == 20
+
+   println("PASS")
+end
+
 function test_poly()
    test_poly_constructors()
    test_poly_manipulation()
@@ -535,6 +570,7 @@ function test_poly()
    test_poly_special()
    test_poly_mul_karatsuba()
    test_poly_mul_ks()
+   test_poly_generic_eval()
 
    println("")
 end

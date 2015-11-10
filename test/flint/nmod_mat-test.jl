@@ -1,3 +1,15 @@
+function randmat(R::NmodMatSpace, d::Int)
+   m = R.rows
+   n = R.cols
+   r = R()
+   for i = 1:m
+      for j = 1:n
+         r[i, j] = randelem(base_ring(R), d)
+      end
+   end
+   return r
+end
+
 function test_nmod_mat_constructors()
   print("nmod_mat.constructors...")
   
@@ -615,6 +627,28 @@ function test_nmod_mat_conversion()
   println("PASS")
 end
 
+function test_nmod_mat_charpoly()
+   print("nmod_mat.charpoly...")
+
+   R = ResidueRing(ZZ, 17)
+
+   for dim = 0:5
+      S = MatrixSpace(R, dim, dim)
+      U, x = PolynomialRing(R, "x")
+
+      for i = 1:10
+         M = randmat(S, 5)
+
+         p1 = charpoly(U, M)
+         p2 = charpoly_danilevsky!(U, M)
+
+         @test p1 == p2
+      end
+   end
+
+   println("PASS")   
+end
+
 function test_nmod_mat()
   test_nmod_mat_constructors()
   test_nmod_mat_manipulation()
@@ -632,6 +666,7 @@ function test_nmod_mat()
   test_nmod_mat_window()
   test_nmod_mat_concatenation()
   test_nmod_mat_conversion()
+  test_nmod_mat_charpoly()
 
   println("")
 end
