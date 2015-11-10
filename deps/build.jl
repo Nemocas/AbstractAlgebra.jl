@@ -160,6 +160,8 @@ end
 if on_windows
    if Int == Int32
       download("http://nemocas.org/binaries/w32-libarb.dll", joinpath(vdir, "lib", "libarb.dll"))
+   else
+      download("http://nemocas.org/binaries/w64-libarb.dll", joinpath(vdir, "lib", "libarb.dll"))
    end
 else
    cd("$wdir/arb")

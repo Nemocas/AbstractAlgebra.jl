@@ -16,11 +16,9 @@ include("antic/nf_elem.jl")
 
 include("pari/pari_nf.jl")
 
-if !on_windows64
-   include("arb/arb.jl")
+include("arb/arb.jl")
 
-   include("arb/acb.jl")
-end
+include("arb/acb.jl")
 
 //{T <: FieldElem}(a::T, b::T) = divexact(a, b)
 

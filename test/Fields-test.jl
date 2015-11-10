@@ -11,10 +11,8 @@ include("arb/arb-test.jl")
 include("arb/acb-test.jl")
 
 function test_fields()
-   if !on_windows64
-     test_arb()
-     test_acb()
-   end
+   test_arb()
+   test_acb()
 
    test_fraction()
 

@@ -120,9 +120,7 @@ include("flint/FlintTypes.jl")
 
 include("antic/AnticTypes.jl")
 
-if !on_windows64
-  include("arb/ArbTypes.jl")
-end
+include("arb/ArbTypes.jl")
 
 include("pari/PariTypes.jl")
 
