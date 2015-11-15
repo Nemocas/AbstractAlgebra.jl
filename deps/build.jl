@@ -48,18 +48,12 @@ cd(wdir)
 
 # install GMP/MPIR
 
-if on_windows
-   download("https://gmplib.org/download/gmp/gmp-6.0.0a.tar.bz2", joinpath(wdir, "gmp-6.0.0a.tar.bz2"))
-   run(`tar -xvf gmp-6.0.0a.tar.bz2`)
-   run(`rm gmp-6.0.0a.tar.bz2`)
-else
-   if !ispath(Pkg.dir("Nemo", "local", "mpir-2.7.0"))
-      download("http://mpir.org/mpir-2.7.0.tar.bz2", joinpath(wdir, "mpir-2.7.0.tar.bz2"))
-      run(`tar -xvf mpir-2.7.0.tar.bz2`)
-      run(`rm mpir-2.7.0.tar.bz2`)
-   end
-   cd("$wdir/mpir-2.7.0")
+if !ispath(Pkg.dir("Nemo", "local", "mpir-2.7.1"))
+   download("http://mpir.org/mpir-2.7.1.tar.bz2", joinpath(wdir, "mpir-2.7.1.tar.bz2"))
+   run(`tar -xvf mpir-2.7.1.tar.bz2`)
+   run(`rm mpir-2.7.1.tar.bz2`)
 end
+cd("$wdir/mpir-2.7.1")
 
 if on_windows
    if Int == Int32
@@ -77,7 +71,6 @@ else
    run(`make -j4`)
    run(`make install`)
    cd(wdir)
-   run(`rm -rf mpir-2.7.0`)
    run(`rm -rf bin`)
 end
 
@@ -104,7 +97,6 @@ else
    run(`make -j4`)
    run(`make install`)
    cd(wdir)
-   run(`rm -rf mpfr-3.1.3`)
 end
 
 cd(wdir)
