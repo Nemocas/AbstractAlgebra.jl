@@ -86,7 +86,7 @@ cd(wdir)
 # install MPFR
 
 if !ispath(Pkg.dir("Nemo", "local", "mpfr-3.1.3"))
-   download("http://www.mpfr.org/mpfr-current/mpfr-3.1.3.tar.bz2", joinpath(wdir, "mpfr-3.1.3.tar.bz2"))
+   download("http://ftp.gnu.org/gnu/mpfr/mpfr-3.1.3.tar.bz2", joinpath(wdir, "mpfr-3.1.3.tar.bz2"))
    run(`tar -xvf mpfr-3.1.3.tar.bz2`)
    run(`rm mpfr-3.1.3.tar.bz2`)
 end
