@@ -7614,18 +7614,19 @@ Here is an example of linear solving.
    x = solve(a, b)
 \end{lstlisting}
 
-\subsubsection{LU decomposition}
+\subsubsection{LU factorisation}
 
 \begin{lstlisting}
 lufact(a::nmod_mat)
 \end{lstlisting}
 
-\desc{Compute a tuple of matrices $(l, u, p)$ such that $pa = lu$ where $l$ is a
-lower triangular matrix, $u$ is upper triangular and $p$ is a permutation matrix.}
+\desc{Compute a tuple of matrices $(r, p, l, u)$ such that $pa = lu$ where $l$ is a
+lower triangular matrix, $u$ is upper triangular, $p$ is a permutation matrix and
+$r$ is the rank of $a$.}
 
 \textbf{Examples.}
 
-Here is an example of LU decomposition.
+Here is an example of LU factorisation.
 
 \begin{lstlisting}
    R = ResidueRing(ZZ, 7)
@@ -7634,7 +7635,7 @@ Here is an example of LU decomposition.
 
    a = S([4 5 6; 7 3 2; 1 4 5])
   
-   l, u, p = lufact(a)
+   r, p, l, u = lufact(a)
 \end{lstlisting}
 
 \subsubsection{Matrix concatenation}
