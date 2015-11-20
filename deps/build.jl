@@ -188,7 +188,7 @@ if on_windows
    end
 else
    cd("$wdir/pari-2.7.4")
-   withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "CFLAGS"=>LDFLAGS) do
+   withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "DLLDFLAGS"=>LDFLAGS) do
       run(`./Configure --prefix=$vdir --with-gmp=$vdir --mt=pthread`)
       run(`make -j4 gp`)
       run(`make install`)
