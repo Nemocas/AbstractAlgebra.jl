@@ -48,12 +48,12 @@ cd(wdir)
 
 # install GMP/MPIR
 
-if !ispath(Pkg.dir("Nemo", "local", "mpir-2.7.1"))
-   download("http://mpir.org/mpir-2.7.1.tar.bz2", joinpath(wdir, "mpir-2.7.1.tar.bz2"))
-   run(`tar -xvf mpir-2.7.1.tar.bz2`)
-   run(`rm mpir-2.7.1.tar.bz2`)
+if !ispath(Pkg.dir("Nemo", "local", "mpir-2.7.0"))
+   download("http://mpir.org/mpir-2.7.0.tar.bz2", joinpath(wdir, "mpir-2.7.0.tar.bz2"))
+   run(`tar -xvf mpir-2.7.0.tar.bz2`)
+   run(`rm mpir-2.7.0.tar.bz2`)
 end
-cd("$wdir/mpir-2.7.1")
+cd("$wdir/mpir-2.7.0")
 
 if on_windows
    if Int == Int32
@@ -92,10 +92,11 @@ if on_windows
    end
 else
    cd("$wdir/mpfr-3.1.3")
-   withenv(()->run(`./configure --prefix=$vdir --with-gmp=$vdir --disable-static --enable-shared`), 
-                           "LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS)
-   run(`make -j4`)
-   run(`make install`)
+   withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
+      run(`./configure --prefix=$vdir --with-gmp=$vdir --disable-static --enable-shared`) 
+      run(`make -j4`)
+      run(`make install`)
+   end
    cd(wdir)
 end
 
@@ -131,10 +132,11 @@ if on_windows
    end
 else
    cd("$wdir/flint2")
-   withenv(()->run(`./configure --prefix=$vdir --extensions="$wdir/antic" --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir`), 
-                           "LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS)
-   run(`make -j4`)
-   run(`make install`)
+   withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
+      run(`./configure --prefix=$vdir --extensions="$wdir/antic" --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir`) 
+      run(`make -j4`)
+      run(`make install`)
+   end
 end
 
 cd(wdir)
@@ -157,10 +159,11 @@ if on_windows
    end
 else
    cd("$wdir/arb")
-   withenv(()->run(`./configure --prefix=$vdir --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir --with-flint=$vdir`), 
-                           "LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS)
-   run(`make -j4`)
-   run(`make install`)
+   withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
+      run(`./configure --prefix=$vdir --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir --with-flint=$vdir`)
+      run(`make -j4`)
+      run(`make install`)
+   end
 end
 
 cd(wdir)
@@ -185,15 +188,11 @@ if on_windows
    end
 else
    cd("$wdir/pari-2.7.4")
-   #env_copy = copy(ENV)
-   #env_copy["LD_LIBRARY_PATH"] = "$vdir/lib"
-   #env_copy["CFLAGS"] = 
-   withenv(()->run(`./Configure --prefix=$vdir --with-gmp=$vdir --mt=pthread`), 
-                           "CFLAGS"=>LDFLAGS, "LD_LIBRARY_PATH"=>"$vdir/lib")
-   #config_str = setenv(config_str, env_copy)
-   #run(config_str)
-   run(`make -j4 gp`)
-   run(`make install`)
+   withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "CFLAGS"=>LDFLAGS) do
+      run(`./Configure --prefix=$vdir --with-gmp=$vdir --mt=pthread`)
+      run(`make -j4 gp`)
+      run(`make install`)
+   end
 end
 
 cd(wdir)
