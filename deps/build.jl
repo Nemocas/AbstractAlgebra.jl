@@ -15,6 +15,7 @@ if !ispath(Pkg.dir("Nemo", "local", "lib"))
 end
 
 LDFLAGS = "-Wl,-rpath,$vdir/lib -Wl,-rpath,\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/Nemo/local/lib"
+DLCFLAGS = "-fPIC -fno-common"
 
 cd(wdir)
 
@@ -186,10 +187,17 @@ if on_windows
    else
       download("http://nemocas.org/binaries/w64-libpari.dll", joinpath(vdir, "lib", "libpari.dll"))
    end
+elseif on_osx
+   cd("$wdir/pari-2.7.4")
+   withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "DLCFLAGS"=>DLCFLAGS) do
+      run(`./Configure --prefix=$vdir --with-gmp=$vdir`)
+      run(`make -j4 gp`)
+      run(`make install`)
+   end
 else
    cd("$wdir/pari-2.7.4")
    withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "DLLDFLAGS"=>LDFLAGS) do
-      run(`./Configure --prefix=$vdir --with-gmp=$vdir --mt=pthread`)
+      run(`./Configure --prefix=$vdir --with-gmp=$vdir`)
       run(`make -j4 gp`)
       run(`make install`)
    end
