@@ -189,7 +189,7 @@ if on_windows
    end
 elseif on_osx
    cd("$wdir/pari-2.7.4")
-   withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "DLCFLAGS"=>DLCFLAGS) do
+   withenv("DYLD_LIBRARY_PATH"=>"$vdir/lib", "DLCFLAGS"=>DLCFLAGS) do
       run(`./Configure --prefix=$vdir --with-gmp=$vdir`)
       run(`make -j4 gp`)
       run(`make install`)
