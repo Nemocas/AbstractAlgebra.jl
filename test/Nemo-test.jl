@@ -10,10 +10,10 @@ include("Fields-test.jl")
 include("Benchmark-test.jl")
 
 function test_all()
-#   test_groups()
+   test_groups()
    test_rings()
-#   test_fields()
-#   test_benchmarks()
+   test_fields()
+   test_benchmarks()
 end
 
 end # module
