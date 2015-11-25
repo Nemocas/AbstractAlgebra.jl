@@ -7525,6 +7525,34 @@ Here is an example of row echelon form.
    b = rref(a)
 \end{lstlisting}
 
+\begin{lstlisting}
+howell_form(a::nmod_mat)
+\end{lstlisting}
+
+\desc{Return the Howell normal form of $a$. The matrix $a$ must have at least as
+many rows as columns.}
+
+\begin{lstlisting}
+strong_echelon_form(a::nmod_mat)
+\end{lstlisting}
+
+\desc{Return the strong echeleon form of $a$. The matrix $a$ must have at least as
+many rows as columns.}
+
+\textbf{Examples.}
+
+Here is an example of Howell and strong echelon form.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 12)
+   S = MatrixSpace(R, 3, 3)
+
+   a = S([8 5 5; 0 9 8; 0 0 10])
+
+   b = howell_form(a)
+   c = strong_echelon_form(a)
+\end{lstlisting}
+
 \subsubsection{Determinant}
 
 \begin{lstlisting}
@@ -8066,6 +8094,13 @@ hnf_modular(a::fmpz_mat, m::fmpz)
 the determinant of the nonzero rows of $a$.}
 
 \begin{lstlisting}
+hnf_modular_eldiv(a::fmpz_mat, m::fmpz)
+\end{lstlisting}
+
+\desc{Compute the Hermite normal form of $a$ given that $m$ is a multiple of
+the largest elementary divisor of $a$. The matrix $a$ must have full rank.}
+
+\begin{lstlisting}
 is_hnf(a::fmpz_mat)
 \end{lstlisting}
 
@@ -8084,6 +8119,7 @@ Here are some examples of computing the Hermite normal form.
    B = hnf(A)
    H, T = hnf_with_transform(A)
    M = hnf_modular(A, fmpz(27))
+   MM = hnf_modular_eldiv(A, fmpz(27))
    is_hnf(M) == true
 \end{lstlisting}
 

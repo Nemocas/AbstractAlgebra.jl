@@ -7,7 +7,8 @@
 export nmod_mat, NmodMatSpace, getindex, setindex!, set_entry!, deepcopy, rows, 
        cols, parent, base_ring, zero, one, issquare, show, transpose,
        transpose!, rref, rref!, trace, determinant, rank, inv, solve, lufact,
-       sub, window, hcat, vcat, Array, lift, lift!, MatrixSpace, check_parent
+       sub, window, hcat, vcat, Array, lift, lift!, MatrixSpace, check_parent,
+       howell_form, howell_form!, strong_echelon_form, strong_echelon_form!
 
 ################################################################################
 #
@@ -299,6 +300,37 @@ end
 function rref!(a::nmod_mat)
   ccall((:nmod_mat_rref, :libflint), Void, (Ptr{nmod_mat}, ), &a)
   return a
+end
+
+################################################################################
+#
+#  Strong echelon form and Howell form
+#
+################################################################################
+
+function strong_echelon_form!(a::nmod_mat)
+  ccall((:nmod_mat_strong_echelon_form, :libflint), Void, (Ptr{nmod_mat}, ), &a)
+end
+
+function strong_echelon_form(a::nmod_mat)
+  (rows(a) < cols(a)) &&
+              error("Matrix must have at least as many rows as columsn")
+  z = deepcopy(a)
+  strong_echelon_form!(z)
+  return z
+end
+
+function howell_form!(a::nmod_mat)
+  ccall((:nmod_mat_howell_form, :libflint), Void, (Ptr{nmod_mat}, ), &a)
+end
+
+function howell_form(a::nmod_mat)
+  (rows(a) < cols(a)) &&
+              error("Matrix must have at least as many rows as columsn")
+
+  z = deepcopy(a)
+  howell_form!(z)
+  return z
 end
 
 ################################################################################
