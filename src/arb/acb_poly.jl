@@ -261,11 +261,11 @@ end
 #
 ###############################################################################
 
-function divexact(x::acb_poly, y::Union{Int,fmpz,fmpq,Float64,arb})
+function divexact(x::acb_poly, y::Union{Int,fmpz,fmpq,Float64,arb,acb})
     return x * inv(base_ring(parent(x))(y))
 end
 
-//(x::acb_poly, y::Union{Int,fmpz,fmpq,Float64,arb}) = divexact(x, y)
+//(x::acb_poly, y::Union{Int,fmpz,fmpq,Float64,arb,acb}) = divexact(x, y)
 
 ###############################################################################
 #
