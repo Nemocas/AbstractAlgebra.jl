@@ -11,7 +11,7 @@ export fmpz_mat, FmpzMatSpace, getindex, getindex!, setindex!, rows, cols,
        lll_with_removal, lll_with_removal_transform,
        nullspace, rank, rref, reduce_mod, snf, snf_diagonal, is_snf, solve,
        solve_dixon, trace, transpose, content, hcat, vcat, addmul!, zero!,
-       window, pseudo_inv
+       window, pseudo_inv, hnf_modular_eldiv
 
 ###############################################################################
 #
@@ -466,6 +466,20 @@ end
 
 ###############################################################################
 #
+#   Minimal polynomial
+#
+###############################################################################
+
+function minpoly(R::FmpzPolyRing, x::fmpz_mat)
+   rows(x) != cols(x) && error("Non-square")
+   z = R()
+   ccall((:fmpz_mat_minpoly, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_mat}), &z, &x)
+   return z
+end
+
+###############################################################################
+#
 #   Determinant
 #
 ###############################################################################
@@ -566,6 +580,15 @@ function hnf_modular(x::fmpz_mat, d::fmpz)
    z = parent(x)()
    ccall((:fmpz_mat_hnf_modular, :libflint), Void, 
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz}), &z, &x, &d)
+   return z
+end
+
+function hnf_modular_eldiv(x::fmpz_mat, d::fmpz)
+   (rows(x) < cols(x)) &&
+                error("Matrix must have at least as many rows as columns")
+   z = deepcopy(x)
+   ccall((:fmpz_mat_hnf_modular_eldiv, :libflint), Void, 
+                (Ptr{fmpz_mat}, Ptr{fmpz}), &z, &d)
    return z
 end
 

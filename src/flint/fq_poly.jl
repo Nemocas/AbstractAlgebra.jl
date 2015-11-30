@@ -553,13 +553,13 @@ end
 function fit!(z::fq_poly, n::Int)
    ccall((:fq_poly_fit_length, :libflint), Void, 
          (Ptr{fq_poly}, Int, Ptr{FqFiniteField}),
-         &z, n, &base_ring(parent(x)))
+         &z, n, &base_ring(parent(z)))
 end
 
 function setcoeff!(z::fq_poly, n::Int, x::fq)
-   ccall((:fq_poly_set_coeff_fmpz, :libflint), Void, 
+   ccall((:fq_poly_set_coeff, :libflint), Void, 
          (Ptr{fq_poly}, Int, Ptr{fq}, Ptr{FqFiniteField}),
-         &z, n, &temp, &base_ring(parent(x)))
+         &z, n, &x, &base_ring(parent(z)))
 end
 
 function mul!(z::fq_poly, x::fq_poly, y::fq_poly)
@@ -598,6 +598,19 @@ Base.promote_rule{V <: Integer}(::Type{fq_poly}, ::Type{V}) = fq_poly
 Base.promote_rule(::Type{fq_poly}, ::Type{fmpz}) = fq_poly
 
 Base.promote_rule(::Type{fq_poly}, ::Type{fq}) = fq_poly
+
+###############################################################################
+#
+#   Polynomial substitution
+#
+###############################################################################
+
+function Base.call(f::fq_poly, a::fq)
+   if parent(a) != base_ring(f)
+      return subst(f, a)
+   end
+   return evaluate(f, a)
+end
 
 ################################################################################
 #

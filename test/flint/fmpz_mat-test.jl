@@ -316,6 +316,8 @@ function test_fmpz_mat_hnf()
    S = MatrixSpace(ZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
+
+   B = S([1 0 0; 10 2 0; 0 0 4])
    
    @test hnf(A) == S([1 0 16; 0 1 18; 0 0 27])
 
@@ -326,6 +328,11 @@ function test_fmpz_mat_hnf()
    M = hnf_modular(A, fmpz(27))
 
    @test is_hnf(M)
+
+   MM = hnf_modular_eldiv(B, fmpz(4))
+
+   @test is_hnf(MM)
+   @test S([1 0 0; 0 2 0; 0 0 4]) == MM
 
    println("PASS")
 end

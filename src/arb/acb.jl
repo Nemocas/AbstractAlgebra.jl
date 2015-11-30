@@ -667,19 +667,23 @@ end
 ################################################################################
 
 function add!(z::acb, x::acb, y::acb)
-  ccall((:acb_add, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}), &z, &x, &y)
+  ccall((:acb_add, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}, Int),
+         &z, &x, &y, parent(z).prec)
 end
 
 function sub!(z::acb, x::acb, y::acb)
-  ccall((:acb_sub, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}), &z, &x, &y)
+  ccall((:acb_sub, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}, Int),
+        &z, &x, &y, parent(z).prec)
 end
 
 function mul!(z::acb, x::acb, y::acb)
-  ccall((:acb_mul, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}), &z, &x, &y)
+  ccall((:acb_mul, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}, Int),
+        &z, &x, &y, parent(z).prec)
 end
 
 function div!(z::acb, x::acb, y::acb)
-  ccall((:acb_div, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}), &z, &x, &y)
+  ccall((:acb_div, :libarb), Void, (Ptr{acb}, Ptr{acb}, Ptr{acb}, Int),
+        &z, &x, &y, parent(z).prec)
 end
 
 ################################################################################

@@ -10,8 +10,8 @@ export Poly, PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow,
        resultant, discriminant, gcdx, zero, one, gen, length, iszero, 
        normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod, 
        invmod, lcm, divrem, mod, gcdinv, canonical_unit, var, chebyshev_t,
-       chebyshev_u, set_length!, mul_classical, sqr_classical, mul_ks,
-       mul_karatsuba, pow_multinomial
+       chebyshev_u, set_length!, mul_classical, sqr_classical, mul_ks, subst,
+       mul_karatsuba, pow_multinomial, monomial_to_newton!, newton_to_monomial!
 
 ###############################################################################
 #
@@ -53,7 +53,6 @@ function normalise(a::Poly, len::Int)
    while len > 0 && iszero(a.coeffs[len]) 
       len -= 1
    end
-
    return len
 end
 
@@ -169,7 +168,7 @@ needs_parentheses(x::PolyElem) = length(x) > 1
 
 is_negative(x::PolyElem) = length(x) <= 1 && is_negative(coeff(x, 0))
 
-show_minus_one{T <: RingElem}(::Type{PolyElem{T}}) = show_minus_one(T)
+show_minus_one{T <: RingElem}(::Type{Poly{T}}) = show_minus_one(T)
 
 ###############################################################################
 #
@@ -839,8 +838,10 @@ function mod{T <: Union{ResidueElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{T})
       while length(f) >= length(g)
          l = -lead(f)
          for i = 1:length(g)
-            mul!(c, g.coeffs[i], l)
-            addeq!(f.coeffs[i + length(f) - length(g)], c)
+            mul!(c, coeff(g, i - 1), l)
+            u = coeff(f, i + length(f) - length(g) - 1)
+            addeq!(u, c)
+            setcoeff!(f, i + length(f) - length(g) - 1, u)
          end
          set_length!(f, normalise(f, length(f)))
       end
@@ -872,8 +873,10 @@ function divrem{T <: Union{ResidueElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{
       l = -q1
       setcoeff!(q, length(f) - length(g), q1*binv)
       for i = 1:length(g)
-         mul!(c, g.coeffs[i], l)
-         addeq!(f.coeffs[i + length(f) - length(g)], c)
+         mul!(c, coeff(g, i - 1), l)
+         u = coeff(f, i + length(f) - length(g) - 1)
+         addeq!(u, c)
+         setcoeff!(f, i + length(f) - length(g) - 1, u)
       end
       set_length!(f, normalise(f, length(f)))
    end
@@ -938,6 +941,9 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    end
    if b == 0
       return a
+   end
+   if b == 1
+      return b
    end
    c = gcd(content(a), content(b))
    a = divexact(a, c)
@@ -1012,6 +1018,9 @@ function evaluate{T <: RingElem}(a::PolyElem{T}, b::T)
    if i == 0
        return zero(base_ring(a))
    end
+   if i > 25
+      return subst(a, b)
+   end
    z = coeff(a, i - 1)
    while i > 1
       i -= 1
@@ -1032,6 +1041,9 @@ function compose(a::Poly, b::Poly)
    i = length(a)
    if i == 0
        return zero(parent(a))
+   end
+   if i*length(b) > 25
+      return subst(a, b)
    end
    z = coeff(a, i - 1)
    while i > 1
@@ -1404,6 +1416,78 @@ end
 
 ###############################################################################
 #
+#   Newton representation
+#
+###############################################################################
+
+function monomial_to_newton!{T <: RingElem}(P::Array{T, 1}, roots::Array{T, 1})
+   n = length(roots)
+   if n > 0
+      R = parent(roots[1])
+      t = R()
+      for i = 1:n - 1
+         for j = n - 1:-1:i
+            mul!(t, P[j + 1], roots[i])
+            addeq!(P[j], t)
+         end
+      end
+   end
+   return
+end
+
+function newton_to_monomial!{T <: RingElem}(P::Array{T, 1}, roots::Array{T, 1})
+   n = length(roots)
+   if n > 0
+      R = parent(roots[1])
+      t = R()
+      for i = n - 1:-1:1
+         d = -roots[i]
+         for j = i:n - 1
+            mul!(t, P[j + 1], d)
+            addeq!(P[j], t)
+         end
+      end
+   end
+   return
+end
+
+###############################################################################
+#
+#   Interpolation
+#
+###############################################################################
+
+function interpolate{T <: RingElem}(S::PolynomialRing, x::Array{T, 1}, y::Array{T, 1})
+   length(x) != length(y) && error("Array lengths don't match in interpolate")
+   n = length(x)
+   if n == 0
+      return S()
+   elseif n == 1
+      return S(y[1])
+   end
+   R = base_ring(S)
+   parent(y[1]) != R && error("Polynomial ring does not match inputs")
+   P = Array{T}(n)
+   for i = 1:n
+      P[i] = deepcopy(y[i])
+   end
+   for i = 2:n
+      t = P[i - 1]
+      for j = i:n
+         p = P[j] - t
+         q = x[j] - x[j - i + 1]
+         t = P[j]
+         P[j] = divexact(p, q)
+      end
+   end
+   newton_to_monomial!(P, x)
+   r = S(P)
+   set_length!(r, normalise(r, n))
+   return r
+end
+
+###############################################################################
+#
 #   Special functions
 #
 ###############################################################################
@@ -1513,6 +1597,13 @@ function mul!{T <: RingElem}(c::Poly{T}, a::Poly{T}, b::Poly{T})
    if lena == 0 || lenb == 0
       c.length = 0
    else
+      if a === c
+         a = deepcopy(a)
+      end
+      if b === c
+         b = deepcopy(b)
+      end
+
       t = base_ring(a)()
 
       lenc = lena + lenb - 1
@@ -1557,6 +1648,65 @@ end
 Base.promote_rule{T <: RingElem, V <: Integer}(::Type{Poly{T}}, ::Type{V}) = Poly{T}
 
 Base.promote_rule{T <: RingElem}(::Type{Poly{T}}, ::Type{T}) = Poly{T}
+
+###############################################################################
+#
+#   Polynomial substitution
+#
+###############################################################################
+
+function subst{T <: RingElem}(f::PolyElem{T}, a)
+   S = parent(a)
+   n = degree(f)
+   if n < 0
+      return S()
+   elseif n == 0
+      return coeff(f, 0)*S(1)
+   elseif n == 1
+      return coeff(f, 0)*S(1) + coeff(f, 1)*a
+   end
+   d1 = isqrt(n)
+   d = div(n, d1)
+   A = powers(a, d)
+   s = coeff(f, d1*d)*A[1]
+   for j = 1:min(n - d1*d, d - 1)
+      c = coeff(f, d1*d + j)
+      if c != 0
+         s += c*A[j + 1]
+      end
+   end
+   for i = 1:d1
+      s *= A[d + 1]
+      s += coeff(f, (d1 - i)*d)*A[1]
+      for j = 1:min(n - (d1 - i)*d, d - 1)
+         c = coeff(f, (d1 - i)*d + j)
+         if c != 0
+            s += c*A[j + 1]
+         end
+      end
+   end
+   return s
+end
+
+call{T <: RingElem}(f::PolyElem{T}, a) = subst(f, a)
+
+function Base.call{T <: RingElem}(f::PolyElem{T}, a::PolyElem{T})
+   if parent(f) != parent(a)
+      return subst(f, a)
+   end
+   return compose(f, a)
+end
+
+Base.call{T <: RingElem}(f::PolyElem{T}, a::Integer) = evaluate(f, a)
+
+Base.call{T <: RingElem}(f::PolyElem{T}, a::fmpz) = evaluate(f, a)
+
+function Base.call{T <: RingElem}(f::PolyElem{T}, a::T)
+   if parent(a) != base_ring(f)
+      return subst(f, a)
+   end
+   return evaluate(f, a)
+end
 
 ###############################################################################
 #
@@ -1623,3 +1773,8 @@ function PolynomialRing(R::Ring, s::AbstractString{})
 
    return parent_obj, parent_obj([R(0), R(1)])
 end
+
+# S, x = R["x"] syntax
+getindex(R::Ring, s::ASCIIString) = PolynomialRing(R, s)
+
+getindex{T}(R::Tuple{Ring,T}, s::ASCIIString) = PolynomialRing(R[1], s)

@@ -1,5 +1,3 @@
-if !on_windows64
-
 RR = ArbField(64)
 CC = AcbField(64)
 
@@ -434,5 +432,3 @@ function test_acb()
 
    println("")
 end
-
-end # on_windows64

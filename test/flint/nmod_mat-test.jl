@@ -1,3 +1,15 @@
+function randmat(R::NmodMatSpace, d::Int)
+   m = R.rows
+   n = R.cols
+   r = R()
+   for i = 1:m
+      for j = 1:n
+         r[i, j] = randelem(base_ring(R), d)
+      end
+   end
+   return r
+end
+
 function test_nmod_mat_constructors()
   print("nmod_mat.constructors...")
   
@@ -369,6 +381,25 @@ function test_nmod_mat_row_echelon_form()
   println("PASS")
 end
 
+function test_nmod_mat_howell_form()
+  print("nmod_mat.row_echelon_form...")
+
+  Z17 = ResidueRing(ZZ, 12)
+  R = MatrixSpace(Z17, 3, 3)
+
+  a = R([4 1 0; 0 0 5; 0 0 0 ])
+
+  b = R([8 5 5; 0 9 8; 0 0 10])
+
+  c = R([4 1 0; 0 3 0; 0 0 1])
+
+  d = R([4 0 0; 0 0 1; 0 0 0])
+
+  @test howell_form(a) == c
+  @test howell_form(b) == c
+  @test strong_echelon_form(d) == R([4 0 0; 0 0 0; 0 0 1])
+end
+
 function test_nmod_mat_trace_determinant()
   print("nmod_mat.trace_determinant...")
 
@@ -499,11 +530,11 @@ function test_nmod_mat_lu()
 
   b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
-  l,u,p = lufact(a)
+  r, P, l, u = lufact(a)
 
   @test l*u == a
 
-  l,u,p = lufact(b)
+  r, P, l, u = lufact(b)
 
   @test l*u == S([ 2 1 0 1; 0 1 2 0; 0 0 0 0])
 
@@ -615,6 +646,28 @@ function test_nmod_mat_conversion()
   println("PASS")
 end
 
+function test_nmod_mat_charpoly()
+   print("nmod_mat.charpoly...")
+
+   R = ResidueRing(ZZ, 17)
+
+   for dim = 0:5
+      S = MatrixSpace(R, dim, dim)
+      U, x = PolynomialRing(R, "x")
+
+      for i = 1:10
+         M = randmat(S, 5)
+
+         p1 = charpoly(U, M)
+         p2 = charpoly_danilevsky!(U, M)
+
+         @test p1 == p2
+      end
+   end
+
+   println("PASS")   
+end
+
 function test_nmod_mat()
   test_nmod_mat_constructors()
   test_nmod_mat_manipulation()
@@ -625,6 +678,7 @@ function test_nmod_mat()
   test_nmod_mat_adhoc_comparison()
   test_nmod_mat_powering()
   test_nmod_mat_row_echelon_form()
+  test_nmod_mat_howell_form()
   test_nmod_mat_trace_determinant()
   test_nmod_mat_rank()
   test_nmod_mat_inv()
@@ -632,6 +686,7 @@ function test_nmod_mat()
   test_nmod_mat_window()
   test_nmod_mat_concatenation()
   test_nmod_mat_conversion()
+  test_nmod_mat_charpoly()
 
   println("")
 end

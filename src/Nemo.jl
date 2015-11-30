@@ -2,17 +2,19 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module Nemo
 
-import Base: abs, asin, asinh, atan, atanh, base, bin, call, checkbounds,
-             convert, cmp, contains, cos, cosh, dec, deepcopy, den,
-             deserialize, div, divrem, exp, factor, gcd, gcdx, getindex, hash,
-             hex, intersect, inv, invmod, isequal, isless, isprime, isqrt, lcm,
-             length, log, lufact, mod, ndigits, nextpow2, norm, nullspace, num,
-             oct, one, parent, parity, parseint, precision, prevpow2,
-             promote_rule, rank, Rational, rem, reverse, serialize, setindex!,
-             show, sign, sin, sinh, size, sqrt, string, sub, tan, tanh, trace,
-             trailing_zeros, transpose, transpose!, truncate, var, zero,
-             +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, hcat, vcat, //,
-             /, !=, isfinite, ldexp
+import Base: Array, abs, asin, asinh, atan, atanh, base, bin, call,
+             checkbounds, convert, cmp, contains, cos, cosh, dec, deepcopy,
+             den, deserialize, div, divrem, exp, factor, gcd, gcdx, getindex,
+             hash, hcat, hex, intersect, inv, invmod, isequal, isfinite,
+             isless, isprime, isqrt, lcm, ldexp, length, log, lufact, mod,
+             ndigits, nextpow2, norm, nullspace, num, oct, one, parent, parity,
+             parseint, precision, prevpow2, promote_rule, rank, Rational, rem,
+             reverse, serialize, setindex!, show, sign, sin, sinh, size, sqrt,
+             string, sub, tan, tanh, trace, trailing_zeros, transpose,
+             transpose!, truncate, typed_hvcat, typed_hcat, var, vcat, zero,
+             zeros,
+             +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
+             /, !=
 
 import Base: floor, ceil, hypot, sqrt,
              log, log1p, exp, expm1, sin, cos, sinpi, cospi, tan, cot,
@@ -29,9 +31,10 @@ export PolyElem, SeriesElem, ResidueElem, FractionElem, MatElem,
 export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
        MaximalRealSubfield, MaximalOrder, Ideal, PermutationGroup
 
-export RR, CC, RealField, ComplexField
+export RealField, ComplexField
 
-export create_accessors, get_handle, package_handle, allocatemem
+export create_accessors, get_handle, package_handle, allocatemem, zeros,
+       Array
 
 export flint_cleanup, flint_set_num_threads
 
@@ -45,7 +48,7 @@ include("AbstractTypes.jl")
 #
 ###############################################################################
 
-const pkgdir = joinpath(dirname(@__FILE__), "..")
+const pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
 const libdir = joinpath(pkgdir, "local", "lib")
 const libgmp = joinpath(pkgdir, "local", "lib", "libgmp")
 const libmpfr = joinpath(pkgdir, "local", "lib", "libmpfr")
@@ -122,9 +125,7 @@ include("flint/FlintTypes.jl")
 
 include("antic/AnticTypes.jl")
 
-if !on_windows64
-  include("arb/ArbTypes.jl")
-end
+include("arb/ArbTypes.jl")
 
 include("pari/PariTypes.jl")
 
@@ -162,6 +163,23 @@ function create_accessors(T, S, handle)
          a.auxilliary_data[$handle] = b
       end
    end
+end
+
+###############################################################################
+#
+#   Array creation functions
+#
+###############################################################################
+
+Array(R::Ring, r::Int...) = Array(elem_type(R), r)
+
+function zeros(R::Ring, r::Int...)
+   T = elem_type(R)
+   A = Array(T, r)
+   for i in eachindex(A)
+      A[i] = R()
+   end
+   return A
 end
 
 ###############################################################################

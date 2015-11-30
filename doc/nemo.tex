@@ -619,6 +619,16 @@ to be the same as the string \code{"x"}. The latter is simply how \code{x} will 
 when we evaluate it. Of course, in most situations it is convenient to use the same 
 letter for the variable and for the string.
 
+We also provide an alternative syntax for constructing polynomial rings.
+This is best demonstrated with an example.
+
+\begin{lstlisting}
+R, x = ZZ["x"]
+S, y = R["y"]
+
+f = (x^2 + 2x + 1)*y^3 + (x - 1)*y + 4x - 1
+\end{lstlisting}
+
 Once we have constructed a polynomial ring as above, we can use it to construct
 polynomials of various kinds.
 
@@ -1370,6 +1380,38 @@ g = (x + 1)*y + (x^3 + 2x + 2)
 h = compose(f, g)
 \end{lstlisting}
 
+\subsubsection{Substitution}
+
+\begin{lstlisting}
+subst{T <: RingElem}(f::Poly{T}, c)
+\end{lstlisting}
+
+\desc{Return the value of the polynomial $f$ at $c$, i.e. return the value
+$f(c)$. The value can live in any ring or be any object for which (associative)
+addition and multiplication and scalar multiplication by the coefficients of
+$f$ are defined.}
+
+In order to make evaluation of polynomials at arbitrary values more convenient
+we also overload the call operator for polynomial objects so that the
+expression $f(c)$ will return the value of $f$ at $c$. For efficiency,
+polynomial evaluation and composition are called instead when evaluating at
+polynomials or scalars in the coefficient ring.
+
+Here are some examples of substitution.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+M = R[x + 1 2x; x - 3 2x - 1]
+
+f = x*y^2 + (x + 1)*y + 3
+
+g = subst(f, M)
+h = f(M)
+k = f(23)
+\end{lstlisting}
+
 \subsubsection{Derivative}
 
 \begin{lstlisting}
@@ -1484,6 +1526,73 @@ g = 6(x + 1)*y + (x^3 + 2x + 2)
 r, s, t = gcdx(f, g)
 \end{lstlisting}
 
+\subsubsection{Newton basis}
+
+\begin{lstlisting}
+monomial_to_newton!{T <: RingElem}(p::Array{T, 1}, roots::Array{T, 1})
+\end{lstlisting}
+
+\desc{Converts a polynomial $p$, given as an array of coefficients, in-place
+from its coefficients given in the standard monomial basis to the Newton basis
+for the roots $r_0, r_1, \ldots, r_{n-2}$. In other words, this determines
+output coefficients $c_i$ such that
+$$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots +
+        c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$$
+is equal to the input polynomial.}
+
+\begin{lstlisting}
+newton_to_monomial!{T <: RingElem}(p::Array{T, 1}, roots::Array{T, 1})
+\end{lstlisting}
+
+\desc{Converts a polynomial $p$, given as an array of coefficients, in-place
+from its coefficients given in the Newton basis for the roots
+$r_0, r_1, \ldots, r_{n-2}$ to the standard monomial basis. In other words,
+this evaluates
+$$c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + \ldots +
+        c_{n-1}(x-r_0)(x-r_1)\cdots(x-r_{n-2})$$
+where $c_i$ are the input coefficients given by $p$.}
+
+\textbf{Examples.}
+
+Here is an example of converting to and from a Newton basis.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+f = 3x*y^2 + (x + 1)*y + 3
+g = deepcopy(f)
+roots = [R(1), R(2), R(3)]
+
+monomial_to_newton!(g.coeffs, roots)
+newton_to_monomial!(g.coeffs, roots)
+\end{lstlisting}
+
+\subsubsection{Interpolation}
+
+\begin{lstlisting}
+interpolate{T <: RingElem}(R::PolynomialRing, xs::Array{T, 1}, ys::Array{T, 1})
+\end{lstlisting}
+
+\desc{Given two arrays of values $xs$ and $ys$ of the same length $n$, find
+the polynomial $f$ in the polynomial ring $R$ of length at most $n$ such that
+$f$ has the value $ys$ at the points $xs$. The values in the arrays $xs$ and
+$ys$ must belong to the base ring of the polynomial ring $R$.}
+
+\textbf{Examples.}
+
+Here is an example of interpolation.
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+S, y = PolynomialRing(R, "y")
+
+xs = [R(1), R(2), R(3), R(4)]
+ys = [R(1), R(4), R(9), R(16)]
+
+f = interpolate(S, xs, ys)
+\end{lstlisting}
+ 
 \subsubsection{Special polynomials}
 
 The following functions compute univariate special polynomials. It is expected
@@ -2918,9 +3027,30 @@ S(a::RingElem)
 \desc{Try to coerce $a$ into the base ring of the matrix space and then construct
 the diagonal $r\times c$ matrix with diagonal entries equal to $a$.}
 
+We also allow arrays to be constructed by passing an explicit list of rows or an
+explicit list of entries for a row vector, as for arrays and row vectors of
+Julia types. Each entry is coerced into the given base ring.
+
+\begin{lstlisting}
+R[a b c...;...]
+\end{lstlisting}
+
+\desc{Create the matrix with entries in $R$ consisting of the given rows
+(separated by semicolons). Each entry is coerced into $R$ automatically.}
+
+\begin{lstlisting}
+R[a b c...]
+\end{lstlisting}
+
+\desc{Create the row vector with entries in $R$ consisting of the given
+entries (separated by spaces). Each entry is coerced into $R$ automatically.}
+
+To create a column vector, one can transpose a row vector using the \code{'}
+operator.
+
 \textbf{Examples.}
 
-Here are some examples of power series constructors.
+Here are some examples of matrix constructors.
 
 \begin{lstlisting}
 R, t = PolynomialRing(QQ, "t")
@@ -2929,8 +3059,12 @@ S = MatrixSpace(R, 3, 3)
 A = S()
 B = S(12)
 C = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-D = S(c)
+D = S(C)
 F = S(R(11))
+
+G = R[t + 1 1; t^2 0]
+H = R[t + 1 2 t]
+K = R[1 2 t]'
 \end{lstlisting}
 
 \subsubsection{Basic manipulation}
@@ -3397,6 +3531,307 @@ Here is an example of computing the determinant.
    A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 
    d = determinant(A)
+\end{lstlisting}
+
+\subsubsection{Rank}
+
+\begin{lstlisting}
+rank{T <: RingElem}(A::Mat{T})
+\end{lstlisting}
+
+\desc{Return the rank of the matrix $A$. For an integral domain, we define this
+to be the rank over the fraction field.}
+
+\textbf{Examples.}
+
+Here is an example of computing the rank.
+
+\begin{lstlisting}
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   S = MatrixSpace(K, 3, 3)
+   
+   A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+
+   d = rank(A)
+\end{lstlisting}
+
+\subsubsection{Linear solving}
+
+\begin{lstlisting}
+solve{T <: RingElem}(A::Mat{T}, b::Mat{T})
+\end{lstlisting}
+
+\desc{Given a non-singular $n\times n$ matrix over a ring and an $n\times m$
+matrix over the same ring, return a tuple $x, d$ consisting of an
+$n\times m$ matrix $x$ and a denominator $d$ such that $Ax = db$. The
+denominator will be the determinant of $A$ up to sign. If $A$ is singular an
+exception is raised.}
+
+\begin{lstlisting}
+solve{T <: FieldElem}(A::Mat{T}, b::Mat{T})
+\end{lstlisting}
+
+\desc{Given a non-singular $n\times n$ matrix over a field and an $n\times m$
+matrix over the same field, return an $n\times m$ matrix $x$
+such that $Ax = b$. If $A$ is singular an exception is raised.}
+
+\begin{lstlisting}
+solve_triu{T <: FieldElem}(U::Mat{T}, b::Mat{T}, unit=false)
+\end{lstlisting}
+
+\desc{Given a non-singular $n\times n$ matrix over a field which is upper
+triangular, and an $n\times m$ matrix over the same field, return an
+$n\times m$ matrix $x$ such that $Ax = b$. If $A$ is singular an exception
+is raised. If unit is true then $U$ is assumed to have ones on its
+diagonal, and the diagonal will not be read.}
+
+\textbf{Examples.}
+
+Here are some examples of linear solving.
+
+\begin{lstlisting}
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   S = MatrixSpace(K, 3, 3)
+   U = MatrixSpace(K, 3, 1)
+
+   A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+   b = U([2a a + 1 (-a - 1)]')
+
+   x = solve(A, b)
+
+   A = S([a + 1 2a + 3 a^2 + 1; K(0) a^2 - 1 2a; K(0) K(0) a])
+   b = U([2a a + 1 (-a - 1)]')
+
+   x = solve_triu(A, b, false)
+
+   R, x = PolynomialRing(ZZ, "x")
+   S = MatrixSpace(R, 3, 3)
+   U = MatrixSpace(R, 3, 2)
+
+   A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
+   b = U([2x x + 1 (-x - 1); x + 1 (-x) x^2]')
+
+   x, d = solve(A, b)
+\end{lstlisting}
+
+\subsubsection{Inversion}
+
+\begin{lstlisting}
+inv{T <: RingElem}(A::Mat{T})
+\end{lstlisting}
+
+\desc{Given a non-singular $n\times n$ matrix over a ring the tuple $X, d$
+consisting of an $n\times n$ matrix $X$ and a denominator $d$ such that
+$AX = dI_n$, where $I_n$ is the $n\times n$ identity matrix. The denominator
+will be the determinant of $A$ up to sign. If $A$ is singular an exception 
+is raised.}
+
+\begin{lstlisting}
+inv{T <: FieldElem}(A::Mat{T})
+\end{lstlisting}
+
+\desc{Given a non-singular $n\times n$ matrix over a field, return an
+$n\times n$ matrix $X$ such that $AX = I_n$ where $I_n$ is the $n\times n$
+identity matrix. If $A$ is singular an exception is raised.}
+
+\textbf{Examples.}
+
+Here are some examples of inversion.
+
+\begin{lstlisting}
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   S = MatrixSpace(K, 3, 3)
+
+   A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+
+   X = inv(A)
+
+   R, x = PolynomialRing(ZZ, "x")
+   S = MatrixSpace(R, 3, 3)
+
+   A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
+    
+   X, d = inv(A)
+\end{lstlisting}
+
+\subsubsection{Reduced row echelon form}
+
+\begin{lstlisting}
+rref{T <: RingElem}(M::Mat{T})
+\end{lstlisting}
+
+\desc{Returns a tuple $(r, d, A)$ consisting of the rank $r$ of $M$ and a
+denominator $d$ in the base ring of $M$ and a matrix $A$ such that $A/d$ is
+the reduced row echelon form of $M$. Note that the denominator is not
+usually minimal.}
+
+\begin{lstlisting}
+rref{T <: FieldElem}(M::Mat{T})
+\end{lstlisting}
+
+\desc{Returns a tuple $(r, A)$ consisting of the rank $r$ of $M$ and a
+reduced row echelon form $A$ of $M$.}
+
+\textbf{Examples.}
+
+Here are some examples of computing the reduced row echelon form.
+
+\begin{lstlisting}
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   S = MatrixSpace(K, 3, 3)
+   
+   M = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+   
+   r, d, A = rref(M)
+
+   R, x = PolynomialRing(ZZ, "x")
+   S = MatrixSpace(R, 3, 3)
+   U = MatrixSpace(R, 3, 2)
+
+   M = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
+   
+   r, A = rref(M)
+\end{lstlisting}
+
+\subsubsection{Nullspace}
+
+\begin{lstlisting}
+nullspace{T <: RingElem}(M::Mat{T})
+\end{lstlisting}
+
+\desc{Returns a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
+a basis $N$ (consisting of column vectors) for the right nullspace of $M$,
+i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix
+$N$ will be an $n\times \nu$ matrix. Note that the nullspace is taken to be
+the vector space kernel over the fraction field of the base ring if the
+latter is not a field. In Nemo we use the name ``kernel'' for a function to
+compute an integral kernel.}
+
+\textbf{Examples.}
+
+Here is an example of computing the nullspace.
+
+\begin{lstlisting}
+   R, x = PolynomialRing(ZZ, "x")
+   S = MatrixSpace(R, 4, 4)
+   
+   M = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;
+          -8*x^2+8*x+16 -16*x^2+38*x-20 90*x^2-82*x-44 60*x^2+54*x-34;
+          -4*x^2+4*x+8 -8*x^2+13*x-10 35*x^2-31*x-14 22*x^2+21*x-15;
+          -10*x^2+10*x+20 -20*x^2+70*x-25 150*x^2-140*x-85 105*x^2+90*x-50])
+   
+   n, N = nullspace(M)
+\end{lstlisting}
+
+\subsubsection{Hessenberg form}
+
+\begin{lstlisting}
+hessenberg{T <: FieldElem}(M::Mat{T})
+\end{lstlisting}
+
+\desc{Returns the Hessenberg form of $M$, i.e. an upper Hessenberg matrix
+which is similar to $M$. The upper Hessenberg form has nonzero entries
+above and on the diagonal and in the diagonal line immediately below the
+diagonal.}
+
+\begin{lstlisting}
+is_hessenberg{T <: FieldElem}(M::Mat{T})
+\end{lstlisting}
+
+\desc{Returns \code{true} if $M$ is in Hessenberg form, otherwise returns
+false.}
+
+\textbf{Examples.}
+
+Here is an example of computing the Hessenberg form.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 4, 4)
+   
+   M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
+          R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
+   
+   A = hessenberg(M)
+   is_hessenberg(A) == true
+\end{lstlisting}
+
+\subsubsection{Similarity transform}
+
+\begin{lstlisting}
+similarity!{T <: RingElem}(M::MatElem{T}, r::Int, d::T)
+\end{lstlisting}
+
+\desc{Applies a similarity transform to the $n\times n$ matrix $M$ in-place.
+Let $P$ be the $n\times n$ identity matrix that has had all zero entries
+of row $r$ replaced with $d$, then the transform applied is equivalent to
+$M = P^{-1}MP$. We require $M$ to be a square matrix. A similarity transform
+preserves the minimal and characteristic polynomials of a matrix.}
+
+\textbf{Examples.}
+
+Here is an example of applying a similarity transform.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 4, 4)
+   
+   M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
+          R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
+   
+   similarity!(M, 1, R(3))
+\end{lstlisting}
+
+\subsubsection{Characteristic polynomial}
+
+\begin{lstlisting}
+charpoly{T <: RingElem}(R::Ring, M::Mat{T})
+\end{lstlisting}
+
+\desc{Returns the characteristic polynomial $p$ of the matrix $M$. The
+polynomial ring $R$ of the resulting polynomial must be supplied.}
+
+\textbf{Examples.}
+
+Here is an example of computing the characteristic polynomial.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 7)
+   S = MatrixSpace(R, 4, 4)
+   T, x = PolynomialRing(R, "x")
+
+   M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
+          R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
+   
+   A = charpoly(T, M)
+\end{lstlisting}
+
+\subsubsection{Minimal polynomial}
+
+\begin{lstlisting}
+minpoly{T <: RingElem}(R::Ring, M::Mat{T})
+\end{lstlisting}
+
+\desc{Returns the minimal polynomial $p$ of the matrix $M$. The
+polynomial ring $R$ of the resulting polynomial must be supplied.}
+
+\textbf{Examples.}
+
+Here is an example of computing the minimal polynomial.
+
+\begin{lstlisting}
+   R, x = FiniteField(13, 1, "x")
+   T, y = PolynomialRing(R, "y")
+   
+   M = R[7 6 1;
+         7 7 5;
+         8 12 5]
+
+   A = minpoly(T, M)
 \end{lstlisting}
 
 \section{Generic fields}
@@ -3968,6 +4403,36 @@ S, x = PolynomialRing(ZZ, "x")
 a = -x//(2x + 1)
 
 f = gcd(a, (x + 1)/(x - 1))
+\end{lstlisting}
+
+\section{Top level types and functions}
+
+Not all Nemo functions and constructors can be classified as Set, Group, Ring or Field
+operations. We introduce here some additional top level types and functions defined
+thereon.
+
+\subsection{Arrays}
+
+Given a Nemo parent object $R$ we can construct Julia arrays of such objects.
+
+\begin{lstlisting}
+Array(R, dims...)
+\end{lstlisting}
+
+\desc{Construct an array of objects with the given dimensions.}
+
+\begin{lstlisting}
+zeros(R, dims...)
+\end{lstlisting}
+
+\desc{Construct an array of objects with the given dimensions and initialise each
+entry to the zero of the given ring.}
+
+\begin{lstlisting}
+R, x = PolynomialRing(ZZ, "x")
+
+A = Array(R, 2, 3)
+B = zeros(R, 2, 3)
 \end{lstlisting}
 
 \section{Flint rings}
@@ -7060,6 +7525,34 @@ Here is an example of row echelon form.
    b = rref(a)
 \end{lstlisting}
 
+\begin{lstlisting}
+howell_form(a::nmod_mat)
+\end{lstlisting}
+
+\desc{Return the Howell normal form of $a$. The matrix $a$ must have at least as
+many rows as columns.}
+
+\begin{lstlisting}
+strong_echelon_form(a::nmod_mat)
+\end{lstlisting}
+
+\desc{Return the strong echeleon form of $a$. The matrix $a$ must have at least as
+many rows as columns.}
+
+\textbf{Examples.}
+
+Here is an example of Howell and strong echelon form.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 12)
+   S = MatrixSpace(R, 3, 3)
+
+   a = S([8 5 5; 0 9 8; 0 0 10])
+
+   b = howell_form(a)
+   c = strong_echelon_form(a)
+\end{lstlisting}
+
 \subsubsection{Determinant}
 
 \begin{lstlisting}
@@ -7149,18 +7642,19 @@ Here is an example of linear solving.
    x = solve(a, b)
 \end{lstlisting}
 
-\subsubsection{LU decomposition}
+\subsubsection{LU factorisation}
 
 \begin{lstlisting}
 lufact(a::nmod_mat)
 \end{lstlisting}
 
-\desc{Compute a tuple of matrices $(l, u, p)$ such that $pa = lu$ where $l$ is a
-lower triangular matrix, $u$ is upper triangular and $p$ is a permutation matrix.}
+\desc{Compute a tuple of matrices $(r, p, l, u)$ such that $pa = lu$ where $l$ is a
+lower triangular matrix, $u$ is upper triangular, $p$ is a permutation matrix and
+$r$ is the rank of $a$.}
 
 \textbf{Examples.}
 
-Here is an example of LU decomposition.
+Here is an example of LU factorisation.
 
 \begin{lstlisting}
    R = ResidueRing(ZZ, 7)
@@ -7169,7 +7663,7 @@ Here is an example of LU decomposition.
 
    a = S([4 5 6; 7 3 2; 1 4 5])
   
-   l, u, p = lufact(a)
+   r, p, l, u = lufact(a)
 \end{lstlisting}
 
 \subsubsection{Matrix concatenation}
@@ -7600,6 +8094,13 @@ hnf_modular(a::fmpz_mat, m::fmpz)
 the determinant of the nonzero rows of $a$.}
 
 \begin{lstlisting}
+hnf_modular_eldiv(a::fmpz_mat, m::fmpz)
+\end{lstlisting}
+
+\desc{Compute the Hermite normal form of $a$ given that $m$ is a multiple of
+the largest elementary divisor of $a$. The matrix $a$ must have full rank.}
+
+\begin{lstlisting}
 is_hnf(a::fmpz_mat)
 \end{lstlisting}
 
@@ -7618,6 +8119,7 @@ Here are some examples of computing the Hermite normal form.
    B = hnf(A)
    H, T = hnf_with_transform(A)
    M = hnf_modular(A, fmpz(27))
+   MM = hnf_modular_eldiv(A, fmpz(27))
    is_hnf(M) == true
 \end{lstlisting}
 

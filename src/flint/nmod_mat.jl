@@ -7,7 +7,8 @@
 export nmod_mat, NmodMatSpace, getindex, setindex!, set_entry!, deepcopy, rows, 
        cols, parent, base_ring, zero, one, issquare, show, transpose,
        transpose!, rref, rref!, trace, determinant, rank, inv, solve, lufact,
-       sub, window, hcat, vcat, Array, lift, lift!, MatrixSpace, check_parent
+       sub, window, hcat, vcat, Array, lift, lift!, MatrixSpace, check_parent,
+       howell_form, howell_form!, strong_echelon_form, strong_echelon_form!
 
 ################################################################################
 #
@@ -303,6 +304,37 @@ end
 
 ################################################################################
 #
+#  Strong echelon form and Howell form
+#
+################################################################################
+
+function strong_echelon_form!(a::nmod_mat)
+  ccall((:nmod_mat_strong_echelon_form, :libflint), Void, (Ptr{nmod_mat}, ), &a)
+end
+
+function strong_echelon_form(a::nmod_mat)
+  (rows(a) < cols(a)) &&
+              error("Matrix must have at least as many rows as columsn")
+  z = deepcopy(a)
+  strong_echelon_form!(z)
+  return z
+end
+
+function howell_form!(a::nmod_mat)
+  ccall((:nmod_mat_howell_form, :libflint), Void, (Ptr{nmod_mat}, ), &a)
+end
+
+function howell_form(a::nmod_mat)
+  (rows(a) < cols(a)) &&
+              error("Matrix must have at least as many rows as columsn")
+
+  z = deepcopy(a)
+  howell_form!(z)
+  return z
+end
+
+################################################################################
+#
 #  Trace
 #
 ################################################################################
@@ -321,8 +353,16 @@ end
 
 function determinant(a::nmod_mat)
   !issquare(a) && error("Matrix must be a square matrix")
-  r = ccall((:nmod_mat_det, :libflint), UInt, (Ptr{nmod_mat}, ), &a)
-  return base_ring(a)(r)
+  if isprime(modulus(base_ring(a)))
+     r = ccall((:nmod_mat_det, :libflint), UInt, (Ptr{nmod_mat}, ), &a)
+     return base_ring(a)(r)
+  else
+     try
+        return determinant_fflu(a)
+     catch
+        return determinant_df(a)
+     end
+  end
 end
 
 ################################################################################
@@ -374,46 +414,41 @@ end
 #
 ################################################################################
 
-function lufact(x::nmod_mat)
-  t = deepcopy(x)
-  p = Array(Int, x.r)
-  r = ccall((:nmod_mat_lu, :libflint), Cint,
-          (Ptr{Int}, Ptr{nmod_mat}, Cint), p, &t, 0)
-  r = Int(r)
-  if issquare(x) && r == rows(x)
-    l = deepcopy(t)
-    for i in 1:cols(l)
-      l[i,i] = 1
-    end
-    for i in 1:rows(l)
-      for j in i+1:cols(l)
-        l[i,j] = 0
-      end
-    end
-    for i in 1:cols(t)
-      for j in 1:i-1
-        t[i,j] = 0
-      end
-    end
-    u = t
+function lufact!(P::perm, x::nmod_mat)
+  rank = ccall((:nmod_mat_lu, :libflint), Cint, (Ptr{Int}, Ptr{nmod_mat}, Cint),
+           P.d, &x, 0)
+  return rank
+end
+
+function lufact(x::nmod_mat, P = FlintPermGroup(rows(x)))
+  m = rows(x)
+  n = cols(x)
+  P.n != m && error("Permutation does not match matrix")
+  p = P()
+  R = base_ring(x)
+  U = deepcopy(x)
+
+  if m == n
+    L = parent(x)()
   else
-    l = window(t, 1, 1, rows(x), r)
-    for i in 1:r 
-      l[i,i] = 1
-    end
-    for i in 1:rows(l)
-      for j in i+1:cols(l)
-        l[i,j] = 0
+    L = MatrixSpace(R, m, m)()::nmod_mat
+  end
+
+  rank = lufact!(p, U)
+
+  for i = 1:m
+    for j = 1:n
+      if i > j
+        L[i, j] = U[i, j]
+        U[i, j] = R()
+      elseif i == j
+        L[i, j] = R(1)
+      elseif j <= m
+        L[i, j] = R()
       end
     end
-    u = window(t, 1, 1, r, cols(x))
-      for i in 1:rows(u)
-        for j in 1:i-1
-          u[i,j] = 0
-        end
-      end
-    end
-  return l,u,p
+  end
+  return rank, p, L, U
 end
 
 ################################################################################
@@ -501,6 +536,33 @@ function lift!(z::fmpz_mat, a::nmod_mat)
   ccall((:fmpz_mat_set_nmod_mat, :libflint), Void,
           (Ptr{fmpz_mat}, Ptr{nmod_mat}), &z, &a)
   return z 
+end
+
+################################################################################
+#
+#  Characteristic polynomial
+#
+################################################################################
+
+function charpoly(R::NmodPolyRing, a::nmod_mat)
+  m = deepcopy(a)
+  p = R()
+  ccall((:nmod_mat_charpoly, :libflint), Void,
+          (Ptr{nmod_poly}, Ptr{nmod_mat}), &p, &m)
+  return p
+end
+
+################################################################################
+#
+#  Minimal polynomial
+#
+################################################################################
+
+function minpoly(R::NmodPolyRing, a::nmod_mat)
+  p = R()
+  ccall((:nmod_mat_minpoly, :libflint), Void,
+          (Ptr{nmod_poly}, Ptr{nmod_mat}), &p, &a)
+  return p
 end
 
 ###############################################################################
@@ -642,7 +704,8 @@ function MatrixSpace(R::ResidueRing{fmpz}, r::Int, c::Int)
   return try
     NmodMatSpace(R, r, c)
   catch
-    error("Not yet implemented")
+    T = elem_type(R)
+    return MatrixSpace{T}(R, r, c)
   end
 end
 

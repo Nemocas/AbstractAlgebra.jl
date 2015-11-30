@@ -15,16 +15,25 @@ if !ispath(Pkg.dir("Nemo", "local", "lib"))
 end
 
 LDFLAGS = "-Wl,-rpath,$vdir/lib -Wl,-rpath,\$\$ORIGIN/../share/julia/site/v$(VERSION.major).$(VERSION.minor)/Nemo/local/lib"
+DLCFLAGS = "-fPIC -fno-common"
 
 cd(wdir)
+
+function download_dll(url_string, location_string)
+   try
+      run(`curl -o $(location_string) -L $(url_string)`)
+   catch
+      download(url_string, location_string)
+   end
+end
 
 #install libpthreads
 
 if on_windows
    if Int == Int32
-      download("http://nemocas.org/binaries/w32-libwinpthread-1.dll", joinpath(vdir, "lib", "libwinpthread-1.dll"))
+      download_dll("http://nemocas.org/binaries/w32-libwinpthread-1.dll", joinpath(vdir, "lib", "libwinpthread-1.dll"))
    else
-      download("http://nemocas.org/binaries/w64-libwinpthread-1.dll", joinpath(vdir, "lib", "libwinpthread-1.dll"))
+      download_dll("http://nemocas.org/binaries/w64-libwinpthread-1.dll", joinpath(vdir, "lib", "libwinpthread-1.dll"))
    end
 end
 
@@ -32,40 +41,36 @@ cd(wdir)
 
 # install M4
 
-try
-   run(`m4 --version`)
-catch
-   download("http://ftp.gnu.org/gnu/m4/m4-1.4.17.tar.bz2", joinpath(wdir, "m4-1.4.17.tar.bz2"))
-   run(`tar -xvf m4-1.4.17.tar.bz2`)
-   run(`rm m4-1.4.17.tar.bz2`)
-   cd("$wdir/m4-1.4.17")
-   run(`./configure --prefix=$vdir`)
-   run(`make`)
-   run(`make install`)
+if !on_windows
+   try
+      run(`m4 --version`)
+   catch
+      download("http://ftp.gnu.org/gnu/m4/m4-1.4.17.tar.bz2", joinpath(wdir, "m4-1.4.17.tar.bz2"))
+      run(`tar -xvf m4-1.4.17.tar.bz2`)
+      run(`rm m4-1.4.17.tar.bz2`)
+      cd("$wdir/m4-1.4.17")
+      run(`./configure --prefix=$vdir`)
+      run(`make`)
+      run(`make install`)
+   end
 end
 
 cd(wdir)
 
 # install GMP/MPIR
 
-if on_windows
-   download("https://gmplib.org/download/gmp/gmp-6.0.0a.tar.bz2", joinpath(wdir, "gmp-6.0.0a.tar.bz2"))
-   run(`tar -xvf gmp-6.0.0a.tar.bz2`)
-   run(`rm gmp-6.0.0a.tar.bz2`)
-else
-   if !ispath(Pkg.dir("Nemo", "local", "mpir-2.7.0"))
-      download("http://mpir.org/mpir-2.7.0.tar.bz2", joinpath(wdir, "mpir-2.7.0.tar.bz2"))
-      run(`tar -xvf mpir-2.7.0.tar.bz2`)
-      run(`rm mpir-2.7.0.tar.bz2`)
-   end
-   cd("$wdir/mpir-2.7.0")
+if !ispath(Pkg.dir("Nemo", "local", "mpir-2.7.2"))
+   download("http://mpir.org/mpir-2.7.2.tar.bz2", joinpath(wdir, "mpir-2.7.2.tar.bz2"))
+   run(`tar -xvf mpir-2.7.2.tar.bz2`)
+   run(`rm mpir-2.7.2.tar.bz2`)
 end
+cd("$wdir/mpir-2.7.2")
 
 if on_windows
    if Int == Int32
-      download("http://nemocas.org/binaries/w32-libgmp-10.dll", joinpath(vdir, "lib", "libgmp-10.dll"))
+      download_dll("http://nemocas.org/binaries/w32-libgmp-16.dll", joinpath(vdir, "lib", "libgmp-16.dll"))
    else
-      download("http://nemocas.org/binaries/w64-libgmp-10.dll", joinpath(vdir, "lib", "libgmp-10.dll"))
+      download_dll("http://nemocas.org/binaries/w64-libgmp-16.dll", joinpath(vdir, "lib", "libgmp-16.dll"))
    end
 else
    try
@@ -77,7 +82,6 @@ else
    run(`make -j4`)
    run(`make install`)
    cd(wdir)
-   run(`rm -rf mpir-2.7.0`)
    run(`rm -rf bin`)
 end
 
@@ -86,25 +90,25 @@ cd(wdir)
 # install MPFR
 
 if !ispath(Pkg.dir("Nemo", "local", "mpfr-3.1.3"))
-   download("http://www.mpfr.org/mpfr-current/mpfr-3.1.3.tar.bz2", joinpath(wdir, "mpfr-3.1.3.tar.bz2"))
+   download("http://ftp.gnu.org/gnu/mpfr/mpfr-3.1.3.tar.bz2", joinpath(wdir, "mpfr-3.1.3.tar.bz2"))
    run(`tar -xvf mpfr-3.1.3.tar.bz2`)
    run(`rm mpfr-3.1.3.tar.bz2`)
 end
 
 if on_windows
    if Int == Int32
-      download("http://nemocas.org/binaries/w32-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
+      download_dll("http://nemocas.org/binaries/w32-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
    else
-      download("http://nemocas.org/binaries/w64-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
+      download_dll("http://nemocas.org/binaries/w64-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
    end
 else
    cd("$wdir/mpfr-3.1.3")
-   withenv(()->run(`./configure --prefix=$vdir --with-gmp=$vdir --disable-static --enable-shared`), 
-                           "LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS)
-   run(`make -j4`)
-   run(`make install`)
+   withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
+      run(`./configure --prefix=$vdir --with-gmp=$vdir --disable-static --enable-shared`) 
+      run(`make -j4`)
+      run(`make install`)
+   end
    cd(wdir)
-   run(`rm -rf mpfr-3.1.3`)
 end
 
 cd(wdir)
@@ -130,19 +134,20 @@ end
 
 if on_windows
    if Int == Int32
-      download("http://nemocas.org/binaries/w32-libflint.dll", joinpath(vdir, "lib", "libflint.dll"))
+      download_dll("http://nemocas.org/binaries/w32-libflint.dll", joinpath(vdir, "lib", "libflint.dll"))
    else
-      download("http://nemocas.org/binaries/w64-libflint.dll", joinpath(vdir, "lib", "libflint.dll"))
+      download_dll("http://nemocas.org/binaries/w64-libflint.dll", joinpath(vdir, "lib", "libflint.dll"))
    end
    try
       run(`ln -sf $vdir\\lib\\libflint.dll $vdir\\lib\\libflint-13.dll`)
    end
 else
    cd("$wdir/flint2")
-   withenv(()->run(`./configure --prefix=$vdir --extensions="$wdir/antic" --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir`), 
-                           "LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS)
-   run(`make -j4`)
-   run(`make install`)
+   withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
+      run(`./configure --prefix=$vdir --extensions="$wdir/antic" --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir`) 
+      run(`make -j4`)
+      run(`make install`)
+   end
 end
 
 cd(wdir)
@@ -159,14 +164,17 @@ end
  
 if on_windows
    if Int == Int32
-      download("http://nemocas.org/binaries/w32-libarb.dll", joinpath(vdir, "lib", "libarb.dll"))
+      download_dll("http://nemocas.org/binaries/w32-libarb.dll", joinpath(vdir, "lib", "libarb.dll"))
+   else
+      download_dll("http://nemocas.org/binaries/w64-libarb.dll", joinpath(vdir, "lib", "libarb.dll"))
    end
 else
    cd("$wdir/arb")
-   withenv(()->run(`./configure --prefix=$vdir --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir --with-flint=$vdir`), 
-                           "LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS)
-   run(`make -j4`)
-   run(`make install`)
+   withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
+      run(`./configure --prefix=$vdir --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir --with-flint=$vdir`)
+      run(`make -j4`)
+      run(`make install`)
+   end
 end
 
 cd(wdir)
@@ -185,21 +193,24 @@ end
 
 if on_windows
    if Int == Int32
-      download("http://nemocas.org/binaries/w32-libpari.dll", joinpath(vdir, "lib", "libpari.dll"))
+      download_dll("http://nemocas.org/binaries/w32-libpari.dll", joinpath(vdir, "lib", "libpari.dll"))
    else
-      download("http://nemocas.org/binaries/w64-libpari.dll", joinpath(vdir, "lib", "libpari.dll"))
+      download_dll("http://nemocas.org/binaries/w64-libpari.dll", joinpath(vdir, "lib", "libpari.dll"))
+   end
+elseif on_osx
+   cd("$wdir/pari-2.7.4")
+   withenv("DYLD_LIBRARY_PATH"=>"$vdir/lib", "DLCFLAGS"=>DLCFLAGS) do
+      run(`./Configure --prefix=$vdir --with-gmp=$vdir`)
+      run(`make -j4 gp`)
+      run(`make install`)
    end
 else
    cd("$wdir/pari-2.7.4")
-   #env_copy = copy(ENV)
-   #env_copy["LD_LIBRARY_PATH"] = "$vdir/lib"
-   #env_copy["CFLAGS"] = 
-   withenv(()->run(`./Configure --prefix=$vdir --with-gmp=$vdir --mt=pthread`), 
-                           "LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS)
-   #config_str = setenv(config_str, env_copy)
-   #run(config_str)
-   run(`make -j4 gp`)
-   run(`make install`)
+   withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "DLLDFLAGS"=>LDFLAGS) do
+      run(`./Configure --prefix=$vdir --with-gmp=$vdir`)
+      run(`make -j4 gp`)
+      run(`make install`)
+   end
 end
 
 cd(wdir)
