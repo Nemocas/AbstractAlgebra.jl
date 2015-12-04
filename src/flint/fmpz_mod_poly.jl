@@ -449,9 +449,11 @@ function divrem(x::fmpz_mod_poly, y::fmpz_mod_poly)
   iszero(y) && throw(DivideError()) 
   q = parent(x)()
   r = parent(x)()
-  ccall((:fmpz_mod_poly_divrem, :libflint), Void,
-        (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}),
-          &q, &r, &x, &y)
+  d = fmpz()
+  ccall((:fmpz_mod_poly_divrem_f, :libflint), Void,
+        (Ptr{fmpz}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}),
+          &d, &q, &r, &x, &y)
+  d > 1 && error("Impossible inverse in divrem")
   return q, r
 end
 
@@ -462,12 +464,8 @@ end
 ################################################################################
 
 function rem(x::fmpz_mod_poly, y::fmpz_mod_poly)
-  check_parent(x,y)
-  iszero(y) && throw(DivideError()) 
-  z = parent(x)()
-  ccall((:fmpz_mod_poly_rem, :libflint), Void,
-          (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), &z, &x, &y)
-  return z
+  q, r = divrem(x, y)
+  return r
 end
 
 mod(x::fmpz_mod_poly, y::fmpz_mod_poly) = rem(x,y)
@@ -481,9 +479,11 @@ mod(x::fmpz_mod_poly, y::fmpz_mod_poly) = rem(x,y)
 function gcd(x::fmpz_mod_poly, y::fmpz_mod_poly)
   check_parent(x, y)
   z = parent(x)()
-  ccall((:fmpz_mod_poly_gcd, :libflint), Void,
-          (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
-              &z, &x, &y)
+  f = fmpz()
+  ccall((:fmpz_mod_poly_gcd_f, :libflint), Void,
+          (Ptr{fmpz}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), 
+              &f, &z, &x, &y)
+  f > 1 && error("Impossible inverse: $(f) divides modulus")
   return z
 end 
 
@@ -492,9 +492,11 @@ function gcdx(x::fmpz_mod_poly, y::fmpz_mod_poly)
   g = parent(x)()
   s = parent(x)()
   t = parent(x)()
-  ccall((:fmpz_mod_poly_xgcd, :libflint), Void,
-          (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly},
-           Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), &g, &s, &t, &x, &y)
+  f = fmpz()
+  ccall((:fmpz_mod_poly_xgcd_f, :libflint), Void,
+        (Ptr{fmpz}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly},
+         Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), &f, &g, &s, &t, &x, &y)
+  f > 1 && error("Impossible inverse: $(f) divides modulus")
   return g, s, t
 end
 
@@ -503,9 +505,11 @@ function gcdinv(x::fmpz_mod_poly, y::fmpz_mod_poly)
   length(y) <= 1 && error("Length of second argument must be >= 2")
   g = parent(x)()
   s = parent(x)()
-  ccall((:fmpz_mod_poly_gcdinv, :libflint), Void,
-          (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}),
-          &g, &s, &x, &y)
+  f = fmpz()
+  ccall((:fmpz_mod_poly_gcdinv_f, :libflint), Void,
+          (Ptr{fmpz}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}),
+          &f, &g, &s, &x, &y)
+  f > 1 && error("Impossible inverse: $(f) divides modulus")
   return g, s
 end 
 
@@ -564,6 +568,7 @@ end
 function resultant(x::fmpz_mod_poly, y::fmpz_mod_poly)
   check_parent(x,y)
   z = parent(x)()
+  !isprobabprime(modulus(x)) && error("Modulus not prime in resultant")
   r = fmpz()
   ccall((:fmpz_mod_poly_resultant, :libflint), Void,
           (Ptr{fmpz}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}), &r, &x, &y)
@@ -649,6 +654,7 @@ end
 ################################################################################
 
 function isirreducible(x::fmpz_mod_poly)
+  !isprobabprime(modulus(x)) && error("Modulus not prime in isirreducible")
   return Bool(ccall((:fmpz_mod_poly_is_irreducible, :libflint), Int32,
           (Ptr{fmpz_mod_poly}, ), &x))
 end
@@ -660,7 +666,8 @@ end
 ################################################################################
 
 function issquarefree(x::fmpz_mod_poly)
-  return Bool(ccall((:fmpz_mod_poly_is_squarefree, :libflint), Int32, 
+   !isprobabprime(modulus(x)) && error("Modulus not prime in issquarefree")
+   return Bool(ccall((:fmpz_mod_poly_is_squarefree, :libflint), Int32, 
       (Ptr{fmpz_mod_poly}, ), &x))
 end
 
@@ -671,6 +678,7 @@ end
 ################################################################################
 
 function factor(x::fmpz_mod_poly)
+  !isprobabprime(modulus(x)) && error("Modulus not prime in factor")
   fac = fmpz_mod_poly_factor(parent(x)._n)
   ccall((:fmpz_mod_poly_factor, :libflint), UInt,
           (Ptr{fmpz_mod_poly_factor}, Ptr{fmpz_mod_poly}), &fac, &x)
@@ -686,6 +694,7 @@ function factor(x::fmpz_mod_poly)
 end  
 
 function factor_squarefree(x::fmpz_mod_poly)
+  !isprobabprime(modulus(x)) && error("Modulus not prime in factor_squarefree")
   fac = fmpz_mod_poly_factor(parent(x)._n)
   ccall((:fmpz_mod_poly_factor_squarefree, :libflint), UInt,
           (Ptr{fmpz_mod_poly_factor}, Ptr{fmpz_mod_poly}), &fac, &x)
@@ -702,6 +711,7 @@ end
 
 function factor_distinct_deg(x::fmpz_mod_poly)
   !issquarefree(x) && error("Polynomial must be squarefree")
+  !isprobabprime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")
   degs = Array(Int, degree(x))
   degss = [ pointer(degs) ]
   fac = fmpz_mod_poly_factor(parent(x)._n)

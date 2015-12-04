@@ -2104,12 +2104,12 @@ end
 
 ###############################################################################
 #
-#   Minimum polynomial
+#   Minimal polynomial
 #
 ###############################################################################
 
 # We let the rows of A be the Krylov sequence v, Mv, M^2v, ... where v
-# is a standard basis vector. We find a minimum polynomial P_v by finding
+# is a standard basis vector. We find a minimal polynomial P_v by finding
 # a linear relation amongst the rows (rows are added one at a time until
 # a relation is found). We then append the rows from A to B and row reduce
 # by all the rows already in B. We then look for a new standard basis vector

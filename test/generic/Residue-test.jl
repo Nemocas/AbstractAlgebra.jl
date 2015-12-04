@@ -242,12 +242,13 @@ function test_residue_inversion()
 
    @test inv(a) == 10
 
+   R = ResidueRing(ZZ, 41)
    S, x = PolynomialRing(R, "x")
    T = ResidueRing(S, x^3 + 3x + 1)
 
    f = T(x^5 + 1)
 
-   @test inv(f) == T(37*x^2+34*x+26)
+   @test inv(f) == T(26*x^2+31*x+10)
 
    println("PASS")
 end
@@ -262,13 +263,14 @@ function test_residue_exact_division()
 
    @test divexact(a, b) == 18
 
+   R = ResidueRing(ZZ, 41)
    S, x = PolynomialRing(R, "x")
    T = ResidueRing(S, x^3 + 3x + 1)
 
    f = T(x^5 + 1)
    g = T(x^4 + x + 2)
 
-   @test divexact(f, g) == T(17*x^2+14*x+30)
+   @test divexact(f, g) == T(7*x^2+25*x+26)
 
    println("PASS")
 end
