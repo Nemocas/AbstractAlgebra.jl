@@ -1,14 +1,6 @@
 Build
 -----
 
-* Building on Windows should use binaries (building 64 bit Pari is not supported)
-
-* Pari doesn't find libgmp.so even when told explicitly where to look because
-LD_LIBRARY_PATH needs to be set. We can get around this by having Pari statically
-link against libgmp.a on Linux.
-
-* Build Pari and Arb on Windows (32 bit only)
-
 * Use git clone rather than wget for mpir/mpfr and try/except
 
 General
@@ -17,20 +9,10 @@ General
 * our hashing doesn't conform to the Julia standard and this matters for sets
 and the like.
 
-* Make Benchmarks test with pearce monaghan and resultant (and other) benchmarks
-in it, instead of throughout the test code.
-
-* replace Culong with UInt and Clong with Int throughout, esp. fmpz.jl
-
 * Implement more generic ad hoc operators so we can remove all the documentation
 of ad hoc operators for other types
 
 * add lots of tests for exceptions and special cases dealt with in code
-
-* Julia uses column major format whereas Flint uses row major. We have to
-decide on which convention to use for Nemo
-
-* Nemo uses num/den, but for polys we are using numerator/denominator
 
 * entry/coeff, set_entry!/set_coeff! for Residue{fmpz} entries but 
   entry_data/coeff_data, set_entry!/set_coeff! (overloaded) for Int/fmpz
@@ -38,8 +20,6 @@ decide on which convention to use for Nemo
 
 * Implement strict equality, e.g. isidentical(1+O(x), 1+O(x^2)) == false;
   don't use isequal; in Julia it's for objects that hash to the same value
-
-* Add test code
 
 * change names of shift_left/right
 
@@ -74,8 +54,6 @@ fq_poly.jl / fq_nmod_poly.jl
 * divexact is missing along with numerous other things provided by generic Poly
 
 * division is currently using basecase instead of divide and conquer
-
-* write test code
 
 nmod_poly.jl
 ------------
@@ -141,8 +119,6 @@ FLINT
 
 * fix printing of parentheses in polys over finite fields
 
-* fix issue with dll production on Windows
-
 * document and test fq_poly_scalar_div_fq
 
 * add fq_poly_scalar_div_ui/si/fmpz
@@ -152,11 +128,6 @@ FLINT
 * suppress printing of 1 coeffs in fmpq_poly_print_pretty
 
 * fmpq_poly_inv_series can be faster than Sage's power series inversion
-
-* fix isprime bug
-
-* document and test set_exact_fmpz, add_exact, mul_exact, sub_exact, inv_exact,
-  div_exact, sqrt_exact, pow_exact_si, div_exact_fmpz
 
 * handle monomials and binomials optimally in powering, composition, division
   etc. in polynomial/power series functions (over Z, Z/nZ, Q, Fq)
@@ -180,7 +151,7 @@ can still be performed
 * ensure exp is only defined for rings in which division by an integer is
 possible
 
-* Use set_length in instead of setting power series length field directly,
+* Use set_length instead of setting power series length field directly,
   otherwise generic functions can't act as catchall for series types that don't
   have a length field
 
@@ -238,22 +209,12 @@ fmpz_mat
 
 * fix _checkbounds
 
-
 Julia bugs??
 ============
-
-* Julia cleans up fq_ctx before it is passed to C function fq_poly_clear
 
 * Overloading / for poly/coeff causes ambiguity
 
 * Stack overflow when using the catchall in Rings.jl
-
-* functions defined inside functions (e.g. convert in PolynomialRing) cause crashes
-  if function is called multiple times with different types, because the same lines
-  of code correspond to different functions
-
-* ccall needs {S} when functions containing them are called from within other
-  functions
 
 * disambiguation required in Fraction.jl
 
