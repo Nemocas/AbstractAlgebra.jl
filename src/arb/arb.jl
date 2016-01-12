@@ -296,8 +296,8 @@ end
 ################################################################################
 
 function ball(mid::arb, rad::arb)
-  z = parent(mid)()
   z = arb(mid, rad)
+  z.parent = parent(mid)
   return z
 end
 
