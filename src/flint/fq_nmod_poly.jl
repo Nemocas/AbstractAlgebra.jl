@@ -20,7 +20,7 @@ parent(a::fq_nmod_poly) = a.parent
 
 var(a::FqNmodPolyRing) = a.S
 
-function check_parent(a::fq_nmod, b::fq_nmod) 
+function check_parent(a::fq_nmod_poly, b::fq_nmod_poly) 
    a.parent != b.parent &&
          error("Operations on distinct polynomial rings not supported")
 end

@@ -476,18 +476,6 @@ function invmod(x::fmpz, y::fmpz)
     return z
 end
 
-function gcdinv(x::fmpz, y::fmpz)
-    y <= 0 && throw(DomainError())
-    g = fmpz()
-    z = fmpz()
-    if y == 1
-        return fmpz(0), fmpz(0)
-    end
-    ccall((:fmpz_gcdinv, :libflint), Void, 
-          (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &g, &z, &x, &y)
-    return g, z
-end
-
 function sqrtmod(x::fmpz, y::fmpz)
     y <= 0 && throw(DomainError())
     z = fmpz()

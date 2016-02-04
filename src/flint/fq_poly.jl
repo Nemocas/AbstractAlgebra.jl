@@ -47,10 +47,6 @@ end
 set_length!(x::fq_poly, n::Int) = ccall((:_fq_poly_set_length, :libflint), Void,
                               (Ptr{fq_poly}, Int), &x, n)
 
-iszero(x::fq_poly) = ccall((:fq_poly_is_zero, :libflint), Bool,
-                              (Ptr{fq_poly}, Ptr{FqFiniteField}),
-                              &x, &base_ring(x.parent))
-
 zero(a::FqPolyRing) = a(zero(base_ring(a)))
 
 one(a::FqPolyRing) = a(one(base_ring(a)))

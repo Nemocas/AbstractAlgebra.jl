@@ -19,8 +19,6 @@ fmpq(a::Rational{BigInt}) = fmpq(fmpz(a.num), fmpz(a.den))
 
 fmpq(a::Integer) = fmpq(fmpz(a), fmpz(1))
 
-fmpq(a::fmpz) = fmpq(a, fmpz(1))
-
 fmpq(a::Integer, b::Integer) = fmpq(fmpz(a), fmpz(b))
 
 fmpq(a::fmpz, b::Integer) = fmpq(a, fmpz(b))
@@ -61,10 +59,6 @@ function hash(a::fmpq)
    h = 0x8a30b0d963237dd5
    return h $ hash(num(a)) $ hash(den(a))
 end
-
-zero(a::FlintRationalField) = fmpq(0, 1)
-
-one(a::FlintRationalField) = fmpq(1, 1)
 
 function num(a::fmpq)
    z = fmpz()

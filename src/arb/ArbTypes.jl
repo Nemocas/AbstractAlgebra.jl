@@ -112,8 +112,6 @@ function _arb_clear_fn(x::arb)
   ccall((:arb_clear, :libarb), Void, (Ptr{arb}, ), &x)
 end
 
-elem_type(x::ArbField) = arb
-
 parent(x::arb) = x.parent
 
 function deepcopy(a::arb)

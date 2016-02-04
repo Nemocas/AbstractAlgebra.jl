@@ -110,6 +110,13 @@ function call(r::ArbField, x::Irrational)
   end
 end
 
+function call(r::ArbField, x::Union{Int, UInt, fmpz, fmpq, Float64, arb,
+                                    AbstractString, BigFloat})
+  z = arb(x, r.prec)
+  z.parent = r
+  return z
+end
+
 ################################################################################
 #
 #  Conversions
@@ -995,35 +1002,6 @@ for (typeofx, passtoc) in ((arb, Ref{arb}), (Ptr{arb}, Ptr{arb}))
       ccall((:arb_set_round, :libarb), Void,
                   (($passtoc), ($passtoc), Int), x, x, p)
     end
-  end
-end
-
-################################################################################
-#
-#  Parent object overloading
-#
-################################################################################
-
-function call(r::ArbField)
-  z = arb()
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::Union{Int, UInt, fmpz, fmpq, Float64, arb,
-                                    AbstractString, BigFloat})
-  z = arb(x, r.prec)
-  z.parent = r
-  return z
-end
-
-function call(r::ArbField, x::Irrational)
-  if x == pi
-    return const_pi(r)
-  elseif x == e
-    return const_e(r.prec)
-  else
-    error("constant not supported")
   end
 end
 

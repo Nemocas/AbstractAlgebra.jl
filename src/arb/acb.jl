@@ -123,9 +123,6 @@ end
 ==(x::acb,y::fmpz) = (x == parent(x)(y))
 ==(x::fmpz,y::acb) = (y == parent(y)(x))
 
-==(x::acb,y::arb) = (x == parent(x)(y))
-==(x::arb,y::acb) = (y == parent(y)(x))
-
 ==(x::acb,y::Float64) = (x == parent(x)(y))
 ==(x::Float64,y::acb) = (y == parent(y)(x))
 
@@ -137,9 +134,6 @@ end
 
 !=(x::acb,y::fmpz) = (x != parent(x)(y))
 !=(x::fmpz,y::acb) = (y != parent(y)(x))
-
-!=(x::acb,y::arb) = (x != parent(x)(y))
-!=(x::arb,y::acb) = (y != parent(y)(x))
 
 !=(x::acb,y::Float64) = (x != parent(x)(y))
 !=(x::Float64,y::acb) = (y != parent(y)(x))
@@ -740,28 +734,6 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
                   (($passtoc), Int, Int), x, y, z)
       ccall((:acb_set_round, :libarb), Void,
                   (($passtoc), ($passtoc), Int), x, x, p)
-    end
-
-    function _acb_set(x::($typeofx), y::fmpz, z::fmpz)
-      ccall((:acb_set_fmpz_fmpz, :libarb), Void,
-                  (($passtoc), ptr{fmpz}, ptr{fmpq}), x, &y, &z)
-    end
-
-    function _acb_set(x::($typeofx), y::fmpz, z::fmpz, p::Int)
-      _acb_set(x, y, z)
-      ccall((:acb_set_round, :libarb), Void,
-                  (($passtoc), ($passtoc), int), x, x, p)
-    end
-
-    function _acb_set(x::($typeofx), y::Float64, z::Float64)
-      ccall((:acb_set_d_d, :libarb), Void,
-                  (($passtoc), Float64, Float64), x, y, z)
-    end
-
-    function _acb_set(x::($typeofx), y::Float64, z::Float64, p::Int)
-      _acb_set(x, y, z)
-      ccall((:acb_set_round, :libarb), Void,
-                  (($passtoc), ($passtoc), int), x, x, p)
     end
 
     function _acb_set(x::($typeofx), y::arb, z::arb)

@@ -270,20 +270,6 @@ function test_nf_elem_adhoc_exact_division()
 end
 
 function test_nf_elem_norm_trace()
-   print("nf_elem.adhoc_norm_trace...")
- 
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
-
-   c = 3a^2 - a + 1
-   
-   @test norm(c) == 113
-   @test trace(c) == -15
-  
-   println("PASS")
-end
-
-function test_nf_elem_norm_trace()
    print("nf_elem.norm_trace...")
  
    R, x = PolynomialRing(QQ, "x")
