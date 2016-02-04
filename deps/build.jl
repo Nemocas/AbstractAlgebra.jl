@@ -61,10 +61,7 @@ cd(wdir)
 
 if !ispath(Pkg.dir("Nemo", "local", "mpir-2.7.2"))
    download("http://mpir.org/mpir-2.7.2.tar.bz2", joinpath(wdir, "mpir-2.7.2.tar.bz2"))
-   run(`tar -xvf mpir-2.7.2.tar.bz2`)
-   run(`rm mpir-2.7.2.tar.bz2`)
 end
-cd("$wdir/mpir-2.7.2")
 
 if on_windows
    if Int == Int32
@@ -73,6 +70,9 @@ if on_windows
       download_dll("http://nemocas.org/binaries/w64-libgmp-16.dll", joinpath(vdir, "lib", "libgmp-16.dll"))
    end
 else
+   run(`tar -xvf mpir-2.7.2.tar.bz2`)
+   run(`rm mpir-2.7.2.tar.bz2`)
+   cd("$wdir/mpir-2.7.2")
    try
       run(`m4 --version`)
       run(`./configure --prefix=$vdir --enable-gmpcompat --disable-static --enable-shared`)
@@ -91,8 +91,6 @@ cd(wdir)
 
 if !ispath(Pkg.dir("Nemo", "local", "mpfr-3.1.3"))
    download("http://ftp.gnu.org/gnu/mpfr/mpfr-3.1.3.tar.bz2", joinpath(wdir, "mpfr-3.1.3.tar.bz2"))
-   run(`tar -xvf mpfr-3.1.3.tar.bz2`)
-   run(`rm mpfr-3.1.3.tar.bz2`)
 end
 
 if on_windows
@@ -102,6 +100,8 @@ if on_windows
       download_dll("http://nemocas.org/binaries/w64-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
    end
 else
+   run(`tar -xvf mpfr-3.1.3.tar.bz2`)
+   run(`rm mpfr-3.1.3.tar.bz2`)
    cd("$wdir/mpfr-3.1.3")
    withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
       run(`./configure --prefix=$vdir --with-gmp=$vdir --disable-static --enable-shared`) 
@@ -187,8 +187,6 @@ if !ispath(Pkg.dir("Nemo", "deps", "pari-2.7.4"))
    # so we use the 2.7.4 tarball
 
    download("http://pari.math.u-bordeaux.fr/pub/pari/unix/pari-2.7.4.tar.gz", joinpath(wdir, "pari-2.7.4.tar.gz"))
-   run(`tar -xvf pari-2.7.4.tar.gz`)
-   run(`rm pari-2.7.4.tar.gz`)
 end
 
 if on_windows
@@ -198,6 +196,8 @@ if on_windows
       download_dll("http://nemocas.org/binaries/w64-libpari.dll", joinpath(vdir, "lib", "libpari.dll"))
    end
 elseif on_osx
+   run(`tar -xvf pari-2.7.4.tar.gz`)
+   run(`rm pari-2.7.4.tar.gz`)
    cd("$wdir/pari-2.7.4")
    withenv("DYLD_LIBRARY_PATH"=>"$vdir/lib", "DLCFLAGS"=>DLCFLAGS) do
       run(`./Configure --prefix=$vdir --with-gmp=$vdir`)
@@ -205,6 +205,8 @@ elseif on_osx
       run(`make install`)
    end
 else
+   run(`tar -xvf pari-2.7.4.tar.gz`)
+   run(`rm pari-2.7.4.tar.gz`)
    cd("$wdir/pari-2.7.4")
    withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "DLLDFLAGS"=>LDFLAGS) do
       run(`./Configure --prefix=$vdir --with-gmp=$vdir`)

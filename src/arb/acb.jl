@@ -794,7 +794,7 @@ function call(r::AcbField)
   return z
 end
 
-function call(r::AcbField, x::Union{Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString})
+function call(r::AcbField, x::Union{Int, UInt, fmpz, fmpq, arb, acb, Float64, BigFloat, AbstractString})
   z = acb(x, r.prec)
   z.parent = r
   return z
