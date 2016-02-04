@@ -4,52 +4,29 @@
 #
 #################################################################################
 
-type Factor{T <: Ring}
-   d::PariFactor
-   len::Int
-   parent::T
-end
-
-function getindex(a::Factor{FlintIntegerRing}, i::Int)
-   p, n = a.d[i]
-   return fmpz(p), n
-end
-
-function getindex(a::Factor{FmpzPolyRing}, i::Int)
-   p, n = a.d[i]
-   return a.parent(p), n
-end
-
-function getindex(a::Factor{FmpqPolyRing}, i::Int)
-   p, n = a.d[i]
-   return a.parent(p), n
-end
-
-function show(io::IO, a::Factor)
-   print(io, "[")
-   for i = 1:a.len
-      print(io, a[i])
-      if i != a.len
-         print(io, ", ")
-      end
-   end
-   print(io, "]")
+function _Factor(f::PariFactor, R::Ring)
+  D = Dict{typeof(zero(R)), Int}()
+  for i=1:f.len
+    p, n = f[i]
+    D[R(p)] = n
+  end
+  return D
 end
 
 function factor(n::fmpz)
    f = factor(pari(n))
-   return Factor{FlintIntegerRing}(f, f.len, FlintZZ)
+   return _Factor(f, FlintZZ)
 end
 
 function factor(g::fmpz_poly)
    h = pari(g)
    f = factor(h)
-   return Factor{FmpzPolyRing}(f, f.len, g.parent)
+   return _Factor(f, g.parent)
 end
 
 function factor(g::fmpq_poly)
    h = pari(g)
    f = factor(h)
-   return Factor{FmpqPolyRing}(f, f.len, g.parent)
+   return _Factor(f, g.parent)
 end
 
