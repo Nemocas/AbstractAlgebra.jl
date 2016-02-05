@@ -507,14 +507,14 @@ function factor(x::fq_nmod_poly)
    ccall((:fq_nmod_poly_factor, :libflint), Void, (Ptr{fq_nmod_poly_factor},
          Ptr{fq_nmod}, Ptr{fq_nmod_poly}, Ptr{FqNmodFiniteField}),
          &fac, &a, &x, &F)
-   res = Array(Tuple{fq_nmod_poly,Int},fac.num)
+   res = Dict{fq_nmod_poly,Int}()
    for i in 1:fac.num
       f = R()
       ccall((:fq_nmod_poly_factor_get_poly, :libflint), Void,
             (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly_factor}, Int,
             Ptr{FqNmodFiniteField}), &f, &fac, i-1, &F)
       e = unsafe_load(fac.exp,i)
-      res[i] = (f,e)
+      res[f] = e
    end
    return res 
 end  
@@ -530,14 +530,14 @@ function factor_distinct_deg(x::fq_nmod_poly)
    ccall((:fq_nmod_poly_factor_distinct_deg, :libflint), Void, 
          (Ptr{fq_nmod_poly_factor}, Ptr{fq_nmod_poly}, Ptr{Int},
          Ptr{FqNmodFiniteField}), &fac, &x, &tmp.exp, &F)
-   res = Array(Tuple{fq_nmod_poly, Int}, fac.num)
+   res = Dict{fq_nmod_poly, Int}()
    for i in 1:fac.num
       f = R()
       ccall((:fq_nmod_poly_factor_get_poly, :libflint), Void,
             (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly_factor}, Int,
             Ptr{FqNmodFiniteField}), &f, &fac, i-1, &F)
       d = unsafe_load(tmp.exp,i)
-      res[i] = (f,d)
+      res[f] = d
    end
    return res
 end

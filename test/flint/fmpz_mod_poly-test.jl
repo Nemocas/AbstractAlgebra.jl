@@ -497,26 +497,23 @@ function test_fmpz_mod_poly_factor()
    R = factor(f*g)
 
    @test length(R) == 2
-   @test R[1] == (x^3+3*x+1, 1)
-   @test R[2] == (x + 1, 2)
+   @test R == Dict(x^3+3*x+1 => 1, x + 1 => 2)
 
    R = factor_squarefree(f*g)
 
    @test length(R) == 2
-   @test R[1] == (x^3+3*x+1, 1)
-   @test R[2] == (x + 1, 2)
+   @test R == Dict(x^3+3*x+1 => 1, x + 1 => 2)
 
    R = factor_distinct_deg((x + 1)*g*(x^5+x+1))
 
    @test length(R) == 2
-   @test R[1] == (x^3+2*x^2+2*x+1, 1)
-   @test R[2] == (x^6+123456789012345678948*x^5+3*x^4+123456789012345678948*x^3+123456789012345678948*x^2+3*x+1, 3)
+   @test R == Dict(x^3+2*x^2+2*x+1=> 1,
+                x^6+123456789012345678948*x^5+3*x^4+123456789012345678948*x^3+123456789012345678948*x^2+3*x+1 => 3)
 
    R = factor_shape(f*g)
    
    @test length(R) == 2
-   @test R[1] == (3, 1)
-   @test R[2] == (1, 2)
+   @test R == Dict(3=>1, 1=>2)
 
    println("PASS")
 end

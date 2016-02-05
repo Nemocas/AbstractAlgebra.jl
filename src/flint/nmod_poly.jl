@@ -680,13 +680,13 @@ function factor(x::nmod_poly)
   fac = nmod_poly_factor(x._mod_n)
   ccall((:nmod_poly_factor, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}), &fac, &x)
-  res = Array(Tuple{nmod_poly,Int}, fac._num)
+  res = Dict{nmod_poly,Int}()
   for i in 1:fac._num
     f = parent(x)()
     ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
     e = unsafe_load(fac.exp,i)
-    res[i] = (f, e)
+    res[f] = e
   end
   return res 
 end  
@@ -696,13 +696,13 @@ function factor_squarefree(x::nmod_poly)
   fac = nmod_poly_factor(x._mod_n)
   ccall((:nmod_poly_factor_squarefree, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}), &fac, &x)
-  res = Array(Tuple{nmod_poly,Int}, fac._num)
+  res = Dict{nmod_poly,Int}()
   for i in 1:fac._num
     f = parent(x)()
     ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
     e = unsafe_load(fac.exp,i)
-    res[i] = (f, e)
+    res[f] = e
   end
   return res 
 end  
@@ -716,39 +716,31 @@ function factor_distinct_deg(x::nmod_poly)
   ccall((:nmod_poly_factor_distinct_deg, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}, Ptr{Ptr{Int}}),
           &fac, &x, degss)
-  res = Array(Tuple{nmod_poly,Int}, fac._num)
+  res = Dict{nmod_poly,Int}()
   for i in 1:fac._num
     f = parent(x)()
     ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
-    res[i] = (f, degs[i])
+    res[f] = degs[i]        
   end
   return res 
 end  
 
-function factor_shape(x::nmod_poly)
-  res = Array(Int, degree(x))
-  res2 = Array(Int, degree(x))
-  res3 = Array(Tuple{Int, Int}, degree(x))
-  k = 1
-  fill!(res, 0)
+function factor_shape{T <: RingElem}(x::PolyElem{T})
+  res = Dict{Int, Int}()
   square_fac = factor_squarefree(x)
   for (f, i) in square_fac
     discdeg = factor_distinct_deg(f)
     for (g,j) in discdeg
-      num = div(degree(g), j)
-      res[j] += num*i
-      res2[k] = j
-      k += 1
+      num = div(degree(g), j)*i
+      if haskey(res, j)
+        res[j] += num
+      else
+        res[j] = num
+      end
     end
   end
-  resize!(res2, k - 1)
-  res2 = unique(res2)
-  resize!(res3, length(res2))
-  for j in 1:length(res2)
-    res3[j] = (res2[j], res[res2[j]])
-  end
-  return res3
+  return res
 end  
 
 ################################################################################
