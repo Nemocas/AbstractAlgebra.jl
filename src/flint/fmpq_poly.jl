@@ -406,7 +406,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::fmpq_poly, y::fmpq_poly)
+function div(x::fmpq_poly, y::fmpq_poly)
    check_parent(x, y)
    y == 0 && throw(DivideError())
    z = parent(x)()
@@ -415,7 +415,7 @@ function divexact(x::fmpq_poly, y::fmpq_poly)
    return z
 end
 
-div(x::fmpq_poly, y::fmpq_poly) = divexact(x,y)
+divexact(x::fmpq_poly, y::fmpq_poly) = div(x,y)
 
 ###############################################################################
 #
