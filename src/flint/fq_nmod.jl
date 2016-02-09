@@ -30,13 +30,13 @@ end
 #
 ###############################################################################
 
-function hash(a::fq_nmod)
-   h = 0x78e5f766c8ace18d
+function Base.hash(a::fq_nmod, h::UInt)
+   b = 0x78e5f766c8ace18d
    for i in 1:degree(parent(a)) + 1
-         h $= hash(coeff(a, i))
-         h = (h << 1) | (h >> (sizeof(Int)*8 - 1))
+         b $= hash(coeff(a, i), h) $ h
+         b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
-   return h
+   return b
 end
 
 function coeff(x::fq_nmod, n::Int)

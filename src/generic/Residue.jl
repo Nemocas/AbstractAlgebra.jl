@@ -30,9 +30,9 @@ end
 #
 ###############################################################################
 
-function hash(a::ResidueElem)
-   h = 0x539c1c8715c1adc2
-   return h $ hash(data(a))
+function Base.hash(a::ResidueElem, h::UInt)
+   b = 0x539c1c8715c1adc2
+   return b $ hash(data(a), h) $ h
 end
 
 function modulus(R::ResidueRing)

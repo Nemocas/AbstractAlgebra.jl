@@ -22,6 +22,15 @@ function deepcopy(a::perm)
    return p
 end
 
+function Base.hash(a::perm, h::UInt)
+   b = 0x595dee0e71d271d0
+   for i in 1:a.d
+         b $= hash(a[i - 1], h) $ h
+         b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+   end
+   return b
+end
+
 function parity(a::perm)
    R = parent(a)
    return Int(ccall((:_perm_parity, :libflint), Cint, 

@@ -9667,6 +9667,18 @@ valuation(a::padic)
 \desc{Return the $p$-adic valuation of the given $p$-adic value.}
 
 \begin{lstlisting}
+lift(R::FlintRationalField, a::padic)
+\end{lstlisting}
+
+\desc{Lift the given (truncated) $p$-adic value to the rationals.}
+
+\begin{lstlisting}
+lift(R::FlintIntegerRing, a::padic)
+\end{lstlisting}
+
+\desc{Lift the given (truncated) $p$-adic value to the integers.}
+
+\begin{lstlisting}
 zero(R::PadicField)
 \end{lstlisting}
 
@@ -9712,6 +9724,8 @@ h = iszero(f)
 k = precision(a)
 m = prime(R)
 n = valuation(b)
+p = lift(FlintZZ, a)
+q = lift(FlintQQ, divexact(a, b))
 \end{lstlisting}
 
 \subsubsection{Unary operators}
