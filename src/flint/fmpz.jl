@@ -188,6 +188,12 @@ function addeq!(z::fmpz, x::fmpz)
          (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &z, &x)
 end
 
+function add!(z::fmpz, x::fmpz, y::fmpz)
+   ccall((:fmpz_add, :libflint), Void, 
+         (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x, &y)
+end
+
+
 ###############################################################################
 #
 #   Ad hoc binary operators
