@@ -7029,6 +7029,27 @@ Here is an example of inflation and deflation.
   h = deflate(g, 2)
 \end{lstlisting}
 
+\subsubsection{Squarefree testing}
+
+\begin{lstlisting}
+issquarefree(x::fq_nmod_poly)
+\end{lstlisting}
+
+\desc{Return \code{true} if the polynomial $x$ is squarefree, otherwise return \code{false}.}
+
+\textbf{Examples.}
+
+Here is an example of lifting.
+
+\begin{lstlisting}
+   R = FiniteField(23, 5, "x")
+   S, x = PolynomialRing(R, "x")
+
+   f = x^2 + 2x + 1
+
+   issquarefree(f) == false
+\end{lstlisting}
+
 \subsubsection{Factorisation}
 
 \begin{lstlisting}
