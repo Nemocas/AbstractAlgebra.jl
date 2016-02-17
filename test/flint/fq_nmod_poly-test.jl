@@ -474,6 +474,21 @@ function test_fq_nmod_poly_inflation_deflation()
    println("PASS")
 end
 
+function test_fq_nmod_poly_issquarefree()
+  print("fq_nmod_poly.issquarefree...")
+
+  R, x = FiniteField(23, 5, "x")
+  S, y = PolynomialRing(R, "y")
+
+  f = y^6 + y^4 + 2 *y^2 
+
+  @test !issquarefree(f)
+
+  @test issquarefree((y+1)*(y+2)*(y+3))
+
+  println("PASS")
+end
+
 function test_fq_nmod_poly_factor()
    print("fq_nmod_poly.factor()...")
 
@@ -522,6 +537,7 @@ function test_fq_nmod_poly()
    test_fq_nmod_poly_gcdx()
    test_fq_nmod_poly_special()
    test_fq_nmod_poly_inflation_deflation()
+   test_fq_nmod_poly_issquarefree()
    test_fq_nmod_poly_factor()
 
    println("")
