@@ -278,7 +278,7 @@ end
 #
 ###############################################################################
 
-function ResidueRing{T <: RingElem}(R::Ring, el::T)
+function ResidueRing{T <: RingElem}(R::Ring, el::T, gbl = true)
    parent(el) != R && error("Modulus is not an element of the specified ring")
    el == 0 && throw(DivideError())
    
@@ -290,11 +290,11 @@ function ResidueRing{T <: RingElem}(R::Ring, el::T)
       eval(:(Base.promote_rule(::Type{$parent_type}, ::Type{$T2}) = $parent_type))
    end
 
-   return ResidueRing{T}(el)
+   return ResidueRing{T}(el, gbl)
 end
 
-function ResidueRing(R::FlintIntegerRing, el::Integer)
+function ResidueRing(R::FlintIntegerRing, el::Integer, gbl = true)
    el == 0 && throw(DivideError())
    
-   return ResidueRing{fmpz}(R(el))
+   return ResidueRing{fmpz}(R(el), gbl)
 end

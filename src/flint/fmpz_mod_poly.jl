@@ -868,11 +868,11 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::ResidueRing{fmpz}, s::AbstractString{})
+function PolynomialRing(R::ResidueRing{fmpz}, s::AbstractString{}, glb::Bool=true)
    if modulus(R) <= fmpz(typemax(UInt))
-      parent_obj = NmodPolyRing(R, symbol(s))
+      parent_obj = NmodPolyRing(R, symbol(s), glb)
    else
-      parent_obj = FmpzModPolyRing(R, symbol(s))
+      parent_obj = FmpzModPolyRing(R, symbol(s),glb)
    end
 
    return parent_obj, parent_obj([R(0), R(1)])
