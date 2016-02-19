@@ -23,17 +23,6 @@ type PolynomialRing{T <: RingElem} <: Ring{Generic}
          PolyID[R, s] = new(R, s)
       end
    end
-
-   function PolynomialRing(R::Ring, s::Symbol, gbl::Bool = true)
-      if !gbl
-        return new(R, s)
-      end
-      return try
-         PolyID[R, s]
-      catch
-         PolyID[R, s] = new(R, s)
-      end
-   end
 end
 
 type Poly{T <: RingElem} <: PolyElem{T}
@@ -68,17 +57,6 @@ type ResidueRing{T <: RingElem} <: Ring{Generic}
          cached ? ModulusDict[parent(modulus), modulus] = R : R
       end
    end
-   function ResidueRing(modulus::T, gbl::Bool = true)
-      if !gbl
-        return new(parent(modulus), modulus)
-      end  
-      return try
-         ModulusDict[parent(modulus), modulus]
-      catch
-         ModulusDict[parent(modulus), modulus] = new(parent(modulus), modulus)
-      end
-   end
-
 end
 
 type Residue{T <: RingElem} <: ResidueElem{T}
