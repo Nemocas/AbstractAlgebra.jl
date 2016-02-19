@@ -226,4 +226,6 @@ Ideal = PariIdeal
 
 include("../test/Nemo-test.jl")
 
+include("Benchmark.jl")
+
 end # module
