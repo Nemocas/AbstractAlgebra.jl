@@ -20,8 +20,15 @@ base_ring(a::ResidueElem) = base_ring(parent(a))
 
 parent(a::ResidueElem) = a.parent
 
+function check_parent_type{T <: RingElem}(a::ResidueRing{T}, b::ResidueRing{T})
+   # exists only to check types of parents agree
+end
+   
 function check_parent(a::ResidueElem, b::ResidueElem)
-   parent(a) != parent(b) && error("Incompatible moduli in residue operation")
+   if parent(a) != parent(b)
+      check_parent_type(parent(a), parent(b))
+      a.hash != b.hash && error("Incompatible moduli in residue operation")
+   end
 end
 
 ###############################################################################
@@ -278,7 +285,7 @@ end
 #
 ###############################################################################
 
-function ResidueRing{T <: RingElem}(R::Ring, el::T)
+function ResidueRing{T <: RingElem}(R::Ring, el::T; cached=true)
    parent(el) != R && error("Modulus is not an element of the specified ring")
    el == 0 && throw(DivideError())
    
@@ -289,12 +296,11 @@ function ResidueRing{T <: RingElem}(R::Ring, el::T)
       T2 = elem_type(R2)
       eval(:(Base.promote_rule(::Type{$parent_type}, ::Type{$T2}) = $parent_type))
    end
-
-   return ResidueRing{T}(el)
+   return ResidueRing{T}(el, cached)
 end
 
-function ResidueRing(R::FlintIntegerRing, el::Integer)
+function ResidueRing(R::FlintIntegerRing, el::Integer; cached=true)
    el == 0 && throw(DivideError())
    
-   return ResidueRing{fmpz}(R(el))
+   return ResidueRing{fmpz}(R(el), cached)
 end
