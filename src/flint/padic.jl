@@ -68,6 +68,10 @@ end
 #
 ###############################################################################
 
+function Base.hash(a::padic, h::UInt)
+   return hash(lift(FlintQQ, a), h) $ hash(prime(parent(a)), h) $ h
+end
+
 function prime(R::FlintPadicField)
    z = fmpz()
    ccall((:padic_ctx_pow_ui, :libflint), Void, 
@@ -78,6 +82,22 @@ end
 precision(a::padic) = a.N
 
 valuation(a::padic) = a.v
+
+function lift(R::FlintRationalField, a::padic)
+    ctx = parent(a)
+    r = fmpq()
+    ccall((:padic_get_fmpq, :libflint), Void,
+          (Ptr{fmpq}, Ptr{padic}, Ptr{FlintPadicField}), &r, &a, &ctx)
+    return r
+end
+
+function lift(R::FlintIntegerRing, a::padic)
+    ctx = parent(a)
+    r = fmpz()
+    ccall((:padic_get_fmpz, :libflint), Void,
+          (Ptr{fmpz}, Ptr{padic}, Ptr{FlintPadicField}), &r, &a, &ctx)
+    return r
+end
 
 function zero(R::FlintPadicField)
    z = padic(R.prec_max)

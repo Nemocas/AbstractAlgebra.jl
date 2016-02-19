@@ -68,17 +68,6 @@ size(t::fmpz_mat, d) = d <= 2 ? size(t)[d] : 1
 #
 ###############################################################################
 
-function hash(a::fmpz_mat)
-   h = 0xb14b9caecfda49af
-   for i in 1:rows(a)
-      for j in 1:cols(a)
-         h $= hash(getindex(a, i, j))
-         h = (h << 1) | (h >> (sizeof(Int)*8 - 1))
-      end
-   end
-   return h
-end
-
 function getindex!(v::fmpz, a::fmpz_mat, r::Int, c::Int)
    z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ptr{fmpz_mat}, Int, Int), &a, r - 1, c - 1)

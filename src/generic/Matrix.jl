@@ -34,15 +34,15 @@ end
 #
 ###############################################################################    
 
-function hash(a::MatElem)
-   h = 0x3e4ea81eb31d94f4
+function Base.hash(a::MatElem, h::UInt)
+   b = 0x3e4ea81eb31d94f4
    for i in 1:rows(a)
       for j in 1:cols(a)
-         h $= hash(a[i, j])
-         h = (h << 1) | (h >> (sizeof(Int)*8 - 1))
+         b $= hash(a[i, j], h) $ h
+         b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
       end
    end
-   return h
+   return b
 end
 
 rows(a::MatElem) = parent(a).rows

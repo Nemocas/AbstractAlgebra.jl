@@ -60,11 +60,12 @@ type ResidueRing{T <: RingElem} <: Ring{Generic}
    base_ring::Ring
    modulus::T
 
-   function ResidueRing(modulus::T)
+   function ResidueRing(modulus::T, cached=true)
       return try
          ModulusDict[parent(modulus), modulus]
       catch
-         ModulusDict[parent(modulus), modulus] = new(parent(modulus), modulus)
+         R = new(parent(modulus), modulus)
+         cached ? ModulusDict[parent(modulus), modulus] = R : R
       end
    end
    function ResidueRing(modulus::T, gbl::Bool = true)

@@ -54,7 +54,7 @@ elem_type(::FlintIntegerRing) = fmpz
 
 base_ring(a::FlintIntegerRing) = Union{}
 
-hash(a::fmpz) = hash(BigInt(a))
+Base.hash(a::fmpz, h::UInt) = hash(BigInt(a), h)
 
 ###############################################################################
 #

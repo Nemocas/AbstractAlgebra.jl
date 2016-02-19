@@ -40,13 +40,13 @@ end
 #
 ###############################################################################    
 
-function hash(a::PolyElem)
-   h = 0x53dd43cd511044d1
+function Base.hash(a::PolyElem, h::UInt)
+   b = 0x53dd43cd511044d1
    for i in 0:length(a) - 1
-      h $= hash(coeff(a, i))
-      h = (h << 1) | (h >> (sizeof(Int)*8 - 1))
+      b $= hash(coeff(a, i), h) $ h
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
-   return h
+   return b
 end
 
 function normalise(a::Poly, len::Int)

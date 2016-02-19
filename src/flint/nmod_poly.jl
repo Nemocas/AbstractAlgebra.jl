@@ -47,7 +47,7 @@ degree(x::nmod_poly) = ccall((:nmod_poly_degree, :libflint), Int,
                                (Ptr{nmod_poly}, ), &x)
 
 function coeff(x::nmod_poly, n::Int)
-  (n < 0 || n > degree(x)) && throw(DomainError())
+  n < 0 && throw(DomainError())
   return base_ring(x)(ccall((:nmod_poly_get_coeff_ui, :libflint), UInt,
           (Ptr{nmod_poly}, Int), &x, n))
 end
