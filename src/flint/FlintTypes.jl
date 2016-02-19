@@ -135,8 +135,9 @@ type FmpzPolyRing <: Ring{Flint}
       if haskey(FmpzPolyID, s)
          return FmpzPolyID[s]::FmpzPolyRing
       else
-         FmpzPolyID[s] = new(FlintZZ, s)
-         return FmpzPolyID[s]::FmpzPolyRing
+         z = new(FlintZZ, s)
+         FmpzPolyID[s] = z
+         return z
       end
    end
 end
@@ -313,8 +314,9 @@ type NmodPolyRing <: Ring{Flint}
     if haskey(NmodPolyRingID, (m, s))
        return NmodPolyRingID[m, s]::NmodPolyRing
     else
-       NmodPolyRingID[m, s] = new(R, s, m)
-       return NmodPolyRingID[m, s]::NmodPolyRing
+       z = new(R, s, m)
+       NmodPolyRingID[m, s] = z
+       return z
     end
   end
 end
@@ -456,8 +458,9 @@ type FmpzModPolyRing <: Ring{Flint}
     if haskey(FmpzModPolyRingID, (m, s))
        return FmpzModPolyRingID[m, s]::FmpzModPolyRing
     else
-       FmpzModPolyRingID[m, s] = new(R, s, m)
-       return FmpzModPolyRingID[m ,s]::FmpzModPolyRing
+       z = new(R, s, m)
+       FmpzModPolyRingID[m ,s] = z
+       return z
     end
   end
 end
@@ -717,7 +720,8 @@ type FqFiniteField <: Field{Flint}
       if haskey(FqFiniteFieldID, (char, deg, s))
          return FqFiniteFieldID[char, deg, s]::FqFiniteField
       else
-         d = FqFiniteFieldID[char, deg, s] = new()
+         d = new()
+         FqFiniteFieldID[char, deg, s] = d
          finalizer(d, _FqFiniteField_clear_fn)
          ccall((:fq_ctx_init, :libflint), Void,
                (Ptr{FqFiniteField}, Ptr{fmpz}, Int, Ptr{UInt8}),
@@ -867,8 +871,9 @@ type FmpzSeriesRing <: Ring{Flint}
       if haskey(FmpzSeriesID, (prec, s))
          FmpzSeriesID[prec, s]::FmpzSeriesRing
       else
-         FmpzSeriesID[prec, s] = new(FlintZZ, prec, s)
-         return FmpzSeriesID[prec, s]
+         z = new(FlintZZ, prec, s)
+         FmpzSeriesID[prec, s] = z
+         return z
       end
    end
 end
@@ -932,8 +937,9 @@ type FmpqSeriesRing <: Ring{Flint}
       if haskey(FmpqSeriesID, (prec, s))
          return FmpqSeriesID[prec, s]::FmpqSeriesRing
       else
-         FmpqSeriesID[prec, s] = new(FlintQQ, prec, s)
-         return FmpqSeriesID[prec, s]
+         z = new(FlintQQ, prec, s)
+         FmpqSeriesID[prec, s] = z
+         return z
       end
    end
 end

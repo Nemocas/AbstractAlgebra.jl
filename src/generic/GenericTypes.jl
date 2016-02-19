@@ -20,8 +20,9 @@ type PolynomialRing{T <: RingElem} <: Ring{Generic}
       if haskey(PolyID, (R, s))
          return PolyID[R, s]::PolynomialRing{T}
       else 
-         PolyID[R, s] = new{T}(R, s)
-         return PolyID[R, s]::PolynomialRing{T}
+         z = new{T}(R, s)
+         PolyID[R, s] = z
+         return z
       end
    end
 end
@@ -54,8 +55,9 @@ type ResidueRing{T <: RingElem} <: Ring{Generic}
       if haskey(ModulusDict, (parent(modulus), modulus))
          return ModulusDict[parent(modulus), modulus]::ResidueRing{T}
       else
-         ModulusDict[parent(modulus), modulus] = new{T}(parent(modulus), modulus)
-         return ModulusDict[parent(modulus), modulus]
+         z = new{T}(parent(modulus), modulus)
+         ModulusDict[parent(modulus), modulus] = z
+         return z
       end
    end
 end
@@ -84,8 +86,9 @@ type PowerSeriesRing{T <: RingElem} <: Ring{Generic}
       if haskey(PowerSeriesID, (R, prec, s))
          return PowerSeriesID[R, prec, s]::PowerSeriesRing{T}
       else
-         PowerSeriesID[R, prec, s] = new{T}(R, prec, s)
-         return PowerSeriesID[R, prec, s]
+         z = new{T}(R, prec, s)
+         PowerSeriesID[R, prec, s] = z
+         return z
       end
    end
 end
@@ -115,8 +118,9 @@ type FractionField{T <: RingElem} <: Field{Generic}
       if haskey(FractionDict, R)
          return FractionDict[R]::FractionField{T}
       else
-         FractionDict[R] = new{T}(R)
-         return FractionDict[R]
+         z = new{T}(R)
+         FractionDict[R] = z
+         return z
       end
    end
 end
@@ -147,7 +151,9 @@ type MatrixSpace{T <: RingElem} <: Ring{Generic}
       if haskey(MatrixDict, (R, r, c))
          return MatrixDict[R, r, c]::MatrixSpace{T}
       else
-         MatrixDict[R, r, c] = new{T}(r, c, R)::MatrixSpace{T}
+         z = new{T}(r, c, R)
+         MatrixDict[R, r, c] = z
+         return z
       end
    end
 end
