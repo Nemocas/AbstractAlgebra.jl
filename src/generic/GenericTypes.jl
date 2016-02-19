@@ -17,10 +17,11 @@ type PolynomialRing{T <: RingElem} <: Ring{Generic}
    S::Symbol
 
    function PolynomialRing(R::Ring, s::Symbol)
-      return try
-         PolyID[R, s]
-      catch
-         PolyID[R, s] = new(R, s)
+      if haskey(PolyID, (R, s))
+         return PolyID[R, s]::PolynomialRing{T}
+      else 
+         PolyID[R, s] = new{T}(R, s)
+         return PolyID[R, s]::PolynomialRing{T}
       end
    end
 end
@@ -50,10 +51,11 @@ type ResidueRing{T <: RingElem} <: Ring{Generic}
    modulus::T
 
    function ResidueRing(modulus::T)
-      return try
-         ModulusDict[parent(modulus), modulus]
-      catch
-         ModulusDict[parent(modulus), modulus] = new(parent(modulus), modulus)
+      if haskey(ModulusDict, (parent(modulus), modulus))
+         return ModulusDict[parent(modulus), modulus]::ResidueRing{T}
+      else
+         ModulusDict[parent(modulus), modulus] = new{T}(parent(modulus), modulus)
+         return ModulusDict[parent(modulus), modulus]
       end
    end
 end
@@ -79,10 +81,11 @@ type PowerSeriesRing{T <: RingElem} <: Ring{Generic}
    S::Symbol
 
    function PowerSeriesRing(R::Ring, prec::Int, s::Symbol)
-      return try
-         PowerSeriesID[R, prec, s]
-      catch
-         PowerSeriesID[R, prec, s] = new(R, prec, s)
+      if haskey(PowerSeriesID, (R, prec, s))
+         return PowerSeriesID[R, prec, s]::PowerSeriesRing{T}
+      else
+         PowerSeriesID[R, prec, s] = new{T}(R, prec, s)
+         return PowerSeriesID[R, prec, s]
       end
    end
 end
@@ -109,10 +112,11 @@ type FractionField{T <: RingElem} <: Field{Generic}
    base_ring::Ring
 
    function FractionField(R::Ring)
-      return try
-         FractionDict[R]
-      catch
-         FractionDict[R] = new(R)
+      if haskey(FractionDict, R)
+         return FractionDict[R]::FractionField{T}
+      else
+         FractionDict[R] = new{T}(R)
+         return FractionDict[R]
       end
    end
 end
@@ -140,10 +144,10 @@ type MatrixSpace{T <: RingElem} <: Ring{Generic}
    base_ring::Ring
 
    function MatrixSpace(R::Ring, r::Int, c::Int)
-      return try
-         MatrixDict[R, r, c]
-      catch
-         MatrixDict[R, r, c] = new(r, c, R)
+      if haskey(MatrixDict, (R, r, c))
+         return MatrixDict[R, r, c]::MatrixSpace{T}
+      else
+         MatrixDict[R, r, c] = new{T}(r, c, R)::MatrixSpace{T}
       end
    end
 end

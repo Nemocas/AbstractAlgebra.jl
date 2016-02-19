@@ -12,9 +12,11 @@ export FractionField, Fraction, num, den
 #
 ###############################################################################
 
+parent_type{T}(::Type{Fraction{T}}) = FractionField{T}
+
 elem_type{T <: RingElem}(::FractionField{T}) = Fraction{T}
 
-base_ring(a::FractionField) = a.base_ring
+base_ring{T}(a::FractionField{T}) = a.base_ring::parent_type(T)
 
 base_ring(a::FractionElem) = base_ring(parent(a))
 

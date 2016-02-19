@@ -12,6 +12,8 @@ export FmpqPolyRing, fmpq_poly
 #
 ###############################################################################
 
+parent_type(::Type{fmpq_poly}) = FmpqPolyRing
+
 elem_type(::FmpqPolyRing) = fmpq_poly
 
 base_ring(a::FmpqPolyRing) = a.base_ring

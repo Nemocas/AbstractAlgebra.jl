@@ -13,6 +13,8 @@ export AnticNumberField, norm, trace, CyclotomicField, MaximalRealSubfield,
 #
 ###############################################################################
 
+parent_type(::Type{nf_elem}) = AnticNumberField
+
 parent(a::nf_elem) = a.parent
 
 elem_type(::AnticNumberField) = nf_elem

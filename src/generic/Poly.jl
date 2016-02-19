@@ -19,9 +19,11 @@ export Poly, PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow,
 #
 ###############################################################################
 
+parent_type{T}(::Type{Poly{T}}) = PolynomialRing{T}
+
 elem_type{T <: RingElem}(::PolynomialRing{T}) = Poly{T}
 
-base_ring(a::PolynomialRing) = a.base_ring
+base_ring{T}(a::PolynomialRing{T}) = a.base_ring::parent_type(T)
 
 base_ring(a::PolyElem) = base_ring(parent(a))
 

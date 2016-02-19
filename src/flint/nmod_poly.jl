@@ -25,6 +25,8 @@ base_ring(R::NmodPolyRing) = R.base_ring
 
 base_ring(a::nmod_poly) = base_ring(parent(a))
 
+parent_type(::Type{nmod_poly}) = NmodPolyRing
+
 elem_type(::nmod_poly) = nmod_poly
 
 elem_type(::NmodPolyRing) = nmod_poly

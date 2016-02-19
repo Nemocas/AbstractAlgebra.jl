@@ -20,6 +20,8 @@ function O(a::fq_series)
    return z
 end
 
+parent_type(::Type{fq_series}) = FqSeriesRing
+
 elem_type(::FqSeriesRing) = fq_series
 
 base_ring(R::FqSeriesRing) = R.base_ring

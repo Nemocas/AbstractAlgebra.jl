@@ -13,6 +13,8 @@ export FmpzPolyRing, fmpz_poly, cyclotomic, theta_qexp, eta_qexp, cos_minpoly,
 #
 ###############################################################################
 
+parent_type(::Type{fmpz_poly}) = FmpzPolyRing
+
 elem_type(::FmpzPolyRing) = fmpz_poly
 
 base_ring(a::FmpzPolyRing) = a.base_ring

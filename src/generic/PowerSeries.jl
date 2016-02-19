@@ -21,11 +21,13 @@ function O{T}(a::PowerSeries{T})
    return z
 end
 
+parent_type{T}(::Type{PowerSeries{T}}) = PowerSeriesRing{T}
+
 parent(a::SeriesElem) = a.parent
 
 elem_type{T <: RingElem}(::PowerSeriesRing{T}) = PowerSeries{T}
 
-base_ring(R::PowerSeriesRing) = R.base_ring
+base_ring{T}(R::PowerSeriesRing{T}) = R.base_ring::parent_type(T)
 
 base_ring(a::SeriesElem) = base_ring(parent(a))
 
