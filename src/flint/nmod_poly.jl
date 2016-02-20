@@ -300,6 +300,10 @@ function ==(x::nmod_poly, y::Residue{fmpz})
   end 
 end
 
+#CF: needs(?) to be provides as Dict and friends use this function
+#    the generic one is too slow (ie. visible in the profiler)
+isequal(x::nmod_poly, y::nmod_poly) = x == y
+
 ==(x::Residue{fmpz}, y::nmod_poly) = y == x
 
 ################################################################################

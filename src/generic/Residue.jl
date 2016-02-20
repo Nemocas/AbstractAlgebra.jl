@@ -296,7 +296,6 @@ function ResidueRing{T <: RingElem}(R::Ring, el::T; cached=true)
       T2 = elem_type(R2)
       eval(:(Base.promote_rule(::Type{$parent_type}, ::Type{$T2}) = $parent_type))
    end
-
    return ResidueRing{T}(el, cached)
 end
 

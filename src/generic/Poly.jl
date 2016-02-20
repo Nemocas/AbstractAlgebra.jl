@@ -1757,10 +1757,10 @@ end
 #
 ###############################################################################
 
-function PolynomialRing(R::Ring, s::AbstractString{})
+function PolynomialRing(R::Ring, s::AbstractString{}; cached::Bool = true)
    S = symbol(s)
    T = elem_type(R)
-   parent_obj = PolynomialRing{T}(R, S)
+   parent_obj = PolynomialRing{T}(R, S, cached)
 
    base = base_ring(R)
    R2 = R
