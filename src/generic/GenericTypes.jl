@@ -16,11 +16,12 @@ type PolynomialRing{T <: RingElem} <: Ring{Generic}
    base_ring :: Ring
    S::Symbol
 
-   function PolynomialRing(R::Ring, s::Symbol)
+   function PolynomialRing(R::Ring, s::Symbol, cached::Bool = true)
       return try
          PolyID[R, s]
       catch
-         PolyID[R, s] = new(R, s)
+         S = new(R, s)
+         cached ? PolyID[R, s] = S : S
       end
    end
 end
