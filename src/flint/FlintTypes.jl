@@ -1089,8 +1089,9 @@ type FqSeriesRing <: Ring{Flint}
       if haskey(FqSeriesID, (R, prec, s))
          return FqSeriesID[R, prec, s]::FqSeriesRing
       else
-         FqSeriesID[R, prec, s] = new(R, prec, s)
-         return FqSeriesID[R, prec, s]
+         z = new(R, prec, s)
+         FqSeriesID[R, prec, s] = z
+         return z
       end
    end
 end
@@ -1158,8 +1159,9 @@ type FqNmodSeriesRing <: Ring{Flint}
       if haskey(FqNmodSeriesID, (R, prec, s))
          return FqNmodSeriesID[R, prec, s]::FqNmodSeriesRing
       else
-         FqNmodSeriesID[R, prec, s] = new(R, prec, s)
-         return FqNmodSeriesID[R, prec, s]
+         z = new(R, prec, s)
+         FqNmodSeriesID[R, prec, s] = z
+         return z
       end
    end
 end
@@ -1228,8 +1230,9 @@ type FmpzMatSpace <: Ring{Flint}
       if haskey(FmpzMatID, (r, c))
          return FmpzMatID[r, c]::FmpzMatSpace
       else
-         FmpzMatID[r, c] = new(r, c, FlintZZ)
-         return FmpzMatID[r, c]
+         z = new(r, c, FlintZZ)
+         FmpzMatID[r, c] = z
+         return z
       end
    end
 end
@@ -1334,8 +1337,9 @@ type NmodMatSpace <: Ring{Flint}
     if haskey(NmodMatID, (R, r, c))
       return NmodMatID[R, r, c]::NmodMatSpace
     else
-      NmodMatID[R, r, c] = new(R, UInt(R.modulus), r, c)
-      return NmodMatID[R, r, c]
+      z = new(R, UInt(R.modulus), r, c)
+      NmodMatID[R, r, c] = z
+      return z
     end
   end
 end
@@ -1719,8 +1723,9 @@ type FlintPermGroup <: Group{Flint}
       if haskey(FlintPermID, n)
          return FlintPermID[n]::FlintPermGroup
       else
-         FlintPermID[n] = new(n)
-         return FlintPermID[n]
+         z = new(n)
+         FlintPermID[n] = z
+         return z
       end
    end
 end
