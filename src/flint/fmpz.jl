@@ -56,7 +56,7 @@ elem_type(::FlintIntegerRing) = fmpz
 
 base_ring(a::FlintIntegerRing) = Union{}
 
-hash(a::fmpz) = hash(BigInt(a))
+Base.hash(a::fmpz, h::UInt) = hash(BigInt(a), h)
 
 ###############################################################################
 #
@@ -379,7 +379,9 @@ function ^(x::fmpz, y::Int)
     if y > typemax(UInt); throw(DomainError()); end
     if y == 0; return one(FlintZZ); end
     if y == 1; return x; end
-    return x^UInt(y)
+    z = fmpz()
+    ccall((:fmpz_pow_ui, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}, Uint), &z, &x, Uint(y))
+    return z
 end
 
 ###############################################################################
@@ -927,7 +929,9 @@ end
 
 ndigits(x::fmpz, b::Integer = 10) = x == 0 ? 1 : ndigits_internal(x, b)
 
-nbits(x::fmpz) = x == 0 ? 0 : ndigits(x, 2)
+nbits(x::fmpz) = x == 0 ? 0 : Int(ccall((:fmpz_sizeinbase, :libflint), UInt,
+                  (Ptr{fmpz}, Int32), &x, 2))  # docu states: always correct
+                                #if base is power of 2
 
 ###############################################################################
 #

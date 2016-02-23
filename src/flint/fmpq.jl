@@ -57,11 +57,6 @@ end
 #
 ###############################################################################
 
-function hash(a::fmpq)
-   h = 0x8a30b0d963237dd5
-   return h $ hash(num(a)) $ hash(den(a))
-end
-
 function num(a::fmpq)
    z = fmpz()
    ccall((:fmpq_numerator, :libflint), Void, (Ptr{fmpz}, Ptr{fmpq}), &z, &a)

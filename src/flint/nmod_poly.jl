@@ -49,7 +49,7 @@ degree(x::nmod_poly) = ccall((:nmod_poly_degree, :libflint), Int,
                                (Ptr{nmod_poly}, ), &x)
 
 function coeff(x::nmod_poly, n::Int)
-  (n < 0 || n > degree(x)) && throw(DomainError())
+  n < 0 && throw(DomainError())
   return base_ring(x)(ccall((:nmod_poly_get_coeff_ui, :libflint), UInt,
           (Ptr{nmod_poly}, Int), &x, n))
 end
@@ -301,6 +301,10 @@ function ==(x::nmod_poly, y::Residue{fmpz})
     return y == 0
   end 
 end
+
+#CF: needs(?) to be provides as Dict and friends use this function
+#    the generic one is too slow (ie. visible in the profiler)
+isequal(x::nmod_poly, y::nmod_poly) = x == y
 
 ==(x::Residue{fmpz}, y::nmod_poly) = y == x
 

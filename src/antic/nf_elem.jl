@@ -33,13 +33,13 @@ end
 #
 ###############################################################################
 
-function hash(a::nf_elem)
-   h = 0xc2a44fbe466a1827
+function hash(a::nf_elem, h::UInt)
+   b = 0xc2a44fbe466a1827
    for i in 1:degree(parent(a)) + 1
-         h $= hash(coeff(a, i))
-         h = (h << 1) | (h >> (sizeof(Int)*8 - 1))
+         b $= hash(coeff(a, i), h) $ h
+         b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
-   return h
+   return b
 end
 
 function coeff(x::nf_elem, n::Int)

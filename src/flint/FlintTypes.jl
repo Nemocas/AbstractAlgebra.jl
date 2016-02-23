@@ -309,13 +309,15 @@ type NmodPolyRing <: Ring{Flint}
   S::Symbol
   _n::UInt
 
-  function NmodPolyRing(R::ResidueRing{fmpz}, s::Symbol)
+  function NmodPolyRing(R::ResidueRing{fmpz}, s::Symbol, cached=true)
     m = UInt(modulus(R))
     if haskey(NmodPolyRingID, (m, s))
        return NmodPolyRingID[m, s]::NmodPolyRing
     else
        z = new(R, s, m)
-       NmodPolyRingID[m, s] = z
+       if cached
+          NmodPolyRingID[m, s] = z
+       end
        return z
     end
   end
@@ -453,13 +455,15 @@ type FmpzModPolyRing <: Ring{Flint}
   S::Symbol
   _n::fmpz
 
-  function FmpzModPolyRing(R::ResidueRing{fmpz}, s::Symbol)
+  function FmpzModPolyRing(R::ResidueRing{fmpz}, s::Symbol, cached=true)
     m = modulus(R)
     if haskey(FmpzModPolyRingID, (m, s))
        return FmpzModPolyRingID[m, s]::FmpzModPolyRing
     else
        z = new(R, s, m)
-       FmpzModPolyRingID[m ,s] = z
+       if cached
+          FmpzModPolyRingID[m ,s] = z
+       end
        return z
     end
   end

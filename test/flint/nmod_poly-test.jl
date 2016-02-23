@@ -130,7 +130,7 @@ function test_nmod_poly_unary_ops()
 end
  
 function test_nmod_poly_binary_ops()
-  print("nmod_poly.binar_ops...")
+  print("nmod_poly.binary_ops...")
 
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
@@ -553,7 +553,6 @@ function test_nmod_poly_inflate()
 
   println("PASS")
 end
-
 
 function test_nmod_poly_deflate()
   print("nmod_poly.deflate...")

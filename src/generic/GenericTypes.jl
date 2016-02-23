@@ -16,12 +16,14 @@ type PolynomialRing{T <: RingElem} <: Ring{Generic}
    base_ring :: Ring
    S::Symbol
 
-   function PolynomialRing(R::Ring, s::Symbol)
+   function PolynomialRing(R::Ring, s::Symbol, cached=true)
       if haskey(PolyID, (R, s))
          return PolyID[R, s]::PolynomialRing{T}
       else 
          z = new{T}(R, s)
-         PolyID[R, s] = z
+         if cached
+           PolyID[R, s] = z
+         end
          return z
       end
    end
@@ -51,12 +53,14 @@ type ResidueRing{T <: RingElem} <: Ring{Generic}
    base_ring::Ring
    modulus::T
 
-   function ResidueRing(modulus::T)
+   function ResidueRing(modulus::T, cached=true)
       if haskey(ModulusDict, (parent(modulus), modulus))
          return ModulusDict[parent(modulus), modulus]::ResidueRing{T}
       else
          z = new{T}(parent(modulus), modulus)
-         ModulusDict[parent(modulus), modulus] = z
+         if cached
+            ModulusDict[parent(modulus), modulus] = z
+         end
          return z
       end
    end
@@ -82,12 +86,14 @@ type PowerSeriesRing{T <: RingElem} <: Ring{Generic}
    prec_max::Int
    S::Symbol
 
-   function PowerSeriesRing(R::Ring, prec::Int, s::Symbol)
+   function PowerSeriesRing(R::Ring, prec::Int, s::Symbol, cached=true)
       if haskey(PowerSeriesID, (R, prec, s))
          return PowerSeriesID[R, prec, s]::PowerSeriesRing{T}
       else
          z = new{T}(R, prec, s)
-         PowerSeriesID[R, prec, s] = z
+         if cached
+            PowerSeriesID[R, prec, s] = z
+         end
          return z
       end
    end
@@ -114,12 +120,14 @@ const FractionDict = ObjectIdDict()
 type FractionField{T <: RingElem} <: Field{Generic}
    base_ring::Ring
 
-   function FractionField(R::Ring)
+   function FractionField(R::Ring, cached=true)
       if haskey(FractionDict, R)
          return FractionDict[R]::FractionField{T}
       else
          z = new{T}(R)
-         FractionDict[R] = z
+         if cached
+            FractionDict[R] = z
+         end
          return z
       end
    end
@@ -147,12 +155,14 @@ type MatrixSpace{T <: RingElem} <: Ring{Generic}
    cols::Int
    base_ring::Ring
 
-   function MatrixSpace(R::Ring, r::Int, c::Int)
+   function MatrixSpace(R::Ring, r::Int, c::Int, cached=true)
       if haskey(MatrixDict, (R, r, c))
          return MatrixDict[R, r, c]::MatrixSpace{T}
       else
          z = new{T}(r, c, R)
-         MatrixDict[R, r, c] = z
+         if cached
+            MatrixDict[R, r, c] = z
+         end
          return z
       end
    end
