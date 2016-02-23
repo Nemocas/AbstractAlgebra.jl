@@ -380,7 +380,7 @@ function ^(x::fmpz, y::Int)
     if y == 0; return one(FlintZZ); end
     if y == 1; return x; end
     z = fmpz()
-    ccall((:fmpz_pow_ui, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}, Uint), &z, &x, Uint(y))
+    ccall((:fmpz_pow_ui, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}, UInt), &z, &x, UInt(y))
     return z
 end
 
