@@ -2435,9 +2435,9 @@ end
 #
 ###############################################################################
 
-function MatrixSpace(R::Ring, r::Int, c::Int)
+function MatrixSpace(R::Ring, r::Int, c::Int; cached=true)
    T = elem_type(R)
-   return MatrixSpace{T}(R, r, c)
+   return MatrixSpace{T}(R, r, c, cached)
 end
 
 function typed_hvcat(R::Ring, dims, d...)

@@ -497,7 +497,7 @@ end
 #
 ###############################################################################
 
-function FractionField(R::Ring)
+function FractionField(R::Ring; cached=true)
    R2 = R
    T = elem_type(R)
    parent_type = Fraction{T}
@@ -507,6 +507,6 @@ function FractionField(R::Ring)
       eval(:(Base.promote_rule(::Type{$parent_type}, ::Type{$T2}) = $parent_type))
    end
 
-   return FractionField{T}(R)
+   return FractionField{T}(R, cached)
 end
 

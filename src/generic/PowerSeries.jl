@@ -806,10 +806,10 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{})
+function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{}; cached=true)
    S = symbol(s)
    T = elem_type(R)
-   parent_obj = PowerSeriesRing{T}(R, prec, S)
+   parent_obj = PowerSeriesRing{T}(R, prec, S, cached)
 
    base = base_ring(R)
    R2 = R
