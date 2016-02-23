@@ -174,3 +174,4 @@ type Mat{T <: RingElem} <: MatElem{T}
 
    Mat(a::Array{T, 2}) = new(a) 
 end
+
