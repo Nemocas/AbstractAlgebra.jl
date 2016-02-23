@@ -21,11 +21,13 @@ function O{T}(a::PowerSeries{T})
    return z
 end
 
+parent_type{T}(::Type{PowerSeries{T}}) = PowerSeriesRing{T}
+
 parent(a::SeriesElem) = a.parent
 
 elem_type{T <: RingElem}(::PowerSeriesRing{T}) = PowerSeries{T}
 
-base_ring(R::PowerSeriesRing) = R.base_ring
+base_ring{T}(R::PowerSeriesRing{T}) = R.base_ring::parent_type(T)
 
 base_ring(a::SeriesElem) = base_ring(parent(a))
 
@@ -804,10 +806,10 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{})
+function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{}; cached=true)
    S = symbol(s)
    T = elem_type(R)
-   parent_obj = PowerSeriesRing{T}(R, prec, S)
+   parent_obj = PowerSeriesRing{T}(R, prec, S, cached)
 
    base = base_ring(R)
    R2 = R

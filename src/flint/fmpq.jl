@@ -27,6 +27,8 @@ fmpq(a::Integer, b::fmpz) = fmpq(fmpz(a), b)
 
 parent(a::fmpq) = FlintQQ
 
+parent_type(::Type{fmpq}) = FlintRationalField
+
 elem_type(::FlintRationalField) = fmpq
 
 base_ring(a::FlintRationalField) = FlintZZ

@@ -15,9 +15,11 @@ export Mat, MatrixSpace, fflu!, fflu, solve_triu, is_rref,
 #
 ###############################################################################
 
+parent_type{T}(::Type{Mat{T}}) = MatrixSpace{T}
+
 elem_type{T <: RingElem}(::MatrixSpace{T}) = Mat{T}
 
-base_ring(a::MatrixSpace) = a.base_ring
+base_ring{T}(a::MatrixSpace{T}) = a.base_ring::parent_type(T)
 
 base_ring(a::MatElem) = base_ring(parent(a))
 
@@ -2433,9 +2435,9 @@ end
 #
 ###############################################################################
 
-function MatrixSpace(R::Ring, r::Int, c::Int)
+function MatrixSpace(R::Ring, r::Int, c::Int; cached=true)
    T = elem_type(R)
-   return MatrixSpace{T}(R, r, c)
+   return MatrixSpace{T}(R, r, c, cached)
 end
 
 function typed_hvcat(R::Ring, dims, d...)

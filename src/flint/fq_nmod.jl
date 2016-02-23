@@ -12,6 +12,8 @@ export fq_nmod, FqNmodFiniteField
 #
 ###############################################################################
 
+parent_type(::Type{fq_nmod}) = FqNmodFiniteField
+
 elem_type(::FqNmodFiniteField) = fq_nmod
 
 base_ring(a::FqNmodFiniteField) = Union{}

@@ -12,9 +12,11 @@ export FractionField, Fraction, num, den
 #
 ###############################################################################
 
+parent_type{T}(::Type{Fraction{T}}) = FractionField{T}
+
 elem_type{T <: RingElem}(::FractionField{T}) = Fraction{T}
 
-base_ring(a::FractionField) = a.base_ring
+base_ring{T}(a::FractionField{T}) = a.base_ring::parent_type(T)
 
 base_ring(a::FractionElem) = base_ring(parent(a))
 
@@ -495,7 +497,7 @@ end
 #
 ###############################################################################
 
-function FractionField(R::Ring)
+function FractionField(R::Ring; cached=true)
    R2 = R
    T = elem_type(R)
    parent_type = Fraction{T}
@@ -505,6 +507,6 @@ function FractionField(R::Ring)
       eval(:(Base.promote_rule(::Type{$parent_type}, ::Type{$T2}) = $parent_type))
    end
 
-   return FractionField{T}(R)
+   return FractionField{T}(R, cached)
 end
 

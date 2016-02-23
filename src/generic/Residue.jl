@@ -12,9 +12,11 @@ export ResidueRing, Residue, inv, modulus, data
 #
 ###############################################################################
 
+parent_type{T}(::Type{Residue{T}}) = ResidueRing{T}
+
 elem_type{T <: RingElem}(::ResidueRing{T}) = Residue{T}
 
-base_ring(a::ResidueRing) = a.base_ring
+base_ring{T}(a::ResidueRing{T}) = a.base_ring::parent_type(T)
 
 base_ring(a::ResidueElem) = base_ring(parent(a))
 

@@ -13,6 +13,8 @@ export FlintFiniteField, characteristic, order, fq, FqFiniteField, frobenius,
 #
 ###############################################################################
 
+parent_type(::Type{fq}) = FqFiniteField
+
 elem_type(::FqFiniteField) = fq
 
 base_ring(a::FqFiniteField) = Union{}

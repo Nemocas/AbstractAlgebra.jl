@@ -48,6 +48,8 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, fac, bell,
 #
 ###############################################################################
 
+parent_type(::Type{fmpz}) = FlintIntegerRing
+
 parent(a::fmpz) = FlintZZ
 
 elem_type(::FlintIntegerRing) = fmpz
