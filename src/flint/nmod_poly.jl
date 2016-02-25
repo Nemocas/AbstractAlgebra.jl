@@ -68,14 +68,14 @@ iszero(a::nmod_poly) = Bool(ccall((:nmod_poly_is_zero, :libflint), Int32,
 
 modulus(a::nmod_poly) = a.parent._n
 
-modulus(R::NmodPolyRing) = a._n
+modulus(R::NmodPolyRing) = R._n
 
 var(R::NmodPolyRing) = R.S
 
 function deepcopy(a::nmod_poly)
   z = nmod_poly(modulus(a), a)
   z.parent = a.parent
-  return z
+  return z::nmod_poly
 end
 
 ################################################################################
@@ -486,12 +486,12 @@ function invmod(x::nmod_poly, y::nmod_poly)
   length(y) == 0 && error("Second argument must not be 0")
   check_parent(x,y)
   if length(y) == 1 
-    return parent(x)(inv(eval(x,coeff(y,0))))
+    return parent(x)(inv(eval(x,coeff(y,0))))::nmod_poly
   end
   z = parent(x)()
   r = ccall((:nmod_poly_invmod, :libflint), Int32,
           (Ptr{nmod_poly}, Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &x, &y)
-  r == 0 ? error("Impossible inverse in invmod") : return z
+  r == 0 ? error("Impossible inverse in invmod") : return z::nmod_poly
 end
 
 function mulmod(x::nmod_poly, y::nmod_poly, z::nmod_poly)

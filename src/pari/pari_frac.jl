@@ -14,7 +14,7 @@ export PariRationalField, pari_rat, PariQQ, fmpq!
 
 PariQQ = PariRationalField()
 
-parent(a::pari_rat) = PariQQ
+parent(a::pari_rat) = PariQQ::PariRationalField
 
 ###############################################################################
 #

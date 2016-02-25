@@ -14,7 +14,7 @@ export PariZZ, pari, fmpz!, factor, PariIntegerRing, pari_int
 
 PariZZ = PariIntegerRing()
 
-parent(a::pari_int) = PariZZ
+parent(a::pari_int) = PariZZ::PariIntegerRing
 
 ###############################################################################
 #
@@ -24,7 +24,7 @@ parent(a::pari_int) = PariZZ
 
 size(a::pari_int) = (unsafe_load(a.d, 1) & LGBITS) - 2
 
-sign(a::pari_int) = signe(unsafe_load(a.d, 2))
+sign(a::pari_int) = signe(unsafe_load(a.d, 2)::Ptr{Int})
 
 ###############################################################################
 #

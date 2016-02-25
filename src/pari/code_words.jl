@@ -84,27 +84,40 @@ evalsigne(x::Int) = x << SIGNSHIFT
 
 evalvarn(x::Int) = x << VARNSHIFT
 
-setsigne(x::Ptr{Int}, s::Int) = unsafe_store!(x, ((unsafe_load(x, 2)
-                                           & (~SIGNBITS)) | evalsigne(s)), 2)
+function setsigne(x::Ptr{Int}, s::Int)
+   unsafe_store!(x, ((unsafe_load(x, 2) & (~SIGNBITS)) | evalsigne(s)), 2)
+end
 
-settyp(x::Ptr{Int}, s::Int) = unsafe_store!(x, ((unsafe_load(x, 1)
-                                           & (~TYPBITS)) | evaltyp(s)), 1)
+function settyp(x::Ptr{Int}, s::Int)
+   unsafe_store!(x, ((unsafe_load(x, 1) & (~TYPBITS)) | evaltyp(s)), 1)
+end
 
-varn(x::Ptr{Int}) = (unsafe_load(x, 2) & VARNBITS) >> VARNSHIFT
+function varn(x::Ptr{Int})
+   return reinterpret(Int, (reinterpret(UInt, unsafe_load(x, 2))
+                                                 & VARNBITS) >> VARNSHIFT)::Int
+end
 
 function typ(x::Ptr{Int})
-   return reinterpret(Int, reinterpret(UInt, unsafe_load(x, 1)) >> TYPSHIFT)
+   return reinterpret(Int, reinterpret(UInt, unsafe_load(x, 1))
+                                                              >> TYPSHIFT)::Int
 end
 
 function setvarn(x::Ptr{Int}, s::Int)
-   return unsafe_store(x, (unsafe_load(x, 2) & ~VARNBITS) | evalvarn(s), 2)
+   return unsafe_store(x, reinterpret(Int, reinterpret(UInt, unsafe_load(x, 2))
+                                            & ~VARNBITS) | evalvarn(s), 2)::Int
 end
 
-signe(x::Ptr{Int}) = (unsafe_load(x) >> SIGNSHIFT)
+function signe(x::Ptr{Int})
+   return (reinterpret(Int, unsafe_load(x)) >> SIGNSHIFT)::Int
+end
 
-lg(x::Ptr{Int}) = unsafe_load(x) & LGBITS
+function lg(x::Ptr{Int})
+   return reinterpret(Int, (reinterpret(UInt, unsafe_load(x)) & LGBITS))::Int
+end
 
-pari_load(x::Ptr{Int}, n::Int) = reinterpret(Ptr{Int}, unsafe_load(x, n))
+function pari_load(x::Ptr{Int}, n::Int)
+   return reinterpret(Ptr{Int}, unsafe_load(x, n))::Ptr{Int}
+end
 
 ###############################################################################
 #
