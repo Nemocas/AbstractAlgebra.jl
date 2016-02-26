@@ -33,6 +33,8 @@ export sqrt, rsqrt, log, log1p, exp, exppii, sin, cos, tan, cot,
 
 elem_type(::AcbField) = acb
 
+parent_type(::Type{acb}) = AcbField
+
 base_ring(R::AcbField) = Union{} 
 
 ################################################################################

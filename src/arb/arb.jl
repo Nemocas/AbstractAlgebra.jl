@@ -34,6 +34,8 @@ export ball, radius, midpoint, contains, contains_zero,
 
 elem_type(::ArbField) = arb
 
+parent_type(::Type{arb}) = ArbField
+
 base_ring(R::ArbField) = Union{} 
 
 zero(R::ArbField) = R(0)
