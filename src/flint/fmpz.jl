@@ -903,7 +903,9 @@ function base(n::fmpz, b::Integer)
     p = ccall((:fmpz_get_str,:libflint), Ptr{UInt8}, 
               (Ptr{UInt8}, Cint, Ptr{fmpz}), C_NULL, b, &n)
     len = Int(ccall(:strlen, Csize_t, (Ptr{UInt8},), p))
-    ASCIIString{}{}(pointer_to_array(p, len, true))
+    s = ASCIIString{}{}((pointer_to_array(p, len, false)))
+    _flint_free(reinterpret(Ptr{Void}, p))
+    return s
 end
 
 function ndigits_internal(x::fmpz, b::Integer = 10)
