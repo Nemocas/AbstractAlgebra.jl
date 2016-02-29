@@ -75,7 +75,7 @@ function __init__()
        push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
    elseif on_linux
        push!(Libdl.DL_LOAD_PATH, libdir)
-       Libdl.dlopen(libgmp)
+       global const _libgmp_ = Libdl.dlopen(libgmp)
        Libdl.dlopen(libmpfr)
        Libdl.dlopen(libflint)
        Libdl.dlopen(libpari)
@@ -103,7 +103,8 @@ function __init__()
 
    unsafe_store!(pari_sigint, cfunction(pari_sigint_handler, Void, ()), 1)
 
-   ccall((:__gmp_set_memory_functions, :libgmp), Void,
+   smf = Libdl.dlsym(_libgmp_, :__gmp_set_memory_functions)
+   ccall(smf, Void,
       (Ptr{Void},Ptr{Void},Ptr{Void}),
       cglobal(:jl_gc_counted_malloc),
       cglobal(:jl_gc_counted_realloc_with_old_size),
@@ -121,10 +122,6 @@ function __init__()
    println("")
    println("Nemo comes with absolutely no warranty whatsoever")
    println("")
-end
-
-function _flint_free(p::Ptr{Void})
-  ccall((:flint_free, :libflint), Void, (Ptr{Void}, ), p)
 end
 
 function flint_set_num_threads(a::Int)
