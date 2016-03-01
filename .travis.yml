@@ -1,4 +1,9 @@
 language: julia
+sudo: false
+addons:
+  apt:
+    packages:
+      - texlive
 os:
   - linux
   - osx
