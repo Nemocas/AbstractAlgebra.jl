@@ -904,7 +904,7 @@ function base(n::fmpz, b::Integer)
               (Ptr{UInt8}, Cint, Ptr{fmpz}), C_NULL, b, &n)
     len = Int(ccall(:strlen, Csize_t, (Ptr{UInt8},), p))
     s = ASCIIString{}{}((pointer_to_array(p, len, false)))
-    _flint_free(reinterpret(Ptr{Void}, p))
+    ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), p)
     return s
 end
 
