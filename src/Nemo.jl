@@ -75,7 +75,7 @@ function __init__()
        push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
    elseif on_linux
        push!(Libdl.DL_LOAD_PATH, libdir)
-       Libdl.dlopen(libgmp)
+       global const _libgmp_ = Libdl.dlopen(libgmp)
        Libdl.dlopen(libmpfr)
        Libdl.dlopen(libflint)
        Libdl.dlopen(libpari)
@@ -84,6 +84,13 @@ function __init__()
       push!(Libdl.DL_LOAD_PATH, libdir)
    end
  
+   ccall((:pari_set_memory_functions, :libpari), Void,
+      (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
+      cglobal(:jl_malloc),
+      cglobal(:jl_calloc),
+      cglobal(:jl_realloc),
+      cglobal(:jl_free))
+
    ccall((:pari_init, libpari), Void, (Int, Int), 300000000, 10000)
   
    global avma = cglobal((:avma, libpari), Ptr{Int})
@@ -95,6 +102,20 @@ function __init__()
    global pari_sigint = cglobal((:cb_pari_sigint, libpari), Ptr{Void})
 
    unsafe_store!(pari_sigint, cfunction(pari_sigint_handler, Void, ()), 1)
+
+   smf = Libdl.dlsym(_libgmp_, :__gmp_set_memory_functions)
+   ccall(smf, Void,
+      (Ptr{Void},Ptr{Void},Ptr{Void}),
+      cglobal(:jl_gc_counted_malloc),
+      cglobal(:jl_gc_counted_realloc_with_old_size),
+      cglobal(:jl_gc_counted_free))
+
+   ccall((:__flint_set_memory_functions, :libflint), Void,
+      (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
+      cglobal(:jl_malloc),
+      cglobal(:jl_calloc),
+      cglobal(:jl_realloc),
+      cglobal(:jl_free))
 
    println("")
    println("Welcome to Nemo version 0.4.0")
