@@ -75,7 +75,7 @@ function __init__()
        push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
    elseif on_linux
        push!(Libdl.DL_LOAD_PATH, libdir)
-       global const _libgmp_ = Libdl.dlopen(libgmp)
+       Libdl.dlopen(libgmp)
        Libdl.dlopen(libmpfr)
        Libdl.dlopen(libflint)
        Libdl.dlopen(libpari)
@@ -84,7 +84,7 @@ function __init__()
       push!(Libdl.DL_LOAD_PATH, libdir)
    end
  
-   ccall((:pari_set_memory_functions, :libpari), Void,
+   ccall((:pari_set_memory_functions, libpari), Void,
       (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
       cglobal(:jl_malloc),
       cglobal(:jl_calloc),
@@ -103,14 +103,13 @@ function __init__()
 
    unsafe_store!(pari_sigint, cfunction(pari_sigint_handler, Void, ()), 1)
 
-   smf = Libdl.dlsym(_libgmp_, :__gmp_set_memory_functions)
-   ccall(smf, Void,
+   ccall((:__gmp_set_memory_functions, libgmp), Void,
       (Ptr{Void},Ptr{Void},Ptr{Void}),
       cglobal(:jl_gc_counted_malloc),
       cglobal(:jl_gc_counted_realloc_with_old_size),
       cglobal(:jl_gc_counted_free))
 
-   ccall((:__flint_set_memory_functions, :libflint), Void,
+   ccall((:__flint_set_memory_functions, libflint), Void,
       (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
       cglobal(:jl_malloc),
       cglobal(:jl_calloc),
@@ -125,11 +124,11 @@ function __init__()
 end
 
 function flint_set_num_threads(a::Int)
-   ccall((:flint_set_num_threads, :libflint), Void, (Int,), a)
+   ccall((:flint_set_num_threads, libflint), Void, (Int,), a)
 end
 
 function flint_cleanup()
-   ccall((:flint_cleanup, :libflint), Void, ())
+   ccall((:flint_cleanup, libflint), Void, ())
 end
 
 ###############################################################################
