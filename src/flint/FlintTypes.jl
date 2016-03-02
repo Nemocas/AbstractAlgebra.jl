@@ -1337,51 +1337,66 @@ type nmod_mat <: MatElem{Residue{fmpz}}
     return z
   end
 
-  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{UInt, 2})
+  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{UInt, 2}, transpose::Bool = false)
     (r <= 0 || c <= 0) && error("Dimensions must be positive")
     (size(arr) != (r,c)) && error("Array of wrong dimension")
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
     finalizer(z, _nmod_mat_clear_fn)
+    if transpose 
+      se(z, i, j, k) = set_entry!(z, j, i, k)
+    else
+      se(z, i, j, k) = set_entry!(z, i, j, k)
+    end
     for i = 1:r
       for j = 1:c
-        set_entry!(z, i, j, arr[i,j])
+        se(z, i, j, arr[i,j])
       end
     end
     return z
   end
 
-  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{fmpz, 2})
+  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{fmpz, 2}, transpose::Bool = false)
     (r <= 0 || c <= 0) && error("Dimensions must be positive")
     (size(arr) != (r,c)) && error("Array of wrong dimension")
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
     finalizer(z, _nmod_mat_clear_fn)
+    if transpose 
+      se(z, i, j, k) = set_entry!(z, j, i, k)
+    else
+      se(z, i, j, k) = set_entry!(z, i, j, k)
+    end
     for i = 1:r
       for j = 1:c
-        set_entry!(z, i, j, arr[i,j])
+        se(z, i, j, arr[i,j])
       end
     end
     return z
   end
 
-  function nmod_mat{T <: Integer}(r::Int, c::Int, n::UInt, arr::Array{T, 2})
+  function nmod_mat{T <: Integer}(r::Int, c::Int, n::UInt, arr::Array{T, 2}, transpose::Bool = false)
     arr = map(fmpz, arr)
-    return nmod_mat(r, c, n, arr)
+    return nmod_mat(r, c, n, arr, transpose)
   end
 
-  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{Residue{fmpz}, 2})
+  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{Residue{fmpz}, 2}, transpose::Bool = false)
     (r <= 0 || c <= 0) && error("Dimensions must be positive")
     (size(arr) != (r,c)) && error("Array of wrong dimension")
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
     finalizer(z, _nmod_mat_clear_fn)
+    if transpose 
+      se(z, i, j, k) = set_entry!(z, j, i, k)
+    else
+      se(z, i, j, k) = set_entry!(z, i, j, k)
+    end
     for i = 1:r
       for j = 1:c
-        set_entry!(z, i, j, arr[i,j])
+        se(z, i, j, arr[i,j])
       end
     end
     return z
