@@ -258,3 +258,5 @@ include("pari/PariIdeal.jl")
 
 include("Factor.jl")
 
+include("flint/misc.jl")
+

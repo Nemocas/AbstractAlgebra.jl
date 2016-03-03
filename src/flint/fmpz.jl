@@ -56,7 +56,7 @@ elem_type(::FlintIntegerRing) = fmpz
 
 base_ring(a::FlintIntegerRing) = Union{}
 
-Base.hash(a::fmpz, h::UInt) = hash(BigInt(a), h)
+#Base.hash(a::fmpz, h::UInt) = hash(BigInt(a), h)
 
 ###############################################################################
 #
@@ -599,6 +599,32 @@ end
 <(x::Int, y::fmpz) = cmp(y,x) > 0
 
 >(x::Int, y::fmpz) = cmp(y,x) < 0
+
+function cmp(x::fmpz, y::Uint)
+    Int(ccall((:fmpz_cmp_ui, :libflint), Cint, (Ptr{fmpz}, Uint), &x, y))
+end
+
+==(x::fmpz, y::Uint) = cmp(x,y) == 0
+
+<=(x::fmpz, y::Uint) = cmp(x,y) <= 0
+
+>=(x::fmpz, y::Uint) = cmp(x,y) >= 0
+
+<(x::fmpz, y::Uint) = cmp(x,y) < 0
+
+>(x::fmpz, y::Uint) = cmp(x,y) > 0
+
+==(x::Uint, y::fmpz) = cmp(y,x) == 0
+
+<=(x::Uint, y::fmpz) = cmp(y,x) >= 0
+
+>=(x::Uint, y::fmpz) = cmp(y,x) <= 0
+
+<(x::Uint, y::fmpz) = cmp(y,x) > 0
+
+>(x::Uint, y::fmpz) = cmp(y,x) < 0
+
+
 
 ###############################################################################
 #
