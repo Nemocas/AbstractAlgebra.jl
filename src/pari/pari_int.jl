@@ -14,7 +14,7 @@ export PariZZ, pari, fmpz!, factor, PariIntegerRing, pari_int
 
 PariZZ = PariIntegerRing()
 
-parent(a::pari_int) = PariZZ::PariIntegerRing
+parent(a::pari_int) = PariZZ
 
 ###############################################################################
 #

@@ -336,7 +336,7 @@ function divexact{T <: RingElem}(a::Fraction{T}, b::Integer)
    g = gcd(num(a), c)
    n = divexact(num(a), g)
    d = den(a)*divexact(c, g)
-   return parent(a)(n, d)::Fraction{T}
+   return parent(a)(n, d)
 end
 
 function divexact{T <: RingElem}(a::Integer, b::Fraction{T})
@@ -345,7 +345,7 @@ function divexact{T <: RingElem}(a::Integer, b::Fraction{T})
    g = gcd(num(b), c)
    n = den(b)*divexact(c, g)
    d = divexact(num(b), g)
-   return parent(b)(n, d)::Fraction{T}
+   return parent(b)(n, d)
 end
 
 # remove ambiguity
@@ -359,7 +359,7 @@ function divexact{T <: RingElem}(a::Fraction{T}, b::T)
    g = gcd(num(a), b)
    n = divexact(num(a), g)
    d = den(a)*divexact(b, g)
-   return parent(a)(n, d)::Fraction{T}
+   return parent(a)(n, d)
 end
 
 function divexact{T <: RingElem}(a::T, b::Fraction{T})
@@ -367,7 +367,7 @@ function divexact{T <: RingElem}(a::T, b::Fraction{T})
    g = gcd(num(b), a)
    n = den(b)*divexact(a, g)
    d = divexact(num(b), g)
-   return parent(b)(n, d)::Fraction{T}
+   return parent(b)(n, d)
 end
 
 ###############################################################################

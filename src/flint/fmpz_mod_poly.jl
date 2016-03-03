@@ -68,7 +68,7 @@ modulus(R::FmpzModPolyRing) = R._n
 function deepcopy(a::fmpz_mod_poly)
   z = fmpz_mod_poly(modulus(a), a)
   z.parent = a.parent
-  return z::fmpz_mod_poly
+  return z
 end
 
 ################################################################################
@@ -523,13 +523,13 @@ function invmod(x::fmpz_mod_poly, y::fmpz_mod_poly)
   length(y) == 0 && error("Second argument must not be 0")
   check_parent(x, y)
   if length(y) == 1 
-    return parent(x)(inv(eval(x, coeff(y, 0))))::fmpz_mod_poly
+    return parent(x)(inv(eval(x, coeff(y, 0))))
   end
   z = parent(x)()
   r = ccall((:fmpz_mod_poly_invmod, :libflint), Int32,
             (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}),
                &z, &x, &y)
-  r == 0 ? error("Impossible inverse in invmod") : return z::fmpz_mod_poly
+  r == 0 ? error("Impossible inverse in invmod") : return z
 end
 
 function mulmod(x::fmpz_mod_poly, y::fmpz_mod_poly, z::fmpz_mod_poly)

@@ -66,7 +66,7 @@ length(x::PolyElem) = x.length
 
 degree(x::PolyElem) = length(x) - 1
 
-coeff{T <: RingElem}(a::Poly{T}, n::Int) = n >= length(a) ? base_ring(a)(0)::T : a.coeffs[n + 1]::T
+coeff{T <: RingElem}(a::Poly{T}, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
 lead(a::PolyElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
 
@@ -1463,9 +1463,9 @@ function interpolate{T <: RingElem}(S::PolynomialRing, x::Array{T, 1}, y::Array{
    length(x) != length(y) && error("Array lengths don't match in interpolate")
    n = length(x)
    if n == 0
-      return S()::Poly{T}
+      return S()
    elseif n == 1
-      return S(y[1])::Poly{T}
+      return S(y[1])
    end
    R = base_ring(S)
    parent(y[1]) != R && error("Polynomial ring does not match inputs")
@@ -1485,7 +1485,7 @@ function interpolate{T <: RingElem}(S::PolynomialRing, x::Array{T, 1}, y::Array{
    newton_to_monomial!(P, x)
    r = S(P)
    set_length!(r, normalise(r, n))
-   return r::Poly{T}
+   return r
 end
 
 ###############################################################################

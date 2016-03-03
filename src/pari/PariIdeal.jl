@@ -276,7 +276,7 @@ function factor_mul(a::PariFactor{pari_maximal_order_elem})
                     a.parent.order.pari_nf.data, a.data, C_NULL, 0)
    r = a.parent(p)
    unsafe_store!(avma, av, 1)
-   return r::PariIdeal
+   return r
 end
 
 ###############################################################################
