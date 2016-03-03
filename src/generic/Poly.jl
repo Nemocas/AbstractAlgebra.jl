@@ -1764,13 +1764,16 @@ function PolynomialRing(R::Ring, s::AbstractString{}; cached::Bool = true)
    T = elem_type(R)
    parent_obj = PolynomialRing{T}(R, S, cached)
 
-   base = base_ring(R)
    R2 = R
-   parent_type = Poly{T}
+   par_type = Poly{T}
+   sig_table = [x.sig for x in methods(promote_rule)]
+   filter!(x -> x <: Tuple{Type{par_type}, Any}, sig_table)
    while base_ring(R2) != Union{}
       R2 = base_ring(R2)
       T2 = elem_type(R2)
-      eval(:(Base.promote_rule(::Type{$parent_type}, ::Type{$T2}) = $parent_type))
+      if !in(Tuple{Type{par_type}, Type{T2}}, sig_table)
+         eval(:(Base.promote_rule(::Type{$par_type}, ::Type{$T2}) = $par_type))
+      end
    end
 
    return parent_obj, parent_obj([R(0), R(1)])

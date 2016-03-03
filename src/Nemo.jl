@@ -32,7 +32,7 @@ export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
        MaximalRealSubfield, MaximalOrder, Ideal, PermutationGroup
 
 export create_accessors, get_handle, package_handle, allocatemem, zeros,
-       Array
+       Array, method_with_sig_exists
 
 export flint_cleanup, flint_set_num_threads
 
