@@ -12,6 +12,8 @@ export fq_poly, FqPolyRing
 #
 ################################################################################
 
+parent_type(::Type{fq_poly}) = FqPolyRing
+
 elem_type(::FqPolyRing) = fq_poly
 
 base_ring(a::FqPolyRing) = a.base_ring
@@ -505,14 +507,14 @@ function factor(x::fq_poly)
    ccall((:fq_poly_factor, :libflint), Void, (Ptr{fq_poly_factor},
          Ptr{fq}, Ptr{fq_poly}, Ptr{FqFiniteField}),
          &fac, &a, &x, &F)
-   res = Array(Tuple{fq_poly,Int},fac.num)
+   res = Dict{fq_poly,Int}()
    for i in 1:fac.num
       f = R()
       ccall((:fq_poly_factor_get_poly, :libflint), Void,
             (Ptr{fq_poly}, Ptr{fq_poly_factor}, Int,
             Ptr{FqFiniteField}), &f, &fac, i-1, &F)
       e = unsafe_load(fac.exp,i)
-      res[i] = (f,e)
+      res[f] = e
    end
    return res 
 end  
@@ -528,14 +530,14 @@ function factor_distinct_deg(x::fq_poly)
    ccall((:fq_poly_factor_distinct_deg, :libflint), Void, 
          (Ptr{fq_poly_factor}, Ptr{fq_poly}, Ptr{Int},
          Ptr{FqFiniteField}), &fac, &x, &tmp.exp, &F)
-   res = Array(Tuple{fq_poly, Int}, fac.num)
+   res = Dict{fq_poly, Int}()
    for i in 1:fac.num
       f = R()
       ccall((:fq_poly_factor_get_poly, :libflint), Void,
             (Ptr{fq_poly}, Ptr{fq_poly_factor}, Int,
             Ptr{FqFiniteField}), &f, &fac, i-1, &F)
       d = unsafe_load(tmp.exp,i)
-      res[i] = (f,d)
+      res[f] = d
    end
    return res
 end

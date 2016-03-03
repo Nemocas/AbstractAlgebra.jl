@@ -474,6 +474,21 @@ function test_fq_nmod_poly_inflation_deflation()
    println("PASS")
 end
 
+function test_fq_nmod_poly_issquarefree()
+  print("fq_nmod_poly.issquarefree...")
+
+  R, x = FiniteField(23, 5, "x")
+  S, y = PolynomialRing(R, "y")
+
+  f = y^6 + y^4 + 2 *y^2 
+
+  @test !issquarefree(f)
+
+  @test issquarefree((y+1)*(y+2)*(y+3))
+
+  println("PASS")
+end
+
 function test_fq_nmod_poly_factor()
    print("fq_nmod_poly.factor()...")
 
@@ -486,23 +501,13 @@ function test_fq_nmod_poly_factor()
    A = factor(f*g)
 
    @test length(A) == 3
-  
-   (a1, n1) = A[1]
-   (a2, n2) = A[2]
-   (a3, n3) = A[3]
-
-   @test a1^n1*a2^n2*a3^n3 == 3*f*g
+   @test prod([h^e for (h,e)=A]) == 3*f*g
 
    B = factor_distinct_deg((y + 1)*g*(y^5+y^3+y+1))
 
    @test length(B) == 3
+   @test 11*prod([h for (h,e)=B]) == ((y + 1)*g*(y^5+y^3+y+1))
    
-   (b1, n1) = B[1]
-   (b2, n2) = B[2]
-   (b3, n3) = B[3]
-
-   @test  b1*b2*b3 == 21*((y + 1)*g*(y^5+y^3+y+1))
-
    println("PASS")
 end
 
@@ -532,6 +537,7 @@ function test_fq_nmod_poly()
    test_fq_nmod_poly_gcdx()
    test_fq_nmod_poly_special()
    test_fq_nmod_poly_inflation_deflation()
+   test_fq_nmod_poly_issquarefree()
    test_fq_nmod_poly_factor()
 
    println("")

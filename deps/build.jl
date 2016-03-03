@@ -181,7 +181,7 @@ cd(wdir)
 
 # install PARI
 
-if !ispath(Pkg.dir("Nemo", "deps", "pari-2.7.4"))
+if !ispath(Pkg.dir("Nemo", "local", "pari-2.7.4"))
    # git clone pari doesn't seem to work on Windows
    # bison is too old on OSX for pari git
    # so we use the 2.7.4 tarball

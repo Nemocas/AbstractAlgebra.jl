@@ -34,6 +34,8 @@ export ball, radius, midpoint, contains, contains_zero,
 
 elem_type(::ArbField) = arb
 
+parent_type(::Type{arb}) = ArbField
+
 base_ring(R::ArbField) = Union{} 
 
 zero(R::ArbField) = R(0)
@@ -129,8 +131,8 @@ function convert(::Type{Float64}, x::arb)
     t.size = x.mid_size
     t.d1 = x.mid_d1
     t.d2 = x.mid_d2
-    # rounds to zero
-    return ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), &t, 0)
+    # rounds to nearest
+    return ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), &t, 4)
 end
 
 ################################################################################

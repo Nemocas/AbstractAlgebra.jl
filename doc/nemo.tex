@@ -6040,7 +6040,7 @@ isirreducible(x::fmpz_mod_poly)
 
 \textbf{Examples.}
 
-Here is an example of lifting.
+Here is an example of irreducibility testing.
 
 \begin{lstlisting}
    R = ResidueRing(ZZ, 123456789012345678949)
@@ -6061,7 +6061,7 @@ issquarefree(x::fmpz_mod_poly)
 
 \textbf{Examples.}
 
-Here is an example of lifting.
+Here is an example of squarefree testing.
 
 \begin{lstlisting}
    R = ResidueRing(ZZ, 123456789012345678949)
@@ -6390,7 +6390,7 @@ isirreducible(x::nmod_poly)
 
 \textbf{Examples.}
 
-Here is an example of lifting.
+Here is an example of irreducibility testing.
 
 \begin{lstlisting}
    R = ResidueRing(ZZ, 23)
@@ -6411,7 +6411,7 @@ issquarefree(x::nmod_poly)
 
 \textbf{Examples.}
 
-Here is an example of lifting.
+Here is an example of squarefree testing.
 
 \begin{lstlisting}
    R = ResidueRing(ZZ, 23)
@@ -7027,6 +7027,27 @@ Here is an example of inflation and deflation.
 
   g = inflate(f, 2)
   h = deflate(g, 2)
+\end{lstlisting}
+
+\subsubsection{Squarefree testing}
+
+\begin{lstlisting}
+issquarefree(x::fq_nmod_poly)
+\end{lstlisting}
+
+\desc{Return \code{true} if the polynomial $x$ is squarefree, otherwise return \code{false}.}
+
+\textbf{Examples.}
+
+Here is an example of squarefree testing.
+
+\begin{lstlisting}
+   R = FiniteField(23, 5, "x")
+   S, x = PolynomialRing(R, "x")
+
+   f = x^2 + 2x + 1
+
+   issquarefree(f) == false
 \end{lstlisting}
 
 \subsubsection{Factorisation}
@@ -9667,6 +9688,18 @@ valuation(a::padic)
 \desc{Return the $p$-adic valuation of the given $p$-adic value.}
 
 \begin{lstlisting}
+lift(R::FlintRationalField, a::padic)
+\end{lstlisting}
+
+\desc{Lift the given (truncated) $p$-adic value to the rationals.}
+
+\begin{lstlisting}
+lift(R::FlintIntegerRing, a::padic)
+\end{lstlisting}
+
+\desc{Lift the given (truncated) $p$-adic value to the integers.}
+
+\begin{lstlisting}
 zero(R::PadicField)
 \end{lstlisting}
 
@@ -9712,6 +9745,8 @@ h = iszero(f)
 k = precision(a)
 m = prime(R)
 n = valuation(b)
+p = lift(FlintZZ, a)
+q = lift(FlintQQ, divexact(a, b))
 \end{lstlisting}
 
 \subsubsection{Unary operators}

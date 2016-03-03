@@ -48,13 +48,15 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, fac, bell,
 #
 ###############################################################################
 
+parent_type(::Type{fmpz}) = FlintIntegerRing
+
 parent(a::fmpz) = FlintZZ
 
 elem_type(::FlintIntegerRing) = fmpz
 
 base_ring(a::FlintIntegerRing) = Union{}
 
-hash(a::fmpz) = hash(BigInt(a))
+Base.hash(a::fmpz, h::UInt) = hash(BigInt(a), h)
 
 ###############################################################################
 #
@@ -187,6 +189,12 @@ function addeq!(z::fmpz, x::fmpz)
    ccall((:fmpz_add, :libflint), Void, 
          (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &z, &x)
 end
+
+function add!(z::fmpz, x::fmpz, y::fmpz)
+   ccall((:fmpz_add, :libflint), Void, 
+         (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x, &y)
+end
+
 
 ###############################################################################
 #
@@ -371,7 +379,9 @@ function ^(x::fmpz, y::Int)
     if y > typemax(UInt); throw(DomainError()); end
     if y == 0; return one(FlintZZ); end
     if y == 1; return x; end
-    return x^UInt(y)
+    z = fmpz()
+    ccall((:fmpz_pow_ui, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}, UInt), &z, &x, UInt(y))
+    return z
 end
 
 ###############################################################################
@@ -678,32 +688,36 @@ function clog(x::fmpz, c::Int)
                  (Ptr{fmpz}, Int), &x, c)
 end
     
-###############################################################################
+################################################################################
+##
+##   Array arithmetic
+##
+################################################################################
 #
-#   Array arithmetic
+# CF: Julia has build-in mapreduce stuff. The native prod/ sum is actually
+#     slightly better than this, it is the "same" algorithm as the
+#     fmpz_vec_prod function in C.
+#     If this becomes critical, I have an even better one in Hecke...
+#function sum(arr::AbstractArray{fmpz})
+#    n = fmpz(0)
+#    for i in arr
+#        ccall((:fmpz_add, :libflint), Void,
+#            (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}),
+#            &n, &n, &i)
+#    end
+#    return n
+#end
 #
-###############################################################################
-
-function sum(arr::AbstractArray{fmpz})
-    n = fmpz(0)
-    for i in arr
-        ccall((:fmpz_add, :libflint), Void,
-            (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}),
-            &n, &n, &i)
-    end
-    return n
-end
-
-function prod(arr::AbstractArray{fmpz})
-    n = fmpz(1)
-    for i in arr
-        ccall((:fmpz_mul, :libflint), Void,
-            (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}),
-            &n, &n, &i)
-    end
-    return n
-end
-
+#function prod(arr::AbstractArray{fmpz})
+#    n = fmpz(1)
+#    for i in arr
+#        ccall((:fmpz_mul, :libflint), Void,
+#            (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}),
+#            &n, &n, &i)
+#    end
+#    return n
+#end
+#
 ###############################################################################
 #
 #   Number theoretic/combinatorial
@@ -917,7 +931,9 @@ end
 
 ndigits(x::fmpz, b::Integer = 10) = x == 0 ? 1 : ndigits_internal(x, b)
 
-nbits(x::fmpz) = x == 0 ? 0 : ndigits(x, 2)
+nbits(x::fmpz) = x == 0 ? 0 : Int(ccall((:fmpz_sizeinbase, :libflint), UInt,
+                  (Ptr{fmpz}, Int32), &x, 2))  # docu states: always correct
+                                #if base is power of 2
 
 ###############################################################################
 #

@@ -63,12 +63,12 @@ var(R::FmpzModPolyRing) = R.S
 
 modulus(a::fmpz_mod_poly) = a.parent._n
 
-modulus(R::FmpzModPolyRing) = a._n
+modulus(R::FmpzModPolyRing) = R._n
 
 function deepcopy(a::fmpz_mod_poly)
   z = fmpz_mod_poly(modulus(a), a)
   z.parent = a.parent
-  return z
+  return z::fmpz_mod_poly
 end
 
 ################################################################################
@@ -523,13 +523,13 @@ function invmod(x::fmpz_mod_poly, y::fmpz_mod_poly)
   length(y) == 0 && error("Second argument must not be 0")
   check_parent(x, y)
   if length(y) == 1 
-    return parent(x)(inv(eval(x, coeff(y, 0))))
+    return parent(x)(inv(eval(x, coeff(y, 0))))::fmpz_mod_poly
   end
   z = parent(x)()
   r = ccall((:fmpz_mod_poly_invmod, :libflint), Int32,
             (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly}),
                &z, &x, &y)
-  r == 0 ? error("Impossible inverse in invmod") : return z
+  r == 0 ? error("Impossible inverse in invmod") : return z::fmpz_mod_poly
 end
 
 function mulmod(x::fmpz_mod_poly, y::fmpz_mod_poly, z::fmpz_mod_poly)
@@ -682,13 +682,13 @@ function factor(x::fmpz_mod_poly)
   fac = fmpz_mod_poly_factor(parent(x)._n)
   ccall((:fmpz_mod_poly_factor, :libflint), UInt,
           (Ptr{fmpz_mod_poly_factor}, Ptr{fmpz_mod_poly}), &fac, &x)
-  res = Array(Tuple{fmpz_mod_poly, Int}, fac._num)
+  res = Dict{fmpz_mod_poly, Int}()
   for i in 1:fac._num
     f = parent(x)()
     ccall((:fmpz_mod_poly_factor_get_fmpz_mod_poly, :libflint), Void,
          (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly_factor}, Int), &f, &fac, i - 1)
     e = unsafe_load(fac.exp, i)
-    res[i] = (f, e)
+    res[f] = e
   end
   return res 
 end  
@@ -698,13 +698,13 @@ function factor_squarefree(x::fmpz_mod_poly)
   fac = fmpz_mod_poly_factor(parent(x)._n)
   ccall((:fmpz_mod_poly_factor_squarefree, :libflint), UInt,
           (Ptr{fmpz_mod_poly_factor}, Ptr{fmpz_mod_poly}), &fac, &x)
-  res = Array(Tuple{fmpz_mod_poly, Int}, fac._num)
+  res = Dict{fmpz_mod_poly, Int}()
   for i in 1:fac._num
     f = parent(x)()
     ccall((:fmpz_mod_poly_factor_get_fmpz_mod_poly, :libflint), Void,
          (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly_factor}, Int), &f, &fac, i - 1)
     e = unsafe_load(fac.exp, i)
-    res[i] = (f, e)
+    res[f] = e
   end
   return res 
 end  
@@ -718,39 +718,14 @@ function factor_distinct_deg(x::fmpz_mod_poly)
   ccall((:fmpz_mod_poly_factor_distinct_deg, :libflint), UInt,
           (Ptr{fmpz_mod_poly_factor}, Ptr{fmpz_mod_poly}, Ptr{Ptr{Int}}),
           &fac, &x, degss)
-  res = Array(Tuple{fmpz_mod_poly, Int}, fac._num)
+  res = Dict{fmpz_mod_poly, Int}()
   for i in 1:fac._num
     f = parent(x)()
     ccall((:fmpz_mod_poly_factor_get_fmpz_mod_poly, :libflint), Void,
          (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly_factor}, Int), &f, &fac, i - 1)
-    res[i] = (f, degs[i])
+    res[f] = degs[i]     
   end
   return res 
-end  
-
-function factor_shape(x::fmpz_mod_poly)
-  res = Array(Int, degree(x))
-  res2 = Array(Int, degree(x))
-  res3 = Array(Tuple{Int, Int}, degree(x))
-  k = 1
-  fill!(res, 0)
-  square_fac = factor_squarefree(x)
-  for (f, i) in square_fac
-    discdeg = factor_distinct_deg(f)
-    for (g, j) in discdeg
-      num = div(degree(g), j)
-      res[j] += num*i
-      res2[k] = j
-      k += 1
-    end
-  end
-  resize!(res2, k - 1)
-  res2 = unique(res2)
-  resize!(res3, length(res2))
-  for j in 1:length(res2)
-    res3[j] = (res2[j], res[res2[j]])
-  end
-  return res3
 end  
 
 ################################################################################
@@ -893,11 +868,11 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::ResidueRing{fmpz}, s::AbstractString{})
+function PolynomialRing(R::ResidueRing{fmpz}, s::AbstractString{}; cached=true)
    if modulus(R) <= fmpz(typemax(UInt))
-      parent_obj = NmodPolyRing(R, symbol(s))
+      parent_obj = NmodPolyRing(R, symbol(s), cached)
    else
-      parent_obj = FmpzModPolyRing(R, symbol(s))
+      parent_obj = FmpzModPolyRing(R, symbol(s), cached)
    end
 
    return parent_obj, parent_obj([R(0), R(1)])

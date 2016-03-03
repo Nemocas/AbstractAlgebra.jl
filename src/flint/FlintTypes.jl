@@ -128,14 +128,16 @@ _fmpq_clear_fn(a::fmpq) = ccall((:fmpq_clear, :libflint), Void, (Ptr{fmpq},), &a
 const FmpzPolyID = ObjectIdDict()
 
 type FmpzPolyRing <: Ring{Flint}
-   base_ring::Ring
+   base_ring::FlintIntegerRing
    S::Symbol
 
    function FmpzPolyRing(s::Symbol)
-      return try
-         FmpzPolyID[s]
-      catch
-         FmpzPolyID[s] = new(FlintZZ, s)
+      if haskey(FmpzPolyID, s)
+         return FmpzPolyID[s]::FmpzPolyRing
+      else
+         z = new(FlintZZ, s)
+         FmpzPolyID[s] = z
+         return z
       end
    end
 end
@@ -205,14 +207,16 @@ end
 const FmpqPolyID = ObjectIdDict()
 
 type FmpqPolyRing <: Ring{Flint}
-   base_ring::Field
+   base_ring::FlintRationalField
    S::Symbol
 
    function FmpqPolyRing(R::FlintRationalField, s::Symbol)
-      return try
-         FmpqPolyID[s]
-      catch
-         FmpqPolyID[s] = new(R, s)
+      if haskey(FmpqPolyID, s)
+         return FmpqPolyID[s]::FmpqPolyRing
+      else
+         z = new(R, s)
+         FmpqPolyID[s] = z
+         return z
       end
    end
 end
@@ -301,16 +305,20 @@ end
 const NmodPolyRingID = ObjectIdDict()
 
 type NmodPolyRing <: Ring{Flint}
-  base_ring::ResidueRing
+  base_ring::ResidueRing{fmpz}
   S::Symbol
   _n::UInt
 
-  function NmodPolyRing(R::ResidueRing{fmpz}, s::Symbol)
+  function NmodPolyRing(R::ResidueRing{fmpz}, s::Symbol, cached=true)
     m = UInt(modulus(R))
-    return try
-       NmodPolyRingID[m, s]
-    catch
-       NmodPolyRingID[m, s] = new(R, s, m)
+    if haskey(NmodPolyRingID, (m, s))
+       return NmodPolyRingID[m, s]::NmodPolyRing
+    else
+       z = new(R, s, m)
+       if cached
+          NmodPolyRingID[m, s] = z
+       end
+       return z
     end
   end
 end
@@ -443,16 +451,20 @@ end
 const FmpzModPolyRingID = ObjectIdDict()
 
 type FmpzModPolyRing <: Ring{Flint}
-  base_ring::ResidueRing
+  base_ring::ResidueRing{fmpz}
   S::Symbol
   _n::fmpz
 
-  function FmpzModPolyRing(R::ResidueRing{fmpz}, s::Symbol)
+  function FmpzModPolyRing(R::ResidueRing{fmpz}, s::Symbol, cached=true)
     m = modulus(R)
-    return try
-       FmpzModPolyRingID[m, s]
-    catch
-       FmpzModPolyRingID[m, s] = new(R, s, m)
+    if haskey(FmpzModPolyRingID, (m, s))
+       return FmpzModPolyRingID[m, s]::FmpzModPolyRing
+    else
+       z = new(R, s, m)
+       if cached
+          FmpzModPolyRingID[m ,s] = z
+       end
+       return z
     end
   end
 end
@@ -597,9 +609,9 @@ type FqNmodFiniteField <: Field{Flint}
    var :: Ptr{Void}
 
    function FqNmodFiniteField(c::fmpz, deg::Int, s::Symbol)
-      try
-        return FqNmodFiniteFieldID[char, deg, s]
-      catch
+      if haskey(FqNmodFiniteFieldID, (char, deg, s))
+         return FqNmodFiniteFieldID[char, deg, s]::FqNmodFiniteField
+      else
          d = new()
          ccall((:fq_nmod_ctx_init, :libflint), Void, 
                (Ptr{FqNmodFiniteField}, Ptr{fmpz}, Int, Ptr{UInt8}), 
@@ -611,9 +623,9 @@ type FqNmodFiniteField <: Field{Flint}
    end
 
    function FqNmodFiniteField(f::nmod_poly, s::Symbol)
-      try
-         return FqNmodFiniteFieldIDPol[parent(f), f, s]
-      catch
+      if haskey(FqNmodFiniteFieldIDPol, (parent(f), f, s))
+         return FqNmodFiniteFieldIDPol[parent(f), f, s]::FqNmodFiniteField
+      else
          z = new()
          ccall((:fq_nmod_ctx_init_modulus, :libflint), Void, 
             (Ptr{FqNmodFiniteField}, Ptr{nmod_poly}, Ptr{UInt8}), 
@@ -709,10 +721,11 @@ type FqFiniteField <: Field{Flint}
    var::Ptr{Void}
 
    function FqFiniteField(char::fmpz, deg::Int, s::Symbol)
-      try
-         return FqFiniteFieldID[char, deg, s]
-      catch
-         d = FqFiniteFieldID[char, deg, s] = new()
+      if haskey(FqFiniteFieldID, (char, deg, s))
+         return FqFiniteFieldID[char, deg, s]::FqFiniteField
+      else
+         d = new()
+         FqFiniteFieldID[char, deg, s] = d
          finalizer(d, _FqFiniteField_clear_fn)
          ccall((:fq_ctx_init, :libflint), Void,
                (Ptr{FqFiniteField}, Ptr{fmpz}, Int, Ptr{UInt8}),
@@ -722,9 +735,9 @@ type FqFiniteField <: Field{Flint}
    end
    
    function FqFiniteField(f::fmpz_mod_poly, s::Symbol)
-      try
-         return FqFiniteFieldIDPol[f, s]
-      catch
+      if haskey(FqFiniteFieldIDPol, (f, s))
+         return FqFiniteFieldIDPol[f, s]::FqFiniteField
+      else
          z = new()
          ccall((:fq_ctx_init_modulus, :libflint), Void,
                (Ptr{FqFiniteField}, Ptr{fmpz_mod_poly}, Ptr{UInt8}),
@@ -854,15 +867,17 @@ end
 const FmpzSeriesID = ObjectIdDict()
 
 type FmpzSeriesRing <: Ring{Flint}
-   base_ring::Ring
+   base_ring::FlintIntegerRing
    prec_max::Int
    S::Symbol
 
    function FmpzSeriesRing(prec::Int, s::Symbol)
-      return try
-         FmpzSeriesID[prec, s]
-      catch
-         FmpzSeriesID[prec, s] = new(FlintZZ, prec, s)
+      if haskey(FmpzSeriesID, (prec, s))
+         FmpzSeriesID[prec, s]::FmpzSeriesRing
+      else
+         z = new(FlintZZ, prec, s)
+         FmpzSeriesID[prec, s] = z
+         return z
       end
    end
 end
@@ -918,15 +933,17 @@ end
 const FmpqSeriesID = ObjectIdDict()
 
 type FmpqSeriesRing <: Ring{Flint}
-   base_ring::Ring
+   base_ring::FlintRationalField
    prec_max::Int
    S::Symbol
 
    function FmpqSeriesRing(prec::Int, s::Symbol)
-      return try
-         FmpqSeriesID[prec, s]
-      catch
-         FmpqSeriesID[prec, s] = new(FlintQQ, prec, s)
+      if haskey(FmpqSeriesID, (prec, s))
+         return FmpqSeriesID[prec, s]::FmpqSeriesRing
+      else
+         z = new(FlintQQ, prec, s)
+         FmpqSeriesID[prec, s] = z
+         return z
       end
    end
 end
@@ -983,15 +1000,16 @@ end
 const FmpzModSeriesID = ObjectIdDict()
 
 type FmpzModSeriesRing <: Ring{Flint}
-   base_ring::ResidueRing
+   base_ring::ResidueRing{fmpz}
    prec_max::Int
    S::Symbol
 
    function FmpzModSeriesRing(R::Ring, prec::Int, s::Symbol)
-      return try
-         FmpzModSeriesID[R, prec, s]
-      catch
+      if haskey(FmpzModSeriesID, (R, prec, s))
+         return FmpzModSeriesID[R, prec, s]::FmpzModSeriesRing
+      else
          FmpzModSeriesID[R, prec, s] = new(R, prec, s)
+         return FmpzModSeriesID[R, prec, s]
       end
    end
 end
@@ -1063,15 +1081,17 @@ end
 const FqSeriesID = ObjectIdDict()
 
 type FqSeriesRing <: Ring{Flint}
-   base_ring::Field
+   base_ring::FqFiniteField
    prec_max::Int
    S::Symbol
 
-   function FqSeriesRing(R::Ring, prec::Int, s::Symbol)
-      return try
-         FqSeriesID[R, prec, s]
-      catch
-         FqSeriesID[R, prec, s] = new(R, prec, s)
+   function FqSeriesRing(R::FqFiniteField, prec::Int, s::Symbol)
+      if haskey(FqSeriesID, (R, prec, s))
+         return FqSeriesID[R, prec, s]::FqSeriesRing
+      else
+         z = new(R, prec, s)
+         FqSeriesID[R, prec, s] = z
+         return z
       end
    end
 end
@@ -1131,15 +1151,17 @@ end
 const FqNmodSeriesID = ObjectIdDict()
 
 type FqNmodSeriesRing <: Ring{Flint}
-   base_ring::Field
+   base_ring::FqNmodFiniteField
    prec_max::Int
    S::Symbol
 
-   function FqNmodSeriesRing(R::Ring{Flint}, prec::Int, s::Symbol)
-      return try
-         FqNmodSeriesID[R, prec, s]
-      catch
-         FqNmodSeriesID[R, prec, s] = new(R, prec, s)
+   function FqNmodSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol)
+      if haskey(FqNmodSeriesID, (R, prec, s))
+         return FqNmodSeriesID[R, prec, s]::FqNmodSeriesRing
+      else
+         z = new(R, prec, s)
+         FqNmodSeriesID[R, prec, s] = z
+         return z
       end
    end
 end
@@ -1205,10 +1227,12 @@ type FmpzMatSpace <: Ring{Flint}
    base_ring::FlintIntegerRing
 
    function FmpzMatSpace(r::Int, c::Int)
-      return try
-         FmpzMatID[r, c]
-      catch
-         FmpzMatID[r, c] = new(r, c, FlintZZ)
+      if haskey(FmpzMatID, (r, c))
+         return FmpzMatID[r, c]::FmpzMatSpace
+      else
+         z = new(r, c, FlintZZ)
+         FmpzMatID[r, c] = z
+         return z
       end
    end
 end
@@ -1218,7 +1242,7 @@ type fmpz_mat <: MatElem{fmpz}
    r::Int
    c::Int
    rows::Ptr{Void}
-   parent::Ring{Flint}
+   parent::FmpzMatSpace
 
    # used by windows, not finalised!!
    function fmpz_mat()
@@ -1299,23 +1323,31 @@ end
 ###############################################################################
 
 const NmodMatID = ObjectIdDict()
+const error_dim_non_negative = "Dimensions must be non-negative"
 
 type NmodMatSpace <: Ring{Flint}
-  base_ring::ResidueRing
+  base_ring::ResidueRing{fmpz}
   _n::UInt
   rows::Int
   cols::Int
 
   function NmodMatSpace(R::ResidueRing{fmpz}, r::Int, c::Int)
-    (r <= 0 || c <= 0) && error("Dimensions must be positive")
+    (r < 0 || c < 0) && error(error_dim_non_negative)
     fmpz(typemax(UInt)) < abs(R.modulus) &&
       error("Modulus of ResidueRing must less then ", fmpz(typemax(UInt)))
-    try
-      return NmodMatID[R, r, c]
-    catch
-      NmodMatID[R, r, c] = new(R, UInt(R.modulus), r, c)
+    if haskey(NmodMatID, (R, r, c))
+      return NmodMatID[R, r, c]::NmodMatSpace
+    else
+      z = new(R, UInt(R.modulus), r, c)
+      NmodMatID[R, r, c] = z
+      return z
     end
   end
+end
+
+function _check_dim{T}(r::Int, c::Int, arr::Array{T, 2}, transpose::Bool)
+  (r < 0 || c < 0) && error(error_dim_non_negative)
+  (size(arr) != (transpose ? (c,r) : (r,c))) && error("Array of wrong dimension")
 end
 
 type nmod_mat <: MatElem{Residue{fmpz}}
@@ -1329,7 +1361,7 @@ type nmod_mat <: MatElem{Residue{fmpz}}
   parent::NmodMatSpace
 
   function nmod_mat(r::Int, c::Int, n::UInt)
-    (r <= 0 || c <= 0) && error("Dimensions must be positive")
+    (r < 0 || c < 0) && error(error_dim_non_negative)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
@@ -1338,14 +1370,14 @@ type nmod_mat <: MatElem{Residue{fmpz}}
   end
 
   function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{UInt, 2}, transpose::Bool = false)
-    (r <= 0 || c <= 0) && error("Dimensions must be positive")
-    (size(arr) != (r,c)) && error("Array of wrong dimension")
+    _check_dim(r, c, arr, transpose)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
     finalizer(z, _nmod_mat_clear_fn)
     if transpose 
       se(z, i, j, k) = set_entry!(z, j, i, k)
+      r,c = c,r
     else
       se(z, i, j, k) = set_entry!(z, i, j, k)
     end
@@ -1358,14 +1390,14 @@ type nmod_mat <: MatElem{Residue{fmpz}}
   end
 
   function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{fmpz, 2}, transpose::Bool = false)
-    (r <= 0 || c <= 0) && error("Dimensions must be positive")
-    (size(arr) != (r,c)) && error("Array of wrong dimension")
+    _check_dim(r, c, arr, transpose)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
     finalizer(z, _nmod_mat_clear_fn)
     if transpose 
       se(z, i, j, k) = set_entry!(z, j, i, k)
+      r,c = c,r
     else
       se(z, i, j, k) = set_entry!(z, i, j, k)
     end
@@ -1383,14 +1415,14 @@ type nmod_mat <: MatElem{Residue{fmpz}}
   end
 
   function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{Residue{fmpz}, 2}, transpose::Bool = false)
-    (r <= 0 || c <= 0) && error("Dimensions must be positive")
-    (size(arr) != (r,c)) && error("Array of wrong dimension")
+    _check_dim(r, c, arr, transpose)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
     finalizer(z, _nmod_mat_clear_fn)
     if transpose 
       se(z, i, j, k) = set_entry!(z, j, i, k)
+      r,c = c,r
     else
       se(z, i, j, k) = set_entry!(z, i, j, k)
     end
@@ -1401,6 +1433,27 @@ type nmod_mat <: MatElem{Residue{fmpz}}
     end
     return z
   end
+
+  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{Residue{fmpz}, 1}, transpose::Bool = false)
+    (r<0 || c<0 || r*c != length(arr)) && error(error_dim_non_negative)
+    z = new()
+    ccall((:nmod_mat_init, :libflint), Void,
+            (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
+    finalizer(z, _nmod_mat_clear_fn)
+    if transpose 
+      se(z, i, j, k) = set_entry!(z, j, i, k)
+      r,c = c,r
+    else
+      se(z, i, j, k) = set_entry!(z, i, j, k)
+    end
+    for i = 1:r
+      for j = 1:c
+        se(z, i, j, arr[(i-1)*c+j])
+      end
+    end
+    return z
+  end
+
 
   function nmod_mat(n::UInt, b::fmpz_mat)
     z = new()
@@ -1413,14 +1466,14 @@ type nmod_mat <: MatElem{Residue{fmpz}}
   end
 
   function nmod_mat(n::Int, b::fmpz_mat)
-    (n < 0) && error("Modulus must be postive")
+    (n < 0) && error("Modulus must be positive")
     return nmod_mat(UInt(n), b)
   end
 
   function nmod_mat(n::fmpz, b::fmpz_mat)
-    (n < 0) && error("Modulus must be postive")
+    (n < 0) && error("Modulus must be positive")
     (n > fmpz(typemax(UInt))) &&
-          error("Exponent must be smaller then ", fmpz(typemax(UInt)))
+          error("Exponent must be smaller than ", fmpz(typemax(UInt)))
     return nmod_mat(UInt(n), b) 
   end
 end
@@ -1438,12 +1491,12 @@ end
 const FqPolyID = ObjectIdDict()
 
 type FqPolyRing <: Ring{Flint}
-   base_ring::Field
+   base_ring::FqFiniteField
    S::Symbol
 
    function FqPolyRing(R::FqFiniteField, s::Symbol)
       if haskey(FqPolyID, (R, s))
-         return FqPolyID[(R,s)]
+         return FqPolyID[(R,s)]::FqPolyRing
       else
          z = new(R,s)
          FqPolyID[(R,s)] = z
@@ -1572,12 +1625,12 @@ end
 const FqNmodPolyID = ObjectIdDict()
 
 type FqNmodPolyRing <: Ring{Flint}
-   base_ring::Field
+   base_ring::FqNmodFiniteField
    S::Symbol
 
    function FqNmodPolyRing(R::FqNmodFiniteField, s::Symbol)
       if haskey(FqNmodPolyID, (R, s))
-         return FqNmodPolyID[(R,s)]
+         return FqNmodPolyID[(R,s)]::FqNmodPolyRing
       else
          z = new(R,s)
          FqNmodPolyID[(R,s)] = z
@@ -1709,17 +1762,19 @@ type FlintPermGroup <: Group{Flint}
    n::Int
 
    function FlintPermGroup(n::Int)
-      return try
-         FlintPermID[n]
-      catch
-         FlintPermID[n] = new(n)
+      if haskey(FlintPermID, n)
+         return FlintPermID[n]::FlintPermGroup
+      else
+         z = new(n)
+         FlintPermID[n] = z
+         return z
       end
    end
 end
 
 type perm <: PermElem
    d::Array{Int, 1}
-   parent::Group
+   parent::FlintPermGroup
 
    function perm(n::Int)
       p = new(Array(Int, n))
@@ -1738,4 +1793,3 @@ type perm <: PermElem
    end
 end
 
-   

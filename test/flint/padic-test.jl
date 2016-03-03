@@ -45,6 +45,10 @@ function test_padic_manipulation()
 
    @test valuation(b) == 2
 
+   @test lift(FlintZZ, a) == 211
+
+   @test lift(FlintQQ, divexact(a, b)) == fmpq(337, 49)
+
    println("PASS")
 end
 

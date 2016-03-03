@@ -19,9 +19,11 @@ export Poly, PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow,
 #
 ###############################################################################
 
+parent_type{T}(::Type{Poly{T}}) = PolynomialRing{T}
+
 elem_type{T <: RingElem}(::PolynomialRing{T}) = Poly{T}
 
-base_ring(a::PolynomialRing) = a.base_ring
+base_ring{T}(a::PolynomialRing{T}) = a.base_ring::parent_type(T)
 
 base_ring(a::PolyElem) = base_ring(parent(a))
 
@@ -40,13 +42,13 @@ end
 #
 ###############################################################################    
 
-function hash(a::PolyElem)
-   h = 0x53dd43cd511044d1
+function Base.hash(a::PolyElem, h::UInt)
+   b = 0x53dd43cd511044d1
    for i in 0:length(a) - 1
-      h $= hash(coeff(a, i))
-      h = (h << 1) | (h >> (sizeof(Int)*8 - 1))
+      b $= hash(coeff(a, i), h) $ h
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
-   return h
+   return b
 end
 
 function normalise(a::Poly, len::Int)
@@ -64,7 +66,7 @@ length(x::PolyElem) = x.length
 
 degree(x::PolyElem) = length(x) - 1
 
-coeff(a::Poly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
+coeff{T <: RingElem}(a::Poly{T}, n::Int) = n >= length(a) ? base_ring(a)(0)::T : a.coeffs[n + 1]::T
 
 lead(a::PolyElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
 
@@ -1461,9 +1463,9 @@ function interpolate{T <: RingElem}(S::PolynomialRing, x::Array{T, 1}, y::Array{
    length(x) != length(y) && error("Array lengths don't match in interpolate")
    n = length(x)
    if n == 0
-      return S()
+      return S()::Poly{T}
    elseif n == 1
-      return S(y[1])
+      return S(y[1])::Poly{T}
    end
    R = base_ring(S)
    parent(y[1]) != R && error("Polynomial ring does not match inputs")
@@ -1483,7 +1485,7 @@ function interpolate{T <: RingElem}(S::PolynomialRing, x::Array{T, 1}, y::Array{
    newton_to_monomial!(P, x)
    r = S(P)
    set_length!(r, normalise(r, n))
-   return r
+   return r::Poly{T}
 end
 
 ###############################################################################
@@ -1757,10 +1759,10 @@ end
 #
 ###############################################################################
 
-function PolynomialRing(R::Ring, s::AbstractString{})
+function PolynomialRing(R::Ring, s::AbstractString{}; cached::Bool = true)
    S = symbol(s)
    T = elem_type(R)
-   parent_obj = PolynomialRing{T}(R, S)
+   parent_obj = PolynomialRing{T}(R, S, cached)
 
    base = base_ring(R)
    R2 = R

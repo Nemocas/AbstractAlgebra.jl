@@ -6,9 +6,6 @@ Build
 General
 -------
 
-* our hashing doesn't conform to the Julia standard and this matters for sets
-and the like.
-
 * Implement more generic ad hoc operators so we can remove all the documentation
 of ad hoc operators for other types
 
@@ -35,7 +32,7 @@ of ad hoc operators for other types
 
 * rename primpart to primitive_part
 
-* add hashing for all types
+* add hashing for all Pari and Arb types
 
 * put underscore before den and num type fields, to prevent a.num instead
   of num(a)

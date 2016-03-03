@@ -16,11 +16,15 @@ type PolynomialRing{T <: RingElem} <: Ring{Generic}
    base_ring :: Ring
    S::Symbol
 
-   function PolynomialRing(R::Ring, s::Symbol)
-      return try
-         PolyID[R, s]
-      catch
-         PolyID[R, s] = new(R, s)
+   function PolynomialRing(R::Ring, s::Symbol, cached=true)
+      if haskey(PolyID, (R, s))
+         return PolyID[R, s]::PolynomialRing{T}
+      else 
+         z = new{T}(R, s)
+         if cached
+           PolyID[R, s] = z
+         end
+         return z
       end
    end
 end
@@ -49,11 +53,15 @@ type ResidueRing{T <: RingElem} <: Ring{Generic}
    base_ring::Ring
    modulus::T
 
-   function ResidueRing(modulus::T)
-      return try
-         ModulusDict[parent(modulus), modulus]
-      catch
-         ModulusDict[parent(modulus), modulus] = new(parent(modulus), modulus)
+   function ResidueRing(modulus::T, cached=true)
+      if haskey(ModulusDict, (parent(modulus), modulus))
+         return ModulusDict[parent(modulus), modulus]::ResidueRing{T}
+      else
+         z = new{T}(parent(modulus), modulus)
+         if cached
+            ModulusDict[parent(modulus), modulus] = z
+         end
+         return z
       end
    end
 end
@@ -78,11 +86,15 @@ type PowerSeriesRing{T <: RingElem} <: Ring{Generic}
    prec_max::Int
    S::Symbol
 
-   function PowerSeriesRing(R::Ring, prec::Int, s::Symbol)
-      return try
-         PowerSeriesID[R, prec, s]
-      catch
-         PowerSeriesID[R, prec, s] = new(R, prec, s)
+   function PowerSeriesRing(R::Ring, prec::Int, s::Symbol, cached=true)
+      if haskey(PowerSeriesID, (R, prec, s))
+         return PowerSeriesID[R, prec, s]::PowerSeriesRing{T}
+      else
+         z = new{T}(R, prec, s)
+         if cached
+            PowerSeriesID[R, prec, s] = z
+         end
+         return z
       end
    end
 end
@@ -108,11 +120,15 @@ const FractionDict = ObjectIdDict()
 type FractionField{T <: RingElem} <: Field{Generic}
    base_ring::Ring
 
-   function FractionField(R::Ring)
-      return try
-         FractionDict[R]
-      catch
-         FractionDict[R] = new(R)
+   function FractionField(R::Ring, cached=true)
+      if haskey(FractionDict, R)
+         return FractionDict[R]::FractionField{T}
+      else
+         z = new{T}(R)
+         if cached
+            FractionDict[R] = z
+         end
+         return z
       end
    end
 end
@@ -139,11 +155,15 @@ type MatrixSpace{T <: RingElem} <: Ring{Generic}
    cols::Int
    base_ring::Ring
 
-   function MatrixSpace(R::Ring, r::Int, c::Int)
-      return try
-         MatrixDict[R, r, c]
-      catch
-         MatrixDict[R, r, c] = new(r, c, R)
+   function MatrixSpace(R::Ring, r::Int, c::Int, cached=true)
+      if haskey(MatrixDict, (R, r, c))
+         return MatrixDict[R, r, c]::MatrixSpace{T}
+      else
+         z = new{T}(r, c, R)
+         if cached
+            MatrixDict[R, r, c] = z
+         end
+         return z
       end
    end
 end
@@ -154,3 +174,4 @@ type Mat{T <: RingElem} <: MatElem{T}
 
    Mat(a::Array{T, 2}) = new(a) 
 end
+

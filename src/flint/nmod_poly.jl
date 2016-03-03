@@ -25,6 +25,8 @@ base_ring(R::NmodPolyRing) = R.base_ring
 
 base_ring(a::nmod_poly) = base_ring(parent(a))
 
+parent_type(::Type{nmod_poly}) = NmodPolyRing
+
 elem_type(::nmod_poly) = nmod_poly
 
 elem_type(::NmodPolyRing) = nmod_poly
@@ -47,7 +49,7 @@ degree(x::nmod_poly) = ccall((:nmod_poly_degree, :libflint), Int,
                                (Ptr{nmod_poly}, ), &x)
 
 function coeff(x::nmod_poly, n::Int)
-  (n < 0 || n > degree(x)) && throw(DomainError())
+  n < 0 && throw(DomainError())
   return base_ring(x)(ccall((:nmod_poly_get_coeff_ui, :libflint), UInt,
           (Ptr{nmod_poly}, Int), &x, n))
 end
@@ -66,14 +68,14 @@ iszero(a::nmod_poly) = Bool(ccall((:nmod_poly_is_zero, :libflint), Int32,
 
 modulus(a::nmod_poly) = a.parent._n
 
-modulus(R::NmodPolyRing) = a._n
+modulus(R::NmodPolyRing) = R._n
 
 var(R::NmodPolyRing) = R.S
 
 function deepcopy(a::nmod_poly)
   z = nmod_poly(modulus(a), a)
   z.parent = a.parent
-  return z
+  return z::nmod_poly
 end
 
 ################################################################################
@@ -300,6 +302,10 @@ function ==(x::nmod_poly, y::Residue{fmpz})
   end 
 end
 
+#CF: needs(?) to be provides as Dict and friends use this function
+#    the generic one is too slow (ie. visible in the profiler)
+isequal(x::nmod_poly, y::nmod_poly) = x == y
+
 ==(x::Residue{fmpz}, y::nmod_poly) = y == x
 
 ################################################################################
@@ -480,12 +486,12 @@ function invmod(x::nmod_poly, y::nmod_poly)
   length(y) == 0 && error("Second argument must not be 0")
   check_parent(x,y)
   if length(y) == 1 
-    return parent(x)(inv(eval(x,coeff(y,0))))
+    return parent(x)(inv(eval(x,coeff(y,0))))::nmod_poly
   end
   z = parent(x)()
   r = ccall((:nmod_poly_invmod, :libflint), Int32,
           (Ptr{nmod_poly}, Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &x, &y)
-  r == 0 ? error("Impossible inverse in invmod") : return z
+  r == 0 ? error("Impossible inverse in invmod") : return z::nmod_poly
 end
 
 function mulmod(x::nmod_poly, y::nmod_poly, z::nmod_poly)
@@ -680,13 +686,13 @@ function factor(x::nmod_poly)
   fac = nmod_poly_factor(x._mod_n)
   ccall((:nmod_poly_factor, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}), &fac, &x)
-  res = Array(Tuple{nmod_poly,Int}, fac._num)
+  res = Dict{nmod_poly,Int}()
   for i in 1:fac._num
     f = parent(x)()
     ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
     e = unsafe_load(fac.exp,i)
-    res[i] = (f, e)
+    res[f] = e
   end
   return res 
 end  
@@ -696,13 +702,13 @@ function factor_squarefree(x::nmod_poly)
   fac = nmod_poly_factor(x._mod_n)
   ccall((:nmod_poly_factor_squarefree, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}), &fac, &x)
-  res = Array(Tuple{nmod_poly,Int}, fac._num)
+  res = Dict{nmod_poly,Int}()
   for i in 1:fac._num
     f = parent(x)()
     ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
     e = unsafe_load(fac.exp,i)
-    res[i] = (f, e)
+    res[f] = e
   end
   return res 
 end  
@@ -716,39 +722,31 @@ function factor_distinct_deg(x::nmod_poly)
   ccall((:nmod_poly_factor_distinct_deg, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}, Ptr{Ptr{Int}}),
           &fac, &x, degss)
-  res = Array(Tuple{nmod_poly,Int}, fac._num)
+  res = Dict{nmod_poly,Int}()
   for i in 1:fac._num
     f = parent(x)()
     ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
-    res[i] = (f, degs[i])
+    res[f] = degs[i]        
   end
   return res 
 end  
 
-function factor_shape(x::nmod_poly)
-  res = Array(Int, degree(x))
-  res2 = Array(Int, degree(x))
-  res3 = Array(Tuple{Int, Int}, degree(x))
-  k = 1
-  fill!(res, 0)
+function factor_shape{T <: RingElem}(x::PolyElem{T})
+  res = Dict{Int, Int}()
   square_fac = factor_squarefree(x)
   for (f, i) in square_fac
     discdeg = factor_distinct_deg(f)
     for (g,j) in discdeg
-      num = div(degree(g), j)
-      res[j] += num*i
-      res2[k] = j
-      k += 1
+      num = div(degree(g), j)*i
+      if haskey(res, j)
+        res[j] += num
+      else
+        res[j] = num
+      end
     end
   end
-  resize!(res2, k - 1)
-  res2 = unique(res2)
-  resize!(res3, length(res2))
-  for j in 1:length(res2)
-    res3[j] = (res2[j], res[res2[j]])
-  end
-  return res3
+  return res
 end  
 
 ################################################################################

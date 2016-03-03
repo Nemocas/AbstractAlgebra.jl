@@ -4,26 +4,6 @@
 #
 ###############################################################################
 
-###############################################################################
-#
-#   Hashing (needed for hashing tuples)
-#
-###############################################################################
-
-function hash(a::RingElem, b::UInt)
-   h = hash(a) $ hash(b)
-   h = (h << 1) | (h >> (sizeof(Int)*8 - 1))
-   return h
-end
-
-if (@windows? true : false) && Int == Int32
-   function hash(a::Ring, b::UInt64)
-      h = hash(a) $ hash(b)
-      h = (h << 1) | (h >> (sizeof(Int)*8 - 1))
-      return h
-   end
-end
-
 function isequal(a::RingElem, b::RingElem)
    return parent(a) == parent(b) && a == b
 end

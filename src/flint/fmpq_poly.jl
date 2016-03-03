@@ -12,6 +12,8 @@ export FmpqPolyRing, fmpq_poly
 #
 ###############################################################################
 
+parent_type(::Type{fmpq_poly}) = FmpqPolyRing
+
 elem_type(::FmpqPolyRing) = fmpq_poly
 
 base_ring(a::FmpqPolyRing) = a.base_ring
@@ -386,6 +388,9 @@ function mod(x::fmpq_poly, y::fmpq_poly)
    return r
 end
 
+rem(x::fmpq_poly, y::fmpq_poly) = mod(x, y)
+
+
 function divrem(x::fmpq_poly, y::fmpq_poly)
    check_parent(x, y)
    y == 0 && throw(DivideError())
@@ -403,7 +408,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::fmpq_poly, y::fmpq_poly)
+function div(x::fmpq_poly, y::fmpq_poly)
    check_parent(x, y)
    y == 0 && throw(DivideError())
    z = parent(x)()
@@ -411,6 +416,8 @@ function divexact(x::fmpq_poly, y::fmpq_poly)
             (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq_poly}), &z, &x, &y)
    return z
 end
+
+divexact(x::fmpq_poly, y::fmpq_poly) = div(x,y)
 
 ###############################################################################
 #

@@ -15,9 +15,11 @@ export Mat, MatrixSpace, fflu!, fflu, solve_triu, is_rref,
 #
 ###############################################################################
 
+parent_type{T}(::Type{Mat{T}}) = MatrixSpace{T}
+
 elem_type{T <: RingElem}(::MatrixSpace{T}) = Mat{T}
 
-base_ring(a::MatrixSpace) = a.base_ring
+base_ring{T}(a::MatrixSpace{T}) = a.base_ring::parent_type(T)
 
 base_ring(a::MatElem) = base_ring(parent(a))
 
@@ -34,15 +36,15 @@ end
 #
 ###############################################################################    
 
-function hash(a::MatElem)
-   h = 0x3e4ea81eb31d94f4
+function Base.hash(a::MatElem, h::UInt)
+   b = 0x3e4ea81eb31d94f4
    for i in 1:rows(a)
       for j in 1:cols(a)
-         h $= hash(a[i, j])
-         h = (h << 1) | (h >> (sizeof(Int)*8 - 1))
+         b $= hash(a[i, j], h) $ h
+         b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
       end
    end
-   return h
+   return b
 end
 
 rows(a::MatElem) = parent(a).rows
@@ -2433,9 +2435,9 @@ end
 #
 ###############################################################################
 
-function MatrixSpace(R::Ring, r::Int, c::Int)
+function MatrixSpace(R::Ring, r::Int, c::Int; cached=true)
    T = elem_type(R)
-   return MatrixSpace{T}(R, r, c)
+   return MatrixSpace{T}(R, r, c, cached)
 end
 
 function typed_hvcat(R::Ring, dims, d...)

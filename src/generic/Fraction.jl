@@ -12,9 +12,11 @@ export FractionField, Fraction, num, den
 #
 ###############################################################################
 
+parent_type{T}(::Type{Fraction{T}}) = FractionField{T}
+
 elem_type{T <: RingElem}(::FractionField{T}) = Fraction{T}
 
-base_ring(a::FractionField) = a.base_ring
+base_ring{T}(a::FractionField{T}) = a.base_ring::parent_type(T)
 
 base_ring(a::FractionElem) = base_ring(parent(a))
 
@@ -59,9 +61,9 @@ end
 #
 ###############################################################################
 
-function hash(a::FractionElem)
-   h = 0x8a30b0d963237dd5
-   return h $ hash(num(a)) $ hash(den(a))
+function Base.hash(a::FractionElem, h::UInt)
+   b = 0x8a30b0d963237dd5
+   return b $ hash(num(a), h) $ hash(den(a), h) $ h
 end
 
 function num(a::Fraction)
@@ -334,7 +336,7 @@ function divexact{T <: RingElem}(a::Fraction{T}, b::Integer)
    g = gcd(num(a), c)
    n = divexact(num(a), g)
    d = den(a)*divexact(c, g)
-   return parent(a)(n, d)
+   return parent(a)(n, d)::Fraction{T}
 end
 
 function divexact{T <: RingElem}(a::Integer, b::Fraction{T})
@@ -343,7 +345,7 @@ function divexact{T <: RingElem}(a::Integer, b::Fraction{T})
    g = gcd(num(b), c)
    n = den(b)*divexact(c, g)
    d = divexact(num(b), g)
-   return parent(b)(n, d)
+   return parent(b)(n, d)::Fraction{T}
 end
 
 # remove ambiguity
@@ -357,7 +359,7 @@ function divexact{T <: RingElem}(a::Fraction{T}, b::T)
    g = gcd(num(a), b)
    n = divexact(num(a), g)
    d = den(a)*divexact(b, g)
-   return parent(a)(n, d)
+   return parent(a)(n, d)::Fraction{T}
 end
 
 function divexact{T <: RingElem}(a::T, b::Fraction{T})
@@ -365,7 +367,7 @@ function divexact{T <: RingElem}(a::T, b::Fraction{T})
    g = gcd(num(b), a)
    n = den(b)*divexact(a, g)
    d = divexact(num(b), g)
-   return parent(b)(n, d)
+   return parent(b)(n, d)::Fraction{T}
 end
 
 ###############################################################################
@@ -495,7 +497,7 @@ end
 #
 ###############################################################################
 
-function FractionField(R::Ring)
+function FractionField(R::Ring; cached=true)
    R2 = R
    T = elem_type(R)
    parent_type = Fraction{T}
@@ -505,6 +507,6 @@ function FractionField(R::Ring)
       eval(:(Base.promote_rule(::Type{$parent_type}, ::Type{$T2}) = $parent_type))
    end
 
-   return FractionField{T}(R)
+   return FractionField{T}(R, cached)
 end
 

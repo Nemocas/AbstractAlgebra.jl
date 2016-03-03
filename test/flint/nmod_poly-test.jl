@@ -130,7 +130,7 @@ function test_nmod_poly_unary_ops()
 end
  
 function test_nmod_poly_binary_ops()
-  print("nmod_poly.binar_ops...")
+  print("nmod_poly.binary_ops...")
 
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
@@ -554,7 +554,6 @@ function test_nmod_poly_inflate()
   println("PASS")
 end
 
-
 function test_nmod_poly_deflate()
   print("nmod_poly.deflate...")
   
@@ -634,28 +633,30 @@ function test_nmod_poly_factor()
 
   p = Rx(1)
 
-  for i in 1:length(fac)
-    p *= fac[i][1]^fac[i][2]
+  for (g, e) in fac
+    p *= g^e
   end
 
   @test f == p
 
   sh = factor_shape(f)
 
-  @test Set(sh) == Set([(36,1),(1,1),(4,1),(19,1)])
+  @test sh == Dict(36=>1,1=>1,4=>1,19=>1)
 
   f = (x^6 + x^4 + 2 *x^2 )^10 
 
   fac = factor_squarefree(f)
 
-  @test Set(fac) == Set([(x^4+x^2+2,10), (x,20)])
+  @test fac == Dict(x^4+x^2+2=>10, x=>20)
 
   @test_throws ErrorException factor_distinct_deg(f)
 
   fac = factor_distinct_deg(x^6 + x^4 + 2*x^2+2)
 
   @test length(fac) == 1
-  @test fac[1] == (x^6+x^4+2*x^2 + 2, 2)
+  k = first(keys(fac))
+  @test k == x^6+x^4+2*x^2 + 2
+  @test fac[k] == 2
 
   println("PASS")
 end

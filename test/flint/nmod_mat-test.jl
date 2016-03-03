@@ -382,7 +382,7 @@ function test_nmod_mat_row_echelon_form()
 end
 
 function test_nmod_mat_howell_form()
-  print("nmod_mat.row_echelon_form...")
+  print("nmod_mat.howell_form...")
 
   Z17 = ResidueRing(ZZ, 12)
   R = MatrixSpace(Z17, 3, 3)
@@ -398,6 +398,8 @@ function test_nmod_mat_howell_form()
   @test howell_form(a) == c
   @test howell_form(b) == c
   @test strong_echelon_form(d) == R([4 0 0; 0 0 0; 0 0 1])
+
+  println("PASS")
 end
 
 function test_nmod_mat_trace_determinant()
