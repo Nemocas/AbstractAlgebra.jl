@@ -35,6 +35,28 @@ function check_parent(x::nmod_poly, y::nmod_poly)
   parent(x) != parent(y) && error("Parents must coincide")
   nothing
 end
+################################################################################
+#
+#  Basic helper
+#
+################################################################################
+
+function lead_is_unit(a::nmod_poly)
+  d = degree(a)
+  u = ccall((:nmod_poly_get_coeff_ui, :libflint), UInt, (Ptr{nmod_poly}, Int), &a, d)
+  n = ccall((:n_gcd, :libflint), UInt, (UInt, UInt), u, modulus(a))
+  return n==1
+end
+
+function Base.hash(a::nmod_poly, h::UInt)
+   b = 0x53dd43cd511044d1
+   for i in 0:length(a) - 1
+      u = ccall((:nmod_poly_get_coeff_ui, :libflint), UInt, (Ptr{nmod_poly}, Int), &a, i)
+      b $= hash(u, h) $ h
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+   end
+   return b
+end
 
 ################################################################################
 #
@@ -379,8 +401,7 @@ end
 function divexact(x::nmod_poly, y::nmod_poly)
   check_parent(x, y)
   iszero(y) && throw(DivideError())
-  d = gcd(data(lead(y)), fmpz(modulus(x)))
-  d != 1 && error("Impossible inverse in divexact")
+  !lead_is_unit(y) && error("Impossible inverse in divexact")
   z = parent(x)()
   ccall((:nmod_poly_div, :libflint), Void, 
           (Ptr{nmod_poly}, Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &x, &y)
@@ -408,8 +429,7 @@ end
 function divrem(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
   iszero(y) && throw(DivideError())
-  g = gcd(data(lead(y)), fmpz(modulus(x)))
-  g != 1 && error("Impossible inverse in divrem") 
+  !lead_is_unit(y) && error("Impossible inverse in divrem")
   q = parent(x)()
   r = parent(x)()
   ccall((:nmod_poly_divrem, :libflint), Void,
@@ -427,8 +447,7 @@ end
 function rem(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
   iszero(y) && throw(DivideError()) 
-  g = gcd(data(lead(y)), fmpz(modulus(x)))
-  g != 1 && error("Impossible inverse in rem") 
+  !lead_is_unit(y) && error("Impossible inverse in rem")
   z = parent(x)()
   ccall((:nmod_poly_rem, :libflint), Void,
           (Ptr{nmod_poly}, Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &x, &y)

@@ -32,6 +32,13 @@ type fmpz <: IntegerRingElem
         return z
     end
 
+    function fmpz(x::UInt)
+        z = new()
+        ccall((:fmpz_init_set_ui, :libflint), Void, (Ptr{fmpz}, UInt), &z, x)
+        finalizer(z, _fmpz_clear_fn)
+        return z
+    end
+
     function fmpz(x::BigInt)
         z = new()
         ccall((:fmpz_init, :libflint), Void, (Ptr{fmpz},), &z)
