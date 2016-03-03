@@ -68,7 +68,7 @@ end
 
 type Residue{T <: RingElem} <: ResidueElem{T}
    data::T
-   parent::ResidueRing
+   parent::ResidueRing{T}
 
    Residue(a::T) = new(a)
 end
