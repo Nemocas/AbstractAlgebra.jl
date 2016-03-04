@@ -1340,7 +1340,7 @@ type NmodMatSpace <: Ring{Flint}
 
   function NmodMatSpace(R::ResidueRing{fmpz}, r::Int, c::Int)
     (r < 0 || c < 0) && error(error_dim_non_negative)
-    R.modulus > typemax(Uint) && 
+    R.modulus > typemax(UInt) && 
       error("Modulus of ResidueRing must less then ", fmpz(typemax(UInt)))
     if haskey(NmodMatID, (R, r, c))
       return NmodMatID[R, r, c]::NmodMatSpace
