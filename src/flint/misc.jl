@@ -21,9 +21,10 @@ function hash_integer(a::fmpz, h::UInt)  ## cloned from the BigInt function
 end
 
 function hash(a::fmpz, h::UInt)
-  pow = trailing_zeros(a)
-  h = Base.hash_uint(unsigned(pow) $ h) $ h
-  h = hash_integer(a>>pow, h)
+#  pow = trailing_zeros(a)
+#  h = Base.hash_uint(unsigned(pow) $ h) $ h
+#  h = hash_integer(a>>pow, h)
+  h = hash_integer(a, h)
   return h
 end
 
