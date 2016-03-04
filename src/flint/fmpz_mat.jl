@@ -899,7 +899,11 @@ function Base.call{T <: Integer}(a::FmpzMatSpace, arr::Array{T, 2})
    return z
 end
 
-Base.call(a::FmpzMatSpace, arr::Array{fmpz, 1}) = a(arr'')
+function Base.call(a::FmpzMatSpace, arr::Array{fmpz, 1})
+   z = fmpz_mat(a.rows, a.cols, arr)
+   z.parent = a
+   return z
+end
 
 Base.call{T <: Integer}(a::FmpzMatSpace, arr::Array{T, 1}) = a(arr'')
 

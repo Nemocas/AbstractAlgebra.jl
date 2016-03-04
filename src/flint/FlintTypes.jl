@@ -1280,6 +1280,22 @@ type fmpz_mat <: MatElem{fmpz}
       return z
    end
 
+   function fmpz_mat(r::Int, c::Int, arr::Array{fmpz, 1})
+      z = new()
+      ccall((:fmpz_mat_init, :libflint), Void, 
+            (Ptr{fmpz_mat}, Int, Int), &z, r, c)
+      finalizer(z, _fmpz_mat_clear_fn)
+      for i = 1:r
+         for j = 1:c
+            el = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
+                       (Ptr{fmpz_mat}, Int, Int), &z, i - 1, j - 1)
+            ccall((:fmpz_set, :libflint), Void,
+                  (Ptr{fmpz}, Ptr{fmpz}), el, &arr[(i-1)*c+j])
+         end
+      end
+      return z
+   end
+
    function fmpz_mat{T <: Integer}(r::Int, c::Int, arr::Array{T, 2})
       z = new()
       ccall((:fmpz_mat_init, :libflint), Void, 
