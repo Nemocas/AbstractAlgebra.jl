@@ -369,7 +369,7 @@ type nmod_poly <: PolyElem{Residue{fmpz}}
       ccall((:nmod_poly_init2, :libflint), Void,
             (Ptr{nmod_poly}, UInt, Int), &z, n, length(arr))
       for i in 1:length(arr)
-         tt = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &arr[i])
+         tt = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &arr[i], n)
          ccall((:nmod_poly_set_coeff_ui, :libflint), Void,
               (Ptr{nmod_poly}, Int, UInt), &z, i - 1, tt)
       end
@@ -394,7 +394,7 @@ type nmod_poly <: PolyElem{Residue{fmpz}}
       ccall((:nmod_poly_init2, :libflint), Void,
             (Ptr{nmod_poly}, UInt, Int), &z, n, length(arr))
       for i in 1:length(arr)
-         tt = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &(arr[i]).data)
+         tt = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &(arr[i]).data, n)
          ccall((:nmod_poly_set_coeff_ui, :libflint), Void,
               (Ptr{nmod_poly}, Int, UInt), &z, i-1, tt)
       end
@@ -428,7 +428,7 @@ function _nmod_poly_clear_fn(x::nmod_poly)
 end
 
 type nmod_poly_factor
-  poly::Ptr{nmod_poly}
+  poly::Ptr{nmod_poly}  #actually wrong: it is an array of flint-nmod_poly
   exp::Ptr{Int} 
   _num::Int
   _alloc::Int
