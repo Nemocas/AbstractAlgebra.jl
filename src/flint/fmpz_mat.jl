@@ -691,6 +691,25 @@ end
 ###############################################################################
 
 function nullspace(x::fmpz_mat)
+  H, T = hnf_with_transform(x')
+  for i = rows(H):-1:1
+    for j = 1:cols(H)
+      if !iszero(H[i,j])
+        N = MatrixSpace(FlintZZ, cols(x), rows(H)-i)()
+        for k = 1:rows(N)
+          for l = 1:cols(N)
+            N[k,l] = T[rows(T)-l+1, k]
+          end
+        end
+        return N, cols(N)
+      end
+    end
+  end
+  return MatrixSpace(FlintZZ, cols(x), 0)(), 0
+end
+
+function nullspace_over_Q(x::fmpz_mat)  # will only find a Q-basis for the nullspace
+                                        # NOT a Z-basis
    z = parent(x)()
    if rows(x) == cols(x)
       parz = parent(x)
