@@ -809,11 +809,11 @@ end
 
 function setcoeff!(x::nmod_poly, n::Int, y::Int)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
-                   (Ptr{nmod_poly}, Int, UInt), &x, n, mod(y, x._n))
+                   (Ptr{nmod_poly}, Int, UInt), &x, n, mod(y, x._mod_n))
 end
   
 function setcoeff!(x::nmod_poly, n::Int, y::fmpz)
-  r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), y, x._n)
+  r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), y, x._mod_n)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{nmod_poly}, Int, UInt), &x, n, r)
 end
