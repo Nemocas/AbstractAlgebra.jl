@@ -122,7 +122,7 @@ end
 function show(io::IO, a::fmpq)
    print(io, num(a))
    if den(a) != 1
-      print("//", den(a))
+      print(io, "//", den(a))
    end
 end
 
