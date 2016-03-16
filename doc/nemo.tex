@@ -5048,7 +5048,7 @@ end
 
 \subsubsection{Ad hoc comparison operators}
 
-We overload the comparison operators to more easily deal with values of type \code{Int}.
+We overload the comparison operators to more easily deal with values of type \code{Int} and \code{UInt}.
 
 \begin{lstlisting}
 ==(a::fmpz, b::Int)
@@ -5063,6 +5063,19 @@ We overload the comparison operators to more easily deal with values of type \co
 >=(a::Int, b::fmpz)
 \end{lstlisting}
 
+\begin{lstlisting}
+==(a::fmpz, b::UInt)
+==(a::UInt, b::fmpz)
+>(a::fmpz, b::UInt)
+>(a::UInt, b::fmpz)
+<(a::fmpz, b::UInt)
+<(a::UInt, b::fmpz)
+<=(a::fmpz, b::UInt)
+<=(a::UInt, b::fmpz)
+>=(a::fmpz, b::UInt)
+>=(a::UInt, b::fmpz)
+\end{lstlisting}
+
 \textbf{Examples.}
 
 Here are some examples of the ad hoc comparison operators.
@@ -5070,7 +5083,7 @@ Here are some examples of the ad hoc comparison operators.
 \begin{lstlisting}
 a = fmpz(-12)
 
-if a < 7
+if a < UInt(7)
    println("a < 7")
 end
 

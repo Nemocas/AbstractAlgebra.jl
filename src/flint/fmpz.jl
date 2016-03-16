@@ -600,6 +600,30 @@ end
 
 >(x::Int, y::fmpz) = cmp(y,x) < 0
 
+function cmp(x::fmpz, y::UInt)
+    Int(ccall((:fmpz_cmp_ui, :libflint), Cint, (Ptr{fmpz}, UInt), &x, y))
+end
+
+==(x::fmpz, y::UInt) = cmp(x,y) == 0
+
+<=(x::fmpz, y::UInt) = cmp(x,y) <= 0
+
+>=(x::fmpz, y::UInt) = cmp(x,y) >= 0
+
+<(x::fmpz, y::UInt) = cmp(x,y) < 0
+
+>(x::fmpz, y::UInt) = cmp(x,y) > 0
+
+==(x::UInt, y::fmpz) = cmp(y,x) == 0
+
+<=(x::UInt, y::fmpz) = cmp(y,x) >= 0
+
+>=(x::UInt, y::fmpz) = cmp(y,x) <= 0
+
+<(x::UInt, y::fmpz) = cmp(y,x) > 0
+
+>(x::UInt, y::fmpz) = cmp(y,x) < 0
+
 ###############################################################################
 #
 #   Bit fiddling
