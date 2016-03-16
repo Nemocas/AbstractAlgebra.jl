@@ -282,10 +282,10 @@ end
 ###############################################################################
 
 function rem(x::fmpz, c::Int)
-   c < 0 && throw(DomainError())
-   c == 0 && throw(DivideError())
-   r = ccall((:fmpz_tdiv_ui, :libflint), Int, (Ptr{fmpz}, Int), &x, c)
-   return sign(x) < 0 ? -r : r
+    c < 0 && throw(DomainError())
+    c == 0 && throw(DivideError())
+    r = ccall((:fmpz_tdiv_ui, :libflint), Int, (Ptr{fmpz}, Int), &x, c)
+    return sign(x) < 0 ? -r : r
 end
 
 function tdivpow2(x::fmpz, c::Int)
