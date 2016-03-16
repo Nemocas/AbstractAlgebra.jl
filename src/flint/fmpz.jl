@@ -1030,11 +1030,13 @@ function convert(::Type{BigInt}, a::fmpz)
 end
 
 function convert(::Type{Int}, a::fmpz) 
+   (a > typemax(Int) || a < typemin(Int)) && throw(InexactError())
    return ccall((:fmpz_get_si, :libflint), Int, (Ptr{fmpz},), &a)
 end
 
-function convert(::Type{UInt}, x::fmpz)
-   return ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &x)
+function convert(::Type{UInt}, a::fmpz)
+   (a > typemax(UInt) || a < 0) && throw(InexactError())
+   return ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &a)
 end
 
 function convert(::Type{Float64}, n::fmpz)
