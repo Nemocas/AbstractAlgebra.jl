@@ -282,10 +282,10 @@ end
 ###############################################################################
 
 function rem(x::fmpz, c::Int)
-   c < 0 && throw(DomainError())
-   c == 0 && throw(DivideError())
-   r = ccall((:fmpz_tdiv_ui, :libflint), Int, (Ptr{fmpz}, Int), &x, c)
-   return sign(x) < 0 ? -r : r
+    c < 0 && throw(DomainError())
+    c == 0 && throw(DivideError())
+    r = ccall((:fmpz_tdiv_ui, :libflint), Int, (Ptr{fmpz}, Int), &x, c)
+    return sign(x) < 0 ? -r : r
 end
 
 function tdivpow2(x::fmpz, c::Int)
@@ -599,6 +599,30 @@ end
 <(x::Int, y::fmpz) = cmp(y,x) > 0
 
 >(x::Int, y::fmpz) = cmp(y,x) < 0
+
+function cmp(x::fmpz, y::UInt)
+    Int(ccall((:fmpz_cmp_ui, :libflint), Cint, (Ptr{fmpz}, UInt), &x, y))
+end
+
+==(x::fmpz, y::UInt) = cmp(x,y) == 0
+
+<=(x::fmpz, y::UInt) = cmp(x,y) <= 0
+
+>=(x::fmpz, y::UInt) = cmp(x,y) >= 0
+
+<(x::fmpz, y::UInt) = cmp(x,y) < 0
+
+>(x::fmpz, y::UInt) = cmp(x,y) > 0
+
+==(x::UInt, y::fmpz) = cmp(y,x) == 0
+
+<=(x::UInt, y::fmpz) = cmp(y,x) >= 0
+
+>=(x::UInt, y::fmpz) = cmp(y,x) <= 0
+
+<(x::UInt, y::fmpz) = cmp(y,x) > 0
+
+>(x::UInt, y::fmpz) = cmp(y,x) < 0
 
 ###############################################################################
 #
@@ -1006,11 +1030,13 @@ function convert(::Type{BigInt}, a::fmpz)
 end
 
 function convert(::Type{Int}, a::fmpz) 
+   (a > typemax(Int) || a < typemin(Int)) && throw(InexactError())
    return ccall((:fmpz_get_si, :libflint), Int, (Ptr{fmpz},), &a)
 end
 
-function convert(::Type{UInt}, x::fmpz)
-   return ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &x)
+function convert(::Type{UInt}, a::fmpz)
+   (a > typemax(UInt) || a < 0) && throw(InexactError())
+   return ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &a)
 end
 
 function convert(::Type{Float64}, n::fmpz)
