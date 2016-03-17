@@ -778,7 +778,7 @@ end
 
 ################################################################################
 #
-# Valuation
+#   Valuation
 #
 ################################################################################
 
@@ -791,8 +791,8 @@ function valuation(z::nmod_poly, p::nmod_poly)
     v += 1
   end
   return v, z
-end 
-  
+end
+
 ################################################################################
 #
 #  Speedups for rings over nmod_poly
@@ -806,7 +806,7 @@ function determinant(M::Mat{nmod_poly})
    catch
       return determinant_df(M)
    end
-end 
+end
 
 ################################################################################
 #
@@ -870,7 +870,6 @@ function mul!(z::nmod_poly, x::nmod_poly, y::UInt)
             (Ptr{nmod_poly}, Ptr{nmod_poly}, UInt), &z, &x, y)
   return z
 end
-
 
 ################################################################################
 #
