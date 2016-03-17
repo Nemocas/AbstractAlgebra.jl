@@ -11,7 +11,7 @@ export NmodPolyRing, nmod_poly, parent, base_ring, elem_type, length, zero,
        isirreducible, issquarefree, factor, factor_squarefree,
        factor_distinct_deg, factor_shape, setcoeff!, canonical_unit,
        add!, sub!, mul!, call, PolynomialRing, check_parent, gcdx, mod,
-       invmod, gcdinv, mulmod, powmod, zero!, one!
+       invmod, gcdinv, mulmod, powmod, zero!, one!, valuation
 
 ################################################################################
 #
@@ -105,7 +105,7 @@ var(R::NmodPolyRing) = R.S
 function deepcopy(a::nmod_poly)
   z = nmod_poly(modulus(a), a)
   z.parent = a.parent
-  return z
+  return z::nmod_poly
 end
 
 ################################################################################
@@ -332,8 +332,6 @@ function ==(x::nmod_poly, y::Residue{fmpz})
   end 
 end
 
-#CF: needs(?) to be provides as Dict and friends use this function
-#    the generic one is too slow (ie. visible in the profiler)
 isequal(x::nmod_poly, y::nmod_poly) = x == y
 
 ==(x::Residue{fmpz}, y::nmod_poly) = y == x
@@ -428,6 +426,8 @@ function divexact(x::nmod_poly, y::Residue{fmpz})
   return divexact(x, parent(x)(y))
 end
 
+div(x::nmod_poly, y::nmod_poly) = divexact(x,y)
+
 ################################################################################
 #
 #  Division with remainder
@@ -513,12 +513,12 @@ function invmod(x::nmod_poly, y::nmod_poly)
   length(y) == 0 && error("Second argument must not be 0")
   check_parent(x,y)
   if length(y) == 1 
-    return parent(x)(inv(eval(x,coeff(y,0))))
+    return parent(x)(inv(eval(x,coeff(y,0))))::nmod_poly
   end
   z = parent(x)()
   r = ccall((:nmod_poly_invmod, :libflint), Int32,
           (Ptr{nmod_poly}, Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &x, &y)
-  r == 0 ? error("Impossible inverse in invmod") : return z
+  r == 0 ? error("Impossible inverse in invmod") : return z::nmod_poly
 end
 
 function mulmod(x::nmod_poly, y::nmod_poly, z::nmod_poly)
@@ -778,6 +778,23 @@ end
 
 ################################################################################
 #
+# Valuation
+#
+################################################################################
+
+function valuation(z::nmod_poly, p::nmod_poly)
+  check_parent(z,p)
+  z == 0 && error("Not yet implemented")
+  v = 0
+  while mod(z, p) == 0
+    z = div(z, p)
+    v += 1
+  end
+  return v, z
+end 
+  
+################################################################################
+#
 #  Speedups for rings over nmod_poly
 #
 ################################################################################
@@ -813,7 +830,7 @@ function setcoeff!(x::nmod_poly, n::Int, y::Int)
 end
   
 function setcoeff!(x::nmod_poly, n::Int, y::fmpz)
-  r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), y, x._mod_n)
+  r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &y, x._mod_n)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{nmod_poly}, Int, UInt), &x, n, r)
 end
