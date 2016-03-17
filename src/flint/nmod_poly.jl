@@ -11,7 +11,7 @@ export NmodPolyRing, nmod_poly, parent, base_ring, elem_type, length, zero,
        isirreducible, issquarefree, factor, factor_squarefree,
        factor_distinct_deg, factor_shape, setcoeff!, canonical_unit,
        add!, sub!, mul!, call, PolynomialRing, check_parent, gcdx, mod,
-       invmod, gcdinv, mulmod, powmod
+       invmod, gcdinv, mulmod, powmod, zero!, one!
 
 ################################################################################
 #
@@ -35,6 +35,28 @@ function check_parent(x::nmod_poly, y::nmod_poly)
   parent(x) != parent(y) && error("Parents must coincide")
   nothing
 end
+################################################################################
+#
+#  Basic helper
+#
+################################################################################
+
+function lead_is_unit(a::nmod_poly)
+  d = degree(a)
+  u = ccall((:nmod_poly_get_coeff_ui, :libflint), UInt, (Ptr{nmod_poly}, Int), &a, d)
+  n = ccall((:n_gcd, :libflint), UInt, (UInt, UInt), u, modulus(a))
+  return n==1
+end
+
+function Base.hash(a::nmod_poly, h::UInt)
+   b = 0x53dd43cd511044d1
+   for i in 0:length(a) - 1
+      u = ccall((:nmod_poly_get_coeff_ui, :libflint), UInt, (Ptr{nmod_poly}, Int), &a, i)
+      b $= hash(u, h) $ h
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+   end
+   return b
+end
 
 ################################################################################
 #
@@ -52,6 +74,14 @@ function coeff(x::nmod_poly, n::Int)
   n < 0 && throw(DomainError())
   return base_ring(x)(ccall((:nmod_poly_get_coeff_ui, :libflint), UInt,
           (Ptr{nmod_poly}, Int), &x, n))
+end
+
+function zero!(a::nmod_poly)
+  ccall((:nmod_poly_zero, :libflint), Void, (Ptr{nmod_poly}, ), &a)
+end
+
+function one!(a::nmod_poly)
+  ccall((:nmod_poly_one, :libflint), Void, (Ptr{nmod_poly}, ), &a)
 end
 
 zero(R::NmodPolyRing) = R(UInt(0))
@@ -379,8 +409,7 @@ end
 function divexact(x::nmod_poly, y::nmod_poly)
   check_parent(x, y)
   iszero(y) && throw(DivideError())
-  d = gcd(data(lead(y)), fmpz(modulus(x)))
-  d != 1 && error("Impossible inverse in divexact")
+  !lead_is_unit(y) && error("Impossible inverse in divexact")
   z = parent(x)()
   ccall((:nmod_poly_div, :libflint), Void, 
           (Ptr{nmod_poly}, Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &x, &y)
@@ -408,8 +437,7 @@ end
 function divrem(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
   iszero(y) && throw(DivideError())
-  g = gcd(data(lead(y)), fmpz(modulus(x)))
-  g != 1 && error("Impossible inverse in divrem") 
+  !lead_is_unit(y) && error("Impossible inverse in divrem")
   q = parent(x)()
   r = parent(x)()
   ccall((:nmod_poly_divrem, :libflint), Void,
@@ -427,8 +455,7 @@ end
 function rem(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
   iszero(y) && throw(DivideError()) 
-  g = gcd(data(lead(y)), fmpz(modulus(x)))
-  g != 1 && error("Impossible inverse in rem") 
+  !lead_is_unit(y) && error("Impossible inverse in rem")
   z = parent(x)()
   ccall((:nmod_poly_rem, :libflint), Void,
           (Ptr{nmod_poly}, Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &x, &y)
@@ -782,11 +809,11 @@ end
 
 function setcoeff!(x::nmod_poly, n::Int, y::Int)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
-                   (Ptr{nmod_poly}, Int, UInt), &x, n, mod(y, x._n))
+                   (Ptr{nmod_poly}, Int, UInt), &x, n, mod(y, x._mod_n))
 end
   
 function setcoeff!(x::nmod_poly, n::Int, y::fmpz)
-  r = ccall((:fmpz_mod_ui, :libflint), UInt, (Ptr{fmpz}, UInt), (y, x._n))
+  r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), y, x._mod_n)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{nmod_poly}, Int, UInt), &x, n, r)
 end
@@ -794,28 +821,39 @@ end
 setcoeff!(x::nmod_poly, n::Int, y::Integer) = setcoeff!(x, n, fmpz(y))
   
 function setcoeff!(x::nmod_poly, n::Int, y::Residue{fmpz})
-  setcoeff!(x, n, UInt(y.data))
+  setcoeff!(x, n, y.data)
 end
 
 function add!(z::nmod_poly, x::nmod_poly, y::nmod_poly)
   ccall((:nmod_poly_add, :libflint), Void, 
           (Ptr{nmod_poly}, Ptr{nmod_poly},  Ptr{nmod_poly}), &z, &x, &y)
+  return z        
 end
 
 function addeq!(z::nmod_poly, y::nmod_poly)
   ccall((:nmod_poly_add, :libflint), Void, 
           (Ptr{nmod_poly}, Ptr{nmod_poly},  Ptr{nmod_poly}), &z, &z, &y)
+  return z        
 end
 
 function sub!(z::nmod_poly, x::nmod_poly, y::nmod_poly)
   ccall((:nmod_poly_sub, :libflint), Void, 
           (Ptr{nmod_poly}, Ptr{nmod_poly},  Ptr{nmod_poly}), &z, &x, &y)
+  return z        
 end
 
 function mul!(z::nmod_poly, x::nmod_poly, y::nmod_poly)
   ccall((:nmod_poly_mul, :libflint), Void, 
           (Ptr{nmod_poly}, Ptr{nmod_poly},  Ptr{nmod_poly}), &z, &x, &y)
+  return z        
 end
+
+function mul!(z::nmod_poly, x::nmod_poly, y::UInt)
+  ccall((:nmod_poly_scalar_mul_nmod, :libflint), Void,
+            (Ptr{nmod_poly}, Ptr{nmod_poly}, UInt), &z, &x, y)
+  return z
+end
+
 
 ################################################################################
 #

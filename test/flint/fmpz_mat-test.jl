@@ -369,14 +369,15 @@ function test_fmpz_mat_nullspace()
    print("fmpz_mat.nullspace...")
 
    S = MatrixSpace(ZZ, 3, 3)
+   T = MatrixSpace(ZZ, 3, 1)
 
    A = S([fmpz(2) 3 5; 1 4 7; 4 1 1])
    
-   @test nullspace(A) == (S([-1 0 0; 9 0 0; -5 0 0]), 1)
+   @test nullspace(A) == (T([1; -9; 5]), 1)
 
    N, r = nullspace(A)
 
-   A*N == zero(S)
+   @test iszero(A*N)
 
    println("PASS")
 end
