@@ -633,24 +633,28 @@ function Base.call(a::NmodMatSpace, b::Residue{fmpz})
 end
 
 function Base.call(a::NmodMatSpace, arr::Array{BigInt, 2}, transpose::Bool = false)
+  _check_dim(a.rows, a.cols, arr, transpose)
   z = nmod_mat(a.rows, a.cols, a._n, arr, transpose)
   z.parent = a
   return z
 end
 
 function Base.call(a::NmodMatSpace, arr::Array{fmpz, 2}, transpose::Bool = false)
+  _check_dim(a.rows, a.cols, arr, transpose)
   z = nmod_mat(a.rows, a.cols, a._n, arr, transpose)
   z.parent = a
   return z
 end
 
 function Base.call(a::NmodMatSpace, arr::Array{Int, 2}, transpose::Bool = false)
+  _check_dim(a.rows, a.cols, arr, transpose)
   z = nmod_mat(a.rows, a.cols, a._n, arr, transpose)
   z.parent = a
   return z
 end
 
 function Base.call(a::NmodMatSpace, arr::Array{Residue{fmpz}, 2}, transpose::Bool = false)
+  _check_dim(a.rows, a.cols, arr, transpose)
   length(arr) == 0 && error("Array must be nonempty")
   (base_ring(a) != parent(arr[1])) && error("Elements must have same base ring")
   z = nmod_mat(a.rows, a.cols, a._n, arr, transpose)

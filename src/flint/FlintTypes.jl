@@ -1346,7 +1346,7 @@ end
 ###############################################################################
 
 const NmodMatID = ObjectIdDict()
-const error_dim_non_negative = "Dimensions must be non-negative"
+
 
 type NmodMatSpace <: Ring{Flint}
   base_ring::ResidueRing{fmpz}
@@ -1355,7 +1355,7 @@ type NmodMatSpace <: Ring{Flint}
   cols::Int
 
   function NmodMatSpace(R::ResidueRing{fmpz}, r::Int, c::Int)
-    (r < 0 || c < 0) && error(error_dim_non_negative)
+    (r < 0 || c < 0) && throw(error_dim_negative)
     R.modulus > typemax(UInt) && 
       error("Modulus of ResidueRing must less then ", fmpz(typemax(UInt)))
     if haskey(NmodMatID, (R, r, c))
@@ -1369,7 +1369,7 @@ type NmodMatSpace <: Ring{Flint}
 end
 
 function _check_dim{T}(r::Int, c::Int, arr::Array{T, 2}, transpose::Bool)
-  (r < 0 || c < 0) && error(error_dim_non_negative)
+  (r < 0 || c < 0) && throw(error_dim_negative)
   (size(arr) != (transpose ? (c,r) : (r,c))) && error("Array of wrong dimension")
 end
 
@@ -1384,7 +1384,6 @@ type nmod_mat <: MatElem{Residue{fmpz}}
   parent::NmodMatSpace
 
   function nmod_mat(r::Int, c::Int, n::UInt)
-    (r < 0 || c < 0) && error(error_dim_non_negative)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
@@ -1413,7 +1412,6 @@ type nmod_mat <: MatElem{Residue{fmpz}}
   end
 
   function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{fmpz, 2}, transpose::Bool = false)
-    _check_dim(r, c, arr, transpose)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
@@ -1438,7 +1436,6 @@ type nmod_mat <: MatElem{Residue{fmpz}}
   end
 
   function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{Residue{fmpz}, 2}, transpose::Bool = false)
-    _check_dim(r, c, arr, transpose)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
@@ -1458,7 +1455,6 @@ type nmod_mat <: MatElem{Residue{fmpz}}
   end
 
   function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{Residue{fmpz}, 1}, transpose::Bool = false)
-    (r<0 || c<0 || r*c != length(arr)) && error(error_dim_non_negative)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
@@ -1476,7 +1472,6 @@ type nmod_mat <: MatElem{Residue{fmpz}}
     end
     return z
   end
-
 
   function nmod_mat(n::UInt, b::fmpz_mat)
     z = new()
