@@ -45,7 +45,7 @@ end
 ###############################################################################    
    
 function Base.hash(a::SeriesElem, h::UInt)
-   b = 0xb44d6896204881f3
+   b = 0xb44d6896204881f3%UInt
    for i in 0:length(a) - 1
       b $= hash(coeff(a, i), h) $ h
       b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
