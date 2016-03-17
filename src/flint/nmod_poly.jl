@@ -35,9 +35,10 @@ function check_parent(x::nmod_poly, y::nmod_poly)
   parent(x) != parent(y) && error("Parents must coincide")
   nothing
 end
+
 ################################################################################
 #
-#  Basic helper
+#   Basic helper
 #
 ################################################################################
 
@@ -49,7 +50,7 @@ function lead_is_unit(a::nmod_poly)
 end
 
 function Base.hash(a::nmod_poly, h::UInt)
-   b = 0x53dd43cd511044d1
+   b = 0x53dd43cd511044d1%UInt
    for i in 0:length(a) - 1
       u = ccall((:nmod_poly_get_coeff_ui, :libflint), UInt, (Ptr{nmod_poly}, Int), &a, i)
       b $= hash(u, h) $ h
@@ -786,11 +787,16 @@ function valuation(z::nmod_poly, p::nmod_poly)
   check_parent(z,p)
   z == 0 && error("Not yet implemented")
   v = 0
-  while mod(z, p) == 0
-    z = div(z, p)
+  zz = z
+  z, r = divrem(zz, p)
+
+  while r == 0
+    zz = z
+    z, r = divrem(zz, p)
     v += 1
   end
-  return v, z
+
+  return v, zz
 end
 
 ################################################################################

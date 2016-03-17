@@ -6486,6 +6486,31 @@ Here are some examples of factoring.
    U = factor_shape(f*g)
 \end{lstlisting}
 
+\subsubsection{Valuation}
+
+\begin{lstlisting}
+valuation(z::nmod_poly, p::nmod_poly)
+\end{lstlisting}
+
+\desc{Return a tuple $(n, q)$ consisting of an integer $n$ and a polynomial
+$q$ not divisible by $p$ such that $z = p^n \cdot q$. It is assumed that the
+modulus is prime.}
+
+\textbf{Examples.}
+
+Here is an example.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 23)
+   S, x = PolynomialRing(R, "x")
+
+   z = (x + 1)^10 * (x + 2)
+   p = x + 1
+
+   n, q = valuation(z, p)
+\end{lstlisting}
+
+
 \subsection{Flint polynomials over $\Q$: \code{fmpq_poly}}
 
 The Flint type for polynomials over $\Q$ is \code{fmpq_poly}.

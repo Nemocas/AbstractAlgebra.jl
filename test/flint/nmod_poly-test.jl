@@ -27,7 +27,7 @@ function test_nmod_poly_constructors()
   @test parent(a) == Rx
 
   b = Rx(2)
-  
+
   @test isa(b, PolyElem)
   @test parent(b) == Rx
 
@@ -35,9 +35,9 @@ function test_nmod_poly_constructors()
 
   @test isa(c, PolyElem)
   @test parent(c) == Rx
-  
+
   d = Rx(fmpz(3))
-  
+
   @test isa(d, PolyElem)
   @test parent(d) == Rx
 
@@ -57,12 +57,12 @@ function test_nmod_poly_constructors()
   @test parent(g) == Rx
 
   h = Rx([R(1), R(2), R(3)])
-  
+
   @test isa(h, PolyElem)
   @test parent(h) == Rx
 
   _a = PolynomialRing(ZZ, "y")[1]([fmpz(1),fmpz(2),fmpz(3)])
-  
+
   k = Rx(_a)
 
   @test isa(k, PolyElem)
@@ -77,10 +77,10 @@ function test_nmod_poly_constructors()
   @test g == h
   @test h == k
   @test k == l
-  
+
   println("PASS")
 end
-  
+
 function test_nmod_poly_manipulation()
   print("nmod_poly.manipulation...")
 
@@ -335,7 +335,7 @@ function test_nmod_poly_division()
   @test g == x^4 + x^3 + 2*x + 1
 
   g = divexact(f,x+1)
-  
+
   @test g == x^4 + 2*x + 22
 
   h = x^1235+x^23
@@ -372,19 +372,19 @@ function test_nmod_poly_adhoc_exact_division()
    S, x = PolynomialRing(R, "x")
 
    f = x^2 + 2x + 1
-   
+ 
    @test divexact(3*f, fmpz(3)) == f
 
    @test divexact(3*f, 3) == f
 
    @test divexact(R(7)*f, R(7)) == f
-   
+ 
    println("PASS")
 end
 
 function test_nmod_poly_gcd()
   print("nmod_poly.gcd...")
-  
+
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -426,7 +426,7 @@ end
 
 function test_nmod_poly_resultant()
   print("nmod_poly.resultant...")
-  
+
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -445,7 +445,7 @@ end
 
 function test_nmod_poly_evaluate()
   print("nmod_poly.evaluate...")
-  
+
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -472,7 +472,7 @@ end
 
 function test_nmod_poly_derivative()
   print("nmod_poly.derivative...")
-  
+
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -494,7 +494,7 @@ function test_nmod_poly_integral()
   S, x = PolynomialRing(R, "x")
 
   f = x^2 + 2x + 1
-  
+
   @test integral(f) == 5x^3 + x^2 + x
 
   println("PASS")
@@ -502,7 +502,7 @@ end
 
 function test_nmod_poly_compose()
   print("nmod_poly.compose...")
-  
+
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -520,7 +520,7 @@ end
 
 function test_nmod_poly_interpolate()
   print("nmod_poly.interpolate...")
-  
+
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -538,7 +538,7 @@ end
 
 function test_nmod_poly_inflate()
   print("nmod_poly.inflate...")
-  
+
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -556,7 +556,7 @@ end
 
 function test_nmod_poly_deflate()
   print("nmod_poly.deflate...")
-  
+
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -574,7 +574,7 @@ end
 
 function test_nmod_poly_lifting()
   print("nmod_poly.lifting...")
-  
+
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
   Zy,y = PolynomialRing(ZZ, "y")
@@ -623,7 +623,7 @@ end
 
 function test_nmod_poly_factor()
   print("nmod_poly.lifting...")
-  
+
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
@@ -671,6 +671,21 @@ function test_nmod_poly_canonicalization()
   println("PASS")
 end
 
+function test_nmod_poly_valuation()
+  print("nmod_poly.valuation...")
+  R = ResidueRing(ZZ, 23)
+  Rx, x = PolynomialRing(R, "x")
+
+  f = (x + 1)^10 * (x + 2) * (x + 3)
+  g = x + 1
+
+  n, p = valuation(f, g)
+
+  @test n == 10
+  @test p == (x+2)*(x+3)
+  println("PASS")
+end
+
 function test_nmod_poly()
   test_nmod_poly_constructors()
   test_nmod_poly_manipulation()
@@ -701,6 +716,7 @@ function test_nmod_poly()
   test_nmod_poly_issquarefree()
   test_nmod_poly_factor()
   test_nmod_poly_canonicalization()
+  test_nmod_poly_valuation()
 
   println("")
 end
