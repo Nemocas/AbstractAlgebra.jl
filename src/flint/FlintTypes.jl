@@ -428,7 +428,7 @@ function _nmod_poly_clear_fn(x::nmod_poly)
 end
 
 type nmod_poly_factor
-  poly::Ptr{nmod_poly}  #actually wrong: it is an array of flint-nmod_poly
+  poly::Ptr{nmod_poly}  # array of flint nmod_poly_struct's
   exp::Ptr{Int} 
   _num::Int
   _alloc::Int
