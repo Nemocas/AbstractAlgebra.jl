@@ -40,7 +40,7 @@ end
 ###############################################################################
 
 function Base.hash(a::ResidueElem, h::UInt)
-   b = 0x539c1c8715c1adc2
+   b = 0x539c1c8715c1adc2%UInt
    return b $ hash(data(a), h) $ h
 end
 

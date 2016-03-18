@@ -37,7 +37,7 @@ end
 ###############################################################################    
 
 function Base.hash(a::MatElem, h::UInt)
-   b = 0x3e4ea81eb31d94f4
+   b = 0x3e4ea81eb31d94f4%UInt
    for i in 1:rows(a)
       for j in 1:cols(a)
          b $= hash(a[i, j], h) $ h

@@ -6486,6 +6486,31 @@ Here are some examples of factoring.
    U = factor_shape(f*g)
 \end{lstlisting}
 
+\subsubsection{Valuation}
+
+\begin{lstlisting}
+valuation(z::nmod_poly, p::nmod_poly)
+\end{lstlisting}
+
+\desc{Return a tuple $(n, q)$ consisting of an integer $n$ and a polynomial
+$q$ not divisible by $p$ such that $z = p^n \cdot q$. It is assumed that the
+modulus is prime.}
+
+\textbf{Examples.}
+
+Here is an example.
+
+\begin{lstlisting}
+   R = ResidueRing(ZZ, 23)
+   S, x = PolynomialRing(R, "x")
+
+   z = (x + 1)^10 * (x + 2)
+   p = x + 1
+
+   n, q = valuation(z, p)
+\end{lstlisting}
+
+
 \subsection{Flint polynomials over $\Q$: \code{fmpq_poly}}
 
 The Flint type for polynomials over $\Q$ is \code{fmpq_poly}.
@@ -8085,13 +8110,30 @@ Here is an example of computing the Hadamard matrix.
 
 \subsubsection{Nullspace}
 
+\desc{Return a tuple $(N, n)$ consisting of the nullity $n$ and a matrix $N$ with
+$c$ rows and $c$ columns, where $c$ is the number of columns of $a$, such that 
+the first $n$ columns of $N$ are a $\Q$-basis for the nullspace of $a$.}
+
+\textbf{Examples.}
+
+Here is an example of computing the $\Q$-basis of a nullspace.
+
+\begin{lstlisting}
+   S = MatrixSpace(ZZ, 3, 3)
+
+   A = S([fmpz(2) 3 5; 1 4 7; 4 1 1])
+
+   N, r = nullspace_over_Q(A)
+\end{lstlisting}
+
+
 \begin{lstlisting}
 nullspace(a::fmpz_mat)
 \end{lstlisting}
 
 \desc{Return a tuple $(N, n)$ consisting of the nullity $n$ and a matrix $N$ with
-$c$ rows and $c$ columns, where $c$ is the number of columns of $a$, such that 
-the first $n$ columns of $N$ are a basis for the nullspace of $a$.}
+$c$ rows and $r$ columns, where $c$ is the number of columns of $a$, such that 
+the columns of $N$ are a $\Z$-basis for the nullspace of $a$.}
 
 \textbf{Examples.}
 

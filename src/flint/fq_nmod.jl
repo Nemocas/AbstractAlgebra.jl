@@ -33,7 +33,7 @@ end
 ###############################################################################
 
 function Base.hash(a::fq_nmod, h::UInt)
-   b = 0x78e5f766c8ace18d
+   b = 0x78e5f766c8ace18d%UInt
    for i in 1:degree(parent(a)) + 1
          b $= hash(coeff(a, i), h) $ h
          b = (b << 1) | (b >> (sizeof(Int)*8 - 1))

@@ -36,6 +36,8 @@ export create_accessors, get_handle, package_handle, allocatemem, zeros,
 
 export flint_cleanup, flint_set_num_threads
 
+export error_dim_negative
+
 export on_windows64
 
 include("AbstractTypes.jl")
@@ -237,6 +239,14 @@ MaximalRealSubfield = AnticMaximalRealSubfield
 
 MaximalOrder = PariMaximalOrder
 Ideal = PariIdeal
+
+###############################################################################
+#
+#   Error objects
+#
+###############################################################################
+
+const error_dim_negative = ErrorException("Dimensions must be non-negative")
 
 ###############################################################################
 #

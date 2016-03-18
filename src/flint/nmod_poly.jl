@@ -11,7 +11,7 @@ export NmodPolyRing, nmod_poly, parent, base_ring, elem_type, length, zero,
        isirreducible, issquarefree, factor, factor_squarefree,
        factor_distinct_deg, factor_shape, setcoeff!, canonical_unit,
        add!, sub!, mul!, call, PolynomialRing, check_parent, gcdx, mod,
-       invmod, gcdinv, mulmod, powmod
+       invmod, gcdinv, mulmod, powmod, zero!, one!, valuation
 
 ################################################################################
 #
@@ -38,6 +38,29 @@ end
 
 ################################################################################
 #
+#   Basic helper
+#
+################################################################################
+
+function lead_is_unit(a::nmod_poly)
+  d = degree(a)
+  u = ccall((:nmod_poly_get_coeff_ui, :libflint), UInt, (Ptr{nmod_poly}, Int), &a, d)
+  n = ccall((:n_gcd, :libflint), UInt, (UInt, UInt), u, modulus(a))
+  return n==1
+end
+
+function Base.hash(a::nmod_poly, h::UInt)
+   b = 0x53dd43cd511044d1%UInt
+   for i in 0:length(a) - 1
+      u = ccall((:nmod_poly_get_coeff_ui, :libflint), UInt, (Ptr{nmod_poly}, Int), &a, i)
+      b $= hash(u, h) $ h
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+   end
+   return b
+end
+
+################################################################################
+#
 #  Basic manipulation
 #
 ################################################################################
@@ -52,6 +75,14 @@ function coeff(x::nmod_poly, n::Int)
   n < 0 && throw(DomainError())
   return base_ring(x)(ccall((:nmod_poly_get_coeff_ui, :libflint), UInt,
           (Ptr{nmod_poly}, Int), &x, n))
+end
+
+function zero!(a::nmod_poly)
+  ccall((:nmod_poly_zero, :libflint), Void, (Ptr{nmod_poly}, ), &a)
+end
+
+function one!(a::nmod_poly)
+  ccall((:nmod_poly_one, :libflint), Void, (Ptr{nmod_poly}, ), &a)
 end
 
 zero(R::NmodPolyRing) = R(UInt(0))
@@ -302,8 +333,6 @@ function ==(x::nmod_poly, y::Residue{fmpz})
   end 
 end
 
-#CF: needs(?) to be provides as Dict and friends use this function
-#    the generic one is too slow (ie. visible in the profiler)
 isequal(x::nmod_poly, y::nmod_poly) = x == y
 
 ==(x::Residue{fmpz}, y::nmod_poly) = y == x
@@ -379,8 +408,7 @@ end
 function divexact(x::nmod_poly, y::nmod_poly)
   check_parent(x, y)
   iszero(y) && throw(DivideError())
-  d = gcd(data(lead(y)), fmpz(modulus(x)))
-  d != 1 && error("Impossible inverse in divexact")
+  !lead_is_unit(y) && error("Impossible inverse in divexact")
   z = parent(x)()
   ccall((:nmod_poly_div, :libflint), Void, 
           (Ptr{nmod_poly}, Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &x, &y)
@@ -399,6 +427,8 @@ function divexact(x::nmod_poly, y::Residue{fmpz})
   return divexact(x, parent(x)(y))
 end
 
+div(x::nmod_poly, y::nmod_poly) = divexact(x,y)
+
 ################################################################################
 #
 #  Division with remainder
@@ -408,8 +438,7 @@ end
 function divrem(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
   iszero(y) && throw(DivideError())
-  g = gcd(data(lead(y)), fmpz(modulus(x)))
-  g != 1 && error("Impossible inverse in divrem") 
+  !lead_is_unit(y) && error("Impossible inverse in divrem")
   q = parent(x)()
   r = parent(x)()
   ccall((:nmod_poly_divrem, :libflint), Void,
@@ -427,8 +456,7 @@ end
 function rem(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
   iszero(y) && throw(DivideError()) 
-  g = gcd(data(lead(y)), fmpz(modulus(x)))
-  g != 1 && error("Impossible inverse in rem") 
+  !lead_is_unit(y) && error("Impossible inverse in rem")
   z = parent(x)()
   ccall((:nmod_poly_rem, :libflint), Void,
           (Ptr{nmod_poly}, Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &x, &y)
@@ -751,6 +779,28 @@ end
 
 ################################################################################
 #
+#   Valuation
+#
+################################################################################
+
+function valuation(z::nmod_poly, p::nmod_poly)
+  check_parent(z,p)
+  z == 0 && error("Not yet implemented")
+  v = 0
+  zz = z
+  z, r = divrem(zz, p)
+
+  while r == 0
+    zz = z
+    z, r = divrem(zz, p)
+    v += 1
+  end
+
+  return v, zz
+end
+
+################################################################################
+#
 #  Speedups for rings over nmod_poly
 #
 ################################################################################
@@ -762,7 +812,7 @@ function determinant(M::Mat{nmod_poly})
    catch
       return determinant_df(M)
    end
-end 
+end
 
 ################################################################################
 #
@@ -782,11 +832,11 @@ end
 
 function setcoeff!(x::nmod_poly, n::Int, y::Int)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
-                   (Ptr{nmod_poly}, Int, UInt), &x, n, mod(y, x._n))
+                   (Ptr{nmod_poly}, Int, UInt), &x, n, mod(y, x._mod_n))
 end
   
 function setcoeff!(x::nmod_poly, n::Int, y::fmpz)
-  r = ccall((:fmpz_mod_ui, :libflint), UInt, (Ptr{fmpz}, UInt), (y, x._n))
+  r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &y, x._mod_n)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{nmod_poly}, Int, UInt), &x, n, r)
 end
@@ -794,27 +844,37 @@ end
 setcoeff!(x::nmod_poly, n::Int, y::Integer) = setcoeff!(x, n, fmpz(y))
   
 function setcoeff!(x::nmod_poly, n::Int, y::Residue{fmpz})
-  setcoeff!(x, n, UInt(y.data))
+  setcoeff!(x, n, y.data)
 end
 
 function add!(z::nmod_poly, x::nmod_poly, y::nmod_poly)
   ccall((:nmod_poly_add, :libflint), Void, 
           (Ptr{nmod_poly}, Ptr{nmod_poly},  Ptr{nmod_poly}), &z, &x, &y)
+  return z        
 end
 
 function addeq!(z::nmod_poly, y::nmod_poly)
   ccall((:nmod_poly_add, :libflint), Void, 
           (Ptr{nmod_poly}, Ptr{nmod_poly},  Ptr{nmod_poly}), &z, &z, &y)
+  return z        
 end
 
 function sub!(z::nmod_poly, x::nmod_poly, y::nmod_poly)
   ccall((:nmod_poly_sub, :libflint), Void, 
           (Ptr{nmod_poly}, Ptr{nmod_poly},  Ptr{nmod_poly}), &z, &x, &y)
+  return z        
 end
 
 function mul!(z::nmod_poly, x::nmod_poly, y::nmod_poly)
   ccall((:nmod_poly_mul, :libflint), Void, 
           (Ptr{nmod_poly}, Ptr{nmod_poly},  Ptr{nmod_poly}), &z, &x, &y)
+  return z        
+end
+
+function mul!(z::nmod_poly, x::nmod_poly, y::UInt)
+  ccall((:nmod_poly_scalar_mul_nmod, :libflint), Void,
+            (Ptr{nmod_poly}, Ptr{nmod_poly}, UInt), &z, &x, y)
+  return z
 end
 
 ################################################################################

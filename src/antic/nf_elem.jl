@@ -23,7 +23,7 @@ base_ring(a::AnticNumberField) = Union{}
 
 var(a::AnticNumberField) = a.S
 
-function check_parent(a::nf_elem, b::nf_elem) 
+function check_parent(a::nf_elem, b::nf_elem)
    a.parent != b.parent && error("Incompatible number field elements")
 end
 
@@ -35,8 +35,11 @@ end
 
 function hash(a::nf_elem, h::UInt)
    b = 0xc2a44fbe466a1827
+   d = den(a)
+   b = hash(d, b)
    for i in 1:degree(parent(a)) + 1
-         b $= hash(coeff(a, i), h) $ h
+         num_coeff!(d, a, i)
+         b $= hash(d, h) $ h
          b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
    return b
@@ -45,21 +48,30 @@ end
 function coeff(x::nf_elem, n::Int)
    n < 0 && throw(DomainError())
    z = fmpq()
-   ccall((:nf_elem_get_coeff_fmpq, :libflint), Void, 
+   ccall((:nf_elem_get_coeff_fmpq, :libflint), Void,
      (Ptr{fmpq}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}), &z, &x, n, &parent(x))
    return z
 end
 
+function num_coeff!(z::fmpz, x::nf_elem, n::Int)
+   n < 0 && throw(DomainError())
+   ccall((:nf_elem_get_coeff_fmpz, :libflint), Void,
+     (Ptr{fmpq}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}), &z, &x, n, &parent(x))
+   return z
+end
+
+
+
 function gen(a::AnticNumberField)
    r = nf_elem(a)
-   ccall((:nf_elem_gen, :libflint), Void, 
+   ccall((:nf_elem_gen, :libflint), Void,
          (Ptr{nf_elem}, Ptr{AnticNumberField}), &r, &a)
    return r
 end
 
 function one(a::AnticNumberField)
    r = nf_elem(a)
-   ccall((:nf_elem_one, :libflint), Void, 
+   ccall((:nf_elem_one, :libflint), Void,
          (Ptr{nf_elem}, Ptr{AnticNumberField}), &r, &a)
    return r
 end
@@ -72,17 +84,17 @@ function zero(a::AnticNumberField)
 end
 
 function isgen(a::nf_elem)
-   return ccall((:nf_elem_is_gen, :libflint), Bool, 
+   return ccall((:nf_elem_is_gen, :libflint), Bool,
                 (Ptr{nf_elem}, Ptr{AnticNumberField}), &a, &a.parent)
 end
 
 function isone(a::nf_elem)
-   return ccall((:nf_elem_is_one, :libflint), Bool, 
+   return ccall((:nf_elem_is_one, :libflint), Bool,
                 (Ptr{nf_elem}, Ptr{AnticNumberField}), &a, &a.parent)
 end
 
 function iszero(a::nf_elem)
-   return ccall((:nf_elem_is_zero, :libflint), Bool, 
+   return ccall((:nf_elem_is_zero, :libflint), Bool,
                 (Ptr{nf_elem}, Ptr{AnticNumberField}), &a, &a.parent)
 end
 
@@ -132,8 +144,8 @@ function show(io::IO, a::AnticNumberField)
 end
 
 function show(io::IO, x::nf_elem)
-   cstr = ccall((:nf_elem_get_str_pretty, :libflint), Ptr{UInt8}, 
-                (Ptr{nf_elem}, Ptr{UInt8}, Ptr{AnticNumberField}), 
+   cstr = ccall((:nf_elem_get_str_pretty, :libflint), Ptr{UInt8},
+                (Ptr{nf_elem}, Ptr{UInt8}, Ptr{AnticNumberField}),
                  &x, bytestring(string(var(parent(x)))), &parent(x))
 
    print(io, bytestring(cstr))
@@ -341,7 +353,7 @@ end
 
 function ==(a::nf_elem, b::nf_elem)
    check_parent(a, b)
-   return ccall((:nf_elem_equal, :libflint), Bool, 
+   return ccall((:nf_elem_equal, :libflint), Bool,
            (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}), &a, &b, &a.parent)
 end
 
@@ -352,7 +364,7 @@ end
 ###############################################################################
 
 function inv(a::nf_elem)
-   a == 0 && throw(DivideError())
+   iszero(a) && throw(DivideError())
    r = a.parent()
    ccall((:nf_elem_inv, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
@@ -367,7 +379,7 @@ end
 ###############################################################################
 
 function divexact(a::nf_elem, b::nf_elem)
-   b == 0 && throw(DivideError())
+   iszero(b) && throw(DivideError())
    check_parent(a, b)
    r = a.parent()
    ccall((:nf_elem_div, :libflint), Void,
@@ -438,20 +450,20 @@ end
 ###############################################################################
 
 function mul!(z::nf_elem, x::nf_elem, y::nf_elem)
-   ccall((:nf_elem_mul, :libflint), Void, 
-         (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}), 
+   ccall((:nf_elem_mul, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
                                                   &z, &x, &y, &parent(x))
 end
 
 function mul_red!(z::nf_elem, x::nf_elem, y::nf_elem, red::Bool)
-   ccall((:nf_elem_mul_red, :libflint), Void, 
-         (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}, Cint), 
+   ccall((:nf_elem_mul_red, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}, Cint),
                                                 &z, &x, &y, &parent(x), red)
 end
 
 function addeq!(z::nf_elem, x::nf_elem)
-   ccall((:nf_elem_add, :libflint), Void, 
-         (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}), 
+   ccall((:nf_elem_add, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
                                                   &z, &z, &x, &parent(x))
 end
 
@@ -462,7 +474,7 @@ function add!(a::nf_elem, b::nf_elem, c::nf_elem)
 end
 
 function reduce!(x::nf_elem)
-   ccall((:nf_elem_reduce, :libflint), Void, 
+   ccall((:nf_elem_reduce, :libflint), Void,
          (Ptr{nf_elem}, Ptr{AnticNumberField}), &x, &parent(x))
 end
 
@@ -544,7 +556,7 @@ function mul!(c::nf_elem, a::nf_elem, b::fmpz)
          &c, &a, &b, &a.parent)
 end
 
-function mul!(c::nf_elem, a::nf_elem, b::Int) 
+function mul!(c::nf_elem, a::nf_elem, b::Int)
    ccall((:nf_elem_scalar_mul_si, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}),
          &c, &a, b, &a.parent)
@@ -560,12 +572,12 @@ mul!(c::nf_elem, a::nf_elem, b::Integer) = mul!(c, a, fmpz(b))
 
 function sqr_classical(a::Poly{nf_elem})
    lena = length(a)
-   
+
    t = base_ring(a)()
 
    lenz = 2*lena - 1
    d = Array(nf_elem, lenz)
-   
+
    for i = 1:lena - 1
       d[2i - 1] = base_ring(a)()
       d[2i] = base_ring(a)()
@@ -581,13 +593,13 @@ function sqr_classical(a::Poly{nf_elem})
          addeq!(d[i + j - 1], t)
       end
    end
-   
+
    for i = 1:lenz
       reduce!(d[i])
    end
 
    z = parent(a)(d)
-        
+
    set_length!(z, normalise(z, lenz))
 
    return z
@@ -610,7 +622,7 @@ function mul_classical(a::Poly{nf_elem}, b::Poly{nf_elem})
 
    lenz = lena + lenb - 1
    d = Array(nf_elem, lenz)
-   
+
    for i = 1:lena
       d[i] = base_ring(a)()
       mul_red!(d[i], coeff(a, i - 1), coeff(b, 0), false)
@@ -620,20 +632,20 @@ function mul_classical(a::Poly{nf_elem}, b::Poly{nf_elem})
       d[lena + i - 1] = base_ring(a)()
       mul_red!(d[lena + i - 1], a.coeffs[lena], coeff(b, i - 1), false)
    end
-   
+
    for i = 1:lena - 1
       for j = 2:lenb
          mul_red!(t, coeff(a, i - 1), b.coeffs[j], false)
          addeq!(d[i + j - 1], t)
       end
    end
-   
+
    for i = 1:lenz
       reduce!(d[i])
    end
 
    z = parent(a)(d)
-        
+
    set_length!(z, normalise(z, lenz))
 
    return z
@@ -703,28 +715,28 @@ Base.promote_rule(::Type{nf_elem}, ::Type{fmpq_poly}) = nf_elem
 
 function Base.call(a::AnticNumberField)
    z = nf_elem(a)
-   ccall((:nf_elem_set_si, :libflint), Void, 
+   ccall((:nf_elem_set_si, :libflint), Void,
          (Ptr{nf_elem}, Int, Ptr{AnticNumberField}), &z, 0, &a)
    return z
 end
 
 function Base.call(a::AnticNumberField, c::Int)
    z = nf_elem(a)
-   ccall((:nf_elem_set_si, :libflint), Void, 
+   ccall((:nf_elem_set_si, :libflint), Void,
          (Ptr{nf_elem}, Int, Ptr{AnticNumberField}), &z, c, &a)
    return z
 end
 
 function Base.call(a::AnticNumberField, c::fmpz)
    z = nf_elem(a)
-   ccall((:nf_elem_set_fmpz, :libflint), Void, 
+   ccall((:nf_elem_set_fmpz, :libflint), Void,
          (Ptr{nf_elem}, Ptr{fmpz}, Ptr{AnticNumberField}), &z, &c, &a)
    return z
 end
 
 function Base.call(a::AnticNumberField, c::fmpq)
    z = nf_elem(a)
-   ccall((:nf_elem_set_fmpq, :libflint), Void, 
+   ccall((:nf_elem_set_fmpq, :libflint), Void,
          (Ptr{nf_elem}, Ptr{fmpq}, Ptr{AnticNumberField}), &z, &c, &a)
    return z
 end
@@ -740,7 +752,7 @@ function Base.call(a::AnticNumberField, pol::fmpq_poly)
    if length(pol) >= length(a.pol)
       pol = mod(pol, a.pol)
    end
-   ccall((:nf_elem_set_fmpq_poly, :libflint), Void, 
+   ccall((:nf_elem_set_fmpq_poly, :libflint), Void,
          (Ptr{nf_elem}, Ptr{fmpq_poly}, Ptr{AnticNumberField}), &z, &pol, &a)
    return z
 end
@@ -748,7 +760,7 @@ end
 function Base.call(a::FmpqPolyRing, b::nf_elem)
    parent(parent(b).pol) != a && error("Cannot coerce from number field to polynomial ring")
    r = a()
-   ccall((:nf_elem_get_fmpq_poly, :libflint), Void, 
+   ccall((:nf_elem_get_fmpq_poly, :libflint), Void,
          (Ptr{fmpq_poly}, Ptr{nf_elem}, Ptr{AnticNumberField}), &r, &b, &parent(b))
    return r
 end
@@ -763,7 +775,7 @@ function AnticNumberField(pol::fmpq_poly, s::AbstractString{})
    S = symbol(s)
    parent_obj = AnticNumberField(pol, S)
 
-   return parent_obj, gen(parent_obj) 
+   return parent_obj, gen(parent_obj)
 end
 
 function AnticCyclotomicField(n::Int, s::AbstractString{}, t = "\$")

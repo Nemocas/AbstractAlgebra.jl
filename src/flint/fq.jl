@@ -34,7 +34,7 @@ end
 ###############################################################################
 
 function Base.hash(a::fq, h::UInt)
-   b = 0xb310fb6ea97e1f1a
+   b = 0xb310fb6ea97e1f1a%UInt
    for i in 1:degree(parent(a)) + 1
          b $= hash(coeff(a, i), h) $ h
          b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
