@@ -293,3 +293,14 @@ include("pari/PariIdeal.jl")
 
 include("Factor.jl")
 
+###############################################################################
+#
+#   Generic functions to be defined after all rings
+#
+###############################################################################
+
+if VERSION >= v"0.5.0-dev+3171"
+
+include("polysubst.jl")
+
+end

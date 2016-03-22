@@ -354,16 +354,19 @@ function test_fq_poly_evaluation()
 
    @test evaluate(g, 3) == 12x + 6
 
-   @test g(3) == 12x + 6
-
    @test evaluate(g, fmpz(3)) == 12x + 6
-
-   @test g(fmpz(3)) == 12x + 6
 
    @test evaluate(g, f) == x^5+4*x^4+7*x^3+7*x^2+4*x+4
 
+if VERSION >= v"0.5.0-dev+3171"
+
+   @test g(3) == 12x + 6
+
+   @test g(fmpz(3)) == 12x + 6
+
    @test g(f) == x^5+4*x^4+7*x^3+7*x^2+4*x+4
 
+end
    println("PASS")
 end
 
