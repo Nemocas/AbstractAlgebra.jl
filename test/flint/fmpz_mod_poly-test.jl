@@ -364,15 +364,19 @@ function test_fmpz_mod_poly_evaluation()
 
    @test evaluate(f, 3) == 16
    
-   @test f(3) == 16
-
    @test evaluate(f, fmpz(10)) == 121
-
-   @test f(fmpz(10)) == 121
 
    @test evaluate(f, R(10)) == 121
 
+if VERSION >= v"0.5.0-dev+3171"
+
+   @test f(3) == 16
+
+   @test f(fmpz(10)) == 121
+
    @test f(R(10)) == 121
+
+end
 
    println("PASS")
 end
