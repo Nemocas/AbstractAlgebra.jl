@@ -813,12 +813,11 @@ function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{}; cached=true)
 
    R2 = R
    par_type = PowerSeries{T}
-   sig_table = [x.sig for x in methods(promote_rule)]
-   filter!(x -> x <: Tuple{Type{par_type}, Any}, sig_table)
+   sig_table = [x.sig for x in methods(Base.promote_rule)]
    while base_ring(R2) != Union{}
       R2 = base_ring(R2)
       T2 = elem_type(R2)
-      if !in(Tuple{Type{par_type}, Type{T2}}, sig_table)
+      if !sig_exists(Tuple{typeof(Base.promote_rule), Type{par_type}, Type{T2}}, sig_table)
          eval(:(Base.promote_rule(::Type{$par_type}, ::Type{$T2}) = $par_type))
       end
    end
