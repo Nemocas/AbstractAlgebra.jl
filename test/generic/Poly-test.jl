@@ -570,7 +570,9 @@ function test_poly()
    test_poly_special()
    test_poly_mul_karatsuba()
    test_poly_mul_ks()
+if VERSION >= v"0.5.0-dev+3171"
    test_poly_generic_eval()
+end
 
    println("")
 end
