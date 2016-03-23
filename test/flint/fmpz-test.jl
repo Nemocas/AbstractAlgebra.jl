@@ -304,6 +304,32 @@ function test_fmpz_adhoc_comparison()
 
    @test 4 != a
 
+   a = fmpz(2)
+   
+   @test a < UInt(7)
+
+   @test a > UInt(1) 
+
+   @test UInt(7) > a
+
+   @test UInt(1) < a
+
+   @test a <= UInt(7)
+
+   @test a >= UInt(2)
+
+   @test UInt(7) >= a
+
+   @test UInt(1) <= a
+
+   @test a == UInt(2)
+
+   @test a != UInt(4)
+
+   @test UInt(2) == a
+
+   @test UInt(4) != a
+
    println("PASS")
 end
 

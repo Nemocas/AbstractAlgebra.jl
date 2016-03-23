@@ -632,28 +632,32 @@ function Base.call(a::NmodMatSpace, b::Residue{fmpz})
    return M
 end
 
-function Base.call(a::NmodMatSpace, arr::Array{BigInt, 2})
-  z = nmod_mat(a.rows, a.cols, a._n, arr)
+function Base.call(a::NmodMatSpace, arr::Array{BigInt, 2}, transpose::Bool = false)
+  _check_dim(a.rows, a.cols, arr, transpose)
+  z = nmod_mat(a.rows, a.cols, a._n, arr, transpose)
   z.parent = a
   return z
 end
 
-function Base.call(a::NmodMatSpace, arr::Array{fmpz, 2})
-  z = nmod_mat(a.rows, a.cols, a._n, arr)
+function Base.call(a::NmodMatSpace, arr::Array{fmpz, 2}, transpose::Bool = false)
+  _check_dim(a.rows, a.cols, arr, transpose)
+  z = nmod_mat(a.rows, a.cols, a._n, arr, transpose)
   z.parent = a
   return z
 end
 
-function Base.call(a::NmodMatSpace, arr::Array{Int, 2})
-  z = nmod_mat(a.rows, a.cols, a._n, arr)
+function Base.call(a::NmodMatSpace, arr::Array{Int, 2}, transpose::Bool = false)
+  _check_dim(a.rows, a.cols, arr, transpose)
+  z = nmod_mat(a.rows, a.cols, a._n, arr, transpose)
   z.parent = a
   return z
 end
 
-function Base.call(a::NmodMatSpace, arr::Array{Residue{fmpz}, 2})
+function Base.call(a::NmodMatSpace, arr::Array{Residue{fmpz}, 2}, transpose::Bool = false)
+  _check_dim(a.rows, a.cols, arr, transpose)
   length(arr) == 0 && error("Array must be nonempty")
   (base_ring(a) != parent(arr[1])) && error("Elements must have same base ring")
-  z = nmod_mat(a.rows, a.cols, a._n, arr)
+  z = nmod_mat(a.rows, a.cols, a._n, arr, transpose)
   z.parent = a
   return z
 end
@@ -662,29 +666,31 @@ function Base.call(a::NmodMatSpace, arr::Array{Int, 1})
   (length(arr) != a.cols * a.rows) &&
           error("Array must be of length ", a.cols * a.rows)
 
-  arr = transpose(reshape(arr,a.cols,a.rows))
-  return a(arr)
+  arr = reshape(arr,a.cols,a.rows)
+  return a(arr, true)
 end
 
 function Base.call(a::NmodMatSpace, arr::Array{BigInt, 1})
   (length(arr) != a.cols * a.rows) &&
           error("Array must be of length ", a.cols * a.rows)
-  arr = transpose(reshape(arr,a.cols,a.rows))
-  return a(arr)
+  arr = reshape(arr,a.cols,a.rows)
+  return a(arr, true)
 end
 
 function Base.call(a::NmodMatSpace, arr::Array{fmpz, 1})
   (length(arr) != a.cols * a.rows) &&
           error("Array must be of length ", a.cols * a.rows)
-  arr = transpose(reshape(arr,a.cols,a.rows))
-  return a(arr)
+  arr = reshape(arr,a.cols,a.rows)
+  return a(arr, true)
 end
 
 function Base.call(a::NmodMatSpace, arr::Array{Residue{fmpz}, 1})
   (length(arr) != a.cols * a.rows) &&
           error("Array must be of length ", a.cols * a.rows)
-  arr = transpose(reshape(arr,a.cols,a.rows))
-  return a(arr)
+  z = nmod_mat(a.rows, a.cols, a._n, arr)
+  z.parent = a
+
+  return z
 end
 
 function Base.call(a::NmodMatSpace, b::fmpz_mat)

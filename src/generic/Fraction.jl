@@ -62,7 +62,7 @@ end
 ###############################################################################
 
 function Base.hash(a::FractionElem, h::UInt)
-   b = 0x8a30b0d963237dd5
+   b = 0x8a30b0d963237dd5%UInt
    return b $ hash(num(a), h) $ hash(den(a), h) $ h
 end
 

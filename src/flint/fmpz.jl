@@ -56,7 +56,59 @@ elem_type(::FlintIntegerRing) = fmpz
 
 base_ring(a::FlintIntegerRing) = Union{}
 
-Base.hash(a::fmpz, h::UInt) = hash(BigInt(a), h)
+################################################################################
+#
+#   Hashing
+#
+################################################################################
+
+# Similar to hash for BigInt found in julia/base
+
+function _fmpz_is_small(a::fmpz)
+   return __fmpz_is_small(a.d)
+end
+
+function _fmpz_limbs(a::fmpz)
+   return __fmpz_limbs(a.d)
+end
+
+function hash_integer(a::fmpz, h::UInt)
+   return _hash_integer(a.d, h)
+end
+
+function hash(a::fmpz, h::UInt)
+   return hash_integer(a, h)
+end
+
+function __fmpz_is_small(a::Int)
+   return (unsigned(a) >> (WORD_SIZE - 2) !=1 )
+end
+
+function __fmpz_limbs(a::Int)
+   if __fmpz_is_small(a)
+      return 0
+   end
+   b = unsafe_load(convert(Ptr{Cint}, unsigned(a)<<2), 2)
+   return b
+end
+
+function _hash_integer(a::Int, h::UInt)  
+   s = __fmpz_limbs(a)
+   s == 0 && return Base.hash_integer(a, h)
+   # get the pointer after the first two Cint
+   d = convert(Ptr{Ptr{UInt}}, unsigned(a) << 2) + 2*sizeof(Cint)
+   p = unsafe_load(d)
+   b = unsafe_load(p)
+   h = Base.hash_uint(ifelse(s < 0, -b, b) $ h) $ h
+   for k = 2:abs(s)
+      h = Base.hash_uint(unsafe_load(p, k) $ h) $ h
+   end
+   return h
+end
+
+function Base.hash(a::fmpq, h::UInt)
+   return _hash_integer(a.num, _hash_integer(a.den, h))
+end
 
 ###############################################################################
 #
@@ -91,11 +143,11 @@ iszero(a::fmpz) = ccall((:fmpz_is_zero, :libflint), Bool, (Ptr{fmpz},), &a)
 isone(a::fmpz) = ccall((:fmpz_is_one, :libflint), Bool, (Ptr{fmpz},), &a)
 
 function den(a::fmpz)
-  return fmpz(1)
+   return fmpz(1)
 end
 
 function num(a::fmpz)
-  return a
+   return a
 end
 
 ###############################################################################
@@ -282,10 +334,10 @@ end
 ###############################################################################
 
 function rem(x::fmpz, c::Int)
-   c < 0 && throw(DomainError())
-   c == 0 && throw(DivideError())
-   r = ccall((:fmpz_tdiv_ui, :libflint), Int, (Ptr{fmpz}, Int), &x, c)
-   return sign(x) < 0 ? -r : r
+    c < 0 && throw(DomainError())
+    c == 0 && throw(DivideError())
+    r = ccall((:fmpz_tdiv_ui, :libflint), Int, (Ptr{fmpz}, Int), &x, c)
+    return sign(x) < 0 ? -r : r
 end
 
 function tdivpow2(x::fmpz, c::Int)
@@ -599,6 +651,30 @@ end
 <(x::Int, y::fmpz) = cmp(y,x) > 0
 
 >(x::Int, y::fmpz) = cmp(y,x) < 0
+
+function cmp(x::fmpz, y::UInt)
+    Int(ccall((:fmpz_cmp_ui, :libflint), Cint, (Ptr{fmpz}, UInt), &x, y))
+end
+
+==(x::fmpz, y::UInt) = cmp(x,y) == 0
+
+<=(x::fmpz, y::UInt) = cmp(x,y) <= 0
+
+>=(x::fmpz, y::UInt) = cmp(x,y) >= 0
+
+<(x::fmpz, y::UInt) = cmp(x,y) < 0
+
+>(x::fmpz, y::UInt) = cmp(x,y) > 0
+
+==(x::UInt, y::fmpz) = cmp(y,x) == 0
+
+<=(x::UInt, y::fmpz) = cmp(y,x) >= 0
+
+>=(x::UInt, y::fmpz) = cmp(y,x) <= 0
+
+<(x::UInt, y::fmpz) = cmp(y,x) > 0
+
+>(x::UInt, y::fmpz) = cmp(y,x) < 0
 
 ###############################################################################
 #
@@ -1006,11 +1082,13 @@ function convert(::Type{BigInt}, a::fmpz)
 end
 
 function convert(::Type{Int}, a::fmpz) 
+   (a > typemax(Int) || a < typemin(Int)) && throw(InexactError())
    return ccall((:fmpz_get_si, :libflint), Int, (Ptr{fmpz},), &a)
 end
 
-function convert(::Type{UInt}, x::fmpz)
-   return ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &x)
+function convert(::Type{UInt}, a::fmpz)
+   (a > typemax(UInt) || a < 0) && throw(InexactError())
+   return ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &a)
 end
 
 function convert(::Type{Float64}, n::fmpz)
