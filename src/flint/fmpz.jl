@@ -106,10 +106,6 @@ function _hash_integer(a::Int, h::UInt)
    return h
 end
 
-function Base.hash(a::fmpq, h::UInt)
-   return _hash_integer(a.num, _hash_integer(a.den, h))
-end
-
 ###############################################################################
 #
 #   Basic manipulation
