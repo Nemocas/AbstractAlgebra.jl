@@ -59,6 +59,8 @@ function setindex!{T <: RingElem}(a::Mat{T}, d::T, r::Int, c::Int)
    a.entries[r, c] = d
 end
 
+setindex_t!{T <: RingElem}(a::Mat{T}, d::T, r::Int, c::Int) = setindex!(a, d, c, r)
+
 zero(a::MatrixSpace) = a()
 
 one(a::MatrixSpace) = a(1)

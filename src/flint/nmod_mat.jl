@@ -31,7 +31,7 @@ function check_parent(x::nmod_mat, y::nmod_mat)
   return nothing
 end
 
-size(x::nmod_mat) = tuple(x.parent.rows, x.parent.cols)
+size(x::nmod_mat) = tuple(x.r, x.c)
 
 size(t::nmod_mat, d) = d <= 2 ? size(t)[d] : 1
 
@@ -69,6 +69,9 @@ end
 setindex!(a::nmod_mat, u::Integer, i::Int, j::Int) =
         setindex!(a, fmpz(u), i, j)
 
+setindex_t!{T<:Union{RingElem, Integer}}(a::nmod_mat, u::T, i::Int, j::Int) =
+  setindex!(a, u, j, i)
+
 function set_entry!(a::nmod_mat, i::Int, j::Int, u::UInt)
   ccall((:nmod_mat_set_entry, :libflint), Void,
           (Ptr{nmod_mat}, Int, Int, UInt), &a, i-1, j-1, u)
@@ -84,6 +87,9 @@ end
 
 set_entry!(a::nmod_mat, i::Int, j::Int, u::Residue{fmpz}) =
         set_entry!(a, i, j, u.data)
+
+set_entry_t!{T<:Union{RingElem, Integer}}(a::nmod_mat, i::Int, j::Int, u::T) =
+  set_entry!(a, j, i, u)
  
 function deepcopy(a::nmod_mat)
   z = nmod_mat(rows(a), cols(a), a._n)

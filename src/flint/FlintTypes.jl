@@ -1398,10 +1398,10 @@ type nmod_mat <: MatElem{Residue{fmpz}}
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
     finalizer(z, _nmod_mat_clear_fn)
     if transpose 
-      se(z, i, j, k) = set_entry!(z, j, i, k)
+      se = set_entry_t!
       r,c = c,r
     else
-      se(z, i, j, k) = set_entry!(z, i, j, k)
+      se = set_entry!
     end
     for i = 1:r
       for j = 1:c
@@ -1417,10 +1417,10 @@ type nmod_mat <: MatElem{Residue{fmpz}}
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
     finalizer(z, _nmod_mat_clear_fn)
     if transpose 
-      se(z, i, j, k) = set_entry!(z, j, i, k)
+      se = set_entry_t!
       r,c = c,r
     else
-      se(z, i, j, k) = set_entry!(z, i, j, k)
+      se = set_entry!
     end
     for i = 1:r
       for j = 1:c
@@ -1441,10 +1441,10 @@ type nmod_mat <: MatElem{Residue{fmpz}}
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
     finalizer(z, _nmod_mat_clear_fn)
     if transpose 
-      se(z, i, j, k) = set_entry!(z, j, i, k)
+      se = set_entry_t!
       r,c = c,r
     else
-      se(z, i, j, k) = set_entry!(z, i, j, k)
+      se = set_entry!
     end
     for i = 1:r
       for j = 1:c
@@ -1460,10 +1460,10 @@ type nmod_mat <: MatElem{Residue{fmpz}}
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
     finalizer(z, _nmod_mat_clear_fn)
     if transpose 
-      se(z, i, j, k) = set_entry!(z, j, i, k)
+      se = set_entry_t!
       r,c = c,r
     else
-      se(z, i, j, k) = set_entry!(z, i, j, k)
+      se = set_entry!
     end
     for i = 1:r
       for j = 1:c
