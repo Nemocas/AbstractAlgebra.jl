@@ -8,8 +8,9 @@ os:
   - linux
   - osx
 julia:
-  - release
   - 0.4
+  - release
+  - nightly
 notifications:
   - email: false
 #script:
