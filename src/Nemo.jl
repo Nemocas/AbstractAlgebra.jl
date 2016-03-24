@@ -32,7 +32,7 @@ export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
        MaximalRealSubfield, MaximalOrder, Ideal, PermutationGroup
 
 export create_accessors, get_handle, package_handle, allocatemem, zeros,
-       Array, method_with_sig_exists
+       Array, promotion_rule_exists
 
 export flint_cleanup, flint_set_num_threads
 
@@ -184,6 +184,31 @@ function create_accessors(T, S, handle)
       end
    end
 end
+
+###############################################################################
+#
+#   Promote rule helpers
+#
+###############################################################################
+
+if VERSION >= v"0.5.0-dev+3171"
+
+function sig_exists{U, V, W}(T::Type{Tuple{U, V, W}}, sig_table::Array{Any, 1})
+   for s in sig_table
+      if s === T
+         return true
+      end
+   end
+   return false
+end
+
+else
+
+function sig_exists{U, V, W}(T::Type{Tuple{U, V, W}}, sig_table::Array{Any, 1})
+   return false
+end
+
+end # if VERSION
 
 ###############################################################################
 #
