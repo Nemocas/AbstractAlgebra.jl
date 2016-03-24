@@ -1,6 +1,6 @@
 # Nemo
 
-[![Build Status](https://travis-ci.org/wbhart/Nemo.jl.svg?branch=master)](https://travis-ci.org/wbhart/Nemo.jl)
+[![Build Status](https://travis-ci.org/Nemocas/Nemo.jl.svg?branch=master)](https://travis-ci.org/Nemocas/Nemo.jl)
 
 Nemo is a computer algebra package for the Julia programming language. It aims
 to cover commutative algebra, number theory and group theory.
