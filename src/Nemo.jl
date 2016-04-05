@@ -66,6 +66,11 @@ function pari_sigint_handler()
    return
 end
 
+function flint_abort()
+  error("Problem in the Flint-Subsystem")
+end
+
+
 on_windows64 = (@windows ? true : false) && (Int == Int64)
 
 function __init__()
@@ -117,6 +122,9 @@ function __init__()
       cglobal(:jl_calloc),
       cglobal(:jl_realloc),
       cglobal(:jl_free))
+
+   ccall((:flint_set_abort, libflint), Void,
+      (Ptr{Void},), cfunction(flint_abort, Void, ()))
 
    println("")
    println("Welcome to Nemo version 0.4.0")
