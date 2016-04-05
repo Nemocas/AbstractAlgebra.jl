@@ -12,7 +12,7 @@ import Base: Array, abs, asin, asinh, atan, atanh, base, bin, call,
              reverse, serialize, setindex!, show, sign, sin, sinh, size, sqrt,
              string, sub, tan, tanh, trace, trailing_zeros, transpose,
              transpose!, truncate, typed_hvcat, typed_hcat, var, vcat, zero,
-             zeros,
+             zeros, det,
              +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
              /, !=
 
