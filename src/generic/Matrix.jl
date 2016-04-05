@@ -1123,7 +1123,7 @@ end
 #
 ###############################################################################
 
-function determinant_clow{T <: RingElem}(M::MatElem{T})
+function det_clow{T <: RingElem}(M::MatElem{T})
    R = base_ring(M)
    n = rows(M)
    A = Array(T, n, n)
@@ -1172,7 +1172,7 @@ function determinant_clow{T <: RingElem}(M::MatElem{T})
    return isodd(n) ? -D : D
 end
 
-function determinant_df{T <: RingElem}(M::MatElem{T})
+function det_df{T <: RingElem}(M::MatElem{T})
    R = base_ring(M)
    S, z = PolynomialRing(R, "z")
    n = rows(M)
@@ -1181,7 +1181,7 @@ function determinant_df{T <: RingElem}(M::MatElem{T})
    return isodd(n) ? -d : d
 end
 
-function determinant_fflu{T <: RingElem}(M::MatElem{T})
+function det_fflu{T <: RingElem}(M::MatElem{T})
    n = rows(M)
    if n == 0
       return base_ring(M)()
@@ -1192,20 +1192,20 @@ function determinant_fflu{T <: RingElem}(M::MatElem{T})
    return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
 end
 
-function determinant{T <: FieldElem}(M::MatElem{T})
-   rows(M) != cols(M) && error("Not a square matrix in determinant")
-   return determinant_fflu(M)
+function det{T <: FieldElem}(M::MatElem{T})
+   rows(M) != cols(M) && error("Not a square matrix in det")
+   return det_fflu(M)
 end
 
-function determinant{T <: RingElem}(M::MatElem{T})
+function det{T <: RingElem}(M::MatElem{T})
    try
-      return determinant_fflu(M)
+      return det_fflu(M)
    catch
-      return determinant_df(M)
+      return det_df(M)
    end
 end
 
-function determinant_interpolation{T <: PolyElem}(M::MatElem{T})
+function det_interpolation{T <: PolyElem}(M::MatElem{T})
    n = rows(M)
    R = base_ring(M)
    if n == 0
@@ -1235,19 +1235,19 @@ function determinant_interpolation{T <: PolyElem}(M::MatElem{T})
             X[j, k] = evaluate(M[j, k], x[i])
          end
       end
-      d[i] = determinant(X)
+      d[i] = det(X)
    end
    return interpolate(R, x, d)
 end
 
-function determinant{T <: PolyElem}(M::MatElem{T})
-   rows(M) != cols(M) && error("Not a square matrix in determinant")
+function det{T <: PolyElem}(M::MatElem{T})
+   rows(M) != cols(M) && error("Not a square matrix in det")
    try
-      return determinant_interpolation(M)
+      return det_interpolation(M)
    catch
       # no point trying fflu, since it probably fails
-      # for same reason as determinant_interpolation
-      return determinant_df(M)
+      # for same reason as det_interpolation
+      return det_df(M)
    end
 end
 
@@ -1525,7 +1525,7 @@ function solve_interpolation{T <: RingElem}(M::MatElem{Poly{T}}, b::MatElem{Poly
          maxlenb = max(maxlenb, length(b[i, j]))
       end
    end
-   # bound from xd = (M*)b where d is the determinant
+   # bound from xd = (M*)b where d is the det
    bound = (maxlen - 1)*(m - 1) + max(maxlenb, maxlen)
    V = Array(elem_type(U), bound)
    d = Array(elem_type(base_ring(R)), bound)
@@ -2054,7 +2054,7 @@ function charpoly_danilevsky!{T <: RingElem}(S::Ring, A::MatElem{T})
 end
 
 function charpoly{T <: RingElem}(V::Ring, Y::MatElem{T})
-   rows(Y) != cols(Y) && error("Dimensions don't match in determinant")
+   rows(Y) != cols(Y) && error("Dimensions don't match in det")
    R = base_ring(Y)
    base_ring(V) != base_ring(Y) && error("Cannot coerce into polynomial ring")
    n = rows(Y)

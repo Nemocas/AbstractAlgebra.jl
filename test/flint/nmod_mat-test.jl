@@ -402,8 +402,8 @@ function test_nmod_mat_howell_form()
   println("PASS")
 end
 
-function test_nmod_mat_trace_determinant()
-  print("nmod_mat.trace_determinant...")
+function test_nmod_mat_trace_det()
+  print("nmod_mat.trace_det...")
 
   Z17 = ResidueRing(ZZ,17)
   R = MatrixSpace(Z17, 3, 4)
@@ -425,13 +425,13 @@ function test_nmod_mat_trace_determinant()
 
   @test_throws ErrorException trace(b)
 
-  c = determinant(a)
+  c = det(a)
 
   @test c == zero(Z17)
 
-  @test_throws ErrorException determinant(b)
+  @test_throws ErrorException det(b)
 
-  c = determinant(aa)
+  c = det(aa)
 
   @test c == Z17(13)
 
@@ -681,7 +681,7 @@ function test_nmod_mat()
   test_nmod_mat_powering()
   test_nmod_mat_row_echelon_form()
   test_nmod_mat_howell_form()
-  test_nmod_mat_trace_determinant()
+  test_nmod_mat_trace_det()
   test_nmod_mat_rank()
   test_nmod_mat_inv()
   test_nmod_mat_lu()

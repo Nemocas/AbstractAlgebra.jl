@@ -6,7 +6,7 @@
 
 export nmod_mat, NmodMatSpace, getindex, setindex!, set_entry!, deepcopy, rows, 
        cols, parent, base_ring, zero, one, issquare, show, transpose,
-       transpose!, rref, rref!, trace, determinant, rank, inv, solve, lufact,
+       transpose!, rref, rref!, trace, det, rank, inv, solve, lufact,
        sub, window, hcat, vcat, Array, lift, lift!, MatrixSpace, check_parent,
        howell_form, howell_form!, strong_echelon_form, strong_echelon_form!
 
@@ -357,16 +357,16 @@ end
 #
 ################################################################################
 
-function determinant(a::nmod_mat)
+function det(a::nmod_mat)
   !issquare(a) && error("Matrix must be a square matrix")
   if isprime(modulus(base_ring(a)))
      r = ccall((:nmod_mat_det, :libflint), UInt, (Ptr{nmod_mat}, ), &a)
      return base_ring(a)(r)
   else
      try
-        return determinant_fflu(a)
+        return det_fflu(a)
      catch
-        return determinant_df(a)
+        return det_df(a)
      end
   end
 end

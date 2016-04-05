@@ -779,7 +779,10 @@ end
 
 ################################################################################
 #
-#   Valuation
+#    Valuation
+#
+################################################################################
+#CF TODO: use squaring for fast large valuation
 #
 ################################################################################
 
@@ -805,12 +808,12 @@ end
 #
 ################################################################################
 
-function determinant(M::Mat{nmod_poly})
-   rows(M) != cols(M) && error("Not a square matrix in determinant")
+function det(M::Mat{nmod_poly})
+   rows(M) != cols(M) && error("Not a square matrix in det")
    try
-      return determinant_fflu(M)
+      return det_fflu(M)
    catch
-      return determinant_df(M)
+      return det_df(M)
    end
 end
 

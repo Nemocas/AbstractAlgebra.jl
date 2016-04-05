@@ -9,6 +9,6 @@ function benchmark_det_poly_ring()
       end
    end
 
-   tt = @elapsed determinant(M)
+   tt = @elapsed det(M)
    println("$tt")
 end
