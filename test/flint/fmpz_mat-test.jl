@@ -282,20 +282,20 @@ function test_fmpz_mat_modular_reduction()
    println("PASS")
 end
 
-function test_fmpz_mat_determinant()
-   print("fmpz_mat.determinant...")
+function test_fmpz_mat_det()
+   print("fmpz_mat.det...")
 
    S = MatrixSpace(ZZ, 3, 3)
 
    A = S([fmpz(2) 3 5; 1 4 7; 19 3 7])
    
-   @test determinant(A) == 27
+   @test det(A) == 27
 
-   @test determinant_divisor(A) == 27
+   @test det_divisor(A) == 27
 
-   @test determinant_given_divisor(A, 9) == 27
+   @test det_given_divisor(A, 9) == 27
 
-   @test determinant_given_divisor(A, fmpz(9)) == 27
+   @test det_given_divisor(A, fmpz(9)) == 27
 
    println("PASS")
 end
@@ -487,7 +487,7 @@ function test_fmpz_mat()
    test_fmpz_mat_pseudo_inversion()
    test_fmpz_mat_exact_division()
    test_fmpz_mat_modular_reduction()
-   test_fmpz_mat_determinant()
+   test_fmpz_mat_det()
    test_fmpz_mat_hadamard()
    test_fmpz_mat_hnf()
    test_fmpz_mat_lll()

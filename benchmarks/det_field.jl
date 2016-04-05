@@ -12,7 +12,7 @@ function benchmark_nf_det()
      end
    end
 
-   tt = @elapsed determinant(M)
+   tt = @elapsed det(M)
    println("$tt")
 end
 

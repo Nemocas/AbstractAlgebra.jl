@@ -477,8 +477,8 @@ function test_matrix_fflu()
    println("PASS")
 end
 
-function test_matrix_determinant()
-   print("Matrix.determinant...")
+function test_matrix_det()
+   print("Matrix.det...")
 
    S, x = PolynomialRing(ResidueRing(ZZ, 1009*2003), "x")
 
@@ -487,7 +487,7 @@ function test_matrix_determinant()
 
       M = randmat(R, 5, 100);
 
-      @test determinant(M) == Nemo.determinant_clow(M)
+      @test det(M) == Nemo.det_clow(M)
    end
 
    S, z = PolynomialRing(ZZ, "z")
@@ -497,7 +497,7 @@ function test_matrix_determinant()
 
       M = randmat(R, 3, 20);
 
-      @test determinant(M) == Nemo.determinant_clow(M)
+      @test det(M) == Nemo.det_clow(M)
    end
 
    R, x = PolynomialRing(QQ, "x")
@@ -508,7 +508,7 @@ function test_matrix_determinant()
 
       M = randmat(S, 100);
 
-      @test determinant(M) == Nemo.determinant_clow(M)
+      @test det(M) == Nemo.det_clow(M)
    end
 
    R, x = PolynomialRing(ZZ, "x")
@@ -518,7 +518,7 @@ function test_matrix_determinant()
       T = MatrixSpace(S, dim, dim)
       M = randmat(T, 20)
       
-      @test determinant(M) == Nemo.determinant_clow(M)
+      @test det(M) == Nemo.det_clow(M)
    end
 
    println("PASS")
@@ -1072,7 +1072,7 @@ function test_matrix()
    test_matrix_content()
    test_matrix_lufact()
    test_matrix_fflu()
-   test_matrix_determinant()
+   test_matrix_det()
    test_matrix_rank()
    test_matrix_solve()
    test_matrix_solve_triu()

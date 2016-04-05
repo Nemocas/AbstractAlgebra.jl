@@ -5,7 +5,7 @@
 ###############################################################################
 
 export fmpz_mat, FmpzMatSpace, getindex, getindex!, setindex!, rows, cols,
-       charpoly, determinant, determinant_divisor, determinant_given_divisor,
+       charpoly, det, det_divisor, det_given_divisor,
        gram, hadamard, is_hadamard, hnf, is_hnf, hnf_with_transform,
        hnf_modular, lll, lll_gram, lll_with_transform, lll_gram_with_transform,
        lll_with_removal, lll_with_removal_transform,
@@ -473,7 +473,7 @@ end
 #
 ###############################################################################
 
-function determinant(x::fmpz_mat)
+function det(x::fmpz_mat)
    rows(x) != cols(x) && error("Non-square matrix")
    z = fmpz()
    ccall((:fmpz_mat_det, :libflint), Void,
@@ -481,7 +481,7 @@ function determinant(x::fmpz_mat)
    return z
 end
 
-function determinant_divisor(x::fmpz_mat)
+function det_divisor(x::fmpz_mat)
    rows(x) != cols(x) && error("Non-square matrix")
    z = fmpz()
    ccall((:fmpz_mat_det_divisor, :libflint), Void,
@@ -489,7 +489,7 @@ function determinant_divisor(x::fmpz_mat)
    return z
 end
 
-function determinant_given_divisor(x::fmpz_mat, d::fmpz, proved=true)
+function det_given_divisor(x::fmpz_mat, d::fmpz, proved=true)
    rows(x) != cols(x) && error("Non-square")
    z = fmpz()
    ccall((:fmpz_mat_det_modular_given_divisor, :libflint), Void,
@@ -497,8 +497,8 @@ function determinant_given_divisor(x::fmpz_mat, d::fmpz, proved=true)
    return z
 end
 
-function determinant_given_divisor(x::fmpz_mat, d::Integer, proved=true)
-   return determinant_given_divisor(x, fmpz(d), proved)
+function det_given_divisor(x::fmpz_mat, d::Integer, proved=true)
+   return det_given_divisor(x, fmpz(d), proved)
 end
 
 ###############################################################################
