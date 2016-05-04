@@ -807,7 +807,7 @@ end
 ###############################################################################
 
 function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{}; cached=true)
-   S = symbol(s)
+   S = Symbol(s)
    T = elem_type(R)
    parent_obj = PowerSeriesRing{T}(R, prec, S, cached)
 

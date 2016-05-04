@@ -870,9 +870,9 @@ end
 
 function PolynomialRing(R::ResidueRing{fmpz}, s::AbstractString{}; cached=true)
    if modulus(R) <= typemax(UInt)
-      parent_obj = NmodPolyRing(R, symbol(s), cached)
+      parent_obj = NmodPolyRing(R, Symbol(s), cached)
    else
-      parent_obj = FmpzModPolyRing(R, symbol(s), cached)
+      parent_obj = FmpzModPolyRing(R, Symbol(s), cached)
    end
 
    return parent_obj, parent_obj([R(0), R(1)])

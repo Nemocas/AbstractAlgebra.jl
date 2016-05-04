@@ -174,7 +174,7 @@ for (s,f) in (("iszero", "acb_is_zero"),
               ("isreal", "acb_is_real"),
               ("contains_zero", "acb_contains_zero"))
   @eval begin
-    function($(symbol(s)))(x::acb)
+    function($(Symbol(s)))(x::acb)
       return Bool(ccall(($f, :libarb), Cint, (Ptr{acb},), &x))
     end
   end
@@ -444,7 +444,7 @@ for (s,f) in (
               ("ellipe", "acb_modular_elliptic_e"),
              )
   @eval begin
-    function($(symbol(s)))(x::acb)
+    function($(Symbol(s)))(x::acb)
       z = parent(x)()
       ccall(($f, :libarb), Void, (Ptr{acb}, Ptr{acb}, Int), &z, &x, parent(x).prec)
       return z

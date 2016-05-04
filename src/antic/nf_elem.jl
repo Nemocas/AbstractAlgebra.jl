@@ -772,7 +772,7 @@ end
 ###############################################################################
 
 function AnticNumberField(pol::fmpq_poly, s::AbstractString{})
-   S = symbol(s)
+   S = Symbol(s)
    parent_obj = AnticNumberField(pol, S)
 
    return parent_obj, gen(parent_obj)

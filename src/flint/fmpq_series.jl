@@ -739,7 +739,7 @@ end
 ###############################################################################
 
 function PowerSeriesRing(R::FlintRationalField, prec::Int, s::AbstractString{})
-   S = symbol(s)
+   S = Symbol(s)
 
    parent_obj = FmpqSeriesRing(prec, S)
    
