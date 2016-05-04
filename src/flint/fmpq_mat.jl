@@ -326,7 +326,7 @@ end
 
 function inv(x::fmpq_mat)
    z = parent(x)()
-   success = ccall((:fmpq_mat_inv, :libflint), Int,
+   success = ccall((:fmpq_mat_inv, :libflint), Cint,
          (Ptr{fmpq_mat}, Ptr{fmpq_mat}), &z, &x)
    success == 0 && error("Matrix not invertible")
    return z
@@ -496,7 +496,7 @@ end
 function trace(x::fmpq_mat)
    rows(x) != cols(x) && error("Not a square matrix in trace")
    d = fmpq()
-   ccall((:fmpq_mat_trace, :libflint), Int,
+   ccall((:fmpq_mat_trace, :libflint), Void,
                 (Ptr{fmpq}, Ptr{fmpq_mat}), &d, &x)
    return d
 end
