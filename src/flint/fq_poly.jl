@@ -674,7 +674,7 @@ end
 ################################################################################
 
 function PolynomialRing(R::FqFiniteField, s::AbstractString{})
-   S = symbol(s)
+   S = Symbol(s)
    parent_obj = FqPolyRing(R, S)
    return parent_obj, parent_obj([R(0), R(1)])
 end

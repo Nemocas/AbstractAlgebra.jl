@@ -548,7 +548,7 @@ end
 ###############################################################################
 
 function PowerSeriesRing(R::ResidueRing{fmpz}, prec::Int, s::AbstractString{})
-   S = symbol(s)
+   S = Symbol(s)
 
    parent_obj = FmpzModSeriesRing(R, prec, S)
 

@@ -697,7 +697,7 @@ end
 ###############################################################################
 
 function PolynomialRing(R::FlintRationalField, s::AbstractString{})
-   S = symbol(s)
+   S = Symbol(s)
 
    parent_obj = FmpqPolyRing(R, S)
    
