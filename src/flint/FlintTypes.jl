@@ -1221,6 +1221,126 @@ end
 
 ###############################################################################
 #
+#   FmpqMatSpace / fmpq_mat
+#
+###############################################################################
+
+const FmpqMatID = ObjectIdDict()
+
+# not really a mathematical ring
+type FmpqMatSpace <: Ring{Flint}
+   rows::Int
+   cols::Int
+   base_ring::FlintRationalField
+
+   function FmpqMatSpace(r::Int, c::Int)
+      if haskey(FmpqMatID, (r, c))
+         return FmpqMatID[r, c]::FmpqMatSpace
+      else
+         z = new(r, c, FlintQQ)
+         FmpqMatID[r, c] = z
+         return z
+      end
+   end
+end
+
+type fmpq_mat <: MatElem{fmpq}
+   entries::Ptr{Void}
+   r::Int
+   c::Int
+   rows::Ptr{Void}
+   parent::FmpqMatSpace
+
+   # used by windows, not finalised!!
+   function fmpq_mat()
+      return new() 
+   end
+
+   function fmpq_mat(r::Int, c::Int)
+      z = new()
+      ccall((:fmpq_mat_init, :libflint), Void, 
+            (Ptr{fmpq_mat}, Int, Int), &z, r, c)
+      finalizer(z, _fmpq_mat_clear_fn)
+      return z
+   end
+
+   function fmpq_mat(r::Int, c::Int, arr::Array{fmpq, 2})
+      z = new()
+      ccall((:fmpq_mat_init, :libflint), Void, 
+            (Ptr{fmpq_mat}, Int, Int), &z, r, c)
+      finalizer(z, _fmpq_mat_clear_fn)
+      for i = 1:r
+         for j = 1:c
+            el = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
+                       (Ptr{fmpq_mat}, Int, Int), &z, i - 1, j - 1)
+            ccall((:fmpq_set, :libflint), Void,
+                  (Ptr{fmpq}, Ptr{fmpq}), el, &arr[i, j])
+         end
+      end
+      return z
+   end
+
+   function fmpq_mat(r::Int, c::Int, arr::Array{fmpq, 1})
+      z = new()
+      ccall((:fmpq_mat_init, :libflint), Void, 
+            (Ptr{fmpq_mat}, Int, Int), &z, r, c)
+      finalizer(z, _fmpq_mat_clear_fn)
+      for i = 1:r
+         for j = 1:c
+            el = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
+                       (Ptr{fmpq_mat}, Int, Int), &z, i - 1, j - 1)
+            ccall((:fmpq_set, :libflint), Void,
+                  (Ptr{fmpq}, Ptr{fmpq}), el, &arr[(i-1)*c+j])
+         end
+      end
+      return z
+   end
+
+   function fmpq_mat{T <: Integer}(r::Int, c::Int, arr::Array{T, 2})
+      z = new()
+      ccall((:fmpq_mat_init, :libflint), Void, 
+            (Ptr{fmpq_mat}, Int, Int), &z, r, c)
+      finalizer(z, _fmpq_mat_clear_fn)
+      for i = 1:r
+         for j = 1:c
+            el = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
+                       (Ptr{fmpq_mat}, Int, Int), &z, i - 1, j - 1)
+            ccall((:fmpq_set, :libflint), Void,
+                  (Ptr{fmpq}, Ptr{fmpq}), el, &fmpq(arr[i, j]))
+         end
+      end
+      return z
+   end
+
+   function fmpq_mat(r::Int, c::Int, d::fmpq)
+      z = new()
+      ccall((:fmpq_mat_init, :libflint), Void, 
+            (Ptr{fmpq_mat}, Int, Int), &z, r, c)
+      finalizer(z, _fmpq_mat_clear_fn)
+      for i = 1:min(r, c)
+         el = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
+                    (Ptr{fmpq_mat}, Int, Int), &z, i - 1, i - 1)
+         ccall((:fmpq_set, :libflint), Void,
+               (Ptr{fmpq}, Ptr{fmpq}), el, &d)
+      end
+      return z
+   end
+
+   function fmpq_mat(m::fmpq_mat)
+      z = new()
+      ccall((:fmpq_mat_init_set, :libflint), Void, 
+            (Ptr{fmpq_mat}, Ptr{fmpq_mat}), &z, &m)
+      finalizer(z, _fmpq_mat_clear_fn)
+      return z
+   end
+end
+
+function _fmpq_mat_clear_fn(a::fmpq_mat)
+   ccall((:fmpq_mat_clear, :libflint), Void, (Ptr{fmpq_mat},), &a)
+end
+
+###############################################################################
+#
 #   FmpzMatSpace / fmpz_mat
 #
 ###############################################################################
