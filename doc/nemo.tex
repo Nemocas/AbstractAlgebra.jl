@@ -8302,6 +8302,59 @@ Here are some examples of computing the Smith normal form.
    C = snf_diagonal(B)
 \end{lstlisting}
 
+\subsection{Flint matrices over $\Q$: \code{fmpq_mat}}
+
+The Flint type for matrices over $\Q$ is \code{fmpq_mat}. Matrices
+of this type are created using the \code{MatrixSpace} constructor in Nemo. 
+
+\begin{lstlisting}
+S = MatrixSpace(QQ, 3, 3)
+\end{lstlisting}
+
+Matrices in this matrix space have parent of type \code{FmpqMatSpace}.
+
+We describe functions for \code{fmpq_mat} only where they differ from the functions
+available for generic matrices.
+
+\subsubsection{Gram-Schmidt orthogonalisation}
+
+\begin{lstlisting}
+gso(A::fmpq_mat)
+\end{lstlisting}
+
+\desc{Return the Gram-Schmidt orthogonalisation of $A$.}
+
+\textbf{Examples.}
+
+Here is an example of computing the Gram-Schmidt orthogonalisation.
+
+\begin{lstlisting}
+   S = MatrixSpace(QQ, 3, 3)
+
+   A = S([fmpq(2) 3 5; 1 4 7; 9 6 3])
+
+   G = gso(A)
+\end{lstlisting}
+
+\subsubsection{Hilbert matrix}
+
+\begin{lstlisting}
+hilbert(S::FmpqMatSpace)
+\end{lstlisting}
+
+\desc{Return the Hilbert matrix for the given matrix space. This is the matrix with entries
+$H_{i,j} = 1/(i + j - 1)$.}
+
+\textbf{Examples.}
+
+Here is an example of computing the Hilbert matrix.
+
+\begin{lstlisting}
+   S = MatrixSpace(QQ, 3, 3)
+
+   A = hilbert(S)
+\end{lstlisting}
+
 \section{Flint fields}
 
 Flint provides implementations of various explicit fields. We describe their
