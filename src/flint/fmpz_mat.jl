@@ -26,7 +26,7 @@ base_ring(a::FmpzMatSpace) = a.base_ring
 parent(a::fmpz_mat) = a.parent
 
 function check_parent(a::fmpz_mat, b::fmpz_mat)
-   parent(a) != parent(b) && error("Incompatible moduli in residue operation")
+   parent(a) != parent(b) && error("Incompatible matrices")
 end
 
 ###############################################################################
@@ -779,7 +779,7 @@ end
 
 function solve(a::fmpz_mat, b::fmpz_mat)
    rows(a) != cols(a) && error("Not a square matrix in solve")
-   rows(b) != rows(a) || cols(b) != 1 && ("Not a column vector in solve")
+   rows(b) != rows(a) && error("Incompatible dimensions in solve")
    z = parent(b)()
    d = fmpz()
    nonsing = ccall((:fmpz_mat_solve, :libflint), Bool,
@@ -790,7 +790,7 @@ end
 
 function solve_dixon(a::fmpz_mat, b::fmpz_mat)
    rows(a) != cols(a) && error("Not a square matrix in solve")
-   rows(b) != rows(a) || cols(b) != 1 && ("Not a column vector in solve")
+   rows(b) != rows(a) && error("Incompatible dimensions in solve")
    z = parent(b)()
    d = fmpz()
    nonsing = ccall((:fmpz_mat_solve_dixon, :libflint), Bool,

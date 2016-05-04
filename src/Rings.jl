@@ -255,6 +255,8 @@ include("generic/Matrix.jl")
 
 include("flint/fmpz_mat.jl")
 
+include("flint/fmpq_mat.jl")
+
 include("flint/nmod_mat.jl")
 
 include("pari/pari_int.jl")
