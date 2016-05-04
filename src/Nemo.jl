@@ -32,7 +32,7 @@ export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
        MaximalRealSubfield, MaximalOrder, Ideal, PermutationGroup
 
 export create_accessors, get_handle, package_handle, allocatemem, zeros,
-       Array, promotion_rule_exists
+       Array, sig_exists
 
 export flint_cleanup, flint_set_num_threads
 
@@ -63,7 +63,6 @@ end
 
 function pari_sigint_handler()
    error("User interrupt")
-   return
 end
 
 function flint_abort()
@@ -201,7 +200,7 @@ end
 
 if VERSION >= v"0.5.0-dev+3171"
 
-function sig_exists{U, V, W}(T::Type{Tuple{U, V, W}}, sig_table::Array{Any, 1})
+function sig_exists{U, V, W, X}(T::Type{Tuple{U, V, W}}, sig_table::Array{X, 1})
    for s in sig_table
       if s === T
          return true
@@ -212,7 +211,7 @@ end
 
 else
 
-function sig_exists{U, V, W}(T::Type{Tuple{U, V, W}}, sig_table::Array{Any, 1})
+function sig_exists{U, V, W, X}(T::Type{Tuple{U, V, W}}, sig_table::Array{X, 1})
    return false
 end
 

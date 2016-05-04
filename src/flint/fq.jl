@@ -371,7 +371,7 @@ end
 ###############################################################################
 
 function FlintFiniteField(char::fmpz, deg::Int, s::AbstractString{})
-   S = symbol(s)
+   S = Symbol(s)
    parent_obj = FqFiniteField(char, deg, S)
 
    return parent_obj, gen(parent_obj)
@@ -382,7 +382,7 @@ function FlintFiniteField(char::Integer, deg::Int, s::AbstractString{})
 end
 
 function FlintFiniteField(pol::fmpz_mod_poly, s::AbstractString{})
-   S = symbol(s)
+   S = Symbol(s)
    parent_obj = FqFiniteField(pol, S)
 
    return parent_obj, gen(parent_obj)

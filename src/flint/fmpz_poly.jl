@@ -726,7 +726,7 @@ Base.call(a::FmpzPolyRing, b::fmpz_poly) = b
 ###############################################################################
 
 function PolynomialRing(R::FlintIntegerRing, s::AbstractString{})
-   S = symbol(s)
+   S = Symbol(s)
 
    parent_obj = FmpzPolyRing(S)
    

@@ -558,7 +558,7 @@ end
 ###############################################################################
 
 function PowerSeriesRing(R::FqNmodFiniteField, prec::Int, s::AbstractString{})
-   S = symbol(s)
+   S = Symbol(s)
 
    parent_obj = FqNmodSeriesRing(R, prec, S)
 

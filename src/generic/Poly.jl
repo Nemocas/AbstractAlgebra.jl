@@ -1740,7 +1740,7 @@ end
 ###############################################################################
 
 function PolynomialRing(R::Ring, s::AbstractString{}; cached::Bool = true)
-   S = symbol(s)
+   S = Symbol(s)
    T = elem_type(R)
    parent_obj = PolynomialRing{T}(R, S, cached)
 
