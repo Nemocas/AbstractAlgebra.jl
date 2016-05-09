@@ -16,7 +16,7 @@ notifications:
 #script:
   - julia -e 'Pkg.clone(pwd()); Pkg.test("Nemo")'
 
-after_success::
+after_success:
   - julia -e 'Pkg.clone("https://github.com/MichaelHatherly/Documenter.jl")'
   - julia -e 'cd(Pkg.dir("Nemo")); include(joinpath("doc", "build.jl"))'
 
