@@ -20,3 +20,11 @@ Nemo consists of wrappers of specialised C/C++ libraries:
 It will also eventually provide interfaces to interpreted library code from other computer algebra
 systems such as Gap and Singular.
 
+Nemo also provides implementations of generic algorithms and mathematical data structures. So far the
+fully recursive constructions include
+
+  - Univariate polynomial rings
+  - Power series rings
+  - Residue rings (modulo principal ideals)
+  - Fraction fields
+  - Matrices
