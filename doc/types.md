@@ -119,9 +119,12 @@ true
 
 ## Concrete types in Nemo
 
-Finally we come to all the concrete types in Nemo. These are of two main kinds: those for generic
-constructions (e.g. generic polynomials over an arbitrary ring) and those for specific implementation,
-usually provided by a C library (e.g. polynomials over the integers, provided by Flint).
+Finally we come to all the concrete types in Nemo. Although types are rarely dealt with directly when
+using Nemo, they are of interest to developers. So we list them here.
+
+These are of two main kinds: those for generic constructions (e.g. generic polynomials over an arbitrary
+ring) and those for specific implementations, usually provided by a C library (e.g. polynomials over the
+integers, provided by Flint).
 
 We give the type of each kind of element available in Nemo. In parentheses we list the concrete types
 of their corresponding parent objects.
@@ -136,3 +139,41 @@ over.
      - `Fraction{T}` (`FractionField{T}`)
      - `Mat{T}` (`MatrixSpace{T}`)
 
+  - Flint
+     - `fmpz` (`FlintIntegerRing`)
+     - `fmpq` (`FlintRationalField`)
+     - `fq_nmod` (`FqNmodFiniteField`)
+     - `fq` (`FqFiniteField`)
+     - `padic` (`FlintPadicField`)
+     - `fmpz_poly` (`FmpzPolyRing`)
+     - `fmpq_poly` (`FmpqPolyRing`)
+     - `nmod_poly` (`NmodPolyRing`)
+     - `fmpz_mod_poly` (`FmpzModPolyRing`)
+     - `fq_poly` (`FqPolyRing`)
+     - `fq_nmod_poly` (`FqNmodPolyRing`)
+     - `fmpz_series` (`FmpzSeriesRing`)
+     - `fmpq_series` (`FmpqSeriesRing`)
+     - `fmpz_mod_series` (`FmpzModSeriesRing`)
+     - `fq_nmod_series` (`FqNmodSeriesRing`)
+     - `fq_series` (`FqSeriesRing`)
+     - `fmpz_mat` (`FmpzMatSpace`)
+     - `nmod_mat` (`NmodMatSpace`)
+     - `perm` (`FlintPermGroup`)
+
+  - Antic
+     - `nf_elem` (`AnticNumberField`)
+
+  - Arb
+     - `arb` (`ArbField`)
+     - `acb` (`AcbField`)
+
+  - Pari
+     - `pari_int` (`PariIntegerRing`)
+     - `pari_rat` (`PariRationalField`)
+     - `pari_vec{T}` (`PariVector{T}`)
+     - `pari_poly{T}` (`PariPolyRing{T}`)
+     - `pari_polmod{T}` (`PariPolModRing{T}`)
+     - `pari_maximal_order_elem` (`PariMaximalOrder`)
+     - `PariIdeal` (`PariIdealSet`)
+     - no element type (`PariNumberField`)
+     - `PariFactor{T}` (no parent type)
