@@ -72,7 +72,7 @@ polynomial ring would have type `Poly`.
 In order to model this distinction between elements and the domains they belong to, Nemo has two main
 branches in its abstract type hierarchy, as shown in the following diagram.
 
-![alt text](/types.png "Abstract type hierarchy")
+![alt text](img/types.png "Abstract type hierarchy")
 
 All objects in Nemo, whether they represent rings, fields, groups, sets on the one hand, or ring
 elements, field elements, etc. on the other hand, have concrete types that belong to one of the abstract
