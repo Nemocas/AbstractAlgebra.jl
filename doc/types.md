@@ -78,3 +78,41 @@ All objects in Nemo, whether they represent rings, fields, groups, sets on the o
 elements, field elements, etc. on the other hand, have concrete types that belong to one of the abstract
 types shown above.
 
+## Parent objects in Nemo
+
+The Julia type system doesn't directly provide us with a way of modeling that an object of type `Poly`
+belongs to a given polynomial ring (represented by an object of type `PolynomialRing` in Nemo).
+
+In order to model this relationship, we provide a function `parent`, which tells us which domain a given
+element belongs to.
+
+Here is some Julia/Nemo code which constructs a polynomial ring over the integers, a polynomial in that
+ring and then does some introspection to illustrate the various relations between the objects and types.
+
+```
+julia> using Nemo
+
+julia> R, x = ZZ["x"]
+(Univariate Polynomial Ring in x over Integer Ring,x)
+
+julia> f = x^2 + 3x + 1
+x^2+3*x+1
+
+julia> typeof(R)
+Nemo.FmpzPolyRing
+
+julia> typeof(f)
+Nemo.fmpz_poly
+
+julia> parent(f)
+Univariate Polynomial Ring in x over Integer Ring
+
+julia> typeof(R) <: FmpzPolyRing
+true
+
+julia> typeof(f) <: PolyElem
+true
+
+julia> parent(f) == R
+true
+```
