@@ -116,3 +116,23 @@ true
 julia> parent(f) == R
 true
 ```
+
+## Concrete types in Nemo
+
+Finally we come to all the concrete types in Nemo. These are of two main kinds: those for generic
+constructions (e.g. generic polynomials over an arbitrary ring) and those for specific implementation,
+usually provided by a C library (e.g. polynomials over the integers, provided by Flint).
+
+We give the type of each kind of element available in Nemo. In parentheses we list the concrete types
+of their corresponding parent objects.
+
+All the generic types are parameterised by the type `T` of the elements of the ring they are defined
+over.
+
+  - Generic
+     - `Poly{T}` (`PolynomialRing{T}`)
+     - `PowerSeries{T}` (`PowerSeriesRing{T}`)
+     - `Residue{T}` (`ResidueRing{T}`)
+     - `Fraction{T}` (`FractionField{T}`)
+     - `Mat{T}` (`MatrixSpace{T}`)
+
