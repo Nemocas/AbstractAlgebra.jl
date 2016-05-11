@@ -24,8 +24,8 @@ abstract type. Then we create the individual concrete types that belong to that 
 function can then be constructed with a type parameter, `T` say, similar to a template parameter in C++.
 The main difference is that we can specify which abstract type our type parameter `T` must belong to.
 
-We use the symbol <: in Julia to determine that a given type belongs to a given abstract type. For
-example the built-in Julia type `Int64` for 64 bit machine integers belongs to the Julia type class
+We use the symbol `<:` in Julia to determine that a given type belongs to a given abstract type. For
+example the built-in Julia type `Int64` for 64 bit machine integers belongs to the Julia abstract type
 `Integer`. Thus `Int <: Integer` returns `true`.
 
 Here is some Julia code illustrating this with a more complex example. We create an abstract type called
@@ -104,11 +104,11 @@ As an example, consider the ring $R = \mathbb{Z}/n\mathbb{Z}$ for a multiprecisi
 were to model the ring $R$ as a type, then the type would somehow need to contain the modulus
 $n$. This is not possible in Julia, and in fact it is not desirable either.
 
-Julia dispatches on type, and each time we call the a generic function with different types, a new
-version of the function is compiled at runtime for performance. But this would be a disaster if we were
-writing a multimodular algorithm, say. In such an algorithm many rings $\mathbb{Z}/n\mathbb{Z}$ would be
-needed and every function we use would be recompiled over and over for each different $n$. This would
-result in a huge delay as the compiler is invoked many times.
+Julia dispatches on type, and each time we call a generic function with different types, a new version
+of the function is compiled at runtime for performance. But this would be a disaster if we were writing
+a multimodular algorithm, say. In such an algorithm many rings $\mathbb{Z}/n\mathbb{Z}$ would be needed
+and every function we use would be recompiled over and over for each different $n$. This would result 
+in a huge delay as the compiler is invoked many times.
 
 For this reason, the modulus $n$ needs to be attached to the *elements* of the ring, not to type
 associated with those elements.
@@ -118,23 +118,28 @@ the type? Suppose all rings $\mathbb{Z}/n\mathbb{Z}$ were represented by the sam
 would we create $a = 3 \pmod{7}$? We could not write `a = Zmod(3)` since the modulus $7$ is not contained
 in the type `Zmod`.
 
-The way we get around this in Nemo is to have a special object that acts like a type, but is really just
-an ordinary Julia object, which can contain the modulus $n$. We treat such an object like a type in Nemo,
-even though it is really an object. We call such objects *parent* objects.
+We could of course use the notation `a = Zmod(3, 7)`, but this would make implementation of generic
+algorithms very difficult, as they would need to distinguish the case where constructors take a single
+argument, such as `a = ZZ(7)` and cases where they take a modulus, such as `a = Zmod(3, 7)`.
+
+The way we get around this in Nemo is to have special (singleton) objects that act like types, but are
+really just ordinary Julia objects. These object, called *parent* objects can contain extra information,
+such as the modulus $n$. 
 
 In order to create new elements of $\mathbb{Z}/n\mathbb{Z}$ as above, we overload the `call` operator
-for the parent object, making it callable.
+for the parent object, making it callable. Making a parent object callable is exactly analogous to
+writing a constructor for a type.
 
-In the following example, we create the parent object `R` corresponding to the ring
-$\mathbb{Z}/7\mathbb{Z}$ in Nemo. We then create a new element `a` of this ring by calling the
-parent object `R`, just as though `R` were a type. 
+In the following Nemo example, we create the parent object `R` corresponding to the ring
+$\mathbb{Z}/7\mathbb{Z}$. We then create a new element `a` of this ring by calling the parent object
+`R`, just as though `R` were a type with a constructor accepting an `Int` parameter. 
 
 ```
 R = ResidueRing(ZZ, 7)
 a = R(3)
 ```
 
-This example creates the element $a = 3 \pmod{7}$.
+This example creates the element $a = 3 \pmod{7}$. 
 
 The important point is that unlike a type, a parent object such as `R` can contain additional information
 that a type cannot contain, such as the modulus $7$ of the ring in this example, or context objects
@@ -181,13 +186,18 @@ These are of two main kinds: those for generic constructions (e.g. generic polyn
 ring) and those for specific implementations, usually provided by a C library (e.g. polynomials over the
 integers, provided by Flint).
 
-We give the type of each kind of element available in Nemo. In parentheses we list the types of their
-corresponding parent objects. Note that these are the types of the element objects and parent objects,
-not the abstract types to which these types belong.
+Below we give the type of each kind of element available in Nemo. In parentheses we list the types of
+their corresponding parent objects. Note that these are the types of the element objects and parent
+objects respectively, not the abstract types to which these types belong, which the reader can easily
+guess. 
 
-All the generic types are parameterised by a type `T` which is the type of the elements of the ring they
-are defined over. For example, a polynomial ring over the Flint integers `fmpz` would have type
-`PolynomialRing{fmpz}`, i.e. where `T = fmpz`.
+For example, `fmpz` belongs to the abstract type `RingElem` and `FlintIntegerRing` belongs to `Ring`.
+Similarly `Poly{T}` belongs to `PolyElem` whereas `PolynomialRing{T}` belongs to `Ring`. We also have
+that `fmpz_poly` belongs to `PolyElem` and `FmpzPolyRing` belongs to `Ring`, and so on.
+
+All the generic types are parameterised by a type `T` which is the type of the *elements* of the ring
+they are defined over. For example, a polynomial ring over the Flint integers `fmpz` would have type
+`PolynomialRing{fmpz}`, thus in that example the type parameter `T` would be instantiated as `fmpz`.
 
   - Generic
      - `Poly{T}` (`PolynomialRing{T}`)
