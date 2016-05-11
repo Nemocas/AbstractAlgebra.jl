@@ -4,7 +4,7 @@ On this page we discuss the type hierarchy in Nemo and a concept known as parent
 quite technical and should be skipped or skimmed by new users of Julia/Nemo. Types are almost never dealt with
 directly when scripting Nemo to do mathematical computations. 
 
-In contrast, Nemo developers will certainlty want to know how we model mathematical objects and the
+In contrast, Nemo developers will certainly want to know how we model mathematical objects and the
 rings, fields, groups, etc. that they belong to in Nemo.
 
 ## Introduction
