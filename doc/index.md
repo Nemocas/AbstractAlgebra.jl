@@ -123,9 +123,6 @@ And here is an example with power series.
 ```
 julia> using Nemo
 
-julia> @time divexact((u*exp(x*u)), (exp(u)-1));
-  0.022710 seconds (67.06 k allocations: 2.074 MB)
-
 julia> R, x = QQ["x"]
 (Univariate Polynomial Ring in x over Rational Field,x)
 
