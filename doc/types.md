@@ -123,7 +123,7 @@ algorithms very difficult, as they would need to distinguish the case where cons
 argument, such as `a = ZZ(7)` and cases where they take a modulus, such as `a = Zmod(3, 7)`.
 
 The way we get around this in Nemo is to have special (singleton) objects that act like types, but are
-really just ordinary Julia objects. These object, called *parent* objects can contain extra information,
+really just ordinary Julia objects. These objects, called *parent* objects can contain extra information,
 such as the modulus $n$. 
 
 In order to create new elements of $\mathbb{Z}/n\mathbb{Z}$ as above, we overload the `call` operator
