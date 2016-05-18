@@ -212,7 +212,7 @@ function test_gen_fraction_gcd()
    println("PASS")
 end
 
-function test_fraction()
+function test_gen_fraction()
    test_gen_fraction_constructors()
    test_gen_fraction_manipulation()
    test_gen_fraction_unary_ops()

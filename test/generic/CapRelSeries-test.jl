@@ -331,7 +331,7 @@ function test_cap_rel_series_special_functions()
    println("PASS")
 end
 
-function test_cap_rel_series()
+function test_gen_cap_rel_series()
    test_cap_rel_series_constructors()
    test_cap_rel_series_manipulation()
    test_cap_rel_series_unary_ops()

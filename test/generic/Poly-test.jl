@@ -540,7 +540,7 @@ function test_gen_poly_generic_eval()
    println("PASS")
 end
 
-function test_poly()
+function test_gen_poly()
    test_gen_poly_constructors()
    test_gen_poly_manipulation()
    test_gen_poly_binary_ops()

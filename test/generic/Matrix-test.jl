@@ -1056,7 +1056,7 @@ function test_gen_matrix_minpoly()
    println("PASS")   
 end
 
-function test_matrix()
+function test_gen_matrix()
    test_gen_matrix_constructors()
    test_gen_matrix_manipulation()
    test_gen_matrix_unary_ops()

@@ -275,7 +275,7 @@ function test_gen_residue_exact_division()
    println("PASS")
 end
 
-function test_residue()
+function test_gen_residue()
    test_gen_residue_constructors()
    test_gen_residue_manipulation()
    test_gen_residue_unary_ops()
