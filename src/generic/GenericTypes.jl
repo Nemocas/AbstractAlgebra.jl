@@ -79,34 +79,34 @@ end
 #
 ###############################################################################
 
-const PowerSeriesID = ObjectIdDict()
+const GenCapRelSeriesID = ObjectIdDict()
 
-type PowerSeriesRing{T <: RingElem} <: Ring{Generic}
+type GenCapRelPowerSeriesRing{T <: RingElem} <: Ring{Generic}
    base_ring::Ring
    prec_max::Int
    S::Symbol
 
-   function PowerSeriesRing(R::Ring, prec::Int, s::Symbol, cached=true)
-      if haskey(PowerSeriesID, (R, prec, s))
-         return PowerSeriesID[R, prec, s]::PowerSeriesRing{T}
+   function GenCapRelPowerSeriesRing(R::Ring, prec::Int, s::Symbol, cached=true)
+      if haskey(GenCapRelSeriesID, (R, prec, s))
+         return GenCapRelSeriesID[R, prec, s]::GenCapRelPowerSeriesRing{T}
       else
          z = new{T}(R, prec, s)
          if cached
-            PowerSeriesID[R, prec, s] = z
+            GenCapRelSeriesID[R, prec, s] = z
          end
          return z
       end
    end
 end
 
-type PowerSeries{T <: RingElem} <: SeriesElem{T}
+type GenCapRelSeries{T <: RingElem} <: SeriesElem{T}
    coeffs::Array{T, 1}
    length::Int
    prec::Int
-   parent::PowerSeriesRing{T}
+   parent::GenCapRelPowerSeriesRing{T}
 
-   PowerSeries(a::Array{T, 1}, length::Int, prec::Int) = new(a, length, prec)   
-   PowerSeries(a::PowerSeries{T}) = a
+   GenCapRelSeries(a::Array{T, 1}, length::Int, prec::Int) = new(a, length, prec)   
+   GenCapRelSeries(a::GenCapRelSeries{T}) = a
 end
 
 ###############################################################################

@@ -19,7 +19,7 @@ include("pari/PariIdeal-test.jl")
 
 include("generic/Poly-test.jl")
 include("generic/Residue-test.jl")
-include("generic/PowerSeries-test.jl")
+include("generic/CapRelSeries-test.jl")
 include("generic/Matrix-test.jl")
 
 function test_rings()
@@ -41,7 +41,7 @@ function test_rings()
 
    test_poly()
    test_residue()
-   test_series()
+   test_cap_rel_series()
    test_matrix()
    test_nmod_mat()
    test_fmpz_mat()
