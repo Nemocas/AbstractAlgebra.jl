@@ -49,13 +49,13 @@ end
 
 const ModulusDict = Dict{Tuple{Ring, RingElem}, Ring}()
 
-type ResidueRing{T <: RingElem} <: Ring{Generic}
+type GenResidueRing{T <: RingElem} <: Ring{Generic}
    base_ring::Ring
    modulus::T
 
-   function ResidueRing(modulus::T, cached=true)
+   function GenResidueRing(modulus::T, cached=true)
       if haskey(ModulusDict, (parent(modulus), modulus))
-         return ModulusDict[parent(modulus), modulus]::ResidueRing{T}
+         return ModulusDict[parent(modulus), modulus]::GenResidueRing{T}
       else
          z = new{T}(parent(modulus), modulus)
          if cached
@@ -66,11 +66,11 @@ type ResidueRing{T <: RingElem} <: Ring{Generic}
    end
 end
 
-type Residue{T <: RingElem} <: ResidueElem{T}
+type GenResidue{T <: RingElem} <: ResidueElem{T}
    data::T
-   parent::ResidueRing{T}
+   parent::GenResidueRing{T}
 
-   Residue(a::T) = new(a)
+   GenResidue(a::T) = new(a)
 end
 
 ###############################################################################

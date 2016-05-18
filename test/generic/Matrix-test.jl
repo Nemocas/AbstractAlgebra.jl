@@ -25,7 +25,7 @@ function randelem(R::FmpzPolyRing, n)
    return s
 end
 
-function randelem(R::ResidueRing{fmpz}, n)
+function randelem(R::GenResidueRing{fmpz}, n)
    return R(rand(-n:n))
 end
 
