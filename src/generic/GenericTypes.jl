@@ -115,30 +115,30 @@ end
 #
 ###############################################################################
 
-const FractionDict = ObjectIdDict()
+const GenFractionDict = ObjectIdDict()
 
-type FractionField{T <: RingElem} <: Field{Generic}
+type GenFractionField{T <: RingElem} <: Field{Generic}
    base_ring::Ring
 
-   function FractionField(R::Ring, cached=true)
-      if haskey(FractionDict, R)
-         return FractionDict[R]::FractionField{T}
+   function GenFractionField(R::Ring, cached=true)
+      if haskey(GenFractionDict, R)
+         return GenFractionDict[R]::GenFractionField{T}
       else
          z = new{T}(R)
          if cached
-            FractionDict[R] = z
+            GenFractionDict[R] = z
          end
          return z
       end
    end
 end
 
-type Fraction{T <: RingElem} <: FractionElem{T}
+type GenFraction{T <: RingElem} <: FractionElem{T}
    num::T
    den::T
-   parent::FractionField{T}
+   parent::GenFractionField{T}
 
-   Fraction(num::T, den::T) = new(num, den) 
+   GenFraction(num::T, den::T) = new(num, den) 
 end
 
 ###############################################################################
