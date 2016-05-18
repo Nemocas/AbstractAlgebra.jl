@@ -808,7 +808,7 @@ end
 #
 ################################################################################
 
-function det(M::Mat{nmod_poly})
+function det(M::GenMat{nmod_poly})
    rows(M) != cols(M) && error("Not a square matrix in det")
    try
       return det_fflu(M)

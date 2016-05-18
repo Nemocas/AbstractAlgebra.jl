@@ -38,7 +38,7 @@ function randelem(R, n)
    return s
 end
 
-function randmat{T <: RingElem}(R::MatrixSpace{T}, d::Int, c::Int)
+function randmat{T <: RingElem}(R::GenMatrixSpace{T}, d::Int, c::Int)
    m = R.rows
    n = R.cols
    r = R()
@@ -50,7 +50,7 @@ function randmat{T <: RingElem}(R::MatrixSpace{T}, d::Int, c::Int)
    return r
 end
 
-function randmat{T <: RingElem}(S::MatrixSpace{T}, c::Int)
+function randmat{T <: RingElem}(S::GenMatrixSpace{T}, c::Int)
    M = S()
    m = rows(M)
    n = cols(M)
@@ -62,7 +62,7 @@ function randmat{T <: RingElem}(S::MatrixSpace{T}, c::Int)
    return M
 end
 
-function randmat_triu{T <: RingElem}(R::MatrixSpace{T}, d::Int, c::Int)
+function randmat_triu{T <: RingElem}(R::GenMatrixSpace{T}, d::Int, c::Int)
    m = R.rows
    n = R.cols
    r = R()
@@ -80,7 +80,7 @@ function randmat_triu{T <: RingElem}(R::MatrixSpace{T}, d::Int, c::Int)
    return r
 end
 
-function randmat_triu{T <: RingElem}(S::MatrixSpace{T}, c::Int)
+function randmat_triu{T <: RingElem}(S::GenMatrixSpace{T}, c::Int)
    M = S()
    m = rows(M)
    n = cols(M)
@@ -98,7 +98,7 @@ function randmat_triu{T <: RingElem}(S::MatrixSpace{T}, c::Int)
    return M
 end
 
-function randmat_with_rank{T <: RingElem}(R::MatrixSpace{T}, d::Int, c::Int, rank::Int)
+function randmat_with_rank{T <: RingElem}(R::GenMatrixSpace{T}, d::Int, c::Int, rank::Int)
    m = R.rows
    n = R.cols
    r = R()
@@ -133,7 +133,7 @@ function randmat_with_rank{T <: RingElem}(R::MatrixSpace{T}, d::Int, c::Int, ran
    return r
 end
 
-function randmat_with_rank{T <: RingElem}(S::MatrixSpace{T}, c::Int, rank::Int)
+function randmat_with_rank{T <: RingElem}(S::GenMatrixSpace{T}, c::Int, rank::Int)
    M = S()
    m = rows(M)
    n = cols(M)
@@ -168,13 +168,13 @@ function randmat_with_rank{T <: RingElem}(S::MatrixSpace{T}, c::Int, rank::Int)
    return M
 end
 
-function test_matrix_constructors()
-   print("Matrix.constructors...")
+function test_gen_matrix_constructors()
+   print("GenMatrix.constructors...")
  
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
-   @test typeof(S) <: MatrixSpace
+   @test typeof(S) <: GenMatrixSpace
 
    f = S(t^2 + 1)
 
@@ -203,8 +203,8 @@ function test_matrix_constructors()
    println("PASS")
 end
 
-function test_matrix_manipulation()
-   print("Matrix.manipulation...")
+function test_gen_matrix_manipulation()
+   print("GenMatrix.manipulation...")
 
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
@@ -227,8 +227,8 @@ function test_matrix_manipulation()
    println("PASS")
 end
 
-function test_matrix_unary_ops()
-   print("Matrix.unary_ops...")
+function test_gen_matrix_unary_ops()
+   print("GenMatrix.unary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
@@ -241,8 +241,8 @@ function test_matrix_unary_ops()
    println("PASS")
 end
 
-function test_matrix_binary_ops()
-   print("Matrix.binary_ops...")
+function test_gen_matrix_binary_ops()
+   print("GenMatrix.binary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
@@ -259,8 +259,8 @@ function test_matrix_binary_ops()
    println("PASS")
 end
 
-function test_matrix_adhoc_binary()
-   print("Matrix.adhoc_binary...")
+function test_gen_matrix_adhoc_binary()
+   print("GenMatrix.adhoc_binary...")
 
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
@@ -280,8 +280,8 @@ function test_matrix_adhoc_binary()
    println("PASS")
 end
 
-function test_matrix_permutation()
-   print("Matrix.permutation...")
+function test_gen_matrix_permutation()
+   print("GenMatrix.permutation...")
 
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
@@ -296,8 +296,8 @@ function test_matrix_permutation()
    println("PASS")
 end
 
-function test_matrix_comparison()
-   print("Matrix.comparison...")
+function test_gen_matrix_comparison()
+   print("GenMatrix.comparison...")
 
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
@@ -312,8 +312,8 @@ function test_matrix_comparison()
    println("PASS")
 end
 
-function test_matrix_adhoc_comparison()
-   print("Matrix.adhoc_comparison...")
+function test_gen_matrix_adhoc_comparison()
+   print("GenMatrix.adhoc_comparison...")
 
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
@@ -332,8 +332,8 @@ function test_matrix_adhoc_comparison()
    println("PASS")
 end
 
-function test_matrix_powering()
-   print("Matrix.powering...")
+function test_gen_matrix_powering()
+   print("GenMatrix.powering...")
 
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
@@ -347,8 +347,8 @@ function test_matrix_powering()
    println("PASS")
 end
 
-function test_matrix_adhoc_exact_division()
-   print("Matrix.adhoc_exact_division...")
+function test_gen_matrix_adhoc_exact_division()
+   print("GenMatrix.adhoc_exact_division...")
 
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
@@ -362,8 +362,8 @@ function test_matrix_adhoc_exact_division()
    println("PASS")
 end
 
-function test_matrix_gram()
-   print("Matrix.gram...")
+function test_gen_matrix_gram()
+   print("GenMatrix.gram...")
 
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
@@ -375,8 +375,8 @@ function test_matrix_gram()
    println("PASS")
 end
 
-function test_matrix_trace()
-   print("Matrix.trace...")
+function test_gen_matrix_trace()
+   print("GenMatrix.trace...")
 
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
@@ -388,8 +388,8 @@ function test_matrix_trace()
    println("PASS")
 end
 
-function test_matrix_content()
-   print("Matrix.content...")
+function test_gen_matrix_content()
+   print("GenMatrix.content...")
 
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
@@ -400,8 +400,8 @@ function test_matrix_content()
    println("PASS")
 end
 
-function test_matrix_lufact()
-   print("Matrix.lufact...")
+function test_gen_matrix_lufact()
+   print("GenMatrix.lufact...")
 
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
@@ -431,8 +431,8 @@ function test_matrix_lufact()
    println("PASS")
 end
 
-function test_matrix_fflu()
-   print("Matrix.fflu...")
+function test_gen_matrix_fflu()
+   print("GenMatrix.fflu...")
 
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
@@ -477,8 +477,8 @@ function test_matrix_fflu()
    println("PASS")
 end
 
-function test_matrix_det()
-   print("Matrix.det...")
+function test_gen_matrix_det()
+   print("GenMatrix.det...")
 
    S, x = PolynomialRing(ResidueRing(ZZ, 1009*2003), "x")
 
@@ -524,8 +524,8 @@ function test_matrix_det()
    println("PASS")
 end
 
-function test_matrix_rank()
-   print("Matrix.rank...")
+function test_gen_matrix_rank()
+   print("GenMatrix.rank...")
 
    S, x = PolynomialRing(ResidueRing(ZZ, 1009*2003), "x")
    R = MatrixSpace(S, 3, 3)
@@ -595,8 +595,8 @@ function test_matrix_rank()
    println("PASS")   
 end
 
-function test_matrix_solve()
-   print("Matrix.solve...")
+function test_gen_matrix_solve()
+   print("GenMatrix.solve...")
 
    S, x = PolynomialRing(ResidueRing(ZZ, 20011*10007), "x")
 
@@ -672,8 +672,8 @@ function test_matrix_solve()
    println("PASS")
 end
 
-function test_matrix_solve_triu()
-   print("Matrix.solve_triu...")
+function test_gen_matrix_solve_triu()
+   print("GenMatrix.solve_triu...")
 
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
@@ -693,8 +693,8 @@ function test_matrix_solve_triu()
    println("PASS")
 end
 
-function test_matrix_rref()
-   print("Matrix.rref...")
+function test_gen_matrix_rref()
+   print("GenMatrix.rref...")
 
    S, x = PolynomialRing(ResidueRing(ZZ, 20011*10007), "x")
    R = MatrixSpace(S, 5, 5)
@@ -749,8 +749,8 @@ function test_matrix_rref()
    println("PASS")   
 end
 
-function test_matrix_nullspace()
-   print("Matrix.nullspace...")
+function test_gen_matrix_nullspace()
+   print("GenMatrix.nullspace...")
 
    S, x = PolynomialRing(ResidueRing(ZZ, 20011*10007), "x")
    R = MatrixSpace(S, 5, 5)
@@ -809,8 +809,8 @@ function test_matrix_nullspace()
    println("PASS")   
 end
 
-function test_matrix_inversion()
-   print("Matrix.inversion...")
+function test_gen_matrix_inversion()
+   print("GenMatrix.inversion...")
 
    S, x = PolynomialRing(ResidueRing(ZZ, 20011*10007), "x")
 
@@ -865,8 +865,8 @@ function test_matrix_inversion()
    println("PASS")   
 end
 
-function test_matrix_hessenberg()
-   print("Matrix.hessenberg...")
+function test_gen_matrix_hessenberg()
+   print("GenMatrix.hessenberg...")
 
    R = ResidueRing(ZZ, 18446744073709551629)
 
@@ -886,8 +886,8 @@ function test_matrix_hessenberg()
    println("PASS")   
 end
 
-function test_matrix_charpoly()
-   print("Matrix.charpoly...")
+function test_gen_matrix_charpoly()
+   print("GenMatrix.charpoly...")
 
    R = ResidueRing(ZZ, 18446744073709551629)
 
@@ -948,8 +948,8 @@ function test_matrix_charpoly()
    println("PASS")   
 end
 
-function test_matrix_minpoly()
-   print("Matrix.minpoly...")
+function test_gen_matrix_minpoly()
+   print("GenMatrix.minpoly...")
 
    R, x = FiniteField(103, 1, "x")
    T, y = PolynomialRing(R, "y")
@@ -1057,31 +1057,31 @@ function test_matrix_minpoly()
 end
 
 function test_matrix()
-   test_matrix_constructors()
-   test_matrix_manipulation()
-   test_matrix_unary_ops()
-   test_matrix_binary_ops()
-   test_matrix_adhoc_binary()
-   test_matrix_permutation()
-   test_matrix_comparison()
-   test_matrix_adhoc_comparison()
-   test_matrix_powering()
-   test_matrix_adhoc_exact_division()
-   test_matrix_gram()
-   test_matrix_trace()
-   test_matrix_content()
-   test_matrix_lufact()
-   test_matrix_fflu()
-   test_matrix_det()
-   test_matrix_rank()
-   test_matrix_solve()
-   test_matrix_solve_triu()
-   test_matrix_rref()
-   test_matrix_nullspace()
-   test_matrix_inversion()
-   test_matrix_hessenberg()
-   test_matrix_charpoly()
-   test_matrix_minpoly()
+   test_gen_matrix_constructors()
+   test_gen_matrix_manipulation()
+   test_gen_matrix_unary_ops()
+   test_gen_matrix_binary_ops()
+   test_gen_matrix_adhoc_binary()
+   test_gen_matrix_permutation()
+   test_gen_matrix_comparison()
+   test_gen_matrix_adhoc_comparison()
+   test_gen_matrix_powering()
+   test_gen_matrix_adhoc_exact_division()
+   test_gen_matrix_gram()
+   test_gen_matrix_trace()
+   test_gen_matrix_content()
+   test_gen_matrix_lufact()
+   test_gen_matrix_fflu()
+   test_gen_matrix_det()
+   test_gen_matrix_rank()
+   test_gen_matrix_solve()
+   test_gen_matrix_solve_triu()
+   test_gen_matrix_rref()
+   test_gen_matrix_nullspace()
+   test_gen_matrix_inversion()
+   test_gen_matrix_hessenberg()
+   test_gen_matrix_charpoly()
+   test_gen_matrix_minpoly()
 
    println("")
 end

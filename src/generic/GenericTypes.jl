@@ -147,31 +147,31 @@ end
 #
 ###############################################################################
 
-const MatrixDict = ObjectIdDict()
+const GenMatrixDict = ObjectIdDict()
 
 # not really a mathematical ring
-type MatrixSpace{T <: RingElem} <: Ring{Generic}
+type GenMatrixSpace{T <: RingElem} <: Ring{Generic}
    rows::Int
    cols::Int
    base_ring::Ring
 
-   function MatrixSpace(R::Ring, r::Int, c::Int, cached=true)
-      if haskey(MatrixDict, (R, r, c))
-         return MatrixDict[R, r, c]::MatrixSpace{T}
+   function GenMatrixSpace(R::Ring, r::Int, c::Int, cached=true)
+      if haskey(GenMatrixDict, (R, r, c))
+         return GenMatrixDict[R, r, c]::GenMatrixSpace{T}
       else
          z = new{T}(r, c, R)
          if cached
-            MatrixDict[R, r, c] = z
+            GenMatrixDict[R, r, c] = z
          end
          return z
       end
    end
 end
 
-type Mat{T <: RingElem} <: MatElem{T}
+type GenMat{T <: RingElem} <: MatElem{T}
    entries::Array{T, 2}
-   parent::MatrixSpace{T}
+   parent::GenMatrixSpace{T}
 
-   Mat(a::Array{T, 2}) = new(a) 
+   GenMat(a::Array{T, 2}) = new(a) 
 end
 

@@ -717,7 +717,7 @@ function MatrixSpace(R::GenResidueRing{fmpz}, r::Int, c::Int)
     NmodMatSpace(R, r, c)
   catch
     T = elem_type(R)
-    return MatrixSpace{T}(R, r, c)
+    return GenMatrixSpace{T}(R, r, c)
   end
 end
 
