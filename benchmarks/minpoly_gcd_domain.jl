@@ -1,6 +1,6 @@
 function benchmark_minpoly_gcd_domain()
    print("benchmark_minpoly_gcd_domain ... ")
-   ZZx, x = PolynomialRing(FlintZZ, "x")
+   ZZx, x = PolynomialRing(ZZ, "x")
 
    M = MatrixSpace(ZZx, 20, 20)()
 

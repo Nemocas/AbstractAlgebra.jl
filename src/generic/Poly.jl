@@ -4,14 +4,15 @@
 #
 ###############################################################################
 
-export Poly, PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow, 
-       reverse, shift_left, shift_right, divexact, pseudorem, pseudodivrem, 
-       gcd, degree, content, primpart, evaluate, compose, derivative, integral, 
-       resultant, discriminant, gcdx, zero, one, gen, length, iszero, 
-       normalise, isone, isunit, addeq!, mul!, fit!, setcoeff!, mulmod, powmod, 
-       invmod, lcm, divrem, mod, gcdinv, canonical_unit, var, chebyshev_t,
-       chebyshev_u, set_length!, mul_classical, sqr_classical, mul_ks, subst,
-       mul_karatsuba, pow_multinomial, monomial_to_newton!, newton_to_monomial!
+export GenPoly, GenPolynomialRing, PolynomialRing, hash, coeff, isgen, lead,
+       var, truncate, mullow, reverse, shift_left, shift_right, divexact,
+       pseudorem, pseudodivrem, gcd, degree, content, primpart, evaluate, 
+       compose, derivative, integral, resultant, discriminant, gcdx, zero, one,
+       gen, length, iszero, normalise, isone, isunit, addeq!, mul!, fit!,
+       setcoeff!, mulmod, powmod, invmod, lcm, divrem, mod, gcdinv,
+       canonical_unit, var, chebyshev_t, chebyshev_u, set_length!,
+       mul_classical, sqr_classical, mul_ks, subst, mul_karatsuba,
+       pow_multinomial, monomial_to_newton!, newton_to_monomial!
 
 ###############################################################################
 #
@@ -19,17 +20,17 @@ export Poly, PolynomialRing, hash, coeff, isgen, lead, var, truncate, mullow,
 #
 ###############################################################################
 
-parent_type{T}(::Type{Poly{T}}) = PolynomialRing{T}
+parent_type{T}(::Type{GenPoly{T}}) = GenPolynomialRing{T}
 
-elem_type{T <: RingElem}(::PolynomialRing{T}) = Poly{T}
+elem_type{T <: RingElem}(::GenPolynomialRing{T}) = GenPoly{T}
 
-base_ring{T}(a::PolynomialRing{T}) = a.base_ring::parent_type(T)
+base_ring{T}(a::GenPolynomialRing{T}) = a.base_ring::parent_type(T)
 
 base_ring(a::PolyElem) = base_ring(parent(a))
 
 parent(a::PolyElem) = a.parent
 
-var(a::PolynomialRing) = a.S
+var(a::GenPolynomialRing) = a.S
 
 function check_parent(a::PolyElem, b::PolyElem)
    parent(a) != parent(b) && 
@@ -51,14 +52,14 @@ function Base.hash(a::PolyElem, h::UInt)
    return b
 end
 
-function normalise(a::Poly, len::Int)
+function normalise(a::GenPoly, len::Int)
    while len > 0 && iszero(a.coeffs[len]) 
       len -= 1
    end
    return len
 end
 
-function set_length!(a::Poly, len::Int)
+function set_length!(a::GenPoly, len::Int)
    a.length = len
 end
 
@@ -66,15 +67,15 @@ length(x::PolyElem) = x.length
 
 degree(x::PolyElem) = length(x) - 1
 
-coeff{T <: RingElem}(a::Poly{T}, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
+coeff{T <: RingElem}(a::GenPoly{T}, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
 lead(a::PolyElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
 
-zero(a::PolynomialRing) = a(0)
+zero(a::GenPolynomialRing) = a(0)
 
-one(a::PolynomialRing) = a(1)
+one(a::GenPolynomialRing) = a(1)
 
-gen(a::PolynomialRing) = a([zero(base_ring(a)), one(base_ring(a))])
+gen(a::GenPolynomialRing) = a([zero(base_ring(a)), one(base_ring(a))])
 
 iszero(a::PolyElem) = length(a) == 0
 
@@ -86,7 +87,7 @@ end
 
 isunit(a::PolyElem) = length(a) == 1 && isunit(coeff(a, 0))
 
-function deepcopy{T <: RingElem}(a::Poly{T})
+function deepcopy{T <: RingElem}(a::GenPoly{T})
    coeffs = Array(T, length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy(coeff(a, i - 1))
@@ -159,7 +160,7 @@ function show{T <: RingElem}(io::IO, x::PolyElem{T})
    end
 end
 
-function show{T <: RingElem}(io::IO, p::PolynomialRing{T})
+function show{T <: RingElem}(io::IO, p::GenPolynomialRing{T})
    print(io, "Univariate Polynomial Ring in ")
    print(io, string(var(p)))
    print(io, " over ")
@@ -170,7 +171,7 @@ needs_parentheses(x::PolyElem) = length(x) > 1
 
 is_negative(x::PolyElem) = length(x) <= 1 && is_negative(coeff(x, 0))
 
-show_minus_one{T <: RingElem}(::Type{Poly{T}}) = show_minus_one(T)
+show_minus_one{T <: RingElem}(::Type{GenPoly{T}}) = show_minus_one(T)
 
 ###############################################################################
 #
@@ -178,7 +179,7 @@ show_minus_one{T <: RingElem}(::Type{Poly{T}}) = show_minus_one(T)
 #
 ###############################################################################
 
-function -{T <: RingElem}(a::Poly{T})
+function -{T <: RingElem}(a::GenPoly{T})
    len = length(a)
    d = Array(T, len)
    for i = 1:len
@@ -195,7 +196,7 @@ end
 #
 ###############################################################################
 
-function +{T <: RingElem}(a::Poly{T}, b::Poly{T})
+function +{T <: RingElem}(a::GenPoly{T}, b::GenPoly{T})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -225,7 +226,7 @@ function +{T <: RingElem}(a::Poly{T}, b::Poly{T})
    return z
 end
 
-function -{T <: RingElem}(a::Poly{T}, b::Poly{T})
+function -{T <: RingElem}(a::GenPoly{T}, b::GenPoly{T})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -255,7 +256,7 @@ function -{T <: RingElem}(a::Poly{T}, b::Poly{T})
    return z
 end
 
-function mul_karatsuba{T <: RingElem}(a::Poly{T}, b::Poly{T})
+function mul_karatsuba{T <: RingElem}(a::GenPoly{T}, b::GenPoly{T})
    # we assume len(a) != 0 != lenb and parent(a) == parent(b)
 
    lena = length(a)
@@ -313,7 +314,7 @@ function mul_karatsuba{T <: RingElem}(a::Poly{T}, b::Poly{T})
    return r
 end
 
-function mul_ks{T <: PolyElem}(a::Poly{T}, b::Poly{T})
+function mul_ks{T <: PolyElem}(a::GenPoly{T}, b::GenPoly{T})
    lena = length(a)
    lenb = length(b)
    if lena == 0 || lenb == 0
@@ -383,7 +384,7 @@ function mul_ks{T <: PolyElem}(a::Poly{T}, b::Poly{T})
    return r
 end
 
-function mul_classical{T <: RingElem}(a::Poly{T}, b::Poly{T})
+function mul_classical{T <: RingElem}(a::GenPoly{T}, b::GenPoly{T})
    lena = length(a)
    lenb = length(b)
 
@@ -418,7 +419,7 @@ function mul_classical{T <: RingElem}(a::Poly{T}, b::Poly{T})
    return z
 end
 
-function *{T <: RingElem}(a::Poly{T}, b::Poly{T})
+function *{T <: RingElem}(a::GenPoly{T}, b::GenPoly{T})
    check_parent(a, b)
    return mul_classical(a, b)
 end
@@ -429,7 +430,7 @@ end
 #
 ###############################################################################
 
-function *{T <: RingElem}(a::Int, b::Poly{T})
+function *{T <: RingElem}(a::Int, b::GenPoly{T})
    len = length(b)
    d = Array(T, len)
    for i = 1:len
@@ -440,7 +441,7 @@ function *{T <: RingElem}(a::Int, b::Poly{T})
    return z
 end
 
-function *{T <: RingElem}(a::fmpz, b::Poly{T})
+function *{T <: RingElem}(a::fmpz, b::GenPoly{T})
    len = length(b)
    d = Array(T, len)
    for i = 1:len
@@ -451,9 +452,9 @@ function *{T <: RingElem}(a::fmpz, b::Poly{T})
    return z
 end
 
-*(a::Poly, b::Int) = b*a
+*(a::GenPoly, b::Int) = b*a
 
-*(a::Poly, b::fmpz) = b*a
+*(a::GenPoly, b::fmpz) = b*a
 
 ###############################################################################
 #
@@ -574,10 +575,10 @@ end
 #
 ###############################################################################
 
-==(x::Poly, y::Integer) = ((length(x) == 0 && y == 0)
+==(x::GenPoly, y::Integer) = ((length(x) == 0 && y == 0)
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-==(x::Integer, y::Poly) = y == x
+==(x::Integer, y::GenPoly) = y == x
 
 ###############################################################################
 #
@@ -798,7 +799,7 @@ end
 #
 ###############################################################################
 
-function divexact{T <: RingElem}(a::Poly{T}, b::T)
+function divexact{T <: RingElem}(a::GenPoly{T}, b::T)
    b == 0 && throw(DivideError())
    d = Array(T, length(a))
    for i = 1:length(a)
@@ -809,7 +810,7 @@ function divexact{T <: RingElem}(a::Poly{T}, b::T)
    return z
 end
 
-function divexact{T <: RingElem}(a::Poly{T}, b::Integer)
+function divexact{T <: RingElem}(a::GenPoly{T}, b::Integer)
    b == 0 && throw(DivideError())
    d = Array(T, length(a))
    for i = 1:length(a)
@@ -1039,7 +1040,7 @@ function evaluate{T <: RingElem}(a::PolyElem{T}, b::fmpz)
    return evaluate(a, base_ring(a)(b))
 end
 
-function compose(a::Poly, b::Poly)
+function compose(a::GenPoly, b::GenPoly)
    i = length(a)
    if i == 0
        return zero(parent(a))
@@ -1459,7 +1460,7 @@ end
 #
 ###############################################################################
 
-function interpolate{T <: RingElem}(S::PolynomialRing, x::Array{T, 1}, y::Array{T, 1})
+function interpolate{T <: RingElem}(S::GenPolynomialRing, x::Array{T, 1}, y::Array{T, 1})
    length(x) != length(y) && error("Array lengths don't match in interpolate")
    n = length(x)
    if n == 0
@@ -1570,7 +1571,7 @@ end
 #
 ###############################################################################
 
-function fit!{T <: RingElem}(c::Poly{T}, n::Int)
+function fit!{T <: RingElem}(c::GenPoly{T}, n::Int)
    if length(c) < n
       t = c.coeffs
       c.coeffs = Array(T, n)
@@ -1583,7 +1584,7 @@ function fit!{T <: RingElem}(c::Poly{T}, n::Int)
    end
 end
 
-function setcoeff!{T <: RingElem}(c::Poly{T}, n::Int, a::T)
+function setcoeff!{T <: RingElem}(c::GenPoly{T}, n::Int, a::T)
    if a != 0 || n + 1 <= length(c)
       fit!(c, n + 1)
       c.coeffs[n + 1] = a
@@ -1592,7 +1593,7 @@ function setcoeff!{T <: RingElem}(c::Poly{T}, n::Int, a::T)
    end
 end
 
-function mul!{T <: RingElem}(c::Poly{T}, a::Poly{T}, b::Poly{T})
+function mul!{T <: RingElem}(c::GenPoly{T}, a::GenPoly{T}, b::GenPoly{T})
    lena = length(a)
    lenb = length(b)
 
@@ -1630,7 +1631,7 @@ function mul!{T <: RingElem}(c::Poly{T}, a::Poly{T}, b::Poly{T})
    end
 end
 
-function addeq!{T <: RingElem}(c::Poly{T}, a::Poly{T})
+function addeq!{T <: RingElem}(c::GenPoly{T}, a::GenPoly{T})
    lenc = length(c)
    lena = length(a)
    len = max(lenc, lena)
@@ -1647,9 +1648,9 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: RingElem, V <: Integer}(::Type{Poly{T}}, ::Type{V}) = Poly{T}
+Base.promote_rule{T <: RingElem, V <: Integer}(::Type{GenPoly{T}}, ::Type{V}) = GenPoly{T}
 
-Base.promote_rule{T <: RingElem}(::Type{Poly{T}}, ::Type{T}) = Poly{T}
+Base.promote_rule{T <: RingElem}(::Type{GenPoly{T}}, ::Type{T}) = GenPoly{T}
 
 ###############################################################################
 #
@@ -1696,56 +1697,56 @@ end
 #
 ###############################################################################
 
-function Base.call{T <: RingElem}(a::PolynomialRing{T}, b::RingElem)
+function Base.call{T <: RingElem}(a::GenPolynomialRing{T}, b::RingElem)
    return a(base_ring(a)(b))
 end
 
-function Base.call{T <: RingElem}(a::PolynomialRing{T})
-   z = Poly{T}()
+function Base.call{T <: RingElem}(a::GenPolynomialRing{T})
+   z = GenPoly{T}()
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::PolynomialRing{T}, b::Integer)
-   z = Poly{T}(base_ring(a)(b))
+function Base.call{T <: RingElem}(a::GenPolynomialRing{T}, b::Integer)
+   z = GenPoly{T}(base_ring(a)(b))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::PolynomialRing{T}, b::T)
+function Base.call{T <: RingElem}(a::GenPolynomialRing{T}, b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
-   z = Poly{T}(b)
+   z = GenPoly{T}(b)
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::PolynomialRing{T}, b::Poly{T})
+function Base.call{T <: RingElem}(a::GenPolynomialRing{T}, b::GenPoly{T})
    parent(b) != a && error("Unable to coerce polynomial")
    return b
 end
 
-function Base.call{T <: RingElem}(a::PolynomialRing{T}, b::Array{T, 1})
+function Base.call{T <: RingElem}(a::GenPolynomialRing{T}, b::Array{T, 1})
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end
-   z = Poly{T}(b)
+   z = GenPoly{T}(b)
    z.parent = a
    return z
 end
 
 ###############################################################################
 #
-#   PolynomialRing constructor
+#   GenPolynomialRing constructor
 #
 ###############################################################################
 
 function PolynomialRing(R::Ring, s::AbstractString{}; cached::Bool = true)
    S = Symbol(s)
    T = elem_type(R)
-   parent_obj = PolynomialRing{T}(R, S, cached)
+   parent_obj = GenPolynomialRing{T}(R, S, cached)
 
    R2 = R
-   par_type = Poly{T}
+   par_type = GenPoly{T}
    sig_table = [x.sig for x in methods(Base.promote_rule)]
    while base_ring(R2) != Union{}
       R2 = base_ring(R2)

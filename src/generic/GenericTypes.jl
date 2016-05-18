@@ -10,35 +10,35 @@
 #
 ###############################################################################
 
-const PolyID = ObjectIdDict()
+const GenPolyID = ObjectIdDict()
 
-type PolynomialRing{T <: RingElem} <: Ring{Generic}
+type GenPolynomialRing{T <: RingElem} <: Ring{Generic}
    base_ring :: Ring
    S::Symbol
 
-   function PolynomialRing(R::Ring, s::Symbol, cached=true)
-      if haskey(PolyID, (R, s))
-         return PolyID[R, s]::PolynomialRing{T}
+   function GenPolynomialRing(R::Ring, s::Symbol, cached=true)
+      if haskey(GenPolyID, (R, s))
+         return GenPolyID[R, s]::GenPolynomialRing{T}
       else 
          z = new{T}(R, s)
          if cached
-           PolyID[R, s] = z
+           GenPolyID[R, s] = z
          end
          return z
       end
    end
 end
 
-type Poly{T <: RingElem} <: PolyElem{T}
+type GenPoly{T <: RingElem} <: PolyElem{T}
    coeffs::Array{T, 1}
    length::Int
-   parent::PolynomialRing{T}
+   parent::GenPolynomialRing{T}
 
-   Poly() = new(Array(T, 0), 0)
+   GenPoly() = new(Array(T, 0), 0)
    
-   Poly(a::Array{T, 1}) = new(a, length(a))
+   GenPoly(a::Array{T, 1}) = new(a, length(a))
 
-   Poly(a::T) = a == 0 ? new(Array(T, 0), 0) : new([a], 1)
+   GenPoly(a::T) = a == 0 ? new(Array(T, 0), 0) : new([a], 1)
 end
 
 ###############################################################################

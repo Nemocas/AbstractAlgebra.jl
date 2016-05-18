@@ -1503,7 +1503,7 @@ function solve_ff{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
    return x, d
 end
 
-function solve_interpolation{T <: RingElem}(M::MatElem{Poly{T}}, b::MatElem{Poly{T}})
+function solve_interpolation{T <: RingElem}(M::MatElem{PolyElem{T}}, b::MatElem{PolyElem{T}})
    m = rows(M)
    h = cols(b)
    if m == 0
@@ -1567,7 +1567,7 @@ function solve{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
    return solve_ff(M, b)
 end
 
-function solve{T <: RingElem}(M::MatElem{Poly{T}}, b::MatElem{Poly{T}})
+function solve{T <: RingElem}(M::MatElem{PolyElem{T}}, b::MatElem{PolyElem{T}})
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
    rows(M) != cols(M) && error("Non-square matrix in solve")
    rows(M) != rows(b) && error("Dimensions don't match in solve")

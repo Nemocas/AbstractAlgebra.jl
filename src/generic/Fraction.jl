@@ -349,10 +349,10 @@ function divexact{T <: RingElem}(a::Integer, b::Fraction{T})
 end
 
 # remove ambiguity
-divexact{T <: RingElem}(a::Fraction{T}, b::Poly{T}) = error("Not supported")
+divexact{T <: RingElem}(a::Fraction{T}, b::PolyElem{T}) = error("Not supported")
 
 # remove ambiguity
-divexact{T <: RingElem}(a::Poly{T}, b::Fraction{T}) = error("Not supported")
+divexact{T <: RingElem}(a::PolyElem{T}, b::Fraction{T}) = error("Not supported")
 
 function divexact{T <: RingElem}(a::Fraction{T}, b::T)
    b == 0 && throw(DivideError())

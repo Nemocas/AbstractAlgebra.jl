@@ -570,7 +570,7 @@ mul!(c::nf_elem, a::nf_elem, b::Integer) = mul!(c, a, fmpz(b))
 #
 ###############################################################################
 
-function sqr_classical(a::Poly{nf_elem})
+function sqr_classical(a::GenPoly{nf_elem})
    lena = length(a)
 
    t = base_ring(a)()
@@ -605,7 +605,7 @@ function sqr_classical(a::Poly{nf_elem})
    return z
 end
 
-function mul_classical(a::Poly{nf_elem}, b::Poly{nf_elem})
+function mul_classical(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -651,7 +651,7 @@ function mul_classical(a::Poly{nf_elem}, b::Poly{nf_elem})
    return z
 end
 
-function *(a::Poly{nf_elem}, b::Poly{nf_elem})
+function *(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -667,7 +667,7 @@ function *(a::Poly{nf_elem}, b::Poly{nf_elem})
    K = base_ring(a)
    R = parent(pol)
    T = elem_type(R)
-   S = PolynomialRing{T}(R, :y)
+   S = GenPolynomialRing{T}(R, :y)
    f = S()
    fit!(f, lena)
    for i = 1:lena
