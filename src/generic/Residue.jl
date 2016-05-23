@@ -247,6 +247,14 @@ Base.promote_rule{T <: RingElem}(::Type{GenResidue{T}}, ::Type{T}) = GenResidue{
 
 Base.promote_rule{T <: RingElem, U <: Integer}(::Type{GenResidue{T}}, ::Type{U}) = GenResidue{T}
 
+function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenResidue{T}}, ::Type{GenResidue{U}})
+   Base.promote_rule(T, GenResidue{U}) == T ? GenResidue{T} : Union{}
+end
+
+function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenResidue{T}}, ::Type{U})
+   Base.promote_rule(T, U) == T ? GenResidue{T} : promote_rule1(U, GenResidue{T})
+end
+
 ###############################################################################
 #
 #   Parent object call overloading
@@ -291,16 +299,6 @@ function ResidueRing{T <: RingElem}(R::Ring, el::T; cached=true)
    parent(el) != R && error("Modulus is not an element of the specified ring")
    el == 0 && throw(DivideError())
    
-   R2 = R
-   par_type = GenResidue{T}
-   sig_table = [x.sig for x in methods(Base.promote_rule)]
-   while base_ring(R2) != Union{}
-      R2 = base_ring(R2)
-      T2 = elem_type(R2)
-      if !sig_exists(Tuple{typeof(Base.promote_rule), Type{par_type}, Type{T2}}, sig_table)
-         eval(:(Base.promote_rule(::Type{$par_type}, ::Type{$T2}) = $par_type))
-      end
-   end
    return GenResidueRing{T}(el, cached)
 end
 

@@ -1652,6 +1652,14 @@ Base.promote_rule{T <: RingElem, V <: Integer}(::Type{GenPoly{T}}, ::Type{V}) = 
 
 Base.promote_rule{T <: RingElem}(::Type{GenPoly{T}}, ::Type{T}) = GenPoly{T}
 
+function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenPoly{T}}, ::Type{GenPoly{U}})
+   Base.promote_rule(T, GenPoly{U}) == T ? GenPoly{T} : Union{}
+end
+
+function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenPoly{T}}, ::Type{U})
+   Base.promote_rule(T, U) == T ? GenPoly{T} : promote_rule1(U, GenPoly{T})
+end
+
 ###############################################################################
 #
 #   Polynomial substitution
@@ -1744,17 +1752,6 @@ function PolynomialRing(R::Ring, s::AbstractString{}; cached::Bool = true)
    S = Symbol(s)
    T = elem_type(R)
    parent_obj = GenPolynomialRing{T}(R, S, cached)
-
-   R2 = R
-   par_type = GenPoly{T}
-   sig_table = [x.sig for x in methods(Base.promote_rule)]
-   while base_ring(R2) != Union{}
-      R2 = base_ring(R2)
-      T2 = elem_type(R2)
-      if !sig_exists(Tuple{typeof(Base.promote_rule), Type{par_type}, Type{T2}}, sig_table)
-         eval(:(Base.promote_rule(::Type{$par_type}, ::Type{$T2}) = $par_type))
-      end
-   end
 
    return parent_obj, parent_obj([R(0), R(1)])
 end

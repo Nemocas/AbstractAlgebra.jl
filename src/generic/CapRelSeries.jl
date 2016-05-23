@@ -749,6 +749,14 @@ function Base.promote_rule{T <: RingElem}(::Type{GenCapRelSeries{T}}, ::Type{T})
    return GenCapRelSeries{T}
 end
 
+function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenCapRelSeries{T}}, ::Type{GenCapRelSeries{U}})
+   Base.promote_rule(T, GenCapRelSeries{U}) == T ? GenCapRelSeries{T} : Union{}
+end
+
+function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenCapRelSeries{T}}, ::Type{U})
+   Base.promote_rule(T, U) == T ? GenCapRelSeries{T} : promote_rule1(U, GenCapRelSeries{T})
+end
+
 ###############################################################################
 #
 #   Parent object call overload
@@ -810,17 +818,6 @@ function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{}; cached=true)
    S = Symbol(s)
    T = elem_type(R)
    parent_obj = GenCapRelPowerSeriesRing{T}(R, prec, S, cached)
-
-   R2 = R
-   par_type = GenCapRelSeries{T}
-   sig_table = [x.sig for x in methods(Base.promote_rule)]
-   while base_ring(R2) != Union{}
-      R2 = base_ring(R2)
-      T2 = elem_type(R2)
-      if !sig_exists(Tuple{typeof(Base.promote_rule), Type{par_type}, Type{T2}}, sig_table)
-         eval(:(Base.promote_rule(::Type{$par_type}, ::Type{$T2}) = $par_type))
-      end
-   end
 
    return parent_obj, parent_obj([R(0), R(1)], 2, prec + 1)
 end
