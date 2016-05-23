@@ -1,10 +1,10 @@
-function test_series_constructors()
-   print("PowerSeries.constructors...")
+function test_cap_rel_series_constructors()
+   print("GenCapRelSeries.constructors...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
-   @test isa(S, PowerSeriesRing)
+   @test isa(S, GenCapRelPowerSeriesRing)
 
    a = x^3 + 2x + 1
    b = (t^2 + 1)*x^2 + (t + 3)x + O(x^4)
@@ -33,8 +33,8 @@ function test_series_constructors()
    println("PASS")
 end
 
-function test_series_manipulation()
-   print("PowerSeries.manipulation...")
+function test_cap_rel_series_manipulation()
+   print("GenCapRelSeries.manipulation...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -77,8 +77,8 @@ function test_series_manipulation()
    println("PASS")
 end
 
-function test_series_unary_ops()
-   print("PowerSeries.unary_ops...")
+function test_cap_rel_series_unary_ops()
+   print("GenCapRelSeries.unary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -93,8 +93,8 @@ function test_series_unary_ops()
    println("PASS")
 end
 
-function test_series_binary_ops()
-   print("PowerSeries.binary_ops...")
+function test_cap_rel_series_binary_ops()
+   print("GenCapRelSeries.binary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -117,8 +117,8 @@ function test_series_binary_ops()
    println("PASS")
 end
 
-function test_series_adhoc_binary_ops()
-   print("PowerSeries.adhoc_binary_ops...")
+function test_cap_rel_series_adhoc_binary_ops()
+   print("GenCapRelSeries.adhoc_binary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -139,8 +139,8 @@ function test_series_adhoc_binary_ops()
    println("PASS")
 end
 
-function test_series_comparison()
-   print("PowerSeries.comparison...")
+function test_cap_rel_series_comparison()
+   print("GenCapRelSeries.comparison...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -163,8 +163,8 @@ function test_series_comparison()
    println("PASS")
 end
 
-function test_series_adhoc_comparison()
-   print("PowerSeries.adhoc_comparison...")
+function test_cap_rel_series_adhoc_comparison()
+   print("GenCapRelSeries.adhoc_comparison...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -187,8 +187,8 @@ function test_series_adhoc_comparison()
    println("PASS")
 end
 
-function test_series_powering()
-   print("PowerSeries.powering...")
+function test_cap_rel_series_powering()
+   print("GenCapRelSeries.powering...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -209,8 +209,8 @@ function test_series_powering()
    println("PASS")
 end
 
-function test_series_shift()
-   print("PowerSeries.shift...")
+function test_cap_rel_series_shift()
+   print("GenCapRelSeries.shift...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -231,8 +231,8 @@ function test_series_shift()
    println("PASS")
 end
 
-function test_series_truncation()
-   print("PowerSeries.truncation...")
+function test_cap_rel_series_truncation()
+   print("GenCapRelSeries.truncation...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -253,8 +253,8 @@ function test_series_truncation()
    println("PASS")
 end
 
-function test_series_inversion()
-   print("PowerSeries.inversion...")
+function test_cap_rel_series_inversion()
+   print("GenCapRelSeries.inversion...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -269,8 +269,8 @@ function test_series_inversion()
    println("PASS")
 end
 
-function test_series_exact_division()
-   print("PowerSeries.exact_division...")
+function test_cap_rel_series_exact_division()
+   print("GenCapRelSeries.exact_division...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -291,8 +291,8 @@ function test_series_exact_division()
    println("PASS")
 end
 
-function test_series_adhoc_exact_division()
-   print("PowerSeries.adhoc_exact_division...")
+function test_cap_rel_series_adhoc_exact_division()
+   print("GenCapRelSeries.adhoc_exact_division...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -317,8 +317,8 @@ function test_series_adhoc_exact_division()
    println("PASS")
 end
 
-function test_series_special_functions()
-   print("PowerSeries.special_functions...")
+function test_cap_rel_series_special_functions()
+   print("GenCapRelSeries.special_functions...")
 
    R = ResidueRing(ZZ, 17)
    T, t = PolynomialRing(R, "t")
@@ -331,21 +331,21 @@ function test_series_special_functions()
    println("PASS")
 end
 
-function test_series()
-   test_series_constructors()
-   test_series_manipulation()
-   test_series_unary_ops()
-   test_series_binary_ops()
-   test_series_adhoc_binary_ops()
-   test_series_comparison()
-   test_series_adhoc_comparison()
-   test_series_powering()
-   test_series_shift()
-   test_series_truncation()
-   test_series_exact_division()
-   test_series_adhoc_exact_division()
-   test_series_inversion()
-   test_series_special_functions()
+function test_gen_cap_rel_series()
+   test_cap_rel_series_constructors()
+   test_cap_rel_series_manipulation()
+   test_cap_rel_series_unary_ops()
+   test_cap_rel_series_binary_ops()
+   test_cap_rel_series_adhoc_binary_ops()
+   test_cap_rel_series_comparison()
+   test_cap_rel_series_adhoc_comparison()
+   test_cap_rel_series_powering()
+   test_cap_rel_series_shift()
+   test_cap_rel_series_truncation()
+   test_cap_rel_series_exact_division()
+   test_cap_rel_series_adhoc_exact_division()
+   test_cap_rel_series_inversion()
+   test_cap_rel_series_special_functions()
 
    println("")
 end

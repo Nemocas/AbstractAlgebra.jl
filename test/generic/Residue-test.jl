@@ -1,9 +1,9 @@
-function test_residue_constructors()
-   print("Residue.constructors...")
+function test_gen_residue_constructors()
+   print("GenResidue.constructors...")
  
    R = ResidueRing(ZZ, 16453889)
 
-   @test isa(R, ResidueRing)
+   @test isa(R, GenResidueRing)
 
    a = R(123)
 
@@ -24,7 +24,7 @@ function test_residue_constructors()
    S, x = PolynomialRing(R, "x")
    T = ResidueRing(S, x^3 + 3x + 1)
 
-   @test isa(T, ResidueRing)
+   @test isa(T, GenResidueRing)
 
    f = T(x^4)
 
@@ -37,8 +37,8 @@ function test_residue_constructors()
    println("PASS")
 end
 
-function test_residue_manipulation()
-   print("Residue.manipulation...")
+function test_gen_residue_manipulation()
+   print("GenResidue.manipulation...")
  
    R = ResidueRing(ZZ, 16453889)
 
@@ -70,8 +70,8 @@ function test_residue_manipulation()
    println("PASS")
 end
 
-function test_residue_unary_ops()
-   print("Residue.unary_ops...")
+function test_gen_residue_unary_ops()
+   print("GenResidue.unary_ops...")
  
    R = ResidueRing(ZZ, 16453889)
 
@@ -85,8 +85,8 @@ function test_residue_unary_ops()
    println("PASS")
 end
 
-function test_residue_binary_ops()
-   print("Residue.binary_ops...")
+function test_gen_residue_binary_ops()
+   print("GenResidue.binary_ops...")
  
    R = ResidueRing(ZZ, 12)
 
@@ -115,8 +115,8 @@ function test_residue_binary_ops()
    println("PASS")
 end
 
-function test_residue_gcd()
-   print("Residue.gcd...")
+function test_gen_residue_gcd()
+   print("GenResidue.gcd...")
  
    R = ResidueRing(ZZ, 12)
 
@@ -137,8 +137,8 @@ function test_residue_gcd()
    println("PASS")
 end
 
-function test_residue_adhoc_binary()
-   print("Residue.adhoc_binary...")
+function test_gen_residue_adhoc_binary()
+   print("GenResidue.adhoc_binary...")
  
    R = ResidueRing(ZZ, 7)
 
@@ -164,8 +164,8 @@ function test_residue_adhoc_binary()
    println("PASS")
 end
 
-function test_residue_comparison()
-   print("Residue.comparison...")
+function test_gen_residue_comparison()
+   print("GenResidue.comparison...")
  
    R = ResidueRing(ZZ, 7)
 
@@ -194,8 +194,8 @@ function test_residue_comparison()
    println("PASS")
 end
 
-function test_residue_adhoc_comparison()
-   print("Residue.adhoc_comparison...")
+function test_gen_residue_adhoc_comparison()
+   print("GenResidue.adhoc_comparison...")
  
    R = ResidueRing(ZZ, 7)
 
@@ -214,8 +214,8 @@ function test_residue_adhoc_comparison()
    println("PASS")
 end
 
-function test_residue_powering()
-   print("Residue.powering...")
+function test_gen_residue_powering()
+   print("GenResidue.powering...")
  
    R = ResidueRing(ZZ, 7)
 
@@ -233,8 +233,8 @@ function test_residue_powering()
    println("PASS")
 end
 
-function test_residue_inversion()
-   print("Residue.inversion...")
+function test_gen_residue_inversion()
+   print("GenResidue.inversion...")
  
    R = ResidueRing(ZZ, 49)
 
@@ -253,8 +253,8 @@ function test_residue_inversion()
    println("PASS")
 end
 
-function test_residue_exact_division()
-   print("Residue.exact_division...")
+function test_gen_residue_exact_division()
+   print("GenResidue.exact_division...")
  
    R = ResidueRing(ZZ, 49)
 
@@ -275,18 +275,18 @@ function test_residue_exact_division()
    println("PASS")
 end
 
-function test_residue()
-   test_residue_constructors()
-   test_residue_manipulation()
-   test_residue_unary_ops()
-   test_residue_binary_ops()
-   test_residue_gcd()
-   test_residue_adhoc_binary()
-   test_residue_comparison()
-   test_residue_adhoc_comparison()
-   test_residue_powering()
-   test_residue_inversion()
-   test_residue_exact_division()
+function test_gen_residue()
+   test_gen_residue_constructors()
+   test_gen_residue_manipulation()
+   test_gen_residue_unary_ops()
+   test_gen_residue_binary_ops()
+   test_gen_residue_gcd()
+   test_gen_residue_adhoc_binary()
+   test_gen_residue_comparison()
+   test_gen_residue_adhoc_comparison()
+   test_gen_residue_powering()
+   test_gen_residue_inversion()
+   test_gen_residue_exact_division()
 
    println("")
 end

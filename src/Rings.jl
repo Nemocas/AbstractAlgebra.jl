@@ -245,7 +245,7 @@ include("flint/nmod_poly.jl")
 
 include("flint/fmpz_mod_poly.jl")
 
-include("generic/PowerSeries.jl")
+include("generic/CapRelSeries.jl")
 
 include("flint/fmpz_series.jl")
 

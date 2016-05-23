@@ -6,56 +6,56 @@
 
 ###############################################################################
 #
-#   PolynomialRing / Poly
+#   GenPolynomialRing / GenPoly
 #
 ###############################################################################
 
-const PolyID = ObjectIdDict()
+const GenPolyID = ObjectIdDict()
 
-type PolynomialRing{T <: RingElem} <: Ring{Generic}
+type GenPolynomialRing{T <: RingElem} <: Ring{Generic}
    base_ring :: Ring
    S::Symbol
 
-   function PolynomialRing(R::Ring, s::Symbol, cached=true)
-      if haskey(PolyID, (R, s))
-         return PolyID[R, s]::PolynomialRing{T}
+   function GenPolynomialRing(R::Ring, s::Symbol, cached=true)
+      if haskey(GenPolyID, (R, s))
+         return GenPolyID[R, s]::GenPolynomialRing{T}
       else 
          z = new{T}(R, s)
          if cached
-           PolyID[R, s] = z
+           GenPolyID[R, s] = z
          end
          return z
       end
    end
 end
 
-type Poly{T <: RingElem} <: PolyElem{T}
+type GenPoly{T <: RingElem} <: PolyElem{T}
    coeffs::Array{T, 1}
    length::Int
-   parent::PolynomialRing{T}
+   parent::GenPolynomialRing{T}
 
-   Poly() = new(Array(T, 0), 0)
+   GenPoly() = new(Array(T, 0), 0)
    
-   Poly(a::Array{T, 1}) = new(a, length(a))
+   GenPoly(a::Array{T, 1}) = new(a, length(a))
 
-   Poly(a::T) = a == 0 ? new(Array(T, 0), 0) : new([a], 1)
+   GenPoly(a::T) = a == 0 ? new(Array(T, 0), 0) : new([a], 1)
 end
 
 ###############################################################################
 #
-#   ResidueRing / Residue
+#   GenResidueRing / GenResidue
 #
 ###############################################################################
 
 const ModulusDict = Dict{Tuple{Ring, RingElem}, Ring}()
 
-type ResidueRing{T <: RingElem} <: Ring{Generic}
+type GenResidueRing{T <: RingElem} <: Ring{Generic}
    base_ring::Ring
    modulus::T
 
-   function ResidueRing(modulus::T, cached=true)
+   function GenResidueRing(modulus::T, cached=true)
       if haskey(ModulusDict, (parent(modulus), modulus))
-         return ModulusDict[parent(modulus), modulus]::ResidueRing{T}
+         return ModulusDict[parent(modulus), modulus]::GenResidueRing{T}
       else
          z = new{T}(parent(modulus), modulus)
          if cached
@@ -66,112 +66,112 @@ type ResidueRing{T <: RingElem} <: Ring{Generic}
    end
 end
 
-type Residue{T <: RingElem} <: ResidueElem{T}
+type GenResidue{T <: RingElem} <: ResidueElem{T}
    data::T
-   parent::ResidueRing{T}
+   parent::GenResidueRing{T}
 
-   Residue(a::T) = new(a)
+   GenResidue(a::T) = new(a)
 end
 
 ###############################################################################
 #
-#   PowerSeriesRing / PowerSeries
+#   GenCapRelPowerSeriesRing / GenCapRelSeries
 #
 ###############################################################################
 
-const PowerSeriesID = ObjectIdDict()
+const GenCapRelSeriesID = ObjectIdDict()
 
-type PowerSeriesRing{T <: RingElem} <: Ring{Generic}
+type GenCapRelPowerSeriesRing{T <: RingElem} <: Ring{Generic}
    base_ring::Ring
    prec_max::Int
    S::Symbol
 
-   function PowerSeriesRing(R::Ring, prec::Int, s::Symbol, cached=true)
-      if haskey(PowerSeriesID, (R, prec, s))
-         return PowerSeriesID[R, prec, s]::PowerSeriesRing{T}
+   function GenCapRelPowerSeriesRing(R::Ring, prec::Int, s::Symbol, cached=true)
+      if haskey(GenCapRelSeriesID, (R, prec, s))
+         return GenCapRelSeriesID[R, prec, s]::GenCapRelPowerSeriesRing{T}
       else
          z = new{T}(R, prec, s)
          if cached
-            PowerSeriesID[R, prec, s] = z
+            GenCapRelSeriesID[R, prec, s] = z
          end
          return z
       end
    end
 end
 
-type PowerSeries{T <: RingElem} <: SeriesElem{T}
+type GenCapRelSeries{T <: RingElem} <: SeriesElem{T}
    coeffs::Array{T, 1}
    length::Int
    prec::Int
-   parent::PowerSeriesRing{T}
+   parent::GenCapRelPowerSeriesRing{T}
 
-   PowerSeries(a::Array{T, 1}, length::Int, prec::Int) = new(a, length, prec)   
-   PowerSeries(a::PowerSeries{T}) = a
+   GenCapRelSeries(a::Array{T, 1}, length::Int, prec::Int) = new(a, length, prec)   
+   GenCapRelSeries(a::GenCapRelSeries{T}) = a
 end
 
 ###############################################################################
 #
-#   FractionField / Fraction
+#   GenFractionField / GenFraction
 #
 ###############################################################################
 
-const FractionDict = ObjectIdDict()
+const GenFractionDict = ObjectIdDict()
 
-type FractionField{T <: RingElem} <: Field{Generic}
+type GenFractionField{T <: RingElem} <: Field{Generic}
    base_ring::Ring
 
-   function FractionField(R::Ring, cached=true)
-      if haskey(FractionDict, R)
-         return FractionDict[R]::FractionField{T}
+   function GenFractionField(R::Ring, cached=true)
+      if haskey(GenFractionDict, R)
+         return GenFractionDict[R]::GenFractionField{T}
       else
          z = new{T}(R)
          if cached
-            FractionDict[R] = z
+            GenFractionDict[R] = z
          end
          return z
       end
    end
 end
 
-type Fraction{T <: RingElem} <: FractionElem{T}
+type GenFraction{T <: RingElem} <: FractionElem{T}
    num::T
    den::T
-   parent::FractionField{T}
+   parent::GenFractionField{T}
 
-   Fraction(num::T, den::T) = new(num, den) 
+   GenFraction(num::T, den::T) = new(num, den) 
 end
 
 ###############################################################################
 #
-#   MatrixSpace / Matrix
+#   GenMatrixSpace / GenMatrix
 #
 ###############################################################################
 
-const MatrixDict = ObjectIdDict()
+const GenMatrixDict = ObjectIdDict()
 
 # not really a mathematical ring
-type MatrixSpace{T <: RingElem} <: Ring{Generic}
+type GenMatrixSpace{T <: RingElem} <: Ring{Generic}
    rows::Int
    cols::Int
    base_ring::Ring
 
-   function MatrixSpace(R::Ring, r::Int, c::Int, cached=true)
-      if haskey(MatrixDict, (R, r, c))
-         return MatrixDict[R, r, c]::MatrixSpace{T}
+   function GenMatrixSpace(R::Ring, r::Int, c::Int, cached=true)
+      if haskey(GenMatrixDict, (R, r, c))
+         return GenMatrixDict[R, r, c]::GenMatrixSpace{T}
       else
          z = new{T}(r, c, R)
          if cached
-            MatrixDict[R, r, c] = z
+            GenMatrixDict[R, r, c] = z
          end
          return z
       end
    end
 end
 
-type Mat{T <: RingElem} <: MatElem{T}
+type GenMat{T <: RingElem} <: MatElem{T}
    entries::Array{T, 2}
-   parent::MatrixSpace{T}
+   parent::GenMatrixSpace{T}
 
-   Mat(a::Array{T, 2}) = new(a) 
+   GenMat(a::Array{T, 2}) = new(a) 
 end
 

@@ -10,7 +10,7 @@ function test_fq_poly_constructors()
 
    T, z = PolynomialRing(S, "z")
 
-   @test typeof(T) <: PolynomialRing
+   @test typeof(T) <: GenPolynomialRing
 
    @test isa(z, PolyElem)
 

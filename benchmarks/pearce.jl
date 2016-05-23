@@ -1,6 +1,6 @@
 function benchmark_pearce()
    print("benchmark_pearce ... ")
-   R, x = PolynomialRing(FlintZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
    T, z = PolynomialRing(S, "z")
    U, t = PolynomialRing(T, "t")

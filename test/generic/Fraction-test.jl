@@ -1,10 +1,10 @@
-function test_fraction_constructors()
-   print("Fraction.constructors...")
+function test_gen_fraction_constructors()
+   print("GenFraction.constructors...")
 
    S, x = PolynomialRing(ZZ, "x")
    T = FractionField(S)
 
-   @test isa(T, FractionField)
+   @test isa(T, GenFractionField)
 
    @test isa(T(3), FractionElem)
 
@@ -39,8 +39,8 @@ function test_fraction_constructors()
    println("PASS")
 end
 
-function test_fraction_manipulation()
-   print("Fraction.manipulation...")
+function test_gen_fraction_manipulation()
+   print("GenFraction.manipulation...")
 
    R = FractionField(ZZ)
    S, x = PolynomialRing(ZZ, "x")
@@ -61,8 +61,8 @@ function test_fraction_manipulation()
    println("PASS")
 end
 
-function test_fraction_unary_ops()
-   print("Fraction.unary_ops...")
+function test_gen_fraction_unary_ops()
+   print("GenFraction.unary_ops...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -71,8 +71,8 @@ function test_fraction_unary_ops()
    println("PASS")
 end
 
-function test_fraction_binary_ops()
-   print("Fraction.binary_ops...")
+function test_gen_fraction_binary_ops()
+   print("GenFraction.binary_ops...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -89,8 +89,8 @@ function test_fraction_binary_ops()
    println("PASS")
 end
 
-function test_fraction_adhoc_binary()
-   print("Fraction.adhoc_binary...")
+function test_gen_fraction_adhoc_binary()
+   print("GenFraction.adhoc_binary...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -112,8 +112,8 @@ function test_fraction_adhoc_binary()
    println("PASS")
 end
 
-function test_fraction_comparison()
-   print("Fraction.comparison...")
+function test_gen_fraction_comparison()
+   print("GenFraction.comparison...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -126,8 +126,8 @@ function test_fraction_comparison()
    println("PASS")
 end
 
-function test_fraction_adhoc_comparison()
-   print("Fraction.adhoc_comparison...")
+function test_gen_fraction_adhoc_comparison()
+   print("GenFraction.adhoc_comparison...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -144,8 +144,8 @@ function test_fraction_adhoc_comparison()
    println("PASS")
 end
 
-function test_fraction_powering()
-   print("Fraction.powering()...")
+function test_gen_fraction_powering()
+   print("GenFraction.powering()...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -156,8 +156,8 @@ function test_fraction_powering()
    println("PASS")
 end
 
-function test_fraction_inversion()
-   print("Fraction.inversion()...")
+function test_gen_fraction_inversion()
+   print("GenFraction.inversion()...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -168,8 +168,8 @@ function test_fraction_inversion()
    println("PASS")
 end
 
-function test_fraction_exact_division()
-   print("Fraction.exact_division...")
+function test_gen_fraction_exact_division()
+   print("GenFraction.exact_division...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -181,8 +181,8 @@ function test_fraction_exact_division()
    println("PASS")
 end
 
-function test_fraction_adhoc_exact_division()
-   print("Fraction.adhoc_exact_division...")
+function test_gen_fraction_adhoc_exact_division()
+   print("GenFraction.adhoc_exact_division...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -200,8 +200,8 @@ function test_fraction_adhoc_exact_division()
    println("PASS")
 end
 
-function test_fraction_gcd()
-   print("Fraction.gcd...")
+function test_gen_fraction_gcd()
+   print("GenFraction.gcd...")
 
    S, x = PolynomialRing(ZZ, "x")
 
@@ -212,19 +212,19 @@ function test_fraction_gcd()
    println("PASS")
 end
 
-function test_fraction()
-   test_fraction_constructors()
-   test_fraction_manipulation()
-   test_fraction_unary_ops()
-   test_fraction_binary_ops()
-   test_fraction_adhoc_binary()
-   test_fraction_comparison()
-   test_fraction_adhoc_comparison()
-   test_fraction_powering()
-   test_fraction_inversion()
-   test_fraction_exact_division()
-   test_fraction_adhoc_exact_division()
-   test_fraction_gcd()
+function test_gen_fraction()
+   test_gen_fraction_constructors()
+   test_gen_fraction_manipulation()
+   test_gen_fraction_unary_ops()
+   test_gen_fraction_binary_ops()
+   test_gen_fraction_adhoc_binary()
+   test_gen_fraction_comparison()
+   test_gen_fraction_adhoc_comparison()
+   test_gen_fraction_powering()
+   test_gen_fraction_inversion()
+   test_gen_fraction_exact_division()
+   test_gen_fraction_adhoc_exact_division()
+   test_gen_fraction_gcd()
 
    println("")
 end
