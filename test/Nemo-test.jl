@@ -1,9 +1,3 @@
-module Test
-
-using Base.Test, Nemo
-
-export test_all
-
 include("Groups-test.jl")
 include("Rings-test.jl")
 include("Fields-test.jl")
@@ -15,5 +9,3 @@ function test_all()
    test_fields()
    test_benchmarks()
 end
-
-end # module

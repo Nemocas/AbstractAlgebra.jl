@@ -286,8 +286,6 @@ const error_dim_negative = ErrorException("Dimensions must be non-negative")
 #
 ###############################################################################
 
-include("../test/Nemo-test.jl")
-
 include("../benchmarks/runbenchmarks.jl")
 
 end # module

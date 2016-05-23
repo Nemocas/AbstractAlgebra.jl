@@ -1,3 +1,5 @@
 using Nemo, Base.Test
 
-Nemo.Test.test_all()
+include("../test/Nemo-test.jl")
+
+test_all()

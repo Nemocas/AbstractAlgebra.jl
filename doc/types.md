@@ -81,8 +81,8 @@ Nemo which is designed to work with ring objects will certainly also work with f
 
 In Nemo we also distinguish between the elements of a field, say, and the field itself, and similarly
 for groups and rings and all other kinds of domains in Nemo. For example, we have an object of type
-`PolynomialRing` to model a generic polynomial ring, and elements of that polynomial ring would have
-type `Poly`. 
+`GenPolynomialRing` to model a generic polynomial ring, and elements of that polynomial ring would have
+type `GenPoly`. 
 
 In order to model this distinction between elements and the domains they belong to, Nemo has two main
 branches in its abstract type hierarchy, as shown in the following diagram. One branch consists of the
@@ -200,11 +200,11 @@ they are defined over. For example, a polynomial ring over the Flint integers `f
 `PolynomialRing{fmpz}`, thus in that example the type parameter `T` would be instantiated as `fmpz`.
 
   - Generic
-     - `Poly{T}` (`PolynomialRing{T}`)
-     - `PowerSeries{T}` (`PowerSeriesRing{T}`)
-     - `Residue{T}` (`ResidueRing{T}`)
-     - `Fraction{T}` (`FractionField{T}`)
-     - `Mat{T}` (`MatrixSpace{T}`)
+     - `GenPoly{T}` (`GenPolynomialRing{T}`)
+     - `GenCapRelSeries{T}` (`GenCapRelPowerSeriesRing{T}`)
+     - `GenResidue{T}` (`GenResidueRing{T}`)
+     - `GenFraction{T}` (`GenFractionField{T}`)
+     - `GenMat{T}` (`GenMatrixSpace{T}`)
 
   - Flint
      - `fmpz` (`FlintIntegerRing`)
