@@ -2362,6 +2362,14 @@ Base.promote_rule{T <: RingElem}(::Type{GenMat{T}}, ::Type{T}) = GenMat{T}
 
 Base.promote_rule{T <: RingElem}(::Type{GenMat{T}}, ::Type{fmpz}) = GenMat{T}
 
+function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenMat{T}}, ::Type{GenMat{U}})
+   U == T ? GenMat{T} : Union{}
+end
+
+function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenMat{T}}, ::Type{U})
+   Base.promote_rule(T, U) == T ? GenMat{T} : promote_rule1(U, GenMat{T})
+end
+
 ###############################################################################
 #
 #   Parent object call overload

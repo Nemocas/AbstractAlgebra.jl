@@ -14,6 +14,8 @@ end
 #
 ###############################################################################
 
+promote_rule1{T <: RingElem, U <: RingElem}(::Type{T}, ::Type{U}) = Base.promote_rule(T, U)
+
 function +{S <: RingElem, T <: RingElem}(x::S, y::T) 
    T1 = Base.promote_rule(S, T)
    if S == T1

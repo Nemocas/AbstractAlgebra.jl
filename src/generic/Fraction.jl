@@ -429,6 +429,14 @@ Base.promote_rule{T <: RingElem}(::Type{GenFraction{T}}, ::Type{T}) = GenFractio
 
 Base.promote_rule{T <: RingElem, U <: Integer}(::Type{GenFraction{T}}, ::Type{U}) = GenFraction{T}
 
+function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenFraction{T}}, ::Type{GenFraction{U}})
+   Base.promote_rule(T, GenFraction{U}) == T ? GenFraction{T} : Union{}
+end
+
+function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenFraction{T}}, ::Type{U})
+   Base.promote_rule(T, U) == T ? GenFraction{T} : promote_rule1(U, GenFraction{T})
+end
+
 ###############################################################################
 #
 #   Parent object call overloading
@@ -500,16 +508,7 @@ end
 function FractionField(R::Ring; cached=true)
    R2 = R
    T = elem_type(R)
-   par_type = GenFraction{T}
-   sig_table = [x.sig for x in methods(Base.promote_rule)]
-   while base_ring(R2) != Union{}
-      R2 = base_ring(R2)
-      T2 = elem_type(R2)
-      if !sig_exists(Tuple{typeof(Base.promote_rule), Type{par_type}, Type{T2}}, sig_table)
-         eval(:(Base.promote_rule(::Type{$par_type}, ::Type{$T2}) = $par_type))
-      end
-   end
-
+   
    return GenFractionField{T}(R, cached)
 end
 
