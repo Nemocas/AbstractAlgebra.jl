@@ -1,10 +1,10 @@
-###############################################################################
+  ###############################################################################
 #
 #   Matrix.jl : Generic mxn matrices over rings
 #
 ###############################################################################
 
-export MatricSpace, GenMat, GenMatrixSpace, fflu!, fflu, solve_triu, is_rref,
+export MatricSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, is_rref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
        is_hessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
        powers, similarity!
@@ -15,11 +15,11 @@ export MatricSpace, GenMat, GenMatrixSpace, fflu!, fflu, solve_triu, is_rref,
 #
 ###############################################################################
 
-parent_type{T}(::Type{GenMat{T}}) = GenMatrixSpace{T}
+parent_type{T}(::Type{GenMat{T}}) = GenMatSpace{T}
 
-elem_type{T <: RingElem}(::GenMatrixSpace{T}) = GenMat{T}
+elem_type{T <: RingElem}(::GenMatSpace{T}) = GenMat{T}
 
-base_ring{T}(a::GenMatrixSpace{T}) = a.base_ring::parent_type(T)
+base_ring{T}(a::MatSpace{T}) = a.base_ring::parent_type(T)
 
 base_ring(a::MatElem) = base_ring(parent(a))
 
@@ -51,19 +51,19 @@ rows(a::MatElem) = parent(a).rows
 
 cols(a::MatElem) = parent(a).cols
 
-function getindex{T <: RingElem}(a::GenMat{T}, r::Int, c::Int)
+function getindex{T <: RingElem}(a::MatElem{T}, r::Int, c::Int)
    return a.entries[r, c]
 end
  
-function setindex!{T <: RingElem}(a::GenMat{T}, d::T, r::Int, c::Int)
+function setindex!{T <: RingElem}(a::MatElem{T}, d::T, r::Int, c::Int)
    a.entries[r, c] = d
 end
 
-setindex_t!{T <: RingElem}(a::GenMat{T}, d::T, r::Int, c::Int) = setindex!(a, d, c, r)
+setindex_t!{T <: RingElem}(a::MatElem{T}, d::T, r::Int, c::Int) = setindex!(a, d, c, r)
 
-zero(a::GenMatrixSpace) = a()
+zero(a::MatSpace) = a()
 
-one(a::GenMatrixSpace) = a(1)
+one(a::MatSpace) = a(1)
 
 function iszero(a::MatElem)
    for i = 1:rows(a)
@@ -93,7 +93,7 @@ function isone(a::MatElem)
   return true
 end
 
-function deepcopy{T <: RingElem}(d::GenMat{T})
+function deepcopy{T <: RingElem}(d::MatElem{T})
    entries = Array(T, rows(d), cols(d))
    for i = 1:rows(d)
       for j = 1:cols(d)
@@ -117,7 +117,7 @@ canonical_unit(a::MatElem) = canonical_unit(a[1, 1])
 #
 ###############################################################################
 
-function show(io::IO, a::GenMatrixSpace)
+function show(io::IO, a::MatSpace)
    print(io, "Matrix Space of ")
    print(io, a.rows, " rows and ", a.cols, " columns over ")
    print(io, base_ring(a))
@@ -141,7 +141,7 @@ function show(io::IO, a::MatElem)
    end
 end
 
-show_minus_one{T <: RingElem}(::Type{GenMat{T}}) = false
+show_minus_one{T <: RingElem}(::Type{MatElem{T}}) = false
 
 ###############################################################################
 #
@@ -149,16 +149,16 @@ show_minus_one{T <: RingElem}(::Type{GenMat{T}}) = false
 #
 ###############################################################################
 
-function -(x::GenMat)
+function -(x::MatElem)
    par = parent(x)
    return par(-x.entries)
 end
 
-function transpose(x::GenMat)
+function transpose(x::MatElem)
    if rows(x) == cols(x)
       par = parent(x)
    else
-      par = GenMatrixSpace(base_ring(x), cols(x), rows(x))
+      par = GenMatSpace(base_ring(x), cols(x), rows(x))
    end
    return par(x.entries')
 end
@@ -169,19 +169,19 @@ end
 #
 ###############################################################################
 
-function +{T <: RingElem}(x::GenMat{T}, y::GenMat{T})
+function +{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
    check_parent(x, y)
    parz = parent(x)
    return parz(x.entries + y.entries)
 end
 
-function -{T <: RingElem}(x::GenMat{T}, y::GenMat{T})
+function -{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
    check_parent(x, y)
    parz = parent(x)
    return parz(x.entries - y.entries)
 end
 
-function *{T <: RingElem}(x::GenMat{T}, y::GenMat{T})
+function *{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
    cols(x) != rows(y) && error("Incompatible matrix dimensions")
    if rows(x) == cols(y) && rows(x) == cols(x)
       parz = parent(x)
@@ -208,7 +208,7 @@ end
 #
 ###############################################################################
 
-function *{T <: RingElem}(x::Integer, y::GenMat{T})
+function *{T <: RingElem}(x::Integer, y::MatElem{T})
    z = similar(y.entries)
    parz = parent(y)
    for i = 1:rows(y)
@@ -219,7 +219,7 @@ function *{T <: RingElem}(x::Integer, y::GenMat{T})
    return parz(z)
 end
 
-function *{T <: RingElem}(x::fmpz, y::GenMat{T})
+function *{T <: RingElem}(x::fmpz, y::MatElem{T})
    z = similar(y.entries)
    parz = parent(y)
    for i = 1:rows(y)
@@ -230,7 +230,7 @@ function *{T <: RingElem}(x::fmpz, y::GenMat{T})
    return parz(z)
 end
 
-function *{T <: RingElem}(x::T, y::GenMat{T})
+function *{T <: RingElem}(x::T, y::MatElem{T})
    z = similar(y.entries)
    parz = parent(y)
    for i = 1:rows(y)
@@ -241,13 +241,13 @@ function *{T <: RingElem}(x::T, y::GenMat{T})
    return parz(z)
 end
 
-*{T <: RingElem}(x::GenMat{T}, y::Integer) = y*x
+*{T <: RingElem}(x::MatElem{T}, y::Integer) = y*x
 
-*{T <: RingElem}(x::GenMat{T}, y::fmpz) = y*x
+*{T <: RingElem}(x::MatElem{T}, y::fmpz) = y*x
 
-*{T <: RingElem}(x::GenMat{T}, y::T) = y*x
+*{T <: RingElem}(x::MatElem{T}, y::T) = y*x
 
-function +{T <: RingElem}(x::Integer, y::GenMat{T})
+function +{T <: RingElem}(x::Integer, y::MatElem{T})
    z = similar(y.entries)
    parz = parent(y)
    R = base_ring(y)
@@ -263,9 +263,9 @@ function +{T <: RingElem}(x::Integer, y::GenMat{T})
    return parz(z)
 end
 
-+{T <: RingElem}(x::GenMat{T}, y::Integer) = y + x
++{T <: RingElem}(x::MatElem{T}, y::Integer) = y + x
 
-function +{T <: RingElem}(x::fmpz, y::GenMat{T})
+function +{T <: RingElem}(x::fmpz, y::MatElem{T})
    z = similar(y.entries)
    parz = parent(y)
    R = base_ring(y)
@@ -281,9 +281,9 @@ function +{T <: RingElem}(x::fmpz, y::GenMat{T})
    return parz(z)
 end
 
-+{T <: RingElem}(x::GenMat{T}, y::fmpz) = y + x
++{T <: RingElem}(x::MatElem{T}, y::fmpz) = y + x
 
-function +{T <: RingElem}(x::T, y::GenMat{T})
+function +{T <: RingElem}(x::T, y::MatElem{T})
    z = similar(y.entries)
    parz = parent(y)
    for i = 1:rows(y)
@@ -298,9 +298,9 @@ function +{T <: RingElem}(x::T, y::GenMat{T})
    return parz(z)
 end
 
-+{T <: RingElem}(x::GenMat{T}, y::T) = y + x
++{T <: RingElem}(x::MatElem{T}, y::T) = y + x
 
-function -{T <: RingElem}(x::Integer, y::GenMat{T})
+function -{T <: RingElem}(x::Integer, y::MatElem{T})
    z = similar(y.entries)
    parz = parent(y)
    R = base_ring(y)
@@ -316,7 +316,7 @@ function -{T <: RingElem}(x::Integer, y::GenMat{T})
    return parz(z)
 end
 
-function -{T <: RingElem}(x::GenMat{T}, y::Integer) 
+function -{T <: RingElem}(x::MatElem{T}, y::Integer) 
    z = similar(x.entries)
    parz = parent(x)
    R = base_ring(x)
@@ -332,7 +332,7 @@ function -{T <: RingElem}(x::GenMat{T}, y::Integer)
    return parz(z)
 end
 
-function -{T <: RingElem}(x::fmpz, y::GenMat{T})
+function -{T <: RingElem}(x::fmpz, y::MatElem{T})
    z = similar(y.entries)
    parz = parent(y)
    R = base_ring(y)
@@ -348,7 +348,7 @@ function -{T <: RingElem}(x::fmpz, y::GenMat{T})
    return parz(z)
 end
 
-function -{T <: RingElem}(x::GenMat{T}, y::fmpz) 
+function -{T <: RingElem}(x::MatElem{T}, y::fmpz) 
    z = similar(x.entries)
    parz = parent(x)
    R = base_ring(x)
@@ -364,7 +364,7 @@ function -{T <: RingElem}(x::GenMat{T}, y::fmpz)
    return parz(z)
 end
 
-function -{T <: RingElem}(x::T, y::GenMat{T})
+function -{T <: RingElem}(x::T, y::MatElem{T})
    z = similar(y.entries)
    parz = parent(y)
    R = base_ring(y)
@@ -380,7 +380,7 @@ function -{T <: RingElem}(x::T, y::GenMat{T})
    return parz(z)
 end
 
-function -{T <: RingElem}(x::GenMat{T}, y::T) 
+function -{T <: RingElem}(x::MatElem{T}, y::T) 
    z = similar(x.entries)
    parz = parent(x)
    R = base_ring(x)
@@ -469,7 +469,7 @@ end
 #
 ###############################################################################
 
-function =={T <: RingElem}(x::GenMat{T}, y::Integer) 
+function =={T <: RingElem}(x::MatElem{T}, y::Integer) 
    for i = 1:min(rows(x), cols(x))
       if x[i, i] != y
          return false
@@ -485,9 +485,9 @@ function =={T <: RingElem}(x::GenMat{T}, y::Integer)
    return true
 end
 
-=={T <: RingElem}(x::Integer, y::GenMat{T}) = y == x
+=={T <: RingElem}(x::Integer, y::MatElem{T}) = y == x
 
-function =={T <: RingElem}(x::GenMat{T}, y::fmpz) 
+function =={T <: RingElem}(x::MatElem{T}, y::fmpz) 
    for i = 1:min(rows(x), cols(x))
       if x[i, i] != y
          return false
@@ -503,7 +503,7 @@ function =={T <: RingElem}(x::GenMat{T}, y::fmpz)
    return true
 end
 
-=={T <: RingElem}(x::fmpz, y::GenMat{T}) = y == x
+=={T <: RingElem}(x::fmpz, y::MatElem{T}) = y == x
 
 ###############################################################################
 #
@@ -511,7 +511,7 @@ end
 #
 ###############################################################################
 
-function divexact{T <: RingElem}(x::GenMat{T}, y::Integer)
+function divexact{T <: RingElem}(x::MatElem{T}, y::Integer)
    z = similar(x.entries)
    parz = parent(x)
    for i = 1:rows(x)
@@ -522,7 +522,7 @@ function divexact{T <: RingElem}(x::GenMat{T}, y::Integer)
    return parz(z)
 end
 
-function divexact{T <: RingElem}(x::GenMat{T}, y::fmpz)
+function divexact{T <: RingElem}(x::MatElem{T}, y::fmpz)
    z = similar(x.entries)
    parz = parent(x)
    for i = 1:rows(x)
@@ -533,7 +533,7 @@ function divexact{T <: RingElem}(x::GenMat{T}, y::fmpz)
    return parz(z)
 end
 
-function divexact{T <: RingElem}(x::GenMat{T}, y::T)
+function divexact{T <: RingElem}(x::MatElem{T}, y::T)
    z = similar(x.entries)
    parz = parent(x)
    for i = 1:rows(x)
@@ -2376,11 +2376,11 @@ end
 #
 ###############################################################################
 
-function Base.call{T <: RingElem}(a::GenMatrixSpace{T}, b::RingElem)
+function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::RingElem)
    return a(base_ring(a)(b))
 end
 
-function Base.call{T <: RingElem}(a::GenMatrixSpace{T})
+function Base.call{T <: RingElem}(a::GenMatSpace{T})
    entries = Array(T, a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
@@ -2392,7 +2392,7 @@ function Base.call{T <: RingElem}(a::GenMatrixSpace{T})
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenMatrixSpace{T}, b::Integer)
+function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::Integer)
    entries = Array(T, a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
@@ -2408,7 +2408,7 @@ function Base.call{T <: RingElem}(a::GenMatrixSpace{T}, b::Integer)
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenMatrixSpace{T}, b::T)
+function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to matrix")
    entries = Array(T, a.rows, a.cols)
    for i = 1:a.rows
@@ -2425,12 +2425,12 @@ function Base.call{T <: RingElem}(a::GenMatrixSpace{T}, b::T)
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenMatrixSpace{T}, b::GenMat{T})
+function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::GenMat{T})
    parent(b) != a && error("Unable to coerce matrix")
    return b
 end
 
-function Base.call{T <: RingElem}(a::GenMatrixSpace{T}, b::Array{T, 2})
+function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::Array{T, 2})
    if length(b) > 0
       parent(b[1, 1]) != base_ring(a) && error("Unable to coerce to matrix")
    end
@@ -2447,7 +2447,7 @@ end
 
 function MatrixSpace(R::Ring, r::Int, c::Int; cached=true)
    T = elem_type(R)
-   return GenMatrixSpace{T}(R, r, c, cached)
+   return GenMatSpace{T}(R, r, c, cached)
 end
 
 function typed_hvcat(R::Ring, dims, d...)

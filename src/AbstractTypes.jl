@@ -4,28 +4,16 @@
 #
 ###############################################################################
 
-# libraries
+# broad mathematical domains
+# these contain the type classes of parent objects
 
-abstract Pari
+   abstract Set
 
-abstract Flint
+   abstract Group <: Set
 
-abstract Antic
+   abstract Ring <: Group
 
-abstract Arb
-
-abstract Generic
-
-# mathematical domains, parameterised by a library
-# these are the type classes of parent objects
-
-   abstract Set{T}
-
-   abstract Group{T} <: Set{T}
-
-   abstract Ring{T} <: Group{T}
-
-   abstract Field{T} <: Ring{T}
+   abstract Field <: Ring
 
 # elements of mathematical domains
 
@@ -37,6 +25,25 @@ abstract Generic
 
    abstract FieldElem <: RingElem
 
+# rings, fields etc, parameterised by an element type
+# these are the type classes of different kinds of
+# mathematical rings/fields/etc, which have a base ring,
+# and for which a generic implementation is possible
+# over that base ring
+
+   abstract PolyRing{T} <: Ring
+
+   abstract SeriesRing{T} <: Ring
+
+   abstract ResRing{T} <: Ring
+
+   abstract FracField{T} <: Field
+
+# not always really mathematical rings
+# later we'll distinguish matrix algebras
+# from the generic case
+   abstract MatSpace{T} <: Ring
+
 # mathematical objects parameterised by an element type
 # these are the type classes of mathematical objects
 # that have some kind of base ring, and a generic 
@@ -44,9 +51,9 @@ abstract Generic
 
    abstract PolyElem{T} <: RingElem
 
-   abstract ResidueElem{T} <: RingElem
+   abstract ResElem{T} <: RingElem
 
-   abstract FractionElem{T} <: FieldElem
+   abstract FracElem{T} <: FieldElem
 
    abstract SeriesElem{T} <: RingElem
 
@@ -54,19 +61,13 @@ abstract Generic
    # later we'll maybe distinguish MatAlgebraElem, MatModuleElem
    abstract MatElem{T} <: RingElem
 
-# leaf objects, with no parameterisation
-# these are also type classes of mathematical objects
-# usually provided by a C library and not by generic
+# additional abstract types for parents, added ad hoc to form
+# collections of types as needed by applications
 
-   abstract PermElem <: GroupElem
+   abstract FinField <: Field     # for fq, fq_nmod, etc
+   
+# additional abstract types for elements, added ad hoc to form
+# collections of types as needed by applications
 
-   abstract IntegerRingElem <: RingElem
-
-   abstract FiniteFieldElem <: FieldElem
-
-   abstract NumberFieldElem <: FieldElem
-
-   abstract MaximalOrderElem <: RingElem
-
-   abstract PadicFieldElem <: FieldElem
-
+   abstract FinFieldElem <: FieldElem # for fq, fq_nmod, etc
+  

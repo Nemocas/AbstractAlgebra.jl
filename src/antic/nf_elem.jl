@@ -4,8 +4,8 @@
 #
 ###############################################################################
 
-export AnticNumberField, norm, trace, CyclotomicField, MaximalRealSubfield,
-       add!, sub!, mul!, signature
+export AnticNumberField, nf_elem, norm, trace, CyclotomicField,
+       MaximalRealSubfield, add!, sub!, mul!, signature
 
 ###############################################################################
 #
@@ -667,7 +667,7 @@ function *(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
    K = base_ring(a)
    R = parent(pol)
    T = elem_type(R)
-   S = GenPolynomialRing{T}(R, :y)
+   S = GenPolyRing{T}(R, :y)
    f = S()
    fit!(f, lena)
    for i = 1:lena

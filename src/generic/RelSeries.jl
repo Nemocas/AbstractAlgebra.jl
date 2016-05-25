@@ -4,7 +4,7 @@
 #
 ###############################################################################    
 
-export GenCapRelSeries, GenCapRelPowerSeriesRing, PowerSeriesRing, O, valuation, exp,
+export GenRelSeries, GenRelSeriesRing, PowerSeriesRing, O, valuation, exp,
        precision, max_precision, set_prec!
 
 ###############################################################################
@@ -13,25 +13,25 @@ export GenCapRelSeries, GenCapRelPowerSeriesRing, PowerSeriesRing, O, valuation,
 #
 ###############################################################################
 
-function O{T}(a::GenCapRelSeries{T})
+function O{T}(a::SeriesElem{T})
    prec = length(a) - 1
    prec < 0 && throw(DomainError())
-   z = GenCapRelSeries{T}(Array(T, 0), 0, prec)
+   z = GenRelSeries{T}(Array(T, 0), 0, prec)
    z.parent = parent(a)
    return z
 end
 
-parent_type{T}(::Type{GenCapRelSeries{T}}) = GenCapRelPowerSeriesRing{T}
+parent_type{T}(::Type{GenRelSeries{T}}) = GenRelSeriesRing{T}
 
 parent(a::SeriesElem) = a.parent
 
-elem_type{T <: RingElem}(::GenCapRelPowerSeriesRing{T}) = GenCapRelSeries{T}
+elem_type{T <: RingElem}(::GenRelSeriesRing{T}) = GenRelSeries{T}
 
-base_ring{T}(R::GenCapRelPowerSeriesRing{T}) = R.base_ring::parent_type(T)
+base_ring{T}(R::SeriesRing{T}) = R.base_ring::parent_type(T)
 
 base_ring(a::SeriesElem) = base_ring(parent(a))
 
-var(a::GenCapRelPowerSeriesRing) = a.S
+var(a::SeriesRing) = a.S
 
 function check_parent(a::SeriesElem, b::SeriesElem)
    parent(a) != parent(b) && 
@@ -53,13 +53,13 @@ function Base.hash(a::SeriesElem, h::UInt)
    return b
 end
 
-length(x::GenCapRelSeries) = x.length
+length(x::SeriesElem) = x.length
 
-precision(x::GenCapRelSeries) = x.prec
+precision(x::SeriesElem) = x.prec
 
-max_precision(R::GenCapRelPowerSeriesRing) = R.prec_max
+max_precision(R::SeriesRing) = R.prec_max
 
-function normalise(a::GenCapRelSeries, len::Int)
+function normalise(a::SeriesElem, len::Int)
    while len > 0 && iszero(a.coeffs[len])
       len -= 1
    end
@@ -67,26 +67,26 @@ function normalise(a::GenCapRelSeries, len::Int)
    return len
 end
 
-function set_length!(a::GenCapRelSeries, len::Int)
+function set_length!(a::SeriesElem, len::Int)
    a.length = len
 end
 
-function set_prec!(a::GenCapRelSeries, prec::Int)
+function set_prec!(a::SeriesElem, prec::Int)
    a.prec = prec
 end
 
-function coeff(a::GenCapRelSeries, n::Int)
+function coeff(a::SeriesElem, n::Int)
    n < 0  && throw(DomainError())
    return n >= length(a) ? zero(base_ring(a)) : a.coeffs[n + 1]
 end
 
-zero(R::GenCapRelPowerSeriesRing) = R(0)
+zero(R::SeriesRing) = R(0)
 
-one(R::GenCapRelPowerSeriesRing) = R(1)
+one(R::SeriesRing) = R(1)
 
-function gen{T}(R::GenCapRelPowerSeriesRing{T})
+function gen{T}(R::SeriesRing{T})
    S = base_ring(R)
-   z = GenCapRelSeries{T}([S(0), S(1)], 2, max_precision(R) + 1)
+   z = GenRelSeries{T}([S(0), S(1)], 2, max_precision(R) + 1)
    z.parent = R
    return z
 end
@@ -115,7 +115,7 @@ function valuation(a::SeriesElem)
    error("Power series is not normalised")
 end
 
-function deepcopy{T <: RingElem}(a::GenCapRelSeries{T})
+function deepcopy{T <: RingElem}(a::SeriesElem{T})
    coeffs = Array(T, length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy(coeff(a, i - 1))
@@ -180,7 +180,7 @@ function show{T <: RingElem}(io::IO, x::SeriesElem{T})
    print(io, "+O(", string(var(parent(x))), "^", precision(x), ")")
 end
 
-function show{T <: RingElem}(io::IO, a::GenCapRelPowerSeriesRing{T})
+function show{T <: RingElem}(io::IO, a::SeriesRing{T})
    print(io, "Univariate power series ring in ", var(a), " over ")
    show(io, base_ring(a))
 end
@@ -197,7 +197,7 @@ show_minus_one{T <: RingElem}(::Type{SeriesElem{T}}) = show_minus_one(T)
 #
 ###############################################################################
 
-function -{T <: RingElem}(a::GenCapRelSeries{T})
+function -{T <: RingElem}(a::SeriesElem{T})
    len = length(a)
    d = Array(T, len)
    for i = 1:len
@@ -212,7 +212,7 @@ end
 #
 ###############################################################################
 
-function +{T <: RingElem}(a::GenCapRelSeries{T}, b::GenCapRelSeries{T})
+function +{T <: RingElem}(a::SeriesElem{T}, b::SeriesElem{T})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -248,7 +248,7 @@ function +{T <: RingElem}(a::GenCapRelSeries{T}, b::GenCapRelSeries{T})
    return z
 end
   
-function -{T <: RingElem}(a::GenCapRelSeries{T}, b::GenCapRelSeries{T})
+function -{T <: RingElem}(a::SeriesElem{T}, b::SeriesElem{T})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -284,7 +284,7 @@ function -{T <: RingElem}(a::GenCapRelSeries{T}, b::GenCapRelSeries{T})
    return z
 end
 
-function *{T <: RingElem}(a::GenCapRelSeries{T}, b::GenCapRelSeries{T})
+function *{T <: RingElem}(a::SeriesElem{T}, b::SeriesElem{T})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -339,7 +339,7 @@ end
 #
 ###############################################################################
 
-function *{T <: RingElem}(a::Int, b::GenCapRelSeries{T})
+function *{T <: RingElem}(a::Integer, b::SeriesElem{T})
    len = length(b)
    d = Array(T, len)
    for i = 1:len
@@ -350,7 +350,7 @@ function *{T <: RingElem}(a::Int, b::GenCapRelSeries{T})
    return z
 end
 
-function *{T <: RingElem}(a::fmpz, b::GenCapRelSeries{T})
+function *{T <: RingElem}(a::fmpz, b::SeriesElem{T})
    len = length(b)
    d = Array(T, len)
    for i = 1:len
@@ -361,9 +361,9 @@ function *{T <: RingElem}(a::fmpz, b::GenCapRelSeries{T})
    return z
 end
 
-*(a::GenCapRelSeries, b::Int) = b*a
+*(a::SeriesElem, b::Integer) = b*a
 
-*(a::GenCapRelSeries, b::fmpz) = b*a
+*(a::SeriesElem, b::fmpz) = b*a
 
 ###############################################################################
 #
@@ -523,15 +523,15 @@ end
 #
 ###############################################################################
 
-==(x::GenCapRelSeries, y::Int) = precision(x) == 0 || ((length(x) == 0 && y == 0)
+==(x::SeriesElem, y::Int) = precision(x) == 0 || ((length(x) == 0 && y == 0)
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
-==(x::GenCapRelSeries, y::fmpz) = precision(x) == 0 || ((length(x) == 0 && y == 0)
+==(x::SeriesElem, y::fmpz) = precision(x) == 0 || ((length(x) == 0 && y == 0)
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
-==(x::Int, y::GenCapRelSeries) = y == x
+==(x::Int, y::SeriesElem) = y == x
 
-==(x::fmpz, y::GenCapRelSeries) = y == x
+==(x::fmpz, y::SeriesElem) = y == x
 
 ###############################################################################
 #
@@ -560,7 +560,7 @@ end
 #
 ###############################################################################
 
-function divexact{T <: RingElem}(x::GenCapRelSeries{T}, y::Int)
+function divexact{T <: RingElem}(x::SeriesElem{T}, y::Integer)
    y == 0 && throw(DivideError())
    lenx = length(x)
    d = Array(T, lenx)
@@ -570,7 +570,7 @@ function divexact{T <: RingElem}(x::GenCapRelSeries{T}, y::Int)
    return parent(x)(d, lenx, precision(x))
 end
 
-function divexact{T <: RingElem}(x::GenCapRelSeries{T}, y::fmpz)
+function divexact{T <: RingElem}(x::SeriesElem{T}, y::fmpz)
    y == 0 && throw(DivideError())
    lenx = length(x)
    d = Array(T, lenx)
@@ -580,7 +580,7 @@ function divexact{T <: RingElem}(x::GenCapRelSeries{T}, y::fmpz)
    return parent(x)(d, lenx, precision(x))
 end
 
-function divexact{T <: RingElem}(x::GenCapRelSeries{T}, y::T)
+function divexact{T <: RingElem}(x::SeriesElem{T}, y::T)
    y == 0 && throw(DivideError())
    lenx = length(x)
    d = Array(T, lenx)
@@ -589,8 +589,6 @@ function divexact{T <: RingElem}(x::GenCapRelSeries{T}, y::T)
    end
    return parent(x)(d, lenx, precision(x))
 end
-
-divexact{T <: RingElem}(x::GenCapRelSeries{T}, y::Integer) = divexact(x, fmpz(y))
 
 ###############################################################################
 #
@@ -651,7 +649,7 @@ end
 #
 ###############################################################################
 
-function fit!{T <: RingElem}(c::GenCapRelSeries{T}, n::Int)
+function fit!{T <: RingElem}(c::SeriesElem{T}, n::Int)
    if c.length < n
       t = c.coeffs
       c.coeffs = Array(T, n)
@@ -664,7 +662,7 @@ function fit!{T <: RingElem}(c::GenCapRelSeries{T}, n::Int)
    end
 end
 
-function setcoeff!{T <: RingElem}(c::GenCapRelSeries{T}, n::Int, a::T)
+function setcoeff!{T <: RingElem}(c::SeriesElem{T}, n::Int, a::T)
    if (a != 0 && precision(c) > n) || n + 1 <= c.length
       fit!(c, n + 1)
       c.coeffs[n + 1] = a
@@ -673,7 +671,7 @@ function setcoeff!{T <: RingElem}(c::GenCapRelSeries{T}, n::Int, a::T)
    end
 end
 
-function mul!{T <: RingElem}(c::GenCapRelSeries{T}, a::GenCapRelSeries{T}, b::GenCapRelSeries{T})
+function mul!{T <: RingElem}(c::SeriesElem{T}, a::SeriesElem{T}, b::SeriesElem{T})
    lena = length(a)
    lenb = length(b)
 
@@ -717,7 +715,7 @@ function mul!{T <: RingElem}(c::GenCapRelSeries{T}, a::GenCapRelSeries{T}, b::Ge
    c.prec = prec
 end
 
-function addeq!{T <: RingElem}(c::GenCapRelSeries{T}, a::GenCapRelSeries{T})
+function addeq!{T <: RingElem}(c::SeriesElem{T}, a::SeriesElem{T})
    lenc = length(c)
    lena = length(a)
    
@@ -741,20 +739,20 @@ end
 #
 ###############################################################################
 
-function Base.promote_rule{T <: RingElem, V <: Integer}(::Type{GenCapRelSeries{T}}, ::Type{V})
-   return GenCapRelSeries{T}
+function Base.promote_rule{T <: RingElem, V <: Integer}(::Type{GenRelSeries{T}}, ::Type{V})
+   return GenRelSeries{T}
 end
 
-function Base.promote_rule{T <: RingElem}(::Type{GenCapRelSeries{T}}, ::Type{T})
-   return GenCapRelSeries{T}
+function Base.promote_rule{T <: RingElem}(::Type{GenRelSeries{T}}, ::Type{T})
+   return GenRelSeries{T}
 end
 
-function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenCapRelSeries{T}}, ::Type{GenCapRelSeries{U}})
-   Base.promote_rule(T, GenCapRelSeries{U}) == T ? GenCapRelSeries{T} : Union{}
+function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenRelSeries{T}}, ::Type{GenRelSeries{U}})
+   Base.promote_rule(T, GenRelSeries{U}) == T ? GenRelSeries{T} : Union{}
 end
 
-function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenCapRelSeries{T}}, ::Type{U})
-   Base.promote_rule(T, U) == T ? GenCapRelSeries{T} : promote_rule1(U, GenCapRelSeries{T})
+function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenRelSeries{T}}, ::Type{U})
+   Base.promote_rule(T, U) == T ? GenRelSeries{T} : promote_rule1(U, GenRelSeries{T})
 end
 
 ###############################################################################
@@ -763,47 +761,47 @@ end
 #
 ###############################################################################
 
-function Base.call{T <: RingElem}(a::GenCapRelPowerSeriesRing{T}, b::RingElem)
+function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::RingElem)
    return a(base_ring(a)(b))
 end
 
-function Base.call{T <: RingElem}(a::GenCapRelPowerSeriesRing{T})
-   z = GenCapRelSeries{T}(Array(T, 0), 0, a.prec_max)
+function Base.call{T <: RingElem}(a::GenRelSeriesRing{T})
+   z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max)
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenCapRelPowerSeriesRing{T}, b::Integer)
+function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::Integer)
    if b == 0
-      z = GenCapRelSeries{T}(Array(T, 0), 0, a.prec_max)
+      z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max)
    else
-      z = GenCapRelSeries{T}([base_ring(a)(b)], 1, a.prec_max)
+      z = GenRelSeries{T}([base_ring(a)(b)], 1, a.prec_max)
    end
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenCapRelPowerSeriesRing{T}, b::T)
+function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to power series")
    if b == 0
-      z = GenCapRelSeries{T}(Array(T, 0), 0, a.prec_max)
+      z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max)
    else
-      z = GenCapRelSeries{T}([b], 1, a.prec_max)
+      z = GenRelSeries{T}([b], 1, a.prec_max)
    end
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenCapRelPowerSeriesRing{T}, b::GenCapRelSeries{T})
+function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::SeriesElem{T})
    parent(b) != a && error("Unable to coerce power series")
    return b
 end
 
-function Base.call{T <: RingElem}(a::GenCapRelPowerSeriesRing{T}, b::Array{T, 1}, len::Int, prec::Int)
+function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::Array{T, 1}, len::Int, prec::Int)
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to power series")
    end
-   z = GenCapRelSeries{T}(b, len, prec)
+   z = GenRelSeries{T}(b, len, prec)
    z.parent = a
    return z
 end
@@ -817,7 +815,7 @@ end
 function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{}; cached=true)
    S = Symbol(s)
    T = elem_type(R)
-   parent_obj = GenCapRelPowerSeriesRing{T}(R, prec, S, cached)
+   parent_obj = GenRelSeriesRing{T}(R, prec, S, cached)
 
    return parent_obj, parent_obj([R(0), R(1)], 2, prec + 1)
 end

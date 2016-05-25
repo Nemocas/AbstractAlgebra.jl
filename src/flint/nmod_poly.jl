@@ -97,9 +97,9 @@ isgen(a::nmod_poly) = (degree(a) == 1 &&
 iszero(a::nmod_poly) = Bool(ccall((:nmod_poly_is_zero, :libflint), Int32,
                               (Ptr{nmod_poly}, ), &a))
 
-modulus(a::nmod_poly) = a.parent._n
+modulus(a::nmod_poly) = a.parent.n
 
-modulus(R::NmodPolyRing) = R._n
+modulus(R::NmodPolyRing) = R.n
 
 var(R::NmodPolyRing) = R.S
 
@@ -206,7 +206,7 @@ function *(x::nmod_poly, y::fmpz)
   t = fmpz()
   tt = UInt(0)
   ccall((:fmpz_mod_ui, :libflint), UInt,
-                (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &y, parent(x)._n)
+                (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &y, parent(x).n)
   tt = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &t)
   return x*tt
 end
@@ -217,12 +217,12 @@ end
 
 *(x::Integer, y::nmod_poly) = y*x
 
-function *(x::nmod_poly, y::GenResidue{fmpz})
+function *(x::nmod_poly, y::GenRes{fmpz})
   (base_ring(x) != parent(y)) && error("Must have same parent")
   return x*y.data
 end
 
-*(x::GenResidue{fmpz}, y::nmod_poly) = y*x
+*(x::GenRes{fmpz}, y::nmod_poly) = y*x
 
 function +(x::nmod_poly, y::UInt)
   z = parent(x)()
@@ -238,7 +238,7 @@ function +(x::nmod_poly, y::fmpz)
   t = fmpz()
   tt = UInt(0)
   ccall((:fmpz_mod_ui, :libflint), UInt,
-                (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &y, parent(x)._n)
+                (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &y, parent(x).n)
   tt = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &t)
   return +(x,tt)
 end
@@ -249,12 +249,12 @@ end
 
 +(x::Integer, y::nmod_poly) = y + x 
 
-function +(x::nmod_poly, y::GenResidue{fmpz})
+function +(x::nmod_poly, y::GenRes{fmpz})
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
   return +(x,y.data)
 end
 
-+(x::GenResidue{fmpz}, y::nmod_poly) = y + x
++(x::GenRes{fmpz}, y::nmod_poly) = y + x
 
 function -(x::nmod_poly, y::UInt)
   z = parent(x)()
@@ -270,7 +270,7 @@ function -(x::nmod_poly, y::fmpz)
   t = fmpz()
   tt = UInt(0)
   ccall((:fmpz_mod_ui, :libflint), UInt,
-                (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &y, parent(x)._n)
+                (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &y, parent(x).n)
   tt = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &t)
   return -(x,tt)
 end
@@ -281,12 +281,12 @@ end
 
 -(x::Integer, y::nmod_poly) = -(y - x)
 
-function -(x::nmod_poly, y::GenResidue{fmpz})
+function -(x::nmod_poly, y::GenRes{fmpz})
   (base_ring(x) != parent(y)) && error("Elements must have same parent")
   return -(x,y.data)
 end
 
--(x::GenResidue{fmpz}, y::nmod_poly) = -(y - x)
+-(x::GenRes{fmpz}, y::nmod_poly) = -(y - x)
 
 ################################################################################
 #
@@ -320,7 +320,7 @@ end
 #
 ################################################################################
 
-function ==(x::nmod_poly, y::GenResidue{fmpz})
+function ==(x::nmod_poly, y::GenRes{fmpz})
   base_ring(x) != parent(y) && error("Incompatible base rings in comparison")
   if length(x) > 1
     return false
@@ -335,7 +335,7 @@ end
 
 isequal(x::nmod_poly, y::nmod_poly) = x == y
 
-==(x::GenResidue{fmpz}, y::nmod_poly) = y == x
+==(x::GenRes{fmpz}, y::nmod_poly) = y == x
 
 ################################################################################
 #
@@ -421,13 +421,19 @@ end
 #
 ################################################################################
 
-function divexact(x::nmod_poly, y::GenResidue{fmpz})
+function divexact(x::nmod_poly, y::GenRes{fmpz})
   base_ring(x) != parent(y) && error("Elements must have same parent")
   iszero(y) && throw(DivideError())
   return divexact(x, parent(x)(y))
 end
 
 div(x::nmod_poly, y::nmod_poly) = divexact(x,y)
+
+function divexact(x::nmod_poly, y::Int)
+  y == 0 && throw(DivideError())
+  return divexact(x, parent(x)(y))
+end
+
 
 ################################################################################
 #
@@ -562,7 +568,7 @@ end
 #
 ################################################################################
 
-function evaluate(x::nmod_poly, y::GenResidue{fmpz})
+function evaluate(x::nmod_poly, y::GenRes{fmpz})
   base_ring(x) != parent(y) && error("Elements must have same parent")
   u = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &y.data)
   z = ccall((:nmod_poly_evaluate_nmod, :libflint), UInt,
@@ -616,8 +622,8 @@ end
 #
 ################################################################################
 
-function interpolate(R::NmodPolyRing, x::Array{GenResidue{fmpz}, 1},
-                                      y::Array{GenResidue{fmpz}, 1})
+function interpolate(R::NmodPolyRing, x::Array{GenRes{fmpz}, 1},
+                                      y::Array{GenRes{fmpz}, 1})
   z = R()
 
   ax = Array(UInt, length(x))
@@ -627,12 +633,12 @@ function interpolate(R::NmodPolyRing, x::Array{GenResidue{fmpz}, 1},
 
   for i in 1:length(x)
     ccall((:fmpz_mod_ui, :libflint), Void,
-          (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &x[i].data, R._n)
+          (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &x[i].data, R.n)
     u = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &t)
     ax[i] = u
 
     ccall((:fmpz_mod_ui, :libflint), Void,
-          (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &y[i].data, R._n)
+          (Ptr{fmpz}, Ptr{fmpz}, UInt), &t, &y[i].data, R.n)
     u = ccall((:fmpz_get_ui, :libflint), UInt, (Ptr{fmpz}, ), &t)
     
     ay[i] = u
@@ -711,11 +717,11 @@ end
 
 function factor(x::nmod_poly)
   !isprime(modulus(x)) && error("Modulus not prime in factor")
-  fac = nmod_poly_factor(x._mod_n)
+  fac = nmod_poly_factor(x.mod_n)
   ccall((:nmod_poly_factor, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}), &fac, &x)
   res = Dict{nmod_poly,Int}()
-  for i in 1:fac._num
+  for i in 1:fac.num
     f = parent(x)()
     ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
@@ -727,11 +733,11 @@ end
 
 function factor_squarefree(x::nmod_poly)
   !isprime(modulus(x)) && error("Modulus not prime in factor_squarefree")
-  fac = nmod_poly_factor(x._mod_n)
+  fac = nmod_poly_factor(x.mod_n)
   ccall((:nmod_poly_factor_squarefree, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}), &fac, &x)
   res = Dict{nmod_poly,Int}()
-  for i in 1:fac._num
+  for i in 1:fac.num
     f = parent(x)()
     ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
@@ -746,12 +752,12 @@ function factor_distinct_deg(x::nmod_poly)
   !isprime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")
   degs = Array(Int, degree(x))
   degss = [ pointer(degs) ]
-  fac = nmod_poly_factor(x._mod_n)
+  fac = nmod_poly_factor(x.mod_n)
   ccall((:nmod_poly_factor_distinct_deg, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}, Ptr{Ptr{Int}}),
           &fac, &x, degss)
   res = Dict{nmod_poly,Int}()
-  for i in 1:fac._num
+  for i in 1:fac.num
     f = parent(x)()
     ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
@@ -835,18 +841,18 @@ end
 
 function setcoeff!(x::nmod_poly, n::Int, y::Int)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
-                   (Ptr{nmod_poly}, Int, UInt), &x, n, mod(y, x._mod_n))
+                   (Ptr{nmod_poly}, Int, UInt), &x, n, mod(y, x.mod_n))
 end
   
 function setcoeff!(x::nmod_poly, n::Int, y::fmpz)
-  r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &y, x._mod_n)
+  r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &y, x.mod_n)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{nmod_poly}, Int, UInt), &x, n, r)
 end
   
 setcoeff!(x::nmod_poly, n::Int, y::Integer) = setcoeff!(x, n, fmpz(y))
   
-function setcoeff!(x::nmod_poly, n::Int, y::GenResidue{fmpz})
+function setcoeff!(x::nmod_poly, n::Int, y::GenRes{fmpz})
   setcoeff!(x, n, y.data)
 end
 
@@ -896,7 +902,7 @@ Base.promote_rule(::Type{nmod_poly}, ::Type{fmpz}) = nmod_poly
 #
 ###############################################################################
 
-function Base.call(f::nmod_poly, a::GenResidue{fmpz})
+function Base.call(f::nmod_poly, a::GenRes{fmpz})
    if parent(a) != base_ring(f)
       return subst(f, a)
    end
@@ -910,60 +916,60 @@ end
 ################################################################################
 
 function Base.call(R::NmodPolyRing)
-  z = nmod_poly(R._n)
+  z = nmod_poly(R.n)
   z.parent = R
   return z
 end
 
 function Base.call(R::NmodPolyRing, x::fmpz)
-  r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &x, R._n)
-  z = nmod_poly(R._n, r)
+  r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &x, R.n)
+  z = nmod_poly(R.n, r)
   z.parent = R
   return z
 end
 
 function Base.call(R::NmodPolyRing, x::UInt)
-  z = nmod_poly(R._n, x)
+  z = nmod_poly(R.n, x)
   z.parent = R
   return z
 end
 
 function Base.call(R::NmodPolyRing, x::Integer)
-  z = nmod_poly(R._n, x)
+  z = nmod_poly(R.n, x)
   z.parent = R
   return z
 end
 
-function Base.call(R::NmodPolyRing, x::GenResidue{fmpz})
+function Base.call(R::NmodPolyRing, x::GenRes{fmpz})
   base_ring(R) != parent(x) && error("Wrong parents")
-  z = nmod_poly(R._n, UInt(x.data))
+  z = nmod_poly(R.n, UInt(x.data))
   z.parent = R
   return z
 end
 
 function Base.call(R::NmodPolyRing, arr::Array{fmpz, 1})
-  z = nmod_poly(R._n, arr)
+  z = nmod_poly(R.n, arr)
   z.parent = R
   return z
 end
 
 function Base.call(R::NmodPolyRing, arr::Array{UInt, 1})
-  z = nmod_poly(R._n, arr)
+  z = nmod_poly(R.n, arr)
   z.parent = R
   return z
 end
 
-function Base.call(R::NmodPolyRing, arr::Array{GenResidue{fmpz}, 1})
+function Base.call(R::NmodPolyRing, arr::Array{GenRes{fmpz}, 1})
   if length(arr) > 0
      (base_ring(R) != parent(arr[1])) && error("Wrong parents")
   end
-  z = nmod_poly(R._n, arr)
+  z = nmod_poly(R.n, arr)
   z.parent = R
   return z
 end
 
 function Base.call(R::NmodPolyRing, x::fmpz_poly)
-  z = nmod_poly(R._n, x)
+  z = nmod_poly(R.n, x)
   z.parent = R
   return z
 end
