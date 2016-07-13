@@ -1237,8 +1237,7 @@ function base(n::fmpz, b::Integer)
     2 <= b <= 62 || error("invalid base: $b")
     p = ccall((:fmpz_get_str,:libflint), Ptr{UInt8}, 
               (Ptr{UInt8}, Cint, Ptr{fmpz}), C_NULL, b, &n)
-    len = Int(ccall(:strlen, Csize_t, (Ptr{UInt8},), p))
-    s = ASCIIString{}{}((pointer_to_array(p, len, false)))
+    s = bytestring(p)
     ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), p)
     return s
 end
