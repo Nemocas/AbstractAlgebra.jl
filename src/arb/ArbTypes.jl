@@ -112,14 +112,6 @@ function _arb_clear_fn(x::arb)
   ccall((:arb_clear, :libarb), Void, (Ptr{arb}, ), &x)
 end
 
-parent(x::arb) = x.parent
-
-function deepcopy(a::arb)
-  b = parent(a)()
-  ccall((:arb_set, :libarb), Void, (Ptr{arb}, Ptr{arb}), &b, &a)
-  return b
-end
-
 ################################################################################
 #
 #  Types and memory management for AcbField
@@ -204,11 +196,4 @@ function _acb_clear_fn(x::acb)
   ccall((:acb_clear, :libarb), Void, (Ptr{acb}, ), &x)
 end
 
-parent(x::acb) = x.parent
-
-function deepcopy(a::acb)
-  b = parent(a)()
-  ccall((:acb_set, :libarb), Void, (Ptr{acb}, Ptr{acb}), &b, &a)
-  return b
-end
 

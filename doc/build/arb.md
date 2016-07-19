@@ -160,6 +160,14 @@ addeq!(c::arb, a::arb)
 In-place addition. Adds $a$ to $c$ and sets $c$ to the result. This function is provided for performance reasons as it saves allocating a new object for the result and eliminates associated garbage collection.
 
 
+```
+deepcopy(a::arb)
+```
+
+
+Return a copy of the Arb field element $a$, recursively copying the internal data. Arb field elements are mutable in Nemo so a shallow copy is not sufficient.
+
+
 Given the parent object `R` for an Arb real field, the following coercion functions are provided to coerce various elements into the Arb field. Developers provide these by overloading the `call` operator for the real field parent objects.
 
 
@@ -278,79 +286,10 @@ base_ring(x::arb)
 
 
 ```
-parent(A)
+parent(x::arb)
 ```
 
-Returns the "parent array" of an array view type (e.g., `SubArray`), or the array itself if it is not a view
-
-```
-parent(a::padic)
-```
-
-> Returns the parent of the given p-adic field element.
-
-
-```
-parent(a::nf_elem)
-```
-
-> Return the parent of the given number field element.
-
-
-```
-parent(a::fq)
-```
-
-> Returns the parent of the given finite field element.
-
-
-```
-parent(a::FracElem)
-```
-
-> Return the parent object of the given fraction element.
-
-
-```
-parent(a::MatElem)
-```
-
-> Return the parent object of the given matrix.
-
-
-```
-parent(a::SeriesElem)
-```
-
-> Return the parent of the given power series.
-
-
-```
-parent(a::PolyElem)
-```
-
-> Return the parent of the given polynomial.
-
-
-```
-parent(a::ResElem)
-```
-
-> Return the parent object of the given residue element.
-
-
-```
-parent(a::fmpz)
-```
-
-> Returns the unique Flint integer parent object `FlintZZ`.
-
-
-```
-parent(a::perm)
-```
-
-> Return the parent of the given permutation group element.
+> Return the parent of the given Arb field element.
 
 
 <a id='Nemo.iszero-Tuple{Nemo.arb}' href='#Nemo.iszero-Tuple{Nemo.arb}'>#</a>
@@ -796,7 +735,7 @@ As well as these, we provide a full range of ad hoc comparison operators. Again,
 ## Function
 
 
-`isless(x::arb, y::Integer)` `isless(x::Integer, y::arb)` `isless(x::arb, y::fmpz)` `isless(x::fmpz, y::arb)` `isless(x::arb, y::Float64)` `isless(x::Float64, y::arb)`
+`==(x::arb, y::Integer)` `==(x::Integer, y::arb)` `==(x::arb, y::fmpz)` `==(x::fmpz, y::arb)` `==(x::arb, y::Float64)` `==(x::Float64, y::arb)` `isless(x::arb, y::Integer)` `isless(x::Integer, y::arb)` `isless(x::arb, y::fmpz)` `isless(x::fmpz, y::arb)` `isless(x::arb, y::Float64)` `isless(x::Float64, y::arb)`
 
 
 Here are some examples of comparison.
@@ -1131,7 +1070,7 @@ sqrt(x::arb)
 rsqrt(x::arb)
 ```
 
-> Return the inverse of the square root of $x$, i.e. $1/\sqrt{x}$.
+> Return the reciprocal of the square root of $x$, i.e. $1/\sqrt{x}$.
 
 
 <a id='Nemo.sqrt1pm1-Tuple{Nemo.arb}' href='#Nemo.sqrt1pm1-Tuple{Nemo.arb}'>#</a>
@@ -1589,7 +1528,7 @@ agm(x::arb, y::arb)
 zeta(s::arb, a::arb)
 ```
 
-> Return the Hurwitz zeta function $\zeta(s,a)$..
+> Return the Hurwitz zeta function $\zeta(s,a)$.
 
 
 ```
