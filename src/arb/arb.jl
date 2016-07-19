@@ -49,6 +49,12 @@ doc"""
 base_ring(x::arb) = Union{}
 
 doc"""
+    parent(x::arb)
+> Return the parent of the given Arb field element.
+"""
+parent(x::arb) = x.parent
+
+doc"""
     zero(R::ArbField)
 > Return exact zero in the given Arb field. 
 """
@@ -60,7 +66,7 @@ doc"""
 """
 one(R::ArbField) = R(1)
 
-# TODO: Add deepcopy and hash (and document under arb basic functionality)
+# TODO: Add hash (and document under arb basic functionality)
 
 doc"""
     accuracy_bits(x::arb)
@@ -69,6 +75,12 @@ doc"""
 """
 function accuracy_bits(x::arb)
   return ccall((:arb_rel_accuracy_bits, :libarb), Int, (Ptr{arb},), &x)
+end
+
+function deepcopy(a::arb)
+  b = parent(a)()
+  ccall((:arb_set, :libarb), Void, (Ptr{arb}, Ptr{arb}), &b, &a)
+  return b
 end
 
 ################################################################################
@@ -103,6 +115,11 @@ function show(io::IO, x::arb)
                                                   &x, Int(d), UInt(0))
   print(io, bytestring(cstr))
   ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
+end
+
+function show(io::IO, r::ArbField)
+  print(io, r.prec)
+  print(io, " bit real balls")
 end
 
 ################################################################################
@@ -463,27 +480,6 @@ function -(x::arb)
   return z
 end
 
-doc"""
-    abs(x::arb)
-> Return the absolute value of $x$.
-"""
-function abs(x::arb)
-  z = parent(x)()
-  ccall((:arb_abs, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &x)
-  return z
-end
-
-doc"""
-    inv(x::arb)
-> Return the multiplicative inverse of $x$, i.e. $1/x$.
-"""
-function inv(x::arb)
-  z = parent(x)()
-  ccall((:arb_inv, :libarb), Void,
-              (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
-  return parent(x)(z)
-end
-
 ################################################################################
 #
 #  Binary operations
@@ -683,7 +679,40 @@ end
 
 ################################################################################
 #
-#  Precision, shifting and other operations
+#  Absolute value
+#
+################################################################################
+
+doc"""
+    abs(x::arb)
+> Return the absolute value of $x$.
+"""
+function abs(x::arb)
+  z = parent(x)()
+  ccall((:arb_abs, :libarb), Void, (Ptr{arb}, Ptr{arb}), &z, &x)
+  return z
+end
+
+################################################################################
+#
+#  Inverse
+#
+################################################################################
+
+doc"""
+    inv(x::arb)
+> Return the multiplicative inverse of $x$, i.e. $1/x$.
+"""
+function inv(x::arb)
+  z = parent(x)()
+  ccall((:arb_inv, :libarb), Void,
+              (Ptr{arb}, Ptr{arb}, Int), &z, &x, parent(x).prec)
+  return parent(x)(z)
+end
+
+################################################################################
+#
+#  Shifting
 #
 ################################################################################
 
@@ -708,6 +737,12 @@ function ldexp(x::arb, y::fmpz)
               (Ptr{arb}, Ptr{arb}, Ptr{fmpz}), &z, &x, &y)
   return z
 end
+
+################################################################################
+#
+#  Miscellaneous
+#
+################################################################################
 
 doc"""
     trim(x::arb)
@@ -874,7 +909,7 @@ end
 
 doc"""
     rsqrt(x::arb)
-> Return the inverse of the square root of $x$, i.e. $1/\sqrt{x}$.
+> Return the reciprocal of the square root of $x$, i.e. $1/\sqrt{x}$.
 """
 function rsqrt(x::arb)
    z = parent(x)()
@@ -1258,7 +1293,7 @@ end
 
 doc"""
     zeta(s::arb, a::arb)
-> Return the Hurwitz zeta function $\zeta(s,a)$..
+> Return the Hurwitz zeta function $\zeta(s,a)$.
 """
 function zeta(s::arb, a::arb)
   z = parent(s)()

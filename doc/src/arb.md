@@ -127,6 +127,14 @@ In-place addition. Adds $a$ to $c$ and sets $c$ to the result. This function
 is provided for performance reasons as it saves allocating a new object for
 the result and eliminates associated garbage collection.
 
+```
+deepcopy(a::arb)
+```
+
+Return a copy of the Arb field element $a$, recursively copying the internal
+data. Arb field elements are mutable in Nemo so a shallow copy is not
+sufficient.
+
 Given the parent object `R` for an Arb real field, the following coercion
 functions are provided to coerce various elements into the Arb field.
 Developers provide these by overloading the `call` operator for the real
@@ -427,6 +435,12 @@ Again, these are implemented directly in Julia, but we document them as though
 
 Function
 -----------------------------
+`==(x::arb, y::Integer)`
+`==(x::Integer, y::arb)`
+`==(x::arb, y::fmpz)`
+`==(x::fmpz, y::arb)`
+`==(x::arb, y::Float64)`
+`==(x::Float64, y::arb)`
 `isless(x::arb, y::Integer)`
 `isless(x::Integer, y::arb)`
 `isless(x::arb, y::fmpz)`

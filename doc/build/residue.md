@@ -258,6 +258,20 @@ base_ring(a::FlintPadicField)
 
 
 ```
+base_ring(a::acb)
+```
+
+> Returns `Union{}` since an Arb complex field does not depend on any other ring.
+
+
+```
+base_ring(R::AcbField)
+```
+
+> Returns `Union{}` since an Arb complex field does not depend on any other ring.
+
+
+```
 base_ring(x::arb)
 ```
 
