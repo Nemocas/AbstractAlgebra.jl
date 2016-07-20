@@ -10965,47 +10965,19 @@ or any nonnegative point.}
 \desc{Compare two intervals.}
 
 \begin{lstlisting}
-==(x::arb, y::Int)
-!=(x::arb, y::Int)
-<=(x::arb, y::Int)
->=(x::arb, y::Int)
-<(x::arb, y::Int)
->(x::arb, y::Int)
+==(x::arb, y::Union{Int,Float64,fmpz,fmpq})
+!=(x::arb, y::Union{Int,Float64,fmpz,fmpq})
+<=(x::arb, y::Union{Int,Float64,fmpz,fmpq})
+>=(x::arb, y::Union{Int,Float64,fmpz,fmpq})
+<(x::arb, y::Union{Int,Float64,fmpz,fmpq})
+>(x::arb, y::Union{Int,Float64,fmpz,fmpq})
 
-==(x::Int, y::arb)
-!=(x::Int, y::arb)
-<=(x::Int, y::arb)
->=(x::Int, y::arb)
-<(x::Int, y::arb)
->(x::Int, y::arb)
-
-==(x::arb, y::fmpz)
-!=(x::arb, y::fmpz)
-<=(x::arb, y::fmpz)
->=(x::arb, y::fmpz)
-<(x::arb, y::fmpz)
->(x::arb, y::fmpz)
-
-==(x::fmpz, y::arb)
-!=(x::fmpz, y::arb)
-<=(x::fmpz, y::arb)
->=(x::fmpz, y::arb)
-<(x::fmpz, y::arb)
->(x::fmpz, y::arb)
-
-==(x::arb, y::Float64)
-!=(x::arb, y::Float64)
-<=(x::arb, y::Float64)
->=(x::arb, y::Float64)
-<(x::arb, y::Float64)
->(x::arb, y::Float64)
-
-==(x::Float64, y::arb)
-!=(x::Float64, y::arb)
-<=(x::Float64, y::arb)
->=(x::Float64, y::arb)
-<(x::Float64, y::arb)
->(x::Float64, y::arb)
+==(x::Union{Int,Float64,fmpz,fmpq}, y::arb)
+!=(x::Union{Int,Float64,fmpz,fmpq}, y::arb)
+<=(x::Union{Int,Float64,fmpz,fmpq}, y::arb)
+>=(x::Union{Int,Float64,fmpz,fmpq}, y::arb)
+<(x::Union{Int,Float64,fmpz,fmpq}, y::arb)
+>(x::Union{Int,Float64,fmpz,fmpq}, y::arb)
 \end{lstlisting}
 
 \desc{Compare an interval with a quantity of another type.}
@@ -11545,14 +11517,17 @@ CC(x::fmpz)
 CC(x::fmpq)
 CC(x::arb)
 CC(x::Float64)
+CC(x::AbstractString)
+CC(x::Union{Complex{Float64},Complex{Int}})
 CC(x::arb, y::arb)
 CC(x::Int, y::Int)
-CC(x::AbstractString)
-CC(x::AbstractString, y::AbstractString)
+CC(x::Union{Int,Float64,fmpz,fmpq,arb,AbstractString},
++  y::Union{Int,Float64,fmpz,fmpq,arb,AbstractString})
 \end{lstlisting}
 
-\desc{Constructs an \code{acb} element from the given real number or
-pair of real numbers.}
+
+\desc{Constructs an \code{acb} element from the given real number,
+complex number, or pair of real numbers.}
 
 \begin{lstlisting}
 zero(r::AcbField)
@@ -12116,6 +12091,338 @@ besselj(s, z)
 
 hyp1f1(s, s+1, z)
 
+\end{lstlisting}
+
+\subsection{Arb real polynomials ($\R[x]$): \code|arb\_poly|}
+
+Note that some discrete properties of polynomials over
+\code{arb} coefficients are upper or lower bounds.
+For example, we define the degree of a polynomial with leading term
+$[0 \pm 0.1] x^8$ to be 8, despite the fact that the leading coefficient
+is not known to be nonzero.
+Some operations (such as polynomial division)
+will throw an error when the leading coefficient is not
+certainly nonzero.
+
+\begin{lstlisting}
+R, x = PolynomialRing(RR::ArbField, s::AbstractString)
+\end{lstlisting}
+
+Throughout this section, we assume that \code{RR} is an \code{ArbField}
+and that \code{R} is the corresponding polynomial ring
+in the variable \code{x}.
+
+\subsubsection{Constructors}
+
+\begin{lstlisting}
+R()
+R(b::Union{Int,fmpz,fmpq,Float64,arb})
+R(b::Array{arb, 1})
+R(b::fmpz_poly)
+R(b::fmpq_poly)
+R(b::arb_poly)
+\end{lstlisting}
+
+\desc{Create a polynomial from a given constant value, array of coefficients,
+or polynomial.}
+
+\subsubsection{Basic manipulation}
+
+\begin{lstlisting}
+length(x::arb_poly)
+
+degree(x::arb_poly)
+
+coeff(a::arb_poly, n::Int)
+
+zero(a::ArbPolyRing) = a(0)
+
+one(a::ArbPolyRing) = a(1)
+
+gen(a::ArbPolyRing)
+
+isgen(a::arb_poly)
+
+deepcopy(a::arb_poly)
+\end{lstlisting}
+
+\subsubsection{Comparisons}
+
+\begin{lstlisting}
+strongequal(x::arb_poly, y::arb_poly)
+
+overlaps(x::arb_poly, y::arb_poly)
+
+contains(x::arb_poly, y::arb_poly)
+
+contains(x::arb_poly, y::fmpz_poly)
+
+contains(x::arb_poly, y::fmpq_poly)
+
+==(x::arb_poly, y::arb_poly)
+
+!=(x::arb_poly, y::arb_poly)
+
+unique_integer(x::arb_poly)
+\end{lstlisting}
+
+\begin{lstlisting}
+shift_left(x::arb_poly, len::Int)
+
+shift_right(x::arb_poly, len::Int)
+\end{lstlisting}
+
+\subsubsection{Arithmetic}
+
+\begin{lstlisting}
+-(x::arb_poly)
++(x::arb_poly, y::arb_poly)
+*(x::arb_poly, y::arb_poly)
+-(x::arb_poly, y::arb_poly)
+
+^(x::arb_poly, y::Int)
+
+divexact(x::arb_poly, y::Union{Int,fmpz,fmpq,Float64,arb})
+
+//(x::arb_poly, y::Union{Int,fmpz,fmpq,Float64,arb})
+\end{lstlisting}
+
+\subsubsection{Polynomial division}
+
+\begin{lstlisting}
+divrem(x::arb_poly, y::arb_poly)
+
+mod(x::arb_poly, y::arb_poly)
+
+divexact(x::arb_poly, y::arb_poly)
+\end{lstlisting}
+
+\subsubsection{Truncation}
+
+\begin{lstlisting}
+truncate(a::arb_poly, n::Int)
+\end{lstlisting}
+
+\begin{lstlisting}
+mullow(x::arb_poly, y::arb_poly, n::Int)
+\end{lstlisting}
+
+\subsubsection{Evaluation}
+
+\begin{lstlisting}
+evaluate(x::arb_poly, y::arb)
+
+evaluate(x::arb_poly, y::acb)
+
+evaluate(x::arb_poly, y::Union{Int,Float64,fmpq})
+
+evaluate(x::arb_poly, y::fmpz)
+\end{lstlisting}
+
+\begin{lstlisting}
+evaluate2(x::arb_poly, y::arb)
+
+evaluate2(x::arb_poly, y::acb)
+
+evaluate2(x::arb_poly, y::Union{Int,Float64,fmpz,fmpq})
+\end{lstlisting}
+
+\subsubsection{Composition}
+
+\begin{lstlisting}
+compose(x::arb_poly, y::arb_poly)
+\end{lstlisting}
+
+\subsubsection{Derivative and integral}
+
+\begin{lstlisting}
+derivative(x::arb_poly)
+
+integral(x::arb_poly)
+\end{lstlisting}
+
+\subsubsection{Multipoint evaluation and interpolation}
+
+\begin{lstlisting}
+from_roots(R::ArbPolyRing, b::Array{arb, 1})
+\end{lstlisting}
+
+\begin{lstlisting}
+evaluate_iter(x::arb_poly, b::Array{arb, 1})
+
+evaluate_fast(x::arb_poly, b::Array{arb, 1})
+
+evaluate(x::arb_poly, b::Array{arb, 1})
+\end{lstlisting}
+
+\begin{lstlisting}
+interpolate_newton(R::ArbPolyRing, xs::Array{arb, 1}, ys::Array{arb, 1})
+
+interpolate_barycentric(R::ArbPolyRing, xs::Array{arb, 1}, ys::Array{arb, 1})
+
+interpolate_fast(R::ArbPolyRing, xs::Array{arb, 1}, ys::Array{arb, 1})
+
+interpolate(R::ArbPolyRing, xs::Array{arb, 1}, ys::Array{arb, 1})
+\end{lstlisting}
+
+\subsection{Arb complex polynomials ($\C[x]$): \code|acb\_poly|}
+
+\subsubsection{Constructors}
+
+\begin{lstlisting}
+R()
+R(b::Union{Int,fmpz,fmpq,Float64,Complex{Float64},Complex{Int},arb,acb})
+R(b::Array{acb, 1})
+R(b::fmpz_poly)
+R(b::fmpq_poly)
+R(b::arb_poly)
+R(b::acb_poly)
+\end{lstlisting}
+
+\desc{Create a polynomial from a given constant value, array of coefficients,
+or polynomial.}
+
+\subsubsection{Basic manipulation}
+
+\begin{lstlisting}
+length(x::acb_poly)
+
+degree(x::acb_poly)
+
+coeff(a::acb_poly, n::Int)
+
+zero(a::AcbPolyRing) = a(0)
+
+one(a::AcbPolyRing) = a(1)
+
+gen(a::AcbPolyRing)
+
+isgen(a::acb_poly)
+
+deepcopy(a::acb_poly)
+\end{lstlisting}
+
+\subsubsection{Comparisons}
+
+\begin{lstlisting}
+strongequal(x::acb_poly, y::acb_poly)
+
+overlaps(x::acb_poly, y::acb_poly)
+
+contains(x::acb_poly, y::acb_poly)
+
+contains(x::acb_poly, y::fmpz_poly)
+
+contains(x::acb_poly, y::fmpq_poly)
+
+==(x::acb_poly, y::acb_poly)
+
+!=(x::acb_poly, y::acb_poly)
+
+unique_integer(x::acb_poly)
+
+isreal(x::acb_poly)
+\end{lstlisting}
+
+\begin{lstlisting}
+shift_left(x::acb_poly, len::Int)
+
+shift_right(x::acb_poly, len::Int)
+\end{lstlisting}
+
+\subsubsection{Arithmetic}
+
+\begin{lstlisting}
+-(x::acb_poly)
++(x::acb_poly, y::acb_poly)
+*(x::acb_poly, y::acb_poly)
+-(x::acb_poly, y::acb_poly)
+
+^(x::acb_poly, y::Int)
+
+divexact(x::acb_poly, y::Union{Int,fmpz,fmpq,Float64,arb,acb})
+
+//(x::acb_poly, y::Union{Int,fmpz,fmpq,Float64,arb,acb})
+\end{lstlisting}
+
+\subsubsection{Polynomial division}
+
+\begin{lstlisting}
+divrem(x::acb_poly, y::acb_poly)
+
+mod(x::acb_poly, y::acb_poly)
+
+divexact(x::acb_poly, y::acb_poly)
+\end{lstlisting}
+
+\subsubsection{Truncation}
+
+\begin{lstlisting}
+truncate(a::acb_poly, n::Int)
+\end{lstlisting}
+
+\begin{lstlisting}
+mullow(x::acb_poly, y::acb_poly, n::Int)
+\end{lstlisting}
+
+\subsubsection{Evaluation}
+
+\begin{lstlisting}
+evaluate(x::acb_poly, y::acb)
+
+evaluate(x::acb_poly, y::Union{Int,Float64,fmpq,arb})
+
+evaluate(x::acb_poly, y::fmpz)
+\end{lstlisting}
+
+\begin{lstlisting}
+evaluate2(x::acb_poly, y::acb)
+
+evaluate2(x::acb_poly, y::Union{Int,Float64,fmpz,fmpq,arb})
+\end{lstlisting}
+
+\subsubsection{Composition}
+
+\begin{lstlisting}
+compose(x::acb_poly, y::acb_poly)
+\end{lstlisting}
+
+\subsubsection{Derivative and integral}
+
+\begin{lstlisting}
+derivative(x::acb_poly)
+
+integral(x::acb_poly)
+\end{lstlisting}
+
+\subsubsection{Multipoint evaluation and interpolation}
+
+\begin{lstlisting}
+from_roots(R::AcbPolyRing, b::Array{acb, 1})
+\end{lstlisting}
+
+\begin{lstlisting}
+evaluate_iter(x::acb_poly, b::Array{acb, 1})
+
+evaluate_fast(x::acb_poly, b::Array{acb, 1})
+
+evaluate(x::acb_poly, b::Array{acb, 1})
+\end{lstlisting}
+
+\begin{lstlisting}
+interpolate_newton(R::AcbPolyRing, xs::Array{acb, 1}, ys::Array{acb, 1})
+
+interpolate_barycentric(R::AcbPolyRing, xs::Array{acb, 1}, ys::Array{acb, 1})
+
+interpolate_fast(R::AcbPolyRing, xs::Array{acb, 1}, ys::Array{acb, 1})
+
+interpolate(R::AcbPolyRing, xs::Array{acb, 1}, ys::Array{acb, 1})
+\end{lstlisting}
+
+\subsubsection{Complex roots}
+
+\begin{lstlisting}
+roots(x::acb_poly; target=0, isolate_real=false, initial_prec=0, max_prec=0, max_iter=0)
 \end{lstlisting}
 
 \section{Pari rings}

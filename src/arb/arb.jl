@@ -94,13 +94,9 @@ doc"""
 > Return the midpoint of $x$ rounded down to a machine double.
 """
 function convert(::Type{Float64}, x::arb)
-    t = arf_struct(0, 0, 0, 0)
-    t.exp = x.mid_exp
-    t.size = x.mid_size
-    t.d1 = x.mid_d1
-    t.d2 = x.mid_d2
-    # rounds to nearest
-    return ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), &t, 4)
+    t = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), &x)
+    # 4 == round to nearest
+    return ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), t, 4)
 end
 
 ################################################################################
@@ -109,17 +105,18 @@ end
 #
 ################################################################################
 
+function show(io::IO, x::ArbField)
+  print(io, "Real Field with ")
+  print(io, prec(x))
+  print(io, " bits of precision and error bounds")
+end
+
 function show(io::IO, x::arb)
   d = ceil(parent(x).prec * 0.30102999566398119521)
   cstr = ccall((:arb_get_str, :libarb), Ptr{UInt8}, (Ptr{arb}, Int, UInt),
                                                   &x, Int(d), UInt(0))
   print(io, bytestring(cstr))
   ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
-end
-
-function show(io::IO, r::ArbField)
-  print(io, r.prec)
-  print(io, " bit real balls")
 end
 
 ################################################################################

@@ -31,6 +31,8 @@ export PolyRing, SeriesRing, ResRing, FracField, MatSpace, FinField
 export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
        MaximalRealSubfield, MaximalOrder, Ideal, PermutationGroup
 
+export RealField, ComplexField
+
 export create_accessors, get_handle, package_handle, allocatemem, zeros,
        Array, sig_exists
 
@@ -252,6 +254,15 @@ ZZ = FlintZZ
 QQ = FlintQQ
 PadicField = FlintPadicField
 FiniteField = FlintFiniteField
+
+###############################################################################
+#
+#   Set domain for RR, CC to Arb
+#
+###############################################################################
+
+RealField = ArbField
+ComplexField = AcbField
 
 ###############################################################################
 #
