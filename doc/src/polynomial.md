@@ -729,6 +729,24 @@ evaluate(::PolyElem, ::fmpz)
 ```
 
 ```@docs
+evaluate2(::arb_poly, ::Integer)
+evaluate2(::arb_poly, ::Float64)
+evaluate2(::arb_poly, ::fmpz)
+evaluate2(::arb_poly, ::fmpq)
+evaluate2(::arb_poly, ::arb)
+evaluate2(::arb_poly, ::acb)
+```
+
+```@docs
+evaluate2(::acb_poly, ::Integer)
+evaluate2(::acb_poly, ::Float64)
+evaluate2(::acb_poly, ::fmpz)
+evaluate2(::acb_poly, ::fmpq)
+evaluate2(::acb_poly, ::arb)
+evaluate2(::acb_poly, ::acb)
+```
+
+```@docs
 compose(::PolyElem, ::PolyElem)
 ```
 
@@ -743,19 +761,23 @@ Julia 0.5 however.
 Here are some examples of polynomial evaluation, composition and substitution.
 
 ```
+RR = RealField(64)
 R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
-
+T, z = PolynomialRing(RR, "z")
+   
 f = x*y^2 + (x + 1)*y + 3
 g = (x + 1)*y + (x^3 + 2x + 2)
+h = z^2 + 2z + 1
 M = R[x + 1 2x; x - 3 2x - 1]
 
-h = evaluate(f, 3)
-k = evaluate(f, x^2 + 2x + 1)
-m = compose(f, g)
-n = subst(f, M)
-p = f(M)
-k = f(23)
+k = evaluate(f, 3)
+m = evaluate(f, x^2 + 2x + 1)
+n = compose(f, g)
+p = subst(f, M)
+q = f(M)
+r = f(23)
+s, t = evaluate2(h, RR("2.0 +/- 0.1"))
 ```
 
 ## Derivative and integral
@@ -831,7 +853,7 @@ monomial_to_newton!(g.coeffs, roots)
 newton_to_monomial!(g.coeffs, roots)
 ```
 
-## Interpolation
+## Multipoint evaluation and interpolation
 
 ```@docs
 interpolate{T <: RingElem}(::PolyRing, ::Array{T, 1}, ::Array{T, 1})
@@ -868,6 +890,41 @@ f = x^3 + 3x + 1
 (r, s) = signature(f)
 ```
 
+## Root finding
+
+```@docs
+roots(::acb_poly)
+```
+
+Here is an example of finding complex roots.
+
+```
+CC = ComplexField(64)
+C, y = PolynomialRing(CC, "y")
+
+m = y^2 + 2y + 3
+n = m + CC("0 +/- 0.0001", "0 +/- 0.0001")
+
+r = roots(n)
+```
+
+## Construction from roots
+
+```@docs
+from_roots(::ArbPolyRing, ::Array{arb, 1})
+from_roots(::AcbPolyRing, ::Array{acb, 1})
+```
+
+Here are some examples of constructing polynomials from their roots.
+
+```
+RR = RealField(64)
+R, x = PolynomialRing(RR, "x")
+
+xs = arb[inv(RR(i)) for i=1:5]
+f = from_roots(R, xs)
+```
+
 ## Lifting
 
 When working over a residue ring it is useful to be able to lift to the base
@@ -890,6 +947,65 @@ f = x^2 + 2x + 1
 a = lift(T, f)
 ```
 
+## Overlapping and containment
+
+Occasionally it is useful to be able to tell when inexact polynomials overlap
+or contain other exact or inexact polynomials. The following functions are
+provided for this purpose.
+
+```@docs
+overlaps(::arb_poly, ::arb_poly)
+overlaps(::acb_poly, ::acb_poly)
+```
+
+```@docs
+contains(::arb_poly, ::arb_poly)
+contains(::acb_poly, ::acb_poly)
+```
+
+```@docs
+contains(::arb_poly, ::fmpz_poly)
+contains(::arb_poly, ::fmpq_poly)
+contains(::acb_poly, ::fmpz_poly)
+contains(::acb_poly, ::fmpq_poly)
+```
+
+It is sometimes also useful to be able to determine if there is a unique
+integer contained in the coefficient of an inexact constant polynomial.
+
+```@docs
+unique_integer(::arb_poly)
+unique_integer(::acb_poly)
+```
+
+We also have the following functions.
+
+```@docs
+isreal(::acb_poly)
+```
+
+Here are some examples of overlapping and containment.
+
+```
+RR = RealField(64)
+CC = ComplexField(64)
+R, x = PolynomialRing(RR, "x")
+C, y = PolynomialRing(CC, "y")
+Zx, zx = PolynomialRing(ZZ, "x")
+Qx, qx = PolynomialRing(QQ, "x")
+
+f = x^2 + 2x + 1
+h = f + RR("0 +/- 0.0001")
+k = f + RR("0 +/- 0.0001") * x^4
+m = y^2 + 2y + 1
+n = m + CC("0 +/- 0.0001", "0 +/- 0.0001")
+
+contains(h, f)
+overlaps(f, k)
+contains(n, m)
+t, z = unique_integer(k)
+isreal(n)
+```
 ## Factorisation
 
 Polynomials can only be factorised over certain rings. In general we use the

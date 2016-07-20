@@ -157,8 +157,8 @@ function test_arb_poly_comparison()
    @test !(f == i)
    @test !(f != i)
 
-   @test strongequal(f, deepcopy(f))
-   @test !strongequal(f, h)
+   @test isequal(f, deepcopy(f))
+   @test !isequal(f, h)
 
    @test contains(f, f)
    @test contains(h, f)

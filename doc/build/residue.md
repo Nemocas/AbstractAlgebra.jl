@@ -46,7 +46,7 @@ ResidueRing{T <: RingElem}(R::Ring, a::T; cached=true)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L549' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L549' class='documenter-source'>source</a><br>
 
 
 Here are some examples of creating residue rings and making use of the resulting parent objects to coerce various elements into those rings.
@@ -86,7 +86,7 @@ zero(R::ResRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L79' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L79' class='documenter-source'>source</a><br>
 
 <a id='Base.one-Tuple{Nemo.ResRing}' href='#Base.one-Tuple{Nemo.ResRing}'>#</a>
 **`Base.one`** &mdash; *Method*.
@@ -101,7 +101,7 @@ zero(R::ResRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L86' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L86' class='documenter-source'>source</a><br>
 
 
 Here are some examples of constructing residues.
@@ -264,7 +264,7 @@ base_ring(r::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L25' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L25' class='documenter-source'>source</a><br>
 
 <a id='Base.parent-Tuple{Nemo.ResElem}' href='#Base.parent-Tuple{Nemo.ResElem}'>#</a>
 **`Base.parent`** &mdash; *Method*.
@@ -279,7 +279,7 @@ parent(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L32' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L32' class='documenter-source'>source</a><br>
 
 <a id='Nemo.modulus-Tuple{Nemo.ResRing}' href='#Nemo.modulus-Tuple{Nemo.ResRing}'>#</a>
 **`Nemo.modulus`** &mdash; *Method*.
@@ -294,7 +294,7 @@ modulus(R::ResRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L60' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L60' class='documenter-source'>source</a><br>
 
 <a id='Nemo.modulus-Tuple{Nemo.ResElem}' href='#Nemo.modulus-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.modulus`** &mdash; *Method*.
@@ -309,7 +309,7 @@ modulus(R::ResRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L68' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L68' class='documenter-source'>source</a><br>
 
 <a id='Nemo.iszero-Tuple{Nemo.ResElem}' href='#Nemo.iszero-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
@@ -324,7 +324,7 @@ iszero(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L92' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L92' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isone-Tuple{Nemo.ResElem}' href='#Nemo.isone-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
@@ -339,7 +339,7 @@ isone(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L99' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L99' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isunit-Tuple{Nemo.ResElem}' href='#Nemo.isunit-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.isunit`** &mdash; *Method*.
@@ -354,7 +354,7 @@ iszero(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L106' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L106' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of residues.
@@ -413,7 +413,7 @@ Unary minus operator.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L166' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L166' class='documenter-source'>source</a><br>
 
 
 ```
@@ -424,7 +424,7 @@ Unary minus operator.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L247' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L247' class='documenter-source'>source</a><br>
 
 
 ```
@@ -435,7 +435,7 @@ Unary minus operator.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L265' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L265' class='documenter-source'>source</a><br>
 
 <a id='Base.--Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.--Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.-`** &mdash; *Method*.
@@ -460,7 +460,7 @@ Subtraction operator.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L175' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L175' class='documenter-source'>source</a><br>
 
 
 ```
@@ -471,7 +471,7 @@ Subtraction operator.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L283' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L283' class='documenter-source'>source</a><br>
 
 
 ```
@@ -482,7 +482,7 @@ Subtraction operator.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L301' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L301' class='documenter-source'>source</a><br>
 
 <a id='Base.*-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.*-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.*`** &mdash; *Method*.
@@ -507,7 +507,7 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L184' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L184' class='documenter-source'>source</a><br>
 
 
 ```
@@ -518,7 +518,7 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L211' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L211' class='documenter-source'>source</a><br>
 
 
 ```
@@ -529,7 +529,7 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L229' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L229' class='documenter-source'>source</a><br>
 
 <a id='Nemo.divexact-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}' href='#Nemo.divexact-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
 **`Nemo.divexact`** &mdash; *Method*.
@@ -544,7 +544,7 @@ divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L441' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L441' class='documenter-source'>source</a><br>
 
 
 The following ad hoc operators are also provided.
@@ -562,7 +562,7 @@ The following ad hoc operators are also provided.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L253' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L253' class='documenter-source'>source</a><br>
 
 <a id='Base.+-Tuple{Nemo.ResElem,Integer}' href='#Base.+-Tuple{Nemo.ResElem,Integer}'>#</a>
 **`Base.+`** &mdash; *Method*.
@@ -577,7 +577,7 @@ The following ad hoc operators are also provided.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L235' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L235' class='documenter-source'>source</a><br>
 
 <a id='Base.+-Tuple{Nemo.fmpz,Nemo.ResElem}' href='#Base.+-Tuple{Nemo.fmpz,Nemo.ResElem}'>#</a>
 **`Base.+`** &mdash; *Method*.
@@ -592,7 +592,7 @@ The following ad hoc operators are also provided.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L259' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L259' class='documenter-source'>source</a><br>
 
 <a id='Base.+-Tuple{Nemo.ResElem,Nemo.fmpz}' href='#Base.+-Tuple{Nemo.ResElem,Nemo.fmpz}'>#</a>
 **`Base.+`** &mdash; *Method*.
@@ -607,7 +607,7 @@ The following ad hoc operators are also provided.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L241' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L241' class='documenter-source'>source</a><br>
 
 <a id='Base.+-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.+-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.+`** &mdash; *Method*.
@@ -622,7 +622,7 @@ The following ad hoc operators are also provided.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L265' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L265' class='documenter-source'>source</a><br>
 
 <a id='Base.+-Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.+-Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
 **`Base.+`** &mdash; *Method*.
@@ -637,7 +637,7 @@ The following ad hoc operators are also provided.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L247' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L247' class='documenter-source'>source</a><br>
 
 <a id='Base.--Tuple{Integer,Nemo.ResElem}' href='#Base.--Tuple{Integer,Nemo.ResElem}'>#</a>
 **`Base.-`** &mdash; *Method*.
@@ -662,7 +662,7 @@ Subtraction operator.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L289' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L289' class='documenter-source'>source</a><br>
 
 <a id='Base.--Tuple{Nemo.ResElem,Integer}' href='#Base.--Tuple{Nemo.ResElem,Integer}'>#</a>
 **`Base.-`** &mdash; *Method*.
@@ -687,7 +687,7 @@ Subtraction operator.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L271' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L271' class='documenter-source'>source</a><br>
 
 <a id='Base.--Tuple{Nemo.fmpz,Nemo.ResElem}' href='#Base.--Tuple{Nemo.fmpz,Nemo.ResElem}'>#</a>
 **`Base.-`** &mdash; *Method*.
@@ -712,7 +712,7 @@ Subtraction operator.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L295' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L295' class='documenter-source'>source</a><br>
 
 <a id='Base.--Tuple{Nemo.ResElem,Nemo.fmpz}' href='#Base.--Tuple{Nemo.ResElem,Nemo.fmpz}'>#</a>
 **`Base.-`** &mdash; *Method*.
@@ -737,7 +737,7 @@ Subtraction operator.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L277' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L277' class='documenter-source'>source</a><br>
 
 <a id='Base.--Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.--Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.-`** &mdash; *Method*.
@@ -762,7 +762,7 @@ Subtraction operator.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L301' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L301' class='documenter-source'>source</a><br>
 
 <a id='Base.--Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.--Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
 **`Base.-`** &mdash; *Method*.
@@ -787,7 +787,7 @@ Subtraction operator.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L283' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L283' class='documenter-source'>source</a><br>
 
 <a id='Base.*-Tuple{Integer,Nemo.ResElem}' href='#Base.*-Tuple{Integer,Nemo.ResElem}'>#</a>
 **`Base.*`** &mdash; *Method*.
@@ -812,7 +812,7 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L217' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L217' class='documenter-source'>source</a><br>
 
 <a id='Base.*-Tuple{Nemo.ResElem,Integer}' href='#Base.*-Tuple{Nemo.ResElem,Integer}'>#</a>
 **`Base.*`** &mdash; *Method*.
@@ -837,7 +837,7 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L199' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L199' class='documenter-source'>source</a><br>
 
 <a id='Base.*-Tuple{Nemo.fmpz,Nemo.ResElem}' href='#Base.*-Tuple{Nemo.fmpz,Nemo.ResElem}'>#</a>
 **`Base.*`** &mdash; *Method*.
@@ -862,7 +862,7 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L223' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L223' class='documenter-source'>source</a><br>
 
 <a id='Base.*-Tuple{Nemo.ResElem,Nemo.fmpz}' href='#Base.*-Tuple{Nemo.ResElem,Nemo.fmpz}'>#</a>
 **`Base.*`** &mdash; *Method*.
@@ -887,7 +887,7 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L205' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L205' class='documenter-source'>source</a><br>
 
 <a id='Base.*-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.*-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.*`** &mdash; *Method*.
@@ -912,7 +912,7 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L229' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L229' class='documenter-source'>source</a><br>
 
 <a id='Base.*-Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.*-Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
 **`Base.*`** &mdash; *Method*.
@@ -937,7 +937,7 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L211' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L211' class='documenter-source'>source</a><br>
 
 <a id='Base.^-Tuple{Nemo.ResElem,Int64}' href='#Base.^-Tuple{Nemo.ResElem,Int64}'>#</a>
 **`Base.^`** &mdash; *Method*.
@@ -962,7 +962,7 @@ Exponentiation operator.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L313' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L313' class='documenter-source'>source</a><br>
 
 
 If the appropriate `promote_rule` and coercion exists, these operators can also be used with elements of other rings. Nemo will try to coerce the operands to the dominating type and then apply the operator.
@@ -1022,7 +1022,7 @@ The following comparison operators are implemented for residues in Nemo.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L327' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L327' class='documenter-source'>source</a><br>
 
 
 ```
@@ -1033,7 +1033,7 @@ The following comparison operators are implemented for residues in Nemo.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L392' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L392' class='documenter-source'>source</a><br>
 
 
 ```
@@ -1044,7 +1044,7 @@ The following comparison operators are implemented for residues in Nemo.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L401' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L401' class='documenter-source'>source</a><br>
 
 <a id='Base.isequal-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.isequal-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.isequal`** &mdash; *Method*.
@@ -1059,7 +1059,7 @@ isequal{T <: RingElem}(x::ResElem{T}, y::ResElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L338' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L338' class='documenter-source'>source</a><br>
 
 
 In addition we have the following ad hoc comparison operators.
@@ -1077,7 +1077,7 @@ In addition we have the following ad hoc comparison operators.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L392' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L392' class='documenter-source'>source</a><br>
 
 <a id='Base.==-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.==-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.==`** &mdash; *Method*.
@@ -1092,7 +1092,7 @@ In addition we have the following ad hoc comparison operators.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L401' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L401' class='documenter-source'>source</a><br>
 
 <a id='Base.==-Tuple{Nemo.ResElem,Integer}' href='#Base.==-Tuple{Nemo.ResElem,Integer}'>#</a>
 **`Base.==`** &mdash; *Method*.
@@ -1107,7 +1107,7 @@ In addition we have the following ad hoc comparison operators.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L356' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L356' class='documenter-source'>source</a><br>
 
 <a id='Base.==-Tuple{Integer,Nemo.ResElem}' href='#Base.==-Tuple{Integer,Nemo.ResElem}'>#</a>
 **`Base.==`** &mdash; *Method*.
@@ -1122,7 +1122,7 @@ In addition we have the following ad hoc comparison operators.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L365' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L365' class='documenter-source'>source</a><br>
 
 <a id='Base.==-Tuple{Nemo.ResElem,Nemo.fmpz}' href='#Base.==-Tuple{Nemo.ResElem,Nemo.fmpz}'>#</a>
 **`Base.==`** &mdash; *Method*.
@@ -1137,7 +1137,7 @@ In addition we have the following ad hoc comparison operators.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L374' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L374' class='documenter-source'>source</a><br>
 
 <a id='Base.==-Tuple{Nemo.fmpz,Nemo.ResElem}' href='#Base.==-Tuple{Nemo.fmpz,Nemo.ResElem}'>#</a>
 **`Base.==`** &mdash; *Method*.
@@ -1152,7 +1152,7 @@ In addition we have the following ad hoc comparison operators.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L383' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L383' class='documenter-source'>source</a><br>
 
 
 Here are some examples of comparisons.
@@ -1198,7 +1198,7 @@ inv(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L422' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L422' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing inverses.
@@ -1234,7 +1234,7 @@ gcd{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/Residue.jl#L460' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L460' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing a greatest common divisor.

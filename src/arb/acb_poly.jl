@@ -4,10 +4,10 @@
 #
 ###############################################################################
 
-export AcbPolyRing, acb_poly, isreal, strongequal, derivative, integral, evaluate,
+export AcbPolyRing, acb_poly, isreal, derivative, integral, evaluate,
        evaluate2, compose, from_roots, evaluate_iter, evaluate_fast, evaluate,
-       interpolate_newton, interpolate_barycentric, interpolate_fast, interpolate,
-       roots
+       interpolate_newton, interpolate_barycentric, interpolate_fast,
+       interpolate, roots
 
 ###############################################################################
 #
@@ -45,7 +45,7 @@ end
 
 # todo: write a C function for this
 function isgen(a::acb_poly)
-   return strongequal(a, gen(parent(a)))
+   return isequal(a, gen(parent(a)))
 end
 
 #function iszero(a::acb_poly)
@@ -53,7 +53,7 @@ end
 #end
 
 #function isone(a::acb_poly)
-#   return strongequal(a, one(parent(a)))
+#   return isequal(a, one(parent(a)))
 #end
 
 function deepcopy(a::acb_poly)
@@ -95,26 +95,46 @@ end
 #
 ###############################################################################
 
-function strongequal(x::acb_poly, y::acb_poly)
+function isequal(x::acb_poly, y::acb_poly)
    return ccall((:acb_poly_equal, :libarb), Bool, 
                                       (Ptr{acb_poly}, Ptr{acb_poly}), &x, &y)
 end
 
+doc"""
+    overlaps(x::acb_poly, y::acb_poly)
+> Return `true` if the coefficient boxes of $x$ overlap the coefficient boxes
+> of $y$, otherwise return `false`.
+"""
 function overlaps(x::acb_poly, y::acb_poly)
    return ccall((:acb_poly_overlaps, :libarb), Bool, 
                                       (Ptr{acb_poly}, Ptr{acb_poly}), &x, &y)
 end
 
+doc"""
+    contains(x::acb_poly, y::acb_poly)
+> Return `true` if the coefficient boxes of $x$ contain the corresponding
+> coefficient boxes of $y$, otherwise return `false`.
+"""
 function contains(x::acb_poly, y::acb_poly)
    return ccall((:acb_poly_contains, :libarb), Bool, 
                                       (Ptr{acb_poly}, Ptr{acb_poly}), &x, &y)
 end
 
+doc"""
+    contains(x::acb_poly, y::fmpz_poly)
+> Return `true` if the coefficient boxes of $x$ contain the corresponding
+> exact coefficients of $y$, otherwise return `false`.
+"""
 function contains(x::acb_poly, y::fmpz_poly)
    return ccall((:acb_poly_contains_fmpz_poly, :libarb), Bool, 
                                       (Ptr{acb_poly}, Ptr{fmpz_poly}), &x, &y)
 end
 
+doc"""
+    contains(x::acb_poly, y::fmpq_poly)
+> Return `true` if the coefficient boxes of $x$ contain the corresponding
+> exact coefficients of $y$, otherwise return `false`.
+"""
 function contains(x::acb_poly, y::fmpq_poly)
    return ccall((:acb_poly_contains_fmpq_poly, :libarb), Bool, 
                                       (Ptr{acb_poly}, Ptr{fmpq_poly}), &x, &y)
@@ -141,6 +161,12 @@ function !=(x::acb_poly, y::acb_poly)
     return false
 end
 
+doc"""
+    unique_integer(x::acb_poly)
+> Return a tuple `(t, z)` where $t$ is `true` if there is a unique integer
+> contained in the (constant) polynomial $x$, along with that integer $z$
+> in case it is, otherwise sets $t$ to `false`.
+"""
 function unique_integer(x::acb_poly)
   z = FmpzPolyRing(var(parent(x)))()
   unique = ccall((:acb_poly_get_unique_fmpz_poly, :libarb), Int,
@@ -148,6 +174,11 @@ function unique_integer(x::acb_poly)
   return (unique != 0, z)
 end
 
+doc"""
+    isreal(x::acb_poly)
+> Return `true` if all the coefficients of $x$ are real, i.e. have exact zero
+> imaginary parts.
+"""
 function isreal(x::acb_poly)
   return ccall((:acb_poly_is_real, :libarb), Cint, (Ptr{acb_poly}, ), &x) != 0
 end
@@ -455,6 +486,11 @@ function evaluate(x::acb_poly, y::acb)
    return z
 end
 
+doc"""
+    evaluate2(x::acb_poly, y::acb)
+> Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
+> its derivative evaluated at $y$.
+"""
 function evaluate2(x::acb_poly, y::acb)
    z = parent(y)()
    w = parent(y)()
@@ -472,7 +508,48 @@ function evaluate(x::acb_poly, y::fmpz)
     return evaluate(x, base_ring(parent(x))(y))
 end
 
-function evaluate2(x::acb_poly, y::Union{Int,Float64,fmpz,fmpq,arb})
+doc"""
+    evaluate2(x::acb_poly, y::Integer)
+> Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
+> its derivative evaluated at $y$.
+"""
+function evaluate2(x::acb_poly, y::Integer)
+    return evaluate2(x, base_ring(parent(x))(y))
+end
+
+doc"""
+    evaluate2(x::acb_poly, y::Float64)
+> Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
+> its derivative evaluated at $y$.
+"""
+function evaluate2(x::acb_poly, y::Float64)
+    return evaluate2(x, base_ring(parent(x))(y))
+end
+
+doc"""
+    evaluate2(x::acb_poly, y::fmpq)
+> Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
+> its derivative evaluated at $y$.
+"""
+function evaluate2(x::acb_poly, y::fmpz)
+    return evaluate2(x, base_ring(parent(x))(y))
+end
+
+doc"""
+    evaluate2(x::acb_poly, y::fmpq)
+> Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
+> its derivative evaluated at $y$.
+"""
+function evaluate2(x::acb_poly, y::fmpq)
+    return evaluate2(x, base_ring(parent(x))(y))
+end
+
+doc"""
+    evaluate2(x::acb_poly, y::arb)
+> Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
+> its derivative evaluated at $y$.
+"""
+function evaluate2(x::acb_poly, y::arb)
     return evaluate2(x, base_ring(parent(x))(y))
 end
 
@@ -543,6 +620,10 @@ function acb_vec_clear(v::Ptr{acb_struct}, n::Int)
    ccall((:_acb_vec_clear, :libarb), Void, (Ptr{acb_struct}, Int), v, n)
 end
 
+doc"""
+    from_roots(R::AcbPolyRing, b::Array{acb, 1})
+> Construct a polynomial in the given polynomial ring from a list of its roots.
+"""
 function from_roots(R::AcbPolyRing, b::Array{acb, 1})
    z = R()
    tmp = acb_vec(b)
@@ -615,6 +696,16 @@ function evaluate(x::acb_poly, b::Array{acb, 1})
    return evaluate_iter(x, b)
 end
 
+###############################################################################
+#
+#   Root finding
+#
+###############################################################################
+
+doc"""
+    roots(x::acb_poly; target=0, isolate_real=false, initial_prec=0, max_prec=0, max_iter=0)
+> Find the complex roots of the complex polynomial $x$.
+"""
 function roots(x::acb_poly; target=0, isolate_real=false, initial_prec=0, max_prec=0, max_iter=0)
     deg = degree(x)
     if deg <= 0

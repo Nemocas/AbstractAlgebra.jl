@@ -4,9 +4,10 @@
 #
 ###############################################################################
 
-export ArbPolyRing, arb_poly, strongequal, derivative, integral, evaluate,
-       evaluate2, compose, from_roots, evaluate_iter, evaluate_fast, evaluate,
-       interpolate_newton, interpolate_barycentric, interpolate_fast, interpolate
+export ArbPolyRing, arb_poly, derivative, integral, evaluate, evaluate2,
+       compose, from_roots, evaluate_iter, evaluate_fast, evaluate,
+       interpolate, interpolate_newton, interpolate_barycentric,
+       interpolate_fast
 
 ###############################################################################
 #
@@ -44,7 +45,7 @@ end
 
 # todo: write a C function for this
 function isgen(a::arb_poly)
-   return strongequal(a, gen(parent(a)))
+   return isequal(a, gen(parent(a)))
 end
 
 #function iszero(a::arb_poly)
@@ -94,26 +95,46 @@ end
 #
 ###############################################################################
 
-function strongequal(x::arb_poly, y::arb_poly)
+function isequal(x::arb_poly, y::arb_poly)
    return ccall((:arb_poly_equal, :libarb), Bool, 
                                       (Ptr{arb_poly}, Ptr{arb_poly}), &x, &y)
 end
 
+doc"""
+    overlaps(x::arb_poly, y::arb_poly)
+> Return `true` if the coefficient balls of $x$ overlap the coefficient balls
+> of $y$, otherwise return `false`.
+"""
 function overlaps(x::arb_poly, y::arb_poly)
    return ccall((:arb_poly_overlaps, :libarb), Bool, 
                                       (Ptr{arb_poly}, Ptr{arb_poly}), &x, &y)
 end
 
+doc"""
+    contains(x::arb_poly, y::arb_poly)
+> Return `true` if the coefficient balls of $x$ contain the corresponding
+> coefficient balls of $y$, otherwise return `false`.
+"""
 function contains(x::arb_poly, y::arb_poly)
    return ccall((:arb_poly_contains, :libarb), Bool, 
                                       (Ptr{arb_poly}, Ptr{arb_poly}), &x, &y)
 end
 
+doc"""
+    contains(x::arb_poly, y::fmpz_poly)
+> Return `true` if the coefficient balls of $x$ contain the corresponding
+> exact coefficients of $y$, otherwise return `false`.
+"""
 function contains(x::arb_poly, y::fmpz_poly)
    return ccall((:arb_poly_contains_fmpz_poly, :libarb), Bool, 
                                       (Ptr{arb_poly}, Ptr{fmpz_poly}), &x, &y)
 end
 
+doc"""
+    contains(x::arb_poly, y::fmpq_poly)
+> Return `true` if the coefficient balls of $x$ contain the corresponding
+> exact coefficients of $y$, otherwise return `false`.
+"""
 function contains(x::arb_poly, y::fmpq_poly)
    return ccall((:arb_poly_contains_fmpq_poly, :libarb), Bool, 
                                       (Ptr{arb_poly}, Ptr{fmpq_poly}), &x, &y)
@@ -140,6 +161,12 @@ function !=(x::arb_poly, y::arb_poly)
     return false
 end
 
+doc"""
+    unique_integer(x::arb_poly)
+> Return a tuple `(t, z)` where $t$ is `true` if there is a unique integer
+> contained in each of the coefficients of $x$, otherwise sets $t$ to `false`.
+> In the former case, $z$ is set to the integer polynomial.
+"""
 function unique_integer(x::arb_poly)
   z = FmpzPolyRing(var(parent(x)))()
   unique = ccall((:arb_poly_get_unique_fmpz_poly, :libarb), Int,
@@ -434,6 +461,11 @@ function evaluate(x::arb_poly, y::arb)
    return z
 end
 
+doc"""
+    evaluate2(x::arb_poly, y::arb)
+> Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
+> its derivative evaluated at $y$.
+"""
 function evaluate2(x::arb_poly, y::arb)
    z = parent(y)()
    w = parent(y)()
@@ -451,6 +483,11 @@ function evaluate(x::arb_poly, y::acb)
    return z
 end
 
+doc"""
+    evaluate2(x::arb_poly, y::acb)
+> Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
+> its derivative evaluated at $y$.
+"""
 function evaluate2(x::arb_poly, y::acb)
    z = parent(y)()
    w = parent(y)()
@@ -468,7 +505,39 @@ function evaluate(x::arb_poly, y::fmpz)
     return evaluate(x, base_ring(parent(x))(y))
 end
 
-function evaluate2(x::arb_poly, y::Union{Int,Float64,fmpz,fmpq})
+doc"""
+    evaluate2(x::arb_poly, y::Integer)
+> Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
+> its derivative evaluated at $y$.
+"""
+function evaluate2(x::arb_poly, y::Integer)
+    return evaluate2(x, base_ring(parent(x))(y))
+end
+
+doc"""
+    evaluate2(x::arb_poly, y::Float64)
+> Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
+> its derivative evaluated at $y$.
+"""
+function evaluate2(x::arb_poly, y::Float64)
+    return evaluate2(x, base_ring(parent(x))(y))
+end
+
+doc"""
+    evaluate2(x::arb_poly, y::fmpz)
+> Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
+> its derivative evaluated at $y$.
+"""
+function evaluate2(x::arb_poly, y::fmpz)
+    return evaluate2(x, base_ring(parent(x))(y))
+end
+
+doc"""
+    evaluate2(x::arb_poly, y::fmpq)
+> Return a tuple $p, q$ consisting of the polynomial $x$ evaluated at $y$ and
+> its derivative evaluated at $y$.
+"""
+function evaluate2(x::arb_poly, y::fmpq)
     return evaluate2(x, base_ring(parent(x))(y))
 end
 
@@ -539,6 +608,10 @@ function arb_vec_clear(v::Ptr{arb_struct}, n::Int)
    ccall((:_arb_vec_clear, :libarb), Void, (Ptr{arb_struct}, Int), v, n)
 end
 
+doc"""
+    from_roots(R::ArbPolyRing, b::Array{arb, 1})
+> Construct a polynomial in the given polynomial ring from a list of its roots.
+"""
 function from_roots(R::ArbPolyRing, b::Array{arb, 1})
    z = R()
    tmp = arb_vec(b)

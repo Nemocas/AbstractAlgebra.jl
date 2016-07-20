@@ -89,6 +89,11 @@ Poly.jl/fmpz_poly.jl
   otherwise generic functions can't act as catchall for poly types that don't
   have a length field
 
+* Add generic multipoint evaluation a la arb_poly evaluate(x::arb_poly, b::Array{arb, 1}).
+
+* Add generic function for constructing a polynomial from its roots, a la the
+arb_poly function from_roots.
+
 ZZ.jl
 -----
 
