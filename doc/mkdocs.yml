@@ -21,6 +21,7 @@ pages:
 - P-adic fields:                build/padic.md
 - Number fields:                build/numberfield.md
 - Real balls:                   build/arb.md
+- Complex boxes:                build/acb.md
 - Permutation groups:           build/perm.md
 
 markdown_extensions:
