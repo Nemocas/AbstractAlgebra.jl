@@ -11,6 +11,15 @@ represented in in rectangular form $a+bi$ where $a,b$ are `arb` balls.
 The Arb complex field is constructed using the `AcbField` constructor. This
 constructs the parent object for the Arb complex field.
 
+We define
+
+```
+ComplexField = AcbField
+```
+
+so that one can construct the Arb complex field parent using `ComplexField`
+instead of `AcbField`.
+
 The types of complex boxes in Nemo are given in the following table, along with
 the libraries that provide them and the associated types of the parent objects.
 
@@ -35,11 +44,19 @@ Return the Arb complex field with precision in bits `prec` used for operations
 on interval midpoints. The precision used for interval radii is a fixed
 implementation-defined constant (30 bits).
 
+We define
+
+```
+ComplexField = AcbField
+```
+
+so that one can use `ComplexField` instead of `AcbField`.
+
 Here is an example of creating an Arb complex field and using the resulting
 parent object to coerce values into the resulting field.
 
 ```
-CC = AcbField(64)
+CC = ComplexField(64)
 
 a = CC("0.25")
 b = CC("0.1")
@@ -83,7 +100,7 @@ onei(::AcbField)
 Here are some examples of constructing complex boxes.
 
 ```
-CC = AcbField(64)
+CC = ComplexField(64)
 
 a = zero(CC)
 b = one(CC)
@@ -185,8 +202,8 @@ return it. A copy of the original is not made.
 Here are some examples of coercing elements into the Arb complex field.
 
 ```
-RR = ArbField(64)
-CC = AcbField(64)
+RR = RealField(64)
+CC = ComplexField(64)
 
 a = CC(3)
 b = CC(QQ(2,3))
@@ -260,7 +277,7 @@ accuracy_bits(::acb)
 Here are some examples of basic manipulation of Arb complex boxes.
 
 ```
-CC = AcbField(64)
+CC = ComplexField(64)
 
 a = CC("1.2 +/- 0.001")
 b = CC(3)
@@ -337,7 +354,7 @@ Function               | Operation
 Here are some examples of arithmetic operations on Arb complex boxes.
 
 ```
-CC = AcbField(64)
+CC = ComplexField(64)
 
 x = CC(3)
 y = CC(QQ(2,3))
@@ -379,7 +396,7 @@ contains_zero(::acb)
 Here are some examples of testing containment.
 
 ```
-CC = AcbField(64)
+CC = ComplexField(64)
 x = CC("1 +/- 0.001")
 y = CC("3")
 
@@ -428,7 +445,7 @@ Function
 Here are some examples of comparison.
 
 ```
-CC = AcbField(64)
+CC = ComplexField(64)
 x = CC("1 +/- 0.001")
 y = CC("3")
 z = CC("4")
@@ -449,7 +466,7 @@ abs(::acb)
 Here are some examples of taking the absolute value.
 
 ```
-CC = AcbField(64)
+CC = ComplexField(64)
 x = CC("-1 +/- 0.001")
 
 a = abs(x)
@@ -464,7 +481,7 @@ inv(::acb)
 Here are some examples of taking the inverse.
 
 ```
-CC = AcbField(64)
+CC = ComplexField(64)
 x = CC("-3 +/- 0.001")
 
 a = inv(x)
@@ -480,7 +497,7 @@ ldexp(x::acb, y::fmpz)
 Here are some examples of shifting.
 
 ```
-CC = AcbField(64)
+CC = ComplexField(64)
 x = CC("-3 +/- 0.001")
 
 a = ldexp(x, 23)
@@ -508,7 +525,7 @@ angle(::acb)
 Here are some examples of miscellaneous operations.
 
 ```
-CC = AcbField(64)
+CC = ComplexField(64)
 x = CC("-3 +/- 0.001", "0.1")
 
 a = trim(x)
@@ -527,7 +544,7 @@ const_pi(::AcbField)
 Here are some examples of computing complex constants.
 
 ```
-CC = AcbField(200)
+CC = ComplexField(200)
 
 a = const_pi(CC)
 ```
@@ -790,7 +807,7 @@ ellipwp(::acb, ::acb)
 Here are some examples of complex valued mathematical functions.
 
 ```
-CC = AcbField(64)
+CC = ComplexField(64)
 
 s = CC(1, 2)
 z = CC("1.23", "3.45")

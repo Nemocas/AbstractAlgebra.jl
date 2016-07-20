@@ -4,15 +4,15 @@ module Nemo
  
 import Base: Array, abs, asin, asinh, atan, atanh, base, bin, call,
              checkbounds, convert, cmp, contains, cos, cosh, dec, deepcopy,
-             den, deserialize, div, divrem, exp, factor, gcd, gcdx, getindex,
-             hash, hcat, hex, intersect, inv, invmod, isequal, isfinite,
-             isless, isprime, isqrt, lcm, ldexp, length, log, lufact, mod,
-             ndigits, nextpow2, norm, nullspace, num, oct, one, parent, parity,
-             parseint, precision, prevpow2, promote_rule, rank, Rational, rem,
-             reverse, serialize, setindex!, show, sign, sin, sinh, size, sqrt,
-             string, sub, tan, tanh, trace, trailing_zeros, transpose,
-             transpose!, truncate, typed_hvcat, typed_hcat, var, vcat, zero,
-             zeros, det,
+             den, deserialize, det, div, divrem, exp, factor, gcd, gcdx,
+             getindex, hash, hcat, hex, intersect, inv, invmod, isequal,
+             isfinite, isless, isprime, isqrt, isreal, lcm, ldexp, length,
+             log, lufact, mod, ndigits, nextpow2, norm, nullspace, num, oct,
+             one, parent, parity, parseint, precision, prevpow2, promote_rule,
+             rank, Rational, rem, reverse, serialize, setindex!, show, sign,
+             sin, sinh, size, sqrt, string, sub, tan, tanh, trace,
+             trailing_zeros, transpose, transpose!, truncate, typed_hvcat,
+             typed_hcat, var, vcat, zero, zeros,
              +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
              /, !=
 
@@ -30,6 +30,8 @@ export PolyRing, SeriesRing, ResRing, FracField, MatSpace, FinField
 
 export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
        MaximalRealSubfield, MaximalOrder, Ideal, PermutationGroup
+
+export RealField, ComplexField
 
 export create_accessors, get_handle, package_handle, allocatemem, zeros,
        Array, sig_exists
@@ -252,6 +254,15 @@ ZZ = FlintZZ
 QQ = FlintQQ
 PadicField = FlintPadicField
 FiniteField = FlintFiniteField
+
+###############################################################################
+#
+#   Set domain for RR, CC to Arb
+#
+###############################################################################
+
+RealField = ArbField
+ComplexField = AcbField
 
 ###############################################################################
 #

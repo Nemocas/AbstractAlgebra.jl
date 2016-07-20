@@ -12,12 +12,12 @@ Nemo allow the creation of dense matricses over any computable ring $R$. There a
 The following table shows each of the matrix types available in Nemo, the base ring $R$, and the Julia/Nemo types for that kind of matrix (the type information is mainly of concern to developers).
 
 
-                           Base ring | Library | Element type |      Parent type
------------------------------------: | ------: | -----------: | ---------------:
-                    Generic ring $R$ |    Nemo |  `GenMat{T}` | `GenMatSpace{T}`
-                        $\mathbb{Z}$ |   Flint |   `fmpz_mat` |   `FmpzMatSpace`
-$\mathbb{Z}/n\mathbb{Z}$ (small $n$) |   Flint |   `nmod_mat` |   `NmodMatSpace`
-                        $\mathbb{Q}$ |   Flint |   `fmpq_mat` |   `FmpqMatSpace`
+|                            Base ring | Library | Element type |      Parent type |
+| ------------------------------------:| -------:| ------------:| ----------------:|
+|                     Generic ring $R$ |    Nemo |  `GenMat{T}` | `GenMatSpace{T}` |
+|                         $\mathbb{Z}$ |   Flint |   `fmpz_mat` |   `FmpzMatSpace` |
+| $\mathbb{Z}/n\mathbb{Z}$ (small $n$) |   Flint |   `nmod_mat` |   `NmodMatSpace` |
+|                         $\mathbb{Q}$ |   Flint |   `fmpq_mat` |   `FmpqMatSpace` |
 
 
 The dimensions and base ring $R$ of a generic matrix are stored in its parent object. 
@@ -40,8 +40,6 @@ In order to construct matrices in Nemo, one usually first constructs the matrix 
 **`Nemo.MatrixSpace`** &mdash; *Method*.
 
 
-
-nothing
 
 We also allow matrices over a given base ring to be constructed directly. In such cases, Nemo automatically constructs the matrix space internally. See the matrix element constructors below for examples. However, note that there may be a small peformance disadvantage to doing it that way, since the matrix space needs to be looked up internally every time a matrix is constructed.
 
@@ -69,7 +67,7 @@ Once a matrix space is constructed, there are various ways to construct matrices
 
 In addition to coercing elements into the matrix space as above, we provide the following functions for constructing certain useful matrices.
 
-<a id='Base.zero-Tuple{Nemo.MatSpace{T}}' href='#Base.zero-Tuple{Nemo.MatSpace{T}}'>#</a>
+<a id='Base.zero-Tuple{Nemo.MatSpace}' href='#Base.zero-Tuple{Nemo.MatSpace}'>#</a>
 **`Base.zero`** &mdash; *Method*.
 
 
@@ -81,7 +79,10 @@ zero(a::MatSpace)
 > Construct the zero matrix in the given matrix space.
 
 
-<a id='Base.one-Tuple{Nemo.MatSpace{T}}' href='#Base.one-Tuple{Nemo.MatSpace{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L85' class='documenter-source'>source</a><br>
+
+<a id='Base.one-Tuple{Nemo.MatSpace}' href='#Base.one-Tuple{Nemo.MatSpace}'>#</a>
 **`Base.one`** &mdash; *Method*.
 
 
@@ -92,6 +93,9 @@ one(a::MatSpace)
 
 > Construct the matrix in the given matrix space with ones down the diagonal and zeroes elsewhere.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L91' class='documenter-source'>source</a><br>
 
 
 In addition, there are various shorthand notations for constructing matrices over a given base ring without first constructing the matrix space parent object.
@@ -265,166 +269,11 @@ Typically a developer will also overload the `MatrixSpace` generic function to c
 
 Numerous functions are provided to manipulate matricess and to set and retrieve entries and other basic data associated with the matrices. Also see the section on basic functionality above.
 
-<a id='Nemo.base_ring-Tuple{Nemo.MatSpace{T}}' href='#Nemo.base_ring-Tuple{Nemo.MatSpace{T}}'>#</a>
+<a id='Nemo.base_ring-Tuple{Nemo.MatSpace}' href='#Nemo.base_ring-Tuple{Nemo.MatSpace}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
 
 
-
-```
-base_ring(a::padic)
-```
-
-> Returns `Union{}` as this field is not dependent on another field.
-
-
-```
-base_ring(a::FlintPadicField)
-```
-
-> Returns `Union{}` as this field is not dependent on another field.
-
-
-```
-base_ring(a::acb)
-```
-
-> Returns `Union{}` since an Arb complex field does not depend on any other ring.
-
-
-```
-base_ring(R::AcbField)
-```
-
-> Returns `Union{}` since an Arb complex field does not depend on any other ring.
-
-
-```
-base_ring(x::arb)
-```
-
-> Returns `Union{}` since an Arb field does not depend on any other ring.
-
-
-```
-base_ring(R::ArbField)
-```
-
-> Returns `Union{}` since an Arb field does not depend on any other ring.
-
-
-```
-base_ring(a::nf_elem)
-```
-
-> Returns `Union{}` since a number field doesn't depend on any ring.
-
-
-```
-base_ring(a::AnticNumberField)
-```
-
-> Returns `Union{}` since a number field doesn't depend on any ring.
-
-
-```
-base_ring(a::fq)
-```
-
-> Returns `Union{}` as this field is not dependent on another field.
-
-
-```
-base_ring(a::FqFiniteField)
-```
-
-> Returns `Union{}` as this field is not dependent on another field.
-
-
-```
-base_ring{T}(r::FracElem)
-```
-
-> Return the base ring $R$ of the fraction field that the supplied element $a$ belongs to.
-
-
-```
-base_ring{T}(S::FracField{T})
-```
-
-> Return the base ring $R$ of the given fraction field.
-
-
-```
-base_ring(r::MatElem)
-```
-
-> Return the base ring $R$ of the matrix space that the supplied matrix $r$ belongs to.
-
-
-```
-base_ring{T <: RingElem}(S::MatSpace{T})
-```
-
-> Return the base ring $R$ of the given matrix space.
-
-
-```
-base_ring(a::SeriesElem)
-```
-
-> Return the base ring of the power series ring of the given power series.
-
-
-```
-base_ring(R::SeriesRing)
-```
-
-> Return the base ring of the given power series ring.
-
-
-```
-base_ring(a::PolyElem)
-```
-
-> Return the base ring of the polynomial ring of the given polynomial.
-
-
-```
-base_ring(R::PolyRing)
-```
-
-> Return the base ring of the given polynomial ring.
-
-
-```
-base_ring(r::ResElem)
-```
-
-> Return the base ring $R$ of the residue ring $R/(a)$ that the supplied element $r$ belongs to.
-
-
-```
-base_ring{T <: RingElem}(S::ResRing{T})
-```
-
-> Return the base ring $R$ of the given residue ring $S = R/(a)$.
-
-
-```
-base_ring(a::fmpz)
-```
-
-> Returns `Union{}` as the parent ring is not dependent on another ring.
-
-
-```
-base_ring(a::FlintIntegerRing)
-```
-
-> Returns `Union{}` as this ring is not dependent on another ring.
-
-
-<a id='Nemo.base_ring-Tuple{Nemo.MatElem{T}}' href='#Nemo.base_ring-Tuple{Nemo.MatElem{T}}'>#</a>
+<a id='Nemo.base_ring-Tuple{Nemo.MatElem}' href='#Nemo.base_ring-Tuple{Nemo.MatElem}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
 
 
@@ -436,7 +285,10 @@ base_ring(r::MatElem)
 > Return the base ring $R$ of the matrix space that the supplied matrix $r$ belongs to.
 
 
-<a id='Base.parent-Tuple{Nemo.MatElem{T}}' href='#Base.parent-Tuple{Nemo.MatElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L28' class='documenter-source'>source</a><br>
+
+<a id='Base.parent-Tuple{Nemo.MatElem}' href='#Base.parent-Tuple{Nemo.MatElem}'>#</a>
 **`Base.parent`** &mdash; *Method*.
 
 
@@ -448,7 +300,10 @@ parent(a::MatElem)
 > Return the parent object of the given matrix.
 
 
-<a id='Nemo.rows-Tuple{Nemo.MatElem{T}}' href='#Nemo.rows-Tuple{Nemo.MatElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L35' class='documenter-source'>source</a><br>
+
+<a id='Nemo.rows-Tuple{Nemo.MatElem}' href='#Nemo.rows-Tuple{Nemo.MatElem}'>#</a>
 **`Nemo.rows`** &mdash; *Method*.
 
 
@@ -460,7 +315,10 @@ rows(a::MatElem)
 > Return the number of rows of the given matrix.
 
 
-<a id='Nemo.cols-Tuple{Nemo.MatElem{T}}' href='#Nemo.cols-Tuple{Nemo.MatElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L63' class='documenter-source'>source</a><br>
+
+<a id='Nemo.cols-Tuple{Nemo.MatElem}' href='#Nemo.cols-Tuple{Nemo.MatElem}'>#</a>
 **`Nemo.cols`** &mdash; *Method*.
 
 
@@ -472,7 +330,10 @@ cols(a::MatElem)
 > Return the number of columns of the given matrix.
 
 
-<a id='Nemo.iszero-Tuple{Nemo.MatElem{T}}' href='#Nemo.iszero-Tuple{Nemo.MatElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L69' class='documenter-source'>source</a><br>
+
+<a id='Nemo.iszero-Tuple{Nemo.MatElem}' href='#Nemo.iszero-Tuple{Nemo.MatElem}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
 
 
@@ -484,7 +345,10 @@ iszero(a::MatElem)
 > Return `true` if the supplied matrix $a$ is the zero matrix, otherwise return `false`.
 
 
-<a id='Nemo.isone-Tuple{Nemo.MatElem{T}}' href='#Nemo.isone-Tuple{Nemo.MatElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L98' class='documenter-source'>source</a><br>
+
+<a id='Nemo.isone-Tuple{Nemo.MatElem}' href='#Nemo.isone-Tuple{Nemo.MatElem}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
 
 
@@ -495,6 +359,9 @@ isone(a::MatElem)
 
 > Return `true` if the supplied matrix $a$ is diagonal with ones along the diagonal, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L114' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of matrices.
@@ -527,9 +394,19 @@ W = parent(D)
 
 All the usual arithmetic operators are overloaded for Nemo matrices. Note that Julia uses the single slash for floating point division. Therefore to perform exact division by a constant we use `divexact`. 
 
-<a id='Base.--Tuple{Nemo.MatElem{T}}' href='#Base.--Tuple{Nemo.MatElem{T}}'>#</a>
+<a id='Base.--Tuple{Nemo.MatElem}' href='#Base.--Tuple{Nemo.MatElem}'>#</a>
 **`Base.-`** &mdash; *Method*.
 
+
+
+```
+-(x)
+```
+
+Unary minus operator.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L636-640' class='documenter-source'>source</a><br>
 
 
 ```
@@ -539,11 +416,8 @@ All the usual arithmetic operators are overloaded for Nemo matrices. Note that J
 > Return $-a$.
 
 
-```
--(x)
-```
 
-Unary minus operator.
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L192' class='documenter-source'>source</a><br>
 
 <a id='Base.+-Tuple{Nemo.MatElem{T<:Nemo.RingElem},Nemo.MatElem{T<:Nemo.RingElem}}' href='#Base.+-Tuple{Nemo.MatElem{T<:Nemo.RingElem},Nemo.MatElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.+`** &mdash; *Method*.
@@ -557,11 +431,19 @@ Unary minus operator.
 > Return $a + b$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L207' class='documenter-source'>source</a><br>
+
+
 ```
 +{T <: RingElem}(x::T, y::MatElem{T})
 ```
 
 > Return $S(x) + y$ where $S$ is the parent of $y$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L383' class='documenter-source'>source</a><br>
 
 
 ```
@@ -571,9 +453,22 @@ Unary minus operator.
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L402' class='documenter-source'>source</a><br>
+
 <a id='Base.--Tuple{Nemo.MatElem{T<:Nemo.RingElem},Nemo.MatElem{T<:Nemo.RingElem}}' href='#Base.--Tuple{Nemo.MatElem{T<:Nemo.RingElem},Nemo.MatElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.-`** &mdash; *Method*.
 
+
+
+```
+-(x, y)
+```
+
+Subtraction operator.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
 
 
 ```
@@ -583,11 +478,19 @@ Unary minus operator.
 > Return $a - b$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L222' class='documenter-source'>source</a><br>
+
+
 ```
 -{T <: RingElem}(x::T, y::MatElem{T})
 ```
 
 > Return $S(x) - y$ where $S$ is the parent of $y$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L488' class='documenter-source'>source</a><br>
 
 
 ```
@@ -597,15 +500,22 @@ Unary minus operator.
 > Return $x - S(y)$, where $S$ is the parent of $a$.
 
 
-```
--(x, y)
-```
 
-Subtraction operator.
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L508' class='documenter-source'>source</a><br>
 
 <a id='Base.*-Tuple{Nemo.MatElem{T<:Nemo.RingElem},Nemo.MatElem{T<:Nemo.RingElem}}' href='#Base.*-Tuple{Nemo.MatElem{T<:Nemo.RingElem},Nemo.MatElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.*`** &mdash; *Method*.
 
+
+
+```
+*(x, y...)
+```
+
+Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
 
 
 ```
@@ -615,11 +525,19 @@ Subtraction operator.
 > Return $a\times b$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L237' class='documenter-source'>source</a><br>
+
+
 ```
 *{T <: RingElem}(x::T, y::MatElem{T})
 ```
 
 > Return $x\times y$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L298' class='documenter-source'>source</a><br>
 
 
 ```
@@ -629,11 +547,8 @@ Subtraction operator.
 > Return $x\times y$.
 
 
-```
-*(x, y...)
-```
 
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L325' class='documenter-source'>source</a><br>
 
 <a id='Nemo.divexact-Tuple{Nemo.MatElem{T<:Nemo.RingElem},Nemo.MatElem{T<:Nemo.RingElem}}' href='#Nemo.divexact-Tuple{Nemo.MatElem{T<:Nemo.RingElem},Nemo.MatElem{T<:Nemo.RingElem}}'>#</a>
 **`Nemo.divexact`** &mdash; *Method*.
@@ -648,9 +563,12 @@ divexact{T <: RingElem}(x::MatElem{T}, y::T)
 
 
 
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L756' class='documenter-source'>source</a><br>
+
+
 The following ad hoc operators are also provided.
 
-<a id='Base.+-Tuple{Integer,Nemo.MatElem{T}}' href='#Base.+-Tuple{Integer,Nemo.MatElem{T}}'>#</a>
+<a id='Base.+-Tuple{Integer,Nemo.MatElem}' href='#Base.+-Tuple{Integer,Nemo.MatElem}'>#</a>
 **`Base.+`** &mdash; *Method*.
 
 
@@ -662,7 +580,10 @@ The following ad hoc operators are also provided.
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 
 
-<a id='Base.+-Tuple{Nemo.MatElem{T},Integer}' href='#Base.+-Tuple{Nemo.MatElem{T},Integer}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L331' class='documenter-source'>source</a><br>
+
+<a id='Base.+-Tuple{Nemo.MatElem,Integer}' href='#Base.+-Tuple{Nemo.MatElem,Integer}'>#</a>
 **`Base.+`** &mdash; *Method*.
 
 
@@ -674,7 +595,10 @@ The following ad hoc operators are also provided.
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 
 
-<a id='Base.+-Tuple{Nemo.fmpz,Nemo.MatElem{T}}' href='#Base.+-Tuple{Nemo.fmpz,Nemo.MatElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L351' class='documenter-source'>source</a><br>
+
+<a id='Base.+-Tuple{Nemo.fmpz,Nemo.MatElem}' href='#Base.+-Tuple{Nemo.fmpz,Nemo.MatElem}'>#</a>
 **`Base.+`** &mdash; *Method*.
 
 
@@ -686,7 +610,10 @@ The following ad hoc operators are also provided.
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 
 
-<a id='Base.+-Tuple{Nemo.MatElem{T},Nemo.fmpz}' href='#Base.+-Tuple{Nemo.MatElem{T},Nemo.fmpz}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L357' class='documenter-source'>source</a><br>
+
+<a id='Base.+-Tuple{Nemo.MatElem,Nemo.fmpz}' href='#Base.+-Tuple{Nemo.MatElem,Nemo.fmpz}'>#</a>
 **`Base.+`** &mdash; *Method*.
 
 
@@ -697,6 +624,9 @@ The following ad hoc operators are also provided.
 
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L377' class='documenter-source'>source</a><br>
 
 <a id='Base.+-Tuple{T<:Nemo.RingElem,Nemo.MatElem{T<:Nemo.RingElem}}' href='#Base.+-Tuple{T<:Nemo.RingElem,Nemo.MatElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.+`** &mdash; *Method*.
@@ -710,6 +640,9 @@ The following ad hoc operators are also provided.
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L383' class='documenter-source'>source</a><br>
+
 <a id='Base.+-Tuple{Nemo.MatElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.+-Tuple{Nemo.MatElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
 **`Base.+`** &mdash; *Method*.
 
@@ -722,9 +655,22 @@ The following ad hoc operators are also provided.
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 
 
-<a id='Base.--Tuple{Integer,Nemo.MatElem{T}}' href='#Base.--Tuple{Integer,Nemo.MatElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L402' class='documenter-source'>source</a><br>
+
+<a id='Base.--Tuple{Integer,Nemo.MatElem}' href='#Base.--Tuple{Integer,Nemo.MatElem}'>#</a>
 **`Base.-`** &mdash; *Method*.
 
+
+
+```
+-(x, y)
+```
+
+Subtraction operator.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
 
 
 ```
@@ -734,15 +680,22 @@ The following ad hoc operators are also provided.
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L408' class='documenter-source'>source</a><br>
+
+<a id='Base.--Tuple{Nemo.MatElem,Integer}' href='#Base.--Tuple{Nemo.MatElem,Integer}'>#</a>
+**`Base.-`** &mdash; *Method*.
+
+
+
 ```
 -(x, y)
 ```
 
 Subtraction operator.
 
-<a id='Base.--Tuple{Nemo.MatElem{T},Integer}' href='#Base.--Tuple{Nemo.MatElem{T},Integer}'>#</a>
-**`Base.-`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
 
 
 ```
@@ -752,15 +705,22 @@ Subtraction operator.
 > Return $x - S(y)$, where $S$ is the parent of $x$
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L428' class='documenter-source'>source</a><br>
+
+<a id='Base.--Tuple{Nemo.fmpz,Nemo.MatElem}' href='#Base.--Tuple{Nemo.fmpz,Nemo.MatElem}'>#</a>
+**`Base.-`** &mdash; *Method*.
+
+
+
 ```
 -(x, y)
 ```
 
 Subtraction operator.
 
-<a id='Base.--Tuple{Nemo.fmpz,Nemo.MatElem{T}}' href='#Base.--Tuple{Nemo.fmpz,Nemo.MatElem{T}}'>#</a>
-**`Base.-`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
 
 
 ```
@@ -770,15 +730,22 @@ Subtraction operator.
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L448' class='documenter-source'>source</a><br>
+
+<a id='Base.--Tuple{Nemo.MatElem,Nemo.fmpz}' href='#Base.--Tuple{Nemo.MatElem,Nemo.fmpz}'>#</a>
+**`Base.-`** &mdash; *Method*.
+
+
+
 ```
 -(x, y)
 ```
 
 Subtraction operator.
 
-<a id='Base.--Tuple{Nemo.MatElem{T},Nemo.fmpz}' href='#Base.--Tuple{Nemo.MatElem{T},Nemo.fmpz}'>#</a>
-**`Base.-`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
 
 
 ```
@@ -788,15 +755,22 @@ Subtraction operator.
 > Return $x - S(y)$, where $S$ is the parent of $x$
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L468' class='documenter-source'>source</a><br>
+
+<a id='Base.--Tuple{T<:Nemo.RingElem,Nemo.MatElem{T<:Nemo.RingElem}}' href='#Base.--Tuple{T<:Nemo.RingElem,Nemo.MatElem{T<:Nemo.RingElem}}'>#</a>
+**`Base.-`** &mdash; *Method*.
+
+
+
 ```
 -(x, y)
 ```
 
 Subtraction operator.
 
-<a id='Base.--Tuple{T<:Nemo.RingElem,Nemo.MatElem{T<:Nemo.RingElem}}' href='#Base.--Tuple{T<:Nemo.RingElem,Nemo.MatElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.-`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
 
 
 ```
@@ -806,15 +780,22 @@ Subtraction operator.
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L488' class='documenter-source'>source</a><br>
+
+<a id='Base.--Tuple{Nemo.MatElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.--Tuple{Nemo.MatElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
+**`Base.-`** &mdash; *Method*.
+
+
+
 ```
 -(x, y)
 ```
 
 Subtraction operator.
 
-<a id='Base.--Tuple{Nemo.MatElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.--Tuple{Nemo.MatElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
-**`Base.-`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
 
 
 ```
@@ -824,15 +805,22 @@ Subtraction operator.
 > Return $x - S(y)$, where $S$ is the parent of $a$.
 
 
-```
--(x, y)
-```
 
-Subtraction operator.
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L508' class='documenter-source'>source</a><br>
 
-<a id='Base.*-Tuple{Integer,Nemo.MatElem{T}}' href='#Base.*-Tuple{Integer,Nemo.MatElem{T}}'>#</a>
+<a id='Base.*-Tuple{Integer,Nemo.MatElem}' href='#Base.*-Tuple{Integer,Nemo.MatElem}'>#</a>
 **`Base.*`** &mdash; *Method*.
 
+
+
+```
+*(x, y...)
+```
+
+Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
 
 
 ```
@@ -842,15 +830,22 @@ Subtraction operator.
 > Return $x\times y$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L268' class='documenter-source'>source</a><br>
+
+<a id='Base.*-Tuple{Nemo.MatElem,Integer}' href='#Base.*-Tuple{Nemo.MatElem,Integer}'>#</a>
+**`Base.*`** &mdash; *Method*.
+
+
+
 ```
 *(x, y...)
 ```
 
 Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
 
-<a id='Base.*-Tuple{Nemo.MatElem{T},Integer}' href='#Base.*-Tuple{Nemo.MatElem{T},Integer}'>#</a>
-**`Base.*`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
 
 
 ```
@@ -860,15 +855,22 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 > Return $x\times y$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L313' class='documenter-source'>source</a><br>
+
+<a id='Base.*-Tuple{Nemo.fmpz,Nemo.MatElem}' href='#Base.*-Tuple{Nemo.fmpz,Nemo.MatElem}'>#</a>
+**`Base.*`** &mdash; *Method*.
+
+
+
 ```
 *(x, y...)
 ```
 
 Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
 
-<a id='Base.*-Tuple{Nemo.fmpz,Nemo.MatElem{T}}' href='#Base.*-Tuple{Nemo.fmpz,Nemo.MatElem{T}}'>#</a>
-**`Base.*`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
 
 
 ```
@@ -878,15 +880,22 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 > Return $x\times y$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L283' class='documenter-source'>source</a><br>
+
+<a id='Base.*-Tuple{Nemo.MatElem,Nemo.fmpz}' href='#Base.*-Tuple{Nemo.MatElem,Nemo.fmpz}'>#</a>
+**`Base.*`** &mdash; *Method*.
+
+
+
 ```
 *(x, y...)
 ```
 
 Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
 
-<a id='Base.*-Tuple{Nemo.MatElem{T},Nemo.fmpz}' href='#Base.*-Tuple{Nemo.MatElem{T},Nemo.fmpz}'>#</a>
-**`Base.*`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
 
 
 ```
@@ -896,15 +905,22 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 > Return $x\times y$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L319' class='documenter-source'>source</a><br>
+
+<a id='Base.*-Tuple{T<:Nemo.RingElem,Nemo.MatElem{T<:Nemo.RingElem}}' href='#Base.*-Tuple{T<:Nemo.RingElem,Nemo.MatElem{T<:Nemo.RingElem}}'>#</a>
+**`Base.*`** &mdash; *Method*.
+
+
+
 ```
 *(x, y...)
 ```
 
 Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
 
-<a id='Base.*-Tuple{T<:Nemo.RingElem,Nemo.MatElem{T<:Nemo.RingElem}}' href='#Base.*-Tuple{T<:Nemo.RingElem,Nemo.MatElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.*`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
 
 
 ```
@@ -914,15 +930,22 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 > Return $x\times y$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L298' class='documenter-source'>source</a><br>
+
+<a id='Base.*-Tuple{Nemo.MatElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.*-Tuple{Nemo.MatElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
+**`Base.*`** &mdash; *Method*.
+
+
+
 ```
 *(x, y...)
 ```
 
 Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
 
-<a id='Base.*-Tuple{Nemo.MatElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.*-Tuple{Nemo.MatElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
-**`Base.*`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
 
 
 ```
@@ -932,13 +955,10 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 > Return $x\times y$.
 
 
-```
-*(x, y...)
-```
 
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L325' class='documenter-source'>source</a><br>
 
-<a id='Nemo.divexact-Tuple{Nemo.MatElem{T},Integer}' href='#Nemo.divexact-Tuple{Nemo.MatElem{T},Integer}'>#</a>
+<a id='Nemo.divexact-Tuple{Nemo.MatElem,Integer}' href='#Nemo.divexact-Tuple{Nemo.MatElem,Integer}'>#</a>
 **`Nemo.divexact`** &mdash; *Method*.
 
 
@@ -950,7 +970,10 @@ divexact(x::MatElem, y::Integer)
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by $y$. Each division is expected to be exact.
 
 
-<a id='Nemo.divexact-Tuple{Nemo.MatElem{T},Nemo.fmpz}' href='#Nemo.divexact-Tuple{Nemo.MatElem{T},Nemo.fmpz}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L724' class='documenter-source'>source</a><br>
+
+<a id='Nemo.divexact-Tuple{Nemo.MatElem,Nemo.fmpz}' href='#Nemo.divexact-Tuple{Nemo.MatElem,Nemo.fmpz}'>#</a>
 **`Nemo.divexact`** &mdash; *Method*.
 
 
@@ -961,6 +984,9 @@ divexact(x::MatElem, y::fmpz)
 
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by $y$. Each division is expected to be exact.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L740' class='documenter-source'>source</a><br>
 
 <a id='Nemo.divexact-Tuple{Nemo.MatElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Nemo.divexact-Tuple{Nemo.MatElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
 **`Nemo.divexact`** &mdash; *Method*.
@@ -974,7 +1000,10 @@ divexact{T <: RingElem}(x::MatElem{T}, y::T)
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by $y$. Each division is expected to be exact.
 
 
-<a id='Base.^-Tuple{Nemo.MatElem{T},Int64}' href='#Base.^-Tuple{Nemo.MatElem{T},Int64}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L756' class='documenter-source'>source</a><br>
+
+<a id='Base.^-Tuple{Nemo.MatElem,Int64}' href='#Base.^-Tuple{Nemo.MatElem,Int64}'>#</a>
 **`Base.^`** &mdash; *Method*.
 
 
@@ -984,6 +1013,9 @@ divexact{T <: RingElem}(x::MatElem{T}, y::T)
 ```
 
 Exponentiation operator.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L4495-4499' class='documenter-source'>source</a><br>
 
 <a id='Nemo.powers-Tuple{Nemo.MatElem{T<:Nemo.RingElem},Int64}' href='#Nemo.powers-Tuple{Nemo.MatElem{T<:Nemo.RingElem},Int64}'>#</a>
 **`Nemo.powers`** &mdash; *Method*.
@@ -996,6 +1028,9 @@ powers{T <: RingElem}(a::MatElem{T}, d::Int)
 
 > Return an array of matrices $M$ wher $M[i + 1] = a^i$ for $i = 0..d$
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L564' class='documenter-source'>source</a><br>
 
 
 If the appropriate `promote_rule` and coercion exists, these operators can also be used with elements of other rings. Nemo will try to coerce the operands to the dominating type and then apply the operator.
@@ -1044,11 +1079,19 @@ The following comparison operators are implemented for matrices in Nemo.
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall that power series to different precisions may still be arithmetically equal to the minimum of the two precisions.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L591' class='documenter-source'>source</a><br>
+
+
 ```
 =={T <: RingElem}(x::MatElem{T}, y::T)
 ```
 
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L690' class='documenter-source'>source</a><br>
 
 
 ```
@@ -1057,6 +1100,9 @@ The following comparison operators are implemented for matrices in Nemo.
 
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L711' class='documenter-source'>source</a><br>
 
 <a id='Base.isequal-Tuple{Nemo.MatElem{T<:Nemo.RingElem},Nemo.MatElem{T<:Nemo.RingElem}}' href='#Base.isequal-Tuple{Nemo.MatElem{T<:Nemo.RingElem},Nemo.MatElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.isequal`** &mdash; *Method*.
@@ -1069,6 +1115,9 @@ isequal{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
 
 > Return `true` if $x == y$ exactly, otherwise return `false`. This function is useful in cases where the entries of the matrices are inexact, e.g. power series. Only if the power series are precisely the same, to the same precision, are they declared equal by this function.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L609' class='documenter-source'>source</a><br>
 
 
 In addition we have the following ad hoc comparison operators.
@@ -1085,6 +1134,9 @@ In addition we have the following ad hoc comparison operators.
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$, otherwise return `false`.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L690' class='documenter-source'>source</a><br>
+
 <a id='Base.==-Tuple{T<:Nemo.RingElem,Nemo.MatElem{T<:Nemo.RingElem}}' href='#Base.==-Tuple{T<:Nemo.RingElem,Nemo.MatElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.==`** &mdash; *Method*.
 
@@ -1097,7 +1149,10 @@ In addition we have the following ad hoc comparison operators.
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$, otherwise return `false`.
 
 
-<a id='Base.==-Tuple{Nemo.MatElem{T},Integer}' href='#Base.==-Tuple{Nemo.MatElem{T},Integer}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L711' class='documenter-source'>source</a><br>
+
+<a id='Base.==-Tuple{Nemo.MatElem,Integer}' href='#Base.==-Tuple{Nemo.MatElem,Integer}'>#</a>
 **`Base.==`** &mdash; *Method*.
 
 
@@ -1109,7 +1164,10 @@ In addition we have the following ad hoc comparison operators.
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$, otherwise return `false`.
 
 
-<a id='Base.==-Tuple{Integer,Nemo.MatElem{T}}' href='#Base.==-Tuple{Integer,Nemo.MatElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L634' class='documenter-source'>source</a><br>
+
+<a id='Base.==-Tuple{Integer,Nemo.MatElem}' href='#Base.==-Tuple{Integer,Nemo.MatElem}'>#</a>
 **`Base.==`** &mdash; *Method*.
 
 
@@ -1121,7 +1179,10 @@ In addition we have the following ad hoc comparison operators.
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$, otherwise return `false`.
 
 
-<a id='Base.==-Tuple{Nemo.MatElem{T},Nemo.fmpz}' href='#Base.==-Tuple{Nemo.MatElem{T},Nemo.fmpz}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L655' class='documenter-source'>source</a><br>
+
+<a id='Base.==-Tuple{Nemo.MatElem,Nemo.fmpz}' href='#Base.==-Tuple{Nemo.MatElem,Nemo.fmpz}'>#</a>
 **`Base.==`** &mdash; *Method*.
 
 
@@ -1133,273 +1194,11 @@ In addition we have the following ad hoc comparison operators.
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$, otherwise return `false`.
 
 
-<a id='Base.==-Tuple{Nemo.fmpz,Nemo.MatElem{T}}' href='#Base.==-Tuple{Nemo.fmpz,Nemo.MatElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L662' class='documenter-source'>source</a><br>
+
+<a id='Base.==-Tuple{Nemo.fmpz,Nemo.MatElem}' href='#Base.==-Tuple{Nemo.fmpz,Nemo.MatElem}'>#</a>
 **`Base.==`** &mdash; *Method*.
-
-
-
-```
-==(x, y)
-```
-
-Generic equality operator, giving a single `Bool` result. Falls back to `===`. Should be implemented for all types with a notion of equality, based on the abstract value that an instance represents. For example, all numeric types are compared by numeric value, ignoring type. Strings are compared as sequences of characters, ignoring encoding.
-
-Follows IEEE semantics for floating-point numbers.
-
-Collections should generally implement `==` by calling `==` recursively on all contents.
-
-New numeric types should implement this function for two arguments of the new type, and handle comparison to other types via promotion rules where possible.
-
-```
-=={T <: RingElem}(x::T, y::FracElem{T})
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-=={T <: RingElem}(x::FracElem{T}, y::T)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-==(x::fmpz, y::FracElem)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-==(x::FracElem, y::fmpz)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-==(x::Integer, y::FracElem)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-==(x::FracElem, y::Integer)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-=={T <: RingElem}(x::FracElem{T}, y::FracElem{T})
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall that power series to different precisions may still be arithmetically equal to the minimum of the two precisions.
-
-
-```
-=={T <: RingElem}(x::T, y::MatElem{T})
-```
-
-> Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$, otherwise return `false`.
-
-
-```
-=={T <: RingElem}(x::MatElem{T}, y::T)
-```
-
-> Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$, otherwise return `false`.
-
-
-```
-==(x::fmpz, y::MatElem)
-```
-
-> Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$, otherwise return `false`.
-
-
-```
-==(x::MatElem, y::fmpz)
-```
-
-> Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$, otherwise return `false`.
-
-
-```
-==(x::Integer, y::MatElem)
-```
-
-> Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$, otherwise return `false`.
-
-
-```
-==(x::MatElem, y::Integer)
-```
-
-> Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$, otherwise return `false`.
-
-
-```
-=={T <: RingElem}(x::MatElem{T}, y::MatElem{T})
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall that power series to different precisions may still be arithmetically equal to the minimum of the two precisions.
-
-
-```
-==(x::fmpz, y::SeriesElem)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-==(x::Integer, y::SeriesElem)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-==(x::SeriesElem, y::fmpz)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-==(x::SeriesElem, y::Integer)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-=={T <: RingElem}(x::T, y::SeriesElem{T})
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-=={T <: RingElem}(x::SeriesElem{T}, y::T)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-=={T <: RingElem}(x::SeriesElem{T}, y::SeriesElem{T})
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall that power series to different precisions may still be arithmetically equal to the minimum of the two precisions.
-
-
-```
-==(x::fmpz, y::PolyElem)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-==(x::PolyElem, y::fmpz)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-==(x::Integer, y::PolyElem)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-==(x::PolyElem, y::Integer)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-=={T <: RingElem}(x::T, y::PolyElem{T})
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-=={T <: RingElem}(x::PolyElem{T}, y::T)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-=={T <: RingElem}(x::PolyElem{T}, y::PolyElem{T})
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall that power series to different precisions may still be arithmetically equal to the minimum of the two precisions.
-
-
-```
-=={T <: RingElem}(x::T, y::ResElem{T})
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-=={T <: RingElem}(x::ResElem{T}, y::T)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-==(x::fmpz, y::ResElem)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-==(x::ResElem, y::fmpz)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-==(x::Integer, y::ResElem)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-==(x::ResElem, y::Integer)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-```
-=={T <: RingElem}(x::ResElem{T}, y::ResElem{T})
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall that power series to different precisions may still be arithmetically equal to the minimum of the two precisions.
-
-
-```
-==(a::perm, b::perm)
-```
-
-> Return `true` if the given permutations are equal, otherwise return `false`.
 
 
 
@@ -1432,15 +1231,73 @@ S(11) == 11
 
 
 ```
+<<(x, n)
+```
+
+Left bit shift operator, `x << n`. For `n >= 0`, the result is `x` shifted left by `n` bits, filling with `0`s. This is equivalent to `x * 2^n`. For `n < 0`, this is equivalent to `x >> -n`.
+
+```jldoctest
+julia> Int8(3) << 2
+12
+
+julia> bits(Int8(3))
+"00000011"
+
+julia> bits(Int8(12))
+"00001100"
+```
+
+See also [`>>`](:func:`>>`), [`>>>`](:func:`>>>`).
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/operators.jl#L134-152' class='documenter-source'>source</a><br>
+
+
+```
 <<(x::fmpz_mat, y::Int)
 ```
 
 > Return $2^yx$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L295' class='documenter-source'>source</a><br>
+
 <a id='Base.>>-Tuple{Nemo.fmpz_mat,Int64}' href='#Base.>>-Tuple{Nemo.fmpz_mat,Int64}'>#</a>
 **`Base.>>`** &mdash; *Method*.
 
+
+
+```
+>>(x, n)
+```
+
+Right bit shift operator, `x >> n`. For `n >= 0`, the result is `x` shifted right by `n` bits, where `n >= 0`, filling with `0`s if `x >= 0`, `1`s if `x < 0`, preserving the sign of `x`. This is equivalent to `fld(x, 2^n)`. For `n < 0`, this is equivalent to `x << -n`.
+
+```jldoctest
+julia> Int8(13) >> 2
+3
+
+julia> bits(Int8(13))
+"00001101"
+
+julia> bits(Int8(3))
+"00000011"
+
+julia> Int8(-14) >> 2
+-4
+
+julia> bits(Int8(-14))
+"11110010"
+
+julia> bits(Int8(-4))
+"11111100"
+```
+
+See also [`>>>`](:func:`>>>`), [`<<`](:func:`<<`).
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/operators.jl#L161-190' class='documenter-source'>source</a><br>
 
 
 ```
@@ -1449,6 +1306,9 @@ S(11) == 11
 
 > Return $x/2^y$ where rounding is towards zero.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L308' class='documenter-source'>source</a><br>
 
 
 Here are some examples of scaling matrices.
@@ -1468,7 +1328,7 @@ C = B>>2
 
 ## Transpose
 
-<a id='Base.transpose-Tuple{Nemo.MatElem{T}}' href='#Base.transpose-Tuple{Nemo.MatElem{T}}'>#</a>
+<a id='Base.transpose-Tuple{Nemo.MatElem}' href='#Base.transpose-Tuple{Nemo.MatElem}'>#</a>
 **`Base.transpose`** &mdash; *Method*.
 
 
@@ -1479,6 +1339,9 @@ transpose(x::MatElem)
 
 > Return the transpose of the given matrix.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L778' class='documenter-source'>source</a><br>
 
 
 Here is an example of transposing a matrix.
@@ -1498,7 +1361,7 @@ B = transpose(A)
 
 ## Gram matrix
 
-<a id='Nemo.gram-Tuple{Nemo.MatElem{T}}' href='#Nemo.gram-Tuple{Nemo.MatElem{T}}'>#</a>
+<a id='Nemo.gram-Tuple{Nemo.MatElem}' href='#Nemo.gram-Tuple{Nemo.MatElem}'>#</a>
 **`Nemo.gram`** &mdash; *Method*.
 
 
@@ -1509,6 +1372,9 @@ gram(x::MatElem)
 
 > Return the Gram matrix of $x$, i.e. if $x$ is an $r\times c$ matrix return the $r\times r$ matrix whose entries $i, j$ are the dot products of the $i$-th and $j$-th rows, respectively.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L797' class='documenter-source'>source</a><br>
 
 
 Here is an example of computing the Gram matrix.
@@ -1528,7 +1394,7 @@ B = gram(A)
 
 ## Trace
 
-<a id='Base.LinAlg.trace-Tuple{Nemo.MatElem{T}}' href='#Base.LinAlg.trace-Tuple{Nemo.MatElem{T}}'>#</a>
+<a id='Base.LinAlg.trace-Tuple{Nemo.MatElem}' href='#Base.LinAlg.trace-Tuple{Nemo.MatElem}'>#</a>
 **`Base.LinAlg.trace`** &mdash; *Method*.
 
 
@@ -1539,6 +1405,9 @@ trace(x::MatElem)
 
 > Return the trace of the matrix $a$, i.e. the sum of the diagonal elements. We require the matrix to be square.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L827' class='documenter-source'>source</a><br>
 
 
 Here is an example of computing the trace.
@@ -1558,7 +1427,7 @@ b = trace(A)
 
 ## Content
 
-<a id='Nemo.content-Tuple{Nemo.MatElem{T}}' href='#Nemo.content-Tuple{Nemo.MatElem{T}}'>#</a>
+<a id='Nemo.content-Tuple{Nemo.MatElem}' href='#Nemo.content-Tuple{Nemo.MatElem}'>#</a>
 **`Nemo.content`** &mdash; *Method*.
 
 
@@ -1569,6 +1438,9 @@ content(x::MatElem)
 
 > Return the content of the matrix $a$, i.e. the greatest common divisor of all its entries, assuming it exists.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L847' class='documenter-source'>source</a><br>
 
 
 Here is an example of computing the content of a matrix.
@@ -1588,7 +1460,7 @@ b = content(A)
 
 ## Concatenation
 
-<a id='Base.hcat-Tuple{Nemo.MatElem{T},Nemo.MatElem{T}}' href='#Base.hcat-Tuple{Nemo.MatElem{T},Nemo.MatElem{T}}'>#</a>
+<a id='Base.hcat-Tuple{Nemo.MatElem,Nemo.MatElem}' href='#Base.hcat-Tuple{Nemo.MatElem,Nemo.MatElem}'>#</a>
 **`Base.hcat`** &mdash; *Method*.
 
 
@@ -1600,7 +1472,10 @@ hcat(a::MatElem, b::MatElem)
 > Return the horizontal concatenation of $a$ and $b$. Assumes that the number of rows is the same in $a$ and $b$.
 
 
-<a id='Base.vcat-Tuple{Nemo.MatElem{T},Nemo.MatElem{T}}' href='#Base.vcat-Tuple{Nemo.MatElem{T},Nemo.MatElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L2765' class='documenter-source'>source</a><br>
+
+<a id='Base.vcat-Tuple{Nemo.MatElem,Nemo.MatElem}' href='#Base.vcat-Tuple{Nemo.MatElem,Nemo.MatElem}'>#</a>
 **`Base.vcat`** &mdash; *Method*.
 
 
@@ -1611,6 +1486,9 @@ vcat(a::MatElem, b::MatElem)
 
 > Return the vertical concatenation of $a$ and $b$. Assumes that the number of columns is the same in $a$ and $b$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L2785' class='documenter-source'>source</a><br>
 
 
 Here are some examples of concatenation.
@@ -1632,9 +1510,19 @@ vcat(A, B)
 
 ## Permutation
 
-<a id='Base.*-Tuple{Nemo.perm,Nemo.MatElem{T}}' href='#Base.*-Tuple{Nemo.perm,Nemo.MatElem{T}}'>#</a>
+<a id='Base.*-Tuple{Nemo.perm,Nemo.MatElem}' href='#Base.*-Tuple{Nemo.perm,Nemo.MatElem}'>#</a>
 **`Base.*`** &mdash; *Method*.
 
+
+
+```
+*(x, y...)
+```
+
+Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
 
 
 ```
@@ -1644,11 +1532,8 @@ vcat(A, B)
 > Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 
 
-```
-*(x, y...)
-```
 
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L871' class='documenter-source'>source</a><br>
 
 
 Here is an example of applying a permutation to a matrix.
@@ -1682,6 +1567,9 @@ lufact{T <: FieldElem}(A::MatElem{T}, P = FlintPermGroup(rows(A)))
 > Return a tuple $r, p, L, U$ consisting of the rank of $A$, a permutation $p$ of $A$ belonging to $P$, a lower triangular matrix $L$ and an upper triangular matrix $U$ such that $p(A) = LU$, where $p(A)$ stands for the matrix whose rows are the given permutation $p$ of the rows of $A$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L938' class='documenter-source'>source</a><br>
+
 <a id='Nemo.fflu-Tuple{Nemo.MatElem{T<:Nemo.RingElem},Nemo.FlintPermGroup}' href='#Nemo.fflu-Tuple{Nemo.MatElem{T<:Nemo.RingElem},Nemo.FlintPermGroup}'>#</a>
 **`Nemo.fflu`** &mdash; *Method*.
 
@@ -1693,6 +1581,9 @@ fflu{T <: RingElem}(A::MatElem{T}, P = FlintPermGroup(rows(A)))
 
 > Return a tuple $r, d, p, L, U$ consisting of the rank of $A$, a denominator $d$, a permutation $p$ of $A$ belonging to $P$, a lower triangular matrix $L$ and an upper triangular matrix $U$ such that $p(A) = LD^1U$, where $p(A)$ stands for the matrix whose rows are the given permutation $p$ of the rows of $A$ and such that $D$ is the diagonal matrix diag$(p_1, p_1p_2, \ldots, p_{n-2}p_{n-1}, p_{n-1}$ where the $p_i$ are the inverses of the diagonal entries of $U$. The denominator $d$ is set to $\pm \mbox{det}(S)$ where $S$ is an appropriate submatrix of $A$ ($S = A$ if $A$ is square) and the sign is decided by the parity of the permutation.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1082' class='documenter-source'>source</a><br>
 
 
 Here are some examples of LU factorisation.
@@ -1726,9 +1617,23 @@ rref{T <: RingElem}(M::MatElem{T})
 > Returns a tuple $(r, d, A)$ consisting of the rank $r$ of $M$ and a denominator $d$ in the base ring of $M$ and a matrix $A$ such that $A/d$ is the reduced row echelon form of $M$. Note that the denominator is not usually minimal.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1187' class='documenter-source'>source</a><br>
+
 <a id='Nemo.rref-Tuple{Nemo.MatElem{T<:Nemo.FieldElem}}' href='#Nemo.rref-Tuple{Nemo.MatElem{T<:Nemo.FieldElem}}'>#</a>
 **`Nemo.rref`** &mdash; *Method*.
 
+
+
+```
+rref{T <: RingElem}(M::MatElem{T})
+```
+
+> Returns a tuple $(r, d, A)$ consisting of the rank $r$ of $M$ and a denominator $d$ in the base ring of $M$ and a matrix $A$ such that $A/d$ is the reduced row echelon form of $M$. Note that the denominator is not usually minimal.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1187' class='documenter-source'>source</a><br>
 
 
 ```
@@ -1738,12 +1643,8 @@ rref{T <: FieldElem}(M::MatElem{T})
 > Returns a tuple $(r, A)$ consisting of the rank $r$ of $M$ and a reduced row echelon form $A$ of $M$.
 
 
-```
-rref{T <: RingElem}(M::MatElem{T})
-```
 
-> Returns a tuple $(r, d, A)$ consisting of the rank $r$ of $M$ and a denominator $d$ in the base ring of $M$ and a matrix $A$ such that $A/d$ is the reduced row echelon form of $M$. Note that the denominator is not usually minimal.
-
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1260' class='documenter-source'>source</a><br>
 
 <a id='Nemo.is_rref-Tuple{Nemo.MatElem{T<:Nemo.RingElem}}' href='#Nemo.is_rref-Tuple{Nemo.MatElem{T<:Nemo.RingElem}}'>#</a>
 **`Nemo.is_rref`** &mdash; *Method*.
@@ -1757,9 +1658,23 @@ is_rref{T <: RingElem}(M::MatElem{T})
 > Return `true` if $M$ is in reduced row echelon form, otherwise return `false`.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1271' class='documenter-source'>source</a><br>
+
 <a id='Nemo.is_rref-Tuple{Nemo.MatElem{T<:Nemo.FieldElem}}' href='#Nemo.is_rref-Tuple{Nemo.MatElem{T<:Nemo.FieldElem}}'>#</a>
 **`Nemo.is_rref`** &mdash; *Method*.
 
+
+
+```
+is_rref{T <: RingElem}(M::MatElem{T})
+```
+
+> Return `true` if $M$ is in reduced row echelon form, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1271' class='documenter-source'>source</a><br>
 
 
 ```
@@ -1769,12 +1684,8 @@ is_rref{T <: FieldElem}(M::MatElem{T})
 > Return `true` if $M$ is in reduced row echelon form, otherwise return `false`.
 
 
-```
-is_rref{T <: RingElem}(M::MatElem{T})
-```
 
-> Return `true` if $M$ is in reduced row echelon form, otherwise return `false`.
-
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1300' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing reduced row echelon form.
@@ -1817,6 +1728,9 @@ det{T <: RingElem}(M::MatElem{T})
 > Return the determinant of the matrix $M$. We assume $M$ is square.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1509' class='documenter-source'>source</a><br>
+
 <a id='Base.LinAlg.det-Tuple{Nemo.MatElem{T<:Nemo.FieldElem}}' href='#Base.LinAlg.det-Tuple{Nemo.MatElem{T<:Nemo.FieldElem}}'>#</a>
 **`Base.LinAlg.det`** &mdash; *Method*.
 
@@ -1829,12 +1743,19 @@ det{T <: FieldElem}(M::MatElem{T})
 > Return the determinant of the matrix $M$. We assume $M$ is square.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1500' class='documenter-source'>source</a><br>
+
+
 ```
 det{T <: RingElem}(M::MatElem{T})
 ```
 
 > Return the determinant of the matrix $M$. We assume $M$ is square.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1509' class='documenter-source'>source</a><br>
 
 <a id='Nemo.det_divisor-Tuple{Nemo.fmpz_mat}' href='#Nemo.det_divisor-Tuple{Nemo.fmpz_mat}'>#</a>
 **`Nemo.det_divisor`** &mdash; *Method*.
@@ -1848,6 +1769,9 @@ det_divisor(x::fmpz_mat)
 > Return some positive divisor of the determinant of $x$, if the determinant is nonzero, otherwise return zero.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L517' class='documenter-source'>source</a><br>
+
 <a id='Nemo.det_given_divisor-Tuple{Nemo.fmpz_mat,Integer,Bool}' href='#Nemo.det_given_divisor-Tuple{Nemo.fmpz_mat,Integer,Bool}'>#</a>
 **`Nemo.det_given_divisor`** &mdash; *Method*.
 
@@ -1860,6 +1784,9 @@ det_given_divisor(x::fmpz_mat, d::Integer, proved=true)
 > Return the determinant of $x$ given a positive divisor of its determinant. If `proved == true` (the default), the output is guaranteed to be correct, otherwise a heuristic algorithm is used.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L544' class='documenter-source'>source</a><br>
+
 <a id='Nemo.det_given_divisor-Tuple{Nemo.fmpz_mat,Nemo.fmpz,Bool}' href='#Nemo.det_given_divisor-Tuple{Nemo.fmpz_mat,Nemo.fmpz,Bool}'>#</a>
 **`Nemo.det_given_divisor`** &mdash; *Method*.
 
@@ -1871,6 +1798,9 @@ det_given_divisor(x::fmpz_mat, d::fmpz, proved=true)
 
 > Return the determinant of $x$ given a positive divisor of its determinant. If `proved == true` (the default), the output is guaranteed to be correct, otherwise a heuristic algorithm is used.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L530' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing the determinant.
@@ -1910,9 +1840,23 @@ rank{T <: RingElem}(M::MatElem{T})
 > Return the rank of the matrix $M$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1573' class='documenter-source'>source</a><br>
+
 <a id='Base.LinAlg.rank-Tuple{Nemo.MatElem{T<:Nemo.FieldElem}}' href='#Base.LinAlg.rank-Tuple{Nemo.MatElem{T<:Nemo.FieldElem}}'>#</a>
 **`Base.LinAlg.rank`** &mdash; *Method*.
 
+
+
+```
+rank{T <: RingElem}(M::MatElem{T})
+```
+
+> Return the rank of the matrix $M$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1573' class='documenter-source'>source</a><br>
 
 
 ```
@@ -1922,12 +1866,8 @@ rank{T <: FieldElem}(M::MatElem{T})
 > Return the rank of the matrix $M$.
 
 
-```
-rank{T <: RingElem}(M::MatElem{T})
-```
 
-> Return the rank of the matrix $M$.
-
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1588' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing the rank of a matrix.
@@ -1960,6 +1900,9 @@ solve{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
 > Given a non-singular $n\times n$ matrix over a ring and an $n\times m$ matrix over the same ring, return a tuple $x, d$ consisting of an $n\times m$ matrix $x$ and a denominator $d$ such that $Ax = db$. The denominator will be the determinant of $A$ up to sign. If $A$ is singular an exception is raised.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1884' class='documenter-source'>source</a><br>
+
 <a id='Nemo.solve_triu-Tuple{Nemo.MatElem{T<:Nemo.FieldElem},Nemo.MatElem{T<:Nemo.FieldElem},Bool}' href='#Nemo.solve_triu-Tuple{Nemo.MatElem{T<:Nemo.FieldElem},Nemo.MatElem{T<:Nemo.FieldElem},Bool}'>#</a>
 **`Nemo.solve_triu`** &mdash; *Method*.
 
@@ -1971,6 +1914,9 @@ solve_triu{T <: FieldElem}(U::MatElem{T}, b::MatElem{T}, unit=false)
 
 > Given a non-singular $n\times n$ matrix over a field which is upper triangular, and an $n\times m$ matrix over the same field, return an $n\times m$ matrix $x$ such that $Ax = b$. If $A$ is singular an exception is raised. If unit is true then $U$ is assumed to have ones on its diagonal, and the diagonal will not be read.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1916' class='documenter-source'>source</a><br>
 
 <a id='Nemo.solve_dixon-Tuple{Nemo.fmpz_mat,Nemo.fmpz_mat}' href='#Nemo.solve_dixon-Tuple{Nemo.fmpz_mat,Nemo.fmpz_mat}'>#</a>
 **`Nemo.solve_dixon`** &mdash; *Method*.
@@ -1984,6 +1930,9 @@ solve_dixon(a::fmpz_mat, b::fmpz_mat)
 > Return a tuple $(x, m)$ consisting of the column vector $x$ such that $ax = b \pmod{m}$ where $x$ and $b$ are column vectors with the same number of rows as the $a$. Note that $a$ must be a square matrix. If these conditions are not met, an exception is raised.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L931' class='documenter-source'>source</a><br>
+
 <a id='Nemo.solve_dixon-Tuple{Nemo.fmpq_mat,Nemo.fmpq_mat}' href='#Nemo.solve_dixon-Tuple{Nemo.fmpq_mat,Nemo.fmpq_mat}'>#</a>
 **`Nemo.solve_dixon`** &mdash; *Method*.
 
@@ -1995,6 +1944,9 @@ solve_dixon(a::fmpq_mat, b::fmpq_mat)
 
 > Solve $ax = b$ by clearing denominators and using Dixon's algorithm. This is usually faster for large systems.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpq_mat.jl#L505' class='documenter-source'>source</a><br>
 
 
 Here are some examples of linear solving.
@@ -2052,9 +2004,23 @@ inv{T <: RingElem}(M::MatElem{T})
 > Given a non-singular $n\times n$ matrix over a ring the tuple $X, d$ consisting of an $n\times n$ matrix $X$ and a denominator $d$ such that $AX = dI_n$, where $I_n$ is the $n\times n$ identity matrix. The denominator will be the determinant of $A$ up to sign. If $A$ is singular an exception  is raised.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1966' class='documenter-source'>source</a><br>
+
 <a id='Base.inv-Tuple{Nemo.MatElem{T<:Nemo.FieldElem}}' href='#Base.inv-Tuple{Nemo.MatElem{T<:Nemo.FieldElem}}'>#</a>
 **`Base.inv`** &mdash; *Method*.
 
+
+
+```
+inv{T <: RingElem}(M::MatElem{T})
+```
+
+> Given a non-singular $n\times n$ matrix over a ring the tuple $X, d$ consisting of an $n\times n$ matrix $X$ and a denominator $d$ such that $AX = dI_n$, where $I_n$ is the $n\times n$ identity matrix. The denominator will be the determinant of $A$ up to sign. If $A$ is singular an exception  is raised.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1966' class='documenter-source'>source</a><br>
 
 
 ```
@@ -2064,12 +2030,8 @@ inv{T <: FieldElem}(M::MatElem{T})
 > Given a non-singular $n\times n$ matrix over a field, return an $n\times n$ matrix $X$ such that $AX = I_n$ where $I_n$ is the $n\times n$ identity matrix. If $A$ is singular an exception is raised.
 
 
-```
-inv{T <: RingElem}(M::MatElem{T})
-```
 
-> Given a non-singular $n\times n$ matrix over a ring the tuple $X, d$ consisting of an $n\times n$ matrix $X$ and a denominator $d$ such that $AX = dI_n$, where $I_n$ is the $n\times n$ identity matrix. The denominator will be the determinant of $A$ up to sign. If $A$ is singular an exception  is raised.
-
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L1983' class='documenter-source'>source</a><br>
 
 <a id='Nemo.pseudo_inv-Tuple{Nemo.fmpz_mat}' href='#Nemo.pseudo_inv-Tuple{Nemo.fmpz_mat}'>#</a>
 **`Nemo.pseudo_inv`** &mdash; *Method*.
@@ -2082,6 +2044,9 @@ pseudo_inv(x::fmpz_mat)
 
 > Return a tuple $(z, d)$ consisting of a matrix $z$ and denominator $d$ such that $z/d$ is the inverse of $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L403' class='documenter-source'>source</a><br>
 
 
 Here are some examples of taking the inverse of a matrix.
@@ -2127,9 +2092,23 @@ nullspace{T <: RingElem}(M::MatElem{T})
 > Returns a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and a basis $N$ (consisting of column vectors) for the right nullspace of $M$, i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix $N$ will be an $n\times \nu$ matrix. Note that the nullspace is taken to be the vector space kernel over the fraction field of the base ring if the latter is not a field. In Nemo we use the name ``kernel'' for a function to compute an integral kernel.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L2004' class='documenter-source'>source</a><br>
+
 <a id='Base.LinAlg.nullspace-Tuple{Nemo.MatElem{T<:Nemo.FieldElem}}' href='#Base.LinAlg.nullspace-Tuple{Nemo.MatElem{T<:Nemo.FieldElem}}'>#</a>
 **`Base.LinAlg.nullspace`** &mdash; *Method*.
 
+
+
+```
+nullspace{T <: RingElem}(M::MatElem{T})
+```
+
+> Returns a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and a basis $N$ (consisting of column vectors) for the right nullspace of $M$, i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix $N$ will be an $n\times \nu$ matrix. Note that the nullspace is taken to be the vector space kernel over the fraction field of the base ring if the latter is not a field. In Nemo we use the name ``kernel'' for a function to compute an integral kernel.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L2004' class='documenter-source'>source</a><br>
 
 
 ```
@@ -2139,12 +2118,8 @@ nullspace{T <: FieldElem}(M::MatElem{T})
 > Returns a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and a basis $N$ (consisting of column vectors) for the right nullspace of $M$, i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix $N$ will be an $n\times \nu$ matrix. Note that the nullspace is taken to be the vector space kernel over the fraction field of the base ring if the latter is not a field. In Nemo we use the name ``kernel'' for a function to compute an integral kernel.
 
 
-```
-nullspace{T <: RingElem}(M::MatElem{T})
-```
 
-> Returns a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and a basis $N$ (consisting of column vectors) for the right nullspace of $M$, i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix $N$ will be an $n\times \nu$ matrix. Note that the nullspace is taken to be the vector space kernel over the fraction field of the base ring if the latter is not a field. In Nemo we use the name ``kernel'' for a function to compute an integral kernel.
-
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L2053' class='documenter-source'>source</a><br>
 
 <a id='Nemo.nullspace_right_rational-Tuple{Nemo.fmpz_mat}' href='#Nemo.nullspace_right_rational-Tuple{Nemo.fmpz_mat}'>#</a>
 **`Nemo.nullspace_right_rational`** &mdash; *Method*.
@@ -2157,6 +2132,9 @@ nullspace_right_rational(x::fmpz_mat)
 
 > Return the right rational nullspace of $x$, i.e. a set of vectors over $\mathbb{Z}$ giving a $\mathbb{Q}$-basis for the nullspace of $x$ considered as a matrix over $\mathbb{Q}$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L833' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing the nullspace of a matrix.
@@ -2191,6 +2169,9 @@ hessenberg{T <: RingElem}(A::MatElem{T})
 > Returns the Hessenberg form of $M$, i.e. an upper Hessenberg matrix which is similar to $M$. The upper Hessenberg form has nonzero entries above and on the diagonal and in the diagonal line immediately below the diagonal.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L2155' class='documenter-source'>source</a><br>
+
 <a id='Nemo.is_hessenberg-Tuple{Nemo.MatElem{T<:Nemo.RingElem}}' href='#Nemo.is_hessenberg-Tuple{Nemo.MatElem{T<:Nemo.RingElem}}'>#</a>
 **`Nemo.is_hessenberg`** &mdash; *Method*.
 
@@ -2202,6 +2183,9 @@ is_hessenberg{T <: RingElem}(A::MatElem{T})
 
 > Returns `true` if $M$ is in Hessenberg form, otherwise returns `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L2169' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing the Hessenberg form.
@@ -2236,6 +2220,9 @@ charpoly{T <: RingElem}(V::Ring, Y::MatElem{T})
 
 
 
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L2438' class='documenter-source'>source</a><br>
+
+
 Here are some examples of computing the characteristic polynomial.
 
 
@@ -2267,6 +2254,9 @@ minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
 > Returns the minimal polynomial $p$ of the matrix $M$. The polynomial ring $R$ of the resulting polynomial must be supplied and the matrix must be square.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L2615' class='documenter-source'>source</a><br>
+
 <a id='Nemo.minpoly-Tuple{Nemo.Ring,Nemo.MatElem{T<:Nemo.FieldElem},Bool}' href='#Nemo.minpoly-Tuple{Nemo.Ring,Nemo.MatElem{T<:Nemo.FieldElem},Bool}'>#</a>
 **`Nemo.minpoly`** &mdash; *Method*.
 
@@ -2279,12 +2269,19 @@ minpoly{T <: FieldElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
 > Returns the minimal polynomial $p$ of the matrix $M$. The polynomial ring $R$ of the resulting polynomial must be supplied and the matrix must be square.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L2519' class='documenter-source'>source</a><br>
+
+
 ```
 minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
 ```
 
 > Returns the minimal polynomial $p$ of the matrix $M$. The polynomial ring $R$ of the resulting polynomial must be supplied and the matrix must be square.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L2615' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing the minimal polynomial of a matrix.
@@ -2319,6 +2316,9 @@ similarity!{T <: RingElem}(A::MatElem{T}, r::Int, d::T)
 
 
 
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Matrix.jl#L2719' class='documenter-source'>source</a><br>
+
+
 Here is an example of applying a similarity transform to a matrix.
 
 
@@ -2349,6 +2349,9 @@ reduce_mod(x::fmpz_mat, y::Integer)
 > Reduce the entries of $x$ modulo $y$ and return the result.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L469' class='documenter-source'>source</a><br>
+
 <a id='Nemo.reduce_mod-Tuple{Nemo.fmpz_mat,Nemo.fmpz}' href='#Nemo.reduce_mod-Tuple{Nemo.fmpz_mat,Nemo.fmpz}'>#</a>
 **`Nemo.reduce_mod`** &mdash; *Method*.
 
@@ -2360,6 +2363,9 @@ reduce_mod(x::fmpz_mat, y::fmpz)
 
 > Reduce the entries of $x$ modulo $y$ and return the result.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L458' class='documenter-source'>source</a><br>
 
 
 Here are some examples of modular reduction.
@@ -2392,6 +2398,9 @@ lift(a::nmod_mat)
 
 
 
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/nmod_mat.jl#L544' class='documenter-source'>source</a><br>
+
+
 Here are some examples of lifting.
 
 
@@ -2421,6 +2430,9 @@ hadamard(R::FmpzMatSpace)
 > Return the Hadamard matrix for the given matrix space. The number of rows and columns must be equal.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L578' class='documenter-source'>source</a><br>
+
 <a id='Nemo.is_hadamard-Tuple{Nemo.fmpz_mat}' href='#Nemo.is_hadamard-Tuple{Nemo.fmpz_mat}'>#</a>
 **`Nemo.is_hadamard`** &mdash; *Method*.
 
@@ -2433,6 +2445,9 @@ is_hadamard(x::fmpz_mat)
 > Return `true` if the given matrix is Hadamard, otherwise return `false`.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L592' class='documenter-source'>source</a><br>
+
 <a id='Nemo.hilbert-Tuple{Nemo.FmpqMatSpace}' href='#Nemo.hilbert-Tuple{Nemo.FmpqMatSpace}'>#</a>
 **`Nemo.hilbert`** &mdash; *Method*.
 
@@ -2444,6 +2459,9 @@ hilbert(R::FmpqMatSpace)
 
 > Return the Hilbert matrix in the given matrix space. This is the matrix with entries $H_{i,j} = 1/(i + j - 1)$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpq_mat.jl#L451' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing special matrices.
@@ -2475,6 +2493,9 @@ hnf(x::fmpz_mat)
 > Return the Hermite Normal Form of $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L607' class='documenter-source'>source</a><br>
+
 <a id='Nemo.hnf_with_transform-Tuple{Nemo.fmpz_mat}' href='#Nemo.hnf_with_transform-Tuple{Nemo.fmpz_mat}'>#</a>
 **`Nemo.hnf_with_transform`** &mdash; *Method*.
 
@@ -2486,6 +2507,9 @@ hnf_with_transform(x::fmpz_mat)
 
 > Compute a tuple $(H, T)$ where $H$ is the Hermite normal form of $x$ and $T$ is a transformation matrix so that $H = Tx$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L618' class='documenter-source'>source</a><br>
 
 <a id='Nemo.hnf_modular-Tuple{Nemo.fmpz_mat,Nemo.fmpz}' href='#Nemo.hnf_modular-Tuple{Nemo.fmpz_mat,Nemo.fmpz}'>#</a>
 **`Nemo.hnf_modular`** &mdash; *Method*.
@@ -2499,6 +2523,9 @@ hnf_modular(x::fmpz_mat, d::fmpz)
 > Compute the Hermite normal form of $x$ given that $d$ is a multiple of the determinant of the nonzero rows of $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L636' class='documenter-source'>source</a><br>
+
 <a id='Nemo.hnf_modular_eldiv-Tuple{Nemo.fmpz_mat,Nemo.fmpz}' href='#Nemo.hnf_modular_eldiv-Tuple{Nemo.fmpz_mat,Nemo.fmpz}'>#</a>
 **`Nemo.hnf_modular_eldiv`** &mdash; *Method*.
 
@@ -2511,6 +2538,9 @@ hnf_modular_eldiv(x::fmpz_mat, d::fmpz)
 > Compute the Hermite normal form of $x$ given that $d$ is a multiple of the largest elementary divisor of $x$. The matrix $x$ must have full rank.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L648' class='documenter-source'>source</a><br>
+
 <a id='Nemo.is_hnf-Tuple{Nemo.fmpz_mat}' href='#Nemo.is_hnf-Tuple{Nemo.fmpz_mat}'>#</a>
 **`Nemo.is_hnf`** &mdash; *Method*.
 
@@ -2522,6 +2552,9 @@ is_hnf(x::fmpz_mat)
 
 > Return `true` if the given matrix is in Hermite Normal Form, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L662' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing the Hermite Normal Form.
@@ -2567,6 +2600,9 @@ lll(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51))
 > Return the LLL reduction of the matrix $x$. By default the matrix $x$ is a $\mathbb{Z}$-basis and the Gram matrix is maintained throughout in approximate form. The LLL is performed with reduction parameters $\delta = 0.99$ and $\eta = 0.51$. All of these defaults can be overridden by specifying an optional context object.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L710' class='documenter-source'>source</a><br>
+
 <a id='Nemo.lll_with_transform-Tuple{Nemo.fmpz_mat,Nemo.lll_ctx}' href='#Nemo.lll_with_transform-Tuple{Nemo.fmpz_mat,Nemo.lll_ctx}'>#</a>
 **`Nemo.lll_with_transform`** &mdash; *Method*.
 
@@ -2574,6 +2610,9 @@ lll(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51))
 
 > Compute a tuple $(L, T)$ where $L$ is the LLL reduction of $a$ and $T$ is a transformation matrix so that $L = Ta$. All the default parameters can be overridden by supplying an optional context object.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L692' class='documenter-source'>source</a><br>
 
 <a id='Nemo.lll_gram-Tuple{Nemo.fmpz_mat,Nemo.lll_ctx}' href='#Nemo.lll_gram-Tuple{Nemo.fmpz_mat,Nemo.lll_ctx}'>#</a>
 **`Nemo.lll_gram`** &mdash; *Method*.
@@ -2587,6 +2626,9 @@ lll_gram(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51, :gram))
 > Given the Gram matrix $x$ of a matrix, compute the Gram matrix of its LLL reduction.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L753' class='documenter-source'>source</a><br>
+
 <a id='Nemo.lll_gram_with_transform-Tuple{Nemo.fmpz_mat,Nemo.lll_ctx}' href='#Nemo.lll_gram_with_transform-Tuple{Nemo.fmpz_mat,Nemo.lll_ctx}'>#</a>
 **`Nemo.lll_gram_with_transform`** &mdash; *Method*.
 
@@ -2598,6 +2640,9 @@ lll_gram_with_transform(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51, :gram))
 
 > Given the Gram matrix $x$ of a matrix $M$, compute a tuple $(L, T)$ where $L$ is the gram matrix of the LLL reduction of the matrix and $T$ is a transformation matrix so that $L = TM$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L734' class='documenter-source'>source</a><br>
 
 <a id='Nemo.lll_with_removal-Tuple{Nemo.fmpz_mat,Nemo.fmpz,Nemo.lll_ctx}' href='#Nemo.lll_with_removal-Tuple{Nemo.fmpz_mat,Nemo.fmpz,Nemo.lll_ctx}'>#</a>
 **`Nemo.lll_with_removal`** &mdash; *Method*.
@@ -2611,6 +2656,9 @@ lll_with_removal(x::fmpz_mat, b::fmpz, ctx=lll_ctx(0.99, 0.51))
 > Compute the LLL reduction of $x$ and throw away rows whose norm exceeds the given bound $b$. Return a tuple $(r, L)$ where the first $r$ rows of $L$ are the rows remaining after removal.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L790' class='documenter-source'>source</a><br>
+
 <a id='Nemo.lll_with_removal_transform-Tuple{Nemo.fmpz_mat,Nemo.fmpz,Nemo.lll_ctx}' href='#Nemo.lll_with_removal_transform-Tuple{Nemo.fmpz_mat,Nemo.fmpz,Nemo.lll_ctx}'>#</a>
 **`Nemo.lll_with_removal_transform`** &mdash; *Method*.
 
@@ -2622,6 +2670,9 @@ lll_with_removal_transform(x::fmpz_mat, b::fmpz, ctx=lll_ctx(0.99, 0.51))
 
 > Compute a tuple $(r, L, T)$ where the first $r$ rows of $L$ are those remaining from the LLL reduction after removal of vectors with norm exceeding the bound $b$ and $T$ is a transformation matrix so that $L = Tx$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L771' class='documenter-source'>source</a><br>
 
 
 Here are some examples of lattice basis reduction.
@@ -2659,6 +2710,9 @@ snf(x::fmpz_mat)
 > Compute the Smith normal form of $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L883' class='documenter-source'>source</a><br>
+
 <a id='Nemo.snf_diagonal-Tuple{Nemo.fmpz_mat}' href='#Nemo.snf_diagonal-Tuple{Nemo.fmpz_mat}'>#</a>
 **`Nemo.snf_diagonal`** &mdash; *Method*.
 
@@ -2671,6 +2725,9 @@ snf_diagonal(x::fmpz_mat)
 > Given a diagonal matrix $x$ compute the Smith normal form of $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L894' class='documenter-source'>source</a><br>
+
 <a id='Nemo.is_snf-Tuple{Nemo.fmpz_mat}' href='#Nemo.is_snf-Tuple{Nemo.fmpz_mat}'>#</a>
 **`Nemo.is_snf`** &mdash; *Method*.
 
@@ -2682,6 +2739,9 @@ is_snf(x::fmpz_mat)
 
 > Return `true` if $x$ is in Smith normal form, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpz_mat.jl#L905' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing the Smith Normal Form.
@@ -2718,6 +2778,9 @@ strong_echelon_form(a::nmod_mat)
 
 
 
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/nmod_mat.jl#L321' class='documenter-source'>source</a><br>
+
+
 Here is an example of computing the strong echelon form.
 
 
@@ -2748,6 +2811,9 @@ howell_form(a::nmod_mat)
 
 
 
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/nmod_mat.jl#L338' class='documenter-source'>source</a><br>
+
+
 Here is an example of computing the Howell form.
 
 
@@ -2776,6 +2842,9 @@ gso(x::fmpq_mat)
 
 > Return the Gram-Schmidt Orthogonalisation of the matrix $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/fmpq_mat.jl#L434' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing the Gram-Schmidt Orthogonalisation.

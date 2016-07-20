@@ -23,9 +23,9 @@ so that permutation groups can be created using `PermutationGroup` instead of `F
 The types of permutations in Nemo are given by the following table, along with the libraries that provide them and the associated types of the parent objects.
 
 
-Library | Group | Element type |      Parent type
-------: | ----: | -----------: | ---------------:
-  Flint | $S_n$ |       `perm` | `FlintPermGroup`
+| Library | Group | Element type |      Parent type |
+| -------:| -----:| ------------:| ----------------:|
+|   Flint | $S_n$ |       `perm` | `FlintPermGroup` |
 
 
 All the permutation group types belong to the `Group` abstract type and the corresponding permutation element types belong to the `GroupElem` abstract type.
@@ -78,6 +78,9 @@ eye(R::FlintPermGroup)
 
 > Return the identity permutation for the given permutation group.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/perm.jl#L68' class='documenter-source'>source</a><br>
 
 
 Note that permutations consist of lists of $n$ integers numbered from $1$ to $n$. If the $i$-th entry of a permuation is $j$, this corresponds to sending $i \to j$ in the permutation.
@@ -198,6 +201,9 @@ parent(a::perm)
 > Return the parent of the given permutation group element.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/perm.jl#L25' class='documenter-source'>source</a><br>
+
 <a id='Base.parity-Tuple{Nemo.perm}' href='#Base.parity-Tuple{Nemo.perm}'>#</a>
 **`Base.parity`** &mdash; *Method*.
 
@@ -209,6 +215,9 @@ parity(a::perm)
 
 > Return the parity of the given permutation, i.e. the parity of the number of transpositions that compose it. The function returns $1$ if the parity is odd otherwise it returns $0$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/perm.jl#L48' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of permutations.
@@ -233,14 +242,21 @@ a = parity(p)
 
 
 
-> Return the composition of the two permutations, i.e. $a\circ b$. In other words, the permutation corresponding to applying $b$ first, then $a$, is returned.
-
-
 ```
 *(x, y...)
 ```
 
 Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
+
+
+> Return the composition of the two permutations, i.e. $a\circ b$. In other words, the permutation corresponding to applying $b$ first, then $a$, is returned.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/perm.jl#L120' class='documenter-source'>source</a><br>
 
 
 Here are some examples of arithmetic operations.

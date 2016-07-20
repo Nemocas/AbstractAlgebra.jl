@@ -107,6 +107,23 @@ end
 
 ################################################################################
 #
+#  Conversions
+#
+################################################################################
+
+function convert(::Type{Complex128}, x::acb)
+    re = ccall((:acb_real_ptr, :libarb), Ptr{arb_struct}, (Ptr{acb}, ), &x)
+    im = ccall((:acb_imag_ptr, :libarb), Ptr{arb_struct}, (Ptr{acb}, ), &x)
+    t = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), re)
+    u = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), im)
+    # 4 == round to nearest
+    v = ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), t, 4)
+    w = ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), u, 4)
+    return complex(v, w)
+end
+
+################################################################################
+#
 #  Real and imaginary part
 #
 ################################################################################
@@ -145,9 +162,10 @@ function show(io::IO, x::acb)
   show(io, imag(x))
 end
 
-function show(io::IO, r::AcbField)
-  print(io, r.prec)
-  print(io, " bit complex balls")
+function show(io::IO, x::AcbField)
+  print(io, "Complex Field with ")
+  print(io, prec(x))
+  print(io, " bits of precision and error bounds")
 end
 
 ################################################################################
@@ -560,7 +578,7 @@ doc"""
 """
 function unique_integer(x::acb)
   z = fmpz()
-  unique = ccall((:arb_get_unique_fmpz, :libarb), Int,
+  unique = ccall((:acb_get_unique_fmpz, :libarb), Int,
     (Ptr{fmpz}, Ptr{acb}), &z, &x)
   return (unique != 0, z)
 end
@@ -1255,7 +1273,7 @@ doc"""
 function hyperu(a::acb, b::acb, x::acb)
   z = parent(x)()
   ccall((:acb_hypgeom_u, :libarb), Void,
-              (Ptr{acb}, Ptr{acb}, Ptr{acb}, Ptr{acb}, Int, Int), &z, &a, &b, &x, parent(x).prec)
+              (Ptr{acb}, Ptr{acb}, Ptr{acb}, Ptr{acb}, Int), &z, &a, &b, &x, parent(x).prec)
   return z
 end
 
