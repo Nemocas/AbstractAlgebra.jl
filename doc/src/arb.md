@@ -11,6 +11,15 @@ represented in mid-rad interval form $[m \pm r] = [m-r, m+r]$.
 The Arb real field is constructed using the `ArbField` constructor. This
 constructs the parent object for the Arb real field.
 
+However, we define
+
+```
+RealField = ArbField
+```
+
+so that one can construct the Arb real field parent object using `RealField`
+instead of `ArbField`.
+
 The types of real balls in Nemo are given in the following table, along with
 the libraries that provide them and the associated types of the parent objects.
 
@@ -35,11 +44,19 @@ Return the Arb field with precision in bits `prec` used for operations on
 interval midpoints. The precision used for interval radii is a fixed
 implementation-defined constant (30 bits).
 
+We define
+
+```
+RealField = ArbField
+```
+
+so that one can use `RealField` in place of `ArbField`.
+
 Here is an example of creating an Arb real field and using the resulting
 parent object to coerce values into the resulting field.
 
 ```
-RR = ArbField(64)
+RR = RealField(64)
 
 a = RR("0.25")
 b = RR("0.1")
@@ -83,7 +100,7 @@ ball(::arb, ::arb)
 Here are some examples of constructing balls.
 
 ```
-RR = ArbField(64)
+RR = RealField(64)
 
 a = zero(RR)
 b = one(RR)
@@ -177,7 +194,7 @@ return it. A copy of the original is not made.
 Here are some examples of coercing elements into the Arb field.
 
 ```
-RR = ArbField(64)
+RR = RealField(64)
 
 a = RR(3)
 b = RR(QQ(2,3))
@@ -272,7 +289,7 @@ accuracy_bits(::arb)
 Here are some examples of basic manipulation of Arb balls.
 
 ```
-RR = ArbField(64)
+RR = RealField(64)
 
 a = RR("1.2 +/- 0.001")
 b = RR(3)
@@ -334,7 +351,7 @@ Function               | Operation
 Here are some examples of arithmetic operations on Arb balls.
 
 ```
-RR = ArbField(64)
+RR = RealField(64)
 
 x = RR(3)
 y = RR(QQ(2,3))
@@ -393,7 +410,7 @@ contains_nonpositive(::arb)
 Here are some examples of testing containment.
 
 ```
-RR = ArbField(64)
+RR = RealField(64)
 x = RR("1 +/- 0.001")
 y = RR("3")
 
@@ -451,7 +468,7 @@ Function
 Here are some examples of comparison.
 
 ```
-RR = ArbField(64)
+RR = RealField(64)
 x = RR("1 +/- 0.001")
 y = RR("3")
 z = RR("4")
@@ -472,7 +489,7 @@ abs(::arb)
 Here are some examples of taking the absolute value.
 
 ```
-RR = ArbField(64)
+RR = RealField(64)
 x = RR("-1 +/- 0.001")
 
 a = abs(x)
@@ -487,7 +504,7 @@ inv(::arb)
 Here are some examples of taking the inverse.
 
 ```
-RR = ArbField(64)
+RR = RealField(64)
 x = RR("-3 +/- 0.001")
 
 a = inv(x)
@@ -503,7 +520,7 @@ ldexp(x::arb, y::fmpz)
 Here are some examples of shifting.
 
 ```
-RR = ArbField(64)
+RR = RealField(64)
 x = RR("-3 +/- 0.001")
 
 a = ldexp(x, 23)
@@ -527,7 +544,7 @@ setunion(::arb, ::arb)
 Here are some examples of miscellaneous operations.
 
 ```
-RR = ArbField(64)
+RR = RealField(64)
 x = RR("-3 +/- 0.001")
 y = RR("2 +/- 0.5")
 
@@ -573,7 +590,7 @@ const_glaisher(::ArbField)
 Here are some examples of computing real constants.
 
 ```
-RR = ArbField(200)
+RR = RealField(200)
 
 a = const_pi(RR)
 b = const_e(RR)
@@ -842,11 +859,11 @@ bell(::Int, ::ArbField)
 Here are some examples of real valued mathematical functions.
 
 ```
-RR = ArbField(64)
+RR = RealField(64)
 
 a = floor(exp(RR(1)))
 b = sinpi(QQ(5,6), RR)
-c = gamma(QQ(1,3), ArbField(256))
-d = bernoulli(1000, ArbField(53))
+c = gamma(QQ(1,3), RealField(256))
+d = bernoulli(1000, RealField(53))
 f = polylog(3, RR(-10))
 ```

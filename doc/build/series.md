@@ -15,14 +15,14 @@ There are two different kinds of implementation: a generic one for the case wher
 The following table shows each of the relative power series types available in Nemo, the base ring $R$, and the Julia/Nemo types for that kind of series (the type information is mainly of concern to developers).
 
 
-                     Base ring | Library |          Element type |            Parent type
------------------------------: | ------: | --------------------: | ---------------------:
-              Generic ring $R$ |    Nemo |     `GenRelSeries{T}` |  `GenRelSeriesRing{T}`
-                  $\mathbb{Z}$ |   Flint |     `fmpz_rel_series` |    `FmpzRelSeriesRing`
-      $\mathbb{Z}/n\mathbb{Z}$ |   Flint | `fmpz_mod_rel_series` | `FmpzModRelSeriesRing`
-                  $\mathbb{Q}$ |   Flint |     `fmpq_rel_series` |     `FmpqRelSerieRing`
-$\mathbb{F}_{p^n}$ (small $n$) |   Flint |  `fq_nmod_rel_series` |  `FqNmodRelSeriesRing`
-$\mathbb{F}_{p^n}$ (large $n$) |   Flint |       `fq_rel_series` |      `FqRelSeriesRing`
+|                      Base ring | Library |          Element type |            Parent type |
+| ------------------------------:| -------:| ---------------------:| ----------------------:|
+|               Generic ring $R$ |    Nemo |     `GenRelSeries{T}` |  `GenRelSeriesRing{T}` |
+|                   $\mathbb{Z}$ |   Flint |     `fmpz_rel_series` |    `FmpzRelSeriesRing` |
+|       $\mathbb{Z}/n\mathbb{Z}$ |   Flint | `fmpz_mod_rel_series` | `FmpzModRelSeriesRing` |
+|                   $\mathbb{Q}$ |   Flint |     `fmpq_rel_series` |     `FmpqRelSerieRing` |
+| $\mathbb{F}_{p^n}$ (small $n$) |   Flint |  `fq_nmod_rel_series` |  `FqNmodRelSeriesRing` |
+| $\mathbb{F}_{p^n}$ (large $n$) |   Flint |       `fq_rel_series` |      `FqRelSeriesRing` |
 
 
 The maximum relative precision, the string representation of the variable and the base ring $R$ of a generic power series are stored in its parent object. 
@@ -90,8 +90,6 @@ In order to construct power series in Nemo, one must first construct the power s
 
 
 
-nothing
-
 Here are some examples of creating a power series ring using the constructor and using the resulting parent object to coerce various elements into the power series ring.
 
 
@@ -130,9 +128,12 @@ O{T}(a::SeriesElem{T})
 
 
 
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L16' class='documenter-source'>source</a><br>
+
+
 In addition we provide the following functions for constructing certain useful polynomials.
 
-<a id='Base.zero-Tuple{Nemo.SeriesRing{T}}' href='#Base.zero-Tuple{Nemo.SeriesRing{T}}'>#</a>
+<a id='Base.zero-Tuple{Nemo.SeriesRing}' href='#Base.zero-Tuple{Nemo.SeriesRing}'>#</a>
 **`Base.zero`** &mdash; *Method*.
 
 
@@ -144,7 +145,10 @@ zero(R::SeriesRing)
 > Return $0 + O(x^n)$ where $n$ is the maximum precision of the power series ring $R$.
 
 
-<a id='Base.one-Tuple{Nemo.SeriesRing{T}}' href='#Base.one-Tuple{Nemo.SeriesRing{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L108' class='documenter-source'>source</a><br>
+
+<a id='Base.one-Tuple{Nemo.SeriesRing}' href='#Base.one-Tuple{Nemo.SeriesRing}'>#</a>
 **`Base.one`** &mdash; *Method*.
 
 
@@ -156,7 +160,10 @@ zero(R::SeriesRing)
 > Return $1 + O(x^n)$ where $n$ is the maximum precision of the power series ring $R$.
 
 
-<a id='Nemo.gen-Tuple{Nemo.SeriesRing{T}}' href='#Nemo.gen-Tuple{Nemo.SeriesRing{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L115' class='documenter-source'>source</a><br>
+
+<a id='Nemo.gen-Tuple{Nemo.SeriesRing}' href='#Nemo.gen-Tuple{Nemo.SeriesRing}'>#</a>
 **`Nemo.gen`** &mdash; *Method*.
 
 
@@ -167,6 +174,9 @@ zero(R::SeriesRing)
 
 > Return the generator of the power series ring, i.e. $x + O(x^{n + 1})$ where $n$ is the maximum precision of the power series ring $R$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L122' class='documenter-source'>source</a><br>
 
 
 Here are some examples of constructing power series.
@@ -378,7 +388,7 @@ Typically a developer will also overload the `PowerSeriesRing` generic function 
 
 Numerous functions are provided to manipulate polynomials and to set and retrieve coefficients and other basic data associated with the polynomials. Also see the section on basic functionality above.
 
-<a id='Nemo.base_ring-Tuple{Nemo.SeriesRing{T}}' href='#Nemo.base_ring-Tuple{Nemo.SeriesRing{T}}'>#</a>
+<a id='Nemo.base_ring-Tuple{Nemo.SeriesRing}' href='#Nemo.base_ring-Tuple{Nemo.SeriesRing}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
 
 
@@ -390,7 +400,10 @@ base_ring(R::SeriesRing)
 > Return the base ring of the given power series ring.
 
 
-<a id='Nemo.base_ring-Tuple{Nemo.SeriesElem{T}}' href='#Nemo.base_ring-Tuple{Nemo.SeriesElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L38' class='documenter-source'>source</a><br>
+
+<a id='Nemo.base_ring-Tuple{Nemo.SeriesElem}' href='#Nemo.base_ring-Tuple{Nemo.SeriesElem}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
 
 
@@ -402,7 +415,10 @@ base_ring(a::SeriesElem)
 > Return the base ring of the power series ring of the given power series.
 
 
-<a id='Base.parent-Tuple{Nemo.SeriesElem{T}}' href='#Base.parent-Tuple{Nemo.SeriesElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L44' class='documenter-source'>source</a><br>
+
+<a id='Base.parent-Tuple{Nemo.SeriesElem}' href='#Base.parent-Tuple{Nemo.SeriesElem}'>#</a>
 **`Base.parent`** &mdash; *Method*.
 
 
@@ -414,7 +430,10 @@ parent(a::SeriesElem)
 > Return the parent of the given power series.
 
 
-<a id='Base.var-Tuple{Nemo.SeriesRing{T}}' href='#Base.var-Tuple{Nemo.SeriesRing{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L30' class='documenter-source'>source</a><br>
+
+<a id='Base.var-Tuple{Nemo.SeriesRing}' href='#Base.var-Tuple{Nemo.SeriesRing}'>#</a>
 **`Base.var`** &mdash; *Method*.
 
 
@@ -426,7 +445,10 @@ var(a::SeriesRing)
 > Return the internal name of the generator of the power series ring. Note that this is returned as a `Symbol` not a `String`.
 
 
-<a id='Nemo.valuation-Tuple{Nemo.SeriesElem{T}}' href='#Nemo.valuation-Tuple{Nemo.SeriesElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L50' class='documenter-source'>source</a><br>
+
+<a id='Nemo.valuation-Tuple{Nemo.SeriesElem}' href='#Nemo.valuation-Tuple{Nemo.SeriesElem}'>#</a>
 **`Nemo.valuation`** &mdash; *Method*.
 
 
@@ -438,7 +460,10 @@ valuation(a::SeriesElem)
 > Return the valuation of the given power series, i.e. the degree of the first nonzero term (or the precision if it is arithmetically zero).
 
 
-<a id='Nemo.max_precision-Tuple{Nemo.SeriesRing{T}}' href='#Nemo.max_precision-Tuple{Nemo.SeriesRing{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L165' class='documenter-source'>source</a><br>
+
+<a id='Nemo.max_precision-Tuple{Nemo.SeriesRing}' href='#Nemo.max_precision-Tuple{Nemo.SeriesRing}'>#</a>
 **`Nemo.max_precision`** &mdash; *Method*.
 
 
@@ -450,7 +475,10 @@ max_precision(R::SeriesRing)
 > Return the maximum relative precision of power series in the given power series ring.
 
 
-<a id='Nemo.modulus-Tuple{Nemo.SeriesElem{T<:Nemo.ResElem{T}}}' href='#Nemo.modulus-Tuple{Nemo.SeriesElem{T<:Nemo.ResElem{T}}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L81' class='documenter-source'>source</a><br>
+
+<a id='Nemo.modulus-Tuple{Nemo.SeriesElem{T<:Nemo.ResElem}}' href='#Nemo.modulus-Tuple{Nemo.SeriesElem{T<:Nemo.ResElem}}'>#</a>
 **`Nemo.modulus`** &mdash; *Method*.
 
 
@@ -462,7 +490,10 @@ modulus{T <: ResElem}(a::SeriesElem{T})
 > Return the modulus of the coefficients of the given polynomial.
 
 
-<a id='Nemo.iszero-Tuple{Nemo.SeriesElem{T}}' href='#Nemo.iszero-Tuple{Nemo.SeriesElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L182' class='documenter-source'>source</a><br>
+
+<a id='Nemo.iszero-Tuple{Nemo.SeriesElem}' href='#Nemo.iszero-Tuple{Nemo.SeriesElem}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
 
 
@@ -474,7 +505,10 @@ iszero(a::SeriesElem)
 > Return `true` if the given power series is arithmetically equal to zero to its current precision, otherwise return `false`.
 
 
-<a id='Nemo.isone-Tuple{Nemo.SeriesElem{T}}' href='#Nemo.isone-Tuple{Nemo.SeriesElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L132' class='documenter-source'>source</a><br>
+
+<a id='Nemo.isone-Tuple{Nemo.SeriesElem}' href='#Nemo.isone-Tuple{Nemo.SeriesElem}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
 
 
@@ -486,7 +520,10 @@ isone(a::SeriesElem)
 > Return `true` if the given power series is arithmetically equal to one to its current precision, otherwise return `false`.
 
 
-<a id='Nemo.isgen-Tuple{Nemo.SeriesElem{T}}' href='#Nemo.isgen-Tuple{Nemo.SeriesElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L139' class='documenter-source'>source</a><br>
+
+<a id='Nemo.isgen-Tuple{Nemo.SeriesElem}' href='#Nemo.isgen-Tuple{Nemo.SeriesElem}'>#</a>
 **`Nemo.isgen`** &mdash; *Method*.
 
 
@@ -498,7 +535,10 @@ isgen(a::SeriesElem)
 > Return `true` if the given power series is arithmetically equal to the generator of its power series ring to its current precision, otherwise return `false`.
 
 
-<a id='Nemo.isunit-Tuple{Nemo.SeriesElem{T}}' href='#Nemo.isunit-Tuple{Nemo.SeriesElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L148' class='documenter-source'>source</a><br>
+
+<a id='Nemo.isunit-Tuple{Nemo.SeriesElem}' href='#Nemo.isunit-Tuple{Nemo.SeriesElem}'>#</a>
 **`Nemo.isunit`** &mdash; *Method*.
 
 
@@ -509,6 +549,9 @@ isunit(a::SeriesElem)
 
 > Return `true` if the given power series is arithmetically equal to a unit, i.e. is invertible, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L158' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of power series.
@@ -545,7 +588,7 @@ W = parent(t + 1)
 
 All the usual arithmetic operators are overloaded for Nemo power series. Note that Julia uses the single slash for floating point division. Therefore to perform exact division in a ring we use `divexact`. To construct an element of a fraction field one can use the double slash operator `//`.
 
-<a id='Base.--Tuple{Nemo.SeriesElem{T}}' href='#Base.--Tuple{Nemo.SeriesElem{T}}'>#</a>
+<a id='Base.--Tuple{Nemo.SeriesElem}' href='#Base.--Tuple{Nemo.SeriesElem}'>#</a>
 **`Base.-`** &mdash; *Method*.
 
 
@@ -555,6 +598,9 @@ All the usual arithmetic operators are overloaded for Nemo power series. Note th
 ```
 
 Unary minus operator.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L636-640' class='documenter-source'>source</a><br>
 
 <a id='Base.+-Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},Nemo.SeriesElem{T<:Nemo.RingElem}}' href='#Base.+-Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},Nemo.SeriesElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.+`** &mdash; *Method*.
@@ -568,11 +614,19 @@ Unary minus operator.
 > Return $a + b$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L291' class='documenter-source'>source</a><br>
+
+
 ```
 +{T <: RingElem}(a::T, b::SeriesElem{T})
 ```
 
 > Return $a + b$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L467' class='documenter-source'>source</a><br>
 
 
 ```
@@ -582,9 +636,22 @@ Unary minus operator.
 > Return $a + b$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L485' class='documenter-source'>source</a><br>
+
 <a id='Base.--Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},Nemo.SeriesElem{T<:Nemo.RingElem}}' href='#Base.--Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},Nemo.SeriesElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.-`** &mdash; *Method*.
 
+
+
+```
+-(x, y)
+```
+
+Subtraction operator.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
 
 
 ```
@@ -594,11 +661,19 @@ Unary minus operator.
 > Return $a - b$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L323' class='documenter-source'>source</a><br>
+
+
 ```
 -{T <: RingElem}(a::T, b::SeriesElem{T})
 ```
 
 > Return $a - b$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L503' class='documenter-source'>source</a><br>
 
 
 ```
@@ -608,15 +683,22 @@ Unary minus operator.
 > Return $a - b$.
 
 
-```
--(x, y)
-```
 
-Subtraction operator.
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L521' class='documenter-source'>source</a><br>
 
 <a id='Base.*-Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},Nemo.SeriesElem{T<:Nemo.RingElem}}' href='#Base.*-Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},Nemo.SeriesElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.*`** &mdash; *Method*.
 
+
+
+```
+*(x, y...)
+```
+
+Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
 
 
 ```
@@ -626,11 +708,19 @@ Subtraction operator.
 > Return $a\times b$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L355' class='documenter-source'>source</a><br>
+
+
 ```
 *{T <: RingElem}(a::T, b::SeriesElem{T})
 ```
 
 > Return $a\times b$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L401' class='documenter-source'>source</a><br>
 
 
 ```
@@ -640,11 +730,8 @@ Subtraction operator.
 > Return $a\times b$.
 
 
-```
-*(x, y...)
-```
 
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L449' class='documenter-source'>source</a><br>
 
 <a id='Nemo.divexact-Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},Nemo.SeriesElem{T<:Nemo.RingElem}}' href='#Nemo.divexact-Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},Nemo.SeriesElem{T<:Nemo.RingElem}}'>#</a>
 **`Nemo.divexact`** &mdash; *Method*.
@@ -658,6 +745,10 @@ divexact{T <: RingElem}(a::SeriesElem{T}, b::SeriesElem{T})
 > Return $a/b$. Requires $b$ to be invertible.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L785' class='documenter-source'>source</a><br>
+
+
 ```
 divexact{T <: RingElem}(a::SeriesElem{T}, b::T)
 ```
@@ -666,9 +757,12 @@ divexact{T <: RingElem}(a::SeriesElem{T}, b::T)
 
 
 
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L842' class='documenter-source'>source</a><br>
+
+
 The following ad hoc operators are also provided.
 
-<a id='Base.+-Tuple{Integer,Nemo.SeriesElem{T}}' href='#Base.+-Tuple{Integer,Nemo.SeriesElem{T}}'>#</a>
+<a id='Base.+-Tuple{Integer,Nemo.SeriesElem}' href='#Base.+-Tuple{Integer,Nemo.SeriesElem}'>#</a>
 **`Base.+`** &mdash; *Method*.
 
 
@@ -680,7 +774,10 @@ The following ad hoc operators are also provided.
 > Return $a + b$.
 
 
-<a id='Base.+-Tuple{Nemo.SeriesElem{T},Integer}' href='#Base.+-Tuple{Nemo.SeriesElem{T},Integer}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L473' class='documenter-source'>source</a><br>
+
+<a id='Base.+-Tuple{Nemo.SeriesElem,Integer}' href='#Base.+-Tuple{Nemo.SeriesElem,Integer}'>#</a>
 **`Base.+`** &mdash; *Method*.
 
 
@@ -692,7 +789,10 @@ The following ad hoc operators are also provided.
 > Return $a + b$.
 
 
-<a id='Base.+-Tuple{Nemo.fmpz,Nemo.SeriesElem{T}}' href='#Base.+-Tuple{Nemo.fmpz,Nemo.SeriesElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L491' class='documenter-source'>source</a><br>
+
+<a id='Base.+-Tuple{Nemo.fmpz,Nemo.SeriesElem}' href='#Base.+-Tuple{Nemo.fmpz,Nemo.SeriesElem}'>#</a>
 **`Base.+`** &mdash; *Method*.
 
 
@@ -704,7 +804,10 @@ The following ad hoc operators are also provided.
 > Return $a + b$.
 
 
-<a id='Base.+-Tuple{Nemo.SeriesElem{T},Nemo.fmpz}' href='#Base.+-Tuple{Nemo.SeriesElem{T},Nemo.fmpz}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L479' class='documenter-source'>source</a><br>
+
+<a id='Base.+-Tuple{Nemo.SeriesElem,Nemo.fmpz}' href='#Base.+-Tuple{Nemo.SeriesElem,Nemo.fmpz}'>#</a>
 **`Base.+`** &mdash; *Method*.
 
 
@@ -715,6 +818,9 @@ The following ad hoc operators are also provided.
 
 > Return $a + b$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L497' class='documenter-source'>source</a><br>
 
 <a id='Base.+-Tuple{T<:Nemo.RingElem,Nemo.SeriesElem{T<:Nemo.RingElem}}' href='#Base.+-Tuple{T<:Nemo.RingElem,Nemo.SeriesElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.+`** &mdash; *Method*.
@@ -728,6 +834,9 @@ The following ad hoc operators are also provided.
 > Return $a + b$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L467' class='documenter-source'>source</a><br>
+
 <a id='Base.+-Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.+-Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
 **`Base.+`** &mdash; *Method*.
 
@@ -740,9 +849,22 @@ The following ad hoc operators are also provided.
 > Return $a + b$.
 
 
-<a id='Base.--Tuple{Integer,Nemo.SeriesElem{T}}' href='#Base.--Tuple{Integer,Nemo.SeriesElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L485' class='documenter-source'>source</a><br>
+
+<a id='Base.--Tuple{Integer,Nemo.SeriesElem}' href='#Base.--Tuple{Integer,Nemo.SeriesElem}'>#</a>
 **`Base.-`** &mdash; *Method*.
 
+
+
+```
+-(x, y)
+```
+
+Subtraction operator.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
 
 
 ```
@@ -752,15 +874,22 @@ The following ad hoc operators are also provided.
 > Return $a - b$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L509' class='documenter-source'>source</a><br>
+
+<a id='Base.--Tuple{Nemo.SeriesElem,Integer}' href='#Base.--Tuple{Nemo.SeriesElem,Integer}'>#</a>
+**`Base.-`** &mdash; *Method*.
+
+
+
 ```
 -(x, y)
 ```
 
 Subtraction operator.
 
-<a id='Base.--Tuple{Nemo.SeriesElem{T},Integer}' href='#Base.--Tuple{Nemo.SeriesElem{T},Integer}'>#</a>
-**`Base.-`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
 
 
 ```
@@ -770,15 +899,22 @@ Subtraction operator.
 > Return $a - b$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L527' class='documenter-source'>source</a><br>
+
+<a id='Base.--Tuple{Nemo.fmpz,Nemo.SeriesElem}' href='#Base.--Tuple{Nemo.fmpz,Nemo.SeriesElem}'>#</a>
+**`Base.-`** &mdash; *Method*.
+
+
+
 ```
 -(x, y)
 ```
 
 Subtraction operator.
 
-<a id='Base.--Tuple{Nemo.fmpz,Nemo.SeriesElem{T}}' href='#Base.--Tuple{Nemo.fmpz,Nemo.SeriesElem{T}}'>#</a>
-**`Base.-`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
 
 
 ```
@@ -788,15 +924,22 @@ Subtraction operator.
 > Return $a - b$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L515' class='documenter-source'>source</a><br>
+
+<a id='Base.--Tuple{Nemo.SeriesElem,Nemo.fmpz}' href='#Base.--Tuple{Nemo.SeriesElem,Nemo.fmpz}'>#</a>
+**`Base.-`** &mdash; *Method*.
+
+
+
 ```
 -(x, y)
 ```
 
 Subtraction operator.
 
-<a id='Base.--Tuple{Nemo.SeriesElem{T},Nemo.fmpz}' href='#Base.--Tuple{Nemo.SeriesElem{T},Nemo.fmpz}'>#</a>
-**`Base.-`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
 
 
 ```
@@ -806,15 +949,22 @@ Subtraction operator.
 > Return $a - b$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L533' class='documenter-source'>source</a><br>
+
+<a id='Base.--Tuple{T<:Nemo.RingElem,Nemo.SeriesElem{T<:Nemo.RingElem}}' href='#Base.--Tuple{T<:Nemo.RingElem,Nemo.SeriesElem{T<:Nemo.RingElem}}'>#</a>
+**`Base.-`** &mdash; *Method*.
+
+
+
 ```
 -(x, y)
 ```
 
 Subtraction operator.
 
-<a id='Base.--Tuple{T<:Nemo.RingElem,Nemo.SeriesElem{T<:Nemo.RingElem}}' href='#Base.--Tuple{T<:Nemo.RingElem,Nemo.SeriesElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.-`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
 
 
 ```
@@ -824,15 +974,22 @@ Subtraction operator.
 > Return $a - b$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L503' class='documenter-source'>source</a><br>
+
+<a id='Base.--Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.--Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
+**`Base.-`** &mdash; *Method*.
+
+
+
 ```
 -(x, y)
 ```
 
 Subtraction operator.
 
-<a id='Base.--Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.--Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
-**`Base.-`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
 
 
 ```
@@ -842,13 +999,10 @@ Subtraction operator.
 > Return $a - b$.
 
 
-```
--(x, y)
-```
 
-Subtraction operator.
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L521' class='documenter-source'>source</a><br>
 
-<a id='Base.*-Tuple{Integer,Nemo.SeriesElem{T}}' href='#Base.*-Tuple{Integer,Nemo.SeriesElem{T}}'>#</a>
+<a id='Base.*-Tuple{Integer,Nemo.SeriesElem}' href='#Base.*-Tuple{Integer,Nemo.SeriesElem}'>#</a>
 **`Base.*`** &mdash; *Method*.
 
 
@@ -859,9 +1013,22 @@ Subtraction operator.
 
 Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
 
-<a id='Base.*-Tuple{Nemo.SeriesElem{T},Integer}' href='#Base.*-Tuple{Nemo.SeriesElem{T},Integer}'>#</a>
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
+
+<a id='Base.*-Tuple{Nemo.SeriesElem,Integer}' href='#Base.*-Tuple{Nemo.SeriesElem,Integer}'>#</a>
 **`Base.*`** &mdash; *Method*.
 
+
+
+```
+*(x, y...)
+```
+
+Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
 
 
 ```
@@ -871,13 +1038,10 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 > Return $a\times b$.
 
 
-```
-*(x, y...)
-```
 
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L455' class='documenter-source'>source</a><br>
 
-<a id='Base.*-Tuple{Nemo.fmpz,Nemo.SeriesElem{T}}' href='#Base.*-Tuple{Nemo.fmpz,Nemo.SeriesElem{T}}'>#</a>
+<a id='Base.*-Tuple{Nemo.fmpz,Nemo.SeriesElem}' href='#Base.*-Tuple{Nemo.fmpz,Nemo.SeriesElem}'>#</a>
 **`Base.*`** &mdash; *Method*.
 
 
@@ -888,9 +1052,33 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 
 Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
 
-<a id='Base.*-Tuple{Nemo.SeriesElem{T},Nemo.fmpz}' href='#Base.*-Tuple{Nemo.SeriesElem{T},Nemo.fmpz}'>#</a>
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
+
+<a id='Base.*-Tuple{Nemo.SeriesElem,Nemo.fmpz}' href='#Base.*-Tuple{Nemo.SeriesElem,Nemo.fmpz}'>#</a>
 **`Base.*`** &mdash; *Method*.
 
+
+
+```
+*(x, y...)
+```
+
+Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
+
+
+```
+*{T <: RingElem}(a::SeriesElem{T}, b::T)
+```
+
+> Return $a\times b$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L449' class='documenter-source'>source</a><br>
 
 
 ```
@@ -900,11 +1088,12 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 > Return $a\times b$.
 
 
-```
-*{T <: RingElem}(a::SeriesElem{T}, b::T)
-```
 
-> Return $a\times b$.
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L461' class='documenter-source'>source</a><br>
+
+<a id='Base.*-Tuple{T<:Nemo.RingElem,Nemo.SeriesElem{T<:Nemo.RingElem}}' href='#Base.*-Tuple{T<:Nemo.RingElem,Nemo.SeriesElem{T<:Nemo.RingElem}}'>#</a>
+**`Base.*`** &mdash; *Method*.
+
 
 
 ```
@@ -913,9 +1102,8 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 
 Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
 
-<a id='Base.*-Tuple{T<:Nemo.RingElem,Nemo.SeriesElem{T<:Nemo.RingElem}}' href='#Base.*-Tuple{T<:Nemo.RingElem,Nemo.SeriesElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.*`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
 
 
 ```
@@ -925,15 +1113,22 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 > Return $a\times b$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L401' class='documenter-source'>source</a><br>
+
+<a id='Base.*-Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.*-Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
+**`Base.*`** &mdash; *Method*.
+
+
+
 ```
 *(x, y...)
 ```
 
 Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
 
-<a id='Base.*-Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.*-Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
-**`Base.*`** &mdash; *Method*.
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
 
 
 ```
@@ -943,286 +1138,15 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 > Return $a\times b$.
 
 
-```
-*(x, y...)
-```
 
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L449' class='documenter-source'>source</a><br>
 
-<a id='Nemo.divexact-Tuple{Nemo.SeriesElem{T},Integer}' href='#Nemo.divexact-Tuple{Nemo.SeriesElem{T},Integer}'>#</a>
+<a id='Nemo.divexact-Tuple{Nemo.SeriesElem,Integer}' href='#Nemo.divexact-Tuple{Nemo.SeriesElem,Integer}'>#</a>
 **`Nemo.divexact`** &mdash; *Method*.
 
 
-
-```
-divexact{T <: RingElem}(a::T, b::FracElem{T})
-```
-
-> Return $a/b$.
-
-
-```
-divexact{T <: RingElem}(a::FracElem{T}, b::T)
-```
-
-> Return $a/b$.
-
-
-```
-divexact(a::fmpz, b::FracElem)
-```
-
-> Return $a/b$.
-
-
-```
-divexact(a::FracElem, b::fmpz)
-```
-
-> Return $a/b$.
-
-
-```
-divexact(a::Integer, b::FracElem)
-```
-
-> Return $a/b$.
-
-
-```
-divexact(a::FracElem, b::Integer)
-```
-
-> Return $a/b$.
-
-
-```
-divexact{T <: RingElem}(a::FracElem{T}, b::FracElem{T})
-```
-
-> Return $a/b$.
-
-
-```
-divexact{T <: RingElem}(x::MatElem{T}, y::T)
-```
-
-> Return $x/y$, i.e. the matrix where each of the entries has been divided by $y$. Each division is expected to be exact.
-
-
-```
-divexact(x::MatElem, y::fmpz)
-```
-
-> Return $x/y$, i.e. the matrix where each of the entries has been divided by $y$. Each division is expected to be exact.
-
-
-```
-divexact(x::MatElem, y::Integer)
-```
-
-> Return $x/y$, i.e. the matrix where each of the entries has been divided by $y$. Each division is expected to be exact.
-
-
-```
-divexact{T <: RingElem}(a::SeriesElem{T}, b::T)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-```
-divexact{T <: RingElem}(a::SeriesElem{T}, b::fmpz)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-```
-divexact{T <: RingElem}(a::SeriesElem{T}, b::Integer)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-```
-divexact{T <: RingElem}(a::SeriesElem{T}, b::SeriesElem{T})
-```
-
-> Return $a/b$. Requires $b$ to be invertible.
-
-
-```
-divexact(a::PolyElem, b::fmpz)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-```
-divexact(a::PolyElem, b::Integer)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-```
-divexact{T <: RingElem}(a::PolyElem{T}, b::T)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-```
-divexact{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-```
-divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-<a id='Nemo.divexact-Tuple{Nemo.SeriesElem{T},Nemo.fmpz}' href='#Nemo.divexact-Tuple{Nemo.SeriesElem{T},Nemo.fmpz}'>#</a>
+<a id='Nemo.divexact-Tuple{Nemo.SeriesElem,Nemo.fmpz}' href='#Nemo.divexact-Tuple{Nemo.SeriesElem,Nemo.fmpz}'>#</a>
 **`Nemo.divexact`** &mdash; *Method*.
-
-
-
-```
-divexact{T <: RingElem}(a::T, b::FracElem{T})
-```
-
-> Return $a/b$.
-
-
-```
-divexact{T <: RingElem}(a::FracElem{T}, b::T)
-```
-
-> Return $a/b$.
-
-
-```
-divexact(a::fmpz, b::FracElem)
-```
-
-> Return $a/b$.
-
-
-```
-divexact(a::FracElem, b::fmpz)
-```
-
-> Return $a/b$.
-
-
-```
-divexact(a::Integer, b::FracElem)
-```
-
-> Return $a/b$.
-
-
-```
-divexact(a::FracElem, b::Integer)
-```
-
-> Return $a/b$.
-
-
-```
-divexact{T <: RingElem}(a::FracElem{T}, b::FracElem{T})
-```
-
-> Return $a/b$.
-
-
-```
-divexact{T <: RingElem}(x::MatElem{T}, y::T)
-```
-
-> Return $x/y$, i.e. the matrix where each of the entries has been divided by $y$. Each division is expected to be exact.
-
-
-```
-divexact(x::MatElem, y::fmpz)
-```
-
-> Return $x/y$, i.e. the matrix where each of the entries has been divided by $y$. Each division is expected to be exact.
-
-
-```
-divexact(x::MatElem, y::Integer)
-```
-
-> Return $x/y$, i.e. the matrix where each of the entries has been divided by $y$. Each division is expected to be exact.
-
-
-```
-divexact{T <: RingElem}(a::SeriesElem{T}, b::T)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-```
-divexact{T <: RingElem}(a::SeriesElem{T}, b::fmpz)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-```
-divexact{T <: RingElem}(a::SeriesElem{T}, b::Integer)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-```
-divexact{T <: RingElem}(a::SeriesElem{T}, b::SeriesElem{T})
-```
-
-> Return $a/b$. Requires $b$ to be invertible.
-
-
-```
-divexact(a::PolyElem, b::fmpz)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-```
-divexact(a::PolyElem, b::Integer)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-```
-divexact{T <: RingElem}(a::PolyElem{T}, b::T)
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-```
-divexact{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-```
-divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
 
 
 <a id='Nemo.divexact-Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Nemo.divexact-Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
@@ -1237,7 +1161,10 @@ divexact{T <: RingElem}(a::SeriesElem{T}, b::T)
 > Return $a/b$ where the quotient is expected to be exact.
 
 
-<a id='Base.^-Tuple{Nemo.SeriesElem{T},Int64}' href='#Base.^-Tuple{Nemo.SeriesElem{T},Int64}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L842' class='documenter-source'>source</a><br>
+
+<a id='Base.^-Tuple{Nemo.SeriesElem,Int64}' href='#Base.^-Tuple{Nemo.SeriesElem,Int64}'>#</a>
 **`Base.^`** &mdash; *Method*.
 
 
@@ -1247,6 +1174,9 @@ divexact{T <: RingElem}(a::SeriesElem{T}, b::T)
 ```
 
 Exponentiation operator.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L4495-4499' class='documenter-source'>source</a><br>
 
 
 If the appropriate `promote_rule` and coercion exists, these operators can also be used with elements of other rings. Nemo will try to coerce the operands to the dominating type and then apply the operator.
@@ -1300,11 +1230,19 @@ The following comparison operators are implemented for power series in Nemo.
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall that power series to different precisions may still be arithmetically equal to the minimum of the two precisions.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L679' class='documenter-source'>source</a><br>
+
+
 ```
 =={T <: RingElem}(x::SeriesElem{T}, y::T)
 ```
 
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L740' class='documenter-source'>source</a><br>
 
 
 ```
@@ -1313,6 +1251,9 @@ The following comparison operators are implemented for power series in Nemo.
 
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L747' class='documenter-source'>source</a><br>
 
 <a id='Base.isequal-Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},Nemo.SeriesElem{T<:Nemo.RingElem}}' href='#Base.isequal-Tuple{Nemo.SeriesElem{T<:Nemo.RingElem},Nemo.SeriesElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.isequal`** &mdash; *Method*.
@@ -1325,6 +1266,9 @@ isequal{T <: RingElem}(x::SeriesElem{T}, y::SeriesElem{T})
 
 > Return `true` if $x == y$ exactly, otherwise return `false`. Only if the power series are precisely the same, to the same precision, are they declared equal by this function.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L713' class='documenter-source'>source</a><br>
 
 
 In addition we have the following ad hoc comparison operators.
@@ -1341,6 +1285,9 @@ In addition we have the following ad hoc comparison operators.
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L740' class='documenter-source'>source</a><br>
+
 <a id='Base.==-Tuple{T<:Nemo.RingElem,Nemo.SeriesElem{T<:Nemo.RingElem}}' href='#Base.==-Tuple{T<:Nemo.RingElem,Nemo.SeriesElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.==`** &mdash; *Method*.
 
@@ -1353,7 +1300,10 @@ In addition we have the following ad hoc comparison operators.
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 
 
-<a id='Base.==-Tuple{Nemo.SeriesElem{T},Integer}' href='#Base.==-Tuple{Nemo.SeriesElem{T},Integer}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L747' class='documenter-source'>source</a><br>
+
+<a id='Base.==-Tuple{Nemo.SeriesElem,Integer}' href='#Base.==-Tuple{Nemo.SeriesElem,Integer}'>#</a>
 **`Base.==`** &mdash; *Method*.
 
 
@@ -1365,7 +1315,10 @@ In addition we have the following ad hoc comparison operators.
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 
 
-<a id='Base.==-Tuple{Integer,Nemo.SeriesElem{T}}' href='#Base.==-Tuple{Integer,Nemo.SeriesElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L753' class='documenter-source'>source</a><br>
+
+<a id='Base.==-Tuple{Integer,Nemo.SeriesElem}' href='#Base.==-Tuple{Integer,Nemo.SeriesElem}'>#</a>
 **`Base.==`** &mdash; *Method*.
 
 
@@ -1377,7 +1330,10 @@ In addition we have the following ad hoc comparison operators.
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 
 
-<a id='Base.==-Tuple{Nemo.SeriesElem{T},Nemo.fmpz}' href='#Base.==-Tuple{Nemo.SeriesElem{T},Nemo.fmpz}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L767' class='documenter-source'>source</a><br>
+
+<a id='Base.==-Tuple{Nemo.SeriesElem,Nemo.fmpz}' href='#Base.==-Tuple{Nemo.SeriesElem,Nemo.fmpz}'>#</a>
 **`Base.==`** &mdash; *Method*.
 
 
@@ -1389,7 +1345,10 @@ In addition we have the following ad hoc comparison operators.
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 
 
-<a id='Base.==-Tuple{Nemo.fmpz,Nemo.SeriesElem{T}}' href='#Base.==-Tuple{Nemo.fmpz,Nemo.SeriesElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L760' class='documenter-source'>source</a><br>
+
+<a id='Base.==-Tuple{Nemo.fmpz,Nemo.SeriesElem}' href='#Base.==-Tuple{Nemo.fmpz,Nemo.SeriesElem}'>#</a>
 **`Base.==`** &mdash; *Method*.
 
 
@@ -1400,6 +1359,9 @@ In addition we have the following ad hoc comparison operators.
 
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L773' class='documenter-source'>source</a><br>
 
 
 Here are some examples of comparisons.
@@ -1430,42 +1392,12 @@ fmpz(1) == c
 
 ## Shifting
 
-<a id='Nemo.shift_left-Tuple{Nemo.SeriesElem{T},Int64}' href='#Nemo.shift_left-Tuple{Nemo.SeriesElem{T},Int64}'>#</a>
+<a id='Nemo.shift_left-Tuple{Nemo.SeriesElem,Int64}' href='#Nemo.shift_left-Tuple{Nemo.SeriesElem,Int64}'>#</a>
 **`Nemo.shift_left`** &mdash; *Method*.
 
 
-
-```
-shift_left(x::SeriesElem, n::Int)
-```
-
-> Return the power series $f$ shifted left by $n$ terms, i.e. multiplied by $x^n$.
-
-
-```
-shift_left(x::PolyElem, n::Int)
-```
-
-> Return the polynomial $f$ shifted left by $n$ terms, i.e. multiplied by $x^n$.
-
-
-<a id='Nemo.shift_right-Tuple{Nemo.SeriesElem{T},Int64}' href='#Nemo.shift_right-Tuple{Nemo.SeriesElem{T},Int64}'>#</a>
+<a id='Nemo.shift_right-Tuple{Nemo.SeriesElem,Int64}' href='#Nemo.shift_right-Tuple{Nemo.SeriesElem,Int64}'>#</a>
 **`Nemo.shift_right`** &mdash; *Method*.
-
-
-
-```
-shift_right(f::SeriesElem, n::Int)
-```
-
-> Return the power series $f$ shifted right by $n$ terms, i.e. divided by $x^n$.
-
-
-```
-shift_right(f::PolyElem, n::Int)
-```
-
-> Return the polynomial $f$ shifted right by $n$ terms, i.e. divided by $x^n$.
 
 
 
@@ -1492,29 +1424,8 @@ k = shift_right(d, 3)
 
 ## Truncation
 
-<a id='Base.truncate-Tuple{Nemo.SeriesElem{T},Int64}' href='#Base.truncate-Tuple{Nemo.SeriesElem{T},Int64}'>#</a>
+<a id='Base.truncate-Tuple{Nemo.SeriesElem,Int64}' href='#Base.truncate-Tuple{Nemo.SeriesElem,Int64}'>#</a>
 **`Base.truncate`** &mdash; *Method*.
-
-
-
-```
-truncate(file,n)
-```
-
-Resize the file or buffer given by the first argument to exactly `n` bytes, filling previously unallocated space with '\0' if the file or buffer is grown
-
-```
-truncate(a::SeriesElem, n::Int)
-```
-
-> Return $a$ truncated to $n$ terms.
-
-
-```
-truncate(a::PolyElem, n::Int)
-```
-
-> Return $a$ truncated to $n$ terms.
 
 
 
@@ -1541,7 +1452,7 @@ k = truncate(d, 5)
 
 ## Inverse
 
-<a id='Base.inv-Tuple{Nemo.SeriesElem{T}}' href='#Base.inv-Tuple{Nemo.SeriesElem{T}}'>#</a>
+<a id='Base.inv-Tuple{Nemo.SeriesElem}' href='#Base.inv-Tuple{Nemo.SeriesElem}'>#</a>
 **`Base.inv`** &mdash; *Method*.
 
 
@@ -1550,6 +1461,9 @@ inv(a::SeriesElem)
 
 > Return the inverse of the power series $a$, i.e. $1/a$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L864' class='documenter-source'>source</a><br>
 
 
 Here are some examples of taking the inverse.
@@ -1571,7 +1485,7 @@ d = inv(b)
 
 ## Special functions
 
-<a id='Base.exp-Tuple{Nemo.SeriesElem{T}}' href='#Base.exp-Tuple{Nemo.SeriesElem{T}}'>#</a>
+<a id='Base.exp-Tuple{Nemo.SeriesElem}' href='#Base.exp-Tuple{Nemo.SeriesElem}'>#</a>
 **`Base.exp`** &mdash; *Method*.
 
 
@@ -1584,16 +1498,14 @@ exp(a::SeriesElem)
 
 
 
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/generic/RelSeries.jl#L896' class='documenter-source'>source</a><br>
+
+
 The following special functions are only available for certain rings.
 
 <a id='Base.log-Tuple{Nemo.fmpq_rel_series}' href='#Base.log-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.log`** &mdash; *Method*.
 
-
-
-log(a::fmpq_rel_series)
-
-> Return log$(a)$. Requires the constant term to be one.
 
 
 ```
@@ -1603,6 +1515,18 @@ log(x)
 Compute the natural logarithm of `x`. Throws `DomainError` for negative `Real` arguments. Use complex negative arguments to obtain complex results.
 
 There is an experimental variant in the `Base.Math.JuliaLibm` module, which is typically faster and more accurate.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L3536-3544' class='documenter-source'>source</a><br>
+
+
+log(a::fmpq_rel_series)
+
+> Return log$(a)$. Requires the constant term to be one.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/flint/fmpq_rel_series.jl#L464' class='documenter-source'>source</a><br>
 
 <a id='Base.sqrt-Tuple{Nemo.fmpq_rel_series}' href='#Base.sqrt-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.sqrt`** &mdash; *Method*.
@@ -1614,6 +1538,9 @@ sqrt(a::fmpq_rel_series)
 > Return the power series square root of $a$. Requires a constant term equal to one.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/flint/fmpq_rel_series.jl#L651' class='documenter-source'>source</a><br>
+
 <a id='Base.tan-Tuple{Nemo.fmpq_rel_series}' href='#Base.tan-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.tan`** &mdash; *Method*.
 
@@ -1623,6 +1550,9 @@ tan(a::fmpq_rel_series)
 
 > Return tan$(a)$. Requires a zero constant term.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/flint/fmpq_rel_series.jl#L481' class='documenter-source'>source</a><br>
 
 <a id='Base.tanh-Tuple{Nemo.fmpq_rel_series}' href='#Base.tanh-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.tanh`** &mdash; *Method*.
@@ -1634,6 +1564,9 @@ tanh(a::fmpq_rel_series)
 > Return tanh$(a)$. Requires a zero constant term.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/flint/fmpq_rel_series.jl#L498' class='documenter-source'>source</a><br>
+
 <a id='Base.sin-Tuple{Nemo.fmpq_rel_series}' href='#Base.sin-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.sin`** &mdash; *Method*.
 
@@ -1643,6 +1576,9 @@ sin(a::fmpq_rel_series)
 
 > Return sin$(a)$. Requires a zero constant term.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/flint/fmpq_rel_series.jl#L515' class='documenter-source'>source</a><br>
 
 <a id='Base.sinh-Tuple{Nemo.fmpq_rel_series}' href='#Base.sinh-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.sinh`** &mdash; *Method*.
@@ -1654,6 +1590,9 @@ sinh(a::fmpq_rel_series)
 > Return sinh$(a)$. Requires a zero constant term.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/flint/fmpq_rel_series.jl#L532' class='documenter-source'>source</a><br>
+
 <a id='Base.cos-Tuple{Nemo.fmpq_rel_series}' href='#Base.cos-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.cos`** &mdash; *Method*.
 
@@ -1663,6 +1602,9 @@ cos(a::fmpq_rel_series)
 
 > Return cos$(a)$. Requires a zero constant term.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/flint/fmpq_rel_series.jl#L549' class='documenter-source'>source</a><br>
 
 <a id='Base.cosh-Tuple{Nemo.fmpq_rel_series}' href='#Base.cosh-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.cosh`** &mdash; *Method*.
@@ -1674,6 +1616,9 @@ cosh(a::fmpq_rel_series)
 > Return cosh$(a)$. Requires a zero constant term.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/flint/fmpq_rel_series.jl#L566' class='documenter-source'>source</a><br>
+
 <a id='Base.asin-Tuple{Nemo.fmpq_rel_series}' href='#Base.asin-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.asin`** &mdash; *Method*.
 
@@ -1683,6 +1628,9 @@ asin(a::fmpq_rel_series)
 
 > Return asin$(a)$. Requires a zero constant term.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/flint/fmpq_rel_series.jl#L583' class='documenter-source'>source</a><br>
 
 <a id='Base.asinh-Tuple{Nemo.fmpq_rel_series}' href='#Base.asinh-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.asinh`** &mdash; *Method*.
@@ -1694,6 +1642,9 @@ asinh(a::fmpq_rel_series)
 > Return asinh$(a)$. Requires a zero constant term.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/flint/fmpq_rel_series.jl#L600' class='documenter-source'>source</a><br>
+
 <a id='Base.atan-Tuple{Nemo.fmpq_rel_series}' href='#Base.atan-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.atan`** &mdash; *Method*.
 
@@ -1704,6 +1655,9 @@ atan(a::fmpq_rel_series)
 > Return atan$(a)$. Requires a zero constant term.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/flint/fmpq_rel_series.jl#L617' class='documenter-source'>source</a><br>
+
 <a id='Base.atanh-Tuple{Nemo.fmpq_rel_series}' href='#Base.atanh-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.atanh`** &mdash; *Method*.
 
@@ -1713,6 +1667,9 @@ atanh(a::fmpq_rel_series)
 
 > Return atanh$(a)$. Requires a zero constant term.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/73562614f04fbf543aacd73feb832aff7b4fe899/src/flint/fmpq_rel_series.jl#L634' class='documenter-source'>source</a><br>
 
 
 Here are some examples of special functions.

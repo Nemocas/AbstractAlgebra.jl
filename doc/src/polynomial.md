@@ -23,6 +23,8 @@ $\mathbb{Z}/n\mathbb{Z}$ (large $n$)  | Flint               | `fmpz_mod_poly`   
 $\mathbb{Q}$                          | Flint               | `fmpq_poly`         | `FmpqPolyRing`
 $\mathbb{F}_{p^n}$ (small $n$)        | Flint               | `fq_nmod_poly`      | `FqNmodPolyRing`
 $\mathbb{F}_{p^n}$ (large $n$)        | Flint               | `fq_poly`           | `FqPolyRing`
+$\mathbb{R}$                          | Arb                 | `arb_poly`          | `ArbPolyRing`
+$\mathbb{C}$                          | Arb                 | `acb_poly`          | `AcbPolyRing`
 
 The string representation of the variable and the base ring $R$ of a generic
 polynomial is stored in its parent object. 
