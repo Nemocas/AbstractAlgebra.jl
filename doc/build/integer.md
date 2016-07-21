@@ -64,7 +64,7 @@ zero(R::FlintIntegerRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L141' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L141' class='documenter-source'>source</a><br>
 
 <a id='Base.one-Tuple{Nemo.FlintIntegerRing}' href='#Base.one-Tuple{Nemo.FlintIntegerRing}'>#</a>
 **`Base.one`** &mdash; *Method*.
@@ -79,7 +79,7 @@ one(R::FlintIntegerRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L135' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L135' class='documenter-source'>source</a><br>
 
 
 Here are some examples of constructing integers.
@@ -217,7 +217,7 @@ base_ring(a::FlintIntegerRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L61' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L61' class='documenter-source'>source</a><br>
 
 <a id='Nemo.base_ring-Tuple{Nemo.fmpz}' href='#Nemo.base_ring-Tuple{Nemo.fmpz}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
@@ -232,7 +232,7 @@ base_ring(a::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L67' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L67' class='documenter-source'>source</a><br>
 
 <a id='Base.parent-Tuple{Nemo.fmpz}' href='#Base.parent-Tuple{Nemo.fmpz}'>#</a>
 **`Base.parent`** &mdash; *Method*.
@@ -247,7 +247,7 @@ parent(a::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L53' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L53' class='documenter-source'>source</a><br>
 
 <a id='Nemo.iszero-Tuple{Nemo.fmpz}' href='#Nemo.iszero-Tuple{Nemo.fmpz}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
@@ -262,7 +262,7 @@ iszero(a::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L183' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L183' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isone-Tuple{Nemo.fmpz}' href='#Nemo.isone-Tuple{Nemo.fmpz}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
@@ -277,7 +277,7 @@ isone(a::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L189' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L189' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isunit-Tuple{Nemo.fmpz}' href='#Nemo.isunit-Tuple{Nemo.fmpz}'>#</a>
 **`Nemo.isunit`** &mdash; *Method*.
@@ -292,7 +292,7 @@ isunit(a::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L176' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L176' class='documenter-source'>source</a><br>
 
 <a id='Base.sign-Tuple{Nemo.fmpz}' href='#Base.sign-Tuple{Nemo.fmpz}'>#</a>
 **`Base.sign`** &mdash; *Method*.
@@ -307,7 +307,7 @@ sign(a::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L148' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L148' class='documenter-source'>source</a><br>
 
 <a id='Base.size-Tuple{Nemo.fmpz}' href='#Base.size-Tuple{Nemo.fmpz}'>#</a>
 **`Base.size`** &mdash; *Method*.
@@ -322,7 +322,7 @@ size(a::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L170' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L170' class='documenter-source'>source</a><br>
 
 <a id='Nemo.fits-Tuple{Type{UInt64},Nemo.fmpz}' href='#Nemo.fits-Tuple{Type{UInt64},Nemo.fmpz}'>#</a>
 **`Nemo.fits`** &mdash; *Method*.
@@ -337,7 +337,7 @@ fits(::Type{UInt}, a::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L162' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L162' class='documenter-source'>source</a><br>
 
 <a id='Nemo.fits-Tuple{Type{Int64},Nemo.fmpz}' href='#Nemo.fits-Tuple{Type{Int64},Nemo.fmpz}'>#</a>
 **`Nemo.fits`** &mdash; *Method*.
@@ -352,7 +352,7 @@ fits(::Type{Int}, a::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L154' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L154' class='documenter-source'>source</a><br>
 
 <a id='Base.den-Tuple{Nemo.fmpz}' href='#Base.den-Tuple{Nemo.fmpz}'>#</a>
 **`Base.den`** &mdash; *Method*.
@@ -367,7 +367,7 @@ den(a::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L195' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L195' class='documenter-source'>source</a><br>
 
 <a id='Base.num-Tuple{Nemo.fmpz}' href='#Base.num-Tuple{Nemo.fmpz}'>#</a>
 **`Base.num`** &mdash; *Method*.
@@ -382,7 +382,7 @@ num(a::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L203' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L203' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of integers.
@@ -605,7 +605,7 @@ See also [`>>`](:func:`>>`), [`>>>`](:func:`>>>`).
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L612' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L612' class='documenter-source'>source</a><br>
 
 <a id='Base.>>-Tuple{Nemo.fmpz,Int64}' href='#Base.>>-Tuple{Nemo.fmpz,Int64}'>#</a>
 **`Base.>>`** &mdash; *Method*.
@@ -652,7 +652,7 @@ See also [`>>>`](:func:`>>>`), [`<<`](:func:`<<`).
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L625' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L625' class='documenter-source'>source</a><br>
 
 
 Here are some examples of shifting.
@@ -683,7 +683,7 @@ mod(x::fmpz, y::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L644' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L644' class='documenter-source'>source</a><br>
 
 <a id='Base.mod-Tuple{Nemo.fmpz,Int64}' href='#Base.mod-Tuple{Nemo.fmpz,Int64}'>#</a>
 **`Base.mod`** &mdash; *Method*.
@@ -698,7 +698,7 @@ mod(x::fmpz, y::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L656' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L656' class='documenter-source'>source</a><br>
 
 <a id='Nemo.powmod-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz}' href='#Nemo.powmod-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz}'>#</a>
 **`Nemo.powmod`** &mdash; *Method*.
@@ -713,7 +713,7 @@ powmod(x::fmpz, p::fmpz, m::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L671' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L671' class='documenter-source'>source</a><br>
 
 <a id='Nemo.powmod-Tuple{Nemo.fmpz,Int64,Nemo.fmpz}' href='#Nemo.powmod-Tuple{Nemo.fmpz,Int64,Nemo.fmpz}'>#</a>
 **`Nemo.powmod`** &mdash; *Method*.
@@ -728,7 +728,7 @@ powmod(x::fmpz, p::Int, m::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L688' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L688' class='documenter-source'>source</a><br>
 
 <a id='Base.invmod-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Base.invmod-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
 **`Base.invmod`** &mdash; *Method*.
@@ -743,7 +743,7 @@ invmod(x::fmpz, m::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L705' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L705' class='documenter-source'>source</a><br>
 
 <a id='Nemo.sqrtmod-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Nemo.sqrtmod-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
 **`Nemo.sqrtmod`** &mdash; *Method*.
@@ -758,7 +758,7 @@ sqrtmod(x::fmpz, m::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L722' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L722' class='documenter-source'>source</a><br>
 
 <a id='Nemo.crt-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz,Nemo.fmpz,Bool}' href='#Nemo.crt-Tuple{Nemo.fmpz,Nemo.fmpz,Nemo.fmpz,Nemo.fmpz,Bool}'>#</a>
 **`Nemo.crt`** &mdash; *Method*.
@@ -773,7 +773,7 @@ crt(r1::fmpz, m1::fmpz, r2::fmpz, m2::fmpz, signed=false)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L738' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L738' class='documenter-source'>source</a><br>
 
 <a id='Nemo.crt-Tuple{Nemo.fmpz,Nemo.fmpz,Int64,Int64,Bool}' href='#Nemo.crt-Tuple{Nemo.fmpz,Nemo.fmpz,Int64,Int64,Bool}'>#</a>
 **`Nemo.crt`** &mdash; *Method*.
@@ -788,7 +788,7 @@ crt(r1::fmpz, m1::fmpz, r2::Int, m2::Int, signed=false)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L752' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L752' class='documenter-source'>source</a><br>
 
 
 Here are some examples of modular arithmetic.
@@ -820,7 +820,7 @@ flog(x::fmpz, c::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L774' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L774' class='documenter-source'>source</a><br>
 
 <a id='Nemo.flog-Tuple{Nemo.fmpz,Int64}' href='#Nemo.flog-Tuple{Nemo.fmpz,Int64}'>#</a>
 **`Nemo.flog`** &mdash; *Method*.
@@ -835,7 +835,7 @@ flog(x::fmpz, c::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L796' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L796' class='documenter-source'>source</a><br>
 
 <a id='Nemo.clog-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Nemo.clog-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
 **`Nemo.clog`** &mdash; *Method*.
@@ -850,7 +850,7 @@ clog(x::fmpz, c::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L785' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L785' class='documenter-source'>source</a><br>
 
 <a id='Nemo.clog-Tuple{Nemo.fmpz,Int64}' href='#Nemo.clog-Tuple{Nemo.fmpz,Int64}'>#</a>
 **`Nemo.clog`** &mdash; *Method*.
@@ -865,7 +865,7 @@ clog(x::fmpz, c::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L806' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L806' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing integer logarithms.
@@ -897,7 +897,7 @@ gcd(x::fmpz, y::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L822' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L822' class='documenter-source'>source</a><br>
 
 <a id='Base.lcm-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Base.lcm-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
 **`Base.lcm`** &mdash; *Method*.
@@ -912,7 +912,7 @@ lcm(x::fmpz, y::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L834' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L834' class='documenter-source'>source</a><br>
 
 <a id='Base.gcdx-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Base.gcdx-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
 **`Base.gcdx`** &mdash; *Method*.
@@ -927,7 +927,7 @@ gcdx(a::fmpz, b::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L852' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L852' class='documenter-source'>source</a><br>
 
 <a id='Nemo.gcdinv-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Nemo.gcdinv-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
 **`Nemo.gcdinv`** &mdash; *Method*.
@@ -942,7 +942,7 @@ gcdinv(a::fmpz, b::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L870' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L870' class='documenter-source'>source</a><br>
 
 
 Here are some examples of GCD and LCM.
@@ -976,7 +976,7 @@ isqrt(x::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L895' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L895' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isqrtrem-Tuple{Nemo.fmpz}' href='#Nemo.isqrtrem-Tuple{Nemo.fmpz}'>#</a>
 **`Nemo.isqrtrem`** &mdash; *Method*.
@@ -991,7 +991,7 @@ isqrtrem(x::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L906' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L906' class='documenter-source'>source</a><br>
 
 <a id='Nemo.root-Tuple{Nemo.fmpz,Int64}' href='#Nemo.root-Tuple{Nemo.fmpz,Int64}'>#</a>
 **`Nemo.root`** &mdash; *Method*.
@@ -1006,7 +1006,7 @@ root(x::fmpz, n::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L920' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L920' class='documenter-source'>source</a><br>
 
 
 Here are some examples of integer roots.
@@ -1038,7 +1038,7 @@ divisible(x::fmpz, y::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L951' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L951' class='documenter-source'>source</a><br>
 
 <a id='Nemo.divisible-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Nemo.divisible-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
 **`Nemo.divisible`** &mdash; *Method*.
@@ -1053,7 +1053,7 @@ divisible(x::fmpz, y::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L940' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L940' class='documenter-source'>source</a><br>
 
 <a id='Nemo.issquare-Tuple{Nemo.fmpz}' href='#Nemo.issquare-Tuple{Nemo.fmpz}'>#</a>
 **`Nemo.issquare`** &mdash; *Method*.
@@ -1068,7 +1068,7 @@ issquare(x::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L962' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L962' class='documenter-source'>source</a><br>
 
 <a id='Nemo.is_prime-Tuple{UInt64}' href='#Nemo.is_prime-Tuple{UInt64}'>#</a>
 **`Nemo.is_prime`** &mdash; *Method*.
@@ -1083,7 +1083,7 @@ is_prime(x::UInt)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L969' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L969' class='documenter-source'>source</a><br>
 
 <a id='Base.isprime-Tuple{Nemo.fmpz}' href='#Base.isprime-Tuple{Nemo.fmpz}'>#</a>
 **`Base.isprime`** &mdash; *Method*.
@@ -1098,7 +1098,7 @@ isprime(x::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L975' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L975' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isprobabprime-Tuple{Nemo.fmpz}' href='#Nemo.isprobabprime-Tuple{Nemo.fmpz}'>#</a>
 **`Nemo.isprobabprime`** &mdash; *Method*.
@@ -1113,7 +1113,7 @@ isprobabprime(x::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L983' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L983' class='documenter-source'>source</a><br>
 
 <a id='Nemo.remove-Tuple{Nemo.fmpz,Any}' href='#Nemo.remove-Tuple{Nemo.fmpz,Any}'>#</a>
 **`Nemo.remove`** &mdash; *Method*.
@@ -1132,7 +1132,7 @@ divisor_lenstra(n::fmpz, r::fmpz, m::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1004' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1004' class='documenter-source'>source</a><br>
 
 <a id='Nemo.fac-Tuple{Int64}' href='#Nemo.fac-Tuple{Int64}'>#</a>
 **`Nemo.fac`** &mdash; *Method*.
@@ -1147,7 +1147,7 @@ fac(x::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1023' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1023' class='documenter-source'>source</a><br>
 
 <a id='Nemo.risingfac-Tuple{Nemo.fmpz,Int64}' href='#Nemo.risingfac-Tuple{Nemo.fmpz,Int64}'>#</a>
 **`Nemo.risingfac`** &mdash; *Method*.
@@ -1162,7 +1162,7 @@ risingfac(x::fmpz, y::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1035' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1035' class='documenter-source'>source</a><br>
 
 <a id='Nemo.risingfac-Tuple{Int64,Int64}' href='#Nemo.risingfac-Tuple{Int64,Int64}'>#</a>
 **`Nemo.risingfac`** &mdash; *Method*.
@@ -1177,7 +1177,7 @@ risingfac(x::Int, y::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1048' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1048' class='documenter-source'>source</a><br>
 
 <a id='Nemo.primorial-Tuple{Int64}' href='#Nemo.primorial-Tuple{Int64}'>#</a>
 **`Nemo.primorial`** &mdash; *Method*.
@@ -1192,7 +1192,7 @@ primorial(x::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1068' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1068' class='documenter-source'>source</a><br>
 
 <a id='Nemo.fib-Tuple{Int64}' href='#Nemo.fib-Tuple{Int64}'>#</a>
 **`Nemo.fib`** &mdash; *Method*.
@@ -1207,7 +1207,7 @@ fib(x::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1081' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1081' class='documenter-source'>source</a><br>
 
 <a id='Nemo.bell-Tuple{Int64}' href='#Nemo.bell-Tuple{Int64}'>#</a>
 **`Nemo.bell`** &mdash; *Method*.
@@ -1222,7 +1222,7 @@ bell(x::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1095' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1095' class='documenter-source'>source</a><br>
 
 <a id='Nemo.binom-Tuple{Int64,Int64}' href='#Nemo.binom-Tuple{Int64,Int64}'>#</a>
 **`Nemo.binom`** &mdash; *Method*.
@@ -1237,7 +1237,7 @@ binom(n::Int, k::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1107' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1107' class='documenter-source'>source</a><br>
 
 <a id='Nemo.moebiusmu-Tuple{Nemo.fmpz}' href='#Nemo.moebiusmu-Tuple{Nemo.fmpz}'>#</a>
 **`Nemo.moebiusmu`** &mdash; *Method*.
@@ -1252,7 +1252,7 @@ moebiusmu(x::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1121' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1121' class='documenter-source'>source</a><br>
 
 <a id='Nemo.jacobi-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Nemo.jacobi-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
 **`Nemo.jacobi`** &mdash; *Method*.
@@ -1267,7 +1267,7 @@ jacobi(x::fmpz, y::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1132' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1132' class='documenter-source'>source</a><br>
 
 <a id='Nemo.sigma-Tuple{Nemo.fmpz,Int64}' href='#Nemo.sigma-Tuple{Nemo.fmpz,Int64}'>#</a>
 **`Nemo.sigma`** &mdash; *Method*.
@@ -1282,7 +1282,7 @@ sigma(x::fmpz, y::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1144' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1144' class='documenter-source'>source</a><br>
 
 <a id='Nemo.eulerphi-Tuple{Nemo.fmpz}' href='#Nemo.eulerphi-Tuple{Nemo.fmpz}'>#</a>
 **`Nemo.eulerphi`** &mdash; *Method*.
@@ -1297,7 +1297,7 @@ eulerphi(x::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1157' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1157' class='documenter-source'>source</a><br>
 
 <a id='Nemo.numpart-Tuple{Int64}' href='#Nemo.numpart-Tuple{Int64}'>#</a>
 **`Nemo.numpart`** &mdash; *Method*.
@@ -1312,7 +1312,7 @@ numpart(x::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1170' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1170' class='documenter-source'>source</a><br>
 
 <a id='Nemo.numpart-Tuple{Nemo.fmpz}' href='#Nemo.numpart-Tuple{Nemo.fmpz}'>#</a>
 **`Nemo.numpart`** &mdash; *Method*.
@@ -1327,7 +1327,7 @@ numpart(x::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1186' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1186' class='documenter-source'>source</a><br>
 
 
 Here are some examples of number theoretic functionality.
@@ -1359,7 +1359,7 @@ bin(n::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1208' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1208' class='documenter-source'>source</a><br>
 
 <a id='Base.oct-Tuple{Nemo.fmpz}' href='#Base.oct-Tuple{Nemo.fmpz}'>#</a>
 **`Base.oct`** &mdash; *Method*.
@@ -1374,7 +1374,7 @@ oct(n::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1214' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1214' class='documenter-source'>source</a><br>
 
 <a id='Base.dec-Tuple{Nemo.fmpz}' href='#Base.dec-Tuple{Nemo.fmpz}'>#</a>
 **`Base.dec`** &mdash; *Method*.
@@ -1389,7 +1389,7 @@ dec(n::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1220' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1220' class='documenter-source'>source</a><br>
 
 <a id='Base.hex-Tuple{Nemo.fmpz}' href='#Base.hex-Tuple{Nemo.fmpz}'>#</a>
 **`Base.hex`** &mdash; *Method*.
@@ -1404,7 +1404,7 @@ hex(n::fmpz) = base(n, 16)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1226' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1226' class='documenter-source'>source</a><br>
 
 <a id='Base.base-Tuple{Nemo.fmpz,Integer}' href='#Base.base-Tuple{Nemo.fmpz,Integer}'>#</a>
 **`Base.base`** &mdash; *Method*.
@@ -1419,7 +1419,7 @@ base(n::fmpz, b::Integer)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1232' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1232' class='documenter-source'>source</a><br>
 
 <a id='Base.ndigits-Tuple{Nemo.fmpz,Integer}' href='#Base.ndigits-Tuple{Nemo.fmpz,Integer}'>#</a>
 **`Base.ndigits`** &mdash; *Method*.
@@ -1434,7 +1434,7 @@ ndigits(x::fmpz, b::Integer = 10)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1252' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1252' class='documenter-source'>source</a><br>
 
 <a id='Nemo.nbits-Tuple{Nemo.fmpz}' href='#Nemo.nbits-Tuple{Nemo.fmpz}'>#</a>
 **`Nemo.nbits`** &mdash; *Method*.
@@ -1449,7 +1449,7 @@ nbits(x::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1258' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1258' class='documenter-source'>source</a><br>
 
 
 Here are some examples of writing numbers in various bases.
@@ -1482,7 +1482,7 @@ popcount(x::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1272' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1272' class='documenter-source'>source</a><br>
 
 <a id='Base.prevpow2-Tuple{Nemo.fmpz}' href='#Base.prevpow2-Tuple{Nemo.fmpz}'>#</a>
 **`Base.prevpow2`** &mdash; *Method*.
@@ -1497,7 +1497,7 @@ prevpow2(x::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1279' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1279' class='documenter-source'>source</a><br>
 
 <a id='Base.nextpow2-Tuple{Nemo.fmpz}' href='#Base.nextpow2-Tuple{Nemo.fmpz}'>#</a>
 **`Base.nextpow2`** &mdash; *Method*.
@@ -1512,7 +1512,7 @@ nextpow2(x::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1286' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1286' class='documenter-source'>source</a><br>
 
 <a id='Base.trailing_zeros-Tuple{Nemo.fmpz}' href='#Base.trailing_zeros-Tuple{Nemo.fmpz}'>#</a>
 **`Base.trailing_zeros`** &mdash; *Method*.
@@ -1527,7 +1527,7 @@ trailing_zeros(x::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1293' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1293' class='documenter-source'>source</a><br>
 
 <a id='Nemo.clrbit!-Tuple{Nemo.fmpz,Int64}' href='#Nemo.clrbit!-Tuple{Nemo.fmpz,Int64}'>#</a>
 **`Nemo.clrbit!`** &mdash; *Method*.
@@ -1542,7 +1542,7 @@ clrbit!(x::fmpz, c::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1306' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1306' class='documenter-source'>source</a><br>
 
 <a id='Nemo.setbit!-Tuple{Nemo.fmpz,Int64}' href='#Nemo.setbit!-Tuple{Nemo.fmpz,Int64}'>#</a>
 **`Nemo.setbit!`** &mdash; *Method*.
@@ -1557,7 +1557,7 @@ setbit!(x::fmpz, c::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1316' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1316' class='documenter-source'>source</a><br>
 
 <a id='Nemo.combit!-Tuple{Nemo.fmpz,Int64}' href='#Nemo.combit!-Tuple{Nemo.fmpz,Int64}'>#</a>
 **`Nemo.combit!`** &mdash; *Method*.
@@ -1572,7 +1572,7 @@ combit!(x::fmpz, c::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpz.jl#L1326' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpz.jl#L1326' class='documenter-source'>source</a><br>
 
 
 Here are some examples of bit twiddling.

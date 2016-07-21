@@ -106,7 +106,7 @@ zero(R::FracField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Fraction.jl#L92' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Fraction.jl#L92' class='documenter-source'>source</a><br>
 
 <a id='Base.one-Tuple{Nemo.FracField}' href='#Base.one-Tuple{Nemo.FracField}'>#</a>
 **`Base.one`** &mdash; *Method*.
@@ -121,7 +121,7 @@ one(R::FracField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Fraction.jl#L98' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Fraction.jl#L98' class='documenter-source'>source</a><br>
 
 
 It is also possible to construct fractions directly in Nemo, without first manually constructing the relevant fraction field. For this purpose we overload Julia's fraction operator `//`.
@@ -304,7 +304,7 @@ base_ring{T}(S::FracField{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Fraction.jl#L19' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Fraction.jl#L19' class='documenter-source'>source</a><br>
 
 <a id='Nemo.base_ring-Tuple{Nemo.FracElem}' href='#Nemo.base_ring-Tuple{Nemo.FracElem}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
@@ -319,7 +319,7 @@ base_ring{T}(r::FracElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Fraction.jl#L25' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Fraction.jl#L25' class='documenter-source'>source</a><br>
 
 <a id='Base.parent-Tuple{Nemo.FracElem}' href='#Base.parent-Tuple{Nemo.FracElem}'>#</a>
 **`Base.parent`** &mdash; *Method*.
@@ -334,7 +334,7 @@ parent(a::FracElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Fraction.jl#L32' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Fraction.jl#L32' class='documenter-source'>source</a><br>
 
 <a id='Nemo.iszero-Tuple{Nemo.FracElem}' href='#Nemo.iszero-Tuple{Nemo.FracElem}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
@@ -349,7 +349,7 @@ iszero(a::FracElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Fraction.jl#L104' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Fraction.jl#L104' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isone-Tuple{Nemo.FracElem}' href='#Nemo.isone-Tuple{Nemo.FracElem}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
@@ -364,7 +364,7 @@ isone(a::FracElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Fraction.jl#L111' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Fraction.jl#L111' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isunit-Tuple{Nemo.FracElem}' href='#Nemo.isunit-Tuple{Nemo.FracElem}'>#</a>
 **`Nemo.isunit`** &mdash; *Method*.
@@ -379,7 +379,7 @@ isunit(a::FracElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Fraction.jl#L118' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Fraction.jl#L118' class='documenter-source'>source</a><br>
 
 
 Some functions are only available for certain rings.
@@ -397,7 +397,7 @@ abs(a::fmpq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L82' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L82' class='documenter-source'>source</a><br>
 
 <a id='Nemo.height-Tuple{Nemo.fmpq}' href='#Nemo.height-Tuple{Nemo.fmpq}'>#</a>
 **`Nemo.height`** &mdash; *Method*.
@@ -412,7 +412,7 @@ height(a::fmpq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L102' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L102' class='documenter-source'>source</a><br>
 
 <a id='Nemo.height_bits-Tuple{Nemo.fmpq}' href='#Nemo.height_bits-Tuple{Nemo.fmpq}'>#</a>
 **`Nemo.height_bits`** &mdash; *Method*.
@@ -427,7 +427,7 @@ height_bits(a::fmpq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L113' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L113' class='documenter-source'>source</a><br>
 
 <a id='Base.<<-Tuple{Nemo.fmpq,Int64}' href='#Base.<<-Tuple{Nemo.fmpq,Int64}'>#</a>
 **`Base.<<`** &mdash; *Method*.
@@ -465,7 +465,7 @@ See also [`>>`](:func:`>>`), [`>>>`](:func:`>>>`).
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L359' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L359' class='documenter-source'>source</a><br>
 
 <a id='Base.>>-Tuple{Nemo.fmpq,Int64}' href='#Base.>>-Tuple{Nemo.fmpq,Int64}'>#</a>
 **`Base.>>`** &mdash; *Method*.
@@ -512,7 +512,7 @@ See also [`>>>`](:func:`>>>`), [`<<`](:func:`<<`).
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L348' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L348' class='documenter-source'>source</a><br>
 
 
 Rational fractions can be compared with each other and with integers. Julia provides the full range of operators $<, >, \leq, \geq$ which depend on the following functions.
@@ -530,7 +530,7 @@ isless(a::fmpq, b::fmpq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L261' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L261' class='documenter-source'>source</a><br>
 
 <a id='Base.isless-Tuple{Integer,Nemo.fmpq}' href='#Base.isless-Tuple{Integer,Nemo.fmpq}'>#</a>
 **`Base.isless`** &mdash; *Method*.
@@ -545,7 +545,7 @@ isless(a::Integer, b::fmpq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L299' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L299' class='documenter-source'>source</a><br>
 
 <a id='Base.isless-Tuple{Nemo.fmpq,Integer}' href='#Base.isless-Tuple{Nemo.fmpq,Integer}'>#</a>
 **`Base.isless`** &mdash; *Method*.
@@ -560,7 +560,7 @@ isless(a::fmpq, b::Integer)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L289' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L289' class='documenter-source'>source</a><br>
 
 <a id='Base.isless-Tuple{Nemo.fmpq,Nemo.fmpz}' href='#Base.isless-Tuple{Nemo.fmpq,Nemo.fmpz}'>#</a>
 **`Base.isless`** &mdash; *Method*.
@@ -575,7 +575,7 @@ isless(a::fmpq, b::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L309' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L309' class='documenter-source'>source</a><br>
 
 <a id='Base.isless-Tuple{Nemo.fmpz,Nemo.fmpq}' href='#Base.isless-Tuple{Nemo.fmpz,Nemo.fmpq}'>#</a>
 **`Base.isless`** &mdash; *Method*.
@@ -590,7 +590,7 @@ isless(a::fmpz, b::fmpq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L319' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L319' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of fractions.
@@ -753,7 +753,7 @@ inv(a::FracElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Fraction.jl#L513' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Fraction.jl#L513' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing inverses.
@@ -785,7 +785,7 @@ gcd{T <: RingElem}(a::FracElem{T}, b::FracElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Fraction.jl#L653' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Fraction.jl#L653' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing a greatest common divisor.
@@ -820,7 +820,7 @@ mod(a::fmpq, b::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L420' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L420' class='documenter-source'>source</a><br>
 
 <a id='Base.mod-Tuple{Nemo.fmpq,Integer}' href='#Base.mod-Tuple{Nemo.fmpq,Integer}'>#</a>
 **`Base.mod`** &mdash; *Method*.
@@ -835,7 +835,7 @@ mod(a::fmpq, b::Integer)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L432' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L432' class='documenter-source'>source</a><br>
 
 
 Here are some examples of modular arithmetic.
@@ -870,7 +870,7 @@ reconstruct(a::fmpz, b::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L458' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L458' class='documenter-source'>source</a><br>
 
 <a id='Nemo.reconstruct-Tuple{Nemo.fmpz,Integer}' href='#Nemo.reconstruct-Tuple{Nemo.fmpz,Integer}'>#</a>
 **`Nemo.reconstruct`** &mdash; *Method*.
@@ -885,7 +885,7 @@ reconstruct(a::fmpz, b::Integer)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L474' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L474' class='documenter-source'>source</a><br>
 
 <a id='Nemo.reconstruct-Tuple{Integer,Nemo.fmpz}' href='#Nemo.reconstruct-Tuple{Integer,Nemo.fmpz}'>#</a>
 **`Nemo.reconstruct`** &mdash; *Method*.
@@ -900,7 +900,7 @@ reconstruct(a::Integer, b::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L483' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L483' class='documenter-source'>source</a><br>
 
 <a id='Nemo.reconstruct-Tuple{Integer,Integer}' href='#Nemo.reconstruct-Tuple{Integer,Integer}'>#</a>
 **`Nemo.reconstruct`** &mdash; *Method*.
@@ -915,7 +915,7 @@ reconstruct(a::Integer, b::Integer)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L492' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L492' class='documenter-source'>source</a><br>
 
 
 Here are some examples of rational reconstruction.
@@ -948,7 +948,7 @@ next_minimal(a::fmpq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L507' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L507' class='documenter-source'>source</a><br>
 
 <a id='Nemo.next_signed_minimal-Tuple{Nemo.fmpq}' href='#Nemo.next_signed_minimal-Tuple{Nemo.fmpq}'>#</a>
 **`Nemo.next_signed_minimal`** &mdash; *Method*.
@@ -963,7 +963,7 @@ next_signed_minimal(a::fmpq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L526' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L526' class='documenter-source'>source</a><br>
 
 <a id='Nemo.next_calkin_wilf-Tuple{Nemo.fmpq}' href='#Nemo.next_calkin_wilf-Tuple{Nemo.fmpq}'>#</a>
 **`Nemo.next_calkin_wilf`** &mdash; *Method*.
@@ -978,7 +978,7 @@ next_calkin_wilf(a::fmpq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L542' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L542' class='documenter-source'>source</a><br>
 
 <a id='Nemo.next_signed_calkin_wilf-Tuple{Nemo.fmpq}' href='#Nemo.next_signed_calkin_wilf-Tuple{Nemo.fmpq}'>#</a>
 **`Nemo.next_signed_calkin_wilf`** &mdash; *Method*.
@@ -993,7 +993,7 @@ next_signed_calkin_wilf(a::fmpq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L561' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L561' class='documenter-source'>source</a><br>
 
 
 Here are some examples of rational enumeration.
@@ -1027,7 +1027,7 @@ harmonic(n::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L582' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L582' class='documenter-source'>source</a><br>
 
 <a id='Nemo.bernoulli-Tuple{Int64}' href='#Nemo.bernoulli-Tuple{Int64}'>#</a>
 **`Nemo.bernoulli`** &mdash; *Method*.
@@ -1042,7 +1042,7 @@ bernoulli(n::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L595' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L595' class='documenter-source'>source</a><br>
 
 <a id='Nemo.bernoulli_cache-Tuple{Int64}' href='#Nemo.bernoulli_cache-Tuple{Int64}'>#</a>
 **`Nemo.bernoulli_cache`** &mdash; *Method*.
@@ -1057,7 +1057,7 @@ bernoulli_cache(n::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L606' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L606' class='documenter-source'>source</a><br>
 
 <a id='Nemo.dedekind_sum-Tuple{Nemo.fmpz,Nemo.fmpz}' href='#Nemo.dedekind_sum-Tuple{Nemo.fmpz,Nemo.fmpz}'>#</a>
 **`Nemo.dedekind_sum`** &mdash; *Method*.
@@ -1069,7 +1069,7 @@ dedekind_sum(h::fmpz, k::fmpz)
 ```
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L619' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L619' class='documenter-source'>source</a><br>
 
 <a id='Nemo.dedekind_sum-Tuple{Nemo.fmpz,Integer}' href='#Nemo.dedekind_sum-Tuple{Nemo.fmpz,Integer}'>#</a>
 **`Nemo.dedekind_sum`** &mdash; *Method*.
@@ -1084,7 +1084,7 @@ dedekind_sum(h::fmpz, k::Integer)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L629' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L629' class='documenter-source'>source</a><br>
 
 <a id='Nemo.dedekind_sum-Tuple{Integer,Nemo.fmpz}' href='#Nemo.dedekind_sum-Tuple{Integer,Nemo.fmpz}'>#</a>
 **`Nemo.dedekind_sum`** &mdash; *Method*.
@@ -1099,7 +1099,7 @@ dedekind_sum(h::Integer, k::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L635' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L635' class='documenter-source'>source</a><br>
 
 <a id='Nemo.dedekind_sum-Tuple{Integer,Integer}' href='#Nemo.dedekind_sum-Tuple{Integer,Integer}'>#</a>
 **`Nemo.dedekind_sum`** &mdash; *Method*.
@@ -1114,7 +1114,7 @@ dedekind_sum(h::Integer, k::Integer)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/flint/fmpq.jl#L641' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/fmpq.jl#L641' class='documenter-source'>source</a><br>
 
 
 Here are some examples of special functions.

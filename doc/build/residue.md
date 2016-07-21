@@ -46,7 +46,7 @@ ResidueRing{T <: RingElem}(R::Ring, a::T; cached=true)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Residue.jl#L549' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L549' class='documenter-source'>source</a><br>
 
 
 Here are some examples of creating residue rings and making use of the resulting parent objects to coerce various elements into those rings.
@@ -86,7 +86,7 @@ zero(R::ResRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Residue.jl#L79' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L79' class='documenter-source'>source</a><br>
 
 <a id='Base.one-Tuple{Nemo.ResRing}' href='#Base.one-Tuple{Nemo.ResRing}'>#</a>
 **`Base.one`** &mdash; *Method*.
@@ -101,7 +101,7 @@ zero(R::ResRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Residue.jl#L86' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L86' class='documenter-source'>source</a><br>
 
 
 Here are some examples of constructing residues.
@@ -264,7 +264,7 @@ base_ring(r::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Residue.jl#L25' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L25' class='documenter-source'>source</a><br>
 
 <a id='Base.parent-Tuple{Nemo.ResElem}' href='#Base.parent-Tuple{Nemo.ResElem}'>#</a>
 **`Base.parent`** &mdash; *Method*.
@@ -279,7 +279,7 @@ parent(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Residue.jl#L32' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L32' class='documenter-source'>source</a><br>
 
 <a id='Nemo.modulus-Tuple{Nemo.ResRing}' href='#Nemo.modulus-Tuple{Nemo.ResRing}'>#</a>
 **`Nemo.modulus`** &mdash; *Method*.
@@ -294,7 +294,7 @@ modulus(R::ResRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Residue.jl#L60' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L60' class='documenter-source'>source</a><br>
 
 <a id='Nemo.modulus-Tuple{Nemo.ResElem}' href='#Nemo.modulus-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.modulus`** &mdash; *Method*.
@@ -309,7 +309,7 @@ modulus(R::ResRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Residue.jl#L68' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L68' class='documenter-source'>source</a><br>
 
 <a id='Nemo.iszero-Tuple{Nemo.ResElem}' href='#Nemo.iszero-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
@@ -324,7 +324,7 @@ iszero(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Residue.jl#L92' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L92' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isone-Tuple{Nemo.ResElem}' href='#Nemo.isone-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
@@ -339,7 +339,7 @@ isone(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Residue.jl#L99' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L99' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isunit-Tuple{Nemo.ResElem}' href='#Nemo.isunit-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.isunit`** &mdash; *Method*.
@@ -354,7 +354,7 @@ iszero(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Residue.jl#L106' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L106' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of residues.
@@ -535,7 +535,7 @@ inv(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Residue.jl#L422' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L422' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing inverses.
@@ -571,7 +571,7 @@ gcd{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/generic/Residue.jl#L460' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L460' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing a greatest common divisor.
