@@ -51,7 +51,7 @@ AnticNumberField(f::fmpq_poly, s::AbstractString{})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L895' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L895' class='documenter-source'>source</a><br>
 
 <a id='Nemo.AnticCyclotomicField-Tuple{Int64,AbstractString,Any}' href='#Nemo.AnticCyclotomicField-Tuple{Int64,AbstractString,Any}'>#</a>
 **`Nemo.AnticCyclotomicField`** &mdash; *Method*.
@@ -66,7 +66,7 @@ AnticCyclotomicField(n::Int, s::AbstractString{}, t = "\$")
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L909' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L909' class='documenter-source'>source</a><br>
 
 <a id='Nemo.AnticMaximalRealSubfield-Tuple{Int64,AbstractString,AbstractString}' href='#Nemo.AnticMaximalRealSubfield-Tuple{Int64,AbstractString,AbstractString}'>#</a>
 **`Nemo.AnticMaximalRealSubfield`** &mdash; *Method*.
@@ -81,7 +81,7 @@ AnticMaximalRealSubfield(n::Int, s::AbstractString{}, t = "\$")
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L925' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L925' class='documenter-source'>source</a><br>
 
 
 For convenience we define
@@ -137,7 +137,7 @@ zero(a::AnticNumberField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L110' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L110' class='documenter-source'>source</a><br>
 
 <a id='Base.one-Tuple{Nemo.AnticNumberField}' href='#Base.one-Tuple{Nemo.AnticNumberField}'>#</a>
 **`Base.one`** &mdash; *Method*.
@@ -152,7 +152,7 @@ one(a::AnticNumberField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L99' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L99' class='documenter-source'>source</a><br>
 
 <a id='Nemo.gen-Tuple{Nemo.AnticNumberField}' href='#Nemo.gen-Tuple{Nemo.AnticNumberField}'>#</a>
 **`Nemo.gen`** &mdash; *Method*.
@@ -167,7 +167,7 @@ gen(a::AnticNumberField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L88' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L88' class='documenter-source'>source</a><br>
 
 
 The easiest way of constructing number field elements is to use element arithmetic with the generator, to construct the desired element by its representation as a polynomial. See the following examples for how to do this.
@@ -346,7 +346,7 @@ base_ring(a::AnticNumberField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L26' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L26' class='documenter-source'>source</a><br>
 
 <a id='Nemo.base_ring-Tuple{Nemo.nf_elem}' href='#Nemo.base_ring-Tuple{Nemo.nf_elem}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
@@ -361,7 +361,7 @@ base_ring(a::nf_elem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L32' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L32' class='documenter-source'>source</a><br>
 
 <a id='Base.parent-Tuple{Nemo.nf_elem}' href='#Base.parent-Tuple{Nemo.nf_elem}'>#</a>
 **`Base.parent`** &mdash; *Method*.
@@ -376,7 +376,7 @@ parent(a::nf_elem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L18' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L18' class='documenter-source'>source</a><br>
 
 <a id='Base.var-Tuple{Nemo.AnticNumberField}' href='#Base.var-Tuple{Nemo.AnticNumberField}'>#</a>
 **`Base.var`** &mdash; *Method*.
@@ -391,7 +391,7 @@ var(a::AnticNumberField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L38' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L38' class='documenter-source'>source</a><br>
 
 <a id='Nemo.iszero-Tuple{Nemo.nf_elem}' href='#Nemo.iszero-Tuple{Nemo.nf_elem}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
@@ -406,7 +406,7 @@ iszero(a::nf_elem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L141' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L141' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isone-Tuple{Nemo.nf_elem}' href='#Nemo.isone-Tuple{Nemo.nf_elem}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
@@ -421,7 +421,7 @@ isone(a::nf_elem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L131' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L131' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isunit-Tuple{Nemo.nf_elem}' href='#Nemo.isunit-Tuple{Nemo.nf_elem}'>#</a>
 **`Nemo.isunit`** &mdash; *Method*.
@@ -436,7 +436,7 @@ isunit(a::nf_elem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L151' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L151' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isgen-Tuple{Nemo.nf_elem}' href='#Nemo.isgen-Tuple{Nemo.nf_elem}'>#</a>
 **`Nemo.isgen`** &mdash; *Method*.
@@ -451,7 +451,7 @@ isgen(a::nf_elem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L121' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L121' class='documenter-source'>source</a><br>
 
 <a id='Nemo.coeff-Tuple{Nemo.nf_elem,Int64}' href='#Nemo.coeff-Tuple{Nemo.nf_elem,Int64}'>#</a>
 **`Nemo.coeff`** &mdash; *Method*.
@@ -466,7 +466,7 @@ coeff(x::nf_elem, n::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L67' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L67' class='documenter-source'>source</a><br>
 
 <a id='Base.den-Tuple{Nemo.nf_elem}' href='#Base.den-Tuple{Nemo.nf_elem}'>#</a>
 **`Base.den`** &mdash; *Method*.
@@ -481,7 +481,7 @@ den(a::nf_elem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L158' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L158' class='documenter-source'>source</a><br>
 
 <a id='Nemo.degree-Tuple{Nemo.AnticNumberField}' href='#Nemo.degree-Tuple{Nemo.AnticNumberField}'>#</a>
 **`Nemo.degree`** &mdash; *Method*.
@@ -496,7 +496,7 @@ degree(a::AnticNumberField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L188' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L188' class='documenter-source'>source</a><br>
 
 <a id='Nemo.signature-Tuple{Nemo.AnticNumberField}' href='#Nemo.signature-Tuple{Nemo.AnticNumberField}'>#</a>
 **`Nemo.signature`** &mdash; *Method*.
@@ -511,7 +511,7 @@ signature(a::AnticNumberField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L195' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L195' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of number field elements.
@@ -671,7 +671,7 @@ inv(a::nf_elem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L465' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L465' class='documenter-source'>source</a><br>
 
 
 Here are some examples of inversion.
@@ -704,7 +704,7 @@ norm(a::nf_elem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L541' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L541' class='documenter-source'>source</a><br>
 
 <a id='Base.LinAlg.trace-Tuple{Nemo.nf_elem}' href='#Base.LinAlg.trace-Tuple{Nemo.nf_elem}'>#</a>
 **`Base.LinAlg.trace`** &mdash; *Method*.
@@ -719,7 +719,7 @@ norm(a::nf_elem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/antic/nf_elem.jl#L553' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/antic/nf_elem.jl#L553' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing the norm and trace.

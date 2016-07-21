@@ -106,7 +106,7 @@ zero(R::AcbField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L58' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L58' class='documenter-source'>source</a><br>
 
 <a id='Base.one-Tuple{Nemo.AcbField}' href='#Base.one-Tuple{Nemo.AcbField}'>#</a>
 **`Base.one`** &mdash; *Method*.
@@ -121,7 +121,7 @@ one(R::AcbField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L68' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L68' class='documenter-source'>source</a><br>
 
 <a id='Nemo.onei-Tuple{Nemo.AcbField}' href='#Nemo.onei-Tuple{Nemo.AcbField}'>#</a>
 **`Nemo.onei`** &mdash; *Method*.
@@ -136,7 +136,7 @@ onei(R::AcbField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L79' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L79' class='documenter-source'>source</a><br>
 
 
 Here are some examples of constructing complex boxes.
@@ -293,7 +293,7 @@ base_ring(R::AcbField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L38' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L38' class='documenter-source'>source</a><br>
 
 <a id='Nemo.base_ring-Tuple{Nemo.acb}' href='#Nemo.base_ring-Tuple{Nemo.acb}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
@@ -308,7 +308,7 @@ base_ring(a::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L45' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L45' class='documenter-source'>source</a><br>
 
 <a id='Base.parent-Tuple{Nemo.acb}' href='#Base.parent-Tuple{Nemo.acb}'>#</a>
 **`Base.parent`** &mdash; *Method*.
@@ -323,7 +323,7 @@ parent(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L52' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L52' class='documenter-source'>source</a><br>
 
 <a id='Nemo.iszero-Tuple{Nemo.acb}' href='#Nemo.iszero-Tuple{Nemo.acb}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
@@ -338,7 +338,7 @@ iszero(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L442' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L442' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isone-Tuple{Nemo.acb}' href='#Nemo.isone-Tuple{Nemo.acb}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
@@ -353,7 +353,7 @@ isone(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L450' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L450' class='documenter-source'>source</a><br>
 
 <a id='Base.isfinite-Tuple{Nemo.acb}' href='#Base.isfinite-Tuple{Nemo.acb}'>#</a>
 **`Base.isfinite`** &mdash; *Method*.
@@ -368,7 +368,7 @@ isfinite(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L458' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L458' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isexact-Tuple{Nemo.acb}' href='#Nemo.isexact-Tuple{Nemo.acb}'>#</a>
 **`Nemo.isexact`** &mdash; *Method*.
@@ -383,7 +383,7 @@ isexact(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L467' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L467' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isint-Tuple{Nemo.acb}' href='#Nemo.isint-Tuple{Nemo.acb}'>#</a>
 **`Nemo.isint`** &mdash; *Method*.
@@ -398,7 +398,7 @@ isint(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L476' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L476' class='documenter-source'>source</a><br>
 
 <a id='Base.isreal-Tuple{Nemo.acb}' href='#Base.isreal-Tuple{Nemo.acb}'>#</a>
 **`Base.isreal`** &mdash; *Method*.
@@ -413,7 +413,7 @@ isint(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L484' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L484' class='documenter-source'>source</a><br>
 
 <a id='Base.real-Tuple{Nemo.acb}' href='#Base.real-Tuple{Nemo.acb}'>#</a>
 **`Base.real`** &mdash; *Method*.
@@ -428,7 +428,7 @@ real(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L131' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L131' class='documenter-source'>source</a><br>
 
 <a id='Base.imag-Tuple{Nemo.acb}' href='#Base.imag-Tuple{Nemo.acb}'>#</a>
 **`Base.imag`** &mdash; *Method*.
@@ -443,7 +443,7 @@ imag(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L142' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L142' class='documenter-source'>source</a><br>
 
 <a id='Nemo.accuracy_bits-Tuple{Nemo.acb}' href='#Nemo.accuracy_bits-Tuple{Nemo.acb}'>#</a>
 **`Nemo.accuracy_bits`** &mdash; *Method*.
@@ -458,7 +458,7 @@ accuracy_bits(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L90' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L90' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of Arb complex boxes.
@@ -581,7 +581,7 @@ overlaps(x::acb, y::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L375' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L375' class='documenter-source'>source</a><br>
 
 <a id='Base.contains-Tuple{Nemo.acb,Nemo.acb}' href='#Base.contains-Tuple{Nemo.acb,Nemo.acb}'>#</a>
 **`Base.contains`** &mdash; *Method*.
@@ -596,7 +596,7 @@ contains(x::acb, y::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L385' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L385' class='documenter-source'>source</a><br>
 
 <a id='Base.contains-Tuple{Nemo.acb,Integer}' href='#Base.contains-Tuple{Nemo.acb,Integer}'>#</a>
 **`Base.contains`** &mdash; *Method*.
@@ -611,7 +611,7 @@ contains(x::acb, y::Integer)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L421' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L421' class='documenter-source'>source</a><br>
 
 <a id='Base.contains-Tuple{Nemo.acb,Nemo.fmpz}' href='#Base.contains-Tuple{Nemo.acb,Nemo.fmpz}'>#</a>
 **`Base.contains`** &mdash; *Method*.
@@ -626,7 +626,7 @@ contains(x::acb, y::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L405' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L405' class='documenter-source'>source</a><br>
 
 <a id='Base.contains-Tuple{Nemo.acb,Nemo.fmpq}' href='#Base.contains-Tuple{Nemo.acb,Nemo.fmpq}'>#</a>
 **`Base.contains`** &mdash; *Method*.
@@ -641,7 +641,7 @@ contains(x::acb, y::fmpq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L395' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L395' class='documenter-source'>source</a><br>
 
 
 The following functions are also provided for determining if a box intersects a certain part of the complex number plane.
@@ -659,7 +659,7 @@ contains_zero(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L428' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L428' class='documenter-source'>source</a><br>
 
 
 Here are some examples of testing containment.
@@ -701,7 +701,7 @@ isequal(x::acb, y::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L322' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L322' class='documenter-source'>source</a><br>
 
 
 A full range of functions is available for comparing boxes, i.e. `==` and `!=`. In fact, these are implemented directly in C. In the table below we document these as though only `==` had been provided to Julia.
@@ -760,7 +760,7 @@ abs(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L499' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L499' class='documenter-source'>source</a><br>
 
 
 Here are some examples of taking the absolute value.
@@ -791,7 +791,7 @@ inv(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L517' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L517' class='documenter-source'>source</a><br>
 
 
 Here are some examples of taking the inverse.
@@ -822,7 +822,7 @@ ldexp(x::acb, y::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L533' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L533' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.ldexp-Tuple{Nemo.acb,Nemo.fmpz}' href='#Base.Math.ldexp-Tuple{Nemo.acb,Nemo.fmpz}'>#</a>
 **`Base.Math.ldexp`** &mdash; *Method*.
@@ -837,7 +837,7 @@ ldexp(x::acb, y::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L544' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L544' class='documenter-source'>source</a><br>
 
 
 Here are some examples of shifting.
@@ -869,7 +869,7 @@ trim(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L561' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L561' class='documenter-source'>source</a><br>
 
 <a id='Nemo.unique_integer-Tuple{Nemo.acb}' href='#Nemo.unique_integer-Tuple{Nemo.acb}'>#</a>
 **`Nemo.unique_integer`** &mdash; *Method*.
@@ -884,7 +884,7 @@ unique_integer(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L572' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L572' class='documenter-source'>source</a><br>
 
 <a id='Base.conj-Tuple{Nemo.acb}' href='#Base.conj-Tuple{Nemo.acb}'>#</a>
 **`Base.conj`** &mdash; *Method*.
@@ -899,7 +899,7 @@ conj(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L586' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L586' class='documenter-source'>source</a><br>
 
 <a id='Base.angle-Tuple{Nemo.acb}' href='#Base.angle-Tuple{Nemo.acb}'>#</a>
 **`Base.angle`** &mdash; *Method*.
@@ -914,7 +914,7 @@ angle(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L596' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L596' class='documenter-source'>source</a><br>
 
 
 Here are some examples of miscellaneous operations.
@@ -967,7 +967,7 @@ sqrt(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L629' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L629' class='documenter-source'>source</a><br>
 
 <a id='Nemo.rsqrt-Tuple{Nemo.acb}' href='#Nemo.rsqrt-Tuple{Nemo.acb}'>#</a>
 **`Nemo.rsqrt`** &mdash; *Method*.
@@ -982,7 +982,7 @@ rsqrt(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L639' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L639' class='documenter-source'>source</a><br>
 
 <a id='Base.log-Tuple{Nemo.acb}' href='#Base.log-Tuple{Nemo.acb}'>#</a>
 **`Base.log`** &mdash; *Method*.
@@ -1009,7 +1009,7 @@ log(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L649' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L649' class='documenter-source'>source</a><br>
 
 <a id='Base.log1p-Tuple{Nemo.acb}' href='#Base.log1p-Tuple{Nemo.acb}'>#</a>
 **`Base.log1p`** &mdash; *Method*.
@@ -1024,7 +1024,7 @@ log1p(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L659' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L659' class='documenter-source'>source</a><br>
 
 <a id='Base.exp-Tuple{Nemo.acb}' href='#Base.exp-Tuple{Nemo.acb}'>#</a>
 **`Base.exp`** &mdash; *Method*.
@@ -1039,7 +1039,7 @@ exp(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L669' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L669' class='documenter-source'>source</a><br>
 
 <a id='Nemo.exppii-Tuple{Nemo.acb}' href='#Nemo.exppii-Tuple{Nemo.acb}'>#</a>
 **`Nemo.exppii`** &mdash; *Method*.
@@ -1054,7 +1054,7 @@ exppii(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L679' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L679' class='documenter-source'>source</a><br>
 
 <a id='Base.sin-Tuple{Nemo.acb}' href='#Base.sin-Tuple{Nemo.acb}'>#</a>
 **`Base.sin`** &mdash; *Method*.
@@ -1069,7 +1069,7 @@ sin(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L689' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L689' class='documenter-source'>source</a><br>
 
 <a id='Base.cos-Tuple{Nemo.acb}' href='#Base.cos-Tuple{Nemo.acb}'>#</a>
 **`Base.cos`** &mdash; *Method*.
@@ -1084,7 +1084,7 @@ cos(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L699' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L699' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.sinpi-Tuple{Nemo.acb}' href='#Base.Math.sinpi-Tuple{Nemo.acb}'>#</a>
 **`Base.Math.sinpi`** &mdash; *Method*.
@@ -1099,7 +1099,7 @@ sinpi(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L729' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L729' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.cospi-Tuple{Nemo.acb}' href='#Base.Math.cospi-Tuple{Nemo.acb}'>#</a>
 **`Base.Math.cospi`** &mdash; *Method*.
@@ -1114,7 +1114,7 @@ cospi(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L739' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L739' class='documenter-source'>source</a><br>
 
 <a id='Base.tan-Tuple{Nemo.acb}' href='#Base.tan-Tuple{Nemo.acb}'>#</a>
 **`Base.tan`** &mdash; *Method*.
@@ -1129,7 +1129,7 @@ tan(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L709' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L709' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.cot-Tuple{Nemo.acb}' href='#Base.Math.cot-Tuple{Nemo.acb}'>#</a>
 **`Base.Math.cot`** &mdash; *Method*.
@@ -1144,7 +1144,7 @@ cot(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L719' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L719' class='documenter-source'>source</a><br>
 
 <a id='Nemo.tanpi-Tuple{Nemo.acb}' href='#Nemo.tanpi-Tuple{Nemo.acb}'>#</a>
 **`Nemo.tanpi`** &mdash; *Method*.
@@ -1159,7 +1159,7 @@ tanpi(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L749' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L749' class='documenter-source'>source</a><br>
 
 <a id='Nemo.cotpi-Tuple{Nemo.acb}' href='#Nemo.cotpi-Tuple{Nemo.acb}'>#</a>
 **`Nemo.cotpi`** &mdash; *Method*.
@@ -1174,7 +1174,7 @@ cotpi(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L759' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L759' class='documenter-source'>source</a><br>
 
 <a id='Base.sinh-Tuple{Nemo.acb}' href='#Base.sinh-Tuple{Nemo.acb}'>#</a>
 **`Base.sinh`** &mdash; *Method*.
@@ -1189,7 +1189,7 @@ sinh(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L769' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L769' class='documenter-source'>source</a><br>
 
 <a id='Base.cosh-Tuple{Nemo.acb}' href='#Base.cosh-Tuple{Nemo.acb}'>#</a>
 **`Base.cosh`** &mdash; *Method*.
@@ -1204,7 +1204,7 @@ cosh(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L779' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L779' class='documenter-source'>source</a><br>
 
 <a id='Base.tanh-Tuple{Nemo.acb}' href='#Base.tanh-Tuple{Nemo.acb}'>#</a>
 **`Base.tanh`** &mdash; *Method*.
@@ -1219,7 +1219,7 @@ tanh(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L789' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L789' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.coth-Tuple{Nemo.acb}' href='#Base.Math.coth-Tuple{Nemo.acb}'>#</a>
 **`Base.Math.coth`** &mdash; *Method*.
@@ -1234,7 +1234,7 @@ coth(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L799' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L799' class='documenter-source'>source</a><br>
 
 <a id='Base.atan-Tuple{Nemo.acb}' href='#Base.atan-Tuple{Nemo.acb}'>#</a>
 **`Base.atan`** &mdash; *Method*.
@@ -1249,7 +1249,7 @@ atan(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L809' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L809' class='documenter-source'>source</a><br>
 
 <a id='Nemo.logsinpi-Tuple{Nemo.acb}' href='#Nemo.logsinpi-Tuple{Nemo.acb}'>#</a>
 **`Nemo.logsinpi`** &mdash; *Method*.
@@ -1264,7 +1264,7 @@ logsinpi(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L819' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L819' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.gamma-Tuple{Nemo.acb}' href='#Base.Math.gamma-Tuple{Nemo.acb}'>#</a>
 **`Base.Math.gamma`** &mdash; *Method*.
@@ -1279,7 +1279,7 @@ gamma(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L829' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L829' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.lgamma-Tuple{Nemo.acb}' href='#Base.Math.lgamma-Tuple{Nemo.acb}'>#</a>
 **`Base.Math.lgamma`** &mdash; *Method*.
@@ -1294,7 +1294,7 @@ lgamma(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L849' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L849' class='documenter-source'>source</a><br>
 
 <a id='Nemo.rgamma-Tuple{Nemo.acb}' href='#Nemo.rgamma-Tuple{Nemo.acb}'>#</a>
 **`Nemo.rgamma`** &mdash; *Method*.
@@ -1309,7 +1309,7 @@ rgamma(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L839' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L839' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.digamma-Tuple{Nemo.acb}' href='#Base.Math.digamma-Tuple{Nemo.acb}'>#</a>
 **`Base.Math.digamma`** &mdash; *Method*.
@@ -1324,7 +1324,7 @@ digamma(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L859' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L859' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.zeta-Tuple{Nemo.acb}' href='#Base.Math.zeta-Tuple{Nemo.acb}'>#</a>
 **`Base.Math.zeta`** &mdash; *Method*.
@@ -1349,7 +1349,7 @@ zeta(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L870' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L870' class='documenter-source'>source</a><br>
 
 <a id='Nemo.barnesg-Tuple{Nemo.acb}' href='#Nemo.barnesg-Tuple{Nemo.acb}'>#</a>
 **`Nemo.barnesg`** &mdash; *Method*.
@@ -1364,7 +1364,7 @@ barnesg(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L880' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L880' class='documenter-source'>source</a><br>
 
 <a id='Nemo.logbarnesg-Tuple{Nemo.acb}' href='#Nemo.logbarnesg-Tuple{Nemo.acb}'>#</a>
 **`Nemo.logbarnesg`** &mdash; *Method*.
@@ -1379,7 +1379,7 @@ logbarnesg(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L890' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L890' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.erf-Tuple{Nemo.acb}' href='#Base.Math.erf-Tuple{Nemo.acb}'>#</a>
 **`Base.Math.erf`** &mdash; *Method*.
@@ -1394,7 +1394,7 @@ erf(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L910' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L910' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.erfi-Tuple{Nemo.acb}' href='#Base.Math.erfi-Tuple{Nemo.acb}'>#</a>
 **`Base.Math.erfi`** &mdash; *Method*.
@@ -1409,7 +1409,7 @@ erfi(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L920' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L920' class='documenter-source'>source</a><br>
 
 <a id='Nemo.ei-Tuple{Nemo.acb}' href='#Nemo.ei-Tuple{Nemo.acb}'>#</a>
 **`Nemo.ei`** &mdash; *Method*.
@@ -1424,7 +1424,7 @@ ei(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L940' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L940' class='documenter-source'>source</a><br>
 
 <a id='Nemo.si-Tuple{Nemo.acb}' href='#Nemo.si-Tuple{Nemo.acb}'>#</a>
 **`Nemo.si`** &mdash; *Method*.
@@ -1439,7 +1439,7 @@ si(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L950' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L950' class='documenter-source'>source</a><br>
 
 <a id='Nemo.ci-Tuple{Nemo.acb}' href='#Nemo.ci-Tuple{Nemo.acb}'>#</a>
 **`Nemo.ci`** &mdash; *Method*.
@@ -1454,7 +1454,7 @@ ci(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L960' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L960' class='documenter-source'>source</a><br>
 
 <a id='Nemo.shi-Tuple{Nemo.acb}' href='#Nemo.shi-Tuple{Nemo.acb}'>#</a>
 **`Nemo.shi`** &mdash; *Method*.
@@ -1469,7 +1469,7 @@ shi(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L970' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L970' class='documenter-source'>source</a><br>
 
 <a id='Nemo.chi-Tuple{Nemo.acb}' href='#Nemo.chi-Tuple{Nemo.acb}'>#</a>
 **`Nemo.chi`** &mdash; *Method*.
@@ -1484,7 +1484,7 @@ chi(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L980' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L980' class='documenter-source'>source</a><br>
 
 <a id='Nemo.modeta-Tuple{Nemo.acb}' href='#Nemo.modeta-Tuple{Nemo.acb}'>#</a>
 **`Nemo.modeta`** &mdash; *Method*.
@@ -1499,7 +1499,7 @@ modeta(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L990' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L990' class='documenter-source'>source</a><br>
 
 <a id='Nemo.modj-Tuple{Nemo.acb}' href='#Nemo.modj-Tuple{Nemo.acb}'>#</a>
 **`Nemo.modj`** &mdash; *Method*.
@@ -1514,7 +1514,7 @@ modj(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1000' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1000' class='documenter-source'>source</a><br>
 
 <a id='Nemo.modlambda-Tuple{Nemo.acb}' href='#Nemo.modlambda-Tuple{Nemo.acb}'>#</a>
 **`Nemo.modlambda`** &mdash; *Method*.
@@ -1529,7 +1529,7 @@ modlambda(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1010' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1010' class='documenter-source'>source</a><br>
 
 <a id='Nemo.moddelta-Tuple{Nemo.acb}' href='#Nemo.moddelta-Tuple{Nemo.acb}'>#</a>
 **`Nemo.moddelta`** &mdash; *Method*.
@@ -1544,7 +1544,7 @@ moddelta(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1020' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1020' class='documenter-source'>source</a><br>
 
 <a id='Nemo.ellipk-Tuple{Nemo.acb}' href='#Nemo.ellipk-Tuple{Nemo.acb}'>#</a>
 **`Nemo.ellipk`** &mdash; *Method*.
@@ -1559,7 +1559,7 @@ ellipk(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1030' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1030' class='documenter-source'>source</a><br>
 
 <a id='Nemo.ellipe-Tuple{Nemo.acb}' href='#Nemo.ellipe-Tuple{Nemo.acb}'>#</a>
 **`Nemo.ellipe`** &mdash; *Method*.
@@ -1574,7 +1574,7 @@ ellipe(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1040' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1040' class='documenter-source'>source</a><br>
 
 <a id='Nemo.sincos-Tuple{Nemo.acb}' href='#Nemo.sincos-Tuple{Nemo.acb}'>#</a>
 **`Nemo.sincos`** &mdash; *Method*.
@@ -1589,7 +1589,7 @@ sincos(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1050' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1050' class='documenter-source'>source</a><br>
 
 <a id='Nemo.sincospi-Tuple{Nemo.acb}' href='#Nemo.sincospi-Tuple{Nemo.acb}'>#</a>
 **`Nemo.sincospi`** &mdash; *Method*.
@@ -1604,7 +1604,7 @@ sincospi(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1062' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1062' class='documenter-source'>source</a><br>
 
 <a id='Nemo.sinhcosh-Tuple{Nemo.acb}' href='#Nemo.sinhcosh-Tuple{Nemo.acb}'>#</a>
 **`Nemo.sinhcosh`** &mdash; *Method*.
@@ -1619,7 +1619,7 @@ sinhcosh(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1074' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1074' class='documenter-source'>source</a><br>
 
 <a id='Nemo.agm-Tuple{Nemo.acb}' href='#Nemo.agm-Tuple{Nemo.acb}'>#</a>
 **`Nemo.agm`** &mdash; *Method*.
@@ -1634,7 +1634,7 @@ agm(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L900' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L900' class='documenter-source'>source</a><br>
 
 <a id='Nemo.agm-Tuple{Nemo.acb,Nemo.acb}' href='#Nemo.agm-Tuple{Nemo.acb,Nemo.acb}'>#</a>
 **`Nemo.agm`** &mdash; *Method*.
@@ -1649,7 +1649,7 @@ agm(x::acb, y::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1307' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1307' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.polygamma-Tuple{Nemo.acb,Nemo.acb}' href='#Base.Math.polygamma-Tuple{Nemo.acb,Nemo.acb}'>#</a>
 **`Base.Math.polygamma`** &mdash; *Method*.
@@ -1664,7 +1664,7 @@ polygamma(s::acb, a::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1097' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1097' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.zeta-Tuple{Nemo.acb,Nemo.acb}' href='#Base.Math.zeta-Tuple{Nemo.acb,Nemo.acb}'>#</a>
 **`Base.Math.zeta`** &mdash; *Method*.
@@ -1689,7 +1689,7 @@ zeta(s::acb, a::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1086' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1086' class='documenter-source'>source</a><br>
 
 <a id='Nemo.risingfac-Tuple{Nemo.acb,Int64}' href='#Nemo.risingfac-Tuple{Nemo.acb,Int64}'>#</a>
 **`Nemo.risingfac`** &mdash; *Method*.
@@ -1704,7 +1704,7 @@ risingfac(x::acb, n::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1115' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1115' class='documenter-source'>source</a><br>
 
 <a id='Nemo.risingfac2-Tuple{Nemo.acb,Int64}' href='#Nemo.risingfac2-Tuple{Nemo.acb,Int64}'>#</a>
 **`Nemo.risingfac2`** &mdash; *Method*.
@@ -1719,7 +1719,7 @@ risingfac2(x::acb, n::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1129' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1129' class='documenter-source'>source</a><br>
 
 <a id='Nemo.polylog-Tuple{Nemo.acb,Nemo.acb}' href='#Nemo.polylog-Tuple{Nemo.acb,Nemo.acb}'>#</a>
 **`Nemo.polylog`** &mdash; *Method*.
@@ -1734,7 +1734,7 @@ polylog(s::acb, a::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1136' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1136' class='documenter-source'>source</a><br>
 
 <a id='Nemo.polylog-Tuple{Int64,Nemo.acb}' href='#Nemo.polylog-Tuple{Int64,Nemo.acb}'>#</a>
 **`Nemo.polylog`** &mdash; *Method*.
@@ -1749,7 +1749,7 @@ polylog(s::Int, a::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1147' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1147' class='documenter-source'>source</a><br>
 
 <a id='Nemo.li-Tuple{Nemo.acb}' href='#Nemo.li-Tuple{Nemo.acb}'>#</a>
 **`Nemo.li`** &mdash; *Method*.
@@ -1764,7 +1764,7 @@ li(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1158' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1158' class='documenter-source'>source</a><br>
 
 <a id='Nemo.lioffset-Tuple{Nemo.acb}' href='#Nemo.lioffset-Tuple{Nemo.acb}'>#</a>
 **`Nemo.lioffset`** &mdash; *Method*.
@@ -1779,7 +1779,7 @@ lioffset(x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1169' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1169' class='documenter-source'>source</a><br>
 
 <a id='Nemo.expint-Tuple{Nemo.acb}' href='#Nemo.expint-Tuple{Nemo.acb}'>#</a>
 **`Nemo.expint`** &mdash; *Method*.
@@ -1798,7 +1798,7 @@ gamma(s::acb, x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1191' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1191' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.besselj-Tuple{Nemo.acb,Nemo.acb}' href='#Base.Math.besselj-Tuple{Nemo.acb,Nemo.acb}'>#</a>
 **`Base.Math.besselj`** &mdash; *Method*.
@@ -1813,7 +1813,7 @@ besselj(nu::acb, x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1202' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1202' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.bessely-Tuple{Nemo.acb,Nemo.acb}' href='#Base.Math.bessely-Tuple{Nemo.acb,Nemo.acb}'>#</a>
 **`Base.Math.bessely`** &mdash; *Method*.
@@ -1828,7 +1828,7 @@ bessely(nu::acb, x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1213' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1213' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.besseli-Tuple{Nemo.acb,Nemo.acb}' href='#Base.Math.besseli-Tuple{Nemo.acb,Nemo.acb}'>#</a>
 **`Base.Math.besseli`** &mdash; *Method*.
@@ -1843,7 +1843,7 @@ besseli(nu::acb, x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1224' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1224' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.besselk-Tuple{Nemo.acb,Nemo.acb}' href='#Base.Math.besselk-Tuple{Nemo.acb,Nemo.acb}'>#</a>
 **`Base.Math.besselk`** &mdash; *Method*.
@@ -1858,7 +1858,7 @@ besselk(nu::acb, x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1235' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1235' class='documenter-source'>source</a><br>
 
 <a id='Nemo.hyp1f1-Tuple{Nemo.acb,Nemo.acb,Nemo.acb}' href='#Nemo.hyp1f1-Tuple{Nemo.acb,Nemo.acb,Nemo.acb}'>#</a>
 **`Nemo.hyp1f1`** &mdash; *Method*.
@@ -1873,7 +1873,7 @@ hyp1f1(a::acb, b::acb, x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1246' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1246' class='documenter-source'>source</a><br>
 
 <a id='Nemo.hyp1f1r-Tuple{Nemo.acb,Nemo.acb,Nemo.acb}' href='#Nemo.hyp1f1r-Tuple{Nemo.acb,Nemo.acb,Nemo.acb}'>#</a>
 **`Nemo.hyp1f1r`** &mdash; *Method*.
@@ -1888,7 +1888,7 @@ hyp1f1r(a::acb, b::acb, x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1257' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1257' class='documenter-source'>source</a><br>
 
 <a id='Nemo.hyperu-Tuple{Nemo.acb,Nemo.acb,Nemo.acb}' href='#Nemo.hyperu-Tuple{Nemo.acb,Nemo.acb,Nemo.acb}'>#</a>
 **`Nemo.hyperu`** &mdash; *Method*.
@@ -1903,7 +1903,7 @@ hyperu(a::acb, b::acb, x::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1269' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1269' class='documenter-source'>source</a><br>
 
 <a id='Nemo.jtheta-Tuple{Nemo.acb,Nemo.acb}' href='#Nemo.jtheta-Tuple{Nemo.acb,Nemo.acb}'>#</a>
 **`Nemo.jtheta`** &mdash; *Method*.
@@ -1918,7 +1918,7 @@ jtheta(z::acb, tau::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1280' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1280' class='documenter-source'>source</a><br>
 
 <a id='Nemo.ellipwp-Tuple{Nemo.acb,Nemo.acb}' href='#Nemo.ellipwp-Tuple{Nemo.acb,Nemo.acb}'>#</a>
 **`Nemo.ellipwp`** &mdash; *Method*.
@@ -1933,7 +1933,7 @@ ellipwp(z::acb, tau::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/arb/acb.jl#L1296' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/77e81499b94b6e998865a0624d01b192a674b2e1/src/arb/acb.jl#L1296' class='documenter-source'>source</a><br>
 
 
 Here are some examples of complex valued mathematical functions.

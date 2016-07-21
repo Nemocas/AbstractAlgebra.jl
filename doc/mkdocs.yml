@@ -19,9 +19,11 @@ pages:
 - Rationals:                    build/rational.md
 - Finite fields:                build/finitefield.md
 - P-adic fields:                build/padic.md
-- Number fields:                build/numberfield.md
 - Real balls:                   build/arb.md
 - Complex boxes:                build/acb.md
+- Number fields:                build/numberfield.md
+- Maximal orders:               build/maximalorder.md
+- Class groups:                 build/classgroup.md
 - Permutation groups:           build/perm.md
 
 markdown_extensions:

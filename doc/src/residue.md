@@ -255,58 +255,39 @@ that Julia uses the single slash for floating point division. Therefore to
 perform exact division in a ring we use `divexact`. To construct an element
 of a fraction field one can use the double slash operator `//`.
 
-```@docs
--(::ResElem)
-```
+The following operators and functions are provided.
 
-```@docs
-+{T <: RingElem}(::ResElem{T}, ::ResElem{T})
-```
-
-```@docs
--{T <: RingElem}(::ResElem{T}, ::ResElem{T})
-```
-
-```@docs
-*{T <: RingElem}(::ResElem{T}, ::ResElem{T})
-```
-
-```@docs
-divexact{T <: RingElem}(::ResElem{T}, ::ResElem{T})
-```
+Function                                                | Operation
+--------------------------------------------------------|----------------
+`-(a::ResElem)`                                         | unary minus
+`+{T <: RingElem}(a::ResElem{T}, b::ResElem{T})`        | addition
+`-{T <: RingElem}(a::ResElem{T}, b::ResElem{T})`        | subtraction
+`*{T <: RingElem}(a::ResElem{T}, b::ResElem{T})`        | multiplication
+`divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})` | exact division
 
 The following ad hoc operators are also provided.
 
-```@docs
-+(::Integer, ::ResElem)
-+(::ResElem, ::Integer)
-+(::fmpz, ::ResElem)
-+(::ResElem, ::fmpz)
-+{T <: RingElem}(::T, ::ResElem{T})
-+{T <: RingElem}(::ResElem{T}, ::T)
-```
-
-```@docs
--(::Integer, ::ResElem)
--(::ResElem, ::Integer)
--(::fmpz, ::ResElem)
--(::ResElem, ::fmpz)
--{T <: RingElem}(::T, ::ResElem{T})
--{T <: RingElem}(::ResElem{T}, ::T)
-``` 
-
-```@docs
-*(::Integer, ::ResElem)
-*(::ResElem, ::Integer)
-*(::fmpz, ::ResElem)
-*(::ResElem, ::fmpz)
-*{T <: RingElem}(::T, ::ResElem{T})
-*{T <: RingElem}(::ResElem{T}, ::T)
-``` 
-
-```@docs
-^(::ResElem, ::Int)
-```
+Function                                | Operation
+----------------------------------------|----------------
+`+(a::Integer, b::ResElem)`             | addition    
+`+(a::ResElem, b::Integer)`             | addition
+`+(a::fmpz, b::ResElem)`                | addition
+`+(a::ResElem, b::fmpz)`                | addition
+`+{T <: RingElem}(a::T, b::ResElem{T})` | addition
+`+{T <: RingElem}(a::ResElem{T}, b::T)` | addition
+`-(a::Integer, b::ResElem)`             | subtraction
+`-(a::ResElem, b::Integer)`             | subtraction
+`-(a::fmpz, b::ResElem)`                | subtraction
+`-(a::ResElem, b::fmpz)`                | subtraction
+`-{T <: RingElem}(a::T, b::ResElem{T})` | subtraction
+`-{T <: RingElem}(a::ResElem{T}, b::T)` | subtraction
+`*(a::Integer, b::ResElem)`             | multiplication
+`*(a::ResElem, b::Integer)`             | multiplication
+`*(a::fmpz, b::ResElem)`                | multiplication
+`*(a::ResElem, b::fmpz)`                | multiplication
+`*{T <: RingElem}(a::T, b::ResElem{T})` | multiplication
+`*{T <: RingElem}(a::ResElem{T}, b::T)` | multiplication
+`^(a::ResElem, n::Int)`                 | powering
 
 If the appropriate `promote_rule` and coercion exists, these operators can also
 be used with elements of other rings. Nemo will try to coerce the operands to
@@ -347,25 +328,30 @@ z = p^12
 ## Comparison operators
 
 The following comparison operators are implemented for residues in Nemo.
+Julia provides the corresponding `!=` operator automatically.
 
-```@docs
-=={T <: RingElem}(::ResElem{T}, ::ResElem{T})
-```
+Function
+-------------------------------------------------------
+`isequal{T <: RingElem}(a::ResElem{T}, b::ResElem{T})`
+`=={T <: RingElem}(a::ResElem{T}, b::ResElem{T})`
 
-```@docs
-isequal{T <: RingElem}(::ResElem{T}, ::ResElem{T})
-```
+The `isequal` operation returns `true` if and only if residues are precisely
+equal as compared by `isequal`. This is a stronger form of equality, used for
+comparing inexact ring elements, such as elements of a power series ring, the
+$p$-adics, or the reals or complex numbers. Two elements are precisely equal
+only if they have the same precision or bounds in addition to being
+arithmetically equal. 
 
 In addition we have the following ad hoc comparison operators.
 
-```@docs
-=={T <: RingElem}(::ResElem{T}, ::T)
-=={T <: RingElem}(::T, ::ResElem{T})
-==(::ResElem, ::Integer)
-==(::Integer, ::ResElem)
-==(::ResElem, ::fmpz)
-==(::fmpz, ::ResElem)
-```
+Function
+-----------------------------------------
+`=={T <: RingElem}(a::ResElem{T}, b::T)`
+`=={T <: RingElem}(a::T, b::ResElem{T})`
+`==(a::ResElem, b::Integer)`
+`==(a::Integer, b::ResElem)`
+`==(a::ResElem, b::fmpz)`
+`==(a::fmpz, b::ResElem)`
 
 Here are some examples of comparisons.
 

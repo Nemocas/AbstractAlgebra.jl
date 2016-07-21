@@ -369,64 +369,42 @@ that Julia uses the single slash for floating point division. Therefore to
 perform exact division in a ring we use `divexact`. To construct an element
 of a fraction field one can use the double slash operator `//`.
 
-```@docs
--(::PolyElem)
-```
+The following standard operators and functions are provided.
 
-```@docs
-+{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
-```
+Function                                                  | Operation
+----------------------------------------------------------|----------------
+`-(a::PolyElem)`                                          | unary minus
+`+{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})`        | addition
+`-{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})`        | subtraction
+`*{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})`        | multiplication
+`divexact{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})` | exact division
 
-```@docs
--{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
-```
+The following ad hoc operators and functions are also provided.
 
-```@docs
-*{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
-```
-
-```@docs
-divexact{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
-```
-
-The following ad hoc operators are also provided.
-
-```@docs
-+(::Integer, ::PolyElem)
-+(::PolyElem, ::Integer)
-+(::fmpz, ::PolyElem)
-+(::PolyElem, ::fmpz)
-+{T <: RingElem}(::T, ::PolyElem{T})
-+{T <: RingElem}(::PolyElem{T}, ::T)
-```
-
-```@docs
--(::Integer, ::PolyElem)
--(::PolyElem, ::Integer)
--(::fmpz, ::PolyElem)
--(::PolyElem, ::fmpz)
--{T <: RingElem}(::T, ::PolyElem{T})
--{T <: RingElem}(::PolyElem{T}, ::T)
-``` 
-
-```@docs
-*(::Integer, ::PolyElem)
-*(::PolyElem, ::Integer)
-*(::fmpz, ::PolyElem)
-*(::PolyElem, ::fmpz)
-*{T <: RingElem}(::T, ::PolyElem{T})
-*{T <: RingElem}(::PolyElem{T}, ::T)
-``` 
-
-```@docs
-divexact(::PolyElem, ::Integer)
-divexact(::PolyElem, ::fmpz)
-divexact{T <: RingElem}(::PolyElem{T}, ::T)
-```
-
-```@docs
-^(::PolyElem, ::Int)
-```
+Function                                        | Operation
+------------------------------------------------|----------------
+`+(a::Integer, b::PolyElem)`                    | addition
+`+(a::PolyElem, b::Integer)`                    | addition
+`+(a::fmpz, b::PolyElem)`                       | addition
+`+(a::PolyElem, b::fmpz)`                       | addition
+`+{T <: RingElem}(a::T, b::PolyElem{T})`        | addition
+`+{T <: RingElem}(a::PolyElem{T}, b::T)`        | addition
+`-(a::Integer, b::PolyElem)`                    | subtraction
+`-(a::PolyElem, b::Integer)`                    | subtraction
+`-(a::fmpz, b::PolyElem)`                       | subtraction
+`-(a::PolyElem, b::fmpz)`                       | subtraction
+`-{T <: RingElem}(a::T, b::PolyElem{T})`        | subtraction
+`-{T <: RingElem}(a::PolyElem{T}, b::T)`        | subtraction
+`*(a::Integer, b::PolyElem)`                    | multiplication
+`*(a::PolyElem, b::Integer)`                    | multiplication
+`*(a::fmpz, b::PolyElem)`                       | multiplication
+`*(a::PolyElem, b::fmpz)`                       | multiplication
+`*{T <: RingElem}(a::T, b::PolyElem{T})`        | multiplication
+`*{T <: RingElem}(a::PolyElem{T}, b::T)`        | multiplication
+`divexact(a::PolyElem, b::Integer)`             | exact division
+`divexact(a::PolyElem, b::fmpz)`                | exact division
+`divexact{T <: RingElem}(a::PolyElem{T}, b::T)` | exact division
+`^(a::PolyElem, n::Int)`                        | powering
 
 If the appropriate `promote_rule` and coercion exists, these operators can also
 be used with elements of other rings. Nemo will try to coerce the operands to
@@ -455,25 +433,30 @@ t = f^3
 ## Comparison operators
 
 The following comparison operators are implemented for polynomials in Nemo.
+Julia provides the corresponding `!=` operator automatically.
 
-```@docs
-=={T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
-```
+Function
+---------------------------------------------------------
+`isequal{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})`
+`=={T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})`
 
-```@docs
-isequal{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
-```
+The `isequal` operation returns `true` if and only if all the coefficients of
+the polynomial are precisely equal as compared by `isequal`. This is a stronger
+form of equality, used for comparing inexact coefficients, such as elements of
+a power series ring, the $p$-adics, or the reals or complex numbers. Two
+elements are precisely equal only if they have the same precision or bounds
+in addition to being arithmetically equal. 
 
-In addition we have the following ad hoc comparison operators.
+We also have the following ad hoc comparison operators.
 
-```@docs
-=={T <: RingElem}(::PolyElem{T}, ::T)
-=={T <: RingElem}(::T, ::PolyElem{T})
-==(::PolyElem, ::Integer)
-==(::Integer, ::PolyElem)
-==(::PolyElem, ::fmpz)
-==(::fmpz, ::PolyElem)
-```
+Function
+------------------------------------------
+`=={T <: RingElem}(a::PolyElem{T}, b::T)`
+`=={T <: RingElem}(a::T, b::PolyElem{T})`
+`==(a::PolyElem, b::Integer)`
+`==(a::Integer, b::PolyElem)`
+`==(a::PolyElem, b::fmpz)`
+`==(a::fmpz, b::PolyElem)`
 
 Here are some examples of comparisons.
 

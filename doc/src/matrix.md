@@ -297,64 +297,46 @@ All the usual arithmetic operators are overloaded for Nemo matrices. Note
 that Julia uses the single slash for floating point division. Therefore to
 perform exact division by a constant we use `divexact`. 
 
-```@docs
--(::MatElem)
-```
+Function                                                | Operation
+--------------------------------------------------------|----------------
+`-(a::MatElem)`                                         | unary minus
+`+{T <: RingElem}(a::MatElem{T}, b::MatElem{T})`        | addition
+`-{T <: RingElem}(a::MatElem{T}, b::MatElem{T})`        | subtraction
+`*{T <: RingElem}(a::MatElem{T}, b::MatElem{T})`        | multiplication
+`divexact{T <: RingElem}(a::MatElem{T}, b::MatElem{T})` | exact division
 
-```@docs
-+{T <: RingElem}(::MatElem{T}, ::MatElem{T})
-```
-
-```@docs
--{T <: RingElem}(::MatElem{T}, ::MatElem{T})
-```
-
-```@docs
-*{T <: RingElem}(::MatElem{T}, ::MatElem{T})
-```
-
-```@docs
-divexact{T <: RingElem}(::MatElem{T}, ::MatElem{T})
-```
+An exception is raised if the matrix dimensions are not compatible for the
+given operation. The `divexact` function computes `a*inv(b)` where `inv(b)`
+is the inverse of the matrix $b$. This assumes that $b$ can be inverted.
 
 The following ad hoc operators are also provided.
 
-```@docs
-+(::Integer, ::MatElem)
-+(::MatElem, ::Integer)
-+(::fmpz, ::MatElem)
-+(::MatElem, ::fmpz)
-+{T <: RingElem}(::T, ::MatElem{T})
-+{T <: RingElem}(::MatElem{T}, ::T)
-```
+Function                                       | Operation
+-----------------------------------------------|----------------
+`+(a::Integer, b::MatElem)`                    | addition
+`+(a::MatElem, b::Integer)`                    | addition
+`+(a::fmpz, b::MatElem)`                       | addition
+`+(a::MatElem, b::fmpz)`                       | addition
+`+{T <: RingElem}(a::T, b::MatElem{T})`        | addition
+`+{T <: RingElem}(a::MatElem{T}, b::T)`        | addition
+`-(a::Integer, b::MatElem)`                    | subtraction
+`-(a::MatElem, b::Integer)`                    | subtraction
+`-(a::fmpz, b::MatElem)`                       | subtraction
+`-(a::MatElem, b::fmpz)`                       | subtraction
+`-{T <: RingElem}(a::T, b::MatElem{T})`        | subtraction
+`-{T <: RingElem}(a::MatElem{T}, b::T)`        | subtraction
+`*(a::Integer, b::MatElem)`                    | multiplication
+`*(a::MatElem, b::Integer)`                    | multiplication
+`*(a::fmpz, b::MatElem)`                       | multiplication
+`*(a::MatElem, b::fmpz)`                       | multiplication
+`*{T <: RingElem}(a::T, b::MatElem{T})`        | multiplication
+`*{T <: RingElem}(a::MatElem{T}, b::T)`        | multiplication
+`divexact(a::MatElem, b::Integer)`             | exact division
+`divexact(a::MatElem, b::fmpz)`                | exact division
+`divexact{T <: RingElem}(a::MatElem{T}, b::T)` | exact division
+`^(a::MatElem, n::Int)`                        | powering
 
-```@docs
--(::Integer, ::MatElem)
--(::MatElem, ::Integer)
--(::fmpz, ::MatElem)
--(::MatElem, ::fmpz)
--{T <: RingElem}(::T, ::MatElem{T})
--{T <: RingElem}(::MatElem{T}, ::T)
-``` 
-
-```@docs
-*(::Integer, ::MatElem)
-*(::MatElem, ::Integer)
-*(::fmpz, ::MatElem)
-*(::MatElem, ::fmpz)
-*{T <: RingElem}(::T, ::MatElem{T})
-*{T <: RingElem}(::MatElem{T}, ::T)
-``` 
-
-```@docs
-divexact(::MatElem, ::Integer)
-divexact(::MatElem, ::fmpz)
-divexact{T <: RingElem}(::MatElem{T}, ::T)
-```
-
-```@docs
-^(::MatElem, ::Int)
-```
+The following function is also provided.
 
 ```@docs
 powers{T <: RingElem}(a::MatElem{T}, d::Int)
@@ -390,24 +372,28 @@ R = divexact(A*3, 3)
 
 The following comparison operators are implemented for matrices in Nemo.
 
-```@docs
-=={T <: RingElem}(::MatElem{T}, ::MatElem{T})
-```
+Function
+-------------------------------------------------------
+`isequal{T <: RingElem}(a::MatElem{T}, b::MatElem{T})`
+`=={T <: RingElem}(a::MatElem{T}, b::MatElem{T})`
 
-```@docs
-isequal{T <: RingElem}(::MatElem{T}, ::MatElem{T})
-```
+The `isequal` operation returns `true` if and only if all the entries of the
+matrix are precisely equal as compared by `isequal`. This is a stronger form
+of equality, used for comparing inexact coefficients, such as elements of a
+power series ring, the $p$-adics, or the reals or complex numbers. Two
+elements are precisely equal only if they have the same precision or bounds
+in addition to being arithmetically equal. 
 
 In addition we have the following ad hoc comparison operators.
 
-```@docs
-=={T <: RingElem}(::MatElem{T}, ::T)
-=={T <: RingElem}(::T, ::MatElem{T})
-==(::MatElem, ::Integer)
-==(::Integer, ::MatElem)
-==(::MatElem, ::fmpz)
-==(::fmpz, ::MatElem)
-```
+Function
+------------------------------------------
+`=={T <: RingElem}(a::MatElem{T}, b::T)`
+`=={T <: RingElem}(a::T, b::MatElem{T})`
+`==(a::MatElem, b::Integer)`
+`==(a::Integer, b::MatElem)`
+`==(a::MatElem, b::fmpz)`
+`==(a::fmpz, b::MatElem)`
 
 Here are some examples of comparisons.
 
