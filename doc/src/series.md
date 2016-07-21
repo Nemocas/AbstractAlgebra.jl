@@ -450,64 +450,42 @@ that Julia uses the single slash for floating point division. Therefore to
 perform exact division in a ring we use `divexact`. To construct an element
 of a fraction field one can use the double slash operator `//`.
 
-```@docs
--(::SeriesElem)
-```
+The following operators and functions are provided.
 
-```@docs
-+{T <: RingElem}(::SeriesElem{T}, ::SeriesElem{T})
-```
-
-```@docs
--{T <: RingElem}(::SeriesElem{T}, ::SeriesElem{T})
-```
-
-```@docs
-*{T <: RingElem}(::SeriesElem{T}, ::SeriesElem{T})
-```
-
-```@docs
-divexact{T <: RingElem}(::SeriesElem{T}, ::SeriesElem{T})
-```
+Function                                                      | Operation
+--------------------------------------------------------------|----------------
+`-(a::SeriesElem)`                                            | unary minus
+`+{T <: RingElem}(a::SeriesElem{T}, b::SeriesElem{T})`        | addition
+`-{T <: RingElem}(a::SeriesElem{T}, b::SeriesElem{T})`        | subtraction
+`*{T <: RingElem}(a::SeriesElem{T}, b::SeriesElem{T})`        | multiplication
+`divexact{T <: RingElem}(a::SeriesElem{T}, b::SeriesElem{T})` | exact division
 
 The following ad hoc operators are also provided.
 
-```@docs
-+(::Integer, ::SeriesElem)
-+(::SeriesElem, ::Integer)
-+(::fmpz, ::SeriesElem)
-+(::SeriesElem, ::fmpz)
-+{T <: RingElem}(::T, ::SeriesElem{T})
-+{T <: RingElem}(::SeriesElem{T}, ::T)
-```
-
-```@docs
--(::Integer, ::SeriesElem)
--(::SeriesElem, ::Integer)
--(::fmpz, ::SeriesElem)
--(::SeriesElem, ::fmpz)
--{T <: RingElem}(::T, ::SeriesElem{T})
--{T <: RingElem}(::SeriesElem{T}, ::T)
-``` 
-
-```@docs
-*(::Integer, ::SeriesElem)
-*(::SeriesElem, ::Integer)
-*(::fmpz, ::SeriesElem)
-*(::SeriesElem, ::fmpz)
-*{T <: RingElem}(::T, ::SeriesElem{T})
-*{T <: RingElem}(::SeriesElem{T}, ::T)
-``` 
-
-```@docs
-divexact(::SeriesElem, ::Integer)
-divexact(::SeriesElem, ::fmpz)
-divexact{T <: RingElem}(::SeriesElem{T}, ::T)
-```
-
-```@docs
-^(::SeriesElem, ::Int)
-```
+Function                                          | Operation
+--------------------------------------------------|----------------
+`+(a::Integer, b::SeriesElem)`                    | addition
+`+(a::SeriesElem, b::Integer)`                    | addition
+`+(a::fmpz, b::SeriesElem)`                       | addition
+`+(a::SeriesElem, b::fmpz)`                       | addition
+`+{T <: RingElem}(a::T, b::SeriesElem{T})`        | addition
+`+{T <: RingElem}(a::SeriesElem{T}, b::T)`        | addition
+`-(a::Integer, b::SeriesElem)`                    | subtraction
+`-(a::SeriesElem, b::Integer)`                    | subtraction
+`-(a::fmpz, b::SeriesElem)`                       | subtraction
+`-(a::SeriesElem, b::fmpz)`                       | subtraction
+`-{T <: RingElem}(a::T, b::SeriesElem{T})`        | subtraction
+`-{T <: RingElem}(a::SeriesElem{T}, b::T)`        | subtraction
+`*(a::Integer, b::SeriesElem)`                    | multiplication
+`*(a::SeriesElem, b::Integer)`                    | multiplication
+`*(a::fmpz, b::SeriesElem)`                       | multiplication
+`*(a::SeriesElem, b::fmpz)`                       | multiplication
+`*{T <: RingElem}(a::T, b::SeriesElem{T})`        | multiplication
+`*{T <: RingElem}(a::SeriesElem{T}, b::T)`        | multiplication
+`divexact(a::SeriesElem, b::Integer)`             | exact division
+`divexact(a::SeriesElem, b::fmpz)`                | exact division
+`divexact{T <: RingElem}(a::SeriesElem{T}, b::T)` | exact division
+`^(a::SeriesElem, n::Int)`                        | powering         
 
 If the appropriate `promote_rule` and coercion exists, these operators can also
 be used with elements of other rings. Nemo will try to coerce the operands to
@@ -543,25 +521,29 @@ w = divexact(b, fmpz(11))
 ## Comparison operators
 
 The following comparison operators are implemented for power series in Nemo.
+Julia provides the corresponding `!=` function automatically.
 
-```@docs
-=={T <: RingElem}(::SeriesElem{T}, ::SeriesElem{T})
-```
+Function
+-------------------------------------------------------------
+`isequal{T <: RingElem}(a::SeriesElem{T}, b::SeriesElem{T})`
+`=={T <: RingElem}(a::SeriesElem{T}, b::SeriesElem{T})`
 
-```@docs
-isequal{T <: RingElem}(::SeriesElem{T}, ::SeriesElem{T})
-```
+The `isequal` function is a stronger notion of equality. It requires that the
+precision of the power series is identical as well as the power series being
+arithmetically equal. Coefficients are also compared using `isequal`
+recursively. The `==` function notionally truncates both power series to the
+lower of the two (absolute) precisions, and then compares arithmetically.
 
 In addition we have the following ad hoc comparison operators.
 
-```@docs
-=={T <: RingElem}(::SeriesElem{T}, ::T)
-=={T <: RingElem}(::T, ::SeriesElem{T})
-==(::SeriesElem, ::Integer)
-==(::Integer, ::SeriesElem)
-==(::SeriesElem, ::fmpz)
-==(::fmpz, ::SeriesElem)
-```
+Function
+--------------------------------------------
+`=={T <: RingElem}(a::SeriesElem{T}, b::T)`
+`=={T <: RingElem}(a::T, b::SeriesElem{T})`
+`==(a::SeriesElem, b::Integer)`
+`==(a::Integer, b::SeriesElem)`
+`==(a::SeriesElem, b::fmpz)`
+`==(a::fmpz, b::SeriesElem)`
 
 Here are some examples of comparisons.
 

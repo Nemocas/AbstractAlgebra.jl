@@ -80,7 +80,7 @@ eye(R::FlintPermGroup)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/perm.jl#L68' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/perm.jl#L68' class='documenter-source'>source</a><br>
 
 
 Note that permutations consist of lists of $n$ integers numbered from $1$ to $n$. If the $i$-th entry of a permuation is $j$, this corresponds to sending $i \to j$ in the permutation.
@@ -202,7 +202,7 @@ parent(a::perm)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/perm.jl#L25' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/perm.jl#L25' class='documenter-source'>source</a><br>
 
 <a id='Base.parity-Tuple{Nemo.perm}' href='#Base.parity-Tuple{Nemo.perm}'>#</a>
 **`Base.parity`** &mdash; *Method*.
@@ -217,7 +217,7 @@ parity(a::perm)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/perm.jl#L48' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/perm.jl#L48' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of permutations.
@@ -256,7 +256,7 @@ Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/flint/perm.jl#L120' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/perm.jl#L120' class='documenter-source'>source</a><br>
 
 
 Here are some examples of arithmetic operations.

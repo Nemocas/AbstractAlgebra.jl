@@ -46,7 +46,7 @@ ResidueRing{T <: RingElem}(R::Ring, a::T; cached=true)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L549' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L549' class='documenter-source'>source</a><br>
 
 
 Here are some examples of creating residue rings and making use of the resulting parent objects to coerce various elements into those rings.
@@ -86,7 +86,7 @@ zero(R::ResRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L79' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L79' class='documenter-source'>source</a><br>
 
 <a id='Base.one-Tuple{Nemo.ResRing}' href='#Base.one-Tuple{Nemo.ResRing}'>#</a>
 **`Base.one`** &mdash; *Method*.
@@ -101,7 +101,7 @@ zero(R::ResRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L86' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L86' class='documenter-source'>source</a><br>
 
 
 Here are some examples of constructing residues.
@@ -264,7 +264,7 @@ base_ring(r::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L25' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L25' class='documenter-source'>source</a><br>
 
 <a id='Base.parent-Tuple{Nemo.ResElem}' href='#Base.parent-Tuple{Nemo.ResElem}'>#</a>
 **`Base.parent`** &mdash; *Method*.
@@ -279,7 +279,7 @@ parent(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L32' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L32' class='documenter-source'>source</a><br>
 
 <a id='Nemo.modulus-Tuple{Nemo.ResRing}' href='#Nemo.modulus-Tuple{Nemo.ResRing}'>#</a>
 **`Nemo.modulus`** &mdash; *Method*.
@@ -294,7 +294,7 @@ modulus(R::ResRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L60' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L60' class='documenter-source'>source</a><br>
 
 <a id='Nemo.modulus-Tuple{Nemo.ResElem}' href='#Nemo.modulus-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.modulus`** &mdash; *Method*.
@@ -309,7 +309,7 @@ modulus(R::ResRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L68' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L68' class='documenter-source'>source</a><br>
 
 <a id='Nemo.iszero-Tuple{Nemo.ResElem}' href='#Nemo.iszero-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
@@ -324,7 +324,7 @@ iszero(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L92' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L92' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isone-Tuple{Nemo.ResElem}' href='#Nemo.isone-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
@@ -339,7 +339,7 @@ isone(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L99' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L99' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isunit-Tuple{Nemo.ResElem}' href='#Nemo.isunit-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.isunit`** &mdash; *Method*.
@@ -354,7 +354,7 @@ iszero(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L106' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L106' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of residues.
@@ -386,583 +386,43 @@ W = base_ring(T(x + 1))
 
 All the usual arithmetic operators are overloaded for Nemo residues. Note that Julia uses the single slash for floating point division. Therefore to perform exact division in a ring we use `divexact`. To construct an element of a fraction field one can use the double slash operator `//`.
 
-<a id='Base.--Tuple{Nemo.ResElem}' href='#Base.--Tuple{Nemo.ResElem}'>#</a>
-**`Base.-`** &mdash; *Method*.
 
+The following operators and functions are provided.
 
 
-```
--(x)
-```
-
-Unary minus operator.
-
-
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L636-640' class='documenter-source'>source</a><br>
-
-<a id='Base.+-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.+-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.+`** &mdash; *Method*.
-
-
-
-```
-+{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
-```
-
-> Return $a + b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L166' class='documenter-source'>source</a><br>
-
-
-```
-+{T <: RingElem}(a::ResElem{T}, b::T)
-```
-
-> Return $a + b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L247' class='documenter-source'>source</a><br>
-
-
-```
-+{T <: RingElem}(a::T, b::ResElem{T})
-```
-
-> Return $a + b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L265' class='documenter-source'>source</a><br>
-
-<a id='Base.--Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.--Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
-```
--(x, y)
-```
-
-Subtraction operator.
-
-
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
-
-
-```
--{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
-```
-
-> Return $a - b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L175' class='documenter-source'>source</a><br>
-
-
-```
--{T <: RingElem}(a::ResElem{T}, b::T)
-```
-
-> Return $a - b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L283' class='documenter-source'>source</a><br>
-
-
-```
--{T <: RingElem}(a::T, b::ResElem{T})
-```
-
-> Return $a - b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L301' class='documenter-source'>source</a><br>
-
-<a id='Base.*-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.*-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
-```
-*(x, y...)
-```
-
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
-
-
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
-
-
-```
-*{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
-```
-
-> Return $a\times b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L184' class='documenter-source'>source</a><br>
-
-
-```
-*{T <: RingElem}(a::ResElem{T}, b::T)
-```
-
-> Return $a\times b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L211' class='documenter-source'>source</a><br>
-
-
-```
-*{T <: RingElem}(a::T, b::ResElem{T})
-```
-
-> Return $a\times b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L229' class='documenter-source'>source</a><br>
-
-<a id='Nemo.divexact-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}' href='#Nemo.divexact-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Nemo.divexact`** &mdash; *Method*.
-
-
-
-```
-divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L441' class='documenter-source'>source</a><br>
+|                                                Function |      Operation |
+| -------------------------------------------------------:| --------------:|
+|                                         `-(a::ResElem)` |    unary minus |
+|        `+{T <: RingElem}(a::ResElem{T}, b::ResElem{T})` |       addition |
+|        `-{T <: RingElem}(a::ResElem{T}, b::ResElem{T})` |    subtraction |
+|        `*{T <: RingElem}(a::ResElem{T}, b::ResElem{T})` | multiplication |
+| `divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})` | exact division |
 
 
 The following ad hoc operators are also provided.
 
-<a id='Base.+-Tuple{Integer,Nemo.ResElem}' href='#Base.+-Tuple{Integer,Nemo.ResElem}'>#</a>
-**`Base.+`** &mdash; *Method*.
 
-
-
-```
-+(a::Integer, b::ResElem)
-```
-
-> Return $a + b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L253' class='documenter-source'>source</a><br>
-
-<a id='Base.+-Tuple{Nemo.ResElem,Integer}' href='#Base.+-Tuple{Nemo.ResElem,Integer}'>#</a>
-**`Base.+`** &mdash; *Method*.
-
-
-
-```
-+(a::ResElem, b::Integer)
-```
-
-> Return $a + b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L235' class='documenter-source'>source</a><br>
-
-<a id='Base.+-Tuple{Nemo.fmpz,Nemo.ResElem}' href='#Base.+-Tuple{Nemo.fmpz,Nemo.ResElem}'>#</a>
-**`Base.+`** &mdash; *Method*.
-
-
-
-```
-+(a::fmpz, b::ResElem)
-```
-
-> Return $a + b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L259' class='documenter-source'>source</a><br>
-
-<a id='Base.+-Tuple{Nemo.ResElem,Nemo.fmpz}' href='#Base.+-Tuple{Nemo.ResElem,Nemo.fmpz}'>#</a>
-**`Base.+`** &mdash; *Method*.
-
-
-
-```
-+(a::ResElem, b::Integer)
-```
-
-> Return $a + b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L241' class='documenter-source'>source</a><br>
-
-<a id='Base.+-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.+-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.+`** &mdash; *Method*.
-
-
-
-```
-+{T <: RingElem}(a::T, b::ResElem{T})
-```
-
-> Return $a + b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L265' class='documenter-source'>source</a><br>
-
-<a id='Base.+-Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.+-Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
-**`Base.+`** &mdash; *Method*.
-
-
-
-```
-+{T <: RingElem}(a::ResElem{T}, b::T)
-```
-
-> Return $a + b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L247' class='documenter-source'>source</a><br>
-
-<a id='Base.--Tuple{Integer,Nemo.ResElem}' href='#Base.--Tuple{Integer,Nemo.ResElem}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
-```
--(x, y)
-```
-
-Subtraction operator.
-
-
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
-
-
-```
--(a::Integer, b::ResElem)
-```
-
-> Return $a - b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L289' class='documenter-source'>source</a><br>
-
-<a id='Base.--Tuple{Nemo.ResElem,Integer}' href='#Base.--Tuple{Nemo.ResElem,Integer}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
-```
--(x, y)
-```
-
-Subtraction operator.
-
-
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
-
-
-```
--(a::ResElem, b::Integer)
-```
-
-> Return $a - b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L271' class='documenter-source'>source</a><br>
-
-<a id='Base.--Tuple{Nemo.fmpz,Nemo.ResElem}' href='#Base.--Tuple{Nemo.fmpz,Nemo.ResElem}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
-```
--(x, y)
-```
-
-Subtraction operator.
-
-
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
-
-
-```
--(a::fmpz, b::ResElem)
-```
-
-> Return $a - b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L295' class='documenter-source'>source</a><br>
-
-<a id='Base.--Tuple{Nemo.ResElem,Nemo.fmpz}' href='#Base.--Tuple{Nemo.ResElem,Nemo.fmpz}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
-```
--(x, y)
-```
-
-Subtraction operator.
-
-
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
-
-
-```
--(a::ResElem, b::fmpz)
-```
-
-> Return $a - b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L277' class='documenter-source'>source</a><br>
-
-<a id='Base.--Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.--Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
-```
--(x, y)
-```
-
-Subtraction operator.
-
-
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
-
-
-```
--{T <: RingElem}(a::T, b::ResElem{T})
-```
-
-> Return $a - b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L301' class='documenter-source'>source</a><br>
-
-<a id='Base.--Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.--Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
-```
--(x, y)
-```
-
-Subtraction operator.
-
-
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L643-647' class='documenter-source'>source</a><br>
-
-
-```
--{T <: RingElem}(a::ResElem{T}, b::T)
-```
-
-> Return $a - b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L283' class='documenter-source'>source</a><br>
-
-<a id='Base.*-Tuple{Integer,Nemo.ResElem}' href='#Base.*-Tuple{Integer,Nemo.ResElem}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
-```
-*(x, y...)
-```
-
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
-
-
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
-
-
-```
-*(a::Integer, b::ResElem)
-```
-
-> Return $a\times b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L217' class='documenter-source'>source</a><br>
-
-<a id='Base.*-Tuple{Nemo.ResElem,Integer}' href='#Base.*-Tuple{Nemo.ResElem,Integer}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
-```
-*(x, y...)
-```
-
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
-
-
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
-
-
-```
-*(a::ResElem, b::Integer)
-```
-
-> Return $a\times b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L199' class='documenter-source'>source</a><br>
-
-<a id='Base.*-Tuple{Nemo.fmpz,Nemo.ResElem}' href='#Base.*-Tuple{Nemo.fmpz,Nemo.ResElem}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
-```
-*(x, y...)
-```
-
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
-
-
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
-
-
-```
-*(a::fmpz, b::ResElem)
-```
-
-> Return $a\times b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L223' class='documenter-source'>source</a><br>
-
-<a id='Base.*-Tuple{Nemo.ResElem,Nemo.fmpz}' href='#Base.*-Tuple{Nemo.ResElem,Nemo.fmpz}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
-```
-*(x, y...)
-```
-
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
-
-
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
-
-
-```
-*(a::ResElem, b::fmpz)
-```
-
-> Return $a\times b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L205' class='documenter-source'>source</a><br>
-
-<a id='Base.*-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.*-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
-```
-*(x, y...)
-```
-
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
-
-
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
-
-
-```
-*{T <: RingElem}(a::T, b::ResElem{T})
-```
-
-> Return $a\times b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L229' class='documenter-source'>source</a><br>
-
-<a id='Base.*-Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.*-Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
-```
-*(x, y...)
-```
-
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
-
-
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
-
-
-```
-*{T <: RingElem}(a::ResElem{T}, b::T)
-```
-
-> Return $a\times b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L211' class='documenter-source'>source</a><br>
-
-<a id='Base.^-Tuple{Nemo.ResElem,Int64}' href='#Base.^-Tuple{Nemo.ResElem,Int64}'>#</a>
-**`Base.^`** &mdash; *Method*.
-
-
-
-```
-^(x, y)
-```
-
-Exponentiation operator.
-
-
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L4495-4499' class='documenter-source'>source</a><br>
-
-
-```
-^(a::ResElem, b::Int)
-```
-
-> Return $a^b$.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L313' class='documenter-source'>source</a><br>
+|                                Function |      Operation |
+| ---------------------------------------:| --------------:|
+|             `+(a::Integer, b::ResElem)` |       addition |
+|             `+(a::ResElem, b::Integer)` |       addition |
+|                `+(a::fmpz, b::ResElem)` |       addition |
+|                `+(a::ResElem, b::fmpz)` |       addition |
+| `+{T <: RingElem}(a::T, b::ResElem{T})` |       addition |
+| `+{T <: RingElem}(a::ResElem{T}, b::T)` |       addition |
+|             `-(a::Integer, b::ResElem)` |    subtraction |
+|             `-(a::ResElem, b::Integer)` |    subtraction |
+|                `-(a::fmpz, b::ResElem)` |    subtraction |
+|                `-(a::ResElem, b::fmpz)` |    subtraction |
+| `-{T <: RingElem}(a::T, b::ResElem{T})` |    subtraction |
+| `-{T <: RingElem}(a::ResElem{T}, b::T)` |    subtraction |
+|             `*(a::Integer, b::ResElem)` | multiplication |
+|             `*(a::ResElem, b::Integer)` | multiplication |
+|                `*(a::fmpz, b::ResElem)` | multiplication |
+|                `*(a::ResElem, b::fmpz)` | multiplication |
+| `*{T <: RingElem}(a::T, b::ResElem{T})` | multiplication |
+| `*{T <: RingElem}(a::ResElem{T}, b::T)` | multiplication |
+|                 `^(a::ResElem, n::Int)` |       powering |
 
 
 If the appropriate `promote_rule` and coercion exists, these operators can also be used with elements of other rings. Nemo will try to coerce the operands to the dominating type and then apply the operator.
@@ -1007,152 +467,29 @@ z = p^12
 ## Comparison operators
 
 
-The following comparison operators are implemented for residues in Nemo.
-
-<a id='Base.==-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.==-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.==`** &mdash; *Method*.
+The following comparison operators are implemented for residues in Nemo. Julia provides the corresponding `!=` operator automatically.
 
 
+<a id='Function-1'></a>
 
-```
-=={T <: RingElem}(x::ResElem{T}, y::ResElem{T})
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall that power series to different precisions may still be arithmetically equal to the minimum of the two precisions.
+## Function
 
 
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L327' class='documenter-source'>source</a><br>
-
-
-```
-=={T <: RingElem}(x::ResElem{T}, y::T)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
+`isequal{T <: RingElem}(a::ResElem{T}, b::ResElem{T})` `=={T <: RingElem}(a::ResElem{T}, b::ResElem{T})`
 
 
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L392' class='documenter-source'>source</a><br>
-
-
-```
-=={T <: RingElem}(x::T, y::ResElem{T})
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L401' class='documenter-source'>source</a><br>
-
-<a id='Base.isequal-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.isequal-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.isequal`** &mdash; *Method*.
-
-
-
-```
-isequal{T <: RingElem}(x::ResElem{T}, y::ResElem{T})
-```
-
-> Return `true` if $x == y$ exactly, otherwise return `false`. This function is useful in cases where the data of the residues are inexact, e.g. power series Only if the power series are precisely the same, to the same precision, are they declared equal by this function.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L338' class='documenter-source'>source</a><br>
+The `isequal` operation returns `true` if and only if residues are precisely equal as compared by `isequal`. This is a stronger form of equality, used for comparing inexact ring elements, such as elements of a power series ring, the $p$-adics, or the reals or complex numbers. Two elements are precisely equal only if they have the same precision or bounds in addition to being arithmetically equal. 
 
 
 In addition we have the following ad hoc comparison operators.
 
-<a id='Base.==-Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.==-Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
-**`Base.==`** &mdash; *Method*.
+
+<a id='Function-2'></a>
+
+## Function
 
 
-
-```
-=={T <: RingElem}(x::ResElem{T}, y::T)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L392' class='documenter-source'>source</a><br>
-
-<a id='Base.==-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.==-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.==`** &mdash; *Method*.
-
-
-
-```
-=={T <: RingElem}(x::T, y::ResElem{T})
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L401' class='documenter-source'>source</a><br>
-
-<a id='Base.==-Tuple{Nemo.ResElem,Integer}' href='#Base.==-Tuple{Nemo.ResElem,Integer}'>#</a>
-**`Base.==`** &mdash; *Method*.
-
-
-
-```
-==(x::ResElem, y::Integer)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L356' class='documenter-source'>source</a><br>
-
-<a id='Base.==-Tuple{Integer,Nemo.ResElem}' href='#Base.==-Tuple{Integer,Nemo.ResElem}'>#</a>
-**`Base.==`** &mdash; *Method*.
-
-
-
-```
-==(x::Integer, y::ResElem)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L365' class='documenter-source'>source</a><br>
-
-<a id='Base.==-Tuple{Nemo.ResElem,Nemo.fmpz}' href='#Base.==-Tuple{Nemo.ResElem,Nemo.fmpz}'>#</a>
-**`Base.==`** &mdash; *Method*.
-
-
-
-```
-==(x::ResElem, y::fmpz)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L374' class='documenter-source'>source</a><br>
-
-<a id='Base.==-Tuple{Nemo.fmpz,Nemo.ResElem}' href='#Base.==-Tuple{Nemo.fmpz,Nemo.ResElem}'>#</a>
-**`Base.==`** &mdash; *Method*.
-
-
-
-```
-==(x::fmpz, y::ResElem)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L383' class='documenter-source'>source</a><br>
+`=={T <: RingElem}(a::ResElem{T}, b::T)` `=={T <: RingElem}(a::T, b::ResElem{T})` `==(a::ResElem, b::Integer)` `==(a::Integer, b::ResElem)` `==(a::ResElem, b::fmpz)` `==(a::fmpz, b::ResElem)`
 
 
 Here are some examples of comparisons.
@@ -1198,7 +535,7 @@ inv(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L422' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L422' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing inverses.
@@ -1234,7 +571,7 @@ gcd{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/bd26164b61cbd0978f038227c3d10d550157c1c2/src/generic/Residue.jl#L460' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/generic/Residue.jl#L460' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing a greatest common divisor.

@@ -337,67 +337,45 @@ that Julia uses the single slash for floating point division. Therefore to
 perform exact division in a ring we use `divexact`. To construct an element
 of a fraction field one can use the double slash operator `//`.
 
-```@docs
--(::FracElem)
-```
+The following operators and functions are provided.
 
-```@docs
-+{T <: RingElem}(::FracElem{T}, ::FracElem{T})
-```
-
-```@docs
--{T <: RingElem}(::FracElem{T}, ::FracElem{T})
-```
-
-```@docs
-*{T <: RingElem}(::FracElem{T}, ::FracElem{T})
-```
-
-```@docs
-divexact{T <: RingElem}(::FracElem{T}, ::FracElem{T})
-```
+Function                                                  | Operation
+----------------------------------------------------------|----------------
+`-(a::FracElem)`                                          | unary minus
+`+{T <: RingElem}(a::FracElem{T}, b::FracElem{T})`        | addition
+`-{T <: RingElem}(a::FracElem{T}, b::FracElem{T})`        | subtraction
+`*{T <: RingElem}(a::FracElem{T}, b::FracElem{T})`        | multiplication
+`divexact{T <: RingElem}(a::FracElem{T}, b::FracElem{T})` | exact division
 
 The following ad hoc operators are also provided.
 
-```@docs
-+(::Integer, ::FracElem)
-+(::FracElem, ::Integer)
-+(::fmpz, ::FracElem)
-+(::FracElem, ::fmpz)
-+{T <: RingElem}(::T, ::FracElem{T})
-+{T <: RingElem}(::FracElem{T}, ::T)
-```
-
-```@docs
--(::Integer, ::FracElem)
--(::FracElem, ::Integer)
--(::fmpz, ::FracElem)
--(::FracElem, ::fmpz)
--{T <: RingElem}(::T, ::FracElem{T})
--{T <: RingElem}(::FracElem{T}, ::T)
-``` 
-
-```@docs
-*(::Integer, ::FracElem)
-*(::FracElem, ::Integer)
-*(::fmpz, ::FracElem)
-*(::FracElem, ::fmpz)
-*{T <: RingElem}(::T, ::FracElem{T})
-*{T <: RingElem}(::FracElem{T}, ::T)
-``` 
-
-```@docs
-divexact(::Integer, ::FracElem)
-divexact(::FracElem, ::Integer)
-divexact(::fmpz, ::FracElem)
-divexact(::FracElem, ::fmpz)
-divexact{T <: RingElem}(::T, ::FracElem{T})
-divexact{T <: RingElem}(::FracElem{T}, ::T)
-``` 
-
-```@docs
-^(::FracElem, ::Int)
-```
+Function                                        | Operation
+------------------------------------------------|----------------
+`+(a::Integer, b::FracElem)`                    | addition
+`+(a::FracElem, b::Integer)`                    | addition
+`+(a::fmpz, b::FracElem)`                       | addition
+`+(a::FracElem, b::fmpz)`                       | addition
+`+{T <: RingElem}(a::T, b::FracElem{T})`        | addition
+`+{T <: RingElem}(a::FracElem{T}, b::T)`        | addition
+`-(a::Integer, b::FracElem)`                    | subtraction
+`-(a::FracElem, b::Integer)`                    | subtraction
+`-(a::fmpz, b::FracElem)`                       | subtraction
+`-(a::FracElem, b::fmpz)`                       | subtraction
+`-{T <: RingElem}(a::T, b::FracElem{T})`        | subtraction
+`-{T <: RingElem}(a::FracElem{T}, b::T)`        | subtraction
+`*(a::Integer, b::FracElem)`                    | multiplication
+`*(a::FracElem, b::Integer)`                    | multiplication
+`*(a::fmpz, b::FracElem)`                       | multiplication
+`*(a::FracElem, b::fmpz)`                       | multiplication
+`*{T <: RingElem}(a::T, b::FracElem{T})`        | multiplication
+`*{T <: RingElem}(a::FracElem{T}, b::T)`        | multiplication
+`divexact(a::Integer, b::FracElem)`             | exact division
+`divexact(a::FracElem, b::Integer)`             | exact division
+`divexact(a::fmpz, b::FracElem)`                | exact division
+`divexact(a::FracElem, b::fmpz)`                | exact division
+`divexact{T <: RingElem}(a::T, b::FracElem{T})` | exact division
+`divexact{T <: RingElem}(a::FracElem{T}, b::T)` | exact division
+`^(a::FracElem, n::Int)`                        | powering
 
 If the appropriate `promote_rule` and coercion exists, these operators can also
 be used with elements of other rings. Nemo will try to coerce the operands to
@@ -425,25 +403,30 @@ q = a^3
 ## Comparison operators
 
 The following comparison operators are implemented for fractions in Nemo.
+Julia provides the corresponding `!=` operator automatically.
 
-```@docs
-=={T <: RingElem}(::FracElem{T}, ::FracElem{T})
-```
+Function
+---------------------------------------------------------
+`isequal{T <: RingElem}(a::FracElem{T}, b::FracElem{T})`
+`=={T <: RingElem}(a::FracElem{T}, b::FracElem{T})`
 
-```@docs
-isequal{T <: RingElem}(::FracElem{T}, ::FracElem{T})
-```
+The `isequal` operation returns `true` if and only if numerator and denominator
+of the fraction are precisely equal as compared by `isequal`. This is a
+stronger form of equality, used for comparing inexact ring elements, such as
+elements of a power series ring, the $p$-adics, or the reals or complex numbers.
+Two elements are precisely equal only if they have the same precision or bounds
+in addition to being arithmetically equal. 
 
 In addition we have the following ad hoc comparison operators.
 
-```@docs
-=={T <: RingElem}(::FracElem{T}, ::T)
-=={T <: RingElem}(::T, ::FracElem{T})
-==(::FracElem, ::Integer)
-==(::Integer, ::FracElem)
-==(::FracElem, ::fmpz)
-==(::fmpz, ::FracElem)
-```
+Function
+------------------------------------------
+`=={T <: RingElem}(a::FracElem{T}, b::T)`
+`=={T <: RingElem}(a::T, b::FracElem{T})`
+`==(a::FracElem, b::Integer)`
+`==(a::Integer, b::FracElem)`
+`==(a::FracElem, b::fmpz)`
+`==(a::fmpz, b::FracElem)`
 
 Here are some examples of comparisons.
 
