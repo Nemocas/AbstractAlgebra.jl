@@ -1,49 +1,24 @@
 Build
 -----
 
-* Use git clone rather than wget for mpir/mpfr and try/except
+* Remove dependency on git on Windows
+
+* Remove Pari module (once factorisation of integers and Z[x] is done)
 
 General
 -------
 
-* Implement more generic ad hoc operators so we can remove all the documentation
-of ad hoc operators for other types
-
 * add lots of tests for exceptions and special cases dealt with in code
 
-* entry/coeff, set_entry!/set_coeff! for Residue{fmpz} entries but 
-  entry_data/coeff_data, set_entry!/set_coeff! (overloaded) for Int/fmpz
-  entries
-
-* Implement strict equality, e.g. isidentical(1+O(x), 1+O(x^2)) == false;
-  don't use isequal; in Julia it's for objects that hash to the same value
-
-* change names of shift_left/right
-
-* add deepcopy methods
+* don't use isequal; in Julia it's for objects that hash to the same value
 
 * fix issues with stack overflow on nonexistent operators
 
-* work out how to add /(a::Poly{T}, a::T) methods, etc, without conflicts
-
-* implement type stable division which doesn't assume exactness
-
-* make function names conform to Julia standard
-
 * rename primpart to primitive_part
-
-* add hashing for all Pari and Arb types
-
-* put underscore before den and num type fields, to prevent a.num instead
-  of num(a)
 
 * Optimise for monomials in polynomial modules, especially powering
 
-Factor.jl
----------
-
-* Factorisation of integer, polys over Z and polys over Z/nZ return different
-  formats for the factorisation object, which differ from the Julia factor type
+* introduce CapRelSeries abstract type
 
 fq_poly.jl / fq_nmod_poly.jl
 ----------------------------
@@ -67,8 +42,6 @@ fmpz_mod_poly.jl
 Poly.jl/fmpz_poly.jl
 --------------------
 
-* The generic Nemo Poly type is conflicting with the generic Julia Poly type
-
 * Fix printing of monomials, e.g. y + (x), y + (6)
 
 * Fix efficient powering of x in flint specialised polynomials cases
@@ -85,21 +58,12 @@ Poly.jl/fmpz_poly.jl
 
 * implement fmpz_mod_poly_get_str_pretty and use it in show
 
-* Use set_length in Poly.jl instead of setting poly length field directly,
-  otherwise generic functions can't act as catchall for poly types that don't
-  have a length field
-
 * Add generic multipoint evaluation a la arb_poly evaluate(x::arb_poly, b::Array{arb, 1}).
 
 * Add generic function for constructing a polynomial from its roots, a la the
 arb_poly function from_roots.
 
-ZZ.jl
------
-
-* defining % automatically defines rem, so remove one from ZZ
-
-* hashing of fmpz's is inefficient
+* implement Sylvester matrix version of generic resultant
 
 Residue.jl
 ----------
@@ -107,12 +71,6 @@ Residue.jl
 * Make powering do its own powmod
 
 * implement divexact by an invertible integer, etc
-
-* Hashing of tuples doesn't do what we want, e.g.
-   R = ResidueRing(ZZ, ZZ(2))
-   S = ResidueRing(ZZ, ZZ(2))
-   R == S
-   returns false
 
 FLINT
 -----
@@ -153,21 +111,14 @@ can still be performed
 * ensure exp is only defined for rings in which division by an integer is
 possible
 
-* Use set_length instead of setting power series length field directly,
-  otherwise generic functions can't act as catchall for series types that don't
-  have a length field
+* store relative power series in valuation/unit (i.e. relative) form instead of
+current absolute form 
 
 Fraction.jl
 -----------
 
-* should Fraction only use canonical_unit when printing?
-
 * canonical_unit for fractions is odd for (1//(x^2+1))//(2//(x+1)) over
   rationals
-
-* Fraction functions shouldn't set the parent, but should use the parent call
-  objects instead, otherwise the generic fraction functions can't act as
-  catchalls for fraction fields that don't have a parent field
 
 nf.jl
 -----
@@ -178,29 +129,8 @@ nf.jl
   over Q, and yet allow all the coercions from that ring into number fields
   maximal orders, ideals, etc., without making it inefficient
 
-pari_int.jl
------------
-
-* Pari integer conversion from fmpz is not efficient
-
-pari_frac.jl
-------------
-
-* ZZ! in pari_frac.jl should not be needed, call ZZ! in pari_int 
-  once Julia supports doing so
-
-fq.jl
------
-
-* Allow creation of a finite field from an fmpz_mod_poly as modulus as we've
-  done in fq_nmod.jl for an nmod_poly modulus
-
 nmod_mat
 --------
-
-* General cleanup, decide what should be removed, document the rest
-
-* Deal with matrix windows
 
 * fix _checkbounds and related functions
 
@@ -211,12 +141,12 @@ fmpz_mat
 
 * fix _checkbounds
 
-Julia bugs??
-============
+arb/acb(_poly/mat)
+------------------
 
-* Overloading / for poly/coeff causes ambiguity
+* add hash functions
 
-* Stack overflow when using the catchall in Rings.jl
+* add missing ad hoc operators
 
-* disambiguation required in Fraction.jl
+* document flags for roots() in acb_poly
 
