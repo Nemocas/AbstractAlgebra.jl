@@ -1,5 +1,3 @@
-if !on_windows64
-
 RR = AcbField(64)
 CC = AcbField(64)
 
@@ -451,6 +449,4 @@ function test_acb_poly()
 
    println("")
 end
-
-end # on_windows64
 
