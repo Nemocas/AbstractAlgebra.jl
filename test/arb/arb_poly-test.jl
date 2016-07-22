@@ -1,5 +1,3 @@
-if !on_windows64
-
 RR = ArbField(64)
 
 function test_arb_poly_constructors()
@@ -437,5 +435,4 @@ function test_arb_poly()
    println("")
 end
 
-end # on_windows64
 
