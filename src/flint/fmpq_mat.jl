@@ -99,7 +99,7 @@ function setindex!(a::fmpq_mat, d::Int, r::Int, c::Int)
    _checkbounds(a.parent.cols, c) || throw(BoundsError())
    z = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
              (Ptr{fmpq_mat}, Int, Int), &a, r - 1, c - 1)
-   ccall((:fmpq_set_si, :libflint), Void, (Ptr{fmpq}, Int), z, d)
+   ccall((:fmpq_set_si, :libflint), Void, (Ptr{fmpq}, Int, Int), z, d, 1)
 end
 
 rows(a::fmpq_mat) = a.r
