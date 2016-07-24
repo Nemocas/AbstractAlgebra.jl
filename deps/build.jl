@@ -97,7 +97,7 @@ if on_windows
    if Int == Int32
       download_dll("http://nemocas.org/binaries/w32-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
    else
-      download_dll("http://nemocas.org/binaries/w64-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
+      download_dll("http://nemocas.org/binaries/w64-msys-mpfr-4.dll", joinpath(vdir, "lib", "msys-mpfr-4.dll"))
    end
 else
    run(`tar -xvf mpfr-3.1.4.tar.bz2`)
