@@ -47,5 +47,4 @@ cd ../..
 
 # replace i686 with x86_64 through
 # replace ABI=32 with ABI=64
-# replace mingw32 with mingw64
 
