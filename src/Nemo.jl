@@ -50,9 +50,15 @@ include("AbstractTypes.jl")
 #
 ###############################################################################
 
+on_windows64 = (@windows ? true : false) && (Int == Int64)
+
 const pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
 const libdir = joinpath(pkgdir, "local", "lib")
-const libgmp = joinpath(pkgdir, "local", "lib", "libgmp")
+if (@windows ? true : false)
+   const libgmp = joinpath(pkgdir, "local", "lib", "libgmp-16")
+else
+   const libgmp = joinpath(pkgdir, "local", "lib", "libgmp")
+end
 const libmpfr = joinpath(pkgdir, "local", "lib", "libmpfr")
 const libflint = joinpath(pkgdir, "local", "lib", "libflint")
 const libpari = joinpath(pkgdir, "local", "lib", "libpari")
@@ -70,9 +76,6 @@ end
 function flint_abort()
   error("Problem in the Flint-Subsystem")
 end
-
-
-on_windows64 = (@windows ? true : false) && (Int == Int64)
 
 function __init__()
 
@@ -92,13 +95,15 @@ function __init__()
       push!(Libdl.DL_LOAD_PATH, libdir)
    end
  
-   ccall((:pari_set_memory_functions, libpari), Void,
-      (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
-      cglobal(:jl_malloc),
-      cglobal(:jl_calloc),
-      cglobal(:jl_realloc),
-      cglobal(:jl_free))
-
+   if !on_windows
+      ccall((:pari_set_memory_functions, libpari), Void,
+         (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
+         cglobal(:jl_malloc),
+         cglobal(:jl_calloc),
+         cglobal(:jl_realloc),
+         cglobal(:jl_free))
+   end
+   
    ccall((:pari_init, libpari), Void, (Int, Int), 300000000, 10000)
   
    global avma = cglobal((:avma, libpari), Ptr{Int})
@@ -111,19 +116,21 @@ function __init__()
 
    unsafe_store!(pari_sigint, cfunction(pari_sigint_handler, Void, ()), 1)
 
-   ccall((:__gmp_set_memory_functions, libgmp), Void,
-      (Ptr{Void},Ptr{Void},Ptr{Void}),
-      cglobal(:jl_gc_counted_malloc),
-      cglobal(:jl_gc_counted_realloc_with_old_size),
-      cglobal(:jl_gc_counted_free))
+   if !on_windows
+      ccall((:__gmp_set_memory_functions, libgmp), Void,
+         (Ptr{Void},Ptr{Void},Ptr{Void}),
+         cglobal(:jl_gc_counted_malloc),
+         cglobal(:jl_gc_counted_realloc_with_old_size),
+         cglobal(:jl_gc_counted_free))
 
-   ccall((:__flint_set_memory_functions, libflint), Void,
-      (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
-      cglobal(:jl_malloc),
-      cglobal(:jl_calloc),
-      cglobal(:jl_realloc),
-      cglobal(:jl_free))
-
+      ccall((:__flint_set_memory_functions, libflint), Void,
+         (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
+         cglobal(:jl_malloc),
+         cglobal(:jl_calloc),
+         cglobal(:jl_realloc),
+         cglobal(:jl_free))
+   end
+   
    ccall((:flint_set_abort, libflint), Void,
       (Ptr{Void},), cfunction(flint_abort, Void, ()))
 
