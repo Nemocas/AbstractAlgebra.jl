@@ -3,7 +3,7 @@
 wget http://mpir.org/mpir-2.7.2.tar.bz2
 tar -xvf mpir-2.7.2.tar.bz2
 cd mpir-2.7.2
-./configure --enable-shared --disable-static --enable-gmpcompat --build=core2-pc-mingw64 LDFLAGS=-static-libgcc ABI=32
+./configure --enable-shared --disable-static --enable-gmpcompat --build=core2-w64-mingw64 LDFLAGS=-static-libgcc ABI=32
 make -j
 cd ..
 wget http://www.mpfr.org/mpfr-current/mpfr-3.1.4.tar.bz2
