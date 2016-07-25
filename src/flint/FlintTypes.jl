@@ -50,6 +50,7 @@ type fmpz <: RingElem
     function fmpz(x::Float64)
         !isinteger(x) && throw(InexactError())
         z = new()
+        ccall((:fmpz_init, :libflint), Void, (Ptr{fmpz},), &z)
         ccall((:fmpz_set_d, :libflint), Void, (Ptr{fmpz}, Cdouble), &z, x)
         finalizer(z, _fmpz_clear_fn)
         return z
