@@ -46,6 +46,9 @@ ResidueRing{T <: RingElem}(R::Ring, a::T; cached=true)
 
 
 
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L549' class='documenter-source'>source</a><br>
+
+
 Here are some examples of creating residue rings and making use of the resulting parent objects to coerce various elements into those rings.
 
 
@@ -70,7 +73,7 @@ Once a residue ring is constructed, there are various ways to construct residues
 
 Apart from coercing elements into the residue ring as above, we offer the following functions.
 
-<a id='Base.zero-Tuple{Nemo.ResRing{T}}' href='#Base.zero-Tuple{Nemo.ResRing{T}}'>#</a>
+<a id='Base.zero-Tuple{Nemo.ResRing}' href='#Base.zero-Tuple{Nemo.ResRing}'>#</a>
 **`Base.zero`** &mdash; *Method*.
 
 
@@ -82,7 +85,10 @@ zero(R::ResRing)
 > Return the zero element of the given residue ring, i.e. $0 \pmod{a}$ where $a$ is the modulus of the residue ring.
 
 
-<a id='Base.one-Tuple{Nemo.ResRing{T}}' href='#Base.one-Tuple{Nemo.ResRing{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L79' class='documenter-source'>source</a><br>
+
+<a id='Base.one-Tuple{Nemo.ResRing}' href='#Base.one-Tuple{Nemo.ResRing}'>#</a>
 **`Base.one`** &mdash; *Method*.
 
 
@@ -93,6 +99,9 @@ zero(R::ResRing)
 
 > Return $1 \pmod{a}$ where $a$ is the modulus of the residue ring.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L86' class='documenter-source'>source</a><br>
 
 
 Here are some examples of constructing residues.
@@ -238,11 +247,11 @@ Typically a developer will also overload the `ResidueRing` generic function to c
 
 Numerous functions are provided to manipulate residues. Also see the section on basic functionality above.
 
-<a id='Nemo.base_ring-Tuple{Nemo.ResRing{T}}' href='#Nemo.base_ring-Tuple{Nemo.ResRing{T}}'>#</a>
+<a id='Nemo.base_ring-Tuple{Nemo.ResRing}' href='#Nemo.base_ring-Tuple{Nemo.ResRing}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
 
 
-<a id='Nemo.base_ring-Tuple{Nemo.ResElem{T}}' href='#Nemo.base_ring-Tuple{Nemo.ResElem{T}}'>#</a>
+<a id='Nemo.base_ring-Tuple{Nemo.ResElem}' href='#Nemo.base_ring-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
 
 
@@ -254,7 +263,10 @@ base_ring(r::ResElem)
 > Return the base ring $R$ of the residue ring $R/(a)$ that the supplied element $r$ belongs to.
 
 
-<a id='Base.parent-Tuple{Nemo.ResElem{T}}' href='#Base.parent-Tuple{Nemo.ResElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L25' class='documenter-source'>source</a><br>
+
+<a id='Base.parent-Tuple{Nemo.ResElem}' href='#Base.parent-Tuple{Nemo.ResElem}'>#</a>
 **`Base.parent`** &mdash; *Method*.
 
 
@@ -266,7 +278,10 @@ parent(a::ResElem)
 > Return the parent object of the given residue element.
 
 
-<a id='Nemo.modulus-Tuple{Nemo.ResRing{T}}' href='#Nemo.modulus-Tuple{Nemo.ResRing{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L32' class='documenter-source'>source</a><br>
+
+<a id='Nemo.modulus-Tuple{Nemo.ResRing}' href='#Nemo.modulus-Tuple{Nemo.ResRing}'>#</a>
 **`Nemo.modulus`** &mdash; *Method*.
 
 
@@ -278,7 +293,10 @@ modulus(R::ResRing)
 > Return the modulus $a$ of the given residue ring $S = R/(a)$.
 
 
-<a id='Nemo.modulus-Tuple{Nemo.ResElem{T}}' href='#Nemo.modulus-Tuple{Nemo.ResElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L60' class='documenter-source'>source</a><br>
+
+<a id='Nemo.modulus-Tuple{Nemo.ResElem}' href='#Nemo.modulus-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.modulus`** &mdash; *Method*.
 
 
@@ -290,7 +308,10 @@ modulus(R::ResRing)
 > Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied residue $r$ belongs to.
 
 
-<a id='Nemo.iszero-Tuple{Nemo.ResElem{T}}' href='#Nemo.iszero-Tuple{Nemo.ResElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L68' class='documenter-source'>source</a><br>
+
+<a id='Nemo.iszero-Tuple{Nemo.ResElem}' href='#Nemo.iszero-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
 
 
@@ -302,7 +323,10 @@ iszero(a::ResElem)
 > Return `true` if the supplied element $a$ is zero in the residue ring it belongs to, otherwise return `false`.
 
 
-<a id='Nemo.isone-Tuple{Nemo.ResElem{T}}' href='#Nemo.isone-Tuple{Nemo.ResElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L92' class='documenter-source'>source</a><br>
+
+<a id='Nemo.isone-Tuple{Nemo.ResElem}' href='#Nemo.isone-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
 
 
@@ -314,7 +338,10 @@ isone(a::ResElem)
 > Return `true` if the supplied element $a$ is one in the residue ring it belongs to, otherwise return `false`.
 
 
-<a id='Nemo.isunit-Tuple{Nemo.ResElem{T}}' href='#Nemo.isunit-Tuple{Nemo.ResElem{T}}'>#</a>
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L99' class='documenter-source'>source</a><br>
+
+<a id='Nemo.isunit-Tuple{Nemo.ResElem}' href='#Nemo.isunit-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.isunit`** &mdash; *Method*.
 
 
@@ -325,6 +352,9 @@ iszero(a::ResElem)
 
 > Return `true` if the supplied element $a$ is invertible in the residue ring it belongs to, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L106' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of residues.
@@ -356,448 +386,43 @@ W = base_ring(T(x + 1))
 
 All the usual arithmetic operators are overloaded for Nemo residues. Note that Julia uses the single slash for floating point division. Therefore to perform exact division in a ring we use `divexact`. To construct an element of a fraction field one can use the double slash operator `//`.
 
-<a id='Base.--Tuple{Nemo.ResElem{T}}' href='#Base.--Tuple{Nemo.ResElem{T}}'>#</a>
-**`Base.-`** &mdash; *Method*.
+
+The following operators and functions are provided.
 
 
-
-```
--(x)
-```
-
-Unary minus operator.
-
-<a id='Base.+-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.+-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.+`** &mdash; *Method*.
-
-
-
-```
-+{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
-```
-
-> Return $a + b$.
-
-
-
-```
-+{T <: RingElem}(a::ResElem{T}, b::T)
-```
-
-> Return $a + b$.
-
-
-
-```
-+{T <: RingElem}(a::T, b::ResElem{T})
-```
-
-> Return $a + b$.
-
-
-<a id='Base.--Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.--Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
-```
--(x, y)
-```
-
-Subtraction operator.
-
-
-```
--{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
-```
-
-> Return $a - b$.
-
-
-
-```
--{T <: RingElem}(a::ResElem{T}, b::T)
-```
-
-> Return $a - b$.
-
-
-
-```
--{T <: RingElem}(a::T, b::ResElem{T})
-```
-
-> Return $a - b$.
-
-
-<a id='Base.*-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.*-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
-```
-*(x, y...)
-```
-
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
-
-
-```
-*{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
-```
-
-> Return $a\times b$.
-
-
-
-```
-*{T <: RingElem}(a::ResElem{T}, b::T)
-```
-
-> Return $a\times b$.
-
-
-
-```
-*{T <: RingElem}(a::T, b::ResElem{T})
-```
-
-> Return $a\times b$.
-
-
-<a id='Nemo.divexact-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}' href='#Nemo.divexact-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Nemo.divexact`** &mdash; *Method*.
-
-
-
-```
-divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
-```
-
-> Return $a/b$ where the quotient is expected to be exact.
-
+|                                                Function |      Operation |
+| -------------------------------------------------------:| --------------:|
+|                                         `-(a::ResElem)` |    unary minus |
+|        `+{T <: RingElem}(a::ResElem{T}, b::ResElem{T})` |       addition |
+|        `-{T <: RingElem}(a::ResElem{T}, b::ResElem{T})` |    subtraction |
+|        `*{T <: RingElem}(a::ResElem{T}, b::ResElem{T})` | multiplication |
+| `divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})` | exact division |
 
 
 The following ad hoc operators are also provided.
 
-<a id='Base.+-Tuple{Integer,Nemo.ResElem{T}}' href='#Base.+-Tuple{Integer,Nemo.ResElem{T}}'>#</a>
-**`Base.+`** &mdash; *Method*.
 
-
-
-```
-+(a::Integer, b::ResElem)
-```
-
-> Return $a + b$.
-
-
-<a id='Base.+-Tuple{Nemo.ResElem{T},Integer}' href='#Base.+-Tuple{Nemo.ResElem{T},Integer}'>#</a>
-**`Base.+`** &mdash; *Method*.
-
-
-
-```
-+(a::ResElem, b::Integer)
-```
-
-> Return $a + b$.
-
-
-<a id='Base.+-Tuple{Nemo.fmpz,Nemo.ResElem{T}}' href='#Base.+-Tuple{Nemo.fmpz,Nemo.ResElem{T}}'>#</a>
-**`Base.+`** &mdash; *Method*.
-
-
-
-```
-+(a::fmpz, b::ResElem)
-```
-
-> Return $a + b$.
-
-
-<a id='Base.+-Tuple{Nemo.ResElem{T},Nemo.fmpz}' href='#Base.+-Tuple{Nemo.ResElem{T},Nemo.fmpz}'>#</a>
-**`Base.+`** &mdash; *Method*.
-
-
-
-```
-+(a::ResElem, b::Integer)
-```
-
-> Return $a + b$.
-
-
-<a id='Base.+-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.+-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.+`** &mdash; *Method*.
-
-
-
-```
-+{T <: RingElem}(a::T, b::ResElem{T})
-```
-
-> Return $a + b$.
-
-
-<a id='Base.+-Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.+-Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
-**`Base.+`** &mdash; *Method*.
-
-
-
-```
-+{T <: RingElem}(a::ResElem{T}, b::T)
-```
-
-> Return $a + b$.
-
-
-<a id='Base.--Tuple{Integer,Nemo.ResElem{T}}' href='#Base.--Tuple{Integer,Nemo.ResElem{T}}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
-```
--(x, y)
-```
-
-Subtraction operator.
-
-
-```
--(a::Integer, b::ResElem)
-```
-
-> Return $a - b$.
-
-
-<a id='Base.--Tuple{Nemo.ResElem{T},Integer}' href='#Base.--Tuple{Nemo.ResElem{T},Integer}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
-```
--(x, y)
-```
-
-Subtraction operator.
-
-
-```
--(a::ResElem, b::Integer)
-```
-
-> Return $a - b$.
-
-
-<a id='Base.--Tuple{Nemo.fmpz,Nemo.ResElem{T}}' href='#Base.--Tuple{Nemo.fmpz,Nemo.ResElem{T}}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
-```
--(x, y)
-```
-
-Subtraction operator.
-
-
-```
--(a::fmpz, b::ResElem)
-```
-
-> Return $a - b$.
-
-
-<a id='Base.--Tuple{Nemo.ResElem{T},Nemo.fmpz}' href='#Base.--Tuple{Nemo.ResElem{T},Nemo.fmpz}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
-```
--(x, y)
-```
-
-Subtraction operator.
-
-
-```
--(a::ResElem, b::fmpz)
-```
-
-> Return $a - b$.
-
-
-<a id='Base.--Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.--Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
-```
--(x, y)
-```
-
-Subtraction operator.
-
-
-```
--{T <: RingElem}(a::T, b::ResElem{T})
-```
-
-> Return $a - b$.
-
-
-<a id='Base.--Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.--Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
-**`Base.-`** &mdash; *Method*.
-
-
-
-```
--(x, y)
-```
-
-Subtraction operator.
-
-
-```
--{T <: RingElem}(a::ResElem{T}, b::T)
-```
-
-> Return $a - b$.
-
-
-<a id='Base.*-Tuple{Integer,Nemo.ResElem{T}}' href='#Base.*-Tuple{Integer,Nemo.ResElem{T}}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
-```
-*(x, y...)
-```
-
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
-
-
-```
-*(a::Integer, b::ResElem)
-```
-
-> Return $a\times b$.
-
-
-<a id='Base.*-Tuple{Nemo.ResElem{T},Integer}' href='#Base.*-Tuple{Nemo.ResElem{T},Integer}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
-```
-*(x, y...)
-```
-
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
-
-
-```
-*(a::ResElem, b::Integer)
-```
-
-> Return $a\times b$.
-
-
-<a id='Base.*-Tuple{Nemo.fmpz,Nemo.ResElem{T}}' href='#Base.*-Tuple{Nemo.fmpz,Nemo.ResElem{T}}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
-```
-*(x, y...)
-```
-
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
-
-
-```
-*(a::fmpz, b::ResElem)
-```
-
-> Return $a\times b$.
-
-
-<a id='Base.*-Tuple{Nemo.ResElem{T},Nemo.fmpz}' href='#Base.*-Tuple{Nemo.ResElem{T},Nemo.fmpz}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
-```
-*(x, y...)
-```
-
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
-
-
-```
-*(a::ResElem, b::fmpz)
-```
-
-> Return $a\times b$.
-
-
-<a id='Base.*-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.*-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
-```
-*(x, y...)
-```
-
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
-
-
-```
-*{T <: RingElem}(a::T, b::ResElem{T})
-```
-
-> Return $a\times b$.
-
-
-<a id='Base.*-Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.*-Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
-**`Base.*`** &mdash; *Method*.
-
-
-
-```
-*(x, y...)
-```
-
-Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
-
-
-```
-*{T <: RingElem}(a::ResElem{T}, b::T)
-```
-
-> Return $a\times b$.
-
-
-<a id='Base.^-Tuple{Nemo.ResElem{T},Int64}' href='#Base.^-Tuple{Nemo.ResElem{T},Int64}'>#</a>
-**`Base.^`** &mdash; *Method*.
-
-
-
-```
-^(x, y)
-```
-
-Exponentiation operator.
-
-
-```
-^(a::ResElem, b::Int)
-```
-
-> Return $a^b$.
-
+|                                Function |      Operation |
+| ---------------------------------------:| --------------:|
+|             `+(a::Integer, b::ResElem)` |       addition |
+|             `+(a::ResElem, b::Integer)` |       addition |
+|                `+(a::fmpz, b::ResElem)` |       addition |
+|                `+(a::ResElem, b::fmpz)` |       addition |
+| `+{T <: RingElem}(a::T, b::ResElem{T})` |       addition |
+| `+{T <: RingElem}(a::ResElem{T}, b::T)` |       addition |
+|             `-(a::Integer, b::ResElem)` |    subtraction |
+|             `-(a::ResElem, b::Integer)` |    subtraction |
+|                `-(a::fmpz, b::ResElem)` |    subtraction |
+|                `-(a::ResElem, b::fmpz)` |    subtraction |
+| `-{T <: RingElem}(a::T, b::ResElem{T})` |    subtraction |
+| `-{T <: RingElem}(a::ResElem{T}, b::T)` |    subtraction |
+|             `*(a::Integer, b::ResElem)` | multiplication |
+|             `*(a::ResElem, b::Integer)` | multiplication |
+|                `*(a::fmpz, b::ResElem)` | multiplication |
+|                `*(a::ResElem, b::fmpz)` | multiplication |
+| `*{T <: RingElem}(a::T, b::ResElem{T})` | multiplication |
+| `*{T <: RingElem}(a::ResElem{T}, b::T)` | multiplication |
+|                 `^(a::ResElem, n::Int)` |       powering |
 
 
 If the appropriate `promote_rule` and coercion exists, these operators can also be used with elements of other rings. Nemo will try to coerce the operands to the dominating type and then apply the operator.
@@ -842,122 +467,29 @@ z = p^12
 ## Comparison operators
 
 
-The following comparison operators are implemented for residues in Nemo.
-
-<a id='Base.==-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.==-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.==`** &mdash; *Method*.
+The following comparison operators are implemented for residues in Nemo. Julia provides the corresponding `!=` operator automatically.
 
 
+<a id='Function-1'></a>
 
-```
-=={T <: RingElem}(x::ResElem{T}, y::ResElem{T})
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall that power series to different precisions may still be arithmetically equal to the minimum of the two precisions.
+## Function
 
 
-
-```
-=={T <: RingElem}(x::ResElem{T}, y::T)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
+`isequal{T <: RingElem}(a::ResElem{T}, b::ResElem{T})` `=={T <: RingElem}(a::ResElem{T}, b::ResElem{T})`
 
 
-
-```
-=={T <: RingElem}(x::T, y::ResElem{T})
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-<a id='Base.isequal-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.isequal-Tuple{Nemo.ResElem{T<:Nemo.RingElem},Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.isequal`** &mdash; *Method*.
-
-
-
-```
-isequal{T <: RingElem}(x::ResElem{T}, y::ResElem{T})
-```
-
-> Return `true` if $x == y$ exactly, otherwise return `false`. This function is useful in cases where the data of the residues are inexact, e.g. power series Only if the power series are precisely the same, to the same precision, are they declared equal by this function.
-
+The `isequal` operation returns `true` if and only if residues are precisely equal as compared by `isequal`. This is a stronger form of equality, used for comparing inexact ring elements, such as elements of a power series ring, the $p$-adics, or the reals or complex numbers. Two elements are precisely equal only if they have the same precision or bounds in addition to being arithmetically equal. 
 
 
 In addition we have the following ad hoc comparison operators.
 
-<a id='Base.==-Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}' href='#Base.==-Tuple{Nemo.ResElem{T<:Nemo.RingElem},T<:Nemo.RingElem}'>#</a>
-**`Base.==`** &mdash; *Method*.
+
+<a id='Function-2'></a>
+
+## Function
 
 
-
-```
-=={T <: RingElem}(x::ResElem{T}, y::T)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-<a id='Base.==-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}' href='#Base.==-Tuple{T<:Nemo.RingElem,Nemo.ResElem{T<:Nemo.RingElem}}'>#</a>
-**`Base.==`** &mdash; *Method*.
-
-
-
-```
-=={T <: RingElem}(x::T, y::ResElem{T})
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-<a id='Base.==-Tuple{Nemo.ResElem{T},Integer}' href='#Base.==-Tuple{Nemo.ResElem{T},Integer}'>#</a>
-**`Base.==`** &mdash; *Method*.
-
-
-
-```
-==(x::ResElem, y::Integer)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-<a id='Base.==-Tuple{Integer,Nemo.ResElem{T}}' href='#Base.==-Tuple{Integer,Nemo.ResElem{T}}'>#</a>
-**`Base.==`** &mdash; *Method*.
-
-
-
-```
-==(x::Integer, y::ResElem)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-<a id='Base.==-Tuple{Nemo.ResElem{T},Nemo.fmpz}' href='#Base.==-Tuple{Nemo.ResElem{T},Nemo.fmpz}'>#</a>
-**`Base.==`** &mdash; *Method*.
-
-
-
-```
-==(x::ResElem, y::fmpz)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
-
-<a id='Base.==-Tuple{Nemo.fmpz,Nemo.ResElem{T}}' href='#Base.==-Tuple{Nemo.fmpz,Nemo.ResElem{T}}'>#</a>
-**`Base.==`** &mdash; *Method*.
-
-
-
-```
-==(x::fmpz, y::ResElem)
-```
-
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-
+`=={T <: RingElem}(a::ResElem{T}, b::T)` `=={T <: RingElem}(a::T, b::ResElem{T})` `==(a::ResElem, b::Integer)` `==(a::Integer, b::ResElem)` `==(a::ResElem, b::fmpz)` `==(a::fmpz, b::ResElem)`
 
 
 Here are some examples of comparisons.
@@ -990,7 +522,7 @@ f != 5
 
 ## Inversion
 
-<a id='Base.inv-Tuple{Nemo.ResElem{T}}' href='#Base.inv-Tuple{Nemo.ResElem{T}}'>#</a>
+<a id='Base.inv-Tuple{Nemo.ResElem}' href='#Base.inv-Tuple{Nemo.ResElem}'>#</a>
 **`Base.inv`** &mdash; *Method*.
 
 
@@ -1001,6 +533,9 @@ inv(a::ResElem)
 
 > Return the inverse of the element $a$ in the residue ring. If an impossible inverse is encountered, an exception is raised.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L422' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing inverses.
@@ -1034,6 +569,9 @@ gcd{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
 
 > Return a greatest common divisor of $a$ and $b$ if one exists. This is done by taking the greatest common divisor of the data associated with the supplied residues and taking its greatest common divisor with the modulus.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L460' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing a greatest common divisor.

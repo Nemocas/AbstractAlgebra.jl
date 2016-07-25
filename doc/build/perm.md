@@ -80,6 +80,9 @@ eye(R::FlintPermGroup)
 
 
 
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/perm.jl#L68' class='documenter-source'>source</a><br>
+
+
 Note that permutations consist of lists of $n$ integers numbered from $1$ to $n$. If the $i$-th entry of a permuation is $j$, this corresponds to sending $i \to j$ in the permutation.
 
 
@@ -198,6 +201,9 @@ parent(a::perm)
 > Return the parent of the given permutation group element.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/perm.jl#L25' class='documenter-source'>source</a><br>
+
 <a id='Base.parity-Tuple{Nemo.perm}' href='#Base.parity-Tuple{Nemo.perm}'>#</a>
 **`Base.parity`** &mdash; *Method*.
 
@@ -209,6 +215,9 @@ parity(a::perm)
 
 > Return the parity of the given permutation, i.e. the parity of the number of transpositions that compose it. The function returns $1$ if the parity is odd otherwise it returns $0$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/perm.jl#L48' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of permutations.
@@ -240,8 +249,14 @@ a = parity(p)
 Multiplication operator. `x*y*z*...` calls this function with all arguments, i.e. `*(x, y, z, ...)`.
 
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L7701-7707' class='documenter-source'>source</a><br>
+
+
 > Return the composition of the two permutations, i.e. $a\circ b$. In other words, the permutation corresponding to applying $b$ first, then $a$, is returned.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/perm.jl#L120' class='documenter-source'>source</a><br>
 
 
 Here are some examples of arithmetic operations.

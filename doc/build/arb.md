@@ -105,6 +105,9 @@ zero(R::ArbField)
 > Return exact zero in the given Arb field.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L57' class='documenter-source'>source</a><br>
+
 <a id='Base.one-Tuple{Nemo.ArbField}' href='#Base.one-Tuple{Nemo.ArbField}'>#</a>
 **`Base.one`** &mdash; *Method*.
 
@@ -117,6 +120,9 @@ one(R::ArbField)
 > Return exact one in the given Arb field.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L63' class='documenter-source'>source</a><br>
+
 <a id='Nemo.ball-Tuple{Nemo.arb,Nemo.arb}' href='#Nemo.ball-Tuple{Nemo.arb,Nemo.arb}'>#</a>
 **`Nemo.ball`** &mdash; *Method*.
 
@@ -128,6 +134,9 @@ ball(mid::arb, rad::arb)
 
 > Constructs an `arb` enclosing the range $[m-|r|, m+|r|]$, given the pair $(m, r)$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L437' class='documenter-source'>source</a><br>
 
 
 Here are some examples of constructing balls.
@@ -271,6 +280,9 @@ convert(::Type{Float64}, x::arb)
 
 
 
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L92' class='documenter-source'>source</a><br>
+
+
 <a id='Basic-manipulation-1'></a>
 
 ## Basic manipulation
@@ -290,6 +302,9 @@ base_ring(R::ArbField)
 > Returns `Union{}` since an Arb field does not depend on any other ring.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L39' class='documenter-source'>source</a><br>
+
 <a id='Nemo.base_ring-Tuple{Nemo.arb}' href='#Nemo.base_ring-Tuple{Nemo.arb}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
 
@@ -301,6 +316,9 @@ base_ring(x::arb)
 
 > Returns `Union{}` since an Arb field does not depend on any other ring.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L45' class='documenter-source'>source</a><br>
 
 <a id='Base.parent-Tuple{Nemo.arb}' href='#Base.parent-Tuple{Nemo.arb}'>#</a>
 **`Base.parent`** &mdash; *Method*.
@@ -314,6 +332,9 @@ parent(x::arb)
 > Return the parent of the given Arb field element.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L51' class='documenter-source'>source</a><br>
+
 <a id='Nemo.iszero-Tuple{Nemo.arb}' href='#Nemo.iszero-Tuple{Nemo.arb}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
 
@@ -325,6 +346,9 @@ iszero(x::arb)
 
 > Return `true` if $x$ is certainly zero, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L347' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isnonzero-Tuple{Nemo.arb}' href='#Nemo.isnonzero-Tuple{Nemo.arb}'>#</a>
 **`Nemo.isnonzero`** &mdash; *Method*.
@@ -338,6 +362,9 @@ isnonzero(x::arb)
 > Return `true` if $x$ is certainly not equal to zero, otherwise return `false`.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L355' class='documenter-source'>source</a><br>
+
 <a id='Nemo.isone-Tuple{Nemo.arb}' href='#Nemo.isone-Tuple{Nemo.arb}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
 
@@ -349,6 +376,9 @@ isone(x::arb)
 
 > Return `true` if $x$ is certainly not equal to oneo, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L364' class='documenter-source'>source</a><br>
 
 <a id='Base.isfinite-Tuple{Nemo.arb}' href='#Base.isfinite-Tuple{Nemo.arb}'>#</a>
 **`Base.isfinite`** &mdash; *Method*.
@@ -362,6 +392,9 @@ isfinite(x::arb)
 > Return `true` if $x$ is finite, i.e. having finite midpoint and radius, otherwise return `false`.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L373' class='documenter-source'>source</a><br>
+
 <a id='Nemo.isexact-Tuple{Nemo.arb}' href='#Nemo.isexact-Tuple{Nemo.arb}'>#</a>
 **`Nemo.isexact`** &mdash; *Method*.
 
@@ -373,6 +406,9 @@ isexact(x::arb)
 
 > Return `true` if $x$ is exact, i.e. has zero radius, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L382' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isint-Tuple{Nemo.arb}' href='#Nemo.isint-Tuple{Nemo.arb}'>#</a>
 **`Nemo.isint`** &mdash; *Method*.
@@ -386,6 +422,9 @@ isint(x::arb)
 > Return `true` if $x$ is an exact integer, otherwise return `false`.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L391' class='documenter-source'>source</a><br>
+
 <a id='Nemo.ispositive-Tuple{Nemo.arb}' href='#Nemo.ispositive-Tuple{Nemo.arb}'>#</a>
 **`Nemo.ispositive`** &mdash; *Method*.
 
@@ -397,6 +436,9 @@ ispositive(x::arb)
 
 > Return `true` if $x$ is certainly positive, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L399' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isnonnegative-Tuple{Nemo.arb}' href='#Nemo.isnonnegative-Tuple{Nemo.arb}'>#</a>
 **`Nemo.isnonnegative`** &mdash; *Method*.
@@ -410,6 +452,9 @@ isnonnegative(x::arb)
 > Return `true` if $x$ is certainly nonnegative, otherwise return `false`.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L407' class='documenter-source'>source</a><br>
+
 <a id='Nemo.isnegative-Tuple{Nemo.arb}' href='#Nemo.isnegative-Tuple{Nemo.arb}'>#</a>
 **`Nemo.isnegative`** &mdash; *Method*.
 
@@ -421,6 +466,9 @@ isnegative(x::arb)
 
 > Return `true` if $x$ is certainly negative, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L415' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isnonpositive-Tuple{Nemo.arb}' href='#Nemo.isnonpositive-Tuple{Nemo.arb}'>#</a>
 **`Nemo.isnonpositive`** &mdash; *Method*.
@@ -434,6 +482,9 @@ isnonpositive(x::arb)
 > Return `true` if $x$ is certainly nonpositive, otherwise return `false`.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L423' class='documenter-source'>source</a><br>
+
 <a id='Nemo.midpoint-Tuple{Nemo.arb}' href='#Nemo.midpoint-Tuple{Nemo.arb}'>#</a>
 **`Nemo.midpoint`** &mdash; *Method*.
 
@@ -445,6 +496,9 @@ midpoint(x::arb)
 
 > Return the midpoint of the ball $x$ as an Arb ball.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L458' class='documenter-source'>source</a><br>
 
 <a id='Nemo.radius-Tuple{Nemo.arb}' href='#Nemo.radius-Tuple{Nemo.arb}'>#</a>
 **`Nemo.radius`** &mdash; *Method*.
@@ -458,6 +512,9 @@ radius(x::arb)
 > Return the radius of the ball $x$ as an Arb ball.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L448' class='documenter-source'>source</a><br>
+
 <a id='Nemo.accuracy_bits-Tuple{Nemo.arb}' href='#Nemo.accuracy_bits-Tuple{Nemo.arb}'>#</a>
 **`Nemo.accuracy_bits`** &mdash; *Method*.
 
@@ -469,6 +526,9 @@ accuracy_bits(x::arb)
 
 > Return the relative accuracy of $x$ measured in bits, capped between `typemax(Int)` and `-typemax(Int)`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L71' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of Arb balls.
@@ -574,6 +634,9 @@ overlaps(x::arb, y::arb)
 > Returns `true` if any part of the ball $x$ overlaps any part of the ball $y$, otherwise return `false`.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L128' class='documenter-source'>source</a><br>
+
 <a id='Base.contains-Tuple{Nemo.arb,Nemo.arb}' href='#Base.contains-Tuple{Nemo.arb,Nemo.arb}'>#</a>
 **`Base.contains`** &mdash; *Method*.
 
@@ -585,6 +648,9 @@ contains(x::arb, y::arb)
 
 > Returns `true` if the ball $x$ contains the ball $y$, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L186' class='documenter-source'>source</a><br>
 
 <a id='Base.contains-Tuple{Nemo.arb,Integer}' href='#Base.contains-Tuple{Nemo.arb,Integer}'>#</a>
 **`Base.contains`** &mdash; *Method*.
@@ -598,6 +664,9 @@ contains(x::arb, y::Integer)
 > Returns `true` if the ball $x$ contains the given integer value, otherwise return `false`.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L168' class='documenter-source'>source</a><br>
+
 <a id='Base.contains-Tuple{Nemo.arb,Nemo.fmpz}' href='#Base.contains-Tuple{Nemo.arb,Nemo.fmpz}'>#</a>
 **`Base.contains`** &mdash; *Method*.
 
@@ -609,6 +678,9 @@ contains(x::arb, y::fmpz)
 
 > Returns `true` if the ball $x$ contains the given integer value, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L153' class='documenter-source'>source</a><br>
 
 <a id='Base.contains-Tuple{Nemo.arb,Nemo.fmpq}' href='#Base.contains-Tuple{Nemo.arb,Nemo.fmpq}'>#</a>
 **`Base.contains`** &mdash; *Method*.
@@ -622,6 +694,9 @@ contains(x::arb, y::fmpq)
 > Returns `true` if the ball $x$ contains the given rational value, otherwise return `false`.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L143' class='documenter-source'>source</a><br>
+
 <a id='Base.contains-Tuple{Nemo.arb,BigFloat}' href='#Base.contains-Tuple{Nemo.arb,BigFloat}'>#</a>
 **`Base.contains`** &mdash; *Method*.
 
@@ -633,6 +708,9 @@ contains(x::arb, y::BigFloat)
 
 > Returns `true` if the ball $x$ contains the given floating point value,  otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L175' class='documenter-source'>source</a><br>
 
 
 The following functions are also provided for determining if a ball intersects a certain part of the real number line.
@@ -649,6 +727,9 @@ contains_zero(x::arb)
 > Returns `true` if the ball $x$ contains zero, otherwise return `false`.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L196' class='documenter-source'>source</a><br>
+
 <a id='Nemo.contains_negative-Tuple{Nemo.arb}' href='#Nemo.contains_negative-Tuple{Nemo.arb}'>#</a>
 **`Nemo.contains_negative`** &mdash; *Method*.
 
@@ -660,6 +741,9 @@ contains_negative(x::arb)
 
 > Returns `true` if the ball $x$ contains any negative value, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L205' class='documenter-source'>source</a><br>
 
 <a id='Nemo.contains_positive-Tuple{Nemo.arb}' href='#Nemo.contains_positive-Tuple{Nemo.arb}'>#</a>
 **`Nemo.contains_positive`** &mdash; *Method*.
@@ -673,6 +757,9 @@ contains_positive(x::arb)
 > Returns `true` if the ball $x$ contains any positive value, otherwise return `false`.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L215' class='documenter-source'>source</a><br>
+
 <a id='Nemo.contains_nonnegative-Tuple{Nemo.arb}' href='#Nemo.contains_nonnegative-Tuple{Nemo.arb}'>#</a>
 **`Nemo.contains_nonnegative`** &mdash; *Method*.
 
@@ -685,6 +772,9 @@ contains_nonnegative(x::arb)
 > Returns `true` if the ball $x$ contains any nonnegative value, otherwise return `false`.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L225' class='documenter-source'>source</a><br>
+
 <a id='Nemo.contains_nonpositive-Tuple{Nemo.arb}' href='#Nemo.contains_nonpositive-Tuple{Nemo.arb}'>#</a>
 **`Nemo.contains_nonpositive`** &mdash; *Method*.
 
@@ -696,6 +786,9 @@ contains_nonpositive(x::arb)
 
 > Returns `true` if the ball $x$ contains any nonpositive value, otherwise return `false`.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L235' class='documenter-source'>source</a><br>
 
 
 Here are some examples of testing containment.
@@ -736,6 +829,9 @@ isequal(x::arb, y::arb)
 
 > Return `true` if the balls $x$ and $y$ are precisely equal, i.e. have the same midpoints and radii.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L251' class='documenter-source'>source</a><br>
 
 
 A full range of functions is available for comparing balls, i.e. `==`, `!=`, `<`, `<=`, `>=`, `>`. In fact, all these are implemented directly in C. In the table below we document these as though only `==` and `isless` had been provided to Julia.
@@ -794,6 +890,9 @@ abs(x::arb)
 
 
 
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L683' class='documenter-source'>source</a><br>
+
+
 Here are some examples of taking the absolute value.
 
 
@@ -820,6 +919,9 @@ inv(x::arb)
 
 > Return the multiplicative inverse of $x$, i.e. $1/x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L699' class='documenter-source'>source</a><br>
 
 
 Here are some examples of taking the inverse.
@@ -849,6 +951,9 @@ ldexp(x::arb, y::Int)
 > Return $2^yx$. Note that $y$ can be positive, zero or negative.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L716' class='documenter-source'>source</a><br>
+
 <a id='Base.Math.ldexp-Tuple{Nemo.arb,Nemo.fmpz}' href='#Base.Math.ldexp-Tuple{Nemo.arb,Nemo.fmpz}'>#</a>
 **`Base.Math.ldexp`** &mdash; *Method*.
 
@@ -860,6 +965,9 @@ ldexp(x::arb, y::fmpz)
 
 > Return $2^yx$. Note that $y$ can be positive, zero or negative.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L727' class='documenter-source'>source</a><br>
 
 
 Here are some examples of shifting.
@@ -890,6 +998,9 @@ trim(x::arb)
 > Return an `arb` interval containing $x$ but which may be more economical, by rounding off insignificant bits from the midpoint.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L744' class='documenter-source'>source</a><br>
+
 <a id='Nemo.unique_integer-Tuple{Nemo.arb}' href='#Nemo.unique_integer-Tuple{Nemo.arb}'>#</a>
 **`Nemo.unique_integer`** &mdash; *Method*.
 
@@ -902,6 +1013,9 @@ unique_integer(x::arb)
 > Return a pair where the first value is a boolean and the second is an `fmpz` integer. The boolean indicates whether the interval $x$ contains a unique integer. If this is the case, the second return value is set to this unique integer.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L755' class='documenter-source'>source</a><br>
+
 <a id='Nemo.setunion-Tuple{Nemo.arb,Nemo.arb}' href='#Nemo.setunion-Tuple{Nemo.arb,Nemo.arb}'>#</a>
 **`Nemo.setunion`** &mdash; *Method*.
 
@@ -913,6 +1027,9 @@ setunion(x::arb, y::arb)
 
 > Return an `arb` containing the union of the intervals represented by $x$ and $y$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L769' class='documenter-source'>source</a><br>
 
 
 Here are some examples of miscellaneous operations.
@@ -945,6 +1062,9 @@ const_pi(r::ArbField)
 > Return $\pi = 3.14159\ldots$ as an element of $r$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L787' class='documenter-source'>source</a><br>
+
 <a id='Nemo.const_e-Tuple{Nemo.ArbField}' href='#Nemo.const_e-Tuple{Nemo.ArbField}'>#</a>
 **`Nemo.const_e`** &mdash; *Method*.
 
@@ -956,6 +1076,9 @@ const_e(r::ArbField)
 
 > Return $e = 2.71828\ldots$ as an element of $r$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L797' class='documenter-source'>source</a><br>
 
 <a id='Nemo.const_log2-Tuple{Nemo.ArbField}' href='#Nemo.const_log2-Tuple{Nemo.ArbField}'>#</a>
 **`Nemo.const_log2`** &mdash; *Method*.
@@ -969,6 +1092,9 @@ const_log2(r::ArbField)
 > Return $\log(2) = 0.69314\ldots$ as an element of $r$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L807' class='documenter-source'>source</a><br>
+
 <a id='Nemo.const_log10-Tuple{Nemo.ArbField}' href='#Nemo.const_log10-Tuple{Nemo.ArbField}'>#</a>
 **`Nemo.const_log10`** &mdash; *Method*.
 
@@ -980,6 +1106,9 @@ const_log10(r::ArbField)
 
 > Return $\log(10) = 2.302585\ldots$ as an element of $r$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L817' class='documenter-source'>source</a><br>
 
 <a id='Nemo.const_euler-Tuple{Nemo.ArbField}' href='#Nemo.const_euler-Tuple{Nemo.ArbField}'>#</a>
 **`Nemo.const_euler`** &mdash; *Method*.
@@ -993,6 +1122,9 @@ const_euler(r::ArbField)
 > Return Euler's constant $\gamma = 0.577215\ldots$ as an element of $r$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L827' class='documenter-source'>source</a><br>
+
 <a id='Nemo.const_catalan-Tuple{Nemo.ArbField}' href='#Nemo.const_catalan-Tuple{Nemo.ArbField}'>#</a>
 **`Nemo.const_catalan`** &mdash; *Method*.
 
@@ -1004,6 +1136,9 @@ const_catalan(r::ArbField)
 
 > Return Catalan's constant $C = 0.915965\ldots$ as an element of $r$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L837' class='documenter-source'>source</a><br>
 
 <a id='Nemo.const_khinchin-Tuple{Nemo.ArbField}' href='#Nemo.const_khinchin-Tuple{Nemo.ArbField}'>#</a>
 **`Nemo.const_khinchin`** &mdash; *Method*.
@@ -1017,6 +1152,9 @@ const_khinchin(r::ArbField)
 > Return Khinchin's constant $K = 2.685452\ldots$ as an element of $r$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L847' class='documenter-source'>source</a><br>
+
 <a id='Nemo.const_glaisher-Tuple{Nemo.ArbField}' href='#Nemo.const_glaisher-Tuple{Nemo.ArbField}'>#</a>
 **`Nemo.const_glaisher`** &mdash; *Method*.
 
@@ -1028,6 +1166,9 @@ const_glaisher(r::ArbField)
 
 > Return Glaisher's constant $A = 1.282427\ldots$ as an element of $r$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L857' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing real constants.
@@ -1059,6 +1200,9 @@ floor(x::arb)
 > Compute the floor of $x$, i.e. the greatest integer not exceeding $x$, as an Arb.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L875' class='documenter-source'>source</a><br>
+
 <a id='Base.ceil-Tuple{Nemo.arb}' href='#Base.ceil-Tuple{Nemo.arb}'>#</a>
 **`Base.ceil`** &mdash; *Method*.
 
@@ -1070,6 +1214,9 @@ ceil(x::arb)
 
 > Return the ceiling of $x$, i.e. the least integer not less than $x$, as an Arb.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L886' class='documenter-source'>source</a><br>
 
 <a id='Base.sqrt-Tuple{Nemo.arb}' href='#Base.sqrt-Tuple{Nemo.arb}'>#</a>
 **`Base.sqrt`** &mdash; *Method*.
@@ -1083,6 +1230,9 @@ sqrt(x::arb)
 > Return the square root of $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L897' class='documenter-source'>source</a><br>
+
 <a id='Nemo.rsqrt-Tuple{Nemo.arb}' href='#Nemo.rsqrt-Tuple{Nemo.arb}'>#</a>
 **`Nemo.rsqrt`** &mdash; *Method*.
 
@@ -1095,6 +1245,9 @@ rsqrt(x::arb)
 > Return the reciprocal of the square root of $x$, i.e. $1/\sqrt{x}$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L907' class='documenter-source'>source</a><br>
+
 <a id='Nemo.sqrt1pm1-Tuple{Nemo.arb}' href='#Nemo.sqrt1pm1-Tuple{Nemo.arb}'>#</a>
 **`Nemo.sqrt1pm1`** &mdash; *Method*.
 
@@ -1106,6 +1259,9 @@ sqrt1pm1(x::arb)
 
 > Return $\sqrt{1+x}-1$, evaluated accurately for small $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L917' class='documenter-source'>source</a><br>
 
 <a id='Base.log-Tuple{Nemo.arb}' href='#Base.log-Tuple{Nemo.arb}'>#</a>
 **`Base.log`** &mdash; *Method*.
@@ -1121,12 +1277,18 @@ Compute the natural logarithm of `x`. Throws `DomainError` for negative `Real` a
 There is an experimental variant in the `Base.Math.JuliaLibm` module, which is typically faster and more accurate.
 
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L3536-3544' class='documenter-source'>source</a><br>
+
+
 ```
 log(x::arb)
 ```
 
 > Return the principal branch of the logarithm of $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L927' class='documenter-source'>source</a><br>
 
 <a id='Base.log1p-Tuple{Nemo.arb}' href='#Base.log1p-Tuple{Nemo.arb}'>#</a>
 **`Base.log1p`** &mdash; *Method*.
@@ -1140,6 +1302,9 @@ log1p(x::arb)
 > Return $\log(1+x)$, evaluated accurately for small $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L937' class='documenter-source'>source</a><br>
+
 <a id='Base.exp-Tuple{Nemo.arb}' href='#Base.exp-Tuple{Nemo.arb}'>#</a>
 **`Base.exp`** &mdash; *Method*.
 
@@ -1151,6 +1316,9 @@ exp(x::arb)
 
 > Return the exponential of $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L947' class='documenter-source'>source</a><br>
 
 <a id='Base.expm1-Tuple{Nemo.arb}' href='#Base.expm1-Tuple{Nemo.arb}'>#</a>
 **`Base.expm1`** &mdash; *Method*.
@@ -1164,6 +1332,9 @@ expm1(x::arb)
 > Return $\exp(x)-1$, evaluated accurately for small $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L957' class='documenter-source'>source</a><br>
+
 <a id='Base.sin-Tuple{Nemo.arb}' href='#Base.sin-Tuple{Nemo.arb}'>#</a>
 **`Base.sin`** &mdash; *Method*.
 
@@ -1175,6 +1346,9 @@ sin(x::arb)
 
 > Return the sine of $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L967' class='documenter-source'>source</a><br>
 
 <a id='Base.cos-Tuple{Nemo.arb}' href='#Base.cos-Tuple{Nemo.arb}'>#</a>
 **`Base.cos`** &mdash; *Method*.
@@ -1188,6 +1362,9 @@ cos(x::arb)
 > Return the cosine of $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L977' class='documenter-source'>source</a><br>
+
 <a id='Base.Math.sinpi-Tuple{Nemo.arb}' href='#Base.Math.sinpi-Tuple{Nemo.arb}'>#</a>
 **`Base.Math.sinpi`** &mdash; *Method*.
 
@@ -1199,6 +1376,9 @@ sinpi(x::arb)
 
 > Return the sine of $\pi x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L987' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.cospi-Tuple{Nemo.arb}' href='#Base.Math.cospi-Tuple{Nemo.arb}'>#</a>
 **`Base.Math.cospi`** &mdash; *Method*.
@@ -1212,6 +1392,9 @@ cospi(x::arb)
 > Return the cosine of $\pi x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L997' class='documenter-source'>source</a><br>
+
 <a id='Base.tan-Tuple{Nemo.arb}' href='#Base.tan-Tuple{Nemo.arb}'>#</a>
 **`Base.tan`** &mdash; *Method*.
 
@@ -1223,6 +1406,9 @@ tan(x::arb)
 
 > Return the tangent of $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1007' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.cot-Tuple{Nemo.arb}' href='#Base.Math.cot-Tuple{Nemo.arb}'>#</a>
 **`Base.Math.cot`** &mdash; *Method*.
@@ -1236,6 +1422,9 @@ cot(x::arb)
 > Return the cotangent of $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1017' class='documenter-source'>source</a><br>
+
 <a id='Nemo.tanpi-Tuple{Nemo.arb}' href='#Nemo.tanpi-Tuple{Nemo.arb}'>#</a>
 **`Nemo.tanpi`** &mdash; *Method*.
 
@@ -1247,6 +1436,9 @@ tanpi(x::arb)
 
 > Return the tangent of $\pi x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1027' class='documenter-source'>source</a><br>
 
 <a id='Nemo.cotpi-Tuple{Nemo.arb}' href='#Nemo.cotpi-Tuple{Nemo.arb}'>#</a>
 **`Nemo.cotpi`** &mdash; *Method*.
@@ -1260,6 +1452,9 @@ cotpi(x::arb)
 > Return the cotangent of $\pi x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1037' class='documenter-source'>source</a><br>
+
 <a id='Base.sinh-Tuple{Nemo.arb}' href='#Base.sinh-Tuple{Nemo.arb}'>#</a>
 **`Base.sinh`** &mdash; *Method*.
 
@@ -1271,6 +1466,9 @@ sinh(x::arb)
 
 > Return the hyperbolic sine of $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1047' class='documenter-source'>source</a><br>
 
 <a id='Base.cosh-Tuple{Nemo.arb}' href='#Base.cosh-Tuple{Nemo.arb}'>#</a>
 **`Base.cosh`** &mdash; *Method*.
@@ -1284,6 +1482,9 @@ cosh(x::arb)
 > Return the hyperbolic cosine of $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1057' class='documenter-source'>source</a><br>
+
 <a id='Base.tanh-Tuple{Nemo.arb}' href='#Base.tanh-Tuple{Nemo.arb}'>#</a>
 **`Base.tanh`** &mdash; *Method*.
 
@@ -1295,6 +1496,9 @@ tanh(x::arb)
 
 > Return the hyperbolic tangent of $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1067' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.coth-Tuple{Nemo.arb}' href='#Base.Math.coth-Tuple{Nemo.arb}'>#</a>
 **`Base.Math.coth`** &mdash; *Method*.
@@ -1308,6 +1512,9 @@ coth(x::arb)
 > Return the hyperbolic cotangent of $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1077' class='documenter-source'>source</a><br>
+
 <a id='Base.atan-Tuple{Nemo.arb}' href='#Base.atan-Tuple{Nemo.arb}'>#</a>
 **`Base.atan`** &mdash; *Method*.
 
@@ -1319,6 +1526,9 @@ atan(x::arb)
 
 > Return the arctangent of $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1087' class='documenter-source'>source</a><br>
 
 <a id='Base.asin-Tuple{Nemo.arb}' href='#Base.asin-Tuple{Nemo.arb}'>#</a>
 **`Base.asin`** &mdash; *Method*.
@@ -1332,6 +1542,9 @@ asin(x::arb)
 > Return the arcsine of $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1097' class='documenter-source'>source</a><br>
+
 <a id='Base.acos-Tuple{Nemo.arb}' href='#Base.acos-Tuple{Nemo.arb}'>#</a>
 **`Base.acos`** &mdash; *Method*.
 
@@ -1343,6 +1556,9 @@ acos(x::arb)
 
 > Return the arccosine of $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1107' class='documenter-source'>source</a><br>
 
 <a id='Base.atanh-Tuple{Nemo.arb}' href='#Base.atanh-Tuple{Nemo.arb}'>#</a>
 **`Base.atanh`** &mdash; *Method*.
@@ -1356,6 +1572,9 @@ atanh(x::arb)
 > Return the hyperbolic arctangent of $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1117' class='documenter-source'>source</a><br>
+
 <a id='Base.asinh-Tuple{Nemo.arb}' href='#Base.asinh-Tuple{Nemo.arb}'>#</a>
 **`Base.asinh`** &mdash; *Method*.
 
@@ -1367,6 +1586,9 @@ asinh(x::arb)
 
 > Return the hyperbolic arcsine of $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1127' class='documenter-source'>source</a><br>
 
 <a id='Base.acosh-Tuple{Nemo.arb}' href='#Base.acosh-Tuple{Nemo.arb}'>#</a>
 **`Base.acosh`** &mdash; *Method*.
@@ -1380,6 +1602,9 @@ acosh(x::arb)
 > Return the hyperbolic arccosine of $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1137' class='documenter-source'>source</a><br>
+
 <a id='Base.Math.gamma-Tuple{Nemo.arb}' href='#Base.Math.gamma-Tuple{Nemo.arb}'>#</a>
 **`Base.Math.gamma`** &mdash; *Method*.
 
@@ -1391,6 +1616,9 @@ gamma(x::arb)
 
 > Return the Gamma function evaluated at $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1147' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.lgamma-Tuple{Nemo.arb}' href='#Base.Math.lgamma-Tuple{Nemo.arb}'>#</a>
 **`Base.Math.lgamma`** &mdash; *Method*.
@@ -1404,6 +1632,9 @@ lgamma(x::arb)
 > Return the logarithm of the Gamma function evaluated at $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1157' class='documenter-source'>source</a><br>
+
 <a id='Nemo.rgamma-Tuple{Nemo.arb}' href='#Nemo.rgamma-Tuple{Nemo.arb}'>#</a>
 **`Nemo.rgamma`** &mdash; *Method*.
 
@@ -1415,6 +1646,9 @@ rgamma(x::arb)
 
 > Return the reciprocal of the Gamma function evaluated at $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1167' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.digamma-Tuple{Nemo.arb}' href='#Base.Math.digamma-Tuple{Nemo.arb}'>#</a>
 **`Base.Math.digamma`** &mdash; *Method*.
@@ -1428,6 +1662,9 @@ digamma(x::arb)
 > Return the  logarithmic derivative of the gamma function evaluated at $x$, i.e. $\psi(x)$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1177' class='documenter-source'>source</a><br>
+
 <a id='Base.Math.zeta-Tuple{Nemo.arb}' href='#Base.Math.zeta-Tuple{Nemo.arb}'>#</a>
 **`Base.Math.zeta`** &mdash; *Method*.
 
@@ -1440,12 +1677,18 @@ zeta(s)
 Riemann zeta function $\zeta(s)$.
 
 
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L9507-9511' class='documenter-source'>source</a><br>
+
+
 ```
 zeta(x::arb)
 ```
 
 > Return the Riemann zeta function evaluated at $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1188' class='documenter-source'>source</a><br>
 
 <a id='Nemo.sincos-Tuple{Nemo.arb}' href='#Nemo.sincos-Tuple{Nemo.arb}'>#</a>
 **`Nemo.sincos`** &mdash; *Method*.
@@ -1459,6 +1702,9 @@ sincos(x::arb)
 > Return a tuple $s, c$ consisting of the sine $s$ and cosine $c$ of $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1198' class='documenter-source'>source</a><br>
+
 <a id='Nemo.sincospi-Tuple{Nemo.arb}' href='#Nemo.sincospi-Tuple{Nemo.arb}'>#</a>
 **`Nemo.sincospi`** &mdash; *Method*.
 
@@ -1470,6 +1716,9 @@ sincospi(x::arb)
 
 > Return a tuple $s, c$ consisting of the sine $s$ and cosine $c$ of $\pi x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1210' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.sinpi-Tuple{Nemo.fmpq,Nemo.ArbField}' href='#Base.Math.sinpi-Tuple{Nemo.fmpq,Nemo.ArbField}'>#</a>
 **`Base.Math.sinpi`** &mdash; *Method*.
@@ -1483,6 +1732,9 @@ sinpi(x::fmpq, r::ArbField)
 > Return the sine of $\pi x$ in the given Arb field.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1222' class='documenter-source'>source</a><br>
+
 <a id='Base.Math.cospi-Tuple{Nemo.fmpq,Nemo.ArbField}' href='#Base.Math.cospi-Tuple{Nemo.fmpq,Nemo.ArbField}'>#</a>
 **`Base.Math.cospi`** &mdash; *Method*.
 
@@ -1494,6 +1746,9 @@ cospi(x::fmpq, r::ArbField)
 
 > Return the cosine of $\pi x$ in the given Arb field.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1233' class='documenter-source'>source</a><br>
 
 <a id='Nemo.sincospi-Tuple{Nemo.fmpq,Nemo.ArbField}' href='#Nemo.sincospi-Tuple{Nemo.fmpq,Nemo.ArbField}'>#</a>
 **`Nemo.sincospi`** &mdash; *Method*.
@@ -1507,6 +1762,9 @@ sincospi(x::fmpq, r::ArbField)
 > Return a tuple $s, c$ consisting of the sine and cosine of $\pi x$ in the given Arb field.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1244' class='documenter-source'>source</a><br>
+
 <a id='Nemo.sinhcosh-Tuple{Nemo.arb}' href='#Nemo.sinhcosh-Tuple{Nemo.arb}'>#</a>
 **`Nemo.sinhcosh`** &mdash; *Method*.
 
@@ -1518,6 +1776,9 @@ sinhcosh(x::arb)
 
 > Return a tuple $s, c$ consisting of the hyperbolic sine and cosine of $x$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1257' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.atan2-Tuple{Nemo.arb,Nemo.arb}' href='#Base.Math.atan2-Tuple{Nemo.arb,Nemo.arb}'>#</a>
 **`Base.Math.atan2`** &mdash; *Method*.
@@ -1531,6 +1792,9 @@ atan2(x::arb, y::arb)
 > Return atan2$(b,a) = \arg(a+bi)$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1269' class='documenter-source'>source</a><br>
+
 <a id='Nemo.agm-Tuple{Nemo.arb,Nemo.arb}' href='#Nemo.agm-Tuple{Nemo.arb,Nemo.arb}'>#</a>
 **`Nemo.agm`** &mdash; *Method*.
 
@@ -1543,6 +1807,9 @@ agm(x::arb, y::arb)
 > Return the arithmetic-geometric mean of $x$ and $y$
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1280' class='documenter-source'>source</a><br>
+
 <a id='Base.Math.zeta-Tuple{Nemo.arb,Nemo.arb}' href='#Base.Math.zeta-Tuple{Nemo.arb,Nemo.arb}'>#</a>
 **`Base.Math.zeta`** &mdash; *Method*.
 
@@ -1552,7 +1819,10 @@ agm(x::arb, y::arb)
 zeta(s, z)
 ```
 
-Hurwitz zeta function $\zeta(s, z)$.  (This is equivalent to the Riemann zeta function $\zeta(s)$ for the case of `z=1`.)
+Generalized zeta function $\zeta(s, z)$, defined by the sum $\sum_{k=0}^\infty ((k+z)^2)^{-s/2}$, where any term with $k+z=0$ is excluded.  For $\Re z > 0$, this definition is equivalent to the Hurwitz zeta function $\sum_{k=0}^\infty (k+z)^{-s}$.   For $z=1$, it yields the Riemann zeta function $\zeta(s)$.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/special/gamma.jl#L251-260' class='documenter-source'>source</a><br>
 
 
 ```
@@ -1561,6 +1831,9 @@ zeta(s::arb, a::arb)
 
 > Return the Hurwitz zeta function $\zeta(s,a)$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1291' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.hypot-Tuple{Nemo.arb,Nemo.arb}' href='#Base.Math.hypot-Tuple{Nemo.arb,Nemo.arb}'>#</a>
 **`Base.Math.hypot`** &mdash; *Method*.
@@ -1574,6 +1847,9 @@ hypot(x::arb, y::arb)
 > Return $\sqrt{x^2 + y^2}$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1302' class='documenter-source'>source</a><br>
+
 <a id='Nemo.root-Tuple{Nemo.arb,Int64}' href='#Nemo.root-Tuple{Nemo.arb,Int64}'>#</a>
 **`Nemo.root`** &mdash; *Method*.
 
@@ -1585,6 +1861,9 @@ root(x::arb, n::Int)
 
 > Return the $n$-th root of $x$. We require $x \geq 0$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1320' class='documenter-source'>source</a><br>
 
 <a id='Nemo.fac-Tuple{Nemo.arb}' href='#Nemo.fac-Tuple{Nemo.arb}'>#</a>
 **`Nemo.fac`** &mdash; *Method*.
@@ -1598,6 +1877,9 @@ fac(x::arb)
 > Return the factorial of $x$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1326' class='documenter-source'>source</a><br>
+
 <a id='Nemo.fac-Tuple{Int64,Nemo.ArbField}' href='#Nemo.fac-Tuple{Int64,Nemo.ArbField}'>#</a>
 **`Nemo.fac`** &mdash; *Method*.
 
@@ -1609,6 +1891,9 @@ fac(n::Int, r::ArbField)
 
 > Return the factorial of $n$ in the given Arb field.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1338' class='documenter-source'>source</a><br>
 
 <a id='Nemo.binom-Tuple{Nemo.arb,UInt64}' href='#Nemo.binom-Tuple{Nemo.arb,UInt64}'>#</a>
 **`Nemo.binom`** &mdash; *Method*.
@@ -1622,6 +1907,9 @@ binom(x::arb, n::UInt)
 > Return the binomial coefficient ${x \choose n}$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1344' class='documenter-source'>source</a><br>
+
 <a id='Nemo.binom-Tuple{UInt64,UInt64,Nemo.ArbField}' href='#Nemo.binom-Tuple{UInt64,UInt64,Nemo.ArbField}'>#</a>
 **`Nemo.binom`** &mdash; *Method*.
 
@@ -1633,6 +1921,9 @@ binom(n::UInt, k::UInt, r::ArbField)
 
 > Return the binomial coefficient ${n \choose k}$ in the given Arb field.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1355' class='documenter-source'>source</a><br>
 
 <a id='Nemo.fib-Tuple{Nemo.fmpz,Nemo.ArbField}' href='#Nemo.fib-Tuple{Nemo.fmpz,Nemo.ArbField}'>#</a>
 **`Nemo.fib`** &mdash; *Method*.
@@ -1646,6 +1937,9 @@ fib(n::fmpz, r::ArbField)
 > Return the $n$-th Fibonacci number in the given Arb field.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1366' class='documenter-source'>source</a><br>
+
 <a id='Nemo.fib-Tuple{Int64,Nemo.ArbField}' href='#Nemo.fib-Tuple{Int64,Nemo.ArbField}'>#</a>
 **`Nemo.fib`** &mdash; *Method*.
 
@@ -1657,6 +1951,9 @@ fib(n::Int, r::ArbField)
 
 > Return the $n$-th Fibonacci number in the given Arb field.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1384' class='documenter-source'>source</a><br>
 
 <a id='Base.Math.gamma-Tuple{Nemo.fmpz,Nemo.ArbField}' href='#Base.Math.gamma-Tuple{Nemo.fmpz,Nemo.ArbField}'>#</a>
 **`Base.Math.gamma`** &mdash; *Method*.
@@ -1670,6 +1967,9 @@ gamma(x::fmpz, r::ArbField)
 > Return the Gamma function evaluated at $x$ in the given Arb field.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1390' class='documenter-source'>source</a><br>
+
 <a id='Base.Math.gamma-Tuple{Nemo.fmpq,Nemo.ArbField}' href='#Base.Math.gamma-Tuple{Nemo.fmpq,Nemo.ArbField}'>#</a>
 **`Base.Math.gamma`** &mdash; *Method*.
 
@@ -1682,6 +1982,9 @@ gamma(x::fmpq, r::ArbField)
 > Return the Gamma function evaluated at $x$ in the given Arb field.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1401' class='documenter-source'>source</a><br>
+
 <a id='Base.Math.zeta-Tuple{Int64,Nemo.ArbField}' href='#Base.Math.zeta-Tuple{Int64,Nemo.ArbField}'>#</a>
 **`Base.Math.zeta`** &mdash; *Method*.
 
@@ -1691,7 +1994,10 @@ gamma(x::fmpq, r::ArbField)
 zeta(s, z)
 ```
 
-Hurwitz zeta function $\zeta(s, z)$.  (This is equivalent to the Riemann zeta function $\zeta(s)$ for the case of `z=1`.)
+Generalized zeta function $\zeta(s, z)$, defined by the sum $\sum_{k=0}^\infty ((k+z)^2)^{-s/2}$, where any term with $k+z=0$ is excluded.  For $\Re z > 0$, this definition is equivalent to the Hurwitz zeta function $\sum_{k=0}^\infty (k+z)^{-s}$.   For $z=1$, it yields the Riemann zeta function $\zeta(s)$.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/special/gamma.jl#L251-260' class='documenter-source'>source</a><br>
 
 
 ```
@@ -1700,6 +2006,9 @@ zeta(n::Int, r::ArbField)
 
 > Return the Riemann zeta function $\zeta(n)$ as an element of the given Arb field.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1420' class='documenter-source'>source</a><br>
 
 <a id='Nemo.bernoulli-Tuple{Int64,Nemo.ArbField}' href='#Nemo.bernoulli-Tuple{Int64,Nemo.ArbField}'>#</a>
 **`Nemo.bernoulli`** &mdash; *Method*.
@@ -1713,6 +2022,9 @@ bernoulli(n::Int, r::ArbField)
 > Return the $n$-th Bernoulli number as an element of the given Arb field.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1434' class='documenter-source'>source</a><br>
+
 <a id='Nemo.risingfac-Tuple{Nemo.arb,Int64}' href='#Nemo.risingfac-Tuple{Nemo.arb,Int64}'>#</a>
 **`Nemo.risingfac`** &mdash; *Method*.
 
@@ -1724,6 +2036,9 @@ risingfac(x::arb, n::Int)
 
 > Return the rising factorial $x(x + 1)\ldots (x + n - 1)$ as an Arb.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1447' class='documenter-source'>source</a><br>
 
 <a id='Nemo.risingfac-Tuple{Nemo.fmpq,Int64,Nemo.ArbField}' href='#Nemo.risingfac-Tuple{Nemo.fmpq,Int64,Nemo.ArbField}'>#</a>
 **`Nemo.risingfac`** &mdash; *Method*.
@@ -1737,6 +2052,9 @@ risingfac(x::fmpq, n::Int, r::ArbField)
 > Return the rising factorial $x(x + 1)\ldots (x + n - 1)$ as an element of the given Arb field.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1460' class='documenter-source'>source</a><br>
+
 <a id='Nemo.risingfac2-Tuple{Nemo.arb,Int64}' href='#Nemo.risingfac2-Tuple{Nemo.arb,Int64}'>#</a>
 **`Nemo.risingfac2`** &mdash; *Method*.
 
@@ -1748,6 +2066,9 @@ risingfac2(x::arb, n::Int)
 
 > Return a tuple containing the rising factorial $x(x + 1)\ldots (x + n - 1)$ and its derivative.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1475' class='documenter-source'>source</a><br>
 
 <a id='Nemo.polylog-Tuple{Nemo.arb,Nemo.arb}' href='#Nemo.polylog-Tuple{Nemo.arb,Nemo.arb}'>#</a>
 **`Nemo.polylog`** &mdash; *Method*.
@@ -1761,6 +2082,9 @@ polylog(s::arb, a::arb)
 > Return the polylogarithm Li$_s(a)$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1482' class='documenter-source'>source</a><br>
+
 <a id='Nemo.polylog-Tuple{Int64,Nemo.arb}' href='#Nemo.polylog-Tuple{Int64,Nemo.arb}'>#</a>
 **`Nemo.polylog`** &mdash; *Method*.
 
@@ -1772,6 +2096,9 @@ polylog(s::Int, a::arb)
 
 > Return the polylogarithm Li$_s(a)$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1493' class='documenter-source'>source</a><br>
 
 <a id='Nemo.chebyshev_t-Tuple{Int64,Nemo.arb}' href='#Nemo.chebyshev_t-Tuple{Int64,Nemo.arb}'>#</a>
 **`Nemo.chebyshev_t`** &mdash; *Method*.
@@ -1785,6 +2112,9 @@ chebyshev_t(n::Int, x::arb)
 > Return the value of the Chebyshev polynomial $T_n(x)$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1534' class='documenter-source'>source</a><br>
+
 <a id='Nemo.chebyshev_u-Tuple{Int64,Nemo.arb}' href='#Nemo.chebyshev_u-Tuple{Int64,Nemo.arb}'>#</a>
 **`Nemo.chebyshev_u`** &mdash; *Method*.
 
@@ -1796,6 +2126,9 @@ chebyshev_u(n::Int, x::arb)
 
 > Return the value of the Chebyshev polynomial $U_n(x)$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1540' class='documenter-source'>source</a><br>
 
 <a id='Nemo.chebyshev_t2-Tuple{Int64,Nemo.arb}' href='#Nemo.chebyshev_t2-Tuple{Int64,Nemo.arb}'>#</a>
 **`Nemo.chebyshev_t2`** &mdash; *Method*.
@@ -1809,6 +2142,9 @@ chebyshev_t2(n::Int, x::arb)
 > Return the tuple $(T_{n}(x), T_{n-1}(x))$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1546' class='documenter-source'>source</a><br>
+
 <a id='Nemo.chebyshev_u2-Tuple{Int64,Nemo.arb}' href='#Nemo.chebyshev_u2-Tuple{Int64,Nemo.arb}'>#</a>
 **`Nemo.chebyshev_u2`** &mdash; *Method*.
 
@@ -1820,6 +2156,9 @@ chebyshev_u2(n::Int, x::arb)
 
 > Return the tuple $(U_{n}(x), U_{n-1}(x))$
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1552' class='documenter-source'>source</a><br>
 
 <a id='Nemo.bell-Tuple{Nemo.fmpz,Nemo.ArbField}' href='#Nemo.bell-Tuple{Nemo.fmpz,Nemo.ArbField}'>#</a>
 **`Nemo.bell`** &mdash; *Method*.
@@ -1833,6 +2172,9 @@ bell(n::fmpz, r::ArbField)
 > Return the Bell number $B_n$ as an element of $r$.
 
 
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1558' class='documenter-source'>source</a><br>
+
 <a id='Nemo.bell-Tuple{Int64,Nemo.ArbField}' href='#Nemo.bell-Tuple{Int64,Nemo.ArbField}'>#</a>
 **`Nemo.bell`** &mdash; *Method*.
 
@@ -1844,6 +2186,9 @@ bell(n::Int, r::ArbField)
 
 > Return the Bell number $B_n$ as an element of $r$.
 
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb.jl#L1569' class='documenter-source'>source</a><br>
 
 
 Here are some examples of real valued mathematical functions.

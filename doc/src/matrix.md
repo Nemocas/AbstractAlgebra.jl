@@ -1097,7 +1097,7 @@ A = S([4 1 0; 0 0 5; 0 0 0 ])
 B = howell_form(A)
 ```
 
-## Gram-Schmidt Orthogonoalisation
+## Gram-Schmidt Orthogonalisation
 
 ```@docs
 gso(::fmpq_mat)
