@@ -51,9 +51,6 @@ FlintPadicField(p::Integer, prec::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L648' class='documenter-source'>source</a><br>
-
-
 It is also possible to call the inner constructor directly. It has the following form.
 
 
@@ -101,9 +98,6 @@ zero(R::FlintPadicField)
 > Return zero in the given $p$-adic field, to the default precision.
 
 
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L152' class='documenter-source'>source</a><br>
-
 <a id='Base.one-Tuple{Nemo.FlintPadicField}' href='#Base.one-Tuple{Nemo.FlintPadicField}'>#</a>
 **`Base.one`** &mdash; *Method*.
 
@@ -115,9 +109,6 @@ one(R::FlintPadicField)
 
 > Return zero in the given $p$-adic field, to the default precision.
 
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L163' class='documenter-source'>source</a><br>
 
 
 Elements can also be constructed using the big-oh notation. For this purpose we define the following functions.
@@ -134,9 +125,6 @@ O(R::FlintPadicField, m::Integer)
 > Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$ is not found to be a power of `p = prime(R)`.
 
 
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L60' class='documenter-source'>source</a><br>
-
 <a id='Nemo.O-Tuple{Nemo.FlintPadicField,Nemo.fmpz}' href='#Nemo.O-Tuple{Nemo.FlintPadicField,Nemo.fmpz}'>#</a>
 **`Nemo.O`** &mdash; *Method*.
 
@@ -149,9 +137,6 @@ O(R::FlintPadicField, m::fmpz)
 > Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$ is not found to be a power of `p = prime(R)`.
 
 
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L15' class='documenter-source'>source</a><br>
-
 <a id='Nemo.O-Tuple{Nemo.FlintPadicField,Nemo.fmpq}' href='#Nemo.O-Tuple{Nemo.FlintPadicField,Nemo.fmpq}'>#</a>
 **`Nemo.O`** &mdash; *Method*.
 
@@ -163,9 +148,6 @@ O(R::FlintPadicField, m::fmpq)
 
 > Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$ is not found to be a power of `p = prime(R)`.
 
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L37' class='documenter-source'>source</a><br>
 
 
 The $O(p^n)$ construction can be used to construct $p$-adic values of precision $n$ by adding it to integer values representing the $p$-adic value modulo $p^n$ as in the examples.
@@ -296,9 +278,6 @@ base_ring(a::FlintPadicField)
 > Returns `Union{}` as this field is not dependent on another field.
 
 
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L69' class='documenter-source'>source</a><br>
-
 <a id='Nemo.base_ring-Tuple{Nemo.padic}' href='#Nemo.base_ring-Tuple{Nemo.padic}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
 
@@ -310,9 +289,6 @@ base_ring(a::padic)
 
 > Returns `Union{}` as this field is not dependent on another field.
 
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L75' class='documenter-source'>source</a><br>
 
 <a id='Base.parent-Tuple{Nemo.padic}' href='#Base.parent-Tuple{Nemo.padic}'>#</a>
 **`Base.parent`** &mdash; *Method*.
@@ -326,9 +302,6 @@ parent(a::padic)
 > Returns the parent of the given p-adic field element.
 
 
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L81' class='documenter-source'>source</a><br>
-
 <a id='Nemo.iszero-Tuple{Nemo.padic}' href='#Nemo.iszero-Tuple{Nemo.padic}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
 
@@ -340,9 +313,6 @@ iszero(a::padic)
 
 > Return `true` if the given p-adic field element is zero, otherwise return `false`.
 
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L174' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isone-Tuple{Nemo.padic}' href='#Nemo.isone-Tuple{Nemo.padic}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
@@ -356,9 +326,6 @@ isone(a::padic)
 > Return `true` if the given p-adic field element is one, otherwise return `false`.
 
 
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L182' class='documenter-source'>source</a><br>
-
 <a id='Nemo.isunit-Tuple{Nemo.padic}' href='#Nemo.isunit-Tuple{Nemo.padic}'>#</a>
 **`Nemo.isunit`** &mdash; *Method*.
 
@@ -370,9 +337,6 @@ isunit(a::padic)
 
 > Return `true` if the given p-adic field element is invertible, i.e. nonzero, otherwise return `false`.
 
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L190' class='documenter-source'>source</a><br>
 
 <a id='Nemo.prime-Tuple{Nemo.FlintPadicField}' href='#Nemo.prime-Tuple{Nemo.FlintPadicField}'>#</a>
 **`Nemo.prime`** &mdash; *Method*.
@@ -386,9 +350,6 @@ prime(R::FlintPadicField)
 > Return the prime $p$ for the given $p$-adic field.
 
 
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L102' class='documenter-source'>source</a><br>
-
 <a id='Base.precision-Tuple{Nemo.padic}' href='#Base.precision-Tuple{Nemo.padic}'>#</a>
 **`Base.precision`** &mdash; *Method*.
 
@@ -400,9 +361,6 @@ precision(a::padic)
 
 > Return the precision of the given $p$-adic field element, i.e. if the element is known to $O(p^n)$ this function will return $n$.
 
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L113' class='documenter-source'>source</a><br>
 
 <a id='Nemo.valuation-Tuple{Nemo.padic}' href='#Nemo.valuation-Tuple{Nemo.padic}'>#</a>
 **`Nemo.valuation`** &mdash; *Method*.
@@ -416,9 +374,6 @@ valuation(a::padic)
 > Return the valuation of the given $p$-adic field element, i.e. if the given element is divisible by $p^n$ but not a higher power of $p$ then the function will return $n$.
 
 
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L120' class='documenter-source'>source</a><br>
-
 <a id='Nemo.lift-Tuple{Nemo.FlintIntegerRing,Nemo.padic}' href='#Nemo.lift-Tuple{Nemo.FlintIntegerRing,Nemo.padic}'>#</a>
 **`Nemo.lift`** &mdash; *Method*.
 
@@ -431,9 +386,6 @@ lift(R::FlintIntegerRing, a::padic)
 > Return a lift of the given $p$-adic field element to $\mathbb{Z}$.
 
 
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L140' class='documenter-source'>source</a><br>
-
 <a id='Nemo.lift-Tuple{Nemo.FlintRationalField,Nemo.padic}' href='#Nemo.lift-Tuple{Nemo.FlintRationalField,Nemo.padic}'>#</a>
 **`Nemo.lift`** &mdash; *Method*.
 
@@ -445,9 +397,6 @@ lift(R::FlintRationalField, a::padic)
 
 > Return a lift of the given $p$-adic field element to $\mathbb{Q}$.
 
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L128' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of $p$-adic field elements.
@@ -618,9 +567,6 @@ inv(a::padic)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L436' class='documenter-source'>source</a><br>
-
-
 Here are some examples of inversion.
 
 
@@ -657,9 +603,6 @@ gcd(x::padic, y::padic)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L456' class='documenter-source'>source</a><br>
-
-
 Here are some examples of greatest common divisor.
 
 
@@ -689,9 +632,6 @@ sqrt(a::padic)
 
 > Return the $p$-adic square root of $a$. We define this only when the valuation of $a$ is even. The precision of the output will be precision$(a) -$ valuation$(a)/2$. If the square root does not exist, an exception is thrown.
 
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L477' class='documenter-source'>source</a><br>
 
 
 Here are some examples of taking the square root.
@@ -727,9 +667,6 @@ exp(a::padic)
 > Return the $p$-adic exponential of $a$. We define this only when the valuation of $a$ is positive (unless $a = 0$). The precision of the output will be the same as the precision of the input. If the input is not valid an exception is thrown.
 
 
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L501' class='documenter-source'>source</a><br>
-
 <a id='Base.log-Tuple{Nemo.padic}' href='#Base.log-Tuple{Nemo.padic}'>#</a>
 **`Base.log`** &mdash; *Method*.
 
@@ -744,18 +681,12 @@ Compute the natural logarithm of `x`. Throws `DomainError` for negative `Real` a
 There is an experimental variant in the `Base.Math.JuliaLibm` module, which is typically faster and more accurate.
 
 
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L3536-3544' class='documenter-source'>source</a><br>
-
-
 ```
 log(a::padic)
 ```
 
 > Return the $p$-adic logarithm of $a$. We define this only when the valuation of $a$ is zero (but not for $a == 0$). The precision of the output will be the same as the precision of the input. If the input is not valid an exception is thrown.
 
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L519' class='documenter-source'>source</a><br>
 
 <a id='Nemo.teichmuller-Tuple{Nemo.padic}' href='#Nemo.teichmuller-Tuple{Nemo.padic}'>#</a>
 **`Nemo.teichmuller`** &mdash; *Method*.
@@ -768,9 +699,6 @@ teichmuller(a::padic)
 
 > Return the Teichmuller lift of the $p$-adic value $a$. We require the valuation of $a$ to be nonnegative. The precision of the output will be the same as the precision of the input. For convenience, if $a$ is congruent to zero modulo $p$ we return zero. If the input is not valid an exception is thrown.
 
-
-
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/a918256412ce5e24d66ddc26d76f97f39e1bc601/src/flint/padic.jl#L537' class='documenter-source'>source</a><br>
 
 
 R = PadicField(7, 30)

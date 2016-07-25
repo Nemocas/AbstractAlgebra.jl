@@ -7,7 +7,7 @@
 export rows, cols, zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
        strongequal, overlaps, contains, inv, divexact, charpoly, det, exp,
        lufact, lufact!, solve, solve!, solve_lu_precomp, solve_lu_precomp!,
-       swap_rows, swap_rows!, bound_inf_norm
+       swap_rows, swap_rows!, bound_inf_norm, isreal
 
 ###############################################################################
 #
@@ -154,8 +154,7 @@ function -(x::acb_mat, y::acb_mat)
 end
 
 function *(x::acb_mat, y::acb_mat)
-  check_parent(x, y)
-  cols(x) != rows(y) && error("Matrices have wrong  dimensions")
+  cols(x) != rows(y) && error("Matrices have wrong dimensions")
   z = MatrixSpace(base_ring(x), rows(x), cols(y))()
   ccall((:acb_mat_mul, :libarb), Void,
               (Ptr{acb_mat}, Ptr{acb_mat}, Ptr{acb_mat}, Int),
@@ -218,13 +217,32 @@ end
 
 *(x::acb, y::acb_mat) = y*x
 
++(x::Integer, y::acb_mat) = parent(y)(x) + y
+
++(x::acb_mat, y::Integer) = y + x
+
++(x::fmpz, y::acb_mat) = parent(y)(x) + y
+
++(x::acb_mat, y::fmpz) = y + x
+
+-(x::Integer, y::acb_mat) = parent(y)(x) - y
+
+-(x::acb_mat, y::Integer) = -(y - x)
+
+-(x::fmpz, y::acb_mat) = parent(y)(x) - y
+
+-(x::acb_mat, y::fmpz) = -(y - x)
+
 ###############################################################################
 #
-#   Scaling
+#   Shifting
 #
 ###############################################################################
 
-#doc!!!
+doc"""
+    ldexp(x::acb_mat, y::Int)
+> Return $2^yx$. Note that $y$ can be positive, zero or negative.
+"""
 function ldexp(x::acb_mat, y::Int)
   z = parent(x)()
   ccall((:acb_mat_scalar_mul_2exp_si, :libarb), Void,
@@ -238,6 +256,11 @@ end
 #
 ###############################################################################
 
+doc"""
+    isequal(x::acb_mat, y::acb_mat)
+> Return `true` if the matrices of balls $x$ and $y$ are precisely equal,
+> i.e. if all matrix entries have the same midpoints and radii.
+"""
 function isequal(x::acb_mat, y::acb_mat)
   r = ccall((:acb_mat_equal, :libarb), Cint,
               (Ptr{acb_mat}, Ptr{acb_mat}), &x, &y)
@@ -255,12 +278,22 @@ function !=(x::acb_mat, y::acb_mat)
   return Bool(r)
 end
 
+doc"""
+    overlaps(x::acb_mat, y::acb_mat)
+> Returns `true` if all entries of $x$ overlap with the corresponding entry of
+> $y$, otherwise return `false`.
+"""
 function overlaps(x::acb_mat, y::acb_mat)
   r = ccall((:acb_mat_overlaps, :libarb), Cint,
               (Ptr{acb_mat}, Ptr{acb_mat}), &x, &y)
   return Bool(r)
 end
 
+doc"""
+    contains(x::acb_mat, y::acb_mat)
+> Returns `true` if all entries of $x$ contain the corresponding entry of
+> $y$, otherwise return `false`.
+"""
 function contains(x::acb_mat, y::acb_mat)
   r = ccall((:acb_mat_contains, :libarb), Cint,
               (Ptr{acb_mat}, Ptr{acb_mat}), &x, &y)
@@ -273,15 +306,25 @@ end
 #
 ################################################################################
 
+doc"""
+    contains(x::acb_mat, y::fmpz_mat)
+> Returns `true` if all entries of $x$ contain the corresponding entry of
+> $y$, otherwise return `false`.
+"""
 function contains(x::acb_mat, y::fmpz_mat)
   r = ccall((:acb_mat_contains_fmpz_mat, :libarb), Cint,
               (Ptr{acb_mat}, Ptr{fmpz_mat}), &x, &y)
   return Bool(r)
 end
 
+doc"""
+    contains(x::acb_mat, y::fmpq_mat)
+> Returns `true` if all entries of $x$ contain the corresponding entry of
+> $y$, otherwise return `false`.
+"""
 function contains(x::acb_mat, y::fmpq_mat)
   r = ccall((:acb_mat_contains_fmpq_mat, :libarb), Cint,
-              (Ptr{acb_mat}, Ptr{acb_mat}))
+              (Ptr{acb_mat}, Ptr{fmpq_mat}), &x, &y)
   return Bool(r)
 end
 
@@ -299,7 +342,10 @@ end
 #
 ################################################################################
 
-# doc!!!
+doc"""
+    isreal(M::acb_mat)
+> Returns whether every entry of $M$ has vanishing imaginary part.
+"""
 isreal(x::acb_mat) =
             Bool(ccall((:acb_mat_is_real, :libarb), Cint, (Ptr{acb_mat}, ), &x))
 
@@ -309,6 +355,12 @@ isreal(x::acb_mat) =
 #
 ###############################################################################
 
+doc"""
+    inv(M::acb_mat)
+> Given a $n\times n$ matrix of type `acb_mat`, return an
+> $n\times n$ matrix $X$ such that $AX$ contains the 
+> identity matrix. If $A$ cannot be inverted numerically an exception is raised.
+"""
 function inv(x::acb_mat)
   cols(x) != rows(x) && error("Matrix must be square")
   z = parent(x)()
@@ -401,6 +453,10 @@ end
 #
 ################################################################################
 
+doc"""
+    exp(x::acb_mat)
+> Returns the exponential of the matrix $x$.
+"""
 function exp(x::acb_mat)
   cols(x) != rows(x) && error("Matrix must be square")
   z = parent(x)()
@@ -505,21 +561,21 @@ end
 ################################################################################
 
 doc"""
-    bound_inf_norm(x::arb_mat)
-> Returns a nonnegative element $z$ of type `arb`, such that $z$ is an upper
+    bound_inf_norm(x::acb_mat)
+> Returns a nonnegative element $z$ of type `acb`, such that $z$ is an upper
 > bound for the infinity norm for every matrix in $x$
 """
 function bound_inf_norm(x::acb_mat)
   z = arb()
   t = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (Ptr{arb}, ), &z)
   ccall((:acb_mat_bound_inf_norm, :libarb), Void,
-              (Ptr{mag_struct}, Ptr{arb_mat}), t, &x)
+              (Ptr{mag_struct}, Ptr{acb_mat}), t, &x)
   s = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), &z)
   ccall((:arf_set_mag, :libarb), Void,
               (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
   ccall((:mag_zero, :libarb), Void,
               (Ptr{mag_struct},), t)
-  return base_ring(x)(z)
+  return ArbField(prec(base_ring(x)))(z)
 end
 
 ################################################################################
@@ -591,6 +647,35 @@ end
 
 call{T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, AbstractString,
                 arb}}(x::AcbMatSpace, y::Array{Tuple{T, T}, 1}) = x(y'')
+
+
+function call{T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, acb,
+                         AbstractString}}(x::AcbMatSpace, y::Array{T, 2})
+  (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
+  z = acb_mat(x.rows, x.cols, y, prec(x))
+  z.parent = x
+  return z
+end
+
+call{T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, acb,
+                AbstractString}}(x::ArbMatSpace, y::Array{T, 1}) = x(y'')
+
+function call(x::AcbMatSpace, y::Union{Int, UInt, fmpz, fmpq, Float64,
+                          BigFloat, arb, acb, AbstractString})
+  z = x()
+  for i in 1:rows(z)
+      for j = 1:cols(z)
+         if i != j
+            z[i, j] = zero(base_ring(x))
+         else
+            z[i, j] = y
+         end
+      end
+   end
+   return z
+end
+
+call(x::AcbMatSpace, y::acb_mat) = y
 
 ###############################################################################
 #

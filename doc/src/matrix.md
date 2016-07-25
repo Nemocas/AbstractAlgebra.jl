@@ -19,6 +19,8 @@ Generic ring $R$                      | Nemo                | `GenMat{T}`       
 $\mathbb{Z}$                          | Flint               | `fmpz_mat`          | `FmpzMatSpace`
 $\mathbb{Z}/n\mathbb{Z}$ (small $n$)  | Flint               | `nmod_mat`          | `NmodMatSpace`
 $\mathbb{Q}$                          | Flint               | `fmpq_mat`          | `FmpqMatSpace`
+$\mathbb{R}$                          | Arb                 | `arb_mat`           | `ArbMatSpace`
+$\mathbb{C}$                          | Arb                 | `acb_mat`           | `AcbMatSpace`
 
 The dimensions and base ring $R$ of a generic matrix are stored in its parent
 object. 
@@ -384,6 +386,22 @@ power series ring, the $p$-adics, or the reals or complex numbers. Two
 elements are precisely equal only if they have the same precision or bounds
 in addition to being arithmetically equal. 
 
+```@docs
+overlaps(::arb_mat, ::arb_mat)
+```
+
+```@docs
+overlaps(::acb_mat, ::acb_mat)
+```
+
+```@docs
+contains(::arb_mat, ::arb_mat)
+```
+
+```@docs
+contains(::acb_mat, ::acb_mat)
+```
+
 In addition we have the following ad hoc comparison operators.
 
 Function
@@ -410,6 +428,11 @@ A != 12
 fmpz(11) != A
 B != t
 S(11) == 11
+
+C = RR[1 2; 3 4]
+D = RR["1 +/- 0.1" "2 +/- 0.1"; "3 +/- 0.1" "4 +/- 0.1"]
+overlaps(C, D)
+contains(D, C)
 ```
 
 ## Scaling
@@ -716,6 +739,14 @@ inv{T <: FieldElem}(::MatElem{T})
 ```
 
 ```@docs
+inv(::arb_mat)
+```
+
+```@docs
+inv(::acb_mat)
+```
+
+```@docs
 pseudo_inv(::fmpz_mat)
 ```
 
@@ -742,6 +773,10 @@ S = MatrixSpace(ZZ, 3, 3)
 A = S([1 0 1; 2 3 1; 5 6 7])
   
 B, d = pseudo_inv(A)
+
+A = RR[1 0 1; 2 3 1; 5 6 7]
+
+X = inv(A)
 ```
 
 ## Nullspace
@@ -1077,3 +1112,76 @@ A = S([4 7 3; 2 9 1; 0 5 3])
 
 B = gso(A)
 ```
+
+## Exponential
+
+```@docs
+exp(::arb_mat)
+```
+
+```@docs
+exp(::acb_mat)
+```
+
+Here are some examples of computing the exponential function of matrix.
+
+```
+A = RR[2 0 0; 0 3 0; 0 0 1]
+
+B = exp(A)
+```
+
+## Norm
+
+```@docs
+bound_inf_norm(::arb_mat)
+```
+
+```@docs
+bound_inf_norm(::acb_mat)
+```
+
+Here are some examples of computing bounds on the infinity norm of a matrix.
+
+```
+A = RR[1 2 3; 4 5 6; 7 8 9]
+
+d = bound_inf_norm(A)
+```
+
+## Shifting
+
+```@docs
+ldexp(::arb_mat, ::Int)
+```
+
+```@docs
+ldexp(::acb_mat, ::Int)
+```
+
+Here are some examples of shifting.
+
+```
+A = RR[1 2 3; 4 5 6; 7 8 9]
+
+B = ldexp(A, 4)
+
+overlaps(16*A, B)
+```
+
+## Predicates
+
+```@docs
+isreal(::acb_mat)
+```
+
+Here are some examples for predicates.
+
+```
+A = CC[1 2 3; 4 5 6; 7 8 9]
+
+isreal(A)
+
+isreal(onei(CC)*A)
+```
+

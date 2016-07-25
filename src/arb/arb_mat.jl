@@ -112,7 +112,7 @@ end
 
 function transpose(x::arb_mat)
   z = MatrixSpace(base_ring(x), cols(x), rows(x))()
-  ccall((:acb_mat_transpose, :libarb), Void,
+  ccall((:arb_mat_transpose, :libarb), Void,
               (Ptr{arb_mat}, Ptr{arb_mat}), &z, &x)
   return z
 end
@@ -195,6 +195,39 @@ end
 
 *(x::arb, y::arb_mat) = y*x
 
++(x::Integer, y::arb_mat) = parent(y)(x) + y
+
++(x::arb_mat, y::Integer) = y + x
+
++(x::fmpz, y::arb_mat) = parent(y)(x) + y
+
++(x::arb_mat, y::fmpz) = y + x
+
+-(x::Integer, y::arb_mat) = parent(y)(x) - y
+
+-(x::arb_mat, y::Integer) = -(y - x)
+
+-(x::fmpz, y::arb_mat) = parent(y)(x) - y
+
+-(x::arb_mat, y::fmpz) = -(y - x)
+
+###############################################################################
+#
+#   Shifting
+#
+###############################################################################
+
+doc"""
+    ldexp(x::acb_mat, y::Int)
+> Return $2^yx$. Note that $y$ can be positive, zero or negative.
+"""
+function ldexp(x::arb_mat, y::Int)
+  z = parent(x)()
+  ccall((:arb_mat_scalar_mul_2exp_si, :libarb), Void,
+              (Ptr{arb_mat}, Ptr{arb_mat}, Int), &z, &x, y)
+  return z
+end
+
 ###############################################################################
 #
 #   Comparisons
@@ -235,7 +268,7 @@ function overlaps(x::arb_mat, y::arb_mat)
 end
 
 doc"""
-    overlaps(x::arb_mat, y::arb_mat)
+    contains(x::arb_mat, y::arb_mat)
 > Returns `true` if all entries of $x$ contain the corresponding entry of
 > $y$, otherwise return `false`.
 """
@@ -245,8 +278,14 @@ function contains(x::arb_mat, y::arb_mat)
   return Bool(r)
 end
 
+###############################################################################
+#
+#   Ad hoc comparisons
+#
+###############################################################################
+
 doc"""
-    overlaps(x::arb_mat, y::fmpz_mat)
+    contains(x::arb_mat, y::fmpz_mat)
 > Returns `true` if all entries of $x$ contain the corresponding entry of
 > $y$, otherwise return `false`.
 """
@@ -258,15 +297,27 @@ end
 
 
 doc"""
-    overlaps(x::arb_mat, y::fmpq_mat)
+    contains(x::arb_mat, y::fmpq_mat)
 > Returns `true` if all entries of $x$ contain the corresponding entry of
 > $y$, otherwise return `false`.
 """
 function contains(x::arb_mat, y::fmpq_mat)
   r = ccall((:arb_mat_contains_fmpq_mat, :libarb), Cint,
-              (Ptr{arb_mat}, Ptr{arb_mat}))
+              (Ptr{arb_mat}, Ptr{fmpq_mat}), &x, &y)
   return Bool(r)
 end
+
+==(x::arb_mat, y::Integer) = x == parent(x)(y)
+
+==(x::Integer, y::arb_mat) = y == x
+
+==(x::arb_mat, y::fmpz) = x == parent(x)(y)
+
+==(x::fmpz, y::arb_mat) = y == x
+
+==(x::arb_mat, y::fmpz_mat) = x == parent(x)(y)
+
+==(x::fmpz_mat, y::arb_mat) = y == x
 
 ###############################################################################
 #
@@ -537,6 +588,23 @@ end
 
 call{T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb,
                 AbstractString}}(x::ArbMatSpace, y::Array{T, 1}) = x(y'')
+
+function call(x::ArbMatSpace, y::Union{Int, UInt, fmpz, fmpq, Float64,
+                          BigFloat, arb, AbstractString})
+  z = x()
+  for i in 1:rows(z)
+      for j = 1:cols(z)
+         if i != j
+            z[i, j] = zero(base_ring(x))
+         else
+            z[i, j] = y
+         end
+      end
+   end
+   return z
+end
+
+call(x::ArbMatSpace, y::arb_mat) = y
 
 ###############################################################################
 #
