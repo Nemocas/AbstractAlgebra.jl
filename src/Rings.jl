@@ -293,6 +293,10 @@ include("arb/arb_poly.jl")
 
 include("arb/acb_poly.jl")
 
+include("arb/arb_mat.jl")
+
+include("arb/acb_mat.jl")
+
 include("pari/pari_poly2.jl")
 
 include("pari/pari_maximal_order_elem.jl")
