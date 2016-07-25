@@ -1,6 +1,6 @@
 # Nemo
 
-[![Build Status](https://travis-ci.org/Nemocas/Nemo.jl.svg?branch=master)](https://travis-ci.org/Nemocas/Nemo.jl)
+[![Build Status](https://travis-ci.org/Nemocas/Nemo.jl.svg?branch=master)](https://travis-ci.org/Nemocas/Nemo.jl) [![Build status](https://ci.appveyor.com/api/projects/status/gc4mw5oixputntda/branch/master?svg=true)](https://ci.appveyor.com/project/thofma/nemo-jl-n5gdb/branch/master)
 
 Nemo is a computer algebra package for the Julia programming language. It aims
 to cover commutative algebra, number theory and group theory.
@@ -14,4 +14,3 @@ Nemo currently provides:
 * An experimental wrapper of Pari
 * Generic polynomial rings, matrix spaces, fraction fields, residue rings, power series
 * finite fields, p-adics, integers, rationals, permutations, number fields
-
