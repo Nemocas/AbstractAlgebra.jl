@@ -8,13 +8,20 @@ Individual parts of Nemo may be distributed according to more permissive terms a
 
 * The MPIR and MPFR libraries are licensed LGPL v3+. The license texts are distributed with the libraries, which are downloaded as part of the Nemo package installation.
 
-* The flint library is licensed GPL v2+. The license text is supplied with the library, which is downloaded as part of the Nemo package installation.
+* The Flint library is licensed LGPL v2.1+. The license text is supplied with the library, which is downloaded as part of the Nemo package installation.
+
+* The ANTIC library is licensed GPL v2+.  The license text is supplied with the library, which is downloaded as part of the Nemo package installation.
 
 * The file ZZ.jl is licensed with the MIT license (see ZZ.jl for precise conditions of the license).
 
+* The Arb library is licensed LGPL v2.1+.  The license text is supplied with the library, which is downloaded as part of the Nemo package installation.
+
+* The Pari library is licensed GPL. The license text is supplied with the library, which is downloaded as part of the Nemo package installation.
+
 * The individual .jl files (other than ZZ.jl) in the Nemo.jl package are licensed under the Simplified "2-clause" BSD License:
 
-> Copyright (c) 2014: William Hart.
+> Copyright (c) 2014-2016: William Hart, Tommy Hofmann, Claus Fieker, Fredrik
+> Johansson.
 >
 > Redistribution and use in source and binary forms, with or without
 > modification, are permitted provided that the following conditions are

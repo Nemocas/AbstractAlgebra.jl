@@ -135,7 +135,7 @@ function __init__()
       (Ptr{Void},), cfunction(flint_abort, Void, ()))
 
    println("")
-   println("Welcome to Nemo version 0.4.0")
+   println("Welcome to Nemo version 0.5.0")
    println("")
    println("Nemo comes with absolutely no warranty whatsoever")
    println("")
