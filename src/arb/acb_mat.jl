@@ -649,14 +649,6 @@ call{T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, AbstractString,
                 arb}}(x::AcbMatSpace, y::Array{Tuple{T, T}, 1}) = x(y'')
 
 
-function call{T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, acb,
-                         AbstractString}}(x::AcbMatSpace, y::Array{T, 2})
-  (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
-  z = acb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
-  return z
-end
-
 call{T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, acb,
                 AbstractString}}(x::ArbMatSpace, y::Array{T, 1}) = x(y'')
 
