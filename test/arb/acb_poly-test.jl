@@ -353,6 +353,22 @@ function test_acb_poly_evaluation()
    println("PASS")
 end
 
+function test_acb_poly_roots()
+   print("acb_poly.roots...")
+
+   R, x = PolynomialRing(CC, "x")
+   
+   f = (x - 1)*(x - 2)*(x - CC("5 +/- 0.001"))
+
+   r = roots(f, isolate_real = true)
+
+   @test contains(r[1], 1)
+   @test contains(r[2], 2)
+   @test contains(r[3], 5)
+   
+   println("PASS")
+end
+
 function test_acb_poly_composition()
    print("acb_poly.composition...")
 
@@ -443,6 +459,7 @@ function test_acb_poly()
    test_acb_poly_exact_division()
    test_acb_poly_scalar_division()
    test_acb_poly_evaluation()
+   test_acb_poly_roots()
    test_acb_poly_composition()
    test_acb_poly_derivative_integral()
    test_acb_poly_evaluation_interpolation()

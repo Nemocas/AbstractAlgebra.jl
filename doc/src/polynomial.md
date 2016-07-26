@@ -889,6 +889,10 @@ m = y^2 + 2y + 3
 n = m + CC("0 +/- 0.0001", "0 +/- 0.0001")
 
 r = roots(n)
+
+p = y^7 - 1
+
+r = roots(n, isolate_real = true)
 ```
 
 ## Construction from roots
