@@ -450,7 +450,7 @@ doc"""
     *{T <: RingElem}(a::SeriesElem{T}, b::T)
 > Return $a\times b$.
 """
-*{T <: RingElem}(a::SeriesElem, b::T) = b*a
+*{T <: RingElem}(a::SeriesElem{T}, b::T) = b*a
 
 doc"""
     *{T <: RingElem}(a::SeriesElem{T}, b::Integer)
