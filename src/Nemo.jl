@@ -165,6 +165,8 @@ include("arb/ArbTypes.jl")
 
 include("pari/PariTypes.jl")
 
+include("ambiguities.jl") # remove ambiguity warnings
+
 include("Groups.jl")
 
 ###########################################################

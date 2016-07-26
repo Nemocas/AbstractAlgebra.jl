@@ -215,6 +215,8 @@ function *(x::Int, y::fmpz_rel_series)
    return z
 end
 
+*(x::fmpz_rel_series, y::Int) = y * x
+
 function *(x::fmpz, y::fmpz_rel_series)
    z = parent(y)()
    z.prec = y.prec
@@ -223,6 +225,8 @@ function *(x::fmpz, y::fmpz_rel_series)
                &z, &y, &x)
    return z
 end
+
+*(x::fmpz_rel_series, y::fmpz) = y * x
 
 ###############################################################################
 #
