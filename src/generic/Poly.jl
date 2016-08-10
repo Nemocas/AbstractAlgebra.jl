@@ -49,6 +49,13 @@ doc"""
 """
 var(a::PolyRing) = a.S
 
+doc"""
+    vars(a::PolyRing)
+> Return an array of the variable names for the polynomial ring. Note that
+> this is returned as an array of `Symbol` not `String`.
+"""
+vars(a::PolyRing) = [a.S]
+
 function check_parent(a::PolyElem, b::PolyElem)
    parent(a) != parent(b) && 
                 error("Incompatible polynomial rings in polynomial operation")
@@ -170,7 +177,7 @@ canonical_unit(x::PolyElem) = canonical_unit(lead(x))
 
 ###############################################################################
 #
-#   AbstractString I/O
+#   String I/O
 #
 ###############################################################################
 
