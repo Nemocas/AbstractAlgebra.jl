@@ -20,10 +20,10 @@ vars(a::GenMPolyRing) = a.S
 
 function gens{T <:RingElem, S, N}(a::GenMPolyRing{T, S, N})
    if (S == :deglex || S == :degrevlex)
-      return [a([base_ring(a)(1)], [Monomial{S, N}(tuple(1, [Int(i == j) for j in 1:a.num_vars]...))])
+      return [a([base_ring(a)(1)], [tuple(1, [Int(i == j) for j in 1:a.num_vars]...)])
            for i in 1:a.num_vars]
    else 
-      return [a([base_ring(a)(1)], [Monomial{S, N}(tuple([Int(i == j) for j in 1:a.num_vars]...))])
+      return [a([base_ring(a)(1)], [tuple([Int(i == j) for j in 1:a.num_vars]...)])
            for i in 1:a.num_vars]
    end
 end
@@ -34,56 +34,49 @@ end
 #
 ###############################################################################
 
-zero(::Type{Tuple{Int}}) = (0,)
-
-zero{N}(::Type{NTuple{N, Int}}) = (0, zero(NTuple{N - 1, Int})...)
-
-function +(a::Tuple{Int}, b::Tuple{Int})
-    return (getfield(a, 1) + getfield(b, 1),)
-end
+zero{N}(::Type{NTuple{N, Int}}) = ntuple(i -> 0, N)
 
 function +{N}(a::NTuple{N, Int}, b::NTuple{N, Int})
-   return (getfield(a, 1) + getfield(b, 1), (Base.tail(a) + Base.tail(b))...)
-end
-
-function *(a::Tuple{Int}, n::Int)
-   return (getfield(a, 1)*n,)
+   return ntuple(i -> a[i] + b[i], N)
 end
 
 function *{N}(a::NTuple{N, Int}, n::Int)
-   return (getfield(a, 1)*n, (Base.tail(a)*n)...)
+   return ntuple(i -> a[i]*n, N)
 end
 
-zero{S, N}(::Type{Monomial{S, N}}) = Monomial{S, N}(zero(NTuple{N, Int}))
-
-function +{S, N}(a::Monomial{S, N}, b::Monomial{S, N})
-   return Monomial{S, N}(a.exps + b.exps)
+function cmp{T <: RingElem, N}(a::NTuple{N, Int}, b::NTuple{N, Int}, R::GenMPolyRing{T, :lex, N})
+   i = 1
+   while i < N && a[i] == b[i]
+      i += 1
+   end
+   return a[i] - b[i]
 end
 
-function isless{N}(a::Monomial{:lex, N}, b::Monomial{:lex, N})
-   return a.exps < b.exps
+function cmp{T <: RingElem, N}(a::NTuple{N, Int}, b::NTuple{N, Int}, R::GenMPolyRing{T, :deglex, N})
+   i = 1
+   while i < N && a[i] == b[i]
+      i += 1
+   end
+   return a[i] - b[i]
 end
 
-function isless{N}(a::Monomial{:deglex, N}, b::Monomial{:deglex, N})
-   return a.exps < b.exps
+function cmp{T <: RingElem, N}(a::NTuple{N, Int}, b::NTuple{N, Int}, R::GenMPolyRing{T, :revlex, N})
+   i = N
+   while i > 1 && a[i] == b[i]
+      i -= 1
+   end
+   return a[i] - b[i]
 end
 
-function isless{N}(a::Monomial{:revlex, N}, b::Monomial{:revlex, N})
-   return reverse(a.exps) < reverse(b.exps)
-end
-
-function isless{N}(a::Monomial{:degrevlex, N}, b::Monomial{:degrevlex, N})
-   return (getfield(a.exps, 1) < getfield(b.exps, 1)) ||
-          (getfield(a.exps, 1) == getfield(b.exps, 1) && 
-           reverse(Base.tail(a.exps)) < reverse(Base.tail(b.exps)))
-end
-
-function =={S, N}(a::Monomial{S, N}, b::Monomial{S, N})
-   return a.exps == b.exps
-end
-
-function *{S, N}(a::Monomial{S, N}, n::Int)
-   return Monomial{S, N}(a.exps*n)
+function cmp{T <: RingElem, N}(a::NTuple{N, Int}, b::NTuple{N, Int}, R::GenMPolyRing{T, :degrevlex, N})
+   if a[1] != b[1]
+      return a[1] - b[1]
+   end
+   i = N
+   while i > 2 && a[i] == b[i]
+      i -= 1
+   end
+   return a[i] - b[i]
 end
 
 ###############################################################################
@@ -124,7 +117,7 @@ function show{T <: RingElem, S, N}(io::IO, x::GenMPoly{T, S, N})
         if i != 1 && !is_negative(c)
           print(io, "+")
         end
-        X = x.exps[len - i + 1].exps
+        X = x.exps[len - i + 1]
         if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
           if bracket
             print(io, "(")
@@ -204,17 +197,19 @@ function -{T <: RingElem, S, N}(a::GenMPoly{T, S, N})
 end
 
 function +{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
-   r = parent(a)()
+   par = parent(a)
+   r = par()
    fit!(r, length(a) + length(b))
    i = 1
    j = 1
    k = 1
    while i <= length(a) && j <= length(b)
-      if a.exps[i] < b.exps[j]
+      cmpexp = cmp(a.exps[i], b.exps[j], par)
+      if cmpexp < 0
          r.coeffs[k] = a.coeffs[i]
          r.exps[k] = a.exps[i]
-          i += 1
-      elseif a.exps[i] == b.exps[j]
+         i += 1
+      elseif cmpexp == 0
          c = a.coeffs[i] + b.coeffs[j]
          if c != 0
             r.coeffs[k] = c
@@ -248,17 +243,19 @@ function +{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
 end
 
 function -{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
-   r = parent(a)()
+   par = parent(a)
+   r = par()
    fit!(r, length(a) + length(b))
    i = 1
    j = 1
    k = 1
    while i <= length(a) && j <= length(b)
-      if a.exps[i] < b.exps[j]
+      cmpexp = cmp(a.exps[i], b.exps[j], par)
+      if cmpexp < 0
          r.coeffs[k] = a.coeffs[i]
          r.exps[k] = a.exps[i]
-          i += 1
-      elseif a.exps[i] == b.exps[j]
+         i += 1
+      elseif cmpexp == 0
          c = a.coeffs[i] - b.coeffs[j]
          if c != 0
             r.coeffs[k] = c
@@ -292,24 +289,25 @@ function -{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
 end
 
 function *{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
+   par = parent(a)
    m = length(a)
    n = length(b)
    if m == 0
-      return parent(a)()
+      return par()
    end
    Ai = Array(Int, m)
    Ac = Array(T, m*n)
    Bc = Array(T, m*n)
-   Ae = Array(Monomial{S, N}, m*n)
-   Be = Array(Monomial{S, N}, m*n)
+   Ae = Array(NTuple{N, Int}, m*n)
+   Be = Array(NTuple{N, Int}, m*n)
    for i = 1:m
       c = a.coeffs[i]
-      d = a.exps[i].exps
+      d = a.exps[i]
       k = 1
       for j = 1:n
          s = Ac[(i-1)*n + k] = c*b.coeffs[j]
          if s != 0
-            Ae[(i-1)*n + k] = Monomial{S, N}(d + b.exps[j].exps)
+            Ae[(i-1)*n + k] = d + b.exps[j]
             k += 1
          end
       end
@@ -325,11 +323,12 @@ function *{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
          s2 = n*(2t - 1)
          r = 2*n*(t - 1)
          while i <= Ai[2t - 1] && j <= Ai[2t]
-            if Ae[s1 + i] < Ae[s2 + j]
+            cmpexp = cmp(Ae[s1 + i], Ae[s2 + j], par)
+            if cmpexp < 0
                Bc[r + k] = Ac[s1 + i]
                Be[r + k] = Ae[s1 + i]
                i += 1
-            elseif Ae[s1 + i] == Ae[s2 + j]
+            elseif cmpexp == 0
                c = Ac[s1 + i] + Ac[s2 + j]
                if c != 0
                   Bc[r + k] = c
@@ -547,7 +546,7 @@ function Base.call{T <: RingElem, S, N}(a::GenMPolyRing{T, S, N}, b::PolyElem{T}
    return b
 end
 
-function Base.call{T <: RingElem, S, N}(a::GenMPolyRing{T, S, N}, b::Array{T, 1}, m::Array{Monomial{S, N}, 1})
+function Base.call{T <: RingElem, S, N}(a::GenMPolyRing{T, S, N}, b::Array{T, 1}, m::Array{NTuple{N, Int}, 1})
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end
