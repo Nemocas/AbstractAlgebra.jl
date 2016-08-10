@@ -13,7 +13,7 @@
 const GenPolyID = ObjectIdDict()
 
 type GenPolyRing{T <: RingElem} <: PolyRing{T}
-   base_ring :: Ring
+   base_ring::Ring
    S::Symbol
 
    function GenPolyRing(R::Ring, s::Symbol, cached=true)
@@ -39,6 +39,59 @@ type GenPoly{T <: RingElem} <: PolyElem{T}
    GenPoly(a::Array{T, 1}) = new(a, length(a))
 
    GenPoly(a::T) = a == 0 ? new(Array(T, 0), 0) : new([a], 1)
+end
+
+###############################################################################
+#
+#   GenMPolyRing / GenMPoly / Monomial
+#
+###############################################################################
+
+# S is a Symbol which can take the values:
+# :lex
+# :revlex
+# :deglex
+# :degrevlex
+# 
+# T is an Int which is the number of variables
+# (plus one if ordered by total degree)
+
+immutable Monomial{S, N}
+   exps::NTuple{N, Int}
+end
+
+const GenMPolyID = ObjectIdDict()
+
+type GenMPolyRing{T <: RingElem, S, N} <: PolyRing{T}
+   base_ring::Ring
+   S::Array{Symbol, 1}
+   num_vars::Int
+
+   function GenMPolyRing(R::Ring, s::Array{Symbol, 1}, cached=true)
+      if haskey(GenMPolyID, (R, s))
+         return GenMPolyID[R, s]::GenMPolyRing{T, S, N}
+      else 
+         z = new(R, s, length(s))
+         if cached
+           GenMPolyID[R, s] = z
+         end
+         return z
+      end
+   end
+end
+
+type GenMPoly{T <: RingElem, S, N} <: PolyElem{T}
+   coeffs::Array{T, 1}
+   exps::Array{Monomial{S, N}, 1}
+   length::Int
+   parent::GenMPolyRing{T, S, N}
+
+   GenMPoly() = new(Array(T, 0), Array(Monomial{S, N}, 0), 0)
+   
+   GenMPoly(a::Array{T, 1}, b::Array{Monomial{S, N}, 1}) = new(a, b, length(a))
+
+   GenMPoly(a::T) = a == 0 ? new(Array(T, 0), Array(Monomial{S, N}, 0), 0) : 
+                                      new([a], [zero(Monomial{S, N})], 1)
 end
 
 ###############################################################################
