@@ -302,6 +302,10 @@ var(::PolyRing)
 ```
 
 ```@docs
+vars(::PolyRing)
+```
+
+```@docs
 degree(::PolyElem)
 ```
 
