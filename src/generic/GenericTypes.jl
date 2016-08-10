@@ -105,10 +105,6 @@ end
 # T is an Int which is the number of variables
 # (plus one if ordered by total degree)
 
-immutable Monomial{S, N}
-   exps::NTuple{N, Int}
-end
-
 const GenMPolyID = ObjectIdDict()
 
 type GenMPolyRing{T <: RingElem, S, N} <: PolyRing{T}
@@ -131,16 +127,16 @@ end
 
 type GenMPoly{T <: RingElem, S, N} <: PolyElem{T}
    coeffs::Array{T, 1}
-   exps::Array{Monomial{S, N}, 1}
+   exps::Array{NTuple{N, Int}}
    length::Int
    parent::GenMPolyRing{T, S, N}
 
-   GenMPoly() = new(Array(T, 0), Array(Monomial{S, N}, 0), 0)
+   GenMPoly() = new(Array(T, 0), Array(NTuple{N, Int}, 0), 0)
    
-   GenMPoly(a::Array{T, 1}, b::Array{Monomial{S, N}, 1}) = new(a, b, length(a))
+   GenMPoly(a::Array{T, 1}, b::Array{NTuple{N, Int}, 1}) = new(a, b, length(a))
 
    GenMPoly(a::T) = a == 0 ? new(Array(T, 0), Array(Monomial{S, N}, 0), 0) : 
-                                      new([a], [zero(Monomial{S, N})], 1)
+                                      new([a], [zero(NTuple{N, Int})], 1)
 end
 
 ###############################################################################
