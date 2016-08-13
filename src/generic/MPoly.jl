@@ -20,10 +20,10 @@ vars(a::GenMPolyRing) = a.S
 
 function gens{T <:RingElem, S, N}(a::GenMPolyRing{T, S, N})
    if (S == :deglex || S == :degrevlex)
-      return [a([base_ring(a)(1)], [tuple(1, [Int(i == j) for j in 1:a.num_vars]...)])
+      return [a([base_ring(a)(1)], [tuple(1, [UInt(i == j) for j in 1:a.num_vars]...)])
            for i in 1:a.num_vars]
    else 
-      return [a([base_ring(a)(1)], [tuple([Int(i == j) for j in 1:a.num_vars]...)])
+      return [a([base_ring(a)(1)], [tuple([UInt(i == j) for j in 1:a.num_vars]...)])
            for i in 1:a.num_vars]
    end
 end
@@ -34,49 +34,49 @@ end
 #
 ###############################################################################
 
-zero{N}(::Type{NTuple{N, Int}}) = ntuple(i -> 0, N)
+zero{N}(::Type{NTuple{N, UInt}}) = ntuple(i -> 0, Val{N})
 
-function +{N}(a::NTuple{N, Int}, b::NTuple{N, Int})
-   return ntuple(i -> a[i] + b[i], N)
+function +{N}(a::NTuple{N, UInt}, b::NTuple{N, UInt})
+   return ntuple(i -> a[i] + b[i], Val{N})
 end
 
-function *{N}(a::NTuple{N, Int}, n::Int)
-   return ntuple(i -> a[i]*n, N)
+function *{N}(a::NTuple{N, UInt}, n::Int)
+   return ntuple(i -> a[i]*reinterpret(UInt, n), Val{N})
 end
 
-function cmp{T <: RingElem, N}(a::NTuple{N, Int}, b::NTuple{N, Int}, R::GenMPolyRing{T, :lex, N})
+function cmp{T <: RingElem, N}(a::NTuple{N, UInt}, b::NTuple{N, UInt}, R::GenMPolyRing{T, :lex, N})
    i = 1
    while i < N && a[i] == b[i]
       i += 1
    end
-   return a[i] - b[i]
+   return reinterpret(Int, a[i] - b[i])
 end
 
-function cmp{T <: RingElem, N}(a::NTuple{N, Int}, b::NTuple{N, Int}, R::GenMPolyRing{T, :deglex, N})
+function cmp{T <: RingElem, N}(a::NTuple{N, UInt}, b::NTuple{N, UInt}, R::GenMPolyRing{T, :deglex, N})
    i = 1
    while i < N && a[i] == b[i]
       i += 1
    end
-   return a[i] - b[i]
+   return reinterpret(Int, a[i] - b[i])
 end
 
-function cmp{T <: RingElem, N}(a::NTuple{N, Int}, b::NTuple{N, Int}, R::GenMPolyRing{T, :revlex, N})
+function cmp{T <: RingElem, N}(a::NTuple{N, UInt}, b::NTuple{N, UInt}, R::GenMPolyRing{T, :revlex, N})
    i = N
    while i > 1 && a[i] == b[i]
       i -= 1
    end
-   return a[i] - b[i]
+   return reinterpret(Int, a[i] - b[i])
 end
 
-function cmp{T <: RingElem, N}(a::NTuple{N, Int}, b::NTuple{N, Int}, R::GenMPolyRing{T, :degrevlex, N})
+function cmp{T <: RingElem, N}(a::NTuple{N, UInt}, b::NTuple{N, UInt}, R::GenMPolyRing{T, :degrevlex, N})
    if a[1] != b[1]
-      return a[1] - b[1]
+      return reinterpret(Int, a[1] - b[1])
    end
    i = N
    while i > 2 && a[i] == b[i]
       i -= 1
    end
-   return a[i] - b[i]
+   return reinterpret(Int, a[i] - b[i])
 end
 
 ###############################################################################
@@ -126,7 +126,7 @@ function show{T <: RingElem, S, N}(io::IO, x::GenMPoly{T, S, N})
           if bracket
             print(io, ")")
           end
-          if c != 1 && !(c == -1 && !show_minus_one(typeof(c))) && X != zero(NTuple{N, Int})
+          if c != 1 && !(c == -1 && !show_minus_one(typeof(c))) && X != zero(NTuple{N, UInt})
              print(io, "*")
           end
         end
@@ -134,7 +134,7 @@ function show{T <: RingElem, S, N}(io::IO, x::GenMPoly{T, S, N})
           print(io, "-")
         end
         d = (S == :deglex || S == :degrevlex) ? 1 : 0
-        if X == zero(NTuple{N, Int})
+        if X == zero(NTuple{N, UInt})
           if c == 1
              print(io, c)
           elseif c == -1 && !show_minus_one(typeof(c))
@@ -143,7 +143,7 @@ function show{T <: RingElem, S, N}(io::IO, x::GenMPoly{T, S, N})
         end
         fst = true
         for j = 1:num_vars(x)
-          n = X[j + d]
+          n = reinterpret(Int, X[j + d])
           if n != 0
             if fst
                print(io, U[j])
@@ -288,98 +288,308 @@ function -{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
    return r
 end
 
+function do_copy{T <: RingElem, S, N}(Ac::Array{T, 1}, Bc::Array{T, 1},
+               Ae::Array{NTuple{N, UInt}, 1}, Be::Array{NTuple{N, UInt}, 1}, 
+        s1::Int, r::Int, n1::Int, par::GenMPolyRing{T, S, N})
+   for i = 1:n1
+      Bc[r + i] = Ac[s1 + i]
+      Be[r + i] = Ae[s1 + i]
+   end
+   return n1
+end
+
+function do_merge{T <: RingElem, S, N}(Ac::Array{T, 1}, Bc::Array{T, 1},
+               Ae::Array{NTuple{N, UInt}, 1}, Be::Array{NTuple{N, UInt}, 1}, 
+        s1::Int, s2::Int, r::Int, n1::Int, n2::Int, par::GenMPolyRing{T, S, N})
+   i = 1
+   j = 1
+   k = 1
+   while i <= n1 && j <= n2
+      cmpexp = cmp(Ae[s1 + i], Ae[s2 + j], par)
+      if cmpexp < 0
+         Bc[r + k] = Ac[s1 + i]
+         Be[r + k] = Ae[s1 + i]
+         i += 1
+      elseif cmpexp == 0
+         addeq!(Ac[s1 + i], Ac[s2 + j])
+         if Ac[s1 + i] != 0
+            Bc[r + k] = Ac[s1 + i]
+            Be[r + k] = Ae[s1 + i]
+         else
+            k -= 1
+         end
+         i += 1
+         j += 1
+      else
+         Bc[r + k] = Ac[s2 + j]
+         Be[r + k] = Ae[s2 + j]
+         j += 1
+      end
+      k += 1
+   end
+   while i <= n1
+      Bc[r + k] = Ac[s1 + i]
+      Be[r + k] = Ae[s1 + i]
+      i += 1
+      k += 1
+   end
+   while j <= n2
+      Bc[r + k] = Ac[s2 + j]
+      Be[r + k] = Ae[s2 + j]
+      j += 1
+      k += 1
+   end
+   return k - 1
+end
+
 function *{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
    par = parent(a)
+   R = base_ring(par)
    m = length(a)
    n = length(b)
-   if m == 0
+   if m == 0 || n == 0
       return par()
    end
-   Ai = Array(Int, m)
-   Ac = Array(T, m*n)
-   Bc = Array(T, m*n)
-   Ae = Array(NTuple{N, Int}, m*n)
-   Be = Array(NTuple{N, Int}, m*n)
-   for i = 1:m
+   a_alloc = max(m, n) + n
+   b_alloc = max(m, n) + n
+   Ac = Array(T, a_alloc)
+   Bc = Array(T, b_alloc)
+   Ae = Array(NTuple{N, UInt}, a_alloc)
+   Be = Array(NTuple{N, UInt}, b_alloc)
+   Am = Array(Int, 64) # 64 is upper bound on max(log m, log n)
+   Bm = Array(Int, 64) # ... num polys merged (power of 2)
+   Ai = Array(Int, 64) # index of polys in A minus 1
+   Bi = Array(Int, 64) # index of polys in B minus 1
+   An = Array(Int, 64) # lengths of polys in A
+   Bn = Array(Int, 64) # lengths of polys in B
+   Anum = 0 # number of polys in A
+   Bnum = 0 # number of polys in B
+   sa = 0 # number of used locations in A
+   sb = 0 # number of used locations in B
+   for i = 1:m # loop over monomials in a
+      # check space
+      if sa + n > a_alloc
+         a_alloc = max(2*a_alloc, sa + n)
+         resize!(Ac, a_alloc)
+         resize!(Ae, a_alloc)
+      end
+      # compute monomial by polynomial product and store in A
       c = a.coeffs[i]
       d = a.exps[i]
       k = 1
       for j = 1:n
-         s = Ac[(i-1)*n + k] = c*b.coeffs[j]
+         s = Ac[sa + k] = c*b.coeffs[j]
          if s != 0
-            Ae[(i-1)*n + k] = d + b.exps[j]
+            Ae[sa + k] = d + b.exps[j]
             k += 1
          end
       end
-      Ai[i] = k - 1
-   end
-   while m > 1
-      m2 = div(m, 2)
-      for t = 1:m2
-         i = 1
-         j = 1
-         k = 1
-         s1 = n*(2t - 2)
-         s2 = n*(2t - 1)
-         r = 2*n*(t - 1)
-         while i <= Ai[2t - 1] && j <= Ai[2t]
-            cmpexp = cmp(Ae[s1 + i], Ae[s2 + j], par)
-            if cmpexp < 0
-               Bc[r + k] = Ac[s1 + i]
-               Be[r + k] = Ae[s1 + i]
-               i += 1
-            elseif cmpexp == 0
-               c = Ac[s1 + i] + Ac[s2 + j]
-               if c != 0
-                  Bc[r + k] = c
-                  Be[r + k] = Ae[s1 + i]
-               else
-                  k -= 1
-               end
-               i += 1
-               j += 1
-            else
-               Bc[r + k] = Ac[s2 + j]
-               Be[r + k] = Ae[s2 + j]
-               j += 1
+      k -= 1
+      Anum += 1
+      Am[Anum] = 1
+      Ai[Anum] = sa
+      An[Anum] = k
+      sa += k
+      # merge similar sized polynomials from A to B...
+      while Anum > 1 && (Am[Anum] == Am[Anum - 1])
+         # check space
+         want = sb + An[Anum] + An[Anum - 1]
+         if want > b_alloc
+            b_alloc = max(2*b_alloc, want)
+            resize!(Bc, b_alloc)
+            resize!(Be, b_alloc)            
+         end
+         # do merge to B
+         k = do_merge(Ac, Bc, Ae, Be, Ai[Anum - 1], Ai[Anum], 
+                                               sb, An[Anum - 1], An[Anum], par)
+         Bnum += 1
+         Bm[Bnum] = 2*Am[Anum]
+         Bi[Bnum] = sb
+         Bn[Bnum] = k
+         sb += k
+         sa -= An[Anum]
+         sa -= An[Anum - 1]
+         Anum -= 2
+         # merge similar sized polynomials from B to A...
+         if Bnum > 1 && (Bm[Bnum] == Bm[Bnum - 1])
+            # check space
+            want = sa + Bn[Bnum] + Bn[Bnum - 1]
+            if want > a_alloc
+               a_alloc = max(2*a_alloc, want)
+               resize!(Ac, a_alloc)
+               resize!(Ae, a_alloc)            
             end
-            k += 1
+            # do merge to A
+            k = do_merge(Bc, Ac, Be, Ae, Bi[Bnum - 1], Bi[Bnum], 
+                                               sa, Bn[Bnum - 1], Bn[Bnum], par)
+            Anum += 1
+            Am[Anum] = 2*Bm[Bnum]
+            Ai[Anum] = sa
+            An[Anum] = k
+            sa += k
+            sb -= Bn[Bnum]
+            sb -= Bn[Bnum - 1]
+            Bnum -= 2
          end
-         while i <= Ai[2t - 1]
-            Bc[r + k] = Ac[s1 + i]
-            Be[r + k] = Ae[s1 + i]
-            i += 1
-            k += 1
-         end
-         while j <= Ai[2t]
-            Bc[r + k] = Ac[s2 + j]
-            Be[r + k] = Ae[s2 + j]
-            j += 1
-            k += 1
-         end
-         Ai[t] = k - 1
       end
-      if isodd(m)
-         s1 = n*(2m2)
-         r = 2*n*m2
-         for i = 1:Ai[2m2 + 1]
-            Bc[r + i] = Ac[s1 + i]
-            Be[r + i] = Ae[s1 + i]
-         end
-         Ai[m2 + 1] = Ai[2m2 + 1]
+   end 
+   # Add all irregular sized polynomials together
+   while Anum + Bnum > 1
+      # Find the smallest two polynomials
+      if Anum == 0 || Bnum == 0
+         c1 = c2 = (Anum == 0) ? 2 : 1
+      elseif Anum + Bnum == 2
+         c1 = (Am[Anum] < Bm[Bnum]) ? 1 : 2
+         c2 = 3 - c1
+      elseif Am[Anum] < Bm[Bnum]
+         c1 = 1
+         c2 = (Anum == 1 || (Bnum > 1 && Bm[Bnum] < Am[Anum - 1])) ? 2 : 1
+      else
+         c1 = 2
+         c2 = (Bnum == 1 || (Anum > 1 && Am[Anum] < Bm[Bnum - 1])) ? 1 : 2
       end
-      n = 2*n
-      m = div(m + 1, 2) 
-      t1 = Ac
-      Ac = Bc
-      Bc = t1
-      t2 = Ae
-      Ae = Be
-      Be = t2        
+      # If both polys are on side A, merge to side B
+      if c1 == 1 && c2 == 1
+         # check space
+         want = sb + An[Anum] + An[Anum - 1]
+         if want > b_alloc
+            b_alloc = max(2*b_alloc, want)
+            resize!(Bc, b_alloc)
+            resize!(Be, b_alloc)            
+         end
+         # do merge to B
+         k = do_merge(Ac, Bc, Ae, Be, Ai[Anum - 1], Ai[Anum], 
+                                               sb, An[Anum - 1], An[Anum], par)
+         Bnum += 1
+         Bm[Bnum] = 2*Am[Anum - 1]
+         Bi[Bnum] = sb
+         Bn[Bnum] = k
+         sb += k
+         sa -= An[Anum]
+         sa -= An[Anum - 1]
+         Anum -= 2
+      # If both polys are on side B, merge to side A
+      elseif c1 == 2 && c2 == 2
+         # check space
+         want = sa + Bn[Bnum] + Bn[Bnum - 1]
+         if want > a_alloc
+            a_alloc = max(2*a_alloc, want)
+            resize!(Ac, a_alloc)
+            resize!(Ae, a_alloc)            
+         end
+         # do merge to A
+         k = do_merge(Bc, Ac, Be, Ae, Bi[Bnum - 1], Bi[Bnum], 
+                                            sa, Bn[Bnum - 1], Bn[Bnum], par)
+         Anum += 1
+         Am[Anum] = 2*Bm[Bnum - 1]
+         Ai[Anum] = sa
+         An[Anum] = k
+         sa += k
+         sb -= Bn[Bnum]
+         sb -= Bn[Bnum - 1]
+         Bnum -= 2
+      # Polys are on different sides, move from smallest side to largest
+      else
+         # smallest poly on side A, move to B
+         if c1 == 1
+            # check space
+            want = sb + An[Anum]
+            if want > b_alloc
+               b_alloc = max(2*b_alloc, want)
+               resize!(Bc, b_alloc)
+               resize!(Be, b_alloc)            
+            end
+            # do copy to B
+            k = do_copy(Ac, Bc, Ae, Be, Ai[Anum], sb, An[Anum], par)
+            Bnum += 1
+            Bm[Bnum] = Am[Anum]
+            Bi[Bnum] = sb
+            Bn[Bnum] = k
+            sb += k
+            sa -= An[Anum]
+            Anum -= 1
+         # smallest poly on side B, move to A
+         else
+            # check space
+            want = sa + Bn[Bnum]
+            if want > a_alloc
+               a_alloc = max(2*a_alloc, want)
+               resize!(Ac, a_alloc)
+               resize!(Ae, a_alloc)            
+            end
+            # do copy to A
+            k = do_copy(Bc, Ac, Be, Ae, Bi[Bnum], sa, Bn[Bnum], par)
+            Anum += 1
+            Am[Anum] = Bm[Bnum]
+            Ai[Anum] = sa
+            An[Anum] = k
+            sa += k
+            sb -= Bn[Bnum]
+            Bnum -= 1
+         end
+      end
    end
-   resize!(Ac, Ai[1])
-   resize!(Ae, Ai[1])
-   return parent(a)(Ac, Ae)
+   # Result is on side A
+   if Anum == 1
+      resize!(Ac, An[1])
+      resize!(Ae, An[1])
+      return parent(a)(Ac, Ae)
+   # Result is on side B
+   else
+      resize!(Bc, Bn[1])
+      resize!(Be, Bn[1])
+      return parent(a)(Bc, Be)
+   end
+end
+
+function isless{N}(a::Tuple{NTuple{N, UInt}, Int, Int}, b::Tuple{NTuple{N, UInt}, Int, Int})
+   return a[1] < b[1]
+end
+
+function =={N}(a::Tuple{NTuple{N, UInt}, Int, Int}, b::Tuple{NTuple{N, UInt}, Int, Int})
+   return a[1] == b[1]
+end
+
+function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
+   par = parent(a)
+   R = base_ring(par)
+   m = length(a)
+   n = length(b)
+   if m == 0 || n == 0
+      return par()
+   end
+   H = Array(Tuple{NTuple{N, UInt}, Int, Int}, 0)
+   # set up heap
+   for i = 1:m
+      Collections.heappush!(H, (a.exps[i] + b.exps[1], i, 1))
+   end
+   r_alloc = max(m, n) + n
+   Rc = Array(T, r_alloc)
+   Re = Array(NTuple{N, UInt}, r_alloc)
+   k = 0
+   c = R()
+   while length(H) > 0
+      exp, i, j = Collections.heappop!(H)
+      if k > 0 && exp == Re[k]
+         mul!(c, a.coeffs[i], b.coeffs[j])
+         addeq!(Rc[k], c)
+      else
+         k += 1
+         if k > r_alloc
+            r_alloc *= 2
+            resize!(Rc, r_alloc)
+            resize!(Re, r_alloc)
+         end
+         Rc[k] = a.coeffs[i]*b.coeffs[j]
+         Re[k] = exp
+      end
+      if j < n
+         Collections.heappush!(H, (a.exps[i] + b.exps[j + 1], i, j + 1))
+      end
+   end
+   resize!(Rc, k)
+   resize!(Re, k)
+   return parent(a)(Rc, Re)
 end
 
 ###############################################################################
@@ -482,18 +692,9 @@ function ^(a::GenMPoly, b::Int)
    elseif b == 0
       return parent(a)(1)
    else
-      bit = ~((~UInt(0)) >> 1)
-      while (UInt(bit) & b) == 0
-         bit >>= 1
-      end
       z = a
-      bit >>= 1
-      while bit != 0
-         z = z*z
-         if (UInt(bit) & b) != 0
-            z *= a
-         end
-         bit >>= 1
+      for i = 1:b - 1
+         z *= a
       end
       return z
    end
@@ -546,7 +747,7 @@ function Base.call{T <: RingElem, S, N}(a::GenMPolyRing{T, S, N}, b::PolyElem{T}
    return b
 end
 
-function Base.call{T <: RingElem, S, N}(a::GenMPolyRing{T, S, N}, b::Array{T, 1}, m::Array{NTuple{N, Int}, 1})
+function Base.call{T <: RingElem, S, N}(a::GenMPolyRing{T, S, N}, b::Array{T, 1}, m::Array{NTuple{N, UInt}, 1})
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end
