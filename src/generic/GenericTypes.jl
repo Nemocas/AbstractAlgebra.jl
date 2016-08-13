@@ -113,12 +113,12 @@ type GenMPolyRing{T <: RingElem, S, N} <: PolyRing{T}
    num_vars::Int
 
    function GenMPolyRing(R::Ring, s::Array{Symbol, 1}, cached=true)
-      if haskey(GenMPolyID, (R, s))
-         return GenMPolyID[R, s]::GenMPolyRing{T, S, N}
+      if haskey(GenMPolyID, (R, s, S))
+         return GenMPolyID[R, s, S]::GenMPolyRing{T, S, N}
       else 
          z = new(R, s, length(s))
          if cached
-           GenMPolyID[R, s] = z
+           GenMPolyID[R, s, S] = z
          end
          return z
       end
@@ -127,16 +127,16 @@ end
 
 type GenMPoly{T <: RingElem, S, N} <: PolyElem{T}
    coeffs::Array{T, 1}
-   exps::Array{NTuple{N, Int}}
+   exps::Array{NTuple{N, UInt}}
    length::Int
    parent::GenMPolyRing{T, S, N}
 
-   GenMPoly() = new(Array(T, 0), Array(NTuple{N, Int}, 0), 0)
+   GenMPoly() = new(Array(T, 0), Array(NTuple{N, UInt}, 0), 0)
    
-   GenMPoly(a::Array{T, 1}, b::Array{NTuple{N, Int}, 1}) = new(a, b, length(a))
+   GenMPoly(a::Array{T, 1}, b::Array{NTuple{N, UInt}, 1}) = new(a, b, length(a))
 
-   GenMPoly(a::T) = a == 0 ? new(Array(T, 0), Array(Monomial{S, N}, 0), 0) : 
-                                      new([a], [zero(NTuple{N, Int})], 1)
+   GenMPoly(a::T) = a == 0 ? new(Array(T, 0), Array(NTuple{N, UInt}, 0), 0) : 
+                                      new([a], [zero(NTuple{N, UInt})], 1)
 end
 
 ###############################################################################

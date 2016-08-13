@@ -91,6 +91,7 @@ elem_type{T <: RingElem, S, N}(::GenMPolyRing{T, S, N}) = GenMPoly{T, S, N}
 vars(a::GenMPolyRing) = a.S
 
 function gens{T <:RingElem, S, N}(a::GenMPolyRing{T, S, N})
+<<<<<<< HEAD
    if S == :lex
       return [a([base_ring(a)(1)], [tuple([UInt(i == j) for j in 1:a.num_vars]...)])
            for i in 1:a.num_vars]
@@ -102,6 +103,13 @@ function gens{T <:RingElem, S, N}(a::GenMPolyRing{T, S, N})
            for i in 1:a.num_vars]
    else # S == :degrevlex
       return [a([base_ring(a)(1)], [tuple(UInt(1), [UInt(N - i == j) for j in 1:a.num_vars]...)])
+=======
+   if (S == :deglex || S == :degrevlex)
+      return [a([base_ring(a)(1)], [tuple(1, [UInt(i == j) for j in 1:a.num_vars]...)])
+           for i in 1:a.num_vars]
+   else 
+      return [a([base_ring(a)(1)], [tuple([UInt(i == j) for j in 1:a.num_vars]...)])
+>>>>>>> Add Johnson's multiplication routine and a better classical routine, speed up
            for i in 1:a.num_vars]
    end
 end
@@ -113,6 +121,7 @@ end
 ###############################################################################
 
 zero{N}(::Type{NTuple{N, UInt}}) = ntuple(i -> 0, Val{N})
+<<<<<<< HEAD
 
 function +{N}(a::NTuple{N, UInt}, b::NTuple{N, UInt})
    return ntuple(i -> a[i] + b[i], Val{N})
@@ -124,11 +133,32 @@ end
 
 function cmp{T <: RingElem, S, N}(a::NTuple{N, UInt},
                                   b::NTuple{N, UInt}, R::GenMPolyRing{T, S, N})
+=======
+
+function +{N}(a::NTuple{N, UInt}, b::NTuple{N, UInt})
+   return ntuple(i -> a[i] + b[i], Val{N})
+end
+
+function *{N}(a::NTuple{N, UInt}, n::Int)
+   return ntuple(i -> a[i]*reinterpret(UInt, n), Val{N})
+end
+
+function cmp{T <: RingElem, N}(a::NTuple{N, UInt}, b::NTuple{N, UInt}, R::GenMPolyRing{T, :lex, N})
    i = 1
    while i < N && a[i] == b[i]
       i += 1
    end
    return reinterpret(Int, a[i] - b[i])
+end
+
+function cmp{T <: RingElem, N}(a::NTuple{N, UInt}, b::NTuple{N, UInt}, R::GenMPolyRing{T, :deglex, N})
+>>>>>>> Add Johnson's multiplication routine and a better classical routine, speed up
+   i = 1
+   while i < N && a[i] == b[i]
+      i += 1
+   end
+   return reinterpret(Int, a[i] - b[i])
+<<<<<<< HEAD
 end
 
 function max_degrees{T <: RingElem, S, N}(f::GenMPoly{T, S, N})
@@ -141,6 +171,21 @@ function max_degrees{T <: RingElem, S, N}(f::GenMPoly{T, S, N})
             biggest[j] = reinterpret(Int, v[j])
          end
       end
+=======
+end
+
+function cmp{T <: RingElem, N}(a::NTuple{N, UInt}, b::NTuple{N, UInt}, R::GenMPolyRing{T, :revlex, N})
+   i = N
+   while i > 1 && a[i] == b[i]
+      i -= 1
+   end
+   return reinterpret(Int, a[i] - b[i])
+end
+
+function cmp{T <: RingElem, N}(a::NTuple{N, UInt}, b::NTuple{N, UInt}, R::GenMPolyRing{T, :degrevlex, N})
+   if a[1] != b[1]
+      return reinterpret(Int, a[1] - b[1])
+>>>>>>> Add Johnson's multiplication routine and a better classical routine, speed up
    end
    b = biggest[1]
    for i = 2:N
@@ -148,7 +193,11 @@ function max_degrees{T <: RingElem, S, N}(f::GenMPoly{T, S, N})
          b = biggest[i]
       end
    end
+<<<<<<< HEAD
    return biggest, b
+=======
+   return reinterpret(Int, a[i] - b[i])
+>>>>>>> Add Johnson's multiplication routine and a better classical routine, speed up
 end
 
 ###############################################################################
@@ -208,7 +257,11 @@ function show{T <: RingElem, S, N}(io::IO, x::GenMPoly{T, S, N})
         if c == -1 && !show_minus_one(typeof(c))
           print(io, "-")
         end
+<<<<<<< HEAD
         d = (S == :deglex) ? 1 : 0
+=======
+        d = (S == :deglex || S == :degrevlex) ? 1 : 0
+>>>>>>> Add Johnson's multiplication routine and a better classical routine, speed up
         if X == zero(NTuple{N, UInt})
           if c == 1
              print(io, c)
@@ -601,6 +654,7 @@ function *{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
             sa += k
             sb -= Bn[Bnum]
             Bnum -= 1
+<<<<<<< HEAD
          end
       end
    end
@@ -838,6 +892,72 @@ function mul{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
       unpack_monomials(er, r1.exps, k, bits)
    end
    return parent(a)(r1.coeffs, er)
+=======
+         end
+      end
+   end
+   # Result is on side A
+   if Anum == 1
+      resize!(Ac, An[1])
+      resize!(Ae, An[1])
+      return parent(a)(Ac, Ae)
+   # Result is on side B
+   else
+      resize!(Bc, Bn[1])
+      resize!(Be, Bn[1])
+      return parent(a)(Bc, Be)
+   end
+end
+
+function isless{N}(a::Tuple{NTuple{N, UInt}, Int, Int}, b::Tuple{NTuple{N, UInt}, Int, Int})
+   return a[1] < b[1]
+end
+
+function =={N}(a::Tuple{NTuple{N, UInt}, Int, Int}, b::Tuple{NTuple{N, UInt}, Int, Int})
+   return a[1] == b[1]
+end
+
+function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
+   par = parent(a)
+   R = base_ring(par)
+   m = length(a)
+   n = length(b)
+   if m == 0 || n == 0
+      return par()
+   end
+   H = Array(Tuple{NTuple{N, UInt}, Int, Int}, 0)
+   # set up heap
+   for i = 1:m
+      Collections.heappush!(H, (a.exps[i] + b.exps[1], i, 1))
+   end
+   r_alloc = max(m, n) + n
+   Rc = Array(T, r_alloc)
+   Re = Array(NTuple{N, UInt}, r_alloc)
+   k = 0
+   c = R()
+   while length(H) > 0
+      exp, i, j = Collections.heappop!(H)
+      if k > 0 && exp == Re[k]
+         mul!(c, a.coeffs[i], b.coeffs[j])
+         addeq!(Rc[k], c)
+      else
+         k += 1
+         if k > r_alloc
+            r_alloc *= 2
+            resize!(Rc, r_alloc)
+            resize!(Re, r_alloc)
+         end
+         Rc[k] = a.coeffs[i]*b.coeffs[j]
+         Re[k] = exp
+      end
+      if j < n
+         Collections.heappush!(H, (a.exps[i] + b.exps[j + 1], i, j + 1))
+      end
+   end
+   resize!(Rc, k)
+   resize!(Re, k)
+   return parent(a)(Rc, Re)
+>>>>>>> Add Johnson's multiplication routine and a better classical routine, speed up
 end
 
 ###############################################################################
