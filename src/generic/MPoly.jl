@@ -59,6 +59,26 @@ function cmp{T <: RingElem, S, N}(a::NTuple{N, UInt},
    return reinterpret(Int, a[i] - b[i])
 end
 
+function max_degrees{T <: RingElem, S, N}(f::GenMPoly{T, S, N})
+   biggest = zeros(Int, N)
+   A = f.exps
+   for i = 1:length(f)
+      v = A[i]
+      for j = 1:N
+         if reinterpret(Int, v[j]) > biggest[j]
+            biggest[j] = reinterpret(Int, v[j])
+         end
+      end
+   end
+   b = biggest[1]
+   for i = 2:N
+      if biggest[i] > b
+         b = biggest[i]
+      end
+   end
+   return biggest, b
+end
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -573,6 +593,88 @@ function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S
    resize!(Rc, k)
    resize!(Re, k)
    return parent(a)(Rc, Re)
+end
+
+function pack_monomials{M, N}(a::Array{NTuple{M, UInt}, 1}, b::Array{NTuple{N, UInt}, 1}, k::Int, bits::Int)
+   A = Array(UInt, M)
+   for i = 1:length(a)
+      m = 0
+      n = 1
+      v = UInt(0)
+      c = b[i]
+      for j = 1:N
+         v += c[j]
+         m += 1
+         if m == k
+            m = 0
+            A[n] = v
+            n += 1
+            v = UInt(0)
+         else
+            v <<= bits
+         end
+      end
+      if m != 0
+         A[n] = (v << bits*(k - m - 1))
+      end
+      a[i] = tuple(A...)
+   end
+end
+
+function unpack_monomials{M, N}(a::Array{NTuple{N, UInt}, 1}, b::Array{NTuple{M, UInt}, 1}, k::Int, bits::Int)
+   A = Array(UInt, N)
+   mask = (UInt(1) << bits) - UInt(1)
+   for i = 1:length(b)
+      c = b[i]
+      m = 1
+      n = 1
+      for j = 1:N
+         A[j] = ((c[n] >> ((k - m) * bits)) & mask)
+         if m == k
+            m = 1
+            n += 1
+         else
+            m += 1
+         end
+      end
+      a[i] = tuple(A...)
+   end
+end
+
+function mul{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
+   v1, d1 = max_degrees(a)
+   v2, d2 = max_degrees(b)
+   d = d1 + d2
+   bits = 16
+   max_e = 2^(bits - 1)
+   while d >= max_e
+      bits *= 2
+      max_e = 2^(bits - 1)
+   end
+   word_bits = sizeof(Int)*8
+   k = div(word_bits, bits)
+   if k != 1
+      M = div(N + k - 1, k)
+      e1 = Array(NTuple{M, UInt}, length(a))
+      e2 = Array(NTuple{M, UInt}, length(b))
+      pack_monomials(e1, a.exps, k, bits)
+      pack_monomials(e2, b.exps, k, bits)
+      par = GenMPolyRing{T, S, M}(base_ring(a), parent(a).S)
+      a1 = par(a.coeffs, e1)
+      b1 = par(b.coeffs, e2)
+      a1.length = a.length
+      b1.length = b.length
+      r1 = mul_johnson(a1, b1)
+      er = Array(NTuple{N, UInt}, length(r1))
+      unpack_monomials(er, r1.exps, k, bits)
+   else
+      a1 = a
+      b1 = b
+      r1 = mul_johnson(a1, b1)
+      er = Array(NTuple{N, UInt}, length(r1))
+      unpack_monomials(er, r1.exps, k, bits)
+   end
+   return parent(a)(r1.coeffs, er)
 end
 
 ###############################################################################
