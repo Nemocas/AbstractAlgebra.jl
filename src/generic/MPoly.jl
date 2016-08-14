@@ -19,11 +19,17 @@ elem_type{T <: RingElem, S, N}(::GenMPolyRing{T, S, N}) = GenMPoly{T, S, N}
 vars(a::GenMPolyRing) = a.S
 
 function gens{T <:RingElem, S, N}(a::GenMPolyRing{T, S, N})
-   if (S == :deglex || S == :degrevlex)
-      return [a([base_ring(a)(1)], [tuple(1, [UInt(i == j) for j in 1:a.num_vars]...)])
-           for i in 1:a.num_vars]
-   else 
+   if S == :lex
       return [a([base_ring(a)(1)], [tuple([UInt(i == j) for j in 1:a.num_vars]...)])
+           for i in 1:a.num_vars]
+   elseif S == :deglex
+      return [a([base_ring(a)(1)], [tuple(UInt(1), [UInt(i == j) for j in 1:a.num_vars]...)])
+           for i in 1:a.num_vars]
+   elseif S == :revlex
+      return [a([base_ring(a)(1)], [tuple([UInt(N - i + 1 == j) for j in 1:a.num_vars]...)])
+           for i in 1:a.num_vars]
+   else # S == :degrevlex
+      return [a([base_ring(a)(1)], [tuple(UInt(1), [UInt(N - i == j) for j in 1:a.num_vars]...)])
            for i in 1:a.num_vars]
    end
 end
@@ -44,37 +50,11 @@ function *{N}(a::NTuple{N, UInt}, n::Int)
    return ntuple(i -> a[i]*reinterpret(UInt, n), Val{N})
 end
 
-function cmp{T <: RingElem, N}(a::NTuple{N, UInt}, b::NTuple{N, UInt}, R::GenMPolyRing{T, :lex, N})
+function cmp{T <: RingElem, S, N}(a::NTuple{N, UInt},
+                                  b::NTuple{N, UInt}, R::GenMPolyRing{T, S, N})
    i = 1
    while i < N && a[i] == b[i]
       i += 1
-   end
-   return reinterpret(Int, a[i] - b[i])
-end
-
-function cmp{T <: RingElem, N}(a::NTuple{N, UInt}, b::NTuple{N, UInt}, R::GenMPolyRing{T, :deglex, N})
-   i = 1
-   while i < N && a[i] == b[i]
-      i += 1
-   end
-   return reinterpret(Int, a[i] - b[i])
-end
-
-function cmp{T <: RingElem, N}(a::NTuple{N, UInt}, b::NTuple{N, UInt}, R::GenMPolyRing{T, :revlex, N})
-   i = N
-   while i > 1 && a[i] == b[i]
-      i -= 1
-   end
-   return reinterpret(Int, a[i] - b[i])
-end
-
-function cmp{T <: RingElem, N}(a::NTuple{N, UInt}, b::NTuple{N, UInt}, R::GenMPolyRing{T, :degrevlex, N})
-   if a[1] != b[1]
-      return reinterpret(Int, a[1] - b[1])
-   end
-   i = N
-   while i > 2 && a[i] == b[i]
-      i -= 1
    end
    return reinterpret(Int, a[i] - b[i])
 end
@@ -118,6 +98,9 @@ function show{T <: RingElem, S, N}(io::IO, x::GenMPoly{T, S, N})
           print(io, "+")
         end
         X = x.exps[len - i + 1]
+        if (S == :revlex || S == :degrevlex)
+           X = reverse(X)
+        end
         if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
           if bracket
             print(io, "(")
@@ -133,7 +116,7 @@ function show{T <: RingElem, S, N}(io::IO, x::GenMPoly{T, S, N})
         if c == -1 && !show_minus_one(typeof(c))
           print(io, "-")
         end
-        d = (S == :deglex || S == :degrevlex) ? 1 : 0
+        d = (S == :deglex) ? 1 : 0
         if X == zero(NTuple{N, UInt})
           if c == 1
              print(io, c)
