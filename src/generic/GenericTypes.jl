@@ -64,12 +64,12 @@ type GenMPolyRing{T <: RingElem, S, N} <: PolyRing{T}
    num_vars::Int
 
    function GenMPolyRing(R::Ring, s::Array{Symbol, 1}, cached=true)
-      if haskey(GenMPolyID, (R, s, S))
-         return GenMPolyID[R, s, S]::GenMPolyRing{T, S, N}
+      if haskey(GenMPolyID, (R, s, S, N))
+         return GenMPolyID[R, s, S, N]::GenMPolyRing{T, S, N}
       else 
          z = new(R, s, length(s))
          if cached
-           GenMPolyID[R, s, S] = z
+           GenMPolyID[R, s, S, N] = z
          end
          return z
       end
