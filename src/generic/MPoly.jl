@@ -545,12 +545,18 @@ function *{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
    end
 end
 
-function isless{N}(a::Tuple{NTuple{N, UInt}, Int, Int}, b::Tuple{NTuple{N, UInt}, Int, Int})
-   return a[1] < b[1]
+immutable heap_s{N}
+   exp::NTuple{N, UInt}
+   i::Int
+   j::Int
 end
 
-function =={N}(a::Tuple{NTuple{N, UInt}, Int, Int}, b::Tuple{NTuple{N, UInt}, Int, Int})
-   return a[1] == b[1]
+function isless{N}(a::heap_s{N}, b::heap_s{N})
+   return a.exp < b.exp
+end
+
+function =={N}(a::heap_s{N}, b::heap_s{N})
+   return a.exp == b.exp
 end
 
 function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
@@ -561,10 +567,10 @@ function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S
    if m == 0 || n == 0
       return par()
    end
-   H = Array(Tuple{NTuple{N, UInt}, Int, Int}, 0)
+   H = Array(heap_s{N}, 0)
    # set up heap
    for i = 1:m
-      Collections.heappush!(H, (a.exps[i] + b.exps[1], i, 1))
+      Collections.heappush!(H, heap_s(a.exps[i] + b.exps[1], i, 1))
    end
    r_alloc = max(m, n) + n
    Rc = Array(T, r_alloc)
@@ -572,9 +578,9 @@ function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S
    k = 0
    c = R()
    while length(H) > 0
-      exp, i, j = Collections.heappop!(H)
-      if k > 0 && exp == Re[k]
-         mul!(c, a.coeffs[i], b.coeffs[j])
+      v = H[1]
+      if k > 0 && v.exp == Re[k]
+         mul!(c, a.coeffs[v.i], b.coeffs[v.j])
          addeq!(Rc[k], c)
       else
          k += 1
@@ -582,12 +588,14 @@ function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S
             r_alloc *= 2
             resize!(Rc, r_alloc)
             resize!(Re, r_alloc)
-         end
-         Rc[k] = a.coeffs[i]*b.coeffs[j]
-         Re[k] = exp
+          end
+         Rc[k] = a.coeffs[v.i]*b.coeffs[v.j]
+         Re[k] = v.exp
       end
-      if j < n
-         Collections.heappush!(H, (a.exps[i] + b.exps[j + 1], i, j + 1))
+      if v.j < n
+         Collections.percolate_down!(H, 1, heap_s(a.exps[v.i] + b.exps[v.j + 1], v.i, v.j + 1))
+      else
+         Collections.heappop!(H)
       end
    end
    resize!(Rc, k)
