@@ -545,18 +545,51 @@ function *{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
    end
 end
 
-immutable heap_s{N}
-   exp::NTuple{N, UInt}
+type heap_s
    i::Int
    j::Int
+   next::heap_s
+   heap_s() = new()
+   heap_s(b::Int, c::Int, d::heap_s) = new(b, c, d)   
 end
 
-function isless{N}(a::heap_s{N}, b::heap_s{N})
+immutable heap_t{N}
+   exp::NTuple{N, UInt}
+   s::heap_s
+end
+
+function isless{N}(a::heap_t{N}, b::heap_t{N})
    return a.exp < b.exp
 end
 
-function =={N}(a::heap_s{N}, b::heap_s{N})
+function =={N}(a::heap_t{N}, b::heap_t{N})
    return a.exp == b.exp
+end
+
+heapleft(i::Int) = 2i
+heapright(i::Int) = 2i + 1
+heapparent(i::Int) = div(i, 2)
+
+# either chain (exp, x) or insert into heap
+function heapinsert!{N}(xs::Array{heap_t{N}, 1}, exp::NTuple{N, UInt}, x::heap_s)
+   i = length(xs) + 1
+   if i != 1 && exp == xs[1].exp
+      x.next = xs[1].s
+      xs[1] = heap_t{N}(exp, x)
+      return
+   end
+   while (j = heapparent(i)) >= 1
+      if exp == xs[j].exp
+         x.next = xs[j].s
+         xs[j] = heap_t{N}(exp, x)
+         return
+      elseif exp < xs[j].exp
+         i = j
+      else
+         break
+      end
+   end
+   Collections.heappush!(xs, heap_t{N}(exp, x))
 end
 
 function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
@@ -567,37 +600,62 @@ function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S
    if m == 0 || n == 0
       return par()
    end
-   H = Array(heap_s{N}, 0)
+   H = Array(heap_t{N}, 0)
+   const null_s = heap_s()
    # set up heap
-   for i = 1:m
-      Collections.heappush!(H, heap_s(a.exps[i] + b.exps[1], i, 1))
-   end
+   push!(H, heap_t{N}(a.exps[1] + b.exps[1], heap_s(1, 1, null_s)))
    r_alloc = max(m, n) + n
    Rc = Array(T, r_alloc)
    Re = Array(NTuple{N, UInt}, r_alloc)
    k = 0
    c = R()
-   while length(H) > 0
-      v = H[1]
-      if k > 0 && v.exp == Re[k]
-         mul!(c, a.coeffs[v.i], b.coeffs[v.j])
-         addeq!(Rc[k], c)
-      else
-         k += 1
-         if k > r_alloc
-            r_alloc *= 2
-            resize!(Rc, r_alloc)
-            resize!(Re, r_alloc)
-          end
-         Rc[k] = a.coeffs[v.i]*b.coeffs[v.j]
-         Re[k] = v.exp
+   Q = Array(heap_s, 0)
+   println("start heap")
+   while !isempty(H)
+      exp = H[1].exp
+      k += 1
+      if k > r_alloc
+         r_alloc *= 2
+         resize!(Rc, r_alloc)
+         resize!(Re, r_alloc)
       end
-      if v.j < n
-         Collections.percolate_down!(H, 1, heap_s(a.exps[v.i] + b.exps[v.j + 1], v.i, v.j + 1))
-      else
-         Collections.heappop!(H)
+      first = true
+      while !isempty(H) && H[1].exp == exp
+         u = Collections.heappop!(H)
+         exp = u.exp
+         v = u.s
+         if first
+            Rc[k] = a.coeffs[v.i]*b.coeffs[v.j]
+            Re[k] = exp
+            first = false
+         else
+            mul!(c, a.coeffs[v.i], b.coeffs[v.j])
+            addeq!(Rc[k], c)
+         end
+         if v.j < n
+            push!(Q, v)
+         end
+         while v.next !== null_s
+            v = v.next
+            mul!(c, a.coeffs[v.i], b.coeffs[v.j])
+            addeq!(Rc[k], c)
+            if v.j < n
+               push!(Q, v)
+            end
+         end
+      end
+      while !isempty(Q)
+         v = pop!(Q)
+         if v.j == 1 && v.i < m
+            Collections.heappush!(H, heap_t{N}(a.exps[v.i + 1] + b.exps[1], heap_s(v.i + 1, 1, null_s)))       
+         end
+         exp = a.exps[v.i] + b.exps[v.j + 1]
+         v.j += 1
+         v.next = null_s
+         heapinsert!(H, exp, v) # either chain or insert v into heap   
       end
    end
+   println("end heap")
    resize!(Rc, k)
    resize!(Re, k)
    return parent(a)(Rc, Re)
@@ -653,7 +711,7 @@ function mul{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
    v1, d1 = max_degrees(a)
    v2, d2 = max_degrees(b)
    d = d1 + d2
-   bits = 16
+   bits = 8
    max_e = 2^(bits - 1)
    while d >= max_e
       bits *= 2
