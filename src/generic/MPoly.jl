@@ -545,13 +545,15 @@ function *{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
    end
 end
 
-type heap_s{N}
+immutable heap_s{N}
    exp::NTuple{N, UInt}
+   n::Int
+end
+
+immutable heap_t
    i::Int
    j::Int
-   next::heap_s{N}
-   heap_s() = new()
-   heap_s(a::NTuple{N, UInt}, b::Int, c::Int, d::heap_s) = new(a, b, c, d)   
+   next::Int   
 end
 
 function isless{N}(a::heap_s{N}, b::heap_s{N})
@@ -567,30 +569,31 @@ heapright(i::Int) = 2i + 1
 heapparent(i::Int) = div(i, 2)
 
 # either chain (exp, x) or insert into heap
-function heapinsert!{N}(xs::Array{heap_s{N}, 1}, x::heap_s{N})
+function heapinsert!{N}(xs::Array{heap_s{N}, 1}, ys::Array{heap_t, 1}, m::Int, exp::NTuple{N, UInt})
    i = n = length(xs) + 1
-   if i != 1 && x.exp == xs[1].exp
-      x.next = xs[1]
-      xs[1] = x
+   if i != 1 && exp == xs[1].exp
+      ys[m] = heap_t(ys[m].i, ys[m].j, xs[1].n)
+      xs[1] = heap_s{N}(exp, m)
       return
    end
    @inbounds while (j = heapparent(i)) >= 1
-      if x.exp == xs[j].exp
-         x.next = xs[j]
-         xs[j] = x
+      if exp == xs[j].exp
+         ys[m] = heap_t(ys[m].i, ys[m].j, xs[j].n)
+         xs[j] = heap_s{N}(exp, m)
          return
-      elseif x.exp < xs[j].exp
+      elseif exp < xs[j].exp
          i = j
       else
          break
       end
    end
-   push!(xs, x)
+   push!(xs, heap_s{N}(exp, 0))
    @inbounds while n > i
       xs[n] = xs[heapparent(n)]
       n >>= 1
    end
-   xs[i] = x
+   xs[i] = heap_s{N}(exp, m)
+   return
 end
 
 function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
@@ -602,15 +605,16 @@ function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S
       return par()
    end
    H = Array(heap_s{N}, 0)
-   const null_s = heap_s{N}()
+   I = Array(heap_t, 0)
    # set up heap
-   push!(H, heap_s{N}(a.exps[1] + b.exps[1], 1, 1, null_s))
+   push!(H, heap_s{N}(a.exps[1] + b.exps[1], 1))
+   push!(I, heap_t(1, 1, 0))
    r_alloc = max(m, n) + n
    Rc = Array(T, r_alloc)
    Re = Array(NTuple{N, UInt}, r_alloc)
    k = 0
    c = R()
-   Q = Array(heap_s{N}, 0)
+   Q = Array(Int, 0)
    println("start heap")
    while !isempty(H)
       exp = H[1].exp
@@ -622,36 +626,35 @@ function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S
       end
       first = true
       while !isempty(H) && H[1].exp == exp
-         v = Collections.heappop!(H)
+         x = Collections.heappop!(H)
+         v = I[x.n]
          if first
             Rc[k] = a.coeffs[v.i]*b.coeffs[v.j]
             Re[k] = exp
             first = false
          else
-            mul!(c, a.coeffs[v.i], b.coeffs[v.j])
-            addeq!(Rc[k], c)
+            addmul!(Rc[k], a.coeffs[v.i], b.coeffs[v.j], c)
          end
          if v.j < n
-            push!(Q, v)
+            push!(Q, x.n)
          end
-         while v.next !== null_s
-            v = v.next
-            mul!(c, a.coeffs[v.i], b.coeffs[v.j])
-            addeq!(Rc[k], c)
+         while (xn = v.next) != 0
+            v = I[xn]
+            addmul!(Rc[k], a.coeffs[v.i], b.coeffs[v.j], c)
             if v.j < n
-               push!(Q, v)
+               push!(Q, xn)
             end
          end
       end
       while !isempty(Q)
-         v = pop!(Q)
+         xn = pop!(Q)
+         v = I[xn]
          if v.j == 1 && v.i < m
-            Collections.heappush!(H, heap_s{N}(a.exps[v.i + 1] + b.exps[1], v.i + 1, 1, null_s))       
+            push!(I, heap_t(v.i + 1, 1, 0))
+            Collections.heappush!(H, heap_s{N}(a.exps[v.i + 1] + b.exps[1], length(I)))       
          end
-         v.exp = a.exps[v.i] + b.exps[v.j + 1]
-         v.j += 1
-         v.next = null_s
-         heapinsert!(H, v) # either chain or insert v into heap   
+         I[xn] = heap_t(v.i, v.j + 1, 0)
+         heapinsert!(H, I, xn, a.exps[v.i] + b.exps[v.j + 1]) # either chain or insert v into heap   
       end
    end
    println("end heap")
