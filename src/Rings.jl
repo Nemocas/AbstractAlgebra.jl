@@ -196,6 +196,12 @@ function =={S <: Integer, T <: RingElem}(x::S, y::T)
    end
 end
 
+function addmul!{T <: RingElem}(z::T, x::T, y::T, c::T)
+   mul!(c, x, y)
+   addeq!(z, c)
+   return
+end
+
 ###############################################################################
 #
 #   Baby-steps giant-steps powering
