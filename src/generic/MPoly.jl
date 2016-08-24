@@ -6,6 +6,78 @@
 
 export GenMPoly, GenMPolyRing
 
+export NewInt
+
+type NewIntParent <: Ring
+end
+
+zz = NewIntParent()
+
+immutable NewInt <: RingElem
+   d::Int
+   NewInt(a::Int) = new(a)
+   NewInt() = new(0)
+end
+
+parent(a::NewInt) = zz
+
++(a::NewInt, b::NewInt) = NewInt(a.d + b.d)
+
+*(a::NewInt, b::NewInt) = NewInt(a.d*b.d)
+
+-(a::NewInt) = NewInt(-a)
+
++(a::NewInt, b::Int) = NewInt(a.d + b)
+
++(a::Int, b::NewInt) = NewInt(a + b.d)
+
+*(a::NewInt, b::Int) = NewInt(a.d*b)
+
+*(a::Int, b::NewInt) = NewInt(a*b.d)
+
+function mul!(a::NewInt, b::NewInt, c::NewInt)
+   a.d = b.d*c.d
+end
+
+function addeq!(a::NewInt, b::NewInt)
+   a.d += b.d
+   return
+end
+
+function addmul!(a::NewInt, b::NewInt, c::NewInt, d::NewInt)
+   NewInt(a.d + b.d*c.d)
+end
+
+function call(a::NewIntParent)
+   return NewInt(0)
+end
+
+function call(a::NewIntParent, b::Int)
+   return NewInt(b)
+end
+
+elem_type(::Nemo.NewIntParent) = NewInt
+ 
+parent_type(::Type{Nemo.NewInt}) = NewIntParent
+
+needs_parentheses(::Nemo.NewInt) = false
+
+isone(a::Nemo.NewInt) = a.d == 1
+
+iszero(a::Nemo.NewInt) = a.d == 0
+
+base_ring(a::Nemo.NewInt) = Union{}
+
+base_ring(a::Nemo.NewIntParent) = Union{}
+
+==(a::NewInt, b::Int) = a.d == b
+
+==(a::Int, b::NewInt) = a == b.d
+
+==(a::NewInt, b::NewInt) = a.d == b.d
+
+is_negative(a::Nemo.NewInt) = a.d < 0
+
 ###############################################################################
 #
 #   Data type and parent object methods
@@ -571,7 +643,7 @@ heapparent(i::Int) = div(i, 2)
 # either chain (exp, x) or insert into heap
 function heapinsert!{N}(xs::Array{heap_s{N}, 1}, ys::Array{heap_t, 1}, m::Int, exp::NTuple{N, UInt})
    i = n = length(xs) + 1
-   if i != 1 && exp == xs[1].exp
+   @inbounds if i != 1 && exp == xs[1].exp
       ys[m] = heap_t(ys[m].i, ys[m].j, xs[1].n)
       xs[1] = heap_s{N}(exp, m)
       return
@@ -593,6 +665,28 @@ function heapinsert!{N}(xs::Array{heap_s{N}, 1}, ys::Array{heap_t, 1}, m::Int, e
       n >>= 1
    end
    xs[i] = heap_s{N}(exp, m)
+   return
+end
+
+function heappop!{N}(xs::Array{heap_s{N}, 1})
+   n = length(xs)
+   x = xs[1]
+   i = 1
+   j = 2
+   exp = xs[n].exp
+   @inbounds while j < n
+      if xs[j].exp > xs[j + 1].exp
+         j += 1
+      end
+      xs[i] = xs[j]
+      if exp <= xs[j].exp
+         break
+      end
+      i = j
+      j *= 2
+   end
+   xs[i] = xs[n]
+   pop!(xs)
    return
 end
 
@@ -625,8 +719,9 @@ function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S
          resize!(Re, r_alloc)
       end
       first = true
-      while !isempty(H) && H[1].exp == exp
-         x = Collections.heappop!(H)
+      @inbounds while !isempty(H) && H[1].exp == exp
+         x = H[1]
+         heappop!(H)
          v = I[x.n]
          if first
             Rc[k] = a.coeffs[v.i]*b.coeffs[v.j]
@@ -646,7 +741,7 @@ function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S
             end
          end
       end
-      while !isempty(Q)
+      @inbounds while !isempty(Q)
          xn = pop!(Q)
          v = I[xn]
          if v.j == 1 && v.i < m
