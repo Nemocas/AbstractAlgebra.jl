@@ -628,6 +628,103 @@ end
 
 ###############################################################################
 #
+#   FmpzMPolyRing / fmpz_mpoly
+#
+###############################################################################
+
+# S is a Symbol which can take the values:
+# :lex
+# :revlex
+# :deglex
+# :degrevlex
+# 
+# T is an Int which is the number of variables
+# (plus one if ordered by total degree)
+
+const FmpzMPolyID = ObjectIdDict()
+
+type FmpzMPolyRing{S, N} <: PolyRing{fmpz}
+   N::Int
+   bits::Int
+   n::Int
+   ord::Cint
+   base_ring::FlintIntegerRing
+   S::Array{Symbol, 1}
+   num_vars::Int
+
+   function FmpzMPolyRing(s::Array{Symbol, 1}, bits::Int, cached=true)
+      if haskey(FmpzMPolyID, (bits, s, S, N))
+         return FmpzMPolyID[bits, s, S, N]::FmpzMPolyRing{S, N}
+      else 
+         if S == :lex
+            ord = 0
+         elseif S == :revlex
+            ord = 1
+         elseif S == :deglex
+            ord = 2
+         elseif S == :degrevlex
+            ord = 3
+         end
+
+         NF = div(N + sizeof(UInt) - 1, sizeof(UInt))
+         z = new()
+         ccall((:fmpz_mpoly_ctx_init, :libflint), Void,
+               (Ptr{FmpzMPolyRing}, Int, Int, Int, Int),
+               &z, NF, bits, length(s), ord)
+         z.base_ring = FlintZZ
+         z.S = s
+         z.num_vars = length(s)
+         finalizer(z, _fmpz_mpoly_ctx_clear_fn)
+         if cached
+            FmpzMPolyID[bits, s, S, N] = z
+         end
+         return z
+      end
+   end
+end
+
+type fmpz_mpoly{S, N} <: PolyElem{fmpz}
+   coeffs::Ptr{Void}
+   exps::Ptr{Void}
+   alloc::Int
+   length::Int
+   parent::FmpzMPolyRing
+
+   function fmpz_mpoly(ctx::FmpzMPolyRing{S, N})
+      z = new()
+      ccall((:fmpz_mpoly_init, :libflint), Void, 
+            (Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing},), &z, &ctx)
+      finalizer(z, _fmpz_mpoly_clear_fn)
+      z.parent = ctx
+      return z
+   end
+   
+   function fmpz_mpoly(ctx::FmpzMPolyRing{S, N}, a::Array{fmpz, 1}, b::Array{NTuple{N, UInt}, 1})
+      z = new()
+      finalizer(z, _fmpz_mpoly_clear_fn)
+      return z
+   end
+
+   function fmpz_mpoly(ctx::FmpzMPolyRing{S, N}, a::fmpz)
+      z = new()
+      finalizer(z, _fmpz_mpoly_clear_fn)
+      z.parent = ctx
+      return z
+   end
+end
+
+function _fmpz_mpoly_clear_fn(a::fmpz_mpoly)
+  ccall((:fmpz_mpoly_clear, :libflint), Void,
+          (Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing}), &a, &a.parent)
+end
+
+function _fmpz_mpoly_ctx_clear_fn(a::FmpzMPolyRing)
+  ccall((:fmpz_mpoly_ctx_clear, :libflint), Void,
+          (Ptr{FmpzMPolyRing},), &a)
+end
+
+###############################################################################
+#
 #   FqNmodFiniteField / fq_nmod
 #
 ###############################################################################
