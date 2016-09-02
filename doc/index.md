@@ -37,7 +37,7 @@ julia> Pkg.build("Nemo")
 ```
 
 Alternatively, if you don't want to set Julia up yourself, Julia and Nemo are available on
-[https://cloud.sagemath.com/] (https://cloud.sagemath.com/).
+[https://cloud.sagemath.com/](https://cloud.sagemath.com/).
 
 ## Quick start
 
