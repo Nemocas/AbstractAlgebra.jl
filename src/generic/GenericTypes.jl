@@ -81,7 +81,7 @@ end
 
 const GenRelSeriesID = ObjectIdDict()
 
-type GenRelSeriesRing{T <: RingElem} <: RelSeriesRing{T}
+type GenRelSeriesRing{T <: RingElem} <: SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
@@ -121,7 +121,7 @@ end
 
 const GenAbsSeriesID = ObjectIdDict()
 
-type GenAbsSeriesRing{T <: RingElem} <: AbsSeriesRing{T}
+type GenAbsSeriesRing{T <: RingElem} <: SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
