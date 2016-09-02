@@ -501,6 +501,12 @@ function test_arb_functions()
    @test overlaps(bell(ZZ(100), RR), RR("4.758539127676483365879077e+115 +/- 1.16e+90"))
    @test overlaps(bell(100, RR), RR("4.758539127676483365879077e+115 +/- 1.16e+90"))
 
+   @test numpart(ZZ(10), RR) == 42
+   @test numpart(10, RR) == 42
+   @test numpart(ZZ(-10), RR) == 0
+   @test numpart(-10, RR) == 0
+   @test overlaps(numpart(ZZ(10)^20, RR), RR("1.8381765083448826436e+11140086259 +/- 4.69e+11140086239"))
+
    println("PASS")
 end
 

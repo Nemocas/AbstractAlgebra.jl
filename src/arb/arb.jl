@@ -24,7 +24,7 @@ export ball, radius, midpoint, contains, contains_zero,
        atanh, asinh, acosh, gamma, lgamma, rgamma, digamma, zeta,
        sincos, sincospi, sinhcosh, atan2,
        agm, fac, binom, fib, bernoulli, risingfac, risingfac2, polylog,
-       chebyshev_t, chebyshev_t2, chebyshev_u, chebyshev_u2, bell
+       chebyshev_t, chebyshev_t2, chebyshev_u, chebyshev_u2, bell, numpart
 
 ###############################################################################
 #
@@ -1571,6 +1571,23 @@ doc"""
 > Return the Bell number $B_n$ as an element of $r$.
 """
 bell(n::Int, r::ArbField) = bell(fmpz(n), r)
+
+doc"""
+    numpart(n::fmpz, r::ArbField)
+> Return the number of partitions $p(n)$ as an element of $r$.
+"""
+function numpart(n::fmpz, r::ArbField)
+  z = r()
+  ccall((:arb_partitions_fmpz, :libarb), Void,
+              (Ptr{arb}, Ptr{fmpz}, Int), &z, &n, r.prec)
+  return z
+end
+
+doc"""
+    numpart(n::fmpz, r::ArbField)
+> Return the number of partitions $p(n)$ as an element of $r$.
+"""
+numpart(n::Int, r::ArbField) = numpart(fmpz(n), r)
 
 ################################################################################
 #
