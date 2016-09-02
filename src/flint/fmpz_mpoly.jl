@@ -158,7 +158,7 @@ function PolynomialRing(R::FlintIntegerRing, s::Array{String, 1}; cached::Bool =
    U = [Symbol(x) for x in s]
    N = (ordering == :deglex || ordering == :degrevlex) ? length(U) + 1 : length(U)
    # default to 8 bit exponent fields
-   parent_obj = FmpzMPolyRing{ordering, N}(U, 8, cached)
+   parent_obj = FmpzMPolyRing{ordering, N}(U, cached)
    return tuple(parent_obj, gens(parent_obj)...)
 end
 

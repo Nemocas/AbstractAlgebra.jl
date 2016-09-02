@@ -644,17 +644,15 @@ end
 const FmpzMPolyID = ObjectIdDict()
 
 type FmpzMPolyRing{S, N} <: PolyRing{fmpz}
-   N::Int
-   bits::Int
    n::Int
    ord::Cint
    base_ring::FlintIntegerRing
    S::Array{Symbol, 1}
    num_vars::Int
 
-   function FmpzMPolyRing(s::Array{Symbol, 1}, bits::Int, cached=true)
-      if haskey(FmpzMPolyID, (bits, s, S, N))
-         return FmpzMPolyID[bits, s, S, N]::FmpzMPolyRing{S, N}
+   function FmpzMPolyRing(s::Array{Symbol, 1}, cached=true)
+      if haskey(FmpzMPolyID, (s, S, N))
+         return FmpzMPolyID[s, S, N]::FmpzMPolyRing{S, N}
       else 
          if S == :lex
             ord = 0
@@ -666,17 +664,16 @@ type FmpzMPolyRing{S, N} <: PolyRing{fmpz}
             ord = 3
          end
 
-         NF = div(N + sizeof(UInt) - 1, sizeof(UInt))
          z = new()
          ccall((:fmpz_mpoly_ctx_init, :libflint), Void,
-               (Ptr{FmpzMPolyRing}, Int, Int, Int, Int),
-               &z, NF, bits, length(s), ord)
+               (Ptr{FmpzMPolyRing}, Int, Int),
+               &z, length(s), ord)
          z.base_ring = FlintZZ
          z.S = s
          z.num_vars = length(s)
          finalizer(z, _fmpz_mpoly_ctx_clear_fn)
          if cached
-            FmpzMPolyID[bits, s, S, N] = z
+            FmpzMPolyID[s, S, N] = z
          end
          return z
       end
@@ -688,6 +685,7 @@ type fmpz_mpoly{S, N} <: PolyElem{fmpz}
    exps::Ptr{Void}
    alloc::Int
    length::Int
+   bits::Int
    parent::FmpzMPolyRing
 
    function fmpz_mpoly(ctx::FmpzMPolyRing{S, N})
