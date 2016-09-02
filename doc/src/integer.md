@@ -288,7 +288,7 @@ behaviour. We also give the return value of the function, with $q$ representing
 return of the quotient and $r$ representing return of the remainder.
 
 Function                  | Return | Rounding
-------------------------------------------------------------
+--------------------------|--------|------------------------
 divrem(a::fmpz, b::fmpz)  | q, r   | towards zero 
 tdivrem(a::fmpz, b::fmpz) | q, r   | towards zero
 fdivrem(a::fmpz, b::fmpz) | q, r   | towards minus infinity 
@@ -297,7 +297,7 @@ Nemo also offers the following ad hoc division operators. The notation and
 description is as for the other Euclidean division functions.
 
 Function                  | Return | Rounding
-------------------------------------------------------------
+--------------------------|--------|------------------------
 rem(a::fmpz, b::Int)      | r      | towards zero
 div(a::fmpz, b::Int)      | q      | towards zero
 tdiv(a::fmpz, b::Int)     | q      | towards zero
@@ -309,7 +309,7 @@ by a power of $2$. In other words, for Euclidean division of the form
 $a = b2^{d} + r$. These are useful for bit twiddling.
 
 Function                  | Return | Rounding
-------------------------------------------------------------
+--------------------------|--------|------------------------
 tdivpow2(a::fmpz, d::Int) | q      | towards zero
 fdivpow2(a::fmpz, d::Int) | q      | towards minus infinity
 fmodpow2(a::fmpz, d::Int) | r      | towards minus infinity
