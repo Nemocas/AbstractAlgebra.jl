@@ -121,12 +121,12 @@ one(R::SeriesRing) = R(1)
 
 doc"""
     gen{T}(R::GenAbsSeriesRing{T})
-> Return the generator of the power series ring, i.e. $x + O(x^{n + 1})$ where
-> $n$ is the maximum precision of the power series ring $R$.
+> Return the generator of the power series ring, i.e. $x + O(x^n)$ where
+> $n$ is the precision of the power series ring $R$.
 """
 function gen{T}(R::GenAbsSeriesRing{T})
    S = base_ring(R)
-   return R([S(0), S(1)], 2, max_precision(R), 1)
+   return R([S(0), S(1)], 2, max_precision(R))
 end
 
 doc"""
@@ -142,8 +142,7 @@ doc"""
 > its current precision, otherwise return `false`.
 """
 function isone(a::GenAbsSeries)
-   return (valuation(a) == 0 && length(a) == 1 && isone(coeff(a, 0))) ||
-           precision(a) == 0
+   return (length(a) == 2 && isone(coeff(a, 0))) || precision(a) == 0
 end
 
 doc"""
@@ -169,7 +168,14 @@ doc"""
 > Return the valuation of the given power series, i.e. the degree of the first
 > nonzero term (or the precision if it is arithmetically zero).
 """
-valuation(a::AbsSeriesElem) = a.val
+function valuation(a::AbsSeriesElem)
+   for i = 1:length(a)
+      if !iszero(coeff(a, i - 1))
+         return i - 1
+      end
+   end
+   return precision(a)
+end
 
 doc"""
     modulus{T <: ResElem}(a::SeriesElem{T})
@@ -205,7 +211,7 @@ function show{T <: RingElem}(io::IO, x::GenAbsSeries{T})
             if coeff_printed && !is_negative(c)
                print(io, "+")
             end
-            if i + valuation(x) != 0
+            if i != 0
                if !isone(c) && (c != -1 || show_minus_one(elem_type(base_ring(x))))
                   if bracket
                      print(io, "(")
@@ -214,7 +220,7 @@ function show{T <: RingElem}(io::IO, x::GenAbsSeries{T})
                   if bracket
                      print(io, ")")
                   end
-                  if i + valuation(x) != 0
+                  if i != 0
                      print(io, "*")
                   end
                end
@@ -222,9 +228,9 @@ function show{T <: RingElem}(io::IO, x::GenAbsSeries{T})
                   print(io, "-")
                end
                print(io, string(var(parent(x))))
-               if i + valuation(x) != 1
+               if i != 1
                   print(io, "^")
-                  print(io, valuation(x) + i)
+                  print(io, i)
                end
             else
                print(io, c)
@@ -233,7 +239,7 @@ function show{T <: RingElem}(io::IO, x::GenAbsSeries{T})
          end
       end
    end
-   print(io, "+O(", string(var(parent(x))), "^", precision(x) + valuation(x), ")")
+   print(io, "+O(", string(var(parent(x))), "^", precision(x), ")")
 end
 
 function show{T <: RingElem}(io::IO, a::SeriesRing{T})
@@ -346,9 +352,7 @@ function *{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
-   aval = valuation(a)
-   bval = valuation(b)
-   prec = min(precision(a) + bval, precision(b) + aval)
+   prec = min(precision(a), precision(b))
    lena = min(lena, prec)
    lenb = min(lenb, prec)
    if lena == 0 || lenb == 0
@@ -617,18 +621,11 @@ doc"""
 function ^{T <: RingElem}(a::AbsSeriesElem{T}, b::Int)
    b < 0 && throw(DomainError())
    # special case powers of x for constructing power series efficiently
-   if isgen(a)
+   # if isgen(a)
+   # end
+   if length(a) == 0
       z = parent(a)()
-      fit!(z, b + 1)
-      set_prec!(z, precision(a) + b - 1)
-      setcoeff!(z, b, coeff(a, 1))
-      for i = 1:b
-         setcoeff!(z, i - 1, coeff(a, 0))
-      end
-      return z
-   elseif length(a) == 0
-      z = parent(a)()
-      set_prec!(z, precision(a) + (b - 1)*valuation(a))
+      set_prec!(z, precision(a))
       return z
    elseif length(a) == 1
       z = parent(a)(coeff(a, 0)^b)
@@ -938,10 +935,7 @@ function mul!{T <: RingElem}(c::GenAbsSeries{T}, a::GenAbsSeries{T}, b::GenAbsSe
    lena = length(a)
    lenb = length(b)
 
-   aval = valuation(a)
-   bval = valuation(b)
-
-   prec = min(precision(a) + bval, precision(b) + aval)
+   prec = min(precision(a), precision(b))
    
    lena = min(lena, prec)
    lenb = min(lenb, prec)
@@ -1029,16 +1023,16 @@ function Base.call{T <: RingElem}(a::GenAbsSeriesRing{T}, b::RingElem)
 end
 
 function Base.call{T <: RingElem}(a::GenAbsSeriesRing{T})
-   z = GenAbsSeries{T}(Array(T, 0), 0, a.prec_max, a.prec_max)
+   z = GenAbsSeries{T}(Array(T, 0), 0, a.prec_max)
    z.parent = a
    return z
 end
 
 function Base.call{T <: RingElem}(a::GenAbsSeriesRing{T}, b::Integer)
    if b == 0
-      z = GenAbsSeries{T}(Array(T, 0), 0, a.prec_max, a.prec_max)
+      z = GenAbsSeries{T}(Array(T, 0), 0, a.prec_max)
    else
-      z = GenAbsSeries{T}([base_ring(a)(b)], 1, a.prec_max, 0)
+      z = GenAbsSeries{T}([base_ring(a)(b)], 1, a.prec_max)
    end
    z.parent = a
    return z
@@ -1046,9 +1040,9 @@ end
 
 function Base.call{T <: RingElem}(a::GenAbsSeriesRing{T}, b::fmpz)
    if b == 0
-      z = GenAbsSeries{T}(Array(T, 0), 0, a.prec_max, a.prec_max)
+      z = GenAbsSeries{T}(Array(T, 0), 0, a.prec_max)
    else
-      z = GenAbsSeries{T}([base_ring(a)(b)], 1, a.prec_max, 0)
+      z = GenAbsSeries{T}([base_ring(a)(b)], 1, a.prec_max)
    end
    z.parent = a
    return z
@@ -1057,9 +1051,9 @@ end
 function Base.call{T <: RingElem}(a::GenAbsSeriesRing{T}, b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to power series")
    if b == 0
-      z = GenAbsSeries{T}(Array(T, 0), 0, a.prec_max, a.prec_max)
+      z = GenAbsSeries{T}(Array(T, 0), 0, a.prec_max)
    else
-      z = GenAbsSeries{T}([b], 1, a.prec_max, 0)
+      z = GenAbsSeries{T}([b], 1, a.prec_max)
    end
    z.parent = a
    return z
@@ -1070,11 +1064,11 @@ function Base.call{T <: RingElem}(a::GenAbsSeriesRing{T}, b::AbsSeriesElem{T})
    return b
 end
 
-function Base.call{T <: RingElem}(a::GenAbsSeriesRing{T}, b::Array{T, 1}, len::Int, prec::Int, val::Int)
+function Base.call{T <: RingElem}(a::GenAbsSeriesRing{T}, b::Array{T, 1}, len::Int, prec::Int)
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to power series")
    end
-   z = GenAbsSeries{T}(b, len, prec, val)
+   z = GenAbsSeries{T}(b, len, prec)
    z.parent = a
    return z
 end
