@@ -119,6 +119,8 @@ function show(io::IO, x::arb)
   ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
 end
 
+needs_parentheses(x::arb) = false
+
 ################################################################################
 #
 #  Containment
