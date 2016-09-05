@@ -674,6 +674,24 @@ function ^(x::arb, y::fmpq)
   return z
 end
 
++(x::fmpq, y::arb) = parent(y)(x) + y
++(x::arb, y::fmpq) = x + parent(x)(y)
+-(x::fmpq, y::arb) = parent(y)(x) - y
+-(x::arb, y::fmpq) = x - parent(x)(y)
+*(x::fmpq, y::arb) = parent(y)(x) * y
+*(x::arb, y::fmpq) = x * parent(x)(y)
+^(x::fmpq, y::arb) = parent(y)(x) ^ y
+
+/(x::arb, y::arb) = x // y
+/(x::fmpz, y::arb) = x // y
+/(x::arb, y::fmpz) = x // y
+/(x::Int, y::arb) = x // y
+/(x::arb, y::Int) = x // y
+/(x::UInt, y::arb) = x // y
+/(x::arb, y::UInt) = x // y
+/(x::fmpq, y::arb) = x // y
+/(x::arb, y::fmpq) = x // y
+
 ################################################################################
 #
 #  Absolute value

@@ -313,6 +313,18 @@ end
 //(x::fmpq, y::acb) = parent(y)(x) // y
 ^(x::fmpq, y::acb) = parent(y)(x) ^ y
 
+/(x::acb, y::acb) = x // y
+/(x::fmpz, y::acb) = x // y
+/(x::acb, y::fmpz) = x // y
+/(x::Int, y::acb) = x // y
+/(x::acb, y::Int) = x // y
+/(x::UInt, y::acb) = x // y
+/(x::acb, y::UInt) = x // y
+/(x::fmpq, y::acb) = x // y
+/(x::acb, y::fmpq) = x // y
+/(x::arb, y::acb) = x // y
+/(x::acb, y::arb) = x // y
+
 ################################################################################
 #
 #  Comparison
