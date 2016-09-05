@@ -206,26 +206,18 @@ function show{T <: RingElem}(io::IO, x::GenAbsSeries{T})
       coeff_printed = false
       for i = 0:len - 1
          c = coeff(x, i)
-         bracket = needs_parentheses(c)
          if !iszero(c)
-            if coeff_printed && !is_negative(c)
+            if coeff_printed
                print(io, "+")
             end
             if i != 0
-               if !isone(c) && (c != -1 || show_minus_one(elem_type(base_ring(x))))
-                  if bracket
-                     print(io, "(")
-                  end
+               if !isone(c)
+                  print(io, "(")
                   print(io, c)
-                  if bracket
-                     print(io, ")")
-                  end
+                  print(io, ")")
                   if i != 0
                      print(io, "*")
                   end
-               end
-               if c == -1 && !show_minus_one(elem_type(base_ring(x)))
-                  print(io, "-")
                end
                print(io, string(var(parent(x))))
                if i != 1

@@ -315,6 +315,18 @@ end
 //(x::fmpq, y::acb) = parent(y)(x) // y
 ^(x::fmpq, y::acb) = parent(y)(x) ^ y
 
+divexact(x::acb, y::acb) = x // y
+divexact(x::fmpz, y::acb) = x // y
+divexact(x::acb, y::fmpz) = x // y
+divexact(x::Int, y::acb) = x // y
+divexact(x::acb, y::Int) = x // y
+divexact(x::UInt, y::acb) = x // y
+divexact(x::acb, y::UInt) = x // y
+divexact(x::fmpq, y::acb) = x // y
+divexact(x::acb, y::fmpq) = x // y
+divexact(x::arb, y::acb) = x // y
+divexact(x::acb, y::arb) = x // y
+
 /(x::acb, y::acb) = x // y
 /(x::fmpz, y::acb) = x // y
 /(x::acb, y::fmpz) = x // y
@@ -453,6 +465,10 @@ end
 #
 ################################################################################
 
+function isunit(x::acb)
+   !iszero(x)
+end
+
 doc"""
     iszero(x::acb)
 > Return `true` if $x$ is certainly zero, otherwise return `false`.
@@ -503,6 +519,8 @@ doc"""
 function isreal(x::acb)
    return Bool(ccall((:acb_is_real, :libarb), Cint, (Ptr{acb},), &x))
 end
+
+is_negative(x::acb) = isreal(x) && is_negative(real(x))
 
 ################################################################################
 #
@@ -663,6 +681,7 @@ end
 doc"""
     log(x::acb)
 > Return the principal branch of the logarithm of $x$.
+
 """
 function log(x::acb)
    z = parent(x)()

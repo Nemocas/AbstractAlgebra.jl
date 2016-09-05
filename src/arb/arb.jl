@@ -346,6 +346,10 @@ end
 #
 ################################################################################
 
+function isunit(x::arb)
+   !iszero(x)
+end
+
 doc"""
     iszero(x::arb)
 > Return `true` if $x$ is certainly zero, otherwise return `false`.
@@ -429,6 +433,8 @@ doc"""
 function isnonpositive(x::arb)
    return Bool(ccall((:arb_is_nonpositive, :libarb), Cint, (Ptr{arb},), &x))
 end
+
+is_negative(x::arb) = isnegative(x)
 
 ################################################################################
 #
@@ -693,6 +699,16 @@ end
 /(x::arb, y::UInt) = x // y
 /(x::fmpq, y::arb) = x // y
 /(x::arb, y::fmpq) = x // y
+
+divexact(x::arb, y::arb) = x // y
+divexact(x::fmpz, y::arb) = x // y
+divexact(x::arb, y::fmpz) = x // y
+divexact(x::Int, y::arb) = x // y
+divexact(x::arb, y::Int) = x // y
+divexact(x::UInt, y::arb) = x // y
+divexact(x::arb, y::UInt) = x // y
+divexact(x::fmpq, y::arb) = x // y
+divexact(x::arb, y::fmpq) = x // y
 
 ################################################################################
 #
