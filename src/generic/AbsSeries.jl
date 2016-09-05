@@ -628,9 +628,21 @@ doc"""
 function ^{T <: RingElem}(a::AbsSeriesElem{T}, b::Int)
    b < 0 && throw(DomainError())
    # special case powers of x for constructing power series efficiently
-   # if isgen(a)
-   # end
-   if length(a) == 1
+   if isgen(a)
+      prec = max_precision(parent(a))
+      prec = min(prec, precision(a) + b - 1)
+      if b >= prec
+         return parent(a)(Array(T, 0), 0, prec)
+      end
+      z = parent(a)()
+      fit!(z, b + 1)
+      set_prec!(z, prec)
+      setcoeff!(z, b, coeff(a, 1))
+      for i = 1:b
+         setcoeff!(z, i - 1, coeff(a, 0))
+      end
+      return z
+   elseif length(a) == 1
       z = parent(a)(coeff(a, 0)^b)
       set_prec!(z, precision(a))
       return z
