@@ -25,6 +25,7 @@ include("pari/PariIdeal-test.jl")
 include("generic/Poly-test.jl")
 include("generic/Residue-test.jl")
 include("generic/RelSeries-test.jl")
+include("generic/AbsSeries-test.jl")
 include("generic/Matrix-test.jl")
 
 function test_rings()
@@ -49,6 +50,7 @@ function test_rings()
 
    test_gen_poly()
    test_gen_res()
+   test_gen_abs_series()
    test_gen_rel_series()
    test_gen_mat()
    

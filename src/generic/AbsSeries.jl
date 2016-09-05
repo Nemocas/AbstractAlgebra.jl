@@ -20,9 +20,12 @@ doc"""
 > can be used to set the precision of a power series when constructing it.
 """
 function O{T}(a::AbsSeriesElem{T})
+   if iszero(a)
+      return deepcopy(a)    # 0 + O(x^n)
+   end
    prec = length(a) - 1
    prec < 0 && throw(DomainError())
-   return parent(a)(Array(T, 0), 0, prec, prec)
+   return parent(a)(Array(T, 0), 0, prec)
 end
 
 parent_type{T}(::Type{GenAbsSeries{T}}) = GenAbsSeriesRing{T}
@@ -80,10 +83,10 @@ precision(x::AbsSeriesElem) = x.prec
 
 doc"""
     max_precision(R::SeriesRing)
-> Return the maximum relative precision of power series in the given power
+> Return the maximum absolute precision of power series in the given power
 > series ring.
 """
-max_precision(R::SeriesRing) = R.prec_max
+max_precision(R::GenAbsSeriesRing) = R.prec_max
 
 function normalise(a::GenAbsSeries, len::Int)
    while len > 0 && iszero(a.coeffs[len])
@@ -142,7 +145,7 @@ doc"""
 > its current precision, otherwise return `false`.
 """
 function isone(a::GenAbsSeries)
-   return (length(a) == 2 && isone(coeff(a, 0))) || precision(a) == 0
+   return (length(a) == 1 && isone(coeff(a, 0))) || precision(a) == 0
 end
 
 doc"""
@@ -152,7 +155,7 @@ doc"""
 > `false`.
 """
 function isgen(a::GenAbsSeries)
-   return (valuation(a) == 1 && length(a) == 1 && isone(coeff(a, 0))) || 
+   return (valuation(a) == 1 && length(a) == 2 && isone(coeff(a, 1))) || 
            precision(a) == 0
 end
 
@@ -188,7 +191,7 @@ function deepcopy{T <: RingElem}(a::GenAbsSeries{T})
    for i = 1:length(a)
       coeffs[i] = deepcopy(coeff(a, i - 1))
    end
-   return parent(a)(coeffs, length(a), precision(a), valuation(a))
+   return parent(a)(coeffs, length(a), precision(a))
 end
 
 ###############################################################################
@@ -342,11 +345,19 @@ doc"""
 """
 function *{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
    check_parent(a, b)
+
    lena = length(a)
    lenb = length(b)
-   prec = min(precision(a), precision(b))
+
+   aval = valuation(a)
+   bval = valuation(b)
+
+   prec = min(precision(a) + bval, precision(b) + aval)
+   prec = min(prec, max_precision(parent(a)))
+
    lena = min(lena, prec)
    lenb = min(lenb, prec)
+
    if lena == 0 || lenb == 0
       return parent(a)(Array(T, 0), 0, prec)
    end
@@ -532,20 +543,24 @@ doc"""
 function shift_left{T <: RingElem}(x::AbsSeriesElem{T}, len::Int)
    len < 0 && throw(DomainError())
    xlen = length(x)
+   prec = precision(x) + len
+   prec = min(prec, max_precision(parent(x)))
    if xlen == 0
       z = zero(parent(x))
-      set_prec!(z, precision(x) + len)
+      set_prec!(z, prec)
       return z
    end
+   zlen = min(prec, xlen + len)
    z = parent(x)()
-   fit!(z, xlen + len)
-   set_prec!(z, precision(x) + len)
+   fit!(z, zlen)
+   set_prec!(z, prec)
    for i = 1:len
       setcoeff!(z, i - 1, zero(base_ring(x)))
    end
    for i = 1:xlen
       setcoeff!(z, i + len - 1, coeff(x, i - 1))
    end
+   set_length!(z, normalise(z, zlen))
    return z
 end
 
@@ -615,11 +630,7 @@ function ^{T <: RingElem}(a::AbsSeriesElem{T}, b::Int)
    # special case powers of x for constructing power series efficiently
    # if isgen(a)
    # end
-   if length(a) == 0
-      z = parent(a)()
-      set_prec!(z, precision(a))
-      return z
-   elseif length(a) == 1
+   if length(a) == 1
       z = parent(a)(coeff(a, 0)^b)
       set_prec!(z, precision(a))
       return z
@@ -927,11 +938,15 @@ function mul!{T <: RingElem}(c::GenAbsSeries{T}, a::GenAbsSeries{T}, b::GenAbsSe
    lena = length(a)
    lenb = length(b)
 
-   prec = min(precision(a), precision(b))
-   
+   aval = valuation(a)
+   bval = valuation(b)
+
+   prec = min(precision(a) + bval, precision(b) + aval)
+   prec = min(prec, max_precision(parent(c)))
+
    lena = min(lena, prec)
    lenb = min(lenb, prec)
-   
+
    if lena == 0 || lenb == 0
       c.length = 0
    else
