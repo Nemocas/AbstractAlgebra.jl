@@ -94,7 +94,7 @@ function isgen(a::fmpz_abs_series)
                             (Ptr{fmpz_abs_series},), &a)
 end
 
-iszero(a::SeriesElem) = length(a) == 0
+iszero(a::fmpz_abs_series) = length(a) == 0
 
 isunit(a::fmpz_abs_series) = valuation(a) == 0 && isunit(coeff(a, 0))
 
