@@ -253,6 +253,8 @@ include("generic/AbsSeries.jl")
 
 include("flint/fmpz_rel_series.jl")
 
+include("flint/fmpz_abs_series.jl")
+
 include("flint/fmpz_mod_rel_series.jl")
 
 include("generic/Matrix.jl")
