@@ -958,7 +958,7 @@ type FmpzAbsSeriesRing <: SeriesRing{fmpz}
    end
 end
 
-type fmpz_abs_series <: SeriesElem{fmpz}
+type fmpz_abs_series <: AbsSeriesElem{fmpz}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -1093,7 +1093,7 @@ type FmpqAbsSeriesRing <: SeriesRing{fmpq}
    end
 end
 
-type fmpq_abs_series <: SeriesElem{fmpq}
+type fmpq_abs_series <: AbsSeriesElem{fmpq}
    coeffs::Ptr{Void}
    den::Int
    alloc::Int
@@ -1142,7 +1142,7 @@ end
 #
 ###############################################################################
 
-const FmpzModSeriesID = ObjectIdDict()
+const FmpzModRelSeriesID = ObjectIdDict()
 
 type FmpzModRelSeriesRing <: SeriesRing{GenRes{fmpz}}
    base_ring::GenResRing{fmpz}
@@ -1150,11 +1150,11 @@ type FmpzModRelSeriesRing <: SeriesRing{GenRes{fmpz}}
    S::Symbol
 
    function FmpzModRelSeriesRing(R::Ring, prec::Int, s::Symbol)
-      if haskey(FmpzModSeriesID, (R, prec, s))
-         return FmpzModSeriesID[R, prec, s]::FmpzModRelSeriesRing
+      if haskey(FmpzModRelSeriesID, (R, prec, s))
+         return FmpzModRelSeriesID[R, prec, s]::FmpzModRelSeriesRing
       else
-         FmpzModSeriesID[R, prec, s] = new(R, prec, s)
-         return FmpzModSeriesID[R, prec, s]
+         FmpzModRelSeriesID[R, prec, s] = new(R, prec, s)
+         return FmpzModRelSeriesID[R, prec, s]
       end
    end
 end
@@ -1218,6 +1218,87 @@ end
 
 function _fmpz_mod_rel_series_clear_fn(a::fmpz_mod_rel_series)
    ccall((:fmpz_mod_poly_clear, :libflint), Void, (Ptr{fmpz_mod_rel_series},), &a)
+end
+
+###############################################################################
+#
+#   FmpzModAbsSeriesRing / fmpz_mod_abs_series
+#
+###############################################################################
+
+const FmpzModAbsSeriesID = ObjectIdDict()
+
+type FmpzModAbsSeriesRing <: SeriesRing{GenRes{fmpz}}
+   base_ring::GenResRing{fmpz}
+   prec_max::Int
+   S::Symbol
+
+   function FmpzModAbsSeriesRing(R::Ring, prec::Int, s::Symbol)
+      if haskey(FmpzModAbsSeriesID, (R, prec, s))
+         return FmpzModAbsSeriesID[R, prec, s]::FmpzModAbsSeriesRing
+      else
+         FmpzModAbsSeriesID[R, prec, s] = new(R, prec, s)
+         return FmpzModAbsSeriesID[R, prec, s]
+      end
+   end
+end
+
+type fmpz_mod_abs_series <: AbsSeriesElem{GenRes{fmpz}}
+   coeffs::Ptr{Void}
+   alloc::Int
+   length::Int
+   p::Int
+   prec::Int
+   parent::FmpzModAbsSeriesRing
+
+   function fmpz_mod_abs_series(p::fmpz)
+      z = new()
+      ccall((:fmpz_mod_poly_init, :libflint), Void, 
+            (Ptr{fmpz_mod_abs_series}, Ptr{fmpz}), &z, &p)
+      finalizer(z, _fmpz_mod_abs_series_clear_fn)
+      return z
+   end
+   
+   function fmpz_mod_abs_series(p::fmpz, a::Array{fmpz, 1}, len::Int, prec::Int)
+      z = new()
+      ccall((:fmpz_mod_poly_init2, :libflint), Void, 
+            (Ptr{fmpz_mod_abs_series}, Ptr{fmpz}, Int), &z, &p, len)
+      for i = 1:len
+         ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
+                     (Ptr{fmpz_mod_abs_series}, Int, Ptr{fmpz}), &z, i - 1, &a[i])
+      end
+      z.prec = prec
+      finalizer(z, _fmpz_mod_abs_series_clear_fn)
+      return z
+   end
+   
+   function fmpz_mod_abs_series(p::fmpz, a::Array{GenRes{fmpz}, 1}, len::Int, prec::Int)
+      z = new()
+      ccall((:fmpz_mod_poly_init2, :libflint), Void, 
+            (Ptr{fmpz_mod_abs_series}, Ptr{fmpz}, Int), &z, &p, len)
+      for i = 1:len
+         ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
+                     (Ptr{fmpz_mod_abs_series}, Int, Ptr{fmpz}), &z, i - 1, &data(a[i]))
+      end
+      z.prec = prec
+      finalizer(z, _fmpz_mod_abs_series_clear_fn)
+      return z
+   end
+   
+   function fmpz_mod_abs_series(a::fmpz_mod_abs_series)
+      z = new()
+      p = modulus(base_ring(parent(a)))
+      ccall((:fmpz_mod_poly_init, :libflint), Void, 
+            (Ptr{fmpz_mod_abs_series}, Ptr{fmpz}), &z, &p)
+      ccall((:fmpz_mod_poly_set, :libflint), Void, 
+            (Ptr{fmpz_mod_abs_series}, Ptr{fmpz_mod_abs_series}), &z, &a)
+      finalizer(z, _fmpz_mod_abs_series_clear_fn)
+      return z
+   end
+end
+
+function _fmpz_mod_abs_series_clear_fn(a::fmpz_mod_abs_series)
+   ccall((:fmpz_mod_poly_clear, :libflint), Void, (Ptr{fmpz_mod_abs_series},), &a)
 end
 
 ###############################################################################

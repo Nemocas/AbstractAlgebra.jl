@@ -659,16 +659,3 @@ function (a::FmpzRelSeriesRing)(b::Array{fmpz, 1}, len::Int, prec::Int, val::Int
    return z
 end
 
-###############################################################################
-#
-#   PowerSeriesRing constructor
-#
-###############################################################################
-
-function PowerSeriesRing(R::FlintIntegerRing, prec::Int, s::AbstractString{})
-   S = Symbol(s)
-
-   parent_obj = FmpzRelSeriesRing(prec, S)
-   
-   return parent_obj, parent_obj([fmpz(1)], 1, prec + 1, 1)
-end

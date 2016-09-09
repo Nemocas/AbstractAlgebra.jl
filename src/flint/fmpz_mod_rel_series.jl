@@ -431,6 +431,28 @@ end
 #
 ###############################################################################
 
+function ==(x::fmpz_mod_rel_series, y::GenRes{fmpz}) 
+   if precision(x) == 0
+      return true
+   elseif pol_length(x) > 1
+      return false
+   elseif pol_length(x) == 1 
+      if x.val == 0
+         z = fmpz()
+         ccall((:fmpz_mod_poly_get_coeff_fmpz, :libflint), Void, 
+                       (Ptr{fmpz}, Ptr{fmpz_mod_rel_series}, Int), &z, &x, 0)
+         return ccall((:fmpz_equal, :libflint), Bool, 
+               (Ptr{fmpz}, Ptr{fmpz}), &z, &y.data)
+      else
+         return false
+      end
+   else
+      return y.data == 0
+   end 
+end
+
+==(x::GenRes{fmpz}, y::fmpz_mod_rel_series) = y == x
+
 function ==(x::fmpz_mod_rel_series, y::fmpz) 
    if precision(x) == 0
       return true
@@ -448,7 +470,8 @@ function ==(x::fmpz_mod_rel_series, y::fmpz)
          return false
       end
    else
-      return y == 0
+      r = mod(y, modulus(x))
+      return r == 0
    end 
 end
 
@@ -731,18 +754,4 @@ function (a::FmpzModRelSeriesRing)(b::Array{GenRes{fmpz}, 1}, len::Int, prec::In
    z = fmpz_mod_rel_series(modulus(a), b, len, prec, val)
    z.parent = a
    return z
-end
-
-###############################################################################
-#
-#   PowerSeriesRing constructor
-#
-###############################################################################
-
-function PowerSeriesRing(R::GenResRing{fmpz}, prec::Int, s::AbstractString{})
-   S = Symbol(s)
-
-   parent_obj = FmpzModRelSeriesRing(R, prec, S)
-
-   return parent_obj, parent_obj([fmpz(1)], 1, prec + 1, 1)
 end

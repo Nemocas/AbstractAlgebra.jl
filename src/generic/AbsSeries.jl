@@ -200,7 +200,7 @@ end
 #
 ###############################################################################
 
-function show{T <: RingElem}(io::IO, x::GenAbsSeries{T})
+function show{T <: RingElem}(io::IO, x::AbsSeriesElem{T})
    len = length(x)
 
    if len == 0

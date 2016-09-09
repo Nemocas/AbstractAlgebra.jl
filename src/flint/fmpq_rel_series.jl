@@ -1009,16 +1009,3 @@ function (a::FmpqRelSeriesRing)(b::Array{fmpq, 1}, len::Int, prec::Int, val::Int
    return z
 end
 
-###############################################################################
-#
-#   PowerSeriesRing constructor
-#
-###############################################################################
-
-function PowerSeriesRing(R::FlintRationalField, prec::Int, s::AbstractString{})
-   S = Symbol(s)
-
-   parent_obj = FmpqRelSeriesRing(prec, S)
-   
-   return parent_obj, parent_obj([fmpq(0), fmpq(1)], 2, prec + 1, 1)
-end
