@@ -460,6 +460,7 @@ function *{T <: RingElem}(a::RelSeriesElem{T}, b::RelSeriesElem{T})
    end        
    z = parent(a)(d, lenz, prec + zval, zval)
    set_length!(z, normalise(z, lenz))
+   renormalize!(z)
    return z
 end
 
@@ -483,6 +484,7 @@ function *{T <: RingElem}(a::T, b::RelSeriesElem{T})
       setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
    end
    set_length!(z, normalise(z, len))
+   renormalize!(z)
    return z
 end
 
@@ -500,6 +502,7 @@ function *{T <: RingElem}(a::Integer, b::RelSeriesElem{T})
       setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
    end
    set_length!(z, normalise(z, len))
+   renormalize!(z)
    return z
 end
 
@@ -517,6 +520,7 @@ function *{T <: RingElem}(a::fmpz, b::RelSeriesElem{T})
       setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
    end
    set_length!(z, normalise(z, len))
+   renormalize!(z)
    return z
 end
 
@@ -1079,6 +1083,7 @@ function mul!{T <: RingElem}(c::GenRelSeries{T}, a::GenRelSeries{T}, b::GenRelSe
    end
    c.val = a.val + b.val
    c.prec = prec + c.val
+   renormalize!(z)
    return nothing
 end
 

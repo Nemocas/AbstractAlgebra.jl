@@ -249,7 +249,7 @@ function *(a::fmpz_mod_rel_series, b::fmpz_mod_rel_series)
    ccall((:fmpz_mod_poly_mullow, :libflint), Void, 
                 (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int), 
                &z, &a, &b, lenz)
-
+   renormalize!(z)
    return z
 end
 
@@ -266,6 +266,7 @@ function *(x::GenRes{fmpz}, y::fmpz_mod_rel_series)
    ccall((:fmpz_mod_poly_scalar_mul_fmpz, :libflint), Void, 
                 (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz}), 
                &z, &y, &x.data)
+   renormalize!(z)
    return z
 end
 
@@ -279,6 +280,7 @@ function *(x::fmpz, y::fmpz_mod_rel_series)
    ccall((:fmpz_mod_poly_scalar_mul_fmpz, :libflint), Void, 
                 (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz}), 
                &z, &y, &r)
+   renormalize!(z)
    return z
 end
 
@@ -608,6 +610,7 @@ function mul!(z::fmpz_mod_rel_series, a::fmpz_mod_rel_series, b::fmpz_mod_rel_se
    ccall((:fmpz_mod_poly_mullow, :libflint), Void, 
                 (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int), 
                &z, &a, &b, lenz)
+   renormalize!(z)
    return nothing
 end
 
