@@ -665,17 +665,3 @@ function (a::FqNmodRelSeriesRing)(b::Array{fq_nmod, 1}, len::Int, prec::Int, val
    z.parent = a
    return z
 end
-
-###############################################################################
-#
-#   PowerSeriesRing constructor
-#
-###############################################################################
-
-function PowerSeriesRing(R::FqNmodFiniteField, prec::Int, s::AbstractString{})
-   S = Symbol(s)
-
-   parent_obj = FqNmodRelSeriesRing(R, prec, S)
-
-   return parent_obj, parent_obj([R(1)], 1, prec + 1, 1)
-end
