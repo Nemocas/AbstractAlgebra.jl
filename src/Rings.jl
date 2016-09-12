@@ -291,6 +291,8 @@ include("flint/fmpq_abs_series.jl")
 
 include("flint/fq_rel_series.jl")
 
+include("flint/fq_abs_series.jl")
+
 include("flint/fq_nmod_rel_series.jl")
 
 include("flint/fq_poly.jl")

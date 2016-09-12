@@ -665,17 +665,3 @@ function (a::FqRelSeriesRing)(b::Array{fq, 1}, len::Int, prec::Int, val::Int)
    z.parent = a
    return z
 end
-
-###############################################################################
-#
-#   PowerSeriesRing constructor
-#
-###############################################################################
-
-function PowerSeriesRing(R::FqFiniteField, prec::Int, s::AbstractString{})
-   S = Symbol(s)
-
-   parent_obj = FqRelSeriesRing(R, prec, S)
-
-   return parent_obj, parent_obj([R(1)], 1, prec + 1, 1)
-end
