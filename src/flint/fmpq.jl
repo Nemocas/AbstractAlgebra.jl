@@ -685,7 +685,7 @@ end
 
 (a::FlintRationalField)() = fmpq(fmpz(0), fmpz(1))
 
-(a::FlintRationalField)(b::Rational{BigInt}) = fmpq(b) 
+(a::FlintRationalField)(b::Rational{BigInt}) = fmpq(num(b), den(b)) 
 
 (a::FlintRationalField)(b::Integer) = fmpq(b)
 
