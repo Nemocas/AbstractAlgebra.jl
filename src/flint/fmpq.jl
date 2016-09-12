@@ -687,7 +687,7 @@ call(a::FlintRationalField) = fmpq(fmpz(0), fmpz(1))
 
 call(a::FlintRationalField, b::Rational{BigInt}) = fmpq(b) 
 
-Base.call(::FlintRationalField, x::Rational) = Nemo.fmpq(x.num, x.den)
+call(::FlintRationalField, x::Rational) = fmpq(x.num, x.den)
 
 call(a::FlintRationalField, b::Integer) = fmpq(b)
 
