@@ -693,6 +693,8 @@ end
 
 (a::FlintRationalField)(b::Rational{BigInt}) = fmpq(num(b), den(b)) 
 
+(a::FlintRationalField)(x::Rational) = Nemo.fmpq(x.num, x.den)
+
 (a::FlintRationalField)(b::Integer) = fmpq(b)
 
 (a::FlintRationalField)(b::Int, c::Int) = fmpq(b, c)
