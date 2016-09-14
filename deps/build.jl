@@ -48,7 +48,7 @@ if !on_windows
       download("http://ftp.gnu.org/gnu/m4/m4-1.4.17.tar.bz2", joinpath(wdir, "m4-1.4.17.tar.bz2"))
       run(`tar -xvf m4-1.4.17.tar.bz2`)
       run(`rm m4-1.4.17.tar.bz2`)
-      cd("$wdir/m4-1.4.17")
+      cd(joinpath("$wdir", "m4-1.4.17"))
       run(`./configure --prefix=$vdir`)
       run(`make`)
       run(`make install`)
@@ -118,7 +118,7 @@ cd(wdir)
 try
   run(`git clone https://github.com/wbhart/antic.git`)
 catch
-  cd("$wdir/antic")
+  cd(joinpath("$wdir", "antic"))
   run(`git pull`)
 end          
 
@@ -128,7 +128,7 @@ cd(wdir)
 try
   run(`git clone https://github.com/wbhart/flint2.git`)
 catch
-  cd("$wdir/flint2")
+  cd(joinpath("$wdir", "flint2"))
   run(`git pull`)
 end          
 
@@ -142,7 +142,7 @@ if on_windows
       run(`ln -sf $vdir\\lib\\libflint.dll $vdir\\lib\\libflint-13.dll`)
    end
 else
-   cd("$wdir/flint2")
+   cd(joinpath("$wdir", "flint2"))
    withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
       run(`./configure --prefix=$vdir --extensions="$wdir/antic" --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir`) 
       run(`make -j4`)
@@ -157,7 +157,7 @@ cd(wdir)
 try
   run(`git clone https://github.com/fredrik-johansson/arb.git`)
 catch
-  cd("$wdir/arb")
+  cd(joinpath("$wdir", "arb"))
   run(`git pull`)
   cd(wdir)
 end          
@@ -169,7 +169,7 @@ if on_windows
       download_dll("http://nemocas.org/binaries/w64-libarb.dll", joinpath(vdir, "lib", "libarb.dll"))
    end
 else
-   cd("$wdir/arb")
+   cd(joinpath("$wdir", "arb"))
    withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
       run(`./configure --prefix=$vdir --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir --with-flint=$vdir`)
       run(`make -j4`)
@@ -198,7 +198,7 @@ if on_windows
 elseif on_osx
    run(`tar -xvf pari-2.7.4.tar.gz`)
    run(`rm pari-2.7.4.tar.gz`)
-   cd("$wdir/pari-2.7.4")
+   cd(joinpath("$wdir", "pari-2.7.4"))
    run(`patch -p1 -i ../patch-alloc-2.7.4`)
    withenv("DYLD_LIBRARY_PATH"=>"$vdir/lib", "DLCFLAGS"=>DLCFLAGS) do
       run(`./Configure --prefix=$vdir --with-gmp=$vdir`)
@@ -208,7 +208,7 @@ elseif on_osx
 else
    run(`tar -xvf pari-2.7.4.tar.gz`)
    run(`rm pari-2.7.4.tar.gz`)
-   cd("$wdir/pari-2.7.4")
+   cd(joinpath("$wdir", "pari-2.7.4"))
    run(`patch -p1 -i ../patch-alloc-2.7.4`)
    withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "DLLDFLAGS"=>LDFLAGS) do
       run(`./Configure --prefix=$vdir --with-gmp=$vdir`)
