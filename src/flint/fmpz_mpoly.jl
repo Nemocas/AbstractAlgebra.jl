@@ -29,6 +29,14 @@ function gens{S, N}(R::FmpzMPolyRing{S, N})
    return A
 end
 
+function coeff(a::fmpz_mpoly, i::Int)
+   z = fmpz()
+   ccall((:fmpz_mpoly_get_coeff_fmpz, :libflint), Void,
+         (Ptr{fmpz}, Ptr{fmpz_mpoly}, Int, Ptr{FmpzMPolyRing}),
+         &z, &a, i, &a.parent)
+   return z
+end
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -98,6 +106,14 @@ function -{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N})
    return z
 end
 
+function *{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N})
+   z = parent(a)()
+   ccall((:fmpz_mpoly_mul_johnson, :libflint), Void, 
+       (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing}),
+       &z, &a, &b, &a.parent)
+   return z
+end
+
 ###############################################################################
 #
 #   Ad hoc arithmetic
@@ -123,6 +139,68 @@ end
 *(a::fmpz, b::fmpz_mpoly) = b*a
 
 *(a::Int, b::fmpz_mpoly) = b*a
+
+function +(a::fmpz_mpoly, b::Int)
+   r = parent(a)()
+   ccall((:fmpz_mpoly_add_si, :libflint), Void,
+        (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Int, Ptr{FmpzMPolyRing}), 
+        &r, &a, b, &a.parent)
+   return r
+end
+
+function +(a::fmpz_mpoly, b::fmpz)
+   r = parent(a)()
+   ccall((:fmpz_mpoly_add_fmpz, :libflint), Void,
+        (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{fmpz}, Ptr{FmpzMPolyRing}), 
+        &r, &a, &b, &a.parent)
+   return r
+end
+
++(a::fmpz, b::fmpz_mpoly) = b + a
+
++(a::Int, b::fmpz_mpoly) = b + a
+
+function -(a::fmpz_mpoly, b::Int)
+   r = parent(a)()
+   ccall((:fmpz_mpoly_sub_si, :libflint), Void,
+        (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Int, Ptr{FmpzMPolyRing}), 
+        &r, &a, b, &a.parent)
+   return r
+end
+
+function -(a::fmpz_mpoly, b::fmpz)
+   r = parent(a)()
+   ccall((:fmpz_mpoly_sub_fmpz, :libflint), Void,
+        (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{fmpz}, Ptr{FmpzMPolyRing}), 
+        &r, &a, &b, &a.parent)
+   return r
+end
+
+-(a::fmpz, b::fmpz_mpoly) = -(b - a)
+
+-(a::Int, b::fmpz_mpoly) = -(b - a)
+
+###############################################################################
+#
+#   Powering
+#
+###############################################################################
+
+function ^(a::fmpz_mpoly, b::Int)
+   b < 0 && throw(DomainError())
+   # special case powers of x for constructing polynomials efficiently
+   if length(a) == 0
+      return parent(a)()
+   elseif b == 0
+      return parent(a)(1)
+   else
+      z = a
+      for i = 1:b - 1
+         z *= a
+      end
+      return z
+   end
+end
 
 ###############################################################################
 #
