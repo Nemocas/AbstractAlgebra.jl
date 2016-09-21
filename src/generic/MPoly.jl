@@ -1,10 +1,10 @@
 ###############################################################################
 #
-#   Poly.jl : Generic multivariate polynomials over rings
+#   MPoly.jl : Generic multivariate polynomials over rings
 #
 ###############################################################################
 
-export GenMPoly, GenMPolyRing
+export GenMPoly, GenMPolyRing, max_degrees, gens
 
 export NewInt
 
@@ -709,7 +709,6 @@ function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S
    k = 0
    c = R()
    Q = Array(Int, 0)
-   println("start heap")
    while !isempty(H)
       exp = H[1].exp
       k += 1
@@ -752,7 +751,6 @@ function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S
          heapinsert!(H, I, xn, a.exps[v.i] + b.exps[v.j + 1]) # either chain or insert v into heap   
       end
    end
-   println("end heap")
    resize!(Rc, k)
    resize!(Re, k)
    return parent(a)(Rc, Re)
@@ -959,6 +957,24 @@ function fit!{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, n::Int)
       resize!(a.coeffs, n)
       resize!(a.exps, n)
    end
+end
+
+###############################################################################
+#
+#   Promotion rules
+#
+###############################################################################
+
+Base.promote_rule{T <: RingElem, V <: Integer}(::Type{GenMPoly{T}}, ::Type{V}) = GenMPoly{T}
+
+Base.promote_rule{T <: RingElem}(::Type{GenMPoly{T}}, ::Type{T}) = GenMPoly{T}
+
+function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenMPoly{T}}, ::Type{GenMPoly{U}})
+   Base.promote_rule(T, GenMPoly{U}) == T ? GenMPoly{T} : Union{}
+end
+
+function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenMPoly{T}}, ::Type{U})
+   Base.promote_rule(T, U) == T ? GenMPoly{T} : promote_rule1(U, GenMPoly{T})
 end
 
 ###############################################################################
