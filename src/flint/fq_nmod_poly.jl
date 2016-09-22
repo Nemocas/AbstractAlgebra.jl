@@ -69,7 +69,7 @@ isgen(x::fq_nmod_poly) = ccall((:fq_nmod_poly_is_gen, :libflint), Bool,
 
 degree(f::fq_nmod_poly) = f.length - 1
 
-function deepcopy(a::fq_nmod_poly)
+function deepcopy_internal(a::fq_nmod_poly, dict::ObjectIdDict)
    z = fq_nmod_poly(a)
    z.parent = a.parent
    return z

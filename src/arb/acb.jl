@@ -97,7 +97,7 @@ function accuracy_bits(x::acb)
   return -ccall((:acb_rel_error_bits, :libarb), Int, (Ptr{acb},), &x)
 end
 
-function deepcopy(a::acb)
+function deepcopy_internal(a::acb, dict::ObjectIdDict)
   b = parent(a)()
   ccall((:acb_set, :libarb), Void, (Ptr{acb}, Ptr{acb}), &b, &a)
   return b

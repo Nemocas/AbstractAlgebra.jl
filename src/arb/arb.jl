@@ -77,7 +77,7 @@ function accuracy_bits(x::arb)
   return ccall((:arb_rel_accuracy_bits, :libarb), Int, (Ptr{arb},), &x)
 end
 
-function deepcopy(a::arb)
+function deepcopy_internal(a::arb, dict::ObjectIdDict)
   b = parent(a)()
   ccall((:arb_set, :libarb), Void, (Ptr{arb}, Ptr{arb}), &b, &a)
   return b

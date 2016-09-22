@@ -91,7 +91,7 @@ set_entry!(a::nmod_mat, i::Int, j::Int, u::GenRes{fmpz}) =
 set_entry_t!{T<:Union{RingElem, Integer}}(a::nmod_mat, i::Int, j::Int, u::T) =
   set_entry!(a, j, i, u)
  
-function deepcopy(a::nmod_mat)
+function deepcopy_internal(a::nmod_mat, dict::ObjectIdDict)
   z = nmod_mat(rows(a), cols(a), a.n)
   if isdefined(a, :parent)
     z.parent = a.parent

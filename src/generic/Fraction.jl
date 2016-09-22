@@ -122,7 +122,7 @@ doc"""
 """
 isunit(a::FracElem) = num(a) != 0
 
-function deepcopy{T <: RingElem}(a::GenFrac{T})
+function deepcopy_internal{T <: RingElem}(a::GenFrac{T}, dict::ObjectIdDict)
    v = GenFrac{T}(deepcopy(num(a)), deepcopy(den(a)))
    v.parent = parent(a)
    return v

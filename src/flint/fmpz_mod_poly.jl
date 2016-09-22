@@ -67,7 +67,7 @@ modulus(a::fmpz_mod_poly) = a.parent.n
 
 modulus(R::FmpzModPolyRing) = R.n
 
-function deepcopy(a::fmpz_mod_poly)
+function deepcopy_internal(a::fmpz_mod_poly, dict::ObjectIdDict)
   z = fmpz_mod_poly(modulus(a), a)
   z.parent = a.parent
   return z

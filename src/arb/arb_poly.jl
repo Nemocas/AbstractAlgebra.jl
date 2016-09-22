@@ -56,7 +56,7 @@ end
 #   return strongequal(a, one(parent(a)))
 #end
 
-function deepcopy(a::arb_poly)
+function deepcopy_internal(a::arb_poly, dict::ObjectIdDict)
    z = arb_poly(a)
    z.parent = parent(a)
    return z

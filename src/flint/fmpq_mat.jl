@@ -116,7 +116,7 @@ iszero(a::fmpq_mat) = ccall((:fmpq_mat_is_zero, :libflint), Bool,
 isone(a::fmpq_mat) = ccall((:fmpq_mat_is_one, :libflint), Bool,
                            (Ptr{fmpq_mat},), &a)
 
-function deepcopy(d::fmpq_mat)
+function deepcopy_internal(d::fmpq_mat, dict::ObjectIdDict)
    z = fmpq_mat(d)
    z.parent = d.parent
    return z

@@ -152,7 +152,7 @@ doc"""
 """
 isunit(a::PolyElem) = length(a) == 1 && isunit(coeff(a, 0))
 
-function deepcopy{T <: RingElem}(a::GenPoly{T})
+function deepcopy_internal{T <: RingElem}(a::GenPoly{T}, dict::ObjectIdDict)
    coeffs = Array(T, length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy(a.coeffs[i])

@@ -98,7 +98,7 @@ function degree(a::FqNmodFiniteField)
                 (Ptr{FqNmodFiniteField},), &a)
 end
 
-function deepcopy(d::fq_nmod)
+function deepcopy_internal(d::fq_nmod, dict::ObjectIdDict)
    z = fq_nmod(parent(d), d)
    z.parent = parent(d)
    return z

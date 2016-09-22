@@ -200,7 +200,7 @@ doc"""
 """
 signature(a::AnticNumberField) = signature(a.pol)
 
-function deepcopy(d::nf_elem)
+function deepcopy_internal(d::nf_elem, dict::ObjectIdDict)
    z = nf_elem(parent(d), d)
    return z
 end
