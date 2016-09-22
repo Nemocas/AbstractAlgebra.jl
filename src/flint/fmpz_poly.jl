@@ -49,7 +49,7 @@ gen(a::FmpzPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 isgen(x::fmpz_poly) = ccall((:fmpz_poly_is_x, :libflint), Bool, 
                             (Ptr{fmpz_poly},), &x)
 
-function deepcopy(a::fmpz_poly)
+function deepcopy_internal(a::fmpz_poly, dict::ObjectIdDict)
    z = fmpz_poly(a)
    z.parent = parent(a)
    return z

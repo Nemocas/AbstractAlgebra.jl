@@ -81,7 +81,7 @@ function gen(R::FmpqRelSeriesRing)
    return z
 end
 
-function deepcopy(a::fmpq_rel_series)
+function deepcopy_internal(a::fmpq_rel_series, dict::ObjectIdDict)
    z = fmpq_rel_series(a)
    z.prec = a.prec
    z.parent = parent(a)

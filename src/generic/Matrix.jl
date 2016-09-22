@@ -133,7 +133,7 @@ function isone(a::MatElem)
   return true
 end
 
-function deepcopy{T <: RingElem}(d::MatElem{T})
+function deepcopy_internal{T <: RingElem}(d::MatElem{T}, dict::ObjectIdDict)
    entries = Array(T, rows(d), cols(d))
    for i = 1:rows(d)
       for j = 1:cols(d)

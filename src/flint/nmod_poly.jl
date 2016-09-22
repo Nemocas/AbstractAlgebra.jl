@@ -103,7 +103,7 @@ modulus(R::NmodPolyRing) = R.n
 
 var(R::NmodPolyRing) = R.S
 
-function deepcopy(a::nmod_poly)
+function deepcopy_internal(a::nmod_poly, dict::ObjectIdDict)
   z = nmod_poly(modulus(a), a)
   z.parent = a.parent
   return z

@@ -28,7 +28,7 @@ doc"""
 """
 parent(a::perm) = a.parent
 
-function deepcopy(a::perm)
+function deepcopy_internal(a::perm, dict::ObjectIdDict)
    R = parent(a)
    p = R()
    ccall((:_perm_set, :libflint), Void, 

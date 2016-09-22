@@ -185,7 +185,7 @@ doc"""
 """
 modulus{T <: ResElem}(a::SeriesElem{T}) = modulus(base_ring(a))
 
-function deepcopy{T <: RingElem}(a::SeriesElem{T})
+function deepcopy_internal{T <: RingElem}(a::SeriesElem{T}, dict::ObjectIdDict)
    coeffs = Array(T, length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy(coeff(a, i - 1))
