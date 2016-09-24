@@ -932,13 +932,13 @@ end
 #
 ###############################################################################
 
-function call{N}(R::FlintIntegerRing, a::NTuple{N, UInt})
+function from_exp{N}(R::Ring, a::NTuple{N, UInt})
    z = fmpz(a[1])
    for i = 2:N
       z <<= sizeof(UInt)*8
       z += a[i]
    end
-   return z
+   return R(z)
 end
 
 function pow_sums{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
@@ -963,10 +963,10 @@ function pow_sums{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
    fik = Array(T, m)
    gi = Array(T, 1)
    for i = 1:m
-      fik[i] = R(f.exps[i])*k
+      fik[i] = from_exp(R, f.exps[i])*k
    end
-   kp1f1 = (k+1)*R(f.exps[1])
-   gi[1] = R(Re[1])
+   kp1f1 = (k+1)*from_exp(R, f.exps[1])
+   gi[1] = from_exp(R, Re[1])
    while !isempty(H) && (exp = H[1].exp) <= f.exps[m]*k + f.exps[1]
       r += 1
       if r > r_alloc
@@ -1015,8 +1015,8 @@ function pow_sums{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
       if t == 0
          r -= 1
       else
-         Rc[r] = divexact(t, (R(exp) - kp1f1)*f.coeffs[1])
-         push!(gi, R(Re[r]))
+         Rc[r] = divexact(t, (from_exp(R, exp) - kp1f1)*f.coeffs[1])
+         push!(gi, from_exp(R, Re[r]))
          if largest[2] == 0
             push!(I, heap_t(2, r, 0))
             Collections.heappush!(H, heap_s{N}(f.exps[2] + Re[r], length(I)))   
