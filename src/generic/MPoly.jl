@@ -118,6 +118,10 @@ function +{N}(a::NTuple{N, UInt}, b::NTuple{N, UInt})
    return ntuple(i -> a[i] + b[i], Val{N})
 end
 
+function -{N}(a::NTuple{N, UInt}, b::NTuple{N, UInt})
+   return ntuple(i -> a[i] - b[i], Val{N})
+end
+
 function *{N}(a::NTuple{N, UInt}, n::Int)
    return ntuple(i -> a[i]*reinterpret(UInt, n), Val{N})
 end
@@ -750,6 +754,9 @@ function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S
          I[xn] = heap_t(v.i, v.j + 1, 0)
          heapinsert!(H, I, xn, a.exps[v.i] + b.exps[v.j + 1]) # either chain or insert v into heap   
       end
+      if Rc[k] == 0
+         k -= 1
+      end
    end
    resize!(Rc, k)
    resize!(Re, k)
@@ -829,11 +836,8 @@ function mul{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
       er = Array(NTuple{N, UInt}, length(r1))
       unpack_monomials(er, r1.exps, k, bits)
    else
-      a1 = a
-      b1 = b
-      r1 = mul_johnson(a1, b1)
-      er = Array(NTuple{N, UInt}, length(r1))
-      unpack_monomials(er, r1.exps, k, bits)
+      r1 = mul_johnson(a, b)
+      er = r1.exps
    end
    return parent(a)(r1.coeffs, er)
 end
@@ -928,7 +932,104 @@ end
 #
 ###############################################################################
 
-function ^(a::GenMPoly, b::Int)
+function call{N}(R::FlintIntegerRing, a::NTuple{N, UInt})
+   z = fmpz(a[1])
+   for i = 2:N
+      z <<= sizeof(UInt)*8
+      z += a[i]
+   end
+   return z
+end
+
+function pow_sums{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
+   par = parent(f)
+   R = base_ring(par)
+   m = length(f)
+   H = Array(heap_s{N}, 0)
+   I = Array(heap_t, 0)
+   r_alloc = k*(m - 1) + 1
+   Rc = Array(T, r_alloc)
+   Re = Array(NTuple{N, UInt}, r_alloc)
+   # set up heap
+   Rc[1] = f.coeffs[1]^k
+   Re[1] = f.exps[1]*k
+   push!(H, heap_s{N}(f.exps[2] + Re[1], 1))
+   push!(I, heap_t(2, 1, 0))
+   r = 1
+   c = R()
+   Q = Array(Int, 0)
+   largest = zeros(Int, m)
+   largest[2] = 1
+   fik = Array(T, m)
+   gi = Array(T, 1)
+   for i = 1:m
+      fik[i] = R(f.exps[i])*k
+   end
+   kp1f1 = (k+1)*R(f.exps[1])
+   gi[1] = R(Re[1])
+   while !isempty(H) && (exp = H[1].exp) <= f.exps[m]*k + f.exps[1]
+      r += 1
+      if r > r_alloc
+         r_alloc *= 2
+         resize!(Rc, r_alloc)
+         resize!(Re, r_alloc)
+      end
+      first = true
+      t = R()
+      while !isempty(H) && H[1].exp == exp
+         x = H[1]
+         heappop!(H)
+         v = I[x.n]
+         if v.i == 2 && largest[v.i] == v.j
+            largest[v.i] = 0
+         end
+         t += (fik[v.i] - gi[v.j])*f.coeffs[v.i]*Rc[v.j]
+         if first
+            Re[r] = exp - f.exps[1]
+            first = false
+         end
+         push!(Q, x.n)
+         while (xn = v.next) != 0
+            v = I[xn]
+            if v.i == 2 && largest[v.i] == v.j
+               largest[v.i] = 0
+            end
+            t += (fik[v.i] - gi[v.j])*f.coeffs[v.i]*Rc[v.j]
+            push!(Q, xn)
+         end
+      end
+      while !isempty(Q)
+         xn = pop!(Q)
+         v = I[xn]
+         if v.j < r - 1 && largest[v.i] <  v.j + 1
+            push!(I, heap_t(v.i, v.j + 1, 0))
+            Collections.heappush!(H, heap_s{N}(f.exps[v.i] + Re[v.j + 1], length(I)))
+            largest[v.i] = v.j + 1     
+         end
+         if v.i < m && largest[v.i + 1] < v.j
+            I[xn] = heap_t(v.i + 1, v.j, 0)
+            heapinsert!(H, I, xn, f.exps[v.i + 1] + Re[v.j]) # either chain or insert v into heap   
+            largest[v.i + 1] = v.j 
+         end
+      end
+      if t == 0
+         r -= 1
+      else
+         Rc[r] = divexact(t, (R(exp) - kp1f1)*f.coeffs[1])
+         push!(gi, R(Re[r]))
+         if largest[2] == 0
+            push!(I, heap_t(2, r, 0))
+            Collections.heappush!(H, heap_s{N}(f.exps[2] + Re[r], length(I)))   
+            largest[2] = r
+         end
+      end
+   end
+   resize!(Rc, r)
+   resize!(Re, r)
+   return parent(f)(Rc, Re)
+end
+
+function ^{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::Int)
    b < 0 && throw(DomainError())
    # special case powers of x for constructing polynomials efficiently
    if length(a) == 0
@@ -937,12 +1038,36 @@ function ^(a::GenMPoly, b::Int)
       return parent(a)([coeff(a, 0)^b], [a.exps[1]*b])
    elseif b == 0
       return parent(a)(1)
+   elseif b == 1
+      return a
+   elseif b == 2
+      return a*a
    else
-      z = a
-      for i = 1:b - 1
-         z *= a
+      v, d = max_degrees(a)
+      d *= b
+      bits = 8
+      max_e = 2^(bits - 1)
+      while d >= max_e
+         bits *= 2
+         max_e = 2^(bits - 1)
       end
-      return z
+      word_bits = sizeof(Int)*8
+      k = div(word_bits, bits)
+      if k != 1
+         M = div(N + k - 1, k)
+         e1 = Array(NTuple{M, UInt}, length(a))
+         pack_monomials(e1, a.exps, k, bits)
+         par = GenMPolyRing{T, S, M}(base_ring(a), parent(a).S)
+         a1 = par(a.coeffs, e1)
+         a1.length = a.length
+         r1 = pow_sums(a1, b)
+         er = Array(NTuple{N, UInt}, length(r1))
+         unpack_monomials(er, r1.exps, k, bits)
+      else
+         r1 = pow_sums(a, b)
+         er = r1.exps
+      end
+      return parent(a)(r1.coeffs, er)
    end
 end
 
