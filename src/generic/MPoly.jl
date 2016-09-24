@@ -967,6 +967,8 @@ function pow_sums{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
    end
    kp1f1 = (k+1)*from_exp(R, f.exps[1])
    gi[1] = from_exp(R, Re[1])
+   t1 = R()
+   c = R()
    while !isempty(H) && (exp = H[1].exp) <= f.exps[m]*k + f.exps[1]
       r += 1
       if r > r_alloc
@@ -983,7 +985,8 @@ function pow_sums{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
          if v.i == 2 && largest[v.i] == v.j
             largest[v.i] = 0
          end
-         t += (fik[v.i] - gi[v.j])*f.coeffs[v.i]*Rc[v.j]
+         mul!(t1, f.coeffs[v.i], Rc[v.j])
+         addmul!(t, fik[v.i] - gi[v.j], t1, c)
          if first
             Re[r] = exp - f.exps[1]
             first = false
@@ -994,7 +997,8 @@ function pow_sums{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
             if v.i == 2 && largest[v.i] == v.j
                largest[v.i] = 0
             end
-            t += (fik[v.i] - gi[v.j])*f.coeffs[v.i]*Rc[v.j]
+            mul!(t1, f.coeffs[v.i], Rc[v.j])
+            addmul!(t, fik[v.i] - gi[v.j], t1, c)
             push!(Q, xn)
          end
       end
@@ -1015,7 +1019,8 @@ function pow_sums{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
       if t == 0
          r -= 1
       else
-         Rc[r] = divexact(t, (from_exp(R, exp) - kp1f1)*f.coeffs[1])
+         mul!(t1, from_exp(R, exp) - kp1f1, f.coeffs[1])
+         Rc[r] = divexact(t, t1)
          push!(gi, from_exp(R, Re[r]))
          if largest[2] == 0
             push!(I, heap_t(2, r, 0))
