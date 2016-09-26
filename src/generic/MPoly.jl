@@ -941,18 +941,27 @@ function from_exp{N}(R::Ring, a::NTuple{N, UInt})
    return R(z)
 end
 
+# Implement fps algorithm from "Sparse polynomial powering with heaps" by
+# Monagan and Pearce, except that we modify the algorithm to return terms
+# in ascending order and we fix some issues in the original algorithm
+# http://www.cecm.sfu.ca/CAG/papers/SparsePowering.pdf
+
 function pow_fps{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
    par = parent(f)
    R = base_ring(par)
    m = length(f)
-   H = Array(heap_s{N}, 0)
-   I = Array(heap_t, 0)
+   H = Array(heap_s{N}, 0) # heap
+   I = Array(heap_t, 0) # auxilliary data for heap nodes
+   # set up output poly coeffs and exponents (corresponds to h in paper)
    r_alloc = k*(m - 1) + 1
-   s_alloc = k*(m - 1) + 1
    Rc = Array(T, r_alloc)
-   Re = Array(NTuple{N, UInt}, s_alloc)
-   gc = Array(T, r_alloc)
-   ge = Array(NTuple{N, UInt}, r_alloc)
+   Re = Array(NTuple{N, UInt}, r_alloc)
+   rnext = 1
+   # set up g coeffs and exponents (corresponds to g in paper)
+   g_alloc = k*(m - 1) + 1
+   gc = Array(T, g_alloc)
+   ge = Array(NTuple{N, UInt}, g_alloc)
+   gnext = 1
    # set up heap
    gc[1] = f.coeffs[1]^(k-1)
    ge[1] = f.exps[1]*(k - 1)
@@ -960,38 +969,39 @@ function pow_fps{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
    Re[1] = f.exps[1]*k
    push!(H, heap_s{N}(f.exps[2] + ge[1], 1))
    push!(I, heap_t(2, 1, 0))
-   r = 1
-   rs = 1
-   c = R()
-   Q = Array(Int, 0)
-   largest = zeros(Int, m)
+   Q = Array(Int, 0) # corresponds to Q in paper
+   largest = zeros(Int, m) # largest j s.t. (i, j) has been in heap
    largest[2] = 1
+   # precompute some values
    fik = Array(T, m)
-   gi = Array(T, 1)
    for i = 1:m
       fik[i] = from_exp(R, f.exps[i])*(k - 1)
    end
    kp1f1 = k*from_exp(R, f.exps[1])
+   gi = Array(T, 1)
    gi[1] = from_exp(R, ge[1])
+   finalexp = f.exps[m]*(k - 1) + f.exps[1]
+   # temporary space
    t1 = R()
-   c = R()
+   temp = R() # temporary space for addmul
+   # begin algorithm
    while !isempty(H)
-      exp = exp = H[1].exp
-      r += 1
-      rs += 1
-      if r > r_alloc
-         r_alloc *= 2
-         resize!(gc, r_alloc)
-         resize!(ge, r_alloc)
+      exp = H[1].exp
+      gnext += 1
+      rnext += 1
+      if gnext > g_alloc
+         g_alloc *= 2
+         resize!(gc, g_alloc)
+         resize!(ge, g_alloc)
       end
-      if rs > s_alloc
-         s_alloc *= 2
-         resize!(Rc, s_alloc)
-         resize!(Re, s_alloc)
+      if rnext > r_alloc
+         r_alloc *= 2
+         resize!(Rc, r_alloc)
+         resize!(Re, r_alloc)
       end
       first = true
-      t = R()
-      St = R()
+      C = R() # corresponds to C in paper
+      SS = R() # corresponds to S in paper
       while !isempty(H) && H[1].exp == exp
          x = H[1]
          heappop!(H)
@@ -1000,12 +1010,13 @@ function pow_fps{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
             largest[v.i] = 0
          end
          mul!(t1, f.coeffs[v.i], gc[v.j])
-         addeq!(St, t1)
-         if exp <= f.exps[m]*k + f.exps[1]
-            addmul!(t, fik[v.i] - gi[v.j], t1, c)
+         addeq!(SS, t1)
+         # avoid checking lots of zeroes, fast path first
+         if exp <= finalexp # && (f.exps[v.i][1]*(k - 1) != ge[v.j][1] || f.exps[v.i]*(k - 1) != ge[v.j])
+            addmul!(C, fik[v.i] - gi[v.j], t1, temp)
          end
          if first
-            ge[r] = exp - f.exps[1]
+            ge[gnext] = exp - f.exps[1]
             first = false
          end
          push!(Q, x.n)
@@ -1015,9 +1026,10 @@ function pow_fps{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
                largest[v.i] = 0
             end
             mul!(t1, f.coeffs[v.i], gc[v.j])
-            addeq!(St, t1)
-            if exp <= f.exps[m]*k + f.exps[1]
-               addmul!(t, fik[v.i] - gi[v.j], t1, c)
+            addeq!(SS, t1)
+            # avoid checking lots of zeroes, fast path first
+            if exp <= finalexp # && (f.exps[v.i][1]*(k - 1) != ge[v.j][1] || f.exps[v.i]*(k - 1) != ge[v.j])
+               addmul!(C, fik[v.i] - gi[v.j], t1, temp)
             end
             push!(Q, xn)
          end
@@ -1025,7 +1037,7 @@ function pow_fps{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
       while !isempty(Q)
          xn = pop!(Q)
          v = I[xn]
-         if v.j < r - 1 && largest[v.i] <  v.j + 1
+         if v.j < gnext - 1 && largest[v.i] <  v.j + 1
             push!(I, heap_t(v.i, v.j + 1, 0))
             Collections.heappush!(H, heap_s{N}(f.exps[v.i] + ge[v.j + 1], length(I)))
             largest[v.i] = v.j + 1     
@@ -1036,29 +1048,29 @@ function pow_fps{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
             largest[v.i + 1] = v.j 
          end
       end
-      if t != 0
-         mul!(t1, from_exp(R, exp) - kp1f1, f.coeffs[1])
-         gc[r] = divexact(t, t1)
-         addmul!(St, gc[r], f.coeffs[1], c)
-         push!(gi, from_exp(R, ge[r]))
+      if C != 0
+         temp = divexact(C, from_exp(R, exp) - kp1f1)
+         addeq!(SS, temp)
+         gc[gnext] = divexact(temp, f.coeffs[1])
+         push!(gi, from_exp(R, ge[gnext]))
          if largest[2] == 0
-            push!(I, heap_t(2, r, 0))
-            Collections.heappush!(H, heap_s{N}(f.exps[2] + ge[r], length(I)))   
-            largest[2] = r
+            push!(I, heap_t(2, gnext, 0))
+            Collections.heappush!(H, heap_s{N}(f.exps[2] + ge[gnext], length(I)))   
+            largest[2] = gnext
          end
       end
-      if St != 0
-         Rc[rs] = St
-         Re[rs] = ge[r] + f.exps[1]
+      if SS != 0
+         Rc[rnext] = SS
+         Re[rnext] = ge[gnext] + f.exps[1]
       else
-         rs -= 1
+         rnext -= 1
       end
-      if t == 0
-         r -= 1
+      if C == 0
+         gnext -= 1
       end
    end
-   resize!(Rc, rs)
-   resize!(Re, rs)
+   resize!(Rc, rnext)
+   resize!(Re, rnext)
    return parent(f)(Rc, Re)
 end
 
@@ -1097,7 +1109,7 @@ function ^{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::Int)
          er = Array(NTuple{N, UInt}, length(r1))
          unpack_monomials(er, r1.exps, k, bits)
       else
-         r1 = pow_sums(a, b)
+         r1 = pow_fps(a, b)
          er = r1.exps
       end
       return parent(a)(r1.coeffs, er)
