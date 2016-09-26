@@ -941,21 +941,27 @@ function from_exp{N}(R::Ring, a::NTuple{N, UInt})
    return R(z)
 end
 
-function pow_sums{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
+function pow_fps{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
    par = parent(f)
    R = base_ring(par)
    m = length(f)
    H = Array(heap_s{N}, 0)
    I = Array(heap_t, 0)
    r_alloc = k*(m - 1) + 1
+   s_alloc = k*(m - 1) + 1
    Rc = Array(T, r_alloc)
-   Re = Array(NTuple{N, UInt}, r_alloc)
+   Re = Array(NTuple{N, UInt}, s_alloc)
+   gc = Array(T, r_alloc)
+   ge = Array(NTuple{N, UInt}, r_alloc)
    # set up heap
-   Rc[1] = f.coeffs[1]^k
+   gc[1] = f.coeffs[1]^(k-1)
+   ge[1] = f.exps[1]*(k - 1)
+   Rc[1] = f.coeffs[1]*gc[1]
    Re[1] = f.exps[1]*k
-   push!(H, heap_s{N}(f.exps[2] + Re[1], 1))
+   push!(H, heap_s{N}(f.exps[2] + ge[1], 1))
    push!(I, heap_t(2, 1, 0))
    r = 1
+   rs = 1
    c = R()
    Q = Array(Int, 0)
    largest = zeros(Int, m)
@@ -963,21 +969,29 @@ function pow_sums{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
    fik = Array(T, m)
    gi = Array(T, 1)
    for i = 1:m
-      fik[i] = from_exp(R, f.exps[i])*k
+      fik[i] = from_exp(R, f.exps[i])*(k - 1)
    end
-   kp1f1 = (k+1)*from_exp(R, f.exps[1])
-   gi[1] = from_exp(R, Re[1])
+   kp1f1 = k*from_exp(R, f.exps[1])
+   gi[1] = from_exp(R, ge[1])
    t1 = R()
    c = R()
-   while !isempty(H) && (exp = H[1].exp) <= f.exps[m]*k + f.exps[1]
+   while !isempty(H)
+      exp = exp = H[1].exp
       r += 1
+      rs += 1
       if r > r_alloc
          r_alloc *= 2
-         resize!(Rc, r_alloc)
-         resize!(Re, r_alloc)
+         resize!(gc, r_alloc)
+         resize!(ge, r_alloc)
+      end
+      if rs > s_alloc
+         s_alloc *= 2
+         resize!(Rc, s_alloc)
+         resize!(Re, s_alloc)
       end
       first = true
       t = R()
+      St = R()
       while !isempty(H) && H[1].exp == exp
          x = H[1]
          heappop!(H)
@@ -985,10 +999,13 @@ function pow_sums{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
          if v.i == 2 && largest[v.i] == v.j
             largest[v.i] = 0
          end
-         mul!(t1, f.coeffs[v.i], Rc[v.j])
-         addmul!(t, fik[v.i] - gi[v.j], t1, c)
+         mul!(t1, f.coeffs[v.i], gc[v.j])
+         addeq!(St, t1)
+         if exp <= f.exps[m]*k + f.exps[1]
+            addmul!(t, fik[v.i] - gi[v.j], t1, c)
+         end
          if first
-            Re[r] = exp - f.exps[1]
+            ge[r] = exp - f.exps[1]
             first = false
          end
          push!(Q, x.n)
@@ -997,8 +1014,11 @@ function pow_sums{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
             if v.i == 2 && largest[v.i] == v.j
                largest[v.i] = 0
             end
-            mul!(t1, f.coeffs[v.i], Rc[v.j])
-            addmul!(t, fik[v.i] - gi[v.j], t1, c)
+            mul!(t1, f.coeffs[v.i], gc[v.j])
+            addeq!(St, t1)
+            if exp <= f.exps[m]*k + f.exps[1]
+               addmul!(t, fik[v.i] - gi[v.j], t1, c)
+            end
             push!(Q, xn)
          end
       end
@@ -1007,30 +1027,38 @@ function pow_sums{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
          v = I[xn]
          if v.j < r - 1 && largest[v.i] <  v.j + 1
             push!(I, heap_t(v.i, v.j + 1, 0))
-            Collections.heappush!(H, heap_s{N}(f.exps[v.i] + Re[v.j + 1], length(I)))
+            Collections.heappush!(H, heap_s{N}(f.exps[v.i] + ge[v.j + 1], length(I)))
             largest[v.i] = v.j + 1     
          end
          if v.i < m && largest[v.i + 1] < v.j
             I[xn] = heap_t(v.i + 1, v.j, 0)
-            heapinsert!(H, I, xn, f.exps[v.i + 1] + Re[v.j]) # either chain or insert v into heap   
+            heapinsert!(H, I, xn, f.exps[v.i + 1] + ge[v.j]) # either chain or insert v into heap   
             largest[v.i + 1] = v.j 
          end
       end
-      if t == 0
-         r -= 1
-      else
+      if t != 0
          mul!(t1, from_exp(R, exp) - kp1f1, f.coeffs[1])
-         Rc[r] = divexact(t, t1)
-         push!(gi, from_exp(R, Re[r]))
+         gc[r] = divexact(t, t1)
+         addmul!(St, gc[r], f.coeffs[1], c)
+         push!(gi, from_exp(R, ge[r]))
          if largest[2] == 0
             push!(I, heap_t(2, r, 0))
-            Collections.heappush!(H, heap_s{N}(f.exps[2] + Re[r], length(I)))   
+            Collections.heappush!(H, heap_s{N}(f.exps[2] + ge[r], length(I)))   
             largest[2] = r
          end
       end
+      if St != 0
+         Rc[rs] = St
+         Re[rs] = ge[r] + f.exps[1]
+      else
+         rs -= 1
+      end
+      if t == 0
+         r -= 1
+      end
    end
-   resize!(Rc, r)
-   resize!(Re, r)
+   resize!(Rc, rs)
+   resize!(Re, rs)
    return parent(f)(Rc, Re)
 end
 
@@ -1065,7 +1093,7 @@ function ^{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::Int)
          par = GenMPolyRing{T, S, M}(base_ring(a), parent(a).S)
          a1 = par(a.coeffs, e1)
          a1.length = a.length
-         r1 = pow_sums(a1, b)
+         r1 = pow_fps(a1, b)
          er = Array(NTuple{N, UInt}, length(r1))
          unpack_monomials(er, r1.exps, k, bits)
       else
@@ -1167,7 +1195,7 @@ doc"""
 > cached. `S` is a symbol corresponding to the ordering of the polynomial and
 > can be one of `:lex`, `:deglex`, `:revlex` or `:degrevlex`.
 """
-function PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::Ring, s::Array{ASCIIString{}, 1}; cached::Bool = true, ordering::Symbol = :lex)
    U = [Symbol(x) for x in s]
    T = elem_type(R)
    N = (ordering == :deglex || ordering == :degrevlex) ? length(U) + 1 : length(U)
