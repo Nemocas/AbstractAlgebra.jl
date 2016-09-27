@@ -871,6 +871,12 @@ end
 #
 ###############################################################################
 
+function zero!(z::fmpq_rel_series)
+   ccall((:fmpq_poly_zero, :libflint), Void, 
+                (Ptr{fmpq_rel_series},), &z)
+   z.prec = parent(z).prec_max
+end
+
 function setcoeff!(z::fmpq_rel_series, n::Int, x::fmpq)
    ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, 
                 (Ptr{fmpq_rel_series}, Int, Ptr{fmpq}), 
@@ -901,6 +907,7 @@ function addeq!(a::fmpq_rel_series, b::fmpq_rel_series)
    lena = pol_length(a)
    lenb = pol_length(b)  
    prec = min(a.prec, b.prec)
+<<<<<<< HEAD
    val = min(a.val, b.val)
    lena = min(lena, prec - a.val)
    lenb = min(lenb, prec - b.val)
@@ -937,6 +944,22 @@ function addeq!(a::fmpq_rel_series, b::fmpq_rel_series)
    a.val = val
    renormalize!(a)
    return nothing
+end
+
+function add!(c::fmpq_rel_series, a::fmpq_rel_series, b::fmpq_rel_series)
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenc = max(lena, lenb)
+   c.prec = prec
+   ccall((:fmpq_poly_add_series, :libflint), Void, 
+                (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Int), 
+               &c, &a, &b, lenc)
 end
 
 ###############################################################################

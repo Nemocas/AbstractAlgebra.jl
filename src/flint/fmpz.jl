@@ -1392,6 +1392,11 @@ function add!(z::fmpz, x::fmpz, y::fmpz)
          (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x, &y)
 end
 
+function zero!(z::fmpz)
+   ccall((:fmpz_zero, :libflint), Void, 
+         (Ptr{fmpz},), &z)
+end
+
 ###############################################################################
 #
 #   Parent object overloads

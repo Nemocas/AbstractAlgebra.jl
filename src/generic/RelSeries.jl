@@ -1027,6 +1027,11 @@ end
 #
 ###############################################################################
 
+function zero!{T <: RingElem}(a::GenRelSeries{T})
+   a.length = 0
+   a.prec = parent(a).prec_max
+end
+
 function fit!{T <: RingElem}(c::GenRelSeries{T}, n::Int)
    if length(c.coeffs) < n
       t = c.coeffs
@@ -1133,6 +1138,31 @@ function addeq!{T <: RingElem}(c::GenRelSeries{T}, a::GenRelSeries{T})
    renormalise!(c)
 end
 
+function add!{T <: RingElem}(c::SeriesElem{T}, a::SeriesElem{T}, b::SeriesElem{T})
+   lena = length(a)
+   lenb = length(b)
+   prec = min(precision(a), precision(b))
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+   lenc = max(lena, lenb)
+   fit!(c, lenc)
+   set_prec!(c, prec)
+   i = 1
+   while i <= min(lena, lenb)
+      setcoeff!(c, i - 1, coeff(a, i - 1) + coeff(b, i - 1))
+      i += 1
+   end
+   while i <= lena
+      setcoeff!(c, i - 1, coeff(a, i - 1))
+      i += 1
+   end
+   while i <= lenb
+      setcoeff!(c, i - 1, coeff(b, i - 1))
+      i += 1
+   end
+   set_length!(c, normalise(c, i - 1))
+   nothing
+end
 ###############################################################################
 #
 #   Promotion rules
