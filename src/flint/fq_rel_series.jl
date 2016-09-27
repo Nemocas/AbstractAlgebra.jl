@@ -428,6 +428,12 @@ end
 #
 ###############################################################################
 
+function zero!(x::fq_rel_series)
+  ccall((:fq_poly_zero, :libflint), Void, 
+                   (Ptr{fq_rel_series}, Ptr{FqFiniteField}), &x, &base_ring(x))
+  x.prec = parent(x).prec_max
+end
+
 function fit!(z::fq_rel_series, n::Int)
    ccall((:fq_poly_fit_length, :libflint), Void, 
          (Ptr{fq_rel_series}, Int, Ptr{FqFiniteField}),
@@ -475,11 +481,28 @@ function addeq!(a::fq_rel_series, b::fq_rel_series)
    lena = min(lena, prec)
    lenb = min(lenb, prec)
 
-   lenz = max(lena, lenb)
+   len = max(lena, lenb)
    a.prec = prec
    ccall((:fq_poly_add_series, :libflint), Void, 
      (Ptr{fq_rel_series}, Ptr{fq_rel_series}, Ptr{fq_rel_series}, Int, Ptr{FqFiniteField}),
-               &a, &a, &b, lenz, &ctx)
+               &a, &a, &b, len, &ctx)
+end
+
+function add!(c::fq_rel_series, a::fq_rel_series, b::fq_rel_series)
+   ctx = base_ring(a)
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenc = max(lena, lenb)
+   c.prec = prec
+   ccall((:fq_poly_add_series, :libflint), Void, 
+     (Ptr{fq_rel_series}, Ptr{fq_rel_series}, Ptr{fq_rel_series}, Int, Ptr{FqFiniteField}),
+               &c, &a, &b, lenc, &ctx)
 end
 
 ###############################################################################

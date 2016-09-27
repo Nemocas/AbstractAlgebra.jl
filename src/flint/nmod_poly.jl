@@ -855,6 +855,11 @@ end
 #
 ################################################################################
 
+function zero!(x::nmod_poly)
+  ccall((:nmod_poly_zero, :libflint), Void, 
+                   (Ptr{nmod_poly},), &x)
+end
+
 function fit!(x::nmod_poly, n::Int)
   ccall((:nmod_poly_fit_length, :libflint), Void, 
                    (Ptr{nmod_poly}, Int), &x, n)

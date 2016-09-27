@@ -568,33 +568,44 @@ end
 #
 ###############################################################################
 
+function zero!(a::nf_elem)
+   ccall((:nf_elem_zero, :libflint), Void,
+         (Ptr{nf_elem}, Ptr{AnticNumberField}), &a, &parent(a))
+   nothing
+end
+
 function mul!(z::nf_elem, x::nf_elem, y::nf_elem)
    ccall((:nf_elem_mul, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
                                                   &z, &x, &y, &parent(x))
+   nothing
 end
 
 function mul_red!(z::nf_elem, x::nf_elem, y::nf_elem, red::Bool)
    ccall((:nf_elem_mul_red, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}, Cint),
                                                 &z, &x, &y, &parent(x), red)
+   nothing
 end
 
 function addeq!(z::nf_elem, x::nf_elem)
    ccall((:nf_elem_add, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
                                                   &z, &z, &x, &parent(x))
+   nothing
 end
 
 function add!(a::nf_elem, b::nf_elem, c::nf_elem)
    ccall((:nf_elem_add, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
          &a, &b, &c, &a.parent)
+   nothing
 end
 
 function reduce!(x::nf_elem)
    ccall((:nf_elem_reduce, :libflint), Void,
          (Ptr{nf_elem}, Ptr{AnticNumberField}), &x, &parent(x))
+   nothing
 end
 
 ###############################################################################

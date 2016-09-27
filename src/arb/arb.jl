@@ -1578,12 +1578,18 @@ bell(n::Int, r::ArbField) = bell(fmpz(n), r)
 #
 ################################################################################
 
+function zero!(z::arb)
+   ccall((:arb_zero, :libarb), Void, (Ptr{arb},), &z)
+   nothing
+end
+
 for (s,f) in (("add!","arb_add"), ("mul!","arb_mul"), ("div!", "arb_div"),
               ("sub!","arb_sub"))
   @eval begin
     function ($(Symbol(s)))(z::arb, x::arb, y::arb)
       ccall(($f, :libarb), Void, (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int),
                            &z, &x, &y, parent(x).prec)
+      nothing
     end
   end
 end
@@ -1591,6 +1597,7 @@ end
 function addeq!(z::arb, x::arb)
     ccall((:arb_add, :libarb), Void, (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int),
                            &z, &z, &y, parent(x).prec)
+    nothing
 end
 
 ################################################################################

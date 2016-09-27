@@ -1967,6 +1967,12 @@ function fit!{T <: RingElem}(c::GenPoly{T}, n::Int)
          c.coeffs[i] = zero(base_ring(c))
       end
    end
+   nothing
+end
+
+function zero!{T <: RingElem}(c::GenPoly{T})
+   c.length = 0
+   nothing
 end
 
 function setcoeff!{T <: RingElem}(c::GenPoly{T}, n::Int, a::T)
@@ -1976,6 +1982,7 @@ function setcoeff!{T <: RingElem}(c::GenPoly{T}, n::Int, a::T)
       c.length = max(length(c), n + 1)
       # don't normalise
    end
+   nothing
 end
 
 function mul!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T}, b::PolyElem{T})
@@ -2014,6 +2021,7 @@ function mul!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T}, b::PolyElem{T})
         
       c.length = normalise(c, lenc)
    end
+   nothing
 end
 
 function addeq!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T})
@@ -2025,6 +2033,28 @@ function addeq!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T})
       addeq!(c.coeffs[i], coeff(a, i - 1))
    end
    c.length = normalise(c, len)
+   nothing
+end
+
+function add!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T}, b::PolyElem{T})
+   lena = length(a)
+   lenb = length(b)
+   len = max(lena, lenb)
+   fit!(c, len)
+   i = 1
+   while i <= 1:min(lena, lenb)
+      add!(c.coeffs[i], coeff(a, i - 1), coeff(b, i - 1))
+   end
+   while i <= lena
+      setcoeff!(c, i - 1, coeff(a, i - 1))
+      i += 1
+   end
+   while i <= lenb
+      setcoeff!(c, i - 1, coeff(b, i - 1))
+      i += 1
+   end
+   c.length = normalise(c, len)
+   nothing
 end
 
 ###############################################################################
