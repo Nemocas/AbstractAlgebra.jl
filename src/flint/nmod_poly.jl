@@ -77,14 +77,6 @@ function coeff(x::nmod_poly, n::Int)
           (Ptr{nmod_poly}, Int), &x, n))
 end
 
-function zero!(a::nmod_poly)
-  ccall((:nmod_poly_zero, :libflint), Void, (Ptr{nmod_poly}, ), &a)
-end
-
-function one!(a::nmod_poly)
-  ccall((:nmod_poly_one, :libflint), Void, (Ptr{nmod_poly}, ), &a)
-end
-
 zero(R::NmodPolyRing) = R(UInt(0))
 
 one(R::NmodPolyRing) = R(UInt(1))
@@ -858,6 +850,10 @@ end
 function zero!(x::nmod_poly)
   ccall((:nmod_poly_zero, :libflint), Void, 
                    (Ptr{nmod_poly},), &x)
+end
+
+function one!(a::nmod_poly)
+  ccall((:nmod_poly_one, :libflint), Void, (Ptr{nmod_poly}, ), &a)
 end
 
 function fit!(x::nmod_poly, n::Int)
