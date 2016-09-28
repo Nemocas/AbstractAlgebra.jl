@@ -21,7 +21,7 @@ export sqrt, rsqrt, log, log1p, exp, exppii, sin, cos, tan, cot,
        sinhcosh, atan, logsinpi, gamma, rgamma, lgamma, digamma, risingfac,
        risingfac2, polygamma, polylog, zeta, barnesg, logbarnesg, agm,
        erf, erfi, erfc, ei, si, ci, shi, chi, li, lioffset, expint, gamma,
-       besselj, bessely, besseli, besselk, hyp1f1, hyp1f1r, hyperu,
+       besselj, bessely, besseli, besselk, hyp1f1, hyp1f1r, hyperu, hyp2f1,
        jtheta, modeta, modj, modlambda, moddelta, ellipwp, ellipk, ellipe
 
 
@@ -1274,6 +1274,17 @@ function hyperu(a::acb, b::acb, x::acb)
   z = parent(x)()
   ccall((:acb_hypgeom_u, :libarb), Void,
               (Ptr{acb}, Ptr{acb}, Ptr{acb}, Ptr{acb}, Int), &z, &a, &b, &x, parent(x).prec)
+  return z
+end
+
+doc"""
+    hyp2f1(a::acb, b::acb, c::acb, x::acb)
+> Return the Gauss hypergeometric function ${}_2F_1(a,b,c,x)$.
+"""
+function hyp2f1(a::acb, b::acb, c::acb, x::acb; flags=0)
+  z = parent(x)()
+  ccall((:acb_hypgeom_2f1, :libarb), Void,
+              (Ptr{acb}, Ptr{acb}, Ptr{acb}, Ptr{acb}, Ptr{acb}, Int, Int), &z, &a, &b, &c, &x, flags, parent(x).prec)
   return z
 end
 
