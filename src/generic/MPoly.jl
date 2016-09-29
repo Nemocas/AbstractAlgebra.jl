@@ -967,6 +967,7 @@ function pow_fps{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
    ge[1] = f.exps[1]*(k - 1)
    Rc[1] = f.coeffs[1]*gc[1]
    Re[1] = f.exps[1]*k
+   println("Inserting ", 2, " ", 1);
    push!(H, heap_s{N}(f.exps[2] + ge[1], 1))
    push!(I, heap_t(2, 1, 0))
    Q = Array(Int, 0) # corresponds to Q in paper
@@ -1011,6 +1012,7 @@ function pow_fps{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
          x = H[1]
          heappop!(H)
          v = I[x.n]
+         println("Popping ", v.i, " ", v.j);
          largest[v.i] |= topbit
          mul!(t1, f.coeffs[v.i], gc[v.j])
          addeq!(SS, t1)
@@ -1025,6 +1027,7 @@ function pow_fps{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
          push!(Q, x.n)
          while (xn = v.next) != 0
             v = I[xn]
+            println("Unchaining ", v.i, " ", v.j);
             largest[v.i] |= topbit
             mul!(t1, f.coeffs[v.i], gc[v.j])
             addeq!(SS, t1)
@@ -1041,6 +1044,7 @@ function pow_fps{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
          v = I[xn]
          if v.i < m && largest[v.i + 1] == ((v.j - 1) | topbit)
             I[xn] = heap_t(v.i + 1, v.j, 0)
+            println("Inserting ", v.i + 1, " ", v.j, " ", f.exps[v.i + 1] + ge[v.j]);
             heapinsert!(H, I, xn, f.exps[v.i + 1] + ge[v.j]) # either chain or insert v into heap   
             largest[v.i + 1] = v.j
          else
@@ -1049,10 +1053,12 @@ function pow_fps{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
          if v.j < gnext - 1 && (largest[v.i] & mask) <  v.j + 1
             if reuse != 0
                I[reuse] = heap_t(v.i, v.j + 1, 0)
+               println("Inserting ", v.i, " ", v.j + 1, " ", f.exps[v.i] + ge[v.j + 1]);
                heapinsert!(H, I, reuse, f.exps[v.i] + ge[v.j + 1]) # either chain or insert v into heap
                reuse = 0   
             else
                push!(I, heap_t(v.i, v.j + 1, 0))
+               println("Inserting ", v.i, " ", v.j + 1, " ", f.exps[v.i] + ge[v.j + 1]);
                Collections.heappush!(H, heap_s{N}(f.exps[v.i] + ge[v.j + 1], length(I)))
             end
             largest[v.i] = v.j + 1     
@@ -1065,6 +1071,7 @@ function pow_fps{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
          push!(gi, -from_exp(R, ge[gnext]))
          if (largest[2] & topbit) != 0
             push!(I, heap_t(2, gnext, 0))
+            println("Inserting ", 2, " ", gnext, " ", f.exps[2] + ge[gnext]);
             Collections.heappush!(H, heap_s{N}(f.exps[2] + ge[gnext], length(I)))   
             largest[2] = gnext
          end

@@ -236,18 +236,11 @@ end
 
 function ^(a::fmpz_mpoly, b::Int)
    b < 0 && throw(DomainError())
-   # special case powers of x for constructing polynomials efficiently
-   if length(a) == 0
-      return parent(a)()
-   elseif b == 0
-      return parent(a)(1)
-   else
-      z = a
-      for i = 1:b - 1
-         z *= a
-      end
-      return z
-   end
+   z = parent(a)()
+   ccall((:fmpz_mpoly_pow_fps, :libflint), Void,
+         (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Int, Ptr{FmpzMPolyRing}),
+         &z, &a, b, &parent(a))
+   return z
 end
 
 ###############################################################################
