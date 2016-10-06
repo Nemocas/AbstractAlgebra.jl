@@ -647,6 +647,13 @@ function Base.call(a::FmpqMatSpace, d::Integer)
    return z
 end
 
+function Base.call(a::FmpqMatSpace, M::fmpz_mat)
+   (a.cols == cols(M) && a.rows == rows(M)) || error("wrong matrix dimension")
+   z = a()
+   ccall((:fmpq_mat_set_fmpz_mat, :libflint), Void, (Ptr{fmpq_mat}, Ptr{fmpz_mat}), &z, &M)
+   return z
+end
+
 Base.call(a::FmpqMatSpace, d::fmpq_mat) = d
 
 ###############################################################################
