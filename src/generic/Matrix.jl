@@ -2830,6 +2830,20 @@ end
 #
 ###############################################################################
 
+function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::fmpz_mat)
+  if a.rows != rows(b) || a.cols != cols(b)
+    error("incompatible matrix dimensions")
+  end
+  A = a()
+  R = base_ring(a)
+  for i=1:a.rows
+    for j=1:a.cols
+      A[i,j] = R(b[i,j])
+    end
+  end
+  return A
+end
+
 function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::RingElem)
    return a(base_ring(a)(b))
 end
