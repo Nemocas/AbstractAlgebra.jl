@@ -74,9 +74,9 @@ function show(io::IO, x::fmpz_poly)
       print(io, "0")
    else
       cstr = ccall((:fmpz_poly_get_str_pretty, :libflint), Ptr{UInt8}, 
-          (Ptr{fmpz_poly}, Ptr{UInt8}), &x, bytestring(string(var(parent(x)))))
+          (Ptr{fmpz_poly}, Ptr{UInt8}), &x, string(var(parent(x))))
 
-      print(io, bytestring(cstr))
+      print(io, unsafe_string(cstr))
 
       ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
    end
