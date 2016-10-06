@@ -95,7 +95,7 @@ function hash(a::fmpz, h::UInt)
 end
 
 function __fmpz_is_small(a::Int)
-   return (unsigned(a) >> (WORD_SIZE - 2) != 1)
+   return (unsigned(a) >> (Sys.WORD_SIZE - 2) != 1)
 end
 
 function __fmpz_limbs(a::Int)
