@@ -126,7 +126,7 @@ end
 #
 ###############################################################################
 
-function deepcopy(a::fmpz)
+function deepcopy_internal(a::fmpz, dict::ObjectIdDict)
    z = fmpz()
    ccall((:fmpz_set, :libflint), Void, (Ptr{fmpz}, Ptr{fmpz}), &z, &a)
    return z

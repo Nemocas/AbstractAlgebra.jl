@@ -114,7 +114,7 @@ iszero(a::fmpz_mat) = ccall((:fmpz_mat_is_zero, :libflint), Bool,
 isone(a::fmpz_mat) = ccall((:fmpz_mat_is_one, :libflint), Bool,
                            (Ptr{fmpz_mat},), &a)
 
-function deepcopy(d::fmpz_mat)
+function deepcopy_internal(d::fmpz_mat, dict::ObjectIdDict)
    z = fmpz_mat(d)
    z.parent = d.parent
    return z

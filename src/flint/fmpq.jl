@@ -118,7 +118,7 @@ function height_bits(a::fmpq)
    return ccall((:fmpq_height_bits, :libflint), Int, (Ptr{fmpq},), &a)
 end
 
-function deepcopy(a::fmpq)
+function deepcopy_internal(a::fmpq, dict::ObjectIdDict)
    z = fmpq()
    ccall((:fmpq_set, :libflint), Void, (Ptr{fmpq}, Ptr{fmpq}), &z, &a)
    return z

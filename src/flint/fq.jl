@@ -160,7 +160,7 @@ function degree(a::FqFiniteField)
    return ccall((:fq_ctx_degree, :libflint), Int, (Ptr{FqFiniteField},), &a)
 end
 
-function deepcopy(d::fq)
+function deepcopy_internal(d::fq, dict::ObjectIdDict)
    z = fq(parent(d), d)
    return z
 end

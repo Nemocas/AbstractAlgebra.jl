@@ -56,7 +56,7 @@ end
 #   return isequal(a, one(parent(a)))
 #end
 
-function deepcopy(a::acb_poly)
+function deepcopy_internal(a::acb_poly, dict::ObjectIdDict)
    z = acb_poly(a)
    z.parent = parent(a)
    return z

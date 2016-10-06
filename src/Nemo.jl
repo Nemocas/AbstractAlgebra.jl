@@ -3,16 +3,16 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 module Nemo
  
 import Base: Array, abs, asin, asinh, atan, atanh, base, bin, call,
-             checkbounds, convert, cmp, contains, cos, cosh, dec, deepcopy,
-             den, deserialize, det, div, divrem, exp, factor, gcd, gcdx,
-             getindex, hash, hcat, hex, intersect, inv, invmod, isequal,
-             isfinite, isless, isprime, isqrt, isreal, lcm, ldexp, length,
-             log, lufact, mod, ndigits, nextpow2, norm, nullspace, num, oct,
-             one, parent, parity, parseint, precision, prevpow2, promote_rule,
-             rank, Rational, rem, reverse, serialize, setindex!, show, sign,
-             sin, sinh, size, sqrt, string, sub, tan, tanh, trace,
-             trailing_zeros, transpose, transpose!, truncate, typed_hvcat,
-             typed_hcat, var, vcat, zero, zeros,
+             checkbounds, convert, cmp, contains, cos, cosh, dec,
+             deepcopy, deepcopy_internal, den, deserialize, det, div, divrem,
+             exp, factor, gcd, gcdx, getindex, hash, hcat, hex, intersect, inv,
+             invmod, isequal, isfinite, isless, isprime, isqrt, isreal, lcm,
+             ldexp, length, log, lufact, lufact!, mod, ndigits, nextpow2, norm,
+             nullspace, num, oct, one, parent, parity, parseint, precision,
+             prevpow2, promote_rule, rank, Rational, rem, reverse, serialize,
+             setindex!, show, sign, sin, sinh, size, sqrt, string, sub, tan,
+             tanh, trace, trailing_zeros, transpose, transpose!, truncate,
+             typed_hvcat, typed_hcat, var, vcat, zero, zeros,
              +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
              /, !=
 

@@ -68,7 +68,7 @@ rows(a::acb_mat) = a.r
 
 cols(a::acb_mat) = a.c
 
-function deepcopy(x::acb_mat)
+function deepcopy_internal(x::acb_mat, dict::ObjectIdDict)
   z = parent(x)()
   ccall((:acb_mat_set, :libarb), Void, (Ptr{acb_mat}, Ptr{acb_mat}), &z, &x)
   return z

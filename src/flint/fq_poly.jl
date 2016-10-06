@@ -69,7 +69,7 @@ isone(x::fq_poly) = ccall((:fq_poly_is_one, :libflint), Bool,
 
 degree(f::fq_poly) = f.length - 1
 
-function deepcopy(a::fq_poly)
+function deepcopy_internal(a::fq_poly, dict::ObjectIdDict)
    z = fq_poly(a)
    z.parent = a.parent
    return z

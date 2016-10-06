@@ -856,6 +856,14 @@ bell(::fmpz, ::ArbField)
 bell(::Int, ::ArbField)
 ```
 
+```@docs
+numpart(::fmpz, ::ArbField)
+```
+
+```@docs
+numpart(::Int, ::ArbField)
+```
+
 Here are some examples of real valued mathematical functions.
 
 ```
