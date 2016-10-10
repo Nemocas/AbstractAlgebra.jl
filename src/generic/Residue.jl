@@ -113,7 +113,8 @@ function isunit(a::ResElem)
    return g == 1
 end
 
-deepcopy(a::ResElem) = parent(a)(deepcopy(data(a)))
+deepcopy_internal(a::ResElem, dict::ObjectIdDict) =
+   parent(a)(deepcopy(data(a)))
 
 ###############################################################################
 #
