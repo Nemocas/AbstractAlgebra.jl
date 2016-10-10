@@ -191,10 +191,10 @@ end
 function create_accessors(T, S, handle)
    accessor_name = gensym()
    @eval begin
-      function $(symbol(:get, accessor_name))(a::$T)
+      function $(Symbol(:get, accessor_name))(a::$T)
          return a.auxilliary_data[$handle]::$S
       end,
-      function $(symbol(:set, accessor_name))(a::$T, b::$S)
+      function $(Symbol(:set, accessor_name))(a::$T, b::$S)
          if $handle > length(a.auxilliary_data)
             resize(a.auxilliary_data, $handle)
          end
