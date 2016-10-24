@@ -650,6 +650,11 @@ dedekind_sum(h::Integer, k::Integer) = dedekind_sum(fmpz(h), fmpz(k))
 #
 ###############################################################################
 
+function zero!(c::fmpq)
+   ccall((:fmpq_zero, :libflint), Void,
+         (Ptr{fmpq},), &c)
+end
+
 function mul!(c::fmpq, a::fmpq, b::fmpq)
    ccall((:fmpq_mul, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &c, &a, &b)
@@ -658,6 +663,11 @@ end
 function addeq!(c::fmpq, a::fmpq)
    ccall((:fmpq_add, :libflint), Void,
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &c, &c, &a)
+end
+
+function add!(c::fmpq, a::fmpq, b::fmpq)
+   ccall((:fmpq_add, :libflint), Void,
+         (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &c, &a, &b)
 end
 
 ###############################################################################
@@ -686,6 +696,8 @@ end
 call(a::FlintRationalField) = fmpq(fmpz(0), fmpz(1))
 
 call(a::FlintRationalField, b::Rational{BigInt}) = fmpq(b) 
+
+call(::FlintRationalField, x::Rational) = fmpq(x.num, x.den)
 
 call(a::FlintRationalField, b::Integer) = fmpq(b)
 

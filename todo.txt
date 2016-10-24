@@ -1,3 +1,13 @@
+mpoly
+-----
+
+* setting coefficients to zero should result in a shift of coefficients
+
+* setting a coefficient beyond the end of a polynomial should throw
+
+* scalar multiplication and multiplication should remove any resulting
+zero terms when working over a residue ring
+
 Build
 -----
 

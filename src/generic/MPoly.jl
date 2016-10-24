@@ -1,10 +1,10 @@
 ###############################################################################
 #
-#   Poly.jl : Generic multivariate polynomials over rings
+#   MPoly.jl : Generic multivariate polynomials over rings
 #
 ###############################################################################
 
-export GenMPoly, GenMPolyRing
+export GenMPoly, GenMPolyRing, max_degrees, gens
 
 export NewInt
 
@@ -116,6 +116,10 @@ zero{N}(::Type{NTuple{N, UInt}}) = ntuple(i -> 0, Val{N})
 
 function +{N}(a::NTuple{N, UInt}, b::NTuple{N, UInt})
    return ntuple(i -> a[i] + b[i], Val{N})
+end
+
+function -{N}(a::NTuple{N, UInt}, b::NTuple{N, UInt})
+   return ntuple(i -> a[i] - b[i], Val{N})
 end
 
 function *{N}(a::NTuple{N, UInt}, n::Int)
@@ -669,23 +673,25 @@ function heapinsert!{N}(xs::Array{heap_s{N}, 1}, ys::Array{heap_t, 1}, m::Int, e
 end
 
 function heappop!{N}(xs::Array{heap_s{N}, 1})
-   n = length(xs)
+   s = length(xs)
    x = xs[1]
    i = 1
    j = 2
-   exp = xs[n].exp
-   @inbounds while j < n
-      if xs[j].exp > xs[j + 1].exp
+   @inbounds while j < s
+      if xs[j].exp >= xs[j + 1].exp
          j += 1
       end
       xs[i] = xs[j]
-      if exp <= xs[j].exp
-         break
-      end
       i = j
       j *= 2
    end
-   xs[i] = xs[n]
+   exp = xs[s].exp
+   @inbounds while i > 1 && exp < xs[j].exp
+      xs[i] = xs[j]
+      i = j
+      j >>= 1
+   end
+   xs[i] = xs[s]
    pop!(xs)
    return
 end
@@ -709,7 +715,6 @@ function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S
    k = 0
    c = R()
    Q = Array(Int, 0)
-   println("start heap")
    while !isempty(H)
       exp = H[1].exp
       k += 1
@@ -751,8 +756,10 @@ function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S
          I[xn] = heap_t(v.i, v.j + 1, 0)
          heapinsert!(H, I, xn, a.exps[v.i] + b.exps[v.j + 1]) # either chain or insert v into heap   
       end
+      if Rc[k] == 0
+         k -= 1
+      end
    end
-   println("end heap")
    resize!(Rc, k)
    resize!(Re, k)
    return parent(a)(Rc, Re)
@@ -831,11 +838,8 @@ function mul{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
       er = Array(NTuple{N, UInt}, length(r1))
       unpack_monomials(er, r1.exps, k, bits)
    else
-      a1 = a
-      b1 = b
-      r1 = mul_johnson(a1, b1)
-      er = Array(NTuple{N, UInt}, length(r1))
-      unpack_monomials(er, r1.exps, k, bits)
+      r1 = mul_johnson(a, b)
+      er = r1.exps
    end
    return parent(a)(r1.coeffs, er)
 end
@@ -930,7 +934,160 @@ end
 #
 ###############################################################################
 
-function ^(a::GenMPoly, b::Int)
+function from_exp{N}(R::Ring, a::NTuple{N, UInt})
+   z = fmpz(a[1])
+   for i = 2:N
+      z <<= sizeof(UInt)*8
+      z += a[i]
+   end
+   return R(z)
+end
+
+# Implement fps algorithm from "Sparse polynomial powering with heaps" by
+# Monagan and Pearce, except that we modify the algorithm to return terms
+# in ascending order and we fix some issues in the original algorithm
+# http://www.cecm.sfu.ca/CAG/papers/SparsePowering.pdf
+
+function pow_fps{T <: RingElem, S, N}(f::GenMPoly{T, S, N}, k::Int)
+   par = parent(f)
+   R = base_ring(par)
+   m = length(f)
+   H = Array(heap_s{N}, 0) # heap
+   I = Array(heap_t, 0) # auxilliary data for heap nodes
+   # set up output poly coeffs and exponents (corresponds to h in paper)
+   r_alloc = k*(m - 1) + 1
+   Rc = Array(T, r_alloc)
+   Re = Array(NTuple{N, UInt}, r_alloc)
+   rnext = 1
+   # set up g coeffs and exponents (corresponds to g in paper)
+   g_alloc = k*(m - 1) + 1
+   gc = Array(T, g_alloc)
+   ge = Array(NTuple{N, UInt}, g_alloc)
+   gnext = 1
+   # set up heap
+   gc[1] = f.coeffs[1]^(k-1)
+   ge[1] = f.exps[1]*(k - 1)
+   Rc[1] = f.coeffs[1]*gc[1]
+   Re[1] = f.exps[1]*k
+   push!(H, heap_s{N}(f.exps[2] + ge[1], 1))
+   push!(I, heap_t(2, 1, 0))
+   Q = Array(Int, 0) # corresponds to Q in paper
+   topbit = -1 << (sizeof(Int)*8 - 1)
+   mask = ~topbit
+   largest = fill(topbit, m) # largest j s.t. (i, j) has been in heap
+   largest[2] = 1
+   # precompute some values
+   fik = Array(T, m)
+   for i = 1:m
+      fik[i] = from_exp(R, f.exps[i])*(k - 1)
+   end
+   kp1f1 = k*from_exp(R, f.exps[1])
+   gi = Array(T, 1)
+   gi[1] = -from_exp(R, ge[1])
+   finalexp = f.exps[m]*(k - 1) + f.exps[1]
+   # temporary space
+   t1 = R()
+   C = R() # corresponds to C in paper
+   SS = R() # corresponds to S in paper
+   temp = R() # temporary space for addmul
+   temp2 = R() # temporary space for add
+   # begin algorithm
+   while !isempty(H)
+      exp = H[1].exp
+      gnext += 1
+      rnext += 1
+      if gnext > g_alloc
+         g_alloc *= 2
+         resize!(gc, g_alloc)
+         resize!(ge, g_alloc)
+      end
+      if rnext > r_alloc
+         r_alloc *= 2
+         resize!(Rc, r_alloc)
+         resize!(Re, r_alloc)
+      end
+      first = true
+      zero!(C) 
+      zero!(SS)
+      while !isempty(H) && H[1].exp == exp
+         x = H[1]
+         heappop!(H)
+         v = I[x.n]
+         largest[v.i] |= topbit
+         mul!(t1, f.coeffs[v.i], gc[v.j])
+         addeq!(SS, t1)
+         if exp <= finalexp
+            add!(temp2, fik[v.i], gi[v.j])
+            addmul!(C, temp2, t1, temp)
+         end
+         if first
+            ge[gnext] = exp - f.exps[1]
+            first = false
+         end
+         push!(Q, x.n)
+         while (xn = v.next) != 0
+            v = I[xn]
+            largest[v.i] |= topbit
+            mul!(t1, f.coeffs[v.i], gc[v.j])
+            addeq!(SS, t1)
+            if exp <= finalexp
+               add!(temp2, fik[v.i], gi[v.j])
+               addmul!(C, temp2, t1, temp)
+            end
+            push!(Q, xn)
+         end
+      end
+      reuse = 0
+      while !isempty(Q)
+         xn = pop!(Q)
+         v = I[xn]
+         if v.i < m && largest[v.i + 1] == ((v.j - 1) | topbit)
+            I[xn] = heap_t(v.i + 1, v.j, 0)
+            heapinsert!(H, I, xn, f.exps[v.i + 1] + ge[v.j]) # either chain or insert v into heap   
+            largest[v.i + 1] = v.j
+         else
+            reuse = xn
+         end
+         if v.j < gnext - 1 && (largest[v.i] & mask) <  v.j + 1
+            if reuse != 0
+               I[reuse] = heap_t(v.i, v.j + 1, 0)
+               heapinsert!(H, I, reuse, f.exps[v.i] + ge[v.j + 1]) # either chain or insert v into heap
+               reuse = 0   
+            else
+               push!(I, heap_t(v.i, v.j + 1, 0))
+               Collections.heappush!(H, heap_s{N}(f.exps[v.i] + ge[v.j + 1], length(I)))
+            end
+            largest[v.i] = v.j + 1     
+         end
+      end
+      if C != 0
+         temp = divexact(C, from_exp(R, exp) - kp1f1)
+         addeq!(SS, temp)
+         gc[gnext] = divexact(temp, f.coeffs[1])
+         push!(gi, -from_exp(R, ge[gnext]))
+         if (largest[2] & topbit) != 0
+            push!(I, heap_t(2, gnext, 0))
+            Collections.heappush!(H, heap_s{N}(f.exps[2] + ge[gnext], length(I)))   
+            largest[2] = gnext
+         end
+      end
+      if SS != 0
+         Rc[rnext] = SS
+         Re[rnext] = ge[gnext] + f.exps[1]
+         SS = R()
+      else
+         rnext -= 1
+      end
+      if C == 0
+         gnext -= 1
+      end
+   end
+   resize!(Rc, rnext)
+   resize!(Re, rnext)
+   return parent(f)(Rc, Re)
+end
+
+function ^{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::Int)
    b < 0 && throw(DomainError())
    # special case powers of x for constructing polynomials efficiently
    if length(a) == 0
@@ -939,12 +1096,36 @@ function ^(a::GenMPoly, b::Int)
       return parent(a)([coeff(a, 0)^b], [a.exps[1]*b])
    elseif b == 0
       return parent(a)(1)
+   elseif b == 1
+      return a
+   elseif b == 2
+      return a*a
    else
-      z = a
-      for i = 1:b - 1
-         z *= a
+      v, d = max_degrees(a)
+      d *= b
+      bits = 8
+      max_e = 2^(bits - 1)
+      while d >= max_e
+         bits *= 2
+         max_e = 2^(bits - 1)
       end
-      return z
+      word_bits = sizeof(Int)*8
+      k = div(word_bits, bits)
+      if k != 1
+         M = div(N + k - 1, k)
+         e1 = Array(NTuple{M, UInt}, length(a))
+         pack_monomials(e1, a.exps, k, bits)
+         par = GenMPolyRing{T, S, M}(base_ring(a), parent(a).S)
+         a1 = par(a.coeffs, e1)
+         a1.length = a.length
+         r1 = pow_fps(a1, b)
+         er = Array(NTuple{N, UInt}, length(r1))
+         unpack_monomials(er, r1.exps, k, bits)
+      else
+         r1 = pow_fps(a, b)
+         er = r1.exps
+      end
+      return parent(a)(r1.coeffs, er)
    end
 end
 
@@ -959,6 +1140,24 @@ function fit!{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, n::Int)
       resize!(a.coeffs, n)
       resize!(a.exps, n)
    end
+end
+
+###############################################################################
+#
+#   Promotion rules
+#
+###############################################################################
+
+Base.promote_rule{T <: RingElem, V <: Integer}(::Type{GenMPoly{T}}, ::Type{V}) = GenMPoly{T}
+
+Base.promote_rule{T <: RingElem}(::Type{GenMPoly{T}}, ::Type{T}) = GenMPoly{T}
+
+function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenMPoly{T}}, ::Type{GenMPoly{U}})
+   Base.promote_rule(T, GenMPoly{U}) == T ? GenMPoly{T} : Union{}
+end
+
+function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenMPoly{T}}, ::Type{U})
+   Base.promote_rule(T, U) == T ? GenMPoly{T} : promote_rule1(U, GenMPoly{T})
 end
 
 ###############################################################################
@@ -1021,7 +1220,7 @@ doc"""
 > cached. `S` is a symbol corresponding to the ordering of the polynomial and
 > can be one of `:lex`, `:deglex`, `:revlex` or `:degrevlex`.
 """
-function PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::Ring, s::Array{ASCIIString{}, 1}; cached::Bool = true, ordering::Symbol = :lex)
    U = [Symbol(x) for x in s]
    T = elem_type(R)
    N = (ordering == :deglex || ordering == :degrevlex) ? length(U) + 1 : length(U)

@@ -423,6 +423,12 @@ end
 #
 ###############################################################################
 
+function zero!(x::fmpz_mod_rel_series)
+  ccall((:fmpz_mod_poly_zero, :libflint), Void, 
+                   (Ptr{fmpz_mod_rel_series},), &x)
+  x.prec = parent(x).prec_max
+end
+
 function fit!(x::fmpz_mod_rel_series, n::Int)
   ccall((:fmpz_mod_poly_fit_length, :libflint), Void, 
                    (Ptr{fmpz_mod_rel_series}, Int), &x, n)
@@ -472,11 +478,27 @@ function addeq!(a::fmpz_mod_rel_series, b::fmpz_mod_rel_series)
    lena = min(lena, prec)
    lenb = min(lenb, prec)
 
-   lenz = max(lena, lenb)
+   len = max(lena, lenb)
    a.prec = prec
    ccall((:fmpz_mod_poly_add_series, :libflint), Void, 
                 (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int), 
-               &a, &a, &b, lenz)
+               &a, &a, &b, len)
+end
+
+function add!(c::fmpz_mod_rel_series, a::fmpz_mod_rel_series, b::fmpz_mod_rel_series)
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenc = max(lena, lenb)
+   c.prec = prec
+   ccall((:fmpz_mod_poly_add_series, :libflint), Void, 
+                (Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Ptr{fmpz_mod_rel_series}, Int), 
+               &c, &a, &b, lenc)
 end
 
 ###############################################################################

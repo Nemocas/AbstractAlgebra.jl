@@ -698,6 +698,11 @@ end
 #
 ###############################################################################
 
+function zero!(z::fmpz_poly)
+   ccall((:fmpz_poly_zero, :libflint), Void, 
+                    (Ptr{fmpz_poly},), &z)
+end
+
 function fit!(z::fmpz_poly, n::Int)
    ccall((:fmpz_poly_fit_length, :libflint), Void, 
                     (Ptr{fmpz_poly}, Int), &z, n)
@@ -716,6 +721,11 @@ end
 function addeq!(z::fmpz_poly, x::fmpz_poly)
    ccall((:fmpz_poly_add, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &z, &x)
+end
+
+function add!(z::fmpz_poly, x::fmpz_poly, y::fmpz_poly)
+   ccall((:fmpz_poly_add, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y)
 end
 
 ###############################################################################

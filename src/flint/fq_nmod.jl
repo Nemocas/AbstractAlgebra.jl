@@ -371,6 +371,11 @@ end
 #
 ###############################################################################
 
+function zero!(z::fq_nmod)
+   ccall((:fq_nmod_zero, :libflint), Void, 
+        (Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), &z, &z.parent)
+end
+
 function mul!(z::fq_nmod, x::fq_nmod, y::fq_nmod)
    ccall((:fq_nmod_mul, :libflint), Void, 
          (Ptr{fq_nmod}, Ptr{fq_nmod}, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), 
@@ -381,6 +386,12 @@ function addeq!(z::fq_nmod, x::fq_nmod)
    ccall((:fq_nmod_add, :libflint), Void, 
          (Ptr{fq_nmod}, Ptr{fq_nmod}, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), 
                                                        &z, &z, &x, &x.parent)
+end
+
+function add!(z::fq_nmod, x::fq_nmod, y::fq_nmod)
+   ccall((:fq_nmod_add, :libflint), Void, 
+         (Ptr{fq_nmod}, Ptr{fq_nmod}, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), 
+                                                       &z, &x, &y, &x.parent)
 end
 
 ###############################################################################
