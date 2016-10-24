@@ -740,6 +740,7 @@ function heappop!{N}(xs::Array{heap_s{N}, 1})
       j *= 2
    end
    exp = xs[s].exp
+   j = i >> 1
    @inbounds while i > 1 && exp < xs[j].exp
       xs[i] = xs[j]
       i = j
