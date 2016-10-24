@@ -727,23 +727,25 @@ function heapinsert!{N}(xs::Array{heap_s{N}, 1}, ys::Array{heap_t, 1}, m::Int, e
 end
 
 function heappop!{N}(xs::Array{heap_s{N}, 1})
-   n = length(xs)
+   s = length(xs)
    x = xs[1]
    i = 1
    j = 2
-   exp = xs[n].exp
-   @inbounds while j < n
-      if xs[j].exp > xs[j + 1].exp
+   @inbounds while j < s
+      if xs[j].exp >= xs[j + 1].exp
          j += 1
       end
       xs[i] = xs[j]
-      if exp <= xs[j].exp
-         break
-      end
       i = j
       j *= 2
    end
-   xs[i] = xs[n]
+   exp = xs[s].exp
+   @inbounds while i > 1 && exp < xs[j].exp
+      xs[i] = xs[j]
+      i = j
+      j >>= 1
+   end
+   xs[i] = xs[s]
    pop!(xs)
    return
 end
