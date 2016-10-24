@@ -421,7 +421,7 @@ function do_merge{T <: RingElem, S, N}(Ac::Array{T, 1}, Bc::Array{T, 1},
    return k - 1
 end
 
-function *{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
+function mul_classical{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
    par = parent(a)
    R = base_ring(par)
    m = length(a)
@@ -811,7 +811,7 @@ function unpack_monomials{M, N}(a::Array{NTuple{N, UInt}, 1}, b::Array{NTuple{M,
    end
 end
 
-function mul{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
+function *{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
    v1, d1 = max_degrees(a)
    v2, d2 = max_degrees(b)
    d = d1 + d2
