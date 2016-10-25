@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export GenMPoly, GenMPolyRing, max_degrees, gens
+export GenMPoly, GenMPolyRing, max_degrees, gens, divides
 
 export NewInt
 
@@ -133,6 +133,17 @@ end
 
 function *{N}(a::NTuple{N, UInt}, n::Int)
    return ntuple(i -> a[i]*reinterpret(UInt, n), Val{N})
+end
+
+function divides{N}(a::NTuple{N, UInt}, b::NTuple{N, UInt}, mask::UInt)
+   diff = ntuple(i -> reinterpret(UInt, reinterpret(Int, a[i])
+                    - reinterpret(Int, b[i])), Val{N})
+   for i = 1:N
+      if (diff[i] & mask) != 0
+         return false, diff
+      end
+   end
+   return true, diff
 end
 
 function cmp{T <: RingElem, S, N}(a::NTuple{N, UInt},
@@ -1256,6 +1267,165 @@ function ^{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::Int)
       end
       return parent(a)(r1.coeffs, er)
    end
+end
+
+###############################################################################
+#
+#   Exact division
+#
+###############################################################################
+
+function divides_monagan_pearce{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N}, bits::Int)
+   par = parent(a)
+   R = base_ring(par)
+   m = length(a)
+   n = length(b)
+   n == 0 && error("Division by zero in divides_monagan_pearce")
+   if m == 0
+      return true, par()
+   end
+   mask1 = UInt(1) << (bits - 1)
+   mask = UInt(0)
+   for i = 1:div(sizeof(UInt)*8, bits)
+      mask = (mask << bits) + mask1
+   end
+   H = Array(heap_s{N}, 0)
+   I = Array(heap_t, 0)
+   # set up heap
+   push!(H, heap_s{N}(a.exps[1], 1))
+   push!(I, heap_t(0, 1, 0))
+   q_alloc = max(m - n, n)
+   Qc = Array(T, q_alloc)
+   Qe = Array(NTuple{N, UInt}, q_alloc)
+   k = 0
+   s = n
+   c = R()
+   qc = R()
+   m1 = -R(1)
+   mb = -b.coeffs[1]
+   Q = Array(Int, 0)
+   reuse = Array(Int, 0)
+   while !isempty(H)
+      exp = H[1].exp
+      k += 1
+      if k > q_alloc
+         q_alloc *= 2
+         resize!(Qc, q_alloc)
+         resize!(Qe, q_alloc)
+      end
+      first = true
+      @inbounds while !isempty(H) && H[1].exp == exp
+         x = H[1]
+         heappop!(H)
+         v = I[x.n]
+         if first
+            d1, Qe[k] = divides(exp, b.exps[1], mask)
+            if !d1
+               return false, par()
+            end
+            first = false
+         end
+         if v.i == 0
+            addmul!(qc, a.coeffs[v.j], m1, c)
+         else
+            addmul!(qc, b.coeffs[v.i], Qc[v.j], c)
+         end
+         if v.i != 0 || v.j < m
+            push!(Q, x.n)
+         else
+            push!(reuse, x.n)
+         end
+         while (xn = v.next) != 0
+            v = I[xn]
+            if v.i == 0
+               addmul!(qc, a.coeffs[v.j], m1, c)
+            else
+               addmul!(qc, b.coeffs[v.i], Qc[v.j], c)
+            end
+            if v.i != 0 || v.j < m
+               push!(Q, xn)
+            else
+               push!(reuse, xn)
+            end
+         end
+      end
+      @inbounds while !isempty(Q)
+         xn = pop!(Q)
+         v = I[xn]
+         if v.i == 0
+            I[xn] = heap_t(0, v.j + 1, 0)
+            heapinsert!(H, I, xn, a.exps[v.j + 1]) # either chain or insert into heap   
+         elseif v.j < k - 1
+            I[xn] = heap_t(v.i, v.j + 1, 0)
+            heapinsert!(H, I, xn, b.exps[v.i] + Qe[v.j + 1]) # either chain or insert into heap
+         elseif v.j == k - 1
+            s += 1
+            push!(reuse, xn)
+         end  
+      end
+      if qc == 0
+         k -= 1
+      else
+         d2, Qc[k] = divides(qc, mb)
+         if !d2
+             return false, par()
+         end
+         for i = 2:s
+            if !isempty(reuse)
+               xn = pop!(reuse)
+               I[xn] = heap_t(i, k, 0)
+               heapinsert!(H, I, xn, b.exps[i] + Qe[k]) # either chain or insert into heap
+            else
+               push!(I, heap_t(i, k, 0))
+               Collections.heappush!(H, heap_s{N}(b.exps[i] + Qe[k], length(I)))
+            end                 
+         end
+         s = 1
+      end
+      zero!(qc)
+   end
+   resize!(Qc, k)
+   resize!(Qe, k)
+   return true, parent(a)(Qc, Qe)
+end
+
+function divides{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
+   v1, d1 = max_degrees(a)
+   v2, d2 = max_degrees(b)
+   d = max(d1, d2)
+   bits = 8
+   max_e = 2^(bits - 1)
+   while d >= max_e
+      bits *= 2
+      max_e = 2^(bits - 1)
+   end
+   word_bits = sizeof(Int)*8
+   k = div(word_bits, bits)
+   if k != 1
+      M = div(N + k - 1, k)
+      e1 = Array(NTuple{M, UInt}, length(a))
+      e2 = Array(NTuple{M, UInt}, length(b))
+      pack_monomials(e1, a.exps, k, bits)
+      pack_monomials(e2, b.exps, k, bits)
+      par = GenMPolyRing{T, S, M}(base_ring(a), parent(a).S)
+      a1 = par(a.coeffs, e1)
+      b1 = par(b.coeffs, e2)
+      a1.length = a.length
+      b1.length = b.length
+      flag, q = divides_monagan_pearce(a1, b1, bits)
+      eq = Array(NTuple{N, UInt}, length(q))
+      unpack_monomials(eq, q.exps, k, bits)
+   else
+      flag, q = divides_monagan_pearce(a, b, bits)
+      eq = q.exps
+   end
+   return flag, parent(a)(q.coeffs, eq)
+end
+
+function divexact{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
+   d, q = divides(a, b)
+   d == false && error("Not an exact division in divexact")
+   return q
 end
 
 ###############################################################################

@@ -202,6 +202,15 @@ function addmul!{T <: RingElem}(z::T, x::T, y::T, c::T)
    return
 end
 
+function divides{T <: RingElem}(x::T, y::T)
+   q, r = divrem(x, y)
+   if r == 0
+      return true, q
+   else
+      return false, q
+   end
+end
+
 ###############################################################################
 #
 #   Baby-steps giant-steps powering
@@ -261,7 +270,7 @@ include("flint/nmod_poly.jl")
 
 include("flint/fmpz_mod_poly.jl")
 
-include("flint/fmpz_mpoly.jl")
+#include("flint/fmpz_mpoly.jl")
 
 include("generic/MPoly.jl")
 
