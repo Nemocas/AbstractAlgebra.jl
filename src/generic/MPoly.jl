@@ -632,6 +632,8 @@ function mul_classical{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T,
    end
 end
 
+abstract heap
+
 immutable heap_s{N}
    exp::NTuple{N, UInt}
    n::Int
@@ -641,6 +643,13 @@ immutable heap_t
    i::Int
    j::Int
    next::Int   
+end
+
+immutable nheap_t
+   i::Int
+   j::Int
+   p::Int # polynomial, for heap algorithms that work with multiple polynomials
+   next::Int
 end
 
 function isless{N}(a::heap_s{N}, b::heap_s{N})
@@ -666,6 +675,33 @@ function heapinsert!{N}(xs::Array{heap_s{N}, 1}, ys::Array{heap_t, 1}, m::Int, e
    @inbounds while (j = heapparent(i)) >= 1
       if exp == xs[j].exp
          ys[m] = heap_t(ys[m].i, ys[m].j, xs[j].n)
+         xs[j] = heap_s{N}(exp, m)
+         return
+      elseif exp < xs[j].exp
+         i = j
+      else
+         break
+      end
+   end
+   push!(xs, heap_s{N}(exp, 0))
+   @inbounds while n > i
+      xs[n] = xs[heapparent(n)]
+      n >>= 1
+   end
+   xs[i] = heap_s{N}(exp, m)
+   return
+end
+
+function nheapinsert!{N}(xs::Array{heap_s{N}, 1}, ys::Array{nheap_t, 1}, m::Int, exp::NTuple{N, UInt}, p::Int)
+   i = n = length(xs) + 1
+   @inbounds if i != 1 && exp == xs[1].exp
+      ys[m] = nheap_t(ys[m].i, ys[m].j, p, xs[1].n)
+      xs[1] = heap_s{N}(exp, m)
+      return
+   end
+   @inbounds while (j = heapparent(i)) >= 1
+      if exp == xs[j].exp
+         ys[m] = nheap_t(ys[m].i, ys[m].j, p, xs[j].n)
          xs[j] = heap_s{N}(exp, m)
          return
       elseif exp < xs[j].exp
@@ -1305,9 +1341,9 @@ function divrem_monagan_pearce{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::Gen
    R = base_ring(par)
    m = length(a)
    n = length(b)
-   n == 0 && error("Division by zero in divides_monagan_pearce")
+   n == 0 && error("Division by zero in divrem_monagan_pearce")
    if m == 0
-      return true, par()
+      return par(), par()
    end
    mask1 = UInt(1) << (bits - 1)
    mask = UInt(0)
@@ -1475,6 +1511,195 @@ function divrem{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
       er = r.exps
    end
    return parent(a)(q.coeffs, eq), parent(a)(r.coeffs, er)
+end
+
+function divrem_monagan_pearce{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::Array{GenMPoly{T, S, N}, 1}, bits::Int, maxn::NTuple{N, UInt})
+   par = parent(a)
+   R = base_ring(par)
+   len = length(b)
+   m = length(a)
+   n = [length(b[i]) for i in 1:len]
+   for i = 1:len
+      n[i] == 0 && error("Division by zero in divrem_monagan_pearce")
+   end
+   if m == 0
+      return [par() for i in 1:len], [par() for i in 1:len]
+   end
+   mask1 = UInt(1) << (bits - 1)
+   mask = UInt(0)
+   for i = 1:div(sizeof(UInt)*8, bits)
+      mask = (mask << bits) + mask1
+   end
+   H = Array(heap_s{N}, 0)
+   I = Array(nheap_t, 0)
+   # set up heap
+   push!(H, heap_s{N}(maxn - a.exps[m], 1))
+   push!(I, nheap_t(0, 1, 0, 0))
+   q_alloc = [max(m - n[i], n[i]) for i in 1:len]
+   r_alloc = n[1]
+   Qc = [Array(T, q_alloc[i]) for i in 1:len]
+   Qe = [Array(NTuple{N, UInt}, q_alloc[i]) for i in 1:len]
+   Rc = Array(T, r_alloc)
+   Re = Array(NTuple{N, UInt}, r_alloc)
+   k = [0 for i in 1:len]
+   l = 0
+   s = [n[i] for i in 1:len]
+   c = R()
+   qc = R()
+   m1 = -R(1)
+   mb = [-b[i].coeffs[n[i]] for i in 1:len]
+   Q = Array(Int, 0)
+   reuse = Array(Int, 0)
+   while !isempty(H)
+      exp = H[1].exp
+      @inbounds while !isempty(H) && H[1].exp == exp
+         x = H[1]
+         heappop!(H)
+         v = I[x.n]
+         if v.i == 0
+            addmul!(qc, a.coeffs[m + 1 - v.j], m1, c)
+         else
+            addmul!(qc, b[v.p].coeffs[n[v.p] + 1 - v.i], Qc[v.p][v.j], c)
+         end
+         if v.i != 0 || v.j < m[v.p]
+            push!(Q, x.n)
+         else
+            push!(reuse, x.n)
+         end
+         while (xn = v.next) != 0
+            v = I[xn]
+            if v.i == 0
+               addmul!(qc, a.coeffs[m + 1 - v.j], m1, c)
+            else
+               addmul!(qc, b[v.p].coeffs[n[v.p] + 1 - v.i], Qc[v.p][v.j], c)
+            end
+            if v.i != 0 || v.j < m[v.p]
+               push!(Q, xn)
+            else
+               push!(reuse, xn)
+            end
+         end
+      end
+      @inbounds while !isempty(Q)
+         xn = pop!(Q)
+         v = I[xn]
+         if v.i == 0
+            I[xn] = nheap_t(0, v.j + 1, 0, 0)
+            nheapinsert!(H, I, xn, maxn - a.exps[m - v.j], 0) # either chain or insert into heap   
+         elseif v.j < k[v.p]
+            I[xn] = nheap_t(v.i, v.j + 1, v.p, 0)
+            nheapinsert!(H, I, xn, maxn - b[v.p].exps[n[v.p] + 1 - v.i] - Qe[v.p][v.j + 1], v.p) # either chain or insert into heap
+         elseif v.j == k[v.p]
+            s[v.p] += 1
+            push!(reuse, xn)
+         end  
+      end
+      if qc != 0
+         div_flag = false
+         for w = 1:len
+            d1, texp = divides(maxn - b[w].exps[n[w]], exp, mask)
+            if d1
+               d2, tq = divides(qc, mb[w])
+               if d2
+                  div_flag = true
+                  k[w] += 1
+                  if k[w] > q_alloc[w]
+                     q_alloc[w] *= 2
+                     resize!(Qc[w], q_alloc[w])
+                     resize!(Qe[w], q_alloc[w])
+                  end
+                  Qc[w][k[w]] = tq
+                  Qe[w][k[w]] = texp
+                  for i = 2:s[w]
+                     if !isempty(reuse)
+                        xn = pop!(reuse)
+                        I[xn] = nheap_t(i, k[w], w, 0)
+                        nheapinsert!(H, I, xn, maxn - b[w].exps[n[w] + 1 - i] - Qe[w][k[w]], w) # either chain or insert into heap
+                     else
+                        push!(I, nheap_t(i, k[w], w, 0))
+                        Collections.heappush!(H, heap_s{N}(maxn - b[w].exps[n[w] + 1 - i] - Qe[w][k[w]], length(I)))
+                     end
+                  end                 
+                  s[w] = 1
+                  break
+               end
+            end
+         end
+         if !div_flag
+            l += 1
+            if l >= r_alloc
+               r_alloc *= 2
+               resize!(Rc, r_alloc)
+               resize!(Re, r_alloc)
+            end
+            Rc[l] = -qc
+            Re[l] = maxn - exp
+         end
+      end
+      zero!(qc)
+   end
+   for i = 1:len
+      resize!(Qc[i], k[i])
+      resize!(Qe[i], k[i])
+      reverse!(Qc[i])
+      reverse!(Qe[i])
+   end
+   resize!(Rc, l)
+   resize!(Re, l)
+   reverse!(Rc)
+   reverse!(Re)
+   return [parent(a)(Qc[i], Qe[i]) for i in 1:len], parent(a)(Rc, Re)
+end
+
+function divrem{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::Array{GenMPoly{T, S, N}, 1})
+   v1, d = max_degrees(a)
+   len = length(b)
+   for i = 1:len
+      v2, d2 = max_degrees(b[i])
+      for j = 1:N
+         v1[j] = max(v1[j], v2[j])
+      end
+      d = max(d, d2)
+   end
+   bits = 8
+   max_e = 2^(bits - 1)
+   while d >= max_e
+      bits *= 2
+      max_e = 2^(bits - 1)
+   end
+   maxexp = [ntuple(i -> UInt(v1[i]), Val{N})]
+   word_bits = sizeof(Int)*8
+   k = div(word_bits, bits)
+   if k != 1
+      M = div(N + k - 1, k)
+      e1 = Array(NTuple{M, UInt}, length(a))
+      e2 = [Array(NTuple{M, UInt}, length(b[i])) for i in 1:len]
+      maxn = Array(NTuple{M, UInt}, 1)
+      pack_monomials(maxn, maxexp, k, bits)
+      pack_monomials(e1, a.exps, k, bits)
+      for i = 1:len
+         pack_monomials(e2[i], b[i].exps, k, bits)
+      end
+      par = GenMPolyRing{T, S, M}(base_ring(a), parent(a).S)
+      a1 = par(a.coeffs, e1)
+      a1.length = a.length
+      b1 = [par(b[i].coeffs, e2[i]) for i in 1:len]
+      for i = 1:len
+         b1[i].length = b[i].length
+      end
+      q, r = divrem_monagan_pearce(a1, b1, bits, maxn[1])
+      eq = [Array(NTuple{N, UInt}, length(q[i])) for i in 1:len]
+      for i = 1:len
+         unpack_monomials(eq[i], q[i].exps, k, bits)  
+      end
+      er = Array(NTuple{N, UInt}, length(r))
+      unpack_monomials(er, r.exps, k, bits)  
+   else
+      q, r = divrem_monagan_pearce(a, b, bits, maxn[1])
+      eq = [q[i].exps for i in 1:len]
+      er = r.exps
+   end
+   return [parent(a)(q[i].coeffs, eq[i]) for i in 1:len], parent(a)(r.coeffs, er)
 end
 
 ###############################################################################
