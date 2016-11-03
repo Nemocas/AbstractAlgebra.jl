@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   MPoly.jl : Generic multivariate polynomials over rings
+#   MPoly.jl : Generic sparse distributed multivariate polynomials over rings
 #
 ###############################################################################
 
