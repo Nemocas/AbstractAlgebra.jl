@@ -837,13 +837,13 @@ function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S
          else
             addmul!(Rc[k], a.coeffs[v.i], b.coeffs[v.j], c)
          end
-         if v.j < n
+         if v.j < n || v.j == 1
             push!(Q, x.n)
          end
          while (xn = v.next) != 0
             v = I[xn]
             addmul!(Rc[k], a.coeffs[v.i], b.coeffs[v.j], c)
-            if v.j < n
+            if v.j < n || v.j == 1
                push!(Q, xn)
             end
          end
@@ -855,8 +855,10 @@ function mul_johnson{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S
             push!(I, heap_t(v.i + 1, 1, 0))
             Collections.heappush!(H, heap_s{N}(a.exps[v.i + 1] + b.exps[1], length(I)))       
          end
-         I[xn] = heap_t(v.i, v.j + 1, 0)
-         heapinsert!(H, I, xn, a.exps[v.i] + b.exps[v.j + 1]) # either chain or insert v into heap   
+         if v.j < n
+            I[xn] = heap_t(v.i, v.j + 1, 0)
+            heapinsert!(H, I, xn, a.exps[v.i] + b.exps[v.j + 1]) # either chain or insert v into heap   
+         end
       end
       if Rc[k] == 0
          k -= 1
@@ -1463,6 +1465,12 @@ function divexact{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N
    d == false && error("Not an exact division in divexact")
    return q
 end
+
+###############################################################################
+#
+#   Euclidean division
+#
+###############################################################################
 
 function divrem_monagan_pearce{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N}, bits::Int, maxn::NTuple{N, UInt})
    par = parent(a)
