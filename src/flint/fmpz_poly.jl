@@ -385,7 +385,7 @@ divexact(x::fmpz_poly, y::Integer) = divexact(x, fmpz(y))
 function pseudorem(x::fmpz_poly, y::fmpz_poly)
    check_parent(x, y)
    y == 0 && throw(DivideError())
-   diff = length(x) - length(y)
+   diff = length(x) - length(y) + 1
    r = parent(x)()
    d = Array(Int, 1)
    ccall((:fmpz_poly_pseudo_rem, :libflint), Void, 
@@ -400,7 +400,7 @@ end
 function pseudodivrem(x::fmpz_poly, y::fmpz_poly)
    check_parent(x, y)
    y == 0 && throw(DivideError())
-   diff = length(x) - length(y)
+   diff = length(x) - length(y) + 1
    q = parent(x)()
    r = parent(x)()
    d = Array(Int, 1)

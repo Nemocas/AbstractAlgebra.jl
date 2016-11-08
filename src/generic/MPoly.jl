@@ -1454,19 +1454,23 @@ function divrem_monagan_pearce{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::Gen
                Rc[l] = -tr
                Re[l] = maxn - exp 
             end
-            Qc[k] = tq
-            Qe[k] = texp
-            for i = 2:s
-               if !isempty(reuse)
-                  xn = pop!(reuse)
-                  I[xn] = heap_t(i, k, 0)
-                  heapinsert!(H, I, xn, maxn - b.exps[n + 1 - i] - Qe[k]) # either chain or insert into heap
-               else
-                  push!(I, heap_t(i, k, 0))
-                  Collections.heappush!(H, heap_s{N}(maxn - b.exps[n + 1 - i] - Qe[k], length(I)))
-               end
-            end                 
-            s = 1
+            if tq != 0
+               Qc[k] = tq
+               Qe[k] = texp
+               for i = 2:s
+                  if !isempty(reuse)
+                     xn = pop!(reuse)
+                     I[xn] = heap_t(i, k, 0)
+                     heapinsert!(H, I, xn, maxn - b.exps[n + 1 - i] - Qe[k]) # either chain or insert into heap
+                  else
+                     push!(I, heap_t(i, k, 0))
+                     Collections.heappush!(H, heap_s{N}(maxn - b.exps[n + 1 - i] - Qe[k], length(I)))
+                  end
+               end                 
+               s = 1
+            else
+               k -= 1
+            end
          end
       end
       zero!(qc)
