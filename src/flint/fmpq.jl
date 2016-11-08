@@ -398,6 +398,13 @@ function divexact(a::fmpq, b::fmpq)
    return z
 end
 
+div(a::fmpq, b::fmpq) = divexact(a, b)
+
+function rem(a::fmpq, b::fmpq)
+   b == 0 && throw("Divide by zero in rem")
+   return fmpq(0)
+end
+
 ###############################################################################
 #
 #   Ad hoc exact division

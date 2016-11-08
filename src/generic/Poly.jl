@@ -242,7 +242,7 @@ needs_parentheses(x::PolyElem) = length(x) > 1
 
 is_negative(x::PolyElem) = length(x) <= 1 && is_negative(coeff(x, 0))
 
-show_minus_one{T <: RingElem}(::Type{PolyElem{T}}) = show_minus_one(T)
+show_minus_one{T <: RingElem}(::Type{GenPoly{T}}) = show_minus_one(T)
 
 ###############################################################################
 #
@@ -1176,12 +1176,14 @@ doc"""
 function pseudorem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    check_parent(f, g)
    g == 0 && throw(DivideError())
+   k = length(f) - length(g) + 1
    b = coeff(g, length(g) - 1)
    x = gen(parent(f))
    while length(f) >= length(g)
       f = f*b - shift_left(coeff(f, length(f) - 1)*g, length(f) - length(g))
+      k -= 1
    end
-   return f
+   return f*b^k
 end
 
 doc"""
@@ -1196,6 +1198,7 @@ function pseudodivrem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
       return zero(parent(f)), f
    end
    lenq = length(f) - length(g) + 1
+   k = lenq
    q = parent(f)()
    fit!(q, lenq)
    b = coeff(g, length(g) - 1)
@@ -1206,12 +1209,14 @@ function pseudodivrem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
       end
       setcoeff!(q, length(f) - length(g), coeff(f, length(f) - 1))
       f = f*b - shift_left(coeff(f, length(f) - 1)*g, length(f) - length(g))
+      k -= 1
    end
    while lenq > 0 && coeff(q, lenq - 1) == 0
       lenq -= 1
    end
    set_length!(q, lenq)
-   return q, f
+   s = b^k
+   return q*s, f*s
 end
 
 ###############################################################################

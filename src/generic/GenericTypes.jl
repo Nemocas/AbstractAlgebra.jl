@@ -145,9 +145,11 @@ end
 #
 ###############################################################################
 
+abstract MPolyElem{T} <: RingElem
+
 const GenSRPolyID = ObjectIdDict()
 
-type GenSRPolyRing{T <: RingElem} <: PolyRing{T}
+type GenSRPolyRing{T <: RingElem, K <: RingElem} <: Ring
    base_ring::Ring
    S::Symbol
    num_vars::Int
@@ -165,7 +167,7 @@ type GenSRPolyRing{T <: RingElem} <: PolyRing{T}
    end
 end
 
-type GenSRPoly{T <: RingElem} <: PolyElem{T}
+type GenSRPoly{T <: RingElem, K <: RingElem} <: RingElem
    coeffs::Array{T, 1}
    exps::Array{UInt}
    length::Int
