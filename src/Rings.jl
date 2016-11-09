@@ -268,6 +268,8 @@ include("generic/MPoly.jl")
 
 include("generic/SRPoly.jl")
 
+include("generic/SparsePoly.jl")
+
 include("generic/RelSeries.jl")
 
 include("flint/fmpz_rel_series.jl")
