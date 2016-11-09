@@ -145,8 +145,6 @@ end
 #
 ###############################################################################
 
-abstract MPolyElem{T} <: RingElem
-
 const GenSRPolyID = ObjectIdDict()
 
 type GenSRPolyRing{T <: RingElem, K <: RingElem} <: Ring
@@ -178,6 +176,46 @@ type GenSRPoly{T <: RingElem, K <: RingElem} <: RingElem
    GenSRPoly(a::Array{T, 1}, b::Array{UInt, 1}) = new(a, b, length(a))
 
    GenSRPoly(a::T) = a == 0 ? new(Array(T, 0), Array(UInt, 0), 0) : 
+                                      new([a], [UInt(0)], 1)
+end
+
+###############################################################################
+#
+#   GenSparsePolyRing / GenSparsePoly
+#
+###############################################################################
+
+const GenSparsePolyID = ObjectIdDict()
+
+type GenSparsePolyRing{T <: RingElem} <: Ring
+   base_ring::Ring
+   S::Symbol
+   num_vars::Int
+
+   function GenSparsePolyRing(R::Ring, s::Symbol, cached=true)
+      if haskey(GenSparsePolyID, (R, s))
+         return GenSparsePolyID[R, s]::GenSparsePolyRing{T}
+      else 
+         z = new(R, s)
+         if cached
+           GenSparsePolyID[R, s] = z
+         end
+         return z
+      end
+   end
+end
+
+type GenSparsePoly{T <: RingElem} <: RingElem
+   coeffs::Array{T, 1}
+   exps::Array{UInt}
+   length::Int
+   parent::GenSparsePolyRing{T}
+
+   GenSparsePoly() = new(Array(T, 0), Array(UInt, 0), 0)
+   
+   GenSparsePoly(a::Array{T, 1}, b::Array{UInt, 1}) = new(a, b, length(a))
+
+   GenSparsePoly(a::T) = a == 0 ? new(Array(T, 0), Array(UInt, 0), 0) : 
                                       new([a], [UInt(0)], 1)
 end
 
