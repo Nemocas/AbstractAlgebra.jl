@@ -881,14 +881,13 @@ function divides_monagan_pearce{T <: RingElem, K <: RingElem}(a::GenSRPoly{T, K}
          resize!(Qe, q_alloc)
       end
       first = true
+      d1 = false
       @inbounds while !isempty(H) && H[1].exp == exp
          x = H[1]
          heappop!(H)
          v = I[x.n]
          if first
-            if exp < b.exps[1]
-               return false, par()
-            end
+            d1 = exp >= b.exps[1]
             Qe[k] = exp - b.exps[1]
             first = false
          end
@@ -934,7 +933,7 @@ function divides_monagan_pearce{T <: RingElem, K <: RingElem}(a::GenSRPoly{T, K}
          k -= 1
       else
          d2, Qc[k] = divides(qc, mb)
-         if !d2
+         if !d1 || !d2
              return false, par()
          end
          for i = 2:s
