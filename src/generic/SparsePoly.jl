@@ -58,6 +58,15 @@ base_ring{T <: RingElem}(R::GenSparsePolyRing{T}) = R.base_ring::parent_type(T)
 
 parent(a::GenSparsePoly) = a.parent
 
+function deepcopy{T <: RingElem}(a::GenSparsePoly{T})
+   Re = deepcopy(a.exps)
+   Rc = Array(T, a.length)
+   for i = 1:a.length
+      Rc[i] = deepcopy(a.coeffs[i])
+   end
+   return parent(a)(Rc, Re)
+end
+
 ###############################################################################
 #
 #   String I/O
@@ -856,14 +865,13 @@ function divides_monagan_pearce{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparse
          resize!(Qe, q_alloc)
       end
       first = true
+      d1 = false
       @inbounds while !isempty(H) && H[1].exp == exp
          x = H[1]
          heappop!(H)
          v = I[x.n]
          if first
-            if exp < b.exps[1]
-               return false, par()
-            end
+            d1 = exp >= b.exps[1]
             Qe[k] = exp - b.exps[1]
             first = false
          end
@@ -909,7 +917,7 @@ function divides_monagan_pearce{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparse
          k -= 1
       else
          d2, Qc[k] = divides(qc, mb)
-         if !d2
+         if !d1 || !d2
              return false, par()
          end
          for i = 2:s
@@ -1341,7 +1349,7 @@ function pseudorem{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T})
    n = length(b)
    n == 0 && throw(DivideError())
    if a.exps[a.length] < b.exps[b.length]
-      return a
+      return deepcopy(a)
    end
    if n > 30
       return pseudorem_monagan_pearce(a, b)
@@ -1368,16 +1376,16 @@ function gcd{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T})
       (a, b) = (b, a)
    end
    if b == 0
-      return a
+      return deepcopy(a)
    end
    if b == 1
-      return b
+      return deepcopy(b)
    end
-   #c1 = content(a)
-   #c2 = content(b)
-   #c = gcd(c1, c2)
-   #a = divexact(a, c1)
-   #b = divexact(b, c2)
+   c1 = content(a)
+   c2 = content(b)
+   c = gcd(c1, c2)
+   a = divexact(a, c1)
+   b = divexact(b, c2)
    g = one(base_ring(a))
    h = one(base_ring(a))
    while true
@@ -1386,7 +1394,7 @@ function gcd{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T})
       if r == 0
          break
       end
-      if isone(r)
+      if r.length == 1 && r.exps[1] == 0
          b = one(parent(a))
          break
       end
@@ -1398,13 +1406,16 @@ function gcd{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T})
          h = h^(1 - d)*g^d
       end
    end
-   return b #c*primpart(b)
+   return c*primpart(b)
 end
 
 function content{T <: RingElem}(a::GenSparsePoly{T})
    z = coeff(a, 0)
    for i = 2:length(a)
-      z = gcd(z, coeff(a, i - 1))
+      if z == 1
+         break
+      end
+      z = gcd(coeff(a, i - 1), z)
    end
    return z
 end

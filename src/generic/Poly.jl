@@ -1240,9 +1240,11 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    if b == 1
       return b
    end
-   c = gcd(content(a), content(b))
-   a = divexact(a, c)
-   b = divexact(b, c)
+   c1 = content(a)
+   c2 = content(b)
+   a = divexact(a, c1)
+   b = divexact(b, c2)
+   c = gcd(c1, c2)
    g = one(parent(a))
    h = one(parent(a))
    while true

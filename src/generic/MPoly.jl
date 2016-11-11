@@ -4,7 +4,8 @@
 #
 ###############################################################################
 
-export GenMPoly, GenMPolyRing, max_degrees, gens, divides
+export GenMPoly, GenMPolyRing, max_degrees, gens, divides,
+       main_variable_extract, main_variable_insert
 
 export NewInt
 
@@ -114,6 +115,24 @@ end
 
 zero{N}(::Type{NTuple{N, UInt}}) = ntuple(i -> 0, Val{N})
 
+function iszero{N}(a::NTuple{N, UInt})
+   for i = 1:N
+      if a[i] != UInt(0)
+         return false
+      end
+   end
+   return true
+end
+
+function =={N}(a::NTuple{N, UInt}, b::NTuple{N, UInt})
+   for i = 1:N
+      if a[i] != b[i]
+         return false
+      end
+   end
+   return true
+end
+
 function +{N}(a::NTuple{N, UInt}, b::NTuple{N, UInt})
    return ntuple(i -> a[i] + b[i], Val{N})
 end
@@ -177,13 +196,28 @@ function coeff(x::GenMPoly, i::Int)
    return x.coeffs[i + 1]
 end
 
+length(x::GenMPoly) = x.length
+
 num_vars(x::GenMPoly) = parent(x).num_vars
+
+isone(x::GenMPoly) = x.length == 1 && iszero(x.exps[1]) && x.coeffs[1] == 1
+
+iszero(x::GenMPoly) = x.length == 0
 
 function normalise(a::GenMPoly, n::Int)
    while n > 0 && iszero(a.coeffs[n]) 
       n -= 1
    end
    return n
+end
+
+function deepcopy{T <: RingElem, S, N}(a::GenMPoly{T, S, N})
+   Re = deepcopy(a.exps)
+   Rc = Array(T, a.length)
+   for i = 1:a.length
+      Rc[i] = deepcopy(a.coeffs[i])
+   end
+   return parent(a)(Rc, Re)
 end
 
 ###############################################################################
@@ -268,6 +302,8 @@ function show(io::IO, p::GenMPolyRing)
    print(io, " over ")
    show(io, base_ring(p))
 end
+
+show_minus_one{T <: RingElem, S, N}(::Type{GenMPoly{T, S, N}}) = show_minus_one(T)
 
 ###############################################################################
 #
@@ -980,6 +1016,57 @@ end
 
 ###############################################################################
 #
+#   Comparison functions
+#
+###############################################################################
+
+function =={T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
+   if a.length != b.length
+      return false
+   end
+   for i = 1:a.length
+      if a.exps[i] != b.exps[i] || a.coeffs[i] != b.coeffs[i]
+         return false
+      end
+   end
+   return true
+end
+
+###############################################################################
+#
+#   Ad hoc comparison functions
+#
+###############################################################################
+
+function =={T <: RingElem, S, N}(a::GenMPoly{T, S, N}, n::Integer)
+   if n == 0
+      return a.length == 0
+   elseif a.length == 1
+      return a.coeffs[1] == n && iszero(a.exps[1])
+   end
+   return false
+end
+
+function =={T <: RingElem, S, N}(a::GenMPoly{T, S, N}, n::fmpz)
+   if n == 0
+      return a.length == 0
+   elseif a.length == 1
+      return a.coeffs[1] == n && iszero(a.exps[1])
+   end
+   return false
+end
+
+function =={T <: RingElem, S, N}(a::GenMPoly{T, S, N}, n::T)
+   if n == 0
+      return a.length == 0
+   elseif a.length == 1
+      return a.coeffs[1] == n && iszero(a.exps[1])
+   end
+   return false
+end
+
+###############################################################################
+#
 #   Powering
 #
 ###############################################################################
@@ -1224,15 +1311,13 @@ function divides_monagan_pearce{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::Ge
          resize!(Qe, q_alloc)
       end
       first = true
+      d1 = false
       @inbounds while !isempty(H) && H[1].exp == exp
          x = H[1]
          heappop!(H)
          v = I[x.n]
          if first
             d1, Qe[k] = divides(exp, b.exps[1], mask)
-            if !d1
-               return false, par()
-            end
             first = false
          end
          if v.i == 0
@@ -1277,7 +1362,7 @@ function divides_monagan_pearce{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::Ge
          k -= 1
       else
          d2, Qc[k] = divides(qc, mb)
-         if !d2
+         if !d1 || !d2
              return false, par()
          end
          for i = 2:s
@@ -1716,9 +1801,156 @@ end
 
 ###############################################################################
 #
+#   GCD
+#
+###############################################################################
+
+function gcd{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
+   if a.length == 0
+      return b
+   elseif b.length == 0
+      return a
+   end
+   flag = false
+   if a == 1
+      return deepcopy(a)
+   end
+   if b == 1
+      return deepcopy(b)
+   end
+   k1, p1 = main_variable_extract(a)
+   k2, p2 = main_variable_extract(b)
+   if k1 < k2
+      k1, k2 = k2, k1
+      p1, p2 = p2, p1
+      a, b = b, a
+   end
+   if k2 == 0
+      if k1 == 0
+         return parent(a)(gcd(a.coeffs[1], b.coeffs[1]))
+      else
+         return gcd(content(p1), b)
+      end
+   end
+   if k1 != k2
+      return gcd(a, content(p2))
+   end
+   g = gcd(p1, p2)
+   return main_variable_insert(g, k1)
+end
+
+###############################################################################
+#
+#   Conversions
+#
+###############################################################################
+
+# determine the number of the first variable for which there is a nonzero exp
+# we start at variable k
+function main_variable{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, k::Int)
+   for i = k:N
+      for j = 1:a.length
+         if a.exps[j][i] != 0
+            return i
+         end
+      end
+   end
+   return 0
+end
+
+# return an array of all the starting positions of terms in the main variable
+function main_variable_terms{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, k::Int, ::Type{Val{:lex}})
+   A = Array(Int, 0)
+   current_term = typemax(UInt)
+   for i = 1:a.length
+      if a.exps[i][k] != current_term
+         push!(A, i)
+         current_term = a.exps[i][k]
+      end
+   end
+   return A
+end
+
+# return the coefficient as a sparse distributed polynomial, of the term in variable
+# k starting at position n 
+function main_variable_coefficient{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, k::Int, n::Int, ::Type{Val{:lex}})
+   exp = a.exps[n][k]
+   Ae = Array(NTuple{N, UInt}, 0)
+   Ac = Array(T, 0)
+   for i = n:a.length
+      if a.exps[i][k] != exp
+         break
+      end
+      push!(Ae, ntuple(j -> j == k ? UInt(0) : a.exps[i][j], Val{N}))
+      push!(Ac, a.coeffs[i])
+   end
+   return parent(a)(Ac, Ae)
+end
+
+function main_variable_extract{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, ::Type{Val{:lex}})
+   k = main_variable(a, 1)
+   if k != 0
+      A = main_variable_terms(a, k, Val{:lex})
+      Pe = Array(UInt, length(A))
+      Pc = Array(GenMPoly{T, :lex, N}, length(A))
+      for i = 1:length(A)
+         Pe[i] = a.exps[A[i]][k]
+         Pc[i] = main_variable_coefficient(a, k, A[i], Val{:lex})
+      end
+      sym = parent(a).S[k]
+      R = GenSparsePolyRing{GenMPoly{T, :lex, N}}(parent(a), sym, true)
+      return k, R(Pc, Pe)
+   end
+   return 0, GenSparsePolyRing{GenMPoly{T, :lex, N}}(parent(a), Symbol(""), true)()
+end
+
+function main_variable_extract{T <: RingElem, S, N}(a::GenMPoly{T, S, N})
+   return main_variable_extract(a, Val{S})
+end
+
+function main_variable_insert{T <: RingElem, S, N}(a::GenSparsePoly{GenMPoly{T, S, N}}, k::Int, ::Type{Val{:lex}})
+   len = 0
+   for i = 1:length(a)
+      len += length(a.coeffs[i])
+   end
+   Pe = Array(NTuple{N, UInt}, len)
+   Pc = Array(T, len)
+   l = 1
+   for i = 1:length(a)
+      for j = 1:a.coeffs[i].length
+         Pe[l] = ntuple(m -> m == k ? a.exps[i] : a.coeffs[i].exps[j][m], Val{N})
+         Pc[l] = a.coeffs[i].coeffs[j]
+         l += 1
+      end
+   end
+   return base_ring(a)(Pc, Pe)
+end
+
+function main_variable_insert{T <: RingElem, S, N}(a::GenSparsePoly{GenMPoly{T, S, N}}, k::Int)
+   return main_variable_insert(a, k, Val{S})
+end
+
+###############################################################################
+#
 #   Unsafe functions
 #
 ###############################################################################
+
+function mul!{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N}, c::GenMPoly{T, S, N})
+   t = b*c
+   a.coeffs = t.coeffs
+   a.exps = t.exps
+   a.length = t.length
+   return
+end
+
+function addeq!{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
+   t = a + b
+   a.coeffs = t.coeffs
+   a.exps = t.exps
+   a.length = t.length
+   return
+end
 
 function fit!{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, n::Int)
    if length(a.coeffs) < n
