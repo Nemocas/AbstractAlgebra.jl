@@ -45,6 +45,8 @@ length(x::GenSparsePoly) = x.length
 
 lead(x::GenSparsePoly) = x.length == 0 ? base_ring(x)() : x.coeffs[x.length]
 
+trail(x::GenSparsePoly) = x.length == 0 ? base_ring(x)() : x.coeffs[1]
+
 function normalise(a::GenSparsePoly, n::Int)
    while n > 0 && iszero(a.coeffs[n]) 
       n -= 1
@@ -988,6 +990,18 @@ end
 #
 ###############################################################################
 
+function divides{T <: RingElem}(a::GenSparsePoly{T}, b::T)
+   len = a.length
+   Qc = Array(T, len)
+   for i = 1:len
+      flag, Qc[i] = divides(a.coeffs[i], b)
+      if !flag
+         return false, parent(a)()
+      end
+   end
+   return true, parent(a)(Qc, a.exps)
+end
+
 function divexact{T <: RingElem}(a::GenSparsePoly{T}, b::T)
    len = length(a)
    exps = deepcopy(a.exps)
@@ -1386,6 +1400,10 @@ function gcd{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T})
    c = gcd(c1, c2)
    a = divexact(a, c1)
    b = divexact(b, c2)
+   lead_monomial = lead(a).length == 1 || lead(b).length == 1
+   trail_monomial = trail(a).length == 1 || trail(b).length == 1
+   lead_a = lead(a)
+   lead_b = lead(b)
    g = one(base_ring(a))
    h = one(base_ring(a))
    while true
@@ -1406,6 +1424,39 @@ function gcd{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T})
          h = h^(1 - d)*g^d
       end
    end
+   # remove content from b as cheaply as possible
+   if lead(b).length != 1 && trail(b).length != 1
+      if lead_monomial # lead term monomial, so content contains rest
+         d = divexact(lead(b), term_content(lead(b)))
+         b = divexact(b, d)
+      elseif trail_monomial # trail term is monomial, so ditto
+         d = divexact(trail(b), term_content(trail(b)))
+         b = divexact(b, d)
+      else 
+         glead = gcd(lead_a, lead_b)
+         if glead.length == 1 # gcd of lead coeffs monomial
+            d = divexact(lead(b), term_content(lead(b)))
+            b = divexact(b, d)
+         else # last ditched attempt to find easy content
+            h = gcd(lead(b), glead)
+            h = divexact(h, term_content(h))
+            flag, q = divides(b, h)
+            if flag
+               b = q
+            end
+         end
+      end
+   end
+   # remove any monomial content
+   b1 = term_content(b.coeffs[1])
+   for i = 2:b.length
+      b1 = gcd(b1, term_content(b.coeffs[i]))
+      if isone(b1)
+         break
+      end
+   end
+   b = divexact(b, b1)
+   # remove any stubborn content and put back actual content
    return c*primpart(b)
 end
 
