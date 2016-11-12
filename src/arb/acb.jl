@@ -1496,21 +1496,23 @@ end
 #
 ################################################################################
 
-function call(r::AcbField)
+function (r::AcbField)()
   z = acb()
   z.parent = r
   return z
 end
 
-function call(r::AcbField, x::Union{Int, UInt, fmpz, fmpq, arb, acb, Float64, BigFloat, AbstractString})
+function (r::AcbField)(x::Union{Int, UInt, fmpz, fmpq, arb, acb, Float64,
+                                BigFloat, AbstractString})
   z = acb(x, r.prec)
   z.parent = r
   return z
 end
 
-call(r::AcbField, x::Integer) = r(fmpz(x))
+(r::AcbField)(x::Integer) = r(fmpz(x))
 
-function call{T <: Union{Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString}}(r::AcbField, x::T, y::T)
+function (r::AcbField){T <: Union{Int, UInt, fmpz, fmpq, arb, Float64,
+                                              BigFloat, AbstractString}}(x::T, y::T)
   z = acb(x, y, r.prec)
   z.parent = r
   return z

@@ -52,6 +52,16 @@ function test_fmpq_poly_constructors()
    println("PASS")
 end
 
+function test_fmpq_poly_printing()
+   print("fmpq_poly.printing...")
+ 
+   S, y = PolynomialRing(QQ, "y")
+
+   @test string(y + y^2) == "y^2 + 1*y"
+
+   println("PASS")
+end
+
 function test_fmpq_poly_manipulation()
    print("fmpq_poly.manipulation...")
 
@@ -468,6 +478,7 @@ end
 
 function test_fmpq_poly()
    test_fmpq_poly_constructors()
+   test_fmpq_poly_printing()
    test_fmpq_poly_manipulation()
    test_fmpq_poly_binary_ops()
    test_fmpq_poly_adhoc_binary()

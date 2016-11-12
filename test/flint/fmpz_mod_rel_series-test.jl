@@ -36,6 +36,18 @@ function test_fmpz_mod_rel_series_constructors()
    println("PASS")
 end
 
+function test_fmpz_mod_rel_series_printing()
+   print("fmpz_mod_rel_series.printing...")
+
+   R = ResidueRing(ZZ, 123456789012345678949)
+   S, x = PowerSeriesRing(R, 30, "x")
+   b = x^2 + x + O(x^4)
+
+   @test string(b) == "x^2+x+O(x^4)"
+
+   println("PASS")
+end
+
 function test_fmpz_mod_rel_series_manipulation()
    print("fmpz_mod_rel_series.manipulation...")
 
@@ -335,6 +347,7 @@ end
 
 function test_fmpz_mod_rel_series()
    test_fmpz_mod_rel_series_constructors()
+   test_fmpz_mod_rel_series_printing()
    test_fmpz_mod_rel_series_manipulation()
    test_fmpz_mod_rel_series_unary_ops()
    test_fmpz_mod_rel_series_binary_ops()

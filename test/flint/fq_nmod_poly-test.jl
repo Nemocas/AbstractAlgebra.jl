@@ -55,6 +55,19 @@ function test_fq_nmod_poly_constructors()
    println("PASS")
 end
 
+function test_fq_nmod_poly_printing()
+   print("fq_nmod_poly.printing...")
+ 
+   R, x = FiniteField(23, 5, "x")
+   S, y = PolynomialRing(R, "y")
+
+   f = x^2 + y^3 + 1
+   
+   @test string(f) == "y^3+(x^2+1)"
+
+   println("PASS")
+end
+
 function test_fq_nmod_poly_manipulation()
    print("fq_nmod_poly.manipulation...")
 
@@ -517,6 +530,7 @@ end
 
 function test_fq_nmod_poly()
    test_fq_nmod_poly_constructors()
+   test_fq_nmod_poly_printing()
    test_fq_nmod_poly_manipulation()
    test_fq_nmod_poly_binary_ops()
    test_fq_nmod_poly_adhoc_binary()

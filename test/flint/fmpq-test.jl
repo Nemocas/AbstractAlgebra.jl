@@ -40,6 +40,16 @@ function test_fmpq_constructors()
    println("PASS")
 end
 
+function test_fmpq_printing()
+   print("fmpq.constructors()...")
+
+   a = FlintQQ(1, 2)
+
+   @test string(a) == "1//2"
+   
+   println("PASS")
+end
+
 function test_fmpq_conversions()
    print("fmpq.conversions()...")
 
@@ -323,6 +333,7 @@ end
 
 function test_fmpq()
    test_fmpq_constructors()
+   test_fmpq_printing()
    test_fmpq_conversions()
    test_fmpq_manipulation()
    test_fmpq_unary_ops()

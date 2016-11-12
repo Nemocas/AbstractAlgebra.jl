@@ -564,13 +564,13 @@ end
 #
 ###############################################################################
 
-function call(x::ArbMatSpace)
+function (x::ArbMatSpace)()
   z = arb_mat(x.rows, x.cols)
   z.parent = x
   return z
 end
 
-function call(x::ArbMatSpace, y::fmpz_mat)
+function (x::ArbMatSpace)(y::fmpz_mat)
   (x.cols != cols(y) || x.rows != rows(y)) &&
       error("Dimensions are wrong")
   z = arb_mat(y, prec(x))
@@ -578,18 +578,18 @@ function call(x::ArbMatSpace, y::fmpz_mat)
   return z
 end
 
-function call{T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb,
-                         AbstractString}}(x::ArbMatSpace, y::Array{T, 2})
+function (x::ArbMatSpace){T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat,
+                                     arb, AbstractString}}(y::Array{T, 2})
   (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
   z = arb_mat(x.rows, x.cols, y, prec(x))
   z.parent = x
   return z
 end
 
-call{T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb,
-                AbstractString}}(x::ArbMatSpace, y::Array{T, 1}) = x(y'')
+(x::ArbMatSpace){T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb,
+                AbstractString}}(y::Array{T, 1}) = x(y'')
 
-function call(x::ArbMatSpace, y::Union{Int, UInt, fmpz, fmpq, Float64,
+function (x::ArbMatSpace)(y::Union{Int, UInt, fmpz, fmpq, Float64,
                           BigFloat, arb, AbstractString})
   z = x()
   for i in 1:rows(z)
@@ -604,7 +604,7 @@ function call(x::ArbMatSpace, y::Union{Int, UInt, fmpz, fmpq, Float64,
    return z
 end
 
-call(x::ArbMatSpace, y::arb_mat) = y
+(x::ArbMatSpace)(y::arb_mat) = y
 
 ###############################################################################
 #

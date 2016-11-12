@@ -785,7 +785,7 @@ function transpose(x::MatElem)
    else
       par = MatrixSpace(base_ring(x), cols(x), rows(x))
    end
-   return par(x.entries')
+   return par(permutedims(x.entries, [2, 1]))
 end
 
 ###############################################################################
@@ -2830,7 +2830,7 @@ end
 #
 ###############################################################################
 
-function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::fmpz_mat)
+function (a::GenMatSpace{T}){T <: RingElem}(b::fmpz_mat)
   if a.rows != rows(b) || a.cols != cols(b)
     error("incompatible matrix dimensions")
   end
@@ -2844,11 +2844,11 @@ function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::fmpz_mat)
   return A
 end
 
-function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::RingElem)
+function (a::GenMatSpace{T}){T <: RingElem}(b::RingElem)
    return a(base_ring(a)(b))
 end
 
-function Base.call{T <: RingElem}(a::GenMatSpace{T})
+function (a::GenMatSpace{T}){T <: RingElem}()
    entries = Array(T, a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
@@ -2860,7 +2860,7 @@ function Base.call{T <: RingElem}(a::GenMatSpace{T})
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::Integer)
+function (a::GenMatSpace{T}){T <: RingElem}(b::Integer)
    entries = Array(T, a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
@@ -2876,7 +2876,7 @@ function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::Integer)
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::fmpz)
+function (a::GenMatSpace{T}){T <: RingElem}(b::fmpz)
    entries = Array(T, a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
@@ -2892,7 +2892,7 @@ function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::fmpz)
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::T)
+function (a::GenMatSpace{T}){T <: RingElem}(b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to matrix")
    entries = Array(T, a.rows, a.cols)
    for i = 1:a.rows
@@ -2909,12 +2909,12 @@ function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::T)
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::GenMat{T})
+function (a::GenMatSpace{T}){T <: RingElem}(b::GenMat{T})
    parent(b) != a && error("Unable to coerce matrix")
    return b
 end
 
-function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::Array{T, 2})
+function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 2})
    if length(b) > 0
       parent(b[1, 1]) != base_ring(a) && error("Unable to coerce to matrix")
    end

@@ -99,9 +99,9 @@ function show(io::IO, x::fmpz_mod_rel_series)
       print(io, "0")
    else
       cstr = ccall((:fmpz_poly_get_str_pretty, :libflint), Ptr{UInt8}, 
-        (Ptr{fmpz_mod_rel_series}, Ptr{UInt8}), &x, bytestring(string(var(parent(x)))))
+        (Ptr{fmpz_mod_rel_series}, Ptr{UInt8}), &x, string(var(parent(x))))
 
-      print(io, bytestring(cstr))
+      print(io, unsafe_string(cstr))
 
       ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
    end
@@ -497,14 +497,14 @@ Base.promote_rule(::Type{fmpz_mod_rel_series}, ::Type{GenRes{fmpz}}) = fmpz_mod_
 #
 ###############################################################################
 
-function Base.call(a::FmpzModRelSeriesRing)
+function (a::FmpzModRelSeriesRing)()
    z = fmpz_mod_rel_series(modulus(base_ring(a)))
    z.prec = a.prec_max
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpzModRelSeriesRing, b::Integer)
+function (a::FmpzModRelSeriesRing)(b::Integer)
    if b == 0
       z = fmpz_mod_rel_series(modulus(base_ring(a)))
       z.prec = a.prec_max
@@ -515,7 +515,7 @@ function Base.call(a::FmpzModRelSeriesRing, b::Integer)
    return z
 end
 
-function Base.call(a::FmpzModRelSeriesRing, b::fmpz)
+function (a::FmpzModRelSeriesRing)(b::fmpz)
    if b == 0
       z = fmpz_mod_rel_series(modulus(base_ring(a)))
       z.prec = a.prec_max
@@ -526,7 +526,7 @@ function Base.call(a::FmpzModRelSeriesRing, b::fmpz)
    return z
 end
 
-function Base.call(a::FmpzModRelSeriesRing, b::GenRes{fmpz})
+function (a::FmpzModRelSeriesRing)(b::GenRes{fmpz})
    if b == 0
       z = fmpz_mod_rel_series(modulus(base_ring(a)))
       z.prec = a.prec_max
@@ -537,18 +537,18 @@ function Base.call(a::FmpzModRelSeriesRing, b::GenRes{fmpz})
    return z
 end
 
-function Base.call(a::FmpzModRelSeriesRing, b::fmpz_mod_rel_series)
+function (a::FmpzModRelSeriesRing)(b::fmpz_mod_rel_series)
    parent(b) != a && error("Unable to coerce power series")
    return b
 end
 
-function Base.call(a::FmpzModRelSeriesRing, b::Array{fmpz, 1}, len::Int, prec::Int)
+function (a::FmpzModRelSeriesRing)(b::Array{fmpz, 1}, len::Int, prec::Int)
    z = fmpz_mod_rel_series(modulus(base_ring(a)), b, len, prec)
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpzModRelSeriesRing, b::Array{GenRes{fmpz}, 1}, len::Int, prec::Int)
+function (a::FmpzModRelSeriesRing)(b::Array{GenRes{fmpz}, 1}, len::Int, prec::Int)
    z = fmpz_mod_rel_series(modulus(base_ring(a)), b, len, prec)
    z.parent = a
    return z

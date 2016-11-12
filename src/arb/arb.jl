@@ -115,7 +115,7 @@ function show(io::IO, x::arb)
   d = ceil(parent(x).prec * 0.30102999566398119521)
   cstr = ccall((:arb_get_str, :libarb), Ptr{UInt8}, (Ptr{arb}, Int, UInt),
                                                   &x, Int(d), UInt(0))
-  print(io, bytestring(cstr))
+  print(io, unsafe_string(cstr))
   ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
 end
 
@@ -1657,7 +1657,7 @@ for (typeofx, passtoc) in ((arb, Ref{arb}), (Ptr{arb}, Ptr{arb}))
     end
 
     function _arb_set(x::($typeofx), y::AbstractString, p::Int)
-      s = bytestring(y)
+      s = string(y)
       err = ccall((:arb_set_str, :libarb), Int32,
                   (($passtoc), Ptr{UInt8}, Int), x, s, p)
       err == 0 || error("Invalid real string: $(repr(s))")
@@ -1691,33 +1691,33 @@ end
 #
 ################################################################################
 
-function call(r::ArbField)
+function (r::ArbField)()
   z = arb()
   z.parent = r
   return z
 end
 
-function call(r::ArbField, x::Int)
+function (r::ArbField)(x::Int)
   z = arb(fmpz(x), r.prec)
   z.parent = r
   return z
 end
 
-function call(r::ArbField, x::UInt)
+function (r::ArbField)(x::UInt)
   z = arb(fmpz(x), r.prec)
   z.parent = r
   return z
 end
 
-function call(r::ArbField, x::fmpz)
+function (r::ArbField)(x::fmpz)
   z = arb(x, r.prec)
   z.parent = r
   return z
 end
 
-call(r::ArbField, x::Integer) = r(fmpz(x))
+(r::ArbField)(x::Integer) = r(fmpz(x))
 
-function call(r::ArbField, x::fmpq)
+function (r::ArbField)(x::fmpq)
   z = arb(x, r.prec)
   z.parent = r
   return z
@@ -1729,25 +1729,25 @@ end
 #  return z
 #end
 
-function call(r::ArbField, x::Float64)
+function (r::ArbField)(x::Float64)
   z = arb(x, r.prec)
   z.parent = r
   return z
 end
 
-function call(r::ArbField, x::arb)
+function (r::ArbField)(x::arb)
   z = arb(x, r.prec)
   z.parent = r
   return z
 end
 
-function call(r::ArbField, x::AbstractString)
+function (r::ArbField)(x::AbstractString)
   z = arb(x, r.prec)
   z.parent = r
   return z
 end
 
-function call(r::ArbField, x::Irrational)
+function (r::ArbField)(x::Irrational)
   if x == pi
     return const_pi(r)
   elseif x == e
@@ -1757,7 +1757,7 @@ function call(r::ArbField, x::Irrational)
   end
 end
 
-function call(r::ArbField, x::BigFloat)
+function (r::ArbField)(x::BigFloat)
   z = arb(x, r.prec)
   z.parent = r
   return z

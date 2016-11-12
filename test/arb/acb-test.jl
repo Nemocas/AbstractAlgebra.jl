@@ -13,6 +13,16 @@ function test_acb_constructors()
    println("PASS")
 end
 
+function test_acb_printing()
+   print("acb.printing()...")
+
+   a = CC(1) + onei(CC)
+
+   @test string(a) == "1.0000000000000000000 + i*1.0000000000000000000"
+
+   println("PASS")
+end
+
 function test_acb_basic_ops()
    print("acb.basic_ops()...")
 
@@ -423,6 +433,7 @@ end
 
 function test_acb()
    test_acb_constructors()
+   test_acb_printing()
    test_acb_basic_ops()
    test_acb_comparison()
    test_acb_predicates()

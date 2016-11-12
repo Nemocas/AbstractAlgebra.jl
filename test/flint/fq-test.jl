@@ -31,6 +31,18 @@ function test_fq_constructors()
    println("PASS")
 end
 
+function test_fq_printing()
+   print("fq.printing()...")
+
+   R, x = FiniteField(fmpz(7), 5, "x")
+
+   a = 3x^4 + 2x^3 + 4x^2 + x + 1
+
+   @test string(a) == "3*x^4+2*x^3+4*x^2+x+1"
+
+   println("PASS")
+end
+
 function test_fq_manipulation()
    print("fq.manipulation()...")
 
@@ -205,6 +217,7 @@ end
 
 function test_fq()
    test_fq_constructors()
+   test_fq_printing()
    test_fq_manipulation()
    test_fq_unary_ops()
    test_fq_binary_ops()

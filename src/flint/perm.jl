@@ -161,20 +161,20 @@ end
 #
 ###############################################################################
 
-function Base.call(R::FlintPermGroup)
+function (R::FlintPermGroup)()
    z = perm(R.n)
    z.parent = R
    return z
 end
 
-function Base.call(R::FlintPermGroup, a::Array{Int, 1})
+function (R::FlintPermGroup)(a::Array{Int, 1})
    length(a) != R.n && error("Unable to coerce to permutation")
    z = perm(a)
    z.parent = R
    return z
 end
 
-function Base.call(R::FlintPermGroup, a::perm)
+function (R::FlintPermGroup)(a::perm)
    parent(a) != R && error("Unable to coerce to permutation")
    return a
 end

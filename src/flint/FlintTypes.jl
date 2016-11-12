@@ -623,7 +623,7 @@ type FqNmodFiniteField <: FinField
          d = new()
          ccall((:fq_nmod_ctx_init, :libflint), Void, 
                (Ptr{FqNmodFiniteField}, Ptr{fmpz}, Int, Ptr{UInt8}), 
-			    &d, &c, deg, bytestring(string(s)))
+			    &d, &c, deg, string(s))
          FqNmodFiniteFieldID[c, deg, s] = d
          finalizer(d, _FqNmodFiniteField_clear_fn)
          return d
@@ -637,7 +637,7 @@ type FqNmodFiniteField <: FinField
          z = new()
          ccall((:fq_nmod_ctx_init_modulus, :libflint), Void, 
             (Ptr{FqNmodFiniteField}, Ptr{nmod_poly}, Ptr{UInt8}), 
-	      &z, &f, bytestring(string(s)))
+	      &z, &f, string(s))
          FqNmodFiniteFieldIDPol[parent(f), f, s] = z
          finalizer(z, _FqNmodFiniteField_clear_fn)
          return z
@@ -737,7 +737,7 @@ type FqFiniteField <: FinField
          finalizer(d, _FqFiniteField_clear_fn)
          ccall((:fq_ctx_init, :libflint), Void,
                (Ptr{FqFiniteField}, Ptr{fmpz}, Int, Ptr{UInt8}),
-                  &d, &char, deg, bytestring(string(s)))
+                  &d, &char, deg, string(s))
          return d
       end
    end
@@ -749,7 +749,7 @@ type FqFiniteField <: FinField
          z = new()
          ccall((:fq_ctx_init_modulus, :libflint), Void,
                (Ptr{FqFiniteField}, Ptr{fmpz_mod_poly}, Ptr{UInt8}),
-                  &z, &f, bytestring(string(s)))
+                  &z, &f, string(s))
          FqFiniteFieldIDPol[f, s] = z
          finalizer(z, _FqFiniteField_clear_fn)
          return z

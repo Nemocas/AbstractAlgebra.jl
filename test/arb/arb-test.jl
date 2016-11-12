@@ -12,6 +12,16 @@ function test_arb_constructors()
    println("PASS")
 end
 
+function test_arb_printing()
+   print("arb.printing()...")
+
+   a = RR(2)
+
+   @test string(a) == "2.0000000000000000000"
+
+   println("PASS")
+end
+
 function test_arb_basic_ops()
    print("arb.basic_ops()...")
 
@@ -530,6 +540,7 @@ end
 
 function test_arb()
    test_arb_constructors()
+   test_arb_printing()
    test_arb_basic_ops()
    test_arb_comparison()
    test_arb_adhoc_comparison()

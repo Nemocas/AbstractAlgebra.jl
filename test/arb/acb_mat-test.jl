@@ -48,6 +48,17 @@ function test_acb_mat_constructors()
    println("PASS")
 end
 
+function test_acb_mat_printing()
+   print("acb_mat.constructors...")
+ 
+   S = MatrixSpace(CC, 3, 3)
+   f = S(fmpz(3))
+
+   @test string(f) == "[3.0000000000000000000 + i*0 0 + i*0 0 + i*0]\n[0 + i*0 3.0000000000000000000 + i*0 0 + i*0]\n[0 + i*0 0 + i*0 3.0000000000000000000 + i*0]"
+
+   println("PASS")
+end
+
 function test_acb_mat_manipulation()
    print("acb_mat.manipulation...")
 
@@ -404,6 +415,7 @@ end
 
 function test_acb_mat()
    test_acb_mat_constructors()
+   test_acb_mat_printing()
    test_acb_mat_manipulation()
    test_acb_mat_unary_ops()
    test_acb_mat_transpose()

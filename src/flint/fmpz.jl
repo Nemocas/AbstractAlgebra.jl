@@ -1173,7 +1173,7 @@ doc"""
 > Windows 64.
 """
 function numpart(x::Int) 
-   if (@windows? true : false) && Int == Int64
+   if (is_windows() ? true : false) && Int == Int64
       error("not yet supported on win64")
    end
    x < 0 && throw(DomainError())
@@ -1189,7 +1189,7 @@ doc"""
 > Windows 64.
 """
 function numpart(x::fmpz) 
-   if (@windows? true : false) && Int == Int64
+   if (is_windows() ? true : false) && Int == Int64
       error("not yet supported on win64")
    end
    x < 0 && throw(DomainError())
@@ -1237,7 +1237,7 @@ function base(n::fmpz, b::Integer)
     2 <= b <= 62 || error("invalid base: $b")
     p = ccall((:fmpz_get_str,:libflint), Ptr{UInt8}, 
               (Ptr{UInt8}, Cint, Ptr{fmpz}), C_NULL, b, &n)
-    s = bytestring(p)
+    s = unsafe_string(p)
     ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), p)
     return s
 end
@@ -1360,36 +1360,36 @@ end
 #
 ###############################################################################
 
-call(::FlintIntegerRing) = fmpz()
+(::FlintIntegerRing)() = fmpz()
 
-call(::FlintIntegerRing, a::Integer) = fmpz(a)
+(::FlintIntegerRing)(a::Integer) = fmpz(a)
 
-call(::FlintIntegerRing, a::AbstractString{}) = fmpz(a)
+(::FlintIntegerRing)(a::AbstractString{}) = fmpz(a)
 
-call(::FlintIntegerRing, a::fmpz) = a
+(::FlintIntegerRing)(a::fmpz) = a
 
-call(::FlintIntegerRing, a::Float64) = fmpz(a)
+(::FlintIntegerRing)(a::Float64) = fmpz(a)
 
-call(::FlintIntegerRing, a::Float32) = fmpz(Float64(a))
+(::FlintIntegerRing)(a::Float32) = fmpz(Float64(a))
 
-call(::FlintIntegerRing, a::Float16) = fmpz(Float64(a))
+(::FlintIntegerRing)(a::Float16) = fmpz(Float64(a))
 
-call(::FlintIntegerRing, a::BigFloat) = fmpz(BigInt(a))
+(::FlintIntegerRing)(a::BigFloat) = fmpz(BigInt(a))
 
 ###############################################################################
 #
-#   AbstractString{} parser
+#   String parser
 #
 ###############################################################################
 
-function parseint(::Type{fmpz}, s::AbstractString{}, base::Int = 10)
-    s = bytestring(s)
+function parse(::Type{fmpz}, s::String, base::Int = 10)
+    s = string(s)
     sgn = s[1] == '-' ? -1 : 1
     i = 1 + (sgn == -1)
     z = fmpz()
     err = ccall((:fmpz_set_str, :libflint),
                Int32, (Ptr{fmpz}, Ptr{UInt8}, Int32),
-               &z, bytestring(SubString{}{}(s, i)), base)
+               &z, string(SubString(s, i)), base)
     err == 0 || error("Invalid big integer: $(repr(s))")
     return sgn < 0 ? -z : z
 end
@@ -1400,7 +1400,7 @@ end
 #
 ###############################################################################
 
-fmpz(s::AbstractString{}) = parseint(fmpz, s)
+fmpz(s::AbstractString{}) = parse(fmpz, s)
 
 fmpz(z::Integer) = fmpz(BigInt(z))
 

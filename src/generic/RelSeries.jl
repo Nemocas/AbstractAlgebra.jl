@@ -1038,17 +1038,17 @@ end
 #
 ###############################################################################
 
-function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::RingElem)
+function (a::GenRelSeriesRing{T}){T <: RingElem}(b::RingElem)
    return a(base_ring(a)(b))
 end
 
-function Base.call{T <: RingElem}(a::GenRelSeriesRing{T})
+function (a::GenRelSeriesRing{T}){T <: RingElem}()
    z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max)
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::Integer)
+function (a::GenRelSeriesRing{T}){T <: RingElem}(b::Integer)
    if b == 0
       z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max)
    else
@@ -1058,7 +1058,7 @@ function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::Integer)
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::fmpz)
+function (a::GenRelSeriesRing{T}){T <: RingElem}(b::fmpz)
    if b == 0
       z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max)
    else
@@ -1068,7 +1068,7 @@ function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::fmpz)
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::T)
+function (a::GenRelSeriesRing{T}){T <: RingElem}(b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to power series")
    if b == 0
       z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max)
@@ -1079,12 +1079,12 @@ function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::T)
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::SeriesElem{T})
+function (a::GenRelSeriesRing{T}){T <: RingElem}(b::SeriesElem{T})
    parent(b) != a && error("Unable to coerce power series")
    return b
 end
 
-function Base.call{T <: RingElem}(a::GenRelSeriesRing{T}, b::Array{T, 1}, len::Int, prec::Int)
+function (a::GenRelSeriesRing{T}){T <: RingElem}(b::Array{T, 1}, len::Int, prec::Int)
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to power series")
    end

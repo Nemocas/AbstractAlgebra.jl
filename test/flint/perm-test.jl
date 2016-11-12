@@ -24,6 +24,18 @@ function test_perm_constructors()
    println("PASS")
 end
 
+function test_perm_printing()
+   print("perm.printing...")
+
+   R = PermutationGroup(10)
+
+   b = R([2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
+
+   @test string(b) == "[2, 3, 5, 4, 6, 7, 1, 9, 10, 8]"
+
+   println("PASS")
+end
+
 function test_perm_basic_manipulation()
    print("perm.basic_manipulation...")
 
@@ -83,6 +95,7 @@ end
 function test_perm()
    test_perm_abstract_types()
    test_perm_constructors()
+   test_perm_printing()
    test_perm_basic_manipulation()
    test_perm_comparison()
    test_perm_binary_ops()
