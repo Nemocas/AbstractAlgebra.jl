@@ -110,9 +110,9 @@ function show(io::IO, x::fq_rel_series)
       ctx = base_ring(x)
       cstr = ccall((:fq_poly_get_str_pretty, :libflint), Ptr{UInt8}, 
         (Ptr{fq_rel_series}, Ptr{UInt8}, Ptr{FqFiniteField}), 
-                     &x, bytestring(string(var(parent(x)))), &ctx)
+                     &x, string(var(parent(x))), &ctx)
 
-      print(io, bytestring(cstr))
+      print(io, unsafe_string(cstr))
 
       ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
    end
@@ -500,7 +500,7 @@ Base.promote_rule(::Type{fq_rel_series}, ::Type{fq}) = fq_rel_series
 #
 ###############################################################################
 
-function Base.call(a::FqRelSeriesRing)
+function (a::FqRelSeriesRing)()
    ctx = base_ring(a)
    z = fq_rel_series(ctx)
    z.prec = a.prec_max
@@ -508,7 +508,7 @@ function Base.call(a::FqRelSeriesRing)
    return z
 end
 
-function Base.call(a::FqRelSeriesRing, b::Integer)
+function (a::FqRelSeriesRing)(b::Integer)
    ctx = base_ring(a)
    if b == 0
       z = fq_rel_series(ctx)
@@ -520,7 +520,7 @@ function Base.call(a::FqRelSeriesRing, b::Integer)
    return z
 end
 
-function Base.call(a::FqRelSeriesRing, b::fmpz)
+function (a::FqRelSeriesRing)(b::fmpz)
    ctx = base_ring(a)
    if b == 0
       z = fq_rel_series(ctx)
@@ -532,7 +532,7 @@ function Base.call(a::FqRelSeriesRing, b::fmpz)
    return z
 end
 
-function Base.call(a::FqRelSeriesRing, b::fq)
+function (a::FqRelSeriesRing)(b::fq)
    ctx = base_ring(a)
    if b == 0
       z = fq_rel_series(ctx)
@@ -544,12 +544,12 @@ function Base.call(a::FqRelSeriesRing, b::fq)
    return z
 end
 
-function Base.call(a::FqRelSeriesRing, b::fq_rel_series)
+function (a::FqRelSeriesRing)(b::fq_rel_series)
    parent(b) != a && error("Unable to coerce power series")
    return b
 end
 
-function Base.call(a::FqRelSeriesRing, b::Array{fq, 1}, len::Int, prec::Int)
+function (a::FqRelSeriesRing)(b::Array{fq, 1}, len::Int, prec::Int)
    ctx = base_ring(a)
    z = fq_rel_series(ctx, b, len, prec)
    z.parent = a

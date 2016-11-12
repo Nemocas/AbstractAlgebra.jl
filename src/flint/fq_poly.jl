@@ -95,9 +95,9 @@ function show(io::IO, x::fq_poly)
    else
       cstr = ccall((:fq_poly_get_str_pretty, :libflint), Ptr{UInt8}, 
                   (Ptr{fq_poly}, Ptr{UInt8}, Ptr{FqFiniteField}),
-                  &x, bytestring(string(var(parent(x)))),
+                  &x, string(var(parent(x))),
                   &((x.parent).base_ring))
-      print(io, bytestring(cstr))
+      print(io, unsafe_string(cstr))
       ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
    end
 end
@@ -603,7 +603,7 @@ Base.promote_rule(::Type{fq_poly}, ::Type{fq}) = fq_poly
 #
 ###############################################################################
 
-function Base.call(f::fq_poly, a::fq)
+function (f::fq_poly)(a::fq)
    if parent(a) != base_ring(f)
       return subst(f, a)
    end
@@ -616,27 +616,27 @@ end
 #
 ################################################################################
 
-function Base.call(R::FqPolyRing)
+function (R::FqPolyRing)()
    z = fq_poly()
    z.parent = R
    return z
 end
 
-function Base.call(R::FqPolyRing, x::fq)
+function (R::FqPolyRing)(x::fq)
   z = fq_poly(x)
   z.parent = R
   return z
 end
 
-function Base.call(R::FqPolyRing, x::fmpz)
+function (R::FqPolyRing)(x::fmpz)
    return R(base_ring(R)(x))
 end
 
-function Base.call(R::FqPolyRing, x::Integer)
+function (R::FqPolyRing)(x::Integer)
    return R(fmpz(x))
 end
 
-function Base.call(R::FqPolyRing, x::Array{fq, 1})
+function (R::FqPolyRing)(x::Array{fq, 1})
    length(x) == 0 && error("Array must be non-empty")
    base_ring(R) != parent(x[1]) && error("Coefficient rings must coincide")
    z = fq_poly(x)
@@ -644,25 +644,25 @@ function Base.call(R::FqPolyRing, x::Array{fq, 1})
    return z
 end
 
-function Base.call(R::FqPolyRing, x::Array{fmpz, 1})
+function (R::FqPolyRing)(x::Array{fmpz, 1})
    length(x) == 0 && error("Array must be non-empty")
    z = fq_poly(x, base_ring(R))
    z.parent = R
    return z
 end
 
-function Base.call{T <: Integer}(R::FqPolyRing, x::Array{T, 1})
+function (R::FqPolyRing){T <: Integer}(x::Array{T, 1})
    length(x) == 0 && error("Array must be non-empty")
    return R(map(fmpz, x))
 end
 
-function Base.call(R::FqPolyRing, x::fmpz_poly)
+function (R::FqPolyRing)(x::fmpz_poly)
    z = fq_poly(x, base_ring(R))
    z.parent = R
    return z
 end
 
-function Base.call(R::FqPolyRing, x::fq_poly)
+function (R::FqPolyRing)(x::fq_poly)
   parent(x) != R && error("Unable to coerce to polynomial")
   return x
 end

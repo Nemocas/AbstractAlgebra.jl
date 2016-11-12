@@ -74,7 +74,7 @@ end
 #
 ###############################################################################
 
-function Base.call(ord::PariMaximalOrder)
+function (ord::PariMaximalOrder)()
    av = unsafe_load(avma, 1)
    data = ccall((:algtobasis, :libpari), Ptr{Int}, 
                  (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(fmpz()).d)
@@ -82,7 +82,7 @@ function Base.call(ord::PariMaximalOrder)
    return pari_maximal_order_elem(data, ord)
 end
 
-function Base.call(ord::PariMaximalOrder, b::fmpq_poly)
+function (ord::PariMaximalOrder)(b::fmpq_poly)
    av = unsafe_load(avma, 1)
    data = ccall((:algtobasis, :libpari), Ptr{Int}, 
                  (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(b).d)
@@ -90,7 +90,7 @@ function Base.call(ord::PariMaximalOrder, b::fmpq_poly)
    return pari_maximal_order_elem(data, ord)
 end
 
-function Base.call(ord::PariMaximalOrder, b::nf_elem)
+function (ord::PariMaximalOrder)(b::nf_elem)
    av = unsafe_load(avma, 1)
    par = b.parent.pol.parent
    data = ccall((:algtobasis, :libpari), Ptr{Int}, 
@@ -99,7 +99,7 @@ function Base.call(ord::PariMaximalOrder, b::nf_elem)
    return pari_maximal_order_elem(data, ord)
 end
 
-function Base.call(ord::PariMaximalOrder, b::fmpz)
+function (ord::PariMaximalOrder)(b::fmpz)
    av = unsafe_load(avma, 1)
    data = ccall((:algtobasis, :libpari), Ptr{Int}, 
                  (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(b).d)
@@ -107,7 +107,7 @@ function Base.call(ord::PariMaximalOrder, b::fmpz)
    return pari_maximal_order_elem(data, ord)
 end
 
-function Base.call(ord::PariMaximalOrder, b::Integer)
+function (ord::PariMaximalOrder)(b::Integer)
    av = unsafe_load(avma, 1)
    data = ccall((:algtobasis, :libpari), Ptr{Int}, 
                  (Ptr{Int}, Ptr{Int}), ord.pari_nf.data, pari(fmpz(b)).d)
@@ -115,7 +115,7 @@ function Base.call(ord::PariMaximalOrder, b::Integer)
    return pari_maximal_order_elem(data, ord)
 end
 
-function Base.call(ord::PariMaximalOrder, b::pari_maximal_order_elem)
+function (ord::PariMaximalOrder)(b::pari_maximal_order_elem)
    parent(b) != ord && error("Unable to coerce maximal order element")
    return b
 end

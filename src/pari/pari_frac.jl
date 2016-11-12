@@ -92,7 +92,7 @@ function fmpq!(z::fmpq, g::Ptr{Int})
    end
 end
 
-function call(::FlintRationalField, g::pari_rat)
+function (::FlintRationalField)(g::pari_rat)
    r = fmpq()
    fmpq!(r, g.d)
    return r

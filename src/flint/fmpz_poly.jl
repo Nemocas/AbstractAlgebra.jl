@@ -734,37 +734,37 @@ Base.promote_rule(::Type{fmpz_poly}, ::Type{fmpz}) = fmpz_poly
 #
 ###############################################################################
 
-function Base.call(a::FmpzPolyRing)
+function (a::FmpzPolyRing)()
    z = fmpz_poly()
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpzPolyRing, b::Int)
+function (a::FmpzPolyRing)(b::Int)
    z = fmpz_poly(b)
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpzPolyRing, b::Integer)
+function (a::FmpzPolyRing)(b::Integer)
    z = fmpz_poly(fmpz(b))
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpzPolyRing, b::fmpz)
+function (a::FmpzPolyRing)(b::fmpz)
    z = fmpz_poly(b)
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpzPolyRing, b::Array{fmpz, 1})
+function (a::FmpzPolyRing)(b::Array{fmpz, 1})
    z = fmpz_poly(b)
    z.parent = a
    return z
 end
 
-Base.call(a::FmpzPolyRing, b::fmpz_poly) = b
+(a::FmpzPolyRing)(b::fmpz_poly) = b
 
 ###############################################################################
 #

@@ -683,25 +683,25 @@ end
 #
 ###############################################################################
 
-call(a::FlintRationalField) = fmpq(fmpz(0), fmpz(1))
+(a::FlintRationalField)() = fmpq(fmpz(0), fmpz(1))
 
-call(a::FlintRationalField, b::Rational{BigInt}) = fmpq(b) 
+(a::FlintRationalField)(b::Rational{BigInt}) = fmpq(b) 
 
-call(a::FlintRationalField, b::Integer) = fmpq(b)
+(a::FlintRationalField)(b::Integer) = fmpq(b)
 
-call(a::FlintRationalField, b::Int, c::Int) = fmpq(b, c)
+(a::FlintRationalField)(b::Int, c::Int) = fmpq(b, c)
 
-call(a::FlintRationalField, b::fmpz) = fmpq(b)
+(a::FlintRationalField)(b::fmpz) = fmpq(b)
 
-call(a::FlintRationalField, b::Integer, c::Integer) = fmpq(b, c)
+(a::FlintRationalField)(b::Integer, c::Integer) = fmpq(b, c)
 
-call(a::FlintRationalField, b::fmpz, c::Integer) = fmpq(b, c)
+(a::FlintRationalField)(b::fmpz, c::Integer) = fmpq(b, c)
 
-call(a::FlintRationalField, b::Integer, c::fmpz) = fmpq(b, c)
+(a::FlintRationalField)(b::Integer, c::fmpz) = fmpq(b, c)
 
-call(a::FlintRationalField, b::fmpz, c::fmpz) = fmpq(b, c)
+(a::FlintRationalField)(b::fmpz, c::fmpz) = fmpq(b, c)
 
-call(a::FlintRationalField, b::fmpq) = b
+(a::FlintRationalField)(b::fmpq) = b
 
 ###############################################################################
 #

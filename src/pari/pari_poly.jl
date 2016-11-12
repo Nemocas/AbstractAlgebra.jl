@@ -106,14 +106,14 @@ end
 #
 ###############################################################################
 
-function Base.call(ord::PariPolyRing{pari_int}, n::Ptr{Int})
+function (ord::PariPolyRing{pari_int})(n::Ptr{Int})
    pol = pari_poly{pari_int}(n)
    pol.parent = PariPolyRing{pari_int}(PariZZ, var(ord))
    return pol
 end
 
 
-function Base.call(a::FmpzPolyRing, g::pari_poly{pari_int})
+function (a::FmpzPolyRing)(g::pari_poly{pari_int})
    z = fmpz_poly()
    z.parent = a
    fmpz_poly!(z, g.d)

@@ -97,9 +97,9 @@ function show(io::IO, x::fmpz_rel_series)
       print(io, "0")
    else
       cstr = ccall((:fmpz_poly_get_str_pretty, :libflint), Ptr{UInt8}, 
-        (Ptr{fmpz_rel_series}, Ptr{UInt8}), &x, bytestring(string(var(parent(x)))))
+        (Ptr{fmpz_rel_series}, Ptr{UInt8}), &x, string(var(parent(x))))
 
-      print(io, bytestring(cstr))
+      print(io, unsafe_string(cstr))
 
       ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
    end
@@ -503,14 +503,14 @@ Base.promote_rule(::Type{fmpz_rel_series}, ::Type{fmpz}) = fmpz_rel_series
 #
 ###############################################################################
 
-function Base.call(a::FmpzRelSeriesRing)
+function (a::FmpzRelSeriesRing)()
    z = fmpz_rel_series()
    z.prec = a.prec_max
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpzRelSeriesRing, b::Integer)
+function (a::FmpzRelSeriesRing)(b::Integer)
    if b == 0
       z = fmpz_rel_series()
       z.prec = a.prec_max
@@ -521,7 +521,7 @@ function Base.call(a::FmpzRelSeriesRing, b::Integer)
    return z
 end
 
-function Base.call(a::FmpzRelSeriesRing, b::fmpz)
+function (a::FmpzRelSeriesRing)(b::fmpz)
    if b == 0
       z = fmpz_rel_series()
       z.prec = a.prec_max
@@ -532,12 +532,12 @@ function Base.call(a::FmpzRelSeriesRing, b::fmpz)
    return z
 end
 
-function Base.call(a::FmpzRelSeriesRing, b::fmpz_rel_series)
+function (a::FmpzRelSeriesRing)(b::fmpz_rel_series)
    parent(b) != a && error("Unable to coerce power series")
    return b
 end
 
-function Base.call(a::FmpzRelSeriesRing, b::Array{fmpz, 1}, len::Int, prec::Int)
+function (a::FmpzRelSeriesRing)(b::Array{fmpz, 1}, len::Int, prec::Int)
    z = fmpz_rel_series(b, len, prec)
    z.parent = a
    return z

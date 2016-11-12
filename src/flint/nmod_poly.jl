@@ -120,8 +120,8 @@ function show(io::IO, x::nmod_poly)
     print(io, "0")
   else
     cstr = ccall((:nmod_poly_get_str_pretty, :libflint), Ptr{UInt8},
-            (Ptr{nmod_poly}, Ptr{UInt8}), &x, bytestring(string(var(parent(x)))))
-    print(io, bytestring(cstr))
+            (Ptr{nmod_poly}, Ptr{UInt8}), &x, string(var(parent(x))))
+    print(io, unsafe_string(cstr))
     ccall((:flint_free, :libflint), Void, (Ptr{UInt8}, ), cstr)
   end
 end
@@ -930,7 +930,7 @@ Base.promote_rule(::Type{nmod_poly}, ::Type{GenRes{fmpz}}) = nmod_poly
 #
 ###############################################################################
 
-function Base.call(f::nmod_poly, a::GenRes{fmpz})
+function (f::nmod_poly)(a::GenRes{fmpz})
    if parent(a) != base_ring(f)
       return subst(f, a)
    end
@@ -943,51 +943,51 @@ end
 #
 ################################################################################
 
-function Base.call(R::NmodPolyRing)
+function (R::NmodPolyRing)()
   z = nmod_poly(R.n)
   z.parent = R
   return z
 end
 
-function Base.call(R::NmodPolyRing, x::fmpz)
+function (R::NmodPolyRing)(x::fmpz)
   r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &x, R.n)
   z = nmod_poly(R.n, r)
   z.parent = R
   return z
 end
 
-function Base.call(R::NmodPolyRing, x::UInt)
+function (R::NmodPolyRing)(x::UInt)
   z = nmod_poly(R.n, x)
   z.parent = R
   return z
 end
 
-function Base.call(R::NmodPolyRing, x::Integer)
+function (R::NmodPolyRing)(x::Integer)
   z = nmod_poly(R.n, x)
   z.parent = R
   return z
 end
 
-function Base.call(R::NmodPolyRing, x::GenRes{fmpz})
+function (R::NmodPolyRing)(x::GenRes{fmpz})
   base_ring(R) != parent(x) && error("Wrong parents")
   z = nmod_poly(R.n, UInt(x.data))
   z.parent = R
   return z
 end
 
-function Base.call(R::NmodPolyRing, arr::Array{fmpz, 1})
+function (R::NmodPolyRing)(arr::Array{fmpz, 1})
   z = nmod_poly(R.n, arr)
   z.parent = R
   return z
 end
 
-function Base.call(R::NmodPolyRing, arr::Array{UInt, 1})
+function (R::NmodPolyRing)(arr::Array{UInt, 1})
   z = nmod_poly(R.n, arr)
   z.parent = R
   return z
 end
 
-function Base.call(R::NmodPolyRing, arr::Array{GenRes{fmpz}, 1})
+function (R::NmodPolyRing)(arr::Array{GenRes{fmpz}, 1})
   if length(arr) > 0
      (base_ring(R) != parent(arr[1])) && error("Wrong parents")
   end
@@ -996,7 +996,7 @@ function Base.call(R::NmodPolyRing, arr::Array{GenRes{fmpz}, 1})
   return z
 end
 
-function Base.call(R::NmodPolyRing, x::fmpz_poly)
+function (R::NmodPolyRing)(x::fmpz_poly)
   z = nmod_poly(R.n, x)
   z.parent = R
   return z

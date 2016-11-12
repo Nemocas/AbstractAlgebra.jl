@@ -26,7 +26,7 @@ end
 #
 ###########################################################################################
 
-function Base.call{S <: RingElem}(ord::PariPolModRing{S}, b::Ptr{Int})
+function (ord::PariPolModRing{S}){S <: RingElem}(b::Ptr{Int})
    z = pari_polmod{S}(b)
    z.parent = ord
    return z

@@ -81,10 +81,10 @@ function show(io::IO, f::acb_poly)
   else
     print(io, "[ ")
     for i in 0:degree(f)-1
-      show(io, coeff(f,i))
+      print(io, coeff(f,i))
       print(io, ", ")
     end
-    show(coeff(f,degree(f)))
+    print(io, coeff(f,degree(f)))
     print(io, " ]")
   end
 end
@@ -867,43 +867,43 @@ Base.promote_rule(::Type{acb_poly}, ::Type{arb_poly}) = acb_poly
 #
 ################################################################################
 
-function Base.call(a::AcbPolyRing)
+function (a::AcbPolyRing)()
    z = acb_poly()
    z.parent = a
    return z
 end
 
-function Base.call(a::AcbPolyRing, b::Union{Int,fmpz,fmpq,Float64,Complex{Float64},Complex{Int},arb,acb})
+function (a::AcbPolyRing)(b::Union{Int,fmpz,fmpq,Float64,Complex{Float64},Complex{Int},arb,acb})
    z = acb_poly(base_ring(a)(b), a.base_ring.prec)
    z.parent = a
    return z
 end
 
-function Base.call(a::AcbPolyRing, b::Array{acb, 1})
+function (a::AcbPolyRing)(b::Array{acb, 1})
    z = acb_poly(b, a.base_ring.prec)
    z.parent = a
    return z
 end
 
-function Base.call(a::AcbPolyRing, b::fmpz_poly)
+function (a::AcbPolyRing)(b::fmpz_poly)
    z = acb_poly(b, a.base_ring.prec)
    z.parent = a
    return z
 end
 
-function Base.call(a::AcbPolyRing, b::fmpq_poly)
+function (a::AcbPolyRing)(b::fmpq_poly)
    z = acb_poly(b, a.base_ring.prec)
    z.parent = a
    return z
 end
 
-function Base.call(a::AcbPolyRing, b::arb_poly)
+function (a::AcbPolyRing)(b::arb_poly)
    z = acb_poly(b, a.base_ring.prec)
    z.parent = a
    return z
 end
 
-function Base.call(a::AcbPolyRing, b::acb_poly)
+function (a::AcbPolyRing)(b::acb_poly)
    z = acb_poly(b, a.base_ring.prec)
    z.parent = a
    return z
