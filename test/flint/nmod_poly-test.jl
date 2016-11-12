@@ -81,6 +81,19 @@ function test_nmod_poly_constructors()
   println("PASS")
 end
 
+function test_nmod_poly_printing()
+  print("nmod_poly.printing...")
+
+  R = ResidueRing(ZZ, 17)
+  Rx, x = PolynomialRing(R, "x")
+
+  a = x^3 + x + 1
+
+  @test string(a) == "x^3+x+1"
+
+  println("PASS")
+end
+
 function test_nmod_poly_manipulation()
   print("nmod_poly.manipulation...")
 
@@ -692,6 +705,7 @@ end
 
 function test_nmod_poly()
   test_nmod_poly_constructors()
+  test_nmod_poly_printing()
   test_nmod_poly_manipulation()
   test_nmod_poly_unary_ops()
   test_nmod_poly_binary_ops()

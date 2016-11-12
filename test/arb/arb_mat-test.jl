@@ -47,6 +47,17 @@ function test_arb_mat_constructors()
    println("PASS")
 end
 
+function test_arb_mat_printing()
+   print("arb_mat.constructors...")
+ 
+   S = MatrixSpace(RR, 3, 3)
+   f = S(fmpz(3))
+
+   @test string(f) == "[3.0000000000000000000 0 0]\n[0 3.0000000000000000000 0]\n[0 0 3.0000000000000000000]"
+
+   println("PASS")
+end
+
 function test_arb_mat_manipulation()
    print("arb_mat.manipulation...")
 
@@ -388,6 +399,7 @@ end
 
 function test_arb_mat()
    test_arb_mat_constructors()
+   test_arb_mat_printing()
    test_arb_mat_manipulation()
    test_arb_mat_unary_ops()
    test_arb_mat_transpose()

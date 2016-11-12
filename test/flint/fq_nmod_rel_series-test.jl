@@ -33,6 +33,19 @@ function test_fq_nmod_rel_series_constructors()
    println("PASS")
 end
 
+function test_fq_nmod_rel_series_printing()
+   print("fq_nmod_rel_series.printing...")
+
+   R, t = FiniteField(23, 5, "t")
+   S, x = PowerSeriesRing(R, 30, "x")
+
+   b = (t^2 + 1)*x^2 + (t + 3)x + O(x^4)
+
+   @test string(b) == "(t^2+1)*x^2+(t+3)*x+O(x^4)"
+
+   println("PASS")
+end
+
 function test_fq_nmod_rel_series_manipulation()
    print("fq_nmod_rel_series.manipulation...")
 
@@ -332,6 +345,7 @@ end
 
 function test_fq_nmod_rel_series()
    test_fq_nmod_rel_series_constructors()
+   test_fq_nmod_rel_series_printing()
    test_fq_nmod_rel_series_manipulation()
    test_fq_nmod_rel_series_unary_ops()
    test_fq_nmod_rel_series_binary_ops()

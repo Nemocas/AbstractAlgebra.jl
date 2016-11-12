@@ -1,7 +1,7 @@
 RR = ArbField(64)
 
 function test_arb_poly_constructors()
-   print("arb_poly.constructors()...")
+   print("arb_poly.constructors...")
 
    R, x = PolynomialRing(RR, "x")
 
@@ -24,6 +24,17 @@ function test_arb_poly_constructors()
    k = R([RR(1), RR(0), RR(3)])
 
    @test isa(k, PolyElem)
+
+   println("PASS")
+end
+
+function test_arb_poly_printing()
+   print("arb_poly.printing...")
+
+   R, x = PolynomialRing(RR, "x")
+   f = x^3 + 2x^2 + x + 1
+
+   @test string(f) == "[ 1.0000000000000000000, 1.0000000000000000000, 2.0000000000000000000, 1.0000000000000000000 ]"
 
    println("PASS")
 end
@@ -415,6 +426,7 @@ end
 
 function test_arb_poly()
    test_arb_poly_constructors()
+   test_arb_poly_printing()
    test_arb_poly_manipulation()
    test_arb_poly_binary_ops()
    test_arb_poly_adhoc_binary()

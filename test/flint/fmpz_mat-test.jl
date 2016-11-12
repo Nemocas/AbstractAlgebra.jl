@@ -28,6 +28,17 @@ function test_fmpz_mat_constructors()
    println("PASS")
 end
 
+function test_fmpz_mat_printing()
+   print("fmpz_mat.printing...")
+ 
+   S = MatrixSpace(ZZ, 3, 3)
+   f = S(fmpz(3))
+
+   @test string(f) == "[3 0 0]\n[0 3 0]\n[0 0 3]"
+
+   println("PASS")
+end
+
 function test_fmpz_mat_manipulation()
    print("fmpz_mat.manipulation...")
 
@@ -469,6 +480,7 @@ end
 
 function test_fmpz_mat()
    test_fmpz_mat_constructors()
+   test_fmpz_mat_printing()
    test_fmpz_mat_manipulation()
    test_fmpz_mat_unary_ops()
    test_fmpz_mat_binary_ops()

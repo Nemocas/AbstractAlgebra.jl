@@ -23,6 +23,17 @@ function test_fmpz_rel_series_constructors()
    println("PASS")
 end
 
+function test_fmpz_rel_series_printing()
+   print("fmpz_rel_series.printing...")
+
+   R, x = PowerSeriesRing(ZZ, 30, "x")
+   a = x^3 + 2x + 1
+
+   @test string(a) == "x^3+2*x+1+O(x^30)"
+
+   println("PASS")
+end
+
 function test_fmpz_rel_series_manipulation()
    print("fmpz_rel_series.manipulation...")
 
@@ -270,6 +281,7 @@ function test_fmpz_rel_series_inversion()
 end
 function test_fmpz_rel_series()
    test_fmpz_rel_series_constructors()
+   test_fmpz_rel_series_printing()
    test_fmpz_rel_series_manipulation()
    test_fmpz_rel_series_unary_ops()
    test_fmpz_rel_series_binary_ops()

@@ -2,7 +2,7 @@ RR = AcbField(64)
 CC = AcbField(64)
 
 function test_acb_poly_constructors()
-   print("acb_poly.constructors()...")
+   print("acb_poly.constructors...")
 
    R, x = PolynomialRing(CC, "x")
 
@@ -25,6 +25,17 @@ function test_acb_poly_constructors()
    k = R([CC(1), CC(0), CC(3)])
 
    @test isa(k, PolyElem)
+
+   println("PASS")
+end
+
+function test_acb_poly_printing()
+   print("acb_poly.constructors...")
+
+   R, x = PolynomialRing(CC, "x")
+   f = x^3 + 2x^2 + x + 1
+
+   @test string(f) == "[ 1.0000000000000000000 + i*0, 1.0000000000000000000 + i*0, 2.0000000000000000000 + i*0, 1.0000000000000000000 + i*0 ]"
 
    println("PASS")
 end
@@ -446,6 +457,7 @@ end
 
 function test_acb_poly()
    test_acb_poly_constructors()
+   test_acb_poly_printing()
    test_acb_poly_manipulation()
    test_acb_poly_binary_ops()
    test_acb_poly_adhoc_binary()

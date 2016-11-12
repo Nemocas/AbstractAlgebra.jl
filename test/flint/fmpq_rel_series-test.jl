@@ -25,6 +25,18 @@ function test_fmpq_rel_series_constructors()
    println("PASS")
 end
 
+function test_fmpq_rel_series_printing()
+   print("fmpq_rel_series.printing...")
+
+   R, x = PowerSeriesRing(QQ, 30, "x")
+
+   a = x^3 + 2x + 1
+
+   @test string(a) == "x^3 + 2*x + 1+O(x^30)"
+   
+   println("PASS")
+end
+
 function test_fmpq_rel_series_manipulation()
    print("fmpq_rel_series.manipulation...")
 
@@ -297,6 +309,7 @@ end
 
 function test_fmpq_rel_series()
    test_fmpq_rel_series_constructors()
+   test_fmpq_rel_series_printing()
    test_fmpq_rel_series_manipulation()
    test_fmpq_rel_series_unary_ops()
    test_fmpq_rel_series_binary_ops()

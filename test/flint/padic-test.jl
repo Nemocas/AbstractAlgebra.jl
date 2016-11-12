@@ -26,6 +26,18 @@ function test_padic_constructors()
    println("PASS")
 end
 
+function test_padic_printing()
+   print("padic.constructors()...")  
+
+   R = PadicField(7, 30)
+   
+   a = 1 + 2*7 + 4*7^2 + O(R, 7^3)
+
+   @test string(a) == "1 + 2*7^1 + 4*7^2 + O(7^3)"
+
+   println("PASS")
+end
+
 function test_padic_manipulation()
    print("padic.manipulation()...")  
 
@@ -312,6 +324,7 @@ end
 
 function test_padic()
    test_padic_constructors()
+   test_padic_printing()
    test_padic_manipulation()
    test_padic_unary_ops()
    test_padic_binary_ops()
