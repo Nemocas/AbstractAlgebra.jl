@@ -9,6 +9,8 @@ export GenMPoly, GenMPolyRing, max_degrees, gens, divides,
 
 export NewInt
 
+import Base: min
+
 type NewIntParent <: Ring
 end
 
@@ -131,6 +133,10 @@ function =={N}(a::NTuple{N, UInt}, b::NTuple{N, UInt})
       end
    end
    return true
+end
+
+function min{N}(a::NTuple{N, UInt}, b::NTuple{N, UInt})
+   return ntuple(i -> min(a[i], b[i]), Val{N})
 end
 
 function +{N}(a::NTuple{N, UInt}, b::NTuple{N, UInt})
@@ -1837,6 +1843,29 @@ function gcd{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
    end
    g = gcd(p1, p2)
    return main_variable_insert(g, k1)
+end
+
+function term_content{T <: RingElem, S, N}(a::GenMPoly{T, S, N})
+   if a.length <= 1
+      return a
+   end
+   Ce = Array(NTuple{N, UInt}, 1)
+   Cc = Array(T, 1)
+   Ce[1] = a.exps[1]
+   for i = 2:a.length
+      Ce[1] = min(Ce[1], a.exps[i])
+      if iszero(Ce[1])
+         break
+      end
+   end
+   Cc[1] = a.coeffs[1]
+   for i = 2:a.length
+      Cc[1] = gcd(Cc[1], a.coeffs[i])
+      if isone(Cc[1])
+         break
+      end
+   end
+   return parent(a)(Cc, Ce)
 end
 
 ###############################################################################
