@@ -1949,7 +1949,7 @@ function evaluate{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, A::Array{T})
    if iszero(a)
       return base_ring(a)()
    end
-   while a.length > 1 || !iszero(a.exps[a.length])
+   while a.length > 1 || (a.length == 1 && !iszero(a.exps[a.length]))
       k, p = main_variable_extract(a)
       a = evaluate(p, A[k])
    end
@@ -1964,7 +1964,7 @@ function evaluate{T <: RingElem, S, N, U <: Integer}(a::GenMPoly{T, S, N}, A::Ar
    if iszero(a)
       return base_ring(a)()
    end
-   while a.length > 1 || !iszero(a.exps[a.length])
+   while a.length > 1 || (a.length == 1 && !iszero(a.exps[a.length]))
       k, p = main_variable_extract(a)
       a = evaluate(p, A[k])
    end
