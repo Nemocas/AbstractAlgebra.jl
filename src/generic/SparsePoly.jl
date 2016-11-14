@@ -1381,11 +1381,133 @@ end
 
 ###############################################################################
 #
+#   Evaluation
+#
+###############################################################################
+
+function evaluate{S <: RingElem, T <: RingElem}(a::GenSparsePoly{T}, b::S)
+   if a.length == 0
+      return a
+   end
+   r = a.coeffs[a.length]
+   for i = 1:a.length - 1
+      r *= b^(reinterpret(Int, a.exps[a.length - i + 1] - a.exps[a.length - i]))
+      r += a.coeffs[a.length - i]
+   end
+   return r
+end
+
+function evaluate{T <: RingElem}(a::GenSparsePoly{T}, b::Integer)
+   if a.length == 0
+      return a
+   end
+   r = a.coeffs[a.length]
+   for i = 1:a.length - 1
+      r *= fmpz(b)^(reinterpret(Int, a.exps[a.length - i + 1] - a.exps[a.length - i]))
+      r += a.coeffs[a.length - i]
+   end
+   return r
+end
+
+###############################################################################
+#
 #   GCD, content and primitive part
 #
 ###############################################################################
 
-function gcd{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T})
+# Evaluate the coefficients of the polynomials at random points and try to work
+# out the likely degree of the gcd of the two input polys
+function gcd_likely_degree{T <: RingElem, S, N}(a::GenSparsePoly{GenMPoly{T, S, N}}, b::GenSparsePoly{GenMPoly{T, S, N}})
+   if a.length == 0
+      if b.length == 0
+         return 0
+      else
+         return reinterpret(Int, b.exps[b.length])
+      end
+   elseif b.length == 0
+      return reinterpret(Int, a.exps[a.length])
+   end
+   # check we are not in the univariate case, to prevent infinite recursion
+   constant_coeffs = true
+   for i = 1:a.length
+      if !isconstant(a.coeffs[i])
+         constant_coeffs = false
+         break
+      end
+   end
+   if constant_coeffs
+      return 0
+   end   
+   # try to find two evaluations of a and b with the same gcd
+   num_good = 0
+   iter = 0
+   len = 0
+   V = base_ring(a)
+   R = base_ring(base_ring(a))
+   U = elem_type(R)
+   M = Array(Array{U, 1}, 0)
+   while num_good < 2 && iter < 10
+      i = 1
+      A = Array(U, 0)
+      # find a new set of points to evaluate at
+      while i < 10
+         A = [R(rand(-10:10)) for i in 1:N]
+         newvals = true
+         for j = 1:length(M)
+            if A == M[j]
+               newvals = false
+               break
+            end
+         end
+         if newvals
+            break
+         end
+         i += 1
+      end
+      if i == 10
+         return 0 # unable to find distinct evaluation points
+      end
+      # check none of the coefficients became zero when evaluated
+      Ac = [V(evaluate(a.coeffs[i], A)) for i in 1:a.length]
+      Bc = [V(evaluate(b.coeffs[i], A)) for i in 1:b.length]
+      is_degen = false
+      for i = 1:a.length
+         if Ac[i] == 0
+            is_degen = true
+         end
+      end
+      for i = 1:b.length
+         if Bc[i] == 0
+            is_degen = true
+         end
+      end
+      # take gcd of evaluated polys, check if deg of evaluated gcd has gone up
+      if !is_degen
+         a1 = parent(a)(Ac, a.exps)
+         b1 = parent(b)(Bc, b.exps)
+         g = gcd(a1, b1, true)
+         glen = g.length == 0 ? 0 : reinterpret(Int, g.exps[g.length])
+         if glen > len
+            len = glen
+            num_good = 1
+            resize!(M, 0)
+            push!(M, A)
+         elseif glen == len && glen != 0
+            num_good += 1
+            push!(M, A)
+         end
+      end
+      iter += 1
+   end
+   if iter == 10
+      return 0 # too many iterations - shouldn't happen
+   else
+      return len # probably length of the multivariate gcd
+   end
+end
+
+function gcd{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T}, ignore_content=false)
+   # ensure degree in main variable of a is at least that of b
    if b.exps[b.length] > a.exps[a.length]
       (a, b) = (b, a)
    end
@@ -1395,23 +1517,92 @@ function gcd{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T})
    if b == 1
       return deepcopy(b)
    end
-   c1 = content(a)
-   c2 = content(b)
-   c = gcd(c1, c2)
-   a = divexact(a, c1)
-   b = divexact(b, c2)
+   # compute gcd of contents and divide content out
+   if !ignore_content
+      c1 = content(a)
+      c2 = content(b)
+      c = gcd(c1, c2)
+      a = divexact(a, c1)
+      b = divexact(b, c2)
+   end
+   # check if we are in the univariate case
+   constant_coeffs = true
+   for i = 1:a.length
+      if !isconstant(a.coeffs[i])
+         constant_coeffs = false
+         break
+      end
+   end
+   if constant_coeffs
+      for i = 1:b.length
+         if !isconstant(b.coeffs[i])
+            constant_coeffs = false
+            break
+         end
+      end
+   end
+   # if we in univariate case, convert to dense, take gcd, convert back
+   if constant_coeffs
+      # convert polys to univariate dense
+      R, x = PolynomialRing(base_ring(base_ring(a)), "\$")
+      f = R()
+      g = R()
+      fit!(f, reinterpret(Int, a.exps[a.length] + 1))
+      fit!(g, reinterpret(Int, b.exps[b.length] + 1))
+      for i = 1:a.length
+         setcoeff!(f, reinterpret(Int, a.exps[i]), a.coeffs[i].coeffs[1])
+      end
+      for i = 1:b.length
+         setcoeff!(g, reinterpret(Int, b.exps[i]), b.coeffs[i].coeffs[1])
+      end
+      # take gcd of univariate dense polys
+      h = gcd(f, g)
+      # convert back to sparse polys
+      nonzero = 0
+      Ac = Array(T, 0)
+      Ae = Array(UInt, 0)
+      for i = 1:length(h)
+         ci = coeff(h, i - 1)
+         if ci != 0
+            push!(Ac, base_ring(a)(ci))
+            push!(Ae, UInt(i - 1))
+         end
+      end
+      r = parent(a)(Ac, Ae)
+      if !ignore_content
+         return c*r
+      else
+         return r
+      end
+   end
+   # compute likely degree of gcd
+   deg = gcd_likely_degree(a, b)
+   # is the lead/trail term a monomial
    lead_monomial = lead(a).length == 1 || lead(b).length == 1
    trail_monomial = trail(a).length == 1 || trail(b).length == 1
    lead_a = lead(a)
    lead_b = lead(b)
+   # psr algorithm
    g = one(base_ring(a))
    h = one(base_ring(a))
    while true
-      d = reinterpret(Int, a.exps[a.length] - b.exps[b.length])
+      adeg = reinterpret(Int,  a.exps[a.length])
+      bdeg = reinterpret(Int,  b.exps[b.length])
+      # optimisation: if degree of b is equal to likely degree of gcd, try
+      # exact division, learned from Bernard Parisse
+      if bdeg == deg
+         flag, q = divides(a, b)
+         if flag
+            break
+         end
+      end
+      d = reinterpret(Int, adeg - bdeg)
       r = pseudorem(a, b)
+      # zero remainder
       if r == 0
          break
       end
+      # constant remainder
       if r.length == 1 && r.exps[1] == 0
          b = one(parent(a))
          break
@@ -1424,40 +1615,45 @@ function gcd{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T})
          h = h^(1 - d)*g^d
       end
    end
-   # remove content from b as cheaply as possible
-   if lead(b).length != 1 && trail(b).length != 1
-      if lead_monomial # lead term monomial, so content contains rest
-         d = divexact(lead(b), term_content(lead(b)))
-         b = divexact(b, d)
-      elseif trail_monomial # trail term is monomial, so ditto
-         d = divexact(trail(b), term_content(trail(b)))
-         b = divexact(b, d)
-      else 
-         glead = gcd(lead_a, lead_b)
-         if glead.length == 1 # gcd of lead coeffs monomial
+   # sometimes don't care about content, e.g. when computing likely gcd degree
+   if !ignore_content
+      # remove content from b as cheaply as possible, as per Bernard Parisse
+      if lead(b).length != 1 && trail(b).length != 1
+         if lead_monomial # lead term monomial, so content contains rest
             d = divexact(lead(b), term_content(lead(b)))
             b = divexact(b, d)
-         else # last ditched attempt to find easy content
-            h = gcd(lead(b), glead)
-            h = divexact(h, term_content(h))
-            flag, q = divides(b, h)
-            if flag
-               b = q
+         elseif trail_monomial # trail term is monomial, so ditto
+            d = divexact(trail(b), term_content(trail(b)))
+            b = divexact(b, d)
+         else 
+            glead = gcd(lead_a, lead_b)
+            if glead.length == 1 # gcd of lead coeffs monomial
+               d = divexact(lead(b), term_content(lead(b)))
+               b = divexact(b, d)
+            else # last ditched attempt to find easy content
+               h = gcd(lead(b), glead)
+               h = divexact(h, term_content(h))
+               flag, q = divides(b, h)
+               if flag
+                  b = q
+               end
             end
          end
       end
-   end
-   # remove any monomial content
-   b1 = term_content(b.coeffs[1])
-   for i = 2:b.length
-      b1 = gcd(b1, term_content(b.coeffs[i]))
-      if isone(b1)
-         break
+      # remove any monomial content
+      b1 = term_content(b.coeffs[1])
+      for i = 2:b.length
+         b1 = gcd(b1, term_content(b.coeffs[i]))
+         if isone(b1)
+            break
+         end
       end
+      b = divexact(b, b1)
+      # remove any stubborn content and put back actual content
+      return c*primpart(b)
+   else
+      return b
    end
-   b = divexact(b, b1)
-   # remove any stubborn content and put back actual content
-   return c*primpart(b)
 end
 
 function content{T <: RingElem}(a::GenSparsePoly{T})

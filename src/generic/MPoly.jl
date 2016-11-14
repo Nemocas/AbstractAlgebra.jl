@@ -210,6 +210,8 @@ isone(x::GenMPoly) = x.length == 1 && iszero(x.exps[1]) && x.coeffs[1] == 1
 
 iszero(x::GenMPoly) = x.length == 0
 
+isconstant(x::GenMPoly) = x.length == 0 || (x.length == 1 && iszero(x.exps[1]))
+
 function normalise(a::GenMPoly, n::Int)
    while n > 0 && iszero(a.coeffs[n]) 
       n -= 1
@@ -310,6 +312,10 @@ function show(io::IO, p::GenMPolyRing)
 end
 
 show_minus_one{T <: RingElem, S, N}(::Type{GenMPoly{T, S, N}}) = show_minus_one(T)
+
+needs_parentheses(x::GenMPoly) = length(x) > 1
+
+is_negative(x::GenMPoly) = length(x) == 1 && iszero(x.exps[1]) && is_negative(x.coeffs[1])
 
 ###############################################################################
 #
@@ -1803,6 +1809,57 @@ function divrem{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::Array{GenMPoly{T, 
       er = r.exps
    end
    return [parent(a)(q[i].coeffs, eq[i]) for i in 1:len], parent(a)(r.coeffs, er)
+end
+
+###############################################################################
+#
+#   Evaluation
+#
+###############################################################################
+
+function evaluate{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, A::Array{T})
+   if iszero(a)
+      return base_ring(a)()
+   end
+   while a.length > 1 || !iszero(a.exps[a.length])
+      k, p = main_variable_extract(a)
+      a = evaluate(p, A[k])
+   end
+   if a.length == 0
+      return base_ring(a)()
+   else
+      return a.coeffs[1]
+   end
+end
+
+function evaluate{T <: RingElem, S, N, U <: Integer}(a::GenMPoly{T, S, N}, A::Array{U})
+   if iszero(a)
+      return base_ring(a)()
+   end
+   while a.length > 1 || !iszero(a.exps[a.length])
+      k, p = main_variable_extract(a)
+      a = evaluate(p, A[k])
+   end
+   if a.length == 0
+      return base_ring(a)()
+   else
+      return a.coeffs[1]
+   end
+end
+
+function evaluate{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, A::Array{fmpz})
+   if iszero(a)
+      return base_ring(a)()
+   end
+   while a.length > 1 || (a.length == 1 && !iszero(a.exps[a.length]))
+      k, p = main_variable_extract(a)
+      a = evaluate(p, A[k])
+   end
+   if a.length == 0
+      return base_ring(a)()
+   else
+      return a.coeffs[1]
+   end
 end
 
 ###############################################################################
