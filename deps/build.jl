@@ -142,7 +142,7 @@ if is_windows()
    try
       run(`ln -sf $vdir\\lib\\libflint.dll $vdir\\lib\\libflint-13.dll`)
    catch
-      cp("libflint.dll", "libflint-13.dll")
+      cp(joinpath(vdir, "lib", "libflint.dll"), joinpath(vdir, "lib", "libflint-13.dll"))
    end
 else
    cd(joinpath("$wdir", "flint2"))
