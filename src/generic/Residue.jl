@@ -141,7 +141,7 @@ needs_parentheses(x::ResElem) = needs_parentheses(data(x))
 
 is_negative(x::ResElem) = is_negative(data(x))
 
-show_minus_one{T <: RingElem}(::Type{ResElem{T}}) = true
+show_minus_one{T <: RingElem}(::Type{GenRes{T}}) = true
 
 ###############################################################################
 #
@@ -449,6 +449,11 @@ function divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
       error("Impossible inverse in divexact")
    end
    return parent(a)(data(a) * binv)
+end
+
+function divides{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
+   b == 0 && error("Division by zero in divides")
+   return true, divexact(a, b)
 end
 
 ###############################################################################

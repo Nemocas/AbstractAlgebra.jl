@@ -355,6 +355,11 @@ function divexact(x::fq, y::fq)
    return z
 end
 
+function divides(a::fq, b::fq)
+   b == 0 && error("Division by zero in divides")
+   return true, divexact(a, b)
+end
+
 ###############################################################################
 #
 #   Ad hoc exact division
