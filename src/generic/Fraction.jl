@@ -626,6 +626,11 @@ function divexact{T <: RingElem}(a::T, b::FracElem{T})
    return parent(b)(n, d)
 end
 
+function divides{T <: RingElem}(a::FracElem{T}, b::FracElem{T})
+   b == 0 && error("Division by zero in divides")
+   return true, divexact(a, b)
+end
+
 ###############################################################################
 #
 #   Powering
