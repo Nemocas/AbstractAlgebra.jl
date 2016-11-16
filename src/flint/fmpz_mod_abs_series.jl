@@ -82,7 +82,7 @@ function gen(R::FmpzModAbsSeriesRing)
    return z
 end
 
-function deepcopy(a::fmpz_mod_abs_series)
+function deepcopy_internal(a::fmpz_mod_abs_series, dict::ObjectIdDict)
    z = fmpz_mod_abs_series(a)
    z.prec = a.prec
    z.parent = parent(a)

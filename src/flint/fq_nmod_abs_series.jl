@@ -88,7 +88,7 @@ function gen(R::FqNmodAbsSeriesRing)
    return z
 end
 
-function deepcopy(a::fq_nmod_abs_series)
+function deepcopy_internal(a::fq_nmod_abs_series, dict::ObjectIdDict)
    z = fq_nmod_abs_series(base_ring(a), a)
    z.prec = a.prec
    z.parent = parent(a)

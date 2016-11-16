@@ -41,7 +41,7 @@ function test_fq_rel_series_printing()
 
    b = (t^2 + 1)*x^2 + (t + 3)x + O(x^4)
 
-   @test string(b) == "(t^2+1)*x^2+(t+3)*x+O(x^4)"
+   @test string(b) == "(t+3)*x+(t^2+1)*x^2+O(x^4)"
 
    println("PASS")
 end

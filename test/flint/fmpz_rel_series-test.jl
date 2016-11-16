@@ -29,7 +29,7 @@ function test_fmpz_rel_series_printing()
    R, x = PowerSeriesRing(ZZ, 30, "x")
    a = x^3 + 2x + 1
 
-   @test string(a) == "x^3+2*x+1+O(x^30)"
+   @test string(a) == "1+2*x+x^3+O(x^30)"
 
    println("PASS")
 end

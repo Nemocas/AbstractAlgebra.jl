@@ -79,6 +79,8 @@ function gen(R::FmpzModRelSeriesRing)
    return z
 end
 
+modulus(R::FmpzModRelSeriesRing) = modulus(base_ring(R)) 
+
 function deepcopy_internal(a::fmpz_mod_rel_series, dict::ObjectIdDict)
    z = fmpz_mod_rel_series(a)
    z.prec = a.prec

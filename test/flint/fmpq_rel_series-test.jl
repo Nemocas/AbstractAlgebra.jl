@@ -32,7 +32,7 @@ function test_fmpq_rel_series_printing()
 
    a = x^3 + 2x + 1
 
-   @test string(a) == "x^3 + 2*x + 1+O(x^30)"
+   @test string(a) == "1+2*x+x^3+O(x^30)"
    
    println("PASS")
 end
