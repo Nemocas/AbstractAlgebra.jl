@@ -46,7 +46,7 @@ ResidueRing{T <: RingElem}(R::Ring, a::T; cached=true)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L549' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L549' class='documenter-source'>source</a><br>
 
 
 Here are some examples of creating residue rings and making use of the resulting parent objects to coerce various elements into those rings.
@@ -86,7 +86,7 @@ zero(R::ResRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L79' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L79' class='documenter-source'>source</a><br>
 
 <a id='Base.one-Tuple{Nemo.ResRing}' href='#Base.one-Tuple{Nemo.ResRing}'>#</a>
 **`Base.one`** &mdash; *Method*.
@@ -101,7 +101,7 @@ zero(R::ResRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L86' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L86' class='documenter-source'>source</a><br>
 
 
 Here are some examples of constructing residues.
@@ -251,6 +251,259 @@ Numerous functions are provided to manipulate residues. Also see the section on 
 **`Nemo.base_ring`** &mdash; *Method*.
 
 
+
+```
+base_ring(a::FlintIntegerRing)
+```
+
+> Returns `Union{}` as this ring is not dependent on another ring.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz.jl#L61' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(a::fmpz)
+```
+
+> Returns `Union{}` as the parent ring is not dependent on another ring.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz.jl#L67' class='documenter-source'>source</a><br>
+
+
+```
+base_ring{T <: RingElem}(S::ResRing{T})
+```
+
+> Return the base ring $R$ of the given residue ring $S = R/(a)$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L19' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(r::ResElem)
+```
+
+> Return the base ring $R$ of the residue ring $R/(a)$ that the supplied element $r$ belongs to.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L25' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(R::PolyRing)
+```
+
+> Return the base ring of the given polynomial ring.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L27' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(a::PolyElem)
+```
+
+> Return the base ring of the polynomial ring of the given polynomial.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L33' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(R::SeriesRing)
+```
+
+> Return the base ring of the given power series ring.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/RelSeries.jl#L38' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(a::SeriesElem)
+```
+
+> Return the base ring of the power series ring of the given power series.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L47' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(R::SeriesRing)
+```
+
+> Return the base ring of the given power series ring.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L41' class='documenter-source'>source</a><br>
+
+
+```
+base_ring{T <: RingElem}(S::MatSpace{T})
+```
+
+> Return the base ring $R$ of the given matrix space.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Matrix.jl#L22' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(r::MatElem)
+```
+
+> Return the base ring $R$ of the matrix space that the supplied matrix $r$ belongs to.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Matrix.jl#L28' class='documenter-source'>source</a><br>
+
+
+```
+base_ring{T}(S::FracField{T})
+```
+
+> Return the base ring $R$ of the given fraction field.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Fraction.jl#L19' class='documenter-source'>source</a><br>
+
+
+```
+base_ring{T}(r::FracElem)
+```
+
+> Return the base ring $R$ of the fraction field that the supplied element $a$ belongs to.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Fraction.jl#L25' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(a::FqFiniteField)
+```
+
+> Returns `Union{}` as this field is not dependent on another field.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L20' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(a::fq)
+```
+
+> Returns `Union{}` as this field is not dependent on another field.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L26' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(a::AnticNumberField)
+```
+
+> Returns `Union{}` since a number field doesn't depend on any ring.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/antic/nf_elem.jl#L26' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(a::nf_elem)
+```
+
+> Returns `Union{}` since a number field doesn't depend on any ring.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/antic/nf_elem.jl#L32' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(R::ArbField)
+```
+
+> Returns `Union{}` since an Arb field does not depend on any other ring.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb.jl#L39' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(x::arb)
+```
+
+> Returns `Union{}` since an Arb field does not depend on any other ring.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb.jl#L45' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(R::AcbField)
+```
+
+> Returns `Union{}` since an Arb complex field does not depend on any other ring.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb.jl#L38' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(a::acb)
+```
+
+> Returns `Union{}` since an Arb complex field does not depend on any other ring.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb.jl#L45' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(a::FlintPadicField)
+```
+
+> Returns `Union{}` as this field is not dependent on another field.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/padic.jl#L69' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(a::padic)
+```
+
+> Returns `Union{}` as this field is not dependent on another field.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/padic.jl#L75' class='documenter-source'>source</a><br>
+
 <a id='Nemo.base_ring-Tuple{Nemo.ResElem}' href='#Nemo.base_ring-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
 
@@ -264,7 +517,7 @@ base_ring(r::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L25' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L25' class='documenter-source'>source</a><br>
 
 <a id='Base.parent-Tuple{Nemo.ResElem}' href='#Base.parent-Tuple{Nemo.ResElem}'>#</a>
 **`Base.parent`** &mdash; *Method*.
@@ -279,7 +532,7 @@ parent(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L32' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L32' class='documenter-source'>source</a><br>
 
 <a id='Nemo.modulus-Tuple{Nemo.ResRing}' href='#Nemo.modulus-Tuple{Nemo.ResRing}'>#</a>
 **`Nemo.modulus`** &mdash; *Method*.
@@ -294,7 +547,7 @@ modulus(R::ResRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L60' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L60' class='documenter-source'>source</a><br>
 
 <a id='Nemo.modulus-Tuple{Nemo.ResElem}' href='#Nemo.modulus-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.modulus`** &mdash; *Method*.
@@ -309,7 +562,7 @@ modulus(R::ResRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L68' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L68' class='documenter-source'>source</a><br>
 
 <a id='Nemo.iszero-Tuple{Nemo.ResElem}' href='#Nemo.iszero-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
@@ -324,7 +577,7 @@ iszero(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L92' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L92' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isone-Tuple{Nemo.ResElem}' href='#Nemo.isone-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
@@ -339,7 +592,7 @@ isone(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L99' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L99' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isunit-Tuple{Nemo.ResElem}' href='#Nemo.isunit-Tuple{Nemo.ResElem}'>#</a>
 **`Nemo.isunit`** &mdash; *Method*.
@@ -354,7 +607,7 @@ iszero(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L106' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L106' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of residues.
@@ -535,7 +788,7 @@ inv(a::ResElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L422' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L422' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing inverses.
@@ -571,7 +824,7 @@ gcd{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Residue.jl#L460' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L460' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing a greatest common divisor.

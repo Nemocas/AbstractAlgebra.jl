@@ -10,9 +10,9 @@ function test_fmpq_rel_series_constructors()
 
    @test isa(R(a), SeriesElem)
 
-   @test isa(R([fmpz(1), fmpz(2), fmpq(3)], 3, 5), SeriesElem)
+   @test isa(R([fmpz(1), fmpz(2), fmpq(3)], 3, 5, 0), SeriesElem)
 
-   @test isa(R([fmpq(1), fmpq(2), fmpq(3)], 3, 3), SeriesElem)
+   @test isa(R([fmpq(1), fmpq(2), fmpq(3)], 3, 3, 0), SeriesElem)
 
    @test isa(R(1), SeriesElem)
 

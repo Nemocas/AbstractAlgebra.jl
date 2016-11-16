@@ -237,7 +237,7 @@ that it can change the length to any value from zero to the number of
 coefficients currently allocated and initialised.
 
 ```
-length(a::SeriesElem)
+pol_length(a::SeriesElem)
 ```
 
 Return the current length (not the number of allocated coefficients), of the

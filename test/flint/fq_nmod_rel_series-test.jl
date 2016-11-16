@@ -13,7 +13,7 @@ function test_fq_nmod_rel_series_constructors()
    @test isa(b, SeriesElem)
 
    c = S(a)
-   d = S([t + 1, t, R(1)], 3, 5)
+   d = S([t + 1, t, R(1)], 3, 5, 0)
 
    @test isa(c, SeriesElem)
    @test isa(d, SeriesElem)
@@ -76,12 +76,6 @@ function test_fq_nmod_rel_series_manipulation()
    @test isequal(deepcopy(a), a)
 
    @test isequal(deepcopy(b), b)
-
-   @test length(a) == 4
-
-   @test length(b) == 0
-
-   @test normalise(a, 4) == 4
 
    @test coeff(a, 1) == 2
 

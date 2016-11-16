@@ -58,7 +58,7 @@ FlintFiniteField(char::fmpz, deg::Int, s::AbstractString{})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L506' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L506' class='documenter-source'>source</a><br>
 
 <a id='Nemo.FlintFiniteField-Tuple{Integer,Int64,AbstractString}' href='#Nemo.FlintFiniteField-Tuple{Integer,Int64,AbstractString}'>#</a>
 **`Nemo.FlintFiniteField`** &mdash; *Method*.
@@ -73,7 +73,7 @@ FlintFiniteField(char::Integer, deg::Int, s::AbstractString{})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L524' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L524' class='documenter-source'>source</a><br>
 
 <a id='Nemo.FlintFiniteField-Tuple{Nemo.fmpz_mod_poly,AbstractString}' href='#Nemo.FlintFiniteField-Tuple{Nemo.fmpz_mod_poly,AbstractString}'>#</a>
 **`Nemo.FlintFiniteField`** &mdash; *Method*.
@@ -88,7 +88,7 @@ FlintFiniteField(pol::fmpz_mod_poly, s::AbstractString{})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L539' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L539' class='documenter-source'>source</a><br>
 
 
 Here are some examples of creating finite fields and making use of the resulting parent objects to coerce various elements into those fields.
@@ -130,7 +130,7 @@ zero(a::FqFiniteField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L70' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L70' class='documenter-source'>source</a><br>
 
 <a id='Base.one-Tuple{Nemo.FqFiniteField}' href='#Base.one-Tuple{Nemo.FqFiniteField}'>#</a>
 **`Base.one`** &mdash; *Method*.
@@ -145,7 +145,7 @@ one(a::FqFiniteField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L80' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L80' class='documenter-source'>source</a><br>
 
 <a id='Nemo.gen-Tuple{Nemo.FqFiniteField}' href='#Nemo.gen-Tuple{Nemo.FqFiniteField}'>#</a>
 **`Nemo.gen`** &mdash; *Method*.
@@ -160,7 +160,7 @@ gen(a::FqFiniteField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L90' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L90' class='documenter-source'>source</a><br>
 
 
 Here are some examples of constructing finite field elements.
@@ -282,7 +282,7 @@ base_ring(a::FqFiniteField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L20' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L20' class='documenter-source'>source</a><br>
 
 <a id='Nemo.base_ring-Tuple{Nemo.fq}' href='#Nemo.base_ring-Tuple{Nemo.fq}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
@@ -297,7 +297,7 @@ base_ring(a::fq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L26' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L26' class='documenter-source'>source</a><br>
 
 <a id='Base.parent-Tuple{Nemo.fq}' href='#Base.parent-Tuple{Nemo.fq}'>#</a>
 **`Base.parent`** &mdash; *Method*.
@@ -312,7 +312,7 @@ parent(a::fq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L32' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L32' class='documenter-source'>source</a><br>
 
 <a id='Nemo.iszero-Tuple{Nemo.fq}' href='#Nemo.iszero-Tuple{Nemo.fq}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
@@ -327,7 +327,7 @@ iszero(a::fq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L102' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L102' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isone-Tuple{Nemo.fq}' href='#Nemo.isone-Tuple{Nemo.fq}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
@@ -342,7 +342,7 @@ isone(a::fq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L110' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L110' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isunit-Tuple{Nemo.fq}' href='#Nemo.isunit-Tuple{Nemo.fq}'>#</a>
 **`Nemo.isunit`** &mdash; *Method*.
@@ -357,7 +357,7 @@ isunit(a::fq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L125' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L125' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isgen-Tuple{Nemo.fq}' href='#Nemo.isgen-Tuple{Nemo.fq}'>#</a>
 **`Nemo.isgen`** &mdash; *Method*.
@@ -372,7 +372,7 @@ isgen(a::fq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L118' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L118' class='documenter-source'>source</a><br>
 
 <a id='Nemo.coeff-Tuple{Nemo.fq,Int64}' href='#Nemo.coeff-Tuple{Nemo.fq,Int64}'>#</a>
 **`Nemo.coeff`** &mdash; *Method*.
@@ -387,7 +387,7 @@ coeff(x::fq, n::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L57' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L57' class='documenter-source'>source</a><br>
 
 <a id='Nemo.degree-Tuple{Nemo.FqFiniteField}' href='#Nemo.degree-Tuple{Nemo.FqFiniteField}'>#</a>
 **`Nemo.degree`** &mdash; *Method*.
@@ -402,7 +402,7 @@ degree(a::FqFiniteField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L155' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L155' class='documenter-source'>source</a><br>
 
 <a id='Nemo.characteristic-Tuple{Nemo.FqFiniteField}' href='#Nemo.characteristic-Tuple{Nemo.FqFiniteField}'>#</a>
 **`Nemo.characteristic`** &mdash; *Method*.
@@ -417,7 +417,7 @@ characteristic(a::FqFiniteField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L133' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L133' class='documenter-source'>source</a><br>
 
 <a id='Nemo.order-Tuple{Nemo.FqFiniteField}' href='#Nemo.order-Tuple{Nemo.FqFiniteField}'>#</a>
 **`Nemo.order`** &mdash; *Method*.
@@ -432,7 +432,7 @@ order(a::FqFiniteField)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L144' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L144' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of finite field elements.
@@ -579,7 +579,7 @@ inv(x::fq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L378' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L378' class='documenter-source'>source</a><br>
 
 
 Here are some examples of inversion.
@@ -614,7 +614,7 @@ trace(x::fq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L408' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L408' class='documenter-source'>source</a><br>
 
 <a id='Base.LinAlg.norm-Tuple{Nemo.fq}' href='#Base.LinAlg.norm-Tuple{Nemo.fq}'>#</a>
 **`Base.LinAlg.norm`** &mdash; *Method*.
@@ -629,7 +629,7 @@ norm(x::fq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L420' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L420' class='documenter-source'>source</a><br>
 
 <a id='Nemo.frobenius-Tuple{Nemo.fq,Int64}' href='#Nemo.frobenius-Tuple{Nemo.fq,Int64}'>#</a>
 **`Nemo.frobenius`** &mdash; *Method*.
@@ -644,7 +644,7 @@ frobenius(x::fq, n = 1)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L432' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L432' class='documenter-source'>source</a><br>
 
 <a id='Nemo.pth_root-Tuple{Nemo.fq}' href='#Nemo.pth_root-Tuple{Nemo.fq}'>#</a>
 **`Nemo.pth_root`** &mdash; *Method*.
@@ -659,7 +659,7 @@ pth_root(x::fq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fq.jl#L396' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L396' class='documenter-source'>source</a><br>
 
 
 Here are some examples of special functions.
