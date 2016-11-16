@@ -22,39 +22,39 @@ doc"""
 function O{T}(a::RelSeriesElem{T})
    prec = length(a) - 1
    prec < 0 && throw(DomainError())
-   return parent(a)(Array(T, 0), 0, prec)
+   return parent(a)(Array(T, 0), 0, prec, prec)
 end
 
 parent_type{T}(::Type{GenRelSeries{T}}) = GenRelSeriesRing{T}
 
 doc"""
-    parent(a::RelSeriesElem)
+    parent(a::SeriesElem)
 > Return the parent of the given power series.
 """
-parent(a::RelSeriesElem) = a.parent
+parent(a::SeriesElem) = a.parent
 
 elem_type{T <: RingElem}(::GenRelSeriesRing{T}) = GenRelSeries{T}
 
 doc"""
-    base_ring(R::RelSeriesRing)
+    base_ring(R::SeriesRing)
 > Return the base ring of the given power series ring.
 """
-base_ring{T}(R::RelSeriesRing{T}) = R.base_ring::parent_type(T)
+base_ring{T}(R::SeriesRing{T}) = R.base_ring::parent_type(T)
 
 doc"""
-    base_ring(a::RelSeriesElem)
+    base_ring(a::SeriesElem)
 > Return the base ring of the power series ring of the given power series.
 """
-base_ring(a::RelSeriesElem) = base_ring(parent(a))
+base_ring(a::SeriesElem) = base_ring(parent(a))
 
 doc"""
-    var(a::RelSeriesRing)
+    var(a::SeriesRing)
 > Return the internal name of the generator of the power series ring. Note that
 > this is returned as a `Symbol` not a `String`.
 """
-var(a::RelSeriesRing) = a.S
+var(a::SeriesRing) = a.S
 
-function check_parent(a::RelSeriesElem, b::RelSeriesElem)
+function check_parent(a::SeriesElem, b::SeriesElem)
    parent(a) != parent(b) && 
              error("Incompatible power series rings in power series operation")
 end
@@ -65,7 +65,7 @@ end
 #
 ###############################################################################    
    
-function Base.hash(a::RelSeriesElem, h::UInt)
+function Base.hash(a::SeriesElem, h::UInt)
    b = 0xb44d6896204881f3%UInt
    for i in 0:length(a) - 1
       b $= hash(coeff(a, i), h) $ h
@@ -79,11 +79,11 @@ length(x::RelSeriesElem) = x.length
 precision(x::RelSeriesElem) = x.prec
 
 doc"""
-    max_precision(R::RelSeriesRing)
+    max_precision(R::SeriesRing)
 > Return the maximum relative precision of power series in the given power
 > series ring.
 """
-max_precision(R::RelSeriesRing) = R.prec_max
+max_precision(R::SeriesRing) = R.prec_max
 
 function normalise(a::GenRelSeries, len::Int)
    while len > 0 && iszero(a.coeffs[len])
@@ -92,11 +92,11 @@ function normalise(a::GenRelSeries, len::Int)
    return len
 end
 
-function set_length!(a::RelSeriesElem, len::Int)
+function set_length!(a::SeriesElem, len::Int)
    a.length = len
 end
 
-function set_prec!(a::RelSeriesElem, prec::Int)
+function set_prec!(a::SeriesElem, prec::Int)
    a.prec = prec
 end
 
@@ -106,53 +106,55 @@ function coeff(a::GenRelSeries, n::Int)
 end
 
 doc"""
-    zero(R::RelSeriesRing)
+    zero(R::SeriesRing)
 > Return $0 + O(x^n)$ where $n$ is the maximum precision of the power series
 > ring $R$.
 """
-zero(R::RelSeriesRing) = R(0)
+zero(R::SeriesRing) = R(0)
 
 doc"""
-    zero(R::RelSeriesRing)
+    zero(R::SeriesRing)
 > Return $1 + O(x^n)$ where $n$ is the maximum precision of the power series
 > ring $R$.
 """
-one(R::RelSeriesRing) = R(1)
+one(R::SeriesRing) = R(1)
 
 doc"""
-    zero(R::RelSeriesRing)
+    gen{T}(R::GenRelSeriesRing{T})
 > Return the generator of the power series ring, i.e. $x + O(x^{n + 1})$ where
 > $n$ is the maximum precision of the power series ring $R$.
 """
-function gen{T}(R::RelSeriesRing{T})
+function gen{T}(R::GenRelSeriesRing{T})
    S = base_ring(R)
-   return R([S(0), S(1)], 2, max_precision(R) + 1)
+   return R([S(0), S(1)], 2, max_precision(R), 1)
 end
 
 doc"""
-    iszero(a::RelSeriesElem)
+    iszero(a::SeriesElem)
 > Return `true` if the given power series is arithmetically equal to zero to
 > its current precision, otherwise return `false`.
 """
-iszero(a::RelSeriesElem) = length(a) == 0
+iszero(a::SeriesElem) = length(a) == 0
 
 doc"""
-    isone(a::RelSeriesElem)
+    isone(a::GenRelSeries)
 > Return `true` if the given power series is arithmetically equal to one to
 > its current precision, otherwise return `false`.
 """
-function isone(a::RelSeriesElem)
-   return length(a) == 1 && isone(coeff(a, 0))
+function isone(a::GenRelSeries)
+   return (valuation(a) == 0 && length(a) == 1 && isone(coeff(a, 0))) ||
+           precision(a) == 0
 end
 
 doc"""
-    isgen(a::RelSeriesElem)
+    isgen(a::GenRelSeries)
 > Return `true` if the given power series is arithmetically equal to the
 > generator of its power series ring to its current precision, otherwise return
 > `false`.
 """
-function isgen(a::RelSeriesElem)
-   return length(a) == 2 && iszero(coeff(a, 0)) && isone(coeff(a, 1))
+function isgen(a::GenRelSeries)
+   return (valuation(a) == 1 && length(a) == 1 && isone(coeff(a, 0))) || 
+           precision(a) == 0
 end
 
 doc"""
@@ -160,37 +162,27 @@ doc"""
 > Return `true` if the given power series is arithmetically equal to a unit,
 > i.e. is invertible, otherwise return `false`.
 """
-isunit(a::RelSeriesElem) = isunit(coeff(a, 0))
+isunit(a::RelSeriesElem) = valuation(a) == 0 && isunit(coeff(a, 0))
 
 doc"""
     valuation(a::RelSeriesElem)
 > Return the valuation of the given power series, i.e. the degree of the first
 > nonzero term (or the precision if it is arithmetically zero).
 """
-function valuation(a::RelSeriesElem)
-   if length(a) == 0
-      return precision(a)
-   end
-   for i = 1:length(a)
-      if coeff(a, i - 1) != 0
-         return i - 1
-      end
-   end
-   error("Power series is not normalised")
-end
+valuation(a::RelSeriesElem) = a.val
 
 doc"""
-    modulus{T <: ResElem}(a::RelSeriesElem{T})
+    modulus{T <: ResElem}(a::SeriesElem{T})
 > Return the modulus of the coefficients of the given polynomial.
 """
-modulus{T <: ResElem}(a::RelSeriesElem{T}) = modulus(base_ring(a))
+modulus{T <: ResElem}(a::SeriesElem{T}) = modulus(base_ring(a))
 
-function deepcopy_internal{T <: RingElem}(a::RelSeriesElem{T}, dict::ObjectIdDict)
+function deepcopy_internal{T <: RingElem}(a::GenRelSeries{T}, dict::ObjectIdDict)
    coeffs = Array(T, length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy(coeff(a, i - 1))
    end
-   return parent(a)(coeffs, length(a), precision(a))
+   return parent(a)(coeffs, length(a), precision(a), valuation(a))
 end
 
 ###############################################################################
@@ -199,67 +191,61 @@ end
 #
 ###############################################################################
 
-function show{T <: RingElem}(io::IO, x::RelSeriesElem{T})
+function show{T <: RingElem}(io::IO, x::GenRelSeries{T})
    len = length(x)
 
    if len == 0
       print(io, zero(base_ring(x)))
    else
       coeff_printed = false
-      c = coeff(x, 0)
-      bracket = needs_parentheses(c)
-      if !iszero(c)
-         if bracket
-            print(io, "(")
-         end
-         show(io, c)
-         if bracket
-            print(io, ")")
-         end
-         coeff_printed = true
-      end
-      for i = 1:len - 1
+      for i = 0:len - 1
          c = coeff(x, i)
          bracket = needs_parentheses(c)
          if !iszero(c)
             if coeff_printed && !is_negative(c)
                print(io, "+")
             end
-            if !isone(c) && (c != -1 || show_minus_one(elem_type(base_ring(x))))
-               if bracket
-                  print(io, "(")
+            if i + valuation(x) != 0
+               if !isone(c) && (c != -1 || show_minus_one(elem_type(base_ring(x))))
+                  if bracket
+                     print(io, "(")
+                  end
+                  print(io, c)
+                  if bracket
+                     print(io, ")")
+                  end
+                  if i + valuation(x) != 0
+                     print(io, "*")
+                  end
                end
-               show(io, c)
-               if bracket
-                  print(io, ")")
+               if c == -1 && !show_minus_one(elem_type(base_ring(x)))
+                  print(io, "-")
                end
-               print(io, "*")
-            end
-            if c == -1 && !show_minus_one(elem_type(base_ring(x)))
-               print(io, "-")
-            end
-            print(io, string(var(parent(x))))
-            if i != 1
-               print(io, "^")
-               print(io, i)
+               print(io, string(var(parent(x))))
+               if i + valuation(x) != 1
+                  print(io, "^")
+                  print(io, valuation(x) + i)
+               end
+            else
+               print(io, c)
             end
             coeff_printed = true
          end
       end
    end
-   print(io, "+O(", string(var(parent(x))), "^", precision(x), ")")
+   print(io, "+O(", string(var(parent(x))), "^", precision(x) + valuation(x), ")")
 end
 
-function show{T <: RingElem}(io::IO, a::RelSeriesRing{T})
+function show{T <: RingElem}(io::IO, a::SeriesRing{T})
    print(io, "Univariate power series ring in ", var(a), " over ")
    show(io, base_ring(a))
 end
 
-needs_parentheses(x::RelSeriesElem) = length(x) > 1
+needs_parentheses(x::SeriesElem) = length(x) > 1
 
-is_negative(x::RelSeriesElem) = length(x) <= 1 && is_negative(coeff(x, 0))
+is_negative(x::SeriesElem) = length(x) <= 1 && is_negative(coeff(x, 0))
 
-show_minus_one{T <: RingElem}(::Type{RelSeriesElem{T}}) = show_minus_one(T)
+show_minus_one{T <: RingElem}(::Type{SeriesElem{T}}) = show_minus_one(T)
 
 ###############################################################################
 #
@@ -1043,16 +1029,16 @@ function (a::GenRelSeriesRing{T}){T <: RingElem}(b::RingElem)
 end
 
 function (a::GenRelSeriesRing{T}){T <: RingElem}()
-   z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max)
+   z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max, a.prec_max)
    z.parent = a
    return z
 end
 
 function (a::GenRelSeriesRing{T}){T <: RingElem}(b::Integer)
    if b == 0
-      z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max)
+      z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max, a.prec_max)
    else
-      z = GenRelSeries{T}([base_ring(a)(b)], 1, a.prec_max)
+      z = GenRelSeries{T}([base_ring(a)(b)], 1, a.prec_max, 0)
    end
    z.parent = a
    return z
@@ -1060,9 +1046,9 @@ end
 
 function (a::GenRelSeriesRing{T}){T <: RingElem}(b::fmpz)
    if b == 0
-      z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max)
+      z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max, a.prec_max)
    else
-      z = GenRelSeries{T}([base_ring(a)(b)], 1, a.prec_max)
+      z = GenRelSeries{T}([base_ring(a)(b)], 1, a.prec_max, 0)
    end
    z.parent = a
    return z
@@ -1071,9 +1057,9 @@ end
 function (a::GenRelSeriesRing{T}){T <: RingElem}(b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to power series")
    if b == 0
-      z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max)
+      z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max, a.prec_max)
    else
-      z = GenRelSeries{T}([b], 1, a.prec_max)
+      z = GenRelSeries{T}([b], 1, a.prec_max, 0)
    end
    z.parent = a
    return z
@@ -1084,11 +1070,11 @@ function (a::GenRelSeriesRing{T}){T <: RingElem}(b::RelSeriesElem{T})
    return b
 end
 
-function (a::GenRelSeriesRing{T}){T <: RingElem}(b::Array{T, 1}, len::Int, prec::Int)
+function (a::GenRelSeriesRing{T}){T <: RingElem}(b::Array{T, 1}, len::Int, prec::Int, val::Int)
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to power series")
    end
-   z = GenRelSeries{T}(b, len, prec)
+   z = GenRelSeries{T}(b, len, prec, val)
    z.parent = a
    return z
 end
@@ -1100,20 +1086,27 @@ end
 ###############################################################################
 
 doc"""
-   PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{}; cached=true)
+   PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{}; cached=true, model=:capped_relative)
 > Return a tuple $(S, x)$ consisting of the parent object `S` of a power series
 > ring over the given base ring and a generator `x` for the power series ring.
-> The maximum relative precision of power series in the ring is set to `prec`.
-> The supplied string `s` specifies the way the generator of the power series
-> ring will be printed. By default, the parent object `S` will be cached so
-> that supplying the same base ring, string and precision in future will return
-> the same parent object and generator. If caching of the parent object is not
-> required, `cached` can be set to `false`.
+> The maximum precision of power series in the ring is set to `prec`. If the
+> model is set to `:capped_relative` this is taken as a maximum relative
+> precision, and if it is set to `:capped_absolute` this is take to be a 
+> maximum absolute precision. The supplied string `s` specifies the way the
+> generator of the power series ring will be printed. By default, the parent
+> object `S` will be cached so that supplying the same base ring, string and
+> precision in future will return the same parent object and generator. If
+> caching of the parent object is not required, `cached` can be set to `false`.
 """
-function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{}; cached=true)
+function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{}; cached=true, model=:capped_relative)
    S = Symbol(s)
    T = elem_type(R)
-   parent_obj = GenRelSeriesRing{T}(R, prec, S, cached)
+   
+   if model == :capped_relative
+      parent_obj = GenRelSeriesRing{T}(R, prec, S, cached)
+   elseif model == :capped_absolute
+      parent_obj = GenAbsSeriesRing{T}(R, prec, S, cached)
+   end
 
-   return parent_obj, parent_obj([R(0), R(1)], 2, prec + 1)
+   return parent_obj, gen(parent_obj)
 end
