@@ -81,7 +81,7 @@ end
 
 const GenRelSeriesID = ObjectIdDict()
 
-type GenRelSeriesRing{T <: RingElem} <: SeriesRing{T}
+type GenRelSeriesRing{T <: RingElem} <: RelSeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
@@ -99,7 +99,7 @@ type GenRelSeriesRing{T <: RingElem} <: SeriesRing{T}
    end
 end
 
-type GenRelSeries{T <: RingElem} <: SeriesElem{T}
+type GenRelSeries{T <: RingElem} <: RelSeriesElem{T}
    coeffs::Array{T, 1}
    length::Int
    prec::Int
@@ -121,7 +121,7 @@ end
 
 const GenAbsSeriesID = ObjectIdDict()
 
-type GenAbsSeriesRing{T <: RingElem} <: SeriesRing{T}
+type GenAbsSeriesRing{T <: RingElem} <: AbsSeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
@@ -139,7 +139,7 @@ type GenAbsSeriesRing{T <: RingElem} <: SeriesRing{T}
    end
 end
 
-type GenAbsSeries{T <: RingElem} <: SeriesElem{T}
+type GenAbsSeries{T <: RingElem} <: AbsSeriesElem{T}
    coeffs::Array{T, 1}
    length::Int
    prec::Int

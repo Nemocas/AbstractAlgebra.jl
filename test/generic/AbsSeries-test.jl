@@ -1,40 +1,40 @@
-function test_rel_series_constructors()
-   print("GenRelSeries.constructors...")
+function test_abs_series_constructors()
+   print("GenAbsSeries.constructors...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
-   @test isa(S, GenRelSeriesRing)
+   @test isa(S, GenAbsSeriesRing)
 
    a = x^3 + 2x + 1
    b = (t^2 + 1)*x^2 + (t + 3)x + O(x^4)
 
-   @test isa(a, RelSeriesElem)
-   @test isa(b, RelSeriesElem)
+   @test isa(a, AbsSeriesElem)
+   @test isa(b, AbsSeriesElem)
 
    c = S(a)
    d = S([t + 1, t, R(1)], 3, 5)
 
-   @test isa(c, RelSeriesElem)
-   @test isa(d, RelSeriesElem)
+   @test isa(c, AbsSeriesElem)
+   @test isa(d, AbsSeriesElem)
 
    g = S(1)
    h = S(fmpz(2))
    k = S()
 
-   @test isa(g, RelSeriesElem)
-   @test isa(h, RelSeriesElem)
-   @test isa(k, RelSeriesElem)
+   @test isa(g, AbsSeriesElem)
+   @test isa(h, AbsSeriesElem)
+   @test isa(k, AbsSeriesElem)
 
    l = S(t)
 
-   @test isa(l, RelSeriesElem)
+   @test isa(l, AbsSeriesElem)
 
    println("PASS")
 end
 
-function test_rel_series_manipulation()
-   print("GenRelSeries.manipulation...")
+function test_abs_series_manipulation()
+   print("GenAbsSeries.manipulation...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -77,8 +77,8 @@ function test_rel_series_manipulation()
    println("PASS")
 end
 
-function test_rel_series_unary_ops()
-   print("GenRelSeries.unary_ops...")
+function test_abs_series_unary_ops()
+   print("GenAbsSeries.unary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -93,8 +93,8 @@ function test_rel_series_unary_ops()
    println("PASS")
 end
 
-function test_rel_series_binary_ops()
-   print("GenRelSeries.binary_ops...")
+function test_abs_series_binary_ops()
+   print("GenAbsSeries.binary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -117,8 +117,8 @@ function test_rel_series_binary_ops()
    println("PASS")
 end
 
-function test_rel_series_adhoc_binary_ops()
-   print("GenRelSeries.adhoc_binary_ops...")
+function test_abs_series_adhoc_binary_ops()
+   print("GenAbsSeries.adhoc_binary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -139,8 +139,8 @@ function test_rel_series_adhoc_binary_ops()
    println("PASS")
 end
 
-function test_rel_series_comparison()
-   print("GenRelSeries.comparison...")
+function test_abs_series_comparison()
+   print("GenAbsSeries.comparison...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -163,8 +163,8 @@ function test_rel_series_comparison()
    println("PASS")
 end
 
-function test_rel_series_adhoc_comparison()
-   print("GenRelSeries.adhoc_comparison...")
+function test_abs_series_adhoc_comparison()
+   print("GenAbsSeries.adhoc_comparison...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -187,8 +187,8 @@ function test_rel_series_adhoc_comparison()
    println("PASS")
 end
 
-function test_rel_series_powering()
-   print("GenRelSeries.powering...")
+function test_abs_series_powering()
+   print("GenAbsSeries.powering...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -209,8 +209,8 @@ function test_rel_series_powering()
    println("PASS")
 end
 
-function test_rel_series_shift()
-   print("GenRelSeries.shift...")
+function test_abs_series_shift()
+   print("GenAbsSeries.shift...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -231,8 +231,8 @@ function test_rel_series_shift()
    println("PASS")
 end
 
-function test_rel_series_truncation()
-   print("GenRelSeries.truncation...")
+function test_abs_series_truncation()
+   print("GenAbsSeries.truncation...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -253,8 +253,8 @@ function test_rel_series_truncation()
    println("PASS")
 end
 
-function test_rel_series_inversion()
-   print("GenRelSeries.inversion...")
+function test_abs_series_inversion()
+   print("GenAbsSeries.inversion...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -269,8 +269,8 @@ function test_rel_series_inversion()
    println("PASS")
 end
 
-function test_rel_series_exact_division()
-   print("GenRelSeries.exact_division...")
+function test_abs_series_exact_division()
+   print("GenAbsSeries.exact_division...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -291,8 +291,8 @@ function test_rel_series_exact_division()
    println("PASS")
 end
 
-function test_rel_series_adhoc_exact_division()
-   print("GenRelSeries.adhoc_exact_division...")
+function test_abs_series_adhoc_exact_division()
+   print("GenAbsSeries.adhoc_exact_division...")
 
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
@@ -317,8 +317,8 @@ function test_rel_series_adhoc_exact_division()
    println("PASS")
 end
 
-function test_rel_series_special_functions()
-   print("GenRelSeries.special_functions...")
+function test_abs_series_special_functions()
+   print("GenAbsSeries.special_functions...")
 
    R = ResidueRing(ZZ, 17)
    T, t = PolynomialRing(R, "t")
@@ -331,21 +331,21 @@ function test_rel_series_special_functions()
    println("PASS")
 end
 
-function test_gen_rel_series()
-   test_rel_series_constructors()
-   test_rel_series_manipulation()
-   test_rel_series_unary_ops()
-   test_rel_series_binary_ops()
-   test_rel_series_adhoc_binary_ops()
-   test_rel_series_comparison()
-   test_rel_series_adhoc_comparison()
-   test_rel_series_powering()
-   test_rel_series_shift()
-   test_rel_series_truncation()
-   test_rel_series_exact_division()
-   test_rel_series_adhoc_exact_division()
-   test_rel_series_inversion()
-   test_rel_series_special_functions()
+function test_gen_abs_series()
+   test_abs_series_constructors()
+   test_abs_series_manipulation()
+   test_abs_series_unary_ops()
+   test_abs_series_binary_ops()
+   test_abs_series_adhoc_binary_ops()
+   test_abs_series_comparison()
+   test_abs_series_adhoc_comparison()
+   test_abs_series_powering()
+   test_abs_series_shift()
+   test_abs_series_truncation()
+   test_abs_series_exact_division()
+   test_abs_series_adhoc_exact_division()
+   test_abs_series_inversion()
+   test_abs_series_special_functions()
 
    println("")
 end

@@ -57,6 +57,10 @@
 
    abstract SeriesElem{T} <: RingElem
 
+   abstract RelSeriesElem{T} <: SeriesElem{T}
+
+   abstract AbsSeriesElem{T} <: SeriesElem{T}
+   
    # not always mathematical ring elements
    # later we'll maybe distinguish MatAlgebraElem, MatModuleElem
    abstract MatElem{T} <: RingElem
