@@ -30,37 +30,7 @@ end
 
 parent_type{T}(::Type{GenAbsSeries{T}}) = GenAbsSeriesRing{T}
 
-doc"""
-    parent(a::SeriesElem)
-> Return the parent of the given power series.
-"""
-parent(a::SeriesElem) = a.parent
-
 elem_type{T <: RingElem}(::GenAbsSeriesRing{T}) = GenAbsSeries{T}
-
-doc"""
-    base_ring(R::SeriesRing)
-> Return the base ring of the given power series ring.
-"""
-base_ring{T}(R::SeriesRing{T}) = R.base_ring::parent_type(T)
-
-doc"""
-    base_ring(a::SeriesElem)
-> Return the base ring of the power series ring of the given power series.
-"""
-base_ring(a::SeriesElem) = base_ring(parent(a))
-
-doc"""
-    var(a::SeriesRing)
-> Return the internal name of the generator of the power series ring. Note that
-> this is returned as a `Symbol` not a `String`.
-"""
-var(a::SeriesRing) = a.S
-
-function check_parent(a::SeriesElem, b::SeriesElem)
-   parent(a) != parent(b) && 
-             error("Incompatible power series rings in power series operation")
-end
 
 ###############################################################################
 #
@@ -68,15 +38,6 @@ end
 #
 ###############################################################################    
    
-function Base.hash(a::SeriesElem, h::UInt)
-   b = 0xb44d6896204881f3%UInt
-   for i in 0:length(a) - 1
-      b $= hash(coeff(a, i), h) $ h
-      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
-   end
-   return b
-end
-
 length(x::AbsSeriesElem) = x.length
 
 precision(x::AbsSeriesElem) = x.prec
@@ -95,32 +56,10 @@ function normalise(a::GenAbsSeries, len::Int)
    return len
 end
 
-function set_length!(a::SeriesElem, len::Int)
-   a.length = len
-end
-
-function set_prec!(a::SeriesElem, prec::Int)
-   a.prec = prec
-end
-
 function coeff(a::GenAbsSeries, n::Int)
    n < 0  && throw(DomainError())
    return n >= length(a) ? zero(base_ring(a)) : a.coeffs[n + 1]
 end
-
-doc"""
-    zero(R::SeriesRing)
-> Return $0 + O(x^n)$ where $n$ is the maximum precision of the power series
-> ring $R$.
-"""
-zero(R::SeriesRing) = R(0)
-
-doc"""
-    zero(R::SeriesRing)
-> Return $1 + O(x^n)$ where $n$ is the maximum precision of the power series
-> ring $R$.
-"""
-one(R::SeriesRing) = R(1)
 
 doc"""
     gen{T}(R::GenAbsSeriesRing{T})
@@ -180,12 +119,6 @@ function valuation(a::AbsSeriesElem)
    return precision(a)
 end
 
-doc"""
-    modulus{T <: ResElem}(a::SeriesElem{T})
-> Return the modulus of the coefficients of the given polynomial.
-"""
-modulus{T <: ResElem}(a::SeriesElem{T}) = modulus(base_ring(a))
-
 function deepcopy{T <: RingElem}(a::GenAbsSeries{T})
    coeffs = Array(T, length(a))
    for i = 1:length(a)
@@ -236,17 +169,6 @@ function show{T <: RingElem}(io::IO, x::AbsSeriesElem{T})
    end
    print(io, "+O(", string(var(parent(x))), "^", precision(x), ")")
 end
-
-function show{T <: RingElem}(io::IO, a::SeriesRing{T})
-   print(io, "Univariate power series ring in ", var(a), " over ")
-   show(io, base_ring(a))
-end
-
-needs_parentheses(x::SeriesElem) = length(x) > 1
-
-is_negative(x::SeriesElem) = length(x) <= 1 && is_negative(coeff(x, 0))
-
-show_minus_one{T <: RingElem}(::Type{SeriesElem{T}}) = show_minus_one(T)
 
 ###############################################################################
 #
@@ -1086,29 +1008,4 @@ end
 #
 ###############################################################################
 
-doc"""
-   PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{}; cached=true, model=:capped_relative)
-> Return a tuple $(S, x)$ consisting of the parent object `S` of a power series
-> ring over the given base ring and a generator `x` for the power series ring.
-> The maximum precision of power series in the ring is set to `prec`. If the
-> model is set to `:capped_relative` this is taken as a maximum relative
-> precision, and if it is set to `:capped_absolute` this is take to be a 
-> maximum absolute precision. The supplied string `s` specifies the way the
-> generator of the power series ring will be printed. By default, the parent
-> object `S` will be cached so that supplying the same base ring, string and
-> precision in future will return the same parent object and generator. If
-> caching of the parent object is not required, `cached` can be set to `false`.
-"""
-function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{}; cached=true, model=:capped_relative)
-   S = Symbol(s)
-   T = elem_type(R)
-   
-   if model == :capped_relative
-      parent_obj = GenRelSeriesRing{T}(R, prec, S, cached)
-   elseif model == :capped_absolute
-      parent_obj = GenAbsSeriesRing{T}(R, prec, S, cached)
-   end
-
-   return parent_obj, gen(parent_obj)
-end
-
+# see RelSeries.jl

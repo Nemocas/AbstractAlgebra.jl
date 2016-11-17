@@ -241,8 +241,6 @@ function *(x::fmpz, y::fmpz_mod_abs_series)
    return z
 end
 
-*(x::fmpz_mod_abs_series, y::fmpz) = y * x
-
 *(x::Integer, y::fmpz_mod_abs_series) = fmpz(x)*y
 
 *(x::fmpz_mod_abs_series, y::Integer) = y * x
