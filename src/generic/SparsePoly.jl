@@ -1657,6 +1657,18 @@ function gcd{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T}, ignore_con
 end
 
 function content{T <: RingElem}(a::GenSparsePoly{T})
+   for i = 1:length(a)
+      if a.coeffs[i].length == 1
+         z = term_content(a.coeffs[1])
+         for j = 2:length(a)
+            if isone(z)
+               return z
+            end
+            z = gcd(z, term_content(a.coeffs[j]))
+         end
+         return z
+      end
+   end
    z = coeff(a, 0)
    for i = 2:length(a)
       if z == 1

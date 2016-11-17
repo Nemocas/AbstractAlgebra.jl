@@ -1949,8 +1949,14 @@ function evaluate{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, A::Array{T})
    if iszero(a)
       return base_ring(a)()
    end
+   if S == :lex || S == :revlex
+      start_var = 1
+   else
+      start_var = 2
+   end
    while a.length > 1 || (a.length == 1 && !iszero(a.exps[a.length]))
-      k, p = main_variable_extract(a)
+      k = main_variable(a, start_var)
+      p = main_variable_extract(a, k)
       a = evaluate(p, A[k])
    end
    if a.length == 0
@@ -1964,8 +1970,14 @@ function evaluate{T <: RingElem, S, N, U <: Integer}(a::GenMPoly{T, S, N}, A::Ar
    if iszero(a)
       return base_ring(a)()
    end
+   if S == :lex || S == :revlex
+      start_var = 1
+   else
+      start_var = 2
+   end
    while a.length > 1 || (a.length == 1 && !iszero(a.exps[a.length]))
-      k, p = main_variable_extract(a)
+      k = main_variable(a, start_var)
+      p = main_variable_extract(a, k)
       a = evaluate(p, A[k])
    end
    if a.length == 0
@@ -1979,8 +1991,14 @@ function evaluate{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, A::Array{fmpz})
    if iszero(a)
       return base_ring(a)()
    end
+   if S == :lex || S == :revlex
+      start_var = 1
+   else
+      start_var = 2
+   end
    while a.length > 1 || (a.length == 1 && !iszero(a.exps[a.length]))
-      k, p = main_variable_extract(a)
+      k = main_variable(a, start_var)
+      p = main_variable_extract(a, k)
       a = evaluate(p, A[k])
    end
    if a.length == 0
@@ -2002,32 +2020,81 @@ function gcd{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
    elseif b.length == 0
       return a
    end
-   flag = false
    if a == 1
       return deepcopy(a)
    end
    if b == 1
       return deepcopy(b)
    end
-   k1, p1 = main_variable_extract(a)
-   k2, p2 = main_variable_extract(b)
-   if k1 < k2
-      k1, k2 = k2, k1
-      p1, p2 = p2, p1
-      a, b = b, a
+   # get degrees in each variable
+   v1, d1 = max_degrees(a)
+   v2, d2 = max_degrees(b)
+   # check if both polys are constant
+   if d1 == 0 && d2 == 0
+      return parent(a)(gcd(a.coeffs[1], b.coeffs[1]))
    end
-   if k2 == 0
-      if k1 == 0
-         return parent(a)(gcd(a.coeffs[1], b.coeffs[1]))
-      else
+   if S == :lex || S == :revlex
+      start_var = 1
+   else
+      start_var = 2
+   end
+   # check for cases where degree is 0 in one of the variables for one poly
+   for k = start_var:N
+      if v1[k] == 0 && v2[k] != 0
+         p2 = main_variable_extract(b, k)
+         return gcd(a, content(p2))
+      end
+      if v2[k] == 0 && v1[k] != 0
+         p1 = main_variable_extract(a, k)
          return gcd(content(p1), b)
       end
    end
-   if k1 != k2
-      return gcd(a, content(p2))
+   # count number of terms in lead coefficient, for each variable
+   lead1 = zeros(Int, N)
+   lead2 = zeros(Int, N)
+   for i = start_var:N
+      if v1[i] != 0
+         for j = 1:length(a)
+            if a.exps[j][i] == v1[i]
+               lead1[i] += 1
+            end
+         end
+      end
+      if v2[i] != 0
+         for j = 1:length(b)
+            if b.exps[j][i] == v2[i]
+               lead2[i] += 1
+            end
+         end
+      end
    end
+   # heuristic to decide optimal variable k to choose as main variable
+   # it basically looks for low degree in the main variable, but
+   # heavily weights monomial leading term
+   k = 0
+   m = Inf
+   for i = start_var:N
+      if v1[i] != 0
+         if v1[i] >= v2[i]
+            c = max(log(lead2[i])*v1[i]*v2[i], log(2)*v2[i])
+            if c < m
+               m = c
+               k = i
+            end
+         else
+            c = max(log(lead1[i])*v2[i]*v1[i], log(2)*v1[i])
+            if c < m
+               m = c
+               k = i
+            end
+         end
+      end
+   end
+   # write polys in terms of main variable k, do gcd, then convert back
+   p1 = main_variable_extract(a, k)
+   p2 = main_variable_extract(b, k)
    g = gcd(p1, p2)
-   return main_variable_insert(g, k1)
+   return main_variable_insert(g, k)
 end
 
 function term_content{T <: RingElem, S, N}(a::GenMPoly{T, S, N})
@@ -2072,8 +2139,8 @@ function main_variable{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, k::Int)
    return 0
 end
 
-# return an array of all the starting positions of terms in the main variable
-function main_variable_terms{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, k::Int, ::Type{Val{:lex}})
+# return an array of all the starting positions of terms in the main variable k
+function main_variable_terms{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, k::Int)
    A = Array(Int, 0)
    current_term = typemax(UInt)
    for i = 1:a.length
@@ -2087,7 +2154,7 @@ end
 
 # return the coefficient as a sparse distributed polynomial, of the term in variable
 # k starting at position n 
-function main_variable_coefficient{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, k::Int, n::Int, ::Type{Val{:lex}})
+function main_variable_coefficient_lex{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, k::Int, n::Int)
    exp = a.exps[n][k]
    Ae = Array(NTuple{N, UInt}, 0)
    Ac = Array(T, 0)
@@ -2101,47 +2168,82 @@ function main_variable_coefficient{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, k:
    return parent(a)(Ac, Ae)
 end
 
-function main_variable_extract{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, ::Type{Val{:lex}})
-   k = main_variable(a, 1)
-   if k != 0
-      A = main_variable_terms(a, k, Val{:lex})
-      Pe = Array(UInt, length(A))
-      Pc = Array(GenMPoly{T, :lex, N}, length(A))
-      for i = 1:length(A)
-         Pe[i] = a.exps[A[i]][k]
-         Pc[i] = main_variable_coefficient(a, k, A[i], Val{:lex})
+function main_variable_coefficient{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, k::Int, n::Int, ::Type{Val{:lex}})
+   return main_variable_coefficient_lex(a, k, n)
+end
+
+function main_variable_coefficient{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, k::Int, n::Int, ::Type{Val{:revlex}})
+   return main_variable_coefficient_lex(a, k, n)
+end
+
+function main_variable_coefficient_deglex{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, k::Int, n::Int)
+   exp = a.exps[n][k]
+   Ae = Array(NTuple{N, UInt}, 0)
+   Ac = Array(T, 0)
+   for i = n:a.length
+      if a.exps[i][k] != exp
+         break
       end
+      push!(Ae, ntuple(j -> j == 1 ? a.exps[i][1] - a.exps[i][k] : (j == k ? UInt(0) : a.exps[i][j]), Val{N}))
+      push!(Ac, a.coeffs[i])
+   end
+   return parent(a)(Ac, Ae)
+end
+
+function main_variable_coefficient{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, k::Int, n::Int, ::Type{Val{:deglex}})
+   return main_variable_coefficient_deglex(a, k, n)
+end
+
+function main_variable_coefficient{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, k::Int, n::Int, ::Type{Val{:degrevlex}})
+   return main_variable_coefficient_deglex(a, k, n)
+end
+
+function main_variable_extract{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, k::Int)
+   V = [(a.exps[i][k], i) for i in 1:length(a)]
+   sort!(V)
+   Rc = [a.coeffs[V[i][2]] for i in 1:length(a)]
+   Re = [a.exps[V[i][2]] for i in 1:length(a)]
+   a2 = parent(a)(Rc, Re)
+   A = main_variable_terms(a2, k)
+   Pe = Array(UInt, length(A))
+   Pc = Array(GenMPoly{T, S, N}, length(A))
+   for i = 1:length(A)
+      Pe[i] = a2.exps[A[i]][k]
+      Pc[i] = main_variable_coefficient(a2, k, A[i], Val{S})
+   end
+   if S == :lex || S == :revlex
       sym = parent(a).S[k]
-      R = GenSparsePolyRing{GenMPoly{T, :lex, N}}(parent(a), sym, true)
-      return k, R(Pc, Pe)
+   else
+      sym = parent(a).S[k - 1]
    end
-   return 0, GenSparsePolyRing{GenMPoly{T, :lex, N}}(parent(a), Symbol(""), true)()
+   R = GenSparsePolyRing{GenMPoly{T, S, N}}(parent(a), sym, true)
+   return R(Pc, Pe)
 end
 
-function main_variable_extract{T <: RingElem, S, N}(a::GenMPoly{T, S, N})
-   return main_variable_extract(a, Val{S})
+function main_variable_insert_lex{T <: RingElem, S, N}(a::GenSparsePoly{GenMPoly{T, S, N}}, k::Int)
+   V = [(ntuple(i -> i == k ? a.exps[r] : a.coeffs[r].exps[s][i], Val{N}), r, s) for
+       r in 1:length(a) for s in 1:length(a.coeffs[r])]
+   sort!(V)
+   Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in 1:length(V)]
+   Re = [V[i][1] for i in 1:length(V)]
+   return base_ring(a)(Rc, Re)
 end
 
-function main_variable_insert{T <: RingElem, S, N}(a::GenSparsePoly{GenMPoly{T, S, N}}, k::Int, ::Type{Val{:lex}})
-   len = 0
-   for i = 1:length(a)
-      len += length(a.coeffs[i])
-   end
-   Pe = Array(NTuple{N, UInt}, len)
-   Pc = Array(T, len)
-   l = 1
-   for i = 1:length(a)
-      for j = 1:a.coeffs[i].length
-         Pe[l] = ntuple(m -> m == k ? a.exps[i] : a.coeffs[i].exps[j][m], Val{N})
-         Pc[l] = a.coeffs[i].coeffs[j]
-         l += 1
-      end
-   end
-   return base_ring(a)(Pc, Pe)
+function main_variable_insert_deglex{T <: RingElem, S, N}(a::GenSparsePoly{GenMPoly{T, S, N}}, k::Int)
+   V = [(ntuple(i -> i == 1 ? a.exps[r] + a.coeffs[r].exps[s][1] : (i == k ? a.exps[r] :
+        a.coeffs[r].exps[s][i]), Val{N}), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
+   sort!(V)
+   Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in 1:length(V)]
+   Re = [V[i][1] for i in 1:length(V)]
+   return base_ring(a)(Rc, Re)
 end
 
 function main_variable_insert{T <: RingElem, S, N}(a::GenSparsePoly{GenMPoly{T, S, N}}, k::Int)
-   return main_variable_insert(a, k, Val{S})
+   if S == :lex || S == :revlex
+      return main_variable_insert_lex(a, k)
+   else
+      return main_variable_insert_deglex(a, k)
+   end
 end
 
 ###############################################################################
@@ -2171,6 +2273,10 @@ function fit!{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, n::Int)
       resize!(a.coeffs, n)
       resize!(a.exps, n)
    end
+end
+
+function zero!{T <: RingElem, S, N}(a::GenMPoly{T, S, N})
+   a.length = 0
 end
 
 ###############################################################################
