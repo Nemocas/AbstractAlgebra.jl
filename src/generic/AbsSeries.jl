@@ -119,7 +119,7 @@ function valuation(a::AbsSeriesElem)
    return precision(a)
 end
 
-function deepcopy{T <: RingElem}(a::GenAbsSeries{T})
+function deepcopy_internal{T <: RingElem}(a::GenAbsSeries{T}, dict::ObjectIdDict)
    coeffs = Array(T, length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy(coeff(a, i - 1))
