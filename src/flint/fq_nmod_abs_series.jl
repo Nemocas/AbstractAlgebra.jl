@@ -512,7 +512,7 @@ Base.promote_rule(::Type{fq_nmod_abs_series}, ::Type{fmpz}) = fq_nmod_abs_series
 #
 ###############################################################################
 
-function Base.call(a::FqNmodAbsSeriesRing)
+function (a::FqNmodAbsSeriesRing)()
    ctx = base_ring(a)
    z = fq_nmod_abs_series(ctx)
    z.prec = a.prec_max
@@ -520,7 +520,7 @@ function Base.call(a::FqNmodAbsSeriesRing)
    return z
 end
 
-function Base.call(a::FqNmodAbsSeriesRing, b::Integer)
+function (a::FqNmodAbsSeriesRing)(b::Integer)
    ctx = base_ring(a)
    if b == 0
       z = fq_nmod_abs_series(ctx)
@@ -532,7 +532,7 @@ function Base.call(a::FqNmodAbsSeriesRing, b::Integer)
    return z
 end
 
-function Base.call(a::FqNmodAbsSeriesRing, b::fmpz)
+function (a::FqNmodAbsSeriesRing)(b::fmpz)
    ctx = base_ring(a)
    if b == 0
       z = fq_nmod_abs_series(ctx)
@@ -544,7 +544,7 @@ function Base.call(a::FqNmodAbsSeriesRing, b::fmpz)
    return z
 end
 
-function Base.call(a::FqNmodAbsSeriesRing, b::fq_nmod)
+function (a::FqNmodAbsSeriesRing)(b::fq_nmod)
    ctx = base_ring(a)
    if b == 0
       z = fq_nmod_abs_series(ctx)
@@ -556,12 +556,12 @@ function Base.call(a::FqNmodAbsSeriesRing, b::fq_nmod)
    return z
 end
 
-function Base.call(a::FqNmodAbsSeriesRing, b::fq_nmod_abs_series)
+function (a::FqNmodAbsSeriesRing)(b::fq_nmod_abs_series)
    parent(b) != a && error("Unable to coerce power series")
    return b
 end
 
-function Base.call(a::FqNmodAbsSeriesRing, b::Array{fq_nmod, 1}, len::Int, prec::Int)
+function (a::FqNmodAbsSeriesRing)(b::Array{fq_nmod, 1}, len::Int, prec::Int)
    ctx = base_ring(a)
    z = fq_nmod_abs_series(ctx, b, len, prec)
    z.parent = a

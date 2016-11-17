@@ -512,7 +512,7 @@ Base.promote_rule(::Type{fq_abs_series}, ::Type{fmpz}) = fq_abs_series
 #
 ###############################################################################
 
-function Base.call(a::FqAbsSeriesRing)
+function (a::FqAbsSeriesRing)()
    ctx = base_ring(a)
    z = fq_abs_series(ctx)
    z.prec = a.prec_max
@@ -520,7 +520,7 @@ function Base.call(a::FqAbsSeriesRing)
    return z
 end
 
-function Base.call(a::FqAbsSeriesRing, b::Integer)
+function (a::FqAbsSeriesRing)(b::Integer)
    ctx = base_ring(a)
    if b == 0
       z = fq_abs_series(ctx)
@@ -532,7 +532,7 @@ function Base.call(a::FqAbsSeriesRing, b::Integer)
    return z
 end
 
-function Base.call(a::FqAbsSeriesRing, b::fmpz)
+function (a::FqAbsSeriesRing)(b::fmpz)
    ctx = base_ring(a)
    if b == 0
       z = fq_abs_series(ctx)
@@ -544,7 +544,7 @@ function Base.call(a::FqAbsSeriesRing, b::fmpz)
    return z
 end
 
-function Base.call(a::FqAbsSeriesRing, b::fq)
+function (a::FqAbsSeriesRing)(b::fq)
    ctx = base_ring(a)
    if b == 0
       z = fq_abs_series(ctx)
@@ -556,12 +556,12 @@ function Base.call(a::FqAbsSeriesRing, b::fq)
    return z
 end
 
-function Base.call(a::FqAbsSeriesRing, b::fq_abs_series)
+function (a::FqAbsSeriesRing)(b::fq_abs_series)
    parent(b) != a && error("Unable to coerce power series")
    return b
 end
 
-function Base.call(a::FqAbsSeriesRing, b::Array{fq, 1}, len::Int, prec::Int)
+function (a::FqAbsSeriesRing)(b::Array{fq, 1}, len::Int, prec::Int)
    ctx = base_ring(a)
    z = fq_abs_series(ctx, b, len, prec)
    z.parent = a

@@ -516,14 +516,14 @@ Base.promote_rule(::Type{fmpz_abs_series}, ::Type{fmpz}) = fmpz_abs_series
 #
 ###############################################################################
 
-function Base.call(a::FmpzAbsSeriesRing)
+function (a::FmpzAbsSeriesRing)()
    z = fmpz_abs_series()
    z.prec = a.prec_max
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpzAbsSeriesRing, b::Integer)
+function (a::FmpzAbsSeriesRing)(b::Integer)
    if b == 0
       z = fmpz_abs_series()
       z.prec = a.prec_max
@@ -534,7 +534,7 @@ function Base.call(a::FmpzAbsSeriesRing, b::Integer)
    return z
 end
 
-function Base.call(a::FmpzAbsSeriesRing, b::fmpz)
+function (a::FmpzAbsSeriesRing)(b::fmpz)
    if b == 0
       z = fmpz_abs_series()
       z.prec = a.prec_max
@@ -545,12 +545,12 @@ function Base.call(a::FmpzAbsSeriesRing, b::fmpz)
    return z
 end
 
-function Base.call(a::FmpzAbsSeriesRing, b::fmpz_abs_series)
+function (a::FmpzAbsSeriesRing)(b::fmpz_abs_series)
    parent(b) != a && error("Unable to coerce power series")
    return b
 end
 
-function Base.call(a::FmpzAbsSeriesRing, b::Array{fmpz, 1}, len::Int, prec::Int)
+function (a::FmpzAbsSeriesRing)(b::Array{fmpz, 1}, len::Int, prec::Int)
    z = fmpz_abs_series(b, len, prec)
    z.parent = a
    return z
