@@ -92,46 +92,6 @@ end
 
 ###############################################################################
 #
-#   GenSRPolyRing / GenSRPoly
-#
-###############################################################################
-
-const GenSRPolyID = ObjectIdDict()
-
-type GenSRPolyRing{T <: RingElem, K <: RingElem} <: Ring
-   base_ring::Ring
-   S::Symbol
-   num_vars::Int
-
-   function GenSRPolyRing(R::Ring, s::Symbol, n::Int, cached=true)
-      if haskey(GenSRPolyID, (R, s, n))
-         return GenSRPolyID[R, s, n]::GenSRPolyRing{T}
-      else 
-         z = new(R, s, n)
-         if cached
-           GenSRPolyID[R, s, n] = z
-         end
-         return z
-      end
-   end
-end
-
-type GenSRPoly{T <: RingElem, K <: RingElem} <: RingElem
-   coeffs::Array{T, 1}
-   exps::Array{UInt}
-   length::Int
-   parent::GenSRPolyRing{T}
-
-   GenSRPoly() = new(Array(T, 0), Array(UInt, 0), 0)
-   
-   GenSRPoly(a::Array{T, 1}, b::Array{UInt, 1}) = new(a, b, length(a))
-
-   GenSRPoly(a::T) = a == 0 ? new(Array(T, 0), Array(UInt, 0), 0) : 
-                                      new([a], [UInt(0)], 1)
-end
-
-###############################################################################
-#
 #   GenSparsePolyRing / GenSparsePoly
 #
 ###############################################################################
