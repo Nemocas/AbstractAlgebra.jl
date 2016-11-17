@@ -23,6 +23,18 @@ function test_fmpz_abs_series_constructors()
    println("PASS")
 end
 
+function test_fmpz_abs_series_printing()
+   print("fmpz_abs_series.printing...")
+
+   R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
+
+   b = x^2 + 3x + O(x^4)
+
+   @test string(b) == "(3)*x+x^2+O(x^4)"
+
+   println("PASS")
+end
+
 function test_fmpz_abs_series_manipulation()
    print("fmpz_abs_series.manipulation...")
 
@@ -268,8 +280,10 @@ function test_fmpz_abs_series_inversion()
 
    println("PASS")
 end
+
 function test_fmpz_abs_series()
    test_fmpz_abs_series_constructors()
+   test_fmpz_abs_series_printing()
    test_fmpz_abs_series_manipulation()
    test_fmpz_abs_series_unary_ops()
    test_fmpz_abs_series_binary_ops()
