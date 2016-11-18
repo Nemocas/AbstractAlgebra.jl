@@ -90,6 +90,15 @@ In order to construct power series in Nemo, one must first construct the power s
 
 
 
+PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{}; cached=true, model=:capped_relative)
+
+> Return a tuple $(S, x)$ consisting of the parent object `S` of a power series ring over the given base ring and a generator `x` for the power series ring. The maximum precision of power series in the ring is set to `prec`. If the model is set to `:capped_relative` this is taken as a maximum relative precision, and if it is set to `:capped_absolute` this is take to be a  maximum absolute precision. The supplied string `s` specifies the way the generator of the power series ring will be printed. By default, the parent object `S` will be cached so that supplying the same base ring, string and precision in future will return the same parent object and generator. If caching of the parent object is not required, `cached` can be set to `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L1089' class='documenter-source'>source</a><br>
+
+
 Here are some examples of creating a power series ring using the constructor and using the resulting parent object to coerce various elements into the power series ring.
 
 
@@ -121,14 +130,58 @@ The easiest way is simply using the generator returned by the `PowerSeriesRing` 
 
 
 ```
-O{T}(a::SeriesElem{T})
+O{T}(a::RelSeriesElem{T})
 ```
 
 > Returns $0 + O(x^\mbox{deg}(a))$. Usually this function is called with $x^n$ as parameter. Then the function returns the power series $0 + O(x^n)$, which can be used to set the precision of a power series when constructing it.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L16' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/RelSeries.jl#L16' class='documenter-source'>source</a><br>
+
+
+```
+O{T}(a::AbsSeriesElem{T})
+```
+
+> Returns $0 + O(x^\mbox{deg}(a))$. Usually this function is called with $x^n$ as parameter. Then the function returns the power series $0 + O(x^n)$, which can be used to set the precision of a power series when constructing it.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L16' class='documenter-source'>source</a><br>
+
+
+```
+O(R::FlintPadicField, m::fmpz)
+```
+
+> Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$ is not found to be a power of `p = prime(R)`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/padic.jl#L15' class='documenter-source'>source</a><br>
+
+
+```
+O(R::FlintPadicField, m::fmpq)
+```
+
+> Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$ is not found to be a power of `p = prime(R)`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/padic.jl#L37' class='documenter-source'>source</a><br>
+
+
+```
+O(R::FlintPadicField, m::Integer)
+```
+
+> Construct the value $0 + O(p^n)$ given $m = p^n$. An exception results if $m$ is not found to be a power of `p = prime(R)`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/padic.jl#L60' class='documenter-source'>source</a><br>
 
 
 In addition we provide the following functions for constructing certain useful polynomials.
@@ -146,7 +199,7 @@ zero(R::SeriesRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L108' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L111' class='documenter-source'>source</a><br>
 
 <a id='Base.one-Tuple{Nemo.SeriesRing}' href='#Base.one-Tuple{Nemo.SeriesRing}'>#</a>
 **`Base.one`** &mdash; *Method*.
@@ -161,7 +214,7 @@ zero(R::SeriesRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L115' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L118' class='documenter-source'>source</a><br>
 
 <a id='Nemo.gen-Tuple{Nemo.SeriesRing}' href='#Nemo.gen-Tuple{Nemo.SeriesRing}'>#</a>
 **`Nemo.gen`** &mdash; *Method*.
@@ -169,14 +222,58 @@ zero(R::SeriesRing)
 
 
 ```
-zero(R::SeriesRing)
+gen(R::PolyRing)
+```
+
+> Return the generator of the given polynomial ring.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L120' class='documenter-source'>source</a><br>
+
+
+```
+gen{T}(R::GenRelSeriesRing{T})
 ```
 
 > Return the generator of the power series ring, i.e. $x + O(x^{n + 1})$ where $n$ is the maximum precision of the power series ring $R$.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L122' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/RelSeries.jl#L134' class='documenter-source'>source</a><br>
+
+
+```
+gen{T}(R::GenAbsSeriesRing{T})
+```
+
+> Return the generator of the power series ring, i.e. $x + O(x^n)$ where $n$ is the precision of the power series ring $R$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L125' class='documenter-source'>source</a><br>
+
+
+```
+gen(a::FqFiniteField)
+```
+
+> Return the generator of the finite field. Note that this is only guaranteed to be a multiplicative generator if the finite field is generated by a Conway polynomial automatically.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L90' class='documenter-source'>source</a><br>
+
+
+```
+gen(a::AnticNumberField)
+```
+
+> Return the generator of the given number field.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/antic/nf_elem.jl#L88' class='documenter-source'>source</a><br>
 
 
 Here are some examples of constructing power series.
@@ -260,7 +357,7 @@ Set the length of the polynomial underlying a power series assuming it has suffi
 
 
 ```
-length(a::SeriesElem)
+pol_length(a::SeriesElem)
 ```
 
 
@@ -401,7 +498,18 @@ base_ring(R::SeriesRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L38' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/RelSeries.jl#L38' class='documenter-source'>source</a><br>
+
+
+```
+base_ring(R::SeriesRing)
+```
+
+> Return the base ring of the given power series ring.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L41' class='documenter-source'>source</a><br>
 
 <a id='Nemo.base_ring-Tuple{Nemo.SeriesElem}' href='#Nemo.base_ring-Tuple{Nemo.SeriesElem}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
@@ -416,7 +524,7 @@ base_ring(a::SeriesElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L44' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L47' class='documenter-source'>source</a><br>
 
 <a id='Base.parent-Tuple{Nemo.SeriesElem}' href='#Base.parent-Tuple{Nemo.SeriesElem}'>#</a>
 **`Base.parent`** &mdash; *Method*.
@@ -431,7 +539,7 @@ parent(a::SeriesElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L30' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L33' class='documenter-source'>source</a><br>
 
 <a id='Base.var-Tuple{Nemo.SeriesRing}' href='#Base.var-Tuple{Nemo.SeriesRing}'>#</a>
 **`Base.var`** &mdash; *Method*.
@@ -446,7 +554,7 @@ var(a::SeriesRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L50' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L53' class='documenter-source'>source</a><br>
 
 <a id='Nemo.valuation-Tuple{Nemo.SeriesElem}' href='#Nemo.valuation-Tuple{Nemo.SeriesElem}'>#</a>
 **`Nemo.valuation`** &mdash; *Method*.
@@ -454,14 +562,36 @@ var(a::SeriesRing)
 
 
 ```
-valuation(a::SeriesElem)
+valuation(a::RelSeriesElem)
 ```
 
 > Return the valuation of the given power series, i.e. the degree of the first nonzero term (or the precision if it is arithmetically zero).
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L165' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/RelSeries.jl#L177' class='documenter-source'>source</a><br>
+
+
+```
+valuation(a::AbsSeriesElem)
+```
+
+> Return the valuation of the given power series, i.e. the degree of the first nonzero term (or the precision if it is arithmetically zero).
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L169' class='documenter-source'>source</a><br>
+
+
+```
+valuation(a::padic)
+```
+
+> Return the valuation of the given $p$-adic field element, i.e. if the given element is divisible by $p^n$ but not a higher power of $p$ then the function will return $n$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/padic.jl#L120' class='documenter-source'>source</a><br>
 
 <a id='Nemo.max_precision-Tuple{Nemo.SeriesRing}' href='#Nemo.max_precision-Tuple{Nemo.SeriesRing}'>#</a>
 **`Nemo.max_precision`** &mdash; *Method*.
@@ -476,7 +606,7 @@ max_precision(R::SeriesRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L81' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/RelSeries.jl#L81' class='documenter-source'>source</a><br>
 
 <a id='Nemo.modulus-Tuple{Nemo.SeriesElem{T<:Nemo.ResElem}}' href='#Nemo.modulus-Tuple{Nemo.SeriesElem{T<:Nemo.ResElem}}'>#</a>
 **`Nemo.modulus`** &mdash; *Method*.
@@ -491,7 +621,18 @@ modulus{T <: ResElem}(a::SeriesElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L182' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/RelSeries.jl#L184' class='documenter-source'>source</a><br>
+
+
+```
+modulus{T <: ResElem}(a::SeriesElem{T})
+```
+
+> Return the modulus of the coefficients of the given polynomial.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L183' class='documenter-source'>source</a><br>
 
 <a id='Nemo.iszero-Tuple{Nemo.SeriesElem}' href='#Nemo.iszero-Tuple{Nemo.SeriesElem}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
@@ -506,7 +647,7 @@ iszero(a::SeriesElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L132' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L135' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isone-Tuple{Nemo.SeriesElem}' href='#Nemo.isone-Tuple{Nemo.SeriesElem}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
@@ -514,14 +655,135 @@ iszero(a::SeriesElem)
 
 
 ```
-isone(a::SeriesElem)
+isone(a::fmpz)
+```
+
+> Return `true` if the given integer is one, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz.jl#L189' class='documenter-source'>source</a><br>
+
+
+```
+isone(a::ResElem)
+```
+
+> Return `true` if the supplied element $a$ is one in the residue ring it belongs to, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L99' class='documenter-source'>source</a><br>
+
+
+```
+isone(a::PolyElem)
+```
+
+> Return `true` if the given polynomial is the constant polynomial $1$, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L132' class='documenter-source'>source</a><br>
+
+
+```
+isone(a::GenRelSeries)
 ```
 
 > Return `true` if the given power series is arithmetically equal to one to its current precision, otherwise return `false`.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L139' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/RelSeries.jl#L151' class='documenter-source'>source</a><br>
+
+
+```
+isone(a::GenAbsSeries)
+```
+
+> Return `true` if the given power series is arithmetically equal to one to its current precision, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L142' class='documenter-source'>source</a><br>
+
+
+```
+isone(a::MatElem)
+```
+
+> Return `true` if the supplied matrix $a$ is diagonal with ones along the diagonal, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Matrix.jl#L114' class='documenter-source'>source</a><br>
+
+
+```
+isone(a::FracElem)
+```
+
+> Return `true` if the supplied element $a$ is one in the fraction field it belongs to, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Fraction.jl#L111' class='documenter-source'>source</a><br>
+
+
+```
+isone(a::fq)
+```
+
+> Return `true` if the given finite field element is one, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L110' class='documenter-source'>source</a><br>
+
+
+```
+isone(a::nf_elem)
+```
+
+> Return `true` if the given number field element is the multiplicative identity of the number field, i.e. one, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/antic/nf_elem.jl#L131' class='documenter-source'>source</a><br>
+
+
+```
+isone(x::arb)
+```
+
+> Return `true` if $x$ is certainly not equal to oneo, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb.jl#L370' class='documenter-source'>source</a><br>
+
+
+```
+isone(x::acb)
+```
+
+> Return `true` if $x$ is certainly zero, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb.jl#L480' class='documenter-source'>source</a><br>
+
+
+```
+isone(a::padic)
+```
+
+> Return `true` if the given p-adic field element is one, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/padic.jl#L182' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isgen-Tuple{Nemo.SeriesElem}' href='#Nemo.isgen-Tuple{Nemo.SeriesElem}'>#</a>
 **`Nemo.isgen`** &mdash; *Method*.
@@ -529,14 +791,58 @@ isone(a::SeriesElem)
 
 
 ```
-isgen(a::SeriesElem)
+isgen(a::PolyElem)
+```
+
+> Return `true` if the given polynomial is the constant generator of its polynomial ring, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L139' class='documenter-source'>source</a><br>
+
+
+```
+isgen(a::GenRelSeries)
 ```
 
 > Return `true` if the given power series is arithmetically equal to the generator of its power series ring to its current precision, otherwise return `false`.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L148' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/RelSeries.jl#L160' class='documenter-source'>source</a><br>
+
+
+```
+isgen(a::GenAbsSeries)
+```
+
+> Return `true` if the given power series is arithmetically equal to the generator of its power series ring to its current precision, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L151' class='documenter-source'>source</a><br>
+
+
+```
+isgen(a::fq)
+```
+
+> Return `true` if the given finite field element is the generator of the finite field, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L118' class='documenter-source'>source</a><br>
+
+
+```
+isgen(a::nf_elem)
+```
+
+> Return `true` if the given number field element is the generator of the number field, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/antic/nf_elem.jl#L121' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isunit-Tuple{Nemo.SeriesElem}' href='#Nemo.isunit-Tuple{Nemo.SeriesElem}'>#</a>
 **`Nemo.isunit`** &mdash; *Method*.
@@ -544,14 +850,102 @@ isgen(a::SeriesElem)
 
 
 ```
-isunit(a::SeriesElem)
+isunit(a::fmpz)
+```
+
+> Return `true` if the given integer is a unit, i.e. $\pm 1$, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz.jl#L176' class='documenter-source'>source</a><br>
+
+
+```
+iszero(a::ResElem)
+```
+
+> Return `true` if the supplied element $a$ is invertible in the residue ring it belongs to, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L106' class='documenter-source'>source</a><br>
+
+
+```
+isunit(a::PolyElem)
+```
+
+> Return `true` if the given polynomial is a unit in its polynomial ring, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L148' class='documenter-source'>source</a><br>
+
+
+```
+isunit(a::RelSeriesElem)
 ```
 
 > Return `true` if the given power series is arithmetically equal to a unit, i.e. is invertible, otherwise return `false`.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L158' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/RelSeries.jl#L170' class='documenter-source'>source</a><br>
+
+
+```
+isunit(a::AbsSeriesElem)
+```
+
+> Return `true` if the given power series is arithmetically equal to a unit, i.e. is invertible, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L162' class='documenter-source'>source</a><br>
+
+
+```
+isunit(a::FracElem)
+```
+
+> Return `true` if the supplied element $a$ is invertible in the fraction field it belongs to, i.e. the numerator is nonzero, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Fraction.jl#L118' class='documenter-source'>source</a><br>
+
+
+```
+isunit(a::fq)
+```
+
+> Return `true` if the given finite field element is invertible, i.e. nonzero, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L125' class='documenter-source'>source</a><br>
+
+
+```
+isunit(a::nf_elem)
+```
+
+> Return `true` if the given number field element is invertible, i.e. nonzero, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/antic/nf_elem.jl#L151' class='documenter-source'>source</a><br>
+
+
+```
+isunit(a::padic)
+```
+
+> Return `true` if the given p-adic field element is invertible, i.e. nonzero, otherwise return `false`.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/padic.jl#L190' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of power series.
@@ -724,9 +1118,75 @@ fmpz(1) == c
 **`Nemo.shift_left`** &mdash; *Method*.
 
 
+
+```
+shift_left(x::PolyElem, n::Int)
+```
+
+> Return the polynomial $f$ shifted left by $n$ terms, i.e. multiplied by $x^n$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L896' class='documenter-source'>source</a><br>
+
+
+```
+shift_left(x::RelSeriesElem, n::Int)
+```
+
+> Return the power series $f$ shifted left by $n$ terms, i.e. multiplied by $x^n$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/RelSeries.jl#L620' class='documenter-source'>source</a><br>
+
+
+```
+shift_left(x::AbsSeriesElem, n::Int)
+```
+
+> Return the power series $f$ shifted left by $n$ terms, i.e. multiplied by $x^n$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L538' class='documenter-source'>source</a><br>
+
 <a id='Nemo.shift_right-Tuple{Nemo.SeriesElem,Int64}' href='#Nemo.shift_right-Tuple{Nemo.SeriesElem,Int64}'>#</a>
 **`Nemo.shift_right`** &mdash; *Method*.
 
+
+
+```
+shift_right(f::PolyElem, n::Int)
+```
+
+> Return the polynomial $f$ shifted right by $n$ terms, i.e. divided by $x^n$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L918' class='documenter-source'>source</a><br>
+
+
+```
+shift_right(f::RelSeriesElem, n::Int)
+```
+
+> Return the power series $f$ shifted right by $n$ terms, i.e. divided by $x^n$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/RelSeries.jl#L644' class='documenter-source'>source</a><br>
+
+
+```
+shift_right(f::AbsSeriesElem, n::Int)
+```
+
+> Return the power series $f$ shifted right by $n$ terms, i.e. divided by $x^n$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L567' class='documenter-source'>source</a><br>
 
 
 Here are some examples of shifting.
@@ -757,6 +1217,49 @@ k = shift_right(d, 3)
 
 
 
+```
+truncate(file,n)
+```
+
+Resize the file or buffer given by the first argument to exactly `n` bytes, filling previously unallocated space with '\0' if the file or buffer is grown.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/38c803d2252736612878ccf5b040fb35c4bfa516/base/docs/helpdb/Base.jl#L2033-2038' class='documenter-source'>source</a><br>
+
+
+```
+truncate(a::PolyElem, n::Int)
+```
+
+> Return $a$ truncated to $n$ terms.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L797' class='documenter-source'>source</a><br>
+
+
+```
+truncate(a::RelSeriesElem, n::Int)
+```
+
+> Return $a$ truncated to $n$ terms.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/RelSeries.jl#L678' class='documenter-source'>source</a><br>
+
+
+```
+truncate(a::AbsSeriesElem, n::Int)
+```
+
+> Return $a$ truncated to $n$ terms.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L595' class='documenter-source'>source</a><br>
+
+
 Here are some examples of truncation.
 
 
@@ -785,13 +1288,164 @@ k = truncate(d, 5)
 
 
 
-inv(a::SeriesElem)
+```
+inv(M)
+```
+
+Matrix inverse.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/38c803d2252736612878ccf5b040fb35c4bfa516/base/docs/helpdb/Base.jl#L7346-7350' class='documenter-source'>source</a><br>
+
+
+```
+inv(a::perm)
+```
+
+> Return the inverse of the given permutation, i.e. the permuation $a^{-1}$ such that $a\circ a^{-1} = a^{-1}\circ a$ is the identity permutation.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/perm.jl#L139' class='documenter-source'>source</a><br>
+
+
+```
+inv(a::ResElem)
+```
+
+> Return the inverse of the element $a$ in the residue ring. If an impossible inverse is encountered, an exception is raised.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Residue.jl#L422' class='documenter-source'>source</a><br>
+
+
+inv(a::RelSeriesElem)
 
 > Return the inverse of the power series $a$, i.e. $1/a$.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L864' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/RelSeries.jl#L957' class='documenter-source'>source</a><br>
+
+
+inv(a::AbsSeriesElem)
+
+> Return the inverse of the power series $a$, i.e. $1/a$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L850' class='documenter-source'>source</a><br>
+
+
+```
+inv{T <: RingElem}(M::MatElem{T})
+```
+
+> Given a non-singular $n\times n$ matrix over a ring the tuple $X, d$ consisting of an $n\times n$ matrix $X$ and a denominator $d$ such that $AX = dI_n$, where $I_n$ is the $n\times n$ identity matrix. The denominator will be the determinant of $A$ up to sign. If $A$ is singular an exception  is raised.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Matrix.jl#L1966' class='documenter-source'>source</a><br>
+
+
+```
+inv{T <: FieldElem}(M::MatElem{T})
+```
+
+> Given a non-singular $n\times n$ matrix over a field, return an $n\times n$ matrix $X$ such that $AX = I_n$ where $I_n$ is the $n\times n$ identity matrix. If $A$ is singular an exception is raised.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Matrix.jl#L1983' class='documenter-source'>source</a><br>
+
+
+```
+inv(a::FracElem)
+```
+
+> Return the inverse of the fraction $a$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Fraction.jl#L513' class='documenter-source'>source</a><br>
+
+
+```
+inv(x::fq)
+```
+
+> Return $x^{-1}$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fq.jl#L378' class='documenter-source'>source</a><br>
+
+
+```
+inv(a::nf_elem)
+```
+
+> Return $a^{-1}$. Requires $a \neq 0$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/antic/nf_elem.jl#L465' class='documenter-source'>source</a><br>
+
+
+```
+inv(x::arb)
+```
+
+> Return the multiplicative inverse of $x$, i.e. $1/x$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb.jl#L735' class='documenter-source'>source</a><br>
+
+
+```
+inv(x::acb)
+```
+
+> Return the multiplicative inverse of $x$, i.e. $1/x$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb.jl#L549' class='documenter-source'>source</a><br>
+
+
+```
+inv(a::padic)
+```
+
+> Returns $a^{-1}$. If $a = 0$ a `DivideError()` is thrown.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/padic.jl#L436' class='documenter-source'>source</a><br>
+
+
+```
+inv(M::arb_mat)
+```
+
+> Given a  $n\times n$ matrix of type `arb_mat`, return an $n\times n$ matrix $X$ such that $AX$ contains the  identity matrix. If $A$ cannot be inverted numerically an exception is raised.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb_mat.jl#L328' class='documenter-source'>source</a><br>
+
+
+```
+inv(M::acb_mat)
+```
+
+> Given a $n\times n$ matrix of type `acb_mat`, return an $n\times n$ matrix $X$ such that $AX$ contains the  identity matrix. If $A$ cannot be inverted numerically an exception is raised.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb_mat.jl#L358' class='documenter-source'>source</a><br>
 
 
 Here are some examples of taking the inverse.
@@ -819,14 +1473,90 @@ d = inv(b)
 
 
 ```
-exp(a::SeriesElem)
+exp(x)
+```
+
+Compute $e^x$.
+
+
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/38c803d2252736612878ccf5b040fb35c4bfa516/base/docs/helpdb/Base.jl#L7258-7262' class='documenter-source'>source</a><br>
+
+
+```
+exp(a::RelSeriesElem)
 ```
 
 > Return the exponential of the power series $a$.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/RelSeries.jl#L896' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/RelSeries.jl#L990' class='documenter-source'>source</a><br>
+
+
+```
+exp(a::AbsSeriesElem)
+```
+
+> Return the exponential of the power series $a$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/AbsSeries.jl#L882' class='documenter-source'>source</a><br>
+
+
+```
+exp(x::arb)
+```
+
+> Return the exponential of $x$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb.jl#L983' class='documenter-source'>source</a><br>
+
+
+```
+exp(x::acb)
+```
+
+> Return the exponential of $x$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb.jl#L702' class='documenter-source'>source</a><br>
+
+
+```
+exp(a::padic)
+```
+
+> Return the $p$-adic exponential of $a$. We define this only when the valuation of $a$ is positive (unless $a = 0$). The precision of the output will be the same as the precision of the input. If the input is not valid an exception is thrown.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/padic.jl#L501' class='documenter-source'>source</a><br>
+
+
+```
+exp(x::arb_mat)
+```
+
+> Returns the exponential of the matrix $x$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb_mat.jl#L418' class='documenter-source'>source</a><br>
+
+
+```
+exp(x::acb_mat)
+```
+
+> Returns the exponential of the matrix $x$.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb_mat.jl#L456' class='documenter-source'>source</a><br>
 
 
 The following special functions are only available for certain rings.
@@ -845,7 +1575,7 @@ Compute the natural logarithm of `x`. Throws `DomainError` for negative `Real` a
 There is an experimental variant in the `Base.Math.JuliaLibm` module, which is typically faster and more accurate.
 
 
-<a target='_blank' href='https://github.com/JuliaLang/julia/tree/55e3a39579696345027d0d8ae489825c9d9201ab/base/docs/helpdb/Base.jl#L3536-3544' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/JuliaLang/julia/tree/38c803d2252736612878ccf5b040fb35c4bfa516/base/docs/helpdb/Base.jl#L3333-3341' class='documenter-source'>source</a><br>
 
 
 log(a::fmpq_rel_series)
@@ -854,7 +1584,7 @@ log(a::fmpq_rel_series)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpq_rel_series.jl#L464' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpq_rel_series.jl#L464' class='documenter-source'>source</a><br>
 
 <a id='Base.sqrt-Tuple{Nemo.fmpq_rel_series}' href='#Base.sqrt-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.sqrt`** &mdash; *Method*.
@@ -867,7 +1597,7 @@ sqrt(a::fmpq_rel_series)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpq_rel_series.jl#L651' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpq_rel_series.jl#L651' class='documenter-source'>source</a><br>
 
 <a id='Base.tan-Tuple{Nemo.fmpq_rel_series}' href='#Base.tan-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.tan`** &mdash; *Method*.
@@ -880,7 +1610,7 @@ tan(a::fmpq_rel_series)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpq_rel_series.jl#L481' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpq_rel_series.jl#L481' class='documenter-source'>source</a><br>
 
 <a id='Base.tanh-Tuple{Nemo.fmpq_rel_series}' href='#Base.tanh-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.tanh`** &mdash; *Method*.
@@ -893,7 +1623,7 @@ tanh(a::fmpq_rel_series)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpq_rel_series.jl#L498' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpq_rel_series.jl#L498' class='documenter-source'>source</a><br>
 
 <a id='Base.sin-Tuple{Nemo.fmpq_rel_series}' href='#Base.sin-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.sin`** &mdash; *Method*.
@@ -906,7 +1636,7 @@ sin(a::fmpq_rel_series)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpq_rel_series.jl#L515' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpq_rel_series.jl#L515' class='documenter-source'>source</a><br>
 
 <a id='Base.sinh-Tuple{Nemo.fmpq_rel_series}' href='#Base.sinh-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.sinh`** &mdash; *Method*.
@@ -919,7 +1649,7 @@ sinh(a::fmpq_rel_series)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpq_rel_series.jl#L532' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpq_rel_series.jl#L532' class='documenter-source'>source</a><br>
 
 <a id='Base.cos-Tuple{Nemo.fmpq_rel_series}' href='#Base.cos-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.cos`** &mdash; *Method*.
@@ -932,7 +1662,7 @@ cos(a::fmpq_rel_series)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpq_rel_series.jl#L549' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpq_rel_series.jl#L549' class='documenter-source'>source</a><br>
 
 <a id='Base.cosh-Tuple{Nemo.fmpq_rel_series}' href='#Base.cosh-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.cosh`** &mdash; *Method*.
@@ -945,7 +1675,7 @@ cosh(a::fmpq_rel_series)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpq_rel_series.jl#L566' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpq_rel_series.jl#L566' class='documenter-source'>source</a><br>
 
 <a id='Base.asin-Tuple{Nemo.fmpq_rel_series}' href='#Base.asin-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.asin`** &mdash; *Method*.
@@ -958,7 +1688,7 @@ asin(a::fmpq_rel_series)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpq_rel_series.jl#L583' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpq_rel_series.jl#L583' class='documenter-source'>source</a><br>
 
 <a id='Base.asinh-Tuple{Nemo.fmpq_rel_series}' href='#Base.asinh-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.asinh`** &mdash; *Method*.
@@ -971,7 +1701,7 @@ asinh(a::fmpq_rel_series)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpq_rel_series.jl#L600' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpq_rel_series.jl#L600' class='documenter-source'>source</a><br>
 
 <a id='Base.atan-Tuple{Nemo.fmpq_rel_series}' href='#Base.atan-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.atan`** &mdash; *Method*.
@@ -984,7 +1714,7 @@ atan(a::fmpq_rel_series)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpq_rel_series.jl#L617' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpq_rel_series.jl#L617' class='documenter-source'>source</a><br>
 
 <a id='Base.atanh-Tuple{Nemo.fmpq_rel_series}' href='#Base.atanh-Tuple{Nemo.fmpq_rel_series}'>#</a>
 **`Base.atanh`** &mdash; *Method*.
@@ -997,7 +1727,7 @@ atanh(a::fmpq_rel_series)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpq_rel_series.jl#L634' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpq_rel_series.jl#L634' class='documenter-source'>source</a><br>
 
 
 Here are some examples of special functions.

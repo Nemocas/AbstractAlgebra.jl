@@ -1,43 +1,43 @@
-function test_rel_series_constructors()
-   print("GenRelSeries.constructors...")
+function test_abs_series_constructors()
+   print("GenAbsSeries.constructors...")
 
    R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
 
-   @test isa(S, GenRelSeriesRing)
+   @test isa(S, GenAbsSeriesRing)
 
    a = x^3 + 2x + 1
    b = (t^2 + 1)*x^2 + (t + 3)x + O(x^4)
 
-   @test isa(a, GenRelSeries)
-   @test isa(b, GenRelSeries)
+   @test isa(a, AbsSeriesElem)
+   @test isa(b, AbsSeriesElem)
 
    c = S(a)
-   d = S([t + 1, t, R(1)], 3, 5, 0)
+   d = S([t + 1, t, R(1)], 3, 5)
 
-   @test isa(c, GenRelSeries)
-   @test isa(d, GenRelSeries)
+   @test isa(c, AbsSeriesElem)
+   @test isa(d, AbsSeriesElem)
 
    g = S(1)
    h = S(fmpz(2))
    k = S()
 
-   @test isa(g, GenRelSeries)
-   @test isa(h, GenRelSeries)
-   @test isa(k, GenRelSeries)
+   @test isa(g, AbsSeriesElem)
+   @test isa(h, AbsSeriesElem)
+   @test isa(k, AbsSeriesElem)
 
    l = S(t)
 
-   @test isa(l, GenRelSeries)
+   @test isa(l, AbsSeriesElem)
 
    println("PASS")
 end
 
-function test_rel_series_manipulation()
-   print("GenRelSeries.manipulation...")
+function test_abs_series_manipulation()
+   print("GenAbsSeries.manipulation...")
 
    R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
    
    @test max_precision(S) == 30
 
@@ -56,7 +56,7 @@ function test_rel_series_manipulation()
 
    @test valuation(b) == 4
 
-   @test precision(a) == 31
+   @test precision(a) == 30
 
    @test precision(b) == 4
 
@@ -64,7 +64,11 @@ function test_rel_series_manipulation()
 
    @test isequal(deepcopy(b), b)
 
-   @test normalise(a, 3) == 3
+   @test length(a) == 4
+
+   @test length(b) == 0
+
+   @test normalise(a, 4) == 4
 
    @test coeff(a, 1) == 2
 
@@ -73,27 +77,27 @@ function test_rel_series_manipulation()
    println("PASS")
 end
 
-function test_rel_series_unary_ops()
-   print("GenRelSeries.unary_ops...")
+function test_abs_series_unary_ops()
+   print("GenAbsSeries.unary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = 1 + 2x + x^2 + O(x^3)
 
-   @test isequal(-a, -2x - x^3 + O(x^31))
+   @test isequal(-a, -2x - x^3 + O(x^30))
    
    @test isequal(-b, -1 - 2x - x^2 + O(x^3))
 
    println("PASS")
 end
 
-function test_rel_series_binary_ops()
-   print("GenRelSeries.binary_ops...")
+function test_abs_series_binary_ops()
+   print("GenAbsSeries.binary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -108,38 +112,38 @@ function test_rel_series_binary_ops()
 
    @test isequal(a*c, 3*x^5+x^4+7*x^3+2*x^2+2*x+O(x^6))
 
-   @test isequal(a*d, -x^7+3*x^6-x^5+6*x^4+2*x^3+O(x^33))
+   @test isequal(a*d, -x^7+3*x^6-x^5+6*x^4+2*x^3+O(x^30))
 
    println("PASS")
 end
 
-function test_rel_series_adhoc_binary_ops()
-   print("GenRelSeries.adhoc_binary_ops...")
+function test_abs_series_adhoc_binary_ops()
+   print("GenAbsSeries.adhoc_binary_ops...")
 
    R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
    c = 1 + x + 3x^2 + O(x^5)
    d = x^2 + 3x^3 - x^4
 
-   @test isequal(2a, 4x + 2x^3 + O(x^31))
+   @test isequal(2a, 4x + 2x^3 + O(x^30))
 
    @test isequal(fmpz(3)*b, O(x^4))
 
    @test isequal(c*2, 2 + 2*x + 6*x^2 + O(x^5))
 
-   @test isequal(d*fmpz(3), 3x^2 + 9x^3 - 3x^4 + O(x^32))
+   @test isequal(d*fmpz(3), 3x^2 + 9x^3 - 3x^4 + O(x^30))
 
    println("PASS")
 end
 
-function test_rel_series_comparison()
-   print("GenRelSeries.comparison...")
+function test_abs_series_comparison()
+   print("GenAbsSeries.comparison...")
 
    R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^3)
@@ -152,18 +156,18 @@ function test_rel_series_comparison()
 
    @test c != d
 
-   @test isequal(a, 2x + x^3 + O(x^31))
+   @test isequal(a, 2x + x^3 + O(x^30))
 
    @test !isequal(b, d)
 
    println("PASS")
 end
 
-function test_rel_series_adhoc_comparison()
-   print("GenRelSeries.adhoc_comparison...")
+function test_abs_series_adhoc_comparison()
+   print("GenAbsSeries.adhoc_comparison...")
 
    R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^0)
@@ -183,20 +187,20 @@ function test_rel_series_adhoc_comparison()
    println("PASS")
 end
 
-function test_rel_series_powering()
-   print("GenRelSeries.powering...")
+function test_abs_series_powering()
+   print("GenAbsSeries.powering...")
 
    R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
    c = 1 + x + 2x^2 + O(x^5)
    d = 2x + x^3 + O(x^4)
 
-   @test isequal(a^12, x^36+24*x^34+264*x^32+1760*x^30+7920*x^28+25344*x^26+59136*x^24+101376*x^22+126720*x^20+112640*x^18+67584*x^16+24576*x^14+4096*x^12+O(x^42))
+   @test isequal(a^12, x^36+24*x^34+264*x^32+1760*x^30+7920*x^28+25344*x^26+59136*x^24+101376*x^22+126720*x^20+112640*x^18+67584*x^16+24576*x^14+4096*x^12+O(x^30))
 
-   @test isequal(b^12, O(x^48))
+   @test isequal(b^12, O(x^30))
 
    @test isequal(c^12, 2079*x^4+484*x^3+90*x^2+12*x+1+O(x^5))
 
@@ -205,18 +209,18 @@ function test_rel_series_powering()
    println("PASS")
 end
 
-function test_rel_series_shift()
-   print("GenRelSeries.shift...")
+function test_abs_series_shift()
+   print("GenAbsSeries.shift...")
 
    R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
    c = 1 + x + 2x^2 + O(x^5)
    d = 2x + x^3 + O(x^4)
 
-   @test isequal(shift_left(a, 2), 2*x^3+x^5+O(x^33))
+   @test isequal(shift_left(a, 2), 2*x^3+x^5+O(x^30))
 
    @test isequal(shift_left(b, 2), O(x^6))
 
@@ -227,11 +231,11 @@ function test_rel_series_shift()
    println("PASS")
 end
 
-function test_rel_series_truncation()
-   print("GenRelSeries.truncation...")
+function test_abs_series_truncation()
+   print("GenAbsSeries.truncation...")
 
    R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
 
    a = 2x + x^3
    b = O(x^4)
@@ -249,11 +253,11 @@ function test_rel_series_truncation()
    println("PASS")
 end
 
-function test_rel_series_inversion()
-   print("GenRelSeries.inversion...")
+function test_abs_series_inversion()
+   print("GenAbsSeries.inversion...")
 
    R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
 
    a = 1 + x + 2x^2 + O(x^5)
    b = S(-1)
@@ -265,11 +269,11 @@ function test_rel_series_inversion()
    println("PASS")
 end
 
-function test_rel_series_exact_division()
-   print("GenRelSeries.exact_division...")
+function test_abs_series_exact_division()
+   print("GenAbsSeries.exact_division...")
 
    R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
 
    a = x + x^3
    b = O(x^4)
@@ -287,18 +291,18 @@ function test_rel_series_exact_division()
    println("PASS")
 end
 
-function test_rel_series_adhoc_exact_division()
-   print("GenRelSeries.adhoc_exact_division...")
+function test_abs_series_adhoc_exact_division()
+   print("GenAbsSeries.adhoc_exact_division...")
 
    R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
 
    a = x + x^3
    b = O(x^4)
    c = 1 + x + 2x^2 + O(x^5)
    d = x + x^3 + O(x^6)
 
-   @test isequal(divexact(a, 7), fmpz(1)//7*x+fmpz(1)//7*x^3+O(x^31))
+   @test isequal(divexact(a, 7), fmpz(1)//7*x+fmpz(1)//7*x^3+O(x^30))
 
    @test isequal(divexact(b, fmpz(11)), 0+O(x^4))
 
@@ -313,12 +317,12 @@ function test_rel_series_adhoc_exact_division()
    println("PASS")
 end
 
-function test_rel_series_special_functions()
-   print("GenRelSeries.special_functions...")
+function test_abs_series_special_functions()
+   print("GenAbsSeries.special_functions...")
 
    R = ResidueRing(ZZ, 17)
    T, t = PolynomialRing(R, "t")
-   S, x = PowerSeriesRing(T, 30, "x")
+   S, x = PowerSeriesRing(T, 30, "x", model=:capped_absolute)
 
    @test isequal(exp(x + O(x^10)),  8*x^9+4*x^8+15*x^7+3*x^6+x^5+5*x^4+3*x^3+9*x^2+x+1+O(x^10))
 
@@ -327,21 +331,21 @@ function test_rel_series_special_functions()
    println("PASS")
 end
 
-function test_gen_rel_series()
-   test_rel_series_constructors()
-   test_rel_series_manipulation()
-   test_rel_series_unary_ops()
-   test_rel_series_binary_ops()
-   test_rel_series_adhoc_binary_ops()
-   test_rel_series_comparison()
-   test_rel_series_adhoc_comparison()
-   test_rel_series_powering()
-   test_rel_series_shift()
-   test_rel_series_truncation()
-   test_rel_series_exact_division()
-   test_rel_series_adhoc_exact_division()
-   test_rel_series_inversion()
-   test_rel_series_special_functions()
+function test_gen_abs_series()
+   test_abs_series_constructors()
+   test_abs_series_manipulation()
+   test_abs_series_unary_ops()
+   test_abs_series_binary_ops()
+   test_abs_series_adhoc_binary_ops()
+   test_abs_series_comparison()
+   test_abs_series_adhoc_comparison()
+   test_abs_series_powering()
+   test_abs_series_shift()
+   test_abs_series_truncation()
+   test_abs_series_exact_division()
+   test_abs_series_adhoc_exact_division()
+   test_abs_series_inversion()
+   test_abs_series_special_functions()
 
    println("")
 end

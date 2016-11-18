@@ -119,6 +119,8 @@ function show(io::IO, x::arb)
   ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
 end
 
+needs_parentheses(x::arb) = false
+
 ################################################################################
 #
 #  Containment
@@ -344,6 +346,10 @@ end
 #
 ################################################################################
 
+function isunit(x::arb)
+   !iszero(x)
+end
+
 doc"""
     iszero(x::arb)
 > Return `true` if $x$ is certainly zero, otherwise return `false`.
@@ -427,6 +433,8 @@ doc"""
 function isnonpositive(x::arb)
    return Bool(ccall((:arb_is_nonpositive, :libarb), Cint, (Ptr{arb},), &x))
 end
+
+is_negative(x::arb) = isnegative(x)
 
 ################################################################################
 #
@@ -673,6 +681,34 @@ function ^(x::arb, y::fmpq)
               &z, &x, &y, parent(x).prec)
   return z
 end
+
++(x::fmpq, y::arb) = parent(y)(x) + y
++(x::arb, y::fmpq) = x + parent(x)(y)
+-(x::fmpq, y::arb) = parent(y)(x) - y
+-(x::arb, y::fmpq) = x - parent(x)(y)
+*(x::fmpq, y::arb) = parent(y)(x) * y
+*(x::arb, y::fmpq) = x * parent(x)(y)
+^(x::fmpq, y::arb) = parent(y)(x) ^ y
+
+/(x::arb, y::arb) = x // y
+/(x::fmpz, y::arb) = x // y
+/(x::arb, y::fmpz) = x // y
+/(x::Int, y::arb) = x // y
+/(x::arb, y::Int) = x // y
+/(x::UInt, y::arb) = x // y
+/(x::arb, y::UInt) = x // y
+/(x::fmpq, y::arb) = x // y
+/(x::arb, y::fmpq) = x // y
+
+divexact(x::arb, y::arb) = x // y
+divexact(x::fmpz, y::arb) = x // y
+divexact(x::arb, y::fmpz) = x // y
+divexact(x::Int, y::arb) = x // y
+divexact(x::arb, y::Int) = x // y
+divexact(x::UInt, y::arb) = x // y
+divexact(x::arb, y::UInt) = x // y
+divexact(x::fmpq, y::arb) = x // y
+divexact(x::arb, y::fmpq) = x // y
 
 ################################################################################
 #
