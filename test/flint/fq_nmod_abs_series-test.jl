@@ -33,6 +33,8 @@ function test_fq_nmod_abs_series_printing()
    b = x^2 + 3x + O(x^4)
 
    @test string(b) == "(3)*x+x^2+O(x^4)"
+
+   println("PASS")
 end
 
 function test_fq_nmod_abs_series_manipulation()
