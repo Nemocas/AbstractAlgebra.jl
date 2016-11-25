@@ -1824,7 +1824,7 @@ function solve_ff{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
    return x, d
 end
 
-function solve_interpolation{T <: RingElem}(M::MatElem{PolyElem{T}}, b::MatElem{PolyElem{T}})
+function solve_interpolation{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
    m = rows(M)
    h = cols(b)
    if m == 0
@@ -1889,14 +1889,18 @@ doc"""
 > denominator will be the determinant of $A$ up to sign. If $A$ is singular an
 > exception is raised.
 """
-function solve{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
+function solve{T}(M::MatElem{T}, b::MatElem{T})
+   return solve_ringelem(M, b)
+end
+
+function solve_ringelem{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
    rows(M) != cols(M) && error("Non-square matrix in solve")
    rows(M) != rows(b) && error("Dimensions don't match in solve")
    return solve_ff(M, b)
 end
 
-function solve{T <: RingElem}(M::MatElem{PolyElem{T}}, b::MatElem{PolyElem{T}})
+function solve{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
    rows(M) != cols(M) && error("Non-square matrix in solve")
    rows(M) != rows(b) && error("Dimensions don't match in solve")
