@@ -229,6 +229,14 @@ function exp{T <: RingElem}(a::T)
    return one(parent(a))
 end
 
+################################################################################
+#
+#   Transpose for ring elements
+#
+################################################################################
+
+transpose{T <: RingElem}(x::T) = deepcopy(x)
+
 ###############################################################################
 #
 #   Generic and specific rings and fields
