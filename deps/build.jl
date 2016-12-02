@@ -186,7 +186,7 @@ if !ispath(Pkg.dir("Nemo", "local", "pari-2.7.4"))
    # bison is too old on OSX for pari git
    # so we use the 2.7.4 tarball
 
-   download("http://pari.math.u-bordeaux.fr/pub/pari/unix/pari-2.7.4.tar.gz", joinpath(wdir, "pari-2.7.4.tar.gz"))
+   download("http://nemocas.org/binaries/pari-2.7.4.tar.gz", joinpath(wdir, "pari-2.7.4.tar.gz"))
 end
 
 if on_windows
