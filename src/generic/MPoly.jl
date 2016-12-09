@@ -966,7 +966,13 @@ end
 function mul{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::GenMPoly{T, S, N})
    v1, d1 = max_degrees(a)
    v2, d2 = max_degrees(b)
-   d = d1 + d2
+   v = v1 + v2
+   d = 0
+   for i = 1:length(v)
+      if v[i] > d
+         d = v[i]
+      end
+   end
    bits = 8
    max_e = 2^(bits - 1)
    while d >= max_e
