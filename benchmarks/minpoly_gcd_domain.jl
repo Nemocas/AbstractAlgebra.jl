@@ -13,7 +13,7 @@ function benchmark_minpoly_gcd_domain()
    end
 
    for i in 1:10
-      similarity!(M, 20, ZZx(rand(-3:3)))
+      similarity!(M, rand(1:20), ZZx(rand(-3:3)))
    end
 
    tt = @elapsed minpoly(PolynomialRing(ZZx, "y")[1], M)
