@@ -14,7 +14,7 @@ function benchmark_minpoly_finite_field()
    end
 
    for i in 1:10
-      similarity!(M, 80, F(rand(-3:3)))
+      similarity!(M, rand(1:80), F(rand(-3:3)))
    end
 
    tt = @elapsed minpoly(PolynomialRing(F, "x")[1], M)
