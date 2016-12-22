@@ -115,7 +115,7 @@ end
 #
 ###############################################################################
 
-zero{N}(::Type{NTuple{N, UInt}}) = ntuple(i -> 0, Val{N})
+zero{N}(::Type{NTuple{N, UInt}}) = ntuple(i -> UInt(0), Val{N})
 
 function iszero{N}(a::NTuple{N, UInt})
    for i = 1:N
