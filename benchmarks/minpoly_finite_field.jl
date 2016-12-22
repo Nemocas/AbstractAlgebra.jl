@@ -9,12 +9,12 @@ function benchmark_minpoly_finite_field()
       for j in 1:40
          r = F(rand(1:103)) + s*(rand(1:103))
          M[i, j] = r
-         M[40 + i, 40 + j] = r
+         M[40 + i, 40 + j] = deepcopy(r)
       end
    end
 
    for i in 1:10
-      similarity!(M, 80, F(rand(-3:3)))
+      similarity!(M, rand(1:80), F(rand(-3:3)))
    end
 
    tt = @elapsed minpoly(PolynomialRing(F, "x")[1], M)
