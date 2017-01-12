@@ -42,6 +42,8 @@ export error_dim_negative
 
 export is_windows64
 
+export test_module
+
 include("AbstractTypes.jl")
 
 ###############################################################################
@@ -304,5 +306,33 @@ const error_dim_negative = ErrorException("Dimensions must be non-negative")
 ###############################################################################
 
 include("../benchmarks/runbenchmarks.jl")
+
+function test_module(x, y)
+   julia_exe = Base.julia_cmd()
+   test_file = joinpath(pkgdir, "test/$x/")
+   test_file = test_file * "$y-test.jl";
+   test_function_name = "test_"
+   if x in ["flint", "arb", "antic"]
+     test_function_name *= y
+   else x == "generic"
+     if y == "RelSeries" 
+       test_function_name *= "gen_rel_series"
+     elseif y == "AbsSeries"
+       test_function_name *= "gen_abs_series"
+     elseif y == "Matrix"
+       test_function_name *= "gen_mat"
+     elseif y == "Fraction"
+       test_function_name *= "gen_frac"
+     elseif y == "Residue"
+       test_function_name *= "gen_res"
+     else
+       test_function_name *= "gen_$(lowercase(y))"
+     end
+   end
+
+   cmd = "using Base.Test; using Nemo; include(\"$test_file\"); $test_function_name();"
+   info("spawning ", `$julia_exe -e \"$cmd\"`)
+   run(`$julia_exe -e $cmd`)
+end
 
 end # module
