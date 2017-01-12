@@ -513,6 +513,11 @@ end
 ################################################################################
 
 function factor(x::fq_nmod_poly)
+   res, z = _factor(x)
+   return Fac(parent(x)(z), res)
+end
+
+function _factor(x::fq_nmod_poly)
    R = parent(x)
    F = base_ring(R)
    a = F()
@@ -529,7 +534,7 @@ function factor(x::fq_nmod_poly)
       e = unsafe_load(fac.exp,i)
       res[f] = e
    end
-   return res 
+   return res, a
 end  
 
 function factor_distinct_deg(x::fq_nmod_poly)
@@ -543,14 +548,14 @@ function factor_distinct_deg(x::fq_nmod_poly)
    ccall((:fq_nmod_poly_factor_distinct_deg, :libflint), Void, 
          (Ptr{fq_nmod_poly_factor}, Ptr{fq_nmod_poly}, Ptr{Int},
          Ptr{FqNmodFiniteField}), &fac, &x, &tmp.exp, &F)
-   res = Dict{fq_nmod_poly, Int}()
+   res = Dict{Int, fq_nmod_poly}()
    for i in 1:fac.num
       f = R()
       ccall((:fq_nmod_poly_factor_get_poly, :libflint), Void,
             (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly_factor}, Int,
             Ptr{FqNmodFiniteField}), &f, &fac, i-1, &F)
       d = unsafe_load(tmp.exp,i)
-      res[f] = d
+      res[d] = f
    end
    return res
 end

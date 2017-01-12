@@ -734,9 +734,14 @@ doc"""
 > Return the factorisation of $x$.
 """
 function factor(x::nmod_poly)
+  fac, z = _factor(x)
+  return Fac(parent(x)(z), fac)
+end
+
+function _factor(x::nmod_poly)
   !is_prime(modulus(x)) && error("Modulus not prime in factor")
   fac = nmod_poly_factor(x.mod_n)
-  ccall((:nmod_poly_factor, :libflint), UInt,
+  z = ccall((:nmod_poly_factor, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}), &fac, &x)
   res = Dict{nmod_poly,Int}()
   for i in 1:fac.num
@@ -746,7 +751,7 @@ function factor(x::nmod_poly)
     e = unsafe_load(fac.exp,i)
     res[f] = e
   end
-  return res 
+  return res, base_ring(x)(z)
 end  
 
 doc"""
@@ -755,6 +760,10 @@ doc"""
 """
 function factor_squarefree(x::nmod_poly)
   !is_prime(modulus(x)) && error("Modulus not prime in factor_squarefree")
+  return Fac(parent(x)(lead(x)), _factor_squarefree(x))
+end
+
+function _factor_squarefree(x::nmod_poly)
   fac = nmod_poly_factor(x.mod_n)
   ccall((:nmod_poly_factor_squarefree, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}), &fac, &x)
@@ -782,12 +791,12 @@ function factor_distinct_deg(x::nmod_poly)
   ccall((:nmod_poly_factor_distinct_deg, :libflint), UInt,
           (Ptr{nmod_poly_factor}, Ptr{nmod_poly}, Ptr{Ptr{Int}}),
           &fac, &x, degss)
-  res = Dict{nmod_poly,Int}()
+  res = Dict{Int,nmod_poly}()
   for i in 1:fac.num
     f = parent(x)()
     ccall((:nmod_poly_factor_get_nmod_poly, :libflint), Void,
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
-    res[f] = degs[i]        
+    res[degs[i]] = f
   end
   return res 
 end  
@@ -797,7 +806,7 @@ function factor_shape{T <: RingElem}(x::PolyElem{T})
   square_fac = factor_squarefree(x)
   for (f, i) in square_fac
     discdeg = factor_distinct_deg(f)
-    for (g,j) in discdeg
+    for (j,g) in discdeg
       num = div(degree(g), j)*i
       if haskey(res, j)
         res[j] += num

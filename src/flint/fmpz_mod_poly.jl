@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-export FmpzModPolyRing, fmpz_mod_poly
+export FmpzModPolyRing, fmpz_mod_poly, factor
 
 ################################################################################
 #
@@ -713,6 +713,11 @@ doc"""
 """
 function factor(x::fmpz_mod_poly)
   !isprobabprime(modulus(x)) && error("Modulus not prime in factor")
+  fac = _factor(x)
+  return Fac(parent(x)(lead(x)), fac)
+end
+
+function _factor(x::fmpz_mod_poly)
   fac = fmpz_mod_poly_factor(parent(x).n)
   ccall((:fmpz_mod_poly_factor, :libflint), UInt,
           (Ptr{fmpz_mod_poly_factor}, Ptr{fmpz_mod_poly}), &fac, &x)
@@ -733,6 +738,11 @@ doc"""
 """
 function factor_squarefree(x::fmpz_mod_poly)
   !isprobabprime(modulus(x)) && error("Modulus not prime in factor_squarefree")
+  fac = _factor_squarefree(x)
+  return Fac(parent(x)(lead(x)), fac)
+end
+
+function _factor_squarefree(x::fmpz_mod_poly)
   fac = fmpz_mod_poly_factor(parent(x).n)
   ccall((:fmpz_mod_poly_factor_squarefree, :libflint), UInt,
           (Ptr{fmpz_mod_poly_factor}, Ptr{fmpz_mod_poly}), &fac, &x)
@@ -760,12 +770,12 @@ function factor_distinct_deg(x::fmpz_mod_poly)
   ccall((:fmpz_mod_poly_factor_distinct_deg, :libflint), UInt,
           (Ptr{fmpz_mod_poly_factor}, Ptr{fmpz_mod_poly}, Ptr{Ptr{Int}}),
           &fac, &x, degss)
-  res = Dict{fmpz_mod_poly, Int}()
+  res = Dict{Int, fmpz_mod_poly}()
   for i in 1:fac.num
     f = parent(x)()
     ccall((:fmpz_mod_poly_factor_get_fmpz_mod_poly, :libflint), Void,
          (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly_factor}, Int), &f, &fac, i - 1)
-    res[f] = degs[i]     
+    res[degs[i]] = f
   end
   return res 
 end  

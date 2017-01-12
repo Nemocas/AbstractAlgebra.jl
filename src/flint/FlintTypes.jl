@@ -63,6 +63,26 @@ function _fmpz_clear_fn(a::fmpz)
    ccall((:fmpz_clear, :libflint), Void, (Ptr{fmpz},), &a)
 end
 
+type fmpz_factor
+   sign::Cint
+   p::Ptr{Void} # Array of fmpz_struct's
+   exp::Ptr{UInt}
+   alloc::Int
+   num::Int
+
+   function fmpz_factor()
+      z = new()
+      ccall((:fmpz_factor_init, :libflint), Void, (Ptr{fmpz_factor}, ), &z)
+      finalizer(z, _fmpz_factor_clear_fn)
+      return z
+   end
+end
+
+function _fmpz_factor_clear_fn(a::fmpz_factor)
+   ccall((:fmpz_factor_clear, :libflint), Void,
+         (Ptr{fmpz_factor}, ), &a)
+end
+
 ###############################################################################
 #
 #   FlintRationalField / fmpq
@@ -204,6 +224,28 @@ end
 
 function _fmpz_poly_clear_fn(a::fmpz_poly)
    ccall((:fmpz_poly_clear, :libflint), Void, (Ptr{fmpz_poly},), &a)
+end
+
+type fmpz_poly_factor
+  d::Int # fmpz
+  p::Ptr{fmpz_poly} # array of flint fmpz_poly_struct's
+  exp::Ptr{Int}
+  num::Int
+  alloc::Int
+
+  function fmpz_poly_factor()
+    z = new()
+    ccall((:fmpz_poly_factor_init, :libflint), Void,
+                (Ptr{fmpz_poly_factor}, ), &z)
+    finalizer(z, _fmpz_poly_factor_clear_fn)
+    return z
+  end
+end
+
+function _fmpz_poly_factor_clear_fn(f::fmpz_poly_factor)
+  ccall((:fmpz_poly_factor_clear, :libflint), Void,
+            (Ptr{fmpz_poly_factor}, ), &f)
+  nothing
 end
 
 ###############################################################################

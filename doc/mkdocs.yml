@@ -25,6 +25,7 @@ pages:
 - Maximal orders:               build/maximalorder.md
 - Class groups:                 build/classgroup.md
 - Permutation groups:           build/perm.md
+- Factorization                 build/factor.md
 
 markdown_extensions:
 - extra

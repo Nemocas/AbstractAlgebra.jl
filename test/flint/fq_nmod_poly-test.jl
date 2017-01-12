@@ -517,13 +517,13 @@ function test_fq_nmod_poly_factor()
 
    A = factor(f*g)
 
-   @test length(A) == 3
-   @test prod([h^e for (h,e)=A]) == 3*f*g
+   #@test length(A) == 3
+   @test unit(A)*prod([h^e for (h,e)=A]) == f*g
 
    B = factor_distinct_deg((y + 1)*g*(y^5+y^3+y+1))
 
    @test length(B) == 3
-   @test 11*prod([h for (h,e)=B]) == ((y + 1)*g*(y^5+y^3+y+1))
+   @test 11*prod([e for (h,e)=B]) == ((y + 1)*g*(y^5+y^3+y+1))
    
    println("PASS")
 end

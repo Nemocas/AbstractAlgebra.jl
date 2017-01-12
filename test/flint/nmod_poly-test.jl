@@ -639,41 +639,33 @@ function test_nmod_poly_issquarefree()
 end
 
 function test_nmod_poly_factor()
-  print("nmod_poly.lifting...")
+  print("nmod_poly.factor...")
 
   R = ResidueRing(ZZ, 23)
   Rx, x = PolynomialRing(R, "x")
 
-  f = (x^6 + x^4 + 2 *x^2 )^10 + x - 1
+  f = 2*((x^6 + x^4 + 2 *x^2 )^10 + x - 1)
 
   fac = factor(f)
 
-  p = Rx(1)
-
-  for (g, e) in fac
-    p *= g^e
-  end
-
-  @test f == p
+  @test f == unit(fac)*prod([ p^e for (p, e) in fac])
+  p = unit(fac)
 
   sh = factor_shape(f)
 
   @test sh == Dict(36=>1,1=>1,4=>1,19=>1)
 
-  f = (x^6 + x^4 + 2 *x^2 )^10 
+  f = 5*(x^6 + x^4 + 2 *x^2 )^10 
 
   fac = factor_squarefree(f)
 
-  @test fac == Dict(x^4+x^2+2=>10, x=>20)
+  @test f == unit(fac) * prod([ p^e for (p, e) in fac])
 
   @test_throws ErrorException factor_distinct_deg(f)
 
-  fac = factor_distinct_deg(x^6 + x^4 + 2*x^2+2)
+  fac = factor_distinct_deg(x* (x^2 + 1)*(x^2 + 2)*(x+1))
 
-  @test length(fac) == 1
-  k = first(keys(fac))
-  @test k == x^6+x^4+2*x^2 + 2
-  @test fac[k] == 2
+  @test fac == Dict(2=>x^4+3*x^2+2,1=>x^2 + x)
 
   println("PASS")
 end

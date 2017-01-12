@@ -549,6 +549,8 @@ function cmpabs(x::fmpz, y::fmpz)
               (Ptr{fmpz}, Ptr{fmpz}), &x, &y))
 end
 
+isless(x::fmpz, y::fmpz) = x < y
+
 ###############################################################################
 #
 #   Ad hoc comparison
@@ -929,6 +931,36 @@ function root(x::fmpz, n::Int)
    ccall((:fmpz_root, :libflint), Void,
          (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &x, n)
    return z
+end
+
+###############################################################################
+#
+#   Factorization
+#
+###############################################################################
+
+function _factor(a::fmpz)
+   # This is a hack around https://github.com/JuliaLang/julia/issues/19963
+   # Remove this once julia 6.0 is required
+   if a == 1 || a == -1
+     return Dict{fmpz, Int}(), a
+   end
+
+   F = fmpz_factor()
+   ccall((:fmpz_factor, :libflint), Void, (Ptr{fmpz_factor}, Ptr{fmpz}), &F, &a)
+   res = Dict{fmpz, Int}()
+   for i in 1:F.num
+     z = fmpz()
+     ccall((:fmpz_factor_get_fmpz, :libflint), Void,
+           (Ptr{fmpz}, Ptr{fmpz_factor}, Int), &z, &F, i - 1)
+     res[z] = unsafe_load(F.exp, i)
+   end
+   return res, canonical_unit(a)
+end
+
+function factor(a::fmpz)
+   fac, z = _factor(a)
+   return Fac(z, fac)
 end
 
 ###############################################################################

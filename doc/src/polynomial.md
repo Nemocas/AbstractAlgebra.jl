@@ -1010,6 +1010,7 @@ issquarefree(::fmpz_mod_poly)
 ```
 
 ```@docs
+factor(::fmpz_poly)
 factor(::nmod_poly)
 factor(::fmpz_mod_poly)
 ```
