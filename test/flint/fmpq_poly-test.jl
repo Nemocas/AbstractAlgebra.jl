@@ -439,6 +439,19 @@ function test_fmpq_poly_gcdx()
    println("PASS")
 end
 
+function test_fmpq_poly_factor()
+   print("fmpq_poly.factor...")
+
+   S, y = PolynomialRing(QQ, "y")
+
+   f = (2y + 1)^10*(5*y^3 + 1)^100*(-fmpq(1,5))
+
+   fac = factor(f)
+
+   @test f == unit(fac) * prod([ p^e for (p, e) in fac])
+
+   println("PASS")
+end
 function test_fmpq_poly_signature()
    print("fmpq_poly.signature...")
 
@@ -501,6 +514,7 @@ function test_fmpq_poly()
    test_fmpq_poly_resultant()
    test_fmpq_poly_discriminant()
    test_fmpq_poly_gcdx()
+   test_fmpq_poly_factor()
    test_fmpq_poly_signature()
    test_fmpq_poly_special()
    test_fmpq_poly_Polynomials()

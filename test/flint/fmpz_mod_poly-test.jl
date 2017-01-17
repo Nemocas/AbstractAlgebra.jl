@@ -507,24 +507,22 @@ function test_fmpz_mod_poly_factor()
    R = ResidueRing(ZZ, 123456789012345678949)
    S, x = PolynomialRing(R, "x")
 
-   f = x^2 + 2x + 1
+   f = 3*(x^2 + 2x + 1)
    g = x^3 + 3x + 1
 
    R = factor(f*g)
 
-   @test length(R) == 2
-   @test R == Dict(x^3+3*x+1 => 1, x + 1 => 2)
+   @test f*g == unit(R) * prod([ p^e for (p, e) in R])
 
    R = factor_squarefree(f*g)
 
-   @test length(R) == 2
-   @test R == Dict(x^3+3*x+1 => 1, x + 1 => 2)
+   @test f*g == unit(R) * prod([ p^e for (p, e) in R])
 
    R = factor_distinct_deg((x + 1)*g*(x^5+x+1))
 
    @test length(R) == 2
-   @test R == Dict(x^3+2*x^2+2*x+1=> 1,
-                x^6+123456789012345678948*x^5+3*x^4+123456789012345678948*x^3+123456789012345678948*x^2+3*x+1 => 3)
+   @test R == Dict(1 => x^3+2*x^2+2*x+1,
+                3 => x^6+123456789012345678948*x^5+3*x^4+123456789012345678948*x^3+123456789012345678948*x^2+3*x+1)
 
    R = factor_shape(f*g)
    

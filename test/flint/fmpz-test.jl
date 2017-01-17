@@ -473,6 +473,41 @@ function test_fmpz_modular_arithmetic()
    println("PASS")
 end
 
+function test_fmpz_factor()
+   print("fmpz.factor...")
+
+   a = fmpz(fmpz(-3*5*7*11*13^10))
+
+   fac = factor(a)
+
+   b = unit(fac)
+
+   for (p, e) in fac
+      b = b*p^e
+   end
+
+   @test b == a
+   
+   @test fac[fmpz(3)] == 1
+   @test fac[fmpz(5)] == 1
+   @test fac[fmpz(7)] == 1
+   @test fac[fmpz(11)] == 1
+   @test fac[fmpz(13)] == 10
+   @test 3 in fac
+   @test !(2 in fac)
+
+   fac = factor(fmpz(-1))
+
+   @test fac.fac == Dict{fmpz, Int}()
+
+   fac = factor(fmpz(-2))
+
+   @test fac.fac == Dict(fmpz(2) => 1)
+   @test unit(fac) == -1
+
+   println("PASS")
+end
+
 function test_fmpz_number_theoretic()
    print("fmpz.number_theoretic...")
 
@@ -546,6 +581,7 @@ function test_fmpz()
    test_fmpz_bases()
    test_fmpz_string_io()
    test_fmpz_modular_arithmetic()
+   test_fmpz_factor()
    test_fmpz_number_theoretic()
 
    println("")

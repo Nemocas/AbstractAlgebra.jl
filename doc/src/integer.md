@@ -527,6 +527,10 @@ isprobabprime(::fmpz)
 ```
 
 ```@docs
+factor(::fmpz)
+```
+
+```@docs
 remove(::fmpz, y:fmpz)
 ```
 
@@ -588,6 +592,7 @@ n = fac(100)
 s = sigma(ZZ(128), 10)
 a = eulerphi(ZZ(12480))
 p = numpart(1000)
+f = factor(ZZ(12))
 ```
 
 ## Number digits and bases

@@ -585,6 +585,45 @@ function interpolate(R::FmpzPolyRing, x::Array{fmpz, 1},
   return z
 end
 
+################################################################################
+#
+#  Factorization
+#
+################################################################################
+
+doc"""
+    factor(x::fmpz_poly)
+> Returns the factorization of $x$.
+"""
+function factor(x::fmpz_poly)
+  fac, z = _factor(x)
+  ffac = factor(z)
+
+  for (p, e) in ffac
+    fac[parent(x)(p)] = e
+  end
+
+  return Fac(parent(x)(unit(ffac)), fac)
+end
+  
+function _factor(x::fmpz_poly)
+  fac = fmpz_poly_factor()
+  ccall((:fmpz_poly_factor, :libflint), Void,
+              (Ptr{fmpz_poly_factor}, Ptr{fmpz_poly}), &fac, &x)
+  res = Dict{fmpz_poly,Int}()
+  z = fmpz()
+  ccall((:fmpz_poly_factor_get_fmpz, :libflint), Void,
+            (Ptr{fmpz}, Ptr{fmpz_poly_factor}), &z, &fac)
+  for i in 1:fac.num
+    f = parent(x)()
+    ccall((:fmpz_poly_factor_get_fmpz_poly, :libflint), Void,
+            (Ptr{fmpz_poly}, Ptr{fmpz_poly_factor}, Int), &f, &fac, i - 1)
+    e = unsafe_load(fac.exp, i)
+    res[f] = e
+  end
+  return res, z
+end  
+
 ###############################################################################
 #
 #   Special polynomials

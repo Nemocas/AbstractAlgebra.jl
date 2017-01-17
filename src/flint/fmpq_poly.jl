@@ -577,6 +577,42 @@ function gcdx(x::fmpq_poly, y::fmpq_poly)
    return (z, u, v)
 end
 
+################################################################################
+#
+#   Factorization
+#
+################################################################################
+
+doc"""
+    factor(x::fmpq_poly)
+> Returns the factorization of $x$.
+"""
+function factor(x::fmpq_poly)
+   res, z = _factor(x)
+   return Fac(parent(x)(z), res)
+end
+
+function _factor(x::fmpq_poly)
+   res = Dict{fmpq_poly, Int}()
+   y = fmpz_poly()
+   ccall((:fmpq_poly_get_numerator, :libflint), Void,
+         (Ptr{fmpz_poly}, Ptr{fmpq_poly}), &y, &x)
+   fac = fmpz_poly_factor()
+   ccall((:fmpz_poly_factor, :libflint), Void,
+              (Ptr{fmpz_poly_factor}, Ptr{fmpz_poly}), &fac, &y)
+   z = fmpz()
+   ccall((:fmpz_poly_factor_get_fmpz, :libflint), Void,
+            (Ptr{fmpz}, Ptr{fmpz_poly_factor}), &z, &fac)
+   f = fmpz_poly()
+   for i in 1:fac.num
+      ccall((:fmpz_poly_factor_get_fmpz_poly, :libflint), Void,
+            (Ptr{fmpz_poly}, Ptr{fmpz_poly_factor}, Int), &f, &fac, i - 1)
+      e = unsafe_load(fac.exp, i)
+      res[parent(x)(f)] = e
+   end
+   return res, fmpq(z, den(x))
+end
+
 ###############################################################################
 #
 #   Signature
