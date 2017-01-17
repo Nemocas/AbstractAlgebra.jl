@@ -65,7 +65,7 @@ canonical_unit(a::fmpz_poly) = canonical_unit(lead(a))
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -772,7 +772,7 @@ end
 #
 ###############################################################################
 
-function PolynomialRing(R::FlintIntegerRing, s::AbstractString{})
+function PolynomialRing(R::FlintIntegerRing, s::AbstractString)
    S = Symbol(s)
 
    parent_obj = FmpzPolyRing(S)

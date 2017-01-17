@@ -115,7 +115,7 @@ end
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -562,7 +562,7 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::FlintIntegerRing, prec::Int, s::AbstractString{}; model=:capped_relative)
+function PowerSeriesRing(R::FlintIntegerRing, prec::Int, s::AbstractString; model=:capped_relative)
    S = Symbol(s)
 
    if model == :capped_relative

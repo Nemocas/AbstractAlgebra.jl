@@ -75,7 +75,7 @@ end
 
 ################################################################################
 #
-#  AbstractString{} I/O
+#  AbstractString I/O
 #
 ################################################################################
 
@@ -912,7 +912,7 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::GenResRing{fmpz}, s::AbstractString{}; cached=true)
+function PolynomialRing(R::GenResRing{fmpz}, s::AbstractString; cached=true)
    if modulus(R) <= typemax(UInt)
       parent_obj = NmodPolyRing(R, Symbol(s), cached)
    else

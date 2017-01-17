@@ -170,7 +170,7 @@ canonical_unit(x::PolyElem) = canonical_unit(lead(x))
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -2132,7 +2132,7 @@ end
 ###############################################################################
 
 doc"""
-    PolynomialRing(R::Ring, s::AbstractString{}; cached::Bool = true)
+    PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
 > Given a base ring `R` and string `s` specifying how the generator (variable)
 > should be printed, return a tuple `S, x` representing the new polynomial
 > ring $S = R[x]$ and the generator $x$ of the ring. By default the parent
@@ -2140,7 +2140,7 @@ doc"""
 > optional argument `cached` to `false` will prevent the parent object `S` from
 > being cached.
 """
-function PolynomialRing(R::Ring, s::AbstractString{}; cached::Bool = true)
+function PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
    S = Symbol(s)
    T = elem_type(R)
    parent_obj = GenPolyRing{T}(R, S, cached)

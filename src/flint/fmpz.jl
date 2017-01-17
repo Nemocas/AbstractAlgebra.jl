@@ -210,7 +210,7 @@ end
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -1364,7 +1364,7 @@ end
 
 (::FlintIntegerRing)(a::Integer) = fmpz(a)
 
-(::FlintIntegerRing)(a::AbstractString{}) = fmpz(a)
+(::FlintIntegerRing)(a::AbstractString) = fmpz(a)
 
 (::FlintIntegerRing)(a::fmpz) = a
 
@@ -1400,7 +1400,7 @@ end
 #
 ###############################################################################
 
-fmpz(s::AbstractString{}) = parse(fmpz, s)
+fmpz(s::AbstractString) = parse(fmpz, s)
 
 fmpz(z::Integer) = fmpz(BigInt(z))
 

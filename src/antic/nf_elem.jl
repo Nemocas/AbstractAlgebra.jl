@@ -207,7 +207,7 @@ end
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -893,13 +893,13 @@ end
 ###############################################################################
 
 doc"""
-    AnticNumberField(f::fmpq_poly, s::AbstractString{})
+    AnticNumberField(f::fmpq_poly, s::AbstractString)
 > Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
 > of the number field $\mathbb{Q}/(f)$ where $f$ is the supplied polynomial.
 > The supplied string `s` specifies how the generator of the number field
 > should be printed.
 """
-function AnticNumberField(f::fmpq_poly, s::AbstractString{})
+function AnticNumberField(f::fmpq_poly, s::AbstractString)
    S = Symbol(s)
    parent_obj = AnticNumberField(f, S)
 
@@ -907,7 +907,7 @@ function AnticNumberField(f::fmpq_poly, s::AbstractString{})
 end
 
 doc"""
-    AnticCyclotomicField(n::Int, s::AbstractString{}, t = "\$")
+    AnticCyclotomicField(n::Int, s::AbstractString, t = "\$")
 > Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
 > of the $n$-th cyclotomic field, $\mathbb{Q}(\zeta_n)$. The supplied string
 > `s` specifies how the generator of the number field should be printed. If
@@ -915,7 +915,7 @@ doc"""
 > from which the number field is constructed, should be printed. If it is not
 > supplied, a default dollar sign will be used to represent the variable.
 """
-function AnticCyclotomicField(n::Int, s::AbstractString{}, t = "\$")
+function AnticCyclotomicField(n::Int, s::AbstractString, t = "\$")
    Zx, x = PolynomialRing(FlintZZ, string(gensym()))
    Qx, = PolynomialRing(FlintQQ, t)
    f = cyclotomic(n, x)
@@ -923,7 +923,7 @@ function AnticCyclotomicField(n::Int, s::AbstractString{}, t = "\$")
 end
 
 doc"""
-    AnticMaximalRealSubfield(n::Int, s::AbstractString{}, t = "\$")
+    AnticMaximalRealSubfield(n::Int, s::AbstractString, t = "\$")
 > Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
 > of the totally real subfield of the $n$-th cyclotomic field,
 > $\mathbb{Q}(\zeta_n)$. The supplied string `s` specifies how the generator of
@@ -932,7 +932,7 @@ doc"""
 > constructed, should be printed. If it is not supplied, a default dollar sign
 > will be used to represent the variable.
 """
-function AnticMaximalRealSubfield(n::Int, s::AbstractString{}, t = "\$")
+function AnticMaximalRealSubfield(n::Int, s::AbstractString, t = "\$")
    Zx, x = PolynomialRing(FlintZZ, string(gensym()))
    Qx, = PolynomialRing(FlintQQ, t)
    f = cos_minpoly(n, x)
