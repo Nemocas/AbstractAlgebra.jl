@@ -15,6 +15,18 @@ export Fac, factors, unit
 type Fac{T <: RingElem}
    unit::T
    fac::Dict{T, Int}
+   function Fac()
+     f = new()
+     f.fac = Dict{T, Int}()
+     return f
+   end
+end
+
+function Fac{T}(u::T, d::Dict{T, Int})
+ f = Fac{T}()
+ f.unit = u
+ f.fac = d
+ return f
 end
 
 doc"""
@@ -55,6 +67,20 @@ function getindex{T}(a::Fac{T}, b::T)
   end
 end
 
+doc"""
+    setindex!(a::Fac{T}, c::Int, b::T)
+
+> If `b` is a factor of `a`, the corresponding entry is set to c.
+"""
+function setindex!{T}(a::Fac{T}, c::Int, b::T)
+  if haskey(a.fac, b)
+    error("$b is already set (to $(a[b]))")
+  else
+    setindex!(a.fac, c, b)
+  end
+end
+
+
 ################################################################################
 #
 #   String I/O
@@ -62,7 +88,11 @@ end
 ################################################################################
 
 function Base.show(io::IO, a::Fac)
-  print(io, "$(a.unit)")
+  if isdefined(a, :unit)
+    print(io, "$(a.unit)")
+  else
+    print(io, "unit not set")
+  end
   for (p, e) in a.fac
     bracket = needs_parentheses(p)
     print(io, " * ")
