@@ -365,6 +365,14 @@ end
 
 +(a::fmpq, b::nf_elem) = b + a
 
++(a::Rational, b::nf_elem) = fmpq(a) + b
+
++(a::nf_elem, b::Rational) = b + a
+
+-(a::Rational, b::nf_elem) = fmpq(a) - b
+
+-(a::nf_elem, b::Rational) = a - fmpq(b)
+
 function *(a::nf_elem, b::Int)
    r = a.parent()
    ccall((:nf_elem_scalar_mul_si, :libflint), Void,
@@ -389,6 +397,12 @@ function *(a::nf_elem, b::fmpq)
    return r
 end
 
+function *(a::Rational, b::nf_elem)
+  return fmpq(a) * b
+end
+
+*(a::nf_elem, b::Rational) = b*a
+
 *(a::Integer, b::nf_elem) = b * a
 
 *(a::fmpz, b::nf_elem) = b * a
@@ -408,6 +422,10 @@ end
 //(a::fmpz, b::nf_elem) = divexact(a, b)
 
 //(a::fmpq, b::nf_elem) = divexact(a, b)
+
+//(a::Rational, b::nf_elem) = divexact(fmpq(a), b)
+
+//(a::nf_elem, b::Rational) = divexact(a, fmpq(b))
 
 ###############################################################################
 #
