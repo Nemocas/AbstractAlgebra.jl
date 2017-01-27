@@ -17,6 +17,12 @@ export fmpq, FlintQQ, FractionField, Rational, FlintRationalField, height,
 
 fmpq(a::Rational{BigInt}) = fmpq(fmpz(a.num), fmpz(a.den))
 
+function fmpq(a::Rational{Int})
+  r = fmpq()
+  ccall((:fmpq_set_si, :libflint), Void, (Ptr{fmpq}, Int64, UInt64), &r, num(a), den(a))
+  return r
+end
+
 fmpq(a::Integer) = fmpq(fmpz(a), fmpz(1))
 
 fmpq(a::Integer, b::Integer) = fmpq(fmpz(a), fmpz(b))
