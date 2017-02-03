@@ -29,11 +29,11 @@ export PolyElem, SeriesElem, AbsSeriesElem, ResElem, FracElem, MatElem, FinField
 export PolyRing, SeriesRing, AbsSeriesRing, ResRing, FracField, MatSpace, FinField
 
 export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
-       MaximalRealSubfield, MaximalOrder, Ideal, PermutationGroup
+       MaximalRealSubfield, PermutationGroup
 
 export RealField, ComplexField
 
-export create_accessors, get_handle, package_handle, allocatemem, zeros,
+export create_accessors, get_handle, package_handle, zeros,
        Array, sig_exists
 
 export flint_cleanup, flint_set_num_threads
@@ -63,18 +63,8 @@ else
 end
 const libmpfr = joinpath(pkgdir, "local", "lib", "libmpfr")
 const libflint = joinpath(pkgdir, "local", "lib", "libflint")
-const libpari = joinpath(pkgdir, "local", "lib", "libpari")
 const libarb = joinpath(pkgdir, "local", "lib", "libarb")
   
-function allocatemem(bytes::Int)
-   newsize = pari(fmpz(bytes)).d
-   ccall((:gp_allocatemem, :libpari), Void, (Ptr{Int},), newsize)
-end
-
-function pari_sigint_handler()
-   error("User interrupt")
-end
-
 function flint_abort()
   error("Problem in the Flint-Subsystem")
 end
@@ -88,32 +78,10 @@ function __init__()
        Libdl.dlopen(libgmp)
        Libdl.dlopen(libmpfr)
        Libdl.dlopen(libflint)
-       Libdl.dlopen(libpari)
        Libdl.dlopen(libarb)
    else
       push!(Libdl.DL_LOAD_PATH, libdir)
    end
- 
-   if !is_windows()
-      ccall((:pari_set_memory_functions, libpari), Void,
-         (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
-         cglobal(:jl_malloc),
-         cglobal(:jl_calloc),
-         cglobal(:jl_realloc),
-         cglobal(:jl_free))
-   end
-   
-   ccall((:pari_init, libpari), Void, (Int, Int), 300000000, 10000)
-  
-   global avma = cglobal((:avma, libpari), Ptr{Int})
-
-   global gen_0 = cglobal((:gen_0, libpari), Ptr{Int})
-
-   global gen_1 = cglobal((:gen_1, libpari), Ptr{Int})
-
-   global pari_sigint = cglobal((:cb_pari_sigint, libpari), Ptr{Void})
-
-   unsafe_store!(pari_sigint, cfunction(pari_sigint_handler, Void, ()), 1)
 
    if !is_windows()
       ccall((:__gmp_set_memory_functions, libgmp), Void,
@@ -161,8 +129,6 @@ include("flint/FlintTypes.jl")
 include("antic/AnticTypes.jl")
 
 include("arb/ArbTypes.jl")
-
-include("pari/PariTypes.jl")
 
 include("ambiguities.jl") # remove ambiguity warnings
 
@@ -281,15 +247,6 @@ ComplexField = AcbField
 NumberField = AnticNumberField
 CyclotomicField = AnticCyclotomicField
 MaximalRealSubfield = AnticMaximalRealSubfield
-
-###############################################################################
-#
-#   Set domain for MaximalOrder and Ideal to Pari
-#
-###############################################################################
-
-MaximalOrder = PariMaximalOrder
-Ideal = PariIdeal
 
 ###############################################################################
 #

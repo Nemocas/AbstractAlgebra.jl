@@ -275,19 +275,7 @@ include("flint/fmpq_mat.jl")
 
 include("flint/nmod_mat.jl")
 
-include("pari/pari_int.jl")
-
-include("pari/pari_poly.jl")
-
-include("pari/pari_polmod.jl")
-
-include("pari/pari_vec.jl")
-
-include("pari/PariFactor.jl")
-
 include("Fields.jl")
-
-include("pari/pari_frac.jl")
 
 include("flint/fmpq_poly.jl")
 
@@ -316,12 +304,6 @@ include("arb/acb_poly.jl")
 include("arb/arb_mat.jl")
 
 include("arb/acb_mat.jl")
-
-include("pari/pari_poly2.jl")
-
-include("pari/pari_maximal_order_elem.jl")
-
-include("pari/PariIdeal.jl")
 
 include("Factor.jl")
 
