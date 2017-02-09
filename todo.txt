@@ -3,8 +3,6 @@ Build
 
 * Remove dependency on git on Windows
 
-* Remove Pari module (once factorisation of integers and Z[x] is done)
-
 General
 -------
 
@@ -19,6 +17,8 @@ General
 * Optimise for monomials in polynomial modules, especially powering
 
 * introduce CapRelSeries abstract type
+
+* extend documentation for absolute power series
 
 fq_poly.jl / fq_nmod_poly.jl
 ----------------------------
