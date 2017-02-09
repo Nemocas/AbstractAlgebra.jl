@@ -15,7 +15,7 @@ export fmpq_rel_series, FmpqRelSeriesRing
 function O(a::fmpq_rel_series)
    val = pol_length(a) + valuation(a) - 1
    val < 0 && throw(DomainError())
-   z = fmpq_rel_series(Array(fmpq, 0), 0, val, val)
+   z = fmpq_rel_series(Array{fmpq}(0), 0, val, val)
    z.parent = parent(a)
    return z
 end

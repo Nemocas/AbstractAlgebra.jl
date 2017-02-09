@@ -595,7 +595,7 @@ function arb_vec(b::Array{arb, 1})
 end
 
 function array(R::ArbField, v::Ptr{arb_struct}, n::Int)
-   r = Array(arb, n)
+   r = Array{arb}(n)
    for i=1:n
        r[i] = R()
        ccall((:arb_set, :libarb), Void, (Ptr{arb}, Ptr{arb_struct}),

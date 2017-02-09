@@ -713,7 +713,7 @@ function sqr_classical(a::GenPoly{nf_elem})
    t = base_ring(a)()
 
    lenz = 2*lena - 1
-   d = Array(nf_elem, lenz)
+   d = Array{nf_elem}(lenz)
 
    for i = 1:lena - 1
       d[2i - 1] = base_ring(a)()
@@ -758,7 +758,7 @@ function mul_classical(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
    t = base_ring(a)()
 
    lenz = lena + lenb - 1
-   d = Array(nf_elem, lenz)
+   d = Array{nf_elem}(lenz)
 
    for i = 1:lena
       d[i] = base_ring(a)()

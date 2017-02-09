@@ -626,8 +626,8 @@ function interpolate(R::NmodPolyRing, x::Array{GenRes{fmpz}, 1},
                                       y::Array{GenRes{fmpz}, 1})
   z = R()
 
-  ax = Array(UInt, length(x))
-  ay = Array(UInt, length(y))
+  ax = Array{UInt}(length(x))
+  ay = Array{UInt}(length(y))
 
   t = fmpz()
 
@@ -785,7 +785,7 @@ doc"""
 function factor_distinct_deg(x::nmod_poly)
   !issquarefree(x) && error("Polynomial must be squarefree")
   !is_prime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")
-  degs = Array(Int, degree(x))
+  degs = Array{Int}(degree(x))
   degss = [ pointer(degs) ]
   fac = nmod_poly_factor(x.mod_n)
   ccall((:nmod_poly_factor_distinct_deg, :libflint), UInt,

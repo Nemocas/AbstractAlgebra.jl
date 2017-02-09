@@ -2322,7 +2322,7 @@ type perm <: GroupElem
    parent::FlintPermGroup
 
    function perm(n::Int)
-      p = new(Array(Int, n))
+      p = new(Array{Int}(n))
       ccall((:_perm_set_one, :libflint), Void,
             (Ref{Int}, Int), p.d, length(p.d))
       return p
@@ -2330,7 +2330,7 @@ type perm <: GroupElem
 
    function perm(a::Array{Int, 1})
       n = length(a)
-      d = Array(Int, n)
+      d = Array{Int}(n)
       for i = 1:n
          d[i] = a[i] - 1
       end
