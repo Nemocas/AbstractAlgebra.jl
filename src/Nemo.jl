@@ -6,15 +6,14 @@ import Base: Array, abs, asin, asinh, atan, atanh, base, bin, call,
              checkbounds, convert, cmp, contains, cos, cosh, dec,
              deepcopy, deepcopy_internal, den, deserialize, det, div, divrem,
              exp, factor, gcd, gcdx, getindex, hash, hcat, hex, intersect, inv,
-             invmod, isequal, isfinite, isless, isprime, isqrt, isreal, lcm,
-             ldexp, length, log, lufact, lufact!, mod, ndigits, nextpow2, norm,
-             nullspace, num, oct, one, parent, parity, parse, precision,
+             invmod, isequal, isfinite, isless, isprime, isqrt, isreal, iszero,
+             lcm, ldexp, length, log, lufact, lufact!, mod, ndigits, nextpow2,
+             norm, nullspace, num, oct, one, parent, parity, parse, precision,
              prevpow2, promote_rule, rank, Rational, rem, reverse, serialize,
              setindex!, show, sign, sin, sinh, size, sqrt, string, sub, tan,
              tanh, trace, trailing_zeros, transpose, transpose!, truncate,
-             typed_hvcat, typed_hcat, var, vcat, zero, zeros,
-             +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
-             /, !=
+             typed_hvcat, typed_hcat, var, vcat, zero, zeros, +, -, *, ==, ^,
+             &, |, $, <<, >>, ~, <=, >=, <, >, //, /, !=
 
 import Base: floor, ceil, hypot, sqrt,
              log, log1p, exp, expm1, sin, cos, sinpi, cospi, tan, cot,
@@ -154,18 +153,16 @@ end
 ###############################################################################
 
 function create_accessors(T, S, handle)
-   accessor_name = gensym()
-   @eval begin
-      function $(Symbol(:get, accessor_name))(a::$T)
-         return a.auxilliary_data[$handle]::$S
-      end,
-      function $(Symbol(:set, accessor_name))(a::$T, b::$S)
-         if $handle > length(a.auxilliary_data)
-            resize(a.auxilliary_data, $handle)
-         end
-         a.auxilliary_data[$handle] = b
-      end
+   get = function(a)
+      return a.auxilliary_data[handle]
    end
+   set = function(a, b)
+      if handle > length(a.auxilliary_data)
+         resize(a.auxilliary_data, handle)
+      end
+      a.auxilliary_data[handle] = b
+   end
+   return get, set
 end
 
 ###############################################################################
@@ -199,11 +196,11 @@ end # if VERSION
 #
 ###############################################################################
 
-Array(R::Ring, r::Int...) = Array(elem_type(R), r)
+Array(R::Ring, r::Int...) = Array{elem_type(R)}(r)
 
 function zeros(R::Ring, r::Int...)
    T = elem_type(R)
-   A = Array(T, r)
+   A = Array{T}(r)
    for i in eachindex(A)
       A[i] = R()
    end

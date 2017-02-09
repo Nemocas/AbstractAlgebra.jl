@@ -625,8 +625,8 @@ doc"""
 > real roots of $f$ and $s$ is half the number of complex roots.
 """
 function signature(f::fmpq_poly)
-   r = Array(Int, 1)
-   s = Array(Int, 1)
+   r = Array{Int}(1)
+   s = Array{Int}(1)
    z = fmpz_poly()
    ccall((:fmpq_poly_get_numerator, :libflint), Void,
          (Ptr{fmpz_poly}, Ptr{fmpq_poly}), &z, &f)

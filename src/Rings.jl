@@ -205,7 +205,7 @@ end
 function powers{T <: RingElem}(a::T, d::Int)
    d <= 0 && throw(DomainError())
    S = parent(a)
-   A = Array(T, d + 1)
+   A = Array{T}(d + 1)
    A[1] = one(S)
    if d > 1
       c = a
