@@ -13,6 +13,7 @@ julia:
 notifications:
   - email: false
 after_success:
-  - julia -e 'Pkg.clone("https://github.com/MichaelHatherly/Documenter.jl")'
+#  - julia -e 'Pkg.clone("https://github.com/MichaelHatherly/Documenter.jl")'
+  - julia -e 'Pkg.add("Documenter")'
   - julia -e 'cd(Pkg.dir("Nemo")); include(joinpath("doc", "build.jl"))'
 
