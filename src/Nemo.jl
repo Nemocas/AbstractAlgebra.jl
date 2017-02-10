@@ -266,6 +266,7 @@ function test_module(x, y)
    test_file = joinpath(pkgdir, "test/$x/")
    test_file = test_file * "$y-test.jl";
    test_function_name = "test_"
+
    if x in ["flint", "arb", "antic"]
      test_function_name *= y
    else x == "generic"
