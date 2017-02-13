@@ -134,7 +134,7 @@ In order to construct power series in Nemo, one must first construct the
 power series ring itself. This is accomplished with the following constructor.
 
 ```@docs
-PowerSeriesRing(::Ring, ::Int, ::AbstractString{}; ::Bool, ::Symbol)
+PowerSeriesRing(::Ring, ::Int, ::AbstractString; ::Bool, ::Symbol)
 ```
 
 Here are some examples of creating a power series ring using the constructor
