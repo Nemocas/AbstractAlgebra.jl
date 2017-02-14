@@ -153,7 +153,7 @@ doc"""
 isunit(a::PolyElem) = length(a) == 1 && isunit(coeff(a, 0))
 
 function deepcopy_internal{T <: RingElem}(a::GenPoly{T}, dict::ObjectIdDict)
-   coeffs = Array(T, length(a))
+   coeffs = Array{T}(length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy(a.coeffs[i])
    end
@@ -397,7 +397,7 @@ function mul_ks{T <: PolyElem}(a::PolyElem{T}, b::PolyElem{T})
    end
    m = maxa + maxb - 1
    z = base_ring(base_ring(a))()
-   A1 = Array(elem_type(base_ring(base_ring(a))), m*lena)
+   A1 = Array{elem_type(base_ring(base_ring(a)))}(m*lena)
    for i = 1:lena
       c = coeff(a, i - 1)
       for j = 1:length(c)
@@ -409,7 +409,7 @@ function mul_ks{T <: PolyElem}(a::PolyElem{T}, b::PolyElem{T})
    end
    ksa = base_ring(a)(A1)
    if a !== b
-      A2 = Array(elem_type(base_ring(base_ring(a))), m*lenb)
+      A2 = Array{elem_type(base_ring(base_ring(a)))}(m*lenb)
       for i = 1:lenb
          c = coeff(b, i - 1)
          for j = 1:length(c)
@@ -445,7 +445,7 @@ function mul_classical{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    end
    t = base_ring(a)()
    lenz = lena + lenb - 1
-   d = Array(T, lenz)
+   d = Array{T}(lenz)
    for i = 1:lena
       d[i] = coeff(a, i - 1)*coeff(b, 0)
    end
@@ -623,7 +623,7 @@ function pow_multinomial{T <: RingElem}(a::PolyElem{T}, e::Int)
    e < 0 && throw(DomainError())
    lena = length(a)
    lenz = (lena - 1) * e + 1
-   res = Array(T, lenz)
+   res = Array{T}(lenz)
    for k = 1:lenz
       res[k] = base_ring(a)()
    end
@@ -830,7 +830,7 @@ function mullow{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, n::Int)
    end
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, n)
-   d = Array(T, lenz)
+   d = Array{T}(lenz)
    for i = 1:min(lena, lenz)
       d[i] = coeff(a, i - 1)*coeff(b, 0)
    end
@@ -1017,7 +1017,7 @@ function divexact{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
       return zero(parent(f))
    end
    lenq = length(f) - length(g) + 1
-   d = Array(T, lenq)
+   d = Array{T}(lenq)
    for i = 1:lenq
       d[i] = zero(base_ring(f))
    end
@@ -1952,7 +1952,7 @@ end
 function fit!{T <: RingElem}(c::GenPoly{T}, n::Int)
    if length(c.coeffs) < n
       t = c.coeffs
-      c.coeffs = Array(T, n)
+      c.coeffs = Array{T}(n)
       for i = 1:length(c)
          c.coeffs[i] = t[i]
       end

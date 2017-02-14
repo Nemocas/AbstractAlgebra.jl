@@ -40,7 +40,8 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, fac, bell,
        gcdinv, isprobabprime, issquare, jacobi, remove, root, size, isqrtrem,
        sqrtmod, trailing_zeros, sigma, eulerphi, fib, moebiusmu, primorial,
        risingfac, numpart, canonical_unit, needs_parentheses, is_negative,
-       show_minus_one, parseint, addeq!, mul!, isunit, isequal, num, den
+       show_minus_one, parseint, addeq!, mul!, isunit, isequal, num, den,
+       iszero
 
 ###############################################################################
 #

@@ -607,7 +607,7 @@ function acb_vec(b::Array{acb, 1})
 end
 
 function array(R::AcbField, v::Ptr{acb_struct}, n::Int)
-   r = Array(acb, n)
+   r = Array{acb}(n)
    for i=1:n
        r[i] = R()
        ccall((:acb_set, :libarb), Void, (Ptr{acb}, Ptr{acb_struct}),
@@ -720,7 +720,7 @@ doc"""
 function roots(x::acb_poly; target=0, isolate_real=false, initial_prec=0, max_prec=0, max_iter=0)
     deg = degree(x)
     if deg <= 0
-        return Array(acb, 0)
+        return Array{acb}(0)
     end
 
     initial_prec = (initial_prec >= 2) ? initial_prec : 32

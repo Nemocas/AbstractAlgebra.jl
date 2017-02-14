@@ -15,7 +15,7 @@ export fq_rel_series, FqRelSeriesRing
 function O(a::fq_rel_series)
    val = pol_length(a) + valuation(a) - 1
    val < 0 && throw(DomainError())
-   z = fq_rel_series(base_ring(a), Array(fq, 0), 0, val, val)
+   z = fq_rel_series(base_ring(a), Array{fq}(0), 0, val, val)
    z.parent = parent(a)
    return z
 end
