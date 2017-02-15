@@ -1895,9 +1895,18 @@ type NmodMatSpace <: MatSpace{GenRes{fmpz}}
   end
 end
 
-function _check_dim{T}(r::Int, c::Int, arr::Array{T, 2}, transpose::Bool)
-  (r < 0 || c < 0) && throw(error_dim_negative)
-  (size(arr) != (transpose ? (c,r) : (r,c))) && error("Array of wrong dimension")
+function _check_dim{T}(r::Int, c::Int, arr::Array{T, 2}, transpose::Bool = false)
+  if !transpose
+    size(arr) != (r, c) && throw(ErrorConstrDimMismatch(r, c, size(arr)...))
+  else
+    size(arr) != (c, r) && throw(ErrorConstrDimMismatch(r, c, (reverse(size(arr)))...))
+  end
+  return nothing
+end
+
+function _check_dim{T}(r::Int, c::Int, arr::Array{T, 1})
+  length(arr) != r*c && throw(ErrorConstrDimMismatch(r, c, length(arr)))
+  return nothing
 end
 
 type nmod_mat <: MatElem{GenRes{fmpz}}
