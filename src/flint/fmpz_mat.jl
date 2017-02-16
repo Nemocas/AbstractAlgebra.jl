@@ -1053,24 +1053,32 @@ function (a::FmpzMatSpace)()
 end
 
 function (a::FmpzMatSpace)(arr::Array{fmpz, 2})
+   _check_dim(a.rows, a.cols, arr)
    z = fmpz_mat(a.rows, a.cols, arr)
    z.parent = a
    return z
 end
 
 function (a::FmpzMatSpace){T <: Integer}(arr::Array{T, 2})
+   _check_dim(a.rows, a.cols, arr)
    z = fmpz_mat(a.rows, a.cols, arr)
    z.parent = a
    return z
 end
 
 function (a::FmpzMatSpace)(arr::Array{fmpz, 1})
+   _check_dim(a.rows, a.cols, arr)
    z = fmpz_mat(a.rows, a.cols, arr)
    z.parent = a
    return z
 end
 
-(a::FmpzMatSpace){T <: Integer}(arr::Array{T, 1}) = a(reshape(arr, (a.rows, a.cols)))
+function (a::FmpzMatSpace){T <: Integer}(arr::Array{T, 1})
+  _check_dim(a.rows, a.cols, arr)
+  z = fmpz_mat(a.rows, a.cols, arr)
+  z.parent = a
+  return z
+end
 
 function (a::FmpzMatSpace)(d::fmpz)
    z = fmpz_mat(a.rows, a.cols, d)

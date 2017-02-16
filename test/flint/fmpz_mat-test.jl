@@ -25,6 +25,11 @@ function test_fmpz_mat_constructors()
 
    @test isa(m, MatElem)
 
+   @test_throws ErrorConstrDimMismatch (S([fmpz(1) 2; 3 4]))
+   @test_throws ErrorConstrDimMismatch (S([fmpz(1), 2, 3, 4]))
+   @test_throws ErrorConstrDimMismatch (S([fmpz(1) 2 3 4; 5 6 7 8; 1 2 3 4]))
+   @test_throws ErrorConstrDimMismatch (S([fmpz(1), 2, 3, 4, 5, 6, 7, 8, 1, 2, 3, 4]))
+
    println("PASS")
 end
 

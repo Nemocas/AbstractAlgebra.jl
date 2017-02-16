@@ -37,7 +37,7 @@ export create_accessors, get_handle, package_handle, zeros,
 
 export flint_cleanup, flint_set_num_threads
 
-export error_dim_negative
+export error_dim_negative, ErrorConstrDimMismatch
 
 export is_windows64
 

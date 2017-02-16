@@ -1720,6 +1720,22 @@ type fmpq_mat <: MatElem{fmpq}
       return z
    end
 
+   function fmpq_mat{T <: Integer}(r::Int, c::Int, arr::Array{T, 1})
+      z = new()
+      ccall((:fmpq_mat_init, :libflint), Void, 
+            (Ptr{fmpq_mat}, Int, Int), &z, r, c)
+      finalizer(z, _fmpq_mat_clear_fn)
+      for i = 1:r
+         for j = 1:c
+            el = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
+                       (Ptr{fmpq_mat}, Int, Int), &z, i - 1, j - 1)
+            ccall((:fmpq_set, :libflint), Void,
+                  (Ptr{fmpq}, Ptr{fmpq}), el, &fmpq(arr[(i-1)*c+j]))
+         end
+      end
+      return z
+   end
+
    function fmpq_mat(r::Int, c::Int, d::fmpq)
       z = new()
       ccall((:fmpq_mat_init, :libflint), Void, 
@@ -1840,6 +1856,22 @@ type fmpz_mat <: MatElem{fmpz}
       return z
    end
 
+   function fmpz_mat{T <: Integer}(r::Int, c::Int, arr::Array{T,1})
+      z = new()
+      ccall((:fmpz_mat_init, :libflint), Void,
+            (Ptr{fmpz_mat}, Int, Int), &z, r, c)
+      finalizer(z, _fmpz_mat_clear_fn)
+      for i = 1:r
+         for j = 1:c
+            el = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
+                       (Ptr{fmpz_mat}, Int, Int), &z, i - 1, j - 1)
+            ccall((:fmpz_set, :libflint), Void,
+                  (Ptr{fmpz}, Ptr{fmpz}), el, &fmpz(arr[(i-1)*c+j]))
+         end
+      end
+      return z
+   end
+
    function fmpz_mat(r::Int, c::Int, d::fmpz)
       z = new()
       ccall((:fmpz_mat_init, :libflint), Void, 
@@ -1947,6 +1979,26 @@ type nmod_mat <: MatElem{GenRes{fmpz}}
     return z
   end
 
+  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{UInt, 1}, transpose::Bool = false)
+    _check_dim(r, c, arr, transpose)
+    z = new()
+    ccall((:nmod_mat_init, :libflint), Void,
+            (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
+    finalizer(z, _nmod_mat_clear_fn)
+    if transpose 
+      se = set_entry_t!
+      r,c = c,r
+    else
+      se = set_entry!
+    end
+    for i = 1:r
+      for j = 1:c
+        se(z, i, j, arr[(i-1)*c+j])
+      end
+    end
+    return z
+  end
+
   function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{fmpz, 2}, transpose::Bool = false)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
@@ -1966,7 +2018,31 @@ type nmod_mat <: MatElem{GenRes{fmpz}}
     return z
   end
 
+  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{fmpz, 1}, transpose::Bool = false)
+    z = new()
+    ccall((:nmod_mat_init, :libflint), Void,
+            (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
+    finalizer(z, _nmod_mat_clear_fn)
+    if transpose 
+      se = set_entry_t!
+      r,c = c,r
+    else
+      se = set_entry!
+    end
+    for i = 1:r
+      for j = 1:c
+        se(z, i, j, arr[(i-1)*c+j])
+      end
+    end
+    return z
+  end
+
   function nmod_mat{T <: Integer}(r::Int, c::Int, n::UInt, arr::Array{T, 2}, transpose::Bool = false)
+    arr = map(fmpz, arr)
+    return nmod_mat(r, c, n, arr, transpose)
+  end
+
+  function nmod_mat{T <: Integer}(r::Int, c::Int, n::UInt, arr::Array{T, 1}, transpose::Bool = false)
     arr = map(fmpz, arr)
     return nmod_mat(r, c, n, arr, transpose)
   end

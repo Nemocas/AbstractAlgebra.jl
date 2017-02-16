@@ -512,6 +512,22 @@ type arb_mat <: MatElem{arb}
     return z
   end
 
+  function arb_mat{T <: Union{Int, UInt, fmpz, Float64, BigFloat,
+                              arb}}(r::Int, c::Int, arr::Array{T, 1})
+    z = new()
+    ccall((:arb_mat_init, :libarb), Void, 
+                (Ptr{arb_mat}, Int, Int), &z, r, c)
+    finalizer(z, _arb_mat_clear_fn)
+    for i = 1:r
+      for j = 1:c
+        el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
+                    (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
+        Nemo._arb_set(el, arr[(i-1)*c+j])
+      end
+    end
+    return z
+  end
+
   function arb_mat{T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb,
                               AbstractString}}(r::Int, c::Int, arr::Array{T, 2},
                                                prec::Int)
@@ -529,6 +545,23 @@ type arb_mat <: MatElem{arb}
     return z
   end
      
+  function arb_mat{T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb,
+                              AbstractString}}(r::Int, c::Int, arr::Array{T, 1},
+                                               prec::Int)
+    z = new()
+    ccall((:arb_mat_init, :libarb), Void, 
+                (Ptr{arb_mat}, Int, Int), &z, r, c)
+    finalizer(z, _arb_mat_clear_fn)
+    for i = 1:r
+      for j = 1:c
+        el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
+                    (Ptr{arb_mat}, Int, Int), &z, i - 1, j - 1)
+        _arb_set(el, arr[(i-1)*c+j], prec)
+      end
+    end
+    return z
+  end
+
   function arb_mat(a::fmpq_mat, prec::Int)
     z = new()
     ccall((:arb_mat_init, :libarb), Void,
@@ -646,6 +679,22 @@ type acb_mat <: MatElem{acb}
     return z
   end
 
+  function acb_mat{T <: Union{Int, UInt, Float64, fmpz, BigFloat, acb,
+                              arb}}(r::Int, c::Int, arr::Array{T, 1})
+    z = new()
+    ccall((:acb_mat_init, :libarb), Void, 
+                (Ptr{acb_mat}, Int, Int), &z, r, c)
+    finalizer(z, _acb_mat_clear_fn)
+    for i = 1:r
+      for j = 1:c
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
+                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+        _acb_set(el, arr[(i-1)*c+j])
+      end
+    end
+    return z
+  end
+
   function acb_mat{T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb,
                               AbstractString, acb}}(r::Int, c::Int,
                                                     arr::Array{T, 2}, prec::Int)
@@ -658,6 +707,23 @@ type acb_mat <: MatElem{acb}
         el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                     (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
         _acb_set(el, arr[i, j], prec)
+      end
+    end
+    return z
+  end
+
+  function acb_mat{T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb,
+                              AbstractString, acb}}(r::Int, c::Int,
+                                                    arr::Array{T, 1}, prec::Int)
+    z = new()
+    ccall((:acb_mat_init, :libarb), Void, 
+                (Ptr{acb_mat}, Int, Int), &z, r, c)
+    finalizer(z, _acb_mat_clear_fn)
+    for i = 1:r
+      for j = 1:c
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
+                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+        _acb_set(el, arr[(i-1)*c+j], prec)
       end
     end
     return z
@@ -677,6 +743,25 @@ type acb_mat <: MatElem{acb}
         el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                     (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
         _acb_set(el, arr[i, j][1], arr[i,j][2], prec)
+      end
+    end
+    return z
+  end
+
+  function acb_mat{T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb,
+                              AbstractString}}(r::Int, c::Int,
+                                               arr::Array{Tuple{T, T}, 1},
+                                               prec::Int)
+
+    z = new()
+    ccall((:acb_mat_init, :libarb), Void, 
+                (Ptr{acb_mat}, Int, Int), &z, r, c)
+    finalizer(z, _acb_mat_clear_fn)
+    for i = 1:r
+      for j = 1:c
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
+                    (Ptr{acb_mat}, Int, Int), &z, i - 1, j - 1)
+        _acb_set(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
       end
     end
     return z

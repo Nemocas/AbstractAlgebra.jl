@@ -684,33 +684,30 @@ function (a::NmodMatSpace)(arr::Array{GenRes{fmpz}, 2}, transpose::Bool = false)
 end
 
 function (a::NmodMatSpace)(arr::Array{Int, 1})
-  (length(arr) != a.cols * a.rows) &&
-          error("Array must be of length ", a.cols * a.rows)
-
-  arr = reshape(arr,a.cols,a.rows)
-  return a(arr, true)
+  _check_dim(a.rows, a.cols, arr)
+  z = nmod_mat(a.rows, a.cols, a.n, arr)
+  z.parent = a
+  return z
 end
 
 function (a::NmodMatSpace)(arr::Array{BigInt, 1})
-  (length(arr) != a.cols * a.rows) &&
-          error("Array must be of length ", a.cols * a.rows)
-  arr = reshape(arr,a.cols,a.rows)
-  return a(arr, true)
+  _check_dim(a.rows, a.cols, arr)
+  z = nmod_mat(a.rows, a.cols, a.n, arr)
+  z.parent = a
+  return z
 end
 
 function (a::NmodMatSpace)(arr::Array{fmpz, 1})
-  (length(arr) != a.cols * a.rows) &&
-          error("Array must be of length ", a.cols * a.rows)
-  arr = reshape(arr,a.cols,a.rows)
-  return a(arr, true)
+  _check_dim(a.rows, a.cols, arr)
+  z = nmod_mat(a.rows, a.cols, a.n, arr)
+  z.parent = a
+  return z
 end
 
 function (a::NmodMatSpace)(arr::Array{GenRes{fmpz}, 1})
-  (length(arr) != a.cols * a.rows) &&
-          error("Array must be of length ", a.cols * a.rows)
+  _check_dim(a.rows, a.cols, arr)
   z = nmod_mat(a.rows, a.cols, a.n, arr)
   z.parent = a
-
   return z
 end
 
