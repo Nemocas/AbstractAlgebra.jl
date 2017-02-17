@@ -907,7 +907,6 @@ function addeq!(a::fmpq_rel_series, b::fmpq_rel_series)
    lena = pol_length(a)
    lenb = pol_length(b)  
    prec = min(a.prec, b.prec)
-<<<<<<< HEAD
    val = min(a.val, b.val)
    lena = min(lena, prec - a.val)
    lenb = min(lenb, prec - b.val)

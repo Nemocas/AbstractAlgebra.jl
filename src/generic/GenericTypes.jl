@@ -34,11 +34,11 @@ type GenPoly{T <: RingElem} <: PolyElem{T}
    length::Int
    parent::GenPolyRing{T}
 
-   GenPoly() = new(Array{T}(0), 0)
+   GenPoly() = new(Array(T, 0), 0)
    
    GenPoly(a::Array{T, 1}) = new(a, length(a))
 
-   GenPoly(a::T) = a == 0 ? new(Array{T}(0), 0) : new([a], 1)
+   GenPoly(a::T) = a == 0 ? new(Array(T, 0), 0) : new([a], 1)
 end
 
 ###############################################################################
@@ -70,55 +70,6 @@ type GenMPolyRing{T <: RingElem, S, N} <: PolyRing{T}
          z = new(R, s, length(s))
          if cached
            GenMPolyID[R, s, S, N] = z
-         end
-         return z
-      end
-   end
-end
-
-type GenMPoly{T <: RingElem, S, N} <: PolyElem{T}
-   coeffs::Array{T, 1}
-   exps::Array{NTuple{N, UInt}}
-   length::Int
-   parent::GenMPolyRing{T, S, N}
-
-   GenMPoly() = new(Array(T, 0), Array(NTuple{N, UInt}, 0), 0)
-   
-   GenMPoly(a::Array{T, 1}, b::Array{NTuple{N, UInt}, 1}) = new(a, b, length(a))
-
-   GenMPoly(a::T) = a == 0 ? new(Array(T, 0), Array(NTuple{N, UInt}, 0), 0) : 
-                                      new([a], [zero(NTuple{N, UInt})], 1)
-end
-
-###############################################################################
-#
-#   GenMPolyRing / GenMPoly / Monomial
-#
-###############################################################################
-
-# S is a Symbol which can take the values:
-# :lex
-# :revlex
-# :deglex
-# :degrevlex
-# 
-# T is an Int which is the number of variables
-# (plus one if ordered by total degree)
-
-const GenMPolyID = ObjectIdDict()
-
-type GenMPolyRing{T <: RingElem, S, N} <: PolyRing{T}
-   base_ring::Ring
-   S::Array{Symbol, 1}
-   num_vars::Int
-
-   function GenMPolyRing(R::Ring, s::Array{Symbol, 1}, cached=true)
-      if haskey(GenMPolyID, (R, s, S))
-         return GenMPolyID[R, s, S]::GenMPolyRing{T, S, N}
-      else 
-         z = new(R, s, length(s))
-         if cached
-           GenMPolyID[R, s, S] = z
          end
          return z
       end
@@ -286,7 +237,6 @@ type GenAbsSeries{T <: RingElem} <: AbsSeriesElem{T}
    GenAbsSeries(a::Array{T, 1}, length::Int, prec::Int) = new(a, length, prec)   
    GenAbsSeries(a::GenAbsSeries{T}) = a
 end
-
 ###############################################################################
 #
 #   GenFracField / GenFrac
