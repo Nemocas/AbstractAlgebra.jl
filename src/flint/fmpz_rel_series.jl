@@ -534,6 +534,12 @@ end
 #
 ###############################################################################
 
+function zero!(x::fmpz_rel_series)
+  ccall((:fmpz_poly_zero, :libflint), Void, 
+                   (Ptr{fmpz_rel_series},), &x)
+  x.prec = parent(x).prec_max
+end
+
 function setcoeff!(z::fmpz_rel_series, n::Int, x::fmpz)
    ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
                 (Ptr{fmpz_rel_series}, Int, Ptr{fmpz}), 
@@ -600,6 +606,22 @@ function addeq!(a::fmpz_rel_series, b::fmpz_rel_series)
    a.val = val
    renormalize!(a)
    return nothing
+end
+
+function add!(c::fmpz_rel_series, a::fmpz_rel_series, b::fmpz_rel_series)
+   lena = length(a)
+   lenb = length(b)
+         
+   prec = min(a.prec, b.prec)
+ 
+   lena = min(lena, prec)
+   lenb = min(lenb, prec)
+
+   lenc = max(lena, lenb)
+   c.prec = prec
+   ccall((:fmpz_poly_add_series, :libflint), Void, 
+                (Ptr{fmpz_rel_series}, Ptr{fmpz_rel_series}, Ptr{fmpz_rel_series}, Int), 
+               &c, &a, &b, lenc)
 end
 
 ###############################################################################

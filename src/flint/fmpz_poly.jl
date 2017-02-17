@@ -385,7 +385,7 @@ divexact(x::fmpz_poly, y::Integer) = divexact(x, fmpz(y))
 function pseudorem(x::fmpz_poly, y::fmpz_poly)
    check_parent(x, y)
    y == 0 && throw(DivideError())
-   diff = length(x) - length(y)
+   diff = length(x) - length(y) + 1
    r = parent(x)()
    d = Array{Int}(1)
    ccall((:fmpz_poly_pseudo_rem, :libflint), Void, 
@@ -400,7 +400,7 @@ end
 function pseudodivrem(x::fmpz_poly, y::fmpz_poly)
    check_parent(x, y)
    y == 0 && throw(DivideError())
-   diff = length(x) - length(y)
+   diff = length(x) - length(y) + 1
    q = parent(x)()
    r = parent(x)()
    d = Array{Int}(1)
@@ -737,6 +737,11 @@ end
 #
 ###############################################################################
 
+function zero!(z::fmpz_poly)
+   ccall((:fmpz_poly_zero, :libflint), Void, 
+                    (Ptr{fmpz_poly},), &z)
+end
+
 function fit!(z::fmpz_poly, n::Int)
    ccall((:fmpz_poly_fit_length, :libflint), Void, 
                     (Ptr{fmpz_poly}, Int), &z, n)
@@ -755,6 +760,11 @@ end
 function addeq!(z::fmpz_poly, x::fmpz_poly)
    ccall((:fmpz_poly_add, :libflint), Void, 
                 (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &z, &x)
+end
+
+function add!(z::fmpz_poly, x::fmpz_poly, y::fmpz_poly)
+   ccall((:fmpz_poly_add, :libflint), Void, 
+                (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y)
 end
 
 ###############################################################################

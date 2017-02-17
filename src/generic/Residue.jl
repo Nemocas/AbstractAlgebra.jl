@@ -142,7 +142,7 @@ needs_parentheses(x::ResElem) = needs_parentheses(data(x))
 
 is_negative(x::ResElem) = is_negative(data(x))
 
-show_minus_one{T <: RingElem}(::Type{ResElem{T}}) = true
+show_minus_one{T <: RingElem}(::Type{GenRes{T}}) = true
 
 ###############################################################################
 #
@@ -452,6 +452,11 @@ function divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
    return parent(a)(data(a) * binv)
 end
 
+function divides{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
+   b == 0 && error("Division by zero in divides")
+   return true, divexact(a, b)
+end
+
 ###############################################################################
 #
 #   GCD
@@ -475,12 +480,24 @@ end
 #
 ###############################################################################
 
+function zero!{T <: RingElem}(a::ResElem{T})
+   zero!(a.data)
+   nothing
+end
+
 function mul!{T <: RingElem}(c::ResElem{T}, a::ResElem{T}, b::ResElem{T})
    c.data = mod(data(a)*data(b), modulus(a))
+   nothing
 end
 
 function addeq!{T <: RingElem}(c::ResElem{T}, a::ResElem{T})
    c.data = mod(c.data + data(a), modulus(a))
+   nothing
+end
+
+function add!{T <: RingElem}(c::ResElem{T}, a::ResElem{T}, b::ResElem{T})
+   c.data = mod(data(a) + data(b), modulus(a))
+   nothing
 end
 
 ###############################################################################

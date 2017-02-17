@@ -49,6 +49,13 @@ doc"""
 """
 var(a::PolyRing) = a.S
 
+doc"""
+    vars(a::PolyRing)
+> Return an array of the variable names for the polynomial ring. Note that
+> this is returned as an array of `Symbol` not `String`.
+"""
+vars(a::PolyRing) = [a.S]
+
 function check_parent(a::PolyElem, b::PolyElem)
    parent(a) != parent(b) && 
                 error("Incompatible polynomial rings in polynomial operation")
@@ -170,7 +177,7 @@ canonical_unit(x::PolyElem) = canonical_unit(lead(x))
 
 ###############################################################################
 #
-#   AbstractString I/O
+#   String I/O
 #
 ###############################################################################
 
@@ -235,7 +242,7 @@ needs_parentheses(x::PolyElem) = length(x) > 1
 
 is_negative(x::PolyElem) = length(x) <= 1 && is_negative(coeff(x, 0))
 
-show_minus_one{T <: RingElem}(::Type{PolyElem{T}}) = show_minus_one(T)
+show_minus_one{T <: RingElem}(::Type{GenPoly{T}}) = show_minus_one(T)
 
 ###############################################################################
 #
@@ -1169,12 +1176,14 @@ doc"""
 function pseudorem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    check_parent(f, g)
    g == 0 && throw(DivideError())
+   k = length(f) - length(g) + 1
    b = coeff(g, length(g) - 1)
    x = gen(parent(f))
    while length(f) >= length(g)
       f = f*b - shift_left(coeff(f, length(f) - 1)*g, length(f) - length(g))
+      k -= 1
    end
-   return f
+   return f*b^k
 end
 
 doc"""
@@ -1189,6 +1198,7 @@ function pseudodivrem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
       return zero(parent(f)), f
    end
    lenq = length(f) - length(g) + 1
+   k = lenq
    q = parent(f)()
    fit!(q, lenq)
    b = coeff(g, length(g) - 1)
@@ -1199,12 +1209,14 @@ function pseudodivrem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
       end
       setcoeff!(q, length(f) - length(g), coeff(f, length(f) - 1))
       f = f*b - shift_left(coeff(f, length(f) - 1)*g, length(f) - length(g))
+      k -= 1
    end
    while lenq > 0 && coeff(q, lenq - 1) == 0
       lenq -= 1
    end
    set_length!(q, lenq)
-   return q, f
+   s = b^k
+   return q*s, f*s
 end
 
 ###############################################################################
@@ -1228,9 +1240,11 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    if b == 1
       return b
    end
-   c = gcd(content(a), content(b))
-   a = divexact(a, c)
-   b = divexact(b, c)
+   c1 = content(a)
+   c2 = content(b)
+   a = divexact(a, c1)
+   b = divexact(b, c2)
+   c = gcd(c1, c2)
    g = one(parent(a))
    h = one(parent(a))
    while true
@@ -1960,6 +1974,12 @@ function fit!{T <: RingElem}(c::GenPoly{T}, n::Int)
          c.coeffs[i] = zero(base_ring(c))
       end
    end
+   nothing
+end
+
+function zero!{T <: RingElem}(c::GenPoly{T})
+   c.length = 0
+   nothing
 end
 
 function setcoeff!{T <: RingElem}(c::GenPoly{T}, n::Int, a::T)
@@ -1969,6 +1989,7 @@ function setcoeff!{T <: RingElem}(c::GenPoly{T}, n::Int, a::T)
       c.length = max(length(c), n + 1)
       # don't normalise
    end
+   nothing
 end
 
 function mul!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T}, b::PolyElem{T})
@@ -2007,6 +2028,7 @@ function mul!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T}, b::PolyElem{T})
         
       c.length = normalise(c, lenc)
    end
+   nothing
 end
 
 function addeq!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T})
@@ -2018,6 +2040,28 @@ function addeq!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T})
       addeq!(c.coeffs[i], coeff(a, i - 1))
    end
    c.length = normalise(c, len)
+   nothing
+end
+
+function add!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T}, b::PolyElem{T})
+   lena = length(a)
+   lenb = length(b)
+   len = max(lena, lenb)
+   fit!(c, len)
+   i = 1
+   while i <= 1:min(lena, lenb)
+      add!(c.coeffs[i], coeff(a, i - 1), coeff(b, i - 1))
+   end
+   while i <= lena
+      setcoeff!(c, i - 1, coeff(a, i - 1))
+      i += 1
+   end
+   while i <= lenb
+      setcoeff!(c, i - 1, coeff(b, i - 1))
+      i += 1
+   end
+   c.length = normalise(c, len)
+   nothing
 end
 
 ###############################################################################
