@@ -2,24 +2,21 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module Nemo
  
-import Base: Array, abs, asin, asinh, atan, atanh, base, bin, call,
-             checkbounds, convert, cmp, contains, cos, cosh, dec,
-             deepcopy, deepcopy_internal, den, deserialize, det, div, divrem,
-             exp, factor, gcd, gcdx, getindex, hash, hcat, hex, intersect, inv,
-             invmod, isequal, isfinite, isless, isprime, isqrt, isreal, iszero,
-             lcm, ldexp, length, log, lufact, lufact!, mod, ndigits, nextpow2,
-             norm, nullspace, num, oct, one, parent, parity, parse, precision,
-             prevpow2, promote_rule, rank, Rational, rem, reverse, serialize,
-             setindex!, show, sign, sin, sinh, size, sqrt, string, sub, tan,
-             tanh, trace, trailing_zeros, transpose, transpose!, truncate,
-             typed_hvcat, typed_hcat, var, vcat, zero, zeros, +, -, *, ==, ^,
-             &, |, $, <<, >>, ~, <=, >=, <, >, //, /, !=
+import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
+             convert, cmp, contains, cos, cosh, dec, deepcopy,
+             deepcopy_internal, den, deserialize, det, div, divrem, exp, gcd,
+             gcdx, getindex, hash, hcat, hex, intersect, inv, invmod, isequal,
+             isfinite, isless, isqrt, isreal, lcm, ldexp, length, log, lufact,
+             lufact!, mod, ndigits, nextpow2, norm, nullspace, num, oct, one,
+             parent, parse, precision, prevpow2, promote_rule, rank, Rational,
+             rem, reverse, serialize, setindex!, show, sign, sin, sinh, size,
+             sqrt, string, tan, tanh, trace, trailing_zeros, transpose,
+             transpose!, truncate, typed_hvcat, typed_hcat, var, vcat, zero,
+             zeros, +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //, /, !=
 
-import Base: floor, ceil, hypot, sqrt,
-             log, log1p, exp, expm1, sin, cos, sinpi, cospi, tan, cot,
-             sinh, cosh, tanh, coth, atan, asin, acos,
-             atanh, asinh, acosh, gamma, lgamma, digamma, zeta,
-             sinpi, cospi, atan2
+import Base: floor, ceil, hypot, sqrt, log, log1p, exp, expm1, sin, cos, sinpi,
+             cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
+             asinh, acosh, gamma, lgamma, digamma, zeta, sinpi, cospi, atan2
 
 export SetElem, GroupElem, RingElem, FieldElem
 
@@ -42,6 +39,14 @@ export error_dim_negative
 export is_windows64
 
 export test_module
+
+if VERSION >= v"0.6.0-dev.2024" # julia started exporting iszero (again?)
+   import Base: iszero
+end
+
+if VERSION < v"0.6-"
+   import Base: isprime, factor, parity, sub, call
+end
 
 include("AbstractTypes.jl")
 
@@ -101,7 +106,7 @@ function __init__()
       (Ptr{Void},), cfunction(flint_abort, Void, ()))
 
    println("")
-   println("Welcome to Nemo version 0.5.2")
+   println("Welcome to Nemo version 0.6.0")
    println("")
    println("Nemo comes with absolutely no warranty whatsoever")
    println("")

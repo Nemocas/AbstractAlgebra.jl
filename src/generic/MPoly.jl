@@ -51,11 +51,11 @@ function addmul!(a::NewInt, b::NewInt, c::NewInt, d::NewInt)
    NewInt(a.d + b.d*c.d)
 end
 
-function call(a::NewIntParent)
+function (a::NewIntParent)()
    return NewInt(0)
 end
 
-function call(a::NewIntParent, b::Int)
+function (a::NewIntParent)(b::Int)
    return NewInt(b)
 end
 
@@ -2181,35 +2181,35 @@ end
 #
 ###############################################################################
 
-function Base.call{T <: RingElem, S, N}(a::GenMPolyRing{T, S, N}, b::RingElem)
+function (a::GenMPolyRing{T, S, N}){T <: RingElem, S, N}(b::RingElem)
    return a(base_ring(a)(b), a.vars)
 end
 
-function Base.call{T <: RingElem, S, N}(a::GenMPolyRing{T, S, N})
+function (a::GenMPolyRing{T, S, N}){T <: RingElem, S, N}()
    z = GenMPoly{T, S, N}()
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem, S, N}(a::GenMPolyRing{T, S, N}, b::Integer)
+function (a::GenMPolyRing{T, S, N}){T <: RingElem, S, N}(b::Integer)
    z = GenMPoly{T, S, N}(base_ring(a)(b))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem, S, N}(a::GenMPolyRing{T, S, N}, b::T)
+function (a::GenMPolyRing{T, S, N}){T <: RingElem, S, N}(b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
    z = GenMPoly{T, S, N}(b)
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem, S, N}(a::GenMPolyRing{T, S, N}, b::PolyElem{T})
+function (a::GenMPolyRing{T, S, N}){T <: RingElem, S, N}(b::PolyElem{T})
    parent(b) != a && error("Unable to coerce polynomial")
    return b
 end
 
-function Base.call{T <: RingElem, S, N}(a::GenMPolyRing{T, S, N}, b::Array{T, 1}, m::Array{NTuple{N, UInt}, 1})
+function (a::GenMPolyRing{T, S, N}){T <: RingElem, S, N}(b::Array{T, 1}, m::Array{NTuple{N, UInt}, 1})
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end
@@ -2235,7 +2235,7 @@ doc"""
 > cached. `S` is a symbol corresponding to the ordering of the polynomial and
 > can be one of `:lex`, `:deglex`, `:revlex` or `:degrevlex`.
 """
-function PolynomialRing(R::Ring, s::Array{ASCIIString{}, 1}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
    U = [Symbol(x) for x in s]
    T = elem_type(R)
    N = (ordering == :deglex || ordering == :degrevlex) ? length(U) + 1 : length(U)
