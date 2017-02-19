@@ -1767,35 +1767,35 @@ end
 #
 ###############################################################################
 
-function Base.call{T <: RingElem}(a::GenSparsePolyRing{T}, b::RingElem)
+function (a::GenSparsePolyRing{T}){T <: RingElem}(b::RingElem)
    return a([base_ring(a)(b)], [UInt(0)])
 end
 
-function Base.call{T <: RingElem}(a::GenSparsePolyRing{T})
+function (a::GenSparsePolyRing{T}){T <: RingElem}()
    z = GenSparsePoly{T}()
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenSparsePolyRing{T}, b::Integer)
+function (a::GenSparsePolyRing{T}){T <: RingElem}(b::Integer)
    z = GenSparsePoly{T}(base_ring(a)(b))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenSparsePolyRing{T}, b::T)
+function (a::GenSparsePolyRing{T}){T <: RingElem}(b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
    z = GenSparsePoly{T}(b)
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenSparsePolyRing{T}, b::GenSparsePoly{T})
+function (a::GenSparsePolyRing{T}){T <: RingElem}(b::GenSparsePoly{T})
    parent(b) != a && error("Unable to coerce polynomial")
    return b
 end
 
-function Base.call{T <: RingElem}(a::GenSparsePolyRing{T}, b::Array{T, 1}, m::Array{UInt, 1})
+function (a::GenSparsePolyRing{T}){T <: RingElem}(b::Array{T, 1}, m::Array{UInt, 1})
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end
