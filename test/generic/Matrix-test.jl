@@ -199,7 +199,11 @@ function test_gen_mat_constructors()
    m = S()
 
    @test isa(m, MatElem)
-
+   
+   @test_throws ErrorConstrDimMismatch S([t t^2 ; t^3 t^4])
+   @test_throws ErrorConstrDimMismatch S([t t^2 t^3 ; t^4 t^5 t^6 ; t^7 t^8 t^9 ; t t^2 t^3])
+   @test_throws ErrorConstrDimMismatch S([t, t^2])
+   @test_throws ErrorConstrDimMismatch S([t, t^2, t^3, t^4, t^5, t^6, t^7, t^8, t^9, t^10]) 
    println("PASS")
 end
 

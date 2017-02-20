@@ -2922,6 +2922,18 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 2})
    if length(b) > 0
       parent(b[1, 1]) != base_ring(a) && error("Unable to coerce to matrix")
    end
+   _check_dim(a.rows, a.cols, b)
+   z = GenMat{T}(b)
+   z.parent = a
+   return z
+end
+
+function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 1})
+   if length(b) > 0
+      parent(b[1]) != base_ring(a) && error("Unable to coerce to matrix")
+   end
+   _check_dim(a.rows, a.cols, b)
+   b = reshape(b, a.rows, a.cols)
    z = GenMat{T}(b)
    z.parent = a
    return z
