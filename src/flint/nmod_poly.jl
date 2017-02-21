@@ -545,10 +545,11 @@ end
 #
 ################################################################################
 
-function resultant(x::nmod_poly, y::nmod_poly)
-  check_parent(x,y)
-  !is_prime(modulus(x)) && error("Modulus not prime in resultant")
-  z = parent(x)()
+function resultant(x::nmod_poly, y::nmod_poly,  check = true)
+  if check
+    check_parent(x,y)
+    !is_prime(modulus(x)) && error("Modulus not prime in resultant")
+  end
   r = ccall((:nmod_poly_resultant, :libflint), UInt,
           (Ptr{nmod_poly}, Ptr{nmod_poly}), &x, &y)
   return base_ring(x)(r)
