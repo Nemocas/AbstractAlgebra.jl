@@ -545,7 +545,7 @@ end
 #
 ################################################################################
 
-function resultant(x::nmod_poly, y::nmod_poly,  check = true)
+function resultant(x::nmod_poly, y::nmod_poly,  check::Bool = true)
   if check
     check_parent(x,y)
     !is_prime(modulus(x)) && error("Modulus not prime in resultant")
