@@ -580,14 +580,19 @@ end
 
 function (x::ArbMatSpace){T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat,
                                      arb, AbstractString}}(y::Array{T, 2})
-  (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
+  _check_dim(x.rows, x.cols, y)
   z = arb_mat(x.rows, x.cols, y, prec(x))
   z.parent = x
   return z
 end
 
-(x::ArbMatSpace){T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb,
-                AbstractString}}(y::Array{T, 1}) = x(y'')
+function (x::ArbMatSpace){T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat,
+                                     arb, AbstractString}}(y::Array{T, 1})
+  _check_dim(x.rows, x.cols, y)
+  z = arb_mat(x.rows, x.cols, y, prec(x))
+  z.parent = x
+  return z
+end
 
 function (x::ArbMatSpace)(y::Union{Int, UInt, fmpz, fmpq, Float64,
                           BigFloat, arb, AbstractString})
