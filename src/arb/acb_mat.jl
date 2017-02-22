@@ -648,8 +648,14 @@ function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, a
   return z
 end
 
-function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb,
-                         AbstractString}}(y::Array{Tuple{T, T}, 1})
+function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq}}(y::Array{Tuple{T, T}, 1})
+  _check_dim(x.rows, x.cols, y)
+  z = acb_mat(x.rows, x.cols, y, prec(x))
+  z.parent = x
+  return z
+end
+
+function (x::AcbMatSpace){T <: Union{BigFloat, arb, AbstractString}}(y::Array{Tuple{T, T}, 1})
   _check_dim(x.rows, x.cols, y)
   z = acb_mat(x.rows, x.cols, y, prec(x))
   z.parent = x
