@@ -249,7 +249,7 @@ function add!(a::nmod_mat, b::nmod_mat, c::nmod_mat)
 end
 
 function sub!(a::nmod_mat, b::nmod_mat, c::nmod_mat)
-  ccall((:nmod_mat_add, :libflint), Void, (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b, &c)
+  ccall((:nmod_mat_sub, :libflint), Void, (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b, &c)
 end
 
 function zero!(a::nmod_mat)
