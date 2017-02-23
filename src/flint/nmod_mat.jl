@@ -239,7 +239,6 @@ end
 #  Unsafe operations
 #
 ################################################################################
-
 function mul!(a::nmod_mat, b::nmod_mat, c::nmod_mat)
   ccall((:nmod_mat_mul, :libflint), Void, (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b, &c)
 end
@@ -248,16 +247,8 @@ function add!(a::nmod_mat, b::nmod_mat, c::nmod_mat)
   ccall((:nmod_mat_add, :libflint), Void, (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b, &c)
 end
 
-function sub!(a::nmod_mat, b::nmod_mat, c::nmod_mat)
-  ccall((:nmod_mat_sub, :libflint), Void, (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b, &c)
-end
-
 function zero!(a::nmod_mat)
   ccall((:nmod_mat_zero, :libflint), Void, (Ptr{nmod_mat}, ), &a)
-end
-
-function one!(a::nmod_mat)
-  ccall((:nmod_mat_one, :libflint), Void, (Ptr{nmod_mat}, ), &a)
 end
 ################################################################################
 #
