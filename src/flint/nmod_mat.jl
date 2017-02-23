@@ -50,6 +50,11 @@ function getindex(a::nmod_mat, i::Int, j::Int)
   return base_ring(a)(u)
 end
 
+#as above, but as a plain UInt
+function _get_entry_raw(a::nmod_mat, i::Int, j::Int)
+  return ccall((:nmod_mat_get_entry, :libflint), UInt, (Ptr{nmod_mat}, Int, Int), &a, i-1, j-1)
+end
+
 function setindex!(a::nmod_mat, u::UInt, i::Int, j::Int)
   _checkbounds(a, i, j)
   set_entry!(a, i, j, u)
@@ -228,6 +233,32 @@ function *(x::nmod_mat, y::nmod_mat)
   return z
 end
 
+
+################################################################################
+#
+#  Unsafe operations
+#
+################################################################################
+
+function mul!(a::nmod_mat, b::nmod_mat, c::nmod_mat)
+  ccall((:nmod_mat_mul, :libflint), Void, (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b, &c)
+end
+
+function add!(a::nmod_mat, b::nmod_mat, c::nmod_mat)
+  ccall((:nmod_mat_add, :libflint), Void, (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b, &c)
+end
+
+function sub!(a::nmod_mat, b::nmod_mat, c::nmod_mat)
+  ccall((:nmod_mat_add, :libflint), Void, (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b, &c)
+end
+
+function zero!(a::nmod_mat)
+  ccall((:nmod_mat_zero, :libflint), Void, (Ptr{nmod_mat}, ), &a)
+end
+
+function one!(a::nmod_mat)
+  ccall((:nmod_mat_one, :libflint), Void, (Ptr{nmod_mat}, ), &a)
+end
 ################################################################################
 #
 #  Ad hoc binary operators
