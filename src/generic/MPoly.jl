@@ -2241,5 +2241,5 @@ function PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, order
    N = (ordering == :deglex || ordering == :degrevlex) ? length(U) + 1 : length(U)
    parent_obj = GenMPolyRing{T, ordering, N}(R, U, cached)
 
-   return tuple(parent_obj, gens(parent_obj)...)
+   return tuple(parent_obj, gens(parent_obj))
 end
