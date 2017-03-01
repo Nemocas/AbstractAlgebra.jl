@@ -1649,7 +1649,7 @@ end
 
 function addeq!(z::arb, x::arb)
     ccall((:arb_add, :libarb), Void, (Ptr{arb}, Ptr{arb}, Ptr{arb}, Int),
-                           &z, &z, &y, parent(x).prec)
+                           &z, &z, &x, parent(x).prec)
     nothing
 end
 
