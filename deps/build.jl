@@ -87,7 +87,7 @@ cd(wdir)
 # install MPFR
 
 if !ispath(Pkg.dir("Nemo", "local", "mpfr-3.1.5"))
-   download("http://ftp.gnu.org/gnu/mpfr/mpfr-3.1.5.tar.bz2", joinpath(wdir, "mpfr-3.1.5.tar.bz2"))
+   download("http://www.mpfr.org/mpfr-current/mpfr-3.1.5.tar.bz2", joinpath(wdir, "mpfr-3.1.5.tar.bz2"))
 end
 
 if is_windows()
