@@ -86,8 +86,8 @@ cd(wdir)
 
 # install MPFR
 
-if !ispath(Pkg.dir("Nemo", "local", "mpfr-3.1.4"))
-   download("http://ftp.gnu.org/gnu/mpfr/mpfr-3.1.4.tar.bz2", joinpath(wdir, "mpfr-3.1.4.tar.bz2"))
+if !ispath(Pkg.dir("Nemo", "local", "mpfr-3.1.5"))
+   download("http://www.mpfr.org/mpfr-current/mpfr-3.1.5.tar.bz2", joinpath(wdir, "mpfr-3.1.5.tar.bz2"))
 end
 
 if is_windows()
@@ -97,9 +97,9 @@ if is_windows()
       download_dll("http://nemocas.org/binaries/w64-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
    end
 else
-   run(`tar -xvf mpfr-3.1.4.tar.bz2`)
-   run(`rm mpfr-3.1.4.tar.bz2`)
-   cd("$wdir/mpfr-3.1.4")
+   run(`tar -xvf mpfr-3.1.5.tar.bz2`)
+   run(`rm mpfr-3.1.5.tar.bz2`)
+   cd("$wdir/mpfr-3.1.5")
    withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
       run(`./configure --prefix=$vdir --with-gmp=$vdir --disable-static --enable-shared`) 
       run(`make -j4`)
