@@ -1817,6 +1817,36 @@ function divrem{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::Array{GenMPoly{T, 
    return [parent(a)(q[i].coeffs, eq[i]) for i in 1:len], parent(a)(r.coeffs, er)
 end
 
+################################################################################
+#
+#   valuation/ remove
+#
+################################################################################
+
+doc"""
+  valuation{T <: RingElem, S, N}(z::GenMPoly{T, S, N}, p::GenMPoly{T, S, N})
+> Computes the valuation of $z$ at $p$, ie. the largest $k$ s.th. 
+> $divides(z, p^k)==true$ holds. 
+> Additionally, $exactdiv(z, p^k)$ is returned as well.
+"""
+function valuation{T <: RingElem, S, N}(z::GenMPoly{T, S, N}, p::GenMPoly{T, S, N})
+  check_parent(z,p)
+  z == 0 && error("Not yet implemented")
+  fl, q = divides(z, p)
+  if !fl
+    return 0, z
+  end
+  v = 0
+  qn = q
+  while fl
+    q = qn
+    fl, qn = divides(q, p)
+    v += 1
+  end
+  return v, q
+end
+
+
 ###############################################################################
 #
 #   Evaluation

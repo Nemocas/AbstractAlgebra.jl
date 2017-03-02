@@ -532,6 +532,25 @@ function test_fmpz_mod_poly_factor()
    println("PASS")
 end
 
+function test_fmpz_mod_poly_valuation()
+   print("fmpz_mod_poly.valuation()...")
+
+   R = ResidueRing(ZZ, 123456789012345678949)
+   S, y = PolynomialRing(R, "y")
+
+   f = 7y^2 + 3y + 2
+   g = f^5*(11y^3 - 2y^2 + 5)
+
+   v, h = valuation(g, f)
+
+   @test v == 5
+   @test h == (11y^3 - 2y^2 + 5)
+
+   println("PASS")
+end
+
+
+
 function test_fmpz_mod_poly()
    test_fmpz_mod_poly_constructors()
    test_fmpz_mod_poly_printing()
@@ -560,6 +579,7 @@ function test_fmpz_mod_poly()
    test_fmpz_mod_poly_isirreducible()
    test_fmpz_mod_poly_issquarefree()
    test_fmpz_mod_poly_factor()
+   test_fmpz_mod_poly_valuation()
 
    println("")
 end

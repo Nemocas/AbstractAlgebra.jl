@@ -1219,6 +1219,35 @@ function pseudodivrem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    return q*s, f*s
 end
 
+################################################################################
+#
+#   valuation/ remove
+#
+################################################################################
+
+doc"""
+  valuation{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+> Computes the valuation of $z$ at $p$, ie. the largest $k$ s.th. 
+> $divrem(z, p^k)$ computes a remainder of $0$.
+> Additionally, $div(z, p^k)$ is returned as well.
+"""
+function valuation{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+  check_parent(z,p)
+  z == 0 && error("Not yet implemented")
+  q, r = divrem(z, p)
+  if !iszero(r)
+    return 0, z
+  end
+  v = 0
+  qn = q
+  while iszero(r)
+    q = qn
+    qn, r = divrem(q, p)
+    v += 1
+  end
+  return v, q
+end
+
 ###############################################################################
 #
 #   Content, primitive part, GCD and LCM

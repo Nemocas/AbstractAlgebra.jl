@@ -513,6 +513,24 @@ function test_gen_poly_mul_ks()
    println("PASS")
 end
 
+function test_gen_poly_valuation()
+   print("GenPoly.valuation...")
+
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3-2, "a");
+   S, y = PolynomialRing(K, "y")
+
+   f = 3a*y^2 + (a + 1)*y + 3
+   g = 6(a + 1)*y + (a^3 + 2x + 2)
+
+   v, q = valuation(f^3*g^4, g)
+
+   @test q == f^3
+   @test v == 4
+
+   println("PASS")
+end
+
 function test_gen_poly_generic_eval()
    print("GenPoly.generic_eval...")
 
@@ -573,6 +591,8 @@ function test_gen_poly()
 if VERSION >= v"0.5.0-dev+3171"
    test_gen_poly_generic_eval()
 end
+   test_gen_poly_valuation()
+   
 
    println("")
 end

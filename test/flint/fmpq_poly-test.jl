@@ -489,6 +489,23 @@ function test_fmpq_poly_Polynomials()
    println("PASS")
 end
 
+function test_fmpq_poly_valuation()
+   print("fmpq_poly.valuation()...")
+
+   S, y = PolynomialRing(FlintQQ, "y")
+
+   f = 7y^2 + 3y + 2
+   g = f^5*(11y^3 - 2y^2 + 5)
+
+   v, h = valuation(g, f)
+
+   @test v == 5
+   @test h == (11y^3 - 2y^2 + 5)
+
+   println("PASS")
+end
+
+
 function test_fmpq_poly()
    test_fmpq_poly_constructors()
    test_fmpq_poly_printing()
@@ -518,6 +535,7 @@ function test_fmpq_poly()
    test_fmpq_poly_signature()
    test_fmpq_poly_special()
    test_fmpq_poly_Polynomials()
+   test_fmpq_poly_valuation()
 
    println("")
 end

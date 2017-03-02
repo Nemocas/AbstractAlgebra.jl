@@ -528,6 +528,24 @@ function test_fq_nmod_poly_factor()
    println("PASS")
 end
 
+function test_fq_nmod_poly_valuation()
+   print("fq_nmod_poly.valuation()...")
+
+   R, x = FiniteField(23, 5, "x")
+   S, y = PolynomialRing(R, "y")
+
+   f = 7y^2 + 3y + 2
+   g = f^5*(11y^3 - 2y^2 + 5)
+
+   v, h = valuation(g, f)
+
+   @test v == 5
+   @test h == (11y^3 - 2y^2 + 5)
+
+   println("PASS")
+end
+
+
 function test_fq_nmod_poly()
    test_fq_nmod_poly_constructors()
    test_fq_nmod_poly_printing()
@@ -557,6 +575,7 @@ function test_fq_nmod_poly()
    test_fq_nmod_poly_inflation_deflation()
    test_fq_nmod_poly_issquarefree()
    test_fq_nmod_poly_factor()
+   test_fq_nmod_poly_valuation()
 
    println("")
 end

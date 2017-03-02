@@ -820,20 +820,18 @@ end
 #
 ################################################################################
 
+doc"""
+    valuation(x::nmod_poly, y::nmod_poly)
+> Computes the valuation of $x$ at $y$, ie. the largest $k$ s.th. 
+> $mod(x, y^k)==0$ holds. 
+> Additionally, $div(x, y^k)$ is returned as well.
+"""
 function valuation(z::nmod_poly, p::nmod_poly)
   check_parent(z,p)
   z == 0 && error("Not yet implemented")
-  v = 0
-  zz = z
-  z, r = divrem(zz, p)
-
-  while r == 0
-    zz = z
-    z, r = divrem(zz, p)
-    v += 1
-  end
-
-  return v, zz
+  z = deepcopy(z)
+  v = ccall((:nmod_poly_remove, :libflint), Int, (Ptr{nmod_poly}, Ptr{nmod_poly}), &z,  &p)
+  return v, z
 end
 
 ################################################################################
