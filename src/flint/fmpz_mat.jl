@@ -6,10 +6,10 @@
 
 export fmpz_mat, FmpzMatSpace, getindex, getindex!, setindex!, rows, cols,
        charpoly, det, det_divisor, det_given_divisor,
-       gram, hadamard, is_hadamard, hnf, is_hnf, hnf_with_transform,
+       gram, hadamard, ishadamard, hnf, ishnf, hnf_with_transform,
        hnf_modular, lll, lll_gram, lll_with_transform, lll_gram_with_transform,
        lll_with_removal, lll_with_removal_transform,
-       nullspace, rank, rref, reduce_mod, snf, snf_diagonal, is_snf, solve,
+       nullspace, rank, rref, reduce_mod, snf, snf_diagonal, issnf, solve,
        solve_dixon, trace, transpose, content, hcat, vcat, addmul!, zero!,
        window, pseudo_inv, hnf_modular_eldiv, nullspace_right_rational
 
@@ -590,10 +590,10 @@ function hadamard(R::FmpzMatSpace)
 end
 
 doc"""
-    is_hadamard(x::fmpz_mat)
+    ishadamard(x::fmpz_mat)
 > Return `true` if the given matrix is Hadamard, otherwise return `false`.
 """
-function is_hadamard(x::fmpz_mat)
+function ishadamard(x::fmpz_mat)
    return ccall((:fmpz_mat_is_hadamard, :libflint), Bool,
                    (Ptr{fmpz_mat},), &x)
 end
@@ -660,11 +660,11 @@ function hnf_modular_eldiv(x::fmpz_mat, d::fmpz)
 end
 
 doc"""
-    is_hnf(x::fmpz_mat)
+    ishnf(x::fmpz_mat)
 > Return `true` if the given matrix is in Hermite Normal Form, otherwise return
 > `false`.
 """
-function is_hnf(x::fmpz_mat)
+function ishnf(x::fmpz_mat)
    return ccall((:fmpz_mat_is_in_hnf, :libflint), Bool,
                    (Ptr{fmpz_mat},), &x)
 end
@@ -903,10 +903,10 @@ function snf_diagonal(x::fmpz_mat)
 end
 
 doc"""
-    is_snf(x::fmpz_mat)
+    issnf(x::fmpz_mat)
 > Return `true` if $x$ is in Smith normal form, otherwise return `false`.
 """
-function is_snf(x::fmpz_mat)
+function issnf(x::fmpz_mat)
    return ccall((:fmpz_mat_is_in_snf, :libflint), Bool,
                    (Ptr{fmpz_mat},), &x)
 end

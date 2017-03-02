@@ -79,7 +79,7 @@ base_ring(a::Nemo.NewIntParent) = Union{}
 
 ==(a::NewInt, b::NewInt) = a.d == b.d
 
-is_negative(a::Nemo.NewInt) = a.d < 0
+isnegative(a::Nemo.NewInt) = a.d < 0
 
 ###############################################################################
 #
@@ -243,7 +243,7 @@ function show{T <: RingElem, S, N}(io::IO, x::GenMPoly{T, S, N})
       for i = 1:len
         c = coeff(x, len - i)
         bracket = needs_parentheses(c)
-        if i != 1 && !is_negative(c)
+        if i != 1 && !isnegative(c)
           print(io, "+")
         end
         X = x.exps[len - i + 1]
@@ -315,7 +315,7 @@ show_minus_one{T <: RingElem, S, N}(::Type{GenMPoly{T, S, N}}) = show_minus_one(
 
 needs_parentheses(x::GenMPoly) = length(x) > 1
 
-is_negative(x::GenMPoly) = length(x) == 1 && iszero(x.exps[1]) && is_negative(x.coeffs[1])
+isnegative(x::GenMPoly) = length(x) == 1 && iszero(x.exps[1]) && isnegative(x.coeffs[1])
 
 ###############################################################################
 #

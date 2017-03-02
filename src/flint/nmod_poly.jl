@@ -42,7 +42,7 @@ end
 #
 ################################################################################
 
-function lead_is_unit(a::nmod_poly)
+function lead_isunit(a::nmod_poly)
   d = degree(a)
   u = ccall((:nmod_poly_get_coeff_ui, :libflint), UInt, (Ptr{nmod_poly}, Int), &a, d)
   n = ccall((:n_gcd, :libflint), UInt, (UInt, UInt), u, modulus(a))
@@ -400,7 +400,7 @@ end
 function divexact(x::nmod_poly, y::nmod_poly)
   check_parent(x, y)
   iszero(y) && throw(DivideError())
-  !lead_is_unit(y) && error("Impossible inverse in divexact")
+  !lead_isunit(y) && error("Impossible inverse in divexact")
   z = parent(x)()
   ccall((:nmod_poly_div, :libflint), Void, 
           (Ptr{nmod_poly}, Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &x, &y)
@@ -436,7 +436,7 @@ end
 function divrem(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
   iszero(y) && throw(DivideError())
-  !lead_is_unit(y) && error("Impossible inverse in divrem")
+  !lead_isunit(y) && error("Impossible inverse in divrem")
   q = parent(x)()
   r = parent(x)()
   ccall((:nmod_poly_divrem, :libflint), Void,
@@ -454,7 +454,7 @@ end
 function rem(x::nmod_poly, y::nmod_poly)
   check_parent(x,y)
   iszero(y) && throw(DivideError()) 
-  !lead_is_unit(y) && error("Impossible inverse in rem")
+  !lead_isunit(y) && error("Impossible inverse in rem")
   z = parent(x)()
   ccall((:nmod_poly_rem, :libflint), Void,
           (Ptr{nmod_poly}, Ptr{nmod_poly}, Ptr{nmod_poly}), &z, &x, &y)

@@ -171,7 +171,7 @@ end
 
 needs_parentheses(x::FracElem) = den(x) == 1 && needs_parentheses(num(x))
 
-is_negative(x::FracElem) = !needs_parentheses(num(x)) && is_negative(num(x))
+isnegative(x::FracElem) = !needs_parentheses(num(x)) && isnegative(num(x))
 
 show_minus_one{T <: RingElem}(::Type{FracElem{T}}) = show_minus_one(T)
 

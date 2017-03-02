@@ -4,9 +4,9 @@
 #
 ###############################################################################
 
-export MatricSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, is_rref,
+export MatricSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
-       is_hessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
+       ishessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
        powers, similarity!
 
 ###############################################################################
@@ -1269,11 +1269,11 @@ function rref{T <: FieldElem}(M::MatElem{T})
 end
 
 doc"""
-    is_rref{T <: RingElem}(M::MatElem{T})
+    isrref{T <: RingElem}(M::MatElem{T})
 > Return `true` if $M$ is in reduced row echelon form, otherwise return
 > `false`.
 """
-function is_rref{T <: RingElem}(M::MatElem{T})
+function isrref{T <: RingElem}(M::MatElem{T})
    m = rows(M)
    n = cols(M)
    c = 1
@@ -1298,11 +1298,11 @@ function is_rref{T <: RingElem}(M::MatElem{T})
 end
 
 doc"""
-    is_rref{T <: FieldElem}(M::MatElem{T})
+    isrref{T <: FieldElem}(M::MatElem{T})
 > Return `true` if $M$ is in reduced row echelon form, otherwise return
 > `false`.
 """
-function is_rref{T <: FieldElem}(M::MatElem{T})
+function isrref{T <: FieldElem}(M::MatElem{T})
    m = rows(M)
    n = cols(M)
    c = 1
@@ -2171,10 +2171,10 @@ function hessenberg{T <: RingElem}(A::MatElem{T})
 end
 
 doc"""
-    is_hessenberg{T <: RingElem}(A::MatElem{T})
+    ishessenberg{T <: RingElem}(A::MatElem{T})
 > Returns `true` if $M$ is in Hessenberg form, otherwise returns `false`.
 """
-function is_hessenberg{T <: RingElem}(A::MatElem{T})
+function ishessenberg{T <: RingElem}(A::MatElem{T})
    n = rows(A)
    for i = 3:n
       for j = 1:i - 2

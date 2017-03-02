@@ -221,7 +221,7 @@ end
 
 needs_parentheses(x::padic) = true
 
-is_negative(x::padic) = false
+isnegative(x::padic) = false
 
 show_minus_one(::FlintPadicField) = true
 

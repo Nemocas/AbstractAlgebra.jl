@@ -134,7 +134,7 @@ end
 
 needs_parentheses(x::fq_nmod) = x.length > 1
 
-is_negative(x::fq_nmod) = false
+isnegative(x::fq_nmod) = false
 
 show_minus_one(::Type{fq_nmod}) = true
 

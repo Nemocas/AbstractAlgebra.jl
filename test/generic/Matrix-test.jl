@@ -709,7 +709,7 @@ function test_gen_mat_rref()
       r, d, A = rref(M)
 
       @test r == i
-      @test is_rref(A)
+      @test isrref(A)
    end
 
    S, z = PolynomialRing(ZZ, "z")
@@ -721,7 +721,7 @@ function test_gen_mat_rref()
       r, d, A = rref(M)
 
       @test r == i
-      @test is_rref(A)
+      @test isrref(A)
    end
 
    R, x = PolynomialRing(QQ, "x")
@@ -734,7 +734,7 @@ function test_gen_mat_rref()
       r, A = rref(M)
 
       @test r == i
-      @test is_rref(A)
+      @test isrref(A)
    end
 
    R, x = PolynomialRing(ZZ, "x")
@@ -747,7 +747,7 @@ function test_gen_mat_rref()
       r, d, A = rref(M)
 
       @test r == i
-      @test is_rref(A)
+      @test isrref(A)
    end
 
    println("PASS")   
@@ -883,7 +883,7 @@ function test_gen_mat_hessenberg()
 
          A = hessenberg(M)
 
-         @test is_hessenberg(A)
+         @test ishessenberg(A)
       end
    end
 
