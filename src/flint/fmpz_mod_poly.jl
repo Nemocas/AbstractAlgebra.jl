@@ -90,7 +90,7 @@ function show(io::IO, x::fmpz_mod_poly)
          c = coeff(x, len - i)
          bracket = needs_parentheses(c)
          if !iszero(c)
-            if i != 1 && !is_negative(c)
+            if i != 1 && !isnegative(c)
                print(io, "+")
             end
             if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
@@ -116,7 +116,7 @@ function show(io::IO, x::fmpz_mod_poly)
       c = coeff(x, 0)
       bracket = needs_parentheses(c)
       if !iszero(c)
-         if len != 1 && !is_negative(c)
+         if len != 1 && !isnegative(c)
             print(io, "+")
          end
          if bracket

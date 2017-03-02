@@ -191,7 +191,7 @@ function show(io::IO, x::PolyElem)
          c = coeff(x, len - i)
          bracket = needs_parentheses(c)
          if !iszero(c)
-            if i != 1 && !is_negative(c)
+            if i != 1 && !isnegative(c)
                print(io, "+")
             end
             if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
@@ -217,7 +217,7 @@ function show(io::IO, x::PolyElem)
       c = coeff(x, 0)
       bracket = needs_parentheses(c)
       if !iszero(c)
-         if len != 1 && !is_negative(c)
+         if len != 1 && !isnegative(c)
             print(io, "+")
          end
          if bracket
@@ -240,7 +240,7 @@ end
 
 needs_parentheses(x::PolyElem) = length(x) > 1
 
-is_negative(x::PolyElem) = length(x) <= 1 && is_negative(coeff(x, 0))
+isnegative(x::PolyElem) = length(x) <= 1 && isnegative(coeff(x, 0))
 
 show_minus_one{T <: RingElem}(::Type{GenPoly{T}}) = show_minus_one(T)
 

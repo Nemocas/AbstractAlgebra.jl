@@ -39,7 +39,7 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, fac, bell,
        combit!, crt, divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2,
        gcdinv, isprobabprime, issquare, jacobi, remove, root, size, isqrtrem,
        sqrtmod, trailing_zeros, sigma, eulerphi, fib, moebiusmu, primorial,
-       risingfac, numpart, canonical_unit, needs_parentheses, is_negative,
+       risingfac, numpart, canonical_unit, needs_parentheses, isnegative,
        show_minus_one, parseint, addeq!, mul!, isunit, isequal, num, den,
        iszero
 
@@ -223,7 +223,7 @@ show(io::IO, a::FlintIntegerRing) = print(io, "Integer Ring")
 
 needs_parentheses(x::fmpz) = false
 
-is_negative(x::fmpz) = x < 0
+isnegative(x::fmpz) = x < 0
 
 show_minus_one(::Type{fmpz}) = false
 

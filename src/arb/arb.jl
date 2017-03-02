@@ -434,8 +434,6 @@ function isnonpositive(x::arb)
    return Bool(ccall((:arb_is_nonpositive, :libarb), Cint, (Ptr{arb},), &x))
 end
 
-is_negative(x::arb) = isnegative(x)
-
 ################################################################################
 #
 #  Parts of numbers
