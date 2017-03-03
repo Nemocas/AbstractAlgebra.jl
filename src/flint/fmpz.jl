@@ -39,7 +39,7 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, fac, bell,
        combit!, crt, divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2,
        gcdinv, isprobabprime, issquare, jacobi, remove, root, size, isqrtrem,
        sqrtmod, trailing_zeros, sigma, eulerphi, fib, moebiusmu, primorial,
-       risingfac, numpart, canonical_unit, needs_parentheses, is_negative,
+       risingfac, numpart, canonical_unit, needs_parentheses, isnegative,
        show_minus_one, parseint, addeq!, mul!, isunit, isequal, num, den,
        iszero
 
@@ -223,7 +223,7 @@ show(io::IO, a::FlintIntegerRing) = print(io, "Integer Ring")
 
 needs_parentheses(x::fmpz) = false
 
-is_negative(x::fmpz) = x < 0
+isnegative(x::fmpz) = x < 0
 
 show_minus_one(::Type{fmpz}) = false
 
@@ -1033,6 +1033,27 @@ function remove(x::fmpz, y::fmpz)
                (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x, &y)
    return num, z
 end
+
+remove(x::fmpz, y::Integer) = remove(x, fmpz(y))
+
+remove(x::Integer, y::fmpz) = remove(fmpz(x), y)
+
+remove(x::Integer, y::Integer) = remove(fmpz(x), fmpz(y))
+
+doc"""
+    valuation(x::fmpz, y::fmpz)
+> Return the largest $n$ such that $y^n$ divides $x$.
+"""
+function valuation(x::fmpz, y::fmpz)
+   n, _ = remove(x, y)
+   return n
+end
+
+valuation(x::fmpz, y::Integer) = valuation(x, fmpz(y))
+
+valuation(x::Integer, y::fmpz) = valuation(fmpz(x), y)
+
+valuation(x::Integer, y::Integer) = valuation(fmpz(x), fmpz(y))
 
 doc"""
     divisor_lenstra(n::fmpz, r::fmpz, m::fmpz)

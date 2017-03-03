@@ -195,7 +195,7 @@ end
 
 needs_parentheses(x::fq) = x.length > 1
 
-is_negative(x::fq) = false
+isnegative(x::fq) = false
 
 show_minus_one(::Type{fq}) = true
 

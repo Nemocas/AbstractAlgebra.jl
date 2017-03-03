@@ -157,7 +157,7 @@ end
 
 needs_parentheses(x::fmpq) = false
 
-is_negative(x::fmpq) = x < 0
+isnegative(x::fmpq) = x < 0
 
 show_minus_one(::Type{fmpq}) = false
 
@@ -461,6 +461,16 @@ function gcd(a::fmpq, b::fmpq)
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
    return z
 end
+
+################################################################################
+#
+#   Ad hoc Remove and valuation
+#
+################################################################################
+
+remove(a::fmpq, b::Integer) = remove(a, fmpz(b))
+
+valuation(a::fmpq, b::Integer) = valuation(a, fmpz(b))
 
 ###############################################################################
 #

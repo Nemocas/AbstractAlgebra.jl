@@ -79,7 +79,7 @@ base_ring(a::Nemo.NewIntParent) = Union{}
 
 ==(a::NewInt, b::NewInt) = a.d == b.d
 
-is_negative(a::Nemo.NewInt) = a.d < 0
+isnegative(a::Nemo.NewInt) = a.d < 0
 
 ###############################################################################
 #
@@ -243,7 +243,7 @@ function show{T <: RingElem, S, N}(io::IO, x::GenMPoly{T, S, N})
       for i = 1:len
         c = coeff(x, len - i)
         bracket = needs_parentheses(c)
-        if i != 1 && !is_negative(c)
+        if i != 1 && !isnegative(c)
           print(io, "+")
         end
         X = x.exps[len - i + 1]
@@ -315,7 +315,7 @@ show_minus_one{T <: RingElem, S, N}(::Type{GenMPoly{T, S, N}}) = show_minus_one(
 
 needs_parentheses(x::GenMPoly) = length(x) > 1
 
-is_negative(x::GenMPoly) = length(x) == 1 && iszero(x.exps[1]) && is_negative(x.coeffs[1])
+isnegative(x::GenMPoly) = length(x) == 1 && iszero(x.exps[1]) && isnegative(x.coeffs[1])
 
 ###############################################################################
 #
@@ -1817,6 +1817,48 @@ function divrem{T <: RingElem, S, N}(a::GenMPoly{T, S, N}, b::Array{GenMPoly{T, 
    return [parent(a)(q[i].coeffs, eq[i]) for i in 1:len], parent(a)(r.coeffs, er)
 end
 
+################################################################################
+#
+#   Remove and valuation
+#
+################################################################################
+
+doc"""
+    remove(z::GenMPoly, p::GenMPoly)
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
+>
+> See also `valuation`, which only returns the valuation.
+"""
+function remove{T <: RingElem, S, N}(z::GenMPoly{T, S, N}, p::GenMPoly{T, S, N})
+   check_parent(z,p)
+   z == 0 && error("Not yet implemented")
+   fl, q = divides(z, p)
+   if !fl
+      return 0, z
+   end
+   v = 0
+   qn = q
+   while fl
+      q = qn
+      fl, qn = divides(q, p)
+      v += 1
+   end
+   return v, q
+end
+
+doc"""
+    valuation(z::GenMPoly, p::GenMPoly)
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$.
+>
+> See also `remove`, which also returns $z/p^k$.
+"""
+function valuation{T <: RingElem, S, N}(z::GenMPoly{T, S, N}, p::GenMPoly{T, S, N})
+  v, _ = remove(z, p)
+  return v
+end
+
 ###############################################################################
 #
 #   Evaluation
@@ -2241,5 +2283,5 @@ function PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, order
    N = (ordering == :deglex || ordering == :degrevlex) ? length(U) + 1 : length(U)
    parent_obj = GenMPolyRing{T, ordering, N}(R, U, cached)
 
-   return tuple(parent_obj, gens(parent_obj)...)
+   return tuple(parent_obj, gens(parent_obj))
 end

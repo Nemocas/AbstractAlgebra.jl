@@ -84,7 +84,7 @@ function show{T <: RingElem}(io::IO, x::GenSparsePoly{T})
       for i = 1:len
         c = coeff(x, len - i)
         bracket = needs_parentheses(c)
-        if i != 1 && !is_negative(c)
+        if i != 1 && !isnegative(c)
           print(io, "+")
         end
         X = x.exps[len - i + 1]
@@ -132,7 +132,7 @@ show_minus_one{T <: RingElem}(::Type{GenSparsePoly{T}}) = show_minus_one(T)
 
 needs_parentheses{T <: RingElem}(a::GenSparsePoly{T}) = length(a) > 1
 
-is_negative(x::GenSparsePoly) = length(x) <= 1 && is_negative(coeff(x, 0))
+isnegative(x::GenSparsePoly) = length(x) <= 1 && isnegative(coeff(x, 0))
 
 ###############################################################################
 #

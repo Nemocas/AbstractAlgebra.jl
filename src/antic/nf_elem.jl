@@ -231,7 +231,7 @@ end
 
 needs_parentheses(::Nemo.nf_elem) = true
 
-is_negative(::nf_elem) = false
+isnegative(::nf_elem) = false
 
 ###############################################################################
 #

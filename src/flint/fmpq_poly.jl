@@ -395,7 +395,6 @@ end
 
 rem(x::fmpq_poly, y::fmpq_poly) = mod(x, y)
 
-
 function divrem(x::fmpq_poly, y::fmpq_poly)
    check_parent(x, y)
    y == 0 && throw(DivideError())
