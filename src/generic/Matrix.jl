@@ -2970,21 +2970,13 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 1})
    return z
 end
 
-function (a::GenMatSpace)(b::Array{fmpz, 2})
-   return a(map(base_ring(a), b))
-end
+(a::GenMatSpace)(b::Array{fmpz, 2}) = a(map(base_ring(a), b))
 
-function (a::GenMatSpace)(b::Array{fmpz, 1})
-   return a(map(base_ring(a), b))
-end
+(a::GenMatSpace)(b::Array{fmpz, 1}) = a(map(base_ring(a), b))
 
-function (a::GenMatSpace){T <: Integer}(b::Array{T, 2})
-   return a(map(base_ring(a), b))
-end
+(a::GenMatSpace){T <: Integer}(b::Array{T, 2}) = a(map(base_ring(a), b))
 
-function (a::GenMatSpace){T <: Integer}(b::Array{T, 1})
-   return a(map(base_ring(a), b))
-end
+(a::GenMatSpace){T <: Integer}(b::Array{T, 1}) = a(map(base_ring(a), b))
 
 function Base.Matrix{T}(R::Ring, r::Int, c::Int, a::Array{T,2})
    M = MatrixSpace(R, r, c; cached = false)
