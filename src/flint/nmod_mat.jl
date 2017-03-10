@@ -749,12 +749,12 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::GenResRing{fmpz}, r::Int, c::Int)
+function MatrixSpace(R::GenResRing{fmpz}, r::Int, c::Int; cached = true)
   return try
-    NmodMatSpace(R, r, c)
+    NmodMatSpace(R, r, c, cached)
   catch
     T = elem_type(R)
-    return GenMatSpace{T}(R, r, c)
+    return GenMatSpace{T}(R, r, c, cached)
   end
 end
 

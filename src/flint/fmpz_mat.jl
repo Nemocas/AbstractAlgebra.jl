@@ -1110,6 +1110,6 @@ Base.promote_rule(::Type{fmpz_mat}, ::Type{fmpz}) = fmpz_mat
 #
 ###############################################################################
 
-function MatrixSpace(R::FlintIntegerRing, r::Int, c::Int)
-   return FmpzMatSpace(r, c)
+function MatrixSpace(R::FlintIntegerRing, r::Int, c::Int; cached = true)
+   return FmpzMatSpace(r, c, cached)
 end

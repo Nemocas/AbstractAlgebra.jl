@@ -707,7 +707,7 @@ Base.promote_rule(::Type{acb_mat}, ::Type{arb_mat}) = acb_mat
 #
 ###############################################################################
 
-function MatrixSpace(R::AcbField, r::Int, c::Int)
+function MatrixSpace(R::AcbField, r::Int, c::Int; cached = true)
   (r <= 0 || c <= 0) && error("Dimensions must be positive")
-  return AcbMatSpace(R, r, c)
+  return AcbMatSpace(R, r, c, cached)
 end
