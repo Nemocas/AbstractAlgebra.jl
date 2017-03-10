@@ -2762,6 +2762,37 @@ end
 
 ###############################################################################
 #
+#   Row swapping
+#
+###############################################################################
+
+doc"""
+    swap_rows(a::MatElem, i::Int, j::Int)
+> Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th 
+> row are swapped.
+"""
+function swap_rows(a::MatElem, i::Int, j::Int)
+   (1<=i<=rows(a) && 1<=j<=rows(a)) || throw(BoundsError())  
+   b = deepcopy(a)
+   swap_rows!(b, i, j)
+   return b
+end
+
+doc"""
+    swap_rows!(a::MatElem, i::Int, j::Int)
+> Swap the $i$th and $j$th row of $a$.
+"""
+function swap_rows!(a::MatElem, i::Int, j::Int)
+   (1<=i<=rows(a) && 1<=j<=rows(a)) || throw(BoundsError())
+   for k=1:cols(a)
+      x = a[i,k]
+      a[i,k] = a[j,k]
+      a[j,k] = x
+   end
+end
+
+###############################################################################
+#
 #   Concatenation
 #
 ###############################################################################
@@ -2933,10 +2964,36 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 1})
       parent(b[1]) != base_ring(a) && error("Unable to coerce to matrix")
    end
    _check_dim(a.rows, a.cols, b)
-   b = reshape(b, a.rows, a.cols)
+   b = reshape(b, a.rows, a.cols)'
    z = GenMat{T}(b)
    z.parent = a
    return z
+end
+
+function (a::GenMatSpace)(b::Array{fmpz, 2})
+   return a(map(base_ring(a), b))
+end
+
+function (a::GenMatSpace)(b::Array{fmpz, 1})
+   return a(map(base_ring(a), b))
+end
+
+function (a::GenMatSpace){T <: Integer}(b::Array{T, 2})
+   return a(map(base_ring(a), b))
+end
+
+function (a::GenMatSpace){T <: Integer}(b::Array{T, 1})
+   return a(map(base_ring(a), b))
+end
+
+function Base.Matrix{T}(R::Ring, r::Int, c::Int, a::Array{T,2})
+   M = MatrixSpace(R, r, c; cached = false)
+   return M(a)
+end
+
+function Base.Matrix{T}(R::Ring, r::Int, c::Int, a::Array{T,1})
+   M = MatrixSpace(R, r, c; cached =  false)
+   return M(a)
 end
 
 ###############################################################################

@@ -1060,6 +1060,23 @@ function test_gen_mat_minpoly()
    println("PASS")   
 end
 
+function test_gen_row_swapping()
+   print("GenMat.row_swapping...")
+
+   R, x = PolynomialRing(ZZ, "x")
+   M = MatrixSpace(R, 3, 2)
+
+   a = M(map(R, [1 2; 3 4; 5 6]))
+
+   @test swap_rows(a, 1, 3) == M(map(R, [5 6; 3 4; 1 2]))
+
+   swap_rows!(a, 2, 3)
+
+   @test a == M(map(R, [1 2; 5 6; 3 4]))
+
+   println("PASS")
+end
+
 function test_gen_concat()
    print("GenMat.concat...")
 
@@ -1108,6 +1125,7 @@ function test_gen_mat()
    test_gen_mat_hessenberg()
    test_gen_mat_charpoly()
    test_gen_mat_minpoly()
+   test_gen_row_swapping()
    test_gen_concat()
 
    println("")
