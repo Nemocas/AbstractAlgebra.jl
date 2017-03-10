@@ -750,6 +750,10 @@ function (a::FmpqPolyRing)(b::Array{fmpq, 1})
    return z
 end
 
+(a::FmpqPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(fmpq, b))
+
+(a::FmpqPolyRing)(b::Array{fmpz, 1}) = a(map(fmpq, b))
+
 (a::FmpqPolyRing)(b::fmpq_poly) = b
 
 function (a::FmpqPolyRing)(b::fmpz_poly)
@@ -764,10 +768,10 @@ end
 #
 ###############################################################################
 
-function PolynomialRing(R::FlintRationalField, s::AbstractString)
+function PolynomialRing(R::FlintRationalField, s::AbstractString; cached = true)
    S = Symbol(s)
 
-   parent_obj = FmpqPolyRing(R, S)
+   parent_obj = FmpqPolyRing(R, S, cached)
    
    return parent_obj, parent_obj([fmpq(0), fmpq(1)])
 end

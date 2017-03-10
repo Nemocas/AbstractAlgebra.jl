@@ -48,7 +48,15 @@ function test_fmpq_poly_constructors()
    n = S(fmpz(12))
 
    @test isa(n, PolyElem)
-   
+
+   o = S([1, 2, 3])
+
+   @test isa(o, PolyElem)
+
+   p = S([ZZ(1), ZZ(2), ZZ(3)])
+
+   @test isa(p, PolyElem)
+
    println("PASS")
 end
 

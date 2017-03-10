@@ -2213,6 +2213,10 @@ function (a::GenPolyRing{T}){T <: RingElem}(b::Array{T, 1})
    return z
 end
 
+(a::GenPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(base_ring(a), b))
+
+(a::GenPolyRing)(b::Array{fmpz, 1}) = a(map(base_ring(a), b))
+
 ###############################################################################
 #
 #   PolynomialRing constructor

@@ -1002,6 +1002,8 @@ function (R::NmodPolyRing)(arr::Array{UInt, 1})
   return z
 end
 
+(R::NmodPolyRing){T <: Integer}(arr::Array{T, 1}) = R(map(base_ring(R), arr))
+
 function (R::NmodPolyRing)(arr::Array{GenRes{fmpz}, 1})
   if length(arr) > 0
      (base_ring(R) != parent(arr[1])) && error("Wrong parents")

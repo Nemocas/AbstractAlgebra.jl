@@ -813,6 +813,8 @@ function (a::FmpzPolyRing)(b::Array{fmpz, 1})
    return z
 end
 
+(a::FmpzPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(fmpz, b))
+
 (a::FmpzPolyRing)(b::fmpz_poly) = b
 
 ###############################################################################
@@ -821,10 +823,10 @@ end
 #
 ###############################################################################
 
-function PolynomialRing(R::FlintIntegerRing, s::AbstractString)
+function PolynomialRing(R::FlintIntegerRing, s::AbstractString; cached = true)
    S = Symbol(s)
 
-   parent_obj = FmpzPolyRing(S)
+   parent_obj = FmpzPolyRing(S, cached)
    
    return parent_obj, parent_obj([fmpz(0), fmpz(1)])
 end

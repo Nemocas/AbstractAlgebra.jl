@@ -78,6 +78,10 @@ function test_nmod_poly_constructors()
   @test h == k
   @test k == l
 
+  m = Rx([1, 2, 3])
+
+  @test isa(m, PolyElem)
+
   println("PASS")
 end
 
