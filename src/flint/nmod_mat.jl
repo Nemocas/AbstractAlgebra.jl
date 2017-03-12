@@ -51,8 +51,9 @@ function getindex(a::nmod_mat, i::Int, j::Int)
 end
 
 #as above, but as a plain UInt
-function _get_entry_raw(a::nmod_mat, i::Int, j::Int)
-  return ccall((:nmod_mat_get_entry, :libflint), UInt, (Ptr{nmod_mat}, Int, Int), &a, i-1, j-1)
+function getindex_raw(a::nmod_mat, i::Int, j::Int)
+  return ccall((:nmod_mat_get_entry, :libflint), UInt,
+                 (Ptr{nmod_mat}, Int, Int), &a, i - 1, j - 1)
 end
 
 function setindex!(a::nmod_mat, u::UInt, i::Int, j::Int)
@@ -239,6 +240,7 @@ end
 #  Unsafe operations
 #
 ################################################################################
+
 function mul!(a::nmod_mat, b::nmod_mat, c::nmod_mat)
   ccall((:nmod_mat_mul, :libflint), Void, (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b, &c)
 end
@@ -250,6 +252,7 @@ end
 function zero!(a::nmod_mat)
   ccall((:nmod_mat_zero, :libflint), Void, (Ptr{nmod_mat}, ), &a)
 end
+
 ################################################################################
 #
 #  Ad hoc binary operators

@@ -77,6 +77,11 @@ function coeff(x::nmod_poly, n::Int)
           (Ptr{nmod_poly}, Int), &x, n))
 end
 
+function coeff_raw(x::nmod_poly, n::Int)
+  return ccall((:nmod_poly_get_coeff_ui, :libflint), UInt,
+                (Ptr{nmod_poly}, Int), &x, n)
+end
+
 zero(R::NmodPolyRing) = R(UInt(0))
 
 one(R::NmodPolyRing) = R(UInt(1))
