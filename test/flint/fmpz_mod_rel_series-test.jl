@@ -13,9 +13,9 @@ function test_fmpz_mod_rel_series_constructors()
    @test isa(b, SeriesElem)
 
    c = S(a)
-   d = S([fmpz(0), fmpz(3), fmpz(1)], 3, 5)
+   d = S([fmpz(0), fmpz(3), fmpz(1)], 3, 5, 0)
 
-   f = S([R(0), R(3), R(1)], 3, 5)
+   f = S([R(0), R(3), R(1)], 3, 5, 0)
 
    @test isa(c, SeriesElem)
    @test isa(d, SeriesElem)
@@ -32,6 +32,18 @@ function test_fmpz_mod_rel_series_constructors()
    l = S(R(4))
 
    @test isa(l, SeriesElem)
+
+   println("PASS")
+end
+
+function test_fmpz_mod_rel_series_printing()
+   print("fmpz_mod_rel_series.printing...")
+
+   R = ResidueRing(ZZ, 123456789012345678949)
+   S, x = PowerSeriesRing(R, 30, "x")
+   b = x^2 + x + O(x^4)
+
+   @test string(b) == "x+x^2+O(x^4)"
 
    println("PASS")
 end
@@ -66,12 +78,6 @@ function test_fmpz_mod_rel_series_manipulation()
    @test isequal(deepcopy(a), a)
 
    @test isequal(deepcopy(b), b)
-
-   @test length(a) == 4
-
-   @test length(b) == 0
-
-   @test normalise(a, 4) == 4
 
    @test coeff(a, 1) == 2
 
@@ -116,6 +122,124 @@ function test_fmpz_mod_rel_series_binary_ops()
    @test isequal(a*c, 3*x^5+x^4+7*x^3+2*x^2+2*x+O(x^6))
 
    @test isequal(a*d, -x^7+3*x^6-x^5+6*x^4+2*x^3+O(x^33))
+
+   f1 = 1 + x + x^2 + x^3
+   f2 = x + x^2
+   f3 = x + x^2 + x^3
+   f4 = x^2 + x^3 + x^4 + x^5
+
+   @test f1 + f1 == 2+2*x+2*x^2+2*x^3+O(x^30)
+
+   @test f1 + f2 == 1+2*x+2*x^2+x^3+O(x^30)
+   @test f2 + f1 == f1 + f2
+
+   @test f1 + f3 == 1+2*x+2*x^2+2*x^3+O(x^30)
+   @test f3 + f1 == f1 + f3
+   
+   @test f1 + f4 == 1+x+2*x^2+2*x^3+x^4+x^5+O(x^30)
+   @test f4 + f1 == f1 + f4
+
+   @test f1 - f1 == 0+O(x^30)
+
+   @test f1 - f2 == 1+x^3+O(x^30)
+
+   @test f1 - f3 == 1+O(x^30)
+
+   @test f1 - f4 == 1+x-x^4-x^5+O(x^30)
+
+   g1 = x^2*f1
+   g2 = x^2*f2
+   g3 = x^2*f3
+   g4 = x^2*f4
+
+   @test g1 + g1 == 2*x^2+2*x^3+2*x^4+2*x^5+O(x^32)
+
+   @test g1 + g2 == x^2+2*x^3+2*x^4+x^5+O(x^32)
+   @test g2 + g1 == g1 + g2
+
+   @test g1 + g3 == x^2+2*x^3+2*x^4+2*x^5+O(x^32)
+   @test g3 + g1 == g1 + g3
+
+   @test g1 + g4 == x^2+x^3+2*x^4+2*x^5+x^6+x^7+O(x^32)
+   @test g4 + g1 == g1 + g4
+
+   @test g1 - g1 == 0+O(x^32)
+
+   @test g1 - g2 == x^2+x^5+O(x^32)
+   @test g2 - g1 == -(g1 - g2)
+
+   @test g1 - g3 == x^2+O(x^32)
+   @test g3 - g1 == -(g1 - g3)
+
+   @test g1 - g4 == x^2+x^3-x^6-x^7+O(x^32)
+   @test g4 - g1 == -(g1 - g4)
+
+   h1 = f1
+   h2 = -f2
+   h3 = -f3
+   h4 = -f4
+
+   @test h1 + h2 == 1+x^3+O(x^30)
+   @test h2 + h1 == h1 + h2
+
+   @test h1 + h3 == 1+O(x^30)
+   @test h3 + h1 == h1 + h3
+
+   @test h1 + h4 == 1+x-x^4-x^5+O(x^30)
+   @test h4 + h1 == h1 + h4
+
+   @test h1 - h2 == 1+2*x+2*x^2+x^3+O(x^30)
+   @test h2 - h1 == -(h1 - h2)
+
+   @test h1 - h3 == 1+2*x+2*x^2+2*x^3+O(x^30)
+   @test h3 - h1 == -(h1 - h3)
+
+   @test h1 - h4 == 1+x+2*x^2+2*x^3+x^4+x^5+O(x^30)
+   @test h4 - h1 == -(h1 - h4)
+
+   k1 = g1
+   k2 = -g2
+   k3 = -g3
+   k4 = -g4
+
+   @test k1 + k2 == x^2+x^5+O(x^32)
+   @test k2 + k1 == k1 + k2
+   
+   @test k1 + k3 == x^2+O(x^32)
+   @test k3 + k1 == k1 + k3
+  
+   @test k1 + k4 == x^2+x^3-x^6-x^7+O(x^32)
+   @test k4 + k1 == k1 + k4
+   
+   @test k1 - k2 == x^2+2*x^3+2*x^4+x^5+O(x^32)
+   @test k2 - k1 == -(k1 - k2)
+   
+   @test k1 - k3 == x^2+2*x^3+2*x^4+2*x^5+O(x^32)
+   @test k3 - k1 == -(k1 - k3)
+   
+   @test k1 - k4 == x^2+x^3+2*x^4+2*x^5+x^6+x^7+O(x^32)
+   @test k4 - k1 == -(k1 - k4)
+   
+   m1 = 1 + x + x^2 + x^3 + O(x^4)
+   m2 = x + x^2 + O(x^3)
+   m3 = x + x^2 + x^3 + O(x^4)
+   m4 = x^2 + x^3 + x^4 + x^5 + O(x^6)
+
+   @test isequal(m1 + m1, 2+2*x+2*x^2+2*x^3+O(x^4))
+
+   @test isequal(m1 + m2, 1+2*x+2*x^2+O(x^3))
+ 
+   @test isequal(m1 + m3, 1+2*x+2*x^2+2*x^3+O(x^4))
+
+   @test isequal(m1 + m4, 1+x+2*x^2+2*x^3+O(x^4))
+
+   @test isequal(m1 - m1, 0+O(x^4))
+
+   @test isequal(m1 - m2, 1+O(x^3))
+ 
+   @test isequal(m1 - m3, 1+O(x^4))
+
+   @test isequal(m1 - m4, 1+x+O(x^4))
 
    println("PASS")
 end
@@ -335,6 +459,7 @@ end
 
 function test_fmpz_mod_rel_series()
    test_fmpz_mod_rel_series_constructors()
+   test_fmpz_mod_rel_series_printing()
    test_fmpz_mod_rel_series_manipulation()
    test_fmpz_mod_rel_series_unary_ops()
    test_fmpz_mod_rel_series_binary_ops()

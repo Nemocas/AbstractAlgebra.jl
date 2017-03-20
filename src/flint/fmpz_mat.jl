@@ -114,7 +114,7 @@ iszero(a::fmpz_mat) = ccall((:fmpz_mat_is_zero, :libflint), Bool,
 isone(a::fmpz_mat) = ccall((:fmpz_mat_is_one, :libflint), Bool,
                            (Ptr{fmpz_mat},), &a)
 
-function deepcopy(d::fmpz_mat)
+function deepcopy_internal(d::fmpz_mat, dict::ObjectIdDict)
    z = fmpz_mat(d)
    z.parent = d.parent
    return z
@@ -1046,45 +1046,45 @@ end
 #
 ###############################################################################
 
-function Base.call(a::FmpzMatSpace)
+function (a::FmpzMatSpace)()
    z = fmpz_mat(a.rows, a.cols)
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpzMatSpace, arr::Array{fmpz, 2})
+function (a::FmpzMatSpace)(arr::Array{fmpz, 2})
    z = fmpz_mat(a.rows, a.cols, arr)
    z.parent = a
    return z
 end
 
-function Base.call{T <: Integer}(a::FmpzMatSpace, arr::Array{T, 2})
+function (a::FmpzMatSpace){T <: Integer}(arr::Array{T, 2})
    z = fmpz_mat(a.rows, a.cols, arr)
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpzMatSpace, arr::Array{fmpz, 1})
+function (a::FmpzMatSpace)(arr::Array{fmpz, 1})
    z = fmpz_mat(a.rows, a.cols, arr)
    z.parent = a
    return z
 end
 
-Base.call{T <: Integer}(a::FmpzMatSpace, arr::Array{T, 1}) = a(arr'')
+(a::FmpzMatSpace){T <: Integer}(arr::Array{T, 1}) = a(arr'')
 
-function Base.call(a::FmpzMatSpace, d::fmpz)
+function (a::FmpzMatSpace)(d::fmpz)
    z = fmpz_mat(a.rows, a.cols, d)
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpzMatSpace, d::Integer)
+function (a::FmpzMatSpace)(d::Integer)
    z = fmpz_mat(a.rows, a.cols, fmpz(d))
    z.parent = a
    return z
 end
 
-Base.call(a::FmpzMatSpace, d::fmpz_mat) = d
+(a::FmpzMatSpace)(d::fmpz_mat) = d
 
 ###############################################################################
 #

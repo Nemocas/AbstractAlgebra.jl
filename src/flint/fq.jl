@@ -160,7 +160,7 @@ function degree(a::FqFiniteField)
    return ccall((:fq_ctx_degree, :libflint), Int, (Ptr{FqFiniteField},), &a)
 end
 
-function deepcopy(d::fq)
+function deepcopy_internal(d::fq, dict::ObjectIdDict)
    z = fq(parent(d), d)
    return z
 end
@@ -183,7 +183,7 @@ function show(io::IO, x::fq)
    cstr = ccall((:fq_get_str_pretty, :libflint), Ptr{UInt8}, 
                 (Ptr{fq}, Ptr{FqFiniteField}), &x, &x.parent)
 
-   print(io, bytestring(cstr))
+   print(io, unsafe_string(cstr))
 
    ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
 end
@@ -490,24 +490,24 @@ Base.promote_rule(::Type{fq}, ::Type{fmpz}) = fq
 #
 ###############################################################################
 
-function Base.call(a::FqFiniteField)
+function (a::FqFiniteField)()
    z = fq(a)
    return z
 end
 
-Base.call(a::FqFiniteField, b::Integer) = a(fmpz(b))
+(a::FqFiniteField)(b::Integer) = a(fmpz(b))
 
-function Base.call(a::FqFiniteField, b::Int)
+function (a::FqFiniteField)(b::Int)
    z = fq(a, b)
    return z
 end
 
-function Base.call(a::FqFiniteField, b::fmpz)
+function (a::FqFiniteField)(b::fmpz)
    z = fq(a, b)
    return z
 end
 
-function Base.call(a::FqFiniteField, b::fq)
+function (a::FqFiniteField)(b::fq)
    parent(b) != a && error("Coercion between finite fields not implemented")
    return b
 end

@@ -46,6 +46,18 @@ function test_fmpz_mod_poly_constructors()
    println("PASS")
 end
 
+function test_fmpz_mod_poly_printing()
+   print("fmpz_mod_poly.printing...")
+ 
+   R = ResidueRing(ZZ, 123456789012345678949)
+   S, x = PolynomialRing(R, "x")
+   f = x^3 + 2x^2 + x + 1
+
+   @test string(f) == "x^3+2*x^2+x+1"
+
+   println("PASS")
+end
+
 function test_fmpz_mod_poly_manipulation()
    print("fmpz_mod_poly.manipulation...")
 
@@ -524,6 +536,7 @@ end
 
 function test_fmpz_mod_poly()
    test_fmpz_mod_poly_constructors()
+   test_fmpz_mod_poly_printing()
    test_fmpz_mod_poly_manipulation()
    test_fmpz_mod_poly_binary_ops()
    test_fmpz_mod_poly_adhoc_binary()

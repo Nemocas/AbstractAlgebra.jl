@@ -21,7 +21,7 @@ export sqrt, rsqrt, log, log1p, exp, exppii, sin, cos, tan, cot,
        sinhcosh, atan, logsinpi, gamma, rgamma, lgamma, digamma, risingfac,
        risingfac2, polygamma, polylog, zeta, barnesg, logbarnesg, agm,
        erf, erfi, erfc, ei, si, ci, shi, chi, li, lioffset, expint, gamma,
-       besselj, bessely, besseli, besselk, hyp1f1, hyp1f1r, hyperu,
+       besselj, bessely, besseli, besselk, hyp1f1, hyp1f1r, hyperu, hyp2f1,
        jtheta, modeta, modj, modlambda, moddelta, ellipwp, ellipk, ellipe
 
 
@@ -97,7 +97,7 @@ function accuracy_bits(x::acb)
   return -ccall((:acb_rel_error_bits, :libarb), Int, (Ptr{acb},), &x)
 end
 
-function deepcopy(a::acb)
+function deepcopy_internal(a::acb, dict::ObjectIdDict)
   b = parent(a)()
   ccall((:acb_set, :libarb), Void, (Ptr{acb}, Ptr{acb}), &b, &a)
   return b
@@ -167,6 +167,8 @@ function show(io::IO, x::AcbField)
   print(io, prec(x))
   print(io, " bits of precision and error bounds")
 end
+
+needs_parentheses(x::acb) = true
 
 ################################################################################
 #
@@ -313,6 +315,30 @@ end
 //(x::fmpq, y::acb) = parent(y)(x) // y
 ^(x::fmpq, y::acb) = parent(y)(x) ^ y
 
+divexact(x::acb, y::acb) = x // y
+divexact(x::fmpz, y::acb) = x // y
+divexact(x::acb, y::fmpz) = x // y
+divexact(x::Int, y::acb) = x // y
+divexact(x::acb, y::Int) = x // y
+divexact(x::UInt, y::acb) = x // y
+divexact(x::acb, y::UInt) = x // y
+divexact(x::fmpq, y::acb) = x // y
+divexact(x::acb, y::fmpq) = x // y
+divexact(x::arb, y::acb) = x // y
+divexact(x::acb, y::arb) = x // y
+
+/(x::acb, y::acb) = x // y
+/(x::fmpz, y::acb) = x // y
+/(x::acb, y::fmpz) = x // y
+/(x::Int, y::acb) = x // y
+/(x::acb, y::Int) = x // y
+/(x::UInt, y::acb) = x // y
+/(x::acb, y::UInt) = x // y
+/(x::fmpq, y::acb) = x // y
+/(x::acb, y::fmpq) = x // y
+/(x::arb, y::acb) = x // y
+/(x::acb, y::arb) = x // y
+
 ################################################################################
 #
 #  Comparison
@@ -439,6 +465,10 @@ end
 #
 ################################################################################
 
+function isunit(x::acb)
+   !iszero(x)
+end
+
 doc"""
     iszero(x::acb)
 > Return `true` if $x$ is certainly zero, otherwise return `false`.
@@ -489,6 +519,8 @@ doc"""
 function isreal(x::acb)
    return Bool(ccall((:acb_is_real, :libarb), Cint, (Ptr{acb},), &x))
 end
+
+is_negative(x::acb) = isreal(x) && is_negative(real(x))
 
 ################################################################################
 #
@@ -649,6 +681,7 @@ end
 doc"""
     log(x::acb)
 > Return the principal branch of the logarithm of $x$.
+
 """
 function log(x::acb)
    z = parent(x)()
@@ -1278,6 +1311,17 @@ function hyperu(a::acb, b::acb, x::acb)
 end
 
 doc"""
+    hyp2f1(a::acb, b::acb, c::acb, x::acb)
+> Return the Gauss hypergeometric function ${}_2F_1(a,b,c,x)$.
+"""
+function hyp2f1(a::acb, b::acb, c::acb, x::acb; flags=0)
+  z = parent(x)()
+  ccall((:acb_hypgeom_2f1, :libarb), Void,
+              (Ptr{acb}, Ptr{acb}, Ptr{acb}, Ptr{acb}, Ptr{acb}, Int, Int), &z, &a, &b, &c, &x, flags, parent(x).prec)
+  return z
+end
+
+doc"""
     jtheta(z::acb, tau::acb)
 > Return a tuple of four elements containing the Jacobi theta function values
 > $\theta_1, \theta_2, \theta_3, \theta_4$ evaluated at $z, \tau$.
@@ -1490,21 +1534,23 @@ end
 #
 ################################################################################
 
-function call(r::AcbField)
+function (r::AcbField)()
   z = acb()
   z.parent = r
   return z
 end
 
-function call(r::AcbField, x::Union{Int, UInt, fmpz, fmpq, arb, acb, Float64, BigFloat, AbstractString})
+function (r::AcbField)(x::Union{Int, UInt, fmpz, fmpq, arb, acb, Float64,
+                                BigFloat, AbstractString})
   z = acb(x, r.prec)
   z.parent = r
   return z
 end
 
-call(r::AcbField, x::Integer) = r(fmpz(x))
+(r::AcbField)(x::Integer) = r(fmpz(x))
 
-function call{T <: Union{Int, UInt, fmpz, fmpq, arb, Float64, BigFloat, AbstractString}}(r::AcbField, x::T, y::T)
+function (r::AcbField){T <: Union{Int, UInt, fmpz, fmpq, arb, Float64,
+                                              BigFloat, AbstractString}}(x::T, y::T)
   z = acb(x, y, r.prec)
   z.parent = r
   return z

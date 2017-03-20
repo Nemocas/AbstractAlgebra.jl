@@ -91,7 +91,7 @@ set_entry!(a::nmod_mat, i::Int, j::Int, u::GenRes{fmpz}) =
 set_entry_t!{T<:Union{RingElem, Integer}}(a::nmod_mat, i::Int, j::Int, u::T) =
   set_entry!(a, j, i, u)
  
-function deepcopy(a::nmod_mat)
+function deepcopy_internal(a::nmod_mat, dict::ObjectIdDict)
   z = nmod_mat(rows(a), cols(a), a.n)
   if isdefined(a, :parent)
     z.parent = a.parent
@@ -604,13 +604,13 @@ Base.promote_rule(::Type{nmod_mat}, ::Type{fmpz}) = nmod_mat
 #
 ################################################################################
 
-function Base.call(a::NmodMatSpace)
+function (a::NmodMatSpace)()
   z = nmod_mat(a.rows, a.cols, a.n)
   z.parent = a
   return z
 end
 
-function Base.call(a::NmodMatSpace, b::Integer)
+function (a::NmodMatSpace)(b::Integer)
    M = a()
    for i = 1:a.rows
       for j = 1:a.cols
@@ -624,7 +624,7 @@ function Base.call(a::NmodMatSpace, b::Integer)
    return M
 end
 
-function Base.call(a::NmodMatSpace, b::fmpz)
+function (a::NmodMatSpace)(b::fmpz)
    M = a()
    for i = 1:a.rows
       for j = 1:a.cols
@@ -638,7 +638,7 @@ function Base.call(a::NmodMatSpace, b::fmpz)
    return M
 end
 
-function Base.call(a::NmodMatSpace, b::GenRes{fmpz})
+function (a::NmodMatSpace)(b::GenRes{fmpz})
    parent(b) != base_ring(a) && error("Unable to coerce to matrix")
    M = a()
    for i = 1:a.rows
@@ -653,28 +653,28 @@ function Base.call(a::NmodMatSpace, b::GenRes{fmpz})
    return M
 end
 
-function Base.call(a::NmodMatSpace, arr::Array{BigInt, 2}, transpose::Bool = false)
+function (a::NmodMatSpace)(arr::Array{BigInt, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
   z.parent = a
   return z
 end
 
-function Base.call(a::NmodMatSpace, arr::Array{fmpz, 2}, transpose::Bool = false)
+function (a::NmodMatSpace)(arr::Array{fmpz, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
   z.parent = a
   return z
 end
 
-function Base.call(a::NmodMatSpace, arr::Array{Int, 2}, transpose::Bool = false)
+function (a::NmodMatSpace)(arr::Array{Int, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
   z.parent = a
   return z
 end
 
-function Base.call(a::NmodMatSpace, arr::Array{GenRes{fmpz}, 2}, transpose::Bool = false)
+function (a::NmodMatSpace)(arr::Array{GenRes{fmpz}, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
   length(arr) == 0 && error("Array must be nonempty")
   (base_ring(a) != parent(arr[1])) && error("Elements must have same base ring")
@@ -683,7 +683,7 @@ function Base.call(a::NmodMatSpace, arr::Array{GenRes{fmpz}, 2}, transpose::Bool
   return z
 end
 
-function Base.call(a::NmodMatSpace, arr::Array{Int, 1})
+function (a::NmodMatSpace)(arr::Array{Int, 1})
   (length(arr) != a.cols * a.rows) &&
           error("Array must be of length ", a.cols * a.rows)
 
@@ -691,21 +691,21 @@ function Base.call(a::NmodMatSpace, arr::Array{Int, 1})
   return a(arr, true)
 end
 
-function Base.call(a::NmodMatSpace, arr::Array{BigInt, 1})
+function (a::NmodMatSpace)(arr::Array{BigInt, 1})
   (length(arr) != a.cols * a.rows) &&
           error("Array must be of length ", a.cols * a.rows)
   arr = reshape(arr,a.cols,a.rows)
   return a(arr, true)
 end
 
-function Base.call(a::NmodMatSpace, arr::Array{fmpz, 1})
+function (a::NmodMatSpace)(arr::Array{fmpz, 1})
   (length(arr) != a.cols * a.rows) &&
           error("Array must be of length ", a.cols * a.rows)
   arr = reshape(arr,a.cols,a.rows)
   return a(arr, true)
 end
 
-function Base.call(a::NmodMatSpace, arr::Array{GenRes{fmpz}, 1})
+function (a::NmodMatSpace)(arr::Array{GenRes{fmpz}, 1})
   (length(arr) != a.cols * a.rows) &&
           error("Array must be of length ", a.cols * a.rows)
   z = nmod_mat(a.rows, a.cols, a.n, arr)
@@ -714,7 +714,7 @@ function Base.call(a::NmodMatSpace, arr::Array{GenRes{fmpz}, 1})
   return z
 end
 
-function Base.call(a::NmodMatSpace, b::fmpz_mat)
+function (a::NmodMatSpace)(b::fmpz_mat)
   (a.cols != b.c || a.rows != b.r) && error("Dimensions do not fit")
   z = nmod_mat(a.n, b)
   z.parent = a

@@ -32,6 +32,16 @@ function test_fmpq_mat_constructors()
    println("PASS")
 end
 
+function test_fmpq_mat_printing()
+   print("fmpq_mat.printing...")
+ 
+   a = MatrixSpace(QQ, 2, 2)(1)
+   
+   @test string(a) == "[1 0]\n[0 1]"
+
+   println("PASS")
+end
+
 function test_fmpq_mat_manipulation()
    print("fmpq_mat.manipulation...")
 
@@ -392,6 +402,7 @@ end
 
 function test_fmpq_mat()
    test_fmpq_mat_constructors()
+   test_fmpq_mat_printing()
    test_fmpq_mat_manipulation()
    test_fmpq_mat_unary_ops()
    test_fmpq_mat_binary_ops()

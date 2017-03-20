@@ -73,13 +73,13 @@ end
 #
 ###############################################################################
 
-function Base.call(ord::PariPolyRing{pari_rat}, n::Ptr{Int})
+function (ord::PariPolyRing{pari_rat})(n::Ptr{Int})
    pol = pari_poly{pari_rat}(n)
    pol.parent = PariPolyRing{pari_rat}(PariQQ, var(ord))
    return pol
 end
 
-function Base.call(a::FmpqPolyRing, g::pari_poly{pari_rat})
+function (a::FmpqPolyRing)(g::pari_poly{pari_rat})
    z = fmpq_poly()
    z.parent = a
    fmpq_poly!(z, g.d)

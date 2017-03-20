@@ -116,7 +116,7 @@ iszero(a::fmpq_mat) = ccall((:fmpq_mat_is_zero, :libflint), Bool,
 isone(a::fmpq_mat) = ccall((:fmpq_mat_is_one, :libflint), Bool,
                            (Ptr{fmpq_mat},), &a)
 
-function deepcopy(d::fmpq_mat)
+function deepcopy_internal(d::fmpq_mat, dict::ObjectIdDict)
    z = fmpq_mat(d)
    z.parent = d.parent
    return z
@@ -603,51 +603,58 @@ end
 #
 ###############################################################################
 
-function Base.call(a::FmpqMatSpace)
+function (a::FmpqMatSpace)()
    z = fmpq_mat(a.rows, a.cols)
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpqMatSpace, arr::Array{fmpq, 2})
+function (a::FmpqMatSpace)(arr::Array{fmpq, 2})
    z = fmpq_mat(a.rows, a.cols, arr)
    z.parent = a
    return z
 end
 
-function Base.call{T <: Integer}(a::FmpqMatSpace, arr::Array{T, 2})
+function (a::FmpqMatSpace){T <: Integer}(arr::Array{T, 2})
    z = fmpq_mat(a.rows, a.cols, arr)
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpqMatSpace, arr::Array{fmpq, 1})
+function (a::FmpqMatSpace)(arr::Array{fmpq, 1})
    z = fmpq_mat(a.rows, a.cols, arr)
    z.parent = a
    return z
 end
 
-Base.call{T <: Integer}(a::FmpqMatSpace, arr::Array{T, 1}) = a(arr'')
+(a::FmpqMatSpace){T <: Integer}(arr::Array{T, 1}) = a(arr'')
 
-function Base.call(a::FmpqMatSpace, d::fmpq)
+function (a::FmpqMatSpace)(d::fmpq)
    z = fmpq_mat(a.rows, a.cols, d)
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpqMatSpace, d::fmpz)
+function (a::FmpqMatSpace)(d::fmpz)
    z = fmpq_mat(a.rows, a.cols, fmpq(d))
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpqMatSpace, d::Integer)
+function (a::FmpqMatSpace)(d::Integer)
    z = fmpq_mat(a.rows, a.cols, fmpq(d))
    z.parent = a
    return z
 end
 
-Base.call(a::FmpqMatSpace, d::fmpq_mat) = d
+function (a::FmpqMatSpace)(M::fmpz_mat)
+   (a.cols == cols(M) && a.rows == rows(M)) || error("wrong matrix dimension")
+   z = a()
+   ccall((:fmpq_mat_set_fmpz_mat, :libflint), Void, (Ptr{fmpq_mat}, Ptr{fmpz_mat}), &z, &M)
+   return z
+end
+
+(a::FmpqMatSpace)(d::fmpq_mat) = d
 
 ###############################################################################
 #

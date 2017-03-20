@@ -31,6 +31,18 @@ function test_fq_nmod_constructors()
    println("PASS")
 end
 
+function test_fq_nmod_printing()
+   print("fq_nmod.printing()...")
+
+   R, x = FiniteField(7, 5, "x")
+
+   a = 3x^4 + 2x^3 + 4x^2 + x + 1
+
+   @test string(a) == "3*x^4+2*x^3+4*x^2+x+1"
+
+   println("PASS")
+end
+
 function test_fq_nmod_manipulation()
    print("fq_nmod.manipulation()...")
 
@@ -205,6 +217,7 @@ end
 
 function test_fq_nmod()
    test_fq_nmod_constructors()
+   test_fq_nmod_printing()
    test_fq_nmod_manipulation()
    test_fq_nmod_unary_ops()
    test_fq_nmod_binary_ops()

@@ -43,6 +43,17 @@ In order to construct polynomials in Nemo, one must first construct the polynomi
 
 
 
+```
+PolynomialRing(R::Ring, s::AbstractString{}; cached::Bool = true)
+```
+
+> Given a base ring `R` and string `s` specifying how the generator (variable) should be printed, return a tuple `S, x` representing the new polynomial ring $S = R[x]$ and the generator $x$ of the ring. By default the parent object `S` will depend only on `R` and `x` and will be cached. Setting the optional argument `cached` to `false` will prevent the parent object `S` from being cached.
+
+
+
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L2134' class='documenter-source'>source</a><br>
+
+
 A shorthand version of this function is provided: given a base ring `R`, we abbreviate the constructor as follows.
 
 
@@ -93,7 +104,7 @@ zero(R::PolyRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L108' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L108' class='documenter-source'>source</a><br>
 
 <a id='Base.one-Tuple{Nemo.PolyRing}' href='#Base.one-Tuple{Nemo.PolyRing}'>#</a>
 **`Base.one`** &mdash; *Method*.
@@ -108,7 +119,7 @@ one(R::PolyRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L114' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L114' class='documenter-source'>source</a><br>
 
 <a id='Nemo.gen-Tuple{Nemo.PolyRing}' href='#Nemo.gen-Tuple{Nemo.PolyRing}'>#</a>
 **`Nemo.gen`** &mdash; *Method*.
@@ -123,7 +134,7 @@ gen(R::PolyRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L120' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L120' class='documenter-source'>source</a><br>
 
 
 Here are some examples of constructing polynomials.
@@ -333,7 +344,7 @@ base_ring(R::PolyRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L27' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L27' class='documenter-source'>source</a><br>
 
 <a id='Nemo.base_ring-Tuple{Nemo.PolyElem}' href='#Nemo.base_ring-Tuple{Nemo.PolyElem}'>#</a>
 **`Nemo.base_ring`** &mdash; *Method*.
@@ -348,7 +359,7 @@ base_ring(a::PolyElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L33' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L33' class='documenter-source'>source</a><br>
 
 <a id='Base.parent-Tuple{Nemo.PolyElem}' href='#Base.parent-Tuple{Nemo.PolyElem}'>#</a>
 **`Base.parent`** &mdash; *Method*.
@@ -363,7 +374,7 @@ parent(a::PolyElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L39' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L39' class='documenter-source'>source</a><br>
 
 <a id='Base.var-Tuple{Nemo.PolyRing}' href='#Base.var-Tuple{Nemo.PolyRing}'>#</a>
 **`Base.var`** &mdash; *Method*.
@@ -378,7 +389,7 @@ var(a::PolyRing)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L45' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L45' class='documenter-source'>source</a><br>
 
 <a id='Nemo.degree-Tuple{Nemo.PolyElem}' href='#Nemo.degree-Tuple{Nemo.PolyElem}'>#</a>
 **`Nemo.degree`** &mdash; *Method*.
@@ -393,7 +404,7 @@ degree(a::PolyElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L85' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L85' class='documenter-source'>source</a><br>
 
 <a id='Nemo.modulus-Tuple{Nemo.PolyElem{T<:Nemo.ResElem}}' href='#Nemo.modulus-Tuple{Nemo.PolyElem{T<:Nemo.ResElem}}'>#</a>
 **`Nemo.modulus`** &mdash; *Method*.
@@ -408,7 +419,7 @@ modulus{T <: ResElem}(a::PolyElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L92' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L92' class='documenter-source'>source</a><br>
 
 <a id='Nemo.lead-Tuple{Nemo.PolyElem}' href='#Nemo.lead-Tuple{Nemo.PolyElem}'>#</a>
 **`Nemo.lead`** &mdash; *Method*.
@@ -423,7 +434,7 @@ lead(x::PolyElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L100' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L100' class='documenter-source'>source</a><br>
 
 <a id='Nemo.iszero-Tuple{Nemo.PolyElem}' href='#Nemo.iszero-Tuple{Nemo.PolyElem}'>#</a>
 **`Nemo.iszero`** &mdash; *Method*.
@@ -438,7 +449,7 @@ iszero(a::PolyElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L126' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L126' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isone-Tuple{Nemo.PolyElem}' href='#Nemo.isone-Tuple{Nemo.PolyElem}'>#</a>
 **`Nemo.isone`** &mdash; *Method*.
@@ -453,7 +464,7 @@ isone(a::PolyElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L132' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L132' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isgen-Tuple{Nemo.PolyElem}' href='#Nemo.isgen-Tuple{Nemo.PolyElem}'>#</a>
 **`Nemo.isgen`** &mdash; *Method*.
@@ -468,7 +479,7 @@ isgen(a::PolyElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L139' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L139' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isunit-Tuple{Nemo.PolyElem}' href='#Nemo.isunit-Tuple{Nemo.PolyElem}'>#</a>
 **`Nemo.isunit`** &mdash; *Method*.
@@ -483,7 +494,7 @@ isunit(a::PolyElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L148' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L148' class='documenter-source'>source</a><br>
 
 <a id='Base.den-Tuple{Nemo.fmpq_poly}' href='#Base.den-Tuple{Nemo.fmpq_poly}'>#</a>
 **`Base.den`** &mdash; *Method*.
@@ -498,7 +509,7 @@ den(a::fmpq_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpq_poly.jl#L29' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpq_poly.jl#L29' class='documenter-source'>source</a><br>
 
 
 Here are some examples of basic manipulation of polynomials.
@@ -672,7 +683,7 @@ truncate(a::PolyElem, n::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L797' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L797' class='documenter-source'>source</a><br>
 
 <a id='Nemo.mullow-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},Nemo.PolyElem{T<:Nemo.RingElem},Int64}' href='#Nemo.mullow-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},Nemo.PolyElem{T<:Nemo.RingElem},Int64}'>#</a>
 **`Nemo.mullow`** &mdash; *Method*.
@@ -687,7 +698,7 @@ mullow{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, n::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L817' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L817' class='documenter-source'>source</a><br>
 
 
 Here are some examples of truncated operations.
@@ -722,7 +733,7 @@ reverse(x::PolyElem, len::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L861' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L861' class='documenter-source'>source</a><br>
 
 <a id='Base.reverse-Tuple{Nemo.PolyElem}' href='#Base.reverse-Tuple{Nemo.PolyElem}'>#</a>
 **`Base.reverse`** &mdash; *Method*.
@@ -737,7 +748,7 @@ reverse(x::PolyElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L880' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L880' class='documenter-source'>source</a><br>
 
 
 Here are some examples of reversal.
@@ -771,7 +782,7 @@ shift_left(x::PolyElem, n::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L896' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L896' class='documenter-source'>source</a><br>
 
 <a id='Nemo.shift_right-Tuple{Nemo.PolyElem,Int64}' href='#Nemo.shift_right-Tuple{Nemo.PolyElem,Int64}'>#</a>
 **`Nemo.shift_right`** &mdash; *Method*.
@@ -786,7 +797,7 @@ shift_right(f::PolyElem, n::Int)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L918' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L918' class='documenter-source'>source</a><br>
 
 
 Here are some examples of shifting.
@@ -823,7 +834,7 @@ mulmod{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T}, d::PolyEl
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L946' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L946' class='documenter-source'>source</a><br>
 
 <a id='Nemo.powmod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Int64,Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}' href='#Nemo.powmod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Int64,Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}'>#</a>
 **`Nemo.powmod`** &mdash; *Method*.
@@ -838,7 +849,7 @@ powmod{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::Int, d::PolyElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L956' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L956' class='documenter-source'>source</a><br>
 
 <a id='Nemo.powmod-Tuple{Nemo.fmpz_mod_poly,Nemo.fmpz,Nemo.fmpz_mod_poly}' href='#Nemo.powmod-Tuple{Nemo.fmpz_mod_poly,Nemo.fmpz,Nemo.fmpz_mod_poly}'>#</a>
 **`Nemo.powmod`** &mdash; *Method*.
@@ -853,7 +864,7 @@ powmod(x::fmpz_mod_poly, e::fmpz, y::fmpz_mod_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpz_mod_poly.jl#L564' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz_mod_poly.jl#L564' class='documenter-source'>source</a><br>
 
 <a id='Base.invmod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}' href='#Base.invmod-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}'>#</a>
 **`Base.invmod`** &mdash; *Method*.
@@ -868,7 +879,7 @@ invmod{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L990' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L990' class='documenter-source'>source</a><br>
 
 
 Here are some examples of modular arithmetic.
@@ -909,7 +920,7 @@ mod{T <: Union{ResElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1093' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1093' class='documenter-source'>source</a><br>
 
 <a id='Base.divrem-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}' href='#Base.divrem-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}'>#</a>
 **`Base.divrem`** &mdash; *Method*.
@@ -924,7 +935,7 @@ divrem{T <: Union{ResElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1122' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1122' class='documenter-source'>source</a><br>
 
 
 Here are some examples of euclidean division.
@@ -967,7 +978,7 @@ pseudorem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1164' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1164' class='documenter-source'>source</a><br>
 
 <a id='Nemo.pseudodivrem-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},Nemo.PolyElem{T<:Nemo.RingElem}}' href='#Nemo.pseudodivrem-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},Nemo.PolyElem{T<:Nemo.RingElem}}'>#</a>
 **`Nemo.pseudodivrem`** &mdash; *Method*.
@@ -982,7 +993,7 @@ pseudodivrem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1180' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1180' class='documenter-source'>source</a><br>
 
 
 Here are some examples of pseudodivision.
@@ -1023,7 +1034,7 @@ gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1216' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1216' class='documenter-source'>source</a><br>
 
 <a id='Base.lcm-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},Nemo.PolyElem{T<:Nemo.RingElem}}' href='#Base.lcm-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},Nemo.PolyElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.lcm`** &mdash; *Method*.
@@ -1038,7 +1049,7 @@ lcm{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1276' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1276' class='documenter-source'>source</a><br>
 
 <a id='Nemo.content-Tuple{Nemo.PolyElem}' href='#Nemo.content-Tuple{Nemo.PolyElem}'>#</a>
 **`Nemo.content`** &mdash; *Method*.
@@ -1053,7 +1064,7 @@ content(a::PolyElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1285' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1285' class='documenter-source'>source</a><br>
 
 <a id='Nemo.primpart-Tuple{Nemo.PolyElem}' href='#Nemo.primpart-Tuple{Nemo.PolyElem}'>#</a>
 **`Nemo.primpart`** &mdash; *Method*.
@@ -1068,7 +1079,7 @@ primpart(a::PolyElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1298' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1298' class='documenter-source'>source</a><br>
 
 <a id='Base.gcdx-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},Nemo.PolyElem{T<:Nemo.RingElem}}' href='#Base.gcdx-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},Nemo.PolyElem{T<:Nemo.RingElem}}'>#</a>
 **`Base.gcdx`** &mdash; *Method*.
@@ -1083,7 +1094,7 @@ gcdx{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1617' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1617' class='documenter-source'>source</a><br>
 
 <a id='Base.gcdx-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}' href='#Base.gcdx-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}'>#</a>
 **`Base.gcdx`** &mdash; *Method*.
@@ -1098,7 +1109,7 @@ gcdx{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1617' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1617' class='documenter-source'>source</a><br>
 
 
 ```
@@ -1109,7 +1120,7 @@ gcdx{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1673' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1673' class='documenter-source'>source</a><br>
 
 <a id='Nemo.gcdinv-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}' href='#Nemo.gcdinv-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}},Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}'>#</a>
 **`Nemo.gcdinv`** &mdash; *Method*.
@@ -1124,7 +1135,7 @@ gcdinv{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1716' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1716' class='documenter-source'>source</a><br>
 
 
 Here are some examples of content, primitive part and GCD.
@@ -1172,7 +1183,7 @@ evaluate{T <: RingElem}(a::PolyElem{T}, b::T)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1313' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1313' class='documenter-source'>source</a><br>
 
 <a id='Nemo.evaluate-Tuple{Nemo.PolyElem,Integer}' href='#Nemo.evaluate-Tuple{Nemo.PolyElem,Integer}'>#</a>
 **`Nemo.evaluate`** &mdash; *Method*.
@@ -1187,7 +1198,7 @@ evaluate(a::PolyElem, b::Integer)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1333' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1333' class='documenter-source'>source</a><br>
 
 <a id='Nemo.evaluate-Tuple{Nemo.PolyElem,Nemo.fmpz}' href='#Nemo.evaluate-Tuple{Nemo.PolyElem,Nemo.fmpz}'>#</a>
 **`Nemo.evaluate`** &mdash; *Method*.
@@ -1202,7 +1213,7 @@ evaluate(a::PolyElem, b::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1341' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1341' class='documenter-source'>source</a><br>
 
 <a id='Nemo.evaluate2-Tuple{Nemo.arb_poly,Integer}' href='#Nemo.evaluate2-Tuple{Nemo.arb_poly,Integer}'>#</a>
 **`Nemo.evaluate2`** &mdash; *Method*.
@@ -1217,7 +1228,7 @@ evaluate2(x::arb_poly, y::Integer)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb_poly.jl#L508' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb_poly.jl#L508' class='documenter-source'>source</a><br>
 
 <a id='Nemo.evaluate2-Tuple{Nemo.arb_poly,Float64}' href='#Nemo.evaluate2-Tuple{Nemo.arb_poly,Float64}'>#</a>
 **`Nemo.evaluate2`** &mdash; *Method*.
@@ -1232,7 +1243,7 @@ evaluate2(x::arb_poly, y::Float64)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb_poly.jl#L517' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb_poly.jl#L517' class='documenter-source'>source</a><br>
 
 <a id='Nemo.evaluate2-Tuple{Nemo.arb_poly,Nemo.fmpz}' href='#Nemo.evaluate2-Tuple{Nemo.arb_poly,Nemo.fmpz}'>#</a>
 **`Nemo.evaluate2`** &mdash; *Method*.
@@ -1247,7 +1258,7 @@ evaluate2(x::arb_poly, y::fmpz)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb_poly.jl#L526' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb_poly.jl#L526' class='documenter-source'>source</a><br>
 
 <a id='Nemo.evaluate2-Tuple{Nemo.arb_poly,Nemo.fmpq}' href='#Nemo.evaluate2-Tuple{Nemo.arb_poly,Nemo.fmpq}'>#</a>
 **`Nemo.evaluate2`** &mdash; *Method*.
@@ -1262,7 +1273,7 @@ evaluate2(x::arb_poly, y::fmpq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb_poly.jl#L535' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb_poly.jl#L535' class='documenter-source'>source</a><br>
 
 <a id='Nemo.evaluate2-Tuple{Nemo.arb_poly,Nemo.arb}' href='#Nemo.evaluate2-Tuple{Nemo.arb_poly,Nemo.arb}'>#</a>
 **`Nemo.evaluate2`** &mdash; *Method*.
@@ -1277,7 +1288,7 @@ evaluate2(x::arb_poly, y::arb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb_poly.jl#L464' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb_poly.jl#L464' class='documenter-source'>source</a><br>
 
 <a id='Nemo.evaluate2-Tuple{Nemo.arb_poly,Nemo.acb}' href='#Nemo.evaluate2-Tuple{Nemo.arb_poly,Nemo.acb}'>#</a>
 **`Nemo.evaluate2`** &mdash; *Method*.
@@ -1292,7 +1303,7 @@ evaluate2(x::arb_poly, y::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb_poly.jl#L486' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb_poly.jl#L486' class='documenter-source'>source</a><br>
 
 <a id='Nemo.evaluate2-Tuple{Nemo.acb_poly,Integer}' href='#Nemo.evaluate2-Tuple{Nemo.acb_poly,Integer}'>#</a>
 **`Nemo.evaluate2`** &mdash; *Method*.
@@ -1307,7 +1318,7 @@ evaluate2(x::acb_poly, y::Integer)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/acb_poly.jl#L511' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb_poly.jl#L511' class='documenter-source'>source</a><br>
 
 <a id='Nemo.evaluate2-Tuple{Nemo.acb_poly,Float64}' href='#Nemo.evaluate2-Tuple{Nemo.acb_poly,Float64}'>#</a>
 **`Nemo.evaluate2`** &mdash; *Method*.
@@ -1322,7 +1333,7 @@ evaluate2(x::acb_poly, y::Float64)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/acb_poly.jl#L520' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb_poly.jl#L520' class='documenter-source'>source</a><br>
 
 <a id='Nemo.evaluate2-Tuple{Nemo.acb_poly,Nemo.fmpz}' href='#Nemo.evaluate2-Tuple{Nemo.acb_poly,Nemo.fmpz}'>#</a>
 **`Nemo.evaluate2`** &mdash; *Method*.
@@ -1337,7 +1348,7 @@ evaluate2(x::acb_poly, y::fmpq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/acb_poly.jl#L529' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb_poly.jl#L529' class='documenter-source'>source</a><br>
 
 <a id='Nemo.evaluate2-Tuple{Nemo.acb_poly,Nemo.fmpq}' href='#Nemo.evaluate2-Tuple{Nemo.acb_poly,Nemo.fmpq}'>#</a>
 **`Nemo.evaluate2`** &mdash; *Method*.
@@ -1352,7 +1363,7 @@ evaluate2(x::acb_poly, y::fmpq)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/acb_poly.jl#L538' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb_poly.jl#L538' class='documenter-source'>source</a><br>
 
 <a id='Nemo.evaluate2-Tuple{Nemo.acb_poly,Nemo.arb}' href='#Nemo.evaluate2-Tuple{Nemo.acb_poly,Nemo.arb}'>#</a>
 **`Nemo.evaluate2`** &mdash; *Method*.
@@ -1367,7 +1378,7 @@ evaluate2(x::acb_poly, y::arb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/acb_poly.jl#L547' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb_poly.jl#L547' class='documenter-source'>source</a><br>
 
 <a id='Nemo.evaluate2-Tuple{Nemo.acb_poly,Nemo.acb}' href='#Nemo.evaluate2-Tuple{Nemo.acb_poly,Nemo.acb}'>#</a>
 **`Nemo.evaluate2`** &mdash; *Method*.
@@ -1382,7 +1393,7 @@ evaluate2(x::acb_poly, y::acb)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/acb_poly.jl#L489' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb_poly.jl#L489' class='documenter-source'>source</a><br>
 
 <a id='Nemo.compose-Tuple{Nemo.PolyElem,Nemo.PolyElem}' href='#Nemo.compose-Tuple{Nemo.PolyElem,Nemo.PolyElem}'>#</a>
 **`Nemo.compose`** &mdash; *Method*.
@@ -1397,7 +1408,7 @@ compose(a::PolyElem, b::PolyElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1349' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1349' class='documenter-source'>source</a><br>
 
 <a id='Nemo.subst-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},Any}' href='#Nemo.subst-Tuple{Nemo.PolyElem{T<:Nemo.RingElem},Any}'>#</a>
 **`Nemo.subst`** &mdash; *Method*.
@@ -1412,7 +1423,7 @@ subst{T <: RingElem}(f::PolyElem{T}, a::Any)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L2047' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L2047' class='documenter-source'>source</a><br>
 
 
 We also overload the functional notation so that the polynomial $f$ can be evaluated at $a$ by writing $f(a)$. This feature is only available with  Julia 0.5 however.
@@ -1459,7 +1470,7 @@ derivative(a::PolyElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1376' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1376' class='documenter-source'>source</a><br>
 
 <a id='Nemo.integral-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}' href='#Nemo.integral-Tuple{Nemo.PolyElem{T<:Union{Nemo.FieldElem,Nemo.ResElem}}}'>#</a>
 **`Nemo.integral`** &mdash; *Method*.
@@ -1474,7 +1485,7 @@ integral{T <: Union{ResElem, FieldElem}}(x::PolyElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1400' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1400' class='documenter-source'>source</a><br>
 
 
 Here are some examples of integral and derivative.
@@ -1512,7 +1523,7 @@ resultant{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1426' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1426' class='documenter-source'>source</a><br>
 
 <a id='Nemo.discriminant-Tuple{Nemo.PolyElem}' href='#Nemo.discriminant-Tuple{Nemo.PolyElem}'>#</a>
 **`Nemo.discriminant`** &mdash; *Method*.
@@ -1527,7 +1538,7 @@ discriminant(a::PolyElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1595' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1595' class='documenter-source'>source</a><br>
 
 
 Here are some examples of computing the resultant and discriminant.
@@ -1562,7 +1573,7 @@ monomial_to_newton!{T <: RingElem}(P::Array{T, 1}, roots::Array{T, 1})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1769' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1769' class='documenter-source'>source</a><br>
 
 <a id='Nemo.newton_to_monomial!-Tuple{Array{T<:Nemo.RingElem,1},Array{T<:Nemo.RingElem,1}}' href='#Nemo.newton_to_monomial!-Tuple{Array{T<:Nemo.RingElem,1},Array{T<:Nemo.RingElem,1}}'>#</a>
 **`Nemo.newton_to_monomial!`** &mdash; *Method*.
@@ -1577,7 +1588,7 @@ newton_to_monomial!{T <: RingElem}(P::Array{T, 1}, roots::Array{T, 1})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1793' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1793' class='documenter-source'>source</a><br>
 
 
 Here are some examples of conversion to and from Newton representation.
@@ -1613,7 +1624,7 @@ interpolate{T <: RingElem}(S::PolyRing, x::Array{T, 1}, y::Array{T, 1})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1824' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1824' class='documenter-source'>source</a><br>
 
 
 Here is an example of interpolation.
@@ -1650,7 +1661,7 @@ signature(f::fmpz_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpz_poly.jl#L548' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz_poly.jl#L548' class='documenter-source'>source</a><br>
 
 <a id='Nemo.signature-Tuple{Nemo.fmpq_poly}' href='#Nemo.signature-Tuple{Nemo.fmpq_poly}'>#</a>
 **`Nemo.signature`** &mdash; *Method*.
@@ -1665,7 +1676,7 @@ signature(f::fmpq_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpq_poly.jl#L586' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpq_poly.jl#L586' class='documenter-source'>source</a><br>
 
 
 Here is an example of signature.
@@ -1693,11 +1704,17 @@ f = x^3 + 3x + 1
 roots(x::acb_poly; target=0, isolate_real=false, initial_prec=0, max_prec=0, max_iter=0)
 ```
 
-> Find the complex roots of the complex polynomial $x$.
+> Attempts to isolate the complex roots of the complex polynomial $x$ by iteratively refining balls in which they lie.
+>
+> This is done by increasing the working precision, starting at `initial_prec`. The maximal number of iterations can be set using `max_iter` and the maximal precision can be set using `max_prec`.
+>
+> If `isolate_real` is set and $x$ is strictly real, then the real roots will be isolated from the non-real roots. Every root will have either zero, positive or negative real part.
+>
+> It is assumed that $x$ is squarefree.
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/acb_poly.jl#L705' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb_poly.jl#L705' class='documenter-source'>source</a><br>
 
 
 Here is an example of finding complex roots.
@@ -1711,6 +1728,10 @@ m = y^2 + 2y + 3
 n = m + CC("0 +/- 0.0001", "0 +/- 0.0001")
 
 r = roots(n)
+
+p = y^7 - 1
+
+r = roots(n, isolate_real = true)
 ```
 
 
@@ -1731,7 +1752,7 @@ from_roots(R::ArbPolyRing, b::Array{arb, 1})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb_poly.jl#L611' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb_poly.jl#L611' class='documenter-source'>source</a><br>
 
 <a id='Nemo.from_roots-Tuple{Nemo.AcbPolyRing,Array{Nemo.acb,1}}' href='#Nemo.from_roots-Tuple{Nemo.AcbPolyRing,Array{Nemo.acb,1}}'>#</a>
 **`Nemo.from_roots`** &mdash; *Method*.
@@ -1746,7 +1767,7 @@ from_roots(R::AcbPolyRing, b::Array{acb, 1})
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/acb_poly.jl#L623' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb_poly.jl#L623' class='documenter-source'>source</a><br>
 
 
 Here are some examples of constructing polynomials from their roots.
@@ -1781,7 +1802,7 @@ function lift(R::FmpzPolyRing, y::nmod_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/nmod_poly.jl#L680' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/nmod_poly.jl#L680' class='documenter-source'>source</a><br>
 
 <a id='Nemo.lift-Tuple{Nemo.FmpzPolyRing,Nemo.fmpz_mod_poly}' href='#Nemo.lift-Tuple{Nemo.FmpzPolyRing,Nemo.fmpz_mod_poly}'>#</a>
 **`Nemo.lift`** &mdash; *Method*.
@@ -1796,7 +1817,7 @@ function lift(R::FmpzPolyRing, y::fmpz_mod_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpz_mod_poly.jl#L658' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz_mod_poly.jl#L658' class='documenter-source'>source</a><br>
 
 
 Here is an example of lifting.
@@ -1833,7 +1854,7 @@ overlaps(x::arb_poly, y::arb_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb_poly.jl#L103' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb_poly.jl#L103' class='documenter-source'>source</a><br>
 
 <a id='Nemo.overlaps-Tuple{Nemo.acb_poly,Nemo.acb_poly}' href='#Nemo.overlaps-Tuple{Nemo.acb_poly,Nemo.acb_poly}'>#</a>
 **`Nemo.overlaps`** &mdash; *Method*.
@@ -1848,7 +1869,7 @@ overlaps(x::acb_poly, y::acb_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/acb_poly.jl#L103' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb_poly.jl#L103' class='documenter-source'>source</a><br>
 
 <a id='Base.contains-Tuple{Nemo.arb_poly,Nemo.arb_poly}' href='#Base.contains-Tuple{Nemo.arb_poly,Nemo.arb_poly}'>#</a>
 **`Base.contains`** &mdash; *Method*.
@@ -1863,7 +1884,7 @@ contains(x::arb_poly, y::arb_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb_poly.jl#L113' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb_poly.jl#L113' class='documenter-source'>source</a><br>
 
 <a id='Base.contains-Tuple{Nemo.acb_poly,Nemo.acb_poly}' href='#Base.contains-Tuple{Nemo.acb_poly,Nemo.acb_poly}'>#</a>
 **`Base.contains`** &mdash; *Method*.
@@ -1878,7 +1899,7 @@ contains(x::acb_poly, y::acb_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/acb_poly.jl#L113' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb_poly.jl#L113' class='documenter-source'>source</a><br>
 
 <a id='Base.contains-Tuple{Nemo.arb_poly,Nemo.fmpz_poly}' href='#Base.contains-Tuple{Nemo.arb_poly,Nemo.fmpz_poly}'>#</a>
 **`Base.contains`** &mdash; *Method*.
@@ -1893,7 +1914,7 @@ contains(x::arb_poly, y::fmpz_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb_poly.jl#L123' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb_poly.jl#L123' class='documenter-source'>source</a><br>
 
 <a id='Base.contains-Tuple{Nemo.arb_poly,Nemo.fmpq_poly}' href='#Base.contains-Tuple{Nemo.arb_poly,Nemo.fmpq_poly}'>#</a>
 **`Base.contains`** &mdash; *Method*.
@@ -1908,7 +1929,7 @@ contains(x::arb_poly, y::fmpq_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb_poly.jl#L133' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb_poly.jl#L133' class='documenter-source'>source</a><br>
 
 <a id='Base.contains-Tuple{Nemo.acb_poly,Nemo.fmpz_poly}' href='#Base.contains-Tuple{Nemo.acb_poly,Nemo.fmpz_poly}'>#</a>
 **`Base.contains`** &mdash; *Method*.
@@ -1923,7 +1944,7 @@ contains(x::acb_poly, y::fmpz_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/acb_poly.jl#L123' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb_poly.jl#L123' class='documenter-source'>source</a><br>
 
 <a id='Base.contains-Tuple{Nemo.acb_poly,Nemo.fmpq_poly}' href='#Base.contains-Tuple{Nemo.acb_poly,Nemo.fmpq_poly}'>#</a>
 **`Base.contains`** &mdash; *Method*.
@@ -1938,7 +1959,7 @@ contains(x::acb_poly, y::fmpq_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/acb_poly.jl#L133' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb_poly.jl#L133' class='documenter-source'>source</a><br>
 
 
 It is sometimes also useful to be able to determine if there is a unique integer contained in the coefficient of an inexact constant polynomial.
@@ -1956,7 +1977,7 @@ unique_integer(x::arb_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/arb_poly.jl#L164' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/arb_poly.jl#L164' class='documenter-source'>source</a><br>
 
 <a id='Nemo.unique_integer-Tuple{Nemo.acb_poly}' href='#Nemo.unique_integer-Tuple{Nemo.acb_poly}'>#</a>
 **`Nemo.unique_integer`** &mdash; *Method*.
@@ -1971,7 +1992,7 @@ unique_integer(x::acb_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/acb_poly.jl#L164' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb_poly.jl#L164' class='documenter-source'>source</a><br>
 
 
 We also have the following functions.
@@ -1989,7 +2010,7 @@ isreal(x::acb_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/arb/acb_poly.jl#L177' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/arb/acb_poly.jl#L177' class='documenter-source'>source</a><br>
 
 
 Here are some examples of overlapping and containment.
@@ -2037,7 +2058,7 @@ isirreducible(x::nmod_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/nmod_poly.jl#L700' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/nmod_poly.jl#L700' class='documenter-source'>source</a><br>
 
 <a id='Nemo.isirreducible-Tuple{Nemo.fmpz_mod_poly}' href='#Nemo.isirreducible-Tuple{Nemo.fmpz_mod_poly}'>#</a>
 **`Nemo.isirreducible`** &mdash; *Method*.
@@ -2052,7 +2073,7 @@ isirreducible(x::fmpz_mod_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpz_mod_poly.jl#L678' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz_mod_poly.jl#L678' class='documenter-source'>source</a><br>
 
 <a id='Nemo.issquarefree-Tuple{Nemo.nmod_poly}' href='#Nemo.issquarefree-Tuple{Nemo.nmod_poly}'>#</a>
 **`Nemo.issquarefree`** &mdash; *Method*.
@@ -2067,7 +2088,7 @@ issquarefree(x::nmod_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/nmod_poly.jl#L716' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/nmod_poly.jl#L716' class='documenter-source'>source</a><br>
 
 <a id='Nemo.issquarefree-Tuple{Nemo.fmpz_mod_poly}' href='#Nemo.issquarefree-Tuple{Nemo.fmpz_mod_poly}'>#</a>
 **`Nemo.issquarefree`** &mdash; *Method*.
@@ -2082,7 +2103,7 @@ issquarefree(x::fmpz_mod_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpz_mod_poly.jl#L694' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz_mod_poly.jl#L694' class='documenter-source'>source</a><br>
 
 <a id='Base.factor-Tuple{Nemo.nmod_poly}' href='#Base.factor-Tuple{Nemo.nmod_poly}'>#</a>
 **`Base.factor`** &mdash; *Method*.
@@ -2097,7 +2118,7 @@ factor(x::nmod_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/nmod_poly.jl#L732' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/nmod_poly.jl#L732' class='documenter-source'>source</a><br>
 
 <a id='Base.factor-Tuple{Nemo.fmpz_mod_poly}' href='#Base.factor-Tuple{Nemo.fmpz_mod_poly}'>#</a>
 **`Base.factor`** &mdash; *Method*.
@@ -2112,7 +2133,7 @@ factor(x::fmpz_mod_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpz_mod_poly.jl#L710' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz_mod_poly.jl#L710' class='documenter-source'>source</a><br>
 
 <a id='Nemo.factor_squarefree-Tuple{Nemo.nmod_poly}' href='#Nemo.factor_squarefree-Tuple{Nemo.nmod_poly}'>#</a>
 **`Nemo.factor_squarefree`** &mdash; *Method*.
@@ -2127,7 +2148,7 @@ factor_squarefree(x::nmod_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/nmod_poly.jl#L752' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/nmod_poly.jl#L752' class='documenter-source'>source</a><br>
 
 <a id='Nemo.factor_squarefree-Tuple{Nemo.fmpz_mod_poly}' href='#Nemo.factor_squarefree-Tuple{Nemo.fmpz_mod_poly}'>#</a>
 **`Nemo.factor_squarefree`** &mdash; *Method*.
@@ -2142,7 +2163,7 @@ factor_squarefree(x::fmpz_mod_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpz_mod_poly.jl#L730' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz_mod_poly.jl#L730' class='documenter-source'>source</a><br>
 
 <a id='Nemo.factor_distinct_deg-Tuple{Nemo.nmod_poly}' href='#Nemo.factor_distinct_deg-Tuple{Nemo.nmod_poly}'>#</a>
 **`Nemo.factor_distinct_deg`** &mdash; *Method*.
@@ -2157,7 +2178,7 @@ factor_distinct_deg(x::nmod_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/nmod_poly.jl#L772' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/nmod_poly.jl#L772' class='documenter-source'>source</a><br>
 
 <a id='Nemo.factor_distinct_deg-Tuple{Nemo.fmpz_mod_poly}' href='#Nemo.factor_distinct_deg-Tuple{Nemo.fmpz_mod_poly}'>#</a>
 **`Nemo.factor_distinct_deg`** &mdash; *Method*.
@@ -2172,7 +2193,7 @@ factor_distinct_deg(x::fmpz_mod_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpz_mod_poly.jl#L750' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz_mod_poly.jl#L750' class='documenter-source'>source</a><br>
 
 
 Here are some examples of factorisation.
@@ -2211,7 +2232,7 @@ chebyshev_t(n::Int, x::PolyElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1883' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1883' class='documenter-source'>source</a><br>
 
 <a id='Nemo.chebyshev_u-Tuple{Int64,Nemo.PolyElem}' href='#Nemo.chebyshev_u-Tuple{Int64,Nemo.PolyElem}'>#</a>
 **`Nemo.chebyshev_u`** &mdash; *Method*.
@@ -2226,7 +2247,7 @@ chebyshev_u(n::Int, x::PolyElem)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/generic/Poly.jl#L1923' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/generic/Poly.jl#L1923' class='documenter-source'>source</a><br>
 
 
 The following special polynomials are only available for certain base rings.
@@ -2244,7 +2265,7 @@ cyclotomic(n::Int, x::fmpz_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpz_poly.jl#L608' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz_poly.jl#L608' class='documenter-source'>source</a><br>
 
 <a id='Nemo.swinnerton_dyer-Tuple{Int64,Nemo.fmpz_poly}' href='#Nemo.swinnerton_dyer-Tuple{Int64,Nemo.fmpz_poly}'>#</a>
 **`Nemo.swinnerton_dyer`** &mdash; *Method*.
@@ -2259,7 +2280,7 @@ swinnerton_dyer(n::Int, x::fmpz_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpz_poly.jl#L621' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz_poly.jl#L621' class='documenter-source'>source</a><br>
 
 <a id='Nemo.cos_minpoly-Tuple{Int64,Nemo.fmpz_poly}' href='#Nemo.cos_minpoly-Tuple{Int64,Nemo.fmpz_poly}'>#</a>
 **`Nemo.cos_minpoly`** &mdash; *Method*.
@@ -2274,7 +2295,7 @@ cos_minpoly(n::Int, x::fmpz_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpz_poly.jl#L637' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz_poly.jl#L637' class='documenter-source'>source</a><br>
 
 <a id='Nemo.theta_qexp-Tuple{Int64,Int64,Nemo.fmpz_poly}' href='#Nemo.theta_qexp-Tuple{Int64,Int64,Nemo.fmpz_poly}'>#</a>
 **`Nemo.theta_qexp`** &mdash; *Method*.
@@ -2289,7 +2310,7 @@ theta_qexp(e::Int, n::Int, x::fmpz_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpz_poly.jl#L650' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz_poly.jl#L650' class='documenter-source'>source</a><br>
 
 <a id='Nemo.eta_qexp-Tuple{Int64,Int64,Nemo.fmpz_poly}' href='#Nemo.eta_qexp-Tuple{Int64,Int64,Nemo.fmpz_poly}'>#</a>
 **`Nemo.eta_qexp`** &mdash; *Method*.
@@ -2304,7 +2325,7 @@ eta_qexp(e::Int, n::Int, x::fmpz_poly)
 
 
 
-<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/00727ca77a4ddfb3293c0b6590c674f002191822/src/flint/fmpz_poly.jl#L663' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/wbhart/Nemo.jl/tree/2d9f699d07b271409d36504c459e30f3e8d24ffb/src/flint/fmpz_poly.jl#L663' class='documenter-source'>source</a><br>
 
 
 Here are some examples of special functions.

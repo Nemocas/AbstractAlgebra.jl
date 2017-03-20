@@ -49,7 +49,7 @@ gen(a::FmpzPolyRing) = a([zero(base_ring(a)), one(base_ring(a))])
 isgen(x::fmpz_poly) = ccall((:fmpz_poly_is_x, :libflint), Bool, 
                             (Ptr{fmpz_poly},), &x)
 
-function deepcopy(a::fmpz_poly)
+function deepcopy_internal(a::fmpz_poly, dict::ObjectIdDict)
    z = fmpz_poly(a)
    z.parent = parent(a)
    return z
@@ -74,9 +74,9 @@ function show(io::IO, x::fmpz_poly)
       print(io, "0")
    else
       cstr = ccall((:fmpz_poly_get_str_pretty, :libflint), Ptr{UInt8}, 
-          (Ptr{fmpz_poly}, Ptr{UInt8}), &x, bytestring(string(var(parent(x)))))
+          (Ptr{fmpz_poly}, Ptr{UInt8}), &x, string(var(parent(x))))
 
-      print(io, bytestring(cstr))
+      print(io, unsafe_string(cstr))
 
       ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
    end
@@ -744,37 +744,37 @@ Base.promote_rule(::Type{fmpz_poly}, ::Type{fmpz}) = fmpz_poly
 #
 ###############################################################################
 
-function Base.call(a::FmpzPolyRing)
+function (a::FmpzPolyRing)()
    z = fmpz_poly()
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpzPolyRing, b::Int)
+function (a::FmpzPolyRing)(b::Int)
    z = fmpz_poly(b)
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpzPolyRing, b::Integer)
+function (a::FmpzPolyRing)(b::Integer)
    z = fmpz_poly(fmpz(b))
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpzPolyRing, b::fmpz)
+function (a::FmpzPolyRing)(b::fmpz)
    z = fmpz_poly(b)
    z.parent = a
    return z
 end
 
-function Base.call(a::FmpzPolyRing, b::Array{fmpz, 1})
+function (a::FmpzPolyRing)(b::Array{fmpz, 1})
    z = fmpz_poly(b)
    z.parent = a
    return z
 end
 
-Base.call(a::FmpzPolyRing, b::fmpz_poly) = b
+(a::FmpzPolyRing)(b::fmpz_poly) = b
 
 ###############################################################################
 #

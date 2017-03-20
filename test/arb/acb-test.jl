@@ -13,6 +13,16 @@ function test_acb_constructors()
    println("PASS")
 end
 
+function test_acb_printing()
+   print("acb.printing()...")
+
+   a = CC(1) + onei(CC)
+
+   @test string(a) == "1.0000000000000000000 + i*1.0000000000000000000"
+
+   println("PASS")
+end
+
 function test_acb_basic_ops()
    print("acb.basic_ops()...")
 
@@ -243,6 +253,7 @@ function test_acb_functions()
    z = CC("0.2", "0.3")
    a = CC("0.3", "0.4")
    b = CC("0.4", "0.5")
+   c = CC("0.5", "0.6")
 
    @test overlaps(sqrt(z), CC("0.5294124703604926084627418 +/- 6.58e-26",
                               "0.2833329556779434450121655 +/- 5.25e-26"))
@@ -273,16 +284,16 @@ function test_acb_functions()
    @test overlaps(cotpi(z), CC("0.310809701365069898900469 +/- 6.52e-25",
                               "-1.051367546125004636154355 +/- 3.73e-25"))
 
-   s, c = sincos(z)
-   @test overlaps(s, CC("0.2076767030562843558332814 +/- 4.54e-26",
+   sval, cval = sincos(z)
+   @test overlaps(sval, CC("0.2076767030562843558332814 +/- 4.54e-26",
                               "0.2984501618819517453633022 +/- 5.06e-26"))
-   @test overlaps(c, CC("1.024501340227920709172021 +/- 1.78e-25",
+   @test overlaps(cval, CC("1.024501340227920709172021 +/- 1.78e-25",
                               "-0.06049884291265948916305985 +/- 8.58e-27"))
 
-   s, c = sincospi(z)
-   @test overlaps(s, CC("0.868744702162250462386018 +/- 1.48e-25",
+   sval, cval = sincospi(z)
+   @test overlaps(sval, CC("0.868744702162250462386018 +/- 1.48e-25",
                               "0.880482019377109404605517 +/- 2.50e-25"))
-   @test overlaps(c, CC("1.195724501561235958056311 +/- 4.82e-25",
+   @test overlaps(cval, CC("1.195724501561235958056311 +/- 4.82e-25",
                               "-0.639707632221510215793558 +/- 1.74e-25"))
 
    @test overlaps(sinh(z), CC("0.1923436298021928222471007 +/- 3.58e-26",
@@ -294,10 +305,10 @@ function test_acb_functions()
    @test overlaps(coth(z), CC("1.606152868815847688442798 +/- 4.94e-25",
                               "-2.207905035537343796489195 +/- 5.54e-25"))
 
-   s, c = sinhcosh(z)
-   @test overlaps(s, CC("0.1923436298021928222471007 +/- 3.58e-26",
+   sval, cval = sinhcosh(z)
+   @test overlaps(sval, CC("0.1923436298021928222471007 +/- 3.58e-26",
                               "0.3014503384289114663670543 +/- 5.95e-26"))
-   @test overlaps(c, CC("0.9745069929868754653674075 +/- 6.93e-26",
+   @test overlaps(cval, CC("0.9745069929868754653674075 +/- 6.93e-26",
                               "0.05949885707931208506240025 +/- 6.31e-27"))
 
 
@@ -387,6 +398,8 @@ function test_acb_functions()
                               "0.86691422812428398524918 +/- 1.89e-24"))
    @test overlaps(hyperu(a,b,z), CC("1.21934210138907906272586 +/- 8.19e-24",
                             "-0.00184089966759759298894 +/- 8.42e-24"))
+   @test overlaps(hyp2f1(a,b,c,z), CC("0.913507440913606871706633 +/- 6.52e-25",
+                            "0.127477171451557511736624 +/- 3.04e-25"))
 
    t1, t2, t3, t4 = jtheta(z,a)
    @test overlaps(t1, CC("1.15342827918495425546807 +/- 7.18e-24",
@@ -420,6 +433,7 @@ end
 
 function test_acb()
    test_acb_constructors()
+   test_acb_printing()
    test_acb_basic_ops()
    test_acb_comparison()
    test_acb_predicates()

@@ -26,6 +26,17 @@ function test_fmpz_poly_constructors()
    println("PASS")
 end
 
+function test_fmpz_poly_printing()
+   print("fmpz_poly.printing...")
+ 
+   R, x = PolynomialRing(ZZ, "x")
+   f = x^3 + 2x^2 + x + 1
+
+   @test string(f) == "x^3+2*x^2+x+1"
+
+   println("PASS")
+end
+
 function test_fmpz_poly_manipulation()
    print("fmpz_poly.manipulation...")
 
@@ -421,6 +432,7 @@ end
 
 function test_fmpz_poly()
    test_fmpz_poly_constructors()
+   test_fmpz_poly_printing()
    test_fmpz_poly_manipulation()
    test_fmpz_poly_binary_ops()
    test_fmpz_poly_adhoc_binary()

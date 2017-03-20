@@ -3,16 +3,16 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 module Nemo
  
 import Base: Array, abs, asin, asinh, atan, atanh, base, bin, call,
-             checkbounds, convert, cmp, contains, cos, cosh, dec, deepcopy,
-             den, deserialize, det, div, divrem, exp, factor, gcd, gcdx,
-             getindex, hash, hcat, hex, intersect, inv, invmod, isequal,
-             isfinite, isless, isprime, isqrt, isreal, lcm, ldexp, length,
-             log, lufact, mod, ndigits, nextpow2, norm, nullspace, num, oct,
-             one, parent, parity, parseint, precision, prevpow2, promote_rule,
-             rank, Rational, rem, reverse, serialize, setindex!, show, sign,
-             sin, sinh, size, sqrt, string, sub, tan, tanh, trace,
-             trailing_zeros, transpose, transpose!, truncate, typed_hvcat,
-             typed_hcat, var, vcat, zero, zeros,
+             checkbounds, convert, cmp, contains, cos, cosh, dec,
+             deepcopy, deepcopy_internal, den, deserialize, det, div, divrem,
+             exp, factor, gcd, gcdx, getindex, hash, hcat, hex, intersect, inv,
+             invmod, isequal, isfinite, isless, isprime, isqrt, isreal, lcm,
+             ldexp, length, log, lufact, lufact!, mod, ndigits, nextpow2, norm,
+             nullspace, num, oct, one, parent, parity, parse, precision,
+             prevpow2, promote_rule, rank, Rational, rem, reverse, serialize,
+             setindex!, show, sign, sin, sinh, size, sqrt, string, sub, tan,
+             tanh, trace, trailing_zeros, transpose, transpose!, truncate,
+             typed_hvcat, typed_hcat, var, vcat, zero, zeros,
              +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
              /, !=
 
@@ -24,9 +24,9 @@ import Base: floor, ceil, hypot, sqrt,
 
 export SetElem, GroupElem, RingElem, FieldElem
 
-export PolyElem, SeriesElem, ResElem, FracElem, MatElem, FinFieldElem
+export PolyElem, SeriesElem, AbsSeriesElem, ResElem, FracElem, MatElem, FinFieldElem
 
-export PolyRing, SeriesRing, ResRing, FracField, MatSpace, FinField
+export PolyRing, SeriesRing, AbsSeriesRing, ResRing, FracField, MatSpace, FinField
 
 export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
        MaximalRealSubfield, MaximalOrder, Ideal, PermutationGroup
@@ -40,7 +40,7 @@ export flint_cleanup, flint_set_num_threads
 
 export error_dim_negative
 
-export on_windows64
+export is_windows64
 
 include("AbstractTypes.jl")
 
@@ -50,11 +50,11 @@ include("AbstractTypes.jl")
 #
 ###############################################################################
 
-on_windows64 = (@windows ? true : false) && (Int == Int64)
+is_windows64() = (is_windows() ? true : false) && (Int == Int64)
 
 const pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
 const libdir = joinpath(pkgdir, "local", "lib")
-if (@windows ? true : false)
+if is_windows()
    const libgmp = joinpath(pkgdir, "local", "lib", "libgmp-16")
 else
    const libgmp = joinpath(pkgdir, "local", "lib", "libgmp")
@@ -79,12 +79,9 @@ end
 
 function __init__()
 
-   on_windows = @windows ? true : false
-   on_linux = @linux ? true : false
-
    if "HOSTNAME" in keys(ENV) && ENV["HOSTNAME"] == "juliabox"
        push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
-   elseif on_linux
+   elseif is_linux()
        push!(Libdl.DL_LOAD_PATH, libdir)
        Libdl.dlopen(libgmp)
        Libdl.dlopen(libmpfr)
@@ -95,7 +92,7 @@ function __init__()
       push!(Libdl.DL_LOAD_PATH, libdir)
    end
  
-   if !on_windows
+   if !is_windows()
       ccall((:pari_set_memory_functions, libpari), Void,
          (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
          cglobal(:jl_malloc),
@@ -116,7 +113,7 @@ function __init__()
 
    unsafe_store!(pari_sigint, cfunction(pari_sigint_handler, Void, ()), 1)
 
-   if !on_windows
+   if !is_windows()
       ccall((:__gmp_set_memory_functions, libgmp), Void,
          (Ptr{Void},Ptr{Void},Ptr{Void}),
          cglobal(:jl_gc_counted_malloc),
@@ -135,7 +132,7 @@ function __init__()
       (Ptr{Void},), cfunction(flint_abort, Void, ()))
 
    println("")
-   println("Welcome to Nemo version 0.5.0")
+   println("Welcome to Nemo version 0.5.2")
    println("")
    println("Nemo comes with absolutely no warranty whatsoever")
    println("")
@@ -191,10 +188,10 @@ end
 function create_accessors(T, S, handle)
    accessor_name = gensym()
    @eval begin
-      function $(symbol(:get, accessor_name))(a::$T)
+      function $(Symbol(:get, accessor_name))(a::$T)
          return a.auxilliary_data[$handle]::$S
       end,
-      function $(symbol(:set, accessor_name))(a::$T, b::$S)
+      function $(Symbol(:set, accessor_name))(a::$T, b::$S)
          if $handle > length(a.auxilliary_data)
             resize(a.auxilliary_data, $handle)
          end

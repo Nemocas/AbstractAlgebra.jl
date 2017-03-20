@@ -1,6 +1,3 @@
-on_windows = @windows ? true : false
-on_osx = @osx ? true : false
-
 oldwdir = pwd()
 
 pkgdir = Pkg.dir("Nemo") 
@@ -29,7 +26,7 @@ end
 
 #install libpthreads
 
-if on_windows
+if is_windows()
    if Int == Int32
       download_dll("http://nemocas.org/binaries/w32-libwinpthread-1.dll", joinpath(vdir, "lib", "libwinpthread-1.dll"))
    else
@@ -41,14 +38,14 @@ cd(wdir)
 
 # install M4
 
-if !on_windows
+if !is_windows()
    try
       run(`m4 --version`)
    catch
       download("http://ftp.gnu.org/gnu/m4/m4-1.4.17.tar.bz2", joinpath(wdir, "m4-1.4.17.tar.bz2"))
       run(`tar -xvf m4-1.4.17.tar.bz2`)
       run(`rm m4-1.4.17.tar.bz2`)
-      cd("$wdir/m4-1.4.17")
+      cd(joinpath("$wdir", "m4-1.4.17"))
       run(`./configure --prefix=$vdir`)
       run(`make`)
       run(`make install`)
@@ -63,7 +60,7 @@ if !ispath(Pkg.dir("Nemo", "local", "mpir-2.7.2"))
    download("http://mpir.org/mpir-2.7.2.tar.bz2", joinpath(wdir, "mpir-2.7.2.tar.bz2"))
 end
 
-if on_windows
+if is_windows()
    if Int == Int32
       download_dll("http://nemocas.org/binaries/w32-libgmp-16.dll", joinpath(vdir, "lib", "libgmp-16.dll"))
    else
@@ -93,7 +90,7 @@ if !ispath(Pkg.dir("Nemo", "local", "mpfr-3.1.4"))
    download("http://ftp.gnu.org/gnu/mpfr/mpfr-3.1.4.tar.bz2", joinpath(wdir, "mpfr-3.1.4.tar.bz2"))
 end
 
-if on_windows
+if is_windows()
    if Int == Int32
       download_dll("http://nemocas.org/binaries/w32-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
    else
@@ -115,24 +112,28 @@ cd(wdir)
 
 # install ANTIC
 
-try
-  run(`git clone https://github.com/wbhart/antic.git`)
-catch
-  cd("$wdir/antic")
-  run(`git pull`)
-end          
+if !is_windows()
+  try
+    run(`git clone https://github.com/wbhart/antic.git`)
+  catch
+    cd(joinpath("$wdir", "antic"))
+    run(`git pull`)
+  end          
+end
 
 cd(wdir)
 
 # install FLINT
-try
-  run(`git clone https://github.com/wbhart/flint2.git`)
-catch
-  cd("$wdir/flint2")
-  run(`git pull`)
-end          
+if !is_windows()
+  try
+    run(`git clone https://github.com/wbhart/flint2.git`)
+  catch
+    cd(joinpath("$wdir", "flint2"))
+    run(`git pull`)
+  end          
+end
 
-if on_windows
+if is_windows()
    if Int == Int32
       download_dll("http://nemocas.org/binaries/w32-libflint.dll", joinpath(vdir, "lib", "libflint.dll"))
    else
@@ -140,9 +141,11 @@ if on_windows
    end
    try
       run(`ln -sf $vdir\\lib\\libflint.dll $vdir\\lib\\libflint-13.dll`)
+   catch
+      cp(joinpath(vdir, "lib", "libflint.dll"), joinpath(vdir, "lib", "libflint-13.dll"))
    end
 else
-   cd("$wdir/flint2")
+   cd(joinpath("$wdir", "flint2"))
    withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
       run(`./configure --prefix=$vdir --extensions="$wdir/antic" --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir`) 
       run(`make -j4`)
@@ -154,22 +157,24 @@ cd(wdir)
 
 # INSTALL ARB 
 
-try
-  run(`git clone https://github.com/fredrik-johansson/arb.git`)
-catch
-  cd("$wdir/arb")
-  run(`git pull`)
-  cd(wdir)
-end          
+if !is_windows()
+  try
+    run(`git clone https://github.com/fredrik-johansson/arb.git`)
+  catch
+    cd(joinpath("$wdir", "arb"))
+    run(`git pull`)
+    cd(wdir)
+  end          
+end
  
-if on_windows
+if is_windows()
    if Int == Int32
       download_dll("http://nemocas.org/binaries/w32-libarb.dll", joinpath(vdir, "lib", "libarb.dll"))
    else
       download_dll("http://nemocas.org/binaries/w64-libarb.dll", joinpath(vdir, "lib", "libarb.dll"))
    end
 else
-   cd("$wdir/arb")
+   cd(joinpath("$wdir", "arb"))
    withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
       run(`./configure --prefix=$vdir --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir --with-flint=$vdir`)
       run(`make -j4`)
@@ -189,16 +194,16 @@ if !ispath(Pkg.dir("Nemo", "local", "pari-2.7.4"))
    download("http://nemocas.org/binaries/pari-2.7.4.tar.gz", joinpath(wdir, "pari-2.7.4.tar.gz"))
 end
 
-if on_windows
+if is_windows()
    if Int == Int32
       download_dll("http://nemocas.org/binaries/w32-libpari.dll", joinpath(vdir, "lib", "libpari.dll"))
    else
       download_dll("http://nemocas.org/binaries/w64-libpari.dll", joinpath(vdir, "lib", "libpari.dll"))
    end
-elseif on_osx
+elseif is_apple()
    run(`tar -xvf pari-2.7.4.tar.gz`)
    run(`rm pari-2.7.4.tar.gz`)
-   cd("$wdir/pari-2.7.4")
+   cd(joinpath("$wdir", "pari-2.7.4"))
    run(`patch -p1 -i ../patch-alloc-2.7.4`)
    withenv("DYLD_LIBRARY_PATH"=>"$vdir/lib", "DLCFLAGS"=>DLCFLAGS) do
       run(`./Configure --prefix=$vdir --with-gmp=$vdir`)
@@ -208,7 +213,7 @@ elseif on_osx
 else
    run(`tar -xvf pari-2.7.4.tar.gz`)
    run(`rm pari-2.7.4.tar.gz`)
-   cd("$wdir/pari-2.7.4")
+   cd(joinpath("$wdir", "pari-2.7.4"))
    run(`patch -p1 -i ../patch-alloc-2.7.4`)
    withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "DLLDFLAGS"=>LDFLAGS) do
       run(`./Configure --prefix=$vdir --with-gmp=$vdir`)

@@ -116,6 +116,19 @@ function test_nmod_mat_constructors()
   println("PASS")
 end
 
+function test_nmod_mat_printing()
+  print("nmod_mat.printing...")
+  
+  Z2 = ResidueRing(ZZ, 2)
+  R = NmodMatSpace(Z2, 2, 2)
+
+  a = R(1)
+
+  @test string(a) == "[1 0]\n[0 1]"
+
+  println("PASS")
+end
+
 function test_nmod_mat_manipulation()
   print("nmod_mat.manipulation...")
   Z10 = ResidueRing(ZZ, 10)
@@ -672,6 +685,7 @@ end
 
 function test_nmod_mat()
   test_nmod_mat_constructors()
+  test_nmod_mat_printing()
   test_nmod_mat_manipulation()
   test_nmod_mat_unary_ops()
   test_nmod_mat_binary_ops()

@@ -67,7 +67,7 @@ modulus(a::fmpz_mod_poly) = a.parent.n
 
 modulus(R::FmpzModPolyRing) = R.n
 
-function deepcopy(a::fmpz_mod_poly)
+function deepcopy_internal(a::fmpz_mod_poly, dict::ObjectIdDict)
   z = fmpz_mod_poly(modulus(a), a)
   z.parent = a.parent
   return z
@@ -847,7 +847,7 @@ Base.promote_rule(::Type{fmpz_mod_poly}, ::Type{GenRes{fmpz}}) = fmpz_mod_poly
 #
 ###############################################################################
 
-function Base.call(f::fmpz_mod_poly, a::GenRes{fmpz})
+function (f::fmpz_mod_poly)(a::GenRes{fmpz})
    if parent(a) != base_ring(f)
       return subst(f, a)
    end
@@ -860,38 +860,38 @@ end
 #
 ################################################################################
 
-function Base.call(R::FmpzModPolyRing)
+function (R::FmpzModPolyRing)()
   z = fmpz_mod_poly(R.n)
   z.parent = R
   return z
 end
 
-function Base.call(R::FmpzModPolyRing, x::fmpz)
+function (R::FmpzModPolyRing)(x::fmpz)
   z = fmpz_mod_poly(R.n, x)
   z.parent = R
   return z
 end
 
-function Base.call(R::FmpzModPolyRing, x::Integer)
+function (R::FmpzModPolyRing)(x::Integer)
   z = fmpz_mod_poly(R.n, fmpz(x))
   z.parent = R
   return z
 end
 
-function Base.call(R::FmpzModPolyRing, x::GenRes{fmpz})
+function (R::FmpzModPolyRing)(x::GenRes{fmpz})
   base_ring(R) != parent(x) && error("Wrong parents")
   z = fmpz_mod_poly(R.n, x.data)
   z.parent = R
   return z
 end
 
-function Base.call(R::FmpzModPolyRing, arr::Array{fmpz, 1})
+function (R::FmpzModPolyRing)(arr::Array{fmpz, 1})
   z = fmpz_mod_poly(R.n, arr)
   z.parent = R
   return z
 end
 
-function Base.call(R::FmpzModPolyRing, arr::Array{GenRes{fmpz}, 1})
+function (R::FmpzModPolyRing)(arr::Array{GenRes{fmpz}, 1})
   if length(arr) > 0
      (base_ring(R) != parent(arr[1])) && error("Wrong parents")
   end
@@ -900,13 +900,13 @@ function Base.call(R::FmpzModPolyRing, arr::Array{GenRes{fmpz}, 1})
   return z
 end
 
-function Base.call(R::FmpzModPolyRing, x::fmpz_poly)
+function (R::FmpzModPolyRing)(x::fmpz_poly)
   z = fmpz_mod_poly(R.n, x)
   z.parent = R
   return z
 end
 
-function Base.call(R::FmpzModPolyRing, f::fmpz_mod_poly)
+function (R::FmpzModPolyRing)(f::fmpz_mod_poly)
    parent(f) != R && error("Unable to coerce polynomial")
    return f
 end

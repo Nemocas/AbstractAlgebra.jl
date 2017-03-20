@@ -1,3 +1,17 @@
+function test_nf_accessor_functions()
+   print("nf_elem.accessors...")
+   t = create_accessors(AnticNumberField, fmpz, get_handle())
+   get_test = t[1]
+   set_test = t[2]
+
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+
+   set_test(K, fmpz(2))
+   @test 2 == get_test(K)
+   println("PASS")
+end
+
 function test_nf_elem_constructors()
    print("nf_elem.constructors...")
  
@@ -29,6 +43,18 @@ function test_nf_elem_constructors()
    g = K(x^2 + 2x - 7)
 
    @test isa(g, nf_elem)
+
+   println("PASS")
+end
+
+function test_nf_elem_printing()
+   print("nf_elem.constructors...")
+ 
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   g = K(x^2 + 2x - 7)
+
+   @test string(g) == "a^2 + 2*a - 7"
 
    println("PASS")
 end
@@ -300,7 +326,9 @@ function test_nf_elem_Polynomials()
 end
 
 function test_nf_elem()
+   test_nf_accessor_functions()
    test_nf_elem_constructors()
+   test_nf_elem_printing()
    test_nf_elem_fmpz_mat_conversions()
    test_nf_elem_fmpq_poly_conversion()
    test_nf_elem_denominator()

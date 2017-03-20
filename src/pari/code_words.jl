@@ -135,12 +135,12 @@ debug(a::Ptr{Int}) = ccall((:dbgGEN, :libpari), Void, (Ptr{Int}, Int), a, -1)
 
 function pari_print(a::Ptr{Int})
    cstr = ccall((:GENtostr, :libpari), Ptr{UInt8}, (Ptr{Int},), a)
-   print(bytestring(cstr))
+   print(unsafe_string(cstr))
    ccall((:pari_free, :libpari), Void, (Ptr{UInt8},), cstr)
 end
    
 function pari_print(io::IO, a::Ptr{Int})
    cstr = ccall((:GENtostr, :libpari), Ptr{UInt8}, (Ptr{Int},), a)
-   print(io, bytestring(cstr))
+   print(io, unsafe_string(cstr))
    ccall((:pari_free, :libpari), Void, (Ptr{UInt8},), cstr)
 end

@@ -159,7 +159,7 @@ doc"""
 """
 isunit(a::PolyElem) = length(a) == 1 && isunit(coeff(a, 0))
 
-function deepcopy{T <: RingElem}(a::GenPoly{T})
+function deepcopy_internal{T <: RingElem}(a::GenPoly{T}, dict::ObjectIdDict)
    coeffs = Array(T, length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy(a.coeffs[i])
@@ -2132,35 +2132,35 @@ end
 #
 ###############################################################################
 
-function Base.call{T <: RingElem}(a::GenPolyRing{T}, b::RingElem)
+function (a::GenPolyRing{T}){T <: RingElem}(b::RingElem)
    return a(base_ring(a)(b))
 end
 
-function Base.call{T <: RingElem}(a::GenPolyRing{T})
+function (a::GenPolyRing{T}){T <: RingElem}()
    z = GenPoly{T}()
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenPolyRing{T}, b::Integer)
+function (a::GenPolyRing{T}){T <: RingElem}(b::Integer)
    z = GenPoly{T}(base_ring(a)(b))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenPolyRing{T}, b::T)
+function (a::GenPolyRing{T}){T <: RingElem}(b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
    z = GenPoly{T}(b)
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenPolyRing{T}, b::PolyElem{T})
+function (a::GenPolyRing{T}){T <: RingElem}(b::PolyElem{T})
    parent(b) != a && error("Unable to coerce polynomial")
    return b
 end
 
-function Base.call{T <: RingElem}(a::GenPolyRing{T}, b::Array{T, 1})
+function (a::GenPolyRing{T}){T <: RingElem}(b::Array{T, 1})
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end
@@ -2193,6 +2193,6 @@ function PolynomialRing(R::Ring, s::AbstractString{}; cached::Bool = true)
 end
 
 # S, x = R["x"] syntax
-getindex(R::Ring, s::ASCIIString) = PolynomialRing(R, s)
+getindex(R::Ring, s::String) = PolynomialRing(R, s)
 
-getindex{T}(R::Tuple{Ring,T}, s::ASCIIString) = PolynomialRing(R[1], s)
+getindex{T}(R::Tuple{Ring,T}, s::String) = PolynomialRing(R[1], s)

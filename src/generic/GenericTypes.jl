@@ -188,14 +188,54 @@ type GenRelSeriesRing{T <: RingElem} <: SeriesRing{T}
    end
 end
 
-type GenRelSeries{T <: RingElem} <: SeriesElem{T}
+type GenRelSeries{T <: RingElem} <: RelSeriesElem{T}
    coeffs::Array{T, 1}
    length::Int
    prec::Int
+   val::Int
    parent::GenRelSeriesRing{T}
 
-   GenRelSeries(a::Array{T, 1}, length::Int, prec::Int) = new(a, length, prec)   
+   function GenRelSeries(a::Array{T, 1}, length::Int, prec::Int, val::Int)
+      new(a, length, prec, val)
+   end
+
    GenRelSeries(a::GenRelSeries{T}) = a
+end
+
+###############################################################################
+#
+#   GenAbsSeriesRing / GenAbsSeries
+#
+###############################################################################
+
+const GenAbsSeriesID = ObjectIdDict()
+
+type GenAbsSeriesRing{T <: RingElem} <: SeriesRing{T}
+   base_ring::Ring
+   prec_max::Int
+   S::Symbol
+
+   function GenAbsSeriesRing(R::Ring, prec::Int, s::Symbol, cached=true)
+      if haskey(GenAbsSeriesID, (R, prec, s))
+         return GenAbsSeriesID[R, prec, s]::GenAbsSeriesRing{T}
+      else
+         z = new{T}(R, prec, s)
+         if cached
+            GenAbsSeriesID[R, prec, s] = z
+         end
+         return z
+      end
+   end
+end
+
+type GenAbsSeries{T <: RingElem} <: AbsSeriesElem{T}
+   coeffs::Array{T, 1}
+   length::Int
+   prec::Int
+   parent::GenAbsSeriesRing{T}
+
+   GenAbsSeries(a::Array{T, 1}, length::Int, prec::Int) = new(a, length, prec)   
+   GenAbsSeries(a::GenAbsSeries{T}) = a
 end
 
 ###############################################################################

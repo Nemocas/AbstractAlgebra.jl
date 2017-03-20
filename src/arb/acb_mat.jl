@@ -68,7 +68,7 @@ rows(a::acb_mat) = a.r
 
 cols(a::acb_mat) = a.c
 
-function deepcopy(x::acb_mat)
+function deepcopy_internal(x::acb_mat, dict::ObjectIdDict)
   z = parent(x)()
   ccall((:acb_mat_set, :libarb), Void, (Ptr{acb_mat}, Ptr{acb_mat}), &z, &x)
   return z
@@ -601,13 +601,13 @@ end
 #
 ###############################################################################
 
-function call(x::AcbMatSpace)
+function (x::AcbMatSpace)()
   z = acb_mat(x.rows, x.cols)
   z.parent = x
   return z
 end
 
-function call(x::AcbMatSpace, y::fmpz_mat)
+function (x::AcbMatSpace)(y::fmpz_mat)
   (x.cols != cols(y) || x.rows != rows(y)) &&
       error("Dimensions are wrong")
   z = acb_mat(y, prec(x))
@@ -615,7 +615,7 @@ function call(x::AcbMatSpace, y::fmpz_mat)
   return z
 end
 
-function call(x::AcbMatSpace, y::arb_mat)
+function (x::AcbMatSpace)(y::arb_mat)
   (x.cols != cols(y) || x.rows != rows(y)) &&
       error("Dimensions are wrong")
   z = acb_mat(y, prec(x))
@@ -624,35 +624,34 @@ function call(x::AcbMatSpace, y::arb_mat)
 end
 
 
-function call{T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb, acb,
-                         AbstractString}}(x::AcbMatSpace, y::Array{T, 2})
+function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb, acb,
+                         AbstractString}}(y::Array{T, 2})
   (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
   z = acb_mat(x.rows, x.cols, y, prec(x))
   z.parent = x
   return z
 end
 
-call{T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb, acb,
-                AbstractString}}(x::AcbMatSpace, y::Array{T, 1}) = x(y'')
+(x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb, acb,
+                AbstractString}}(y::Array{T, 1}) = x(y'')
 
 
-function call{T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb,
-                         AbstractString}}(x::AcbMatSpace,
-                                          y::Array{Tuple{T, T}, 2})
+function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb,
+                         AbstractString}}(y::Array{Tuple{T, T}, 2})
   (x.rows, x.cols) != size(y) && error("Dimensions are wrong")
   z = acb_mat(x.rows, x.cols, y, prec(x))
   z.parent = x
   return z
 end
 
-call{T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, AbstractString,
-                arb}}(x::AcbMatSpace, y::Array{Tuple{T, T}, 1}) = x(y'')
+(x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, AbstractString,
+                arb}}(y::Array{Tuple{T, T}, 1}) = x(y'')
 
 
-call{T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, acb,
-                AbstractString}}(x::ArbMatSpace, y::Array{T, 1}) = x(y'')
+(x::ArbMatSpace){T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, acb,
+                AbstractString}}(y::Array{T, 1}) = x(y'')
 
-function call(x::AcbMatSpace, y::Union{Int, UInt, fmpz, fmpq, Float64,
+function (x::AcbMatSpace)(y::Union{Int, UInt, fmpz, fmpq, Float64,
                           BigFloat, arb, acb, AbstractString})
   z = x()
   for i in 1:rows(z)
@@ -667,7 +666,7 @@ function call(x::AcbMatSpace, y::Union{Int, UInt, fmpz, fmpq, Float64,
    return z
 end
 
-call(x::AcbMatSpace, y::acb_mat) = y
+(x::AcbMatSpace)(y::acb_mat) = y
 
 ###############################################################################
 #

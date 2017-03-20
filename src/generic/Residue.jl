@@ -113,7 +113,8 @@ function isunit(a::ResElem)
    return g == 1
 end
 
-deepcopy(a::ResElem) = parent(a)(deepcopy(data(a)))
+deepcopy_internal(a::ResElem, dict::ObjectIdDict) =
+   parent(a)(deepcopy(data(a)))
 
 ###############################################################################
 #
@@ -523,36 +524,36 @@ end
 #
 ###############################################################################
 
-function Base.call{T <: RingElem}(a::GenResRing{T}, b::RingElem)
+function (a::GenResRing{T}){T <: RingElem}(b::RingElem)
    return a(base_ring(a)(b))
 end
 
-function Base.call{T <: RingElem}(a::GenResRing{T})
+function (a::GenResRing{T}){T <: RingElem}()
    z = GenRes{T}(zero(base_ring(a)))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenResRing{T}, b::Integer)
+function (a::GenResRing{T}){T <: RingElem}(b::Integer)
    z = GenRes{T}(mod(base_ring(a)(b), modulus(a)))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenResRing{T}, b::fmpz)
+function (a::GenResRing{T}){T <: RingElem}(b::fmpz)
    z = GenRes{T}(mod(base_ring(a)(b), modulus(a)))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenResRing{T}, b::T)
+function (a::GenResRing{T}){T <: RingElem}(b::T)
    base_ring(a) != parent(b) && error("Operation on incompatible objects")
    z = GenRes{T}(mod(b, modulus(a)))
    z.parent = a
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenResRing{T}, b::ResElem{T})
+function (a::GenResRing{T}){T <: RingElem}(b::ResElem{T})
    a != parent(b) && error("Operation on incompatible objects")
    return b
 end

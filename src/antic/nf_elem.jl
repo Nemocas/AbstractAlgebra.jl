@@ -200,7 +200,7 @@ doc"""
 """
 signature(a::AnticNumberField) = signature(a.pol)
 
-function deepcopy(d::nf_elem)
+function deepcopy_internal(d::nf_elem, dict::ObjectIdDict)
    z = nf_elem(parent(d), d)
    return z
 end
@@ -219,9 +219,9 @@ end
 function show(io::IO, x::nf_elem)
    cstr = ccall((:nf_elem_get_str_pretty, :libflint), Ptr{UInt8},
                 (Ptr{nf_elem}, Ptr{UInt8}, Ptr{AnticNumberField}),
-                 &x, bytestring(string(var(parent(x)))), &parent(x))
+                 &x, string(var(parent(x))), &parent(x))
 
-   print(io, bytestring(cstr))
+   print(io, unsafe_string(cstr))
 
    ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
 end
@@ -843,42 +843,42 @@ Base.promote_rule(::Type{nf_elem}, ::Type{fmpq_poly}) = nf_elem
 #
 ###############################################################################
 
-function Base.call(a::AnticNumberField)
+function (a::AnticNumberField)()
    z = nf_elem(a)
    ccall((:nf_elem_set_si, :libflint), Void,
          (Ptr{nf_elem}, Int, Ptr{AnticNumberField}), &z, 0, &a)
    return z
 end
 
-function Base.call(a::AnticNumberField, c::Int)
+function (a::AnticNumberField)(c::Int)
    z = nf_elem(a)
    ccall((:nf_elem_set_si, :libflint), Void,
          (Ptr{nf_elem}, Int, Ptr{AnticNumberField}), &z, c, &a)
    return z
 end
 
-Base.call(a::AnticNumberField, c::Integer) = a(fmpz(c))
+(a::AnticNumberField)(c::Integer) = a(fmpz(c))
 
-function Base.call(a::AnticNumberField, c::fmpz)
+function (a::AnticNumberField)(c::fmpz)
    z = nf_elem(a)
    ccall((:nf_elem_set_fmpz, :libflint), Void,
          (Ptr{nf_elem}, Ptr{fmpz}, Ptr{AnticNumberField}), &z, &c, &a)
    return z
 end
 
-function Base.call(a::AnticNumberField, c::fmpq)
+function (a::AnticNumberField)(c::fmpq)
    z = nf_elem(a)
    ccall((:nf_elem_set_fmpq, :libflint), Void,
          (Ptr{nf_elem}, Ptr{fmpq}, Ptr{AnticNumberField}), &z, &c, &a)
    return z
 end
 
-function Base.call(a::AnticNumberField, b::nf_elem)
+function (a::AnticNumberField)(b::nf_elem)
    parent(b) != a && error("Cannot coerce number field element")
    return b
 end
 
-function Base.call(a::AnticNumberField, pol::fmpq_poly)
+function (a::AnticNumberField)(pol::fmpq_poly)
    pol = parent(a.pol)(pol) # check pol has correct parent
    z = nf_elem(a)
    if length(pol) >= length(a.pol)
@@ -889,7 +889,7 @@ function Base.call(a::AnticNumberField, pol::fmpq_poly)
    return z
 end
 
-function Base.call(a::FmpqPolyRing, b::nf_elem)
+function (a::FmpqPolyRing)(b::nf_elem)
    parent(parent(b).pol) != a && error("Cannot coerce from number field to polynomial ring")
    r = a()
    ccall((:nf_elem_get_fmpq_poly, :libflint), Void,

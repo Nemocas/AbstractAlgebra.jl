@@ -92,7 +92,7 @@ function fmpz!(z::fmpz, g::Ptr{Int})
    return z
 end
 
-function call(::FlintIntegerRing, g::pari_int)
+function (::FlintIntegerRing)(g::pari_int)
    z = fmpz()
    fmpz!(z, g.d)
    return z
@@ -118,7 +118,7 @@ end
 #
 ###############################################################################
 
-function Base.call(ord::PariIntegerRing, n::Ptr{Int})
+function (ord::PariIntegerRing)(n::Ptr{Int})
    return fmpz!(fmpz(), n)
 end
 

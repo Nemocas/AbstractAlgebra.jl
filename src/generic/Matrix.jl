@@ -133,7 +133,7 @@ function isone(a::MatElem)
   return true
 end
 
-function deepcopy{T <: RingElem}(d::MatElem{T})
+function deepcopy_internal{T <: RingElem}(d::MatElem{T}, dict::ObjectIdDict)
    entries = Array(T, rows(d), cols(d))
    for i = 1:rows(d)
       for j = 1:cols(d)
@@ -785,7 +785,7 @@ function transpose(x::MatElem)
    else
       par = MatrixSpace(base_ring(x), cols(x), rows(x))
    end
-   return par(x.entries')
+   return par(permutedims(x.entries, [2, 1]))
 end
 
 ###############################################################################
@@ -1824,7 +1824,7 @@ function solve_ff{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
    return x, d
 end
 
-function solve_interpolation{T <: RingElem}(M::MatElem{PolyElem{T}}, b::MatElem{PolyElem{T}})
+function solve_interpolation{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
    m = rows(M)
    h = cols(b)
    if m == 0
@@ -1889,14 +1889,18 @@ doc"""
 > denominator will be the determinant of $A$ up to sign. If $A$ is singular an
 > exception is raised.
 """
-function solve{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
+function solve{T}(M::MatElem{T}, b::MatElem{T})
+   return solve_ringelem(M, b)
+end
+
+function solve_ringelem{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
    rows(M) != cols(M) && error("Non-square matrix in solve")
    rows(M) != rows(b) && error("Dimensions don't match in solve")
    return solve_ff(M, b)
 end
 
-function solve{T <: RingElem}(M::MatElem{PolyElem{T}}, b::MatElem{PolyElem{T}})
+function solve{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
    rows(M) != cols(M) && error("Non-square matrix in solve")
    rows(M) != rows(b) && error("Dimensions don't match in solve")
@@ -2830,11 +2834,25 @@ end
 #
 ###############################################################################
 
-function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::RingElem)
+function (a::GenMatSpace{T}){T <: RingElem}(b::fmpz_mat)
+  if a.rows != rows(b) || a.cols != cols(b)
+    error("incompatible matrix dimensions")
+  end
+  A = a()
+  R = base_ring(a)
+  for i=1:a.rows
+    for j=1:a.cols
+      A[i,j] = R(b[i,j])
+    end
+  end
+  return A
+end
+
+function (a::GenMatSpace{T}){T <: RingElem}(b::RingElem)
    return a(base_ring(a)(b))
 end
 
-function Base.call{T <: RingElem}(a::GenMatSpace{T})
+function (a::GenMatSpace{T}){T <: RingElem}()
    entries = Array(T, a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
@@ -2846,7 +2864,7 @@ function Base.call{T <: RingElem}(a::GenMatSpace{T})
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::Integer)
+function (a::GenMatSpace{T}){T <: RingElem}(b::Integer)
    entries = Array(T, a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
@@ -2862,7 +2880,7 @@ function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::Integer)
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::fmpz)
+function (a::GenMatSpace{T}){T <: RingElem}(b::fmpz)
    entries = Array(T, a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
@@ -2878,7 +2896,7 @@ function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::fmpz)
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::T)
+function (a::GenMatSpace{T}){T <: RingElem}(b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to matrix")
    entries = Array(T, a.rows, a.cols)
    for i = 1:a.rows
@@ -2895,12 +2913,12 @@ function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::T)
    return z
 end
 
-function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::GenMat{T})
+function (a::GenMatSpace{T}){T <: RingElem}(b::GenMat{T})
    parent(b) != a && error("Unable to coerce matrix")
    return b
 end
 
-function Base.call{T <: RingElem}(a::GenMatSpace{T}, b::Array{T, 2})
+function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 2})
    if length(b) > 0
       parent(b[1, 1]) != base_ring(a) && error("Unable to coerce to matrix")
    end

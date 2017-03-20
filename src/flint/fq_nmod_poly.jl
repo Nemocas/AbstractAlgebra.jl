@@ -69,7 +69,7 @@ isgen(x::fq_nmod_poly) = ccall((:fq_nmod_poly_is_gen, :libflint), Bool,
 
 degree(f::fq_nmod_poly) = f.length - 1
 
-function deepcopy(a::fq_nmod_poly)
+function deepcopy_internal(a::fq_nmod_poly, dict::ObjectIdDict)
    z = fq_nmod_poly(a)
    z.parent = a.parent
    return z
@@ -95,9 +95,9 @@ function show(io::IO, x::fq_nmod_poly)
    else
       cstr = ccall((:fq_nmod_poly_get_str_pretty, :libflint), Ptr{UInt8}, 
                   (Ptr{fq_nmod_poly}, Ptr{UInt8}, Ptr{FqNmodFiniteField}),
-                  &x, bytestring(string(var(parent(x)))),
+                  &x, string(var(parent(x))),
                   &((x.parent).base_ring))
-      print(io, bytestring(cstr))
+      print(io, unsafe_string(cstr))
       ccall((:flint_free, :libflint), Void, (Ptr{UInt8},), cstr)
    end
 end
@@ -622,7 +622,7 @@ Base.promote_rule(::Type{fq_nmod_poly}, ::Type{fq_nmod}) = fq_nmod_poly
 #
 ###############################################################################
 
-function Base.call(f::fq_nmod_poly, a::fq_nmod)
+function (f::fq_nmod_poly)(a::fq_nmod)
    if parent(a) != base_ring(f)
       return subst(f, a)
    end
@@ -635,27 +635,27 @@ end
 #
 ################################################################################
 
-function Base.call(R::FqNmodPolyRing)
+function (R::FqNmodPolyRing)()
    z = fq_nmod_poly()
    z.parent = R
    return z
 end
 
-function Base.call(R::FqNmodPolyRing, x::fq_nmod)
+function (R::FqNmodPolyRing)(x::fq_nmod)
   z = fq_nmod_poly(x)
   z.parent = R
   return z
 end
 
-function Base.call(R::FqNmodPolyRing, x::fmpz)
+function (R::FqNmodPolyRing)(x::fmpz)
    return R(base_ring(R)(x))
 end
 
-function Base.call(R::FqNmodPolyRing, x::Integer)
+function (R::FqNmodPolyRing)(x::Integer)
    return R(fmpz(x))
 end
 
-function Base.call(R::FqNmodPolyRing, x::Array{fq_nmod, 1})
+function (R::FqNmodPolyRing)(x::Array{fq_nmod, 1})
    length(x) == 0 && error("Array must be non-empty")
    base_ring(R) != parent(x[1]) && error("Coefficient rings must coincide")
    z = fq_nmod_poly(x)
@@ -663,25 +663,25 @@ function Base.call(R::FqNmodPolyRing, x::Array{fq_nmod, 1})
    return z
 end
 
-function Base.call(R::FqNmodPolyRing, x::Array{fmpz, 1})
+function (R::FqNmodPolyRing)(x::Array{fmpz, 1})
    length(x) == 0 && error("Array must be non-empty")
    z = fq_nmod_poly(x, base_ring(R))
    z.parent = R
    return z
 end
 
-function Base.call{T <: Integer}(R::FqNmodPolyRing, x::Array{T, 1})
+function (R::FqNmodPolyRing){T <: Integer}(x::Array{T, 1})
    length(x) == 0 && error("Array must be non-empty")
    return R(map(fmpz, x))
 end
 
-function Base.call(R::FqNmodPolyRing, x::fmpz_poly)
+function (R::FqNmodPolyRing)(x::fmpz_poly)
    z = fq_nmod_poly(x, base_ring(R))
    z.parent = R
    return z
 end
 
-function Base.call(R::FqNmodPolyRing, x::fq_nmod_poly)
+function (R::FqNmodPolyRing)(x::fq_nmod_poly)
   parent(x) != R && error("Unable to coerce to polynomial")
   return x
 end

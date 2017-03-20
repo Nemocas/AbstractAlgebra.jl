@@ -405,7 +405,7 @@ end
 #
 ###############################################################################
 
-function Base.call(ord::PariIdealSet, id::Ptr{Int})
+function (ord::PariIdealSet)(id::Ptr{Int})
    return PariIdeal(id, PariIdealSet(ord))
 end
 

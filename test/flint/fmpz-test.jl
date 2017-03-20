@@ -35,6 +35,16 @@ function test_fmpz_constructors()
    println("PASS")
 end
 
+function test_fmpz_printing()
+   print("fmpz.printing...")
+
+   a = fmpz(-123)
+
+   @test string(a) == "-123"
+
+   println("PASS")
+end
+
 function test_fmpz_convert()
    print("fmpz.convert...")
 
@@ -498,7 +508,7 @@ function test_fmpz_number_theoretic()
 
    @test jacobi(fmpz(2), fmpz(5)) == -1
 
-   if !on_windows64
+   if !is_windows64()
 
       @test numpart(10) == 42
 
@@ -512,6 +522,7 @@ end
 function test_fmpz()
    test_fmpz_abstract_types()
    test_fmpz_constructors()
+   test_fmpz_printing()
    test_fmpz_convert()
    test_fmpz_manipulation()
    test_fmpz_binary_ops()

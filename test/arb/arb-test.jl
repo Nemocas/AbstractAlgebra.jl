@@ -12,6 +12,16 @@ function test_arb_constructors()
    println("PASS")
 end
 
+function test_arb_printing()
+   print("arb.printing()...")
+
+   a = RR(2)
+
+   @test string(a) == "2.0000000000000000000"
+
+   println("PASS")
+end
+
 function test_arb_basic_ops()
    print("arb.basic_ops()...")
 
@@ -501,6 +511,12 @@ function test_arb_functions()
    @test overlaps(bell(ZZ(100), RR), RR("4.758539127676483365879077e+115 +/- 1.16e+90"))
    @test overlaps(bell(100, RR), RR("4.758539127676483365879077e+115 +/- 1.16e+90"))
 
+   @test numpart(ZZ(10), RR) == 42
+   @test numpart(10, RR) == 42
+   @test numpart(ZZ(-10), RR) == 0
+   @test numpart(-10, RR) == 0
+   @test overlaps(numpart(ZZ(10)^20, RR), RR("1.8381765083448826436e+11140086259 +/- 4.69e+11140086239"))
+
    println("PASS")
 end
 
@@ -524,6 +540,7 @@ end
 
 function test_arb()
    test_arb_constructors()
+   test_arb_printing()
    test_arb_basic_ops()
    test_arb_comparison()
    test_arb_adhoc_comparison()

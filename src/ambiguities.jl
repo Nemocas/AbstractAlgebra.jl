@@ -59,6 +59,38 @@ evaluate(::PolyElem{fmpz}, ::fmpz) = nothing
 
 ==(::SeriesElem{fmpz}, ::fmpz) = nothing
 
+*(::fmpz, ::RelSeriesElem{fmpz}) = nothing
+
+*(::RelSeriesElem{fmpz}, ::fmpz) = nothing
+
++(::fmpz, ::RelSeriesElem{fmpz}) = nothing
+
++(::RelSeriesElem{fmpz}, ::fmpz) = nothing
+
+-(::fmpz, ::RelSeriesElem{fmpz}) = nothing
+
+-(::RelSeriesElem{fmpz}, ::fmpz) = nothing
+
+==(::fmpz, ::RelSeriesElem{fmpz}) = nothing
+
+==(::RelSeriesElem{fmpz}, ::fmpz) = nothing
+
+*(::fmpz, ::AbsSeriesElem{fmpz}) = nothing
+
+*(::AbsSeriesElem{fmpz}, ::fmpz) = nothing
+
++(::fmpz, ::AbsSeriesElem{fmpz}) = nothing
+
++(::AbsSeriesElem{fmpz}, ::fmpz) = nothing
+
+-(::fmpz, ::AbsSeriesElem{fmpz}) = nothing
+
+-(::AbsSeriesElem{fmpz}, ::fmpz) = nothing
+
+==(::fmpz, ::AbsSeriesElem{fmpz}) = nothing
+
+==(::AbsSeriesElem{fmpz}, ::fmpz) = nothing
+
 *(::fmpz, ::MatElem{fmpz}) = nothing
 
 *(::MatElem{fmpz}, ::fmpz) = nothing

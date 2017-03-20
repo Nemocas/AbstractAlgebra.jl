@@ -797,6 +797,10 @@ hyperu(::acb, ::acb, ::acb)
 ```
 
 ```@docs
+hyp2f1(::acb, ::acb, ::acb, ::acb)
+```
+
+```@docs
 jtheta(::acb, ::acb)
 ```
 
