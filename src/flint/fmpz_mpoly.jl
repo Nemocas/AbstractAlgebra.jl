@@ -162,6 +162,14 @@ function *{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N})
    return z
 end
 
+function mul_array{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N})
+   z = parent(a)()
+   ccall((:fmpz_mpoly_mul_array, :libflint), Void, 
+       (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing}),
+       &z, &a, &b, &a.parent)
+   return z
+end
+
 ###############################################################################
 #
 #   Ad hoc arithmetic
@@ -280,6 +288,46 @@ end
 ==(a::fmpz_mpoly, b::Integer) = a == fmpz(b)
 
 ==(a::Integer, b::fmpz_mpoly) = b == a
+
+###############################################################################
+#
+#   Ad hoc exact division
+#
+###############################################################################
+
+function divides_array{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N})
+   z = parent(a)()
+   d = ccall((:fmpz_mpoly_divides_array, :libflint), Cint, 
+       (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing}),
+       &z, &a, &b, &a.parent)
+   d == -1 && error("Polynomial too large for divides_array")
+   return d == 1, z
+end
+
+function divides_monagan_pearce{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N})
+   z = parent(a)()
+   d = Bool(ccall((:fmpz_mpoly_divides_monagan_pearce, :libflint), Cint, 
+       (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing}),
+       &z, &a, &b, &a.parent))
+   return d, z
+end
+
+###############################################################################
+#
+#   Division with remainder
+#
+###############################################################################
+
+function divrem_monagan_pearce{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N})
+   q = parent(a)()
+   r = parent(a)()
+   ccall((:fmpz_mpoly_divrem_monagan_pearce, :libflint), Cint, 
+       (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly},
+        Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing}),
+       &q, &r, &a, &b, &a.parent)
+   return q, r
+end
+
 
 ###############################################################################
 #
