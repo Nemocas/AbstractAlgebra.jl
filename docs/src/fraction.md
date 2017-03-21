@@ -406,8 +406,8 @@ In case the base ring supports the functions `remove` and `valuation`,
 the same is true for fractions.
 
 ```@docs
-remove{T <: RingElem}(::RingElem{T}, T)
-valuation{T <: RingElem}(::RingElem{T}, T)
+remove{T <: RingElem}(::T, ::T)
+valuation{T <: RingElem}(::T, ::T)
 ```
 
 Here is an example:
