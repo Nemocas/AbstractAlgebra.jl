@@ -2979,12 +2979,12 @@ end
 (a::GenMatSpace){T <: Integer}(b::Array{T, 1}) = a(map(base_ring(a), b))
 
 function Base.Matrix{T}(R::Ring, r::Int, c::Int, a::Array{T,2})
-   M = MatrixSpace(R, r, c; cached = false)
+   M = MatrixSpace(R, r, c)
    return M(a)
 end
 
 function Base.Matrix{T}(R::Ring, r::Int, c::Int, a::Array{T,1})
-   M = MatrixSpace(R, r, c; cached =  false)
+   M = MatrixSpace(R, r, c)
    return M(a)
 end
 
