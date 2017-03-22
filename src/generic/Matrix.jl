@@ -7,7 +7,8 @@
 export MatricSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
        ishessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
-       powers, similarity!, solve, solve_rational
+       powers, similarity!, solve, solve_rational, hnf, hnf_with_trafo, snf,
+       snf_with_trafo
 
 ###############################################################################
 #
@@ -2723,6 +2724,237 @@ function minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
       first_poly = false
    end
    return divexact(p, canonical_unit(p))
+end
+
+###############################################################################
+#
+#   Hermite Normal Form
+#
+###############################################################################
+
+function add_scaled_rows!{T <: RingElem}(A::MatElem{T}, i::Int, j::Int, x::T, y::T)
+   (1<=i<=rows(A) && 1<=j<=rows(A)) || throw(BoundsError())
+   for k=1:cols(A)
+      A[i,k] = x*A[i,k] + y*A[j,k]
+   end
+end
+
+function hnf_cohen{T <: RingElem}(A::MatElem{T})
+   H = deepcopy(A)
+   m = rows(H)
+   n = cols(H)
+   U = one(MatrixSpace(base_ring(parent(A)), m, m))
+   l = min(m, n)
+   k = 1
+   for i = 1:l
+      for j = k+1:m
+         if H[j,i] == 0
+            continue
+         end
+         d, u, v = gcdx(H[k,i], H[j,i])
+         a = divexact(H[k,i], d)
+         b = divexact(H[j,i], d)
+         for c = i:n
+            h = H[j,c]
+            H[j,c] = a*H[j,c] - b*H[k,c]
+            H[k,c] = u*H[k,c] + v*h
+         end
+         for c = 1:m
+            w = U[j,c]
+            U[j,c] = a*U[j,c] - b*U[k,c]
+            U[k,c] = u*U[k,c] + v*w
+         end
+      end
+     # if H[k,i] < 0
+     #    for c = i:n
+     #       H[k,c] = -H[k,c]
+     #    end
+     #    for c = 1:m
+     #       U[k,c] = -U[k,c]
+     #    end
+     # end 
+      if H[k,i] == 0
+         continue
+      end
+      for j = 1:k-1
+         q = div(H[j,i], H[k, i])
+         for c = i:n
+            H[j,c] = H[j,c] - q*H[k,c]
+         end
+         for c = 1:m
+            U[j,c] = U[j,c] - q*U[k,c]
+         end
+      end
+      k += 1
+   end
+   return H, U
+end
+
+function kb_reduced_gcdx{T <: RingElem}(a::T, b::T)
+   d, u, v = gcdx(a,b)
+   if a == 0 || b == 0
+      return d, u, v
+   end
+   # "a<b"
+   if div(a,b) == 0
+      if v != 0 && div(a,v) != 0
+         v = v + div(u, b)*a
+         u = u - div(u, b)*b
+      end
+   else
+      if u != 0 && div(b,u) != 0
+         u = u + div(v, a)*b
+         v = v - div(v, a)*a
+      end
+   end
+   return d, u, v
+end
+
+function kb_reduce_off_diagonal!{T <: RingElem}(A::MatElem{T}, U::MatElem{T}, k::Int)
+  # if A[k,k] < 0
+  #    for c=1:cols(A)
+  #       A[k,c] = -A[k,c]
+  #       U[k,c] = -U[k,c]
+  #    end
+  # end
+   for r = 1:k-1
+      q  = div(A[r,k],A[k,k])
+      for c = 1:cols(A)
+         A[r,c] = A[r,c] - q*A[k,c]
+         U[r,c] = U[r,c] - q*U[k,c]
+      end
+   end
+end
+
+function hnf_kb{T <: RingElem}(A::MatElem{T})
+   #_check_issquare(A)
+   cols(A) == rows(A) || error("Expected square matrix, but matrix is $(cols(A)) x $(rows(A)).")
+   H = deepcopy(A)
+   m = rows(H)
+   U = one(MatrixSpace(base_ring(parent(A)), m, m))
+   for i = 1:m-1
+      for j = 1:i
+         d, u, v = kb_reduced_gcdx(H[j,j], H[i+1,j])
+         a = divexact(H[j,j], d)
+         b = divexact(H[i+1,j], d)
+         for c = 1:m
+            h = H[i+1,c]
+            H[i+1,c] = a*H[i+1,c] - b*H[j,c]
+            H[j,c] = u*H[j,c] + v*h
+         end
+         for c = 1:m
+            w = U[i+1,c]
+            U[i+1,c] = a*U[i+1,c] - b*U[j,c]
+            U[j,c] = u*U[j,c] + v*w
+         end
+         if j > 1
+            kb_reduce_off_diagonal!(H, U, j)
+         end
+      end
+      kb_reduce_off_diagonal!(H, U, i+1)
+   end
+   return H, U
+end
+
+###############################################################################
+#
+#   Smith Normal Form
+#
+###############################################################################
+
+function kb_clear_column!{T <: RingElem}(A::MatElem{T}, U::MatElem{T}, i::Int)
+   n = rows(A)
+   for j = i+1:n
+      d, u, v = kb_reduced_gcdx(A[i,i], A[j,i])
+      a = divexact(A[i,i], d)
+      b = divexact(A[j,i], d)
+      for c = i:n
+         h = A[j,c]
+         A[j,c] = a*A[j,c] - b*A[i,c]
+         A[i,c] = u*A[i,c] + v*h
+      end
+      for c = 1:n
+         w = U[j,c]
+         U[j,c] = a*U[j,c] - b*U[i,c]
+         U[i,c] = u*U[i,c] + v*w
+      end
+   end
+end
+
+function kb_reduce_off_diagonal_ri_bot_col!{T <: RingElem}(A::MatElem{T}, K::MatElem{T}, k::Int, j::Int)
+   n = cols(A)
+   for c = n-k+1:j-1
+      q = div(A[j,c],A[j,j])
+      for r = 1:rows(A)
+         A[r,c] = A[r,c] - q*A[r,j]
+         K[r,c] = K[r,c] - q*K[r,j]
+      end
+   end
+end
+
+function kb_ri_bot_col_hnf!{T <: RingElem}(A::MatElem{T}, K::MatElem{T}, k::Int)
+   n = rows(A)
+   for i = n-k+1:n-1
+      for j = n-k+1:i
+         d, u, v = kb_reduced_gcdx(A[j,j], A[j,i+1])
+         a = divexact(A[j,j], d)
+         b = divexact(A[j,i+1], d)
+         for r = 1:n
+            h = A[r,i+1]
+            A[r,i+1] = a*A[r,i+1] - b*A[r,j]
+            A[r,j] = u*A[r,j] + v*h
+         end
+         for r = 1:n
+            w = K[r,i+1]
+            K[r,i+1] = a*K[r,i+1] - b*K[r,j]
+            K[r,j] = u*K[r,j] + v*w
+         end
+         if j > 1
+            kb_reduce_off_diagonal_ri_bot_col!(A, K, k, j)
+         end
+      end
+      kb_reduce_off_diagonal_ri_bot_col!(A, K, k, i+1)
+   end
+end
+
+function snf_kb{T <: RingElem}(A::MatElem{T})
+   #_check_issquare(A)
+   cols(A) == rows(A) || error("Expected square matrix, but matrix is $(cols(A)) x $(rows(A)).")
+   S = deepcopy(A)
+   m = rows(S)
+   U = one(parent(A))
+   K = one(parent(A))
+   i = 0
+   while i<=m-1
+      kb_clear_column!(S, U, i+1)
+      kb_ri_bot_col_hnf!(S, K, m-i)
+      r = i+2
+      while r <= m && S[r, i+1] == 0
+         r+=1
+      end
+      if r != m+1
+         continue
+      end
+      breakLoop = false
+      for k = i+1:m
+         for j = i+1:k
+            if rem(S[k,j], S[i+1, i+1]) != 0
+               for r = 1:m
+                  S[r,i+1] += S[r,j]
+                  K[r,i+1] += K[r,j]
+               end
+               i -= 1
+               breakLoop = true
+               break
+            end
+         end
+         if breakLoop
+            break
+         end
+      end
+      i+=1
+   end
+   return S, U, K
 end
 
 ###############################################################################
