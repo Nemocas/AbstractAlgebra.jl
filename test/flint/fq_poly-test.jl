@@ -52,6 +52,10 @@ function test_fq_poly_constructors()
 
    @test isa(p, PolyElem)
 
+   r = S([ZZ(1), ZZ(2), ZZ(3)])
+
+   @test isa(r, PolyElem)
+
    println("PASS")
 end
 

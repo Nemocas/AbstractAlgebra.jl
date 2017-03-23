@@ -635,8 +635,8 @@ Base.promote_rule(::Type{arb_mat}, ::Type{fmpq_mat}) = arb_mat
 #
 ###############################################################################
 
-function MatrixSpace(R::ArbField, r::Int, c::Int)
+function MatrixSpace(R::ArbField, r::Int, c::Int; cached = true)
   (r <= 0 || c <= 0) && error("Dimensions must be positive")
-  return ArbMatSpace(R, r, c)
+  return ArbMatSpace(R, r, c, cached)
 end
 

@@ -910,6 +910,8 @@ function (R::FmpzModPolyRing)(arr::Array{GenRes{fmpz}, 1})
   return z
 end
 
+(R::FmpzModPolyRing){T <: Integer}(arr::Array{T, 1}) = R(map(base_ring(R), arr))
+
 function (R::FmpzModPolyRing)(x::fmpz_poly)
   z = fmpz_mod_poly(R.n, x)
   z.parent = R

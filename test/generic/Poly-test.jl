@@ -46,6 +46,14 @@ function test_gen_poly_constructors()
 
    @test isa(l, PolyElem)
 
+   m = S([1, 2, 3])
+
+   @test isa(m, PolyElem)
+
+   n = S([ZZ(1), ZZ(2), ZZ(3)])
+
+   @test isa(n, PolyElem)
+
    println("PASS")
 end
 

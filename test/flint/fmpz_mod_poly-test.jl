@@ -43,6 +43,10 @@ function test_fmpz_mod_poly_constructors()
 
    @test isa(q, PolyElem)
 
+   r = S([1, 2, 3])
+
+   @test isa(r, PolyElem)
+
    println("PASS")
 end
 

@@ -707,9 +707,9 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::FqFiniteField, s::AbstractString)
+function PolynomialRing(R::FqFiniteField, s::AbstractString; cached = true)
    S = Symbol(s)
-   parent_obj = FqPolyRing(R, S)
+   parent_obj = FqPolyRing(R, S, cached)
    return parent_obj, parent_obj([R(0), R(1)])
 end
 

@@ -159,12 +159,14 @@ type FmpzPolyRing <: PolyRing{fmpz}
    base_ring::FlintIntegerRing
    S::Symbol
 
-   function FmpzPolyRing(s::Symbol)
+   function FmpzPolyRing(s::Symbol, cached=true)
       if haskey(FmpzPolyID, s)
          return FmpzPolyID[s]::FmpzPolyRing
       else
          z = new(FlintZZ, s)
-         FmpzPolyID[s] = z
+         if cached
+            FmpzPolyID[s] = z
+         end
          return z
       end
    end
@@ -260,12 +262,14 @@ type FmpqPolyRing <: PolyRing{fmpq}
    base_ring::FlintRationalField
    S::Symbol
 
-   function FmpqPolyRing(R::FlintRationalField, s::Symbol)
+   function FmpqPolyRing(R::FlintRationalField, s::Symbol, cached=true)
       if haskey(FmpqPolyID, s)
          return FmpqPolyID[s]::FmpqPolyRing
       else
          z = new(R, s)
-         FmpqPolyID[s] = z
+         if cached
+            FmpqPolyID[s] = z
+         end
          return z
       end
    end
@@ -795,7 +799,7 @@ type FqNmodFiniteField <: FinField
    inv_norm :: Int
    var :: Ptr{Void}
 
-   function FqNmodFiniteField(c::fmpz, deg::Int, s::Symbol)
+   function FqNmodFiniteField(c::fmpz, deg::Int, s::Symbol, cached=true)
       if haskey(FqNmodFiniteFieldID, (c, deg, s))
          return FqNmodFiniteFieldID[c, deg, s]::FqNmodFiniteField
       else
@@ -803,13 +807,15 @@ type FqNmodFiniteField <: FinField
          ccall((:fq_nmod_ctx_init, :libflint), Void, 
                (Ptr{FqNmodFiniteField}, Ptr{fmpz}, Int, Ptr{UInt8}), 
 			    &d, &c, deg, string(s))
-         FqNmodFiniteFieldID[c, deg, s] = d
+         if cached
+            FqNmodFiniteFieldID[c, deg, s] = d
+         end
          finalizer(d, _FqNmodFiniteField_clear_fn)
          return d
       end
    end
 
-   function FqNmodFiniteField(f::nmod_poly, s::Symbol)
+   function FqNmodFiniteField(f::nmod_poly, s::Symbol, cached=true)
       if haskey(FqNmodFiniteFieldIDPol, (parent(f), f, s))
          return FqNmodFiniteFieldIDPol[parent(f), f, s]::FqNmodFiniteField
       else
@@ -817,7 +823,9 @@ type FqNmodFiniteField <: FinField
          ccall((:fq_nmod_ctx_init_modulus, :libflint), Void, 
             (Ptr{FqNmodFiniteField}, Ptr{nmod_poly}, Ptr{UInt8}), 
 	      &z, &f, string(s))
-         FqNmodFiniteFieldIDPol[parent(f), f, s] = z
+         if cached
+            FqNmodFiniteFieldIDPol[parent(f), f, s] = z
+         end
          finalizer(z, _FqNmodFiniteField_clear_fn)
          return z
       end
@@ -907,21 +915,23 @@ type FqFiniteField <: FinField
    inv_p::Int # fmpz
    var::Ptr{Void}
 
-   function FqFiniteField(char::fmpz, deg::Int, s::Symbol)
+   function FqFiniteField(char::fmpz, deg::Int, s::Symbol, cached=true)
       if haskey(FqFiniteFieldID, (char, deg, s))
          return FqFiniteFieldID[char, deg, s]::FqFiniteField
       else
          d = new()
-         FqFiniteFieldID[char, deg, s] = d
          finalizer(d, _FqFiniteField_clear_fn)
          ccall((:fq_ctx_init, :libflint), Void,
                (Ptr{FqFiniteField}, Ptr{fmpz}, Int, Ptr{UInt8}),
                   &d, &char, deg, string(s))
+         if cached
+            FqFiniteFieldID[char, deg, s] = d
+         end
          return d
       end
    end
    
-   function FqFiniteField(f::fmpz_mod_poly, s::Symbol)
+   function FqFiniteField(f::fmpz_mod_poly, s::Symbol, cached=true)
       if haskey(FqFiniteFieldIDPol, (f, s))
          return FqFiniteFieldIDPol[f, s]::FqFiniteField
       else
@@ -929,7 +939,9 @@ type FqFiniteField <: FinField
          ccall((:fq_ctx_init_modulus, :libflint), Void,
                (Ptr{FqFiniteField}, Ptr{fmpz_mod_poly}, Ptr{UInt8}),
                   &z, &f, string(s))
-         FqFiniteFieldIDPol[f, s] = z
+         if cached
+            FqFiniteFieldIDPol[f, s] = z
+         end
          finalizer(z, _FqFiniteField_clear_fn)
          return z
       end
@@ -1058,12 +1070,14 @@ type FmpzRelSeriesRing <: SeriesRing{fmpz}
    prec_max::Int
    S::Symbol
 
-   function FmpzRelSeriesRing(prec::Int, s::Symbol)
+   function FmpzRelSeriesRing(prec::Int, s::Symbol, cached=true)
       if haskey(FmpzRelSeriesID, (prec, s))
          FmpzRelSeriesID[prec, s]::FmpzRelSeriesRing
       else
          z = new(FlintZZ, prec, s)
-         FmpzRelSeriesID[prec, s] = z
+         if cached
+            FmpzRelSeriesID[prec, s] = z
+         end
          return z
       end
    end
@@ -1126,12 +1140,14 @@ type FmpzAbsSeriesRing <: SeriesRing{fmpz}
    prec_max::Int
    S::Symbol
 
-   function FmpzAbsSeriesRing(prec::Int, s::Symbol)
+   function FmpzAbsSeriesRing(prec::Int, s::Symbol, cached=true)
       if haskey(FmpzAbsSeriesID, (prec, s))
          FmpzAbsSeriesID[prec, s]::FmpzAbsSeriesRing
       else
          z = new(FlintZZ, prec, s)
-         FmpzAbsSeriesID[prec, s] = z
+         if cached
+            FmpzAbsSeriesID[prec, s] = z
+         end
          return z
       end
    end
@@ -1192,12 +1208,14 @@ type FmpqRelSeriesRing <: SeriesRing{fmpq}
    prec_max::Int
    S::Symbol
 
-   function FmpqRelSeriesRing(prec::Int, s::Symbol)
+   function FmpqRelSeriesRing(prec::Int, s::Symbol, cached=true)
       if haskey(FmpqRelSeriesID, (prec, s))
          return FmpqRelSeriesID[prec, s]::FmpqRelSeriesRing
       else
          z = new(FlintQQ, prec, s)
-         FmpqRelSeriesID[prec, s] = z
+         if cached
+            FmpqRelSeriesID[prec, s] = z
+         end
          return z
       end
    end
@@ -1261,12 +1279,14 @@ type FmpqAbsSeriesRing <: SeriesRing{fmpq}
    prec_max::Int
    S::Symbol
 
-   function FmpqAbsSeriesRing(prec::Int, s::Symbol)
+   function FmpqAbsSeriesRing(prec::Int, s::Symbol, cached=true)
       if haskey(FmpqAbsSeriesID, (prec, s))
          return FmpqAbsSeriesID[prec, s]::FmpqAbsSeriesRing
       else
          z = new(FlintQQ, prec, s)
-         FmpqAbsSeriesID[prec, s] = z
+         if cached
+            FmpqAbsSeriesID[prec, s] = z
+         end
          return z
       end
    end
@@ -1328,12 +1348,15 @@ type FmpzModRelSeriesRing <: SeriesRing{GenRes{fmpz}}
    prec_max::Int
    S::Symbol
 
-   function FmpzModRelSeriesRing(R::Ring, prec::Int, s::Symbol)
+   function FmpzModRelSeriesRing(R::Ring, prec::Int, s::Symbol, cached=true)
       if haskey(FmpzModRelSeriesID, (R, prec, s))
          return FmpzModRelSeriesID[R, prec, s]::FmpzModRelSeriesRing
       else
-         FmpzModRelSeriesID[R, prec, s] = new(R, prec, s)
-         return FmpzModRelSeriesID[R, prec, s]
+         z = new(R, prec, s)
+         if cached
+            FmpzModRelSeriesID[R, prec, s] = z
+         end
+         return z
       end
    end
 end
@@ -1412,12 +1435,15 @@ type FmpzModAbsSeriesRing <: SeriesRing{GenRes{fmpz}}
    prec_max::Int
    S::Symbol
 
-   function FmpzModAbsSeriesRing(R::Ring, prec::Int, s::Symbol)
+   function FmpzModAbsSeriesRing(R::Ring, prec::Int, s::Symbol, cached=true)
       if haskey(FmpzModAbsSeriesID, (R, prec, s))
          return FmpzModAbsSeriesID[R, prec, s]::FmpzModAbsSeriesRing
       else
-         FmpzModAbsSeriesID[R, prec, s] = new(R, prec, s)
-         return FmpzModAbsSeriesID[R, prec, s]
+         z = new(R, prec, s)
+         if cached
+            FmpzModAbsSeriesID[R, prec, s]  = z
+         end
+         return z
       end
    end
 end
@@ -1493,12 +1519,14 @@ type FqRelSeriesRing <: SeriesRing{fq}
    prec_max::Int
    S::Symbol
 
-   function FqRelSeriesRing(R::FqFiniteField, prec::Int, s::Symbol)
+   function FqRelSeriesRing(R::FqFiniteField, prec::Int, s::Symbol, cached=true)
       if haskey(FqRelSeriesID, (R, prec, s))
          return FqRelSeriesID[R, prec, s]::FqRelSeriesRing
       else
          z = new(R, prec, s)
-         FqRelSeriesID[R, prec, s] = z
+         if cached
+            FqRelSeriesID[R, prec, s] = z
+         end
          return z
       end
    end
@@ -1565,12 +1593,14 @@ type FqAbsSeriesRing <: SeriesRing{fq}
    prec_max::Int
    S::Symbol
 
-   function FqAbsSeriesRing(R::FqFiniteField, prec::Int, s::Symbol)
+   function FqAbsSeriesRing(R::FqFiniteField, prec::Int, s::Symbol, cached=true)
       if haskey(FqAbsSeriesID, (R, prec, s))
          return FqAbsSeriesID[R, prec, s]::FqAbsSeriesRing
       else
          z = new(R, prec, s)
-         FqAbsSeriesID[R, prec, s] = z
+         if cached
+            FqAbsSeriesID[R, prec, s] = z
+         end
          return z
       end
    end
@@ -1635,12 +1665,14 @@ type FqNmodRelSeriesRing <: SeriesRing{fq_nmod}
    prec_max::Int
    S::Symbol
 
-   function FqNmodRelSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol)
+   function FqNmodRelSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol, cached=true)
       if haskey(FqNmodRelSeriesID, (R, prec, s))
          return FqNmodRelSeriesID[R, prec, s]::FqNmodRelSeriesRing
       else
          z = new(R, prec, s)
-         FqNmodRelSeriesID[R, prec, s] = z
+         if cached
+            FqNmodRelSeriesID[R, prec, s] = z
+         end
          return z
       end
    end
@@ -1707,12 +1739,14 @@ type FqNmodAbsSeriesRing <: SeriesRing{fq_nmod}
    prec_max::Int
    S::Symbol
 
-   function FqNmodAbsSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol)
+   function FqNmodAbsSeriesRing(R::FqNmodFiniteField, prec::Int, s::Symbol, cached=true)
       if haskey(FqNmodAbsSeriesID, (R, prec, s))
          return FqNmodAbsSeriesID[R, prec, s]::FqNmodAbsSeriesRing
       else
          z = new(R, prec, s)
-         FqNmodAbsSeriesID[R, prec, s] = z
+         if cached
+            FqNmodAbsSeriesID[R, prec, s] = z
+         end
          return z
       end
    end
@@ -1778,12 +1812,14 @@ type FmpqMatSpace <: MatSpace{fmpq}
    cols::Int
    base_ring::FlintRationalField
 
-   function FmpqMatSpace(r::Int, c::Int)
+   function FmpqMatSpace(r::Int, c::Int, cached=true)
       if haskey(FmpqMatID, (r, c))
          return FmpqMatID[r, c]::FmpqMatSpace
       else
          z = new(r, c, FlintQQ)
-         FmpqMatID[r, c] = z
+         if cached
+            FmpqMatID[r, c] = z
+         end
          return z
       end
    end
@@ -1914,12 +1950,14 @@ type FmpzMatSpace <: MatSpace{fmpz}
    cols::Int
    base_ring::FlintIntegerRing
 
-   function FmpzMatSpace(r::Int, c::Int)
+   function FmpzMatSpace(r::Int, c::Int, cached=true)
       if haskey(FmpzMatID, (r, c))
          return FmpzMatID[r, c]::FmpzMatSpace
       else
          z = new(r, c, FlintZZ)
-         FmpzMatID[r, c] = z
+         if cached
+            FmpzMatID[r, c] = z
+         end
          return z
       end
    end
@@ -2050,7 +2088,7 @@ type NmodMatSpace <: MatSpace{GenRes{fmpz}}
   rows::Int
   cols::Int
 
-  function NmodMatSpace(R::GenResRing{fmpz}, r::Int, c::Int)
+  function NmodMatSpace(R::GenResRing{fmpz}, r::Int, c::Int, cached=true)
     (r < 0 || c < 0) && throw(error_dim_negative)
     R.modulus > typemax(UInt) && 
       error("Modulus of ResidueRing must less then ", fmpz(typemax(UInt)))
@@ -2058,7 +2096,9 @@ type NmodMatSpace <: MatSpace{GenRes{fmpz}}
       return NmodMatID[R, r, c]::NmodMatSpace
     else
       z = new(R, UInt(R.modulus), r, c)
-      NmodMatID[R, r, c] = z
+      if cached
+        NmodMatID[R, r, c] = z
+      end
       return z
     end
   end
@@ -2261,12 +2301,14 @@ type FqPolyRing <: PolyRing{fq}
    base_ring::FqFiniteField
    S::Symbol
 
-   function FqPolyRing(R::FqFiniteField, s::Symbol)
+   function FqPolyRing(R::FqFiniteField, s::Symbol, cached=true)
       if haskey(FqPolyID, (R, s))
          return FqPolyID[(R,s)]::FqPolyRing
       else
          z = new(R,s)
-         FqPolyID[(R,s)] = z
+         if cached
+            FqPolyID[(R,s)] = z
+         end
          return z
       end
    end
@@ -2395,12 +2437,14 @@ type FqNmodPolyRing <: PolyRing{fq_nmod}
    base_ring::FqNmodFiniteField
    S::Symbol
 
-   function FqNmodPolyRing(R::FqNmodFiniteField, s::Symbol)
+   function FqNmodPolyRing(R::FqNmodFiniteField, s::Symbol, cached=true)
       if haskey(FqNmodPolyID, (R, s))
          return FqNmodPolyID[(R,s)]::FqNmodPolyRing
       else
          z = new(R,s)
-         FqNmodPolyID[(R,s)] = z
+         if cached
+            FqNmodPolyID[(R,s)] = z
+         end
          return z
       end
    end
@@ -2528,12 +2572,14 @@ const FlintPermID = ObjectIdDict()
 type FlintPermGroup <: Group
    n::Int
 
-   function FlintPermGroup(n::Int)
+   function FlintPermGroup(n::Int, cached=true)
       if haskey(FlintPermID, n)
          return FlintPermID[n]::FlintPermGroup
       else
          z = new(n)
-         FlintPermID[n] = z
+         if cached
+            FlintPermID[n] = z
+         end
          return z
       end
    end

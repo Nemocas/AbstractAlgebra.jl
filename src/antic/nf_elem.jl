@@ -931,9 +931,9 @@ doc"""
 > The supplied string `s` specifies how the generator of the number field
 > should be printed.
 """
-function AnticNumberField(f::fmpq_poly, s::AbstractString)
+function AnticNumberField(f::fmpq_poly, s::AbstractString; cached = true)
    S = Symbol(s)
-   parent_obj = AnticNumberField(f, S)
+   parent_obj = AnticNumberField(f, S, cached)
 
    return parent_obj, gen(parent_obj)
 end
@@ -947,11 +947,11 @@ doc"""
 > from which the number field is constructed, should be printed. If it is not
 > supplied, a default dollar sign will be used to represent the variable.
 """
-function AnticCyclotomicField(n::Int, s::AbstractString, t = "\$")
-   Zx, x = PolynomialRing(FlintZZ, string(gensym()))
-   Qx, = PolynomialRing(FlintQQ, t)
+function AnticCyclotomicField(n::Int, s::AbstractString, t = "\$"; cached = true)
+   Zx, x = PolynomialRing(FlintZZ, string(gensym()); cached = cached)
+   Qx, = PolynomialRing(FlintQQ, t; cached = cached)
    f = cyclotomic(n, x)
-   return AnticNumberField(Qx(f), s)
+   return AnticNumberField(Qx(f), s; cached = cached)
 end
 
 doc"""
@@ -964,9 +964,9 @@ doc"""
 > constructed, should be printed. If it is not supplied, a default dollar sign
 > will be used to represent the variable.
 """
-function AnticMaximalRealSubfield(n::Int, s::AbstractString, t = "\$")
-   Zx, x = PolynomialRing(FlintZZ, string(gensym()))
-   Qx, = PolynomialRing(FlintQQ, t)
+function AnticMaximalRealSubfield(n::Int, s::AbstractString, t = "\$"; cached = true)
+   Zx, x = PolynomialRing(FlintZZ, string(gensym()); cached = cached)
+   Qx, = PolynomialRing(FlintQQ, t; cached = cached)
    f = cos_minpoly(n, x)
-   return AnticNumberField(Qx(f), s)
+   return AnticNumberField(Qx(f), s; cached = cached)
 end
