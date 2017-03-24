@@ -650,7 +650,7 @@ end
 function add!(c::nf_elem, a::nf_elem, b::Int)
    ccall((:nf_elem_add_si, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}),
-         &c, &a, &b, &a.parent)
+         &c, &a, b, &a.parent)
 end
 
 add!(c::nf_elem, a::nf_elem, b::Integer) = add!(c, a, fmpz(b))
@@ -670,7 +670,7 @@ end
 function sub!(c::nf_elem, a::nf_elem, b::Int)
    ccall((:nf_elem_sub_si, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}),
-         &c, &a, &b, &a.parent)
+         &c, &a, b, &a.parent)
 end
 
 sub!(c::nf_elem, a::nf_elem, b::Integer) = sub!(c, a, fmpz(b))
@@ -690,7 +690,7 @@ end
 function sub!(c::nf_elem, a::Int, b::nf_elem)
    ccall((:nf_elem_si_sub, :libflint), Void,
          (Ptr{nf_elem}, Int, Ptr{nf_elem}, Ptr{AnticNumberField}),
-         &c, &a, &b, &a.parent)
+         &c, a, &b, &b.parent)
 end
 
 sub!(c::nf_elem, a::Integer, b::nf_elem) = sub!(c, fmpz(a), b)
