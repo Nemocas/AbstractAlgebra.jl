@@ -38,7 +38,7 @@ type GenPoly{T <: RingElem} <: PolyElem{T}
    
    GenPoly(a::Array{T, 1}) = new(a, length(a))
 
-   GenPoly(a::T) = a == 0 ? new(Array(T, 0), 0) : new([a], 1)
+   GenPoly(a::T) = a == 0 ? new(Array{T}(0), 0) : new([a], 1)
 end
 
 ###############################################################################
@@ -245,7 +245,6 @@ type GenAbsSeries{T <: RingElem} <: AbsSeriesElem{T}
    GenAbsSeries(a::Array{T, 1}, length::Int, prec::Int) = new(a, length, prec)   
    GenAbsSeries(a::GenAbsSeries{T}) = a
 end
-
 ###############################################################################
 #
 #   GenFracField / GenFrac

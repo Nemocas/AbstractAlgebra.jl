@@ -15,7 +15,7 @@ export fq_nmod_rel_series, FqNmodRelSeriesRing
 function O(a::fq_nmod_rel_series)
    val = pol_length(a) + valuation(a) - 1
    val < 0 && throw(DomainError())
-   z = fq_nmod_rel_series(base_ring(a), Array(fq_nmod, 0), 0, val, val)
+   z = fq_nmod_rel_series(base_ring(a), Array{fq_nmod}(0), 0, val, val)
    z.parent = parent(a)
    return z
 end
@@ -113,7 +113,7 @@ end
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 

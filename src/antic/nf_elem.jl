@@ -52,8 +52,11 @@ end
 #
 ###############################################################################
 
+const hash_seed = UInt==UInt64 ? 0xc2a44fbe466a1827 : 0xc2a44fb
+
 function hash(a::nf_elem, h::UInt)
-   b = 0xc2a44fbe466a1827
+   global hash_seed
+   b = hash_seed
    d = den(a)
    b = hash(d, b)
    for i in 1:degree(parent(a)) + 1
@@ -81,7 +84,7 @@ end
 function num_coeff!(z::fmpz, x::nf_elem, n::Int)
    n < 0 && throw(DomainError())
    ccall((:nf_elem_get_coeff_fmpz, :libflint), Void,
-     (Ptr{fmpq}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}), &z, &x, n, &parent(x))
+     (Ptr{fmpz}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}), &z, &x, n, &parent(x))
    return z
 end
 
@@ -207,7 +210,7 @@ end
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -228,7 +231,7 @@ end
 
 needs_parentheses(::Nemo.nf_elem) = true
 
-is_negative(::nf_elem) = false
+isnegative(::nf_elem) = false
 
 ###############################################################################
 #
@@ -365,6 +368,14 @@ end
 
 +(a::fmpq, b::nf_elem) = b + a
 
++(a::Rational, b::nf_elem) = fmpq(a) + b
+
++(a::nf_elem, b::Rational) = b + a
+
+-(a::Rational, b::nf_elem) = fmpq(a) - b
+
+-(a::nf_elem, b::Rational) = a - fmpq(b)
+
 function *(a::nf_elem, b::Int)
    r = a.parent()
    ccall((:nf_elem_scalar_mul_si, :libflint), Void,
@@ -389,6 +400,12 @@ function *(a::nf_elem, b::fmpq)
    return r
 end
 
+function *(a::Rational, b::nf_elem)
+  return fmpq(a) * b
+end
+
+*(a::nf_elem, b::Rational) = b*a
+
 *(a::Integer, b::nf_elem) = b * a
 
 *(a::fmpz, b::nf_elem) = b * a
@@ -408,6 +425,10 @@ end
 //(a::fmpz, b::nf_elem) = divexact(a, b)
 
 //(a::fmpq, b::nf_elem) = divexact(a, b)
+
+//(a::Rational, b::nf_elem) = divexact(fmpq(a), b)
+
+//(a::nf_elem, b::Rational) = divexact(a, fmpq(b))
 
 ###############################################################################
 #
@@ -629,7 +650,7 @@ end
 function add!(c::nf_elem, a::nf_elem, b::Int)
    ccall((:nf_elem_add_si, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}),
-         &c, &a, &b, &a.parent)
+         &c, &a, b, &a.parent)
 end
 
 add!(c::nf_elem, a::nf_elem, b::Integer) = add!(c, a, fmpz(b))
@@ -649,7 +670,7 @@ end
 function sub!(c::nf_elem, a::nf_elem, b::Int)
    ccall((:nf_elem_sub_si, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}),
-         &c, &a, &b, &a.parent)
+         &c, &a, b, &a.parent)
 end
 
 sub!(c::nf_elem, a::nf_elem, b::Integer) = sub!(c, a, fmpz(b))
@@ -669,7 +690,7 @@ end
 function sub!(c::nf_elem, a::Int, b::nf_elem)
    ccall((:nf_elem_si_sub, :libflint), Void,
          (Ptr{nf_elem}, Int, Ptr{nf_elem}, Ptr{AnticNumberField}),
-         &c, &a, &b, &a.parent)
+         &c, a, &b, &b.parent)
 end
 
 sub!(c::nf_elem, a::Integer, b::nf_elem) = sub!(c, fmpz(a), b)
@@ -706,7 +727,7 @@ function sqr_classical(a::GenPoly{nf_elem})
    t = base_ring(a)()
 
    lenz = 2*lena - 1
-   d = Array(nf_elem, lenz)
+   d = Array{nf_elem}(lenz)
 
    for i = 1:lena - 1
       d[2i - 1] = base_ring(a)()
@@ -751,7 +772,7 @@ function mul_classical(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
    t = base_ring(a)()
 
    lenz = lena + lenb - 1
-   d = Array(nf_elem, lenz)
+   d = Array{nf_elem}(lenz)
 
    for i = 1:lena
       d[i] = base_ring(a)()
@@ -904,21 +925,21 @@ end
 ###############################################################################
 
 doc"""
-    AnticNumberField(f::fmpq_poly, s::AbstractString{})
+    AnticNumberField(f::fmpq_poly, s::AbstractString)
 > Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
 > of the number field $\mathbb{Q}/(f)$ where $f$ is the supplied polynomial.
 > The supplied string `s` specifies how the generator of the number field
 > should be printed.
 """
-function AnticNumberField(f::fmpq_poly, s::AbstractString{})
+function AnticNumberField(f::fmpq_poly, s::AbstractString; cached = true)
    S = Symbol(s)
-   parent_obj = AnticNumberField(f, S)
+   parent_obj = AnticNumberField(f, S, cached)
 
    return parent_obj, gen(parent_obj)
 end
 
 doc"""
-    AnticCyclotomicField(n::Int, s::AbstractString{}, t = "\$")
+    AnticCyclotomicField(n::Int, s::AbstractString, t = "\$")
 > Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
 > of the $n$-th cyclotomic field, $\mathbb{Q}(\zeta_n)$. The supplied string
 > `s` specifies how the generator of the number field should be printed. If
@@ -926,15 +947,15 @@ doc"""
 > from which the number field is constructed, should be printed. If it is not
 > supplied, a default dollar sign will be used to represent the variable.
 """
-function AnticCyclotomicField(n::Int, s::AbstractString{}, t = "\$")
-   Zx, x = PolynomialRing(FlintZZ, string(gensym()))
-   Qx, = PolynomialRing(FlintQQ, t)
+function AnticCyclotomicField(n::Int, s::AbstractString, t = "\$"; cached = true)
+   Zx, x = PolynomialRing(FlintZZ, string(gensym()); cached = cached)
+   Qx, = PolynomialRing(FlintQQ, t; cached = cached)
    f = cyclotomic(n, x)
-   return AnticNumberField(Qx(f), s)
+   return AnticNumberField(Qx(f), s; cached = cached)
 end
 
 doc"""
-    AnticMaximalRealSubfield(n::Int, s::AbstractString{}, t = "\$")
+    AnticMaximalRealSubfield(n::Int, s::AbstractString, t = "\$")
 > Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
 > of the totally real subfield of the $n$-th cyclotomic field,
 > $\mathbb{Q}(\zeta_n)$. The supplied string `s` specifies how the generator of
@@ -943,9 +964,9 @@ doc"""
 > constructed, should be printed. If it is not supplied, a default dollar sign
 > will be used to represent the variable.
 """
-function AnticMaximalRealSubfield(n::Int, s::AbstractString{}, t = "\$")
-   Zx, x = PolynomialRing(FlintZZ, string(gensym()))
-   Qx, = PolynomialRing(FlintQQ, t)
+function AnticMaximalRealSubfield(n::Int, s::AbstractString, t = "\$"; cached = true)
+   Zx, x = PolynomialRing(FlintZZ, string(gensym()); cached = cached)
+   Qx, = PolynomialRing(FlintQQ, t; cached = cached)
    f = cos_minpoly(n, x)
-   return AnticNumberField(Qx(f), s)
+   return AnticNumberField(Qx(f), s; cached = cached)
 end

@@ -39,7 +39,7 @@ In order to construct polynomials in Nemo, one must first construct the
 polynomial ring itself. This is accomplished with the following constructor.
 
 ```@docs
-PolynomialRing(::Ring, ::AbstractString{}, ::Bool)
+PolynomialRing(::Ring, ::AbstractString, ::Bool)
 ```
 
 A shorthand version of this function is provided: given a base ring `R`, we
@@ -715,6 +715,12 @@ evaluate(::PolyElem, ::Integer)
 evaluate(::PolyElem, ::fmpz)
 ```
 
+## Remove and valuation
+```@docs
+remove{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+valuation{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+```
+
 ```@docs
 evaluate2(::arb_poly, ::Integer)
 evaluate2(::arb_poly, ::Float64)
@@ -1014,6 +1020,7 @@ issquarefree(::fmpz_mod_poly)
 ```
 
 ```@docs
+factor(::fmpz_poly)
 factor(::nmod_poly)
 factor(::fmpz_mod_poly)
 ```

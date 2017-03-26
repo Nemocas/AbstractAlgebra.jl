@@ -160,7 +160,7 @@ doc"""
 isunit(a::PolyElem) = length(a) == 1 && isunit(coeff(a, 0))
 
 function deepcopy_internal{T <: RingElem}(a::GenPoly{T}, dict::ObjectIdDict)
-   coeffs = Array(T, length(a))
+   coeffs = Array{T}(length(a))
    for i = 1:length(a)
       coeffs[i] = deepcopy(a.coeffs[i])
    end
@@ -191,7 +191,7 @@ function show(io::IO, x::PolyElem)
          c = coeff(x, len - i)
          bracket = needs_parentheses(c)
          if !iszero(c)
-            if i != 1 && !is_negative(c)
+            if i != 1 && !isnegative(c)
                print(io, "+")
             end
             if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
@@ -217,7 +217,7 @@ function show(io::IO, x::PolyElem)
       c = coeff(x, 0)
       bracket = needs_parentheses(c)
       if !iszero(c)
-         if len != 1 && !is_negative(c)
+         if len != 1 && !isnegative(c)
             print(io, "+")
          end
          if bracket
@@ -240,7 +240,7 @@ end
 
 needs_parentheses(x::PolyElem) = length(x) > 1
 
-is_negative(x::PolyElem) = length(x) <= 1 && is_negative(coeff(x, 0))
+isnegative(x::PolyElem) = length(x) <= 1 && isnegative(coeff(x, 0))
 
 show_minus_one{T <: RingElem}(::Type{GenPoly{T}}) = show_minus_one(T)
 
@@ -404,7 +404,7 @@ function mul_ks{T <: PolyElem}(a::PolyElem{T}, b::PolyElem{T})
    end
    m = maxa + maxb - 1
    z = base_ring(base_ring(a))()
-   A1 = Array(elem_type(base_ring(base_ring(a))), m*lena)
+   A1 = Array{elem_type(base_ring(base_ring(a)))}(m*lena)
    for i = 1:lena
       c = coeff(a, i - 1)
       for j = 1:length(c)
@@ -416,7 +416,7 @@ function mul_ks{T <: PolyElem}(a::PolyElem{T}, b::PolyElem{T})
    end
    ksa = base_ring(a)(A1)
    if a !== b
-      A2 = Array(elem_type(base_ring(base_ring(a))), m*lenb)
+      A2 = Array{elem_type(base_ring(base_ring(a)))}(m*lenb)
       for i = 1:lenb
          c = coeff(b, i - 1)
          for j = 1:length(c)
@@ -452,7 +452,7 @@ function mul_classical{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    end
    t = base_ring(a)()
    lenz = lena + lenb - 1
-   d = Array(T, lenz)
+   d = Array{T}(lenz)
    for i = 1:lena
       d[i] = coeff(a, i - 1)*coeff(b, 0)
    end
@@ -630,7 +630,7 @@ function pow_multinomial{T <: RingElem}(a::PolyElem{T}, e::Int)
    e < 0 && throw(DomainError())
    lena = length(a)
    lenz = (lena - 1) * e + 1
-   res = Array(T, lenz)
+   res = Array{T}(lenz)
    for k = 1:lenz
       res[k] = base_ring(a)()
    end
@@ -837,7 +837,7 @@ function mullow{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, n::Int)
    end
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, n)
-   d = Array(T, lenz)
+   d = Array{T}(lenz)
    for i = 1:min(lena, lenz)
       d[i] = coeff(a, i - 1)*coeff(b, 0)
    end
@@ -1024,7 +1024,7 @@ function divexact{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
       return zero(parent(f))
    end
    lenq = length(f) - length(g) + 1
-   d = Array(T, lenq)
+   d = Array{T}(lenq)
    for i = 1:lenq
       d[i] = zero(base_ring(f))
    end
@@ -1217,6 +1217,50 @@ function pseudodivrem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    set_length!(q, lenq)
    s = b^k
    return q*s, f*s
+end
+
+################################################################################
+#
+#   Remove and valuation
+#
+################################################################################
+
+#CF TODO: use squaring for fast large valuation
+
+doc"""
+    remove{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
+>
+> See also `valuation`, which only returns the valuation.
+"""
+function remove{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+  check_parent(z,p)
+  z == 0 && error("Not yet implemented")
+  q, r = divrem(z, p)
+  if !iszero(r)
+    return 0, z
+  end
+  v = 0
+  qn = q
+  while iszero(r)
+    q = qn
+    qn, r = divrem(q, p)
+    v += 1
+  end
+  return v, q
+end
+
+doc"""
+    valuation{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$.
+>
+> See also `remove`, which also returns $z/p^k$.
+"""
+function valuation{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+  v, _ = remove(z, p)
+  return v
 end
 
 ###############################################################################
@@ -1966,7 +2010,7 @@ end
 function fit!{T <: RingElem}(c::GenPoly{T}, n::Int)
    if length(c.coeffs) < n
       t = c.coeffs
-      c.coeffs = Array(T, n)
+      c.coeffs = Array{T}(n)
       for i = 1:length(c)
          c.coeffs[i] = t[i]
       end
@@ -2169,6 +2213,10 @@ function (a::GenPolyRing{T}){T <: RingElem}(b::Array{T, 1})
    return z
 end
 
+(a::GenPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(base_ring(a), b))
+
+(a::GenPolyRing)(b::Array{fmpz, 1}) = a(map(base_ring(a), b))
+
 ###############################################################################
 #
 #   PolynomialRing constructor
@@ -2176,7 +2224,7 @@ end
 ###############################################################################
 
 doc"""
-    PolynomialRing(R::Ring, s::AbstractString{}; cached::Bool = true)
+    PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
 > Given a base ring `R` and string `s` specifying how the generator (variable)
 > should be printed, return a tuple `S, x` representing the new polynomial
 > ring $S = R[x]$ and the generator $x$ of the ring. By default the parent
@@ -2184,7 +2232,7 @@ doc"""
 > optional argument `cached` to `false` will prevent the parent object `S` from
 > being cached.
 """
-function PolynomialRing(R::Ring, s::AbstractString{}; cached::Bool = true)
+function PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
    S = Symbol(s)
    T = elem_type(R)
    parent_obj = GenPolyRing{T}(R, S, cached)

@@ -23,6 +23,10 @@ function test_fmpz_poly_constructors()
 
    @test isa(k, PolyElem)
 
+   l = R([1, 2, 3])
+
+   @test isa(l, PolyElem)
+
    println("PASS")
 end
 
@@ -393,6 +397,26 @@ function test_fmpz_poly_interpolate()
   println("PASS")
 end
 
+function test_fmpz_poly_factor()
+  print("fmpz_poly.factor...")
+
+  Rx, x = PolynomialRing(FlintZZ, "x")
+
+  f = x^24 - x^23 + x^19 - x^18 + x^17 - x^16 + x^14 - x^13 + x^12 - x^11 + x^10 - x^8 + x^7 - x^6 + x^5 - x + 1
+  g = x - 1
+
+  fac = factor(-10*f^10 * g^20)
+
+  @test -10*f^10 * g^20 == unit(fac) * prod([ p^e for (p, e) in fac])
+
+  @test fac[f] == 10
+  @test fac[g] == 20
+  @test f in fac
+  @test !(x in fac)
+
+  println("PASS")
+end
+
 function test_fmpz_poly_special()
    print("fmpz_poly.special...")
 
@@ -455,6 +479,7 @@ function test_fmpz_poly()
    test_fmpz_poly_gcdx()
    test_fmpz_poly_signature()
    test_fmpz_poly_interpolate()
+   test_fmpz_poly_factor()
    test_fmpz_poly_special()
    test_fmpz_poly_Polynomials()
 

@@ -17,6 +17,12 @@ export fmpq, FlintQQ, FractionField, Rational, FlintRationalField, height,
 
 fmpq(a::Rational{BigInt}) = fmpq(fmpz(a.num), fmpz(a.den))
 
+function fmpq(a::Rational{Int})
+  r = fmpq()
+  ccall((:fmpq_set_si, :libflint), Void, (Ptr{fmpq}, Int64, UInt64), &r, num(a), den(a))
+  return r
+end
+
 fmpq(a::Integer) = fmpq(fmpz(a), fmpz(1))
 
 fmpq(a::Integer, b::Integer) = fmpq(fmpz(a), fmpz(b))
@@ -134,7 +140,7 @@ canonical_unit(a::fmpq) = a
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -151,7 +157,7 @@ end
 
 needs_parentheses(x::fmpq) = false
 
-is_negative(x::fmpq) = x < 0
+isnegative(x::fmpq) = x < 0
 
 show_minus_one(::Type{fmpq}) = false
 
@@ -455,6 +461,16 @@ function gcd(a::fmpq, b::fmpq)
          (Ptr{fmpq}, Ptr{fmpq}, Ptr{fmpq}), &z, &a, &b)
    return z
 end
+
+################################################################################
+#
+#   Ad hoc Remove and valuation
+#
+################################################################################
+
+remove(a::fmpq, b::Integer) = remove(a, fmpz(b))
+
+valuation(a::fmpq, b::Integer) = valuation(a, fmpz(b))
 
 ###############################################################################
 #

@@ -22,7 +22,7 @@ doc"""
 function O{T}(a::RelSeriesElem{T})
    val = pol_length(a) + valuation(a) - 1
    val < 0 && throw(DomainError())
-   return parent(a)(Array(T, 0), 0, val, val)
+   return parent(a)(Array{T}(0), 0, val, val)
 end
 
 parent_type{T}(::Type{GenRelSeries{T}}) = GenRelSeriesRing{T}
@@ -188,7 +188,7 @@ doc"""
 modulus{T <: ResElem}(a::SeriesElem{T}) = modulus(base_ring(a))
 
 function deepcopy_internal{T <: RingElem}(a::GenRelSeries{T}, dict::ObjectIdDict)
-   coeffs = Array(T, pol_length(a))
+   coeffs = Array{T}(pol_length(a))
    for i = 1:pol_length(a)
       coeffs[i] = deepcopy(polcoeff(a, i - 1))
    end
@@ -219,7 +219,7 @@ end
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -233,7 +233,7 @@ function show{T <: RingElem}(io::IO, x::RelSeriesElem{T})
          c = polcoeff(x, i)
          bracket = needs_parentheses(c)
          if !iszero(c)
-            if coeff_printed && !is_negative(c)
+            if coeff_printed && !isnegative(c)
                print(io, "+")
             end
             if i + valuation(x) != 0
@@ -274,7 +274,7 @@ end
 
 needs_parentheses(x::SeriesElem) = pol_length(x) > 1
 
-is_negative(x::SeriesElem) = pol_length(x) <= 1 && is_negative(polcoeff(x, 0))
+isnegative(x::SeriesElem) = pol_length(x) <= 1 && isnegative(polcoeff(x, 0))
 
 show_minus_one{T <: RingElem}(::Type{SeriesElem{T}}) = show_minus_one(T)
 
@@ -437,11 +437,11 @@ function *{T <: RingElem}(a::RelSeriesElem{T}, b::RelSeriesElem{T})
    lena = min(lena, prec)
    lenb = min(lenb, prec)
    if lena == 0 || lenb == 0
-      return parent(a)(Array(T, 0), 0, prec + zval, zval)
+      return parent(a)(Array{T}(0), 0, prec + zval, zval)
    end
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, prec)
-   d = Array(T, lenz)
+   d = Array{T}(lenz)
    for i = 1:min(lena, lenz)
       d[i] = polcoeff(a, i - 1)*polcoeff(b, 0)
    end
@@ -1035,7 +1035,7 @@ end
 function fit!{T <: RingElem}(c::GenRelSeries{T}, n::Int)
    if length(c.coeffs) < n
       t = c.coeffs
-      c.coeffs = Array(T, n)
+      c.coeffs = Array{T}(n)
       for i = 1:c.length
          c.coeffs[i] = t[i]
       end
@@ -1196,14 +1196,14 @@ function (a::GenRelSeriesRing{T}){T <: RingElem}(b::RingElem)
 end
 
 function (a::GenRelSeriesRing{T}){T <: RingElem}()
-   z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max, a.prec_max)
+   z = GenRelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
    z.parent = a
    return z
 end
 
 function (a::GenRelSeriesRing{T}){T <: RingElem}(b::Integer)
    if b == 0
-      z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max, a.prec_max)
+      z = GenRelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
    else
       z = GenRelSeries{T}([base_ring(a)(b)], 1, a.prec_max, 0)
    end
@@ -1213,7 +1213,7 @@ end
 
 function (a::GenRelSeriesRing{T}){T <: RingElem}(b::fmpz)
    if b == 0
-      z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max, a.prec_max)
+      z = GenRelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
    else
       z = GenRelSeries{T}([base_ring(a)(b)], 1, a.prec_max, 0)
    end
@@ -1224,7 +1224,7 @@ end
 function (a::GenRelSeriesRing{T}){T <: RingElem}(b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to power series")
    if b == 0
-      z = GenRelSeries{T}(Array(T, 0), 0, a.prec_max, a.prec_max)
+      z = GenRelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
    else
       z = GenRelSeries{T}([b], 1, a.prec_max, 0)
    end
@@ -1253,7 +1253,7 @@ end
 ###############################################################################
 
 doc"""
-   PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{}; cached=true, model=:capped_relative)
+   PowerSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
 > Return a tuple $(S, x)$ consisting of the parent object `S` of a power series
 > ring over the given base ring and a generator `x` for the power series ring.
 > The maximum precision of power series in the ring is set to `prec`. If the
@@ -1265,7 +1265,7 @@ doc"""
 > precision in future will return the same parent object and generator. If
 > caching of the parent object is not required, `cached` can be set to `false`.
 """
-function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString{}; cached=true, model=:capped_relative)
+function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
    S = Symbol(s)
    T = elem_type(R)
    

@@ -48,7 +48,15 @@ function test_fmpq_poly_constructors()
    n = S(fmpz(12))
 
    @test isa(n, PolyElem)
-   
+
+   o = S([1, 2, 3])
+
+   @test isa(o, PolyElem)
+
+   p = S([ZZ(1), ZZ(2), ZZ(3)])
+
+   @test isa(p, PolyElem)
+
    println("PASS")
 end
 
@@ -439,6 +447,19 @@ function test_fmpq_poly_gcdx()
    println("PASS")
 end
 
+function test_fmpq_poly_factor()
+   print("fmpq_poly.factor...")
+
+   S, y = PolynomialRing(QQ, "y")
+
+   f = (2y + 1)^10*(5*y^3 + 1)^100*(-fmpq(1,5))
+
+   fac = factor(f)
+
+   @test f == unit(fac) * prod([ p^e for (p, e) in fac])
+
+   println("PASS")
+end
 function test_fmpq_poly_signature()
    print("fmpq_poly.signature...")
 
@@ -476,6 +497,24 @@ function test_fmpq_poly_Polynomials()
    println("PASS")
 end
 
+function test_fmpq_poly_remove_valuation()
+   print("fmpq_poly.remove_valuation()...")
+
+   S, y = PolynomialRing(FlintQQ, "y")
+
+   f = 7y^2 + 3y + 2
+   g = f^5*(11y^3 - 2y^2 + 5)
+
+   v, h = remove(g, f)
+
+   @test valuation(g, f) == 5
+   @test v == 5
+   @test h == (11y^3 - 2y^2 + 5)
+
+   println("PASS")
+end
+
+
 function test_fmpq_poly()
    test_fmpq_poly_constructors()
    test_fmpq_poly_printing()
@@ -501,9 +540,11 @@ function test_fmpq_poly()
    test_fmpq_poly_resultant()
    test_fmpq_poly_discriminant()
    test_fmpq_poly_gcdx()
+   test_fmpq_poly_factor()
    test_fmpq_poly_signature()
    test_fmpq_poly_special()
    test_fmpq_poly_Polynomials()
+   test_fmpq_poly_remove_valuation()
 
    println("")
 end

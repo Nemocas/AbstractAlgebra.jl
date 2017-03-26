@@ -372,7 +372,30 @@ function divrem(x::fq_poly, y::fq_poly)
    ccall((:fq_poly_divrem, :libflint), Void, (Ptr{fq_poly},
          Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly},
          Ptr{FqFiniteField}), &z, &r, &x, &y, &base_ring(parent(x)))
-   return z,r
+   return z, r
+end
+
+################################################################################
+#
+#   Remove
+#
+################################################################################
+
+doc"""
+    remove(z::fq_poly, p::fq_poly)
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
+>
+> See also `valuation`, which only returns the valuation.
+"""
+function remove(z::fq_poly, p::fq_poly)
+   check_parent(z,p)
+   z == 0 && error("Not yet implemented")
+   z = deepcopy(z)
+   v = ccall((:fq_poly_remove, :libflint), Int,
+            (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{FqFiniteField}),
+             &z,  &p, &base_ring(parent(z)))
+   return v, z
 end
 
 ################################################################################
@@ -500,6 +523,11 @@ end
 ################################################################################
 
 function factor(x::fq_poly)
+   fac, z = _factor(x)
+   return Fac(parent(x)(z), fac)
+end
+
+function _factor(x::fq_poly)
    R = parent(x)
    F = base_ring(R)
    a = F()
@@ -516,7 +544,7 @@ function factor(x::fq_poly)
       e = unsafe_load(fac.exp,i)
       res[f] = e
    end
-   return res 
+   return res, a
 end  
 
 function factor_distinct_deg(x::fq_poly)
@@ -530,14 +558,14 @@ function factor_distinct_deg(x::fq_poly)
    ccall((:fq_poly_factor_distinct_deg, :libflint), Void, 
          (Ptr{fq_poly_factor}, Ptr{fq_poly}, Ptr{Int},
          Ptr{FqFiniteField}), &fac, &x, &tmp.exp, &F)
-   res = Dict{fq_poly, Int}()
+   res = Dict{Int, fq_poly}()
    for i in 1:fac.num
       f = R()
       ccall((:fq_poly_factor_get_poly, :libflint), Void,
             (Ptr{fq_poly}, Ptr{fq_poly_factor}, Int,
             Ptr{FqFiniteField}), &f, &fac, i-1, &F)
       d = unsafe_load(tmp.exp,i)
-      res[f] = d
+      res[d] = f
    end
    return res
 end
@@ -679,9 +707,9 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::FqFiniteField, s::AbstractString{})
+function PolynomialRing(R::FqFiniteField, s::AbstractString; cached = true)
    S = Symbol(s)
-   parent_obj = FqPolyRing(R, S)
+   parent_obj = FqPolyRing(R, S, cached)
    return parent_obj, parent_obj([R(0), R(1)])
 end
 

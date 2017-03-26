@@ -4,9 +4,9 @@
 #
 ###############################################################################
 
-export MatricSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, is_rref,
+export MatricSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
-       is_hessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
+       ishessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
        powers, similarity!
 
 ###############################################################################
@@ -134,7 +134,7 @@ function isone(a::MatElem)
 end
 
 function deepcopy_internal{T <: RingElem}(d::MatElem{T}, dict::ObjectIdDict)
-   entries = Array(T, rows(d), cols(d))
+   entries = Array{T}(rows(d), cols(d))
    for i = 1:rows(d)
       for j = 1:cols(d)
          entries[i, j] = deepcopy(d[i, j])
@@ -245,7 +245,7 @@ function *{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
    else
       parz = MatrixSpace(base_ring(x), rows(x), cols(y))
    end
-   A = Array(T, rows(x), cols(y))
+   A = Array{T}(rows(x), cols(y))
    C = base_ring(x)()
    for i = 1:rows(x)
       for j = 1:cols(y)
@@ -569,7 +569,7 @@ function powers{T <: RingElem}(a::MatElem{T}, d::Int)
    rows(a) != cols(a) && error("Dimensions do not match in powers")
    d <= 0 && throw(DomainError())
    S = parent(a)
-   A = Array(MatElem{T}, d + 1)
+   A = Array{MatElem{T}}(d + 1)
    A[1] = one(S)
    if d > 1
       c = a
@@ -1143,7 +1143,7 @@ function rref!{T <: RingElem}(A::MatElem{T})
       t = R()
       q = R()
       d = -d
-      pivots = Array(Int, n)
+      pivots = Array{Int}(n)
       np = rank
       j = k = 1
       for i = 1:rank
@@ -1213,7 +1213,7 @@ function rref!{T <: FieldElem}(A::MatElem{T})
    end
    U = MatrixSpace(R, rnk, rnk)()
    V = MatrixSpace(R, rnk, n - rnk)()
-   pivots = Array(Int, n)
+   pivots = Array{Int}(n)
    np = rnk
    j = k = 1
    for i = 1:rnk
@@ -1269,11 +1269,11 @@ function rref{T <: FieldElem}(M::MatElem{T})
 end
 
 doc"""
-    is_rref{T <: RingElem}(M::MatElem{T})
+    isrref{T <: RingElem}(M::MatElem{T})
 > Return `true` if $M$ is in reduced row echelon form, otherwise return
 > `false`.
 """
-function is_rref{T <: RingElem}(M::MatElem{T})
+function isrref{T <: RingElem}(M::MatElem{T})
    m = rows(M)
    n = cols(M)
    c = 1
@@ -1298,11 +1298,11 @@ function is_rref{T <: RingElem}(M::MatElem{T})
 end
 
 doc"""
-    is_rref{T <: FieldElem}(M::MatElem{T})
+    isrref{T <: FieldElem}(M::MatElem{T})
 > Return `true` if $M$ is in reduced row echelon form, otherwise return
 > `false`.
 """
-function is_rref{T <: FieldElem}(M::MatElem{T})
+function isrref{T <: FieldElem}(M::MatElem{T})
    m = rows(M)
    n = cols(M)
    c = 1
@@ -1431,8 +1431,8 @@ end
 function det_clow{T <: RingElem}(M::MatElem{T})
    R = base_ring(M)
    n = rows(M)
-   A = Array(T, n, n)
-   B = Array(T, n, n)
+   A = Array{T}(n, n)
+   B = Array{T}(n, n)
    C = R()
    for i = 1:n
       for j = 1:n
@@ -1848,10 +1848,10 @@ function solve_interpolation{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
    end
    # bound from xd = (M*)b where d is the det
    bound = (maxlen - 1)*(m - 1) + max(maxlenb, maxlen)
-   V = Array(elem_type(U), bound)
-   d = Array(elem_type(base_ring(R)), bound)
-   y = Array(elem_type(base_ring(R)), bound)
-   bj = Array(elem_type(base_ring(R)), bound)
+   V = Array{elem_type(U)}(bound)
+   d = Array{elem_type(base_ring(R))}(bound)
+   y = Array{elem_type(base_ring(R))}(bound)
+   bj = Array{elem_type(base_ring(R))}(bound)
    X = S()
    Y = U()
    x = parent(b)()
@@ -1930,8 +1930,8 @@ function solve_triu{T <: FieldElem}(U::MatElem{T}, b::MatElem{T}, unit=false)
    m = cols(b)
    R = base_ring(U)
    X = parent(b)()
-   Tinv = Array(elem_type(R), n)
-   tmp = Array(elem_type(R), n)
+   Tinv = Array{elem_type(R)}(n)
+   tmp = Array{elem_type(R)}(n)
    if unit == false
       for i = 1:n
          Tinv[i] = inv(U[i, i])
@@ -2026,8 +2026,8 @@ function nullspace{T <: RingElem}(M::MatElem{T})
          U[i, i] = R(1)
       end
    elseif nullity != 0
-      pivots = Array(Int, rank)
-      nonpivots = Array(Int, nullity)
+      pivots = Array{Int}(rank)
+      nonpivots = Array{Int}(nullity)
       j = k = 1
       for i = 1:rank
          while A[i, j] == 0
@@ -2076,7 +2076,7 @@ function nullspace{T <: FieldElem}(M::MatElem{T})
          X[i, i] = R(1)
       end
    elseif nullity != 0
-      pivots = Array(Int, max(m, n))
+      pivots = Array{Int}(max(m, n))
       np = rank
       j = k = 1
       for i = 1:rank
@@ -2171,10 +2171,10 @@ function hessenberg{T <: RingElem}(A::MatElem{T})
 end
 
 doc"""
-    is_hessenberg{T <: RingElem}(A::MatElem{T})
+    ishessenberg{T <: RingElem}(A::MatElem{T})
 > Returns `true` if $M$ is in Hessenberg form, otherwise returns `false`.
 """
-function is_hessenberg{T <: RingElem}(A::MatElem{T})
+function ishessenberg{T <: RingElem}(A::MatElem{T})
    n = rows(A)
    for i = 3:n
       for j = 1:i - 2
@@ -2204,7 +2204,7 @@ function charpoly_hessenberg!{T <: RingElem}(S::Ring, A::MatElem{T})
       return gen(S) - A[1, 1]
    end
    hessenberg!(A)
-   P = Array(elem_type(S), n + 1)
+   P = Array{elem_type(S)}(n + 1)
    P[1] = S(1)
    x = gen(S)
    for m = 1:n
@@ -2231,8 +2231,8 @@ function charpoly_danilevsky_ff!{T <: RingElem}(S::Ring, A::MatElem{T})
    end
    d = R(1)
    t = R()
-   V = Array(T, n)
-   W = Array(T, n)
+   V = Array{T}(n)
+   W = Array{T}(n)
    pol = S(1)
    i = 1
    while i < n
@@ -2347,8 +2347,8 @@ function charpoly_danilevsky!{T <: RingElem}(S::Ring, A::MatElem{T})
       return gen(S) - A[1, 1]
    end
    t = R()
-   V = Array(T, n)
-   W = Array(T, n)
+   V = Array{T}(n)
+   W = Array{T}(n)
    pol = S(1)
    i = 1
    while i < n
@@ -2453,9 +2453,9 @@ function charpoly{T <: RingElem}(V::Ring, Y::MatElem{T})
    if n == 0
       return V(1)
    end
-   F = Array(elem_type(R), n)
-   A = Array(elem_type(R), n)
-   M = Array(elem_type(R), n - 1, n)
+   F = Array{elem_type(R)}(n)
+   A = Array{elem_type(R)}(n)
+   M = Array{elem_type(R)}(n - 1, n)
    F[1] = -Y[1, 1]
    for i = 2:n
       F[i] = R()
@@ -2762,6 +2762,37 @@ end
 
 ###############################################################################
 #
+#   Row swapping
+#
+###############################################################################
+
+doc"""
+    swap_rows(a::MatElem, i::Int, j::Int)
+> Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th 
+> row are swapped.
+"""
+function swap_rows(a::MatElem, i::Int, j::Int)
+   (1<=i<=rows(a) && 1<=j<=rows(a)) || throw(BoundsError())  
+   b = deepcopy(a)
+   swap_rows!(b, i, j)
+   return b
+end
+
+doc"""
+    swap_rows!(a::MatElem, i::Int, j::Int)
+> Swap the $i$th and $j$th row of $a$.
+"""
+function swap_rows!(a::MatElem, i::Int, j::Int)
+   (1<=i<=rows(a) && 1<=j<=rows(a)) || throw(BoundsError())
+   for k=1:cols(a)
+      x = a[i,k]
+      a[i,k] = a[j,k]
+      a[j,k] = x
+   end
+end
+
+###############################################################################
+#
 #   Concatenation
 #
 ###############################################################################
@@ -2853,7 +2884,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::RingElem)
 end
 
 function (a::GenMatSpace{T}){T <: RingElem}()
-   entries = Array(T, a.rows, a.cols)
+   entries = Array{T}(a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
          entries[i, j] = zero(base_ring(a))
@@ -2865,7 +2896,7 @@ function (a::GenMatSpace{T}){T <: RingElem}()
 end
 
 function (a::GenMatSpace{T}){T <: RingElem}(b::Integer)
-   entries = Array(T, a.rows, a.cols)
+   entries = Array{T}(a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
          if i != j
@@ -2881,7 +2912,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Integer)
 end
 
 function (a::GenMatSpace{T}){T <: RingElem}(b::fmpz)
-   entries = Array(T, a.rows, a.cols)
+   entries = Array{T}(a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
          if i != j
@@ -2898,7 +2929,7 @@ end
 
 function (a::GenMatSpace{T}){T <: RingElem}(b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to matrix")
-   entries = Array(T, a.rows, a.cols)
+   entries = Array{T}(a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
          if i != j
@@ -2922,9 +2953,39 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 2})
    if length(b) > 0
       parent(b[1, 1]) != base_ring(a) && error("Unable to coerce to matrix")
    end
+   _check_dim(a.rows, a.cols, b)
    z = GenMat{T}(b)
    z.parent = a
    return z
+end
+
+function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 1})
+   if length(b) > 0
+      parent(b[1]) != base_ring(a) && error("Unable to coerce to matrix")
+   end
+   _check_dim(a.rows, a.cols, b)
+   b = reshape(b, a.rows, a.cols)'
+   z = GenMat{T}(b)
+   z.parent = a
+   return z
+end
+
+(a::GenMatSpace)(b::Array{fmpz, 2}) = a(map(base_ring(a), b))
+
+(a::GenMatSpace)(b::Array{fmpz, 1}) = a(map(base_ring(a), b))
+
+(a::GenMatSpace){T <: Integer}(b::Array{T, 2}) = a(map(base_ring(a), b))
+
+(a::GenMatSpace){T <: Integer}(b::Array{T, 1}) = a(map(base_ring(a), b))
+
+function Base.Matrix{T}(R::Ring, r::Int, c::Int, a::Array{T,2})
+   M = MatrixSpace(R, r, c)
+   return M(a)
+end
+
+function Base.Matrix{T}(R::Ring, r::Int, c::Int, a::Array{T,1})
+   M = MatrixSpace(R, r, c)
+   return M(a)
 end
 
 ###############################################################################
@@ -2949,7 +3010,7 @@ function typed_hvcat(R::Ring, dims, d...)
    T = elem_type(R)
    r = length(dims)
    c = dims[1]
-   A = Array(T, r, c)
+   A = Array{T}(r, c)
    for i = 1:r
       dims[i] != c && throw(ArgumentError("row $i has mismatched number of columns (expected $c, got $(dims[i]))"))
       for j = 1:c
@@ -2963,7 +3024,7 @@ end
 function typed_hcat(R::Ring, d...)
    T = elem_type(R)
    r = length(d)
-   A = Array(T, 1, r)
+   A = Array{T}(1, r)
    for i = 1:r
       A[1, i] = R(d[i])
    end

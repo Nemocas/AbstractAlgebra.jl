@@ -6,7 +6,7 @@ function benchmark_minpoly_integers()
       for j in 1:40
          r = rand(-20:20)
          M[i, j] = r
-         M[40 + i, 40 + j] = r
+         M[40 + i, 40 + j] = deepcopy(r)
       end
    end
 

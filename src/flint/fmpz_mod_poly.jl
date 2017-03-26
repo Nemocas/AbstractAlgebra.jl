@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-export FmpzModPolyRing, fmpz_mod_poly
+export FmpzModPolyRing, fmpz_mod_poly, factor
 
 ################################################################################
 #
@@ -75,7 +75,7 @@ end
 
 ################################################################################
 #
-#  AbstractString{} I/O
+#  AbstractString I/O
 #
 ################################################################################
 
@@ -90,7 +90,7 @@ function show(io::IO, x::fmpz_mod_poly)
          c = coeff(x, len - i)
          bracket = needs_parentheses(c)
          if !iszero(c)
-            if i != 1 && !is_negative(c)
+            if i != 1 && !isnegative(c)
                print(io, "+")
             end
             if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
@@ -116,7 +116,7 @@ function show(io::IO, x::fmpz_mod_poly)
       c = coeff(x, 0)
       bracket = needs_parentheses(c)
       if !iszero(c)
-         if len != 1 && !is_negative(c)
+         if len != 1 && !isnegative(c)
             print(io, "+")
          end
          if bracket
@@ -625,7 +625,7 @@ end
 
 function integral(x::fmpz_mod_poly)
    len = length(x)
-   v = Array(GenRes{fmpz}, len + 1)
+   v = Array{GenRes{fmpz}}(len + 1)
    v[1] = zero(base_ring(x))
    for i = 1:len
       v[i + 1] = divexact(coeff(x, i - 1), base_ring(x)(i))
@@ -713,6 +713,11 @@ doc"""
 """
 function factor(x::fmpz_mod_poly)
   !isprobabprime(modulus(x)) && error("Modulus not prime in factor")
+  fac = _factor(x)
+  return Fac(parent(x)(lead(x)), fac)
+end
+
+function _factor(x::fmpz_mod_poly)
   fac = fmpz_mod_poly_factor(parent(x).n)
   ccall((:fmpz_mod_poly_factor, :libflint), UInt,
           (Ptr{fmpz_mod_poly_factor}, Ptr{fmpz_mod_poly}), &fac, &x)
@@ -733,6 +738,11 @@ doc"""
 """
 function factor_squarefree(x::fmpz_mod_poly)
   !isprobabprime(modulus(x)) && error("Modulus not prime in factor_squarefree")
+  fac = _factor_squarefree(x)
+  return Fac(parent(x)(lead(x)), fac)
+end
+
+function _factor_squarefree(x::fmpz_mod_poly)
   fac = fmpz_mod_poly_factor(parent(x).n)
   ccall((:fmpz_mod_poly_factor_squarefree, :libflint), UInt,
           (Ptr{fmpz_mod_poly_factor}, Ptr{fmpz_mod_poly}), &fac, &x)
@@ -754,18 +764,18 @@ doc"""
 function factor_distinct_deg(x::fmpz_mod_poly)
   !issquarefree(x) && error("Polynomial must be squarefree")
   !isprobabprime(modulus(x)) && error("Modulus not prime in factor_distinct_deg")
-  degs = Array(Int, degree(x))
+  degs = Array{Int}(degree(x))
   degss = [ pointer(degs) ]
   fac = fmpz_mod_poly_factor(parent(x).n)
   ccall((:fmpz_mod_poly_factor_distinct_deg, :libflint), UInt,
           (Ptr{fmpz_mod_poly_factor}, Ptr{fmpz_mod_poly}, Ptr{Ptr{Int}}),
           &fac, &x, degss)
-  res = Dict{fmpz_mod_poly, Int}()
+  res = Dict{Int, fmpz_mod_poly}()
   for i in 1:fac.num
     f = parent(x)()
     ccall((:fmpz_mod_poly_factor_get_fmpz_mod_poly, :libflint), Void,
          (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly_factor}, Int), &f, &fac, i - 1)
-    res[f] = degs[i]     
+    res[degs[i]] = f
   end
   return res 
 end  
@@ -900,6 +910,8 @@ function (R::FmpzModPolyRing)(arr::Array{GenRes{fmpz}, 1})
   return z
 end
 
+(R::FmpzModPolyRing){T <: Integer}(arr::Array{T, 1}) = R(map(base_ring(R), arr))
+
 function (R::FmpzModPolyRing)(x::fmpz_poly)
   z = fmpz_mod_poly(R.n, x)
   z.parent = R
@@ -917,7 +929,7 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::GenResRing{fmpz}, s::AbstractString{}; cached=true)
+function PolynomialRing(R::GenResRing{fmpz}, s::AbstractString; cached=true)
    if modulus(R) <= typemax(UInt)
       parent_obj = NmodPolyRing(R, Symbol(s), cached)
    else

@@ -15,7 +15,7 @@ export fmpz_rel_series, FmpzRelSeriesRing
 function O(a::fmpz_rel_series)
    val = pol_length(a) + valuation(a) - 1
    val < 0 && throw(DomainError())
-   z = fmpz_rel_series(Array(fmpz, 0), 0, val, val)
+   z = fmpz_rel_series(Array{fmpz}(0), 0, val, val)
    z.parent = parent(a)
    return z
 end

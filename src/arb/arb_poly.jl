@@ -64,7 +64,7 @@ end
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -595,7 +595,7 @@ function arb_vec(b::Array{arb, 1})
 end
 
 function array(R::ArbField, v::Ptr{arb_struct}, n::Int)
-   r = Array(arb, n)
+   r = Array{arb}(n)
    for i=1:n
        r[i] = R()
        ccall((:arb_set, :libarb), Void, (Ptr{arb}, Ptr{arb_struct}),
@@ -779,6 +779,10 @@ function (a::ArbPolyRing)(b::Array{arb, 1})
    return z
 end
 
+(a::ArbPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(base_ring(a), b))
+
+(a::ArbPolyRing)(b::Array{fmpz, 1}) = a(map(base_ring(a), b))
+
 function (a::ArbPolyRing)(b::fmpz_poly)
    z = arb_poly(b, a.base_ring.prec)
    z.parent = a
@@ -803,9 +807,9 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::ArbField, s::AbstractString)
+function PolynomialRing(R::ArbField, s::AbstractString; cached = true)
   S = Symbol(s)
-  parent_obj = ArbPolyRing(R, S)
+  parent_obj = ArbPolyRing(R, S, cached)
   return parent_obj, parent_obj(fmpz_poly([fmpz(0), fmpz(1)]))
 end
 

@@ -85,7 +85,7 @@ canonical_unit(a::fq_nmod_poly) = canonical_unit(lead(a))
   
 ################################################################################
 #
-#  AbstractString{} I/O
+#  AbstractString I/O
 #
 ################################################################################
 
@@ -377,6 +377,29 @@ end
 
 ################################################################################
 #
+#   Remove
+#
+################################################################################
+
+doc"""
+    remove(z::fq_nmod_poly, p::fq_nmod_poly)
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
+>
+> See also `valuation`, which only returns the valuation.
+"""
+function remove(z::fq_nmod_poly, p::fq_nmod_poly)
+   check_parent(z,p)
+   z == 0 && error("Not yet implemented")
+   z = deepcopy(z)
+   v = ccall((:fq_nmod_poly_remove, :libflint), Int,
+            (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, Ptr{FqNmodFiniteField}),
+             &z,  &p, &base_ring(parent(z)))
+   return v, z
+end
+
+################################################################################
+#
 #   Modular arithmetic
 #
 ################################################################################
@@ -513,6 +536,11 @@ end
 ################################################################################
 
 function factor(x::fq_nmod_poly)
+   res, z = _factor(x)
+   return Fac(parent(x)(z), res)
+end
+
+function _factor(x::fq_nmod_poly)
    R = parent(x)
    F = base_ring(R)
    a = F()
@@ -529,7 +557,7 @@ function factor(x::fq_nmod_poly)
       e = unsafe_load(fac.exp,i)
       res[f] = e
    end
-   return res 
+   return res, a
 end  
 
 function factor_distinct_deg(x::fq_nmod_poly)
@@ -543,14 +571,14 @@ function factor_distinct_deg(x::fq_nmod_poly)
    ccall((:fq_nmod_poly_factor_distinct_deg, :libflint), Void, 
          (Ptr{fq_nmod_poly_factor}, Ptr{fq_nmod_poly}, Ptr{Int},
          Ptr{FqNmodFiniteField}), &fac, &x, &tmp.exp, &F)
-   res = Dict{fq_nmod_poly, Int}()
+   res = Dict{Int, fq_nmod_poly}()
    for i in 1:fac.num
       f = R()
       ccall((:fq_nmod_poly_factor_get_poly, :libflint), Void,
             (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly_factor}, Int,
             Ptr{FqNmodFiniteField}), &f, &fac, i-1, &F)
       d = unsafe_load(tmp.exp,i)
-      res[f] = d
+      res[d] = f
    end
    return res
 end
@@ -692,9 +720,9 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::FqNmodFiniteField, s::AbstractString{})
+function PolynomialRing(R::FqNmodFiniteField, s::AbstractString; cached = true)
    S = Symbol(s)
-   parent_obj = FqNmodPolyRing(R, S)
+   parent_obj = FqNmodPolyRing(R, S, cached)
    return parent_obj, parent_obj([R(0), R(1)])
 end
 

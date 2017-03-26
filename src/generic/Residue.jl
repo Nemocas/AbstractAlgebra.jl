@@ -126,7 +126,7 @@ canonical_unit(a::ResElem) = a
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -140,7 +140,7 @@ end
 
 needs_parentheses(x::ResElem) = needs_parentheses(data(x))
 
-is_negative(x::ResElem) = is_negative(data(x))
+isnegative(x::ResElem) = isnegative(data(x))
 
 show_minus_one{T <: RingElem}(::Type{GenRes{T}}) = true
 
@@ -542,6 +542,12 @@ end
 
 function (a::GenResRing{T}){T <: RingElem}(b::fmpz)
    z = GenRes{T}(mod(base_ring(a)(b), modulus(a)))
+   z.parent = a
+   return z
+end
+
+function (a::GenResRing{fmpz})(b::fmpz)
+   z = GenRes{fmpz}(mod(base_ring(a)(b), modulus(a)))
    z.parent = a
    return z
 end

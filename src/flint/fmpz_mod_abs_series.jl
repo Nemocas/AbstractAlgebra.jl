@@ -18,7 +18,7 @@ function O(a::fmpz_mod_abs_series)
    end
    prec = length(a) - 1
    prec < 0 && throw(DomainError())
-   z = fmpz_mod_abs_series(modulus(a), Array(fmpz, 0), 0, prec)
+   z = fmpz_mod_abs_series(modulus(a), Array{fmpz}(0), 0, prec)
    z.parent = parent(a)
    return z
 end
@@ -115,7 +115,7 @@ end
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -602,13 +602,13 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::GenResRing{fmpz}, prec::Int, s::AbstractString{}; model=:capped_relative)
+function PowerSeriesRing(R::GenResRing{fmpz}, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    S = Symbol(s)
 
    if model == :capped_relative
-      parent_obj = FmpzModRelSeriesRing(R, prec, S)
+      parent_obj = FmpzModRelSeriesRing(R, prec, S, cached)
    elseif model == :capped_absolute
-      parent_obj = FmpzModAbsSeriesRing(R, prec, S)
+      parent_obj = FmpzModAbsSeriesRing(R, prec, S, cached)
    end
    return parent_obj, gen(parent_obj)
 end

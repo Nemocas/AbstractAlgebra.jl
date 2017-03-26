@@ -197,7 +197,7 @@ isunit(a::padic) = !Bool(ccall((:padic_is_zero, :libflint), Cint,
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -221,7 +221,7 @@ end
 
 needs_parentheses(x::padic) = true
 
-is_negative(x::padic) = false
+isnegative(x::padic) = false
 
 show_minus_one(::FlintPadicField) = true
 

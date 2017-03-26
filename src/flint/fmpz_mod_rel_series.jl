@@ -15,7 +15,7 @@ export fmpz_mod_rel_series, FmpzModRelSeriesRing
 function O(a::fmpz_mod_rel_series)
    val = pol_length(a) + valuation(a) - 1
    val < 0 && throw(DomainError())
-   z = fmpz_mod_rel_series(modulus(a), Array(fmpz, 0), 0, val, val)
+   z = fmpz_mod_rel_series(modulus(a), Array{fmpz}(0), 0, val, val)
    z.parent = parent(a)
    return z
 end
@@ -110,7 +110,7 @@ end
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -580,7 +580,7 @@ function exp(a::fmpz_mod_rel_series)
    R = base_ring(a)
    vala = valuation(a)
    preca = precision(a)
-   d = Array(fmpz, preca)
+   d = Array{fmpz}(preca)
    c = vala == 0 ? polcoeff(a, 0) : R()
    d[1] = exp(c).data
    len = pol_length(a) + vala

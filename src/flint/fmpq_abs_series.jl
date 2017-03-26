@@ -114,7 +114,7 @@ end
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -801,13 +801,13 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::FlintRationalField, prec::Int, s::AbstractString{}; model=:capped_relative)
+function PowerSeriesRing(R::FlintRationalField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    S = Symbol(s)
 
    if model == :capped_relative
-      parent_obj = FmpqRelSeriesRing(prec, S)
+      parent_obj = FmpqRelSeriesRing(prec, S, cached)
    elseif model == :capped_absolute
-      parent_obj = FmpqAbsSeriesRing(prec, S)
+      parent_obj = FmpqAbsSeriesRing(prec, S, cached)
    end
 
    return parent_obj, gen(parent_obj)

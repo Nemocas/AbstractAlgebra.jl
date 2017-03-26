@@ -18,7 +18,7 @@ function O(a::fq_abs_series)
    end
    prec = length(a) - 1
    prec < 0 && throw(DomainError())
-   z = fq_abs_series(base_ring(a), Array(fq, 0), 0, prec)
+   z = fq_abs_series(base_ring(a), Array{fq}(0), 0, prec)
    z.parent = parent(a)
    return z
 end
@@ -121,7 +121,7 @@ end
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -574,13 +574,13 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::FqFiniteField, prec::Int, s::AbstractString{}; model=:capped_relative)
+function PowerSeriesRing(R::FqFiniteField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    S = Symbol(s)
 
    if model == :capped_relative
-      parent_obj = FqRelSeriesRing(R, prec, S)
+      parent_obj = FqRelSeriesRing(R, prec, S, cached)
    elseif model == :capped_absolute
-      parent_obj = FqAbsSeriesRing(R, prec, S)
+      parent_obj = FqAbsSeriesRing(R, prec, S, cached)
    end
 
    return parent_obj, gen(parent_obj)

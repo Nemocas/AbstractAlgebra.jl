@@ -39,8 +39,9 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, fac, bell,
        combit!, crt, divisible, divisor_lenstra, fdivrem, tdivrem, fmodpow2,
        gcdinv, isprobabprime, issquare, jacobi, remove, root, size, isqrtrem,
        sqrtmod, trailing_zeros, sigma, eulerphi, fib, moebiusmu, primorial,
-       risingfac, numpart, canonical_unit, needs_parentheses, is_negative,
-       show_minus_one, parseint, addeq!, mul!, isunit, isequal, num, den
+       risingfac, numpart, canonical_unit, needs_parentheses, isnegative,
+       show_minus_one, parseint, addeq!, mul!, isunit, isequal, num, den,
+       iszero
 
 ###############################################################################
 #
@@ -210,7 +211,7 @@ end
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -222,7 +223,7 @@ show(io::IO, a::FlintIntegerRing) = print(io, "Integer Ring")
 
 needs_parentheses(x::fmpz) = false
 
-is_negative(x::fmpz) = x < 0
+isnegative(x::fmpz) = x < 0
 
 show_minus_one(::Type{fmpz}) = false
 
@@ -548,6 +549,8 @@ function cmpabs(x::fmpz, y::fmpz)
     Int(ccall((:fmpz_cmpabs, :libflint), Cint, 
               (Ptr{fmpz}, Ptr{fmpz}), &x, &y))
 end
+
+isless(x::fmpz, y::fmpz) = x < y
 
 ###############################################################################
 #
@@ -933,6 +936,36 @@ end
 
 ###############################################################################
 #
+#   Factorization
+#
+###############################################################################
+
+function _factor(a::fmpz)
+   # This is a hack around https://github.com/JuliaLang/julia/issues/19963
+   # Remove this once julia 6.0 is required
+   if a == 1 || a == -1
+     return Dict{fmpz, Int}(), a
+   end
+
+   F = fmpz_factor()
+   ccall((:fmpz_factor, :libflint), Void, (Ptr{fmpz_factor}, Ptr{fmpz}), &F, &a)
+   res = Dict{fmpz, Int}()
+   for i in 1:F.num
+     z = fmpz()
+     ccall((:fmpz_factor_get_fmpz, :libflint), Void,
+           (Ptr{fmpz}, Ptr{fmpz_factor}, Int), &z, &F, i - 1)
+     res[z] = unsafe_load(F.exp, i)
+   end
+   return res, canonical_unit(a)
+end
+
+function factor(a::fmpz)
+   fac, z = _factor(a)
+   return Fac(z, fac)
+end
+
+###############################################################################
+#
 #   Number theoretic/combinatorial
 #
 ###############################################################################
@@ -1000,6 +1033,27 @@ function remove(x::fmpz, y::fmpz)
                (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &x, &y)
    return num, z
 end
+
+remove(x::fmpz, y::Integer) = remove(x, fmpz(y))
+
+remove(x::Integer, y::fmpz) = remove(fmpz(x), y)
+
+remove(x::Integer, y::Integer) = remove(fmpz(x), fmpz(y))
+
+doc"""
+    valuation(x::fmpz, y::fmpz)
+> Return the largest $n$ such that $y^n$ divides $x$.
+"""
+function valuation(x::fmpz, y::fmpz)
+   n, _ = remove(x, y)
+   return n
+end
+
+valuation(x::fmpz, y::Integer) = valuation(x, fmpz(y))
+
+valuation(x::Integer, y::fmpz) = valuation(fmpz(x), y)
+
+valuation(x::Integer, y::Integer) = valuation(fmpz(x), fmpz(y))
 
 doc"""
     divisor_lenstra(n::fmpz, r::fmpz, m::fmpz)
@@ -1379,7 +1433,7 @@ end
 
 (::FlintIntegerRing)(a::Integer) = fmpz(a)
 
-(::FlintIntegerRing)(a::AbstractString{}) = fmpz(a)
+(::FlintIntegerRing)(a::AbstractString) = fmpz(a)
 
 (::FlintIntegerRing)(a::fmpz) = a
 
@@ -1415,7 +1469,7 @@ end
 #
 ###############################################################################
 
-fmpz(s::AbstractString{}) = parse(fmpz, s)
+fmpz(s::AbstractString) = parse(fmpz, s)
 
 fmpz(z::Integer) = fmpz(BigInt(z))
 

@@ -65,7 +65,7 @@ canonical_unit(a::fmpz_poly) = canonical_unit(lead(a))
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -387,7 +387,7 @@ function pseudorem(x::fmpz_poly, y::fmpz_poly)
    y == 0 && throw(DivideError())
    diff = length(x) - length(y) + 1
    r = parent(x)()
-   d = Array(Int, 1)
+   d = Array{Int}(1)
    ccall((:fmpz_poly_pseudo_rem, :libflint), Void, 
      (Ptr{fmpz_poly}, Ptr{Int}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &r, d, &x, &y)
    if (diff > d[1])
@@ -403,7 +403,7 @@ function pseudodivrem(x::fmpz_poly, y::fmpz_poly)
    diff = length(x) - length(y) + 1
    q = parent(x)()
    r = parent(x)()
-   d = Array(Int, 1)
+   d = Array{Int}(1)
    ccall((:fmpz_poly_pseudo_divrem_divconquer, :libflint), Void, 
     (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{Int}, Ptr{fmpz_poly}, Ptr{fmpz_poly}),
                &q, &r, d, &x, &y)
@@ -552,8 +552,8 @@ doc"""
 > roots.
 """
 function signature(f::fmpz_poly)
-   r = Array(Int, 1)
-   s = Array(Int, 1)
+   r = Array{Int}(1)
+   s = Array{Int}(1)
    ccall((:fmpz_poly_signature, :libflint), Void,
          (Ptr{Int}, Ptr{Int}, Ptr{fmpz_poly}), r, s, &f)
    return (r[1], s[1])
@@ -569,8 +569,8 @@ function interpolate(R::FmpzPolyRing, x::Array{fmpz, 1},
                                       y::Array{fmpz, 1})
   z = R()
 
-  ax = Array(Int, length(x))
-  ay = Array(Int, length(y))
+  ax = Array{Int}(length(x))
+  ay = Array{Int}(length(y))
 
   t = fmpz()
 
@@ -584,6 +584,45 @@ function interpolate(R::FmpzPolyRing, x::Array{fmpz, 1},
           &z, ax, ay, length(x))
   return z
 end
+
+################################################################################
+#
+#  Factorization
+#
+################################################################################
+
+doc"""
+    factor(x::fmpz_poly)
+> Returns the factorization of $x$.
+"""
+function factor(x::fmpz_poly)
+  fac, z = _factor(x)
+  ffac = factor(z)
+
+  for (p, e) in ffac
+    fac[parent(x)(p)] = e
+  end
+
+  return Fac(parent(x)(unit(ffac)), fac)
+end
+  
+function _factor(x::fmpz_poly)
+  fac = fmpz_poly_factor()
+  ccall((:fmpz_poly_factor, :libflint), Void,
+              (Ptr{fmpz_poly_factor}, Ptr{fmpz_poly}), &fac, &x)
+  res = Dict{fmpz_poly,Int}()
+  z = fmpz()
+  ccall((:fmpz_poly_factor_get_fmpz, :libflint), Void,
+            (Ptr{fmpz}, Ptr{fmpz_poly_factor}), &z, &fac)
+  for i in 1:fac.num
+    f = parent(x)()
+    ccall((:fmpz_poly_factor_get_fmpz_poly, :libflint), Void,
+            (Ptr{fmpz_poly}, Ptr{fmpz_poly_factor}, Int), &f, &fac, i - 1)
+    e = unsafe_load(fac.exp, i)
+    res[f] = e
+  end
+  return res, z
+end  
 
 ###############################################################################
 #
@@ -774,6 +813,8 @@ function (a::FmpzPolyRing)(b::Array{fmpz, 1})
    return z
 end
 
+(a::FmpzPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(fmpz, b))
+
 (a::FmpzPolyRing)(b::fmpz_poly) = b
 
 ###############################################################################
@@ -782,10 +823,10 @@ end
 #
 ###############################################################################
 
-function PolynomialRing(R::FlintIntegerRing, s::AbstractString{})
+function PolynomialRing(R::FlintIntegerRing, s::AbstractString; cached = true)
    S = Symbol(s)
 
-   parent_obj = FmpzPolyRing(S)
+   parent_obj = FmpzPolyRing(S, cached)
    
    return parent_obj, parent_obj([fmpz(0), fmpz(1)])
 end

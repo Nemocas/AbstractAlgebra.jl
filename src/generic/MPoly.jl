@@ -79,7 +79,7 @@ base_ring(a::Nemo.NewIntParent) = Union{}
 
 ==(a::NewInt, b::NewInt) = a.d == b.d
 
-is_negative(a::Nemo.NewInt) = a.d < 0
+isnegative(a::Nemo.NewInt) = a.d < 0
 
 ###############################################################################
 #
@@ -291,7 +291,7 @@ function show{T <: RingElem}(io::IO, x::GenMPoly{T})
       for i = 1:len
         c = coeff(x, len - i)
         bracket = needs_parentheses(c)
-        if i != 1 && !is_negative(c)
+        if i != 1 && !isnegative(c)
           print(io, "+")
         end
         X = Array(UInt, N, 1)
@@ -365,7 +365,7 @@ show_minus_one{T <: RingElem}(::Type{GenMPoly{T}}) = show_minus_one(T)
 
 needs_parentheses(x::GenMPoly) = length(x) > 1
 
-is_negative(x::GenMPoly) = length(x) == 1 && monomial_iszero(x.exps, 1) && is_negative(x.coeffs[1])
+isnegative(x::GenMPoly) = length(x) == 1 && monomial_iszero(x.exps, 1) && isnegative(x.coeffs[1])
 
 ###############################################################################
 #
@@ -2372,11 +2372,11 @@ doc"""
 > cached. `S` is a symbol corresponding to the ordering of the polynomial and
 > can be one of `:lex`, `:deglex`, `:revlex` or `:degrevlex`.
 """
-function PolynomialRing(R::Ring, s::Array{ASCIIString{}, 1}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
    U = [Symbol(x) for x in s]
    T = elem_type(R)
    N = (ordering == :deglex || ordering == :degrevlex) ? length(U) + 1 : length(U)
    parent_obj = GenMPolyRing{T}(R, U, ordering, N, cached)
 
-   return tuple(parent_obj, gens(parent_obj, Val{ordering})...)
+   return tuple(parent_obj, gens(parent_obj, Val{ordering}))
 end

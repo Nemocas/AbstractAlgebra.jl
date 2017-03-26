@@ -2,25 +2,21 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module Nemo
  
-import Base: Array, abs, asin, asinh, atan, atanh, base, bin, call,
-             checkbounds, convert, cmp, contains, cos, cosh, dec,
-             deepcopy, deepcopy_internal, den, deserialize, det, div, divrem,
-             exp, factor, gcd, gcdx, getindex, hash, hcat, hex, intersect, inv,
-             invmod, isequal, isfinite, isless, isprime, isqrt, isreal, lcm,
-             ldexp, length, log, lufact, lufact!, mod, ndigits, nextpow2, norm,
-             nullspace, num, oct, one, parent, parity, parse, precision,
-             prevpow2, promote_rule, rank, Rational, rem, reverse, serialize,
-             setindex!, show, sign, sin, sinh, size, sqrt, string, sub, tan,
-             tanh, trace, trailing_zeros, transpose, transpose!, truncate,
-             typed_hvcat, typed_hcat, var, vcat, zero, zeros,
-             +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //,
-             /, !=
+import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
+             convert, cmp, contains, cos, cosh, dec, deepcopy,
+             deepcopy_internal, den, deserialize, det, div, divrem, exp, gcd,
+             gcdx, getindex, hash, hcat, hex, intersect, inv, invmod, isequal,
+             isfinite, isless, isqrt, isreal, lcm, ldexp, length, log, lufact,
+             lufact!, mod, ndigits, nextpow2, norm, nullspace, num, oct, one,
+             parent, parse, precision, prevpow2, promote_rule, rank, Rational,
+             rem, reverse, serialize, setindex!, show, sign, sin, sinh, size,
+             sqrt, string, tan, tanh, trace, trailing_zeros, transpose,
+             transpose!, truncate, typed_hvcat, typed_hcat, var, vcat, zero,
+             zeros, +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //, /, !=
 
-import Base: floor, ceil, hypot, sqrt,
-             log, log1p, exp, expm1, sin, cos, sinpi, cospi, tan, cot,
-             sinh, cosh, tanh, coth, atan, asin, acos,
-             atanh, asinh, acosh, gamma, lgamma, digamma, zeta,
-             sinpi, cospi, atan2
+import Base: floor, ceil, hypot, sqrt, log, log1p, exp, expm1, sin, cos, sinpi,
+             cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
+             asinh, acosh, gamma, lgamma, digamma, zeta, sinpi, cospi, atan2
 
 export SetElem, GroupElem, RingElem, FieldElem
 
@@ -29,18 +25,26 @@ export PolyElem, SeriesElem, AbsSeriesElem, ResElem, FracElem, MatElem, FinField
 export PolyRing, SeriesRing, AbsSeriesRing, ResRing, FracField, MatSpace, FinField
 
 export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
-       MaximalRealSubfield, MaximalOrder, Ideal, PermutationGroup
+       MaximalRealSubfield, PermutationGroup
 
 export RealField, ComplexField
 
-export create_accessors, get_handle, package_handle, allocatemem, zeros,
+export create_accessors, get_handle, package_handle, zeros,
        Array, sig_exists
 
 export flint_cleanup, flint_set_num_threads
 
-export error_dim_negative
+export error_dim_negative, ErrorConstrDimMismatch
 
 export is_windows64
+
+if VERSION >= v"0.6.0-dev.2024" # julia started exporting iszero (again?)
+   import Base: iszero
+end
+
+if VERSION < v"0.6-"
+   import Base: isprime, factor, parity, sub, call
+end
 
 include("AbstractTypes.jl")
 
@@ -61,18 +65,8 @@ else
 end
 const libmpfr = joinpath(pkgdir, "local", "lib", "libmpfr")
 const libflint = joinpath(pkgdir, "local", "lib", "libflint")
-const libpari = joinpath(pkgdir, "local", "lib", "libpari")
 const libarb = joinpath(pkgdir, "local", "lib", "libarb")
   
-function allocatemem(bytes::Int)
-   newsize = pari(fmpz(bytes)).d
-   ccall((:gp_allocatemem, :libpari), Void, (Ptr{Int},), newsize)
-end
-
-function pari_sigint_handler()
-   error("User interrupt")
-end
-
 function flint_abort()
   error("Problem in the Flint-Subsystem")
 end
@@ -86,32 +80,10 @@ function __init__()
        Libdl.dlopen(libgmp)
        Libdl.dlopen(libmpfr)
        Libdl.dlopen(libflint)
-       Libdl.dlopen(libpari)
        Libdl.dlopen(libarb)
    else
       push!(Libdl.DL_LOAD_PATH, libdir)
    end
- 
-   if !is_windows()
-      ccall((:pari_set_memory_functions, libpari), Void,
-         (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
-         cglobal(:jl_malloc),
-         cglobal(:jl_calloc),
-         cglobal(:jl_realloc),
-         cglobal(:jl_free))
-   end
-   
-   ccall((:pari_init, libpari), Void, (Int, Int), 300000000, 10000)
-  
-   global avma = cglobal((:avma, libpari), Ptr{Int})
-
-   global gen_0 = cglobal((:gen_0, libpari), Ptr{Int})
-
-   global gen_1 = cglobal((:gen_1, libpari), Ptr{Int})
-
-   global pari_sigint = cglobal((:cb_pari_sigint, libpari), Ptr{Void})
-
-   unsafe_store!(pari_sigint, cfunction(pari_sigint_handler, Void, ()), 1)
 
    if !is_windows()
       ccall((:__gmp_set_memory_functions, libgmp), Void,
@@ -132,7 +104,7 @@ function __init__()
       (Ptr{Void},), cfunction(flint_abort, Void, ()))
 
    println("")
-   println("Welcome to Nemo version 0.5.2")
+   println("Welcome to Nemo version 0.6.0")
    println("")
    println("Nemo comes with absolutely no warranty whatsoever")
    println("")
@@ -160,8 +132,6 @@ include("antic/AnticTypes.jl")
 
 include("arb/ArbTypes.jl")
 
-include("pari/PariTypes.jl")
-
 include("ambiguities.jl") # remove ambiguity warnings
 
 include("Groups.jl")
@@ -186,18 +156,16 @@ end
 ###############################################################################
 
 function create_accessors(T, S, handle)
-   accessor_name = gensym()
-   @eval begin
-      function $(Symbol(:get, accessor_name))(a::$T)
-         return a.auxilliary_data[$handle]::$S
-      end,
-      function $(Symbol(:set, accessor_name))(a::$T, b::$S)
-         if $handle > length(a.auxilliary_data)
-            resize(a.auxilliary_data, $handle)
-         end
-         a.auxilliary_data[$handle] = b
-      end
+   get = function(a)
+      return a.auxilliary_data[handle]
    end
+   set = function(a, b)
+      if handle > length(a.auxilliary_data)
+         resize(a.auxilliary_data, handle)
+      end
+      a.auxilliary_data[handle] = b
+   end
+   return get, set
 end
 
 ###############################################################################
@@ -231,11 +199,11 @@ end # if VERSION
 #
 ###############################################################################
 
-Array(R::Ring, r::Int...) = Array(elem_type(R), r)
+Array(R::Ring, r::Int...) = Array{elem_type(R)}(r)
 
 function zeros(R::Ring, r::Int...)
    T = elem_type(R)
-   A = Array(T, r)
+   A = Array{T}(r)
    for i in eachindex(A)
       A[i] = R()
    end
@@ -282,18 +250,47 @@ MaximalRealSubfield = AnticMaximalRealSubfield
 
 ###############################################################################
 #
-#   Set domain for MaximalOrder and Ideal to Pari
-#
-###############################################################################
-
-MaximalOrder = PariMaximalOrder
-Ideal = PariIdeal
-
-###############################################################################
-#
 #   Error objects
 #
 ###############################################################################
+
+type ErrorConstrDimMismatch <: Exception
+  expect_r::Int
+  expect_c::Int
+  get_r::Int
+  get_c::Int
+  get_l::Int
+
+  function ErrorConstrDimMismatch(er::Int, ec::Int, gr::Int, gc::Int)
+    e = new(er, ec, gr, gc, -1)
+    return e
+  end
+
+  function ErrorConstrDimMismatch(er::Int, ec::Int, gl::Int)
+    e = new(er, ec, -1, -1, gl)
+    return e
+  end
+
+  function ErrorConstrDimMismatch{T}(er::Int, ec::Int, a::Array{T, 2})
+    gr, gc = size(a)
+    return ErrorConstrDimMismatch(er, ec, gr, gc)
+  end
+
+  function ErrorConstrDimMismatch{T}(er::Int, ec::Int, a::Array{T, 1})
+    gl = length(a)
+    return ErrorConstrDimMismatch(er, ec, gl)
+  end
+end
+
+function Base.showerror(io::IO, e::ErrorConstrDimMismatch)
+  if e.get_l == -1
+    print(io, "Expected dimension $(e.expect_r) x $(e.expect_c), ")
+    print(io, "got $(e.get_r) x $(e.get_c)")
+  else
+    print(io, "Expected an array of length $(e.expect_r * e.expect_c), ")
+    print(io, "got $(e.get_l)")
+  end
+end
 
 const error_dim_negative = ErrorException("Dimensions must be non-negative")
 
@@ -304,5 +301,34 @@ const error_dim_negative = ErrorException("Dimensions must be non-negative")
 ###############################################################################
 
 include("../benchmarks/runbenchmarks.jl")
+
+function test_module(x, y)
+   julia_exe = Base.julia_cmd()
+   test_file = joinpath(pkgdir, "test/$x/")
+   test_file = test_file * "$y-test.jl";
+   test_function_name = "test_"
+
+   if x in ["flint", "arb", "antic"]
+     test_function_name *= y
+   else x == "generic"
+     if y == "RelSeries" 
+       test_function_name *= "gen_rel_series"
+     elseif y == "AbsSeries"
+       test_function_name *= "gen_abs_series"
+     elseif y == "Matrix"
+       test_function_name *= "gen_mat"
+     elseif y == "Fraction"
+       test_function_name *= "gen_frac"
+     elseif y == "Residue"
+       test_function_name *= "gen_res"
+     else
+       test_function_name *= "gen_$(lowercase(y))"
+     end
+   end
+
+   cmd = "using Base.Test; using Nemo; include(\"$test_file\"); $test_function_name();"
+   info("spawning ", `$julia_exe -e \"$cmd\"`)
+   run(`$julia_exe -e $cmd`)
+end
 
 end # module

@@ -64,7 +64,7 @@ end
 
 ###############################################################################
 #
-#   AbstractString{} I/O
+#   AbstractString I/O
 #
 ###############################################################################
 
@@ -607,7 +607,7 @@ function acb_vec(b::Array{acb, 1})
 end
 
 function array(R::AcbField, v::Ptr{acb_struct}, n::Int)
-   r = Array(acb, n)
+   r = Array{acb}(n)
    for i=1:n
        r[i] = R()
        ccall((:acb_set, :libarb), Void, (Ptr{acb}, Ptr{acb_struct}),
@@ -720,7 +720,7 @@ doc"""
 function roots(x::acb_poly; target=0, isolate_real=false, initial_prec=0, max_prec=0, max_iter=0)
     deg = degree(x)
     if deg <= 0
-        return Array(acb, 0)
+        return Array{acb}(0)
     end
 
     initial_prec = (initial_prec >= 2) ? initial_prec : 32
@@ -902,6 +902,10 @@ function (a::AcbPolyRing)(b::Array{acb, 1})
    return z
 end
 
+(a::AcbPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(base_ring(a), b))
+
+(a::AcbPolyRing)(b::Array{fmpz, 1}) = a(map(base_ring(a), b))
+
 function (a::AcbPolyRing)(b::fmpz_poly)
    z = acb_poly(b, a.base_ring.prec)
    z.parent = a
@@ -932,9 +936,9 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::AcbField, s::AbstractString)
+function PolynomialRing(R::AcbField, s::AbstractString; cached = true)
   S = Symbol(s)
-  parent_obj = AcbPolyRing(R, S)
+  parent_obj = AcbPolyRing(R, S, cached)
   return parent_obj, parent_obj(fmpz_poly([fmpz(0), fmpz(1)]))
 end
 

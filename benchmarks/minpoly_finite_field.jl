@@ -9,7 +9,7 @@ function benchmark_minpoly_finite_field()
       for j in 1:40
          r = F(rand(1:103)) + s*(rand(1:103))
          M[i, j] = r
-         M[40 + i, 40 + j] = r
+         M[40 + i, 40 + j] = deepcopy(r)
       end
    end
 
