@@ -1943,13 +1943,55 @@ function divrem{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{T}, 1})
    return [parent(a)(q[i].coeffs, eq[i]) for i in 1:len], parent(a)(r.coeffs, er)
 end
 
+################################################################################
+#
+#   Remove and valuation
+#
+################################################################################
+
+doc"""
+    remove(z::GenMPoly, p::GenMPoly)
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
+>
+> See also `valuation`, which only returns the valuation.
+"""
+function remove{T <: RingElem}(z::GenMPoly{T}, p::GenMPoly{T})
+   check_parent(z, p)
+   z == 0 && error("Not yet implemented")
+   fl, q = divides(z, p)
+   if !fl
+      return 0, z
+   end
+   v = 0
+   qn = q
+   while fl
+      q = qn
+      fl, qn = divides(q, p)
+      v += 1
+   end
+   return v, q
+end
+
+doc"""
+    valuation(z::GenMPoly, p::GenMPoly)
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$.
+>
+> See also `remove`, which also returns $z/p^k$.
+"""
+function valuation{T <: RingElem}(z::GenMPoly{T}, p::GenMPoly{T})
+  v, _ = remove(z, p)
+  return v
+end
+
 ###############################################################################
 #
 #   Evaluation
 #
 ###############################################################################
 
-function evaluate{T <: RingElem}(a::GenMPoly{T}, A::Array{T})
+function evaluate{T <: RingElem}(a::GenMPoly{T}, A::Array{T, 1})
    if iszero(a)
       return base_ring(a)()
    end
