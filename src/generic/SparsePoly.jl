@@ -1417,7 +1417,8 @@ end
 
 # Evaluate the coefficients of the polynomials at random points and try to work
 # out the likely degree of the gcd of the two input polys
-function gcd_likely_degree{T <: RingElem, S, N}(a::GenSparsePoly{GenMPoly{T, S, N}}, b::GenSparsePoly{GenMPoly{T, S, N}})
+function gcd_likely_degree{T <: RingElem}(a::GenSparsePoly{GenMPoly{T}}, b::GenSparsePoly{GenMPoly{T}})
+   N = base_ring(a).N
    if a.length == 0
       if b.length == 0
          return 0
