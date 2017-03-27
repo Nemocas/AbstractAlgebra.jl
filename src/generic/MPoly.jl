@@ -1427,14 +1427,20 @@ function divides_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, b
       mask = (mask << bits) + mask1
    end
    N = parent(a).N
-   H = Array(heap_s{N}, 0)
+   H = Array(heap_s, 0)
    I = Array(heap_t, 0)
+   Exps = Array(UInt, N, n + 1)
+   Viewn = [i for i in 1:n + 1]
+   viewc = n + 1
    # set up heap
-   push!(H, heap_s{N}(a.exps[1], 1))
+   vw = Viewn[viewc]
+   viewc -= 1
+   monomial_set!(Exps, vw, a.exps, 1, N)
+   push!(H, heap_s(vw, 1))
    push!(I, heap_t(0, 1, 0))
    q_alloc = max(m - n, n)
    Qc = Array(T, q_alloc)
-   Qe = Array(NTuple{N, UInt}, q_alloc)
+   Qe = Array(UInt, N, q_alloc)
    k = 0
    s = n
    c = R()
@@ -1443,22 +1449,25 @@ function divides_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, b
    mb = -b.coeffs[1]
    Q = Array(Int, 0)
    reuse = Array(Int, 0)
-   while !isempty(H)
+   @inbounds while !isempty(H)
       exp = H[1].exp
       k += 1
       if k > q_alloc
          q_alloc *= 2
          resize!(Qc, q_alloc)
-         resize!(Qe, q_alloc)
+         Qe = reshape(Qe, N*size(Qe, 2))
+         resize!(Qe, N*q_alloc)
+         Qe = reshape(Qe, N, q_alloc)
       end
       first = true
       d1 = false
-      @inbounds while !isempty(H) && H[1].exp == exp
+      @inbounds while !isempty(H) && monomial_isequal(Exps, H[1].exp, exp, N)
          x = H[1]
-         heappop!(H)
+         viewc += 1
+         Viewn[viewc] = heappop!(H, Exps, N)
          v = I[x.n]
          if first
-            d1, Qe[k] = divides(exp, b.exps[1], mask)
+            d1 = monomial_divides!(Qe, k, Exps, exp, b.exps, 1, mask, N)
             first = false
          end
          if v.i == 0
@@ -1490,10 +1499,18 @@ function divides_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, b
          v = I[xn]
          if v.i == 0
             I[xn] = heap_t(0, v.j + 1, 0)
-            heapinsert!(H, I, xn, a.exps[v.j + 1]) # either chain or insert into heap   
+            vw = Viewn[viewc]
+            monomial_set!(Exps, vw, a.exps, v.j + 1, N)
+            if heapinsert!(H, I, xn, vw, Exps, N) # either chain or insert into heap   
+               viewc -= 1
+            end
          elseif v.j < k - 1
             I[xn] = heap_t(v.i, v.j + 1, 0)
-            heapinsert!(H, I, xn, b.exps[v.i] + Qe[v.j + 1]) # either chain or insert into heap
+            vw = Viewn[viewc]
+            monomial_add!(Exps, vw, b.exps, v.i, Qe, v.j + 1, N)
+            if heapinsert!(H, I, xn, vw, Exps, N) # either chain or insert into heap
+               viewc -= 1
+            end
          elseif v.j == k - 1
             s += 1
             push!(reuse, xn)
@@ -1510,10 +1527,18 @@ function divides_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, b
             if !isempty(reuse)
                xn = pop!(reuse)
                I[xn] = heap_t(i, k, 0)
-               heapinsert!(H, I, xn, b.exps[i] + Qe[k]) # either chain or insert into heap
+               vw = Viewn[viewc]
+               monomial_add!(Exps, vw, b.exps, i, Qe, k, N)
+               if heapinsert!(H, I, xn, vw, Exps, N) # either chain or insert into heap
+                  viewc -= 1
+               end
             else
                push!(I, heap_t(i, k, 0))
-               Collections.heappush!(H, heap_s{N}(b.exps[i] + Qe[k], length(I)))
+               vw = Viewn[viewc]
+               monomial_add!(Exps, vw, b.exps, i, Qe, k, N)
+               if heapinsert!(H, I, length(I), vw, Exps, N)
+                  viewc -= 1
+               end
             end                 
          end
          s = 1
@@ -1521,7 +1546,9 @@ function divides_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, b
       zero!(qc)
    end
    resize!(Qc, k)
-   resize!(Qe, k)
+   Qe = reshape(Qe, N*size(Qe, 2))
+   resize!(Qe, N*k)
+   Qe = reshape(Qe, N, k)
    return true, parent(a)(Qc, Qe)
 end
 
@@ -1529,31 +1556,31 @@ function divides{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
    v1, d1 = max_degrees(a)
    v2, d2 = max_degrees(b)
    d = max(d1, d2)
-   bits = 8
-   max_e = 2^(bits - 1)
+   exp_bits = 8
+   max_e = 2^(exp_bits - 1)
    while d >= max_e
-      bits *= 2
-      max_e = 2^(bits - 1)
+      exp_bits *= 2
+      max_e = 2^(exp_bits - 1)
    end
    word_bits = sizeof(Int)*8
-   k = div(word_bits, bits)
+   k = div(word_bits, exp_bits)
    N = parent(a).N
    if k != 1
       M = div(N + k - 1, k)
-      e1 = Array(NTuple{M, UInt}, length(a))
-      e2 = Array(NTuple{M, UInt}, length(b))
-      pack_monomials(e1, a.exps, k, bits)
-      pack_monomials(e2, b.exps, k, bits)
+      e1 = Array(UInt, M, length(a))
+      e2 = Array(UInt, M, length(b))
+      pack_monomials(e1, a.exps, k, exp_bits)
+      pack_monomials(e2, b.exps, k, exp_bits)
       par = GenMPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
       a1 = par(a.coeffs, e1)
       b1 = par(b.coeffs, e2)
       a1.length = a.length
       b1.length = b.length
-      flag, q = divides_monagan_pearce(a1, b1, bits)
-      eq = Array(NTuple{N, UInt}, length(q))
-      unpack_monomials(eq, q.exps, k, bits)
+      flag, q = divides_monagan_pearce(a1, b1, exp_bits)
+      eq = Array(UInt, N, length(q))
+      unpack_monomials(eq, q.exps, k, exp_bits)
    else
-      flag, q = divides_monagan_pearce(a, b, bits)
+      flag, q = divides_monagan_pearce(a, b, exp_bits)
       eq = q.exps
    end
    return flag, parent(a)(q.coeffs, eq)
