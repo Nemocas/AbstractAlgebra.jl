@@ -2732,18 +2732,17 @@ end
 #
 ###############################################################################
 
-function add_scaled_rows!{T <: RingElem}(A::MatElem{T}, i::Int, j::Int, x::T, y::T)
-   (1<=i<=rows(A) && 1<=j<=rows(A)) || throw(BoundsError())
-   for k=1:cols(A)
-      A[i,k] = x*A[i,k] + y*A[j,k]
-   end
-end
-
-function hnf_cohen{T <: RingElem}(A::MatElem{T})
+function hnf_cohen(A::MatElem, canonical = false)
    H = deepcopy(A)
    m = rows(H)
-   n = cols(H)
    U = one(MatrixSpace(base_ring(parent(A)), m, m))
+   hnf_cohen!(H, U, canonical)
+   return H, U
+end
+
+function hnf_cohen!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = false)
+   m = rows(H)
+   n = cols(H)
    l = min(m, n)
    k = 1
    for i = 1:l
@@ -2765,14 +2764,17 @@ function hnf_cohen{T <: RingElem}(A::MatElem{T})
             U[k,c] = u*U[k,c] + v*w
          end
       end
-     # if H[k,i] < 0
-     #    for c = i:n
-     #       H[k,c] = -H[k,c]
-     #    end
-     #    for c = 1:m
-     #       U[k,c] = -U[k,c]
-     #    end
-     # end 
+      if canonical
+         cu = canonical_unit(H[k,i])
+         if cu != 1
+            for c = i:n
+               H[k,c] = divexact(H[k,c],cu)
+           end
+            for c = 1:m
+               U[k,c] = divexact(U[k,c],cu)
+            end
+         end
+      end
       if H[k,i] == 0
          continue
       end
@@ -2787,73 +2789,181 @@ function hnf_cohen{T <: RingElem}(A::MatElem{T})
       end
       k += 1
    end
-   return H, U
 end
 
-function kb_reduced_gcdx{T <: RingElem}(a::T, b::T)
-   d, u, v = gcdx(a,b)
-   if a == 0 || b == 0
-      return d, u, v
-   end
-   # "a<b"
-   if div(a,b) == 0
-      if v != 0 && div(a,v) != 0
-         v = v + div(u, b)*a
-         u = u - div(u, b)*b
-      end
-   else
-      if u != 0 && div(b,u) != 0
-         u = u + div(v, a)*b
-         v = v - div(v, a)*a
-      end
-   end
-   return d, u, v
-end
-
-function kb_reduce_off_diagonal!{T <: RingElem}(A::MatElem{T}, U::MatElem{T}, k::Int)
-  # if A[k,k] < 0
-  #    for c=1:cols(A)
-  #       A[k,c] = -A[k,c]
-  #       U[k,c] = -U[k,c]
-  #    end
-  # end
-   for r = 1:k-1
-      q  = div(A[r,k],A[k,k])
-      for c = 1:cols(A)
-         A[r,c] = A[r,c] - q*A[k,c]
-         U[r,c] = U[r,c] - q*U[k,c]
-      end
-   end
-end
-
-function hnf_kb{T <: RingElem}(A::MatElem{T})
-   #_check_issquare(A)
-   cols(A) == rows(A) || error("Expected square matrix, but matrix is $(cols(A)) x $(rows(A)).")
+function hnf_kb(A::MatElem, canonical = false)
    H = deepcopy(A)
    m = rows(H)
+   n = cols(H)
    U = one(MatrixSpace(base_ring(parent(A)), m, m))
-   for i = 1:m-1
-      for j = 1:i
-         d, u, v = kb_reduced_gcdx(H[j,j], H[i+1,j])
-         a = divexact(H[j,j], d)
-         b = divexact(H[i+1,j], d)
-         for c = 1:m
-            h = H[i+1,c]
-            H[i+1,c] = a*H[i+1,c] - b*H[j,c]
-            H[j,c] = u*H[j,c] + v*h
-         end
-         for c = 1:m
-            w = U[i+1,c]
-            U[i+1,c] = a*U[i+1,c] - b*U[j,c]
-            U[j,c] = u*U[j,c] + v*w
-         end
-         if j > 1
-            kb_reduce_off_diagonal!(H, U, j)
+   hnf_kb!(H, U, canonical)
+   return H, U
+end
+
+function kb_search_first_pivot(H::MatElem)
+   for r = 1:rows(H)
+      for c = 1:cols(H)
+         if H[r,c] != 0
+            return r, c
          end
       end
-      kb_reduce_off_diagonal!(H, U, i+1)
    end
-   return H, U
+   return 0, 0
+end
+
+function kb_reduce_row!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, pivot::Array{Int}, c::Int)
+   r = pivot[c]
+   for i = c+1:cols(H)
+      p = pivot[i]
+      if p == 0
+         continue
+      end
+      q = div(H[r,i], H[p,i])
+      for j = i:cols(H)
+         H[r,j] = H[r,j] - q*H[p,j]
+      end
+      for j = 1:cols(U)
+         U[r,j] = U[r,j] - q*U[p,j]
+      end
+   end
+end
+
+function kb_reduce_column!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, pivot::Array{Int}, c::Int)
+   r = pivot[c]
+   for i = 1:c-1
+      p = pivot[i]
+      if p == 0
+         continue
+      end
+      q = div(H[p,c],H[r,c])
+      for j = c:cols(H)
+         H[p,j] = H[p,j] - q*H[r,j]
+      end
+      for j = 1:cols(U)
+         U[p,j] = U[p,j] - q*U[r,j]
+      end
+   end
+end
+
+function kb_canonical_row!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, r::Int, c::Int)
+   cu = canonical_unit(H[r,c])
+   if cu != 1
+      for j = c:cols(H)
+         H[r,j] = divexact(H[r,j],cu)
+      end
+      for j = 1:cols(U)
+         U[r,j] = divexact(U[r,j],cu)
+      end
+   end
+end
+
+function swap_rows!(a::MatElem, i::Int, j::Int)
+   (1<=i<=rows(a) && 1<=j<=rows(a)) || throw(BoundsError())
+   for k=1:cols(a)
+      x = a[i,k]
+      a[i,k] = a[j,k]
+      a[j,k] = x
+   end
+end
+
+function kb_sort_rows!{T <:RingElem}(H::MatElem{T}, U::MatElem{T}, pivot::Array{Int})
+   m = rows(H)
+   n = cols(H)
+   pivot2 = zeros(Int, m)
+   for i = 1:n
+      if pivot[i] == 0
+         continue
+      end
+      pivot2[pivot[i]] = i
+   end
+   
+   r1 = 1
+   for i = 1:n
+      r2 = pivot[i]
+      if r2 == 0
+         continue
+      end
+      if r1 != r2
+         swap_rows!(H, r1, r2)
+         swap_rows!(U, r1, r2)
+         p = pivot2[r1]
+         pivot[i] = r1
+         if p != 0
+            pivot[p] = r2
+         end
+         pivot2[r1] = i
+         pivot2[r2] = p
+      end
+      r1 += 1
+      if r1 == m
+         break
+      end 
+   end
+end
+
+function hnf_kb!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = false)
+   m = rows(H)
+   n = cols(H)
+   pivot = zeros(Int, n)
+   row1, col1 = kb_search_first_pivot(H)
+   if row1 == 0
+      return nothing
+   end
+   pivot[col1] = row1
+   if canonical
+      kb_canonical_row!(H, U, row1, col1)
+   end
+   pivot_max = col1
+   for i=row1:m-1
+      new_pivot = false
+      for j = 1:pivot_max
+         if H[i+1,j] == 0
+            continue
+         end
+         if pivot[j] == 0
+            pivot[j] = i+1
+            kb_reduce_row!(H, U, pivot, j)
+            pivot_max = max(pivot_max, j)
+            new_pivot = true
+         else
+            p = pivot[j]
+            d, u, v = gcdx(H[p,j],H[i+1,j])
+            a = divexact(H[p,j],d)
+            b = divexact(H[i+1,j],d)
+            for c = j:n
+               h = H[i+1,c]
+               H[i+1,c] = a*H[i+1,c] - b*H[p,c]
+               H[p,c] = u*H[p,c] + v*h
+            end
+            for c = 1:m
+               w = U[i+1,c]
+               U[i+1,c] = a*U[i+1,c] - b*U[p,c]
+               U[p,c] = u*U[p,c] + v*w
+            end
+         end
+         if canonical
+            kb_canonical_row!(H, U, pivot[j], j)
+         end
+         kb_reduce_column!(H, U, pivot, j)
+         if new_pivot
+            break
+         end
+      end
+      if !new_pivot
+         for c = pivot_max+1:n
+            if H[i+1,c] != 0
+               pivot[c] = i+1 
+               if canonical
+                  kb_canonical_row!(H, U, pivot[c], c)
+               end
+               kb_reduce_column!(H, U, pivot, c)
+               pivot_max = max(pivot_max, c)
+               break
+            end
+         end
+      end
+   end
+   kb_sort_rows!(H, U, pivot)
 end
 
 ###############################################################################
@@ -2865,7 +2975,7 @@ end
 function kb_clear_column!{T <: RingElem}(A::MatElem{T}, U::MatElem{T}, i::Int)
    n = rows(A)
    for j = i+1:n
-      d, u, v = kb_reduced_gcdx(A[i,i], A[j,i])
+      d, u, v = gcdx(A[i,i], A[j,i])
       a = divexact(A[i,i], d)
       b = divexact(A[j,i], d)
       for c = i:n
@@ -2896,7 +3006,7 @@ function kb_ri_bot_col_hnf!{T <: RingElem}(A::MatElem{T}, K::MatElem{T}, k::Int)
    n = rows(A)
    for i = n-k+1:n-1
       for j = n-k+1:i
-         d, u, v = kb_reduced_gcdx(A[j,j], A[j,i+1])
+         d, u, v = gcdx(A[j,j], A[j,i+1])
          a = divexact(A[j,j], d)
          b = divexact(A[j,i+1], d)
          for r = 1:n
