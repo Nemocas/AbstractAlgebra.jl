@@ -252,11 +252,11 @@ length(x::GenMPoly) = x.length
 
 num_vars(x::GenMPoly) = parent(x).num_vars
 
-isone(x::GenMPoly) = x.length == 1 && monomial_iszero(x.exps, 1) && x.coeffs[1] == 1
+isone(x::GenMPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && x.coeffs[1] == 1
 
 iszero(x::GenMPoly) = x.length == 0
 
-isconstant(x::GenMPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1))
+isconstant(x::GenMPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
 
 function normalise(a::GenMPoly, n::Int)
    while n > 0 && iszero(a.coeffs[n]) 
@@ -2132,7 +2132,7 @@ function evaluate{T <: RingElem}(a::GenMPoly{T}, A::Array{T, 1})
    else
       start_var = 2
    end
-   while a.length > 1 || (a.length == 1 && !iszero(a.exps[a.length]))
+   while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
       k = main_variable(a, start_var)
       p = main_variable_extract(a, k)
       a = evaluate(p, A[k])
@@ -2154,7 +2154,8 @@ function evaluate{T <: RingElem, U <: Integer}(a::GenMPoly{T}, A::Array{U})
    else
       start_var = 2
    end
-   while a.length > 1 || (a.length == 1 && !iszero(a.exps[a.length]))
+   N = size(a.exps, 1)
+   while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
       k = main_variable(a, start_var)
       p = main_variable_extract(a, k)
       a = evaluate(p, A[k])
@@ -2176,7 +2177,7 @@ function evaluate{T <: RingElem}(a::GenMPoly{T}, A::Array{fmpz})
    else
       start_var = 2
    end
-   while a.length > 1 || (a.length == 1 && !iszero(a.exps[a.length]))
+   while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
       k = main_variable(a, start_var)
       p = main_variable_extract(a, k)
       a = evaluate(p, A[k])
@@ -2310,46 +2311,64 @@ end
 ###############################################################################
 
 # determine the number of the first variable for which there is a nonzero exp
-# we start at variable k
-function main_variable{T <: RingElem}(a::GenMPoly{T}, k::Int)
+# we start at variable k0
+function main_variable{T <: RingElem}(a::GenMPoly{T}, k0::Int)
    N = parent(a).N
-   for i = k:N
+   for k = k0:N
       for j = 1:a.length
-         if a.exps[j][i] != 0
-            return i
+         if a.exps[k, j] != 0
+            return k
          end
       end
    end
    return 0
 end
 
-# return an array of all the starting positions of terms in the main variable k
+# return an array of all the starting positions of terms in the main variable n
 function main_variable_terms{T <: RingElem}(a::GenMPoly{T}, k::Int)
    A = Array(Int, 0)
    current_term = typemax(UInt)
    for i = 1:a.length
-      if a.exps[i][k] != current_term
+      if a.exps[k, i] != current_term
          push!(A, i)
-         current_term = a.exps[i][k]
+         current_term = a.exps[k, i]
       end
    end
    return A
 end
 
 # return the coefficient as a sparse distributed polynomial, of the term in variable
-# k starting at position n 
-function main_variable_coefficient_lex{T <: RingElem}(a::GenMPoly{T}, k::Int, n::Int)
-   exp = a.exps[n][k]
+# k0 starting at position n 
+function main_variable_coefficient_lex{T <: RingElem}(a::GenMPoly{T}, k0::Int, n::Int)
+   exp = a.exps[k0, n]
    N = parent(a).N
-   Ae = Array(NTuple{N, UInt}, 0)
+   Ae = Array(UInt, N, 0)
+   a_alloc = 0
    Ac = Array(T, 0)
+   l = 0
    for i = n:a.length
-      if a.exps[i][k] != exp
+      if a.exps[k0, i] != exp
          break
       end
-      push!(Ae, ntuple(j -> j == k ? UInt(0) : a.exps[i][j], Val{N}))
+      l += 1
+      if l > a_alloc
+         a_alloc = a_alloc*2 + 1
+         tt = reshape(Ae, N*size(Ae, 2))
+         resize!(tt, N*a_alloc)
+         Ae = reshape(tt, N, a_alloc)
+      end
+      for k = 1:N
+         if k == k0
+            Ae[k, l] = UInt(0)
+         else 
+            Ae[k, l] = a.exps[k, i]
+         end
+      end
       push!(Ac, a.coeffs[i])
    end
+   tt = reshape(Ae, N*size(Ae, 2))
+   resize!(tt, N*l)
+   Ae = reshape(tt, N, l)
    return parent(a)(Ac, Ae)
 end
 
@@ -2361,18 +2380,38 @@ function main_variable_coefficient{T <: RingElem}(a::GenMPoly{T}, k::Int, n::Int
    return main_variable_coefficient_lex(a, k, n)
 end
 
-function main_variable_coefficient_deglex{T <: RingElem}(a::GenMPoly{T}, k::Int, n::Int)
-   exp = a.exps[n][k]
+function main_variable_coefficient_deglex{T <: RingElem}(a::GenMPoly{T}, k0::Int, n::Int)
+   exp = a.exps[k0, n]
    N = parent(a).N
-   Ae = Array(NTuple{N, UInt}, 0)
+   Ae = Array(UInt, N, 0)
+   a_alloc = 0
    Ac = Array(T, 0)
+   l = 0
    for i = n:a.length
-      if a.exps[i][k] != exp
+      if a.exps[k0, i] != exp
          break
       end
-      push!(Ae, ntuple(j -> j == 1 ? a.exps[i][1] - a.exps[i][k] : (j == k ? UInt(0) : a.exps[i][j]), Val{N}))
+      l += 1
+      if l > a_alloc
+         a_alloc = 2*a_alloc + 1
+         tt = reshape(Ae, N*size(Ae, 2))
+         resize!(tt, N*a_alloc)
+         Ae = reshape(tt, N, a_alloc)
+      end
+      for k = 1:N
+         if k == 1
+            Ae[k, l] = a.exps[1, i] - a.exps[k, i]
+         elseif k == k0
+            Ae[k, l] = UInt(0)
+         else 
+            Ae[k, l] = a.exps[k, i]
+         end
+      end
       push!(Ac, a.coeffs[i])
    end
+   tt = reshape(Ae, N*size(Ae, 2))
+   resize!(tt, N*l)
+   Ae = reshape(tt, N, l)
    return parent(a)(Ac, Ae)
 end
 
@@ -2385,17 +2424,23 @@ function main_variable_coefficient{T <: RingElem}(a::GenMPoly{T}, k::Int, n::Int
 end
 
 function main_variable_extract{T <: RingElem}(a::GenMPoly{T}, k::Int)
-   V = [(a.exps[i][k], i) for i in 1:length(a)]
+   V = [(a.exps[k, i], i) for i in 1:length(a)]
    sort!(V)
+   N = size(a.exps, 1)
    Rc = [a.coeffs[V[i][2]] for i in 1:length(a)]
-   Re = [a.exps[V[i][2]] for i in 1:length(a)]
+   Re = Array(UInt, N, length(a))
+   for i = 1:length(a)
+      for j = 1:N
+         Re[j, i] = a.exps[j, V[i][2]]
+      end
+   end
    a2 = parent(a)(Rc, Re)
    A = main_variable_terms(a2, k)
    Pe = Array(UInt, length(A))
    Pc = Array(GenMPoly{T}, length(A))
    ord = parent(a).ord
    for i = 1:length(A)
-      Pe[i] = a2.exps[A[i]][k]
+      Pe[i] = a2.exps[k, A[i]]
       Pc[i] = main_variable_coefficient(a2, k, A[i], Val{ord})
    end
    if ord == :lex || ord == :revlex
