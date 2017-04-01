@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export MatricSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
+export MatrixSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
        ishessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
        powers, similarity!, solve, solve_rational, hnf, hnf_with_trafo, snf,
@@ -2735,7 +2735,7 @@ end
 function hnf_cohen(A::MatElem, canonical = false)
    H = deepcopy(A)
    m = rows(H)
-   U = one(MatrixSpace(base_ring(parent(A)), m, m))
+   U = one(MatrixSpace(base_ring(A), m, m))
    hnf_cohen!(H, U, canonical)
    return H, U
 end
@@ -2764,6 +2764,9 @@ function hnf_cohen!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = fal
             U[k,c] = u*U[k,c] + v*w
          end
       end
+      if H[k,i] == 0
+         continue
+      end
       if canonical
          cu = canonical_unit(H[k,i])
          if cu != 1
@@ -2774,9 +2777,6 @@ function hnf_cohen!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = fal
                U[k,c] = divexact(U[k,c],cu)
             end
          end
-      end
-      if H[k,i] == 0
-         continue
       end
       for j = 1:k-1
          q = div(H[j,i], H[k, i])
@@ -2795,7 +2795,7 @@ function hnf_kb(A::MatElem, canonical = false)
    H = deepcopy(A)
    m = rows(H)
    n = cols(H)
-   U = one(MatrixSpace(base_ring(parent(A)), m, m))
+   U = one(MatrixSpace(base_ring(A), m, m))
    hnf_kb!(H, U, canonical)
    return H, U
 end
@@ -2996,86 +2996,64 @@ end
 #
 ###############################################################################
 
-function kb_clear_column!{T <: RingElem}(A::MatElem{T}, U::MatElem{T}, i::Int)
-   n = rows(A)
-   for j = i+1:n
-      d, u, v = gcdx(A[i,i], A[j,i])
-      a = divexact(A[i,i], d)
-      b = divexact(A[j,i], d)
-      for c = i:n
-         h = A[j,c]
-         A[j,c] = a*A[j,c] - b*A[i,c]
-         A[i,c] = u*A[i,c] + v*h
-      end
-      for c = 1:n
-         w = U[j,c]
-         U[j,c] = a*U[j,c] - b*U[i,c]
-         U[i,c] = u*U[i,c] + v*w
-      end
-   end
-end
-
-function kb_reduce_off_diagonal_ri_bot_col!{T <: RingElem}(A::MatElem{T}, K::MatElem{T}, k::Int, j::Int)
-   n = cols(A)
-   for c = n-k+1:j-1
-      q = div(A[j,c],A[j,j])
-      for r = 1:rows(A)
-         A[r,c] = A[r,c] - q*A[r,j]
-         K[r,c] = K[r,c] - q*K[r,j]
-      end
-   end
-end
-
-function kb_ri_bot_col_hnf!{T <: RingElem}(A::MatElem{T}, K::MatElem{T}, k::Int)
-   n = rows(A)
-   for i = n-k+1:n-1
-      for j = n-k+1:i
-         d, u, v = gcdx(A[j,j], A[j,i+1])
-         a = divexact(A[j,j], d)
-         b = divexact(A[j,i+1], d)
-         for r = 1:n
-            h = A[r,i+1]
-            A[r,i+1] = a*A[r,i+1] - b*A[r,j]
-            A[r,j] = u*A[r,j] + v*h
-         end
-         for r = 1:n
-            w = K[r,i+1]
-            K[r,i+1] = a*K[r,i+1] - b*K[r,j]
-            K[r,j] = u*K[r,j] + v*w
-         end
-         if j > 1
-            kb_reduce_off_diagonal_ri_bot_col!(A, K, k, j)
-         end
-      end
-      kb_reduce_off_diagonal_ri_bot_col!(A, K, k, i+1)
-   end
-end
-
-function snf_kb{T <: RingElem}(A::MatElem{T})
-   #_check_issquare(A)
-   cols(A) == rows(A) || error("Expected square matrix, but matrix is $(cols(A)) x $(rows(A)).")
+function snf_kb(A::MatElem, canonical = false)
    S = deepcopy(A)
+   m = rows(A)
+   n = cols(A)
+   U = one(MatrixSpace(base_ring(A), m, m))
+   K = one(MatrixSpace(base_ring(A), n, n))
+   snf_kb!(S, U, K, canonical)
+   return S, U, K
+end
+
+function kb_clear_row!{T <: RingElem}(S::MatElem{T}, K::MatElem{T}, i::Int)
    m = rows(S)
-   U = one(parent(A))
-   K = one(parent(A))
-   i = 0
-   while i<=m-1
-      kb_clear_column!(S, U, i+1)
-      kb_ri_bot_col_hnf!(S, K, m-i)
-      r = i+2
-      while r <= m && S[r, i+1] == 0
-         r+=1
-      end
-      if r != m+1
+   n = cols(S)
+   for j = i+1:n
+      if S[i,j] == 0
          continue
       end
+      d, u, v = gcdx(S[i,i], S[i,j])
+      a = divexact(S[i,i], d)
+      b = divexact(S[i,j], d)
+      for r = i:m
+         h = S[r,j]
+         S[r,j] = a*S[r,j] - b*S[r,i]
+         S[r,i] = u*S[r,i] + v*h
+      end
+      for r = 1:n
+         w = K[r,j]
+         K[r,j] = a*K[r,j] - b*K[r,i]
+         K[r,i] = u*K[r,i] + v*w
+      end
+   end
+end
+
+function snf_kb!{T <: RingElem}(S::MatElem{T}, U::MatElem{T}, K::MatElem{T}, canonical = false)
+   m = rows(S)
+   n = cols(S)
+   l = min(m,n)
+   i = 0
+   while i<=l-1
+      kb_clear_row!(S, K, i+1)
+      hnf_cohen!(S, U, canonical)
+      c = i+2
+      while c <= n && S[i+1, c] == 0
+         c+=1
+      end
+      if c != n+1
+         continue
+      end
+      if S[i+1, i+1] == 0
+         return nothing
+      end
       breakLoop = false
-      for k = i+1:m
-         for j = i+1:k
-            if rem(S[k,j], S[i+1, i+1]) != 0
-               for r = 1:m
-                  S[r,i+1] += S[r,j]
-                  K[r,i+1] += K[r,j]
+      for k = i+1:n
+         for j = i+1:min(m,k)
+            if rem(S[j,k], S[i+1, i+1]) != 0
+               for c = 1:n
+                  S[i+1,c] += S[j,c]
+                  U[i+1,c] += U[j,c]
                end
                i -= 1
                breakLoop = true
@@ -3088,7 +3066,6 @@ function snf_kb{T <: RingElem}(A::MatElem{T})
       end
       i+=1
    end
-   return S, U, K
 end
 
 ###############################################################################
