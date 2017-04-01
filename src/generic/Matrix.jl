@@ -2745,6 +2745,14 @@ function hnf_cohen!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = fal
    n = cols(H)
    l = min(m, n)
    k = 1
+   t = base_ring(H)()
+   t1 = base_ring(H)()
+   t2 = base_ring(H)()
+   a = base_ring(H)()
+   b = base_ring(H)()
+   u = base_ring(H)()
+   v = base_ring(H)()
+   d = base_ring(H)()
    for i = 1:l
       for j = k+1:m
          if H[j,i] == 0
@@ -2752,16 +2760,32 @@ function hnf_cohen!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = fal
          end
          d, u, v = gcdx(H[k,i], H[j,i])
          a = divexact(H[k,i], d)
-         b = divexact(H[j,i], d)
+         b = -divexact(H[j,i], d)
          for c = i:n
-            h = H[j,c]
-            H[j,c] = a*H[j,c] - b*H[k,c]
-            H[k,c] = u*H[k,c] + v*h
+            t = deepcopy(H[j,c])
+            mul!(t1, a, H[j,c])
+            mul!(t2, b, H[k,c])
+            s = H[j,c]
+            add!(s, t1, t2)
+            H[j,c] = s
+            mul!(t1, u, H[k,c])
+            mul!(t2, v, t)
+            s = H[k,c]
+            add!(s, t1, t2)
+            H[k,c] = s
          end
          for c = 1:m
-            w = U[j,c]
-            U[j,c] = a*U[j,c] - b*U[k,c]
-            U[k,c] = u*U[k,c] + v*w
+            t = deepcopy(U[j,c])
+            mul!(t1, a, U[j,c])
+            mul!(t2, b, U[k,c])
+            s = U[j,c]
+            add!(s, t1, t2)
+            U[j,c] = s
+            mul!(t1, u, U[k,c])
+            mul!(t2, v, t)
+            s = U[k,c]
+            add!(s, t1, t2)
+            U[k,c] = s
          end
       end
       if H[k,i] == 0
@@ -2779,12 +2803,18 @@ function hnf_cohen!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = fal
          end
       end
       for j = 1:k-1
-         q = div(H[j,i], H[k, i])
+         q = -div(H[j,i], H[k, i])
          for c = i:n
-            H[j,c] = H[j,c] - q*H[k,c]
+            mul!(t, q, H[k,c])
+            s = H[j,c]
+            addeq!(s, t)
+            H[j,c] = s
          end
          for c = 1:m
-            U[j,c] = U[j,c] - q*U[k,c]
+            mul!(t, q, U[k,c])
+            s = U[j,c]
+            addeq!(s, t)
+            U[j,c] = s
          end
       end
       k += 1
@@ -2823,11 +2853,15 @@ function kb_reduce_row!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, pivot::Arra
       q = -div(H[r,i], H[p,i])
       for j = i:cols(H)
          mul!(t, q, H[p,j])
-         addeq!(H[r,j], t)
+         s = H[r,j]
+         addeq!(s, t)
+         H[r,j] = s
       end
       for j = 1:cols(U)
          mul!(t, q, U[p,j])
-         addeq!(U[r,j], t)
+         s = U[r,j]
+         addeq!(s, t)
+         U[r,j] = s
       end
    end
 end
@@ -2844,11 +2878,15 @@ function kb_reduce_column!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, pivot::A
       q = -div(H[p,c],H[r,c])
       for j = c:cols(H)
          mul!(t, q, H[r,j])
-         addeq!(H[p,j], t)
+         s = H[p,j]
+         addeq!(s, t)
+         H[p,j] = s
       end
       for j = 1:cols(U)
          mul!(t, q, U[r,j])
-         addeq!(U[p,j], t)
+         s = U[p,j]
+         addeq!(s, t)
+         U[p,j] = s
       end
    end
 end
@@ -2950,19 +2988,27 @@ function hnf_kb!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = false)
                t = deepcopy(H[i+1,c])
                mul!(t1, a, H[i+1,c])
                mul!(t2, b, H[p,c])
-               add!(H[i+1,c], t1, t2)
+               s = H[i+1,c]
+               add!(s, t1, t2)
+               H[i+1,c] = s
                mul!(t1, u, H[p,c])
                mul!(t2, v, t)
-               add!(H[p,c], t1, t2)
+               s = H[p,c]
+               add!(s, t1, t2)
+               H[p,c] = s
             end
             for c = 1:m
                t = deepcopy(U[i+1,c])
                mul!(t1, a, U[i+1,c])
                mul!(t2, b, U[p,c])
-               add!(U[i+1,c], t1, t2)
+               s = U[i+1,c]
+               add!(s, t1, t2)
+               U[i+1,c] = s
                mul!(t1, u, U[p,c])
                mul!(t2, v, t)
-               add!(U[p,c], t1, t2)
+               s = U[p,c]
+               add!(s, t1, t2)
+               U[p,c] = s
             end
          end
          if canonical
@@ -3009,22 +3055,46 @@ end
 function kb_clear_row!{T <: RingElem}(S::MatElem{T}, K::MatElem{T}, i::Int)
    m = rows(S)
    n = cols(S)
+   t = base_ring(S)()
+   t1 = base_ring(S)()
+   t2 = base_ring(S)()
+   a = base_ring(S)()
+   b = base_ring(S)()
+   u = base_ring(S)()
+   v = base_ring(S)()
+   d = base_ring(S)()
    for j = i+1:n
       if S[i,j] == 0
          continue
       end
       d, u, v = gcdx(S[i,i], S[i,j])
       a = divexact(S[i,i], d)
-      b = divexact(S[i,j], d)
+      b = -divexact(S[i,j], d)
       for r = i:m
-         h = S[r,j]
-         S[r,j] = a*S[r,j] - b*S[r,i]
-         S[r,i] = u*S[r,i] + v*h
+         t = deepcopy(S[r,j])
+         mul!(t1, a, S[r,j])
+         mul!(t2, b, S[r,i])
+         s = S[r,j]
+         add!(s, t1, t2)
+         S[r,j] = s
+         mul!(t1, u, S[r,i])
+         mul!(t2, v, t)
+         s = S[r,i]
+         add!(s, t1, t2)
+         S[r,i] = s
       end
       for r = 1:n
-         w = K[r,j]
-         K[r,j] = a*K[r,j] - b*K[r,i]
-         K[r,i] = u*K[r,i] + v*w
+         t = deepcopy(K[r,j])
+         mul!(t1, a, K[r,j])
+         mul!(t2, b, K[r,i])
+         s = K[r,j]
+         add!(s, t1, t2)
+         K[r,j] = s
+         mul!(t1, u, K[r,i])
+         mul!(t2, v, t)
+         s = K[r,i]
+         add!(s, t1, t2)
+         K[r,i] = s
       end
    end
 end
@@ -3036,7 +3106,7 @@ function snf_kb!{T <: RingElem}(S::MatElem{T}, U::MatElem{T}, K::MatElem{T}, can
    i = 0
    while i<=l-1
       kb_clear_row!(S, K, i+1)
-      hnf_cohen!(S, U, canonical)
+      hnf_kb!(S, U, canonical)
       c = i+2
       while c <= n && S[i+1, c] == 0
          c+=1
@@ -3052,8 +3122,14 @@ function snf_kb!{T <: RingElem}(S::MatElem{T}, U::MatElem{T}, K::MatElem{T}, can
          for j = i+1:min(m,k)
             if rem(S[j,k], S[i+1, i+1]) != 0
                for c = 1:n
-                  S[i+1,c] += S[j,c]
-                  U[i+1,c] += U[j,c]
+                  s = S[i+1,c]
+                  addeq!(s, S[j,c])
+                  S[i+1,c] = s
+               end
+               for c = 1:m
+                  s = U[i+1,c]
+                  addeq!(s, U[j,c])
+                  U[i+1,c] = s
                end
                i -= 1
                breakLoop = true
