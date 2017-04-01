@@ -823,7 +823,11 @@ function ^{T <: RingElem}(a::GenSparsePoly{T}, b::Int)
    elseif b == 2
       return a*a
    else
-      return pow_fps(a, b)
+      z = a*a
+      for i = 3:b
+         z *= a
+      end
+      return z
    end
 end
 
@@ -1365,9 +1369,6 @@ function pseudorem{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T})
    if a.exps[a.length] < b.exps[b.length]
       return deepcopy(a)
    end
-   if n > 30
-      return pseudorem_monagan_pearce(a, b)
-   end
    k = reinterpret(Int, a.exps[a.length] - b.exps[b.length]) + 1
    l = lead(b)
    while a.length > 0 && a.exps[a.length] >= b.exps[b.length]
@@ -1542,7 +1543,7 @@ function gcd{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T}, ignore_con
          end
       end
    end
-   # if we in univariate case, convert to dense, take gcd, convert back
+   # if we are in univariate case, convert to dense, take gcd, convert back
    if constant_coeffs
       # convert polys to univariate dense
       R, x = PolynomialRing(base_ring(base_ring(a)), "\$")
@@ -1577,7 +1578,7 @@ function gcd{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T}, ignore_con
       end
    end
    # compute likely degree of gcd
-   deg = gcd_likely_degree(a, b)
+   deg = 0 # gcd_likely_degree(a, b)
    # is the lead/trail term a monomial
    lead_monomial = lead(a).length == 1 || lead(b).length == 1
    trail_monomial = trail(a).length == 1 || trail(b).length == 1

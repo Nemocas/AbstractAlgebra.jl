@@ -157,6 +157,18 @@ function monomial_isless(A::Array{UInt, 2}, i::Int, j::Int, N::Int)
    return false
 end
 
+function monomial_min!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int)
+   for k = 1:N
+      if A[k, i] < B[k, j]
+         break
+      elseif A[k, i] > B[k, j]
+         monomial_set!(A, i, B, j, N)
+         break
+      end
+   end
+   nothing
+end
+
 function monomial_isless(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int)
    for k = 1:N
       if A[k, i] < B[k, j]
@@ -2126,6 +2138,7 @@ function evaluate{T <: RingElem}(a::GenMPoly{T}, A::Array{T, 1})
    if iszero(a)
       return base_ring(a)()
    end
+   N = size(a.exps, 1)
    ord = parent(a).ord
    if ord == :lex || ord == :revlex
       start_var = 1
@@ -2148,6 +2161,7 @@ function evaluate{T <: RingElem, U <: Integer}(a::GenMPoly{T}, A::Array{U})
    if iszero(a)
       return base_ring(a)()
    end
+   N = size(a.exps, 1)
    ord = parent(a).ord
    if ord == :lex || ord == :revlex
       start_var = 1
@@ -2171,6 +2185,7 @@ function evaluate{T <: RingElem}(a::GenMPoly{T}, A::Array{fmpz})
    if iszero(a)
       return base_ring(a)()
    end
+   N = size(a.exps, 1)
    ord = parent(a).ord
    if ord == :lex || ord == :revlex
       start_var = 1
@@ -2238,14 +2253,14 @@ function gcd{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
    for i = start_var:N
       if v1[i] != 0
          for j = 1:length(a)
-            if a.exps[j][i] == v1[i]
+            if a.exps[i, j] == v1[i]
                lead1[i] += 1
             end
          end
       end
       if v2[i] != 0
          for j = 1:length(b)
-            if b.exps[j][i] == v2[i]
+            if b.exps[i, j] == v2[i]
                lead2[i] += 1
             end
          end
@@ -2285,12 +2300,12 @@ function term_content{T <: RingElem}(a::GenMPoly{T})
       return a
    end
    N = parent(a).N
-   Ce = Array(NTuple{N, UInt}, 1)
+   Ce = Array(UInt, N, 1)
    Cc = Array(T, 1)
-   Ce[1] = a.exps[1]
+   monomial_set!(Ce, 1, a.exps, 1, N)
    for i = 2:a.length
-      Ce[1] = min(Ce[1], a.exps[i])
-      if iszero(Ce[1])
+      monomial_min!(Ce, 1, a.exps, i, N)
+      if monomial_iszero(Ce, 1, N)
          break
       end
    end
@@ -2454,20 +2469,29 @@ end
 
 function main_variable_insert_lex{T <: RingElem}(a::GenSparsePoly{GenMPoly{T}}, k::Int)
    N = base_ring(a).N
-   V = [(ntuple(i -> i == k ? a.exps[r] : a.coeffs[r].exps[s][i], Val{N}), r, s) for
+   V = [(ntuple(i -> i == k ? a.exps[r] : a.coeffs[r].exps[i, s], Val{N}), r, s) for
        r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in 1:length(V)]
-   Re = [V[i][1] for i in 1:length(V)]
+   Re = Array(UInt, N, length(V))
+   for i = 1:length(V)
+      for j = 1:N
+         Re[j, i] = V[i][1][j]
+      end
+   end
    return base_ring(a)(Rc, Re)
 end
 
 function main_variable_insert_deglex{T <: RingElem}(a::GenSparsePoly{GenMPoly{T}}, k::Int)
-   V = [(ntuple(i -> i == 1 ? a.exps[r] + a.coeffs[r].exps[s][1] : (i == k ? a.exps[r] :
-        a.coeffs[r].exps[s][i]), Val{N}), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
+   V = [(ntuple(i -> i == 1 ? a.exps[r] + a.coeffs[r].exps[1, s] : (i == k ? a.exps[r] :
+        a.coeffs[r].exps[i, s]), Val{N}), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in 1:length(V)]
-   Re = [V[i][1] for i in 1:length(V)]
+   for i = 1:length(V)
+      for j = 1:N
+         Re[j, i] = V[i][1][j]
+      end
+   end
    return base_ring(a)(Rc, Re)
 end
 
