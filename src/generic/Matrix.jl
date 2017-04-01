@@ -2813,34 +2813,42 @@ end
 
 function kb_reduce_row!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, pivot::Array{Int}, c::Int)
    r = pivot[c]
+   t = base_ring(H)()
+   q = base_ring(H)()
    for i = c+1:cols(H)
       p = pivot[i]
       if p == 0
          continue
       end
-      q = div(H[r,i], H[p,i])
+      q = -div(H[r,i], H[p,i])
       for j = i:cols(H)
-         H[r,j] = H[r,j] - q*H[p,j]
+         mul!(t, q, H[p,j])
+         addeq!(H[r,j], t)
       end
       for j = 1:cols(U)
-         U[r,j] = U[r,j] - q*U[p,j]
+         mul!(t, q, U[p,j])
+         addeq!(U[r,j], t)
       end
    end
 end
 
 function kb_reduce_column!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, pivot::Array{Int}, c::Int)
    r = pivot[c]
+   t = base_ring(H)()
+   q = base_ring(H)()
    for i = 1:c-1
       p = pivot[i]
       if p == 0
          continue
       end
-      q = div(H[p,c],H[r,c])
+      q = -div(H[p,c],H[r,c])
       for j = c:cols(H)
-         H[p,j] = H[p,j] - q*H[r,j]
+         mul!(t, q, H[r,j])
+         addeq!(H[p,j], t)
       end
       for j = 1:cols(U)
-         U[p,j] = U[p,j] - q*U[r,j]
+         mul!(t, q, U[r,j])
+         addeq!(U[p,j], t)
       end
    end
 end
@@ -2914,6 +2922,14 @@ function hnf_kb!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = false)
       kb_canonical_row!(H, U, row1, col1)
    end
    pivot_max = col1
+   t = base_ring(H)()
+   t1 = base_ring(H)()
+   t2 = base_ring(H)()
+   a = base_ring(H)()
+   b = base_ring(H)()
+   u = base_ring(H)()
+   v = base_ring(H)()
+   d = base_ring(H)()
    for i=row1:m-1
       new_pivot = false
       for j = 1:pivot_max
@@ -2929,16 +2945,24 @@ function hnf_kb!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = false)
             p = pivot[j]
             d, u, v = gcdx(H[p,j],H[i+1,j])
             a = divexact(H[p,j],d)
-            b = divexact(H[i+1,j],d)
+            b = -divexact(H[i+1,j],d)
             for c = j:n
-               h = H[i+1,c]
-               H[i+1,c] = a*H[i+1,c] - b*H[p,c]
-               H[p,c] = u*H[p,c] + v*h
+               t = deepcopy(H[i+1,c])
+               mul!(t1, a, H[i+1,c])
+               mul!(t2, b, H[p,c])
+               add!(H[i+1,c], t1, t2)
+               mul!(t1, u, H[p,c])
+               mul!(t2, v, t)
+               add!(H[p,c], t1, t2)
             end
             for c = 1:m
-               w = U[i+1,c]
-               U[i+1,c] = a*U[i+1,c] - b*U[p,c]
-               U[p,c] = u*U[p,c] + v*w
+               t = deepcopy(U[i+1,c])
+               mul!(t1, a, U[i+1,c])
+               mul!(t2, b, U[p,c])
+               add!(U[i+1,c], t1, t2)
+               mul!(t1, u, U[p,c])
+               mul!(t2, v, t)
+               add!(U[p,c], t1, t2)
             end
          end
          if canonical
