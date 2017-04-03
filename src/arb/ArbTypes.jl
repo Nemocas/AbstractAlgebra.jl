@@ -27,13 +27,16 @@ const ArbFieldID = ObjectIdDict()
 type ArbField <: Field
   prec::Int
 
-  function ArbField(p::Int = 256)
+  function ArbField(p::Int = 256; cached = true)
     arb_check_prec(p)
-    try
+    if haskey(ArbFieldID, p)
       return ArbFieldID[p]::ArbField
-    catch
-      ArbFieldID[p] = new(p)
-      return ArbFieldID[p]::ArbField
+    else
+      z = new(p)
+      if cached
+        ArbFieldID[p] = z
+      end
+      return z
     end
   end
 end
@@ -143,12 +146,16 @@ const AcbFieldID = ObjectIdDict()
 type AcbField <: Field
   prec::Int
 
-  function AcbField(p::Int = 256)
+  function AcbField(p::Int = 256; cached = true)
     arb_check_prec(p)
-    try
+    if haskey(AcbFieldID, p)
       return AcbFieldID[p]::AcbField
-    catch
-      AcbFieldID[p] = new(p)::AcbField
+    else
+      z = new(p)
+      if cached
+        AcbFieldID[p] = z
+      end
+      return z
     end
   end
 end
@@ -229,12 +236,15 @@ type ArbPolyRing <: PolyRing{arb}
   base_ring::ArbField
   S::Symbol
 
-  function ArbPolyRing(R::ArbField, S::Symbol)
-    try
+  function ArbPolyRing(R::ArbField, S::Symbol, cached = true)
+    if haskey(ArbPolyRingID, (R, S))
       return ArbPolyRingID[R, S]::ArbPolyRing
-    catch
-      ArbPolyRingID[R, S] = new(R,S)
-      return ArbPolyRingID[R, S]::ArbPolyRing
+    else
+      z = new(R, S)
+      if cached
+        ArbPolyRingID[R, S] = z
+      end
+      return z
     end
   end
 end
@@ -334,12 +344,15 @@ type AcbPolyRing <: PolyRing{acb}
   base_ring::AcbField
   S::Symbol
 
-  function AcbPolyRing(R::AcbField, S::Symbol)
-    try
+  function AcbPolyRing(R::AcbField, S::Symbol, cached = true)
+    if haskey(AcbPolyRingID, (R, S))
       return AcbPolyRingID[R, S]::AcbPolyRing
-    catch
-      AcbPolyRingID[R, S] = new(R,S)
-      return AcbPolyRingID[R, S]::AcbPolyRing
+    else
+      z = new(R, S)
+      if cached
+        AcbPolyRingID[R, S] = z
+      end
+      return z
     end
   end
 end
@@ -451,12 +464,14 @@ type ArbMatSpace <: MatSpace{arb}
   cols::Int
   base_ring::ArbField
 
-  function ArbMatSpace(R::ArbField, r::Int, c::Int)
+  function ArbMatSpace(R::ArbField, r::Int, c::Int, cached = true)
     if haskey(ArbMatSpaceID, (R, r, c))
       return ArbMatSpaceID[(R, r, c)]::ArbMatSpace
     else
       z = new(r, c, R)
-      ArbMatSpaceID[(R, r, c)] = z
+      if cached
+        ArbMatSpaceID[(R, r, c)] = z
+      end
       return z::ArbMatSpace
     end
   end
@@ -598,12 +613,14 @@ type AcbMatSpace <: MatSpace{acb}
   cols::Int
   base_ring::AcbField
 
-  function AcbMatSpace(R::AcbField, r::Int, c::Int)
+  function AcbMatSpace(R::AcbField, r::Int, c::Int, cached = true)
     if haskey(AcbMatSpaceID, (R, r, c))
       return AcbMatSpaceID[(R, r, c)]::AcbMatSpace
     else
       z = new(r, c, R)
-      AcbMatSpaceID[(R, r, c)] = z
+      if cached
+        AcbMatSpaceID[(R, r, c)] = z
+      end
       return z::AcbMatSpace
     end
   end

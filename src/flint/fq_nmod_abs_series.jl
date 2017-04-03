@@ -574,13 +574,13 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::FqNmodFiniteField, prec::Int, s::AbstractString; model=:capped_relative)
+function PowerSeriesRing(R::FqNmodFiniteField, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    S = Symbol(s)
 
    if model == :capped_relative
-      parent_obj = FqNmodRelSeriesRing(R, prec, S)
+      parent_obj = FqNmodRelSeriesRing(R, prec, S, cached)
    elseif model == :capped_absolute
-      parent_obj = FqNmodAbsSeriesRing(R, prec, S)
+      parent_obj = FqNmodAbsSeriesRing(R, prec, S, cached)
    end
 
    return parent_obj, gen(parent_obj)

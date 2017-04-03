@@ -720,7 +720,7 @@ end
 
 (a::FlintRationalField)(b::Rational{BigInt}) = fmpq(num(b), den(b)) 
 
-(::FlintRationalField)(x::Rational) = fmpq(x.num, x.den)
+(a::FlintRationalField)(b::Rational) = fmpq(b.num, b.den)
 
 (a::FlintRationalField)(b::Integer) = fmpq(b)
 

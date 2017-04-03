@@ -77,6 +77,11 @@ function coeff(x::nmod_poly, n::Int)
           (Ptr{nmod_poly}, Int), &x, n))
 end
 
+function coeff_raw(x::nmod_poly, n::Int)
+  return ccall((:nmod_poly_get_coeff_ui, :libflint), UInt,
+                (Ptr{nmod_poly}, Int), &x, n)
+end
+
 zero(R::NmodPolyRing) = R(UInt(0))
 
 one(R::NmodPolyRing) = R(UInt(1))
@@ -996,6 +1001,8 @@ function (R::NmodPolyRing)(arr::Array{UInt, 1})
   z.parent = R
   return z
 end
+
+(R::NmodPolyRing){T <: Integer}(arr::Array{T, 1}) = R(map(base_ring(R), arr))
 
 function (R::NmodPolyRing)(arr::Array{GenRes{fmpz}, 1})
   if length(arr) > 0

@@ -682,6 +682,6 @@ Base.promote_rule(::Type{fmpq_mat}, ::Type{fmpz}) = fmpq_mat
 #
 ###############################################################################
 
-function MatrixSpace(R::FlintRationalField, r::Int, c::Int)
-   return FmpqMatSpace(r, c)
+function MatrixSpace(R::FlintRationalField, r::Int, c::Int; cached = true)
+   return FmpqMatSpace(r, c, cached)
 end
