@@ -610,24 +610,32 @@ function (a::FmpqMatSpace)()
 end
 
 function (a::FmpqMatSpace)(arr::Array{fmpq, 2})
+   _check_dim(a.rows, a.cols, arr)
    z = fmpq_mat(a.rows, a.cols, arr)
    z.parent = a
    return z
 end
 
 function (a::FmpqMatSpace){T <: Integer}(arr::Array{T, 2})
+   _check_dim(a.rows, a.cols, arr)
    z = fmpq_mat(a.rows, a.cols, arr)
    z.parent = a
    return z
 end
 
 function (a::FmpqMatSpace)(arr::Array{fmpq, 1})
+   _check_dim(a.rows, a.cols, arr)
    z = fmpq_mat(a.rows, a.cols, arr)
    z.parent = a
    return z
 end
 
-(a::FmpqMatSpace){T <: Integer}(arr::Array{T, 1}) = a(reshape(arr, (a.rows, a.cols)))
+function (a::FmpqMatSpace){T <: Integer}(arr::Array{T, 1})
+   _check_dim(a.rows, a.cols, arr)
+   z = fmpq_mat(a.rows, a.cols, arr)
+   z.parent = a
+   return z
+end
 
 function (a::FmpqMatSpace)(d::fmpq)
    z = fmpq_mat(a.rows, a.cols, d)
@@ -674,6 +682,6 @@ Base.promote_rule(::Type{fmpq_mat}, ::Type{fmpz}) = fmpq_mat
 #
 ###############################################################################
 
-function MatrixSpace(R::FlintRationalField, r::Int, c::Int)
-   return FmpqMatSpace(r, c)
+function MatrixSpace(R::FlintRationalField, r::Int, c::Int; cached = true)
+   return FmpqMatSpace(r, c, cached)
 end

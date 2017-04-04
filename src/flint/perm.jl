@@ -37,7 +37,7 @@ function deepcopy_internal(a::perm, dict::ObjectIdDict)
 end
 
 function Base.hash(a::perm, h::UInt)
-   b = 0x595dee0e71d271d0
+   b = 0x595dee0e71d271d0%UInt
    for i in 1:a.d
          b $= hash(a[i - 1], h) $ h
          b = (b << 1) | (b >> (sizeof(Int)*8 - 1))

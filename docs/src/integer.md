@@ -518,7 +518,7 @@ issquare(::fmpz)
 ```
 
 ```@docs
-is_prime(::UInt)
+isprime(::UInt)
 isprime(::fmpz)
 ```
 

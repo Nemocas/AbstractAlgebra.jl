@@ -191,7 +191,7 @@ function show(io::IO, x::PolyElem)
          c = coeff(x, len - i)
          bracket = needs_parentheses(c)
          if !iszero(c)
-            if i != 1 && !is_negative(c)
+            if i != 1 && !isnegative(c)
                print(io, "+")
             end
             if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
@@ -217,7 +217,7 @@ function show(io::IO, x::PolyElem)
       c = coeff(x, 0)
       bracket = needs_parentheses(c)
       if !iszero(c)
-         if len != 1 && !is_negative(c)
+         if len != 1 && !isnegative(c)
             print(io, "+")
          end
          if bracket
@@ -240,7 +240,7 @@ end
 
 needs_parentheses(x::PolyElem) = length(x) > 1
 
-is_negative(x::PolyElem) = length(x) <= 1 && is_negative(coeff(x, 0))
+isnegative(x::PolyElem) = length(x) <= 1 && isnegative(coeff(x, 0))
 
 show_minus_one{T <: RingElem}(::Type{GenPoly{T}}) = show_minus_one(T)
 
@@ -1219,6 +1219,50 @@ function pseudodivrem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    return q*s, f*s
 end
 
+################################################################################
+#
+#   Remove and valuation
+#
+################################################################################
+
+#CF TODO: use squaring for fast large valuation
+
+doc"""
+    remove{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
+>
+> See also `valuation`, which only returns the valuation.
+"""
+function remove{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+  check_parent(z,p)
+  z == 0 && error("Not yet implemented")
+  q, r = divrem(z, p)
+  if !iszero(r)
+    return 0, z
+  end
+  v = 0
+  qn = q
+  while iszero(r)
+    q = qn
+    qn, r = divrem(q, p)
+    v += 1
+  end
+  return v, q
+end
+
+doc"""
+    valuation{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$.
+>
+> See also `remove`, which also returns $z/p^k$.
+"""
+function valuation{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
+  v, _ = remove(z, p)
+  return v
+end
+
 ###############################################################################
 #
 #   Content, primitive part, GCD and LCM
@@ -2168,6 +2212,10 @@ function (a::GenPolyRing{T}){T <: RingElem}(b::Array{T, 1})
    z.parent = a
    return z
 end
+
+(a::GenPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(base_ring(a), b))
+
+(a::GenPolyRing)(b::Array{fmpz, 1}) = a(map(base_ring(a), b))
 
 ###############################################################################
 #

@@ -377,6 +377,29 @@ end
 
 ################################################################################
 #
+#   Remove
+#
+################################################################################
+
+doc"""
+    remove(z::fq_nmod_poly, p::fq_nmod_poly)
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
+>
+> See also `valuation`, which only returns the valuation.
+"""
+function remove(z::fq_nmod_poly, p::fq_nmod_poly)
+   check_parent(z,p)
+   z == 0 && error("Not yet implemented")
+   z = deepcopy(z)
+   v = ccall((:fq_nmod_poly_remove, :libflint), Int,
+            (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, Ptr{FqNmodFiniteField}),
+             &z,  &p, &base_ring(parent(z)))
+   return v, z
+end
+
+################################################################################
+#
 #   Modular arithmetic
 #
 ################################################################################
@@ -697,9 +720,9 @@ end
 #
 ################################################################################
 
-function PolynomialRing(R::FqNmodFiniteField, s::AbstractString)
+function PolynomialRing(R::FqNmodFiniteField, s::AbstractString; cached = true)
    S = Symbol(s)
-   parent_obj = FqNmodPolyRing(R, S)
+   parent_obj = FqNmodPolyRing(R, S, cached)
    return parent_obj, parent_obj([R(0), R(1)])
 end
 

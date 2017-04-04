@@ -157,7 +157,7 @@ end
 
 needs_parentheses(x::fmpq) = false
 
-is_negative(x::fmpq) = x < 0
+isnegative(x::fmpq) = x < 0
 
 show_minus_one(::Type{fmpq}) = false
 
@@ -462,6 +462,16 @@ function gcd(a::fmpq, b::fmpq)
    return z
 end
 
+################################################################################
+#
+#   Ad hoc Remove and valuation
+#
+################################################################################
+
+remove(a::fmpq, b::Integer) = remove(a, fmpz(b))
+
+valuation(a::fmpq, b::Integer) = valuation(a, fmpz(b))
+
 ###############################################################################
 #
 #   Rational reconstruction
@@ -710,7 +720,7 @@ end
 
 (a::FlintRationalField)(b::Rational{BigInt}) = fmpq(num(b), den(b)) 
 
-(::FlintRationalField)(x::Rational) = fmpq(x.num, x.den)
+(a::FlintRationalField)(b::Rational) = fmpq(b.num, b.den)
 
 (a::FlintRationalField)(b::Integer) = fmpq(b)
 
