@@ -1051,6 +1051,7 @@ function *{T <: RingElem}(a::GenMPoly{T}, n::Integer)
       end
    end
    r.length = j - 1
+   resize!(r.coeffs, r.length)
    return r
 end
 
@@ -1068,6 +1069,7 @@ function *{T <: RingElem}(a::GenMPoly{T}, n::fmpz)
       end
    end
    r.length = j - 1
+   resize!(r.coeffs, r.length)
    return r
 end
 
@@ -1085,6 +1087,7 @@ function *{T <: RingElem}(a::GenMPoly{T}, n::T)
       end
    end
    r.length = j - 1
+   resize!(r.coeffs, r.length)
    return r
 end
 
