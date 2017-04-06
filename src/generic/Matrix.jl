@@ -2825,9 +2825,9 @@ function _hnf_kb{T}(A::GenMat, trafo::Type{Val{T}} = Val{false})
    end
 end
 
-function kb_search_first_pivot(H::GenMat)
-   for r = 1:rows(H)
-      for c = 1:cols(H)
+function kb_search_first_pivot(H::GenMat, start_element = 1)
+   for r = start_element:rows(H)
+      for c = start_element:cols(H)
          if H[r,c] != 0
             return r, c
          end
@@ -2859,10 +2859,10 @@ function kb_reduce_row!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{
    return nothing
 end
 
-function kb_reduce_column!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int}, c::Int, with_trafo::Bool)
+function kb_reduce_column!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int}, c::Int, with_trafo::Bool, start_element = 1)
    r = pivot[c]
    t = base_ring(H)()
-   for i = 1:c-1
+   for i = start_element:c-1
       p = pivot[i]
       if p == 0
          continue
@@ -2906,7 +2906,7 @@ function swap_rows!(a::MatElem, i::Int, j::Int)
    end
 end
 
-function kb_sort_rows!{T <:RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int}, with_trafo::Bool)
+function kb_sort_rows!{T <:RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int}, with_trafo::Bool, start_element = 1)
    m = rows(H)
    n = cols(H)
    pivot2 = zeros(Int, m)
@@ -2917,8 +2917,8 @@ function kb_sort_rows!{T <:RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{In
       pivot2[pivot[i]] = i
    end
    
-   r1 = 1
-   for i = 1:n
+   r1 = start_element
+   for i = start_element:n
       r2 = pivot[i]
       if r2 == 0
          continue
@@ -2942,11 +2942,11 @@ function kb_sort_rows!{T <:RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{In
    return nothing
 end
 
-function hnf_kb!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, with_trafo = false)
+function hnf_kb!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, with_trafo = false, start_element = 1)
    m = rows(H)
    n = cols(H)
    pivot = zeros(Int, n)
-   row1, col1 = kb_search_first_pivot(H)
+   row1, col1 = kb_search_first_pivot(H, start_element)
    if row1 == 0
       return nothing
    end
@@ -2958,7 +2958,7 @@ function hnf_kb!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, with_trafo = false)
    t2 = base_ring(H)()
    for i=row1:m-1
       new_pivot = false
-      for j = 1:pivot_max
+      for j = start_element:pivot_max
          if H[i+1,j] == 0
             continue
          end
@@ -2994,7 +2994,7 @@ function hnf_kb!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, with_trafo = false)
             end
          end
          kb_canonical_row!(H, U, pivot[j], j, with_trafo)
-         kb_reduce_column!(H, U, pivot, j, with_trafo)
+         kb_reduce_column!(H, U, pivot, j, with_trafo, start_element)
          if new_pivot
             break
          end
@@ -3004,14 +3004,14 @@ function hnf_kb!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, with_trafo = false)
             if H[i+1,c] != 0
                pivot[c] = i+1 
                kb_canonical_row!(H, U, pivot[c], c, with_trafo)
-               kb_reduce_column!(H, U, pivot, c, with_trafo)
+               kb_reduce_column!(H, U, pivot, c, with_trafo, start_element)
                pivot_max = max(pivot_max, c)
                break
             end
          end
       end
    end
-   kb_sort_rows!(H, U, pivot, with_trafo)
+   kb_sort_rows!(H, U, pivot, with_trafo, start_element)
    return nothing
 end
 
@@ -3087,42 +3087,52 @@ function snf_kb!{T <: RingElem}(S::GenMat{T}, U::GenMat{T}, K::GenMat{T}, with_t
    m = rows(S)
    n = cols(S)
    l = min(m,n)
-   i = 0
-   while i<=l-1
-      kb_clear_row!(S, K, i+1, with_trafo)
-      hnf_kb!(S, U, with_trafo)
-      c = i+2
-      while c <= n && S[i+1, c] == 0
+   i = 1
+   t = base_ring(S)()
+   t1 = base_ring(S)()
+   t2 = base_ring(S)()
+   while i<=l
+      kb_clear_row!(S, K, i, with_trafo)
+      hnf_kb!(S, U, with_trafo, i)
+      c = i+1
+      while c <= n && S[i, c] == 0
          c+=1
       end
       if c != n+1
          continue
       end
-      if S[i+1, i+1] == 0
-         return nothing
-      end
-      breakLoop = false
-      for k = i+1:n
-         for j = i+1:min(m,k)
-            if rem(S[j,k], S[i+1, i+1]) != 0
-               for c = 1:n
-                  addeq!(S[i+1,c], S[j,c])
-               end
-               if with_trafo
-                  for c = 1:m
-                     addeq!(U[i+1,c], U[j,c])
-                  end
-               end
-               i -= 1
-               breakLoop = true
-               break
-            end
-         end
-         if breakLoop
-            break
-         end
-      end
       i+=1
+   end
+   for i = 1:l-1
+      if S[i,i] == 0 && S[i+1,i+1] == 0
+         continue
+      end
+      d, u, v = gcdx(S[i,i], S[i+1,i+1])
+      if with_trafo
+         q = -divexact(S[i+1,i+1], d)
+         mul!(t1, q, v)
+         for c = 1:m
+            t = deepcopy(U[i,c])
+            addeq!(U[i,c], U[i+1,c])
+            mul!(t2, t1, U[i+1,c])
+            addeq!(U[i+1,c], t2)
+            mul!(t2, t1, t)
+            addeq!(U[i+1,c], t2)
+         end
+         q1 = -divexact(S[i+1,i+1], d)
+         q2 = divexact(S[i,i], d)
+         for r = 1:n
+            t = deepcopy(K[r,i])
+            mul!(t1, K[r,i], u)
+            mul!(t2, K[r,i+1], v)
+            add!(K[r,i], t1, t2)
+            mul!(t1, t, q1)
+            mul!(t2, K[r,i+1], q2)
+            add!(K[r,i+1], t1, t2)
+         end
+      end
+      S[i+1,i+1] = divexact(S[i,i]*S[i+1,i+1],d)
+      S[i,i] = d
    end
    return nothing
 end
