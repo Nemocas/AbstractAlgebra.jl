@@ -2732,15 +2732,15 @@ end
 #
 ###############################################################################
 
-function hnf_cohen(A::MatElem, canonical = false)
+function hnf_cohen(A::GenMat)
    H = deepcopy(A)
    m = rows(H)
-   U = one(MatrixSpace(base_ring(A), m, m))
-   hnf_cohen!(H, U, canonical)
+   U = one(MatrixSpace(base_ring(H), m, m))
+   hnf_cohen!(H, U)
    return H, U
 end
 
-function hnf_cohen!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = false)
+function hnf_cohen!{T <: RingElem}(H::GenMat{T}, U::GenMat{T})
    m = rows(H)
    n = cols(H)
    l = min(m, n)
@@ -2748,11 +2748,6 @@ function hnf_cohen!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = fal
    t = base_ring(H)()
    t1 = base_ring(H)()
    t2 = base_ring(H)()
-   a = base_ring(H)()
-   b = base_ring(H)()
-   u = base_ring(H)()
-   v = base_ring(H)()
-   d = base_ring(H)()
    for i = 1:l
       for j = k+1:m
          if H[j,i] == 0
@@ -2765,72 +2760,72 @@ function hnf_cohen!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = fal
             t = deepcopy(H[j,c])
             mul!(t1, a, H[j,c])
             mul!(t2, b, H[k,c])
-            s = H[j,c]
-            add!(s, t1, t2)
-            H[j,c] = s
+            add!(H[j,c], t1, t2)
             mul!(t1, u, H[k,c])
             mul!(t2, v, t)
-            s = H[k,c]
-            add!(s, t1, t2)
-            H[k,c] = s
+            add!(H[k,c], t1, t2)
          end
          for c = 1:m
             t = deepcopy(U[j,c])
             mul!(t1, a, U[j,c])
             mul!(t2, b, U[k,c])
-            s = U[j,c]
-            add!(s, t1, t2)
-            U[j,c] = s
+            add!(U[j,c], t1, t2)
             mul!(t1, u, U[k,c])
             mul!(t2, v, t)
-            s = U[k,c]
-            add!(s, t1, t2)
-            U[k,c] = s
+            add!(U[k,c], t1, t2)
          end
       end
       if H[k,i] == 0
          continue
       end
-      if canonical
-         cu = canonical_unit(H[k,i])
-         if cu != 1
-            for c = i:n
-               H[k,c] = divexact(H[k,c],cu)
-           end
-            for c = 1:m
-               U[k,c] = divexact(U[k,c],cu)
-            end
+      cu = canonical_unit(H[k,i])
+      if cu != 1
+         for c = i:n
+            H[k,c] = divexact(H[k,c],cu)
+        end
+         for c = 1:m
+            U[k,c] = divexact(U[k,c],cu)
          end
       end
       for j = 1:k-1
          q = -div(H[j,i], H[k, i])
          for c = i:n
             mul!(t, q, H[k,c])
-            s = H[j,c]
-            addeq!(s, t)
-            H[j,c] = s
+            addeq!(H[j,c], t)
          end
          for c = 1:m
             mul!(t, q, U[k,c])
-            s = U[j,c]
-            addeq!(s, t)
-            U[j,c] = s
+            addeq!(U[j,c], t)
          end
       end
       k += 1
    end
+   return nothing
 end
 
-function hnf_kb(A::MatElem, canonical = false)
+function hnf_kb(A::GenMat)
+   return _hnf_kb(A, Val{false})
+end
+
+function hnf_kb_with_trafo(A::GenMat)
+   return _hnf_kb(A, Val{true})
+end
+
+function _hnf_kb{T}(A::GenMat, trafo::Type{Val{T}} = Val{false})
    H = deepcopy(A)
    m = rows(H)
-   n = cols(H)
-   U = one(MatrixSpace(base_ring(A), m, m))
-   hnf_kb!(H, U, canonical)
-   return H, U
+   if trafo == Val{true}
+      U = one(MatrixSpace(base_ring(H), m, m))
+      hnf_kb!(H, U, true)
+      return H, U
+   else
+      U = zero(MatrixSpace(base_ring(H), 0, 0))
+      hnf_kb!(H, U, false)
+      return H
+   end
 end
 
-function kb_search_first_pivot(H::MatElem)
+function kb_search_first_pivot(H::GenMat)
    for r = 1:rows(H)
       for c = 1:cols(H)
          if H[r,c] != 0
@@ -2841,10 +2836,9 @@ function kb_search_first_pivot(H::MatElem)
    return 0, 0
 end
 
-function kb_reduce_row!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, pivot::Array{Int}, c::Int)
+function kb_reduce_row!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int}, c::Int, with_trafo::Bool)
    r = pivot[c]
    t = base_ring(H)()
-   q = base_ring(H)()
    for i = c+1:cols(H)
       p = pivot[i]
       if p == 0
@@ -2853,23 +2847,21 @@ function kb_reduce_row!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, pivot::Arra
       q = -div(H[r,i], H[p,i])
       for j = i:cols(H)
          mul!(t, q, H[p,j])
-         s = H[r,j]
-         addeq!(s, t)
-         H[r,j] = s
+         addeq!(H[r,j], t)
       end
-      for j = 1:cols(U)
-         mul!(t, q, U[p,j])
-         s = U[r,j]
-         addeq!(s, t)
-         U[r,j] = s
+      if with_trafo
+         for j = 1:cols(U)
+            mul!(t, q, U[p,j])
+            addeq!(U[r,j], t)
+         end
       end
    end
+   return nothing
 end
 
-function kb_reduce_column!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, pivot::Array{Int}, c::Int)
+function kb_reduce_column!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int}, c::Int, with_trafo::Bool)
    r = pivot[c]
    t = base_ring(H)()
-   q = base_ring(H)()
    for i = 1:c-1
       p = pivot[i]
       if p == 0
@@ -2878,29 +2870,31 @@ function kb_reduce_column!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, pivot::A
       q = -div(H[p,c],H[r,c])
       for j = c:cols(H)
          mul!(t, q, H[r,j])
-         s = H[p,j]
-         addeq!(s, t)
-         H[p,j] = s
+         addeq!(H[p,j], t)
       end
-      for j = 1:cols(U)
-         mul!(t, q, U[r,j])
-         s = U[p,j]
-         addeq!(s, t)
-         U[p,j] = s
+      if with_trafo
+         for j = 1:cols(U)
+            mul!(t, q, U[r,j])
+            addeq!(U[p,j], t)
+         end
       end
    end
+   return nothing
 end
 
-function kb_canonical_row!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, r::Int, c::Int)
+function kb_canonical_row!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, r::Int, c::Int, with_trafo::Bool)
    cu = canonical_unit(H[r,c])
    if cu != 1
       for j = c:cols(H)
          H[r,j] = divexact(H[r,j],cu)
       end
-      for j = 1:cols(U)
-         U[r,j] = divexact(U[r,j],cu)
+      if with_trafo
+         for j = 1:cols(U)
+            U[r,j] = divexact(U[r,j],cu)
+         end
       end
    end
+   return nothing
 end
 
 function swap_rows!(a::MatElem, i::Int, j::Int)
@@ -2912,7 +2906,7 @@ function swap_rows!(a::MatElem, i::Int, j::Int)
    end
 end
 
-function kb_sort_rows!{T <:RingElem}(H::MatElem{T}, U::MatElem{T}, pivot::Array{Int})
+function kb_sort_rows!{T <:RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int}, with_trafo::Bool)
    m = rows(H)
    n = cols(H)
    pivot2 = zeros(Int, m)
@@ -2931,7 +2925,7 @@ function kb_sort_rows!{T <:RingElem}(H::MatElem{T}, U::MatElem{T}, pivot::Array{
       end
       if r1 != r2
          swap_rows!(H, r1, r2)
-         swap_rows!(U, r1, r2)
+         with_trafo ? swap_rows!(U, r1, r2) : nothing
          p = pivot2[r1]
          pivot[i] = r1
          if p != 0
@@ -2945,9 +2939,10 @@ function kb_sort_rows!{T <:RingElem}(H::MatElem{T}, U::MatElem{T}, pivot::Array{
          break
       end 
    end
+   return nothing
 end
 
-function hnf_kb!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = false)
+function hnf_kb!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, with_trafo = false)
    m = rows(H)
    n = cols(H)
    pivot = zeros(Int, n)
@@ -2956,18 +2951,11 @@ function hnf_kb!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = false)
       return nothing
    end
    pivot[col1] = row1
-   if canonical
-      kb_canonical_row!(H, U, row1, col1)
-   end
+   kb_canonical_row!(H, U, row1, col1, with_trafo)
    pivot_max = col1
    t = base_ring(H)()
    t1 = base_ring(H)()
    t2 = base_ring(H)()
-   a = base_ring(H)()
-   b = base_ring(H)()
-   u = base_ring(H)()
-   v = base_ring(H)()
-   d = base_ring(H)()
    for i=row1:m-1
       new_pivot = false
       for j = 1:pivot_max
@@ -2976,7 +2964,7 @@ function hnf_kb!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = false)
          end
          if pivot[j] == 0
             pivot[j] = i+1
-            kb_reduce_row!(H, U, pivot, j)
+            kb_reduce_row!(H, U, pivot, j, with_trafo)
             pivot_max = max(pivot_max, j)
             new_pivot = true
          else
@@ -2988,33 +2976,25 @@ function hnf_kb!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = false)
                t = deepcopy(H[i+1,c])
                mul!(t1, a, H[i+1,c])
                mul!(t2, b, H[p,c])
-               s = H[i+1,c]
-               add!(s, t1, t2)
-               H[i+1,c] = s
+               add!(H[i+1,c], t1, t2)
                mul!(t1, u, H[p,c])
                mul!(t2, v, t)
-               s = H[p,c]
-               add!(s, t1, t2)
-               H[p,c] = s
+               add!(H[p,c], t1, t2)
             end
-            for c = 1:m
-               t = deepcopy(U[i+1,c])
-               mul!(t1, a, U[i+1,c])
-               mul!(t2, b, U[p,c])
-               s = U[i+1,c]
-               add!(s, t1, t2)
-               U[i+1,c] = s
-               mul!(t1, u, U[p,c])
-               mul!(t2, v, t)
-               s = U[p,c]
-               add!(s, t1, t2)
-               U[p,c] = s
+            if with_trafo
+               for c = 1:m
+                  t = deepcopy(U[i+1,c])
+                  mul!(t1, a, U[i+1,c])
+                  mul!(t2, b, U[p,c])
+                  add!(U[i+1,c], t1, t2)
+                  mul!(t1, u, U[p,c])
+                  mul!(t2, v, t)
+                  add!(U[p,c], t1, t2)
+               end
             end
          end
-         if canonical
-            kb_canonical_row!(H, U, pivot[j], j)
-         end
-         kb_reduce_column!(H, U, pivot, j)
+         kb_canonical_row!(H, U, pivot[j], j, with_trafo)
+         kb_reduce_column!(H, U, pivot, j, with_trafo)
          if new_pivot
             break
          end
@@ -3023,17 +3003,16 @@ function hnf_kb!{T <: RingElem}(H::MatElem{T}, U::MatElem{T}, canonical = false)
          for c = pivot_max+1:n
             if H[i+1,c] != 0
                pivot[c] = i+1 
-               if canonical
-                  kb_canonical_row!(H, U, pivot[c], c)
-               end
-               kb_reduce_column!(H, U, pivot, c)
+               kb_canonical_row!(H, U, pivot[c], c, with_trafo)
+               kb_reduce_column!(H, U, pivot, c, with_trafo)
                pivot_max = max(pivot_max, c)
                break
             end
          end
       end
    end
-   kb_sort_rows!(H, U, pivot)
+   kb_sort_rows!(H, U, pivot, with_trafo)
+   return nothing
 end
 
 ###############################################################################
@@ -3042,27 +3021,37 @@ end
 #
 ###############################################################################
 
-function snf_kb(A::MatElem, canonical = false)
-   S = deepcopy(A)
-   m = rows(A)
-   n = cols(A)
-   U = one(MatrixSpace(base_ring(A), m, m))
-   K = one(MatrixSpace(base_ring(A), n, n))
-   snf_kb!(S, U, K, canonical)
-   return S, U, K
+function snf_kb(A::GenMat)
+   return _snf_kb(A, Val{false})
 end
 
-function kb_clear_row!{T <: RingElem}(S::MatElem{T}, K::MatElem{T}, i::Int)
+function snf_kb_with_trafo(A::GenMat)
+   return _snf_kb(A, Val{true})
+end
+
+function _snf_kb{T}(A::GenMat, trafo::Type{Val{T}} = Val{false})
+   S = deepcopy(A)
+   m = rows(S)
+   n = cols(S)
+   if trafo == Val{true}
+      U = one(MatrixSpace(base_ring(S), m, m))
+      K = one(MatrixSpace(base_ring(S), n, n))
+      snf_kb!(S, U, K, true)
+      return S, U, K
+   else
+      U = zero(MatrixSpace(base_ring(S), 0, 0))
+      K = U
+      snf_kb!(S, U, K, false)
+      return S
+   end
+end
+
+function kb_clear_row!{T <: RingElem}(S::GenMat{T}, K::GenMat{T}, i::Int, with_trafo::Bool)
    m = rows(S)
    n = cols(S)
    t = base_ring(S)()
    t1 = base_ring(S)()
    t2 = base_ring(S)()
-   a = base_ring(S)()
-   b = base_ring(S)()
-   u = base_ring(S)()
-   v = base_ring(S)()
-   d = base_ring(S)()
    for j = i+1:n
       if S[i,j] == 0
          continue
@@ -3074,39 +3063,34 @@ function kb_clear_row!{T <: RingElem}(S::MatElem{T}, K::MatElem{T}, i::Int)
          t = deepcopy(S[r,j])
          mul!(t1, a, S[r,j])
          mul!(t2, b, S[r,i])
-         s = S[r,j]
-         add!(s, t1, t2)
-         S[r,j] = s
+         add!(S[r,j], t1, t2)
          mul!(t1, u, S[r,i])
          mul!(t2, v, t)
-         s = S[r,i]
-         add!(s, t1, t2)
-         S[r,i] = s
+         add!(S[r,i], t1, t2)
       end
-      for r = 1:n
-         t = deepcopy(K[r,j])
-         mul!(t1, a, K[r,j])
-         mul!(t2, b, K[r,i])
-         s = K[r,j]
-         add!(s, t1, t2)
-         K[r,j] = s
-         mul!(t1, u, K[r,i])
-         mul!(t2, v, t)
-         s = K[r,i]
-         add!(s, t1, t2)
-         K[r,i] = s
+      if with_trafo
+         for r = 1:n
+            t = deepcopy(K[r,j])
+            mul!(t1, a, K[r,j])
+            mul!(t2, b, K[r,i])
+            add!(K[r,j], t1, t2)
+            mul!(t1, u, K[r,i])
+            mul!(t2, v, t)
+            add!(K[r,i], t1, t2)
+         end
       end
    end
+   return nothing
 end
 
-function snf_kb!{T <: RingElem}(S::MatElem{T}, U::MatElem{T}, K::MatElem{T}, canonical = false)
+function snf_kb!{T <: RingElem}(S::GenMat{T}, U::GenMat{T}, K::GenMat{T}, with_trafo = false)
    m = rows(S)
    n = cols(S)
    l = min(m,n)
    i = 0
    while i<=l-1
-      kb_clear_row!(S, K, i+1)
-      hnf_kb!(S, U, canonical)
+      kb_clear_row!(S, K, i+1, with_trafo)
+      hnf_kb!(S, U, with_trafo)
       c = i+2
       while c <= n && S[i+1, c] == 0
          c+=1
@@ -3122,14 +3106,12 @@ function snf_kb!{T <: RingElem}(S::MatElem{T}, U::MatElem{T}, K::MatElem{T}, can
          for j = i+1:min(m,k)
             if rem(S[j,k], S[i+1, i+1]) != 0
                for c = 1:n
-                  s = S[i+1,c]
-                  addeq!(s, S[j,c])
-                  S[i+1,c] = s
+                  addeq!(S[i+1,c], S[j,c])
                end
-               for c = 1:m
-                  s = U[i+1,c]
-                  addeq!(s, U[j,c])
-                  U[i+1,c] = s
+               if with_trafo
+                  for c = 1:m
+                     addeq!(U[i+1,c], U[j,c])
+                  end
                end
                i -= 1
                breakLoop = true
@@ -3142,6 +3124,7 @@ function snf_kb!{T <: RingElem}(S::MatElem{T}, U::MatElem{T}, K::MatElem{T}, can
       end
       i+=1
    end
+   return nothing
 end
 
 ###############################################################################
