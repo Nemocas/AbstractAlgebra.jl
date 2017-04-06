@@ -56,8 +56,8 @@ cd(wdir)
 
 # install GMP/MPIR
 
-if !ispath(Pkg.dir("Nemo", "local", "mpir-2.7.2"))
-   download("http://mpir.org/mpir-2.7.2.tar.bz2", joinpath(wdir, "mpir-2.7.2.tar.bz2"))
+if !ispath(Pkg.dir("Nemo", "local", "mpir-3.0.0"))
+   download("http://mpir.org/mpir-3.0.0.tar.bz2", joinpath(wdir, "mpir-3.0.0.tar.bz2"))
 end
 
 if is_windows()
@@ -67,9 +67,9 @@ if is_windows()
       download_dll("http://nemocas.org/binaries/w64-libgmp-16.dll", joinpath(vdir, "lib", "libgmp-16.dll"))
    end
 else
-   run(`tar -xvf mpir-2.7.2.tar.bz2`)
-   run(`rm mpir-2.7.2.tar.bz2`)
-   cd("$wdir/mpir-2.7.2")
+   run(`tar -xvf mpir-3.0.0.tar.bz2`)
+   run(`rm mpir-3.0.0.tar.bz2`)
+   cd("$wdir/mpir-3.0.0")
    try
       run(`m4 --version`)
       run(`./configure --prefix=$vdir --enable-gmpcompat --disable-static --enable-shared`)
