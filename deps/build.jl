@@ -54,6 +54,21 @@ end
 
 cd(wdir)
 
+# install yasm
+
+if !is_windows()
+   if !ispath(Pkg.dir("Nemo", "local", "yasm-1.3.0"))
+      download("http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz", "yasm-1.3.0.tar.gz")
+      run(`tar -xvf yasm-1.3.0.tar.gz`)
+      run(`rm yasm-1.3.0.tar.gz`)
+      cd(joinpath("$wdir","yasm-1.3.0"))
+      run(`./configure`)
+      run(`make`)
+   end
+end
+
+cd(wdir)
+
 # install GMP/MPIR
 
 if !ispath(Pkg.dir("Nemo", "local", "mpir-3.0.0"))
@@ -72,9 +87,9 @@ else
    cd("$wdir/mpir-3.0.0")
    try
       run(`m4 --version`)
-      run(`./configure --prefix=$vdir --enable-gmpcompat --disable-static --enable-shared`)
+      run(`./configure --with-yasm=$wdir/yasm-1.3.0/yasm --prefix=$vdir --enable-gmpcompat --disable-static --enable-shared`)
    catch
-      run(`./configure --prefix=$vdir M4=$vdir/bin/m4 --enable-gmpcompat --disable-static --enable-shared`)
+      run(`./configure --with-yasm=$wdir/yasm-1.3.0/yasm --prefix=$vdir M4=$vdir/bin/m4 --enable-gmpcompat --disable-static --enable-shared`)
    end
    run(`make -j4`)
    run(`make install`)
