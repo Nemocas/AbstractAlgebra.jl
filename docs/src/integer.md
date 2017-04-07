@@ -456,10 +456,12 @@ d = clog(a, 3)
 
 ```@docs
 gcd(::fmpz, ::fmpz)
+gcd(::Array{fmpz, 1})
 ```
 
 ```@docs
 lcm(::fmpz, ::fmpz)
+lcm(::Array{fmpz, 1})
 ```
 
 ```@docs
