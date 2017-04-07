@@ -263,6 +263,18 @@ end
 
 *(x::fmpq_poly, y::Integer) = fmpz(y)*x
 
++(x::Rational, y::fmpq_poly) = fmpq(x) + y
+
+-(x::Rational, y::fmpq_poly) = fmpq(x) - y
+
+*(x::Rational, y::fmpq_poly) = fmpq(x) * y
+
++(x::fmpq_poly, y::Rational) = x + fmpq(y)
+
+-(x::fmpq_poly, y::Rational) = x - fmpq(y)
+
+*(x::fmpq_poly, y::Rational) = x * fmpq(y)
+
 ###############################################################################
 #
 #   Powering
@@ -311,6 +323,10 @@ function ==(x::fmpq_poly, y::fmpq)
 end
 
 ==(x::fmpq, y::fmpq_poly) = y == x
+
+==(x::fmpq_poly, y::Rational) = x == fmpq(y)
+
+==(x::Rational, y::fmpq_poly) = y == x
 
 ###############################################################################
 #
@@ -455,6 +471,8 @@ end
 
 divexact(x::fmpq_poly, y::Integer) = divexact(x, fmpz(y)) 
 
+divexact(x::fmpq_poly, y::Rational) = divexact(x, fmpq(y))
+
 ###############################################################################
 #
 #   Content, primitive part, GCD and LCM
@@ -504,6 +522,8 @@ function evaluate(x::fmpq_poly, y::fmpq)
 end
 
 evaluate(x::fmpq_poly, y::Integer) = evaluate(x, fmpz(y))
+
+evaluate(x::fmpq_poly, y::Rational) = evaluate(x, fmpq(y))
 
 ###############################################################################
 #
@@ -700,6 +720,8 @@ Base.promote_rule(::Type{fmpq_poly}, ::Type{fmpz}) = fmpq_poly
 
 Base.promote_rule(::Type{fmpq_poly}, ::Type{fmpq}) = fmpq_poly
 
+Base.promote_rule{T <: Integer}(::Type{fmpq_poly}, ::Type{Rational{T}}) = fmpq_poly
+
 ###############################################################################
 #
 #   Polynomial substitution
@@ -707,6 +729,8 @@ Base.promote_rule(::Type{fmpq_poly}, ::Type{fmpq}) = fmpq_poly
 ###############################################################################
 
 (f::fmpq_poly)(a::fmpq) = evaluate(f, a)
+
+(f::fmpq_poly)(a::Rational) = evaluate(f, fmpq(a))
 
 ###############################################################################
 #
@@ -750,7 +774,11 @@ function (a::FmpqPolyRing)(b::Array{fmpq, 1})
    return z
 end
 
+(a::FmpqPolyRing)(b::Rational) = a(fmpq(b))
+
 (a::FmpqPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(fmpq, b))
+
+(a::FmpqPolyRing){T <: Integer}(b::Array{Rational{T}, 1}) = a(map(fmpq, b))
 
 (a::FmpqPolyRing)(b::Array{fmpz, 1}) = a(map(fmpq, b))
 
