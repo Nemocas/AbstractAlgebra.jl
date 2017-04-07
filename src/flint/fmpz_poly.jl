@@ -352,6 +352,15 @@ function divexact(x::fmpz_poly, y::fmpz_poly)
    return z
 end
 
+function divides(x::fmpz_poly, y::fmpz_poly)
+   check_parent(x, y)
+   y == 0 && throw(DivideError())
+   z = parent(x)()
+   flag = Bool(ccall((:fmpz_poly_divides, :libflint), Cint,
+           (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y))
+   return flag, z
+end
+
 ###############################################################################
 #
 #   Ad hoc exact division
