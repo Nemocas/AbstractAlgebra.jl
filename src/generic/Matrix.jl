@@ -7,7 +7,7 @@
 export MatricSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
        ishessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
-       powers, similarity!
+       powers, similarity!, weak_popov, weak_popov_with_trafo
 
 ###############################################################################
 #
@@ -2712,6 +2712,90 @@ function minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
       first_poly = false
    end
    return divexact(p, canonical_unit(p))
+end
+
+###############################################################################
+#
+#   Popov Form
+#
+###############################################################################
+
+function weak_popov{T <: PolyElem}(A::GenMat{T})
+   return _weak_popov(A, Val{false})
+end
+
+function weak_popov_with_trafo{T <: PolyElem}(A::GenMat{T})
+   return _weak_popov(A, Val{true})
+end
+
+function _weak_popov{T <: PolyElem, S}(A::GenMat{T}, trafo::Type{Val{S}} = Val{false})
+   P = deepcopy(A)
+   m = rows(P)
+   if trafo == Val{true}
+      U = one(MatrixSpace(base_ring(P), m, m))
+      weak_popov!(P, U, true)
+      return P, U
+   else
+      U = zero(MatrixSpace(base_ring(P), 0, 0))
+      weak_popov!(P, U, false)
+      return P
+   end
+end
+
+function find_pivot_popov(P::GenMat, r::Int)
+   pivot = cols(P)
+   for c = cols(P)-1:-1:1
+      if degree(P[r,c]) > degree(P[r,pivot])
+         pivot = c
+      end
+   end
+   return pivot
+end
+
+function weak_popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, with_trafo = false)
+   m = rows(P)
+   n = cols(P)
+   t = base_ring(P)()
+   pivots = Array{Array{Int,1}}(n)
+   for i = 1:n
+      pivots[i] = Array{Int}(0)
+   end
+   for r = 1:m
+      pivot = find_pivot_popov(P, r)
+      P[r,pivot] != 0 ? push!(pivots[pivot], r) : nothing
+   end
+   change = true
+   while change
+      change = false
+      for i = 1:n
+         if length(pivots[i]) <= 1
+            continue
+         end
+         change = true
+         sort!(pivots[i], lt = (x,y) -> degree(P[x, i]) <= degree(P[y, i]))
+         pivot = pivots[i][1]
+         for j = 2:length(pivots[i])
+            q = -div(P[pivots[i][j],i],P[pivot,i])
+            for c = 1:n
+               mul!(t, q, P[pivot,c])
+               addeq!(P[pivots[i][j],c], t)
+            end
+            if with_trafo
+               for c = 1:m
+                  mul!(t, q, U[pivot,c])
+                  addeq!(U[pivots[i][j],c], t)
+               end
+            end
+         end
+         old_pivots = pivots[i]
+         pivots[i] = [pivot]
+         for j = 2:length(old_pivots)
+            pivot = find_pivot_popov(P,old_pivots[j])
+            P[old_pivots[j],pivot] != 0 ? push!(pivots[pivot], old_pivots[j]) : nothing
+         end
+      end
+   end
+   return nothing
 end
 
 ###############################################################################
