@@ -1302,6 +1302,12 @@ function valuation{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
   return v
 end
 
+doc"""
+    divides{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
+> Returns a pair consisting of a flag which is set to `true` if $f$ divides
+> $g$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
+> such a polynomial exists. If not, the value of $h$ is undetermined.
+"""
 function divides{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    check_parent(f, g)
    if length(g) == 0
@@ -1338,6 +1344,12 @@ function divides{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    return f == 0, q
 end
 
+doc"""
+    divides{T <: RingElem}(f::PolyElem{T}, g::T)
+> Returns a pair consisting of a flag which is set to `true` if $f$ divides
+> $g$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
+> such a polynomial exists. If not, the value of $h$ is undetermined.
+"""
 function divides{T <: RingElem}(z::PolyElem{T}, x::T)
    parent(x) != base_ring(z) && error("Wrong parents in divides")
    q = parent(z)()

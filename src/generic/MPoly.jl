@@ -2297,6 +2297,21 @@ function gcd{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
    return main_variable_insert(g, k)
 end
 
+function term_gcd{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
+   if a.length < 1
+      return b
+   elseif b.length < 1
+      return a
+   end
+   N = parent(a).N
+   Ce = Array(UInt, N, 1)
+   Cc = Array(T, 1)
+   monomial_set!(Ce, 1, a.exps, 1, N)
+   monomial_vecmin!(Ce, 1, b.exps, 1, N)
+   Cc[1] = gcd(a.coeffs[1], b.coeffs[1])
+   return parent(a)(Cc, Ce)
+end
+
 function term_content{T <: RingElem}(a::GenMPoly{T})
    if a.length <= 1
       return a
