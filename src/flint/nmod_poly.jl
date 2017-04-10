@@ -536,10 +536,19 @@ function mulmod(x::nmod_poly, y::nmod_poly, z::nmod_poly)
 end
 
 function powmod(x::nmod_poly, e::Int, y::nmod_poly)
-  e < 0 && error("Exponent must be positive")
+  check_parent(x,y)
   z = parent(x)()
+
+  if e < 0
+    g, x = gcdinv(x, y)
+    if g != 1
+      error("Element not invertible")
+    end
+    e = -e
+  end
+
   ccall((:nmod_poly_powmod_ui_binexp, :libflint), Void,
-  (Ptr{nmod_poly}, Ptr{nmod_poly}, Int, Ptr{nmod_poly}), &z, &x, e, &y)
+        (Ptr{nmod_poly}, Ptr{nmod_poly}, Int, Ptr{nmod_poly}), &z, &x, e, &y)
 
   return z
 end

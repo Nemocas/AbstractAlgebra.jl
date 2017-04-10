@@ -438,6 +438,8 @@ function test_nmod_poly_modular_arithmetic()
 
   @test powmod(f, 10, h) == 485924368*x^2+380106591*x+302530457
 
+  @test powmod(f, -10, g) == 484381224*x+14566177
+
   println("PASS")
 end
 

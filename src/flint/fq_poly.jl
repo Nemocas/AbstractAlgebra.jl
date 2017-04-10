@@ -407,6 +407,15 @@ end
 function powmod(x::fq_poly, n::Int, y::fq_poly)
    check_parent(x,y)
    z = parent(x)()
+
+   if n < 0
+      g, x = gcdinv(x, y)
+      if g != 1
+         error("Element not invertible")
+      end
+      n = -n
+   end
+
    ccall((:fq_poly_powmod_ui_binexp, :libflint), Void,
          (Ptr{fq_poly}, Ptr{fq_poly}, Int, Ptr{fq_poly},
          Ptr{FqFiniteField}), &z, &x, n, &y, &base_ring(parent(x)))

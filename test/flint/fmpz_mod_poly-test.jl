@@ -321,6 +321,10 @@ function test_fmpz_mod_poly_modular_arithmetic()
 
    @test powmod(f, fmpz(10), h) == 118470346535924950143*x^2+97790722831392543222*x+115967716915690326718
 
+   @test powmod(f, -10, g) == 78305338116088931412*x+91239060941924718463
+
+   @test powmod(f, -fmpz(10), g) == 78305338116088931412*x+91239060941924718463
+
    println("PASS")
 end
 
