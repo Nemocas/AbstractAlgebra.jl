@@ -581,9 +581,17 @@ function test_fmpq_poly_remove_valuation()
    @test v == 5
    @test h == (11y^3 - 2y^2 + 5)
 
+   v, q = divides(f*g, f)
+
+   @test v
+   @test q == g
+
+   v, q = divides(f*g + 1, f)
+
+   @test !v
+
    println("PASS")
 end
-
 
 function test_fmpq_poly()
    test_fmpq_poly_constructors()

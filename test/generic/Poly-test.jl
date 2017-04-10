@@ -75,6 +75,8 @@ function test_gen_poly_manipulation()
 
    @test lead(f) == 2x
 
+   @test trail(2x*y + x^2) == x^2
+
    @test degree(f) == 1
 
    h = x*y^2 + (x + 1)*y + 3
@@ -86,6 +88,10 @@ function test_gen_poly_manipulation()
    @test canonical_unit(-x*y + x + 1) == -1
 
    @test deepcopy(h) == h
+
+   @test ismonomial(2*x*y^2)
+
+   @test !ismonomial(2*x*y^2 + y + 1)
 
    println("PASS")
 end
@@ -537,6 +543,15 @@ function test_gen_poly_remove_valuation()
    @test q == f^3
    @test v == 4
 
+   v, q = divides(f*g, f)
+
+   @test v
+   @test q == g
+
+   v, q = divides(f*g + 1, f)
+
+   @test !v
+   
    println("PASS")
 end
 

@@ -479,7 +479,18 @@ function rem(x::fmpz_mod_poly, y::fmpz_mod_poly)
   return r
 end
 
-mod(x::fmpz_mod_poly, y::fmpz_mod_poly) = rem(x,y)
+mod(x::fmpz_mod_poly, y::fmpz_mod_poly) = rem(x, y)
+
+################################################################################
+#
+#  Removal and valuation
+#
+################################################################################
+
+function divides(z::fmpz_mod_poly, x::fmpz_mod_poly)
+   q, r = divrem(z, x)
+   return r == 0, q
+end
 
 ################################################################################
 #

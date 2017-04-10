@@ -377,7 +377,7 @@ end
 
 ################################################################################
 #
-#   Remove
+#   Remove and valuation
 #
 ################################################################################
 
@@ -396,6 +396,16 @@ function remove(z::fq_poly, p::fq_poly)
             (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{FqFiniteField}),
              &z,  &p, &base_ring(parent(z)))
    return v, z
+end
+
+function divides(z::fq_poly, x::fq_poly)
+   check_parent(z, x)
+   q = parent(z)()
+   v = Bool(ccall((:fq_poly_divides, :libflint), Cint,
+            (Ptr{fq_poly}, Ptr{fq_poly},
+             Ptr{fq_poly}, Ptr{FqFiniteField}),
+             &q, &z, &x, &base_ring(parent(z))))
+   return v, q
 end
 
 ################################################################################

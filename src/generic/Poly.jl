@@ -11,8 +11,8 @@ export GenPoly, GenPolyRing, PolynomialRing, hash, coeff, isgen, lead,
        gen, length, iszero, normalise, isone, isunit, addeq!, mul!, fit!,
        setcoeff!, mulmod, powmod, invmod, lcm, divrem, mod, gcdinv,
        canonical_unit, var, chebyshev_t, chebyshev_u, set_length!,
-       mul_classical, sqr_classical, mul_ks, subst, mul_karatsuba,
-       pow_multinomial, monomial_to_newton!, newton_to_monomial!
+       mul_classical, sqr_classical, mul_ks, subst, mul_karatsuba, trail,
+       pow_multinomial, monomial_to_newton!, newton_to_monomial!, ismonomial
 
 ###############################################################################
 #
@@ -190,7 +190,7 @@ function ismonomial(a::PolyElem)
    if !ismonomial(lead(a))
       return false
    end
-   for i = 1:length(a - 1)
+   for i = 1:length(a) - 1
       if coeff(a, i - 1) != 0
          return false
       end
@@ -1346,8 +1346,8 @@ end
 
 doc"""
     divides{T <: RingElem}(f::PolyElem{T}, g::T)
-> Returns a pair consisting of a flag which is set to `true` if $f$ divides
-> $g$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
+> Returns a pair consisting of a flag which is set to `true` if $g$ divides
+> $f$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
 > such a polynomial exists. If not, the value of $h$ is undetermined.
 """
 function divides{T <: RingElem}(z::PolyElem{T}, x::T)

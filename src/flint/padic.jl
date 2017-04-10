@@ -449,6 +449,23 @@ end
 
 ###############################################################################
 #
+#   Divides
+#
+###############################################################################
+
+doc"""
+    divides(f::padic, g::padic)
+> Returns a pair consisting of a flag which is set to `true` if $g$ divides
+> $f$ and `false` otherwise, and a value $h$ such that $f = gh$ if
+> such a value exists. If not, the value of $h$ is undetermined.
+"""
+function divides(a::padic, b::padic)
+   b == 0 && throw(DivideError())
+   return true, divexact(a, b)   
+end
+
+###############################################################################
+#
 #   GCD
 #
 ###############################################################################

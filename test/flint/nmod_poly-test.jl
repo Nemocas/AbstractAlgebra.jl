@@ -697,6 +697,16 @@ function test_nmod_poly_remove_valuation()
   @test n == valuation(f, g)
   @test n == 10
   @test p == (x+2)*(x+3)
+
+   v, q = divides(f*g, f)
+
+   @test v
+   @test q == g
+
+   v, q = divides(f*g + 1, f)
+
+   @test !v
+
   println("PASS")
 end
 
