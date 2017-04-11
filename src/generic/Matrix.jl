@@ -3217,9 +3217,12 @@ function weak_popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, with_trafo = fal
             continue
          end
          change = true
-         sort!(pivots[i], lt = (x,y) -> degree(P[x, i]) <= degree(P[y, i]))
-         pivot = pivots[i][1]
-         for j = 2:length(pivots[i])
+         pivotInd = indmin(map(degree, [ P[j, i] for j in pivots[i] ]))
+         pivot = pivots[i][pivotInd]
+         for j = 1:length(pivots[i])
+            if j == pivotInd
+               continue
+            end
             q = -div(P[pivots[i][j],i],P[pivot,i])
             for c = 1:n
                mul!(t, q, P[pivot,c])
@@ -3234,9 +3237,12 @@ function weak_popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, with_trafo = fal
          end
          old_pivots = pivots[i]
          pivots[i] = [pivot]
-         for j = 2:length(old_pivots)
-            pivot = find_pivot_popov(P,old_pivots[j])
-            P[old_pivots[j],pivot] != 0 ? push!(pivots[pivot], old_pivots[j]) : nothing
+         for j = 1:length(old_pivots)
+            if j == pivotInd
+               continue
+            end
+            p = find_pivot_popov(P,old_pivots[j])
+            P[old_pivots[j],p] != 0 ? push!(pivots[p], old_pivots[j]) : nothing
          end
       end
    end
