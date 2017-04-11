@@ -11,8 +11,8 @@ export GenPoly, GenPolyRing, PolynomialRing, hash, coeff, isgen, lead,
        gen, length, iszero, normalise, isone, isunit, addeq!, mul!, fit!,
        setcoeff!, mulmod, powmod, invmod, lcm, divrem, mod, gcdinv,
        canonical_unit, var, chebyshev_t, chebyshev_u, set_length!,
-       mul_classical, sqr_classical, mul_ks, subst, mul_karatsuba,
-       pow_multinomial, monomial_to_newton!, newton_to_monomial!
+       mul_classical, sqr_classical, mul_ks, subst, mul_karatsuba, trail,
+       pow_multinomial, monomial_to_newton!, newton_to_monomial!, ismonomial
 
 ###############################################################################
 #
@@ -113,6 +113,26 @@ doc"""
 lead(a::PolyElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
 
 doc"""
+    trail(x::PolyElem)
+> Return the trailing coefficient of the given polynomial. This will be the
+> nonzero coefficient of the term with lowest degree unless the polynomial
+> in the zero polynomial, in which case a zero coefficient is returned.
+"""
+function trail(a::PolyElem)
+   if a == 0
+      return base_ring(a)(0)
+   else
+      for i = 1:length(a)
+         c = coeff(a, i - 1)
+         if c != 0
+            return c
+         end
+      end
+      return coeff(a, length(a) - 1)
+   end
+end
+
+doc"""
     zero(R::PolyRing)
 > Return the zero polynomial in the given polynomial ring.
 """
@@ -158,6 +178,25 @@ doc"""
 > otherwise return `false`.
 """
 isunit(a::PolyElem) = length(a) == 1 && isunit(coeff(a, 0))
+
+ismonomial{T<:RingElem}(a::T) = true
+
+doc"""
+    ismonomial(a::PolyElem)
+> Return `true` if the given polynomial is a monomial. This function is
+> recursive, with all scalar types returning true.
+"""
+function ismonomial(a::PolyElem)
+   if !ismonomial(lead(a))
+      return false
+   end
+   for i = 1:length(a) - 1
+      if coeff(a, i - 1) != 0
+         return false
+      end
+   end
+   return true
+end
 
 function deepcopy_internal{T <: RingElem}(a::GenPoly{T}, dict::ObjectIdDict)
    coeffs = Array{T}(length(a))
@@ -1263,17 +1302,113 @@ function valuation{T <: RingElem}(z::PolyElem{T}, p::PolyElem{T})
   return v
 end
 
+doc"""
+    divides{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
+> Returns a pair consisting of a flag which is set to `true` if $f$ divides
+> $g$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
+> such a polynomial exists. If not, the value of $h$ is undetermined.
+"""
+function divides{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
+   check_parent(f, g)
+   if length(g) == 0
+      raise(DivideError())
+   end
+   if length(f) == 0
+      return true, parent(f)()
+   end
+   if length(f) < length(g)
+      return false, parent(f)()
+   end
+   f = deepcopy(f)
+   g_lead = lead(g) 
+   qlen = length(f) - length(g) + 1
+   q = parent(f)()
+   fit!(q, qlen)
+   c = base_ring(f)()
+   while length(f) >= length(g)
+      q1 = lead(f)
+      flag, d = divides(q1, g_lead)
+      if !flag
+         return false, parent(f)()
+      end
+      setcoeff!(q, length(f) - length(g), d)
+      d = -d
+      for i = 1:length(g)
+         mul!(c, coeff(g, i - 1), d)
+         u = coeff(f, i + length(f) - length(g) - 1)
+         addeq!(u, c)
+         setcoeff!(f, i + length(f) - length(g) - 1, u)
+      end
+      set_length!(f, normalise(f, length(f)))
+   end
+   return f == 0, q
+end
+
+doc"""
+    divides{T <: RingElem}(f::PolyElem{T}, g::T)
+> Returns a pair consisting of a flag which is set to `true` if $g$ divides
+> $f$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
+> such a polynomial exists. If not, the value of $h$ is undetermined.
+"""
+function divides{T <: RingElem}(z::PolyElem{T}, x::T)
+   parent(x) != base_ring(z) && error("Wrong parents in divides")
+   q = parent(z)()
+   fit!(q, length(z))
+   flag = true
+   for i = 1:length(z)
+      flag, c = divides(coeff(z, i - 1), x)
+      if !flag
+         break
+      end
+      setcoeff!(q, i - 1, c)
+   end
+   set_length!(q, length(z))
+   return flag, q
+end
+
 ###############################################################################
 #
 #   Content, primitive part, GCD and LCM
 #
 ###############################################################################
 
+function term_gcd{T <: RingElem}(a::T, b::T)
+   return gcd(a, b)
+end
+
+function term_content{T <: RingElem}(a::T)
+   return a
+end
+
+function term_gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+   d = min(degree(a), degree(b))
+   x = gen(parent(a))
+   return term_gcd(coeff(a, degree(a)), coeff(b, degree(b)))*x^d
+end
+
+function term_content{T <: RingElem}(a::PolyElem{T})
+   for i = 1:length(a)
+      c = coeff(a, i - 1)
+      if c != 0
+         g = term_content(c)
+         for j = i + 1:length(a)
+            c = coeff(a, j - 1)
+            if c != 0
+               g = term_gcd(g, term_content(c))
+            end
+         end
+         x = gen(parent(a))
+         return g*x^(i - 1)
+      end
+   end
+   return parent(a)()
+end
+
 doc"""
     gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
 > Return a greatest common divisor of $a$ and $b$ if it exists.
 """
-function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
+function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, ignore_content=false)
    check_parent(a, b)
    if length(b) > length(a)
       (a, b) = (b, a)
@@ -1284,11 +1419,17 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    if b == 1
       return b
    end
-   c1 = content(a)
-   c2 = content(b)
-   a = divexact(a, c1)
-   b = divexact(b, c2)
-   c = gcd(c1, c2)
+   if !ignore_content
+      c1 = content(a)
+      c2 = content(b)
+      a = divexact(a, c1)
+      b = divexact(b, c2)
+      c = gcd(c1, c2)
+   end
+   lead_monomial = ismonomial(lead(a)) || ismonomial(lead(b))
+   trail_monomial = ismonomial(trail(a)) || ismonomial(trail(b))
+   lead_a = lead(a)
+   lead_b = lead(b)
    g = one(parent(a))
    h = one(parent(a))
    while true
@@ -1309,7 +1450,33 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
          h = h^(1 - d)*g^d
       end
    end
-   return c*primpart(b)
+   if !ignore_content
+      if !ismonomial(lead(b)) && !ismonomial(trail(b))
+         if lead_monomial # lead term monomial, so content contains rest
+            d = divexact(lead(b), term_content(lead(b)))
+            b = divexact(b, d)
+         elseif trail_monomial # trail term is monomial, so ditto
+            d = divexact(trail(b), term_content(trail(b)))
+            b = divexact(b, d)
+         else
+            glead = gcd(lead_a, lead_b)
+            if ismonomial(glead)
+               d = divexact(lead(b), term_content(lead(b)))
+               b = divexact(b, d)
+            else # last ditched attempt to find easy content
+               h = gcd(lead(b), glead)
+               h = divexact(h, term_content(h))
+               flag, q = divides(b, h)
+               if flag
+                  b = q
+               end
+            end
+         end
+      end
+      b = divexact(b, term_content(b))
+   else
+      return b
+   end
 end
 
 

@@ -161,7 +161,7 @@ function create_accessors(T, S, handle)
    end
    set = function(a, b)
       if handle > length(a.auxilliary_data)
-         resize(a.auxilliary_data, handle)
+         resize!(a.auxilliary_data, handle)
       end
       a.auxilliary_data[handle] = b
    end

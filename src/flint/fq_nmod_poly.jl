@@ -377,7 +377,7 @@ end
 
 ################################################################################
 #
-#   Remove
+#   Remove and valuation
 #
 ################################################################################
 
@@ -398,6 +398,16 @@ function remove(z::fq_nmod_poly, p::fq_nmod_poly)
    return v, z
 end
 
+function divides(z::fq_nmod_poly, x::fq_nmod_poly)
+   check_parent(z, x)
+   q = parent(z)()
+   v = Bool(ccall((:fq_nmod_poly_divides, :libflint), Cint,
+            (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly},
+             Ptr{fq_nmod_poly}, Ptr{FqNmodFiniteField}),
+             &q, &z, &x, &base_ring(parent(z))))
+   return v, q
+end
+
 ################################################################################
 #
 #   Modular arithmetic
@@ -407,6 +417,15 @@ end
 function powmod(x::fq_nmod_poly, n::Int, y::fq_nmod_poly)
    check_parent(x,y)
    z = parent(x)()
+
+   if n < 0
+      g, x = gcdinv(x, y)
+      if g != 1
+         error("Element not invertible")
+      end
+      n = -n
+   end
+
    ccall((:fq_nmod_poly_powmod_ui_binexp, :libflint), Void,
          (Ptr{fq_nmod_poly}, Ptr{fq_nmod_poly}, Int, Ptr{fq_nmod_poly},
          Ptr{FqNmodFiniteField}), &z, &x, n, &y, &base_ring(parent(x)))

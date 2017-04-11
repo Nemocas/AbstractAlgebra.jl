@@ -555,6 +555,23 @@ divexact(a::fmpq, b::nf_elem) = inv(b)*a
 
 ###############################################################################
 #
+#   Removal and valuation
+#
+###############################################################################
+
+doc"""
+    divides(f::nf_elem, g::nf_elem)
+> Returns a pair consisting of a flag which is set to `true` if $g$ divides
+> $f$ and `false` otherwise, and a number field element $h$ such that $f = gh$
+> if such exists. If not, the value of $h$ is undetermined.
+"""
+function divides(a::nf_elem, b::nf_elem)
+   b == 0 && throw(DivideError())
+   return true, divexact(a, b)
+end
+
+###############################################################################
+#
 #   Norm and trace
 #
 ###############################################################################

@@ -315,6 +315,7 @@ modulus{T <: ResElem}(::PolyElem{T})
 
 ```@docs
 lead(::PolyElem)
+trail(::PolyElem)
 ```
 
 ```@docs
@@ -331,6 +332,10 @@ isgen(::PolyElem)
 
 ```@docs
 isunit(::PolyElem)
+```
+
+```@docs
+isonomial(::PolyElem)
 ```
 
 ```@docs
@@ -719,6 +724,8 @@ evaluate(::PolyElem, ::fmpz)
 ```@docs
 remove{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
 valuation{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+divides{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+divides{T <: RingElem}(::PolyElem{T}, ::T)
 ```
 
 ```@docs

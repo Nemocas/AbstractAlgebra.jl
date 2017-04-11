@@ -1861,6 +1861,24 @@ type fmpq_mat <: MatElem{fmpq}
       return z
    end
 
+   function fmpq_mat(r::Int, c::Int, arr::Array{fmpz, 2})
+      z = new()
+      ccall((:fmpq_mat_init, :libflint), Void, 
+            (Ptr{fmpq_mat}, Int, Int), &z, r, c)
+      finalizer(z, _fmpq_mat_clear_fn)
+      b = fmpz(1)
+      for i = 1:r
+         for j = 1:c
+            el = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
+                       (Ptr{fmpq_mat}, Int, Int), &z, i - 1, j - 1)
+            ccall((:fmpq_set_fmpz_frac, :libflint), Void,
+                  (Ptr{fmpq}, Ptr{fmpz}, Ptr{fmpz}), el, &arr[i, j], &b)
+         end
+      end
+      return z
+   end
+
+
    function fmpq_mat(r::Int, c::Int, arr::Array{fmpq, 1})
       z = new()
       ccall((:fmpq_mat_init, :libflint), Void, 
@@ -1876,6 +1894,24 @@ type fmpq_mat <: MatElem{fmpq}
       end
       return z
    end
+
+   function fmpq_mat(r::Int, c::Int, arr::Array{fmpz, 1})
+      z = new()
+      ccall((:fmpq_mat_init, :libflint), Void, 
+            (Ptr{fmpq_mat}, Int, Int), &z, r, c)
+      finalizer(z, _fmpq_mat_clear_fn)
+      b = fmpz(1)
+      for i = 1:r
+         for j = 1:c
+            el = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
+                       (Ptr{fmpq_mat}, Int, Int), &z, i - 1, j - 1)
+            ccall((:fmpq_set_fmpz_frac, :libflint), Void,
+                  (Ptr{fmpq}, Ptr{fmpz}, Ptr{fmpz}), el, &arr[(i-1)*c+j], &b)
+         end
+      end
+      return z
+   end
+
 
    function fmpq_mat{T <: Integer}(r::Int, c::Int, arr::Array{T, 2})
       z = new()

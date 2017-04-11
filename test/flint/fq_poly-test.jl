@@ -286,6 +286,8 @@ function test_fq_poly_modular_arithmetic()
    @test mulmod(f, g, h) == (15*x^4+11*x^3+15*x^2+5*x+2)*y^3+(5*x^4+8*x^3+8*x^2+6*x+1)*y^2+(5*x^3+4*x^2+5*x+2)*y+(x^3+x^2+x+1)
    
    @test powmod(f, 3, h) == (17*x^4+14*x^3+7*x^2+20*x+5)*y^3+(20*x^4+7*x^3+16*x^2+x+10)*y^2+(x^4+6*x^3+17*x^2+16*x+21)*y+(3*x^4+5*x+1)
+
+   @test powmod(f, -3, g) == (18*x^4+x^3+7*x^2+15*x+5)*y+(16*x^4+14*x^3+15*x^2+5*x+21)
    
    println("PASS")
 end
@@ -531,6 +533,15 @@ function test_fq_poly_remove_valuation()
    @test valuation(g, f) == 5
    @test v == 5
    @test h == (11y^3 - 2y^2 + 5)
+
+   v, q = divides(f*g, f)
+
+   @test v
+   @test q == g
+
+   v, q = divides(f*g + 1, f)
+
+   @test !v
 
    println("PASS")
 end

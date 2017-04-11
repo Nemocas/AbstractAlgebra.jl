@@ -157,13 +157,10 @@ function monomial_isless(A::Array{UInt, 2}, i::Int, j::Int, N::Int)
    return false
 end
 
-function monomial_min!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int)
+function monomial_vecmin!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int)
    for k = 1:N
-      if A[k, i] < B[k, j]
-         break
-      elseif A[k, i] > B[k, j]
-         monomial_set!(A, i, B, j, N)
-         break
+      if B[k, j] < A[k, i]
+         A[k, i] = B[k, j]
       end
    end
    nothing
@@ -269,6 +266,8 @@ isone(x::GenMPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)
 iszero(x::GenMPoly) = x.length == 0
 
 isconstant(x::GenMPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
+
+ismonomial(c::GenMPoly) = x.length == 1
 
 function normalise(a::GenMPoly, n::Int)
    while n > 0 && iszero(a.coeffs[n]) 
@@ -1051,6 +1050,7 @@ function *{T <: RingElem}(a::GenMPoly{T}, n::Integer)
       end
    end
    r.length = j - 1
+   resize!(r.coeffs, r.length)
    return r
 end
 
@@ -1068,6 +1068,7 @@ function *{T <: RingElem}(a::GenMPoly{T}, n::fmpz)
       end
    end
    r.length = j - 1
+   resize!(r.coeffs, r.length)
    return r
 end
 
@@ -1085,6 +1086,7 @@ function *{T <: RingElem}(a::GenMPoly{T}, n::T)
       end
    end
    r.length = j - 1
+   resize!(r.coeffs, r.length)
    return r
 end
 
@@ -2295,6 +2297,21 @@ function gcd{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
    return main_variable_insert(g, k)
 end
 
+function term_gcd{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
+   if a.length < 1
+      return b
+   elseif b.length < 1
+      return a
+   end
+   N = parent(a).N
+   Ce = Array(UInt, N, 1)
+   Cc = Array(T, 1)
+   monomial_set!(Ce, 1, a.exps, 1, N)
+   monomial_vecmin!(Ce, 1, b.exps, 1, N)
+   Cc[1] = gcd(a.coeffs[1], b.coeffs[1])
+   return parent(a)(Cc, Ce)
+end
+
 function term_content{T <: RingElem}(a::GenMPoly{T})
    if a.length <= 1
       return a
@@ -2304,7 +2321,7 @@ function term_content{T <: RingElem}(a::GenMPoly{T})
    Cc = Array(T, 1)
    monomial_set!(Ce, 1, a.exps, 1, N)
    for i = 2:a.length
-      monomial_min!(Ce, 1, a.exps, i, N)
+      monomial_vecmin!(Ce, 1, a.exps, i, N)
       if monomial_iszero(Ce, 1, N)
          break
       end

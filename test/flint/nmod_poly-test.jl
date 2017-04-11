@@ -438,6 +438,8 @@ function test_nmod_poly_modular_arithmetic()
 
   @test powmod(f, 10, h) == 485924368*x^2+380106591*x+302530457
 
+  @test powmod(f, -10, g) == 484381224*x+14566177
+
   println("PASS")
 end
 
@@ -697,6 +699,16 @@ function test_nmod_poly_remove_valuation()
   @test n == valuation(f, g)
   @test n == 10
   @test p == (x+2)*(x+3)
+
+   v, q = divides(f*g, f)
+
+   @test v
+   @test q == g
+
+   v, q = divides(f*g + 1, f)
+
+   @test !v
+
   println("PASS")
 end
 
