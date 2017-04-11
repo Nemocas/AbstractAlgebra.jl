@@ -168,6 +168,26 @@ function randmat_with_rank{T <: RingElem}(S::GenMatSpace{T}, c::Int, rank::Int)
    return M
 end
 
+function is_weak_popov(P::GenMat, rank::Int)
+   zero_rows = 0
+   pivots = zeros(cols(P))
+   for r = 1:rows(P)
+      p = Nemo.find_pivot_popov(P, r)
+      if P[r,p] == 0
+         zero_rows += 1
+         continue
+      end
+      if pivots[p] != 0
+         return false
+      end
+      pivots[p] = r
+   end
+   if zero_rows != rows(P)-rank
+      return false
+   end
+   return true
+end
+
 function test_gen_mat_constructors()
    print("GenMat.constructors...")
  
@@ -1099,6 +1119,40 @@ function test_gen_concat()
    println("PASS")   
 end
 
+function test_gen_mat_weak_popov()
+   print("GenMat.weak_popov...")
+
+   R, x = PolynomialRing(QQ, "x")
+
+   A = Matrix(R, 3, 4, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
+   r = rank(A)
+
+   P = weak_popov(A)
+   @test is_weak_popov(P, r)
+
+   P, U = weak_popov_with_trafo(A)
+   @test is_weak_popov(P, r)
+   @test U*A == P
+   @test isunit(det(U))
+
+   F, a = FiniteField(7, 1, "a")
+
+   S, y = PolynomialRing(F, "y")
+
+   B = Matrix(S, 3, 3, map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]))
+   s = rank(B)
+
+   P = weak_popov(B)
+   @test is_weak_popov(P, s)
+
+   P, U = weak_popov_with_trafo(B)
+   @test is_weak_popov(P, s)
+   @test U*B == P
+   @test isunit(det(U))
+
+   println("PASS")
+end
+
 function test_gen_mat()
    test_gen_mat_constructors()
    test_gen_mat_manipulation()
@@ -1127,6 +1181,7 @@ function test_gen_mat()
    test_gen_mat_minpoly()
    test_gen_row_swapping()
    test_gen_concat()
+   test_gen_mat_weak_popov()
 
    println("")
 end
