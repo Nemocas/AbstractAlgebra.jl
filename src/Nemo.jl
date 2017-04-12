@@ -120,6 +120,51 @@ end
 
 ###############################################################################
 #
+#  Version information
+#
+################################################################################
+
+function versioninfo()
+  print("Nemo version 0.6.0 \n")
+  nemorepo = Pkg.dir("Nemo")
+
+  print("Nemo: ")
+  prepo = Base.LibGit2.GitRepo(nemorepo)
+  Base.LibGit2.with(LibGit2.head(prepo)) do phead
+    print("commit: ")
+    print(string(LibGit2.Oid(phead))[1:8])
+    print(" date: ")
+    commit = Base.LibGit2.get(Base.LibGit2.GitCommit, prepo, LibGit2.Oid(phead))
+    print(Base.Dates.unix2datetime(Base.LibGit2.author(commit).time))
+    print(")\n")
+  end
+
+  finalize(prepo)
+
+  for deps in ["flint2", "arb", "antic"]
+    if ispath(joinpath(nemorepo, "deps/flint2"))
+      print("$deps: ")
+      repo = joinpath(nemorepo, "deps", deps)
+
+      prepo = Base.LibGit2.GitRepo(repo)
+
+      Base.LibGit2.with(LibGit2.head(prepo)) do phead
+        print("commit: ")
+        print(string(LibGit2.Oid(phead))[1:8])
+        print(" date: ")
+        commit = Base.LibGit2.get(Base.LibGit2.GitCommit, prepo, LibGit2.Oid(phead))
+        print(Base.Dates.unix2datetime(Base.LibGit2.author(commit).time))
+        print(")\n")
+      end
+      finalize(prepo)
+    end
+  end
+
+  return nothing
+end
+
+###############################################################################
+#
 #   Load Nemo Rings/Fields/etc
 #
 ###############################################################################
