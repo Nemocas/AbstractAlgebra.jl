@@ -142,7 +142,7 @@ function versioninfo()
   finalize(prepo)
 
   for deps in ["flint2", "arb", "antic"]
-    if ispath(joinpath(nemorepo, "deps/flint2"))
+    if ispath(joinpath(nemorepo, "deps", deps))
       print("$deps: ")
       repo = joinpath(nemorepo, "deps", deps)
 
