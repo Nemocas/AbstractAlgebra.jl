@@ -7,7 +7,8 @@
 export MatricSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
        ishessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
-       powers, similarity!, weak_popov, weak_popov_with_trafo
+       powers, similarity!, weak_popov, weak_popov_with_trafo,
+       rank_profile_popov
 
 ###############################################################################
 #
@@ -2752,10 +2753,9 @@ function find_pivot_popov(P::GenMat, r::Int)
    return pivot
 end
 
-function weak_popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, with_trafo = false)
-   m = rows(P)
+function weak_popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, with_trafo = false, last_row = 0)
+   last_row == 0 ? m = rows(P) : m = last_row
    n = cols(P)
-   t = base_ring(P)()
    pivots = Array{Array{Int,1}}(n)
    for i = 1:n
       pivots[i] = Array{Int}(0)
@@ -2764,6 +2764,16 @@ function weak_popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, with_trafo = fal
       pivot = find_pivot_popov(P, r)
       P[r,pivot] != 0 ? push!(pivots[pivot], r) : nothing
    end
+   weak_popov_with_pivots!(P, U, pivots, with_trafo, last_row)
+   return nothing
+end
+
+function weak_popov_with_pivots!{T <: PolyElem, S}(P::GenMat{T}, U::GenMat{T}, pivots::Array{Array{Int,1}},
+                                    with_trafo = false, last_row = 0, return_pivots::Type{Val{S}} = Val{false})
+   @assert length(pivots) == cols(P)
+   last_row == 0 ? m = rows(P) : m = last_row
+   n = cols(P)
+   t = base_ring(P)()
    change = true
    while change
       change = false
@@ -2801,7 +2811,40 @@ function weak_popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, with_trafo = fal
          end
       end
    end
-   return nothing
+   return return_pivots == Val{true} ? pivots : nothing
+end
+
+function rank_profile_popov{T <: PolyElem}(A::GenMat{T})
+   B = deepcopy(A)
+   m = rows(A)
+   n = cols(A)
+   U = zero(MatrixSpace(base_ring(A), 0, 0))
+   r = 0
+   rank_profile = Array{Int,1}(0)
+   pivots = Array{Array{Int,1}}(n)
+   for i = 1:n
+      pivots[i] = Array{Int}(0)
+   end
+   p = find_pivot_popov(B, 1)
+   if B[1,p] != 0
+      push!(pivots[p], 1)
+      r = 1
+      push!(rank_profile, 1)
+   end
+   for i = 2:m
+      p = find_pivot_popov(B, i)
+      B[i,p] != 0 ? push!(pivots[p], i) : nothing
+      pivots = weak_popov_with_pivots!(B, U, pivots, false, i, Val{true})
+      s = 0
+      for j = 1:n
+         length(pivots[j]) != 0 ? s += 1 : nothing
+      end
+      if s != r
+         push!(rank_profile, i)
+         r = s
+      end
+   end
+   return rank_profile
 end
 
 ###############################################################################
