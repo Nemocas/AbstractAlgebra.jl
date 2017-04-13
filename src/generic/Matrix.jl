@@ -3267,7 +3267,7 @@ function weak_popov_with_pivots!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::G
                continue
             end
             q = -div(P[pivots[i][j],i],P[pivot,i])
-            for c = 1:n
+            for c = 1:cols(P)
                mul!(t, q, P[pivot,c])
                addeq!(P[pivots[i][j],c], t)
             end
@@ -3293,7 +3293,7 @@ function weak_popov_with_pivots!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::G
          end
       end
    end
-   return return_pivots == Val{true} ? pivots : nothing
+   return nothing
 end
 
 function rank_profile_popov{T <: PolyElem}(A::GenMat{T})
@@ -3301,6 +3301,7 @@ function rank_profile_popov{T <: PolyElem}(A::GenMat{T})
    m = rows(A)
    n = cols(A)
    U = zero(MatrixSpace(base_ring(A), 0, 0))
+   V = U
    r = 0
    rank_profile = Array{Int,1}(0)
    pivots = Array{Array{Int,1}}(n)
@@ -3316,10 +3317,10 @@ function rank_profile_popov{T <: PolyElem}(A::GenMat{T})
    for i = 2:m
       p = find_pivot_popov(B, i)
       B[i,p] != 0 ? push!(pivots[p], i) : nothing
-      pivots = weak_popov_with_pivots!(B, U, pivots, false, i, Val{true})
+      weak_popov_with_pivots!(B, V, U, pivots, false, false, i)
       s = 0
       for j = 1:n
-         length(pivots[j]) != 0 ? s += 1 : nothing
+         s += length(pivots[j])
       end
       if s != r
          push!(rank_profile, i)
