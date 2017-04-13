@@ -8,7 +8,8 @@ export MatrixSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
        ishessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
        powers, similarity!, solve, solve_rational, hnf, hnf_with_trafo, snf,
-       snf_with_trafo, weak_popov, weak_popov_with_trafo, rank_profile_popov
+       snf_with_trafo, weak_popov, weak_popov_with_trafo, extended_weak_popov,
+       extended_weak_popov_with_trafo, rank_profile_popov
 
 ###############################################################################
 #
@@ -3176,14 +3177,39 @@ end
 function _weak_popov{T <: PolyElem, S}(A::GenMat{T}, trafo::Type{Val{S}} = Val{false})
    P = deepcopy(A)
    m = rows(P)
+   W = zero(MatrixSpace(base_ring(P), 0, 0))
    if trafo == Val{true}
       U = one(MatrixSpace(base_ring(P), m, m))
-      weak_popov!(P, U, true)
+      weak_popov!(P, W, U, false, true)
       return P, U
    else
       U = zero(MatrixSpace(base_ring(P), 0, 0))
-      weak_popov!(P, U, false)
+      weak_popov!(P, W, U, false, false)
       return P
+   end
+end
+
+function extended_weak_popov{T <: PolyElem}(A::GenMat{T}, V::GenMat{T})
+   return _extended_weak_popov(A, V, Val{false})
+end
+
+function extended_weak_popov_with_trafo{T <: PolyElem}(A::GenMat{T}, V::GenMat{T})
+   return _extended_weak_popov(A, V, Val{true})
+end
+
+function _extended_weak_popov{T <: PolyElem, S}(A::GenMat{T}, V::GenMat{T}, trafo::Type{Val{S}} = Val{false})
+   @assert rows(V) == rows(A) && cols(V) == 1
+   P = deepcopy(A)
+   W = deepcopy(V)
+   m = rows(P)
+   if trafo == Val{true}
+      U = one(MatrixSpace(base_ring(P), m, m))
+      weak_popov!(P, W, U, true, true)
+      return P, W, U
+   else
+      U = zero(MatrixSpace(base_ring(P), 0, 0))
+      weak_popov!(P, W, U, true, false)
+      return P, W
    end
 end
 
@@ -3197,7 +3223,7 @@ function find_pivot_popov(P::GenMat, r::Int)
    return pivot
 end
 
-function weak_popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, with_trafo = false, last_row = 0)
+function weak_popov!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::GenMat{T}, extended = false, with_trafo = false, last_row = 0)
    last_row == 0 ? m = rows(P) : m = last_row
    n = cols(P)
    pivots = Array{Array{Int,1}}(n)
@@ -3208,12 +3234,13 @@ function weak_popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, with_trafo = fal
       pivot = find_pivot_popov(P, r)
       P[r,pivot] != 0 ? push!(pivots[pivot], r) : nothing
    end
-   weak_popov_with_pivots!(P, U, pivots, with_trafo, last_row)
+   weak_popov_with_pivots!(P, W, U, pivots, extended, with_trafo, last_row)
    return nothing
 end
 
-function weak_popov_with_pivots!{T <: PolyElem, S}(P::GenMat{T}, U::GenMat{T}, pivots::Array{Array{Int,1}},
-                                    with_trafo = false, last_row = 0, return_pivots::Type{Val{S}} = Val{false})
+function weak_popov_with_pivots!{T <: PolyElem, S}(P::GenMat{T}, W::GenMat{T}, U::GenMat{T}, pivots::Array{Array{Int,1}},
+                                                   extended = false, with_trafo = false, last_row = 0,
+                                                    return_pivots::Type{Val{S}} = Val{false})
    @assert length(pivots) == cols(P)
    last_row == 0 ? m = rows(P) : m = last_row
    n = cols(P)
@@ -3238,10 +3265,14 @@ function weak_popov_with_pivots!{T <: PolyElem, S}(P::GenMat{T}, U::GenMat{T}, p
                addeq!(P[pivots[i][j],c], t)
             end
             if with_trafo
-               for c = 1:m
+               for c = 1:cols(U)
                   mul!(t, q, U[pivot,c])
                   addeq!(U[pivots[i][j],c], t)
                end
+            end
+            if extended
+               mul!(t, q, W[pivot,1])
+               addeq!(W[pivots[i][j],1], t)
             end
          end
          old_pivots = pivots[i]
@@ -3541,7 +3572,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 1})
       parent(b[1]) != base_ring(a) && error("Unable to coerce to matrix")
    end
    _check_dim(a.rows, a.cols, b)
-   b = reshape(b, a.rows, a.cols)'
+   b = reshape(b, a.cols, a.rows)'
    z = GenMat{T}(b)
    z.parent = a
    return z
