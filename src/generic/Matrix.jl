@@ -3267,7 +3267,7 @@ function weak_popov_with_pivots!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::G
                continue
             end
             q = -div(P[pivots[i][j],i],P[pivot,i])
-            for c = 1:cols(P)
+            for c = 1:n
                mul!(t, q, P[pivot,c])
                addeq!(P[pivots[i][j],c], t)
             end
