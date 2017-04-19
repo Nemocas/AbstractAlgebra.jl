@@ -2769,7 +2769,7 @@ function _extended_weak_popov{T <: PolyElem, S}(A::GenMat{T}, V::GenMat{T}, traf
    end
 end
 
-function find_pivot_popov{T <: PolyElem}(P::GenMat{T}, r::Int, last_col = 0)
+function find_pivot_popov{T <: PolyElem}(P::GenMat{T}, r::Int, last_col::Int = 0)
    last_col == 0 ? n = cols(P) : n = last_col
    pivot = n
    for c = n-1:-1:1
@@ -2780,7 +2780,7 @@ function find_pivot_popov{T <: PolyElem}(P::GenMat{T}, r::Int, last_col = 0)
    return pivot
 end
 
-function init_pivots_popov{T <: PolyElem}(P::GenMat{T}, last_row = 0, last_col = 0)
+function init_pivots_popov{T <: PolyElem}(P::GenMat{T}, last_row::Int = 0, last_col::Int = 0)
    last_row == 0 ? m = rows(P) : m = last_row
    last_col == 0 ? n = cols(P) : n = last_col
    pivots = Array{Array{Int,1}}(n)
@@ -2794,17 +2794,18 @@ function init_pivots_popov{T <: PolyElem}(P::GenMat{T}, last_row = 0, last_col =
    return pivots
 end
 
-function weak_popov!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::GenMat{T}, extended = false, with_trafo = false, last_row = 0, last_col = 0)
+function weak_popov!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::GenMat{T}, extended::Bool = false,
+                                       with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0)
    pivots = init_pivots_popov(P, last_row, last_col)
    weak_popov_with_pivots!(P, W, U, pivots, extended, with_trafo, last_row, last_col)
    return nothing
 end
 
 function weak_popov_with_pivots!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::GenMat{T}, pivots::Array{Array{Int,1}},
-                                                   extended = false, with_trafo = false, last_row = 0, last_col = 0)
+                                                   extended::Bool = false, with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0)
    last_row == 0 ? m = rows(P) : m = last_row
    last_col == 0 ? n = cols(P) : n = last_col
-   @assert length(pivots) == n
+   @assert length(pivots) >= n
 
    t = base_ring(P)()
    change = true
@@ -2822,7 +2823,7 @@ function weak_popov_with_pivots!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::G
                continue
             end
             q = -div(P[pivots[i][j],i],P[pivot,i])
-            for c = 1:cols(P)
+            for c = 1:n
                mul!(t, q, P[pivot,c])
                addeq!(P[pivots[i][j],c], t)
             end
@@ -2893,18 +2894,22 @@ function det_popov{T <: PolyElem}(A::GenMat{T})
    det = one(R)
    V = zero(MatrixSpace(R, n, 1))
    U = zero(MatrixSpace(R, 0, 0))
+   pivots = init_pivots_popov(B, n, n-1)
    for i = n-1:-1:1
       for j = 1:i+1
          V[j,1] = deepcopy(B[j,i+1])
       end
-      pivots = init_pivots_popov(B, i+1, i)
       weak_popov_with_pivots!(B, V, U, pivots, true, false, i+1, i)
       non_zero_rows = BitArray(i+1)
+      last_pivot = 0
       for j = 1:i
          if length(pivots[j]) == 0
             continue
          end
          non_zero_rows[pivots[j][1]] = true
+         if pivots[j][1] == i+1
+            last_pivot = j
+         end
       end
       k = 0
       for j = 1:i+1
@@ -2915,11 +2920,126 @@ function det_popov{T <: PolyElem}(A::GenMat{T})
       end
       if k != i+1
          swap_rows!(B, k, i+1)
-         V[k,1] *= -1
+         mul!(V[k,1], V[k,1], R(-1))
+         pivots[last_pivot][1] = k
       end
       mul!(det, det, V[k,1])
+      if i > 1
+         p = find_pivot_popov(B, pivots[i][1], i-1)
+         B[pivots[i][1], p] != 0 ? push!(pivots[p], pivots[i][1]) : nothing
+         deleteat!(pivots[i], 1)
+      end
    end
-   return B[1,1] * det
+   mul!(det, det, B[1,1])
+   return det
+end
+
+function popov{T <: PolyElem}(A::GenMat{T})
+   return _popov(A, Val{false})
+end
+
+function popov_with_trafo{T <: PolyElem}(A::GenMat{T})
+   return _popov(A, Val{true})
+end
+
+function _popov{T <: PolyElem, S}(A::GenMat{T}, trafo::Type{Val{S}} = Val{false})
+   P = deepcopy(A)
+   m = rows(P)
+   if trafo == Val{true}
+      U = one(MatrixSpace(base_ring(P), m, m))
+      popov!(P, U, true)
+      return P, U
+   else
+      U = zero(MatrixSpace(base_ring(P), 0, 0))
+      popov!(P, U, false)
+      return P
+   end
+end
+
+function asc_order_popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, pivots::Array{Array{Int,1}}, with_trafo::Bool)
+   m = rows(P)
+   n = cols(P)
+   pivots2 = Array{NTuple,1}(m)
+   for r = 1:m
+      pivots2[r] = (r,n,-1)
+   end
+   for c = 1:n
+      if length(pivots[c]) == 0
+         continue
+      end
+      r = pivots[c][1]
+      pivots2[r] = (r, c, degree(P[r,c]))
+   end
+   sort!(pivots2, lt = (x,y) -> ( x[3] < y[3] || ( x[3] == y[3] && x[2] <= y[2] ) ))
+   row_nums = [ i for i = 1:m ]
+   for r = 1:m
+      if pivots2[r][3] != -1
+         c = pivots2[r][2]
+         pivots[c] = [r]
+      end
+      i = pivots2[r][1]
+      r2 = row_nums[i]
+      if r == r2
+         continue
+      end
+      swap_rows!(P, r, r2)
+      with_trafo ? swap_rows!(U, r, r2) : nothing
+      j = findfirst(row_nums, r)
+      row_nums[i] = r
+      row_nums[j] = r2
+   end
+   return nothing
+end
+
+function popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, with_trafo::Bool = false)
+   m = rows(P)
+   n = cols(P)
+   W = zero(MatrixSpace(base_ring(P), 0, 0))
+   pivots = init_pivots_popov(P)
+   weak_popov_with_pivots!(P, W, U, pivots, false, with_trafo)
+   asc_order_popov!(P, U, pivots, with_trafo)
+   t = base_ring(P)()
+   for i = 1:n
+      if length(pivots[i]) == 0
+         continue
+      end
+      pivot = pivots[i][1]
+      d = degree(P[pivot,i])
+      for r = 1:pivot-1
+         if degree(P[r,i]) < d
+            continue
+         end
+         q = -div(P[r,i],P[pivot,i])
+         for c = 1:n
+            mul!(t, q, P[pivot,c])
+            addeq!(P[r,c], t)
+         end
+         if with_trafo
+            for c = 1:cols(U)
+               mul!(t, q, U[pivot,c])
+               addeq!(U[r,c], t)
+            end
+         end
+      end
+   end
+   for i = 1:n
+      if length(pivots[i]) == 0
+         continue
+      end
+      r = pivots[i][1]
+      cu = canonical_unit(P[r,i])
+      if cu != 1
+         for j = 1:n
+            P[r,j] = divexact(P[r,j],cu)
+         end
+         if with_trafo
+            for j = 1:cols(U)
+               U[r,j] = divexact(U[r,j],cu)
+            end
+         end
+      end
+   end
+   return nothing
 end
 
 ###############################################################################
