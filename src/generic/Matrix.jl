@@ -2825,7 +2825,7 @@ function _hnf_kb{T}(A::GenMat, trafo::Type{Val{T}} = Val{false})
    end
 end
 
-function kb_search_first_pivot(H::GenMat, start_element = 1)
+function kb_search_first_pivot(H::GenMat, start_element::Int = 1)
    for r = start_element:rows(H)
       for c = start_element:cols(H)
          if H[r,c] != 0
@@ -2859,7 +2859,7 @@ function kb_reduce_row!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{
    return nothing
 end
 
-function kb_reduce_column!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int}, c::Int, with_trafo::Bool, start_element = 1)
+function kb_reduce_column!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int}, c::Int, with_trafo::Bool, start_element::Int = 1)
    r = pivot[c]
    t = base_ring(H)()
    for i = start_element:c-1
@@ -2906,7 +2906,7 @@ function swap_rows!(a::MatElem, i::Int, j::Int)
    end
 end
 
-function kb_sort_rows!{T <:RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int}, with_trafo::Bool, start_element = 1)
+function kb_sort_rows!{T <:RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int}, with_trafo::Bool, start_element::Int = 1)
    m = rows(H)
    n = cols(H)
    pivot2 = zeros(Int, m)
@@ -2942,7 +2942,7 @@ function kb_sort_rows!{T <:RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{In
    return nothing
 end
 
-function hnf_kb!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, with_trafo = false, start_element = 1)
+function hnf_kb!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, with_trafo::Bool = false, start_element::Int = 1)
    m = rows(H)
    n = cols(H)
    pivot = zeros(Int, n)
@@ -3083,7 +3083,7 @@ function kb_clear_row!{T <: RingElem}(S::GenMat{T}, K::GenMat{T}, i::Int, with_t
    return nothing
 end
 
-function snf_kb!{T <: RingElem}(S::GenMat{T}, U::GenMat{T}, K::GenMat{T}, with_trafo = false)
+function snf_kb!{T <: RingElem}(S::GenMat{T}, U::GenMat{T}, K::GenMat{T}, with_trafo::Bool = false)
    m = rows(S)
    n = cols(S)
    l = min(m,n)
