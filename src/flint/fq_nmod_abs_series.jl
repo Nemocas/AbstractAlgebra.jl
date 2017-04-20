@@ -221,7 +221,7 @@ function *(x::fq_nmod, y::fq_nmod_abs_series)
    z.prec = y.prec
    ccall((:fq_nmod_poly_scalar_mul_fq_nmod, :libflint), Void, 
          (Ptr{fq_nmod_abs_series}, Ptr{fq_nmod_abs_series}, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), 
-               &z, &y, &x, &base_ring(x))
+               &z, &y, &x, &parent(x))
    return z
 end
 
