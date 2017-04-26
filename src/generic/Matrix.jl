@@ -3389,13 +3389,7 @@ function det_popov{T <: PolyElem}(A::GenMat{T})
             last_pivot = j
          end
       end
-      k = 0
-      for j = 1:i+1
-         if !non_zero_rows[j]
-            k = j
-            break
-         end
-      end
+      k = findfirst(non_zero_rows, false)
       if k != i+1
          swap_rows!(B, k, i+1)
          mul!(V[k,1], V[k,1], R(-1))
