@@ -2895,12 +2895,14 @@ function det_popov{T <: PolyElem}(A::GenMat{T})
    V = zero(MatrixSpace(R, n, 1))
    U = zero(MatrixSpace(R, 0, 0))
    pivots = init_pivots_popov(B, n, n-1)
+   minusOne = R(-1)
    for i = n-1:-1:1
       for j = 1:i+1
          V[j,1] = deepcopy(B[j,i+1])
       end
       weak_popov_with_pivots!(B, V, U, pivots, true, false, i+1, i)
       non_zero_rows = BitArray(i+1)
+      fill!(non_zero_rows, false)
       last_pivot = 0
       for j = 1:i
          if length(pivots[j]) == 0
@@ -2914,7 +2916,7 @@ function det_popov{T <: PolyElem}(A::GenMat{T})
       k = findfirst(non_zero_rows, false)
       if k != i+1
          swap_rows!(B, k, i+1)
-         mul!(V[k,1], V[k,1], R(-1))
+         mul!(V[k,1], V[k,1], minusOne)
          pivots[last_pivot][1] = k
       end
       mul!(det, det, V[k,1])
