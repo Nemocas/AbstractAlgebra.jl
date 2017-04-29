@@ -1915,7 +1915,7 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{
          else
             addmul!(qc, b[v.p].coeffs[n[v.p] + 1 - v.i], Qc[v.p][v.j], c)
          end
-         if v.i != 0 || v.j < m[v.p]
+         if v.i != 0 || v.j < m
             push!(Q, x.n)
          else
             push!(reuse, x.n)
@@ -1927,7 +1927,7 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{
             else
                addmul!(qc, b[v.p].coeffs[n[v.p] + 1 - v.i], Qc[v.p][v.j], c)
             end
-            if v.i != 0 || v.j < m[v.p]
+            if v.i != 0 || v.j < m
                push!(Q, xn)
             else
                push!(reuse, xn)
@@ -1988,7 +1988,7 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{
                         end
                      else
                         push!(I, nheap_t(i, k[w], w, 0))
-                        Collections.heappush!vw = Viewn[viewc]
+                        vw = Viewn[viewc]
                         monomial_sub!(Exps, vw, maxn, 1, b[w].exps, n[w] + 1 - i, N)
                         monomial_sub!(Exps, vw, Exps, vw, Qe[w], k[w], N)
                         if nheapinsert!(H, I, length(I), vw, Exps, N, w)
