@@ -3371,41 +3371,54 @@ function det_popov{T <: PolyElem}(A::GenMat{T})
    n = cols(B)
    R = base_ring(B)
    det = one(R)
-   V = zero(MatrixSpace(R, n, 1))
    U = zero(MatrixSpace(R, 0, 0))
-   pivots = init_pivots_popov(B, n, n-1)
-   minusOne = R(-1)
-   for i = n-1:-1:1
-      for j = 1:i+1
-         V[j,1] = deepcopy(B[j,i+1])
-      end
-      weak_popov_with_pivots!(B, V, U, pivots, true, false, i+1, i)
-      non_zero_rows = BitArray(i+1)
-      fill!(non_zero_rows, false)
-      last_pivot = 0
-      for j = 1:i
-         if length(pivots[j]) == 0
-            continue
-         end
-         non_zero_rows[pivots[j][1]] = true
-         if pivots[j][1] == i+1
-            last_pivot = j
-         end
-      end
-      k = findfirst(non_zero_rows, false)
-      if k != i+1
-         swap_rows!(B, k, i+1)
-         mul!(V[k,1], V[k,1], minusOne)
-         pivots[last_pivot][1] = k
-      end
-      mul!(det, det, V[k,1])
-      if i > 1
-         p = find_pivot_popov(B, pivots[i][1], i-1)
-         B[pivots[i][1], p] != 0 ? push!(pivots[p], pivots[i][1]) : nothing
-         deleteat!(pivots[i], 1)
+   V = U
+   t = R()
+   pivots1 = init_pivots_popov(B)
+   weak_popov_with_pivots!(B, V, U, pivots1, false, false)
+   pivots = zeros(Int, n)
+   diag_elems = zeros(Int, n)
+   for i = 1:n
+      try pivots[i] = pivots1[i][1]
+      catch return R(0)
       end
    end
-   mul!(det, det, B[1,1])
+   for i = n-1:-1:1
+      r1 = pivots[i+1]
+      c = find_pivot_popov(B, r1, i)
+      while !iszero(B[r1,c])
+         r2 = pivots[c]
+         if degree(B[r2,c]) > degree(B[r1,c])
+            r1, r2 = r2, r1
+            pivots[c] = r2
+         end
+         q = -div(B[r1,c],B[r2,c])
+         for j = 1:i+1
+            mul!(t, q, B[r2,j])
+            addeq!(B[r1,j], t)
+         end
+         c = find_pivot_popov(B, r1, i)
+      end
+      if iszero(B[r1, i+1])
+         return R(0)
+      end
+      diag_elems[i+1] = r1
+      mul!(det, det, B[r1,i+1])
+   end
+   mul!(det, det, B[pivots[1],1])
+   diag_elems[1] = pivots[1]
+   number_of_swaps = 0
+   for i = 1:n
+      while diag_elems[i] != i
+         r = diag_elems[i]
+         diag_elems[i] = diag_elems[r]
+         diag_elems[r] = r
+         number_of_swaps += 1
+      end
+   end
+   if number_of_swaps%2 == 1
+      mul!(det, det, R(-1))
+   end
    return det
 end
 
