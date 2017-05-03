@@ -9,7 +9,7 @@ export MatricSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
        ishessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
        powers, similarity!, weak_popov, weak_popov_with_trafo,
        extended_weak_popov, extended_weak_popov_with_trafo,
-       rank_profile_popov
+       rank_profile_popov, hnf_popov, hnf_popov_with_trafo
 
 ###############################################################################
 #
@@ -3034,6 +3034,193 @@ function popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, with_trafo::Bool = fa
             end
          end
       end
+   end
+   return nothing
+end
+
+function hnf_popov{T <: PolyElem}(A::GenMat{T})
+   return _hnf_popov(A, Val{false})
+end
+
+function hnf_popov_with_trafo{T <: PolyElem}(A::GenMat{T})
+   return _hnf_popov(A, Val{true})
+end
+
+function _hnf_popov{T <: PolyElem, S}(A::GenMat{T}, trafo::Type{Val{S}} = Val{false})
+   H = deepcopy(A)
+   m = rows(H)
+   if trafo == Val{true}
+      U = one(MatrixSpace(base_ring(H), m, m))
+      hnf_popov!(H, U, true)
+      return H, U
+   else
+      U = zero(MatrixSpace(base_ring(H), 0, 0))
+      hnf_popov!(H, U, false)
+      return H
+   end
+end
+
+function hnf_popov_reduce_row!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, pivots_hermite::Array{Int}, r::Int, with_trafo::Bool)
+   n = cols(H)
+   t = base_ring(H)()
+   for c = 1:n
+      if pivots_hermite[c] == 0
+         continue
+      end
+      pivot = pivots_hermite[c]
+      q = -div(H[r,c],H[pivot,c])
+      for j = c:n
+         mul!(t, q, H[pivot,j])
+         addeq!(H[r,j], t)
+      end
+      if with_trafo
+         for j = 1:cols(U)
+            mul!(t, q, U[pivot,j])
+            addeq!(U[r,j], t)
+         end
+      end
+   end
+   return nothing
+end
+
+function hnf_popov_reduce_column!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, pivots_hermite::Array{Int}, c::Int, with_trafo::Bool)
+   m = rows(H)
+   n = cols(H)
+   t = base_ring(H)()
+   r = pivots_hermite[c]
+   for i = 1:m
+      if i == r
+         continue
+      end
+      if degree(H[i,c]) < degree(H[r,c])
+         continue
+      end
+      q = -div(H[i,c],H[r,c])
+      for j = 1:n
+         mul!(t, q, H[r,j])
+         addeq!(H[i,j], t)
+      end
+      if with_trafo
+         for j = 1:cols(U)
+            mul!(t, q, U[r,j])
+            addeq!(U[i,j], t)
+         end
+      end
+   end
+   return nothing
+end
+
+# From branch 'hnf'
+function kb_canonical_row!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, r::Int, c::Int, with_trafo::Bool)
+   cu = canonical_unit(H[r,c])
+   if cu != 1
+      for j = c:cols(H)
+         H[r,j] = divexact(H[r,j],cu)
+      end
+      if with_trafo
+         for j = 1:cols(U)
+            U[r,j] = divexact(U[r,j],cu)
+         end
+      end
+   end
+   return nothing
+end
+
+#From branch 'hnf'
+function kb_sort_rows!{T <:RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int}, with_trafo::Bool, start_element::Int = 1)
+   m = rows(H)
+   n = cols(H)
+   pivot2 = zeros(Int, m)
+   for i = 1:n
+      if pivot[i] == 0
+         continue
+      end
+      pivot2[pivot[i]] = i
+   end
+
+   r1 = start_element
+   for i = start_element:n
+      r2 = pivot[i]
+      if r2 == 0
+         continue
+      end
+      if r1 != r2
+         swap_rows!(H, r1, r2)
+         with_trafo ? swap_rows!(U, r1, r2) : nothing
+         p = pivot2[r1]
+         pivot[i] = r1
+         if p != 0
+            pivot[p] = r2
+         end
+         pivot2[r1] = i
+         pivot2[r2] = p
+      end
+      r1 += 1
+      if r1 == m
+         break
+      end
+   end
+   return nothing
+end
+
+function hnf_popov!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, with_trafo::Bool = false)
+   m = rows(H)
+   n = cols(H)
+   R = base_ring(H)
+   W = zero(MatrixSpace(R, 0, 0))
+   t = R()
+   pivots = init_pivots_popov(H)
+   weak_popov_with_pivots!(H, W, U, pivots, false, with_trafo)
+   pivots_popov = zeros(Int, n)
+   for j = 1:n
+      try pivots_popov[j] = pivots[j][1] end
+   end
+   pivots_hermite = zeros(Int, n)
+   for i = n-1:-1:1
+      r1 = pivots_popov[i+1]
+      if r1 == 0
+         continue
+      end
+      c = find_pivot_popov(H, r1, i)
+      new_pivot = true
+      while !iszero(H[r1,c])
+         r2 = pivots_popov[c]
+         if r2 == 0
+            pivots_popov[c] = r1
+            new_pivot = false
+            break
+         end
+         if degree(H[r2,c]) > degree(H[r1,c])
+            r1, r2 = r2, r1
+            pivots_popov[c] = r2
+         end
+         q = -div(H[r1,c],H[r2,c])
+         for j = 1:n
+            mul!(t, q, H[r2,j])
+            addeq!(H[r1,j], t)
+         end
+         if with_trafo
+            for j = 1:cols(U)
+               mul!(t, q, U[r2,j])
+               addeq!(U[r1,j], t)
+            end
+         end
+         hnf_popov_reduce_row!(H, U, pivots_hermite, r1, with_trafo)
+         c = find_pivot_popov(H, r1, i)
+      end
+      new_pivot ? nothing : continue
+      pivots_hermite[i+1] = r1
+      hnf_popov_reduce_column!(H, U, pivots_hermite, i+1, with_trafo)
+      l = pivots_popov[i]
+      hnf_popov_reduce_row!(H, U, pivots_hermite, l, with_trafo)
+   end
+   pivots_hermite[1] = pivots_popov[1]
+   kb_sort_rows!(H, U, pivots_hermite, with_trafo)
+   for c = 1:n
+      if pivots_hermite[c] == 0
+         continue
+      end
+      kb_canonical_row!(H, U, pivots_hermite[c], c, with_trafo)
    end
    return nothing
 end
