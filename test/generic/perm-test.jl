@@ -3,7 +3,7 @@ function test_perm_abstract_types()
 
    @test perm <: GroupElem
 
-   @test FlintPermGroup <: Nemo.Group
+   @test PermGroup <: Nemo.Group
 
    println("PASS")
 end
