@@ -33,17 +33,16 @@ end
 
 #install libpthreads
 
-print("Downloading libpthread ... ")
 
 if is_windows()
+   println("Downloading libpthread ... ")
    if Int == Int32
       download_dll("http://nemocas.org/binaries/w32-libwinpthread-1.dll", joinpath(vdir, "lib", "libwinpthread-1.dll"))
    else
       download_dll("http://nemocas.org/binaries/w64-libwinpthread-1.dll", joinpath(vdir, "lib", "libwinpthread-1.dll"))
    end
+   println("DONE")
 end
-
-println("DONE")
 
 cd(wdir)
 
@@ -53,7 +52,7 @@ if !is_windows()
    try
       run(`m4 --version`)
    catch
-      print("Building m4 ... ")
+      println("Building m4 ... ")
       download("http://ftp.gnu.org/gnu/m4/m4-1.4.17.tar.bz2", joinpath(wdir, "m4-1.4.17.tar.bz2"))
       run(`tar -xvf m4-1.4.17.tar.bz2`)
       run(`rm m4-1.4.17.tar.bz2`)
@@ -61,7 +60,7 @@ if !is_windows()
       run(`./configure --prefix=$vdir`)
       run(`make`)
       run(`make install`)
-      print("DONE")
+      println("DONE")
    end
 end
 
@@ -70,8 +69,8 @@ cd(wdir)
 # install yasm
 
 if !is_windows()
-   if !ispath(Pkg.dir("Nemo", "local", "yasm-1.3.0"))
-      print("Building yasm ... ")
+   if !ispath(joinpath(wdir, "yasm-1.3.0"))
+      println("Building yasm ... ")
       download("http://www.tortall.net/projects/yasm/releases/yasm-1.3.0.tar.gz", "yasm-1.3.0.tar.gz")
       run(`tar -xvf yasm-1.3.0.tar.gz`)
       run(`rm yasm-1.3.0.tar.gz`)
@@ -86,14 +85,14 @@ cd(wdir)
 
 # install GMP/MPIR
 
-if !ispath(Pkg.dir("Nemo", "local", "mpir-3.0.0"))
-   print("Downloading MPIR sources ... ")
+if !ispath(joinpath(wdir, "mpir-3.0.0"))
+   println("Downloading MPIR sources ... ")
    download("http://mpir.org/mpir-3.0.0.tar.bz2", joinpath(wdir, "mpir-3.0.0.tar.bz2"))
    println("DONE")
 end
 
 if is_windows()
-   print("Downloading MPIR ... ")
+   println("Downloading MPIR ... ")
    if Int == Int32
       download_dll("http://nemocas.org/binaries/w32-libgmp-16.dll", joinpath(vdir, "lib", "libgmp-16.dll"))
    else
@@ -101,9 +100,11 @@ if is_windows()
    end
    println("DONE")
 else
-   print("Building MPIR ... ")
-   run(`tar -xvf mpir-3.0.0.tar.bz2`)
-   run(`rm mpir-3.0.0.tar.bz2`)
+   println("Building MPIR ... ")
+   if isfile(joinpath(wdir, "mpir-3.0.0.tar.bz2"))
+      run(`tar -xvf mpir-3.0.0.tar.bz2`)
+      run(`rm mpir-3.0.0.tar.bz2`)
+   end
    cd("$wdir/mpir-3.0.0")
    try
       run(`m4 --version`)
@@ -122,14 +123,14 @@ cd(wdir)
 
 # install MPFR
 
-if !ispath(Pkg.dir("Nemo", "local", "mpfr-3.1.5"))
-   print("Downloading MPFR sources ... ")
+if !ispath(joinpath(wdir, "mpfr-3.1.5"))
+   println("Downloading MPFR sources ... ")
    download("http://www.mpfr.org/mpfr-current/mpfr-3.1.5.tar.bz2", joinpath(wdir, "mpfr-3.1.5.tar.bz2"))
    println("DONE")
 end
 
 if is_windows()
-   print("Downloading MPFR ... ")
+   println("Downloading MPFR ... ")
    if Int == Int32
       download_dll("http://nemocas.org/binaries/w32-libmpfr-4.dll", joinpath(vdir, "lib", "libmpfr-4.dll"))
    else
@@ -137,9 +138,11 @@ if is_windows()
    end
    println("DONE")
 else
-   print("Building MPFR ... ")
-   run(`tar -xvf mpfr-3.1.5.tar.bz2`)
-   run(`rm mpfr-3.1.5.tar.bz2`)
+   println("Building MPFR ... ")
+   if isfile(joinpath(wdir, "mpfr-3.1.5.tar.bz2"))
+      run(`tar -xvf mpfr-3.1.5.tar.bz2`)
+      run(`rm mpfr-3.1.5.tar.bz2`)
+   end
    cd("$wdir/mpfr-3.1.5")
    withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
       run(`./configure --prefix=$vdir --with-gmp=$vdir --disable-static --enable-shared`) 
@@ -155,7 +158,7 @@ cd(wdir)
 # install ANTIC
 
 if !is_windows()
-  print("Cloning antic ... ")
+  println("Cloning antic ... ")
   try
     run(`git clone https://github.com/wbhart/antic.git`)
     cd(joinpath("$wdir", "antic"))
@@ -164,7 +167,7 @@ if !is_windows()
   catch
     if ispath(joinpath("$wdir", "antic"))
       cd(joinpath("$wdir", "antic"))
-      run(`git pull`)
+      run(`git fetch origin`)
       run(`git checkout 119d15d686436d94f39fd3badf5eea4acf94ab72`)
       cd(wdir)
     end
@@ -177,24 +180,24 @@ cd(wdir)
 # install FLINT
 if !is_windows()
   try
-    print("Cloning flint2 ... ")
+    println("Cloning flint2 ... ")
     run(`git clone https://github.com/wbhart/flint2.git`)
     cd(joinpath("$wdir", "flint2"))
     run(`git checkout 768d1aaa54516ddb351a06683e532ead54d47470`)
     cd(wdir)
   catch
     if ispath(joinpath("$wdir", "flint2"))
-      cd(joinpath("$wdir", "flint2"))
-      run(`git pull`)
-      run(`git checkout 768d1aaa54516ddb351a06683e532ead54d47470`)
-      cd(wdir)
+       cd(joinpath("$wdir", "flint2"))
+       run(`git fetch`)
+       run(`git checkout 768d1aaa54516ddb351a06683e532ead54d47470`)
+       cd(wdir)
     end
   end          
   println("DONE")
 end
 
 if is_windows()
-   print("Downloading flint ... ")
+   println("Downloading flint ... ")
    if Int == Int32
       download_dll("http://nemocas.org/binaries/w32-libflint.dll", joinpath(vdir, "lib", "libflint.dll"))
    else
@@ -207,7 +210,7 @@ if is_windows()
    end
    println("DONE")
 else
-   print("Building flint ... ")
+   println("Building flint ... ")
    cd(joinpath("$wdir", "flint2"))
    withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
       run(`./configure --prefix=$vdir --extensions="$wdir/antic" --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir`) 
@@ -222,7 +225,7 @@ cd(wdir)
 # INSTALL ARB 
 
 if !is_windows()
-  print("Cloning arb ... ")
+  println("Cloning arb ... ")
   try
     run(`git clone https://github.com/fredrik-johansson/arb.git`)
     cd(joinpath("$wdir", "arb"))
@@ -231,7 +234,7 @@ if !is_windows()
   catch
     if ispath(joinpath("$wdir", "arb"))
       cd(joinpath("$wdir", "arb"))
-      run(`git pull`)
+      run(`git fetch`)
       run(`git checkout 99c1696b48de74959ccb6bd88187e8b15262ff4d`)
       cd(wdir)
     end
@@ -240,7 +243,7 @@ if !is_windows()
 end
  
 if is_windows()
-   print("Downloading arb ... ")
+   println("Downloading arb ... ")
    if Int == Int32
       download_dll("http://nemocas.org/binaries/w32-libarb.dll", joinpath(vdir, "lib", "libarb.dll"))
    else
@@ -248,7 +251,7 @@ if is_windows()
    end
    println("DONE")
 else
-   print("Building arb ... ")
+   println("Building arb ... ")
    cd(joinpath("$wdir", "arb"))
    withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
       run(`./configure --prefix=$vdir --disable-static --enable-shared --with-mpir=$vdir --with-mpfr=$vdir --with-flint=$vdir`)
