@@ -936,13 +936,13 @@ function lufact!{T <: FieldElem}(P::perm, A::MatElem{T})
 end
 
 doc"""
-    lufact{T <: FieldElem}(A::MatElem{T}, P = FlintPermGroup(rows(A)))
+    lufact{T <: FieldElem}(A::MatElem{T}, P = PermGroup(rows(A)))
 > Return a tuple $r, p, L, U$ consisting of the rank of $A$, a permutation
 > $p$ of $A$ belonging to $P$, a lower triangular matrix $L$ and an upper
 > triangular matrix $U$ such that $p(A) = LU$, where $p(A)$ stands for the
 > matrix whose rows are the given permutation $p$ of the rows of $A$.
 """
-function lufact{T <: FieldElem}(A::MatElem{T}, P = FlintPermGroup(rows(A)))
+function lufact{T <: FieldElem}(A::MatElem{T}, P = PermGroup(rows(A)))
    m = rows(A)
    n = cols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -1080,7 +1080,7 @@ function fflu!{T <: FieldElem}(P::perm, A::MatElem{T})
 end
 
 doc"""
-    fflu{T <: RingElem}(A::MatElem{T}, P = FlintPermGroup(rows(A)))
+    fflu{T <: RingElem}(A::MatElem{T}, P = PermGroup(rows(A)))
 > Return a tuple $r, d, p, L, U$ consisting of the rank of $A$, a
 > denominator $d$, a permutation $p$ of $A$ belonging to $P$, a lower
 > triangular matrix $L$ and an upper triangular matrix $U$ such that
@@ -1091,7 +1091,7 @@ doc"""
 > $\pm \mbox{det}(S)$ where $S$ is an appropriate submatrix of $A$ ($S = A$ if
 > $A$ is square) and the sign is decided by the parity of the permutation.
 """
-function fflu{T <: RingElem}(A::MatElem{T}, P = FlintPermGroup(rows(A)))
+function fflu{T <: RingElem}(A::MatElem{T}, P = PermGroup(rows(A)))
    m = rows(A)
    n = cols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -1132,7 +1132,7 @@ function rref!{T <: RingElem}(A::MatElem{T})
    m = rows(A)
    n = cols(A)
    R = base_ring(A)
-   P = FlintPermGroup(m)()
+   P = PermGroup(m)()
    rank, d = fflu!(P, A)
    for i = rank + 1:m
       for j = 1:n
@@ -1201,7 +1201,7 @@ function rref!{T <: FieldElem}(A::MatElem{T})
    m = rows(A)
    n = cols(A)
    R = base_ring(A)
-   P = FlintPermGroup(m)()
+   P = PermGroup(m)()
    rnk = lufact!(P, A)
    if rnk == 0
       return 0
@@ -1492,7 +1492,7 @@ function det_fflu{T <: RingElem}(M::MatElem{T})
       return base_ring(M)()
    end
    A = deepcopy(M)
-   P = FlintPermGroup(n)()
+   P = PermGroup(n)()
    r, d = fflu!(P, A)
    return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
 end
@@ -1580,7 +1580,7 @@ function rank{T <: RingElem}(M::MatElem{T})
       return 0
    end
    A = deepcopy(M)
-   P = FlintPermGroup(n)()
+   P = PermGroup(n)()
    r, d = fflu!(P, A)
    return r
 end
@@ -1595,7 +1595,7 @@ function rank{T <: FieldElem}(M::MatElem{T})
       return 0
    end
    A = deepcopy(M)
-   P = FlintPermGroup(n)()
+   P = PermGroup(n)()
    return lufact!(P, A)   
 end
 
