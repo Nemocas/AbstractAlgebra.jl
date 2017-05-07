@@ -195,6 +195,43 @@ function inv!(a::perm)
    a.d = d
 end
 
+doc"""
+>Returns `Task` that produces all permutations on `1:n` using Heaps algorithm.
+
+"""
+function all_permutations(n::Int)
+    c = ones(Int,n)
+    elts = collect(1:n)
+    i = 1
+
+    function _it()
+        produce(copy(elts))
+        while i ≤ n
+            if c[i] < i
+                if isodd(i)
+                    elts[1], elts[i] = elts[i], elts[1]
+                else
+                    elts[c[i]], elts[i] = elts[i], elts[c[i]]
+                end
+                produce(copy(elts))
+                c[i] += 1
+                i = 1
+            else
+                c[i] = 1
+                i += 1
+            end
+        end
+    end
+    return Task(_it)
+end
+
+doc"""
+    elements(G::PermGroup)
+> Returns an iterator over all elements in the group $G$. You may use
+> `collect(elements(G))` to get an array with all elements.
+
+"""
+elements(G::PermGroup) = (G(p) for p in all_permutations(G.n))
 ###############################################################################
 #
 #   Parent object call overloads
