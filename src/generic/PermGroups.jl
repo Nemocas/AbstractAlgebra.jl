@@ -217,6 +217,12 @@ function inv!(a::perm)
    a.d = d
 end
 
+###############################################################################
+#
+#   Misc
+#
+###############################################################################
+
 doc"""
 >Returns `Task` that produces all permutations on `1:n` using Heaps algorithm.
 
@@ -254,6 +260,13 @@ doc"""
 
 """
 elements(G::PermGroup) = (G(p) for p in all_permutations(G.n))
+
+doc"""
+    order(G::PermGroup)
+> Returns the order of the full permutation group.
+
+"""
+order(G::PermGroup) = factorial(G.n)
 
 doc"""
     cycles(p::perm)
