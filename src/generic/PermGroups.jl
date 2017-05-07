@@ -123,8 +123,30 @@ function show(io::IO, R::PermGroup)
    print(io, "Permutation group over $(R.n) elements")
 end
 
-function show(io::IO, x::perm)
-   print(io, "[" * join(x.d, ", ") * "]")
+type DisplayStyle
+   format::Symbol
+end
+
+const perm_display_style = DisplayStyle(:array)
+
+function setpermstyle(format::Symbol)
+   format in (:array, :cycles) || throw("Permutations can be displayed
+   only in styles :array or :cycles")
+   perm_display_style.format = format
+   return  format
+end
+
+function show(io::IO, p::perm)
+   if perm_display_style.format == :array
+      print(io, "[" * join(p.d, ", ") * "]")
+   elseif perm_display_style.format == :cycles
+      if p == parent(p)()
+         print(io, "()")
+      else
+         print(io, join(["("*join(c, ",")*")" for c in cycles(p) if
+            length(c)>1],""))
+      end
+   end
 end
 
 ###############################################################################
