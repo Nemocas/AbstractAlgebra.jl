@@ -35,7 +35,7 @@ type perm <: GroupElem
    end
 end
 
-export PermGroup, perm, parity
+export PermGroup, perm, parity, elements, cycles
 
 ###############################################################################
 #
