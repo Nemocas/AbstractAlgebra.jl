@@ -232,6 +232,31 @@ doc"""
 
 """
 elements(G::PermGroup) = (G(p) for p in all_permutations(G.n))
+
+doc"""
+    cycles(p::perm)
+> Decomposes permutation into disjoint cycles.
+
+"""
+function cycles(p::Nemo.perm)
+    to_visit = trues(p.d)
+    cycles = Vector{Vector{Int}}()
+    while any(to_visit)
+        cycle = Vector{Int}()
+        k = findfirst(to_visit)
+        to_visit[k] = false
+        push!(cycle, k)
+        next = p[k]
+        while next ≠ k
+            push!(cycle, next)
+            to_visit[next] = false
+            next = p[next]
+        end
+        push!(cycles, cycle)
+    end
+    return cycles
+end
+
 ###############################################################################
 #
 #   Parent object call overloads
