@@ -683,6 +683,14 @@ solve{T <: RingElem}(::MatElem{T}, ::MatElem{T})
 ```
 
 ```@docs
+cansolve(::fmpz_mat, ::fmpz_mat)
+```
+
+```@docs
+solve_rational{T <: RingElem}(::MatElem{T}, ::MatElem{T})
+```
+
+```@docs
 solve_triu{T <: FieldElem}(::MatElem{T}, ::MatElem{T}, ::Bool)
 ```
 
@@ -716,7 +724,7 @@ U = MatrixSpace(R, 3, 2)
 A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
 b = U([2x x + 1 (-x - 1); x + 1 (-x) x^2]')
 
-x, d = solve(A, b)
+x, d = solve_rational(A, b)
 
 S = MatrixSpace(ZZ, 3, 3)
 T = MatrixSpace(ZZ, 3, 1)
@@ -724,7 +732,7 @@ T = MatrixSpace(ZZ, 3, 1)
 A = S([fmpz(2) 3 5; 1 4 7; 9 2 2])   
 B = T([fmpz(4), 5, 7])
 
-X, d = solve(A, B)
+X, d = solve_rational(A, B)
 X, m = solve_dixon(A, B)
 ```
 
