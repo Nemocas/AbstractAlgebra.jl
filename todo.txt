@@ -143,9 +143,6 @@ nf.jl
   over Q, and yet allow all the coercions from that ring into number fields
   maximal orders, ideals, etc., without making it inefficient
 
-* AnticNumberField returns only field and is cached. All(?) other constructors 
-  return field and generator.
-
 nmod_mat
 --------
 
