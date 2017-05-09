@@ -58,7 +58,6 @@ elem_type(::PermGroup) = perm
 doc"""
     parent(a::perm)
 > Return the parent of the given permutation group element.
-
 """
 parent(a::perm) = a.parent
 
@@ -81,7 +80,6 @@ doc"""
 > Return the parity of the given permutation, i.e. the parity of the number of
 > transpositions that compose it. The function returns $1$ if the parity is odd
 > otherwise it returns $0$.
-
 """
 # TODO: 2x slower than Flint
 function parity(a::perm)
@@ -112,7 +110,6 @@ end
 doc"""
     eye(G::PermGroup)
 > Return the identity permutation for the given permutation group.
-
 """
 eye(G::PermGroup) = G()
 
@@ -170,7 +167,6 @@ end
 doc"""
     ==(a::perm, b::perm)
 > Return `true` if the given permutations are equal, otherwise return `false`.
-
 """
 function ==(a::perm, b::perm)
    parent(a) == parent(b) || return false
@@ -188,7 +184,6 @@ doc"""
 > Return the composition of the two permutations, i.e. $a\circ b$. In other
 > words, the permutation corresponding to applying $b$ first, then $a$, is
 > returned.
-
 """
 function *(a::perm, b::perm)
    d = similar(a.d)
@@ -209,7 +204,6 @@ doc"""
     inv(a::perm)
 > Return the inverse of the given permutation, i.e. the permuation $a^{-1}$
 > such that $a\circ a^{-1} = a^{-1}\circ a$ is the identity permutation.
-
 """
 function inv(a::perm)
    d = similar(a.d)
@@ -239,7 +233,6 @@ doc"""
    AllPerms(n::Int)
 > Returns an iterator over arrays representing all permutations of `1:n`.
 > Similar to `Combinatorics.permutations(1:n)`
-
 """
 immutable AllPerms
    n::Int
@@ -278,8 +271,7 @@ end
 doc"""
     elements(G::PermGroup)
 > Returns an iterator over all elements in the group $G$. You may use
-> `collect(elements(G))` to get an array with all elements.
-
+> `collect(elements(G))` to get an array of all elements.
 """
 elements(G::PermGroup) = (G(p) for p in AllPerms(G.n))
 
@@ -292,14 +284,12 @@ elements(G::PermGroup) = (G(p) for p in AllPerms(G.n))
 doc"""
     order(G::PermGroup)
 > Returns the order of the full permutation group.
-
 """
 order(G::PermGroup) = factorial(G.n)
 
 doc"""
     cycles(a::perm)
 > Decomposes permutation into disjoint cycles.
-
 """
 function cycles(a::perm)
    to_visit = trues(a.d)
@@ -325,7 +315,6 @@ doc"""
     matrix_repr(a::perm)
 > Return the permutation matrix representing `a` via natural embedding of the
 > permutation group into general linear group over ZZ
-
 """
 function matrix_repr(a::perm)
    A = eye(Int, parent(a).n)
