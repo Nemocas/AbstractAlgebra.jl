@@ -85,9 +85,10 @@ doc"""
 function parity(a::perm)
    to_visit = trues(a.d)
    parity = length(to_visit)
+   k = 1
    while any(to_visit)
       parity -= 1
-      k = findfirst(to_visit)
+      k = findnext(to_visit, k)
       to_visit[k] = false
       next = a[k]
       while next != k
@@ -271,6 +272,12 @@ doc"""
 """
 elements(G::PermGroup) = (G(p) for p in AllPerms(G.n))
 
+###############################################################################
+#
+#   Misc
+#
+###############################################################################
+
 doc"""
     order(G::PermGroup)
 > Returns the order of the full permutation group.
@@ -279,27 +286,29 @@ doc"""
 order(G::PermGroup) = factorial(G.n)
 
 doc"""
-    cycles(p::perm)
+    cycles(a::perm)
 > Decomposes permutation into disjoint cycles.
 
 """
-function cycles(p::Nemo.perm)
-    to_visit = trues(p.d)
-    cycles = Vector{Vector{Int}}()
-    while any(to_visit)
-        cycle = Vector{Int}()
-        k = findfirst(to_visit)
-        to_visit[k] = false
-        push!(cycle, k)
-        next = p[k]
-        while next ≠ k
-            push!(cycle, next)
-            to_visit[next] = false
-            next = p[next]
-        end
-        push!(cycles, cycle)
-    end
-    return cycles
+function cycles(a::perm)
+   to_visit = trues(a.d)
+   cycles = Vector{Vector{Int}}()
+   k = 1
+   while any(to_visit)
+      cycle = Vector{Int}()
+      k = findnext(to_visit, k)
+      to_visit[k] = false
+      push!(cycle, k)
+      next = a[k]
+      while next != k
+         push!(cycle, next)
+         to_visit[next] = false
+         next = a[next]
+      end
+      push!(cycles, cycle)
+   end
+   return cycles
+end
 end
 
 ###############################################################################
