@@ -333,12 +333,14 @@ function (R::PermGroup)()
    return z
 end
 
-function (R::PermGroup)(a::Array{Int, 1})
-   length(a) != R.n && error("Unable to coerce to permutation")
-   Base.Set(a) != Base.Set(1:length(a)) && error("Unable to coerce to permutation")
-
+function (G::PermGroup)(a::Array{Int, 1}; checked=true)
+   length(a) != G.n && error("Unable to coerce to permutation")
+   if checked
+      Base.Set(a) != Base.Set(1:length(a)) && error("Unable to coerce to
+         permutation")
+   end
    z = perm(a)
-   z.parent = R
+   z.parent = G
    return z
 end
 
