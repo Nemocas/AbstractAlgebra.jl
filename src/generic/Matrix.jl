@@ -7,7 +7,7 @@
 export MatricSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
        ishessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
-       powers, similarity!
+       powers, similarity!, solve, solve_rational
 
 ###############################################################################
 #
@@ -1882,14 +1882,25 @@ function solve_interpolation{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
 end
 
 doc"""
-    solve{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
+    solve{T <: FieldElem}(M::MatElem{T}, b::MatElem{T})
+> Given a non-singular $n\times n$ matrix over a field and an $n\times m$
+> matrix over the same field, return $x$ an
+> $n\times m$ matrix $x$ such that $Ax = b$. 
+> If $A$ is singular an exception is raised.
+"""
+function solve{T <: FieldElem}(M::MatElem{T}, b::MatElem{T})
+    return solve_ringelem(M, b)
+end
+
+doc"""
+    solve_rational{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
 > Given a non-singular $n\times n$ matrix over a ring and an $n\times m$
 > matrix over the same ring, return a tuple $x, d$ consisting of an
 > $n\times m$ matrix $x$ and a denominator $d$ such that $Ax = db$. The
 > denominator will be the determinant of $A$ up to sign. If $A$ is singular an
 > exception is raised.
 """
-function solve{T}(M::MatElem{T}, b::MatElem{T})
+function solve_rational{T}(M::MatElem{T}, b::MatElem{T})
    return solve_ringelem(M, b)
 end
 
@@ -1900,7 +1911,7 @@ function solve_ringelem{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
    return solve_ff(M, b)
 end
 
-function solve{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
+function solve_rational{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
    rows(M) != cols(M) && error("Non-square matrix in solve")
    rows(M) != rows(b) && error("Dimensions don't match in solve")

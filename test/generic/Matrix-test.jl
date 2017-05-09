@@ -599,8 +599,8 @@ function test_gen_mat_rank()
    println("PASS")   
 end
 
-function test_gen_mat_solve()
-   print("GenMat.solve...")
+function test_gen_mat_solve_rational()
+   print("GenMat.solve_rational...")
 
    S, x = PolynomialRing(ResidueRing(ZZ, 20011*10007), "x")
 
@@ -611,7 +611,7 @@ function test_gen_mat_solve()
       M = randmat_with_rank(R, 5, 100, dim);
       b = randmat(U, 5, 100);
 
-      x, d = solve(M, b)
+      x, d = solve_rational(M, b)
 
       @test M*x == d*b
    end
@@ -625,7 +625,7 @@ function test_gen_mat_solve()
       M = randmat_with_rank(R, 3, 20, dim);
       b = randmat(U, 3, 20);
 
-      x, d = solve(M, b)
+      x, d = solve_rational(M, b)
 
       @test M*x == d*b
    end
@@ -655,7 +655,7 @@ function test_gen_mat_solve()
       M = randmat_with_rank(T, 20, dim)
       b = randmat(U, 20)
  
-      x, d = solve(M, b)
+      x, d = solve_rational(M, b)
 
       @test M*x == d*b
    end
@@ -669,7 +669,7 @@ function test_gen_mat_solve()
    M = T([3y*a^2 + (y + 1)*a + 2y (5y+1)*a^2 + 2a + y - 1 a^2 + (-a) + 2y; (y + 1)*a^2 + 2y - 4 3y*a^2 + (2y - 1)*a + y (4y - 1)*a^2 + (y - 1)*a + 5; 2a + y + 1 (2y + 2)*a^2 + 3y*a + 3y a^2 + (-y-1)*a + (-y - 3)])
    b = U(permutedims([4y*a^2 + 4y*a + 2y + 1 5y*a^2 + (2y + 1)*a + 6y + 1 (y + 1)*a^2 + 3y*a + 2y + 4], [2, 1]))
 
-   x, d = solve(M, b)
+   x, d = solve_rational(M, b)
 
    @test M*x == d*b
 
@@ -1117,7 +1117,7 @@ function test_gen_mat()
    test_gen_mat_fflu()
    test_gen_mat_det()
    test_gen_mat_rank()
-   test_gen_mat_solve()
+   test_gen_mat_solve_rational()
    test_gen_mat_solve_triu()
    test_gen_mat_rref()
    test_gen_mat_nullspace()
