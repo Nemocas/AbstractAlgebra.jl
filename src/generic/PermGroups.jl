@@ -4,6 +4,8 @@
 #
 ###############################################################################
 
+import Base.eye
+
 const PermID = ObjectIdDict()
 
 type PermGroup <: Group
