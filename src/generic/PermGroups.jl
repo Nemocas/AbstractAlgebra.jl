@@ -242,7 +242,7 @@ Base.done(A::AllPerms, state) = state[2] > A.all
 Base.eltype(::AllPerms) = Vector{Int}
 Base.length(A::AllPerms) = factorial(A.n)
 
-function all_permutations(elts, counter, i, c)
+function all_perms(elts, counter, i, c)
    if counter == 1
       return (copy(elts), (elts, counter+1, i, c))
    end
