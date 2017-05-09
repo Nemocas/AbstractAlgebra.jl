@@ -45,7 +45,7 @@ export PermGroup, perm, parity, elements, cycles
 
 parent_type(::Type{perm}) = PermGroup
 
-elem_type(R::PermGroup) = perm
+elem_type(::PermGroup) = perm
 
 ###############################################################################
 #
@@ -55,14 +55,14 @@ elem_type(R::PermGroup) = perm
 
 doc"""
     parent(a::perm)
->Return the parent of the given permutation group element.
+> Return the parent of the given permutation group element.
 
 """
 parent(a::perm) = a.parent
 
 function deepcopy_internal(a::perm, dict::ObjectIdDict)
-   R = parent(a)
-   return R(deepcopy(a.d))
+   G = parent(a)
+   return G(deepcopy(a.d))
 end
 
 function Base.hash(a::perm, h::UInt)
@@ -108,11 +108,11 @@ function setindex!(a::perm, d::Int, n::Int)
 end
 
 doc"""
-    eye(R::PermGroup)
+    eye(G::PermGroup)
 > Return the identity permutation for the given permutation group.
 
 """
-eye(R::PermGroup) = R()
+eye(G::PermGroup) = G()
 
 ###############################################################################
 #
@@ -120,8 +120,8 @@ eye(R::PermGroup) = R()
 #
 ###############################################################################
 
-function show(io::IO, R::PermGroup)
-   print(io, "Permutation group over $(R.n) elements")
+function show(io::IO, G::PermGroup)
+   print(io, "Permutation group over $(G.n) elements")
 end
 
 type DisplayStyle
@@ -134,17 +134,17 @@ function setpermstyle(format::Symbol)
    format in (:array, :cycles) || throw("Permutations can be displayed
    only in styles :array or :cycles")
    perm_display_style.format = format
-   return  format
+   return format
 end
 
-function show(io::IO, p::perm)
+function show(io::IO, a::perm)
    if perm_display_style.format == :array
-      print(io, "[" * join(p.d, ", ") * "]")
+      print(io, "[" * join(a.d, ", ") * "]")
    elseif perm_display_style.format == :cycles
-      if p == parent(p)()
+      if a == parent(a)()
          print(io, "()")
       else
-         print(io, join(["("*join(c, ",")*")" for c in cycles(p) if
+         print(io, join(["("*join(c, ",")*")" for c in cycles(a) if
             length(c)>1],""))
       end
    end
@@ -184,8 +184,8 @@ function *(a::perm, b::perm)
    for i in 1:length(d)
       d[i] = a[b[i]]
    end
-   R = parent(a)
-   return R(d)
+   G = parent(a)
+   return G(d)
 end
 
 ###############################################################################
@@ -205,8 +205,8 @@ function inv(a::perm)
    for i in 1:length(a.d)
       d[a[i]] = i
    end
-   R = parent(a)
-   return R(d)
+   G = parent(a)
+   return G(d)
 end
 
 # TODO: can we do that in place??
@@ -327,9 +327,9 @@ end
 #
 ###############################################################################
 
-function (R::PermGroup)()
-   z = perm(R.n)
-   z.parent = R
+function (G::PermGroup)()
+   z = perm(G.n)
+   z.parent = G
    return z
 end
 
@@ -344,8 +344,8 @@ function (G::PermGroup)(a::Array{Int, 1}; checked=true)
    return z
 end
 
-function (R::PermGroup)(a::perm)
-   parent(a) != R && error("Unable to coerce to permutation")
+function (G::PermGroup)(a::perm)
+   parent(a) != G && error("Unable to coerce to permutation")
    return a
 end
 
