@@ -138,10 +138,11 @@ function deepcopy_internal{T <: RingElem}(d::MatElem{T}, dict::ObjectIdDict)
    entries = Array{T}(rows(d), cols(d))
    for i = 1:rows(d)
       for j = 1:cols(d)
-         entries[i, j] = deepcopy(d[i, j])
+         entries[i, j] = deepcopy_internal(d[i, j], dict)
       end
    end
-   return parent(d)(entries)
+   M = parent(d)
+   return M(entries)
 end
 
 ###############################################################################
@@ -2732,7 +2733,12 @@ end
 #
 ###############################################################################
 
-function hnf_cohen(A::GenMat)
+function hnf_cohen{T <: RingElem}(A::GenMat{T})
+   H, U = hnf_cohen_with_trafo(A)
+   return H
+end
+
+function hnf_cohen_with_trafo{T <: RingElem}(A::GenMat{T})
    H = deepcopy(A)
    m = rows(H)
    U = one(MatrixSpace(base_ring(H), m, m))
@@ -2836,7 +2842,7 @@ function kb_search_first_pivot(H::GenMat, start_element::Int = 1)
    return 0, 0
 end
 
-function kb_reduce_row!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int}, c::Int, with_trafo::Bool)
+function kb_reduce_row!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool)
    r = pivot[c]
    t = base_ring(H)()
    for i = c+1:cols(H)
@@ -2859,7 +2865,7 @@ function kb_reduce_row!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{
    return nothing
 end
 
-function kb_reduce_column!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int}, c::Int, with_trafo::Bool, start_element::Int = 1)
+function kb_reduce_column!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool, start_element::Int = 1)
    r = pivot[c]
    t = base_ring(H)()
    for i = start_element:c-1
@@ -2897,16 +2903,7 @@ function kb_canonical_row!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, r::Int, c:
    return nothing
 end
 
-function swap_rows!(a::MatElem, i::Int, j::Int)
-   (1<=i<=rows(a) && 1<=j<=rows(a)) || throw(BoundsError())
-   for k=1:cols(a)
-      x = a[i,k]
-      a[i,k] = a[j,k]
-      a[j,k] = x
-   end
-end
-
-function kb_sort_rows!{T <:RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int}, with_trafo::Bool, start_element::Int = 1)
+function kb_sort_rows!{T <:RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int, 1}, with_trafo::Bool, start_element::Int = 1)
    m = rows(H)
    n = cols(H)
    pivot2 = zeros(Int, m)
@@ -3015,21 +3012,38 @@ function hnf_kb!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, with_trafo::Bool = f
    return nothing
 end
 
+doc"""
+    hnf{T <: RingElem}(A::GenMat{T}) -> GenMat{T}
+> Return the upper right row Hermite normal form of $A$.
+"""
+function hnf{T <: RingElem}(A::GenMat{T})
+  return hnf_kb(A)
+end
+
+doc"""
+    hnf{T <: RingElem}(A::GenMat{T}) -> GenMaT{T}, GenMat{T}
+> Return the upper right row Hermite normal form $H$ of $A$ together with
+> invertible matrix $U$ such that $UA = H$.
+"""
+function hnf_with_trafo{T <: RingElem}(A::GenMat{T})
+  return hnf_kb_with_trafo(A)
+end
+
 ###############################################################################
 #
 #   Smith Normal Form
 #
 ###############################################################################
 
-function snf_kb(A::GenMat)
+function snf_kb{T <: RingElem}(A::GenMat{T})
    return _snf_kb(A, Val{false})
 end
 
-function snf_kb_with_trafo(A::GenMat)
+function snf_kb_with_trafo{T <: RingElem}(A::GenMat{T})
    return _snf_kb(A, Val{true})
 end
 
-function _snf_kb{T}(A::GenMat, trafo::Type{Val{T}} = Val{false})
+function _snf_kb{V, T <: RingElem}(A::GenMat{T}, trafo::Type{Val{V}} = Val{false})
    S = deepcopy(A)
    m = rows(S)
    n = cols(S)
@@ -3135,6 +3149,14 @@ function snf_kb!{T <: RingElem}(S::GenMat{T}, U::GenMat{T}, K::GenMat{T}, with_t
       S[i,i] = d
    end
    return nothing
+end
+
+function snf{T <: RingElem}(a::GenMat{T})
+  return snf_kb(a)
+end
+
+function snf_with_trafo{T <: RingElem}(a::GenMat{T})
+  return snf_kb_with_trafo(a)
 end
 
 ###############################################################################

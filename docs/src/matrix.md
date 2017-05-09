@@ -622,6 +622,13 @@ r, A = rref(M)
 isrref(A)
 ```
 
+## Hermite normal form
+
+```@docs
+hnf{T <: RingElem}(::GenMat{T})
+hnf_with_trafo{T <: RingElem}(::GenMat{T})
+```
+
 ## Determinant
 
 ```@docs
