@@ -90,7 +90,7 @@ function parity(a::perm)
       k = findfirst(to_visit)
       to_visit[k] = false
       next = a[k]
-      while next ≠ k
+      while next != k
          to_visit[next] = false
          next = a[next]
       end
