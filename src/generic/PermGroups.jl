@@ -219,38 +219,48 @@ end
 
 ###############################################################################
 #
-#   Misc
+#   Iterating over all permutations
 #
 ###############################################################################
 
 doc"""
->Returns `Task` that produces all permutations on `1:n` using Heaps algorithm.
+   AllPerms(n::Int)
+> Returns an iterator over arrays representing all permutations of `1:n`.
+> Similar to `Combinatorics.permutations(1:n)`
 
 """
-function all_permutations(n::Int)
-    c = ones(Int,n)
-    elts = collect(1:n)
-    i = 1
+immutable AllPerms
+   n::Int
+   all::Int
+   AllPerms(n::Int) = new(n, factorial(n))
+end
 
-    function _it()
-        produce(copy(elts))
-        while i ≤ n
-            if c[i] < i
-                if isodd(i)
-                    elts[1], elts[i] = elts[i], elts[1]
-                else
-                    elts[c[i]], elts[i] = elts[i], elts[c[i]]
-                end
-                produce(copy(elts))
-                c[i] += 1
-                i = 1
-            else
-                c[i] = 1
-                i += 1
-            end
-        end
+Base.start(A::AllPerms) = (collect(1:A.n), 1, 1, ones(Int, A.n))
+Base.next(A::AllPerms, state) = all_perms(state...)
+Base.done(A::AllPerms, state) = state[2] > A.all
+Base.eltype(::AllPerms) = Vector{Int}
+Base.length(A::AllPerms) = factorial(A.n)
+
+function all_permutations(elts, counter, i, c)
+   if counter == 1
+      return (copy(elts), (elts, counter+1, i, c))
+   end
+   n = length(elts)
+   while i <= n
+       if c[i] < i
+          if isodd(i)
+             elts[1], elts[i] = elts[i], elts[1]
+          else
+             elts[c[i]], elts[i] = elts[i], elts[c[i]]
+          end
+          c[i] += 1
+          i = 1
+          return (copy(elts), (elts, counter+1, i, c))
+       else
+          c[i] = 1
+          i += 1
+       end
     end
-    return Task(_it)
 end
 
 doc"""
@@ -259,7 +269,7 @@ doc"""
 > `collect(elements(G))` to get an array with all elements.
 
 """
-elements(G::PermGroup) = (G(p) for p in all_permutations(G.n))
+elements(G::PermGroup) = (G(p) for p in AllPerms(G.n))
 
 doc"""
     order(G::PermGroup)
