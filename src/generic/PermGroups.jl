@@ -248,20 +248,20 @@ function all_permutations(elts, counter, i, c)
    end
    n = length(elts)
    while i <= n
-       if c[i] < i
-          if isodd(i)
-             elts[1], elts[i] = elts[i], elts[1]
-          else
-             elts[c[i]], elts[i] = elts[i], elts[c[i]]
-          end
-          c[i] += 1
-          i = 1
-          return (copy(elts), (elts, counter+1, i, c))
-       else
-          c[i] = 1
-          i += 1
-       end
-    end
+      if c[i] < i
+         if isodd(i)
+            elts[1], elts[i] = elts[i], elts[1]
+         else
+            elts[c[i]], elts[i] = elts[i], elts[c[i]]
+         end
+         c[i] += 1
+         i = 1
+         return (copy(elts), (elts, counter+1, i, c))
+      else
+         c[i] = 1
+         i += 1
+      end
+   end
 end
 
 doc"""
