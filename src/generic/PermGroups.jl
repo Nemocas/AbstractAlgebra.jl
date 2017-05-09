@@ -124,11 +124,11 @@ function show(io::IO, G::PermGroup)
    print(io, "Permutation group over $(G.n) elements")
 end
 
-type DisplayStyle
+type PermDisplayStyle
    format::Symbol
 end
 
-const perm_display_style = DisplayStyle(:array)
+const perm_display_style = PermDisplayStyle(:array)
 
 function setpermstyle(format::Symbol)
    format in (:array, :cycles) || throw("Permutations can be displayed
