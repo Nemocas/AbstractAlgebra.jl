@@ -9,7 +9,7 @@ export MatricSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
        ishessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
        powers, similarity!, weak_popov, weak_popov_with_trafo,
        extended_weak_popov, extended_weak_popov_with_trafo,
-       rank_profile_popov, hnf_popov, hnf_popov_with_trafo
+       rank_profile_popov, hnf_via_popov, hnf_via_popov_with_trafo
 
 ###############################################################################
 #
@@ -2816,7 +2816,7 @@ function weak_popov_with_pivots!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::G
             continue
          end
          change = true
-         pivotInd = indmin(map(degree, [ P[j, i] for j in pivots[i] ]))
+         pivotInd = indmin(degree(P[j, i]) for j in pivots[i])
          pivot = pivots[i][pivotInd]
          for j = 1:length(pivots[i])
             if j == pivotInd
@@ -2968,7 +2968,7 @@ end
 function asc_order_popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, pivots::Array{Array{Int,1}}, with_trafo::Bool)
    m = rows(P)
    n = cols(P)
-   pivots2 = Array{NTuple,1}(m)
+   pivots2 = Array{NTuple{Int,3},1}(m)
    for r = 1:m
       pivots2[r] = (r,n,-1)
    end
@@ -3051,29 +3051,29 @@ function popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, with_trafo::Bool = fa
    return nothing
 end
 
-function hnf_popov{T <: PolyElem}(A::GenMat{T})
-   return _hnf_popov(A, Val{false})
+function hnf_via_popov{T <: PolyElem}(A::GenMat{T})
+   return _hnf_via_popov(A, Val{false})
 end
 
-function hnf_popov_with_trafo{T <: PolyElem}(A::GenMat{T})
-   return _hnf_popov(A, Val{true})
+function hnf_via_popov_with_trafo{T <: PolyElem}(A::GenMat{T})
+   return _hnf_via_popov(A, Val{true})
 end
 
-function _hnf_popov{T <: PolyElem, S}(A::GenMat{T}, trafo::Type{Val{S}} = Val{false})
+function _hnf_via_popov{T <: PolyElem, S}(A::GenMat{T}, trafo::Type{Val{S}} = Val{false})
    H = deepcopy(A)
    m = rows(H)
    if trafo == Val{true}
       U = one(MatrixSpace(base_ring(H), m, m))
-      hnf_popov!(H, U, true)
+      hnf_via_popov!(H, U, true)
       return H, U
    else
       U = zero(MatrixSpace(base_ring(H), 0, 0))
-      hnf_popov!(H, U, false)
+      hnf_via_popov!(H, U, false)
       return H
    end
 end
 
-function hnf_popov_reduce_row!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, pivots_hermite::Array{Int}, r::Int, with_trafo::Bool)
+function hnf_via_popov_reduce_row!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, pivots_hermite::Array{Int}, r::Int, with_trafo::Bool)
    n = cols(H)
    t = base_ring(H)()
    for c = 1:n
@@ -3096,7 +3096,7 @@ function hnf_popov_reduce_row!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, pivots
    return nothing
 end
 
-function hnf_popov_reduce_column!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, pivots_hermite::Array{Int}, c::Int, with_trafo::Bool)
+function hnf_via_popov_reduce_column!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, pivots_hermite::Array{Int}, c::Int, with_trafo::Bool)
    m = rows(H)
    n = cols(H)
    t = base_ring(H)()
@@ -3176,7 +3176,7 @@ function kb_sort_rows!{T <:RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{In
    return nothing
 end
 
-function hnf_popov!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, with_trafo::Bool = false)
+function hnf_via_popov!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, with_trafo::Bool = false)
    m = rows(H)
    n = cols(H)
    R = base_ring(H)
@@ -3218,14 +3218,14 @@ function hnf_popov!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, with_trafo::Bool 
                addeq!(U[r1,j], t)
             end
          end
-         hnf_popov_reduce_row!(H, U, pivots_hermite, r1, with_trafo)
+         hnf_via_popov_reduce_row!(H, U, pivots_hermite, r1, with_trafo)
          c = find_pivot_popov(H, r1, i)
       end
       new_pivot ? nothing : continue
       pivots_hermite[i+1] = r1
-      hnf_popov_reduce_column!(H, U, pivots_hermite, i+1, with_trafo)
+      hnf_via_popov_reduce_column!(H, U, pivots_hermite, i+1, with_trafo)
       l = pivots_popov[i]
-      hnf_popov_reduce_row!(H, U, pivots_hermite, l, with_trafo)
+      hnf_via_popov_reduce_row!(H, U, pivots_hermite, l, with_trafo)
    end
    pivots_hermite[1] = pivots_popov[1]
    kb_sort_rows!(H, U, pivots_hermite, with_trafo)
