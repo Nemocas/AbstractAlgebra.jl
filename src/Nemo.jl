@@ -4,15 +4,16 @@ module Nemo
  
 import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
              convert, cmp, contains, cos, cosh, dec, deepcopy,
-             deepcopy_internal, den, deserialize, det, div, divrem, exp, gcd,
-             gcdx, getindex, hash, hcat, hex, intersect, inv, invmod, isequal,
-             isfinite, isless, isqrt, isreal, lcm, ldexp, length, log, lufact,
-             lufact!, mod, ndigits, nextpow2, norm, nullspace, num, oct, one,
-             parent, parse, precision, prevpow2, promote_rule, rank, Rational,
-             rem, reverse, serialize, setindex!, show, sign, sin, sinh, size,
-             sqrt, string, tan, tanh, trace, trailing_zeros, transpose,
-             transpose!, truncate, typed_hvcat, typed_hcat, var, vcat, zero,
-             zeros, +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <, >, //, /, !=
+             deepcopy_internal, den, deserialize, det, div, divrem, exp, eye
+             gcd, gcdx, getindex, hash, hcat, hex, intersect, inv, invmod,
+             isequal, isfinite, isless, isqrt, isreal, lcm, ldexp, length, log,
+             lufact, lufact!, mod, ndigits, nextpow2, norm, nullspace, num,
+             oct, one, parent, parse, precision, prevpow2, promote_rule, rank,
+             Rational, rem, reverse, serialize, setindex!, show, sign, sin,
+             sinh, size, sqrt, string, tan, tanh, trace, trailing_zeros,
+             transpose, transpose!, truncate, typed_hvcat, typed_hcat, var,
+             vcat, zero, zeros, +, -, *, ==, ^, &, |, $, <<, >>, ~, <=, >=, <,
+             >, //, /, !=
 
 import Base: floor, ceil, hypot, sqrt, log, log1p, exp, expm1, sin, cos, sinpi,
              cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
