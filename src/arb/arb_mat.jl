@@ -15,6 +15,8 @@ export rows, cols, zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
 #
 ###############################################################################
 
+parent_type(::Type{arb_mat}) = ArbMatSpace
+
 function getindex!(z::arb, x::arb_mat, r::Int, c::Int)
   v = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
               (Ptr{arb_mat}, Int, Int), &x, r - 1, c - 1)

@@ -20,7 +20,8 @@ import Base: floor, ceil, hypot, sqrt, log, log1p, exp, expm1, sin, cos, sinpi,
 
 export SetElem, GroupElem, RingElem, FieldElem
 
-export PolyElem, SeriesElem, AbsSeriesElem, ResElem, FracElem, MatElem, FinFieldElem
+export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
+       MatElem, FinFieldElem
 
 export PolyRing, SeriesRing, AbsSeriesRing, ResRing, FracField, MatSpace, FinField
 
