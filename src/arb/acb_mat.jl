@@ -15,6 +15,8 @@ export rows, cols, zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
 #
 ###############################################################################
 
+parent_type(::Type{acb_mat}) = AcbMatSpace
+
 function getindex!(z::acb, x::acb_mat, r::Int, c::Int)
   v = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
               (Ptr{acb_mat}, Int, Int), &x, r - 1, c - 1)
