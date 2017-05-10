@@ -611,41 +611,41 @@ end
 function zero!(a::nf_elem)
    ccall((:nf_elem_zero, :libflint), Void,
          (Ptr{nf_elem}, Ptr{AnticNumberField}), &a, &parent(a))
-   nothing
+   return a
 end
 
 function mul!(z::nf_elem, x::nf_elem, y::nf_elem)
    ccall((:nf_elem_mul, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
                                                   &z, &x, &y, &parent(x))
-   nothing
+   return z
 end
 
 function mul_red!(z::nf_elem, x::nf_elem, y::nf_elem, red::Bool)
    ccall((:nf_elem_mul_red, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}, Cint),
                                                 &z, &x, &y, &parent(x), red)
-   nothing
+   return z
 end
 
 function addeq!(z::nf_elem, x::nf_elem)
    ccall((:nf_elem_add, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
                                                   &z, &z, &x, &parent(x))
-   nothing
+   return z
 end
 
 function add!(a::nf_elem, b::nf_elem, c::nf_elem)
    ccall((:nf_elem_add, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{nf_elem}, Ptr{AnticNumberField}),
          &a, &b, &c, &a.parent)
-   nothing
+  return a
 end
 
 function reduce!(x::nf_elem)
    ccall((:nf_elem_reduce, :libflint), Void,
          (Ptr{nf_elem}, Ptr{AnticNumberField}), &x, &parent(x))
-   nothing
+   return x
 end
 
 ###############################################################################
@@ -658,18 +658,21 @@ function add!(c::nf_elem, a::nf_elem, b::fmpq)
    ccall((:nf_elem_add_fmpq, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpq}, Ptr{AnticNumberField}),
          &c, &a, &b, &a.parent)
+   return c
 end
 
 function add!(c::nf_elem, a::nf_elem, b::fmpz)
    ccall((:nf_elem_add_fmpz, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpz}, Ptr{AnticNumberField}),
          &c, &a, &b, &a.parent)
+   return c
 end
 
 function add!(c::nf_elem, a::nf_elem, b::Int)
    ccall((:nf_elem_add_si, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}),
          &c, &a, b, &a.parent)
+   return c
 end
 
 add!(c::nf_elem, a::nf_elem, b::Integer) = add!(c, a, fmpz(b))
@@ -678,18 +681,21 @@ function sub!(c::nf_elem, a::nf_elem, b::fmpq)
    ccall((:nf_elem_sub_fmpq, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpq}, Ptr{AnticNumberField}),
          &c, &a, &b, &a.parent)
+   return c
 end
 
 function sub!(c::nf_elem, a::nf_elem, b::fmpz)
    ccall((:nf_elem_sub_fmpz, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpz}, Ptr{AnticNumberField}),
          &c, &a, &b, &a.parent)
+   return c
 end
 
 function sub!(c::nf_elem, a::nf_elem, b::Int)
    ccall((:nf_elem_sub_si, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}),
          &c, &a, b, &a.parent)
+   return c
 end
 
 sub!(c::nf_elem, a::nf_elem, b::Integer) = sub!(c, a, fmpz(b))
@@ -698,18 +704,21 @@ function sub!(c::nf_elem, a::fmpq, b::nf_elem)
    ccall((:nf_elem_fmpq_sub, :libflint), Void,
          (Ptr{nf_elem}, Ptr{fmpq}, Ptr{nf_elem}, Ptr{AnticNumberField}),
          &c, &a, &b, &a.parent)
+   return c
 end
 
 function sub!(c::nf_elem, a::fmpz, b::nf_elem)
    ccall((:nf_elem_fmpz_sub, :libflint), Void,
          (Ptr{nf_elem}, Ptr{fmpz}, Ptr{nf_elem}, Ptr{AnticNumberField}),
          &c, &a, &b, &a.parent)
+   return c
 end
 
 function sub!(c::nf_elem, a::Int, b::nf_elem)
    ccall((:nf_elem_si_sub, :libflint), Void,
          (Ptr{nf_elem}, Int, Ptr{nf_elem}, Ptr{AnticNumberField}),
          &c, a, &b, &b.parent)
+   return c
 end
 
 sub!(c::nf_elem, a::Integer, b::nf_elem) = sub!(c, fmpz(a), b)
@@ -718,18 +727,21 @@ function mul!(c::nf_elem, a::nf_elem, b::fmpq)
    ccall((:nf_elem_scalar_mul_fmpq, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpq}, Ptr{AnticNumberField}),
          &c, &a, &b, &a.parent)
+   return c
 end
 
 function mul!(c::nf_elem, a::nf_elem, b::fmpz)
    ccall((:nf_elem_scalar_mul_fmpz, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Ptr{fmpz}, Ptr{AnticNumberField}),
          &c, &a, &b, &a.parent)
+   return c
 end
 
 function mul!(c::nf_elem, a::nf_elem, b::Int)
    ccall((:nf_elem_scalar_mul_si, :libflint), Void,
          (Ptr{nf_elem}, Ptr{nf_elem}, Int, Ptr{AnticNumberField}),
          &c, &a, b, &a.parent)
+   return c
 end
 
 mul!(c::nf_elem, a::nf_elem, b::Integer) = mul!(c, a, fmpz(b))

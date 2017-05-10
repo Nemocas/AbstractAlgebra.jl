@@ -204,7 +204,7 @@ end
 function addmul!{T <: RingElem}(z::T, x::T, y::T, c::T)
    mul!(c, x, y)
    addeq!(z, c)
-   return
+   return z
 end
 
 ###############################################################################

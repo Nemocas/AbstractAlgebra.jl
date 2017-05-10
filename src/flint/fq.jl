@@ -457,21 +457,25 @@ end
 function zero!(z::fq)
    ccall((:fq_zero, :libflint), Void, 
         (Ptr{fq}, Ptr{FqFiniteField}), &z, &z.parent)
+   return z
 end
 
 function mul!(z::fq, x::fq, y::fq)
    ccall((:fq_mul, :libflint), Void, 
         (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &x, &y, &y.parent)
+   return z
 end
 
 function addeq!(z::fq, x::fq)
    ccall((:fq_add, :libflint), Void, 
         (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &z, &x, &x.parent)
+   return z
 end
 
 function add!(z::fq, x::fq, y::fq)
    ccall((:fq_add, :libflint), Void, 
         (Ptr{fq}, Ptr{fq}, Ptr{fq}, Ptr{FqFiniteField}), &z, &x, &y, &x.parent)
+   return z
 end
 
 ###############################################################################

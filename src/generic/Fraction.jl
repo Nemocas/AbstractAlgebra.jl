@@ -708,7 +708,7 @@ function zero!{T <: RingElem}(c::FracElem{T})
    if !isone(c.den)
       c.den = one(parent(c))
    end
-   nothing
+   return c
 end
 
 function mul!{T <: RingElem}(c::FracElem{T}, a::FracElem{T}, b::FracElem{T})
@@ -716,7 +716,7 @@ function mul!{T <: RingElem}(c::FracElem{T}, a::FracElem{T}, b::FracElem{T})
    g2 = gcd(num(b), den(a))
    c.num = divexact(num(a), g1)*divexact(num(b), g2)
    c.den = divexact(den(a), g2)*divexact(den(b), g1)
-   nothing
+   return c
 end
 
 function addeq!{T <: RingElem}(c::FracElem{T}, a::FracElem{T})
@@ -725,7 +725,7 @@ function addeq!{T <: RingElem}(c::FracElem{T}, a::FracElem{T})
    g = gcd(n, d)
    c.num = divexact(n, g)
    c.den = divexact(c.den, g)
-   nothing
+   return c
 end
 
 function add!{T <: RingElem}(c::FracElem{T}, a::FracElem{T}, b::FracElem{T})
@@ -734,7 +734,7 @@ function add!{T <: RingElem}(c::FracElem{T}, a::FracElem{T}, b::FracElem{T})
    g = gcd(n, d)
    c.num = divexact(n, g)
    c.den = divexact(d, g)
-   nothing
+   return c
 end
 
 function addeq!{T <: RingElem}(c::FracElem{T}, a::FracElem{T}, b::FracElem{T})
@@ -743,7 +743,7 @@ function addeq!{T <: RingElem}(c::FracElem{T}, a::FracElem{T}, b::FracElem{T})
    g = gcd(n, d)
    c.num = divexact(n, g)
    c.den = divexact(c.den, g)
-   nothing
+   return c
 end
 
 

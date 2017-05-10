@@ -1030,6 +1030,7 @@ end
 function zero!{T <: RingElem}(a::GenRelSeries{T})
    a.length = 0
    a.prec = parent(a).prec_max
+   return a
 end
 
 function fit!{T <: RingElem}(c::GenRelSeries{T}, n::Int)
@@ -1043,6 +1044,7 @@ function fit!{T <: RingElem}(c::GenRelSeries{T}, n::Int)
          c.coeffs[i] = zero(base_ring(c))
       end
    end
+   return c
 end
 
 function setcoeff!{T <: RingElem}(c::GenRelSeries{T}, n::Int, a::T)
@@ -1052,6 +1054,7 @@ function setcoeff!{T <: RingElem}(c::GenRelSeries{T}, n::Int, a::T)
       c.length = max(pol_length(c), n + 1)
       # don't normalise
    end
+   return c
 end
 
 function mul!{T <: RingElem}(c::GenRelSeries{T}, a::GenRelSeries{T}, b::GenRelSeries{T})
@@ -1089,7 +1092,7 @@ function mul!{T <: RingElem}(c::GenRelSeries{T}, a::GenRelSeries{T}, b::GenRelSe
    c.val = a.val + b.val
    c.prec = prec + c.val
    renormalize!(z)
-   return nothing
+   return c
 end
 
 function addeq!{T <: RingElem}(c::GenRelSeries{T}, a::GenRelSeries{T})
@@ -1136,6 +1139,7 @@ function addeq!{T <: RingElem}(c::GenRelSeries{T}, a::GenRelSeries{T})
    c.prec = prec
    c.val = valr
    renormalise!(c)
+   return c
 end
 
 function add!{T <: RingElem}(c::SeriesElem{T}, a::SeriesElem{T}, b::SeriesElem{T})
@@ -1161,7 +1165,7 @@ function add!{T <: RingElem}(c::SeriesElem{T}, a::SeriesElem{T}, b::SeriesElem{T
       i += 1
    end
    set_length!(c, normalise(c, i - 1))
-   nothing
+   return c
 end
 ###############################################################################
 #

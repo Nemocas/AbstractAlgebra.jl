@@ -2185,12 +2185,12 @@ function fit!{T <: RingElem}(c::GenPoly{T}, n::Int)
          c.coeffs[i] = zero(base_ring(c))
       end
    end
-   nothing
+   return c
 end
 
 function zero!{T <: RingElem}(c::GenPoly{T})
    c.length = 0
-   nothing
+   return c
 end
 
 function setcoeff!{T <: RingElem}(c::GenPoly{T}, n::Int, a::T)
@@ -2200,7 +2200,7 @@ function setcoeff!{T <: RingElem}(c::GenPoly{T}, n::Int, a::T)
       c.length = max(length(c), n + 1)
       # don't normalise
    end
-   nothing
+   return c
 end
 
 function mul!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T}, b::PolyElem{T})
@@ -2239,7 +2239,7 @@ function mul!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T}, b::PolyElem{T})
         
       c.length = normalise(c, lenc)
    end
-   nothing
+   return c
 end
 
 function addeq!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T})
@@ -2251,7 +2251,7 @@ function addeq!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T})
       addeq!(c.coeffs[i], coeff(a, i - 1))
    end
    c.length = normalise(c, len)
-   nothing
+   return c
 end
 
 function add!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T}, b::PolyElem{T})
@@ -2272,7 +2272,7 @@ function add!{T <: RingElem}(c::PolyElem{T}, a::PolyElem{T}, b::PolyElem{T})
       i += 1
    end
    c.length = normalise(c, len)
-   nothing
+   return c
 end
 
 ###############################################################################

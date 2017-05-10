@@ -1697,7 +1697,7 @@ function fit!{T <: RingElem}(a::GenSparsePoly{T}, n::Int)
       resize!(a.coeffs, n)
       resize!(a.exps, n)
    end
-   return
+   return a
 end
 
 function addmul!{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T}, c::GenSparsePoly{T}, d::GenSparsePoly{T})
@@ -1706,7 +1706,7 @@ function addmul!{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T}, c::Gen
    a.coeffs = t.coeffs
    a.exps = t.exps
    a.length = t.length
-   return
+   return a
 end
 
 function mul!{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T}, c::GenSparsePoly{T})
@@ -1714,7 +1714,7 @@ function mul!{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T}, c::GenSpa
    a.coeffs = t.coeffs
    a.exps = t.exps
    a.length = t.length
-   return
+   return a
 end
 
 function addeq!{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T})
@@ -1722,7 +1722,7 @@ function addeq!{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T})
    a.coeffs = t.coeffs
    a.exps = t.exps
    a.length = t.length
-   return
+   return a
 end
 
 function add!{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T}, c::GenSparsePoly{T})
@@ -1730,19 +1730,19 @@ function add!{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T}, c::GenSpa
    a.coeffs = t.coeffs
    a.exps = t.exps
    a.length = t.length
-   return
+   return a
 end
 
 function zero!{T <: RingElem}(a::GenSparsePoly{T})
    a.length = 0
-   return
+   return a
 end
 
 function shift_left!{T <: RingElem}(a::GenSparsePoly{T}, n::UInt)
    for i = 1:length(a)
       a.exps[i] += n
    end
-   return
+   return a
 end
 
 ###############################################################################

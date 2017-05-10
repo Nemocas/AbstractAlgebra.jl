@@ -712,6 +712,7 @@ function setcoeff!(z::fmpq_abs_series, n::Int, x::fmpq)
    ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, 
                 (Ptr{fmpq_abs_series}, Int, Ptr{fmpq}), 
                &z, n, &x)
+   return z
 end
 
 function mul!(z::fmpq_abs_series, a::fmpq_abs_series, b::fmpq_abs_series)
@@ -736,6 +737,7 @@ function mul!(z::fmpq_abs_series, a::fmpq_abs_series, b::fmpq_abs_series)
    ccall((:fmpq_poly_mullow, :libflint), Void, 
                 (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int), 
                &z, &a, &b, lenz)
+   return z
 end
 
 function addeq!(a::fmpq_abs_series, b::fmpq_abs_series)
@@ -752,6 +754,7 @@ function addeq!(a::fmpq_abs_series, b::fmpq_abs_series)
    ccall((:fmpq_poly_add_series, :libflint), Void, 
                 (Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Ptr{fmpq_abs_series}, Int), 
                &a, &a, &b, lenz)
+   return a
 end
 
 ###############################################################################

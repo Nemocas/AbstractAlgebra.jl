@@ -40,15 +40,17 @@ parent(a::NewInt) = zz
 
 function mul!(a::NewInt, b::NewInt, c::NewInt)
    a.d = b.d*c.d
+   return a
 end
 
 function addeq!(a::NewInt, b::NewInt)
    a.d += b.d
-   return
+   return a
 end
 
 function addmul!(a::NewInt, b::NewInt, c::NewInt, d::NewInt)
    NewInt(a.d + b.d*c.d)
+   return a
 end
 
 function (a::NewIntParent)()
@@ -2532,7 +2534,7 @@ function mul!{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, c::GenMPoly{T})
    a.coeffs = t.coeffs
    a.exps = t.exps
    a.length = t.length
-   return
+   return a
 end
 
 function addeq!{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
@@ -2540,7 +2542,7 @@ function addeq!{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
    a.coeffs = t.coeffs
    a.exps = t.exps
    a.length = t.length
-   return
+   return a
 end
 
 function fit!{T <: RingElem}(a::GenMPoly{T}, n::Int)
@@ -2551,10 +2553,12 @@ function fit!{T <: RingElem}(a::GenMPoly{T}, n::Int)
       resize!(A, n*N) 
       a.exps = reshape(A, N, n)
    end
+   return a
 end
 
 function zero!{T <: RingElem}(a::GenMPoly{T})
    a.length = 0
+   return a
 end
 
 ###############################################################################

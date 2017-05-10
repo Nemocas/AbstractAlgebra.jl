@@ -482,22 +482,22 @@ end
 
 function zero!{T <: RingElem}(a::ResElem{T})
    zero!(a.data)
-   nothing
+   return a
 end
 
 function mul!{T <: RingElem}(c::ResElem{T}, a::ResElem{T}, b::ResElem{T})
    c.data = mod(data(a)*data(b), modulus(a))
-   nothing
+   return c
 end
 
 function addeq!{T <: RingElem}(c::ResElem{T}, a::ResElem{T})
    c.data = mod(c.data + data(a), modulus(a))
-   nothing
+   return c
 end
 
 function add!{T <: RingElem}(c::ResElem{T}, a::ResElem{T}, b::ResElem{T})
    c.data = mod(data(a) + data(b), modulus(a))
-   nothing
+   return c
 end
 
 ###############################################################################

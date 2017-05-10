@@ -845,6 +845,7 @@ function fit!{T <: RingElem}(c::GenAbsSeries{T}, n::Int)
          c.coeffs[i] = zero(base_ring(c))
       end
    end
+   return c
 end
 
 function setcoeff!{T <: RingElem}(c::GenAbsSeries{T}, n::Int, a::T)
@@ -854,6 +855,7 @@ function setcoeff!{T <: RingElem}(c::GenAbsSeries{T}, n::Int, a::T)
       c.length = max(length(c), n + 1)
       # don't normalise
    end
+   return c
 end
 
 function mul!{T <: RingElem}(c::GenAbsSeries{T}, a::GenAbsSeries{T}, b::GenAbsSeries{T})
@@ -899,6 +901,7 @@ function mul!{T <: RingElem}(c::GenAbsSeries{T}, a::GenAbsSeries{T}, b::GenAbsSe
       c.length = normalise(c, lenc)
    end
    c.prec = prec
+   return c
 end
 
 function addeq!{T <: RingElem}(c::GenAbsSeries{T}, a::GenAbsSeries{T})
@@ -917,6 +920,7 @@ function addeq!{T <: RingElem}(c::GenAbsSeries{T}, a::GenAbsSeries{T})
    end
    c.length = normalise(c, len)
    c.prec = prec
+   return c
 end
 
 ###############################################################################

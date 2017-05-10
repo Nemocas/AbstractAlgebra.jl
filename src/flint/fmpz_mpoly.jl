@@ -363,25 +363,27 @@ function addeq!{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N})
    ccall((:fmpz_mpoly_add, :libflint), Void,
          (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly},
           Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing}), &a, &a, &b, &a.parent)
-   return nothing
+   return a
 end
 
 function mul!{S, N}(a::fmpz_mpoly{S, N}, b::fmpz_mpoly{S, N}, c::fmpz_mpoly{S, N})
    ccall((:fmpz_mpoly_mul_johnson, :libflint), Void,
          (Ptr{fmpz_mpoly}, Ptr{fmpz_mpoly},
           Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing}), &a, &b, &c, &a.parent)
-   return nothing
+   return a
 end
 
 function setcoeff!(a::fmpz_mpoly, i::Int, c::Int)
    ccall((:fmpz_mpoly_set_coeff_si, :libflint), Void,
         (Ptr{fmpz_mpoly}, Int, Int, Ptr{FmpzMPolyRing}), &a, i, c, &a.parent)
+   return a
 end
 
 function setcoeff!(a::fmpz_mpoly, i::Int, c::fmpz)
    ccall((:fmpz_mpoly_set_coeff_fmpz, :libflint), Void,
         (Ptr{fmpz_mpoly}, Int, Ptr{fmpz}, Ptr{FmpzMPolyRing}),
                                                           &a, i, &c, &a.parent)
+   return a
 end
 
 ###############################################################################

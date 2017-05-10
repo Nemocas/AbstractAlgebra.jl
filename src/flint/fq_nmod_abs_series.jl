@@ -452,12 +452,14 @@ function fit!(z::fq_nmod_abs_series, n::Int)
    ccall((:fq_nmod_poly_fit_length, :libflint), Void, 
          (Ptr{fq_nmod_abs_series}, Int, Ptr{FqNmodFiniteField}),
          &z, n, &base_ring(z))
+   return z
 end
 
 function setcoeff!(z::fq_nmod_abs_series, n::Int, x::fq_nmod)
    ccall((:fq_nmod_poly_set_coeff, :libflint), Void, 
                 (Ptr{fq_nmod_abs_series}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}), 
                &z, n, &x, &base_ring(z))
+   return z
 end
 
 function mul!(z::fq_nmod_abs_series, a::fq_nmod_abs_series, b::fq_nmod_abs_series)
@@ -478,6 +480,7 @@ function mul!(z::fq_nmod_abs_series, a::fq_nmod_abs_series, b::fq_nmod_abs_serie
          (Ptr{fq_nmod_abs_series}, Ptr{fq_nmod_abs_series},
           Ptr{fq_nmod_abs_series}, Int, Ptr{FqNmodFiniteField}), 
                &z, &a, &b, lenz, &base_ring(z))
+   return z
 end
 
 function addeq!(a::fq_nmod_abs_series, b::fq_nmod_abs_series)
@@ -492,6 +495,7 @@ function addeq!(a::fq_nmod_abs_series, b::fq_nmod_abs_series)
          (Ptr{fq_nmod_abs_series}, Ptr{fq_nmod_abs_series},
           Ptr{fq_nmod_abs_series}, Int, Ptr{FqNmodFiniteField}), 
                &a, &a, &b, lenz, &base_ring(a))
+   return a
 end
 
 ###############################################################################
