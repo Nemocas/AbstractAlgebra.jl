@@ -168,7 +168,7 @@ function randmat_with_rank{T <: RingElem}(S::GenMatSpace{T}, c::Int, rank::Int)
    return M
 end
 
-function is_upper_triangular(A::GenMat)
+function istriu(A::GenMat)
    m = rows(A)
    n = cols(A)
    d = 0
@@ -1151,10 +1151,10 @@ function test_gen_mat_hnf_kb()
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    H = Nemo.hnf_kb(A)
-   @test is_upper_triangular(H)
+   @test istriu(H)
 
    H, U = Nemo.hnf_kb_with_trafo(A)
-   @test is_upper_triangular(H)
+   @test istriu(H)
    @test isunit(det(U))
    @test U*A == H
 
@@ -1167,10 +1167,10 @@ function test_gen_mat_hnf_kb()
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
    H = Nemo.hnf_kb(B)
-   @test is_upper_triangular(H)
+   @test istriu(H)
 
    H, U = Nemo.hnf_kb_with_trafo(B)
-   @test is_upper_triangular(H)
+   @test istriu(H)
    @test isunit(det(U))
    @test U*B == H
 
@@ -1187,10 +1187,10 @@ function test_gen_mat_hnf_cohen()
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    H = Nemo.hnf_cohen(A)
-   @test is_upper_triangular(H)
+   @test istriu(H)
 
    H, U = Nemo.hnf_cohen_with_trafo(A)
-   @test is_upper_triangular(H)
+   @test istriu(H)
    @test isunit(det(U))
    @test U*A == H
 
@@ -1203,10 +1203,10 @@ function test_gen_mat_hnf_cohen()
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
    H = Nemo.hnf_cohen(B)
-   @test is_upper_triangular(H)
+   @test istriu(H)
 
    H, U = Nemo.hnf_cohen_with_trafo(B)
-   @test is_upper_triangular(H)
+   @test istriu(H)
    @test isunit(det(U))
    @test U*B == H
 
@@ -1223,10 +1223,10 @@ function test_gen_mat_hnf()
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    H = hnf(A)
-   @test is_upper_triangular(H)
+   @test istriu(H)
 
    H, U = hnf_with_trafo(A)
-   @test is_upper_triangular(H)
+   @test istriu(H)
    @test isunit(det(U))
    @test U*A == H
 
@@ -1239,10 +1239,10 @@ function test_gen_mat_hnf()
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
    H = hnf(B)
-   @test is_upper_triangular(H)
+   @test istriu(H)
 
    H, U = hnf_with_trafo(B)
-   @test is_upper_triangular(H)
+   @test istriu(H)
    @test isunit(det(U))
    @test U*B == H
 
