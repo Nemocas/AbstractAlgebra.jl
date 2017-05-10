@@ -2722,10 +2722,19 @@ end
 #
 ###############################################################################
 
+doc"""
+    weak_popov{T <: PolyElem}(A::GenMat{T})
+> Return the weak Popov form of $A$.
+"""
 function weak_popov{T <: PolyElem}(A::GenMat{T})
    return _weak_popov(A, Val{false})
 end
 
+doc"""
+    weak_popov_with_trafo{T <: PolyElem}(A::GenMat{T})
+> Compute a tuple $(P, U)$ where $P$ is the weak Popov form of $A$ and $U$
+> is a transformation matrix so that $P = UA$.
+"""
 function weak_popov_with_trafo{T <: PolyElem}(A::GenMat{T})
    return _weak_popov(A, Val{true})
 end
@@ -2745,10 +2754,23 @@ function _weak_popov{T <: PolyElem, S}(A::GenMat{T}, trafo::Type{Val{S}} = Val{f
    end
 end
 
+doc"""
+    extended_weak_popov{T <: PolyElem}(A::GenMat{T}, V::GenMat{T})
+> Compute the weak Popov form $P$ of $A$ by applying simple row transformations
+> on $A$ and a vector $W$ by applying the same transformations on the vector $V$.
+> Return the tuple $(P, W)$.
+"""
 function extended_weak_popov{T <: PolyElem}(A::GenMat{T}, V::GenMat{T})
    return _extended_weak_popov(A, V, Val{false})
 end
 
+doc"""
+    extended_weak_popov_with_trafo{T <: PolyElem}(A::GenMat{T}, V::GenMat{T})
+> Compute the weak Popov form $P$ of $A$ by applying simple row transformations
+> on $A$, a vector $W$ by applying the same transformations on the vector $V$,
+> and a transformation matrix $U$ so that $P = UA$.
+> Return the tuple $(P, W, U)$.
+"""
 function extended_weak_popov_with_trafo{T <: PolyElem}(A::GenMat{T}, V::GenMat{T})
    return _extended_weak_popov(A, V, Val{true})
 end
@@ -2787,6 +2809,7 @@ function init_pivots_popov{T <: PolyElem}(P::GenMat{T}, last_row::Int = 0, last_
    for i = 1:n
       pivots[i] = Array{Int}(0)
    end
+   # pivots[i] contains the indices of the rows in which the pivot element is in the ith column.
    for r = 1:m
       pivot = find_pivot_popov(P, r, last_col)
       P[r,pivot] != 0 ? push!(pivots[pivot], r) : nothing
@@ -2801,6 +2824,10 @@ function weak_popov!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::GenMat{T}, ex
    return nothing
 end
 
+#=
+The weak Popov form is defined by T. Mulders and A. Storjohann in
+"On lattice reduction for polynomial matrices"
+=#
 function weak_popov_with_pivots!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::GenMat{T}, pivots::Array{Array{Int,1}},
                                                    extended::Bool = false, with_trafo::Bool = false, last_row::Int = 0, last_col::Int = 0)
    last_row == 0 ? m = rows(P) : m = last_row
@@ -2816,6 +2843,7 @@ function weak_popov_with_pivots!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::G
             continue
          end
          change = true
+         # Reduce with the pivot of minimal degree.
          pivotInd = indmin(degree(P[j, i]) for j in pivots[i])
          pivot = pivots[i][pivotInd]
          for j = 1:length(pivots[i])
@@ -2852,6 +2880,11 @@ function weak_popov_with_pivots!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::G
    return nothing
 end
 
+doc"""
+    rank_profile_popov{T <: PolyElem}(A::GenMat{T})
+> Return an array of $r$ row indices such that these rows of $A$ are linearly
+> independent, where $r$ is the rank of $A$.
+"""
 function rank_profile_popov{T <: PolyElem}(A::GenMat{T})
    B = deepcopy(A)
    m = rows(A)
@@ -2876,6 +2909,8 @@ function rank_profile_popov{T <: PolyElem}(A::GenMat{T})
       weak_popov_with_pivots!(B, V, U, pivots, false, false, i)
       s = 0
       for j = 1:n
+         # length(pivots[j]) is either 1 or 0, since B is in weak
+         # Popov form.
          s += length(pivots[j])
       end
       if s != r
@@ -2901,12 +2936,17 @@ function det_popov{T <: PolyElem}(A::GenMat{T})
    diag_elems = zeros(Int, n)
    for i = 1:n
       try pivots[i] = pivots1[i][1]
-      catch return R(0)
+      catch
+         # If there is no pivot in the ith column, A has not full rank.
+         return R(0)
       end
    end
    for i = n-1:-1:1
+      # "Remove" the column i+1 and compute a weak Popov Form of the
+      # remaining matrix.
       r1 = pivots[i+1]
       c = find_pivot_popov(B, r1, i)
+      # If the pivot B[r1,c] is zero then the row is zero.
       while !iszero(B[r1,c])
          r2 = pivots[c]
          if degree(B[r2,c]) > degree(B[r1,c])
@@ -2929,6 +2969,7 @@ function det_popov{T <: PolyElem}(A::GenMat{T})
    mul!(det, det, B[pivots[1],1])
    diag_elems[1] = pivots[1]
    number_of_swaps = 0
+   # Adjust the sign of det by sorting the diagonal elements.
    for i = 1:n
       while diag_elems[i] != i
          r = diag_elems[i]
@@ -2943,10 +2984,19 @@ function det_popov{T <: PolyElem}(A::GenMat{T})
    return det
 end
 
+doc"""
+    popov{T <: PolyElem}(A::GenMat{T})
+> Return the Popov form of $A$.
+"""
 function popov{T <: PolyElem}(A::GenMat{T})
    return _popov(A, Val{false})
 end
 
+doc"""
+    popov_with_trafo{T <: PolyElem}(A::GenMat{T})
+> Compute a tuple $(P, U)$ where $P$ is the Popov form of $A$ and $U$
+> is a transformation matrix so that $P = UA$.
+"""
 function popov_with_trafo{T <: PolyElem}(A::GenMat{T})
    return _popov(A, Val{true})
 end
@@ -3190,12 +3240,15 @@ function hnf_via_popov!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, with_trafo::B
    end
    pivots_hermite = zeros(Int, n)
    for i = n-1:-1:1
+      # "Remove" the column i+1 and compute a weak Popov Form of the
+      # remaining matrix.
       r1 = pivots_popov[i+1]
       if r1 == 0
          continue
       end
       c = find_pivot_popov(H, r1, i)
       new_pivot = true
+      # If the pivot H[r1,c] is zero then the row is zero.
       while !iszero(H[r1,c])
          r2 = pivots_popov[c]
          if r2 == 0
