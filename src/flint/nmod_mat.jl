@@ -463,7 +463,7 @@ function lufact!(P::perm, x::nmod_mat)
   return rank
 end
 
-function lufact(x::nmod_mat, P = FlintPermGroup(rows(x)))
+function lufact(x::nmod_mat, P = PermGroup(rows(x)))
   m = rows(x)
   n = cols(x)
   P.n != m && error("Permutation does not match matrix")
