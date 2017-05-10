@@ -1,7 +1,7 @@
 VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module Nemo
- 
+
 import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
              convert, cmp, contains, cos, cosh, dec, deepcopy,
              deepcopy_internal, den, deserialize, det, div, divrem, exp, eye,
@@ -67,7 +67,7 @@ end
 const libmpfr = joinpath(pkgdir, "local", "lib", "libmpfr")
 const libflint = joinpath(pkgdir, "local", "lib", "libflint")
 const libarb = joinpath(pkgdir, "local", "lib", "libarb")
-  
+
 function flint_abort()
   error("Problem in the Flint-Subsystem")
 end
@@ -100,7 +100,7 @@ function __init__()
          cglobal(:jl_realloc),
          cglobal(:jl_free))
    end
-   
+
    ccall((:flint_set_abort, libflint), Void,
       (Ptr{Void},), cfunction(flint_abort, Void, ()))
 
@@ -357,7 +357,7 @@ function test_module(x, y)
    if x in ["flint", "arb", "antic"]
      test_function_name *= y
    else x == "generic"
-     if y == "RelSeries" 
+     if y == "RelSeries"
        test_function_name *= "gen_rel_series"
      elseif y == "AbsSeries"
        test_function_name *= "gen_abs_series"
