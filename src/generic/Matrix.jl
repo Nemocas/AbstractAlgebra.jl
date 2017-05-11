@@ -255,8 +255,8 @@ function *{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
       for j = 1:cols(y)
          A[i, j] = base_ring(x)()
          for k = 1:cols(x)
-            mul!(C, x[i, k], y[k, j])
-            addeq!(A[i, j], C)
+            C = mul!(C, x[i, k], y[k, j])
+            A[i, j] = addeq!(A[i, j], C)
          end
       end
    end
@@ -837,7 +837,7 @@ function trace(x::MatElem)
    rows(x) != cols(x) && error("Not a square matrix in trace")
    d = zero(base_ring(x))
    for i = 1:rows(x)
-      addeq!(d, x[i, i])
+      d = addeq!(d, x[i, i])
    end
    return d
 end
@@ -925,10 +925,8 @@ function lufact!{T <: FieldElem}(P::perm, A::MatElem{T})
       for i = r + 1:m
          q = A[i, c]*d
          for j = c + 1:n
-            mul!(t, A[r, j], q)
-            u = A[i, j]
-            addeq!(u, t)
-            A[i, j] = u
+            t = mul!(t, A[r, j], q)
+            A[i, j] = addeq!(A[i, j], t)
          end
          A[i, c] = R()
          A[i, rank] = -q
@@ -1009,14 +1007,13 @@ function fflu!{T <: RingElem}(P::perm, A::MatElem{T})
       q = -A[r, c]
       for i = r + 1:m
          for j = c + 1:n
-            u = A[i, j]
-            mul!(u, u, q)
-            mul!(t, A[i, c], A[r, j])
-            addeq!(u, t)
+            A[i, j] = mul!(A[i, j], A[i, j], q)
+            t = mul!(t, A[i, c], A[r, j])
+            A[i, j] = addeq!(A[i, j], t)
             if r > 1
-               A[i, j] = divexact(u, d)
+               A[i, j] = divexact(A[i, j], d)
             else
-               A[i, j] = -u
+               A[i, j] = -A[i, j]
             end
          end
       end
@@ -1063,15 +1060,13 @@ function fflu!{T <: FieldElem}(P::perm, A::MatElem{T})
       q = -A[r, c]
       for i = r + 1:m
          for j = c + 1:n
-            u = A[i, j]
-            mul!(u, u, q)
-            mul!(t, A[i, c], A[r, j])
-            addeq!(u, t)
+            A[i, j] = mul!(A[i, j], A[i, j], q)
+            t = mul!(t, A[i, c], A[r, j])
+            A[i, j] = addeq!(A[i, j], t)
             if r > 1
-               mul!(u, u, d)
-               A[i, j] = u
+               A[i, j] = mul!(A[i, j], A[i, j], d)
             else
-               A[i, j] = -u
+               A[i, j] = -A[i, j]
             end
          end
       end
@@ -1166,10 +1161,10 @@ function rref!{T <: RingElem}(A::MatElem{T})
       end
       for k = 1:n - rank
          for i = rank - 1:-1:1
-            mul!(t, A[i, pivots[np + k]], d)
+            t = mul!(t, A[i, pivots[np + k]], d)
             for j = i + 1:rank
-               mul!(q, A[i, pivots[j]], A[j, pivots[np + k]])
-               addeq!(t, q)
+               q = mul!(q, A[i, pivots[j]], A[j, pivots[np + k]])
+               t = addeq!(t, q)
             end
             A[i, pivots[np + k]] = divexact(-t, A[i, pivots[i]])
          end
@@ -1355,18 +1350,14 @@ function reduce_row!{T <: FieldElem}(A::MatElem{T}, P::Array{Int}, L::Array{Int}
          if r != 0
             A[m, i] = R()
             for j = i + 1:L[r]
-               mul!(t, A[r, j], h)
-               s = A[m, j]
-               addeq!(s, t)
-               A[m, j] = s
+               t = mul!(t, A[r, j], h)
+               A[m, j] = addeq!(A[m, j], t)
             end 
          else
             h = inv(A[m, i])
             A[m, i] = R(1)
             for j = i + 1:L[m]
-               s = A[m, j]
-               mul!(s, s, h)
-               A[m, j] = s
+               A[m, j] = mul!(A[m, j], A[m, j], h)
             end
             P[i] = m
             return i
@@ -1390,16 +1381,12 @@ function reduce_row!{T <: RingElem}(A::MatElem{T}, P::Array{Int}, L::Array{Int},
             d = A[r, i]
             A[m, i] = R()
             for j = i + 1:L[r]
-               mul!(t, A[r, j], h)
-               s = A[m, j]
-               mul!(s, s, d)
-               addeq!(s, t)
-               A[m, j] = s
+               t = mul!(t, A[r, j], h)
+               A[m, j] = mul!(A[m, j], A[m, j], d)
+               A[m, j] = addeq!(A[m, j], t)
             end 
             for j = L[r] + 1:L[m]
-               s = A[m, j]
-               mul!(s, s, d)
-               A[m, j] = s
+               A[m, j] = mul!(A[m, j], A[m, j], d)
             end
             if c1 > 0 && P[c1] < P[i]
                for j = i + 1:L[m]
@@ -1416,9 +1403,7 @@ function reduce_row!{T <: RingElem}(A::MatElem{T}, P::Array{Int}, L::Array{Int},
          r = P[i]
          if r != 0
             for j = i + 1:L[m]
-               s = A[m, j]
-               mul!(s, s, A[r, i])
-               A[m, j] = s
+               A[m, j] = mul!(A[m, j], A[m, j], A[r, i])
             end
          end
       end
@@ -1449,12 +1434,12 @@ function det_clow{T <: RingElem}(M::MatElem{T})
          for j = 1:i
             if !iszero(A[i, j])
                for m = j + 1:n
-                  mul!(C, A[i, j], M[i, m])
-                  addeq!(B[m, j], C)
+                  C = mul!(C, A[i, j], M[i, m])
+                  B[m, j] = addeq!(B[m, j], C)
                end
                for m = j + 1:n
-                  mul!(C, A[i, j], M[i, j])
-                  addeq!(B[m, m], -C)
+                  C = mul!(C, A[i, j], M[i, j])
+                  B[m, m] = addeq!(B[m, m], -C)
                end
             end
          end
@@ -1624,13 +1609,12 @@ function backsolve!{T <: FieldElem}(A::MatElem{T}, b::MatElem{T})
    for i = m:-1:1
       d = -inv(A[i, i])
       for k = 1:h
-         u = -b[i, k]
+         b[i, k] = -b[i, k]
          for j = i + 1:m
-            mul!(t, A[i, j], b[j, k])
-            addeq!(u, t)
+            t = mul!(t, A[i, j], b[j, k])
+            b[i, k] = addeq!(b[i, k], t)
          end
-         mul!(u, u, d)
-         b[i, k] = u
+         b[i, k] = mul!(b[i, k], b[i, k], d)
       end 
    end
 end
@@ -1667,29 +1651,23 @@ function solve!{T <: FieldElem}(A::MatElem{T}, b::MatElem{T})
       q = -A[r, c]
       for i = r + 1:m
          for j = 1:h
-            mul!(t, A[i, c], b[r, j])
-            u = b[i, j]
-            mul!(u, u, A[r, c])
-            addeq!(u, -t)
-            b[i, j] = u 
+            t = mul!(t, A[i, c], b[r, j])
+            b[i, j] = mul!(b[i, j], b[i, j], A[r, c])
+            b[i, j] = addeq!(b[i, j], -t)
          end
          for j = c + 1:n
-            u = A[i, j]
-            mul!(u, u, q)
-            mul!(t, A[i, c], A[r, j])
-            addeq!(u, t)
+            A[i, j] = mul!(A[i, j], A[i, j], q)
+            t = mul!(t, A[i, c], A[r, j])
+            A[i, j] = addeq!(A[i, j], t)
             if r > 1
-               mul!(u, u, d)
-               A[i, j] = u
+               A[i, j] = mul!(A[i, j], A[i, j], d)
             else
-               A[i, j] = -u
+               A[i, j] = -A[i, j]
             end
          end
          if r > 1
             for j = 1:h
-               u = b[i, j]
-               mul!(u, u, -d)
-               b[i, j] = u
+               b[i, j] = mul!(b[i, j], b[i, j], -d)
             end
          end
       end
@@ -1720,9 +1698,7 @@ function solve_with_det{T <: FieldElem}(M::MatElem{T}, b::MatElem{T})
    d = A[m, m]
    for i = 1:m
       for j = 1:h
-         u = x[i, j]
-         mul!(u, u, d)
-         x[i, j] = u
+         x[i, j] = mul!(x[i, j], x[i, j], d)
       end
    end   
    return x, d
@@ -1744,13 +1720,12 @@ function backsolve!{T <: RingElem}(A::MatElem{T}, b::MatElem{T})
    for i = m - 1:-1:1
       q = -A[i, i]
       for k = 1:h
-         u = b[i, k]
-         mul!(u, u, d)
+         b[i, k] = mul!(b[i, k], b[i, k], d)
          for j = i + 1:m
-            mul!(t, A[i, j], b[j, k])
-            addeq!(u, t)
+            t = mul!(t, A[i, j], b[j, k])
+            b[i, k] = addeq!(b[i, k], t)
          end
-         b[i, k] = divexact(u, q)
+         b[i, k] = divexact(b[i, k], q)
       end 
    end
    for i = 1:m
@@ -1793,21 +1768,18 @@ function solve!{T <: RingElem}(A::MatElem{T}, b::MatElem{T})
       q = -A[r, c]
       for i = r + 1:m
          for j = 1:h
-            mul!(t, A[i, c], b[r, j])
-            u = b[i, j]
-            mul!(u, u, A[r, c])
-            addeq!(u, -t)
-            b[i, j] = u
+            t = mul!(t, A[i, c], b[r, j])
+            b[i, j] = mul!(b[i, j], b[i, j], A[r, c])
+            b[i, j] = addeq!(b[i, j], -t)
          end 
          for j = c + 1:n
-            u = A[i, j]
-            mul!(u, u, q)
-            mul!(t, A[i, c], A[r, j])
-            addeq!(u, t)
+            A[i, j] = mul!(A[i, j], A[i, j], q)
+            t = mul!(t, A[i, c], A[r, j])
+            A[i, j] = addeq!(A[i, j], t)
             if r > 1
-               A[i, j] = divexact(u, d)
+               A[i, j] = divexact(A[i, j], d)
             else
-               A[i, j] = -u
+               A[i, j] = -A[i, j]
             end
          end
          if r > 1
@@ -1967,12 +1939,12 @@ function solve_triu{T <: FieldElem}(U::MatElem{T}, b::MatElem{T}, unit=false)
       for j = n:-1:1
          s = R()
          for k = j + 1:n
-            mul!(t, U[j, k], tmp[k])
-            addeq!(s, t)
+            t = mul!(t, U[j, k], tmp[k])
+            s = addeq!(s, t)
          end
          s = b[j, i] - s
          if unit == false
-            mul!(s, s, Tinv[j])
+            s = mul!(s, s, Tinv[j])
          end
          tmp[j] = s 
       end
@@ -2157,19 +2129,15 @@ function hessenberg!{T <: RingElem}(A::MatElem{T})
          end
          for i = m + 1:n
             if A[i, m - 1] != 0
-               mul!(u, A[i, m - 1], h)
+               u = mul!(u, A[i, m - 1], h)
                for j = m:n
-                  mul!(t, u, A[m, j])
-                  s = A[i, j]
-                  addeq!(s, t)
-                  A[i, j] = s
+                  t = mul!(t, u, A[m, j])
+                  A[i, j] = addeq!(A[i, j], t)
                end
                u = -u
                for j = 1:n
-                  mul!(t, u, A[j, i])
-                  s = A[j, m]
-                  addeq!(s, t)
-                  A[j, m] = s
+                  t = mul!(t, u, A[j, i])
+                  A[j, m] = addeq!(A[j, m], t)
                end
                A[i, m - 1] = R()
             end
@@ -2233,7 +2201,7 @@ function charpoly_hessenberg!{T <: RingElem}(S::Ring, A::MatElem{T})
       P[m + 1] = (x - A[m, m])*P[m]
       t = R(1)
       for i = 1:m - 1
-         mul!(t, t, A[m - i + 1, m - i])
+         t = mul!(t, t, A[m - i + 1, m - i])
          P[m + 1] -= t*A[m - i, m]*P[m - i]
       end
    end
@@ -2266,10 +2234,10 @@ function charpoly_danilevsky_ff!{T <: RingElem}(S::Ring, A::MatElem{T})
          end
          if k == n - i
             b = S()
-            fit!(b, i + 1)
-            setcoeff!(b, i, R(1))
+            b = fit!(b, i + 1)
+            b = setcoeff!(b, i, R(1))
             for k = 1:i
-               setcoeff!(b, k - 1, -A[n - i + 1, n - k + 1]*d)
+               b = setcoeff!(b, k - 1, -A[n - i + 1, n - k + 1]*d)
             end
             pol *= b
             n -= i
@@ -2294,16 +2262,14 @@ function charpoly_danilevsky_ff!{T <: RingElem}(S::Ring, A::MatElem{T})
       end
       for j = 1:n - i
          for k = 1:n - i - 1
-            mul!(t, A[j, n - i], V[k])
-            u = A[j, k]*h
-            addeq!(u, t)
-            A[j, k] = u
+            t = mul!(t, A[j, n - i], V[k])
+            A[j, k] = mul!(A[j, k], A[j, k], h)
+            A[j, k] = addeq!(A[j, k], t)
          end
          for k = n - i + 1:n
-            mul!(t, A[j, n - i], V[k])
-            u = A[j, k]*h
-            addeq!(u, t)
-            A[j, k] = u
+            t = mul!(t, A[j, n - i], V[k])
+            A[j, k] = mul!(A[j, k], A[j, k], h)
+            A[j, k] = addeq!(A[j, k], t)
          end
       end
       for k = 1:n
@@ -2311,48 +2277,48 @@ function charpoly_danilevsky_ff!{T <: RingElem}(S::Ring, A::MatElem{T})
       end
       for j = 1:n - i
          for k = 1:n - i - 1
-            mul!(A[j, k], A[j, k], d)
+            A[j, k] = mul!(A[j, k], A[j, k], d)
          end
          for k = n - i + 1:n
-            mul!(A[j, k], A[j, k], d)
+            A[j, k] = mul!(A[j, k], A[j, k], d)
          end
       end
       A[n - i + 1, n - i] = deepcopy(h)
       for j = 1:n - i - 1
          s = R()
          for k = 1:n - i
-            mul!(t, A[k, j], W[k])
-            addeq!(s, t)
+            t = mul!(t, A[k, j], W[k])
+            s = addeq!(s, t)
          end
          A[n - i, j] = s
       end
       for j = n - i:n - 1
          s = R()
          for k = 1:n - i
-            mul!(t, A[k, j], W[k])
-            addeq!(s, t)
+            t = mul!(t, A[k, j], W[k])
+            s = addeq!(s, t)
          end
-         mul!(t, h, W[j + 1])
-         addeq!(s, t)
+         t = mul!(t, h, W[j + 1])
+         s = addeq!(s, t)
          A[n - i, j] = s
       end
       s = R()
       for k = 1:n - i
-         mul!(t, A[k, n], W[k])
-         addeq!(s, t)
+         t = mul!(t, A[k, n], W[k])
+         s = addeq!(s, t)
       end
       A[n - i, n] = s
       for k = 1:n
-         mul!(A[n - i, k], A[n - i, k], d)
+         A[n - i, k] = mul!(A[n - i, k], A[n - i, k], d)
       end
       d = inv(h)
       i += 1
    end
    b = S()
-   fit!(b, n + 1)
-   setcoeff!(b, n, R(1))
+   b = fit!(b, n + 1)
+   b = setcoeff!(b, n, R(1))
    for i = 1:n
-      setcoeff!(b, i - 1, -A[1, n - i + 1]*d)
+      b = setcoeff!(b, i - 1, -A[1, n - i + 1]*d)
    end
    return pol*b
 end
@@ -2382,10 +2348,10 @@ function charpoly_danilevsky!{T <: RingElem}(S::Ring, A::MatElem{T})
          end
          if k == n - i
             b = S()
-            fit!(b, i + 1)
-            setcoeff!(b, i, R(1))
+            b = fit!(b, i + 1)
+            b = setcoeff!(b, i, R(1))
             for k = 1:i
-               setcoeff!(b, k - 1, -A[n - i + 1, n - k + 1])
+               b = setcoeff!(b, k - 1, -A[n - i + 1, n - k + 1])
             end
             pol *= b
             n -= i
@@ -2412,51 +2378,45 @@ function charpoly_danilevsky!{T <: RingElem}(S::Ring, A::MatElem{T})
       h = -h
       for j = 1:n - i
          for k = 1:n - i - 1
-            mul!(t, A[j, n - i], V[k])
-            u = A[j, k]
-            addeq!(u, t)
-            A[j, k] = u
+            t = mul!(t, A[j, n - i], V[k])
+            A[j, k] = addeq!(A[j, k], t)
          end
          for k = n - i + 1:n
-            mul!(t, A[j, n - i], V[k])
-            u = A[j, k]
-            addeq!(u, t)
-            A[j, k] = u
+            t = mul!(t, A[j, n - i], V[k])
+            A[j, k] = addeq!(A[j, k], t)
          end
-         u = A[j, n - i]
-         mul!(u, u, h)
-         A[j, n - i] = u
+         A[j, n - i] = mul!(A[j, n - i], A[j, n - i], h)
       end
       for j = 1:n - i - 1
          s = R()
          for k = 1:n - i
-            mul!(t, A[k, j], W[k])
-            addeq!(s, t)
+            t = mul!(t, A[k, j], W[k])
+            s = addeq!(s, t)
          end
          A[n - i, j] = s
       end
       for j = n - i:n - 1
          s = R()
          for k = 1:n - i
-            mul!(t, A[k, j], W[k])
-            addeq!(s, t)
+            t = mul!(t, A[k, j], W[k])
+            s = addeq!(s, t)
          end
-         addeq!(s, W[j + 1])
+         s = addeq!(s, W[j + 1])
          A[n - i, j] = s
       end
       s = R()
       for k = 1:n - i
-         mul!(t, A[k, n], W[k])
-         addeq!(s, t)
+         t = mul!(t, A[k, n], W[k])
+         s = addeq!(s, t)
       end
       A[n - i, n] = s
       i += 1
    end
    b = S()
-   fit!(b, n + 1)
-   setcoeff!(b, n, R(1))
+   b = fit!(b, n + 1)
+   b = setcoeff!(b, n, R(1))
    for i = 1:n
-      setcoeff!(b, i - 1, -A[1, n - i + 1])
+      b = setcoeff!(b, i - 1, -A[1, n - i + 1])
    end
    return pol*b
 end
@@ -2490,8 +2450,8 @@ function charpoly{T <: RingElem}(V::Ring, Y::MatElem{T})
          for k = 1:i
             s = R()
             for l = 1:i
-               mul!(p, Y[k, l], M[j - 1, l])
-               addeq!(s, p)
+               p = mul!(p, Y[k, l], M[j - 1, l])
+               s = addeq!(s, p)
             end
             M[j, k] = s
          end
@@ -2499,15 +2459,15 @@ function charpoly{T <: RingElem}(V::Ring, Y::MatElem{T})
       end 
       s = R()
       for j = 1:i
-         mul!(p, Y[i, j], M[i - 1, j])
-         addeq!(s, p)
+         p = mul!(p, Y[i, j], M[i - 1, j])
+         s = addeq!(s, p)
       end
       A[i] = s
       for j = 1:i
          s = -F[j]
          for k = 1:j - 1
-            mul!(p, A[k], F[j - k])
-            addeq!(s, p)
+            p = mul!(p, A[k], F[j - k])
+            s = addeq!(s, p)
          end
          F[j] = -s - A[j]
      end
@@ -2515,7 +2475,7 @@ function charpoly{T <: RingElem}(V::Ring, Y::MatElem{T})
    z = gen(V)
    f = z^n
    for i = 1:n
-      setcoeff!(f, n - i, F[i])
+      f = setcoeff!(f, n - i, F[i])
    end
    return f
 end
@@ -2617,10 +2577,10 @@ function minpoly{T <: FieldElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
       end
       c2 = c
       b = S()
-      fit!(b, r1)
+      b = fit!(b, r1)
       h = inv(A[r1, n + r1])
       for i = 1:r1
-         setcoeff!(b, i - 1, A[r1, n + i]*h)
+         b = setcoeff!(b, i - 1, A[r1, n + i]*h)
       end
       p = lcm(p, b)
       if charpoly_only == true
@@ -2713,9 +2673,9 @@ function minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
       end
       c2 = c
       b = S()
-      fit!(b, r1)
+      b = fit!(b, r1)
       for i = 1:r1
-         setcoeff!(b, i - 1, A[r1, n + i])
+         b = setcoeff!(b, i - 1, A[r1, n + i])
       end
       b = reverse(b, r1)
       b = primpart(b)
@@ -3709,30 +3669,24 @@ function similarity!{T <: RingElem}(A::MatElem{T}, r::Int, d::T)
    t = base_ring(A)()
    for i = 1:n
       for j = 1:r - 1
-         mul!(t, A[i, r], d)
-         s = A[i, j]
-         addeq!(s, t)
-         A[i, j] = s
+         t = mul!(t, A[i, r], d)
+         A[i, j] = addeq!(A[i, j], t)
       end
       for j = r + 1:n
-         mul!(t, A[i, r], d)
-         s = A[i, j]
-         addeq!(s, t)
-         A[i, j] = s
+         t = mul!(t, A[i, r], d)
+         A[i, j] = addeq!(A[i, j], t)
       end
    end
    d = -d
    for i = 1:n
-      s = A[r, i]
       for j = 1:r - 1
-         mul!(t, A[j, i], d)
-         addeq!(s, t)
+         t = mul!(t, A[j, i], d)
+         A[r, i] = addeq!(A[r, i], t)
       end
       for j = r + 1:n
-         mul!(t, A[j, i], d)
-         addeq!(s, t)
+         t = mul!(t, A[j, i], d)
+         A[r, i] = addeq!(A[r, i], t)
       end
-      A[r, i] = s
    end
 end
 
