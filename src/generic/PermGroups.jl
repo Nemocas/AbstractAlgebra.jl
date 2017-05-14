@@ -362,9 +362,9 @@ function (G::PermGroup)()
    return z
 end
 
-function (G::PermGroup)(a::Array{Int, 1}; checked::Bool=true)
+function (G::PermGroup)(a::Array{Int, 1}, check::Bool=true)
    length(a) != G.n && error("Unable to coerce to permutation: lengths differ")
-   if checked
+   if check
       Base.Set(a) != Base.Set(1:length(a)) && error("Unable to coerce to
          permutation: non-unique elements in array")
    end
