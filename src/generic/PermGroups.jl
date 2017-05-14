@@ -335,8 +335,8 @@ function cycles(a::perm)
 end
 
 doc"""
-    odred(a::perm)
-> Returns the order of permutation `p`
+    order(a::perm)
+> Returns the order of permutation `a`.
 """
 order(a::perm) = lcm([length(c) for c in cycles(a)])
 
