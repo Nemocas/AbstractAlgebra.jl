@@ -192,6 +192,31 @@ function *(a::perm, b::perm)
    return G(d)
 end
 
+function ^(a::perm, n::Int)
+   if n <0
+      return inv(a)^-n
+   elseif n == 0
+      return one(parent(a))
+   elseif n == 1
+      return deepcopy(a)
+   elseif n == 2
+      return a*a
+   elseif n == 3
+      return a*a*a
+   else
+      new_perm = similar(a.d)
+      cyls = cycles(a)
+      for cycle in cyls
+         k = n % length(cycle)
+         shifted = circshift(cycle, -k)
+         for (idx,j) in enumerate(cycle)
+            new_perm[j] = shifted[idx]
+         end
+      end
+      return parent(a)(new_perm)
+   end
+end
+
 ###############################################################################
 #
 #   Inversion
