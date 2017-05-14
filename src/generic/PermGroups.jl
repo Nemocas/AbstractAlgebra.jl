@@ -196,7 +196,7 @@ function ^(a::perm, n::Int)
    if n <0
       return inv(a)^-n
    elseif n == 0
-      return one(parent(a))
+      return parent(a)()
    elseif n == 1
       return deepcopy(a)
    elseif n == 2
