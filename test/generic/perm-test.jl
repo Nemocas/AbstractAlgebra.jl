@@ -94,6 +94,14 @@ function test_perm_binary_ops()
       @test parity(a*b) == (parity(b)+parity(a)) % 2
    end
 
+   G = PermutationGroup(10)
+   p = G([9,5,4,7,3,8,2,10,1,6]) # (1,9)(2,5,3,4,7)(6,8,10)
+   @test p^0 == G()
+   @test p^1 == p
+   @test p^-1 == inv(p)
+   @test p^5 == p*p*p*p*p
+   @test p^-4 == inv(p)*inv(p)*inv(p)*inv(p)
+   @test p^2 * p^-2 == G()
    println("PASS")
 end
 
