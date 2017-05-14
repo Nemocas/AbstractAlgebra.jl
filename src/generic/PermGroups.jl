@@ -363,10 +363,10 @@ function (G::PermGroup)()
 end
 
 function (G::PermGroup)(a::Array{Int, 1}; checked=true)
-   length(a) != G.n && error("Unable to coerce to permutation")
+   length(a) != G.n && error("Unable to coerce to permutation: lengths differ")
    if checked
       Base.Set(a) != Base.Set(1:length(a)) && error("Unable to coerce to
-         permutation")
+         permutation: non-unique elements in array")
    end
    z = perm(a)
    z.parent = G
@@ -374,7 +374,7 @@ function (G::PermGroup)(a::Array{Int, 1}; checked=true)
 end
 
 function (G::PermGroup)(a::perm)
-   parent(a) != G && error("Unable to coerce to permutation")
+   parent(a) != G && error("Unable to coerce to permutation: wrong parent")
    return a
 end
 
