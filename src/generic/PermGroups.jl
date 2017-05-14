@@ -335,6 +335,12 @@ function cycles(a::perm)
 end
 
 doc"""
+    odred(a::perm)
+> Returns the order of permutation `p`
+"""
+order(a::perm) = lcm([length(c) for c in cycles(a)])
+
+doc"""
     matrix_repr(a::perm)
 > Return the permutation matrix representing `a` via natural embedding of the
 > permutation group into general linear group over ZZ
