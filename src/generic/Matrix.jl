@@ -3652,59 +3652,6 @@ function hnf_via_popov_reduce_column!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T},
    return nothing
 end
 
-# From branch 'hnf'
-function kb_canonical_row!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, r::Int, c::Int, with_trafo::Bool)
-   cu = canonical_unit(H[r,c])
-   if cu != 1
-      for j = c:cols(H)
-         H[r,j] = divexact(H[r,j],cu)
-      end
-      if with_trafo
-         for j = 1:cols(U)
-            U[r,j] = divexact(U[r,j],cu)
-         end
-      end
-   end
-   return nothing
-end
-
-#From branch 'hnf'
-function kb_sort_rows!{T <:RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int}, with_trafo::Bool, start_element::Int = 1)
-   m = rows(H)
-   n = cols(H)
-   pivot2 = zeros(Int, m)
-   for i = 1:n
-      if pivot[i] == 0
-         continue
-      end
-      pivot2[pivot[i]] = i
-   end
-
-   r1 = start_element
-   for i = start_element:n
-      r2 = pivot[i]
-      if r2 == 0
-         continue
-      end
-      if r1 != r2
-         swap_rows!(H, r1, r2)
-         with_trafo ? swap_rows!(U, r1, r2) : nothing
-         p = pivot2[r1]
-         pivot[i] = r1
-         if p != 0
-            pivot[p] = r2
-         end
-         pivot2[r1] = i
-         pivot2[r2] = p
-      end
-      r1 += 1
-      if r1 == m
-         break
-      end
-   end
-   return nothing
-end
-
 function hnf_via_popov!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, with_trafo::Bool = false)
    m = rows(H)
    n = cols(H)
