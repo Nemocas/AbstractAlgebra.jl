@@ -2553,7 +2553,7 @@ function fit!{T <: RingElem}(a::GenMPoly{T}, n::Int)
       resize!(A, n*N) 
       a.exps = reshape(A, N, n)
    end
-   return a
+   return nothing
 end
 
 function zero!{T <: RingElem}(a::GenMPoly{T})

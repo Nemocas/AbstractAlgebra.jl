@@ -673,7 +673,7 @@ function fit!(z::fq_nmod_poly, n::Int)
    ccall((:fq_nmod_poly_fit_length, :libflint), Void, 
          (Ptr{fq_nmod_poly}, Int, Ptr{FqNmodFiniteField}),
          &z, n, &base_ring(parent(z)))
-   return z
+   return nothing
 end
 
 function setcoeff!(z::fq_nmod_poly, n::Int, x::fq_nmod)

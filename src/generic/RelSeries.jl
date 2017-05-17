@@ -1044,7 +1044,7 @@ function fit!{T <: RingElem}(c::GenRelSeries{T}, n::Int)
          c.coeffs[i] = zero(base_ring(c))
       end
    end
-   return c
+   return nothing
 end
 
 function setcoeff!{T <: RingElem}(c::GenRelSeries{T}, n::Int, a::T)

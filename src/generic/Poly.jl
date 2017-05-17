@@ -2185,7 +2185,7 @@ function fit!{T <: RingElem}(c::GenPoly{T}, n::Int)
          c.coeffs[i] = zero(base_ring(c))
       end
    end
-   return c
+   return nothing
 end
 
 function zero!{T <: RingElem}(c::GenPoly{T})

@@ -816,7 +816,7 @@ end
 function fit!(z::acb_poly, n::Int)
    ccall((:acb_poly_fit_length, :libarb), Void, 
                     (Ptr{acb_poly}, Int), &z, n)
-   return z
+   return nothing
 end
 
 function setcoeff!(z::acb_poly, n::Int, x::fmpz)

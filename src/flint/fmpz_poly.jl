@@ -755,7 +755,7 @@ end
 function fit!(z::fmpz_poly, n::Int)
    ccall((:fmpz_poly_fit_length, :libflint), Void, 
                     (Ptr{fmpz_poly}, Int), &z, n)
-   return z
+   return nothing
 end
 
 function setcoeff!(z::fmpz_poly, n::Int, x::fmpz)

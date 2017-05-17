@@ -2234,7 +2234,7 @@ function charpoly_danilevsky_ff!{T <: RingElem}(S::Ring, A::MatElem{T})
          end
          if k == n - i
             b = S()
-            b = fit!(b, i + 1)
+            fit!(b, i + 1)
             b = setcoeff!(b, i, R(1))
             for k = 1:i
                b = setcoeff!(b, k - 1, -A[n - i + 1, n - k + 1]*d)
@@ -2315,7 +2315,7 @@ function charpoly_danilevsky_ff!{T <: RingElem}(S::Ring, A::MatElem{T})
       i += 1
    end
    b = S()
-   b = fit!(b, n + 1)
+   fit!(b, n + 1)
    b = setcoeff!(b, n, R(1))
    for i = 1:n
       b = setcoeff!(b, i - 1, -A[1, n - i + 1]*d)
@@ -2348,7 +2348,7 @@ function charpoly_danilevsky!{T <: RingElem}(S::Ring, A::MatElem{T})
          end
          if k == n - i
             b = S()
-            b = fit!(b, i + 1)
+            fit!(b, i + 1)
             b = setcoeff!(b, i, R(1))
             for k = 1:i
                b = setcoeff!(b, k - 1, -A[n - i + 1, n - k + 1])
@@ -2413,7 +2413,7 @@ function charpoly_danilevsky!{T <: RingElem}(S::Ring, A::MatElem{T})
       i += 1
    end
    b = S()
-   b = fit!(b, n + 1)
+   fit!(b, n + 1)
    b = setcoeff!(b, n, R(1))
    for i = 1:n
       b = setcoeff!(b, i - 1, -A[1, n - i + 1])
@@ -2577,7 +2577,7 @@ function minpoly{T <: FieldElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
       end
       c2 = c
       b = S()
-      b = fit!(b, r1)
+      fit!(b, r1)
       h = inv(A[r1, n + r1])
       for i = 1:r1
          b = setcoeff!(b, i - 1, A[r1, n + i]*h)
@@ -2673,7 +2673,7 @@ function minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
       end
       c2 = c
       b = S()
-      b = fit!(b, r1)
+      fit!(b, r1)
       for i = 1:r1
          b = setcoeff!(b, i - 1, A[r1, n + i])
       end

@@ -1697,7 +1697,7 @@ function fit!{T <: RingElem}(a::GenSparsePoly{T}, n::Int)
       resize!(a.coeffs, n)
       resize!(a.exps, n)
    end
-   return a
+   return nothing
 end
 
 function addmul!{T <: RingElem}(a::GenSparsePoly{T}, b::GenSparsePoly{T}, c::GenSparsePoly{T}, d::GenSparsePoly{T})
