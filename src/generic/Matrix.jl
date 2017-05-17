@@ -3366,40 +3366,6 @@ function rank_profile_popov{T <: PolyElem}(A::GenMat{T})
    return rank_profile
 end
 
-function rank_profile_popov{T <: PolyElem}(A::GenMat{T})
-   B = deepcopy(A)
-   m = rows(A)
-   n = cols(A)
-   U = zero(MatrixSpace(base_ring(A), 0, 0))
-   V = U
-   r = 0
-   rank_profile = Array{Int,1}(0)
-   pivots = Array{Array{Int,1}}(n)
-   for i = 1:n
-      pivots[i] = Array{Int}(0)
-   end
-   p = find_pivot_popov(B, 1)
-   if B[1,p] != 0
-      push!(pivots[p], 1)
-      r = 1
-      push!(rank_profile, 1)
-   end
-   for i = 2:m
-      p = find_pivot_popov(B, i)
-      B[i,p] != 0 ? push!(pivots[p], i) : nothing
-      weak_popov_with_pivots!(B, V, U, pivots, false, false, i)
-      s = 0
-      for j = 1:n
-         s += length(pivots[j])
-      end
-      if s != r
-         push!(rank_profile, i)
-         r = s
-      end
-   end
-   return rank_profile
-end
-
 function det_popov{T <: PolyElem}(A::GenMat{T})
    rows(A) != cols(A) && error("Not a square matrix in det_popov.")
    B = deepcopy(A)
@@ -3497,7 +3463,7 @@ end
 function asc_order_popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, pivots::Array{Array{Int,1}}, with_trafo::Bool)
    m = rows(P)
    n = cols(P)
-   pivots2 = Array{NTuple{Int,3},1}(m)
+   pivots2 = Array{NTuple{3,Int},1}(m)
    for r = 1:m
       pivots2[r] = (r,n,-1)
    end
