@@ -24,6 +24,7 @@ end
 
 type perm <: GroupElem
    d::Array{Int, 1}
+   cycles::Vector{Vector{Int}}
    parent::PermGroup
 
    function perm(n::Int)
@@ -315,23 +316,28 @@ doc"""
 > Decomposes permutation into disjoint cycles.
 """
 function cycles(a::perm)
-   to_visit = trues(a.d)
-   cycles = Vector{Vector{Int}}()
-   k = 1
-   while any(to_visit)
-      cycle = Vector{Int}()
-      k = findnext(to_visit, k)
-      to_visit[k] = false
-      push!(cycle, k)
-      next = a[k]
-      while next != k
-         push!(cycle, next)
-         to_visit[next] = false
-         next = a[next]
+   if isdefined(a, :cycles)
+      return a.cycles
+   else
+      to_visit = trues(a.d)
+      cycles = Vector{Vector{Int}}()
+      k = 1
+      while any(to_visit)
+         cycle = Vector{Int}()
+         k = findnext(to_visit, k)
+         to_visit[k] = false
+         push!(cycle, k)
+         next = a[k]
+         while next != k
+            push!(cycle, next)
+            to_visit[next] = false
+            next = a[next]
+         end
+         push!(cycles, cycle)
       end
-      push!(cycles, cycle)
+      a.cycles = cycles
+      return cycles
    end
-   return cycles
 end
 
 doc"""
