@@ -201,9 +201,9 @@ function ^(a::perm, n::Int)
    elseif n == 1
       return deepcopy(a)
    elseif n == 2
-      return a*a
+      return parent(a)(a.d[a.d])
    elseif n == 3
-      return a*a*a
+      return parent(a)(a.d[a.d[a.d]])
    else
       new_perm = similar(a.d)
       cyls = cycles(a)
