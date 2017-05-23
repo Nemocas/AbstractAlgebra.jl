@@ -180,6 +180,7 @@ end
 ###############################################################################
 
 doc"""
+    *(a::perm, b::perm)
 > Return the composition of the two permutations, i.e. $a\circ b$. In other
 > words, the permutation corresponding to applying $b$ first, then $a$, is
 > returned.
@@ -193,6 +194,15 @@ function *(a::perm, b::perm)
    return G(d)
 end
 
+doc"""
+    ^(a::perm, n::Int)
+> Return the `n`-th power of a permutation `a`. By default Nemo computes powers
+> by cycle decomposition of `a`. `Nemo.power_by_squaring` provides a different
+> method for powering which may or may not be faster, depending on the
+> particuar case. Due to caching of cycle structure repeatedly powering should
+> be faster with the default method. NOTE: cycle structure is not computed
+> for `n<4`.
+"""
 function ^(a::perm, n::Int)
    if n <0
       return inv(a)^-n
