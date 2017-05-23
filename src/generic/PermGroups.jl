@@ -218,6 +218,37 @@ function ^(a::perm, n::Int)
    end
 end
 
+function power_by_squaring(a::perm, b::Int)
+   if n <0
+      return inv(a)^-n
+   elseif n == 0
+      return parent(a)()
+   elseif n == 1
+      return deepcopy(a)
+   elseif n == 2
+      return parent(a)(a.d[a.d])
+   elseif n == 3
+      return parent(a)(a.d[a.d[a.d]])
+   else
+      bit = ~((~UInt(0)) >> 1)
+      while (UInt(bit) & b) == 0
+         bit >>= 1
+      end
+      cache1 = deepcopy(a.d)
+      cache2 = deepcopy(a.d)
+      bit >>= 1
+      while bit != 0
+         cache2 = cache1[cache1]
+         cache1 = cache2
+         if (UInt(bit) & b) != 0
+            cache1 = cache1[a.d]
+         end
+         bit >>= 1
+      end
+      return parent(a)(cache1)
+   end
+end
+
 ###############################################################################
 #
 #   Inversion
