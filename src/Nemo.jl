@@ -127,7 +127,7 @@ end
 ################################################################################
 
 function versioninfo()
-  print("Nemo version 0.6.0 \n")
+  print("Nemo version 0.6.2 \n")
   nemorepo = Pkg.dir("Nemo")
 
   print("Nemo: ")
