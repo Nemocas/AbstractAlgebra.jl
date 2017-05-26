@@ -168,7 +168,7 @@ function test_fmpz_gcd_lcm()
 
    @test gcd(a, b) == 2
 
-   @test gcd(fmpz[]) == 1
+   @test_throws ErrorException gcd(fmpz[])
 
    @test gcd(fmpz[8]) == 8
 
@@ -180,7 +180,7 @@ function test_fmpz_gcd_lcm()
 
    @test lcm(a, b) == 156
  
-   @test lcm(fmpz[]) == 1
+   @test_throws ErrorException lcm(fmpz[])
 
    @test lcm(fmpz[2]) == 2
 

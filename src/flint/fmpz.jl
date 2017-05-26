@@ -842,9 +842,9 @@ doc"""
 """
 function gcd(x::Array{fmpz, 1})
    if length(x) == 0
-     return fmpz(1)
+      error("Array must not be empty")
    elseif length(x) == 1
-     return x[1]
+      return x[1]
    end
 
    z = fmpz()
@@ -855,7 +855,7 @@ function gcd(x::Array{fmpz, 1})
       ccall((:fmpz_gcd, :libflint), Void, 
             (Ptr{fmpz}, Ptr{fmpz}, Ptr{fmpz}), &z, &z, &x[i])
       if z == 1
-        return z
+         return z
       end
    end
 
@@ -881,7 +881,7 @@ doc"""
 """
 function lcm(x::Array{fmpz, 1})
    if length(x) == 0
-      return fmpz(1)
+      error("Array must not be empty")
    elseif length(x) == 1
       return x[1]
    end
