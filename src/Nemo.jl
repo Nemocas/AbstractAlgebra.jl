@@ -48,6 +48,10 @@ if VERSION < v"0.6-"
    import Base: isprime, factor, parity, sub, call
 end
 
+if VERSION >= v"0.7.0-DEV.264" # julia started exporting sincos
+   import Base: sincos
+end
+
 include("AbstractTypes.jl")
 
 ###############################################################################
