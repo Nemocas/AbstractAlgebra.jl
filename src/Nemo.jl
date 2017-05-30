@@ -48,6 +48,10 @@ if VERSION < v"0.6-"
    import Base: isprime, factor, parity, sub, call
 end
 
+if VERSION >= v"0.7.0-DEV.264" # julia started exporting sincos
+   import Base: sincos
+end
+
 include("AbstractTypes.jl")
 
 ###############################################################################
@@ -127,8 +131,8 @@ end
 ################################################################################
 
 function versioninfo()
-  print("Nemo version 0.6.0 \n")
-  nemorepo = Pkg.dir("Nemo")
+  print("Nemo version 0.6.2 \n")
+  nemorepo = dirname(dirname(@__FILE__))
 
   print("Nemo: ")
   prepo = Base.LibGit2.GitRepo(nemorepo)
