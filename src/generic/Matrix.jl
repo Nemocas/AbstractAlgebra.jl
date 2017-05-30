@@ -10,7 +10,7 @@ export MatrixSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
        powers, similarity!, solve, solve_rational, hnf, hnf_with_trafo, snf,
        snf_with_trafo, weak_popov, weak_popov_with_trafo, extended_weak_popov,
        extended_weak_popov_with_trafo, rank_profile_popov, hnf_via_popov, 
-       hnf_via_popov_with_trafo, popov
+       hnf_via_popov_with_trafo, popov, det_popov
 
 ###############################################################################
 #
