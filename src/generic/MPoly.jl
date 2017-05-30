@@ -104,13 +104,13 @@ function gens{T <: RingElem}(a::GenMPolyRing{T}, ::Type{Val{:deglex}})
 end
 
 function gens{T <: RingElem}(a::GenMPolyRing{T}, ::Type{Val{:revlex}})
-   N = parent(a).N
+   N = a.N
    return [a([base_ring(a)(1)], reshape([UInt(N - i + 1 == j) for j = 1:a.num_vars], a.num_vars, 1))
       for i in 1:a.num_vars]
 end
 
 function gens{T <: RingElem}(a::GenMPolyRing{T}, ::Type{Val{:degrevlex}})
-   N = parent(a).N
+   N = a.N
    return [a([base_ring(a)(1)], reshape([UInt(1), [UInt(N - i == j) for j in 1:a.num_vars]...], a.num_vars + 1, 1))
       for i in 1:a.num_vars]
 end
