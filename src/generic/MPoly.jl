@@ -267,7 +267,7 @@ iszero(x::GenMPoly) = x.length == 0
 
 isconstant(x::GenMPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
 
-ismonomial(c::GenMPoly) = x.length == 1
+ismonomial(x::GenMPoly) = x.length == 1
 
 function normalise(a::GenMPoly, n::Int)
    while n > 0 && iszero(a.coeffs[n]) 
