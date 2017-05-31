@@ -860,6 +860,11 @@ end
 
 function det(M::GenMat{nmod_poly})
    rows(M) != cols(M) && error("Not a square matrix in det")
+
+   if is_prime(modulus(base_ring(M)))
+     return det_popov(M)
+   end
+
    try
       return det_fflu(M)
    catch

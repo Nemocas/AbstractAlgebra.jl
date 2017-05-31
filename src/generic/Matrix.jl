@@ -1557,6 +1557,13 @@ function det_interpolation{T <: PolyElem}(M::MatElem{T})
    return interpolate(R, x, d)
 end
 
+if VERSION >= v"0.6-"
+   function det{S <: FinFieldElem, T <: PolyElem{S}}(M::MatElem{T})
+      rows(M) != cols(M) && error("Not a square matrix in det")
+      return det_popov(M)
+   end
+end
+
 function det{T <: PolyElem}(M::MatElem{T})
    rows(M) != cols(M) && error("Not a square matrix in det")
    try
