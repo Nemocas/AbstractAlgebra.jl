@@ -335,7 +335,7 @@ isunit(::PolyElem)
 ```
 
 ```@docs
-isonomial(::PolyElem)
+ismonomial(::PolyElem)
 ```
 
 ```@docs

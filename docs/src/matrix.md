@@ -995,6 +995,19 @@ N = hnf_modular_eldiv(A, fmpz(27))
 ishnf(M)
 ```
 
+## (Weak) Popov form
+
+Nemo provdes algorithms for computing the (weak) Popov of a matrix with entries
+in a univariate polynomial ring over a field.
+
+```@docs
+weak_popov{T <: PolyElem}(::GenMat{T})
+weak_popov_with_trafo{T <: PolyElem}(::GenMat{T})
+popov{T <: PolyElem}(::GenMat{T})
+popov_with_trafo{T <: PolyElem}(::GenMat{T})
+det_popov{T <: PolyElem}(::GenMat{T})
+```
+
 ## Lattice basis reduction
 
 Nemo provides LLL lattice basis reduction. Optionally one can specify the setup

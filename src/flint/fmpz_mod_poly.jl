@@ -424,6 +424,8 @@ function divexact(x::fmpz_mod_poly, y::fmpz_mod_poly)
   return q
 end
 
+div(x::fmpz_mod_poly, y::fmpz_mod_poly) = divexact(x,y)
+
 ################################################################################
 #
 #  Ad hoc exact division
