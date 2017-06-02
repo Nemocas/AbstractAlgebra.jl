@@ -125,7 +125,7 @@ cd(wdir)
 
 if !ispath(joinpath(wdir, "mpfr-3.1.5"))
    println("Downloading MPFR sources ... ")
-   download("http://www.mpfr.org/mpfr-current/mpfr-3.1.5.tar.bz2", joinpath(wdir, "mpfr-3.1.5.tar.bz2"))
+   download("http://ftp.gnu.org/gnu/mpfr/mpfr-3.1.5.tar.bz2", joinpath(wdir, "mpfr-3.1.5.tar.bz2"))
    println("DONE")
 end
 
