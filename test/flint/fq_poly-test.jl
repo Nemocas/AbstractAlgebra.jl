@@ -1,6 +1,6 @@
 function test_fq_poly_constructors()
    print("fq_poly.constructors...")
- 
+
    R, x = FiniteField(fmpz(23), 5, "x")
    S, y = PolynomialRing(R, "y")
 
@@ -61,7 +61,7 @@ end
 
 function test_fq_poly_printing()
    print("fq_poly.printing...")
- 
+
    R, x = FiniteField(fmpz(23), 5, "x")
    S, y = PolynomialRing(R, "y")
    T, z = PolynomialRing(S, "z")
@@ -80,11 +80,11 @@ function test_fq_poly_manipulation()
    S, y = PolynomialRing(R, "y")
 
    @test iszero(zero(S))
-   
+
    @test isone(one(S))
 
    @test isgen(gen(S))
-   
+
    @test isunit(one(S))
 
    f = 2x*y + x^2 + 1
@@ -114,7 +114,7 @@ function test_fq_poly_binary_ops()
 
    f = x*y^2 + (x + 1)*y + 3
    g = (x + 1)*y + (x^3 + 2x + 2)
-   
+
    @test f - g == x*y^2+(-x^3-2*x+1)
 
    @test f + g == x*y^2+(2*x+2)*y+(x^3+2*x+5)
@@ -136,7 +136,7 @@ function test_fq_poly_adhoc_binary()
    @test f*4 == (4*x)*y^2+(4*x+4)*y+12
 
    @test 7*f == (7*x)*y^2+(7*x+7)*y+21
-   
+
    @test fmpz(5)*g == (5*x+5)*y+(5*x^3+10*x+10)
 
    @test g*fmpz(3) == (3*x+3)*y+(3*x^3+6*x+6)
@@ -186,7 +186,7 @@ function test_fq_poly_adhoc_comparison()
    R, x = FiniteField(fmpz(23), 5, "x")
    S, y = PolynomialRing(R, "y")
 
-   @test S(1) == 1 
+   @test S(1) == 1
 
    @test 1 != x + y
 
@@ -282,13 +282,13 @@ function test_fq_poly_modular_arithmetic()
    h = (3*x^3 + 2*x^2 + x + 7)*y^5 + 2x*y + 1
 
    @test invmod(f, g) == (19*x^4+16*x^3+14*x^2+9*x+13)*y+(13*x^4+19*x^3+4*x^2+19*x+18)
-   
+
    @test mulmod(f, g, h) == (15*x^4+11*x^3+15*x^2+5*x+2)*y^3+(5*x^4+8*x^3+8*x^2+6*x+1)*y^2+(5*x^3+4*x^2+5*x+2)*y+(x^3+x^2+x+1)
-   
+
    @test powmod(f, 3, h) == (17*x^4+14*x^3+7*x^2+20*x+5)*y^3+(20*x^4+7*x^3+16*x^2+x+10)*y^2+(x^4+6*x^3+17*x^2+16*x+21)*y+(3*x^4+5*x+1)
 
    @test powmod(f, -3, g) == (18*x^4+x^3+7*x^2+15*x+5)*y+(16*x^4+14*x^3+15*x^2+5*x+21)
-   
+
    println("PASS")
 end
 
@@ -331,9 +331,9 @@ function test_fq_poly_euclidean_division()
    l = (x + 1)*y^2 + (x^3 + 2x + 2)
 
    @test mod(k, l) == (18*x^4+5*x^3+17*x^2+7*x+1)*y+(5*x^4+17*x^3+6*x^2+15*x+1)
-   
+
    @test divrem(k, l) == ((18*x^4+5*x^3+18*x^2+5*x+3)*y+(5*x^4+18*x^3+5*x^2+18*x+21), (18*x^4+5*x^3+17*x^2+7*x+1)*y+(5*x^4+17*x^3+6*x^2+15*x+1))
- 
+
    println("PASS")
 end
 
@@ -424,7 +424,7 @@ function test_fq_poly_integral()
    S, y = PolynomialRing(R, "y")
 
    f = (x^2 + 2x + 1)*y^2 + (x + 1)*y - 2x + 4
-   
+
    @test integral(f) == (8*x^2+16*x+8)*y^3+(12*x+12)*y^2+(21*x+4)*y
 
    println("PASS")
@@ -497,6 +497,38 @@ function test_fq_poly_inflation_deflation()
    println("PASS")
 end
 
+function test_fq_poly_isirreducible()
+  print("fq_poly.isirreducible...")
+
+  R, a = FiniteField(fmpz(23), 1, "a")
+  Rx, x = PolynomialRing(R, "x")
+
+  f = x^6 + x^4 + 2 *x^2
+
+  @test !isirreducible(f)
+
+  @test isirreducible(x)
+
+  @test isirreducible(x^16+2*x^9+x^8+x^2+x+1)
+
+  println("PASS")
+end
+
+function test_fq_poly_issquarefree()
+  print("fq_poly.issquarefree...")
+
+  R, a = FiniteField(fmpz(23), 1, "a")
+  Rx, x = PolynomialRing(R, "x")
+
+  f = x^6 + x^4 + 2 *x^2
+
+  @test !issquarefree(f)
+
+  @test issquarefree((x+1)*(x+2)*(x+3))
+
+  println("PASS")
+end
+
 function test_fq_poly_factor()
    print("fq_poly.factor()...")
 
@@ -508,14 +540,26 @@ function test_fq_poly_factor()
 
    A = factor(f*g)
 
-   #@test length(A) == 3
    @test unit(A)*prod([h^e for (h,e) = A]) == f*g
-  
+
+   A = factor_squarefree(f^2*g)
+
+   @test unit(A)*prod([h^e for (h,e)=A]) == f^2*g
+
+   @test unit(A)*prod([h^e for (h,e)=A]) == f^2*g
+   @test divexact(g, lead(g)) in A
+   @test A[divexact(g, lead(g))] == 1
+   @test divexact(f, lead(f)) in A
+   @test A[divexact(f, lead(f))] == 2
+
+   C = factor_shape(f^2 * g)
+   @test C == Dict(2 => 3, 1 => 1)
+
    B = factor_distinct_deg((y + 1)*g*(y^5+y^3+y+1))
 
    @test length(B) == 3
    @test 11*prod([h for (e,h) = B]) == ((y + 1)*g*(y^5+y^3+y+1))
-   
+
    println("PASS")
 end
 
@@ -573,6 +617,8 @@ function test_fq_poly()
    test_fq_poly_gcdx()
    test_fq_poly_special()
    test_fq_poly_inflation_deflation()
+   test_fq_poly_isirreducible()
+   test_fq_poly_issquarefree()
    test_fq_poly_factor()
    test_fq_poly_remove_valuation()
 

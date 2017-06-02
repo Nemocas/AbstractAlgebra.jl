@@ -537,10 +537,45 @@ end
 
 ################################################################################
 #
+#  Irreducibility
+#
+################################################################################
+
+doc"""
+    isirreducible(x::fq_poly)
+> Return `true` if $x$ is irreducible, otherwise return `false`.
+"""
+function isirreducible(x::fq_poly)
+  return Bool(ccall((:fq_poly_is_irreducible, :libflint), Int32,
+                    (Ptr{fq_poly}, Ptr{FqFiniteField} ),
+                    &x, &base_ring(parent(x))))
+end
+
+################################################################################
+#
+#  Squarefree testing
+#
+################################################################################
+
+doc"""
+    issquarefree(x::fq_poly)
+> Return `true` if $x$ is squarefree, otherwise return `false`.
+"""
+function issquarefree(x::fq_poly)
+   return Bool(ccall((:fq_poly_is_squarefree, :libflint), Int32, 
+       (Ptr{fq_poly}, Ptr{FqFiniteField}), &x, &base_ring(parent(x))))
+end
+
+################################################################################
+#
 #  Factorization
 #
 ################################################################################
 
+doc"""
+    factor(x::fq_poly)
+> Return the factorisation of $x$.
+"""
 function factor(x::fq_poly)
    fac, z = _factor(x)
    return Fac(parent(x)(z), fac)
@@ -564,8 +599,38 @@ function _factor(x::fq_poly)
       res[f] = e
    end
    return res, a
-end  
+end
 
+doc"""
+    factor_squarefree(x::fq_poly)
+> Return the squarefree factorisation of $x$.
+"""
+function factor_squarefree(x::fq_poly)
+  # _factor_squareefree does weird things if the polynomial is not monic
+  return Fac(parent(x)(lead(x)), _factor_squarefree(divexact(x, lead(x))))
+end
+
+function _factor_squarefree(x::fq_poly)
+  F = base_ring(parent(x))
+  fac = fq_poly_factor(F)
+  ccall((:fq_poly_factor_squarefree, :libflint), UInt,
+        (Ptr{fq_poly_factor}, Ptr{fq_poly}, Ptr{FqFiniteField}), &fac, &x, &F)
+  res = Dict{fq_poly,Int}()
+  for i in 1:fac.num
+    f = parent(x)()
+    ccall((:fq_poly_factor_get_poly, :libflint), Void,
+          (Ptr{fq_poly}, Ptr{fq_poly_factor}, Int,
+          Ptr{FqFiniteField}), &f, &fac, i-1, &F)
+    e = unsafe_load(fac.exp, i)
+    res[f] = e
+  end
+  return res
+end
+
+doc"""
+    factor_distinct_deg(x::fq_poly)
+> Return the distinct degree factorisation of a squarefree polynomial $x$.
+"""
 function factor_distinct_deg(x::fq_poly)
    R = parent(x)
    F = base_ring(R)

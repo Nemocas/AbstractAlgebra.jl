@@ -726,7 +726,7 @@ doc"""
 """
 function issquarefree(x::nmod_poly)
    !is_prime(modulus(x)) && error("Modulus not prime in issquarefree")
-   return Bool(ccall((:nmod_poly_is_squarefree, :libflint), Int32, 
+   return Bool(ccall((:nmod_poly_is_squarefree, :libflint), Int32,
        (Ptr{nmod_poly}, ), &x))
 end
 
@@ -759,7 +759,7 @@ function _factor(x::nmod_poly)
     res[f] = e
   end
   return res, base_ring(x)(z)
-end  
+end
 
 doc"""
     factor_squarefree(x::nmod_poly)
@@ -782,8 +782,8 @@ function _factor_squarefree(x::nmod_poly)
     e = unsafe_load(fac.exp,i)
     res[f] = e
   end
-  return res 
-end  
+  return res
+end
 
 doc"""
     factor_distinct_deg(x::nmod_poly)
@@ -805,8 +805,8 @@ function factor_distinct_deg(x::nmod_poly)
             (Ptr{nmod_poly}, Ptr{nmod_poly_factor}, Int), &f, &fac, i-1)
     res[degs[i]] = f
   end
-  return res 
-end  
+  return res
+end
 
 function factor_shape{T <: RingElem}(x::PolyElem{T})
   res = Dict{Int, Int}()
@@ -823,7 +823,7 @@ function factor_shape{T <: RingElem}(x::PolyElem{T})
     end
   end
   return res
-end  
+end
 
 ################################################################################
 #
