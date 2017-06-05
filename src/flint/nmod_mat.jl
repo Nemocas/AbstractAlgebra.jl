@@ -18,6 +18,8 @@ export nmod_mat, NmodMatSpace, getindex, setindex!, set_entry!, deepcopy, rows,
 
 parent_type(::Type{nmod_mat}) = NmodMatSpace
 
+elem_type(::NmodMatSpace) = nmod_mat
+
 function _checkbounds(I::Int, J::Int)
    J >= 1 && J <= I
 end
