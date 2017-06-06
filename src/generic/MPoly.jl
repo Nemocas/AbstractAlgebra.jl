@@ -1861,7 +1861,7 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{
       n[i] == 0 && error("Division by zero in divrem_monagan_pearce")
    end
    if m == 0
-      return [par() for i in 1:len], [par() for i in 1:len]
+      return [par() for i in 1:len], par()
    end
    mask1 = UInt(1) << (bits - 1)
    mask = UInt(0)
@@ -2607,7 +2607,7 @@ function (a::GenMPolyRing{T}){T <: RingElem}(b::PolyElem{T})
 end
 
 function (a::GenMPolyRing{T}){T <: RingElem}(b::Array{T, 1}, m::Array{UInt, 2})
-   if length(b) > 0
+   if length(b) > 0 && isdefined(b, 1)
       parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end
    z = GenMPoly{T}(a, b, m)
