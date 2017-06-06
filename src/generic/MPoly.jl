@@ -2276,6 +2276,7 @@ function divrem{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{T}, 1})
          b1[i].length = b[i].length
       end
       q, r = divrem_monagan_pearce(a1, b1, exp_bits, maxn)
+      println(q, r)
       eq = [Array(UInt, N, length(q[i])) for i in 1:len]
       for i = 1:len
          unpack_monomials(eq[i], q[i].exps, k, exp_bits)  
