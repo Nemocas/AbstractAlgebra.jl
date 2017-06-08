@@ -743,19 +743,19 @@ end
 #
 ###############################################################################
 
-Base.promote_rule(::Type{arb_poly}, ::Type{Float64}) = arb_poly
+promote_rule(::Type{arb_poly}, ::Type{Float64}) = arb_poly
 
-Base.promote_rule(::Type{arb_poly}, ::Type{Int}) = arb_poly
+promote_rule(::Type{arb_poly}, ::Type{Int}) = arb_poly
 
-Base.promote_rule(::Type{arb_poly}, ::Type{fmpz}) = arb_poly
+promote_rule(::Type{arb_poly}, ::Type{fmpz}) = arb_poly
 
-Base.promote_rule(::Type{arb_poly}, ::Type{fmpq}) = arb_poly
+promote_rule(::Type{arb_poly}, ::Type{fmpq}) = arb_poly
 
-Base.promote_rule(::Type{arb_poly}, ::Type{arb}) = arb_poly
+promote_rule(::Type{arb_poly}, ::Type{arb}) = arb_poly
 
-Base.promote_rule(::Type{arb_poly}, ::Type{fmpz_poly}) = arb_poly
+promote_rule(::Type{arb_poly}, ::Type{fmpz_poly}) = arb_poly
 
-Base.promote_rule(::Type{arb_poly}, ::Type{fmpq_poly}) = arb_poly
+promote_rule(::Type{arb_poly}, ::Type{fmpq_poly}) = arb_poly
 
 ################################################################################
 #

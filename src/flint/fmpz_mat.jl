@@ -1212,9 +1212,9 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fmpz_mat}, ::Type{T}) = fmpz_mat
+promote_rule{T <: Integer}(::Type{fmpz_mat}, ::Type{T}) = fmpz_mat
 
-Base.promote_rule(::Type{fmpz_mat}, ::Type{fmpz}) = fmpz_mat
+promote_rule(::Type{fmpz_mat}, ::Type{fmpz}) = fmpz_mat
 
 ###############################################################################
 #

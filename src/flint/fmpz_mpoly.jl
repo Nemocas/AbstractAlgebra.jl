@@ -390,9 +390,9 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{V <: Integer}(::Type{fmpz_mpoly}, ::Type{V}) = fmpz_mpoly
+promote_rule{V <: Integer}(::Type{fmpz_mpoly}, ::Type{V}) = fmpz_mpoly
 
-Base.promote_rule(::Type{fmpz_mpoly}, ::Type{fmpz}) = fmpz_mpoly
+promote_rule(::Type{fmpz_mpoly}, ::Type{fmpz}) = fmpz_mpoly
 
 ###############################################################################
 #

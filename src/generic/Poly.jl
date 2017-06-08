@@ -2281,16 +2281,16 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: RingElem, V <: Integer}(::Type{GenPoly{T}}, ::Type{V}) = GenPoly{T}
+promote_rule{T <: RingElem, V <: Integer}(::Type{GenPoly{T}}, ::Type{V}) = GenPoly{T}
 
-Base.promote_rule{T <: RingElem}(::Type{GenPoly{T}}, ::Type{T}) = GenPoly{T}
+promote_rule{T <: RingElem}(::Type{GenPoly{T}}, ::Type{T}) = GenPoly{T}
 
 function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenPoly{T}}, ::Type{GenPoly{U}})
-   Base.promote_rule(T, GenPoly{U}) == T ? GenPoly{T} : Union{}
+   promote_rule(T, GenPoly{U}) == T ? GenPoly{T} : Union{}
 end
 
-function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenPoly{T}}, ::Type{U})
-   Base.promote_rule(T, U) == T ? GenPoly{T} : promote_rule1(U, GenPoly{T})
+function promote_rule{T <: RingElem, U <: RingElem}(::Type{GenPoly{T}}, ::Type{U})
+   promote_rule(T, U) == T ? GenPoly{T} : promote_rule1(U, GenPoly{T})
 end
 
 ###############################################################################

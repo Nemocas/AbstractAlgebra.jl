@@ -858,27 +858,27 @@ end
 #
 ###############################################################################
 
-Base.promote_rule(::Type{acb_poly}, ::Type{Float64}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{Float64}) = acb_poly
 
-Base.promote_rule(::Type{acb_poly}, ::Type{Complex{Float64}}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{Complex{Float64}}) = acb_poly
 
-Base.promote_rule(::Type{acb_poly}, ::Type{Int}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{Int}) = acb_poly
 
-Base.promote_rule(::Type{acb_poly}, ::Type{Complex{Int}}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{Complex{Int}}) = acb_poly
 
-Base.promote_rule(::Type{acb_poly}, ::Type{fmpz}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{fmpz}) = acb_poly
 
-Base.promote_rule(::Type{acb_poly}, ::Type{fmpq}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{fmpq}) = acb_poly
 
-Base.promote_rule(::Type{acb_poly}, ::Type{arb}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{arb}) = acb_poly
 
-Base.promote_rule(::Type{acb_poly}, ::Type{acb}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{acb}) = acb_poly
 
-Base.promote_rule(::Type{acb_poly}, ::Type{fmpz_poly}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{fmpz_poly}) = acb_poly
 
-Base.promote_rule(::Type{acb_poly}, ::Type{fmpq_poly}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{fmpq_poly}) = acb_poly
 
-Base.promote_rule(::Type{acb_poly}, ::Type{arb_poly}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{arb_poly}) = acb_poly
 
 ################################################################################
 #

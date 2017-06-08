@@ -2276,7 +2276,6 @@ function divrem{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{T}, 1})
          b1[i].length = b[i].length
       end
       q, r = divrem_monagan_pearce(a1, b1, exp_bits, maxn)
-      println(q, r)
       eq = [Array(UInt, N, length(q[i])) for i in 1:len]
       for i = 1:len
          unpack_monomials(eq[i], q[i].exps, k, exp_bits)  
@@ -2766,16 +2765,16 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: RingElem, V <: Integer}(::Type{GenMPoly{T}}, ::Type{V}) = GenMPoly{T}
+promote_rule{T <: RingElem, V <: Integer}(::Type{GenMPoly{T}}, ::Type{V}) = GenMPoly{T}
 
-Base.promote_rule{T <: RingElem}(::Type{GenMPoly{T}}, ::Type{T}) = GenMPoly{T}
+promote_rule{T <: RingElem}(::Type{GenMPoly{T}}, ::Type{T}) = GenMPoly{T}
 
 function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenMPoly{T}}, ::Type{GenMPoly{U}})
-   Base.promote_rule(T, GenMPoly{U}) == T ? GenMPoly{T} : Union{}
+   promote_rule(T, GenMPoly{U}) == T ? GenMPoly{T} : Union{}
 end
 
-function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenMPoly{T}}, ::Type{U})
-   Base.promote_rule(T, U) == T ? GenMPoly{T} : promote_rule1(U, GenMPoly{T})
+function promote_rule{T <: RingElem, U <: RingElem}(::Type{GenMPoly{T}}, ::Type{U})
+   promote_rule(T, U) == T ? GenMPoly{T} : promote_rule1(U, GenMPoly{T})
 end
 
 ###############################################################################

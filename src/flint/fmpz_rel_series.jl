@@ -630,9 +630,9 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fmpz_rel_series}, ::Type{T}) = fmpz_rel_series
+promote_rule{T <: Integer}(::Type{fmpz_rel_series}, ::Type{T}) = fmpz_rel_series
 
-Base.promote_rule(::Type{fmpz_rel_series}, ::Type{fmpz}) = fmpz_rel_series
+promote_rule(::Type{fmpz_rel_series}, ::Type{fmpz}) = fmpz_rel_series
 
 ###############################################################################
 #

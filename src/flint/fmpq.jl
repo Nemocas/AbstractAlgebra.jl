@@ -779,6 +779,8 @@ Base.promote_rule{T <: Integer}(::Type{fmpq}, ::Type{T}) = fmpq
 
 Base.promote_rule(::Type{fmpq}, ::Type{fmpz}) = fmpq
 
+promote_rule(::Type{fmpq}, ::Type{fmpz}) = fmpq
+
 Base.promote_rule{T <: Integer}(::Type{fmpq}, ::Type{Rational{T}}) = fmpq
 
 convert(::Type{Rational{BigInt}}, a::fmpq) = Rational(a)

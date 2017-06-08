@@ -1169,20 +1169,20 @@ end
 #
 ###############################################################################
 
-function Base.promote_rule{T <: RingElem, V <: Integer}(::Type{GenRelSeries{T}}, ::Type{V})
+function promote_rule{T <: RingElem, V <: Integer}(::Type{GenRelSeries{T}}, ::Type{V})
    return GenRelSeries{T}
 end
 
-function Base.promote_rule{T <: RingElem}(::Type{GenRelSeries{T}}, ::Type{T})
+function promote_rule{T <: RingElem}(::Type{GenRelSeries{T}}, ::Type{T})
    return GenRelSeries{T}
 end
 
 function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenRelSeries{T}}, ::Type{GenRelSeries{U}})
-   Base.promote_rule(T, GenRelSeries{U}) == T ? GenRelSeries{T} : Union{}
+   promote_rule(T, GenRelSeries{U}) == T ? GenRelSeries{T} : Union{}
 end
 
-function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenRelSeries{T}}, ::Type{U})
-   Base.promote_rule(T, U) == T ? GenRelSeries{T} : promote_rule1(U, GenRelSeries{T})
+function promote_rule{T <: RingElem, U <: RingElem}(::Type{GenRelSeries{T}}, ::Type{U})
+   promote_rule(T, U) == T ? GenRelSeries{T} : promote_rule1(U, GenRelSeries{T})
 end
 
 ###############################################################################

@@ -709,11 +709,11 @@ end
 #
 ################################################################################
 
-Base.promote_rule{V <: Integer}(::Type{fq_poly}, ::Type{V}) = fq_poly
+promote_rule{V <: Integer}(::Type{fq_poly}, ::Type{V}) = fq_poly
 
-Base.promote_rule(::Type{fq_poly}, ::Type{fmpz}) = fq_poly
+promote_rule(::Type{fq_poly}, ::Type{fmpz}) = fq_poly
 
-Base.promote_rule(::Type{fq_poly}, ::Type{fq}) = fq_poly
+promote_rule(::Type{fq_poly}, ::Type{fq}) = fq_poly
 
 ###############################################################################
 #

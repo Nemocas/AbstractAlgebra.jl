@@ -753,16 +753,16 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: RingElem}(::Type{GenFrac{T}}, ::Type{T}) = GenFrac{T}
+promote_rule{T <: RingElem}(::Type{GenFrac{T}}, ::Type{T}) = GenFrac{T}
 
-Base.promote_rule{T <: RingElem, U <: Integer}(::Type{GenFrac{T}}, ::Type{U}) = GenFrac{T}
+promote_rule{T <: RingElem, U <: Integer}(::Type{GenFrac{T}}, ::Type{U}) = GenFrac{T}
 
 function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenFrac{T}}, ::Type{GenFrac{U}})
-   Base.promote_rule(T, GenFrac{U}) == T ? GenFrac{T} : Union{}
+   promote_rule(T, GenFrac{U}) == T ? GenFrac{T} : Union{}
 end
 
-function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenFrac{T}}, ::Type{U})
-   Base.promote_rule(T, U) == T ? GenFrac{T} : promote_rule1(U, GenFrac{T})
+function promote_rule{T <: RingElem, U <: RingElem}(::Type{GenFrac{T}}, ::Type{U})
+   promote_rule(T, U) == T ? GenFrac{T} : promote_rule1(U, GenFrac{T})
 end
 
 ###############################################################################

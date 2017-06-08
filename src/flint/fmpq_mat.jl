@@ -723,13 +723,13 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fmpq_mat}, ::Type{T}) = fmpq_mat
+promote_rule{T <: Integer}(::Type{fmpq_mat}, ::Type{T}) = fmpq_mat
 
-Base.promote_rule(::Type{fmpq_mat}, ::Type{fmpq}) = fmpq_mat
+promote_rule(::Type{fmpq_mat}, ::Type{fmpq}) = fmpq_mat
 
-Base.promote_rule(::Type{fmpq_mat}, ::Type{fmpz}) = fmpq_mat
+promote_rule(::Type{fmpq_mat}, ::Type{fmpz}) = fmpq_mat
 
-Base.promote_rule{T <: Integer}(::Type{fmpq_mat}, ::Type{Rational{T}}) = fmpq_mat
+promote_rule{T <: Integer}(::Type{fmpq_mat}, ::Type{Rational{T}}) = fmpq_mat
 
 ###############################################################################
 #

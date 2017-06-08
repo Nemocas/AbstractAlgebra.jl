@@ -506,16 +506,18 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: RingElem}(::Type{GenRes{T}}, ::Type{T}) = GenRes{T}
+promote_rule(::Type{GenRes{fmpz}}, ::Type{fmpz}) = GenRes{fmpz}
 
-Base.promote_rule{T <: RingElem, U <: Integer}(::Type{GenRes{T}}, ::Type{U}) = GenRes{T}
+promote_rule{T <: RingElem}(::Type{GenRes{T}}, ::Type{T}) = GenRes{T}
+
+promote_rule{T <: RingElem, U <: Integer}(::Type{GenRes{T}}, ::Type{U}) = GenRes{T}
 
 function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenRes{T}}, ::Type{GenRes{U}})
-   Base.promote_rule(T, GenRes{U}) == T ? GenRes{T} : Union{}
+   promote_rule(T, GenRes{U}) == T ? GenRes{T} : Union{}
 end
 
-function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenRes{T}}, ::Type{U})
-   Base.promote_rule(T, U) == T ? GenRes{T} : promote_rule1(U, GenRes{T})
+function promote_rule{T <: RingElem, U <: RingElem}(::Type{GenRes{T}}, ::Type{U})
+   promote_rule(T, U) == T ? GenRes{T} : promote_rule1(U, GenRes{T})
 end
 
 ###############################################################################

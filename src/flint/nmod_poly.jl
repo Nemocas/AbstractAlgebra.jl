@@ -950,11 +950,11 @@ end
 #
 ################################################################################
 
-Base.promote_rule{V <: Integer}(::Type{nmod_poly}, ::Type{V}) = nmod_poly
+promote_rule{V <: Integer}(::Type{nmod_poly}, ::Type{V}) = nmod_poly
 
-Base.promote_rule(::Type{nmod_poly}, ::Type{fmpz}) = nmod_poly
+promote_rule(::Type{nmod_poly}, ::Type{fmpz}) = nmod_poly
 
-Base.promote_rule(::Type{nmod_poly}, ::Type{GenRes{fmpz}}) = nmod_poly
+promote_rule(::Type{nmod_poly}, ::Type{GenRes{fmpz}}) = nmod_poly
 
 ###############################################################################
 #
