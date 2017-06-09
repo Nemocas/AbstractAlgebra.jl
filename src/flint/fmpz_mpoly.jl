@@ -444,5 +444,3 @@ function PolynomialRing(R::FlintIntegerRing, s::Array{String, 1}; cached::Bool =
    return tuple(parent_obj, gens(parent_obj))
 end
 
-
-

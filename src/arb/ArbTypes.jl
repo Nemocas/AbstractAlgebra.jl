@@ -22,15 +22,13 @@ arb_check_prec(p::Int) = (p >= 2 && p < (typemax(Int) >> 4)) || throw(ArgumentEr
 #
 ################################################################################
 
-const ArbFieldID = ObjectIdDict()
-
 type ArbField <: Field
   prec::Int
 
-  function ArbField(p::Int = 256; cached = true)
+  function ArbField(p::Int = 256; cached::Bool = true)
     arb_check_prec(p)
     if haskey(ArbFieldID, p)
-      return ArbFieldID[p]::ArbField
+      return ArbFieldID[p]
     else
       z = new(p)
       if cached
@@ -40,6 +38,8 @@ type ArbField <: Field
     end
   end
 end
+
+const ArbFieldID = Dict{Int, ArbField}()
 
 prec(x::ArbField) = x.prec
 
@@ -141,15 +141,13 @@ end
 #
 ################################################################################
 
-const AcbFieldID = ObjectIdDict()
-
 type AcbField <: Field
   prec::Int
 
-  function AcbField(p::Int = 256; cached = true)
+  function AcbField(p::Int = 256; cached::Bool = true)
     arb_check_prec(p)
     if haskey(AcbFieldID, p)
-      return AcbFieldID[p]::AcbField
+      return AcbFieldID[p]
     else
       z = new(p)
       if cached
@@ -159,6 +157,8 @@ type AcbField <: Field
     end
   end
 end
+
+const AcbFieldID = Dict{Int, AcbField}()
 
 prec(x::AcbField) = x.prec
 
@@ -230,15 +230,13 @@ end
 #
 ################################################################################
 
-const ArbPolyRingID = ObjectIdDict()
-
 type ArbPolyRing <: PolyRing{arb}
   base_ring::ArbField
   S::Symbol
 
-  function ArbPolyRing(R::ArbField, S::Symbol, cached = true)
+  function ArbPolyRing(R::ArbField, S::Symbol, cached::Bool = true)
     if haskey(ArbPolyRingID, (R, S))
-      return ArbPolyRingID[R, S]::ArbPolyRing
+      return ArbPolyRingID[R, S]
     else
       z = new(R, S)
       if cached
@@ -248,6 +246,8 @@ type ArbPolyRing <: PolyRing{arb}
     end
   end
 end
+
+const ArbPolyRingID = Dict{Tuple{ArbField, Symbol}, ArbPolyRing}()
 
 type arb_poly <: PolyElem{arb}
   coeffs::Ptr{Void}
@@ -338,15 +338,13 @@ base_ring(a::ArbPolyRing) = a.base_ring
 #
 ################################################################################
 
-const AcbPolyRingID = ObjectIdDict()
-
 type AcbPolyRing <: PolyRing{acb}
   base_ring::AcbField
   S::Symbol
 
-  function AcbPolyRing(R::AcbField, S::Symbol, cached = true)
+  function AcbPolyRing(R::AcbField, S::Symbol, cached::Bool = true)
     if haskey(AcbPolyRingID, (R, S))
-      return AcbPolyRingID[R, S]::AcbPolyRing
+      return AcbPolyRingID[R, S]
     else
       z = new(R, S)
       if cached
@@ -356,6 +354,8 @@ type AcbPolyRing <: PolyRing{acb}
     end
   end
 end
+
+const AcbPolyRingID = Dict{Tuple{AcbField, Symbol}, AcbPolyRing}()
 
 type acb_poly <: PolyElem{acb}
   coeffs::Ptr{Void}
@@ -457,16 +457,14 @@ base_ring(a::AcbPolyRing) = a.base_ring
 #
 ################################################################################
 
-const ArbMatSpaceID = ObjectIdDict()
-
 type ArbMatSpace <: MatSpace{arb}
   rows::Int
   cols::Int
   base_ring::ArbField
 
-  function ArbMatSpace(R::ArbField, r::Int, c::Int, cached = true)
+  function ArbMatSpace(R::ArbField, r::Int, c::Int, cached::Bool = true)
     if haskey(ArbMatSpaceID, (R, r, c))
-      return ArbMatSpaceID[(R, r, c)]::ArbMatSpace
+      return ArbMatSpaceID[(R, r, c)]
     else
       z = new(r, c, R)
       if cached
@@ -476,6 +474,8 @@ type ArbMatSpace <: MatSpace{arb}
     end
   end
 end
+
+const ArbMatSpaceID = Dict{Tuple{ArbField, Int, Int}, ArbMatSpace}()
 
 type arb_mat <: MatElem{arb}
   entries::Ptr{Void}
@@ -606,16 +606,14 @@ base_ring(a::ArbMatSpace) = a.base_ring
 #
 ################################################################################
 
-const AcbMatSpaceID = ObjectIdDict()
-
 type AcbMatSpace <: MatSpace{acb}
   rows::Int
   cols::Int
   base_ring::AcbField
 
-  function AcbMatSpace(R::AcbField, r::Int, c::Int, cached = true)
+  function AcbMatSpace(R::AcbField, r::Int, c::Int, cached::Bool = true)
     if haskey(AcbMatSpaceID, (R, r, c))
-      return AcbMatSpaceID[(R, r, c)]::AcbMatSpace
+      return AcbMatSpaceID[(R, r, c)]
     else
       z = new(r, c, R)
       if cached
@@ -625,6 +623,8 @@ type AcbMatSpace <: MatSpace{acb}
     end
   end
 end
+
+const AcbMatSpaceID = Dict{Tuple{AcbField, Int, Int}, AcbMatSpace}()
 
 type acb_mat <: MatElem{acb}
   entries::Ptr{Void}
