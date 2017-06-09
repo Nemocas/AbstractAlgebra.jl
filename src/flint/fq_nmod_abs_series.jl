@@ -500,11 +500,11 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fq_nmod_abs_series}, ::Type{T}) = fq_nmod_abs_series
+promote_rule{T <: Integer}(::Type{fq_nmod_abs_series}, ::Type{T}) = fq_nmod_abs_series
 
-Base.promote_rule(::Type{fq_nmod_abs_series}, ::Type{fq_nmod}) = fq_nmod_abs_series
+promote_rule(::Type{fq_nmod_abs_series}, ::Type{fq_nmod}) = fq_nmod_abs_series
 
-Base.promote_rule(::Type{fq_nmod_abs_series}, ::Type{fmpz}) = fq_nmod_abs_series
+promote_rule(::Type{fq_nmod_abs_series}, ::Type{fmpz}) = fq_nmod_abs_series
 
 ###############################################################################
 #

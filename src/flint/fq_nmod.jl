@@ -405,9 +405,9 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fq_nmod}, ::Type{T}) = fq_nmod
+promote_rule{T <: Integer}(::Type{fq_nmod}, ::Type{T}) = fq_nmod
 
-Base.promote_rule(::Type{fq_nmod}, ::Type{fmpz}) = fq_nmod
+promote_rule(::Type{fq_nmod}, ::Type{fmpz}) = fq_nmod
 
 ###############################################################################
 #

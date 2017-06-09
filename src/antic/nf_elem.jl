@@ -869,13 +869,13 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{nf_elem}, ::Type{T}) = nf_elem
+promote_rule{T <: Integer}(::Type{nf_elem}, ::Type{T}) = nf_elem
 
-Base.promote_rule(::Type{nf_elem}, ::Type{fmpz}) = nf_elem
+promote_rule(::Type{nf_elem}, ::Type{fmpz}) = nf_elem
 
-Base.promote_rule(::Type{nf_elem}, ::Type{fmpq}) = nf_elem
+promote_rule(::Type{nf_elem}, ::Type{fmpq}) = nf_elem
 
-Base.promote_rule(::Type{nf_elem}, ::Type{fmpq_poly}) = nf_elem
+promote_rule(::Type{nf_elem}, ::Type{fmpq_poly}) = nf_elem
 
 ###############################################################################
 #

@@ -689,21 +689,21 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{acb_mat}, ::Type{T}) = acb_mat
+promote_rule{T <: Integer}(::Type{acb_mat}, ::Type{T}) = acb_mat
 
-Base.promote_rule(::Type{acb_mat}, ::Type{fmpz}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{fmpz}) = acb_mat
 
-Base.promote_rule(::Type{acb_mat}, ::Type{fmpq}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{fmpq}) = acb_mat
 
-Base.promote_rule(::Type{acb_mat}, ::Type{arb}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{arb}) = acb_mat
 
-Base.promote_rule(::Type{acb_mat}, ::Type{acb}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{acb}) = acb_mat
 
-Base.promote_rule(::Type{acb_mat}, ::Type{fmpz_mat}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{fmpz_mat}) = acb_mat
 
-Base.promote_rule(::Type{acb_mat}, ::Type{fmpq_mat}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{fmpq_mat}) = acb_mat
 
-Base.promote_rule(::Type{acb_mat}, ::Type{arb_mat}) = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{arb_mat}) = acb_mat
 
 ###############################################################################
 #

@@ -1567,3 +1567,5 @@ convert(::Type{Float16}, n::fmpz) = Float16(Float64(n))
 convert(::Type{BigFloat}, n::fmpz) = BigFloat(BigInt(n))
 
 Base.promote_rule{T <: Integer}(::Type{fmpz}, ::Type{T}) = fmpz
+
+promote_rule{T <: Integer}(::Type{fmpz}, ::Type{T}) = fmpz

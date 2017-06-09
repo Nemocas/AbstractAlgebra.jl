@@ -480,9 +480,9 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fq}, ::Type{T}) = fq
+promote_rule{T <: Integer}(::Type{fq}, ::Type{T}) = fq
 
-Base.promote_rule(::Type{fq}, ::Type{fmpz}) = fq
+promote_rule(::Type{fq}, ::Type{fmpz}) = fq
 
 ###############################################################################
 #

@@ -528,11 +528,11 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fmpz_mod_abs_series}, ::Type{T}) = fmpz_mod_abs_series
+promote_rule{T <: Integer}(::Type{fmpz_mod_abs_series}, ::Type{T}) = fmpz_mod_abs_series
 
-Base.promote_rule(::Type{fmpz_mod_abs_series}, ::Type{fmpz}) = fmpz_mod_abs_series
+promote_rule(::Type{fmpz_mod_abs_series}, ::Type{fmpz}) = fmpz_mod_abs_series
 
-Base.promote_rule(::Type{fmpz_mod_abs_series}, ::Type{GenRes{fmpz}}) = fmpz_mod_abs_series
+promote_rule(::Type{fmpz_mod_abs_series}, ::Type{GenRes{fmpz}}) = fmpz_mod_abs_series
 
 ###############################################################################
 #

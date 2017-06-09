@@ -925,20 +925,20 @@ end
 #
 ###############################################################################
 
-function Base.promote_rule{T <: RingElem, V <: Integer}(::Type{GenAbsSeries{T}}, ::Type{V})
+function promote_rule{T <: RingElem, V <: Integer}(::Type{GenAbsSeries{T}}, ::Type{V})
    return GenAbsSeries{T}
 end
 
-function Base.promote_rule{T <: RingElem}(::Type{GenAbsSeries{T}}, ::Type{T})
+function promote_rule{T <: RingElem}(::Type{GenAbsSeries{T}}, ::Type{T})
    return GenAbsSeries{T}
 end
 
 function promote_rule1{T <: RingElem, U <: RingElem}(::Type{GenAbsSeries{T}}, ::Type{GenAbsSeries{U}})
-   Base.promote_rule(T, GenAbsSeries{U}) == T ? GenAbsSeries{T} : Union{}
+   promote_rule(T, GenAbsSeries{U}) == T ? GenAbsSeries{T} : Union{}
 end
 
-function Base.promote_rule{T <: RingElem, U <: RingElem}(::Type{GenAbsSeries{T}}, ::Type{U})
-   Base.promote_rule(T, U) == T ? GenAbsSeries{T} : promote_rule1(U, GenAbsSeries{T})
+function promote_rule{T <: RingElem, U <: RingElem}(::Type{GenAbsSeries{T}}, ::Type{U})
+   promote_rule(T, U) == T ? GenAbsSeries{T} : promote_rule1(U, GenAbsSeries{T})
 end
 
 ###############################################################################

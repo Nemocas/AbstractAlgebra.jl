@@ -506,9 +506,9 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fmpz_abs_series}, ::Type{T}) = fmpz_abs_series
+promote_rule{T <: Integer}(::Type{fmpz_abs_series}, ::Type{T}) = fmpz_abs_series
 
-Base.promote_rule(::Type{fmpz_abs_series}, ::Type{fmpz}) = fmpz_abs_series
+promote_rule(::Type{fmpz_abs_series}, ::Type{fmpz}) = fmpz_abs_series
 
 ###############################################################################
 #

@@ -621,17 +621,17 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{arb_mat}, ::Type{T}) = arb_mat
+promote_rule{T <: Integer}(::Type{arb_mat}, ::Type{T}) = arb_mat
 
-Base.promote_rule(::Type{arb_mat}, ::Type{fmpz}) = arb_mat
+promote_rule(::Type{arb_mat}, ::Type{fmpz}) = arb_mat
 
-Base.promote_rule(::Type{arb_mat}, ::Type{fmpq}) = arb_mat
+promote_rule(::Type{arb_mat}, ::Type{fmpq}) = arb_mat
 
-Base.promote_rule(::Type{arb_mat}, ::Type{arb}) = arb_mat
+promote_rule(::Type{arb_mat}, ::Type{arb}) = arb_mat
 
-Base.promote_rule(::Type{arb_mat}, ::Type{fmpz_mat}) = arb_mat
+promote_rule(::Type{arb_mat}, ::Type{fmpz_mat}) = arb_mat
 
-Base.promote_rule(::Type{arb_mat}, ::Type{fmpq_mat}) = arb_mat
+promote_rule(::Type{arb_mat}, ::Type{fmpq_mat}) = arb_mat
 
 ###############################################################################
 #

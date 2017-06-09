@@ -782,9 +782,9 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fmpz_poly}, ::Type{T}) = fmpz_poly
+promote_rule{T <: Integer}(::Type{fmpz_poly}, ::Type{T}) = fmpz_poly
 
-Base.promote_rule(::Type{fmpz_poly}, ::Type{fmpz}) = fmpz_poly
+promote_rule(::Type{fmpz_poly}, ::Type{fmpz}) = fmpz_poly
 
 ###############################################################################
 #

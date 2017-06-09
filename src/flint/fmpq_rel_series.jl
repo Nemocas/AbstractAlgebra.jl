@@ -989,13 +989,13 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fmpq_rel_series}, ::Type{T}) = fmpq_rel_series
+promote_rule{T <: Integer}(::Type{fmpq_rel_series}, ::Type{T}) = fmpq_rel_series
 
-Base.promote_rule{T <: Integer}(::Type{fmpq_rel_series}, ::Type{Rational{T}}) = fmpq_rel_series
+promote_rule{T <: Integer}(::Type{fmpq_rel_series}, ::Type{Rational{T}}) = fmpq_rel_series
 
-Base.promote_rule(::Type{fmpq_rel_series}, ::Type{fmpz}) = fmpq_rel_series
+promote_rule(::Type{fmpq_rel_series}, ::Type{fmpz}) = fmpq_rel_series
 
-Base.promote_rule(::Type{fmpq_rel_series}, ::Type{fmpq}) = fmpq_rel_series
+promote_rule(::Type{fmpq_rel_series}, ::Type{fmpq}) = fmpq_rel_series
 
 ###############################################################################
 #

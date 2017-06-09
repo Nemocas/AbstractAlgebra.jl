@@ -725,13 +725,13 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{T <: Integer}(::Type{fmpq_poly}, ::Type{T}) = fmpq_poly
+promote_rule{T <: Integer}(::Type{fmpq_poly}, ::Type{T}) = fmpq_poly
 
-Base.promote_rule(::Type{fmpq_poly}, ::Type{fmpz}) = fmpq_poly
+promote_rule(::Type{fmpq_poly}, ::Type{fmpz}) = fmpq_poly
 
-Base.promote_rule(::Type{fmpq_poly}, ::Type{fmpq}) = fmpq_poly
+promote_rule(::Type{fmpq_poly}, ::Type{fmpq}) = fmpq_poly
 
-Base.promote_rule{T <: Integer}(::Type{fmpq_poly}, ::Type{Rational{T}}) = fmpq_poly
+promote_rule{T <: Integer}(::Type{fmpq_poly}, ::Type{Rational{T}}) = fmpq_poly
 
 ###############################################################################
 #

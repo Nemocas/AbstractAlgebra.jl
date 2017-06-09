@@ -621,11 +621,11 @@ end
 #
 ###############################################################################
 
-Base.promote_rule{V <: Integer}(::Type{nmod_mat}, ::Type{V}) = nmod_mat
+promote_rule{V <: Integer}(::Type{nmod_mat}, ::Type{V}) = nmod_mat
 
-Base.promote_rule(::Type{nmod_mat}, ::Type{GenRes{fmpz}}) = nmod_mat
+promote_rule(::Type{nmod_mat}, ::Type{GenRes{fmpz}}) = nmod_mat
 
-Base.promote_rule(::Type{nmod_mat}, ::Type{fmpz}) = nmod_mat
+promote_rule(::Type{nmod_mat}, ::Type{fmpz}) = nmod_mat
 
 ################################################################################
 #
