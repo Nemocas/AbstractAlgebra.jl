@@ -247,14 +247,17 @@ end
 
 function mul!(a::nmod_mat, b::nmod_mat, c::nmod_mat)
   ccall((:nmod_mat_mul, :libflint), Void, (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b, &c)
+  return a
 end
 
 function add!(a::nmod_mat, b::nmod_mat, c::nmod_mat)
   ccall((:nmod_mat_add, :libflint), Void, (Ptr{nmod_mat}, Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b, &c)
+  return a
 end
 
 function zero!(a::nmod_mat)
   ccall((:nmod_mat_zero, :libflint), Void, (Ptr{nmod_mat}, ), &a)
+  return a
 end
 
 ################################################################################

@@ -881,38 +881,42 @@ end
 function zero!(x::nmod_poly)
   ccall((:nmod_poly_zero, :libflint), Void, 
                    (Ptr{nmod_poly},), &x)
+  return x
 end
 
 function one!(a::nmod_poly)
   ccall((:nmod_poly_one, :libflint), Void, (Ptr{nmod_poly}, ), &a)
+  return a
 end
 
 function fit!(x::nmod_poly, n::Int)
   ccall((:nmod_poly_fit_length, :libflint), Void, 
                    (Ptr{nmod_poly}, Int), &x, n)
+  return nothing
 end
 
 function setcoeff!(x::nmod_poly, n::Int, y::UInt)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{nmod_poly}, Int, UInt), &x, n, y)
+  return x
 end
 
 function setcoeff!(x::nmod_poly, n::Int, y::Int)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{nmod_poly}, Int, UInt), &x, n, mod(y, x.mod_n))
+  return x
 end
   
 function setcoeff!(x::nmod_poly, n::Int, y::fmpz)
   r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &y, x.mod_n)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{nmod_poly}, Int, UInt), &x, n, r)
+  return x
 end
   
 setcoeff!(x::nmod_poly, n::Int, y::Integer) = setcoeff!(x, n, fmpz(y))
   
-function setcoeff!(x::nmod_poly, n::Int, y::GenRes{fmpz})
-  setcoeff!(x, n, y.data)
-end
+setcoeff!(x::nmod_poly, n::Int, y::GenRes{fmpz}) = setcoeff!(x, n, y.data)
 
 function add!(z::nmod_poly, x::nmod_poly, y::nmod_poly)
   ccall((:nmod_poly_add, :libflint), Void, 

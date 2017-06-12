@@ -558,6 +558,7 @@ for (s,f) in (("add!","arb_mat_add"), ("mul!","arb_mat_mul"),
       ccall(($f, :libarb), Void,
                   (Ptr{arb_mat}, Ptr{arb_mat}, Ptr{arb_mat}, Int),
                   &z, &x, &y, prec(parent(x)))
+      return z
     end
   end
 end

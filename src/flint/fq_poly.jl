@@ -664,36 +664,42 @@ function zero!(z::fq_poly)
    ccall((:fq_poly_zero, :libflint), Void, 
          (Ptr{fq_poly}, Ptr{FqFiniteField}),
          &z, &base_ring(parent(z)))
+   return z
 end
 
 function fit!(z::fq_poly, n::Int)
    ccall((:fq_poly_fit_length, :libflint), Void, 
          (Ptr{fq_poly}, Int, Ptr{FqFiniteField}),
          &z, n, &base_ring(parent(z)))
+   return nothing
 end
 
 function setcoeff!(z::fq_poly, n::Int, x::fq)
    ccall((:fq_poly_set_coeff, :libflint), Void, 
          (Ptr{fq_poly}, Int, Ptr{fq}, Ptr{FqFiniteField}),
          &z, n, &x, &base_ring(parent(z)))
+   return z
 end
 
 function mul!(z::fq_poly, x::fq_poly, y::fq_poly)
    ccall((:fq_poly_mul, :libflint), Void, 
          (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly},
          Ptr{FqFiniteField}), &z, &x, &y, &base_ring(parent(x)))
+   return z
 end
 
 function add!(z::fq_poly, x::fq_poly, y::fq_poly)
    ccall((:fq_poly_add, :libflint), Void, 
          (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly},
          Ptr{FqFiniteField}), &z, &x, &y, &base_ring(parent(x)))
+   return z
 end
 
 function sub!(z::fq_poly, x::fq_poly, y::fq_poly)
    ccall((:fq_poly_sub, :libflint), Void, 
          (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly},
          Ptr{FqFiniteField}), &z, &x, &y, &base_ring(parent(x)))
+   return z
 end
 
 
@@ -701,6 +707,7 @@ function addeq!(z::fq_poly, x::fq_poly)
    ccall((:fq_poly_add, :libflint), Void, 
          (Ptr{fq_poly}, Ptr{fq_poly}, Ptr{fq_poly},
          Ptr{FqFiniteField}), &z, &z, &x, &base_ring(parent(x)))
+   return z
 end
 
 ################################################################################

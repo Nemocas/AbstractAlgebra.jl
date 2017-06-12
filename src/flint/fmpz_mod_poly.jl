@@ -820,54 +820,59 @@ end
 function zero!(x::fmpz_mod_poly)
   ccall((:fmpz_mod_poly_zero, :libflint), Void, 
                    (Ptr{fmpz_mod_poly}, ), &x)
+  return x
 end
 
 function fit!(x::fmpz_mod_poly, n::Int)
   ccall((:fmpz_mod_poly_fit_length, :libflint), Void, 
                    (Ptr{fmpz_mod_poly}, Int), &x, n)
+  return nothing
 end
 
 function setcoeff!(x::fmpz_mod_poly, n::Int, y::UInt)
   ccall((:fmpz_mod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{fmpz_mod_poly}, Int, UInt), &x, n, y)
+  return x
 end
 
 function setcoeff!(x::fmpz_mod_poly, n::Int, y::Int)
   ccall((:fmpz_mod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{fmpz_mod_poly}, Int, UInt), &x, n, mod(y, x.n))
+  return x
 end
 
 function setcoeff!(x::fmpz_mod_poly, n::Int, y::fmpz)
   ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
                    (Ptr{fmpz_mod_poly}, Int, Ptr{fmpz}), &x, n, &y)
+  return x
 end
 
-function setcoeff!(x::fmpz_mod_poly, n::Int, y::Integer)
-  setcoeff!(x, n, fmpz(y))
-end
-  
-function setcoeff!(x::fmpz_mod_poly, n::Int, y::GenRes{fmpz})
-  setcoeff!(x, n, y.data)
-end
+setcoeff!(x::fmpz_mod_poly, n::Int, y::Integer) = setcoeff!(x, n, fmpz(y))
+
+setcoeff!(x::fmpz_mod_poly, n::Int, y::GenRes{fmpz}) = setcoeff!(x, n, y.data)
 
 function add!(z::fmpz_mod_poly, x::fmpz_mod_poly, y::fmpz_mod_poly)
   ccall((:fmpz_mod_poly_add, :libflint), Void, 
      (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly},  Ptr{fmpz_mod_poly}), &z, &x, &y)
+  return z
 end
 
 function addeq!(z::fmpz_mod_poly, y::fmpz_mod_poly)
   ccall((:fmpz_mod_poly_add, :libflint), Void, 
      (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly},  Ptr{fmpz_mod_poly}), &z, &z, &y)
+  return z
 end
 
 function sub!(z::fmpz_mod_poly, x::fmpz_mod_poly, y::fmpz_mod_poly)
   ccall((:fmpz_mod_poly_sub, :libflint), Void, 
      (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly},  Ptr{fmpz_mod_poly}), &z, &x, &y)
+  return z
 end
 
 function mul!(z::fmpz_mod_poly, x::fmpz_mod_poly, y::fmpz_mod_poly)
   ccall((:fmpz_mod_poly_mul, :libflint), Void, 
      (Ptr{fmpz_mod_poly}, Ptr{fmpz_mod_poly},  Ptr{fmpz_mod_poly}), &z, &x, &y)
+  return z
 end
 
 ################################################################################

@@ -695,46 +695,46 @@ end
 function zero!(z::arb_poly)
    ccall((:arb_poly_zero, :libarb), Void, 
                     (Ptr{arb_poly}, ), &z)
-   nothing
+   return z
 end
 
 function fit!(z::arb_poly, n::Int)
    ccall((:arb_poly_fit_length, :libarb), Void, 
                     (Ptr{arb_poly}, Int), &z, n)
-   nothing
+   return nothing
 end
 
 function setcoeff!(z::arb_poly, n::Int, x::fmpz)
    ccall((:arb_poly_set_coeff_fmpz, :libarb), Void, 
                     (Ptr{arb_poly}, Int, Ptr{fmpz}), &z, n, &x)
-   nothing
+   return z
 end
 
 function setcoeff!(z::arb_poly, n::Int, x::arb)
    ccall((:arb_poly_set_coeff_arb, :libarb), Void, 
                     (Ptr{arb_poly}, Int, Ptr{arb}), &z, n, &x)
-   nothing
+   return z
 end
 
 function mul!(z::arb_poly, x::arb_poly, y::arb_poly)
    ccall((:arb_poly_mul, :libarb), Void, 
                 (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int),
                     &z, &x, &y, prec(parent(z)))
-   nothing
+   return z
 end
 
 function addeq!(z::arb_poly, x::arb_poly)
    ccall((:arb_poly_add, :libarb), Void, 
                 (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int),
                     &z, &z, &x, prec(parent(z)))
-   nothing
+   return z
 end
 
 function add!(z::arb_poly, x::arb_poly, y::arb_poly)
    ccall((:arb_poly_add, :libarb), Void, 
                 (Ptr{arb_poly}, Ptr{arb_poly}, Ptr{arb_poly}, Int),
                     &z, &x, &y, prec(parent(z)))
-   nothing
+   return z
 end
 
 ###############################################################################
