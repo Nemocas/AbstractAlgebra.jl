@@ -847,13 +847,9 @@ function setcoeff!(x::fmpz_mod_poly, n::Int, y::fmpz)
   return x
 end
 
-function setcoeff!(x::fmpz_mod_poly, n::Int, y::Integer)
-  return setcoeff!(x, n, fmpz(y))
-end
-  
-function setcoeff!(x::fmpz_mod_poly, n::Int, y::GenRes{fmpz})
-  return setcoeff!(x, n, y.data)
-end
+setcoeff!(x::fmpz_mod_poly, n::Int, y::Integer) = setcoeff!(x, n, fmpz(y))
+
+setcoeff!(x::fmpz_mod_poly, n::Int, y::GenRes{fmpz}) = setcoeff!(x, n, y.data)
 
 function add!(z::fmpz_mod_poly, x::fmpz_mod_poly, y::fmpz_mod_poly)
   ccall((:fmpz_mod_poly_add, :libflint), Void, 

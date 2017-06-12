@@ -384,7 +384,7 @@ function ^(a::fmpq_rel_series, b::Int)
    b < 0 && throw(DomainError())
    if isgen(a)
       z = parent(a)()
-      setcoeff!(z, 0, fmpq(1))
+      z = setcoeff!(z, 0, fmpq(1))
       z.prec = a.prec + b - 1
       z.val = b
    elseif pol_length(a) == 0

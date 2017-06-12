@@ -202,8 +202,8 @@ function =={S <: Integer, T <: RingElem}(x::S, y::T)
 end
 
 function addmul!{T <: RingElem}(z::T, x::T, y::T, c::T)
-   mul!(c, x, y)
-   addeq!(z, c)
+   c = mul!(c, x, y)
+   z = addeq!(z, c)
    return z
 end
 

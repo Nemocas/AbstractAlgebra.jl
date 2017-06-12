@@ -186,7 +186,7 @@ function -{T <: RingElem}(a::AbsSeriesElem{T})
    set_prec!(z, precision(a))
    fit!(z, len)
    for i = 1:len
-      setcoeff!(z, i - 1, -coeff(a, i - 1))
+      z = setcoeff!(z, i - 1, -coeff(a, i - 1))
    end
    return z
 end
@@ -214,15 +214,15 @@ function +{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
    set_prec!(z, prec)
    i = 1
    while i <= min(lena, lenb)
-      setcoeff!(z, i - 1, coeff(a, i - 1) + coeff(b, i - 1))
+      z = setcoeff!(z, i - 1, coeff(a, i - 1) + coeff(b, i - 1))
       i += 1
    end
    while i <= lena
-      setcoeff!(z, i - 1, coeff(a, i - 1))
+      z = setcoeff!(z, i - 1, coeff(a, i - 1))
       i += 1
    end
    while i <= lenb
-      setcoeff!(z, i - 1, coeff(b, i - 1))
+      z = setcoeff!(z, i - 1, coeff(b, i - 1))
       i += 1
    end
    set_length!(z, normalise(z, i - 1))
@@ -246,15 +246,15 @@ function -{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
    set_prec!(z, prec)
    i = 1
    while i <= min(lena, lenb)
-      setcoeff!(z, i - 1, coeff(a, i - 1) - coeff(b, i - 1))
+      z = setcoeff!(z, i - 1, coeff(a, i - 1) - coeff(b, i - 1))
       i += 1
    end
    while i <= lena
-      setcoeff!(z, i - 1, coeff(a, i - 1))
+      z = setcoeff!(z, i - 1, coeff(a, i - 1))
       i += 1
    end
    while i <= lenb
-      setcoeff!(z, i - 1, -coeff(b, i - 1))
+      z = setcoeff!(z, i - 1, -coeff(b, i - 1))
       i += 1
    end
    set_length!(z, normalise(z, i - 1))
@@ -297,8 +297,8 @@ function *{T <: RingElem}(a::AbsSeriesElem{T}, b::AbsSeriesElem{T})
    for i = 1:lena - 1
       if lenz > i
          for j = 2:min(lenb, lenz - i + 1)
-            mul!(t, coeff(a, i - 1), coeff(b, j - 1))
-            addeq!(d[i + j - 1], t)
+            t = mul!(t, coeff(a, i - 1), coeff(b, j - 1))
+            d[i + j - 1] = addeq!(d[i + j - 1], t)
          end
       end
    end
@@ -323,7 +323,7 @@ function *{T <: RingElem}(a::T, b::AbsSeriesElem{T})
    fit!(z, len)
    set_prec!(z, precision(b))
    for i = 1:len
-      setcoeff!(z, i - 1, a*coeff(b, i - 1))
+      z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
    set_length!(z, normalise(z, len))
    return z
@@ -339,7 +339,7 @@ function *{T <: RingElem}(a::Integer, b::AbsSeriesElem{T})
    fit!(z, len)
    set_prec!(z, precision(b))
    for i = 1:len
-      setcoeff!(z, i - 1, a*coeff(b, i - 1))
+      z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
    set_length!(z, normalise(z, len))
    return z
@@ -355,7 +355,7 @@ function *{T <: RingElem}(a::fmpz, b::AbsSeriesElem{T})
    fit!(z, len)
    set_prec!(z, precision(b))
    for i = 1:len
-      setcoeff!(z, i - 1, a*coeff(b, i - 1))
+      z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
    set_length!(z, normalise(z, len))
    return z
@@ -477,10 +477,10 @@ function shift_left{T <: RingElem}(x::AbsSeriesElem{T}, len::Int)
    fit!(z, zlen)
    set_prec!(z, prec)
    for i = 1:len
-      setcoeff!(z, i - 1, zero(base_ring(x)))
+      z = setcoeff!(z, i - 1, zero(base_ring(x)))
    end
    for i = 1:xlen
-      setcoeff!(z, i + len - 1, coeff(x, i - 1))
+      z = setcoeff!(z, i + len - 1, coeff(x, i - 1))
    end
    set_length!(z, normalise(z, zlen))
    return z
@@ -503,7 +503,7 @@ function shift_right{T <: RingElem}(x::AbsSeriesElem{T}, len::Int)
    fit!(z, xlen - len)
    set_prec!(z, precision(x) - len)
    for i = 1:xlen - len
-      setcoeff!(z, i - 1, coeff(x, i + len - 1))
+      z = setcoeff!(z, i - 1, coeff(x, i + len - 1))
    end
    return z
 end
@@ -528,10 +528,10 @@ function truncate{T <: RingElem}(a::AbsSeriesElem{T}, prec::Int)
    fit!(z, prec)
    set_prec!(z, prec)
    for i = 1:min(prec, len)
-      setcoeff!(z, i - 1, coeff(a, i - 1))
+      z = setcoeff!(z, i - 1, coeff(a, i - 1))
    end
    for i = len + 1:prec
-      setcoeff!(z, i - 1, zero(base_ring(a)))
+      z = setcoeff!(z, i - 1, zero(base_ring(a)))
    end
    set_length!(z, normalise(z, prec))
    return z
@@ -726,7 +726,7 @@ function divexact{T <: RingElem}(x::AbsSeriesElem{T}, y::Integer)
    fit!(z, lenx)
    set_prec!(z, precision(x))
    for i = 1:lenx
-      setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
    end
    return z
 end
@@ -742,7 +742,7 @@ function divexact{T <: RingElem}(x::AbsSeriesElem{T}, y::fmpz)
    fit!(z, lenx)
    set_prec!(z, precision(x))
    for i = 1:lenx
-      setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
    end
    return z
 end
@@ -758,7 +758,7 @@ function divexact{T <: RingElem}(x::AbsSeriesElem{T}, y::T)
    fit!(z, lenx)
    set_prec!(z, precision(x))
    for i = 1:lenx
-      setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
+      z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
    end
    return z
 end
@@ -781,7 +781,7 @@ function inv(a::AbsSeriesElem)
    fit!(ainv, precision(a))
    set_prec!(ainv, precision(a))
    if precision(a) != 0
-      setcoeff!(ainv, 0, divexact(one(base_ring(a)), a1))
+      ainv = setcoeff!(ainv, 0, divexact(one(base_ring(a)), a1))
    end
    a1 = -a1
    for n = 2:precision(a)
@@ -789,7 +789,7 @@ function inv(a::AbsSeriesElem)
       for i = 2:min(n, length(a)) - 1
          s += coeff(a, i)*coeff(ainv, n - i - 1)
       end
-      setcoeff!(ainv, n - 1, divexact(s, a1))
+      ainv = setcoeff!(ainv, n - 1, divexact(s, a1))
    end
    set_length!(ainv, normalise(ainv, precision(a)))
    return ainv
@@ -814,7 +814,7 @@ function exp(a::AbsSeriesElem)
    z = parent(a)()
    fit!(z, precision(a))
    set_prec!(z, precision(a))
-   setcoeff!(z, 0, exp(coeff(a, 0)))
+   z = setcoeff!(z, 0, exp(coeff(a, 0)))
    len = length(a)
    for k = 1 : precision(a) - 1
       s = zero(base_ring(a))
@@ -822,7 +822,7 @@ function exp(a::AbsSeriesElem)
          s += j * coeff(a, j) * coeff(z, k - j)
       end
       !isunit(base_ring(a)(k)) && error("Unable to divide in exp")
-      setcoeff!(z, k, divexact(s, k))
+      z = setcoeff!(z, k, divexact(s, k))
    end
    set_length!(z, normalise(z, precision(a)))
    return z
@@ -880,20 +880,20 @@ function mul!{T <: RingElem}(c::GenAbsSeries{T}, a::GenAbsSeries{T}, b::GenAbsSe
       fit!(c, lenc)
 
       for i = 1:min(lena, lenc)
-         mul!(c.coeffs[i], coeff(a, i - 1), coeff(b, 0))
+         c.coeffs[i] = mul!(c.coeffs[i], coeff(a, i - 1), coeff(b, 0))
       end
 
       if lenc > lena
          for i = 2:min(lenb, lenc - lena + 1)
-            mul!(c.coeffs[lena + i - 1], coeff(a, lena - 1), coeff(b, i - 1))
+            c.coeffs[lena + i - 1] = mul!(c.coeffs[lena + i - 1], coeff(a, lena - 1), coeff(b, i - 1))
          end
       end
 
       for i = 1:lena - 1
          if lenc > i
             for j = 2:min(lenb, lenc - i + 1)
-               mul!(t, coeff(a, i - 1), coeff(b, j - 1))
-               addeq!(c.coeffs[i + j - 1], t)
+               t = mul!(t, coeff(a, i - 1), coeff(b, j - 1))
+               c.coeffs[i + j - 1] = addeq!(c.coeffs[i + j - 1], t)
             end
          end
       end
@@ -916,7 +916,7 @@ function addeq!{T <: RingElem}(c::GenAbsSeries{T}, a::GenAbsSeries{T})
    len = max(lenc, lena)
    fit!(c, len)
    for i = 1:lena
-      addeq!(c.coeffs[i], coeff(a, i - 1))
+      c.coeffs[i] = addeq!(c.coeffs[i], coeff(a, i - 1))
    end
    c.length = normalise(c, len)
    c.prec = prec

@@ -763,21 +763,21 @@ function sqr_classical(a::GenPoly{nf_elem})
    for i = 1:lena - 1
       d[2i - 1] = base_ring(a)()
       d[2i] = base_ring(a)()
-      mul_red!(d[2i - 1], coeff(a, i - 1), coeff(a, i - 1), false)
+      d[2i - 1] = mul_red!(d[2i - 1], coeff(a, i - 1), coeff(a, i - 1), false)
    end
    d[2*lena - 1] = base_ring(a)()
-   mul_red!(d[2*lena - 1], coeff(a, lena - 1), coeff(a, lena - 1), false)
+   d[2*lena - 1] = mul_red!(d[2*lena - 1], coeff(a, lena - 1), coeff(a, lena - 1), false)
 
    for i = 1:lena
       for j = i + 1:lena
-         mul_red!(t, coeff(a, i - 1), coeff(a, j - 1), false)
-         addeq!(d[i + j - 1], t)
-         addeq!(d[i + j - 1], t)
+         t = mul_red!(t, coeff(a, i - 1), coeff(a, j - 1), false)
+         d[i + j - 1] = addeq!(d[i + j - 1], t)
+         d[i + j - 1] = addeq!(d[i + j - 1], t)
       end
    end
 
    for i = 1:lenz
-      reduce!(d[i])
+      d[i] = reduce!(d[i])
    end
 
    z = parent(a)(d)
@@ -807,23 +807,23 @@ function mul_classical(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
 
    for i = 1:lena
       d[i] = base_ring(a)()
-      mul_red!(d[i], coeff(a, i - 1), coeff(b, 0), false)
+      d[i] = mul_red!(d[i], coeff(a, i - 1), coeff(b, 0), false)
    end
 
    for i = 2:lenb
       d[lena + i - 1] = base_ring(a)()
-      mul_red!(d[lena + i - 1], a.coeffs[lena], coeff(b, i - 1), false)
+      d[lena + i - 1] = mul_red!(d[lena + i - 1], a.coeffs[lena], coeff(b, i - 1), false)
    end
 
    for i = 1:lena - 1
       for j = 2:lenb
-         mul_red!(t, coeff(a, i - 1), b.coeffs[j], false)
-         addeq!(d[i + j - 1], t)
+         t = mul_red!(t, coeff(a, i - 1), b.coeffs[j], false)
+         d[i + j - 1] = addeq!(d[i + j - 1], t)
       end
    end
 
    for i = 1:lenz
-      reduce!(d[i])
+      d[i] = reduce!(d[i])
    end
 
    z = parent(a)(d)
@@ -853,14 +853,14 @@ function *(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
    f = S()
    fit!(f, lena)
    for i = 1:lena
-      setcoeff!(f, i - 1, R(coeff(a, i - 1)))
+      f = setcoeff!(f, i - 1, R(coeff(a, i - 1)))
    end
    set_length!(f, lena)
    if a !== b
       g = S()
       fit!(g, lenb)
       for i = 1:lenb
-         setcoeff!(g, i - 1, R(coeff(b, i - 1)))
+         g = setcoeff!(g, i - 1, R(coeff(b, i - 1)))
       end
       set_length!(g, lenb)
    else

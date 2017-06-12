@@ -916,9 +916,7 @@ end
   
 setcoeff!(x::nmod_poly, n::Int, y::Integer) = setcoeff!(x, n, fmpz(y))
   
-function setcoeff!(x::nmod_poly, n::Int, y::GenRes{fmpz})
-  return setcoeff!(x, n, y.data)
-end
+setcoeff!(x::nmod_poly, n::Int, y::GenRes{fmpz}) = setcoeff!(x, n, y.data)
 
 function add!(z::nmod_poly, x::nmod_poly, y::nmod_poly)
   ccall((:nmod_poly_add, :libflint), Void, 

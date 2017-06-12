@@ -2733,21 +2733,21 @@ function hnf_cohen!{T <: RingElem}(H::GenMat{T}, U::GenMat{T})
          b = -divexact(H[j,i], d)
          for c = i:n
             t = deepcopy(H[j,c])
-            mul!(t1, a, H[j,c])
-            mul!(t2, b, H[k,c])
-            add!(H[j,c], t1, t2)
-            mul!(t1, u, H[k,c])
-            mul!(t2, v, t)
-            add!(H[k,c], t1, t2)
+            t1 = mul!(t1, a, H[j,c])
+            t2 = mul!(t2, b, H[k,c])
+            H[j,c] = add!(H[j,c], t1, t2)
+            t1 = mul!(t1, u, H[k,c])
+            t2 = mul!(t2, v, t)
+            H[k,c] = add!(H[k,c], t1, t2)
          end
          for c = 1:m
             t = deepcopy(U[j,c])
-            mul!(t1, a, U[j,c])
-            mul!(t2, b, U[k,c])
-            add!(U[j,c], t1, t2)
-            mul!(t1, u, U[k,c])
-            mul!(t2, v, t)
-            add!(U[k,c], t1, t2)
+            t1 = mul!(t1, a, U[j,c])
+            t2 = mul!(t2, b, U[k,c])
+            U[j,c] = add!(U[j,c], t1, t2)
+            t1 = mul!(t1, u, U[k,c])
+            t2 = mul!(t2, v, t)
+            U[k,c] = add!(U[k,c], t1, t2)
          end
       end
       if H[k,i] == 0
@@ -2765,12 +2765,12 @@ function hnf_cohen!{T <: RingElem}(H::GenMat{T}, U::GenMat{T})
       for j = 1:k-1
          q = -div(H[j,i], H[k, i])
          for c = i:n
-            mul!(t, q, H[k,c])
-            addeq!(H[j,c], t)
+            t = mul!(t, q, H[k,c])
+            H[j,c] = addeq!(H[j,c], t)
          end
          for c = 1:m
-            mul!(t, q, U[k,c])
-            addeq!(U[j,c], t)
+            t = mul!(t, q, U[k,c])
+            U[j,c] = addeq!(U[j,c], t)
          end
       end
       k += 1
@@ -2821,13 +2821,13 @@ function kb_reduce_row!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Array{
       end
       q = -div(H[r,i], H[p,i])
       for j = i:cols(H)
-         mul!(t, q, H[p,j])
-         addeq!(H[r,j], t)
+         t = mul!(t, q, H[p,j])
+         H[r,j] = addeq!(H[r,j], t)
       end
       if with_trafo
          for j = 1:cols(U)
-            mul!(t, q, U[p,j])
-            addeq!(U[r,j], t)
+            t = mul!(t, q, U[p,j])
+            U[r,j] = addeq!(U[r,j], t)
          end
       end
    end
@@ -2844,13 +2844,13 @@ function kb_reduce_column!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, pivot::Arr
       end
       q = -div(H[p,c],H[r,c])
       for j = c:cols(H)
-         mul!(t, q, H[r,j])
-         addeq!(H[p,j], t)
+         t = mul!(t, q, H[r,j])
+         H[p,j] = addeq!(H[p,j], t)
       end
       if with_trafo
          for j = 1:cols(U)
-            mul!(t, q, U[r,j])
-            addeq!(U[p,j], t)
+            t = mul!(t, q, U[r,j])
+            U[p,j] = addeq!(U[p,j], t)
          end
       end
    end
@@ -2940,22 +2940,22 @@ function hnf_kb!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, with_trafo::Bool = f
             b = -divexact(H[i+1,j],d)
             for c = j:n
                t = deepcopy(H[i+1,c])
-               mul!(t1, a, H[i+1,c])
-               mul!(t2, b, H[p,c])
-               add!(H[i+1,c], t1, t2)
-               mul!(t1, u, H[p,c])
-               mul!(t2, v, t)
-               add!(H[p,c], t1, t2)
+               t1 = mul!(t1, a, H[i+1,c])
+               t2 = mul!(t2, b, H[p,c])
+               H[i+1,c] = add!(H[i+1,c], t1, t2)
+               t1 = mul!(t1, u, H[p,c])
+               t2 = mul!(t2, v, t)
+               H[p,c] = add!(H[p,c], t1, t2)
             end
             if with_trafo
                for c = 1:m
                   t = deepcopy(U[i+1,c])
-                  mul!(t1, a, U[i+1,c])
-                  mul!(t2, b, U[p,c])
-                  add!(U[i+1,c], t1, t2)
-                  mul!(t1, u, U[p,c])
-                  mul!(t2, v, t)
-                  add!(U[p,c], t1, t2)
+                  t1 = mul!(t1, a, U[i+1,c])
+                  t2 = mul!(t2, b, U[p,c])
+                  U[i+1,c] = add!(U[i+1,c], t1, t2)
+                  t1 = mul!(t1, u, U[p,c])
+                  t2 = mul!(t2, v, t)
+                  U[p,c] = add!(U[p,c], t1, t2)
                end
             end
          end
@@ -3044,22 +3044,22 @@ function kb_clear_row!{T <: RingElem}(S::GenMat{T}, K::GenMat{T}, i::Int, with_t
       b = -divexact(S[i,j], d)
       for r = i:m
          t = deepcopy(S[r,j])
-         mul!(t1, a, S[r,j])
-         mul!(t2, b, S[r,i])
-         add!(S[r,j], t1, t2)
-         mul!(t1, u, S[r,i])
-         mul!(t2, v, t)
-         add!(S[r,i], t1, t2)
+         t1 = mul!(t1, a, S[r,j])
+         t2 = mul!(t2, b, S[r,i])
+         S[r,j] = add!(S[r,j], t1, t2)
+         t1 = mul!(t1, u, S[r,i])
+         t2 = mul!(t2, v, t)
+         S[r,i] = add!(S[r,i], t1, t2)
       end
       if with_trafo
          for r = 1:n
             t = deepcopy(K[r,j])
-            mul!(t1, a, K[r,j])
-            mul!(t2, b, K[r,i])
-            add!(K[r,j], t1, t2)
-            mul!(t1, u, K[r,i])
-            mul!(t2, v, t)
-            add!(K[r,i], t1, t2)
+            t1 = mul!(t1, a, K[r,j])
+            t2 = mul!(t2, b, K[r,i])
+            K[r,j] = add!(K[r,j], t1, t2)
+            t1 = mul!(t1, u, K[r,i])
+            t2 = mul!(t2, v, t)
+            K[r,i] = add!(K[r,i], t1, t2)
          end
       end
    end
@@ -3093,25 +3093,25 @@ function snf_kb!{T <: RingElem}(S::GenMat{T}, U::GenMat{T}, K::GenMat{T}, with_t
       d, u, v = gcdx(S[i,i], S[i+1,i+1])
       if with_trafo
          q = -divexact(S[i+1,i+1], d)
-         mul!(t1, q, v)
+         t1 = mul!(t1, q, v)
          for c = 1:m
             t = deepcopy(U[i,c])
-            addeq!(U[i,c], U[i+1,c])
-            mul!(t2, t1, U[i+1,c])
-            addeq!(U[i+1,c], t2)
-            mul!(t2, t1, t)
-            addeq!(U[i+1,c], t2)
+            U[i,c] = addeq!(U[i,c], U[i+1,c])
+            t2 = mul!(t2, t1, U[i+1,c])
+            U[i+1,c] = addeq!(U[i+1,c], t2)
+            t2 = mul!(t2, t1, t)
+            U[i+1,c] = addeq!(U[i+1,c], t2)
          end
          q1 = -divexact(S[i+1,i+1], d)
          q2 = divexact(S[i,i], d)
          for r = 1:n
             t = deepcopy(K[r,i])
-            mul!(t1, K[r,i], u)
-            mul!(t2, K[r,i+1], v)
-            add!(K[r,i], t1, t2)
-            mul!(t1, t, q1)
-            mul!(t2, K[r,i+1], q2)
-            add!(K[r,i+1], t1, t2)
+            t1 = mul!(t1, K[r,i], u)
+            t2 = mul!(t2, K[r,i+1], v)
+            K[r,i] = add!(K[r,i], t1, t2)
+            t1 = mul!(t1, t, q1)
+            t2 = mul!(t2, K[r,i+1], q2)
+            K[r,i+1] = add!(K[r,i+1], t1, t2)
          end
       end
       S[i+1,i+1] = divexact(S[i,i]*S[i+1,i+1],d)
@@ -3264,18 +3264,18 @@ function weak_popov_with_pivots!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::G
             end
             q = -div(P[pivots[i][j],i],P[pivot,i])
             for c = 1:n
-               mul!(t, q, P[pivot,c])
-               addeq!(P[pivots[i][j],c], t)
+               t = mul!(t, q, P[pivot,c])
+               P[pivots[i][j],c] = addeq!(P[pivots[i][j],c], t)
             end
             if with_trafo
                for c = 1:cols(U)
-                  mul!(t, q, U[pivot,c])
-                  addeq!(U[pivots[i][j],c], t)
+                  t = mul!(t, q, U[pivot,c])
+                  U[pivots[i][j],c] = addeq!(U[pivots[i][j],c], t)
                end
             end
             if extended
-               mul!(t, q, W[pivot,1])
-               addeq!(W[pivots[i][j],1], t)
+               t = mul!(t, q, W[pivot,1])
+               W[pivots[i][j],1] = addeq!(W[pivots[i][j],1], t)
             end
          end
          old_pivots = pivots[i]
@@ -3367,8 +3367,8 @@ function det_popov{T <: PolyElem}(A::GenMat{T})
          end
          q = -div(B[r1,c],B[r2,c])
          for j = 1:i+1
-            mul!(t, q, B[r2,j])
-            addeq!(B[r1,j], t)
+            t = mul!(t, q, B[r2,j])
+            B[r1,j] = addeq!(B[r1,j], t)
          end
          c = find_pivot_popov(B, r1, i)
       end
@@ -3376,9 +3376,9 @@ function det_popov{T <: PolyElem}(A::GenMat{T})
          return R(0)
       end
       diag_elems[i+1] = r1
-      mul!(det, det, B[r1,i+1])
+      det = mul!(det, det, B[r1,i+1])
    end
-   mul!(det, det, B[pivots[1],1])
+   det = mul!(det, det, B[pivots[1],1])
    diag_elems[1] = pivots[1]
    number_of_swaps = 0
    # Adjust the sign of det by sorting the diagonal elements.
@@ -3391,7 +3391,7 @@ function det_popov{T <: PolyElem}(A::GenMat{T})
       end
    end
    if number_of_swaps%2 == 1
-      mul!(det, det, R(-1))
+      det = mul!(det, det, R(-1))
    end
    return det
 end
@@ -3482,13 +3482,13 @@ function popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, with_trafo::Bool = fa
          end
          q = -div(P[r,i],P[pivot,i])
          for c = 1:n
-            mul!(t, q, P[pivot,c])
-            addeq!(P[r,c], t)
+            t = mul!(t, q, P[pivot,c])
+            P[r,c] = addeq!(P[r,c], t)
          end
          if with_trafo
             for c = 1:cols(U)
-               mul!(t, q, U[pivot,c])
-               addeq!(U[r,c], t)
+               t = mul!(t, q, U[pivot,c])
+               U[r,c] = addeq!(U[r,c], t)
             end
          end
       end
@@ -3545,13 +3545,13 @@ function hnf_via_popov_reduce_row!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, pi
       pivot = pivots_hermite[c]
       q = -div(H[r,c],H[pivot,c])
       for j = c:n
-         mul!(t, q, H[pivot,j])
-         addeq!(H[r,j], t)
+         t = mul!(t, q, H[pivot,j])
+         H[r,j] = addeq!(H[r,j], t)
       end
       if with_trafo
          for j = 1:cols(U)
-            mul!(t, q, U[pivot,j])
-            addeq!(U[r,j], t)
+            t = mul!(t, q, U[pivot,j])
+            U[r,j] = addeq!(U[r,j], t)
          end
       end
    end
@@ -3572,13 +3572,13 @@ function hnf_via_popov_reduce_column!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T},
       end
       q = -div(H[i,c],H[r,c])
       for j = 1:n
-         mul!(t, q, H[r,j])
-         addeq!(H[i,j], t)
+         t = mul!(t, q, H[r,j])
+         H[i,j] = addeq!(H[i,j], t)
       end
       if with_trafo
          for j = 1:cols(U)
-            mul!(t, q, U[r,j])
-            addeq!(U[i,j], t)
+            t = mul!(t, q, U[r,j])
+            U[i,j] = addeq!(U[i,j], t)
          end
       end
    end
@@ -3621,13 +3621,13 @@ function hnf_via_popov!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, with_trafo::B
          end
          q = -div(H[r1,c],H[r2,c])
          for j = 1:n
-            mul!(t, q, H[r2,j])
-            addeq!(H[r1,j], t)
+            t = mul!(t, q, H[r2,j])
+            H[r1,j] = addeq!(H[r1,j], t)
          end
          if with_trafo
             for j = 1:cols(U)
-               mul!(t, q, U[r2,j])
-               addeq!(U[r1,j], t)
+               t = mul!(t, q, U[r2,j])
+               U[r1,j] = addeq!(U[r1,j], t)
             end
          end
          hnf_via_popov_reduce_row!(H, U, pivots_hermite, r1, with_trafo)

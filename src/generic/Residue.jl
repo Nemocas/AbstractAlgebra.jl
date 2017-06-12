@@ -481,7 +481,7 @@ end
 ###############################################################################
 
 function zero!{T <: RingElem}(a::ResElem{T})
-   zero!(a.data)
+   a.data = zero!(a.data)
    return a
 end
 
