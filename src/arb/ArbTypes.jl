@@ -482,7 +482,7 @@ type arb_mat <: MatElem{arb}
   r::Int
   c::Int
   rows::Ptr{Void}
-  parent::ArbMatSpace
+  base_ring::ArbField
 
   function arb_mat(r::Int, c::Int)
     z = new()
@@ -592,14 +592,6 @@ function _arb_mat_clear_fn(x::arb_mat)
   ccall((:arb_mat_clear, :libarb), Void, (Ptr{arb_mat}, ), &x)
 end
 
-parent(x::arb_mat) = x.parent
-
-elem_type(x::ArbMatSpace) = arb_mat
-
-prec(x::ArbMatSpace) = prec(x.base_ring)
-
-base_ring(a::ArbMatSpace) = a.base_ring
-
 ################################################################################
 #
 #  Types and memory management for AcbMatSpace
@@ -631,7 +623,7 @@ type acb_mat <: MatElem{acb}
   r::Int
   c::Int
   rows::Ptr{Void}
-  parent::AcbMatSpace
+  base_ring::AcbField
 
   function acb_mat(r::Int, c::Int)
     z = new()
@@ -894,12 +886,4 @@ end
 function _acb_mat_clear_fn(x::acb_mat)
   ccall((:acb_mat_clear, :libarb), Void, (Ptr{acb_mat}, ), &x)
 end
-
-parent(x::acb_mat) = x.parent
-
-elem_type(x::AcbMatSpace) = acb_mat
-
-prec(x::AcbMatSpace) = prec(x.base_ring)
-
-base_ring(a::AcbMatSpace) = a.base_ring
 

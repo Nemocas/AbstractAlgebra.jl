@@ -53,7 +53,7 @@ function test_arb_mat_constructors()
 end
 
 function test_arb_mat_printing()
-   print("arb_mat.constructors...")
+   print("arb_mat.printing...")
  
    S = MatrixSpace(RR, 3, 3)
    f = S(fmpz(3))

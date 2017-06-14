@@ -174,8 +174,8 @@ function den(a::nf_elem)
 end
 
 function elem_from_mat_row(a::AnticNumberField, b::fmpz_mat, i::Int, d::fmpz)
-   _checkbounds(b.parent.rows, i) || throw(BoundsError())
-   b.parent.cols == degree(a) || error("Wrong number of columns")
+   _checkbounds(rows(b), i) || throw(BoundsError())
+   cols(b) == degree(a) || error("Wrong number of columns")
    z = a()
    ccall((:nf_elem_set_fmpz_mat_row, :libflint), Void,
         (Ptr{nf_elem}, Ptr{fmpz_mat}, Cint, Ptr{fmpz}, Ptr{AnticNumberField}),

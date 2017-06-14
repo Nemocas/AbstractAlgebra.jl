@@ -485,7 +485,7 @@ function test_fq_nmod_poly_special()
 end
 
 function test_fq_nmod_poly_inflation_deflation()
-   print("fq_nmod_poly.inflation_deflation()...")
+   print("fq_nmod_poly.inflation_deflation...")
 
    R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
@@ -498,7 +498,7 @@ function test_fq_nmod_poly_inflation_deflation()
 end
 
 function test_fq_nmod_poly_isirreducible()
-  print("fq_poly.isirreducible...")
+  print("fq_nmod_poly.isirreducible...")
 
   R, a = FiniteField(23, 1, "a")
   Rx, x = PolynomialRing(R, "x")
@@ -530,7 +530,7 @@ function test_fq_nmod_poly_issquarefree()
 end
 
 function test_fq_nmod_poly_factor()
-   print("fq_nmod_poly.factor()...")
+   print("fq_nmod_poly.factor...")
 
    R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
@@ -562,7 +562,7 @@ function test_fq_nmod_poly_factor()
 end
 
 function test_fq_nmod_poly_remove_valuation()
-   print("fq_nmod_poly.remove_valuation()...")
+   print("fq_nmod_poly.remove_valuation...")
 
    R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
