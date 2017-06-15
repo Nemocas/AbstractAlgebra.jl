@@ -26,10 +26,11 @@ parent_type(::Type{fmpz_mat}) = FmpzMatSpace
 
 base_ring(a::FmpzMatSpace) = a.base_ring
 
-parent(a::fmpz_mat) = a.parent
+parent(a::fmpz_mat, cached::Bool = true) = 
+    FmpzMatSpace(rows(a), cols(a), cached)
 
 function check_parent(a::fmpz_mat, b::fmpz_mat)
-   parent(a) != parent(b) && error("Incompatible matrices")
+   (rows(a) != rows(b) || cols(a) != cols(b)) && error("Incompatible matrices")
 end
 
 ###############################################################################
@@ -45,7 +46,7 @@ function window(x::fmpz_mat, r1::Int, c1::Int, r2::Int, c2::Int)
   _checkbounds(x.c, c2) || throw(BoundsError())
   (r1 > r2 || c1 > c2) && error("Invalid parameters")
   b = fmpz_mat()
-  b.parent = MatrixSpace(parent(x).base_ring, r2 - r1 + 1, c2 - c1 + 1)
+  b.base_ring = FlintZZ
   ccall((:fmpz_mat_window_init, :libflint), Void,
         (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Int, Int, Int, Int),
             &b, &x, r1-1, c1-1, r2, c2)
@@ -61,7 +62,7 @@ function _fmpz_mat_window_clear_fn(a::fmpz_mat)
    ccall((:fmpz_mat_window_clear, :libflint), Void, (Ptr{fmpz_mat},), &a)
 end
 
-size(x::fmpz_mat) = tuple(x.parent.rows, x.parent.cols)
+size(x::fmpz_mat) = tuple(rows(x), cols(x))
 
 size(t::fmpz_mat, d) = d <= 2 ? size(t)[d] : 1
 
@@ -78,8 +79,8 @@ function getindex!(v::fmpz, a::fmpz_mat, r::Int, c::Int)
 end
 
 function getindex(a::fmpz_mat, r::Int, c::Int)
-   _checkbounds(a.parent.rows, r) || throw(BoundsError())
-   _checkbounds(a.parent.cols, c) || throw(BoundsError())
+   _checkbounds(rows(a), r) || throw(BoundsError())
+   _checkbounds(cols(a), c) || throw(BoundsError())
    v = fmpz()
    z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ptr{fmpz_mat}, Int, Int), &a, r - 1, c - 1)
@@ -96,8 +97,8 @@ end
 setindex!(a::fmpz_mat, d::Integer, r::Int, c::Int) = setindex!(a, fmpz(d), r, c)
 
 function setindex!(a::fmpz_mat, d::Int, r::Int, c::Int)
-   _checkbounds(a.parent.rows, r) || throw(BoundsError())
-   _checkbounds(a.parent.cols, c) || throw(BoundsError())
+   _checkbounds(rows(a), r) || throw(BoundsError())
+   _checkbounds(cols(a), c) || throw(BoundsError())
    z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ptr{fmpz_mat}, Int, Int), &a, r - 1, c - 1)
    ccall((:fmpz_set_si, :libflint), Void, (Ptr{fmpz}, Int), z, d)
@@ -119,7 +120,7 @@ isone(a::fmpz_mat) = ccall((:fmpz_mat_is_one, :libflint), Bool,
 
 function deepcopy_internal(d::fmpz_mat, dict::ObjectIdDict)
    z = fmpz_mat(d)
-   z.parent = d.parent
+   z.base_ring = d.base_ring
    return z
 end
 
@@ -144,18 +145,18 @@ function show(io::IO, a::FmpzMatSpace)
 end
 
 function show(io::IO, a::fmpz_mat)
-   rows = a.parent.rows
-   cols = a.parent.cols
-   for i = 1:rows
+   r = rows(a)
+   c = cols(a)
+   for i = 1:r
       print(io, "[")
-      for j = 1:cols
+      for j = 1:c
          print(io, a[i, j])
-         if j != cols
+         if j != c
             print(io, " ")
          end
       end
       print(io, "]")
-      if i != rows
+      if i != r
          println(io, "")
       end
    end
@@ -1163,47 +1164,47 @@ end
 
 function (a::FmpzMatSpace)()
    z = fmpz_mat(a.rows, a.cols)
-   z.parent = a
+   z.base_ring = FlintZZ
    return z
 end
 
 function (a::FmpzMatSpace)(arr::Array{fmpz, 2})
    _check_dim(a.rows, a.cols, arr)
    z = fmpz_mat(a.rows, a.cols, arr)
-   z.parent = a
+   z.base_ring = FlintZZ
    return z
 end
 
 function (a::FmpzMatSpace){T <: Integer}(arr::Array{T, 2})
    _check_dim(a.rows, a.cols, arr)
    z = fmpz_mat(a.rows, a.cols, arr)
-   z.parent = a
+   z.base_ring = FlintZZ
    return z
 end
 
 function (a::FmpzMatSpace)(arr::Array{fmpz, 1})
    _check_dim(a.rows, a.cols, arr)
    z = fmpz_mat(a.rows, a.cols, arr)
-   z.parent = a
+   z.base_ring = FlintZZ
    return z
 end
 
 function (a::FmpzMatSpace){T <: Integer}(arr::Array{T, 1})
-  _check_dim(a.rows, a.cols, arr)
-  z = fmpz_mat(a.rows, a.cols, arr)
-  z.parent = a
-  return z
+   _check_dim(a.rows, a.cols, arr)
+   z = fmpz_mat(a.rows, a.cols, arr)
+   z.base_ring = FlintZZ
+   return z
 end
 
 function (a::FmpzMatSpace)(d::fmpz)
    z = fmpz_mat(a.rows, a.cols, d)
-   z.parent = a
+   z.base_ring = FlintZZ
    return z
 end
 
 function (a::FmpzMatSpace)(d::Integer)
    z = fmpz_mat(a.rows, a.cols, fmpz(d))
-   z.parent = a
+   z.base_ring = FlintZZ
    return z
 end
 
@@ -1225,6 +1226,6 @@ promote_rule(::Type{fmpz_mat}, ::Type{fmpz}) = fmpz_mat
 #
 ###############################################################################
 
-function MatrixSpace(R::FlintIntegerRing, r::Int, c::Int; cached = true)
+function MatrixSpace(R::FlintIntegerRing, r::Int, c::Int, cached::Bool = true)
    return FmpzMatSpace(r, c, cached)
 end

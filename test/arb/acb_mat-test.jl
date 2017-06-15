@@ -60,7 +60,7 @@ function test_acb_mat_constructors()
 end
 
 function test_acb_mat_printing()
-   print("acb_mat.constructors...")
+   print("acb_mat.printing...")
  
    S = MatrixSpace(CC, 3, 3)
    f = S(fmpz(3))

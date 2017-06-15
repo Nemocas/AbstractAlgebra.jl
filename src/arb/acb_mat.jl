@@ -17,6 +17,17 @@ export rows, cols, zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
 
 parent_type(::Type{acb_mat}) = AcbMatSpace
 
+parent(x::acb_mat, cached::Bool = true) =
+      MatrixSpace(base_ring(x), rows(x), cols(x))
+
+elem_type(x::AcbMatSpace) = acb_mat
+
+prec(x::AcbMatSpace) = prec(x.base_ring)
+
+base_ring(a::AcbMatSpace) = a.base_ring
+
+base_ring(a::acb_mat) = a.base_ring
+
 function getindex!(z::acb, x::acb_mat, r::Int, c::Int)
   v = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
               (Ptr{acb_mat}, Int, Int), &x, r - 1, c - 1)
@@ -89,18 +100,18 @@ function show(io::IO, a::AcbMatSpace)
 end
 
 function show(io::IO, a::acb_mat)
-   rows = a.parent.rows
-   cols = a.parent.cols
-   for i = 1:rows
+   r = rows(a)
+   c = cols(a)
+   for i = 1:r
       print(io, "[")
-      for j = 1:cols
+      for j = 1:c
          print(io, a[i, j])
-         if j != cols
+         if j != c
             print(io, " ")
          end
       end
       print(io, "]")
-      if i != rows
+      if i != r
          println(io, "")
       end
    end
@@ -608,7 +619,7 @@ end
 
 function (x::AcbMatSpace)()
   z = acb_mat(x.rows, x.cols)
-  z.parent = x
+  z.base_ring = x.base_ring
   return z
 end
 
@@ -616,7 +627,7 @@ function (x::AcbMatSpace)(y::fmpz_mat)
   (x.cols != cols(y) || x.rows != rows(y)) &&
       error("Dimensions are wrong")
   z = acb_mat(y, prec(x))
-  z.parent = x
+  z.base_ring = x.base_ring
   return z
 end
 
@@ -624,7 +635,7 @@ function (x::AcbMatSpace)(y::arb_mat)
   (x.cols != cols(y) || x.rows != rows(y)) &&
       error("Dimensions are wrong")
   z = acb_mat(y, prec(x))
-  z.parent = x
+  z.base_ring = x.base_ring
   return z
 end
 
@@ -633,7 +644,7 @@ function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, a
                          AbstractString}}(y::Array{T, 2})
   _check_dim(x.rows, x.cols, y)
   z = acb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
+  z.base_ring = x.base_ring
   return z
 end
 
@@ -641,7 +652,7 @@ function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, a
                          AbstractString}}(y::Array{T, 1})
   _check_dim(x.rows, x.cols, y)
   z = acb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
+  z.base_ring = x.base_ring
   return z
 end
 
@@ -649,21 +660,21 @@ function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, a
                          AbstractString}}(y::Array{Tuple{T, T}, 2})
   _check_dim(x.rows, x.cols, y)
   z = acb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
+  z.base_ring = x.base_ring
   return z
 end
 
 function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq}}(y::Array{Tuple{T, T}, 1})
   _check_dim(x.rows, x.cols, y)
   z = acb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
+  z.base_ring = x.base_ring
   return z
 end
 
 function (x::AcbMatSpace){T <: Union{BigFloat, arb, AbstractString}}(y::Array{Tuple{T, T}, 1})
   _check_dim(x.rows, x.cols, y)
   z = acb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
+  z.base_ring = x.base_ring
   return z
 end
 

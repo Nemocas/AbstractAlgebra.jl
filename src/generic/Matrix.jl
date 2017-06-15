@@ -33,16 +33,17 @@ doc"""
 > Return the base ring $R$ of the matrix space that the supplied matrix $r$
 > belongs to.
 """
-base_ring(a::MatElem) = base_ring(parent(a))
+base_ring(a::MatElem) = a.base_ring
 
 doc"""
     parent(a::MatElem)
 > Return the parent object of the given matrix.
 """
-parent(a::MatElem) = a.parent
+parent{T}(a::MatElem{T}, cached::Bool = true) =
+    GenMatSpace{T}(a.base_ring, size(a.entries)..., cached)
 
 function check_parent(a::MatElem, b::MatElem)
-   parent(a) != parent(b) && 
+  (base_ring(a) != base_ring(b) || rows(a) != rows(b) || cols(a) != cols(b)) && 
                 error("Incompatible matrix spaces in matrix operation")
 end
 
@@ -67,13 +68,13 @@ doc"""
     rows(a::MatElem)
 > Return the number of rows of the given matrix.
 """
-rows(a::MatElem) = parent(a).rows
+rows(a::MatElem) = size(a.entries, 1)
 
 doc"""
     cols(a::MatElem)
 > Return the number of columns of the given matrix.
 """
-cols(a::MatElem) = parent(a).cols
+cols(a::MatElem) = size(a.entries, 2)
 
 function getindex{T <: RingElem}(a::MatElem{T}, r::Int, c::Int)
    return a.entries[r, c]
@@ -135,6 +136,8 @@ function isone(a::MatElem)
   end
   return true
 end
+
+global bla = []
 
 function deepcopy_internal{T <: RingElem}(d::MatElem{T}, dict::ObjectIdDict)
    entries = Array{T}(rows(d), cols(d))
@@ -3821,7 +3824,7 @@ function (a::GenMatSpace{T}){T <: RingElem}()
       end
    end
    z = GenMat{T}(entries)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
@@ -3837,7 +3840,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Integer)
       end
    end
    z = GenMat{T}(entries)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
@@ -3853,7 +3856,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::fmpz)
       end
    end
    z = GenMat{T}(entries)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
@@ -3870,7 +3873,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::T)
       end
    end
    z = GenMat{T}(entries)
-   z.parent = a
+   z.base_ring = base_ring(a)
    return z
 end
 
@@ -3885,7 +3888,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 2})
    end
    _check_dim(a.rows, a.cols, b)
    z = GenMat{T}(b)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 
@@ -3896,7 +3899,7 @@ function (a::GenMatSpace{T}){T <: RingElem}(b::Array{T, 1})
    _check_dim(a.rows, a.cols, b)
    b = reshape(b, a.cols, a.rows)'
    z = GenMat{T}(b)
-   z.parent = a
+   z.base_ring = a.base_ring
    return z
 end
 

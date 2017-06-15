@@ -1843,7 +1843,7 @@ type fmpq_mat <: MatElem{fmpq}
    r::Int
    c::Int
    rows::Ptr{Void}
-   parent::FmpqMatSpace
+   base_ring::FlintRationalField
 
    # used by windows, not finalised!!
    function fmpq_mat()
@@ -2017,7 +2017,7 @@ type fmpz_mat <: MatElem{fmpz}
    r::Int
    c::Int
    rows::Ptr{Void}
-   parent::FmpzMatSpace
+   base_ring::FlintIntegerRing
 
    # used by windows, not finalised!!
    function fmpz_mat()
@@ -2176,7 +2176,7 @@ type nmod_mat <: MatElem{GenRes{fmpz}}
   n::UInt                # mp_limb_t / Culong
   ninv::UInt             # mp_limb_t / Culong
   norm::UInt             # mp_limb_t / Culong
-  parent::NmodMatSpace
+  base_ring::GenResRing{fmpz}
 
   function nmod_mat(r::Int, c::Int, n::UInt)
     z = new()

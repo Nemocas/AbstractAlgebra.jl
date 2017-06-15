@@ -17,6 +17,17 @@ export rows, cols, zero, one, deepcopy, -, transpose, +, *, &, ==, !=,
 
 parent_type(::Type{arb_mat}) = ArbMatSpace
 
+base_ring(a::ArbMatSpace) = a.base_ring
+
+base_ring(a::arb_mat) = a.base_ring
+
+parent(x::arb_mat, cached::Bool = true) =
+      MatrixSpace(base_ring(x), rows(x), cols(x))
+
+elem_type(x::ArbMatSpace) = arb_mat
+
+prec(x::ArbMatSpace) = prec(x.base_ring)
+
 function getindex!(z::arb, x::arb_mat, r::Int, c::Int)
   v = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
               (Ptr{arb_mat}, Int, Int), &x, r - 1, c - 1)
@@ -59,8 +70,9 @@ rows(a::arb_mat) = a.r
 cols(a::arb_mat) = a.c
 
 function deepcopy_internal(x::arb_mat, dict::ObjectIdDict)
-  z = parent(x)()
+  z = arb_mat(rows(x), cols(x))
   ccall((:arb_mat_set, :libarb), Void, (Ptr{arb_mat}, Ptr{arb_mat}), &z, &x)
+  z.base_ring = x.base_ring
   return z
 end
 
@@ -77,18 +89,18 @@ function show(io::IO, a::ArbMatSpace)
 end
 
 function show(io::IO, a::arb_mat)
-   rows = a.parent.rows
-   cols = a.parent.cols
-   for i = 1:rows
+   r = rows(a)
+   c = cols(a)
+   for i = 1:r
       print(io, "[")
-      for j = 1:cols
+      for j = 1:c
          print(io, a[i, j])
-         if j != cols
+         if j != c
             print(io, " ")
          end
       end
       print(io, "]")
-      if i != rows
+      if i != r
          println(io, "")
       end
    end
@@ -571,7 +583,7 @@ end
 
 function (x::ArbMatSpace)()
   z = arb_mat(x.rows, x.cols)
-  z.parent = x
+  z.base_ring = x.base_ring
   return z
 end
 
@@ -579,7 +591,7 @@ function (x::ArbMatSpace)(y::fmpz_mat)
   (x.cols != cols(y) || x.rows != rows(y)) &&
       error("Dimensions are wrong")
   z = arb_mat(y, prec(x))
-  z.parent = x
+  z.base_ring = x.base_ring
   return z
 end
 
@@ -587,7 +599,7 @@ function (x::ArbMatSpace){T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat,
                                      arb, AbstractString}}(y::Array{T, 2})
   _check_dim(x.rows, x.cols, y)
   z = arb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
+  z.base_ring = x.base_ring
   return z
 end
 
@@ -595,7 +607,7 @@ function (x::ArbMatSpace){T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat,
                                      arb, AbstractString}}(y::Array{T, 1})
   _check_dim(x.rows, x.cols, y)
   z = arb_mat(x.rows, x.cols, y, prec(x))
-  z.parent = x
+  z.base_ring = x.base_ring
   return z
 end
 

@@ -103,8 +103,8 @@ set_entry_t!{T<:Union{RingElem, Integer}}(a::nmod_mat, i::Int, j::Int, u::T) =
  
 function deepcopy_internal(a::nmod_mat, dict::ObjectIdDict)
   z = nmod_mat(rows(a), cols(a), a.n)
-  if isdefined(a, :parent)
-    z.parent = a.parent
+  if isdefined(a, :base_ring)
+    z.base_ring = a.base_ring
   end
   ccall((:nmod_mat_set, :libflint), Void,
           (Ptr{nmod_mat}, Ptr{nmod_mat}), &z, &a)
@@ -115,11 +115,11 @@ rows(a::nmod_mat) = a.r
 
 cols(a::nmod_mat) = a.c
 
-parent(a::nmod_mat) = a.parent
+parent(a::nmod_mat, cached::Bool = true) = MatrixSpace(base_ring(a), rows(a), cols(a), cached)
 
 base_ring(a::NmodMatSpace) = a.base_ring
 
-base_ring(a::nmod_mat) = a.parent.base_ring
+base_ring(a::nmod_mat) = a.base_ring
 
 zero(a::NmodMatSpace) = a()
 
@@ -171,7 +171,7 @@ end
 #
 ################################################################################
 
-==(a::nmod_mat, b::nmod_mat) = (a.parent == b.parent) &&
+==(a::nmod_mat, b::nmod_mat) = (a.base_ring == b.base_ring) &&
         Bool(ccall((:nmod_mat_equal, :libflint), Cint,
                 (Ptr{nmod_mat}, Ptr{nmod_mat}), &a, &b))
 
@@ -509,7 +509,7 @@ function window(x::nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int)
   _checkbounds(x, r1, c1)
   _checkbounds(x, r2, c2)
   (r1 > r2 || c1 > c2) && error("Invalid parameters")
-  temp = MatrixSpace(parent(x).base_ring, r2 - r1 + 1, c2 - c1 + 1)()
+  temp = MatrixSpace(base_ring(x), r2 - r1 + 1, c2 - c1 + 1)()
   ccall((:nmod_mat_window_init, :libflint), Void,
           (Ptr{nmod_mat}, Ptr{nmod_mat}, Int, Int, Int, Int),
           &temp, &x, r1-1, c1-1, r2, c2)
@@ -638,7 +638,7 @@ promote_rule(::Type{nmod_mat}, ::Type{fmpz}) = nmod_mat
 
 function (a::NmodMatSpace)()
   z = nmod_mat(a.rows, a.cols, a.n)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
@@ -688,42 +688,42 @@ end
 function (a::NmodMatSpace)(arr::Array{BigInt, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
 function (a::NmodMatSpace)(arr::Array{BigInt, 1}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr)
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
 function (a::NmodMatSpace)(arr::Array{fmpz, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
 function (a::NmodMatSpace)(arr::Array{fmpz, 1}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr)
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
 function (a::NmodMatSpace)(arr::Array{Int, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
 function (a::NmodMatSpace)(arr::Array{Int, 1}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr)
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
@@ -731,7 +731,7 @@ function (a::NmodMatSpace)(arr::Array{GenRes{fmpz}, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
   (base_ring(a) != parent(arr[1])) && error("Elements must have same base ring")
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
@@ -739,14 +739,14 @@ function (a::NmodMatSpace)(arr::Array{GenRes{fmpz}, 1}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr)
   (base_ring(a) != parent(arr[1])) && error("Elements must have same base ring")
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
 function (a::NmodMatSpace)(b::fmpz_mat)
   (a.cols != b.c || a.rows != b.r) && error("Dimensions do not fit")
   z = nmod_mat(a.n, b)
-  z.parent = a
+  z.base_ring = a.base_ring
   return z
 end
 
@@ -756,7 +756,7 @@ end
 #
 ################################################################################
 
-function MatrixSpace(R::GenResRing{fmpz}, r::Int, c::Int; cached = true)
+function MatrixSpace(R::GenResRing{fmpz}, r::Int, c::Int, cached::Bool = true)
   return try
     NmodMatSpace(R, r, c, cached)
   catch
