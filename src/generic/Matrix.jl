@@ -14,6 +14,34 @@ export MatrixSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
 
 ###############################################################################
 #
+#   Similar
+#
+###############################################################################
+
+function similar{T}(x::GenMat{T})
+   z = GenMat{T}(similar(x.entries))
+   for i in 1:rows(z)
+      for j in 1:cols(z)
+         z[i, j] = zero(base_ring(x))
+      end
+   end
+   z.base_ring = base_ring(x)
+   return z
+end
+
+function similar{T}(x::GenMat{T}, r::Int, c::Int)
+   z = GenMat{T}(similar(x.entries, r, c))
+   for i in 1:rows(z)
+      for j in 1:cols(z)
+         z[i, j] = zero(base_ring(x))
+      end
+   end
+   z.base_ring = base_ring(x)
+   return z
+end
+
+###############################################################################
+#
 #   Data type and parent object methods
 #
 ###############################################################################
@@ -137,17 +165,14 @@ function isone(a::MatElem)
   return true
 end
 
-global bla = []
-
 function deepcopy_internal{T <: RingElem}(d::MatElem{T}, dict::ObjectIdDict)
-   entries = Array{T}(rows(d), cols(d))
+   c = similar(d)
    for i = 1:rows(d)
       for j = 1:cols(d)
-         entries[i, j] = deepcopy_internal(d[i, j], dict)
+         c[i, j] = deepcopy_internal(d[i, j], dict)
       end
    end
-   M = parent(d)
-   return M(entries)
+   return c
 end
 
 ###############################################################################
@@ -201,8 +226,13 @@ doc"""
 > Return $-a$.
 """
 function -(x::MatElem)
-   par = parent(x)
-   return par(-x.entries)
+   z = similar(x)
+   for i in 1:rows(x)
+      for j in 1:cols(x)
+         z[i, j] = -x[i, j]
+      end
+   end
+   return z
 end
 
 ###############################################################################
@@ -217,7 +247,7 @@ doc"""
 """
 function +{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
    check_parent(x, y)
-   r = parent(x)()
+   r = similar(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
          r[i, j] = x[i, j] + y[i, j]
@@ -232,7 +262,7 @@ doc"""
 """
 function -{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
    check_parent(x, y)
-   r = parent(x)()
+   r = similar(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
          r[i, j] = x[i, j] - y[i, j]
@@ -247,12 +277,7 @@ doc"""
 """
 function *{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
    cols(x) != rows(y) && error("Incompatible matrix dimensions")
-   if rows(x) == cols(y) && rows(x) == cols(x)
-      parz = parent(x)
-   else
-      parz = MatrixSpace(base_ring(x), rows(x), cols(y))
-   end
-   A = Array{T}(rows(x), cols(y))
+   A = similar(x, rows(x), cols(y))
    C = base_ring(x)()
    for i = 1:rows(x)
       for j = 1:cols(y)
@@ -263,7 +288,7 @@ function *{T <: RingElem}(x::MatElem{T}, y::MatElem{T})
          end
       end
    end
-   return parz(A)
+   return A
 end
 
 ###############################################################################
@@ -277,14 +302,13 @@ doc"""
 > Return $x\times y$.
 """
 function *(x::Integer, y::MatElem)
-   z = similar(y.entries)
-   parz = parent(y)
+   z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
          z[i, j] = x*y[i, j]
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
@@ -340,8 +364,7 @@ doc"""
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
 function +(x::Integer, y::MatElem)
-   z = similar(y.entries)
-   parz = parent(y)
+   z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -352,7 +375,7 @@ function +(x::Integer, y::MatElem)
          end
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
@@ -366,8 +389,7 @@ doc"""
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
 function +(x::fmpz, y::MatElem)
-   z = similar(y.entries)
-   parz = parent(y)
+   z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -378,7 +400,7 @@ function +(x::fmpz, y::MatElem)
          end
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
@@ -392,8 +414,7 @@ doc"""
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
 function +{T <: RingElem}(x::T, y::MatElem{T})
-   z = similar(y.entries)
-   parz = parent(y)
+   z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
          if i != j
@@ -403,7 +424,7 @@ function +{T <: RingElem}(x::T, y::MatElem{T})
          end
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
@@ -417,8 +438,7 @@ doc"""
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 """
 function -(x::Integer, y::MatElem)
-   z = similar(y.entries)
-   parz = parent(y)
+   z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -429,16 +449,15 @@ function -(x::Integer, y::MatElem)
          end
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
     -(x::MatElem, y::Integer)
-> Return $x - S(y)$, where $S$ is the parent of $x$
+> Return $x - S(y)$, where $S$ is the parent of $x$.
 """
 function -(x::MatElem, y::Integer) 
-   z = similar(x.entries)
-   parz = parent(x)
+   z = similar(x)
    R = base_ring(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
@@ -449,7 +468,7 @@ function -(x::MatElem, y::Integer)
          end
       end
    end
-   return parz(z)
+   return z
 end
 
 doc"""
@@ -808,17 +827,12 @@ doc"""
 > $i$-th and $j$-th rows, respectively.
 """
 function gram(x::MatElem)
-   if rows(x) == cols(x)
-      parz = parent(x)
-   else
-      parz = MatrixSpace(base_ring(x), rows(x), rows(x))
-   end
-   z = parz()   
+   z = similar(x, rows(x), rows(x))
    for i = 1:rows(x)
       for j = 1:rows(x)
          z[i, j] = zero(base_ring(x))
          for k = 1:cols(x)
-            z[i, j] += x[i, k]*x[j, k]
+            z[i, j] += x[i, k] * x[j, k]
          end
       end
    end
@@ -954,11 +968,7 @@ function lufact{T <: FieldElem}(A::MatElem{T}, P = PermGroup(rows(A)))
    p = P()
    R = base_ring(A)
    U = deepcopy(A)
-   if m == n
-      L = parent(A)()
-   else
-      L = MatrixSpace(R, m, m)()
-   end
+   L = similar(A, m, m)
    rank = lufact!(p, U)
    for i = 1:m
       for j = 1:n
@@ -1100,11 +1110,7 @@ function fflu{T <: RingElem}(A::MatElem{T}, P = PermGroup(rows(A)))
    p = P()
    R = base_ring(A)
    U = deepcopy(A)
-   if m == n
-      L = parent(A)()
-   else
-      L = MatrixSpace(R, m, m)()
-   end
+   L = similar(A, m, m)
    rank, d = fflu!(p, U)
    for i = 1:m
       for j = 1:n
@@ -1213,8 +1219,8 @@ function rref!{T <: FieldElem}(A::MatElem{T})
          A[i, j] = R()
       end
    end
-   U = MatrixSpace(R, rnk, rnk)()
-   V = MatrixSpace(R, rnk, n - rnk)()
+   U = similar(A, rnk, rnk)
+   V = similar(A, rnk, n - rnk)
    pivots = Array{Int}(n)
    np = rnk
    j = k = 1
@@ -1528,8 +1534,7 @@ function det_interpolation{T <: PolyElem}(M::MatElem{T})
    bound = n*(maxlen - 1) + 1
    x = Array{elem_type(base_ring(R))}(bound)
    d = Array{elem_type(base_ring(R))}(bound)
-   S = MatrixSpace(base_ring(R), n, n)
-   X = S()
+   X = similar(M, n, n)
    b2 = div(bound, 2)
    pt1 = base_ring(R)(1 - b2)
    for i = 1:bound
@@ -1817,8 +1822,6 @@ function solve_interpolation{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
       return b, base_ring(M)()
    end  
    R = base_ring(M)
-   S = MatrixSpace(base_ring(R), m, m)
-   U = MatrixSpace(base_ring(R), m, h)
    maxlen = 0
    for i = 1:m
       for j = 1:m
@@ -1838,9 +1841,9 @@ function solve_interpolation{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
    d = Array{elem_type(base_ring(R))}(bound)
    y = Array{elem_type(base_ring(R))}(bound)
    bj = Array{elem_type(base_ring(R))}(bound)
-   X = S()
-   Y = U()
-   x = parent(b)()
+   X = similar(M, m, m)
+   Y = similar(M, m, h)
+   x = similar(b)
    b2 = div(bound, 2)
    pt1 = base_ring(R)(1 - b2)
    for i = 1:bound
@@ -2017,7 +2020,7 @@ function nullspace{T <: RingElem}(M::MatElem{T})
    rank, d, A = rref(M)
    nullity = n - rank
    R = base_ring(M)
-   U = MatrixSpace(R, n, nullity)()
+   U = similar(M, n, nullity)
    if rank == 0
       for i = 1:nullity
          U[i, i] = R(1)
@@ -2067,7 +2070,7 @@ function nullspace{T <: FieldElem}(M::MatElem{T})
    rank, A = rref(M)
    nullity = n - rank
    R = base_ring(M)
-   X = MatrixSpace(R, n, nullity)()
+   X = similar(M, n, nullity)
    if rank == 0
       for i = 1:nullity
          X[i, i] = R(1)
@@ -2519,9 +2522,8 @@ function minpoly{T <: FieldElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
    end
    R = base_ring(M)
    p = S(1)
-   A = MatrixSpace(R, n + 1, 2n + 1)()
-   B = MatrixSpace(R, n, n)()
-   U = MatrixSpace(R, n, 1)
+   A = similar(M, n + 1, 2n + 1)
+   B = similar(M, n, n)
    L1 = [n + i for i in 1:n + 1]
    L2 = [n for i in 1:n]
    P2 = zeros(Int, n)
@@ -2531,7 +2533,7 @@ function minpoly{T <: FieldElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
    first_poly = true
    while r2 <= n
       P1 = [0 for i in 1:2n + 1]
-      v = zero(U)
+      v = similar(M, n, 1)
       for j = 1:n
          B[r2, j] = v[j, 1]
          A[1, j] = R()
@@ -2615,9 +2617,8 @@ function minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
    end
    R = base_ring(M)
    p = S(1)
-   A = MatrixSpace(R, n + 1, 2n + 1)()
-   B = MatrixSpace(R, n, n)()
-   U = MatrixSpace(R, n, 1)
+   A = similar(M, n + 1, 2n + 1)
+   B = similar(M, n, n)
    L1 = [n + i for i in 1:n + 1]
    L2 = [n for i in 1:n]
    P2 = zeros(Int, n)
@@ -2627,7 +2628,7 @@ function minpoly{T <: RingElem}(S::Ring, M::MatElem{T}, charpoly_only = false)
    first_poly = true
    while r2 <= n
       P1 = [0 for i in 1:2n + 1]
-      v = zero(U)
+      v = similar(M, n, 1)
       for j = 1:n
          B[r2, j] = v[j, 1]
          A[1, j] = R()
@@ -2713,7 +2714,7 @@ end
 function hnf_cohen_with_trafo{T <: RingElem}(A::GenMat{T})
    H = deepcopy(A)
    m = rows(H)
-   U = one(MatrixSpace(base_ring(H), m, m))
+   U = one(parent(similar(A, m, m)))
    hnf_cohen!(H, U)
    return H, U
 end
@@ -2793,11 +2794,11 @@ function _hnf_kb{T}(A::GenMat, trafo::Type{Val{T}} = Val{false})
    H = deepcopy(A)
    m = rows(H)
    if trafo == Val{true}
-      U = one(MatrixSpace(base_ring(H), m, m))
+      U = one(parent(similar(A, m, m)))
       hnf_kb!(H, U, true)
       return H, U
    else
-      U = zero(MatrixSpace(base_ring(H), 0, 0))
+      U = similar(A, 0, 0)
       hnf_kb!(H, U, false)
       return H
    end
@@ -3020,12 +3021,12 @@ function _snf_kb{V, T <: RingElem}(A::GenMat{T}, trafo::Type{Val{V}} = Val{false
    m = rows(S)
    n = cols(S)
    if trafo == Val{true}
-      U = one(MatrixSpace(base_ring(S), m, m))
-      K = one(MatrixSpace(base_ring(S), n, n))
+      U = one(parent(similar(A, m, m)))
+      K = one(parent(similar(A, n, n)))
       snf_kb!(S, U, K, true)
       return S, U, K
    else
-      U = zero(MatrixSpace(base_ring(S), 0, 0))
+      U = similar(A, 0, 0)
       K = U
       snf_kb!(S, U, K, false)
       return S
@@ -3157,13 +3158,13 @@ end
 function _weak_popov{T <: PolyElem, S}(A::GenMat{T}, trafo::Type{Val{S}} = Val{false})
    P = deepcopy(A)
    m = rows(P)
-   W = zero(MatrixSpace(base_ring(P), 0, 0))
+   W = similar(A, 0, 0)
    if trafo == Val{true}
-      U = one(MatrixSpace(base_ring(P), m, m))
+      U = one(parent(similar(A, m, m)))
       weak_popov!(P, W, U, false, true)
       return P, U
    else
-      U = zero(MatrixSpace(base_ring(P), 0, 0))
+      U = similar(A, 0, 0)
       weak_popov!(P, W, U, false, false)
       return P
    end
@@ -3196,11 +3197,11 @@ function _extended_weak_popov{T <: PolyElem, S}(A::GenMat{T}, V::GenMat{T}, traf
    W = deepcopy(V)
    m = rows(P)
    if trafo == Val{true}
-      U = one(MatrixSpace(base_ring(P), m, m))
+      U = one(parent(similar(A, m, m)))
       weak_popov!(P, W, U, true, true)
       return P, W, U
    else
-      U = zero(MatrixSpace(base_ring(P), 0, 0))
+      U = similar(A, 0, 0)
       weak_popov!(P, W, U, true, false)
       return P, W
    end
@@ -3304,7 +3305,7 @@ function rank_profile_popov{T <: PolyElem}(A::GenMat{T})
    B = deepcopy(A)
    m = rows(A)
    n = cols(A)
-   U = zero(MatrixSpace(base_ring(A), 0, 0))
+   U = similar(A, 0, 0)
    V = U
    r = 0
    rank_profile = Array{Int,1}(0)
@@ -3342,7 +3343,7 @@ function det_popov{T <: PolyElem}(A::GenMat{T})
    n = cols(B)
    R = base_ring(B)
    det = one(R)
-   U = zero(MatrixSpace(R, 0, 0))
+   U = similar(A, 0, 0)
    V = U
    t = R()
    pivots1 = init_pivots_popov(B)
@@ -3420,11 +3421,11 @@ function _popov{T <: PolyElem, S}(A::GenMat{T}, trafo::Type{Val{S}} = Val{false}
    P = deepcopy(A)
    m = rows(P)
    if trafo == Val{true}
-      U = one(MatrixSpace(base_ring(P), m, m))
+      U = one(parent(similar(A), m, m))
       popov!(P, U, true)
       return P, U
    else
-      U = zero(MatrixSpace(base_ring(P), 0, 0))
+      U = similar(A, 0, 0)
       popov!(P, U, false)
       return P
    end
@@ -3468,7 +3469,7 @@ end
 function popov!{T <: PolyElem}(P::GenMat{T}, U::GenMat{T}, with_trafo::Bool = false)
    m = rows(P)
    n = cols(P)
-   W = zero(MatrixSpace(base_ring(P), 0, 0))
+   W = similar(U, 0, 0)
    pivots = init_pivots_popov(P)
    weak_popov_with_pivots!(P, W, U, pivots, false, with_trafo)
    asc_order_popov!(P, U, pivots, with_trafo)
@@ -3528,11 +3529,11 @@ function _hnf_via_popov{T <: PolyElem, S}(A::GenMat{T}, trafo::Type{Val{S}} = Va
    H = deepcopy(A)
    m = rows(H)
    if trafo == Val{true}
-      U = one(MatrixSpace(base_ring(H), m, m))
+      U = one(parent(similar(A, m, m)))
       hnf_via_popov!(H, U, true)
       return H, U
    else
-      U = zero(MatrixSpace(base_ring(H), 0, 0))
+      U = similar(A, 0, 0)
       hnf_via_popov!(H, U, false)
       return H
    end
@@ -3592,7 +3593,7 @@ function hnf_via_popov!{T <: PolyElem}(H::GenMat{T}, U::GenMat{T}, with_trafo::B
    m = rows(H)
    n = cols(H)
    R = base_ring(H)
-   W = zero(MatrixSpace(R, 0, 0))
+   W = similar(H, 0, 0)
    t = R()
    pivots = init_pivots_popov(H)
    weak_popov_with_pivots!(H, W, U, pivots, false, with_trafo)
@@ -3737,7 +3738,7 @@ doc"""
 """
 function hcat(a::MatElem, b::MatElem)
    rows(a) != rows(b) && error("Incompatible number of rows in hcat")
-   c = MatrixSpace(base_ring(a), rows(a), cols(a) + cols(b))()
+   c = similar(a, rows(a), cols(a) + cols(b))
    n = cols(a)
    for i = 1:rows(a)
       for j = 1:cols(a)
@@ -3757,7 +3758,7 @@ doc"""
 """
 function vcat(a::MatElem, b::MatElem)
    cols(a) != cols(b) && error("Incompatible number of columns in vcat")
-   c = MatrixSpace(base_ring(a), rows(a) + rows(b), cols(a))()
+   c = similar(a, rows(a) + rows(b), cols(a))
    n = rows(a)
    for i = 1:rows(a)
       for j = 1:cols(a)
