@@ -5,14 +5,14 @@
 ###############################################################################
 
 export fmpz_mat, FmpzMatSpace, getindex, getindex!, setindex!, rows, cols,
-       charpoly, det, det_divisor, det_given_divisor,
-       gram, hadamard, ishadamard, hnf, ishnf, hnf_with_transform,
-       hnf_modular, lll, lll_gram, lll_with_transform, lll_gram_with_transform,
-       lll_with_removal, lll_with_removal_transform,
-       nullspace, rank, rref, reduce_mod, snf, snf_diagonal, issnf, solve,
-       solve_rational, cansolve, cansolve_with_nullspace,
-       solve_dixon, trace, transpose, content, hcat, vcat, addmul!, zero!,
-       window, pseudo_inv, hnf_modular_eldiv, nullspace_right_rational
+       charpoly, det, det_divisor, det_given_divisor, gram, hadamard,
+       ishadamard, hnf, ishnf, hnf_with_transform, hnf_modular, lll, lll_gram,
+       lll_with_transform, lll_gram_with_transform, lll_with_removal,
+       lll_with_removal_transform, nullspace, rank, rref, reduce_mod, similar,
+       snf, snf_diagonal, issnf, solve, solve_rational, cansolve,
+       cansolve_with_nullspace, solve_dixon, trace, transpose, content, hcat,
+       vcat, addmul!, zero!, window, pseudo_inv, hnf_modular_eldiv,
+       nullspace_right_rational
 
 ###############################################################################
 #
@@ -31,6 +31,24 @@ parent(a::fmpz_mat, cached::Bool = true) =
 
 function check_parent(a::fmpz_mat, b::fmpz_mat)
    (rows(a) != rows(b) || cols(a) != cols(b)) && error("Incompatible matrices")
+end
+
+###############################################################################
+#
+#   Similar
+#
+###############################################################################
+
+function similar(x::fmpz_mat)
+   z = fmpz_mat(rows(x), cols(x))
+   z.base_ring = x.base_ring
+   return z
+end
+
+function similar(x::fmpz_mat, r::Int, c::Int)
+   z = fmpz_mat(r, c)
+   z.base_ring = x.base_ring
+   return z
 end
 
 ###############################################################################
@@ -171,7 +189,7 @@ show_minus_one(::Type{fmpz_mat}) = show_minus_one(fmpz)
 ###############################################################################
 
 function -(x::fmpz_mat)
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpz_mat_neg, :libflint), Void,
          (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &x)
    return z
@@ -184,7 +202,7 @@ end
 ###############################################################################
 
 function transpose(x::fmpz_mat)
-   z = MatrixSpace(FlintZZ, cols(x), rows(x))()
+   z = similar(x, cols(x), rows(x))
    ccall((:fmpz_mat_transpose, :libflint), Void,
          (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &x)
    return z
@@ -198,7 +216,7 @@ end
 
 function +(x::fmpz_mat, y::fmpz_mat)
    check_parent(x, y)
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpz_mat_add, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat},  Ptr{fmpz_mat}),
                &z, &x, &y)
@@ -207,7 +225,7 @@ end
 
 function -(x::fmpz_mat, y::fmpz_mat)
    check_parent(x, y)
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpz_mat_sub, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat},  Ptr{fmpz_mat}),
                &z, &x, &y)
@@ -217,11 +235,10 @@ end
 function *(x::fmpz_mat, y::fmpz_mat)
    cols(x) != rows(y) && error("Incompatible matrix dimensions")
    if rows(x) == cols(y) && rows(x) == cols(x)
-      parz = parent(x)
+      z = similar(x)
    else
-      parz = FmpzMatSpace(rows(x), cols(y))
+      z = similar(x, rows(x), cols(y))
    end
-   z = parz()
    ccall((:fmpz_mat_mul, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat},  Ptr{fmpz_mat}),
                &z, &x, &y)
@@ -235,14 +252,14 @@ end
 ###############################################################################
 
 function *(x::Int, y::fmpz_mat)
-   z = parent(y)()
+   z = similar(y)
    ccall((:fmpz_mat_scalar_mul_si, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Int), &z, &y, x)
    return z
 end
 
 function *(x::fmpz, y::fmpz_mat)
-   z = parent(y)()
+   z = similar(y)
    ccall((:fmpz_mat_scalar_mul_fmpz, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz}), &z, &y, &x)
    return z
@@ -264,19 +281,21 @@ function +(x::fmpz_mat, y::Integer)
    return z
 end
 
-+(x::Integer, y::fmpz_mat) = y + x
-
-+(x::fmpz, y::fmpz_mat) = parent(y)(x) + y
-
-+(x::fmpz_mat, y::fmpz) = x + parent(x)(y)
-
-function -(x::fmpz_mat, y::Integer)
+function +(x::fmpz_mat, y::fmpz)
    z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
-      z[i, i] -= y
+      z[i, i] = addeq!(z[i, i], y)
    end
    return z
 end
+
++(x::Integer, y::fmpz_mat) = y + x
+
++(x::fmpz, y::fmpz_mat) = y + x
+
+-(x::fmpz_mat, y::Integer) = x + (-y)
+
+-(x::fmpz_mat, y::fmpz) = x + (-y)
 
 function -(x::Integer, y::fmpz_mat)
    z = -y
@@ -286,9 +305,13 @@ function -(x::Integer, y::fmpz_mat)
    return z
 end
 
--(x::fmpz, y::fmpz_mat) = parent(y)(x) - y
-
--(x::fmpz_mat, y::fmpz) = x - parent(x)(y)
+function -(x::fmpz, y::fmpz_mat)
+   z = -y
+   for i = 1:min(rows(y), cols(y))
+      z[i, i] = addeq!(z[i, i], x)
+   end
+   return z
+end
 
 ###############################################################################
 #
@@ -302,7 +325,7 @@ doc"""
 """
 function <<(x::fmpz_mat, y::Int)
    y < 0 && throw(DomainError())
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpz_mat_scalar_mul_2exp, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Int),
                &z, &x, y)
@@ -315,7 +338,7 @@ doc"""
 """
 function >>(x::fmpz_mat, y::Int)
    y < 0 && throw(DomainError())
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpz_mat_scalar_tdiv_q_2exp, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Int),
                &z, &x, y)
@@ -331,7 +354,7 @@ end
 function ^(x::fmpz_mat, y::Int)
    y < 0 && throw(DomainError())
    rows(x) != cols(x) && error("Incompatible matrix dimensions")
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpz_mat_pow, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Int),
                &z, &x, y)
@@ -385,7 +408,7 @@ end
 ###############################################################################
 
 function inv(x::fmpz_mat)
-   z = parent(x)()
+   z = similar(x)
    d = fmpz()
    ccall((:fmpz_mat_inv, :libflint), Void,
          (Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{fmpz_mat}), &z, &d, &x)
@@ -410,7 +433,7 @@ doc"""
 > that $z/d$ is the inverse of $x$.
 """
 function pseudo_inv(x::fmpz_mat)
-   z = parent(x)()
+   z = similar(x)
    d = fmpz()
    ccall((:fmpz_mat_inv, :libflint), Void,
          (Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{fmpz_mat}), &z, &d, &x)
@@ -438,14 +461,14 @@ end
 ###############################################################################
 
 function divexact(x::fmpz_mat, y::Int)
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpz_mat_scalar_divexact_si, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Int), &z, &x, y)
    return z
 end
 
 function divexact(x::fmpz_mat, y::fmpz)
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpz_mat_scalar_divexact_fmpz, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz}), &z, &x, &y)
    return z
@@ -464,7 +487,7 @@ doc"""
 > Reduce the entries of $x$ modulo $y$ and return the result.
 """
 function reduce_mod(x::fmpz_mat, y::fmpz)
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpz_mat_scalar_mod_fmpz, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz}), &z, &x, &y)
    return z
@@ -562,12 +585,7 @@ end
 ###############################################################################
 
 function gram(x::fmpz_mat)
-   if rows(x) == cols(x)
-      parz = parent(x)
-   else
-      parz = FmpzMatSpace(rows(x), rows(x))
-   end
-   z = parz()
+   z = similar(x, rows(x), rows(x))
    ccall((:fmpz_mat_gram, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &x)
    return z
@@ -613,7 +631,7 @@ doc"""
 > Return the Hermite Normal Form of $x$.
 """
 function hnf(x::fmpz_mat)
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpz_mat_hnf, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &x)
    return z
@@ -625,13 +643,8 @@ doc"""
 > is a transformation matrix so that $H = Tx$.
 """
 function hnf_with_transform(x::fmpz_mat)
-   z = parent(x)()
-   if rows(x) == cols(x)
-      parz = parent(x)
-   else
-      parz = FmpzMatSpace(rows(x), rows(x))
-   end
-   u = parz()
+   z = similar(x)
+   u = similar(x, rows(x), rows(x))
    ccall((:fmpz_mat_hnf_transform, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &u, &x)
    return z, u
@@ -643,7 +656,7 @@ doc"""
 > determinant of the nonzero rows of $x$.
 """
 function hnf_modular(x::fmpz_mat, d::fmpz)
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpz_mat_hnf_modular, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz}), &z, &x, &d)
    return z
@@ -685,7 +698,8 @@ type lll_ctx
    rep_type::Int
    gram_type::Int
 
-   function lll_ctx(delta::Float64, eta::Float64, rep=:zbasis, gram=:approx)
+   function lll_ctx(delta::Float64, eta::Float64,
+                    rep::Symbol = :zbasis, gram::Symbol = :approx)
       rt = rep == :zbasis ? 1 : 0
       gt = gram == :approx ? 0 : 1
       return new(delta, eta, rt, gt)
@@ -698,14 +712,12 @@ doc"""
 > transformation matrix so that $L = Ta$. All the default parameters can be
 > overridden by supplying an optional context object.
 """
-function lll_with_transform(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51))
+function lll_with_transform(x::fmpz_mat, ctx::lll_ctx = lll_ctx(0.99, 0.51))
    z = deepcopy(x)
-   if rows(x) == cols(x)
-      parz = parent(x)
-   else
-      parz = FmpzMatSpace(rows(x), rows(x))
+   u = similar(x, rows(x), rows(x))
+   for i in 1:rows(u)
+      u[i, i] = 1
    end
-   u = parz(1)
    ccall((:fmpz_lll, :libflint), Void,
          (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{lll_ctx}), &z, &u, &ctx)
    return z, u
@@ -719,17 +731,12 @@ doc"""
 > $\delta = 0.99$ and $\eta = 0.51$. All of these defaults can be overridden by
 > specifying an optional context object.
 """
-function lll(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51))
+function lll(x::fmpz_mat, ctx::lll_ctx = lll_ctx(0.99, 0.51))
    z = deepcopy(x)
-   if rows(z)==0 
+   if rows(z) == 0 
      return z
    end
-   if rows(x) == cols(x)
-      parz = parent(x)
-   else
-      parz = FmpzMatSpace(rows(x), rows(x))
-   end
-   u = parz(1)
+   u = similar(x, rows(x), rows(x))
    ccall((:fmpz_lll, :libflint), Void,
          (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{lll_ctx}), &z, &u, &ctx)
    return z
@@ -741,14 +748,12 @@ doc"""
 > $L$ is the gram matrix of the LLL reduction of the matrix and $T$ is a
 > transformation matrix so that $L = TM$.
 """
-function lll_gram_with_transform(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51, :gram))
+function lll_gram_with_transform(x::fmpz_mat, ctx::lll_ctx = lll_ctx(0.99, 0.51, :gram))
    z = deepcopy(x)
-   if rows(x) == cols(x)
-      parz = parent(x)
-   else
-      parz = FmpzMatSpace(rows(x), rows(x))
+   u = similar(x, rows(x), rows(x))
+   for i in 1:rows(u)
+      u[i, i] = 1
    end
-   u = parz(1)
    ccall((:fmpz_lll, :libflint), Void,
          (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{lll_ctx}), &z, &u, &ctx)
    return z, u
@@ -759,14 +764,9 @@ doc"""
 > Given the Gram matrix $x$ of a matrix, compute the Gram matrix of its LLL
 > reduction.
 """
-function lll_gram(x::fmpz_mat, ctx=lll_ctx(0.99, 0.51, :gram))
+function lll_gram(x::fmpz_mat, ctx::lll_ctx = lll_ctx(0.99, 0.51, :gram))
    z = deepcopy(x)
-   if rows(x) == cols(x)
-      parz = parent(x)
-   else
-      parz = FmpzMatSpace(rows(x), rows(x))
-   end
-   u = parz(1)
+   u = similar(x, rows(x), rows(x))
    ccall((:fmpz_lll, :libflint), Void,
          (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{lll_ctx}), &z, &u, &ctx)
    return z
@@ -778,14 +778,12 @@ doc"""
 > remaining from the LLL reduction after removal of vectors with norm exceeding
 > the bound $b$ and $T$ is a transformation matrix so that $L = Tx$.
 """
-function lll_with_removal_transform(x::fmpz_mat, b::fmpz, ctx=lll_ctx(0.99, 0.51))
+function lll_with_removal_transform(x::fmpz_mat, b::fmpz, ctx::lll_ctx = lll_ctx(0.99, 0.51))
    z = deepcopy(x)
-   if rows(x) == cols(x)
-      parz = parent(x)
-   else
-      parz = FmpzMatSpace(rows(x), rows(x))
+   u = similar(x, rows(x), rows(x))
+   for i in 1:rows(u)
+      u[i, i] = 1
    end
-   u = parz(1)
    d = Int(ccall((:fmpz_lll_with_removal, :libflint), Cint,
     (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{lll_ctx}), &z, &u, &b, &ctx))
    return d, z, u
@@ -797,14 +795,9 @@ doc"""
 > the given bound $b$. Return a tuple $(r, L)$ where the first $r$ rows of $L$
 > are the rows remaining after removal.
 """
-function lll_with_removal(x::fmpz_mat, b::fmpz, ctx=lll_ctx(0.99, 0.51))
+function lll_with_removal(x::fmpz_mat, b::fmpz, ctx::lll_ctx = lll_ctx(0.99, 0.51))
    z = deepcopy(x)
-   if rows(x) == cols(x)
-      parz = parent(x)
-   else
-      parz = FmpzMatSpace(rows(x), rows(x))
-   end
-   u = parz(1)
+   u = similar(x, rows(x), rows(x))
    d = Int(ccall((:fmpz_lll_with_removal, :libflint), Cint,
     (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{lll_ctx}), &z, &u, &b, &ctx))
    return d, z
@@ -820,18 +813,18 @@ function nullspace(x::fmpz_mat)
   H, T = hnf_with_transform(x')
   for i = rows(H):-1:1
     for j = 1:cols(H)
-      if !iszero(H[i,j])
-        N = MatrixSpace(FlintZZ, cols(x), rows(H)-i)()
+      if !iszero(H[i, j])
+        N = similar(x, cols(x), rows(H) - i)
         for k = 1:rows(N)
           for l = 1:cols(N)
-            N[k,l] = T[rows(T)-l+1, k]
+            N[k, l] = T[rows(T) - l + 1, k]
           end
         end
         return N, cols(N)
       end
     end
   end
-  return MatrixSpace(FlintZZ, cols(x), 0)(), 0
+  return similar(x, cols(x), 0), 0
 end
 
 doc"""
@@ -841,13 +834,8 @@ doc"""
 > considered as a matrix over $\mathbb{Q}$.
 """
 function nullspace_right_rational(x::fmpz_mat)
-   z = parent(x)()
-   if rows(x) == cols(x)
-      parz = parent(x)
-   else
-      parz = FmpzMatSpace(cols(x), cols(x))
-   end
-   u = parz()
+   z = similar(x)
+   u = similar(x, cols(x), cols(x))
    rank = ccall((:fmpz_mat_nullspace, :libflint), Cint,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &u, &x)
    return u, rank
@@ -871,7 +859,7 @@ end
 ###############################################################################
 
 function rref(x::fmpz_mat)
-   z = parent(x)()
+   z = similar(x)
    d = fmpz()
    ccall((:fmpz_mat_rref, :libflint), Void,
          (Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{fmpz_mat}), &z, &d, &x)
@@ -889,7 +877,7 @@ doc"""
 > Compute the Smith normal form of $x$.
 """
 function snf(x::fmpz_mat)
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpz_mat_snf, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &x)
    return z
@@ -900,7 +888,7 @@ doc"""
 > Given a diagonal matrix $x$ compute the Smith normal form of $x$.
 """
 function snf_diagonal(x::fmpz_mat)
-   z = parent(x)()
+   z = similar(x)
    ccall((:fmpz_mat_snf_diagonal, :libflint), Void,
                 (Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &x)
    return z
@@ -944,7 +932,7 @@ function cansolve(a::fmpz_mat, b::fmpz_mat)
    rows(b) != rows(a) && error("Incompatible dimensions in cansolve")
    H, T = hnf_with_transform(a')
    b = deepcopy(b)
-   z = MatrixSpace(FlintZZ, cols(b), cols(a))()
+   z = similar(a, cols(b), cols(a))
    l = min(rows(a), cols(a))
    for i=1:cols(b)
      for j=1:l
@@ -980,7 +968,7 @@ doc"""
 function cansolve_with_nullspace(a::fmpz_mat, b::fmpz_mat)
    rows(b) != rows(a) && error("Incompatible dimensions in cansolve_with_nullspace")
    H, T = hnf_with_transform(a')
-   z = MatrixSpace(FlintZZ, cols(b), cols(a))()
+   z = similar(a, cols(b), cols(a))
    l = min(rows(a), cols(a))
    for i=1:cols(b)
      for j=1:l
@@ -1008,7 +996,7 @@ function cansolve_with_nullspace(a::fmpz_mat, b::fmpz_mat)
    for i = rows(H):-1:1
      for j = 1:cols(H)
        if !iszero(H[i,j])
-         N = MatrixSpace(FlintZZ, cols(a), rows(H) -i)()
+         N = similar(a, cols(a), rows(H) - i)
          for k = 1:rows(N)
            for l = 1:cols(N)
              N[k,l] = T[rows(T) - l + 1, k]
@@ -1018,7 +1006,7 @@ function cansolve_with_nullspace(a::fmpz_mat, b::fmpz_mat)
        end
      end
    end
-   N =  MatrixSpace(FlintZZ, cols(a), 0)()
+   N =  similar(a, cols(a), 0)
 
    return true, (z*T), N
 end
@@ -1033,7 +1021,7 @@ doc"""
 function solve_rational(a::fmpz_mat, b::fmpz_mat)
    rows(a) != cols(a) && error("Not a square matrix in solve_rational")
    rows(b) != rows(a) && error("Incompatible dimensions in solve_rational")
-   z = parent(b)()
+   z = similar(b)
    d = fmpz()
    nonsing = ccall((:fmpz_mat_solve, :libflint), Bool,
       (Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &d, &a, &b)
@@ -1051,7 +1039,7 @@ doc"""
 function solve_dixon(a::fmpz_mat, b::fmpz_mat)
    rows(a) != cols(a) && error("Not a square matrix in solve")
    rows(b) != rows(a) && error("Incompatible dimensions in solve")
-   z = parent(b)()
+   z = similar(b)
    d = fmpz()
    nonsing = ccall((:fmpz_mat_solve_dixon, :libflint), Bool,
       (Ptr{fmpz_mat}, Ptr{fmpz}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &z, &d, &a, &b)
@@ -1094,7 +1082,7 @@ end
 
 function hcat(a::fmpz_mat, b::fmpz_mat)
   rows(a) != rows(b) && error("Incompatible number of rows in hcat")
-  c = MatrixSpace(FlintZZ, rows(a), cols(a) + cols(b))()
+  c = similar(a, rows(a), cols(a) + cols(b))
   ccall((:fmpz_mat_concat_horizontal, :libflint), Void,
         (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &c, &a, &b)
   return c
@@ -1102,7 +1090,7 @@ end
 
 function vcat(a::fmpz_mat, b::fmpz_mat)
   cols(a) != cols(b) && error("Incompatible number of columns in vcat")
-  c = MatrixSpace(FlintZZ, rows(a) + rows(b), cols(a))()
+  c = similar(a, rows(a) + rows(b), cols(a))
   ccall((:fmpz_mat_concat_vertical, :libflint), Void,
         (Ptr{fmpz_mat}, Ptr{fmpz_mat}, Ptr{fmpz_mat}), &c, &a, &b)
   return c
