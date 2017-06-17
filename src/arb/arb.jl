@@ -1689,7 +1689,7 @@ for (typeofx, passtoc) in ((arb, Ref{arb}), (Ptr{arb}, Ptr{arb}))
     end
 
     function _arb_set(x::($typeofx), y::arb)
-      ccall((:arb_set, :libarb), Void, (($passtoc), Ptr{arb}, Int), x, &y)
+      ccall((:arb_set, :libarb), Void, (($passtoc), Ptr{arb}), x, &y)
     end
 
     function _arb_set(x::($typeofx), y::arb, p::Int)

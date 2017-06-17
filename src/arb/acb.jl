@@ -1451,7 +1451,7 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
     end
 
     function _acb_set(x::($typeofx), y::acb)
-      ccall((:acb_set, :libarb), Void, (($passtoc), Ptr{acb}, Int), x, &y)
+      ccall((:acb_set, :libarb), Void, (($passtoc), Ptr{acb}), x, &y)
     end
 
     function _acb_set(x::($typeofx), y::acb, p::Int)
