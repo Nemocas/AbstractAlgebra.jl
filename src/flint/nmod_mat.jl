@@ -593,7 +593,8 @@ doc"""
 > entries of the returned matrix are those of $a$ lifted to $\mathbb{Z}$.
 """
 function lift(a::nmod_mat)
-  z = MatrixSpace(FlintZZ, rows(a), cols(a))()
+  z = fmpz_mat(rows(a), cols(a))
+  z.base_ring = FlintIntegerRing()
   ccall((:fmpz_mat_set_nmod_mat, :libflint), Void,
           (Ptr{fmpz_mat}, Ptr{nmod_mat}), &z, &a)
   return z 
