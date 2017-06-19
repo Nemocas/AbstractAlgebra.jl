@@ -19,7 +19,7 @@ import Base: floor, ceil, hypot, sqrt, log, log1p, exp, expm1, sin, cos, sinpi,
              cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
              asinh, acosh, gamma, lgamma, digamma, zeta, sinpi, cospi, atan2
 
-export SetElem, GroupElem, RingElem, FieldElem
+export SetElem, GroupElem, RingElem, FieldElem, AccessorNotSetError
 
 export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
        MatElem, FinFieldElem
@@ -206,8 +206,15 @@ end
 #
 ###############################################################################
 
+type AccessorNotSetError <: Exception
+end
+
 function create_accessors(T, S, handle)
    get = function(a)
+      if handle > length(a.auxilliary_data) || 
+         !isdefined(a.auxilliary_data, handle)
+        throw(AccessorNotSetError())
+      end
       return a.auxilliary_data[handle]
    end
    set = function(a, b)
