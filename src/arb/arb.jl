@@ -32,7 +32,7 @@ export ball, radius, midpoint, contains, contains_zero,
 #
 ###############################################################################
 
-elem_type(::ArbField) = arb
+elem_type(::Type{ArbField}) = arb
 
 parent_type(::Type{arb}) = ArbField
 

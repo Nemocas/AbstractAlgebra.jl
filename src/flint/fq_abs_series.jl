@@ -23,7 +23,7 @@ function O(a::fq_abs_series)
    return z
 end
 
-elem_type(::FqAbsSeriesRing) = fq_abs_series
+elem_type(::Type{FqAbsSeriesRing}) = fq_abs_series
 
 parent_type(::Type{fq_abs_series}) = FqAbsSeriesRing
 

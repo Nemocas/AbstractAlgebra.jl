@@ -35,10 +35,10 @@ end
 
 parent_type(::Type{acb_mat}) = AcbMatSpace
 
+elem_type(::Type{AcbMatSpace}) = acb_mat
+
 parent(x::acb_mat, cached::Bool = true) =
       MatrixSpace(base_ring(x), rows(x), cols(x))
-
-elem_type(x::AcbMatSpace) = acb_mat
 
 prec(x::AcbMatSpace) = prec(x.base_ring)
 

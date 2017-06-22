@@ -14,7 +14,7 @@ export ResidueRing, GenRes, GenResRing, inv, modulus, data
 
 parent_type{T}(::Type{GenRes{T}}) = GenResRing{T}
 
-elem_type{T <: RingElem}(::GenResRing{T}) = GenRes{T}
+elem_type{T <: RingElem}(::Type{GenResRing{T}}) = GenRes{T}
 
 doc"""
     base_ring{T <: RingElem}(S::ResRing{T})

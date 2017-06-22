@@ -2,7 +2,7 @@ RR = ArbField(64)
 CC = AcbField(64)
 
 function test_acb_constructors()
-   print("acb.constructors()...")
+   print("acb.constructors...")
 
    @test isa(CC, AcbField)
    @test isa(CC(2), FieldElem)
@@ -10,11 +10,14 @@ function test_acb_constructors()
    @test elem_type(CC) == acb
    @test base_ring(CC) == Union{} 
 
+   @test elem_type(AcbField) == acb
+   @test parent_type(acb) == AcbField
+
    println("PASS")
 end
 
 function test_acb_printing()
-   print("acb.printing()...")
+   print("acb.printing...")
 
    a = CC(1) + onei(CC)
 
@@ -24,7 +27,7 @@ function test_acb_printing()
 end
 
 function test_acb_basic_ops()
-   print("acb.basic_ops()...")
+   print("acb.basic_ops...")
 
    @test one(CC) == 1
    @test zero(CC) == 0
@@ -54,7 +57,7 @@ function test_acb_basic_ops()
 end
 
 function test_acb_comparison()
-   print("acb.comparison()...")
+   print("acb.comparison...")
 
    exact3 = CC(3)
    exact4 = CC(4)
@@ -92,7 +95,7 @@ end
 
 
 function test_acb_predicates()
-   print("acb.predicates()...")
+   print("acb.predicates...")
 
    @test iszero(CC(0))
    @test !iszero(CC(1))
@@ -121,7 +124,7 @@ function test_acb_predicates()
 end
 
 function test_acb_unary_ops()
-   print("acb.unary_ops()...")
+   print("acb.unary_ops...")
 
    @test -CC(3) == CC(-3)
    @test abs(-CC(3)) == 3
@@ -132,7 +135,7 @@ function test_acb_unary_ops()
 end
 
 function test_acb_binary_ops()
-   print("acb.binary_ops()...")
+   print("acb.binary_ops...")
 
    x = CC(2)
    y = CC(4)
@@ -194,7 +197,7 @@ function test_acb_binary_ops()
 end
 
 function test_acb_misc_ops()
-   print("acb.misc_ops()...")
+   print("acb.misc_ops...")
 
    @test ldexp(CC(3), 2) == 12
    @test ldexp(CC(3), ZZ(2)) == 12
@@ -218,7 +221,7 @@ function test_acb_misc_ops()
 end
 
 function test_acb_unsafe_ops()
-   print("acb.unsafe_ops()...")
+   print("acb.unsafe_ops...")
 
    z = CC(1)
    x = CC(2)
@@ -240,7 +243,7 @@ function test_acb_unsafe_ops()
 end
 
 function test_acb_constants()
-   print("acb.constants()...")
+   print("acb.constants...")
 
    @test overlaps(const_pi(CC), CC("3.141592653589793238462643 +/- 4.03e-25"))
 
@@ -248,7 +251,7 @@ function test_acb_constants()
 end
 
 function test_acb_functions()
-   print("acb.functions()...")
+   print("acb.functions...")
 
    z = CC("0.2", "0.3")
    a = CC("0.3", "0.4")

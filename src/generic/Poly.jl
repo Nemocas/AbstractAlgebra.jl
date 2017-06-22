@@ -22,7 +22,7 @@ export GenPoly, GenPolyRing, PolynomialRing, hash, coeff, isgen, lead,
 
 parent_type{T}(::Type{GenPoly{T}}) = GenPolyRing{T}
 
-elem_type{T <: RingElem}(::GenPolyRing{T}) = GenPoly{T}
+elem_type{T <: RingElem}(::Type{GenPolyRing{T}}) = GenPoly{T}
 
 doc"""
     base_ring(R::PolyRing)

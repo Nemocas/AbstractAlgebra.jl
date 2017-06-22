@@ -20,7 +20,7 @@ function O(a::fmpz_mod_rel_series)
    return z
 end
 
-elem_type(::FmpzModRelSeriesRing) = fmpz_mod_rel_series
+elem_type(::Type{FmpzModRelSeriesRing}) = fmpz_mod_rel_series
 
 parent_type(::Type{fmpz_mod_rel_series}) = FmpzModRelSeriesRing
 

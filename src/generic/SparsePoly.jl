@@ -14,7 +14,7 @@ export GenSparsePoly, GenSparsePolyRing, SparsePolynomialRing
 
 parent_type{T <: RingElem}(::Type{GenSparsePoly{T}}) = GenSparsePolyRing{T}
 
-elem_type{T <: RingElem}(::GenSparsePolyRing{T}) = GenSparsePoly{T}
+elem_type{T <: RingElem}(::Type{GenSparsePolyRing{T}}) = GenSparsePoly{T}
 
 var(a::GenSparsePolyRing) = a.S
 

@@ -72,7 +72,7 @@ end
 
 parent_type{T}(::Type{GenMat{T}}) = GenMatSpace{T}
 
-elem_type{T <: RingElem}(::GenMatSpace{T}) = GenMat{T}
+elem_type{T <: RingElem}(::Type{GenMatSpace{T}}) = GenMat{T}
 
 doc"""
     base_ring{T <: RingElem}(S::MatSpace{T})

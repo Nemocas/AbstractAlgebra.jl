@@ -5,6 +5,10 @@ function test_arb_poly_constructors()
 
    R, x = PolynomialRing(RR, "x")
 
+   @test elem_type(R) == arb_poly
+   @test elem_type(ArbPolyRing) == arb_poly
+   @test parent_type(arb_poly) == ArbPolyRing
+
    @test typeof(R) <: ArbPolyRing
 
    @test isa(x, PolyElem)

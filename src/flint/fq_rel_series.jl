@@ -20,7 +20,7 @@ function O(a::fq_rel_series)
    return z
 end
 
-elem_type(::FqRelSeriesRing) = fq_rel_series
+elem_type(::Type{FqRelSeriesRing}) = fq_rel_series
 
 parent_type(::Type{fq_rel_series}) = FqRelSeriesRing
 

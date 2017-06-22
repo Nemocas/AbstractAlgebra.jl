@@ -14,7 +14,7 @@ export FractionField, GenFrac, GenFracField, num, den
 
 parent_type{T}(::Type{GenFrac{T}}) = GenFracField{T}
 
-elem_type{T <: RingElem}(::GenFracField{T}) = GenFrac{T}
+elem_type{T <: RingElem}(::Type{GenFracField{T}}) = GenFrac{T}
 
 doc"""
     base_ring{T}(S::FracField{T})

@@ -35,14 +35,14 @@ end
 
 parent_type(::Type{arb_mat}) = ArbMatSpace
 
+elem_type(::Type{ArbMatSpace}) = arb_mat
+
 base_ring(a::ArbMatSpace) = a.base_ring
 
 base_ring(a::arb_mat) = a.base_ring
 
 parent(x::arb_mat, cached::Bool = true) =
       MatrixSpace(base_ring(x), rows(x), cols(x))
-
-elem_type(x::ArbMatSpace) = arb_mat
 
 prec(x::ArbMatSpace) = prec(x.base_ring)
 

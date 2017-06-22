@@ -61,7 +61,7 @@ function (a::NewIntParent)(b::Int)
    return NewInt(b)
 end
 
-elem_type(::Nemo.NewIntParent) = NewInt
+elem_type(::Type{Nemo.NewIntParent}) = NewInt
  
 parent_type(::Type{Nemo.NewInt}) = NewIntParent
 
@@ -91,7 +91,7 @@ isnegative(a::Nemo.NewInt) = a.d < 0
 
 parent_type{T}(::Type{GenMPoly{T}}) = GenMPolyRing{T}
 
-elem_type{T <: RingElem}(::GenMPolyRing{T}) = GenMPoly{T}
+elem_type{T <: RingElem}(::Type{GenMPolyRing{T}}) = GenMPoly{T}
 
 vars(a::GenMPolyRing) = a.S
 

@@ -27,9 +27,9 @@ base_ring(a::nmod_poly) = base_ring(parent(a))
 
 parent_type(::Type{nmod_poly}) = NmodPolyRing
 
-elem_type(::nmod_poly) = nmod_poly
+elem_type(::Type{nmod_poly}) = nmod_poly
 
-elem_type(::NmodPolyRing) = nmod_poly
+elem_type(::Type{NmodPolyRing}) = nmod_poly
 
 function check_parent(x::nmod_poly, y::nmod_poly)
   parent(x) != parent(y) && error("Parents must coincide")

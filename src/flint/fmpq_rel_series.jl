@@ -20,7 +20,7 @@ function O(a::fmpq_rel_series)
    return z
 end
 
-elem_type(::FmpqRelSeriesRing) = fmpq_rel_series
+elem_type(::Type{FmpqRelSeriesRing}) = fmpq_rel_series
 
 parent_type(::Type{fmpq_rel_series}) = FmpqRelSeriesRing
 

@@ -23,7 +23,7 @@ function O(a::fmpz_abs_series)
    return z
 end
 
-elem_type(::FmpzAbsSeriesRing) = fmpz_abs_series
+elem_type(::Type{FmpzAbsSeriesRing}) = fmpz_abs_series
 
 parent_type(::Type{fmpz_abs_series}) = FmpzAbsSeriesRing
 
