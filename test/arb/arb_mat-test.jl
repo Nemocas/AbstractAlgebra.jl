@@ -73,9 +73,13 @@ function test_arb_mat_manipulation()
    @test iszero(zero(S))
    @test isone(one(S))
 
-   B[1, 1] = fmpz(3)
+   i = 0
+   for T in [Int, UInt, fmpz, fmpq, Float64, BigFloat, fmpz, fmpq]
+      i += 1
+      B[1, 1] = T(i)
 
-   @test B[1, 1] == RR(3)
+      @test B[1, 1] == RR(i)
+   end
 
    @test rows(B) == 3
    @test cols(B) == 3

@@ -64,28 +64,37 @@ function getindex(x::acb_mat, r::Int, c::Int)
   return z
 end
 
-function setindex!(x::acb_mat,
-                   y::Union{Int, UInt, Float64, fmpz, fmpq, arb, BigFloat,
-                            acb, AbstractString},
-                   r::Int, c::Int)
-  _checkbounds(rows(x), r) || throw(BoundsError())
-  _checkbounds(cols(x), c) || throw(BoundsError())
+for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, acb, AbstractString]
+   @eval begin
+      function setindex!(x::acb_mat, y::$T, r::Int, c::Int)
+         _checkbounds(rows(x), r) || throw(BoundsError())
+         _checkbounds(cols(x), c) || throw(BoundsError())
 
-  z = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
-              (Ptr{acb_mat}, Int, Int), &x, r - 1, c - 1)
-  _acb_set(z, y, prec(base_ring(x)))
+         z = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
+                   (Ptr{acb_mat}, Int, Int), &x, r - 1, c - 1)
+         _acb_set(z, y, prec(base_ring(x)))
+      end
+   end
 end
 
-function setindex!{T <: Union{Int, UInt, Float64, fmpz, fmpq, arb, BigFloat,
-                              AbstractString}}(x::acb_mat, y::Tuple{T, T},
-                              r::Int, c::Int)
-  _checkbounds(rows(x), r) || throw(BoundsError())
-  _checkbounds(cols(x), c) || throw(BoundsError())
+setindex!{T <: Integer}(x::acb_mat, y::Rational{T}, r::Int, c::Int) =
+         setindex!(x, fmpq(y), r, c)
 
-  z = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
-              (Ptr{acb_mat}, Int, Int), &x, r - 1, c - 1)
-  _acb_set(z, y[1], y[2], prec(base_ring(x)))
+for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, AbstractString]
+   @eval begin
+      function setindex!(x::acb_mat, y::Tuple{$T, $T}, r::Int, c::Int)
+         _checkbounds(rows(x), r) || throw(BoundsError())
+         _checkbounds(cols(x), c) || throw(BoundsError())
+
+         z = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
+                   (Ptr{acb_mat}, Int, Int), &x, r - 1, c - 1)
+         _acb_set(z, y[1], y[2], prec(base_ring(x)))
+      end
+   end
 end
+
+setindex!{T <: Integer}(x::acb_mat, y::Tuple{Rational{T}, Rational{T}}, r::Int, c::Int) =
+         setindex!(x, map(fmpq, y), r, c)
 
 zero(x::AcbMatSpace) = x()
 
@@ -248,6 +257,26 @@ end
 
 *(x::acb, y::acb_mat) = y*x
 
+*(x::Integer, y::acb_mat) = fmpz(x) * y
+
+*(x::acb_mat, y::Integer) = y * x
+
+*(x::fmpq, y::acb_mat) = base_ring(y)(x) * y
+
+*(x::acb_mat, y::fmpq) = y * x
+
+*(x::Float64, y::acb_mat) = base_ring(y)(x) * y
+
+*(x::acb_mat, y::Float64) = y * x
+
+*(x::BigFloat, y::acb_mat) = base_ring(y)(x) * y
+
+*(x::acb_mat, y::BigFloat) = y * x
+
+*{T <: Integer}(x::Rational{T}, y::acb_mat) = fmpq(x) * y
+
+*{T <: Integer}(x::acb_mat, y::Rational{T}) = y * x
+
 for T in [Integer, fmpz, fmpq, arb, acb]
    @eval begin
       function +(x::acb_mat, y::$T)
@@ -276,6 +305,32 @@ for T in [Integer, fmpz, fmpq, arb, acb]
          return z
       end
    end
+end
+
+function +{T <: Integer}(x::acb_mat, y::Rational{T})
+   z = deepcopy(x)
+   for i = 1:min(rows(x), cols(x))
+      z[i, i] += y
+   end
+   return z
+end
+
++{T <: Integer}(x::Rational{T}, y::acb_mat) = y + x
+
+function -{T <: Integer}(x::acb_mat, y::Rational{T})
+   z = deepcopy(x)
+   for i = 1:min(rows(x), cols(x))
+      z[i, i] -= y
+   end
+   return z
+end
+
+function -{T <: Integer}(x::Rational{T}, y::acb_mat)
+   z = -y
+   for i = 1:min(rows(y), cols(y))
+      z[i, i] += x
+   end
+   return z
 end
 
 ###############################################################################
@@ -463,6 +518,14 @@ function divexact(x::acb_mat, y::acb)
               &z, &x, &y, prec(base_ring(x)))
   return z
 end
+
+divexact(x::acb_mat, y::Float64) = divexact(x, base_ring(x)(y))
+
+divexact(x::acb_mat, y::BigFloat) = divexact(x, base_ring(x)(y))
+
+divexact(x::acb_mat, y::Integer) = divexact(x, fmpz(y))
+
+divexact{T <: Integer}(x::acb_mat, y::Rational{T}) = divexact(x, fmpq(y))
 
 ################################################################################
 #
@@ -671,59 +734,81 @@ function (x::AcbMatSpace)(y::arb_mat)
   return z
 end
 
-
-function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb, acb,
-                         AbstractString}}(y::Array{T, 2})
-  _check_dim(x.rows, x.cols, y)
-  z = acb_mat(x.rows, x.cols, y, prec(x))
-  z.base_ring = x.base_ring
-  return z
-end
-
-function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb, acb,
-                         AbstractString}}(y::Array{T, 1})
-  _check_dim(x.rows, x.cols, y)
-  z = acb_mat(x.rows, x.cols, y, prec(x))
-  z.base_ring = x.base_ring
-  return z
-end
-
-function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq, BigFloat, arb,
-                         AbstractString}}(y::Array{Tuple{T, T}, 2})
-  _check_dim(x.rows, x.cols, y)
-  z = acb_mat(x.rows, x.cols, y, prec(x))
-  z.base_ring = x.base_ring
-  return z
-end
-
-function (x::AcbMatSpace){T <: Union{Int, UInt, Float64, fmpz, fmpq}}(y::Array{Tuple{T, T}, 1})
-  _check_dim(x.rows, x.cols, y)
-  z = acb_mat(x.rows, x.cols, y, prec(x))
-  z.base_ring = x.base_ring
-  return z
-end
-
-function (x::AcbMatSpace){T <: Union{BigFloat, arb, AbstractString}}(y::Array{Tuple{T, T}, 1})
-  _check_dim(x.rows, x.cols, y)
-  z = acb_mat(x.rows, x.cols, y, prec(x))
-  z.base_ring = x.base_ring
-  return z
-end
-
-function (x::AcbMatSpace)(y::Union{Int, UInt, fmpz, fmpq, Float64,
-                          BigFloat, arb, acb, AbstractString})
-  z = x()
-  for i in 1:rows(z)
-      for j = 1:cols(z)
-         if i != j
-            z[i, j] = zero(base_ring(x))
-         else
-            z[i, j] = y
-         end
+for T in [Float64, fmpz, fmpq, BigFloat, arb, acb, String]
+   @eval begin
+      function (x::AcbMatSpace)(y::Array{$T, 2})
+         _check_dim(x.rows, x.cols, y)
+         z = acb_mat(x.rows, x.cols, y, prec(x))
+         z.base_ring = x.base_ring
+         return z
+      end
+      
+      function (x::AcbMatSpace)(y::Array{$T, 1})
+         _check_dim(x.rows, x.cols, y)
+         z = acb_mat(x.rows, x.cols, y, prec(x))
+         z.base_ring = x.base_ring
+         return z
       end
    end
-   return z
 end
+
+(x::AcbMatSpace){T <: Integer}(y::Array{T, 2}) = x(map(fmpz, y))
+
+(x::AcbMatSpace){T <: Integer}(y::Array{T, 1}) = x(map(fmpz, y))
+
+(x::AcbMatSpace){T <: Integer}(y::Array{Rational{T}, 2}) = x(map(fmpq, y))
+
+(x::AcbMatSpace){T <: Integer}(y::Array{Rational{T}, 1}) = x(map(fmpq, y))
+
+for T in [Float64, fmpz, fmpq, BigFloat, arb, String]
+   @eval begin
+      function (x::AcbMatSpace)(y::Array{Tuple{$T, $T}, 2})
+         _check_dim(x.rows, x.cols, y)
+         z = acb_mat(x.rows, x.cols, y, prec(x))
+         z.base_ring = x.base_ring
+         return z
+      end
+      
+      function (x::AcbMatSpace)(y::Array{Tuple{$T, $T}, 1})
+         _check_dim(x.rows, x.cols, y)
+         z = acb_mat(x.rows, x.cols, y, prec(x))
+         z.base_ring = x.base_ring
+         return z
+      end
+   end
+end
+
+(x::AcbMatSpace){T <: Integer}(y::Array{Tuple{T, T}, 2}) = 
+         x(map(z -> (fmpz(z[1]), fmpz(z[2])), y))
+
+(x::AcbMatSpace){T <: Integer}(y::Array{Tuple{T, T}, 1}) = 
+         x(map(z -> (fmpz(z[1]), fmpz(z[2])), y))
+
+(x::AcbMatSpace){T <: Integer}(y::Array{Tuple{Rational{T}, Rational{T}}, 2}) = 
+         x(map(z -> (fmpq(z[1]), fmpq(z[2])), y))
+
+(x::AcbMatSpace){T <: Integer}(y::Array{Tuple{Rational{T}, Rational{T}}, 1}) = 
+         x(map(z -> (fmpq(z[1]), fmpq(z[2])), y))
+
+for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb, String]
+   @eval begin
+      function (x::AcbMatSpace)(y::$T)
+         z = x()
+         for i in 1:rows(z)
+            for j = 1:cols(z)
+               if i != j
+                  z[i, j] = zero(base_ring(x))
+               else
+                  z[i, j] = y
+               end
+            end
+         end
+         return z
+      end
+   end
+end
+
+(x::AcbMatSpace){T <: Integer}(y::Rational{T}) = x(fmpq(y))
 
 (x::AcbMatSpace)(y::acb_mat) = y
 
@@ -734,6 +819,8 @@ end
 ###############################################################################
 
 promote_rule{T <: Integer}(::Type{acb_mat}, ::Type{T}) = acb_mat
+
+promote_rule{T <: Integer}(::Type{acb_mat}, ::Type{Rational{T}}) = acb_mat
 
 promote_rule(::Type{acb_mat}, ::Type{fmpz}) = acb_mat
 

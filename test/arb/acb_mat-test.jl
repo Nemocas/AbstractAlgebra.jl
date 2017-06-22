@@ -17,9 +17,13 @@ function test_acb_mat_constructors()
 
    @test isa(g, MatElem)
 
-   k = S([fmpz(2) 3 5; 1 4 7; 9 6 3])
+   for T in [fmpz, fmpq, Int, UInt, BigInt, Rational{Int}, Rational{BigInt}, Float64, BigFloat]
+      k = S(map(T, [2 3 5; 1 4 7; 9 6 3]))
 
-   @test isa(k, MatElem)
+      @test isa(k, MatElem)
+   end
+
+   k = S(map(fmpz, [2 3 5; 1 4 7; 9 6 3]))
 
    l = S(k)
 
@@ -29,17 +33,9 @@ function test_acb_mat_constructors()
 
    @test isa(m, MatElem)
 
-   o = S([1.0 2.0 3.0; 1.0 1.0 1.0; 2.0 3.1 4.1])
-
-   @test isa(o, MatElem)
-   
-   p = S(BigFloat[1.0 2.0 3.0; 1.0 1.0 1.0; 2.0 3.1 4.1])
-
-   @test isa(p, MatElem)
-
    q = S(["1.0" "2.0" "3.0"; "1.0" "1.0" "1.0"; "2.0" "3.1" "4.1"])
 
-   @test isa(p, MatElem)
+   @test isa(q, MatElem)
 
    r = S(R([fmpz(2) 3 5; 1 4 7; 9 6 3]))
 
@@ -154,6 +150,7 @@ function test_acb_mat_adhoc_binary()
    B = R([fmpz(2) 3 5; 1 4 7; 9 6 3])
    C = T([QQ(2) 3 5; 1 4 7; 9 6 3])
    q = QQ(1)//QQ(3)
+   qq = 1//3
 
    @test contains(12 + A, B + 12)
    @test contains(A + 12, B + 12)
@@ -181,7 +178,16 @@ function test_acb_mat_adhoc_binary()
 
    @test contains(q*A, C*q)
    @test contains(A*q, C*q)
- 
+
+   @test contains(qq + A, C + qq)
+   @test contains(A + qq, C + qq)
+
+   @test contains(A - qq, -(qq - C))
+   @test contains(qq - A, qq - C)
+
+   @test contains(qq*A, C*qq)
+   @test contains(A*qq, C*qq)
+
    println("PASS")
 end
 
@@ -311,6 +317,9 @@ function test_acb_mat_adhoc_divexact()
 
    @test contains(divexact(A, 3), B)
    @test contains(divexact(A, fmpz(3)), B)
+   @test contains(divexact(A, BigInt(3)), B)
+   @test contains(divexact(A, Float64(3)), B)
+   @test contains(divexact(A, BigFloat(3)), B)
    @test contains(divexact(A, CC("3.0 +/- 0.5")), B)
 
    println("PASS")

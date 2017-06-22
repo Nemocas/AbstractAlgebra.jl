@@ -264,113 +264,33 @@ end
 #
 ###############################################################################
 
-+(x::acb_poly, y::Int) = x + parent(x)(y)
+for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb, fmpz_poly, fmpq_poly]
+   @eval begin
+      +(x::acb_poly, y::$T) = x + parent(x)(y)
 
-+(x::acb_poly, y::Integer) = x + parent(x)(y)
+      +(x::$T, y::acb_poly) = y + x
 
-+(x::acb_poly, y::fmpz) = x + parent(x)(y)
+      -(x::acb_poly, y::$T) = x - parent(x)(y)
 
-+(x::acb_poly, y::fmpq) = x + parent(x)(y)
+      -(x::$T, y::acb_poly) = parent(y)(x) - y
+     
+      *(x::acb_poly, y::$T) = x * parent(x)(y)
 
-+(x::acb_poly, y::Float64) = x + parent(x)(y)
+      *(x::$T, y::acb_poly) = y * x
+   end
+end
 
-+(x::acb_poly, y::arb) = x + parent(x)(y)
++{T <: Integer}(x::acb_poly, y::Rational{T}) = x + parent(x)(y)
 
-+(x::acb_poly, y::acb) = x + parent(x)(y)
++{T <: Integer}(x::Rational{T}, y::acb_poly) = y + x
 
-+(x::acb_poly, y::fmpz_poly) = x + parent(x)(y)
+-{T <: Integer}(x::acb_poly, y::Rational{T}) = x - parent(x)(y)
 
-+(x::acb_poly, y::fmpq_poly) = x + parent(x)(y)
+-{T <: Integer}(x::Rational{T}, y::acb_poly) = parent(y)(x) - y
 
--(x::acb_poly, y::Int) = x - parent(x)(y)
+*{T <: Integer}(x::acb_poly, y::Rational{T}) = x * parent(x)(y)
 
--(x::acb_poly, y::Integer) = x - parent(x)(y)
-
--(x::acb_poly, y::fmpz) = x - parent(x)(y)
-
--(x::acb_poly, y::fmpq) = x - parent(x)(y)
-
--(x::acb_poly, y::Float64) = x - parent(x)(y)
-
--(x::acb_poly, y::arb) = x - parent(x)(y)
-
--(x::acb_poly, y::acb) = x - parent(x)(y)
-
--(x::acb_poly, y::fmpz_poly) = x - parent(x)(y)
-
--(x::acb_poly, y::fmpq_poly) = x - parent(x)(y)
-
-*(x::acb_poly, y::Int) = x*parent(x)(y)
-
-*(x::acb_poly, y::Integer) = x*parent(x)(y)
-
-*(x::acb_poly, y::fmpz) = x*parent(x)(y)
-
-*(x::acb_poly, y::fmpq) = x*parent(x)(y)
-
-*(x::acb_poly, y::Float64) = x*parent(x)(y)
-
-*(x::acb_poly, y::arb) = x*parent(x)(y)
-
-*(x::acb_poly, y::acb) = x*parent(x)(y)
-
-*(x::acb_poly, y::fmpz_poly) = x*parent(x)(y)
-
-*(x::acb_poly, y::fmpq_poly) = x*parent(x)(y)
-
-+(x::Int, y::acb_poly) = y + x
-
-+(x::Integer, y::acb_poly) = y + x
-
-+(x::fmpz, y::acb_poly) = y + x
-
-+(x::fmpq, y::acb_poly) = y + x
-
-+(x::Float64, y::acb_poly) = y + x
-
-+(x::arb, y::acb_poly) = y + x
-
-+(x::acb, y::acb_poly) = y + x
-
-+(x::fmpz_poly, y::acb_poly) = y + x
-
-+(x::fmpq_poly, y::acb_poly) = y + x
-
--(x::Int, y::acb_poly) = parent(y)(x) - y
-
--(x::Integer, y::acb_poly) = parent(y)(x) - y
-
--(x::fmpz, y::acb_poly) = parent(y)(x) - y
-
--(x::fmpq, y::acb_poly) = parent(y)(x) - y
-
--(x::Float64, y::acb_poly) = parent(y)(x) - y
-
--(x::arb, y::acb_poly) = parent(y)(x) - y
-
--(x::acb, y::acb_poly) = parent(y)(x) - y
-
--(x::fmpz_poly, y::acb_poly) = parent(y)(x) - y
-
--(x::fmpq_poly, y::acb_poly) = parent(y)(x) - y
-
-*(x::Int, y::acb_poly) = y*x
-
-*(x::Integer, y::acb_poly) = y*x
-
-*(x::fmpz, y::acb_poly) = y*x
-
-*(x::fmpq, y::acb_poly) = y*x
-
-*(x::Float64, y::acb_poly) = y*x
-
-*(x::arb, y::acb_poly) = y*x
-
-*(x::acb, y::acb_poly) = y*x
-
-*(x::fmpz_poly, y::acb_poly) = y*x
-
-*(x::fmpq_poly, y::acb_poly) = y*x
+*{T <: Integer}(x::Rational{T}, y::acb_poly) = y * x
 
 ###############################################################################
 #
@@ -378,33 +298,17 @@ end
 #
 ###############################################################################
 
-divexact(x::acb_poly, y::Int) = x*inv(base_ring(parent(x))(y))
+for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb]
+   @eval begin
+      divexact(x::acb_poly, y::$T) = x * inv(base_ring(parent(x))(y))
 
-divexact(x::acb_poly, y::Integer) = x*inv(base_ring(parent(x))(y))
+      //(x::acb_poly, y::$T) = divexact(x, y)
+   end
+end
 
-divexact(x::acb_poly, y::fmpz) = x*inv(base_ring(parent(x))(y))
+divexact{T <: Integer}(x::acb_poly, y::Rational{T}) = x * inv(base_ring(parent(x))(y))
 
-divexact(x::acb_poly, y::fmpq) = x*inv(base_ring(parent(x))(y))
-
-divexact(x::acb_poly, y::Float64) = x*inv(base_ring(parent(x))(y))
-
-divexact(x::acb_poly, y::arb) = x*inv(base_ring(parent(x))(y))
-
-divexact(x::acb_poly, y::acb) = x*inv(base_ring(parent(x))(y))
-
-//(x::acb_poly, y::Int) = divexact(x, y)
-
-//(x::acb_poly, y::Integer) = divexact(x, y)
-
-//(x::acb_poly, y::fmpz) = divexact(x, y)
-
-//(x::acb_poly, y::fmpq) = divexact(x, y)
-
-//(x::acb_poly, y::Float64) = divexact(x, y)
-
-//(x::acb_poly, y::arb) = divexact(x, y)
-
-//(x::acb_poly, y::acb) = divexact(x, y)
+//{T <: Integer}(x::acb_poly, y::Rational{T}) = divexact(x, y)
 
 ###############################################################################
 #
@@ -862,7 +766,9 @@ promote_rule(::Type{acb_poly}, ::Type{Float64}) = acb_poly
 
 promote_rule(::Type{acb_poly}, ::Type{Complex{Float64}}) = acb_poly
 
-promote_rule(::Type{acb_poly}, ::Type{Int}) = acb_poly
+promote_rule{T <: Integer}(::Type{acb_poly}, ::Type{T}) = acb_poly
+
+promote_rule{T <: Integer}(::Type{acb_poly}, ::Type{Rational{T}}) = acb_poly
 
 promote_rule(::Type{acb_poly}, ::Type{Complex{Int}}) = acb_poly
 
@@ -892,11 +798,18 @@ function (a::AcbPolyRing)()
    return z
 end
 
-function (a::AcbPolyRing)(b::Union{Int,fmpz,fmpq,Float64,Complex{Float64},Complex{Int},arb,acb})
-   z = acb_poly(base_ring(a)(b), a.base_ring.prec)
-   z.parent = a
-   return z
+for T in [Integer, fmpz, fmpq, Float64, Complex{Float64},
+          Complex{Int}, arb, acb]
+  @eval begin
+    function (a::AcbPolyRing)(b::$T)
+      z = acb_poly(base_ring(a)(b), a.base_ring.prec)
+      z.parent = a
+      return z
+    end
+  end
 end
+
+(a::AcbPolyRing){T <: Integer}(b::Rational{T}) = a(fmpq(b))
 
 function (a::AcbPolyRing)(b::Array{acb, 1})
    z = acb_poly(b, a.base_ring.prec)
@@ -904,9 +817,15 @@ function (a::AcbPolyRing)(b::Array{acb, 1})
    return z
 end
 
+for T in [fmpz, fmpq, Float64, Complex{Float64}, Complex{Int}, arb]
+  @eval begin
+    (a::AcbPolyRing)(b::Array{$T, 1}) = a(map(base_ring(a), b))
+  end
+end
+
 (a::AcbPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(base_ring(a), b))
 
-(a::AcbPolyRing)(b::Array{fmpz, 1}) = a(map(base_ring(a), b))
+(a::AcbPolyRing){T <: Integer}(b::Array{Rational{T}, 1}) = a(map(base_ring(a), b))
 
 function (a::AcbPolyRing)(b::fmpz_poly)
    z = acb_poly(b, a.base_ring.prec)
