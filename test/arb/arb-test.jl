@@ -1,19 +1,21 @@
 RR = ArbField(64)
 
 function test_arb_constructors()
-   print("arb.constructors()...")
+   print("arb.constructors...")
 
    @test isa(RR, ArbField)
    @test isa(RR(2), FieldElem)
 
    @test elem_type(RR) == arb
+   @test elem_type(ArbField) == arb
+   @test parent_type(arb) == ArbField
    @test base_ring(RR) == Union{} 
 
    println("PASS")
 end
 
 function test_arb_printing()
-   print("arb.printing()...")
+   print("arb.printing...")
 
    a = RR(2)
 
@@ -23,7 +25,7 @@ function test_arb_printing()
 end
 
 function test_arb_basic_ops()
-   print("arb.basic_ops()...")
+   print("arb.basic_ops...")
 
    @test one(RR) == 1
    @test zero(RR) == 0
@@ -49,7 +51,7 @@ function test_arb_basic_ops()
 end
 
 function test_arb_comparison()
-   print("arb.comparison()...")
+   print("arb.comparison...")
 
    exact3 = RR(3)
    exact4 = RR(4)
@@ -114,7 +116,7 @@ function test_arb_comparison()
 end
 
 function test_arb_adhoc_comparison()
-   print("arb.adhoc_comparison()...")
+   print("arb.adhoc_comparison...")
 
    a = RR(3)
 
@@ -212,7 +214,7 @@ function test_arb_adhoc_comparison()
 end
 
 function test_arb_predicates()
-   print("arb.predicates()...")
+   print("arb.predicates...")
 
    @test iszero(RR(0))
    @test !iszero(RR(1))
@@ -251,7 +253,7 @@ function test_arb_predicates()
 end
 
 function test_arb_parts()
-   print("arb.parts()...")
+   print("arb.parts...")
 
    @test midpoint(RR(3)) == 3
    @test radius(RR(3)) == 0
@@ -262,7 +264,7 @@ function test_arb_parts()
 end
 
 function test_arb_unary_ops()
-   print("arb.unary_ops()...")
+   print("arb.unary_ops...")
 
    @test -RR(3) == RR(-3)
    @test abs(-RR(3)) == 3
@@ -273,7 +275,7 @@ function test_arb_unary_ops()
 end
 
 function test_arb_binary_ops()
-   print("arb.binary_ops()...")
+   print("arb.binary_ops...")
 
    x = RR(2)
    y = RR(4)
@@ -320,7 +322,7 @@ function test_arb_binary_ops()
 end
 
 function test_arb_misc_ops()
-   print("arb.misc_ops()...")
+   print("arb.misc_ops...")
 
    @test ldexp(RR(3), 2) == 12
    @test ldexp(RR(3), ZZ(2)) == 12
@@ -344,7 +346,7 @@ function test_arb_misc_ops()
 end
 
 function test_arb_unsafe_ops()
-   print("arb.unsafe_ops()...")
+   print("arb.unsafe_ops...")
 
    z = RR(1)
    x = RR(2)
@@ -366,7 +368,7 @@ function test_arb_unsafe_ops()
 end
 
 function test_arb_constants()
-   print("arb.constants()...")
+   print("arb.constants...")
 
    @test overlaps(const_pi(RR), RR("3.141592653589793238462643 +/- 4.03e-25"))
    @test overlaps(const_e(RR), RR("2.718281828459045235360287 +/- 4.96e-25"))
@@ -381,7 +383,7 @@ function test_arb_constants()
 end
 
 function test_arb_functions()
-   print("arb.functions()...")
+   print("arb.functions...")
 
    @test floor(RR(2.5)) == 2
    @test ceil(RR(2.5)) == 3
@@ -521,7 +523,7 @@ function test_arb_functions()
 end
 
 function test_fmpq_arb_special_functions()
-   print("fmpq.arb_special_functions()...")
+   print("fmpq.arb_special_functions...")
 
    @test bernoulli(10) == fmpz(5)//66
 

@@ -12,7 +12,7 @@ export fmpq_mat, FmpqMatSpace, gso, hilbert
 #
 ###############################################################################
 
-elem_type(::FmpqMatSpace) = fmpq_mat
+elem_type(::Type{FmpqMatSpace}) = fmpq_mat
 
 parent_type(::Type{fmpq_mat}) = FmpqMatSpace
 

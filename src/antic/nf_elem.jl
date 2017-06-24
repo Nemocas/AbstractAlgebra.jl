@@ -21,7 +21,7 @@ doc"""
 """
 parent(a::nf_elem) = a.parent
 
-elem_type(::AnticNumberField) = nf_elem
+elem_type(::Type{AnticNumberField}) = nf_elem
 
 doc"""
     base_ring(a::AnticNumberField)

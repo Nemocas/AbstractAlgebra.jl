@@ -14,7 +14,7 @@ export fq_nmod_poly, FqNmodPolyRing
 
 parent_type(::Type{fq_nmod_poly}) = FqNmodPolyRing
 
-elem_type(::FqNmodPolyRing) = fq_nmod_poly
+elem_type(::Type{FqNmodPolyRing}) = fq_nmod_poly
 
 base_ring(a::FqNmodPolyRing) = a.base_ring
 

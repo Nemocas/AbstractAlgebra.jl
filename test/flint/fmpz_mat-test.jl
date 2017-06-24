@@ -3,6 +3,10 @@ function test_fmpz_mat_constructors()
 
    S = MatrixSpace(ZZ, 3, 3)
 
+   @test elem_type(S) == fmpz_mat
+   @test elem_type(FmpzMatSpace) == fmpz_mat
+   @test parent_type(fmpz_mat) == FmpzMatSpace
+
    @test isa(S, FmpzMatSpace)
 
    f = S(fmpz(3))

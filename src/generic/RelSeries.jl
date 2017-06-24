@@ -33,7 +33,7 @@ doc"""
 """
 parent(a::SeriesElem) = a.parent
 
-elem_type{T <: RingElem}(::GenRelSeriesRing{T}) = GenRelSeries{T}
+elem_type{T <: RingElem}(::Type{GenRelSeriesRing{T}}) = GenRelSeries{T}
 
 doc"""
     base_ring(R::SeriesRing)

@@ -6,6 +6,10 @@ function test_arb_mat_constructors()
    S = MatrixSpace(RR, 3, 3)
    R = MatrixSpace(ZZ, 3, 3)
 
+   @test elem_type(S) == arb_mat
+   @test elem_type(ArbMatSpace) == arb_mat
+   @test parent_type(arb_mat) == ArbMatSpace
+
    @test isa(S, ArbMatSpace)
 
    f = S(fmpz(3))

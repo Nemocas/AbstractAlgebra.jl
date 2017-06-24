@@ -57,7 +57,7 @@ doc"""
 """
 parent(a::fmpz) = FlintZZ
 
-elem_type(::FlintIntegerRing) = fmpz
+elem_type(::Type{FlintIntegerRing}) = fmpz
 
 doc"""
     base_ring(a::FlintIntegerRing)

@@ -20,7 +20,7 @@ export fmpz_mat, FmpzMatSpace, getindex, getindex!, setindex!, rows, cols,
 #
 ###############################################################################
 
-elem_type(::FmpzMatSpace) = fmpz_mat
+elem_type(::Type{FmpzMatSpace}) = fmpz_mat
 
 parent_type(::Type{fmpz_mat}) = FmpzMatSpace
 

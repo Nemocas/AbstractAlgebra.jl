@@ -37,7 +37,7 @@ parent(a::fmpq) = FlintQQ
 
 parent_type(::Type{fmpq}) = FlintRationalField
 
-elem_type(::FlintRationalField) = fmpq
+elem_type(::Type{FlintRationalField}) = fmpq
 
 base_ring(a::FlintRationalField) = FlintZZ
 

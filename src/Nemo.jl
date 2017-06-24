@@ -19,6 +19,8 @@ import Base: floor, ceil, hypot, sqrt, log, log1p, exp, expm1, sin, cos, sinpi,
              cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
              asinh, acosh, gamma, lgamma, digamma, zeta, sinpi, cospi, atan2
 
+export elem_type, parent_type
+
 export SetElem, GroupElem, RingElem, FieldElem, AccessorNotSetError
 
 export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,

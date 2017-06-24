@@ -14,7 +14,7 @@ export fq_poly, FqPolyRing
 
 parent_type(::Type{fq_poly}) = FqPolyRing
 
-elem_type(::FqPolyRing) = fq_poly
+elem_type(::Type{FqPolyRing}) = fq_poly
 
 base_ring(a::FqPolyRing) = a.base_ring
 

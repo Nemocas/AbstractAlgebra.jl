@@ -7,6 +7,10 @@ function test_acb_mat_constructors()
    S = MatrixSpace(CC, 3, 3)
    R = MatrixSpace(ZZ, 3, 3)
 
+   @test elem_type(S) == acb_mat
+   @test elem_type(AcbMatSpace) == acb_mat
+   @test parent_type(acb_mat) == AcbMatSpace
+
    @test isa(S, AcbMatSpace)
 
    f = S(fmpz(3))

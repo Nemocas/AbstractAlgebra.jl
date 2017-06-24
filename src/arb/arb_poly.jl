@@ -17,6 +17,8 @@ export ArbPolyRing, arb_poly, derivative, integral, evaluate, evaluate2,
   
 parent_type(::Type{arb_poly}) = ArbPolyRing
 
+elem_type(::Type{ArbPolyRing}) = arb_poly
+
 length(x::arb_poly) = ccall((:arb_poly_length, :libarb), Int, 
                                    (Ptr{arb_poly},), &x)
 

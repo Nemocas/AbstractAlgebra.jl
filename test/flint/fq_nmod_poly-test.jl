@@ -4,6 +4,10 @@ function test_fq_nmod_poly_constructors()
    R, x = FiniteField(23, 5, "x")
    S, y = PolynomialRing(R, "y")
 
+   @test elem_type(S) == fq_nmod_poly
+   @test elem_type(FqNmodPolyRing) == fq_nmod_poly
+   @test parent_type(fq_nmod_poly) == FqNmodPolyRing
+
    @test typeof(S) <: FqNmodPolyRing
 
    @test isa(y, PolyElem)

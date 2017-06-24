@@ -28,9 +28,9 @@ function O{T}(a::AbsSeriesElem{T})
    return parent(a)(Array{T}(0), 0, prec)
 end
 
-parent_type{T}(::Type{GenAbsSeries{T}}) = GenAbsSeriesRing{T}
+parent_type{T <: RingElem}(::Type{GenAbsSeries{T}}) = GenAbsSeriesRing{T}
 
-elem_type{T <: RingElem}(::GenAbsSeriesRing{T}) = GenAbsSeries{T}
+elem_type{T <: RingElem}(::Type{GenAbsSeriesRing{T}}) = GenAbsSeries{T}
 
 ###############################################################################
 #

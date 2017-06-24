@@ -64,7 +64,7 @@ doc"""
 """
 O(R::FlintPadicField, m::Integer) = O(R, fmpz(m))
 
-elem_type(::FlintPadicField) = padic
+elem_type(::Type{FlintPadicField}) = padic
 
 doc"""
     base_ring(a::FlintPadicField)

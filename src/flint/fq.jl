@@ -15,7 +15,7 @@ export FlintFiniteField, characteristic, order, fq, FqFiniteField, frobenius,
 
 parent_type(::Type{fq}) = FqFiniteField
 
-elem_type(::FqFiniteField) = fq
+elem_type(::Type{FqFiniteField}) = fq
 
 doc"""
     base_ring(a::FqFiniteField)

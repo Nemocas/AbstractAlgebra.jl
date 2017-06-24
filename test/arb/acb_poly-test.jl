@@ -6,6 +6,10 @@ function test_acb_poly_constructors()
 
    R, x = PolynomialRing(CC, "x")
 
+   @test elem_type(R) == acb_poly
+   @test elem_type(AcbPolyRing) == acb_poly
+   @test parent_type(acb_poly) == AcbPolyRing
+
    @test typeof(R) <: AcbPolyRing
 
    @test isa(x, PolyElem)
