@@ -326,6 +326,14 @@ divexact(x::fmpq, y::acb) = x // y
 divexact(x::acb, y::fmpq) = x // y
 divexact(x::arb, y::acb) = x // y
 divexact(x::acb, y::arb) = x // y
+divexact(x::Float64, y::acb) = x // y
+divexact(x::acb, y::Float64) = x // y
+divexact(x::BigFloat, y::acb) = x // y
+divexact(x::acb, y::BigFloat) = x // y
+divexact(x::Integer, y::acb) = x // y
+divexact(x::acb, y::Integer) = x // y
+divexact{T <: Integer}(x::Rational{T}, y::acb) = x // y
+divexact{T <: Integer}(x::acb, y::Rational{T}) = x // y
 
 /(x::acb, y::acb) = x // y
 /(x::fmpz, y::acb) = x // y
@@ -338,6 +346,39 @@ divexact(x::acb, y::arb) = x // y
 /(x::acb, y::fmpq) = x // y
 /(x::arb, y::acb) = x // y
 /(x::acb, y::arb) = x // y
+
++{T <: Integer}(x::Rational{T}, y::acb) = fmpq(x) + y
++{T <: Integer}(x::acb, y::Rational{T}) = x + fmpq(y)
+-{T <: Integer}(x::Rational{T}, y::acb) = fmpq(x) - y
+-{T <: Integer}(x::acb, y::Rational{T}) = x - fmpq(y)
+*{T <: Integer}(x::Rational{T}, y::acb) = fmpq(x) * y
+*{T <: Integer}(x::acb, y::Rational{T}) = x * fmpq(y)
+//{T <: Integer}(x::Rational{T}, y::acb) = fmpq(x) // y
+//{T <: Integer}(x::acb, y::Rational{T}) = x // fmpq(y)
+^{T <: Integer}(x::Rational{T}, y::acb) = fmpq(x)^y
+^{T <: Integer}(x::acb, y::Rational{T}) = x ^ fmpq(y)
+
++(x::Float64, y::acb) = parent(y)(x) + y
++(x::acb, y::Float64) = x + parent(x)(y)
+-(x::Float64, y::acb) = parent(y)(x) - y
+-(x::acb, y::Float64) = x - parent(x)(y)
+*(x::Float64, y::acb) = parent(y)(x) * y
+*(x::acb, y::Float64) = x * parent(x)(y)
+//(x::Float64, y::acb) = parent(y)(x) // y
+//(x::acb, y::Float64) = x // parent(x)(y)
+^(x::Float64, y::acb) = parent(y)(x)^y
+^(x::acb, y::Float64) = x ^ parent(x)(y) 
+
++(x::BigFloat, y::acb) = parent(y)(x) + y
++(x::acb, y::BigFloat) = x + parent(x)(y)
+-(x::BigFloat, y::acb) = parent(y)(x) - y
+-(x::acb, y::BigFloat) = x - parent(x)(y)
+*(x::BigFloat, y::acb) = parent(y)(x) * y
+*(x::acb, y::BigFloat) = x * parent(x)(y)
+//(x::BigFloat, y::acb) = parent(y)(x) // y
+//(x::acb, y::BigFloat) = x // parent(x)(y)
+^(x::BigFloat, y::acb) = parent(y)(x)^y
+^(x::acb, y::BigFloat) = x ^ parent(x)(y) 
 
 ################################################################################
 #
@@ -450,6 +491,13 @@ doc"""
 > return `false`.
 """
 contains(x::acb, y::Integer) = contains(x, fmpz(y))
+
+doc"""
+    contains(x::acb, y::Rational{Integer})
+> Returns `true` if the box $x$ contains the given rational value, otherwise
+> return `false`.
+"""
+contains{T <: Integer}(x::acb, y::Rational{T}) = contains(x, fmpz(y))
 
 doc"""
     contains_zero(x::acb)
@@ -1554,12 +1602,19 @@ end
 
 (r::AcbField)(x::Integer) = r(fmpz(x))
 
-function (r::AcbField){T <: Union{Int, UInt, fmpz, fmpq, arb, Float64,
+(r::AcbField){T <: Integer}(x::Rational{T}) = r(fmpq(x))
+
+function (r::AcbField){T <: Union{Int, UInt,fmpz, fmpq, arb, Float64,
                                               BigFloat, AbstractString}}(x::T, y::T)
   z = acb(x, y, r.prec)
   z.parent = r
   return z
 end
+
+(r::AcbField)(x::BigInt, y::BigInt) = r(fmpz(x), fmpz(y))
+
+(r::AcbField){S <: Integer, T <: Integer}(x::Rational{S}, y::Rational{T}) =
+      r(fmpq(x), fmpq(y))
 
 ################################################################################
 #

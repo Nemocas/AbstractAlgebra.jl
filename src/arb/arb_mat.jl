@@ -64,16 +64,23 @@ function getindex(x::arb_mat, r::Int, c::Int)
   return z
 end
 
-function setindex!(x::arb_mat, y::Union{Int, UInt, fmpz, fmpq, Float64,
-                                        BigFloat, arb, AbstractString},
-                                        r::Int, c::Int)
-  _checkbounds(rows(x), r) || throw(BoundsError())
-  _checkbounds(cols(x), c) || throw(BoundsError())
+for T in [Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, AbstractString]
+   @eval begin
+      function setindex!(x::arb_mat, y::$T, r::Int, c::Int)
+         _checkbounds(rows(x), r) || throw(BoundsError())
+         _checkbounds(cols(x), c) || throw(BoundsError())
 
-  z = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
-              (Ptr{arb_mat}, Int, Int), &x, r - 1, c - 1)
-  Nemo._arb_set(z, y, prec(base_ring(x)))
+         z = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
+                   (Ptr{arb_mat}, Int, Int), &x, r - 1, c - 1)
+         Nemo._arb_set(z, y, prec(base_ring(x)))
+      end
+   end
 end
+
+setindex!(x::arb_mat, y::Integer, r::Int, c::Int) = setindex!(x, fmpz(y), r, c)
+
+setindex!{T <: Rational}(x::arb_mat, y::Rational{T}, r::Int, c::Int) =
+         setindex!(x, fmpz(y), r, c)
 
 zero(a::ArbMatSpace) = a()
 
@@ -255,6 +262,32 @@ for T in [Integer, fmpz, fmpq, arb]
          return z
       end
    end
+end
+
+function +{T <: Integer}(x::arb_mat, y::Rational{T})
+   z = deepcopy(x)
+   for i = 1:min(rows(x), cols(x))
+      z[i, i] += y
+   end
+   return z
+end
+
++{T <: Integer}(x::Rational{T}, y::arb_mat) = y + x
+
+function -{T <: Integer}(x::arb_mat, y::Rational{T})
+   z = deepcopy(x)
+   for i = 1:min(rows(x), cols(x))
+      z[i, i] -= y
+   end
+   return z
+end
+
+function -{T <: Integer}(x::Rational{T}, y::arb_mat)
+   z = -y
+   for i = 1:min(rows(y), cols(y))
+      z[i, i] += x
+   end
+   return z
 end
 
 ###############################################################################
@@ -668,11 +701,17 @@ end
 
 promote_rule{T <: Integer}(::Type{arb_mat}, ::Type{T}) = arb_mat
 
+promote_rule{T <: Integer}(::Type{arb_mat}, ::Type{Rational{T}}) = arb_mat
+
 promote_rule(::Type{arb_mat}, ::Type{fmpz}) = arb_mat
 
 promote_rule(::Type{arb_mat}, ::Type{fmpq}) = arb_mat
 
 promote_rule(::Type{arb_mat}, ::Type{arb}) = arb_mat
+
+promote_rule(::Type{arb_mat}, ::Type{Float64}) = arb_mat
+
+promote_rule(::Type{arb_mat}, ::Type{BigFloat}) = arb_mat
 
 promote_rule(::Type{arb_mat}, ::Type{fmpz_mat}) = arb_mat
 

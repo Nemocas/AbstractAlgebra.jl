@@ -38,6 +38,9 @@ function test_acb_basic_ops()
    @test CC(QQ(1)) == a
    @test CC(RR(1)) == a
    @test CC(UInt(1)) == a
+   @test CC(BigInt(1)) == a
+   @test CC(Rational{Int}(1)) == a
+   @test CC(Rational{BigInt}(1)) == a
    @test CC(RR(1)) == a
    @test CC("1.0") == a
    @test CC("1.0 +/- 0") == a
@@ -48,6 +51,9 @@ function test_acb_basic_ops()
    @test CC("2","3") == b
    @test CC(RR(2),RR(3)) == b
    @test CC(UInt(2), UInt(3)) == b
+   @test CC(BigInt(2), BigInt(3)) == b
+   @test CC(Rational{Int}(2), Rational{Int}(3)) == b
+   @test CC(Rational{BigInt}(2), Rational{BigInt}(3)) == b
    @test CC(2.0, 3.0) == b
    @test CC(BigFloat(2), BigFloat(3)) == b
    @test real(b) == 2
@@ -145,53 +151,30 @@ function test_acb_binary_ops()
    @test x * y == 8
    @test x // y == 0.5
 
-   @test x + UInt(4) == 6
-   @test x - UInt(4) == -2
-   @test x * UInt(4) == 8
-   @test x // UInt(4) == 0.5
-   @test UInt(2) + y == 6
-   @test UInt(2) - y == -2
-   @test UInt(2) * y == 8
-   @test UInt(2) // y == 0.5
+   for T in [fmpz, fmpq, Int, BigInt, Rational{Int}, Rational{BigInt}]
 
-   @test x + Int(4) == 6
-   @test x - Int(4) == -2
-   @test x * Int(4) == 8
-   @test x // Int(4) == 0.5
-   @test Int(2) + y == 6
-   @test Int(2) - y == -2
-   @test Int(2) * y == 8
-   @test Int(2) // y == 0.5
+      @test x + T(4) == 6
+      @test x - T(4) == -2
+      @test x * T(4) == 8
+      @test x // T(4) == 0.5
+      @test T(2) + y == 6
+      @test T(2) - y == -2
+      @test T(2) * y == 8
+      @test T(2) // y == 0.5
+      @test x ^ T(4) == 16
+   end
 
-   @test x + ZZ(4) == 6
-   @test x - ZZ(4) == -2
-   @test x * ZZ(4) == 8
-   @test x // ZZ(4) == 0.5
-   @test ZZ(2) + y == 6
-   @test ZZ(2) - y == -2
-   @test ZZ(2) * y == 8
-   @test ZZ(2) // y == 0.5
-
-   @test x + QQ(4) == 6
-   @test x - QQ(4) == -2
-   @test x * QQ(4) == 8
-   @test x // QQ(4) == 0.5
-   @test QQ(2) + y == 6
-   @test QQ(2) - y == -2
-   @test QQ(2) * y == 8
-   @test QQ(2) // y == 0.5
-
-   @test x ^ y == 16
-   @test x ^ ZZ(4) == 16
-   @test x ^ UInt(4) == 16
-   @test x ^ Int(4) == 16
-   @test x ^ QQ(4) == 16
-
-   @test ZZ(2) ^ y == 16
-   @test UInt(2) ^ y == 16
-   @test Int(2) ^ y == 16
-   @test QQ(2) ^ y == 16
-
+   for T in [Float64, BigFloat, arb]
+      @test contains(x + T(4), 6)
+      @test contains(x - T(4), -2)
+      @test contains(x * T(4), 8)
+      @test contains(x // T(4), fmpq(1, 2))
+      @test contains(T(2) + y, 6)
+      @test contains(T(2) - y, -2)
+      @test contains(T(2) * y, 8)
+      @test contains(T(2) // y, fmpq(1, 2))
+      @test contains(x ^ T(4), 16)
+   end
 
    println("PASS")
 end
