@@ -564,11 +564,13 @@ function test_nmod_mat_lu()
 
   r, P, l, u = lufact(a)
 
-  @test l*u == a
+  @test l*u == P*a
 
   r, P, l, u = lufact(b)
 
   @test l*u == S([ 2 1 0 1; 0 1 2 0; 0 0 0 0])
+
+  @test l*u == P*b
 
   println("PASS")
 end
