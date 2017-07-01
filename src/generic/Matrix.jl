@@ -908,7 +908,7 @@ doc"""
 > Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 """
 function *(P::perm, x::MatElem)
-  z = similar(x)
+   z = similar(x)
    m = rows(x)
    n = cols(x)
    for i = 1:m

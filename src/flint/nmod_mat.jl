@@ -483,6 +483,11 @@ end
 function lufact!(P::perm, x::nmod_mat)
   rank = ccall((:nmod_mat_lu, :libflint), Cint, (Ptr{Int}, Ptr{nmod_mat}, Cint),
            P.d, &x, 0)
+
+  for i in 1:length(P.d)
+    P.d[i] += 1
+  end
+
   return rank
 end
 
