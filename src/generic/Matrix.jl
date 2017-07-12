@@ -1560,7 +1560,7 @@ function det_interpolation{T <: PolyElem}(M::MatElem{T})
    bound = n*(maxlen - 1) + 1
    x = Array{elem_type(base_ring(R))}(bound)
    d = Array{elem_type(base_ring(R))}(bound)
-   X = similar(M, n, n)
+   X = MatrixSpace(base_ring(R), n, n)()
    b2 = div(bound, 2)
    pt1 = base_ring(R)(1 - b2)
    for i = 1:bound
