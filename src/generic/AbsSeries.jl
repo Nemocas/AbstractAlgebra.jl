@@ -599,13 +599,13 @@ function =={T <: RingElem}(x::AbsSeriesElem{T}, y::AbsSeriesElem{T})
    m2 = min(m2, prec)
    if length(x) >= m2
       for i = m1 + 1: m2
-         if coeff(x, i - 1) != 0
+         if !iszero(coeff(x, i - 1))
             return false
           end
       end
    else
       for i = m1 + 1: m2
-         if coeff(y, i - 1) != 0
+         if !iszero(coeff(y, i - 1))
             return false
           end
       end
@@ -650,7 +650,7 @@ doc"""
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 =={T <: RingElem}(x::AbsSeriesElem{T}, y::T) = precision(x) == 0 ||
-           ((length(x) == 0 && y == 0) || (length(x) == 1 && coeff(x, 0) == y))
+      ((length(x) == 0 && iszero(y)) || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
     =={T <: RingElem}(x::T, y::AbsSeriesElem{T})
@@ -662,14 +662,14 @@ doc"""
     ==(x::AbsSeriesElem, y::Integer)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::AbsSeriesElem, y::Integer) = precision(x) == 0 || ((length(x) == 0 && y == 0)
+==(x::AbsSeriesElem, y::Integer) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
     ==(x::AbsSeriesElem, y::fmpz)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::AbsSeriesElem, y::fmpz) = precision(x) == 0 || ((length(x) == 0 && y == 0)
+==(x::AbsSeriesElem, y::fmpz) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
@@ -696,7 +696,7 @@ doc"""
 """
 function divexact{T <: RingElem}(x::AbsSeriesElem{T}, y::AbsSeriesElem{T})
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    v2 = valuation(y)
    if v2 != 0
       v1 = valuation(x)
@@ -736,7 +736,7 @@ doc"""
 > Return $a/b$ where the quotient is expected to be exact.
 """
 function divexact{T <: RingElem}(x::AbsSeriesElem{T}, y::fmpz)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
    fit!(z, lenx)
@@ -752,7 +752,7 @@ doc"""
 > Return $a/b$ where the quotient is expected to be exact.
 """
 function divexact{T <: RingElem}(x::AbsSeriesElem{T}, y::T)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
    fit!(z, lenx)
@@ -774,7 +774,7 @@ doc"""
 > Return the inverse of the power series $a$, i.e. $1/a$.
 """
 function inv(a::AbsSeriesElem)
-   a == 0 && throw(DivideError())
+   iszero(a) && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
    a1 = coeff(a, 0)
    ainv = parent(a)()
@@ -806,7 +806,7 @@ doc"""
 > Return the exponential of the power series $a$.
 """
 function exp(a::AbsSeriesElem)
-   if a == 0
+   if iszero(a)
       z = one(parent(a))
       set_prec!(z, precision(a))
       return z
@@ -849,7 +849,7 @@ function fit!{T <: RingElem}(c::GenAbsSeries{T}, n::Int)
 end
 
 function setcoeff!{T <: RingElem}(c::GenAbsSeries{T}, n::Int, a::T)
-   if (a != 0 && precision(c) > n) || n + 1 <= c.length
+   if (!iszero(a) && precision(c) > n) || n + 1 <= c.length
       fit!(c, n + 1)
       c.coeffs[n + 1] = a
       c.length = max(length(c), n + 1)

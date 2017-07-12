@@ -110,7 +110,7 @@ doc"""
 """
 function isunit(a::ResElem)
    g, ainv = gcdinv(data(a), modulus(a))
-   return g == 1
+   return isone(g)
 end
 
 deepcopy_internal(a::ResElem, dict::ObjectIdDict) =
@@ -453,7 +453,7 @@ function divexact{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
 end
 
 function divides{T <: RingElem}(a::ResElem{T}, b::ResElem{T})
-   b == 0 && error("Division by zero in divides")
+   iszero(b) && error("Division by zero in divides")
    return true, divexact(a, b)
 end
 
@@ -581,7 +581,7 @@ doc"""
 """
 function ResidueRing{T <: RingElem}(R::Ring, a::T; cached=true)
    parent(a) != R && error("Modulus is not an element of the specified ring")
-   a == 0 && throw(DivideError())
+   iszero(a) && throw(DivideError())
    
    return GenResRing{T}(a, cached)
 end

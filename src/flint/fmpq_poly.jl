@@ -318,7 +318,7 @@ function ==(x::fmpq_poly, y::fmpq)
       return ccall((:fmpq_equal, :libflint), Bool, 
                (Ptr{fmpq}, Ptr{fmpq}, Int), &z, &y, 0)
    else
-      return y == 0
+      return iszero(y)
    end 
 end
 
@@ -401,7 +401,7 @@ end
 
 function mod(x::fmpq_poly, y::fmpq_poly)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    r = parent(x)()
    ccall((:fmpq_poly_rem, :libflint), Void, 
                 (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq_poly}), 
@@ -413,7 +413,7 @@ rem(x::fmpq_poly, y::fmpq_poly) = mod(x, y)
 
 function divrem(x::fmpq_poly, y::fmpq_poly)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    q = parent(x)()
    r = parent(x)()
    ccall((:fmpq_poly_divrem, :libflint), Void, 
@@ -430,7 +430,7 @@ end
 
 function div(x::fmpq_poly, y::fmpq_poly)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    ccall((:fmpq_poly_div, :libflint), Void, 
             (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq_poly}), &z, &x, &y)
@@ -446,7 +446,7 @@ divexact(x::fmpq_poly, y::fmpq_poly) = div(x,y)
 ###############################################################################
 
 function divexact(x::fmpq_poly, y::fmpz)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    ccall((:fmpq_poly_scalar_div_fmpz, :libflint), Void, 
           (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpz}), &z, &x, &y)
@@ -454,7 +454,7 @@ function divexact(x::fmpq_poly, y::fmpz)
 end
 
 function divexact(x::fmpq_poly, y::fmpq)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    ccall((:fmpq_poly_scalar_div_fmpq, :libflint), Void, 
           (Ptr{fmpq_poly}, Ptr{fmpq_poly}, Ptr{fmpq}), &z, &x, &y)
@@ -481,7 +481,7 @@ divexact(x::fmpq_poly, y::Rational) = divexact(x, fmpq(y))
 
 function divides(z::fmpq_poly, x::fmpq_poly)
    q, r = divrem(z, x)
-   return r == 0, q
+   return iszero(r), q
 end
 
 ###############################################################################

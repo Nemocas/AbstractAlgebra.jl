@@ -405,7 +405,7 @@ end
 
 function divexact(x::fmpq_abs_series, y::fmpq_abs_series)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    v2 = valuation(y)
    v1 = valuation(x)
    if v2 != 0
@@ -441,7 +441,7 @@ function divexact(x::fmpq_abs_series, y::Int)
 end
 
 function divexact(x::fmpq_abs_series, y::fmpz)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    ccall((:fmpq_poly_scalar_div_fmpz, :libflint), Void, 
@@ -451,7 +451,7 @@ function divexact(x::fmpq_abs_series, y::fmpz)
 end
 
 function divexact(x::fmpq_abs_series, y::fmpq)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    ccall((:fmpq_poly_scalar_div_fmpq, :libflint), Void, 
@@ -471,7 +471,7 @@ divexact(x::fmpq_abs_series, y::Rational) = divexact(x, fmpq(y))
 ###############################################################################
 
 function inv(a::fmpq_abs_series)
-   a == 0 && throw(DivideError())
+  iszero(a) && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
    ainv = parent(a)()
    ainv.prec = a.prec
@@ -488,7 +488,7 @@ end
 ###############################################################################
 
 function exp(a::fmpq_abs_series)
-   coeff(a, 0) != 0 && error("Constant term not zero in exp")
+   !iszero(coeff(a, 0)) && error("Constant term not zero in exp")
    if length(a) == 0 || a.prec == 1
       return parent(a)([fmpq(1)], 1, a.prec)
    end
@@ -505,7 +505,7 @@ doc"""
 > Return log$(a)$. Requires the constant term to be one.
 """
 function log(a::fmpq_abs_series)
-   coeff(a, 0) != 1 && error("Constant term not one in log")
+   !isone(coeff(a, 0)) && error("Constant term not one in log")
    if length(a) == 1 || a.prec < 2
       return parent(a)()
    end
@@ -522,8 +522,8 @@ doc"""
 > Return tan$(a)$. Requires a zero constant term.
 """
 function tan(a::fmpq_abs_series)
-   coeff(a, 0) != 0 && error("Constant term not zero in tan")
-   if a == 0 || a.prec < 2
+   !iszero(coeff(a, 0)) && error("Constant term not zero in tan")
+   if iszero(a) || a.prec < 2
       return parent(a)()
    end
    z = parent(a)()
@@ -539,8 +539,8 @@ doc"""
 > Return tanh$(a)$. Requires a zero constant term.
 """
 function tanh(a::fmpq_abs_series)
-   coeff(a, 0) != 0 && error("Constant term not zero in tanh")
-   if a == 0 || a.prec < 2
+   !iszero(coeff(a, 0)) && error("Constant term not zero in tanh")
+   if iszero(a) || a.prec < 2
       return parent(a)()
    end
    z = parent(a)()
@@ -556,8 +556,8 @@ doc"""
 > Return sin$(a)$. Requires a zero constant term.
 """
 function sin(a::fmpq_abs_series)
-   coeff(a, 0) != 0 && error("Constant term not zero in sin")
-   if a == 0 || a.prec < 2
+   !iszero(coeff(a, 0)) && error("Constant term not zero in sin")
+   if iszero(a) || a.prec < 2
       return parent(a)()
    end
    z = parent(a)()
@@ -573,8 +573,8 @@ doc"""
 > Return sinh$(a)$. Requires a zero constant term.
 """
 function sinh(a::fmpq_abs_series)
-   coeff(a, 0) != 0 && error("Constant term not zero in sinh")
-   if a == 0 || a.prec < 2
+   !iszero(coeff(a, 0)) && error("Constant term not zero in sinh")
+   if iszero(a) || a.prec < 2
       return parent(a)()
    end
    z = parent(a)()
@@ -590,7 +590,7 @@ doc"""
 > Return cos$(a)$. Requires a zero constant term.
 """
 function cos(a::fmpq_abs_series)
-   coeff(a, 0) != 0 && error("Constant term not zero in cos")
+   !iszero(coeff(a, 0)) && error("Constant term not zero in cos")
    if length(a) == 0 || a.prec == 1
       return one(parent(a))
    end
@@ -607,7 +607,7 @@ doc"""
 > Return cosh$(a)$. Requires a zero constant term.
 """
 function cosh(a::fmpq_abs_series)
-   coeff(a, 0) != 0 && error("Constant term not zero in cosh")
+   !iszero(coeff(a, 0)) && error("Constant term not zero in cosh")
    if length(a) == 0 || a.prec == 1
       return one(parent(a))
    end
@@ -624,8 +624,8 @@ doc"""
 > Return asin$(a)$. Requires a zero constant term.
 """
 function asin(a::fmpq_abs_series)
-   coeff(a, 0) != 0 && error("Constant term not zero in asin")
-   if a == 0 || a.prec < 2
+   !iszero(coeff(a, 0)) && error("Constant term not zero in asin")
+   if iszero(a) || a.prec < 2
       return parent(a)()
    end
    z = parent(a)()
@@ -641,8 +641,8 @@ doc"""
 > Return asinh$(a)$. Requires a zero constant term.
 """
 function asinh(a::fmpq_abs_series)
-   coeff(a, 0) != 0 && error("Constant term not zero in asinh")
-   if a == 0 || a.prec < 2
+   !iszero(coeff(a, 0)) && error("Constant term not zero in asinh")
+   if iszero(a) || a.prec < 2
       return parent(a)()
    end
    z = parent(a)()
@@ -658,8 +658,8 @@ doc"""
 > Return atan$(a)$. Requires a zero constant term.
 """
 function atan(a::fmpq_abs_series)
-   coeff(a, 0) != 0 && error("Constant term not zero in atan")
-   if a == 0 || a.prec < 2
+   !iszero(coeff(a, 0)) && error("Constant term not zero in atan")
+   if iszero(a) || a.prec < 2
       return parent(a)()
    end
    z = parent(a)()
@@ -675,8 +675,8 @@ doc"""
 > Return atanh$(a)$. Requires a zero constant term.
 """
 function atanh(a::fmpq_abs_series)
-   coeff(a, 0) != 0 && error("Constant term not zero in atanh")
-   if a == 0 || a.prec < 2
+   !iszero(coeff(a, 0)) && error("Constant term not zero in atanh")
+   if iszero(a) || a.prec < 2
       return parent(a)()
    end
    z = parent(a)()
@@ -693,7 +693,7 @@ doc"""
 > one.
 """
 function sqrt(a::fmpq_abs_series)
-   coeff(a, 0) != 1 && error("Constant term not one in sqrt")
+   !isone(coeff(a, 0)) && error("Constant term not one in sqrt")
    z = parent(a)()
    z.prec = a.prec
    ccall((:fmpq_poly_sqrt_series, :libflint), Void, 
@@ -796,7 +796,7 @@ function (a::FmpqAbsSeriesRing)(b::Integer)
 end
 
 function (a::FmpqAbsSeriesRing)(b::fmpz)
-   if b == 0
+   if iszero(b)
       z = fmpq_abs_series()
       z.prec = a.prec_max
    else
@@ -807,7 +807,7 @@ function (a::FmpqAbsSeriesRing)(b::fmpz)
 end
 
 function (a::FmpqAbsSeriesRing)(b::fmpq)
-   if b == 0
+   if iszero(b)
       z = fmpq_abs_series()
       z.prec = a.prec_max
    else

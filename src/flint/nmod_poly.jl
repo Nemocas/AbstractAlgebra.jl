@@ -326,7 +326,7 @@ function ==(x::nmod_poly, y::GenRes{fmpz})
             (Ptr{nmod_poly}, Int), &x, 0)
     return u == y
   else
-    return y == 0
+    return iszero(y)
   end 
 end
 
@@ -840,7 +840,7 @@ doc"""
 """
 function remove(z::nmod_poly, p::nmod_poly)
    check_parent(z,p)
-   z == 0 && error("Not yet implemented")
+   iszero(z) && error("Not yet implemented")
    z = deepcopy(z)
    v = ccall((:nmod_poly_remove, :libflint), Int,
                (Ptr{nmod_poly}, Ptr{nmod_poly}), &z,  &p)
@@ -849,7 +849,7 @@ end
 
 function divides(z::nmod_poly, x::nmod_poly)
    q, r = divrem(z, x)
-   return r == 0, q
+   return iszero(r), q
 end
 
 ################################################################################

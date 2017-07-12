@@ -262,7 +262,7 @@ function ==(x::fmpz_poly, y::fmpz)
       return ccall((:fmpz_equal, :libflint), Bool, 
                (Ptr{fmpz}, Ptr{fmpz}, Int), &z, &y, 0)
    else
-      return y == 0
+      return iszero(y)
    end 
 end
 
@@ -345,7 +345,7 @@ end
 
 function divexact(x::fmpz_poly, y::fmpz_poly)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    ccall((:fmpz_poly_div, :libflint), Void, 
             (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y)
@@ -354,7 +354,7 @@ end
 
 function divides(x::fmpz_poly, y::fmpz_poly)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    flag = Bool(ccall((:fmpz_poly_divides, :libflint), Cint,
            (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &x, &y))
@@ -368,7 +368,7 @@ end
 ###############################################################################
 
 function divexact(x::fmpz_poly, y::fmpz)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    ccall((:fmpz_poly_scalar_divexact_fmpz, :libflint), Void, 
           (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz}), &z, &x, &y)
@@ -393,7 +393,7 @@ divexact(x::fmpz_poly, y::Integer) = divexact(x, fmpz(y))
 
 function pseudorem(x::fmpz_poly, y::fmpz_poly)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    diff = length(x) - length(y) + 1
    r = parent(x)()
    d = Array{Int}(1)
@@ -408,7 +408,7 @@ end
 
 function pseudodivrem(x::fmpz_poly, y::fmpz_poly)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    diff = length(x) - length(y) + 1
    q = parent(x)()
    r = parent(x)()

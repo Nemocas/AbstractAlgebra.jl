@@ -94,7 +94,7 @@ function renormalize!(z::fmpz_mod_rel_series)
    zlen = pol_length(z)
    zval = valuation(z)
    zprec = precision(z)
-   while i < zlen && polcoeff(z, i) == 0
+   while i < zlen && iszero(polcoeff(z, i))
       i += 1
    end
    z.prec = zprec
@@ -449,7 +449,7 @@ function ==(x::fmpz_mod_rel_series, y::GenRes{fmpz})
          return false
       end
    else
-      return y.data == 0
+      return iszero(y.data)
    end 
 end
 
@@ -473,7 +473,7 @@ function ==(x::fmpz_mod_rel_series, y::fmpz)
       end
    else
       r = mod(y, modulus(x))
-      return r == 0
+      return iszero(r)
    end 
 end
 
@@ -491,7 +491,7 @@ end
 
 function divexact(x::fmpz_mod_rel_series, y::fmpz_mod_rel_series)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    yval = valuation(y)
    xval = valuation(x)
    if yval != 0
@@ -520,7 +520,7 @@ end
 ###############################################################################
 
 function divexact(x::fmpz_mod_rel_series, y::GenRes{fmpz})
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    z.val = x.val
@@ -531,7 +531,7 @@ function divexact(x::fmpz_mod_rel_series, y::GenRes{fmpz})
 end
 
 function divexact(x::fmpz_mod_rel_series, y::fmpz)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    z.prec = x.prec
@@ -552,7 +552,7 @@ divexact(x::fmpz_mod_rel_series, y::Integer) = divexact(x, fmpz(y))
 ###############################################################################
 
 function inv(a::fmpz_mod_rel_series)
-   a == 0 && throw(DivideError())
+   iszero(a) && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
    ainv = parent(a)()
    ainv.prec = a.prec
@@ -570,7 +570,7 @@ end
 ###############################################################################
 
 function exp(a::fmpz_mod_rel_series)
-   if a == 0
+   if iszero(a)
       z = one(parent(a))
       z.prec = precision(a)
       z.val = valuation(a)
@@ -752,7 +752,7 @@ function (a::FmpzModRelSeriesRing)(b::Integer)
 end
 
 function (a::FmpzModRelSeriesRing)(b::fmpz)
-   if b == 0
+   if iszero(b)
       z = fmpz_mod_rel_series(modulus(a))
       z.prec = a.prec_max
    else
@@ -763,7 +763,7 @@ function (a::FmpzModRelSeriesRing)(b::fmpz)
 end
 
 function (a::FmpzModRelSeriesRing)(b::GenRes{fmpz})
-   if b == 0
+   if iszero(b)
       z = fmpz_mod_rel_series(modulus(a))
       z.prec = a.prec_max
    else
