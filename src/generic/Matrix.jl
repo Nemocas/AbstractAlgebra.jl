@@ -136,7 +136,19 @@ function setindex!{T <: RingElem}(a::MatElem{T}, d::T, r::Int, c::Int)
    a.entries[r, c] = d
 end
 
+function setindex!{T <: RingElem}(a::MatElem{T}, d::Integer, r::Int, c::Int)
+    setindex!(a, base_ring(a)(d), r, c)
+end
+
+function setindex!{T <: RingElem}(a::MatElem{T}, d::fmpz, r::Int, c::Int)
+    setindex!(a, base_ring(a)(d), r, c)
+end
+
 setindex_t!{T <: RingElem}(a::MatElem{T}, d::T, r::Int, c::Int) = setindex!(a, d, c, r)
+
+setindex_t!{T <: RingElem}(a::MatElem{T}, d::Integer, r::Int, c::Int) = setindex!(a, d, c, r)
+
+setindex_t!{T <: RingElem}(a::MatElem{T}, d::fmpz, r::Int, c::Int) = setindex!(a, d, c, r)
 
 doc"""
     zero(a::MatSpace)
