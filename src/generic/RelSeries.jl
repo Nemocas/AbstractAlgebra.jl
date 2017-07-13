@@ -200,7 +200,7 @@ function renormalize!(z::RelSeriesElem)
    zlen = pol_length(z)
    zval = valuation(z)
    zprec = precision(z)
-   while i < zlen && polcoeff(z, i) == 0
+   while i < zlen && iszero(polcoeff(z, i))
       i += 1
    end
    set_prec!(z, zprec)
@@ -829,7 +829,7 @@ doc"""
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 =={T <: RingElem}(x::RelSeriesElem{T}, y::T) = precision(x) == 0 ||
-           ((pol_length(x) == 0 && y == 0) || (pol_length(x) == 1 && 
+           ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 && 
              valuation(x) == 0 && polcoeff(x, 0) == y))
 
 doc"""
@@ -843,7 +843,7 @@ doc"""
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::RelSeriesElem, y::Integer) = precision(x) == 0 ||
-                  ((pol_length(x) == 0 && y == 0) || (pol_length(x) == 1 && 
+                  ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 && 
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
 doc"""
@@ -851,7 +851,7 @@ doc"""
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::RelSeriesElem, y::fmpz) = precision(x) == 0 ||
-                  ((pol_length(x) == 0 && y == 0) || (pol_length(x) == 1 && 
+                  ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 && 
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
 doc"""
@@ -878,7 +878,7 @@ doc"""
 """
 function divexact{T <: RingElem}(x::RelSeriesElem{T}, y::RelSeriesElem{T})
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    v2 = valuation(y)
    if v2 != 0
       v1 = valuation(x)
@@ -919,7 +919,7 @@ doc"""
 > Return $a/b$ where the quotient is expected to be exact.
 """
 function divexact{T <: RingElem}(x::RelSeriesElem{T}, y::fmpz)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
    fit!(z, lenx)
@@ -936,7 +936,7 @@ doc"""
 > Return $a/b$ where the quotient is expected to be exact.
 """
 function divexact{T <: RingElem}(x::RelSeriesElem{T}, y::T)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
    fit!(z, lenx)
@@ -959,7 +959,7 @@ doc"""
 > Return the inverse of the power series $a$, i.e. $1/a$.
 """
 function inv(a::RelSeriesElem)
-   a == 0 && throw(DivideError())
+   iszero(a) && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
    a1 = polcoeff(a, 0)
    ainv = parent(a)()
@@ -992,7 +992,7 @@ doc"""
 > Return the exponential of the power series $a$.
 """
 function exp(a::RelSeriesElem)
-   if a == 0
+   if iszero(a)
       z = one(parent(a))
       set_prec!(z, precision(a))
       set_val!(z, valuation(a))
@@ -1216,7 +1216,7 @@ function (a::GenRelSeriesRing{T}){T <: RingElem}(b::Integer)
 end
 
 function (a::GenRelSeriesRing{T}){T <: RingElem}(b::fmpz)
-   if b == 0
+   if iszero(b)
       z = GenRelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
    else
       z = GenRelSeries{T}([base_ring(a)(b)], 1, a.prec_max, 0)
@@ -1227,7 +1227,7 @@ end
 
 function (a::GenRelSeriesRing{T}){T <: RingElem}(b::T)
    parent(b) != base_ring(a) && error("Unable to coerce to power series")
-   if b == 0
+   if iszero(b)
       z = GenRelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
    else
       z = GenRelSeries{T}([b], 1, a.prec_max, 0)

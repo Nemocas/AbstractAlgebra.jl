@@ -46,7 +46,7 @@ end
 ###############################################################################
 
 function //{T <: RingElem}(x::T, y::T)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    g = gcd(x, y)
    z = GenFrac{T}(divexact(x, g), divexact(y, g))
    try
@@ -120,7 +120,7 @@ doc"""
 > Return `true` if the supplied element $a$ is invertible in the fraction field
 > it belongs to, i.e. the numerator is nonzero, otherwise return `false`.
 """
-isunit(a::FracElem) = num(a) != 0
+isunit(a::FracElem) = !iszero(num(a))
 
 function deepcopy_internal{T <: RingElem}(a::GenFrac{T}, dict::ObjectIdDict)
    v = GenFrac{T}(deepcopy(num(a)), deepcopy(den(a)))
@@ -169,7 +169,7 @@ function show(io::IO, a::FracField)
    print(io, "Fraction field of ", base_ring(a))
 end
 
-needs_parentheses(x::FracElem) = den(x) == 1 && needs_parentheses(num(x))
+needs_parentheses(x::FracElem) = isone(den(x)) && needs_parentheses(num(x))
 
 isnegative(x::FracElem) = !needs_parentheses(num(x)) && isnegative(num(x))
 
@@ -467,7 +467,7 @@ doc"""
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 function ==(x::FracElem, y::Integer)
-   return (den(x) == 1 && num(x) == y) || (num(x) == den(x)*y)
+   return (isone(den(x)) && num(x) == y) || (num(x) == den(x)*y)
 end
 
 doc"""
@@ -481,7 +481,7 @@ doc"""
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 function ==(x::FracElem, y::fmpz)
-   return (den(x) == 1 && num(x) == y) || (num(x) == den(x)*y)
+   return (isone(den(x)) && num(x) == y) || (num(x) == den(x)*y)
 end
 
 doc"""
@@ -495,7 +495,7 @@ doc"""
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 function =={T <: RingElem}(x::FracElem{T}, y::T)
-   return (den(x) == 1 && num(x) == y) || (num(x) == den(x)*y)
+   return (isone(den(x)) && num(x) == y) || (num(x) == den(x)*y)
 end
 
 doc"""
@@ -515,7 +515,7 @@ doc"""
 > Return the inverse of the fraction $a$.
 """
 function inv(a::FracElem)
-   num(a) == 0 && throw(DivideError())
+   iszero(num(a)) && throw(DivideError())
    return parent(a)(den(a), num(a))
 end
 
@@ -562,7 +562,7 @@ doc"""
 > Return $a/b$.
 """
 function divexact(a::Integer, b::FracElem)
-   b == 0 && throw(DivideError())
+   iszero(b) && throw(DivideError())
    c = base_ring(b)(a)
    g = gcd(num(b), c)
    n = den(b)*divexact(c, g)
@@ -575,7 +575,7 @@ doc"""
 > Return $a/b$.
 """
 function divexact(a::FracElem, b::fmpz)
-   b == 0 && throw(DivideError())
+   iszero(b) && throw(DivideError())
    c = base_ring(a)(b)
    g = gcd(num(a), c)
    n = divexact(num(a), g)
@@ -588,7 +588,7 @@ doc"""
 > Return $a/b$.
 """
 function divexact(a::fmpz, b::FracElem)
-   b == 0 && throw(DivideError())
+   iszero(b) && throw(DivideError())
    c = base_ring(b)(a)
    g = gcd(num(b), c)
    n = den(b)*divexact(c, g)
@@ -607,7 +607,7 @@ doc"""
 > Return $a/b$.
 """
 function divexact{T <: RingElem}(a::FracElem{T}, b::T)
-   b == 0 && throw(DivideError())
+   iszero(b) && throw(DivideError())
    g = gcd(num(a), b)
    n = divexact(num(a), g)
    d = den(a)*divexact(b, g)
@@ -619,7 +619,7 @@ doc"""
 > Return $a/b$.
 """
 function divexact{T <: RingElem}(a::T, b::FracElem{T})
-   b == 0 && throw(DivideError())
+   iszero(b) && throw(DivideError())
    g = gcd(num(b), a)
    n = den(b)*divexact(a, g)
    d = divexact(num(b), g)
@@ -627,7 +627,7 @@ function divexact{T <: RingElem}(a::T, b::FracElem{T})
 end
 
 function divides{T <: RingElem}(a::FracElem{T}, b::FracElem{T})
-   b == 0 && error("Division by zero in divides")
+   iszero(b) && error("Division by zero in divides")
    return true, divexact(a, b)
 end
 
@@ -682,7 +682,7 @@ doc"""
 > $p$.
 """
 function remove{T <: RingElem}(z::FracElem{T}, p::T)
-   z == 0 && error("Not yet implemented")
+   iszero(z) && error("Not yet implemented")
    v, d = remove(den(z), p)
    w, n = remove(num(z), p)
    return w-v, n//d

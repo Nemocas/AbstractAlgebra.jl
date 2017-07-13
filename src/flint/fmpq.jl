@@ -60,7 +60,7 @@ end
 ###############################################################################
 
 function //(x::fmpz, y::fmpz)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    g = gcd(x, y)
    return fmpq(divexact(x, g), divexact(y, g))
 end
@@ -101,11 +101,15 @@ zero(a::FlintRationalField) = fmpq(0)
 
 one(a::FlintRationalField) = fmpq(1)
 
-isone(a::fmpq) = a == 1
+function isone(a::fmpq)
+   return Bool(ccall((:fmpq_is_one, :libflint), Cint, (Ptr{fmpq}, ), &a))  
+end
 
-iszero(a::fmpq) = a == 0
+function iszero(a::fmpq)
+   return Bool(ccall((:fmpq_is_zero, :libflint), Cint, (Ptr{fmpq}, ), &a))  
+end
 
-isunit(a::fmpq) = a != 0
+isunit(a::fmpq) = !iszero(a)
 
 doc"""
     height(a::fmpq)
@@ -426,7 +430,7 @@ end
 div(a::fmpq, b::fmpq) = divexact(a, b)
 
 function rem(a::fmpq, b::fmpq)
-   b == 0 && throw("Divide by zero in rem")
+   iszero(b) && throw("Divide by zero in rem")
    return fmpq(0)
 end
 

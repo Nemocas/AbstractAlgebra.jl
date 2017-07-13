@@ -699,7 +699,7 @@ function ==(x::MatElem, y::Integer)
    end
    for i = 1:rows(x)
       for j = 1:cols(x)
-         if i != j && x[i, j] != 0
+         if i != j && !iszero(x[i, j])
             return false
          end
       end
@@ -727,7 +727,7 @@ function ==(x::MatElem, y::fmpz)
    end
    for i = 1:rows(x)
       for j = 1:cols(x)
-         if i != j && x[i, j] != 0
+         if i != j && !iszero(x[i, j])
             return false
          end
       end
@@ -755,7 +755,7 @@ function =={T <: RingElem}(x::MatElem{T}, y::T)
    end
    for i = 1:rows(x)
       for j = 1:cols(x)
-         if i != j && x[i, j] != 0
+         if i != j && !iszero(x[i, j])
             return false
          end
       end
@@ -949,7 +949,7 @@ function lufact!{T <: FieldElem}(P::perm, A::MatElem{T})
       if A[r, c] == 0
          i = r + 1
          while i <= m
-            if A[i, c] != 0
+            if !iszero(A[i, c])
                for j = 1:n
                   A[i, j], A[r, j] = A[r, j], A[i, j]
                end
@@ -1028,7 +1028,7 @@ function fflu!{T <: RingElem}(P::perm, A::MatElem{T})
       if A[r, c] == 0
          i = r + 1
          while i <= m
-            if A[i, c] != 0
+            if !iszero(A[i, c])
                for j = 1:n
                   A[i, j], A[r, j] = A[r, j], A[i, j]
                end
@@ -1081,7 +1081,7 @@ function fflu!{T <: FieldElem}(P::perm, A::MatElem{T})
       if A[r, c] == 0
          i = r + 1
          while i <= m
-            if A[i, c] != 0
+            if !iszero(A[i, c])
                for j = 1:n
                   A[i, j], A[r, j] = A[r, j], A[i, j]
                end
@@ -1313,7 +1313,7 @@ function isrref{T <: RingElem}(M::MatElem{T})
    c = 1
    for r = 1:m
       for i = 1:c - 1
-         if M[r, i] != 0
+         if !iszero(M[r, i])
             return false
          end
       end
@@ -1322,7 +1322,7 @@ function isrref{T <: RingElem}(M::MatElem{T})
       end
       if c <= n
          for i = 1:r - 1
-            if M[i, c] != 0
+            if !iszero(M[i, c])
                return false
             end
          end
@@ -1342,7 +1342,7 @@ function isrref{T <: FieldElem}(M::MatElem{T})
    c = 1
    for r = 1:m
       for i = 1:c - 1
-         if M[r, i] != 0
+         if !iszero(M[r, i])
             return false
          end
       end
@@ -1354,7 +1354,7 @@ function isrref{T <: FieldElem}(M::MatElem{T})
             return false
          end
          for i = 1:r - 1
-            if M[i, c] != 0
+            if !iszero(M[i, c])
                return false
             end
          end
@@ -1379,7 +1379,7 @@ function reduce_row!{T <: FieldElem}(A::MatElem{T}, P::Array{Int}, L::Array{Int}
    n = cols(A)
    t = R()
    for i = 1:n
-      if A[m, i] != 0
+      if !iszero(A[m, i])
          h = -A[m, i]
          r = P[i]
          if r != 0
@@ -1409,7 +1409,7 @@ function reduce_row!{T <: RingElem}(A::MatElem{T}, P::Array{Int}, L::Array{Int},
    c = R(1)
    c1 = 0
    for i = 1:n
-      if A[m, i] != 0
+      if !iszero(A[m, i])
          h = -A[m, i]
          r = P[i]
          if r != 0
@@ -1669,7 +1669,7 @@ function solve!{T <: FieldElem}(A::MatElem{T}, b::MatElem{T})
       if A[r, c] == 0
          i = r + 1
          while i <= m
-            if A[i, c] != 0
+            if !iszero(A[i, c])
                for j = 1:n
                   A[i, j], A[r, j] = A[r, j], A[i, j]
                end
@@ -1786,7 +1786,7 @@ function solve!{T <: RingElem}(A::MatElem{T}, b::MatElem{T})
       if A[r, c] == 0
          i = r + 1
          while i <= m
-            if A[i, c] != 0
+            if !iszero(A[i, c])
                for j = 1:n
                   A[i, j], A[r, j] = A[r, j], A[i, j]
                end
@@ -2147,7 +2147,7 @@ function hessenberg!{T <: RingElem}(A::MatElem{T})
          i += 1
       end
       if i != n + 1
-         if A[m, m - 1] != 0
+         if !iszero(A[m, m - 1])
             i = m
          end
          h = -inv(A[i, m - 1])
@@ -2160,7 +2160,7 @@ function hessenberg!{T <: RingElem}(A::MatElem{T})
             end
          end
          for i = m + 1:n
-            if A[i, m - 1] != 0
+            if !iszero(A[i, m - 1])
                u = mul!(u, A[i, m - 1], h)
                for j = m:n
                   t = mul!(t, u, A[m, j])
@@ -2200,7 +2200,7 @@ function ishessenberg{T <: RingElem}(A::MatElem{T})
    n = rows(A)
    for i = 3:n
       for j = 1:i - 2
-         if A[i, j] != 0
+         if !iszero(A[i, j])
             return false
          end
       end
@@ -2755,7 +2755,7 @@ function hnf_cohen!{T <: RingElem}(H::GenMat{T}, U::GenMat{T})
    t2 = base_ring(H)()
    for i = 1:l
       for j = k+1:m
-         if H[j,i] == 0
+         if iszero(H[j,i])
             continue
          end
          d, u, v = gcdx(H[k,i], H[j,i])
@@ -2780,7 +2780,7 @@ function hnf_cohen!{T <: RingElem}(H::GenMat{T}, U::GenMat{T})
             U[k,c] = add!(U[k,c], t1, t2)
          end
       end
-      if H[k,i] == 0
+      if iszero(H[k,i])
          continue
       end
       cu = canonical_unit(H[k,i])
@@ -2833,7 +2833,7 @@ end
 function kb_search_first_pivot(H::GenMat, start_element::Int = 1)
    for r = start_element:rows(H)
       for c = start_element:cols(H)
-         if H[r,c] != 0
+         if !iszero(H[r,c])
             return r, c
          end
       end
@@ -2955,7 +2955,7 @@ function hnf_kb!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, with_trafo::Bool = f
    for i=row1:m-1
       new_pivot = false
       for j = start_element:pivot_max
-         if H[i+1,j] == 0
+         if iszero(H[i+1,j])
             continue
          end
          if pivot[j] == 0
@@ -2997,7 +2997,7 @@ function hnf_kb!{T <: RingElem}(H::GenMat{T}, U::GenMat{T}, with_trafo::Bool = f
       end
       if !new_pivot
          for c = pivot_max+1:n
-            if H[i+1,c] != 0
+            if !iszero(H[i+1,c])
                pivot[c] = i+1 
                kb_canonical_row!(H, U, pivot[c], c, with_trafo)
                kb_reduce_column!(H, U, pivot, c, with_trafo, start_element)
@@ -3066,7 +3066,7 @@ function kb_clear_row!{T <: RingElem}(S::GenMat{T}, K::GenMat{T}, i::Int, with_t
    t1 = base_ring(S)()
    t2 = base_ring(S)()
    for j = i+1:n
-      if S[i,j] == 0
+      if iszero(S[i,j])
          continue
       end
       d, u, v = gcdx(S[i,i], S[i,j])
@@ -3108,7 +3108,7 @@ function snf_kb!{T <: RingElem}(S::GenMat{T}, U::GenMat{T}, K::GenMat{T}, with_t
       kb_clear_row!(S, K, i, with_trafo)
       hnf_kb!(S, U, with_trafo, i)
       c = i+1
-      while c <= n && S[i, c] == 0
+      while c <= n && iszero(S[i, c])
          c+=1
       end
       if c != n+1
@@ -3117,7 +3117,7 @@ function snf_kb!{T <: RingElem}(S::GenMat{T}, U::GenMat{T}, K::GenMat{T}, with_t
       i+=1
    end
    for i = 1:l-1
-      if S[i,i] == 0 && S[i+1,i+1] == 0
+      if iszero(S[i,i]) && iszero(S[i+1,i+1])
          continue
       end
       d, u, v = gcdx(S[i,i], S[i+1,i+1])
@@ -3254,7 +3254,7 @@ function init_pivots_popov{T <: PolyElem}(P::GenMat{T}, last_row::Int = 0, last_
    # pivots[i] contains the indices of the rows in which the pivot element is in the ith column.
    for r = 1:m
       pivot = find_pivot_popov(P, r, last_col)
-      P[r,pivot] != 0 ? push!(pivots[pivot], r) : nothing
+      !iszero(P[r,pivot]) ? push!(pivots[pivot], r) : nothing
    end
    return pivots
 end
@@ -3315,7 +3315,7 @@ function weak_popov_with_pivots!{T <: PolyElem}(P::GenMat{T}, W::GenMat{T}, U::G
                continue
             end
             p = find_pivot_popov(P, old_pivots[j], last_col)
-            P[old_pivots[j],p] != 0 ? push!(pivots[p], old_pivots[j]) : nothing
+            !iszero(P[old_pivots[j],p]) ? push!(pivots[p], old_pivots[j]) : nothing
          end
       end
    end
@@ -3340,14 +3340,14 @@ function rank_profile_popov{T <: PolyElem}(A::GenMat{T})
       pivots[i] = Array{Int}(0)
    end
    p = find_pivot_popov(B, 1)
-   if B[1,p] != 0
+   if !iszero(B[1,p])
       push!(pivots[p], 1)
       r = 1
       push!(rank_profile, 1)
    end
    for i = 2:m
       p = find_pivot_popov(B, i)
-      B[i,p] != 0 ? push!(pivots[p], i) : nothing
+      !iszero(B[i,p]) ? push!(pivots[p], i) : nothing
       weak_popov_with_pivots!(B, V, U, pivots, false, false, i)
       s = 0
       for j = 1:n

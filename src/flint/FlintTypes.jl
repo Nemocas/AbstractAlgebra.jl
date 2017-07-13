@@ -106,7 +106,7 @@ type fmpq <: FracElem{fmpz}
    end
 
    function fmpq(a::fmpz, b::fmpz)
-      b == 0 && throw(DivideError())
+      iszero(b) && throw(DivideError())
       z = new()
       ccall((:fmpq_init, :libflint), Void, (Ptr{fmpq},), &z)
       ccall((:fmpq_set_fmpz_frac, :libflint), Void,
@@ -559,7 +559,7 @@ type fmpz_mod_poly <: PolyElem{GenRes{fmpz}}
    end
 
    function fmpz_mod_poly(n::fmpz, arr::Array{fmpz, 1})
-      length(arr) == 0  && error("Array must have length > 0")
+      length(arr) == 0 && error("Array must have length > 0")
       z = new()
       ccall((:fmpz_mod_poly_init2, :libflint), Void,
             (Ptr{fmpz_mod_poly}, Ptr{fmpz}, Int), &z, &n, length(arr))

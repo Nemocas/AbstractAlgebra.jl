@@ -332,7 +332,7 @@ function ==(x::fmpz_mod_poly, y::GenRes{fmpz})
             (Ptr{fmpz}, Ptr{fmpz_mod_poly}, Int), &u, &x, 0)
      return u == y
   else
-    return y == 0
+    return iszero(y)
   end 
 end
 
@@ -491,7 +491,7 @@ mod(x::fmpz_mod_poly, y::fmpz_mod_poly) = rem(x, y)
 
 function divides(z::fmpz_mod_poly, x::fmpz_mod_poly)
    q, r = divrem(z, x)
-   return r == 0, q
+   return iszero(r), q
 end
 
 ################################################################################

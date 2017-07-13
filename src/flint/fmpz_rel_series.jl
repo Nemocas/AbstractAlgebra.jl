@@ -439,7 +439,7 @@ function ==(x::fmpz_rel_series, y::fmpz)
          return false
       end
    else
-      return y == 0
+      return iszero(y)
    end 
 end
 
@@ -457,7 +457,7 @@ end
 
 function divexact(x::fmpz_rel_series, y::fmpz_rel_series)
    check_parent(x, y)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    yval = valuation(y)
    xval = valuation(x)
    if yval != 0
@@ -497,7 +497,7 @@ function divexact(x::fmpz_rel_series, y::Int)
 end
 
 function divexact(x::fmpz_rel_series, y::fmpz)
-   y == 0 && throw(DivideError())
+   iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
    z.prec = x.prec

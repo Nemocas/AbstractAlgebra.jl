@@ -185,7 +185,7 @@ end
 
 function divides{T <: RingElem}(x::T, y::T)
    q, r = divrem(x, y)
-   return r == 0, q
+   return iszero(r), q
 end
 
 function =={S <: RingElem, T <: RingElem}(x::S, y::T) 

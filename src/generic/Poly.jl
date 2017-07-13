@@ -119,12 +119,12 @@ doc"""
 > in the zero polynomial, in which case a zero coefficient is returned.
 """
 function trail(a::PolyElem)
-   if a == 0
+   if iszero(a)
       return base_ring(a)(0)
    else
       for i = 1:length(a)
          c = coeff(a, i - 1)
-         if c != 0
+         if !iszero(c)
             return c
          end
       end
@@ -191,7 +191,7 @@ function ismonomial(a::PolyElem)
       return false
    end
    for i = 1:length(a) - 1
-      if coeff(a, i - 1) != 0
+      if !iszero(coeff(a, i - 1))
          return false
       end
    end
@@ -799,7 +799,7 @@ doc"""
     =={T <: RingElem}(x::PolyElem{T}, y::T)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-=={T <: RingElem}(x::PolyElem{T}, y::T) = ((length(x) == 0 && y == 0)
+=={T <: RingElem}(x::PolyElem{T}, y::T) = ((length(x) == 0 && iszero(y))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
@@ -825,7 +825,7 @@ doc"""
     ==(x::PolyElem, y::fmpz)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::PolyElem, y::fmpz) = ((length(x) == 0 && y == 0)
+==(x::PolyElem, y::fmpz) = ((length(x) == 0 && iszero(y))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
@@ -1058,8 +1058,8 @@ doc"""
 """
 function divexact{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    check_parent(f, g)
-   g == 0 && throw(DivideError())
-   if f == 0
+   iszero(g) && throw(DivideError())
+   if iszero(f)
       return zero(parent(f))
    end
    lenq = length(f) - length(g) + 1
@@ -1090,7 +1090,7 @@ doc"""
 > Return $a/b$ where the quotient is expected to be exact.
 """
 function divexact{T <: RingElem}(a::PolyElem{T}, b::T)
-   b == 0 && throw(DivideError())
+   iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
    for i = 1:length(a)
@@ -1120,7 +1120,7 @@ doc"""
 > Return $a/b$ where the quotient is expected to be exact.
 """
 function divexact(a::PolyElem, b::fmpz)
-   b == 0 && throw(DivideError())
+   iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
    for i = 1:length(a)
@@ -1389,11 +1389,11 @@ end
 function term_content{T <: RingElem}(a::PolyElem{T})
    for i = 1:length(a)
       c = coeff(a, i - 1)
-      if c != 0
+      if !iszero(c)
          g = term_content(c)
          for j = i + 1:length(a)
             c = coeff(a, j - 1)
-            if c != 0
+            if !iszero(c)
                g = term_gcd(g, term_content(c))
             end
          end
@@ -1413,10 +1413,10 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, ignore_content=false
    if length(b) > length(a)
       (a, b) = (b, a)
    end
-   if b == 0
+   if iszero(b)
       return a
    end
-   if b == 1
+   if isone(b)
       return b
    end
    if !ignore_content
@@ -1485,13 +1485,13 @@ function gcd{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
    if length(a) > length(b)
       (a, b) = (b, a)
    end
-   if b == 0
+   if iszero(b)
       return a
    end
    g = gcd(content(a), content(b))
    a = divexact(a, g)
    b = divexact(b, g)
-   while a != 0
+   while !iszero(a)
       (a, b) = (mod(b, a), a)
    end
    b = g*b
@@ -2194,7 +2194,7 @@ function zero!{T <: RingElem}(c::GenPoly{T})
 end
 
 function setcoeff!{T <: RingElem}(c::GenPoly{T}, n::Int, a::T)
-   if a != 0 || n + 1 <= length(c)
+   if !iszero(a) || n + 1 <= length(c)
       fit!(c, n + 1)
       c.coeffs[n + 1] = a
       c.length = max(length(c), n + 1)
@@ -2320,7 +2320,7 @@ function subst{T <: RingElem}(f::PolyElem{T}, a::Any)
    s = coeff(f, d1*d)*A[1]
    for j = 1:min(n - d1*d, d - 1)
       c = coeff(f, d1*d + j)
-      if c != 0
+      if !iszero(c)
          s += c*A[j + 1]
       end
    end
@@ -2329,7 +2329,7 @@ function subst{T <: RingElem}(f::PolyElem{T}, a::Any)
       s += coeff(f, (d1 - i)*d)*A[1]
       for j = 1:min(n - (d1 - i)*d, d - 1)
          c = coeff(f, (d1 - i)*d + j)
-         if c != 0
+         if !iszero(c)
             s += c*A[j + 1]
          end
       end
