@@ -178,14 +178,14 @@ function elem_from_mat_row(a::AnticNumberField, b::fmpz_mat, i::Int, d::fmpz)
    cols(b) == degree(a) || error("Wrong number of columns")
    z = a()
    ccall((:nf_elem_set_fmpz_mat_row, :libflint), Void,
-        (Ptr{nf_elem}, Ptr{fmpz_mat}, Cint, Ptr{fmpz}, Ptr{AnticNumberField}),
+        (Ptr{nf_elem}, Ptr{fmpz_mat}, Int, Ptr{fmpz}, Ptr{AnticNumberField}),
         &z, &b, i - 1, &d, &a)
    return z
 end
 
 function elem_to_mat_row!(a::fmpz_mat, i::Int, d::fmpz, b::nf_elem)
    ccall((:nf_elem_get_fmpz_mat_row, :libflint), Void,
-         (Ptr{fmpz_mat}, Cint, Ptr{fmpz}, Ptr{nf_elem}, Ptr{AnticNumberField}),
+         (Ptr{fmpz_mat}, Int, Ptr{fmpz}, Ptr{nf_elem}, Ptr{AnticNumberField}),
          &a, i - 1, &d, &b, &b.parent)
    nothing
  end
