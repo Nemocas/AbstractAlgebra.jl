@@ -358,8 +358,16 @@ function test_gen_mat_manipulation()
    @test isone(one(S))
 
    B[1, 1] = R(3)
-
    @test B[1, 1] == R(3)
+
+   B[1, 1] = 4
+   @test B[1, 1] == R(4)
+
+   B[1, 1] = BigInt(5)
+   @test B[1, 1] == R(5)
+
+   B[1, 1] = fmpz(5)
+   @test B[1, 1] == R(5)
 
    @test rows(B) == 3
    @test cols(B) == 3
