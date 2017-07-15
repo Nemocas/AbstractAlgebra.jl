@@ -749,7 +749,7 @@ end
 
 function (a::NmodMatSpace)(arr::Array{GenRes{fmpz}, 2}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr, transpose)
-  (base_ring(a) != parent(arr[1])) && error("Elements must have same base ring")
+  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
   z.base_ring = a.base_ring
   return z
@@ -757,7 +757,7 @@ end
 
 function (a::NmodMatSpace)(arr::Array{GenRes{fmpz}, 1}, transpose::Bool = false)
   _check_dim(a.rows, a.cols, arr)
-  (base_ring(a) != parent(arr[1])) && error("Elements must have same base ring")
+  (length(arr) > 0 && (base_ring(a) != parent(arr[1]))) && error("Elements must have same base ring")
   z = nmod_mat(a.rows, a.cols, a.n, arr, transpose)
   z.base_ring = a.base_ring
   return z
