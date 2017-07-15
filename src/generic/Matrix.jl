@@ -1727,7 +1727,7 @@ function solve_with_det{T <: FieldElem}(M::MatElem{T}, b::MatElem{T})
 end
 
 function solve_with_det{T <: RingElem}(M::MatElem{T}, b::MatElem{T})
-   return solve(M, b)
+   return solve_rational(M, b)
 end
 
 function backsolve!{T <: RingElem}(A::MatElem{T}, b::MatElem{T})
@@ -1851,12 +1851,13 @@ function solve_interpolation{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
    end
    # bound from xd = (M*)b where d is the det
    bound = (maxlen - 1)*(m - 1) + max(maxlenb, maxlen)
-   V = Array{elem_type(U)}(bound)
+   tmat = Matrix(base_ring(R), 0, 0, elem_type(base_ring(R))[])
+   V = Array{typeof(tmat)}(bound)
    d = Array{elem_type(base_ring(R))}(bound)
    y = Array{elem_type(base_ring(R))}(bound)
    bj = Array{elem_type(base_ring(R))}(bound)
-   X = similar(M, m, m)
-   Y = similar(M, m, h)
+   X = similar(tmat, m, m)
+   Y = similar(tmat, m, h)
    x = similar(b)
    b2 = div(bound, 2)
    pt1 = base_ring(R)(1 - b2)
@@ -1920,7 +1921,10 @@ function solve_rational{T <: PolyElem}(M::MatElem{T}, b::MatElem{T})
    rows(M) != rows(b) && error("Dimensions don't match in solve")
    try
       return solve_interpolation(M, b)
-   catch
+   catch e
+      if !isa(e, ErrorException) 
+         rethrow(e)
+      end
       return solve_ff(M, b)
    end
 end
