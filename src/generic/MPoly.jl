@@ -41,6 +41,10 @@ end
 #
 ###############################################################################
 
+function monomial_drmask(bits::Int)
+   return reinterpret(UInt, ((1 << (sizeof(UInt)*8 - bits)) - 1))
+end
+
 function monomial_zero!(A::Array{UInt, 2}, i::Int, N::Int)
    for k = 1:N
       A[k, i] = UInt(0)
@@ -66,9 +70,14 @@ function monomial_isequal(A::Array{UInt, 2}, i::Int, j::Int, N::Int)
    return true
 end
 
-function monomial_isless{T <: RingElem}(A::Array{UInt, 2}, i::Int, j::Int, N::Int, R::GenMPolyRing{T})
+function monomial_isless{T <: RingElem}(A::Array{UInt, 2}, i::Int, j::Int, N::Int, R::GenMPolyRing{T}, drmask::UInt)
    if R.ord == :degrevlex
-      for k = 1:N
+      if (A[1, i] $ drmask) < (A[1, j] $ drmask)
+         return true
+      elseif (A[1, i] $ drmask) < (A[1, j] $ drmask)
+         return false
+      end
+      for k = 2:N
          if A[k, i] > A[k, j]
             return true
          elseif A[k, i] < A[k, j]
@@ -89,7 +98,12 @@ end
 
 function monomial_isless{T <: RingElem}(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int, R::GenMPolyRing{T})
    if R.ord == :degrevlex
-      for k = 1:N
+      if (A[1, i] $ drmask) < (B[1, j] $ drmask)
+         return true
+      elseif (A[1, i] $ drmask) < (B[1, j] $ drmask)
+         return false
+      end
+      for k = 2:N
          if A[k, i] > B[k, j]
             return true
          elseif A[k, i] < B[k, j]
@@ -165,13 +179,13 @@ function monomial_divides!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j1::Int
    return flag
 end
 
-function monomial_cmp{T <: RingElem}(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int, R::GenMPolyRing{T})
+function monomial_cmp{T <: RingElem}(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int, R::GenMPolyRing{T}, drmask::UInt)
    k = 1
    while k < N && A[k, i] == B[k, j]
       k += 1
    end
    if R.ord == :degrevlex
-      return k == 1 ? reinterpret(Int, A[k, i] - B[k, j]) : reinterpret(Int, B[k, j] - A[k, i])
+      return k == 1 ? reinterpret(Int, (drmask $ A[k, i]) - (drmask $ B[k, j])) : reinterpret(Int, B[k, j] - A[k, i])
    else
       return reinterpret(Int, A[k, i] - B[k, j])
    end
@@ -349,7 +363,7 @@ function +{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
    j = 1
    k = 1
    while i <= length(a) && j <= length(b)
-      cmpexp = monomial_cmp(a.exps, i, b.exps, j, N, par)
+      cmpexp = monomial_cmp(a.exps, i, b.exps, j, N, par, UInt(0))
       if cmpexp > 0
          r.coeffs[k] = a.coeffs[i]
          monomial_set!(r.exps, k, a.exps, i, N)
@@ -396,7 +410,7 @@ function -{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
    j = 1
    k = 1
    while i <= length(a) && j <= length(b)
-      cmpexp = monomial_cmp(a.exps, i, b.exps, j, N, par)
+      cmpexp = monomial_cmp(a.exps, i, b.exps, j, N, par, UInt(0))
       if cmpexp > 0
          r.coeffs[k] = a.coeffs[i]
          monomial_set!(r.exps, k, a.exps, i, N)
@@ -453,7 +467,7 @@ function do_merge{T <: RingElem}(Ac::Array{T, 1}, Bc::Array{T, 1},
    k = 1
    N = size(Ae, 1)
    while i <= n1 && j <= n2
-      cmpexp = monomial_cmp(Ae, s1 + i, Ae, s2 + j, N, par)
+      cmpexp = monomial_cmp(Ae, s1 + i, Ae, s2 + j, N, par, UInt(0))
       if cmpexp > 0
          Bc[r + k] = Ac[s1 + i]
          monomial_set!(Be, r + k, Ae, s1 + i, N)
@@ -719,7 +733,7 @@ heapright(i::Int) = 2i + 1
 heapparent(i::Int) = div(i, 2)
 
 # either chain (exp, x) or insert into heap
-function heapinsert!{T <: RingElem}(xs::Array{heap_s, 1}, ys::Array{heap_t, 1}, m::Int, exp::Int, exps::Array{UInt, 2}, N::Int, R::GenMPolyRing{T})
+function heapinsert!{T <: RingElem}(xs::Array{heap_s, 1}, ys::Array{heap_t, 1}, m::Int, exp::Int, exps::Array{UInt, 2}, N::Int, R::GenMPolyRing{T}, drmask::UInt)
    i = n = length(xs) + 1
    @inbounds if i != 1 && monomial_isequal(exps, exp, xs[1].exp, N)
       ys[m] = heap_t(ys[m].i, ys[m].j, xs[1].n)
@@ -731,7 +745,7 @@ function heapinsert!{T <: RingElem}(xs::Array{heap_s, 1}, ys::Array{heap_t, 1}, 
          ys[m] = heap_t(ys[m].i, ys[m].j, xs[j].n)
          xs[j] = heap_s(xs[j].exp, m)
          return false
-      elseif monomial_isless(exps, xs[j].exp, exp, N, R)
+      elseif monomial_isless(exps, xs[j].exp, exp, N, R, drmask)
          i = j
       else
          break
@@ -746,7 +760,7 @@ function heapinsert!{T <: RingElem}(xs::Array{heap_s, 1}, ys::Array{heap_t, 1}, 
    return true
 end
 
-function nheapinsert!{T <: RingElem}(xs::Array{heap_s, 1}, ys::Array{nheap_t, 1}, m::Int, exp::Int, exps::Array{UInt, 2}, N::Int, p::Int, R::GenMPolyRing{T})
+function nheapinsert!{T <: RingElem}(xs::Array{heap_s, 1}, ys::Array{nheap_t, 1}, m::Int, exp::Int, exps::Array{UInt, 2}, N::Int, p::Int, R::GenMPolyRing{T}, drmask::UInt)
    i = n = length(xs) + 1
    @inbounds if i != 1 && monomial_isequal(exps, exp, xs[1].exp, N)
       ys[m] = nheap_t(ys[m].i, ys[m].j, p, xs[1].n)
@@ -758,7 +772,7 @@ function nheapinsert!{T <: RingElem}(xs::Array{heap_s, 1}, ys::Array{nheap_t, 1}
          ys[m] = nheap_t(ys[m].i, ys[m].j, p, xs[j].n)
          xs[j] = heap_s(xs[j].exp, m)
          return false
-      elseif monomial_isless(exps, xs[j].exp, exp, N, R)
+      elseif monomial_isless(exps, xs[j].exp, exp, N, R, drmask)
          i = j
       else
          break
@@ -773,13 +787,13 @@ function nheapinsert!{T <: RingElem}(xs::Array{heap_s, 1}, ys::Array{nheap_t, 1}
    return true
 end
 
-function heappop!{T <: RingElem}(xs::Array{heap_s, 1}, exps::Array{UInt, 2}, N::Int, R::GenMPolyRing{T})
+function heappop!{T <: RingElem}(xs::Array{heap_s, 1}, exps::Array{UInt, 2}, N::Int, R::GenMPolyRing{T}, drmask::UInt)
    s = length(xs)
    x = xs[1]
    i = 1
    j = 2
    @inbounds while j < s
-      if !monomial_isless(exps, xs[j + 1].exp, xs[j].exp, N, R)
+      if !monomial_isless(exps, xs[j + 1].exp, xs[j].exp, N, R, drmask)
          j += 1
       end
       xs[i] = xs[j]
@@ -788,7 +802,7 @@ function heappop!{T <: RingElem}(xs::Array{heap_s, 1}, exps::Array{UInt, 2}, N::
    end
    exp = xs[s].exp
    j = i >> 1
-   @inbounds while i > 1 && monomial_isless(exps, xs[j].exp, exp, N, R)
+   @inbounds while i > 1 && monomial_isless(exps, xs[j].exp, exp, N, R, drmask)
       xs[i] = xs[j]
       i = j
       j >>= 1
@@ -798,7 +812,7 @@ function heappop!{T <: RingElem}(xs::Array{heap_s, 1}, exps::Array{UInt, 2}, N::
    return x.exp
 end
 
-function mul_johnson{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
+function mul_johnson{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bits::Int)
    par = parent(a)
    R = base_ring(par)
    m = length(a)
@@ -806,6 +820,7 @@ function mul_johnson{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
    if m == 0 || n == 0
       return par()
    end
+   drmask = monomial_drmask(bits)
    N = size(a.exps, 1)
    H = Array(heap_s, 0)
    I = Array(heap_t, 0)
@@ -836,7 +851,7 @@ function mul_johnson{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
       @inbounds while !isempty(H) && monomial_isequal(Exps, H[1].exp, exp, N)
          x = H[1]
          viewc += 1
-         Viewn[viewc] = heappop!(H, Exps, N, par)
+         Viewn[viewc] = heappop!(H, Exps, N, par, drmask)
          v = I[x.n]
          if first
             Rc[k] = a.coeffs[v.i]*b.coeffs[v.j]
@@ -863,7 +878,7 @@ function mul_johnson{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
             push!(I, heap_t(v.i + 1, 1, 0))
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, a.exps, v.i + 1, b.exps, 1, N)
-            if heapinsert!(H, I, length(I), vw, Exps, N, par)
+            if heapinsert!(H, I, length(I), vw, Exps, N, par, drmask)
                viewc -= 1
             end
          end
@@ -871,7 +886,7 @@ function mul_johnson{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
             I[xn] = heap_t(v.i, v.j + 1, 0)
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, a.exps, v.i, b.exps, v.j + 1, N)
-            if heapinsert!(H, I, xn, vw, Exps, N, par) # either chain or insert v into heap 
+            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert v into heap 
                viewc -= 1
             end
          end
@@ -957,14 +972,14 @@ function *{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
       a1.length = a.length
       b1.length = b.length
       if a1.length < b1.length
-         r1 = mul_johnson(a1, b1)
+         r1 = mul_johnson(a1, b1, exp_bits)
       else
-         r1 = mul_johnson(b1, a1)
+         r1 = mul_johnson(b1, a1, exp_bits)
       end
       er = Array(UInt, N, length(r1))
       unpack_monomials(er, r1.exps, k, exp_bits)
    else
-      r1 = mul_johnson(a, b)
+      r1 = mul_johnson(a, b, exp_bits)
       er = r1.exps
    end
    return parent(a)(r1.coeffs, er)
@@ -1140,11 +1155,12 @@ end
 # in ascending order and we fix some issues in the original algorithm
 # http://www.cecm.sfu.ca/CAG/papers/SparsePowering.pdf
 
-function pow_fps{T <: RingElem}(f::GenMPoly{T}, k::Int)
+function pow_fps{T <: RingElem}(f::GenMPoly{T}, k::Int, bits::Int)
    par = parent(f)
    R = base_ring(par)
    m = length(f)
    N = parent(f).N
+   drmask = monomial_drmask(bits)
    H = Array(heap_s, 0) # heap
    I = Array(heap_t, 0) # auxilliary data for heap nodes
    # set up output poly coeffs and exponents (corresponds to h in paper)
@@ -1215,7 +1231,7 @@ function pow_fps{T <: RingElem}(f::GenMPoly{T}, k::Int)
       while !isempty(H) && monomial_isequal(Exps, H[1].exp, exp, N)
          x = H[1]
          viewc += 1
-         Viewn[viewc] = heappop!(H, Exps, N, par)
+         Viewn[viewc] = heappop!(H, Exps, N, par, drmask)
          v = I[x.n]
          largest[v.i] |= topbit
          t1 = mul!(t1, f.coeffs[v.i], gc[v.j])
@@ -1249,7 +1265,7 @@ function pow_fps{T <: RingElem}(f::GenMPoly{T}, k::Int)
             I[xn] = heap_t(v.i + 1, v.j, 0)
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, f.exps, v.i + 1, ge, v.j, N)
-            if heapinsert!(H, I, xn, vw, Exps, N, par) # either chain or insert v into heap  
+            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert v into heap  
                viewc -= 1 
             end
             largest[v.i + 1] = v.j
@@ -1261,7 +1277,7 @@ function pow_fps{T <: RingElem}(f::GenMPoly{T}, k::Int)
                I[reuse] = heap_t(v.i, v.j + 1, 0)
                vw = Viewn[viewc]
                monomial_add!(Exps, vw, f.exps, v.i, ge, v.j + 1, N)
-               if heapinsert!(H, I, reuse, vw, Exps, N, par) # either chain or insert v into heap
+               if heapinsert!(H, I, reuse, vw, Exps, N, par, drmask) # either chain or insert v into heap
                   viewc -= 1
                end
                reuse = 0   
@@ -1269,7 +1285,7 @@ function pow_fps{T <: RingElem}(f::GenMPoly{T}, k::Int)
                push!(I, heap_t(v.i, v.j + 1, 0))
                vw = Viewn[viewc]
                monomial_add!(Exps, vw, f.exps, v.i, ge, v.j + 1, N)
-               if heapinsert!(H, I, length(I), vw, Exps, N, par)
+               if heapinsert!(H, I, length(I), vw, Exps, N, par, drmask)
                   viewc -= 1
                end
             end
@@ -1285,7 +1301,7 @@ function pow_fps{T <: RingElem}(f::GenMPoly{T}, k::Int)
             push!(I, heap_t(2, gnext, 0))
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, f.exps, 2, ge, gnext, N)
-            if heapinsert!(H, I, length(I), vw, Exps, N, par)
+            if heapinsert!(H, I, length(I), vw, Exps, N, par, drmask)
                viewc -= 1
             end
             largest[2] = gnext
@@ -1342,11 +1358,11 @@ function ^{T <: RingElem}(a::GenMPoly{T}, b::Int)
          par = GenMPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
          a1 = par(a.coeffs, e1)
          a1.length = a.length
-         r1 = pow_fps(a1, b)
+         r1 = pow_fps(a1, b, exp_bits)
          er = Array(UInt, N, length(r1))
          unpack_monomials(er, r1.exps, k, exp_bits)
       else
-         r1 = pow_fps(a, b)
+         r1 = pow_fps(a, b, exp_bits)
          er = r1.exps
       end
       return parent(a)(r1.coeffs, er)
@@ -1368,6 +1384,7 @@ function divides_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, b
    if m == 0
       return true, par()
    end
+   drmask = monomial_drmask(bits)
    mask1 = UInt(1) << (bits - 1)
    mask = UInt(0)
    for i = 1:div(sizeof(UInt)*8, bits)
@@ -1409,7 +1426,7 @@ function divides_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, b
       @inbounds while !isempty(H) && monomial_isequal(Exps, H[1].exp, exp, N)
          x = H[1]
          viewc += 1
-         Viewn[viewc] = heappop!(H, Exps, N, par)
+         Viewn[viewc] = heappop!(H, Exps, N, par, drmask)
          v = I[x.n]
          if first
             d1 = monomial_divides!(Qe, k, Exps, exp, b.exps, 1, mask, N)
@@ -1446,14 +1463,14 @@ function divides_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, b
             I[xn] = heap_t(0, v.j + 1, 0)
             vw = Viewn[viewc]
             monomial_set!(Exps, vw, a.exps, v.j + 1, N)
-            if heapinsert!(H, I, xn, vw, Exps, N, par) # either chain or insert into heap   
+            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap   
                viewc -= 1
             end
          elseif v.j < k - 1
             I[xn] = heap_t(v.i, v.j + 1, 0)
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, b.exps, v.i, Qe, v.j + 1, N)
-            if heapinsert!(H, I, xn, vw, Exps, N, par) # either chain or insert into heap
+            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                viewc -= 1
             end
          elseif v.j == k - 1
@@ -1474,14 +1491,14 @@ function divides_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, b
                I[xn] = heap_t(i, k, 0)
                vw = Viewn[viewc]
                monomial_add!(Exps, vw, b.exps, i, Qe, k, N)
-               if heapinsert!(H, I, xn, vw, Exps, N, par) # either chain or insert into heap
+               if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                   viewc -= 1
                end
             else
                push!(I, heap_t(i, k, 0))
                vw = Viewn[viewc]
                monomial_add!(Exps, vw, b.exps, i, Qe, k, N)
-               if heapinsert!(H, I, length(I), vw, Exps, N, par)
+               if heapinsert!(H, I, length(I), vw, Exps, N, par, drmask)
                   viewc -= 1
                end
             end                 
@@ -1550,6 +1567,7 @@ function div_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bits:
    if m == 0
       return par()
    end
+   drmask = monomial_drmask(bits)
    mask1 = UInt(1) << (bits - 1)
    mask = UInt(0)
    for i = 1:div(sizeof(UInt)*8, bits)
@@ -1595,7 +1613,7 @@ function div_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bits:
       @inbounds while !isempty(H) && monomial_isequal(Exps, H[1].exp, exp, N)
          x = H[1]
          viewc += 1
-         Viewn[viewc] = heappop!(H, Exps, N, par)
+         Viewn[viewc] = heappop!(H, Exps, N, par, drmask)
          v = I[x.n]
          if v.i == 0
             addmul!(qc, a.coeffs[m + 1 - v.j], m1, c)
@@ -1629,7 +1647,7 @@ function div_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bits:
             vw = Viewn[viewc]
             monomial_sub!(Exps, vw, maxn, 1, a.exps, m - v.j, N)
             if monomial_divides!(texp, 1, temp2, 1, Exps, vw, mask, N)
-               if heapinsert!(H, I, xn, vw, Exps, N, par) # either chain or insert into heap  
+               if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap  
                   viewc -= 1
                end
             end 
@@ -1639,7 +1657,7 @@ function div_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bits:
             monomial_sub!(temp, 1, maxn, 1, b.exps, n + 1 - v.i, N)
             monomial_sub!(Exps, vw, temp, 1, Qe, v.j + 1, N)
             if monomial_divides!(texp, 1, temp2, 1, Exps, vw, mask, N)
-               if heapinsert!(H, I, xn, vw, Exps, N, par) # either chain or insert into heap
+               if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                   viewc -= 1
                end
             end
@@ -1667,7 +1685,7 @@ function div_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bits:
                      monomial_sub!(temp, 1, maxn, 1, b.exps, n + 1 - i, N)
                      monomial_sub!(Exps, vw, temp, 1, Qe, k, N)
                      if monomial_divides!(texp, 1, temp2, 1, Exps, vw, mask, N)
-                        if heapinsert!(H, I, xn, vw, Exps, N, par) # either chain or insert into heap
+                        if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                            viewc -= 1
                         end
                      end
@@ -1677,7 +1695,7 @@ function div_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bits:
                      monomial_sub!(Exps, vw, maxn, 1, b.exps, n + 1 - i, N)
                      monomial_sub!(Exps, vw, Exps, vw, Qe, k, N)
                      if monomial_divides!(texp, 1, temp2, 1, Exps, vw, mask, N)
-                        if heapinsert!(H, I, length(I), vw, Exps, N, par)
+                        if heapinsert!(H, I, length(I), vw, Exps, N, par, drmask)
                            viewc -= 1
                         end
                      end
@@ -1745,6 +1763,7 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bi
    if m == 0
       return par(), par()
    end
+   drmask = monomial_drmask(bits)
    mask1 = UInt(1) << (bits - 1)
    mask = UInt(0)
    for i = 1:div(sizeof(UInt)*8, bits)
@@ -1794,7 +1813,7 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bi
       @inbounds while !isempty(H) && monomial_isequal(Exps, H[1].exp, exp, N)
          x = H[1]
          viewc += 1
-         Viewn[viewc] = heappop!(H, Exps, N, par)
+         Viewn[viewc] = heappop!(H, Exps, N, par, drmask)
          v = I[x.n]
          if v.i == 0
             qc = addmul!(qc, a.coeffs[m + 1 - v.j], m1, c)
@@ -1827,7 +1846,7 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bi
             I[xn] = heap_t(0, v.j + 1, 0)
             vw = Viewn[viewc]
             monomial_sub!(Exps, vw, maxn, 1, a.exps, m - v.j, N)
-            if heapinsert!(H, I, xn, vw, Exps, N, par) # either chain or insert into heap  
+            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap  
                viewc -= 1
             end 
          elseif v.j < k - 1
@@ -1835,7 +1854,7 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bi
             vw = Viewn[viewc]
             monomial_sub!(temp, 1, maxn, 1, b.exps, n + 1 - v.i, N)
             monomial_sub!(Exps, vw, temp, 1, Qe, v.j + 1, N)
-            if heapinsert!(H, I, xn, vw, Exps, N, par) # either chain or insert into heap
+            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                viewc -= 1
             end
          elseif v.j == k - 1
@@ -1879,7 +1898,7 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bi
                      vw = Viewn[viewc]
                      monomial_sub!(temp, 1, maxn, 1, b.exps, n + 1 - i, N)
                      monomial_sub!(Exps, vw, temp, 1, Qe, k, N)
-                     if heapinsert!(H, I, xn, vw, Exps, N, par) # either chain or insert into heap
+                     if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                         viewc -= 1
                      end
                   else
@@ -1887,7 +1906,7 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bi
                      vw = Viewn[viewc]
                      monomial_sub!(Exps, vw, maxn, 1, b.exps, n + 1 - i, N)
                      monomial_sub!(Exps, vw, Exps, vw, Qe, k, N)
-                     if heapinsert!(H, I, length(I), vw, Exps, N, par)
+                     if heapinsert!(H, I, length(I), vw, Exps, N, par, drmask)
                         viewc -= 1
                      end
                   end
@@ -1962,6 +1981,7 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{
    if m == 0
       return [par() for i in 1:len], par()
    end
+   drmask = monomial_drmask(bits)
    mask1 = UInt(1) << (bits - 1)
    mask = UInt(0)
    for i = 1:div(sizeof(UInt)*8, bits)
@@ -2007,7 +2027,7 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{
       @inbounds while !isempty(H) && monomial_isequal(Exps, H[1].exp, exp, N)
          x = H[1]
          viewc += 1
-         Viewn[viewc] = heappop!(H, Exps, N, par)
+         Viewn[viewc] = heappop!(H, Exps, N, par, drmask)
          v = I[x.n]
          if v.i == 0
             qc = addmul!(qc, a.coeffs[m + 1 - v.j], m1, c)
@@ -2040,7 +2060,7 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{
             I[xn] = nheap_t(0, v.j + 1, 0, 0)
             vw = Viewn[viewc]
             monomial_sub!(Exps, vw, maxn, 1, a.exps, m - v.j, N)
-            if nheapinsert!(H, I, xn, vw, Exps, N, 0, par) # either chain or insert into heap  
+            if nheapinsert!(H, I, xn, vw, Exps, N, 0, par, drmask) # either chain or insert into heap  
                viewc -= 1
             end 
          elseif v.j < k[v.p]
@@ -2048,7 +2068,7 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{
             vw = Viewn[viewc]
             monomial_sub!(temp, 1, maxn, 1, b[v.p].exps, n[v.p] + 1 - v.i, N)
             monomial_sub!(Exps, vw, temp, 1, Qe[v.p], v.j + 1, N)
-            if nheapinsert!(H, I, xn, vw, Exps, N, v.p, par) # either chain or insert into heap
+            if nheapinsert!(H, I, xn, vw, Exps, N, v.p, par, drmask) # either chain or insert into heap
                viewc -= 1
             end
          elseif v.j == k[v.p]
@@ -2080,7 +2100,7 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{
                         vw = Viewn[viewc]
                         monomial_sub!(temp, 1, maxn, 1, b[w].exps, n[w] + 1 - i, N)
                         monomial_sub!(Exps, vw, temp, 1, Qe[w], k[w], N)
-                        if nheapinsert!(H, I, xn, vw, Exps, N, w, par) # either chain or insert into heap
+                        if nheapinsert!(H, I, xn, vw, Exps, N, w, par, drmask) # either chain or insert into heap
                            viewc -= 1
                         end
                      else
@@ -2088,7 +2108,7 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{
                         vw = Viewn[viewc]
                         monomial_sub!(Exps, vw, maxn, 1, b[w].exps, n[w] + 1 - i, N)
                         monomial_sub!(Exps, vw, Exps, vw, Qe[w], k[w], N)
-                        if nheapinsert!(H, I, length(I), vw, Exps, N, w, par)
+                        if nheapinsert!(H, I, length(I), vw, Exps, N, w, par, drmask)
                            viewc -= 1
                         end
                      end
@@ -2579,10 +2599,12 @@ function main_variable_insert_lex{T <: RingElem}(a::GenSparsePoly{GenMPoly{T}}, 
 end
 
 function main_variable_insert_deglex{T <: RingElem}(a::GenSparsePoly{GenMPoly{T}}, k::Int)
+   N = base_ring(a).N
    V = [(ntuple(i -> i == 1 ? a.exps[r] + a.coeffs[r].exps[1, s] : (i == k ? a.exps[r] :
         a.coeffs[r].exps[i, s]), Val{N}), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in 1:length(V)]
+   Re = Array(UInt, N, length(V))
    for i = 1:length(V)
       for j = 1:N
          Re[j, i] = V[i][1][j]
@@ -2593,7 +2615,7 @@ end
 
 function main_variable_insert{T <: RingElem}(a::GenSparsePoly{GenMPoly{T}}, k::Int)
    ord = base_ring(a).ord
-   if ord == :lex || ord == :revlex
+   if ord == :lex
       return main_variable_insert_lex(a, k)
    else
       return main_variable_insert_deglex(a, k)
