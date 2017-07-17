@@ -352,6 +352,16 @@ function divexact(x::fmpz_poly, y::fmpz_poly)
    return z
 end
 
+function divrem(x::fmpz_poly, y::fmpz_poly)
+   check_parent(x, y)
+   iszero(y) && throw(DivideError())
+   z = parent(x)()
+   r = parent(x)()
+   ccall((:fmpz_poly_divrem, :libflint), Void, 
+            (Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}, Ptr{fmpz_poly}), &z, &r, &x, &y)
+   return z, r
+end
+
 function divides(x::fmpz_poly, y::fmpz_poly)
    check_parent(x, y)
    iszero(y) && throw(DivideError())
