@@ -2455,11 +2455,19 @@ function term_gcd{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
    elseif b.length < 1
       return a
    end
+   ord = parent(a).ord
    N = parent(a).N
    Ce = Array(UInt, N, 1)
    Cc = Array(T, 1)
    monomial_set!(Ce, 1, a.exps, 1, N)
    monomial_vecmin!(Ce, 1, b.exps, 1, N)
+   if ord == :deglex || ord == :degrevlex
+      sum = UInt(0)
+      for j = 2:N
+         sum += Ce[j, 1]
+      end
+      Ce[1, 1] = sum
+   end
    Cc[1] = gcd(a.coeffs[1], b.coeffs[1])
    return parent(a)(Cc, Ce)
 end
@@ -2468,12 +2476,20 @@ function term_content{T <: RingElem}(a::GenMPoly{T})
    if a.length <= 1
       return a
    end
+   ord = parent(a).ord
    N = parent(a).N
    Ce = Array(UInt, N, 1)
    Cc = Array(T, 1)
    monomial_set!(Ce, 1, a.exps, 1, N)
    for i = 2:a.length
       monomial_vecmin!(Ce, 1, a.exps, i, N)
+      if ord == :deglex || ord == :degrevlex
+         sum = UInt(0)
+         for j = 2:N
+            sum += Ce[j, 1]
+         end
+         Ce[1, 1] = sum
+      end
       if monomial_iszero(Ce, 1, N)
          break
       end
@@ -2654,12 +2670,46 @@ function main_variable_insert_deglex{T <: RingElem}(a::GenSparsePoly{GenMPoly{T}
    return base_ring(a)(Rc, Re)
 end
 
+function is_less_degrevlex(a::Tuple, b::Tuple)
+   N = length(a[1])
+   if a[1][1] < b[1][1]
+      return true
+   elseif a[1][1] > b[1][1]
+      return false
+   end
+   for i = 2:N
+      if a[1][i] > b[1][i]
+         return true
+      elseif a[1][i] < b[1][i]
+         return false
+      end
+   end
+   return false
+end
+
+function main_variable_insert_degrevlex{T <: RingElem}(a::GenSparsePoly{GenMPoly{T}}, k::Int)
+   N = base_ring(a).N
+   V = [(ntuple(i -> i == 1 ? a.exps[r] + a.coeffs[r].exps[1, s] : (i == k ? a.exps[r] :
+        a.coeffs[r].exps[i, s]), Val{N}), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
+   sort!(V, lt = is_less_degrevlex)
+   Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]
+   Re = Array(UInt, N, length(V))
+   for i = 1:length(V)
+      for j = 1:N
+         Re[j, length(V) - i + 1] = V[i][1][j]
+      end
+   end
+   return base_ring(a)(Rc, Re)
+end
+
 function main_variable_insert{T <: RingElem}(a::GenSparsePoly{GenMPoly{T}}, k::Int)
    ord = base_ring(a).ord
    if ord == :lex
       return main_variable_insert_lex(a, k)
-   else
+   elseif ord == :deglex
       return main_variable_insert_deglex(a, k)
+   else
+      return main_variable_insert_degrevlex(a, k)
    end
 end
 
