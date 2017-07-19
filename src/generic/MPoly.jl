@@ -2384,7 +2384,7 @@ function gcd{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
       return parent(a)(gcd(a.coeffs[1], b.coeffs[1]))
    end
    ord = parent(a).ord
-   if ord == :lex || ord == :revlex
+   if ord == :lex
       start_var = 1
    else
       start_var = 2
@@ -2556,10 +2556,6 @@ function main_variable_coefficient{T <: RingElem}(a::GenMPoly{T}, k::Int, n::Int
    return main_variable_coefficient_lex(a, k, n)
 end
 
-function main_variable_coefficient{T <: RingElem}(a::GenMPoly{T}, k::Int, n::Int, ::Type{Val{:revlex}})
-   return main_variable_coefficient_lex(a, k, n)
-end
-
 function main_variable_coefficient_deglex{T <: RingElem}(a::GenMPoly{T}, k0::Int, n::Int)
    exp = a.exps[k0, n]
    N = parent(a).N
@@ -2578,7 +2574,7 @@ function main_variable_coefficient_deglex{T <: RingElem}(a::GenMPoly{T}, k0::Int
       end
       for k = 1:N
          if k == 1
-            Ae[k, l] = a.exps[1, i] - a.exps[k, i]
+            Ae[k, l] = a.exps[1, i] - a.exps[k0, i]
          elseif k == k0
             Ae[k, l] = UInt(0)
          else 
@@ -2619,7 +2615,7 @@ function main_variable_extract{T <: RingElem}(a::GenMPoly{T}, k::Int)
       Pe[i] = a2.exps[k, A[i]]
       Pc[i] = main_variable_coefficient(a2, k, A[i], Val{ord})
    end
-   if ord == :lex || ord == :revlex
+   if ord == :lex
       sym = parent(a).S[k]
    else
       sym = parent(a).S[k - 1]
@@ -2633,11 +2629,11 @@ function main_variable_insert_lex{T <: RingElem}(a::GenSparsePoly{GenMPoly{T}}, 
    V = [(ntuple(i -> i == k ? a.exps[r] : a.coeffs[r].exps[i, s], Val{N}), r, s) for
        r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V)
-   Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in 1:length(V)]
+   Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]
    Re = Array(UInt, N, length(V))
    for i = 1:length(V)
       for j = 1:N
-         Re[j, i] = V[i][1][j]
+         Re[j, length(V) - i + 1] = V[i][1][j]
       end
    end
    return base_ring(a)(Rc, Re)
@@ -2648,11 +2644,11 @@ function main_variable_insert_deglex{T <: RingElem}(a::GenSparsePoly{GenMPoly{T}
    V = [(ntuple(i -> i == 1 ? a.exps[r] + a.coeffs[r].exps[1, s] : (i == k ? a.exps[r] :
         a.coeffs[r].exps[i, s]), Val{N}), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V)
-   Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in 1:length(V)]
+   Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]
    Re = Array(UInt, N, length(V))
    for i = 1:length(V)
       for j = 1:N
-         Re[j, i] = V[i][1][j]
+         Re[j, length(V) - i + 1] = V[i][1][j]
       end
    end
    return base_ring(a)(Rc, Re)
