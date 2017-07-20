@@ -5,7 +5,9 @@
 ###############################################################################
 
 export GenMPoly, GenMPolyRing, max_degrees, gens, divides,
-       main_variable_extract, main_variable_insert, rand_ordering, vars
+       isconstant, isdegree, ismonomial, isreverse, isterm, 
+       main_variable_extract, main_variable_insert, nvars, ordering,
+       rand_ordering, vars 
 
 ###############################################################################
 #
@@ -40,19 +42,22 @@ function gens{T <: RingElem}(a::GenMPolyRing{T}, ::Type{Val{:degrevlex}})
       for i in 1:a.num_vars]
 end
 
+doc"""
+    gens{T <: RingElem}(a::GenMPolyRing{T})
+> Return an array of all the generators (variables) of the given polynomial
+> ring.
+"""
 function gens{T <: RingElem}(a::GenMPolyRing{T})
    return gens(a, Val{a.ord})
 end
 
-function rand_ordering()
-   i = rand(1:3)
-   if i == 1
-      return :lex
-   elseif i == 2
-      return :deglex
-   else
-      return :degrevlex
-   end
+doc"""
+    ordering{T <: RingElem}(a::GenMPolyRing{T})
+> Return the ordering of the given polynomial ring as a symbol. The options are
+> `:lex`, `:deglex` and `:degrevlex`.
+"""
+function ordering{T <: RingElem}(a::GenMPolyRing{T})
+   return a.ord
 end
 
 ###############################################################################
@@ -94,7 +99,7 @@ function monomial_isless{T <: RingElem}(A::Array{UInt, 2}, i::Int, j::Int, N::In
    if R.ord == :degrevlex
       if (A[1, i] $ drmask) < (A[1, j] $ drmask)
          return true
-      elseif (A[1, i] $ drmask) < (A[1, j] $ drmask)
+      elseif (A[1, i] $ drmask) > (A[1, j] $ drmask)
          return false
       end
       for k = 2:N
@@ -120,7 +125,7 @@ function monomial_isless{T <: RingElem}(A::Array{UInt, 2}, i::Int, B::Array{UInt
    if R.ord == :degrevlex
       if (A[1, i] $ drmask) < (B[1, j] $ drmask)
          return true
-      elseif (A[1, i] $ drmask) < (B[1, j] $ drmask)
+      elseif (A[1, i] $ drmask) > (B[1, j] $ drmask)
          return false
       end
       for k = 2:N
@@ -220,6 +225,81 @@ function monomial_cmp{T <: RingElem}(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2
    end
 end
 
+###############################################################################
+#
+#   Basic manipulation
+#
+###############################################################################
+
+doc"""
+    isdegree(s::Symbol)
+> Return `true` if the given symbol represents a degree ordering (deglex or
+> degrevlex).
+"""
+isdegree(s::Symbol) = s == :deglex || s == :degrevlex
+
+doc"""
+    isdegree(s::Symbol)
+> Return `true` if the given symbol represents a reverse ordering (degrevlex).
+"""
+isreverse(s::Symbol) = s == :degrevlex
+
+function isgen{T <: RingElem}(x::GenMPoly{T}, ::Type{Val{:lex}})
+   exps = x.exps
+   N = size(exps, 1)
+   for k = 1:N
+      exp = exps[k, 1]
+      if exp != UInt(0)
+         if exp != UInt(1)
+            return false
+         end
+         for j = k + 1:N
+            if exps[j, 1] != UInt(0)
+               return false
+            end
+         end
+         return true
+      end
+   end
+   return false
+end
+
+function isgen{T <: RingElem}(x::GenMPoly{T}, ::Type{Val{:deglex}})
+   return x.exps[1, 1] == UInt(1)
+end
+
+function isgen{T <: RingElem}(x::GenMPoly{T}, ::Type{Val{:degrevlex}})
+   return x.exps[1, 1] == UInt(1)
+end
+
+doc"""
+    isgen{T <: RingElem}(x::GenMPoly{T})
+> Return `true` if the given polynomial is a generator (variable) of the
+> polynomial ring it belongs to.
+"""
+function isgen{T <: RingElem}(x::GenMPoly{T})
+   if length(x) != 1
+      return false
+   end
+   if coeff(x, 0) != 1
+      return false
+   end
+   return isgen(x, Val{parent(x).ord})
+end
+
+function coeff(x::GenMPoly, i::Int)
+   i < 0 && throw(DomainError())
+   return x.coeffs[i + 1]
+end
+
+doc"""
+    max_degrees{T <: RingElem}(f::GenMPoly{T})
+> Return a tuple `(degs, biggest)` consisting of an array `degs` of the maximum
+> exponent for each field in the exponent vectors of `f` and an integer which
+> is the largest of the entries in `degs`. The array `degs` will have `n + 1`
+> entries in the case of a degree ordering, or `n` otherwise, where `n` is the
+> number of variables of the polynomial ring `f` belongs to.
+"""
 function max_degrees{T <: RingElem}(f::GenMPoly{T})
    A = f.exps
    N = size(A, 1)
@@ -240,28 +320,38 @@ function max_degrees{T <: RingElem}(f::GenMPoly{T})
    return biggest, b
 end
 
-###############################################################################
-#
-#   Basic manipulation
-#
-###############################################################################
-
-function coeff(x::GenMPoly, i::Int)
-   i < 0 && throw(DomainError())
-   return x.coeffs[i + 1]
-end
-
 length(x::GenMPoly) = x.length
 
-num_vars(x::GenMPoly) = parent(x).num_vars
+doc"""
+    nvars(x::GenMPoly)
+> Returns the number of variables of the polynomial ring the given polynomial
+> belongs to.
+"""
+nvars(x::GenMPoly) = parent(x).num_vars
 
 isone(x::GenMPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && x.coeffs[1] == 1
 
 iszero(x::GenMPoly) = x.length == 0
 
+doc"""
+    isconstant(x::GenMPoly)
+> Return `true` if `x` is a degree zero polynomial or the zero polynomial, i.e.
+> a constant polynomial.
+"""
 isconstant(x::GenMPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
 
-ismonomial(x::GenMPoly) = x.length == 1
+doc"""
+    isterm(x::GenMPoly)
+> Return `true` if the given polynomial has precisely one term, with
+> coefficient `1`.
+"""
+isterm(x::GenMPoly) = x.length == 1
+
+doc"""
+    isterm(x::GenMPoly)
+> Return `true` if the given polynomial has precisely one nonzero term.
+"""
+ismonomial(x::GenMPoly) = x.length == 1 && isone(coeff(x, 0))
 
 function deepcopy{T <: RingElem}(a::GenMPoly{T})
    Re = deepcopy(a.exps)
@@ -322,7 +412,7 @@ function show{T <: RingElem}(io::IO, x::GenMPoly{T})
           end
         end
         fst = true
-        for j = 1:num_vars(x)
+        for j = 1:nvars(x)
           n = reinterpret(Int, X[j + d, 1])
           if n != 0
             if fst
@@ -2780,6 +2870,17 @@ end
 #   Random elements
 #
 ###############################################################################
+
+function rand_ordering()
+   i = rand(1:3)
+   if i == 1
+      return :lex
+   elseif i == 2
+      return :deglex
+   else
+      return :degrevlex
+   end
+end
 
 function rand(S::GenMPolyRing, term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
    f = S()
