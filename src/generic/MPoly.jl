@@ -1,11 +1,11 @@
-#############################################################################
+###############################################################################
 #
 #   MPoly.jl : Generic sparse distributed multivariate polynomials over rings
 #
 ###############################################################################
 
 export GenMPoly, GenMPolyRing, max_degrees, gens, divides,
-       main_variable_extract, main_variable_insert
+       main_variable_extract, main_variable_insert, rand_ordering, vars
 
 ###############################################################################
 #
@@ -17,6 +17,11 @@ parent_type{T}(::Type{GenMPoly{T}}) = GenMPolyRing{T}
 
 elem_type{T <: RingElem}(::Type{GenMPolyRing{T}}) = GenMPoly{T}
 
+doc"""
+    vars(a::GenMPolyRing)
+> Return an array of symbols representing the variable names for the given
+> polynomial ring.
+"""
 vars(a::GenMPolyRing) = a.S
 
 function gens{T <: RingElem}(a::GenMPolyRing{T}, ::Type{Val{:lex}})
@@ -33,6 +38,21 @@ function gens{T <: RingElem}(a::GenMPolyRing{T}, ::Type{Val{:degrevlex}})
    N = a.N
    return [a([base_ring(a)(1)], reshape([UInt(1), [UInt(N - i == j) for j in 1:a.num_vars]...], a.num_vars + 1, 1))
       for i in 1:a.num_vars]
+end
+
+function gens{T <: RingElem}(a::GenMPolyRing{T})
+   return gens(a, Val{a.ord})
+end
+
+function rand_ordering()
+   i = rand(1:3)
+   if i == 1
+      return :lex
+   elseif i == 2
+      return :deglex
+   else
+      return :degrevlex
+   end
 end
 
 ###############################################################################
@@ -2757,6 +2777,27 @@ end
 
 ###############################################################################
 #
+#   Random elements
+#
+###############################################################################
+
+function rand(S::GenMPolyRing, term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
+   f = S()
+   g = gens(S)
+   R = base_ring(S)
+   for i = 1:rand(term_range)
+      term = S(1)
+      for j = 1:length(g)
+         term *= g[j]^rand(exp_bound)
+      end
+      term *= rand(R, v...)
+      f += term
+   end
+   return f
+end
+
+###############################################################################
+#
 #   Promotion rules
 #
 ###############################################################################
@@ -2821,7 +2862,7 @@ end
 doc"""
     PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, S::Symbol = :lex)
 > Given a base ring `R` and an array of strings `s` specifying how the
-> generators (variables) should be printed, return a tuple `S, x1, x2, ...`
+> generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
 > representing the new polynomial ring $T = R[x1, x2, ...]$ and the generators
 > $x1, x2, ...$ of the polynomial ring. By default the parent object `T` will
 > depend only on `R` and `x1, x2, ...` and will be cached. Setting the optional

@@ -638,7 +638,6 @@ end
 
 # S is a Symbol which can take the values:
 # :lex
-# :revlex
 # :deglex
 # :degrevlex
 # 
@@ -658,12 +657,10 @@ type FmpzMPolyRing{S, N} <: PolyRing{fmpz}
       else 
          if S == :lex
             ord = 0
-         elseif S == :revlex
-            ord = 1
          elseif S == :deglex
-            ord = 2
+            ord = 1
          elseif S == :degrevlex
-            ord = 3
+            ord = 2
          end
 
          z = new()

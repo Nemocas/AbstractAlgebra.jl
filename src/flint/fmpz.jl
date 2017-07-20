@@ -41,7 +41,7 @@ export fmpz, FlintZZ, FlintIntegerRing, parent, show, convert, hash, fac, bell,
        sqrtmod, trailing_zeros, sigma, eulerphi, fib, moebiusmu, primorial,
        risingfac, numpart, canonical_unit, needs_parentheses, isnegative,
        show_minus_one, parseint, addeq!, mul!, isunit, isequal, num, den,
-       iszero
+       iszero, rand
 
 ###############################################################################
 #
@@ -1515,6 +1515,16 @@ function parse(::Type{fmpz}, s::String, base::Int = 10)
     return sgn < 0 ? -z : z
 end
 
+###############################################################################
+#
+#   Random generation
+#
+###############################################################################
+
+function rand(R::FlintIntegerRing, n::UnitRange{Int})
+   return R(rand(n))
+end
+   
 ###############################################################################
 #
 #   Constructors
