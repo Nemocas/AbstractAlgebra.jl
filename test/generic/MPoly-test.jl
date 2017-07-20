@@ -155,6 +155,137 @@ function test_gen_mpoly_binary_ops()
          @test f*g == g*f
          @test f*g + f*h == f*(g + h)
          @test f*g - f*h == f*(g - h)
+
+         @test f*g == Nemo.mul_classical(f, g)
+      end
+   end
+
+   println("PASS")
+end   
+
+function test_gen_mpoly_adhoc_binary()
+   print("GenMPoly.adhoc_binary...")
+
+   R, x = ZZ["y"]
+
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+
+      for iter = 1:100
+         f = rand(S, 0:5, 0:100, 0:0, -100:100)
+
+         d1 = rand(-20:20)
+         d2 = rand(-20:20)
+         g1 = rand(R, 0:2, -10:10)
+         g2 = rand(R, 0:2, -10:10)
+
+         @test f*d1 + f*d2 == (d1 + d2)*f
+         @test f*ZZ(d1) + f*ZZ(d2) == (ZZ(d1) + ZZ(d2))*f
+         @test f*g1 + f*g2 == (g1 + g2)*f
+         
+         @test f + d1 + d2 == d1 + d2 + f
+         @test f + ZZ(d1) + ZZ(d2) == ZZ(d1) + ZZ(d2) + f
+         @test f + g1 + g2 == g1 + g2 + f
+         
+         @test f - d1 - d2 == -((d1 + d2) - f)
+         @test f - ZZ(d1) - ZZ(d2) == -((ZZ(d1) + ZZ(d2)) - f)
+         @test f - g1 - g2 == -((g1 + g2) - f)
+
+         @test f + d1 - d1 == f
+         @test f + ZZ(d1) - ZZ(d1) == f
+         @test f + g1 - g1 == f
+      end
+   end
+
+   println("PASS")
+end   
+
+function test_gen_mpoly_adhoc_comparison()
+   print("GenMPoly.adhoc_comparison...")
+
+   R, x = ZZ["y"]
+
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+
+      for iter = 1:100
+         d = rand(-100:100)
+         g = rand(R, 0:2, -10:10)
+         
+         @test S(d) == d
+         @test d == S(d)
+         @test S(d) == ZZ(d)
+         @test ZZ(d) == S(d)
+         @test S(g) == g
+         @test g == S(g)
+      end
+   end
+
+   println("PASS")
+end   
+
+function test_gen_mpoly_powering()
+   print("GenMPoly.powering...")
+
+   R, x = ZZ["y"]
+
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+
+      for iter = 1:10
+         f = rand(S, 0:5, 0:100, 0:0, -100:100)
+
+         expn = rand(0:10)
+
+         r = S(1)
+         for i = 1:expn
+            r *= f
+         end
+
+         @test (f == 0 && expn == 0 && f^expn == 0) || f^expn == r 
+      end
+   end
+
+   println("PASS")
+end   
+
+function test_gen_mpoly_divides()
+   print("GenMPoly.divides...")
+
+   R, x = ZZ["y"]
+
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+
+      for iter = 1:10
+         f = S(0)
+         while iszero(f)
+            f = rand(S, 0:5, 0:100, 0:0, -100:100)
+         end
+         g = rand(S, 0:5, 0:100, 0:0, -100:100)
+
+         p = f*g
+
+         flag, q = divides(p, f)
+
+         @test flag == true
+         @test q == g
+
+         q = divexact(p, f)
+
+         @test q == g
       end
    end
 
@@ -166,6 +297,10 @@ function test_gen_mpoly()
    test_gen_mpoly_manipulation()
    test_gen_mpoly_unary_ops()
    test_gen_mpoly_binary_ops()
+   test_gen_mpoly_adhoc_binary()
+   test_gen_mpoly_adhoc_comparison()
+   test_gen_mpoly_powering()
+   test_gen_mpoly_divides()
 
    println("")
 end
