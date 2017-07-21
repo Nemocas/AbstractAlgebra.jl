@@ -2173,7 +2173,9 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{
       exp = H[1].exp
       monomial_set!(exp_copy, 1, Exps, exp, N)
       if monomial_overflows(exp_copy, 1, mask, N)
-         k = 0
+         for i = 1:len
+            k[i] = 0
+         end
          l = 0
          flag = false
          break
@@ -2289,6 +2291,11 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{
    return flag, [parent(a)(Qc[i], Qe[i]) for i in 1:len], parent(a)(Rc, Re)
 end
 
+doc"""
+    divrem{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{T}, 1})
+> Return a tuple `(q, r)` consisting of an array of polynomials `q`, one for
+> each polynomial in `b`, and a polynomial `r` such that `a = sum_i b[i]*q[i]`.
+"""
 function divrem{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{T}, 1})
    v1, d = max_degrees(a)
    len = length(b)
@@ -2359,7 +2366,8 @@ end
 doc"""
     remove(z::GenMPoly, p::GenMPoly)
 > Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
-> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
+> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as the second return.
+> value.
 >
 > See also `valuation`, which only returns the valuation.
 """
@@ -2404,7 +2412,7 @@ function evaluate{T <: RingElem}(a::GenMPoly{T}, A::Array{T, 1})
    end
    N = size(a.exps, 1)
    ord = parent(a).ord
-   if ord == :lex || ord == :revlex
+   if ord == :lex
       start_var = 1
    else
       start_var = 2
@@ -2412,7 +2420,7 @@ function evaluate{T <: RingElem}(a::GenMPoly{T}, A::Array{T, 1})
    while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
       k = main_variable(a, start_var)
       p = main_variable_extract(a, k)
-      a = evaluate(p, A[k])
+      a = evaluate(p, A[k - start_var + 1])
    end
    if a.length == 0
       return base_ring(a)()
@@ -2427,7 +2435,7 @@ function evaluate{T <: RingElem, U <: Integer}(a::GenMPoly{T}, A::Array{U})
    end
    N = size(a.exps, 1)
    ord = parent(a).ord
-   if ord == :lex || ord == :revlex
+   if ord == :lex
       start_var = 1
    else
       start_var = 2
@@ -2436,7 +2444,7 @@ function evaluate{T <: RingElem, U <: Integer}(a::GenMPoly{T}, A::Array{U})
    while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
       k = main_variable(a, start_var)
       p = main_variable_extract(a, k)
-      a = evaluate(p, A[k])
+      a = evaluate(p, A[k - start_var + 1])
    end
    if a.length == 0
       return base_ring(a)()
@@ -2451,7 +2459,7 @@ function evaluate{T <: RingElem}(a::GenMPoly{T}, A::Array{fmpz})
    end
    N = size(a.exps, 1)
    ord = parent(a).ord
-   if ord == :lex || ord == :revlex
+   if ord == :lex
       start_var = 1
    else
       start_var = 2
@@ -2459,7 +2467,7 @@ function evaluate{T <: RingElem}(a::GenMPoly{T}, A::Array{fmpz})
    while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
       k = main_variable(a, start_var)
       p = main_variable_extract(a, k)
-      a = evaluate(p, A[k])
+      a = evaluate(p, A[k - start_var + 1])
    end
    if a.length == 0
       return base_ring(a)()

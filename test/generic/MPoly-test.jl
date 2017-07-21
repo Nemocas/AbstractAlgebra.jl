@@ -290,6 +290,209 @@ function test_gen_mpoly_divides()
    end
 
    println("PASS")
+end
+
+function test_gen_mpoly_euclidean_division()
+   print("GenMPoly.euclidean_division...")
+
+   R, x = ZZ["y"]
+
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+
+      for iter = 1:10
+         f = S(0)
+         while iszero(f)
+            f = rand(S, 0:5, 0:100, 0:0, -100:100)
+         end
+         g = rand(S, 0:5, 0:100, 0:0, -100:100)
+
+         p = f*g
+
+         q1, r = divrem(p, f)
+         q2 = div(p, f)
+
+         @test q1 == g
+         @test q2 == g
+         @test f*q1 + r == p
+
+         q3, r3 = divrem(g, f)
+         q4 = div(g, f)
+         flag, q5 = divides(g, f)
+
+         @test q3*f + r3 == g
+         @test q3 == q4
+         @test (r3 == 0 && flag == true && q5 == q3) || (r3 != 0 && flag == false)
+      end
+   end
+
+   println("PASS")
+end   
+
+function test_gen_mpoly_ideal_reduction()
+   print("GenMPoly.ideal_reduction...")
+
+   R, x = ZZ["y"]
+
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+
+      for iter = 1:10
+         f = S(0)
+         while iszero(f)
+            f = rand(S, 0:5, 0:100, 0:0, -100:100)
+         end
+         g = rand(S, 0:5, 0:100, 0:0, -100:100)
+
+         p = f*g
+
+         q1, r = divrem(p, [f])
+
+         @test q1[1] == g
+         @test r == 0
+      end
+
+      for iter = 1:10
+         num = rand(1:5)
+         
+         V = Array(elem_type(S), num)
+         
+         for i = 1:num
+            V[i] = S(0)
+            while iszero(V[i])
+               V[i] = rand(S, 0:5, 0:100, 0:0, -100:100)
+            end
+         end
+         g = rand(S, 0:5, 0:100, 0:0, -100:100)
+
+         q, r = divrem(g, V)
+
+         p = r
+         for i = 1:num
+            p += q[i]*V[i]
+         end
+
+         @test p == g
+      end
+   end
+
+   println("PASS")
+end   
+
+function test_gen_mpoly_gcd()
+   print("GenMPoly.gcd...")
+
+   for num_vars = 1:4
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
+
+      for iter = 1:10
+         f = rand(S, 0:4, 0:5, -10:10)
+         g = rand(S, 0:4, 0:5, -10:10)
+         h = rand(S, 0:4, 0:5, -10:10)
+
+         g1 = gcd(f, g)
+         g2 = gcd(f*h, g*h)
+
+         @test g2 == g1*h || g2 == -g1*h
+      end
+   end
+
+   println("PASS")
+end   
+
+function test_gen_mpoly_evaluation()
+   print("GenMPoly.evaluation...")
+
+   R, x = ZZ["y"]
+
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+
+      for iter = 1:100
+         f = rand(S, 0:5, 0:100, 0:0, -100:100)
+         g = rand(S, 0:5, 0:100, 0:0, -100:100)
+       
+         V1 = [rand(-10:10) for i in 1:num_vars]
+
+         r1 = evaluate(f, V1)
+         r2 = evaluate(g, V1)
+         r3 = evaluate(f + g, V1)
+
+         @test r3 == r1 + r2
+
+         V2 = [ZZ(rand(-10:10)) for i in 1:num_vars]
+
+         r1 = evaluate(f, V2)
+         r2 = evaluate(g, V2)
+         r3 = evaluate(f + g, V2)
+
+         @test r3 == r1 + r2
+
+         V3 = [R(rand(-10:10)) for i in 1:num_vars]
+
+         r1 = evaluate(f, V3)
+         r2 = evaluate(g, V3)
+         r3 = evaluate(f + g, V3)
+
+         @test r3 == r1 + r2
+      end
+   end
+
+   println("PASS")
+end   
+
+function test_gen_mpoly_valuation()
+   print("GenMPoly.valuation...")
+
+   R, x = ZZ["y"]
+
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+
+      for iter = 1:100
+         f = S()
+         g = S()
+         while f == 0 || g == 0
+            f = rand(S, 0:5, 0:100, 0:0, -100:100)
+            g = rand(S, 0:5, 0:100, 0:0, -100:100)
+         end
+
+         d1 = valuation(f, g)
+
+         expn = rand(1:5)
+
+         d2 = valuation(f*g^expn, g)
+
+         @test d2 == d1 + expn
+
+         d3, q3 = remove(f, g)
+
+         @test d3 == d1
+         @test f == q3*g^d3
+
+         d4, q4 = remove(q3*g^expn, g)
+         
+         @test d4 == expn
+         @test q4 == q3
+      end
+   end
+
+   println("PASS")
 end   
 
 function test_gen_mpoly()
@@ -301,6 +504,11 @@ function test_gen_mpoly()
    test_gen_mpoly_adhoc_comparison()
    test_gen_mpoly_powering()
    test_gen_mpoly_divides()
+   test_gen_mpoly_euclidean_division()
+   test_gen_mpoly_ideal_reduction()
+   test_gen_mpoly_gcd()
+   test_gen_mpoly_evaluation()
+   test_gen_mpoly_valuation()
 
    println("")
 end
