@@ -2955,7 +2955,7 @@ function (a::GenMPolyRing{T}){T <: RingElem}(b::PolyElem{T})
 end
 
 function (a::GenMPolyRing{T}){T <: RingElem}(b::Array{T, 1}, m::Array{UInt, 2})
-   if length(b) > 0 && isdefined(b, 1)
+   if length(b) > 0 && isassigned(b, 1)
       parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end
    z = GenMPoly{T}(a, b, m)
