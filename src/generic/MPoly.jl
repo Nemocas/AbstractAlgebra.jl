@@ -355,7 +355,7 @@ ismonomial(x::GenMPoly) = x.length == 1 && isone(coeff(x, 0))
 
 function deepcopy{T <: RingElem}(a::GenMPoly{T})
    Re = deepcopy(a.exps)
-   Rc = Array(T, a.length)
+   Rc = Array{T}(a.length)
    for i = 1:a.length
       Rc[i] = deepcopy(a.coeffs[i])
    end
@@ -382,7 +382,7 @@ function show{T <: RingElem}(io::IO, x::GenMPoly{T})
         if i != 1 && !isnegative(c)
           print(io, "+")
         end
-        X = Array(UInt, N, 1)
+        X = Array{UInt}(N, 1)
         if ord == :degrevlex
            monomial_reverse!(X, 1, x.exps, i, N)
         else
@@ -633,17 +633,17 @@ function mul_classical{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
    end
    a_alloc = max(m, n) + n
    b_alloc = max(m, n) + n
-   Ac = Array(T, a_alloc)
-   Bc = Array(T, b_alloc)
+   Ac = Array{T}(a_alloc)
+   Bc = Array{T}(b_alloc)
    N = parent(a).N
-   Ae = Array(UInt, N, a_alloc)
-   Be = Array(UInt, N, b_alloc)
-   Am = Array(Int, 64) # 64 is upper bound on max(log m, log n)
-   Bm = Array(Int, 64) # ... num polys merged (power of 2)
-   Ai = Array(Int, 64) # index of polys in A minus 1
-   Bi = Array(Int, 64) # index of polys in B minus 1
-   An = Array(Int, 64) # lengths of polys in A
-   Bn = Array(Int, 64) # lengths of polys in B
+   Ae = Array{UInt}(N, a_alloc)
+   Be = Array{UInt}(N, b_alloc)
+   Am = Array{Int}(64) # 64 is upper bound on max(log m, log n)
+   Bm = Array{Int}(64) # ... num polys merged (power of 2)
+   Ai = Array{Int}(64) # index of polys in A minus 1
+   Bi = Array{Int}(64) # index of polys in B minus 1
+   An = Array{Int}(64) # lengths of polys in A
+   Bn = Array{Int}(64) # lengths of polys in B
    Anum = 0 # number of polys in A
    Bnum = 0 # number of polys in B
    sa = 0 # number of used locations in A
@@ -941,9 +941,9 @@ function mul_johnson{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bits::Int)
    end
    drmask = monomial_drmask(bits)
    N = size(a.exps, 1)
-   H = Array(heap_s, 0)
-   I = Array(heap_t, 0)
-   Exps = Array(UInt, N, m + 1)
+   H = Array{heap_s}(0)
+   I = Array{heap_t}(0)
+   Exps = Array{UInt}(N, m + 1)
    Viewn = [i for i in 1:m + 1]
    viewc = m + 1
    # set up heap
@@ -953,11 +953,11 @@ function mul_johnson{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bits::Int)
    push!(H, heap_s(vw, 1))
    push!(I, heap_t(1, 1, 0))
    r_alloc = max(m, n) + n
-   Rc = Array(T, r_alloc)
-   Re = Array(UInt, N, r_alloc)
+   Rc = Array{T}(r_alloc)
+   Re = Array{UInt}(N, r_alloc)
    k = 0
    c = R()
-   Q = Array(Int, 0)
+   Q = Array{Int}(0)
    @inbounds while !isempty(H)
       exp = H[1].exp
       k += 1
@@ -1084,8 +1084,8 @@ function *{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
    N = parent(a).N
    if k != 1
       M = div(N + k - 1, k)
-      e1 = Array(UInt, M, length(a))
-      e2 = Array(UInt, M, length(b))
+      e1 = Array{UInt}(M, length(a))
+      e2 = Array{UInt}(M, length(b))
       pack_monomials(e1, a.exps, k, exp_bits)
       pack_monomials(e2, b.exps, k, exp_bits)
       par = GenMPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
@@ -1098,7 +1098,7 @@ function *{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
       else
          r1 = mul_johnson(b1, a1, exp_bits)
       end
-      er = Array(UInt, N, length(r1))
+      er = Array{UInt}(N, length(r1))
       unpack_monomials(er, r1.exps, k, exp_bits)
    else
       r1 = mul_johnson(a, b, exp_bits)
@@ -1283,24 +1283,24 @@ function pow_fps{T <: RingElem}(f::GenMPoly{T}, k::Int, bits::Int)
    m = length(f)
    N = parent(f).N
    drmask = monomial_drmask(bits)
-   H = Array(heap_s, 0) # heap
-   I = Array(heap_t, 0) # auxilliary data for heap nodes
+   H = Array{heap_s}(0) # heap
+   I = Array{heap_t}(0) # auxilliary data for heap nodes
    # set up output poly coeffs and exponents (corresponds to h in paper)
    r_alloc = k*(m - 1) + 1
-   Rc = Array(T, r_alloc)
-   Re = Array(UInt, N, r_alloc)
+   Rc = Array{T}(r_alloc)
+   Re = Array{UInt}(N, r_alloc)
    rnext = 1
    # set up g coeffs and exponents (corresponds to g in paper)
    g_alloc = k*(m - 1) + 1
-   gc = Array(T, g_alloc)
-   ge = Array(UInt, N, g_alloc)
+   gc = Array{T}(g_alloc)
+   ge = Array{UInt}(N, g_alloc)
    gnext = 1
    # set up heap
    gc[1] = f.coeffs[1]^(k-1)
    monomial_mul!(ge, 1, f.exps, 1, k - 1, N)
    Rc[1] = f.coeffs[1]*gc[1]
    monomial_mul!(Re, 1, f.exps, 1, k, N)
-   Exps = Array(UInt, N, m + 1)
+   Exps = Array{UInt}(N, m + 1)
    Viewn = [i for i in 1:m + 1]
    viewc = m + 1
    # set up heap
@@ -1309,21 +1309,21 @@ function pow_fps{T <: RingElem}(f::GenMPoly{T}, k::Int, bits::Int)
    monomial_add!(Exps, vw, f.exps, 2, ge, 1, N)
    push!(H, heap_s(vw, 1))
    push!(I, heap_t(2, 1, 0))
-   Q = Array(Int, 0) # corresponds to Q in paper
+   Q = Array{Int}(0) # corresponds to Q in paper
    topbit = -1 << (sizeof(Int)*8 - 1)
    mask = ~topbit
    largest = fill(topbit, m) # largest j s.t. (i, j) has been in heap
    largest[2] = 1
    # precompute some values
-   fik = Array(T, m)
+   fik = Array{T}(m)
    for i = 1:m
       fik[i] = from_exp(R, f.exps, i, N)*(k - 1)
    end
    kp1f1 = k*from_exp(R, f.exps, 1, N)
-   gi = Array(T, 1)
+   gi = Array{T}(1)
    gi[1] = -from_exp(R, ge, 1, N)
-   final_exp = Array(UInt, N, 1)
-   exp_copy = Array(UInt, N, 1)
+   final_exp = Array{UInt}(N, 1)
+   exp_copy = Array{UInt}(N, 1)
    monomial_set!(final_exp, 1, f.exps, m, N)
    # temporary space
    t1 = R()
@@ -1452,7 +1452,7 @@ function ^{T <: RingElem}(a::GenMPoly{T}, b::Int)
       return parent(a)()
    elseif length(a) == 1
       N = size(a.exps, 1)
-      exps = Array(UInt, N, 1)
+      exps = Array{UInt}(N, 1)
       monomial_mul!(exps, 1, a.exps, 1, b, N)
       return parent(a)([coeff(a, 0)^b], exps)
    elseif b == 0
@@ -1478,13 +1478,13 @@ function ^{T <: RingElem}(a::GenMPoly{T}, b::Int)
       N = parent(a).N
       if k != 1
          M = div(N + k - 1, k)
-         e1 = Array(UInt, M, length(a))
+         e1 = Array{UInt}(M, length(a))
          pack_monomials(e1, a.exps, k, exp_bits)
          par = GenMPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
          a1 = par(a.coeffs, e1)
          a1.length = a.length
          r1 = pow_fps(a1, b, exp_bits)
-         er = Array(UInt, N, length(r1))
+         er = Array{UInt}(N, length(r1))
          unpack_monomials(er, r1.exps, k, exp_bits)
       else
          r1 = pow_fps(a, b, exp_bits)
@@ -1516,9 +1516,9 @@ function divides_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, b
       mask = (mask << bits) + mask1
    end
    N = parent(a).N
-   H = Array(heap_s, 0)
-   I = Array(heap_t, 0)
-   Exps = Array(UInt, N, n + 1)
+   H = Array{heap_s}(0)
+   I = Array{heap_t}(0)
+   Exps = Array{UInt}(N, n + 1)
    Viewn = [i for i in 1:n + 1]
    viewc = n + 1
    # set up heap
@@ -1528,16 +1528,16 @@ function divides_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, b
    push!(H, heap_s(vw, 1))
    push!(I, heap_t(0, 1, 0))
    q_alloc = max(m - n, n)
-   Qc = Array(T, q_alloc)
-   Qe = Array(UInt, N, q_alloc)
+   Qc = Array{T}(q_alloc)
+   Qe = Array{UInt}(N, q_alloc)
    k = 0
    s = n
    c = R()
    qc = R()
    m1 = -R(1)
    mb = -b.coeffs[1]
-   Q = Array(Int, 0)
-   reuse = Array(Int, 0)
+   Q = Array{Int}(0)
+   reuse = Array{Int}(0)
    @inbounds while !isempty(H)
       exp = H[1].exp
       k += 1
@@ -1652,8 +1652,8 @@ function divides{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
    N = parent(a).N
    if k != 1
       M = div(N + k - 1, k)
-      e1 = Array(UInt, M, length(a))
-      e2 = Array(UInt, M, length(b))
+      e1 = Array{UInt}(M, length(a))
+      e2 = Array{UInt}(M, length(b))
       pack_monomials(e1, a.exps, k, exp_bits)
       pack_monomials(e2, b.exps, k, exp_bits)
       par = GenMPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
@@ -1662,7 +1662,7 @@ function divides{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
       a1.length = a.length
       b1.length = b.length
       flag, q = divides_monagan_pearce(a1, b1, exp_bits)
-      eq = Array(UInt, N, length(q))
+      eq = Array{UInt}(N, length(q))
       unpack_monomials(eq, q.exps, k, exp_bits)
    else
       flag, q = divides_monagan_pearce(a, b, exp_bits)
@@ -1700,9 +1700,9 @@ function div_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bits:
       mask = (mask << bits) + mask1
    end
    N = size(a.exps, 1)
-   H = Array(heap_s, 0)
-   I = Array(heap_t, 0)
-   Exps = Array(UInt, N, n + 1)
+   H = Array{heap_s}(0)
+   I = Array{heap_t}(0)
+   Exps = Array{UInt}(N, n + 1)
    Viewn = [i for i in 1:n + 1]
    viewc = n + 1
    # set up heap
@@ -1712,20 +1712,20 @@ function div_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bits:
    push!(H, heap_s(vw, 1))
    push!(I, heap_t(0, 1, 0))
    q_alloc = max(m - n, n)
-   Qc = Array(T, q_alloc)
-   Qe = Array(UInt, N, q_alloc)
+   Qc = Array{T}(q_alloc)
+   Qe = Array{UInt}(N, q_alloc)
    k = 0
    s = n
    c = R()
    qc = R()
    m1 = -R(1)
    mb = -b.coeffs[1]
-   Q = Array(Int, 0)
-   reuse = Array(Int, 0)
-   exp_copy = Array(UInt, N, 1)
-   temp = Array(UInt, N, 1)
-   temp2 = Array(UInt, N, 1)
-   texp = Array(UInt, N, 1)
+   Q = Array{Int}(0)
+   reuse = Array{Int}(0)
+   exp_copy = Array{UInt}(N, 1)
+   temp = Array{UInt}(N, 1)
+   temp2 = Array{UInt}(N, 1)
+   texp = Array{UInt}(N, 1)
    monomial_set!(temp2, 1, b.exps, 1, N)
    while !isempty(H)
       exp = H[1].exp
@@ -1860,14 +1860,14 @@ function div{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
    N = parent(a).N
    word_bits = sizeof(Int)*8
    q = parent(a)()
-   eq = Array(UInt, N, 0)
+   eq = Array{UInt}(N, 0)
    flag = false
    while flag == false
       k = div(word_bits, exp_bits)
       if k != 1
          M = div(N + k - 1, k)
-         e1 = Array(UInt, M, length(a))
-         e2 = Array(UInt, M, length(b))
+         e1 = Array{UInt}(M, length(a))
+         e2 = Array{UInt}(M, length(b))
          pack_monomials(e1, a.exps, k, exp_bits)
          pack_monomials(e2, b.exps, k, exp_bits)
          par = GenMPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
@@ -1879,7 +1879,7 @@ function div{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
          if flag == false
             exp_bits *= 2
          else
-            eq = Array(UInt, N, length(q))
+            eq = Array{UInt}(N, length(q))
             unpack_monomials(eq, q.exps, k, exp_bits)
          end
       else
@@ -1908,9 +1908,9 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bi
       mask = (mask << bits) + mask1
    end
    N = size(a.exps, 1)
-   H = Array(heap_s, 0)
-   I = Array(heap_t, 0)
-   Exps = Array(UInt, N, n + 1)
+   H = Array{heap_s}(0)
+   I = Array{heap_t}(0)
+   Exps = Array{UInt}(N, n + 1)
    Viewn = [i for i in 1:n + 1]
    viewc = n + 1
    # set up heap
@@ -1921,10 +1921,10 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bi
    push!(I, heap_t(0, 1, 0))
    q_alloc = max(m - n, n)
    r_alloc = n
-   Qc = Array(T, q_alloc)
-   Qe = Array(UInt, N, q_alloc)
-   Rc = Array(T, r_alloc)
-   Re = Array(UInt, N, r_alloc)
+   Qc = Array{T}(q_alloc)
+   Qe = Array{UInt}(N, q_alloc)
+   Rc = Array{T}(r_alloc)
+   Re = Array{UInt}(N, r_alloc)
    k = 0
    l = 0
    s = n
@@ -1932,12 +1932,12 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T}, bi
    qc = R()
    m1 = -R(1)
    mb = -b.coeffs[1]
-   Q = Array(Int, 0)
-   reuse = Array(Int, 0)
-   exp_copy = Array(UInt, N, 1)
-   temp = Array(UInt, N, 1)
-   temp2 = Array(UInt, N, 1)
-   texp = Array(UInt, N, 1)
+   Q = Array{Int}(0)
+   reuse = Array{Int}(0)
+   exp_copy = Array{UInt}(N, 1)
+   temp = Array{UInt}(N, 1)
+   temp2 = Array{UInt}(N, 1)
+   texp = Array{UInt}(N, 1)
    monomial_set!(temp2, 1, b.exps, 1, N)
    while !isempty(H)
       exp = H[1].exp
@@ -2081,15 +2081,15 @@ function divrem{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
    word_bits = sizeof(Int)*8
    q = parent(a)()
    r = parent(a)()
-   eq = Array(UInt, N, 0)
-   er = Array(UInt, N, 0)
+   eq = Array{UInt}(N, 0)
+   er = Array{UInt}(N, 0)
    flag = false
    while flag == false
       k = div(word_bits, exp_bits)
       if k != 1
          M = div(N + k - 1, k)
-         e1 = Array(UInt, M, length(a))
-         e2 = Array(UInt, M, length(b))
+         e1 = Array{UInt}(M, length(a))
+         e2 = Array{UInt}(M, length(b))
          pack_monomials(e1, a.exps, k, exp_bits)
          pack_monomials(e2, b.exps, k, exp_bits)
          par = GenMPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
@@ -2101,8 +2101,8 @@ function divrem{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
          if flag == false
             exp_bits *= 2
          else
-            eq = Array(UInt, N, length(q))
-            er = Array(UInt, N, length(r))
+            eq = Array{UInt}(N, length(q))
+            er = Array{UInt}(N, length(r))
             unpack_monomials(eq, q.exps, k, exp_bits)
             unpack_monomials(er, r.exps, k, exp_bits)
          end
@@ -2136,13 +2136,13 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{
       mask = (mask << bits) + mask1
    end
    N = size(a.exps, 1)
-   H = Array(heap_s, 0)
-   I = Array(nheap_t, 0)
+   H = Array{heap_s}(0)
+   I = Array{nheap_t}(0)
    heapn = 0
    for i = 1:len
       heapn += n[i]
    end
-   Exps = Array(UInt, N, heapn + 1)
+   Exps = Array{UInt}(N, heapn + 1)
    Viewn = [i for i in 1:heapn + 1]
    viewc = heapn + 1
    # set up heap
@@ -2153,10 +2153,10 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{
    push!(I, nheap_t(0, 1, 0, 0))
    q_alloc = [max(m - n[i], n[i]) for i in 1:len]
    r_alloc = n[1]
-   Qc = [Array(T, q_alloc[i]) for i in 1:len]
-   Qe = [Array(UInt, N, q_alloc[i]) for i in 1:len]
-   Rc = Array(T, r_alloc)
-   Re = Array(UInt, N, r_alloc)
+   Qc = [Array{T}(q_alloc[i]) for i in 1:len]
+   Qe = [Array{UInt}(N, q_alloc[i]) for i in 1:len]
+   Rc = Array{T}(r_alloc)
+   Re = Array{UInt}(N, r_alloc)
    k = [0 for i in 1:len]
    l = 0
    s = [n[i] for i in 1:len]
@@ -2164,11 +2164,11 @@ function divrem_monagan_pearce{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{
    qc = R()
    m1 = -R(1)
    mb = [-b[i].coeffs[1] for i in 1:len]
-   Q = Array(Int, 0)
-   reuse = Array(Int, 0)
-   exp_copy = Array(UInt, N, 1)
-   temp = Array(UInt, N, 1)
-   texp = Array(UInt, N, 1)
+   Q = Array{Int}(0)
+   reuse = Array{Int}(0)
+   exp_copy = Array{UInt}(N, 1)
+   temp = Array{UInt}(N, 1)
+   texp = Array{UInt}(N, 1)
    while !isempty(H)
       exp = H[1].exp
       monomial_set!(exp_copy, 1, Exps, exp, N)
@@ -2315,16 +2315,16 @@ function divrem{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{T}, 1})
    end
    word_bits = sizeof(Int)*8
    q = [parent(a)() for i in 1:len]
-   eq = [Array(UInt, N, 0) for i in 1:len]
+   eq = [Array{UInt}(N, 0) for i in 1:len]
    r = parent(a)()
-   er = Array(UInt, N, 0)
+   er = Array{UInt}(N, 0)
    flag = false
    while flag == false
       k = div(word_bits, exp_bits)
       if k != 1
          M = div(N + k - 1, k)
-         e1 = Array(UInt, M, length(a))
-         e2 = [Array(UInt, M, length(b[i])) for i in 1:len]
+         e1 = Array{UInt}(M, length(a))
+         e2 = [Array{UInt}(M, length(b[i])) for i in 1:len]
          pack_monomials(e1, a.exps, k, exp_bits)
          for i = 1:len
             pack_monomials(e2[i], b[i].exps, k, exp_bits)
@@ -2340,11 +2340,11 @@ function divrem{T <: RingElem}(a::GenMPoly{T}, b::Array{GenMPoly{T}, 1})
          if flag == false
             exp_bits *= 2
          else
-            eq = [Array(UInt, N, length(q[i])) for i in 1:len]
+            eq = [Array{UInt}(N, length(q[i])) for i in 1:len]
             for i = 1:len
                unpack_monomials(eq[i], q[i].exps, k, exp_bits)  
             end
-            er = Array(UInt, N, length(r))
+            er = Array{UInt}(N, length(r))
             unpack_monomials(er, r.exps, k, exp_bits)  
          end
       else
@@ -2575,8 +2575,8 @@ function term_gcd{T <: RingElem}(a::GenMPoly{T}, b::GenMPoly{T})
    end
    ord = parent(a).ord
    N = parent(a).N
-   Ce = Array(UInt, N, 1)
-   Cc = Array(T, 1)
+   Ce = Array{UInt}(N, 1)
+   Cc = Array{T}(1)
    monomial_set!(Ce, 1, a.exps, 1, N)
    monomial_vecmin!(Ce, 1, b.exps, 1, N)
    if ord == :deglex || ord == :degrevlex
@@ -2596,8 +2596,8 @@ function term_content{T <: RingElem}(a::GenMPoly{T})
    end
    ord = parent(a).ord
    N = parent(a).N
-   Ce = Array(UInt, N, 1)
-   Cc = Array(T, 1)
+   Ce = Array{UInt}(N, 1)
+   Cc = Array{T}(1)
    monomial_set!(Ce, 1, a.exps, 1, N)
    for i = 2:a.length
       monomial_vecmin!(Ce, 1, a.exps, i, N)
@@ -2644,7 +2644,7 @@ end
 
 # return an array of all the starting positions of terms in the main variable n
 function main_variable_terms{T <: RingElem}(a::GenMPoly{T}, k::Int)
-   A = Array(Int, 0)
+   A = Array{Int}(0)
    current_term = typemax(UInt)
    for i = 1:a.length
       if a.exps[k, i] != current_term
@@ -2660,9 +2660,9 @@ end
 function main_variable_coefficient_lex{T <: RingElem}(a::GenMPoly{T}, k0::Int, n::Int)
    exp = a.exps[k0, n]
    N = parent(a).N
-   Ae = Array(UInt, N, 0)
+   Ae = Array{UInt}(N, 0)
    a_alloc = 0
-   Ac = Array(T, 0)
+   Ac = Array{T}(0)
    l = 0
    for i = n:a.length
       if a.exps[k0, i] != exp
@@ -2693,9 +2693,9 @@ end
 function main_variable_coefficient_deglex{T <: RingElem}(a::GenMPoly{T}, k0::Int, n::Int)
    exp = a.exps[k0, n]
    N = parent(a).N
-   Ae = Array(UInt, N, 0)
+   Ae = Array{UInt}(N, 0)
    a_alloc = 0
-   Ac = Array(T, 0)
+   Ac = Array{T}(0)
    l = 0
    for i = n:a.length
       if a.exps[k0, i] != exp
@@ -2734,7 +2734,7 @@ function main_variable_extract{T <: RingElem}(a::GenMPoly{T}, k::Int)
    sort!(V)
    N = size(a.exps, 1)
    Rc = [a.coeffs[V[i][2]] for i in 1:length(a)]
-   Re = Array(UInt, N, length(a))
+   Re = Array{UInt}(N, length(a))
    for i = 1:length(a)
       for j = 1:N
          Re[j, i] = a.exps[j, V[i][2]]
@@ -2742,8 +2742,8 @@ function main_variable_extract{T <: RingElem}(a::GenMPoly{T}, k::Int)
    end
    a2 = parent(a)(Rc, Re)
    A = main_variable_terms(a2, k)
-   Pe = Array(UInt, length(A))
-   Pc = Array(GenMPoly{T}, length(A))
+   Pe = Array{UInt}(length(A))
+   Pc = Array{GenMPoly{T}}(length(A))
    ord = parent(a).ord
    for i = 1:length(A)
       Pe[i] = a2.exps[k, A[i]]
@@ -2764,7 +2764,7 @@ function main_variable_insert_lex{T <: RingElem}(a::GenSparsePoly{GenMPoly{T}}, 
        r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]
-   Re = Array(UInt, N, length(V))
+   Re = Array{UInt}(N, length(V))
    for i = 1:length(V)
       for j = 1:N
          Re[j, length(V) - i + 1] = V[i][1][j]
@@ -2779,7 +2779,7 @@ function main_variable_insert_deglex{T <: RingElem}(a::GenSparsePoly{GenMPoly{T}
         a.coeffs[r].exps[i, s]), Val{N}), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]
-   Re = Array(UInt, N, length(V))
+   Re = Array{UInt}(N, length(V))
    for i = 1:length(V)
       for j = 1:N
          Re[j, length(V) - i + 1] = V[i][1][j]
@@ -2811,7 +2811,7 @@ function main_variable_insert_degrevlex{T <: RingElem}(a::GenSparsePoly{GenMPoly
         a.coeffs[r].exps[i, s]), Val{N}), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V, lt = is_less_degrevlex)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]
-   Re = Array(UInt, N, length(V))
+   Re = Array{UInt}(N, length(V))
    for i = 1:length(V)
       for j = 1:N
          Re[j, length(V) - i + 1] = V[i][1][j]

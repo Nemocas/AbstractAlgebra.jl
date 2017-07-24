@@ -34,7 +34,7 @@ type GenPoly{T <: RingElem} <: PolyElem{T}
    length::Int
    parent::GenPolyRing{T}
 
-   GenPoly() = new(Array(T, 0), 0)
+   GenPoly() = new(Array{T}(0), 0)
    
    GenPoly(a::Array{T, 1}) = new(a, length(a))
 
@@ -87,14 +87,14 @@ type GenMPoly{T <: RingElem} <: PolyElem{T}
 
    function GenMPoly(R::GenMPolyRing)
       N = R.N
-      return new(Array(T, 0), Array(UInt, N, 0), 0, R)
+      return new(Array{T}(0), Array{UInt}(N, 0), 0, R)
    end
    
    GenMPoly(R::GenMPolyRing, a::Array{T, 1}, b::Array{UInt, 2}) = new(a, b, length(a), R)
 
    function GenMPoly(R::GenMPolyRing, a::T)
       N = R.N
-      return iszero(a) ? new(Array(T, 0), Array(UInt, N, 0), 0, R) : 
+      return iszero(a) ? new(Array{T}(0), Array{UInt}(N, 0), 0, R) : 
                                       new([a], zeros(UInt, N, 1), 1, R)
    end
 end
@@ -131,11 +131,11 @@ type GenSparsePoly{T <: RingElem} <: RingElem
    length::Int
    parent::GenSparsePolyRing{T}
 
-   GenSparsePoly() = new(Array(T, 0), Array(UInt, 0), 0)
+   GenSparsePoly() = new(Array{T}(0), Array{UInt}(0), 0)
    
    GenSparsePoly(a::Array{T, 1}, b::Array{UInt, 1}) = new(a, b, length(a))
 
-   GenSparsePoly(a::T) = iszero(a) ? new(Array(T, 0), Array(UInt, 0), 0) : 
+   GenSparsePoly(a::T) = iszero(a) ? new(Array{T}(0), Array{UInt}(0), 0) : 
                                       new([a], [UInt(0)], 1)
 end
 
