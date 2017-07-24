@@ -188,13 +188,13 @@ if !is_windows()
     println("Cloning flint2 ... ")
     run(`git clone https://github.com/wbhart/flint2.git`)
     cd(joinpath("$wdir", "flint2"))
-    run(`git checkout 768d1aaa54516ddb351a06683e532ead54d47470`)
+    run(`git checkout c1d81677b0a6f21c1b07c807c252a1f50969657a `)
     cd(wdir)
   catch
     if ispath(joinpath("$wdir", "flint2"))
        cd(joinpath("$wdir", "flint2"))
        run(`git fetch`)
-       run(`git checkout 768d1aaa54516ddb351a06683e532ead54d47470`)
+       run(`git checkout c1d81677b0a6f21c1b07c807c252a1f50969657a`)
        cd(wdir)
     end
   end
@@ -235,13 +235,13 @@ if !is_windows()
   try
     run(`git clone https://github.com/fredrik-johansson/arb.git`)
     cd(joinpath("$wdir", "arb"))
-    run(`git checkout 99c1696b48de74959ccb6bd88187e8b15262ff4d`)
+    run(`git checkout de4fc234ea4a7f592d312ba1a28e1542ce399994`)
     cd(wdir)
   catch
     if ispath(joinpath("$wdir", "arb"))
       cd(joinpath("$wdir", "arb"))
       run(`git fetch`)
-      run(`git checkout 99c1696b48de74959ccb6bd88187e8b15262ff4d`)
+      run(`git checkout de4fc234ea4a7f592d312ba1a28e1542ce399994`)
       cd(wdir)
     end
   end
