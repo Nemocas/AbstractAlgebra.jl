@@ -54,6 +54,10 @@ if VERSION >= v"0.7.0-DEV.264" # julia started exporting sincos
    import Base: sincos
 end
 
+if VERSION >= v"0.7.0-DEV.1144"
+    import Base: isone
+end
+
 include("AbstractTypes.jl")
 
 ###############################################################################
