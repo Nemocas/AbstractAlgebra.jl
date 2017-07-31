@@ -69,10 +69,10 @@ function test_benchmark_poly_nf_elem()
 end
 
 function test_benchmarks()
-   test_benchmark_resultant()
-   test_benchmark_fateman()
-   test_benchmark_pearce()
-   test_benchmark_poly_nf_elem()
+#   test_benchmark_resultant()
+#   test_benchmark_fateman()
+#   test_benchmark_pearce()
+#   test_benchmark_poly_nf_elem()
 
    println("")
 end
