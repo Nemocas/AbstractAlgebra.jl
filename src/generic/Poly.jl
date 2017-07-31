@@ -2281,7 +2281,7 @@ end
 #
 ###############################################################################
 
-function rand{T <: RingElem}(S::PolyRing{T}, deg_range::UnitRange{Int}, v...)
+function rand(S::PolyRing, deg_range::UnitRange{Int}, v...)
    R = base_ring(S)
    f = S()
    x = gen(S)

@@ -508,7 +508,7 @@ end
 
 function rand{T <: RingElem}(S::ResRing{T}, v...)
    R = base_ring(S)
-   return S(rand(v...))
+   return S(rand(R, v...))
 end
 
 ###############################################################################
