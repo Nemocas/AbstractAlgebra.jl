@@ -1578,13 +1578,14 @@ doc"""
 """
 function compose(a::PolyElem, b::PolyElem)
    i = length(a)
+   R = parent(a)
    if i == 0
-       return zero(parent(a))
+       return zero(R)
    end
    if i*length(b) > 25
       return subst(a, b)
    end
-   z = coeff(a, i - 1)
+   z = R(coeff(a, i - 1))
    while i > 1
       i -= 1
       z = z*b + coeff(a, i - 1)
