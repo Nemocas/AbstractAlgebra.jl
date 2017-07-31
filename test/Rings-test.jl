@@ -32,6 +32,8 @@ include("generic/Matrix-test.jl")
 include("generic/MPoly-test.jl")
 
 function test_rings()
+   test_gen_poly()
+
    test_fmpz()
    test_fmpz_poly()
    test_fmpz_mod_poly()
@@ -53,7 +55,6 @@ function test_rings()
    test_arb_poly()
    test_acb_poly()
 
-   test_gen_poly()
    test_gen_res()
    test_gen_abs_series()
    test_gen_rel_series()
