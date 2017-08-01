@@ -746,6 +746,21 @@ function addeq!{T <: RingElem}(c::FracElem{T}, a::FracElem{T}, b::FracElem{T})
    return c
 end
 
+###############################################################################
+#
+#   Random functions
+#
+###############################################################################
+   
+function rand{T <: RingElem}(S::FracField{T}, v...)
+   R = base_ring(S)
+   n = rand(R, v...)
+   d = R()
+   while d == 0
+      d = rand(R, v...)
+   end
+   return S(n, d)
+end
 
 ###############################################################################
 #

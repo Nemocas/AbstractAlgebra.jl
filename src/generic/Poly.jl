@@ -1006,11 +1006,11 @@ doc"""
 function powmod{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::Int, d::PolyElem{T})
    check_parent(a, d)
    if length(a) == 0
-      return zero(parent(a))
+      z = zero(parent(a))
    elseif length(a) == 1
-      return parent(a)(coeff(a, 0)^b)
+      z = parent(a)(coeff(a, 0)^b)
    elseif b == 0
-      return one(parent(a))
+      z = one(parent(a))
    else
       if b < 0
          a = invmod(a, d)
@@ -1029,8 +1029,11 @@ function powmod{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::Int, d::PolyE
          end
          bit >>= 1
       end
-      return z
    end
+   if length(z) >= length(d)
+      z = mod(z, d)
+   end
+   return z
 end
 
 doc"""
@@ -1215,6 +1218,9 @@ doc"""
 function pseudorem{T <: RingElem}(f::PolyElem{T}, g::PolyElem{T})
    check_parent(f, g)
    g == 0 && throw(DivideError())
+   if length(f) < length(g)
+      return f
+   end
    k = length(f) - length(g) + 1
    b = coeff(g, length(g) - 1)
    x = gen(parent(f))
@@ -1414,7 +1420,11 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, ignore_content=false
       (a, b) = (b, a)
    end
    if iszero(b)
-      return a
+      if a == 0
+         return a
+      else
+         return divexact(a, canonical_unit(lead(a)))
+      end
    end
    if isone(b)
       return b
@@ -1474,11 +1484,11 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, ignore_content=false
          end
       end
       b = divexact(b, term_content(b))
-   else
-      return b
+      b = divexact(b, content(b))
    end
+   b = c*b
+   return divexact(b, canonical_unit(lead(b)))
 end
-
 
 function gcd{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
    check_parent(a, b)
@@ -1486,7 +1496,11 @@ function gcd{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
       (a, b) = (b, a)
    end
    if iszero(b)
-      return a
+      if iszero(a)
+         return(a)
+      else
+         return inv(lead(a))*a
+      end
    end
    g = gcd(content(a), content(b))
    a = divexact(a, g)
@@ -1517,7 +1531,11 @@ function content(a::PolyElem)
    for i = 2:length(a)
       z = gcd(z, coeff(a, i - 1))
    end
-   return z
+   if z == 0
+      return z
+   else
+      return divexact(z, canonical_unit(z))
+   end
 end
 
 doc"""
@@ -1893,6 +1911,10 @@ function gcdx{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T})
    if swap
       u2, v2 = v2, u2
    end
+   u = canonical_unit(lead(res))
+   res = divexact(res, u)
+   u2 = divexact(u2, u)
+   v2 = divexact(v2, u)
    return res, u2, v2
 end
 
