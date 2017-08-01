@@ -521,13 +521,15 @@ function test_gen_poly_evaluation()
 
    @test evaluate(g, f) == x^5+4*x^4+7*x^3+7*x^2+4*x+4
 
-   f = rand(R, 0:4, -100:100)
+   for _ in 1:10
+      f = rand(R, 0:4, -100:100)
 
-   @test evaluate(g, f) == x*f^2 + (x + 1)*f + 3
-
-   g = rand(S, 0:2, 0:2, -100:100)
-
-   @test evaluate(g, f)^2 == evaluate(g^2, f)
+      @test evaluate(g, f) == x*f^2 + (x + 1)*f + 3
+      
+      h = rand(S, 0:2, 0:2, -100:100)
+      
+      @test evaluate(h, f)^2 == evaluate(h^2, f)
+   end
 
    println("PASS")
 end
@@ -543,17 +545,19 @@ function test_gen_poly_composition()
 
    @test compose(f, g) == (x^3+2*x^2+x)*y^2+(2*x^5+2*x^4+4*x^3+9*x^2+6*x+1)*y+(x^7+4*x^5+5*x^4+5*x^3+10*x^2+8*x+5)
 
-   g = rand(S, 0:2, 0:2, -100:100)
+   for d in 1:10
+      g = rand(S, 0:d, 0:2, -100:100)
 
-   @test compose(f, g) == x*g^2 + (x + 1)*g + 3
+      @test compose(f, g) == x*g^2 + (x + 1)*g + 3
 
-   f = rand(S, 0:2, 0:2, -100:100)
+      h = rand(S, 0:d, 0:2, -100:100)
 
-   @test compose(f, g)^2 == compose(f^2, g)
+      @test compose(h, g)^2 == compose(h^2, g)
 
-   h = rand(S, 0:2, 0:2, -100:100)
+      k = rand(S, 0:d, 0:2, -100:100)
 
-   @test compose(f, compose(g, h)) == compose(compose(f, g), h)# || (f, g, h)
+      @test compose(g, compose(h, k)) == compose(compose(g, h), k)
+   end
 
    println("PASS")
 end
@@ -568,12 +572,14 @@ function test_gen_poly_derivative()
 
    @test derivative(h) == 2x*y + x + 1
 
-   f = rand(S, 0:4, 0:4, -100:100)
-   g = rand(S, 0:4, 0:4, -100:100)
+   for _ in 1:10
+      f = rand(S, 0:4, 0:4, -100:100)
+      g = rand(S, 0:4, 0:4, -100:100)
 
-   @test derivative(f + g) == derivative(g) + derivative(f)
+      @test derivative(f + g) == derivative(g) + derivative(f)
 
-   @test derivative(g*f) == derivative(g)*f + derivative(f)*g
+      @test derivative(g*f) == derivative(g)*f + derivative(f)*g
+   end
 
    println("PASS")
 end
@@ -589,14 +595,16 @@ function test_gen_poly_integral()
 
    @test integral(f) == (fmpz(1)//3*x^2 + fmpz(2)//3*x + fmpz(1)//3)*y^3+(fmpz(1)//2*x+fmpz(1)//2)*y^2+(-2*x+4)*y
 
-   f = rand(T, 0:2, -100:100)
+   for _ in 1:10
+      f = rand(T, 0:2, 0:2, -100:100, 1:100)
 
-   @test derivative(integral(f)) == f
+      @test derivative(integral(f)) == f
 
-   g = rand(T, 0:2, -100:100)
+      g = rand(T, 0:2, 0:2, -100:100, 1:100)
 
-   @test integral(f + g) == integral(g) + integral(f)
-   @test integral(f)*integral(g) == integral(integral(f)*g + integral(g)*f)
+      @test integral(f + g) == integral(g) + integral(f)
+      @test integral(f)*integral(g) == integral(integral(f)*g + integral(g)*f)
+   end
 
    println("PASS")
 end
@@ -612,12 +620,14 @@ function test_gen_poly_resultant()
 
    @test resultant(f, g) == 3*x^7+6*x^5-6*x^3+96*x^2+192*x+96
 
-   f = rand(S, 0:2, 0:2, -100:100)
-   g = rand(S, 0:2, 0:2, -100:100)
-   h = rand(S, 0:2, 0:2, -100:100)
+   for _ in 1:10
+      f = rand(S, 0:2, 0:2, -100:100)
+      g = rand(S, 0:2, 0:2, -100:100)
+      h = rand(S, 0:2, 0:2, -100:100)
 
-   @test resultant(f*g, h) == resultant(f, h) * resultant(g, h)
-   @test resultant(f, g*h) == resultant(f, g) * resultant(f, h)
+      @test resultant(f*g, h) == resultant(f, h) * resultant(g, h)
+      @test resultant(f, g*h) == resultant(f, g) * resultant(f, h)
+   end
 
    println("PASS")
 end
@@ -646,16 +656,35 @@ function test_gen_poly_gcdx()
 
    @test gcdx(f, g) == (3*x^7+6*x^5-6*x^3+96*x^2+192*x+96, (36*x^2+72*x+36), (-18*x^2-18*x)*y+(3*x^4-6*x-6))
 
-   f = rand(S, 2:2, 0:2, -1:100)
-   g = rand(S, 2:2, 0:2, -100:-1)
-   r, u, v = gcdx(f, g)
+   for _ in 1:100
+      f = rand(S, 2:2, 0:2, 1:100)
+      g = rand(S, 2:2, 0:2, -100:-1)
+      r, u, v = gcdx(f, g)
 
-   @test u*f + v*g == r
+      @test u*f + v*g == r
 
-   h = rand(S, 0:2, 0:2, -100:100)
-   r, u, v = gcdx(f*h, g*h)
+      h = rand(S, 0:2, 0:2, -100:100)
+      r, u, v = gcdx(f*h, g*h)
 
-   @test (u*f + v*g)*h == r
+      @test (u*f + v*g)*h == r
+   end
+
+   R, x = PolynomialRing(QQ, "x")
+   T = ResidueRing(R, x^3 + 3x - 2)
+   S, z = PolynomialRing(T, "z")
+
+   for _ in 1:10
+      f = rand(S, 2:2, 0:2, 1:100, 1:100)
+      g = rand(S, 2:2, 0:2, -100:-1, 1:100)
+      r, u, v = gcdx(f, g)
+
+      @test u*f + v*g == r
+
+      h = rand(S, 0:2, 0:2, -100:100, 1:100)
+      r, u, v = gcdx(f*h, g*h)
+
+      @test (u*f + v*g)*h == r
+   end
 
    println("PASS")
 end
@@ -666,14 +695,16 @@ function test_gen_poly_newton_representation()
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
-   f = rand(S, 2:2, 0:2, 1:100)
+   for _ in 1:10
+      f = rand(S, 2:2, 0:2, 1:100)
 
-   g = deepcopy(f)
-   roots = [R(1), R(2), R(3)]
-   monomial_to_newton!(g.coeffs, roots)
-   newton_to_monomial!(g.coeffs, roots)
+      g = deepcopy(f)
+      roots = [R(1), R(2), R(3)]
+      monomial_to_newton!(g.coeffs, roots)
+      newton_to_monomial!(g.coeffs, roots)
 
-   @test f == g
+      @test f == g
+   end
 
    println("PASS")
 end
@@ -691,10 +722,12 @@ function test_gen_poly_interpolation()
 
    @test f == y^2
 
-   ys = [rand(R, 0:2, -100:100) for i in 1:4]
-   f = interpolate(S, xs, ys)
+   for _ in 1:10
+      ys = [rand(R, 0:2, -100:100) for i in 1:4]
+      f = interpolate(S, xs, ys)
 
-   @test all(evaluate(f, a) == b for (a,b) in zip(xs, ys))
+      @test all(evaluate(f, a) == b for (a,b) in zip(xs, ys))
+   end
 
    println("PASS")
 end
@@ -709,20 +742,21 @@ function test_gen_poly_special()
 
    @test chebyshev_u(15, y) == 32768*y^15-114688*y^13+159744*y^11-112640*y^9+42240*y^7-8064*y^5+672*y^3-16*y
 
-   n = rand(10:20)
-   T = chebyshev_t(n, y)
-   dT = derivative(T)
-   ddT = derivative(dT)
+   for n in 10:20
+      T = chebyshev_t(n, y)
+      dT = derivative(T)
+      ddT = derivative(dT)
 
-   @test (1 - y^2)*ddT + n^2*T == y*dT
+      @test (1 - y^2)*ddT + n^2*T == y*dT
 
-   U = chebyshev_u(n - 1, y)
-   dU = derivative(U)
-   ddU = derivative(dU)
+      U = chebyshev_u(n - 1, y)
+      dU = derivative(U)
+      ddU = derivative(dU)
 
-   @test (1 - y^2)*ddU + (n-1)*(n+1)*U == 3*y*dU
+      @test (1 - y^2)*ddU + (n-1)*(n+1)*U == 3*y*dU
 
-   @test T^2 == 1 + (y^2 - 1)*U^2
+      @test T^2 == 1 + (y^2 - 1)*U^2
+   end
 
    println("PASS")
 end
@@ -802,11 +836,13 @@ function test_gen_poly_generic_eval()
 
    @test f(fmpz(123)) == 45510*x + 126
 
-   f = rand(S, 0:2, 0:2, -100:100)
-   g = rand(S, 0:2, 0:2, -100:100)
-   h = rand(S, 0:2, 0:2, -100:100)
+   for _ in 1:10
+      f = rand(S, 0:2, 0:2, -100:100)
+      g = rand(S, 0:2, 0:2, -100:100)
+      h = rand(S, 0:2, 0:2, -100:100)
 
-   @test f(g(h)) == f(g)(h)
+      @test f(g(h)) == f(g)(h)
+   end
 
    R, x = PolynomialRing(ZZ, "x")
    T, y = FiniteField(103, 1, "y")
