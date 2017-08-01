@@ -230,13 +230,41 @@ function test_gen_poly_powering()
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
-   f = x*y^2 + (x + 1)*y + 3
+   for iter = 1:10
+      f = rand(S, 0:10, 0:10, -10:10)
 
-   @test f^5 == (x^5)*y^10+(5*x^5+5*x^4)*y^9+(10*x^5+35*x^4+10*x^3)*y^8+(10*x^5+90*x^4+90*x^3+10*x^2)*y^7+(5*x^5+110*x^4+300*x^3+110*x^2+5*x)*y^6+(x^5+65*x^4+460*x^3+460*x^2+65*x+1)*y^5+(15*x^4+330*x^3+900*x^2+330*x+15)*y^4+(90*x^3+810*x^2+810*x+90)*y^3+(270*x^2+945*x+270)*y^2+(405*x+405)*y+243
+      r2 = S(1)
 
-   g = shift_left(f, 3)
+      for expn = 0:10
+         r1 = f^expn
 
-   @test g^5 == y^15*f^5
+         @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2        
+
+         r2 *= f
+      end
+   end
+
+   for iter = 1:10
+      n = rand(2:26)
+
+      Zn = ResidueRing(ZZ, n)
+
+      R, x = PolynomialRing(Zn, "x")
+      S, y = PolynomialRing(R, "y")
+
+      f = rand(S, 0:10, 0:10, 0:n - 1)
+
+      r2 = S(1)
+
+      for expn = 0:10
+         r1 = f^expn
+
+         @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2         
+
+         r2 *= f
+      end
+   end
+   
 
    println("PASS")
 end
@@ -244,20 +272,54 @@ end
 function test_gen_poly_modular_arithmetic()
    print("GenPoly.modular_arithmetic...")
 
-   R, x = PolynomialRing(QQ, "x")
-   S = ResidueRing(R, x^3 + 3x + 1)
-   T, y = PolynomialRing(S, "y")
+   for pow2n = 1:3
+      R, x = PolynomialRing(ZZ, "x")
+      S, y = PolynomialRing(QQ, "y")
+      p = swinnerton_dyer(pow2n, x) # irreducible
+      T = ResidueRing(S, S(p))
+      U, z = PolynomialRing(T, "z")
 
-   f = (3*x^2 + x + 2)*y + x^2 + 1
-   g = (5*x^2 + 2*x + 1)*y^2 + 2x*y + x + 1
-   h = (3*x^3 + 2*x^2 + x + 7)*y^5 + 2x*y + 1
+      for iter = 1:10
+         f = rand(U, 0:5, 0:2^pow2n, -10:10)
+         g = rand(U, 0:5, 0:2^pow2n, -10:10)
+         h = rand(U, 0:5, 0:2^pow2n, -10:10)
+         k = U()
+         while k == 0
+            k = rand(U, 0:5, 0:2^pow2n, -10:10)
+         end
 
-   @test invmod(f, g) == (fmpz(707)//3530*x^2 + fmpz(2151)//1765*x + fmpz(123)//3530)*y+(fmpz(-178)//1765*x^2 - fmpz(551)//3530*x + fmpz(698)//1765)
-   
-   @test mulmod(f, g, h) == (-30*x^2 - 43*x - 9)*y^3+(-7*x^2 - 23*x - 7)*y^2+(4*x^2 - 10*x - 3)*y+(x^2 - 2*x)
-   
-   @test powmod(f, 3, h) == (69*x^2 + 243*x + 79)*y^3+(78*x^2 + 180*x + 63)*y^2+(27*x^2 + 42*x + 18)*y+(3*x^2 + 3*x + 2)
-   
+         @test mulmod(mulmod(f, g, k), h, k) == mulmod(f, mulmod(g, h, k), k)
+      end
+
+      for iter = 1:10
+         f = U()
+         g = U()
+         while f == 0 || g == 0 || gcd(f, g) != 1
+            f = rand(U, 0:5, 0:2^pow2n, -10:10)
+            g = rand(U, 0:5, 0:2^pow2n, -10:10)
+         end
+
+         @test mulmod(invmod(f, g), f, g) == mod(U(1), g)
+      end
+
+      for iter = 1:10
+         f = rand(U, 0:5, 0:2^pow2n, -10:10)
+         g = U()
+         while g == 0
+            g = rand(U, 0:5, 0:2^pow2n, -10:10)
+         end
+         p = mod(U(1), g)
+
+         for expn = 0:5
+            r = powmod(f, expn, g)
+
+            @test (f == 0 && expn == 0 && r == 0) || r == p
+
+            p = mulmod(p, f, g)
+         end
+      end
+    end
+  
    println("PASS")
 end
 
@@ -267,10 +329,30 @@ function test_gen_poly_exact_division()
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
-   f = x*y^2 + (x + 1)*y + 3
-   g = (x + 1)*y + (x^3 + 2x + 2)
+   for iter = 1:100
+      f = rand(S, 0:10, 0:0, -100:100)
+      g = S()
+      while g == 0
+         g = rand(S, 0:10, 0:0, -100:100)
+      end
 
-   @test divexact(f*g, f) == g
+      @test divexact(f*g, g) == f
+   end
+
+   n = 23
+   Zn = ResidueRing(ZZ, n)
+   R, x = PolynomialRing(Zn, "x")
+   S, y = PolynomialRing(R, "y")
+
+   for iter = 1:100
+      f = rand(S, 0:10, 0:10, 0:n - 1)
+      g = S()
+      while g == 0
+         g = rand(S, 0:10, 0:10, 0:n - 1)
+      end
+
+      @test divexact(f*g, g) == f
+   end
 
    println("PASS")
 end
@@ -281,11 +363,30 @@ function test_gen_poly_adhoc_exact_division()
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
-   f = x*y^2 + (x + 1)*y + 3
+   for iter = 1:100
+      f = rand(S, 0:10, 0:10, -100:100)
+      g = R()
+      while g == 0
+         g = rand(R, 0:10, -100:100)
+      end
 
-   @test divexact(3*f, 3) == f
+      @test divexact(f*g, g) == f
+   end
 
-   @test divexact(x*f, x) == f
+   n = 23
+   Zn = ResidueRing(ZZ, n)
+   R, x = PolynomialRing(Zn, "x")
+   S, y = PolynomialRing(R, "y")
+
+   for iter = 1:100
+      f = rand(S, 0:10, 0:10, -100:100)
+      g = R()
+      while g == 0
+         g = rand(R, 0:10, -100:100)
+      end
+
+      @test divexact(f*g, g) == f
+   end
 
    println("PASS")
 end
@@ -293,17 +394,37 @@ end
 function test_gen_poly_euclidean_division()
    print("GenPoly.euclidean_division...")
 
-   R = ResidueRing(ZZ, 7)
-   S, x = PolynomialRing(R, "x")
-   T = ResidueRing(S, x^3 + 3x + 1)
-   U, y = PolynomialRing(T, "y")
+   for pow2n = 1:3
+      R, x = PolynomialRing(ZZ, "x")
+      S, y = PolynomialRing(QQ, "y")
+      p = swinnerton_dyer(pow2n, x) # irreducible
+      T = ResidueRing(S, S(p))
+      U, z = PolynomialRing(T, "z")
 
-   k = y^3 + x*y^2 + (x + 1)*y + 3
-   l = (x + 1)*y^2 + (x^3 + 2x + 2)
+      for iter = 1:10
+         f = rand(U, 0:5, 0:2^pow2n, -10:10)
+         g = rand(U, 0:5, 0:2^pow2n, -10:10)
+         h = U()
+         while h == 0
+            h = rand(U, 0:5, 0:2^pow2n, -10:10)
+         end
 
-   @test mod(k, l) == (4*x^2+4*x+4)*y+(3*x^2+5*x+6)
-   
-   @test divrem(k, l) == ((5*x^2+2*x+6)*y+(2*x^2+5*x+2), (4*x^2+4*x+4)*y+(3*x^2+5*x+6))
+         @test mod(f + g, h) == mod(f, h) + mod(g, h)
+      end
+
+      for iter = 1:10
+         f = rand(U, 0:5, 0:2^pow2n, -10:10)
+         g = U()
+         while g == 0
+            g = rand(U, 0:5, 0:2^pow2n, -10:10)
+         end
+
+         q, r = divrem(f, g)
+         @test q*g + r == f
+
+         @test mod(f, g) == r
+      end
+   end
  
    println("PASS")
 end
@@ -314,12 +435,23 @@ function test_gen_poly_pseudodivision()
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
-   k = x*y^2 + (x + 1)*y + 3
-   l = (x + 1)*y + (x^3 + 2x + 2)
+   for iter = 1:100
+      f = rand(S, 0:5, 0:0, -10:10)
+      g = S()
+      while g == 0
+         g = rand(S, 0:5, 0:0, -10:10)
+      end
 
-   @test pseudorem(k, l) == (x^7+3*x^5+2*x^4+x^3+5*x^2+4*x+1)
+      q, r = pseudodivrem(f, g)
+      
+      if length(f) < length(g)
+         @test f == r && q == 0
+      else
+         @test q*g + r == f*lead(g)^(length(f) - length(g) + 1)
+      end
 
-   @test pseudodivrem(k, l) == ((x^2+x)*y+(-x^4-x^2+1), (x^7+3*x^5+2*x^4+x^3+5*x^2+4*x+1))
+      @test pseudorem(f, g) == r
+   end
 
    println("PASS")
 end
@@ -330,26 +462,46 @@ function test_gen_poly_content_primpart_gcd()
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
-   k = x*y^2 + (x + 1)*y + 3
-   l = (x + 1)*y + (x^3 + 2x + 2)
-   m = y^2 + x + 1
+   for iter = 1:100
+      f = rand(S, 0:10, 0:10, -100:100)
 
-   @test content(k) == 1
+      g = rand(R, 0:10, -100:100)
 
-   @test primpart(k*(x^2 + 1)) == k
+      @test content(f*g) == divexact(g, canonical_unit(lead(g)))*content(f)
 
-   @test gcd(k*m, l*m) == m
+      @test primpart(f*g) == canonical_unit(lead(g))*primpart(f)
+   end
 
-   @test lcm(k*m, l*m) == k*l*m
+   for iter = 1:20
+      f = rand(S, 0:10, 0:10, -100:100)
+      g = rand(S, 0:10, 0:10, -100:100)
+      h = rand(S, 0:10, 0:10, -100:100)
 
-   R, x = PolynomialRing(QQ, "x")
-   T = ResidueRing(R, x^3 + 3x + 1)
-   U, z = PolynomialRing(T, "z")
+      @test gcd(f*h, g*h) == divexact(h, canonical_unit(lead(h)))*gcd(f, g)
+   end
 
-   r = z^3 + 2z + 1
-   s = z^5 + 1
+   for pow2n = 1:3
+      R, x = PolynomialRing(ZZ, "x")
+      S, y = PolynomialRing(QQ, "y")
+      p = swinnerton_dyer(pow2n, x) # irreducible
+      T = ResidueRing(S, S(p))
+      U, z = PolynomialRing(T, "z")
 
-   @test gcdinv(r, s) == (1,fmpz(-21)//62*z^4+fmpz(13)//62*z^3-fmpz(11)//62*z^2-fmpz(5)//62*z+fmpz(9)//62)
+      for iter = 1:10
+         f = U()
+         g = U()
+         while f == 0 || g == 0 || gcd(f, g) != 1
+            f = rand(U, 0:5, 0:2^pow2n, -10:10)
+            g = rand(U, 0:5, 0:2^pow2n, -10:10)
+         end
+
+         d, inv = gcdinv(f, g)
+
+         @test d == gcd(f, g)
+
+         @test mod(f*inv, g) == mod(U(1), g) 
+      end
+   end
 
    println("PASS")
 end
