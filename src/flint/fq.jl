@@ -478,6 +478,26 @@ function add!(z::fq, x::fq, y::fq)
    return z
 end
 
+
+###############################################################################
+#
+#   Random functions
+#
+###############################################################################
+
+function rand(K::FinField)
+	p = characteristic(K)
+	r = degree(K)
+	alpha = gen(K)
+	res = zero(K)
+	for i = 0 : (r-1)
+		c = rand(BigInt(0) : BigInt(p - 1))
+		res += c * alpha^i
+	end
+	return res
+end
+
+
 ###############################################################################
 #
 #   Promotions
