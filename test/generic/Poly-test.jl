@@ -511,7 +511,10 @@ function test_gen_poly_content_primpart_gcd()
    for iter = 1:100
       f = rand(S, 0:10, 0:10, -100:100)
 
-      g = rand(R, 0:10, -100:100)
+      g = R()
+      while g == 0
+         g = rand(R, 0:10, -100:100)
+      end
 
       @test content(f*g) == divexact(g, canonical_unit(lead(g)))*content(f)
 
@@ -521,7 +524,10 @@ function test_gen_poly_content_primpart_gcd()
    for iter = 1:20
       f = rand(S, 0:10, 0:10, -100:100)
       g = rand(S, 0:10, 0:10, -100:100)
-      h = rand(S, 0:10, 0:10, -100:100)
+      h = S()
+      while h == 0
+         h = rand(S, 0:10, 0:10, -100:100)
+      end
 
       @test gcd(f*h, g*h) == divexact(h, canonical_unit(lead(h)))*gcd(f, g)
    end
@@ -547,6 +553,48 @@ function test_gen_poly_content_primpart_gcd()
 
          @test mod(f*inv, g) == mod(U(1), g) 
       end
+   end
+
+   R, x = PolynomialRing(ZZ, "x")
+
+   S = FractionField(R)
+
+   T, y = PolynomialRing(S, "y")
+
+   for iter = 1:100
+      f = rand(T, 0:5, 0:3, -10:10)
+
+      g = R()
+      while g == 0
+         g = rand(R, 0:3, -10:10)
+      end
+
+      @test content(f*g) == content(f)
+
+      @test primpart(f*g) == primpart(f)*g
+   end
+
+   for iter = 1:20
+      f = rand(T, 0:5, 0:3, -10:10)
+      g = rand(T, 0:5, 0:3, -10:10)
+      h = rand(T, 0:5, 0:3, -10:10)
+
+      @test gcd(f*h, g*h) == inv(lead(h))*h*gcd(f, g)
+   end
+
+   for iter = 1:10
+      f = T()
+      g = T()
+      while f == 0 || g == 0 || gcd(f, g) != 1
+         f = rand(T, 0:5, 0:3, -10:10)
+         g = rand(T, 0:5, 0:3, -10:10)
+      end
+
+      d, inv = gcdinv(f, g)
+
+      @test d == gcd(f, g)
+
+      @test mod(f*inv, g) == mod(T(1), g) 
    end
 
    println("PASS")

@@ -1544,7 +1544,11 @@ doc"""
 """
 function primpart(a::PolyElem)
    d = content(a)
-   return divexact(a, d)
+   if d == 0
+      return 0
+   else
+      return divexact(a, d)
+   end
 end
 
 ###############################################################################
