@@ -302,11 +302,18 @@ function test_gen_poly_reverse()
    for iter = 1:maxIter
       f = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
       len = rand(1:(degmax + 1))
-      setcoeff!(f, 0, R(1))
       f_rev = reverse(f, len)
-      @test (degree(f_rev) + 1) == len
-      for co = 1:len
-        @test coeff(f_rev, co - 1) == coeff(f, len - co)
+      if f == 0
+        @test f_rev == 0
+      else #count the number of trailing 0 coeffs
+        it = 0
+        while coeff(f,it) == 0
+            it = it+1
+        end
+        @test length(f_rev) == (len - it)
+        for co = 1:length(f_rev)
+          @test coeff(f_rev, co - 1) == coeff(f, len - co)
+        end
       end
    end
 #  the same over z/6Z
@@ -316,11 +323,18 @@ function test_gen_poly_reverse()
    for iter = 1:maxIter
       f = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
       len = rand(1:(degmax + 1))
-      setcoeff!(f, 0, R(1))
       f_rev = reverse(f, len)
-      @test (degree(f_rev) + 1) == len
-      for co = 1:len
-        @test coeff(f_rev, co - 1) == coeff(f, len - co)
+      if f == 0
+        @test f_rev == 0
+      else #count the number of trailing 0 coeffs
+        it = 0
+        while coeff(f,it) == 0
+            it = it+1
+        end
+        @test length(f_rev) == (len - it)
+        for co = 1:length(f_rev)
+          @test coeff(f_rev, co - 1) == coeff(f, len - co)
+        end
       end
    end
 #  Remi Imbach 31/07/17: end
