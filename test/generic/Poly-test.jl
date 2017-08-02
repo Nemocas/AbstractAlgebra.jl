@@ -106,121 +106,311 @@ function test_gen_poly_binary_ops()
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
-   f = x*y^2 + (x + 1)*y + 3
-   g = (x + 1)*y + (x^3 + 2x + 2)
-   
-   @test f - g == x*y^2+(-x^3-2*x+1)
-
-   @test f + g == x*y^2+(2*x+2)*y+(x^3+2*x+5)
-
-   @test f*g == (x^2+x)*y^3+(x^4+3*x^2+4*x+1)*y^2+(x^4+x^3+2*x^2+7*x+5)*y+(3*x^3+6*x+6)
-
+#  Remi Imbach 31/07/17: begin
+#    f = x*y^2 + (x + 1)*y + 3
+#    g = (x + 1)*y + (x^3 + 2x + 2)
+#    @test f - g == x*y^2+(-x^3-2*x+1)
+#    @test f + g == x*y^2+(2*x+2)*y+(x^3+2*x+5)
+#    @test f*g == (x^2+x)*y^3+(x^4+3*x^2+4*x+1)*y^2+(x^4+x^3+2*x^2+7*x+5)*y+(3*x^3+6*x+6)
+#  replaced by
+   maxIter::Int64 = 100
+   degmax::Int64 = 50
+   bitsize::Int64 = 20
+   for iter = 1:maxIter
+      f = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      g = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      h = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      @test (f-h) + (g+h) == (f+g)
+      @test (f+g)*(f-g) == f*f - g*g
+   end
+   #the same over z/6Z
+   T = ResidueRing(ZZ, 6)
+   R,x = T["x"]
+   S,y = R["y"]
+   for iter = 1:maxIter
+      f = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      g = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      h = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      @test (f-h) + (g+h) == (f+g)
+      @test (f+g)*(f-g) == f*f - g*g
+   end
+#  Remi Imbach 31/07/17: end
    println("PASS")
 end
 
 function test_gen_poly_adhoc_binary()
    print("GenPoly.adhoc_binary...")
-
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-
-   f = x*y^2 + (x + 1)*y + 3
-   g = (x + 1)*y + (x^3 + 2x + 2)
-
-   @test f*4 == (4*x)*y^2+(4*x+4)*y+12
-
-   @test 7*f == (7*x)*y^2+(7*x+7)*y+21
-   
-   @test fmpz(5)*g == (5*x+5)*y+(5*x^3+10*x+10)
-
-   @test g*fmpz(3) == (3*x+3)*y+(3*x^3+6*x+6)
-
+#  Remi Imbach 31/07/17: begin
+#    R, x = PolynomialRing(ZZ, "x")
+#    S, y = PolynomialRing(R, "y")
+#    f = x*y^2 + (x + 1)*y + 3
+#    g = (x + 1)*y + (x^3 + 2x + 2)
+#    @test f*4 == (4*x)*y^2+(4*x+4)*y+12
+#    @test 7*f == (7*x)*y^2+(7*x+7)*y+21
+#    @test fmpz(5)*g == (5*x+5)*y+(5*x^3+10*x+10)
+#    @test g*fmpz(3) == (3*x+3)*y+(3*x^3+6*x+6)
+#  replaced by
+   R,x = ZZ["x"]
+   S,y = R["y"]
+   U,z = S["z"]
+   maxIter::Int64 = 100
+   degmax::Int64 = 50
+   bitsize::Int64 = 20
+   for iter = 1:maxIter
+      f = rand(U, 0:degmax, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      c1 = rand(ZZ, -2^bitsize:2^bitsize)
+      c2 = rand(ZZ, -2^bitsize:2^bitsize)
+      @test c1*f - c2*f == (c1-c2)*f
+   end
+   #the same over z/6Z
+   T = ResidueRing(ZZ, 6)
+   R,x = T["x"]
+   S,y = R["y"]
+   U,z = S["z"]
+   for iter = 1:maxIter
+      f = rand(U, 0:degmax, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      c1 = rand(T, -2^bitsize:2^bitsize)
+      c2 = rand(T, -2^bitsize:2^bitsize)
+      @test c1*f - c2*f == (c1-c2)*f
+   end
+#  Remi Imbach 31/07/17: end
    println("PASS")
 end
 
 function test_gen_poly_comparison()
    print("GenPoly.comparison...")
-
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-
-   f = x*y^2 + (x + 1)*y + 3
-   g = x*y^2 + (x + 1)*y + 3
-
-   @test f == g
-
-   @test isequal(f, g)
-
+#  Remi Imbach 31/07/17: begin
+#    R, x = PolynomialRing(ZZ, "x")
+#    S, y = PolynomialRing(R, "y")
+#    f = x*y^2 + (x + 1)*y + 3
+#    g = x*y^2 + (x + 1)*y + 3
+#    @test f == g
+#    @test isequal(f, g)
+#  replaced by
+   R,x = ZZ["x"]
+   S,y = R["y"]
+   maxIter::Int64 = 100
+   degmax::Int64 = 100
+   bitsize::Int64 = 32
+   for iter = 1:maxIter
+      f = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      g = f
+      @test f==g
+      @test isequal(f, g)
+      g = f+(rand(ZZ, -2^bitsize:2^bitsize) +1)
+      @test f!=g
+   end
+   #the same over z/6Z
+   T = ResidueRing(ZZ, 6)
+   R,x = T["x"]
+   S,y = R["y"]
+   for iter = 1:maxIter
+      f = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      g = f
+      @test f==g
+      @test isequal(f, g)
+      g = f+(rand(T, 0:4)+1)
+      @test f!=g
+   end
+#  Remi Imbach 31/07/17: end
    println("PASS")
 end
 
 function test_gen_poly_adhoc_comparison()
    print("GenPoly.adhoc_comparison...")
 
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-
-   @test S(1) == 1
-
-   @test 1 != x + y
-
+#  Remi Imbach 31/07/17: begin
+#    R, x = PolynomialRing(ZZ, "x")
+#    S, y = PolynomialRing(R, "y")
+#    @test S(1) == 1 
+#    @test 1 != x + y
+#  replaced by
+   R,x = ZZ["x"]
+   S,y = R["y"]
+   U,z = S["z"]
+   maxIter::Int64 = 100
+   bitsize::Int64 = 32
+   for iter = 1:maxIter
+      c1 = rand(ZZ, -2^bitsize:2^bitsize)
+      @test U(c1) == c1 
+      @test U(c1) != y + rand(ZZ, -2^bitsize:2^bitsize)*z
+   end
+   #the same over z/6Z
+   T = ResidueRing(ZZ, 6)
+   R,x = T["x"]
+   S,y = R["y"]
+   U,z = S["z"]
+   for iter = 1:maxIter
+      c1 = rand(T, -2^bitsize:2^bitsize)
+      @test U(c1) == c1
+      @test U(c1) != y + rand(T, 0:100)*z
+   end
+#  Remi Imbach 31/07/17: end
    println("PASS")
 end
 
 function test_gen_poly_unary_ops()
    print("GenPoly.unary_ops...")
-
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-
-   f = x*y^2 + (x + 1)*y + 3
-
-   @test -f == -x*y^2 - (x + 1)*y - 3
-
+#  Remi Imbach 31/07/17: begin
+#    R, x = PolynomialRing(ZZ, "x")
+#    S, y = PolynomialRing(R, "y")
+#    f = x*y^2 + (x + 1)*y + 3
+#    @test -f == -x*y^2 - (x + 1)*y - 3
+#  replaced by
+   R,x = ZZ["x"]
+   S,y = R["y"]
+   maxIter::Int64 = 100
+   degmax::Int64 = 100
+   bitsize::Int64 = 32
+   for iter = 1:maxIter
+      f = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      c1 = rand(ZZ, -2^bitsize:2^bitsize)
+      mf = -f
+      @test -(S(c1))==-c1
+      @test degree(mf)==degree(f)
+      for co = 1:degree(f)+1
+        @test coeff(mf, co) == -coeff(f,co)
+      end
+   end
+   #the same over z/6Z
+   T = ResidueRing(ZZ, 6)
+   R,x = T["x"]
+   S,y = R["y"]
+   for iter = 1:maxIter
+      f = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      c1 = rand(T, -2^bitsize:2^bitsize)
+      mf = -f
+      @test -(S(c1))==-c1
+      @test degree(mf)==degree(f)
+      for co = 1:degree(f)+1
+        @test coeff(mf, co) == -coeff(f,co)
+      end
+   end
+#  Remi Imbach 31/07/17: end
    println("PASS")
 end
 
 function test_gen_poly_truncation()
    print("GenPoly.truncation...")
-
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-
-   f = x*y^2 + (x + 1)*y + 3
-   g = (x + 1)*y + (x^3 + 2x + 2)
-
-   @test truncate(f, 1) == 3
-
-   @test mullow(f, g, 4) == (x^2+x)*y^3+(x^4+3*x^2+4*x+1)*y^2+(x^4+x^3+2*x^2+7*x+5)*y+(3*x^3+6*x+6)
-
+#  Remi Imbach 31/07/17: begin
+#    R, x = PolynomialRing(ZZ, "x")
+#    S, y = PolynomialRing(R, "y")
+#    f = x*y^2 + (x + 1)*y + 3
+#    g = (x + 1)*y + (x^3 + 2x + 2)
+#    @test truncate(f, 1) == 3
+#    @test mullow(f, g, 4) == (x^2+x)*y^3+(x^4+3*x^2+4*x+1)*y^2+(x^4+x^3+2*x^2+7*x+5)*y+(3*x^3+6*x+6)
+#  replaced by
+   R,x = ZZ["x"]
+   S,y = R["y"]
+   maxIter::Int64 = 100
+   degmax::Int64 = 100
+   bitsize::Int64 = 32
+   for iter = 1:maxIter
+      f = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      t = Int64(rand(ZZ, 1:degmax))
+      h = truncate(f, t)
+      @test degree(h)+1 <= min(degree(f)+1,t) #verify degree
+      for co = 1:degree(h)+1 #verify each coeff
+         @test coeff(h, co-1)==coeff(f, co-1)
+      end
+   end
+#  the same over z/6Z
+   T = ResidueRing(ZZ, 6)
+   R,x = T["x"]
+   S,y = R["y"]
+   for iter = 1:maxIter
+      f = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      t = Int64(rand(ZZ, 1:degmax))
+      h = truncate(f, t)
+      @test degree(h)+1 <= min(degree(f)+1,t) #verify degree
+      for co = 1:degree(h)+1 #verify each coeff
+         @test coeff(h, co-1)==coeff(f, co-1)
+      end
+   end
+#  Remi Imbach 31/07/17: end
    println("PASS")
 end
 
 function test_gen_poly_reverse()
    print("GenPoly.reverse...")
-
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-
-   f = x*y^2 + (x + 1)*y + 3
-
-   @test reverse(f, 7) == 3y^6 + (x + 1)*y^5 + x*y^4
-
+#  Remi Imbach 31/07/17: begin
+#    R, x = PolynomialRing(ZZ, "x")
+#    S, y = PolynomialRing(R, "y")
+#    f = x*y^2 + (x + 1)*y + 3
+#    @test reverse(f, 7) == 3y^6 + (x + 1)*y^5 + x*y^4
+#  replaced by
+   R,x = ZZ["x"]
+   S,y = R["y"]
+   maxIter::Int64 = 100trailing whitespace.
+   degmax::Int64 = 50
+   bitsize::Int64 = 32
+   for iter = 1:maxIter
+      f = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      len = Int64( rand(ZZ, 1:(degmax+1)) )trailing whitespace.
+      f_rev = reverse(f, len)
+      @test (degree(f_rev)+1) == len
+      for co = 1:len
+        @test coeff(f_rev, co-1) == coeff(f, len-co)
+      end
+   end
+#  the same over z/6Z
+   T = ResidueRing(ZZ, 6)
+   R,x = T["x"]
+   S,y = R["y"]
+   for iter = 1:maxIter
+      f = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      len = Int64( rand(ZZ, 1:(degmax+1)) )
+      f_rev = reverse(f, len)
+      @test (degree(f_rev)+1) == len
+      for co = 1:len
+        @test coeff(f_rev, co-1) == coeff(f, len-co)
+      end
+   end
+#  Remi Imbach 31/07/17: end
    println("PASS")
 end
 
 function test_gen_poly_shift()
    print("GenPoly.shift...")
-
-   R, x = PolynomialRing(ZZ, "x")
-   S, y = PolynomialRing(R, "y")
-
-   f = x*y^2 + (x + 1)*y + 3
-
-   @test shift_left(f, 7) == x*y^9 + (x + 1)*y^8 + 3y^7
-
-   @test shift_right(f, 3) == 0
-
+#  Remi Imbach 31/07/17: begin
+#    R, x = PolynomialRing(ZZ, "x")
+#    S, y = PolynomialRing(R, "y")
+#    f = x*y^2 + (x + 1)*y + 3
+#    @test shift_left(f, 7) == x*y^9 + (x + 1)*y^8 + 3y^7
+#    @test shift_right(f, 3) == 0
+#  replaced by
+   R,x = ZZ["x"]
+   S,y = R["y"]
+   maxIter::Int64 = 100
+   degmax::Int64 = 50
+   bitsize::Int64 = 32
+   for iter = 1:maxIter
+      f = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      s = Int64( rand(ZZ, 0:degmax) )
+      fsr = shift_right(f, s)
+      fsl = shift_left(f, s)
+      @test fsl == (y^s)*f
+      f_rev = reverse(f, degree(f)+1)
+      f_rev_trun = truncate( f_rev, max(0, degree(f)+1-s) )
+      f_rev_trun_rev = reverse( f_rev_trun, max(0, degree(f)+1-s) )
+      @test fsr == f_rev_trun_rev
+   end
+#  the same over z/6Z
+   T = ResidueRing(ZZ, 6)
+   R,x = T["x"]
+   S,y = R["y"]
+   for iter = 1:maxIter
+      f = rand(S, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
+      s = Int64( rand(ZZ, 0:degmax) )
+      fsr = shift_right(f, s)
+      fsl = shift_left(f, s)
+      @test fsl == (y^s)*f
+      f_rev = reverse(f, degree(f)+1)
+      f_rev_trun = truncate( f_rev, max(0, degree(f)+1-s) )
+      f_rev_trun_rev = reverse( f_rev_trun, max(0, degree(f)+1-s) )
+      @test fsr == f_rev_trun_rev
+   end
+#  Remi Imbach 31/07/17: end
    println("PASS")
 end
 

@@ -852,7 +852,7 @@ function truncate(a::PolyElem, n::Int)
    end
    lenz = min(lena, n)
    z = parent(a)()
-   fit!(a, lenz)
+   fit!(z, lenz)
    for i = 1:lenz
       z = setcoeff!(z, i - 1, coeff(a, i - 1))
    end
