@@ -435,6 +435,12 @@ function emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
    return p -> Nemo.emb!(G(), p, V)
 end
 
+doc"""
+    rand(G::PermGroup)
+> Returns a random element from group `G`.
+"""
+rand(G::PermGroup) = G(randperm(G.n))
+
 ###############################################################################
 #
 #   Parent object call overloads
