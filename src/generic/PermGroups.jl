@@ -439,7 +439,7 @@ doc"""
     rand(G::PermGroup)
 > Returns a random element from group `G`.
 """
-rand(G::PermGroup) = G(randperm(G.n))
+rand(G::PermGroup) = G(randperm(G.n), false)
 
 ###############################################################################
 #
