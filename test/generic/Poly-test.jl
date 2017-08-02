@@ -596,11 +596,11 @@ function test_gen_poly_integral()
    @test integral(f) == (fmpz(1)//3*x^2 + fmpz(2)//3*x + fmpz(1)//3)*y^3+(fmpz(1)//2*x+fmpz(1)//2)*y^2+(-2*x+4)*y
 
    for _ in 1:10
-      f = rand(T, 0:2, 0:2, -100:100, 1:100)
+      f = rand(T, 0:2, 0:2, -100:100)
 
       @test derivative(integral(f)) == f
 
-      g = rand(T, 0:2, 0:2, -100:100, 1:100)
+      g = rand(T, 0:2, 0:2, -100:100)
 
       @test integral(f + g) == integral(g) + integral(f)
       @test integral(f)*integral(g) == integral(integral(f)*g + integral(g)*f)
@@ -670,17 +670,17 @@ function test_gen_poly_gcdx()
    end
 
    R, x = PolynomialRing(QQ, "x")
-   T = ResidueRing(R, x^3 + 3x - 2)
+   T = ResidueRing(R, (x^3 + 3x - 2)*(x - 1))
    S, z = PolynomialRing(T, "z")
 
    for _ in 1:10
-      f = rand(S, 2:2, 0:2, 1:100, 1:100)
-      g = rand(S, 2:2, 0:2, -100:-1, 1:100)
+      f = rand(S, 2:2, 0:2, 1:100)
+      g = rand(S, 2:2, 0:2, -100:-1)
       r, u, v = gcdx(f, g)
 
       @test u*f + v*g == r
 
-      h = rand(S, 0:2, 0:2, -100:100, 1:100)
+      h = rand(S, 0:2, 0:2, -100:100)
       r, u, v = gcdx(f*h, g*h)
 
       @test (u*f + v*g)*h == r
