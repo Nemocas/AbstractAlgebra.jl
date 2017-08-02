@@ -722,7 +722,7 @@ end
 function addeq!{T <: RingElem}(c::FracElem{T}, a::FracElem{T})
    n = c.num*den(a) + num(a)*c.den
    c.den = mul!(c.den, c.den, den(a))
-   g = gcd(n, d)
+   g = gcd(n, c.den)
    c.num = divexact(n, g)
    c.den = divexact(c.den, g)
    return c

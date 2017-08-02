@@ -318,8 +318,54 @@ function test_gen_poly_modular_arithmetic()
             p = mulmod(p, f, g)
          end
       end
-    end
-  
+   end
+
+   R, x = PolynomialRing(ZZ, "x")
+
+   S = FractionField(R)
+
+   T, y = PolynomialRing(S, "y")
+
+   for iter = 1:10
+      f = rand(T, 0:5, 0:3, -10:10)
+      g = rand(T, 0:5, 0:3, -10:10)
+      h = rand(T, 0:5, 0:3, -10:10)
+      k = T()
+      while k == 0
+         k = rand(T, 0:5, 0:3, -10:10)
+      end
+
+      @test mulmod(mulmod(f, g, k), h, k) == mulmod(f, mulmod(g, h, k), k)
+   end
+
+   for iter = 1:10
+      f = T()
+      g = T()
+      while f == 0 || g == 0 || gcd(f, g) != 1
+         f = rand(T, 0:5, 0:3, -10:10)
+         g = rand(T, 0:5, 0:3, -10:10)
+      end
+
+      @test mulmod(invmod(f, g), f, g) == mod(T(1), g)
+   end
+
+   for iter = 1:10
+      f = rand(T, 0:5, 0:3, -10:10)
+      g = T()
+      while g == 0
+         g = rand(T, 0:5, 0:3, -10:10)
+      end
+      p = mod(T(1), g)
+
+      for expn = 0:5
+         r = powmod(f, expn, g)
+
+         @test (f == 0 && expn == 0 && r == 0) || r == p
+
+         p = mulmod(p, f, g)
+      end
+   end
+
    println("PASS")
 end
 
