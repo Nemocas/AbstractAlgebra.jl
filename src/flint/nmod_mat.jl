@@ -7,7 +7,7 @@
 export nmod_mat, NmodMatSpace, getindex, setindex!, set_entry!, deepcopy, rows, 
        cols, parent, base_ring, zero, one, issquare, show, transpose,
        transpose!, rref, rref!, trace, det, rank, inv, solve, lufact,
-       sub, window, hcat, vcat, Array, lift, lift!, MatrixSpace, check_parent,
+       sub, hcat, vcat, Array, lift, lift!, MatrixSpace, check_parent,
        howell_form, howell_form!, strong_echelon_form, strong_echelon_form!
 
 ################################################################################
@@ -524,7 +524,7 @@ end
 #
 ################################################################################
 
-function window(x::nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int)
+function Base.view(x::nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int)
   _checkbounds(x, r1, c1)
   _checkbounds(x, r2, c2)
   (r1 > r2 || c1 > c2) && error("Invalid parameters")
@@ -537,14 +537,14 @@ function window(x::nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int)
   return z
 end
 
-function window(x::nmod_mat, r::UnitRange{Int}, c::UnitRange{Int})
-  return window(x, r.start, c.start, r.stop, c.stop)
+function Base.view(x::nmod_mat, r::UnitRange{Int}, c::UnitRange{Int})
+  return Base.view(x, r.start, c.start, r.stop, c.stop)
 end
 
 sub(x::nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int) =
-        window(x, r1, c1, r2, c2)
+        Base.view(x, r1, c1, r2, c2)
 
-sub(x::nmod_mat, r::UnitRange{Int}, c::UnitRange{Int}) = window(x, r, c)
+sub(x::nmod_mat, r::UnitRange{Int}, c::UnitRange{Int}) = Base.view(x, r, c)
   
 ################################################################################
 #

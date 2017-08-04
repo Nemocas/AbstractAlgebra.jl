@@ -575,8 +575,8 @@ function test_nmod_mat_lu()
   println("PASS")
 end
 
-function test_nmod_mat_window()
-  print("nmod_mat.window...")
+function test_nmod_mat_view()
+  print("nmod_mat.view...")
 
   Z17 = ResidueRing(ZZ,17)
   R = MatrixSpace(Z17, 3, 3)
@@ -586,29 +586,29 @@ function test_nmod_mat_window()
 
   b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
-  t = window(a,1,1,3,3)
+  t = view(a,1,1,3,3)
 
   @test t == a
 
-  @test window(a,1,1,3,3) == window(a,1:3,1:3)
-  @test window(a,1,1,3,3) == sub(a,1,1,3,3)
-  @test window(a,1,1,3,3) == sub(a,1:3,1:3)
+  @test view(a,1,1,3,3) == view(a,1:3,1:3)
+  @test view(a,1,1,3,3) == sub(a,1,1,3,3)
+  @test view(a,1,1,3,3) == sub(a,1:3,1:3)
 
-  t = window(a,1,1,2,2)
+  t = view(a,1,1,2,2)
 
   @test t == MatrixSpace(base_ring(a),2,2)([1 2; 3 2])
 
-  t = window(a,2,2,3,2)
+  t = view(a,2,2,3,2)
 
   @test t == MatrixSpace(base_ring(a),2,1)(reshape([2 ; 0],2,1))
 
-  @test window(a,2,2,3,2) == window(a,2:3, 2:2)
-  @test window(a,2,2,3,2) == sub(a,2,2,3,2)
-  @test window(a,2,2,3,2) == sub(a,2:3,2:2)
+  @test view(a,2,2,3,2) == view(a,2:3, 2:2)
+  @test view(a,2,2,3,2) == sub(a,2,2,3,2)
+  @test view(a,2,2,3,2) == sub(a,2:3,2:2)
 
-  @test_throws BoundsError window(a,4,4,1,1)
+  @test_throws BoundsError view(a,4,4,1,1)
 
-  @test_throws ErrorException window(a,2,2,1,1)
+  @test_throws ErrorException view(a,2,2,1,1)
 
   println("PASS")
 end
@@ -718,7 +718,7 @@ function test_nmod_mat()
   test_nmod_mat_rank()
   test_nmod_mat_inv()
   test_nmod_mat_lu()
-  test_nmod_mat_window()
+  test_nmod_mat_view()
   test_nmod_mat_concatenation()
   test_nmod_mat_conversion()
   test_nmod_mat_charpoly()

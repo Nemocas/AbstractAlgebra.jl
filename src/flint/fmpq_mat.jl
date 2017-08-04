@@ -52,7 +52,7 @@ end
 #
 ###############################################################################
 
-function window(x::fmpq_mat, r1::Int, c1::Int, r2::Int, c2::Int)
+function Base.view(x::fmpq_mat, r1::Int, c1::Int, r2::Int, c2::Int)
   _checkbounds(x.r, r1) || throw(BoundsError())
   _checkbounds(x.r, r2) || throw(BoundsError())
   _checkbounds(x.c, c1) || throw(BoundsError())
@@ -67,8 +67,8 @@ function window(x::fmpq_mat, r1::Int, c1::Int, r2::Int, c2::Int)
   return b
 end
 
-function window(x::fmpq_mat, r::UnitRange{Int}, c::UnitRange{Int})
-  return window(x, r.start, c.start, r.stop, c.stop)
+function Base.view(x::fmpq_mat, r::UnitRange{Int}, c::UnitRange{Int})
+  return Base.view(x, r.start, c.start, r.stop, c.stop)
 end
 
 function _fmpq_mat_window_clear_fn(a::fmpq_mat)
