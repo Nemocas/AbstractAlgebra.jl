@@ -732,7 +732,10 @@ function test_gen_poly_content_primpart_gcd()
    for iter = 1:20
       f = rand(T, 0:5, 0:3, -10:10)
       g = rand(T, 0:5, 0:3, -10:10)
-      h = rand(T, 0:5, 0:3, -10:10)
+      h = T()
+      while h == 0
+         h = rand(T, 0:5, 0:3, -10:10)
+      end
 
       @test gcd(f*h, g*h) == inv(lead(h))*h*gcd(f, g)
    end
