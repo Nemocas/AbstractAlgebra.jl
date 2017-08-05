@@ -179,12 +179,30 @@ doc"""
 """
 isunit(a::PolyElem) = length(a) == 1 && isunit(coeff(a, 0))
 
-ismonomial{T<:RingElem}(a::T) = true
+isterm{T<:RingElem}(a::T) = true
+
+doc"""
+    isterm(a::PolyElem)
+> Return `true` if the given polynomial is has one term. This function is
+> recursive, with all scalar types returning true.
+"""
+function isterm(a::PolyElem)
+   if !isterm(lead(a))
+      return false
+   end
+   for i = 1:length(a) - 1
+      if !iszero(coeff(a, i - 1))
+         return false
+      end
+   end
+   return true
+end
+
+ismonomial{T<:RingElem}(a::T) = isone(a)
 
 doc"""
     ismonomial(a::PolyElem)
-> Return `true` if the given polynomial is a monomial. This function is
-> recursive, with all scalar types returning true.
+> Return `true` if the given polynomial is a monomial. 
 """
 function ismonomial(a::PolyElem)
    if !ismonomial(lead(a))
@@ -1436,8 +1454,8 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, ignore_content=false
       b = divexact(b, c2)
       c = gcd(c1, c2)
    end
-   lead_monomial = ismonomial(lead(a)) || ismonomial(lead(b))
-   trail_monomial = ismonomial(trail(a)) || ismonomial(trail(b))
+   lead_monomial = isterm(lead(a)) || isterm(lead(b))
+   trail_monomial = isterm(trail(a)) || isterm(trail(b))
    lead_a = lead(a)
    lead_b = lead(b)
    g = one(parent(a))
@@ -1461,7 +1479,7 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, ignore_content=false
       end
    end
    if !ignore_content
-      if !ismonomial(lead(b)) && !ismonomial(trail(b))
+      if !isterm(lead(b)) && !isterm(trail(b))
          if lead_monomial # lead term monomial, so content contains rest
             d = divexact(lead(b), term_content(lead(b)))
             b = divexact(b, d)
@@ -1470,7 +1488,7 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, ignore_content=false
             b = divexact(b, d)
          else
             glead = gcd(lead_a, lead_b)
-            if ismonomial(glead)
+            if isterm(glead)
                d = divexact(lead(b), term_content(lead(b)))
                b = divexact(b, d)
             else # last ditched attempt to find easy content
@@ -1483,7 +1501,6 @@ function gcd{T <: RingElem}(a::PolyElem{T}, b::PolyElem{T}, ignore_content=false
             end
          end
       end
-      b = divexact(b, term_content(b))
       b = divexact(b, content(b))
    end
    b = c*b

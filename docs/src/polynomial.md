@@ -339,6 +339,10 @@ ismonomial(::PolyElem)
 ```
 
 ```@docs
+isterm(::PolyElem)
+```
+
+```@docs
 den(::fmpq_poly)
 ```
 

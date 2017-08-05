@@ -93,7 +93,11 @@ function test_gen_poly_manipulation()
 
    @test deepcopy(h) == h
 
-   @test ismonomial(2*x*y^2)
+   @test isterm(2*x*y^2)
+
+   @test !ismonomial(2*x*y^2)
+
+   @test ismonomial(x*y^2)
 
    @test !ismonomial(2*x*y^2 + y + 1)
 
@@ -664,11 +668,11 @@ function test_gen_poly_content_primpart_gcd()
    S, y = PolynomialRing(R, "y")
 
    for iter = 1:100
-      f = rand(S, 0:10, 0:10, -100:100)
+      f = rand(S, 0:10, 0:10, -10:10)
 
       g = R()
       while g == 0
-         g = rand(R, 0:10, -100:100)
+         g = rand(R, 0:10, -10:10)
       end
 
       @test content(f*g) == divexact(g, canonical_unit(lead(g)))*content(f)
@@ -677,11 +681,11 @@ function test_gen_poly_content_primpart_gcd()
    end
 
    for iter = 1:20
-      f = rand(S, 0:10, 0:10, -100:100)
-      g = rand(S, 0:10, 0:10, -100:100)
+      f = rand(S, 0:10, 0:10, -10:10)
+      g = rand(S, 0:10, 0:10, -10:10)
       h = S()
       while h == 0
-         h = rand(S, 0:10, 0:10, -100:100)
+         h = rand(S, 0:10, 0:10, -10:10)
       end
 
       @test gcd(f*h, g*h) == divexact(h, canonical_unit(lead(h)))*gcd(f, g)
