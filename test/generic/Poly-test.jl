@@ -909,13 +909,20 @@ function test_gen_poly_gcdx()
    @test gcdx(f, g) == (3*x^7+6*x^5-6*x^3+96*x^2+192*x+96, (36*x^2+72*x+36), (-18*x^2-18*x)*y+(3*x^4-6*x-6))
 
    for _ in 1:100
-      f = rand(S, 2:2, 0:2, 1:100)
-      g = rand(S, 2:2, 0:2, -100:-1)
+      f = S()
+      g = S()
+      while length(f) < 2 || length(g) < 2
+         f = rand(S, 2:2, 0:2, 1:100)
+         g = rand(S, 2:2, 0:2, -100:-1)
+      end
       r, u, v = gcdx(f, g)
 
       @test u*f + v*g == r
 
-      h = rand(S, 0:2, 0:2, -100:100)
+      h = S()
+      while h == 0
+         h = rand(S, 0:2, 0:2, -100:100)
+      end
       r, u, v = gcdx(f*h, g*h)
 
       @test (u*f + v*g)*h == r
@@ -926,13 +933,20 @@ function test_gen_poly_gcdx()
    S, z = PolynomialRing(T, "z")
 
    for _ in 1:10
-      f = rand(S, 2:2, 0:2, 1:100)
-      g = rand(S, 2:2, 0:2, -100:-1)
+      f = S()
+      g = S()
+      while length(f) < 2 || length(g) < 2
+         f = rand(S, 2:2, 0:2, 1:100)
+         g = rand(S, 2:2, 0:2, -100:-1)
+      end
       r, u, v = gcdx(f, g)
 
       @test u*f + v*g == r
 
-      h = rand(S, 0:2, 0:2, -100:100)
+      h = S()
+      while h == 0
+         h = rand(S, 0:2, 0:2, -100:100)
+      end
       r, u, v = gcdx(f*h, g*h)
 
       @test (u*f + v*g)*h == r
