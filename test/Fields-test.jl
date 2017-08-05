@@ -11,15 +11,15 @@ include("arb/arb-test.jl")
 include("arb/acb-test.jl")
 
 function test_fields()
-#   test_arb()
-#   test_acb()
+   test_arb()
+   test_acb()
 
-#   test_gen_frac()
+   test_gen_frac()
 
-#   test_fmpq()
-#   test_fq()
-#   test_fq_nmod()
-#   test_padic()
+   test_fmpq()
+   test_fq()
+   test_fq_nmod()
+   test_padic()
 
-#   test_nf_elem()
+   test_nf_elem()
 end
