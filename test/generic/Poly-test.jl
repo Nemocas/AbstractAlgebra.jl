@@ -993,10 +993,17 @@ function test_gen_poly_interpolation()
    @test f == y^2
 
    for _ in 1:10
-      ys = [rand(R, 0:2, -100:100) for i in 1:4]
+      p = S()
+      while p == 0
+         p = rand(S, 0:10, 0:5, -10:10)
+      end
+
+      xs = [R(i) for i in 1:length(p)]
+      ys = [p(i) for i in 1:length(p)]
+      
       f = interpolate(S, xs, ys)
 
-      @test all(evaluate(f, a) == b for (a,b) in zip(xs, ys))
+      @test f == p
    end
 
    println("PASS")

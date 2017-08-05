@@ -2095,7 +2095,8 @@ doc"""
 > Given two arrays of values $xs$ and $ys$ of the same length $n$, find
 > the polynomial $f$ in the polynomial ring $R$ of length at most $n$ such that
 > $f$ has the value $ys$ at the points $xs$. The values in the arrays $xs$ and
-> $ys$ must belong to the base ring of the polynomial ring $R$.
+> $ys$ must belong to the base ring of the polynomial ring $R$. If no such
+> polynomial exists, an exception is raised.
 """
 function interpolate{T <: RingElem}(S::PolyRing, x::Array{T, 1}, y::Array{T, 1})
    length(x) != length(y) && error("Array lengths don't match in interpolate")
@@ -2117,7 +2118,8 @@ function interpolate{T <: RingElem}(S::PolyRing, x::Array{T, 1}, y::Array{T, 1})
          p = P[j] - t
          q = x[j] - x[j - i + 1]
          t = P[j]
-         P[j] = divexact(p, q)
+         flag, P[j] = divides(p, q)
+         flag == false && error("Not an exact division in interpolate")
       end
    end
    newton_to_monomial!(P, x)
