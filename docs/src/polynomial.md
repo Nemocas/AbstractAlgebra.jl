@@ -933,6 +933,13 @@ xs = arb[inv(RR(i)) for i=1:5]
 f = from_roots(R, xs)
 ```
 
+## Bounding absolute values of roots
+
+```@docs
+roots_upper_bound(::arb_poly)
+roots_upper_bound(::acb_poly)
+```
+
 ## Lifting
 
 When working over a residue ring it is useful to be able to lift to the base

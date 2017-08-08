@@ -16,6 +16,14 @@ export AcbMatSpace, acb_mat
 
 arb_check_prec(p::Int) = (p >= 2 && p < (typemax(Int) >> 4)) || throw(ArgumentError("invalid precision"))
 
+# Rounding modes
+
+const ARB_RND_DOWN = Cint(0)   # towards zero
+const ARB_RND_UP = Cint(1)     # away from zero
+const ARB_RND_FLOOR = Cint(2)  # towards -infinity
+const ARB_RND_CEIL = Cint(3)   # towards +infinity
+const ARB_RND_NEAR = Cint(4)   # to nearest
+
 ################################################################################
 #
 #  Types and memory management for ArbField

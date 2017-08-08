@@ -710,6 +710,31 @@ end
 
 ###############################################################################
 #
+#   Root bounds
+#
+###############################################################################
+
+doc"""
+    roots_upper_bound(f::acb_poly) -> arb
+
+> Returns an upper bound for the absolute value of all complex roots of $f$.
+"""
+function roots_upper_bound(x::acb_poly)
+   z = ArbField(prec(base_ring(x)))()
+   p = prec(base_ring(x))
+   t = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (Ptr{arb}, ), &z)
+   ccall((:acb_poly_root_bound_fujiwara, :libarb), Void,
+         (Ptr{mag_struct}, Ptr{acb_poly}), t, &x)
+   s = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), &z)
+   ccall((:arf_set_mag, :libarb), Void, (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
+   ccall((:arf_set_round, :libarb), Void,
+         (Ptr{arf_struct}, Ptr{arf_struct}, Int, Cint), s, s, p, ARB_RND_CEIL)
+   ccall((:mag_zero, :libarb), Void, (Ptr{mag_struct},), t)
+   return z
+end
+
+###############################################################################
+#
 #   Unsafe functions
 #
 ###############################################################################

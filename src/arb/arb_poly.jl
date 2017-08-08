@@ -7,7 +7,7 @@
 export ArbPolyRing, arb_poly, derivative, integral, evaluate, evaluate2,
        compose, from_roots, evaluate_iter, evaluate_fast, evaluate,
        interpolate, interpolate_newton, interpolate_barycentric,
-       interpolate_fast
+       interpolate_fast, roots_upper_bound
 
 ###############################################################################
 #
@@ -606,6 +606,31 @@ end
 # todo: cutoffs for fast algorithm
 function evaluate(x::arb_poly, b::Array{arb, 1})
    return evaluate_iter(x, b)
+end
+
+###############################################################################
+#
+#   Root bounds
+#
+###############################################################################
+
+doc"""
+    roots_upper_bound(f::arb_poly) -> arb
+
+> Returns an upper bound for the absolute value of all complex roots of $f$.
+"""
+function roots_upper_bound(x::arb_poly)
+   z = base_ring(x)()
+   p = prec(base_ring(x))
+   t = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (Ptr{arb}, ), &z)
+   ccall((:arb_poly_root_bound_fujiwara, :libarb), Void,
+         (Ptr{mag_struct}, Ptr{arb_poly}), t, &x)
+   s = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), &z)
+   ccall((:arf_set_mag, :libarb), Void, (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
+   ccall((:arf_set_round, :libarb), Void,
+         (Ptr{arf_struct}, Ptr{arf_struct}, Int, Cint), s, s, p, ARB_RND_CEIL)
+   ccall((:mag_zero, :libarb), Void, (Ptr{mag_struct},), t)
+   return z
 end
 
 ###############################################################################
