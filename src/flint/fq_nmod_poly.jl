@@ -718,7 +718,7 @@ end
 #
 ################################################################################
 
-promote_rule{V <: Integer}(::Type{fq_nmod_poly}, ::Type{V}) = fq_nmod_poly
+promote_rule(::Type{fq_nmod_poly}, ::Type{V}) where {V <: Integer} = fq_nmod_poly
 
 promote_rule(::Type{fq_nmod_poly}, ::Type{fmpz}) = fq_nmod_poly
 
@@ -778,7 +778,7 @@ function (R::FqNmodPolyRing)(x::Array{fmpz, 1})
    return z
 end
 
-function (R::FqNmodPolyRing){T <: Integer}(x::Array{T, 1})
+function (R::FqNmodPolyRing)(x::Array{T, 1} where {T <: Integer}) 
    length(x) == 0 && error("Array must be non-empty")
    return R(map(fmpz, x))
 end

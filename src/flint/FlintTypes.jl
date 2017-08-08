@@ -10,12 +10,12 @@
 #
 ###############################################################################
 
-type FlintIntegerRing <: Ring
+mutable struct FlintIntegerRing <: Ring
 end
 
 const FlintZZ = FlintIntegerRing()
 
-type fmpz <: RingElem
+mutable struct fmpz <: RingElem
     d::Int
 
     function fmpz()
@@ -63,7 +63,7 @@ function _fmpz_clear_fn(a::fmpz)
    ccall((:fmpz_clear, :libflint), Void, (Ptr{fmpz},), &a)
 end
 
-type fmpz_factor
+mutable struct fmpz_factor
    sign::Cint
    p::Ptr{Void} # Array of fmpz_struct's
    exp::Ptr{UInt}
@@ -89,12 +89,12 @@ end
 #
 ###############################################################################
 
-type FlintRationalField <: FracField{fmpz}
+mutable struct FlintRationalField <: FracField{fmpz}
 end
 
 const FlintQQ = FlintRationalField()
 
-type fmpq <: FracElem{fmpz}
+mutable struct fmpq <: FracElem{fmpz}
    num::Int
    den::Int
 
@@ -153,7 +153,7 @@ _fmpq_clear_fn(a::fmpq) = ccall((:fmpq_clear, :libflint), Void, (Ptr{fmpq},), &a
 #
 ###############################################################################
 
-type FmpzPolyRing <: PolyRing{fmpz}
+mutable struct FmpzPolyRing <: PolyRing{fmpz}
    base_ring::FlintIntegerRing
    S::Symbol
 
@@ -172,7 +172,7 @@ end
 
 const FmpzPolyID = Dict{Symbol, FmpzPolyRing}()
 
-type fmpz_poly <: PolyElem{fmpz}
+mutable struct fmpz_poly <: PolyElem{fmpz}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -228,7 +228,7 @@ function _fmpz_poly_clear_fn(a::fmpz_poly)
    ccall((:fmpz_poly_clear, :libflint), Void, (Ptr{fmpz_poly},), &a)
 end
 
-type fmpz_poly_factor
+mutable struct fmpz_poly_factor
   d::Int # fmpz
   p::Ptr{fmpz_poly} # array of flint fmpz_poly_struct's
   exp::Ptr{Int}
@@ -256,7 +256,7 @@ end
 #
 ###############################################################################
 
-type FmpqPolyRing <: PolyRing{fmpq}
+mutable struct FmpqPolyRing <: PolyRing{fmpq}
    base_ring::FlintRationalField
    S::Symbol
 
@@ -275,7 +275,7 @@ end
 
 const FmpqPolyID = Dict{Symbol, FmpqPolyRing}()
 
-type fmpq_poly <: PolyElem{fmpq}
+mutable struct fmpq_poly <: PolyElem{fmpq}
    coeffs::Ptr{Int}
    den::Int 
    alloc::Int
@@ -356,7 +356,7 @@ end
 #
 ###############################################################################
 
-type NmodPolyRing <: PolyRing{GenRes{fmpz}}
+mutable struct NmodPolyRing <: PolyRing{GenRes{fmpz}}
   base_ring::GenResRing{fmpz}
   S::Symbol
   n::UInt
@@ -377,7 +377,7 @@ end
 
 const NmodPolyRingID = Dict{Tuple{UInt, Symbol}, NmodPolyRing}()
 
-type nmod_poly <: PolyElem{GenRes{fmpz}}
+mutable struct nmod_poly <: PolyElem{GenRes{fmpz}}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -474,7 +474,7 @@ function _nmod_poly_clear_fn(x::nmod_poly)
   ccall((:nmod_poly_clear, :libflint), Void, (Ptr{nmod_poly}, ), &x)
 end
 
-type nmod_poly_factor
+mutable struct nmod_poly_factor
   poly::Ptr{nmod_poly}  # array of flint nmod_poly_struct's
   exp::Ptr{Int} 
   num::Int
@@ -502,7 +502,7 @@ end
 #
 ###############################################################################
 
-type FmpzModPolyRing <: PolyRing{GenRes{fmpz}}
+mutable struct FmpzModPolyRing <: PolyRing{GenRes{fmpz}}
   base_ring::GenResRing{fmpz}
   S::Symbol
   n::fmpz
@@ -523,7 +523,7 @@ end
 
 const FmpzModPolyRingID = Dict{Tuple{fmpz, Symbol}, FmpzModPolyRing}()
 
-type fmpz_mod_poly <: PolyElem{GenRes{fmpz}}
+mutable struct fmpz_mod_poly <: PolyElem{GenRes{fmpz}}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -608,7 +608,7 @@ function _fmpz_mod_poly_clear_fn(x::fmpz_mod_poly)
   ccall((:fmpz_mod_poly_clear, :libflint), Void, (Ptr{fmpz_mod_poly}, ), &x)
 end
 
-type fmpz_mod_poly_factor
+mutable struct fmpz_mod_poly_factor
   poly::Ptr{fmpz_mod_poly}
   exp::Ptr{Int} 
   num::Int
@@ -644,14 +644,14 @@ end
 # T is an Int which is the number of variables
 # (plus one if ordered by total degree)
 
-type FmpzMPolyRing{S, N} <: PolyRing{fmpz}
+mutable struct FmpzMPolyRing{S, N} <: PolyRing{fmpz}
    n::Int
    ord::Cint
    base_ring::FlintIntegerRing
    S::Array{Symbol, 1}
    num_vars::Int
 
-   function FmpzMPolyRing(s::Array{Symbol, 1}, cached::Bool = true)
+   function FmpzMPolyRing{S, N}(s::Array{Symbol, 1}, cached::Bool = true) where {S, N}
       if haskey(FmpzMPolyID, (s, S, N))
          return FmpzMPolyID[s, S, N]
       else 
@@ -663,7 +663,7 @@ type FmpzMPolyRing{S, N} <: PolyRing{fmpz}
             ord = 2
          end
 
-         z = new()
+         z = new{S, N}()
          ccall((:fmpz_mpoly_ctx_init, :libflint), Void,
                (Ptr{FmpzMPolyRing}, Int, Int),
                &z, length(s), ord)
@@ -681,7 +681,7 @@ end
 
 const FmpzMPolyID = Dict{Tuple{Array{Symbol, 1}, Symbol, Int}, PolyRing{fmpz}}()
 
-type fmpz_mpoly{S, N} <: PolyElem{fmpz}
+mutable struct fmpz_mpoly{S, N} <: PolyElem{fmpz}
    coeffs::Ptr{Void}
    exps::Ptr{Void}
    alloc::Int
@@ -689,16 +689,16 @@ type fmpz_mpoly{S, N} <: PolyElem{fmpz}
    bits::Int
    parent::FmpzMPolyRing
 
-   function fmpz_mpoly(ctx::FmpzMPolyRing{S, N})
-      z = new()
+   function fmpz_mpoly(ctx::FmpzMPolyRing{S, N}) where {S, N}
+      z = new{S, N}()
       ccall((:fmpz_mpoly_init, :libflint), Void, 
             (Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing},), &z, &ctx)
       finalizer(z, _fmpz_mpoly_clear_fn)
       return z
    end
    
-   function fmpz_mpoly(ctx::FmpzMPolyRing{S, N}, a::Array{fmpz, 1}, b::Array{NTuple{N, Int}, 1})
-      z = new()
+   function fmpz_mpoly(ctx::FmpzMPolyRing{S, N}, a::Array{fmpz, 1}, b::Array{NTuple{N, Int}, 1}) where {S, N}
+      z = new{S, N}()
       ccall((:fmpz_mpoly_init, :libflint), Void, 
             (Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing},), &z, &ctx)
       m = 0
@@ -733,8 +733,8 @@ type fmpz_mpoly{S, N} <: PolyElem{fmpz}
       return z
    end
 
-   function fmpz_mpoly(ctx::FmpzMPolyRing{S, N}, a::Int)
-      z = new()
+   function fmpz_mpoly(ctx::FmpzMPolyRing{S, N}, a::Int) where {S, N}
+      z = new{S, N}()
       ccall((:fmpz_mpoly_init, :libflint), Void, 
             (Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing},), &z, &ctx)
       ccall((:fmpz_mpoly_set_si, :libflint), Void,
@@ -743,8 +743,8 @@ type fmpz_mpoly{S, N} <: PolyElem{fmpz}
       return z
    end
 
-   function fmpz_mpoly(ctx::FmpzMPolyRing{S, N}, a::fmpz)
-      z = new()
+   function fmpz_mpoly(ctx::FmpzMPolyRing{S, N}, a::fmpz) where {S, N}
+      z = new{S, N}()
       ccall((:fmpz_mpoly_init, :libflint), Void, 
             (Ptr{fmpz_mpoly}, Ptr{FmpzMPolyRing},), &z, &ctx)
       ccall((:fmpz_mpoly_set_fmpz, :libflint), Void,
@@ -770,7 +770,7 @@ end
 #
 ###############################################################################
 
-type FqNmodFiniteField <: FinField
+mutable struct FqNmodFiniteField <: FinField
    p :: Int 
    n :: Int
    ninv :: Int
@@ -835,7 +835,7 @@ function _FqNmodFiniteField_clear_fn(a :: FqNmodFiniteField)
    ccall((:fq_nmod_ctx_clear, :libflint), Void, (Ptr{FqNmodFiniteField},), &a)
 end
 
-type fq_nmod <: FinFieldElem
+mutable struct fq_nmod <: FinFieldElem
    coeffs :: Ptr{Void}
    alloc :: Int
    length :: Int
@@ -894,7 +894,7 @@ end
 #
 ###############################################################################
 
-type FqFiniteField <: FinField
+mutable struct FqFiniteField <: FinField
    p::Int # fmpz
    sparse_modulus::Int
    a::Ptr{Void}
@@ -951,7 +951,7 @@ function _FqFiniteField_clear_fn(a :: FqFiniteField)
    ccall((:fq_ctx_clear, :libflint), Void, (Ptr{FqFiniteField},), &a)
 end
 
-type fq <: FinFieldElem
+mutable struct fq <: FinFieldElem
    coeffs :: Ptr{Void}
    alloc :: Int
    length :: Int
@@ -1012,7 +1012,7 @@ end
 ###############################################################################
 
 
-type FlintPadicField <: Field
+mutable struct FlintPadicField <: Field
    p::Int 
    pinv::Float64
    pow::Ptr{Void}
@@ -1039,7 +1039,7 @@ function _padic_ctx_clear_fn(a::FlintPadicField)
    ccall((:padic_ctx_clear, :libflint), Void, (Ptr{FlintPadicField},), &a)
 end
 
-type padic <: FieldElem
+mutable struct padic <: FieldElem
    u :: Int
    v :: Int
    N :: Int
@@ -1063,7 +1063,7 @@ end
 #
 ###############################################################################
 
-type FmpzRelSeriesRing <: SeriesRing{fmpz}
+mutable struct FmpzRelSeriesRing <: SeriesRing{fmpz}
    base_ring::FlintIntegerRing
    prec_max::Int
    S::Symbol
@@ -1083,7 +1083,7 @@ end
 
 const FmpzRelSeriesID = Dict{Tuple{Int, Symbol}, FmpzRelSeriesRing}()
 
-type fmpz_rel_series <: RelSeriesElem{fmpz}
+mutable struct fmpz_rel_series <: RelSeriesElem{fmpz}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -1133,7 +1133,7 @@ end
 #
 ###############################################################################
 
-type FmpzAbsSeriesRing <: SeriesRing{fmpz}
+mutable struct FmpzAbsSeriesRing <: SeriesRing{fmpz}
    base_ring::FlintIntegerRing
    prec_max::Int
    S::Symbol
@@ -1153,7 +1153,7 @@ end
 
 const FmpzAbsSeriesID = Dict{Tuple{Int, Symbol}, FmpzAbsSeriesRing}()
 
-type fmpz_abs_series <: AbsSeriesElem{fmpz}
+mutable struct fmpz_abs_series <: AbsSeriesElem{fmpz}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -1201,7 +1201,7 @@ end
 #
 ###############################################################################
 
-type FmpqRelSeriesRing <: SeriesRing{fmpq}
+mutable struct FmpqRelSeriesRing <: SeriesRing{fmpq}
    base_ring::FlintRationalField
    prec_max::Int
    S::Symbol
@@ -1221,7 +1221,7 @@ end
 
 const FmpqRelSeriesID = Dict{Tuple{Int, Symbol}, FmpqRelSeriesRing}()
 
-type fmpq_rel_series <: RelSeriesElem{fmpq}
+mutable struct fmpq_rel_series <: RelSeriesElem{fmpq}
    coeffs::Ptr{Void}
    den::Int
    alloc::Int
@@ -1272,7 +1272,7 @@ end
 #
 ###############################################################################
 
-type FmpqAbsSeriesRing <: SeriesRing{fmpq}
+mutable struct FmpqAbsSeriesRing <: SeriesRing{fmpq}
    base_ring::FlintRationalField
    prec_max::Int
    S::Symbol
@@ -1292,7 +1292,7 @@ end
 
 const FmpqAbsSeriesID = Dict{Tuple{Int, Symbol}, FmpqAbsSeriesRing}()
 
-type fmpq_abs_series <: AbsSeriesElem{fmpq}
+mutable struct fmpq_abs_series <: AbsSeriesElem{fmpq}
    coeffs::Ptr{Void}
    den::Int
    alloc::Int
@@ -1341,7 +1341,7 @@ end
 #
 ###############################################################################
 
-type FmpzModRelSeriesRing <: SeriesRing{GenRes{fmpz}}
+mutable struct FmpzModRelSeriesRing <: SeriesRing{GenRes{fmpz}}
    base_ring::GenResRing{fmpz}
    prec_max::Int
    S::Symbol
@@ -1363,7 +1363,7 @@ end
 const FmpzModRelSeriesID = Dict{Tuple{GenResRing{fmpz}, Int, Symbol},
                                 FmpzModRelSeriesRing}()
 
-type fmpz_mod_rel_series <: RelSeriesElem{GenRes{fmpz}}
+mutable struct fmpz_mod_rel_series <: RelSeriesElem{GenRes{fmpz}}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -1430,7 +1430,7 @@ end
 #
 ###############################################################################
 
-type FmpzModAbsSeriesRing <: SeriesRing{GenRes{fmpz}}
+mutable struct FmpzModAbsSeriesRing <: SeriesRing{GenRes{fmpz}}
    base_ring::GenResRing{fmpz}
    prec_max::Int
    S::Symbol
@@ -1452,7 +1452,7 @@ end
 const FmpzModAbsSeriesID = Dict{Tuple{GenResRing{fmpz}, Int, Symbol},
                                 FmpzModAbsSeriesRing}()
 
-type fmpz_mod_abs_series <: AbsSeriesElem{GenRes{fmpz}}
+mutable struct fmpz_mod_abs_series <: AbsSeriesElem{GenRes{fmpz}}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -1516,7 +1516,7 @@ end
 #
 ###############################################################################
 
-type FqRelSeriesRing <: SeriesRing{fq}
+mutable struct FqRelSeriesRing <: SeriesRing{fq}
    base_ring::FqFiniteField
    prec_max::Int
    S::Symbol
@@ -1537,7 +1537,7 @@ end
 
 const FqRelSeriesID = Dict{Tuple{FqFiniteField, Int, Symbol}, FqRelSeriesRing}()
 
-type fq_rel_series <: RelSeriesElem{fq}
+mutable struct fq_rel_series <: RelSeriesElem{fq}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -1591,7 +1591,7 @@ end
 #
 ###############################################################################
 
-type FqAbsSeriesRing <: SeriesRing{fq}
+mutable struct FqAbsSeriesRing <: SeriesRing{fq}
    base_ring::FqFiniteField
    prec_max::Int
    S::Symbol
@@ -1612,7 +1612,7 @@ end
 
 const FqAbsSeriesID = Dict{Tuple{FqFiniteField, Int, Symbol}, FqAbsSeriesRing}()
 
-type fq_abs_series <: AbsSeriesElem{fq}
+mutable struct fq_abs_series <: AbsSeriesElem{fq}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -1664,7 +1664,7 @@ end
 #
 ###############################################################################
 
-type FqNmodRelSeriesRing <: SeriesRing{fq_nmod}
+mutable struct FqNmodRelSeriesRing <: SeriesRing{fq_nmod}
    base_ring::FqNmodFiniteField
    prec_max::Int
    S::Symbol
@@ -1686,7 +1686,7 @@ end
 const FqNmodRelSeriesID = Dict{Tuple{FqNmodFiniteField, Int, Symbol},
                                FqNmodRelSeriesRing}()
 
-type fq_nmod_rel_series <: RelSeriesElem{fq_nmod}
+mutable struct fq_nmod_rel_series <: RelSeriesElem{fq_nmod}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -1740,7 +1740,7 @@ end
 #
 ###############################################################################
 
-type FqNmodAbsSeriesRing <: SeriesRing{fq_nmod}
+mutable struct FqNmodAbsSeriesRing <: SeriesRing{fq_nmod}
    base_ring::FqNmodFiniteField
    prec_max::Int
    S::Symbol
@@ -1762,7 +1762,7 @@ end
 const FqNmodAbsSeriesID = Dict{Tuple{FqNmodFiniteField, Int, Symbol},
                                FqNmodAbsSeriesRing}()
 
-type fq_nmod_abs_series <: AbsSeriesElem{fq_nmod}
+mutable struct fq_nmod_abs_series <: AbsSeriesElem{fq_nmod}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -1815,7 +1815,7 @@ end
 ###############################################################################
 
 # not really a mathematical ring
-type FmpqMatSpace <: MatSpace{fmpq}
+mutable struct FmpqMatSpace <: MatSpace{fmpq}
    rows::Int
    cols::Int
    base_ring::FlintRationalField
@@ -1835,7 +1835,7 @@ end
 
 const FmpqMatID = Dict{Tuple{Int, Int}, FmpqMatSpace}()
 
-type fmpq_mat <: MatElem{fmpq}
+mutable struct fmpq_mat <: MatElem{fmpq}
    entries::Ptr{Void}
    r::Int
    c::Int
@@ -1923,7 +1923,7 @@ type fmpq_mat <: MatElem{fmpq}
    end
 
 
-   function fmpq_mat{T <: Integer}(r::Int, c::Int, arr::Array{T, 2})
+   function fmpq_mat(r::Int, c::Int, arr::Array{T, 2}) where {T <: Integer}
       z = new()
       ccall((:fmpq_mat_init, :libflint), Void, 
             (Ptr{fmpq_mat}, Int, Int), &z, r, c)
@@ -1939,7 +1939,7 @@ type fmpq_mat <: MatElem{fmpq}
       return z
    end
 
-   function fmpq_mat{T <: Integer}(r::Int, c::Int, arr::Array{T, 1})
+   function fmpq_mat(r::Int, c::Int, arr::Array{T, 1}) where {T <: Integer}
       z = new()
       ccall((:fmpq_mat_init, :libflint), Void, 
             (Ptr{fmpq_mat}, Int, Int), &z, r, c)
@@ -1989,7 +1989,7 @@ end
 ###############################################################################
 
 # not really a mathematical ring
-type FmpzMatSpace <: MatSpace{fmpz}
+mutable struct FmpzMatSpace <: MatSpace{fmpz}
    rows::Int
    cols::Int
    base_ring::FlintIntegerRing
@@ -2009,7 +2009,7 @@ end
 
 const FmpzMatID = Dict{Tuple{Int, Int}, FmpzMatSpace}()
 
-type fmpz_mat <: MatElem{fmpz}
+mutable struct fmpz_mat <: MatElem{fmpz}
    entries::Ptr{Void}
    r::Int
    c::Int
@@ -2061,7 +2061,7 @@ type fmpz_mat <: MatElem{fmpz}
       return z
    end
 
-   function fmpz_mat{T <: Integer}(r::Int, c::Int, arr::Array{T, 2})
+   function fmpz_mat(r::Int, c::Int, arr::Array{T, 2}) where {T <: Integer}
       z = new()
       ccall((:fmpz_mat_init, :libflint), Void, 
             (Ptr{fmpz_mat}, Int, Int), &z, r, c)
@@ -2077,7 +2077,7 @@ type fmpz_mat <: MatElem{fmpz}
       return z
    end
 
-   function fmpz_mat{T <: Integer}(r::Int, c::Int, arr::Array{T,1})
+   function fmpz_mat(r::Int, c::Int, arr::Array{T,1}) where {T <: Integer}
       z = new()
       ccall((:fmpz_mat_init, :libflint), Void,
             (Ptr{fmpz_mat}, Int, Int), &z, r, c)
@@ -2126,7 +2126,7 @@ end
 #
 ###############################################################################
 
-type NmodMatSpace <: MatSpace{GenRes{fmpz}}
+mutable struct NmodMatSpace <: MatSpace{GenRes{fmpz}}
   base_ring::GenResRing{fmpz}
   n::UInt
   rows::Int
@@ -2151,7 +2151,7 @@ end
 
 const NmodMatID = Dict{Tuple{GenResRing{fmpz}, Int, Int}, NmodMatSpace}()
 
-function _check_dim{T}(r::Int, c::Int, arr::Array{T, 2}, transpose::Bool = false)
+function _check_dim(r::Int, c::Int, arr::Array{T, 2}, transpose::Bool = false) where {T}
   if !transpose
     size(arr) != (r, c) && throw(ErrorConstrDimMismatch(r, c, size(arr)...))
   else
@@ -2160,12 +2160,12 @@ function _check_dim{T}(r::Int, c::Int, arr::Array{T, 2}, transpose::Bool = false
   return nothing
 end
 
-function _check_dim{T}(r::Int, c::Int, arr::Array{T, 1})
+function _check_dim(r::Int, c::Int, arr::Array{T, 1}) where {T}
   length(arr) != r*c && throw(ErrorConstrDimMismatch(r, c, length(arr)))
   return nothing
 end
 
-type nmod_mat <: MatElem{GenRes{fmpz}}
+mutable struct nmod_mat <: MatElem{GenRes{fmpz}}
   entries::Ptr{Void}
   r::Int                  # Int
   c::Int                  # Int
@@ -2261,12 +2261,12 @@ type nmod_mat <: MatElem{GenRes{fmpz}}
     return z
   end
 
-  function nmod_mat{T <: Integer}(r::Int, c::Int, n::UInt, arr::Array{T, 2}, transpose::Bool = false)
+  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{T, 2}, transpose::Bool = false) where {T <: Integer}
     arr = map(fmpz, arr)
     return nmod_mat(r, c, n, arr, transpose)
   end
 
-  function nmod_mat{T <: Integer}(r::Int, c::Int, n::UInt, arr::Array{T, 1}, transpose::Bool = false)
+  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{T, 1}, transpose::Bool = false) where {T <: Integer}
     arr = map(fmpz, arr)
     return nmod_mat(r, c, n, arr, transpose)
   end
@@ -2342,7 +2342,7 @@ end
 #
 ###############################################################################
 
-type FqPolyRing <: PolyRing{fq}
+mutable struct FqPolyRing <: PolyRing{fq}
    base_ring::FqFiniteField
    S::Symbol
 
@@ -2361,7 +2361,7 @@ end
 
 const FqPolyID = Dict{Tuple{FqFiniteField, Symbol}, FqPolyRing}()
 
-type fq_poly <: PolyElem{fq}
+mutable struct fq_poly <: PolyElem{fq}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -2449,7 +2449,7 @@ function _fq_poly_clear_fn(a::fq_poly)
    ccall((:fq_poly_clear, :libflint), Void, (Ptr{fq_poly},), &a)
 end
 
-type fq_poly_factor
+mutable struct fq_poly_factor
   poly::Ptr{fq_poly}
   exp::Ptr{Int} 
   num::Int
@@ -2478,7 +2478,7 @@ end
 #
 ###############################################################################
 
-type FqNmodPolyRing <: PolyRing{fq_nmod}
+mutable struct FqNmodPolyRing <: PolyRing{fq_nmod}
    base_ring::FqNmodFiniteField
    S::Symbol
 
@@ -2497,7 +2497,7 @@ end
 
 const FqNmodPolyID = Dict{Tuple{FqNmodFiniteField, Symbol}, FqNmodPolyRing}()
 
-type fq_nmod_poly <: PolyElem{fq_nmod}
+mutable struct fq_nmod_poly <: PolyElem{fq_nmod}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -2585,7 +2585,7 @@ function _fq_nmod_poly_clear_fn(a::fq_nmod_poly)
    ccall((:fq_nmod_poly_clear, :libflint), Void, (Ptr{fq_nmod_poly},), &a)
 end
 
-type fq_nmod_poly_factor
+mutable struct fq_nmod_poly_factor
   poly::Ptr{fq_nmod_poly}
   exp::Ptr{Int} 
   num::Int

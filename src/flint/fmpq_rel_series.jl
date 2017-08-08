@@ -992,9 +992,9 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fmpq_rel_series}, ::Type{T}) = fmpq_rel_series
+promote_rule(::Type{fmpq_rel_series}, ::Type{T}) where {T <: Integer} = fmpq_rel_series
 
-promote_rule{T <: Integer}(::Type{fmpq_rel_series}, ::Type{Rational{T}}) = fmpq_rel_series
+promote_rule(::Type{fmpq_rel_series}, ::Type{Rational{T}}) where {T <: Integer} = fmpq_rel_series
 
 promote_rule(::Type{fmpq_rel_series}, ::Type{fmpz}) = fmpq_rel_series
 
@@ -1063,8 +1063,8 @@ end
 (a::FmpqRelSeriesRing)(b::Array{fmpz, 1}, len::Int, prec::Int, val::Int) =
     a(map(fmpq, b), len, prec, val)
 
-(a::FmpqRelSeriesRing){T <: Integer}(b::Array{T, 1}, len::Int, prec::Int, val::Int) =
+(a::FmpqRelSeriesRing)(b::Array{T, 1}, len::Int, prec::Int, val::Int) where {T <: Integer} =
     a(map(fmpq, b), len, prec, val)
     
-(a::FmpqRelSeriesRing){T <: Integer}(b::Array{Rational{T}, 1}, len::Int, prec::Int, val::Int) =
+(a::FmpqRelSeriesRing)(b::Array{Rational{T}, 1}, len::Int, prec::Int, val::Int) where {T <: Integer} =
     a(map(fmpq, b), len, prec, val)

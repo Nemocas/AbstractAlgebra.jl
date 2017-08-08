@@ -48,8 +48,8 @@ end
 function Base.hash(a::fq, h::UInt)
    b = 0xb310fb6ea97e1f1a%UInt
    for i in 1:degree(parent(a)) + 1
-         b $= hash(coeff(a, i), h) $ h
-         b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+      b = xor(b, xor(hash(coeff(a, i), h), h))
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
    return b
 end
@@ -504,7 +504,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fq}, ::Type{T}) = fq
+promote_rule(::Type{fq}, ::Type{T}) where {T <: Integer} = fq
 
 promote_rule(::Type{fq}, ::Type{fmpz}) = fq
 

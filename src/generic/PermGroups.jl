@@ -6,7 +6,7 @@
 
 const PermID = ObjectIdDict()
 
-type PermGroup <: Group
+mutable struct PermGroup <: Group
    n::Int
 
    function PermGroup(n::Int, cached=true)
@@ -22,7 +22,7 @@ type PermGroup <: Group
    end
 end
 
-type perm <: GroupElem
+mutable struct perm <: GroupElem
    d::Array{Int, 1}
    cycles::Vector{Vector{Int}}
    parent::PermGroup
@@ -68,7 +68,7 @@ end
 function Base.hash(a::perm, h::UInt)
    b = 0x595dee0e71d271d0%UInt
    for i in 1:length(a.d)
-      b $= hash(a[i], h) $ h
+      b = xor(b, xor(hash(a[i], h), h))
       b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
    return b
@@ -129,7 +129,7 @@ function show(io::IO, G::PermGroup)
    print(io, "Permutation group over $(G.n) elements")
 end
 
-type PermDisplayStyle
+mutable struct PermDisplayStyle
    format::Symbol
 end
 
@@ -305,7 +305,7 @@ doc"""
 > Returns an iterator over arrays representing all permutations of `1:n`.
 > Similar to `Combinatorics.permutations(1:n)`
 """
-immutable AllPerms
+struct AllPerms
    n::Int
    all::Int
    AllPerms(n::Int) = new(n, factorial(n))

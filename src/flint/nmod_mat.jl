@@ -97,7 +97,7 @@ end
 setindex!(a::nmod_mat, u::Integer, i::Int, j::Int) =
         setindex!(a, fmpz(u), i, j)
 
-setindex_t!{T<:Union{RingElem, Integer}}(a::nmod_mat, u::T, i::Int, j::Int) =
+setindex_t!(a::nmod_mat, u::T, i::Int, j::Int) where {T<:Union{RingElem, Integer}} =
   setindex!(a, u, j, i)
 
 function set_entry!(a::nmod_mat, i::Int, j::Int, u::UInt)
@@ -116,7 +116,7 @@ end
 set_entry!(a::nmod_mat, i::Int, j::Int, u::GenRes{fmpz}) =
         set_entry!(a, i, j, u.data)
 
-set_entry_t!{T<:Union{RingElem, Integer}}(a::nmod_mat, i::Int, j::Int, u::T) =
+set_entry_t!(a::nmod_mat, i::Int, j::Int, u::T) where {T<:Union{RingElem, Integer}} =
   set_entry!(a, j, i, u)
  
 function deepcopy_internal(a::nmod_mat, dict::ObjectIdDict)
@@ -644,7 +644,7 @@ end
 #
 ###############################################################################
 
-promote_rule{V <: Integer}(::Type{nmod_mat}, ::Type{V}) = nmod_mat
+promote_rule(::Type{nmod_mat}, ::Type{V}) where {V <: Integer} = nmod_mat
 
 promote_rule(::Type{nmod_mat}, ::Type{GenRes{fmpz}}) = nmod_mat
 

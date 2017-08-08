@@ -763,9 +763,9 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fmpq_abs_series}, ::Type{T}) = fmpq_abs_series
+promote_rule(::Type{fmpq_abs_series}, ::Type{T}) where {T <: Integer} = fmpq_abs_series
 
-promote_rule{T <: Integer}(::Type{fmpq_abs_series}, ::Type{Rational{T}}) = fmpq_abs_series
+promote_rule(::Type{fmpq_abs_series}, ::Type{Rational{T}}) where {T <: Integer} = fmpq_abs_series
 
 promote_rule(::Type{fmpq_abs_series}, ::Type{fmpz}) = fmpq_abs_series
 

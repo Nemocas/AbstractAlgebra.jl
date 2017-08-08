@@ -9,7 +9,7 @@ doc"""
 > Partition represents integer partition into numbers in non-increasing order.
 > It is a thin wrapper over `Vector{Int}`
 """
-type Partition <: AbstractVector{Int}
+mutable struct Partition <: AbstractVector{Int}
    n::Int
    part::Vector{Int}
 
@@ -25,9 +25,13 @@ type Partition <: AbstractVector{Int}
 end
 
 length(p::Partition) = length(p.part)
+
 size(p::Partition) = size(p.part)
-Base.linearindexing{T<:Partition}(::Type{T}) = Base.LinearFast()
+
+Base.IndexStyle(::Type{T}) where {T <: Partition} = Base.IndexLinear()
+
 getindex(p::Partition, i::Int) = p.part[i]
+
 function setindex!(p::Partition, v::Int, i::Int)
    prev = Inf
    nex = 1
@@ -83,7 +87,7 @@ doc"""
 > Returns an iterator over all integer `Partition`s of `n`. They come in
 > ascending order. See also `Combinatorics.partitions(n)`.
 """
-immutable Partitions
+struct Partitions
     n::Int
 end
 
@@ -237,7 +241,7 @@ doc"""
 > Returns the Young tableaux of partition `part` of `n`, filled linearly
 > (row-major) by `fill` vector.
 """
-immutable YoungTableau <: AbstractArray{Int, 2}
+struct YoungTableau <: AbstractArray{Int, 2}
    part::Partition
    tab::Array{Int,2}
 end
@@ -256,7 +260,9 @@ end
 YoungTableau(p::Vector{Int}) = YoungTableau(Partition(p))
 
 size(Y::YoungTableau) = size(Y.tab)
-Base.linearindexing{T<:YoungTableau}(::Type{T}) = Base.LinearFast()
+
+Base.IndexStyle(::Type{T}) where {T <: YoungTableau} = Base.IndexLinear()
+
 getindex(Y::YoungTableau, i::Int) = Y.tab[i]
 
 function ==(Y1::YoungTableau,Y2::YoungTableau)
@@ -319,7 +325,7 @@ doc"""
 > Implements a skew diagram, i.e. a difference of two Young diagrams
 > represented by partitions `lambda` and `mu`.
 """
-immutable SkewDiagram
+struct SkewDiagram
    lam::Partition
    mu::Partition
 

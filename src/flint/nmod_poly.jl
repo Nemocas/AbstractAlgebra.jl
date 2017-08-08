@@ -53,7 +53,7 @@ function Base.hash(a::nmod_poly, h::UInt)
    b = 0x53dd43cd511044d1%UInt
    for i in 0:length(a) - 1
       u = ccall((:nmod_poly_get_coeff_ui, :libflint), UInt, (Ptr{nmod_poly}, Int), &a, i)
-      b $= hash(u, h) $ h
+      b = xor(b, xor(hash(u, h), h))
       b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
    return b
@@ -808,7 +808,7 @@ function factor_distinct_deg(x::nmod_poly)
   return res
 end
 
-function factor_shape{T <: RingElem}(x::PolyElem{T})
+function factor_shape(x::PolyElem{T}) where {T <: RingElem}
   res = Dict{Int, Int}()
   square_fac = factor_squarefree(x)
   for (f, i) in square_fac
@@ -954,7 +954,7 @@ end
 #
 ################################################################################
 
-promote_rule{V <: Integer}(::Type{nmod_poly}, ::Type{V}) = nmod_poly
+promote_rule(::Type{nmod_poly}, ::Type{V}) where {V <: Integer} = nmod_poly
 
 promote_rule(::Type{nmod_poly}, ::Type{fmpz}) = nmod_poly
 
@@ -1023,7 +1023,7 @@ function (R::NmodPolyRing)(arr::Array{UInt, 1})
   return z
 end
 
-(R::NmodPolyRing){T <: Integer}(arr::Array{T, 1}) = R(map(base_ring(R), arr))
+(R::NmodPolyRing)(arr::Array{T, 1}) where {T <: Integer} = R(map(base_ring(R), arr))
 
 function (R::NmodPolyRing)(arr::Array{GenRes{fmpz}, 1})
   if length(arr) > 0

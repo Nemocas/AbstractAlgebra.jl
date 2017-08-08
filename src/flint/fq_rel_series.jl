@@ -625,7 +625,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fq_rel_series}, ::Type{T}) = fq_rel_series
+promote_rule(::Type{fq_rel_series}, ::Type{T}) where {T <: Integer} = fq_rel_series
 
 promote_rule(::Type{fq_rel_series}, ::Type{fmpz}) = fq_rel_series
 

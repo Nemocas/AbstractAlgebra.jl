@@ -27,11 +27,11 @@ end
 
 promote_rule(T, U) = Union{}
 
-promote_rule{T <: RingElem}(::Type{T}, ::Type{fmpz}) = T
+promote_rule(::Type{T}, ::Type{fmpz}) where {T <: RingElem} = T
 
-promote_rule{T <: RingElem, S <: Integer}(::Type{T}, ::Type{S}) = T
+promote_rule(::Type{T}, ::Type{S}) where {T <: RingElem, S <: Integer} = T
 
-promote_rule1{T <: RingElem, U <: RingElem}(::Type{T}, ::Type{U}) = promote_rule(T, U)
+promote_rule1(::Type{T}, ::Type{U}) where {T <: RingElem, U <: RingElem} = promote_rule(T, U)
 
 ###############################################################################
 #
@@ -39,7 +39,7 @@ promote_rule1{T <: RingElem, U <: RingElem}(::Type{T}, ::Type{U}) = promote_rule
 #
 ###############################################################################
 
-function +{S <: RingElem, T <: RingElem}(x::S, y::T) 
+function +(x::S, y::T) where {S <: RingElem, T <: RingElem}
    T1 = promote_rule(S, T)
    if S == T1
       +(x, parent(x)(y))
@@ -57,7 +57,7 @@ function +{S <: RingElem, T <: RingElem}(x::S, y::T)
    end
 end
 
-function +{S <: RingElem, T <: Integer}(x::S, y::T) 
+function +(x::S, y::T) where {S <: RingElem, T <: Integer}
    T1 = promote_rule(S, T)
    if S == T1
       +(x, parent(x)(y))
@@ -66,7 +66,7 @@ function +{S <: RingElem, T <: Integer}(x::S, y::T)
    end
 end
 
-function +{S <: Integer, T <: RingElem}(x::S, y::T) 
+function +(x::S, y::T) where {S <: Integer, T <: RingElem}
    T1 = promote_rule(T, S)
    if T == T1
       +(parent(y)(x), y)
@@ -75,7 +75,7 @@ function +{S <: Integer, T <: RingElem}(x::S, y::T)
    end
 end
 
-function -{S <: RingElem, T <: RingElem}(x::S, y::T) 
+function -(x::S, y::T) where {S <: RingElem, T <: RingElem}
    T1 = promote_rule(S, T)
    if S == T1
       -(x, parent(x)(y))
@@ -93,7 +93,7 @@ function -{S <: RingElem, T <: RingElem}(x::S, y::T)
    end
 end
 
-function -{S <: RingElem, T <: Integer}(x::S, y::T) 
+function -(x::S, y::T) where {S <: RingElem, T <: Integer}
    T1 = promote_rule(S, T)
    if S == T1
       -(x, parent(x)(y))
@@ -102,7 +102,7 @@ function -{S <: RingElem, T <: Integer}(x::S, y::T)
    end
 end
 
-function -{S <: Integer, T <: RingElem}(x::S, y::T) 
+function -(x::S, y::T) where {S <: Integer, T <: RingElem}
    T1 = promote_rule(T, S)
    if T == T1
       -(parent(y)(x), y)
@@ -111,7 +111,7 @@ function -{S <: Integer, T <: RingElem}(x::S, y::T)
    end
 end
 
-function *{S <: RingElem, T <: RingElem}(x::S, y::T) 
+function *(x::S, y::T) where {S <: RingElem, T <: RingElem}
    T1 = promote_rule(S, T)
    if S == T1
       *(x, parent(x)(y))
@@ -129,7 +129,7 @@ function *{S <: RingElem, T <: RingElem}(x::S, y::T)
    end
 end
 
-function *{S <: RingElem, T <: Integer}(x::S, y::T) 
+function *(x::S, y::T) where {S <: RingElem, T <: Integer}
    T1 = promote_rule(S, T)
    if S == T1
       *(x, parent(x)(y))
@@ -138,7 +138,7 @@ function *{S <: RingElem, T <: Integer}(x::S, y::T)
    end
 end
 
-function *{S <: Integer, T <: RingElem}(x::S, y::T) 
+function *(x::S, y::T) where {S <: Integer, T <: RingElem}
    T1 = promote_rule(T, S)
    if T == T1
       *(parent(y)(x), y)
@@ -147,7 +147,7 @@ function *{S <: Integer, T <: RingElem}(x::S, y::T)
    end
 end
 
-function divexact{S <: RingElem, T <: RingElem}(x::S, y::T) 
+function divexact(x::S, y::T) where {S <: RingElem, T <: RingElem}
    T1 = promote_rule(S, T)
    if S == T1
       divexact(x, parent(x)(y))
@@ -165,7 +165,7 @@ function divexact{S <: RingElem, T <: RingElem}(x::S, y::T)
    end
 end
 
-function divexact{S <: RingElem, T <: Integer}(x::S, y::T) 
+function divexact(x::S, y::T) where {S <: RingElem, T <: Integer}
    T1 = promote_rule(S, T)
    if S == T1
       divexact(x, parent(x)(y))
@@ -174,7 +174,7 @@ function divexact{S <: RingElem, T <: Integer}(x::S, y::T)
    end
 end
 
-function divexact{S <: Integer, T <: RingElem}(x::S, y::T) 
+function divexact(x::S, y::T) where {S <: Integer, T <: RingElem}
    T1 = promote_rule(T, S)
    if T == T1
       divexact(parent(y)(x), y)
@@ -183,12 +183,12 @@ function divexact{S <: Integer, T <: RingElem}(x::S, y::T)
    end
 end
 
-function divides{T <: RingElem}(x::T, y::T)
+function divides(x::T, y::T) where {T <: RingElem}
    q, r = divrem(x, y)
    return iszero(r), q
 end
 
-function =={S <: RingElem, T <: RingElem}(x::S, y::T) 
+function ==(x::S, y::T) where {S <: RingElem, T <: RingElem}
    T1 = promote_rule(S, T)
    if S == T1
       ==(x, parent(x)(y))
@@ -206,7 +206,7 @@ function =={S <: RingElem, T <: RingElem}(x::S, y::T)
    end
 end
 
-function =={S <: RingElem, T <: Integer}(x::S, y::T) 
+function ==(x::S, y::T) where {S <: RingElem, T <: Integer}
    T1 = promote_rule(S, T)
    if S == T1
       ==(x, parent(x)(y))
@@ -215,7 +215,7 @@ function =={S <: RingElem, T <: Integer}(x::S, y::T)
    end
 end
 
-function =={S <: Integer, T <: RingElem}(x::S, y::T) 
+function ==(x::S, y::T) where {S <: Integer, T <: RingElem}
    T1 = promote_rule(T, S)
    if T == T1
       ==(parent(y)(x), y)
@@ -224,7 +224,7 @@ function =={S <: Integer, T <: RingElem}(x::S, y::T)
    end
 end
 
-function addmul!{T <: RingElem}(z::T, x::T, y::T, c::T)
+function addmul!(z::T, x::T, y::T, c::T) where {T <: RingElem}
    c = mul!(c, x, y)
    z = addeq!(z, c)
    return z
@@ -236,7 +236,7 @@ end
 #
 ###############################################################################
 
-function powers{T <: RingElem}(a::T, d::Int)
+function powers(a::T, d::Int) where {T <: RingElem}
    d <= 0 && throw(DomainError())
    S = parent(a)
    A = Array{T}(d + 1)
@@ -258,7 +258,7 @@ end
 #
 ###############################################################################
 
-function exp{T <: RingElem}(a::T)
+function exp(a::T) where {T <: RingElem}
    a != 0 && error("Exponential of nonzero element")
    return one(parent(a))
 end
@@ -269,7 +269,7 @@ end
 #
 ################################################################################
 
-transpose{T <: RingElem}(x::T) = deepcopy(x)
+transpose(x::T) where {T <: RingElem} = deepcopy(x)
 
 ###############################################################################
 #

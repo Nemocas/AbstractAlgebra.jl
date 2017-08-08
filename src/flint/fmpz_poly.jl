@@ -798,7 +798,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fmpz_poly}, ::Type{T}) = fmpz_poly
+promote_rule(::Type{fmpz_poly}, ::Type{T}) where {T <: Integer} = fmpz_poly
 
 promote_rule(::Type{fmpz_poly}, ::Type{fmpz}) = fmpz_poly
 
@@ -838,7 +838,7 @@ function (a::FmpzPolyRing)(b::Array{fmpz, 1})
    return z
 end
 
-(a::FmpzPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(fmpz, b))
+(a::FmpzPolyRing)(b::Array{T, 1}) where {T <: Integer} = a(map(fmpz, b))
 
 (a::FmpzPolyRing)(b::fmpz_poly) = b
 

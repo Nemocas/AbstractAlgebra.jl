@@ -881,7 +881,7 @@ end
 #
 ################################################################################
 
-promote_rule{V <: Integer}(::Type{fmpz_mod_poly}, ::Type{V}) = fmpz_mod_poly
+promote_rule(::Type{fmpz_mod_poly}, ::Type{V}) where {V <: Integer} = fmpz_mod_poly
 
 promote_rule(::Type{fmpz_mod_poly}, ::Type{fmpz}) = fmpz_mod_poly
 
@@ -946,7 +946,7 @@ function (R::FmpzModPolyRing)(arr::Array{GenRes{fmpz}, 1})
   return z
 end
 
-(R::FmpzModPolyRing){T <: Integer}(arr::Array{T, 1}) = R(map(base_ring(R), arr))
+(R::FmpzModPolyRing)(arr::Array{T, 1}) where {T <: Integer} = R(map(base_ring(R), arr))
 
 function (R::FmpzModPolyRing)(x::fmpz_poly)
   z = fmpz_mod_poly(R.n, x)

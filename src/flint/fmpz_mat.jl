@@ -692,7 +692,7 @@ end
 #
 ###############################################################################
 
-type lll_ctx
+mutable struct lll_ctx
    delta::Float64
    eta::Float64
    rep_type::Int
@@ -1163,7 +1163,7 @@ function (a::FmpzMatSpace)(arr::Array{fmpz, 2})
    return z
 end
 
-function (a::FmpzMatSpace){T <: Integer}(arr::Array{T, 2})
+function (a::FmpzMatSpace)(arr::Array{T, 2}) where {T <: Integer}
    _check_dim(a.rows, a.cols, arr)
    z = fmpz_mat(a.rows, a.cols, arr)
    z.base_ring = FlintZZ
@@ -1177,7 +1177,7 @@ function (a::FmpzMatSpace)(arr::Array{fmpz, 1})
    return z
 end
 
-function (a::FmpzMatSpace){T <: Integer}(arr::Array{T, 1})
+function (a::FmpzMatSpace)(arr::Array{T, 1}) where {T <: Integer}
    _check_dim(a.rows, a.cols, arr)
    z = fmpz_mat(a.rows, a.cols, arr)
    z.base_ring = FlintZZ
@@ -1204,7 +1204,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fmpz_mat}, ::Type{T}) = fmpz_mat
+promote_rule(::Type{fmpz_mat}, ::Type{T}) where {T <: Integer} = fmpz_mat
 
 promote_rule(::Type{fmpz_mat}, ::Type{fmpz}) = fmpz_mat
 

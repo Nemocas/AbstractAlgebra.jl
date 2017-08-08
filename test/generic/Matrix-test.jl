@@ -86,7 +86,7 @@ function randelem(R, n)
    return s
 end
 
-function randpolymat{T <: RingElem}(R::GenMatSpace{T}, d::Int)
+function randpolymat(R::GenMatSpace{T}, d::Int) where {T <: RingElem}
    m = R.rows
    n = R.cols
    r = R()
@@ -98,7 +98,7 @@ function randpolymat{T <: RingElem}(R::GenMatSpace{T}, d::Int)
    return r
 end
 
-function randmat{T <: RingElem}(R::GenMatSpace{T}, d::Int, c::Int)
+function randmat(R::GenMatSpace{T}, d::Int, c::Int) where {T <: RingElem}
    m = R.rows
    n = R.cols
    r = R()
@@ -110,7 +110,7 @@ function randmat{T <: RingElem}(R::GenMatSpace{T}, d::Int, c::Int)
    return r
 end
 
-function randmat{T <: RingElem}(S::GenMatSpace{T})
+function randmat(S::GenMatSpace{T}) where {T <: RingElem}
    M = S()
    m = rows(M)
    n = cols(M)
@@ -122,7 +122,7 @@ function randmat{T <: RingElem}(S::GenMatSpace{T})
    return M
 end
 
-function randmat{T <: RingElem}(S::GenMatSpace{T}, c::Int)
+function randmat(S::GenMatSpace{T}, c::Int) where {T <: RingElem}
    M = S()
    m = rows(M)
    n = cols(M)
@@ -134,7 +134,7 @@ function randmat{T <: RingElem}(S::GenMatSpace{T}, c::Int)
    return M
 end
 
-function randmat_triu{T <: RingElem}(R::GenMatSpace{T}, d::Int, c::Int)
+function randmat_triu(R::GenMatSpace{T}, d::Int, c::Int) where {T <: RingElem}
    m = R.rows
    n = R.cols
    r = R()
@@ -152,7 +152,7 @@ function randmat_triu{T <: RingElem}(R::GenMatSpace{T}, d::Int, c::Int)
    return r
 end
 
-function randmat_triu{T <: RingElem}(S::GenMatSpace{T}, c::Int)
+function randmat_triu(S::GenMatSpace{T}, c::Int) where {T <: RingElem}
    M = S()
    m = rows(M)
    n = cols(M)
@@ -170,7 +170,7 @@ function randmat_triu{T <: RingElem}(S::GenMatSpace{T}, c::Int)
    return M
 end
 
-function randmat_with_rank{T <: RingElem}(R::GenMatSpace{T}, d::Int, c::Int, rank::Int)
+function randmat_with_rank(R::GenMatSpace{T}, d::Int, c::Int, rank::Int) where {T <: RingElem}
    m = R.rows
    n = R.cols
    r = R()
@@ -205,7 +205,7 @@ function randmat_with_rank{T <: RingElem}(R::GenMatSpace{T}, d::Int, c::Int, ran
    return r
 end
 
-function randmat_with_rank{T <: RingElem}(S::GenMatSpace{T}, c::Int, rank::Int)
+function randmat_with_rank(S::GenMatSpace{T}, c::Int, rank::Int) where {T <: RingElem}
    M = S()
    m = rows(M)
    n = cols(M)

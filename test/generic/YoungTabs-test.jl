@@ -88,7 +88,7 @@ function test_skewdiags()
    @test Nemo.inskewdiag(SkewDiagram([4,3,1], [2]), 1, 4) == true
 
    @test Nemo.matrix_repr(Partition([1], false)/Partition(Int[], false)) == ones(Int, 1,1)
-   @test Nemo.matrix_repr(xi) == [(Nemo.inskewdiag(xi, i,j)? 1:0) for i in 1:size(xi.lam,1), j in 1:maximum(xi.lam)]
+   @test Nemo.matrix_repr(xi) == [(Nemo.inskewdiag(xi, i,j) ? 1 : 0) for i in 1:size(xi.lam,1), j in 1:maximum(xi.lam)]
 
    @test Nemo.has_left_neighbor(xi, 1, 5) == true
    @test Nemo.has_left_neighbor(xi, 1, 3) == false
