@@ -114,9 +114,9 @@ function _hash_integer(a::Int, h::UInt)
    d = convert(Ptr{Ptr{UInt}}, unsigned(a) << 2) + 2*sizeof(Cint)
    p = unsafe_load(d)
    b = unsafe_load(p)
-   h = Base.hash_uint(ifelse(s < 0, -b, b) $ h) $ h
+   h = xor(Base.hash_uint(xor(ifelse(s < 0, -b, b), h)), h)
    for k = 2:abs(s)
-      h = Base.hash_uint(unsafe_load(p, k) $ h) $ h
+      h = xor(Base.hash_uint(xor(unsafe_load(p, k), h)), h)
    end
    return h
 end
@@ -1576,6 +1576,6 @@ convert(::Type{Float16}, n::fmpz) = Float16(Float64(n))
 
 convert(::Type{BigFloat}, n::fmpz) = BigFloat(BigInt(n))
 
-Base.promote_rule{T <: Integer}(::Type{fmpz}, ::Type{T}) = fmpz
+Base.promote_rule(::Type{fmpz}, ::Type{T}) where {T <: Integer} = fmpz
 
-promote_rule{T <: Integer}(::Type{fmpz}, ::Type{T}) = fmpz
+promote_rule(::Type{fmpz}, ::Type{T}) where {T <: Integer} = fmpz

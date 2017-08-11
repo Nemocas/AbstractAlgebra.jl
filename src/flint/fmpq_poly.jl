@@ -732,13 +732,13 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fmpq_poly}, ::Type{T}) = fmpq_poly
+promote_rule(::Type{fmpq_poly}, ::Type{T}) where {T <: Integer} = fmpq_poly
 
 promote_rule(::Type{fmpq_poly}, ::Type{fmpz}) = fmpq_poly
 
 promote_rule(::Type{fmpq_poly}, ::Type{fmpq}) = fmpq_poly
 
-promote_rule{T <: Integer}(::Type{fmpq_poly}, ::Type{Rational{T}}) = fmpq_poly
+promote_rule(::Type{fmpq_poly}, ::Type{Rational{T}}) where {T <: Integer} = fmpq_poly
 
 ###############################################################################
 #
@@ -794,9 +794,9 @@ end
 
 (a::FmpqPolyRing)(b::Rational) = a(fmpq(b))
 
-(a::FmpqPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(fmpq, b))
+(a::FmpqPolyRing)(b::Array{T, 1}) where {T <: Integer} = a(map(fmpq, b))
 
-(a::FmpqPolyRing){T <: Integer}(b::Array{Rational{T}, 1}) = a(map(fmpq, b))
+(a::FmpqPolyRing)(b::Array{Rational{T}, 1}) where {T <: Integer} = a(map(fmpq, b))
 
 (a::FmpqPolyRing)(b::Array{fmpz, 1}) = a(map(fmpq, b))
 

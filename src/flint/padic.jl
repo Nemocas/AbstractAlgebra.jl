@@ -98,7 +98,7 @@ parent_type(::Type{padic}) = FlintPadicField
 ###############################################################################
 
 function Base.hash(a::padic, h::UInt)
-   return hash(lift(FlintQQ, a), h) $ hash(prime(parent(a)), h) $ h
+   return xor(hash(lift(FlintQQ, a), h), xor(hash(prime(parent(a)), h), h))
 end
 
 doc"""
@@ -618,7 +618,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T<:Integer}(::Type{padic}, ::Type{T}) = padic
+promote_rule(::Type{padic}, ::Type{T}) where {T <: Integer} = padic
 
 promote_rule(::Type{padic}, ::Type{fmpz}) = padic
 

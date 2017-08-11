@@ -531,7 +531,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fmpz_mod_abs_series}, ::Type{T}) = fmpz_mod_abs_series
+promote_rule(::Type{fmpz_mod_abs_series}, ::Type{T}) where {T <: Integer} = fmpz_mod_abs_series
 
 promote_rule(::Type{fmpz_mod_abs_series}, ::Type{fmpz}) = fmpz_mod_abs_series
 

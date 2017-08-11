@@ -273,17 +273,17 @@ for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, fmpz_poly, fmpq_poly]
    end
 end
 
-+{T <: Integer}(x::arb_poly, y::Rational{T}) = x + parent(x)(y)
++(x::arb_poly, y::Rational{T}) where {T <: Integer} = x + parent(x)(y)
 
-+{T <: Integer}(x::Rational{T}, y::arb_poly) = y + x
++(x::Rational{T}, y::arb_poly) where {T <: Integer} = y + x
 
--{T <: Integer}(x::arb_poly, y::Rational{T}) = x - parent(x)(y)
+-(x::arb_poly, y::Rational{T}) where {T <: Integer} = x - parent(x)(y)
 
--{T <: Integer}(x::Rational{T}, y::arb_poly) = parent(y)(x) - y
+-(x::Rational{T}, y::arb_poly) where {T <: Integer} = parent(y)(x) - y
 
-*{T <: Integer}(x::arb_poly, y::Rational{T}) = x * parent(x)(y)
+*(x::arb_poly, y::Rational{T}) where {T <: Integer} = x * parent(x)(y)
 
-*{T <: Integer}(x::Rational{T}, y::arb_poly) = y * x
+*(x::Rational{T}, y::arb_poly) where {T <: Integer} = y * x
 
 ###############################################################################
 #
@@ -299,9 +299,9 @@ for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb]
    end
 end
 
-divexact{T <: Integer}(x::arb_poly, y::Rational{T}) = x * inv(base_ring(parent(x))(y))
+divexact(x::arb_poly, y::Rational{T}) where {T <: Integer} = x * inv(base_ring(parent(x))(y))
 
-//{T <: Integer}(x::arb_poly, y::Rational{T}) = divexact(x, y)
+//(x::arb_poly, y::Rational{T}) where {T <: Integer} = divexact(x, y)
 
 ###############################################################################
 #
@@ -679,9 +679,9 @@ promote_rule(::Type{arb_poly}, ::Type{fmpz_poly}) = arb_poly
 
 promote_rule(::Type{arb_poly}, ::Type{fmpq_poly}) = arb_poly
 
-promote_rule{T <: Integer}(::Type{arb_poly}, ::Type{T}) = arb_poly
+promote_rule(::Type{arb_poly}, ::Type{T}) where {T <: Integer} = arb_poly
 
-promote_rule{T <: Integer}(::Type{arb_poly}, ::Type{Rational{T}}) = arb_poly
+promote_rule(::Type{arb_poly}, ::Type{Rational{T}}) where {T <: Integer} = arb_poly
 
 ################################################################################
 #
@@ -705,7 +705,7 @@ for T in [Integer, fmpz, fmpq, Float64, arb, BigFloat]
    end
 end
 
-function (a::ArbPolyRing){T <: Integer}(b::Rational{T})
+function (a::ArbPolyRing)(b::Rational{T}) where {T <: Integer}
    z = arb_poly(base_ring(a)(b), a.base_ring.prec)
    z.parent = a
    return z
@@ -723,9 +723,9 @@ for T in [fmpz, fmpq, Float64, BigFloat]
    end
 end
 
-(a::ArbPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(base_ring(a), b))
+(a::ArbPolyRing)(b::Array{T, 1}) where {T <: Integer} = a(map(base_ring(a), b))
 
-(a::ArbPolyRing){T <: Integer}(b::Array{Rational{T}, 1}) = a(map(base_ring(a), b))
+(a::ArbPolyRing)(b::Array{Rational{T}, 1}) where {T <: Integer} = a(map(base_ring(a), b))
 
 function (a::ArbPolyRing)(b::fmpz_poly)
    z = arb_poly(b, a.base_ring.prec)

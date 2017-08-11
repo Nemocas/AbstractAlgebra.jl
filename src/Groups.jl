@@ -16,4 +16,4 @@ include("Rings.jl")
 #
 ################################################################################
 
-elem_type{T <: Group}(::T) = elem_type(T)
+elem_type(::T) where {T <: Group} = elem_type(T)

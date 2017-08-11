@@ -18,9 +18,9 @@ include("arb/arb.jl")
 
 include("arb/acb.jl")
 
-//{T <: FieldElem}(a::T, b::T) = divexact(a, b)
+//(a::T, b::T) where {T <: FieldElem} = divexact(a, b)
 
-function gcd{T <: FieldElem}(x::T, y::T)
+function gcd(x::T, y::T) where {T <: FieldElem}
    check_parent(x, y)
    return iszero(x) && iszero(y) ? zero(parent(y)) : one(parent(y))
 end

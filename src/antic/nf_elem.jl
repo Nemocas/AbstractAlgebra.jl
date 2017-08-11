@@ -63,7 +63,7 @@ function hash(a::nf_elem, h::UInt)
    b = hash(d, b)
    for i in 1:degree(parent(a)) + 1
          num_coeff!(d, a, i)
-         b $= hash(d, h) $ h
+         b = xor(b, xor(hash(d, h), h))
          b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
    return b
@@ -881,7 +881,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{nf_elem}, ::Type{T}) = nf_elem
+promote_rule(::Type{nf_elem}, ::Type{T}) where {T <: Integer} = nf_elem
 
 promote_rule(::Type{nf_elem}, ::Type{fmpz}) = nf_elem
 

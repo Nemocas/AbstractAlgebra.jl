@@ -282,17 +282,17 @@ for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb, fmpz_poly, fmpq_poly
    end
 end
 
-+{T <: Integer}(x::acb_poly, y::Rational{T}) = x + parent(x)(y)
++(x::acb_poly, y::Rational{T}) where {T <: Integer} = x + parent(x)(y)
 
-+{T <: Integer}(x::Rational{T}, y::acb_poly) = y + x
++(x::Rational{T}, y::acb_poly) where {T <: Integer} = y + x
 
--{T <: Integer}(x::acb_poly, y::Rational{T}) = x - parent(x)(y)
+-(x::acb_poly, y::Rational{T}) where {T <: Integer} = x - parent(x)(y)
 
--{T <: Integer}(x::Rational{T}, y::acb_poly) = parent(y)(x) - y
+-(x::Rational{T}, y::acb_poly) where {T <: Integer} = parent(y)(x) - y
 
-*{T <: Integer}(x::acb_poly, y::Rational{T}) = x * parent(x)(y)
+*(x::acb_poly, y::Rational{T}) where {T <: Integer} = x * parent(x)(y)
 
-*{T <: Integer}(x::Rational{T}, y::acb_poly) = y * x
+*(x::Rational{T}, y::acb_poly) where {T <: Integer} = y * x
 
 ###############################################################################
 #
@@ -308,9 +308,9 @@ for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb]
    end
 end
 
-divexact{T <: Integer}(x::acb_poly, y::Rational{T}) = x * inv(base_ring(parent(x))(y))
+divexact(x::acb_poly, y::Rational{T}) where {T <: Integer} = x * inv(base_ring(parent(x))(y))
 
-//{T <: Integer}(x::acb_poly, y::Rational{T}) = divexact(x, y)
+//(x::acb_poly, y::Rational{T}) where {T <: Integer} = divexact(x, y)
 
 ###############################################################################
 #
@@ -768,9 +768,9 @@ promote_rule(::Type{acb_poly}, ::Type{Float64}) = acb_poly
 
 promote_rule(::Type{acb_poly}, ::Type{Complex{Float64}}) = acb_poly
 
-promote_rule{T <: Integer}(::Type{acb_poly}, ::Type{T}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{T}) where {T <: Integer} = acb_poly
 
-promote_rule{T <: Integer}(::Type{acb_poly}, ::Type{Rational{T}}) = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{Rational{T}}) where {T <: Integer} = acb_poly
 
 promote_rule(::Type{acb_poly}, ::Type{Complex{Int}}) = acb_poly
 
@@ -811,7 +811,7 @@ for T in [Integer, fmpz, fmpq, Float64, Complex{Float64},
   end
 end
 
-(a::AcbPolyRing){T <: Integer}(b::Rational{T}) = a(fmpq(b))
+(a::AcbPolyRing)(b::Rational{T}) where {T <: Integer} = a(fmpq(b))
 
 function (a::AcbPolyRing)(b::Array{acb, 1})
    z = acb_poly(b, a.base_ring.prec)
@@ -825,9 +825,9 @@ for T in [fmpz, fmpq, Float64, Complex{Float64}, Complex{Int}, arb]
   end
 end
 
-(a::AcbPolyRing){T <: Integer}(b::Array{T, 1}) = a(map(base_ring(a), b))
+(a::AcbPolyRing)(b::Array{T, 1}) where {T <: Integer} = a(map(base_ring(a), b))
 
-(a::AcbPolyRing){T <: Integer}(b::Array{Rational{T}, 1}) = a(map(base_ring(a), b))
+(a::AcbPolyRing)(b::Array{Rational{T}, 1}) where {T <: Integer} = a(map(base_ring(a), b))
 
 function (a::AcbPolyRing)(b::fmpz_poly)
    z = acb_poly(b, a.base_ring.prec)

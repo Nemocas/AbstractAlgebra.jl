@@ -17,7 +17,7 @@ import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
 
 import Base: floor, ceil, hypot, sqrt, log, log1p, exp, expm1, sin, cos, sinpi,
              cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
-             asinh, acosh, gamma, lgamma, digamma, zeta, sinpi, cospi, atan2
+             asinh, acosh, gamma, lgamma, sinpi, cospi, atan2
 
 export elem_type, parent_type
 
@@ -212,13 +212,13 @@ end
 #
 ###############################################################################
 
-type AccessorNotSetError <: Exception
+mutable struct AccessorNotSetError <: Exception
 end
 
 function create_accessors(T, S, handle)
    get = function(a)
       if handle > length(a.auxilliary_data) || 
-         !isdefined(a.auxilliary_data, handle)
+         !isassigned(a.auxilliary_data, handle)
         throw(AccessorNotSetError())
       end
       return a.auxilliary_data[handle]
@@ -240,7 +240,7 @@ end
 
 if VERSION >= v"0.5.0-dev+3171"
 
-function sig_exists{U, V, W, X}(T::Type{Tuple{U, V, W}}, sig_table::Array{X, 1})
+function sig_exists(T::Type{Tuple{U, V, W}}, sig_table::Array{X, 1}) where {U, V, W, X}
    for s in sig_table
       if s === T
          return true
@@ -251,7 +251,7 @@ end
 
 else
 
-function sig_exists{U, V, W, X}(T::Type{Tuple{U, V, W}}, sig_table::Array{X, 1})
+function sig_exists(T::Type{Tuple{U, V, W}}, sig_table::Array{X, 1}) where {U, V, W, X}
    return false
 end
 
@@ -318,7 +318,7 @@ MaximalRealSubfield = AnticMaximalRealSubfield
 #
 ###############################################################################
 
-type ErrorConstrDimMismatch <: Exception
+mutable struct ErrorConstrDimMismatch <: Exception
   expect_r::Int
   expect_c::Int
   get_r::Int
@@ -335,12 +335,12 @@ type ErrorConstrDimMismatch <: Exception
     return e
   end
 
-  function ErrorConstrDimMismatch{T}(er::Int, ec::Int, a::Array{T, 2})
+  function ErrorConstrDimMismatch(er::Int, ec::Int, a::Array{T, 2}) where {T}
     gr, gc = size(a)
     return ErrorConstrDimMismatch(er, ec, gr, gc)
   end
 
-  function ErrorConstrDimMismatch{T}(er::Int, ec::Int, a::Array{T, 1})
+  function ErrorConstrDimMismatch(er::Int, ec::Int, a::Array{T, 1}) where {T}
     gl = length(a)
     return ErrorConstrDimMismatch(er, ec, gl)
   end

@@ -504,7 +504,7 @@ end
 #
 ###############################################################################
 
-promote_rule{T <: Integer}(::Type{fq_nmod_abs_series}, ::Type{T}) = fq_nmod_abs_series
+promote_rule(::Type{fq_nmod_abs_series}, ::Type{T}) where {T <: Integer} = fq_nmod_abs_series
 
 promote_rule(::Type{fq_nmod_abs_series}, ::Type{fq_nmod}) = fq_nmod_abs_series
 
