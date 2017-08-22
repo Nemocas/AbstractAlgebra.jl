@@ -7,6 +7,10 @@ ZZ = Nemo.ZZ
 QQ = Nemo.QQ
 FiniteField = Nemo.FiniteField
 PadicField = Nemo.PadicField
+NumberField = Nemo.NumberField
+CyclotomicField = Nemo.CyclotomicField
+MaximalRealSubfield = Nemo.MaximalRealSubfield
+PermutationGroup = Nemo.PermutationGroup
 
 function test_all()
    test_groups()
