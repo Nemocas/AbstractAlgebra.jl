@@ -28,8 +28,7 @@ export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
 
 export PolyRing, SeriesRing, AbsSeriesRing, ResRing, FracField, MatSpace, FinField
 
-export ZZ, QQ, PadicField, FiniteField, NumberField, CyclotomicField,
-       MaximalRealSubfield, PermutationGroup
+export NumberField, CyclotomicField, MaximalRealSubfield, PermutationGroup
 
 export RealField, ComplexField
 
