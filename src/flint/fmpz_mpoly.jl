@@ -432,32 +432,32 @@ promote_rule(::Type{fmpz_mpoly}, ::Type{fmpz}) = fmpz_mpoly
 #
 ###############################################################################
 
-function Base.call{S, N}(R::FmpzMPolyRing{S, N})
-   z = fmpz_mpoly{S, N}(R)
+function (R::FmpzMPolyRing{S, N}){S, N}()
+   z = fmpz_mpoly(R)
    z.parent = R
    return z
 end
 
-function Base.call{S, N}(R::FmpzMPolyRing{S, N}, b::Int)
-   z = fmpz_mpoly{S, N}(R, b)
+function (R::FmpzMPolyRing{S, N}){S, N}(b::Int)
+   z = fmpz_mpoly(R, b)
    z.parent = R
    return z
 end
 
-function Base.call{S, N}(R::FmpzMPolyRing{S, N}, b::fmpz)
-   z = fmpz_mpoly{S, N}(R, b)
+function (R::FmpzMPolyRing{S, N}){S, N}(b::fmpz)
+   z = fmpz_mpoly(R, b)
    z.parent = R
    return z
 end
 
-function Base.call{S, N}(R::FmpzMPolyRing{S, N}, b::Integer)
-   z = fmpz_mpoly{S, N}(R, fmpz(b))
+function (R::FmpzMPolyRing{S, N}){S, N}(b::Integer)
+   z = fmpz_mpoly(R, fmpz(b))
    z.parent = R
    return z
 end
 
-function Base.call{S, N}(R::FmpzMPolyRing{S, N}, a::Array{fmpz, 1}, b::Array{NTuple{N, Int}, 1})
-   z = fmpz_mpoly{S, N}(R, a, b)
+function (R::FmpzMPolyRing{S, N}){S, N}(a::Array{fmpz, 1}, b::Array{NTuple{N, Int}, 1})
+   z = fmpz_mpoly(R, a, b)
    z.parent = R
    return z
 end
