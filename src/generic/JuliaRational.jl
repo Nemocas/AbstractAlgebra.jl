@@ -16,7 +16,7 @@ qq = Rationals{Int}()
 
 parent(a::Rational{T}) where T <: Union{Int, BigInt} = Rationals{T}()
 
-elem_type(::Type{Rationals{T}}) where T <: Union{Int, BigInt} = Rational{T}
+elem_type(::Rationals{T}) where T <: Union{Int, BigInt} = Rational{T}
   
 parent_type(::Type{Rational{T}}) where T <: Union{Int, BigInt} = Rationals{T}
 
@@ -34,6 +34,10 @@ base_ring(a::Rationals{BigInt}) = JuliaZZ
 #
 ###############################################################################
 
+zero(::Rationals{T}) where T <: Union{Int, BigInt} = Rational{T}(0)
+
+one(::Rationals{T}) where T <: Union{Int, BigInt} = Rational{T}(1)
+
 isone(a::Rational{T}) where T <: Union{Int, BigInt} = a == 1
 
 ###############################################################################
@@ -50,6 +54,22 @@ end
 needs_parentheses(::Rational{T}) where T <: Union{Int, BigInt} = false
 
 isnegative(a::Rational{T}) where T <: Union{Int, BigInt} = a < 0
+
+###############################################################################
+#
+#   Exact division
+#
+###############################################################################
+
+divexact(a::Rational{Int}, b::Int) = a//b
+
+divexact(a::Rational{Int}, b::Rational{Int}) = a//b
+
+divexact(a::Rational{BigInt}, b::Int) = a//b
+
+divexact(a::Rational{BigInt}, b::BigInt) = a//b
+
+divexact(a::Rational{BigInt}, b::Rational{BigInt}) = a//b
 
 ###############################################################################
 #
@@ -101,6 +121,10 @@ end
 
 function (R::Rationals{BigInt})(b::BigInt)
    return Rational{BigInt}(b)
+end
+
+function (R::Rationals{BigInt})(b::Rational{BigInt})
+   return b
 end
 
 ###############################################################################

@@ -14,7 +14,7 @@ JuliaZZ = Integers()
 
 parent(a::BigInt) = JuliaZZ
 
-elem_type(::Type{Integers}) = BigInt
+elem_type(::Integers) = BigInt
  
 parent_type(::Type{BigInt}) = Integers
 
@@ -27,6 +27,10 @@ base_ring(a::Integers) = Union{}
 #   Basic manipulation
 #
 ###############################################################################
+
+zero(::Integers) = BigInt(0)
+
+one(::Integers) = BigInt(1)
 
 isone(a::BigInt) = a == 1
 
@@ -43,6 +47,16 @@ end
 needs_parentheses(::BigInt) = false
 
 isnegative(a::BigInt) = a < 0
+
+###############################################################################
+#
+#   Exact division
+#
+###############################################################################
+
+divexact(a::BigInt, b::Int) = div(a, b)
+
+divexact(a::BigInt, b::BigInt) = div(a, b)
 
 ###############################################################################
 #
@@ -82,7 +96,7 @@ end
 ###############################################################################
 
 function (a::Integers)()
-   return 0
+   return BigInt(0)
 end
 
 function (a::Integers)(b::Int)

@@ -82,3 +82,4 @@ abstract type FinField <: Field end    # for fq, fq_nmod, etc
 # collections of types as needed by applications
 
 abstract type FinFieldElem <: FieldElem end # for fq, fq_nmod, etc
+

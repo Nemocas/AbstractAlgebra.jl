@@ -33,15 +33,29 @@ end
 
 ###############################################################################
 #
+#   Unions of Nemo abstract types and Julia types
+#
+###############################################################################
+
+const RingParent = Union{Ring, Integers, MachineIntegers, Rationals{Int}, Rationals{BigInt}}
+
+const RingElement = Union{RingElem, Int, BigInt, Rational{Int}, Rational{BigInt}}
+
+const FieldParent = Union{Field, Rationals{Int}, Rationals{BigInt}}
+
+const FieldElement = Union{FieldElem, Rational{Int}, Rational{BigInt}}
+
+###############################################################################
+#
 #   GenPolyRing / GenPoly
 #
 ###############################################################################
 
-mutable struct GenPolyRing{T <: RingElem} <: PolyRing{T}
-   base_ring::Ring
+mutable struct GenPolyRing{T <: RingElement} <: PolyRing{T}
+   base_ring::RingParent
    S::Symbol
 
-   function GenPolyRing{T}(R::Ring, s::Symbol, cached::Bool = true) where {T}
+   function GenPolyRing{T}(R::RingParent, s::Symbol, cached::Bool = true) where {T}
       if haskey(GenPolyID, (R, s))
          return GenPolyID[R, s]::GenPolyRing{T}
       else 
@@ -54,9 +68,9 @@ mutable struct GenPolyRing{T <: RingElem} <: PolyRing{T}
    end
 end
 
-const GenPolyID = Dict{Tuple{Ring, Symbol}, Ring}()
+const GenPolyID = Dict{Tuple{RingParent, Symbol}, Ring}()
 
-mutable struct GenPoly{T <: RingElem} <: PolyElem{T}
+mutable struct GenPoly{T <: RingElement} <: PolyElem{T}
    coeffs::Array{T, 1}
    length::Int
    parent::GenPolyRing{T}
@@ -339,4 +353,3 @@ mutable struct GenMat{T <: RingElem} <: MatElem{T}
 
    GenMat{T}(a::Array{T, 2}) where {T} = new{T}(a) 
 end
-

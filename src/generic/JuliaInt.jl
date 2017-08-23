@@ -14,7 +14,7 @@ zz = MachineIntegers()
 
 parent(a::Int) = zz
 
-elem_type(::Type{MachineIntegers}) = Int
+elem_type(::MachineIntegers) = Int
  
 parent_type(::Type{Int}) = MachineIntegers
 
@@ -27,6 +27,10 @@ base_ring(a::MachineIntegers) = Union{}
 #   Basic manipulation
 #
 ###############################################################################
+
+zero(::MachineIntegers) = 0
+
+one(::MachineIntegers) = 1
 
 isone(a::Int) = a == 1
 
@@ -43,6 +47,14 @@ end
 needs_parentheses(::Int) = false
 
 isnegative(a::Int) = a < 0
+
+###############################################################################
+#
+#   Exact division
+#
+###############################################################################
+
+divexact(a::Int, b::Int) = div(a, b)
 
 ###############################################################################
 #
