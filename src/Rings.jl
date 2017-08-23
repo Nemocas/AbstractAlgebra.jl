@@ -281,6 +281,8 @@ include("generic/JuliaInt.jl")
 
 include("generic/JuliaBigInt.jl")
 
+include("generic/JuliaRational.jl")
+
 include("flint/fmpz.jl")
 
 include("generic/Residue.jl")
