@@ -50,8 +50,16 @@ isnegative(a::Int) = a < 0
 #
 ###############################################################################
 
+function zero!(a::Int)
+   return 0
+end
+
 function mul!(a::Int, b::Int, c::Int)
    return b*c
+end
+
+function add!(a::Int, b::Int, c::Int)
+   return b + c
 end
 
 function addeq!(a::Int, b::Int)

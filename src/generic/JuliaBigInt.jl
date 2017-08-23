@@ -50,6 +50,11 @@ isnegative(a::BigInt) = a < 0
 #
 ###############################################################################
 
+function zero!(a::BigInt)
+   ccall((:__gmpz_set_si, :libgmp), Void, (Ptr{BigInt}, Int), &a, 0)
+   return a
+end
+
 function mul!(a::BigInt, b::BigInt, c::BigInt)
    ccall((:__gmpz_mul, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &b, &c)
    return a
@@ -57,6 +62,11 @@ end
 
 function addeq!(a::BigInt, b::BigInt)
    ccall((:__gmpz_add, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &a, &b)
+   return a
+end
+
+function add!(a::BigInt, b::BigInt, c::BigInt)
+   ccall((:__gmpz_add, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &b, &c)
    return a
 end
 
