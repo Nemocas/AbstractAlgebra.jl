@@ -34,6 +34,8 @@ one(::Integers) = BigInt(1)
 
 isone(a::BigInt) = a == 1
 
+canonical_unit(a::BigInt) = a < 0 ? BigInt(-1) : BigInt(1)
+
 ###############################################################################
 #
 #   String I/O
@@ -47,6 +49,19 @@ end
 needs_parentheses(::BigInt) = false
 
 isnegative(a::BigInt) = a < 0
+
+show_minus_one(::Type{BigInt}) = false
+
+###############################################################################
+#
+#   Divides
+#
+###############################################################################
+
+function divides(a::BigInt, b::BigInt)
+   q, r = divrem(a, b)
+   return r == 0, q
+end
 
 ###############################################################################
 #
@@ -87,6 +102,21 @@ end
 function addmul!(a::BigInt, b::BigInt, c::BigInt, d::BigInt)
    ccall((:__gmpz_addmul, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &b, &c)
    return a
+end
+
+function addmul!(a::BigInt, b::BigInt, c::BigInt) # special case, no temporary required
+   ccall((:__gmpz_addmul, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &b, &c)
+   return a
+end
+
+###############################################################################
+#
+#   Random generation
+#
+###############################################################################
+
+function rand(R::Integers, n::UnitRange{Int})
+   return R(rand(n))
 end
 
 ###############################################################################

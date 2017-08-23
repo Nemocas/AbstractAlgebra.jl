@@ -558,6 +558,21 @@ function *(a::T, b::PolyElem{T}) where {T <: RingElem}
 end
 
 doc"""
+    *{T <: Union{BigInt, Int}(a::Rational{T}, b::PolyElem{Rational{T}})
+> Return $a\times b$.
+"""
+function *(a::Rational{T}, b::PolyElem{Rational{T}})  where T <: Union{BigInt, Int}
+   len = length(b)
+   z = parent(b)()
+   fit!(z, len)
+   for i = 1:len
+      z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
+   end
+   set_length!(z, normalise(z, len))
+   return z
+end
+
+doc"""
     *(a::Integer, b::PolyElem)
 > Return $a\times b$.
 """
@@ -594,6 +609,12 @@ doc"""
 *(a::PolyElem{T}, b::T) where {T <: RingElem} = b*a
 
 doc"""
+    *{T <: Union{BigInt, Int}(a::PolyElem{Rational{T}}, b::Rational{T})
+> Return $a\times b$.
+"""
+*(a::PolyElem{Rational{T}}, b::Rational{T}) where T <: Union{BigInt, Int} = b*a
+
+doc"""
     *(a::PolyElem, b::Integer)
 > Return $a\times b$.
 """
@@ -612,6 +633,12 @@ doc"""
 +(a::Integer, b::PolyElem) = parent(b)(a) + b
 
 doc"""
+    +{T <: Union{Int, BigInt}}(a::Rational{T}, b::PolyElem{T})
+> Return $a + b$.
+"""
++(a::Rational{T}, b::PolyElem{Rational{T}}) where T <: Union{Int, BigInt} = parent(b)(a) + b
+
+doc"""
     +(a::fmpz, b::PolyElem)
 > Return $a + b$.
 """
@@ -622,6 +649,12 @@ doc"""
 > Return $a + b$.
 """
 +(a::PolyElem, b::Integer) = b + a
+
+doc"""
+    +{T <: Union{Int, BigInt}}(a::PolyElem{T}, b::Rational{T})
+> Return $a + b$.
+"""
++(a::PolyElem{Rational{T}}, b::Rational{T}) where T <: Union{Int, BigInt} = parent(a)(b) + a
 
 doc"""
     +(a::PolyElem, b::fmpz)
@@ -636,6 +669,12 @@ doc"""
 -(a::Integer, b::PolyElem) = parent(b)(a) - b
 
 doc"""
+    -{T <: Union{Int, BigInt}}(a::Rational{T}, b::PolyElem{T})
+> Return $a - b$.
+"""
+-(a::Rational{T}, b::PolyElem{Rational{T}}) where T <: Union{Int, BigInt} = parent(b)(a) - b
+
+doc"""
     -(a::fmpz, b::PolyElem)
 > Return $a - b$.
 """
@@ -646,6 +685,12 @@ doc"""
 > Return $a - b$.
 """
 -(a::PolyElem, b::Integer) = a - parent(a)(b)
+
+doc"""
+    -{T <: Union{Int, BigInt}}(a::PolyElem{T}, b::Rational{T})
+> Return $a - b$.
+"""
+-(a::PolyElem{Rational{T}}, b::Rational{T}) where T <: Union{Int, BigInt} = a - parent(a)(b)
 
 doc"""
     -(a::PolyElem, b::fmpz)
@@ -708,7 +753,7 @@ function ^(a::PolyElem{T}, b::Int) where {T <: RingElement}
    elseif b == 0
       return one(parent(a))
    else
-      if T <: FieldElem
+      if T <: FieldElement
          zn = 0
          while iszero(coeff(a, zn))
             zn += 1
@@ -971,20 +1016,20 @@ end
 ###############################################################################
 
 doc"""
-    mulmod{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T}, d::PolyElem{T})
+    mulmod{T <: Union{ResElem, FieldElement}}(a::PolyElem{T}, b::PolyElem{T}, d::PolyElem{T})
 > Return $a\times b \pmod{d}$.
 """
-function mulmod(a::PolyElem{T}, b::PolyElem{T}, d::PolyElem{T}) where {T <: Union{ResElem, FieldElem}}
+function mulmod(a::PolyElem{T}, b::PolyElem{T}, d::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(a, b)
    check_parent(a, d)
    return mod(a*b, d)
 end
 
 doc"""
-    powmod{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::Int, d::PolyElem{T})
+    powmod{T <: Union{ResElem, FieldElement}}(a::PolyElem{T}, b::Int, d::PolyElem{T})
 > Return $a^b \pmod{d}$. There are no restrictions on $b$.
 """
-function powmod(a::PolyElem{T}, b::Int, d::PolyElem{T}) where {T <: Union{ResElem, FieldElem}}
+function powmod(a::PolyElem{T}, b::Int, d::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(a, d)
    if length(a) == 0
       z = zero(parent(a))
@@ -1018,10 +1063,10 @@ function powmod(a::PolyElem{T}, b::Int, d::PolyElem{T}) where {T <: Union{ResEle
 end
 
 doc"""
-    invmod{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
+    invmod{T <: Union{ResElem, FieldElement}}(a::PolyElem{T}, b::PolyElem{T})
 > Return $a^{-1} \pmod{d}$.
 """
-function invmod(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElem}}
+function invmod(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(a, b)
    g, z = gcdinv(a, b)
    if g != 1
@@ -1085,6 +1130,21 @@ function divexact(a::PolyElem{T}, b::T) where {T <: RingElem}
 end
 
 doc"""
+    divexact{T <: Union{BigInt, Int}(a::PolyElem{Rational{T}}, b::Rational{T})
+> Return $a/b$ where the quotient is expected to be exact.
+"""
+function divexact(a::PolyElem{Rational{T}}, b::Rational{T}) where T <: Union{BigInt, Int}
+   iszero(b) && throw(DivideError())
+   z = parent(a)()
+   fit!(z, length(a))
+   for i = 1:length(a)
+      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b))
+   end
+   set_length!(z, length(a))
+   return z
+end
+
+doc"""
     divexact(a::PolyElem, b::Integer)
 > Return $a/b$ where the quotient is expected to be exact.
 """
@@ -1121,10 +1181,10 @@ end
 ###############################################################################
 
 doc"""
-    mod{T <: Union{ResElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{T})
+    mod{T <: Union{ResElem, FieldElement}}(f::PolyElem{T}, g::PolyElem{T})
 > Return $f \pmod{g}$.
 """
-function mod(f::PolyElem{T}, g::PolyElem{T}) where {T <: Union{ResElem, FieldElem}}
+function mod(f::PolyElem{T}, g::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(f, g)
    if length(g) == 0
       raise(DivideError())
@@ -1150,11 +1210,11 @@ function mod(f::PolyElem{T}, g::PolyElem{T}) where {T <: Union{ResElem, FieldEle
 end
 
 doc"""
-    divrem{T <: Union{ResElem, FieldElem}}(f::PolyElem{T}, g::PolyElem{T})
+    divrem{T <: Union{ResElem, FieldElement}}(f::PolyElem{T}, g::PolyElem{T})
 > Return a tuple $(q, r)$ such that $f = qg + r$ where $q$ is the euclidean
 > quotient of $f$ by $g$.
 """
-function divrem(f::PolyElem{T}, g::PolyElem{T}) where {T <: Union{ResElem, FieldElem}}
+function divrem(f::PolyElem{T}, g::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(f, g)
    if length(g) == 0
       raise(DivideError())
@@ -1349,7 +1409,7 @@ function divides(z::PolyElem{T}, x::T) where {T <: RingElement}
       end
       q = setcoeff!(q, i - 1, c)
    end
-   set_length!(q, length(z))
+   set_length!(q, flag ? length(z) : 0)
    return flag, q
 end
 
@@ -1470,7 +1530,7 @@ function gcd(a::PolyElem{T}, b::PolyElem{T}, ignore_content::Bool = false) where
    return divexact(b, canonical_unit(lead(b)))
 end
 
-function gcd(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElem}}
+function gcd(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(a, b)
    if length(a) > length(b)
       (a, b) = (b, a)
@@ -1626,10 +1686,10 @@ end
 ###############################################################################
 
 doc"""
-    integral{T <: Union{ResElem, FieldElem}}(x::PolyElem{T})
+    integral{T <: Union{ResElem, FieldElement}}(x::PolyElem{T})
 > Return the integral of the polynomial $a$.
 """
-function integral(x::PolyElem{T}) where {T <: Union{ResElem, FieldElem}}
+function integral(x::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    len = length(x)
    p = parent(x)()
    fit!(p, len + 1)
@@ -1698,7 +1758,7 @@ function resultant(a::PolyElem{T}, b::PolyElem{T}) where {T <: RingElement}
    res = c1^(lb - 1)*c2^(la - 1)*s*sgn
 end
 
-function resultant_lehmer(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElem}}
+function resultant_lehmer(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    const crossover = 40
    R = base_ring(a)
    check_parent(a, b)
@@ -1774,7 +1834,7 @@ function resultant_lehmer(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResE
    return c1^(lB - 1)*c2^(lA - 1)*s*sgn
 end
 
-function resultant(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElem}}
+function resultant(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(a, b)
    if length(a) == 0 || length(b) == 0
       return zero(base_ring(a))
@@ -1895,7 +1955,7 @@ function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: RingElement}
    if swap
       u2, v2 = v2, u2
    end
-   u = canonical_unit(lead(res))
+   u = canonical_unit(res)
    res = divexact(res, u)
    u2 = divexact(u2, u)
    v2 = divexact(v2, u)
@@ -1903,11 +1963,11 @@ function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: RingElement}
 end
 
 doc"""
-    gcdx{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
+    gcdx{T <: Union{ResElem, FieldElement}}(a::PolyElem{T}, b::PolyElem{T})
 > Return a tuple $(g, s, t)$ such that $g$ is the greatest common divisor of
 > $a$ and $b$ and such that $r = a\times s + b\times t$.
 """
-function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElem}}
+function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(a, b)
    if length(a) == 0
       return b, zero(parent(a)), one(parent(a))
@@ -1946,12 +2006,12 @@ function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldEl
 end
 
 doc"""
-    gcdinv{T <: Union{ResElem, FieldElem}}(a::PolyElem{T}, b::PolyElem{T})
+    gcdinv{T <: Union{ResElem, FieldElement}}(a::PolyElem{T}, b::PolyElem{T})
 > Return a tuple $(g, s)$ such that $g$ is the greatest common divisor of $a$
 > and $b$ and such that $s = a^{-1} \pmod{b}$. This function is useful for
 > inverting modulo a polynomial and checking that it really was invertible.
 """
-function gcdinv(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElem}}
+function gcdinv(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    check_parent(a, b)
    if length(a) == 0
       if length(b) == 0
