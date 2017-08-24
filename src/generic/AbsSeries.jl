@@ -775,10 +775,10 @@ end
 ###############################################################################
 
 doc"""
-    divexact{T <: RingElem}(a::AbsSeriesElem{T}, b::Integer)
+    divexact(a::AbsSeriesElem, b::Integer)
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact(x::AbsSeriesElem{T}, y::Integer) where {T <: RingElem}
+function divexact(x::AbsSeriesElem, y::Integer)
    y == 0 && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
@@ -791,10 +791,10 @@ function divexact(x::AbsSeriesElem{T}, y::Integer) where {T <: RingElem}
 end
 
 doc"""
-    divexact{T <: RingElem}(a::AbsSeriesElem{T}, b::fmpz)
+    divexact(a::AbsSeriesElem, b::fmpz)
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact(x::AbsSeriesElem{T}, y::fmpz) where {T <: RingElem}
+function divexact(x::AbsSeriesElem, y::fmpz)
    iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
