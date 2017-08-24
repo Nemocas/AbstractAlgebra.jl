@@ -327,12 +327,12 @@ end
 ###############################################################################
 
 # not really a mathematical ring
-mutable struct GenMatSpace{T <: RingElem} <: MatSpace{T}
+mutable struct GenMatSpace{T <: RingElement} <: MatSpace{T}
    rows::Int
    cols::Int
-   base_ring::Ring
+   base_ring::RingParent
 
-   function GenMatSpace{T}(R::Ring, r::Int, c::Int, cached::Bool = true) where {T}
+   function GenMatSpace{T}(R::RingParent, r::Int, c::Int, cached::Bool = true) where T <: RingElement
       if haskey(GenMatDict, (R, r, c))
          return GenMatDict[R, r, c]::GenMatSpace{T}
       else
@@ -345,11 +345,11 @@ mutable struct GenMatSpace{T <: RingElem} <: MatSpace{T}
    end
 end
 
-const GenMatDict = Dict{Tuple{Ring, Int, Int}, Ring}()
+const GenMatDict = Dict{Tuple{RingParent, Int, Int}, RingParent}()
 
-mutable struct GenMat{T <: RingElem} <: MatElem{T}
+mutable struct GenMat{T <: RingElement} <: MatElem{T}
    entries::Array{T, 2}
    base_ring::Ring
 
-   GenMat{T}(a::Array{T, 2}) where {T} = new{T}(a) 
+   GenMat{T}(a::Array{T, 2}) where T <: RingElement = new{T}(a) 
 end
