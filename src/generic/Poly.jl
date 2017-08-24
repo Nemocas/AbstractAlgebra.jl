@@ -633,7 +633,7 @@ doc"""
 +(a::Integer, b::PolyElem) = parent(b)(a) + b
 
 doc"""
-    +{T <: Union{Int, BigInt}}(a::Rational{T}, b::PolyElem{T})
+    +{T <: Union{Int, BigInt}}(a::Rational{T}, b::PolyElem{Rational{T}})
 > Return $a + b$.
 """
 +(a::Rational{T}, b::PolyElem{Rational{T}}) where T <: Union{Int, BigInt} = parent(b)(a) + b
@@ -651,7 +651,7 @@ doc"""
 +(a::PolyElem, b::Integer) = b + a
 
 doc"""
-    +{T <: Union{Int, BigInt}}(a::PolyElem{T}, b::Rational{T})
+    +{T <: Union{Int, BigInt}}(a::PolyElem{Rational{T}}, b::Rational{T})
 > Return $a + b$.
 """
 +(a::PolyElem{Rational{T}}, b::Rational{T}) where T <: Union{Int, BigInt} = parent(a)(b) + a
@@ -669,7 +669,7 @@ doc"""
 -(a::Integer, b::PolyElem) = parent(b)(a) - b
 
 doc"""
-    -{T <: Union{Int, BigInt}}(a::Rational{T}, b::PolyElem{T})
+    -{T <: Union{Int, BigInt}}(a::Rational{T}, b::PolyElem{Rational{T}})
 > Return $a - b$.
 """
 -(a::Rational{T}, b::PolyElem{Rational{T}}) where T <: Union{Int, BigInt} = parent(b)(a) - b
@@ -687,7 +687,7 @@ doc"""
 -(a::PolyElem, b::Integer) = a - parent(a)(b)
 
 doc"""
-    -{T <: Union{Int, BigInt}}(a::PolyElem{T}, b::Rational{T})
+    -{T <: Union{Int, BigInt}}(a::PolyElem{Rational{T}}, b::Rational{T})
 > Return $a - b$.
 """
 -(a::PolyElem{Rational{T}}, b::Rational{T}) where T <: Union{Int, BigInt} = a - parent(a)(b)
@@ -859,6 +859,18 @@ doc"""
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::fmpz, y::PolyElem) = y == x
+
+doc"""
+    =={T <: Union{Int, BigInt}}(a::Rational{T}, b::PolyElem{Rational{T}})
+> Return `true` if $a = b$.
+"""
+==(a::Rational{T}, b::PolyElem{Rational{T}}) where T <: Union{Int, BigInt} = parent(b)(a) == b
+
+doc"""
+    =={T <: Union{Int, BigInt}}(a::PolyElem{Rational{T}}, b::Rational{T})
+> Return `true` if $a == b$.
+"""
+==(a::PolyElem{Rational{T}}, b::Rational{T}) where T <: Union{Int, BigInt} = a == parent(a)(b)
 
 ###############################################################################
 #
