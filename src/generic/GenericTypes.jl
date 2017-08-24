@@ -55,7 +55,7 @@ mutable struct GenPolyRing{T <: RingElement} <: PolyRing{T}
    base_ring::RingParent
    S::Symbol
 
-   function GenPolyRing{T}(R::RingParent, s::Symbol, cached::Bool = true) where {T}
+   function GenPolyRing{T}(R::RingParent, s::Symbol, cached::Bool = true) where T <: RingElement
       if haskey(GenPolyID, (R, s))
          return GenPolyID[R, s]::GenPolyRing{T}
       else 
@@ -75,11 +75,11 @@ mutable struct GenPoly{T <: RingElement} <: PolyElem{T}
    length::Int
    parent::GenPolyRing{T}
 
-   GenPoly{T}() where {T} = new{T}(Array{T}(0), 0)
+   GenPoly{T}() where T <: RingElement = new{T}(Array{T}(0), 0)
    
-   GenPoly{T}(a::Array{T, 1}) where {T} = new{T}(a, length(a))
+   GenPoly{T}(a::Array{T, 1}) where T <: RingElement = new{T}(a, length(a))
 
-   GenPoly{T}(a::T) where {T} = iszero(a) ? new{T}(Array{T}(0), 0) : new{T}([a], 1)
+   GenPoly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Array{T}(0), 0) : new{T}([a], 1)
 end
 
 ###############################################################################
@@ -218,12 +218,12 @@ end
 #
 ###############################################################################
 
-mutable struct GenRelSeriesRing{T <: RingElem} <: SeriesRing{T}
-   base_ring::Ring
+mutable struct GenRelSeriesRing{T <: RingElement} <: SeriesRing{T}
+   base_ring::RingParent
    prec_max::Int
    S::Symbol
 
-   function GenRelSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where {T}
+   function GenRelSeriesRing{T}(R::RingParent, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
       if haskey(GenRelSeriesID, (R, prec, s))
          return GenRelSeriesID[R, prec, s]::GenRelSeriesRing{T}
       else
@@ -236,20 +236,20 @@ mutable struct GenRelSeriesRing{T <: RingElem} <: SeriesRing{T}
    end
 end
 
-const GenRelSeriesID = Dict{Tuple{Ring, Int, Symbol}, Ring}()
+const GenRelSeriesID = Dict{Tuple{RingParent, Int, Symbol}, RingParent}()
 
-mutable struct GenRelSeries{T <: RingElem} <: RelSeriesElem{T}
+mutable struct GenRelSeries{T <: RingElement} <: RelSeriesElem{T}
    coeffs::Array{T, 1}
    length::Int
    prec::Int
    val::Int
    parent::GenRelSeriesRing{T}
 
-   function GenRelSeries{T}(a::Array{T, 1}, length::Int, prec::Int, val::Int) where {T}
+   function GenRelSeries{T}(a::Array{T, 1}, length::Int, prec::Int, val::Int) where T <: RingElement
       new{T}(a, length, prec, val)
    end
 
-   GenRelSeries{T}(a::GenRelSeries{T}) where {T} = a
+   GenRelSeries{T}(a::GenRelSeries{T}) where T <: RingElement = a
 end
 
 ###############################################################################
