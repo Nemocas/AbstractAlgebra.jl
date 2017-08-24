@@ -125,7 +125,7 @@ doc"""
 zero(R::SeriesRing) = R(0)
 
 doc"""
-    zero(R::SeriesRing)
+    one(R::SeriesRing)
 > Return $1 + O(x^n)$ where $n$ is the maximum precision of the power series
 > ring $R$.
 """
@@ -507,10 +507,10 @@ function *(a::Rational{T}, b::RelSeriesElem{Rational{T}}) where T <: Union{BigIn
 end
 
 doc"""
-    *{T <: RingElem}(a::Integer, b::RelSeriesElem{T})
+    *(a::Integer, b::RelSeriesElem)
 > Return $a\times b$.
 """
-function *(a::Integer, b::RelSeriesElem{T}) where {T <: RingElem}
+function *(a::Integer, b::RelSeriesElem)
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
@@ -525,10 +525,10 @@ function *(a::Integer, b::RelSeriesElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    *{T <: RingElem}(a::fmpz, b::RelSeriesElem{T})
+    *(a::fmpz, b::RelSeriesElem)
 > Return $a\times b$.
 """
-function *(a::fmpz, b::RelSeriesElem{T}) where {T <: RingElem}
+function *(a::fmpz, b::RelSeriesElem)
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
@@ -555,13 +555,13 @@ doc"""
 *(a::RelSeriesElem{Rational{T}}, b::Rational{T}) where T <: Union{Int, BigInt} = b*a
 
 doc"""
-    *{T <: RingElem}(a::RelSeriesElem{T}, b::Integer)
+    *(a::RelSeriesElem, b::Integer)
 > Return $a\times b$.
 """
 *(a::RelSeriesElem, b::Integer) = b*a
 
 doc"""
-    *{T <: RingElem}(a::RelSeriesElem{T}, b::fmpz)
+    *(a::RelSeriesElem, b::fmpz)
 > Return $a\times b$.
 """
 *(a::RelSeriesElem, b::fmpz) = b*a
@@ -960,10 +960,10 @@ end
 ###############################################################################
 
 doc"""
-    divexact{T <: RingElem}(a::RelSeriesElem{T}, b::Integer)
+    divexact(a::RelSeriesElem, b::Integer)
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact(x::RelSeriesElem{T}, y::Integer) where {T <: RingElem}
+function divexact(x::RelSeriesElem, y::Integer)
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -977,10 +977,10 @@ function divexact(x::RelSeriesElem{T}, y::Integer) where {T <: RingElem}
 end
 
 doc"""
-    divexact{T <: RingElem}(a::RelSeriesElem{T}, b::fmpz)
+    divexact(a::RelSeriesElem, b::fmpz)
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact(x::RelSeriesElem{T}, y::fmpz) where {T <: RingElem}
+function divexact(x::RelSeriesElem, y::fmpz)
    iszero(y) && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -1246,6 +1246,7 @@ function add!(c::SeriesElem{T}, a::SeriesElem{T}, b::SeriesElem{T}) where {T <: 
    set_length!(c, normalise(c, i - 1))
    return c
 end
+
 ###############################################################################
 #
 #   Promotion rules

@@ -34,6 +34,8 @@ one(::Integers) = BigInt(1)
 
 isone(a::BigInt) = a == 1
 
+isunit(a::BigInt) = a == 1 || a == -1
+
 canonical_unit(a::BigInt) = a < 0 ? BigInt(-1) : BigInt(1)
 
 ###############################################################################

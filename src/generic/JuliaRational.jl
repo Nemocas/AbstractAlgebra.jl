@@ -40,6 +40,8 @@ one(::Rationals{T}) where T <: Union{Int, BigInt} = Rational{T}(1)
 
 isone(a::Rational{T}) where T <: Union{Int, BigInt} = a == 1
 
+isunit(a::Rational{T}) where T <: Union{Int, BigInt} = a != 0
+
 canonical_unit(a::Rational{T})  where T <: Union{Int, BigInt} = a
 
 ###############################################################################
