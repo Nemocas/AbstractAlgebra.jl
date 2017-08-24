@@ -258,12 +258,12 @@ end
 #
 ###############################################################################
 
-mutable struct GenAbsSeriesRing{T <: RingElem} <: SeriesRing{T}
-   base_ring::Ring
+mutable struct GenAbsSeriesRing{T <: RingElement} <: SeriesRing{T}
+   base_ring::RingParent
    prec_max::Int
    S::Symbol
 
-   function GenAbsSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where {T}
+   function GenAbsSeriesRing{T}(R::RingParent, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
       if haskey(GenAbsSeriesID, (R, prec, s))
          return GenAbsSeriesID[R, prec, s]::GenAbsSeriesRing{T}
       else
@@ -276,16 +276,16 @@ mutable struct GenAbsSeriesRing{T <: RingElem} <: SeriesRing{T}
    end
 end
 
-const GenAbsSeriesID = Dict{Tuple{Ring, Int, Symbol}, Ring}()
+const GenAbsSeriesID = Dict{Tuple{RingParent, Int, Symbol}, RingParent}()
 
-mutable struct GenAbsSeries{T <: RingElem} <: AbsSeriesElem{T}
+mutable struct GenAbsSeries{T <: RingElement} <: AbsSeriesElem{T}
    coeffs::Array{T, 1}
    length::Int
    prec::Int
    parent::GenAbsSeriesRing{T}
 
-   GenAbsSeries{T}(a::Array{T, 1}, length::Int, prec::Int) where {T} = new{T}(a, length, prec)   
-   GenAbsSeries{T}(a::GenAbsSeries{T}) where {T} = a
+   GenAbsSeries{T}(a::Array{T, 1}, length::Int, prec::Int) where T <: RingElement = new{T}(a, length, prec)   
+   GenAbsSeries{T}(a::GenAbsSeries{T}) where T <: RingElement = a
 end
 
 ###############################################################################
