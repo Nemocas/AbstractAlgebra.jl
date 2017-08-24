@@ -349,7 +349,7 @@ const GenMatDict = Dict{Tuple{RingParent, Int, Int}, RingParent}()
 
 mutable struct GenMat{T <: RingElement} <: MatElem{T}
    entries::Array{T, 2}
-   base_ring::Ring
+   base_ring::RingParent
 
    GenMat{T}(a::Array{T, 2}) where T <: RingElement = new{T}(a) 
 end
