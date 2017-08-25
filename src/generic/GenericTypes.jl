@@ -97,15 +97,15 @@ end
 # T is an Int which is the number of variables
 # (plus one if ordered by total degree)
 
-mutable struct GenMPolyRing{T <: RingElem} <: PolyRing{T}
-   base_ring::Ring
+mutable struct GenMPolyRing{T <: RingElement} <: PolyRing{T}
+   base_ring::RingParent
    S::Array{Symbol, 1}
    ord::Symbol
    num_vars::Int
    N::Int
 
-   function GenMPolyRing{T}(R::Ring, s::Array{Symbol, 1}, ord::Symbol, N::Int,
-                         cached::Bool = true) where {T}
+   function GenMPolyRing{T}(R::RingParent, s::Array{Symbol, 1}, ord::Symbol, N::Int,
+                         cached::Bool = true) where T <: RingElement
       if haskey(GenMPolyID, (R, s, ord, N))
          return GenMPolyID[R, s, ord, N]::GenMPolyRing{T}
       else 
@@ -118,22 +118,22 @@ mutable struct GenMPolyRing{T <: RingElem} <: PolyRing{T}
    end
 end
 
-const GenMPolyID = Dict{Tuple{Ring, Array{Symbol, 1}, Symbol, Int}, Ring}()
+const GenMPolyID = Dict{Tuple{RingParent, Array{Symbol, 1}, Symbol, Int}, RingParent}()
 
-mutable struct GenMPoly{T <: RingElem} <: PolyElem{T}
+mutable struct GenMPoly{T <: RingElement} <: PolyElem{T}
    coeffs::Array{T, 1}
    exps::Array{UInt, 2}
    length::Int
    parent::GenMPolyRing{T}
 
-   function GenMPoly{T}(R::GenMPolyRing) where {T}
+   function GenMPoly{T}(R::GenMPolyRing) where T <: RingElement
       N = R.N
       return new{T}(Array{T}(0), Array{UInt}(N, 0), 0, R)
    end
    
-   GenMPoly{T}(R::GenMPolyRing, a::Array{T, 1}, b::Array{UInt, 2}) where {T} = new{T}(a, b, length(a), R)
+   GenMPoly{T}(R::GenMPolyRing, a::Array{T, 1}, b::Array{UInt, 2}) where T <: RingElement = new{T}(a, b, length(a), R)
 
-   function GenMPoly{T}(R::GenMPolyRing, a::T) where {T}
+   function GenMPoly{T}(R::GenMPolyRing, a::T) where T <: RingElement
       N = R.N
       return iszero(a) ? new{T}(Array{T}(0), Array{UInt}(N, 0), 0, R) : 
                                           new{T}([a], zeros(UInt, N, 1), 1, R)
