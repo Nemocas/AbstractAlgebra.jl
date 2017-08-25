@@ -146,12 +146,12 @@ end
 #
 ###############################################################################
 
-mutable struct GenSparsePolyRing{T <: RingElem} <: Ring
-   base_ring::Ring
+mutable struct GenSparsePolyRing{T <: RingElement} <: Ring
+   base_ring::RingParent
    S::Symbol
    num_vars::Int
 
-   function GenSparsePolyRing{T}(R::Ring, s::Symbol, cached::Bool = true) where {T}
+   function GenSparsePolyRing{T}(R::RingParent, s::Symbol, cached::Bool = true) where T <: RingElement
       if haskey(GenSparsePolyID, (R, s))
          return GenSparsePolyID[R, s]::GenSparsePolyRing{T}
       else 
@@ -164,19 +164,19 @@ mutable struct GenSparsePolyRing{T <: RingElem} <: Ring
    end
 end
 
-const GenSparsePolyID = Dict{Tuple{Ring, Symbol}, GenSparsePolyRing}()
+const GenSparsePolyID = Dict{Tuple{RingParent, Symbol}, GenSparsePolyRing}()
 
-mutable struct GenSparsePoly{T <: RingElem} <: RingElem
+mutable struct GenSparsePoly{T <: RingElement} <: RingElem
    coeffs::Array{T, 1}
    exps::Array{UInt}
    length::Int
    parent::GenSparsePolyRing{T}
 
-   GenSparsePoly{T}() where {T} = new{T}(Array{T}(0), Array{UInt}(0), 0)
+   GenSparsePoly{T}() where T <: RingElement = new{T}(Array{T}(0), Array{UInt}(0), 0)
    
-   GenSparsePoly{T}(a::Array{T, 1}, b::Array{UInt, 1}) where {T} = new{T}(a, b, length(a))
+   GenSparsePoly{T}(a::Array{T, 1}, b::Array{UInt, 1}) where T <: RingElement = new{T}(a, b, length(a))
 
-   GenSparsePoly{T}(a::T) where {T} = iszero(a) ? new{T}(Array{T}(0), Array{UInt}(0), 0) : 
+   GenSparsePoly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Array{T}(0), Array{UInt}(0), 0) : 
                                                new{T}([a], [UInt(0)], 1)
 end
 
