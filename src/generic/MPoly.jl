@@ -348,7 +348,7 @@ doc"""
 isterm(x::GenMPoly) = x.length == 1
 
 doc"""
-    isterm(x::GenMPoly)
+    ismonomial(x::GenMPoly)
 > Return `true` if the given polynomial has precisely one nonzero term.
 """
 ismonomial(x::GenMPoly) = x.length == 1 && isone(coeff(x, 0))
