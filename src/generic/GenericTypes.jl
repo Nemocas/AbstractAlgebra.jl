@@ -297,7 +297,7 @@ end
 mutable struct GenFracField{T <: RingElem} <: FracField{T}
    base_ring::Ring
 
-   function GenFracField{T}(R::Ring, cached::Bool = true) where {T}
+   function GenFracField{T}(R::Ring, cached::Bool = true) where T <: RingElem
       if haskey(GenFracDict, R)
          return GenFracDict[R]::GenFracField{T}
       else
@@ -317,7 +317,7 @@ mutable struct GenFrac{T <: RingElem} <: FracElem{T}
    den::T
    parent::GenFracField{T}
 
-   GenFrac{T}(num::T, den::T) where {T} = new{T}(num, den) 
+   GenFrac{T}(num::T, den::T) where T <: RingElem = new{T}(num, den) 
 end
 
 ###############################################################################

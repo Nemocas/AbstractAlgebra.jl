@@ -12,7 +12,7 @@ export FractionField, GenFrac, GenFracField, num, den
 #
 ###############################################################################
 
-parent_type(::Type{GenFrac{T}}) where {T} = GenFracField{T}
+parent_type(::Type{GenFrac{T}}) where T <: RingElem = GenFracField{T}
 
 elem_type(::Type{GenFracField{T}}) where {T <: RingElem} = GenFrac{T}
 
@@ -20,7 +20,7 @@ doc"""
     base_ring{T}(S::FracField{T})
 > Return the base ring $R$ of the given fraction field.
 """
-base_ring(a::FracField{T}) where {T} = a.base_ring::parent_type(T)
+base_ring(a::FracField{T}) where T <: RingElem = a.base_ring::parent_type(T)
 
 doc"""
     base_ring{T}(r::FracElem)
@@ -61,11 +61,8 @@ end
                                           
 //(x::Integer, y::T) where {T <: RingElem} = parent(y)(x)//y
 
-# disambiguation
-//(x::FracElem{T}, y::FracElem{T}) where {T <: RingElem} = divexact(x, y)
-
 //(x::T, y::FracElem{T}) where {T <: RingElem} = parent(y)(x)//y
-                                              
+
 //(x::FracElem{T}, y::T) where {T <: RingElem} = x//parent(x)(y)
 
 ###############################################################################
@@ -595,12 +592,6 @@ function divexact(a::fmpz, b::FracElem)
    d = divexact(num(b), g)
    return parent(b)(n, d)
 end
-
-# remove ambiguity
-divexact(a::FracElem{T}, b::PolyElem{T}) where {T <: RingElem} = error("Not supported")
-
-# remove ambiguity
-divexact(a::PolyElem{T}, b::FracElem{T}) where {T <: RingElem} = error("Not supported")
 
 doc"""
     divexact{T <: RingElem}(a::FracElem{T}, b::T)
