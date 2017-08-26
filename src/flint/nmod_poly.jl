@@ -1004,6 +1004,11 @@ function (R::NmodPolyRing)(x::Integer)
   return z
 end
 
+function (R::NmodPolyRing)(x::nmod_poly)
+   R != parent(x) && error("Wrong parents")
+   return x
+end
+
 function (R::NmodPolyRing)(x::GenRes{fmpz})
   base_ring(R) != parent(x) && error("Wrong parents")
   z = nmod_poly(R.n, UInt(x.data))

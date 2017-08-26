@@ -186,11 +186,11 @@ end
 #
 ###############################################################################
 
-mutable struct GenResRing{T <: RingElem} <: ResRing{T}
-   base_ring::Ring
+mutable struct GenResRing{T <: RingElement} <: ResRing{T}
+   base_ring::RingParent
    modulus::T
 
-   function GenResRing{T}(modulus::T, cached::Bool = true) where {T}
+   function GenResRing{T}(modulus::T, cached::Bool = true) where T <: RingElement
       if haskey(ModulusDict, (parent(modulus), modulus))
          return ModulusDict[parent(modulus), modulus]::GenResRing{T}
       else
@@ -203,13 +203,13 @@ mutable struct GenResRing{T <: RingElem} <: ResRing{T}
    end
 end
 
-const ModulusDict = Dict{Tuple{Ring, RingElem}, Ring}()
+const ModulusDict = Dict{Tuple{RingParent, RingElement}, RingParent}()
 
-mutable struct GenRes{T <: RingElem} <: ResElem{T}
+mutable struct GenRes{T <: RingElement} <: ResElem{T}
    data::T
    parent::GenResRing{T}
 
-   GenRes{T}(a::T) where {T} = new{T}(a)
+   GenRes{T}(a::T) where T <: RingElement = new{T}(a)
 end
 
 ###############################################################################

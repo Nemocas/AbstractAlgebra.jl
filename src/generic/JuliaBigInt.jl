@@ -56,6 +56,37 @@ show_minus_one(::Type{BigInt}) = false
 
 ###############################################################################
 #
+#   Modular arithmetic
+#
+###############################################################################
+
+function powmod(a::BigInt, b::Int, c::BigInt)
+   b < 0 && throw(DomainError())
+   # special cases
+   if a == 0
+      return zero(parent(a))
+   elseif b == 0
+      return one(parent(a))
+   else
+      bit = ~((~UInt(0)) >> 1)
+      while (UInt(bit) & b) == 0
+         bit >>= 1
+      end
+      z = a
+      bit >>= 1
+      while bit != 0
+         z = mod(z*z, c)
+         if (UInt(bit) & b) != 0
+            z = mod(z*a, c)
+         end
+         bit >>= 1
+      end
+      return z
+   end
+end
+
+###############################################################################
+#
 #   Divides
 #
 ###############################################################################
@@ -74,6 +105,17 @@ end
 divexact(a::BigInt, b::Int) = div(a, b)
 
 divexact(a::BigInt, b::BigInt) = div(a, b)
+
+###############################################################################
+#
+#   GCD
+#
+###############################################################################
+
+function gcdinv(a::BigInt, b::BigInt)
+   g, s, t = gcdx(a, b)
+   return g, s
+end
 
 ###############################################################################
 #
