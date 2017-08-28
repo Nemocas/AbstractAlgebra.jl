@@ -1962,8 +1962,12 @@ function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: RingElement}
    end
    s = divexact(h*lead(B)^(lena - 1), h^(lena - 1))
    res = c1^(length(b) - 1)*c2^(length(a) - 1)*s*sgn
-   u2 *= c1^(length(b) - 2)*c2^(length(a) - 1)
-   v2 *= c1^(length(b) - 1)*c2^(length(a) - 2)
+   u2 *= c1^(length(b) - 2)*c2^(length(a) - 1)*sgn
+   v2 *= c1^(length(b) - 1)*c2^(length(a) - 2)*sgn
+   if lena != 2
+      u2 = divexact(u2*lead(B)^(lena - 2), h^(lena - 2))
+      v2 = divexact(v2*lead(B)^(lena - 2), h^(lena - 2))
+   end
    if swap
       u2, v2 = v2, u2
    end

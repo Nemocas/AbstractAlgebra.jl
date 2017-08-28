@@ -296,14 +296,14 @@ function test_gen_poly_reverse()
    bitsize = 32
    for iter = 1:maxIter
       f = rand(R, 0:degmax, -2^bitsize:2^bitsize)
-      len = rand(1:degmax + 1)
+      len = rand(length(f):degmax + 1)
       f_rev = reverse(f, len)
       if f == 0
         @test f_rev == 0
       else # count the number of trailing 0 coeffs
         it = 0
         while coeff(f, it) == 0
-            it = it+1
+            it += 1
         end
         @test length(f_rev) == len - it
         for co = 1:length(f_rev)
@@ -316,7 +316,7 @@ function test_gen_poly_reverse()
    R, x = T["x"]
    for iter = 1:maxIter
       f = rand(R, 0:degmax, -2^bitsize:2^bitsize)
-      len = rand(1:degmax + 1)
+      len = rand(length(f):degmax + 1)
       f_rev = reverse(f, len)
       if f == 0
         @test f_rev == 0
@@ -843,8 +843,8 @@ function test_gen_poly_gcdx()
       f = R()
       g = R()
       while length(f) < 2 || length(g) < 2
-         f = rand(R, 2:2, 1:100)
-         g = rand(R, 2:2, -100:-1)
+         f = rand(R, 2:5, -10:10)
+         g = rand(R, 2:5, -10:10)
       end
       r, u, v = gcdx(f, g)
 
@@ -852,7 +852,7 @@ function test_gen_poly_gcdx()
 
       h = R()
       while h == 0
-         h = rand(R, 0:2, -100:100)
+         h = rand(R, 0:5, -10:10)
       end
       r, u, v = gcdx(f*h, g*h)
 
