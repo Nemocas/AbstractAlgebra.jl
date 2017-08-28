@@ -104,7 +104,7 @@ function gcd(p::Rational{T}, q::Rational{T}) where T <: Union{Int, BigInt}
       d = divexact(d, g)
    end
    if n == 0
-      return Rational{T}(n, Rational{T}(1))
+      return Rational{T}(n, T(1))
    else
       return Rational{T}(n, d)
    end

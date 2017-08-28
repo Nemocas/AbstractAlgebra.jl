@@ -236,7 +236,7 @@ end
 #
 ###############################################################################
 
-function powers(a::T, d::Int) where {T <: RingElem}
+function powers(a::T, d::Int) where {T <: RingElement}
    d <= 0 && throw(DomainError())
    S = parent(a)
    A = Array{T}(d + 1)
@@ -269,7 +269,7 @@ end
 #
 ################################################################################
 
-transpose(x::T) where {T <: RingElem} = deepcopy(x)
+transpose(x::T) where {T <: RingElement} = deepcopy(x)
 
 ###############################################################################
 #
@@ -359,8 +359,5 @@ include("Factor.jl")
 #
 ###############################################################################
 
-if VERSION >= v"0.5.0-dev+3171"
-
 include("polysubst.jl")
 
-end

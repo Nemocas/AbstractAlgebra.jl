@@ -28,6 +28,8 @@ export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
 
 export PolyRing, SeriesRing, AbsSeriesRing, ResRing, FracField, MatSpace, FinField
 
+export JuliaZZ, JuliaQQ, zz, qq
+
 export create_accessors, get_handle, package_handle, zeros,
        Array, sig_exists
 
