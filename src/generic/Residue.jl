@@ -216,10 +216,10 @@ doc"""
 *(a::ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) * b)
 
 doc"""
-    *{T <: Union{Int, BigInt}}(a::ResElem{Rational{T}}, b::Rational{T})
+    *{T <: Union{Int, BigInt}}(a::ResElem, b::Rational{T})
 > Return $a\times b$.
 """
-*(a::ResElem{Rational{T}}, b::Rational{T}) where T <: Union{Int, BigInt} = parent(a)(data(a) * b)
+*(a::ResElem, b::Rational{T}) where T <: Union{Int, BigInt} = parent(a)(data(a) * b)
 
 doc"""
     *(a::Integer, b::ResElem)
@@ -240,10 +240,10 @@ doc"""
 *(a::T, b::ResElem{T}) where {T <: RingElem} = parent(b)(a * data(b))
 
 doc"""
-    *{T <: Union{Int, BigInt}}(a::Rational{T}, b::ResElem{Rational{T}})
+    *{T <: Union{Int, BigInt}}(a::Rational{T}, b::ResElem)
 > Return $a\times b$.
 """
-*(a::Rational{T}, b::ResElem{Rational{T}}) where T <: Union{Int, BigInt} = parent(b)(a * data(b))
+*(a::Rational{T}, b::ResElem) where T <: Union{Int, BigInt} = parent(b)(a * data(b))
 
 doc"""
     +(a::ResElem, b::Integer)
@@ -264,10 +264,10 @@ doc"""
 +(a::ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) + b)
 
 doc"""
-    +{T <: Union{Int, BigInt}}(a::ResElem{Rational{T}}, b::Rational{T})
+    +{T <: Union{Int, BigInt}}(a::ResElem, b::Rational{T})
 > Return $a + b$.
 """
-+(a::ResElem{Rational{T}}, b::Rational{T}) where T <: Union{Int, BigInt} = parent(a)(data(a) + b)
++(a::ResElem, b::Rational{T}) where T <: Union{Int, BigInt} = parent(a)(data(a) + b)
 
 doc"""
     +(a::Integer, b::ResElem)
@@ -288,10 +288,10 @@ doc"""
 +(a::T, b::ResElem{T}) where {T <: RingElem} = parent(b)(a + data(b))
 
 doc"""
-    +{T <: Union{Int, BigInt}}(a::Rational{T}, b::ResElem{Rational{T}})
+    +{T <: Union{Int, BigInt}}(a::Rational{T}, b::ResElem)
 > Return $a + b$.
 """
-+(a::Rational{T}, b::ResElem{Rational{T}}) where T <: Union{Int, BigInt} = parent(b)(a + data(b))
++(a::Rational{T}, b::ResElem) where T <: Union{Int, BigInt} = parent(b)(a + data(b))
 
 doc"""
     -(a::ResElem, b::Integer)
@@ -312,10 +312,10 @@ doc"""
 -(a::ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) - b)
 
 doc"""
-    -{T <: Union{Int, BigInt}}(a::ResElem{Rational{T}}, b::Rational{T})
+    -{T <: Union{Int, BigInt}}(a::ResElem, b::Rational{T})
 > Return $a - b$.
 """
--(a::ResElem{Rational{T}}, b::Rational{T}) where T <: Union{Int, BigInt} = parent(a)(data(a) - b)
+-(a::ResElem, b::Rational{T}) where T <: Union{Int, BigInt} = parent(a)(data(a) - b)
 
 doc"""
     -(a::Integer, b::ResElem)
@@ -336,10 +336,10 @@ doc"""
 -(a::T, b::ResElem{T}) where {T <: RingElem} = parent(b)(a - data(b))
 
 doc"""
-    -{T <: Union{Int, BigInt}}(a::Rational{T}, b::ResElem{Rational{T}})
+    -{T <: Union{Int, BigInt}}(a::Rational{T}, b::ResElem)
 > Return $a - b$.
 """
--(a::Rational{T}, b::ResElem{Rational{T}}) where T <: Union{Int, BigInt} = parent(b)(a - data(b))
+-(a::Rational{T}, b::ResElem) where T <: Union{Int, BigInt} = parent(b)(a - data(b))
 
 ###############################################################################
 #
@@ -436,10 +436,10 @@ function ==(a::ResElem{T}, b::T) where {T <: RingElem}
 end
 
 doc"""
-    =={T <: Union{Int, BigInt}}(x::ResElem{Rational{T}}, y::Rational{T})
+    =={T <: Union{Int, BigInt}}(x::ResElem, y::Rational{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::ResElem{Rational{T}}, b::Rational{T}) where T <: Union{Int, BigInt}
+function ==(a::ResElem, b::Rational{T}) where T <: Union{Int, BigInt}
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
@@ -454,10 +454,10 @@ function ==(a::T, b::ResElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    =={T <: Union{Int, BigInt}}(x::Rational{T}, y::ResElem{Rational{T}})
+    =={T <: Union{Int, BigInt}}(x::Rational{T}, y::ResElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::Rational{T}, b::ResElem{Rational{T}}) where T <: Union{Int, BigInt}
+function ==(a::Rational{T}, b::ResElem) where T <: Union{Int, BigInt}
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
 end
