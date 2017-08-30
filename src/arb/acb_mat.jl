@@ -273,9 +273,9 @@ end
 
 *(x::acb_mat, y::BigFloat) = y * x
 
-*(x::Rational{T}, y::acb_mat) where {T <: Integer} = fmpq(x) * y
+*(x::Rational{T}, y::acb_mat) where T <: Union{Int, BigInt} = fmpq(x) * y
 
-*(x::acb_mat, y::Rational{T}) where {T <: Integer} = y * x
+*(x::acb_mat, y::Rational{T}) where T <: Union{Int, BigInt} = y * x
 
 for T in [Integer, fmpz, fmpq, arb, acb]
    @eval begin
@@ -307,7 +307,7 @@ for T in [Integer, fmpz, fmpq, arb, acb]
    end
 end
 
-function +(x::acb_mat, y::Rational{T}) where {T <: Integer}
+function +(x::acb_mat, y::Rational{T}) where T <: Union{Int, BigInt}
    z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
       z[i, i] += y
@@ -315,9 +315,9 @@ function +(x::acb_mat, y::Rational{T}) where {T <: Integer}
    return z
 end
 
-+(x::Rational{T}, y::acb_mat) where {T <: Integer} = y + x
++(x::Rational{T}, y::acb_mat) where T <: Union{Int, BigInt} = y + x
 
-function -(x::acb_mat, y::Rational{T}) where {T <: Integer}
+function -(x::acb_mat, y::Rational{T}) where T <: Union{Int, BigInt}
    z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
       z[i, i] -= y
@@ -325,7 +325,7 @@ function -(x::acb_mat, y::Rational{T}) where {T <: Integer}
    return z
 end
 
-function -(x::Rational{T}, y::acb_mat) where {T <: Integer}
+function -(x::Rational{T}, y::acb_mat) where T <: Union{Int, BigInt}
    z = -y
    for i = 1:min(rows(y), cols(y))
       z[i, i] += x
@@ -525,7 +525,7 @@ divexact(x::acb_mat, y::BigFloat) = divexact(x, base_ring(x)(y))
 
 divexact(x::acb_mat, y::Integer) = divexact(x, fmpz(y))
 
-divexact(x::acb_mat, y::Rational{T}) where {T <: Integer} = divexact(x, fmpq(y))
+divexact(x::acb_mat, y::Rational{T}) where T <: Union{Int, BigInt} = divexact(x, fmpq(y))
 
 ################################################################################
 #
@@ -820,7 +820,7 @@ end
 
 promote_rule(::Type{acb_mat}, ::Type{T}) where {T <: Integer} = acb_mat
 
-promote_rule(::Type{acb_mat}, ::Type{Rational{T}}) where {T <: Integer} = acb_mat
+promote_rule(::Type{acb_mat}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = acb_mat
 
 promote_rule(::Type{acb_mat}, ::Type{fmpz}) = acb_mat
 

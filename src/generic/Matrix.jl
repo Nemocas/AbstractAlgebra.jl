@@ -376,10 +376,10 @@ function *(x::T, y::MatElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    *{T <: Union{Int, BigInt}}(x::Rational{T}, y::MatElem{Rational{T}})
+    *{T <: Union{Int, BigInt}}(x::Rational{T}, y::MatElem)
 > Return $x\times y$.
 """
-function *(x::Rational{T}, y::MatElem{Rational{T}}) where T <: Union{Int, BigInt}
+function *(x::Rational{T}, y::MatElem) where T <: Union{Int, BigInt}
    z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -408,10 +408,10 @@ doc"""
 *(x::MatElem{T}, y::T) where {T <: RingElem} = y*x
 
 doc"""
-    *{T <: Union{Int, BigInt}}(x::MatElem{Rational{T}}, y::Rational{T})
+    *{T <: Union{Int, BigInt}}(x::MatElem, y::Rational{T})
 > Return $x\times y$.
 """
-*(x::MatElem{Rational{T}}, y::Rational{T}) where T <: Union{Int, BigInt} = y*x
+*(x::MatElem, y::Rational{T}) where T <: Union{Int, BigInt} = y*x
 
 doc"""
     +(x::Integer, y::MatElem)
@@ -482,10 +482,10 @@ function +(x::T, y::MatElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    +{T <: Union{Int, BigInt}}(x::Rational{T}, y::MatElem{Rational{T}})
+    +{T <: Union{Int, BigInt}}(x::Rational{T}, y::MatElem)
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
-function +(x::Rational{T}, y::MatElem{Rational{T}}) where T <: Union{Int, BigInt}
+function +(x::Rational{T}, y::MatElem) where T <: Union{Int, BigInt}
    z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -506,10 +506,10 @@ doc"""
 +(x::MatElem{T}, y::T) where {T <: RingElem} = y + x
 
 doc"""
-    +{T <: Union{Int, BigInt}}(x::MatElem{Rational{T}}, y::Rational{T})
+    +{T <: Union{Int, BigInt}}(x::MatElem, y::Rational{T})
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 """
-+(x::MatElem{Rational{T}}, y::Rational{T}) where T <: Union{Int, BigInt} = y + x
++(x::MatElem, y::Rational{T}) where T <: Union{Int, BigInt} = y + x
 
 doc"""
     -(x::Integer, y::MatElem)
@@ -607,10 +607,10 @@ function -(x::T, y::MatElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    -{T <: Union{Int, BigInt}}(x::Rational{T}, y::MatElem{Rational{T}})
+    -{T <: Union{Int, BigInt}}(x::Rational{T}, y::MatElem)
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 """
-function -(x::Rational{T}, y::MatElem{Rational{T}}) where T <: Union{Int, BigInt}
+function -(x::Rational{T}, y::MatElem) where T <: Union{Int, BigInt}
    z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
@@ -645,10 +645,10 @@ function -(x::MatElem{T}, y::T) where {T <: RingElem}
 end
 
 doc"""
-    -{T <: Union{Int, BigInt}}(x::MatElem{Rational{T}}, y::Rational{T})
+    -{T <: Union{Int, BigInt}}(x::MatElem, y::Rational{T})
 > Return $x - S(y)$, where $S$ is the parent of $a$.
 """
-function -(x::MatElem{Rational{T}}, y::Rational{T}) where T <: Union{Int, BigInt}
+function -(x::MatElem, y::Rational{T}) where T <: Union{Int, BigInt}
    z = similar(x)
    R = base_ring(x)
    for i = 1:rows(x)
@@ -846,11 +846,11 @@ function ==(x::MatElem{T}, y::T) where {T <: RingElem}
 end
 
 doc"""
-    =={T <: Union{Int, BigInt}}(x::MatElem{Rational{T}}, y::Rational{T})
+    =={T <: Union{Int, BigInt}}(x::MatElem, y::Rational{T})
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 > otherwise return `false`.
 """
-function ==(x::MatElem{Rational{T}}, y::Rational{T}) where T <: Union{Int, BigInt}
+function ==(x::MatElem, y::Rational{T}) where T <: Union{Int, BigInt}
    for i = 1:min(rows(x), cols(x))
       if x[i, i] != y
          return false
@@ -874,11 +874,11 @@ doc"""
 ==(x::T, y::MatElem{T}) where {T <: RingElem} = y == x
 
 doc"""
-    =={T <: Union{Int, BigInt}}(x::Rational{T}, y::MatElem{Rational{T}})
+    =={T <: Union{Int, BigInt}}(x::Rational{T}, y::MatElem)
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 > otherwise return `false`.
 """
-==(x::Rational{T}, y::MatElem{Rational{T}}) where T <: Union{Int, BigInt} = y == x
+==(x::Rational{T}, y::MatElem) where T <: Union{Int, BigInt} = y == x
 
 ###############################################################################
 #
@@ -932,11 +932,11 @@ function divexact(x::MatElem{T}, y::T) where {T <: RingElem}
 end
 
 doc"""
-    divexact{T <: Union{Int, BigInt}}(x::MatElem{Rational{T}}, y::Rational{T})
+    divexact(x::MatElem, y::Rational{T})
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by
 > $y$. Each division is expected to be exact.
 """
-function divexact(x::MatElem{Rational{T}}, y::Rational{T}) where T <: Union{Int, BigInt}
+function divexact(x::MatElem, y::Rational{T}) where T <: Union{Int, BigInt}
    z = similar(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
@@ -2783,13 +2783,18 @@ function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <
       P1 = [0 for i in 1:2n + 1]
       v = similar(M, n, 1)
       for j = 1:n
-         B[r2, j] = v[j, 1]
+         B[r2, j] = deepcopy(v[j, 1])
          A[1, j] = R()
       end
       P1[c2] = 1
       P2[c2] = r2
       v[c2, 1] = R(1)
-      B[r2, c2] = v[c2, 1]
+      B[r2, c2] = deepcopy(v[c2, 1])
+      for s = 1:c2 - 1
+         if P2[s] != 0
+            B[r2, c2] *= B[P2[s], s]
+         end
+      end
       A[1, c2] = R(1)
       A[1, n + 1] = R(1)
       indep = true
@@ -2976,7 +2981,7 @@ function kb_reduce_row!(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int, 1}, c::Int
       if p == 0
          continue
       end
-      q = -div(H[r,i], H[p,i])
+      q = -divexact(H[r,i], H[p,i])
       for j = i:cols(H)
          t = mul!(t, q, H[p,j])
          H[r,j] = addeq!(H[r,j], t)
@@ -2999,7 +3004,7 @@ function kb_reduce_column!(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int, 1}, c::
       if p == 0
          continue
       end
-      q = -div(H[p,c],H[r,c])
+      q = -divexact(H[p,c],H[r,c])
       for j = c:cols(H)
          t = mul!(t, q, H[r,j])
          H[p,j] = addeq!(H[p,j], t)
@@ -3419,7 +3424,7 @@ function weak_popov_with_pivots!(P::GenMat{T}, W::GenMat{T}, U::GenMat{T}, pivot
             if j == pivotInd
                continue
             end
-            q = -div(P[pivots[i][j],i],P[pivot,i])
+            q = -divexact(P[pivots[i][j],i], P[pivot,i])
             for c = 1:n
                t = mul!(t, q, P[pivot,c])
                P[pivots[i][j],c] = addeq!(P[pivots[i][j],c], t)
@@ -4058,7 +4063,7 @@ function (a::GenMatSpace{T})(b::Array{T, 2}) where {T <: RingElement}
       parent(b[1, 1]) != base_ring(a) && error("Unable to coerce to matrix")
    end
    _check_dim(a.rows, a.cols, b)
-   z = GenMat{T}(b)
+   z = GenMat{T}(deepcopy(b)) # must make copy as user may not have distinct entries
    z.base_ring = a.base_ring
    return z
 end

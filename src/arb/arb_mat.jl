@@ -79,7 +79,7 @@ end
 
 setindex!(x::arb_mat, y::Integer, r::Int, c::Int) = setindex!(x, fmpz(y), r, c)
 
-setindex!(x::arb_mat, y::Rational{T}, r::Int, c::Int) where {T <: Rational} =
+setindex!(x::arb_mat, y::Rational{T}, r::Int, c::Int) where {T <: Integer} =
          setindex!(x, fmpz(y), r, c)
 
 zero(a::ArbMatSpace) = a()
@@ -264,7 +264,7 @@ for T in [Integer, fmpz, fmpq, arb]
    end
 end
 
-function +(x::arb_mat, y::Rational{T}) where {T <: Integer}
+function +(x::arb_mat, y::Rational{T}) where T <: Union{Int, BigInt}
    z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
       z[i, i] += y
@@ -272,9 +272,9 @@ function +(x::arb_mat, y::Rational{T}) where {T <: Integer}
    return z
 end
 
-+(x::Rational{T}, y::arb_mat) where {T <: Integer} = y + x
++(x::Rational{T}, y::arb_mat) where T <: Union{Int, BigInt} = y + x
 
-function -(x::arb_mat, y::Rational{T}) where {T <: Integer}
+function -(x::arb_mat, y::Rational{T}) where T <: Union{Int, BigInt}
    z = deepcopy(x)
    for i = 1:min(rows(x), cols(x))
       z[i, i] -= y
@@ -282,7 +282,7 @@ function -(x::arb_mat, y::Rational{T}) where {T <: Integer}
    return z
 end
 
-function -(x::Rational{T}, y::arb_mat) where {T <: Integer}
+function -(x::Rational{T}, y::arb_mat) where T <: Union{Int, BigInt}
    z = -y
    for i = 1:min(rows(y), cols(y))
       z[i, i] += x
@@ -699,7 +699,7 @@ end
 
 promote_rule(::Type{arb_mat}, ::Type{T}) where {T <: Integer} = arb_mat
 
-promote_rule(::Type{arb_mat}, ::Type{Rational{T}}) where {T <: Integer} = arb_mat
+promote_rule(::Type{arb_mat}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = arb_mat
 
 promote_rule(::Type{arb_mat}, ::Type{fmpz}) = arb_mat
 

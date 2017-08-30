@@ -674,7 +674,7 @@ function fit!(z::fq_poly, n::Int)
    return nothing
 end
 
-function setcoeff!(z::fq_poly, n::Int, x::fq)
+function setcoeff!(z::fq_poly, n::Int, x::fq, copy::Bool=true)
    ccall((:fq_poly_set_coeff, :libflint), Void, 
          (Ptr{fq_poly}, Int, Ptr{fq}, Ptr{FqFiniteField}),
          &z, n, &x, &base_ring(parent(z)))

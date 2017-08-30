@@ -282,17 +282,17 @@ for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, acb, fmpz_poly, fmpq_poly
    end
 end
 
-+(x::acb_poly, y::Rational{T}) where {T <: Integer} = x + parent(x)(y)
++(x::acb_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x + parent(x)(y)
 
-+(x::Rational{T}, y::acb_poly) where {T <: Integer} = y + x
++(x::Rational{T}, y::acb_poly) where T <: Union{Int, BigInt} = y + x
 
--(x::acb_poly, y::Rational{T}) where {T <: Integer} = x - parent(x)(y)
+-(x::acb_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x - parent(x)(y)
 
--(x::Rational{T}, y::acb_poly) where {T <: Integer} = parent(y)(x) - y
+-(x::Rational{T}, y::acb_poly) where T <: Union{Int, BigInt} = parent(y)(x) - y
 
-*(x::acb_poly, y::Rational{T}) where {T <: Integer} = x * parent(x)(y)
+*(x::acb_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x * parent(x)(y)
 
-*(x::Rational{T}, y::acb_poly) where {T <: Integer} = y * x
+*(x::Rational{T}, y::acb_poly) where T <: Union{Int, BigInt} = y * x
 
 ###############################################################################
 #
@@ -795,7 +795,7 @@ promote_rule(::Type{acb_poly}, ::Type{Complex{Float64}}) = acb_poly
 
 promote_rule(::Type{acb_poly}, ::Type{T}) where {T <: Integer} = acb_poly
 
-promote_rule(::Type{acb_poly}, ::Type{Rational{T}}) where {T <: Integer} = acb_poly
+promote_rule(::Type{acb_poly}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = acb_poly
 
 promote_rule(::Type{acb_poly}, ::Type{Complex{Int}}) = acb_poly
 

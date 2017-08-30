@@ -273,17 +273,17 @@ for T in [Integer, fmpz, fmpq, Float64, BigFloat, arb, fmpz_poly, fmpq_poly]
    end
 end
 
-+(x::arb_poly, y::Rational{T}) where {T <: Integer} = x + parent(x)(y)
++(x::arb_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x + parent(x)(y)
 
-+(x::Rational{T}, y::arb_poly) where {T <: Integer} = y + x
++(x::Rational{T}, y::arb_poly) where T <: Union{Int, BigInt} = y + x
 
--(x::arb_poly, y::Rational{T}) where {T <: Integer} = x - parent(x)(y)
+-(x::arb_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x - parent(x)(y)
 
--(x::Rational{T}, y::arb_poly) where {T <: Integer} = parent(y)(x) - y
+-(x::Rational{T}, y::arb_poly) where T <: Union{Int, BigInt} = parent(y)(x) - y
 
-*(x::arb_poly, y::Rational{T}) where {T <: Integer} = x * parent(x)(y)
+*(x::arb_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x * parent(x)(y)
 
-*(x::Rational{T}, y::arb_poly) where {T <: Integer} = y * x
+*(x::Rational{T}, y::arb_poly) where T <: Union{Int, BigInt} = y * x
 
 ###############################################################################
 #
@@ -706,7 +706,7 @@ promote_rule(::Type{arb_poly}, ::Type{fmpq_poly}) = arb_poly
 
 promote_rule(::Type{arb_poly}, ::Type{T}) where {T <: Integer} = arb_poly
 
-promote_rule(::Type{arb_poly}, ::Type{Rational{T}}) where {T <: Integer} = arb_poly
+promote_rule(::Type{arb_poly}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = arb_poly
 
 ################################################################################
 #

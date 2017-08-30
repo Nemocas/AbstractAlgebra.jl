@@ -177,6 +177,10 @@ function (a::Integers)(b::Int)
    return BigInt(b)
 end
 
+function (a::Integers)(b::Integer)
+   return BigInt(b)
+end
+
 function (a::Integers)(b::BigInt)
    return b
 end

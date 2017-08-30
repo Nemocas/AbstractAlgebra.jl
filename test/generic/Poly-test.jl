@@ -140,7 +140,7 @@ function test_gen_poly_adhoc_binary()
    R,x = JuliaZZ["x"]
    S,y = R["y"]
    U,z = S["z"]
-   maxIter = 100
+   maxIter = 30
    degmax = 20
    bitsize = 20
    for iter = 1:maxIter

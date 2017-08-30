@@ -263,17 +263,17 @@ end
 
 *(x::fmpq_poly, y::Integer) = fmpz(y)*x
 
-+(x::Rational, y::fmpq_poly) = fmpq(x) + y
++(x::Rational{T}, y::fmpq_poly) where T <: Union{Int, BigInt} = fmpq(x) + y
 
--(x::Rational, y::fmpq_poly) = fmpq(x) - y
+-(x::Rational{T}, y::fmpq_poly) where T <: Union{Int, BigInt} = fmpq(x) - y
 
-*(x::Rational, y::fmpq_poly) = fmpq(x) * y
+*(x::Rational{T}, y::fmpq_poly) where T <: Union{Int, BigInt} = fmpq(x) * y
 
-+(x::fmpq_poly, y::Rational) = x + fmpq(y)
++(x::fmpq_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x + fmpq(y)
 
--(x::fmpq_poly, y::Rational) = x - fmpq(y)
+-(x::fmpq_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x - fmpq(y)
 
-*(x::fmpq_poly, y::Rational) = x * fmpq(y)
+*(x::fmpq_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x * fmpq(y)
 
 ###############################################################################
 #
@@ -324,9 +324,9 @@ end
 
 ==(x::fmpq, y::fmpq_poly) = y == x
 
-==(x::fmpq_poly, y::Rational) = x == fmpq(y)
+==(x::fmpq_poly, y::Rational{T}) where T <: Union{Int, BigInt} = x == fmpq(y)
 
-==(x::Rational, y::fmpq_poly) = y == x
+==(x::Rational{T}, y::fmpq_poly) where T <: Union{Int, BigInt} = y == x
 
 ###############################################################################
 #
@@ -471,7 +471,7 @@ end
 
 divexact(x::fmpq_poly, y::Integer) = divexact(x, fmpz(y)) 
 
-divexact(x::fmpq_poly, y::Rational) = divexact(x, fmpq(y))
+divexact(x::fmpq_poly, y::Rational{T}) where T <: Union{Int, BigInt} = divexact(x, fmpq(y))
 
 ###############################################################################
 #
@@ -696,13 +696,13 @@ function fit!(z::fmpq_poly, n::Int)
    return nothing
 end
 
-function setcoeff!(z::fmpq_poly, n::Int, x::fmpz)
+function setcoeff!(z::fmpq_poly, n::Int, x::fmpz, copy::Bool=true)
    ccall((:fmpq_poly_set_coeff_fmpz, :libflint), Void, 
                     (Ptr{fmpq_poly}, Int, Ptr{fmpz}), &z, n, &x)
    return z
 end
 
-function setcoeff!(z::fmpq_poly, n::Int, x::fmpq)
+function setcoeff!(z::fmpq_poly, n::Int, x::fmpq, copy::Bool=true)
    ccall((:fmpq_poly_set_coeff_fmpq, :libflint), Void, 
                     (Ptr{fmpq_poly}, Int, Ptr{fmpq}), &z, n, &x)
    return z
@@ -738,7 +738,7 @@ promote_rule(::Type{fmpq_poly}, ::Type{fmpz}) = fmpq_poly
 
 promote_rule(::Type{fmpq_poly}, ::Type{fmpq}) = fmpq_poly
 
-promote_rule(::Type{fmpq_poly}, ::Type{Rational{T}}) where {T <: Integer} = fmpq_poly
+promote_rule(::Type{fmpq_poly}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = fmpq_poly
 
 ###############################################################################
 #

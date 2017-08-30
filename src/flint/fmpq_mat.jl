@@ -277,11 +277,11 @@ end
 
 *(x::fmpq_mat, y::Integer) = fmpz(y)*x
 
-*(x::Rational, y::fmpq_mat) = fmpq(x)*y
+*(x::Rational{T}, y::fmpq_mat) where T <: Union{Int, BigInt} = fmpq(x)*y
 
-*(x::fmpq_mat, y::Rational) = fmpq(y)*x
+*(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt} = fmpq(y)*x
 
-for T in [Integer, Rational, fmpz, fmpq]
+for T in [Integer, fmpz, fmpq]
    @eval begin
       function +(x::fmpq_mat, y::$T)
          z = deepcopy(x)
@@ -309,6 +309,32 @@ for T in [Integer, Rational, fmpz, fmpq]
          return z
       end
    end
+end
+
+function +(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt}
+   z = deepcopy(x)
+   for i = 1:min(rows(x), cols(x))
+      z[i, i] += y
+   end
+   return z
+end
+
++(x::Rational{T}, y::fmpq_mat) where T <: Union{Int, BigInt} = y + x
+
+function -(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt}
+   z = deepcopy(x)
+   for i = 1:min(rows(x), cols(x))
+      z[i, i] -= y
+   end
+   return z
+end
+
+function -(x::Rational{T}, y::fmpq_mat) where T <: Union{Int, BigInt}
+   z = -y
+   for i = 1:min(rows(y), cols(y))
+      z[i, i] += x
+   end
+   return z
 end
 
 ###############################################################################
@@ -347,9 +373,9 @@ end
 
 ==(x::Integer, y::fmpq_mat) = y == x
 
-==(x::fmpq_mat, y::Rational) = x == fmpq(y)
+==(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt} = x == fmpq(y)
 
-==(x::Rational, y::fmpq_mat) = y == x
+==(x::Rational{T}, y::fmpq_mat) where T <: Union{Int, BigInt} = y == x
 
 ###############################################################################
 #
@@ -400,7 +426,7 @@ end
 
 divexact(x::fmpq_mat, y::Integer) = divexact(x, fmpz(y))
 
-divexact(x::fmpq_mat, y::Rational) = divexact(x, fmpq(y))
+divexact(x::fmpq_mat, y::Rational{T}) where T <: Union{Int, BigInt} = divexact(x, fmpq(y))
 
 ###############################################################################
 #
@@ -729,7 +755,7 @@ promote_rule(::Type{fmpq_mat}, ::Type{fmpq}) = fmpq_mat
 
 promote_rule(::Type{fmpq_mat}, ::Type{fmpz}) = fmpq_mat
 
-promote_rule(::Type{fmpq_mat}, ::Type{Rational{T}}) where {T <: Integer} = fmpq_mat
+promote_rule(::Type{fmpq_mat}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = fmpq_mat
 
 ###############################################################################
 #

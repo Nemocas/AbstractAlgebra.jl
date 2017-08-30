@@ -768,7 +768,7 @@ function fit!(z::fmpz_poly, n::Int)
    return nothing
 end
 
-function setcoeff!(z::fmpz_poly, n::Int, x::fmpz)
+function setcoeff!(z::fmpz_poly, n::Int, x::fmpz, copy::Bool=true)
    ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
                     (Ptr{fmpz_poly}, Int, Ptr{fmpz}), &z, n, &x)
    return z

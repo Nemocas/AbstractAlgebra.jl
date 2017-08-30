@@ -424,6 +424,11 @@ function divexact(x::nmod_poly, y::GenRes{fmpz})
   return divexact(x, parent(x)(y))
 end
 
+function divexact(x::nmod_poly, y::fmpz)
+  iszero(y) && throw(DivideError())
+  return divexact(x, parent(x)(y))
+end
+
 div(x::nmod_poly, y::nmod_poly) = divexact(x,y)
 
 function divexact(x::nmod_poly, y::Int)
@@ -895,28 +900,28 @@ function fit!(x::nmod_poly, n::Int)
   return nothing
 end
 
-function setcoeff!(x::nmod_poly, n::Int, y::UInt)
+function setcoeff!(x::nmod_poly, n::Int, y::UInt, copy::Bool=true)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{nmod_poly}, Int, UInt), &x, n, y)
   return x
 end
 
-function setcoeff!(x::nmod_poly, n::Int, y::Int)
+function setcoeff!(x::nmod_poly, n::Int, y::Int, copy::Bool=true)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{nmod_poly}, Int, UInt), &x, n, mod(y, x.mod_n))
   return x
 end
   
-function setcoeff!(x::nmod_poly, n::Int, y::fmpz)
+function setcoeff!(x::nmod_poly, n::Int, y::fmpz, copy::Bool=true)
   r = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt), &y, x.mod_n)
   ccall((:nmod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{nmod_poly}, Int, UInt), &x, n, r)
   return x
 end
   
-setcoeff!(x::nmod_poly, n::Int, y::Integer) = setcoeff!(x, n, fmpz(y))
+setcoeff!(x::nmod_poly, n::Int, y::Integer, copy::Bool=true) = setcoeff!(x, n, fmpz(y))
   
-setcoeff!(x::nmod_poly, n::Int, y::GenRes{fmpz}) = setcoeff!(x, n, y.data)
+setcoeff!(x::nmod_poly, n::Int, y::GenRes{fmpz}, copy::Bool=true) = setcoeff!(x, n, y.data)
 
 function add!(z::nmod_poly, x::nmod_poly, y::nmod_poly)
   ccall((:nmod_poly_add, :libflint), Void, 

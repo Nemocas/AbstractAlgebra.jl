@@ -240,6 +240,10 @@ function (R::Rationals{BigInt})(b::Int)
    return Rational{BigInt}(b)
 end
 
+function (R::Rationals{BigInt})(b::Integer)
+   return Rational{BigInt}(b)
+end
+
 function (R::Rationals{BigInt})(b::BigInt)
    return Rational{BigInt}(b)
 end
