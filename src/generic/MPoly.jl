@@ -1185,7 +1185,7 @@ function *(a::GenMPoly{T}, n::T) where {T <: RingElem}
    return r
 end
 
-function *(a::GenMPoly{Rational{T}}, n::Rational{T}) where T <: Union{Int, BigInt}
+function *(a::GenMPoly, n::Rational{T}) where T <: Union{Int, BigInt}
    N = size(a.exps, 1)
    r = parent(a)()
    fit!(r, length(a))
@@ -1211,11 +1211,11 @@ end
 
 *(n::T, a::GenMPoly{T}) where {T <: RingElem} = a*n
 
-*(n::Rational{T}, a::GenMPoly{Rational{T}}) where T <: Union{Int, BigInt} = a*n
+*(n::Rational{T}, a::GenMPoly) where T <: Union{Int, BigInt} = a*n
 
 +(a::GenMPoly{T}, b::T) where {T <: RingElem} = a + parent(a)(b)
 
-+(a::GenMPoly{Rational{T}}, b::Rational{T}) where T <: Union{Int, BigInt} = a + parent(a)(b)
++(a::GenMPoly, b::Rational{T}) where T <: Union{Int, BigInt} = a + parent(a)(b)
 
 +(a::GenMPoly, b::Integer) = a + parent(a)(b)
 
@@ -1225,7 +1225,7 @@ end
 
 -(a::GenMPoly{T}, b::T) where {T <: RingElem} = a - parent(a)(b)
 
--(a::GenMPoly{Rational{T}}, b::Rational{T}) where T <: Union{Int, BigInt} = a - parent(a)(b)
+-(a::GenMPoly, b::Rational{T}) where T <: Union{Int, BigInt} = a - parent(a)(b)
 
 -(a::GenMPoly, b::Integer) = a - parent(a)(b)
 
@@ -1235,7 +1235,7 @@ end
 
 +(a::T, b::GenMPoly{T}) where {T <: RingElem} = parent(b)(a) + b
 
-+(a::Rational{T}, b::GenMPoly{Rational{T}}) where T <: Union{Int, BigInt} = parent(b)(a) + b
++(a::Rational{T}, b::GenMPoly) where T <: Union{Int, BigInt} = parent(b)(a) + b
 
 +(a::Integer, b::GenMPoly) = parent(b)(a) + b
 
@@ -1245,7 +1245,7 @@ end
 
 -(a::T, b::GenMPoly{T}) where {T <: RingElem} = parent(b)(a) - b
 
--(a::Rational{T}, b::GenMPoly{Rational{T}}) where T <: Union{Int, BigInt} = parent(b)(a) - b
+-(a::Rational{T}, b::GenMPoly) where T <: Union{Int, BigInt} = parent(b)(a) - b
 
 -(a::Integer, b::GenMPoly) = parent(b)(a) - b
 
@@ -1323,7 +1323,7 @@ function ==(a::GenMPoly{T}, n::T) where {T <: RingElem}
    return false
 end
 
-function ==(a::GenMPoly{Rational{T}}, n::Rational{T}) where T <: Union{Int, BigInt}
+function ==(a::GenMPoly, n::Rational{T}) where T <: Union{Int, BigInt}
    N = size(a.exps, 1)
    if n == 0
       return a.length == 0
