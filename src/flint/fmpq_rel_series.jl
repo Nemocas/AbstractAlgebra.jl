@@ -297,17 +297,17 @@ end
 
 *(x::Integer, y::fmpq_rel_series) = fmpz(x) * y
 
-*(x::fmpq_rel_series, y::Rational) = x * fmpq(y)
+*(x::fmpq_rel_series, y::Rational{T}) where T <: Union{Int, BigInt} = x * fmpq(y)
 
-*(x::Rational, y::fmpq_rel_series) = fmpq(x) * y
+*(x::Rational{T}, y::fmpq_rel_series) where T <: Union{Int, BigInt} = fmpq(x) * y
 
 +(x::fmpq_rel_series, y::Integer) = x + fmpz(y)
 
 +(x::Integer, y::fmpq_rel_series) = fmpz(x) + y
 
-+(x::fmpq_rel_series, y::Rational) = x + fmpq(y)
++(x::fmpq_rel_series, y::Rational{T}) where T <: Union{Int, BigInt} = x + fmpq(y)
 
-+(x::Rational, y::fmpq_rel_series) = fmpq(x) + y
++(x::Rational{T}, y::fmpq_rel_series) where T <: Union{Int, BigInt} = fmpq(x) + y
 
 ###############################################################################
 #
@@ -505,9 +505,9 @@ end
 
 ==(x::Integer, y::fmpq_rel_series) = y == x
 
-==(x::fmpq_rel_series, y::Rational) = x == fmpq(y)
+==(x::fmpq_rel_series, y::Rational{T}) where T <: Union{Int, BigInt} = x == fmpq(y)
 
-==(x::Rational, y::fmpq_rel_series) = y == x
+==(x::Rational{T}, y::fmpq_rel_series) where T <: Union{Int, BigInt} = y == x
 
 ###############################################################################
 #
@@ -582,7 +582,7 @@ end
 
 divexact(x::fmpq_rel_series, y::Integer) = divexact(x, fmpz(y))
 
-divexact(x::fmpq_rel_series, y::Rational) = divexact(x, fmpq(y))
+divexact(x::fmpq_rel_series, y::Rational{T}) where T <: Union{Int, BigInt} = divexact(x, fmpq(y))
 
 ###############################################################################
 #
@@ -994,7 +994,7 @@ end
 
 promote_rule(::Type{fmpq_rel_series}, ::Type{T}) where {T <: Integer} = fmpq_rel_series
 
-promote_rule(::Type{fmpq_rel_series}, ::Type{Rational{T}}) where {T <: Integer} = fmpq_rel_series
+promote_rule(::Type{fmpq_rel_series}, ::Type{Rational{T}}) where T <: Union{Int, BigInt} = fmpq_rel_series
 
 promote_rule(::Type{fmpq_rel_series}, ::Type{fmpz}) = fmpq_rel_series
 
@@ -1047,7 +1047,7 @@ function (a::FmpqRelSeriesRing)(b::fmpq)
    return z
 end
 
-(a::FmpqRelSeriesRing)(b::Rational) = a(fmpq(b))
+(a::FmpqRelSeriesRing)(b::Rational{T}) where T <: Union{Int, BigInt} = a(fmpq(b))
 
 function (a::FmpqRelSeriesRing)(b::fmpq_rel_series)
    parent(b) != a && error("Unable to coerce power series")

@@ -489,10 +489,10 @@ function *(a::T, b::RelSeriesElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    *{T <: Union{Int, BigInt}}(a::Rational{T}, b::RelSeriesElem{Rational{T}})
+    *{T <: Union{Int, BigInt}}(a::Rational{T}, b::RelSeriesElem)
 > Return $a\times b$.
 """
-function *(a::Rational{T}, b::RelSeriesElem{Rational{T}}) where T <: Union{BigInt, Int}
+function *(a::Rational{T}, b::RelSeriesElem) where T <: Union{BigInt, Int}
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
@@ -549,10 +549,10 @@ doc"""
 *(a::RelSeriesElem{T}, b::T) where {T <: RingElem} = b*a
 
 doc"""
-    *{T <: Union{Int, BigInt}}(a::RelSeriesElem{Rational{T}}, b::Rational{T})
+    *{T <: Union{Int, BigInt}}(a::RelSeriesElem, b::Rational{T})
 > Return $a\times b$.
 """
-*(a::RelSeriesElem{Rational{T}}, b::Rational{T}) where T <: Union{Int, BigInt} = b*a
+*(a::RelSeriesElem, b::Rational{T}) where T <: Union{Int, BigInt} = b*a
 
 doc"""
     *(a::RelSeriesElem, b::Integer)
@@ -573,10 +573,10 @@ doc"""
 +(a::T, b::RelSeriesElem{T}) where {T <: RingElem} = parent(b)(a) + b
 
 doc"""
-    +{T <: Union{Int, BigInt}}(a::Rational{T}, b::RelSeriesElem{Rational{T}})
+    +{T <: Union{Int, BigInt}}(a::Rational{T}, b::RelSeriesElem)
 > Return $a + b$.
 """
-+(a::Rational{T}, b::RelSeriesElem{Rational{T}}) where T <: Union{Int, BigInt} = parent(b)(a) + b
++(a::Rational{T}, b::RelSeriesElem) where T <: Union{Int, BigInt} = parent(b)(a) + b
 
 doc"""
     +(a::Integer, b::RelSeriesElem)
@@ -597,10 +597,10 @@ doc"""
 +(a::RelSeriesElem{T}, b::T) where {T <: RingElem} = b + a
 
 doc"""
-    +{T <: Union{Int, BigInt}}(a::RelSeriesElem{Rational{T}}, b::Rational{T})
+    +{T <: Union{Int, BigInt}}(a::RelSeriesElem, b::Rational{T})
 > Return $a + b$.
 """
-+(a::RelSeriesElem{Rational{T}}, b::Rational{T}) where T <: Union{Int, BigInt} = b + a
++(a::RelSeriesElem, b::Rational{T}) where T <: Union{Int, BigInt} = b + a
 
 doc"""
     +(a::RelSeriesElem, b::Integer)
@@ -621,10 +621,10 @@ doc"""
 -(a::T, b::RelSeriesElem{T}) where {T <: RingElem} = parent(b)(a) - b
 
 doc"""
-    -{T <: Union{Int, BigInt}}(a::Rational{T}, b::RelSeriesElem{Rational{T}})
+    -{T <: Union{Int, BigInt}}(a::Rational{T}, b::RelSeriesElem)
 > Return $a - b$.
 """
--(a::Rational{T}, b::RelSeriesElem{Rational{T}}) where T <: Union{Int, BigInt} = parent(b)(a) - b
+-(a::Rational{T}, b::RelSeriesElem) where T <: Union{Int, BigInt} = parent(b)(a) - b
 
 doc"""
     -(a::Integer, b::RelSeriesElem)
@@ -645,10 +645,10 @@ doc"""
 -(a::RelSeriesElem{T}, b::T) where {T <: RingElem} = a - parent(a)(b)
 
 doc"""
-    -{T <: Union{Int, BigInt}}(a::RelSeriesElem{Rational{T}}, b::Rational{T})
+    -{T <: Union{Int, BigInt}}(a::RelSeriesElem, b::Rational{T})
 > Return $a - b$.
 """
--(a::RelSeriesElem{Rational{T}}, b::Rational{T}) where T <: Union{Int, BigInt} = a - parent(a)(b)
+-(a::RelSeriesElem, b::Rational{T}) where T <: Union{Int, BigInt} = a - parent(a)(b)
 
 doc"""
     -(a::RelSeriesElem, b::Integer)
@@ -881,10 +881,10 @@ doc"""
              valuation(x) == 0 && polcoeff(x, 0) == y))
 
 doc"""
-    =={T <: Union{Int, BigInt}}(x::RelSeriesElem{Rational{T}}, y::Rational{T})
+    =={T <: Union{Int, BigInt}}(x::RelSeriesElem, y::Rational{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::RelSeriesElem{Rational{T}}, y::Rational{T}) where T <: Union{Int, BigInt} = precision(x) == 0 ||
+==(x::RelSeriesElem, y::Rational{T}) where T <: Union{Int, BigInt} = precision(x) == 0 ||
            ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 && 
              valuation(x) == 0 && polcoeff(x, 0) == y))
 
@@ -895,10 +895,10 @@ doc"""
 ==(x::T, y::RelSeriesElem{T}) where {T <: RingElem} = y == x
 
 doc"""
-    =={T <: Union{Int, BigInt}}(x::Rational{T}, y::RelSeriesElem{Rational{T}})
+    =={T <: Union{Int, BigInt}}(x::Rational{T}, y::RelSeriesElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Rational{T}, y::RelSeriesElem{Rational{T}}) where T <: Union{Int, BigInt} = y == x
+==(x::Rational{T}, y::RelSeriesElem) where T <: Union{Int, BigInt} = y == x
 
 doc"""
     ==(x::RelSeriesElem, y::Integer)
@@ -1011,10 +1011,10 @@ function divexact(x::RelSeriesElem{T}, y::T) where {T <: RingElem}
 end
 
 doc"""
-    divexact{T <: Union{Int, BigInt}}(a::RelSeriesElem{Rational{T}}, b::Rational{T})
+    divexact{T <: Union{Int, BigInt}}(a::RelSeriesElem, b::Rational{T})
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact(x::RelSeriesElem{Rational{T}}, y::Rational{T}) where T <: Union{Int, BigInt}
+function divexact(x::RelSeriesElem, y::Rational{T}) where T <: Union{Int, BigInt}
    iszero(y) && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
