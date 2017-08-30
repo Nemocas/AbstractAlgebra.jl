@@ -1091,7 +1091,7 @@ function mul!(c::GenRelSeries{T}, a::GenRelSeries{T}, b::GenRelSeries{T}) where 
    end
    c.val = a.val + b.val
    c.prec = prec + c.val
-   renormalize!(z)
+   renormalize!(c)
    return c
 end
 
