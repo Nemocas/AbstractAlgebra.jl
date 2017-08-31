@@ -2022,8 +2022,8 @@ function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: Union{ResElem, FieldEl
    c2 = content(b)
    A = divexact(a, c1)
    B = divexact(b, c2)
-   u1, u2 = inv(c1), zero(parent(a))
-   v1, v2 = zero(parent(a)), inv(c2)
+   u1, u2 = parent(a)(inv(c1)), zero(parent(a))
+   v1, v2 = zero(parent(a)), parent(a)(inv(c2))
    while lenb > 0
       d = lena - lenb
       (Q, B), A = divrem(A, B), B
