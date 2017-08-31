@@ -2981,7 +2981,7 @@ function kb_reduce_row!(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int, 1}, c::Int
       if p == 0
          continue
       end
-      q = -divexact(H[r,i], H[p,i])
+      q = -div(H[r,i], H[p,i])
       for j = i:cols(H)
          t = mul!(t, q, H[p,j])
          H[r,j] = addeq!(H[r,j], t)
@@ -3004,7 +3004,7 @@ function kb_reduce_column!(H::GenMat{T}, U::GenMat{T}, pivot::Array{Int, 1}, c::
       if p == 0
          continue
       end
-      q = -divexact(H[p,c],H[r,c])
+      q = -div(H[p,c],H[r,c])
       for j = c:cols(H)
          t = mul!(t, q, H[r,j])
          H[p,j] = addeq!(H[p,j], t)
@@ -3424,7 +3424,7 @@ function weak_popov_with_pivots!(P::GenMat{T}, W::GenMat{T}, U::GenMat{T}, pivot
             if j == pivotInd
                continue
             end
-            q = -divexact(P[pivots[i][j],i], P[pivot,i])
+            q = -div(P[pivots[i][j],i], P[pivot,i])
             for c = 1:n
                t = mul!(t, q, P[pivot,c])
                P[pivots[i][j],c] = addeq!(P[pivots[i][j],c], t)

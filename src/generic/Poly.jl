@@ -1267,6 +1267,16 @@ function divrem(f::PolyElem{T}, g::PolyElem{T}) where {T <: Union{ResElem, Field
    return q, f
 end
 
+doc"""
+    div{T <: Union{ResElem, FieldElement}}(f::PolyElem{T}, g::PolyElem{T})
+> Return a tuple $q$ such that $f = qg + r$ where $q$ is the euclidean
+> quotient of $f$ by $g$.
+"""
+function div(f::PolyElem{T}, g::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
+   q, r = divrem(f, g)
+   return q
+end
+
 ###############################################################################
 #
 #   Pseudodivision
