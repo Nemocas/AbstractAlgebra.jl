@@ -260,6 +260,10 @@ function (R::Rationals{BigInt})(b::Rational{BigInt})
    return b
 end
 
+function (R::Rationals{BigInt})(b::Rational{Int})
+   return Rational{BigInt}(b)
+end
+
 ###############################################################################
 #
 #   FractionField constructor
