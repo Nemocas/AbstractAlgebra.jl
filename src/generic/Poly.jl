@@ -154,7 +154,7 @@ doc"""
     gen(R::PolyRing)
 > Return the generator of the given polynomial ring.
 """
-gen(R::PolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
+gen(R::PolyRing) = R([zero(base_ring(R)), one(base_ring(R))], false)
 
 doc"""
     iszero(a::PolyElem)
@@ -227,7 +227,7 @@ function deepcopy_internal(a::GenPoly{T}, dict::ObjectIdDict) where {T <: RingEl
    for i = 1:length(a)
       coeffs[i] = deepcopy(a.coeffs[i])
    end
-   return parent(a)(coeffs)
+   return parent(a)(coeffs, false)
 end
 
 ###############################################################################
@@ -532,7 +532,7 @@ function mul_classical(a::PolyElem{T}, b::PolyElem{T}) where {T <: RingElement}
          d[i + j - 1] = addeq!(d[i + j - 1], t)
       end
    end
-   z = parent(a)(d)
+   z = parent(a)(d, false)
    set_length!(z, normalise(z, lenz))
    return z
 end
@@ -737,7 +737,7 @@ function pow_multinomial(a::PolyElem{T}, e::Int) where {T <: RingElement}
       d = addeq!(d, first)
       res[k + 1] = divexact(res[k + 1], d)
    end
-   z = parent(a)(res)
+   z = parent(a)(res, false)
    set_length!(z, normalise(z, lenz))
    return z
 end
@@ -943,7 +943,7 @@ function mullow(a::PolyElem{T}, b::PolyElem{T}, n::Int) where {T <: RingElement}
          end
       end
    end  
-   z = parent(a)(d)
+   z = parent(a)(d, false)
    set_length!(z, normalise(z, lenz))
    return z
 end
@@ -1127,7 +1127,7 @@ function divexact(f::PolyElem{T}, g::PolyElem{T}) where {T <: RingElement}
       q1 = d[lenf - leng + 1] = divexact(coeff(f, lenf - 1), coeff(g, leng - 1))
       f = f - shift_left(q1*g, lenf - leng)
    end
-   q = parent(f)(d)
+   q = parent(f)(d, false)
    set_length!(q, lenq)
    return q
 end
