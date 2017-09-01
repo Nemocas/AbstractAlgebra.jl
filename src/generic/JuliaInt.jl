@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   JuliaInt.jl : Additional Nemo functionality for Julia Ints
+#   JuliaInteger.jl : Additional Nemo functionality for Julia Integer
 #
 ###############################################################################
 
@@ -10,17 +10,17 @@
 #
 ###############################################################################
 
-zz = MachineIntegers()
+JuliaZZ = Integers{BigInt}()
 
-parent(a::Int) = zz
+zz = Integers{Int}()
 
-elem_type(::MachineIntegers) = Int
+parent(a::T) where T <: Integer = Integers{T}()
+
+elem_type(::Integers{T}) where T <: Integer = T
  
-parent_type(::Type{Int}) = MachineIntegers
+parent_type(::Type{T}) where T <: Integer = Integers{T}
 
-base_ring(a::Int) = Union{}
-
-base_ring(a::MachineIntegers) = Union{}
+base_ring(a::Integer) = Union{}
 
 ###############################################################################
 #
@@ -28,15 +28,15 @@ base_ring(a::MachineIntegers) = Union{}
 #
 ###############################################################################
 
-zero(::MachineIntegers) = 0
+zero(::Integers{T}) where T <: Integer = T(0)
 
-one(::MachineIntegers) = 1
+one(::Integers{T}) where T <: Integer = T(1)
 
-isone(a::Int) = a == 1
+isone(a::Integer) = a == 1
 
-isunit(a::Int) = a == 1 || a == -1
+isunit(a::Integer) = a == 1 || a == -1
 
-canonical_unit(a::Int) = a < 0 ? -1 : 1
+canonical_unit(a::T) where T <: Integer = a < 0 ? T(-1) : T(1)
 
 ###############################################################################
 #
@@ -44,15 +44,15 @@ canonical_unit(a::Int) = a < 0 ? -1 : 1
 #
 ###############################################################################
 
-function show(io::IO, R::MachineIntegers)
-   print(io, "Machine Integers")
+function show(io::IO, R::Integers)
+   print(io, "Integers")
 end
 
-needs_parentheses(::Int) = false
+needs_parentheses(::Integer) = false
 
-isnegative(a::Int) = a < 0
+isnegative(a::Integer) = a < 0
 
-show_minus_one(::Type{Int}) = false
+show_minus_one(::Type{T}) where T <: Integer = false
 
 ###############################################################################
 #
@@ -60,13 +60,13 @@ show_minus_one(::Type{Int}) = false
 #
 ###############################################################################
 
-function powmod(a::Int, b::Int, c::Int)
+function powmod(a::T, b::Int, c::T) where T <: Integer
    b < 0 && throw(DomainError())
    # special cases
    if a == 0
-      return 0
+      return T(0)
    elseif b == 0
-      return 1
+      return T(1)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0
@@ -91,7 +91,7 @@ end
 #
 ###############################################################################
 
-function divides(a::Int, b::Int)
+function divides(a::T, b::T) where T <: Integer
    q, r = divrem(a, b)
    return r == 0, q
 end
@@ -102,7 +102,7 @@ end
 #
 ###############################################################################
 
-divexact(a::Int, b::Int) = div(a, b)
+divexact(a::T, b::T) where T <: Integer = div(a, b)
 
 ###############################################################################
 #
@@ -110,7 +110,7 @@ divexact(a::Int, b::Int) = div(a, b)
 #
 ###############################################################################
 
-function gcdinv(a::Int, b::Int)
+function gcdinv(a::T, b::T) where T <: Integer
    g, s, t = gcdx(a, b)
    return g, s
 end
@@ -121,28 +121,58 @@ end
 #
 ###############################################################################
 
-function zero!(a::Int)
+function zero!(a::Integer)
    return 0
 end
 
-function mul!(a::Int, b::Int, c::Int)
+function zero!(a::BigInt)
+   ccall((:__gmpz_set_si, :libgmp), Void, (Ptr{BigInt}, Int), &a, 0)
+   return a
+end
+
+function mul!(a::T, b::T, c::T) where T <: Integer
    return b*c
 end
 
-function add!(a::Int, b::Int, c::Int)
+function mul!(a::BigInt, b::BigInt, c::BigInt)
+   ccall((:__gmpz_mul, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &b, &c)
+   return a
+end
+
+function add!(a::T, b::T, c::T) where T <: Integer
    return b + c
 end
 
-function addeq!(a::Int, b::Int)
+function add!(a::BigInt, b::BigInt, c::BigInt)
+   ccall((:__gmpz_add, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &b, &c)
+   return a
+end
+
+function addeq!(a::T, b::T) where T <: Integer
    return a + b
 end
 
-function addmul!(a::Int, b::Int, c::Int, d::Int)
+function addeq!(a::BigInt, b::BigInt)
+   ccall((:__gmpz_add, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &a, &b)
+   return a
+end
+
+function addmul!(a::T, b::T, c::T, d::T) where T <: Integer
    return a + b*c
 end
 
-function addmul!(a::Int, b::Int, c::Int) # special case, no temporary required
+function addmul!(a::BigInt, b::BigInt, c::BigInt, d::BigInt)
+   ccall((:__gmpz_addmul, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &b, &c)
+   return a
+end
+
+function addmul!(a::T, b::T, c::T) where T <: Integer # special case, no temporary required
    return a + b*c
+end
+
+function addmul!(a::BigInt, b::BigInt, c::BigInt) # special case, no temporary required
+   ccall((:__gmpz_addmul, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &b, &c)
+   return a
 end
 
 ###############################################################################
@@ -151,7 +181,7 @@ end
 #
 ###############################################################################
 
-function rand(R::MachineIntegers, n::UnitRange{Int})
+function rand(R::Integers, n::UnitRange{Int})
    return R(rand(n))
 end
 
@@ -161,10 +191,10 @@ end
 #
 ###############################################################################
 
-function (a::MachineIntegers)()
-   return 0
+function (a::Integers{T})() where T <: Integer
+   return T(0)
 end
 
-function (a::MachineIntegers)(b::Int)
-   return b
+function (a::Integers{T})(b::Integer) where T <: Integer
+   return T(b)
 end

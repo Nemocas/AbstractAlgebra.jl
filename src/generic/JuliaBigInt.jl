@@ -10,17 +10,17 @@
 #
 ###############################################################################
 
-JuliaZZ = Integers()
+JuliaZZ = Integers{BigInt}()
 
 parent(a::BigInt) = JuliaZZ
 
 elem_type(::Integers) = BigInt
  
-parent_type(::Type{BigInt}) = Integers
+parent_type(::Type{BigInt}) = Integers{BigInt}
 
 base_ring(a::BigInt) = Union{}
 
-base_ring(a::Integers) = Union{}
+base_ring(a::Integers{BigInt}) = Union{}
 
 ###############################################################################
 #
@@ -28,9 +28,9 @@ base_ring(a::Integers) = Union{}
 #
 ###############################################################################
 
-zero(::Integers) = BigInt(0)
+zero(::Integers{BigInt}) = BigInt(0)
 
-one(::Integers) = BigInt(1)
+one(::Integers{BigInt}) = BigInt(1)
 
 isone(a::BigInt) = a == 1
 
@@ -44,7 +44,7 @@ canonical_unit(a::BigInt) = a < 0 ? BigInt(-1) : BigInt(1)
 #
 ###############################################################################
 
-function show(io::IO, R::Integers)
+function show(io::IO, R::Integers{BigInt})
    print(io, "Integers")
 end
 
@@ -159,7 +159,7 @@ end
 #
 ###############################################################################
 
-function rand(R::Integers, n::UnitRange{Int})
+function rand(R::Integers{BigInt}, n::UnitRange{Int})
    return R(rand(n))
 end
 
@@ -169,18 +169,18 @@ end
 #
 ###############################################################################
 
-function (a::Integers)()
+function (a::Integers{BigInt})()
    return BigInt(0)
 end
 
-function (a::Integers)(b::Int)
+function (a::Integers{BigInt})(b::Int)
    return BigInt(b)
 end
 
-function (a::Integers)(b::Integer)
+function (a::Integers{BigInt})(b::Integer)
    return BigInt(b)
 end
 
-function (a::Integers)(b::BigInt)
+function (a::Integers{BigInt})(b::BigInt)
    return b
 end

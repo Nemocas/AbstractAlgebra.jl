@@ -19,24 +19,28 @@ export MatrixSpace, GenMat, GenMatSpace, fflu!, fflu, solve_triu, isrref,
 ###############################################################################
 
 function similar(x::GenMat{T}) where T <: RingElement
-   z = GenMat{T}(similar(x.entries))
-   for i in 1:rows(z)
-      for j in 1:cols(z)
-         z[i, j] = zero(base_ring(x))
+   R = base_ring(x)
+   M = similar(x.entries)
+   for i in 1:size(M, 1)
+      for j in 1:size(M, 2)
+         M[i, j] = zero(R)
       end
    end
-   z.base_ring = base_ring(x)
+   z = GenMat{T}(M)
+   z.base_ring = R
    return z
 end
 
 function similar(x::GenMat{T}, r::Int, c::Int) where T <: RingElement
-   z = GenMat{T}(similar(x.entries, r, c))
-   for i in 1:rows(z)
-      for j in 1:cols(z)
-         z[i, j] = zero(base_ring(x))
+   R = base_ring(x)
+   M = similar(x.entries, r, c)
+   for i in 1:size(M, 1)
+      for j in 1:size(M, 2)
+         M[i, j] = zero(R)
       end
    end
-   z.base_ring = base_ring(x)
+   z = GenMat{T}(M)
+   z.base_ring = R
    return z
 end
 
@@ -132,23 +136,9 @@ function getindex(a::MatElem, r::Int, c::Int)
    return a.entries[r, c]
 end
  
-function setindex!(a::MatElem{T}, d::T, r::Int, c::Int) where {T <: RingElement}
-   a.entries[r, c] = d
+function setindex!(a::MatElem, d::T, r::Int, c::Int, copy::Bool=true) where T <: RingElement
+    a.entries[r, c] = copy ? base_ring(a)(deepcopy(d)) : d
 end
-
-function setindex!(a::MatElem, d::Integer, r::Int, c::Int)
-    setindex!(a, base_ring(a)(d), r, c)
-end
-
-function setindex!(a::MatElem, d::fmpz, r::Int, c::Int)
-    setindex!(a, base_ring(a)(d), r, c)
-end
-
-setindex_t!(a::MatElem{T}, d::T, r::Int, c::Int) where {T <: RingElement} = setindex!(a, d, c, r)
-
-setindex_t!(a::MatElem, d::Integer, r::Int, c::Int) = setindex!(a, d, c, r)
-
-setindex_t!(a::MatElem, d::fmpz, r::Int, c::Int) = setindex!(a, d, c, r)
 
 doc"""
     zero(a::MatSpace)
@@ -3988,68 +3978,34 @@ function (a::GenMatSpace{T})(b::fmpz_mat) where {T <: RingElement}
   return A
 end
 
-function (a::GenMatSpace{T})(b::RingElement) where {T <: RingElement}
-   return a(base_ring(a)(b))
-end
-
 function (a::GenMatSpace{T})() where {T <: RingElement}
+   R = base_ring(a)
    entries = Array{T}(a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
-         entries[i, j] = zero(base_ring(a))
+         entries[i, j] = zero(R)
       end
    end
    z = GenMat{T}(entries)
-   z.base_ring = a.base_ring
+   z.base_ring = R
    return z
 end
 
-function (a::GenMatSpace{T})(b::Integer) where {T <: RingElement}
+function (a::GenMatSpace{T})(b::S) where {S <: RingElement, T <: RingElement}
+   R = base_ring(a)
    entries = Array{T}(a.rows, a.cols)
+   rb = R(b)
    for i = 1:a.rows
       for j = 1:a.cols
          if i != j
-            entries[i, j] = zero(base_ring(a))
+            entries[i, j] = zero(R)
          else
-            entries[i, j] = base_ring(a)(b)
+            entries[i, j] = deepcopy(rb)
          end
       end
    end
    z = GenMat{T}(entries)
-   z.base_ring = a.base_ring
-   return z
-end
-
-function (a::GenMatSpace{T})(b::fmpz) where {T <: RingElement}
-   entries = Array{T}(a.rows, a.cols)
-   for i = 1:a.rows
-      for j = 1:a.cols
-         if i != j
-            entries[i, j] = zero(base_ring(a))
-         else
-            entries[i, j] = base_ring(a)(b)
-         end
-      end
-   end
-   z = GenMat{T}(entries)
-   z.base_ring = a.base_ring
-   return z
-end
-
-function (a::GenMatSpace{T})(b::T) where {T <: RingElement}
-   parent(b) != base_ring(a) && error("Unable to coerce to matrix")
-   entries = Array{T}(a.rows, a.cols)
-   for i = 1:a.rows
-      for j = 1:a.cols
-         if i != j
-            entries[i, j] = zero(base_ring(a))
-         else
-            entries[i, j] = deepcopy(b)
-         end
-      end
-   end
-   z = GenMat{T}(entries)
-   z.base_ring = base_ring(a)
+   z.base_ring = R
    return z
 end
 
@@ -4058,34 +4014,31 @@ function (a::GenMatSpace{T})(b::GenMat{T}) where {T <: RingElement}
    return b
 end
 
-function (a::GenMatSpace{T})(b::Array{T, 2}) where {T <: RingElement}
-   if length(b) > 0
-      parent(b[1, 1]) != base_ring(a) && error("Unable to coerce to matrix")
-   end
+function (a::GenMatSpace{T})(b::Array{S, 2}, copy::Bool=true) where {S <: RingElement, T <: RingElement}
+   R = base_ring(a)
    _check_dim(a.rows, a.cols, b)
-   z = GenMat{T}(deepcopy(b)) # must make copy as user may not have distinct entries
-   z.base_ring = a.base_ring
+   if copy
+      entries = Array{T}(a.rows, a.cols)
+      for i = 1:a.rows
+         for j = 1:a.cols
+            c = b[i, j]
+            entries[i, j] = parent(c) == R ? deepcopy(c) : R(c)
+         end
+      end
+   else
+      entries = b  
+   end   
+   z = GenMat{T}(entries)
+   z.base_ring = R
    return z
 end
 
-function (a::GenMatSpace{T})(b::Array{T, 1}) where {T <: RingElement}
-   if length(b) > 0
-      parent(b[1]) != base_ring(a) && error("Unable to coerce to matrix")
-   end
+function (a::GenMatSpace{T})(b::Array{S, 1}, copy::Bool=true) where {S <: RingElement, T <: RingElement}
    _check_dim(a.rows, a.cols, b)
    b = reshape(b, a.cols, a.rows)'
-   z = GenMat{T}(b)
-   z.base_ring = a.base_ring
+   z = a(b, copy)
    return z
 end
-
-(a::GenMatSpace)(b::Array{fmpz, 2}) = a(map(base_ring(a), b))
-
-(a::GenMatSpace)(b::Array{fmpz, 1}) = a(map(base_ring(a), b))
-
-(a::GenMatSpace)(b::Array{T, 2}) where {T <: Integer} = a(map(base_ring(a), b))
-
-(a::GenMatSpace)(b::Array{T, 1}) where {T <: Integer} = a(map(base_ring(a), b))
 
 ###############################################################################
 #
@@ -4093,12 +4046,12 @@ end
 #
 ###############################################################################
 
-function Base.Matrix(R::RingParent, r::Int, c::Int, a::Array{T,2}) where T <: RingElement
+function Base.Matrix(R::Ring, r::Int, c::Int, a::Array{T,2}) where T <: RingElement
    M = MatrixSpace(R, r, c)
    return M(a)
 end
 
-function Base.Matrix(R::RingParent, r::Int, c::Int, a::Array{T,1}) where T <: RingElement
+function Base.Matrix(R::Ring, r::Int, c::Int, a::Array{T,1}) where T <: RingElement
    M = MatrixSpace(R, r, c)
    return M(a)
 end
@@ -4110,18 +4063,18 @@ end
 ###############################################################################
 
 doc"""
-    MatrixSpace(R::RingParent, r::Int, c::Int, cached::Bool = true)
+    MatrixSpace(R::Ring, r::Int, c::Int, cached::Bool = true)
 > Return parent object corresponding to the space of $r\times c$ matrices over
 > the ring $R$. If `cached == true` (the default), the returned parent object
 > is cached so that it can returned by future calls to the constructor with the
 > same dimensions and base ring.
 """
-function MatrixSpace(R::RingParent, r::Int, c::Int, cached::Bool = true)
+function MatrixSpace(R::Ring, r::Int, c::Int, cached::Bool = true)
    T = elem_type(R)
    return GenMatSpace{T}(R, r, c, cached)
 end
 
-function typed_hvcat(R::RingParent, dims, d...)
+function typed_hvcat(R::Ring, dims, d...)
    T = elem_type(R)
    r = length(dims)
    c = dims[1]
@@ -4136,7 +4089,7 @@ function typed_hvcat(R::RingParent, dims, d...)
    return S
 end
 
-function typed_hcat(R::RingParent, d...)
+function typed_hcat(R::Ring, d...)
    T = elem_type(R)
    r = length(d)
    A = Array{T}(1, r)

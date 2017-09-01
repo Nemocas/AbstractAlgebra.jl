@@ -16,7 +16,7 @@ end
 # promotion system is orthogonal to the built-in julia promotion system. The
 # julia system assumes that whenever you have a method signature of the form  
 # Base.promote_rule(::Type{T}, ::Type{S}) = R, then there is also a
-# correesponding Base.convert(::Type{R}, ::T) and similar for S. Since we
+# corresponding Base.convert(::Type{R}, ::T) and similar for S. Since we
 # cannot use the julia convert system (we need an instance of the type and not
 # the type), we cannot use the julia promotion system.
 #
@@ -27,11 +27,17 @@ end
 
 promote_rule(T, U) = Union{}
 
-promote_rule(::Type{T}, ::Type{fmpz}) where {T <: RingElem} = T
+promote_rule1(T, U) = Union{}
 
+promote_rule(::Type{T}, ::Type{T}) where {T <: RingElement} = T
+
+promote_rule(::Type{T}, ::Type{fmpz}) where {T <: RingElement} = T
+
+#=
 promote_rule(::Type{T}, ::Type{S}) where {T <: RingElem, S <: Integer} = T
 
 promote_rule1(::Type{T}, ::Type{U}) where {T <: RingElem, U <: RingElem} = promote_rule(T, U)
+=#
 
 ###############################################################################
 #
@@ -40,40 +46,19 @@ promote_rule1(::Type{T}, ::Type{U}) where {T <: RingElem, U <: RingElem} = promo
 ###############################################################################
 
 function +(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   T1 = promote_rule(S, T)
+   T1 = Union{promote_rule(S, T), promote_rule(T, S)}
    if S == T1
       +(x, parent(x)(y))
    elseif T == T1
       +(parent(y)(x), y)
    else
-      T1 = promote_rule(T, S)
-      if S == T1
-         +(x, parent(x)(y))
-      elseif T == T1
-         +(parent(y)(x), y)
-      else
-         error("Unable to promote ", S, " and ", T, " to common type")
-      end
-   end
-end
-
-function +(x::S, y::T) where {S <: RingElem, T <: Integer}
-   T1 = promote_rule(S, T)
-   if S == T1
-      +(x, parent(x)(y))
-   else
       error("Unable to promote ", S, " and ", T, " to common type")
    end
 end
 
-function +(x::S, y::T) where {S <: Integer, T <: RingElem}
-   T1 = promote_rule(T, S)
-   if T == T1
-      +(parent(y)(x), y)
-   else
-      error("Unable to promote ", S, " and ", T, " to common type")
-   end
-end
++(x::RingElem, y::RingElement) = x + parent(x)(y)
+
++(x::RingElement, y::RingElem) = parent(y)(x) + y
 
 function -(x::S, y::T) where {S <: RingElem, T <: RingElem}
    T1 = promote_rule(S, T)
@@ -278,8 +263,6 @@ transpose(x::T) where {T <: RingElem} = deepcopy(x)
 ###############################################################################
 
 include("generic/JuliaInt.jl")
-
-include("generic/JuliaBigInt.jl")
 
 include("generic/JuliaRational.jl")
 

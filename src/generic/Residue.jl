@@ -565,6 +565,7 @@ end
 #
 ###############################################################################
 
+#=
 promote_rule(::Type{GenRes{fmpz}}, ::Type{fmpz}) = GenRes{fmpz}
 
 promote_rule(::Type{GenRes{T}}, ::Type{T}) where {T <: RingElement} = GenRes{T}
@@ -575,6 +576,17 @@ function promote_rule1(::Type{GenRes{T}}, ::Type{GenRes{U}}) where {T <: RingEle
    promote_rule(T, GenRes{U}) == T ? GenRes{T} : Union{}
 end
 
+function promote_rule(::Type{GenRes{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   promote_rule(T, U) == T ? GenRes{T} : promote_rule1(U, GenRes{T})
+end
+=#
+
+function promote_rule1(::Type{GenRes{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   promote_rule(T, U) == T ? GenRes{T} : Union{}
+end
+
+promote_rule(::Type{GenRes{T}}, ::Type{GenRes{T}}) where T <: RingElement = GenRes{T}
+   
 function promote_rule(::Type{GenRes{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
    promote_rule(T, U) == T ? GenRes{T} : promote_rule1(U, GenRes{T})
 end
@@ -632,13 +644,13 @@ end
 ###############################################################################
 
 doc"""
-    ResidueRing{T <: RingElement}(R::RingParent, a::Union{RingElement, Integer}; cached::Bool=true)
+    ResidueRing{T <: RingElement}(R::Ring, a::Union{RingElement, Integer}; cached::Bool=true)
 > Create the residue ring $R/(a)$ where $a$ is an element of the ring $R$. We
 > require $a \neq 0$. If `cached == true` (the default) then the resulting
 > residue ring parent object is cached and returned for any subsequent calls
 > to the constructor with the same base ring $R$ and element $a$. 
 """
-function ResidueRing(R::RingParent, a::Union{RingElement, Integer}; cached::Bool = true)
+function ResidueRing(R::Ring, a::Union{RingElement, Integer}; cached::Bool = true)
    iszero(a) && throw(DivideError())
    T = elem_type(R)
 

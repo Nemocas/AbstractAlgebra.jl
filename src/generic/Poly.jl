@@ -636,6 +636,7 @@ doc"""
 """
 *(a::PolyElem, b::fmpz) = b*a
 
+#=
 doc"""
     +(a::Integer, b::PolyElem)
 > Return $a + b$.
@@ -671,6 +672,7 @@ doc"""
 > Return $a + b$.
 """
 +(a::PolyElem, b::fmpz) = b + a
+=#
 
 doc"""
     -(a::Integer, b::PolyElem)
@@ -1633,36 +1635,21 @@ doc"""
     evaluate{T <: RingElement}(a::PolyElem{T}, b::T)
 > Evaluate the polynomial $a$ at the value $b$ and return the result.
 """
-function evaluate(a::PolyElem{T}, b::T) where {T <: RingElement}
+function evaluate(a::PolyElem, b::T) where {T <: RingElement}
    i = length(a)
+   R = base_ring(a)
    if i == 0
-       return zero(base_ring(a))
+       return zero(R)
    end
    if i > 25
       return subst(a, b)
    end
-   z = coeff(a, i - 1)
+   z = R(coeff(a, i - 1))
    while i > 1
       i -= 1
-      z = z*b + coeff(a, i - 1)
+      z = z*b + R(coeff(a, i - 1))
    end
    return z
-end
-
-doc"""
-    evaluate(a::PolyElem, b::Integer)
-> Evaluate the polynomial $a$ at the value $b$ and return the result.
-"""
-function evaluate(a::PolyElem, b::Integer)
-   return evaluate(a, base_ring(a)(b))
-end
-
-doc"""
-    evaluate(a::PolyElem, b::fmpz)
-> Evaluate the polynomial $a$ at the value $b$ and return the result.
-"""
-function evaluate(a::PolyElem, b::fmpz)
-   return evaluate(a, base_ring(a)(b))
 end
 
 doc"""
@@ -2402,6 +2389,7 @@ end
 #
 ###############################################################################
 
+#=
 promote_rule(::Type{GenPoly{T}}, ::Type{V}) where {T <: RingElement, V <: Integer} = GenPoly{T}
 
 promote_rule(::Type{GenPoly{T}}, ::Type{T}) where {T <: RingElement} = GenPoly{T}
@@ -2410,6 +2398,17 @@ function promote_rule1(::Type{GenPoly{T}}, ::Type{GenPoly{U}}) where {T <: RingE
    promote_rule(T, GenPoly{U}) == T ? GenPoly{T} : Union{}
 end
 
+function promote_rule(::Type{GenPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   promote_rule(T, U) == T ? GenPoly{T} : promote_rule1(U, GenPoly{T})
+end
+=#
+
+function promote_rule1(::Type{GenPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   promote_rule(T, U) == T ? GenPoly{T} : Union{}
+end
+
+promote_rule(::Type{GenPoly{T}}, ::Type{GenPoly{T}}) where T <: RingElement = GenPoly{T}
+   
 function promote_rule(::Type{GenPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
    promote_rule(T, U) == T ? GenPoly{T} : promote_rule1(U, GenPoly{T})
 end
@@ -2492,18 +2491,22 @@ function (a::GenPolyRing{T})(b::PolyElem{T}) where {T <: RingElement}
    return b
 end
 
-function (a::GenPolyRing{T})(b::Array{T, 1}) where {T <: RingElement}
-   if length(b) > 0
-      parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
+function (a::GenPolyRing{T})(b::Array{S, 1}, copy::Bool=true) where {S <: RingElement, T <: RingElement}
+   R = base_ring(a)
+   if copy
+      len = length(b)
+      entries = Array{T}(len)
+      for i = 1:length(b)
+         c = b[i]
+         entries[i] = parent(c) == R ? deepcopy(c) : R(c)
+      end
+   else
+      entries = b
    end
-   z = GenPoly{T}(b)
+   z = GenPoly{T}(entries)
    z.parent = a
    return z
 end
-
-(a::GenPolyRing)(b::Array{T, 1}) where {T <: Integer} = a(map(base_ring(a), b))
-
-(a::GenPolyRing)(b::Array{fmpz, 1}) = a(map(base_ring(a), b))
 
 ###############################################################################
 #
@@ -2520,15 +2523,15 @@ doc"""
 > optional argument `cached` to `false` will prevent the parent object `S` from
 > being cached.
 """
-function PolynomialRing(R::RingParent, s::AbstractString; cached::Bool = true)
+function PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
    S = Symbol(s)
    T = elem_type(R)
    parent_obj = GenPolyRing{T}(R, S, cached)
 
-   return parent_obj, parent_obj([R(0), R(1)])
+   return parent_obj, parent_obj([R(0), R(1)], false)
 end
 
 # S, x = R["x"] syntax
-getindex(R::RingParent, s::String) = PolynomialRing(R, s)
+getindex(R::Ring, s::String) = PolynomialRing(R, s)
 
-getindex(R::Tuple{RingParent, T}, s::String) where {T} = PolynomialRing(R[1], s)
+getindex(R::Tuple{Ring, T}, s::String) where {T} = PolynomialRing(R[1], s)

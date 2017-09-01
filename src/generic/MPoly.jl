@@ -1348,7 +1348,7 @@ function from_exp(R::Integers, A::Array{UInt, 2}, j::Int, N::Int)
    return z
 end
 
-function from_exp(R::RingParent, A::Array{UInt, 2}, j::Int, N::Int)
+function from_exp(R::Ring, A::Array{UInt, 2}, j::Int, N::Int)
    z = R(reinterpret(Int, A[1, j]))
    for k = 2:N
       z *= 2^(sizeof(Int)*4)
@@ -3055,7 +3055,7 @@ end
 ###############################################################################
 
 doc"""
-    PolynomialRing(R::RingParent, s::Array{String, 1}; cached::Bool = true, S::Symbol = :lex)
+    PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, S::Symbol = :lex)
 > Given a base ring `R` and an array of strings `s` specifying how the
 > generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
 > representing the new polynomial ring $T = R[x1, x2, ...]$ and the generators
@@ -3065,7 +3065,7 @@ doc"""
 > cached. `S` is a symbol corresponding to the ordering of the polynomial and
 > can be one of `:lex`, `:deglex` or `:degrevlex`.
 """
-function PolynomialRing(R::RingParent, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
    U = [Symbol(x) for x in s]
    T = elem_type(R)
    N = (ordering == :deglex || ordering == :degrevlex) ? length(U) + 1 : length(U)

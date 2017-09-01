@@ -14,11 +14,11 @@ JuliaQQ = Rationals{BigInt}()
 
 qq = Rationals{Int}()
 
-parent(a::Rational{T}) where T <: Union{Int, BigInt} = Rationals{T}()
+parent(a::Rational{T}) where T <: Integer = Rationals{T}()
 
-elem_type(::Rationals{T}) where T <: Union{Int, BigInt} = Rational{T}
+elem_type(::Rationals{T}) where T <: Integer = Rational{T}
   
-parent_type(::Type{Rational{T}}) where T <: Union{Int, BigInt} = Rationals{T}
+parent_type(::Type{Rational{T}}) where T <: Integer = Rationals{T}
 
 base_ring(a::Rational{Int}) = zz
 
@@ -28,21 +28,25 @@ base_ring(a::Rationals{Int}) = zz
 
 base_ring(a::Rationals{BigInt}) = JuliaZZ
 
+base_ring(a::Rationals{T}) where T <: Integer = Integers{T}()
+
+base_ring(a::Rational{T}) where T <: Integer = Integers{T}()
+
 ###############################################################################
 #
 #   Basic manipulation
 #
 ###############################################################################
 
-zero(::Rationals{T}) where T <: Union{Int, BigInt} = Rational{T}(0)
+zero(::Rationals{T}) where T <: Integer = Rational{T}(0)
 
-one(::Rationals{T}) where T <: Union{Int, BigInt} = Rational{T}(1)
+one(::Rationals{T}) where T <: Integer = Rational{T}(1)
 
-isone(a::Rational{T}) where T <: Union{Int, BigInt} = a == 1
+isone(a::Rational) = a == 1
 
-isunit(a::Rational{T}) where T <: Union{Int, BigInt} = a != 0
+isunit(a::Rational) = a != 0
 
-canonical_unit(a::Rational{T})  where T <: Union{Int, BigInt} = a
+canonical_unit(a::Rational)  = a
 
 ###############################################################################
 #
@@ -50,16 +54,16 @@ canonical_unit(a::Rational{T})  where T <: Union{Int, BigInt} = a
 #
 ###############################################################################
 
-function show(io::IO, R::Rationals{T}) where T <: Union{Int, BigInt}
+function show(io::IO, R::Rationals)
    print(io, "Rationals over ")
    show(io, base_ring(R))
 end
 
-needs_parentheses(::Rational{T}) where T <: Union{Int, BigInt} = false
+needs_parentheses(::Rational) = false
 
-isnegative(a::Rational{T}) where T <: Union{Int, BigInt} = a < 0
+isnegative(a::Rational) = a < 0
 
-show_minus_one(::Type{Rational{T}}) where T <: Union{Int, BigInt} = false
+show_minus_one(::Type{Rational{T}}) where T <: Integer = false
 
 ###############################################################################
 #
@@ -67,7 +71,7 @@ show_minus_one(::Type{Rational{T}}) where T <: Union{Int, BigInt} = false
 #
 ###############################################################################
 
-function divides(a::Rational{T}, b::Rational{T}) where T <: Union{Int, BigInt}
+function divides(a::Rational{T}, b::Rational{T}) where T <: Integer
    return true, a//b
 end
 
@@ -77,15 +81,11 @@ end
 #
 ###############################################################################
 
-divexact(a::Rational{Int}, b::Int) = a//b
+divexact(a::Rational, b::Integer) = a//b
 
-divexact(a::Rational{Int}, b::Rational{Int}) = a//b
+divexact(a::Integer, b::Rational) = a//b
 
-divexact(a::Rational{BigInt}, b::Int) = a//b
-
-divexact(a::Rational{BigInt}, b::BigInt) = a//b
-
-divexact(a::Rational{BigInt}, b::Rational{BigInt}) = a//b
+divexact(a::Rational, b::Rational) = a//b
 
 ###############################################################################
 #
@@ -93,7 +93,7 @@ divexact(a::Rational{BigInt}, b::Rational{BigInt}) = a//b
 #
 ###############################################################################
 
-function gcd(p::Rational{T}, q::Rational{T}) where T <: Union{Int, BigInt}
+function gcd(p::Rational{T}, q::Rational{T}) where T <: Integer
    a = p.num*q.den
    b = p.den*q.num
    n = gcd(a, b)
@@ -116,7 +116,7 @@ end
 #
 ###############################################################################
 
-function zero!(a::Rational{T}) where T <: Union{Int, BigInt}
+function zero!(a::Rational{T}) where T <: Integer
    n = a.num
    n = zero!(n)
    if a.den == 1
@@ -126,7 +126,7 @@ function zero!(a::Rational{T}) where T <: Union{Int, BigInt}
    end
 end
 
-function mul!(a::Rational{T}, b::Rational{T}, c::Rational{T}) where T <: Union{Int, BigInt}
+function mul!(a::Rational{T}, b::Rational{T}, c::Rational{T}) where T <: Integer
    n = a.num
    d = a.den
    n = mul!(n, b.num, c.num)
@@ -143,7 +143,7 @@ function mul!(a::Rational{T}, b::Rational{T}, c::Rational{T}) where T <: Union{I
    end
 end
 
-function add!(a::Rational{T}, b::Rational{T}, c::Rational{T}) where T <: Union{Int, BigInt}
+function add!(a::Rational{T}, b::Rational{T}, c::Rational{T}) where T <: Integer
    if a === b
       return addeq!(a, c)
    elseif a == c
@@ -167,7 +167,7 @@ function add!(a::Rational{T}, b::Rational{T}, c::Rational{T}) where T <: Union{I
    end
 end
 
-function addeq!(a::Rational{T}, b::Rational{T}) where T <: Union{Int, BigInt}
+function addeq!(a::Rational{T}, b::Rational{T}) where T <: Integer
    if a === b
       if iseven(a.den)
          return Rational{T}(a.num, div(b.den, 2))
@@ -193,7 +193,7 @@ function addeq!(a::Rational{T}, b::Rational{T}) where T <: Union{Int, BigInt}
    end
 end
 
-function addmul!(a::Rational{T}, b::Rational{T}, c::Rational{T}, d::Rational{T}) where T <: Union{Int, BigInt}
+function addmul!(a::Rational{T}, b::Rational{T}, c::Rational{T}, d::Rational{T}) where T <: Integer
    d = mul!(d, b, c)
    a = addeq!(a, d)
    return a
@@ -205,7 +205,7 @@ end
 #
 ###############################################################################
 
-function rand(R::Rationals{T}, n::UnitRange{Int}) where T <: Union{Int, BigInt}
+function rand(R::Rationals{T}, n::UnitRange{Int}) where T <: Integer
    d = T(0)
    while d == 0
       d = T(rand(n))
@@ -220,48 +220,16 @@ end
 #
 ###############################################################################
 
-function (R::Rationals{Int})()
-   return Rational{Int}(0)
+function (R::Rationals{T})() where T <: Integer
+   return Rational{T}(0)
 end
 
-function (R::Rationals{BigInt})()
-   return Rational{BigInt}(0)
+function (R::Rationals{T})(b) where T <: Integer
+   return Rational{T}(b)
 end
 
-function (R::Rationals{Int})(b::Int)
-   return Rational{Int}(b)
-end
-
-function (R::Rationals{Int})(b::Int, c::Int)
-   return Rational{Int}(b, c)
-end
-
-function (R::Rationals{BigInt})(b::Int)
-   return Rational{BigInt}(b)
-end
-
-function (R::Rationals{BigInt})(b::Integer)
-   return Rational{BigInt}(b)
-end
-
-function (R::Rationals{BigInt})(b::BigInt)
-   return Rational{BigInt}(b)
-end
-
-function (R::Rationals{BigInt})(b::Int, c::Int)
-   return Rational{BigInt}(b, c)
-end
-
-function (R::Rationals{BigInt})(b::BigInt, c::BigInt)
-   return Rational{BigInt}(b, c)
-end
-
-function (R::Rationals{BigInt})(b::Rational{BigInt})
-   return b
-end
-
-function (R::Rationals{BigInt})(b::Rational{Int})
-   return Rational{BigInt}(b)
+function (R::Rationals{T})(b::Integer, c::Integer) where T <: Integer
+   return Rational{T}(b, c)
 end
 
 ###############################################################################
@@ -270,6 +238,4 @@ end
 #
 ###############################################################################
 
-FractionField(R::MachineIntegers) = Rationals{Int}()
-
-FractionField(R::Integers) = Rationals{BigInt}()
+FractionField(R::Integers{T}) where T <: Integer = Rationals{T}()

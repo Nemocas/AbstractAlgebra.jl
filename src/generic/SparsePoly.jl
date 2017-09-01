@@ -679,7 +679,7 @@ end
 #
 ###############################################################################
 
-function from_exp(R::RingParent, a::UInt)
+function from_exp(R::Ring, a::UInt)
    return R(reinterpret(Int, a))
 end
 
@@ -1779,7 +1779,7 @@ end
 ###############################################################################
 
 doc"""
-    SparsePolynomialRing(R::RingParent, s::String; cached::Bool = true)
+    SparsePolynomialRing(R::Ring, s::String; cached::Bool = true)
 > Given a base ring `R` and a string `s` specifying how the generator
 > (variable) should be printed, return a tuple `S, x` representing the new
 > polynomial ring $T = R[x1, x2, ...]$ and the generator $x$ of the polynomial
@@ -1787,7 +1787,7 @@ doc"""
 > will be cached. Setting the optional argument `cached` to `false` will
 > prevent the parent object `T` from being cached.
 """
-function SparsePolynomialRing(R::RingParent, s::String; cached::Bool = true)
+function SparsePolynomialRing(R::Ring, s::String; cached::Bool = true)
    U = Symbol(s)
    T = elem_type(R)
 
