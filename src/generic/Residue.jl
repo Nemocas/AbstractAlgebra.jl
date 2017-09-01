@@ -565,30 +565,10 @@ end
 #
 ###############################################################################
 
-#=
-promote_rule(::Type{GenRes{fmpz}}, ::Type{fmpz}) = GenRes{fmpz}
-
-promote_rule(::Type{GenRes{T}}, ::Type{T}) where {T <: RingElement} = GenRes{T}
-
-promote_rule(::Type{GenRes{T}}, ::Type{U}) where {T <: RingElement, U <: Integer} = GenRes{T}
-
-function promote_rule1(::Type{GenRes{T}}, ::Type{GenRes{U}}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, GenRes{U}) == T ? GenRes{T} : Union{}
-end
-
-function promote_rule(::Type{GenRes{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? GenRes{T} : promote_rule1(U, GenRes{T})
-end
-=#
-
-function promote_rule1(::Type{GenRes{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? GenRes{T} : Union{}
-end
-
 promote_rule(::Type{GenRes{T}}, ::Type{GenRes{T}}) where T <: RingElement = GenRes{T}
    
 function promote_rule(::Type{GenRes{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? GenRes{T} : promote_rule1(U, GenRes{T})
+   promote_rule(T, U) == T ? GenRes{T} : Union{}
 end
 
 ###############################################################################

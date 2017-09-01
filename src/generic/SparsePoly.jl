@@ -1717,16 +1717,10 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{GenSparsePoly{T}}, ::Type{V}) where {T <: RingElement, V <: Integer} = GenSparsePoly{T}
-
-promote_rule(::Type{GenSparsePoly{T}}, ::Type{T}) where {T <: RingElement} = GenSparsePoly{T}
-
-function promote_rule1(::Type{GenSparsePoly{T}}, ::Type{GenSparsePoly{U}}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, GenSparsePoly{U}) == T ? GenSparsePoly{T} : Union{}
-end
+promote_rule(::Type{GenSparsePoly{T}}, ::Type{GenSparsePoly{T}}) where T <: RingElement = GenSparsePoly{T}
 
 function promote_rule(::Type{GenSparsePoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? GenSparsePoly{T} : promote_rule1(U, GenSparsePoly{T})
+   promote_rule(T, U) == T ? GenSparsePoly{T} : Union{}
 end
 
 ###############################################################################

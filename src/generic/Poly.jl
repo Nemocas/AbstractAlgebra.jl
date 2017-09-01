@@ -568,25 +568,10 @@ function *(a::T, b::PolyElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    *(a::Integer, b::PolyElem)
+    *(a::Union{Integer, Rational}, b::PolyElem)
 > Return $a\times b$.
 """
-function *(a::Integer, b::PolyElem)
-   len = length(b)
-   z = parent(b)()
-   fit!(z, len)
-   for i = 1:len
-      z = setcoeff!(z, i - 1, a*coeff(b, i - 1), false)
-   end
-   set_length!(z, normalise(z, len))
-   return z
-end
-
-doc"""
-    *(a::Rational, b::PolyElem)
-> Return $a\times b$.
-"""
-function *(a::Rational, b::PolyElem)
+function *(a::Union{Integer, Rational}, b::PolyElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -619,16 +604,10 @@ doc"""
 *(a::PolyElem{T}, b::T) where {T <: RingElem} = b*a
 
 doc"""
-    *(a::PolyElem, b::Integer)
+    *(a::PolyElem, b::Union{Integer, Rational})
 > Return $a\times b$.
 """
-*(a::PolyElem, b::Integer) = b*a
-
-doc"""
-    *(a::PolyElem, b::Rational)
-> Return $a\times b$.
-"""
-*(a::PolyElem, b::Rational) = b*a
+*(a::PolyElem, b::Union{Integer, Rational}) = b*a
 
 doc"""
     *(a::PolyElem, b::fmpz)
@@ -773,17 +752,30 @@ end
 ###############################################################################
 
 doc"""
-    ==(x::PolyElem, y::Integer)
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
+    =={T <: RingElem}(x::PolyElem{T}, y::T)
+> Return `true` if $x == y$.
 """
-==(x::PolyElem, y::Integer) = ((length(x) == 0 && y == 0)
+==(x::PolyElem{T}, y::T) where T <: RingElem = ((length(x) == 0 && y == 0)
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
-    ==(x::Integer, y::PolyElem)
+    ==(x::PolyElem, y::Union{Integer, Rational})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Integer, y::PolyElem) = y == x
+==(x::PolyElem, y::Union{Integer, Rational}) = ((length(x) == 0 && y == 0)
+                        || (length(x) == 1 && coeff(x, 0) == y))
+
+doc"""
+    =={T <: RingElem}(x::T, y::PolyElem{T})
+> Return `true` if $x = y$.
+"""
+==(x::T, y::PolyElem{T}) where T <: RingElem = y == x
+
+doc"""
+    ==(x::Union{Integer, Rational}, y::PolyElem)
+> Return `true` if $x == y$ arithmetically, otherwise return `false`.
+"""
+==(x::Union{Integer, Rational}, y::PolyElem) = y == x
 
 doc"""
     ==(x::PolyElem, y::fmpz)
@@ -797,18 +789,6 @@ doc"""
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::fmpz, y::PolyElem) = y == x
-
-doc"""
-    =={T <: Union{Int, BigInt}}(a::Rational{T}, b::PolyElem{Rational{T}})
-> Return `true` if $a = b$.
-"""
-==(a::Rational{T}, b::PolyElem) where T <: Union{Int, BigInt} = parent(b)(a) == b
-
-doc"""
-    =={T <: Union{Int, BigInt}}(a::PolyElem, b::Rational{T})
-> Return `true` if $a == b$.
-"""
-==(a::PolyElem, b::Rational{T}) where T <: Union{Int, BigInt} = a == parent(a)(b)
 
 ###############################################################################
 #
@@ -1080,26 +1060,11 @@ function divexact(a::PolyElem{T}, b::T) where {T <: RingElem}
 end
 
 doc"""
-    divexact{T <: Union{BigInt, Int}(a::PolyElem, b::Rational{T})
+    divexact(a::PolyElem, b::Union{Integer, Rational})
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact(a::PolyElem, b::Rational{T}) where T <: Union{BigInt, Int}
+function divexact(a::PolyElem, b::Union{Integer, Rational})
    iszero(b) && throw(DivideError())
-   z = parent(a)()
-   fit!(z, length(a))
-   for i = 1:length(a)
-      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b), false)
-   end
-   set_length!(z, length(a))
-   return z
-end
-
-doc"""
-    divexact(a::PolyElem, b::Integer)
-> Return $a/b$ where the quotient is expected to be exact.
-"""
-function divexact(a::PolyElem, b::Integer)
-   b == 0 && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
    for i = 1:length(a)
@@ -2315,28 +2280,10 @@ end
 #
 ###############################################################################
 
-#=
-promote_rule(::Type{GenPoly{T}}, ::Type{V}) where {T <: RingElement, V <: Integer} = GenPoly{T}
-
-promote_rule(::Type{GenPoly{T}}, ::Type{T}) where {T <: RingElement} = GenPoly{T}
-
-function promote_rule1(::Type{GenPoly{T}}, ::Type{GenPoly{U}}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, GenPoly{U}) == T ? GenPoly{T} : Union{}
-end
-
-function promote_rule(::Type{GenPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? GenPoly{T} : promote_rule1(U, GenPoly{T})
-end
-=#
-
-function promote_rule1(::Type{GenPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? GenPoly{T} : Union{}
-end
-
 promote_rule(::Type{GenPoly{T}}, ::Type{GenPoly{T}}) where T <: RingElement = GenPoly{T}
-   
+  
 function promote_rule(::Type{GenPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? GenPoly{T} : promote_rule1(U, GenPoly{T})
+   promote_rule(T, U) == T ? GenPoly{T} : Union{}
 end
 
 ###############################################################################

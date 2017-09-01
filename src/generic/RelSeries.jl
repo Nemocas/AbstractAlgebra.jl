@@ -1253,20 +1253,10 @@ end
 #
 ###############################################################################
 
-function promote_rule(::Type{GenRelSeries{T}}, ::Type{V}) where {T <: RingElement, V <: Integer}
-   return GenRelSeries{T}
-end
-
-function promote_rule(::Type{GenRelSeries{T}}, ::Type{T}) where {T <: RingElement}
-   return GenRelSeries{T}
-end
-
-function promote_rule1(::Type{GenRelSeries{T}}, ::Type{GenRelSeries{U}}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, GenRelSeries{U}) == T ? GenRelSeries{T} : Union{}
-end
+promote_rule(::Type{GenRelSeries{T}}, ::Type{GenRelSeries{T}}) where T <: RingElement = GenRelSeries{T}
 
 function promote_rule(::Type{GenRelSeries{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? GenRelSeries{T} : promote_rule1(U, GenRelSeries{T})
+   promote_rule(T, U) == T ? GenRelSeries{T} : Union{}
 end
 
 ###############################################################################

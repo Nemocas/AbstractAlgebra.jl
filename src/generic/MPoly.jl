@@ -2997,16 +2997,10 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{GenMPoly{T}}, ::Type{V}) where {T <: RingElement, V <: Integer} = GenMPoly{T}
-
-promote_rule(::Type{GenMPoly{T}}, ::Type{T}) where {T <: RingElement} = GenMPoly{T}
-
-function promote_rule1(::Type{GenMPoly{T}}, ::Type{GenMPoly{U}}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, GenMPoly{U}) == T ? GenMPoly{T} : Union{}
-end
+promote_rule(::Type{GenMPoly{T}}, ::Type{GenMPoly{T}}) where T <: RingElement = GenMPoly{T}
 
 function promote_rule(::Type{GenMPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? GenMPoly{T} : promote_rule1(U, GenMPoly{T})
+   promote_rule(T, U) == T ? GenMPoly{T} : Union{}
 end
 
 ###############################################################################

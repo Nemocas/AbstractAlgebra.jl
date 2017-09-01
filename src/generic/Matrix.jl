@@ -3944,18 +3944,10 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{GenMat{T}}, ::Type{V}) where {T <: RingElement, V <: Integer} = GenMat{T}
-
-promote_rule(::Type{GenMat{T}}, ::Type{T}) where {T <: RingElement} = GenMat{T}
-
-promote_rule(::Type{GenMat{T}}, ::Type{fmpz}) where {T <: RingElement} = GenMat{T}
-
-function promote_rule1(::Type{GenMat{T}}, ::Type{GenMat{U}}) where {T <: RingElement, U <: RingElement}
-   U == T ? GenMat{T} : Union{}
-end
+promote_rule(::Type{GenMat{T}}, ::Type{GenMat{T}}) where T <: RingElement = GenMat{T}
 
 function promote_rule(::Type{GenMat{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? GenMat{T} : promote_rule1(U, GenMat{T})
+   promote_rule(T, U) == T ? GenMat{T} : Union{}
 end
 
 ###############################################################################

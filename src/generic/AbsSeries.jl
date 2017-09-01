@@ -1004,20 +1004,10 @@ end
 #
 ###############################################################################
 
-function promote_rule(::Type{GenAbsSeries{T}}, ::Type{V}) where {T <: RingElement, V <: Integer}
-   return GenAbsSeries{T}
-end
-
-function promote_rule(::Type{GenAbsSeries{T}}, ::Type{T}) where {T <: RingElement}
-   return GenAbsSeries{T}
-end
-
-function promote_rule1(::Type{GenAbsSeries{T}}, ::Type{GenAbsSeries{U}}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, GenAbsSeries{U}) == T ? GenAbsSeries{T} : Union{}
-end
+promote_rule(::Type{GenAbsSeries{T}}, ::Type{GenAbsSeries{T}}) where T <: RingElement = GenAbsSeries{T}
 
 function promote_rule(::Type{GenAbsSeries{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? GenAbsSeries{T} : promote_rule1(U, GenAbsSeries{T})
+   promote_rule(T, U) == T ? GenAbsSeries{T} : Union{}
 end
 
 ###############################################################################
