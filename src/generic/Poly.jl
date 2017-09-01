@@ -568,10 +568,10 @@ function *(a::T, b::PolyElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    *{T <: Union{BigInt, Int}(a::Rational{T}, b::PolyElem)
+    *(a::Integer, b::PolyElem)
 > Return $a\times b$.
 """
-function *(a::Rational{T}, b::PolyElem)  where T <: Union{BigInt, Int}
+function *(a::Integer, b::PolyElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -583,10 +583,10 @@ function *(a::Rational{T}, b::PolyElem)  where T <: Union{BigInt, Int}
 end
 
 doc"""
-    *(a::Integer, b::PolyElem)
+    *(a::Rational, b::PolyElem)
 > Return $a\times b$.
 """
-function *(a::Integer, b::PolyElem)
+function *(a::Rational, b::PolyElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -619,96 +619,22 @@ doc"""
 *(a::PolyElem{T}, b::T) where {T <: RingElem} = b*a
 
 doc"""
-    *{T <: Union{BigInt, Int}(a::PolyElem, b::Rational{T})
-> Return $a\times b$.
-"""
-*(a::PolyElem, b::Rational{T}) where T <: Union{BigInt, Int} = b*a
-
-doc"""
     *(a::PolyElem, b::Integer)
 > Return $a\times b$.
 """
 *(a::PolyElem, b::Integer) = b*a
 
 doc"""
+    *(a::PolyElem, b::Rational)
+> Return $a\times b$.
+"""
+*(a::PolyElem, b::Rational) = b*a
+
+doc"""
     *(a::PolyElem, b::fmpz)
 > Return $a\times b$.
 """
 *(a::PolyElem, b::fmpz) = b*a
-
-#=
-doc"""
-    +(a::Integer, b::PolyElem)
-> Return $a + b$.
-"""
-+(a::Integer, b::PolyElem) = parent(b)(a) + b
-
-doc"""
-    +{T <: Union{Int, BigInt}}(a::Rational{T}, b::PolyElem)
-> Return $a + b$.
-"""
-+(a::Rational{T}, b::PolyElem) where T <: Union{Int, BigInt} = parent(b)(a) + b
-
-doc"""
-    +(a::fmpz, b::PolyElem)
-> Return $a + b$.
-"""
-+(a::fmpz, b::PolyElem) = parent(b)(a) + b
-
-doc"""
-    +(a::PolyElem, b::Integer)
-> Return $a + b$.
-"""
-+(a::PolyElem, b::Integer) = b + a
-
-doc"""
-    +{T <: Union{Int, BigInt}}(a::PolyElem, b::Rational{T})
-> Return $a + b$.
-"""
-+(a::PolyElem, b::Rational{T}) where T <: Union{Int, BigInt} = parent(a)(b) + a
-
-doc"""
-    +(a::PolyElem, b::fmpz)
-> Return $a + b$.
-"""
-+(a::PolyElem, b::fmpz) = b + a
-=#
-
-doc"""
-    -(a::Integer, b::PolyElem)
-> Return $a - b$.
-"""
--(a::Integer, b::PolyElem) = parent(b)(a) - b
-
-doc"""
-    -{T <: Union{Int, BigInt}}(a::Rational{T}, b::PolyElem)
-> Return $a - b$.
-"""
--(a::Rational{T}, b::PolyElem) where T <: Union{Int, BigInt} = parent(b)(a) - b
-
-doc"""
-    -(a::fmpz, b::PolyElem)
-> Return $a - b$.
-"""
--(a::fmpz, b::PolyElem) = parent(b)(a) - b
-
-doc"""
-    -(a::PolyElem, b::Integer)
-> Return $a - b$.
-"""
--(a::PolyElem, b::Integer) = a - parent(a)(b)
-
-doc"""
-    -{T <: Union{Int, BigInt}}(a::PolyElem, b::Rational{T})
-> Return $a - b$.
-"""
--(a::PolyElem, b::Rational{T}) where T <: Union{Int, BigInt} = a - parent(a)(b)
-
-doc"""
-    -(a::PolyElem, b::fmpz)
-> Return $a - b$.
-"""
--(a::PolyElem, b::fmpz) = a - parent(a)(b)
 
 ###############################################################################
 #
