@@ -832,13 +832,13 @@ function (a::FmpzPolyRing)(b::fmpz)
    return z
 end
 
-function (a::FmpzPolyRing)(b::Array{fmpz, 1})
+function (a::FmpzPolyRing)(b::Array{fmpz, 1}, copy::Bool=true)
    z = fmpz_poly(b)
    z.parent = a
    return z
 end
 
-(a::FmpzPolyRing)(b::Array{T, 1}) where {T <: Integer} = a(map(fmpz, b))
+(a::FmpzPolyRing)(b::Array{T, 1}, copy::Bool=true) where {T <: Integer} = a(map(fmpz, b))
 
 (a::FmpzPolyRing)(b::fmpz_poly) = b
 

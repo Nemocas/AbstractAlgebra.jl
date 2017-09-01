@@ -1021,21 +1021,21 @@ function (R::NmodPolyRing)(x::GenRes{fmpz})
   return z
 end
 
-function (R::NmodPolyRing)(arr::Array{fmpz, 1})
+function (R::NmodPolyRing)(arr::Array{fmpz, 1}, copy::Bool=true)
   z = nmod_poly(R.n, arr)
   z.parent = R
   return z
 end
 
-function (R::NmodPolyRing)(arr::Array{UInt, 1})
+function (R::NmodPolyRing)(arr::Array{UInt, 1}, copy::Bool=true)
   z = nmod_poly(R.n, arr)
   z.parent = R
   return z
 end
 
-(R::NmodPolyRing)(arr::Array{T, 1}) where {T <: Integer} = R(map(base_ring(R), arr))
+(R::NmodPolyRing)(arr::Array{T, 1}, copy::Bool=true) where {T <: Integer} = R(map(base_ring(R), arr))
 
-function (R::NmodPolyRing)(arr::Array{GenRes{fmpz}, 1})
+function (R::NmodPolyRing)(arr::Array{GenRes{fmpz}, 1}, copy::Bool=true)
   if length(arr) > 0
      (base_ring(R) != parent(arr[1])) && error("Wrong parents")
   end

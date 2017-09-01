@@ -786,7 +786,7 @@ function (a::FmpqPolyRing)(b::fmpq)
    return z
 end
 
-function (a::FmpqPolyRing)(b::Array{fmpq, 1})
+function (a::FmpqPolyRing)(b::Array{fmpq, 1}, copy::Bool=true)
    z = fmpq_poly(b)
    z.parent = a
    return z
@@ -794,11 +794,11 @@ end
 
 (a::FmpqPolyRing)(b::Rational) = a(fmpq(b))
 
-(a::FmpqPolyRing)(b::Array{T, 1}) where {T <: Integer} = a(map(fmpq, b))
+(a::FmpqPolyRing)(b::Array{T, 1}, copy::Bool=true) where {T <: Integer} = a(map(fmpq, b))
 
-(a::FmpqPolyRing)(b::Array{Rational{T}, 1}) where {T <: Integer} = a(map(fmpq, b))
+(a::FmpqPolyRing)(b::Array{Rational{T}, 1}, copy::Bool=true) where {T <: Integer} = a(map(fmpq, b))
 
-(a::FmpqPolyRing)(b::Array{fmpz, 1}) = a(map(fmpq, b))
+(a::FmpqPolyRing)(b::Array{fmpz, 1}, copy::Bool=true) = a(map(fmpq, b))
 
 (a::FmpqPolyRing)(b::fmpq_poly) = b
 

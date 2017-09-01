@@ -940,13 +940,13 @@ function (R::FmpzModPolyRing)(x::GenRes{fmpz})
   return z
 end
 
-function (R::FmpzModPolyRing)(arr::Array{fmpz, 1})
+function (R::FmpzModPolyRing)(arr::Array{fmpz, 1}, copy::Bool=true)
   z = fmpz_mod_poly(R.n, arr)
   z.parent = R
   return z
 end
 
-function (R::FmpzModPolyRing)(arr::Array{GenRes{fmpz}, 1})
+function (R::FmpzModPolyRing)(arr::Array{GenRes{fmpz}, 1}, copy::Bool=true)
   if length(arr) > 0
      (base_ring(R) != parent(arr[1])) && error("Wrong parents")
   end
@@ -955,7 +955,7 @@ function (R::FmpzModPolyRing)(arr::Array{GenRes{fmpz}, 1})
   return z
 end
 
-(R::FmpzModPolyRing)(arr::Array{T, 1}) where {T <: Integer} = R(map(base_ring(R), arr))
+(R::FmpzModPolyRing)(arr::Array{T, 1}, copy::Bool=true) where {T <: Integer} = R(map(base_ring(R), arr))
 
 function (R::FmpzModPolyRing)(x::fmpz_poly)
   z = fmpz_mod_poly(R.n, x)
