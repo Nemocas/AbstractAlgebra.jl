@@ -29,8 +29,6 @@ promote_rule(T, U) = Union{}
 
 promote_rule(::Type{T}, ::Type{T}) where T <: RingElement = T
 
-promote_rule(::Type{T}, ::Type{fmpz}) where T <: RingElement = T
-
 ###############################################################################
 #
 #   Generic catchall functions
