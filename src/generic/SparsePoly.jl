@@ -547,7 +547,7 @@ end
 #
 ###############################################################################
 
-function *(a::GenSparsePoly, n::Integer)
+function *(a::GenSparsePoly, n::Union{Integer, Rational})
    r = parent(a)()
    fit!(r, length(a))
    j = 1
@@ -563,7 +563,7 @@ function *(a::GenSparsePoly, n::Integer)
    return r
 end
 
-function *(a::GenSparsePoly, n::fmpz)
+function *(a::GenSparsePoly{T}, n::fmpz) where T <: RingElem
    r = parent(a)()
    fit!(r, length(a))
    j = 1
@@ -595,45 +595,11 @@ function *(a::GenSparsePoly{T}, n::T) where {T <: RingElem}
    return r
 end
 
-function *(a::GenSparsePoly, n::Rational{T}) where T <: Union{Int, BigInt}
-   r = parent(a)()
-   fit!(r, length(a))
-   j = 1
-   for i = 1:length(a)
-      c = a.coeffs[i]*n
-      if c != 0
-         r.coeffs[j] = c 
-         r.exps[j] = a.exps[i]
-         j += 1
-      end
-   end
-   r.length = j - 1
-   return r
-end
-
 *(n::T, a::GenSparsePoly{T}) where {T <: RingElem} = a*n
 
-*(n::Rational{T}, a::GenSparsePoly) where T <: Union{Int, BigInt} = a*n
+*(n::Union{Integer, Rational}, a::GenSparsePoly) = a*n
 
-*(n::Integer, a::GenSparsePoly) = a*n
-
-*(n::fmpz, a::GenSparsePoly) = a*n
-
-+(a::GenSparsePoly, b::Integer) = a + parent(a)(b)
-
-+(a::GenSparsePoly, b::fmpz) = a + parent(a)(b)
-
--(a::GenSparsePoly, b::Integer) = a - parent(a)(b)
-
--(a::GenSparsePoly, b::fmpz) = a - parent(a)(b)
-
-+(a::Integer, b::GenSparsePoly) = parent(b)(a) + b
-
-+(a::fmpz, b::GenSparsePoly) = parent(b)(a) + b
-
--(a::Integer, b::GenSparsePoly) = parent(b)(a) - b
-
--(a::fmpz, b::GenSparsePoly) = parent(b)(a) - b
+*(n::fmpz, a::GenSparsePoly{T}) where T <: RingElem = a*n
 
 ###############################################################################
 #
@@ -659,19 +625,26 @@ end
 #
 ###############################################################################
 
-function ==(a::GenSparsePoly, b::Int)
+function ==(a::GenSparsePoly, b::Union{Integer, Rational})
    return length(a) == 0 ? b == 0 : a.length == 1 && 
           a.exps[1] == 0 && a.coeffs[1] == b
 end
 
-==(a::Int, b::GenSparsePoly) = b == a
+==(a::Union{Integer, Rational}, b::GenSparsePoly) = b == a
 
-function ==(a::GenSparsePoly, b::fmpz) 
+function ==(a::GenSparsePoly{T}, b::fmpz) where T <: RingElem 
    return length(a) == 0 ? b == 0 : a.length == 1 &
           a.exps[1] == 0 && a.coeffs[1] == b
 end
 
-==(a::fmpz, b::GenSparsePoly) = b == a
+==(a::fmpz, b::GenSparsePoly{T}) where T <: RingElem = b == a
+
+function ==(a::GenSparsePoly{T}, b::T) where T <: RingElem
+   return length(a) == 0 ? b == 0 : a.length == 1 &
+          a.exps[1] == 0 && a.coeffs[1] == b
+end
+
+==(a::T, b::GenSparsePoly{T}) where T <: RingElem = b == a
 
 ###############################################################################
 #
@@ -1024,18 +997,6 @@ function divides(a::GenSparsePoly{T}, b::T) where {T <: RingElem}
    return true, parent(a)(Qc, a.exps)
 end
 
-function divides(a::GenSparsePoly, b::Rational{T}) where T <: Union{Int, BigInt}
-   len = a.length
-   Qc = Array{T}(len)
-   for i = 1:len
-      flag, Qc[i] = divides(a.coeffs[i], b)
-      if !flag
-         return false, parent(a)()
-      end
-   end
-   return true, parent(a)(Qc, a.exps)
-end
-
 function divexact(a::GenSparsePoly{T}, b::T) where {T <: RingElem}
    len = length(a)
    exps = deepcopy(a.exps)
@@ -1043,7 +1004,14 @@ function divexact(a::GenSparsePoly{T}, b::T) where {T <: RingElem}
    return parent(a)(coeffs, exps)
 end
 
-function divexact(a::GenSparsePoly, b::Rational{T}) where T <: Union{Int, BigInt}
+function divexact(a::GenSparsePoly, b::Union{Integer, Rational})
+   len = length(a)
+   exps = deepcopy(a.exps)
+   coeffs = [divexact(a.coeffs[i], b) for i in 1:len]
+   return parent(a)(coeffs, exps)
+end
+
+function divexact(a::GenSparsePoly{T}, b::fmpz) where T <: RingElem
    len = length(a)
    exps = deepcopy(a.exps)
    coeffs = [divexact(a.coeffs[i], b) for i in 1:len]

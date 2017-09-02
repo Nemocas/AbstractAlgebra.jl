@@ -330,26 +330,10 @@ function *(a::T, b::AbsSeriesElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    *{T <: Union{Int, BigInt}}(a::Rational{T}, b::AbsSeriesElem)
+    *(a::Union{Integer, Rational}, b::AbsSeriesElem)
 > Return $a\times b$.
 """
-function *(a::Rational{T}, b::AbsSeriesElem) where T <: Union{Int, BigInt}
-   len = length(b)
-   z = parent(b)()
-   fit!(z, len)
-   set_prec!(z, precision(b))
-   for i = 1:len
-      z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
-   end
-   set_length!(z, normalise(z, len))
-   return z
-end
-
-doc"""
-    *(a::Integer, b::AbsSeriesElem)
-> Return $a\times b$.
-"""
-function *(a::Integer, b::AbsSeriesElem) 
+function *(a::Union{Integer, Rational}, b::AbsSeriesElem) 
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -384,118 +368,16 @@ doc"""
 *(a::AbsSeriesElem{T}, b::T) where {T <: RingElem} = b*a
 
 doc"""
-    *{T <: Union{Int, BigInt}}(a::AbsSeriesElem, b::Rational{T})
+    *(a::AbsSeriesElem, b::Union{Integer, Rational})
 > Return $a\times b$.
 """
-*(a::AbsSeriesElem, b::Rational{T}) where T <: Union{Int, BigInt} = b*a
-
-doc"""
-    *(a::AbsSeriesElem, b::Integer)
-> Return $a\times b$.
-"""
-*(a::AbsSeriesElem, b::Integer) = b*a
+*(a::AbsSeriesElem, b::Union{Integer, Rational}) = b*a
 
 doc"""
     *(a::AbsSeriesElem, b::fmpz)
 > Return $a\times b$.
 """
 *(a::AbsSeriesElem, b::fmpz) = b*a
-
-doc"""
-    +{T <: RingElem}(a::T, b::AbsSeriesElem{T})
-> Return $a + b$.
-"""
-+(a::T, b::AbsSeriesElem{T}) where {T <: RingElem} = parent(b)(a) + b
-
-doc"""
-    +{T <: Union{Int, BigInt}}(a::Rational{T}, b::AbsSeriesElem)
-> Return $a + b$.
-"""
-+(a::Rational{T}, b::AbsSeriesElem) where T <: Union{Int, BigInt} = parent(b)(a) + b
-
-doc"""
-    +(a::Integer, b::AbsSeriesElem)
-> Return $a + b$.
-"""
-+(a::Integer, b::AbsSeriesElem) = parent(b)(a) + b
-
-doc"""
-    +(a::fmpz, b::AbsSeriesElem)
-> Return $a + b$.
-"""
-+(a::fmpz, b::AbsSeriesElem) = parent(b)(a) + b
-
-doc"""
-    +{T <: RingElem}(a::AbsSeriesElem{T}, b::T)
-> Return $a + b$.
-"""
-+(a::AbsSeriesElem{T}, b::T) where {T <: RingElem} = b + a
-
-doc"""
-    +{T <: Union{Int, BigInt}}(a::AbsSeriesElem, b::Rational{T})
-> Return $a + b$.
-"""
-+(a::AbsSeriesElem, b::Rational{T}) where T <: Union{Int, BigInt} = b + a
-
-doc"""
-    +(a::AbsSeriesElem, b::Integer)
-> Return $a + b$.
-"""
-+(a::AbsSeriesElem, b::Integer) = b + a
-
-doc"""
-    +(a::AbsSeriesElem, b::fmpz)
-> Return $a + b$.
-"""
-+(a::AbsSeriesElem, b::fmpz) = b + a
-
-doc"""
-    -{T <: RingElem}(a::T, b::AbsSeriesElem{T})
-> Return $a - b$.
-"""
--(a::T, b::AbsSeriesElem{T}) where {T <: RingElem} = parent(b)(a) - b
-
-doc"""
-    -{T <: Union{Int, BigInt}}(a::Rational{T}, b::AbsSeriesElem)
-> Return $a - b$.
-"""
--(a::Rational{T}, b::AbsSeriesElem) where T <: Union{Int, BigInt} = parent(b)(a) - b
-
-doc"""
-    -(a::Integer, b::AbsSeriesElem)
-> Return $a - b$.
-"""
--(a::Integer, b::AbsSeriesElem) = parent(b)(a) - b
-
-doc"""
-    -(a::fmpz, b::AbsSeriesElem)
-> Return $a - b$.
-"""
--(a::fmpz, b::AbsSeriesElem) = parent(b)(a) - b
-
-doc"""
-    -{T <: RingElem}(a::AbsSeriesElem{T}, b::T)
-> Return $a - b$.
-"""
--(a::AbsSeriesElem{T}, b::T) where {T <: RingElem} = a - parent(a)(b)
-
-doc"""
-    -{T <: Union{Int, BigInt}}(a::AbsSeriesElem, b::Rational{T})
-> Return $a - b$.
-"""
--(a::AbsSeriesElem, b::Rational{T}) where T <: Union{Int, BigInt} = a - parent(a)(b)
-
-doc"""
-    -(a::AbsSeriesElem, b::Integer)
-> Return $a - b$.
-"""
--(a::AbsSeriesElem, b::Integer) = a - parent(a)(b)
-
-doc"""
-    -(a::AbsSeriesElem, b::fmpz)
-> Return $a - b$.
-"""
--(a::AbsSeriesElem, b::fmpz) = a - parent(a)(b)
 
 ###############################################################################
 #
@@ -699,29 +581,16 @@ doc"""
       ((length(x) == 0 && iszero(y)) || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
-    =={T <: Union{Int, BigInt}}(x::AbsSeriesElem, y::Rational{T})
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::AbsSeriesElem, y::Rational{T}) where T <: Union{Int, BigInt} = precision(x) == 0 ||
-      ((length(x) == 0 && iszero(y)) || (length(x) == 1 && coeff(x, 0) == y))
-
-doc"""
     =={T <: RingElem}(x::T, y::AbsSeriesElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::T, y::AbsSeriesElem{T}) where {T <: RingElem} = y == x
 
 doc"""
-    =={T <: Union{Int, BigInt}}(x::Rational{T}, y::AbsSeriesElem)
+    ==(x::AbsSeriesElem, y::Union{Integer, Rational})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Rational{T}, y::AbsSeriesElem) where T <: Union{Int, BigInt} = y == x
-
-doc"""
-    ==(x::AbsSeriesElem, y::Integer)
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
-"""
-==(x::AbsSeriesElem, y::Integer) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
+==(x::AbsSeriesElem, y::Union{Integer, Rational}) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
@@ -732,10 +601,10 @@ doc"""
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
-    ==(x::Integer, y::AbsSeriesElem)
+    ==(x::Union{Integer, Rational}, y::AbsSeriesElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Integer, y::AbsSeriesElem) = y == x
+==(x::Union{Integer, Rational}, y::AbsSeriesElem) = y == x
 
 doc"""
     ==(x::fmpz, y::AbsSeriesElem)
@@ -775,10 +644,10 @@ end
 ###############################################################################
 
 doc"""
-    divexact(a::AbsSeriesElem, b::Integer)
+    divexact(a::AbsSeriesElem, b::Union{Integer, Rational})
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact(x::AbsSeriesElem, y::Integer)
+function divexact(x::AbsSeriesElem, y::Union{Integer, Rational})
    y == 0 && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
@@ -811,22 +680,6 @@ doc"""
 > Return $a/b$ where the quotient is expected to be exact.
 """
 function divexact(x::AbsSeriesElem{T}, y::T) where {T <: RingElem}
-   iszero(y) && throw(DivideError())
-   lenx = length(x)
-   z = parent(x)()
-   fit!(z, lenx)
-   set_prec!(z, precision(x))
-   for i = 1:lenx
-      z = setcoeff!(z, i - 1, divexact(coeff(x, i - 1), y))
-   end
-   return z
-end
-
-doc"""
-    divexact{T <: Union{Int, BigInt}}(a::AbsSeriesElem, b::Rational{T})
-> Return $a/b$ where the quotient is expected to be exact.
-"""
-function divexact(x::AbsSeriesElem, y::Rational{T}) where T <: Union{Int, BigInt}
    iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()

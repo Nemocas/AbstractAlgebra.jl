@@ -57,9 +57,13 @@ function //(x::T, y::T) where {T <: RingElem}
    return z
 end
 
-//(x::T, y::Integer) where {T <: RingElem} = x//parent(x)(y)
+//(x::T, y::Union{Integer, Rational}) where {T <: RingElem} = x//parent(x)(y)
                                           
-//(x::Integer, y::T) where {T <: RingElem} = parent(y)(x)//y
+//(x::Union{Integer, Rational}, y::T) where {T <: RingElem} = parent(y)(x)//y
+
+//(x::T, y::fmpz) where {T <: RingElem} = x//parent(x)(y)
+                                          
+//(x::fmpz, y::T) where {T <: RingElem} = parent(y)(x)//y
 
 //(x::T, y::FracElem{T}) where {T <: RingElem} = parent(y)(x)//y
 
@@ -236,10 +240,10 @@ end
 ###############################################################################
 
 doc"""
-    *(a::FracElem, b::Integer)
+    *(a::FracElem, b::Union{Integer, Rational})
 > Return $a\times b$.
 """
-function *(a::FracElem, b::Integer)
+function *(a::FracElem, b::Union{Integer, Rational})
    c = base_ring(a)(b)
    g = gcd(den(a), c)
    n = num(a)*divexact(c, g)
@@ -248,10 +252,10 @@ function *(a::FracElem, b::Integer)
 end
 
 doc"""
-    *(a::Integer, b::FracElem)
+    *(a::Union{Integer, Rational}, b::FracElem)
 > Return $a\times b$.
 """
-function *(a::Integer, b::FracElem)
+function *(a::Union{Integer, Rational}, b::FracElem)
    c = base_ring(b)(a)
    g = gcd(den(b), c)
    n = num(b)*divexact(c, g)
@@ -306,10 +310,10 @@ function *(a::T, b::FracElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    +(a::FracElem, b::Integer)
+    +(a::FracElem, b::Union{Integer, Rational})
 > Return $a + b$.
 """
-function +(a::FracElem, b::Integer)
+function +(a::FracElem, b::Union{Integer, Rational})
    n = num(a) + den(a)*b
    d = den(a)
    g = gcd(n, d)
@@ -328,10 +332,10 @@ function +(a::FracElem, b::fmpz)
 end
 
 doc"""
-    -(a::FracElem, b::Integer)
+    -(a::FracElem, b::Union{Integer, Rational})
 > Return $a - b$.
 """
-function -(a::FracElem, b::Integer)
+function -(a::FracElem, b::Union{Integer, Rational})
    n = num(a) - den(a)*b
    d = den(a)
    g = gcd(n, d)
@@ -350,10 +354,10 @@ function -(a::FracElem, b::fmpz)
 end
 
 doc"""
-    +(a::Integer, b::FracElem)
+    +(a::Union{Integer, Rational}, b::FracElem)
 > Return $a + b$.
 """
-+(a::Integer, b::FracElem) = b + a
++(a::Union{Integer, Rational}, b::FracElem) = b + a
 
 doc"""
     +(a::fmpz, b::FracElem)
@@ -362,10 +366,10 @@ doc"""
 +(a::fmpz, b::FracElem) = b + a
 
 doc"""
-    -(a::Integer, b::FracElem)
+    -(a::Union{Integer, Rational}, b::FracElem)
 > Return $a - b$.
 """
-function -(a::Integer, b::FracElem)
+function -(a::Union{Integer, Rational}, b::FracElem)
    n = a*den(b) - num(b)
    d = den(b)
    g = gcd(n, d)
@@ -460,18 +464,18 @@ end
 ###############################################################################
 
 doc"""
-    ==(x::FracElem, y::Integer)
+    ==(x::FracElem, y::Union{Integer, Rational})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(x::FracElem, y::Integer)
+function ==(x::FracElem, y::Union{Integer, Rational})
    return (isone(den(x)) && num(x) == y) || (num(x) == den(x)*y)
 end
 
 doc"""
-    ==(x::Integer, y::FracElem)
+    ==(x::Union{Integer, Rational}, y::FracElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Integer, y::FracElem) = y == x
+==(x::Union{Integer, Rational}, y::FracElem) = y == x
 
 doc"""
     ==(x::FracElem, y::fmpz)
@@ -542,10 +546,10 @@ end
 ###############################################################################
 
 doc"""
-    divexact(a::FracElem, b::Integer)
+    divexact(a::FracElem, b::Union{Integer, Rational})
 > Return $a/b$.
 """
-function divexact(a::FracElem, b::Integer)
+function divexact(a::FracElem, b::Union{Integer, Rational})
    b == 0 && throw(DivideError())
    c = base_ring(a)(b)
    g = gcd(num(a), c)
@@ -555,10 +559,10 @@ function divexact(a::FracElem, b::Integer)
 end
 
 doc"""
-    divexact(a::Integer, b::FracElem)
+    divexact(a::Union{Integer, Rational}, b::FracElem)
 > Return $a/b$.
 """
-function divexact(a::Integer, b::FracElem)
+function divexact(a::Union{Integer, Rational}, b::FracElem)
    iszero(b) && throw(DivideError())
    c = base_ring(b)(a)
    g = gcd(num(b), c)

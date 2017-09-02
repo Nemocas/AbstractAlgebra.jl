@@ -324,10 +324,10 @@ end
 ###############################################################################
 
 doc"""
-    *(x::Integer, y::MatElem)
+    *(x::Union{Integer, Rational}, y::MatElem)
 > Return $x\times y$.
 """
-function *(x::Integer, y::MatElem)
+function *(x::Union{Integer, Rational}, y::MatElem)
    z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -366,24 +366,10 @@ function *(x::T, y::MatElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    *{T <: Union{Int, BigInt}}(x::Rational{T}, y::MatElem)
+    *(x::MatElem, y::Union{Integer, Rational})
 > Return $x\times y$.
 """
-function *(x::Rational{T}, y::MatElem) where T <: Union{Int, BigInt}
-   z = similar(y)
-   for i = 1:rows(y)
-      for j = 1:cols(y)
-         z[i, j] = x*y[i, j]
-      end
-   end
-   return z
-end
-
-doc"""
-    *(x::MatElem, y::Integer)
-> Return $x\times y$.
-"""
-*(x::MatElem, y::Integer) = y*x
+*(x::MatElem, y::Union{Integer, Rational}) = y*x
 
 doc"""
     *(x::MatElem, y::fmpz)
@@ -398,16 +384,10 @@ doc"""
 *(x::MatElem{T}, y::T) where {T <: RingElem} = y*x
 
 doc"""
-    *{T <: Union{Int, BigInt}}(x::MatElem, y::Rational{T})
-> Return $x\times y$.
-"""
-*(x::MatElem, y::Rational{T}) where T <: Union{Int, BigInt} = y*x
-
-doc"""
-    +(x::Integer, y::MatElem)
+    +(x::Union{Integer, Rational}, y::MatElem)
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
-function +(x::Integer, y::MatElem)
+function +(x::Union{Integer, Rational}, y::MatElem)
    z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
@@ -423,10 +403,10 @@ function +(x::Integer, y::MatElem)
 end
 
 doc"""
-    +(x::MatElem, y::Integer)
+    +(x::MatElem, y::Union{Integer, Rational})
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 """
-+(x::MatElem, y::Integer) = y + x
++(x::MatElem, y::Union{Integer, Rational}) = y + x
 
 doc"""
     +(x::fmpz, y::MatElem)
@@ -472,40 +452,16 @@ function +(x::T, y::MatElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    +{T <: Union{Int, BigInt}}(x::Rational{T}, y::MatElem)
-> Return $S(x) + y$ where $S$ is the parent of $y$.
-"""
-function +(x::Rational{T}, y::MatElem) where T <: Union{Int, BigInt}
-   z = similar(y)
-   for i = 1:rows(y)
-      for j = 1:cols(y)
-         if i != j
-            z[i, j] = deepcopy(y[i, j])
-         else
-            z[i, j] = y[i, j] + x
-         end
-      end
-   end
-   return z
-end
-
-doc"""
     +{T <: RingElem}(x::MatElem{T}, y::T)
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 """
 +(x::MatElem{T}, y::T) where {T <: RingElem} = y + x
 
 doc"""
-    +{T <: Union{Int, BigInt}}(x::MatElem, y::Rational{T})
-> Return $x + S(y)$ where $S$ is the parent of $x$.
-"""
-+(x::MatElem, y::Rational{T}) where T <: Union{Int, BigInt} = y + x
-
-doc"""
-    -(x::Integer, y::MatElem)
+    -(x::Union{Integer, Rational}, y::MatElem)
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 """
-function -(x::Integer, y::MatElem)
+function -(x::Union{Integer, Rational}, y::MatElem)
    z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
@@ -521,10 +477,10 @@ function -(x::Integer, y::MatElem)
 end
 
 doc"""
-    -(x::MatElem, y::Integer)
+    -(x::MatElem, y::Union{Integer, Rational})
 > Return $x - S(y)$, where $S$ is the parent of $x$.
 """
-function -(x::MatElem, y::Integer) 
+function -(x::MatElem, y::Union{Integer, Rational}) 
    z = similar(x)
    R = base_ring(x)
    for i = 1:rows(x)
@@ -597,48 +553,10 @@ function -(x::T, y::MatElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    -{T <: Union{Int, BigInt}}(x::Rational{T}, y::MatElem)
-> Return $S(x) - y$ where $S$ is the parent of $y$.
-"""
-function -(x::Rational{T}, y::MatElem) where T <: Union{Int, BigInt}
-   z = similar(y)
-   R = base_ring(y)
-   for i = 1:rows(y)
-      for j = 1:cols(y)
-         if i != j
-            z[i, j] = -y[i, j]
-         else
-            z[i, j] = x - y[i, j] 
-         end
-      end
-   end
-   return z
-end
-
-doc"""
     -{T <: RingElem}(x::MatElem{T}, y::T)
 > Return $x - S(y)$, where $S$ is the parent of $a$.
 """
 function -(x::MatElem{T}, y::T) where {T <: RingElem}
-   z = similar(x)
-   R = base_ring(x)
-   for i = 1:rows(x)
-      for j = 1:cols(x)
-         if i != j
-            z[i, j] = deepcopy(x[i, j])
-         else
-            z[i, j] = x[i, j] - y
-         end
-      end
-   end
-   return z
-end
-
-doc"""
-    -{T <: Union{Int, BigInt}}(x::MatElem, y::Rational{T})
-> Return $x - S(y)$, where $S$ is the parent of $a$.
-"""
-function -(x::MatElem, y::Rational{T}) where T <: Union{Int, BigInt}
    z = similar(x)
    R = base_ring(x)
    for i = 1:rows(x)
@@ -759,11 +677,11 @@ end
 ###############################################################################
 
 doc"""
-    ==(x::MatElem, y::Integer)
+    ==(x::MatElem, y::Union{Integer, Rational})
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 > otherwise return `false`.
 """
-function ==(x::MatElem, y::Integer) 
+function ==(x::MatElem, y::Union{Integer, Rational}) 
    for i = 1:min(rows(x), cols(x))
       if x[i, i] != y
          return false
@@ -780,11 +698,11 @@ function ==(x::MatElem, y::Integer)
 end
 
 doc"""
-    ==(x::Integer, y::MatElem)
+    ==(x::Union{Integer, Rational}, y::MatElem)
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 > otherwise return `false`.
 """
-==(x::Integer, y::MatElem) = y == x
+==(x::Union{Integer, Rational}, y::MatElem) = y == x
 
 doc"""
     ==(x::MatElem, y::fmpz)
@@ -836,39 +754,11 @@ function ==(x::MatElem{T}, y::T) where {T <: RingElem}
 end
 
 doc"""
-    =={T <: Union{Int, BigInt}}(x::MatElem, y::Rational{T})
-> Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
-> otherwise return `false`.
-"""
-function ==(x::MatElem, y::Rational{T}) where T <: Union{Int, BigInt}
-   for i = 1:min(rows(x), cols(x))
-      if x[i, i] != y
-         return false
-      end
-   end
-   for i = 1:rows(x)
-      for j = 1:cols(x)
-         if i != j && !iszero(x[i, j])
-            return false
-         end
-      end
-   end
-   return true
-end
-
-doc"""
     =={T <: RingElem}(x::T, y::MatElem{T})
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 > otherwise return `false`.
 """
 ==(x::T, y::MatElem{T}) where {T <: RingElem} = y == x
-
-doc"""
-    =={T <: Union{Int, BigInt}}(x::Rational{T}, y::MatElem)
-> Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
-> otherwise return `false`.
-"""
-==(x::Rational{T}, y::MatElem) where T <: Union{Int, BigInt} = y == x
 
 ###############################################################################
 #
@@ -877,11 +767,11 @@ doc"""
 ###############################################################################
 
 doc"""
-    divexact(x::MatElem, y::Integer)
+    divexact(x::MatElem, y::Union{Integer, Rational})
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by
 > $y$. Each division is expected to be exact.
 """
-function divexact(x::MatElem, y::Integer)
+function divexact(x::MatElem, y::Union{Integer, Rational})
    z = similar(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
@@ -912,21 +802,6 @@ doc"""
 > $y$. Each division is expected to be exact.
 """
 function divexact(x::MatElem{T}, y::T) where {T <: RingElem}
-   z = similar(x)
-   for i = 1:rows(x)
-      for j = 1:cols(x)
-         z[i, j] = divexact(x[i, j], y)
-      end
-   end
-   return z
-end
-
-doc"""
-    divexact(x::MatElem, y::Rational{T})
-> Return $x/y$, i.e. the matrix where each of the entries has been divided by
-> $y$. Each division is expected to be exact.
-"""
-function divexact(x::MatElem, y::Rational{T}) where T <: Union{Int, BigInt}
    z = similar(x)
    for i = 1:rows(x)
       for j = 1:cols(x)

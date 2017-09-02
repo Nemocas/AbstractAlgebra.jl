@@ -1113,7 +1113,7 @@ end
 #
 ###############################################################################
 
-function *(a::GenMPoly, n::Integer)
+function *(a::GenMPoly, n::Union{Integer, Rational})
    N = size(a.exps, 1)
    r = parent(a)()
    fit!(r, length(a))
@@ -1131,25 +1131,7 @@ function *(a::GenMPoly, n::Integer)
    return r
 end
 
-function *(a::GenMPoly, n::fmpz)
-   N = size(a.exps, 1)
-   r = parent(a)()
-   fit!(r, length(a))
-   j = 1
-   for i = 1:length(a)
-      c = a.coeffs[i]*n
-      if c != 0
-         r.coeffs[j] = c 
-         monomial_set!(r.exps, j, a.exps, i, N)
-         j += 1
-      end
-   end
-   r.length = j - 1
-   resize!(r.coeffs, r.length)
-   return r
-end
-
-function *(a::GenMPoly{fmpz}, n::fmpz)
+function *(a::GenMPoly{T}, n::fmpz) where T <: RingElem
    N = size(a.exps, 1)
    r = parent(a)()
    fit!(r, length(a))
@@ -1185,73 +1167,11 @@ function *(a::GenMPoly{T}, n::T) where {T <: RingElem}
    return r
 end
 
-function *(a::GenMPoly, n::Rational{T}) where T <: Union{Int, BigInt}
-   N = size(a.exps, 1)
-   r = parent(a)()
-   fit!(r, length(a))
-   j = 1
-   for i = 1:length(a)
-      c = a.coeffs[i]*n
-      if c != 0
-         r.coeffs[j] = c 
-         monomial_set!(r.exps, j, a.exps, i, N)
-         j += 1
-      end
-   end
-   r.length = j - 1
-   resize!(r.coeffs, r.length)
-   return r
-end
+*(n::Union{Integer, Rational}, a::GenMPoly) = a*n
 
-*(n::Integer, a::GenMPoly) = a*n
-
-*(n::fmpz, a::GenMPoly) = a*n
-
-*(n::fmpz, a::GenMPoly{fmpz}) = a*n
+*(n::fmpz, a::GenMPoly{T}) where T <: RingElem = a*n
 
 *(n::T, a::GenMPoly{T}) where {T <: RingElem} = a*n
-
-*(n::Rational{T}, a::GenMPoly) where T <: Union{Int, BigInt} = a*n
-
-+(a::GenMPoly{T}, b::T) where {T <: RingElem} = a + parent(a)(b)
-
-+(a::GenMPoly, b::Rational{T}) where T <: Union{Int, BigInt} = a + parent(a)(b)
-
-+(a::GenMPoly, b::Integer) = a + parent(a)(b)
-
-+(a::GenMPoly, b::fmpz) = a + parent(a)(b)
-
-+(a::GenMPoly{fmpz}, b::fmpz) = a + parent(a)(b)
-
--(a::GenMPoly{T}, b::T) where {T <: RingElem} = a - parent(a)(b)
-
--(a::GenMPoly, b::Rational{T}) where T <: Union{Int, BigInt} = a - parent(a)(b)
-
--(a::GenMPoly, b::Integer) = a - parent(a)(b)
-
--(a::GenMPoly, b::fmpz) = a - parent(a)(b)
-
--(a::GenMPoly{fmpz}, b::fmpz) = a - parent(a)(b)
-
-+(a::T, b::GenMPoly{T}) where {T <: RingElem} = parent(b)(a) + b
-
-+(a::Rational{T}, b::GenMPoly) where T <: Union{Int, BigInt} = parent(b)(a) + b
-
-+(a::Integer, b::GenMPoly) = parent(b)(a) + b
-
-+(a::fmpz, b::GenMPoly) = parent(b)(a) + b
-
-+(a::fmpz, b::GenMPoly{fmpz}) = parent(b)(a) + b
-
--(a::T, b::GenMPoly{T}) where {T <: RingElem} = parent(b)(a) - b
-
--(a::Rational{T}, b::GenMPoly) where T <: Union{Int, BigInt} = parent(b)(a) - b
-
--(a::Integer, b::GenMPoly) = parent(b)(a) - b
-
--(a::fmpz, b::GenMPoly) = parent(b)(a) - b
-
--(a::fmpz, b::GenMPoly{fmpz}) = parent(b)(a) - b
 
 ###############################################################################
 #
@@ -1283,7 +1203,7 @@ end
 #
 ###############################################################################
 
-function ==(a::GenMPoly, n::Integer)
+function ==(a::GenMPoly, n::Union{Integer, Rational})
    N = size(a.exps, 1)
    if n == 0
       return a.length == 0
@@ -1293,17 +1213,7 @@ function ==(a::GenMPoly, n::Integer)
    return false
 end
 
-function ==(a::GenMPoly, n::fmpz)
-   N = size(a.exps, 1)
-   if n == 0
-      return a.length == 0
-   elseif a.length == 1
-      return a.coeffs[1] == n && monomial_iszero(a.exps, 1, N)
-   end
-   return false
-end
-
-function ==(a::GenMPoly{fmpz}, n::fmpz)
+function ==(a::GenMPoly{T}, n::fmpz) where T <: RingElem
    N = size(a.exps, 1)
    if n == 0
       return a.length == 0
@@ -1314,16 +1224,6 @@ function ==(a::GenMPoly{fmpz}, n::fmpz)
 end
 
 function ==(a::GenMPoly{T}, n::T) where {T <: RingElem}
-   N = size(a.exps, 1)
-   if n == 0
-      return a.length == 0
-   elseif a.length == 1
-      return a.coeffs[1] == n && monomial_iszero(a.exps, 1, N)
-   end
-   return false
-end
-
-function ==(a::GenMPoly, n::Rational{T}) where T <: Union{Int, BigInt}
    N = size(a.exps, 1)
    if n == 0
       return a.length == 0
