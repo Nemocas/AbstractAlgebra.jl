@@ -136,8 +136,8 @@ function getindex(a::MatElem, r::Int, c::Int)
    return a.entries[r, c]
 end
  
-function setindex!(a::MatElem, d::T, r::Int, c::Int, copy::Bool=true) where T <: RingElement
-    a.entries[r, c] = copy ? base_ring(a)(deepcopy(d)) : d
+function setindex!(a::MatElem, d::T, r::Int, c::Int) where T <: RingElement
+    a.entries[r, c] = base_ring(a)(d)
 end
 
 doc"""
@@ -2773,13 +2773,13 @@ function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <
       P1 = [0 for i in 1:2n + 1]
       v = similar(M, n, 1)
       for j = 1:n
-         B[r2, j] = deepcopy(v[j, 1])
+         B[r2, j] = v[j, 1]
          A[1, j] = R()
       end
       P1[c2] = 1
       P2[c2] = r2
       v[c2, 1] = R(1)
-      B[r2, c2] = deepcopy(v[c2, 1])
+      B[r2, c2] = v[c2, 1]
       for s = 1:c2 - 1
          if P2[s] != 0
             B[r2, c2] *= B[P2[s], s]
@@ -3992,7 +3992,7 @@ function (a::GenMatSpace{T})(b::S) where {S <: RingElement, T <: RingElement}
          if i != j
             entries[i, j] = zero(R)
          else
-            entries[i, j] = deepcopy(rb)
+            entries[i, j] = rb
          end
       end
    end
@@ -4006,29 +4006,37 @@ function (a::GenMatSpace{T})(b::GenMat{T}) where {T <: RingElement}
    return b
 end
 
-function (a::GenMatSpace{T})(b::Array{S, 2}, copy::Bool=true) where {S <: RingElement, T <: RingElement}
+function (a::GenMatSpace{T})(b::Array{T, 2}) where T <: RingElement
    R = base_ring(a)
    _check_dim(a.rows, a.cols, b)
-   if copy
-      entries = Array{T}(a.rows, a.cols)
-      for i = 1:a.rows
-         for j = 1:a.cols
-            c = b[i, j]
-            entries[i, j] = parent(c) == R ? deepcopy(c) : R(c)
-         end
+   for i = 1:a.rows
+      for j = 1:a.cols
+         b[i, j] = R(b[i, j])
       end
-   else
-      entries = b  
-   end   
+   end
+   z = GenMat{T}(b)
+   z.base_ring = R
+   return z
+end
+
+function (a::GenMatSpace{T})(b::Array{S, 2}) where {S <: RingElement, T <: RingElement}
+   R = base_ring(a)
+   _check_dim(a.rows, a.cols, b)
+   entries = Array{T}(a.rows, a.cols)
+   for i = 1:a.rows
+      for j = 1:a.cols
+         entries[i, j] = R(b[i, j])
+      end
+   end
    z = GenMat{T}(entries)
    z.base_ring = R
    return z
 end
 
-function (a::GenMatSpace{T})(b::Array{S, 1}, copy::Bool=true) where {S <: RingElement, T <: RingElement}
+function (a::GenMatSpace{T})(b::Array{S, 1}) where {S <: RingElement, T <: RingElement}
    _check_dim(a.rows, a.cols, b)
    b = reshape(b, a.cols, a.rows)'
-   z = a(b, copy)
+   z = a(b)
    return z
 end
 
