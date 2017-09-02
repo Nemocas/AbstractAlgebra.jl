@@ -676,7 +676,7 @@ function fit!(z::fq_nmod_poly, n::Int)
    return nothing
 end
 
-function setcoeff!(z::fq_nmod_poly, n::Int, x::fq_nmod, copy::Bool=true)
+function setcoeff!(z::fq_nmod_poly, n::Int, x::fq_nmod)
    ccall((:fq_nmod_poly_set_coeff, :libflint), Void, 
          (Ptr{fq_nmod_poly}, Int, Ptr{fq_nmod}, Ptr{FqNmodFiniteField}),
          &z, n, &x, &base_ring(parent(z)))
@@ -763,7 +763,7 @@ function (R::FqNmodPolyRing)(x::Integer)
    return R(fmpz(x))
 end
 
-function (R::FqNmodPolyRing)(x::Array{fq_nmod, 1}, copy::Bool=true)
+function (R::FqNmodPolyRing)(x::Array{fq_nmod, 1})
    length(x) == 0 && error("Array must be non-empty")
    base_ring(R) != parent(x[1]) && error("Coefficient rings must coincide")
    z = fq_nmod_poly(x)
@@ -771,14 +771,14 @@ function (R::FqNmodPolyRing)(x::Array{fq_nmod, 1}, copy::Bool=true)
    return z
 end
 
-function (R::FqNmodPolyRing)(x::Array{fmpz, 1}, copy::Bool=true)
+function (R::FqNmodPolyRing)(x::Array{fmpz, 1})
    length(x) == 0 && error("Array must be non-empty")
    z = fq_nmod_poly(x, base_ring(R))
    z.parent = R
    return z
 end
 
-function (R::FqNmodPolyRing)(x::Array{T, 1}, copy::Bool=true) where {T <: Integer}
+function (R::FqNmodPolyRing)(x::Array{T, 1}) where {T <: Integer}
    length(x) == 0 && error("Array must be non-empty")
    return R(map(fmpz, x))
 end

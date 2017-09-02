@@ -838,27 +838,27 @@ function fit!(x::fmpz_mod_poly, n::Int)
   return nothing
 end
 
-function setcoeff!(x::fmpz_mod_poly, n::Int, y::UInt, copy::Bool=true)
+function setcoeff!(x::fmpz_mod_poly, n::Int, y::UInt)
   ccall((:fmpz_mod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{fmpz_mod_poly}, Int, UInt), &x, n, y)
   return x
 end
 
-function setcoeff!(x::fmpz_mod_poly, n::Int, y::Int, copy::Bool=true)
+function setcoeff!(x::fmpz_mod_poly, n::Int, y::Int)
   ccall((:fmpz_mod_poly_set_coeff_ui, :libflint), Void, 
                    (Ptr{fmpz_mod_poly}, Int, UInt), &x, n, mod(y, x.n))
   return x
 end
 
-function setcoeff!(x::fmpz_mod_poly, n::Int, y::fmpz, copy::Bool=true)
+function setcoeff!(x::fmpz_mod_poly, n::Int, y::fmpz)
   ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
                    (Ptr{fmpz_mod_poly}, Int, Ptr{fmpz}), &x, n, &y)
   return x
 end
 
-setcoeff!(x::fmpz_mod_poly, n::Int, y::Integer, copy::Bool=true) = setcoeff!(x, n, fmpz(y))
+setcoeff!(x::fmpz_mod_poly, n::Int, y::Integer) = setcoeff!(x, n, fmpz(y))
 
-setcoeff!(x::fmpz_mod_poly, n::Int, y::GenRes{fmpz}, copy::Bool=true) = setcoeff!(x, n, y.data)
+setcoeff!(x::fmpz_mod_poly, n::Int, y::GenRes{fmpz}) = setcoeff!(x, n, y.data)
 
 function add!(z::fmpz_mod_poly, x::fmpz_mod_poly, y::fmpz_mod_poly)
   ccall((:fmpz_mod_poly_add, :libflint), Void, 
@@ -940,13 +940,13 @@ function (R::FmpzModPolyRing)(x::GenRes{fmpz})
   return z
 end
 
-function (R::FmpzModPolyRing)(arr::Array{fmpz, 1}, copy::Bool=true)
+function (R::FmpzModPolyRing)(arr::Array{fmpz, 1})
   z = fmpz_mod_poly(R.n, arr)
   z.parent = R
   return z
 end
 
-function (R::FmpzModPolyRing)(arr::Array{GenRes{fmpz}, 1}, copy::Bool=true)
+function (R::FmpzModPolyRing)(arr::Array{GenRes{fmpz}, 1})
   if length(arr) > 0
      (base_ring(R) != parent(arr[1])) && error("Wrong parents")
   end
@@ -955,7 +955,7 @@ function (R::FmpzModPolyRing)(arr::Array{GenRes{fmpz}, 1}, copy::Bool=true)
   return z
 end
 
-(R::FmpzModPolyRing)(arr::Array{T, 1}, copy::Bool=true) where {T <: Integer} = R(map(base_ring(R), arr))
+(R::FmpzModPolyRing)(arr::Array{T, 1}) where {T <: Integer} = R(map(base_ring(R), arr))
 
 function (R::FmpzModPolyRing)(x::fmpz_poly)
   z = fmpz_mod_poly(R.n, x)

@@ -76,10 +76,10 @@ function Base.hash(a::PolyElem, h::UInt)
    return b
 end
 
-function setcoeff!(c::GenPoly{T}, n::Int, a::T, copy::Bool=true) where {T <: RingElement}
+function setcoeff!(c::GenPoly{T}, n::Int, a::T) where {T <: RingElement}
    if !iszero(a) || n + 1 <= length(c)
       fit!(c, n + 1)
-      c.coeffs[n + 1] = copy ? deepcopy(a) : a
+      c.coeffs[n + 1] = a
       c.length = max(length(c), n + 1)
       # don't normalise
    end
@@ -154,7 +154,7 @@ doc"""
     gen(R::PolyRing)
 > Return the generator of the given polynomial ring.
 """
-gen(R::PolyRing) = R([zero(base_ring(R)), one(base_ring(R))], false)
+gen(R::PolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
 doc"""
     iszero(a::PolyElem)
@@ -227,7 +227,7 @@ function deepcopy_internal(a::GenPoly{T}, dict::ObjectIdDict) where {T <: RingEl
    for i = 1:length(a)
       coeffs[i] = deepcopy(a.coeffs[i])
    end
-   return parent(a)(coeffs, false)
+   return parent(a)(coeffs)
 end
 
 ###############################################################################
@@ -322,7 +322,7 @@ function -(a::PolyElem)
    z = parent(a)()
    fit!(z, len)
    for i = 1:len
-      z = setcoeff!(z, i - 1, -coeff(a, i - 1), false)
+      z = setcoeff!(z, i - 1, -coeff(a, i - 1))
    end
    set_length!(z, len)
    return z
@@ -347,15 +347,15 @@ function +(a::PolyElem{T}, b::PolyElem{T}) where {T <: RingElement}
    fit!(z, lenz)
    i = 1
    while i <= min(lena, lenb)
-      z = setcoeff!(z, i - 1, coeff(a, i - 1) + coeff(b, i - 1), false)
+      z = setcoeff!(z, i - 1, coeff(a, i - 1) + coeff(b, i - 1))
       i += 1
    end
    while i <= lena
-      z = setcoeff!(z, i - 1, coeff(a, i - 1))
+      z = setcoeff!(z, i - 1, deepcopy(coeff(a, i - 1)))
       i += 1
    end
    while i <= lenb
-      z = setcoeff!(z, i - 1, coeff(b, i - 1))
+      z = setcoeff!(z, i - 1, deepcopy(coeff(b, i - 1)))
       i += 1
    end
    set_length!(z, normalise(z, i - 1))
@@ -375,15 +375,15 @@ function -(a::PolyElem{T}, b::PolyElem{T}) where {T <: RingElement}
    fit!(z, lenz)
    i = 1
    while i <= min(lena, lenb)
-      z = setcoeff!(z, i - 1, coeff(a, i - 1) - coeff(b, i - 1), false)
+      z = setcoeff!(z, i - 1, coeff(a, i - 1) - coeff(b, i - 1))
       i += 1
    end
    while i <= lena
-      z = setcoeff!(z, i - 1, coeff(a, i - 1))
+      z = setcoeff!(z, i - 1, deepcopy(coeff(a, i - 1)))
       i += 1
    end
    while i <= lenb
-      z = setcoeff!(z, i - 1, -coeff(b, i - 1), false)
+      z = setcoeff!(z, i - 1, -coeff(b, i - 1))
       i += 1
    end
    set_length!(z, normalise(z, i - 1))
@@ -434,7 +434,7 @@ function mul_karatsuba(a::PolyElem{T}, b::PolyElem{T}) where {T <: RingElement}
    for i = 1:length(z1)
       u = coeff(r, i + m - 1)
       u = addeq!(u, coeff(z1, i - 1))
-      setcoeff!(r, i + m - 1, u, false)
+      setcoeff!(r, i + m - 1, u)
    end
    return r
 end
@@ -505,7 +505,7 @@ function mul_ks(a::PolyElem{T}, b::PolyElem{T}) where {T <: PolyElem}
       for j = 1:m
          u = setcoeff!(u, j - 1, coeff(p, (i - 1)*m + j - 1))
       end
-      setcoeff!(r, i - 1, u, false)
+      setcoeff!(r, i - 1, u)
    end
    set_length!(r, normalise(r, lenr))
    return r
@@ -532,7 +532,7 @@ function mul_classical(a::PolyElem{T}, b::PolyElem{T}) where {T <: RingElement}
          d[i + j - 1] = addeq!(d[i + j - 1], t)
       end
    end
-   z = parent(a)(d, false)
+   z = parent(a)(d)
    set_length!(z, normalise(z, lenz))
    return z
 end
@@ -561,7 +561,7 @@ function *(a::T, b::PolyElem{T}) where {T <: RingElem}
    z = parent(b)()
    fit!(z, len)
    for i = 1:len
-      z = setcoeff!(z, i - 1, a*coeff(b, i - 1), false)
+      z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
    set_length!(z, normalise(z, len))
    return z
@@ -576,7 +576,7 @@ function *(a::Union{Integer, Rational}, b::PolyElem)
    z = parent(b)()
    fit!(z, len)
    for i = 1:len
-      z = setcoeff!(z, i - 1, a*coeff(b, i - 1), false)
+      z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
    set_length!(z, normalise(z, len))
    return z
@@ -591,7 +591,7 @@ function *(a::fmpz, b::PolyElem)
    z = parent(b)()
    fit!(z, len)
    for i = 1:len
-      z = setcoeff!(z, i - 1, a*coeff(b, i - 1), false)
+      z = setcoeff!(z, i - 1, a*coeff(b, i - 1))
    end
    set_length!(z, normalise(z, len))
    return z
@@ -642,7 +642,7 @@ function pow_multinomial(a::PolyElem{T}, e::Int) where {T <: RingElement}
       d = addeq!(d, first)
       res[k + 1] = divexact(res[k + 1], d)
    end
-   z = parent(a)(res, false)
+   z = parent(a)(res)
    set_length!(z, normalise(z, lenz))
    return z
 end
@@ -849,7 +849,7 @@ function mullow(a::PolyElem{T}, b::PolyElem{T}, n::Int) where {T <: RingElement}
          end
       end
    end  
-   z = parent(a)(d, false)
+   z = parent(a)(d)
    set_length!(z, normalise(z, lenz))
    return z
 end
@@ -909,7 +909,7 @@ function shift_left(f::PolyElem, n::Int)
    r = parent(f)()
    fit!(r, flen + n)
    for i = 1:n
-      r = setcoeff!(r, i - 1, zero(base_ring(f)), false)
+      r = setcoeff!(r, i - 1, zero(base_ring(f)))
    end
    for i = 1:flen
       r = setcoeff!(r, i + n - 1, coeff(f, i - 1))
@@ -1033,7 +1033,7 @@ function divexact(f::PolyElem{T}, g::PolyElem{T}) where {T <: RingElement}
       q1 = d[lenf - leng + 1] = divexact(coeff(f, lenf - 1), coeff(g, leng - 1))
       f = f - shift_left(q1*g, lenf - leng)
    end
-   q = parent(f)(d, false)
+   q = parent(f)(d)
    set_length!(q, lenq)
    return q
 end
@@ -1053,7 +1053,7 @@ function divexact(a::PolyElem{T}, b::T) where {T <: RingElem}
    z = parent(a)()
    fit!(z, length(a))
    for i = 1:length(a)
-      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b), false)
+      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b))
    end
    set_length!(z, length(a))
    return z
@@ -1068,7 +1068,7 @@ function divexact(a::PolyElem, b::Union{Integer, Rational})
    z = parent(a)()
    fit!(z, length(a))
    for i = 1:length(a)
-      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b), false)
+      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b))
    end
    set_length!(z, length(a))
    return z
@@ -1083,7 +1083,7 @@ function divexact(a::PolyElem, b::fmpz)
    z = parent(a)()
    fit!(z, length(a))
    for i = 1:length(a)
-      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b), false)
+      z = setcoeff!(z, i - 1, divexact(coeff(a, i - 1), b))
    end
    set_length!(z, length(a))
    return z
@@ -1116,7 +1116,7 @@ function mod(f::PolyElem{T}, g::PolyElem{T}) where {T <: Union{ResElem, FieldEle
             c = mul!(c, coeff(g, i - 1), l)
             u = coeff(f, i + length(f) - length(g) - 1)
             u = addeq!(u, c)
-            f = setcoeff!(f, i + length(f) - length(g) - 1, u, false)
+            f = setcoeff!(f, i + length(f) - length(g) - 1, u)
          end
          set_length!(f, normalise(f, length(f)))
       end
@@ -1148,12 +1148,12 @@ function divrem(f::PolyElem{T}, g::PolyElem{T}) where {T <: Union{ResElem, Field
    while length(f) >= length(g)
       q1 = lead(f)
       l = -q1
-      q = setcoeff!(q, length(f) - length(g), q1*binv, false)
+      q = setcoeff!(q, length(f) - length(g), q1*binv)
       for i = 1:length(g)
          c = mul!(c, coeff(g, i - 1), l)
          u = coeff(f, i + length(f) - length(g) - 1)
          u = addeq!(u, c)
-         f = setcoeff!(f, i + length(f) - length(g) - 1, u, false)
+         f = setcoeff!(f, i + length(f) - length(g) - 1, u)
       end
       set_length!(f, normalise(f, length(f)))
    end
@@ -1216,7 +1216,7 @@ function pseudodivrem(f::PolyElem{T}, g::PolyElem{T}) where {T <: RingElement}
    x = gen(parent(f))
    while length(f) >= length(g)
       for i = length(f) - length(g) + 2:lenq
-         q = setcoeff!(q, i - 1, coeff(q, i - 1) * b, false)
+         q = setcoeff!(q, i - 1, coeff(q, i - 1) * b)
       end
       q = setcoeff!(q, length(f) - length(g), coeff(f, length(f) - 1))
       f = f*b - shift_left(coeff(f, length(f) - 1)*g, length(f) - length(g))
@@ -1303,13 +1303,13 @@ function divides(f::PolyElem{T}, g::PolyElem{T}) where {T <: RingElement}
       if !flag
          return false, parent(f)()
       end
-      q = setcoeff!(q, length(f) - length(g), d, false)
+      q = setcoeff!(q, length(f) - length(g), d)
       d = -d
       for i = 1:length(g)
          c = mul!(c, coeff(g, i - 1), d)
          u = coeff(f, i + length(f) - length(g) - 1)
          u = addeq!(u, c)
-         f = setcoeff!(f, i + length(f) - length(g) - 1, u, false)
+         f = setcoeff!(f, i + length(f) - length(g) - 1, u)
       end
       set_length!(f, normalise(f, length(f)))
    end
@@ -1332,7 +1332,7 @@ function divides(z::PolyElem{T}, x::T) where {T <: RingElement}
       if !flag
          break
       end
-      q = setcoeff!(q, i - 1, c, false)
+      q = setcoeff!(q, i - 1, c)
    end
    set_length!(q, flag ? length(z) : 0)
    return flag, q
@@ -1583,7 +1583,7 @@ function derivative(a::PolyElem)
    z = parent(a)()
    fit!(z, len - 1)
    for i = 1:len - 1
-      z = setcoeff!(z, i - 1, i*coeff(a, i), false)
+      z = setcoeff!(z, i - 1, i*coeff(a, i))
    end
    set_length!(z, normalise(z, len - 1))
    return z
@@ -1603,9 +1603,9 @@ function integral(x::PolyElem{T}) where {T <: Union{ResElem, FieldElement}}
    len = length(x)
    p = parent(x)()
    fit!(p, len + 1)
-   p = setcoeff!(p, 0, zero(base_ring(x)), false)
+   p = setcoeff!(p, 0, zero(base_ring(x)))
    for i = 1:len
-      p = setcoeff!(p, i, divexact(coeff(x, i - 1), base_ring(x)(i)), false)
+      p = setcoeff!(p, i, divexact(coeff(x, i - 1), base_ring(x)(i)))
    end
    len += 1
    while len > 0 && coeff(p, len - 1) == 0 # FIXME: cannot use normalise here
@@ -2364,17 +2364,22 @@ function (a::GenPolyRing{T})(b::PolyElem{T}) where {T <: RingElement}
    return b
 end
 
-function (a::GenPolyRing{T})(b::Array{S, 1}, copy::Bool=true) where {S <: RingElement, T <: RingElement}
+function (a::GenPolyRing{T})(b::Array{T, 1}) where T <: RingElement
    R = base_ring(a)
-   if copy
-      len = length(b)
-      entries = Array{T}(len)
-      for i = 1:length(b)
-         c = b[i]
-         entries[i] = parent(c) == R ? deepcopy(c) : R(c)
-      end
-   else
-      entries = b
+   for i = 1:length(b)
+      b[i] = R(b[i])
+   end
+   z = GenPoly{T}(b)
+   z.parent = a
+   return z
+end
+
+function (a::GenPolyRing{T})(b::Array{S, 1}) where {S <: RingElement, T <: RingElement}
+   R = base_ring(a)
+   len = length(b)
+   entries = Array{T}(len)
+   for i = 1:length(b)
+      entries[i] = R(b[i])
    end
    z = GenPoly{T}(entries)
    z.parent = a
@@ -2401,7 +2406,7 @@ function PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
    T = elem_type(R)
    parent_obj = GenPolyRing{T}(R, S, cached)
 
-   return parent_obj, parent_obj([R(0), R(1)], false)
+   return parent_obj, parent_obj([R(0), R(1)])
 end
 
 # S, x = R["x"] syntax

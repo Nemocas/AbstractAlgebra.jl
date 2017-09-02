@@ -768,7 +768,7 @@ function fit!(z::fmpz_poly, n::Int)
    return nothing
 end
 
-function setcoeff!(z::fmpz_poly, n::Int, x::fmpz, copy::Bool=true)
+function setcoeff!(z::fmpz_poly, n::Int, x::fmpz)
    ccall((:fmpz_poly_set_coeff_fmpz, :libflint), Void, 
                     (Ptr{fmpz_poly}, Int, Ptr{fmpz}), &z, n, &x)
    return z
@@ -832,13 +832,13 @@ function (a::FmpzPolyRing)(b::fmpz)
    return z
 end
 
-function (a::FmpzPolyRing)(b::Array{fmpz, 1}, copy::Bool=true)
+function (a::FmpzPolyRing)(b::Array{fmpz, 1})
    z = fmpz_poly(b)
    z.parent = a
    return z
 end
 
-(a::FmpzPolyRing)(b::Array{T, 1}, copy::Bool=true) where {T <: Integer} = a(map(fmpz, b))
+(a::FmpzPolyRing)(b::Array{T, 1}) where {T <: Integer} = a(map(fmpz, b))
 
 (a::FmpzPolyRing)(b::fmpz_poly) = b
 
