@@ -191,17 +191,13 @@ then the degree of the polynomial, the function returns a zero coefficient.
 We require $n \geq 0$. 
 
 ```
-setcoeff!{T <: RingElem}(a::PolyElem{T}, n::Int, c::T, copy::Bool=true)
+setcoeff!{T <: RingElem}(a::PolyElem{T}, n::Int, c::T)
 ```
 
 Set the coefficient of the degree $n$ term of the given polynomial to the given
 value `a`. The polynomial is not normalised automatically after this operation,
 however the polynomial is automatically resized if there is not sufficient
-allocated space. By default, the function makes a copy of $c$ before inserting
-it into the polynomial. This is to avoid polynomials aliasing coefficients.
-An implementation of this function may ignore the `copy` flag, but if so it
-must make a copy of $c$ rather than insert a reference to $c$ in the
-polynomial.
+allocated space. 
 
 ```
 deepcopy(a::PolyElem)
