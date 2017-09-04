@@ -2346,13 +2346,13 @@ function (a::GenPolyRing{T})() where {T <: RingElement}
    return z
 end
 
-function (a::GenPolyRing{T})(b::Integer) where {T <: RingElement}
+function (a::GenPolyRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
    z = GenPoly{T}(base_ring(a)(b))
    z.parent = a
    return z
 end
 
-function (a::GenPolyRing{T})(b::T) where {T <: RingElement}
+function (a::GenPolyRing{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
    z = GenPoly{T}(b)
    z.parent = a
