@@ -976,6 +976,8 @@ function test_gen_poly_remove_valuation()
 
    for iter = 1:10
       d = true
+      f = R()
+      g = R()
       while d
          f = R()
          g = R()
