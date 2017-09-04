@@ -2918,7 +2918,7 @@ function (a::GenMPolyRing{T})() where {T <: RingElement}
    return z
 end
 
-function (a::GenMPolyRing{T})(b::Integer) where {T <: RingElement}
+function (a::GenMPolyRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
    z = GenMPoly{T}(a, base_ring(a)(b))
    return z
 end

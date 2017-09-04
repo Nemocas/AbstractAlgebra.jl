@@ -879,7 +879,7 @@ function (a::GenAbsSeriesRing{T})() where {T <: RingElement}
    return z
 end
 
-function (a::GenAbsSeriesRing{T})(b::Integer) where {T <: RingElement}
+function (a::GenAbsSeriesRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
    if b == 0
       z = GenAbsSeries{T}(Array{T}(0), 0, a.prec_max)
    else

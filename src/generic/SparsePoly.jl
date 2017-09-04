@@ -1707,7 +1707,7 @@ function (a::GenSparsePolyRing{T})() where {T <: RingElement}
    return z
 end
 
-function (a::GenSparsePolyRing{T})(b::Integer) where {T <: RingElement}
+function (a::GenSparsePolyRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
    z = GenSparsePoly{T}(base_ring(a)(b))
    z.parent = a
    return z

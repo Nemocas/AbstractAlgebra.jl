@@ -775,30 +775,30 @@ end
 #
 ###############################################################################
 
-function (a::GenFracField{T})(b::RingElem) where {T <: RingElem}
+function (a::GenFracField{T})(b::RingElement) where {T <: RingElement}
    return a(base_ring(a)(b))
 end
 
-function (a::GenFracField{T})() where {T <: RingElem}
+function (a::GenFracField{T})() where {T <: RingElement}
    z = GenFrac{T}(zero(base_ring(a)), one(base_ring(a)))
    z.parent = a
    return z
 end
 
-function (a::GenFracField{T})(b::fmpz) where {T <: RingElem}
+function (a::GenFracField{T})(b::fmpz) where {T <: RingElement}
    z = GenFrac{T}(base_ring(a)(b), one(base_ring(a)))
    z.parent = a
    return z
 end
 
-function (a::GenFracField{T})(b::T) where {T <: RingElem}
+function (a::GenFracField{T})(b::T) where {T <: RingElement}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    z = GenFrac{T}(b, one(base_ring(a)))
    z.parent = a
    return z
 end
 
-function (a::GenFracField{T})(b::T, c::T) where {T <: RingElem}
+function (a::GenFracField{T})(b::T, c::T) where {T <: RingElement}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
    z = GenFrac{T}(b, c)
@@ -806,33 +806,33 @@ function (a::GenFracField{T})(b::T, c::T) where {T <: RingElem}
    return z
 end
 
-function (a::GenFracField{T})(b::T, c::Integer) where {T <: RingElem}
+function (a::GenFracField{T})(b::T, c::Union{Integer, Rational}) where {T <: RingElement}
    parent(b) != base_ring(a) && error("Could not coerce to fraction")
    z = GenFrac{T}(b, base_ring(a)(c))
    z.parent = a
    return z
 end
 
-function (a::GenFracField{T})(b::Integer, c::T) where {T <: RingElem}
+function (a::GenFracField{T})(b::Union{Integer, Rational}, c::T) where {T <: RingElement}
    parent(c) != base_ring(a) && error("Could not coerce to fraction")
    z = GenFrac{T}(base_ring(a)(b), c)
    z.parent = a
    return z
 end
 
-function (a::GenFracField{T})(b::Integer) where {T <: RingElem}
+function (a::GenFracField{T})(b::Union{Integer, Rational}) where {T <: RingElement}
    z = GenFrac{T}(base_ring(a)(b), one(base_ring(a)))
    z.parent = a
    return z
 end
 
-function (a::GenFracField{T})(b::Integer, c::Integer) where {T <: RingElem}
+function (a::GenFracField{T})(b::Integer, c::Integer) where {T <: RingElement}
    z = GenFrac{T}(base_ring(a)(b), base_ring(a)(c))
    z.parent = a
    return z
 end
 
-function (a::GenFracField{T})(b::GenFrac{T}) where {T <: RingElem}
+function (a::GenFracField{T})(b::GenFrac{T}) where {T <: RingElement}
    a != parent(b) && error("Could not coerce to fraction")
    return b
 end

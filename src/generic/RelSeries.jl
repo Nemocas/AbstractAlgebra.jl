@@ -1124,7 +1124,7 @@ function (a::GenRelSeriesRing{T})() where {T <: RingElement}
    return z
 end
 
-function (a::GenRelSeriesRing{T})(b::Integer) where {T <: RingElement}
+function (a::GenRelSeriesRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
    if b == 0
       z = GenRelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
    else

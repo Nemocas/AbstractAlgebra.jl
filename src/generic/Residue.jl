@@ -551,7 +551,7 @@ function (a::GenResRing{fmpz})(b::fmpz)
    return z
 end
 
-function (a::GenResRing{T})(b::T) where {T <: RingElement}
+function (a::GenResRing{T})(b::T) where {T <: RingElem}
    base_ring(a) != parent(b) && error("Operation on incompatible objects")
    z = GenRes{T}(mod(b, modulus(a)))
    z.parent = a
