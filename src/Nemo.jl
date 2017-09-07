@@ -30,6 +30,9 @@ export PolyRing, SeriesRing, AbsSeriesRing, ResRing, FracField, MatSpace, FinFie
 
 export JuliaZZ, JuliaQQ, zz, qq
 
+export PermutationGroup, ZZ, QQ, PadicField, FiniteField, RealField, ComplexField,
+       CyclotomicField, MaximalRealSubfield
+
 export create_accessors, get_handle, package_handle, zeros,
        Array, sig_exists
 
