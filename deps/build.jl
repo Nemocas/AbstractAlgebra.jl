@@ -128,9 +128,10 @@ cd(wdir)
 
 # install MPFR
 
-if !ispath(joinpath(wdir, "mpfr-3.1.5"))
+if !ispath(joinpath(wdir, "mpfr-3.1.6"))
    println("Downloading MPFR sources ... ")
-   download("http://ftp.gnu.org/gnu/mpfr/mpfr-3.1.5.tar.bz2", joinpath(wdir, "mpfr-3.1.5.tar.bz2"))
+   download("http://ftp.gnu.org/gnu/mpfr/mpfr-3.1.6.tar.bz2", joinpath(wdir, "mpfr-3.1.6.tar.bz2"))
+
    println("DONE")
 end
 
@@ -144,11 +145,11 @@ if is_windows()
    println("DONE")
 else
    println("Building MPFR ... ")
-   if isfile(joinpath(wdir, "mpfr-3.1.5.tar.bz2"))
-      run(`tar -xvf mpfr-3.1.5.tar.bz2`)
-      run(`rm mpfr-3.1.5.tar.bz2`)
+   if isfile(joinpath(wdir, "mpfr-3.1.6.tar.bz2"))
+      run(`tar -xvf mpfr-3.1.6.tar.bz2`)
+      run(`rm mpfr-3.1.6.tar.bz2`)
    end
-   cd("$wdir/mpfr-3.1.5")
+   cd("$wdir/mpfr-3.1.6")
    withenv("LD_LIBRARY_PATH"=>"$vdir/lib", "LDFLAGS"=>LDFLAGS) do
       run(`./configure --prefix=$vdir --with-gmp=$vdir --disable-static --enable-shared`) 
       run(`make -j4`)
