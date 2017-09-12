@@ -15,9 +15,15 @@ export GenMPoly, GenMPolyRing, max_degrees, gens, divides,
 #
 ###############################################################################
 
+parent(a::GenMPoly{T}) where T <: RingElement = a.parent
+
 parent_type(::Type{GenMPoly{T}}) where T <: RingElement = GenMPolyRing{T}
 
-elem_type(::Type{GenMPolyRing{T}}) where {T <: RingElement} = GenMPoly{T}
+elem_type(::Type{GenMPolyRing{T}}) where T <: RingElement = GenMPoly{T}
+
+base_ring(R::GenMPolyRing{T}) where T <: RingElement = R.base_ring
+
+base_ring(a::GenMPoly{T}) where T <: RingElement = base_ring(parent(a))
 
 doc"""
     vars(a::GenMPolyRing)
@@ -58,6 +64,11 @@ doc"""
 """
 function ordering(a::GenMPolyRing{T}) where {T <: RingElement}
    return a.ord
+end
+
+function check_parent(a::GenMPoly{T}, b::GenMPoly{T}) where T <: RingElement
+   parent(a) != parent(b) && 
+      error("Incompatible polynomial rings in polynomial operation")
 end
 
 ###############################################################################
@@ -329,9 +340,15 @@ doc"""
 """
 nvars(x::GenMPoly) = parent(x).num_vars
 
+one(R::GenMPolyRing) = R(1)
+
+zero(R::GenMPolyRing) = R(0)
+
 isone(x::GenMPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && x.coeffs[1] == 1
 
 iszero(x::GenMPoly) = x.length == 0
+
+isunit(x::GenMPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && isunit(x.coeffs[1])
 
 doc"""
     isconstant(x::GenMPoly)
@@ -2929,7 +2946,7 @@ function (a::GenMPolyRing{T})(b::T) where {T <: RingElement}
    return z
 end
 
-function (a::GenMPolyRing{T})(b::PolyElem{T}) where {T <: RingElement}
+function (a::GenMPolyRing{T})(b::GenMPoly{T}) where {T <: RingElement}
    parent(b) != a && error("Unable to coerce polynomial")
    return b
 end

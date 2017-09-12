@@ -110,7 +110,7 @@ end
 # T is an Int which is the number of variables
 # (plus one if ordered by total degree)
 
-mutable struct GenMPolyRing{T <: RingElement} <: PolyRing{T}
+mutable struct GenMPolyRing{T <: RingElement} <: MPolyRing{T}
    base_ring::Ring
    S::Array{Symbol, 1}
    ord::Symbol
@@ -133,7 +133,7 @@ end
 
 const GenMPolyID = Dict{Tuple{Ring, Array{Symbol, 1}, Symbol, Int}, Ring}()
 
-mutable struct GenMPoly{T <: RingElement} <: PolyElem{T}
+mutable struct GenMPoly{T <: RingElement} <: MPolyElem{T}
    coeffs::Array{T, 1}
    exps::Array{UInt, 2}
    length::Int

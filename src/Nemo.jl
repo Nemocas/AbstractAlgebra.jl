@@ -24,9 +24,10 @@ export elem_type, parent_type
 export SetElem, GroupElem, RingElem, FieldElem, AccessorNotSetError
 
 export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
-       MatElem, FinFieldElem
+       MatElem, FinFieldElem, MPolyElem
 
-export PolyRing, SeriesRing, AbsSeriesRing, ResRing, FracField, MatSpace, FinField
+export PolyRing, SeriesRing, AbsSeriesRing, ResRing, FracField, MatSpace,
+       FinField, MPolyRing
 
 export JuliaZZ, JuliaQQ, zz, qq
 

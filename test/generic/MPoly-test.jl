@@ -18,26 +18,26 @@ function test_gen_mpoly_constructors()
       isa(vars(S), Array{Symbol, 1})
 
       for j = 1:num_vars
-         @test isa(varlist[j], PolyElem)
-         @test isa(gens(S)[j], PolyElem)
+         @test isa(varlist[j], MPolyElem)
+         @test isa(gens(S)[j], MPolyElem)
       end
 
       f =  rand(S, 0:5, 0:100, 0:0, -100:100)
 
-      @test isa(f, PolyElem)
+      @test isa(f, MPolyElem)
 
-      @test isa(S(2), PolyElem)
+      @test isa(S(2), MPolyElem)
 
-      @test isa(S(R(2)), PolyElem)
+      @test isa(S(R(2)), MPolyElem)
 
-      @test isa(S(f), PolyElem)
+      @test isa(S(f), MPolyElem)
 
       V = [R(rand(-100:100)) for i in 1:5]
 
       W0 = UInt[rand(0:100) for i in 1:5*num_vars]
       W = reshape(W0, num_vars, 5)
 
-      @test isa(S(V, W), PolyElem)
+      @test isa(S(V, W), MPolyElem)
    end
 
    println("PASS")

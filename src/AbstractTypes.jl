@@ -41,6 +41,8 @@ abstract type ModuleElem{T <: RingElem} <: GroupElem end
 
 abstract type PolyRing{T} <: Ring end
 
+abstract type MPolyRing{T} <: Ring end
+
 abstract type SeriesRing{T} <: Ring end
 
 abstract type ResRing{T} <: Ring end
@@ -58,6 +60,8 @@ abstract type MatSpace{T} <: Ring end
 # implementation is meaningful over that base ring
 
 abstract type PolyElem{T} <: RingElem end
+
+abstract type MPolyElem{T} <: RingElem end
 
 abstract type ResElem{T} <: RingElem end
 
