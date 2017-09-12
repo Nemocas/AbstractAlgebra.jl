@@ -9,7 +9,7 @@ export GenPoly, GenPolyRing, PolynomialRing, hash, coeff, isgen, lead,
        pseudorem, pseudodivrem, gcd, degree, content, primpart, evaluate, 
        compose, derivative, integral, resultant, discriminant, gcdx, zero, one,
        gen, length, iszero, normalise, isone, isunit, addeq!, mul!, fit!,
-       setcoeff!, mulmod, powmod, invmod, lcm, divrem, mod, gcdinv,
+       setcoeff!, mulmod, powmod, invmod, lcm, divrem, mod, gcdinv, resx,
        canonical_unit, var, chebyshev_t, chebyshev_u, set_length!,
        mul_classical, sqr_classical, mul_ks, subst, mul_karatsuba, trail,
        pow_multinomial, monomial_to_newton!, newton_to_monomial!, ismonomial
@@ -1808,16 +1808,16 @@ end
 
 ###############################################################################
 #
-#   GCDX
+#   RESX
 #
 ###############################################################################
 
 doc"""
-    gcdx{T <: RingElement}(a::PolyElem{T}, b::PolyElem{T})
+    resx{T <: RingElement}(a::PolyElem{T}, b::PolyElem{T})
 > Return a tuple $(r, s, t)$ such that $r$ is the resultant of $a$ and $b$ and
 > such that $r = a\times s + b\times t$.
 """
-function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: RingElement}
+function resx(a::PolyElem{T}, b::PolyElem{T}) where {T <: RingElement}
    check_parent(a, b)
    sgn = 1
    swap = false
@@ -1830,7 +1830,10 @@ function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: RingElement}
    end
    lena = length(a)
    lenb = length(b)
-   (lena <= 1 || lenb <= 1) && error("Constant polynomial in gcdx")  
+   if lenb == 0
+      return zero(base_ring(a)), zero(parent(a)), zero(parent(a))
+   end
+   (lena <= 1 && lenb <= 1) && error("Constant polynomials in resx")
    c1 = content(a)
    c2 = content(b)
    A = divexact(a, c1)
@@ -1860,11 +1863,28 @@ function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: RingElement}
    end
    s = divexact(h*lead(B)^(lena - 1), h^(lena - 1))
    res = c1^(length(b) - 1)*c2^(length(a) - 1)*s*sgn
-   u2 *= c1^(length(b) - 2)*c2^(length(a) - 1)*sgn
-   v2 *= c1^(length(b) - 1)*c2^(length(a) - 2)*sgn
+   if length(b) > 1
+      u2 *= c1^(length(b) - 2)*c2^(length(a) - 1)*sgn
+   else
+      u2 *= c2^(length(a) - 1)*sgn
+      u2 = divexact(u2, c1)
+   end
+   if length(a) > 1
+      v2 *= c1^(length(b) - 1)*c2^(length(a) - 2)*sgn
+   else
+      v2 *= c1^(length(b) - 1)*sgn
+      v2 = divexact(v2, c2)
+   end
    if lena != 2
-      u2 = divexact(u2*lead(B)^(lena - 2), h^(lena - 2))
-      v2 = divexact(v2*lead(B)^(lena - 2), h^(lena - 2))
+      if lena > 1
+         d1 = lead(B)^(lena - 2)
+         d2 = h^(lena - 2)
+         u2 = divexact(u2*d1, d2)
+         v2 = divexact(v2*d1, d2)
+      else
+         u2 = divexact(u2*h, lead(B))
+         v2 = divexact(v2*h, lead(B))
+      end
    end
    if swap
       u2, v2 = v2, u2
@@ -1875,6 +1895,12 @@ function gcdx(a::PolyElem{T}, b::PolyElem{T}) where {T <: RingElement}
    v2 = divexact(v2, u)
    return res, u2, v2
 end
+
+###############################################################################
+#
+#   GCDX
+#
+###############################################################################
 
 doc"""
     gcdx{T <: Union{ResElem, FieldElement}}(a::PolyElem{T}, b::PolyElem{T})

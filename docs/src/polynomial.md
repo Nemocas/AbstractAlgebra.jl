@@ -682,7 +682,6 @@ primpart(::PolyElem)
 ```
 
 ```@docs
-gcdx{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
 gcdx{T <: Union{ResElem, FieldElem}}(::PolyElem{T}, ::PolyElem{T})
 ```
 
@@ -814,6 +813,10 @@ k = integral(g)
 
 ```@docs
 resultant{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
+```
+
+```@docs
+resx{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
 ```
 
 ```@docs

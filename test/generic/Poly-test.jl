@@ -834,27 +834,25 @@ function test_gen_poly_discriminant()
    println("PASS")
 end
 
-function test_gen_poly_gcdx()
-   print("GenPoly.gcdx...")
+function test_gen_poly_resx()
+   print("GenPoly.resx...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
 
    for iter in 1:100
       f = R()
       g = R()
-      while length(f) < 2 || length(g) < 2
-         f = rand(R, 2:5, -10:10)
-         g = rand(R, 2:5, -10:10)
+      while length(f) <= 1 && length(g) <= 1
+         f = rand(R, 0:5, -10:10)
+         g = rand(R, 0:5, -10:10)
       end
-      r, u, v = gcdx(f, g)
+      r, u, v = resx(f, g)
 
       @test u*f + v*g == r
 
       h = R()
-      while h == 0
-         h = rand(R, 0:5, -10:10)
-      end
-      r, u, v = gcdx(f*h, g*h)
+      h = rand(R, 0:5, -10:10)
+      r, u, v = resx(f*h, g*h)
 
       @test (u*f + v*g)*h == r
    end
@@ -1064,7 +1062,7 @@ function test_gen_poly()
    test_gen_poly_integral()
    test_gen_poly_resultant()
    test_gen_poly_discriminant()
-   test_gen_poly_gcdx()
+   test_gen_poly_resx()
    test_gen_poly_newton_representation()
    test_gen_poly_interpolation()
    test_gen_poly_special()
