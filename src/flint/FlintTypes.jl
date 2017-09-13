@@ -356,12 +356,12 @@ end
 #
 ###############################################################################
 
-mutable struct NmodPolyRing <: PolyRing{GenRes{fmpz}}
-  base_ring::GenResRing{fmpz}
+mutable struct NmodPolyRing <: PolyRing{Generic.Res{fmpz}}
+  base_ring::Generic.ResRing{fmpz}
   S::Symbol
   n::UInt
 
-  function NmodPolyRing(R::GenResRing{fmpz}, s::Symbol, cached::Bool = true)
+  function NmodPolyRing(R::Generic.ResRing{fmpz}, s::Symbol, cached::Bool = true)
     m = UInt(modulus(R))
     if haskey(NmodPolyRingID, (m, s))
        return NmodPolyRingID[m, s]
@@ -377,7 +377,7 @@ end
 
 const NmodPolyRingID = Dict{Tuple{UInt, Symbol}, NmodPolyRing}()
 
-mutable struct nmod_poly <: PolyElem{GenRes{fmpz}}
+mutable struct nmod_poly <: PolyElem{Generic.Res{fmpz}}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -436,7 +436,7 @@ mutable struct nmod_poly <: PolyElem{GenRes{fmpz}}
       return z
    end
 
-   function nmod_poly(n::UInt, arr::Array{GenRes{fmpz}, 1})
+   function nmod_poly(n::UInt, arr::Array{Generic.Res{fmpz}, 1})
       z = new()
       ccall((:nmod_poly_init2, :libflint), Void,
             (Ptr{nmod_poly}, UInt, Int), &z, n, length(arr))
@@ -502,12 +502,12 @@ end
 #
 ###############################################################################
 
-mutable struct FmpzModPolyRing <: PolyRing{GenRes{fmpz}}
-  base_ring::GenResRing{fmpz}
+mutable struct FmpzModPolyRing <: PolyRing{Generic.Res{fmpz}}
+  base_ring::Generic.ResRing{fmpz}
   S::Symbol
   n::fmpz
 
-  function FmpzModPolyRing(R::GenResRing{fmpz}, s::Symbol, cached::Bool = true)
+  function FmpzModPolyRing(R::Generic.ResRing{fmpz}, s::Symbol, cached::Bool = true)
     m = modulus(R)
     if haskey(FmpzModPolyRingID, (m, s))
        return FmpzModPolyRingID[m, s]
@@ -523,7 +523,7 @@ end
 
 const FmpzModPolyRingID = Dict{Tuple{fmpz, Symbol}, FmpzModPolyRing}()
 
-mutable struct fmpz_mod_poly <: PolyElem{GenRes{fmpz}}
+mutable struct fmpz_mod_poly <: PolyElem{Generic.Res{fmpz}}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -571,7 +571,7 @@ mutable struct fmpz_mod_poly <: PolyElem{GenRes{fmpz}}
       return z
    end
 
-   function fmpz_mod_poly(n::fmpz, arr::Array{GenRes{fmpz}, 1})
+   function fmpz_mod_poly(n::fmpz, arr::Array{Generic.Res{fmpz}, 1})
       z = new()
       ccall((:fmpz_mod_poly_init2, :libflint), Void,
             (Ptr{fmpz_mod_poly}, Ptr{fmpz}, Int), &z, &n, length(arr))
@@ -1341,8 +1341,8 @@ end
 #
 ###############################################################################
 
-mutable struct FmpzModRelSeriesRing <: SeriesRing{GenRes{fmpz}}
-   base_ring::GenResRing{fmpz}
+mutable struct FmpzModRelSeriesRing <: SeriesRing{Generic.Res{fmpz}}
+   base_ring::Generic.ResRing{fmpz}
    prec_max::Int
    S::Symbol
 
@@ -1360,10 +1360,10 @@ mutable struct FmpzModRelSeriesRing <: SeriesRing{GenRes{fmpz}}
    end
 end
 
-const FmpzModRelSeriesID = Dict{Tuple{GenResRing{fmpz}, Int, Symbol},
+const FmpzModRelSeriesID = Dict{Tuple{Generic.ResRing{fmpz}, Int, Symbol},
                                 FmpzModRelSeriesRing}()
 
-mutable struct fmpz_mod_rel_series <: RelSeriesElem{GenRes{fmpz}}
+mutable struct fmpz_mod_rel_series <: RelSeriesElem{Generic.Res{fmpz}}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -1394,7 +1394,7 @@ mutable struct fmpz_mod_rel_series <: RelSeriesElem{GenRes{fmpz}}
       return z
    end
    
-   function fmpz_mod_rel_series(p::fmpz, a::Array{GenRes{fmpz}, 1}, len::Int, prec::Int, val::Int)
+   function fmpz_mod_rel_series(p::fmpz, a::Array{Generic.Res{fmpz}, 1}, len::Int, prec::Int, val::Int)
       z = new()
       ccall((:fmpz_mod_poly_init2, :libflint), Void, 
             (Ptr{fmpz_mod_rel_series}, Ptr{fmpz}, Int), &z, &p, len)
@@ -1430,8 +1430,8 @@ end
 #
 ###############################################################################
 
-mutable struct FmpzModAbsSeriesRing <: SeriesRing{GenRes{fmpz}}
-   base_ring::GenResRing{fmpz}
+mutable struct FmpzModAbsSeriesRing <: SeriesRing{Generic.Res{fmpz}}
+   base_ring::Generic.ResRing{fmpz}
    prec_max::Int
    S::Symbol
 
@@ -1449,10 +1449,10 @@ mutable struct FmpzModAbsSeriesRing <: SeriesRing{GenRes{fmpz}}
    end
 end
 
-const FmpzModAbsSeriesID = Dict{Tuple{GenResRing{fmpz}, Int, Symbol},
+const FmpzModAbsSeriesID = Dict{Tuple{Generic.ResRing{fmpz}, Int, Symbol},
                                 FmpzModAbsSeriesRing}()
 
-mutable struct fmpz_mod_abs_series <: AbsSeriesElem{GenRes{fmpz}}
+mutable struct fmpz_mod_abs_series <: AbsSeriesElem{Generic.Res{fmpz}}
    coeffs::Ptr{Void}
    alloc::Int
    length::Int
@@ -1481,7 +1481,7 @@ mutable struct fmpz_mod_abs_series <: AbsSeriesElem{GenRes{fmpz}}
       return z
    end
    
-   function fmpz_mod_abs_series(p::fmpz, a::Array{GenRes{fmpz}, 1}, len::Int, prec::Int)
+   function fmpz_mod_abs_series(p::fmpz, a::Array{Generic.Res{fmpz}, 1}, len::Int, prec::Int)
       z = new()
       ccall((:fmpz_mod_poly_init2, :libflint), Void, 
             (Ptr{fmpz_mod_abs_series}, Ptr{fmpz}, Int), &z, &p, len)
@@ -2126,13 +2126,13 @@ end
 #
 ###############################################################################
 
-mutable struct NmodMatSpace <: MatSpace{GenRes{fmpz}}
-  base_ring::GenResRing{fmpz}
+mutable struct NmodMatSpace <: MatSpace{Generic.Res{fmpz}}
+  base_ring::Generic.ResRing{fmpz}
   n::UInt
   rows::Int
   cols::Int
 
-  function NmodMatSpace(R::GenResRing{fmpz}, r::Int, c::Int,
+  function NmodMatSpace(R::Generic.ResRing{fmpz}, r::Int, c::Int,
                         cached::Bool = true)
     (r < 0 || c < 0) && throw(error_dim_negative)
     R.modulus > typemax(UInt) && 
@@ -2149,23 +2149,9 @@ mutable struct NmodMatSpace <: MatSpace{GenRes{fmpz}}
   end
 end
 
-const NmodMatID = Dict{Tuple{GenResRing{fmpz}, Int, Int}, NmodMatSpace}()
+const NmodMatID = Dict{Tuple{Generic.ResRing{fmpz}, Int, Int}, NmodMatSpace}()
 
-function _check_dim(r::Int, c::Int, arr::Array{T, 2}, transpose::Bool = false) where {T}
-  if !transpose
-    size(arr) != (r, c) && throw(ErrorConstrDimMismatch(r, c, size(arr)...))
-  else
-    size(arr) != (c, r) && throw(ErrorConstrDimMismatch(r, c, (reverse(size(arr)))...))
-  end
-  return nothing
-end
-
-function _check_dim(r::Int, c::Int, arr::Array{T, 1}) where {T}
-  length(arr) != r*c && throw(ErrorConstrDimMismatch(r, c, length(arr)))
-  return nothing
-end
-
-mutable struct nmod_mat <: MatElem{GenRes{fmpz}}
+mutable struct nmod_mat <: MatElem{Generic.Res{fmpz}}
   entries::Ptr{Void}
   r::Int                  # Int
   c::Int                  # Int
@@ -2173,7 +2159,7 @@ mutable struct nmod_mat <: MatElem{GenRes{fmpz}}
   n::UInt                # mp_limb_t / Culong
   ninv::UInt             # mp_limb_t / Culong
   norm::UInt             # mp_limb_t / Culong
-  base_ring::GenResRing{fmpz}
+  base_ring::Generic.ResRing{fmpz}
 
   function nmod_mat(r::Int, c::Int, n::UInt)
     z = new()
@@ -2271,7 +2257,7 @@ mutable struct nmod_mat <: MatElem{GenRes{fmpz}}
     return nmod_mat(r, c, n, arr, transpose)
   end
 
-  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{GenRes{fmpz}, 2}, transpose::Bool = false)
+  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{Generic.Res{fmpz}, 2}, transpose::Bool = false)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)
@@ -2290,7 +2276,7 @@ mutable struct nmod_mat <: MatElem{GenRes{fmpz}}
     return z
   end
 
-  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{GenRes{fmpz}, 1}, transpose::Bool = false)
+  function nmod_mat(r::Int, c::Int, n::UInt, arr::Array{Generic.Res{fmpz}, 1}, transpose::Bool = false)
     z = new()
     ccall((:nmod_mat_init, :libflint), Void,
             (Ptr{nmod_mat}, Int, Int, UInt), &z, r, c, n)

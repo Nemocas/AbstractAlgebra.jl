@@ -4,10 +4,10 @@
 #
 ###############################################################################
 
-export GenMPoly, GenMPolyRing, max_degrees, gens, divides,
-       isconstant, isdegree, ismonomial, isreverse, isterm, 
+export max_degrees, gens, divides,
+       isconstant, isdegree, ismonomial, isreverse, isterm, main_variable,
        main_variable_extract, main_variable_insert, nvars, ordering,
-       rand_ordering, vars 
+       rand_ordering, vars, monomial_set!, monomial_iszero
 
 ###############################################################################
 #
@@ -15,58 +15,58 @@ export GenMPoly, GenMPolyRing, max_degrees, gens, divides,
 #
 ###############################################################################
 
-parent(a::GenMPoly{T}) where T <: RingElement = a.parent
+parent(a::MPoly{T}) where T <: RingElement = a.parent
 
-parent_type(::Type{GenMPoly{T}}) where T <: RingElement = GenMPolyRing{T}
+parent_type(::Type{MPoly{T}}) where T <: RingElement = MPolyRing{T}
 
-elem_type(::Type{GenMPolyRing{T}}) where T <: RingElement = GenMPoly{T}
+elem_type(::Type{MPolyRing{T}}) where T <: RingElement = MPoly{T}
 
-base_ring(R::GenMPolyRing{T}) where T <: RingElement = R.base_ring
+base_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring
 
-base_ring(a::GenMPoly{T}) where T <: RingElement = base_ring(parent(a))
+base_ring(a::MPoly{T}) where T <: RingElement = base_ring(parent(a))
 
 doc"""
-    vars(a::GenMPolyRing)
+    vars(a::MPolyRing)
 > Return an array of symbols representing the variable names for the given
 > polynomial ring.
 """
-vars(a::GenMPolyRing) = a.S
+vars(a::MPolyRing) = a.S
 
-function gens(a::GenMPolyRing{T}, ::Type{Val{:lex}}) where {T <: RingElement}
+function gens(a::MPolyRing{T}, ::Type{Val{:lex}}) where {T <: RingElement}
    return [a([base_ring(a)(1)], reshape([UInt(i == j) for j = 1:a.num_vars], a.num_vars, 1))
       for i in 1:a.num_vars]
 end
 
-function gens(a::GenMPolyRing{T}, ::Type{Val{:deglex}}) where {T <: RingElement}
+function gens(a::MPolyRing{T}, ::Type{Val{:deglex}}) where {T <: RingElement}
    return [a([base_ring(a)(1)], reshape([UInt(1), [UInt(i == j) for j in 1:a.num_vars]...], a.num_vars + 1, 1))
       for i in 1:a.num_vars]
 end
 
-function gens(a::GenMPolyRing{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
+function gens(a::MPolyRing{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
    N = a.N
    return [a([base_ring(a)(1)], reshape([UInt(1), [UInt(N - i == j) for j in 1:a.num_vars]...], a.num_vars + 1, 1))
       for i in 1:a.num_vars]
 end
 
 doc"""
-    gens{T <: RingElement}(a::GenMPolyRing{T})
+    gens{T <: RingElement}(a::MPolyRing{T})
 > Return an array of all the generators (variables) of the given polynomial
 > ring.
 """
-function gens(a::GenMPolyRing{T}) where {T <: RingElement}
+function gens(a::MPolyRing{T}) where {T <: RingElement}
    return gens(a, Val{a.ord})
 end
 
 doc"""
-    ordering{T <: RingElement}(a::GenMPolyRing{T})
+    ordering{T <: RingElement}(a::MPolyRing{T})
 > Return the ordering of the given polynomial ring as a symbol. The options are
 > `:lex`, `:deglex` and `:degrevlex`.
 """
-function ordering(a::GenMPolyRing{T}) where {T <: RingElement}
+function ordering(a::MPolyRing{T}) where {T <: RingElement}
    return a.ord
 end
 
-function check_parent(a::GenMPoly{T}, b::GenMPoly{T}) where T <: RingElement
+function check_parent(a::MPoly{T}, b::MPoly{T}) where T <: RingElement
    parent(a) != parent(b) && 
       error("Incompatible polynomial rings in polynomial operation")
 end
@@ -106,7 +106,7 @@ function monomial_isequal(A::Array{UInt, 2}, i::Int, j::Int, N::Int)
    return true
 end
 
-function monomial_isless(A::Array{UInt, 2}, i::Int, j::Int, N::Int, R::GenMPolyRing{T}, drmask::UInt) where {T <: RingElement}
+function monomial_isless(A::Array{UInt, 2}, i::Int, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
    if R.ord == :degrevlex
       if (xor(A[1, i], drmask)) < (xor(A[1, j], drmask))
          return true
@@ -132,7 +132,7 @@ function monomial_isless(A::Array{UInt, 2}, i::Int, j::Int, N::Int, R::GenMPolyR
    return false
 end
 
-function monomial_isless(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int, R::GenMPolyRing{T}, drmask::UInt) where {T <: RingElement}
+function monomial_isless(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
    if R.ord == :degrevlex
       if xor(A[1, i], drmask) < xor(B[1, j], drmask)
          return true
@@ -224,7 +224,7 @@ function monomial_overflows(A::Array{UInt, 2}, i::Int, mask::UInt, N::Int)
    return false
 end
 
-function monomial_cmp(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int, R::GenMPolyRing{T}, drmask::UInt) where {T <: RingElement}
+function monomial_cmp(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
    k = 1
    while k < N && A[k, i] == B[k, j]
       k += 1
@@ -255,7 +255,7 @@ doc"""
 """
 isreverse(s::Symbol) = s == :degrevlex
 
-function isgen(x::GenMPoly{T}, ::Type{Val{:lex}}) where {T <: RingElement}
+function isgen(x::MPoly{T}, ::Type{Val{:lex}}) where {T <: RingElement}
    exps = x.exps
    N = size(exps, 1)
    for k = 1:N
@@ -275,20 +275,20 @@ function isgen(x::GenMPoly{T}, ::Type{Val{:lex}}) where {T <: RingElement}
    return false
 end
 
-function isgen(x::GenMPoly{T}, ::Type{Val{:deglex}}) where {T <: RingElement}
+function isgen(x::MPoly{T}, ::Type{Val{:deglex}}) where {T <: RingElement}
    return x.exps[1, 1] == UInt(1)
 end
 
-function isgen(x::GenMPoly{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
+function isgen(x::MPoly{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
    return x.exps[1, 1] == UInt(1)
 end
 
 doc"""
-    isgen{T <: RingElement}(x::GenMPoly{T})
+    isgen{T <: RingElement}(x::MPoly{T})
 > Return `true` if the given polynomial is a generator (variable) of the
 > polynomial ring it belongs to.
 """
-function isgen(x::GenMPoly{T}) where {T <: RingElement}
+function isgen(x::MPoly{T}) where {T <: RingElement}
    if length(x) != 1
       return false
    end
@@ -298,20 +298,20 @@ function isgen(x::GenMPoly{T}) where {T <: RingElement}
    return isgen(x, Val{parent(x).ord})
 end
 
-function coeff(x::GenMPoly, i::Int)
+function coeff(x::MPoly, i::Int)
    i < 0 && throw(DomainError())
    return x.coeffs[i + 1]
 end
 
 doc"""
-    max_degrees{T <: RingElement}(f::GenMPoly{T})
+    max_degrees{T <: RingElement}(f::MPoly{T})
 > Return a tuple `(degs, biggest)` consisting of an array `degs` of the maximum
 > exponent for each field in the exponent vectors of `f` and an integer which
 > is the largest of the entries in `degs`. The array `degs` will have `n + 1`
 > entries in the case of a degree ordering, or `n` otherwise, where `n` is the
 > number of variables of the polynomial ring `f` belongs to.
 """
-function max_degrees(f::GenMPoly{T}) where {T <: RingElement}
+function max_degrees(f::MPoly{T}) where {T <: RingElement}
    A = f.exps
    N = size(A, 1)
    biggest = zeros(Int, N)
@@ -331,46 +331,46 @@ function max_degrees(f::GenMPoly{T}) where {T <: RingElement}
    return biggest, b
 end
 
-length(x::GenMPoly) = x.length
+length(x::MPoly) = x.length
 
 doc"""
-    nvars(x::GenMPoly)
+    nvars(x::MPoly)
 > Returns the number of variables of the polynomial ring the given polynomial
 > belongs to.
 """
-nvars(x::GenMPoly) = parent(x).num_vars
+nvars(x::MPoly) = parent(x).num_vars
 
-one(R::GenMPolyRing) = R(1)
+one(R::MPolyRing) = R(1)
 
-zero(R::GenMPolyRing) = R(0)
+zero(R::MPolyRing) = R(0)
 
-isone(x::GenMPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && x.coeffs[1] == 1
+isone(x::MPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && x.coeffs[1] == 1
 
-iszero(x::GenMPoly) = x.length == 0
+iszero(x::MPoly) = x.length == 0
 
-isunit(x::GenMPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && isunit(x.coeffs[1])
+isunit(x::MPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && isunit(x.coeffs[1])
 
 doc"""
-    isconstant(x::GenMPoly)
+    isconstant(x::MPoly)
 > Return `true` if `x` is a degree zero polynomial or the zero polynomial, i.e.
 > a constant polynomial.
 """
-isconstant(x::GenMPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
+isconstant(x::MPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
 
 doc"""
-    isterm(x::GenMPoly)
+    isterm(x::MPoly)
 > Return `true` if the given polynomial has precisely one term, with
 > coefficient `1`.
 """
-isterm(x::GenMPoly) = x.length == 1
+isterm(x::MPoly) = x.length == 1
 
 doc"""
-    ismonomial(x::GenMPoly)
+    ismonomial(x::MPoly)
 > Return `true` if the given polynomial has precisely one nonzero term.
 """
-ismonomial(x::GenMPoly) = x.length == 1 && isone(coeff(x, 0))
+ismonomial(x::MPoly) = x.length == 1 && isone(coeff(x, 0))
 
-function Base.deepcopy_internal(a::GenMPoly{T}, dict::ObjectIdDict) where {T <: RingElement}
+function Base.deepcopy_internal(a::MPoly{T}, dict::ObjectIdDict) where {T <: RingElement}
    Re = deepcopy_internal(a.exps, dict)
    Rc = Array{T}(a.length)
    for i = 1:a.length
@@ -385,7 +385,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, x::GenMPoly)
+function show(io::IO, x::MPoly)
     len = length(x)
     U = [string(x) for x in vars(parent(x))]
     if len == 0
@@ -447,7 +447,7 @@ function show(io::IO, x::GenMPoly)
   end
 end
 
-function show(io::IO, p::GenMPolyRing)
+function show(io::IO, p::MPolyRing)
    const max_vars = 5 # largest number of variables to print
    n = p.num_vars
    print(io, "Multivariate Polynomial Ring in ")
@@ -466,11 +466,11 @@ function show(io::IO, p::GenMPolyRing)
    show(io, base_ring(p))
 end
 
-show_minus_one(::Type{GenMPoly{T}}) where {T <: RingElement} = show_minus_one(T)
+show_minus_one(::Type{MPoly{T}}) where {T <: RingElement} = show_minus_one(T)
 
-needs_parentheses(x::GenMPoly) = length(x) > 1
+needs_parentheses(x::MPoly) = length(x) > 1
 
-isnegative(x::GenMPoly) = length(x) == 1 && monomial_iszero(x.exps, 1) && isnegative(x.coeffs[1])
+isnegative(x::MPoly) = length(x) == 1 && monomial_iszero(x.exps, 1) && isnegative(x.coeffs[1])
 
 ###############################################################################
 #
@@ -478,7 +478,7 @@ isnegative(x::GenMPoly) = length(x) == 1 && monomial_iszero(x.exps, 1) && isnega
 #
 ###############################################################################
 
-function -(a::GenMPoly{T}) where {T <: RingElement}
+function -(a::MPoly{T}) where {T <: RingElement}
    N = size(a.exps, 1)
    r = parent(a)()
    fit!(r, length(a))
@@ -490,7 +490,7 @@ function -(a::GenMPoly{T}) where {T <: RingElement}
    return r
 end
 
-function +(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
+function +(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    N = size(a.exps, 1)
    par = parent(a)
    r = par()
@@ -537,7 +537,7 @@ function +(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
    return r
 end
 
-function -(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
+function -(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    N = size(a.exps, 1)
    par = parent(a)
    r = par()
@@ -586,7 +586,7 @@ end
 
 function do_copy(Ac::Array{T, 1}, Bc::Array{T, 1},
                Ae::Array{UInt, 2}, Be::Array{UInt, 2}, 
-        s1::Int, r::Int, n1::Int, par::GenMPolyRing{T}) where {T <: RingElement}
+        s1::Int, r::Int, n1::Int, par::MPolyRing{T}) where {T <: RingElement}
    N = size(Ae, 1)
    for i = 1:n1
       Bc[r + i] = Ac[s1 + i]
@@ -597,7 +597,7 @@ end
 
 function do_merge(Ac::Array{T, 1}, Bc::Array{T, 1},
                Ae::Array{UInt, 2}, Be::Array{UInt, 2}, 
-        s1::Int, s2::Int, r::Int, n1::Int, n2::Int, par::GenMPolyRing{T}) where {T <: RingElement}
+        s1::Int, s2::Int, r::Int, n1::Int, n2::Int, par::MPolyRing{T}) where {T <: RingElement}
    i = 1
    j = 1
    k = 1
@@ -640,7 +640,7 @@ function do_merge(Ac::Array{T, 1}, Bc::Array{T, 1},
    return k - 1
 end
 
-function mul_classical(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
+function mul_classical(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    par = parent(a)
    R = base_ring(par)
    m = length(a)
@@ -869,7 +869,7 @@ heapright(i::Int) = 2i + 1
 heapparent(i::Int) = div(i, 2)
 
 # either chain (exp, x) or insert into heap
-function heapinsert!(xs::Array{heap_s, 1}, ys::Array{heap_t, 1}, m::Int, exp::Int, exps::Array{UInt, 2}, N::Int, R::GenMPolyRing{T}, drmask::UInt) where {T <: RingElement}
+function heapinsert!(xs::Array{heap_s, 1}, ys::Array{heap_t, 1}, m::Int, exp::Int, exps::Array{UInt, 2}, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
    i = n = length(xs) + 1
    @inbounds if i != 1 && monomial_isequal(exps, exp, xs[1].exp, N)
       ys[m] = heap_t(ys[m].i, ys[m].j, xs[1].n)
@@ -896,7 +896,7 @@ function heapinsert!(xs::Array{heap_s, 1}, ys::Array{heap_t, 1}, m::Int, exp::In
    return true
 end
 
-function nheapinsert!(xs::Array{heap_s, 1}, ys::Array{nheap_t, 1}, m::Int, exp::Int, exps::Array{UInt, 2}, N::Int, p::Int, R::GenMPolyRing{T}, drmask::UInt) where {T <: RingElement}
+function nheapinsert!(xs::Array{heap_s, 1}, ys::Array{nheap_t, 1}, m::Int, exp::Int, exps::Array{UInt, 2}, N::Int, p::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
    i = n = length(xs) + 1
    @inbounds if i != 1 && monomial_isequal(exps, exp, xs[1].exp, N)
       ys[m] = nheap_t(ys[m].i, ys[m].j, p, xs[1].n)
@@ -923,7 +923,7 @@ function nheapinsert!(xs::Array{heap_s, 1}, ys::Array{nheap_t, 1}, m::Int, exp::
    return true
 end
 
-function heappop!(xs::Array{heap_s, 1}, exps::Array{UInt, 2}, N::Int, R::GenMPolyRing{T}, drmask::UInt) where {T <: RingElement}
+function heappop!(xs::Array{heap_s, 1}, exps::Array{UInt, 2}, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
    s = length(xs)
    x = xs[1]
    i = 1
@@ -948,7 +948,7 @@ function heappop!(xs::Array{heap_s, 1}, exps::Array{UInt, 2}, N::Int, R::GenMPol
    return x.exp
 end
 
-function mul_johnson(a::GenMPoly{T}, b::GenMPoly{T}, bits::Int) where {T <: RingElement}
+function mul_johnson(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElement}
    par = parent(a)
    R = base_ring(par)
    m = length(a)
@@ -1077,7 +1077,7 @@ function unpack_monomials(a::Array{UInt, 2}, b::Array{UInt, 2}, k::Int, bits::In
    end
 end
 
-function *(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
+function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    v1, d1 = max_degrees(a)
    v2, d2 = max_degrees(b)
    v = v1 + v2
@@ -1105,7 +1105,7 @@ function *(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
       e2 = Array{UInt}(M, length(b))
       pack_monomials(e1, a.exps, k, exp_bits)
       pack_monomials(e2, b.exps, k, exp_bits)
-      par = GenMPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
+      par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
       a1 = par(a.coeffs, e1)
       b1 = par(b.coeffs, e2)
       a1.length = a.length
@@ -1130,7 +1130,7 @@ end
 #
 ###############################################################################
 
-function *(a::GenMPoly, n::Union{Integer, Rational})
+function *(a::MPoly, n::Union{Integer, Rational})
    N = size(a.exps, 1)
    r = parent(a)()
    fit!(r, length(a))
@@ -1148,7 +1148,7 @@ function *(a::GenMPoly, n::Union{Integer, Rational})
    return r
 end
 
-function *(a::GenMPoly{T}, n::fmpz) where T <: RingElem
+function *(a::MPoly{T}, n::T) where {T <: RingElem}
    N = size(a.exps, 1)
    r = parent(a)()
    fit!(r, length(a))
@@ -1166,29 +1166,9 @@ function *(a::GenMPoly{T}, n::fmpz) where T <: RingElem
    return r
 end
 
-function *(a::GenMPoly{T}, n::T) where {T <: RingElem}
-   N = size(a.exps, 1)
-   r = parent(a)()
-   fit!(r, length(a))
-   j = 1
-   for i = 1:length(a)
-      c = a.coeffs[i]*n
-      if c != 0
-         r.coeffs[j] = c 
-         monomial_set!(r.exps, j, a.exps, i, N)
-         j += 1
-      end
-   end
-   r.length = j - 1
-   resize!(r.coeffs, r.length)
-   return r
-end
+*(n::Union{Integer, Rational}, a::MPoly) = a*n
 
-*(n::Union{Integer, Rational}, a::GenMPoly) = a*n
-
-*(n::fmpz, a::GenMPoly{T}) where T <: RingElem = a*n
-
-*(n::T, a::GenMPoly{T}) where {T <: RingElem} = a*n
+*(n::T, a::MPoly{T}) where {T <: RingElem} = a*n
 
 ###############################################################################
 #
@@ -1196,7 +1176,7 @@ end
 #
 ###############################################################################
 
-function ==(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
+function ==(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    if a.length != b.length
       return false
    end
@@ -1220,7 +1200,7 @@ end
 #
 ###############################################################################
 
-function ==(a::GenMPoly, n::Union{Integer, Rational})
+function ==(a::MPoly, n::Union{Integer, Rational})
    N = size(a.exps, 1)
    if n == 0
       return a.length == 0
@@ -1230,17 +1210,7 @@ function ==(a::GenMPoly, n::Union{Integer, Rational})
    return false
 end
 
-function ==(a::GenMPoly{T}, n::fmpz) where T <: RingElem
-   N = size(a.exps, 1)
-   if n == 0
-      return a.length == 0
-   elseif a.length == 1
-      return a.coeffs[1] == n && monomial_iszero(a.exps, 1, N)
-   end
-   return false
-end
-
-function ==(a::GenMPoly{T}, n::T) where {T <: RingElem}
+function ==(a::MPoly{T}, n::T) where {T <: RingElem}
    N = size(a.exps, 1)
    if n == 0
       return a.length == 0
@@ -1280,7 +1250,7 @@ end
 # in ascending order and we fix some issues in the original algorithm
 # http://www.cecm.sfu.ca/CAG/papers/SparsePowering.pdf
 
-function pow_fps(f::GenMPoly{T}, k::Int, bits::Int) where {T <: RingElement}
+function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
    par = parent(f)
    R = base_ring(par)
    m = length(f)
@@ -1448,7 +1418,7 @@ function pow_fps(f::GenMPoly{T}, k::Int, bits::Int) where {T <: RingElement}
    return parent(f)(Rc, Re)
 end
 
-function ^(a::GenMPoly{T}, b::Int) where {T <: RingElement}
+function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
    b < 0 && throw(DomainError())
    # special case powers of x for constructing polynomials efficiently
    if length(a) == 0
@@ -1483,7 +1453,7 @@ function ^(a::GenMPoly{T}, b::Int) where {T <: RingElement}
          M = div(N + k - 1, k)
          e1 = Array{UInt}(M, length(a))
          pack_monomials(e1, a.exps, k, exp_bits)
-         par = GenMPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
+         par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
          a1 = par(a.coeffs, e1)
          a1.length = a.length
          r1 = pow_fps(a1, b, exp_bits)
@@ -1503,7 +1473,7 @@ end
 #
 ###############################################################################
 
-function divides_monagan_pearce(a::GenMPoly{T}, b::GenMPoly{T}, bits::Int) where {T <: RingElement}
+function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElement}
    par = parent(a)
    R = base_ring(par)
    m = length(a)
@@ -1640,7 +1610,7 @@ function divides_monagan_pearce(a::GenMPoly{T}, b::GenMPoly{T}, bits::Int) where
    return true, parent(a)(Qc, Qe)
 end
 
-function divides(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
+function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    v1, d1 = max_degrees(a)
    v2, d2 = max_degrees(b)
    d = max(d1, d2)
@@ -1659,7 +1629,7 @@ function divides(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
       e2 = Array{UInt}(M, length(b))
       pack_monomials(e1, a.exps, k, exp_bits)
       pack_monomials(e2, b.exps, k, exp_bits)
-      par = GenMPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
+      par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
       a1 = par(a.coeffs, e1)
       b1 = par(b.coeffs, e2)
       a1.length = a.length
@@ -1674,7 +1644,7 @@ function divides(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
    return flag, parent(a)(q.coeffs, eq)
 end
 
-function divexact(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
+function divexact(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    d, q = divides(a, b)
    d == false && error("Not an exact division in divexact")
    return q
@@ -1686,7 +1656,7 @@ end
 #
 ###############################################################################
 
-function div_monagan_pearce(a::GenMPoly{T}, b::GenMPoly{T}, bits::Int) where {T <: RingElement}
+function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElement}
    par = parent(a)
    R = base_ring(par)
    m = length(a)
@@ -1850,7 +1820,7 @@ function div_monagan_pearce(a::GenMPoly{T}, b::GenMPoly{T}, bits::Int) where {T 
    return flag, parent(a)(Qc, Qe)
 end
 
-function div(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
+function div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    v1, d1 = max_degrees(a)
    v2, d2 = max_degrees(b)
    d = max(d1, d2)
@@ -1873,7 +1843,7 @@ function div(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
          e2 = Array{UInt}(M, length(b))
          pack_monomials(e1, a.exps, k, exp_bits)
          pack_monomials(e2, b.exps, k, exp_bits)
-         par = GenMPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
+         par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
          a1 = par(a.coeffs, e1)
          b1 = par(b.coeffs, e2)
          a1.length = a.length
@@ -1894,7 +1864,7 @@ function div(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
    return parent(a)(q.coeffs, eq)
 end
 
-function divrem_monagan_pearce(a::GenMPoly{T}, b::GenMPoly{T}, bits::Int) where {T <: RingElement}
+function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElement}
    par = parent(a)
    R = base_ring(par)
    m = length(a)
@@ -2070,7 +2040,7 @@ function divrem_monagan_pearce(a::GenMPoly{T}, b::GenMPoly{T}, bits::Int) where 
    return flag, parent(a)(Qc, Qe), parent(a)(Rc, Re)
 end
 
-function divrem(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
+function divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    v1, d1 = max_degrees(a)
    v2, d2 = max_degrees(b)
    d = max(d1, d2)
@@ -2095,7 +2065,7 @@ function divrem(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
          e2 = Array{UInt}(M, length(b))
          pack_monomials(e1, a.exps, k, exp_bits)
          pack_monomials(e2, b.exps, k, exp_bits)
-         par = GenMPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
+         par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
          a1 = par(a.coeffs, e1)
          b1 = par(b.coeffs, e2)
          a1.length = a.length
@@ -2119,7 +2089,7 @@ function divrem(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
    return parent(a)(q.coeffs, eq), parent(a)(r.coeffs, er)
 end
 
-function divrem_monagan_pearce(a::GenMPoly{T}, b::Array{GenMPoly{T}, 1}, bits::Int) where {T <: RingElement}
+function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) where {T <: RingElement}
    par = parent(a)
    R = base_ring(par)
    len = length(b)
@@ -2295,11 +2265,11 @@ function divrem_monagan_pearce(a::GenMPoly{T}, b::Array{GenMPoly{T}, 1}, bits::I
 end
 
 doc"""
-    divrem{T <: RingElement}(a::GenMPoly{T}, b::Array{GenMPoly{T}, 1})
+    divrem{T <: RingElement}(a::MPoly{T}, b::Array{MPoly{T}, 1})
 > Return a tuple `(q, r)` consisting of an array of polynomials `q`, one for
 > each polynomial in `b`, and a polynomial `r` such that `a = sum_i b[i]*q[i]`.
 """
-function divrem(a::GenMPoly{T}, b::Array{GenMPoly{T}, 1}) where {T <: RingElement}
+function divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
    v1, d = max_degrees(a)
    len = length(b)
    N = parent(a).N
@@ -2332,7 +2302,7 @@ function divrem(a::GenMPoly{T}, b::Array{GenMPoly{T}, 1}) where {T <: RingElemen
          for i = 1:len
             pack_monomials(e2[i], b[i].exps, k, exp_bits)
          end
-         par = GenMPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
+         par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
          a1 = par(a.coeffs, e1)
          a1.length = a.length
          b1 = [par(b[i].coeffs, e2[i]) for i in 1:len]
@@ -2367,14 +2337,14 @@ end
 ################################################################################
 
 doc"""
-    remove(z::GenMPoly, p::GenMPoly)
+    remove(z::MPoly, p::MPoly)
 > Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$. Additionally, $z/p^k$ is returned as the second return.
 > value.
 >
 > See also `valuation`, which only returns the valuation.
 """
-function remove(z::GenMPoly{T}, p::GenMPoly{T}) where {T <: RingElement}
+function remove(z::MPoly{T}, p::MPoly{T}) where {T <: RingElement}
    check_parent(z, p)
    z == 0 && error("Not yet implemented")
    fl, q = divides(z, p)
@@ -2392,13 +2362,13 @@ function remove(z::GenMPoly{T}, p::GenMPoly{T}) where {T <: RingElement}
 end
 
 doc"""
-    valuation(z::GenMPoly, p::GenMPoly)
+    valuation(z::MPoly, p::MPoly)
 > Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$.
 >
 > See also `remove`, which also returns $z/p^k$.
 """
-function valuation(z::GenMPoly{T}, p::GenMPoly{T}) where {T <: RingElement}
+function valuation(z::MPoly{T}, p::MPoly{T}) where {T <: RingElement}
   v, _ = remove(z, p)
   return v
 end
@@ -2409,7 +2379,7 @@ end
 #
 ###############################################################################
 
-function evaluate(a::GenMPoly{T}, A::Array{T, 1}) where {T <: RingElement}
+function evaluate(a::MPoly{T}, A::Array{T, 1}) where {T <: RingElement}
    if iszero(a)
       return base_ring(a)()
    end
@@ -2432,7 +2402,7 @@ function evaluate(a::GenMPoly{T}, A::Array{T, 1}) where {T <: RingElement}
    end
 end
 
-function evaluate(a::GenMPoly{T}, A::Array{U}) where {T <: RingElement, U <: Integer}
+function evaluate(a::MPoly{T}, A::Array{U}) where {T <: RingElement, U <: Integer}
    if iszero(a)
       return base_ring(a)()
    end
@@ -2444,29 +2414,6 @@ function evaluate(a::GenMPoly{T}, A::Array{U}) where {T <: RingElement, U <: Int
       start_var = 2
    end
    N = size(a.exps, 1)
-   while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
-      k = main_variable(a, start_var)
-      p = main_variable_extract(a, k)
-      a = evaluate(p, A[k - start_var + 1])
-   end
-   if a.length == 0
-      return base_ring(a)()
-   else
-      return a.coeffs[1]
-   end
-end
-
-function evaluate(a::GenMPoly{T}, A::Array{fmpz, 1}) where {T <: RingElement}
-   if iszero(a)
-      return base_ring(a)()
-   end
-   N = size(a.exps, 1)
-   ord = parent(a).ord
-   if ord == :lex
-      start_var = 1
-   else
-      start_var = 2
-   end
    while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
       k = main_variable(a, start_var)
       p = main_variable_extract(a, k)
@@ -2485,7 +2432,7 @@ end
 #
 ###############################################################################
 
-function gcd(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
+function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    if a.length == 0
       return b
    elseif b.length == 0
@@ -2570,7 +2517,7 @@ function gcd(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
    return main_variable_insert(g, k)
 end
 
-function term_gcd(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
+function term_gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    if a.length < 1
       return b
    elseif b.length < 1
@@ -2593,7 +2540,7 @@ function term_gcd(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
    return parent(a)(Cc, Ce)
 end
 
-function term_content(a::GenMPoly{T}) where {T <: RingElement}
+function term_content(a::MPoly{T}) where {T <: RingElement}
    if a.length <= 1
       return a
    end
@@ -2633,7 +2580,7 @@ end
 
 # determine the number of the first variable for which there is a nonzero exp
 # we start at variable k0
-function main_variable(a::GenMPoly{T}, k0::Int) where {T <: RingElement}
+function main_variable(a::MPoly{T}, k0::Int) where {T <: RingElement}
    N = parent(a).N
    for k = k0:N
       for j = 1:a.length
@@ -2646,7 +2593,7 @@ function main_variable(a::GenMPoly{T}, k0::Int) where {T <: RingElement}
 end
 
 # return an array of all the starting positions of terms in the main variable n
-function main_variable_terms(a::GenMPoly{T}, k::Int) where {T <: RingElement}
+function main_variable_terms(a::MPoly{T}, k::Int) where {T <: RingElement}
    A = Array{Int}(0)
    current_term = typemax(UInt)
    for i = 1:a.length
@@ -2660,7 +2607,7 @@ end
 
 # return the coefficient as a sparse distributed polynomial, of the term in variable
 # k0 starting at position n 
-function main_variable_coefficient_lex(a::GenMPoly{T}, k0::Int, n::Int) where {T <: RingElement}
+function main_variable_coefficient_lex(a::MPoly{T}, k0::Int, n::Int) where {T <: RingElement}
    exp = a.exps[k0, n]
    N = parent(a).N
    Ae = Array{UInt}(N, 0)
@@ -2689,11 +2636,11 @@ function main_variable_coefficient_lex(a::GenMPoly{T}, k0::Int, n::Int) where {T
    return parent(a)(Ac, Ae)
 end
 
-function main_variable_coefficient(a::GenMPoly{T}, k::Int, n::Int, ::Type{Val{:lex}}) where {T <: RingElement}
+function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Type{Val{:lex}}) where {T <: RingElement}
    return main_variable_coefficient_lex(a, k, n)
 end
 
-function main_variable_coefficient_deglex(a::GenMPoly{T}, k0::Int, n::Int) where {T <: RingElement}
+function main_variable_coefficient_deglex(a::MPoly{T}, k0::Int, n::Int) where {T <: RingElement}
    exp = a.exps[k0, n]
    N = parent(a).N
    Ae = Array{UInt}(N, 0)
@@ -2724,15 +2671,15 @@ function main_variable_coefficient_deglex(a::GenMPoly{T}, k0::Int, n::Int) where
    return parent(a)(Ac, Ae)
 end
 
-function main_variable_coefficient(a::GenMPoly{T}, k::Int, n::Int, ::Type{Val{:deglex}}) where {T <: RingElement}
+function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Type{Val{:deglex}}) where {T <: RingElement}
    return main_variable_coefficient_deglex(a, k, n)
 end
 
-function main_variable_coefficient(a::GenMPoly{T}, k::Int, n::Int, ::Type{Val{:degrevlex}}) where {T <: RingElement}
+function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Type{Val{:degrevlex}}) where {T <: RingElement}
    return main_variable_coefficient_deglex(a, k, n)
 end
 
-function main_variable_extract(a::GenMPoly{T}, k::Int) where {T <: RingElement}
+function main_variable_extract(a::MPoly{T}, k::Int) where {T <: RingElement}
    V = [(a.exps[k, i], i) for i in 1:length(a)]
    sort!(V)
    N = size(a.exps, 1)
@@ -2746,7 +2693,7 @@ function main_variable_extract(a::GenMPoly{T}, k::Int) where {T <: RingElement}
    a2 = parent(a)(Rc, Re)
    A = main_variable_terms(a2, k)
    Pe = Array{UInt}(length(A))
-   Pc = Array{GenMPoly{T}}(length(A))
+   Pc = Array{MPoly{T}}(length(A))
    ord = parent(a).ord
    for i = 1:length(A)
       Pe[i] = a2.exps[k, A[i]]
@@ -2757,11 +2704,11 @@ function main_variable_extract(a::GenMPoly{T}, k::Int) where {T <: RingElement}
    else
       sym = parent(a).S[k - 1]
    end
-   R = GenSparsePolyRing{GenMPoly{T}}(parent(a), sym, true)
+   R = SparsePolyRing{MPoly{T}}(parent(a), sym, true)
    return R(Pc, Pe)
 end
 
-function main_variable_insert_lex(a::GenSparsePoly{GenMPoly{T}}, k::Int) where {T <: RingElement}
+function main_variable_insert_lex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
    N = base_ring(a).N
    V = [(ntuple(i -> i == k ? a.exps[r] : a.coeffs[r].exps[i, s], Val{N}), r, s) for
        r in 1:length(a) for s in 1:length(a.coeffs[r])]
@@ -2776,7 +2723,7 @@ function main_variable_insert_lex(a::GenSparsePoly{GenMPoly{T}}, k::Int) where {
    return base_ring(a)(Rc, Re)
 end
 
-function main_variable_insert_deglex(a::GenSparsePoly{GenMPoly{T}}, k::Int) where {T <: RingElement}
+function main_variable_insert_deglex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
    N = base_ring(a).N
    V = [(ntuple(i -> i == 1 ? a.exps[r] + a.coeffs[r].exps[1, s] : (i == k ? a.exps[r] :
         a.coeffs[r].exps[i, s]), Val{N}), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
@@ -2808,7 +2755,7 @@ function is_less_degrevlex(a::Tuple, b::Tuple)
    return false
 end
 
-function main_variable_insert_degrevlex(a::GenSparsePoly{GenMPoly{T}}, k::Int) where {T <: RingElement}
+function main_variable_insert_degrevlex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
    N = base_ring(a).N
    V = [(ntuple(i -> i == 1 ? a.exps[r] + a.coeffs[r].exps[1, s] : (i == k ? a.exps[r] :
         a.coeffs[r].exps[i, s]), Val{N}), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
@@ -2823,7 +2770,7 @@ function main_variable_insert_degrevlex(a::GenSparsePoly{GenMPoly{T}}, k::Int) w
    return base_ring(a)(Rc, Re)
 end
 
-function main_variable_insert(a::GenSparsePoly{GenMPoly{T}}, k::Int) where {T <: RingElement}
+function main_variable_insert(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
    ord = base_ring(a).ord
    if ord == :lex
       return main_variable_insert_lex(a, k)
@@ -2840,7 +2787,7 @@ end
 #
 ###############################################################################
 
-function mul!(a::GenMPoly{T}, b::GenMPoly{T}, c::GenMPoly{T}) where {T <: RingElement}
+function mul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
    t = b*c
    a.coeffs = t.coeffs
    a.exps = t.exps
@@ -2848,7 +2795,7 @@ function mul!(a::GenMPoly{T}, b::GenMPoly{T}, c::GenMPoly{T}) where {T <: RingEl
    return a
 end
 
-function addeq!(a::GenMPoly{T}, b::GenMPoly{T}) where {T <: RingElement}
+function addeq!(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    t = a + b
    a.coeffs = t.coeffs
    a.exps = t.exps
@@ -2863,7 +2810,7 @@ function resize_exps!(a::Array{UInt, 2}, n::Int)
    return reshape(A, N, n)
 end
 
-function fit!(a::GenMPoly{T}, n::Int) where {T <: RingElement}
+function fit!(a::MPoly{T}, n::Int) where {T <: RingElement}
    if length(a.coeffs) < n
       resize!(a.coeffs, n)
       a.exps = resize_exps!(a.exps, n)
@@ -2871,7 +2818,7 @@ function fit!(a::GenMPoly{T}, n::Int) where {T <: RingElement}
    return nothing
 end
 
-function zero!(a::GenMPoly{T}) where {T <: RingElement}
+function zero!(a::MPoly{T}) where {T <: RingElement}
    a.length = 0
    return a
 end
@@ -2893,7 +2840,7 @@ function rand_ordering()
    end
 end
 
-function rand(S::GenMPolyRing, term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
+function rand(S::MPolyRing, term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
    f = S()
    g = gens(S)
    R = base_ring(S)
@@ -2914,10 +2861,10 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{GenMPoly{T}}, ::Type{GenMPoly{T}}) where T <: RingElement = GenMPoly{T}
+promote_rule(::Type{MPoly{T}}, ::Type{MPoly{T}}) where T <: RingElement = MPoly{T}
 
-function promote_rule(::Type{GenMPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? GenMPoly{T} : Union{}
+function promote_rule(::Type{MPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   promote_rule(T, U) == T ? MPoly{T} : Union{}
 end
 
 ###############################################################################
@@ -2926,36 +2873,36 @@ end
 #
 ###############################################################################
 
-function (a::GenMPolyRing{T})(b::RingElement) where {T <: RingElement}
+function (a::MPolyRing{T})(b::RingElement) where {T <: RingElement}
    return a(base_ring(a)(b))
 end
 
-function (a::GenMPolyRing{T})() where {T <: RingElement}
-   z = GenMPoly{T}(a)
+function (a::MPolyRing{T})() where {T <: RingElement}
+   z = MPoly{T}(a)
    return z
 end
 
-function (a::GenMPolyRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
-   z = GenMPoly{T}(a, base_ring(a)(b))
+function (a::MPolyRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
+   z = MPoly{T}(a, base_ring(a)(b))
    return z
 end
 
-function (a::GenMPolyRing{T})(b::T) where {T <: RingElement}
+function (a::MPolyRing{T})(b::T) where {T <: RingElement}
    parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
-   z = GenMPoly{T}(a, b)
+   z = MPoly{T}(a, b)
    return z
 end
 
-function (a::GenMPolyRing{T})(b::GenMPoly{T}) where {T <: RingElement}
+function (a::MPolyRing{T})(b::MPoly{T}) where {T <: RingElement}
    parent(b) != a && error("Unable to coerce polynomial")
    return b
 end
 
-function (a::GenMPolyRing{T})(b::Array{T, 1}, m::Array{UInt, 2}) where {T <: RingElement}
+function (a::MPolyRing{T})(b::Array{T, 1}, m::Array{UInt, 2}) where {T <: RingElement}
    if length(b) > 0 && isassigned(b, 1)
       parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end
-   z = GenMPoly{T}(a, b, m)
+   z = MPoly{T}(a, b, m)
    return z
 end
 
@@ -2966,7 +2913,7 @@ end
 ###############################################################################
 
 doc"""
-    PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, S::Symbol = :lex)
+    PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true, S::Symbol = :lex)
 > Given a base ring `R` and an array of strings `s` specifying how the
 > generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
 > representing the new polynomial ring $T = R[x1, x2, ...]$ and the generators
@@ -2976,11 +2923,11 @@ doc"""
 > cached. `S` is a symbol corresponding to the ordering of the polynomial and
 > can be one of `:lex`, `:deglex` or `:degrevlex`.
 """
-function PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
    U = [Symbol(x) for x in s]
    T = elem_type(R)
    N = (ordering == :deglex || ordering == :degrevlex) ? length(U) + 1 : length(U)
-   parent_obj = GenMPolyRing{T}(R, U, ordering, N, cached)
+   parent_obj = MPolyRing{T}(R, U, ordering, N, cached)
 
    return tuple(parent_obj, gens(parent_obj, Val{ordering}))
 end

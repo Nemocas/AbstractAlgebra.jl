@@ -1,42 +1,5 @@
-###############################################################################
-#
-#   PermGroup / perm
-#
-###############################################################################
-
-const PermID = ObjectIdDict()
-
-mutable struct PermGroup <: Group
-   n::Int
-
-   function PermGroup(n::Int, cached=true)
-      if haskey(PermID, n)
-         return PermID[n]::PermGroup
-      else
-         z = new(n)
-         if cached
-            PermID[n] = z
-         end
-         return z
-      end
-   end
-end
-
-mutable struct perm <: GroupElem
-   d::Array{Int, 1}
-   cycles::Vector{Vector{Int}}
-   parent::PermGroup
-
-   function perm(n::Int)
-      return new(collect(1:n))
-   end
-
-   function perm(a::Array{Int, 1})
-      return new(a)
-   end
-end
-
-export PermGroup, perm, parity, elements, cycles, character
+export PermGroup, perm, parity, elements, cycles, character, setpermstyle,
+       order
 
 ###############################################################################
 #
@@ -299,17 +262,6 @@ end
 #   Iterating over all permutations
 #
 ###############################################################################
-
-doc"""
-    AllPerms(n::Int)
-> Returns an iterator over arrays representing all permutations of `1:n`.
-> Similar to `Combinatorics.permutations(1:n)`
-"""
-struct AllPerms
-   n::Int
-   all::Int
-   AllPerms(n::Int) = new(n, factorial(n))
-end
 
 Base.start(A::AllPerms) = (collect(1:A.n), 1, 1, ones(Int, A.n))
 Base.next(A::AllPerms, state) = all_perms(state...)

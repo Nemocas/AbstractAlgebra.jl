@@ -5,7 +5,7 @@
 ###############################################################################
 
 export AnticNumberField, nf_elem, norm, trace, CyclotomicField,
-       MaximalRealSubfield, add!, sub!, mul!, signature
+       MaximalRealSubfield, add!, sub!, mul!, signature, sqr_classical
 
 ###############################################################################
 #
@@ -752,7 +752,7 @@ mul!(c::nf_elem, a::nf_elem, b::Integer) = mul!(c, a, fmpz(b))
 #
 ###############################################################################
 
-function sqr_classical(a::GenPoly{nf_elem})
+function sqr_classical(a::Generic.Poly{nf_elem})
    lena = length(a)
 
    t = base_ring(a)()
@@ -787,7 +787,7 @@ function sqr_classical(a::GenPoly{nf_elem})
    return z
 end
 
-function mul_classical(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
+function mul_classical(a::Generic.Poly{nf_elem}, b::Generic.Poly{nf_elem})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -833,7 +833,7 @@ function mul_classical(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
    return z
 end
 
-function *(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
+function *(a::Generic.Poly{nf_elem}, b::Generic.Poly{nf_elem})
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -849,7 +849,7 @@ function *(a::GenPoly{nf_elem}, b::GenPoly{nf_elem})
    K = base_ring(a)
    R = parent(pol)
    T = elem_type(R)
-   S = GenPolyRing{T}(R, :y)
+   S = Generic.PolyRing{T}(R, :y)
    f = S()
    fit!(f, lena)
    for i = 1:lena

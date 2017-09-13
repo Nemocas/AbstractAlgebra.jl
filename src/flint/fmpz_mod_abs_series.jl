@@ -220,7 +220,7 @@ end
 #
 ###############################################################################
 
-function *(x::GenRes{fmpz}, y::fmpz_mod_abs_series)
+function *(x::Generic.Res{fmpz}, y::fmpz_mod_abs_series)
    z = parent(y)()
    z.prec = y.prec
    ccall((:fmpz_mod_poly_scalar_mul_fmpz, :libflint), Void, 
@@ -359,7 +359,7 @@ end
 #
 ###############################################################################
 
-function ==(x::fmpz_mod_abs_series, y::GenRes{fmpz}) 
+function ==(x::fmpz_mod_abs_series, y::Generic.Res{fmpz}) 
    if length(x) > 1
       return false
    elseif length(x) == 1 
@@ -373,7 +373,7 @@ function ==(x::fmpz_mod_abs_series, y::GenRes{fmpz})
    end 
 end
 
-==(x::GenRes{fmpz}, y::fmpz_mod_abs_series) = y == x
+==(x::Generic.Res{fmpz}, y::fmpz_mod_abs_series) = y == x
 
 function ==(x::fmpz_mod_abs_series, y::fmpz) 
    if length(x) > 1
@@ -430,7 +430,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::fmpz_mod_abs_series, y::GenRes{fmpz})
+function divexact(x::fmpz_mod_abs_series, y::Generic.Res{fmpz})
    iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
@@ -535,7 +535,7 @@ promote_rule(::Type{fmpz_mod_abs_series}, ::Type{T}) where {T <: Integer} = fmpz
 
 promote_rule(::Type{fmpz_mod_abs_series}, ::Type{fmpz}) = fmpz_mod_abs_series
 
-promote_rule(::Type{fmpz_mod_abs_series}, ::Type{GenRes{fmpz}}) = fmpz_mod_abs_series
+promote_rule(::Type{fmpz_mod_abs_series}, ::Type{Generic.Res{fmpz}}) = fmpz_mod_abs_series
 
 ###############################################################################
 #
@@ -575,7 +575,7 @@ function (a::FmpzModAbsSeriesRing)(b::fmpz)
    return z
 end
 
-function (a::FmpzModAbsSeriesRing)(b::GenRes{fmpz})
+function (a::FmpzModAbsSeriesRing)(b::Generic.Res{fmpz})
    m = modulus(base_ring(a))
    if iszero(b)
       z = fmpz_mod_abs_series(m)
@@ -605,7 +605,7 @@ end
 #
 ###############################################################################
 
-function PowerSeriesRing(R::GenResRing{fmpz}, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
+function PowerSeriesRing(R::Generic.ResRing{fmpz}, prec::Int, s::AbstractString; model=:capped_relative, cached = true)
    S = Symbol(s)
 
    if model == :capped_relative

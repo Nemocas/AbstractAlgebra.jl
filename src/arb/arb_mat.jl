@@ -512,7 +512,7 @@ end
 #
 ###############################################################################
 
-function lufact!(P::perm, x::arb_mat)
+function lufact!(P::Generic.perm, x::arb_mat)
   cols(x) != rows(x) && error("Matrix must be square")
   parent(P).n != rows(x) && error("Permutation does not match matrix")
   P.d .-= 1
@@ -563,7 +563,7 @@ function solve(x::arb_mat, y::arb_mat)
   return z
 end
 
-function solve_lu_precomp!(z::arb_mat, P::perm, LU::arb_mat, y::arb_mat)
+function solve_lu_precomp!(z::arb_mat, P::Generic.perm, LU::arb_mat, y::arb_mat)
   Q = inv(P)
   ccall((:arb_mat_solve_lu_precomp, :libarb), Void,
               (Ptr{arb_mat}, Ptr{Int}, Ptr{arb_mat}, Ptr{arb_mat}, Int),
@@ -571,7 +571,7 @@ function solve_lu_precomp!(z::arb_mat, P::perm, LU::arb_mat, y::arb_mat)
   nothing
 end
 
-function solve_lu_precomp(P::perm, LU::arb_mat, y::arb_mat)
+function solve_lu_precomp(P::Generic.perm, LU::arb_mat, y::arb_mat)
   cols(LU) != rows(y) && error("Matrix dimensions are wrong")
   z = similar(y)
   solve_lu_precomp!(z, P, LU, y)

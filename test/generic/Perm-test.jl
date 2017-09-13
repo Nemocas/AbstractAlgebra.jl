@@ -1,9 +1,9 @@
 function test_perm_abstract_types()
    print("perm.abstract_types...")
 
-   @test perm <: GroupElem
+   @test Generic.perm <: GroupElem
 
-   @test PermGroup <: Nemo.Group
+   @test Generic.PermGroup <: Nemo.Group
 
    println("PASS")
 end
@@ -13,9 +13,9 @@ function test_perm_constructors()
 
    R = PermutationGroup(10)
 
-   @test elem_type(R) == perm
-   @test elem_type(PermGroup) == perm
-   @test parent_type(perm) == PermGroup
+   @test elem_type(R) == Generic.perm
+   @test elem_type(Generic.PermGroup) == Generic.perm
+   @test parent_type(Generic.perm) == Generic.PermGroup
 
    a = R()
    b = R([2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
@@ -35,10 +35,10 @@ function test_perm_printing()
 
    b = R([2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
 
-   Nemo.setpermstyle(:array);
+   setpermstyle(:array);
    @test string(b) == "[2, 3, 5, 4, 6, 7, 1, 9, 10, 8]"
 
-   Nemo.setpermstyle(:cycles);
+   setpermstyle(:cycles);
    @test string(b) == "(1,2,3,5,6,7)(8,9,10)"
 
    println("PASS")
@@ -70,8 +70,8 @@ function test_perm_iteration()
    print("perm.iteration...")
 
    G = PermutationGroup(5)
-   @test length(Nemo.AllPerms(5)) == 120
-   @test length(unique(Nemo.AllPerms(5))) == 120
+   @test length(AllPerms(5)) == 120
+   @test length(unique(AllPerms(5))) == 120
 
    @test collect(elements(G))[1] == G()
 
@@ -151,7 +151,7 @@ function test_misc_functions()
    @test cycles(p^5) == [[1,9], [2], [3], [4], [5], [6,10,8], [7]]
    @test order(p^5) == 6
 
-   M = Nemo.matrix_repr(a)
+   M = matrix_repr(a)
    for (idx, val) in enumerate(a.d)
       @test M[idx, val] == 1
    end

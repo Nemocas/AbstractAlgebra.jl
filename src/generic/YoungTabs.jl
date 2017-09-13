@@ -1,28 +1,12 @@
+export Partition, Partitions, YoungTableau, SkewDiagram
+export dim, has_left_neighbor, has_bottom_neighbor, inskewdiag, isrimhook,
+       hooklength, leglength, matrix_repr, partitionseq
+
 ##############################################################################
 #
 #   Partition type, AbstractVector interface
 #
 ##############################################################################
-
-doc"""
-    Partition(part::Vector{Int}, check::Bool=true)
-> Partition represents integer partition into numbers in non-increasing order.
-> It is a thin wrapper over `Vector{Int}`
-"""
-mutable struct Partition <: AbstractVector{Int}
-   n::Int
-   part::Vector{Int}
-
-   function Partition(part::Vector{Int}, check::Bool=true)
-      if check
-         all(diff(part) .<= 0) || throw("Partition must be decreasing!")
-         if length(part) > 0
-            part[end] >=1 || throw("Found non-positive entry in partition!")
-         end
-      end
-      return new(sum(part), part)
-   end
-end
 
 length(p::Partition) = length(p.part)
 
@@ -81,15 +65,6 @@ end
 # Implemented following RuleAsc (Algorithm 3.1) from
 #    "Generating All Partitions: A Comparison Of Two Encodings"
 # by Jerome Kelleher and Barry O’Sullivan, ArXiv:0909.2331
-
-doc"""
-   Partitions(n::Int)
-> Returns an iterator over all integer `Partition`s of `n`. They come in
-> ascending order. See also `Combinatorics.partitions(n)`.
-"""
-struct Partitions
-    n::Int
-end
 
 function Base.start(parts::Partitions)
     if parts.n < 1
@@ -182,7 +157,7 @@ function isrimhook(R::BitVector, idx::Int, len::Int)
    return (R[idx+len] == false) && (R[idx] == true)
 end
 
-const _charvalsTable = Dict{Tuple{BitVector,Vector{Int}}, fmpz}()
+const _charvalsTable = Dict{Tuple{BitVector,Vector{Int}}, BigInt}()
 
 doc"""
     MN1inner(R::BitVector, mu::Partition, t::Int, [charvals])
@@ -198,7 +173,7 @@ doc"""
 >     _Journal of Symbolic Computation_, 37(6), 2004, p. 727-748.
 """
 function MN1inner(R::BitVector, mu::Partition, t::Int,
-        charvals=Dict{Tuple{BitVector,Vector{Int}}, fmpz}())
+        charvals=Dict{Tuple{BitVector,Vector{Int}}, BigInt}())
     if t > length(mu)
         chi = 1
     elseif mu[t] > length(R)
@@ -235,16 +210,6 @@ end
 #   YoungTableau type, AbstractVector interface
 #
 ##############################################################################
-
-doc"""
-    YoungTableau(part::Partition, fill::Vector{Int}=collect(1:n))
-> Returns the Young tableaux of partition `part` of `n`, filled linearly
-> (row-major) by `fill` vector.
-"""
-struct YoungTableau <: AbstractArray{Int, 2}
-   part::Partition
-   tab::Array{Int,2}
-end
 
 function YoungTableau(part::Partition, fill::Vector{Int}=collect(1:part.n))
    part.n == length(fill) || throw("Can't fill Young digaram of $part with $fill: different number of elemnets.")
@@ -310,7 +275,7 @@ doc"""
 function dim(Y::YoungTableau)
    n, m = size(Y)
    num = fac(maximum(Y))
-   den = reduce(*, 1, fmpz(hooklength(Y,i,j)) for i in 1:n, j in 1:m if j <= Y.part[i])
+   den = reduce(*, 1, BigInt(hooklength(Y,i,j)) for i in 1:n, j in 1:m if j <= Y.part[i])
    return divexact(num, den)
 end
 
@@ -319,25 +284,6 @@ end
 #   SkewDiagrams
 #
 ##############################################################################
-
-doc"""
-    SkewDiagram(lambda::Partition, mu::Partition)
-> Implements a skew diagram, i.e. a difference of two Young diagrams
-> represented by partitions `lambda` and `mu`.
-"""
-struct SkewDiagram
-   lam::Partition
-   mu::Partition
-
-   function SkewDiagram(lambda, mu)
-      lambda.n >= mu.n || throw("Can't create SkewDiagram: $mu is partition of  $(mu.n) > $(lambda.n).")
-      length(lambda) >= length(mu) || throw("Can't create SkewDiagram: $mu is longer than $(lambda)!")
-      for (l, m) in zip(lambda, mu)
-         l >= m || throw("a row of $mu is longer than a row of $lambda")
-      end
-      return new(lambda, mu)
-   end
-end
 
 SkewDiagram(lambda::Vector{Int}, mu::Vector{Int}) = SkewDiagram(Partition(lambda), Partition(mu))
 
@@ -462,6 +408,3 @@ function leglength(xi::SkewDiagram, check::Bool=true)
    m[1:length(xi.mu)] = xi.mu
    return sum((xi.lam .- m) .> 0) - 1
 end
-
-export Partition, Partitions, YoungTableau, SkewDiagram
-export dim, noPartitions, isrimhook, hooklength, leglength

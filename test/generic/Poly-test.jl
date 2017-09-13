@@ -1,28 +1,28 @@
 function test_gen_poly_constructors()
-   print("GenPoly.constructors...")
+   print("Generic.Poly.constructors...")
  
    R, x = JuliaZZ["x"]
    S, y = R["y"]
 
-   @test elem_type(S) == GenPoly{elem_type(R)}
-   @test elem_type(GenPolyRing{elem_type(R)}) == GenPoly{elem_type(R)}
-   @test parent_type(GenPoly{elem_type(R)}) == GenPolyRing{elem_type(R)}
+   @test elem_type(S) == Generic.Poly{elem_type(R)}
+   @test elem_type(Generic.PolyRing{elem_type(R)}) == Generic.Poly{elem_type(R)}
+   @test parent_type(Generic.Poly{elem_type(R)}) == Generic.PolyRing{elem_type(R)}
 
    @test typeof(R) <: Nemo.Ring
-   @test typeof(S) <: GenPolyRing
+   @test typeof(S) <: Generic.PolyRing
 
    @test isa(y, PolyElem)
 
    R, x = PolynomialRing(JuliaZZ, "x")
    S, y = PolynomialRing(R, "y")
 
-   @test typeof(S) <: GenPolyRing
+   @test typeof(S) <: Generic.PolyRing
 
    @test isa(y, PolyElem)
 
    T, z = PolynomialRing(S, "z")
 
-   @test typeof(T) <: GenPolyRing
+   @test typeof(T) <: Generic.PolyRing
 
    @test isa(z, PolyElem)
 
@@ -62,7 +62,7 @@ function test_gen_poly_constructors()
 end
 
 function test_gen_poly_manipulation()
-   print("GenPoly.manipulation...")
+   print("Generic.Poly.manipulation...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
    S, y = PolynomialRing(R, "y")
@@ -105,7 +105,7 @@ function test_gen_poly_manipulation()
 end
 
 function test_gen_poly_binary_ops()
-   print("GenPoly.binary_ops...")
+   print("Generic.Poly.binary_ops...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
 
@@ -135,7 +135,7 @@ function test_gen_poly_binary_ops()
 end
 
 function test_gen_poly_adhoc_binary()
-   print("GenPoly.adhoc_binary...")
+   print("Generic.Poly.adhoc_binary...")
 #  Remi Imbach 31/07/17: begin
    R,x = JuliaZZ["x"]
    S,y = R["y"]
@@ -165,7 +165,7 @@ function test_gen_poly_adhoc_binary()
 end
 
 function test_gen_poly_comparison()
-   print("GenPoly.comparison...")
+   print("Generic.Poly.comparison...")
 #  Remi Imbach 31/07/17: begin
    R, x = JuliaZZ["x"]
    maxIter = 100
@@ -195,7 +195,7 @@ function test_gen_poly_comparison()
 end
 
 function test_gen_poly_adhoc_comparison()
-   print("GenPoly.adhoc_comparison...")
+   print("Generic.Poly.adhoc_comparison...")
 
 #  Remi Imbach 31/07/17: begin
    R,x = JuliaZZ["x"]
@@ -223,7 +223,7 @@ function test_gen_poly_adhoc_comparison()
 end
 
 function test_gen_poly_unary_ops()
-   print("GenPoly.unary_ops...")
+   print("Generic.Poly.unary_ops...")
 #  Remi Imbach 31/07/17: begin
    R, x = JuliaZZ["x"]
    maxIter = 100
@@ -257,7 +257,7 @@ function test_gen_poly_unary_ops()
 end
 
 function test_gen_poly_truncation()
-   print("GenPoly.truncation...")
+   print("Generic.Poly.truncation...")
 #  Remi Imbach 31/07/17: begin
    R,x = JuliaZZ["x"]
    maxIter = 100
@@ -289,7 +289,7 @@ function test_gen_poly_truncation()
 end
 
 function test_gen_poly_reverse()
-   print("GenPoly.reverse...")
+   print("Generic.Poly.reverse...")
    R, x = JuliaZZ["x"]
    maxIter = 100
    degmax = 50
@@ -336,7 +336,7 @@ function test_gen_poly_reverse()
 end
 
 function test_gen_poly_shift()
-   print("GenPoly.shift...")
+   print("Generic.Poly.shift...")
 #  Remi Imbach 31/07/17: begin
    R, x = JuliaZZ["x"]
    maxIter = 100
@@ -372,7 +372,7 @@ function test_gen_poly_shift()
 end
 
 function test_gen_poly_powering()
-   print("GenPoly.powering...")
+   print("Generic.Poly.powering...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
 
@@ -415,7 +415,7 @@ function test_gen_poly_powering()
 end
 
 function test_gen_poly_modular_arithmetic()
-   print("GenPoly.modular_arithmetic...")
+   print("Generic.Poly.modular_arithmetic...")
 
    R = ResidueRing(JuliaZZ, 23)
    S, x = PolynomialRing(R, "x")
@@ -506,7 +506,7 @@ function test_gen_poly_modular_arithmetic()
 end
 
 function test_gen_poly_exact_division()
-   print("GenPoly.exact_division...")
+   print("Generic.Poly.exact_division...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
 
@@ -538,7 +538,7 @@ function test_gen_poly_exact_division()
 end
 
 function test_gen_poly_adhoc_exact_division()
-   print("GenPoly.adhoc_exact_division...")
+   print("Generic.Poly.adhoc_exact_division...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
    S, y = PolynomialRing(R, "y")
@@ -572,7 +572,7 @@ function test_gen_poly_adhoc_exact_division()
 end
 
 function test_gen_poly_euclidean_division()
-   print("GenPoly.euclidean_division...")
+   print("Generic.Poly.euclidean_division...")
 
    R = ResidueRing(JuliaZZ, 23)
    S, x = PolynomialRing(R, "x")
@@ -605,7 +605,7 @@ function test_gen_poly_euclidean_division()
 end
 
 function test_gen_poly_pseudodivision()
-   print("GenPoly.pseudodivision...")
+   print("Generic.Poly.pseudodivision...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
 
@@ -631,7 +631,7 @@ function test_gen_poly_pseudodivision()
 end
 
 function test_gen_poly_content_primpart_gcd()
-   print("GenPoly.content_primpart_gcd...")
+   print("Generic.Poly.content_primpart_gcd...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
    S, y = PolynomialRing(R, "y")
@@ -723,7 +723,7 @@ function test_gen_poly_content_primpart_gcd()
 end
 
 function test_gen_poly_evaluation()
-   print("GenPoly.evaluation...")
+   print("Generic.Poly.evaluation...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
    S, y = PolynomialRing(R, "y")
@@ -744,7 +744,7 @@ function test_gen_poly_evaluation()
 end
 
 function test_gen_poly_composition()
-   print("GenPoly.composition...")
+   print("Generic.Poly.composition...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
    S, y = PolynomialRing(R, "y")
@@ -769,7 +769,7 @@ function test_gen_poly_composition()
 end
 
 function test_gen_poly_derivative()
-   print("GenPoly.derivative...")
+   print("Generic.Poly.derivative...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
 
@@ -786,7 +786,7 @@ function test_gen_poly_derivative()
 end
 
 function test_gen_poly_integral()
-   print("GenPoly.integral...")
+   print("Generic.Poly.integral...")
 
    R, x = PolynomialRing(JuliaQQ, "x")
 
@@ -805,7 +805,7 @@ function test_gen_poly_integral()
 end
 
 function test_gen_poly_resultant()
-   print("GenPoly.resultant...")
+   print("Generic.Poly.resultant...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
 
@@ -822,7 +822,7 @@ function test_gen_poly_resultant()
 end
 
 function test_gen_poly_discriminant()
-   print("GenPoly.discriminant...")
+   print("Generic.Poly.discriminant...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
    S, y = PolynomialRing(R, "y")
@@ -835,7 +835,7 @@ function test_gen_poly_discriminant()
 end
 
 function test_gen_poly_resx()
-   print("GenPoly.resx...")
+   print("Generic.Poly.resx...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
 
@@ -861,7 +861,7 @@ function test_gen_poly_resx()
 end
 
 function test_gen_poly_newton_representation()
-   print("GenPoly.newton_representation...")
+   print("Generic.Poly.newton_representation...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
 
@@ -880,7 +880,7 @@ function test_gen_poly_newton_representation()
 end
 
 function test_gen_poly_interpolation()
-   print("GenPoly.interpolation...")
+   print("Generic.Poly.interpolation...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
 
@@ -909,7 +909,7 @@ function test_gen_poly_interpolation()
 end
 
 function test_gen_poly_special()
-   print("GenPoly.special...")
+   print("Generic.Poly.special...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
    S, y = PolynomialRing(R, "y")
@@ -938,7 +938,7 @@ function test_gen_poly_special()
 end
 
 function test_gen_poly_mul_karatsuba()
-   print("GenPoly.mul_karatsuba...")
+   print("Generic.Poly.mul_karatsuba...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
    S, y = PolynomialRing(R, "y")
@@ -953,7 +953,7 @@ function test_gen_poly_mul_karatsuba()
 end
 
 function test_gen_poly_mul_ks()
-   print("GenPoly.mul_ks...")
+   print("Generic.Poly.mul_ks...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
    S, y = PolynomialRing(R, "y")
@@ -968,7 +968,7 @@ function test_gen_poly_mul_ks()
 end
 
 function test_gen_poly_remove_valuation()
-   print("GenPoly.remove_valuation...")
+   print("Generic.Poly.remove_valuation...")
 
    R, x = PolynomialRing(JuliaQQ, "x")
 
@@ -1011,7 +1011,7 @@ function test_gen_poly_remove_valuation()
 end
 
 function test_gen_poly_generic_eval()
-   print("GenPoly.generic_eval...")
+   print("Generic.Poly.generic_eval...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
 

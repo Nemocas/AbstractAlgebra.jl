@@ -25,8 +25,6 @@ end
 #
 ################################################################################
 
-promote_rule(T, U) = Union{}
-
 promote_rule(::Type{T}, ::Type{T}) where T <: RingElement = T
 
 ###############################################################################
@@ -153,15 +151,11 @@ transpose(x::T) where {T <: RingElem} = deepcopy(x)
 #
 ###############################################################################
 
-include("generic/JuliaInteger.jl")
+include("julia/JuliaInteger.jl")
 
-include("generic/JuliaRational.jl")
+include("julia/JuliaRational.jl")
 
 include("flint/fmpz.jl")
-
-include("generic/Residue.jl")
-
-include("generic/Poly.jl")
 
 include("flint/fmpz_poly.jl")
 
@@ -171,14 +165,6 @@ include("flint/fmpz_mod_poly.jl")
 
 #include("flint/fmpz_mpoly.jl")
 
-include("generic/MPoly.jl")
-
-include("generic/SparsePoly.jl")
-
-include("generic/RelSeries.jl")
-
-include("generic/AbsSeries.jl")
-
 include("flint/fmpz_rel_series.jl")
 
 include("flint/fmpz_abs_series.jl")
@@ -186,8 +172,6 @@ include("flint/fmpz_abs_series.jl")
 include("flint/fmpz_mod_rel_series.jl")
 
 include("flint/fmpz_mod_abs_series.jl")
-
-include("generic/Matrix.jl")
 
 include("flint/fmpz_mat.jl")
 

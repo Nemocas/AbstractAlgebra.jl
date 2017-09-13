@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export GenSparsePoly, GenSparsePolyRing, SparsePolynomialRing
+export SparsePolynomialRing
 
 ###############################################################################
 #
@@ -12,13 +12,13 @@ export GenSparsePoly, GenSparsePolyRing, SparsePolynomialRing
 #
 ###############################################################################
 
-parent_type(::Type{GenSparsePoly{T}}) where {T <: RingElement} = GenSparsePolyRing{T}
+parent_type(::Type{SparsePoly{T}}) where {T <: RingElement} = SparsePolyRing{T}
 
-elem_type(::Type{GenSparsePolyRing{T}}) where {T <: RingElement} = GenSparsePoly{T}
+elem_type(::Type{SparsePolyRing{T}}) where {T <: RingElement} = SparsePoly{T}
 
-var(a::GenSparsePolyRing) = a.S
+var(a::SparsePolyRing) = a.S
 
-function gen(a::GenSparsePolyRing)
+function gen(a::SparsePolyRing)
    return a([one(base_ring(a))], [UInt(1)])
 end
 
@@ -28,39 +28,39 @@ end
 #
 ###############################################################################
 
-function coeff(x::GenSparsePoly, i::Int)
+function coeff(x::SparsePoly, i::Int)
    i < 0 && throw(DomainError())
    return x.coeffs[i + 1]
 end
 
-one(R::GenSparsePolyRing) = R(1)
+one(R::SparsePolyRing) = R(1)
 
-zero(R::GenSparsePolyRing) = R(0)
+zero(R::SparsePolyRing) = R(0)
  
-iszero(x::GenSparsePoly) = length(x) = 0
+iszero(x::SparsePoly) = length(x) = 0
 
-isone(x::GenSparsePoly) = x == 1
+isone(x::SparsePoly) = x == 1
 
-length(x::GenSparsePoly) = x.length
+length(x::SparsePoly) = x.length
 
-lead(x::GenSparsePoly) = x.length == 0 ? base_ring(x)() : x.coeffs[x.length]
+lead(x::SparsePoly) = x.length == 0 ? base_ring(x)() : x.coeffs[x.length]
 
-trail(x::GenSparsePoly) = x.length == 0 ? base_ring(x)() : x.coeffs[1]
+trail(x::SparsePoly) = x.length == 0 ? base_ring(x)() : x.coeffs[1]
 
-function normalise(a::GenSparsePoly, n::Int)
+function normalise(a::SparsePoly, n::Int)
    while n > 0 && iszero(a.coeffs[n]) 
       n -= 1
    end
    return n
 end
 
-base_ring(a::GenSparsePoly) = base_ring(parent(a))
+base_ring(a::SparsePoly) = base_ring(parent(a))
 
-base_ring(R::GenSparsePolyRing{T}) where {T <: RingElement} = R.base_ring::parent_type(T)
+base_ring(R::SparsePolyRing{T}) where {T <: RingElement} = R.base_ring::parent_type(T)
 
-parent(a::GenSparsePoly) = a.parent
+parent(a::SparsePoly) = a.parent
 
-function Base.deepcopy_internal(a::GenSparsePoly{T}, dict::ObjectIdDict) where {T <: RingElement}
+function Base.deepcopy_internal(a::SparsePoly{T}, dict::ObjectIdDict) where {T <: RingElement}
    Re = Base.deepcopy_internal(a.exps, dict)
    Rc = Array{T}(a.length)
    for i = 1:a.length
@@ -75,7 +75,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, x::GenSparsePoly)
+function show(io::IO, x::SparsePoly)
     len = length(x)
     U = string(var(parent(x)))
     if len == 0
@@ -121,18 +121,18 @@ function show(io::IO, x::GenSparsePoly)
     end
 end
 
-function show(io::IO, p::GenSparsePolyRing)
+function show(io::IO, p::SparsePolyRing)
    print(io, "Sparse Univariate Polynomial Ring in ")
    print(io, string(p.S))
    print(io, " over ")
    show(io, base_ring(p))
 end
 
-show_minus_one(::Type{GenSparsePoly{T}}) where {T <: RingElement} = show_minus_one(T)
+show_minus_one(::Type{SparsePoly{T}}) where {T <: RingElement} = show_minus_one(T)
 
-needs_parentheses(a::GenSparsePoly{T}) where {T <: RingElement} = length(a) > 1
+needs_parentheses(a::SparsePoly{T}) where {T <: RingElement} = length(a) > 1
 
-isnegative(x::GenSparsePoly) = length(x) <= 1 && isnegative(coeff(x, 0))
+isnegative(x::SparsePoly) = length(x) <= 1 && isnegative(coeff(x, 0))
 
 ###############################################################################
 #
@@ -140,7 +140,7 @@ isnegative(x::GenSparsePoly) = length(x) <= 1 && isnegative(coeff(x, 0))
 #
 ###############################################################################
 
-function -(a::GenSparsePoly{T}) where {T <: RingElement}
+function -(a::SparsePoly{T}) where {T <: RingElement}
    r = parent(a)()
    fit!(r, length(a))
    for i = 1:length(a)
@@ -151,7 +151,7 @@ function -(a::GenSparsePoly{T}) where {T <: RingElement}
    return r
 end
 
-function +(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingElement}
+function +(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    par = parent(a)
    r = par()
    fit!(r, length(a) + length(b))
@@ -196,7 +196,7 @@ function +(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingElement}
    return r
 end
 
-function -(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingElement}
+function -(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    par = parent(a)
    r = par()
    fit!(r, length(a) + length(b))
@@ -306,7 +306,7 @@ function heappop!(xs::Array{heap_sr, 1})
    return
 end
 
-function mul_johnson(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingElement}
+function mul_johnson(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    par = parent(a)
    R = base_ring(par)
    m = length(a)
@@ -377,7 +377,7 @@ function mul_johnson(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingE
    return parent(a)(Rc, Re)
 end
 
-function *(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingElement}
+function *(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    m = length(a)
    n = length(b)
    if m == 0 || n == 0
@@ -402,7 +402,7 @@ end
 #
 ###############################################################################
 
-function divrem(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingElement}
+function divrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    par = parent(a)
    R = base_ring(par)
    m = length(a)
@@ -547,7 +547,7 @@ end
 #
 ###############################################################################
 
-function *(a::GenSparsePoly, n::Union{Integer, Rational})
+function *(a::SparsePoly, n::Union{Integer, Rational})
    r = parent(a)()
    fit!(r, length(a))
    j = 1
@@ -563,7 +563,7 @@ function *(a::GenSparsePoly, n::Union{Integer, Rational})
    return r
 end
 
-function *(a::GenSparsePoly{T}, n::fmpz) where T <: RingElem
+function *(a::SparsePoly{T}, n::T) where {T <: RingElem}
    r = parent(a)()
    fit!(r, length(a))
    j = 1
@@ -579,27 +579,9 @@ function *(a::GenSparsePoly{T}, n::fmpz) where T <: RingElem
    return r
 end
 
-function *(a::GenSparsePoly{T}, n::T) where {T <: RingElem}
-   r = parent(a)()
-   fit!(r, length(a))
-   j = 1
-   for i = 1:length(a)
-      c = a.coeffs[i]*n
-      if c != 0
-         r.coeffs[j] = c 
-         r.exps[j] = a.exps[i]
-         j += 1
-      end
-   end
-   r.length = j - 1
-   return r
-end
+*(n::T, a::SparsePoly{T}) where {T <: RingElem} = a*n
 
-*(n::T, a::GenSparsePoly{T}) where {T <: RingElem} = a*n
-
-*(n::Union{Integer, Rational}, a::GenSparsePoly) = a*n
-
-*(n::fmpz, a::GenSparsePoly{T}) where T <: RingElem = a*n
+*(n::Union{Integer, Rational}, a::SparsePoly) = a*n
 
 ###############################################################################
 #
@@ -607,7 +589,7 @@ end
 #
 ###############################################################################
 
-function ==(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingElement}
+function ==(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    if length(a) != length(b)
       return false
    end
@@ -625,26 +607,19 @@ end
 #
 ###############################################################################
 
-function ==(a::GenSparsePoly, b::Union{Integer, Rational})
+function ==(a::SparsePoly, b::Union{Integer, Rational})
    return length(a) == 0 ? b == 0 : a.length == 1 && 
           a.exps[1] == 0 && a.coeffs[1] == b
 end
 
-==(a::Union{Integer, Rational}, b::GenSparsePoly) = b == a
+==(a::Union{Integer, Rational}, b::SparsePoly) = b == a
 
-function ==(a::GenSparsePoly{T}, b::fmpz) where T <: RingElem 
+function ==(a::SparsePoly{T}, b::T) where T <: RingElem
    return length(a) == 0 ? b == 0 : a.length == 1 &
           a.exps[1] == 0 && a.coeffs[1] == b
 end
 
-==(a::fmpz, b::GenSparsePoly{T}) where T <: RingElem = b == a
-
-function ==(a::GenSparsePoly{T}, b::T) where T <: RingElem
-   return length(a) == 0 ? b == 0 : a.length == 1 &
-          a.exps[1] == 0 && a.coeffs[1] == b
-end
-
-==(a::T, b::GenSparsePoly{T}) where T <: RingElem = b == a
+==(a::T, b::SparsePoly{T}) where T <: RingElem = b == a
 
 ###############################################################################
 #
@@ -661,7 +636,7 @@ end
 # in ascending order and we fix some issues in the original algorithm
 # http://www.cecm.sfu.ca/CAG/papers/SparsePowering.pdf
 
-function pow_fps(f::GenSparsePoly{T}, k::Int) where {T <: RingElement}
+function pow_fps(f::SparsePoly{T}, k::Int) where {T <: RingElement}
    par = parent(f)
    R = base_ring(par)
    m = length(f)
@@ -800,7 +775,7 @@ function pow_fps(f::GenSparsePoly{T}, k::Int) where {T <: RingElement}
    return parent(f)(Rc, Re)
 end
 
-function ^(a::GenSparsePoly{T}, b::Int) where {T <: RingElement}
+function ^(a::SparsePoly{T}, b::Int) where {T <: RingElement}
    b < 0 && throw(DomainError())
    # special case powers of x for constructing polynomials efficiently
    if length(a) == 0
@@ -828,7 +803,7 @@ end
 #
 ###############################################################################
 
-function divides_monagan_pearce(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingElement}
+function divides_monagan_pearce(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    par = parent(a)
    R = base_ring(par)
    m = length(a)
@@ -936,7 +911,7 @@ function divides_monagan_pearce(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where 
    return true, parent(a)(Qc, Qe)
 end
 
-function divides(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingElement}
+function divides(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    d1 = a.exps[a.length]
    d2 = b.exps[b.length] - b.exps[1]
    q_alloc = b.length
@@ -973,7 +948,7 @@ function divides(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingEleme
    return true, parent(a)(Qc, Qe)
 end
 
-function divexact(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingElement}
+function divexact(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    d, q = divides(a, b)
    d == false && error("Not an exact division in divexact")
    return q
@@ -985,7 +960,7 @@ end
 #
 ###############################################################################
 
-function divides(a::GenSparsePoly{T}, b::T) where {T <: RingElem}
+function divides(a::SparsePoly{T}, b::T) where {T <: RingElem}
    len = a.length
    Qc = Array{T}(len)
    for i = 1:len
@@ -997,21 +972,14 @@ function divides(a::GenSparsePoly{T}, b::T) where {T <: RingElem}
    return true, parent(a)(Qc, a.exps)
 end
 
-function divexact(a::GenSparsePoly{T}, b::T) where {T <: RingElem}
+function divexact(a::SparsePoly{T}, b::T) where {T <: RingElem}
    len = length(a)
    exps = deepcopy(a.exps)
    coeffs = [divexact(a.coeffs[i], b) for i in 1:len]
    return parent(a)(coeffs, exps)
 end
 
-function divexact(a::GenSparsePoly, b::Union{Integer, Rational})
-   len = length(a)
-   exps = deepcopy(a.exps)
-   coeffs = [divexact(a.coeffs[i], b) for i in 1:len]
-   return parent(a)(coeffs, exps)
-end
-
-function divexact(a::GenSparsePoly{T}, b::fmpz) where T <: RingElem
+function divexact(a::SparsePoly, b::Union{Integer, Rational})
    len = length(a)
    exps = deepcopy(a.exps)
    coeffs = [divexact(a.coeffs[i], b) for i in 1:len]
@@ -1024,7 +992,7 @@ end
 #
 ###############################################################################
 
-function pseudodivrem(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingElement}
+function pseudodivrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    par = parent(a)
    R = base_ring(par)
    m = length(a)
@@ -1200,7 +1168,7 @@ function pseudodivrem(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: Ring
    end
 end
 
-function pseudorem_monagan_pearce(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingElement}
+function pseudorem_monagan_pearce(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    par = parent(a)
    R = base_ring(par)
    m = length(a)
@@ -1365,7 +1333,7 @@ function pseudorem_monagan_pearce(a::GenSparsePoly{T}, b::GenSparsePoly{T}) wher
    end
 end
 
-function pseudorem(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingElement}
+function pseudorem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    par = parent(a)
    R = base_ring(par)
    m = length(a)
@@ -1391,7 +1359,7 @@ end
 #
 ###############################################################################
 
-function evaluate(a::GenSparsePoly{T}, b::S) where {S <: RingElem, T <: RingElement}
+function evaluate(a::SparsePoly{T}, b::S) where {S <: RingElem, T <: RingElement}
    if a.length == 0
       return base_ring(a)()
    end
@@ -1406,7 +1374,7 @@ function evaluate(a::GenSparsePoly{T}, b::S) where {S <: RingElem, T <: RingElem
    return r
 end
 
-function evaluate(a::GenSparsePoly{T}, b::Rational{S}) where {S <: Union{Int, BigInt}, T <: RingElement}
+function evaluate(a::SparsePoly{T}, b::Rational{S}) where {S <: Integer, T <: RingElement}
    if a.length == 0
       return base_ring(a)()
    end
@@ -1421,17 +1389,18 @@ function evaluate(a::GenSparsePoly{T}, b::Rational{S}) where {S <: Union{Int, Bi
    return r
 end
 
-function evaluate(a::GenSparsePoly{T}, b::Integer) where {T <: RingElement}
+function evaluate(a::SparsePoly{T}, b::Integer) where {T <: RingElement}
    if a.length == 0
       return base_ring(a)()
    end
+   R = base_ring(a)
    r = a.coeffs[a.length]
    for i = 1:a.length - 1
-      r *= fmpz(b)^(reinterpret(Int, a.exps[a.length - i + 1] - a.exps[a.length - i]))
+      r *= R(b)^(reinterpret(Int, a.exps[a.length - i + 1] - a.exps[a.length - i]))
       r += a.coeffs[a.length - i]
    end
    if a.exps[1] != 0
-      r *= fmpz(b)^(reinterpret(Int, a.exps[1]))
+      r *= R(b)^(reinterpret(Int, a.exps[1]))
    end
    return r
 end
@@ -1442,7 +1411,7 @@ end
 #
 ###############################################################################
 
-function gcd(a::GenSparsePoly{T}, b::GenSparsePoly{T}, ignore_content::Bool = false) where {T <: RingElement}
+function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) where {T <: RingElement}
    # ensure degree in main variable of a is at least that of b
    if b.exps[b.length] > a.exps[a.length]
       (a, b) = (b, a)
@@ -1592,7 +1561,7 @@ function gcd(a::GenSparsePoly{T}, b::GenSparsePoly{T}, ignore_content::Bool = fa
    end
 end
 
-function content(a::GenSparsePoly{T}) where {T <: RingElement}
+function content(a::SparsePoly{T}) where {T <: RingElement}
    for i = 1:length(a)
       if a.coeffs[i].length == 1
          z = term_content(a.coeffs[1])
@@ -1615,7 +1584,7 @@ function content(a::GenSparsePoly{T}) where {T <: RingElement}
    return z
 end
 
-function primpart(a::GenSparsePoly{T}) where {T <: RingElement}
+function primpart(a::SparsePoly{T}) where {T <: RingElement}
    d = content(a)
    return divexact(a, d)
 end
@@ -1626,7 +1595,7 @@ end
 #
 ###############################################################################
 
-function fit!(a::GenSparsePoly{T}, n::Int) where {T <: RingElement}
+function fit!(a::SparsePoly{T}, n::Int) where {T <: RingElement}
    if length(a.coeffs) < n
       resize!(a.coeffs, n)
       resize!(a.exps, n)
@@ -1634,7 +1603,7 @@ function fit!(a::GenSparsePoly{T}, n::Int) where {T <: RingElement}
    return nothing
 end
 
-function addmul!(a::GenSparsePoly{T}, b::GenSparsePoly{T}, c::GenSparsePoly{T}, d::GenSparsePoly{T}) where {T <: RingElement}
+function addmul!(a::SparsePoly{T}, b::SparsePoly{T}, c::SparsePoly{T}, d::SparsePoly{T}) where {T <: RingElement}
    t = b*c
    t += a
    a.coeffs = t.coeffs
@@ -1643,7 +1612,7 @@ function addmul!(a::GenSparsePoly{T}, b::GenSparsePoly{T}, c::GenSparsePoly{T}, 
    return a
 end
 
-function mul!(a::GenSparsePoly{T}, b::GenSparsePoly{T}, c::GenSparsePoly{T}) where {T <: RingElement}
+function mul!(a::SparsePoly{T}, b::SparsePoly{T}, c::SparsePoly{T}) where {T <: RingElement}
    t = b*c
    a.coeffs = t.coeffs
    a.exps = t.exps
@@ -1651,7 +1620,7 @@ function mul!(a::GenSparsePoly{T}, b::GenSparsePoly{T}, c::GenSparsePoly{T}) whe
    return a
 end
 
-function addeq!(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingElement}
+function addeq!(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
    t = a + b
    a.coeffs = t.coeffs
    a.exps = t.exps
@@ -1659,7 +1628,7 @@ function addeq!(a::GenSparsePoly{T}, b::GenSparsePoly{T}) where {T <: RingElemen
    return a
 end
 
-function add!(a::GenSparsePoly{T}, b::GenSparsePoly{T}, c::GenSparsePoly{T}) where {T <: RingElement}
+function add!(a::SparsePoly{T}, b::SparsePoly{T}, c::SparsePoly{T}) where {T <: RingElement}
    t = b + c
    a.coeffs = t.coeffs
    a.exps = t.exps
@@ -1667,12 +1636,12 @@ function add!(a::GenSparsePoly{T}, b::GenSparsePoly{T}, c::GenSparsePoly{T}) whe
    return a
 end
 
-function zero!(a::GenSparsePoly{T}) where {T <: RingElement}
+function zero!(a::SparsePoly{T}) where {T <: RingElement}
    a.length = 0
    return a
 end
 
-function shift_left!(a::GenSparsePoly{T}, n::UInt) where {T <: RingElement}
+function shift_left!(a::SparsePoly{T}, n::UInt) where {T <: RingElement}
    for i = 1:length(a)
       a.exps[i] += n
    end
@@ -1685,10 +1654,10 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{GenSparsePoly{T}}, ::Type{GenSparsePoly{T}}) where T <: RingElement = GenSparsePoly{T}
+promote_rule(::Type{SparsePoly{T}}, ::Type{SparsePoly{T}}) where T <: RingElement = SparsePoly{T}
 
-function promote_rule(::Type{GenSparsePoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? GenSparsePoly{T} : Union{}
+function promote_rule(::Type{SparsePoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   promote_rule(T, U) == T ? SparsePoly{T} : Union{}
 end
 
 ###############################################################################
@@ -1697,39 +1666,39 @@ end
 #
 ###############################################################################
 
-function (a::GenSparsePolyRing{T} where {T <: RingElement})(b::RingElement)
+function (a::SparsePolyRing{T} where {T <: RingElement})(b::RingElement)
    return a([base_ring(a)(b)], [UInt(0)])
 end
 
-function (a::GenSparsePolyRing{T})() where {T <: RingElement}
-   z = GenSparsePoly{T}()
+function (a::SparsePolyRing{T})() where {T <: RingElement}
+   z = SparsePoly{T}()
    z.parent = a
    return z
 end
 
-function (a::GenSparsePolyRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
-   z = GenSparsePoly{T}(base_ring(a)(b))
+function (a::SparsePolyRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
+   z = SparsePoly{T}(base_ring(a)(b))
    z.parent = a
    return z
 end
 
-function (a::GenSparsePolyRing{T})(b::T) where {T <: RingElement}
+function (a::SparsePolyRing{T})(b::T) where {T <: RingElement}
    parent(b) != base_ring(a) && error("Unable to coerce to polynomial")
-   z = GenSparsePoly{T}(b)
+   z = SparsePoly{T}(b)
    z.parent = a
    return z
 end
 
-function (a::GenSparsePolyRing{T})(b::GenSparsePoly{T}) where {T <: RingElement}
+function (a::SparsePolyRing{T})(b::SparsePoly{T}) where {T <: RingElement}
    parent(b) != a && error("Unable to coerce polynomial")
    return b
 end
 
-function (a::GenSparsePolyRing{T})(b::Array{T, 1}, m::Array{UInt, 1}) where {T <: RingElement}
+function (a::SparsePolyRing{T})(b::Array{T, 1}, m::Array{UInt, 1}) where {T <: RingElement}
    if length(b) > 0
       parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
    end
-   z = GenSparsePoly{T}(b, m)
+   z = SparsePoly{T}(b, m)
    z.parent = a
    return z
 end
@@ -1741,7 +1710,7 @@ end
 ###############################################################################
 
 doc"""
-    SparsePolynomialRing(R::Ring, s::String; cached::Bool = true)
+    SparsePolynomialRing(R::Nemo.Ring, s::String; cached::Bool = true)
 > Given a base ring `R` and a string `s` specifying how the generator
 > (variable) should be printed, return a tuple `S, x` representing the new
 > polynomial ring $T = R[x1, x2, ...]$ and the generator $x$ of the polynomial
@@ -1749,11 +1718,11 @@ doc"""
 > will be cached. Setting the optional argument `cached` to `false` will
 > prevent the parent object `T` from being cached.
 """
-function SparsePolynomialRing(R::Ring, s::String; cached::Bool = true)
+function SparsePolynomialRing(R::Nemo.Ring, s::String; cached::Bool = true)
    U = Symbol(s)
    T = elem_type(R)
 
-   par = GenSparsePolyRing{T}(R, U, cached)
+   par = SparsePolyRing{T}(R, U, cached)
 
    return par, gen(par)
 end

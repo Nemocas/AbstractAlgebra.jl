@@ -4,8 +4,6 @@
 #
 ################################################################################
 
-include("generic/Fraction.jl")
-
 include("flint/fmpq.jl")
 
 include("flint/fq.jl")

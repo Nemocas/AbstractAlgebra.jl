@@ -1,5 +1,5 @@
 function test_gen_mpoly_constructors()
-   print("GenMPoly.constructors...")
+   print("Generic.MPoly.constructors...")
 
    R, x = ZZ["y"]
 
@@ -9,11 +9,11 @@ function test_gen_mpoly_constructors()
 
       S, varlist = PolynomialRing(R, var_names, ordering = ord)
 
-      @test elem_type(S) == GenMPoly{elem_type(R)}
-      @test elem_type(GenMPolyRing{elem_type(R)}) == GenMPoly{elem_type(R)}
-      @test parent_type(GenMPoly{elem_type(R)}) == GenMPolyRing{elem_type(R)}
+      @test elem_type(S) == Generic.MPoly{elem_type(R)}
+      @test elem_type(Generic.MPolyRing{elem_type(R)}) == Generic.MPoly{elem_type(R)}
+      @test parent_type(Generic.MPoly{elem_type(R)}) == Generic.MPolyRing{elem_type(R)}
 
-      @test typeof(S) <: GenMPolyRing
+      @test typeof(S) <: Generic.MPolyRing
 
       isa(vars(S), Array{Symbol, 1})
 
@@ -44,7 +44,7 @@ function test_gen_mpoly_constructors()
 end   
 
 function test_gen_mpoly_manipulation()
-   print("GenMPoly.manipulation...")
+   print("Generic.MPoly.manipulation...")
 
    R, x = ZZ["y"]
 
@@ -114,7 +114,7 @@ function test_gen_mpoly_manipulation()
 end   
 
 function test_gen_mpoly_unary_ops()
-   print("GenMPoly.unary_ops...")
+   print("Generic.MPoly.unary_ops...")
 
    R, x = ZZ["y"]
 
@@ -135,7 +135,7 @@ function test_gen_mpoly_unary_ops()
 end   
 
 function test_gen_mpoly_binary_ops()
-   print("GenMPoly.binary_ops...")
+   print("Generic.MPoly.binary_ops...")
 
    R, x = ZZ["y"]
 
@@ -164,7 +164,7 @@ function test_gen_mpoly_binary_ops()
 end   
 
 function test_gen_mpoly_adhoc_binary()
-   print("GenMPoly.adhoc_binary...")
+   print("Generic.MPoly.adhoc_binary...")
 
    R, x = ZZ["y"]
 
@@ -204,7 +204,7 @@ function test_gen_mpoly_adhoc_binary()
 end   
 
 function test_gen_mpoly_adhoc_comparison()
-   print("GenMPoly.adhoc_comparison...")
+   print("Generic.MPoly.adhoc_comparison...")
 
    R, x = ZZ["y"]
 
@@ -231,7 +231,7 @@ function test_gen_mpoly_adhoc_comparison()
 end   
 
 function test_gen_mpoly_powering()
-   print("GenMPoly.powering...")
+   print("Generic.MPoly.powering...")
 
    R, x = ZZ["y"]
 
@@ -259,7 +259,7 @@ function test_gen_mpoly_powering()
 end   
 
 function test_gen_mpoly_divides()
-   print("GenMPoly.divides...")
+   print("Generic.MPoly.divides...")
 
    R, x = ZZ["y"]
 
@@ -293,7 +293,7 @@ function test_gen_mpoly_divides()
 end
 
 function test_gen_mpoly_euclidean_division()
-   print("GenMPoly.euclidean_division...")
+   print("Generic.MPoly.euclidean_division...")
 
    R, x = ZZ["y"]
 
@@ -333,7 +333,7 @@ function test_gen_mpoly_euclidean_division()
 end   
 
 function test_gen_mpoly_ideal_reduction()
-   print("GenMPoly.ideal_reduction...")
+   print("Generic.MPoly.ideal_reduction...")
 
    R, x = ZZ["y"]
 
@@ -386,7 +386,7 @@ function test_gen_mpoly_ideal_reduction()
 end   
 
 function test_gen_mpoly_gcd()
-   print("GenMPoly.gcd...")
+   print("Generic.MPoly.gcd...")
 
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
@@ -410,7 +410,7 @@ function test_gen_mpoly_gcd()
 end   
 
 function test_gen_mpoly_evaluation()
-   print("GenMPoly.evaluation...")
+   print("Generic.MPoly.evaluation...")
 
    R, x = ZZ["y"]
 
@@ -454,7 +454,7 @@ function test_gen_mpoly_evaluation()
 end   
 
 function test_gen_mpoly_valuation()
-   print("GenMPoly.valuation...")
+   print("Generic.MPoly.valuation...")
 
    R, x = ZZ["y"]
 

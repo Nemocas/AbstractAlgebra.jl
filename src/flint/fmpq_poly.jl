@@ -669,7 +669,7 @@ end
 #
 ###############################################################################
 
-function *(a::GenPoly{fmpq_poly}, b::GenPoly{fmpq_poly})
+function *(a::Generic.Poly{fmpq_poly}, b::Generic.Poly{fmpq_poly})
    check_parent(a, b)
    if min(length(a), length(b)) < 40
       return mul_classical(a, b)

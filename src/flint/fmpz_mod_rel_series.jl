@@ -261,7 +261,7 @@ end
 #
 ###############################################################################
 
-function *(x::GenRes{fmpz}, y::fmpz_mod_rel_series)
+function *(x::Generic.Res{fmpz}, y::fmpz_mod_rel_series)
    z = parent(y)()
    z.prec = y.prec
    z.val = y.val
@@ -272,7 +272,7 @@ function *(x::GenRes{fmpz}, y::fmpz_mod_rel_series)
    return z
 end
 
-*(x::fmpz_mod_rel_series, y::GenRes{fmpz}) = y * x
+*(x::fmpz_mod_rel_series, y::Generic.Res{fmpz}) = y * x
 
 function *(x::fmpz, y::fmpz_mod_rel_series)
    z = parent(y)()
@@ -433,7 +433,7 @@ end
 #
 ###############################################################################
 
-function ==(x::fmpz_mod_rel_series, y::GenRes{fmpz}) 
+function ==(x::fmpz_mod_rel_series, y::Generic.Res{fmpz}) 
    if precision(x) == 0
       return true
    elseif pol_length(x) > 1
@@ -453,7 +453,7 @@ function ==(x::fmpz_mod_rel_series, y::GenRes{fmpz})
    end 
 end
 
-==(x::GenRes{fmpz}, y::fmpz_mod_rel_series) = y == x
+==(x::Generic.Res{fmpz}, y::fmpz_mod_rel_series) = y == x
 
 function ==(x::fmpz_mod_rel_series, y::fmpz) 
    if precision(x) == 0
@@ -519,7 +519,7 @@ end
 #
 ###############################################################################
 
-function divexact(x::fmpz_mod_rel_series, y::GenRes{fmpz})
+function divexact(x::fmpz_mod_rel_series, y::Generic.Res{fmpz})
    iszero(y) && throw(DivideError())
    z = parent(x)()
    z.prec = x.prec
@@ -626,7 +626,7 @@ function setcoeff!(z::fmpz_mod_rel_series, n::Int, x::fmpz)
    return z
 end
 
-function setcoeff!(z::fmpz_mod_rel_series, n::Int, x::GenRes{fmpz})
+function setcoeff!(z::fmpz_mod_rel_series, n::Int, x::Generic.Res{fmpz})
    ccall((:fmpz_mod_poly_set_coeff_fmpz, :libflint), Void, 
                 (Ptr{fmpz_mod_rel_series}, Int, Ptr{fmpz}), 
                &z, n, &x.data)
@@ -724,7 +724,7 @@ promote_rule(::Type{fmpz_mod_rel_series}, ::Type{T}) where {T <: Integer} = fmpz
 
 promote_rule(::Type{fmpz_mod_rel_series}, ::Type{fmpz}) = fmpz_mod_rel_series
 
-promote_rule(::Type{fmpz_mod_rel_series}, ::Type{GenRes{fmpz}}) = fmpz_mod_rel_series
+promote_rule(::Type{fmpz_mod_rel_series}, ::Type{Generic.Res{fmpz}}) = fmpz_mod_rel_series
 
 ###############################################################################
 #
@@ -762,7 +762,7 @@ function (a::FmpzModRelSeriesRing)(b::fmpz)
    return z
 end
 
-function (a::FmpzModRelSeriesRing)(b::GenRes{fmpz})
+function (a::FmpzModRelSeriesRing)(b::Generic.Res{fmpz})
    if iszero(b)
       z = fmpz_mod_rel_series(modulus(a))
       z.prec = a.prec_max
@@ -784,7 +784,7 @@ function (a::FmpzModRelSeriesRing)(b::Array{fmpz, 1}, len::Int, prec::Int, val::
    return z
 end
 
-function (a::FmpzModRelSeriesRing)(b::Array{GenRes{fmpz}, 1}, len::Int, prec::Int, val::Int)
+function (a::FmpzModRelSeriesRing)(b::Array{Generic.Res{fmpz}, 1}, len::Int, prec::Int, val::Int)
    z = fmpz_mod_rel_series(modulus(a), b, len, prec, val)
    z.parent = a
    return z

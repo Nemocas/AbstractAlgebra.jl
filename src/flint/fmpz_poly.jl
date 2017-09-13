@@ -754,7 +754,7 @@ end
 #
 ###############################################################################
 
-function *(a::GenPoly{fmpz_poly}, b::GenPoly{fmpz_poly})
+function *(a::Generic.Poly{fmpz_poly}, b::Generic.Poly{fmpz_poly})
    check_parent(a, b)
    if min(length(a), length(b)) < 40
       return mul_classical(a, b)
