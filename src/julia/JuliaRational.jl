@@ -42,7 +42,9 @@ zero(::Rationals{T}) where T <: Integer = Rational{T}(0)
 
 one(::Rationals{T}) where T <: Integer = Rational{T}(1)
 
+if VERSION < v"0.7.0-DEV.1144"
 isone(a::Rational) = a == 1
+end
 
 isunit(a::Rational) = a != 0
 

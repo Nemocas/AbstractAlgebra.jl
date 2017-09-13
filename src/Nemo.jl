@@ -6,7 +6,7 @@ import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
              conj, convert, cmp, contains, cos, cosh, dec, deepcopy,
              deepcopy_internal, den, deserialize, det, div, divrem, exp, eye,
              gcd, gcdx, getindex, hash, hcat, hex, intersect, inv, invmod,
-             isequal, isfinite, isless, isone, isqrt, isreal, iszero, lcm,
+             isequal, isfinite, isless, isqrt, isreal, iszero, lcm,
              ldexp, length, log, lufact, lufact!, mod, ndigits, nextpow2, norm,
              nullspace, num, oct, one, parent, parse, precision, prevpow2,
              rand, rank, Rational, rem, reverse, serialize, setindex!, show,
@@ -14,6 +14,10 @@ import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
              trailing_zeros, transpose, transpose!, truncate, typed_hvcat,
              typed_hcat, var, vcat, zero, zeros, +, -, *, ==, ^, &, |, $, <<,
              >>, ~, <=, >=, <, >, //, /, !=
+
+if VERSION >= v"0.7.0-DEV.1144"
+import Base: isone
+end
 
 import Base: floor, ceil, hypot, sqrt, log, log1p, exp, expm1, sin, cos, sinpi,
              cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,

@@ -32,7 +32,9 @@ zero(::Integers{T}) where T <: Integer = T(0)
 
 one(::Integers{T}) where T <: Integer = T(1)
 
+if VERSION < v"0.7.0-DEV.1144"
 isone(a::Integer) = a == 1
+end
 
 isunit(a::Integer) = a == 1 || a == -1
 
