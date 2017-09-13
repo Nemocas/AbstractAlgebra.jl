@@ -3283,7 +3283,9 @@ function weak_popov_with_pivots!(P::GenMat{T}, W::GenMat{T}, U::GenMat{T}, pivot
          end
          change = true
          # Reduce with the pivot of minimal degree.
-         pivotInd = indmin(degree(P[j, i]) for j in pivots[i])
+         # TODO: Remove the list comprehension as soon as indmin(f, A) works
+         #pivotInd = indmin(degree(P[j, i]) for j in pivots[i])
+         pivotInd = indmin([degree(P[j, i]) for j in pivots[i]])
          pivot = pivots[i][pivotInd]
          for j = 1:length(pivots[i])
             if j == pivotInd
