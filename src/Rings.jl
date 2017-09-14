@@ -151,9 +151,9 @@ transpose(x::T) where {T <: RingElem} = deepcopy(x)
 #
 ###############################################################################
 
-include("julia/JuliaInteger.jl")
+include("julia/Integer.jl")
 
-include("julia/JuliaRational.jl")
+include("julia/Rational.jl")
 
 include("flint/fmpz.jl")
 

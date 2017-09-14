@@ -636,8 +636,9 @@ doc"""
 function ^(a::Nemo.PolyElem{T}, b::Int) where {T <: RingElement}
    b < 0 && throw(DomainError())
    # special case powers of x for constructing polynomials efficiently
+   R = parent(a)
    if isgen(a)
-      z = parent(a)()
+      z = R()
       fit!(z, b + 1)
       z = setcoeff!(z, b, coeff(a, 1))
       for i = 1:b
@@ -646,13 +647,13 @@ function ^(a::Nemo.PolyElem{T}, b::Int) where {T <: RingElement}
       set_length!(z, b + 1)
       return z
    elseif length(a) == 0
-      return zero(parent(a))
+      return zero(R)
    elseif length(a) == 1
-      return parent(a)(coeff(a, 0)^b)
+      return R(coeff(a, 0)^b)
    elseif b == 0
-      return one(parent(a))
+      return one(R)
    else
-      if T <: FieldElement
+      if T <: FieldElement && characteristic(base_ring(R)) == 0
          zn = 0
          while iszero(coeff(a, zn))
             zn += 1
