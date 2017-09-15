@@ -352,6 +352,37 @@ end
 
 ###############################################################################
 #
+#   NmodRing / nmod
+#
+###############################################################################
+
+mutable struct NmodRing <: Ring
+   n::UInt
+   ninv::UInt
+
+   function NmodRing(n::UInt, cached::Bool=true)
+      if haskey(NmodRingID, n)
+         return NmodRingID[n]
+      else
+         ninv = ccall((:n_preinvert_limb, :libflint), UInt, (UInt,), n)
+         z = new(n, ninv)
+         if cached
+            NmodRingID[n] = z
+         end
+         return z
+      end
+   end
+end
+
+const NmodRingID = Dict{UInt, NmodRing}()
+
+struct nmod <: ResElem{UInt}
+   data::UInt
+   parent::NmodRing
+end
+
+###############################################################################
+#
 #   NmodPolyRing / nmod_poly
 #
 ###############################################################################

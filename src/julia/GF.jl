@@ -46,7 +46,7 @@ end
 
 function Base.hash(a::gfelem, h::UInt)
    b = 0xe08f2b4ea1cd2a13%UInt
-   return xor(xor(hash(a.d, 0), h), b)
+   return xor(xor(hash(a.d), h), b)
 end
 
 doc"""
@@ -152,7 +152,7 @@ function -(x::gfelem{T}) where T <: Integer
       return deepcopy(x)
    else
       R = parent(x)
-     return gfelem{T}(R.p - x.d, x.parent)
+      return gfelem{T}(R.p - x.d, R)
    end
 end
 
@@ -164,23 +164,25 @@ end
 
 function +(x::gfelem{T}, y::gfelem{T}) where T <: Integer
    check_parent(x, y)
-   p = characteristic(x.parent)::T
+   R = parent(x)
+   p = characteristic(R)::T
    d = x.d + y.d
    if d >= p
-      return gfelem{T}(d - p, x.parent)
+      return gfelem{T}(d - p, R)
    else
-      return gfelem{T}(d, x.parent)
+      return gfelem{T}(d, R)
    end
 end
 
 function -(x::gfelem{T}, y::gfelem{T}) where T <: Integer
    check_parent(x, y)
-   p = characteristic(x.parent)::T
+   R = parent(x)
+   p = characteristic(R)::T
    d = x.d - y.d
    if d < 0
-      return gfelem{T}(d + p, x.parent)
+      return gfelem{T}(d + p, R)
    else
-      return gfelem{T}(d, x.parent)
+      return gfelem{T}(d, R)
    end
 end
 
@@ -198,7 +200,6 @@ end
 
 function *(x::Integer, y::gfelem{T}) where T <: Integer
    R = parent(y)
-   p = R.p::T
    return R(widen(x)*widen(y.d))
 end
 
@@ -276,7 +277,10 @@ end
 #
 ###############################################################################
 
-divexact(x::gfelem{T}, y::gfelem{T}) where T <: Integer = x*inv(y)
+function divexact(x::gfelem{T}, y::gfelem{T}) where T <: Integer
+   check_parent(x, y)
+   return x*inv(y)
+end
 
 divides(a::gfelem{T}, b::gfelem{T}) where T <: Integer = true, divexact(a, b)
 
