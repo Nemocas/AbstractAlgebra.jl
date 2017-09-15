@@ -54,7 +54,7 @@ function test_gfelem_manipulation()
    @test iszero(zero(R))
    @test iszero(zero(S))
 
-   @test isone(one(S))
+   @test isone(one(R))
    @test isone(one(S))
 
    @test characteristic(R) == 13

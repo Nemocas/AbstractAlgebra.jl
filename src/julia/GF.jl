@@ -166,9 +166,9 @@ function +(x::gfelem{T}, y::gfelem{T}) where T <: Integer
    check_parent(x, y)
    R = parent(x)
    p = characteristic(R)::T
-   d = x.d + y.d
-   if d >= p
-      return gfelem{T}(d - p, R)
+   d = x.d + y.d - p
+   if d < 0
+      return gfelem{T}(d + p, R)
    else
       return gfelem{T}(d, R)
    end

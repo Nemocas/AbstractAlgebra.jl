@@ -51,7 +51,7 @@ iszero(a::nmod) = a.data == 0
 
 isone(a::nmod) = a.parent.n == 1 ? a.data == 0 : a.data == 1
 
-isunit(a::nmod) = a.parent.n == 1 ? a.data == 0 : a.data != 0
+isunit(a::nmod) = a.parent.n == 1 ? a.data == 0 : gcd(a.data, a.parent.n) == 1
 
 modulus(R::NmodRing) = R.n
 
@@ -113,9 +113,9 @@ function +(x::nmod, y::nmod)
    check_parent(x, y)
    R = parent(x)
    n = modulus(R)
-   d = x.data + y.data
-   if d >= n
-      return nmod(d - n, R)
+   d = x.data + y.data - n
+   if d > x.data
+      return nmod(d + n, R)
    else
       return nmod(d, R)
    end
@@ -177,6 +177,14 @@ function *(x::UInt, y::nmod)
 end
 
 *(x::nmod, y::UInt) = y*x
+
++(x::nmod, y::Integer) = x + parent(x)(y)
+
++(x::Integer, y::nmod) = y + x
+
+-(x::nmod, y::Integer) = x - parent(x)(y)
+
+-(x::Integer, y::nmod) = parent(y)(x) - y
 
 ###############################################################################
 #
@@ -258,7 +266,11 @@ function gcd(x::nmod, y::nmod)
    check_parent(x, y)
    R = parent(x)
    d = gcd(gcd(x.data, R.n), y.data)
-   return nmod(d, R)
+   if d == R.n
+      return nmod(0, R)
+   else
+      return nmod(d, R)
+   end
 end
 
 ###############################################################################
@@ -291,7 +303,7 @@ end
 ###############################################################################
 
 function rand(R::NmodRing)
-   n = rand(UInt(0), R.n)
+   n = rand(UInt(0):R.n - 1)
    return nmod(n, R)
 end
 
@@ -358,7 +370,7 @@ end
 ###############################################################################
 
 function ResidueRing(R::FlintIntegerRing, n::Int; cached::Bool=true)
-   n < 0 && throw(DomainError())
+   n <= 0 && throw(DomainError())
    return NmodRing(UInt(n), cached)
 end
 
