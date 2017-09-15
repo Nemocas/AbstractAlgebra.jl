@@ -40,6 +40,8 @@ function randprime(n::fmpz, m::fmpz)
    return fmpz(r)
 end
 
+randelem(R::Nemo.NmodRing) = rand(R)
+
 function randelem(K::AnticNumberField, n)
    s = K(0)
    a = gen(K)
@@ -82,6 +84,10 @@ function randelem(R::Generic.ResRing{fmpz}, n)
 end
 
 function randelem(R::Generic.ResRing{BigInt}, n)
+   return rand(R, -n:n)
+end
+
+function randelem(R::Nemo.NmodRing, n)
    return rand(R, -n:n)
 end
 

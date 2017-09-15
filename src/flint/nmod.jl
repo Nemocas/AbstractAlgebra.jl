@@ -224,6 +224,10 @@ end
 
 ==(x::Integer, y::nmod) = parent(y)(x) == y
 
+==(x::nmod, y::fmpz) = x == parent(x)(y)
+
+==(x::fmpz, y::nmod) = parent(y)(x) == y
+
 ###############################################################################
 #
 #   Inversion
@@ -307,6 +311,11 @@ function rand(R::NmodRing)
    return nmod(n, R)
 end
 
+function rand(R::NmodRing, b::UnitRange{Int64})
+   n = rand(b)
+   return R(n)
+end
+
 ###############################################################################
 #
 #   Promotions
@@ -357,6 +366,12 @@ function (R::NmodRing)(a::UInt)
    a = ccall((:n_mod2_preinv, :libflint), UInt, (UInt, UInt, UInt),
              a, n, ninv)
    return nmod(a, R)
+end
+
+function (R::NmodRing)(a::fmpz)
+   d = ccall((:fmpz_fdiv_ui, :libflint), UInt, (Ptr{fmpz}, UInt),
+             &a, R.n)
+   return nmod(d, R)
 end
 
 function (R::NmodRing)(a::nmod)
