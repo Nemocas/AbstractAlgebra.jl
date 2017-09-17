@@ -257,13 +257,17 @@ end
 
 *(x::Integer, y::fmpq_abs_series) = fmpz(x)*y
 
-*(x::fmpq_abs_series, y::Rational{T}) where T <: Union{Int, BigInt} = x*fmpq(y)
+*(x::fmpq_abs_series, y::Rational) = x*fmpq(y)
 
-*(x::Rational{T}, y::fmpq_abs_series) where T <: Union{Int, BigInt} = fmpq(x)*y
+*(x::Rational, y::fmpq_abs_series) = fmpq(x)*y
 
-+(x::fmpq_abs_series, y::Rational{T}) where T <: Union{Int, BigInt} = x + fmpq(y)
++(x::fmpq_abs_series, y::Rational) = x + fmpq(y)
 
-+(x::Rational{T}, y::fmpq_abs_series) where T <: Union{Int, BigInt} = fmpq(x) + y
++(x::Rational, y::fmpq_abs_series) = fmpq(x) + y
+
+-(x::fmpq_abs_series, y::Rational) = x - fmpq(y)
+
+-(x::Rational, y::fmpq_abs_series) = fmpq(x) - y
 
 ###############################################################################
 #

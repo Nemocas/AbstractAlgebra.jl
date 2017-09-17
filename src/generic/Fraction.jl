@@ -65,10 +65,6 @@ function //(x::T, y::T) where {T <: RingElem}
    return z
 end
 
-//(x::T, y::Union{Integer, Rational}) where {T <: RingElem} = x//parent(x)(y)
-                                          
-//(x::Union{Integer, Rational}, y::T) where {T <: RingElem} = parent(y)(x)//y
-
 //(x::T, y::Nemo.FracElem{T}) where {T <: RingElem} = parent(y)(x)//y
 
 //(x::Nemo.FracElem{T}, y::T) where {T <: RingElem} = x//parent(x)(y)

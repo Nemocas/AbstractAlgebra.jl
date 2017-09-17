@@ -297,17 +297,25 @@ end
 
 *(x::Integer, y::fmpq_rel_series) = fmpz(x) * y
 
-*(x::fmpq_rel_series, y::Rational{T}) where T <: Union{Int, BigInt} = x * fmpq(y)
+*(x::fmpq_rel_series, y::Rational) = x * fmpq(y)
 
-*(x::Rational{T}, y::fmpq_rel_series) where T <: Union{Int, BigInt} = fmpq(x) * y
+*(x::Rational, y::fmpq_rel_series) = fmpq(x) * y
 
 +(x::fmpq_rel_series, y::Integer) = x + fmpz(y)
 
 +(x::Integer, y::fmpq_rel_series) = fmpz(x) + y
 
-+(x::fmpq_rel_series, y::Rational{T}) where T <: Union{Int, BigInt} = x + fmpq(y)
++(x::fmpq_rel_series, y::Rational) = x + fmpq(y)
 
-+(x::Rational{T}, y::fmpq_rel_series) where T <: Union{Int, BigInt} = fmpq(x) + y
++(x::Rational, y::fmpq_rel_series) = fmpq(x) + y
+
+-(x::fmpq_rel_series, y::Integer) = x - fmpz(y)
+
+-(x::Integer, y::fmpq_rel_series) = fmpz(x) - y
+
+-(x::fmpq_rel_series, y::Rational) = x - fmpq(y)
+
+-(x::Rational, y::fmpq_rel_series) = fmpq(x) - y
 
 ###############################################################################
 #
