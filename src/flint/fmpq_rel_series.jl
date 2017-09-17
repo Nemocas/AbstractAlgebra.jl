@@ -582,7 +582,7 @@ function divexact(x::fmpq_rel_series, y::fmpq)
    z.prec = x.prec
    z.prec = x.prec
    z.val = x.val
-   ccall((:fmpq_poly_scalar_divexact_fmpq, :libflint), Void, 
+   ccall((:fmpq_poly_scalar_div_fmpq, :libflint), Void, 
                 (Ptr{fmpq_rel_series}, Ptr{fmpq_rel_series}, Ptr{fmpq}), 
                &z, &x, &y)
    return z
