@@ -1623,6 +1623,9 @@ function resultant(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: RingEle
    res = c1^(lb - 1)*c2^(la - 1)*s*sgn
 end
 
+# details can be found in, "Optimizations of the subresultant algorithm" by
+# Lionel Ducos, J. Pure and Appl. Algebra 2000. Note, the resultant is
+# the constant coefficient of S_0 (aka S_00 in other sources)
 function resultant_brown(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(p, q)
    s = lead(q)^(length(p) - length(q))
