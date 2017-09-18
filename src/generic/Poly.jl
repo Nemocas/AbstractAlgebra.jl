@@ -1623,6 +1623,35 @@ function resultant(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: RingEle
    res = c1^(lb - 1)*c2^(la - 1)*s*sgn
 end
 
+function resultant_brown(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where {T <: RingElement}
+   check_parent(p, q)
+   s = lead(q)^(length(p) - length(q))
+   S = parent(p)()
+   A = q
+   B = pseudorem(p, -q)
+   while true
+      d1 = length(A)
+      e1 = length(B)
+      if e1 == 0
+         return coeff(S, 0)
+      end
+      S = B
+      delta = d1 - e1
+      if delta > 1
+         C = divexact(lead(B)^(delta - 1)*B, s^(delta - 1))
+         S = C
+      else
+         C = B
+      end
+      if e1 == 1
+         return coeff(S, 0)
+      end
+      B = divexact(pseudorem(A, -B), s^delta*lead(A))
+      A = C
+      s = lead(A)
+   end
+end
+
 function resultant_lehmer(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    const crossover = 40
    R = base_ring(a)
