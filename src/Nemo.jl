@@ -352,7 +352,7 @@ getindex(R::Tuple{Ring, T}, s::String) where {T} = PolynomialRing(R[1], s)
 
 ###############################################################################
 #
-#   Matrix M = R[...] syntax
+#   Matrix M = R[...] syntax and Matrix constructor
 #
 ################################################################################
 
@@ -380,6 +380,16 @@ function typed_hcat(R::Ring, d...)
    end
    S = MatrixSpace(R, 1, r)
    return S(A)
+end
+
+function Base.Matrix(R::Nemo.Ring, r::Int, c::Int, a::Array{T, 2}) where T <: RingElement
+   M = MatrixSpace(R, r, c)
+   return M(a)
+end
+
+function Base.Matrix(R::Nemo.Ring, r::Int, c::Int, a::Array{T, 1}) where T <: RingElement
+   M = MatrixSpace(R, r, c)
+   return M(a)
 end
 
 ###############################################################################
