@@ -28,6 +28,8 @@ parent_type(::Type{fmpq_abs_series}) = FmpqAbsSeriesRing
 
 base_ring(R::FmpqAbsSeriesRing) = R.base_ring
 
+isexact(R::FmpqAbsSeriesRing) = false
+
 var(a::FmpqAbsSeriesRing) = a.S
 
 ###############################################################################

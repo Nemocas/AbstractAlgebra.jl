@@ -45,6 +45,8 @@ doc"""
 """
 parent(a::Nemo.PolyElem) = a.parent
 
+isexact(R::Nemo.PolyRing) = isexact(base_ring(R))
+
 doc"""
     var(a::Nemo.PolyRing)
 > Return the internal name of the generator of the polynomial ring. Note that
@@ -1635,7 +1637,7 @@ doc"""
 """
 # See the paper, "Optimizations of the subresultant algorithm" by Lionel
 # Ducos, J. Pure and Appl. Algebra 2000.
-function resultant(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where {T <: RingElement}
+function resultant_ducos(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(p, q)
    if length(p) == 0 || length(q) == 0
       return zero(base_ring(p))
@@ -1647,16 +1649,16 @@ function resultant(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where {T <: RingEle
          sgn = -sgn
       end
    end
-   la = length(p)
-   lb = length(q)
-   if lb == 1
-      return coeff(q, 0)^(la - 1)
+   lp = length(p)
+   lq = length(q)
+   if lq == 1
+      return coeff(q, 0)^(lp - 1)
    end
    c1 = content(p)
    c2 = content(q)
    p = divexact(p, c1)
    q = divexact(q, c2)
-   sd = lead(q)^(la - lb)
+   sd = lead(q)^(lp - lq)
    Sd0 = parent(p)()
    A = q
    B = pseudorem(p, -A)
@@ -1678,7 +1680,7 @@ function resultant(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where {T <: RingEle
          C = B
       end
       if e1 == 1
-         return coeff(C, 0)*c1^(lb - 1)*c2^(la - 1)*sgn
+         return coeff(C, 0)*c1^(lq - 1)*c2^(lp - 1)*sgn
       end
       B = subresultant_ducos(A, Sd1, C, sd)
       Sd0 = C
@@ -1703,12 +1705,12 @@ function resultant_subresultant(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where 
          sgn = -sgn
       end
    end
-   la = length(p)
-   lb = length(q)
-   if lb == 1
-      return coeff(q, 0)^(la - 1)
+   lp = length(p)
+   lq = length(q)
+   if lq == 1
+      return coeff(q, 0)^(lp - 1)
    end
-   s = lead(q)^(la - lb)
+   s = lead(q)^(lp - lq)
    S = parent(p)()
    A = q
    B = pseudorem(p, -q)
@@ -1811,7 +1813,41 @@ function resultant_lehmer(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: 
    return c1^(lB - 1)*c2^(lA - 1)*s*sgn
 end
 
-function resultant(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
+function resultant_sylvester(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where T <: RingElement
+   check_parent(p, q)
+   R = base_ring(p)
+   if length(p) == 0 || length(q) == 0
+      return zero(R)
+   end
+   m = degree(p)
+   n = degree(q)
+   M = Nemo.MatrixSpace(R, m + n, m + n)()
+   for i = 1:n
+      for j = m:-1:0
+         M[i, m - j + i] = coeff(p, j)
+      end
+   end
+   for i = 1:m
+      for j = n:-1:0
+         M[i + n, n - j + i] = coeff(q, j)
+       end 
+   end
+   return det_df(M)
+end
+
+function resultant(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where {T <: RingElement}
+  R = parent(p)
+  if !isexact(R)
+     return resultant_sylvester(p, q)
+  end
+  try
+     return resultant_ducos(p, q)
+  catch 
+     return resultant_sylvester(p, q) 
+  end
+end
+
+function resultant_euclidean(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where T <: Union{Nemo.ResElem, FieldElement}
    check_parent(a, b)
    if length(a) == 0 || length(b) == 0
       return zero(base_ring(a))
@@ -1849,6 +1885,14 @@ function resultant(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{N
    end
    s *= lead(B)^(lena - 1)
    return c1^(lb - 1)*c2^(la - 1)*s*sgn
+end
+
+function resultant(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
+   try
+      return resultant_euclidean(a, b)
+   catch
+      return resultant_sylvester(a, b)
+   end
 end
 
 ###############################################################################
