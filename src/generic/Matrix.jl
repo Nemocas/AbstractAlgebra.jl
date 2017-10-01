@@ -122,6 +122,15 @@ function _check_dim(r::Int, c::Int, arr::Array{T, 1}) where {T}
   return nothing
 end
 
+function _checkbounds(i::Int, j::Int)
+   j >= 1 && j <= i
+end
+
+function _checkbounds(A, i::Int, j::Int)
+  (_checkbounds(rows(A), i) && _checkbounds(cols(A), j)) ||
+            Base.throw_boundserror(A, (i, j))
+end
+
 ###############################################################################
 #
 #   Basic manipulation
@@ -151,11 +160,12 @@ doc"""
 """
 cols(a::Nemo.MatElem) = size(a.entries, 2)
 
-function getindex(a::Nemo.MatElem, r::Int, c::Int)
+Base.@propagate_inbounds function getindex(a::Nemo.MatElem, r::Int, c::Int)
    return a.entries[r, c]
 end
  
-function setindex!(a::Nemo.MatElem, d::T, r::Int, c::Int) where T <: RingElement
+Base.@propagate_inbounds function setindex!(a::Nemo.MatElem, d::T, r::Int,
+                                            c::Int) where T <: RingElement
     a.entries[r, c] = base_ring(a)(d)
 end
 
