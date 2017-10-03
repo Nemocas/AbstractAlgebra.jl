@@ -973,73 +973,102 @@ end
 function addeq!(c::RelSeries{T}, a::RelSeries{T}) where {T <: RingElement}
    lenc = pol_length(c)
    lena = pol_length(a)
-   precc = precision(c)
-   preca = precision(a)
    valc = valuation(c)
    vala = valuation(a)
-   prec = min(precc, preca)
-   vala = min(vala, prec)
-   valc = min(valc, prec)
-   lena = min(lena, max(0, prec - vala))
-   lenc = min(lenc, max(0, prec - valc))
    valr = min(vala, valc)
-   lenr = max(lena + vala, lenc + valc) - valr
+   precc = precision(c)
+   preca = precision(a)
+   prec = min(precc, preca)
+   mina = min(vala + lena, prec)
+   minc = min(valc + lenc, prec)
+   lenr = max(mina, minc) - valr
    R = base_ring(c)
    fit!(c, lenr)
-   if valc > vala
-      for i = lena:-1:1
-         c.coeffs[i + valc - vala] = c.coeffs[i]
+   if valc >= vala
+      for i = lenc + valc - vala:-1:max(lena, valc - vala) + 1
+         c.coeffs[i] = c.coeffs[i - valc + vala]
       end
-      for i = 1:min(valc, lena)
+      for i = lena:-1:valc - vala + 1
+         c.coeffs[i] = add!(c.coeffs[i], c.coeffs[i - valc + vala], a.coeffs[i])
+      end
+      for i = 1:min(lena, valc - vala)
          c.coeffs[i] = a.coeffs[i]
       end
-      for i = lena + 1:valc
+      for i = lena + 1:min(valc - vala, lenr)
          c.coeffs[i] = R()
-      end
-      for i = valc + 1:min(lena, lenc + valc - vala)
-         c.coeffs[i] = addeq!(c.coeffs[i], a.coeffs[i])
       end
       for i = lenc + valc - vala + 1:lena
          c.coeffs[i] = a.coeffs[i]
       end
    else
-      for i = 1:min(lena, lenc - vala + valc)
-         c.coeffs[i + vala - valc] = addeq!(c.coeffs[i + vala - valc], a.coeffs[i])
+      for i = lenc + 1:min(vala - valc, lenr)
+         c.coeffs[i] = R()
       end
-      for i = lenc + 1:lena + vala - valc
+      for i = vala - valc + 1:lenc
+         c.coeffs[i] = addeq!(c.coeffs[i], a.coeffs[i - vala + valc])
+      end
+      for i = max(lenc, vala - valc) + 1:lena + vala - valc
          c.coeffs[i] = a.coeffs[i - vala + valc]
       end
    end
    c.length = normalise(c, lenr)
    c.prec = prec
    c.val = valr
-   renormalise!(c)
+   renormalize!(c)
    return c
 end
 
-function add!(c::Nemo.SeriesElem{T}, a::Nemo.SeriesElem{T}, b::Nemo.SeriesElem{T}) where {T <: RingElement}
-   lena = length(a)
-   lenb = length(b)
-   prec = min(precision(a), precision(b))
-   lena = min(lena, prec)
-   lenb = min(lenb, prec)
-   lenc = max(lena, lenb)
-   fit!(c, lenc)
-   set_prec!(c, prec)
-   i = 1
-   while i <= min(lena, lenb)
-      c = setcoeff!(c, i - 1, coeff(a, i - 1) + coeff(b, i - 1))
-      i += 1
+function add!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where {T <: RingElement}
+   lena = pol_length(a)
+   lenb = pol_length(b)
+   valb = valuation(b)
+   vala = valuation(a)
+   valr = min(vala, valb)
+   precb = precision(b)
+   preca = precision(a)
+   prec = min(precb, preca)
+   mina = min(vala + lena, prec)
+   minb = min(valb + lenb, prec)
+   lenr = max(mina, minb) - valr
+   R = base_ring(c)
+   fit!(c, lenr)
+   c.prec = prec
+   c.val = valr
+   if vala > valb
+      for i = 1:min(lenb, vala - valb)
+         c.coeffs[i] = b.coeffs[i]
+      end
+      for i = lenb + 1:vala - valb
+         c.coeffs[i] = R()
+      end
+      for i = vala - valb + 1:lenb
+         c.coeffs[i] = add!(c.coeffs[i], a.coeffs[i - vala + valb], b.coeffs[i])
+      end
+      for i = max(lenb, vala - valb) + 1:lena + vala - valb
+         c.coeffs[i] = a.coeffs[i - vala + valb]
+      end
+      for i = lena + vala - valb + 1:lenb
+         c.coeffs[i] = b.coeffs[i]
+      end
+   else
+      for i = 1:min(lena, valb - vala)
+         c.coeffs[i] = a.coeffs[i]
+      end
+      for i = lena + 1:valb - vala
+         c.coeffs[i] = R()
+      end
+      for i = valb - vala + 1:lena
+         c.coeffs[i] = add!(c.coeffs[i], a.coeffs[i], b.coeffs[i - valb + vala])
+      end
+      for i = max(lena, valb - vala) + 1:lenb + valb - vala
+         c.coeffs[i] = b.coeffs[i - valb + vala]
+      end
+      for i = lenb + valb - vala + 1:lena
+         c.coeffs[i] = a.coeffs[i]
+      end
    end
-   while i <= lena
-      c = setcoeff!(c, i - 1, coeff(a, i - 1))
-      i += 1
-   end
-   while i <= lenb
-      c = setcoeff!(c, i - 1, coeff(b, i - 1))
-      i += 1
-   end
-   set_length!(c, normalise(c, i - 1))
+   set_length!(c, normalise(c, lenr))
+   renormalize!(c)
    return c
 end
 

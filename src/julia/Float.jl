@@ -139,7 +139,7 @@ function addeq!(a::T, b::T) where T <: AbstractFloat
 end
 
 function addeq!(a::BigFloat, b::BigFloat)
-   ccall((:mpfr_addmul, :libmpfr), Void, 
+   ccall((:mpfr_add, :libmpfr), Void, 
          (Ptr{BigFloat}, Ptr{BigFloat}, Ptr{BigFloat}, Int32),
                  &a, &a, &b, Base.MPFR.ROUNDING_MODE[])
    return a
@@ -150,9 +150,9 @@ function addmul!(a::T, b::T, c::T, d::T) where T <: AbstractFloat
 end
 
 function addmul!(a::BigFloat, b::BigFloat, c::BigFloat, d::BigFloat)
-   ccall((:mpfr_addmul, :libmpfr), Void,
-         (Ptr{BigFloat}, Ptr{BigFloat}, Ptr{BigFloat}, Int32),
-                 &a, &b, &c, Base.MPFR.ROUNDING_MODE[])
+   ccall((:mpfr_fma, :libmpfr), Void,
+         (Ptr{BigFloat}, Ptr{BigFloat}, Ptr{BigFloat}, Ptr{BigFloat}, Int32),
+                 &a, &b, &c, &a, Base.MPFR.ROUNDING_MODE[])
    return a
 end
 
@@ -161,9 +161,9 @@ function addmul!(a::T, b::T, c::T) where T <: AbstractFloat # special case, no t
 end
 
 function addmul!(a::BigFloat, b::BigFloat, c::BigFloat) # special case, no temporary required
-   ccall((:mpfr_addmul, :libmpfr), Void,
-         (Ptr{BigFloat}, Ptr{BigFloat}, Ptr{BigFloat}, Int32),
-                 &a, &b, &c, Base.MPFR.ROUNDING_MODE[])
+   ccall((:mpfr_fma, :libmpfr), Void,
+         (Ptr{BigFloat}, Ptr{BigFloat}, Ptr{BigFloat}, Ptr{BigFloat}, Int32),
+                 &a, &b, &c, &a, Base.MPFR.ROUNDING_MODE[])
    return a
 end
 
@@ -174,11 +174,11 @@ end
 ###############################################################################
 
 function rand(R::Floats, n::UnitRange{AbstractFloat})
-   return R(rand(n))
+   return R(n.start + rand(Float64)*(n.stop - n.start))
 end
 
 function rand(R::Floats, n::UnitRange{Int})
-   return R(rand(n))
+   return R(n.start + rand(Float64)*(n.stop - n.start))
 end
 
 ###############################################################################

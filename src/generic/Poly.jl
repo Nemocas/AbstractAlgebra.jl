@@ -764,6 +764,36 @@ doc"""
 
 ###############################################################################
 #
+#   Approximation
+#
+###############################################################################
+
+function Base.isapprox(f::Nemo.PolyElem, g::Nemo.PolyElem; atol::Real=sqrt(eps()))
+   nmin = min(length(f), length(g))
+   i = 1
+   while i <= nmin
+      if !isapprox(coeff(f, i - 1), coeff(g, i - 1); atol=atol)
+         return false
+      end
+      i += 1
+   end
+   while i <= length(f)
+      if !isapprox(coeff(f, i - 1), 0; atol=atol)
+         return false
+      end
+      i += 1
+   end
+   while i <= length(g)
+      if !isapprox(coeff(g, i - 1), 0; atol=atol)
+         return false
+      end
+      i += 1
+   end
+   return true
+end
+
+###############################################################################
+#
 #   Truncation
 #
 ###############################################################################
@@ -1065,17 +1095,16 @@ function mod(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: Union{Nemo.Re
       f = deepcopy(f)
       b = lead(g)
       g = inv(b)*g
-      x = gen(parent(f))
       c = base_ring(f)()
       while length(f) >= length(g)
          l = -lead(f)
-         for i = 1:length(g)
+         for i = 1:length(g) - 1
             c = mul!(c, coeff(g, i - 1), l)
             u = coeff(f, i + length(f) - length(g) - 1)
             u = addeq!(u, c)
             f = setcoeff!(f, i + length(f) - length(g) - 1, u)
          end
-         set_length!(f, normalise(f, length(f)))
+         set_length!(f, normalise(f, length(f) - 1))
       end
    end
    return f
@@ -1097,7 +1126,6 @@ function divrem(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: Union{Nemo
    f = deepcopy(f)
    binv = inv(lead(g)) 
    g = binv*g
-   x = gen(parent(f))
    qlen = length(f) - length(g) + 1
    q = parent(f)()
    fit!(q, qlen)
@@ -1106,13 +1134,13 @@ function divrem(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: Union{Nemo
       q1 = lead(f)
       l = -q1
       q = setcoeff!(q, length(f) - length(g), q1*binv)
-      for i = 1:length(g)
+      for i = 1:length(g) - 1
          c = mul!(c, coeff(g, i - 1), l)
          u = coeff(f, i + length(f) - length(g) - 1)
          u = addeq!(u, c)
          f = setcoeff!(f, i + length(f) - length(g) - 1, u)
       end
-      set_length!(f, normalise(f, length(f)))
+      set_length!(f, normalise(f, length(f) - 1))
    end
    return q, f
 end

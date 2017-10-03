@@ -63,21 +63,21 @@ function test_Floats_exact_division()
    S = JuliaRealField
 
    for iter = 1:1000
-      a1 = rand(R, -100:100)
-      a2 = rand(R, -100:100)
-      b1 = rand(S, -100:100)
-      b2 = rand(S, -100:100)
-      c1 = rand(zz, -100:100)
-      c2 = rand(JuliaZZ, -100:100)
+      a1 = rand(R, -10:10)
+      a2 = rand(R, -10:10)
+      b1 = rand(S, -10:10)
+      b2 = rand(S, -10:10)
+      c1 = rand(zz, -10:10)
+      c2 = rand(JuliaZZ, -10:10)
 
-      @test a2 == 0 || divexact(a1*a2, a2) == a1
-      @test b2 == 0 || divexact(b1*b2, b2) == b1
+      @test a2 == 0 || isapprox(divexact(a1*a2, a2), a1)
+      @test b2 == 0 || isapprox(divexact(b1*b2, b2), b1)
 
-      @test c1 == 0 || divexact(a1*c1, c1) == a1
-      @test c2 == 0 || divexact(b1*c2, c2) == b1
+      @test c1 == 0 || isapprox(divexact(a1*c1, c1), a1)
+      @test c2 == 0 || isapprox(divexact(b1*c2, c2), b1)
 
-      @test c1 == 0 || divexact(c1, R(1)*c1) == R(1)
-      @test c2 == 0 || divexact(c2, S(1)*c2) == S(1)
+      @test c1 == 0 || isapprox(divexact(c1, R(1)*c1), R(1))
+      @test c2 == 0 || isapprox(divexact(c2, S(1)*c2), S(1))
    end
 
    println("PASS")
