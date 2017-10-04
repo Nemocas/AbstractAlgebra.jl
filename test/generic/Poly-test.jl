@@ -123,7 +123,7 @@ function test_gen_poly_binary_ops()
 
    #  Exact ring
    R, x = PolynomialRing(JuliaZZ, "x")
-   for iter = 1:1000
+   for iter = 1:300
       f = rand(R, 0:10, -10:10)
       g = rand(R, 0:10, -10:10)
       h = rand(R, 0:10, -10:10)
@@ -138,7 +138,7 @@ function test_gen_poly_binary_ops()
 
    #  Inexact field
    R, x = PolynomialRing(JuliaRealField, "x")
-   for iter = 1:1000
+   for iter = 1:300
       f = rand(R, 0:10, -1:1)
       g = rand(R, 0:10, -1:1)
       h = rand(R, 0:10, -1:1)
@@ -153,7 +153,7 @@ function test_gen_poly_binary_ops()
    # Non-integral domain
    T = ResidueRing(JuliaZZ, 6)
    R, x = T["x"]
-   for iter = 1:1000
+   for iter = 1:300
       f = rand(R, 0:10, 0:5)
       g = rand(R, 0:10, 0:5)
       h = rand(R, 0:10, 0:5)
@@ -262,59 +262,148 @@ end
 
 function test_gen_poly_comparison()
    print("Generic.Poly.comparison...")
-#  Remi Imbach 31/07/17: begin
+
+   # Exact ring
    R, x = JuliaZZ["x"]
-   maxIter = 100
-   degmax = 100
-   bitsize = 32
-   for iter = 1:maxIter
-      f = rand(R, 0:degmax, -2^bitsize:2^bitsize)
-      g = f
+   for iter = 1:500
+      f = rand(R, 0:10, -10:10)
+      g = deepcopy(f)
+      h = R()
+      while iszero(h)
+         h = rand(R, 0:10, -10:10)
+      end
+
       @test f == g
       @test isequal(f, g)
-      g = f + rand(JuliaZZ, -2^bitsize:2^bitsize) + 1
-      @test f != g
+      @test f != g + h
    end
-   #the same over Z/6Z
-   T = ResidueRing(JuliaZZ, 6)
-   R, x = T["x"]
-   for iter = 1:maxIter
-      f = rand(R, 0:degmax, -2^bitsize:2^bitsize)
-      g = f
+
+   # Inexact field
+   R, x = JuliaRealField["x"]
+   for iter = 1:500
+      f = rand(R, 0:10, -1:1)
+      g = deepcopy(f)
+      h = R()
+      while iszero(h)
+         h = rand(R, 0:10, -1:1)
+      end
+
       @test f == g
       @test isequal(f, g)
-      g = f + rand(T, 0:4) + 1
-      @test f != g
+      @test f != g + h
    end
-#  Remi Imbach 31/07/17: end
+
+   # Non-integral domain
+   R = ResidueRing(JuliaZZ, 6)
+   S, x = R["x"]
+   for iter = 1:500
+      f = rand(S, 0:10, 0:5)
+      g = deepcopy(f)
+      h = R()
+      while iszero(h)
+         h = rand(S, 0:10, 0:5)
+      end
+
+      @test f == g
+      @test isequal(f, g)
+      @test f != g + h
+   end
    println("PASS")
 end
 
 function test_gen_poly_adhoc_comparison()
    print("Generic.Poly.adhoc_comparison...")
 
-#  Remi Imbach 31/07/17: begin
-   R,x = JuliaZZ["x"]
-   S,y = R["y"]
-   U,z = S["z"]
-   maxIter = 100
-   bitsize = 32
-   for iter = 1:maxIter
-      c1 = rand(JuliaZZ, -2^bitsize:2^bitsize)
-      @test U(c1) == c1 
-      @test U(c1) != y + rand(JuliaZZ, -2^bitsize:2^bitsize)*z
+   # Exact ring
+   R, x = JuliaZZ["x"]
+   for iter = 1:500
+      f = R()
+      while iszero(f)
+         f = rand(R, 0:10, -10:10)
+      end
+      c1 = rand(JuliaZZ, -10:10)
+      d1 = rand(zz, -10:10)
+
+      @test R(c1) == c1
+      @test c1 == R(c1)
+      @test R(d1) == d1
+      @test d1 == R(d1)
+
+      @test R(c1) != c1 + f
+      @test c1 != R(c1) + f
+      @test R(d1) != d1 + f
+      @test d1 != R(d1) + f
    end
-   #the same over Z/6Z
-   T = ResidueRing(JuliaZZ, 6)
-   R,x = T["x"]
-   S,y = R["y"]
-   U,z = S["z"]
-   for iter = 1:maxIter
-      c1 = rand(T, -2^bitsize:2^bitsize)
-      @test U(c1) == c1
-      @test U(c1) != y + rand(T, 0:100)*z
+
+   # Inexact field
+   R, x = JuliaRealField["x"]
+   for iter = 1:500
+      f = R()
+      while iszero(f)
+         f = rand(R, 0:10, -1:1)
+      end
+      c1 = rand(JuliaZZ, -10:10)
+      d1 = rand(JuliaRealField, -1:1)
+
+      @test R(c1) == c1
+      @test c1 == R(c1)
+      @test R(d1) == d1
+      @test d1 == R(d1)
+
+      @test R(c1) != c1 + f
+      @test c1 != R(c1) + f
+      @test R(d1) != d1 + f
+      @test d1 != R(d1) + f
    end
-#  Remi Imbach 31/07/17: end
+
+   # Non-integral domain
+   R = ResidueRing(JuliaZZ, 6)
+   S, x = R["x"]
+   for iter = 1:500
+      f = S()
+      while iszero(f)
+         f = rand(S, 0:10, 0:5)
+      end
+      c1 = rand(JuliaZZ, -10:10)
+      d1 = rand(zz, -10:10)
+      a1 = rand(R, 0:5)
+
+      @test S(a1) == a1
+      @test a1 == S(a1)
+      @test S(c1) == c1
+      @test c1 == S(c1)
+      @test S(d1) == d1
+      @test d1 == S(d1)
+
+      @test S(a1) != a1 + f
+      @test a1 != S(a1) + f
+      @test S(c1) != c1 + f
+      @test c1 != S(c1) + f
+      @test S(d1) != d1 + f
+      @test d1 != S(d1) + f
+   end
+
+   # Generic tower
+   R, x = JuliaZZ["x"]
+   S, y = R["y"]
+   for iter = 1:100
+      f = S()
+      while iszero(f)
+         f = rand(S, 0:10, 0:5, -10:10)
+      end
+      c1 = rand(JuliaZZ, -10:10)
+      d1 = rand(R, 0:5, -10:10)
+
+      @test S(c1) == c1
+      @test c1 == S(c1)
+      @test S(d1) == d1
+      @test d1 == S(d1)
+
+      @test S(c1) != c1 + f
+      @test c1 != S(c1) + f
+      @test S(d1) != d1 + f
+      @test d1 != S(d1) + f
+   end
    println("PASS")
 end
 

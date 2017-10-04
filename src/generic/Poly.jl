@@ -747,7 +747,7 @@ doc"""
     ==(x::Nemo.PolyElem, y::Union{Integer, Rational})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Nemo.PolyElem, y::Union{Integer, Rational}) = ((length(x) == 0 && y == 0)
+==(x::Nemo.PolyElem, y::Union{Integer, Rational}) = ((length(x) == 0 && base_ring(x)(y) == 0)
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
