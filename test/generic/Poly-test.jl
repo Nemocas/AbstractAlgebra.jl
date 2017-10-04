@@ -5,11 +5,12 @@
 #    4) Inexact fields, e.g. Julia RealField
 #    5) A field of char p > 0, e.g. GF(p)
 #    6) A ring of char p > 0, e.g. Z/pZ
-#    7) Commutative ring which, not an integral domain, e.g. Z/nZ or Z[x]/(f) reducible f
+#    7) Commutative ring, not an integral domain, e.g. Z/nZ or Z[x]/(f) reducible f
 # In some cases, we may also wish to test over:
 #    8) Polynomial rings, e.g. to test interpolation strategies
 #    9) Fraction fields, such as Q, e.g. to test fraction free algorithms, quasidivision, etc.
-# Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the algos differ
+# Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the algos differ,
+# and to test 7 if it has to be handled specially, i.e. in presence of division.
 
 function test_gen_poly_constructors()
    print("Generic.Poly.constructors...")
