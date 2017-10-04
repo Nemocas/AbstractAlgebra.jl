@@ -121,60 +121,142 @@ end
 function test_gen_poly_binary_ops()
    print("Generic.Poly.binary_ops...")
 
+   #  Exact ring
    R, x = PolynomialRing(JuliaZZ, "x")
+   for iter = 1:1000
+      f = rand(R, 0:10, -10:10)
+      g = rand(R, 0:10, -10:10)
+      h = rand(R, 0:10, -10:10)
+      @test f + g == g + f
+      @test f + (g + h) == (f + g) + h
+      @test f*g == g*f
+      @test f*(g + h) == f*g + f*h
+      @test (f - h) + (g + h) == f + g
+      @test (f + g)*(f - g) == f*f - g*g
+      @test f - g == -(g - f)
+   end
 
-#  Remi Imbach 31/07/17: begin
-   maxIter = 100
-   degmax  = 50
-   bitsize = 20
-   for iter = 1:maxIter
-      f = rand(R, 0:degmax, -2^bitsize:2^bitsize)
-      g = rand(R, 0:degmax, -2^bitsize:2^bitsize)
-      h = rand(R, 0:degmax, -2^bitsize:2^bitsize)
-      @test (f - h) + (g + h) == f + g
-      @test (f + g)*(f - g) == f*f - g*g
+   #  Inexact field
+   R, x = PolynomialRing(JuliaRealField, "x")
+   for iter = 1:1000
+      f = rand(R, 0:10, -1:1)
+      g = rand(R, 0:10, -1:1)
+      h = rand(R, 0:10, -1:1)
+      @test isapprox(f + (g + h), (f + g) + h)
+      @test isapprox(f*g, g*f)
+      @test isapprox(f*(g + h), f*g + f*h)
+      @test isapprox((f - h) + (g + h), f + g)
+      @test isapprox((f + g)*(f - g), f*f - g*g)
+      @test isapprox(f - g, -(g - f))
    end
-   #the same over Z/6Z
+
+   # Non-integral domain
    T = ResidueRing(JuliaZZ, 6)
-   R,x = T["x"]
-   for iter = 1:maxIter
-      f = rand(R, 0:degmax, -2^bitsize:2^bitsize)
-      g = rand(R, 0:degmax, -2^bitsize:2^bitsize)
-      h = rand(R, 0:degmax, -2^bitsize:2^bitsize)
+   R, x = T["x"]
+   for iter = 1:1000
+      f = rand(R, 0:10, 0:5)
+      g = rand(R, 0:10, 0:5)
+      h = rand(R, 0:10, 0:5)
+      @test f + (g + h) == (f + g) + h
+      @test f*g == g*f
+      @test f*(g + h) == f*g + f*h
       @test (f - h) + (g + h) == f + g
       @test (f + g)*(f - g) == f*f - g*g
+      @test f - g == -(g - f)
    end
-#  Remi Imbach 31/07/17: end
    println("PASS")
 end
 
 function test_gen_poly_adhoc_binary()
    print("Generic.Poly.adhoc_binary...")
-#  Remi Imbach 31/07/17: begin
-   R,x = JuliaZZ["x"]
-   S,y = R["y"]
-   U,z = S["z"]
-   maxIter = 30
-   degmax = 20
-   bitsize = 20
-   for iter = 1:maxIter
-      f = rand(U, 0:degmax, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
-      c1 = rand(JuliaZZ, -2^bitsize:2^bitsize)
-      c2 = rand(JuliaZZ, -2^bitsize:2^bitsize)
+
+   # Exact ring
+   R, x = JuliaZZ["x"]
+   for iter = 1:500
+      f = rand(R, 0:10, -10:10)
+      c1 = rand(JuliaZZ, -10:10)
+      c2 = rand(JuliaZZ, -10:10)
+      d1 = rand(zz, -10:10)
+      d2 = rand(zz, -10:10)
+
       @test c1*f - c2*f == (c1 - c2)*f
+      @test c1*f + c2*f == (c1 + c2)*f
+      @test d1*f - d2*f == (d1 - d2)*f
+      @test d1*f + d2*f == (d1 + d2)*f
+
+      @test f*c1 - f*c2 == f*(c1 - c2)
+      @test f*c1 + f*c2 == f*(c1 + c2)
+      @test f*d1 - f*d2 == f*(d1 - d2)
+      @test f*d1 + f*d2 == f*(d1 + d2)
    end
-   #the same over Z/6Z
-   T = ResidueRing(ZZ, 6)
-   R,x = T["x"]
-   S,y = R["y"]
-   U,z = S["z"]
-   for iter = 1:maxIter
-      f = rand(U, 0:degmax, 0:degmax, 0:degmax, -2^bitsize:2^bitsize)
-      c1 = rand(T, -2^bitsize:2^bitsize)
-      c2 = rand(T, -2^bitsize:2^bitsize)
+
+   # Inexact field
+   R, x = JuliaRealField["x"]
+   for iter = 1:500
+      f = rand(R, 0:10, -1:1)
+      c1 = rand(JuliaZZ, -10:10)
+      c2 = rand(JuliaZZ, -10:10)
+      d1 = rand(JuliaRealField, -1:1)
+      d2 = rand(JuliaRealField, -1:1)
+
+      @test isapprox(c1*f - c2*f, (c1 - c2)*f)
+      @test isapprox(c1*f + c2*f, (c1 + c2)*f)
+      @test isapprox(d1*f - d2*f, (d1 - d2)*f)
+      @test isapprox(d1*f + d2*f, (d1 + d2)*f)
+
+      @test isapprox(f*c1 - f*c2, f*(c1 - c2))
+      @test isapprox(f*c1 + f*c2, f*(c1 + c2))
+      @test isapprox(f*d1 - f*d2, f*(d1 - d2))
+      @test isapprox(f*d1 + f*d2, f*(d1 + d2))
+   end
+
+   # Non-integral domain
+   R = ResidueRing(JuliaZZ, 6)
+   S, x = R["x"]
+   for iter = 1:500
+      f = rand(S, 0:10, 0:5)
+      c1 = rand(JuliaZZ, -10:10)
+      c2 = rand(JuliaZZ, -10:10)
+      d1 = rand(zz, -10:10)
+      d2 = rand(zz, -10:10)
+      a1 = rand(R, 0:5)
+      a2 = rand(R, 0:5)
+
+      @test a1*f - a2*f == (a1 - a2)*f
+      @test a1*f + a2*f == (a1 + a2)*f
       @test c1*f - c2*f == (c1 - c2)*f
+      @test c1*f + c2*f == (c1 + c2)*f
+      @test d1*f - d2*f == (d1 - d2)*f
+      @test d1*f + d2*f == (d1 + d2)*f
+
+      @test f*a1 - f*a2 == f*(a1 - a2)
+      @test f*a1 + f*a2 == f*(a1 + a2)
+      @test f*c1 - f*c2 == f*(c1 - c2)
+      @test f*c1 + f*c2 == f*(c1 + c2)
+      @test f*d1 - f*d2 == f*(d1 - d2)
+      @test f*d1 + f*d2 == f*(d1 + d2)
    end
-#  Remi Imbach 31/07/17: end
+
+   # Generic tower
+   R, x = JuliaZZ["x"]
+   S, y = R["y"]
+   for iter = 1:100
+      f = rand(S, 0:10, 0:5, -10:10)
+      c1 = rand(JuliaZZ, -10:10)
+      c2 = rand(JuliaZZ, -10:10)
+      d1 = rand(R, 0:5, -10:10)
+      d2 = rand(R, 0:5, -10:10)
+
+      @test c1*f - c2*f == (c1 - c2)*f
+      @test c1*f + c2*f == (c1 + c2)*f
+      @test d1*f - d2*f == (d1 - d2)*f
+      @test d1*f + d2*f == (d1 + d2)*f
+
+      @test f*c1 - f*c2 == f*(c1 - c2)
+      @test f*c1 + f*c2 == f*(c1 + c2)
+      @test f*d1 - f*d2 == f*(d1 - d2)
+      @test f*d1 + f*d2 == f*(d1 + d2)
+   end
    println("PASS")
 end
 
