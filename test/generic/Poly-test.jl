@@ -123,7 +123,7 @@ function test_gen_poly_binary_ops()
 
    #  Exact ring
    R, x = PolynomialRing(JuliaZZ, "x")
-   for iter = 1:300
+   for iter = 1:200
       f = rand(R, 0:10, -10:10)
       g = rand(R, 0:10, -10:10)
       h = rand(R, 0:10, -10:10)
@@ -138,7 +138,7 @@ function test_gen_poly_binary_ops()
 
    #  Inexact field
    R, x = PolynomialRing(JuliaRealField, "x")
-   for iter = 1:300
+   for iter = 1:200
       f = rand(R, 0:10, -1:1)
       g = rand(R, 0:10, -1:1)
       h = rand(R, 0:10, -1:1)
@@ -153,7 +153,7 @@ function test_gen_poly_binary_ops()
    # Non-integral domain
    T = ResidueRing(JuliaZZ, 6)
    R, x = T["x"]
-   for iter = 1:300
+   for iter = 1:200
       f = rand(R, 0:10, 0:5)
       g = rand(R, 0:10, 0:5)
       h = rand(R, 0:10, 0:5)
@@ -409,150 +409,179 @@ end
 
 function test_gen_poly_unary_ops()
    print("Generic.Poly.unary_ops...")
-#  Remi Imbach 31/07/17: begin
-   R, x = JuliaZZ["x"]
-   maxIter = 100
-   degmax = 100
-   bitsize = 32
-   for iter = 1:maxIter
-      f = rand(R, 0:degmax, -2^bitsize:2^bitsize)
-      c1 = rand(JuliaZZ, -2^bitsize:2^bitsize)
-      mf = -f
-      @test -R(c1) == -c1
-      @test degree(mf) == degree(f)
-      for co = 1:degree(f) + 1
-        @test coeff(mf, co) == -coeff(f, co)
-      end
+
+   #  Exact ring
+   R, x = PolynomialRing(JuliaZZ, "x")
+   for iter = 1:300
+      f = rand(R, 0:10, -10:10)
+
+      @test -(-f) == f
+      @test iszero(f + (-f))
    end
-   #the same over Z/6Z
+
+   #  Inexact field
+   R, x = PolynomialRing(JuliaRealField, "x")
+   for iter = 1:300
+      f = rand(R, 0:10, -1:1)
+
+      @test -(-f) == f
+      @test iszero(f + (-f))
+   end
+
+   # Non-integral domain
    T = ResidueRing(JuliaZZ, 6)
    R, x = T["x"]
-   for iter = 1:maxIter
-      f = rand(R, 0:degmax, -2^bitsize:2^bitsize)
-      c1 = rand(T, -2^bitsize:2^bitsize)
-      mf = -f
-      @test -R(c1) == -c1
-      @test degree(mf) == degree(f)
-      for co = 1:degree(f) + 1
-        @test coeff(mf, co) == -coeff(f, co)
-      end
+   for iter = 1:300
+      f = rand(R, 0:10, 0:5)
+
+      @test -(-f) == f
+      @test iszero(f + (-f))
    end
-#  Remi Imbach 31/07/17: end
    println("PASS")
 end
 
 function test_gen_poly_truncation()
    print("Generic.Poly.truncation...")
-#  Remi Imbach 31/07/17: begin
-   R,x = JuliaZZ["x"]
-   maxIter = 100
-   degmax = 100
-   bitsize = 32
-   for iter = 1:maxIter
-      f = rand(R, 0:degmax, -2^bitsize:2^bitsize)
-      t = rand(1:degmax)
-      h = truncate(f, t)
-      @test degree(h) + 1 <= min(degree(f) + 1, t) # verify degree
-      for co = 1:degree(h) + 1 # verify each coeff
-         @test coeff(h, co - 1) == coeff(f, co - 1)
-      end
+
+   #  Exact ring
+   R, x = PolynomialRing(JuliaZZ, "x")
+   for iter = 1:300
+      f = rand(R, 0:10, -10:10)
+      g = rand(R, 0:10, -10:10)
+      n = rand(0:20)
+
+      @test truncate(f*g, n) == mullow(f, g, n)
    end
-#  the same over Z/6Z
+
+   #  Inexact field
+   R, x = PolynomialRing(JuliaRealField, "x")
+   for iter = 1:300
+      f = rand(R, 0:10, -1:1)
+      g = rand(R, 0:10, -1:1)
+      n = rand(0:20)
+
+      @test isapprox(truncate(f*g, n), mullow(f, g, n))
+   end
+
+   # Non-integral domain
    T = ResidueRing(JuliaZZ, 6)
-   R,x = T["x"]
-   for iter = 1:maxIter
-      f = rand(R, 0:degmax, -2^bitsize:2^bitsize)
-      t = rand(1:degmax)
-      h = truncate(f, t)
-      @test degree(h) + 1 <= min(degree(f) + 1, t) # verify degree
-      for co = 1:degree(h) + 1 # verify each coeff
-         @test coeff(h, co - 1) == coeff(f, co - 1)
-      end
+   R, x = T["x"]
+   for iter = 1:300
+      f = rand(R, 0:10, 0:5)
+      g = rand(R, 0:10, 0:5)
+      n = rand(0:20)
+
+      r = mullow(f, g, n)
+
+      @test truncate(f*g, n) == r
+      @test r == 0 || !iszero(lead(r))
    end
-#  Remi Imbach 31/07/17: end
    println("PASS")
 end
 
 function test_gen_poly_reverse()
    print("Generic.Poly.reverse...")
+
+   #  Exact ring
    R, x = JuliaZZ["x"]
-   maxIter = 100
-   degmax = 50
-   bitsize = 32
-   for iter = 1:maxIter
-      f = rand(R, 0:degmax, -2^bitsize:2^bitsize)
-      len = rand(length(f):degmax + 1)
-      f_rev = reverse(f, len)
-      if f == 0
-        @test f_rev == 0
-      else # count the number of trailing 0 coeffs
-        it = 0
-        while coeff(f, it) == 0
-            it += 1
-        end
-        @test length(f_rev) == len - it
-        for co = 1:length(f_rev)
-          @test coeff(f_rev, co - 1) == coeff(f, len - co)
-        end
+   for iter = 1:300
+      f = rand(R, 0:10, -10:10)
+      len = rand(length(f):12)
+      frev = reverse(f, len)
+      
+      shift = 0
+      for i = 1:len
+         if coeff(f, i - 1) != 0
+            break
+         end
+         shift += 1
       end
+
+      @test length(frev) == len - shift
+      @test f == reverse(frev, len)
    end
-#  the same over Z/6Z
+
+   #  Inexact field
+   R, x = PolynomialRing(JuliaRealField, "x")
+   for iter = 1:300
+      f = rand(R, 0:10, -1:1)
+      len = rand(length(f):12)
+      frev = reverse(f, len)
+      
+      shift = 0
+      for i = 1:len
+         if coeff(f, i - 1) != 0
+            break
+         end
+         shift += 1
+      end
+
+      @test length(frev) == len - shift
+      @test f == reverse(frev, len)
+   end
+
+   #  Non-integral domain
    T = ResidueRing(JuliaZZ, 6)
    R, x = T["x"]
-   for iter = 1:maxIter
-      f = rand(R, 0:degmax, -2^bitsize:2^bitsize)
-      len = rand(length(f):degmax + 1)
-      f_rev = reverse(f, len)
-      if f == 0
-        @test f_rev == 0
-      else # count the number of trailing 0 coeffs
-        it = 0
-        while coeff(f, it) == 0
-            it = it + 1
-        end
-        @test length(f_rev) == len - it
-        for co = 1:length(f_rev)
-          @test coeff(f_rev, co - 1) == coeff(f, len - co)
-        end
+   for iter = 1:300
+      f = rand(R, 0:10, 0:5)
+      len = rand(length(f):12)
+      frev = reverse(f, len)
+      
+      shift = 0
+      for i = 1:len
+         if coeff(f, i - 1) != 0
+            break
+         end
+         shift += 1
       end
+
+      @test length(frev) == len - shift
+      @test f == reverse(frev, len)
    end
-#  Remi Imbach 31/07/17: end
    println("PASS")
 end
 
 function test_gen_poly_shift()
    print("Generic.Poly.shift...")
-#  Remi Imbach 31/07/17: begin
+
+   # Exact ring
    R, x = JuliaZZ["x"]
-   maxIter = 100
-   degmax = 50
-   bitsize = 32
-   for iter = 1:maxIter
-      f = rand(R, 0:degmax, -2^bitsize:2^bitsize)
-      s = rand(0:degmax)
-      fsr = shift_right(f, s)
-      fsl = shift_left(f, s)
-      @test fsl == x^s*f
-      f_rev = reverse(f, degree(f) + 1)
-      f_rev_trun = truncate(f_rev, max(0, degree(f) + 1 - s))
-      f_rev_trun_rev = reverse(f_rev_trun, max(0, degree(f) + 1 - s))
-      @test fsr == f_rev_trun_rev
+   for iter = 1:300
+      f = rand(R, 0:10, -10:10)
+      s = rand(0:10)
+      g = s == 0 ? R() : rand(R, 0:s - 1, -1:1)
+
+      @test shift_right(shift_left(f, s) + g, s) == f
+      @test shift_left(f, s) == x^s*f
+      @test length(shift_right(f, s)) == max(0, length(f) - s)
    end
-#  the same over Z/6Z
+
+   # Inexact field
+   R, x = PolynomialRing(JuliaRealField, "x")
+   for iter = 1:300
+      f = rand(R, 0:10, -1:1)
+      s = rand(0:10)
+      g = s == 0 ? R() : rand(R, 0:s - 1, -1:1)
+
+      @test shift_right(shift_left(f, s) + g, s) == f
+      @test shift_left(f, s) == x^s*f
+      @test length(shift_right(f, s)) == max(0, length(f) - s)
+   end
+
+   # Non-integral domain
    T = ResidueRing(JuliaZZ, 6)
    R, x = T["x"]
-   for iter = 1:maxIter
-      f = rand(R, 0:degmax, 0:5)
-      s = rand(0:degmax)
-      fsr = shift_right(f, s)
-      fsl = shift_left(f, s)
-      @test fsl == x^s*f
-      f_rev = reverse(f, degree(f) + 1)
-      f_rev_trun = truncate(f_rev, max(0, degree(f) + 1 - s))
-      f_rev_trun_rev = reverse(f_rev_trun, max(0, degree(f) + 1 - s))
-      @test fsr == f_rev_trun_rev
+   for iter = 1:300
+      f = rand(R, 0:10, 0:5)
+      s = rand(0:10)
+      g = s == 0 ? R() : rand(R, 0:s - 1, -1:1)
+
+      @test shift_right(shift_left(f, s) + g, s) == f
+      @test shift_left(f, s) == x^s*f
+      @test length(shift_right(f, s)) == max(0, length(f) - s)
    end
-#  Remi Imbach 31/07/17: end
+
    println("PASS")
 end
 
