@@ -573,10 +573,10 @@ function *(a::T, b::Nemo.PolyElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    *(a::Union{Integer, Rational}, b::Nemo.PolyElem)
+    *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.PolyElem)
 > Return $a\times b$.
 """
-function *(a::Union{Integer, Rational}, b::Nemo.PolyElem)
+function *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.PolyElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -594,10 +594,10 @@ doc"""
 *(a::Nemo.PolyElem{T}, b::T) where {T <: RingElem} = b*a
 
 doc"""
-    *(a::Nemo.PolyElem, b::Union{Integer, Rational})
+    *(a::Nemo.PolyElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a\times b$.
 """
-*(a::Nemo.PolyElem, b::Union{Integer, Rational}) = b*a
+*(a::Nemo.PolyElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
 
 ###############################################################################
 #
@@ -744,10 +744,10 @@ doc"""
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
-    ==(x::Nemo.PolyElem, y::Union{Integer, Rational})
+    ==(x::Nemo.PolyElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Nemo.PolyElem, y::Union{Integer, Rational}) = ((length(x) == 0 && base_ring(x)(y) == 0)
+==(x::Nemo.PolyElem, y::Union{Integer, Rational, AbstractFloat}) = ((length(x) == 0 && base_ring(x)(y) == 0)
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
@@ -757,10 +757,10 @@ doc"""
 ==(x::T, y::Nemo.PolyElem{T}) where T <: RingElem = y == x
 
 doc"""
-    ==(x::Union{Integer, Rational}, y::Nemo.PolyElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.PolyElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Union{Integer, Rational}, y::Nemo.PolyElem) = y == x
+==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.PolyElem) = y == x
 
 ###############################################################################
 #
@@ -1034,6 +1034,9 @@ function divexact(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: RingElem
       lenf = length(f)
       q1 = d[lenf - leng + 1] = divexact(coeff(f, lenf - 1), coeff(g, leng - 1))
       f = f - shift_left(q1*g, lenf - leng)
+      if length(f) == lenf # inexact case
+         set_length!(f, normalise(f, lenf - 1))
+      end
    end
    q = parent(f)(d)
    set_length!(q, lenq)
@@ -1062,10 +1065,10 @@ function divexact(a::Nemo.PolyElem{T}, b::T) where {T <: RingElem}
 end
 
 doc"""
-    divexact(a::Nemo.PolyElem, b::Union{Integer, Rational})
+    divexact(a::Nemo.PolyElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact(a::Nemo.PolyElem, b::Union{Integer, Rational})
+function divexact(a::Nemo.PolyElem, b::Union{Integer, Rational, AbstractFloat})
    iszero(b) && throw(DivideError())
    z = parent(a)()
    fit!(z, length(a))
@@ -1089,7 +1092,7 @@ doc"""
 function mod(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    check_parent(f, g)
    if length(g) == 0
-      raise(DivideError())
+      throw(DivideError())
    end
    if length(f) >= length(g)
       f = deepcopy(f)
@@ -1118,14 +1121,14 @@ doc"""
 function divrem(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    check_parent(f, g)
    if length(g) == 0
-      raise(DivideError())
+      throw(DivideError())
    end
    if length(f) < length(g)
       return zero(parent(f)), f
    end
    f = deepcopy(f)
    binv = inv(lead(g)) 
-   g = binv*g
+   g = divexact(g, lead(g))
    qlen = length(f) - length(g) + 1
    q = parent(f)()
    fit!(q, qlen)
@@ -1268,7 +1271,7 @@ doc"""
 function divides(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(f, g)
    if length(g) == 0
-      raise(DivideError())
+      throw(DivideError())
    end
    if length(f) == 0
       return true, parent(f)()
@@ -1449,7 +1452,8 @@ function gcd(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.Re
       if iszero(a)
          return(a)
       else
-         return inv(lead(a))*a
+         d = lead(a)
+         return divexact(a, d)
       end
    end
    g = gcd(content(a), content(b))
@@ -1459,7 +1463,8 @@ function gcd(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.Re
       (a, b) = (mod(b, a), a)
    end
    b = g*b
-   return inv(lead(b))*b
+   d = lead(b)
+   return divexact(b, d)
 end
 
 doc"""
@@ -2059,29 +2064,30 @@ doc"""
 function gcdx(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    check_parent(a, b)
    if length(a) == 0
-      return b, zero(parent(a)), one(parent(a))
+      if length(b) == 0
+         return zero(parent(a)), zero(parent(a)), zero(parent(a))
+      else
+         d = lead(b)
+         return divexact(b, d), zero(parent(a)), divexact(one(parent(a)), d)
+      end
    end
    if length(b) == 0
-      return a, one(parent(a)), zero(parent(a))
+      d = lead(a)
+      return divexact(a, d), divexact(one(parent(a)), d), zero(parent(a))
    end
    swap = false
    if length(a) < length(b)
       a, b = b, a
       swap = true
    end
-   lena = length(a)
-   lenb = length(b)
    c1 = content(a)
    c2 = content(b)
    A = divexact(a, c1)
    B = divexact(b, c2)
    u1, u2 = parent(a)(inv(c1)), zero(parent(a))
    v1, v2 = zero(parent(a)), parent(a)(inv(c2))
-   while lenb > 0
-      d = lena - lenb
+   while length(B) > 0
       (Q, B), A = divrem(A, B), B
-      lena = lenb
-      lenb = length(B)
       u2, u1 = u1 - Q*u2, u2
       v2, v1 = v1 - Q*v2, v2 
    end
@@ -2090,8 +2096,8 @@ function gcdx(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.R
    end
    d = gcd(c1, c2)
    A, u1, v1 = d*A, d*u1, d*v1
-   d = inv(lead(A))
-   return d*A, d*u1, d*v1
+   d = lead(A)
+   return divexact(A, d), divexact(u1, d), divexact(v1, d)
 end
 
 doc"""
@@ -2102,17 +2108,18 @@ doc"""
 """
 function gcdinv(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    check_parent(a, b)
+   R = base_ring(a)
    if length(a) == 0
       if length(b) == 0
-         return zero(base_ring(a)), zero(parent(a))
+         return zero(parent(a)), zero(parent(a))
       else
-         d = inv(lead(b))
-         return b*d, zero(parent(a))
+         d = lead(b)
+         return divexact(b, d), zero(parent(a))
       end
    end
    if length(b) == 0
-      d = inv(lead(b))
-      return a*d, d
+      d = lead(a)
+      return divexact(a, d), inv(d)
    end
    if length(a) < length(b)
       a, b = b, a
@@ -2137,8 +2144,8 @@ function gcdinv(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo
    end
    d = gcd(c1, c2)
    A, u1 = d*A, d*u1
-   d = inv(lead(A))
-   return d*A, d*u1
+   d = lead(A)
+   return divexact(A, d), divexact(u1, d)
 end
 
 ###############################################################################
@@ -2527,7 +2534,7 @@ function (a::PolyRing{T})() where {T <: RingElement}
    return z
 end
 
-function (a::PolyRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
+function (a::PolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
    z = Poly{T}(base_ring(a)(b))
    z.parent = a
    return z

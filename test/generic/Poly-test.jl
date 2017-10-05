@@ -123,7 +123,7 @@ function test_gen_poly_binary_ops()
 
    #  Exact ring
    R, x = PolynomialRing(JuliaZZ, "x")
-   for iter = 1:200
+   for iter = 1:100
       f = rand(R, 0:10, -10:10)
       g = rand(R, 0:10, -10:10)
       h = rand(R, 0:10, -10:10)
@@ -138,7 +138,7 @@ function test_gen_poly_binary_ops()
 
    #  Inexact field
    R, x = PolynomialRing(JuliaRealField, "x")
-   for iter = 1:200
+   for iter = 1:100
       f = rand(R, 0:10, -1:1)
       g = rand(R, 0:10, -1:1)
       h = rand(R, 0:10, -1:1)
@@ -153,7 +153,7 @@ function test_gen_poly_binary_ops()
    # Non-integral domain
    T = ResidueRing(JuliaZZ, 6)
    R, x = T["x"]
-   for iter = 1:200
+   for iter = 1:100
       f = rand(R, 0:10, 0:5)
       g = rand(R, 0:10, 0:5)
       h = rand(R, 0:10, 0:5)
@@ -588,11 +588,11 @@ end
 function test_gen_poly_powering()
    print("Generic.Poly.powering...")
 
+   # Exact ring
    R, x = PolynomialRing(JuliaZZ, "x")
 
    for iter = 1:10
       f = rand(R, 0:10, -10:10)
-
       r2 = R(1)
 
       for expn = 0:10
@@ -604,15 +604,30 @@ function test_gen_poly_powering()
       end
    end
 
+   # Inexact field
+   R, x = PolynomialRing(JuliaRealField, "x")
+
+   for iter = 1:10
+      f = rand(R, 0:10, -1:1)
+      r2 = R(1)
+
+      for expn = 0:10
+         r1 = f^expn
+
+         @test (f == 0 && expn == 0 && r1 == 0) || isapprox(r1, r2)        
+
+         r2 *= f
+      end
+   end
+
+   # Non-integral domain
    for iter = 1:10
       n = rand(2:26)
 
       Zn = ResidueRing(JuliaZZ, n)
-
       R, x = PolynomialRing(Zn, "x")
 
       f = rand(R, 0:10, 0:n - 1)
-
       r2 = R(1)
 
       for expn = 0:10
@@ -624,13 +639,13 @@ function test_gen_poly_powering()
       end
    end
    
-
    println("PASS")
 end
 
 function test_gen_poly_modular_arithmetic()
    print("Generic.Poly.modular_arithmetic...")
 
+   # Exact ring
    R = ResidueRing(JuliaZZ, 23)
    S, x = PolynomialRing(R, "x")
 
@@ -674,6 +689,50 @@ function test_gen_poly_modular_arithmetic()
       end
    end
 
+   # Inexact field
+   S, x = PolynomialRing(JuliaRealField, "x")
+
+   for iter = 1:100
+      f = rand(S, 0:5, -1:1)
+      g = rand(S, 0:5, -1:1)
+      h = rand(S, 0:5, -1:1)
+      k = R()
+      while k == 0
+         k = rand(S, 0:5, -1:1)
+      end
+
+      @test isapprox(mulmod(mulmod(f, g, k), h, k), mulmod(f, mulmod(g, h, k), k))
+   end
+
+   for iter = 1:100
+      f = S()
+      g = S()
+      while f == 0 || g == 0 || gcd(f, g) != 1
+         f = rand(S, 0:5, -1:1)
+         g = rand(S, 0:5, -1:1)
+      end
+
+      @test isapprox(mulmod(invmod(f, g), f, g), mod(S(1), g))
+   end
+
+   for iter = 1:100
+      f = rand(S, 0:5, -1:1)
+      g = S()
+      while g == 0
+         g = rand(S, 0:5, -1:1)
+      end
+      p = mod(S(1), g)
+
+      for expn = 0:5
+         r = powmod(f, expn, g)
+
+         @test (f == 0 && expn == 0 && r == 0) || isapprox(r, p)
+
+         p = mulmod(p, f, g)
+      end
+   end
+
+   # Exact field
    R, x = PolynomialRing(JuliaQQ, "y")
 
    for iter = 1:10
