@@ -1137,7 +1137,7 @@ end
 #
 ###############################################################################
 
-function *(a::MPoly, n::Union{Integer, Rational})
+function *(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
    N = size(a.exps, 1)
    r = parent(a)()
    fit!(r, length(a))
@@ -1173,7 +1173,7 @@ function *(a::MPoly{T}, n::T) where {T <: RingElem}
    return r
 end
 
-*(n::Union{Integer, Rational}, a::MPoly) = a*n
+*(n::Union{Integer, Rational, AbstractFloat}, a::MPoly) = a*n
 
 *(n::T, a::MPoly{T}) where {T <: RingElem} = a*n
 
@@ -1207,7 +1207,7 @@ end
 #
 ###############################################################################
 
-function ==(a::MPoly, n::Union{Integer, Rational})
+function ==(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
    N = size(a.exps, 1)
    if n == 0
       return a.length == 0
@@ -2889,7 +2889,7 @@ function (a::MPolyRing{T})() where {T <: RingElement}
    return z
 end
 
-function (a::MPolyRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
+function (a::MPolyRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
    z = MPoly{T}(a, base_ring(a)(b))
    return z
 end

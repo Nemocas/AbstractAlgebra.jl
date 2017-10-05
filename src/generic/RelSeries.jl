@@ -491,10 +491,10 @@ function *(a::T, b::Nemo.RelSeriesElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    *(a::Union{Integer, Rational}, b::Nemo.RelSeriesElem)
+    *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.RelSeriesElem)
 > Return $a\times b$.
 """
-function *(a::Union{Integer, Rational}, b::Nemo.RelSeriesElem)
+function *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.RelSeriesElem)
    len = pol_length(b)
    z = parent(b)()
    fit!(z, len)
@@ -515,10 +515,10 @@ doc"""
 *(a::Nemo.RelSeriesElem{T}, b::T) where {T <: RingElem} = b*a
 
 doc"""
-    *(a::Nemo.RelSeriesElem, b::Union{Integer, Rational})
+    *(a::Nemo.RelSeriesElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a\times b$.
 """
-*(a::Nemo.RelSeriesElem, b::Union{Integer, Rational}) = b*a
+*(a::Nemo.RelSeriesElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
 
 ###############################################################################
 #
@@ -745,18 +745,18 @@ doc"""
 ==(x::T, y::Nemo.RelSeriesElem{T}) where {T <: RingElem} = y == x
 
 doc"""
-    ==(x::Nemo.RelSeriesElem, y::Union{Integer, Rational})
+    ==(x::Nemo.RelSeriesElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Nemo.RelSeriesElem, y::Union{Integer, Rational}) = precision(x) == 0 ||
+==(x::Nemo.RelSeriesElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 ||
                   ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 && 
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
 doc"""
-    ==(x::Union{Integer, Rational}, y::Nemo.RelSeriesElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.RelSeriesElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Union{Integer, Rational}, y::Nemo.RelSeriesElem) = y == x
+==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.RelSeriesElem) = y == x
 
 ###############################################################################
 #
@@ -790,10 +790,10 @@ end
 ###############################################################################
 
 doc"""
-    divexact(a::Nemo.RelSeriesElem, b::Union{Integer, Rational})
+    divexact(a::Nemo.RelSeriesElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact(x::Nemo.RelSeriesElem, y::Union{Integer, Rational})
+function divexact(x::Nemo.RelSeriesElem, y::Union{Integer, Rational, AbstractFloat})
    y == 0 && throw(DivideError())
    lenx = pol_length(x)
    z = parent(x)()
@@ -1123,7 +1123,7 @@ function (a::RelSeriesRing{T})() where {T <: RingElement}
    return z
 end
 
-function (a::RelSeriesRing{T})(b::Union{Integer, Rational}) where {T <: RingElement}
+function (a::RelSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
    if b == 0
       z = RelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
    else
