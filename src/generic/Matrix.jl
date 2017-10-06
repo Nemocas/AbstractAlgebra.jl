@@ -6,14 +6,14 @@
 
 export MatrixSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
-       ishessenberg, charpoly_hessenberg!, minpoly, typed_hvcat, typed_hcat,
-       powers, similarity!, solve, solve_rational, hnf, hnf_with_trafo, snf,
-       snf_with_trafo, weak_popov, weak_popov_with_trafo, extended_weak_popov,
-       extended_weak_popov_with_trafo, rank_profile_popov, hnf_via_popov, 
-       hnf_via_popov_with_trafo, popov, det_popov, _check_dim, rows, cols,
-       gram, rref, rref!, swap_rows, swap_rows!, hnf_kb, hnf_kb_with_trafo,
-       hnf_cohen, hnf_cohen_with_trafo, snf_kb, snf_kb_with_trafo,
-       find_pivot_popov, inv!
+       ishessenberg, charpoly_hessenberg!, matrix, minpoly, typed_hvcat,
+       typed_hcat, powers, similarity!, solve, solve_rational, hnf,
+       hnf_with_trafo, snf, snf_with_trafo, weak_popov, weak_popov_with_trafo,
+       extended_weak_popov, extended_weak_popov_with_trafo, rank_profile_popov,
+       hnf_via_popov, hnf_via_popov_with_trafo, popov, det_popov, _check_dim,
+       rows, cols, gram, rref, rref!, swap_rows, swap_rows!, hnf_kb,
+       hnf_kb_with_trafo, hnf_cohen, hnf_cohen_with_trafo, snf_kb,
+       snf_kb_with_trafo, find_pivot_popov, inv!, zero_matrix
 
 ###############################################################################
 #
@@ -724,13 +724,8 @@ doc"""
     transpose(x::Nemo.MatElem)
 > Return the transpose of the given matrix.
 """
-function transpose(x::Nemo.MatElem)
-   if rows(x) == cols(x)
-      par = parent(x)
-   else
-      par = MatrixSpace(base_ring(x), cols(x), rows(x))
-   end
-   return par(permutedims(x.entries, [2, 1]))
+function transpose(x::Mat)
+   return matrix(base_ring(x), permutedims(x.entries, [2, 1]))
 end
 
 ###############################################################################
@@ -1754,7 +1749,7 @@ function solve_interpolation(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <:
    end
    # bound from xd = (M*)b where d is the det
    bound = (maxlen - 1)*(m - 1) + max(maxlenb, maxlen)
-   tmat = Matrix(base_ring(R), 0, 0, elem_type(base_ring(R))[])
+   tmat = matrix(base_ring(R), 0, 0, elem_type(base_ring(R))[])
    V = Array{typeof(tmat)}(bound)
    d = Array{elem_type(base_ring(R))}(bound)
    y = Array{elem_type(base_ring(R))}(bound)
@@ -3803,6 +3798,56 @@ function (a::MatSpace{T})(b::Array{S, 1}) where {S <: RingElement, T <: RingElem
    _check_dim(a.rows, a.cols, b)
    b = reshape(b, a.cols, a.rows)'
    z = a(b)
+   return z
+end
+
+################################################################################
+#
+#   Matrix constructors
+#
+################################################################################
+
+doc"""
+    matrix(R::Ring, arr::Array{T, 2}) where {T} -> MatElem{T}
+
+> Constructs the matrix over $R$ with entries as in `arr`.
+"""
+function matrix(R::Ring, arr::Array{T, 2}) where {T}
+   arr_coerce = map(R, arr)
+   z = Mat{elem_type(R)}(arr_coerce)
+   z.base_ring = R
+   return z
+end
+
+doc"""
+    matrix(R::Ring, r::Int, c::Int, arr::Array{T, 1}) where {T} -> MatElem{T}
+
+> Constructs the $r \times c$ matrix over $R$, where the entries are taken
+> row-wise from `arr`.
+"""
+function matrix(R::Ring, r::Int, c::Int, arr::Array{T, 1}) where T
+   _check_dim(r, c, arr)
+   arr_coerce = map(R, arr)
+   z = Mat{elem_type(R)}(r, c, arr_coerce)
+   z.base_ring = R
+   return z
+end
+
+################################################################################
+#
+#   Zero matrix
+#
+################################################################################
+
+function zero_matrix(R::Ring, r::Int, c::Int)
+   arr = Array{elem_type(R)}(r, c)
+   for i in 1:r
+      for j in 1:c
+         arr[i, j] = zero(R)
+      end
+   end
+   z = Mat{elem_type(R)}(arr)
+   z.base_ring = R
    return z
 end
 

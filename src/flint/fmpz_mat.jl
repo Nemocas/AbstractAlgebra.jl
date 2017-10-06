@@ -1227,6 +1227,50 @@ end
 
 ###############################################################################
 #
+#   Matrix constructor
+#
+###############################################################################
+
+function matrix(R::FlintIntegerRing, arr::Array{fmpz, 2})
+   z = fmpz_mat(size(arr, 1), size(arr, 2), arr)
+   z.base_ring = FlintZZ
+   return z
+end
+
+function matrix(R::FlintIntegerRing, arr::Array{<: Integer, 2})
+   z = fmpz_mat(size(arr, 1), size(arr, 2), arr)
+   z.base_ring = FlintZZ
+   return z
+end
+
+function matrix(R::FlintIntegerRing, r::Int, c::Int, arr::Array{fmpz, 1})
+   _check_dim(r, c, arr)
+   z = fmpz_mat(r, c, arr)
+   z.base_ring = FlintZZ
+   return z
+end
+
+function matrix(R::FlintIntegerRing, r::Int, c::Int, arr::Array{<: Integer, 1})
+   _check_dim(r, c, arr)
+   z = fmpz_mat(r, c, arr)
+   z.base_ring = FlintZZ
+   return z
+end
+
+###############################################################################
+#
+#  Zero matrix
+#
+###############################################################################
+
+function zero_matrix(R::FlintIntegerRing, r::Int, c::Int)
+   z = fmpz_mat(r, c)
+   z.base_ring = FlintZZ
+   return z
+end
+
+###############################################################################
+#
 #   MatrixSpace constructor
 #
 ###############################################################################
