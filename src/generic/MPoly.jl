@@ -387,9 +387,8 @@ end
 #
 ###############################################################################
 
-function show(io::IO, x::MPoly)
+function show(io::IO, x::MPoly, U::Array{<: AbstractString, 1}) 
     len = length(x)
-    U = [string(x) for x in vars(parent(x))]
     if len == 0
       print(io, base_ring(x)(0))
     else
@@ -447,6 +446,12 @@ function show(io::IO, x::MPoly)
         end      
     end
   end
+end
+
+function show(io::IO, x::MPoly)
+    len = length(x)
+    U = [string(x) for x in vars(parent(x))]
+    show(io, x, U)
 end
 
 function show(io::IO, p::MPolyRing)
