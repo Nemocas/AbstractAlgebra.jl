@@ -15,7 +15,7 @@ export PolynomialRing, hash, coeff, isgen, lead,
        pow_multinomial, monomial_to_newton!, newton_to_monomial!, ismonomial,
        base_ring, parent_type, elem_type, check_parent, promote_rule,
        needs_parentheses, isnegative, show_minus_one, remove, zero!, add!,
-       interpolate
+       interpolate, sylvester_matrix
 
 ###############################################################################
 #
@@ -1813,11 +1813,11 @@ function resultant_lehmer(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: 
    return c1^(lB - 1)*c2^(lA - 1)*s*sgn
 end
 
-function resultant_sylvester(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where T <: RingElement
+function sylvester_matrix(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where T <: RingElement
    check_parent(p, q)
    R = base_ring(p)
    if length(p) == 0 || length(q) == 0
-      return zero(R)
+      return Nemo.MatrixSpace(R, 0, 0)()
    end
    m = degree(p)
    n = degree(q)
@@ -1832,8 +1832,14 @@ function resultant_sylvester(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where T <
          M[i + n, n - j + i] = coeff(q, j)
        end 
    end
-   return det_df(M)
+   return M
 end
+
+function resultant_sylvester(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where T <: RingElement
+   check_parent(p, q)
+   return det_df(sylvester_matrix(p, q))
+end
+
 
 function resultant(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where {T <: RingElement}
   R = parent(p)
