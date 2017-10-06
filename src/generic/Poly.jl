@@ -1837,6 +1837,10 @@ end
 
 function resultant_sylvester(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where T <: RingElement
    check_parent(p, q)
+   R = base_ring(p)
+   if length(p) == 0 || length(q) == 0
+      return R(0)
+   end
    return det_df(sylvester_matrix(p, q))
 end
 
