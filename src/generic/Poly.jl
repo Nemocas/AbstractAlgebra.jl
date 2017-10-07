@@ -769,6 +769,7 @@ doc"""
 ###############################################################################
 
 function Base.isapprox(f::Nemo.PolyElem, g::Nemo.PolyElem; atol::Real=sqrt(eps()))
+   check_parent(f, g)
    nmin = min(length(f), length(g))
    i = 1
    while i <= nmin
@@ -790,6 +791,14 @@ function Base.isapprox(f::Nemo.PolyElem, g::Nemo.PolyElem; atol::Real=sqrt(eps()
       i += 1
    end
    return true
+end
+
+function Base.isapprox(f::Nemo.PolyElem{T}, g::T; atol::Real=sqrt(eps())) where T
+   return isapprox(f, parent(f)(g); atol=atol)
+end
+
+function Base.isapprox(f::T, g::Nemo.PolyElem{T}; atol::Real=sqrt(eps())) where T
+   return isapprox(parent(g)(f), g; atol=atol)
 end
 
 ###############################################################################
@@ -1233,8 +1242,34 @@ doc"""
 >
 > See also `valuation`, which only returns the valuation.
 """
-function remove(z::Nemo.PolyElem{T}, p::Nemo.PolyElem{T}) where {T <: RingElement}
-  check_parent(z,p)
+function remove(z::Nemo.PolyElem{T}, p::Nemo.PolyElem{T}) where T <: RingElement
+  check_parent(z, p)
+  !isexact(parent(z)) && error("remove requires an exact ring")
+  z == 0 && error("Not yet implemented")
+  flag, q = divides(z, p)
+  if !flag
+    return 0, z
+  end
+  v = 0
+  qn = q
+  while flag
+    q = qn
+    flag, qn = divides(q, p)
+    v += 1
+  end
+  return v, q
+end
+
+doc"""
+    remove{T <: Union{Nemo.ResElem, FieldElement}}(z::Nemo.PolyElem{T}, p::Nemo.PolyElem{T})
+> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
+>
+> See also `valuation`, which only returns the valuation.
+"""
+function remove(z::Nemo.PolyElem{T}, p::Nemo.PolyElem{T}) where T <: Union{Nemo.ResElem, FieldElement}
+  check_parent(z, p)
+  !isexact(parent(z)) && error("remove requires an exact ring")
   z == 0 && error("Not yet implemented")
   q, r = divrem(z, p)
   if !iszero(r)
@@ -1270,6 +1305,7 @@ doc"""
 """
 function divides(f::Nemo.PolyElem{T}, g::Nemo.PolyElem{T}) where {T <: RingElement}
    check_parent(f, g)
+   !isexact(parent(f)) && error("divides requires an exact ring")
    if length(g) == 0
       throw(DivideError())
    end
@@ -2043,10 +2079,6 @@ function resx(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: RingElement}
    if swap
       u2, v2 = v2, u2
    end
-   u = canonical_unit(res)
-   res = divexact(res, u)
-   u2 = divexact(u2, u)
-   v2 = divexact(v2, u)
    return res, u2, v2
 end
 
@@ -2063,6 +2095,7 @@ doc"""
 """
 function gcdx(a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) where {T <: Union{Nemo.ResElem, FieldElement}}
    check_parent(a, b)
+   !isexact(base_ring(a)) && error("gcdx requires exact Bezout domain") 
    if length(a) == 0
       if length(b) == 0
          return zero(parent(a)), zero(parent(a)), zero(parent(a))
@@ -2237,8 +2270,12 @@ function interpolate(S::Nemo.PolyRing, x::Array{T, 1}, y::Array{T, 1}) where {T 
          p = P[j] - t
          q = x[j] - x[j - i + 1]
          t = P[j]
-         flag, P[j] = divides(p, q)
-         flag == false && error("Not an exact division in interpolate")
+         if isexact(S)
+            flag, P[j] = divides(p, q)
+            flag == false && error("Not an exact division in interpolate")
+         else
+            P[j] = divexact(p, q)
+         end
       end
    end
    newton_to_monomial!(P, x)

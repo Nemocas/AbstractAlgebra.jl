@@ -106,6 +106,8 @@ end
 
 divexact(a::T, b::T) where T <: Integer = div(a, b)
 
+divexact(a::BigInt, b::T) where T <: Integer = div(a, b)
+
 ###############################################################################
 #
 #   GCD
