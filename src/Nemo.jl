@@ -213,7 +213,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  isgen, ishessenberg, ismonomial, isnegative, isone, isreverse,
                  isrimhook, isrref, isterm, isunit, lcm, lead, length,
                  leglength, main_variable, main_variable_extract,
-                 main_variable_insert, matrix_repr, max_degrees, max_precision,
+                 main_variable_insert, matrix, matrix_repr, max_degrees, max_precision,
                  minpoly, mod, modulus, monomial_iszero, monomial_set!,
                  monomial_to_newton!, mul!, mul_classical, mul_karatsuba,
                  mul_ks, mullow, mulmod, needs_parentheses,
@@ -229,7 +229,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  snf_kb, snf_kb_with_trafo, snf_with_trafo, solve,
                  solve_rational, solve_triu, subst, swap_rows, swap_rows!,
                  trail, truncate, typed_hcat, typed_hvcat, valuation, var,
-                 vars, weak_popov, weak_popov_with_trafo, zero, zero!
+                 vars, weak_popov, weak_popov_with_trafo, zero, zero!, zero_matrix
 
 export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  characteristic, charpoly, charpoly_danilevsky!,
@@ -248,7 +248,7 @@ export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  isgen, ishessenberg, ismonomial, isnegative, isone, isreverse,
                  isrimhook, isrref, isterm, isunit, iszero, lcm, lead,
                  leglength, length, main_variable, main_variable_extract,
-                 main_variable_insert, matrix_repr, max_degrees, max_precision,
+                 main_variable_insert, matrix, matrix_repr, max_degrees, max_precision,
                  minpoly, mod, modulus, monomial_iszero, monomial_set!,
                  monomial_to_newton!, mul!, mul_classical, mul_karatsuba,
                  mul_ks, mullow, mulmod, needs_parentheses,
@@ -264,7 +264,7 @@ export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  snf_kb, snf_kb_with_trafo, snf_with_trafo, solve,
                  solve_rational, solve_triu, subst, swap_rows, swap_rows!,
                  trail, truncate, typed_hcat, typed_hvcat, valuation, var,
-                 vars, weak_popov, weak_popov_with_trafo, zero, zero!
+                 vars, weak_popov, weak_popov_with_trafo, zero, zero!, zero_matrix
 
 function PermGroup(n::Int, cached=true)
    Generic.PermGroup(n, cached)
@@ -356,7 +356,7 @@ getindex(R::Tuple{Ring, T}, s::String) where {T} = PolynomialRing(R[1], s)
 
 ###############################################################################
 #
-#   Matrix M = R[...] syntax and Matrix constructor
+#   Matrix M = R[...] syntax
 #
 ################################################################################
 
@@ -371,7 +371,7 @@ function typed_hvcat(R::Ring, dims, d...)
          A[i, j] = R(d[(i - 1)*c + j])
       end
    end 
-   S = MatrixSpace(R, r, c)(A)
+   S = matrix(R, A)
    return S
 end
 
@@ -382,19 +382,17 @@ function typed_hcat(R::Ring, d...)
    for i = 1:r
       A[1, i] = R(d[i])
    end
-   S = MatrixSpace(R, 1, r)
-   return S(A)
+   S = matrix(R, A)
+   return S
 end
 
-function Base.Matrix(R::Nemo.Ring, r::Int, c::Int, a::Array{T, 2}) where T <: RingElement
-   M = MatrixSpace(R, r, c)
-   return M(a)
-end
+###############################################################################
+#
+#   Load error objects
+#
+###############################################################################
 
-function Base.Matrix(R::Nemo.Ring, r::Int, c::Int, a::Array{T, 1}) where T <: RingElement
-   M = MatrixSpace(R, r, c)
-   return M(a)
-end
+include("error.jl")
 
 ###############################################################################
 #
@@ -532,52 +530,6 @@ ComplexField = AcbField
 NumberField = AnticNumberField
 CyclotomicField = AnticCyclotomicField
 MaximalRealSubfield = AnticMaximalRealSubfield
-
-###############################################################################
-#
-#   Error objects
-#
-###############################################################################
-
-mutable struct ErrorConstrDimMismatch <: Exception
-  expect_r::Int
-  expect_c::Int
-  get_r::Int
-  get_c::Int
-  get_l::Int
-
-  function ErrorConstrDimMismatch(er::Int, ec::Int, gr::Int, gc::Int)
-    e = new(er, ec, gr, gc, -1)
-    return e
-  end
-
-  function ErrorConstrDimMismatch(er::Int, ec::Int, gl::Int)
-    e = new(er, ec, -1, -1, gl)
-    return e
-  end
-
-  function ErrorConstrDimMismatch(er::Int, ec::Int, a::Array{T, 2}) where {T}
-    gr, gc = size(a)
-    return ErrorConstrDimMismatch(er, ec, gr, gc)
-  end
-
-  function ErrorConstrDimMismatch(er::Int, ec::Int, a::Array{T, 1}) where {T}
-    gl = length(a)
-    return ErrorConstrDimMismatch(er, ec, gl)
-  end
-end
-
-function Base.showerror(io::IO, e::ErrorConstrDimMismatch)
-  if e.get_l == -1
-    print(io, "Expected dimension $(e.expect_r) x $(e.expect_c), ")
-    print(io, "got $(e.get_r) x $(e.get_c)")
-  else
-    print(io, "Expected an array of length $(e.expect_r * e.expect_c), ")
-    print(io, "got $(e.get_l)")
-  end
-end
-
-const error_dim_negative = ErrorException("Dimensions must be non-negative")
 
 ###############################################################################
 #

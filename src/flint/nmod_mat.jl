@@ -762,6 +762,37 @@ function (a::NmodMatSpace)(b::fmpz_mat)
   return z
 end
 
+###############################################################################
+#
+#   Matrix constructor
+#
+###############################################################################
+
+function matrix(R::NmodRing, arr::Array{<: Union{nmod, fmpz, Integer}, 2})
+   z = nmod_mat(size(arr, 1), size(arr, 2), R.n, arr)
+   z.base_ring = R
+   return z
+end
+
+function matrix(R::NmodRing, r::Int, c::Int, arr::Array{<: Union{nmod, fmpz, Integer}, 1})
+   _check_dim(r, c, arr)
+   z = nmod_mat(r, c, R.n, arr)
+   z.base_ring = R
+   return z
+end
+
+###############################################################################
+#
+#  Zero matrix
+#
+###############################################################################
+
+function zero_matrix(R::NmodRing, r::Int, c::Int)
+   z = nmod_mat(r, c, R.n)
+   z.base_ring = R
+   return z
+end
+
 ################################################################################
 #
 #  Matrix space constructor

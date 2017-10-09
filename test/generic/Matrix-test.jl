@@ -360,6 +360,31 @@ function test_gen_mat_constructors()
    @test_throws ErrorConstrDimMismatch S([t t^2 t^3 ; t^4 t^5 t^6 ; t^7 t^8 t^9 ; t t^2 t^3])
    @test_throws ErrorConstrDimMismatch S([t, t^2])
    @test_throws ErrorConstrDimMismatch S([t, t^2, t^3, t^4, t^5, t^6, t^7, t^8, t^9, t^10]) 
+
+   arr = [1 2; 3 4]
+   arr2 = [1, 2, 3, 4, 5, 6]
+
+   for T in [R, Int, BigInt, Rational{Int}, Rational{BigInt}]
+      M = matrix(R, map(T, arr))
+      @test isa(M, Generic.Mat{elem_type(R)})
+      @test M.base_ring == R
+      @test rows(M) == 2
+      @test cols(M) == 2
+
+      M2 = matrix(R, 2, 3, map(T, arr2))
+      @test isa(M2, Generic.Mat{elem_type(R)})
+      @test M2.base_ring == R
+      @test rows(M2) == 2
+      @test cols(M2) == 3
+      @test_throws ErrorConstrDimMismatch matrix(R, 2, 2, map(T, arr2))
+      @test_throws ErrorConstrDimMismatch matrix(R, 2, 4, map(T, arr2))
+   end
+
+   M3 = zero_matrix(R, 2, 3)
+
+   @test isa(M3, Generic.Mat{elem_type(R)})
+   @test M3.base_ring == R
+
    println("PASS")
 end
 
@@ -531,6 +556,23 @@ function test_gen_mat_adhoc_exact_division()
    @test divexact((1 + t)*A, 1 + t) == A
 
    println("PASS")
+end
+
+function test_gen_mat_transpose()
+   print("Generic.Mat.transpose...")
+
+   R, t = PolynomialRing(JuliaQQ, "t")
+   arr = [t + 1 t R(1); t^2 t t]
+   A = matrix(R, arr)
+   B = matrix(R, permutedims(arr, [2, 1]))
+   @test transpose(A) == B
+
+   arr = [t + 1 t; t^2 t]
+   A = matrix(R, arr)
+   B = matrix(R, permutedims(arr, [2, 1]))
+   @test transpose(A) == B
+
+   println("PASS")   
 end
 
 function test_gen_mat_gram()
@@ -1244,7 +1286,7 @@ function test_gen_row_swapping()
    println("PASS")
 end
 
-function test_gen_concat()
+function test_gen_mat_concat()
    print("Generic.Mat.concat...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
@@ -1455,7 +1497,7 @@ function test_gen_mat_weak_popov()
 
    R, x = PolynomialRing(JuliaQQ, "x")
 
-   A = Matrix(R, 3, 4, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
+   A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
    r = rank(A)
 
    P = weak_popov(A)
@@ -1470,7 +1512,7 @@ function test_gen_mat_weak_popov()
    
    S, y = PolynomialRing(F, "y")
 
-   B = Matrix(S, 3, 3, map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]))
+   B = matrix(S, map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]))
    s = rank(B)
 
    P = weak_popov(B)
@@ -1530,6 +1572,7 @@ function test_gen_mat()
    test_gen_mat_adhoc_comparison()
    test_gen_mat_powering()
    test_gen_mat_adhoc_exact_division()
+   test_gen_mat_transpose()
    test_gen_mat_gram()
    test_gen_mat_trace()
    test_gen_mat_content()
@@ -1546,7 +1589,7 @@ function test_gen_mat()
    test_gen_mat_charpoly()
    test_gen_mat_minpoly()
    test_gen_row_swapping()
-   test_gen_concat()
+   test_gen_mat_concat()
    test_gen_mat_hnf_kb()
    test_gen_mat_hnf_cohen()
    test_gen_mat_hnf()

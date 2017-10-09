@@ -814,6 +814,57 @@ end
 
 ###############################################################################
 #
+#   Matrix constructor
+#
+###############################################################################
+
+function matrix(R::AcbField, arr::Array{T, 2}) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, acb, AbstractString}}
+   z = acb_mat(size(arr, 1), size(arr, 2), arr, prec(R))
+   z.base_ring = R
+   return z
+end
+
+function matrix(R::AcbField, r::Int, c::Int, arr::Array{T, 1}) where {T <: Union{Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, acb, AbstractString}}
+   _check_dim(r, c, arr)
+   z = acb_mat(r, c, arr, prec(R))
+   z.base_ring = R
+   return z
+end
+
+function matrix(R::AcbField, arr::Array{<: Integer, 2})
+   arr_fmpz = map(fmpz, arr)
+   return matrix(R, arr_fmpz)
+end
+
+function matrix(R::AcbField, r::Int, c::Int, arr::Array{<: Integer, 1})
+   arr_fmpz = map(fmpz, arr)
+   return matrix(R, r, c, arr_fmpz)
+end
+
+function matrix(R::AcbField, arr::Array{Rational{T}, 2}) where {T <: Integer}
+   arr_fmpz = map(fmpq, arr)
+   return matrix(R, arr_fmpz)
+end
+
+function matrix(R::AcbField, r::Int, c::Int, arr::Array{Rational{T}, 1}) where {T <: Integer}
+   arr_fmpz = map(fmpq, arr)
+   return matrix(R, r, c, arr_fmpz)
+end
+
+###############################################################################
+#
+#  Zero matrix
+#
+###############################################################################
+
+function zero_matrix(R::AcbField, r::Int, c::Int)
+   z = acb_mat(r, c)
+   z.base_ring = R
+   return z
+end
+
+###############################################################################
+#
 #   Promotions
 #
 ###############################################################################

@@ -1886,11 +1886,11 @@ function sylvester_matrix(p::Nemo.PolyElem{T}, q::Nemo.PolyElem{T}) where T <: R
    check_parent(p, q)
    R = base_ring(p)
    if length(p) == 0 || length(q) == 0
-      return Nemo.MatrixSpace(R, 0, 0)()
+      return zero_matrix(R, 0, 0)
    end
    m = degree(p)
    n = degree(q)
-   M = Nemo.MatrixSpace(R, m + n, m + n)()
+   M = zero_matrix(R, m + n, m + n)
    for i = 1:n
       for j = m:-1:0
          M[i, m - j + i] = coeff(p, j)
