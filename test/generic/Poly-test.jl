@@ -1800,7 +1800,7 @@ function test_gen_poly_newton_representation()
       f = rand(R, 0:10, 0:22)
 
       g = deepcopy(f)
-      roots = [rand(Zn, 0:22) for i in 1:length(f)]
+      roots = elem_type(Zn)[rand(Zn, 0:22) for i in 1:length(f)]
       monomial_to_newton!(g.coeffs, roots)
       newton_to_monomial!(g.coeffs, roots)
 
