@@ -80,6 +80,11 @@ function test_acb_mat_constructors()
    @test isa(M3, acb_mat)
    @test M3.base_ring == CC
 
+   M4 = identity_matrix(CC, 3)
+
+   @test isa(M4, acb_mat)
+   @test M4.base_ring == CC
+
    println("PASS")
 end
 

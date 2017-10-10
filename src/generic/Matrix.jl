@@ -6,14 +6,15 @@
 
 export MatrixSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
-       ishessenberg, charpoly_hessenberg!, matrix, minpoly, typed_hvcat,
-       typed_hcat, powers, similarity!, solve, solve_rational, hnf,
-       hnf_with_trafo, snf, snf_with_trafo, weak_popov, weak_popov_with_trafo,
-       extended_weak_popov, extended_weak_popov_with_trafo, rank_profile_popov,
-       hnf_via_popov, hnf_via_popov_with_trafo, popov, det_popov, _check_dim,
-       rows, cols, gram, rref, rref!, swap_rows, swap_rows!, hnf_kb,
-       hnf_kb_with_trafo, hnf_cohen, hnf_cohen_with_trafo, snf_kb,
-       snf_kb_with_trafo, find_pivot_popov, inv!, zero_matrix
+       ishessenberg, identity_matrix, charpoly_hessenberg!, matrix, minpoly,
+       typed_hvcat, typed_hcat, powers, similarity!, solve, solve_rational,
+       hnf, hnf_with_trafo, snf, snf_with_trafo, weak_popov,
+       weak_popov_with_trafo, extended_weak_popov,
+       extended_weak_popov_with_trafo, rank_profile_popov, hnf_via_popov,
+       hnf_via_popov_with_trafo, popov, det_popov, _check_dim, rows, cols,
+       gram, rref, rref!, swap_rows, swap_rows!, hnf_kb, hnf_kb_with_trafo,
+       hnf_cohen, hnf_cohen_with_trafo, snf_kb, snf_kb_with_trafo,
+       find_pivot_popov, inv!, zero_matrix
 
 ###############################################################################
 #
@@ -3839,12 +3840,38 @@ end
 #
 ################################################################################
 
+doc"""
+    zero_matrix(R::Ring, r::Int, c::Int) -> MatElem
+
+> Return the $r \times c$ zero matrix over $R$.
+"""
 function zero_matrix(R::Ring, r::Int, c::Int)
    arr = Array{elem_type(R)}(r, c)
    for i in 1:r
       for j in 1:c
          arr[i, j] = zero(R)
       end
+   end
+   z = Mat{elem_type(R)}(arr)
+   z.base_ring = R
+   return z
+end
+
+################################################################################
+#
+#   Identity matrix
+#
+################################################################################
+
+doc"""
+    identity_matrix(R::Ring, n::Int) -> MatElem
+
+> Return the $n \times n$ identity matrix over $R$.
+"""
+function identity_matrix(R::Ring, n::Int)
+   arr = Array{elem_type(R)}(n, n)
+   for i in 1:n
+      arr[i, i] = one(R)
    end
    z = Mat{elem_type(R)}(arr)
    z.base_ring = R
