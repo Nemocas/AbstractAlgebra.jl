@@ -100,6 +100,11 @@ function test_fmpq_mat_constructors()
    @test isa(M3, fmpq_mat)
    @test M3.base_ring == FlintQQ
 
+   M4 = identity_matrix(FlintQQ, 3)
+
+   @test isa(M4, fmpq_mat)
+   @test M4.base_ring == FlintQQ
+
    println("PASS")
 end
 

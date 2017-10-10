@@ -77,6 +77,11 @@ function test_arb_mat_constructors()
    @test isa(M3, arb_mat)
    @test M3.base_ring == RR
 
+   M4 = identity_matrix(RR, 3)
+
+   @test isa(M4, arb_mat)
+   @test M4.base_ring == RR
+
    println("PASS")
 end
 

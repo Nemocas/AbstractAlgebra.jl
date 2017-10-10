@@ -150,6 +150,11 @@ function test_nmod_mat_constructors()
    @test isa(M3, nmod_mat)
    @test M3.base_ring == Z3
 
+   M4 = identity_matrix(Z3, 3)
+
+   @test isa(M4, nmod_mat)
+   @test M4.base_ring == Z3
+
   println("PASS")
 end
 

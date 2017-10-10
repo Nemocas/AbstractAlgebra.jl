@@ -56,6 +56,11 @@ function test_fmpz_mat_constructors()
    @test isa(M3, fmpz_mat)
    @test M3.base_ring == FlintZZ
 
+   M4 = identity_matrix(FlintZZ, 3)
+
+   @test isa(M4, fmpz_mat)
+   @test M4.base_ring == FlintZZ
+
    println("PASS")
 end
 

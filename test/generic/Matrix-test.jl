@@ -385,6 +385,11 @@ function test_gen_mat_constructors()
    @test isa(M3, Generic.Mat{elem_type(R)})
    @test M3.base_ring == R
 
+   M4 = identity_matrix(R, 3)
+
+   @test isa(M4, Generic.Mat{elem_type(R)})
+   @test M4.base_ring == R
+
    println("PASS")
 end
 
