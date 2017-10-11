@@ -8,8 +8,8 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
        ishessenberg, identity_matrix, charpoly_hessenberg!, matrix, minpoly,
        typed_hvcat, typed_hcat, powers, similarity!, solve, solve_rational,
-       hnf, hnf_with_trafo, snf, snf_with_trafo, weak_popov,
-       weak_popov_with_trafo, extended_weak_popov,
+       hnf, hnf_minors, hnf_minors_with_trafo, hnf_with_trafo, snf,
+       snf_with_trafo, weak_popov, weak_popov_with_trafo, extended_weak_popov,
        extended_weak_popov_with_trafo, rank_profile_popov, hnf_via_popov,
        hnf_via_popov_with_trafo, popov, det_popov, _check_dim, rows, cols,
        gram, rref, rref!, swap_rows, swap_rows!, hnf_kb, hnf_kb_with_trafo,
@@ -93,7 +93,7 @@ doc"""
 > Return the base ring $R$ of the matrix space that the supplied matrix $r$
 > belongs to.
 """
-base_ring(a::Nemo.MatElem) = a.base_ring
+base_ring(a::Nemo.MatElem{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
 
 doc"""
     parent(a::Nemo.MatElem)
@@ -164,7 +164,7 @@ cols(a::Nemo.MatElem) = size(a.entries, 2)
 Base.@propagate_inbounds function getindex(a::Nemo.MatElem, r::Int, c::Int)
    return a.entries[r, c]
 end
- 
+
 Base.@propagate_inbounds function setindex!(a::Nemo.MatElem, d::T, r::Int,
                                             c::Int) where T <: RingElement
     a.entries[r, c] = base_ring(a)(d)
@@ -825,7 +825,7 @@ end
 #   LU factorisation
 #
 ###############################################################################
-         
+
 function lufact!(P::Generic.perm, A::Nemo.MatElem{T}) where {T <: FieldElement}
    m = rows(A)
    n = cols(A)
@@ -2628,12 +2628,12 @@ end
 #
 ###############################################################################
 
-function hnf_cohen(A::Mat{T}) where {T <: RingElement}
+function hnf_cohen(A::MatElem{T}) where {T <: RingElement}
    H, U = hnf_cohen_with_trafo(A)
    return H
 end
 
-function hnf_cohen_with_trafo(A::Mat{T}) where {T <: RingElement}
+function hnf_cohen_with_trafo(A::MatElem{T}) where {T <: RingElement}
    H = deepcopy(A)
    m = rows(H)
    U = eye(A, m)
@@ -2641,7 +2641,7 @@ function hnf_cohen_with_trafo(A::Mat{T}) where {T <: RingElement}
    return H, U
 end
 
-function hnf_cohen!(H::Mat{T}, U::Mat{T}) where {T <: RingElement}
+function hnf_cohen!(H::MatElem{T}, U::MatElem{T}) where {T <: RingElement}
    m = rows(H)
    n = cols(H)
    l = min(m, n)
@@ -2704,15 +2704,276 @@ function hnf_cohen!(H::Mat{T}, U::Mat{T}) where {T <: RingElement}
    return nothing
 end
 
-function hnf_kb(A::Mat)
+#  Hermite normal form via Kannan-Bachem for matrices of full column rank
+#
+#  This is the algorithm of Kannan, Bachem, "Polynomial algorithms for computing
+#  the Smith and Hermite normal forms of an integer matrix", Siam J. Comput.,
+#  Vol. 8, No. 4, pp. 499-507.
+
+doc"""
+    hnf_minors(A::Mat) -> Mat
+> Compute the upper right row Hermite normal form of $A$ using the algorithm
+> of Kannan-Bachem.
+"""
+function hnf_minors(A::MatElem{T}) where {T <: RingElement}
+   H = deepcopy(A)
+   _hnf_minors!(H, similar(A, 0, 0), Val{false})
+   return H
+end
+
+doc"""
+    hnf_minors_with_trafo(A::Mat) -> Mat, Mat
+> Compute the upper right row Hermite normal form $H$ of $A$ and an invertible
+> matrix $U$ with $UA = H$ using the algorithm of Kannan-Bachem.
+"""
+function hnf_minors_with_trafo(A::MatElem{T}) where {T <: RingElement}
+   H = deepcopy(A)
+   U = similar(A, rows(A), rows(A))
+   _hnf_minors!(H, U, Val{true})
+   return H, U
+end
+
+function _hnf_minors!(H::MatElem{T}, U::MatElem{T}, with_transform::Type{Val{S}} = Val{false}) where {T <: RingElement, S}
+   m = rows(H)
+   n = cols(H)
+
+   l = m
+   k = 0
+
+   R = base_ring(H)
+
+   with_trafo = with_transform == Val{true} ? true : false
+
+   if with_trafo
+      for i in 1:m
+         for j in 1:m
+            if j == i
+               U[i, j] = one(R)
+            else
+               U[i, j] = zero(R)
+            end
+         end
+      end
+   end
+
+   t = zero(R)
+   b = zero(R)
+   t2 = zero(R)
+   r1d = zero(R)
+   r2d = zero(R)
+   q = zero(R)
+   minus_one = base_ring(H)(-1)
+
+   while k <= n - 1
+      k = k + 1
+      if k == 1 && !iszero(H[k, k])
+         for j2 in 1:n
+            H[k, j2] = deepcopy(H[k, j2])
+         end
+      end
+
+      # We have a matrix of form ( * * * * )
+      #                          ( 0 * * * )
+      #                          ( 0 0 * * ) <- k - 1
+      #                          ( * * * * ) <- k
+      # We want to produce zeroes in the first k entries
+      # of row k.
+
+      for j in 1:k-1
+         # Since we want to mutate the k-th row, first make a copy
+         if j == 1
+            for j2 in j:n
+               H[k, j2] = deepcopy(H[k, j2])
+            end
+         end
+
+         # Shortcuts
+         if iszero(H[k, j])
+            continue
+         end
+
+         di, q = divides(H[k, j], H[j, j])
+         if di
+            q = mul!(q, q, minus_one)
+            for j2 in j:n
+               t = mul!(t, q, H[j, j2])
+               H[k, j2] = add!(H[k, j2], H[k, j2], t)
+            end
+            if with_trafo
+               for j2 in 1:m
+                  t = mul!(t, q, U[j, j2])
+                  U[k, j2] = add!(U[k, j2], U[k, j2], t)
+               end
+            end
+            continue
+         end
+
+         # Generic case
+         d, u, v = gcdx(H[j, j], H[k, j])
+
+         r1d = divexact(H[j, j], d)
+         r2d = divexact(H[k, j], d)
+
+         mul!(r2d, r2d, minus_one)
+         for j2 in j:n
+            b = mul!(b, u, H[j, j2])
+            t2 = mul!(t2, v, H[k, j2])
+            H[k, j2] = mul!(H[k, j2], H[k, j2], r1d)
+            t = mul!(t, r2d, H[j, j2])
+            H[k, j2] = add!(H[k, j2], H[k, j2], t)
+            H[j, j2] = add!(H[j, j2], b, t2)
+         end
+         if with_trafo
+            for j2 in 1:m
+               b = mul!(b, u, U[j, j2])
+               t2 = mul!(t2, v, U[k, j2])
+               U[k, j2] = mul!(U[k, j2], U[k, j2], r1d)
+               t = mul!(t, r2d, U[j, j2])
+               U[k, j2] = add!(U[k, j2], U[k, j2], t)
+               U[j, j2] = add!(U[j, j2], b, t2)
+            end
+         end
+      end
+
+      if iszero(H[k, k])
+         swap_rows!(H, k, l)
+         if with_trafo
+            swap_rows!(U, k, l)
+         end
+         l = l - 1
+         k = k - 1
+         continue
+      end
+
+      u = canonical_unit(H[k, k])
+      if !isone(u)
+         u = R(inv(u))
+         for j in k:n
+            H[k, j] = mul!(H[k, j], H[k, j], u)
+         end
+         if with_trafo
+            for j in 1:m
+               U[k, j] = mul!(U[k, j], U[k, j], u)
+            end
+         end
+      end
+
+      for i in (k - 1):-1:1
+         for j in (i + 1):k
+            q = div(H[i, j], H[j, j])
+            if iszero(q)
+              continue
+            end
+            q = mul!(q, q, minus_one)
+            for j2 in j:n
+               t = mul!(t, q, H[j, j2])
+               H[i, j2] = add!(H[i, j2], H[i, j2], t)
+            end
+            if with_trafo
+               for j2 in 1:m
+                  t = mul!(t, q, U[j, j2])
+                  U[i, j2] = add!(U[i, j2], U[i, j2], t)
+               end
+            end
+         end
+      end
+      l = m
+   end
+
+   # Now the matrix is of form
+   # ( * * * )
+   # ( 0 * * )
+   # ( 0 0 * )
+   # ( * * * ) <- n + 1
+   # ( * * * )
+
+   for k in (n + 1):m
+      for j in 1:n
+         if j == 1
+            for j2 in 1:n
+               H[k, j2] = deepcopy(H[k, j2])
+            end
+         end
+
+         # We do the same shortcuts as above
+         if iszero(H[k, j])
+            continue
+         end
+
+         di, q = divides(H[k, j], H[j, j])
+         if di
+            q = mul!(q, q, minus_one)
+            for j2 in j:n
+               t = mul!(t, q, H[j, j2])
+               H[k, j2] = add!(H[k, j2], H[k, j2], t)
+            end
+            if with_trafo
+               for j2 in 1:m
+                  t = mul!(t, q, U[j, j2])
+                  U[k, j2] = add!(U[k, j2], U[k, j2], t)
+               end
+            end
+            continue
+         end
+
+         d, u, v = gcdx(H[j, j], H[k, j])
+         r1d = divexact(H[j, j], d)
+         r2d = divexact(H[k, j], d)
+         mul!(r2d, r2d, minus_one)
+         for j2 in j:n
+            b = mul!(b, u, H[j, j2])
+            t2 = mul!(t2, v, H[k, j2])
+            H[k, j2] = mul!(H[k, j2], H[k, j2], r1d)
+            t = mul!(t, r2d, H[j, j2])
+            H[k, j2] = add!(H[k, j2], H[k, j2], t)
+            H[j, j2] = add!(H[j, j2], b, t2)
+         end
+         if with_trafo
+            for j2 in 1:m
+               b = mul!(b, u, U[j, j2])
+               t2 = mul!(t2, v, U[k, j2])
+               U[k, j2] = mul!(U[k, j2], U[k, j2], r1d)
+               t = mul!(t, r2d, U[j, j2])
+               U[k, j2] = add!(U[k, j2], U[k, j2], t)
+               U[j, j2] = add!(U[j, j2], b, t2)
+            end
+         end
+      end
+      for i in n:-1:1
+         for j in (i + 1):n
+            q = div(H[i, j], H[j, j])
+            if iszero(q)
+              continue
+            end
+            q = mul!(q, q, minus_one)
+            for j2 in j:n
+               t = mul!(t, q, H[j, j2])
+               H[i, j2] = add!(H[i, j2], H[i, j2], t)
+            end
+            if with_trafo
+               for j2 in 1:m
+                  t = mul!(t, q, U[j, j2])
+                  U[i, j2] = add!(U[i, j2], U[i, j2], t)
+               end
+            end
+         end
+      end
+   end
+   return H
+end
+
+#  Hermite normal form for arbitrary matrices via a modification of the
+#  Kannan-Bachem algorithm
+
+function hnf_kb(A::MatElem{T}) where {T <: RingElement}
    return _hnf_kb(A, Val{false})
 end
 
-function hnf_kb_with_trafo(A::Mat)
+function hnf_kb_with_trafo(A::MatElem{T}) where {T <: RingElement}
    return _hnf_kb(A, Val{true})
 end
 
-function _hnf_kb(A::Mat, trafo::Type{Val{T}} = Val{false}) where T
+function _hnf_kb(A, trafo::Type{Val{T}} = Val{false}) where T
    H = deepcopy(A)
    m = rows(H)
    if trafo == Val{true}
@@ -2726,7 +2987,7 @@ function _hnf_kb(A::Mat, trafo::Type{Val{T}} = Val{false}) where T
    end
 end
 
-function kb_search_first_pivot(H::Mat, start_element::Int = 1)
+function kb_search_first_pivot(H, start_element::Int = 1)
    for r = start_element:rows(H)
       for c = start_element:cols(H)
          if !iszero(H[r,c])
@@ -2737,7 +2998,7 @@ function kb_search_first_pivot(H::Mat, start_element::Int = 1)
    return 0, 0
 end
 
-function kb_reduce_row!(H::Mat{T}, U::Mat{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool) where {T <: RingElement}
+function kb_reduce_row!(H::MatElem{T}, U::MatElem{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool) where {T <: RingElement}
    r = pivot[c]
    t = base_ring(H)()
    for i = c+1:cols(H)
@@ -2760,7 +3021,7 @@ function kb_reduce_row!(H::Mat{T}, U::Mat{T}, pivot::Array{Int, 1}, c::Int, with
    return nothing
 end
 
-function kb_reduce_column!(H::Mat{T}, U::Mat{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool, start_element::Int = 1) where {T <: RingElement}
+function kb_reduce_column!(H::MatElem{T}, U::MatElem{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool, start_element::Int = 1) where {T <: RingElement}
    r = pivot[c]
    t = base_ring(H)()
    for i = start_element:c-1
@@ -2783,7 +3044,7 @@ function kb_reduce_column!(H::Mat{T}, U::Mat{T}, pivot::Array{Int, 1}, c::Int, w
    return nothing
 end
 
-function kb_canonical_row!(H::Mat{T}, U::Mat{T}, r::Int, c::Int, with_trafo::Bool) where {T <: RingElement}
+function kb_canonical_row!(H, U, r::Int, c::Int, with_trafo::Bool)
    cu = canonical_unit(H[r,c])
    if cu != 1
       for j = c:cols(H)
@@ -2798,7 +3059,7 @@ function kb_canonical_row!(H::Mat{T}, U::Mat{T}, r::Int, c::Int, with_trafo::Boo
    return nothing
 end
 
-function kb_sort_rows!(H::Mat{T}, U::Mat{T}, pivot::Array{Int, 1}, with_trafo::Bool, start_element::Int = 1) where {T <:RingElement}
+function kb_sort_rows!(H::MatElem{T}, U::MatElem{T}, pivot::Array{Int, 1}, with_trafo::Bool, start_element::Int = 1) where {T <:RingElement}
    m = rows(H)
    n = cols(H)
    pivot2 = zeros(Int, m)
@@ -2808,7 +3069,7 @@ function kb_sort_rows!(H::Mat{T}, U::Mat{T}, pivot::Array{Int, 1}, with_trafo::B
       end
       pivot2[pivot[i]] = i
    end
-   
+
    r1 = start_element
    for i = start_element:n
       r2 = pivot[i]
@@ -2829,12 +3090,12 @@ function kb_sort_rows!(H::Mat{T}, U::Mat{T}, pivot::Array{Int, 1}, with_trafo::B
       r1 += 1
       if r1 == m
          break
-      end 
+      end
    end
    return nothing
 end
 
-function hnf_kb!(H::Mat{T}, U::Mat{T}, with_trafo::Bool = false, start_element::Int = 1) where {T <: RingElement}
+function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
    m = rows(H)
    n = cols(H)
    pivot = zeros(Int, n)
@@ -2911,7 +3172,7 @@ doc"""
     hnf{T <: RingElement}(A::Mat{T}) -> Mat{T}
 > Return the upper right row Hermite normal form of $A$.
 """
-function hnf(A::Mat{T}) where {T <: RingElement}
+function hnf(A::MatElem{T}) where {T <: RingElement}
   return hnf_kb(A)
 end
 
@@ -2920,7 +3181,7 @@ doc"""
 > Return the upper right row Hermite normal form $H$ of $A$ together with
 > invertible matrix $U$ such that $UA = H$.
 """
-function hnf_with_trafo(A::Mat{T}) where {T <: RingElement}
+function hnf_with_trafo(A)
   return hnf_kb_with_trafo(A)
 end
 
@@ -3869,7 +4130,7 @@ doc"""
 > Return the $n \times n$ identity matrix over $R$.
 """
 function identity_matrix(R::Ring, n::Int)
-   arr = Array{elem_type(R)}(n, n)
+   arr = zero_matrix(R, n, n)
    for i in 1:n
       arr[i, i] = one(R)
    end

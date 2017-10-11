@@ -1313,6 +1313,42 @@ function test_gen_mat_concat()
    println("PASS")   
 end
 
+function test_gen_mat_hnf_minors()
+  print("Generic.Mat.hnf_minors...")
+
+   R, x = PolynomialRing(JuliaQQ, "x")
+
+   M = MatrixSpace(R, 4, 3)
+
+   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
+
+   H = hnf_minors(A)
+   @test istriu(H)
+
+   H, U = hnf_minors_with_trafo(A)
+   @test istriu(H)
+   @test isunit(det(U))
+   @test U*A == H
+
+   F, a = FiniteField(7, 2, "a")
+
+   S, y = PolynomialRing(F, "y")
+
+   N = MatrixSpace(S, 4, 4)
+
+   B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5; y 1 y 2]))
+
+   H = hnf_minors(B)
+   @test istriu(H)
+
+   H, U = hnf_minors_with_trafo(B)
+   @test istriu(H)
+   @test isunit(det(U))
+   @test U*B == H
+
+   println("PASS")
+end
+
 function test_gen_mat_hnf_kb()
    print("Generic.Mat.hnf_kb...")
 
@@ -1595,6 +1631,7 @@ function test_gen_mat()
    test_gen_mat_minpoly()
    test_gen_row_swapping()
    test_gen_mat_concat()
+   test_gen_mat_hnf_minors()
    test_gen_mat_hnf_kb()
    test_gen_mat_hnf_cohen()
    test_gen_mat_hnf()
