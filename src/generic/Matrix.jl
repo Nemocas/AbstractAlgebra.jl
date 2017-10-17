@@ -866,6 +866,7 @@ function lufact!(P::Generic.perm, A::Nemo.MatElem{T}) where {T <: FieldElement}
       r += 1
       c += 1
    end
+   inv!(P)
    return rank
 end
 
