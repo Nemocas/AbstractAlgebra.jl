@@ -646,6 +646,17 @@ function test_gen_mat_lufact()
    @test r == 2
    @test P*A == L*U
 
+   R, z = PolynomialRing(JuliaZZ, "z")
+   F = FractionField(R)
+   
+   A = matrix(F, 3, 3, [0, 0, 11, 78*z^3-102*z^2+48*z+12, 92, -16*z^2+80*z-149, -377*z^3+493*z^2-232*z-58, -448, 80*z^2-385*z+719])
+
+   r, P, L, U = lufact(A)
+
+   @test r == 3
+   @test P*A == L*U
+
+
    println("PASS")
 end
 
