@@ -126,10 +126,10 @@ deepcopy_internal(a::Nemo.ResElem, dict::ObjectIdDict) =
 #
 ###############################################################################
 
-function canonical_unit(a::Nemo.ResElem)
+function canonical_unit(a::ResElem)
   R = parent(a)
   if iszero(a)
-    return R(1)
+    return one(R)
   end
   m = modulus(a)
   A = data(a)
