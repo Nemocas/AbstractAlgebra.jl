@@ -88,7 +88,11 @@ function randelem(R::Generic.ResRing{BigInt}, n)
 end
 
 function randelem(R::Nemo.Rationals{BigInt}, n)
-   return BigInt(rand(-n:n))//BigInt(rand(-n:n))
+   z = BigInt(rand(-n:n))
+   while iszero(z)
+      z = BigInt(rand(-n:n))
+   end
+   return BigInt(rand(-n:n))//z
 end
 
 function randelem(R::Nemo.NmodRing, n)

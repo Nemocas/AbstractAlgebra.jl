@@ -1536,7 +1536,7 @@ function solve_fflu(A::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
 end
 
 function solve_fflu_precomp(p::Generic.perm, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
-   x = inv(p) * b 
+   x = p * b 
    n = rows(x)
    m = cols(x)
    R = base_ring(FFLU)
