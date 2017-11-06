@@ -80,13 +80,22 @@ end
 function test_rel_series_manipulation()
    print("Generic.RelSeries.manipulation...")
 
-   R, t = PolynomialRing(QQ, "t")
+   R, t = PolynomialRing(JuliaQQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    @test max_precision(S) == 30
 
    a = 2x + x^3
    b = O(x^4)
+
+   @test pol_length(a) == 3
+   @test pol_length(b) == 0
+
+   @test valuation(a) == 1
+   @test valuation(b) == 4
+
+   @test precision(a) == 31
+   @test precision(b) == 4
 
    @test isgen(gen(S))
 
@@ -96,23 +105,18 @@ function test_rel_series_manipulation()
 
    @test isunit(-1 + x + 2x^2)
 
-   @test valuation(a) == 1
-
-   @test valuation(b) == 4
-
-   @test precision(a) == 31
-
-   @test precision(b) == 4
-
    @test isequal(deepcopy(a), a)
-
    @test isequal(deepcopy(b), b)
 
    @test normalise(a, 3) == 3
 
    @test coeff(a, 1) == 2
-
    @test coeff(b, 7) == 0
+
+   T = ResidueRing(JuliaZZ, 7)
+   U, y = PowerSeriesRing(T, 10, "y")
+
+   @test modulus(T) == 7
 
    println("PASS")
 end

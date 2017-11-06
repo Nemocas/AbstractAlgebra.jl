@@ -76,9 +76,26 @@ function Base.hash(a::Nemo.SeriesElem, h::UInt)
    return b
 end
 
-pol_length(x::Nemo.RelSeriesElem) = x.length
+doc"""
+    pol_length(a::Nemo.RelSeriesElem)
+> Return the length of the polynomial underlying the given power series. This
+> will be zero if the power series has no nonzero terms.
+"""
+pol_length(a::Nemo.RelSeriesElem) = a.length
 
-precision(x::Nemo.RelSeriesElem) = x.prec
+doc"""
+    precision(a::Nemo.RelSeriesElem)
+> Return the precision of the given power series in absolute terms. This will
+> be the sum of the valuation and the length of the underlying polynomial.
+"""
+precision(a::Nemo.RelSeriesElem) = a.prec
+
+doc"""
+    valuation(a::Nemo.RelSeriesElem)
+> Return the valuation of the given power series, i.e. the degree of the first
+> nonzero term (or the precision if it is arithmetically zero).
+"""
+valuation(a::Nemo.RelSeriesElem) = a.val
 
 doc"""
     max_precision(R::SeriesRing)
@@ -177,15 +194,8 @@ doc"""
 isunit(a::Nemo.RelSeriesElem) = valuation(a) == 0 && isunit(polcoeff(a, 0))
 
 doc"""
-    valuation(a::Nemo.RelSeriesElem)
-> Return the valuation of the given power series, i.e. the degree of the first
-> nonzero term (or the precision if it is arithmetically zero).
-"""
-valuation(a::Nemo.RelSeriesElem) = a.val
-
-doc"""
     modulus{T <: ResElem}(a::Nemo.SeriesElem{T})
-> Return the modulus of the coefficients of the given polynomial.
+> Return the modulus of the coefficients of the given power series.
 """
 modulus(a::Nemo.SeriesElem{T}) where {T <: ResElem} = modulus(base_ring(a))
 
