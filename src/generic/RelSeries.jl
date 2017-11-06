@@ -2,7 +2,7 @@
 #
 #   RelSeries.jl : Power series over rings, capped relative precision
 #
-###############################################################################    
+###############################################################################
 
 export PowerSeriesRing, O, valuation, exp, precision, max_precision, set_prec!,
        polcoeff, set_val!, pol_length, renormalize!
@@ -57,7 +57,7 @@ doc"""
 var(a::SeriesRing) = a.S
 
 function check_parent(a::Nemo.SeriesElem, b::Nemo.SeriesElem)
-   parent(a) != parent(b) && 
+   parent(a) != parent(b) &&
              error("Incompatible power series rings in power series operation")
 end
 
@@ -65,8 +65,8 @@ end
 #
 #   Basic manipulation
 #
-###############################################################################    
-   
+###############################################################################
+
 function Base.hash(a::Nemo.SeriesElem, h::UInt)
    b = 0xb44d6896204881f3%UInt
    for i in 0:pol_length(a) - 1
@@ -365,7 +365,7 @@ function +(a::Nemo.RelSeriesElem{T}, b::Nemo.RelSeriesElem{T}) where {T <: RingE
    renormalize!(z)
    return z
 end
-  
+
 doc"""
     -{T <: RingElement}(a::Nemo.RelSeriesElem{T}, b::Nemo.RelSeriesElem{T})
 > Return $a - b$.
@@ -459,7 +459,7 @@ function *(a::Nemo.RelSeriesElem{T}, b::Nemo.RelSeriesElem{T}) where {T <: RingE
             d[i + j - 1] = addeq!(d[i + j - 1], t)
          end
       end
-   end        
+   end
    z = parent(a)(d, lenz, prec + zval, zval)
    set_length!(z, normalise(z, lenz))
    renormalize!(z)
@@ -735,7 +735,7 @@ doc"""
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::Nemo.RelSeriesElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
-           ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 && 
+           ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
              valuation(x) == 0 && polcoeff(x, 0) == y))
 
 doc"""
@@ -749,7 +749,7 @@ doc"""
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::Nemo.RelSeriesElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 ||
-                  ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 && 
+                  ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
 doc"""
@@ -961,7 +961,7 @@ function mul!(c::RelSeries{T}, a::RelSeries{T}, b::RelSeries{T}) where {T <: Rin
                c.coeffs[i + j - 1] = addeq!(c.coeffs[i + j - 1], t)
             end
          end
-      end        
+      end
       c.length = normalise(c, lenc)
    end
    c.val = a.val + b.val
@@ -1113,48 +1113,48 @@ end
 #
 ###############################################################################
 
-function (a::RelSeriesRing{T})(b::RingElement) where {T <: RingElement}
-   return a(base_ring(a)(b))
+function (R::RelSeriesRing{T})(b::RingElement) where {T <: RingElement}
+   return R(base_ring(R)(b))
 end
 
-function (a::RelSeriesRing{T})() where {T <: RingElement}
-   z = RelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
-   z.parent = a
+function (R::RelSeriesRing{T})() where {T <: RingElement}
+   z = RelSeries{T}(Array{T}(0), 0, R.prec_max, R.prec_max)
+   z.parent = R
    return z
 end
 
-function (a::RelSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
+function (R::RelSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
    if b == 0
-      z = RelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
+      z = RelSeries{T}(Array{T}(0), 0, R.prec_max, R.prec_max)
    else
-      z = RelSeries{T}([base_ring(a)(b)], 1, a.prec_max, 0)
+      z = RelSeries{T}([base_ring(R)(b)], 1, R.prec_max, 0)
    end
-   z.parent = a
+   z.parent = R
    return z
 end
 
-function (a::RelSeriesRing{T})(b::T) where {T <: RingElement}
-   parent(b) != base_ring(a) && error("Unable to coerce to power series")
+function (R::RelSeriesRing{T})(b::T) where {T <: RingElement}
+   parent(b) != base_ring(R) && error("Unable to coerce to power series")
    if iszero(b)
-      z = RelSeries{T}(Array{T}(0), 0, a.prec_max, a.prec_max)
+      z = RelSeries{T}(Array{T}(0), 0, R.prec_max, R.prec_max)
    else
-      z = RelSeries{T}([b], 1, a.prec_max, 0)
+      z = RelSeries{T}([b], 1, R.prec_max, 0)
    end
-   z.parent = a
+   z.parent = R
    return z
 end
 
-function (a::RelSeriesRing{T})(b::Nemo.RelSeriesElem{T}) where {T <: RingElement}
-   parent(b) != a && error("Unable to coerce power series")
+function (R::RelSeriesRing{T})(b::Nemo.RelSeriesElem{T}) where {T <: RingElement}
+   parent(b) != R && error("Unable to coerce power series")
    return b
 end
 
-function (a::RelSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int) where {T <: RingElement}
+function (R::RelSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int) where {T <: RingElement}
    if length(b) > 0
-      parent(b[1]) != base_ring(a) && error("Unable to coerce to power series")
+      parent(b[1]) != base_ring(R) && error("Unable to coerce to power series")
    end
    z = RelSeries{T}(b, len, prec, val)
-   z.parent = a
+   z.parent = R
    return z
 end
 
@@ -1170,7 +1170,7 @@ doc"""
 > ring over the given base ring and a generator `x` for the power series ring.
 > The maximum precision of power series in the ring is set to `prec`. If the
 > model is set to `:capped_relative` this is taken as a maximum relative
-> precision, and if it is set to `:capped_absolute` this is take to be a 
+> precision, and if it is set to `:capped_absolute` this is take to be a
 > maximum absolute precision. The supplied string `s` specifies the way the
 > generator of the power series ring will be printed. By default, the parent
 > object `S` will be cached so that supplying the same base ring, string and
@@ -1180,7 +1180,7 @@ doc"""
 function PowerSeriesRing(R::Nemo.Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
    S = Symbol(s)
    T = elem_type(R)
-   
+
    if model == :capped_relative
       parent_obj = RelSeriesRing{T}(R, prec, S, cached)
    elseif model == :capped_absolute
