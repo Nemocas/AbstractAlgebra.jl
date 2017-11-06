@@ -699,8 +699,8 @@ function ==(x::Nemo.RelSeriesElem{T}, y::Nemo.RelSeriesElem{T}) where {T <: Ring
    if xval != yval
       return false
    end
-   xlen = min(pol_length(x), prec - xval)
-   ylen = min(pol_length(y), prec - yval)
+   xlen = normalise(x, min(pol_length(x), prec - xval))
+   ylen = normalise(y, min(pol_length(y), prec - yval))
    if xlen != ylen
       return false
    end
@@ -767,6 +767,25 @@ doc"""
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.RelSeriesElem) = y == x
+
+###############################################################################
+#
+#   Approximation
+#
+###############################################################################
+
+function Base.isapprox(f::Nemo.RelSeriesElem, g::Nemo.RelSeriesElem; atol::Real=sqrt(eps()))
+   check_parent(f, g)
+   nmin = min(precision(f), precision(g))
+   i = 1
+   while i <= nmin
+      if !isapprox(coeff(f, i - 1), coeff(g, i - 1); atol=atol)
+         return false
+      end
+      i += 1
+   end
+   return true
+end
 
 ###############################################################################
 #
@@ -1095,14 +1114,14 @@ end
 #
 ###############################################################################
 
-function rand(S::SeriesRing, v...)
+function rand(S::SeriesRing, val_range::UnitRange{Int}, v...)
    R = base_ring(S)
    f = S()
    x = gen(S)
    for i = 0:S.prec_max - 1
       f += rand(R, v...)*x^i
    end
-   return f
+   return shift_left(f, rand(val_range))
 end
 
 ###############################################################################

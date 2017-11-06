@@ -124,15 +124,33 @@ end
 function test_rel_series_unary_ops()
    print("Generic.RelSeries.unary_ops...")
 
-   R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   #  Exact ring
+   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   for iter = 1:300
+      f = rand(R, 0:12, -10:10)
 
-   a = 2x + x^3
-   b = 1 + 2x + x^2 + O(x^3)
+      @test isequal(-(-f), f)
+      @test iszero(f + (-f))
+   end
 
-   @test isequal(-a, -2x - x^3 + O(x^31))
+   #  Inexact field
+   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   for iter = 1:300
+      f = rand(R, 0:12, -1:1)
 
-   @test isequal(-b, -1 - 2x - x^2 + O(x^3))
+      @test isequal(-(-f), f)
+      @test iszero(f + (-f))
+   end
+
+   # Non-integral domain
+   T = ResidueRing(JuliaZZ, 6)
+   R, x = PowerSeriesRing(T, 10, "x")
+   for iter = 1:300
+      f = rand(R, 0:12, 0:5)
+
+      @test isequal(-(-f), f)
+      @test iszero(f + (-f))
+   end
 
    println("PASS")
 end
@@ -140,23 +158,52 @@ end
 function test_rel_series_binary_ops()
    print("Generic.RelSeries.binary_ops...")
 
-   R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   #  Exact ring
+   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   for iter = 1:100
+      f = rand(R, 0:12, -10:10)
+      g = rand(R, 0:12, -10:10)
+      h = rand(R, 0:12, -10:10)
+      @test isequal(f + g, g + f)
+      @test isequal(f + (g + h), (f + g) + h)
+      @test isequal(f*g, g*f)
+      @test isequal(f*(g*h), (f*g)*h)
+      @test isequal(f - g, -(g - f))
+      @test (f - h) + h == f
+      @test f*(g + h) == f*g + f*h
+      @test f*(g - h) == f*g - f*h
+   end
 
-   a = 2x + x^3
-   b = O(x^4)
-   c = 1 + x + 3x^2 + O(x^5)
-   d = x^2 + 3x^3 - x^4
+   #  Inexact field
+   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   for iter = 1:100
+      f = rand(R, 0:12, -1:1)
+      g = rand(R, 0:12, -1:1)
+      h = rand(R, 0:12, -1:1)
+      @test isapprox(f + (g + h), (f + g) + h)
+      @test isapprox(f*g, g*f)
+      @test isapprox(f*(g*h), (f*g)*h)
+      @test isapprox(f - g, -(g - f))
+      @test isapprox((f - h) + h, f)
+      @test isapprox(f*(g + h), f*g + f*h)
+      @test isapprox(f*(g - h), f*g - f*h)
+   end
 
-   @test isequal(a + b, x^3+2*x+O(x^4))
-
-   @test isequal(a - c, x^3-3*x^2+x-1+O(x^5))
-
-   @test isequal(b*c, O(x^4))
-
-   @test isequal(a*c, 3*x^5+x^4+7*x^3+2*x^2+2*x+O(x^6))
-
-   @test isequal(a*d, -x^7+3*x^6-x^5+6*x^4+2*x^3+O(x^33))
+   # Non-integral domain
+   T = ResidueRing(JuliaZZ, 6)
+   R, x = PowerSeriesRing(T, 10, "x")
+   for iter = 1:100
+      f = rand(R, 0:12, 0:5)
+      g = rand(R, 0:12, 0:5)
+      h = rand(R, 0:12, 0:5)
+      @test isequal(f + (g + h), (f + g) + h)
+      @test isequal(f*g, g*f)
+      @test f*(g*h) == (f*g)*h
+      @test isequal(f - g, -(g - f))
+      @test (f - h) + h == f
+      @test f*(g + h) == f*g + f*h
+      @test f*(g - h) == f*g - f*h
+   end
 
    println("PASS")
 end
