@@ -360,23 +360,100 @@ end
 function test_rel_series_adhoc_comparison()
    print("Generic.RelSeries.adhoc_comparison...")
 
-   R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   # Exact ring
+   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   for iter = 1:500
+      f = R()
+      while f == 0
+         f = rand(R, 0:0, -10:10)
+      end
+      f += rand(R, 1:12, -10:10)
+      c1 = rand(JuliaZZ, -10:10)
+      d1 = rand(zz, -10:10)
 
-   a = 2x + x^3
-   b = O(x^0)
-   c = 1 + O(x^5)
-   d = S(3)
+      @test R(c1) == c1
+      @test c1 == R(c1)
+      @test R(d1) == d1
+      @test d1 == R(d1)
 
-   @test d == 3
+      @test R(c1) != c1 + f
+      @test c1 != R(c1) + f
+      @test R(d1) != d1 + f
+      @test d1 != R(d1) + f
+   end
 
-   @test c == fmpz(1)
+   # Inexact field
+   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   for iter = 1:500
+      f = R()
+      while isapprox(f, R())
+         f = rand(R, 0:0, -1:1)
+      end
+      f += rand(R, 1:12, -1:1)
+      c1 = rand(JuliaZZ, -10:10)
+      d1 = rand(JuliaRealField, -1:1)
 
-   @test fmpz() != a
+      @test R(c1) == c1
+      @test c1 == R(c1)
+      @test R(d1) == d1
+      @test d1 == R(d1)
 
-   @test 2 == b
+      @test R(c1) != c1 + f
+      @test c1 != R(c1) + f
+      @test R(d1) != d1 + f
+      @test d1 != R(d1) + f
+   end
 
-   @test fmpz(1) == c
+   # Non-integral domain
+   R = ResidueRing(JuliaZZ, 6)
+   S, x = PowerSeriesRing(R, 10, "x")
+   for iter = 1:500
+      f = S()
+      while f == 0
+         f = rand(S, 0:0, 0:5)
+      end
+      f += rand(S, 1:12, 0:5)
+      c1 = rand(JuliaZZ, -10:10)
+      d1 = rand(zz, -10:10)
+      a1 = rand(R, 0:5)
+
+      @test S(a1) == a1
+      @test a1 == S(a1)
+      @test S(c1) == c1
+      @test c1 == S(c1)
+      @test S(d1) == d1
+      @test d1 == S(d1)
+
+      @test S(a1) != a1 + f
+      @test a1 != S(a1) + f
+      @test S(c1) != c1 + f
+      @test c1 != S(c1) + f
+      @test S(d1) != d1 + f
+      @test d1 != S(d1) + f
+   end
+
+   # Generic tower
+   R, x = JuliaZZ["x"]
+   S, y = PowerSeriesRing(R, 10, "y")
+   for iter = 1:100
+      f = S()
+      while f == 0
+         f = rand(S, 0:0, 0:5, -10:10)
+      end
+      f += rand(S, 1:12, 0:5, -10:10)
+      c1 = rand(JuliaZZ, -10:10)
+      d1 = rand(R, 0:5, -10:10)
+
+      @test S(c1) == c1
+      @test c1 == S(c1)
+      @test S(d1) == d1
+      @test d1 == S(d1)
+
+      @test S(c1) != c1 + f
+      @test c1 != S(c1) + f
+      @test S(d1) != d1 + f
+      @test d1 != S(d1) + f
+   end
 
    println("PASS")
 end
