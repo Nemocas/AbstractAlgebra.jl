@@ -211,21 +211,25 @@ end
 function test_rel_series_adhoc_binary_ops()
    print("Generic.RelSeries.adhoc_binary_ops...")
 
-   R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   # Exact ring
+   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   for iter = 1:50000
+      f = rand(R, 0:12, -10:10)
+      c1 = rand(JuliaZZ, -10:10)
+      c2 = rand(JuliaZZ, -10:10)
+      d1 = rand(zz, -10:10)
+      d2 = rand(zz, -10:10)
 
-   a = 2x + x^3
-   b = O(x^4)
-   c = 1 + x + 3x^2 + O(x^5)
-   d = x^2 + 3x^3 - x^4
+      @test isequal(c1*f - c2*f, (c1 - c2)*f)
+      @test isequal(c1*f + c2*f, (c1 + c2)*f)
+      @test isequal(d1*f - d2*f, (d1 - d2)*f)
+      @test isequal(d1*f + d2*f, (d1 + d2)*f)
 
-   @test isequal(2a, 4x + 2x^3 + O(x^31))
-
-   @test isequal(fmpz(3)*b, O(x^4))
-
-   @test isequal(c*2, 2 + 2*x + 6*x^2 + O(x^5))
-
-   @test isequal(d*fmpz(3), 3x^2 + 9x^3 - 3x^4 + O(x^32))
+      @test isequal(f*c1 - f*c2, f*(c1 - c2))
+      @test isequal(f*c1 + f*c2, f*(c1 + c2))
+      @test isequal(f*d1 - f*d2, f*(d1 - d2))
+      @test isequal(f*d1 + f*d2, f*(d1 + d2))
+   end
 
    println("PASS")
 end
