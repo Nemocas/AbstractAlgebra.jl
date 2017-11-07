@@ -653,8 +653,8 @@ function ^(a::Nemo.RelSeriesElem{T}, b::Int) where {T <: RingElement}
       set_val!(z, b*valuation(a))
       return z
    elseif b == 0
+      # in fact, the result would be exact 1 if we had exact series
       z = one(parent(a))
-      set_prec!(z, precision(a) - valuation(a))
       return z
    else
       bit = ~((~UInt(0)) >> 1)

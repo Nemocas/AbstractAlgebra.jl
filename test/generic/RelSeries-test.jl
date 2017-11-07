@@ -461,21 +461,56 @@ end
 function test_rel_series_powering()
    print("Generic.RelSeries.powering...")
 
-   R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   # Exact ring
+   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
 
-   a = 2x + x^3
-   b = O(x^4)
-   c = 1 + x + 2x^2 + O(x^5)
-   d = 2x + x^3 + O(x^4)
+   for iter = 1:100
+      f = rand(R, 0:12, -10:10)
+      r2 = R(1)
 
-   @test isequal(a^12, x^36+24*x^34+264*x^32+1760*x^30+7920*x^28+25344*x^26+59136*x^24+101376*x^22+126720*x^20+112640*x^18+67584*x^16+24576*x^14+4096*x^12+O(x^42))
+      for expn = 0:10
+         r1 = f^expn
 
-   @test isequal(b^12, O(x^48))
+         @test (f == 0 && expn == 0 && r1 == 0) || isequal(r1, r2)
 
-   @test isequal(c^12, 2079*x^4+484*x^3+90*x^2+12*x+1+O(x^5))
+         r2 *= f
+      end
+   end
 
-   @test isequal(d^12, 4096*x^12+24576*x^14+O(x^15))
+   # Inexact field
+   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+
+   for iter = 1:100
+      f = rand(R, 0:12, -1:1)
+      r2 = R(1)
+
+      for expn = 0:4 # cannot set high power here
+         r1 = f^expn
+
+         @test (f == 0 && expn == 0 && r1 == 0) || isapprox(r1, r2)
+
+         r2 *= f
+      end
+   end
+
+   # Non-integral domain
+   for iter = 1:100
+      n = rand(2:26)
+
+      Zn = ResidueRing(JuliaZZ, n)
+      R, x = PowerSeriesRing(Zn, 10, "x")
+
+      f = rand(R, 0:12, 0:n - 1)
+      r2 = R(1)
+
+      for expn = 0:10
+         r1 = f^expn
+
+         @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2
+
+         r2 *= f
+      end
+   end
 
    println("PASS")
 end
