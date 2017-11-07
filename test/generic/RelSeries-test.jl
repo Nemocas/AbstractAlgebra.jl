@@ -213,12 +213,80 @@ function test_rel_series_adhoc_binary_ops()
 
    # Exact ring
    R, x = PowerSeriesRing(JuliaZZ, 10, "x")
-   for iter = 1:50000
+   for iter = 1:500
       f = rand(R, 0:12, -10:10)
       c1 = rand(JuliaZZ, -10:10)
       c2 = rand(JuliaZZ, -10:10)
       d1 = rand(zz, -10:10)
       d2 = rand(zz, -10:10)
+
+      @test isequal(c1*f - c2*f, (c1 - c2)*f)
+      @test isequal(c1*f + c2*f, (c1 + c2)*f)
+      @test isequal(d1*f - d2*f, (d1 - d2)*f)
+      @test isequal(d1*f + d2*f, (d1 + d2)*f)
+
+      @test isequal(f*c1 - f*c2, f*(c1 - c2))
+      @test isequal(f*c1 + f*c2, f*(c1 + c2))
+      @test isequal(f*d1 - f*d2, f*(d1 - d2))
+      @test isequal(f*d1 + f*d2, f*(d1 + d2))
+   end
+
+   # Inexact field
+   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   for iter = 1:500
+      f = rand(R, 0:12, -1:1)
+      c1 = rand(JuliaZZ, -10:10)
+      c2 = rand(JuliaZZ, -10:10)
+      d1 = rand(JuliaRealField, -1:1)
+      d2 = rand(JuliaRealField, -1:1)
+
+      @test isapprox(c1*f - c2*f, (c1 - c2)*f)
+      @test isapprox(c1*f + c2*f, (c1 + c2)*f)
+      @test isapprox(d1*f - d2*f, (d1 - d2)*f)
+      @test isapprox(d1*f + d2*f, (d1 + d2)*f)
+
+      @test isapprox(f*c1 - f*c2, f*(c1 - c2))
+      @test isapprox(f*c1 + f*c2, f*(c1 + c2))
+      @test isapprox(f*d1 - f*d2, f*(d1 - d2))
+      @test isapprox(f*d1 + f*d2, f*(d1 + d2))
+   end
+
+   # Non-integral domain
+   R = ResidueRing(JuliaZZ, 6)
+   S, x = PowerSeriesRing(R, 10, "x")
+   for iter = 1:500
+      f = rand(S, 0:12, 0:5)
+      c1 = rand(JuliaZZ, -10:10)
+      c2 = rand(JuliaZZ, -10:10)
+      d1 = rand(zz, -10:10)
+      d2 = rand(zz, -10:10)
+      a1 = rand(R, 0:5)
+      a2 = rand(R, 0:5)
+
+      @test isequal(a1*f - a2*f, (a1 - a2)*f)
+      @test isequal(a1*f + a2*f, (a1 + a2)*f)
+      @test isequal(c1*f - c2*f, (c1 - c2)*f)
+      @test isequal(c1*f + c2*f, (c1 + c2)*f)
+      @test isequal(d1*f - d2*f, (d1 - d2)*f)
+      @test isequal(d1*f + d2*f, (d1 + d2)*f)
+
+      @test isequal(f*a1 - f*a2, f*(a1 - a2))
+      @test isequal(f*a1 + f*a2, f*(a1 + a2))
+      @test isequal(f*c1 - f*c2, f*(c1 - c2))
+      @test isequal(f*c1 + f*c2, f*(c1 + c2))
+      @test isequal(f*d1 - f*d2, f*(d1 - d2))
+      @test isequal(f*d1 + f*d2, f*(d1 + d2))
+   end
+
+   # Generic tower
+   R, x = JuliaZZ["x"]
+   S, y = PowerSeriesRing(R, 10, "y")
+   for iter = 1:100
+      f = rand(S, 0:12, 0:5, -10:10)
+      c1 = rand(JuliaZZ, -10:10)
+      c2 = rand(JuliaZZ, -10:10)
+      d1 = rand(R, 0:5, -10:10)
+      d2 = rand(R, 0:5, -10:10)
 
       @test isequal(c1*f - c2*f, (c1 - c2)*f)
       @test isequal(c1*f + c2*f, (c1 + c2)*f)
