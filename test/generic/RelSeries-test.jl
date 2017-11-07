@@ -305,23 +305,54 @@ end
 function test_rel_series_comparison()
    print("Generic.RelSeries.comparison...")
 
-   R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   # Exact ring
+   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   for iter = 1:500
+      f = rand(R, 0:12, -10:10)
+      g = deepcopy(f)
+      h = R()
+      while iszero(h)
+         h = rand(R, 0:12, -10:10)
+      end
 
-   a = 2x + x^3
-   b = O(x^3)
-   c = 1 + x + 3x^2 + O(x^5)
-   d = 3x^3 - x^4
+      @test f == g
+      @test isequal(f, g)
+      @test (precision(h) > min(precision(f), precision(g)) || f != g + h)
+      @test (precision(h) > min(precision(f), precision(g)) || !isequal(f, g + h))
+   end
 
-   @test a == 2x + x^3
+   # Inexact field
+   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   for iter = 1:500
+      f = rand(R, 0:12, -1:1)
+      g = deepcopy(f)
+      h = R()
+      while iszero(h)
+         h = rand(R, 0:12, -1:1)
+      end
 
-   @test b == d
+      @test f == g
+      @test isequal(f,  g)
+      @test (precision(h) > min(precision(f), precision(g)) || f != g + h)
+      @test (precision(h) > min(precision(f), precision(g)) || !isequal(f, g + h))
+   end
 
-   @test c != d
+   # Non-integral domain
+   R = ResidueRing(JuliaZZ, 6)
+   S, x = PowerSeriesRing(R, 10, "x")
+   for iter = 1:500
+      f = rand(S, 0:12, 0:5)
+      g = deepcopy(f)
+      h = R()
+      while iszero(h)
+         h = rand(S, 0:12, 0:5)
+      end
 
-   @test isequal(a, 2x + x^3 + O(x^31))
-
-   @test !isequal(b, d)
+      @test f == g
+      @test isequal(f,  g)
+      @test (precision(h) > min(precision(f), precision(g)) || f != g + h)
+      @test (precision(h) > min(precision(f), precision(g)) || !isequal(f, g + h))
+   end
 
    println("PASS")
 end
