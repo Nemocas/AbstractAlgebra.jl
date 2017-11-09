@@ -334,7 +334,7 @@ doc"""
     *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.AbsSeriesElem)
 > Return $a\times b$.
 """
-function *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.AbsSeriesElem) 
+function *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.AbsSeriesElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -467,6 +467,8 @@ function ^(a::Nemo.AbsSeriesElem{T}, b::Int) where {T <: RingElement}
       z = one(parent(a))
       set_prec!(z, precision(a))
       return z
+   elseif b == 1
+      return deepcopy(a)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0

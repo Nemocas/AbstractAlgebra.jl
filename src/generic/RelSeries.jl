@@ -621,6 +621,39 @@ function truncate(a::Nemo.RelSeriesElem{T}, prec::Int) where {T <: RingElement}
    return z
 end
 
+# Intended only for internal use, does not renormalize, assumes n >= 0
+# Only efficient if valuation(a) == valuation(b) == 0
+function mullow(a::Nemo.RelSeriesElem{T}, b::Nemo.RelSeriesElem{T}, n::Int) where {T <: RingElement}
+   lena = pol_length(a)
+   lenb = pol_length(b)
+   if lena == 0 || lenb == 0
+      return zero(parent(a))
+   end
+   prec = min(precision(a), precision(b))
+   t = base_ring(a)()
+   lenz = min(lena + lenb - 1, n)
+   d = Array{T}(lenz)
+   for i = 1:min(lena, lenz)
+      d[i] = coeff(a, i - 1)*coeff(b, 0)
+   end
+   if lenz > lena
+      for j = 2:min(lenb, lenz - lena + 1)
+          d[lena + j - 1] = coeff(a, lena - 1)*coeff(b, j - 1)
+      end
+   end
+   for i = 1:lena - 1
+      if lenz > i
+         for j = 2:min(lenb, lenz - i + 1)
+            t = mul!(t, coeff(a, i - 1), coeff(b, j - 1))
+            d[i + j - 1] = addeq!(d[i + j - 1], t)
+         end
+      end
+   end
+   z = parent(a)(d, lenz, prec, 0)
+   set_length!(z, normalise(z, lenz))
+   return z
+end
+
 ###############################################################################
 #
 #   Powering
@@ -656,20 +689,28 @@ function ^(a::Nemo.RelSeriesElem{T}, b::Int) where {T <: RingElement}
       # in fact, the result would be exact 1 if we had exact series
       z = one(parent(a))
       return z
+   elseif b == 1
+      return deepcopy(a)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0
          bit >>= 1
       end
+      val = valuation(a)
+      a = shift_right(a, val)
+      prec = precision(a)
       z = a
       bit >>= 1
       while bit !=0
-         z = z*z
+         z = mullow(z, z, prec)
          if (UInt(bit) & b) != 0
-            z *= a
+            z = mullow(z, a, prec)
          end
          bit >>= 1
       end
+      set_val!(z, b*val)
+      set_prec!(z, b*val + prec)
+      renormalize!(z)
       return z
    end
 end
