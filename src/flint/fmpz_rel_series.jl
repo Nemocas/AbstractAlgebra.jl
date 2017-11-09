@@ -370,7 +370,7 @@ function ^(a::fmpz_rel_series, b::Int)
       return parent(a)([polcoeff(a, 0)^b], 1,
                            (b - 1)*valuation(a) + precision(a), b*valuation(a))
    elseif b == 0
-      return parent(a)([fmpz(1)], 1, precision(a) - valuation(a), 0)
+      return one(parent(a))
    else
       z = parent(a)()
       z.prec = a.prec + (b - 1)*valuation(a)

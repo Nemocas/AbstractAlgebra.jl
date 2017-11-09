@@ -376,7 +376,7 @@ function ^(a::fq_rel_series, b::Int)
       return parent(a)([polcoeff(a, 0)^b], 1,
                            (b - 1)*valuation(a) + precision(a), b*valuation(a))
    elseif b == 0
-      return parent(a)([base_ring(a)(1)], 1, precision(a) - valuation(a), 0)
+      return one(parent(a))
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & b) == 0
