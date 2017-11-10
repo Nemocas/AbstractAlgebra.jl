@@ -561,7 +561,7 @@ function test_gen_poly_shift()
    for iter = 1:300
       f = rand(R, 0:10, -10:10)
       s = rand(0:10)
-      g = s == 0 ? R() : rand(R, 0:s - 1, -1:1)
+      g = s == 0 ? R() : rand(R, 0:s - 1, -10:10)
 
       @test shift_right(shift_left(f, s) + g, s) == f
       @test shift_left(f, s) == x^s*f
@@ -586,7 +586,7 @@ function test_gen_poly_shift()
    for iter = 1:300
       f = rand(R, 0:10, 0:5)
       s = rand(0:10)
-      g = s == 0 ? R() : rand(R, 0:s - 1, -1:1)
+      g = s == 0 ? R() : rand(R, 0:s - 1, 0:5)
 
       @test shift_right(shift_left(f, s) + g, s) == f
       @test shift_left(f, s) == x^s*f

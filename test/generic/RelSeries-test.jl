@@ -518,21 +518,48 @@ end
 function test_rel_series_shift()
    print("Generic.RelSeries.shift...")
 
-   R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   # Exact ring
+   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   for iter = 1:300
+      f = rand(R, 0:12, -10:10)
+      s = rand(0:12)
+      g = rand(R, 0:0, -10:10) + O(x^s)
 
-   a = 2x + x^3
-   b = O(x^4)
-   c = 1 + x + 2x^2 + O(x^5)
-   d = 2x + x^3 + O(x^4)
+      set_prec!(g, max(precision(g), precision(f) + s))
 
-   @test isequal(shift_left(a, 2), 2*x^3+x^5+O(x^33))
+      @test isequal(shift_right(shift_left(f, s) + g, s), f)
+      @test isequal(shift_left(f, s), x^s*f)
+      @test precision(shift_right(f, s)) == max(0, precision(f) - s)
+   end
 
-   @test isequal(shift_left(b, 2), O(x^6))
+   # Inexact field
+   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   for iter = 1:300
+      f = rand(R, 0:12, -1:1)
+      s = rand(0:12)
+      g = rand(R, 0:0, -1:1) + O(x^s)
 
-   @test isequal(shift_right(c, 1), 1+2*x+O(x^4))
+      set_prec!(g, max(precision(g), precision(f) + s))
 
-   @test isequal(shift_right(d, 3), 1+O(x^1))
+      @test isapprox(shift_right(shift_left(f, s) + g, s), f)
+      @test isapprox(shift_left(f, s), x^s*f)
+      @test precision(shift_right(f, s)) == max(0, precision(f) - s)
+   end
+
+   # Non-integral domain
+   T = ResidueRing(JuliaZZ, 6)
+   R, x = PowerSeriesRing(T, 10, "x")
+   for iter = 1:300
+      f = rand(R, 0:12, 0:5)
+      s = rand(0:12)
+      g = rand(R, 0:0, 0:5) + O(x^s)
+
+      set_prec!(g, max(precision(g), precision(f) + s))
+
+      @test isequal(shift_right(shift_left(f, s) + g, s), f)
+      @test isequal(shift_left(f, s), x^s*f)
+      @test precision(shift_right(f, s)) == max(0, precision(f) - s)
+   end
 
    println("PASS")
 end
@@ -540,21 +567,39 @@ end
 function test_rel_series_truncation()
    print("Generic.RelSeries.truncation...")
 
-   R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   # Exact ring
+   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   for iter = 1:300
+      f = rand(R, 0:12, -10:10)
+      s = rand(0:12)
 
-   a = 2x + x^3
-   b = O(x^4)
-   c = 1 + x + 2x^2 + O(x^5)
-   d = 2x + x^3 + O(x^4)
+      @test truncate(f, s) == f
+      @test isequal(truncate(f, s), f + O(x^s))
+      @test precision(truncate(f, s)) == min(precision(f), s)
+   end
 
-   @test isequal(truncate(a, 3), 2*x + O(x^3))
+   # Inexact field
+   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   for iter = 1:300
+      f = rand(R, 0:12, -1:1)
+      s = rand(0:12)
 
-   @test isequal(truncate(b, 2), O(x^2))
+      @test truncate(f, s) == f
+      @test isapprox(truncate(f, s), f + O(x^s))
+      @test precision(truncate(f, s)) == min(precision(f), s)
+   end
 
-   @test isequal(truncate(c, 5), 2*x^2+x+1+O(x^5))
+   # Non-integral domain
+   T = ResidueRing(JuliaZZ, 6)
+   R, x = PowerSeriesRing(T, 10, "x")
+   for iter = 1:300
+      f = rand(R, 0:12, 0:5)
+      s = rand(0:12)
 
-   @test isequal(truncate(d, 5), x^3+2*x+O(x^4))
+      @test truncate(f, s) == f
+      @test isequal(truncate(f, s), f + O(x^s))
+      @test precision(truncate(f, s)) == min(precision(f), s)
+   end
 
    println("PASS")
 end
