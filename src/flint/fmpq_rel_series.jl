@@ -618,7 +618,7 @@ end
 #
 ###############################################################################
 
-function exp(a::fmpq_rel_series)
+function Base.exp(a::fmpq_rel_series)
    (a.val == 0 && pol_length(a) != 0) && error("Constant term not zero in exp")
    if pol_length(a) + valuation(a) == 0 || a.prec == 1
       return parent(a)([fmpq(1)], 1, a.prec, 0)

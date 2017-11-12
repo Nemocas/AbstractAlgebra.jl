@@ -936,11 +936,10 @@ doc"""
     exp(a::Nemo.RelSeriesElem)
 > Return the exponential of the power series $a$.
 """
-function exp(a::Nemo.RelSeriesElem)
+function Base.exp(a::Nemo.RelSeriesElem)
    if iszero(a)
       z = one(parent(a))
       set_prec!(z, precision(a))
-      set_val!(z, valuation(a))
       return z
    end
    z = parent(a)()
@@ -950,7 +949,7 @@ function exp(a::Nemo.RelSeriesElem)
    fit!(z, preca)
    set_prec!(z, preca)
    c = vala == 0 ? polcoeff(a, 0) : R()
-   z = setcoeff!(z, 0, exp(c))
+   z = setcoeff!(z, 0, Nemo.exp(c))
    len = pol_length(a) + vala
    for k = 1 : preca - 1
       s = R()
