@@ -1202,7 +1202,7 @@ function (R::RelSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where
    return z
 end
 
-function (R::RelSeriesRing{T})(b::T) where {T <: RingElement}
+function (R::RelSeriesRing{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(R) && error("Unable to coerce to power series")
    if iszero(b)
       z = RelSeries{T}(Array{T}(0), 0, R.prec_max, R.prec_max)
