@@ -607,15 +607,39 @@ end
 function test_rel_series_inversion()
    print("Generic.RelSeries.inversion...")
 
-   R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   # Exact field
+   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   for iter = 1:300
+      f = R()
+      while !isunit(f)
+         f = rand(R, 0:0, -10:10)
+      end
 
-   a = 1 + x + 2x^2 + O(x^5)
-   b = S(-1)
+      @test f*inv(f) == 1
+   end
 
-   @test isequal(inv(a), -x^4+3*x^3-x^2-x+1+O(x^5))
+   # Inexact field
+   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   for iter = 1:300
+      f = R()
+      while coeff(f, 0) == 0
+         f = rand(R, 0:0, -1:1)
+      end
 
-   @test isequal(inv(b), -1+O(x^30))
+      @test isapprox(f*inv(f), R(1))
+   end
+
+   # Non-integral domain
+   T = ResidueRing(JuliaZZ, 6)
+   R, x = PowerSeriesRing(T, 10, "x")
+   for iter = 1:300
+      f = R()
+      while !isunit(f)
+         f = rand(R, 0:0, 0:5)
+      end
+
+      @test f*inv(f) == 1
+   end
 
    println("PASS")
 end
@@ -623,21 +647,54 @@ end
 function test_rel_series_exact_division()
    print("Generic.RelSeries.exact_division...")
 
-   R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   # Exact ring
+   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   for iter = 1:300
+      s = rand(0:12)
+      f = rand(R, s:s, -10:10)
+      while valuation(f) != s || !isunit(coeff(f, s))
+         f = rand(R, s:s, -10:10)
+      end
+      g = rand(R, s:s, -10:10)
+      while valuation(g) != s || !isunit(coeff(g, s))
+         g = rand(R, s:s, -10:10)
+      end
 
-   a = x + x^3
-   b = O(x^4)
-   c = 1 + x + 2x^2 + O(x^5)
-   d = x + x^3 + O(x^6)
+      @test divexact(f, g)*g == f
+   end
 
-   @test isequal(divexact(a, d), 1+O(x^5))
+   # Inexact field
+   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   for iter = 1:300
+      s = rand(0:12)
+      f = rand(R, s:s, -1:1)
+      while valuation(f) != s
+         f = rand(R, s:s, -1:1)
+      end
+      g = rand(R, s:s, -1:1)
+      while valuation(g) != s || coeff(g, s) == 0
+         g = rand(R, s:s, -1:1)
+      end
 
-   @test isequal(divexact(d, a), 1+O(x^5))
+      @test isapprox(divexact(f, g)*g, f)
+   end
 
-   @test isequal(divexact(b, c), O(x^4))
+   # Non-integral domain
+   T = ResidueRing(JuliaZZ, 6)
+   R, x = PowerSeriesRing(T, 10, "x")
+   for iter = 1:300
+      s = rand(0:12)
+      f = rand(R, s:s, 0:5)
+      while valuation(f) != s || !isunit(coeff(f, s))
+         f = rand(R, s:s, 0:5)
+      end
+      g = rand(R, s:s, 0:5)
+      while valuation(g) != s || !isunit(coeff(g, s))
+         g = rand(R, s:s, 0:5)
+      end
 
-   @test isequal(divexact(d, c), -2*x^5+2*x^4-x^2+x+O(x^6))
+      @test divexact(f, g)*g == f
+   end
 
    println("PASS")
 end
@@ -645,25 +702,42 @@ end
 function test_rel_series_adhoc_exact_division()
    print("Generic.RelSeries.adhoc_exact_division...")
 
-   R, t = PolynomialRing(QQ, "t")
-   S, x = PowerSeriesRing(R, 30, "x")
+   # Exact field
+   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   for iter = 1:300
+      f = rand(R, 0:12, -10:10)
+      c = JuliaZZ()
+      while c == 0
+         c = rand(JuliaZZ, -10:10)
+      end
 
-   a = x + x^3
-   b = O(x^4)
-   c = 1 + x + 2x^2 + O(x^5)
-   d = x + x^3 + O(x^6)
+      @test isequal(divexact(f*c, c), f)
+   end
 
-   @test isequal(divexact(a, 7), fmpz(1)//7*x+fmpz(1)//7*x^3+O(x^31))
+   # Inexact field
+   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   for iter = 1:300
+      f = rand(R, 0:12, -1:1)
+      c = JuliaRealField()
+      while isapprox(c, 0)
+         c = rand(JuliaRealField, -1:1)
+      end
 
-   @test isequal(divexact(b, fmpz(11)), 0+O(x^4))
+      @test isapprox(divexact(f*c, c), f)
+   end
 
-   @test isequal(divexact(c, fmpz(2)), fmpz(1)//2+fmpz(1)//2*x+x^2+O(x^5))
+   # Non-integral domain
+   T = ResidueRing(JuliaZZ, 6)
+   R, x = PowerSeriesRing(T, 10, "x")
+   for iter = 1:300
+      f = rand(R, 0:0, 0:5)
+      c = T()
+      while !isunit(c)
+         c = rand(T, 0:5)
+      end
 
-   @test isequal(divexact(d, 9), fmpz(1)//9*x+fmpz(1)//9*x^3+O(x^6))
-
-   @test isequal(divexact(94872394861923874346987123694871329847a, 94872394861923874346987123694871329847), a)
-
-   @test isequal(divexact((t + 1)*a, t + 1), a)
+      @test isequal(divexact(f*c, c), f)
+   end
 
    println("PASS")
 end

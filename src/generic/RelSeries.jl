@@ -595,14 +595,14 @@ end
 
 doc"""
     truncate(a::Nemo.RelSeriesElem, n::Int)
-> Return $a$ truncated to $n$ terms.
+> Return $a$ truncated to (absolute) precision $n$.
 """
 function truncate(a::Nemo.RelSeriesElem{T}, prec::Int) where {T <: RingElement}
    prec < 0 && throw(DomainError())
    alen = pol_length(a)
    aprec = precision(a)
    aval = valuation(a)
-   if aprec + aval <= prec
+   if aprec <= prec
       return a
    end
    z = parent(a)()
