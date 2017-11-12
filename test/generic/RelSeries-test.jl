@@ -745,30 +745,65 @@ end
 function test_rel_series_special_functions()
    print("Generic.RelSeries.special_functions...")
 
-   # Characteristic p field
-   R = ResidueRing(JuliaZZ, 17)
-   S, x = PowerSeriesRing(R, 30, "x")
-
-   @test isequal(exp(x + O(x^10)),  8*x^9+4*x^8+15*x^7+3*x^6+x^5+5*x^4+3*x^3+9*x^2+x+1+O(x^10))
-
-   @test isequal(divexact(x, exp(x + O(x^10)) - 1), x^8+11*x^6+14*x^4+10*x^2+8*x+1+O(x^9))
-
-   for iter = 1:15
-      @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))
-   end
-
    # Exact field
-   S, x = PowerSeriesRing(JuliaQQ, 30, "x")
+   S, x = PowerSeriesRing(JuliaQQ, 10, "x")
 
-   for iter = 1:30
+   for iter = 1:10
       @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))
+
+      f = S()
+      while !isunit(f)
+         f = rand(S, 0:0, -10:10)
+      end
+      g = S()
+      while !isunit(g) || !isunit(f + g)
+         g = rand(S, 0:0, -10:10)
+      end
+      f *= x
+      g *= x
+
+      @test isequal(exp(f)*exp(g), exp(f + g))
    end
 
    # Inexact field
-   S, x = PowerSeriesRing(JuliaRealField, 30, "x")
+   S, x = PowerSeriesRing(JuliaRealField, 10, "x")
 
-   for iter = 1:30
+   for iter = 1:10
       @test isapprox(exp(x + O(x^iter)), exp(x + O(x^(iter - 1))))
+
+      f = S()
+      while coeff(f, 0) == 0
+         f = rand(S, 0:0, -1:1)
+      end
+      g = S()
+      while coeff(g, 0) == 0 || coeff(f + g, 0) == 0
+         g = rand(S, 0:0, -1:1)
+      end
+      f *= x
+      g *= x
+
+      @test isapprox(exp(f)*exp(g), exp(f + g))
+   end
+
+   # Non-integral domain
+   R = ResidueRing(JuliaZZ, 143)
+   S, x = PowerSeriesRing(R, 10, "x")
+
+   for iter = 1:10
+      @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))
+
+      f = S()
+      while !isunit(f)
+         f = rand(S, 0:0, -10:10)
+      end
+      g = S()
+      while !isunit(g) || !isunit(f + g)
+         g = rand(S, 0:0, -10:10)
+      end
+      f *= x
+      g *= x
+
+      @test isequal(exp(f)*exp(g), exp(f + g))
    end
 
    println("PASS")
