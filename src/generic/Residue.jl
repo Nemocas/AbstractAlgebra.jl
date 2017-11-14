@@ -35,12 +35,14 @@ doc"""
 """
 parent(a::Nemo.ResElem) = a.parent
 
+isdomain_type(a::Type{T}) where T <: Nemo.ResElem = false
+
 isexact(R::Nemo.ResRing) = isexact(base_ring(R))
 
 function check_parent_type(a::Nemo.ResRing{T}, b::Nemo.ResRing{T}) where {T <: RingElement}
    # exists only to check types of parents agree
 end
-   
+
 function check_parent(a::Nemo.ResElem, b::Nemo.ResElem)
    if parent(a) != parent(b)
       check_parent_type(parent(a), parent(b))
@@ -124,7 +126,7 @@ deepcopy_internal(a::Nemo.ResElem, dict::ObjectIdDict) =
 #
 ###############################################################################
 
-function canonical_unit(a::Nemo.ResElem) 
+function canonical_unit(a::Nemo.ResElem)
   R = parent(a)
   if iszero(a)
     return R(1)
@@ -470,7 +472,7 @@ end
 ###############################################################################
 
 promote_rule(::Type{Res{T}}, ::Type{Res{T}}) where T <: RingElement = Res{T}
-   
+
 function promote_rule(::Type{Res{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
    promote_rule(T, U) == T ? Res{T} : Union{}
 end
@@ -520,7 +522,7 @@ doc"""
 > Create the residue ring $R/(a)$ where $a$ is an element of the ring $R$. We
 > require $a \neq 0$. If `cached == true` (the default) then the resulting
 > residue ring parent object is cached and returned for any subsequent calls
-> to the constructor with the same base ring $R$ and element $a$. 
+> to the constructor with the same base ring $R$ and element $a$.
 """
 function ResidueRing(R::Nemo.Ring, a::RingElement; cached::Bool = true)
    iszero(a) && throw(DivideError())

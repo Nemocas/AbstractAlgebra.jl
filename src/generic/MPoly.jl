@@ -25,6 +25,10 @@ base_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring
 
 base_ring(a::MPoly{T}) where T <: RingElement = base_ring(parent(a))
 
+function isdomain_type(::Type{T}) where {S <: RingElement, T <: Nemo.MPolyElem{S}}
+   return isdomain_type(S)
+end
+
 isexact(R::MPolyRing) = isexact(base_ring(R))
 
 doc"""
@@ -69,7 +73,7 @@ function ordering(a::MPolyRing{T}) where {T <: RingElement}
 end
 
 function check_parent(a::MPoly{T}, b::MPoly{T}) where T <: RingElement
-   parent(a) != parent(b) && 
+   parent(a) != parent(b) &&
       error("Incompatible polynomial rings in polynomial operation")
 end
 
@@ -212,7 +216,7 @@ function monomial_divides!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j1::Int
      A[k, i] = reinterpret(UInt, reinterpret(Int, B[k, j1]) - reinterpret(Int, C[k, j2]))
       if (A[k, i] & mask != 0)
          flag = false
-      end 
+      end
    end
    return flag
 end
@@ -387,7 +391,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, x::MPoly, U::Array{<: AbstractString, 1}) 
+function show(io::IO, x::MPoly, U::Array{<: AbstractString, 1})
     len = length(x)
     if len == 0
       print(io, base_ring(x)(0))
@@ -443,7 +447,7 @@ function show(io::IO, x::MPoly, U::Array{<: AbstractString, 1})
               print(io, "^", n)
             end
           end
-        end      
+        end
     end
   end
 end
@@ -592,7 +596,7 @@ function -(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
 end
 
 function do_copy(Ac::Array{T, 1}, Bc::Array{T, 1},
-               Ae::Array{UInt, 2}, Be::Array{UInt, 2}, 
+               Ae::Array{UInt, 2}, Be::Array{UInt, 2},
         s1::Int, r::Int, n1::Int, par::MPolyRing{T}) where {T <: RingElement}
    N = size(Ae, 1)
    for i = 1:n1
@@ -603,7 +607,7 @@ function do_copy(Ac::Array{T, 1}, Bc::Array{T, 1},
 end
 
 function do_merge(Ac::Array{T, 1}, Bc::Array{T, 1},
-               Ae::Array{UInt, 2}, Be::Array{UInt, 2}, 
+               Ae::Array{UInt, 2}, Be::Array{UInt, 2},
         s1::Int, s2::Int, r::Int, n1::Int, n2::Int, par::MPolyRing{T}) where {T <: RingElement}
    i = 1
    j = 1
@@ -702,10 +706,10 @@ function mul_classical(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          if want > b_alloc
             b_alloc = max(2*b_alloc, want)
             resize!(Bc, b_alloc)
-            Be = resize_exps!(Be, b_alloc)            
+            Be = resize_exps!(Be, b_alloc)
          end
          # do merge to B
-         k = do_merge(Ac, Bc, Ae, Be, Ai[Anum - 1], Ai[Anum], 
+         k = do_merge(Ac, Bc, Ae, Be, Ai[Anum - 1], Ai[Anum],
                                                sb, An[Anum - 1], An[Anum], par)
          Bnum += 1
          Bm[Bnum] = 2*Am[Anum]
@@ -722,10 +726,10 @@ function mul_classical(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
             if want > a_alloc
                a_alloc = max(2*a_alloc, want)
                resize!(Ac, a_alloc)
-               Ae = resize_exps!(Ae, a_alloc)            
+               Ae = resize_exps!(Ae, a_alloc)
             end
             # do merge to A
-            k = do_merge(Bc, Ac, Be, Ae, Bi[Bnum - 1], Bi[Bnum], 
+            k = do_merge(Bc, Ac, Be, Ae, Bi[Bnum - 1], Bi[Bnum],
                                                sa, Bn[Bnum - 1], Bn[Bnum], par)
             Anum += 1
             Am[Anum] = 2*Bm[Bnum]
@@ -737,7 +741,7 @@ function mul_classical(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
             Bnum -= 2
          end
       end
-   end 
+   end
    # Add all irregular sized polynomials together
    while Anum + Bnum > 1
       # Find the smallest two polynomials
@@ -760,10 +764,10 @@ function mul_classical(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          if want > b_alloc
             b_alloc = max(2*b_alloc, want)
             resize!(Bc, b_alloc)
-            Be = resize_exps!(Be, b_alloc)            
+            Be = resize_exps!(Be, b_alloc)
          end
          # do merge to B
-         k = do_merge(Ac, Bc, Ae, Be, Ai[Anum - 1], Ai[Anum], 
+         k = do_merge(Ac, Bc, Ae, Be, Ai[Anum - 1], Ai[Anum],
                                                sb, An[Anum - 1], An[Anum], par)
          Bnum += 1
          Bm[Bnum] = 2*Am[Anum - 1]
@@ -780,10 +784,10 @@ function mul_classical(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          if want > a_alloc
             a_alloc = max(2*a_alloc, want)
             resize!(Ac, a_alloc)
-            Ae = resize_exps!(Ae, a_alloc)            
+            Ae = resize_exps!(Ae, a_alloc)
          end
          # do merge to A
-         k = do_merge(Bc, Ac, Be, Ae, Bi[Bnum - 1], Bi[Bnum], 
+         k = do_merge(Bc, Ac, Be, Ae, Bi[Bnum - 1], Bi[Bnum],
                                             sa, Bn[Bnum - 1], Bn[Bnum], par)
          Anum += 1
          Am[Anum] = 2*Bm[Bnum - 1]
@@ -802,7 +806,7 @@ function mul_classical(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
             if want > b_alloc
                b_alloc = max(2*b_alloc, want)
                resize!(Bc, b_alloc)
-               Be = resize_exps!(Be, b_alloc)            
+               Be = resize_exps!(Be, b_alloc)
             end
             # do copy to B
             k = do_copy(Ac, Bc, Ae, Be, Ai[Anum], sb, An[Anum], par)
@@ -820,7 +824,7 @@ function mul_classical(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
             if want > a_alloc
                a_alloc = max(2*a_alloc, want)
                resize!(Ac, a_alloc)
-               Ae = resize_exps!(Ae, a_alloc)            
+               Ae = resize_exps!(Ae, a_alloc)
             end
             # do copy to A
             k = do_copy(Bc, Ac, Be, Ae, Bi[Bnum], sa, Bn[Bnum], par)
@@ -857,7 +861,7 @@ end
 struct heap_t
    i::Int
    j::Int
-   next::Int   
+   next::Int
 end
 
 struct nheap_t
@@ -1029,7 +1033,7 @@ function mul_johnson(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElemen
             I[xn] = heap_t(v.i, v.j + 1, 0)
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, a.exps, v.i, b.exps, v.j + 1, N)
-            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert v into heap 
+            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert v into heap
                viewc -= 1
             end
          end
@@ -1145,7 +1149,7 @@ function *(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
    for i = 1:length(a)
       c = a.coeffs[i]*n
       if c != 0
-         r.coeffs[j] = c 
+         r.coeffs[j] = c
          monomial_set!(r.exps, j, a.exps, i, N)
          j += 1
       end
@@ -1163,7 +1167,7 @@ function *(a::MPoly{T}, n::T) where {T <: RingElem}
    for i = 1:length(a)
       c = a.coeffs[i]*n
       if c != 0
-         r.coeffs[j] = c 
+         r.coeffs[j] = c
          monomial_set!(r.exps, j, a.exps, i, N)
          j += 1
       end
@@ -1367,8 +1371,8 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
             I[xn] = heap_t(v.i + 1, v.j, 0)
             vw = Viewn[viewc]
             monomial_add!(Exps, vw, f.exps, v.i + 1, ge, v.j, N)
-            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert v into heap  
-               viewc -= 1 
+            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert v into heap
+               viewc -= 1
             end
             largest[v.i + 1] = v.j
          else
@@ -1382,7 +1386,7 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
                if heapinsert!(H, I, reuse, vw, Exps, N, par, drmask) # either chain or insert v into heap
                   viewc -= 1
                end
-               reuse = 0   
+               reuse = 0
             else
                push!(I, heap_t(v.i, v.j + 1, 0))
                vw = Viewn[viewc]
@@ -1391,7 +1395,7 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
                   viewc -= 1
                end
             end
-            largest[v.i] = v.j + 1     
+            largest[v.i] = v.j + 1
          end
       end
       if C != 0
@@ -1568,7 +1572,7 @@ function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <:
             I[xn] = heap_t(0, v.j + 1, 0)
             vw = Viewn[viewc]
             monomial_set!(Exps, vw, a.exps, v.j + 1, N)
-            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap   
+            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                viewc -= 1
             end
          elseif v.j < k - 1
@@ -1581,7 +1585,7 @@ function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <:
          elseif v.j == k - 1
             s += 1
             push!(reuse, xn)
-         end  
+         end
       end
       if qc == 0
          k -= 1
@@ -1606,7 +1610,7 @@ function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <:
                if heapinsert!(H, I, length(I), vw, Exps, N, par, drmask)
                   viewc -= 1
                end
-            end                 
+            end
          end
          s = 1
       end
@@ -1763,10 +1767,10 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
             vw = Viewn[viewc]
             monomial_set!(Exps, vw, a.exps, v.j + 1, N)
             if !monomial_isless(Exps, vw, temp2, 1, N, par, drmask)
-               if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap  
+               if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                   viewc -= 1
                end
-            end 
+            end
          elseif v.j < k - 1
             I[xn] = heap_t(v.i, v.j + 1, 0)
             vw = Viewn[viewc]
@@ -1779,7 +1783,7 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
          elseif v.j == k - 1
             s += 1
             push!(reuse, xn)
-         end  
+         end
       end
       if qc == 0
          k -= 1
@@ -1813,7 +1817,7 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
                         end
                      end
                   end
-               end                 
+               end
                s = 1
             else
                k -= 1
@@ -1970,9 +1974,9 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
             I[xn] = heap_t(0, v.j + 1, 0)
             vw = Viewn[viewc]
             monomial_set!(Exps, vw, a.exps, v.j + 1, N)
-            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap  
+            if heapinsert!(H, I, xn, vw, Exps, N, par, drmask) # either chain or insert into heap
                viewc -= 1
-            end 
+            end
          elseif v.j < k - 1
             I[xn] = heap_t(v.i, v.j + 1, 0)
             vw = Viewn[viewc]
@@ -1983,7 +1987,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
          elseif v.j == k - 1
             s += 1
             push!(reuse, xn)
-         end  
+         end
       end
       if qc == 0
          k -= 1
@@ -2031,7 +2035,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
                         viewc -= 1
                      end
                   end
-               end                 
+               end
                s = 1
             else
                k -= 1
@@ -2196,9 +2200,9 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
             I[xn] = nheap_t(0, v.j + 1, 0, 0)
             vw = Viewn[viewc]
             monomial_set!(Exps, vw, a.exps, v.j + 1, N)
-            if nheapinsert!(H, I, xn, vw, Exps, N, 0, par, drmask) # either chain or insert into heap  
+            if nheapinsert!(H, I, xn, vw, Exps, N, 0, par, drmask) # either chain or insert into heap
                viewc -= 1
-            end 
+            end
          elseif v.j < k[v.p]
             I[xn] = nheap_t(v.i, v.j + 1, v.p, 0)
             vw = Viewn[viewc]
@@ -2209,7 +2213,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
          elseif v.j == k[v.p]
             s[v.p] += 1
             push!(reuse, xn)
-         end  
+         end
       end
       if qc != 0
          div_flag = false
@@ -2244,7 +2248,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
                            viewc -= 1
                         end
                      end
-                  end                 
+                  end
                   s[w] = 1
                end
             end
@@ -2322,10 +2326,10 @@ function divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
          else
             eq = [Array{UInt}(N, length(q[i])) for i in 1:len]
             for i = 1:len
-               unpack_monomials(eq[i], q[i].exps, k, exp_bits)  
+               unpack_monomials(eq[i], q[i].exps, k, exp_bits)
             end
             er = Array{UInt}(N, length(r))
-            unpack_monomials(er, r.exps, k, exp_bits)  
+            unpack_monomials(er, r.exps, k, exp_bits)
          end
       else
          flag, q, r = divrem_monagan_pearce(a, b, exp_bits)
@@ -2613,7 +2617,7 @@ function main_variable_terms(a::MPoly{T}, k::Int) where {T <: RingElement}
 end
 
 # return the coefficient as a sparse distributed polynomial, of the term in variable
-# k0 starting at position n 
+# k0 starting at position n
 function main_variable_coefficient_lex(a::MPoly{T}, k0::Int, n::Int) where {T <: RingElement}
    exp = a.exps[k0, n]
    N = parent(a).N
@@ -2633,7 +2637,7 @@ function main_variable_coefficient_lex(a::MPoly{T}, k0::Int, n::Int) where {T <:
       for k = 1:N
          if k == k0
             Ae[k, l] = UInt(0)
-         else 
+         else
             Ae[k, l] = a.exps[k, i]
          end
       end
@@ -2668,7 +2672,7 @@ function main_variable_coefficient_deglex(a::MPoly{T}, k0::Int, n::Int) where {T
             Ae[k, l] = a.exps[1, i] - a.exps[k0, i]
          elseif k == k0
             Ae[k, l] = UInt(0)
-         else 
+         else
             Ae[k, l] = a.exps[k, i]
          end
       end
@@ -2813,7 +2817,7 @@ end
 function resize_exps!(a::Array{UInt, 2}, n::Int)
    N = size(a, 1)
    A = reshape(a, size(a, 2)*N)
-   resize!(A, n*N) 
+   resize!(A, n*N)
    return reshape(A, N, n)
 end
 

@@ -55,6 +55,8 @@ doc"""
 """
 parent(x::arb) = x.parent
 
+isdomain_type(::Type{arb}) = true
+
 isexact(R::ArbField) = false
 
 doc"""

@@ -14,14 +14,14 @@ end
 #
 # The promote_rule functions are not extending Base.promote_rule. The Nemo
 # promotion system is orthogonal to the built-in julia promotion system. The
-# julia system assumes that whenever you have a method signature of the form  
+# julia system assumes that whenever you have a method signature of the form
 # Base.promote_rule(::Type{T}, ::Type{S}) = R, then there is also a
 # corresponding Base.convert(::Type{R}, ::T) and similar for S. Since we
 # cannot use the julia convert system (we need an instance of the type and not
 # the type), we cannot use the julia promotion system.
 #
 # The Nemo promotion system is used to define catch all functions for
-# arithmetic between arbitrary ring elements. 
+# arithmetic between arbitrary ring elements.
 #
 ################################################################################
 
@@ -137,6 +137,15 @@ isexact(R::Ring) = true
 
 ###############################################################################
 #
+#   isdomain_type
+#
+###############################################################################
+
+# Rings are not domain types unless explicitly specified
+isdomain_type(R::RingElem) = true
+
+###############################################################################
+#
 #   Exponential function for generic rings
 #
 ###############################################################################
@@ -241,4 +250,3 @@ include("Factor.jl")
 ###############################################################################
 
 include("polysubst.jl")
-

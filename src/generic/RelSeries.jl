@@ -47,6 +47,10 @@ doc"""
 """
 base_ring(a::Nemo.SeriesElem) = base_ring(parent(a))
 
+function isdomain_type(::Type{T}) where {S <: RingElement, T <: Nemo.SeriesElem{S}}
+   return isdomain_type(S)
+end
+
 isexact(R::RelSeriesRing) = false
 
 doc"""

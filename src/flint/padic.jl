@@ -84,6 +84,8 @@ doc"""
 """
 parent(a::padic) = a.parent
 
+isdomain_type(::Type{padic}) = true
+
 isexact(R::FlintPadicField) = false
 
 function check_parent(a::padic, b::padic)
@@ -526,7 +528,7 @@ doc"""
 > will be the same as the precision of the input. If the input is not valid an
 > exception is thrown.
 """
-function Base.exp(a::padic) 
+function Base.exp(a::padic)
    !iszero(a) && a.v <= 0 && throw(DomainError())
    ctx = parent(a)
    z = padic(a.N)

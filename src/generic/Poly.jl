@@ -45,6 +45,10 @@ doc"""
 """
 parent(a::Nemo.PolyElem) = a.parent
 
+function isdomain_type(::Type{T}) where {S <: RingElement, T <: Nemo.PolyElem{S}}
+   return isdomain_type(S)
+end
+
 isexact(R::Nemo.PolyRing) = isexact(base_ring(R))
 
 doc"""
@@ -2254,6 +2258,7 @@ doc"""
 """
 function interpolate(S::Nemo.PolyRing, x::Array{T, 1}, y::Array{T, 1}) where {T <: RingElement}
    length(x) != length(y) && error("Array lengths don't match in interpolate")
+   !isdomain_type(T) && error("Generic interpolation requires a domain type")
    n = length(x)
    if n == 0
       return S()
@@ -2272,12 +2277,36 @@ function interpolate(S::Nemo.PolyRing, x::Array{T, 1}, y::Array{T, 1}) where {T 
          p = P[j] - t
          q = x[j] - x[j - i + 1]
          t = P[j]
-         if isexact(S)
-            flag, P[j] = divides(p, q)
-            flag == false && error("Not an exact division in interpolate")
-         else
-            P[j] = divexact(p, q)
-         end
+         P[j] = divexact(p, q) # division is exact over domain (Lipson, 1971)
+      end
+   end
+   newton_to_monomial!(P, x)
+   r = S(P)
+   set_length!(r, normalise(r, n))
+   return r
+end
+
+function interpolate(S::Nemo.PolyRing, x::Array{T, 1}, y::Array{T, 1}) where {T <: ResElem}
+   length(x) != length(y) && error("Array lengths don't match in interpolate")
+   n = length(x)
+   if n == 0
+      return S()
+   elseif n == 1
+      return S(y[1])
+   end
+   R = base_ring(S)
+   parent(y[1]) != R && error("Polynomial ring does not match inputs")
+   P = Array{T}(n)
+   for i = 1:n
+      P[i] = deepcopy(y[i])
+   end
+   for i = 2:n
+      t = P[i - 1]
+      for j = i:n
+         p = P[j] - t
+         q = x[j] - x[j - i + 1]
+         t = P[j]
+         P[j] = p*inv(q) # must have invertible q for now
       end
    end
    newton_to_monomial!(P, x)

@@ -20,7 +20,7 @@ base_ring(a::nmod) = Union{}
 
 parent(a::nmod) = a.parent
 
-function check_parent(a::nmod, b::nmod) 
+function check_parent(a::nmod, b::nmod)
    a.parent != b.parent && error("Operations on distinct residue rings not supported")
 end
 
@@ -218,7 +218,7 @@ end
 #
 ###############################################################################
 
-function ==(x::nmod, y::nmod) 
+function ==(x::nmod, y::nmod)
    check_parent(x, y)
    return x.data == y.data
 end
@@ -253,7 +253,7 @@ function inv(x::nmod)
    g = ccall((:n_gcdinv, :libflint), UInt, (Ptr{UInt}, UInt, UInt),
          pointer(s), x.data, R.n)
    g != 1 && error("Impossible inverse in ", R)
-   return nmod(s[], R) 
+   return nmod(s[], R)
 end
 
 ###############################################################################

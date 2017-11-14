@@ -32,6 +32,8 @@ base_ring(a::Rationals{T}) where T <: Integer = Integers{T}()
 
 base_ring(a::Rational{T}) where T <: Integer = Integers{T}()
 
+isdomain_type(::Type{Rational{T}}) where T <: Integer = true
+
 ###############################################################################
 #
 #   Basic manipulation
