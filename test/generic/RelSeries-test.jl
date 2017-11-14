@@ -748,7 +748,7 @@ function test_rel_series_special_functions()
    # Exact field
    S, x = PowerSeriesRing(JuliaQQ, 10, "x")
 
-   for iter = 1:10
+   for iter = 1:100
       @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))
 
       f = S()
@@ -768,7 +768,7 @@ function test_rel_series_special_functions()
    # Inexact field
    S, x = PowerSeriesRing(JuliaRealField, 10, "x")
 
-   for iter = 1:10
+   for iter = 1:100
       @test isapprox(exp(x + O(x^iter)), exp(x + O(x^(iter - 1))))
 
       f = S()
@@ -793,11 +793,11 @@ function test_rel_series_special_functions()
       @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))
 
       f = S()
-      while !isunit(f)
+      while !isunit(coeff(f, 0))
          f = rand(S, 0:0, -10:10)
       end
       g = S()
-      while !isunit(g) || !isunit(f + g)
+      while !isunit(coeff(g, 0)) || !isunit(coeff(f + g, 0))
          g = rand(S, 0:0, -10:10)
       end
       f *= x
