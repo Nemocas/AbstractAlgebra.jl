@@ -270,11 +270,11 @@ end
 #   Coprime bases
 #
 ###############################################################################
-# from Bernstein: coprime bases
+
+# Bernstein, "Factoring into coprimes in essentially linear time"
 # ppio(a,b) = (c,n) where v_p(c) = v_p(a) if v_p(b) != 0, 0 otherwise
-#                         c*n = a
-# or c = gcd(a, b^infty), n = div(a, c)
-# is used in various Euclidean domains to for Chinese remaindering.
+# c*n = a or c = gcd(a, b^infty), n = div(a, c).
+# This is used in various Euclidean domains for Chinese remaindering.
 
 doc"""
    ppio(a::T, b::T)

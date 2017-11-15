@@ -146,7 +146,6 @@ function canonical_unit(x::Nemo.ResElem{<:Union{Integer, RingElem}})
   return parent(x)(r)
 end
 
-
 ###############################################################################
 #
 #   AbstractString I/O
