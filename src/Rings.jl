@@ -142,7 +142,7 @@ isexact(R::Ring) = true
 ###############################################################################
 
 # Rings are not domain types unless explicitly specified
-isdomain_type(R::RingElem) = true
+isdomain_type(R::RingElem) = false
 
 ###############################################################################
 #
