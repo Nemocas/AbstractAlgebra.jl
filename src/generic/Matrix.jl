@@ -951,6 +951,7 @@ function fflu!(P::Generic.perm, A::Nemo.MatElem{T}) where {T <: RingElement}
       r += 1
       c += 1
    end
+   inv!(P)
    return rank, d2
 end
 
