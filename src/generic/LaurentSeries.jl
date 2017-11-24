@@ -609,8 +609,8 @@ doc"""
 """
 function shift_right(x::LaurentSeriesElem{T}, len::Int) where {T <: RingElement}
    z = deepcopy(x)
-   set_prec!(z, max(0, precision(x) - len))
-   set_val!(z, max(0, valuation(x) - len))
+   set_prec!(z, precision(x) - len)
+   set_val!(z, valuation(x) - len)
    return z
 end
 
