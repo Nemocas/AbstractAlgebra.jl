@@ -322,6 +322,18 @@ function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true, mod
    Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
 end
 
+function LaurentSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true)
+   Generic.LaurentSeriesRing(R, prec, s; cached=cached)
+end
+
+function LaurentSeriesRing(R::Field, prec::Int, s::AbstractString; cached=true)
+   Generic.LaurentSeriesField(R, prec, s; cached=cached)
+end
+
+function LaurentSeriesField(R::Field, prec::Int, s::AbstractString; cached=true)
+   Generic.LaurentSeriesField(R, prec, s; cached=cached)
+end
+
 function PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
    Generic.PolynomialRing(R, s; cached=cached)
 end
@@ -348,7 +360,8 @@ end
 
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        FractionField, ResidueRing, Partition, PermGroup, YoungTableau,
-       Partitions, SkewDiagram, AllPerms, perm
+       Partitions, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
+       LaurentSeriesField
 
 export Generic
 
