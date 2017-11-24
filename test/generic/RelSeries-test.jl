@@ -730,7 +730,7 @@ function test_rel_series_adhoc_exact_division()
    T = ResidueRing(JuliaZZ, 6)
    R, x = PowerSeriesRing(T, 10, "x")
    for iter = 1:300
-      f = rand(R, 0:0, 0:5)
+      f = rand(R, 0:12, 0:5)
       c = T()
       while !isunit(c)
          c = rand(T, 0:5)

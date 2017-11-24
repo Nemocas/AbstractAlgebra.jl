@@ -146,7 +146,7 @@ function test_laurent_series_unary_ops()
    #  Exact ring
    R, x = LaurentSeriesRing(JuliaZZ, 10, "x")
    for iter = 1:300
-      f = rand(R, 0:12, -10:10)
+      f = rand(R, -12:12, -10:10)
 
       @test isequal(-(-f), f)
       @test iszero(f + (-f))
@@ -155,7 +155,7 @@ function test_laurent_series_unary_ops()
    #  Inexact field
    R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:300
-      f = rand(R, 0:12, -1:1)
+      f = rand(R, -12:12, -1:1)
 
       @test isequal(-(-f), f)
       @test iszero(f + (-f))
@@ -165,7 +165,7 @@ function test_laurent_series_unary_ops()
    T = ResidueRing(JuliaZZ, 6)
    R, x = LaurentSeriesRing(T, 10, "x")
    for iter = 1:300
-      f = rand(R, 0:12, 0:5)
+      f = rand(R, -12:12, 0:5)
 
       @test isequal(-(-f), f)
       @test iszero(f + (-f))
@@ -180,9 +180,9 @@ function test_laurent_series_binary_ops()
    #  Exact ring
    R, x = LaurentSeriesRing(JuliaZZ, 10, "x")
    for iter = 1:100
-      f = rand(R, 0:12, -10:10)
-      g = rand(R, 0:12, -10:10)
-      h = rand(R, 0:12, -10:10)
+      f = rand(R, -12:12, -10:10)
+      g = rand(R, -12:12, -10:10)
+      h = rand(R, -12:12, -10:10)
       @test isequal(f + g, g + f)
       @test isequal(f + (g + h), (f + g) + h)
       @test isequal(f*g, g*f)
@@ -196,9 +196,9 @@ function test_laurent_series_binary_ops()
    #  Inexact field
    R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:100
-      f = rand(R, 0:12, -1:1)
-      g = rand(R, 0:12, -1:1)
-      h = rand(R, 0:12, -1:1)
+      f = rand(R, -12:12, -1:1)
+      g = rand(R, -12:12, -1:1)
+      h = rand(R, -12:12, -1:1)
       @test isapprox(f + (g + h), (f + g) + h)
       @test isapprox(f*g, g*f)
       @test isapprox(f*(g*h), (f*g)*h)
@@ -212,9 +212,9 @@ function test_laurent_series_binary_ops()
    T = ResidueRing(JuliaZZ, 6)
    R, x = LaurentSeriesRing(T, 10, "x")
    for iter = 1:100
-      f = rand(R, 0:12, 0:5)
-      g = rand(R, 0:12, 0:5)
-      h = rand(R, 0:12, 0:5)
+      f = rand(R, -12:12, 0:5)
+      g = rand(R, -12:12, 0:5)
+      h = rand(R, -12:12, 0:5)
       @test isequal(f + (g + h), (f + g) + h)
       @test isequal(f*g, g*f)
       @test f*(g*h) == (f*g)*h
@@ -233,7 +233,7 @@ function test_laurent_series_adhoc_binary_ops()
    # Exact ring
    R, x = LaurentSeriesRing(JuliaZZ, 10, "x")
    for iter = 1:500
-      f = rand(R, 0:12, -10:10)
+      f = rand(R, -12:12, -10:10)
       c1 = rand(JuliaZZ, -10:10)
       c2 = rand(JuliaZZ, -10:10)
       d1 = rand(zz, -10:10)
@@ -253,7 +253,7 @@ function test_laurent_series_adhoc_binary_ops()
    # Inexact field
    R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:500
-      f = rand(R, 0:12, -1:1)
+      f = rand(R, -12:12, -1:1)
       c1 = rand(JuliaZZ, -10:10)
       c2 = rand(JuliaZZ, -10:10)
       d1 = rand(JuliaRealField, -1:1)
@@ -274,7 +274,7 @@ function test_laurent_series_adhoc_binary_ops()
    R = ResidueRing(JuliaZZ, 6)
    S, x = LaurentSeriesRing(R, 10, "x")
    for iter = 1:500
-      f = rand(S, 0:12, 0:5)
+      f = rand(S, -12:12, 0:5)
       c1 = rand(JuliaZZ, -10:10)
       c2 = rand(JuliaZZ, -10:10)
       d1 = rand(zz, -10:10)
@@ -301,7 +301,7 @@ function test_laurent_series_adhoc_binary_ops()
    R, x = JuliaZZ["x"]
    S, y = LaurentSeriesRing(R, 10, "y")
    for iter = 1:100
-      f = rand(S, 0:12, 0:5, -10:10)
+      f = rand(S, -12:12, 0:5, -10:10)
       c1 = rand(JuliaZZ, -10:10)
       c2 = rand(JuliaZZ, -10:10)
       d1 = rand(R, 0:5, -10:10)
@@ -327,11 +327,11 @@ function test_laurent_series_comparison()
    # Exact ring
    R, x = LaurentSeriesRing(JuliaZZ, 10, "x")
    for iter = 1:500
-      f = rand(R, 0:12, -10:10)
+      f = rand(R, -12:12, -10:10)
       g = deepcopy(f)
       h = R()
       while iszero(h)
-         h = rand(R, 0:12, -10:10)
+         h = rand(R, -12:12, -10:10)
       end
 
       @test f == g
@@ -343,11 +343,11 @@ function test_laurent_series_comparison()
    # Inexact field
    R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:500
-      f = rand(R, 0:12, -1:1)
+      f = rand(R, -12:12, -1:1)
       g = deepcopy(f)
       h = R()
       while iszero(h)
-         h = rand(R, 0:12, -1:1)
+         h = rand(R, -12:12, -1:1)
       end
 
       @test f == g
@@ -360,11 +360,11 @@ function test_laurent_series_comparison()
    R = ResidueRing(JuliaZZ, 6)
    S, x = LaurentSeriesRing(R, 10, "x")
    for iter = 1:500
-      f = rand(S, 0:12, 0:5)
+      f = rand(S, -12:12, 0:5)
       g = deepcopy(f)
       h = R()
       while iszero(h)
-         h = rand(S, 0:12, 0:5)
+         h = rand(S, -12:12, 0:5)
       end
 
       @test f == g
@@ -484,7 +484,7 @@ function test_laurent_series_powering()
    R, x = LaurentSeriesRing(JuliaZZ, 10, "x")
 
    for iter = 1:100
-      f = rand(R, 0:12, -10:10)
+      f = rand(R, -12:12, -10:10)
       r2 = R(1)
 
       for expn = 0:10
@@ -500,7 +500,7 @@ function test_laurent_series_powering()
    R, x = LaurentSeriesField(JuliaRealField, 10, "x")
 
    for iter = 1:100
-      f = rand(R, 0:12, -1:1)
+      f = rand(R, -12:12, -1:1)
       r2 = R(1)
 
       for expn = 0:4 # cannot set high power here
@@ -519,7 +519,7 @@ function test_laurent_series_powering()
       Zn = ResidueRing(JuliaZZ, n)
       R, x = LaurentSeriesRing(Zn, 10, "x")
 
-      f = rand(R, 0:12, 0:n - 1)
+      f = rand(R, -12:12, 0:n - 1)
       r2 = R(1)
 
       for expn = 0:10
@@ -540,7 +540,7 @@ function test_laurent_series_shift()
    # Exact ring
    R, x = LaurentSeriesRing(JuliaZZ, 10, "x")
    for iter = 1:300
-      f = rand(R, 0:12, -10:10)
+      f = rand(R, -12:12, -10:10)
       s = rand(0:12)
 
       @test isequal(shift_right(shift_left(f, s), s), f)
@@ -551,7 +551,7 @@ function test_laurent_series_shift()
    # Inexact field
    R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:300
-      f = rand(R, 0:12, -1:1)
+      f = rand(R, -12:12, -1:1)
       s = rand(0:12)
 
       @test isapprox(shift_right(shift_left(f, s), s), f)
@@ -563,7 +563,7 @@ function test_laurent_series_shift()
    T = ResidueRing(JuliaZZ, 6)
    R, x = LaurentSeriesRing(T, 10, "x")
    for iter = 1:300
-      f = rand(R, 0:12, 0:5)
+      f = rand(R, -12:12, 0:5)
       s = rand(0:12)
 
       @test isequal(shift_right(shift_left(f, s), s), f)
@@ -580,8 +580,8 @@ function test_laurent_series_truncation()
    # Exact ring
    R, x = LaurentSeriesRing(JuliaZZ, 10, "x")
    for iter = 1:300
-      f = rand(R, 0:12, -10:10)
-      s = rand(0:12)
+      f = rand(R, -12:12, -10:10)
+      s = rand(-12:12)
 
       @test truncate(f, s) == f
       @test isequal(truncate(f, s), f + O(x^s))
@@ -591,8 +591,8 @@ function test_laurent_series_truncation()
    # Inexact field
    R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:300
-      f = rand(R, 0:12, -1:1)
-      s = rand(0:12)
+      f = rand(R, -12:12, -1:1)
+      s = rand(-12:12)
 
       @test truncate(f, s) == f
       @test isapprox(truncate(f, s), f + O(x^s))
@@ -603,8 +603,8 @@ function test_laurent_series_truncation()
    T = ResidueRing(JuliaZZ, 6)
    R, x = LaurentSeriesRing(T, 10, "x")
    for iter = 1:300
-      f = rand(R, 0:12, 0:5)
-      s = rand(0:12)
+      f = rand(R, -12:12, 0:5)
+      s = rand(-12:12)
 
       @test truncate(f, s) == f
       @test isequal(truncate(f, s), f + O(x^s))
@@ -621,8 +621,8 @@ function test_laurent_series_inversion()
    R, x = LaurentSeriesRing(JuliaZZ, 10, "x")
    for iter = 1:300
       f = R()
-      while !isunit(f)
-         f = rand(R, 0:0, -10:10)
+      while iszero(f) || !isunit(polcoeff(f, 0))
+         f = rand(R, -12:12, -10:10)
       end
 
       @test f*inv(f) == 1
@@ -632,8 +632,8 @@ function test_laurent_series_inversion()
    R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:300
       f = R()
-      while coeff(f, 0) == 0
-         f = rand(R, 0:0, -1:1)
+      while iszero(f)
+         f = rand(R, -12:12, -1:1)
       end
 
       @test isapprox(f*inv(f), R(1))
@@ -644,8 +644,8 @@ function test_laurent_series_inversion()
    R, x = LaurentSeriesRing(T, 10, "x")
    for iter = 1:300
       f = R()
-      while !isunit(f)
-         f = rand(R, 0:0, 0:5)
+      while iszero(f) || !isunit(polcoeff(f, 0))
+         f = rand(R, -12:12, 0:5)
       end
 
       @test f*inv(f) == 1
@@ -660,14 +660,10 @@ function test_laurent_series_exact_division()
    # Exact ring
    R, x = LaurentSeriesRing(JuliaZZ, 10, "x")
    for iter = 1:300
-      s = rand(0:12)
-      f = rand(R, s:s, -10:10)
-      while valuation(f) != s || !isunit(coeff(f, s))
-         f = rand(R, s:s, -10:10)
-      end
-      g = rand(R, s:s, -10:10)
-      while valuation(g) != s || !isunit(coeff(g, s))
-         g = rand(R, s:s, -10:10)
+      f = rand(R, -12:12, -10:10)
+      g = rand(R, -12:12, -10:10)
+      while iszero(g) || !isunit(polcoeff(g, 0))
+         g = rand(R, -12:12, -10:10)
       end
 
       @test divexact(f, g)*g == f
@@ -677,13 +673,10 @@ function test_laurent_series_exact_division()
    R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:300
       s = rand(0:12)
-      f = rand(R, s:s, -1:1)
-      while valuation(f) != s
-         f = rand(R, s:s, -1:1)
-      end
-      g = rand(R, s:s, -1:1)
-      while valuation(g) != s || coeff(g, s) == 0
-         g = rand(R, s:s, -1:1)
+      f = rand(R, -12:12, -1:1)
+      g = rand(R, -12:12, -1:1)
+      while iszero(g) || iszero(polcoeff(g, 0))
+         g = rand(R, -12:12, -1:1)
       end
 
       @test isapprox(divexact(f, g)*g, f)
@@ -694,13 +687,10 @@ function test_laurent_series_exact_division()
    R, x = LaurentSeriesRing(T, 10, "x")
    for iter = 1:300
       s = rand(0:12)
-      f = rand(R, s:s, 0:5)
-      while valuation(f) != s || !isunit(coeff(f, s))
-         f = rand(R, s:s, 0:5)
-      end
-      g = rand(R, s:s, 0:5)
-      while valuation(g) != s || !isunit(coeff(g, s))
-         g = rand(R, s:s, 0:5)
+      f = rand(R, -12:12, 0:5)
+      g = rand(R, -12:12, 0:5)
+      while iszero(g) || !isunit(polcoeff(g, 0))
+         g = rand(R, -12:12, 0:5)
       end
 
       @test divexact(f, g)*g == f
@@ -715,7 +705,7 @@ function test_laurent_series_adhoc_exact_division()
    # Exact field
    R, x = LaurentSeriesRing(JuliaZZ, 10, "x")
    for iter = 1:300
-      f = rand(R, 0:12, -10:10)
+      f = rand(R, -12:12, -10:10)
       c = JuliaZZ()
       while c == 0
          c = rand(JuliaZZ, -10:10)
@@ -727,7 +717,7 @@ function test_laurent_series_adhoc_exact_division()
    # Inexact field
    R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:300
-      f = rand(R, 0:12, -1:1)
+      f = rand(R, -12:12, -1:1)
       c = JuliaRealField()
       while isapprox(c, 0)
          c = rand(JuliaRealField, -1:1)
@@ -740,7 +730,7 @@ function test_laurent_series_adhoc_exact_division()
    T = ResidueRing(JuliaZZ, 6)
    R, x = LaurentSeriesRing(T, 10, "x")
    for iter = 1:300
-      f = rand(R, 0:0, 0:5)
+      f = rand(R, -12:12, 0:5)
       c = T()
       while !isunit(c)
          c = rand(T, 0:5)

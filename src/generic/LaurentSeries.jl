@@ -875,13 +875,10 @@ function divexact(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T}) where {T <: 
    iszero(y) && throw(DivideError())
    v2 = valuation(y)
    if v2 != 0
-      v1 = valuation(x)
-      if v1 >= v2
-         x = shift_right(x, v2)
-         y = shift_right(y, v2)
-      end
+      x = shift_right(x, v2)
+      y = shift_right(y, v2)
    end
-   y = truncate(y, precision(x))
+   y = truncate(y, precision(x) - valuation(x) + valuation(y))
    return x*inv(y)
 end
 
@@ -939,15 +936,15 @@ function inv(a::LaurentSeriesElem)
    iszero(a) && throw(DivideError())
    a1 = polcoeff(a, 0)
    ainv = parent(a)()
-   fit!(ainv, precision(a))
-   set_prec!(ainv, precision(a))
+   fit!(ainv, precision(a) - valuation(a))
+   set_prec!(ainv, precision(a) - 2*valuation(a))
    set_val!(ainv, -valuation(a))
    !isunit(a1) && error("Unable to invert power series")
-   if precision(a) != 0
+   if precision(a) - valuation(a) != 0
       ainv = setcoeff!(ainv, 0, divexact(one(base_ring(a)), a1))
    end
    a1 = -a1
-   for n = 2:precision(a)
+   for n = 2:precision(a) - valuation(a)
       s = polcoeff(a, 1)*polcoeff(ainv, n - 2)
       for i = 2:min(n, pol_length(a)) - 1
          s += polcoeff(a, i)*polcoeff(ainv, n - i - 1)
