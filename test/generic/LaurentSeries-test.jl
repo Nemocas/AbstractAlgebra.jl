@@ -24,6 +24,8 @@ function test_laurent_series_constructors()
    S, t = PolynomialRing(JuliaQQ, "t")
    T, y = LaurentSeriesRing(S, 30, "y")
 
+   U, z = LaurentSeriesField(JuliaQQ, 30, "z")
+
    @test elem_type(R) == Generic.LaurentSeriesRingElem{BigInt}
    @test elem_type(Generic.LaurentSeriesRing{BigInt}) == Generic.LaurentSeriesRingElem{BigInt}
    @test parent_type(Generic.LaurentSeriesRingElem{BigInt}) == Generic.LaurentSeriesRing{BigInt}
@@ -32,27 +34,37 @@ function test_laurent_series_constructors()
    @test elem_type(Generic.LaurentSeriesRing{elem_type(S)}) == Generic.LaurentSeriesRingElem{elem_type(S)}
    @test parent_type(Generic.LaurentSeriesRingElem{elem_type(S)}) == Generic.LaurentSeriesRing{elem_type(S)}
 
-   @test isa(R, Generic.LaurentSeriesRing)
+   @test elem_type(U) == Generic.LaurentSeriesFieldElem{Rational{BigInt}}
+   @test elem_type(Generic.LaurentSeriesField{Rational{BigInt}}) == Generic.LaurentSeriesFieldElem{Rational{BigInt}}
+   @test parent_type(Generic.LaurentSeriesFieldElem{Rational{BigInt}}) == Generic.LaurentSeriesField{Rational{BigInt}}
 
+   @test isa(R, Generic.LaurentSeriesRing)
    @test isa(T, Generic.LaurentSeriesRing)
+   @test isa(U, Generic.LaurentSeriesField)
 
    a1 = x^3 + 2x + 1
    a2 = (t^2 + 1)*y^2 + (t + 3)*y + O(y^4)
+   a3 = z^3 + 2z + 1
 
    @test isa(a1, Generic.LaurentSeriesElem)
    @test isa(a2, Generic.LaurentSeriesElem)
+   @test isa(a3, Generic.LaurentSeriesElem)
 
    b1 = R(a1)
    b2 = T(a2)
+   b3 = U(a3)
 
    @test isa(b1, Generic.LaurentSeriesElem)
    @test isa(b2, Generic.LaurentSeriesElem)
+   @test isa(b3, Generic.LaurentSeriesElem)
 
    c1 = R(BigInt[1, 3, 5], 3, 5, 0)
    c2 = T([t + 1, t, S(1)], 3, 5, 0)
+   c3 = U(Rational{BigInt}[1, 3, 5], 3, 5, 0)
 
    @test isa(c1, Generic.LaurentSeriesElem)
    @test isa(c2, Generic.LaurentSeriesElem)
+   @test isa(c3, Generic.LaurentSeriesElem)
 
    g1 = R(1)
    h1 = R(JuliaZZ(2))
@@ -63,12 +75,19 @@ function test_laurent_series_constructors()
    h2 = T(JuliaQQ(2, 3))
    k2 = T()
 
+   g3 = U(1)
+   h3 = U(JuliaZZ(2))
+   k3 = U()
+
    @test isa(g1, Generic.LaurentSeriesElem)
    @test isa(g2, Generic.LaurentSeriesElem)
+   @test isa(g3, Generic.LaurentSeriesElem)
    @test isa(h1, Generic.LaurentSeriesElem)
    @test isa(h2, Generic.LaurentSeriesElem)
+   @test isa(h3, Generic.LaurentSeriesElem)
    @test isa(k1, Generic.LaurentSeriesElem)
    @test isa(k2, Generic.LaurentSeriesElem)
+   @test isa(k3, Generic.LaurentSeriesElem)
 
    l = T(t)
 
@@ -134,7 +153,7 @@ function test_laurent_series_unary_ops()
    end
 
    #  Inexact field
-   R, x = LaurentSeriesRing(JuliaRealField, 10, "x")
+   R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -1:1)
 
@@ -175,7 +194,7 @@ function test_laurent_series_binary_ops()
    end
 
    #  Inexact field
-   R, x = LaurentSeriesRing(JuliaRealField, 10, "x")
+   R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:100
       f = rand(R, 0:12, -1:1)
       g = rand(R, 0:12, -1:1)
@@ -232,7 +251,7 @@ function test_laurent_series_adhoc_binary_ops()
    end
 
    # Inexact field
-   R, x = LaurentSeriesRing(JuliaRealField, 10, "x")
+   R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:500
       f = rand(R, 0:12, -1:1)
       c1 = rand(JuliaZZ, -10:10)
@@ -322,7 +341,7 @@ function test_laurent_series_comparison()
    end
 
    # Inexact field
-   R, x = LaurentSeriesRing(JuliaRealField, 10, "x")
+   R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:500
       f = rand(R, 0:12, -1:1)
       g = deepcopy(f)
@@ -383,7 +402,7 @@ function test_laurent_series_adhoc_comparison()
    end
 
    # Inexact field
-   R, x = LaurentSeriesRing(JuliaRealField, 10, "x")
+   R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:500
       f = R()
       while isapprox(f, R())
@@ -478,7 +497,7 @@ function test_laurent_series_powering()
    end
 
    # Inexact field
-   R, x = LaurentSeriesRing(JuliaRealField, 10, "x")
+   R, x = LaurentSeriesField(JuliaRealField, 10, "x")
 
    for iter = 1:100
       f = rand(R, 0:12, -1:1)
@@ -530,7 +549,7 @@ function test_laurent_series_shift()
    end
 
    # Inexact field
-   R, x = LaurentSeriesRing(JuliaRealField, 10, "x")
+   R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -1:1)
       s = rand(0:12)
@@ -570,7 +589,7 @@ function test_laurent_series_truncation()
    end
 
    # Inexact field
-   R, x = LaurentSeriesRing(JuliaRealField, 10, "x")
+   R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -1:1)
       s = rand(0:12)
@@ -610,7 +629,7 @@ function test_laurent_series_inversion()
    end
 
    # Inexact field
-   R, x = LaurentSeriesRing(JuliaRealField, 10, "x")
+   R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:300
       f = R()
       while coeff(f, 0) == 0
@@ -655,7 +674,7 @@ function test_laurent_series_exact_division()
    end
 
    # Inexact field
-   R, x = LaurentSeriesRing(JuliaRealField, 10, "x")
+   R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:300
       s = rand(0:12)
       f = rand(R, s:s, -1:1)
@@ -706,7 +725,7 @@ function test_laurent_series_adhoc_exact_division()
    end
 
    # Inexact field
-   R, x = LaurentSeriesRing(JuliaRealField, 10, "x")
+   R, x = LaurentSeriesField(JuliaRealField, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -1:1)
       c = JuliaRealField()
@@ -757,7 +776,7 @@ function test_laurent_series_special_functions()
    end
 
    # Inexact field
-   S, x = LaurentSeriesRing(JuliaRealField, 10, "x")
+   S, x = LaurentSeriesField(JuliaRealField, 10, "x")
 
    for iter = 1:100
       @test isapprox(exp(x + O(x^iter)), exp(x + O(x^(iter - 1))))
