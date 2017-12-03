@@ -92,7 +92,7 @@ function test_fmpz_manipulation()
 
    @test isone(a)
    
-   @test num(fmpz(12)) == fmpz(12)
+   @test numerator(fmpz(12)) == fmpz(12)
 
    @test den(fmpz(12)) == fmpz(1)
 

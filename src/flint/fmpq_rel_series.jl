@@ -496,7 +496,7 @@ function ==(x::fmpq_rel_series, y::fmpz)
          ccall((:fmpq_poly_get_coeff_fmpq, :libflint), Void,
                        (Ptr{fmpq}, Ptr{fmpq_rel_series}, Int), &z, &x, 0)
          return isone(den(z)) && ccall((:fmpz_equal, :libflint), Bool,
-               (Ptr{fmpz}, Ptr{fmpz}, Int), &num(z), &y, 0)
+               (Ptr{fmpz}, Ptr{fmpz}, Int), &numerator(z), &y, 0)
       else
          return false
       end
