@@ -88,7 +88,7 @@ function test_fmpq_manipulation()
 
    @test deepcopy(fmpq(2, 3)) == fmpq(2, 3)
 
-   @test num(fmpq(2, 3)) == 2
+   @test numerator(fmpq(2, 3)) == 2
 
    @test den(fmpq(2, 3)) == 3
 
