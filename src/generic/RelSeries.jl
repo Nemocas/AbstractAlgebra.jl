@@ -671,7 +671,16 @@ doc"""
 function ^(a::Nemo.RelSeriesElem{T}, b::Int) where {T <: RingElement}
    b < 0 && throw(DomainError())
    # special case powers of x for constructing power series efficiently
-   if isgen(a)
+   if pol_length(a) == 0
+      z = parent(a)()
+      set_prec!(z, b*valuation(a))
+      set_val!(z, b*valuation(a))
+      return z
+   elseif b == 0
+      # in fact, the result would be exact 1 if we had exact series
+      z = one(parent(a))
+      return z
+   elseif isgen(a)
       z = parent(a)()
       fit!(z, 1)
       set_prec!(z, b + precision(a) - 1)
@@ -679,19 +688,10 @@ function ^(a::Nemo.RelSeriesElem{T}, b::Int) where {T <: RingElement}
       z = setcoeff!(z, 0, polcoeff(a, 0))
       set_length!(z, 1)
       return z
-   elseif pol_length(a) == 0
-      z = parent(a)()
-      set_prec!(z, b*valuation(a))
-      set_val!(z, b*valuation(a))
-      return z
    elseif pol_length(a) == 1
       z = parent(a)(polcoeff(a, 0)^b)
       set_prec!(z, (b - 1)*valuation(a) + precision(a))
       set_val!(z, b*valuation(a))
-      return z
-   elseif b == 0
-      # in fact, the result would be exact 1 if we had exact series
-      z = one(parent(a))
       return z
    elseif b == 1
       return deepcopy(a)
