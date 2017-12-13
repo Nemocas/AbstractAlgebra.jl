@@ -617,7 +617,7 @@ end
 #
 ###############################################################################
 
-function exp(a::nmod_rel_series)
+function Base.exp(a::nmod_rel_series)
    if iszero(a)
       z = one(parent(a))
       z.prec = precision(a)
