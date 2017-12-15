@@ -94,16 +94,16 @@ end
 function test_gen_res_field_binary_ops()
    print("Generic.ResF.binary_ops...")
 
-   R = Generic.ResidueField(ZZ, 12)
+   R = Generic.ResidueField(ZZ, 13)
 
    f = R(4)
    g = R(6)
 
    @test f + g == R(10)
 
-   @test f - g == R(10)
+   @test f - g == R(11)
 
-   @test f*g == R(0)
+   @test f*g == R(11)
 
    Q = Generic.ResidueField(ZZ, 7)
    S, x = PolynomialRing(Q, "x")
@@ -124,12 +124,12 @@ end
 function test_gen_res_field_gcd()
    print("Generic.ResF.gcd...")
 
-   R = Generic.ResidueField(ZZ, 12)
+   R = Generic.ResidueField(ZZ, 13)
 
    f = R(4)
    g = R(6)
 
-   @test gcd(f, g) == R(2)
+   @test gcd(f, g) == R(1)
 
    Q = Generic.ResidueField(ZZ, 7)
    S, x = PolynomialRing(Q, "x")
@@ -242,11 +242,11 @@ end
 function test_gen_res_field_inversion()
    print("Generic.ResF.inversion...")
 
-   R = Generic.ResidueField(ZZ, 49)
+   R = Generic.ResidueField(ZZ, 47)
 
    a = R(5)
 
-   @test inv(a) == 10
+   @test inv(a) == 19
 
    R = Generic.ResidueField(ZZ, 41)
    S, x = PolynomialRing(R, "x")
@@ -262,12 +262,12 @@ end
 function test_gen_res_field_exact_division()
    print("Generic.ResF.exact_division...")
 
-   R = Generic.ResidueField(ZZ, 49)
+   R = Generic.ResidueField(ZZ, 47)
 
    a = R(5)
    b = R(3)
 
-   @test divexact(a, b) == 18
+   @test divexact(a, b) == 33
 
    R = Generic.ResidueField(ZZ, 41)
    S, x = PolynomialRing(R, "x")
