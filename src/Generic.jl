@@ -34,6 +34,8 @@ include("generic/YoungTabs.jl")
 
 include("generic/Residue.jl")
 
+include("generic/ResidueField.jl")
+
 include("generic/Poly.jl")
 
 include("generic/MPoly.jl")

@@ -961,13 +961,13 @@ end
 ###############################################################################
 
 doc"""
-    AnticNumberField(f::fmpq_poly, s::AbstractString)
+    NumberField(f::fmpq_poly, s::AbstractString)
 > Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
 > of the number field $\mathbb{Q}/(f)$ where $f$ is the supplied polynomial.
 > The supplied string `s` specifies how the generator of the number field
 > should be printed.
 """
-function AnticNumberField(f::fmpq_poly, s::AbstractString; cached = true)
+function NumberField(f::fmpq_poly, s::AbstractString; cached = true)
    S = Symbol(s)
    parent_obj = AnticNumberField(f, S, cached)
 
@@ -975,7 +975,7 @@ function AnticNumberField(f::fmpq_poly, s::AbstractString; cached = true)
 end
 
 doc"""
-    AnticCyclotomicField(n::Int, s::AbstractString, t = "\$")
+    CyclotomicField(n::Int, s::AbstractString, t = "\$")
 > Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
 > of the $n$-th cyclotomic field, $\mathbb{Q}(\zeta_n)$. The supplied string
 > `s` specifies how the generator of the number field should be printed. If
@@ -983,15 +983,15 @@ doc"""
 > from which the number field is constructed, should be printed. If it is not
 > supplied, a default dollar sign will be used to represent the variable.
 """
-function AnticCyclotomicField(n::Int, s::AbstractString, t = "\$"; cached = true)
+function CyclotomicField(n::Int, s::AbstractString, t = "\$"; cached = true)
    Zx, x = PolynomialRing(FlintZZ, string(gensym()); cached = cached)
    Qx, = PolynomialRing(FlintQQ, t; cached = cached)
    f = cyclotomic(n, x)
-   return AnticNumberField(Qx(f), s; cached = cached)
+   return NumberField(Qx(f), s; cached = cached)
 end
 
 doc"""
-    AnticMaximalRealSubfield(n::Int, s::AbstractString, t = "\$")
+    MaximalRealSubfield(n::Int, s::AbstractString, t = "\$")
 > Return a tuple $R, x$ consisting of the parent object $R$ and generator $x$
 > of the totally real subfield of the $n$-th cyclotomic field,
 > $\mathbb{Q}(\zeta_n)$. The supplied string `s` specifies how the generator of
@@ -1000,9 +1000,9 @@ doc"""
 > constructed, should be printed. If it is not supplied, a default dollar sign
 > will be used to represent the variable.
 """
-function AnticMaximalRealSubfield(n::Int, s::AbstractString, t = "\$"; cached = true)
+function MaximalRealSubfield(n::Int, s::AbstractString, t = "\$"; cached = true)
    Zx, x = PolynomialRing(FlintZZ, string(gensym()); cached = cached)
    Qx, = PolynomialRing(FlintQQ, t; cached = cached)
    f = cos_minpoly(n, x)
-   return AnticNumberField(Qx(f), s; cached = cached)
+   return NumberField(Qx(f), s; cached = cached)
 end
