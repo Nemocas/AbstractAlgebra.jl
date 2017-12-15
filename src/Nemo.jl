@@ -354,10 +354,18 @@ function ResidueRing(R::Ring, a::Union{RingElement, Integer}; cached::Bool = tru
    Generic.ResidueRing(R, a; cached=cached)
 end
 
+function ResidueField(R::Ring, a::Union{RingElement, Integer}; cached::Bool = true)
+   Generic.ResidueField(R, a; cached=cached)
+end
+
+function NumberField(a::Nemo.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
+   Generic.NumberField(a, s, t; cached=cached)
+end
+
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        FractionField, ResidueRing, Partition, PermGroup, YoungTableau,
        Partitions, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
-       LaurentSeriesField
+       LaurentSeriesField, ResidueField
 
 export Generic
 
@@ -537,16 +545,6 @@ FiniteField = FlintFiniteField
 
 RealField = ArbField
 ComplexField = AcbField
-
-###############################################################################
-#
-#   Set domain for NumberField to Antic
-#
-###############################################################################
-
-NumberField = AnticNumberField
-CyclotomicField = AnticCyclotomicField
-MaximalRealSubfield = AnticMaximalRealSubfield
 
 ###############################################################################
 #

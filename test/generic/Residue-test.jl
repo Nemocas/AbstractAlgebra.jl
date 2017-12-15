@@ -1,6 +1,6 @@
 function test_gen_res_constructors()
    print("Generic.Res.constructors...")
- 
+
    B = FlintZZ
 
    R = Generic.ResidueRing(B, 16453889)
@@ -19,7 +19,7 @@ function test_gen_res_constructors()
 
    @test isa(b, Generic.Res)
 
-   c = R(fmpz(12))
+   c = R(JuliaZZ(12))
 
    @test isa(c, Generic.Res)
 
@@ -45,7 +45,7 @@ end
 
 function test_gen_res_manipulation()
    print("Generic.Res.manipulation...")
- 
+
    R = Generic.ResidueRing(ZZ, 16453889)
 
    @test modulus(R) == 16453889
@@ -68,7 +68,7 @@ function test_gen_res_manipulation()
    @test data(h) == 1
 
    @test canonical_unit(R(11)) == R(11)
-   
+
    @test canonical_unit(T(x + 1)) == T(x + 1)
 
    @test deepcopy(h) == h
@@ -78,7 +78,7 @@ end
 
 function test_gen_res_unary_ops()
    print("Generic.Res.unary_ops...")
- 
+
    R = Generic.ResidueRing(ZZ, 16453889)
 
    @test -R(12345) == R(16441544)
@@ -93,7 +93,7 @@ end
 
 function test_gen_res_binary_ops()
    print("Generic.Res.binary_ops...")
- 
+
    R = Generic.ResidueRing(ZZ, 12)
 
    f = R(4)
@@ -123,7 +123,7 @@ end
 
 function test_gen_res_gcd()
    print("Generic.Res.gcd...")
- 
+
    R = Generic.ResidueRing(ZZ, 12)
 
    f = R(4)
@@ -145,7 +145,7 @@ end
 
 function test_gen_res_adhoc_binary()
    print("Generic.Res.adhoc_binary...")
- 
+
    R = Generic.ResidueRing(ZZ, 7)
 
    a = R(3)
@@ -172,7 +172,7 @@ end
 
 function test_gen_res_comparison()
    print("Generic.Res.comparison...")
- 
+
    R = Generic.ResidueRing(ZZ, 7)
 
    a = R(3)
@@ -202,7 +202,7 @@ end
 
 function test_gen_res_adhoc_comparison()
    print("Generic.Res.adhoc_comparison...")
- 
+
    R = Generic.ResidueRing(ZZ, 7)
 
    a = R(3)
@@ -222,7 +222,7 @@ end
 
 function test_gen_res_powering()
    print("Generic.Res.powering...")
- 
+
    R = Generic.ResidueRing(ZZ, 7)
 
    a = R(3)
@@ -241,7 +241,7 @@ end
 
 function test_gen_res_inversion()
    print("Generic.Res.inversion...")
- 
+
    R = Generic.ResidueRing(ZZ, 49)
 
    a = R(5)
@@ -261,7 +261,7 @@ end
 
 function test_gen_res_exact_division()
    print("Generic.Res.exact_division...")
- 
+
    R = Generic.ResidueRing(ZZ, 49)
 
    a = R(5)
