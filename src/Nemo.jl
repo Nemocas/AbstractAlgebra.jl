@@ -15,13 +15,9 @@ import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
              typed_hcat, var, vcat, zero, zeros, +, -, *, ==, ^, &, |, $, <<,
              >>, ~, <=, >=, <, >, //, /, !=
 
-if VERSION >= v"0.7.0-DEV.1144"
-import Base: isone
-end
-
-import Base: floor, ceil, hypot, sqrt, log, log1p, expm1, sin, cos, sinpi,
-             cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
-             asinh, acosh, gamma, lgamma, sinpi, cospi, atan2
+import Base: floor, ceil, hypot, sqrt, log1p, expm1, sin, cos, sinpi, cospi,
+             tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh, asinh,
+             acosh, gamma, lgamma, sinpi, cospi, atan2
 
 export elem_type, parent_type
 
