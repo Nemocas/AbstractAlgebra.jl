@@ -557,9 +557,19 @@ function ResidueField(R::Nemo.Ring, a::RingElement; cached::Bool = true)
    return ResField{T}(R(a), cached)
 end
 
+###############################################################################
+#
+#   NumberField constructor (mainly for test code)
+#
+###############################################################################
+
 function NumberField(a::Nemo.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
    S = parent(a)
    R = ResidueField(S, a, cached=cached)
    x = gen(S)
    return R, R(x)
+end
+
+function  gen(R::Nemo.Generic.ResField{Nemo.Generic.Poly{Rational{BigInt}}})
+   return R(gen(base_ring(R)))
 end

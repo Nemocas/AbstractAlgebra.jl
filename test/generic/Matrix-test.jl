@@ -330,7 +330,7 @@ end
 
 function test_gen_mat_constructors()
    print("Generic.Mat.constructors...")
- 
+
    R, t = PolynomialRing(JuliaQQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -363,11 +363,11 @@ function test_gen_mat_constructors()
    m = S()
 
    @test isa(m, MatElem)
-   
+
    @test_throws ErrorConstrDimMismatch S([t t^2 ; t^3 t^4])
    @test_throws ErrorConstrDimMismatch S([t t^2 t^3 ; t^4 t^5 t^6 ; t^7 t^8 t^9 ; t t^2 t^3])
    @test_throws ErrorConstrDimMismatch S([t, t^2])
-   @test_throws ErrorConstrDimMismatch S([t, t^2, t^3, t^4, t^5, t^6, t^7, t^8, t^9, t^10]) 
+   @test_throws ErrorConstrDimMismatch S([t, t^2, t^3, t^4, t^5, t^6, t^7, t^8, t^9, t^10])
 
    arr = [1 2; 3 4]
    arr2 = [1, 2, 3, 4, 5, 6]
@@ -585,7 +585,7 @@ function test_gen_mat_transpose()
    B = matrix(R, permutedims(arr, [2, 1]))
    @test transpose(A) == B
 
-   println("PASS")   
+   println("PASS")
 end
 
 function test_gen_mat_gram()
@@ -622,17 +622,17 @@ function test_gen_mat_content()
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
-   @test content((1 + t)*A) == 1 + t 
+   @test content((1 + t)*A) == 1 + t
    println("PASS")
 end
 
 function test_gen_mat_lufact()
    print("Generic.Mat.lufact...")
 
-   R, x = PolynomialRing(QQ, "x")
+   R, x = PolynomialRing(JuliaQQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixSpace(K, 3, 3)
-   
+
    A = S([a + 1 2a + 3 a^2 + 1; 2a^2 - 1 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 
    r, P, L, U = lufact(A)
@@ -656,7 +656,7 @@ function test_gen_mat_lufact()
 
    R, z = PolynomialRing(JuliaZZ, "z")
    F = FractionField(R)
-   
+
    A = matrix(F, 3, 3, [0, 0, 11, 78*z^3-102*z^2+48*z+12, 92, -16*z^2+80*z-149, -377*z^3+493*z^2-232*z-58, -448, 80*z^2-385*z+719])
 
    r, P, L, U = lufact(A)
@@ -671,10 +671,10 @@ end
 function test_gen_mat_fflu()
    print("Generic.Mat.fflu...")
 
-   R, x = PolynomialRing(QQ, "x")
+   R, x = PolynomialRing(JuliaQQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixSpace(K, 3, 3)
-   
+
    A = S([a + 1 2a + 3 a^2 + 1; 2a^2 - 1 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 
    r, d, P, L, U = fflu(A)
@@ -683,7 +683,7 @@ function test_gen_mat_fflu()
    D[1, 1] = inv(U[1, 1])
    D[2, 2] = inv(U[1, 1]*U[2, 2])
    D[3, 3] = inv(U[2, 2])
-   
+
    @test r == 3
    @test P*A == L*D*U
 
@@ -695,7 +695,7 @@ function test_gen_mat_fflu()
    D[1, 1] = inv(U[1, 1])
    D[2, 2] = inv(U[1, 1]*U[2, 2])
    D[3, 3] = inv(U[2, 2])
-   
+
    @test r == 3
    @test P*A == L*D*U
 
@@ -707,7 +707,7 @@ function test_gen_mat_fflu()
    D[1, 1] = inv(U[1, 1])
    D[2, 2] = inv(U[1, 1]*U[2, 2])
    D[3, 3] = inv(U[2, 2])
-   
+
    @test r == 2
    @test P*A == L*D*U
 
@@ -748,9 +748,9 @@ function test_gen_mat_det()
       @test det(M) == Nemo.det_clow(M)
    end
 
-   R, x = PolynomialRing(QQ, "x")
+   R, x = PolynomialRing(JuliaQQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
-   
+
    for dim = 0:10
       S = MatrixSpace(K, dim, dim)
 
@@ -761,11 +761,11 @@ function test_gen_mat_det()
 
    R, x = PolynomialRing(JuliaZZ, "x")
    S, y = PolynomialRing(R, "y")
-   
+
    for dim = 0:5
       T = MatrixSpace(S, dim, dim)
       M = rand(T, 0:2, 0:2, -10:10)
-      
+
       @test det(M) == Nemo.det_clow(M)
    end
 
@@ -806,7 +806,7 @@ function test_gen_mat_rank()
       @test rank(M) == i
    end
 
-   R, x = PolynomialRing(QQ, "x")
+   R, x = PolynomialRing(JuliaQQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixSpace(K, 3, 3)
 
@@ -826,7 +826,7 @@ function test_gen_mat_rank()
    S, y = PolynomialRing(R, "y")
    T = MatrixSpace(S, 3, 3)
 
-   M = T([(2*x^2)*y^2+(-2*x^2-2*x)*y+(-x^2+2*x) S(0) (-x^2-2)*y^2+(x^2+2*x+2)*y+(2*x^2-x-1); 
+   M = T([(2*x^2)*y^2+(-2*x^2-2*x)*y+(-x^2+2*x) S(0) (-x^2-2)*y^2+(x^2+2*x+2)*y+(2*x^2-x-1);
     (-x)*y^2+(-x^2+x-1)*y+(x^2-2*x+2) S(0) (2*x^2+x-1)*y^2+(-2*x^2-2*x-2)*y+(x^2-x);
     (-x+2)*y^2+(x^2+x+1)*y+(-x^2+x-1) S(0) (-x^2-x+2)*y^2+(-x-1)*y+(-x-1)])
 
@@ -840,7 +840,7 @@ function test_gen_mat_rank()
       @test rank(M) == i
    end
 
-   println("PASS")   
+   println("PASS")
 end
 
 function test_gen_mat_solve_lu()
@@ -912,9 +912,9 @@ function test_gen_mat_solve_rational()
       @test M*x == d*b
    end
 
-   R, x = PolynomialRing(QQ, "x")
+   R, x = PolynomialRing(JuliaQQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
-   
+
    for dim = 0:5
       S = MatrixSpace(K, dim, dim)
       U = MatrixSpace(K, dim, rand(1:5))
@@ -929,20 +929,20 @@ function test_gen_mat_solve_rational()
 
    R, x = PolynomialRing(JuliaZZ, "x")
    S, y = PolynomialRing(R, "y")
-   
+
    for dim = 0:5
       T = MatrixSpace(S, dim, dim)
       U = MatrixSpace(S, dim, rand(1:5))
-     
+
       M = randmat_with_rank(T, 20, dim)
       b = randmat(U, 20)
- 
+
       x, d = solve_rational(M, b)
 
       @test M*x == d*b
    end
 
-   R, t = PolynomialRing(QQ, "t")
+   R, t = PolynomialRing(JuliaQQ, "t")
    K, a = NumberField(t^3 + 3t + 1, "a")
    S, y = PolynomialRing(K, "y")
    T = MatrixSpace(S, 3, 3)
@@ -961,9 +961,9 @@ end
 function test_gen_mat_solve_triu()
    print("Generic.Mat.solve_triu...")
 
-   R, x = PolynomialRing(QQ, "x")
+   R, x = PolynomialRing(JuliaQQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
-   
+
    for dim = 0:10
       S = MatrixSpace(K, dim, dim)
       U = MatrixSpace(K, dim, rand(1:5))
@@ -1006,7 +1006,7 @@ function test_gen_mat_rref()
       @test isrref(A)
    end
 
-   R, x = PolynomialRing(QQ, "x")
+   R, x = PolynomialRing(JuliaQQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixSpace(K, 5, 5)
 
@@ -1032,7 +1032,7 @@ function test_gen_mat_rref()
       @test isrref(A)
    end
 
-   println("PASS")   
+   println("PASS")
 end
 
 function test_gen_mat_nullspace()
@@ -1064,7 +1064,7 @@ function test_gen_mat_nullspace()
       @test iszero(M*N)
    end
 
-   R, x = PolynomialRing(QQ, "x")
+   R, x = PolynomialRing(JuliaQQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixSpace(K, 5, 5)
 
@@ -1092,7 +1092,7 @@ function test_gen_mat_nullspace()
       @test iszero(M*N)
    end
 
-   println("PASS")   
+   println("PASS")
 end
 
 function test_gen_mat_inversion()
@@ -1102,9 +1102,9 @@ function test_gen_mat_inversion()
 
    for dim = 1:5
       R = MatrixSpace(S, dim, dim)
-      
+
       M = randmat_with_rank(R, 5, 100, dim);
-      
+
       X, d = inv(M)
 
       @test M*X == d*one(R)
@@ -1114,17 +1114,17 @@ function test_gen_mat_inversion()
 
    for dim = 1:5
       R = MatrixSpace(S, dim, dim)
-      
+
       M = randmat_with_rank(R, 3, 20, dim);
-      
+
       X, d = inv(M)
 
       @test M*X == d*one(R)
    end
 
-   R, x = PolynomialRing(QQ, "x")
+   R, x = PolynomialRing(JuliaQQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
-   
+
    for dim = 1:5
       S = MatrixSpace(K, dim, dim)
 
@@ -1137,18 +1137,18 @@ function test_gen_mat_inversion()
 
    R, x = PolynomialRing(JuliaZZ, "x")
    S, y = PolynomialRing(R, "y")
-   
+
    for dim = 1:5
       T = MatrixSpace(S, dim, dim)
-     
+
       M = randmat_with_rank(T, 20, dim)
-  
+
       X, d = inv(M)
 
       @test M*X == d*one(T)
    end
 
-   println("PASS")   
+   println("PASS")
 end
 
 function test_gen_mat_hessenberg()
@@ -1169,7 +1169,7 @@ function test_gen_mat_hessenberg()
       end
    end
 
-   println("PASS")   
+   println("PASS")
 end
 
 function test_gen_mat_charpoly()
@@ -1231,7 +1231,7 @@ function test_gen_mat_charpoly()
 
    @test p1 == p2
 
-   println("PASS")   
+   println("PASS")
 end
 
 function test_gen_mat_minpoly()
@@ -1339,7 +1339,7 @@ function test_gen_mat_minpoly()
 
    @test p1 == p2
 
-   println("PASS")   
+   println("PASS")
 end
 
 function test_gen_row_swapping()
@@ -1363,7 +1363,7 @@ function test_gen_mat_concat()
    print("Generic.Mat.concat...")
 
    R, x = PolynomialRing(JuliaZZ, "x")
-      
+
    for i = 1:10
       r = rand(0:10)
       c1 = rand(0:10)
@@ -1378,7 +1378,7 @@ function test_gen_mat_concat()
       @test vcat(transpose(M1), transpose(M2)) == transpose(hcat(M1, M2))
    end
 
-   println("PASS")   
+   println("PASS")
 end
 
 function test_gen_mat_hnf_minors()
@@ -1618,7 +1618,7 @@ function test_gen_mat_weak_popov()
    @test isunit(det(U))
 
    F = GF(7)
-   
+
    S, y = PolynomialRing(F, "y")
 
    B = matrix(S, map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]))
