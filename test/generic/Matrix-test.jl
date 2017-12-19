@@ -1389,7 +1389,10 @@ function test_gen_mat_hnf_minors()
    @test isunit(det(U))
    @test U*A == H
 
-   F, a = FiniteField(7, 2, "a")
+   # Fake up finite field of char 7, degree 2
+   R, x = PolynomialRing(GF(7), "x")
+   F = ResidueField(R, x^2 + 6x + 3)
+   a = F(x)
 
    S, y = PolynomialRing(F, "y")
 

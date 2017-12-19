@@ -48,7 +48,7 @@ end
 function check_parent(a::Nemo.ResElem, b::Nemo.ResElem)
    if parent(a) != parent(b)
       check_parent_type(parent(a), parent(b))
-      parent(a).modulus != parent(b).modulus && error("Incompatible moduli in residue operation") #CF: maybe extend to divisibility?
+      modulus(parent(a)) != modulus(parent(b)) && error("Incompatible moduli in residue operation") #CF: maybe extend to divisibility?
    end
 end
 
@@ -420,7 +420,7 @@ function divides(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement
    check_parent(a, b)
    iszero(b) && error("Division by zero in divides")
    if iszero(a)
-      return true, a 
+      return true, a
    end
    A = data(a)
    B = data(b)
@@ -471,7 +471,7 @@ function mul!(c::Nemo.ResElem{T}, a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where 
 end
 
 function addeq!(c::Nemo.ResElem{T}, a::Nemo.ResElem{T}) where {T <: RingElement}
-   c.data = mod(c.data + data(a), modulus(a))
+   c.data = mod(data(c) + data(a), modulus(a))
    return c
 end
 

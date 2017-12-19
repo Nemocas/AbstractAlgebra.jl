@@ -48,7 +48,7 @@ end
 function check_parent(a::Nemo.ResFieldElem, b::Nemo.ResFieldElem)
    if parent(a) != parent(b)
       check_parent_type(parent(a), parent(b))
-      parent(a).modulus != parent(b).modulus && error("Incompatible moduli in residue operation") #CF: maybe extend to divisibility?
+      modulus(parent(a)) != modulus(parent(b)) && error("Incompatible moduli in residue operation") #CF: maybe extend to divisibility?
    end
 end
 
@@ -72,12 +72,37 @@ function modulus(S::Nemo.ResField)
 end
 
 doc"""
-    modulus(R::Nemo.ResField)
+    modulus(R::Nemo.ResFieldElem)
 > Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
 > residue $r$ belongs to.
 """
 function modulus(r::Nemo.ResFieldElem)
    return modulus(parent(r))
+end
+
+doc"""
+    characteristic(R::Nemo.ResField)
+> Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
+> residue $r$ belongs to.
+"""
+function characteristic(r::Nemo.ResField)
+   R = base_ring(r)
+   while R != Union{}
+      if typeof(R) <: Field
+         return characteristic(R)
+      end
+      R = base_ring(R)
+   end
+   return characteristic(base_ring(R)) 
+end
+
+doc"""
+    characteristic{T <: Integer}(R::Nemo.ResField{T})
+> Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
+> residue $r$ belongs to.
+"""
+function characteristic(r::Nemo.ResField{T}) where T <: Integer
+   return modulus(r)
 end
 
 data(a::Nemo.ResFieldElem) = a.data
@@ -129,23 +154,10 @@ deepcopy_internal(a::Nemo.ResFieldElem, dict::ObjectIdDict) =
 ###############################################################################
 
 function canonical_unit(x::Nemo.ResFieldElem{<:Union{Integer, RingElem}})
- #the simple return x does not work
-  # - if x == 0, this is not a unit
-  # - if R is not a field....
   if iszero(x)
     return one(parent(x))
   end
-  g = gcd(modulus(x), data(x))
-  u = divexact(data(x), g)
-  a, b = ppio(modulus(x), u)
-  if isone(a)
-    r = u
-  elseif isone(b)
-    r = b
-  else
-    r = crt(one(parent(a)), a, u, b)
-  end
-  return parent(x)(r)
+  return x
 end
 
 ###############################################################################
@@ -159,7 +171,7 @@ function show(io::IO, x::Nemo.ResFieldElem)
 end
 
 function show(io::IO, a::Nemo.ResField)
-   print(io, "Residue ring of ", base_ring(a), " modulo ", modulus(a))
+   print(io, "Residue field of ", base_ring(a), " modulo ", modulus(a))
 end
 
 needs_parentheses(x::Nemo.ResFieldElem) = needs_parentheses(data(x))
@@ -419,22 +431,7 @@ end
 function divides(a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T}) where {T <: RingElement}
    check_parent(a, b)
    iszero(b) && error("Division by zero in divides")
-   if iszero(a)
-      return true, a
-   end
-   A = data(a)
-   B = data(b)
-   R = parent(a)
-   m = modulus(R)
-   gb = gcd(B, m)
-   ub = divexact(B, gb)
-   q, r = divrem(A, gb)
-   if !iszero(r)
-     return false, b
-   end
-   _, x = ppio(m, ub)
-   rs = R(q*invmod(ub, x))
-   return true, rs
+   return true, a*inv(b)
 end
 
 ###############################################################################
@@ -471,7 +468,7 @@ function mul!(c::Nemo.ResFieldElem{T}, a::Nemo.ResFieldElem{T}, b::Nemo.ResField
 end
 
 function addeq!(c::Nemo.ResFieldElem{T}, a::Nemo.ResFieldElem{T}) where {T <: RingElement}
-   c.data = mod(c.data + data(a), modulus(a))
+   c.data = mod(data(c) + data(a), modulus(a))
    return c
 end
 
