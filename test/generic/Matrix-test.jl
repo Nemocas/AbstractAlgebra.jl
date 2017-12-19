@@ -1,3 +1,11 @@
+primes100 = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59,
+61, 67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137, 139,
+149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211, 223, 227,
+229, 233, 239, 241, 251, 257, 263, 269, 271, 277, 281, 283, 293, 307, 311,
+313, 317, 331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397, 401,
+409, 419, 421, 431, 433, 439, 443, 449, 457, 461, 463, 467, 479, 487, 491,
+499, 503, 509, 521, 523, 541]
+
 function randpoly(S, d::Int, n::Int)
    r = S()
    x = gen(S)
@@ -17,27 +25,10 @@ function randpoly(S, d::Int)
 end
 
 function randprime(n::Int)
-   r = rand(-n:n)
-   while !isprime(fmpz(r))
-      r = rand(-n:n)
+   if n > 100 || n < 1
+      throw(DomainError())
    end
-   return r
-end
-
-function randprime(n::fmpz)
-   r = rand(-BigInt(n):BigInt(n))
-   while !isprime(fmpz(r))
-       r = rand(-BigInt(n):BigInt(n))
-   end
-   return fmpz(r)
-end
-
-function randprime(n::fmpz, m::fmpz)
-   r = rand(-BigInt(n):BigInt(m))
-   while !isprime(fmpz(r))
-       r = rand(-BigInt(n):BigInt(m))
-   end
-   return fmpz(r)
+   return primes100[rand(1:n)]
 end
 
 randelem(R::Nemo.NmodRing) = rand(R)
@@ -66,7 +57,7 @@ function randelem(R::FinField)
    x = gen(R)
    z = zero(R)
    for i in 0:d-1
-      z += fmpz(rand((BigInt(0):BigInt(p))))*x^i
+      z += BigInt(rand((BigInt(0):BigInt(p))))*x^i
    end
    return z
 end
@@ -1646,13 +1637,11 @@ function test_gen_mat_weak_popov()
       @test U*A == P
       @test isunit(det(U))
    end
-   
-   F = FiniteField(randprime(1000), rand(1:5), "a")[1]
-   FF = FiniteField(fmpz(randprime(1000)), rand(1:5), "a")[1]
-   FFF = ResidueRing(ZZ, randprime(1000))
-   FFFF = ResidueRing(ZZ, randprime(fmpz(2)^100, fmpz(2)^200))
 
-   for R in (F, FF, FFF, FFFF)
+   F = GF(randprime(100))
+   FF = ResidueRing(JuliaZZ, randprime(100))
+
+   for R in (F, FF)
       M = MatrixSpace(PolynomialRing(R, "x")[1], rand(1:5), rand(1:5))
 
       for i in 1:2
