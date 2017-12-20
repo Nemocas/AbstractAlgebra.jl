@@ -706,7 +706,7 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
       fit!(z, 1)
       set_prec!(z, b + precision(a) - 1)
       set_val!(z, b)
-      z = setcoeff!(z, 0, polcoeff(a, 0))
+      z = setcoeff!(z, 0, deepcopy(polcoeff(a, 0)))
       set_length!(z, 1)
       return z
    elseif pol_length(a) == 1
@@ -1093,13 +1093,13 @@ function addeq!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}) where {T <: Ri
          c.coeffs[i] = add!(c.coeffs[i], c.coeffs[i - valc + vala], a.coeffs[i])
       end
       for i = 1:min(lena, valc - vala)
-         c.coeffs[i] = a.coeffs[i]
+         c.coeffs[i] = deepcopy(a.coeffs[i])
       end
       for i = lena + 1:min(valc - vala, lenr)
          c.coeffs[i] = R()
       end
       for i = lenc + valc - vala + 1:lena
-         c.coeffs[i] = a.coeffs[i]
+         c.coeffs[i] = deepcopy(a.coeffs[i])
       end
    else
       for i = lenc + 1:min(vala - valc, lenr)
@@ -1109,7 +1109,7 @@ function addeq!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}) where {T <: Ri
          c.coeffs[i] = addeq!(c.coeffs[i], a.coeffs[i - vala + valc])
       end
       for i = max(lenc, vala - valc) + 1:lena + vala - valc
-         c.coeffs[i] = a.coeffs[i - vala + valc]
+         c.coeffs[i] = deepcopy(a.coeffs[i - vala + valc])
       end
    end
    c.length = normalise(c, lenr)
@@ -1142,7 +1142,7 @@ function add!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeries
    c.val = valr
    if vala > valb
       for i = 1:min(lenb, vala - valb)
-         c.coeffs[i] = b.coeffs[i]
+         c.coeffs[i] = deepcopy(b.coeffs[i])
       end
       for i = lenb + 1:vala - valb
          c.coeffs[i] = R()
@@ -1151,14 +1151,14 @@ function add!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeries
          c.coeffs[i] = add!(c.coeffs[i], a.coeffs[i - vala + valb], b.coeffs[i])
       end
       for i = max(lenb, vala - valb) + 1:lena + vala - valb
-         c.coeffs[i] = a.coeffs[i - vala + valb]
+         c.coeffs[i] = deepcopy(a.coeffs[i - vala + valb])
       end
       for i = lena + vala - valb + 1:lenb
-         c.coeffs[i] = b.coeffs[i]
+         c.coeffs[i] = deepcopy(b.coeffs[i])
       end
    else
       for i = 1:min(lena, valb - vala)
-         c.coeffs[i] = a.coeffs[i]
+         c.coeffs[i] = deepcopy(a.coeffs[i])
       end
       for i = lena + 1:valb - vala
          c.coeffs[i] = R()
@@ -1167,10 +1167,10 @@ function add!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeries
          c.coeffs[i] = add!(c.coeffs[i], a.coeffs[i], b.coeffs[i - valb + vala])
       end
       for i = max(lena, valb - vala) + 1:lenb + valb - vala
-         c.coeffs[i] = b.coeffs[i - valb + vala]
+         c.coeffs[i] = deepcopy(b.coeffs[i - valb + vala])
       end
       for i = lenb + valb - vala + 1:lena
-         c.coeffs[i] = a.coeffs[i]
+         c.coeffs[i] = deepcopy(a.coeffs[i])
       end
    end
    set_length!(c, normalise(c, lenr))
