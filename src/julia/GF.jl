@@ -242,7 +242,7 @@ function ^(x::gfelem{T}, y::Integer) where T <: Integer
    if y == 0
       return one(R)
    elseif y == 1
-      return x
+      return deepcopy(x)
    end
    bit = T(1) << (ndigits(y, 2) - 1)
    z = x

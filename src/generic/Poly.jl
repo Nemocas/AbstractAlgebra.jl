@@ -648,9 +648,9 @@ function ^(a::Nemo.PolyElem{T}, b::Int) where {T <: RingElement}
    if isgen(a)
       z = R()
       fit!(z, b + 1)
-      z = setcoeff!(z, b, coeff(a, 1))
+      z = setcoeff!(z, b, deepcopy(coeff(a, 1)))
       for i = 1:b
-         z = setcoeff!(z, i - 1, coeff(a, 0))
+         z = setcoeff!(z, i - 1, deepcopy(coeff(a, 0)))
       end
       set_length!(z, b + 1)
       return z
