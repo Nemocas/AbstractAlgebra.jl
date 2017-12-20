@@ -2499,11 +2499,13 @@ function add!(c::Nemo.PolyElem{T}, a::Nemo.PolyElem{T}, b::Nemo.PolyElem{T}) whe
       i += 1
    end
    while i <= lena
-      c = setcoeff!(c, i - 1, coeff(a, i - 1))
+      # mutating operators must ensure they don't introduce new aliasing
+      c = setcoeff!(c, i - 1, deepcopy(coeff(a, i - 1)))
       i += 1
    end
    while i <= lenb
-      c = setcoeff!(c, i - 1, coeff(b, i - 1))
+      # mutating operators must ensure they don't introduce new aliasing
+      c = setcoeff!(c, i - 1, deepcopy(coeff(b, i - 1)))
       i += 1
    end
    set_length!(c, normalise(c, len))
