@@ -93,7 +93,7 @@ function characteristic(r::Nemo.ResField)
       end
       R = base_ring(R)
    end
-   return characteristic(base_ring(R)) 
+   return characteristic(base_ring(R))
 end
 
 doc"""
