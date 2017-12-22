@@ -7,9 +7,10 @@
 export MatrixSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
        ishessenberg, identity_matrix, charpoly_hessenberg!, matrix, minpoly,
-       typed_hvcat, typed_hcat, powers, similarity!, solve, solve_rational,
-       hnf, hnf_minors, hnf_minors_with_trafo, hnf_with_trafo, snf,
-       snf_with_trafo, weak_popov, weak_popov_with_trafo, extended_weak_popov,
+       typed_hvcat, typed_hcat, powers, randmat_triu, randmat_with_rank,
+       similarity!, solve, solve_rational, hnf, hnf_minors,
+       hnf_minors_with_trafo, hnf_with_trafo, snf, snf_with_trafo, weak_popov,
+       weak_popov_with_trafo, extended_weak_popov,
        extended_weak_popov_with_trafo, rank_profile_popov, hnf_via_popov,
        hnf_via_popov_with_trafo, popov, det_popov, _check_dim, rows, cols,
        gram, rref, rref!, swap_rows, swap_rows!, hnf_kb, hnf_kb_with_trafo,
@@ -3979,6 +3980,58 @@ function rand(S::Nemo.MatSpace, v...)
    for i = 1:rows(M)
       for j = 1:cols(M)
          M[i, j] = rand(R, v...)
+      end
+   end
+   return M
+end
+
+function randmat_triu(S::Nemo.MatSpace, v...)
+   M = S()
+   R = base_ring(S)
+   for i = 1:rows(M)
+      for j = 1:i - 1
+         M[i, j] = R()
+      end
+      for j = i:cols(M)
+         M[i, j] = rand(R, v...)
+      end
+      while M[i, i] == 0
+         M[i, i] = rand(R, v...)
+      end
+   end
+   return M
+end
+
+function randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: Nemo.RingElement}
+   M = S()
+   R = base_ring(S)
+   for i = 1:rank
+      for j = 1:i - 1
+         M[i, j] = R()
+      end
+      M[i, i] = rand(R, v...)
+      while M[i, i] == 0
+         M[i, i] = rand(R, v...)
+      end
+      for j = i + 1:cols(M)
+         M[i, j] = rand(R, v...)
+      end
+   end
+   for i = rank + 1:rows(M)
+      for j = 1:cols(M)
+         M[i, j] = R()
+      end
+   end
+   m = rows(M)
+   if m > 1
+      for i = 1:4*m
+         r1 = rand(1:m)
+         r2 = rand(1:m - 1)
+         r2 = r2 >= r1 ? r2 + 1 : r2
+         d = rand(-5:5)
+         for j = 1:cols(M)
+            M[r1, j] = M[r1, j] + d*M[r2, j]
+         end
       end
    end
    return M

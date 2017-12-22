@@ -6,255 +6,12 @@ primes100 = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59,
 409, 419, 421, 431, 433, 439, 443, 449, 457, 461, 463, 467, 479, 487, 491,
 499, 503, 509, 521, 523, 541]
 
-function randpoly(S, d::Int, n::Int)
-   r = S()
-   x = gen(S)
-   for i = 0:rand(0:d)
-      r += rand(-n:n)*x^i
-   end
-   return r
-end
-
-function randpoly(S, d::Int)
-   r = S()
-   x = gen(S)
-   for i = 0:rand(0:d)
-      r += randelem(base_ring(S))*x^i
-   end
-   return r
-end
 
 function randprime(n::Int)
    if n > 100 || n < 1
       throw(DomainError())
    end
    return primes100[rand(1:n)]
-end
-
-randelem(R::Nemo.NmodRing) = rand(R)
-
-function randelem(K::AnticNumberField, n)
-   s = K(0)
-   a = gen(K)
-   for i = 1:3
-      s += rand(-n:n)*a^(i-1)
-   end
-   return s
-end
-
-function randelem(R::FmpzPolyRing, n)
-   s = R(0)
-   x = gen(R)
-   for i = 1:3
-      s += rand(-n:n)*x^(i-1)
-   end
-   return s
-end
-
-function randelem(R::FinField)
-   p = characteristic(R)
-   d = degree(R)
-   x = gen(R)
-   z = zero(R)
-   for i in 0:d-1
-      z += BigInt(rand((BigInt(0):BigInt(p))))*x^i
-   end
-   return z
-end
-
-function randelem(R::Generic.ResRing{fmpz})
-   return R(rand(BigInt(0):BigInt(R.modulus - 1)))
-end
-
-function randelem(R::Generic.ResRing{BigInt})
-   return R(rand(BigInt(0):BigInt(R.modulus - 1)))
-end
-
-function randelem(R::Generic.ResRing{fmpz}, n)
-   return R(rand(-n:n))
-end
-
-function randelem(R::Generic.ResRing{BigInt}, n)
-   return rand(R, -n:n)
-end
-
-function randelem(R::Nemo.Rationals{BigInt}, n)
-   z = BigInt(rand(-n:n))
-   while iszero(z)
-      z = BigInt(rand(-n:n))
-   end
-   return BigInt(rand(-n:n))//z
-end
-
-function randelem(R::Nemo.NmodRing, n)
-   return rand(R, -n:n)
-end
-
-function randelem(R::Nemo.Integers, n)
-   return rand(R, -n:n)
-end
-
-function randelem(R, n)
-   s = R(0)
-   x = gen(R)
-   for i = 1:3
-      s += randelem(base_ring(R), n)*x^(i-1)
-   end
-   return s
-end
-
-function randpolymat(R::Generic.MatSpace{T}, d::Int) where {T <: RingElem}
-   m = R.rows
-   n = R.cols
-   r = R()
-   for i = 1:m
-      for j = 1:n
-         r[i, j] = randpoly(base_ring(R), d)
-      end
-   end
-   return r
-end
-
-function randmat(R::Generic.MatSpace{T}, d::Int, c::Int) where {T <: RingElem}
-   m = R.rows
-   n = R.cols
-   r = R()
-   for i = 1:m
-      for j = 1:n
-         r[i, j] = randpoly(base_ring(R), d, c)
-      end
-   end
-   return r
-end
-
-function randmat(S::Generic.MatSpace{T}) where {T <: Nemo.RingElement}
-   M = S()
-   m = rows(M)
-   n = cols(M)
-   for i = 1:m
-      for j = 1:n
-         M[i, j] = randelem(base_ring(S))
-      end
-   end
-   return M
-end
-
-function randmat(S::Generic.MatSpace{T}, c::Int) where {T <: Nemo.RingElement}
-   M = S()
-   m = rows(M)
-   n = cols(M)
-   for i = 1:m
-      for j = 1:n
-         M[i, j] = randelem(base_ring(S), c)
-      end
-   end
-   return M
-end
-
-function randmat_triu(R::Generic.MatSpace{T}, d::Int, c::Int) where {T <: RingElem}
-   m = R.rows
-   n = R.cols
-   r = R()
-   for i = 1:m
-      for j = 1:i - 1
-         r[i, j] = base_ring(R)()
-      end
-      for j = i:n
-         r[i, j] = randpoly(base_ring(R), d, c)
-      end
-      while r[i, i] == 0
-         r[i, i] = randpoly(base_ring(R), d, c)
-      end
-   end
-   return r
-end
-
-function randmat_triu(S::Generic.MatSpace{T}, c::Int) where {T <: RingElem}
-   M = S()
-   m = rows(M)
-   n = cols(M)
-   for i = 1:m
-      for j = 1:i - 1
-         M[i, j] = base_ring(S)()
-      end
-      for j = i:n
-         M[i, j] = randelem(base_ring(S), c)
-      end
-      while M[i, i] == 0
-         M[i, i] = randelem(base_ring(S), c)
-      end
-   end
-   return M
-end
-
-function randmat_with_rank(R::Generic.MatSpace{T}, d::Int, c::Int, rank::Int) where {T <: Nemo.RingElement}
-   m = R.rows
-   n = R.cols
-   r = R()
-   for i = 1:rank
-      for j = 1:i - 1
-         r[i, j] = base_ring(R)()
-      end
-      r[i, i] = randpoly(base_ring(R), d, c)
-      while r[i, i] == 0
-         r[i, i] = randpoly(base_ring(R), d, c)
-      end
-      for j = i + 1:n
-         r[i, j] = randpoly(base_ring(R), d, c)
-      end
-   end
-   for i = rank + 1:m
-      for j = 1:n
-         r[i, j] = base_ring(R)()
-      end
-   end
-   if m > 1
-      for i = 1:4m
-         r1 = rand(1:m)
-         r2 = rand(1:m - 1)
-         r2 = r2 >= r1 ? r2 + 1 : r2
-         d = rand(-5:5)
-         for j = 1:n
-            r[r1, j] = r[r1, j] + d*r[r2, j]
-         end
-      end
-   end
-   return r
-end
-
-function randmat_with_rank(S::Generic.MatSpace{T}, c::Int, rank::Int) where {T <: Nemo.RingElement}
-   M = S()
-   m = rows(M)
-   n = cols(M)
-   for i = 1:rank
-      for j = 1:i - 1
-         M[i, j] = base_ring(S)()
-      end
-      M[i, i] = randelem(base_ring(S), c)
-      while M[i, i] == 0
-         M[i, i] = randelem(base_ring(S), c)
-      end
-      for j = i + 1:n
-         M[i, j] = randelem(base_ring(S), c)
-      end
-   end
-   for i = rank + 1:m
-      for j = 1:n
-         M[i, j] = base_ring(S)()
-      end
-   end
-   if m > 1
-      for i = 1:4m
-         r1 = rand(1:m)
-         r2 = rand(1:m - 1)
-         r2 = r2 >= r1 ? r2 + 1 : r2
-         d = rand(-5:5)
-         for j = 1:n
-            M[r1, j] = M[r1, j] + d*M[r2, j]
-         end
-      end
-   end
-   return M
 end
 
 function Base.istriu(A::Generic.Mat)
@@ -655,7 +412,6 @@ function test_gen_mat_lufact()
    @test r == 3
    @test P*A == L*U
 
-
    println("PASS")
 end
 
@@ -724,7 +480,7 @@ function test_gen_mat_det()
    for dim = 0:5
       R = MatrixSpace(S, dim, dim)
 
-      M = randmat(R, 5, 100)
+      M = rand(R, 0:5, -100:100)
 
       @test det(M) == Nemo.det_clow(M)
    end
@@ -734,7 +490,7 @@ function test_gen_mat_det()
    for dim = 0:5
       R = MatrixSpace(S, dim, dim)
 
-      M = randmat(R, 3, 20)
+      M = rand(R, 0:3, -20:20)
 
       @test det(M) == Nemo.det_clow(M)
    end
@@ -742,10 +498,10 @@ function test_gen_mat_det()
    R, x = PolynomialRing(JuliaQQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
-   for dim = 0:10
+   for dim = 0:7
       S = MatrixSpace(K, dim, dim)
 
-      M = randmat(S, 100)
+      M = rand(S, 0:2, -100:100)
 
       @test det(M) == Nemo.det_clow(M)
    end
@@ -777,7 +533,7 @@ function test_gen_mat_rank()
    R = MatrixSpace(S, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(R, 5, 100, i)
+      M = randmat_with_rank(R, i, 0:5, -100:100)
 
       @test rank(M) == i
    end
@@ -792,7 +548,7 @@ function test_gen_mat_rank()
    R = MatrixSpace(S, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(R, 3, 20, i)
+      M = randmat_with_rank(R, i, 0:3, -20:20)
 
       @test rank(M) == i
    end
@@ -808,7 +564,7 @@ function test_gen_mat_rank()
    S = MatrixSpace(K, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(S, 100, i)
+      M = randmat_with_rank(S, i, 0:2, -100:100)
 
       @test rank(M) == i
    end
@@ -826,7 +582,7 @@ function test_gen_mat_rank()
    T = MatrixSpace(S, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(T, 20, i)
+      M = randmat_with_rank(T, i, 0:2, 0:2, -20:20)
 
       @test rank(M) == i
    end
@@ -843,8 +599,8 @@ function test_gen_mat_solve_lu()
       R = MatrixSpace(S, dim, dim)
       U = MatrixSpace(S, dim, rand(1:5))
 
-      M = randmat_with_rank(R, 100, dim);
-      b = randmat(U, 100);
+      M = randmat_with_rank(R, dim, -100:100)
+      b = rand(U, -100:100)
 
       x = Generic.solve_lu(M, b)
 
@@ -858,8 +614,8 @@ function test_gen_mat_solve_lu()
       R = MatrixSpace(S, dim, dim)
       U = MatrixSpace(S, dim, rand(1:5))
 
-      M = randmat_with_rank(R, 5, 100, dim);
-      b = randmat(U, 5, 100);
+      M = randmat_with_rank(R, dim, 0:5, -100:100)
+      b = rand(U, 0:5, -100:100);
 
       MK = matrix(K, elem_type(K)[ K(M[i, j]) for i in 1:rows(M), j in 1:cols(M) ])
       bK = matrix(K, elem_type(K)[ K(b[i, j]) for i in 1:rows(b), j in 1:cols(b) ])
@@ -881,8 +637,8 @@ function test_gen_mat_solve_rational()
    #   R = MatrixSpace(S, dim, dim)
    #   U = MatrixSpace(S, dim, rand(1:5))
 
-   #   M = randmat_with_rank(R, 5, 100, dim);
-   #   b = randmat(U, 5, 100);
+   #   M = randmat_with_rank(R, dim, 0:5, -100:100)
+   #   b = rand(U, 0:5, -100:100);
 
    #   x, d = solve_rational(M, b)
 
@@ -895,8 +651,8 @@ function test_gen_mat_solve_rational()
       R = MatrixSpace(S, dim, dim)
       U = MatrixSpace(S, dim, rand(1:5))
 
-      M = randmat_with_rank(R, 3, 20, dim);
-      b = randmat(U, 3, 20);
+      M = randmat_with_rank(R, dim, 0:3, -20:20)
+      b = rand(U, 0:3, -20:20);
 
       x, d = solve_rational(M, b)
 
@@ -910,8 +666,8 @@ function test_gen_mat_solve_rational()
       S = MatrixSpace(K, dim, dim)
       U = MatrixSpace(K, dim, rand(1:5))
 
-      M = randmat_with_rank(S, 100, dim);
-      b = randmat(U, 100);
+      M = randmat_with_rank(S, dim, 0:2, -100:100)
+      b = rand(U, 0:2, -100:100)
 
       x = solve(M, b)
 
@@ -925,8 +681,8 @@ function test_gen_mat_solve_rational()
       T = MatrixSpace(S, dim, dim)
       U = MatrixSpace(S, dim, rand(1:5))
 
-      M = randmat_with_rank(T, 20, dim)
-      b = randmat(U, 20)
+      M = randmat_with_rank(T, dim, 0:2, 0:2, -20:20)
+      b = rand(U, 0:3, 0:3, -20:20)
 
       x, d = solve_rational(M, b)
 
@@ -959,8 +715,8 @@ function test_gen_mat_solve_triu()
       S = MatrixSpace(K, dim, dim)
       U = MatrixSpace(K, dim, rand(1:5))
 
-      M = randmat_triu(S, 100);
-      b = randmat(U, 100);
+      M = randmat_triu(S, 0:2, -100:100)
+      b = rand(U, 0:2, -100:100)
 
       x = solve_triu(M, b, false)
 
@@ -977,7 +733,7 @@ function test_gen_mat_rref()
    R = MatrixSpace(S, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(R, 5, 100, i)
+      M = randmat_with_rank(R, i, 0:5, -100:100)
 
       r, d, A = rref(M)
 
@@ -989,7 +745,7 @@ function test_gen_mat_rref()
    R = MatrixSpace(S, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(R, 3, 20, i)
+      M = randmat_with_rank(R, i, 0:3, -20:20)
 
       r, d, A = rref(M)
 
@@ -1002,7 +758,7 @@ function test_gen_mat_rref()
    S = MatrixSpace(K, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(S, 100, i)
+      M = randmat_with_rank(S, i, 0:2, -100:100)
 
       r, A = rref(M)
 
@@ -1015,7 +771,7 @@ function test_gen_mat_rref()
    T = MatrixSpace(S, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(T, 20, i)
+      M = randmat_with_rank(T, i, 0:2, 0:2, -20:20)
 
       r, d, A = rref(M)
 
@@ -1033,7 +789,7 @@ function test_gen_mat_nullspace()
    R = MatrixSpace(S, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(R, 5, 100, i)
+      M = randmat_with_rank(R, i, 0:5, -100:100)
 
       n, N = nullspace(M)
 
@@ -1046,7 +802,7 @@ function test_gen_mat_nullspace()
    R = MatrixSpace(S, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(R, 3, 20, i)
+      M = randmat_with_rank(R, i, 0:3, -20:20)
 
       n, N = nullspace(M)
 
@@ -1060,7 +816,7 @@ function test_gen_mat_nullspace()
    S = MatrixSpace(K, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(S, 100, i)
+      M = randmat_with_rank(S, i, 0:2, -100:100)
 
       n, N = nullspace(M)
 
@@ -1074,7 +830,7 @@ function test_gen_mat_nullspace()
    T = MatrixSpace(S, 5, 5)
 
    for i = 0:5
-      M = randmat_with_rank(T, 20, i)
+      M = randmat_with_rank(T, i, 0:2, 0:2, -20:20)
 
       n, N = nullspace(M)
 
@@ -1094,7 +850,7 @@ function test_gen_mat_inversion()
    for dim = 1:5
       R = MatrixSpace(S, dim, dim)
 
-      M = randmat_with_rank(R, 5, 100, dim);
+      M = randmat_with_rank(R, dim, 0:5, -100:100)
 
       X, d = inv(M)
 
@@ -1106,7 +862,7 @@ function test_gen_mat_inversion()
    for dim = 1:5
       R = MatrixSpace(S, dim, dim)
 
-      M = randmat_with_rank(R, 3, 20, dim);
+      M = randmat_with_rank(R, dim, 0:3, -20:20)
 
       X, d = inv(M)
 
@@ -1119,7 +875,7 @@ function test_gen_mat_inversion()
    for dim = 1:5
       S = MatrixSpace(K, dim, dim)
 
-      M = randmat_with_rank(S, 100, dim);
+      M = randmat_with_rank(S, dim, 0:2, -100:100)
 
       X = inv(M)
 
@@ -1132,7 +888,7 @@ function test_gen_mat_inversion()
    for dim = 1:5
       T = MatrixSpace(S, dim, dim)
 
-      M = randmat_with_rank(T, 20, dim)
+      M = randmat_with_rank(T, dim, 0:2, 0:2, -20:20)
 
       X, d = inv(M)
 
@@ -1152,7 +908,7 @@ function test_gen_mat_hessenberg()
       U, x = PolynomialRing(R, "x")
 
       for i = 1:10
-         M = randmat(S, 5)
+         M = rand(S, -5:5)
 
          A = hessenberg(M)
 
@@ -1173,7 +929,7 @@ function test_gen_mat_charpoly()
       U, x = PolynomialRing(R, "x")
 
       for i = 1:10
-         M = randmat(S, 5)
+         M = rand(S, -5:5)
 
          p1 = charpoly(U, M)
          p2 = charpoly_danilevsky!(U, M)
@@ -1182,7 +938,7 @@ function test_gen_mat_charpoly()
       end
 
       for i = 1:10
-         M = randmat(S, 5)
+         M = rand(S, -5:5)
 
          p1 = charpoly(U, M)
          p2 = charpoly_danilevsky_ff!(U, M)
@@ -1191,7 +947,7 @@ function test_gen_mat_charpoly()
       end
 
       for i = 1:10
-         M = randmat(S, 5)
+         M = rand(S, -5:5)
 
          p1 = charpoly(U, M)
          p2 = charpoly_hessenberg!(U, M)
@@ -1207,7 +963,7 @@ function test_gen_mat_charpoly()
    M = T()
    for i = 1:3
       for j = 1:3
-         M[i, j] = randelem(R, 10)
+         M[i, j] = rand(R, 0:2, -10:10)
          M[i + 3, j + 3] = deepcopy(M[i, j])
       end
    end
@@ -1215,7 +971,7 @@ function test_gen_mat_charpoly()
    p1 = charpoly(U, M)
 
    for i = 1:10
-      similarity!(M, rand(1:6), R(randelem(R, 3)))
+      similarity!(M, rand(1:6), R(rand(R, 0:2, -3:3)))
    end
 
    p2 = charpoly(U, M)
@@ -1299,7 +1055,7 @@ function test_gen_mat_minpoly()
    M = T()
    for i = 1:3
       for j = 1:3
-         M[i, j] = randelem(S, 10)
+         M[i, j] = rand(S, 0:3, 0:3, -10:10)
          M[i + 3, j + 3] = deepcopy(M[i, j])
       end
    end
@@ -1315,7 +1071,7 @@ function test_gen_mat_minpoly()
    M = T()
    for i = 1:3
       for j = 1:3
-         M[i, j] = randelem(R, 10)
+         M[i, j] = rand(R, 0:2, -10:10)
          M[i + 3, j + 3] = deepcopy(M[i, j])
       end
    end
@@ -1323,7 +1079,7 @@ function test_gen_mat_minpoly()
    p1 = minpoly(U, M)
 
    for i = 1:10
-      similarity!(M, rand(1:6), R(randelem(R, 3)))
+      similarity!(M, rand(1:6), R(rand(R, 0:2, -3:3)))
    end
 
    p2 = minpoly(U, M)
@@ -1363,8 +1119,8 @@ function test_gen_mat_concat()
       S1 = MatrixSpace(R, r, c1)
       S2 = MatrixSpace(R, r, c2)
 
-      M1 = randmat(S1, 3, 100)
-      M2 = randmat(S2, 3, 100)
+      M1 = rand(S1, 0:3, -100:100)
+      M2 = rand(S2, 0:3, -100:100)
 
       @test vcat(transpose(M1), transpose(M2)) == transpose(hcat(M1, M2))
    end
@@ -1428,7 +1184,10 @@ function test_gen_mat_hnf_kb()
    @test isunit(det(U))
    @test U*A == H
 
-   F, a = FiniteField(7, 2, "a")
+   # Fake up finite field of char 7, degree 2
+   R, x = PolynomialRing(GF(7), "x")
+   F = ResidueField(R, x^2 + 6x + 3)
+   a = F(x)
 
    S, y = PolynomialRing(F, "y")
 
@@ -1464,7 +1223,10 @@ function test_gen_mat_hnf_cohen()
    @test isunit(det(U))
    @test U*A == H
 
-   F, a = FiniteField(7, 2, "a")
+   # Fake up finite field of char 7, degree 2
+   R, x = PolynomialRing(GF(7), "x")
+   F = ResidueField(R, x^2 + 6x + 3)
+   a = F(x)
 
    S, y = PolynomialRing(F, "y")
 
@@ -1500,7 +1262,10 @@ function test_gen_mat_hnf()
    @test isunit(det(U))
    @test U*A == H
 
-   F, a = FiniteField(7, 2, "a")
+   # Fake up finite field of char 7, degree 2
+   R, x = PolynomialRing(GF(7), "x")
+   F = ResidueField(R, x^2 + 6x + 3)
+   a = F(x)
 
    S, y = PolynomialRing(F, "y")
 
@@ -1537,7 +1302,10 @@ function test_gen_mat_snf_kb()
    @test isunit(det(K))
    @test U*A*K == T
 
-   F, a = FiniteField(7, 2, "a")
+   # Fake up finite field of char 7, degree 2
+   R, x = PolynomialRing(GF(7), "x")
+   F = ResidueField(R, x^2 + 6x + 3)
+   a = F(x)
 
    S, y = PolynomialRing(F, "y")
 
@@ -1575,7 +1343,10 @@ function test_gen_mat_snf()
    @test isunit(det(K))
    @test U*A*K == T
 
-   F, a = FiniteField(7, 2, "a")
+   # Fake up finite field of char 7, degree 2
+   R, x = PolynomialRing(GF(7), "x")
+   F = ResidueField(R, x^2 + 6x + 3)
+   a = F(x)
 
    S, y = PolynomialRing(F, "y")
 
@@ -1630,7 +1401,7 @@ function test_gen_mat_weak_popov()
 
    for i in 1:3
       M = MatrixSpace(PolynomialRing(JuliaQQ, "x")[1], rand(1:5), rand(1:5))
-      A = randmat(M, 5, 5)
+      A = rand(M, 0:5, -5:5)
       r = rank(A)
       P = weak_popov(A)
       @test is_weak_popov(P, r)
@@ -1641,24 +1412,38 @@ function test_gen_mat_weak_popov()
       @test isunit(det(U))
    end
 
-   F = GF(randprime(100))
-   FF = ResidueRing(JuliaZZ, randprime(100))
+   R = GF(randprime(100))
 
-   for R in (F, FF)
-      M = MatrixSpace(PolynomialRing(R, "x")[1], rand(1:5), rand(1:5))
+   M = MatrixSpace(PolynomialRing(R, "x")[1], rand(1:5), rand(1:5))
 
-      for i in 1:2
-         A = randpolymat(M, rand(1:5))
-         r = rank(A)
-         P = weak_popov(A)
-         @test is_weak_popov(P, r)
+   for i in 1:2
+      A = rand(M, 1:5)
+      r = rank(A)
+      P = weak_popov(A)
+      @test is_weak_popov(P, r)
 
-         P, U = weak_popov_with_trafo(A)
-         @test is_weak_popov(P, r)
-         @test U*A == P
-         @test isunit(det(U))
-      end
+      P, U = weak_popov_with_trafo(A)
+      @test is_weak_popov(P, r)
+      @test U*A == P
+      @test isunit(det(U))
    end
+
+   R = ResidueRing(JuliaZZ, randprime(100))
+
+   M = MatrixSpace(PolynomialRing(R, "x")[1], rand(1:5), rand(1:5))
+
+   for i in 1:2
+      A = rand(M, 1:5, 0:100)
+      r = rank(A)
+      P = weak_popov(A)
+      @test is_weak_popov(P, r)
+
+      P, U = weak_popov_with_trafo(A)
+      @test is_weak_popov(P, r)
+      @test U*A == P
+      @test isunit(det(U))
+   end
+
    println("PASS")
 end
 
