@@ -460,7 +460,8 @@ function ^(a::Nemo.AbsSeriesElem{T}, b::Int) where {T <: RingElement}
       set_prec!(z, precision(a))
       return z
    elseif precision(a) > 0 && isgen(a) && b > 0
-      return shift_left(a, b - 1)
+      # arithmetic operators must not introduce new aliasing
+      return deepcopy(shift_left(a, b - 1))
    elseif length(a) == 1
       z = parent(a)(coeff(a, 0)^b)
       set_prec!(z, precision(a))
