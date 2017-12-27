@@ -149,7 +149,7 @@ function test_gen_frac_adhoc_comparison()
 end
 
 function test_gen_frac_powering()
-   print("Generic.Frac.powering()...")
+   print("Generic.Frac.powering...")
 
    S, x = PolynomialRing(JuliaZZ, "x")
 
@@ -161,7 +161,7 @@ function test_gen_frac_powering()
 end
 
 function test_gen_frac_inversion()
-   print("Generic.Frac.inversion()...")
+   print("Generic.Frac.inversion...")
 
    S, x = PolynomialRing(JuliaZZ, "x")
 

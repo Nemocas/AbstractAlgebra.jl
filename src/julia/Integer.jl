@@ -145,7 +145,7 @@ function zero!(a::Integer)
 end
 
 function zero!(a::BigInt)
-   ccall((:__gmpz_set_si, :libgmp), Void, (Ptr{BigInt}, Int), &a, 0)
+   ccall((:__gmpz_set_si, :libgmp), Void, (Ref{BigInt}, Int), a, 0)
    return a
 end
 
@@ -154,7 +154,7 @@ function mul!(a::T, b::T, c::T) where T <: Integer
 end
 
 function mul!(a::BigInt, b::BigInt, c::BigInt)
-   ccall((:__gmpz_mul, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &b, &c)
+   ccall((:__gmpz_mul, :libgmp), Void, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, b, c)
    return a
 end
 
@@ -163,7 +163,7 @@ function add!(a::T, b::T, c::T) where T <: Integer
 end
 
 function add!(a::BigInt, b::BigInt, c::BigInt)
-   ccall((:__gmpz_add, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &b, &c)
+   ccall((:__gmpz_add, :libgmp), Void, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, b, c)
    return a
 end
 
@@ -172,7 +172,7 @@ function addeq!(a::T, b::T) where T <: Integer
 end
 
 function addeq!(a::BigInt, b::BigInt)
-   ccall((:__gmpz_add, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &a, &b)
+   ccall((:__gmpz_add, :libgmp), Void, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, a, b)
    return a
 end
 
@@ -181,7 +181,7 @@ function addmul!(a::T, b::T, c::T, d::T) where T <: Integer
 end
 
 function addmul!(a::BigInt, b::BigInt, c::BigInt, d::BigInt)
-   ccall((:__gmpz_addmul, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &b, &c)
+   ccall((:__gmpz_addmul, :libgmp), Void, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, b, c)
    return a
 end
 
@@ -190,7 +190,7 @@ function addmul!(a::T, b::T, c::T) where T <: Integer # special case, no tempora
 end
 
 function addmul!(a::BigInt, b::BigInt, c::BigInt) # special case, no temporary required
-   ccall((:__gmpz_addmul, :libgmp), Void, (Ptr{BigInt}, Ptr{BigInt}, Ptr{BigInt}), &a, &b, &c)
+   ccall((:__gmpz_addmul, :libgmp), Void, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, b, c)
    return a
 end
 
