@@ -1998,10 +1998,10 @@ mutable struct fmpq_mat <: MatElem{fmpq}
       finalizer(z, _fmpq_mat_clear_fn)
       for i = 1:r
          for j = 1:c
-            el = ccall((:fmpq_mat_entry, :libflint), Ref{fmpq},
+            el = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
                        (Ref{fmpq_mat}, Int, Int), z, i - 1, j - 1)
             ccall((:fmpq_set, :libflint), Void,
-                  (Ref{fmpq}, Ref{fmpq}), el, arr[i, j])
+                  (Ptr{fmpq}, Ref{fmpq}), el, arr[i, j])
          end
       end
       return z
@@ -2015,10 +2015,10 @@ mutable struct fmpq_mat <: MatElem{fmpq}
       b = fmpz(1)
       for i = 1:r
          for j = 1:c
-            el = ccall((:fmpq_mat_entry, :libflint), Ref{fmpq},
+            el = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
                        (Ref{fmpq_mat}, Int, Int), z, i - 1, j - 1)
             ccall((:fmpq_set_fmpz_frac, :libflint), Void,
-                  (Ref{fmpq}, Ref{fmpz}, Ref{fmpz}), el, arr[i, j], b)
+                  (Ptr{fmpq}, Ref{fmpz}, Ref{fmpz}), el, arr[i, j], b)
          end
       end
       return z
@@ -2032,10 +2032,10 @@ mutable struct fmpq_mat <: MatElem{fmpq}
       finalizer(z, _fmpq_mat_clear_fn)
       for i = 1:r
          for j = 1:c
-            el = ccall((:fmpq_mat_entry, :libflint), Ref{fmpq},
+            el = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
                        (Ref{fmpq_mat}, Int, Int), z, i - 1, j - 1)
             ccall((:fmpq_set, :libflint), Void,
-                  (Ref{fmpq}, Ref{fmpq}), el, arr[(i-1)*c+j])
+                  (Ptr{fmpq}, Ref{fmpq}), el, arr[(i-1)*c+j])
          end
       end
       return z
@@ -2049,10 +2049,10 @@ mutable struct fmpq_mat <: MatElem{fmpq}
       b = fmpz(1)
       for i = 1:r
          for j = 1:c
-            el = ccall((:fmpq_mat_entry, :libflint), Ref{fmpq},
+            el = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
                        (Ref{fmpq_mat}, Int, Int), z, i - 1, j - 1)
             ccall((:fmpq_set_fmpz_frac, :libflint), Void,
-                  (Ref{fmpq}, Ref{fmpz}, Ref{fmpz}), el, arr[(i-1)*c+j], b)
+                  (Ptr{fmpq}, Ref{fmpz}, Ref{fmpz}), el, arr[(i-1)*c+j], b)
          end
       end
       return z
@@ -2066,10 +2066,10 @@ mutable struct fmpq_mat <: MatElem{fmpq}
       finalizer(z, _fmpq_mat_clear_fn)
       for i = 1:r
          for j = 1:c
-            el = ccall((:fmpq_mat_entry, :libflint), Ref{fmpq},
+            el = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
                        (Ref{fmpq_mat}, Int, Int), z, i - 1, j - 1)
             ccall((:fmpq_set, :libflint), Void,
-                  (Ref{fmpq}, Ref{fmpq}), el, fmpq(arr[i, j]))
+                  (Ptr{fmpq}, Ref{fmpq}), el, fmpq(arr[i, j]))
          end
       end
       return z
@@ -2082,10 +2082,10 @@ mutable struct fmpq_mat <: MatElem{fmpq}
       finalizer(z, _fmpq_mat_clear_fn)
       for i = 1:r
          for j = 1:c
-            el = ccall((:fmpq_mat_entry, :libflint), Ref{fmpq},
+            el = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
                        (Ref{fmpq_mat}, Int, Int), z, i - 1, j - 1)
             ccall((:fmpq_set, :libflint), Void,
-                  (Ref{fmpq}, Ref{fmpq}), el, fmpq(arr[(i-1)*c+j]))
+                  (Ptr{fmpq}, Ref{fmpq}), el, fmpq(arr[(i-1)*c+j]))
          end
       end
       return z
@@ -2097,10 +2097,10 @@ mutable struct fmpq_mat <: MatElem{fmpq}
             (Ref{fmpq_mat}, Int, Int), z, r, c)
       finalizer(z, _fmpq_mat_clear_fn)
       for i = 1:min(r, c)
-         el = ccall((:fmpq_mat_entry, :libflint), Ref{fmpq},
+         el = ccall((:fmpq_mat_entry, :libflint), Ptr{fmpq},
                     (Ref{fmpq_mat}, Int, Int), z, i - 1, i - 1)
          ccall((:fmpq_set, :libflint), Void,
-               (Ref{fmpq}, Ref{fmpq}), el, d)
+               (Ptr{fmpq}, Ref{fmpq}), el, d)
       end
       return z
    end
@@ -2172,10 +2172,10 @@ mutable struct fmpz_mat <: MatElem{fmpz}
       finalizer(z, _fmpz_mat_clear_fn)
       for i = 1:r
          for j = 1:c
-            el = ccall((:fmpz_mat_entry, :libflint), Ref{fmpz},
+            el = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
                        (Ref{fmpz_mat}, Int, Int), z, i - 1, j - 1)
             ccall((:fmpz_set, :libflint), Void,
-                  (Ref{fmpz}, Ref{fmpz}), el, arr[i, j])
+                  (Ptr{fmpz}, Ref{fmpz}), el, arr[i, j])
          end
       end
       return z
@@ -2188,10 +2188,10 @@ mutable struct fmpz_mat <: MatElem{fmpz}
       finalizer(z, _fmpz_mat_clear_fn)
       for i = 1:r
          for j = 1:c
-            el = ccall((:fmpz_mat_entry, :libflint), Ref{fmpz},
+            el = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
                        (Ref{fmpz_mat}, Int, Int), z, i - 1, j - 1)
             ccall((:fmpz_set, :libflint), Void,
-                  (Ref{fmpz}, Ref{fmpz}), el, arr[(i-1)*c+j])
+                  (Ptr{fmpz}, Ref{fmpz}), el, arr[(i-1)*c+j])
          end
       end
       return z
@@ -2204,10 +2204,10 @@ mutable struct fmpz_mat <: MatElem{fmpz}
       finalizer(z, _fmpz_mat_clear_fn)
       for i = 1:r
          for j = 1:c
-            el = ccall((:fmpz_mat_entry, :libflint), Ref{fmpz},
+            el = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
                        (Ref{fmpz_mat}, Int, Int), z, i - 1, j - 1)
             ccall((:fmpz_set, :libflint), Void,
-                  (Ref{fmpz}, Ref{fmpz}), el, fmpz(arr[i, j]))
+                  (Ptr{fmpz}, Ref{fmpz}), el, fmpz(arr[i, j]))
          end
       end
       return z
@@ -2220,10 +2220,10 @@ mutable struct fmpz_mat <: MatElem{fmpz}
       finalizer(z, _fmpz_mat_clear_fn)
       for i = 1:r
          for j = 1:c
-            el = ccall((:fmpz_mat_entry, :libflint), Ref{fmpz},
+            el = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
                        (Ref{fmpz_mat}, Int, Int), z, i - 1, j - 1)
             ccall((:fmpz_set, :libflint), Void,
-                  (Ref{fmpz}, Ref{fmpz}), el, fmpz(arr[(i-1)*c+j]))
+                  (Ptr{fmpz}, Ref{fmpz}), el, fmpz(arr[(i-1)*c+j]))
          end
       end
       return z
@@ -2235,10 +2235,10 @@ mutable struct fmpz_mat <: MatElem{fmpz}
             (Ref{fmpz_mat}, Int, Int), z, r, c)
       finalizer(z, _fmpz_mat_clear_fn)
       for i = 1:min(r, c)
-         el = ccall((:fmpz_mat_entry, :libflint), Ref{fmpz},
+         el = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
                     (Ref{fmpz_mat}, Int, Int), z, i - 1, i- 1)
          ccall((:fmpz_set, :libflint), Void,
-               (Ref{fmpz}, Ref{fmpz}), el, d)
+               (Ptr{fmpz}, Ref{fmpz}), el, d)
       end
       return z
    end
