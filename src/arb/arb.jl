@@ -99,9 +99,9 @@ doc"""
 > Return the midpoint of $x$ rounded down to a machine double.
 """
 function convert(::Type{Float64}, x::arb)
-    t = ccall((:arb_mid_ptr, :libarb), Ref{arf_struct}, (Ref{arb}, ), x)
+    t = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ref{arb}, ), x)
     # 4 == round to nearest
-    return ccall((:arf_get_d, :libarb), Float64, (Ref{arf_struct}, Int), t, 4)
+    return ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), t, 4)
 end
 
 ################################################################################
@@ -1751,7 +1751,7 @@ end
 #
 ################################################################################
 
-for (typeofx, passtoc) in ((arb, Ref{arb}), (Ref{arb}, Ref{arb}))
+for (typeofx, passtoc) in ((arb, Ref{arb}), (Ptr{arb}, Ptr{arb}))
   for (f,t) in (("arb_set_si", Int), ("arb_set_ui", UInt),
                 ("arb_set_d", Float64))
     @eval begin
@@ -1799,20 +1799,20 @@ for (typeofx, passtoc) in ((arb, Ref{arb}), (Ref{arb}, Ref{arb}))
     end
 
     function _arb_set(x::($typeofx), y::BigFloat)
-      m = ccall((:arb_mid_ptr, :libarb), Ref{arf_struct},
+      m = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct},
                   (($passtoc), ), x)
       r = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct},
                   (($passtoc), ), x)
       ccall((:arf_set_mpfr, :libarb), Void,
-                  (Ref{arf_struct}, Ref{BigFloat}), m, y)
+                  (Ptr{arf_struct}, Ref{BigFloat}), m, y)
       ccall((:mag_zero, :libarb), Void, (Ptr{mag_struct}, ), r)
     end
 
     function _arb_set(x::($typeofx), y::BigFloat, p::Int)
-      m = ccall((:arb_mid_ptr, :libarb), Ref{arf_struct}, (($passtoc), ), x)
+      m = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (($passtoc), ), x)
       r = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (($passtoc), ), x)
       ccall((:arf_set_mpfr, :libarb), Void,
-                  (Ref{arf_struct}, Ref{BigFloat}), m, y)
+                  (Ptr{arf_struct}, Ref{BigFloat}), m, y)
       ccall((:mag_zero, :libarb), Void, (Ptr{mag_struct}, ), r)
       ccall((:arb_set_round, :libarb), Void,
                   (($passtoc), ($passtoc), Int), x, x, p)
