@@ -655,8 +655,8 @@ function roots(x::acb_poly; target=0, isolate_real=false, initial_prec=0, max_pr
                         (Ptr{acb}, ), roots + i * sizeof(acb_struct))
                     im = ccall((:acb_imag_ptr, :libarb), Ptr{arb_struct},
                         (Ptr{acb}, ), roots + i * sizeof(acb_struct))
-                    t = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (Ref{arb}, ), re)
-                    u = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (Ref{arb}, ), im)
+                    t = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (Ptr{arb}, ), re)
+                    u = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (Ptr{arb}, ), im)
                     ok = ok && (ccall((:mag_cmp_2exp_si, :libarb), Cint,
                         (Ptr{mag_struct}, Int), t, -target) <= 0)
                     ok = ok && (ccall((:mag_cmp_2exp_si, :libarb), Cint,
@@ -725,10 +725,10 @@ function roots_upper_bound(x::acb_poly)
    t = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (Ref{arb}, ), z)
    ccall((:acb_poly_root_bound_fujiwara, :libarb), Void,
          (Ptr{mag_struct}, Ref{acb_poly}), t, x)
-   s = ccall((:arb_mid_ptr, :libarb), Ref{arf_struct}, (Ref{arb}, ), z)
-   ccall((:arf_set_mag, :libarb), Void, (Ref{arf_struct}, Ptr{mag_struct}), s, t)
+   s = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ref{arb}, ), z)
+   ccall((:arf_set_mag, :libarb), Void, (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
    ccall((:arf_set_round, :libarb), Void,
-         (Ref{arf_struct}, Ref{arf_struct}, Int, Cint), s, s, p, ARB_RND_CEIL)
+         (Ptr{arf_struct}, Ptr{arf_struct}, Int, Cint), s, s, p, ARB_RND_CEIL)
    ccall((:mag_zero, :libarb), Void, (Ptr{mag_struct},), t)
    return z
 end

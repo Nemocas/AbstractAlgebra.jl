@@ -89,34 +89,34 @@ size(t::fmpz_mat, d) = d <= 2 ? size(t)[d] : 1
 ###############################################################################
 
 function getindex!(v::fmpz, a::fmpz_mat, r::Int, c::Int)
-   z = ccall((:fmpz_mat_entry, :libflint), Ref{fmpz},
+   z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ref{fmpz_mat}, Int, Int), a, r - 1, c - 1)
-   ccall((:fmpz_set, :libflint), Void, (Ref{fmpz}, Ref{fmpz}), v, z)
+   ccall((:fmpz_set, :libflint), Void, (Ref{fmpz}, Ptr{fmpz}), v, z)
 end
 
 @inline function getindex(a::fmpz_mat, r::Int, c::Int)
    @boundscheck Generic._checkbounds(a, r, c)
    v = fmpz()
-   z = ccall((:fmpz_mat_entry, :libflint), Ref{fmpz},
+   z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ref{fmpz_mat}, Int, Int), a, r - 1, c - 1)
-   ccall((:fmpz_set, :libflint), Void, (Ref{fmpz}, Ref{fmpz}), v, z)
+   ccall((:fmpz_set, :libflint), Void, (Ref{fmpz}, Ptr{fmpz}), v, z)
    return v
 end
 
 @inline function setindex!(a::fmpz_mat, d::fmpz, r::Int, c::Int)
    @boundscheck Generic._checkbounds(a, r, c)
-   z = ccall((:fmpz_mat_entry, :libflint), Ref{fmpz},
+   z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ref{fmpz_mat}, Int, Int), a, r - 1, c - 1)
-   ccall((:fmpz_set, :libflint), Void, (Ref{fmpz}, Ref{fmpz}), z, d)
+   ccall((:fmpz_set, :libflint), Void, (Ptr{fmpz}, Ref{fmpz}), z, d)
 end
 
 @inline setindex!(a::fmpz_mat, d::Integer, r::Int, c::Int) = setindex!(a, fmpz(d), r, c)
 
 @inline function setindex!(a::fmpz_mat, d::Int, r::Int, c::Int)
    @boundscheck Generic._checkbounds(a, r, c)
-   z = ccall((:fmpz_mat_entry, :libflint), Ref{fmpz},
+   z = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
              (Ref{fmpz_mat}, Int, Int), a, r - 1, c - 1)
-   ccall((:fmpz_set_si, :libflint), Void, (Ref{fmpz}, Int), z, d)
+   ccall((:fmpz_set_si, :libflint), Void, (Ptr{fmpz}, Int), z, d)
 end
 
 @inline rows(a::fmpz_mat) = a.r

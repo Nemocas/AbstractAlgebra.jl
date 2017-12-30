@@ -47,9 +47,9 @@ base_ring(a::AcbMatSpace) = a.base_ring
 base_ring(a::acb_mat) = a.base_ring
 
 function getindex!(z::acb, x::acb_mat, r::Int, c::Int)
-  v = ccall((:acb_mat_entry_ptr, :libarb), Ref{acb},
+  v = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
               (Ref{acb_mat}, Int, Int), x, r - 1, c - 1)
-  ccall((:acb_set, :libarb), Void, (Ref{acb}, Ref{acb}), z, v)
+  ccall((:acb_set, :libarb), Void, (Ref{acb}, Ptr{acb}), z, v)
   return z
 end
 
@@ -57,9 +57,9 @@ end
   @boundscheck Generic._checkbounds(x, r, c)
 
   z = base_ring(x)()
-  v = ccall((:acb_mat_entry_ptr, :libarb), Ref{acb},
+  v = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
               (Ref{acb_mat}, Int, Int), x, r - 1, c - 1)
-  ccall((:acb_set, :libarb), Void, (Ref{acb}, Ref{acb}), z, v)
+  ccall((:acb_set, :libarb), Void, (Ref{acb}, Ptr{acb}), z, v)
   return z
 end
 
@@ -68,7 +68,7 @@ for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, acb, AbstractString]
       @inline function setindex!(x::acb_mat, y::$T, r::Int, c::Int)
          @boundscheck Generic._checkbounds(x, r, c)
 
-         z = ccall((:acb_mat_entry_ptr, :libarb), Ref{acb},
+         z = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                    (Ref{acb_mat}, Int, Int), x, r - 1, c - 1)
          _acb_set(z, y, prec(base_ring(x)))
       end
@@ -84,7 +84,7 @@ for T in [Integer, Float64, fmpz, fmpq, arb, BigFloat, AbstractString]
       @inline function setindex!(x::acb_mat, y::Tuple{$T, $T}, r::Int, c::Int)
          @boundscheck Generic._checkbounds(x, r, c)
 
-         z = ccall((:acb_mat_entry_ptr, :libarb), Ref{acb},
+         z = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                    (Ref{acb_mat}, Int, Int), x, r - 1, c - 1)
          _acb_set(z, y[1], y[2], prec(base_ring(x)))
       end
@@ -678,9 +678,9 @@ function bound_inf_norm(x::acb_mat)
   t = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (Ref{arb}, ), z)
   ccall((:acb_mat_bound_inf_norm, :libarb), Void,
               (Ptr{mag_struct}, Ref{acb_mat}), t, x)
-  s = ccall((:arb_mid_ptr, :libarb), Ref{arf_struct}, (Ref{arb}, ), z)
+  s = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ref{arb}, ), z)
   ccall((:arf_set_mag, :libarb), Void,
-              (Ref{arf_struct}, Ptr{mag_struct}), s, t)
+              (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
   ccall((:mag_zero, :libarb), Void,
               (Ptr{mag_struct},), t)
   return ArbField(prec(base_ring(x)))(z)

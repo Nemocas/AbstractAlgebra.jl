@@ -47,9 +47,9 @@ parent(x::arb_mat, cached::Bool = true) =
 prec(x::ArbMatSpace) = prec(x.base_ring)
 
 function getindex!(z::arb, x::arb_mat, r::Int, c::Int)
-  v = ccall((:arb_mat_entry_ptr, :libarb), Ref{arb},
+  v = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
               (Ref{arb_mat}, Int, Int), x, r - 1, c - 1)
-  ccall((:arb_set, :libarb), Void, (Ref{arb}, Ref{arb}), z, v)
+  ccall((:arb_set, :libarb), Void, (Ref{arb}, Ptr{arb}), z, v)
   return z
 end
 
@@ -57,9 +57,9 @@ end
   @boundscheck Generic._checkbounds(x, r, c)
 
   z = base_ring(x)()
-  v = ccall((:arb_mat_entry_ptr, :libarb), Ref{arb},
+  v = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
               (Ref{arb_mat}, Int, Int), x, r - 1, c - 1)
-  ccall((:arb_set, :libarb), Void, (Ref{arb}, Ref{arb}), z, v)
+  ccall((:arb_set, :libarb), Void, (Ref{arb}, Ptr{arb}), z, v)
   return z
 end
 
@@ -68,7 +68,7 @@ for T in [Int, UInt, fmpz, fmpq, Float64, BigFloat, arb, AbstractString]
       @inline function setindex!(x::arb_mat, y::$T, r::Int, c::Int)
          @boundscheck Generic._checkbounds(x, r, c)
 
-         z = ccall((:arb_mat_entry_ptr, :libarb), Ref{arb},
+         z = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
                    (Ref{arb_mat}, Int, Int), x, r - 1, c - 1)
          Nemo._arb_set(z, y, prec(base_ring(x)))
       end
@@ -615,9 +615,9 @@ function bound_inf_norm(x::arb_mat)
   t = ccall((:arb_rad_ptr, :libarb), Ptr{mag_struct}, (Ref{arb}, ), z)
   ccall((:arb_mat_bound_inf_norm, :libarb), Void,
               (Ptr{mag_struct}, Ref{arb_mat}), t, x)
-  s = ccall((:arb_mid_ptr, :libarb), Ref{arf_struct}, (Ref{arb}, ), z)
+  s = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ref{arb}, ), z)
   ccall((:arf_set_mag, :libarb), Void,
-              (Ref{arf_struct}, Ptr{mag_struct}), s, t)
+              (Ptr{arf_struct}, Ptr{mag_struct}), s, t)
   ccall((:mag_zero, :libarb), Void,
               (Ptr{mag_struct},), t)
   return base_ring(x)(z)

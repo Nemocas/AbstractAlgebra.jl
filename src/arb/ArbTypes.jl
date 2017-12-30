@@ -133,7 +133,7 @@ mutable struct arb <: FieldElem
   #function arb(x::arf)
   #  z = new()
   #  ccall((:arb_init, :libarb), Void, (Ref{arb}, ), z)
-  #  ccall((:arb_set_arf, :libarb), Void, (Ref{arb}, Ref{arf}), z, x)
+  #  ccall((:arb_set_arf, :libarb), Void, (Ref{arb}, Ptr{arf}), z, x)
   #  finalizer(z, _arb_clear_fn)
   #  return z
   #end
@@ -525,7 +525,7 @@ mutable struct arb_mat <: MatElem{arb}
     finalizer(z, _arb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, :libarb), Ref{arb},
+        el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
                     (Ref{arb_mat}, Int, Int), z, i - 1, j - 1)
         Nemo._arb_set(el, arr[i, j])
       end
@@ -540,7 +540,7 @@ mutable struct arb_mat <: MatElem{arb}
     finalizer(z, _arb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, :libarb), Ref{arb},
+        el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
                     (Ref{arb_mat}, Int, Int), z, i - 1, j - 1)
         Nemo._arb_set(el, arr[(i-1)*c+j])
       end
@@ -555,7 +555,7 @@ mutable struct arb_mat <: MatElem{arb}
     finalizer(z, _arb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, :libarb), Ref{arb},
+        el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
                     (Ref{arb_mat}, Int, Int), z, i - 1, j - 1)
         _arb_set(el, arr[i, j], prec)
       end
@@ -570,7 +570,7 @@ mutable struct arb_mat <: MatElem{arb}
     finalizer(z, _arb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        el = ccall((:arb_mat_entry_ptr, :libarb), Ref{arb},
+        el = ccall((:arb_mat_entry_ptr, :libarb), Ptr{arb},
                     (Ref{arb_mat}, Int, Int), z, i - 1, j - 1)
         _arb_set(el, arr[(i-1)*c+j], prec)
       end
@@ -680,7 +680,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, :libarb), Ref{acb},
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j])
       end
@@ -695,7 +695,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, :libarb), Ref{acb},
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j])
       end
@@ -710,7 +710,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, :libarb), Ref{acb},
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j])
       end
@@ -725,7 +725,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, :libarb), Ref{acb},
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j])
       end
@@ -740,7 +740,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, :libarb), Ref{acb},
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j], prec)
       end
@@ -755,7 +755,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, :libarb), Ref{acb},
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j], prec)
       end
@@ -770,7 +770,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, :libarb), Ref{acb},
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j], prec)
       end
@@ -785,7 +785,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, :libarb), Ref{acb},
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j], prec)
       end
@@ -801,7 +801,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, :libarb), Ref{acb},
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j][1], arr[i,j][2], prec)
       end
@@ -817,7 +817,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, :libarb), Ref{acb},
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[i, j][1], arr[i,j][2], prec)
       end
@@ -833,7 +833,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, :libarb), Ref{acb},
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
       end
@@ -849,7 +849,7 @@ mutable struct acb_mat <: MatElem{acb}
     finalizer(z, _acb_mat_clear_fn)
     for i = 1:r
       for j = 1:c
-        el = ccall((:acb_mat_entry_ptr, :libarb), Ref{acb},
+        el = ccall((:acb_mat_entry_ptr, :libarb), Ptr{acb},
                     (Ref{acb_mat}, Int, Int), z, i - 1, j - 1)
         _acb_set(el, arr[(i-1)*c+j][1], arr[(i-1)*c+j][2], prec)
       end

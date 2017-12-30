@@ -113,13 +113,13 @@ end
 ################################################################################
 
 function convert(::Type{Complex128}, x::acb)
-    re = ccall((:acb_real_ptr, :libarb), Ref{arb_struct}, (Ref{acb}, ), x)
-    im = ccall((:acb_imag_ptr, :libarb), Ref{arb_struct}, (Ref{acb}, ), x)
-    t = ccall((:arb_mid_ptr, :libarb), Ref{arf_struct}, (Ref{arb}, ), re)
-    u = ccall((:arb_mid_ptr, :libarb), Ref{arf_struct}, (Ref{arb}, ), im)
+    re = ccall((:acb_real_ptr, :libarb), Ptr{arb_struct}, (Ref{acb}, ), x)
+    im = ccall((:acb_imag_ptr, :libarb), Ptr{arb_struct}, (Ref{acb}, ), x)
+    t = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), re)
+    u = ccall((:arb_mid_ptr, :libarb), Ptr{arf_struct}, (Ptr{arb}, ), im)
     # 4 == round to nearest
-    v = ccall((:arf_get_d, :libarb), Float64, (Ref{arf_struct}, Int), t, 4)
-    w = ccall((:arf_get_d, :libarb), Float64, (Ref{arf_struct}, Int), u, 4)
+    v = ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), t, 4)
+    w = ccall((:arf_get_d, :libarb), Float64, (Ptr{arf_struct}, Int), u, 4)
     return complex(v, w)
 end
 
@@ -1458,7 +1458,7 @@ end
 #
 ################################################################################
 
-for (typeofx, passtoc) in ((acb, Ref{acb}), (Ref{acb}, Ref{acb}))
+for (typeofx, passtoc) in ((acb, Ref{acb}), (Ptr{acb}, Ptr{acb}))
   for (f,t) in (("acb_set_si", Int), ("acb_set_ui", UInt),
                 ("acb_set_d", Float64))
     @eval begin
@@ -1509,24 +1509,24 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ref{acb}, Ref{acb}))
     end
 
     function _acb_set(x::($typeofx), y::AbstractString, p::Int)
-      r = ccall((:acb_real_ptr, :libarb), Ref{arb}, (($passtoc), ), x)
+      r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
       _arb_set(r, y, p)
-      i = ccall((:acb_imag_ptr, :libarb), Ref{arb}, (($passtoc), ), x)
-      ccall((:arb_zero, :libarb), Void, (Ref{arb}, ), i)
+      i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+      ccall((:arb_zero, :libarb), Void, (Ptr{arb}, ), i)
     end
 
     function _acb_set(x::($typeofx), y::BigFloat)
-      r = ccall((:acb_real_ptr, :libarb), Ref{arb}, (($passtoc), ), x)
+      r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
       _arb_set(r, y)
-      i = ccall((:acb_imag_ptr, :libarb), Ref{arb}, (($passtoc), ), x)
-      ccall((:arb_zero, :libarb), Void, (Ref{arb}, ), i)
+      i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+      ccall((:arb_zero, :libarb), Void, (Ptr{arb}, ), i)
     end
 
     function _acb_set(x::($typeofx), y::BigFloat, p::Int)
-      r = ccall((:acb_real_ptr, :libarb), Ref{arb}, (($passtoc), ), x)
+      r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
       _arb_set(r, y, p)
-      i = ccall((:acb_imag_ptr, :libarb), Ref{arb}, (($passtoc), ), x)
-      ccall((:arb_zero, :libarb), Void, (Ref{arb}, ), i)
+      i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
+      ccall((:arb_zero, :libarb), Void, (Ptr{arb}, ), i)
     end
 
     function _acb_set(x::($typeofx), y::Int, z::Int, p::Int)
@@ -1548,16 +1548,16 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ref{acb}, Ref{acb}))
     end
 
     function _acb_set(x::($typeofx), y::fmpq, z::fmpq, p::Int)
-      r = ccall((:acb_real_ptr, :libarb), Ref{arb}, (($passtoc), ), x)
+      r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
       _arb_set(r, y, p)
-      i = ccall((:acb_imag_ptr, :libarb), Ref{arb}, (($passtoc), ), x)
+      i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
       _arb_set(i, z, p)
     end
 
     function _acb_set(x::($typeofx), y::T, z::T, p::Int) where {T <: AbstractString}
-      r = ccall((:acb_real_ptr, :libarb), Ref{arb}, (($passtoc), ), x)
+      r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
       _arb_set(r, y, p)
-      i = ccall((:acb_imag_ptr, :libarb), Ref{arb}, (($passtoc), ), x)
+      i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
       _arb_set(i, z, p)
     end
 
@@ -1566,16 +1566,16 @@ for (typeofx, passtoc) in ((acb, Ref{acb}), (Ref{acb}, Ref{acb}))
   for T in (Float64, BigFloat, UInt, fmpz)
     @eval begin
       function _acb_set(x::($typeofx), y::($T), z::($T))
-        r = ccall((:acb_real_ptr, :libarb), Ref{arb}, (($passtoc), ), x)
+        r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
         _arb_set(r, y)
-        i = ccall((:acb_imag_ptr, :libarb), Ref{arb}, (($passtoc), ), x)
+        i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
         _arb_set(i, z)
       end
 
       function _acb_set(x::($typeofx), y::($T), z::($T), p::Int)
-        r = ccall((:acb_real_ptr, :libarb), Ref{arb}, (($passtoc), ), x)
+        r = ccall((:acb_real_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
         _arb_set(r, y, p)
-        i = ccall((:acb_imag_ptr, :libarb), Ref{arb}, (($passtoc), ), x)
+        i = ccall((:acb_imag_ptr, :libarb), Ptr{arb}, (($passtoc), ), x)
         _arb_set(i, z, p)
       end
     end
