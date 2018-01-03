@@ -269,6 +269,10 @@ function exp(a::T) where T
    return Base.exp(a)
 end
 
+function sqrt(a::T) where T
+  return Base.sqrt(a)
+end
+
 function PermGroup(n::Int, cached=true)
    Generic.PermGroup(n, cached)
 end

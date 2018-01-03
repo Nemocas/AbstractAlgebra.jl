@@ -695,6 +695,61 @@ end
 
 ###############################################################################
 #
+#   Square root
+#
+###############################################################################
+
+doc"""
+   sqrt(a::Nemo.AbsSeriesElem)
+> Return the square root of the power series $a$.
+"""
+# Given a power series f = f0 + f1*x + f2*x^2 + ..., compute the square root
+# g = g0 + g1*x + g2*x^2 + ... using the relations g0^2 = f0, 2g0*g1 = f1
+# 2g0*g2 = f2 - g1^2, 2g0*g3 = f3 - 2g1*g2, 2g0*g4 = f4 - (2g1*g3 + g2^2), etc.
+# where the terms being subtracted are those contributing to the i-th
+# coefficient of the square of g
+function Base.sqrt(a::Nemo.AbsSeriesElem)
+   aval = valuation(a)
+   mod(aval, 2) != 0 && error("Not a square in sqrt")
+   R = base_ring(a)
+   !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
+   aval2 = div(aval, 2)
+   prec = precision(a) - aval2
+   asqrt = parent(a)()
+   fit!(asqrt, prec)
+   set_prec!(asqrt, prec)
+   for n = 1:aval2
+      asqrt = setcoeff!(asqrt, n - 1, R())
+   end
+   if prec > aval2
+      g = Nemo.sqrt(coeff(a, aval))
+      setcoeff!(asqrt, aval2, g)
+      g2 = g + g
+   end
+   p = R()
+   for n = 1:prec - aval2 - 1
+      c = R()
+      for i = 1:div(n - 1, 2)
+         j = n - i
+         p = mul!(p, coeff(asqrt, aval2 + i), coeff(asqrt, aval2 + j))
+         c = addeq!(c, p)
+      end
+      c *= 2
+      if (n % 2) == 0
+         i = div(n, 2)
+         p = mul!(p, coeff(asqrt, aval2 + i), coeff(asqrt, aval2 + i))
+         c = addeq!(c, p)
+      end
+      c = coeff(a, n + aval) - c
+      c = divexact(c, g2)
+      asqrt = setcoeff!(asqrt, aval2 + n, c)
+   end
+   set_length!(asqrt, normalise(asqrt, prec))
+   return asqrt
+end
+
+###############################################################################
+#
 #   Special functions
 #
 ###############################################################################

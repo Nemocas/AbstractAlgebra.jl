@@ -585,6 +585,8 @@ function PowerSeriesRing(R::FqFiniteField, prec::Int, s::AbstractString; model=:
       parent_obj = FqRelSeriesRing(R, prec, S, cached)
    elseif model == :capped_absolute
       parent_obj = FqAbsSeriesRing(R, prec, S, cached)
+   else
+      error("Unknown model")
    end
 
    return parent_obj, gen(parent_obj)

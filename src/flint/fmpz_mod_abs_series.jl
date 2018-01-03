@@ -612,6 +612,8 @@ function PowerSeriesRing(R::Generic.ResRing{fmpz}, prec::Int, s::AbstractString;
       parent_obj = FmpzModRelSeriesRing(R, prec, S, cached)
    elseif model == :capped_absolute
       parent_obj = FmpzModAbsSeriesRing(R, prec, S, cached)
+   else
+      error("Unknown model")
    end
    return parent_obj, gen(parent_obj)
 end

@@ -847,6 +847,8 @@ function PowerSeriesRing(R::FlintRationalField, prec::Int, s::AbstractString; mo
       parent_obj = FmpqRelSeriesRing(prec, S, cached)
    elseif model == :capped_absolute
       parent_obj = FmpqAbsSeriesRing(prec, S, cached)
+   else
+      error("Unknown model")
    end
 
    return parent_obj, gen(parent_obj)

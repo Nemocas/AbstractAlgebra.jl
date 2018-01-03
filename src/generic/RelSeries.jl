@@ -1258,6 +1258,8 @@ function PowerSeriesRing(R::Nemo.Ring, prec::Int, s::AbstractString; cached=true
       parent_obj = RelSeriesRing{T}(R, prec, S, cached)
    elseif model == :capped_absolute
       parent_obj = AbsSeriesRing{T}(R, prec, S, cached)
+   else
+      error("Unknown model")
    end
 
    return parent_obj, gen(parent_obj)

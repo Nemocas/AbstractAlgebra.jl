@@ -975,6 +975,21 @@ function isqrtrem(x::fmpz)
 end
 
 doc"""
+    sqrt(x::fmpz)
+> Return the square root $s$ of $x$ if $x$ is a square, otherwise raise an
+> exception. We require $x \geq 0$.
+"""
+function sqrt(x::fmpz)
+    x < 0 && throw(DomainError())
+    s = fmpz()
+    r = fmpz()
+    ccall((:fmpz_sqrtrem, :libflint), Void,
+          (Ref{fmpz}, Ref{fmpz}, Ref{fmpz}), s, r, x)
+    r != 0 && error("Not a square in sqrt")
+    return s
+end
+
+doc"""
     root(x::fmpz, n::Int)
 > Return the floor of the $n$-the root of $x$. We require $n > 0$ and that
 > $x \geq 0$ if $n$ is even.
