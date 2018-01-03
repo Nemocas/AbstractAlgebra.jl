@@ -1698,7 +1698,7 @@ function solve_with_det(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: Ring
    p = PermGroup(rows(M))()
    r, d = fflu!(p, FFLU)
    if r < rows(M)
-      error("Non-singular matrix in solve_with_det")
+      error("Singular matrix in solve_with_det")
    end
    x = solve_fflu_precomp(p, FFLU, b)
    # Now M*x = d*b, but d is only sign(P) * det(M)
@@ -1782,6 +1782,14 @@ function solve_interpolation(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <:
             rethrow(e)
          end
       end
+
+      # We tested i values and for each of them it was not solvable.
+      # Thus for i values the matrix X is singular.
+
+      if i > bound
+         error("Singular matrix in solve_interpolation")
+      end
+
       i = i + 1
    end
    for k = 1:h
