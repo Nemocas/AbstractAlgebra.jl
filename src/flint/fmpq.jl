@@ -410,13 +410,25 @@ end
 #
 ###############################################################################
 
-function inv(a::fmpq)
-   z = fmpq()
-   ccall((:fmpq_inv, :libflint), Void, (Ref{fmpq}, Ref{fmpq}), z, a)
-   return z
-end
-
+function Base.sqrt(a::fmpq)
+    snum = sqrt(numerator(a))
+    sden = sqrt(denominator(a))
+    return fmpq(snum, sden)
+ end
+ 
+ ###############################################################################
+#
+#   Inversion
+#
 ###############################################################################
+
+function inv(a::fmpq)
+    z = fmpq()
+    ccall((:fmpq_inv, :libflint), Void, (Ref{fmpq}, Ref{fmpq}), z, a)
+    return z
+ end
+ 
+ ###############################################################################
 #
 #   Exact division
 #

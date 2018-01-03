@@ -979,7 +979,7 @@ doc"""
 > Return the square root $s$ of $x$ if $x$ is a square, otherwise raise an
 > exception. We require $x \geq 0$.
 """
-function sqrt(x::fmpz)
+function Base.sqrt(x::fmpz)
     x < 0 && throw(DomainError())
     s = fmpz()
     r = fmpz()
