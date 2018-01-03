@@ -884,7 +884,7 @@ doc"""
 > Return the power series square root of $a$. Requires a constant term equal to
 > one.
 """
-function sqrt(a::fmpq_rel_series)
+function Base.sqrt(a::fmpq_rel_series)
    (a.val != 0 || coeff(a, 0) != 1) && error("Constant term not one in sqrt")
    z = parent(a)()
    z.prec = a.prec

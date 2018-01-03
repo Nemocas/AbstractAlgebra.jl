@@ -5,7 +5,7 @@
 ###############################################################################
 
 export fmpq_abs_series, FmpqAbsSeriesRing, tan, tanh, sin, sinh, asin, asinh,
-       atan, atanh, sqrt, log
+       atan, atanh, log
 
 ###############################################################################
 #
@@ -696,7 +696,7 @@ doc"""
 > Return the power series square root of $a$. Requires a constant term equal to
 > one.
 """
-function sqrt(a::fmpq_abs_series)
+function Base.sqrt(a::fmpq_abs_series)
    !isone(coeff(a, 0)) && error("Constant term not one in sqrt")
    z = parent(a)()
    z.prec = a.prec

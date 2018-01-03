@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export FlintPadicField, padic, prime, teichmuller, log, sqrt
+export FlintPadicField, padic, prime, teichmuller, log
 
 ###############################################################################
 #
@@ -504,7 +504,7 @@ doc"""
 > precision$(a) -$ valuation$(a)/2$. If the square root does not exist, an
 > exception is thrown.
 """
-function sqrt(a::padic)
+function Base.sqrt(a::padic)
    (a.v % 2) != 0 && error("Unable to take padic square root")
    ctx = parent(a)
    z = padic(a.N - div(a.v, 2))

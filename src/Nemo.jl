@@ -2,22 +2,19 @@ VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
 module Nemo
 
-import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
-             conj, convert, cmp, contains, cos, cosh, dec, deepcopy,
-             deepcopy_internal, deserialize, det, div, divrem, eye,
-             gcd, gcdx, getindex, hash, hcat, hex, intersect, inv, invmod,
-             isequal, isfinite, isless, isqrt, isreal, iszero, lcm,
-             ldexp, length, log, lufact, lufact!, mod, ndigits, nextpow2, norm,
-             nullspace, numerator, oct, one, parent, parse, precision, prevpow2,
-             rand, rank, Rational, rem, reverse, serialize, setindex!, show,
-             similar, sign, sin, sinh, size, sqrt, string, tan, tanh, trace,
-             trailing_zeros, transpose, transpose!, truncate, typed_hvcat,
-             typed_hcat, var, vcat, zero, zeros, +, -, *, ==, ^, &, |, $, <<,
-             >>, ~, <=, >=, <, >, //, /, !=
-
-import Base: floor, ceil, hypot, sqrt, log1p, expm1, sin, cos, sinpi, cospi,
-             tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh, asinh,
-             acosh, gamma, lgamma, sinpi, cospi, atan2
+import Base: Array, abs, acos, acosh, asin, asinh, atan, atan2, atanh, base,
+             bin, ceil, checkbounds, conj, convert, cmp, contains, cos, cosh,
+             cospi, cot, coth, dec, deepcopy, deepcopy_internal, deserialize,
+             det, div, divrem, expm1, eye, floor, gamma, gcd, gcdx, getindex,
+             hash, hcat, hex, hypot, intersect, inv, invmod, isequal,
+             isfinite, isless, isqrt, isreal, iszero, lcm, ldexp, length,
+             lgamma, log, log1p, lufact, lufact!, mod, ndigits, nextpow2, norm,
+             nullspace, numerator, oct, one, parent, parse, precision,
+             prevpow2, rand, rank, Rational, rem, reverse, serialize,
+             setindex!, show, similar, sign, sin, sinh, sinpi, size, string,
+             tan, tanh, trace, trailing_zeros, transpose, transpose!, truncate,
+             typed_hvcat, typed_hcat, var, vcat, zero, zeros, +, -, *, ==, ^,
+             &, |, $, <<, >>, ~, <=, >=, <, >, //, /, !=
 
 export elem_type, parent_type
 

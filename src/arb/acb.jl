@@ -7,13 +7,13 @@
 #
 ###############################################################################
 
-import Base: real, imag, abs, conj, angle, sqrt, log, log1p, sin, cos,
+import Base: real, imag, abs, conj, angle, log, log1p, sin, cos,
              tan, cot, sinpi, cospi, sinh, cosh, tanh, coth, atan, gamma,
              lgamma, gamma
 
 export one, onei, real, imag, conj, abs, inv, angle, isreal
 
-export sqrt, rsqrt, log, log1p, exppii, sin, cos, tan, cot,
+export rsqrt, log, log1p, exppii, sin, cos, tan, cot,
        sinpi, cospi, tanpi, cotpi, sincos, sincospi, sinh, cosh, tanh, coth,
        sinhcosh, atan, logsinpi, gamma, rgamma, lgamma, digamma, risingfac,
        risingfac2, polygamma, polylog, zeta, barnesg, logbarnesg, agm,
@@ -711,7 +711,7 @@ doc"""
     sqrt(x::acb)
 > Return the square root of $x$.
 """
-function sqrt(x::acb)
+function Base.sqrt(x::acb)
    z = parent(x)()
    ccall((:acb_sqrt, :libarb), Void, (Ref{acb}, Ref{acb}, Int), z, x, parent(x).prec)
    return z

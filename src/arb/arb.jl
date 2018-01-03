@@ -19,7 +19,7 @@ export ball, radius, midpoint, contains, contains_zero,
        accuracy_bits, trim, ldexp, setunion,
        const_pi, const_e, const_log2, const_log10, const_euler,
        const_catalan, const_khinchin, const_glaisher,
-       floor, ceil, hypot, sqrt, rsqrt, sqrt1pm1, root,
+       floor, ceil, hypot, rsqrt, sqrt1pm1, root,
        log, log1p, expm1, sin, cos, sinpi, cospi, tan, cot,
        tanpi, cotpi, sinh, cosh, tanh, coth, atan, asin, acos,
        atanh, asinh, acosh, gamma, lgamma, rgamma, digamma, zeta,
@@ -1026,7 +1026,7 @@ doc"""
     sqrt(x::arb)
 > Return the square root of $x$.
 """
-function sqrt(x::arb)
+function Base.sqrt(x::arb)
    z = parent(x)()
    ccall((:arb_sqrt, :libarb), Void, (Ref{arb}, Ref{arb}, Int), z, x, parent(x).prec)
    return z
