@@ -957,6 +957,60 @@ end
 
 ###############################################################################
 #
+#   Square root
+#
+###############################################################################
+
+doc"""
+   sqrt(a::LaurentSeriesElem)
+> Return the square root of the power series $a$.
+"""
+function Base.sqrt(a::LaurentSeriesElem)
+   aval = valuation(a)
+   !iseven(aval) && error("Not a square in sqrt")
+   R = base_ring(a)
+   !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
+   aval2 = div(aval, 2)
+   prec = precision(a) - aval
+   if prec == 0
+      asqrt = parent(a)()
+      set_prec!(asqrt, aval2)
+      set_val!(asqrt, aval2)
+      return asqrt
+   end
+   asqrt = parent(a)()
+   fit!(asqrt, prec)
+   set_prec!(asqrt, prec + aval2)
+   set_val!(asqrt, aval2)
+   if prec > 0
+      g = Nemo.sqrt(polcoeff(a, 0))
+      asqrt = setcoeff!(asqrt, 0, g)
+      g2 = g + g
+   end
+   p = R()
+   for n = 1:prec - 1
+      c = R()
+      for i = 1:div(n - 1, 2)
+         j = n - i
+         p = mul!(p, polcoeff(asqrt, i), polcoeff(asqrt, j))
+         c = addeq!(c, p)
+      end
+      c *= 2
+      if (n % 2) == 0
+         i = div(n, 2)
+         p = mul!(p, polcoeff(asqrt, i), polcoeff(asqrt, i))
+         c = addeq!(c, p)
+      end
+      c = polcoeff(a, n) - c
+      c = divexact(c, g2)
+      asqrt = setcoeff!(asqrt, n, c)
+    end
+    set_length!(asqrt, normalise(asqrt, prec))
+    return asqrt
+end
+
+###############################################################################
+#
 #   Special functions
 #
 ###############################################################################

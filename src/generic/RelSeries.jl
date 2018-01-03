@@ -938,7 +938,7 @@ end
 
 doc"""
    sqrt(a::Nemo.RelSeriesElem)
-> Return the inverse of the power series $a$, i.e. $1/a$.
+> Return the square root of the power series $a$.
 """
 function Base.sqrt(a::Nemo.RelSeriesElem)
    aval = valuation(a)
@@ -946,16 +946,16 @@ function Base.sqrt(a::Nemo.RelSeriesElem)
    R = base_ring(a)
    !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
    aval2 = div(aval, 2)
-   if a == 0
+   prec = precision(a) - aval
+   if prec == 0
       asqrt = parent(a)()
       set_prec!(asqrt, aval2)
       set_val!(asqrt, aval2)
       return asqrt
    end
-   prec = precision(a) - aval2
    asqrt = parent(a)()
    fit!(asqrt, prec)
-   set_prec!(asqrt, prec)
+   set_prec!(asqrt, prec + aval2)
    set_val!(asqrt, aval2)
    if prec > 0
       g = Nemo.sqrt(polcoeff(a, 0))
