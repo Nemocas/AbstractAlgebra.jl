@@ -710,9 +710,12 @@ doc"""
 # coefficient of the square of g
 function Base.sqrt(a::Nemo.AbsSeriesElem)
    aval = valuation(a)
-   mod(aval, 2) != 0 && error("Not a square in sqrt")
+   !iseven(aval) && error("Not a square in sqrt")
    R = base_ring(a)
    !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
+   if a == 0
+      return deepcopy(a)
+   end
    aval2 = div(aval, 2)
    prec = precision(a) - aval2
    asqrt = parent(a)()

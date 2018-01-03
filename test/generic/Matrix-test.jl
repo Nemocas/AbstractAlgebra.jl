@@ -682,7 +682,7 @@ function test_gen_mat_solve_rational()
       U = MatrixSpace(S, dim, rand(1:5))
 
       M = randmat_with_rank(T, dim, 0:2, 0:2, -20:20)
-      b = rand(U, 0:3, 0:3, -20:20)
+      b = rand(U, 0:2, 0:2, -20:20)
 
       x, d = solve_rational(M, b)
 
