@@ -432,6 +432,25 @@ function powmod(x::fq_nmod_poly, n::Int, y::fq_nmod_poly)
   return z
 end
 
+function powmod(x::fq_nmod_poly, n::fmpz, y::fq_nmod_poly)
+   check_parent(x,y)
+   z = parent(x)()
+
+   if n < 0
+      g, x = gcdinv(x, y)
+      if g != 1
+         error("Element not invertible")
+      end
+      n = -n
+   end
+
+   ccall((:fq_nmod_poly_powmod_fmpz_binexp, :libflint), Void,
+         (Ref{fq_nmod_poly}, Ref{fq_nmod_poly}, Ref{fmpz}, Ref{fq_nmod_poly},
+         Ref{FqNmodFiniteField}), z, x, n, y, base_ring(parent(x)))
+  return z
+end
+
+
 ################################################################################
 #
 #   GCD
