@@ -420,7 +420,7 @@ function powmod(x::fq_nmod_poly, n::Int, y::fq_nmod_poly)
 
    if n < 0
       g, x = gcdinv(x, y)
-      if g != 1
+      if !isone(g)
          error("Element not invertible")
       end
       n = -n
@@ -438,7 +438,7 @@ function powmod(x::fq_nmod_poly, n::fmpz, y::fq_nmod_poly)
 
    if n < 0
       g, x = gcdinv(x, y)
-      if g != 1
+      if !isone(g)
          error("Element not invertible")
       end
       n = -n
@@ -449,7 +449,6 @@ function powmod(x::fq_nmod_poly, n::fmpz, y::fq_nmod_poly)
          Ref{FqNmodFiniteField}), z, x, n, y, base_ring(parent(x)))
   return z
 end
-
 
 ################################################################################
 #
