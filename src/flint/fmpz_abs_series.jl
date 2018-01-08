@@ -438,16 +438,33 @@ divexact(x::fmpz_abs_series, y::Integer) = divexact(x, fmpz(y))
 ###############################################################################
 
 function inv(a::fmpz_abs_series)
-   iszero(a) && throw(DivideError())
-   !isunit(a) && error("Unable to invert power series")
-   ainv = parent(a)()
-   ainv.prec = a.prec
-   ccall((:fmpz_poly_inv_series, :libflint), Void,
-                (Ref{fmpz_abs_series}, Ref{fmpz_abs_series}, Int),
-               ainv, a, a.prec)
-   return ainv
+    iszero(a) && throw(DivideError())
+    !isunit(a) && error("Unable to invert power series")
+    ainv = parent(a)()
+    ainv.prec = a.prec
+    ccall((:fmpz_poly_inv_series, :libflint), Void,
+          (Ref{fmpz_abs_series}, Ref{fmpz_abs_series}, Int),
+                  ainv, a, a.prec)
+    return ainv
 end
+   
+###############################################################################
+#
+#   Inversion
+#
+###############################################################################
 
+function Base.sqrt(a::fmpz_abs_series)
+    asqrt = parent(a)()
+    v = valuation(a)
+    asqrt.prec = a.prec - div(v, 2)
+    flag = Bool(ccall((:fmpz_poly_sqrt_series, :libflint), Cint,
+               (Ref{fmpz_abs_series}, Ref{fmpz_abs_series}, Int),
+                  asqrt, a, a.prec))
+    flag == false && error("Not a square in sqrt") 
+    return asqrt
+end
+   
 ###############################################################################
 #
 #   Unsafe functions

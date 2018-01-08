@@ -530,6 +530,24 @@ end
 
 ###############################################################################
 #
+#   Square root
+#
+###############################################################################
+
+function Base.sqrt(a::fmpz_rel_series)
+    asqrt = parent(a)()
+    val = div(valuation(a), 2)
+    asqrt.prec = a.prec - val
+    asqrt.val = val
+    flag = Bool(ccall((:fmpz_poly_sqrt_series, :libflint), Cint,
+          (Ref{fmpz_rel_series}, Ref{fmpz_rel_series}, Int),
+                asqrt, a, a.prec - 2*val))
+    flag == false && error("Not a square in sqrt")
+    return asqrt
+end
+   
+###############################################################################
+#
 #   Unsafe functions
 #
 ###############################################################################
