@@ -53,30 +53,46 @@ end
 
 ###############################################################################
 #
-#   Windows - handle with care!!!
+#   View and sub
 #
 ###############################################################################
 
 function Base.view(x::fmpz_mat, r1::Int, c1::Int, r2::Int, c2::Int)
-  Generic._checkbounds(x, r1, c1)
-  Generic._checkbounds(x, r2, c2)
-  (r1 > r2 || c1 > c2) && error("Invalid parameters")
-  b = fmpz_mat()
-  b.base_ring = FlintZZ
-  ccall((:fmpz_mat_window_init, :libflint), Void,
-        (Ref{fmpz_mat}, Ref{fmpz_mat}, Int, Int, Int, Int),
-            b, x, r1 - 1, c1 - 1, r2, c2)
-  finalizer(b, _fmpz_mat_window_clear_fn)
-  return b
+   Generic._checkbounds(x, r1, c1)
+   Generic._checkbounds(x, r2, c2)
+   (r1 > r2 || c1 > c2) && error("Invalid parameters")
+   b = fmpz_mat()
+   b.base_ring = FlintZZ
+   ccall((:fmpz_mat_window_init, :libflint), Void,
+         (Ref{fmpz_mat}, Ref{fmpz_mat}, Int, Int, Int, Int),
+             b, x, r1 - 1, c1 - 1, r2, c2)
+   finalizer(b, _fmpz_mat_window_clear_fn)
+   return b
 end
 
 function Base.view(x::fmpz_mat, r::UnitRange{Int}, c::UnitRange{Int})
-  return Base.view(x, r.start, c.start, r.stop, c.stop)
+   return Base.view(x, r.start, c.start, r.stop, c.stop)
 end
 
 function _fmpz_mat_window_clear_fn(a::fmpz_mat)
    ccall((:fmpz_mat_window_clear, :libflint), Void, (Ref{fmpz_mat},), a)
 end
+
+function sub(x::fmpz_mat, r1::Int, c1::Int, r2::Int, c2::Int)
+   return deepcopy(view(x, r1, c1, r2, c2))
+end
+
+function sub(x::fmpz_mat, r::UnitRange{Int}, c::UnitRange{Int})
+   return deepcopy(view(x, r, c))
+end
+
+getindex(x::fmpz_mat, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
+
+################################################################################
+#
+#   Size
+#
+################################################################################
 
 size(x::fmpz_mat) = tuple(rows(x), cols(x))
 

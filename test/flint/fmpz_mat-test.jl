@@ -143,6 +143,33 @@ function test_fmpz_mat_view()
    println("PASS")
 end
 
+function test_fmpz_mat_sub()
+   print("fmpz_mat.sub...")
+
+   S = MatrixSpace(FlintZZ, 3, 3)
+
+   A = S([1 2 3; 4 5 6; 7 8 9])
+
+   B = @inferred sub(A, 1, 1, 2, 2)
+
+   @test typeof(B) == fmpz_mat
+   @test B == MatrixSpace(FlintZZ, 2, 2)([1 2; 4 5])
+
+   B[1, 1] = 10
+   @test A == S([1 2 3; 4 5 6; 7 8 9])
+
+   C = @inferred sub(B, 1:2, 1:2)
+
+   @test typeof(C) == fmpz_mat
+   @test C == MatrixSpace(FlintZZ, 2, 2)([10 2; 4 5])
+
+   C[1, 1] = 20
+   @test B == MatrixSpace(FlintZZ, 2, 2)([10 2; 4 5])
+   @test A == S([1 2 3; 4 5 6; 7 8 9])
+
+   println("PASS")
+end
+
 function test_fmpz_mat_unary_ops()
    print("fmpz_mat.unary_ops...")
 
@@ -586,6 +613,7 @@ function test_fmpz_mat()
    test_fmpz_mat_convert()
    test_fmpz_mat_manipulation()
    test_fmpz_mat_view()
+   test_fmpz_mat_sub()
    test_fmpz_mat_unary_ops()
    test_fmpz_mat_binary_ops()
    test_fmpz_mat_adhoc_binary()
@@ -596,7 +624,6 @@ function test_fmpz_mat()
    test_fmpz_mat_gram()
    test_fmpz_mat_trace()
    test_fmpz_mat_content()
-
    test_fmpz_mat_transpose()
    test_fmpz_mat_scaling()
    test_fmpz_mat_inversion()
