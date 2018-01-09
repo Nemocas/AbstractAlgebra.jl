@@ -615,31 +615,80 @@ function test_nmod_mat_view()
 
   b = S([ 2 1 0 1; 0 0 0 0; 0 1 2 0 ])
 
-  t = view(a,1,1,3,3)
+  t = view(a, 1, 1, 3, 3)
 
   @test t == a
 
-  @test view(a,1,1,3,3) == view(a,1:3,1:3)
-  @test view(a,1,1,3,3) == sub(a,1,1,3,3)
-  @test view(a,1,1,3,3) == sub(a,1:3,1:3)
+  @test view(a, 1, 1, 3, 3) == view(a, 1:3, 1:3)
+  @test view(a, 1, 1, 3, 3) == sub(a, 1, 1, 3, 3)
+  @test view(a, 1, 1, 3, 3) == sub(a, 1:3, 1:3)
 
-  t = view(a,1,1,2,2)
+  t = view(a, 1, 1, 2, 2)
 
   @test t == MatrixSpace(base_ring(a),2,2)([1 2; 3 2])
 
-  t = view(a,2,2,3,2)
+  t = view(a, 2, 2, 3, 2)
 
-  @test t == MatrixSpace(base_ring(a),2,1)(reshape([2 ; 0],2,1))
+  @test t == MatrixSpace(base_ring(a), 2, 1)(reshape([2 ; 0], 2, 1))
 
-  @test view(a,2,2,3,2) == view(a,2:3, 2:2)
-  @test view(a,2,2,3,2) == sub(a,2,2,3,2)
-  @test view(a,2,2,3,2) == sub(a,2:3,2:2)
+  @test view(a, 2, 2, 3, 2) == view(a, 2:3,  2:2)
+  @test view(a, 2, 2, 3, 2) == sub(a, 2, 2, 3, 2)
+  @test view(a, 2, 2, 3, 2) == sub(a, 2:3, 2:2)
 
-  @test_throws BoundsError view(a,4,4,1,1)
+  @test_throws BoundsError view(a, 4, 4, 1, 1)
 
-  @test_throws ErrorException view(a,2,2,1,1)
+  @test_throws ErrorException view(a, 2, 2, 1, 1)
+
+  S = MatrixSpace(Z17, 3, 3)
+
+  A = S([1 2 3; 4 5 6; 7 8 9])
+
+  B = @inferred view(A, 1, 1, 2, 2)
+
+  @test typeof(B) == nmod_mat
+  @test B == MatrixSpace(Z17, 2, 2)([1 2; 4 5])
+
+  B[1, 1] = 10
+  @test A[1, 1] == 10
+
+  C = @inferred view(B, 1:2, 1:2)
+
+  @test typeof(C) == nmod_mat
+  @test C == MatrixSpace(Z17, 2, 2)([10 2; 4 5])
+
+  C[1, 1] = 20
+  @test B[1, 1] == 20
+  @test A[1, 1] == 20
 
   println("PASS")
+end
+
+function test_nmod_mat_sub()
+   print("nmod_mat.sub...")
+
+   Z17 = ResidueRing(ZZ, 17)
+   S = MatrixSpace(Z17, 3, 3)
+
+   A = S([1 2 3; 4 5 6; 7 8 9])
+
+   B = @inferred sub(A, 1, 1, 2, 2)
+
+   @test typeof(B) == nmod_mat
+   @test B == MatrixSpace(Z17, 2, 2)([1 2; 4 5])
+
+   B[1, 1] = 10
+   @test A == S([1 2 3; 4 5 6; 7 8 9])
+
+   C = @inferred sub(B, 1:2, 1:2)
+
+   @test typeof(C) == nmod_mat
+   @test C == MatrixSpace(Z17, 2, 2)([10 2; 4 5])
+
+   C[1, 1] = 20
+   @test B == MatrixSpace(Z17, 2, 2)([10 2; 4 5])
+   @test A == S([1 2 3; 4 5 6; 7 8 9])
+
+   println("PASS")
 end
 
 function test_nmod_mat_concatenation()
@@ -748,6 +797,7 @@ function test_nmod_mat()
   test_nmod_mat_inv()
   test_nmod_mat_lu()
   test_nmod_mat_view()
+  test_nmod_mat_sub()
   test_nmod_mat_concatenation()
   test_nmod_mat_conversion()
   test_nmod_mat_charpoly()

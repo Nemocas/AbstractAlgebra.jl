@@ -192,6 +192,42 @@ function test_gen_mat_unary_ops()
    println("PASS")
 end
 
+function test_gen_mat_sub()
+   print("Generic.Mat.sub...")
+
+   S = MatrixSpace(JuliaZZ, 3, 3)
+
+   A = S([1 2 3; 4 5 6; 7 8 9])
+
+   B = @inferred sub(A, 1, 1, 2, 2)
+
+   @test typeof(B) == typeof(A)
+   @test B == MatrixSpace(JuliaZZ, 2, 2)([1 2; 4 5])
+
+   B[1, 1] = 10
+   @test A == S([1 2 3; 4 5 6; 7 8 9])
+
+   C = @inferred sub(B, 1:2, 1:2)
+
+   @test typeof(C) == typeof(A)
+   @test C == MatrixSpace(JuliaZZ, 2, 2)([10 2; 4 5])
+
+   C[1, 1] = 20
+   @test B == MatrixSpace(JuliaZZ, 2, 2)([10 2; 4 5])
+   @test A == S([1 2 3; 4 5 6; 7 8 9])
+
+   D = @inferred A[:, 2:3]
+
+   @test D == matrix(JuliaZZ, 3, 2, [2, 3, 5, 6, 8, 9])
+
+   @test A == @inferred A[:, :]
+   @test B == @inferred B[:, :]
+   @test C == @inferred C[:, :]
+   @test D == @inferred D[:, :]
+
+   println("PASS")
+end
+
 function test_gen_mat_binary_ops()
    print("Generic.Mat.binary_ops...")
 
@@ -1450,6 +1486,7 @@ end
 function test_gen_mat()
    test_gen_mat_constructors()
    test_gen_mat_manipulation()
+   test_gen_mat_sub()
    test_gen_mat_unary_ops()
    test_gen_mat_binary_ops()
    test_gen_mat_adhoc_binary()

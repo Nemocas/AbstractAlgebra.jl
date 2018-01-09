@@ -520,12 +520,12 @@ function Base.view(x::nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int)
   Generic._checkbounds(x, r1, c1)
   Generic._checkbounds(x, r2, c2)
   (r1 > r2 || c1 > c2) && error("Invalid parameters")
-  temp = similar(x, r2 - r1 + 1, c2 - c1 + 1)
+  z = nmod_mat()
+  z.base_ring = x.base_ring
   ccall((:nmod_mat_window_init, :libflint), Void,
           (Ref{nmod_mat}, Ref{nmod_mat}, Int, Int, Int, Int),
-          temp, x, r1-1, c1-1, r2, c2)
-  z = deepcopy(temp)
-  ccall((:nmod_mat_window_clear, :libflint), Void, (Ref{nmod_mat}, ), temp)
+          z, x, r1 - 1, c1 - 1, r2, c2)
+  finalizer(z, _nmod_mat_window_clear_fn)
   return z
 end
 
@@ -533,11 +533,20 @@ function Base.view(x::nmod_mat, r::UnitRange{Int}, c::UnitRange{Int})
   return Base.view(x, r.start, c.start, r.stop, c.stop)
 end
 
-sub(x::nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int) =
-        Base.view(x, r1, c1, r2, c2)
+function _nmod_mat_window_clear_fn(a::nmod_mat)
+  ccall((:nmod_mat_window_clear, :libflint), Void, (Ref{nmod_mat}, ), a)
+end
 
-sub(x::nmod_mat, r::UnitRange{Int}, c::UnitRange{Int}) = Base.view(x, r, c)
-  
+function sub(x::nmod_mat, r1::Int, c1::Int, r2::Int, c2::Int)
+  return deepcopy(Base.view(x, r1, c1, r2, c2))
+end
+
+function sub(x::nmod_mat, r::UnitRange{Int}, c::UnitRange{Int})
+  return deepcopy(Base.view(x, r, c))
+end
+
+getindex(x::nmod_mat, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
+
 ################################################################################
 #
 #  Concatenation

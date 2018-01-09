@@ -2152,7 +2152,7 @@ mutable struct fmpz_mat <: MatElem{fmpz}
    rows::Ptr{Void}
    base_ring::FlintIntegerRing
 
-   # used by windows, not finalised!!
+   # Used by view, not finalised!!
    function fmpz_mat()
       return new()
    end
@@ -2294,6 +2294,12 @@ mutable struct nmod_mat <: MatElem{nmod}
   ninv::UInt             # mp_limb_t / Culong
   norm::UInt             # mp_limb_t / Culong
   base_ring::NmodRing
+
+  # Used by view, not finalised!!
+  function nmod_mat()
+    z = new()
+    return z
+  end
 
   function nmod_mat(r::Int, c::Int, n::UInt)
     z = new()
