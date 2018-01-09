@@ -240,6 +240,46 @@ canonical_unit(a::Nemo.MatElem) = canonical_unit(a[1, 1])
 
 ###############################################################################
 #
+#   Sub
+#
+###############################################################################
+
+function sub(M::Nemo.MatElem, rows::UnitRange{Int}, cols::UnitRange{Int})
+  Generic._checkbounds(M, rows.start, cols.start)
+  Generic._checkbounds(M, rows.stop, cols.stop)
+  z = similar(M, length(rows), length(cols))
+  startr = start(rows)
+  startc = start(cols)
+  for i in rows
+    for j in cols
+      z[i - startr + 1, j - startc + 1] = deepcopy(M[i, j])
+    end
+  end
+  return z
+end
+
+function sub(M::Nemo.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
+  return sub(M, r1:r2, c1:c2)
+end
+
+getindex(x::Nemo.MatElem, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
+
+getindex(x::Nemo.MatElem, r::UnitRange, ::Colon) = sub(x, r, 1:cols(x))
+
+getindex(x::Nemo.MatElem, ::Colon, c::UnitRange{Int}) = sub(x, 1:rows(x), c)
+
+getindex(x::Nemo.MatElem, ::Colon, ::Colon) = sub(x, 1:rows(x), 1:cols(x))
+
+function Base.view(M::Nemo.MatElem, rows::UnitRange{Int}, ::Colon)
+  return view(M, rows, 1:cols(M))
+end
+
+function Base.view(M::Nemo.MatElem, ::Colon, cols::UnitRange{Int})
+  return view(M, 1:rows(x), cols)
+end
+
+###############################################################################
+#
 #   String I/O
 #
 ###############################################################################
