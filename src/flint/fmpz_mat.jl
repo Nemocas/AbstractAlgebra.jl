@@ -874,9 +874,9 @@ end
 function rref(x::fmpz_mat)
    z = similar(x)
    d = fmpz()
-   ccall((:fmpz_mat_rref, :libflint), Void,
-         (Ref{fmpz_mat}, Ref{fmpz}, Ref{fmpz_mat}), z, d, x)
-   return z, d
+   r = ccall((:fmpz_mat_rref, :libflint), Int,
+            (Ref{fmpz_mat}, Ref{fmpz}, Ref{fmpz_mat}), z, d, x)
+   return r, z, d
 end
 
 ###############################################################################
