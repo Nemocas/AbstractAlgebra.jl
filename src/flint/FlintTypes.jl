@@ -2731,3 +2731,378 @@ function _fq_nmod_poly_factor_clear_fn(a::fq_nmod_poly_factor)
          (Ref{fq_nmod_poly_factor}, Ref{FqNmodFiniteField}),
          a, a.base_field)
 end
+
+###############################################################################
+#
+#   FqMatSpace/fq_mat
+#
+###############################################################################
+
+mutable struct FqMatSpace <: MatSpace{fq}
+  base_ring::FqFiniteField
+  rows::Int
+  cols::Int
+
+  function FqMatSpace(R::FqFiniteField, r::Int, c::Int, cached::Bool = true)
+    (r < 0 || c < 0) && throw(error_dim_negative)
+    if haskey(FqMatID, (R, r, c))
+      return FqMatID[R, r, c]
+    else
+      z = new(R, r, c)
+      if cached
+        FqMatID[R, r, c] = z
+      end
+      return z
+    end
+  end
+end
+
+const FqMatID = Dict{Tuple{FqFiniteField, Int, Int}, FqMatSpace}()
+
+mutable struct fq_mat <: MatElem{fq}
+   entries::Ptr{Void}
+   r::Int
+   c::Int
+   rows::Ptr{Void}
+   base_ring::FqFiniteField
+   
+   # used by windows, not finalised!!
+   function fq_mat()
+      return new()
+   end
+
+   function fq_mat(r::Int, c::Int, ctx::FqFiniteField)
+      z = new()
+      ccall((:fq_mat_init, :libflint), Void,
+            (Ref{fq_mat}, Int, Int, Ref{FqFiniteField}), z, r, c, ctx)
+      z.base_ring = ctx
+      finalizer(z, _fq_mat_clear_fn)
+      return z
+   end
+
+   function fq_mat(r::Int, c::Int, arr::Array{fq, 2}, ctx::FqFiniteField)
+      z = new()
+      ccall((:fq_mat_init, :libflint), Void,
+            (Ref{fq_mat}, Int, Int, Ref{FqFiniteField}), z, r, c, ctx)
+      for i = 1:r
+         for j = 1:c
+            ccall((:fq_mat_entry_set, :libflint), Void,
+                  (Ref{fq_mat}, Int, Int, Ref{fq}, Ref{FqFiniteField}),
+                   z, i - 1, j - 1, arr[i, j], ctx)
+         end
+      end
+      z.base_ring = ctx
+      finalizer(z, _fq_mat_clear_fn)
+      return z
+   end
+
+   function fq_mat(r::Int, c::Int, arr::Array{fq, 1}, ctx::FqFiniteField)
+      z = new()
+      ccall((:fq_mat_init, :libflint), Void,
+            (Ref{fq_mat}, Int, Int, Ref{FqFiniteField}), z, r, c, ctx)
+      for i = 1:r
+         for j = 1:c
+            ccall((:fq_mat_entry_set, :libflint), Void,
+                       (Ref{fq_mat}, Int, Int, Ref{fq}, Ref{FqFiniteField}),
+                        z, i - 1, j - 1, arr[(i - 1) * c + j], ctx)
+         end
+      end
+      z.base_ring = ctx
+      finalizer(z, _fq_mat_clear_fn)
+      return z
+   end
+
+   function fq_mat(r::Int, c::Int, arr::Array{fmpz, 2}, ctx::FqFiniteField)
+      z = new()
+      ccall((:fq_mat_init, :libflint), Void,
+            (Ref{fq_mat}, Int, Int, Ref{FqFiniteField}), z, r, c, ctx)
+      for i = 1:r
+         for j = 1:c
+            el = ccall((:fq_mat_entry, :libflint), Ptr{fq},
+                       (Ref{fq_mat}, Int, Int), z, i - 1, j - 1)
+            ccall((:fq_set_fmpz, :libflint), Void,
+                  (Ptr{fq}, Ref{fmpz}, Ref{FqFiniteField}), el, arr[i, j], ctx)
+         end
+      end
+      z.base_ring = ctx
+      finalizer(z, _fq_mat_clear_fn)
+      return z
+   end
+
+   function fq_mat(r::Int, c::Int, arr::Array{fmpz, 1}, ctx::FqFiniteField)
+      z = new()
+      ccall((:fq_mat_init, :libflint), Void,
+            (Ref{fq_mat}, Int, Int, Ref{FqFiniteField}), z, r, c, ctx)
+      for i = 1:r
+         for j = 1:c
+            el = ccall((:fq_mat_entry, :libflint), Ptr{fq},
+                       (Ref{fq_mat}, Int, Int), z, i - 1, j - 1)
+            ccall((:fq_set_fmpz, :libflint), Void,
+                  (Ptr{fq}, Ref{fmpz}, Ref{FqFiniteField}), el, arr[(i - 1) * c + j], ctx)
+         end
+      end
+      z.base_ring = ctx
+      finalizer(z, _fq_mat_clear_fn)
+      return z
+   end
+
+   function fq_mat(r::Int, c::Int, arr::Array{T, 2}, ctx::FqFiniteField) where {T <: Integer}
+      z = new()
+      ccall((:fq_mat_init, :libflint), Void,
+            (Ref{fq_mat}, Int, Int, Ref{FqFiniteField}), z, r, c, ctx)
+      for i = 1:r
+         for j = 1:c
+            ccall((:fq_mat_entry_set, :libflint), Void,
+                    (Ref{fq_mat}, Int, Int, Ref{fq}, Ref{FqFiniteField}),
+                     z, i - 1, j - 1, ctx(arr[i, j]), ctx)
+         end
+      end
+      z.base_ring = ctx
+      finalizer(z, _fq_mat_clear_fn)
+      return z
+   end
+
+   function fq_mat(r::Int, c::Int, arr::Array{T ,1}, ctx::FqFiniteField) where {T <: Integer}
+      z = new()
+      ccall((:fq_mat_init, :libflint), Void,
+            (Ref{fq_mat}, Int, Int, Ref{FqFiniteField}), z, r, c, ctx)
+      for i = 1:r
+         for j = 1:c
+            ccall((:fq_mat_entry_set, :libflint), Void,
+                       (Ref{fq_mat}, Int, Int, Ref{fq}, Ref{FqFiniteField}),
+                        z, i - 1, j - 1, ctx(arr[(i - 1) * c + j]), ctx)
+         end
+      end
+      z.base_ring = ctx
+      finalizer(z, _fq_mat_clear_fn)
+      return z
+   end
+
+   function fq_mat(r::Int, c::Int, d::fq)
+      z = new()
+      ctx = parent(d)
+      ccall((:fq_mat_init, :libflint), Void,
+            (Ref{fq_mat}, Int, Int, Ref{FqFiniteField}), z, r, c, ctx)
+      for i = 1:min(r, c)
+         ccall((:fq_mat_entry_set, :libflint), Void,
+               (Ref{fq_mat}, Int, Int, Ref{fq}, Ref{FqFiniteField}), z, i - 1, i- 1, d, ctx)
+      end
+      z.base_ring = ctx
+      finalizer(z, _fq_mat_clear_fn)
+      return z
+   end
+
+   function fq_mat(m::fmpz_mat, ctx::FqFiniteField)
+      z = new()
+      r = rows(m)
+      c = cols(m)
+      ccall((:fq_mat_init, :libflint), Void,
+            (Ref{fq_mat}, Int, Int, Ref{FqFiniteField}), z, r, c, ctx)
+      for i = 1:r
+         for j = 1:c
+            el1 = ccall((:fq_mat_entry, :libflint), Ptr{fq},
+                        (Ref{fq_mat}, Int, Int), z, i - 1, j - 1)
+            el2 = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
+                        (Ref{fmpz_mat}, Int, Int), m, i - 1, j - 1)
+
+            ccall((:fq_set_fmpz, :libflint), Void,
+                  (Ptr{fq}, Ptr{fmpz}, Ref{FqFiniteField}), el1, el2, ctx)
+         end
+      end
+      z.base_ring = ctx
+      finalizer(z, _fq_mat_clear_fn)
+      return z
+   end
+end
+
+function _fq_mat_clear_fn(a::fq_mat)
+   ccall((:fq_mat_clear, :libflint), Void, (Ref{fq_mat}, Ref{FqFiniteField}), a, base_ring(a))
+end
+
+###############################################################################
+#
+#   FqNmodMatSpace/fq_nmod_mat
+#
+###############################################################################
+
+mutable struct FqNmodMatSpace <: MatSpace{fq_nmod}
+  base_ring::FqNmodFiniteField
+  rows::Int
+  cols::Int
+
+  function FqNmodMatSpace(R::FqNmodFiniteField, r::Int, c::Int, cached::Bool = true)
+    (r < 0 || c < 0) && throw(error_dim_negative)
+    if haskey(FqNmodMatID, (R, r, c))
+      return FqNmodMatID[R, r, c]
+    else
+      z = new(R, r, c)
+      if cached
+        FqNmodMatID[R, r, c] = z
+      end
+      return z
+    end
+  end
+end
+
+const FqNmodMatID = Dict{Tuple{FqNmodFiniteField, Int, Int}, FqNmodMatSpace}()
+
+mutable struct fq_nmod_mat <: MatElem{fq_nmod}
+   entries::Ptr{Void}
+   r::Int
+   c::Int
+   rows::Ptr{Void}
+   base_ring::FqNmodFiniteField
+   
+   # used by windows, not finalised!!
+   function fq_nmod_mat()
+      return new()
+   end
+
+   function fq_nmod_mat(r::Int, c::Int, ctx::FqNmodFiniteField)
+      z = new()
+      ccall((:fq_nmod_mat_init, :libflint), Void,
+            (Ref{fq_nmod_mat}, Int, Int, Ref{FqNmodFiniteField}), z, r, c, ctx)
+      z.base_ring = ctx
+      finalizer(z, _fq_nmod_mat_clear_fn)
+      return z
+   end
+
+   function fq_nmod_mat(r::Int, c::Int, arr::Array{fq_nmod, 2}, ctx::FqNmodFiniteField)
+      z = new()
+      ccall((:fq_nmod_mat_init, :libflint), Void,
+            (Ref{fq_nmod_mat}, Int, Int, Ref{FqNmodFiniteField}), z, r, c, ctx)
+      for i = 1:r
+         for j = 1:c
+            ccall((:fq_nmod_mat_entry_set, :libflint), Void,
+                  (Ref{fq_nmod_mat}, Int, Int, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+                   z, i - 1, j - 1, arr[i, j], ctx)
+         end
+      end
+      z.base_ring = ctx
+      finalizer(z, _fq_nmod_mat_clear_fn)
+      return z
+   end
+
+   function fq_nmod_mat(r::Int, c::Int, arr::Array{fq_nmod, 1}, ctx::FqNmodFiniteField)
+      z = new()
+      ccall((:fq_nmod_mat_init, :libflint), Void,
+            (Ref{fq_nmod_mat}, Int, Int, Ref{FqNmodFiniteField}), z, r, c, ctx)
+      for i = 1:r
+         for j = 1:c
+            ccall((:fq_nmod_mat_entry_set, :libflint), Void,
+                       (Ref{fq_nmod_mat}, Int, Int, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+                        z, i - 1, j - 1, arr[(i - 1) * c + j], ctx)
+         end
+      end
+      z.base_ring = ctx
+      finalizer(z, _fq_nmod_mat_clear_fn)
+      return z
+   end
+
+   function fq_nmod_mat(r::Int, c::Int, arr::Array{fmpz, 2}, ctx::FqNmodFiniteField)
+      z = new()
+      ccall((:fq_nmod_mat_init, :libflint), Void,
+            (Ref{fq_nmod_mat}, Int, Int, Ref{FqNmodFiniteField}), z, r, c, ctx)
+      for i = 1:r
+         for j = 1:c
+            el = ccall((:fq_nmod_mat_entry, :libflint), Ptr{fq_nmod},
+                       (Ref{fq_nmod_mat}, Int, Int), z, i - 1, j - 1)
+            ccall((:fq_nmod_set_fmpz, :libflint), Void,
+                  (Ptr{fq_nmod}, Ref{fmpz}, Ref{FqNmodFiniteField}), el, arr[i, j], ctx)
+         end
+      end
+      z.base_ring = ctx
+      finalizer(z, _fq_nmod_mat_clear_fn)
+      return z
+   end
+
+   function fq_nmod_mat(r::Int, c::Int, arr::Array{fmpz, 1}, ctx::FqNmodFiniteField)
+      z = new()
+      ccall((:fq_nmod_mat_init, :libflint), Void,
+            (Ref{fq_nmod_mat}, Int, Int, Ref{FqNmodFiniteField}), z, r, c, ctx)
+      for i = 1:r
+         for j = 1:c
+            el = ccall((:fq_nmod_mat_entry, :libflint), Ptr{fq_nmod},
+                       (Ref{fq_nmod_mat}, Int, Int), z, i - 1, j - 1)
+            ccall((:fq_nmod_set_fmpz, :libflint), Void,
+                  (Ptr{fq_nmod}, Ref{fmpz}, Ref{FqNmodFiniteField}), el, arr[(i - 1) * c + j], ctx)
+         end
+      end
+      z.base_ring = ctx
+      finalizer(z, _fq_nmod_mat_clear_fn)
+      return z
+   end
+
+   function fq_nmod_mat(r::Int, c::Int, arr::Array{T, 2}, ctx::FqNmodFiniteField) where {T <: Integer}
+      z = new()
+      ccall((:fq_nmod_mat_init, :libflint), Void,
+            (Ref{fq_nmod_mat}, Int, Int, Ref{FqNmodFiniteField}), z, r, c, ctx)
+      for i = 1:r
+         for j = 1:c
+            ccall((:fq_nmod_mat_entry_set, :libflint), Void,
+                    (Ref{fq_nmod_mat}, Int, Int, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+                     z, i - 1, j - 1, ctx(arr[i, j]), ctx)
+         end
+      end
+      z.base_ring = ctx
+      finalizer(z, _fq_nmod_mat_clear_fn)
+      return z
+   end
+
+   function fq_nmod_mat(r::Int, c::Int, arr::Array{T ,1}, ctx::FqNmodFiniteField) where {T <: Integer}
+      z = new()
+      ccall((:fq_nmod_mat_init, :libflint), Void,
+            (Ref{fq_nmod_mat}, Int, Int, Ref{FqNmodFiniteField}), z, r, c, ctx)
+      for i = 1:r
+         for j = 1:c
+            ccall((:fq_nmod_mat_entry_set, :libflint), Void,
+                       (Ref{fq_nmod_mat}, Int, Int, Ref{fq_nmod}, Ref{FqNmodFiniteField}),
+                        z, i - 1, j - 1, ctx(arr[(i - 1) * c + j]), ctx)
+         end
+      end
+      z.base_ring = ctx
+      finalizer(z, _fq_nmod_mat_clear_fn)
+      return z
+   end
+
+   function fq_nmod_mat(r::Int, c::Int, d::fq_nmod)
+      z = new()
+      ctx = parent(d)
+      ccall((:fq_nmod_mat_init, :libflint), Void,
+            (Ref{fq_nmod_mat}, Int, Int, Ref{FqNmodFiniteField}), z, r, c, ctx)
+      for i = 1:min(r, c)
+         ccall((:fq_nmod_mat_entry_set, :libflint), Void,
+               (Ref{fq_nmod_mat}, Int, Int, Ref{fq_nmod}, Ref{FqNmodFiniteField}), z, i - 1, i- 1, d, ctx)
+      end
+      z.base_ring = ctx
+      finalizer(z, _fq_nmod_mat_clear_fn)
+      return z
+   end
+
+   function fq_nmod_mat(m::fmpz_mat, ctx::FqNmodFiniteField)
+      z = new()
+      r = rows(m)
+      c = cols(m)
+      ccall((:fq_nmod_mat_init, :libflint), Void,
+            (Ref{fq_nmod_mat}, Int, Int, Ref{FqNmodFiniteField}), z, r, c, ctx)
+      for i = 1:r
+         for j = 1:c
+            el1 = ccall((:fq_nmod_mat_entry, :libflint), Ptr{fq_nmod},
+                        (Ref{fq_nmod_mat}, Int, Int), z, i - 1, j - 1)
+            el2 = ccall((:fmpz_mat_entry, :libflint), Ptr{fmpz},
+                        (Ref{fmpz_mat}, Int, Int), m, i - 1, j - 1)
+
+            ccall((:fq_nmod_set_fmpz, :libflint), Void,
+                  (Ptr{fq_nmod}, Ptr{fmpz}, Ref{FqNmodFiniteField}), el1, el2, ctx)
+         end
+      end
+      z.base_ring = ctx
+      finalizer(z, _fq_nmod_mat_clear_fn)
+      return z
+   end
+end
+
+function _fq_nmod_mat_clear_fn(a::fq_nmod_mat)
+   ccall((:fq_nmod_mat_clear, :libflint), Void, (Ref{fq_nmod_mat}, Ref{FqNmodFiniteField}), a, base_ring(a))
+end
+

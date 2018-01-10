@@ -492,14 +492,12 @@ function rand(K::FinField)
 	alpha = gen(K)
 	res = zero(K)
   range = BigInt(0):BigInt(p - 1)
-  return rand(range)
 	for i = 0 : (r-1)
-		c = rand(BigInt(0) : BigInt(p - 1))
+		c = rand(range)
 		res += c * alpha^i
 	end
 	return res
 end
-
 
 ###############################################################################
 #
