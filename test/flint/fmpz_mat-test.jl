@@ -521,7 +521,10 @@ function test_fmpz_mat_rref()
 
    A = S([fmpz(2) 3 5; 1 4 7; 4 1 1])
 
-   @test rref(A) == (S([5 0 (-1); 0 5 9; 0 0 0]), 5)
+   r, B, d = rref(A)
+
+   @test (B, d) == (S([5 0 (-1); 0 5 9; 0 0 0]), 5)
+   @test r == 2
 
    println("PASS")
 end

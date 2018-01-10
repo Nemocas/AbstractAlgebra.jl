@@ -341,13 +341,13 @@ end
 
 function rref(a::nmod_mat)
   z = deepcopy(a)
-  ccall((:nmod_mat_rref, :libflint), Void, (Ref{nmod_mat}, ), z)
-  return z
+  r = ccall((:nmod_mat_rref, :libflint), Int, (Ref{nmod_mat}, ), z)
+  return r, z
 end
 
 function rref!(a::nmod_mat)
-  ccall((:nmod_mat_rref, :libflint), Void, (Ref{nmod_mat}, ), a)
-  return a
+  r = ccall((:nmod_mat_rref, :libflint), Int, (Ref{nmod_mat}, ), a)
+  return r
 end
 
 ################################################################################
