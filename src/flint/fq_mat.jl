@@ -312,9 +312,9 @@ function rref(a::fq_mat)
 end
 
 function rref!(a::fq_mat)
-   ccall((:fq_mat_rref, :libflint), Int,
+   r = ccall((:fq_mat_rref, :libflint), Int,
          (Ref{fq_mat}, Ref{FqFiniteField}), a, base_ring(a))
-   return a
+   return r
 end
 
 #################################################################################

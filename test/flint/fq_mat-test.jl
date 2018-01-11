@@ -407,17 +407,20 @@ function test_fq_mat_row_echelon_form()
 
   c = a*transpose(a)
 
-  d = rref(a)
-
+  r, d = rref(a)
+  
   @test d == R([ 1 0 0 8; 0 1 0 15; 0 0 1 16])
+  @test r == 3
 
-  rref!(a)
+  r = rref!(a)
 
   @test a == R([ 1 0 0 8; 0 1 0 15; 0 0 1 16])
+  @test r == 3
 
-  d = rref(b)
+  r, d = rref(b)
 
   @test d == parent(b)([ 1 0 0 ; 0 0 1; 0 0 0; 0 0 0])
+  @test r == 2
 
   println("PASS")
 end
