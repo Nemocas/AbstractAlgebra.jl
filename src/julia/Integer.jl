@@ -148,6 +148,34 @@ function exp(a::T) where T <: Integer
  
 ###############################################################################
 #
+#   Coprime bases
+#
+###############################################################################
+
+# Bernstein, "Factoring into coprimes in essentially linear time"
+# ppio(a,b) = (c,n) where v_p(c) = v_p(a) if v_p(b) != 0, 0 otherwise
+# c*n = a or c = gcd(a, b^infty), n = div(a, c).
+# This is used in various Euclidean domains for Chinese remaindering.
+
+doc"""
+   ppio(a::T, b::T)
+
+> Split $a$ into $c*d$ where $c = gcd(a, b^\infty)$.
+"""
+function ppio(a::T, b::T) where T <: Integer
+   c = gcd(a, b)
+   n = div(a, c)
+   g = gcd(c, n)
+   while !isone(g)
+      c *= g
+      n = div(n, g)
+      g = gcd(c, n)
+   end
+   return c, n
+end
+
+###############################################################################
+#
 #   Unsafe functions
 #
 ###############################################################################

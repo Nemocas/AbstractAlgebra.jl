@@ -262,7 +262,7 @@ end
 function test_gen_res_field_exact_division()
    print("Generic.ResF.exact_division...")
 
-   R = Generic.ResidueField(ZZ, 47)
+   R = Generic.ResidueField(JuliaZZ, 47)
 
    a = R(5)
    b = R(3)
