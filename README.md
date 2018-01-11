@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/Nemocas/AbstractAlgebra.jl.svg?branch=master)](https://travis-ci.org/Nemocas/AbstractAlgebra.jl) [![Build status](https://ci.appveyor.com/api/projects/status/gc4mw5oixputntda/branch/master?svg=true)](https://ci.appveyor.com/project/thofma/abstractalgebra-jl-n5gdb/branch/master)
 
-AbstractAlgebra is a pure Julia package for computational abstract algebra. It gre out of the Nemo project and provides all of the abstract types and generic implementations that Nemo relies on.
+AbstractAlgebra is a pure Julia package for computational abstract algebra. It grew out of the Nemo project and provides all of the abstract types and generic implementations that Nemo relies on.
 
 It is currently developed by William Hart, Tommy Hofmann, Fredrik Johansson,
 Claus Fieker with contributions from others.
