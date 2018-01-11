@@ -229,6 +229,6 @@ function test_perm()
    test_perm_binary_ops()
    test_perm_inversion()
    test_misc_functions()
-   #test_characters()
+   test_characters()
    println("")
 end
