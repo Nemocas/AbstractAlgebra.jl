@@ -26,7 +26,7 @@ function test_gen_poly_constructors()
    @test elem_type(Generic.PolyRing{elem_type(R)}) == Generic.Poly{elem_type(R)}
    @test parent_type(Generic.Poly{elem_type(R)}) == Generic.PolyRing{elem_type(R)}
 
-   @test typeof(R) <: Nemo.Ring
+   @test typeof(R) <: AbstractAlgebra.Ring
    @test typeof(S) <: Generic.PolyRing
 
    @test isa(y, PolyElem)

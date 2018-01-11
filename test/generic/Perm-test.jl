@@ -3,7 +3,7 @@ function test_perm_abstract_types()
 
    @test Generic.perm <: GroupElem
 
-   @test Generic.PermGroup <: Nemo.Group
+   @test Generic.PermGroup <: AbstractAlgebra.Group
 
    println("PASS")
 end

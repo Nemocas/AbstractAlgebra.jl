@@ -88,7 +88,7 @@ end
 
 ###############################################################################
 #
-#   Unions of Nemo abstract types and Julia types
+#   Unions of AbstactAlgebra abstract types and Julia types
 #
 ###############################################################################
 

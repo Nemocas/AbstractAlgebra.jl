@@ -9,8 +9,6 @@ for T in subtypes(PolyElem)
   end
 
   (f::T)(a::Integer) = evaluate(f, a)
-  (f::T)(a::fmpz) = evaluate(f, a)
-
 
   function (f::T)(a::RingElem)
      if parent(a) != base_ring(f)

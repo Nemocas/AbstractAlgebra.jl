@@ -9,13 +9,13 @@ function test_Rationals_constructors()
 
    @test elem_type(R) == Rational{Int}
    @test elem_type(S) == Rational{BigInt}
-   @test elem_type(Nemo.Rationals{Int}) == Rational{Int}
-   @test elem_type(Nemo.Rationals{BigInt}) == Rational{BigInt}
-   @test parent_type(Rational{Int}) == Nemo.Rationals{Int}
-   @test parent_type(Rational{BigInt}) == Nemo.Rationals{BigInt}
+   @test elem_type(AbstractAlgebra.Rationals{Int}) == Rational{Int}
+   @test elem_type(AbstractAlgebra.Rationals{BigInt}) == Rational{BigInt}
+   @test parent_type(Rational{Int}) == AbstractAlgebra.Rationals{Int}
+   @test parent_type(Rational{BigInt}) == AbstractAlgebra.Rationals{BigInt}
    
-   @test isa(R, Nemo.Rationals)
-   @test isa(S, Nemo.Rationals)
+   @test isa(R, AbstractAlgebra.Rationals)
+   @test isa(S, AbstractAlgebra.Rationals)
 
    @test isa(R(), Rational{Int})
    @test isa(S(), Rational{BigInt})
@@ -134,8 +134,8 @@ function test_Rationals_square_root()
       f = r^2
       g = s^2
 
-      @test Nemo.sqrt(f)^2 == f
-      @test Nemo.sqrt(g)^2 == g
+      @test AbstractAlgebra.sqrt(f)^2 == f
+      @test AbstractAlgebra.sqrt(g)^2 == g
    end
 
    println("PASS")

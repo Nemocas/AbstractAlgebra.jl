@@ -21,10 +21,10 @@ import Base: floor, ceil, hypot, log, log1p, exp, expm1, sin, cos, sinpi,
              cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
              asinh, acosh, gamma, lgamma, sinpi, cospi, atan2
 
-import Nemo: Integers, Rationals, Ring, RingElem, RingElement, Field,
+import AbstractAlgebra: Integers, Rationals, Ring, RingElem, RingElement, Field,
              FieldElement, promote_rule
 
-using Nemo
+using AbstractAlgebra
 
 include("generic/GenericTypes.jl")
 

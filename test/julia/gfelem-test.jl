@@ -4,29 +4,29 @@ function test_gfelem_constructors()
    R = GF(13)
    S = GF(BigInt(13))
 
-   @test elem_type(R) == Nemo.gfelem{Int}
-   @test elem_type(S) == Nemo.gfelem{BigInt}
-   @test elem_type(Nemo.GFField{Int}) == Nemo.gfelem{Int}
-   @test elem_type(Nemo.GFField{BigInt}) == Nemo.gfelem{BigInt}
-   @test parent_type(Nemo.gfelem{Int}) == Nemo.GFField{Int}
-   @test parent_type(Nemo.gfelem{BigInt}) == Nemo.GFField{BigInt}
+   @test elem_type(R) == AbstractAlgebra.gfelem{Int}
+   @test elem_type(S) == AbstractAlgebra.gfelem{BigInt}
+   @test elem_type(AbstractAlgebra.GFField{Int}) == AbstractAlgebra.gfelem{Int}
+   @test elem_type(AbstractAlgebra.GFField{BigInt}) == AbstractAlgebra.gfelem{BigInt}
+   @test parent_type(AbstractAlgebra.gfelem{Int}) == AbstractAlgebra.GFField{Int}
+   @test parent_type(AbstractAlgebra.gfelem{BigInt}) == AbstractAlgebra.GFField{BigInt}
    
-   @test isa(R, Nemo.GFField)
-   @test isa(S, Nemo.GFField)
+   @test isa(R, AbstractAlgebra.GFField)
+   @test isa(S, AbstractAlgebra.GFField)
 
-   @test isa(R(), Nemo.gfelem)
-   @test isa(S(), Nemo.gfelem)
+   @test isa(R(), AbstractAlgebra.gfelem)
+   @test isa(S(), AbstractAlgebra.gfelem)
 
-   @test isa(R(11), Nemo.gfelem)
-   @test isa(S(BigInt(11)), Nemo.gfelem)
-   @test isa(S(11), Nemo.gfelem)
-   @test isa(S(BigInt(11)), Nemo.gfelem)
+   @test isa(R(11), AbstractAlgebra.gfelem)
+   @test isa(S(BigInt(11)), AbstractAlgebra.gfelem)
+   @test isa(S(11), AbstractAlgebra.gfelem)
+   @test isa(S(BigInt(11)), AbstractAlgebra.gfelem)
 
    a = R(11)
    b = S(11)
 
-   @test isa(R(a), Nemo.gfelem)
-   @test isa(S(b), Nemo.gfelem)
+   @test isa(R(a), AbstractAlgebra.gfelem)
+   @test isa(S(b), AbstractAlgebra.gfelem)
 
    println("PASS")
 end

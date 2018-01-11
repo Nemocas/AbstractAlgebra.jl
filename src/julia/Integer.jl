@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   Integer.jl : Additional Nemo functionality for Julia Integer
+#   Integer.jl : Additional AbstractAlgebra functionality for Julia Integer
 #
 ###############################################################################
 

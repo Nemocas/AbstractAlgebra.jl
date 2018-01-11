@@ -17,35 +17,35 @@ parent_type(::Type{ResF{T}}) where T <: RingElement = ResField{T}
 elem_type(::Type{ResField{T}}) where {T <: RingElement} = ResF{T}
 
 doc"""
-    base_ring{T <: RingElement}(S::Nemo.ResField{T})
+    base_ring{T <: RingElement}(S::AbstractAlgebra.ResField{T})
 > Return the base ring $R$ of the given residue ring $S = R/(a)$.
 """
-base_ring(S::Nemo.ResField{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
+base_ring(S::AbstractAlgebra.ResField{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
 
 doc"""
-    base_ring(r::Nemo.ResFieldElem)
+    base_ring(r::AbstractAlgebra.ResFieldElem)
 > Return the base ring $R$ of the residue ring $R/(a)$ that the supplied
 > element $r$ belongs to.
 """
-base_ring(r::Nemo.ResFieldElem) = base_ring(parent(r))
+base_ring(r::AbstractAlgebra.ResFieldElem) = base_ring(parent(r))
 
 doc"""
-    parent(a::Nemo.ResFieldElem)
+    parent(a::AbstractAlgebra.ResFieldElem)
 > Return the parent object of the given residue element.
 """
-parent(a::Nemo.ResFieldElem) = a.parent
+parent(a::AbstractAlgebra.ResFieldElem) = a.parent
 
-isdomain_type(a::Type{T}) where T <: Nemo.ResFieldElem = false
+isdomain_type(a::Type{T}) where T <: AbstractAlgebra.ResFieldElem = false
 
-function isexact_type(a::Type{T}) where {S <: RingElement, T <: Nemo.ResFieldElem{S}}
+function isexact_type(a::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.ResFieldElem{S}}
    return isexact_type(S)
 end
 
-function check_parent_type(a::Nemo.ResField{T}, b::Nemo.ResField{T}) where {T <: RingElement}
+function check_parent_type(a::AbstractAlgebra.ResField{T}, b::AbstractAlgebra.ResField{T}) where {T <: RingElement}
    # exists only to check types of parents agree
 end
 
-function check_parent(a::Nemo.ResFieldElem, b::Nemo.ResFieldElem)
+function check_parent(a::AbstractAlgebra.ResFieldElem, b::AbstractAlgebra.ResFieldElem)
    if parent(a) != parent(b)
       check_parent_type(parent(a), parent(b))
       modulus(parent(a)) != modulus(parent(b)) && error("Incompatible moduli in residue operation") #CF: maybe extend to divisibility?
@@ -58,34 +58,34 @@ end
 #
 ###############################################################################
 
-function Base.hash(a::Nemo.ResFieldElem, h::UInt)
+function Base.hash(a::AbstractAlgebra.ResFieldElem, h::UInt)
    b = 0x539c1c8715c1adc2%UInt
    return xor(b, xor(hash(data(a), h), h))
 end
 
 doc"""
-    modulus(R::Nemo.ResField)
+    modulus(R::AbstractAlgebra.ResField)
 > Return the modulus $a$ of the given residue ring $S = R/(a)$.
 """
-function modulus(S::Nemo.ResField)
+function modulus(S::AbstractAlgebra.ResField)
    return S.modulus
 end
 
 doc"""
-    modulus(R::Nemo.ResFieldElem)
+    modulus(R::AbstractAlgebra.ResFieldElem)
 > Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
 > residue $r$ belongs to.
 """
-function modulus(r::Nemo.ResFieldElem)
+function modulus(r::AbstractAlgebra.ResFieldElem)
    return modulus(parent(r))
 end
 
 doc"""
-    characteristic(R::Nemo.ResField)
+    characteristic(R::AbstractAlgebra.ResField)
 > Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
 > residue $r$ belongs to.
 """
-function characteristic(r::Nemo.ResField)
+function characteristic(r::AbstractAlgebra.ResField)
    R = base_ring(r)
    while R != Union{}
       if typeof(R) <: Field
@@ -97,54 +97,54 @@ function characteristic(r::Nemo.ResField)
 end
 
 doc"""
-    characteristic{T <: Integer}(R::Nemo.ResField{T})
+    characteristic{T <: Integer}(R::AbstractAlgebra.ResField{T})
 > Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
 > residue $r$ belongs to.
 """
-function characteristic(r::Nemo.ResField{T}) where T <: Integer
+function characteristic(r::AbstractAlgebra.ResField{T}) where T <: Integer
    return modulus(r)
 end
 
-data(a::Nemo.ResFieldElem) = a.data
+data(a::AbstractAlgebra.ResFieldElem) = a.data
 
 doc"""
-    zero(R::Nemo.ResField)
+    zero(R::AbstractAlgebra.ResField)
 > Return the zero element of the given residue ring, i.e. $0 \pmod{a}$ where
 > $a$ is the modulus of the residue ring.
 """
-zero(R::Nemo.ResField) = R(0)
+zero(R::AbstractAlgebra.ResField) = R(0)
 
 doc"""
-    one(R::Nemo.ResField)
+    one(R::AbstractAlgebra.ResField)
 > Return $1 \pmod{a}$ where $a$ is the modulus of the residue ring.
 """
-one(R::Nemo.ResField) = R(1)
+one(R::AbstractAlgebra.ResField) = R(1)
 
 doc"""
-    iszero(a::Nemo.ResFieldElem)
+    iszero(a::AbstractAlgebra.ResFieldElem)
 > Return `true` if the supplied element $a$ is zero in the residue ring it
 > belongs to, otherwise return `false`.
 """
-iszero(a::Nemo.ResFieldElem) = iszero(data(a))
+iszero(a::AbstractAlgebra.ResFieldElem) = iszero(data(a))
 
 doc"""
-    isone(a::Nemo.ResFieldElem)
+    isone(a::AbstractAlgebra.ResFieldElem)
 > Return `true` if the supplied element $a$ is one in the residue ring it
 > belongs to, otherwise return `false`.
 """
-isone(a::Nemo.ResFieldElem) = isone(data(a))
+isone(a::AbstractAlgebra.ResFieldElem) = isone(data(a))
 
 doc"""
-    isunit(a::Nemo.ResFieldElem)
+    isunit(a::AbstractAlgebra.ResFieldElem)
 > Return `true` if the supplied element $a$ is invertible in the residue ring
 > it belongs to, otherwise return `false`.
 """
-function isunit(a::Nemo.ResFieldElem)
+function isunit(a::AbstractAlgebra.ResFieldElem)
    g = gcd(data(a), modulus(a))
    return isone(g)
 end
 
-deepcopy_internal(a::Nemo.ResFieldElem, dict::ObjectIdDict) =
+deepcopy_internal(a::AbstractAlgebra.ResFieldElem, dict::ObjectIdDict) =
    parent(a)(deepcopy(data(a)))
 
 ###############################################################################
@@ -153,7 +153,7 @@ deepcopy_internal(a::Nemo.ResFieldElem, dict::ObjectIdDict) =
 #
 ###############################################################################
 
-function canonical_unit(x::Nemo.ResFieldElem{<:Union{Integer, RingElem}})
+function canonical_unit(x::AbstractAlgebra.ResFieldElem{<:Union{Integer, RingElem}})
   if iszero(x)
     return one(parent(x))
   end
@@ -166,17 +166,17 @@ end
 #
 ###############################################################################
 
-function show(io::IO, x::Nemo.ResFieldElem)
+function show(io::IO, x::AbstractAlgebra.ResFieldElem)
    print(io, data(x))
 end
 
-function show(io::IO, a::Nemo.ResField)
+function show(io::IO, a::AbstractAlgebra.ResField)
    print(io, "Residue field of ", base_ring(a), " modulo ", modulus(a))
 end
 
-needs_parentheses(x::Nemo.ResFieldElem) = needs_parentheses(data(x))
+needs_parentheses(x::AbstractAlgebra.ResFieldElem) = needs_parentheses(data(x))
 
-isnegative(x::Nemo.ResFieldElem) = isnegative(data(x))
+isnegative(x::AbstractAlgebra.ResFieldElem) = isnegative(data(x))
 
 show_minus_one(::Type{ResF{T}}) where {T <: RingElement} = true
 
@@ -187,10 +187,10 @@ show_minus_one(::Type{ResF{T}}) where {T <: RingElement} = true
 ###############################################################################
 
 doc"""
-    -(a::Nemo.ResFieldElem)
+    -(a::AbstractAlgebra.ResFieldElem)
 > Return $-a$.
 """
-function -(a::Nemo.ResFieldElem)
+function -(a::AbstractAlgebra.ResFieldElem)
    parent(a)(-data(a))
 end
 
@@ -201,28 +201,28 @@ end
 ###############################################################################
 
 doc"""
-    +{T <: RingElement}(a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T})
+    +{T <: RingElement}(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T})
 > Return $a + b$.
 """
-function +(a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T}) where {T <: RingElement}
+function +(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(data(a) + data(b))
 end
 
 doc"""
-    -{T <: RingElement}(a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T})
+    -{T <: RingElement}(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T})
 > Return $a - b$.
 """
-function -(a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T}) where {T <: RingElement}
+function -(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(data(a) - data(b))
 end
 
 doc"""
-    *{T <: RingElement}(a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T})
+    *{T <: RingElement}(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T})
 > Return $a\times b$.
 """
-function *(a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T}) where {T <: RingElement}
+function *(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(data(a) * data(b))
 end
@@ -234,76 +234,76 @@ end
 ###############################################################################
 
 doc"""
-    *(a::Nemo.ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
+    *(a::AbstractAlgebra.ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a\times b$.
 """
-*(a::Nemo.ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) * b)
+*(a::AbstractAlgebra.ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) * b)
 
 doc"""
-    *{T <: RingElem}(a::Nemo.ResFieldElem{T}, b::T)
+    *{T <: RingElem}(a::AbstractAlgebra.ResFieldElem{T}, b::T)
 > Return $a\times b$.
 """
-*(a::Nemo.ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) * b)
+*(a::AbstractAlgebra.ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) * b)
 
 doc"""
-    *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResFieldElem)
+    *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResFieldElem)
 > Return $a\times b$.
 """
-*(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResFieldElem) = parent(b)(a * data(b))
+*(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResFieldElem) = parent(b)(a * data(b))
 
 doc"""
-    *{T <: RingElem}(a::T, b::Nemo.ResFieldElem{T})
+    *{T <: RingElem}(a::T, b::AbstractAlgebra.ResFieldElem{T})
 > Return $a\times b$.
 """
-*(a::T, b::Nemo.ResFieldElem{T}) where {T <: RingElem} = parent(b)(a * data(b))
+*(a::T, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElem} = parent(b)(a * data(b))
 
 doc"""
-    +(a::Nemo.ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
+    +(a::AbstractAlgebra.ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a + b$.
 """
-+(a::Nemo.ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) + b)
++(a::AbstractAlgebra.ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) + b)
 
 doc"""
-    +{T <: RingElem}(a::Nemo.ResFieldElem{T}, b::T)
+    +{T <: RingElem}(a::AbstractAlgebra.ResFieldElem{T}, b::T)
 > Return $a + b$.
 """
-+(a::Nemo.ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) + b)
++(a::AbstractAlgebra.ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) + b)
 
 doc"""
-    +(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResFieldElem)
+    +(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResFieldElem)
 > Return $a + b$.
 """
-+(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResFieldElem) = parent(b)(a + data(b))
++(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResFieldElem) = parent(b)(a + data(b))
 
 doc"""
-    +{T <: RingElem}(a::T, b::Nemo.ResFieldElem{T})
+    +{T <: RingElem}(a::T, b::AbstractAlgebra.ResFieldElem{T})
 > Return $a + b$.
 """
-+(a::T, b::Nemo.ResFieldElem{T}) where {T <: RingElem} = parent(b)(a + data(b))
++(a::T, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElem} = parent(b)(a + data(b))
 
 doc"""
-    -(a::Nemo.ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
+    -(a::AbstractAlgebra.ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a - b$.
 """
--(a::Nemo.ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) - b)
+-(a::AbstractAlgebra.ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) - b)
 
 doc"""
-    -{T <: RingElem}(a::Nemo.ResFieldElem{T}, b::T)
+    -{T <: RingElem}(a::AbstractAlgebra.ResFieldElem{T}, b::T)
 > Return $a - b$.
 """
--(a::Nemo.ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) - b)
+-(a::AbstractAlgebra.ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) - b)
 
 doc"""
-    -(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResFieldElem)
+    -(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResFieldElem)
 > Return $a - b$.
 """
--(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResFieldElem) = parent(b)(a - data(b))
+-(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResFieldElem) = parent(b)(a - data(b))
 
 doc"""
-    -{T <: RingElem}(a::T, b::Nemo.ResFieldElem{T})
+    -{T <: RingElem}(a::T, b::AbstractAlgebra.ResFieldElem{T})
 > Return $a - b$.
 """
--(a::T, b::Nemo.ResFieldElem{T}) where {T <: RingElem} = parent(b)(a - data(b))
+-(a::T, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElem} = parent(b)(a - data(b))
 
 ###############################################################################
 #
@@ -312,10 +312,10 @@ doc"""
 ###############################################################################
 
 doc"""
-    ^(a::Nemo.ResFieldElem, b::Int)
+    ^(a::AbstractAlgebra.ResFieldElem, b::Int)
 > Return $a^b$.
 """
-function ^(a::Nemo.ResFieldElem, b::Int)
+function ^(a::AbstractAlgebra.ResFieldElem, b::Int)
    parent(a)(powmod(data(a), b, modulus(a)))
 end
 
@@ -326,24 +326,24 @@ end
 ###############################################################################
 
 doc"""
-    =={T <: RingElement}(x::Nemo.ResFieldElem{T}, y::Nemo.ResFieldElem{T})
+    =={T <: RingElement}(x::AbstractAlgebra.ResFieldElem{T}, y::AbstractAlgebra.ResFieldElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
 > equal to the minimum of the two precisions.
 """
-function ==(a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T}) where {T <: RingElement}
+function ==(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return data(a) == data(b)
 end
 
 doc"""
-    isequal{T <: RingElement}(x::Nemo.ResFieldElem{T}, y::Nemo.ResFieldElem{T})
+    isequal{T <: RingElement}(x::AbstractAlgebra.ResFieldElem{T}, y::AbstractAlgebra.ResFieldElem{T})
 > Return `true` if $x == y$ exactly, otherwise return `false`. This function is
 > useful in cases where the data of the residues are inexact, e.g. power series
 > Only if the power series are precisely the same, to the same precision, are
 > they declared equal by this function.
 """
-function isequal(a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T}) where {T <: RingElement}
+function isequal(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return isequal(data(a), data(b))
 end
@@ -355,37 +355,37 @@ end
 ###############################################################################
 
 doc"""
-    ==(x::Nemo.ResFieldElem, y::Union{Integer, Rational, AbstractFloat})
+    ==(x::AbstractAlgebra.ResFieldElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::Nemo.ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
+function ==(a::AbstractAlgebra.ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
 doc"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.ResFieldElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.ResFieldElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResFieldElem)
+function ==(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResFieldElem)
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
 end
 
 doc"""
-    =={T <: RingElem}(x::Nemo.ResFieldElem{T}, y::T)
+    =={T <: RingElem}(x::AbstractAlgebra.ResFieldElem{T}, y::T)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::Nemo.ResFieldElem{T}, b::T) where {T <: RingElem}
+function ==(a::AbstractAlgebra.ResFieldElem{T}, b::T) where {T <: RingElem}
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
 doc"""
-    =={T <: RingElem}(x::T, y::Nemo.ResFieldElem{T})
+    =={T <: RingElem}(x::T, y::AbstractAlgebra.ResFieldElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::T, b::Nemo.ResFieldElem{T}) where {T <: RingElem}
+function ==(a::T, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElem}
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
 end
@@ -397,11 +397,11 @@ end
 ###############################################################################
 
 doc"""
-    inv(a::Nemo.ResFieldElem)
+    inv(a::AbstractAlgebra.ResFieldElem)
 > Return the inverse of the element $a$ in the residue ring. If an impossible
 > inverse is encountered, an exception is raised.
 """
-function inv(a::Nemo.ResFieldElem)
+function inv(a::AbstractAlgebra.ResFieldElem)
    g, ainv = gcdinv(data(a), modulus(a))
    if g != 1
       error("Impossible inverse in inv")
@@ -416,10 +416,10 @@ end
 ###############################################################################
 
 doc"""
-    divexact{T <: RingElement}(a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T})
+    divexact{T <: RingElement}(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T})
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact(a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T}) where {T <: RingElement}
+function divexact(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
    check_parent(a, b)
    fl, q = divides(a, b)
    if !fl
@@ -428,7 +428,7 @@ function divexact(a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T}) where {T <: 
    return q
 end
 
-function divides(a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T}) where {T <: RingElement}
+function divides(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
    check_parent(a, b)
    iszero(b) && error("Division by zero in divides")
    return true, a*inv(b)
@@ -441,12 +441,12 @@ end
 ###############################################################################
 
 doc"""
-    gcd{T <: RingElement}(a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T})
+    gcd{T <: RingElement}(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T})
 > Return a greatest common divisor of $a$ and $b$ if one exists. This is done
 > by taking the greatest common divisor of the data associated with the
 > supplied residues and taking its greatest common divisor with the modulus.
 """
-function gcd(a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T}) where {T <: RingElement}
+function gcd(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(gcd(gcd(data(a), modulus(a)), data(b)))
 end
@@ -457,22 +457,22 @@ end
 #
 ###############################################################################
 
-function zero!(a::Nemo.ResFieldElem{T}) where {T <: RingElement}
+function zero!(a::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
    a.data = zero!(a.data)
    return a
 end
 
-function mul!(c::Nemo.ResFieldElem{T}, a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T}) where {T <: RingElement}
+function mul!(c::AbstractAlgebra.ResFieldElem{T}, a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
    c.data = mod(data(a)*data(b), modulus(a))
    return c
 end
 
-function addeq!(c::Nemo.ResFieldElem{T}, a::Nemo.ResFieldElem{T}) where {T <: RingElement}
+function addeq!(c::AbstractAlgebra.ResFieldElem{T}, a::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
    c.data = mod(data(c) + data(a), modulus(a))
    return c
 end
 
-function add!(c::Nemo.ResFieldElem{T}, a::Nemo.ResFieldElem{T}, b::Nemo.ResFieldElem{T}) where {T <: RingElement}
+function add!(c::AbstractAlgebra.ResFieldElem{T}, a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
    c.data = mod(data(a) + data(b), modulus(a))
    return c
 end
@@ -483,7 +483,7 @@ end
 #
 ###############################################################################
 
-function rand(S::Nemo.ResField{T}, v...) where {T <: RingElement}
+function rand(S::AbstractAlgebra.ResField{T}, v...) where {T <: RingElement}
    R = base_ring(S)
    return S(rand(R, v...))
 end
@@ -529,7 +529,7 @@ function (a::ResField{T})(b::T) where {T <: RingElem}
    return z
 end
 
-function (a::ResField{T})(b::Nemo.ResFieldElem{T}) where {T <: RingElement}
+function (a::ResField{T})(b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
    a != parent(b) && error("Operation on incompatible objects")
    return b
 end
@@ -541,13 +541,13 @@ end
 ###############################################################################
 
 doc"""
-    ResidueField{T <: RingElement}(R::Nemo.Ring, a::RingElement; cached::Bool=true)
+    ResidueField{T <: RingElement}(R::AbstractAlgebra.Ring, a::RingElement; cached::Bool=true)
 > Create the residue ring $R/(a)$ where $a$ is an element of the ring $R$. We
 > require $a \neq 0$. If `cached == true` (the default) then the resulting
 > residue ring parent object is cached and returned for any subsequent calls
 > to the constructor with the same base ring $R$ and element $a$.
 """
-function ResidueField(R::Nemo.Ring, a::RingElement; cached::Bool = true)
+function ResidueField(R::AbstractAlgebra.Ring, a::RingElement; cached::Bool = true)
    iszero(a) && throw(DivideError())
    T = elem_type(R)
 
@@ -560,13 +560,13 @@ end
 #
 ###############################################################################
 
-function NumberField(a::Nemo.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
+function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
    S = parent(a)
    R = ResidueField(S, a, cached=cached)
    x = gen(S)
    return R, R(x)
 end
 
-function  gen(R::Nemo.Generic.ResField{Nemo.Generic.Poly{Rational{BigInt}}})
+function  gen(R::AbstractAlgebra.Generic.ResField{AbstractAlgebra.Generic.Poly{Rational{BigInt}}})
    return R(gen(base_ring(R)))
 end

@@ -12,15 +12,15 @@ end
 #
 #   Promotion system
 #
-# The promote_rule functions are not extending Base.promote_rule. The Nemo
-# promotion system is orthogonal to the built-in julia promotion system. The
-# julia system assumes that whenever you have a method signature of the form
-# Base.promote_rule(::Type{T}, ::Type{S}) = R, then there is also a
+# The promote_rule functions are not extending Base.promote_rule. The
+# AbstractAlgebra promotion system is orthogonal to the built-in julia promotion
+# system. The julia system assumes that whenever you have a method signature of
+# the form Base.promote_rule(::Type{T}, ::Type{S}) = R, then there is also a
 # corresponding Base.convert(::Type{R}, ::T) and similar for S. Since we
 # cannot use the julia convert system (we need an instance of the type and not
 # the type), we cannot use the julia promotion system.
 #
-# The Nemo promotion system is used to define catch all functions for
+# The AbstractAlgebra promotion system is used to define catch all functions for
 # arithmetic between arbitrary ring elements.
 #
 ################################################################################
@@ -206,67 +206,7 @@ include("julia/Rational.jl")
 
 include("julia/Float.jl")
 
-include("flint/fmpz.jl")
-
-include("flint/fmpz_poly.jl")
-
-include("flint/nmod_poly.jl")
-
-include("flint/nmod.jl")
-
-include("flint/fmpz_mod_poly.jl")
-
-#include("flint/fmpz_mpoly.jl")
-
-include("flint/fmpz_rel_series.jl")
-
-include("flint/fmpz_abs_series.jl")
-
-include("flint/nmod_rel_series.jl")
-
-include("flint/fmpz_mod_rel_series.jl")
-
-include("flint/fmpz_mod_abs_series.jl")
-
-include("flint/fmpz_mat.jl")
-
-include("flint/fmpq_mat.jl")
-
-include("flint/nmod_mat.jl")
-
-include("flint/fq_mat.jl")
-
-include("flint/fq_nmod_mat.jl")
-
 include("Fields.jl")
-
-include("flint/fmpq_poly.jl")
-
-include("flint/padic.jl")
-
-include("flint/fmpq_rel_series.jl")
-
-include("flint/fmpq_abs_series.jl")
-
-include("flint/fq_rel_series.jl")
-
-include("flint/fq_abs_series.jl")
-
-include("flint/fq_nmod_rel_series.jl")
-
-include("flint/fq_nmod_abs_series.jl")
-
-include("flint/fq_poly.jl")
-
-include("flint/fq_nmod_poly.jl")
-
-include("arb/arb_poly.jl")
-
-include("arb/acb_poly.jl")
-
-include("arb/arb_mat.jl")
-
-include("arb/acb_mat.jl")
 
 include("Factor.jl")
 

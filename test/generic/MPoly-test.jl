@@ -156,7 +156,7 @@ function test_gen_mpoly_binary_ops()
          @test f*g + f*h == f*(g + h)
          @test f*g - f*h == f*(g - h)
 
-         @test f*g == Nemo.mul_classical(f, g)
+         @test f*g == AbstractAlgebra.mul_classical(f, g)
       end
    end
 

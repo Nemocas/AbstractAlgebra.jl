@@ -1,9 +1,7 @@
-local/*
-deps/*
-doc/nemo.aux
-doc/nemo.log
-doc/nemo.out
-doc/nemo.pdf
-doc/nemo.toc
+doc/abstractalgebra.aux
+doc/abstractalgebra.log
+doc/abstractalgebra.out
+doc/abstractalgebra.pdf
+doc/abstractalgebra.toc
 doc/build/assets
 doc/site

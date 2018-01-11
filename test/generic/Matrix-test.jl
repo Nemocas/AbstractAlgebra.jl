@@ -60,7 +60,7 @@ function is_weak_popov(P::Generic.Mat, rank::Int)
    zero_rows = 0
    pivots = zeros(cols(P))
    for r = 1:rows(P)
-      p = Nemo.find_pivot_popov(P, r)
+      p = AbstractAlgebra.find_pivot_popov(P, r)
       if P[r,p] == 0
          zero_rows += 1
          continue
@@ -518,7 +518,7 @@ function test_gen_mat_det()
 
       M = rand(R, 0:5, -100:100)
 
-      @test det(M) == Nemo.det_clow(M)
+      @test det(M) == AbstractAlgebra.det_clow(M)
    end
 
    S, z = PolynomialRing(JuliaZZ, "z")
@@ -528,7 +528,7 @@ function test_gen_mat_det()
 
       M = rand(R, 0:3, -20:20)
 
-      @test det(M) == Nemo.det_clow(M)
+      @test det(M) == AbstractAlgebra.det_clow(M)
    end
 
    R, x = PolynomialRing(JuliaQQ, "x")
@@ -539,7 +539,7 @@ function test_gen_mat_det()
 
       M = rand(S, 0:2, -100:100)
 
-      @test det(M) == Nemo.det_clow(M)
+      @test det(M) == AbstractAlgebra.det_clow(M)
    end
 
    R, x = PolynomialRing(JuliaZZ, "x")
@@ -549,7 +549,7 @@ function test_gen_mat_det()
       T = MatrixSpace(S, dim, dim)
       M = rand(T, 0:2, 0:2, -10:10)
 
-      @test det(M) == Nemo.det_clow(M)
+      @test det(M) == AbstractAlgebra.det_clow(M)
    end
 
    println("PASS")
@@ -1212,10 +1212,10 @@ function test_gen_mat_hnf_kb()
 
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
-   H = Nemo.hnf_kb(A)
+   H = AbstractAlgebra.hnf_kb(A)
    @test istriu(H)
 
-   H, U = Nemo.hnf_kb_with_trafo(A)
+   H, U = AbstractAlgebra.hnf_kb_with_trafo(A)
    @test istriu(H)
    @test isunit(det(U))
    @test U*A == H
@@ -1231,10 +1231,10 @@ function test_gen_mat_hnf_kb()
 
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
-   H = Nemo.hnf_kb(B)
+   H = AbstractAlgebra.hnf_kb(B)
    @test istriu(H)
 
-   H, U = Nemo.hnf_kb_with_trafo(B)
+   H, U = AbstractAlgebra.hnf_kb_with_trafo(B)
    @test istriu(H)
    @test isunit(det(U))
    @test U*B == H
@@ -1251,10 +1251,10 @@ function test_gen_mat_hnf_cohen()
 
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
-   H = Nemo.hnf_cohen(A)
+   H = AbstractAlgebra.hnf_cohen(A)
    @test istriu(H)
 
-   H, U = Nemo.hnf_cohen_with_trafo(A)
+   H, U = AbstractAlgebra.hnf_cohen_with_trafo(A)
    @test istriu(H)
    @test isunit(det(U))
    @test U*A == H
@@ -1270,10 +1270,10 @@ function test_gen_mat_hnf_cohen()
 
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
-   H = Nemo.hnf_cohen(B)
+   H = AbstractAlgebra.hnf_cohen(B)
    @test istriu(H)
 
-   H, U = Nemo.hnf_cohen_with_trafo(B)
+   H, U = AbstractAlgebra.hnf_cohen_with_trafo(B)
    @test istriu(H)
    @test isunit(det(U))
    @test U*B == H
@@ -1329,10 +1329,10 @@ function test_gen_mat_snf_kb()
 
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
-   T = Nemo.snf_kb(A)
+   T = AbstractAlgebra.snf_kb(A)
    @test is_snf(T)
 
-   T, U, K = Nemo.snf_kb_with_trafo(A)
+   T, U, K = AbstractAlgebra.snf_kb_with_trafo(A)
    @test is_snf(T)
    @test isunit(det(U))
    @test isunit(det(K))
@@ -1349,10 +1349,10 @@ function test_gen_mat_snf_kb()
 
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
-   T = Nemo.snf_kb(B)
+   T = AbstractAlgebra.snf_kb(B)
    @test is_snf(T)
 
-   T, U, K = Nemo.snf_kb_with_trafo(B)
+   T, U, K = AbstractAlgebra.snf_kb_with_trafo(B)
    @test is_snf(T)
    @test isunit(det(U))
    @test isunit(det(K))

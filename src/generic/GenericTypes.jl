@@ -12,7 +12,7 @@
 
 const PermID = ObjectIdDict()
 
-mutable struct PermGroup <: Nemo.Group
+mutable struct PermGroup <: AbstractAlgebra.Group
    n::Int
 
    function PermGroup(n::Int, cached=true)
@@ -28,7 +28,7 @@ mutable struct PermGroup <: Nemo.Group
    end
 end
 
-mutable struct perm <: Nemo.GroupElem
+mutable struct perm <: AbstractAlgebra.GroupElem
    d::Array{Int, 1}
    cycles::Vector{Vector{Int}}
    parent::PermGroup
@@ -135,7 +135,7 @@ end
 #
 ###############################################################################
 
-mutable struct PolyRing{T <: RingElement} <: Nemo.PolyRing{T}
+mutable struct PolyRing{T <: RingElement} <: AbstractAlgebra.PolyRing{T}
    base_ring::Ring
    S::Symbol
 
@@ -154,7 +154,7 @@ end
 
 const PolyID = Dict{Tuple{Ring, Symbol}, Ring}()
 
-mutable struct Poly{T <: RingElement} <: Nemo.PolyElem{T}
+mutable struct Poly{T <: RingElement} <: AbstractAlgebra.PolyElem{T}
    coeffs::Array{T, 1}
    length::Int
    parent::PolyRing{T}
@@ -185,7 +185,7 @@ end
 # T is an Int which is the number of variables
 # (plus one if ordered by total degree)
 
-mutable struct MPolyRing{T <: RingElement} <: Nemo.MPolyRing{T}
+mutable struct MPolyRing{T <: RingElement} <: AbstractAlgebra.MPolyRing{T}
    base_ring::Ring
    S::Array{Symbol, 1}
    ord::Symbol
@@ -208,7 +208,7 @@ end
 
 const MPolyID = Dict{Tuple{Ring, Array{Symbol, 1}, Symbol, Int}, Ring}()
 
-mutable struct MPoly{T <: RingElement} <: Nemo.MPolyElem{T}
+mutable struct MPoly{T <: RingElement} <: AbstractAlgebra.MPolyElem{T}
    coeffs::Array{T, 1}
    exps::Array{UInt, 2}
    length::Int
@@ -234,7 +234,7 @@ end
 #
 ###############################################################################
 
-mutable struct SparsePolyRing{T <: RingElement} <: Nemo.Ring
+mutable struct SparsePolyRing{T <: RingElement} <: AbstractAlgebra.Ring
    base_ring::Ring
    S::Symbol
    num_vars::Int
@@ -254,7 +254,7 @@ end
 
 const SparsePolyID = Dict{Tuple{Ring, Symbol}, SparsePolyRing}()
 
-mutable struct SparsePoly{T <: RingElement} <: Nemo.RingElem
+mutable struct SparsePoly{T <: RingElement} <: AbstractAlgebra.RingElem
    coeffs::Array{T, 1}
    exps::Array{UInt}
    length::Int
@@ -274,7 +274,7 @@ end
 #
 ###############################################################################
 
-mutable struct ResRing{T <: RingElement} <: Nemo.ResRing{T}
+mutable struct ResRing{T <: RingElement} <: AbstractAlgebra.ResRing{T}
    base_ring::Ring
    modulus::T
 
@@ -297,7 +297,7 @@ end
 
 const ModulusDict = Dict{Tuple{Ring, RingElement}, Ring}()
 
-mutable struct Res{T <: RingElement} <: Nemo.ResElem{T}
+mutable struct Res{T <: RingElement} <: AbstractAlgebra.ResElem{T}
    data::T
    parent::ResRing{T}
 
@@ -310,7 +310,7 @@ end
 #
 ###############################################################################
 
-mutable struct ResField{T <: RingElement} <: Nemo.ResField{T}
+mutable struct ResField{T <: RingElement} <: AbstractAlgebra.ResField{T}
    base_ring::Ring
    modulus::T
 
@@ -333,7 +333,7 @@ end
 
 const ModulusFieldDict = Dict{Tuple{Ring, RingElement}, Field}()
 
-mutable struct ResF{T <: RingElement} <: Nemo.ResFieldElem{T}
+mutable struct ResF{T <: RingElement} <: AbstractAlgebra.ResFieldElem{T}
    data::T
    parent::ResField{T}
 
@@ -346,7 +346,7 @@ end
 #
 ###############################################################################
 
-mutable struct RelSeriesRing{T <: RingElement} <: Nemo.SeriesRing{T}
+mutable struct RelSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
@@ -366,7 +366,7 @@ end
 
 const RelSeriesID = Dict{Tuple{Ring, Int, Symbol}, Ring}()
 
-mutable struct RelSeries{T <: RingElement} <: Nemo.RelSeriesElem{T}
+mutable struct RelSeries{T <: RingElement} <: AbstractAlgebra.RelSeriesElem{T}
    coeffs::Array{T, 1}
    length::Int
    prec::Int
@@ -386,7 +386,7 @@ end
 #
 ###############################################################################
 
-mutable struct AbsSeriesRing{T <: RingElement} <: Nemo.SeriesRing{T}
+mutable struct AbsSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
    base_ring::Ring
    prec_max::Int
    S::Symbol
@@ -406,7 +406,7 @@ end
 
 const AbsSeriesID = Dict{Tuple{Ring, Int, Symbol}, Ring}()
 
-mutable struct AbsSeries{T <: RingElement} <: Nemo.AbsSeriesElem{T}
+mutable struct AbsSeries{T <: RingElement} <: AbstractAlgebra.AbsSeriesElem{T}
    coeffs::Array{T, 1}
    length::Int
    prec::Int
@@ -422,7 +422,7 @@ end
 #
 ###############################################################################
 
-mutable struct LaurentSeriesRing{T <: RingElement} <: Nemo.Ring
+mutable struct LaurentSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
    base_ring::Ring
    prec_max::Int
    S::Symbol
@@ -442,7 +442,7 @@ end
 
 const LaurentSeriesID = Dict{Tuple{Ring, Int, Symbol}, Ring}()
 
-mutable struct LaurentSeriesRingElem{T <: RingElement} <: Nemo.RingElem
+mutable struct LaurentSeriesRingElem{T <: RingElement} <: AbstractAlgebra.RingElem
    coeffs::Array{T, 1}
    length::Int
    prec::Int
@@ -462,7 +462,7 @@ end
 #
 ###############################################################################
 
-mutable struct LaurentSeriesField{T <: FieldElement} <: Nemo.Field
+mutable struct LaurentSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
    base_ring::Field
    prec_max::Int
    S::Symbol
@@ -480,7 +480,7 @@ mutable struct LaurentSeriesField{T <: FieldElement} <: Nemo.Field
    end
 end
 
-mutable struct LaurentSeriesFieldElem{T <: FieldElement} <: Nemo.FieldElem
+mutable struct LaurentSeriesFieldElem{T <: FieldElement} <: AbstractAlgebra.FieldElem
    coeffs::Array{T, 1}
    length::Int
    prec::Int
@@ -502,7 +502,7 @@ const LaurentSeriesElem{T} = Union{LaurentSeriesRingElem{T}, LaurentSeriesFieldE
 #
 ###############################################################################
 
-mutable struct FracField{T <: RingElem} <: Nemo.FracField{T}
+mutable struct FracField{T <: RingElem} <: AbstractAlgebra.FracField{T}
    base_ring::Ring
 
    function FracField{T}(R::Ring, cached::Bool = true) where T <: RingElem
@@ -520,7 +520,7 @@ end
 
 const FracDict = Dict{Ring, Ring}()
 
-mutable struct Frac{T <: RingElem} <: Nemo.FracElem{T}
+mutable struct Frac{T <: RingElem} <: AbstractAlgebra.FracElem{T}
    num::T
    den::T
    parent::FracField{T}
@@ -535,7 +535,7 @@ end
 ###############################################################################
 
 # not really a mathematical ring
-mutable struct MatSpace{T <: RingElement} <: Nemo.MatSpace{T}
+mutable struct MatSpace{T <: RingElement} <: AbstractAlgebra.MatSpace{T}
    rows::Int
    cols::Int
    base_ring::Ring
@@ -555,7 +555,7 @@ end
 
 const MatDict = Dict{Tuple{Ring, Int, Int}, Ring}()
 
-mutable struct Mat{T <: RingElement} <: Nemo.MatElem{T}
+mutable struct Mat{T <: RingElement} <: AbstractAlgebra.MatElem{T}
    entries::Array{T, 2}
    base_ring::Ring
 

@@ -100,9 +100,9 @@ const perm_display_style = PermDisplayStyle(:array)
 
 doc"""
     setpermstyle(format::Symbol)
-> Nemo can display (in REPL or in general as string) permutations by either
-> array of integers whose `n`-th position represents value at `n`, or as
-> (an array of) disjoint cycles, where the value of permutation at `n` is
+> AbstractAlgebra can display (in REPL or in general as string) permutations
+> by either array of integers whose `n`-th position represents value at `n`, or
+> as (an array of) disjoint cycles, where the value of permutation at `n` is
 > represented as the entry immediately following `n` in the cycle.
 > The style can be switched by calling `setpermstyle` with `:array` or
 > `:cycles` argument.
@@ -165,12 +165,12 @@ end
 
 doc"""
     ^(a::perm, n::Int)
-> Return the `n`-th power of a permutation `a`. By default Nemo computes powers
-> by cycle decomposition of `a`. `Nemo.power_by_squaring` provides a different
-> method for powering which may or may not be faster, depending on the
-> particuar case. Due to caching of cycle structure repeatedly powering should
-> be faster with the default method. NOTE: cycle structure is not computed
-> for `n<4`.
+> Return the `n`-th power of a permutation `a`. By default AbstractAlgebra
+> computes powers by cycle decomposition of `a`.
+> `AbstractAlgebra.power_by_squaring` provides a different method for
+> powering which may or may not be faster, depending on the particuar case.
+> Due to caching of cycle structure repeatedly powering should be faster 
+> with the default method. NOTE: cycle structure is not computed for `n<4`.
 """
 function ^(a::perm, n::Int)
    if n <0
@@ -384,7 +384,7 @@ function emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
       @assert length(Base.Set(V)) == length(V)
       @assert all(V .<= G.n)
    end
-   return p -> Nemo.emb!(G(), p, V)
+   return p -> AbstractAlgebra.emb!(G(), p, V)
 end
 
 doc"""

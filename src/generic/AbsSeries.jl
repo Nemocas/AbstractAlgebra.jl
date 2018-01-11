@@ -13,12 +13,12 @@ export O, valuation, exp, precision, max_precision, set_prec!
 ###############################################################################
 
 doc"""
-    O{T <: RingElement}(a::Nemo.AbsSeriesElem{T})
+    O{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T})
 > Returns $0 + O(x^\mbox{deg}(a))$. Usually this function is called with $x^n$
 > as parameter. Then the function returns the power series $0 + O(x^n)$, which
 > can be used to set the precision of a power series when constructing it.
 """
-function O(a::Nemo.AbsSeriesElem{T}) where T <: RingElement
+function O(a::AbstractAlgebra.AbsSeriesElem{T}) where T <: RingElement
    if iszero(a)
       return deepcopy(a)    # 0 + O(x^n)
    end
@@ -37,9 +37,9 @@ elem_type(::Type{AbsSeriesRing{T}}) where {T <: RingElement} = AbsSeries{T}
 #
 ###############################################################################
 
-length(x::Nemo.AbsSeriesElem) = x.length
+length(x::AbstractAlgebra.AbsSeriesElem) = x.length
 
-precision(x::Nemo.AbsSeriesElem) = x.prec
+precision(x::AbstractAlgebra.AbsSeriesElem) = x.prec
 
 doc"""
     max_precision(R::SeriesRing)
@@ -98,18 +98,18 @@ function isgen(a::AbsSeries)
 end
 
 doc"""
-    isunit(a::Nemo.AbsSeriesElem)
+    isunit(a::AbstractAlgebra.AbsSeriesElem)
 > Return `true` if the given power series is arithmetically equal to a unit,
 > i.e. is invertible, otherwise return `false`.
 """
-isunit(a::Nemo.AbsSeriesElem) = valuation(a) == 0 && isunit(coeff(a, 0))
+isunit(a::AbstractAlgebra.AbsSeriesElem) = valuation(a) == 0 && isunit(coeff(a, 0))
 
 doc"""
-    valuation(a::Nemo.AbsSeriesElem)
+    valuation(a::AbstractAlgebra.AbsSeriesElem)
 > Return the valuation of the given power series, i.e. the degree of the first
 > nonzero term (or the precision if it is arithmetically zero).
 """
-function valuation(a::Nemo.AbsSeriesElem)
+function valuation(a::AbstractAlgebra.AbsSeriesElem)
    for i = 1:length(a)
       if !iszero(coeff(a, i - 1))
          return i - 1
@@ -132,7 +132,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, x::Nemo.AbsSeriesElem)
+function show(io::IO, x::AbstractAlgebra.AbsSeriesElem)
    len = length(x)
 
    if len == 0
@@ -176,10 +176,10 @@ end
 ###############################################################################
 
 doc"""
-    -(a::Nemo.AbsSeriesElem)
+    -(a::AbstractAlgebra.AbsSeriesElem)
 > Return $-a$.
 """
-function -(a::Nemo.AbsSeriesElem)
+function -(a::AbstractAlgebra.AbsSeriesElem)
    len = length(a)
    z = parent(a)()
    set_prec!(z, precision(a))
@@ -197,10 +197,10 @@ end
 ###############################################################################
 
 doc"""
-    +{T <: RingElement}(a::Nemo.AbsSeriesElem{T}, b::Nemo.AbsSeriesElem{T})
+    +{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T})
 > Return $a + b$.
 """
-function +(a::Nemo.AbsSeriesElem{T}, b::Nemo.AbsSeriesElem{T}) where {T <: RingElement}
+function +(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -229,10 +229,10 @@ function +(a::Nemo.AbsSeriesElem{T}, b::Nemo.AbsSeriesElem{T}) where {T <: RingE
 end
 
 doc"""
-    -{T <: RingElement}(a::Nemo.AbsSeriesElem{T}, b::Nemo.AbsSeriesElem{T})
+    -{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T})
 > Return $a - b$.
 """
-function -(a::Nemo.AbsSeriesElem{T}, b::Nemo.AbsSeriesElem{T}) where {T <: RingElement}
+function -(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
    check_parent(a, b)
    lena = length(a)
    lenb = length(b)
@@ -261,10 +261,10 @@ function -(a::Nemo.AbsSeriesElem{T}, b::Nemo.AbsSeriesElem{T}) where {T <: RingE
 end
 
 doc"""
-    *{T <: RingElement}(a::Nemo.AbsSeriesElem{T}, b::Nemo.AbsSeriesElem{T})
+    *{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T})
 > Return $a\times b$.
 """
-function *(a::Nemo.AbsSeriesElem{T}, b::Nemo.AbsSeriesElem{T}) where {T <: RingElement}
+function *(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
    check_parent(a, b)
 
    lena = length(a)
@@ -313,10 +313,10 @@ end
 ###############################################################################
 
 doc"""
-    *{T <: RingElem}(a::T, b::Nemo.AbsSeriesElem{T})
+    *{T <: RingElem}(a::T, b::AbstractAlgebra.AbsSeriesElem{T})
 > Return $a\times b$.
 """
-function *(a::T, b::Nemo.AbsSeriesElem{T}) where {T <: RingElem}
+function *(a::T, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElem}
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -329,10 +329,10 @@ function *(a::T, b::Nemo.AbsSeriesElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.AbsSeriesElem)
+    *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.AbsSeriesElem)
 > Return $a\times b$.
 """
-function *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.AbsSeriesElem)
+function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.AbsSeriesElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -345,16 +345,16 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.AbsSeriesElem)
 end
 
 doc"""
-    *{T <: RingElem}(a::Nemo.AbsSeriesElem{T}, b::T)
+    *{T <: RingElem}(a::AbstractAlgebra.AbsSeriesElem{T}, b::T)
 > Return $a\times b$.
 """
-*(a::Nemo.AbsSeriesElem{T}, b::T) where {T <: RingElem} = b*a
+*(a::AbstractAlgebra.AbsSeriesElem{T}, b::T) where {T <: RingElem} = b*a
 
 doc"""
-    *(a::Nemo.AbsSeriesElem, b::Union{Integer, Rational, AbstractFloat})
+    *(a::AbstractAlgebra.AbsSeriesElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a\times b$.
 """
-*(a::Nemo.AbsSeriesElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
+*(a::AbstractAlgebra.AbsSeriesElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
 
 ###############################################################################
 #
@@ -363,11 +363,11 @@ doc"""
 ###############################################################################
 
 doc"""
-    shift_left(x::Nemo.AbsSeriesElem, n::Int)
+    shift_left(x::AbstractAlgebra.AbsSeriesElem, n::Int)
 > Return the power series $f$ shifted left by $n$ terms, i.e. multiplied by
 > $x^n$.
 """
-function shift_left(x::Nemo.AbsSeriesElem{T}, len::Int) where {T <: RingElement}
+function shift_left(x::AbstractAlgebra.AbsSeriesElem{T}, len::Int) where {T <: RingElement}
    len < 0 && throw(DomainError())
    xlen = length(x)
    prec = precision(x) + len
@@ -392,11 +392,11 @@ function shift_left(x::Nemo.AbsSeriesElem{T}, len::Int) where {T <: RingElement}
 end
 
 doc"""
-    shift_right(f::Nemo.AbsSeriesElem, n::Int)
+    shift_right(f::AbstractAlgebra.AbsSeriesElem, n::Int)
 > Return the power series $f$ shifted right by $n$ terms, i.e. divided by
 > $x^n$.
 """
-function shift_right(x::Nemo.AbsSeriesElem{T}, len::Int) where {T <: RingElement}
+function shift_right(x::AbstractAlgebra.AbsSeriesElem{T}, len::Int) where {T <: RingElement}
    len < 0 && throw(DomainError())
    xlen = length(x)
    if len >= xlen
@@ -420,10 +420,10 @@ end
 ###############################################################################
 
 doc"""
-    truncate(a::Nemo.AbsSeriesElem, n::Int)
+    truncate(a::AbstractAlgebra.AbsSeriesElem, n::Int)
 > Return $a$ truncated to $n$ terms.
 """
-function truncate(a::Nemo.AbsSeriesElem{T}, prec::Int) where {T <: RingElement}
+function truncate(a::AbstractAlgebra.AbsSeriesElem{T}, prec::Int) where {T <: RingElement}
    prec < 0 && throw(DomainError())
    len = length(a)
    if precision(a) <= prec
@@ -449,10 +449,10 @@ end
 ###############################################################################
 
 doc"""
-    ^{T <: RingElement}(a::Nemo.AbsSeriesElem{T}, b::Int)
+    ^{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T}, b::Int)
 > Return $a^b$. We require $b \geq 0$.
 """
-function ^(a::Nemo.AbsSeriesElem{T}, b::Int) where {T <: RingElement}
+function ^(a::AbstractAlgebra.AbsSeriesElem{T}, b::Int) where {T <: RingElement}
    b < 0 && throw(DomainError())
    # special case powers of x for constructing power series efficiently
    if b == 0
@@ -493,12 +493,12 @@ end
 ###############################################################################
 
 doc"""
-    =={T <: RingElement}(x::Nemo.AbsSeriesElem{T}, y::Nemo.AbsSeriesElem{T})
+    =={T <: RingElement}(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
 > equal to the minimum of the two precisions.
 """
-function ==(x::Nemo.AbsSeriesElem{T}, y::Nemo.AbsSeriesElem{T}) where {T <: RingElement}
+function ==(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
    check_parent(x, y)
    prec = min(precision(x), precision(y))
    m1 = min(length(x), length(y))
@@ -527,12 +527,12 @@ function ==(x::Nemo.AbsSeriesElem{T}, y::Nemo.AbsSeriesElem{T}) where {T <: Ring
 end
 
 doc"""
-    isequal{T <: RingElement}(x::Nemo.AbsSeriesElem{T}, y::Nemo.AbsSeriesElem{T})
+    isequal{T <: RingElement}(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T})
 > Return `true` if $x == y$ exactly, otherwise return `false`. Only if the
 > power series are precisely the same, to the same precision, are they declared
 > equal by this function.
 """
-function isequal(x::Nemo.AbsSeriesElem{T}, y::Nemo.AbsSeriesElem{T}) where {T <: RingElement}
+function isequal(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
    if parent(x) != parent(y)
       return false
    end
@@ -553,7 +553,7 @@ end
 #
 ###############################################################################
 
-function Base.isapprox(f::Nemo.AbsSeriesElem, g::Nemo.AbsSeriesElem; atol::Real=sqrt(eps()))
+function Base.isapprox(f::AbstractAlgebra.AbsSeriesElem, g::AbstractAlgebra.AbsSeriesElem; atol::Real=sqrt(eps()))
    check_parent(f, g)
    nmin = min(precision(f), precision(g))
    i = 1
@@ -573,30 +573,30 @@ end
 ###############################################################################
 
 doc"""
-    =={T <: RingElem}(x::Nemo.AbsSeriesElem{T}, y::T)
+    =={T <: RingElem}(x::AbstractAlgebra.AbsSeriesElem{T}, y::T)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Nemo.AbsSeriesElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
+==(x::AbstractAlgebra.AbsSeriesElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
       ((length(x) == 0 && iszero(y)) || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
-    =={T <: RingElem}(x::T, y::Nemo.AbsSeriesElem{T})
+    =={T <: RingElem}(x::T, y::AbstractAlgebra.AbsSeriesElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::T, y::Nemo.AbsSeriesElem{T}) where {T <: RingElem} = y == x
+==(x::T, y::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElem} = y == x
 
 doc"""
-    ==(x::Nemo.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
+    ==(x::AbstractAlgebra.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Nemo.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
+==(x::AbstractAlgebra.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
 doc"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.AbsSeriesElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.AbsSeriesElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.AbsSeriesElem) = y == x
+==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.AbsSeriesElem) = y == x
 
 ###############################################################################
 #
@@ -605,10 +605,10 @@ doc"""
 ###############################################################################
 
 doc"""
-    divexact{T <: RingElement}(a::Nemo.AbsSeriesElem{T}, b::Nemo.AbsSeriesElem{T})
+    divexact{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T})
 > Return $a/b$. Requires $b$ to be invertible.
 """
-function divexact(x::Nemo.AbsSeriesElem{T}, y::Nemo.AbsSeriesElem{T}) where {T <: RingElement}
+function divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
    check_parent(x, y)
    iszero(y) && throw(DivideError())
    v2 = valuation(y)
@@ -630,10 +630,10 @@ end
 ###############################################################################
 
 doc"""
-    divexact(a::Nemo.AbsSeriesElem, b::Union{Integer, Rational, AbstractFloat})
+    divexact(a::AbstractAlgebra.AbsSeriesElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact(x::Nemo.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
+function divexact(x::AbstractAlgebra.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
    y == 0 && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
@@ -646,10 +646,10 @@ function divexact(x::Nemo.AbsSeriesElem, y::Union{Integer, Rational, AbstractFlo
 end
 
 doc"""
-    divexact{T <: RingElem}(a::Nemo.AbsSeriesElem{T}, b::T)
+    divexact{T <: RingElem}(a::AbstractAlgebra.AbsSeriesElem{T}, b::T)
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact(x::Nemo.AbsSeriesElem{T}, y::T) where {T <: RingElem}
+function divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::T) where {T <: RingElem}
    iszero(y) && throw(DivideError())
    lenx = length(x)
    z = parent(x)()
@@ -668,10 +668,10 @@ end
 ###############################################################################
 
 doc"""
-   inv(a::Nemo.AbsSeriesElem)
+   inv(a::AbstractAlgebra.AbsSeriesElem)
 > Return the inverse of the power series $a$, i.e. $1/a$.
 """
-function inv(a::Nemo.AbsSeriesElem)
+function inv(a::AbstractAlgebra.AbsSeriesElem)
    iszero(a) && throw(DivideError())
    !isunit(a) && error("Unable to invert power series")
    a1 = coeff(a, 0)
@@ -700,7 +700,7 @@ end
 ###############################################################################
 
 doc"""
-   sqrt(a::Nemo.AbsSeriesElem)
+   sqrt(a::AbstractAlgebra.AbsSeriesElem)
 > Return the square root of the power series $a$.
 """
 # Given a power series f = f0 + f1*x + f2*x^2 + ..., compute the square root
@@ -708,7 +708,7 @@ doc"""
 # 2g0*g2 = f2 - g1^2, 2g0*g3 = f3 - 2g1*g2, 2g0*g4 = f4 - (2g1*g3 + g2^2), etc.
 # where the terms being subtracted are those contributing to the i-th
 # coefficient of the square of g
-function Base.sqrt(a::Nemo.AbsSeriesElem)
+function Base.sqrt(a::AbstractAlgebra.AbsSeriesElem)
    aval = valuation(a)
    !iseven(aval) && error("Not a square in sqrt")
    R = base_ring(a)
@@ -725,7 +725,7 @@ function Base.sqrt(a::Nemo.AbsSeriesElem)
       asqrt = setcoeff!(asqrt, n - 1, R())
    end
    if prec > aval2
-      g = Nemo.sqrt(coeff(a, aval))
+      g = AbstractAlgebra.sqrt(coeff(a, aval))
       setcoeff!(asqrt, aval2, g)
       g2 = g + g
    end
@@ -758,10 +758,10 @@ end
 ###############################################################################
 
 doc"""
-    exp(a::Nemo.AbsSeriesElem)
+    exp(a::AbstractAlgebra.AbsSeriesElem)
 > Return the exponential of the power series $a$.
 """
-function Base.exp(a::Nemo.AbsSeriesElem)
+function Base.exp(a::AbstractAlgebra.AbsSeriesElem)
    if iszero(a)
       z = one(parent(a))
       set_prec!(z, precision(a))
@@ -770,7 +770,7 @@ function Base.exp(a::Nemo.AbsSeriesElem)
    z = parent(a)()
    fit!(z, precision(a))
    set_prec!(z, precision(a))
-   z = setcoeff!(z, 0, Nemo.exp(coeff(a, 0)))
+   z = setcoeff!(z, 0, AbstractAlgebra.exp(coeff(a, 0)))
    len = length(a)
    for k = 1 : precision(a) - 1
       s = zero(base_ring(a))
@@ -928,7 +928,7 @@ function (a::AbsSeriesRing{T})(b::T) where {T <: RingElem}
    return z
 end
 
-function (a::AbsSeriesRing{T})(b::Nemo.AbsSeriesElem{T}) where {T <: RingElement}
+function (a::AbsSeriesRing{T})(b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
    parent(b) != a && error("Unable to coerce power series")
    return b
 end

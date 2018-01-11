@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   Rational.jl : Additional Nemo functionality for Julia Rationals
+#   Rational.jl : Additional AbstractAlgebra functionality for Julia Rationals
 #
 ###############################################################################
 
@@ -123,7 +123,7 @@ end
 ###############################################################################
 
 function sqrt(a::Rational{T}) where T <: Integer
-   return Nemo.sqrt(numerator(a))//Nemo.sqrt(denominator(a))
+   return AbstractAlgebra.sqrt(numerator(a))//AbstractAlgebra.sqrt(denominator(a))
 end
 
 ###############################################################################

@@ -50,10 +50,10 @@ function similar(x::Mat{T}, r::Int, c::Int) where T <: RingElement
 end
 
 doc"""
-    eye(x::Nemo.MatElem)
+    eye(x::AbstractAlgebra.MatElem)
 > Return the identity matrix with the same shape as $x$.
 """
-function eye(x::Nemo.MatElem)
+function eye(x::AbstractAlgebra.MatElem)
   z = similar(x)
   for i in 1:rows(x)
     z[i, i] = one(base_ring(x))
@@ -62,10 +62,10 @@ function eye(x::Nemo.MatElem)
 end
 
 doc"""
-    eye(x::Nemo.MatElem, d::Int)
+    eye(x::AbstractAlgebra.MatElem, d::Int)
 > Return the $d$-by-$d$ identity matrix with the same base ring as $x$.
 """
-function eye(x::Nemo.MatElem, d::Int)
+function eye(x::AbstractAlgebra.MatElem, d::Int)
   z = similar(x, d, d)
   for i in 1:rows(z)
     z[i, i] = one(base_ring(x))
@@ -84,26 +84,26 @@ parent_type(::Type{Mat{T}}) where T <: RingElement = MatSpace{T}
 elem_type(::Type{MatSpace{T}}) where {T <: RingElement} = Mat{T}
 
 doc"""
-    base_ring{T <: RingElement}(S::Nemo.MatSpace{T})
+    base_ring{T <: RingElement}(S::AbstractAlgebra.MatSpace{T})
 > Return the base ring $R$ of the given matrix space.
 """
-base_ring(a::Nemo.MatSpace{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
+base_ring(a::AbstractAlgebra.MatSpace{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
 
 doc"""
-    base_ring(r::Nemo.MatElem)
+    base_ring(r::AbstractAlgebra.MatElem)
 > Return the base ring $R$ of the matrix space that the supplied matrix $r$
 > belongs to.
 """
-base_ring(a::Nemo.MatElem{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
+base_ring(a::AbstractAlgebra.MatElem{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
 
 doc"""
-    parent(a::Nemo.MatElem)
+    parent(a::AbstractAlgebra.MatElem)
 > Return the parent object of the given matrix.
 """
-parent(a::Nemo.MatElem{T}, cached::Bool = true) where T <: RingElement =
+parent(a::AbstractAlgebra.MatElem{T}, cached::Bool = true) where T <: RingElement =
     MatSpace{T}(a.base_ring, size(a.entries)..., cached)
 
-function check_parent(a::Nemo.MatElem, b::Nemo.MatElem)
+function check_parent(a::AbstractAlgebra.MatElem, b::AbstractAlgebra.MatElem)
   (base_ring(a) != base_ring(b) || rows(a) != rows(b) || cols(a) != cols(b)) &&
                 error("Incompatible matrix spaces in matrix operation")
 end
@@ -137,7 +137,7 @@ end
 #
 ###############################################################################
 
-function Base.hash(a::Nemo.MatElem, h::UInt)
+function Base.hash(a::AbstractAlgebra.MatElem, h::UInt)
    b = 0x3e4ea81eb31d94f4%UInt
    for i in 1:rows(a)
       for j in 1:cols(a)
@@ -149,45 +149,45 @@ function Base.hash(a::Nemo.MatElem, h::UInt)
 end
 
 doc"""
-    rows(a::Nemo.MatElem)
+    rows(a::AbstractAlgebra.MatElem)
 > Return the number of rows of the given matrix.
 """
-rows(a::Nemo.MatElem) = size(a.entries, 1)
+rows(a::AbstractAlgebra.MatElem) = size(a.entries, 1)
 
 doc"""
-    cols(a::Nemo.MatElem)
+    cols(a::AbstractAlgebra.MatElem)
 > Return the number of columns of the given matrix.
 """
-cols(a::Nemo.MatElem) = size(a.entries, 2)
+cols(a::AbstractAlgebra.MatElem) = size(a.entries, 2)
 
-Base.@propagate_inbounds function getindex(a::Nemo.MatElem, r::Int, c::Int)
+Base.@propagate_inbounds function getindex(a::AbstractAlgebra.MatElem, r::Int, c::Int)
    return a.entries[r, c]
 end
 
-Base.@propagate_inbounds function setindex!(a::Nemo.MatElem, d::T, r::Int,
+Base.@propagate_inbounds function setindex!(a::AbstractAlgebra.MatElem, d::T, r::Int,
                                             c::Int) where T <: RingElement
     a.entries[r, c] = base_ring(a)(d)
 end
 
 doc"""
-    zero(a::Nemo.MatSpace)
+    zero(a::AbstractAlgebra.MatSpace)
 > Construct the zero matrix in the given matrix space.
 """
-zero(a::Nemo.MatSpace) = a()
+zero(a::AbstractAlgebra.MatSpace) = a()
 
 doc"""
-    one(a::Nemo.MatSpace)
+    one(a::AbstractAlgebra.MatSpace)
 > Construct the matrix in the given matrix space with ones down the diagonal
 > and zeroes elsewhere.
 """
-one(a::Nemo.MatSpace) = a(1)
+one(a::AbstractAlgebra.MatSpace) = a(1)
 
 doc"""
-    iszero(a::Nemo.MatElem)
+    iszero(a::AbstractAlgebra.MatElem)
 > Return `true` if the supplied matrix $a$ is the zero matrix, otherwise
 > return `false`.
 """
-function iszero(a::Nemo.MatElem)
+function iszero(a::AbstractAlgebra.MatElem)
    for i = 1:rows(a)
       for j = 1:cols(a)
          if !iszero(a[i, j])
@@ -199,11 +199,11 @@ function iszero(a::Nemo.MatElem)
 end
 
 doc"""
-    isone(a::Nemo.MatElem)
+    isone(a::AbstractAlgebra.MatElem)
 > Return `true` if the supplied matrix $a$ is diagonal with ones along the
 > diagonal, otherwise return `false`.
 """
-function isone(a::Nemo.MatElem)
+function isone(a::AbstractAlgebra.MatElem)
    for i = 1:rows(a)
       for j = 1:cols(a)
          if i == j
@@ -220,7 +220,7 @@ function isone(a::Nemo.MatElem)
   return true
 end
 
-function deepcopy_internal(d::Nemo.MatElem, dict::ObjectIdDict)
+function deepcopy_internal(d::AbstractAlgebra.MatElem, dict::ObjectIdDict)
    c = similar(d)
    for i = 1:rows(d)
       for j = 1:cols(d)
@@ -236,7 +236,7 @@ end
 #
 ###############################################################################
 
-canonical_unit(a::Nemo.MatElem) = canonical_unit(a[1, 1])
+canonical_unit(a::AbstractAlgebra.MatElem) = canonical_unit(a[1, 1])
 
 ###############################################################################
 #
@@ -244,7 +244,7 @@ canonical_unit(a::Nemo.MatElem) = canonical_unit(a[1, 1])
 #
 ###############################################################################
 
-function sub(M::Nemo.MatElem, rows::UnitRange{Int}, cols::UnitRange{Int})
+function sub(M::AbstractAlgebra.MatElem, rows::UnitRange{Int}, cols::UnitRange{Int})
   Generic._checkbounds(M, rows.start, cols.start)
   Generic._checkbounds(M, rows.stop, cols.stop)
   z = similar(M, length(rows), length(cols))
@@ -258,23 +258,23 @@ function sub(M::Nemo.MatElem, rows::UnitRange{Int}, cols::UnitRange{Int})
   return z
 end
 
-function sub(M::Nemo.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
+function sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
   return sub(M, r1:r2, c1:c2)
 end
 
-getindex(x::Nemo.MatElem, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
+getindex(x::AbstractAlgebra.MatElem, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
 
-getindex(x::Nemo.MatElem, r::UnitRange, ::Colon) = sub(x, r, 1:cols(x))
+getindex(x::AbstractAlgebra.MatElem, r::UnitRange, ::Colon) = sub(x, r, 1:cols(x))
 
-getindex(x::Nemo.MatElem, ::Colon, c::UnitRange{Int}) = sub(x, 1:rows(x), c)
+getindex(x::AbstractAlgebra.MatElem, ::Colon, c::UnitRange{Int}) = sub(x, 1:rows(x), c)
 
-getindex(x::Nemo.MatElem, ::Colon, ::Colon) = sub(x, 1:rows(x), 1:cols(x))
+getindex(x::AbstractAlgebra.MatElem, ::Colon, ::Colon) = sub(x, 1:rows(x), 1:cols(x))
 
-function Base.view(M::Nemo.MatElem, rows::UnitRange{Int}, ::Colon)
+function Base.view(M::AbstractAlgebra.MatElem, rows::UnitRange{Int}, ::Colon)
   return view(M, rows, 1:cols(M))
 end
 
-function Base.view(M::Nemo.MatElem, ::Colon, cols::UnitRange{Int})
+function Base.view(M::AbstractAlgebra.MatElem, ::Colon, cols::UnitRange{Int})
   return view(M, 1:rows(x), cols)
 end
 
@@ -284,13 +284,13 @@ end
 #
 ###############################################################################
 
-function show(io::IO, a::Nemo.MatSpace)
+function show(io::IO, a::AbstractAlgebra.MatSpace)
    print(io, "Matrix Space of ")
    print(io, a.rows, " rows and ", a.cols, " columns over ")
    print(io, base_ring(a))
 end
 
-function show(io::IO, a::Nemo.MatElem)
+function show(io::IO, a::AbstractAlgebra.MatElem)
    r = rows(a)
    c = cols(a)
    for i = 1:r
@@ -308,7 +308,7 @@ function show(io::IO, a::Nemo.MatElem)
    end
 end
 
-show_minus_one(::Type{Nemo.MatElem{T}}) where {T <: RingElement} = false
+show_minus_one(::Type{AbstractAlgebra.MatElem{T}}) where {T <: RingElement} = false
 
 ###############################################################################
 #
@@ -317,10 +317,10 @@ show_minus_one(::Type{Nemo.MatElem{T}}) where {T <: RingElement} = false
 ###############################################################################
 
 doc"""
-    -(a::Nemo.MatElem)
+    -(a::AbstractAlgebra.MatElem)
 > Return $-a$.
 """
-function -(x::Nemo.MatElem)
+function -(x::AbstractAlgebra.MatElem)
    z = similar(x)
    for i in 1:rows(x)
       for j in 1:cols(x)
@@ -337,10 +337,10 @@ end
 ###############################################################################
 
 doc"""
-    +{T <: RingElement}(a::Nemo.MatElem{T}, b::Nemo.MatElem{T})
+    +{T <: RingElement}(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})
 > Return $a + b$.
 """
-function +(x::Nemo.MatElem{T}, y::Nemo.MatElem{T}) where {T <: RingElement}
+function +(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    check_parent(x, y)
    r = similar(x)
    for i = 1:rows(x)
@@ -352,10 +352,10 @@ function +(x::Nemo.MatElem{T}, y::Nemo.MatElem{T}) where {T <: RingElement}
 end
 
 doc"""
-    -{T <: RingElement}(a::Nemo.MatElem{T}, b::Nemo.MatElem{T})
+    -{T <: RingElement}(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})
 > Return $a - b$.
 """
-function -(x::Nemo.MatElem{T}, y::Nemo.MatElem{T}) where {T <: RingElement}
+function -(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    check_parent(x, y)
    r = similar(x)
    for i = 1:rows(x)
@@ -367,10 +367,10 @@ function -(x::Nemo.MatElem{T}, y::Nemo.MatElem{T}) where {T <: RingElement}
 end
 
 doc"""
-    *{T <: RingElement}(a::Nemo.MatElem{T}, b::Nemo.MatElem{T})
+    *{T <: RingElement}(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})
 > Return $a\times b$.
 """
-function *(x::Nemo.MatElem{T}, y::Nemo.MatElem{T}) where {T <: RingElement}
+function *(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    cols(x) != rows(y) && error("Incompatible matrix dimensions")
    A = similar(x, rows(x), cols(y))
    C = base_ring(x)()
@@ -393,10 +393,10 @@ end
 ###############################################################################
 
 doc"""
-    *(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
+    *(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
 > Return $x\times y$.
 """
-function *(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
+function *(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
    z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -407,10 +407,10 @@ function *(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
 end
 
 doc"""
-    *{T <: RingElem}(x::T, y::Nemo.MatElem{T})
+    *{T <: RingElem}(x::T, y::AbstractAlgebra.MatElem{T})
 > Return $x\times y$.
 """
-function *(x::T, y::Nemo.MatElem{T}) where {T <: RingElem}
+function *(x::T, y::AbstractAlgebra.MatElem{T}) where {T <: RingElem}
    z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -421,22 +421,22 @@ function *(x::T, y::Nemo.MatElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    *(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
+    *(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x\times y$.
 """
-*(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat}) = y*x
+*(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat}) = y*x
 
 doc"""
-    *{T <: RingElem}(x::Nemo.MatElem{T}, y::T)
+    *{T <: RingElem}(x::AbstractAlgebra.MatElem{T}, y::T)
 > Return $x\times y$.
 """
-*(x::Nemo.MatElem{T}, y::T) where {T <: RingElem} = y*x
+*(x::AbstractAlgebra.MatElem{T}, y::T) where {T <: RingElem} = y*x
 
 doc"""
-    +(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
+    +(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
-function +(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
+function +(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
    z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
@@ -452,16 +452,16 @@ function +(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
 end
 
 doc"""
-    +(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
+    +(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 """
-+(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat}) = y + x
++(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat}) = y + x
 
 doc"""
-    +{T <: RingElem}(x::T, y::Nemo.MatElem{T})
+    +{T <: RingElem}(x::T, y::AbstractAlgebra.MatElem{T})
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
-function +(x::T, y::Nemo.MatElem{T}) where {T <: RingElem}
+function +(x::T, y::AbstractAlgebra.MatElem{T}) where {T <: RingElem}
    z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -476,16 +476,16 @@ function +(x::T, y::Nemo.MatElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    +{T <: RingElem}(x::Nemo.MatElem{T}, y::T)
+    +{T <: RingElem}(x::AbstractAlgebra.MatElem{T}, y::T)
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 """
-+(x::Nemo.MatElem{T}, y::T) where {T <: RingElem} = y + x
++(x::AbstractAlgebra.MatElem{T}, y::T) where {T <: RingElem} = y + x
 
 doc"""
-    -(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
+    -(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 """
-function -(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
+function -(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
    z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
@@ -501,10 +501,10 @@ function -(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
 end
 
 doc"""
-    -(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
+    -(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x - S(y)$, where $S$ is the parent of $x$.
 """
-function -(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
+function -(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
    z = similar(x)
    R = base_ring(x)
    for i = 1:rows(x)
@@ -520,10 +520,10 @@ function -(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
 end
 
 doc"""
-    -{T <: RingElem}(x::T, y::Nemo.MatElem{T})
+    -{T <: RingElem}(x::T, y::AbstractAlgebra.MatElem{T})
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 """
-function -(x::T, y::Nemo.MatElem{T}) where {T <: RingElem}
+function -(x::T, y::AbstractAlgebra.MatElem{T}) where {T <: RingElem}
    z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
@@ -539,10 +539,10 @@ function -(x::T, y::Nemo.MatElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    -{T <: RingElem}(x::Nemo.MatElem{T}, y::T)
+    -{T <: RingElem}(x::AbstractAlgebra.MatElem{T}, y::T)
 > Return $x - S(y)$, where $S$ is the parent of $a$.
 """
-function -(x::Nemo.MatElem{T}, y::T) where {T <: RingElem}
+function -(x::AbstractAlgebra.MatElem{T}, y::T) where {T <: RingElem}
    z = similar(x)
    R = base_ring(x)
    for i = 1:rows(x)
@@ -564,10 +564,10 @@ end
 ###############################################################################
 
 doc"""
-    ^(a::Nemo.MatElem, b::Int)
+    ^(a::AbstractAlgebra.MatElem, b::Int)
 > Return $a^b$. We require $b \geq 0$ and that the matrix $a$ is square.
 """
-function ^(a::Nemo.MatElem, b::Int)
+function ^(a::AbstractAlgebra.MatElem, b::Int)
    b < 0 && throw(DomainError())
    rows(a) != cols(a) && error("Incompatible matrix dimensions in power")
    # special case powers of x for constructing polynomials efficiently
@@ -594,10 +594,10 @@ function ^(a::Nemo.MatElem, b::Int)
 end
 
 doc"""
-    powers{T <: RingElement}(a::Nemo.MatElem{T}, d::Int)
+    powers{T <: RingElement}(a::AbstractAlgebra.MatElem{T}, d::Int)
 > Return an array of matrices $M$ wher $M[i + 1] = a^i$ for $i = 0..d$
 """
-function powers(a::Nemo.MatElem, d::Int)
+function powers(a::AbstractAlgebra.MatElem, d::Int)
    rows(a) != cols(a) && error("Dimensions do not match in powers")
    d <= 0 && throw(DomainError())
    A = Array{typeof(a)}(d + 1)
@@ -620,12 +620,12 @@ end
 ###############################################################################
 
 doc"""
-    =={T <: RingElement}(x::Nemo.MatElem{T}, y::Nemo.MatElem{T})
+    =={T <: RingElement}(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
 > equal to the minimum of the two precisions.
 """
-function ==(x::Nemo.MatElem{T}, y::Nemo.MatElem{T}) where {T <: RingElement}
+function ==(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    check_parent(x, y)
    for i = 1:rows(x)
       for j = 1:cols(x)
@@ -638,13 +638,13 @@ function ==(x::Nemo.MatElem{T}, y::Nemo.MatElem{T}) where {T <: RingElement}
 end
 
 doc"""
-    isequal{T <: RingElement}(x::Nemo.MatElem{T}, y::Nemo.MatElem{T})
+    isequal{T <: RingElement}(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T})
 > Return `true` if $x == y$ exactly, otherwise return `false`. This function is
 > useful in cases where the entries of the matrices are inexact, e.g. power
 > series. Only if the power series are precisely the same, to the same precision,
 > are they declared equal by this function.
 """
-function isequal(x::Nemo.MatElem{T}, y::Nemo.MatElem{T}) where {T <: RingElement}
+function isequal(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    check_parent(x, y)
    for i = 1:rows(x)
       for j = 1:cols(x)
@@ -663,11 +663,11 @@ end
 ###############################################################################
 
 doc"""
-    ==(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
+    ==(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 > otherwise return `false`.
 """
-function ==(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
+function ==(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
    for i = 1:min(rows(x), cols(x))
       if x[i, i] != y
          return false
@@ -684,18 +684,18 @@ function ==(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
 end
 
 doc"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 > otherwise return `false`.
 """
-==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.MatElem) = y == x
+==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem) = y == x
 
 doc"""
-    =={T <: RingElem}(x::Nemo.MatElem{T}, y::T)
+    =={T <: RingElem}(x::AbstractAlgebra.MatElem{T}, y::T)
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 > otherwise return `false`.
 """
-function ==(x::Nemo.MatElem{T}, y::T) where {T <: RingElem}
+function ==(x::AbstractAlgebra.MatElem{T}, y::T) where {T <: RingElem}
    for i = 1:min(rows(x), cols(x))
       if x[i, i] != y
          return false
@@ -712,11 +712,11 @@ function ==(x::Nemo.MatElem{T}, y::T) where {T <: RingElem}
 end
 
 doc"""
-    =={T <: RingElem}(x::T, y::Nemo.MatElem{T})
+    =={T <: RingElem}(x::T, y::AbstractAlgebra.MatElem{T})
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 > otherwise return `false`.
 """
-==(x::T, y::Nemo.MatElem{T}) where {T <: RingElem} = y == x
+==(x::T, y::AbstractAlgebra.MatElem{T}) where {T <: RingElem} = y == x
 
 ###############################################################################
 #
@@ -725,11 +725,11 @@ doc"""
 ###############################################################################
 
 doc"""
-    divexact(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
+    divexact(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by
 > $y$. Each division is expected to be exact.
 """
-function divexact(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
+function divexact(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
    z = similar(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
@@ -740,11 +740,11 @@ function divexact(x::Nemo.MatElem, y::Union{Integer, Rational, AbstractFloat})
 end
 
 doc"""
-    divexact{T <: RingElem}(x::Nemo.MatElem{T}, y::T)
+    divexact{T <: RingElem}(x::AbstractAlgebra.MatElem{T}, y::T)
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by
 > $y$. Each division is expected to be exact.
 """
-function divexact(x::Nemo.MatElem{T}, y::T) where {T <: RingElem}
+function divexact(x::AbstractAlgebra.MatElem{T}, y::T) where {T <: RingElem}
    z = similar(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
@@ -761,7 +761,7 @@ end
 ###############################################################################
 
 doc"""
-    transpose(x::Nemo.MatElem)
+    transpose(x::AbstractAlgebra.MatElem)
 > Return the transpose of the given matrix.
 """
 function transpose(x::Mat)
@@ -775,12 +775,12 @@ end
 ###############################################################################
 
 doc"""
-    gram(x::Nemo.MatElem)
+    gram(x::AbstractAlgebra.MatElem)
 > Return the Gram matrix of $x$, i.e. if $x$ is an $r\times c$ matrix return
 > the $r\times r$ matrix whose entries $i, j$ are the dot products of the
 > $i$-th and $j$-th rows, respectively.
 """
-function gram(x::Nemo.MatElem)
+function gram(x::AbstractAlgebra.MatElem)
    z = similar(x, rows(x), rows(x))
    for i = 1:rows(x)
       for j = 1:rows(x)
@@ -800,11 +800,11 @@ end
 ###############################################################################
 
 doc"""
-    trace(x::Nemo.MatElem)
+    trace(x::AbstractAlgebra.MatElem)
 > Return the trace of the matrix $a$, i.e. the sum of the diagonal elements. We
 > require the matrix to be square.
 """
-function trace(x::Nemo.MatElem)
+function trace(x::AbstractAlgebra.MatElem)
    rows(x) != cols(x) && error("Not a square matrix in trace")
    d = zero(base_ring(x))
    for i = 1:rows(x)
@@ -820,11 +820,11 @@ end
 ###############################################################################
 
 doc"""
-    content(x::Nemo.MatElem)
+    content(x::AbstractAlgebra.MatElem)
 > Return the content of the matrix $a$, i.e. the greatest common divisor of all
 > its entries, assuming it exists.
 """
-function content(x::Nemo.MatElem)
+function content(x::AbstractAlgebra.MatElem)
   d = zero(base_ring(x))
   for i = 1:rows(x)
      for j = 1:cols(x)
@@ -844,10 +844,10 @@ end
 ###############################################################################
 
 doc"""
-    *(P::Generic.perm, x::Nemo.MatElem)
+    *(P::Generic.perm, x::AbstractAlgebra.MatElem)
 > Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 """
-function *(P::Generic.perm, x::Nemo.MatElem)
+function *(P::Generic.perm, x::AbstractAlgebra.MatElem)
    z = similar(x)
    m = rows(x)
    n = cols(x)
@@ -865,7 +865,7 @@ end
 #
 ###############################################################################
 
-function lufact!(P::Generic.perm, A::Nemo.MatElem{T}) where {T <: FieldElement}
+function lufact!(P::Generic.perm, A::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    m = rows(A)
    n = cols(A)
    rank = 0
@@ -910,13 +910,13 @@ function lufact!(P::Generic.perm, A::Nemo.MatElem{T}) where {T <: FieldElement}
 end
 
 doc"""
-    lufact{T <: FieldElement}(A::Nemo.MatElem{T}, P = PermGroup(rows(A)))
+    lufact{T <: FieldElement}(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A)))
 > Return a tuple $r, p, L, U$ consisting of the rank of $A$, a permutation
 > $p$ of $A$ belonging to $P$, a lower triangular matrix $L$ and an upper
 > triangular matrix $U$ such that $p(A) = LU$, where $p(A)$ stands for the
 > matrix whose rows are the given permutation $p$ of the rows of $A$.
 """
-function lufact(A::Nemo.MatElem{T}, P = PermGroup(rows(A))) where {T <: FieldElement}
+function lufact(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A))) where {T <: FieldElement}
    m = rows(A)
    n = cols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -940,7 +940,7 @@ function lufact(A::Nemo.MatElem{T}, P = PermGroup(rows(A))) where {T <: FieldEle
    return rank, p, L, U
 end
 
-function fflu!(P::Generic.perm, A::Nemo.MatElem{T}) where {T <: RingElement}
+function fflu!(P::Generic.perm, A::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    m = rows(A)
    n = cols(A)
    rank = 0
@@ -994,7 +994,7 @@ function fflu!(P::Generic.perm, A::Nemo.MatElem{T}) where {T <: RingElement}
    return rank, d2
 end
 
-function fflu!(P::Generic.perm, A::Nemo.MatElem{T}) where {T <: FieldElement}
+function fflu!(P::Generic.perm, A::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    m = rows(A)
    n = cols(A)
    rank = 0
@@ -1049,7 +1049,7 @@ function fflu!(P::Generic.perm, A::Nemo.MatElem{T}) where {T <: FieldElement}
 end
 
 doc"""
-    fflu{T <: RingElement}(A::Nemo.MatElem{T}, P = PermGroup(rows(A)))
+    fflu{T <: RingElement}(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A)))
 > Return a tuple $r, d, p, L, U$ consisting of the rank of $A$, a
 > denominator $d$, a permutation $p$ of $A$ belonging to $P$, a lower
 > triangular matrix $L$ and an upper triangular matrix $U$ such that
@@ -1060,7 +1060,7 @@ doc"""
 > $\pm \mbox{det}(S)$ where $S$ is an appropriate submatrix of $A$ ($S = A$ if
 > $A$ is square) and the sign is decided by the parity of the permutation.
 """
-function fflu(A::Nemo.MatElem{T}, P = PermGroup(rows(A))) where {T <: RingElement}
+function fflu(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A))) where {T <: RingElement}
    m = rows(A)
    n = cols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -1093,7 +1093,7 @@ end
 #
 ###############################################################################
 
-function rref!(A::Nemo.MatElem{T}) where {T <: RingElement}
+function rref!(A::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    m = rows(A)
    n = cols(A)
    R = base_ring(A)
@@ -1150,19 +1150,19 @@ function rref!(A::Nemo.MatElem{T}) where {T <: RingElement}
 end
 
 doc"""
-    rref{T <: RingElement}(M::Nemo.MatElem{T})
+    rref{T <: RingElement}(M::AbstractAlgebra.MatElem{T})
 > Returns a tuple $(r, d, A)$ consisting of the rank $r$ of $M$ and a
 > denominator $d$ in the base ring of $M$ and a matrix $A$ such that $A/d$ is
 > the reduced row echelon form of $M$. Note that the denominator is not usually
 > minimal.
 """
-function rref(M::Nemo.MatElem{T}) where {T <: RingElement}
+function rref(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    A = deepcopy(M)
    r, d = rref!(A)
    return r, d, A
 end
 
-function rref!(A::Nemo.MatElem{T}) where {T <: FieldElement}
+function rref!(A::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    m = rows(A)
    n = cols(A)
    R = base_ring(A)
@@ -1223,22 +1223,22 @@ function rref!(A::Nemo.MatElem{T}) where {T <: FieldElement}
 end
 
 doc"""
-    rref{T <: FieldElement}(M::Nemo.MatElem{T})
+    rref{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})
 > Returns a tuple $(r, A)$ consisting of the rank $r$ of $M$ and a reduced row
 > echelon form $A$ of $M$.
 """
-function rref(M::Nemo.MatElem{T}) where {T <: FieldElement}
+function rref(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    A = deepcopy(M)
    r = rref!(A)
    return r, A
 end
 
 doc"""
-    isrref{T <: RingElement}(M::Nemo.MatElem{T})
+    isrref{T <: RingElement}(M::AbstractAlgebra.MatElem{T})
 > Return `true` if $M$ is in reduced row echelon form, otherwise return
 > `false`.
 """
-function isrref(M::Nemo.MatElem{T}) where {T <: RingElement}
+function isrref(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    m = rows(M)
    n = cols(M)
    c = 1
@@ -1263,11 +1263,11 @@ function isrref(M::Nemo.MatElem{T}) where {T <: RingElement}
 end
 
 doc"""
-    isrref(M::Nemo.MatElem{T}) where {T <: FieldElement}
+    isrref(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
 > Return `true` if $M$ is in reduced row echelon form, otherwise return
 > `false`.
 """
-function isrref(M::Nemo.MatElem{T}) where {T <: FieldElement}
+function isrref(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    m = rows(M)
    n = cols(M)
    c = 1
@@ -1305,7 +1305,7 @@ end
 # that A is chambered on the right. Otherwise the entries can all be set to
 # the number of columns of A. The entries of L must be monotonic increasing.
 
-function reduce_row!(A::Nemo.MatElem{T}, P::Array{Int}, L::Array{Int}, m::Int) where {T <: FieldElement}
+function reduce_row!(A::AbstractAlgebra.MatElem{T}, P::Array{Int}, L::Array{Int}, m::Int) where {T <: FieldElement}
    R = base_ring(A)
    n = cols(A)
    t = R()
@@ -1333,7 +1333,7 @@ function reduce_row!(A::Nemo.MatElem{T}, P::Array{Int}, L::Array{Int}, m::Int) w
    return 0
 end
 
-function reduce_row!(A::Nemo.MatElem{T}, P::Array{Int}, L::Array{Int}, m::Int) where {T <: RingElement}
+function reduce_row!(A::AbstractAlgebra.MatElem{T}, P::Array{Int}, L::Array{Int}, m::Int) where {T <: RingElement}
    R = base_ring(A)
    n = cols(A)
    t = R()
@@ -1383,7 +1383,7 @@ end
 #
 ###############################################################################
 
-function det_clow(M::Nemo.MatElem{T}) where {T <: RingElement}
+function det_clow(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    R = base_ring(M)
    n = rows(M)
    if n == 0
@@ -1435,7 +1435,7 @@ function det_clow(M::Nemo.MatElem{T}) where {T <: RingElement}
    return isodd(n) ? -D : D
 end
 
-function det_df(M::Nemo.MatElem{T}) where {T <: RingElement}
+function det_df(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    R = base_ring(M)
    S, z = PolynomialRing(R, "z")
    n = rows(M)
@@ -1444,7 +1444,7 @@ function det_df(M::Nemo.MatElem{T}) where {T <: RingElement}
    return isodd(n) ? -d : d
 end
 
-function det_fflu(M::Nemo.MatElem{T}) where {T <: RingElement}
+function det_fflu(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    n = rows(M)
    if n == 0
       return base_ring(M)()
@@ -1456,10 +1456,10 @@ function det_fflu(M::Nemo.MatElem{T}) where {T <: RingElement}
 end
 
 doc"""
-    det{T <: FieldElement}(M::Nemo.MatElem{T})
+    det{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})
 > Return the determinant of the matrix $M$. We assume $M$ is square.
 """
-function det(M::Nemo.MatElem{T}) where {T <: FieldElement}
+function det(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    rows(M) != cols(M) && error("Not a square matrix in det")
    if rows(M) == 0
       return one(base_ring(M))
@@ -1468,10 +1468,10 @@ function det(M::Nemo.MatElem{T}) where {T <: FieldElement}
 end
 
 doc"""
-    det{T <: RingElement}(M::Nemo.MatElem{T})
+    det{T <: RingElement}(M::AbstractAlgebra.MatElem{T})
 > Return the determinant of the matrix $M$. We assume $M$ is square.
 """
-function det(M::Nemo.MatElem{T}) where {T <: RingElement}
+function det(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    rows(M) != cols(M) && error("Not a square matrix in det")
    if rows(M) == 0
       return one(base_ring(M))
@@ -1483,7 +1483,7 @@ function det(M::Nemo.MatElem{T}) where {T <: RingElement}
    end
 end
 
-function det_interpolation(M::Nemo.MatElem{T}) where {T <: PolyElem}
+function det_interpolation(M::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
    n = rows(M)
    !isdomain_type(elem_type(typeof(base_ring(base_ring(M))))) &&
           error("Generic interpolation requires a domain type")
@@ -1519,7 +1519,7 @@ function det_interpolation(M::Nemo.MatElem{T}) where {T <: PolyElem}
    return interpolate(R, x, d)
 end
 
-function det(M::Nemo.MatElem{T}) where {S <: FinFieldElem, T <: PolyElem{S}}
+function det(M::AbstractAlgebra.MatElem{T}) where {S <: FinFieldElem, T <: PolyElem{S}}
    rows(M) != cols(M) && error("Not a square matrix in det")
    if rows(M) == 0
       return one(base_ring(M))
@@ -1527,7 +1527,7 @@ function det(M::Nemo.MatElem{T}) where {S <: FinFieldElem, T <: PolyElem{S}}
    return det_popov(M)
 end
 
-function det(M::Nemo.MatElem{T}) where {T <: PolyElem}
+function det(M::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
    rows(M) != cols(M) && error("Not a square matrix in det")
    if rows(M) == 0
       return one(base_ring(M))
@@ -1548,10 +1548,10 @@ end
 ###############################################################################
 
 doc"""
-    rank{T <: RingElement}(M::Nemo.MatElem{T})
+    rank{T <: RingElement}(M::AbstractAlgebra.MatElem{T})
 > Return the rank of the matrix $M$.
 """
-function rank(M::Nemo.MatElem{T}) where {T <: RingElement}
+function rank(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    n = rows(M)
    if n == 0
       return 0
@@ -1563,10 +1563,10 @@ function rank(M::Nemo.MatElem{T}) where {T <: RingElement}
 end
 
 doc"""
-    rank{T <: FieldElement}(M::Nemo.MatElem{T})
+    rank{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})
 > Return the rank of the matrix $M$.
 """
-function rank(M::Nemo.MatElem{T}) where {T <: FieldElement}
+function rank(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    n = rows(M)
    if n == 0
       return 0
@@ -1697,7 +1697,7 @@ function solve_lu_precomp(p::Generic.perm, LU::MatElem{T}, b::MatElem{T}) where 
 end
 
 
-function backsolve!(A::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: FieldElement}
+function backsolve!(A::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    m = rows(A)
    h = cols(b)
    R = base_ring(A)
@@ -1715,7 +1715,7 @@ function backsolve!(A::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: FieldEle
    end
 end
 
-function solve_ff(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: FieldElement}
+function solve_ff(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
    rows(M) != cols(M) && error("Non-square matrix in solve")
    rows(M) != rows(b) && error("Dimensions don't match in solve")
@@ -1729,7 +1729,7 @@ function solve_ff(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: FieldEleme
    return x
 end
 
-function solve_with_det(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: RingElement}
+function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    # We cannot use solve_fflu directly, since it forgot about the (parity of
    # the) permutation.
    rows(M) != cols(M) && error("Non-square matrix")
@@ -1755,12 +1755,12 @@ function solve_with_det(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: Ring
    return x, d
 end
 
-function solve_with_det(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: PolyElem}
+function solve_with_det(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
    x, d = solve_interpolation(M, b)
    return x, d
 end
 
-function solve_ff(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: RingElement}
+function solve_ff(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    m = rows(M)
    n = cols(M)
    if m == 0 || n == 0
@@ -1769,7 +1769,7 @@ function solve_ff(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: RingElemen
    return solve_fflu(M, b)
 end
 
-function solve_interpolation(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: PolyElem}
+function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
    m = rows(M)
    h = cols(b)
    if m == 0
@@ -1844,36 +1844,36 @@ function solve_interpolation(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <:
 end
 
 doc"""
-    solve{T <: FieldElement}(M::Nemo.MatElem{T}, b::Nemo.MatElem{T})
+    solve{T <: FieldElement}(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})
 > Given a non-singular $n\times n$ matrix over a field and an $n\times m$
 > matrix over the same field, return $x$ an
 > $n\times m$ matrix $x$ such that $Ax = b$.
 > If $A$ is singular an exception is raised.
 """
-function solve(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: FieldElement}
+function solve(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
     return solve_ringelem(M, b)
 end
 
 doc"""
-    solve_rational{T <: RingElement}(M::Nemo.MatElem{T}, b::Nemo.MatElem{T})
+    solve_rational{T <: RingElement}(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})
 > Given a non-singular $n\times n$ matrix over a ring and an $n\times m$
 > matrix over the same ring, return a tuple $x, d$ consisting of an
 > $n\times m$ matrix $x$ and a denominator $d$ such that $Ax = db$. The
 > denominator will be the determinant of $A$ up to sign. If $A$ is singular an
 > exception is raised.
 """
-function solve_rational(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where T <: RingElement
+function solve_rational(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where T <: RingElement
    return solve_ringelem(M, b)
 end
 
-function solve_ringelem(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: RingElement}
+function solve_ringelem(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
    rows(M) != cols(M) && error("Non-square matrix in solve")
    rows(M) != rows(b) && error("Dimensions don't match in solve")
    return solve_ff(M, b)
 end
 
-function solve_rational(M::Nemo.MatElem{T}, b::Nemo.MatElem{T}) where {T <: PolyElem}
+function solve_rational(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
    rows(M) != cols(M) && error("Non-square matrix in solve")
    rows(M) != rows(b) && error("Dimensions don't match in solve")
@@ -1894,14 +1894,14 @@ end
 ###############################################################################
 
 doc"""
-    solve_triu{T <: FieldElement}(U::Nemo.MatElem{T}, b::Nemo.MatElem{T}, unit=false)
+    solve_triu{T <: FieldElement}(U::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, unit=false)
 > Given a non-singular $n\times n$ matrix over a field which is upper
 > triangular, and an $n\times m$ matrix over the same field, return an
 > $n\times m$ matrix $x$ such that $Ax = b$. If $A$ is singular an exception
 > is raised. If unit is true then $U$ is assumed to have ones on its
 > diagonal, and the diagonal will not be read.
 """
-function solve_triu(U::Nemo.MatElem{T}, b::Nemo.MatElem{T}, unit::Bool = false) where {T <: FieldElement}
+function solve_triu(U::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, unit::Bool = false) where {T <: FieldElement}
    n = rows(U)
    m = cols(b)
    R = base_ring(U)
@@ -1944,14 +1944,14 @@ end
 ###############################################################################
 
 doc"""
-    inv{T <: RingElement}(M::Nemo.MatElem{T})
+    inv{T <: RingElement}(M::AbstractAlgebra.MatElem{T})
 > Given a non-singular $n\times n$ matrix over a ring the tuple $X, d$
 > consisting of an $n\times n$ matrix $X$ and a denominator $d$ such that
 > $AX = dI_n$, where $I_n$ is the $n\times n$ identity matrix. The denominator
 > will be the determinant of $A$ up to sign. If $A$ is singular an exception
 > is raised.
 """
-function inv(M::Nemo.MatElem{T}) where {T <: RingElement}
+function inv(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    cols(M) != rows(M) && error("Matrix not square in invert")
    n = cols(M)
    X = eye(M)
@@ -1961,12 +1961,12 @@ function inv(M::Nemo.MatElem{T}) where {T <: RingElement}
 end
 
 doc"""
-    inv{T <: FieldElement}(M::Nemo.MatElem{T})
+    inv{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})
 > Given a non-singular $n\times n$ matrix over a field, return an
 > $n\times n$ matrix $X$ such that $AX = I_n$ where $I_n$ is the $n\times n$
 > identity matrix. If $A$ is singular an exception is raised.
 """
-function inv(M::Nemo.MatElem{T}) where {T <: FieldElement}
+function inv(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    cols(M) != rows(M) && error("Matrix not square in invert")
    n = cols(M)
    X = eye(M)
@@ -1981,16 +1981,16 @@ end
 ###############################################################################
 
 doc"""
-    nullspace{T <: RingElement}(M::Nemo.MatElem{T})
+    nullspace{T <: RingElement}(M::AbstractAlgebra.MatElem{T})
 > Returns a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
 > a basis $N$ (consisting of column vectors) for the right nullspace of $M$,
 > i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix
 > $N$ will be an $n\times \nu$ matrix. Note that the nullspace is taken to be
 > the vector space kernel over the fraction field of the base ring if the
-> latter is not a field. In Nemo we use the name ``kernel'' for a function to
-> compute an integral kernel.
+> latter is not a field. In AbstractAlgebra we use the name ``kernel'' for a
+> function to compute an integral kernel.
 """
-function nullspace(M::Nemo.MatElem{T}) where {T <: RingElement}
+function nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    n = cols(M)
    rank, d, A = rref(M)
    nullity = n - rank
@@ -2030,7 +2030,7 @@ function nullspace(M::Nemo.MatElem{T}) where {T <: RingElement}
 end
 
 doc"""
-    nullspace{T <: FieldElement}(M::Nemo.MatElem{T})
+    nullspace{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})
 > Returns a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
 > a basis $N$ (consisting of column vectors) for the right nullspace of $M$,
 > i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix
@@ -2039,7 +2039,7 @@ doc"""
 > latter is not a field. In Nemo we use the name ``kernel'' for a function to
 > compute an integral kernel.
 """
-function nullspace(M::Nemo.MatElem{T}) where {T <: FieldElement}
+function nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    m = rows(M)
    n = cols(M)
    rank, A = rref(M)
@@ -2084,7 +2084,7 @@ end
 #
 ###############################################################################
 
-function hessenberg!(A::Nemo.MatElem{T}) where {T <: RingElement}
+function hessenberg!(A::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    rows(A) != cols(A) && error("Dimensions don't match in hessenberg")
    R = base_ring(A)
    n = rows(A)
@@ -2128,13 +2128,13 @@ function hessenberg!(A::Nemo.MatElem{T}) where {T <: RingElement}
 end
 
 doc"""
-    hessenberg(A::Nemo.MatElem{T}) where {T <: RingElement}
+    hessenberg(A::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
 > Returns the Hessenberg form of $M$, i.e. an upper Hessenberg matrix
 > which is similar to $M$. The upper Hessenberg form has nonzero entries
 > above and on the diagonal and in the diagonal line immediately below the
 > diagonal.
 """
-function hessenberg(A::Nemo.MatElem{T}) where {T <: RingElement}
+function hessenberg(A::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    rows(A) != cols(A) && error("Dimensions don't match in hessenberg")
    M = deepcopy(A)
    hessenberg!(M)
@@ -2142,10 +2142,10 @@ function hessenberg(A::Nemo.MatElem{T}) where {T <: RingElement}
 end
 
 doc"""
-    ishessenberg{T <: RingElement}(A::Nemo.MatElem{T})
+    ishessenberg{T <: RingElement}(A::AbstractAlgebra.MatElem{T})
 > Returns `true` if $M$ is in Hessenberg form, otherwise returns `false`.
 """
-function ishessenberg(A::Nemo.MatElem{T}) where {T <: RingElement}
+function ishessenberg(A::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    n = rows(A)
    for i = 3:n
       for j = 1:i - 2
@@ -2163,7 +2163,7 @@ end
 #
 ###############################################################################
 
-function charpoly_hessenberg!(S::Ring, A::Nemo.MatElem{T}) where {T <: RingElement}
+function charpoly_hessenberg!(S::Ring, A::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    rows(A) != cols(A) && error("Dimensions don't match in charpoly")
    R = base_ring(A)
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
@@ -2189,7 +2189,7 @@ function charpoly_hessenberg!(S::Ring, A::Nemo.MatElem{T}) where {T <: RingEleme
    return P[n + 1]
 end
 
-function charpoly_danilevsky_ff!(S::Ring, A::Nemo.MatElem{T}) where {T <: RingElement}
+function charpoly_danilevsky_ff!(S::Ring, A::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    rows(A) != cols(A) && error("Dimensions don't match in charpoly")
    R = base_ring(A)
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
@@ -2304,7 +2304,7 @@ function charpoly_danilevsky_ff!(S::Ring, A::Nemo.MatElem{T}) where {T <: RingEl
    return pol*b
 end
 
-function charpoly_danilevsky!(S::Ring, A::Nemo.MatElem{T}) where {T <: RingElement}
+function charpoly_danilevsky!(S::Ring, A::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    rows(A) != cols(A) && error("Dimensions don't match in charpoly")
    R = base_ring(A)
    base_ring(S) != base_ring(A) && error("Cannot coerce into polynomial ring")
@@ -2403,12 +2403,12 @@ function charpoly_danilevsky!(S::Ring, A::Nemo.MatElem{T}) where {T <: RingEleme
 end
 
 doc"""
-    charpoly{T <: RingElement}(V::Ring, Y::Nemo.MatElem{T})
+    charpoly{T <: RingElement}(V::Ring, Y::AbstractAlgebra.MatElem{T})
 > Returns the characteristic polynomial $p$ of the matrix $M$. The
 > polynomial ring $R$ of the resulting polynomial must be supplied
 > and the matrix is assumed to be square.
 """
-function charpoly(V::Ring, Y::Nemo.MatElem{T}) where {T <: RingElement}
+function charpoly(V::Ring, Y::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    rows(Y) != cols(Y) && error("Dimensions don't match in charpoly")
    R = base_ring(Y)
    base_ring(V) != base_ring(Y) && error("Cannot coerce into polynomial ring")
@@ -2484,11 +2484,11 @@ end
 # extremely fast to compute over some fields).
 
 doc"""
-    minpoly{T <: FieldElement}(S::Ring, M::Nemo.MatElem{T}, charpoly_only = false)
+    minpoly{T <: FieldElement}(S::Ring, M::AbstractAlgebra.MatElem{T}, charpoly_only = false)
 > Returns the minimal polynomial $p$ of the matrix $M$. The polynomial ring $R$
 > of the resulting polynomial must be supplied and the matrix must be square.
 """
-function minpoly(S::Ring, M::Nemo.MatElem{T}, charpoly_only::Bool = false) where {T <: FieldElement}
+function minpoly(S::Ring, M::AbstractAlgebra.MatElem{T}, charpoly_only::Bool = false) where {T <: FieldElement}
    rows(M) != cols(M) && error("Not a square matrix in minpoly")
    base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
    n = rows(M)
@@ -2579,11 +2579,11 @@ function minpoly(S::Ring, M::Nemo.MatElem{T}, charpoly_only::Bool = false) where
 end
 
 doc"""
-    minpoly{T <: RingElement}(S::Ring, M::Nemo.MatElem{T}, charpoly_only = false)
+    minpoly{T <: RingElement}(S::Ring, M::AbstractAlgebra.MatElem{T}, charpoly_only = false)
 > Returns the minimal polynomial $p$ of the matrix $M$. The polynomial ring $R$
 > of the resulting polynomial must be supplied and the matrix must be square.
 """
-function minpoly(S::Ring, M::Nemo.MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
+function minpoly(S::Ring, M::AbstractAlgebra.MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
    rows(M) != cols(M) && error("Not a square matrix in minpoly")
    base_ring(S) != base_ring(M) && error("Unable to coerce polynomial")
    n = rows(M)
@@ -3904,14 +3904,14 @@ end
 ###############################################################################
 
 doc"""
-    similarity!{T <: RingElement}(A::Nemo.MatElem{T}, r::Int, d::T)
+    similarity!{T <: RingElement}(A::AbstractAlgebra.MatElem{T}, r::Int, d::T)
 > Applies a similarity transform to the $n\times n$ matrix $M$ in-place. Let
 > $P$ be the $n\times n$ identity matrix that has had all zero entries of row
 > $r$ replaced with $d$, then the transform applied is equivalent to
 > $M = P^{-1}MP$. We require $M$ to be a square matrix. A similarity transform
 > preserves the minimal and characteristic polynomials of a matrix.
 """
-function similarity!(A::Nemo.MatElem{T}, r::Int, d::T) where {T <: RingElement}
+function similarity!(A::AbstractAlgebra.MatElem{T}, r::Int, d::T) where {T <: RingElement}
    n = rows(A)
    t = base_ring(A)()
    for i = 1:n
@@ -3944,11 +3944,11 @@ end
 ###############################################################################
 
 doc"""
-    swap_rows(a::Nemo.MatElem, i::Int, j::Int)
+    swap_rows(a::AbstractAlgebra.MatElem, i::Int, j::Int)
 > Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
 > row are swapped.
 """
-function swap_rows(a::Nemo.MatElem, i::Int, j::Int)
+function swap_rows(a::AbstractAlgebra.MatElem, i::Int, j::Int)
    (1<=i<=rows(a) && 1<=j<=rows(a)) || throw(BoundsError())
    b = deepcopy(a)
    swap_rows!(b, i, j)
@@ -3956,10 +3956,10 @@ function swap_rows(a::Nemo.MatElem, i::Int, j::Int)
 end
 
 doc"""
-    swap_rows!(a::Nemo.MatElem, i::Int, j::Int)
+    swap_rows!(a::AbstractAlgebra.MatElem, i::Int, j::Int)
 > Swap the $i$th and $j$th row of $a$.
 """
-function swap_rows!(a::Nemo.MatElem, i::Int, j::Int)
+function swap_rows!(a::AbstractAlgebra.MatElem, i::Int, j::Int)
    (1<=i<=rows(a) && 1<=j<=rows(a)) || throw(BoundsError())
    for k=1:cols(a)
       x = a[i,k]
@@ -3975,11 +3975,11 @@ end
 ###############################################################################
 
 doc"""
-    hcat(a::Nemo.MatElem, b::Nemo.MatElem)
+    hcat(a::AbstractAlgebra.MatElem, b::AbstractAlgebra.MatElem)
 > Return the horizontal concatenation of $a$ and $b$. Assumes that the
 > number of rows is the same in $a$ and $b$.
 """
-function hcat(a::Nemo.MatElem, b::Nemo.MatElem)
+function hcat(a::AbstractAlgebra.MatElem, b::AbstractAlgebra.MatElem)
    rows(a) != rows(b) && error("Incompatible number of rows in hcat")
    c = similar(a, rows(a), cols(a) + cols(b))
    n = cols(a)
@@ -3995,11 +3995,11 @@ function hcat(a::Nemo.MatElem, b::Nemo.MatElem)
 end
 
 doc"""
-    vcat(a::Nemo.MatElem, b::Nemo.MatElem)
+    vcat(a::AbstractAlgebra.MatElem, b::AbstractAlgebra.MatElem)
 > Return the vertical concatenation of $a$ and $b$. Assumes that the
 > number of columns is the same in $a$ and $b$.
 """
-function vcat(a::Nemo.MatElem, b::Nemo.MatElem)
+function vcat(a::AbstractAlgebra.MatElem, b::AbstractAlgebra.MatElem)
    cols(a) != cols(b) && error("Incompatible number of columns in vcat")
    c = similar(a, rows(a) + rows(b), cols(a))
    n = rows(a)
@@ -4022,7 +4022,7 @@ end
 #
 ###############################################################################
 
-function rand(S::Nemo.MatSpace, v...)
+function rand(S::AbstractAlgebra.MatSpace, v...)
    M = S()
    R = base_ring(S)
    for i = 1:rows(M)
@@ -4033,7 +4033,7 @@ function rand(S::Nemo.MatSpace, v...)
    return M
 end
 
-function randmat_triu(S::Nemo.MatSpace, v...)
+function randmat_triu(S::AbstractAlgebra.MatSpace, v...)
    M = S()
    R = base_ring(S)
    for i = 1:rows(M)
@@ -4050,7 +4050,7 @@ function randmat_triu(S::Nemo.MatSpace, v...)
    return M
 end
 
-function randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: Nemo.RingElement}
+function randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: AbstractAlgebra.RingElement}
    M = S()
    R = base_ring(S)
    for i = 1:rank
@@ -4256,13 +4256,13 @@ end
 ###############################################################################
 
 doc"""
-    MatrixSpace(R::Nemo.Ring, r::Int, c::Int, cached::Bool = true)
+    MatrixSpace(R::AbstractAlgebra.Ring, r::Int, c::Int, cached::Bool = true)
 > Return parent object corresponding to the space of $r\times c$ matrices over
 > the ring $R$. If `cached == true` (the default), the returned parent object
 > is cached so that it can returned by future calls to the constructor with the
 > same dimensions and base ring.
 """
-function MatrixSpace(R::Nemo.Ring, r::Int, c::Int, cached::Bool = true)
+function MatrixSpace(R::AbstractAlgebra.Ring, r::Int, c::Int, cached::Bool = true)
    T = elem_type(R)
    return MatSpace{T}(R, r, c, cached)
 end

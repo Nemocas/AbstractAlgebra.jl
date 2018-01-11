@@ -6,13 +6,13 @@ function test_Integers_constructors()
 
    @test elem_type(R) == Int
    @test elem_type(S) == BigInt
-   @test elem_type(Nemo.Integers{Int}) == Int
-   @test elem_type(Nemo.Integers{BigInt}) == BigInt
-   @test parent_type(Int) == Nemo.Integers{Int}
-   @test parent_type(BigInt) == Nemo.Integers{BigInt}
+   @test elem_type(AbstractAlgebra.Integers{Int}) == Int
+   @test elem_type(AbstractAlgebra.Integers{BigInt}) == BigInt
+   @test parent_type(Int) == AbstractAlgebra.Integers{Int}
+   @test parent_type(BigInt) == AbstractAlgebra.Integers{BigInt}
    
-   @test isa(R, Nemo.Integers)
-   @test isa(S, Nemo.Integers)
+   @test isa(R, AbstractAlgebra.Integers)
+   @test isa(S, AbstractAlgebra.Integers)
 
    @test isa(R(), Int)
    @test isa(S(), BigInt)
@@ -154,8 +154,8 @@ function test_Integers_square_root()
       f = r^2
       g = s^2
 
-      @test Nemo.sqrt(f)^2 == f
-      @test Nemo.sqrt(g)^2 == g
+      @test AbstractAlgebra.sqrt(f)^2 == f
+      @test AbstractAlgebra.sqrt(g)^2 == g
    end
 
    println("PASS")

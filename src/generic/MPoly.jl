@@ -25,11 +25,11 @@ base_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring
 
 base_ring(a::MPoly{T}) where T <: RingElement = base_ring(parent(a))
 
-function isdomain_type(::Type{T}) where {S <: RingElement, T <: Nemo.MPolyElem{S}}
+function isdomain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.MPolyElem{S}}
    return isdomain_type(S)
 end
 
-function isexact_type(a::Type{T}) where {S <: RingElement, T <: Nemo.MPolyElem{S}}
+function isexact_type(a::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.MPolyElem{S}}
    return isexact_type(S)
 end
 
@@ -2931,7 +2931,7 @@ end
 ###############################################################################
 
 doc"""
-    PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true, S::Symbol = :lex)
+    PolynomialRing(R::AbstractAlgebra.Ring, s::Array{String, 1}; cached::Bool = true, S::Symbol = :lex)
 > Given a base ring `R` and an array of strings `s` specifying how the
 > generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
 > representing the new polynomial ring $T = R[x1, x2, ...]$ and the generators
@@ -2941,7 +2941,7 @@ doc"""
 > cached. `S` is a symbol corresponding to the ordering of the polynomial and
 > can be one of `:lex`, `:deglex` or `:degrevlex`.
 """
-function PolynomialRing(R::Nemo.Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
+function PolynomialRing(R::AbstractAlgebra.Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
    U = [Symbol(x) for x in s]
    T = elem_type(R)
    N = (ordering == :deglex || ordering == :degrevlex) ? length(U) + 1 : length(U)

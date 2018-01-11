@@ -17,35 +17,35 @@ parent_type(::Type{Res{T}}) where T <: RingElement = ResRing{T}
 elem_type(::Type{ResRing{T}}) where {T <: RingElement} = Res{T}
 
 doc"""
-    base_ring{T <: RingElement}(S::Nemo.ResRing{T})
+    base_ring{T <: RingElement}(S::AbstractAlgebra.ResRing{T})
 > Return the base ring $R$ of the given residue ring $S = R/(a)$.
 """
-base_ring(S::Nemo.ResRing{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
+base_ring(S::AbstractAlgebra.ResRing{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
 
 doc"""
-    base_ring(r::Nemo.ResElem)
+    base_ring(r::AbstractAlgebra.ResElem)
 > Return the base ring $R$ of the residue ring $R/(a)$ that the supplied
 > element $r$ belongs to.
 """
-base_ring(r::Nemo.ResElem) = base_ring(parent(r))
+base_ring(r::AbstractAlgebra.ResElem) = base_ring(parent(r))
 
 doc"""
-    parent(a::Nemo.ResElem)
+    parent(a::AbstractAlgebra.ResElem)
 > Return the parent object of the given residue element.
 """
-parent(a::Nemo.ResElem) = a.parent
+parent(a::AbstractAlgebra.ResElem) = a.parent
 
-isdomain_type(a::Type{T}) where T <: Nemo.ResElem = false
+isdomain_type(a::Type{T}) where T <: AbstractAlgebra.ResElem = false
 
-function isexact_type(a::Type{T}) where {S <: RingElement, T <: Nemo.ResElem{S}}
+function isexact_type(a::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.ResElem{S}}
    return isexact_type(S)
 end
 
-function check_parent_type(a::Nemo.ResRing{T}, b::Nemo.ResRing{T}) where {T <: RingElement}
+function check_parent_type(a::AbstractAlgebra.ResRing{T}, b::AbstractAlgebra.ResRing{T}) where {T <: RingElement}
    # exists only to check types of parents agree
 end
 
-function check_parent(a::Nemo.ResElem, b::Nemo.ResElem)
+function check_parent(a::AbstractAlgebra.ResElem, b::AbstractAlgebra.ResElem)
    if parent(a) != parent(b)
       check_parent_type(parent(a), parent(b))
       modulus(parent(a)) != modulus(parent(b)) && error("Incompatible moduli in residue operation") #CF: maybe extend to divisibility?
@@ -58,68 +58,68 @@ end
 #
 ###############################################################################
 
-function Base.hash(a::Nemo.ResElem, h::UInt)
+function Base.hash(a::AbstractAlgebra.ResElem, h::UInt)
    b = 0x539c1c8715c1adc2%UInt
    return xor(b, xor(hash(data(a), h), h))
 end
 
 doc"""
-    modulus(R::Nemo.ResRing)
+    modulus(R::AbstractAlgebra.ResRing)
 > Return the modulus $a$ of the given residue ring $S = R/(a)$.
 """
-function modulus(S::Nemo.ResRing)
+function modulus(S::AbstractAlgebra.ResRing)
    return S.modulus
 end
 
 doc"""
-    modulus(R::Nemo.ResRing)
+    modulus(R::AbstractAlgebra.ResRing)
 > Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
 > residue $r$ belongs to.
 """
-function modulus(r::Nemo.ResElem)
+function modulus(r::AbstractAlgebra.ResElem)
    return modulus(parent(r))
 end
 
-data(a::Nemo.ResElem) = a.data
+data(a::AbstractAlgebra.ResElem) = a.data
 
 doc"""
-    zero(R::Nemo.ResRing)
+    zero(R::AbstractAlgebra.ResRing)
 > Return the zero element of the given residue ring, i.e. $0 \pmod{a}$ where
 > $a$ is the modulus of the residue ring.
 """
-zero(R::Nemo.ResRing) = R(0)
+zero(R::AbstractAlgebra.ResRing) = R(0)
 
 doc"""
-    one(R::Nemo.ResRing)
+    one(R::AbstractAlgebra.ResRing)
 > Return $1 \pmod{a}$ where $a$ is the modulus of the residue ring.
 """
-one(R::Nemo.ResRing) = R(1)
+one(R::AbstractAlgebra.ResRing) = R(1)
 
 doc"""
-    iszero(a::Nemo.ResElem)
+    iszero(a::AbstractAlgebra.ResElem)
 > Return `true` if the supplied element $a$ is zero in the residue ring it
 > belongs to, otherwise return `false`.
 """
-iszero(a::Nemo.ResElem) = iszero(data(a))
+iszero(a::AbstractAlgebra.ResElem) = iszero(data(a))
 
 doc"""
-    isone(a::Nemo.ResElem)
+    isone(a::AbstractAlgebra.ResElem)
 > Return `true` if the supplied element $a$ is one in the residue ring it
 > belongs to, otherwise return `false`.
 """
-isone(a::Nemo.ResElem) = isone(data(a))
+isone(a::AbstractAlgebra.ResElem) = isone(data(a))
 
 doc"""
-    isunit(a::Nemo.ResElem)
+    isunit(a::AbstractAlgebra.ResElem)
 > Return `true` if the supplied element $a$ is invertible in the residue ring
 > it belongs to, otherwise return `false`.
 """
-function isunit(a::Nemo.ResElem)
+function isunit(a::AbstractAlgebra.ResElem)
    g = gcd(data(a), modulus(a))
    return isone(g)
 end
 
-deepcopy_internal(a::Nemo.ResElem, dict::ObjectIdDict) =
+deepcopy_internal(a::AbstractAlgebra.ResElem, dict::ObjectIdDict) =
    parent(a)(deepcopy(data(a)))
 
 ###############################################################################
@@ -128,7 +128,7 @@ deepcopy_internal(a::Nemo.ResElem, dict::ObjectIdDict) =
 #
 ###############################################################################
 
-function canonical_unit(x::Nemo.ResElem{<:Union{Integer, RingElem}})
+function canonical_unit(x::AbstractAlgebra.ResElem{<:Union{Integer, RingElem}})
  #the simple return x does not work
   # - if x == 0, this is not a unit
   # - if R is not a field....
@@ -154,17 +154,17 @@ end
 #
 ###############################################################################
 
-function show(io::IO, x::Nemo.ResElem)
+function show(io::IO, x::AbstractAlgebra.ResElem)
    print(io, data(x))
 end
 
-function show(io::IO, a::Nemo.ResRing)
+function show(io::IO, a::AbstractAlgebra.ResRing)
    print(io, "Residue ring of ", base_ring(a), " modulo ", modulus(a))
 end
 
-needs_parentheses(x::Nemo.ResElem) = needs_parentheses(data(x))
+needs_parentheses(x::AbstractAlgebra.ResElem) = needs_parentheses(data(x))
 
-isnegative(x::Nemo.ResElem) = isnegative(data(x))
+isnegative(x::AbstractAlgebra.ResElem) = isnegative(data(x))
 
 show_minus_one(::Type{Res{T}}) where {T <: RingElement} = true
 
@@ -175,10 +175,10 @@ show_minus_one(::Type{Res{T}}) where {T <: RingElement} = true
 ###############################################################################
 
 doc"""
-    -(a::Nemo.ResElem)
+    -(a::AbstractAlgebra.ResElem)
 > Return $-a$.
 """
-function -(a::Nemo.ResElem)
+function -(a::AbstractAlgebra.ResElem)
    parent(a)(-data(a))
 end
 
@@ -189,28 +189,28 @@ end
 ###############################################################################
 
 doc"""
-    +{T <: RingElement}(a::Nemo.ResElem{T}, b::Nemo.ResElem{T})
+    +{T <: RingElement}(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T})
 > Return $a + b$.
 """
-function +(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
+function +(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(data(a) + data(b))
 end
 
 doc"""
-    -{T <: RingElement}(a::Nemo.ResElem{T}, b::Nemo.ResElem{T})
+    -{T <: RingElement}(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T})
 > Return $a - b$.
 """
-function -(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
+function -(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(data(a) - data(b))
 end
 
 doc"""
-    *{T <: RingElement}(a::Nemo.ResElem{T}, b::Nemo.ResElem{T})
+    *{T <: RingElement}(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T})
 > Return $a\times b$.
 """
-function *(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
+function *(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(data(a) * data(b))
 end
@@ -222,76 +222,76 @@ end
 ###############################################################################
 
 doc"""
-    *(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat})
+    *(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a\times b$.
 """
-*(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) * b)
+*(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) * b)
 
 doc"""
-    *{T <: RingElem}(a::Nemo.ResElem{T}, b::T)
+    *{T <: RingElem}(a::AbstractAlgebra.ResElem{T}, b::T)
 > Return $a\times b$.
 """
-*(a::Nemo.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) * b)
+*(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) * b)
 
 doc"""
-    *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem)
+    *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem)
 > Return $a\times b$.
 """
-*(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem) = parent(b)(a * data(b))
+*(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem) = parent(b)(a * data(b))
 
 doc"""
-    *{T <: RingElem}(a::T, b::Nemo.ResElem{T})
+    *{T <: RingElem}(a::T, b::AbstractAlgebra.ResElem{T})
 > Return $a\times b$.
 """
-*(a::T, b::Nemo.ResElem{T}) where {T <: RingElem} = parent(b)(a * data(b))
+*(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem} = parent(b)(a * data(b))
 
 doc"""
-    +(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat})
+    +(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a + b$.
 """
-+(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) + b)
++(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) + b)
 
 doc"""
-    +{T <: RingElem}(a::Nemo.ResElem{T}, b::T)
+    +{T <: RingElem}(a::AbstractAlgebra.ResElem{T}, b::T)
 > Return $a + b$.
 """
-+(a::Nemo.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) + b)
++(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) + b)
 
 doc"""
-    +(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem)
+    +(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem)
 > Return $a + b$.
 """
-+(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem) = parent(b)(a + data(b))
++(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem) = parent(b)(a + data(b))
 
 doc"""
-    +{T <: RingElem}(a::T, b::Nemo.ResElem{T})
+    +{T <: RingElem}(a::T, b::AbstractAlgebra.ResElem{T})
 > Return $a + b$.
 """
-+(a::T, b::Nemo.ResElem{T}) where {T <: RingElem} = parent(b)(a + data(b))
++(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem} = parent(b)(a + data(b))
 
 doc"""
-    -(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat})
+    -(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a - b$.
 """
--(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) - b)
+-(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) - b)
 
 doc"""
-    -{T <: RingElem}(a::Nemo.ResElem{T}, b::T)
+    -{T <: RingElem}(a::AbstractAlgebra.ResElem{T}, b::T)
 > Return $a - b$.
 """
--(a::Nemo.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) - b)
+-(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) - b)
 
 doc"""
-    -(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem)
+    -(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem)
 > Return $a - b$.
 """
--(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem) = parent(b)(a - data(b))
+-(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem) = parent(b)(a - data(b))
 
 doc"""
-    -{T <: RingElem}(a::T, b::Nemo.ResElem{T})
+    -{T <: RingElem}(a::T, b::AbstractAlgebra.ResElem{T})
 > Return $a - b$.
 """
--(a::T, b::Nemo.ResElem{T}) where {T <: RingElem} = parent(b)(a - data(b))
+-(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem} = parent(b)(a - data(b))
 
 ###############################################################################
 #
@@ -300,10 +300,10 @@ doc"""
 ###############################################################################
 
 doc"""
-    ^(a::Nemo.ResElem, b::Int)
+    ^(a::AbstractAlgebra.ResElem, b::Int)
 > Return $a^b$.
 """
-function ^(a::Nemo.ResElem, b::Int)
+function ^(a::AbstractAlgebra.ResElem, b::Int)
    parent(a)(powmod(data(a), b, modulus(a)))
 end
 
@@ -314,24 +314,24 @@ end
 ###############################################################################
 
 doc"""
-    =={T <: RingElement}(x::Nemo.ResElem{T}, y::Nemo.ResElem{T})
+    =={T <: RingElement}(x::AbstractAlgebra.ResElem{T}, y::AbstractAlgebra.ResElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
 > equal to the minimum of the two precisions.
 """
-function ==(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
+function ==(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return data(a) == data(b)
 end
 
 doc"""
-    isequal{T <: RingElement}(x::Nemo.ResElem{T}, y::Nemo.ResElem{T})
+    isequal{T <: RingElement}(x::AbstractAlgebra.ResElem{T}, y::AbstractAlgebra.ResElem{T})
 > Return `true` if $x == y$ exactly, otherwise return `false`. This function is
 > useful in cases where the data of the residues are inexact, e.g. power series
 > Only if the power series are precisely the same, to the same precision, are
 > they declared equal by this function.
 """
-function isequal(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
+function isequal(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return isequal(data(a), data(b))
 end
@@ -343,37 +343,37 @@ end
 ###############################################################################
 
 doc"""
-    ==(x::Nemo.ResElem, y::Union{Integer, Rational, AbstractFloat})
+    ==(x::AbstractAlgebra.ResElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::Nemo.ResElem, b::Union{Integer, Rational, AbstractFloat})
+function ==(a::AbstractAlgebra.ResElem, b::Union{Integer, Rational, AbstractFloat})
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
 doc"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.ResElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.ResElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.ResElem)
+function ==(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResElem)
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
 end
 
 doc"""
-    =={T <: RingElem}(x::Nemo.ResElem{T}, y::T)
+    =={T <: RingElem}(x::AbstractAlgebra.ResElem{T}, y::T)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::Nemo.ResElem{T}, b::T) where {T <: RingElem}
+function ==(a::AbstractAlgebra.ResElem{T}, b::T) where {T <: RingElem}
    z = base_ring(a)(b)
    return data(a) == mod(z, modulus(a))
 end
 
 doc"""
-    =={T <: RingElem}(x::T, y::Nemo.ResElem{T})
+    =={T <: RingElem}(x::T, y::AbstractAlgebra.ResElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(a::T, b::Nemo.ResElem{T}) where {T <: RingElem}
+function ==(a::T, b::AbstractAlgebra.ResElem{T}) where {T <: RingElem}
    z = base_ring(b)(a)
    return data(b) == mod(z, modulus(b))
 end
@@ -385,11 +385,11 @@ end
 ###############################################################################
 
 doc"""
-    inv(a::Nemo.ResElem)
+    inv(a::AbstractAlgebra.ResElem)
 > Return the inverse of the element $a$ in the residue ring. If an impossible
 > inverse is encountered, an exception is raised.
 """
-function inv(a::Nemo.ResElem)
+function inv(a::AbstractAlgebra.ResElem)
    g, ainv = gcdinv(data(a), modulus(a))
    if g != 1
       error("Impossible inverse in inv")
@@ -404,10 +404,10 @@ end
 ###############################################################################
 
 doc"""
-    divexact{T <: RingElement}(a::Nemo.ResElem{T}, b::Nemo.ResElem{T})
+    divexact{T <: RingElement}(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T})
 > Return $a/b$ where the quotient is expected to be exact.
 """
-function divexact(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
+function divexact(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    fl, q = divides(a, b)
    if !fl
@@ -416,7 +416,7 @@ function divexact(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElemen
    return q
 end
 
-function divides(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
+function divides(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    iszero(b) && error("Division by zero in divides")
    if iszero(a)
@@ -444,12 +444,12 @@ end
 ###############################################################################
 
 doc"""
-    gcd{T <: RingElement}(a::Nemo.ResElem{T}, b::Nemo.ResElem{T})
+    gcd{T <: RingElement}(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T})
 > Return a greatest common divisor of $a$ and $b$ if one exists. This is done
 > by taking the greatest common divisor of the data associated with the
 > supplied residues and taking its greatest common divisor with the modulus.
 """
-function gcd(a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
+function gcd(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
    return parent(a)(gcd(gcd(data(a), modulus(a)), data(b)))
 end
@@ -460,22 +460,22 @@ end
 #
 ###############################################################################
 
-function zero!(a::Nemo.ResElem{T}) where {T <: RingElement}
+function zero!(a::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    a.data = zero!(a.data)
    return a
 end
 
-function mul!(c::Nemo.ResElem{T}, a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
+function mul!(c::AbstractAlgebra.ResElem{T}, a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    c.data = mod(data(a)*data(b), modulus(a))
    return c
 end
 
-function addeq!(c::Nemo.ResElem{T}, a::Nemo.ResElem{T}) where {T <: RingElement}
+function addeq!(c::AbstractAlgebra.ResElem{T}, a::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    c.data = mod(data(c) + data(a), modulus(a))
    return c
 end
 
-function add!(c::Nemo.ResElem{T}, a::Nemo.ResElem{T}, b::Nemo.ResElem{T}) where {T <: RingElement}
+function add!(c::AbstractAlgebra.ResElem{T}, a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    c.data = mod(data(a) + data(b), modulus(a))
    return c
 end
@@ -486,7 +486,7 @@ end
 #
 ###############################################################################
 
-function rand(S::Nemo.ResRing{T}, v...) where {T <: RingElement}
+function rand(S::AbstractAlgebra.ResRing{T}, v...) where {T <: RingElement}
    R = base_ring(S)
    return S(rand(R, v...))
 end
@@ -532,7 +532,7 @@ function (a::ResRing{T})(b::T) where {T <: RingElem}
    return z
 end
 
-function (a::ResRing{T})(b::Nemo.ResElem{T}) where {T <: RingElement}
+function (a::ResRing{T})(b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    a != parent(b) && error("Operation on incompatible objects")
    return b
 end
@@ -544,13 +544,13 @@ end
 ###############################################################################
 
 doc"""
-    ResidueRing{T <: RingElement}(R::Nemo.Ring, a::RingElement; cached::Bool=true)
+    ResidueRing{T <: RingElement}(R::AbstractAlgebra.Ring, a::RingElement; cached::Bool=true)
 > Create the residue ring $R/(a)$ where $a$ is an element of the ring $R$. We
 > require $a \neq 0$. If `cached == true` (the default) then the resulting
 > residue ring parent object is cached and returned for any subsequent calls
 > to the constructor with the same base ring $R$ and element $a$.
 """
-function ResidueRing(R::Nemo.Ring, a::RingElement; cached::Bool = true)
+function ResidueRing(R::AbstractAlgebra.Ring, a::RingElement; cached::Bool = true)
    iszero(a) && throw(DivideError())
    T = elem_type(R)
 

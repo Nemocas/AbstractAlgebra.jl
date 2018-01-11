@@ -13,4 +13,4 @@ notifications:
   - email: false
 after_success:
   - julia -e 'Pkg.add("Documenter")'
-  - DOCUMENTER_DEBUG=true julia -e 'cd(Pkg.dir("Nemo")); include(joinpath("docs", "make.jl"))'
+  - DOCUMENTER_DEBUG=true julia -e 'cd(Pkg.dir("AbstractAlgebra")); include(joinpath("docs", "make.jl"))'

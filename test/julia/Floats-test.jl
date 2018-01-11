@@ -6,13 +6,13 @@ function test_Floats_constructors()
 
    @test elem_type(R) == Float64
    @test elem_type(S) == BigFloat
-   @test elem_type(Nemo.Floats{Float64}) == Float64
-   @test elem_type(Nemo.Floats{BigFloat}) == BigFloat
-   @test parent_type(Float64) == Nemo.Floats{Float64}
-   @test parent_type(BigFloat) == Nemo.Floats{BigFloat}
+   @test elem_type(AbstractAlgebra.Floats{Float64}) == Float64
+   @test elem_type(AbstractAlgebra.Floats{BigFloat}) == BigFloat
+   @test parent_type(Float64) == AbstractAlgebra.Floats{Float64}
+   @test parent_type(BigFloat) == AbstractAlgebra.Floats{BigFloat}
    
-   @test isa(R, Nemo.Floats)
-   @test isa(S, Nemo.Floats)
+   @test isa(R, AbstractAlgebra.Floats)
+   @test isa(S, AbstractAlgebra.Floats)
 
    @test isa(R(), Float64)
    @test isa(S(), BigFloat)

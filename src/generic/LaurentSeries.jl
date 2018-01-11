@@ -983,7 +983,7 @@ function Base.sqrt(a::LaurentSeriesElem)
    set_prec!(asqrt, prec + aval2)
    set_val!(asqrt, aval2)
    if prec > 0
-      g = Nemo.sqrt(polcoeff(a, 0))
+      g = AbstractAlgebra.sqrt(polcoeff(a, 0))
       asqrt = setcoeff!(asqrt, 0, g)
       g2 = g + g
    end
@@ -1034,7 +1034,7 @@ function Base.exp(a::LaurentSeriesElem)
    set_prec!(z, preca)
    set_val!(z, 0)
    c = vala == 0 ? polcoeff(a, 0) : R()
-   z = setcoeff!(z, 0, Nemo.exp(c))
+   z = setcoeff!(z, 0, AbstractAlgebra.exp(c))
    len = pol_length(a) + vala
    for k = 1 : preca - 1
       s = R()
@@ -1373,7 +1373,7 @@ end
 ###############################################################################
 
 doc"""
-   PowerSeriesRing(R::Nemo.Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
+   PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
 > Return a tuple $(S, x)$ consisting of the parent object `S` of a power series
 > ring over the given base ring and a generator `x` for the power series ring.
 > The maximum precision of power series in the ring is set to `prec`. If the
@@ -1385,7 +1385,7 @@ doc"""
 > precision in future will return the same parent object and generator. If
 > caching of the parent object is not required, `cached` can be set to `false`.
 """
-function LaurentSeriesRing(R::Nemo.Ring, prec::Int, s::AbstractString; cached=true)
+function LaurentSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::AbstractString; cached=true)
    S = Symbol(s)
    T = elem_type(R)
 
@@ -1394,7 +1394,7 @@ function LaurentSeriesRing(R::Nemo.Ring, prec::Int, s::AbstractString; cached=tr
    return parent_obj, gen(parent_obj)
 end
 
-function LaurentSeriesRing(R::Nemo.Field, prec::Int, s::AbstractString; cached=true)
+function LaurentSeriesRing(R::AbstractAlgebra.Field, prec::Int, s::AbstractString; cached=true)
    S = Symbol(s)
    T = elem_type(R)
 
@@ -1403,7 +1403,7 @@ function LaurentSeriesRing(R::Nemo.Field, prec::Int, s::AbstractString; cached=t
    return parent_obj, gen(parent_obj)
 end
 
-function LaurentSeriesField(R::Nemo.Field, prec::Int, s::AbstractString; cached=true)
+function LaurentSeriesField(R::AbstractAlgebra.Field, prec::Int, s::AbstractString; cached=true)
    S = Symbol(s)
    T = elem_type(R)
 

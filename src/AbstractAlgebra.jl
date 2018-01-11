@@ -1,6 +1,6 @@
 VERSION >= v"0.4.0-dev+6521" && __precompile__()
 
-module Nemo
+module AbstractAlgebra
 
 import Base: Array, abs, acos, acosh, asin, asinh, atan, atan2, atanh, base,
              bin, ceil, checkbounds, conj, convert, cmp, contains, cos, cosh,
@@ -28,13 +28,10 @@ export PolyRing, SeriesRing, AbsSeriesRing, ResRing, FracField, MatSpace,
 
 export JuliaZZ, JuliaQQ, zz, qq, JuliaRealField, RDF
 
-export PermutationGroup, ZZ, QQ, PadicField, FiniteField, RealField, ComplexField,
-       CyclotomicField, MaximalRealSubfield, NumberField
+export PermutationGroup
 
 export create_accessors, get_handle, package_handle, zeros,
        Array, sig_exists
-
-export flint_cleanup, flint_set_num_threads
 
 export error_dim_negative, ErrorConstrDimMismatch
 
@@ -64,68 +61,12 @@ include("AbstractTypes.jl")
 #
 ###############################################################################
 
-is_windows64() = (is_windows() ? true : false) && (Int == Int64)
-
-const pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
-const libdir = joinpath(pkgdir, "local", "lib")
-if is_windows()
-   const libgmp = joinpath(pkgdir, "local", "lib", "libgmp-16")
-else
-   const libgmp = joinpath(pkgdir, "local", "lib", "libgmp")
-end
-const libmpfr = joinpath(pkgdir, "local", "lib", "libmpfr")
-const libflint = joinpath(pkgdir, "local", "lib", "libflint")
-const libarb = joinpath(pkgdir, "local", "lib", "libarb")
-
-function flint_abort()
-  error("Problem in the Flint-Subsystem")
-end
-
 function __init__()
-
-   if "HOSTNAME" in keys(ENV) && ENV["HOSTNAME"] == "juliabox"
-       push!(Libdl.DL_LOAD_PATH, "/usr/local/lib")
-   elseif is_linux()
-       push!(Libdl.DL_LOAD_PATH, libdir)
-       Libdl.dlopen(libgmp)
-       Libdl.dlopen(libmpfr)
-       Libdl.dlopen(libflint)
-       Libdl.dlopen(libarb)
-   else
-      push!(Libdl.DL_LOAD_PATH, libdir)
-   end
-
-   if !is_windows()
-      ccall((:__gmp_set_memory_functions, libgmp), Void,
-         (Ptr{Void},Ptr{Void},Ptr{Void}),
-         cglobal(:jl_gc_counted_malloc),
-         cglobal(:jl_gc_counted_realloc_with_old_size),
-         cglobal(:jl_gc_counted_free))
-
-      ccall((:__flint_set_memory_functions, libflint), Void,
-         (Ptr{Void},Ptr{Void},Ptr{Void},Ptr{Void}),
-         cglobal(:jl_malloc),
-         cglobal(:jl_calloc),
-         cglobal(:jl_realloc),
-         cglobal(:jl_free))
-   end
-
-   ccall((:flint_set_abort, libflint), Void,
-      (Ptr{Void},), cfunction(flint_abort, Void, ()))
-
    println("")
-   println("Welcome to Nemo version 0.7.4")
+   println("Welcome to AbstractAlgebra version 0.0.1")
    println("")
-   println("Nemo comes with absolutely no warranty whatsoever")
+   println("AbstractAlgebra comes with absolutely no warranty whatsoever")
    println("")
-end
-
-function flint_set_num_threads(a::Int)
-   ccall((:flint_set_num_threads, libflint), Void, (Int,), a)
-end
-
-function flint_cleanup()
-   ccall((:flint_cleanup, libflint), Void, ())
 end
 
 ###############################################################################
@@ -135,11 +76,11 @@ end
 ################################################################################
 
 function versioninfo()
-  print("Nemo version 0.7.4 \n")
-  nemorepo = dirname(dirname(@__FILE__))
+  print("AbstractAlgebra version 0.0.1 \n")
+  abstractalgebrarepo = dirname(dirname(@__FILE__))
 
-  print("Nemo: ")
-  prepo = Base.LibGit2.GitRepo(nemorepo)
+  print("AbstractAlgebra: ")
+  prepo = Base.LibGit2.GitRepo(abstractalgebrarepo)
   Base.LibGit2.with(LibGit2.head(prepo)) do phead
     print("commit: ")
     print(string(LibGit2.Oid(phead))[1:8])
@@ -150,25 +91,6 @@ function versioninfo()
   end
 
   finalize(prepo)
-
-  for deps in ["flint2", "arb", "antic"]
-    if ispath(joinpath(nemorepo, "deps", deps))
-      print("$deps: ")
-      repo = joinpath(nemorepo, "deps", deps)
-
-      prepo = Base.LibGit2.GitRepo(repo)
-
-      Base.LibGit2.with(LibGit2.head(prepo)) do phead
-        print("commit: ")
-        print(string(LibGit2.Oid(phead))[1:8])
-        print(" date: ")
-        commit = Base.LibGit2.get(Base.LibGit2.GitCommit, prepo, LibGit2.Oid(phead))
-        print(Base.Dates.unix2datetime(Base.LibGit2.author(commit).time))
-        print(")\n")
-      end
-      finalize(prepo)
-    end
-  end
 
   return nothing
 end
@@ -360,7 +282,7 @@ function ResidueField(R::Ring, a::Union{RingElement, Integer}; cached::Bool = tr
    Generic.ResidueField(R, a; cached=cached)
 end
 
-function NumberField(a::Nemo.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
+function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
    Generic.NumberField(a, s, t; cached=cached)
 end
 
@@ -423,21 +345,11 @@ include("error.jl")
 
 ###############################################################################
 #
-#   Load Nemo Rings/Fields/etc
+#   Load Groups/Rings/Fields etc.
 #
 ###############################################################################
 
-include("flint/FlintTypes.jl")
-
-include("antic/AnticTypes.jl")
-
-include("arb/ArbTypes.jl")
-
-#include("ambiguities.jl") # remove ambiguity warnings
-
 include("Groups.jl")
-
-include("flint/adhoc.jl")
 
 ###########################################################
 #
@@ -530,23 +442,9 @@ PermutationGroup = PermGroup
 
 ###############################################################################
 #
-#   Set domain for ZZ, QQ, PadicField, FiniteField to Flint
+#   Set domain for ZZ, QQ, FiniteField
 #
 ###############################################################################
-
-ZZ = FlintZZ
-QQ = FlintQQ
-PadicField = FlintPadicField
-FiniteField = FlintFiniteField
-
-###############################################################################
-#
-#   Set domain for RR, CC to Arb
-#
-###############################################################################
-
-RealField = ArbField
-ComplexField = AcbField
 
 ###############################################################################
 #
@@ -554,33 +452,28 @@ ComplexField = AcbField
 #
 ###############################################################################
 
-include("../benchmarks/runbenchmarks.jl")
-
 function test_module(x, y)
    julia_exe = Base.julia_cmd()
    test_file = joinpath(pkgdir, "test/$x/")
    test_file = test_file * "$y-test.jl";
    test_function_name = "test_"
 
-   if x in ["flint", "arb", "antic"]
-     test_function_name *= y
-   else x == "generic"
-     if y == "RelSeries"
-       test_function_name *= "gen_rel_series"
-     elseif y == "AbsSeries"
-       test_function_name *= "gen_abs_series"
-     elseif y == "Matrix"
-       test_function_name *= "gen_mat"
-     elseif y == "Fraction"
-       test_function_name *= "gen_frac"
-     elseif y == "Residue"
-       test_function_name *= "gen_res"
-     else
-       test_function_name *= "gen_$(lowercase(y))"
-     end
+   x == "generic"
+   if y == "RelSeries"
+      test_function_name *= "gen_rel_series"
+   elseif y == "AbsSeries"
+      test_function_name *= "gen_abs_series"
+   elseif y == "Matrix"
+      test_function_name *= "gen_mat"
+   elseif y == "Fraction"
+      test_function_name *= "gen_frac"
+   elseif y == "Residue"
+      test_function_name *= "gen_res"
+   else
+      test_function_name *= "gen_$(lowercase(y))"
    end
 
-   cmd = "using Base.Test; using Nemo; include(\"$test_file\"); $test_function_name();"
+   cmd = "using Base.Test; using AbstractAlgebra; include(\"$test_file\"); $test_function_name();"
    info("spawning ", `$julia_exe -e \"$cmd\"`)
    run(`$julia_exe -e $cmd`)
 end

@@ -1,6 +1,6 @@
 ###############################################################################
 #
-#   Float.jl : Additional Nemo functionality for Julia AbstractFloat types
+#   Float.jl : Additional AbstractAlgebra functionality for Julia AbstractFloat types
 #
 ###############################################################################
 

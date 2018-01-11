@@ -17,41 +17,41 @@ parent_type(::Type{Frac{T}}) where T <: RingElem = FracField{T}
 elem_type(::Type{FracField{T}}) where {T <: RingElem} = Frac{T}
 
 doc"""
-    base_ring{T}(S::Nemo.FracField{T})
+    base_ring{T}(S::AbstractAlgebra.FracField{T})
 > Return the base ring $R$ of the given fraction field.
 """
-base_ring(a::Nemo.FracField{T}) where T <: RingElem = a.base_ring::parent_type(T)
+base_ring(a::AbstractAlgebra.FracField{T}) where T <: RingElem = a.base_ring::parent_type(T)
 
 doc"""
-    base_ring{T}(r::Nemo.FracElem)
+    base_ring{T}(r::AbstractAlgebra.FracElem)
 > Return the base ring $R$ of the fraction field that the supplied
 > element $a$ belongs to.
 """
-base_ring(a::Nemo.FracElem) = base_ring(parent(a))
+base_ring(a::AbstractAlgebra.FracElem) = base_ring(parent(a))
 
 doc"""
-    parent(a::Nemo.FracElem)
+    parent(a::AbstractAlgebra.FracElem)
 > Return the parent object of the given fraction element.
 """
-parent(a::Nemo.FracElem) = a.parent
+parent(a::AbstractAlgebra.FracElem) = a.parent
 
-function isdomain_type(::Type{T}) where {S <: RingElement, T <: Nemo.FracElem{S}}
+function isdomain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.FracElem{S}}
    return isdomain_type(S)
 end
 
-function isexact_type(a::Type{T}) where {S <: RingElement, T <: Nemo.FracElem{S}}
+function isexact_type(a::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.FracElem{S}}
    return isexact_type(S)
 end
 
 doc"""
-    characteristic{T <: RingElem}(R::Nemo.FracField{T})
+    characteristic{T <: RingElem}(R::AbstractAlgebra.FracField{T})
 > Return the characteristic of the given field.
 """
-function characteristic(R::Nemo.FracField{T}) where T <: RingElem
+function characteristic(R::AbstractAlgebra.FracField{T}) where T <: RingElem
    return characteristic(base_ring(R))
 end
 
-function check_parent(a::Nemo.FracElem, b::Nemo.FracElem)
+function check_parent(a::AbstractAlgebra.FracElem, b::AbstractAlgebra.FracElem)
    parent(a) != parent(b) && error("Incompatible rings in fraction field operation")
 end
 
@@ -73,9 +73,9 @@ function //(x::T, y::T) where {T <: RingElem}
    return z
 end
 
-//(x::T, y::Nemo.FracElem{T}) where {T <: RingElem} = parent(y)(x)//y
+//(x::T, y::AbstractAlgebra.FracElem{T}) where {T <: RingElem} = parent(y)(x)//y
 
-//(x::Nemo.FracElem{T}, y::T) where {T <: RingElem} = x//parent(x)(y)
+//(x::AbstractAlgebra.FracElem{T}, y::T) where {T <: RingElem} = x//parent(x)(y)
 
 ###############################################################################
 #
@@ -83,53 +83,53 @@ end
 #
 ###############################################################################
 
-function Base.hash(a::Nemo.FracElem, h::UInt)
+function Base.hash(a::AbstractAlgebra.FracElem, h::UInt)
    b = 0x8a30b0d963237dd5%UInt
    return xor(b, hash(numerator(a), h), hash(denominator(a), h), h)
 end
 
-function numerator(a::Nemo.FracElem)
+function numerator(a::AbstractAlgebra.FracElem)
    u = canonical_unit(a.den)
    return divexact(a.num, u)
 end
 
-function denominator(a::Nemo.FracElem)
+function denominator(a::AbstractAlgebra.FracElem)
    u = canonical_unit(a.den)
    return divexact(a.den, u)
 end
 
 doc"""
-    zero(R::Nemo.FracField)
+    zero(R::AbstractAlgebra.FracField)
 > Return $0/1$ in the given fraction field.
 """
-zero(R::Nemo.FracField) = R(0)
+zero(R::AbstractAlgebra.FracField) = R(0)
 
 doc"""
-    one(R::Nemo.FracField)
+    one(R::AbstractAlgebra.FracField)
 > Return $1/1$ in the given fraction field.
 """
-one(R::Nemo.FracField) = R(1)
+one(R::AbstractAlgebra.FracField) = R(1)
 
 doc"""
-    iszero(a::Nemo.FracElem)
+    iszero(a::AbstractAlgebra.FracElem)
 > Return `true` if the supplied element $a$ is zero in the fraction field it
 > belongs to, otherwise return `false`.
 """
-iszero(a::Nemo.FracElem) = iszero(numerator(a))
+iszero(a::AbstractAlgebra.FracElem) = iszero(numerator(a))
 
 doc"""
-    isone(a::Nemo.FracElem)
+    isone(a::AbstractAlgebra.FracElem)
 > Return `true` if the supplied element $a$ is one in the fraction field it
 > belongs to, otherwise return `false`.
 """
-isone(a::Nemo.FracElem) = numerator(a) == denominator(a)
+isone(a::AbstractAlgebra.FracElem) = numerator(a) == denominator(a)
 
 doc"""
-    isunit(a::Nemo.FracElem)
+    isunit(a::AbstractAlgebra.FracElem)
 > Return `true` if the supplied element $a$ is invertible in the fraction field
 > it belongs to, i.e. the numerator is nonzero, otherwise return `false`.
 """
-isunit(a::Nemo.FracElem) = !iszero(numerator(a))
+isunit(a::AbstractAlgebra.FracElem) = !iszero(numerator(a))
 
 function deepcopy_internal(a::Frac{T}, dict::ObjectIdDict) where {T <: RingElem}
    v = Frac{T}(deepcopy(numerator(a)), deepcopy(denominator(a)))
@@ -143,7 +143,7 @@ end
 #
 ###############################################################################
 
-canonical_unit(a::Nemo.FracElem) = a
+canonical_unit(a::AbstractAlgebra.FracElem) = a
 
 ###############################################################################
 #
@@ -151,7 +151,7 @@ canonical_unit(a::Nemo.FracElem) = a
 #
 ###############################################################################
 
-function show(io::IO, x::Nemo.FracElem)
+function show(io::IO, x::AbstractAlgebra.FracElem)
    u = canonical_unit(denominator(x))
    n = divexact(numerator(x), u)
    d = divexact(denominator(x), u);
@@ -174,15 +174,15 @@ function show(io::IO, x::Nemo.FracElem)
    end
 end
 
-function show(io::IO, a::Nemo.FracField)
+function show(io::IO, a::AbstractAlgebra.FracField)
    print(io, "Fraction field of ", base_ring(a))
 end
 
-needs_parentheses(x::Nemo.FracElem) = isone(denominator(x)) && needs_parentheses(numerator(x))
+needs_parentheses(x::AbstractAlgebra.FracElem) = isone(denominator(x)) && needs_parentheses(numerator(x))
 
-isnegative(x::Nemo.FracElem) = !needs_parentheses(numerator(x)) && isnegative(numerator(x))
+isnegative(x::AbstractAlgebra.FracElem) = !needs_parentheses(numerator(x)) && isnegative(numerator(x))
 
-show_minus_one(::Type{Nemo.FracElem{T}}) where {T <: RingElem} = show_minus_one(T)
+show_minus_one(::Type{AbstractAlgebra.FracElem{T}}) where {T <: RingElem} = show_minus_one(T)
 
 ###############################################################################
 #
@@ -191,10 +191,10 @@ show_minus_one(::Type{Nemo.FracElem{T}}) where {T <: RingElem} = show_minus_one(
 ###############################################################################
 
 doc"""
-    -(a::Nemo.FracElem)
+    -(a::AbstractAlgebra.FracElem)
 > Return $-a$.
 """
-function -(a::Nemo.FracElem)
+function -(a::AbstractAlgebra.FracElem)
    return parent(a)(-numerator(a), denominator(a))
 end
 
@@ -205,10 +205,10 @@ end
 ###############################################################################
 
 doc"""
-    +{T <: RingElem}(a::Nemo.FracElem{T}, b::Nemo.FracElem{T})
+    +{T <: RingElem}(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T})
 > Return $a + b$.
 """
-function +(a::Nemo.FracElem{T}, b::Nemo.FracElem{T}) where {T <: RingElem}
+function +(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
    n = numerator(a)*denominator(b) + numerator(b)*denominator(a)
    d = denominator(a)*denominator(b)
@@ -217,10 +217,10 @@ function +(a::Nemo.FracElem{T}, b::Nemo.FracElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    -{T <: RingElem}(a::Nemo.FracElem{T}, b::Nemo.FracElem{T})
+    -{T <: RingElem}(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T})
 > Return $a - b$.
 """
-function -(a::Nemo.FracElem{T}, b::Nemo.FracElem{T}) where {T <: RingElem}
+function -(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
    n = numerator(a)*denominator(b) - numerator(b)*denominator(a)
    d = denominator(a)*denominator(b)
@@ -229,10 +229,10 @@ function -(a::Nemo.FracElem{T}, b::Nemo.FracElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    *{T <: RingElem}(a::Nemo.FracElem{T}, b::Nemo.FracElem{T})
+    *{T <: RingElem}(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T})
 > Return $a\times b$.
 """
-function *(a::Nemo.FracElem{T}, b::Nemo.FracElem{T}) where {T <: RingElem}
+function *(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
    g1 = gcd(numerator(a), denominator(b))
    g2 = gcd(numerator(b), denominator(a))
@@ -248,10 +248,10 @@ end
 ###############################################################################
 
 doc"""
-    *(a::Nemo.FracElem, b::Union{Integer, Rational, AbstractFloat})
+    *(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a\times b$.
 """
-function *(a::Nemo.FracElem, b::Union{Integer, Rational, AbstractFloat})
+function *(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    c = base_ring(a)(b)
    g = gcd(denominator(a), c)
    n = numerator(a)*divexact(c, g)
@@ -260,10 +260,10 @@ function *(a::Nemo.FracElem, b::Union{Integer, Rational, AbstractFloat})
 end
 
 doc"""
-    *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.FracElem)
+    *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
 > Return $a\times b$.
 """
-function *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.FracElem)
+function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
    c = base_ring(b)(a)
    g = gcd(denominator(b), c)
    n = numerator(b)*divexact(c, g)
@@ -272,10 +272,10 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.FracElem)
 end
 
 doc"""
-    *{T <: RingElem}(a::Nemo.FracElem{T}, b::T)
+    *{T <: RingElem}(a::AbstractAlgebra.FracElem{T}, b::T)
 > Return $a\times b$.
 """
-function *(a::Nemo.FracElem{T}, b::T) where {T <: RingElem}
+function *(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    g = gcd(denominator(a), b)
    n = numerator(a)*divexact(b, g)
    d = divexact(denominator(a), g)
@@ -283,10 +283,10 @@ function *(a::Nemo.FracElem{T}, b::T) where {T <: RingElem}
 end
 
 doc"""
-    *{T <: RingElem}(a::T, b::Nemo.FracElem{T})
+    *{T <: RingElem}(a::T, b::AbstractAlgebra.FracElem{T})
 > Return $a\times b$.
 """
-function *(a::T, b::Nemo.FracElem{T}) where {T <: RingElem}
+function *(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    g = gcd(denominator(b), a)
    n = numerator(b)*divexact(a, g)
    d = divexact(denominator(b), g)
@@ -294,10 +294,10 @@ function *(a::T, b::Nemo.FracElem{T}) where {T <: RingElem}
 end
 
 doc"""
-    +(a::Nemo.FracElem, b::Union{Integer, Rational, AbstractFloat})
+    +(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a + b$.
 """
-function +(a::Nemo.FracElem, b::Union{Integer, Rational, AbstractFloat})
+function +(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    n = numerator(a) + denominator(a)*b
    d = denominator(a)
    g = gcd(n, d)
@@ -305,10 +305,10 @@ function +(a::Nemo.FracElem, b::Union{Integer, Rational, AbstractFloat})
 end
 
 doc"""
-    -(a::Nemo.FracElem, b::Union{Integer, Rational, AbstractFloat})
+    -(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a - b$.
 """
-function -(a::Nemo.FracElem, b::Union{Integer, Rational, AbstractFloat})
+function -(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    n = numerator(a) - denominator(a)*b
    d = denominator(a)
    g = gcd(n, d)
@@ -316,16 +316,16 @@ function -(a::Nemo.FracElem, b::Union{Integer, Rational, AbstractFloat})
 end
 
 doc"""
-    +(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.FracElem)
+    +(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
 > Return $a + b$.
 """
-+(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.FracElem) = b + a
++(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem) = b + a
 
 doc"""
-    -(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.FracElem)
+    -(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
 > Return $a - b$.
 """
-function -(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.FracElem)
+function -(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
    n = a*denominator(b) - numerator(b)
    d = denominator(b)
    g = gcd(n, d)
@@ -333,10 +333,10 @@ function -(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.FracElem)
 end
 
 doc"""
-    +{T <: RingElem}(a::Nemo.FracElem{T}, b::T)
+    +{T <: RingElem}(a::AbstractAlgebra.FracElem{T}, b::T)
 > Return $a + b$.
 """
-function +(a::Nemo.FracElem{T}, b::T) where {T <: RingElem}
+function +(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    n = numerator(a) + denominator(a)*b
    d = denominator(a)
    g = gcd(n, d)
@@ -344,10 +344,10 @@ function +(a::Nemo.FracElem{T}, b::T) where {T <: RingElem}
 end
 
 doc"""
-    -{T <: RingElem}(a::Nemo.FracElem{T}, b::T)
+    -{T <: RingElem}(a::AbstractAlgebra.FracElem{T}, b::T)
 > Return $a - b$.
 """
-function -(a::Nemo.FracElem{T}, b::T) where {T <: RingElem}
+function -(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    n = numerator(a) - denominator(a)*b
    d = denominator(a)
    g = gcd(n, d)
@@ -355,16 +355,16 @@ function -(a::Nemo.FracElem{T}, b::T) where {T <: RingElem}
 end
 
 doc"""
-    +{T <: RingElem}(a::T, b::Nemo.FracElem{T})
+    +{T <: RingElem}(a::T, b::AbstractAlgebra.FracElem{T})
 > Return $a + b$.
 """
-+(a::T, b::Nemo.FracElem{T}) where {T <: RingElem} = b + a
++(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem} = b + a
 
 doc"""
-    -{T <: RingElem}(a::T, b::Nemo.FracElem{T})
+    -{T <: RingElem}(a::T, b::AbstractAlgebra.FracElem{T})
 > Return $a - b$.
 """
-function -(a::T, b::Nemo.FracElem{T}) where {T <: RingElem}
+function -(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    n = a*denominator(b) - numerator(b)
    d = denominator(b)
    g = gcd(n, d)
@@ -378,24 +378,24 @@ end
 ###############################################################################
 
 doc"""
-    =={T <: RingElem}(x::Nemo.FracElem{T}, y::Nemo.FracElem{T})
+    =={T <: RingElem}(x::AbstractAlgebra.FracElem{T}, y::AbstractAlgebra.FracElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
 > equal to the minimum of the two precisions.
 """
-function ==(x::Nemo.FracElem{T}, y::Nemo.FracElem{T}) where {T <: RingElem}
+function ==(x::AbstractAlgebra.FracElem{T}, y::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(x, y)
    return (denominator(x) == denominator(y) && numerator(x) == numerator(y)) || (numerator(x)*denominator(y) == denominator(x)*numerator(y))
 end
 
 doc"""
-    isequal{T <: RingElem}(x::Nemo.FracElem{T}, y::Nemo.FracElem{T})
+    isequal{T <: RingElem}(x::AbstractAlgebra.FracElem{T}, y::AbstractAlgebra.FracElem{T})
 > Return `true` if $x == y$ exactly, otherwise return `false`. This function is
 > useful in cases where the numerators and denominators of the fractions are
 > inexact, e.g. power series. Only if the power series are precisely the same,
 > to the same precision, are they declared equal by this function.
 """
-function isequal(x::Nemo.FracElem{T}, y::Nemo.FracElem{T}) where {T <: RingElem}
+function isequal(x::AbstractAlgebra.FracElem{T}, y::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    if parent(x) != parent(y)
       return false
    end
@@ -409,32 +409,32 @@ end
 ###############################################################################
 
 doc"""
-    ==(x::Nemo.FracElem, y::Union{Integer, Rational, AbstractFloat})
+    ==(x::AbstractAlgebra.FracElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(x::Nemo.FracElem, y::Union{Integer, Rational, AbstractFloat})
+function ==(x::AbstractAlgebra.FracElem, y::Union{Integer, Rational, AbstractFloat})
    return (isone(denominator(x)) && numerator(x) == y) || (numerator(x) == denominator(x)*y)
 end
 
 doc"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.FracElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.FracElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::Union{Integer, Rational, AbstractFloat}, y::Nemo.FracElem) = y == x
+==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.FracElem) = y == x
 
 doc"""
-    =={T <: RingElem}(x::Nemo.FracElem{T}, y::T)
+    =={T <: RingElem}(x::AbstractAlgebra.FracElem{T}, y::T)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-function ==(x::Nemo.FracElem{T}, y::T) where {T <: RingElem}
+function ==(x::AbstractAlgebra.FracElem{T}, y::T) where {T <: RingElem}
    return (isone(denominator(x)) && numerator(x) == y) || (numerator(x) == denominator(x)*y)
 end
 
 doc"""
-    =={T <: RingElem}(x::T, y::Nemo.FracElem{T})
+    =={T <: RingElem}(x::T, y::AbstractAlgebra.FracElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::T, y::Nemo.FracElem{T}) where {T <: RingElem} = y == x
+==(x::T, y::AbstractAlgebra.FracElem{T}) where {T <: RingElem} = y == x
 
 ###############################################################################
 #
@@ -443,10 +443,10 @@ doc"""
 ###############################################################################
 
 doc"""
-    inv(a::Nemo.FracElem)
+    inv(a::AbstractAlgebra.FracElem)
 > Return the inverse of the fraction $a$.
 """
-function inv(a::Nemo.FracElem)
+function inv(a::AbstractAlgebra.FracElem)
    iszero(numerator(a)) && throw(DivideError())
    return parent(a)(denominator(a), numerator(a))
 end
@@ -458,10 +458,10 @@ end
 ###############################################################################
 
 doc"""
-    divexact{T <: RingElem}(a::Nemo.FracElem{T}, b::Nemo.FracElem{T})
+    divexact{T <: RingElem}(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T})
 > Return $a/b$.
 """
-function divexact(a::Nemo.FracElem{T}, b::Nemo.FracElem{T}) where {T <: RingElem}
+function divexact(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
    g1 = gcd(numerator(a), numerator(b))
    g2 = gcd(denominator(b), denominator(a))
@@ -477,10 +477,10 @@ end
 ###############################################################################
 
 doc"""
-    divexact(a::Nemo.FracElem, b::Union{Integer, Rational, AbstractFloat})
+    divexact(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a/b$.
 """
-function divexact(a::Nemo.FracElem, b::Union{Integer, Rational, AbstractFloat})
+function divexact(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    b == 0 && throw(DivideError())
    c = base_ring(a)(b)
    g = gcd(numerator(a), c)
@@ -490,10 +490,10 @@ function divexact(a::Nemo.FracElem, b::Union{Integer, Rational, AbstractFloat})
 end
 
 doc"""
-    divexact(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.FracElem)
+    divexact(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
 > Return $a/b$.
 """
-function divexact(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.FracElem)
+function divexact(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
    iszero(b) && throw(DivideError())
    c = base_ring(b)(a)
    g = gcd(numerator(b), c)
@@ -503,10 +503,10 @@ function divexact(a::Union{Integer, Rational, AbstractFloat}, b::Nemo.FracElem)
 end
 
 doc"""
-    divexact{T <: RingElem}(a::Nemo.FracElem{T}, b::T)
+    divexact{T <: RingElem}(a::AbstractAlgebra.FracElem{T}, b::T)
 > Return $a/b$.
 """
-function divexact(a::Nemo.FracElem{T}, b::T) where {T <: RingElem}
+function divexact(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    iszero(b) && throw(DivideError())
    g = gcd(numerator(a), b)
    n = divexact(numerator(a), g)
@@ -515,10 +515,10 @@ function divexact(a::Nemo.FracElem{T}, b::T) where {T <: RingElem}
 end
 
 doc"""
-    divexact{T <: RingElem}(a::T, b::Nemo.FracElem{T})
+    divexact{T <: RingElem}(a::T, b::AbstractAlgebra.FracElem{T})
 > Return $a/b$.
 """
-function divexact(a::T, b::Nemo.FracElem{T}) where {T <: RingElem}
+function divexact(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    iszero(b) && throw(DivideError())
    g = gcd(numerator(b), a)
    n = denominator(b)*divexact(a, g)
@@ -526,7 +526,7 @@ function divexact(a::T, b::Nemo.FracElem{T}) where {T <: RingElem}
    return parent(b)(n, d)
 end
 
-function divides(a::Nemo.FracElem{T}, b::Nemo.FracElem{T}) where {T <: RingElem}
+function divides(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    iszero(b) && error("Division by zero in divides")
    return true, divexact(a, b)
 end
@@ -538,10 +538,10 @@ end
 ###############################################################################
 
 doc"""
-    ^(a::Nemo.FracElem, b::Int)
+    ^(a::AbstractAlgebra.FracElem, b::Int)
 > Return $a^b$.
 """
-function ^(a::Nemo.FracElem{T}, b::Int) where {T <: RingElem}
+function ^(a::AbstractAlgebra.FracElem{T}, b::Int) where {T <: RingElem}
    if b < 0
       a = inv(a)
       b = -b
@@ -556,13 +556,13 @@ end
 ###############################################################################
 
 doc"""
-    gcd{T <: RingElem}(a::Nemo.FracElem{T}, b::Nemo.FracElem{T})
+    gcd{T <: RingElem}(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T})
 > Return a greatest common divisor of $a$ and $b$ if one exists. N.B: we define
 > the GCD of $a/b$ and $c/d$ to be gcd$(ad, bc)/bd$, reduced to lowest terms.
 > This requires the existence of a greatest common divisor function for the
 > base ring.
 """
-function gcd(a::Nemo.FracElem{T}, b::Nemo.FracElem{T}) where {T <: RingElem}
+function gcd(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
    n = gcd(numerator(a)*denominator(b), denominator(a)*numerator(b))
    d = denominator(a)*denominator(b)
@@ -577,11 +577,11 @@ end
 ################################################################################
 
 doc"""
-    remove{T <: RingElem}(z::Nemo.FracElem{T}, p::T)
+    remove{T <: RingElem}(z::AbstractAlgebra.FracElem{T}, p::T)
 > Return the tuple $n, x$ such that $z = p^nx$ where $x$ has valuation $0$ at
 > $p$.
 """
-function remove(z::Nemo.FracElem{T}, p::T) where {T <: RingElem}
+function remove(z::AbstractAlgebra.FracElem{T}, p::T) where {T <: RingElem}
    iszero(z) && error("Not yet implemented")
    v, d = remove(denominator(z), p)
    w, n = remove(numerator(z), p)
@@ -589,10 +589,10 @@ function remove(z::Nemo.FracElem{T}, p::T) where {T <: RingElem}
 end
 
 doc"""
-    valuation{T <: RingElem}(z::Nemo.FracElem{T}, p::T)
+    valuation{T <: RingElem}(z::AbstractAlgebra.FracElem{T}, p::T)
 > Return the valuation of $z$ at $p$.
 """
-function valuation(z::Nemo.FracElem{T}, p::T) where {T <: RingElem}
+function valuation(z::AbstractAlgebra.FracElem{T}, p::T) where {T <: RingElem}
    v, _ = remove(z, p)
    return v
 end
@@ -603,7 +603,7 @@ end
 #
 ###############################################################################
 
-function zero!(c::Nemo.FracElem)
+function zero!(c::AbstractAlgebra.FracElem)
    c.num = zero!(c.num)
    if !isone(c.den)
       c.den = one(parent(c))
@@ -611,7 +611,7 @@ function zero!(c::Nemo.FracElem)
    return c
 end
 
-function mul!(c::Nemo.FracElem{T}, a::Nemo.FracElem{T}, b::Nemo.FracElem{T}) where {T <: RingElem}
+function mul!(c::AbstractAlgebra.FracElem{T}, a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    g1 = gcd(numerator(a), denominator(b))
    g2 = gcd(numerator(b), denominator(a))
    c.num = divexact(numerator(a), g1)*divexact(numerator(b), g2)
@@ -619,7 +619,7 @@ function mul!(c::Nemo.FracElem{T}, a::Nemo.FracElem{T}, b::Nemo.FracElem{T}) whe
    return c
 end
 
-function addeq!(c::Nemo.FracElem{T}, a::Nemo.FracElem{T}) where {T <: RingElem}
+function addeq!(c::AbstractAlgebra.FracElem{T}, a::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    n = c.num*denominator(a) + numerator(a)*c.den
    c.den = mul!(c.den, c.den, denominator(a))
    g = gcd(n, c.den)
@@ -628,7 +628,7 @@ function addeq!(c::Nemo.FracElem{T}, a::Nemo.FracElem{T}) where {T <: RingElem}
    return c
 end
 
-function add!(c::Nemo.FracElem{T}, a::Nemo.FracElem{T}, b::Nemo.FracElem{T}) where {T <: RingElem}
+function add!(c::AbstractAlgebra.FracElem{T}, a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    n = c.num*denominator(a) + numerator(a)*c.den
    d = c.den*denominator(a)
    g = gcd(n, d)
@@ -637,7 +637,7 @@ function add!(c::Nemo.FracElem{T}, a::Nemo.FracElem{T}, b::Nemo.FracElem{T}) whe
    return c
 end
 
-function addeq!(c::Nemo.FracElem{T}, a::Nemo.FracElem{T}, b::Nemo.FracElem{T}) where {T <: RingElem}
+function addeq!(c::AbstractAlgebra.FracElem{T}, a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    n = numerator(b)*denominator(a) + numerator(a)*denominator(b)
    c.den = mul!(c.den, denominator(b), denominator(a))
    g = gcd(n, d)
@@ -652,7 +652,7 @@ end
 #
 ###############################################################################
 
-function rand(S::Nemo.FracField{T}, v...) where {T <: RingElem}
+function rand(S::AbstractAlgebra.FracField{T}, v...) where {T <: RingElem}
    R = base_ring(S)
    n = rand(R, v...)
    d = R()
@@ -743,13 +743,13 @@ end
 ###############################################################################
 
 doc"""
-    FractionField(R::Nemo.Ring; cached=true)
+    FractionField(R::AbstractAlgebra.Ring; cached=true)
 > Return the parent object of the fraction field over the given base ring $R$.
 > If `cached == true` (the default), the returned parent object is cached so
 > that it will always be returned by a call to the constructor when the same
 > base ring $R$ is supplied.
 """
-function FractionField(R::Nemo.Ring; cached=true)
+function FractionField(R::AbstractAlgebra.Ring; cached=true)
    R2 = R
    T = elem_type(R)
 
