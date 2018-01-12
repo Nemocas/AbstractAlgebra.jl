@@ -49,54 +49,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "types.html#",
-    "page": "Types in AbstractAlgebra.jl",
-    "title": "Types in AbstractAlgebra.jl",
-    "category": "page",
-    "text": ""
-},
-
-{
-    "location": "types.html#Types-in-AbstractAlgebra.jl-1",
-    "page": "Types in AbstractAlgebra.jl",
-    "title": "Types in AbstractAlgebra.jl",
-    "category": "section",
-    "text": "On this page we discuss the abstract type hierarchy in AbstractAlgebra.jl and objects known as parents which contain additional information about groups, rings, fields and modules, etc., that can't be stored in types alone.These details are technical and can be skipped or skimmed by new users of  Julia/AbstractAlgebra.jl. Types are almost never dealt with directly when scripting  AbstractAlgebra.jl to do mathematical computations. In contrast, AbstractAlgebra.jl developers will want to know how we model mathematical objects and their rings, fields, groups, etc."
-},
-
-{
-    "location": "types.html#The-abstract-type-hierarchy-in-AbstractAlgebra.jl-1",
-    "page": "Types in AbstractAlgebra.jl",
-    "title": "The abstract type hierarchy in AbstractAlgebra.jl",
-    "category": "section",
-    "text": "Abstract types in Julia can also belong to one another in a hierarchy. We make use of such a hierarchy to organise the kinds of mathematical objects in AbstractAlgebra.jl.For example, the AbstractAlgebra.Field abstract type belongs to the  AbstractAlgebra.Ring abstract type. In practice, this means that any generic function in AbstractAlgebra.jl which is designed to work with ring objects will also work with field objects.In AbstractAlgebra.jl we also distinguish between the elements of a field, say, and the field itself.For example, we have an object of type Generic.PolyRing to model a generic polynomial ring, and elements of that polynomial ring would have type Generic.Poly. For this purpose, we also have a hierarchy of abstract types, such as FieldElem, that the types of element objects can belong to.(Image: alt text)"
-},
-
-{
-    "location": "types.html#Why-types-aren't-enough-1",
-    "page": "Types in AbstractAlgebra.jl",
-    "title": "Why types aren't enough",
-    "category": "section",
-    "text": "Naively, one might have expected that rings in AbstractAlgebra.jl could be modeled as types and their elements as objects with the given type. But there are various reasons why this is not a good model.Consider the ring R = mathbbZnmathbbZ for a multiprecision integer n. If we were to model the ring R as a type, then the type would somehow need to contain the modulus n. This is not possible in Julia, and in fact it is not desirable, since the compiler would then recompile all the associated functions every time a different modulus n was used.We could attach the modulus n to the objects representing elements of the ring, rather than their type.But now we cannot create new elements of the ring mathbbZnmathbbZ given only their type, since the type no longer contains the modulus n.Instead, the way we get around this in AbstractAlgebra.jl is to have special (singleton) objects that act like types, but are really just ordinary Julia objects. These objects, called parent objects can contain extra information, such as the modulus n. In order to create new elements of mathbbZnmathbbZ as above, we overload the call operator for the parent object.In the following AbstractAlgebra.jl example, we create the parent object R corresponding to the ring mathbbZ7mathbbZ. We then create a new element a of this ring by calling the parent object R.R = ResidueRing(JuliaZZ, 7)\na = R(3)Here, R is the parent object, containing the modulus 7. So this example creates  the element a = 3 pmod7."
-},
-
-{
-    "location": "types.html#More-complex-example-of-parent-objects-1",
-    "page": "Types in AbstractAlgebra.jl",
-    "title": "More complex example of parent objects",
-    "category": "section",
-    "text": "Here is some Julia/AbstractAlgebra.jl code which constructs a polynomial ring over the integers, a polynomial in that ring and then does some introspection to illustrate the various relations between the objects and types.using AbstractAlgebra\n\nR, x = JuliaZZ[\"x\"]\n\nf = x^2 + 3x + 1\n\ntypeof(R) <: PolyRing\n\ntypeof(f) <: PolyElem\n\nparent(f) == R"
-},
-
-{
-    "location": "types.html#Concrete-types-in-AbstractAlgebra.jl-1",
-    "page": "Types in AbstractAlgebra.jl",
-    "title": "Concrete types in AbstractAlgebra.jl",
-    "category": "section",
-    "text": "Here we give a list of the concrete types in AbstractAlgebra.jl.In parentheses we put the types of the corresponding parent objects.gfelem{<:Integer} (GFField{<:Integer})We also think of various Julia types as though they were AbstractAlgebra.jl types:BigInt (Integers{BigInt})\nRational{BigInt} (Rationals{BigInt})Then there are various types for generic constructions over a base ring. They are all parameterised by a type T which is the type of the elements of the base ring they are defined over. Generic.Poly{T} (Generic.PolyRing{T})\nGeneric.MPoly{T} (Generic.MPolyRing{T})\nGeneric.RelSeries{T} (Generic.RelSeriesRing{T})\nGeneric.AbsSeries{T} (Generic.AbsSeriesRing{T})\nGeneric.LaurentSeriesRingElem{T} (Generic.LaurentSeriesRing{T})\nGeneric.LaurentSeriesFieldElem{T} (Generic.LaurentSeriesField{T})\nGeneric.Res{T} (Generic.ResRing{T})\nGeneric.Frac{T} (Generic.FracField{T})\nGeneric.Mat{T} (Generic.MatSpace{T})"
-},
-
-{
     "location": "constructors.html#",
     "page": "Constructing mathematical objects in Nemo",
     "title": "Constructing mathematical objects in Nemo",
@@ -142,6 +94,54 @@ var documenterSearchIndex = {"docs": [
     "title": "List of parent object constructors",
     "category": "section",
     "text": "For convenience, we provide a list of all the parent object constructors in Nemo and explain what domains they represent.Mathematics Nemo constructor\nR = mathbbZ R = ZZ\nR = mathbbQ R = QQ\nR = mathbbF_p^n R, a = FiniteField(p, n, \"a\")\nR = mathbbZnmathbbZ R = ResidueRing(ZZ, n)\nS = Rx S, x = PolynomialRing(R, \"x\")\nS = Rx (to precision n) S, x = PowerSeriesRing(R, n, \"x\")\nS = mboxFrac_R S = FractionField(R)\nS = R(f) S = ResidueRing(R, f)\nS = mboxMat_mtimes n(R) S = MatrixSpace(R, m, n)\nS = mathbbQx(f) S, a = NumberField(f, \"a\")\nO = mathcalO_K S = MaximalOrder(K)\nideal I of O = mathcalO_K I = Ideal(O, gens, ...)"
+},
+
+{
+    "location": "types.html#",
+    "page": "Appendix A: Types in AbstractAlgebra.jl",
+    "title": "Appendix A: Types in AbstractAlgebra.jl",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "types.html#Appendix-A:-Types-in-AbstractAlgebra.jl-1",
+    "page": "Appendix A: Types in AbstractAlgebra.jl",
+    "title": "Appendix A: Types in AbstractAlgebra.jl",
+    "category": "section",
+    "text": "On this page we discuss the abstract type hierarchy in AbstractAlgebra.jl and objects known as parents which contain additional information about groups, rings, fields and modules, etc., that can't be stored in types alone.These details are technical and can be skipped or skimmed by new users of  Julia/AbstractAlgebra.jl. Types are almost never dealt with directly when scripting  AbstractAlgebra.jl to do mathematical computations. In contrast, AbstractAlgebra.jl developers will want to know how we model mathematical objects and their rings, fields, groups, etc."
+},
+
+{
+    "location": "types.html#The-abstract-type-hierarchy-in-AbstractAlgebra.jl-1",
+    "page": "Appendix A: Types in AbstractAlgebra.jl",
+    "title": "The abstract type hierarchy in AbstractAlgebra.jl",
+    "category": "section",
+    "text": "Abstract types in Julia can also belong to one another in a hierarchy. We make use of such a hierarchy to organise the kinds of mathematical objects in AbstractAlgebra.jl.For example, the AbstractAlgebra.Field abstract type belongs to the  AbstractAlgebra.Ring abstract type. In practice, this means that any generic function in AbstractAlgebra.jl which is designed to work with ring objects will also work with field objects.In AbstractAlgebra.jl we also distinguish between the elements of a field, say, and the field itself.For example, we have an object of type Generic.PolyRing to model a generic polynomial ring, and elements of that polynomial ring would have type Generic.Poly. For this purpose, we also have a hierarchy of abstract types, such as FieldElem, that the types of element objects can belong to.(Image: alt text)"
+},
+
+{
+    "location": "types.html#Why-types-aren't-enough-1",
+    "page": "Appendix A: Types in AbstractAlgebra.jl",
+    "title": "Why types aren't enough",
+    "category": "section",
+    "text": "Naively, one might have expected that rings in AbstractAlgebra.jl could be modeled as types and their elements as objects with the given type. But there are various reasons why this is not a good model.Consider the ring R = mathbbZnmathbbZ for a multiprecision integer n. If we were to model the ring R as a type, then the type would somehow need to contain the modulus n. This is not possible in Julia, and in fact it is not desirable, since the compiler would then recompile all the associated functions every time a different modulus n was used.We could attach the modulus n to the objects representing elements of the ring, rather than their type.But now we cannot create new elements of the ring mathbbZnmathbbZ given only their type, since the type no longer contains the modulus n.Instead, the way we get around this in AbstractAlgebra.jl is to have special (singleton) objects that act like types, but are really just ordinary Julia objects. These objects, called parent objects can contain extra information, such as the modulus n. In order to create new elements of mathbbZnmathbbZ as above, we overload the call operator for the parent object.In the following AbstractAlgebra.jl example, we create the parent object R corresponding to the ring mathbbZ7mathbbZ. We then create a new element a of this ring by calling the parent object R.R = ResidueRing(JuliaZZ, 7)\na = R(3)Here, R is the parent object, containing the modulus 7. So this example creates  the element a = 3 pmod7."
+},
+
+{
+    "location": "types.html#More-complex-example-of-parent-objects-1",
+    "page": "Appendix A: Types in AbstractAlgebra.jl",
+    "title": "More complex example of parent objects",
+    "category": "section",
+    "text": "Here is some Julia/AbstractAlgebra.jl code which constructs a polynomial ring over the integers, a polynomial in that ring and then does some introspection to illustrate the various relations between the objects and types.using AbstractAlgebra\n\nR, x = JuliaZZ[\"x\"]\n\nf = x^2 + 3x + 1\n\ntypeof(R) <: PolyRing\n\ntypeof(f) <: PolyElem\n\nparent(f) == R"
+},
+
+{
+    "location": "types.html#Concrete-types-in-AbstractAlgebra.jl-1",
+    "page": "Appendix A: Types in AbstractAlgebra.jl",
+    "title": "Concrete types in AbstractAlgebra.jl",
+    "category": "section",
+    "text": "Here we give a list of the concrete types in AbstractAlgebra.jl.In parentheses we put the types of the corresponding parent objects.gfelem{<:Integer} (GFField{<:Integer})We also think of various Julia types as though they were AbstractAlgebra.jl types:BigInt (Integers{BigInt})\nRational{BigInt} (Rationals{BigInt})Then there are various types for generic constructions over a base ring. They are all parameterised by a type T which is the type of the elements of the base ring they are defined over. Generic.Poly{T} (Generic.PolyRing{T})\nGeneric.MPoly{T} (Generic.MPolyRing{T})\nGeneric.RelSeries{T} (Generic.RelSeriesRing{T})\nGeneric.AbsSeries{T} (Generic.AbsSeriesRing{T})\nGeneric.LaurentSeriesRingElem{T} (Generic.LaurentSeriesRing{T})\nGeneric.LaurentSeriesFieldElem{T} (Generic.LaurentSeriesField{T})\nGeneric.Res{T} (Generic.ResRing{T})\nGeneric.Frac{T} (Generic.FracField{T})\nGeneric.Mat{T} (Generic.MatSpace{T})"
 },
 
 ]}
