@@ -77,7 +77,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Constructing mathematical objects in AbstractAlgebra.jl",
     "title": "How we construct objects in AbstractAlgebra.jl",
     "category": "section",
-    "text": "As we explain in Appendix A, Julia types don't contain enough information to properly model groups, rings, fields, etc. Instead of using types to construct objects, we use special objects that we refer to as parent objects. They behave a lot like Julia types.Consider the following simple example, to create a Flint multiprecision integer:n = JuliaZZ(\"12345678765456787654567890987654567898765678909876567890\")Here JuliaZZ is not a Julia type, but a callable object. However, for most purposes one can think of such a parent object as though it were a type."
+    "text": "As we explain in Appendix A, Julia types don't contain enough information to properly model groups, rings, fields, etc. Instead of using types to construct objects, we use special objects that we refer to as parent objects. They behave a lot like Julia types.Consider the following simple example, to create a multiprecision integer:n = JuliaZZ(\"12345678765456787654567890987654567898765678909876567890\")Here JuliaZZ is not a Julia type, but a callable object. However, for most purposes one can think of such a parent object as though it were a type."
 },
 
 {
