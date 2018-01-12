@@ -54,3 +54,4 @@ The benefits of Julia include
 The main benefits for Nemo are the parametric type system and JIT compilation. The former allows us to
 model many mathematical types, e.g. generic polynomial rings over an arbitrary base ring. The latter
 speeds up the runtime performance, even of highly generic mathematical procedures.
+

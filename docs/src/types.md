@@ -89,7 +89,7 @@ branches in its abstract type hierarchy, as shown in the following diagram. One 
 abstract types for the domains available in Nemo and the other branch is for the abstract types for
 elements of those domains. 
 
-![alt text](img/types.png "Abstract type hierarchy")
+![alt text](img/types.png)
 
 All objects in Nemo, whether they represent rings, fields, groups, sets, etc. on the one hand, or ring
 elements, field elements, etc. on the other hand, have concrete types that belong to one of the abstract
