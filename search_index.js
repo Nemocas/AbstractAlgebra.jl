@@ -2,42 +2,42 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "index.html#",
-    "page": "Nemo",
-    "title": "Nemo",
+    "page": "AbstractAlgebra.jl",
+    "title": "AbstractAlgebra.jl",
     "category": "page",
     "text": ""
 },
 
 {
-    "location": "index.html#Nemo-1",
-    "page": "Nemo",
-    "title": "Nemo",
+    "location": "index.html#AbstractAlgebra.jl-1",
+    "page": "AbstractAlgebra.jl",
+    "title": "AbstractAlgebra.jl",
     "category": "section",
     "text": ""
 },
 
 {
     "location": "index.html#Introduction-1",
-    "page": "Nemo",
+    "page": "AbstractAlgebra.jl",
     "title": "Introduction",
     "category": "section",
-    "text": "Nemo is a computer algebra package for the Julia programming language, maintained by William Hart,  Tommy Hofmann, Claus Fieker, Fredrik Johansson with additional code by Oleksandr Motsak and other contributors.http://nemocas.org (Website)\nhttps://github.com/Nemocas/Nemo.jl (Source code)\nhttp://nemocas.github.io/Nemo.jl/latest/ (Online documentation)The features of Nemo so far include:Multiprecision integers and rationals\nIntegers modulo n\np-adic numbers\nFinite fields (prime and non-prime order)\nNumber field arithmetic\nMaximal orders of number fields\nArithmetic of ideals in maximal orders\nArbitrary precision real and complex balls\nUnivariate polynomials and matrices over the above\nGeneric polynomials, power series, fraction fields, residue rings and matrices"
+    "text": "AbstractAlgebra.jl is a computer algebra package for the Julia programming language,  maintained by William Hart, Tommy Hofmann, Claus Fieker and Fredrik Johansson.[https://github.com/Nemocas/AbstractAlgebra.jl](https://github.com/Nemocas/AbstractAlgebra.jl) (Source code)[http://nemocas.github.io/AbstractAlgebra.jl](http://nemocas.github.io/AbstractAlgebra.jl) (Online documentation)AbstractAlgebra.jl grew out of the Nemo project after a number of requests from the community for the pure Julia part of Nemo to be split off into a separate project. See the Nemo website for more details about Nemo.http://nemocas.org (Website)The features of AbstractAlgebra.jl include:Julia multiprecision integers and rationals\nFinite fields (prime order)\nNumber fields\nUnivariate polynomials\nMultivariate polynomials\nRelative and absolute power series\nLaurent series\nFraction fields\nResidue rings, including mathbbZnmathbbZ\nMatrices and linear algebraAll implementations are fully recursive and generic, so that one can build matrices over polynomial rings, over a finite field, for example.AbstractAlgebra.jl also provides a set of abstract types for Groups, Rings, Fields, Modules and elements thereof, which allow external types to be made part of the AbstractAlgebra.jl type hierarchy."
 },
 
 {
     "location": "index.html#Installation-1",
-    "page": "Nemo",
+    "page": "AbstractAlgebra.jl",
     "title": "Installation",
     "category": "section",
-    "text": "To use Nemo we require Julia 0.4 or higher. Please see http://julialang.org/downloads for instructions on how to obtain julia for your system.At the Julia prompt simply typejulia> Pkg.add(\"Nemo\")\njulia> Pkg.build(\"Nemo\")Alternatively, if you don't want to set Julia up yourself, Julia and Nemo are available on https://cloud.sagemath.com/."
+    "text": "To use AbstractAlgebra we require Julia 0.6 or higher. Please see http://julialang.org/downloads for instructions on  how to obtain Julia for your system.At the Julia prompt simply typejulia> Pkg.add(\"AbstractAlgebra\")"
 },
 
 {
     "location": "index.html#Quick-start-1",
-    "page": "Nemo",
+    "page": "AbstractAlgebra.jl",
     "title": "Quick start",
     "category": "section",
-    "text": "Here are some examples of using Nemo.This example computes recursive univariate polynomials.julia> using Nemo\n\njulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integer Ring,x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integer Ring,y)\n\njulia> T, z = PolynomialRing(S, \"z\")\n(Univariate Polynomial Ring in z over Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integer Ring,z)\n\njulia> f = x + y + z + 1\nz+(y+(x+1))\n\njulia> p = f^30; # semicolon supresses output\n\njulia> @time q = p*(p+1);\n  0.325521 seconds (140.64 k allocations: 3.313 MB)Here is an example using generic recursive ring constructions.julia> using Nemo\n\njulia> R, x = FiniteField(7, 11, \"x\")\n(Finite field of degree 11 over F_7,x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Finite field of degree 11 over F_7,y)\n\njulia> T = ResidueRing(S, y^3 + 3x*y + 1)\nResidue ring of Univariate Polynomial Ring in y over Finite field of degree 11 over F_7 modulo y^3+(3*x)*y+(1)\n\njulia> U, z = PolynomialRing(T, \"z\")\n(Univariate Polynomial Ring in z over Residue ring of Univariate Polynomial Ring in y over Finite field of degree 11 over F_7 modulo y^3+(3*x)*y+(1),z)\n\njulia> f = (3y^2 + y + x)*z^2 + ((x + 2)*y^2 + x + 1)*z + 4x*y + 3;\n\njulia> g = (7y^2 - y + 2x + 7)*z^2 + (3y^2 + 4x + 1)*z + (2x + 1)*y + 1;\n\njulia> s = f^12;\n\njulia> t = (s + g)^12;\n\njulia> @time resultant(s, t)\n  0.426612 seconds (705.88 k allocations: 52.346 MB, 2.79% gc time)\n(x^10+4*x^8+6*x^7+3*x^6+4*x^5+x^4+6*x^3+5*x^2+x)*y^2+(5*x^10+x^8+4*x^7+3*x^5+5*x^4+3*x^3+x^2+x+6)*y+(2*x^10+6*x^9+5*x^8+5*x^7+x^6+6*x^5+5*x^4+4*x^3+x+3)Here is an example using matrices.julia> using Nemo\n\njulia> M = MatrixSpace(R, 40, 40)();\n\njulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integer Ring,x)\n\njulia> M = MatrixSpace(R, 40, 40)();\n\njulia> for i in 1:40\n          for j in 1:40\n             M[i, j] = R(map(fmpz, rand(-20:20, 3)))\n          end\n       end\n\njulia> @time det(M);\n  0.174888 seconds (268.40 k allocations: 26.537 MB, 4.47% gc time)And here is an example with power series.julia> using Nemo\n\njulia> R, x = QQ[\"x\"]\n(Univariate Polynomial Ring in x over Rational Field,x)\n\njulia> S, t = PowerSeriesRing(R, 100, \"t\")\n(Univariate power series ring in t over Univariate Polynomial Ring in x over Rational Field,t+O(t^101))\n\njulia> u = t + O(t^100)\nt+O(t^100)\n\njulia> @time divexact((u*exp(x*u)), (exp(u)-1));\n  0.042663 seconds (64.01 k allocations: 1.999 MB, 15.40% gc time)"
+    "text": "Here are some examples of using AbstractAlgebra.jl..This example computes recursive univariate polynomials.using AbstractAlgebra\n\nR, (x, y, z) = PolynomialRing(JuliaZZ, [\"x\", \"y\", \"z\"])\n\nf = x + y + z + 1\n\np = f^20;\n\n@time q = p*(p+1);Here is an example using generic recursive ring constructions.using AbstractAlgebra\n\nR = GF(7)\n\nS, y = PolynomialRing(R, \"y\")\n\nT = ResidueRing(S, y^3 + 3y + 1)\n\nU, z = PolynomialRing(T, \"z\")\n\nf = (3y^2 + y + 2)*z^2 + (2*y^2 + 1)*z + 4y + 3;\n\ng = (7y^2 - y + 7)*z^2 + (3y^2 + 1)*z + 2y + 1;\n\ns = f^4;\n\nt = (s + g)^4;\n\n@time resultant(s, t)Here is an example using matrices.using AbstractAlgebra\n\nR, x = PolynomialRing(JuliaZZ, \"x\")\n\nS = MatrixSpace(R, 10, 10)\n\nM = rand(S, 0:3, -10:10);\n\n@time det(M)And here is an example with power series.using AbstractAlgebra\n\nR, x = JuliaQQ[\"x\"]\n\nS, t = PowerSeriesRing(R, 30, \"t\")\n\nu = t + O(t^100)\n\n@time divexact((u*exp(x*u)), (exp(u)-1));"
 },
 
 {
@@ -69,7 +69,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Nemo",
     "title": "Why Julia?",
     "category": "section",
-    "text": "Julia is a sophisticated, modern programming language which is designed to be both performant and flexible. It was written by mathematicians, for mathematicians.The benefits of Julia includeFamiliar imperative syntax\nJIT compilation (provides near native performance, even for highly generic code)\nREPL console (cuts down on development time)\nParametric types (allows for fast generic constructions over other data types)\nPowerful metaprogramming facilities\nOperator overloading\nMultiple dispatch (dispatch on every argument of a function)\nEfficient native C interface (no wrapper overhead)\nExperimental C++ interface\nDynamic type inference\nBuilt-in bignums\nAble to be embedded in C programs\nHigh performance collection types (dictionaries, iterators, arrays, etc.)\nJupyter support (for web based notebooks)The main benefits for Nemo are the parametric type system and JIT compilation. The former allows us to model many mathematical types, e.g. generic polynomial rings over an arbitrary base ring. The latter speeds up the runtime performance, even of highly generic mathematical procedures.R, x = PolynomialRing(JuliaZZ, \"x\")"
+    "text": "Julia is a sophisticated, modern programming language which is designed to be both performant and flexible. It was written by mathematicians, for mathematicians.The benefits of Julia includeFamiliar imperative syntax\nJIT compilation (provides near native performance, even for highly generic code)\nREPL console (cuts down on development time)\nParametric types (allows for fast generic constructions over other data types)\nPowerful metaprogramming facilities\nOperator overloading\nMultiple dispatch (dispatch on every argument of a function)\nEfficient native C interface (no wrapper overhead)\nExperimental C++ interface\nDynamic type inference\nBuilt-in bignums\nAble to be embedded in C programs\nHigh performance collection types (dictionaries, iterators, arrays, etc.)\nJupyter support (for web based notebooks)The main benefits for Nemo are the parametric type system and JIT compilation. The former allows us to model many mathematical types, e.g. generic polynomial rings over an arbitrary base ring. The latter speeds up the runtime performance, even of highly generic mathematical procedures."
 },
 
 {
