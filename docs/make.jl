@@ -1,10 +1,10 @@
-using Documenter, Nemo
+using Documenter, AbstractAlgebra
 
 makedocs()
 
 deploydocs(
    deps   = Deps.pip("mkdocs", "python-markdown-math"),
-   repo = "github.com/Nemocas/Nemo.jl.git",
-   julia = "0.5"
+   repo = "github.com/Nemocas/AbstractAlgebra.jl.git",
+   julia = "0.6"
 )
 
