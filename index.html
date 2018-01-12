@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Nemo · AbstractAlgebra.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link href="assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>AbstractAlgebra.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="search.html"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li class="current"><a class="toctext" href="index.html">Nemo</a><ul class="internal"><li><a class="toctext" href="#Introduction-1">Introduction</a></li><li><a class="toctext" href="#Installation-1">Installation</a></li><li><a class="toctext" href="#Quick-start-1">Quick start</a></li></ul></li><li><a class="toctext" href="about.html">Nemo</a></li><li><a class="toctext" href="types.html">Types in Nemo</a></li><li><a class="toctext" href="constructors.html">Constructing mathematical objects in Nemo</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href="index.html">Nemo</a></li></ul><a class="edit-page" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/master/docs/src/index.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Nemo</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Nemo-1" href="#Nemo-1">Nemo</a></h1><h2><a class="nav-anchor" id="Introduction-1" href="#Introduction-1">Introduction</a></h2><p>Nemo is a computer algebra package for the Julia programming language, maintained by William Hart,  Tommy Hofmann, Claus Fieker, Fredrik Johansson with additional code by Oleksandr Motsak and other contributors.</p><ul><li><p><a href="http://nemocas.org">http://nemocas.org</a> (Website)</p></li><li><p><a href="https://github.com/Nemocas/Nemo.jl">https://github.com/Nemocas/Nemo.jl</a> (Source code)</p></li><li><p><a href="http://nemocas.github.io/Nemo.jl/latest/">http://nemocas.github.io/Nemo.jl/latest/</a> (Online documentation)</p></li></ul><p>The features of Nemo so far include:</p><ul><li><p>Multiprecision integers and rationals</p></li><li><p>Integers modulo n</p></li><li><p>p-adic numbers</p></li><li><p>Finite fields (prime and non-prime order)</p></li><li><p>Number field arithmetic</p></li><li><p>Maximal orders of number fields</p></li><li><p>Arithmetic of ideals in maximal orders</p></li><li><p>Arbitrary precision real and complex balls</p></li><li><p>Univariate polynomials and matrices over the above</p></li><li><p>Generic polynomials, power series, fraction fields, residue rings and matrices</p></li></ul><h2><a class="nav-anchor" id="Installation-1" href="#Installation-1">Installation</a></h2><p>To use Nemo we require Julia 0.4 or higher. Please see <a href="http://julialang.org/downloads/">http://julialang.org/downloads</a> for instructions on how to obtain julia for your system.</p><p>At the Julia prompt simply type</p><pre><code class="language-none">julia&gt; Pkg.add(&quot;Nemo&quot;)
+julia&gt; Pkg.build(&quot;Nemo&quot;)</code></pre><p>Alternatively, if you don&#39;t want to set Julia up yourself, Julia and Nemo are available on <a href="https://cloud.sagemath.com/">https://cloud.sagemath.com/</a>.</p><h2><a class="nav-anchor" id="Quick-start-1" href="#Quick-start-1">Quick start</a></h2><p>Here are some examples of using Nemo.</p><p>This example computes recursive univariate polynomials.</p><pre><code class="language-none">julia&gt; using Nemo
+
+julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Integer Ring,x)
+
+julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integer Ring,y)
+
+julia&gt; T, z = PolynomialRing(S, &quot;z&quot;)
+(Univariate Polynomial Ring in z over Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integer Ring,z)
+
+julia&gt; f = x + y + z + 1
+z+(y+(x+1))
+
+julia&gt; p = f^30; # semicolon supresses output
+
+julia&gt; @time q = p*(p+1);
+  0.325521 seconds (140.64 k allocations: 3.313 MB)</code></pre><p>Here is an example using generic recursive ring constructions.</p><pre><code class="language-none">julia&gt; using Nemo
+
+julia&gt; R, x = FiniteField(7, 11, &quot;x&quot;)
+(Finite field of degree 11 over F_7,x)
+
+julia&gt; S, y = PolynomialRing(R, &quot;y&quot;)
+(Univariate Polynomial Ring in y over Finite field of degree 11 over F_7,y)
+
+julia&gt; T = ResidueRing(S, y^3 + 3x*y + 1)
+Residue ring of Univariate Polynomial Ring in y over Finite field of degree 11 over F_7 modulo y^3+(3*x)*y+(1)
+
+julia&gt; U, z = PolynomialRing(T, &quot;z&quot;)
+(Univariate Polynomial Ring in z over Residue ring of Univariate Polynomial Ring in y over Finite field of degree 11 over F_7 modulo y^3+(3*x)*y+(1),z)
+
+julia&gt; f = (3y^2 + y + x)*z^2 + ((x + 2)*y^2 + x + 1)*z + 4x*y + 3;
+
+julia&gt; g = (7y^2 - y + 2x + 7)*z^2 + (3y^2 + 4x + 1)*z + (2x + 1)*y + 1;
+
+julia&gt; s = f^12;
+
+julia&gt; t = (s + g)^12;
+
+julia&gt; @time resultant(s, t)
+  0.426612 seconds (705.88 k allocations: 52.346 MB, 2.79% gc time)
+(x^10+4*x^8+6*x^7+3*x^6+4*x^5+x^4+6*x^3+5*x^2+x)*y^2+(5*x^10+x^8+4*x^7+3*x^5+5*x^4+3*x^3+x^2+x+6)*y+(2*x^10+6*x^9+5*x^8+5*x^7+x^6+6*x^5+5*x^4+4*x^3+x+3)</code></pre><p>Here is an example using matrices.</p><pre><code class="language-none">julia&gt; using Nemo
+
+julia&gt; M = MatrixSpace(R, 40, 40)();
+
+julia&gt; R, x = PolynomialRing(ZZ, &quot;x&quot;)
+(Univariate Polynomial Ring in x over Integer Ring,x)
+
+julia&gt; M = MatrixSpace(R, 40, 40)();
+
+julia&gt; for i in 1:40
+          for j in 1:40
+             M[i, j] = R(map(fmpz, rand(-20:20, 3)))
+          end
+       end
+
+julia&gt; @time det(M);
+  0.174888 seconds (268.40 k allocations: 26.537 MB, 4.47% gc time)</code></pre><p>And here is an example with power series.</p><pre><code class="language-none">julia&gt; using Nemo
+
+julia&gt; R, x = QQ[&quot;x&quot;]
+(Univariate Polynomial Ring in x over Rational Field,x)
+
+julia&gt; S, t = PowerSeriesRing(R, 100, &quot;t&quot;)
+(Univariate power series ring in t over Univariate Polynomial Ring in x over Rational Field,t+O(t^101))
+
+julia&gt; u = t + O(t^100)
+t+O(t^100)
+
+julia&gt; @time divexact((u*exp(x*u)), (exp(u)-1));
+  0.042663 seconds (64.01 k allocations: 1.999 MB, 15.40% gc time)</code></pre><footer><hr/><a class="next" href="about.html"><span class="direction">Next</span><span class="title">Nemo</span></a></footer></article></body></html>
