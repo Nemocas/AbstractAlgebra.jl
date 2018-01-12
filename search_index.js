@@ -21,7 +21,15 @@ var documenterSearchIndex = {"docs": [
     "page": "AbstractAlgebra.jl",
     "title": "Introduction",
     "category": "section",
-    "text": "AbstractAlgebra.jl is a computer algebra package for the Julia programming language,  maintained by William Hart, Tommy Hofmann, Claus Fieker and Fredrik Johansson.[https://github.com/Nemocas/AbstractAlgebra.jl](https://github.com/Nemocas/AbstractAlgebra.jl) (Source code)[http://nemocas.github.io/AbstractAlgebra.jl](http://nemocas.github.io/AbstractAlgebra.jl) (Online documentation)AbstractAlgebra.jl grew out of the Nemo project after a number of requests from the community for the pure Julia part of Nemo to be split off into a separate project. See the Nemo website for more details about Nemo.http://nemocas.org (Website)The features of AbstractAlgebra.jl include:Julia multiprecision integers and rationals\nFinite fields (prime order)\nNumber fields\nUnivariate polynomials\nMultivariate polynomials\nRelative and absolute power series\nLaurent series\nFraction fields\nResidue rings, including mathbbZnmathbbZ\nMatrices and linear algebraAll implementations are fully recursive and generic, so that one can build matrices over polynomial rings, over a finite field, for example.AbstractAlgebra.jl also provides a set of abstract types for Groups, Rings, Fields, Modules and elements thereof, which allow external types to be made part of the AbstractAlgebra.jl type hierarchy."
+    "text": "AbstractAlgebra.jl is a computer algebra package for the Julia programming language,  maintained by William Hart, Tommy Hofmann, Claus Fieker and Fredrik Johansson.[Source code](https://github.com/Nemocas/AbstractAlgebra.jl)[Online documentation](http://nemocas.github.io/AbstractAlgebra.jl)AbstractAlgebra.jl grew out of the Nemo project after a number of requests from the community for the pure Julia part of Nemo to be split off into a separate project. See the Nemo website for more details about Nemo.Nemo website"
+},
+
+{
+    "location": "index.html#Features-1",
+    "page": "AbstractAlgebra.jl",
+    "title": "Features",
+    "category": "section",
+    "text": "The features of AbstractAlgebra.jl include:Julia multiprecision integers and rationals\nFinite fields (prime order)\nNumber fields\nUnivariate polynomials\nMultivariate polynomials\nRelative and absolute power series\nLaurent series\nFraction fields\nResidue rings, including mathbbZnmathbbZ\nMatrices and linear algebraAll implementations are fully recursive and generic, so that one can build matrices over polynomial rings, over a finite field, for example.AbstractAlgebra.jl also provides a set of abstract types for Groups, Rings, Fields, Modules and elements thereof, which allow external types to be made part of the AbstractAlgebra.jl type hierarchy."
 },
 
 {
