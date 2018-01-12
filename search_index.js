@@ -21,7 +21,7 @@ var documenterSearchIndex = {"docs": [
     "page": "AbstractAlgebra.jl",
     "title": "Introduction",
     "category": "section",
-    "text": "AbstractAlgebra.jl is a computer algebra package for the Julia programming language,  maintained by William Hart, Tommy Hofmann, Claus Fieker and Fredrik Johansson.[Source code](https://github.com/Nemocas/AbstractAlgebra.jl)[Online documentation](http://nemocas.github.io/AbstractAlgebra.jl)AbstractAlgebra.jl grew out of the Nemo project after a number of requests from the community for the pure Julia part of Nemo to be split off into a separate project. See the Nemo website for more details about Nemo.Nemo website"
+    "text": "AbstractAlgebra.jl is a computer algebra package for the Julia programming language,  maintained by William Hart, Tommy Hofmann, Claus Fieker and Fredrik Johansson.Source code\nOnline documentationAbstractAlgebra.jl grew out of the Nemo project after a number of requests from the community for the pure Julia part of Nemo to be split off into a separate project. See the Nemo website for more details about Nemo.Nemo website"
 },
 
 {
