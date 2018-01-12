@@ -5,9 +5,8 @@ makedocs(
          sitename = "AbstractAlgebra.jl",
          pages    = [
              "index.md",
-             "about.md",
-             "types.md",
-             "constructors.md"
+             "constructors.md",
+             "types.md"
          ]
 )
 

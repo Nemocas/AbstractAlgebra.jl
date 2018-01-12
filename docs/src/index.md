@@ -1,137 +1,120 @@
-# Nemo
+# AbstractAlgebra.jl
 
 ## Introduction
 
-Nemo is a computer algebra package for the Julia programming language, maintained by William Hart, 
-Tommy Hofmann, Claus Fieker, Fredrik Johansson with additional code by Oleksandr Motsak and other
-contributors.
+AbstractAlgebra.jl is a computer algebra package for the Julia programming language, 
+maintained by William Hart, Tommy Hofmann, Claus Fieker and Fredrik Johansson and
+other interested contributors.
 
-- [http://nemocas.org](http://nemocas.org) (Website)
-- [https://github.com/Nemocas/Nemo.jl](https://github.com/Nemocas/Nemo.jl) (Source code)
-- [http://nemocas.github.io/Nemo.jl/latest/](http://nemocas.github.io/Nemo.jl/latest/) (Online documentation)
+- [Source code](https://github.com/Nemocas/AbstractAlgebra.jl)
+- [Online documentation](http://nemocas.github.io/AbstractAlgebra.jl)
 
-The features of Nemo so far include:
+AbstractAlgebra.jl grew out of the Nemo project after a number of requests from the
+community for the pure Julia part of Nemo to be split off into a separate project. See
+the Nemo website for more details about Nemo.
+ 
+- [Nemo website](http://nemocas.org)
 
-  - Multiprecision integers and rationals
-  - Integers modulo n
-  - p-adic numbers
-  - Finite fields (prime and non-prime order)
-  - Number field arithmetic
-  - Maximal orders of number fields
-  - Arithmetic of ideals in maximal orders
-  - Arbitrary precision real and complex balls
-  - Univariate polynomials and matrices over the above
-  - Generic polynomials, power series, fraction fields, residue rings and matrices
+## Features
+
+The features of AbstractAlgebra.jl include:
+
+  - Use of Julia multiprecision integers and rationals
+  - Finite fields (prime order)
+  - Number fields
+  - Univariate polynomials
+  - Multivariate polynomials
+  - Relative and absolute power series
+  - Laurent series
+  - Fraction fields
+  - Residue rings, including ``\mathbb{Z}/n\mathbb{Z}``
+  - Matrices and linear algebra
+
+All implementations are fully recursive and generic, so that one can build matrices
+over polynomial rings, over a finite field, for example.
+
+AbstractAlgebra.jl also provides a set of abstract types for Groups, Rings, Fields,
+Modules and elements thereof, which allow external types to be made part of the
+AbstractAlgebra.jl type hierarchy.
 
 ## Installation
 
-To use Nemo we require Julia 0.4 or higher. Please see
-[http://julialang.org/downloads](http://julialang.org/downloads/) for instructions on how to obtain
-julia for your system.
+To use AbstractAlgebra we require Julia 0.6 or higher. Please see
+[http://julialang.org/downloads](http://julialang.org/downloads/) for instructions on 
+how to obtain Julia for your system.
 
 At the Julia prompt simply type
 
 ```
-julia> Pkg.add("Nemo")
-julia> Pkg.build("Nemo")
+julia> Pkg.add("AbstractAlgebra")
 ```
-
-Alternatively, if you don't want to set Julia up yourself, Julia and Nemo are available on
-[https://cloud.sagemath.com/](https://cloud.sagemath.com/).
 
 ## Quick start
 
-Here are some examples of using Nemo.
+Here are some examples of using AbstractAlgebra.jl..
 
 This example computes recursive univariate polynomials.
 
-```
-julia> using Nemo
+```julia
+using AbstractAlgebra
 
-julia> R, x = PolynomialRing(ZZ, "x")
-(Univariate Polynomial Ring in x over Integer Ring,x)
+R, (x, y, z) = PolynomialRing(JuliaZZ, ["x", "y", "z"])
 
-julia> S, y = PolynomialRing(R, "y")
-(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integer Ring,y)
+f = x + y + z + 1
 
-julia> T, z = PolynomialRing(S, "z")
-(Univariate Polynomial Ring in z over Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integer Ring,z)
+p = f^20;
 
-julia> f = x + y + z + 1
-z+(y+(x+1))
-
-julia> p = f^30; # semicolon supresses output
-
-julia> @time q = p*(p+1);
-  0.325521 seconds (140.64 k allocations: 3.313 MB)
+@time q = p*(p+1);
 ```
 
 Here is an example using generic recursive ring constructions.
 
-```
-julia> using Nemo
+```julia
+using AbstractAlgebra
 
-julia> R, x = FiniteField(7, 11, "x")
-(Finite field of degree 11 over F_7,x)
+R = GF(7)
 
-julia> S, y = PolynomialRing(R, "y")
-(Univariate Polynomial Ring in y over Finite field of degree 11 over F_7,y)
+S, y = PolynomialRing(R, "y")
 
-julia> T = ResidueRing(S, y^3 + 3x*y + 1)
-Residue ring of Univariate Polynomial Ring in y over Finite field of degree 11 over F_7 modulo y^3+(3*x)*y+(1)
+T = ResidueRing(S, y^3 + 3y + 1)
 
-julia> U, z = PolynomialRing(T, "z")
-(Univariate Polynomial Ring in z over Residue ring of Univariate Polynomial Ring in y over Finite field of degree 11 over F_7 modulo y^3+(3*x)*y+(1),z)
+U, z = PolynomialRing(T, "z")
 
-julia> f = (3y^2 + y + x)*z^2 + ((x + 2)*y^2 + x + 1)*z + 4x*y + 3;
+f = (3y^2 + y + 2)*z^2 + (2*y^2 + 1)*z + 4y + 3;
 
-julia> g = (7y^2 - y + 2x + 7)*z^2 + (3y^2 + 4x + 1)*z + (2x + 1)*y + 1;
+g = (7y^2 - y + 7)*z^2 + (3y^2 + 1)*z + 2y + 1;
 
-julia> s = f^12;
+s = f^4;
 
-julia> t = (s + g)^12;
+t = (s + g)^4;
 
-julia> @time resultant(s, t)
-  0.426612 seconds (705.88 k allocations: 52.346 MB, 2.79% gc time)
-(x^10+4*x^8+6*x^7+3*x^6+4*x^5+x^4+6*x^3+5*x^2+x)*y^2+(5*x^10+x^8+4*x^7+3*x^5+5*x^4+3*x^3+x^2+x+6)*y+(2*x^10+6*x^9+5*x^8+5*x^7+x^6+6*x^5+5*x^4+4*x^3+x+3)
+@time resultant(s, t)
 ```
 
 Here is an example using matrices.
 
-```
-julia> using Nemo
+```julia
+using AbstractAlgebra
 
-julia> M = MatrixSpace(R, 40, 40)();
+R, x = PolynomialRing(JuliaZZ, "x")
 
-julia> R, x = PolynomialRing(ZZ, "x")
-(Univariate Polynomial Ring in x over Integer Ring,x)
+S = MatrixSpace(R, 10, 10)
 
-julia> M = MatrixSpace(R, 40, 40)();
+M = rand(S, 0:3, -10:10);
 
-julia> for i in 1:40
-          for j in 1:40
-             M[i, j] = R(map(fmpz, rand(-20:20, 3)))
-          end
-       end
-
-julia> @time det(M);
-  0.174888 seconds (268.40 k allocations: 26.537 MB, 4.47% gc time)
+@time det(M)
 ```
 
 And here is an example with power series.
 
-```
-julia> using Nemo
+```julia
+using AbstractAlgebra
 
-julia> R, x = QQ["x"]
-(Univariate Polynomial Ring in x over Rational Field,x)
+R, x = JuliaQQ["x"]
 
-julia> S, t = PowerSeriesRing(R, 100, "t")
-(Univariate power series ring in t over Univariate Polynomial Ring in x over Rational Field,t+O(t^101))
+S, t = PowerSeriesRing(R, 30, "t")
 
-julia> u = t + O(t^100)
-t+O(t^100)
+u = t + O(t^100)
 
-julia> @time divexact((u*exp(x*u)), (exp(u)-1));
-  0.042663 seconds (64.01 k allocations: 1.999 MB, 15.40% gc time)
+@time divexact((u*exp(x*u)), (exp(u)-1));
 ```
