@@ -10,19 +10,6 @@ pages:
 - About AbstractAlgebra:        about.md
 - Types in AbstractAlgebra:     types.md
 - Parent object constructors:   constructors.md
-- Univariate polynomials:       polynomial.md
-- Capped relative power series: series.md
-- Residue rings:                residue.md             
-- Fraction fields:              fraction.md
-- Matrices:                     matrix.md
-- Integers:                     integer.md
-- Rationals:                    rational.md
-- Finite fields:                finitefield.md
-- Real balls:                   arb.md
-- Complex boxes:                acb.md
-- Number fields:                numberfield.md
-- Permutation groups:           perm.md
-- Factorization:                factor.md
 
 markdown_extensions:
   - extra
