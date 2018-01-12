@@ -1,5 +1,5 @@
 ```@meta
-CurrentModule = Nemo
+CurrentModule = AbstractAlgebra
 ```
 
 ## Introduction

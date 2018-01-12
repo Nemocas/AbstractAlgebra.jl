@@ -1,7 +1,7 @@
 ```@meta
-CurrentModule = Nemo
+CurrentModule = AbstractAlgebra
 DocTestSetup = quote
-  using Nemo
+  using AbstractAlgebra
 end
 ```
 
