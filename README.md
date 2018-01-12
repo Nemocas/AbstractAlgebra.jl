@@ -14,7 +14,7 @@ AbstractAlgebra currently provides:
 
 Projects that depend on AbstractAlgebra include:
 
-* Nemo.jl [http://nemocas.org](http://nemocas.org/)
-* Hecke.jl [http://thofma.github.io/Hecke.jl/latest/](http://thofma.github.io/Hecke.jl/latest/)
-* Singular.jl [http://github.com/wbhart/Singular.jl](http://github.com/wbhart/Singular.jl)
+* Nemo.jl [http://nemocas.org](http://nemocas.org/) (optimised implementations of specific rings provided by the Flint, Arb and Antic C libraries)
+* Hecke.jl [http://thofma.github.io/Hecke.jl/latest/](http://thofma.github.io/Hecke.jl/latest/) (algebraic number theory)
+* Singular.jl [http://github.com/wbhart/Singular.jl](http://github.com/wbhart/Singular.jl) (polynomial rings and ideals, Groebner bases and computer algebra provided by the Singular C++ library)
 
