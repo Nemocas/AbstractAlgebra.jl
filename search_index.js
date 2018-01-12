@@ -50,50 +50,50 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "constructors.html#",
-    "page": "Constructing mathematical objects in Nemo",
-    "title": "Constructing mathematical objects in Nemo",
+    "page": "Constructing mathematical objects in AbstractAlgebra.jl",
+    "title": "Constructing mathematical objects in AbstractAlgebra.jl",
     "category": "page",
     "text": ""
 },
 
 {
-    "location": "constructors.html#Constructing-mathematical-objects-in-Nemo-1",
-    "page": "Constructing mathematical objects in Nemo",
-    "title": "Constructing mathematical objects in Nemo",
+    "location": "constructors.html#Constructing-mathematical-objects-in-AbstractAlgebra.jl-1",
+    "page": "Constructing mathematical objects in AbstractAlgebra.jl",
+    "title": "Constructing mathematical objects in AbstractAlgebra.jl",
     "category": "section",
     "text": ""
 },
 
 {
     "location": "constructors.html#Constructing-objects-in-Julia-1",
-    "page": "Constructing mathematical objects in Nemo",
+    "page": "Constructing mathematical objects in AbstractAlgebra.jl",
     "title": "Constructing objects in Julia",
     "category": "section",
-    "text": "In Julia, one constructs objects of a given type by calling a type constructor. This is simply a function with the same name as the type itself. For example, to construct a BigInt object in Julia, we simply call the BigInt constructor:n = BigInt(\"1234567898765434567898765434567876543456787654567890\")Julia also uses constructors to convert between types. For example, to convert an Int to a BigInt:m = BigInt(123)"
+    "text": "In Julia, one constructs objects of a given type by calling a type constructor. This is simply a function with the same name as the type itself. For example, to construct a  BigInt object in Julia, we simply call the BigInt constructor:n = BigInt(\"1234567898765434567898765434567876543456787654567890\")Julia also uses constructors to convert between types. For example, to convert an Int to a BigInt:m = BigInt(123)"
 },
 
 {
-    "location": "constructors.html#How-we-construct-objects-in-Nemo-1",
-    "page": "Constructing mathematical objects in Nemo",
-    "title": "How we construct objects in Nemo",
+    "location": "constructors.html#How-we-construct-objects-in-AbstractAlgebra.jl-1",
+    "page": "Constructing mathematical objects in AbstractAlgebra.jl",
+    "title": "How we construct objects in AbstractAlgebra.jl",
     "category": "section",
-    "text": "As we explained in the previous section, Julia types don't contain enough information to properly model the ring of integers modulo n for a multiprecision modulus n. Instead of using types to construct objects, we use special objects that we refer to as parent objects. They behave a lot like Julia types.Consider the following simple example, to create a Flint multiprecision integer:n = ZZ(\"12345678765456787654567890987654567898765678909876567890\")Here ZZ is not a Julia type, but a callable object. However, for most purposes one can think of such a parent object ZZ as though it were a type."
+    "text": "As we explain in Appendix A, Julia types don't contain enough information to properly model groups, rings, fields, etc. Instead of using types to construct objects, we use special objects that we refer to as parent objects. They behave a lot like Julia types.Consider the following simple example, to create a Flint multiprecision integer:n = JuliaZZ(\"12345678765456787654567890987654567898765678909876567890\")Here JuliaZZ is not a Julia type, but a callable object. However, for most purposes one can think of such a parent object as though it were a type."
 },
 
 {
     "location": "constructors.html#Constructing-parent-objects-1",
-    "page": "Constructing mathematical objects in Nemo",
+    "page": "Constructing mathematical objects in AbstractAlgebra.jl",
     "title": "Constructing parent objects",
     "category": "section",
-    "text": "For more complicated groups, rings, fields, etc., one first needs to construct the parent object before one can use it to construct element objects.Nemo provides a set of functions for constructing such parent objects. For example, to create a parent object for polynomials over the integers, we use the PolynomialRing parent object constructor.R, x = PolynomialRing(ZZ, \"x\")\nf = x^3 + 3x + 1\ng = R(12)In this example, R is the parent object and we use it to convert the Int value 12 to an element of the polynomial ring mathbbZx."
+    "text": "For more complicated groups, rings, fields, etc., one first needs to construct the parent object before one can use it to construct element objects.AbstractAlgebra.jl provides a set of functions for constructing such parent objects. For example, to create a parent object for univariate polynomials over the integers, we use the PolynomialRing parent object constructor.R, x = PolynomialRing(JuliaZZ, \"x\")\nf = x^3 + 3x + 1\ng = R(12)In this example, R is the parent object and we use it to convert the Int value 12 to an element of the polynomial ring mathbbZx."
 },
 
 {
     "location": "constructors.html#List-of-parent-object-constructors-1",
-    "page": "Constructing mathematical objects in Nemo",
+    "page": "Constructing mathematical objects in AbstractAlgebra.jl",
     "title": "List of parent object constructors",
     "category": "section",
-    "text": "For convenience, we provide a list of all the parent object constructors in Nemo and explain what domains they represent.Mathematics Nemo constructor\nR = mathbbZ R = ZZ\nR = mathbbQ R = QQ\nR = mathbbF_p^n R, a = FiniteField(p, n, \"a\")\nR = mathbbZnmathbbZ R = ResidueRing(ZZ, n)\nS = Rx S, x = PolynomialRing(R, \"x\")\nS = Rx (to precision n) S, x = PowerSeriesRing(R, n, \"x\")\nS = mboxFrac_R S = FractionField(R)\nS = R(f) S = ResidueRing(R, f)\nS = mboxMat_mtimes n(R) S = MatrixSpace(R, m, n)\nS = mathbbQx(f) S, a = NumberField(f, \"a\")\nO = mathcalO_K S = MaximalOrder(K)\nideal I of O = mathcalO_K I = Ideal(O, gens, ...)"
+    "text": "For convenience, we provide a list of all the parent object constructors in AbstractAlgebra.jl and explain what mathematical domains they represent.Mathematics AbstractAlgebra.jl constructor\nR = mathbbZ R = ZZ\nR = mathbbQ R = QQ\nR = mathbbF_p R = GF(p)\nR = mathbbZnmathbbZ R = ResidueRing(ZZ, n)\nS = Rx S, x = PolynomialRing(R, \"x\")\nS = Rx y S, (x, y) = PolynomialRing(R, [\"x\", \"y\"])\nS = Rx (to precision n) S, x = PowerSeriesRing(R, n, \"x\")\nS = R((x)) (to precision n) S, x = LaurentSeriesRing(R, n, \"x\")\nS = K((x)) (to precision n) S, x = LaurentSeriesField(R, n, \"x\")\nS = mboxFrac_R S = FractionField(R)\nS = R(f) S = ResidueRing(R, f)\nS = mboxMat_mtimes n(R) S = MatrixSpace(R, m, n)\nS = mathbbQx(f) S, a = NumberField(f, \"a\")"
 },
 
 {
