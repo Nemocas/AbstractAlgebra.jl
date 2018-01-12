@@ -50,58 +50,50 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "types.html#",
-    "page": "Types in Nemo",
-    "title": "Types in Nemo",
+    "page": "Types in AbstractAlgebra.jl",
+    "title": "Types in AbstractAlgebra.jl",
     "category": "page",
     "text": ""
 },
 
 {
-    "location": "types.html#Types-in-Nemo-1",
-    "page": "Types in Nemo",
-    "title": "Types in Nemo",
+    "location": "types.html#Types-in-AbstractAlgebra.jl-1",
+    "page": "Types in AbstractAlgebra.jl",
+    "title": "Types in AbstractAlgebra.jl",
     "category": "section",
-    "text": "On this page we discuss the type hierarchy in Nemo and a concept known as parents. These details are quite technical and should be skipped or skimmed by new users of Julia/Nemo. Types are almost never dealt with directly when scripting Nemo to do mathematical computations. In contrast, Nemo developers will certainly want to know how we model mathematical objects and the rings, fields, groups, etc. that they belong to in Nemo."
+    "text": "On this page we discuss the abstract type hierarchy in AbstractAlgebra.jl and objects known as parents which contain additional information about groups, rings, fields and modules, etc., that can't be stored in types alone.These details are technical and can be skipped or skimmed by new users of  Julia/AbstractAlgebra.jl. Types are almost never dealt with directly when scripting  AbstractAlgebra.jl to do mathematical computations. In contrast, AbstractAlgebra.jl developers will want to know how we model mathematical objects and their rings, fields, groups, etc."
 },
 
 {
-    "location": "types.html#Introduction-1",
-    "page": "Types in Nemo",
-    "title": "Introduction",
+    "location": "types.html#The-abstract-type-hierarchy-in-AbstractAlgebra.jl-1",
+    "page": "Types in AbstractAlgebra.jl",
+    "title": "The abstract type hierarchy in AbstractAlgebra.jl",
     "category": "section",
-    "text": "Julia provides two levels of types that we make use ofabstract types\nconcrete typesConcrete types are just like the usual types everyone is familiar with from C or C++.Abstract types can be thought of as collections of types. They are used when writing generic functions that should work for any type in the given collection.To write a generic function that accepts any type in a given collection of types, we first create an abstract type. Then we create the individual concrete types that belong to that abstract type. A generic function can then be constructed with a type parameter, T say, similar to a template parameter in C++. The main difference is that we can specify which abstract type our type parameter T must belong to.We use the symbol <: in Julia to determine that a given type belongs to a given abstract type. For example the built-in Julia type Int64 for 64 bit machine integers belongs to the Julia abstract type Integer. Thus Int <: Integer returns true.Here is some Julia code illustrating this with a more complex example. We create an abstract type called Shape and two user defined concrete types square and circle belonging to Shape. We then show how to write methods that accept each of the concrete types and then show how to write a generic function for any type T belonging to the abstract type Shape.Note that in the type definitions of square and circle we specify that those types belong to the abstract type Shape using the <: operator.abstract Shape\n\ntype square <: Shape\n   width::Int\n   border_thickness::Int\nend\n\ntype circle <: Shape\n   centre::Tuple{Int, Int}\n   radius::Int\n   border_thickness::Int\nend\n\nfunction area(s::square)\n   return s.width^2\nend\n\nfunction area(s::circle)\n   return pi*s.radius^2\nend\n\nfunction border_thickness{T <: Shape}(s::T)\n   return s.border_thickness\nend\n\ns = square(3, 1)\nc = circle((3, 4), 2, 2)\n\narea(s)\narea(c)\nborder_thickness(s)\nborder_thickness(c)"
-},
-
-{
-    "location": "types.html#The-abstract-type-hierarchy-in-Nemo-1",
-    "page": "Types in Nemo",
-    "title": "The abstract type hierarchy in Nemo",
-    "category": "section",
-    "text": "Abstract types in Julia can also belong to one another in a hierarchy. For example, the Nemo.Field abstract type belongs to the Nemo.Ring abstract type. An object representing a field in Nemo has type belonging to Nemo.Field. But because we define the inclusion Nemo.Field <: Nemo.Ring in Nemo, the type of such an object also automatically belongs to Nemo.Ring. This means that any generic function in Nemo which is designed to work with ring objects will certainly also work with field objects.In Nemo we also distinguish between the elements of a field, say, and the field itself, and similarly for groups and rings and all other kinds of domains in Nemo. For example, we have an object of type GenPolyRing to model a generic polynomial ring, and elements of that polynomial ring would have type GenPoly. In order to model this distinction between elements and the domains they belong to, Nemo has two main branches in its abstract type hierarchy, as shown in the following diagram. One branch consists of the abstract types for the domains available in Nemo and the other branch is for the abstract types for elements of those domains. (Image: alt text)All objects in Nemo, whether they represent rings, fields, groups, sets, etc. on the one hand, or ring elements, field elements, etc. on the other hand, have concrete types that belong to one of the abstract types shown above."
+    "text": "Abstract types in Julia can also belong to one another in a hierarchy. We make use of such a hierarchy to organise the kinds of mathematical objects in AbstractAlgebra.jl.For example, the AbstractAlgebra.Field abstract type belongs to the  AbstractAlgebra.Ring abstract type. In practice, this means that any generic function in AbstractAlgebra.jl which is designed to work with ring objects will also work with field objects.In AbstractAlgebra.jl we also distinguish between the elements of a field, say, and the field itself.For example, we have an object of type Generic.PolyRing to model a generic polynomial ring, and elements of that polynomial ring would have type Generic.Poly. For this purpose, we also have a hierarchy of abstract types, such as FieldElem, that the types of element objects can belong to.(Image: alt text)"
 },
 
 {
     "location": "types.html#Why-types-aren't-enough-1",
-    "page": "Types in Nemo",
+    "page": "Types in AbstractAlgebra.jl",
     "title": "Why types aren't enough",
     "category": "section",
-    "text": "Naively, one may expect that rings in Nemo can be modeled as types and their elements as objects with the given type. But there are various reasons why this is not a good model.As an example, consider the ring R = mathbbZnmathbbZ for a multiprecision integer n. If we were to model the ring R as a type, then the type would somehow need to contain the modulus n. This is not possible in Julia, and in fact it is not desirable either.Julia dispatches on type, and each time we call a generic function with different types, a new version of the function is compiled at runtime for performance. But this would be a disaster if we were writing a multimodular algorithm, say. In such an algorithm many rings mathbbZnmathbbZ would be needed and every function we use would be recompiled over and over for each different n. This would result  in a huge delay as the compiler is invoked many times.For this reason, the modulus n needs to be attached to the elements of the ring, not to type associated with those elements.But now we have a problem. How do we create new elements of the ring mathbbZnmathbbZ given only the type? Suppose all rings mathbbZnmathbbZ were represented by the same type Zmod say. How would we create a = 3 pmod7? We could not write a = Zmod(3) since the modulus 7 is not contained in the type Zmod.We could of course use the notation a = Zmod(3, 7), but this would make implementation of generic algorithms very difficult, as they would need to distinguish the case where constructors take a single argument, such as a = ZZ(7) and cases where they take a modulus, such as a = Zmod(3, 7).The way we get around this in Nemo is to have special (singleton) objects that act like types, but are really just ordinary Julia objects. These objects, called parent objects can contain extra information, such as the modulus n. In order to create new elements of mathbbZnmathbbZ as above, we overload the call operator for the parent object, making it callable. Making a parent object callable is exactly analogous to writing a constructor for a type.In the following Nemo example, we create the parent object R corresponding to the ring mathbbZ7mathbbZ. We then create a new element a of this ring by calling the parent object R, just as though R were a type with a constructor accepting an Int parameter. R = ResidueRing(ZZ, 7)\na = R(3)This example creates the element a = 3 pmod7. The important point is that unlike a type, a parent object such as R can contain additional information that a type cannot contain, such as the modulus 7 of the ring in this example, or context objects required by C libraries in other examples."
+    "text": "Naively, one might have expected that rings in AbstractAlgebra.jl could be modeled as types and their elements as objects with the given type. But there are various reasons why this is not a good model.Consider the ring R = mathbbZnmathbbZ for a multiprecision integer n. If we were to model the ring R as a type, then the type would somehow need to contain the modulus n. This is not possible in Julia, and in fact it is not desirable, since the compiler would then recompile all the associated functions every time a different modulus n was used.We could attach the modulus n to the objects representing elements of the ring, rather than their type.But now we cannot create new elements of the ring mathbbZnmathbbZ given only their type, since the type no longer contains the modulus n.Instead, the way we get around this in AbstractAlgebra.jl is to have special (singleton) objects that act like types, but are really just ordinary Julia objects. These objects, called parent objects can contain extra information, such as the modulus n. In order to create new elements of mathbbZnmathbbZ as above, we overload the call operator for the parent object.In the following AbstractAlgebra.jl example, we create the parent object R corresponding to the ring mathbbZ7mathbbZ. We then create a new element a of this ring by calling the parent object R.R = ResidueRing(JuliaZZ, 7)\na = R(3)Here, R is the parent object, containing the modulus 7. So this example creates  the element a = 3 pmod7."
 },
 
 {
     "location": "types.html#More-complex-example-of-parent-objects-1",
-    "page": "Types in Nemo",
+    "page": "Types in AbstractAlgebra.jl",
     "title": "More complex example of parent objects",
     "category": "section",
-    "text": "Here is some Julia/Nemo code which constructs a polynomial ring over the integers, a polynomial in that ring and then does some introspection to illustrate the various relations between the objects and types.julia> using Nemo\n\njulia> R, x = ZZ[\"x\"]\n(Univariate Polynomial Ring in x over Integer Ring,x)\n\njulia> f = x^2 + 3x + 1\nx^2+3*x+1\n\njulia> typeof(R)\nNemo.FmpzPolyRing\n\njulia> typeof(f)\nNemo.fmpz_poly\n\njulia> parent(f)\nUnivariate Polynomial Ring in x over Integer Ring\n\njulia> typeof(R) <: PolyRing\ntrue\n\njulia> typeof(f) <: PolyElem\ntrue\n\njulia> parent(f) == R\ntrue"
+    "text": "Here is some Julia/AbstractAlgebra.jl code which constructs a polynomial ring over the integers, a polynomial in that ring and then does some introspection to illustrate the various relations between the objects and types.using AbstractAlgebra\n\nR, x = JuliaZZ[\"x\"]\n\nf = x^2 + 3x + 1\n\ntypeof(R) <: PolyRing\n\ntypeof(f) <: PolyElem\n\nparent(f) == R"
 },
 
 {
-    "location": "types.html#Concrete-types-in-Nemo-1",
-    "page": "Types in Nemo",
-    "title": "Concrete types in Nemo",
+    "location": "types.html#Concrete-types-in-AbstractAlgebra.jl-1",
+    "page": "Types in AbstractAlgebra.jl",
+    "title": "Concrete types in AbstractAlgebra.jl",
     "category": "section",
-    "text": "Finally we come to all the concrete types in Nemo. These are of two main kinds: those for generic constructions (e.g. generic polynomials over an arbitrary ring) and those for specific implementations, usually provided by a C library (e.g. polynomials over the integers, provided by Flint).Below we give the type of each kind of element available in Nemo. In parentheses we list the types of their corresponding parent objects. Note that these are the types of the element objects and parent objects respectively, not the abstract types to which these types belong, which the reader can easily guess. For example, fmpz belongs to the abstract type RingElem and FlintIntegerRing belongs to Ring. Similarly Poly{T} belongs to PolyElem whereas PolynomialRing{T} belongs to PolyRing. We also have that fmpz_poly belongs to PolyElem and FmpzPolyRing belongs to PolyRing, and so on.All the generic types are parameterised by a type T which is the type of the elements of the ring they are defined over. Generic\nGenPoly{T} (GenPolyRing{T})\nGenRelSeries{T} (GenRelSeriesRing{T})\nGenRes{T} (GenResRing{T})\nGenFrac{T} (GenFracField{T})\nGenMat{T} (GenMatSpace{T})\nFlint\nfmpz (FlintIntegerRing)\nfmpq (FlintRationalField)\nfq_nmod (FqNmodFiniteField)\nfq (FqFiniteField)\npadic (FlintPadicField)\nfmpz_poly (FmpzPolyRing)\nfmpq_poly (FmpqPolyRing)\nnmod_poly (NmodPolyRing)\nfmpz_mod_poly (FmpzModPolyRing)\nfq_poly (FqPolyRing)\nfq_nmod_poly (FqNmodPolyRing)\nfmpz_rel_series (FmpzRelSeriesRing)\nfmpq_rel_series (FmpqRelSeriesRing)\nfmpz_mod_rel_series (FmpzModRelSeriesRing)\nfq_nmod_rel_series (FqNmodRelSeriesRing)\nfq_rel_series (FqRelSeriesRing)\nfmpz_mat (FmpzMatSpace)\nnmod_mat (NmodMatSpace)\nperm (PermGroup)\nAntic\nnf_elem (AnticNumberField)\nArb\narb (ArbField)\nacb (AcbField)"
+    "text": "Here we give a list of the concrete types in AbstractAlgebra.jl.In parentheses we put the types of the corresponding parent objects.gfelem{<:Integer} (GFField{<:Integer})We also think of various Julia types as though they were AbstractAlgebra.jl types:BigInt (Integers{BigInt})\nRational{BigInt} (Rationals{BigInt})Then there are various types for generic constructions over a base ring. They are all parameterised by a type T which is the type of the elements of the base ring they are defined over. Generic.Poly{T} (Generic.PolyRing{T})\nGeneric.MPoly{T} (Generic.MPolyRing{T})\nGeneric.RelSeries{T} (Generic.RelSeriesRing{T})\nGeneric.AbsSeries{T} (Generic.AbsSeriesRing{T})\nGeneric.LaurentSeriesRingElem{T} (Generic.LaurentSeriesRing{T})\nGeneric.LaurentSeriesFieldElem{T} (Generic.LaurentSeriesField{T})\nGeneric.Res{T} (Generic.ResRing{T})\nGeneric.Frac{T} (Generic.FracField{T})\nGeneric.Mat{T} (Generic.MatSpace{T})"
 },
 
 {
