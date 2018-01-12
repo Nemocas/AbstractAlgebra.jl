@@ -49,38 +49,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "about.html#",
-    "page": "Nemo",
-    "title": "Nemo",
-    "category": "page",
-    "text": ""
-},
-
-{
-    "location": "about.html#Nemo-1",
-    "page": "Nemo",
-    "title": "Nemo",
-    "category": "section",
-    "text": ""
-},
-
-{
-    "location": "about.html#What-is-Nemo?-1",
-    "page": "Nemo",
-    "title": "What is Nemo?",
-    "category": "section",
-    "text": "Nemo is a computer algebra package for the Julia programming language. Our aim is to provide a highly performant computer algebra package coveringCommutative Algebra\nNumber Theory\nGroup TheoryNemo consists of wrappers of specialised C/C++ libraries:Flint    [http://flintlib.org/]\nArb      [http://fredrikj.net/arb/]\nAntic    [https://github.com/wbhart/antic/]\nSingular [https://www.singular.uni-kl.de/]\nPari     [http://pari.math.u-bordeaux.fr/]It will also eventually provide interfaces to interpreted library code from other computer algebra systems such as Gap and Singular.Nemo also provides implementations of generic algorithms and mathematical data structures. So far the fully recursive constructions includeUnivariate polynomial rings\nPower series rings\nResidue rings (modulo principal ideals)\nFraction fields\nMatrices"
-},
-
-{
-    "location": "about.html#Why-Julia?-1",
-    "page": "Nemo",
-    "title": "Why Julia?",
-    "category": "section",
-    "text": "Julia is a sophisticated, modern programming language which is designed to be both performant and flexible. It was written by mathematicians, for mathematicians.The benefits of Julia includeFamiliar imperative syntax\nJIT compilation (provides near native performance, even for highly generic code)\nREPL console (cuts down on development time)\nParametric types (allows for fast generic constructions over other data types)\nPowerful metaprogramming facilities\nOperator overloading\nMultiple dispatch (dispatch on every argument of a function)\nEfficient native C interface (no wrapper overhead)\nExperimental C++ interface\nDynamic type inference\nBuilt-in bignums\nAble to be embedded in C programs\nHigh performance collection types (dictionaries, iterators, arrays, etc.)\nJupyter support (for web based notebooks)The main benefits for Nemo are the parametric type system and JIT compilation. The former allows us to model many mathematical types, e.g. generic polynomial rings over an arbitrary base ring. The latter speeds up the runtime performance, even of highly generic mathematical procedures."
-},
-
-{
     "location": "types.html#",
     "page": "Types in Nemo",
     "title": "Types in Nemo",
