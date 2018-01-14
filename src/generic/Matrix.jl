@@ -3895,19 +3895,11 @@ function hnf_via_popov!(H::Mat{T}, U::Mat{T}, with_trafo::Bool = false) where {T
       # "Remove" the column i+1 and compute a weak Popov Form of the
       # remaining matrix.
       r1 = pivots_popov[i+1]
-      if r1 == 0
-         continue
-      end
       c = find_pivot_popov(H, r1, i)
       new_pivot = true
       # If the pivot H[r1,c] is zero then the row is zero.
       while !iszero(H[r1,c])
          r2 = pivots_popov[c]
-         if r2 == 0
-            pivots_popov[c] = r1
-            new_pivot = false
-            break
-         end
          if degree(H[r2,c]) > degree(H[r1,c])
             r1, r2 = r2, r1
             pivots_popov[c] = r2
@@ -3935,9 +3927,6 @@ function hnf_via_popov!(H::Mat{T}, U::Mat{T}, with_trafo::Bool = false) where {T
    pivots_hermite[1] = pivots_popov[1]
    kb_sort_rows!(H, U, pivots_hermite, with_trafo)
    for c = 1:n
-      if pivots_hermite[c] == 0
-         continue
-      end
       kb_canonical_row!(H, U, pivots_hermite[c], c, with_trafo)
    end
    return nothing
