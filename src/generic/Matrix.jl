@@ -3635,8 +3635,9 @@ function det_popov(A::Mat{T}) where {T <: PolyElem}
    pivots = zeros(Int, n)
    diag_elems = zeros(Int, n)
    for i = 1:n
-      try pivots[i] = pivots1[i][1]
-      catch
+      if isassigned(pivots1, i) && length(pivots1[i]) > 0
+         pivots[i] = pivots1[i][1]
+      else
          # If there is no pivot in the ith column, A has not full rank.
          return R(0)
       end
@@ -3883,7 +3884,11 @@ function hnf_via_popov!(H::Mat{T}, U::Mat{T}, with_trafo::Bool = false) where {T
    weak_popov_with_pivots!(H, W, U, pivots, false, with_trafo)
    pivots_popov = zeros(Int, n)
    for j = 1:n
-      try pivots_popov[j] = pivots[j][1] end
+      if isassigned(pivots, j) && length(pivots[j]) > 0
+         pivots_popov[j] = pivots[j][1]
+      else
+         error("The rank must be equal to the number of columns.")
+      end
    end
    pivots_hermite = zeros(Int, n)
    for i = n-1:-1:1
