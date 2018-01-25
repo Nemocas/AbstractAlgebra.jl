@@ -1,4 +1,4 @@
-export Partition, Partitions, YoungTableau, SkewDiagram
+export Partition, AllParts, YoungTableau, SkewDiagram
 export dim, has_left_neighbor, has_bottom_neighbor, inskewdiag, isrimhook,
        hooklength, leglength, matrix_repr, partitionseq
 
@@ -12,11 +12,11 @@ length(p::Partition) = length(p.part)
 
 size(p::Partition) = size(p.part)
 
-Base.IndexStyle(::Type{T}) where {T <: Partition} = Base.IndexLinear()
+Base.IndexStyle(::Type{T}) where T<:Partition = Base.IndexLinear()
 
-getindex(p::Partition, i::Int) = p.part[i]
+getindex(p::Partition, i::T) where T<:Integer = p.part[i]
 
-function setindex!(p::Partition, v::Int, i::Int)
+function setindex!(p::Partition{T}, v::T, i::T) where T<:Integer
    prev = Inf
    nex = 1
    if i == length(p)
@@ -36,7 +36,7 @@ end
 ==(p::Partition, m::Partition) = p.n ==m.n && p.part == m.part
 hash(p::Partition, h::UInt) = hash(p.part, hash(Partition, h))
 
-convert(::Type{Partition}, p::Vector{Int}) = Partition(p)
+convert(::Type{Partition{T}}, p::Vector{T}) where T = Partition(p)
 
 ##############################################################################
 #
@@ -58,7 +58,7 @@ end
 
 ##############################################################################
 #
-#   Iterator interface for Integer Partitions
+#   Iterator interface for Integer AllParts
 #
 ##############################################################################
 
@@ -66,22 +66,22 @@ end
 #    "Generating All Partitions: A Comparison Of Two Encodings"
 # by Jerome Kelleher and Barry O’Sullivan, ArXiv:0909.2331
 
-function Base.start(parts::Partitions)
+function Base.start(parts::AllParts{T}) where T<:Integer
     if parts.n < 1
-        return (Int[], 0)
+        return (T[], 0)
     elseif parts.n == 1
-        return ([1], 0)
+        return (T[1], 0)
     else
-        p = zeros(Int, parts.n)
+        p = zeros(T, parts.n)
         p[2] = parts.n
         return (p, 2)
     end
 end
 
-Base.next(parts::Partitions, state) = nextpart_asc(state...)
-Base.done(parts::Partitions, state) = state[2] == 1
-Base.eltype(::Type{Partitions}) = Partition
-length(parts::Partitions) = BigInt(numpart(parts.n))
+Base.next(parts::AllParts, state) = nextpart_asc(state...)
+Base.done(parts::AllParts, state) = state[2] == 1
+Base.eltype(::Type{AllParts{T}}) where T = Partition{T}
+length(parts::AllParts) = BigInt(numpart(parts.n))
 
 function nextpart_asc(part, k)
     if k == 0
@@ -104,8 +104,8 @@ doc"""
 > Returns the conjugated partition of `part`, i.e. the partition corresponding
 > to the Young tableau of `part` reflected through the main diagonal.
 """
-function conj(part::Partition)
-    p = Int[]
+function conj(part::Partition{T}) where T
+    p = T[]
     for i in 1:part.n
         n = sum(part .>= i)
         n == 0 && break
@@ -139,7 +139,7 @@ function partitionseq(lambda::Partition)
    return seq
 end
 
-partitionseq(v::Vector{Int}) = partitionseq(Partition(v))
+partitionseq(v::Vector{T}) where T<:Integer = partitionseq(Partition(v))
 
 doc"""
     partitionseq(seq::BitVector)
@@ -173,36 +173,36 @@ doc"""
 >     _Journal of Symbolic Computation_, 37(6), 2004, p. 727-748.
 """
 function MN1inner(R::BitVector, mu::Partition, t::Int,
-        charvals=Dict{Tuple{BitVector,Vector{Int}}, BigInt}())
-    if t > length(mu)
-        chi = 1
-    elseif mu[t] > length(R)
-        chi = 0
-    else
-        chi = 0
-        sgn = false
+   charvals=Dict{Tuple{BitVector,Vector{Int}}, BigInt}())
+   if t > length(mu)
+      chi = 1
+   elseif mu[t] > length(R)
+      chi = 0
+   else
+      chi = 0
+      sgn = false
 
-        for j in 1:mu[t]-1
-            if R[j] == false
-                sgn = !sgn
+      for j in 1:mu[t]-1
+         if R[j] == false
+            sgn = !sgn
+         end
+      end
+      for i in 1:length(R)-mu[t]
+         if R[i] != R[i+mu[t]-1]
+            sgn = !sgn
+         end
+         if isrimhook(R, i, mu[t])
+            R[i], R[i+mu[t]] = R[i+mu[t]], R[i]
+            essR = (partitionseq(R), mu[t+1:end])
+            if !haskey(charvals, essR)
+               charvals[essR] = MN1inner(R, mu, t+1, charvals)
             end
-        end
-        for i in 1:length(R)-mu[t]
-            if R[i] != R[i+mu[t]-1]
-                sgn = !sgn
-            end
-            if isrimhook(R, i, mu[t])
-                R[i], R[i+mu[t]] = R[i+mu[t]], R[i]
-                essR = (partitionseq(R), mu[t+1:end])
-                if !haskey(charvals, essR)
-                    charvals[essR] = MN1inner(R, mu, t+1, charvals)
-                end
-                chi += (-1)^Int(sgn)*charvals[essR]
-                R[i], R[i+mu[t]] = R[i+mu[t]], R[i]
-            end
-        end
-    end
-    return chi
+            chi += (-1)^Int(sgn)*charvals[essR]
+            R[i], R[i+mu[t]] = R[i+mu[t]], R[i]
+         end
+      end
+   end
+   return chi
 end
 
 ##############################################################################
