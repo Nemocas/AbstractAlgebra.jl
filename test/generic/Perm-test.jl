@@ -11,14 +11,34 @@ end
 function test_perm_constructors()
    print("perm.constructors...")
 
-   R = PermutationGroup(10)
+   @test elem_type(Generic.PermGroup{Int}) == Generic.perm{Int}
+   @test parent_type(Generic.perm{Int}) == Generic.PermGroup{Int}
 
-   @test elem_type(R) == Generic.perm
-   @test elem_type(Generic.PermGroup) == Generic.perm
-   @test parent_type(Generic.perm) == Generic.PermGroup
+   R = PermutationGroup(10)
+   @test typeof(R) == Generic.PermGroup{Int}
+   @test elem_type(R) == Generic.perm{Int}
 
    a = R()
+   @test typeof(a) == Generic.perm{Int}
+   @test parent_type(typeof(a)) == Generic.PermGroup{Int}
+
    b = R([2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
+   @test typeof(b) == Generic.perm{Int}
+   @test parent_type(typeof(b)) == Generic.PermGroup{Int}
+
+
+   R = PermutationGroup(Int16(10))
+   @test typeof(R) == Generic.PermGroup{Int16}
+   @test elem_type(R) == Generic.perm{Int16}
+
+   a = R()
+   @test typeof(a) == Generic.perm{Int16}
+   @test parent_type(typeof(a)) == Generic.PermGroup{Int16}
+
+   b = R(Int16[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
+   @test typeof(b) == Generic.perm{Int16}
+   @test parent_type(typeof(b)) == Generic.PermGroup{Int16}
+
    c = R(a)
 
    @test isa(a, GroupElem)
@@ -78,6 +98,15 @@ function test_perm_iteration()
    @test length(collect(elements(G))) == 120
    @test length(unique(elements(G))) == 120
 
+   G = PermutationGroup(Int8(5))
+   @test length(AllPerms(Int8(5))) == 120
+   @test length(unique(AllPerms(Int8(5)))) == 120
+
+   @test collect(elements(G))[1] == G()
+
+   @test length(collect(elements(G))) == 120
+   @test length(unique(elements(G))) == 120
+
    println("PASS")
 end
 
@@ -93,6 +122,12 @@ function test_perm_binary_ops()
    @test b*a == G([3,2,1])
    @test a*a == G()
    @test b*b*b == G()
+
+   @test parity(G()) == 0
+   p = parity(a)
+   @test p == 1
+   cycles(a)
+   @test parity(a) == p
 
    for a in elements(G), b in elements(G)
       @test parity(a*b) == (parity(b)+parity(a)) % 2
@@ -164,7 +199,7 @@ function test_characters()
 
    N = 8
    G = PermutationGroup(N)
-   @test all(character(p)(G()) == dim(YoungTableau(p)) for p=Partitions(N))
+   @test all(character(p)(G()) == dim(YoungTableau(p)) for p=AllParts(N))
 
    @test character(Partition([2,2,2,2]), Partition([8])) == 0
 
@@ -194,7 +229,7 @@ function test_characters()
 
    # values taken from GAP; note that we specify the order of partitions to be
    # compatible with GAP numbering of conjugacy classes. This is NOT the order
-   # of partitions given by Partitions.
+   # of partitions given by AllParts.
    N = 5
    G = PermutationGroup(N)
    ps = Partition.([[1,1,1,1,1], [2,1,1,1], [2,2,1], [3,1,1], [3,2], [4,1], [5]])

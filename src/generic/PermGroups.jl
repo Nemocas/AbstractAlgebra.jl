@@ -7,21 +7,21 @@ export PermGroup, perm, parity, elements, cycles, character, setpermstyle,
 #
 ###############################################################################
 
-parent_type(::Type{perm}) = PermGroup
+parent_type(::Type{perm{T}}) where T = PermGroup{T}
 
-elem_type(::Type{PermGroup}) = perm
-
-###############################################################################
-#
-#   Basic manipulation
-#
-###############################################################################
+elem_type(::Type{PermGroup{T}}) where T = perm{T}
 
 doc"""
     parent(a::perm)
 > Return the parent of the given permutation group element.
 """
 parent(a::perm) = a.parent
+
+###############################################################################
+#
+#   Low-level manipulation
+#
+###############################################################################
 
 function deepcopy_internal(a::perm, dict::ObjectIdDict)
    G = parent(a)
@@ -37,28 +37,54 @@ function Base.hash(a::perm, h::UInt)
    return b
 end
 
+function getindex(a::perm{T}, n::S) where {T<:Integer, S<:Integer}
+   return a.d[n]
+end
+
+function setindex!(a::perm{T}, v::T, n::S) where {T<:Integer, S<:Integer}
+   a.d[n] = v
+end
+
+###############################################################################
+#
+#   Basic functions
+#
+###############################################################################
+
 doc"""
     parity(a::perm)
 > Return the parity of the given permutation, i.e. the parity of the number of
 > transpositions that compose it. The function returns $1$ if the parity is odd
-> otherwise it returns $0$.
+> and $0$ otherwise. By default `parity` will uses the cycle decomposition if
+> it is already available, but will not compute it on demand. If You intend to
+> use parity, or the cycle decomposition of a permutation later You may force
+> `parity` to compute the cycle structure by calling
+> `parity(a, Val{:cycles})``.
 """
 # TODO: 2x slower than Flint
-function parity(a::perm)
+function parity(a::perm{T}) where T
+   if isdefined(a, :cycles)
+      return T(sum([(length(c)+1)%2 for c in cycles(a)])%2)
+   end
    to_visit = trues(a.d)
-   parity = length(to_visit)
+   parity = false
    k = 1
-   while any(to_visit)
-      parity -= 1
+   @inbounds while any(to_visit)
       k = findnext(to_visit, k)
       to_visit[k] = false
       next = a[k]
       while next != k
+         parity = !parity
          to_visit[next] = false
          next = a[next]
       end
    end
-   return parity%2
+   return T(parity)
+end
+
+function parity(a::perm, ::Type{Val{:cycles}})
+   cycles(a)
+   return parity(a)
 end
 
 doc"""
@@ -66,21 +92,58 @@ doc"""
 > Returns the sign of the given permutations, i.e. `1` if `a` is even and `-1`
 > if `a` is odd.
 """
-sign(a::perm) = (-1)^parity(a)
+sign(a::perm{T}) where T = (-one(T))^parity(a)
 
-function getindex(a::perm, n::Int)
-   return a.d[n]
-end
-
-function setindex!(a::perm, d::Int, n::Int)
-   a.d[n] = d
+function sign(a::perm, ::Type{Val{:cycles}})
+   cycles(a)
+   return sign(a)
 end
 
 doc"""
-    eye(G::PermGroup)
-> Return the identity permutation for the given permutation group.
+    cycles(a::perm)
+> Decomposes permutation into disjoint cycles.
 """
-eye(G::PermGroup) = G()
+function cycles(a::perm{T}) where T<:Integer
+   if !isdefined(a, :cycles)
+      to_visit = trues(a.d)
+      k = one(T)
+      clens = Vector{T}(1) # cumulative lengths of cycles
+      clens[1] = one(T)
+      sizehint!(clens, 5 + ceil(Int, log(length(a.d))))
+      # expected length of cycle - (overestimation of) the harmonic
+
+      scycles = similar(a.d) # consecutive cycles entries
+      # scycles[clens[i], clens[i+1]-1] contains i-th cycle
+      i = one(T)
+
+      @inbounds while any(to_visit)
+         k = findnext(to_visit, k)
+         to_visit[k] = false
+         next = a[k]
+
+         scycles[i] = k
+         i += 1
+
+         while next != k
+            scycles[i] = next
+            to_visit[next] = false
+            next = a[next]
+            i += 1
+         end
+         push!(clens, i)
+      end
+      a.cycles = [scycles[clens[i]:clens[i+1]-1] for i in 1:length(clens)-1]
+   end
+   return a.cycles
+end
+
+doc"""
+    permtype(a::perm, rev=true)
+> Returns the type of permutation `a`, i.e. lengths of disjoint cycles building
+> `a`. This fully determines the conjugacy class of `a`. The lengths are sorted
+> in reverse order by default.
+"""
+permtype(a::perm{T}) where T = sort([T(length(c)) for c in cycles(a)], rev=true)
 
 ###############################################################################
 #
@@ -96,28 +159,28 @@ mutable struct PermDisplayStyle
    format::Symbol
 end
 
-const perm_display_style = PermDisplayStyle(:array)
+const _perm_display_style = PermDisplayStyle(:array)
 
 doc"""
     setpermstyle(format::Symbol)
-> AbstractAlgebra can display (in REPL or in general as string) permutations
-> by either array of integers whose `n`-th position represents value at `n`, or
-> as (an array of) disjoint cycles, where the value of permutation at `n` is
-> represented as the entry immediately following `n` in the cycle.
+> Nemo can display (in REPL or in general as string) permutations by either
+> array of integers whose `n`-th position represents value at `n`, or as
+> disjoint cycles, where the value of permutation at `n` is represented as the
+> entry immediately following `n` in the cycle.
 > The style can be switched by calling `setpermstyle` with `:array` or
 > `:cycles` argument.
 """
 function setpermstyle(format::Symbol)
    format in (:array, :cycles) || throw("Permutations can be displayed
    only as :array or :cycles.")
-   perm_display_style.format = format
+   _perm_display_style.format = format
    return format
 end
 
 function show(io::IO, a::perm)
-   if perm_display_style.format == :array
+   if _perm_display_style.format == :array
       print(io, "[" * join(a.d, ", ") * "]")
-   elseif perm_display_style.format == :cycles
+   elseif _perm_display_style.format == :cycles
       if a == parent(a)()
          print(io, "()")
       else
@@ -165,12 +228,12 @@ end
 
 doc"""
     ^(a::perm, n::Int)
-> Return the `n`-th power of a permutation `a`. By default AbstractAlgebra
-> computes powers by cycle decomposition of `a`.
-> `AbstractAlgebra.power_by_squaring` provides a different method for
-> powering which may or may not be faster, depending on the particuar case.
-> Due to caching of cycle structure repeatedly powering should be faster 
-> with the default method. NOTE: cycle structure is not computed for `n<4`.
+> Return the `n`-th power of a permutation `a`. By default Nemo computes powers
+> by cycle decomposition of `a`. `Nemo.power_by_squaring` provides a different
+> method for powering which may or may not be faster, depending on the
+> particuar case. Due to caching of cycle structure repeatedly powering should
+> be faster with the default method. NOTE: cycle structure is not computed
+> for `n<4`.
 """
 function ^(a::perm, n::Int)
    if n <0
@@ -197,7 +260,7 @@ function ^(a::perm, n::Int)
    end
 end
 
-function power_by_squaring(a::perm, b::Int)
+function power_by_squaring(a::perm, n::Int)
    if n <0
       return inv(a)^-n
    elseif n == 0
@@ -210,7 +273,7 @@ function power_by_squaring(a::perm, b::Int)
       return parent(a)(a.d[a.d[a.d]])
    else
       bit = ~((~UInt(0)) >> 1)
-      while (UInt(bit) & b) == 0
+      while (UInt(bit) & n) == 0
          bit >>= 1
       end
       cache1 = deepcopy(a.d)
@@ -219,7 +282,7 @@ function power_by_squaring(a::perm, b::Int)
       while bit != 0
          cache2 = cache1[cache1]
          cache1 = cache2
-         if (UInt(bit) & b) != 0
+         if (UInt(bit) & n) != 0
             cache1 = cache1[a.d]
          end
          bit >>= 1
@@ -263,10 +326,10 @@ end
 #
 ###############################################################################
 
-Base.start(A::AllPerms) = (collect(1:A.n), 1, 1, ones(Int, A.n))
+Base.start(A::AllPerms{T}) where T<:Integer = (collect(T, 1:A.n), one(T), one(T), ones(T, A.n))
 Base.next(A::AllPerms, state) = all_perms(state...)
 Base.done(A::AllPerms, state) = state[2] > A.all
-Base.eltype(::Type{AllPerms}) = Vector{Int}
+Base.eltype(::Type{AllPerms{T}}) where T<:Integer = Vector{T}
 length(A::AllPerms) = A.all
 
 function all_perms(elts, counter, i, c)
@@ -311,47 +374,10 @@ doc"""
 order(G::PermGroup) = factorial(G.n)
 
 doc"""
-    cycles(a::perm)
-> Decomposes permutation into disjoint cycles.
-"""
-function cycles(a::perm)
-   if isdefined(a, :cycles)
-      return a.cycles
-   else
-      to_visit = trues(a.d)
-      cycles = Vector{Vector{Int}}()
-      k = 1
-      while any(to_visit)
-         cycle = Vector{Int}()
-         k = findnext(to_visit, k)
-         to_visit[k] = false
-         push!(cycle, k)
-         next = a[k]
-         while next != k
-            push!(cycle, next)
-            to_visit[next] = false
-            next = a[next]
-         end
-         push!(cycles, cycle)
-      end
-      a.cycles = cycles
-      return cycles
-   end
-end
-
-doc"""
     order(a::perm)
 > Returns the order of permutation `a`.
 """
 order(a::perm) = lcm([length(c) for c in cycles(a)])
-
-doc"""
-    permtype(a::perm, rev=true)
-> Returns the type of permutation `a`, i.e. lengths of disjoint cycles building
-> `a`. This fully determines the conjugacy class of `a`. The lengths are sorted
-> in reverse order by default.
-"""
-permtype(a::perm) = sort([length(c) for c in cycles(a)], rev=true)
 
 doc"""
     matrix_repr(a::perm)
@@ -365,7 +391,7 @@ end
 
 doc"""
     emb!(result::perm, p::perm, V::Vector{Int})
-> Embedds permutation `p` into `result` on the indices given by `V`. This
+> Embedds permutation `p` into permutation `result` on the indices given by `V`. This
 > corresponds to natural embedding of $S_k$ into $S_n$ as the subgroup
 > permuting points indexed by `V`.
 """
@@ -384,7 +410,7 @@ function emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
       @assert length(Base.Set(V)) == length(V)
       @assert all(V .<= G.n)
    end
-   return p -> AbstractAlgebra.emb!(G(), p, V)
+   return p -> Nemo.emb!(G(), p, V)
 end
 
 doc"""
@@ -405,7 +431,7 @@ function (G::PermGroup)()
    return z
 end
 
-function (G::PermGroup)(a::Array{Int, 1}, check::Bool=true)
+function (G::PermGroup)(a::Array{T, 1}, check::Bool=true) where T<:Integer
    length(a) != G.n && error("Unable to coerce to permutation: lengths differ")
    if check
       Base.Set(a) != Base.Set(1:length(a)) && error("Unable to coerce to
@@ -416,9 +442,13 @@ function (G::PermGroup)(a::Array{Int, 1}, check::Bool=true)
    return z
 end
 
-function (G::PermGroup)(a::perm)
-   parent(a) != G && error("Unable to coerce to permutation: wrong parent")
-   return a
+function (G::PermGroup{T})(p::perm{S}) where {T<:Integer, S<:Integer}
+   parent(p).n != G.n && error("Unable to coerce permutation: lengths differ")
+   if S<:T
+      return G(Vector{T}(p.d))
+   else
+      error("Unable to coerce to permutation: parents coefficints too narrow")
+   end
 end
 
 ###############################################################################
@@ -445,8 +475,7 @@ doc"""
 > `chi(p, false)`. The values computed by $\chi$ are stored in look-up table.
 >
 > The computation follows the Murnaghan-Nakayama formula:
-> $$\chi_\lambda(\sigma) = \sum_{\text{rimhook }\xi\subset \lambda}
-(-1)^{ll(\lambda\backslash\xi)} \chi_{\lambda \backslash\xi}(\tilde\sigma)$$
+> $$\chi_\lambda(\sigma) = \sum_{\text{rimhook }\xi\subset \lambda}(-1)^{ll(\lambda\backslash\xi)} \chi_{\lambda \backslash\xi}(\tilde\sigma)$$
 > where $\lambda\backslash\xi$ denotes partition associated with Young Diagram
 > of $\lambda$ with $\xi$ removed, $ll$ denotes the leg-length (i.e. number of
 > rows - 1) and $\tilde\sigma$ is permutation obtained from $\sigma$ by the
