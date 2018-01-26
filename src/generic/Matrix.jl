@@ -9,13 +9,13 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref,
        ishessenberg, identity_matrix, charpoly_hessenberg!, matrix, minpoly,
        typed_hvcat, typed_hcat, powers, randmat_triu, randmat_with_rank,
        similarity!, solve, solve_rational, hnf, hnf_minors,
-       hnf_minors_with_trafo, hnf_with_trafo, snf, snf_with_trafo, weak_popov,
-       weak_popov_with_trafo, extended_weak_popov,
+       hnf_minors_with_trafo, hnf_with_trafo, issquare, snf, snf_with_trafo,
+       weak_popov, weak_popov_with_trafo, extended_weak_popov,
        extended_weak_popov_with_trafo, rank_profile_popov, hnf_via_popov,
        hnf_via_popov_with_trafo, popov, det_popov, _check_dim, rows, cols,
        gram, rref, rref!, swap_rows, swap_rows!, hnf_kb, hnf_kb_with_trafo,
        hnf_cohen, hnf_cohen_with_trafo, snf_kb, snf_kb_with_trafo,
-       find_pivot_popov, inv!, zero_matrix
+       find_pivot_popov, inv!, zero_matrix, kronecker_product
 
 ###############################################################################
 #
@@ -277,6 +277,18 @@ end
 function Base.view(M::AbstractAlgebra.MatElem, ::Colon, cols::UnitRange{Int})
   return view(M, 1:rows(x), cols)
 end
+
+################################################################################
+#
+#   Size
+#
+################################################################################
+
+size(x::MatElem) = tuple(rows(x), cols(x))
+
+size(t::MatElem, d) = d <= 2 ? size(t)[d] : 1
+
+issquare(a::MatElem) = (rows(a) == cols(a))
 
 ###############################################################################
 #
@@ -754,6 +766,29 @@ function divexact(x::AbstractAlgebra.MatElem{T}, y::T) where {T <: RingElem}
    return z
 end
 
+###############################################################################
+#
+#   Kronecker product
+#
+###############################################################################
+
+function kronecker_product(x::MatElem{T}, y::MatElem{T}) where {T <: RingElement}
+    base_ring(parent(x)) == base_ring(parent(y)) || error("Incompatible matrix spaces in matrix operation")
+    z = similar(x, rows(x)*rows(y), cols(x)*cols(y))
+    for ix in 1:rows(x)
+       ixr = (ix-1)*rows(y)
+       for jx in 1:cols(x)
+          jxc = (jx-1)*cols(y)
+          for iy in 1:rows(y)
+             for jy in 1:cols(y)
+               z[ixr+iy,jxc+jy] = x[ix,jx]*y[iy,jy]
+             end
+          end
+       end
+    end
+    return z
+end
+ 
 ###############################################################################
 #
 #   Transpose
