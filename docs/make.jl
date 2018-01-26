@@ -7,6 +7,7 @@ makedocs(
              "index.md",
              "constructors.md",
              "rings.md",
+             "euclidean.md",
              "types.md" # Appendix A
          ]
 )
