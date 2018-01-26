@@ -10,6 +10,7 @@ pages:
 - About AbstractAlgebra:        about.md
 - Types in AbstractAlgebra:     types.md
 - Parent object constructors:   constructors.md
+- The Ring interface:           rings.md
 
 markdown_extensions:
   - extra

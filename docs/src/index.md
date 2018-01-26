@@ -51,7 +51,7 @@ julia> Pkg.add("AbstractAlgebra")
 
 ## Quick start
 
-Here are some examples of using AbstractAlgebra.jl..
+Here are some examples of using AbstractAlgebra.jl.
 
 This example computes recursive univariate polynomials.
 
