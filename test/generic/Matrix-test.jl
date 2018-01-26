@@ -955,6 +955,24 @@ function test_gen_mat_hessenberg()
    println("PASS")
 end
 
+function test_gen_mat_kronecker_product()
+   print("Generic.Mat.kronecker_product...")
+   
+   R = ResidueRing(JuliaZZ, 18446744073709551629)
+   S = MatrixSpace(R, 2, 3)
+   S2 = MatrixSpace(R, 2, 2)
+   S3 = MatrixSpace(R, 3, 3)
+   
+   A = S(R.([2 3 5; 9 6 3]))
+   B = S2(R.([2 3; 1 4]))
+   C = S3(R.([2 3 5; 1 4 7; 9 6 3]))
+   
+   @test size(kronecker_product(A, A)) == (4,9)
+   @test kronecker_product(B*A,A*C) == kronecker_product(B,A) * kronecker_product(A,C)
+
+   println("PASS")
+end
+
 function test_gen_mat_charpoly()
    print("Generic.Mat.charpoly...")
 
@@ -1510,6 +1528,7 @@ function test_gen_mat()
    test_gen_mat_nullspace()
    test_gen_mat_inversion()
    test_gen_mat_hessenberg()
+   test_gen_mat_kronecker_product()
    test_gen_mat_charpoly()
    test_gen_mat_minpoly()
    test_gen_row_swapping()
