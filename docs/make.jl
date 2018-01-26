@@ -6,8 +6,8 @@ makedocs(
          pages    = [
              "index.md",
              "constructors.md",
-             "types.md",
-             "rings.md"
+             "rings.md",
+             "types.md" # Appendix A
          ]
 )
 
