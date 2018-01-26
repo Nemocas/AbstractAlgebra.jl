@@ -1,4 +1,4 @@
-# Euclidean rings interface
+# Euclidean ring interface
 
 If a ring provides a meaningful Euclidean structure such that a useful Euclidean
 remainder can be computed practically, various additional functionality is provided
@@ -92,5 +92,5 @@ gcdinv(f::MyElem, g::MyElem)
 ```
 
 Returns a tuple `d, s` such that $d = gcd(f, g)$ and $s = (f/d)^{-1} \pmod{g/d}$. Note
-that $d == 1$ iff $f$ is invertible modulo $g$, in which case $s = f^{-1} \pmod{g}$.
+that $d = 1$ iff $f$ is invertible modulo $g$, in which case $s = f^{-1} \pmod{g}$.
 
