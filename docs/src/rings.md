@@ -72,41 +72,6 @@ functions that are not documented here. If they do, those functions will only be
 available for rings that implement that additional functionality, and should be
 documented as such.
 
-### Constructors
-
-Outer constructors for most AbstractAlgebra types are provided by overloading the call
-syntax for parent objects. 
-
-If `R` is a parent object for a given ring we provide the following constructors.
-
-```julia
-(R::MyParent)()
-```
-
-Return the zero object of the given ring.
-
-```julia
-(R::MyParent)(a::Integer)
-```
-
-Coerce the given integer into the given ring.
-
-```julia
-(R::MyParent)(a::MyElem)
-```
-
-If $a$ belongs to the given ring, the function returns it (without making a copy).
-Otherwise an error is thrown.
-
-For parameterised rings we also require a function to coerce from the base ring into
-the parent ring.
-
-```julia
-(R::MyParent{T})(a::T) where T <: AbstractAlgebra.RingElem
-```
-
-Coerce $a$ into the ring $R$ if $a$ belongs to the base ring of $R$.
-
 ### Data type and parent object methods
 
 ```julia
@@ -222,6 +187,41 @@ may be ignored.
 
 In the case that internal self-references are possible, please consult the Julia
 documentation on how to implement `deepcopy_internal`.
+
+### Constructors
+
+Outer constructors for most AbstractAlgebra types are provided by overloading the call
+syntax for parent objects. 
+
+If `R` is a parent object for a given ring we provide the following constructors.
+
+```julia
+(R::MyParent)()
+```
+
+Return the zero object of the given ring.
+
+```julia
+(R::MyParent)(a::Integer)
+```
+
+Coerce the given integer into the given ring.
+
+```julia
+(R::MyParent)(a::MyElem)
+```
+
+If $a$ belongs to the given ring, the function returns it (without making a copy).
+Otherwise an error is thrown.
+
+For parameterised rings we also require a function to coerce from the base ring into
+the parent ring.
+
+```julia
+(R::MyParent{T})(a::T) where T <: AbstractAlgebra.RingElem
+```
+
+Coerce $a$ into the ring $R$ if $a$ belongs to the base ring of $R$.
 
 ### Basic manipulation of rings and elements
 
