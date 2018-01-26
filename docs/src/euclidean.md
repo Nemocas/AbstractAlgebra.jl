@@ -1,4 +1,4 @@
-## Euclidean rings interface
+# Euclidean rings interface
 
 If a ring provides a meaningful Euclidean structure such that a useful Euclidean
 remainder can be computed practically, various additional functionality is provided
