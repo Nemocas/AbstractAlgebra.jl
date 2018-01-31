@@ -152,8 +152,8 @@ end
 function test_gen_mat_size()
    print("Generic.Mat.size...")
 
-   A = matrix(QQ, [1 2 3; 4 5 6; 7 8 9])
-   B = matrix(QQ, [1 2 3 4; 5 6 7 8])
+   A = matrix(JuliaQQ, [1 2 3; 4 5 6; 7 8 9])
+   B = matrix(JuliaQQ, [1 2 3 4; 5 6 7 8])
 
    @test size(A) == (3,3)
    @test issquare(A)
