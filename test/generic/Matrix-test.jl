@@ -149,6 +149,21 @@ function test_gen_mat_constructors()
    println("PASS")
 end
 
+function test_gen_mat_size()
+   print("Generic.Mat.size...")
+
+   A = matrix(QQ, [1 2 3; 4 5 6; 7 8 9])
+   B = matrix(QQ, [1 2 3 4; 5 6 7 8])
+
+   @test size(A) == (3,3)
+   @test issquare(A)
+
+   @test size(B) == (2,4)
+   @test !issquare(B)
+
+   println("PASS")
+end
+
 function test_gen_mat_manipulation()
    print("Generic.Mat.manipulation...")
 
@@ -1503,6 +1518,7 @@ end
 
 function test_gen_mat()
    test_gen_mat_constructors()
+   test_gen_mat_size()
    test_gen_mat_manipulation()
    test_gen_mat_sub()
    test_gen_mat_unary_ops()
