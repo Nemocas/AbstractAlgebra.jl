@@ -233,75 +233,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "rings.html#Required-functionality-for-inexact-rings-1",
+    "location": "rings.html#Promotion-rules-1",
     "page": "Ring interface",
-    "title": "Required functionality for inexact rings",
+    "title": "Promotion rules",
     "category": "section",
-    "text": ""
-},
-
-{
-    "location": "rings.html#Approximation-(floating-point-and-ball-arithmetic-only)-1",
-    "page": "Ring interface",
-    "title": "Approximation (floating point and ball arithmetic only)",
-    "category": "section",
-    "text": "isapprox(f::MyElem, g::MyElem; atol::Real=sqrt(eps()))This is used by test code that uses rings involving floating point or ball arithmetic. The function should return true if all components of f and g are equal to within the square root of the Julia epsilon, since numerical noise may make an exact comparison impossible."
-},
-
-{
-    "location": "rings.html#Optional-functionality-1",
-    "page": "Ring interface",
-    "title": "Optional functionality",
-    "category": "section",
-    "text": "Some functionality is difficult or impossible to implement for all rings in the system. If it is provided, additional functionality or performance may become available. Here is a list of all functions that are considered optional and can't be relied on by generic functions in the AbstractAlgebra Ring interface.It may be that no algorithm, or no efficient algorithm is known to implement these functions. As these functions are optional, they do not need to exist. Julia will already inform the user that the function has not been implemented if it is called but doesn't exist."
-},
-
-{
-    "location": "rings.html#Optional-basic-manipulation-functionality-1",
-    "page": "Ring interface",
-    "title": "Optional basic manipulation functionality",
-    "category": "section",
-    "text": "isunit(f::MyElem)Return true if the given element is a unit in the ring it belongs to. "
-},
-
-{
-    "location": "rings.html#Optional-binary-ad-hoc-operators-1",
-    "page": "Ring interface",
-    "title": "Optional binary ad hoc operators",
-    "category": "section",
-    "text": "By default, ad hoc operations are handled by AbstractALgebra.jl if they are not defined explicitly, by coercing both operands into the same ring and then performing the required operation.In some cases, e.g. for matrices, this leads to very inefficient behaviour. In such cases, it is advised to implement some of these operators explicitly.It can occasionally be worth adding a separate set of ad hoc binary operators for the type Int, if this can be done more efficiently than for arbitrary Julia Integer types.+(f::MyElem, c::Integer)\n-(f::MyElem, c::Integer)\n*(f::MyElem, c::Integer)+(c::Integer, f::MyElem)\n-(c::Integer, f::MyElem)\n*(c::Integer, f::MyElem)For parameterised types, it is also sometimes more performant to provide explicit ad hoc operators with elements of the base ring.+(f::MyElem{T}, c::T) where T <: AbstractAlgebra.RingElem\n-(f::MyElem{T}, c::T) where T <: AbstractAlgebra.RingElem\n*(f::MyElem{T}, c::T) where T <: AbstractAlgebra.RingElem+(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem\n-(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem\n*(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem"
-},
-
-{
-    "location": "rings.html#Optional-ad-hoc-comparisons-1",
-    "page": "Ring interface",
-    "title": "Optional ad hoc comparisons",
-    "category": "section",
-    "text": "==(f::MyElem, c::Integer)==(c::Integer, f::MyElem)==(f::MyElem{T}, c:T) where T <: AbstractAlgebra.RingElem==(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem"
-},
-
-{
-    "location": "rings.html#Optional-ad-hoc-exact-division-functions-1",
-    "page": "Ring interface",
-    "title": "Optional ad hoc exact division functions",
-    "category": "section",
-    "text": "divexact(a::MyType{T}, b::T) where T <: AbstractAlgebra.RingElemdivexact(a::MyType, b::Integer)"
-},
-
-{
-    "location": "rings.html#Optional-powering-functions-1",
-    "page": "Ring interface",
-    "title": "Optional powering functions",
-    "category": "section",
-    "text": "^(f::MyElem, e::BigInt)In case f cannot explode in size when powered by a very large integer, and it is practical to do so, one may provide this function to support powering with BigInt exponents."
-},
-
-{
-    "location": "rings.html#Optional-unsafe-operators-1",
-    "page": "Ring interface",
-    "title": "Optional unsafe operators",
-    "category": "section",
-    "text": "addmul!(c::MyElem, a::MyElem, b::MyElem, t::MyElem)Set c = c + ab in-place. Return the mutated value. The value t should be a temporary of the same type as a, b and c, which can be used arbitrarily by the implementation to speed up the computation. Aliasing between a, b and c is  permitted."
+    "text": "In order for AbstractAlgebra to be able to automatically coerce up towers of rings, certain promotion rules must be defined. For every ring, one wants to be able to coerce integers into the ring. And for any ring constructed over a base ring, one would like to be able to coerce from the base ring into the ring.The promotion rules look a bit different depending on whether the element type is parameterised or not and whether it is built on a base ring.For ring element types MyElem that are neither parameterised, not built over a base ring, the promotion rules can be defined as follows:promote_rule(::Type{MyElem}, ::Type{T}) where {T <: Integer} = MyElemFor ring element types MyType that aren't parameterised, but which have a base ring with concrete element type T the promotion rules can be defined as follows:promote_rule(::Type{MyElem}, ::Type{U}) where U <: Integer = MyElempromote_rule(::Type{MyElem}, ::Type{T}) = MyElemFor ring element types MyElem{T} that are parameterised by the type of elements of the base ring, the promotion rules can be defined as follows:promote_rule(::Type{MyElem{T}}, ::Type{MyElem{T}}) where T <: RingElement = MyElem{T}\njulia function promote_rule(::Type{MyElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingEle ment}    promote_rule(T, U) == T ? MyElem{T} : Union{} end\n## Required functionality for inexact rings\n\n### Approximation (floating point and ball arithmetic only)\njulia isapprox(f::MyElem, g::MyElem; atol::Real=sqrt(eps()))\nThis is used by test code that uses rings involving floating point or ball arithmetic.\nThe function should return `true` if all components of $f$ and $g$ are equal to\nwithin the square root of the Julia epsilon, since numerical noise may make an exact\ncomparison impossible.\n\nFor parameterised rings over an inexact ring, we also require the following ad hoc\napproximation functionality.\njulia isapprox(f::MyElem{T}, g::T; atol::Real=sqrt(eps())) where T <: AbstractAlgebra.RingElemjulia isapprox(f::T, g::MyElem{T}; atol::Real=sqrt(eps())) where T <: AbstractAlgebra.RingElem\nThese notionally coerce the element of the base ring into the parameterised ring and do\na full comparison.\n\n## Optional functionality\n\nSome functionality is difficult or impossible to implement for all rings in the system.\nIf it is provided, additional functionality or performance may become available. Here\nis a list of all functions that are considered optional and can't be relied on by\ngeneric functions in the AbstractAlgebra Ring interface.\n\nIt may be that no algorithm, or no efficient algorithm is known to implement these\nfunctions. As these functions are optional, they do not need to exist. Julia will\nalready inform the user that the function has not been implemented if it is called but\ndoesn't exist.\n\n### Optional basic manipulation functionality\njulia isunit(f::MyElem)\nReturn `true` if the given element is a unit in the ring it belongs to. \n \n### Optional binary ad hoc operators\n\nBy default, ad hoc operations are handled by AbstractAlgebra.jl if they are not defined\nexplicitly, by coercing both operands into the same ring and then performing the\nrequired operation.\n\nIn some cases, e.g. for matrices, this leads to very inefficient behaviour. In such\ncases, it is advised to implement some of these operators explicitly.\n\nIt can occasionally be worth adding a separate set of ad hoc binary operators for the\ntype `Int`, if this can be done more efficiently than for arbitrary Julia Integer types.\njulia +(f::MyElem, c::Integer) -(f::MyElem, c::Integer) *(f::MyElem, c::Integer)julia +(c::Integer, f::MyElem) -(c::Integer, f::MyElem) *(c::Integer, f::MyElem)\nFor parameterised types, it is also sometimes more performant to provide explicit ad\nhoc operators with elements of the base ring.\njulia +(f::MyElem{T}, c::T) where T <: AbstractAlgebra.RingElem -(f::MyElem{T}, c::T) where T <: AbstractAlgebra.RingElem *(f::MyElem{T}, c::T) where T <: AbstractAlgebra.RingElemjulia +(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem -(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem *(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem\n### Optional ad hoc comparisons\njulia ==(f::MyElem, c::Integer)julia ==(c::Integer, f::MyElem)julia ==(f::MyElem{T}, c:T) where T <: AbstractAlgebra.RingElemjulia ==(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem\n### Optional ad hoc exact division functions\njulia divexact(a::MyType{T}, b::T) where T <: AbstractAlgebra.RingElemjulia divexact(a::MyType, b::Integer)\n### Optional powering functions\njulia ^(f::MyElem, e::BigInt)\nIn case $f$ cannot explode in size when powered by a very large integer, and it is\npractical to do so, one may provide this function to support powering with `BigInt`\nexponents.\n\n### Optional unsafe operators\njulia addmul!(c::MyElem, a::MyElem, b::MyElem, t::MyElem) ```Set c = c + ab in-place. Return the mutated value. The value t should be a temporary of the same type as a, b and c, which can be used arbitrarily by the implementation to speed up the computation. Aliasing between a, b and c is  permitted."
 },
 
 {
@@ -318,6 +254,62 @@ var documenterSearchIndex = {"docs": [
     "title": "Euclidean ring interface",
     "category": "section",
     "text": "If a ring provides a meaningful Euclidean structure such that a useful Euclidean remainder can be computed practically, various additional functionality is provided by AbstractAlgebra.jl for those rings. This functionality depends on the following functions existing.mod(f::MyElem, g::MyElem)Returns the Euclidean remainder of f by g. A DivideError() should be thrown if g is zero. An error should be thrown if an impossible inverse is encountered.divrem(f::MyElem, g::MyElem)Returns a pair q, r consisting of the Euclidean quotient and remainder of f by g. A DivideError should be thrown if g is zero. An error should be thrown if an impossible inverse is encountered.div(f::MyElem, g::MyElem)Returns the Euclidean quotient of f by g. A DivideError should be thrown if g is zero. An error should be thrown if an impossible inverse is encountered.mulmod(f::MyElem, g::MyElem, m::MyElem)Returns fg pmodm.powmod(f::MyElem, e::Int, m::MyElem)Returns f^e pmodm.invmod(f::MyElem, m::MyElem)Returns the inverse of f modulo m. If such an inverse doesn't exist, an impossible inverse error should be thrown.divides(f::MyElem, g::MyElem)Returns a pair, flag, q, where flag is set to true if g divides f, in which case the quotient is set to the quotient, or flag is set to false and the quotient is set to zero in the same ring as f and g.remove(f::MyElem, p::MyElem)Returns a pair v, q where p^v is the highest power of p dividing f, and q is the cofactor after f is divided by this power.valuation(f::MyElem, p::MyElem)Returns v where p^v is the highest power of p dividing f.gcd(f::MyElem, g::MyElem)Returns a greatest common divisor of f and g.lcm(f::MyElem, g::MyElem)Returns fggcd(f g) if either f or g is not zero, otherwise it throws a DivideError().gcdx(f::MyElem, g::MyElem)Returns a triple d, s, t such that d = gcd(f g) and d = sf + tg, with s reduced modulo g and t reduced modulo f.gcdinv(f::MyElem, g::MyElem)Returns a tuple d, s such that d = gcd(f g) and s = (fd)^-1 pmodgd. Note that d = 1 iff f is invertible modulo g, in which case s = f^-1 pmodg."
+},
+
+{
+    "location": "polynomial_rings.html#",
+    "page": "Univariate Polynomial Ring Interface",
+    "title": "Univariate Polynomial Ring Interface",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "polynomial_rings.html#Univariate-Polynomial-Ring-Interface-1",
+    "page": "Univariate Polynomial Ring Interface",
+    "title": "Univariate Polynomial Ring Interface",
+    "category": "section",
+    "text": "Univariate polynomial rings are supported in AbstractAlgebra, and in addition to the standard Ring interface, numerous additional functions are required to be present for univariate polynomial rings.Univariate polynomial rings over a field are also Euclidean and therefore such rings must implement the Euclidean interface.Since a sparse distributed multivariate format can generally also handle sparse univariate polynomials, the univariate polynomial interface is designed around the assumption that they are dense. This is not a requirement, but it may be easier to use the multivariate interface for sparse univariate types."
+},
+
+{
+    "location": "polynomial_rings.html#Types-and-parents-1",
+    "page": "Univariate Polynomial Ring Interface",
+    "title": "Types and parents",
+    "category": "section",
+    "text": "AbstractAlgebra provides two abstract types for polynomial rings and their elements:PolyRing{T} is the abstract type for univariate polynomial ring parent types\nPolyElem{T} is the abstract type for univariate polynomial typesNote that both abstract types are parameterised. The type T should usually be the type of elements of the coefficient ring of the polynomial ring. For example, in the case of mathbbZx the type T would be the type of an integer, e.g. BigInt.If the parent object for such a ring has type MyZX and polynomials in that ring have type MyZXPoly then one would have:`MyZX <: PolyRing{BigInt}\n`MyZXPoly <: PolyElem{BigInt}Polynomial rings should be made unique on the system by caching parent objects (unless an optional cache parameter is set to false). Polynomial rings should at least be distinguished based on their base (coefficient) ring. But if they have the same base ring and symbol (for their variable/generator), they should certainly have the same parent object.See src/generic/GenericTypes.jl for an example of how to implement such a cache (which usually makes use of a dictionary)."
+},
+
+{
+    "location": "polynomial_rings.html#Required-functionality-for-univariate-polynomials-1",
+    "page": "Univariate Polynomial Ring Interface",
+    "title": "Required functionality for univariate polynomials",
+    "category": "section",
+    "text": "In addition to the required functionality for the Ring interface and in the case of polynomials over a field, the Euclidean Ring interface, the Polynomial Ring interface has the following required functions.We suppose that R is a fictitious base ring (coefficient ring) and that S is a univariate polynomial ring over R (i.e. S = Rx) with parent object S of type MyPolyRing{T}. We also assume the polynomials in the ring have type MyPoly{T}, where T is the type of elements of the base (coefficient) ring.Of course, in practice these types may not be parameterised, but we use parameterised types here to make the interface clearer.Note that the type T must (transitively) belong to the abstract type RingElem."
+},
+
+{
+    "location": "polynomial_rings.html#Constructors-1",
+    "page": "Univariate Polynomial Ring Interface",
+    "title": "Constructors",
+    "category": "section",
+    "text": "In addition to the standard constructors, the following constructors, taking an array of coefficients, must be available. In each case, the array may have trailing zero entries, but the resulting polynomial should usually be normalised (of length zero, or with nonzero leading coefficient).(S::MyPolyRing{T})(A::Array{T, 1}) where T <: AbstractAlgebra.RingElemCreate the polynomial in the given ring whose degree i coefficient is given by A[i].(S::MyPolyRing{T})(A::Array{U, 1}) where T <: AbstractAlgebra.RingElem, U <: AbstractAlgebra.RingElemCreate the polynomial in the given ring whose degree i coefficient is given by A[i]. The elements of the array are assumed to be able to be coerced into the base ring R.(S::MyPolyRing{T})(A::Array{U, 1}) where T <: AbstractAlgebra.RingElem, U <: IntegerCreate the polynomial in the given ring whose degree i coefficient is given by A[i].It may be desirable to have a additional version of the function that accepts an array of Julia Int values  if this can be done more efficiently."
+},
+
+{
+    "location": "polynomial_rings.html#Data-type-and-parent-object-methods-1",
+    "page": "Univariate Polynomial Ring Interface",
+    "title": "Data type and parent object methods",
+    "category": "section",
+    "text": "var(S::MyPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn a Symbol representing the variable (generator) of the polynomial ring. Note that this is a Symbol not a String, though its string value will usually be used when printing polynomials.vars(S::MyPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn the array [s] where s	 is aSymbol` representing the variable of the given polynomial ring. This is provided for uniformity with the multivariate interface, where there is more than one variable, and hence an array of symbols."
+},
+
+{
+    "location": "polynomial_rings.html#Basic-manipulation-of-rings-and-elements-1",
+    "page": "Univariate Polynomial Ring Interface",
+    "title": "Basic manipulation of rings and elements",
+    "category": "section",
+    "text": "length(f::MyPoly{T}) where T <: AbstractAlgebra.RingElemReturn the length of the given polynomial. The length of the zero polynomial is defined to be 0, otherwise the length is the degree plus 1. The return value should be of type Int.set_length!(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemThis function must zero any coefficients beyond the requested length n and then set the length of the polynomial to n. This function does not need to normalise the polynomial and is not useful to the user, but is used extensively by the AbstractAlgebra generic functionality.This function mutates the existing polynomial in-place if possible, and returns the mutated polynomial (to also support immutable types).coeff(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemReturn the coefficient of the polynomial f of degree n. If n is larger than the degree of the polynomial, it should return zero in the coefficient ring. setcoeff!(f::MyPoly{T}, n::Int, a::T) where T <: AbstractAlgebra.RingElemSet the degree n coefficient of f to a. This mutates the polynomial in-place if possible and returns the mutated polynomial (so that immutable types can also be supported). The function must not assume that the polynomial already has space for n + 1 coefficients. The polynomial must be resized if this is not the case.Note that this function is not required to normalise the polynomial and is not necessarily useful to the user, but is used extensively by the generic functionality in AbstractAlgebra.jl. It is for setting raw coefficients in the representation.normalise(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemGiven a polynomial whose length is currently n, including any leading zero coefficients, return the length of the normalised polynomial (either zero of the length of the polynomial with nonzero leading coefficient). Note that the function does not actually perform the normalisation.fit!(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemEnsire that the polynomial f internally has space for n coefficients. This function must mutate the function in-place if it is mutable. It does not return the mutated polynomial. Immutable types can still be supported by defining this function to do nothing.Some interfaces for C polynomial types automatically manage the internal allocation of polynomials in every function that can be called on them. Explicit adjustment by the generic code in AbstractAlgebra.jl is not required. In such cases, this function can also be defined to do nothing."
 },
 
 {
