@@ -8,6 +8,7 @@ makedocs(
              "constructors.md",
              "rings.md",
              "euclidean.md",
+             "polynomial_rings.md",
              "types.md" # Appendix A
          ]
 )

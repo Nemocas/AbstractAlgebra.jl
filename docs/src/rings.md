@@ -448,6 +448,47 @@ Returns a random element in the given ring of the specified size.
 There can be as many arguments as is necessary to specify the size of the test example
 which is being produced.
 
+### Promotion rules
+
+In order for AbstractAlgebra to be able to automatically coerce up towers of rings,
+certain promotion rules must be defined. For every ring, one wants to be able to coerce
+integers into the ring. And for any ring constructed over a base ring, one would like to
+be able to coerce from the base ring into the ring.
+
+The promotion rules look a bit different depending on whether the element type is
+parameterised or not and whether it is built on a base ring.
+
+For ring element types `MyElem` that are neither parameterised, not built over a base
+ring, the promotion rules can be defined as follows:
+
+```julia
+promote_rule(::Type{MyElem}, ::Type{T}) where {T <: Integer} = MyElem
+```
+
+For ring element types `MyType` that aren't parameterised, but which have a base ring
+with concrete element type `T` the promotion rules can be defined as follows:
+
+```julia
+promote_rule(::Type{MyElem}, ::Type{U}) where U <: Integer = MyElem
+```
+
+```julia
+promote_rule(::Type{MyElem}, ::Type{T}) = MyElem
+```
+
+For ring element types `MyElem{T}` that are parameterised by the type of elements of
+the base ring, the promotion rules can be defined as follows:
+
+```julia
+promote_rule(::Type{MyElem{T}}, ::Type{MyElem{T}}) where T <: RingElement = MyElem{T}
+
+```julia
+function promote_rule(::Type{MyElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingEle
+ment}
+   promote_rule(T, U) == T ? MyElem{T} : Union{}
+end
+```
+
 ## Required functionality for inexact rings
 
 ### Approximation (floating point and ball arithmetic only)
@@ -460,6 +501,20 @@ This is used by test code that uses rings involving floating point or ball arith
 The function should return `true` if all components of $f$ and $g$ are equal to
 within the square root of the Julia epsilon, since numerical noise may make an exact
 comparison impossible.
+
+For parameterised rings over an inexact ring, we also require the following ad hoc
+approximation functionality.
+
+```julia
+isapprox(f::MyElem{T}, g::T; atol::Real=sqrt(eps())) where T <: AbstractAlgebra.RingElem
+```
+
+```julia
+isapprox(f::T, g::MyElem{T}; atol::Real=sqrt(eps())) where T <: AbstractAlgebra.RingElem
+```
+
+These notionally coerce the element of the base ring into the parameterised ring and do
+a full comparison.
 
 ## Optional functionality
 
@@ -483,7 +538,7 @@ Return `true` if the given element is a unit in the ring it belongs to.
  
 ### Optional binary ad hoc operators
 
-By default, ad hoc operations are handled by AbstractALgebra.jl if they are not defined
+By default, ad hoc operations are handled by AbstractAlgebra.jl if they are not defined
 explicitly, by coercing both operands into the same ring and then performing the
 required operation.
 
