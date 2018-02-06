@@ -321,6 +321,406 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "polynomial.html#",
+    "page": "Generic univariate polynomials",
+    "title": "Generic univariate polynomials",
+    "category": "page",
+    "text": "CurrentModule = AbstractAlgebra"
+},
+
+{
+    "location": "polynomial.html#Generic-univariate-polynomials-1",
+    "page": "Generic univariate polynomials",
+    "title": "Generic univariate polynomials",
+    "category": "section",
+    "text": "AbstractAlgebra.jl provides a module, implemented in src/generic/Poly.jl for generic polynomials over any ring belonging to the AbstractAlgebra abstract type hierarchy.As well as implementing the Univariate Polynomial interface, and relevant parts of the Euclidean Ring interface for polynomials over a field, there are many additional generic algorithms implemented for such polynomial rings. We describe this generic functionality below.All of the generic functionality is part of a submodule of AbstractAlgebra called Generic. This is exported by default so that it is not necessary to qualify the function names with the submodule name."
+},
+
+{
+    "location": "polynomial.html#Types-and-parent-objects-1",
+    "page": "Generic univariate polynomials",
+    "title": "Types and parent objects",
+    "category": "section",
+    "text": "Polynomials implemented using the AbstractAlgebra generics have type Generic.Poly{T} where T is the type of elements of the coefficient ring. Internally they consist of a Julia array of coefficients and some additional fields for length and a parent object, etc. See the file src/generic/GenericTypes.jl for details.Parent objects of such polynomials have type Generic.PolyRing{T}.The string representation of the variable of the polynomial ring, and the base/coefficient ring R is stored in the parent object. The polynomial element types belong to the abstract type AbstractAlgebra.PolyElem{T} and the polynomial ring types belong to the abstract type AbstractAlgebra.PolyRing{T}. This enables one to write generic functions that can accept any AbstractAlgebra polynomial type.Note that both the generic polynomial ring type Generic.PolyRing{T} and the abstract type it belongs to, AbstractAlgebra.PolyRing{T} are both called PolyRing. The  former is a (parameterised) concrete type for a polynomial ring over a given base ring whose elements have type T. The latter is an abstract type representing all polynomial ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g. supplied by a C library)."
+},
+
+{
+    "location": "polynomial.html#Polynomial-ring-constructors-1",
+    "page": "Generic univariate polynomials",
+    "title": "Polynomial ring constructors",
+    "category": "section",
+    "text": "In order to construct polynomials in AbstractAlgebra.jl, one must first construct the polynomial ring itself. This is accomplished with the following constructor.PolynomialRing(R::AbstractAlgebra.Ring, s::AbstractString; cached::Bool = true)Given a base ring R and string s specifying how the generator (variable) should be printed, return a tuple S, x representing the new polynomial ring S = Rx and the generator x of the ring. By default the parent object S will depend only on R and  x and will be cached. Setting the optional argument cached to false will prevent the parent object S from being cached.A shorthand version of this function is provided: given a base ring R, we abbreviate the constructor as follows.R[\"x\"]Here are some examples of creating polynomial rings and making use of the resulting parent objects to coerce various elements into the polynomial ring.R, x = PolynomialRing(JuliaZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\nT, z = JuliaQQ[\"z\"]\n\nf = R()\ng = R(123)\nh = S(BigInt(1234))\nk = S(x + 1)\nm = T(z + 1)All of the examples here are generic polynomial rings, but specialised implementations of polynomial rings provided by external modules will also usually provide a PolynomialRing constructor to allow creation of their polynomial rings."
+},
+
+{
+    "location": "polynomial.html#Basic-ring-functionality-1",
+    "page": "Generic univariate polynomials",
+    "title": "Basic ring functionality",
+    "category": "section",
+    "text": "Once a polynomial ring is constructed, there are various ways to construct polynomials in that ring.The easiest way is simply using the generator returned by the PolynomialRing constructor and build up the polynomial using basic arithmetic, as described in the Ring interface. The Julia language also has special syntax for the construction of polynomials in terms of a generator, e.g. we can write 2x instead of 2*x.The polynomial rings in AbstractAlgebra.jl implement the full Ring interface. Of course the entire Univariate Polynomial Ring interface is also implemented.We give some examples of such functionality.ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = x^3 + 3x + 21\ng = (x + 1)*y^2 + 2x + 1\n\nh = zero(S)\nk = one(R)\nh = isone(k)\nk = iszero(f)\nn = length(g)\nU = base_ring(S)\nV = base_ring(y + 1)\nv = var(S)\nT = parent(y + 1)\ng == deepcopy(g)\nt = divexact(2g, 2)For polynomials over a field, the Euclidean Ring interface is implemented.ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\nT, y = PolynomialRing(S, \"y\")\n\nf = (3*x^2 + x + 2)*y + x^2 + 1\ng = (5*x^2 + 2*x + 1)*y^2 + 2x*y + x + 1\nh = (3*x^3 + 2*x^2 + x + 7)*y^5 + 2x*y + 1\n\ninvmod(f, g)\nmulmod(f, g, h)\npowmod(f, 3, h)\nh = mod(f, g)\nq, r = divrem(f, g)\nd = gcd(f*h, g*h)\nk = gcdinv(f, h)\nm = lcm(f, h)\nflag, q = divides(g^2, g)\nvaluation(3g^3, g) == 3\nval, q = remove(5g^3, g)\nr, s, t = gcdx(g, h)Functions in the Euclidean Ring interface are supported over residue rings that are not fields, except that if an impossible inverse is encountered during the computation an error is thrown."
+},
+
+{
+    "location": "polynomial.html#Polynomial-functionality-provided-by-AbstractAlgebra.jl-1",
+    "page": "Generic univariate polynomials",
+    "title": "Polynomial functionality provided by AbstractAlgebra.jl",
+    "category": "section",
+    "text": "The functionality listed below is automatically provided by AbstractAlgebra.jl for any polynomial module that implements the full Univariate Polynomial Ring interface. This includes AbstractAlgebra.jl's own generic polynomial rings.But if a C library provides all the functionality documented in the Univariate Polynomial Ring interface, then all the functions described here will also be  automatically supplied by AbstractAlgebra.jl for that polynomial type.Of course, modules are free to provide specific implementations of the functions described here, that override the generic implementation."
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.modulus-Union{Tuple{AbstractAlgebra.PolyElem{T}}, Tuple{T}} where T<:AbstractAlgebra.ResElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.modulus",
+    "category": "Method",
+    "text": "modulus{T <: ResElem}(a::AbstractAlgebra.PolyElem{T})\n\nReturn the modulus of the coefficients of the given polynomial.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.lead-Tuple{AbstractAlgebra.PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.lead",
+    "category": "Method",
+    "text": "lead(x::AbstractAlgebra.PolyElem)\n\nReturn the leading coefficient of the given polynomial. This will be the nonzero coefficient of the term with highest degree unless the polynomial in the zero polynomial, in which case a zero coefficient is returned.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.trail-Tuple{AbstractAlgebra.PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.trail",
+    "category": "Method",
+    "text": "trail(x::AbstractAlgebra.PolyElem)\n\nReturn the trailing coefficient of the given polynomial. This will be the nonzero coefficient of the term with lowest degree unless the polynomial in the zero polynomial, in which case a zero coefficient is returned.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.gen-Tuple{AbstractAlgebra.PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.gen",
+    "category": "Method",
+    "text": "gen{T <: RingElement}(R::AbsSeriesRing{T})\n\nReturn the generator of the power series ring, i.e. x + O(x^n) where n is the precision of the power series ring R.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.isgen-Tuple{AbstractAlgebra.PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.isgen",
+    "category": "Method",
+    "text": "isgen(a::AbstractAlgebra.PolyElem)\n\nReturn true if the given polynomial is the constant generator of its polynomial ring, otherwise return false.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.isunit-Tuple{AbstractAlgebra.PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.isunit",
+    "category": "Method",
+    "text": "isunit(a::AbstractAlgebra.PolyElem)\n\nReturn true if the given polynomial is a unit in its polynomial ring, otherwise return false.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.ismonomial-Tuple{AbstractAlgebra.PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.ismonomial",
+    "category": "Method",
+    "text": "ismonomial(a::AbstractAlgebra.PolyElem)\n\nReturn true if the given polynomial is a monomial.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.isterm-Tuple{AbstractAlgebra.PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.isterm",
+    "category": "Method",
+    "text": "isterm(a::AbstractAlgebra.PolyElem)\n\nReturn true if the given polynomial is has one term. This function is recursive, with all scalar types returning true.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#Basic-functionality-1",
+    "page": "Generic univariate polynomials",
+    "title": "Basic functionality",
+    "category": "section",
+    "text": "modulus{T <: ResElem}(::PolyElem{T})lead(::PolyElem)\ntrail(::PolyElem)gen(::PolyElem)isgen(::PolyElem)isunit(::PolyElem)ismonomial(::PolyElem)isterm(::PolyElem)ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\nT, z = PolynomialRing(JuliaQQ, \"z\")\nU = ResidueRing(JuliaZZ, 17)\nV, w = PolynomialRing(U, \"w\")\n\na = zero(S)\nb = one(S)\n\nc = BigInt(1)//2*z^2 + BigInt(1)//3\nd = x*y^2 + (x + 1)*y + 3\n\nf = lead(d)\ny = gen(S)\ng = isgen(w)\nm = isunit(b)\nn = degree(d)\nr = modulus(w)\nisterm(2y^2) == true\nismonomial(y^2) == true"
+},
+
+{
+    "location": "polynomial.html#Base.truncate-Tuple{AbstractAlgebra.PolyElem,Int64}",
+    "page": "Generic univariate polynomials",
+    "title": "Base.truncate",
+    "category": "Method",
+    "text": "truncate(a::AbstractAlgebra.PolyElem, n::Int)\n\nReturn a truncated to n terms.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.mullow-Union{Tuple{AbstractAlgebra.PolyElem{T},AbstractAlgebra.PolyElem{T},Int64}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.mullow",
+    "category": "Method",
+    "text": "mullow{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, n::Int)\n\nReturn atimes b truncated to n terms.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#Truncation-1",
+    "page": "Generic univariate polynomials",
+    "title": "Truncation",
+    "category": "section",
+    "text": "truncate(::PolyElem, ::Int)mullow{T <: RingElem}(::PolyElem{T}, ::PolyElem{T}, ::Int)ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = x*y^2 + (x + 1)*y + 3\ng = (x + 1)*y + (x^3 + 2x + 2)\n\nh = truncate(f, 1)\nk = mullow(f, g, 4)"
+},
+
+{
+    "location": "polynomial.html#Base.reverse-Tuple{AbstractAlgebra.PolyElem,Int64}",
+    "page": "Generic univariate polynomials",
+    "title": "Base.reverse",
+    "category": "Method",
+    "text": "reverse(x::AbstractAlgebra.PolyElem, len::Int)\n\nReturn the reverse of the polynomial x, thought of as a polynomial of the given length (the polynomial will be notionally truncated or padded with zeroes before the leading term if necessary to match the specified length). The resulting polynomial is normalised. If len is negative we throw a DomainError().\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#Base.reverse-Tuple{AbstractAlgebra.PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "Base.reverse",
+    "category": "Method",
+    "text": "reverse(x::AbstractAlgebra.PolyElem)\n\nReturn the reverse of the polynomial x, i.e. the leading coefficient of x becomes the constant coefficient of the result, etc. The resulting polynomial is normalised.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#Reversal-1",
+    "page": "Generic univariate polynomials",
+    "title": "Reversal",
+    "category": "section",
+    "text": "reverse(::PolyElem, ::Int)\nreverse(::PolyElem)ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = x*y^2 + (x + 1)*y + 3\n\ng = reverse(f, 7)\nh = reverse(f)"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.shift_left-Tuple{AbstractAlgebra.PolyElem,Int64}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.shift_left",
+    "category": "Method",
+    "text": "shift_left(x::AbstractAlgebra.PolyElem, n::Int)\n\nReturn the polynomial f shifted left by n terms, i.e. multiplied by x^n.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.shift_right-Tuple{AbstractAlgebra.PolyElem,Int64}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.shift_right",
+    "category": "Method",
+    "text": "shift_right(f::AbstractAlgebra.PolyElem, n::Int)\n\nReturn the polynomial f shifted right by n terms, i.e. divided by x^n.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#Shifting-1",
+    "page": "Generic univariate polynomials",
+    "title": "Shifting",
+    "category": "section",
+    "text": "shift_left(::PolyElem, ::Int)shift_right(::PolyElem, ::Int)ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = x*y^2 + (x + 1)*y + 3\n\ng = shift_left(f, 7)\nh = shift_right(f, 2)"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.pseudorem-Union{Tuple{AbstractAlgebra.PolyElem{T},AbstractAlgebra.PolyElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.pseudorem",
+    "category": "Method",
+    "text": "pseudorem{T <: RingElement}(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T})\n\nReturn the pseudoremainder of a divided by b. If b = 0 we throw a DivideError().\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.pseudodivrem-Union{Tuple{AbstractAlgebra.PolyElem{T},AbstractAlgebra.PolyElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.pseudodivrem",
+    "category": "Method",
+    "text": "pseudodivrem{T <: RingElement}(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T})\n\nReturn a tuple (q r) consisting of the pseudoquotient and pseudoremainder of a divided by b. If b = 0 we throw a DivideError().\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#Pseudodivision-1",
+    "page": "Generic univariate polynomials",
+    "title": "Pseudodivision",
+    "category": "section",
+    "text": "Given two polynomials a b, pseudodivision computes polynomials q and r with length(r)  length(b) such that L^d a = bq + r where d = length(a) - length(b) + 1 and L is the leading coefficient of b.We call q the pseudoquotient and r the pseudoremainder.pseudorem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})pseudodivrem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = x*y^2 + (x + 1)*y + 3\ng = (x + 1)*y + (x^3 + 2x + 2)\n\nh = pseudorem(f, g)\nq, r = pseudodivrem(f, g)"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.content-Tuple{AbstractAlgebra.PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.content",
+    "category": "Method",
+    "text": "content(a::AbstractAlgebra.PolyElem)\n\nReturn the content of a, i.e. the greatest common divisor of its coefficients.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.primpart-Tuple{AbstractAlgebra.PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.primpart",
+    "category": "Method",
+    "text": "primpart(a::AbstractAlgebra.PolyElem)\n\nReturn the primitive part of a, i.e. the polynomial divided by its content.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#Content-and-primitive-part-1",
+    "page": "Generic univariate polynomials",
+    "title": "Content and primitive part",
+    "category": "section",
+    "text": "content(::PolyElem)primpart(::PolyElem)ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nk = x*y^2 + (x + 1)*y + 3\n\nn = content(k)\np = primpart(k*(x^2 + 1))"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.evaluate-Union{Tuple{AbstractAlgebra.PolyElem{T},T}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.evaluate",
+    "category": "Method",
+    "text": "evaluate{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::T)\n\nEvaluate the polynomial a at the value b and return the result.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.evaluate-Tuple{AbstractAlgebra.PolyElem,Integer}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.evaluate",
+    "category": "Method",
+    "text": "evaluate{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::T)\n\nEvaluate the polynomial a at the value b and return the result.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.compose-Tuple{AbstractAlgebra.PolyElem,AbstractAlgebra.PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.compose",
+    "category": "Method",
+    "text": "compose(a::AbstractAlgebra.PolyElem, b::AbstractAlgebra.PolyElem)\n\nCompose the polynomial a with the polynomial b and return the result, i.e. return acirc b.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.subst-Union{Tuple{AbstractAlgebra.PolyElem{T},Any}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.subst",
+    "category": "Method",
+    "text": "subst{T <: RingElement}(f::AbstractAlgebra.PolyElem{T}, a::Any)\n\nEvaluate the polynomial f at a. Note that a can be anything, whether a ring element or not.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#Evaluation,-composition-and-substitution-1",
+    "page": "Generic univariate polynomials",
+    "title": "Evaluation, composition and substitution",
+    "category": "section",
+    "text": "evaluate{T <: RingElem}(::PolyElem{T}, ::T)\nevaluate(::PolyElem, ::Integer)compose(::PolyElem, ::PolyElem)subst{T <: RingElem}(::PolyElem{T}, ::Any)We also overload the functional notation so that the polynomial f can be evaluated at a by writing f(a). ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n   \nf = x*y^2 + (x + 1)*y + 3\ng = (x + 1)*y + (x^3 + 2x + 2)\nM = R[x + 1 2x; x - 3 2x - 1]\n\nk = evaluate(f, 3)\nm = evaluate(f, x^2 + 2x + 1)\nn = compose(f, g)\np = subst(f, M)\nq = f(M)\nr = f(23)"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.derivative-Tuple{AbstractAlgebra.PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.derivative",
+    "category": "Method",
+    "text": "derivative(a::AbstractAlgebra.PolyElem)\n\nReturn the derivative of the polynomial a.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.integral-Union{Tuple{AbstractAlgebra.PolyElem{T}}, Tuple{T}} where T<:Union{AbstractAlgebra.FieldElem, AbstractAlgebra.ResElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.integral",
+    "category": "Method",
+    "text": "integral{T <: Union{AbstractAlgebra.ResElem, FieldElement}}(x::AbstractAlgebra.PolyElem{T})\n\nReturn the integral of the polynomial a.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#Derivative-and-integral-1",
+    "page": "Generic univariate polynomials",
+    "title": "Derivative and integral",
+    "category": "section",
+    "text": "derivative(::PolyElem)integral{T <: Union{ResElem, FieldElem}}(::PolyElem{T})ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\nT, z = PolynomialRing(JuliaQQ, \"z\")\nU = ResidueRing(T, z^3 + 3z + 1)\nV, w = PolynomialRing(U, \"w\")\n\nf = x*y^2 + (x + 1)*y + 3\ng = (z^2 + 2z + 1)*w^2 + (z + 1)*w - 2z + 4\n\nh = derivative(f)\nk = integral(g)   "
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.resultant-Union{Tuple{AbstractAlgebra.PolyElem{T},AbstractAlgebra.PolyElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.resultant",
+    "category": "Method",
+    "text": "resultant{T <: RingElem}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})\n\nReturn the resultant of the given polynomials.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.resx-Union{Tuple{AbstractAlgebra.PolyElem{T},AbstractAlgebra.PolyElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.resx",
+    "category": "Method",
+    "text": "resx{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})\n\nReturn a tuple (r s t) such that r is the resultant of a and b and such that r = atimes s + btimes t.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.discriminant-Tuple{AbstractAlgebra.PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.discriminant",
+    "category": "Method",
+    "text": "discriminant(a::AbstractAlgebra.PolyElem)\n\nReturn the discrimnant of the given polynomial.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#Resultant-and-discriminant-1",
+    "page": "Generic univariate polynomials",
+    "title": "Resultant and discriminant",
+    "category": "section",
+    "text": "resultant{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})resx{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})discriminant(a::PolyElem)ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = 3x*y^2 + (x + 1)*y + 3\ng = 6(x + 1)*y + (x^3 + 2x + 2)\n\nh = resultant(f, g)\nk = discriminant(f)"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.monomial_to_newton!-Union{Tuple{Array{T,1},Array{T,1}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.monomial_to_newton!",
+    "category": "Method",
+    "text": "monomial_to_newton!{T <: RingElement}(P::Array{T, 1}, roots::Array{T, 1})\n\nConverts a polynomial p, given as an array of coefficients, in-place from its coefficients given in the standard monomial basis to the Newton basis for the roots r_0 r_1 ldots r_n-2. In other words, this determines output coefficients c_i such that c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + ldots + c_n-1(x-r_0)(x-r_1)cdots(x-r_n-2) is equal to the input polynomial.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.newton_to_monomial!-Union{Tuple{Array{T,1},Array{T,1}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.newton_to_monomial!",
+    "category": "Method",
+    "text": "newton_to_monomial!{T <: RingElement}(P::Array{T, 1}, roots::Array{T, 1})\n\nConverts a polynomial p, given as an array of coefficients, in-place from its coefficients given in the Newton basis for the roots r_0 r_1 ldots r_n-2 to the standard monomial basis. In other words, this evaluates c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + ldots + c_n-1(x-r_0)(x-r_1)cdots(x-r_n-2) where c_i are the input coefficients given by p.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#Newton-representation-1",
+    "page": "Generic univariate polynomials",
+    "title": "Newton representation",
+    "category": "section",
+    "text": "monomial_to_newton!{T <: RingElem}(::Array{T, 1}, ::Array{T, 1})newton_to_monomial!{T <: RingElem}(::Array{T, 1}, ::Array{T, 1})ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = 3x*y^2 + (x + 1)*y + 3\ng = deepcopy(f)\nroots = [R(1), R(2), R(3)]\n\nmonomial_to_newton!(g.coeffs, roots)\nnewton_to_monomial!(g.coeffs, roots)"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.interpolate-Union{Tuple{AbstractAlgebra.PolyRing,Array{T,1},Array{T,1}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.interpolate",
+    "category": "Method",
+    "text": "interpolate{T <: RingElement}(S::AbstractAlgebra.PolyRing, x::Array{T, 1}, y::Array{T, 1})\n\nGiven two arrays of values xs and ys of the same length n, find the polynomial f in the polynomial ring R of length at most n such that f has the value ys at the points xs. The values in the arrays xs and ys must belong to the base ring of the polynomial ring R. If no such polynomial exists, an exception is raised.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#Interpolation-1",
+    "page": "Generic univariate polynomials",
+    "title": "Interpolation",
+    "category": "section",
+    "text": "interpolate{T <: RingElem}(::PolyRing, ::Array{T, 1}, ::Array{T, 1})ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nxs = [R(1), R(2), R(3), R(4)]\nys = [R(1), R(4), R(9), R(16)]\n\nf = interpolate(S, xs, ys)"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.chebyshev_t-Tuple{Int64,AbstractAlgebra.PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.chebyshev_t",
+    "category": "Method",
+    "text": "chebyshev_t(n::Int, x::AbstractAlgebra.PolyElem)\n\nReturn the Chebyshev polynomial of the first kind T_n(x), defined by T_n(x) = cos(n cos^-1(x)).\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.chebyshev_u-Tuple{Int64,AbstractAlgebra.PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.chebyshev_u",
+    "category": "Method",
+    "text": "chebyshev_u(n::Int, x::AbstractAlgebra.PolyElem)\n\nReturn the Chebyshev polynomial of the first kind U_n(x), defined by (n+1) U_n(x) = T_n+1(x).\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#Special-functions-1",
+    "page": "Generic univariate polynomials",
+    "title": "Special functions",
+    "category": "section",
+    "text": "The following special functions can be computed for any polynomial ring. Typically one uses the generator x of a polynomial ring to get the respective special polynomials expressed in terms of that generator.chebyshev_t(::Int, ::PolyElem)chebyshev_u(::Int, ::PolyElem)ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = chebyshev_t(20, y)\ng = chebyshev_u(15, y)"
+},
+
+{
     "location": "types.html#",
     "page": "Appendix A: Types in AbstractAlgebra.jl",
     "title": "Appendix A: Types in AbstractAlgebra.jl",
