@@ -1921,7 +1921,10 @@ function resultant_sylvester(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgebra.
    return det_df(sylvester_matrix(p, q))
 end
 
-
+doc"""
+    resultant{T <: RingElem}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})
+> Return the resultant of the given polynomials.
+"""
 function resultant(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
   R = parent(p)
   if !isexact_type(T)
