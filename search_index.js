@@ -242,16 +242,16 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "euclidean.html#",
-    "page": "Euclidean ring interface",
-    "title": "Euclidean ring interface",
+    "page": "Euclidean Ring interface",
+    "title": "Euclidean Ring interface",
     "category": "page",
     "text": ""
 },
 
 {
-    "location": "euclidean.html#Euclidean-ring-interface-1",
-    "page": "Euclidean ring interface",
-    "title": "Euclidean ring interface",
+    "location": "euclidean.html#Euclidean-Ring-interface-1",
+    "page": "Euclidean Ring interface",
+    "title": "Euclidean Ring interface",
     "category": "section",
     "text": "If a ring provides a meaningful Euclidean structure such that a useful Euclidean remainder can be computed practically, various additional functionality is provided by AbstractAlgebra.jl for those rings. This functionality depends on the following functions existing.mod(f::MyElem, g::MyElem)Returns the Euclidean remainder of f by g. A DivideError() should be thrown if g is zero. An error should be thrown if an impossible inverse is encountered.divrem(f::MyElem, g::MyElem)Returns a pair q, r consisting of the Euclidean quotient and remainder of f by g. A DivideError should be thrown if g is zero. An error should be thrown if an impossible inverse is encountered.div(f::MyElem, g::MyElem)Returns the Euclidean quotient of f by g. A DivideError should be thrown if g is zero. An error should be thrown if an impossible inverse is encountered.mulmod(f::MyElem, g::MyElem, m::MyElem)Returns fg pmodm.powmod(f::MyElem, e::Int, m::MyElem)Returns f^e pmodm.invmod(f::MyElem, m::MyElem)Returns the inverse of f modulo m. If such an inverse doesn't exist, an impossible inverse error should be thrown.divides(f::MyElem, g::MyElem)Returns a pair, flag, q, where flag is set to true if g divides f, in which case the quotient is set to the quotient, or flag is set to false and the quotient is set to zero in the same ring as f and g.remove(f::MyElem, p::MyElem)Returns a pair v, q where p^v is the highest power of p dividing f, and q is the cofactor after f is divided by this power.valuation(f::MyElem, p::MyElem)Returns v where p^v is the highest power of p dividing f.gcd(f::MyElem, g::MyElem)Returns a greatest common divisor of f and g.lcm(f::MyElem, g::MyElem)Returns fggcd(f g) if either f or g is not zero, otherwise it throws a DivideError().gcdx(f::MyElem, g::MyElem)Returns a triple d, s, t such that d = gcd(f g) and d = sf + tg, with s reduced modulo g and t reduced modulo f.gcdinv(f::MyElem, g::MyElem)Returns a tuple d, s such that d = gcd(f g) and s = (fd)^-1 pmodgd. Note that d = 1 iff f is invertible modulo g, in which case s = f^-1 pmodg."
 },
@@ -293,7 +293,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Univariate Polynomial Ring Interface",
     "title": "Constructors",
     "category": "section",
-    "text": "In addition to the standard constructors, the following constructors, taking an array of coefficients, must be available. In each case, the array may have trailing zero entries, but the resulting polynomial should usually be normalised (of length zero, or with nonzero leading coefficient).(S::MyPolyRing{T})(A::Array{T, 1}) where T <: AbstractAlgebra.RingElemCreate the polynomial in the given ring whose degree i coefficient is given by A[i].(S::MyPolyRing{T})(A::Array{U, 1}) where T <: AbstractAlgebra.RingElem, U <: AbstractAlgebra.RingElemCreate the polynomial in the given ring whose degree i coefficient is given by A[i]. The elements of the array are assumed to be able to be coerced into the base ring R.(S::MyPolyRing{T})(A::Array{U, 1}) where T <: AbstractAlgebra.RingElem, U <: IntegerCreate the polynomial in the given ring whose degree i coefficient is given by A[i].It may be desirable to have a additional version of the function that accepts an array of Julia Int values  if this can be done more efficiently.ExamplesS, x = PolynomialRing(JuliaQQ, \"x\")\n\nf = S(Rational{BigInt}[2, 3, 1])\ng = S(BigInt[1, 0, 4])\nh = S([4, 7, 2, 9])"
+    "text": "In addition to the standard constructors, the following constructors, taking an array of coefficients, must be available.(S::MyPolyRing{T})(A::Array{T, 1}) where T <: AbstractAlgebra.RingElemCreate the polynomial in the given ring whose degree i coefficient is given by A[i].(S::MyPolyRing{T})(A::Array{U, 1}) where T <: AbstractAlgebra.RingElem, U <: AbstractAlgebra.RingElemCreate the polynomial in the given ring whose degree i coefficient is given by A[i]. The elements of the array are assumed to be able to be coerced into the base ring R.(S::MyPolyRing{T})(A::Array{U, 1}) where T <: AbstractAlgebra.RingElem, U <: IntegerCreate the polynomial in the given ring whose degree i coefficient is given by A[i].It may be desirable to have a additional version of the function that accepts an array of Julia Int values  if this can be done more efficiently.ExamplesS, x = PolynomialRing(JuliaQQ, \"x\")\n\nf = S(Rational{BigInt}[2, 3, 1])\ng = S(BigInt[1, 0, 4])\nh = S([4, 7, 2, 9])"
 },
 
 {
@@ -718,6 +718,62 @@ var documenterSearchIndex = {"docs": [
     "title": "Special functions",
     "category": "section",
     "text": "The following special functions can be computed for any polynomial ring. Typically one uses the generator x of a polynomial ring to get the respective special polynomials expressed in terms of that generator.chebyshev_t(::Int, ::PolyElem)chebyshev_u(::Int, ::PolyElem)ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = chebyshev_t(20, y)\ng = chebyshev_u(15, y)"
+},
+
+{
+    "location": "series_rings.html#",
+    "page": "Series Ring Interface",
+    "title": "Series Ring Interface",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "series_rings.html#Series-Ring-Interface-1",
+    "page": "Series Ring Interface",
+    "title": "Series Ring Interface",
+    "category": "section",
+    "text": "Univariate power series rings are supported in AbstractAlgebra in a variety of different forms, including absolute and relative precision models and Laurent series.In addition to the standard Ring interface, numerous additional functions are required to be present for power series rings."
+},
+
+{
+    "location": "series_rings.html#Types-and-parents-1",
+    "page": "Series Ring Interface",
+    "title": "Types and parents",
+    "category": "section",
+    "text": "AbstractAlgebra provides two abstract types for power series rings and their elements:SeriesRing{T} is the abstract type for all power series ring parent types\nSeriesElem{T} is the abstract type for all power series typesWe have that SeriesRing{T} <: AbstractAlgebra.Ring and  SeriesElem{T} <: AbstractAlgebra.RingElem.Note that both abstract types are parameterised. The type T should usually be the type of elements of the coefficient ring of the power series ring. For example, in the case of mathbbZx the type T would be the type of an integer, e.g. BigInt.The SeriesElem{T} abstract type breaks down further into two abstract types: RelSeriesElem{T} for relative series, including Laurent series, and AbsSeriesElem{T} for absolute series.Relative series are typically stored with a valuation and a series that is either zero or that has nonzero constant term. Absolute series are stored starting from the constant term, even if it is zero.If the parent object for a relative series ring over the bignum integers has type MySeriesRing and series in that ring have type MySeries then one would have:MySeriesRing <: SeriesRing{BigInt}\nMySeries <: RelSeriesElem{BigInt}Series rings should be made unique on the system by caching parent objects (unless an optional cache parameter is set to false). Series rings should at least be distinguished based on their base (coefficient) ring. But if they have the same base ring and symbol (for their variable/generator) and same default precision, they should certainly have the same parent object.See src/generic/GenericTypes.jl for an example of how to implement such a cache (which usually makes use of a dictionary)."
+},
+
+{
+    "location": "series_rings.html#Required-functionality-for-series-1",
+    "page": "Series Ring Interface",
+    "title": "Required functionality for series",
+    "category": "section",
+    "text": "In addition to the required functionality for the Ring interface the Series Ring interface has the following required functions.We suppose that R is a fictitious base ring (coefficient ring) and that S is a series ring over R (e.g. S = Rx) with parent object S of type MySeriesRing{T}. We also assume the series in the ring have type MySeries{T}, where  T is the type of elements of the base (coefficient) ring.Of course, in practice these types may not be parameterised, but we use parameterised types here to make the interface clearer.Note that the type T must (transitively) belong to the abstract type RingElem."
+},
+
+{
+    "location": "series_rings.html#Constructors-1",
+    "page": "Series Ring Interface",
+    "title": "Constructors",
+    "category": "section",
+    "text": "In addition to the standard constructors, the following constructors, taking an array of coefficients, must be available.For relative series we have:(S::MySeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int, val::Int) where T <: AbstractAlgebra.RingElemCreate the series in the given ring whose valuation is val, whose absolute precision is given by prec and the coefficients of which are given by A, starting from the first nonzero term. Only len terms of the array are used, the remaining terms being ignored. The value len cannot exceed the length of the supplied array.It is permitted to have trailing zeros in the array, but it is not needed, even if the precision minus the valuation is bigger than the length of the array.ExamplesS, x = PowerSeriesRing(JuliaQQ, 10, \"x\"; model=:capped_relative)\nT, y = LaurentSeriesRing(JuliaZZ, 10, \"y\")\nU, z = LaurentSeriesField(JuliaQQ, 10, \"z\")\n \nf = S(Rational{BigInt}[2, 3, 1], 3, 6, 2)\ng = T(BigInt[2, 3, 1], 3, 6, 2)\nh = U(Rational{BigInt}[2, 3, 1], 3, 6, 2)For absolute power series we have:(S::MySeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int) where T <: Abstrac\ntAlgebra.RingElemCreate the series in the given ring whose absolute precision is given by prec and the coefficients of which are given by A, starting from the constant term. Only len terms of the array are used, the remaining terms being ignored.Note that len is usually maintained separately of any polynomial that is underlying the power series. This allows for easy trucation of a power series without actually modifying the polynomial underlying it.It is permitted to have trailing zeros in the array, but it is not needed, even if the precision is bigger than the length of the array.ExamplesS, x = PowerSeriesRing(JuliaQQ, 10, \"x\"; model=:capped_absolute)\n\nf = S(Rational{BigInt}[0, 2, 3, 1], 4, 6)"
+},
+
+{
+    "location": "series_rings.html#Data-type-and-parent-object-methods-1",
+    "page": "Series Ring Interface",
+    "title": "Data type and parent object methods",
+    "category": "section",
+    "text": "var(S::MySeriesRing{T}) where T <: AbstractAlgebra.RingElemReturn a Symbol representing the variable (generator) of the series ring. Note that this is a Symbol not a String, though its string value will usually be used when printing series.max_precision(S::MySeriesRing{T}) where T <: AbstractAlgebra.RingElemReturn the (default) maximum precision of the power series ring. This is the precision that the output of an operation will be if it cannot be represented to full precision (e.g. because it mathematically has infinite precision).This value is usually supplied upon creation of the series ring and stored in the ring. It is independent of the precision which each series in the ring actually has. Those are stored on a per element basis in the actual series elements.ExamplesS, x = PowerSeriesRing(JuliaQQ, 10, \"x\")\n\nvsym = var(S)\nmax_precision(S) == 10"
+},
+
+{
+    "location": "series_rings.html#Basic-manipulation-of-rings-and-elements-1",
+    "page": "Series Ring Interface",
+    "title": "Basic manipulation of rings and elements",
+    "category": "section",
+    "text": "pol_length(f::MySeries{T}) where T <: AbstractAlgebra.RingElemReturn the length of the polynomial underlying the given power series. This is not generally useful to the user, but is used internally.set_length!(f::MySeries{T}, n::Int) where T <: AbstractAlgebra.RingElemThis function sets the effective length of the polynomial underlying the given series. The function doesn't modify the actual polynomial, but simply changes the number of terms of the polynomial which are considered to belong to the power series. The remaining terms are ignored.This function cannot set the length to a value greater than the length of any underlying polynomial.The function mutates the series in-place but does not return the mutated series.precision(f::MySeries{T})Returns the absolute precision of f.set_prec!(f::MySeries{T}, prec::Int)Set the absolute precision of the given series to the given value.This function mutates the series in-place but does not return the mutated series.set_val!(f::MySeries{T}, val::Int)For relative series only, this function alters the valuation of the given series to the given value.The series is mutated in-place but does not return the mutated series.polcoeff(f::MySeries{T}, n::Int) Return the coefficient of degree n of the polynomial underlying the series. If n is larger than the degree of this polynomial, zero is returned. This function is not generally of use to the user but is used internally.setcoeff!(f::MySeries{T}, n::Int, a::T) where T <: AbstractAlgebra.RingElemSet the degree n coefficient of the polynomial underlying f to a. This mutates the polynomial in-place if possible and returns the mutated series (so that immutable types can also be supported). The function must not assume that the polynomial already has space for n + 1 coefficients. The polynomial must be resized if this is not the case.Note that this function is not required to normalise the polynomial and is not necessarily useful to the user, but is used extensively by the generic functionality in AbstractAlgebra.jl. It is for setting raw coefficients in the representation.renormalize!(f::MySeries{T}) where T <: AbstractAlgebra.RingElemGiven a relative series whose underlying polynomial has zero constant term, say as the result of some internal computation, renormalise the series so that the polynomial has nonzero constant term. The precision and valuation of the series are adjusted to compensate. This function is not intended to be useful to the user, but is used internally.fit!(f::MySeries{T}, n::Int) where T <: AbstractAlgebra.RingElemEnsure that the polynomial underlying f internally has space for n coefficients. This function must mutate the series in-place if it is mutable. It does not return the mutated series. Immutable types can still be supported by defining this function to do nothing.Some interfaces for C polynomial types automatically manage the internal allocation of polynomials in every function that can be called on them. Explicit adjustment by the generic code in AbstractAlgebra.jl is not required. In such cases, this function can also be defined to do nothing.ExamplesS, x = PowerSeriesRing(JuliaZZ, 10, \"x\")\n\nf = 1 + 3x + x^3 + O(x^5)\ng = S(BigInt[1, 2, 0, 1, 0, 0, 0], 4, 10, 3);\n\nn = pol_length(f)\nc = polcoeff(f, 1)\nset_length!(g, 3)\ng = setcoeff!(g, 2, BigInt(11))\nfit!(g, 8)\ng = setcoeff!(g, 7, BigInt(4))\n"
 },
 
 {
