@@ -20,9 +20,8 @@ Note that both abstract types are parameterised. The type `T` should usually be 
 of elements of the coefficient ring of the power series ring. For example, in the case
 of $\mathbb{Z}[[x]]$ the type `T` would be the type of an integer, e.g. `BigInt`.
 
-The `SeriesElem{T}` abstract type breaks down further into two abstract types:
-`RelSeriesElem{T}` for relative series, including Laurent series, and `AbsSeriesElem{T}`
-for absolute series.
+Within the `SeriesElem{T}` abstract type is the abstract type `RelSeriesElem{T}` for
+relative power series, and `AbsSeriesElem{T}` for absolute power series.
 
 Relative series are typically stored with a valuation and a series that is either
 zero or that has nonzero constant term. Absolute series are stored starting from the
@@ -63,7 +62,7 @@ Note that the type `T` must (transitively) belong to the abstract type `RingElem
 In addition to the standard constructors, the following constructors, taking an array of
 coefficients, must be available.
 
-For relative series we have:
+For relative power series and Laurent series we have:
 
 ```julia
 (S::MySeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int, val::Int) where T <: AbstractAlgebra.RingElem
@@ -92,8 +91,7 @@ h = U(Rational{BigInt}[2, 3, 1], 3, 6, 2)
 For absolute power series we have:
 
 ```julia
-(S::MySeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int) where T <: Abstrac
-tAlgebra.RingElem
+(S::MySeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int) where T <: AbstractAlgebra.RingElem
 ```
 
 Create the series in the given ring whose absolute precision is given by `prec` and the
@@ -184,11 +182,17 @@ Set the absolute precision of the given series to the given value.
 This function mutates the series in-place but does not return the mutated series.
 
 ```julia
+valuation(f::MySeries{T})
+```
+
+Return the valuation of the given series.
+
+```julia
 set_val!(f::MySeries{T}, val::Int)
 ```
 
-For relative series only, this function alters the valuation of the given series to the
-given value.
+For relative series and Laurent series only, this function alters the valuation of the
+given series to the given value.
 
 The series is mutated in-place but does not return the mutated series.
 
@@ -216,14 +220,23 @@ necessarily useful to the user, but is used extensively by the generic functiona
 AbstractAlgebra.jl. It is for setting raw coefficients in the representation.
 
 ```julia
+normalise(f::MySeries{T}, n::Int)
+```
+
+Given a series $f$ represented by a polynomial of at least the given length, return the
+normalised length of the underlying polynomial assuming it has length at most $n$. This
+function does not actually normalise the polynomial and is not particularly useful to
+the user. It is used internally.
+
+```julia
 renormalize!(f::MySeries{T}) where T <: AbstractAlgebra.RingElem
 ```
 
-Given a relative series whose underlying polynomial has zero constant term, say as the
-result of some internal computation, renormalise the series so that the polynomial
-has nonzero constant term. The precision and valuation of the series are adjusted to
-compensate. This function is not intended to be useful to the user, but is used
-internally.
+Given a relative series or Laurent series whose underlying polynomial has zero constant
+term, say as the result of some internal computation, renormalise the series so that the 
+polynomial has nonzero constant term. The precision and valuation of the series are
+adjusted to compensate. This function is not intended to be useful to the user, but is 
+used internally.
 
 ```julia
 fit!(f::MySeries{T}, n::Int) where T <: AbstractAlgebra.RingElem
@@ -239,6 +252,12 @@ polynomials in every function that can be called on them. Explicit adjustment by
 the generic code in AbstractAlgebra.jl is not required. In such cases, this function
 can also be defined to do nothing.
 
+```julia
+gen(R::MySeriesRing{T}) where T <: AbstractAlgebra.RingElem
+```
+
+Return the generator `x` of the series ring.
+
 **Examples**
 
 ```julia
@@ -253,6 +272,7 @@ set_length!(g, 3)
 g = setcoeff!(g, 2, BigInt(11))
 fit!(g, 8)
 g = setcoeff!(g, 7, BigInt(4))
-
+w = gen(S)
+isgen(w) == true
 ```
 
