@@ -850,15 +850,15 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#",
-    "page": "-",
-    "title": "-",
+    "page": "Generic power series",
+    "title": "Generic power series",
     "category": "page",
     "text": "CurrentModule = AbstractAlgebra"
 },
 
 {
     "location": "series.html#Generic-power-series-1",
-    "page": "-",
+    "page": "Generic power series",
     "title": "Generic power series",
     "category": "section",
     "text": "AbstractAlgebra.jl allows the creation of capped relative and absolute power series over  any computable commutative ring R.Capped relative power series are power series of the form a_jx^j + a_j+1x^j+1 + cdots + a_k-1x^k-1 + O(x^k) where i geq 0, a_i in R and the relative precision k - j is at most equal to some specified precision n.Capped absolute power series are power series of the form a_jx^j + a_j+1x^j+1 + cdots + a_n-1x^n-1 + O(x^n) where j geq 0, a_j in R and the precision n is fixed.There are two implementations of relative series: relative power series, implemented in src/generic/RelSeries.jl and Laurent series, implemented in src/generic/Laurent.jl. Note that there are two implementations for Laurent series, one over rings and one over fields, though in practice most of the implementation uses the same code in both cases.There is a single implementation of absolute series: absolute power series, implemented in src/generic/AbsSeries.jl.As well as implementing the Series Ring interface, the series modules in AbstractAlgebra.jl implement the generic algorithms described below.All of the generic functionality is part of the Generic submodule of AbstractAlgebra.jl. This is exported by default so that it is not necessary to qualify function names."
@@ -866,7 +866,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#Types-and-parent-objects-1",
-    "page": "-",
+    "page": "Generic power series",
     "title": "Types and parent objects",
     "category": "section",
     "text": "The types of generic polynomials implemented by AbstractAlgebra.jl are Generic.RelSeries{T}, Generic.AbsSeries{T}, LaurentSeriesRingElem{T} and LaurentSeriesFieldElem{T}.Relative power series elements belong to the abstract type AbstractAlgebra.RelSeriesElem.Laurent series elements belong directly to either AbstractAlgebra.RingElem or AbstractAlgebra.FieldElem since it is more useful to be able to distinguish whether they belong to a ring or field than it is to distinguish that they are relative series.Absolute power series elements belong to AbstractAlgebra.AbsSeriesElem.The parent types for relative and absolute power series, Generic.RelSeriesRing{T}  and Generic.AbsSeriesRing{T} respectively, belong to AbstractAlgebra.SeriesRing{T}.The parent types for Laurent series rings and fields, Generic.LaurentSeriesRing{T} and Generic.LaurentSeriesField{T} respectively, belong directly to  AbstractAlgebra.Ring and AbstractAlgebra.Field respectively.The default precision, string representation of the variable and base ring R of a generic power series are stored in its parent object. "
@@ -874,7 +874,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#Series-ring-constructors-1",
-    "page": "-",
+    "page": "Generic power series",
     "title": "Series ring constructors",
     "category": "section",
     "text": "In order to construct series in AbstractAlgebra.jl, one must first construct the ring itself. This is accomplished with any of the following constructors.PowerSeriesRing(R::AbstractAlgebra.Ring, prec_max::Int, s::AbstractString; cached::Bool = true, model=:capped_relative)LaurentSeriesRing(R::AbstractAlgebra.Ring, prec_max::Int, s::AbstractString; cached::Bool = true)LaurentSeriesRing(R::AbstractAlgebra.Field, prec_max::Int, s::AbstractString; cached::Bool = true)Given a base ring R, a maximum precision (relative or absolute, depending on the model) and a string s specifying how the generator (variable) should be printed, return a typle S, x representing the series ring and its generator.By default, S will depend only on S, x and the maximum precision and will be cached. Setting the optional argument cached to false will prevent this.In the case of power series, the optional argument model can be set to either :capped_absolute or capped_relative, depending on which power series model is required.Here are some examples of constructing various kinds of series rings and coercing various elements into those rings.ExamplesR, x = PowerSeriesRing(JuliaZZ, 10, \"x\")\nS, y = PowerSeriesRing(JuliaZZ, 10, \"y\"; model=:capped_absolute)\nT, z = LaurentSeriesRing(JuliaZZ, 10, \"z\")\nU, w = LaurentSeriesField(JuliaQQ, 10, \"w\")\n\nf = R()\ng = S(123)\nh = U(BigInt(1234))\nk = T(z + 1)"
@@ -882,7 +882,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#Big-oh-notation-1",
-    "page": "-",
+    "page": "Generic power series",
     "title": "Big-oh notation",
     "category": "section",
     "text": "Series elements can be given a precision using the big-oh notation. This is provided by a function of the following form, (or something equivalent for Laurent series):O(x::SeriesElem)ExamplesR, x = PowerSeriesRing(JuliaZZ, 10, \"x\")\nS, y = LaurentSeriesRing(JuliaZZ, 10, \"y\")\n\nf = 1 + 2x + O(x^5)\ng = 2y + 7y^2 + O(y^7)What is happening here in practice is that O(x^n) is creating the series 0 + O(x^n) and the rules for addition of series dictate that if this is added to a series of  greater precision, then the lower of the two precisions must be used.Of course it may be that the precision of the series that O(x^n) is added to is already lower than n, in which case adding O(x^n) has no effect. This is the case if the default precision is too low, since x on its own has the default precision."
@@ -890,7 +890,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#Power-series-models-1",
-    "page": "-",
+    "page": "Generic power series",
     "title": "Power series models",
     "category": "section",
     "text": "Capped relative power series have their maximum relative precision capped at some value prec_max. This means that if the leading term of a nonzero power series element is c_ax^a and the precision is b then the power series is of the form  c_ax^a + c_a+1x^a+1 + ldots + O(x^a + b).The zero power series is simply taken to be 0 + O(x^b).The capped relative model has the advantage that power series are stable multiplicatively. In other words, for nonzero power series f and g we have that divexact(f*g), g) == f.However, capped relative power series are not additively stable, i.e. we do not always have (f + g) - g = f.Similar comments apply to Laurent series.On the other hand, capped absolute power series have their absolute precision capped. This means that if the leading term of a nonzero power series element is c_ax^a and the precision is b then the power series is of the form c_ax^a + c_a+1x^a+1 + ldots + O(x^b).Capped absolute series are additively stable, but not necessarily multiplicatively stable.For all models, the maximum precision is also used as a default precision in the case of coercing coefficients into the ring and for any computation where the result could mathematically be given to infinite precision.In all models we say that two power series are equal if they agree up to the minimum absolute precision of the two power series.Thus, for example, x^5 + O(x^10) == 0 + O(x^5), since the minimum absolute precision is 5.During computations, it is possible for power series to lose relative precision due to cancellation. For example if f = x^3 + x^5 + O(x^8) and g = x^3 + x^6 + O(x^8) then f - g = x^5 - x^6 + O(x^8) which now has relative precision 3 instead of relative precision 5.Amongst other things, this means that equality is not transitive. For example x^6 + O(x^11) == 0 + O(x^5) and x^7 + O(x^12) == 0 + O(x^5) but x^6 + O(x^11) neq x^7 + O(x^12).Sometimes it is necessary to compare power series not just for arithmetic equality, as above, but to see if they have precisely the same precision and terms. For this purpose we introduce the isequal function.For example, if f = x^2 + O(x^7) and g = x^2 + O(x^8) and h = 0 + O(x^2) then f == g, f == h and g == h, but isequal(f, g), isequal(f, h) and isequal(g, h) would all return false. However, if k = x^2 + O(x^7) then isequal(f, k) would return true.There are further difficulties if we construct polynomial over power series. For example, consider the polynomial in y over the power series ring in x over the rationals. Normalisation of such polynomials is problematic. For instance, what is the leading coefficient of (0 + O(x^10))y + (1 + O(x^10))?If one takes it to be (0 + O(x^10)) then some functions may not terminate due to the fact that algorithms may require the degree of polynomials to decrease with each iteration. Instead, the degree may remain constant and simply accumulate leading terms which are arithmetically zero but not identically zero.On the other hand, when constructing power series over other power series, if we simply throw away terms which are arithmetically equal to zero, our computations may have different output depending on the order in which the power series are added!One should be aware of these difficulties when working with power series. Power series, as represented on a computer, simply don't satisfy the axioms of a ring. They must be used with care in order to approximate operations in a mathematical power series ring.Simply increasing the precision will not necessarily give a \"more correct\" answer and some computations may not even terminate due to the presence of arithmetic zeroes!An absolute power series ring over a ring R with precision p behaves  very much like the quotient Rx(x^p) of the polynomial ring over R. Therefore one can often treat absolute power series rings as though they were rings. However, this depends on all series being given a precision equal to the specified maximum precision and not a lower precision."
@@ -898,7 +898,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#Basic-ring-functionality-1",
-    "page": "-",
+    "page": "Generic power series",
     "title": "Basic ring functionality",
     "category": "section",
     "text": "All power series models provide the functionality described in the Ring and Series Ring interfaces.ExamplesS, x = PowerSeriesRing(JuliaZZ, 10, \"x\")\n\nf = 1 + 3x + x^3 + O(x^10)\ng = 1 + 2x + x^2 + O(x^10)\n\nh = zero(S)\nk = one(S)\nisone(k) == true\niszero(f) == false\nn = pol_length(f)\nc = polcoeff(f, 3)\nU = base_ring(S)\nv = var(S)\nT = parent(x + 1)\ng == deepcopy(g)\nt = divexact(2g, 2)\np = precision(f)"
@@ -906,7 +906,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#Series-functionality-provided-by-AbstractAlgebra.jl-1",
-    "page": "-",
+    "page": "Generic power series",
     "title": "Series functionality provided by AbstractAlgebra.jl",
     "category": "section",
     "text": "The functionality below is automatically provided by AbstractAlgebra.jl for any series module that implements the full Series Ring interface. This includes AbstractAlgebra's own generic series rings.Of course, modules are encouraged to provide specific implementations of the functions described here, that override the generic implementation.Unless otherwise noted, the functions are available for all series models, including Laurent series. We denote this by using the abstract type AbstractAlgebra.RelSeriesElem, even though absolute series and Laurent series types do not belong to this abstract type."
@@ -914,7 +914,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#AbstractAlgebra.Generic.modulus-Union{Tuple{AbstractAlgebra.SeriesElem{T}}, Tuple{T}} where T<:AbstractAlgebra.ResElem",
-    "page": "-",
+    "page": "Generic power series",
     "title": "AbstractAlgebra.Generic.modulus",
     "category": "Method",
     "text": "modulus{T <: ResElem}(a::AbstractAlgebra.SeriesElem{T})\n\nReturn the modulus of the coefficients of the given power series.\n\n\n\n"
@@ -922,7 +922,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#AbstractAlgebra.Generic.isgen-Tuple{AbstractAlgebra.RelSeriesElem}",
-    "page": "-",
+    "page": "Generic power series",
     "title": "AbstractAlgebra.Generic.isgen",
     "category": "Method",
     "text": "isgen(a::RelSeriesElem)\n\nReturn true if the given power series is arithmetically equal to the generator of its power series ring to its current precision, otherwise return false.\n\n\n\n"
@@ -930,7 +930,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#AbstractAlgebra.Generic.isunit-Tuple{AbstractAlgebra.RelSeriesElem}",
-    "page": "-",
+    "page": "Generic power series",
     "title": "AbstractAlgebra.Generic.isunit",
     "category": "Method",
     "text": "isunit(a::AbstractAlgebra.RelSeriesElem)\n\nReturn true if the given power series is arithmetically equal to a unit, i.e. is invertible, otherwise return false.\n\n\n\n"
@@ -938,7 +938,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#Basic-functionality-1",
-    "page": "-",
+    "page": "Generic power series",
     "title": "Basic functionality",
     "category": "section",
     "text": "coeff(a::AbstractAlgebra.SeriesElem, n::Int)Return the degree n coefficient of the given power series. Note coefficients are numbered from n = 0 for the constant coefficient. If n exceeds the current precision of the power series, the function returns a zero coefficient.For power series types, n must be non-negative. Laurent series do not have this restriction.modulus{T <: ResElem}(::SeriesElem{T})isgen(::RelSeriesElem)isunit(::RelSeriesElem)ExamplesR, t = PowerSeriesRing(JuliaQQ, 10, \"t\")\nS, x = PowerSeriesRing(R, 30, \"x\")\n\na = O(x^4)\nb = (t + 3)*x + (t^2 + 1)*x^2 + O(x^4)\n\nk = isgen(gen(R))\nm = isunit(-1 + x + 2x^2)\nn = valuation(a)\np = valuation(b)\nc = coeff(b, 2)"
@@ -946,7 +946,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#AbstractAlgebra.Generic.shift_left-Union{Tuple{AbstractAlgebra.RelSeriesElem{T},Int64}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
-    "page": "-",
+    "page": "Generic power series",
     "title": "AbstractAlgebra.Generic.shift_left",
     "category": "Method",
     "text": "shift_left(x::AbstractAlgebra.RelSeriesElem, n::Int)\n\nReturn the power series f shifted left by n terms, i.e. multiplied by x^n.\n\n\n\n"
@@ -954,7 +954,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#AbstractAlgebra.Generic.shift_right-Union{Tuple{AbstractAlgebra.RelSeriesElem{T},Int64}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
-    "page": "-",
+    "page": "Generic power series",
     "title": "AbstractAlgebra.Generic.shift_right",
     "category": "Method",
     "text": "shift_right(f::AbstractAlgebra.RelSeriesElem, n::Int)\n\nReturn the power series f shifted right by n terms, i.e. divided by x^n.\n\n\n\n"
@@ -962,7 +962,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#Shifting-1",
-    "page": "-",
+    "page": "Generic power series",
     "title": "Shifting",
     "category": "section",
     "text": "shift_left{T <: RingElem}(::RelSeriesElem{T}, ::Int)shift_right{T <: RingElem}(::RelSeriesElem{T}, ::Int)ExamplesR, t = PolynomialRing(JuliaQQ, \"t\")\nS, x = PowerSeriesRing(R, 30, \"x\")\n\na = 2x + x^3\nb = O(x^4)\nc = 1 + x + 2x^2 + O(x^5)\nd = 2x + x^3 + O(x^4)\n\nf = shift_left(a, 2)\ng = shift_left(b, 2)\nh = shift_right(c, 1)\nk = shift_right(d, 3)"
@@ -970,7 +970,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#Base.truncate-Union{Tuple{AbstractAlgebra.RelSeriesElem{T},Int64}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
-    "page": "-",
+    "page": "Generic power series",
     "title": "Base.truncate",
     "category": "Method",
     "text": "truncate(a::AbstractAlgebra.RelSeriesElem, n::Int)\n\nReturn a truncated to (absolute) precision n.\n\n\n\n"
@@ -978,31 +978,31 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#Truncation-1",
-    "page": "-",
+    "page": "Generic power series",
     "title": "Truncation",
     "category": "section",
     "text": "truncate{T <: RingElem}(::RelSeriesElem{T}, ::Int)ExamplesR, t = PolynomialRing(JuliaQQ, \"t\")\nS, x = PowerSeriesRing(R, 30, \"x\")\n\na = 2x + x^3\nb = O(x^4)\nc = 1 + x + 2x^2 + O(x^5)\nd = 2x + x^3 + O(x^4)\n\nf = truncate(a, 3)\ng = truncate(b, 2)\nh = truncate(c, 7)\nk = truncate(d, 5)"
 },
 
 {
-    "location": "series.html#Base.inv-Union{Tuple{AbstractAlgebra.RelSeriesElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
-    "page": "-",
+    "location": "series.html#Base.inv-Tuple{AbstractAlgebra.RelSeriesElem}",
+    "page": "Generic power series",
     "title": "Base.inv",
     "category": "Method",
-    "text": "inv(M)\n\nMatrix inverse. Computes matrix N such that M * N = I, where I is the identity matrix. Computed by solving the left-division N = M \\ I.\n\nExample\n\njulia> M = [2 5; 1 3]\n2×2 Array{Int64,2}:\n 2  5\n 1  3\n\njulia> N = inv(M)\n2×2 Array{Float64,2}:\n  3.0  -5.0\n -1.0   2.0\n\njulia> M*N == N*M == eye(2)\ntrue\n\n\n\ninv{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nGiven a non-singular ntimes n matrix over a ring the tuple X d consisting of an ntimes n matrix X and a denominator d such that AX = dI_n, where I_n is the ntimes n identity matrix. The denominator will be the determinant of A up to sign. If A is singular an exception is raised.\n\n\n\n"
+    "text": "inv(a::AbstractAlgebra.RelSeriesElem)\n\nReturn the inverse of the power series a, i.e. 1a.\n\n\n\n"
 },
 
 {
     "location": "series.html#Division-1",
-    "page": "-",
+    "page": "Generic power series",
     "title": "Division",
     "category": "section",
-    "text": "inv{T <: RingElem}(::RelSeriesElem{T})ExamplesR, t = PolynomialRing(QQ, \"t\")\nS, x = PowerSeriesRing(R, 30, \"x\")\n\na = 1 + x + 2x^2 + O(x^5)\nb = S(-1)\n\nc = inv(a)\nd = inv(b)"
+    "text": "inv(::RelSeriesElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS, x = PowerSeriesRing(R, 30, \"x\")\n\na = 1 + x + 2x^2 + O(x^5)\nb = S(-1)\n\nc = inv(a)\nd = inv(b)"
 },
 
 {
     "location": "series.html#Base.exp-Tuple{AbstractAlgebra.RelSeriesElem}",
-    "page": "-",
+    "page": "Generic power series",
     "title": "Base.exp",
     "category": "Method",
     "text": "exp(a::AbstractAlgebra.RelSeriesElem)\n\nReturn the exponential of the power series a.\n\n\n\n"
@@ -1010,7 +1010,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#Base.sqrt-Tuple{AbstractAlgebra.RelSeriesElem}",
-    "page": "-",
+    "page": "Generic power series",
     "title": "Base.sqrt",
     "category": "Method",
     "text": "sqrt(a::AbstractAlgebra.RelSeriesElem)\n\nReturn the square root of the power series a.\n\n\n\n"
@@ -1018,7 +1018,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "series.html#Special-functions-1",
-    "page": "-",
+    "page": "Generic power series",
     "title": "Special functions",
     "category": "section",
     "text": "Base.exp(a::RelSeriesElem)Base.sqrt(a::RelSeriesElem)ExamplesR, t = PolynomialRing(JuliaQQ, \"t\")\nS, x = PowerSeriesRing(R, 30, \"x\")\nT, z = PowerSeriesRing(QQ, 30, \"z\")\n\na = 1 + z + 3z^2 + O(z^5)\nb = z + 2z^2 + 5z^3 + O(z^5)\n\nc = exp(x + O(x^40))\nd = divexact(x, exp(x + O(x^40)) - 1)\nf = exp(b)\nh = sqrt(a)"
