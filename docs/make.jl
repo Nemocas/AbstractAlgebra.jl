@@ -11,6 +11,7 @@ makedocs(
              "polynomial_rings.md",
              "polynomial.md",
              "series_rings.md",
+             "series.md",
              "types.md" # Appendix A
          ]
 )

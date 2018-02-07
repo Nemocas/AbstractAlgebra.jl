@@ -481,6 +481,7 @@ the base ring, the promotion rules can be defined as follows:
 
 ```julia
 promote_rule(::Type{MyElem{T}}, ::Type{MyElem{T}}) where T <: RingElement = MyElem{T}
+```
 
 ```julia
 function promote_rule(::Type{MyElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingEle

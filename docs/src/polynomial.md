@@ -5,7 +5,8 @@ CurrentModule = AbstractAlgebra
 # Generic univariate polynomials
 
 AbstractAlgebra.jl provides a module, implemented in `src/generic/Poly.jl` for generic
-polynomials over any ring belonging to the AbstractAlgebra abstract type hierarchy.
+polynomials over any commutative ring belonging to the AbstractAlgebra abstract type
+hierarchy.
 
 As well as implementing the Univariate Polynomial interface, and relevant parts of the
 Euclidean Ring interface for polynomials over a field, there are many additional
@@ -110,8 +111,8 @@ g = (x + 1)*y^2 + 2x + 1
 
 h = zero(S)
 k = one(R)
-h = isone(k)
-k = iszero(f)
+isone(k) == true
+iszero(f) == false
 n = length(g)
 U = base_ring(S)
 V = base_ring(y + 1)
