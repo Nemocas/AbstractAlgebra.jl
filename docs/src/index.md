@@ -20,8 +20,8 @@ the Nemo website for more details about Nemo.
 The features of AbstractAlgebra.jl include:
 
   - Use of Julia multiprecision integers and rationals
-  - Finite fields (prime order)
-  - Number fields
+  - Finite fields (prime order, naive implementation only)
+  - Number fields (naive implementation only)
   - Univariate polynomials
   - Multivariate polynomials
   - Relative and absolute power series
