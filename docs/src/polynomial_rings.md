@@ -59,9 +59,7 @@ Note that the type `T` must (transitively) belong to the abstract type `RingElem
 ### Constructors
 
 In addition to the standard constructors, the following constructors, taking an array of
-coefficients, must be available. In each case, the array may have trailing zero entries,
-but the resulting polynomial should usually be normalised (of length zero, or with
-nonzero leading coefficient).
+coefficients, must be available.
 
 ```julia
 (S::MyPolyRing{T})(A::Array{T, 1}) where T <: AbstractAlgebra.RingElem
@@ -94,6 +92,7 @@ f = S(Rational{BigInt}[2, 3, 1])
 g = S(BigInt[1, 0, 4])
 h = S([4, 7, 2, 9])
 ```
+
 ### Data type and parent object methods
 
 ```julia
