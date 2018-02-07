@@ -356,7 +356,7 @@ inv(::RelSeriesElem)
 **Examples**
 
 ```julia
-R, t = PolynomialRing(QQ, "t")
+R, t = PolynomialRing(JuliaQQ, "t")
 S, x = PowerSeriesRing(R, 30, "x")
 
 a = 1 + x + 2x^2 + O(x^5)
@@ -382,7 +382,7 @@ Base.sqrt(a::RelSeriesElem)
 ```julia
 R, t = PolynomialRing(JuliaQQ, "t")
 S, x = PowerSeriesRing(R, 30, "x")
-T, z = PowerSeriesRing(QQ, 30, "z")
+T, z = PowerSeriesRing(JuliaQQ, 30, "z")
 
 a = 1 + z + 3z^2 + O(z^5)
 b = z + 2z^2 + 5z^3 + O(z^5)
