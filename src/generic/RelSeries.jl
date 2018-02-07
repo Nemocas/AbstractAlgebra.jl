@@ -123,7 +123,7 @@ function set_prec!(a::AbstractAlgebra.SeriesElem, prec::Int)
    a.prec = prec
 end
 
-function set_val!(a::AbstractAlgebra.SeriesElem, val::Int)
+function set_val!(a::AbstractAlgebra.RelSeriesElem, val::Int)
    a.val = val
 end
 
