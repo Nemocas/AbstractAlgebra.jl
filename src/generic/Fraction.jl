@@ -606,7 +606,7 @@ end
 function zero!(c::AbstractAlgebra.FracElem)
    c.num = zero!(c.num)
    if !isone(c.den)
-      c.den = one(parent(c))
+      c.den = one(base_ring(c))
    end
    return c
 end
