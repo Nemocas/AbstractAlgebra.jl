@@ -12,6 +12,7 @@ makedocs(
              "polynomial.md",
              "series_rings.md",
              "series.md",
+             "matrix_spaces.md",
              "types.md" # Appendix A
          ]
 )

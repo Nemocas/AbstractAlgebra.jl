@@ -433,6 +433,12 @@ add!(c::MyElem, a::MyElem, b::MyElem)
 
 Set $c$ to the value $a + b$ in place. Return the mutated value. Aliasing is permitted.
 
+```julia
+addeq!(a::MyElem, b::MyElem)
+```
+
+Set $a$ to $a + b$ in place. Return the mutated value. Aliasing is permitted.
+
 ### Random generation
 
 The random functions are only used for test code to generate test data. They therefore
