@@ -221,7 +221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Ring interface",
     "title": "Unsafe operators",
     "category": "section",
-    "text": "To speed up polynomial and matrix arithmetic, it sometimes makes sense to mutate values in place rather than replace them with a newly created object every time they are modified.For this purpose, certain mutating operators are required. In order to support immutable types (struct in Julia) and systems that don't have in-place operators, all unsafe operators must return the (ostensibly) mutated value. Only the returned value is used in computations, so this lifts the requirement that the unsafe operators actually mutate the value.Note the exclamation point is a convention, which indicates that the object may be mutated in-place.To make use of these functions, one must be certain that no other references are held to the object being mutated, otherwise those values will also be changed!The results of deepcopy and all arithmetic operations, including powering and division can be assumed to be new objects without other references being held, as can objects returned from constructors.Note that R(a) where R is the ring a belongs to, does not create a new value. For this case, use deepcopy(a).zero!(f::MyElem)Set the value f to zero in place. Return the mutated value.mul!(c::MyElem, a::MyElem, b::MyElem)Set c to the value ab in place. Return the mutated value. Aliasing is permitted.add!(c::MyElem, a::MyElem, b::MyElem)Set c to the value a + b in place. Return the mutated value. Aliasing is permitted."
+    "text": "To speed up polynomial and matrix arithmetic, it sometimes makes sense to mutate values in place rather than replace them with a newly created object every time they are modified.For this purpose, certain mutating operators are required. In order to support immutable types (struct in Julia) and systems that don't have in-place operators, all unsafe operators must return the (ostensibly) mutated value. Only the returned value is used in computations, so this lifts the requirement that the unsafe operators actually mutate the value.Note the exclamation point is a convention, which indicates that the object may be mutated in-place.To make use of these functions, one must be certain that no other references are held to the object being mutated, otherwise those values will also be changed!The results of deepcopy and all arithmetic operations, including powering and division can be assumed to be new objects without other references being held, as can objects returned from constructors.Note that R(a) where R is the ring a belongs to, does not create a new value. For this case, use deepcopy(a).zero!(f::MyElem)Set the value f to zero in place. Return the mutated value.mul!(c::MyElem, a::MyElem, b::MyElem)Set c to the value ab in place. Return the mutated value. Aliasing is permitted.add!(c::MyElem, a::MyElem, b::MyElem)Set c to the value a + b in place. Return the mutated value. Aliasing is permitted.addeq!(a::MyElem, b::MyElem)Set a to a + b in place. Return the mutated value. Aliasing is permitted."
 },
 
 {
@@ -1022,6 +1022,94 @@ var documenterSearchIndex = {"docs": [
     "title": "Special functions",
     "category": "section",
     "text": "Base.exp(a::RelSeriesElem)Base.sqrt(a::RelSeriesElem)ExamplesR, t = PolynomialRing(JuliaQQ, \"t\")\nS, x = PowerSeriesRing(R, 30, \"x\")\nT, z = PowerSeriesRing(JuliaQQ, 30, \"z\")\n\na = 1 + z + 3z^2 + O(z^5)\nb = z + 2z^2 + 5z^3 + O(z^5)\n\nc = exp(x + O(x^40))\nd = divexact(x, exp(x + O(x^40)) - 1)\nf = exp(b)\nh = sqrt(a)"
+},
+
+{
+    "location": "matrix_spaces.html#",
+    "page": "Matrix Interface",
+    "title": "Matrix Interface",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "matrix_spaces.html#Matrix-Interface-1",
+    "page": "Matrix Interface",
+    "title": "Matrix Interface",
+    "category": "section",
+    "text": "Generic matrices are supported in AbstractAlgebra.jl. As the space of mtimes n matrices over a commutative ring is not itself a commutative ring, not all of the Ring interface needs to be implemented for matrices in general.In particular, the following functions do not need to be implemented: isdomain_type, needs_parentheses, isnegative, show_minus_one and divexact. The canonical_unit function should be implemented, but simply needs to return the corresponding value for entry 1 1 (the function is never called on empty matrices).Note that AbstractAlgebra.jl matrices are not the same as Julia matrices. We store a base ring in our matrix and matrices are row major instead of column major in order to support the numerous large C libraries that use this convention.All AbstractAlgebra.jl matrices are assumed to be mutable. This is usually critical to performance."
+},
+
+{
+    "location": "matrix_spaces.html#Types-and-parents-1",
+    "page": "Matrix Interface",
+    "title": "Types and parents",
+    "category": "section",
+    "text": "AbstractAlgebra provides two abstract types for matrix spaces and their elements:MatSpace{T} is the abstract type for matrix space parent types\nMatElem{T} is the abstract type for matrix typesNote that both abstract types are parameterised. The type T should usually be the type of elements of the matrices.Matrix spaces should be made unique on the system by caching parent objects (unless an optional cache parameter is set to false). Matrix spaces should at least be distinguished based on their base (coefficient) ring and the dimensions of the matrices in the space.See src/generic/GenericTypes.jl for an example of how to implement such a cache (which usually makes use of a dictionary)."
+},
+
+{
+    "location": "matrix_spaces.html#Required-functionality-for-matrices-1",
+    "page": "Matrix Interface",
+    "title": "Required functionality for matrices",
+    "category": "section",
+    "text": "In addition to the required (relevant) functionality for the Ring interface (see above), the following functionality is required for the Matrix interface.We suppose that R is a fictitious base ring (coefficient ring) and that S is a space of mtimes n matrices over R with parent object S of type MyMatSpace{T}. We also assume the matrices in the space have type MyMat{T}, where T is the type of elements of the base (element) ring.Of course, in practice these types may not be parameterised, but we use parameterised types here to make the interface clearer.Note that the type T must (transitively) belong to the abstract type RingElem."
+},
+
+{
+    "location": "matrix_spaces.html#Constructors-1",
+    "page": "Matrix Interface",
+    "title": "Constructors",
+    "category": "section",
+    "text": "In addition to the standard constructors, the following constructors, taking an array of elements, must be available.(S::MyMatSpace{T})(A::Array{T, 2}) where T <: AbstractAlgebra.RingElemCreate the matrix in the given space whose (i j) entry is given by A[i, j].(S::MyMatSpace{T})(A::Array{S, 2}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}Create the matrix in the given space whose (i j) entry is given by A[i, j], where S is the type of elements that can be coerced into the base ring of the matrix.(S::MyMatSpace{T})(A::Array{S, 1}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}Create the matrix in the given space of matrices (with dimensions mtimes n say), whose (i j) entry is given by A[i*(n - 1) + j] and where S is the type of elements that can be coerced into the base ring of the matrix.ExamplesS = MatrixSpace(JuliaQQ, 2, 3)\n\nM1 = S(Rational{BigInt}[2 3 1; 1 0 4])\nM2 = S(BigInt[2 3 1; 1 0 4])\nM3 = S(BigInt[2, 3, 1, 1, 0, 4])It is also possible to create matrices directly, without first creating the corresponding matrix space (the inner constructor should be called directly). Note that to support this, matrix space parent objects don't contain a reference to their parent. Instead, parents are constructed on-the-fly if requested.matrix(R::Ring, arr::Array{T, 2}) where T <: AbstractAlgebra.RingElemGiven an mtimes n Julia matrix of entries, construct the corresponding Nemo matrix over the given ring R, assuming all the entries can be coerced into R.matrix(R::Ring, r::Int, c::Int, A::Array{T, 1}) where T <: AbstractAlgebra.RingElemConstruct the given rtimes c Nemo matrix over the ring R whose (i j) entry is given by A[c*(i - 1) + j], assuming that all the entries can be coerced into R.zero_matrix(R::Ring, r::Int, c::Int)Construct the rtimes c Nemo zero matrix over the ring R.identity_matrix(R::Ring, n::Int)Construct the ntimes n Nemo identity matrix over the ring R.similar(x::MyMat{T}) where T <: AbstractAlgebra.RingElemConstruct the zero matrix with the same dimensions and base ring as the given matrix.similar(x::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElemConstruct the rtimes c zero matrix with the same base ring as the given matrix.ExamplesM = matrix(JuliaZZ, BigInt[3 1 2; 2 0 1])\nN = matrix(JuliaZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])\nP = zero_matrix(JuliaZZ, 3, 2)\nQ = identity_matrix(JuliaZZ, 4)\nC = similar(P)\nD = similar(Q, 4, 5)"
+},
+
+{
+    "location": "matrix_spaces.html#Basic-manipulation-of-matrices-1",
+    "page": "Matrix Interface",
+    "title": "Basic manipulation of matrices",
+    "category": "section",
+    "text": "rows(f::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the number of rows of the given matrix.cols(f::MyMat{T}) where T <: AbstractAlgebra.RingElemReturns the number of columns of the given matrix.getindex(M::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElemReturn the (i j)-th entry of the matrix M.setindex!(M::MyMat{T}, d::T, r::Int, c::Int) where T <: AbstractAlgebra.RingElemSet the (i j)-th entry of the matrix M to d, which is assumed to be in the base ring of the matrix. The matrix must have such an entry and the matrix is mutated in place and not returned from the function.ExamplesM = matrix(JuliaZZ, BigInt[2 3 0; 1 1 1])\n\nm = rows(M)\nn = cols(M)\nM[1, 2] = BigInt(4)\nc = M[1, 1]"
+},
+
+{
+    "location": "matrix_spaces.html#Optional-functionality-for-matrices-1",
+    "page": "Matrix Interface",
+    "title": "Optional functionality for matrices",
+    "category": "section",
+    "text": "Especially when wrapping C libraries, some functions are best implemented directly, rather than relying on the generic functionality. The following are all provided by the AbstractAlgebra.jl generic code, but can optionally be implemented directly for performance reasons."
+},
+
+{
+    "location": "matrix_spaces.html#Optional-constructors-1",
+    "page": "Matrix Interface",
+    "title": "Optional constructors",
+    "category": "section",
+    "text": "eye(M::MyMat{T}) where T <: AbstractAlgebra.RingElemConstruct the identity matrix with the same dimensions and base ring as the given matrix.eye(M::MyMat{T}, n::Int) where T <: AbstractAlgebra.RingElemConstruct the ntimes n identity matrix with the same base ring as the given matrix.ExamplesM = matrix(JuliaZZ, BigInt[1 2 3; 4 5 6])\n\nN = eye(M)\nP = eye(M, 2)"
+},
+
+{
+    "location": "matrix_spaces.html#Optional-submatrices-1",
+    "page": "Matrix Interface",
+    "title": "Optional submatrices",
+    "category": "section",
+    "text": "sub(M::MyMat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: AbstractAlgebra.RingElemReturn a new matrix with the same entries as the submatrix with the given range of rows and columns.ExamplesM = matrix(JuliaZZ, BigInt[1 2 3; 2 3 4; 3 4 5])\n\nN1 = M[1:2, :]\nN2 = M[:, :]\nN3 = M[2:3, 2:3]"
+},
+
+{
+    "location": "matrix_spaces.html#Optional-row-swapping-1",
+    "page": "Matrix Interface",
+    "title": "Optional row swapping",
+    "category": "section",
+    "text": "swap_rows!(M::MyMat{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElemSwap the rows of M in place. The function does not return the mutated matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).ExamplesM = identity_matrix(JuliaZZ, 3)\n\nswap_rows!(M, 1, 2)"
+},
+
+{
+    "location": "matrix_spaces.html#Optional-concatenation-1",
+    "page": "Matrix Interface",
+    "title": "Optional concatenation",
+    "category": "section",
+    "text": "hcat(M::MyMat{T}, N::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the horizontal concatenation of M and N. It is assumed that the number of rows of M and N are the same.vcat(M::MyMat{T}, N::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the vertical concatenation of M and N. It is assumed that the number of columns of M and N are the same.ExamplesM = matrix(JuliaZZ, BigInt[1 2 3; 2 3 4; 3 4 5])\nN = matrix(JuliaZZ, BigInt[1 0 1; 0 1 0; 1 0 1])\n\nP = hcat(M, N)\nQ = vcat(M, N)"
 },
 
 {
