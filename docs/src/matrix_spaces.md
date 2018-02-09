@@ -180,6 +180,27 @@ n = cols(M)
 M[1, 2] = BigInt(4)
 c = M[1, 1]
 ```
+### Transpose
+
+```julia
+transpose(::MyMat{T}) where T <: AbstractAlgebra.RingElem
+```
+
+Return the transpose of the given matrix.
+
+The standard Julia tick notation can also be used for transposing a matrix.
+
+**Examples**
+
+```julia
+R, t = PolynomialRing(JuliaQQ, "t")
+S = MatrixSpace(R, 3, 3)
+
+A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+B = transpose(A)
+C = A'
+```
 
 ## Optional functionality for matrices
 

@@ -13,6 +13,7 @@ makedocs(
              "series_rings.md",
              "series.md",
              "matrix_spaces.md",
+             "matrix.md",
              "types.md" # Appendix A
          ]
 )

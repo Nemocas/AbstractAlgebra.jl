@@ -12,10 +12,11 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref,
        hnf_minors_with_trafo, hnf_with_trafo, issquare, snf, snf_with_trafo,
        weak_popov, weak_popov_with_trafo, extended_weak_popov,
        extended_weak_popov_with_trafo, rank_profile_popov, hnf_via_popov,
-       hnf_via_popov_with_trafo, popov, det_popov, _check_dim, rows, cols,
-       gram, rref, rref!, swap_rows, swap_rows!, hnf_kb, hnf_kb_with_trafo,
-       hnf_cohen, hnf_cohen_with_trafo, snf_kb, snf_kb_with_trafo,
-       find_pivot_popov, inv!, zero_matrix, kronecker_product
+       hnf_via_popov_with_trafo, popov, popov_with_trafo, det_popov,
+       _check_dim, rows, cols, gram, rref, rref!, swap_rows, swap_rows!,
+       hnf_kb, hnf_kb_with_trafo, hnf_cohen, hnf_cohen_with_trafo, snf_kb,
+       snf_kb_with_trafo, find_pivot_popov, inv!, zero_matrix,
+       kronecker_product
 
 ###############################################################################
 #
@@ -258,6 +259,11 @@ function sub(M::AbstractAlgebra.MatElem, rows::UnitRange{Int}, cols::UnitRange{I
   return z
 end
 
+doc"""
+    sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
+> Return a copy of the submatrix of $M$ from $(r1, c1)$ to $(r2, c2)$ inclusive. Note
+> that is the copy is modified, the original matrix is not.
+"""
 function sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
   return sub(M, r1:r2, c1:c2)
 end
