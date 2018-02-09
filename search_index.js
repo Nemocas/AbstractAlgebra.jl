@@ -1073,6 +1073,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix_spaces.html#Transpose-1",
+    "page": "Matrix Interface",
+    "title": "Transpose",
+    "category": "section",
+    "text": "transpose(::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the transpose of the given matrix.The standard Julia tick notation can also be used for transposing a matrix.ExamplesR, t = PolynomialRing(JuliaQQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n\nB = transpose(A)\nC = A'"
+},
+
+{
     "location": "matrix_spaces.html#Optional-functionality-for-matrices-1",
     "page": "Matrix Interface",
     "title": "Optional functionality for matrices",
@@ -1110,6 +1118,510 @@ var documenterSearchIndex = {"docs": [
     "title": "Optional concatenation",
     "category": "section",
     "text": "hcat(M::MyMat{T}, N::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the horizontal concatenation of M and N. It is assumed that the number of rows of M and N are the same.vcat(M::MyMat{T}, N::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the vertical concatenation of M and N. It is assumed that the number of columns of M and N are the same.ExamplesM = matrix(JuliaZZ, BigInt[1 2 3; 2 3 4; 3 4 5])\nN = matrix(JuliaZZ, BigInt[1 0 1; 0 1 0; 1 0 1])\n\nP = hcat(M, N)\nQ = vcat(M, N)"
+},
+
+{
+    "location": "matrix.html#",
+    "page": "-",
+    "title": "-",
+    "category": "page",
+    "text": "CurrentModule = AbstractAlgebra"
+},
+
+{
+    "location": "matrix.html#Introduction-1",
+    "page": "-",
+    "title": "Introduction",
+    "category": "section",
+    "text": "AbstractAlgebra.jl allows the creation of dense matrices over any computable commutative ring R. Generic matrices over a commutative ring are implemented in src/generic/Matrix.jl.As well as implementing the entire Matrix interface, including the optional functionality, there are many additional generic algorithms implemented for matrix spaces. We describe this functionality below.All of this generic functionality is part of the Generic submodule of AbstractAlgebra.jl. This is exported by default, so it is not necessary to qualify names of functions."
+},
+
+{
+    "location": "matrix.html#Types-and-parent-objects-1",
+    "page": "-",
+    "title": "Types and parent objects",
+    "category": "section",
+    "text": "Generic matrices in AbstractAlgebra.jl have type Generic.Mat{T} where T is the type of elements of the matrix. Internally, generic matrices are implemented using an object wrapping a Julia two dimensional array, though they are not themselves Julia arrays. See the file src/generic/GenericTypes.jl for details.Parents of generic matrices (matrix spaces) have type Generic.MatSpace{T}.The generic matrix types belong to the abstract type AbstractAlgebra.MatElem{T} and the matrix space parent types belong to AbstractAlgebra.MatSpace{T}. Note that both the concrete type of a matrix space parent object and the abstract class it belongs to have the name MatElem, therefore disambiguation is required to specify which is intended.The dimensions and base ring R of a generic matrix are stored in its parent object, however to allow creation of matrices without first creating the matrix space parent, generic matrices in Julia do not contain a reference to their parent. They contain the row and column numbers and the base ring on a per matrix basis. The parent object can then be reconstructed from this data on demand."
+},
+
+{
+    "location": "matrix.html#Matrix-space-constructors-1",
+    "page": "-",
+    "title": "Matrix space constructors",
+    "category": "section",
+    "text": "A matrix space in AbstractAlgebra.jl represents a collection of all matrices with given dimensions and base ring.In order to construct matrices in AbstractAlgebra.jl, one can first constructs the matrix space itself. This is accomplished with the following constructor.MatrixSpace(R::Ring, rows::Int, cols::Int; cache::Bool=true)Construct the space of matrices with the given number of rows and columns over the given base ring. By default such matrix spaces are cached based on the base ring and numbers of rows and columns. If the optional named parameter cached is set to false, no caching occurs.Here are some examples of creating matrix spaces and making use of the resulting parent objects to coerce various elements into the matrix space.ExamplesR, t = PolynomialRing(JuliaQQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S()\nB = S(12)\nC = S(R(11))We also allow matrices over a given base ring to be constructed directly (see the Matrix interface)."
+},
+
+{
+    "location": "matrix.html#Matrix-element-constructors-1",
+    "page": "-",
+    "title": "Matrix element constructors",
+    "category": "section",
+    "text": "In addition to coercing elements into a matrix space as above, we provide the following functions for constructing explicit matrices.Also see the Matrix interface for a list of other ways to create matrices.R[a b c...;...]Create the matrix over the base ring R consisting of the given rows (separated by semicolons). Each entry is coerced into R  automatically. Note that parentheses may be placed around individual entries if the lists would otherwise be ambiguous, e.g.  R[1 2; 2 (-3)].Beware that this syntax does not support the creation of column vectors. See the notation below for creating those.R[a b c...]Create the row vector with entries in R consisting of the given entries (separated by spaces). Each entry is coerced into R automatically. Note that parentheses may be placed around individual entries if the list would otherwise be ambiguous, e.g. R[1 2 (-3)].R[a b c...]'Create the column vector with entries in R consisting of the given entries (separated by spaces). Each entry is coerced into R automatically. Observe the dash that is used to transpose the row vector notation (for free) to turn it into a column vector. Note that parentheses may be placed around individual entries if the list would otherwise be ambiguous, e.g. R[1 2 (-3)]'.ExamplesR, t = PolynomialRing(JuliaQQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nM = R[t + 1 1; t^2 0]\nN = R[t + 1 2 t]\nP = R[1 2 t]'"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.sub-Tuple{AbstractAlgebra.MatElem,Int64,Int64,Int64,Int64}",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.sub",
+    "category": "Method",
+    "text": "sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)\n\nReturn a copy of the submatrix of M from (r1 c1) to (r2 c2) inclusive. Note that is the copy is modified, the original matrix is not.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Submatrices-1",
+    "page": "-",
+    "title": "Submatrices",
+    "category": "section",
+    "text": "In addition to the functionality described in the Matrix interface for taking submatrices of a matrix, the following function variant is also available.sub(::MatElem, ::Int, ::Int, ::Int, ::Int)ExamplesM = JuliaZZ[1 2 3; 2 3 4]\n\nN = sub(M, 1, 1, 2, 2)"
+},
+
+{
+    "location": "matrix.html#Matrix-functionality-provided-by-AbstractAlgebra.jl-1",
+    "page": "-",
+    "title": "Matrix functionality provided by AbstractAlgebra.jl",
+    "category": "section",
+    "text": ""
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.rows-Tuple{AbstractAlgebra.MatElem}",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.rows",
+    "category": "Method",
+    "text": "rows(a::AbstractAlgebra.MatElem)\n\nReturn the number of rows of the given matrix.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.cols-Tuple{AbstractAlgebra.MatElem}",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.cols",
+    "category": "Method",
+    "text": "cols(a::AbstractAlgebra.MatElem)\n\nReturn the number of columns of the given matrix.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Basic-matrix-functionality-1",
+    "page": "-",
+    "title": "Basic matrix functionality",
+    "category": "section",
+    "text": "As well as the Ring and Matrix interfaces, the following functions are provided to manipulate matrices and to set and retrieve entries and other basic data associated with the matrices.rows(::MatElem)cols(::MatElem)ExamplesR, t = PolynomialRing(JuliaQQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\nB = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])\n\nr = rows(B)\nc = cols(B)\nM = A + B\nN = 2 + A\nM1 = deepcopy(A)\nA != B\nisone(one(S)) == true\nV = A[1:2, :]\nW = A^3\nZ = divexact(2*A, 2)"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.powers-Tuple{AbstractAlgebra.MatElem,Int64}",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.powers",
+    "category": "Method",
+    "text": "powers{T <: RingElement}(a::AbstractAlgebra.MatElem{T}, d::Int)\n\nReturn an array of matrices M wher Mi + 1 = a^i for i = 0d\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Powering-1",
+    "page": "-",
+    "title": "Powering",
+    "category": "section",
+    "text": "powers(::MatElem, ::Int)ExamplesM = JuliaZZ[1 2 3; 2 3 4; 4 5 5]\n\nA = powers(M, 4)"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.gram-Tuple{AbstractAlgebra.MatElem}",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.gram",
+    "category": "Method",
+    "text": "gram(x::AbstractAlgebra.MatElem)\n\nReturn the Gram matrix of x, i.e. if x is an rtimes c matrix return the rtimes r matrix whose entries i j are the dot products of the i-th and j-th rows, respectively.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Gram-matrix-1",
+    "page": "-",
+    "title": "Gram matrix",
+    "category": "section",
+    "text": "gram(::MatElem)ExamplesR, t = PolynomialRing(JuliaQQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n\nB = gram(A)"
+},
+
+{
+    "location": "matrix.html#Base.LinAlg.trace-Tuple{AbstractAlgebra.MatElem}",
+    "page": "-",
+    "title": "Base.LinAlg.trace",
+    "category": "Method",
+    "text": "trace(x::AbstractAlgebra.MatElem)\n\nReturn the trace of the matrix a, i.e. the sum of the diagonal elements. We require the matrix to be square.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Trace-1",
+    "page": "-",
+    "title": "Trace",
+    "category": "section",
+    "text": "trace(::MatElem)ExamplesR, t = PolynomialRing(JuliaQQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n\nb = trace(A)"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.content-Tuple{AbstractAlgebra.MatElem}",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.content",
+    "category": "Method",
+    "text": "content(x::AbstractAlgebra.MatElem)\n\nReturn the content of the matrix a, i.e. the greatest common divisor of all its entries, assuming it exists.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Content-1",
+    "page": "-",
+    "title": "Content",
+    "category": "section",
+    "text": "content(::MatElem)ExamplesR, t = PolynomialRing(JuliaQQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n\nb = content(A)"
+},
+
+{
+    "location": "matrix.html#Base.:*-Tuple{AbstractAlgebra.perm,AbstractAlgebra.MatElem}",
+    "page": "-",
+    "title": "Base.:*",
+    "category": "Method",
+    "text": "*(x, y...)\n\nMultiplication operator. x*y*z*... calls this function with all arguments, i.e. *(x, y, z, ...).\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Permutation-1",
+    "page": "-",
+    "title": "Permutation",
+    "category": "section",
+    "text": "*(::perm, ::MatElem)ExamplesR, t = PolynomialRing(JuliaQQ, \"t\")\nS = MatrixSpace(R, 3, 3)\nG = PermGroup(3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\nP = G([1, 3, 2])\n\nB = P*A"
+},
+
+{
+    "location": "matrix.html#Base.LinAlg.lufact-Union{Tuple{AbstractAlgebra.MatElem{T},AbstractAlgebra.PermGroup}, Tuple{T}} where T<:AbstractAlgebra.FieldElem",
+    "page": "-",
+    "title": "Base.LinAlg.lufact",
+    "category": "Method",
+    "text": "lufact{T <: FieldElement}(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A)))\n\nReturn a tuple r p L U consisting of the rank of A, a permutation p of A belonging to P, a lower triangular matrix L and an upper triangular matrix U such that p(A) = LU, where p(A) stands for the matrix whose rows are the given permutation p of the rows of A.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.fflu-Union{Tuple{AbstractAlgebra.MatElem{T},AbstractAlgebra.PermGroup}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.fflu",
+    "category": "Method",
+    "text": "fflu{T <: RingElement}(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A)))\n\nReturn a tuple r d p L U consisting of the rank of A, a denominator d, a permutation p of A belonging to P, a lower triangular matrix L and an upper triangular matrix U such that p(A) = LD^1U, where p(A) stands for the matrix whose rows are the given permutation p of the rows of A and such that D is the diagonal matrix diag(p_1 p_1p_2 ldots p_n-2p_n-1 p_n-1 where the p_i are the inverses of the diagonal entries of U. The denominator d is set to pm mboxdet(S) where S is an appropriate submatrix of A (S = A if A is square) and the sign is decided by the parity of the permutation.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#LU-factorisation-1",
+    "page": "-",
+    "title": "LU factorisation",
+    "category": "section",
+    "text": "lufact{T <: FieldElem}(::MatElem{T}, ::PermGroup)fflu{T <: RingElem}(::MatElem{T}, ::PermGroup)ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\n\nA = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 - 2 a - 1 2a])\n\nr, P, L, U = lufact(A)\nr, d, P, L, U = fflu(A)"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.rref-Union{Tuple{AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.rref",
+    "category": "Method",
+    "text": "rref{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturns a tuple (r d A) consisting of the rank r of M and a denominator d in the base ring of M and a matrix A such that Ad is the reduced row echelon form of M. Note that the denominator is not usually minimal.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.rref-Union{Tuple{AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.FieldElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.rref",
+    "category": "Method",
+    "text": "rref{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturns a tuple (r d A) consisting of the rank r of M and a denominator d in the base ring of M and a matrix A such that Ad is the reduced row echelon form of M. Note that the denominator is not usually minimal.\n\n\n\nrref{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})\n\nReturns a tuple (r A) consisting of the rank r of M and a reduced row echelon form A of M.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.isrref-Union{Tuple{AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.isrref",
+    "category": "Method",
+    "text": "isrref{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturn true if M is in reduced row echelon form, otherwise return false.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.isrref-Union{Tuple{AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.FieldElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.isrref",
+    "category": "Method",
+    "text": "isrref{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturn true if M is in reduced row echelon form, otherwise return false.\n\n\n\nisrref(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}\n\nReturn true if M is in reduced row echelon form, otherwise return false.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Reduced-row-echelon-form-1",
+    "page": "-",
+    "title": "Reduced row-echelon form",
+    "category": "section",
+    "text": "rref{T <: RingElem}(::MatElem{T})\nrref{T <: FieldElem}(::MatElem{T})isrref{T <: RingElem}(::MatElem{T})\nisrref{T <: FieldElem}(::MatElem{T})ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\n   \nM = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n   \nr, A = rref(M)\nisrref(A)\n\nR, x = PolynomialRing(JuliaZZ, \"x\")\nS = MatrixSpace(R, 3, 3)\n\nM = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])\n\nr, d, A = rref(M)\nisrref(A)"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.hnf-Union{Tuple{AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.hnf",
+    "category": "Method",
+    "text": "hnf{T <: RingElement}(A::Mat{T}) -> Mat{T}\n\nReturn the upper right row Hermite normal form of A.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.hnf_with_trafo-Union{Tuple{AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.hnf_with_trafo",
+    "category": "Method",
+    "text": "hnf{T <: RingElement}(A::Mat{T}) -> Mat{T}, Mat{T}\n\nReturn the upper right row Hermite normal form H of A together with invertible matrix U such that UA = H.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Hermite-normal-form-1",
+    "page": "-",
+    "title": "Hermite normal form",
+    "category": "section",
+    "text": "hnf{T <: RingElem}(::MatElem{T})\nhnf_with_trafo{T <: RingElem}(::MatElem{T})"
+},
+
+{
+    "location": "matrix.html#Base.LinAlg.det-Union{Tuple{AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "-",
+    "title": "Base.LinAlg.det",
+    "category": "Method",
+    "text": "det(M)\n\nMatrix determinant.\n\nExample\n\njulia> M = [1 0; 2 2]\n2×2 Array{Int64,2}:\n 1  0\n 2  2\n\njulia> det(M)\n2.0\n\n\n\ndet{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturn the determinant of the matrix M. We assume M is square.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Base.LinAlg.det-Union{Tuple{AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.FieldElem",
+    "page": "-",
+    "title": "Base.LinAlg.det",
+    "category": "Method",
+    "text": "det(M)\n\nMatrix determinant.\n\nExample\n\njulia> M = [1 0; 2 2]\n2×2 Array{Int64,2}:\n 1  0\n 2  2\n\njulia> det(M)\n2.0\n\n\n\ndet{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})\n\nReturn the determinant of the matrix M. We assume M is square.\n\n\n\ndet{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturn the determinant of the matrix M. We assume M is square.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Determinant-1",
+    "page": "-",
+    "title": "Determinant",
+    "category": "section",
+    "text": "det{T <: RingElem}(::MatElem{T})\ndet{T <: FieldElem}(::MatElem{T})ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\n   \nA = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n\nd = det(A)"
+},
+
+{
+    "location": "matrix.html#Base.LinAlg.rank-Union{Tuple{AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "-",
+    "title": "Base.LinAlg.rank",
+    "category": "Method",
+    "text": "rank{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturn the rank of the matrix M.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Base.LinAlg.rank-Union{Tuple{AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.FieldElem",
+    "page": "-",
+    "title": "Base.LinAlg.rank",
+    "category": "Method",
+    "text": "rank{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturn the rank of the matrix M.\n\n\n\nrank{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})\n\nReturn the rank of the matrix M.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Rank-1",
+    "page": "-",
+    "title": "Rank",
+    "category": "section",
+    "text": "rank{T <: RingElem}(::MatElem{T})\nrank{T <: FieldElem}(::MatElem{T})ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\n   \nA = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n\nd = rank(A)"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.solve-Union{Tuple{AbstractAlgebra.MatElem{T},AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.FieldElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.solve",
+    "category": "Method",
+    "text": "solve{T <: FieldElement}(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})\n\nGiven a non-singular ntimes n matrix over a field and an ntimes m matrix over the same field, return x an ntimes m matrix x such that Ax = b. If A is singular an exception is raised.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.solve_rational-Union{Tuple{AbstractAlgebra.MatElem{T},AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.solve_rational",
+    "category": "Method",
+    "text": "solve_rational{T <: RingElement}(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})\n\nGiven a non-singular ntimes n matrix over a ring and an ntimes m matrix over the same ring, return a tuple x d consisting of an ntimes m matrix x and a denominator d such that Ax = db. The denominator will be the determinant of A up to sign. If A is singular an exception is raised.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.solve_triu-Union{Tuple{AbstractAlgebra.MatElem{T},AbstractAlgebra.MatElem{T},Bool}, Tuple{T}} where T<:AbstractAlgebra.FieldElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.solve_triu",
+    "category": "Method",
+    "text": "solve_triu{T <: FieldElement}(U::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, unit=false)\n\nGiven a non-singular ntimes n matrix over a field which is upper triangular, and an ntimes m matrix over the same field, return an ntimes m matrix x such that Ax = b. If A is singular an exception is raised. If unit is true then U is assumed to have ones on its diagonal, and the diagonal will not be read.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Linear-solving-1",
+    "page": "-",
+    "title": "Linear solving",
+    "category": "section",
+    "text": "solve{T <: FieldElem}(::MatElem{T}, ::MatElem{T})solve_rational{T <: RingElem}(::MatElem{T}, ::MatElem{T})solve_triu{T <: FieldElem}(::MatElem{T}, ::MatElem{T}, ::Bool)ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\nU = MatrixSpace(K, 3, 1)\n\nA = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\nb = U([2a a + 1 (-a - 1)]')\n\nx = solve(A, b)\n\nA = S([a + 1 2a + 3 a^2 + 1; K(0) a^2 - 1 2a; K(0) K(0) a])\nb = U([2a a + 1 (-a - 1)]')\n\nx = solve_triu(A, b, false)\n\nR, x = PolynomialRing(JuliaZZ, \"x\")\nS = MatrixSpace(R, 3, 3)\nU = MatrixSpace(R, 3, 2)\n\nA = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])\nb = U([2x x + 1 (-x - 1); x + 1 (-x) x^2]')\n\nx, d = solve_rational(A, b)\n\nS = MatrixSpace(JuliaZZ, 3, 3)\nT = MatrixSpace(JuliaZZ, 3, 1)\n\nA = S([BigInt(2) 3 5; 1 4 7; 9 2 2])   \nB = T([BigInt(4), 5, 7])\n\nX, d = solve_rational(A, B)"
+},
+
+{
+    "location": "matrix.html#Base.inv-Union{Tuple{AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "-",
+    "title": "Base.inv",
+    "category": "Method",
+    "text": "inv(M)\n\nMatrix inverse. Computes matrix N such that M * N = I, where I is the identity matrix. Computed by solving the left-division N = M \\ I.\n\nExample\n\njulia> M = [2 5; 1 3]\n2×2 Array{Int64,2}:\n 2  5\n 1  3\n\njulia> N = inv(M)\n2×2 Array{Float64,2}:\n  3.0  -5.0\n -1.0   2.0\n\njulia> M*N == N*M == eye(2)\ntrue\n\n\n\ninv{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nGiven a non-singular ntimes n matrix over a ring the tuple X d consisting of an ntimes n matrix X and a denominator d such that AX = dI_n, where I_n is the ntimes n identity matrix. The denominator will be the determinant of A up to sign. If A is singular an exception is raised.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Base.inv-Union{Tuple{AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.FieldElem",
+    "page": "-",
+    "title": "Base.inv",
+    "category": "Method",
+    "text": "inv(M)\n\nMatrix inverse. Computes matrix N such that M * N = I, where I is the identity matrix. Computed by solving the left-division N = M \\ I.\n\nExample\n\njulia> M = [2 5; 1 3]\n2×2 Array{Int64,2}:\n 2  5\n 1  3\n\njulia> N = inv(M)\n2×2 Array{Float64,2}:\n  3.0  -5.0\n -1.0   2.0\n\njulia> M*N == N*M == eye(2)\ntrue\n\n\n\ninv{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nGiven a non-singular ntimes n matrix over a ring the tuple X d consisting of an ntimes n matrix X and a denominator d such that AX = dI_n, where I_n is the ntimes n identity matrix. The denominator will be the determinant of A up to sign. If A is singular an exception is raised.\n\n\n\ninv{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})\n\nGiven a non-singular ntimes n matrix over a field, return an ntimes n matrix X such that AX = I_n where I_n is the ntimes n identity matrix. If A is singular an exception is raised.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Inverse-1",
+    "page": "-",
+    "title": "Inverse",
+    "category": "section",
+    "text": "inv{T <: RingElem}(::MatElem{T})\ninv{T <: FieldElem}(::MatElem{T})ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\n\nA = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n\nX = inv(A)\n\nR, x = PolynomialRing(JuliaZZ, \"x\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])\n    \nX, d = inv(A)"
+},
+
+{
+    "location": "matrix.html#Base.LinAlg.nullspace-Union{Tuple{AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "-",
+    "title": "Base.LinAlg.nullspace",
+    "category": "Method",
+    "text": "nullspace(M)\n\nBasis for nullspace of M.\n\nExample\n\njulia> M = [1 0 0; 0 1 0; 0 0 0]\n3×3 Array{Int64,2}:\n 1  0  0\n 0  1  0\n 0  0  0\n\njulia> nullspace(M)\n3×1 Array{Float64,2}:\n 0.0\n 0.0\n 1.0\n\n\n\nnullspace{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturns a tuple (nu N) consisting of the nullity nu of M and a basis N (consisting of column vectors) for the right nullspace of M, i.e. such that MN is the zero matrix. If M is an mtimes n matrix N will be an ntimes nu matrix. Note that the nullspace is taken to be the vector space kernel over the fraction field of the base ring if the latter is not a field. In AbstractAlgebra we use the name ``kernel'' for a function to compute an integral kernel.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Base.LinAlg.nullspace-Union{Tuple{AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.FieldElem",
+    "page": "-",
+    "title": "Base.LinAlg.nullspace",
+    "category": "Method",
+    "text": "nullspace(M)\n\nBasis for nullspace of M.\n\nExample\n\njulia> M = [1 0 0; 0 1 0; 0 0 0]\n3×3 Array{Int64,2}:\n 1  0  0\n 0  1  0\n 0  0  0\n\njulia> nullspace(M)\n3×1 Array{Float64,2}:\n 0.0\n 0.0\n 1.0\n\n\n\nnullspace{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturns a tuple (nu N) consisting of the nullity nu of M and a basis N (consisting of column vectors) for the right nullspace of M, i.e. such that MN is the zero matrix. If M is an mtimes n matrix N will be an ntimes nu matrix. Note that the nullspace is taken to be the vector space kernel over the fraction field of the base ring if the latter is not a field. In AbstractAlgebra we use the name ``kernel'' for a function to compute an integral kernel.\n\n\n\nnullspace{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})\n\nReturns a tuple (nu N) consisting of the nullity nu of M and a basis N (consisting of column vectors) for the right nullspace of M, i.e. such that MN is the zero matrix. If M is an mtimes n matrix N will be an ntimes nu matrix. Note that the nullspace is taken to be the vector space kernel over the fraction field of the base ring if the latter is not a field. In Nemo we use the name ``kernel'' for a function to compute an integral kernel.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Nullspace-1",
+    "page": "-",
+    "title": "Nullspace",
+    "category": "section",
+    "text": "nullspace{T <: RingElem}(::MatElem{T})\nnullspace{T <: FieldElem}(::MatElem{T})ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\nS = MatrixSpace(R, 4, 4)\n   \nM = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;\n       -8*x^2+8*x+16 -16*x^2+38*x-20 90*x^2-82*x-44 60*x^2+54*x-34;\n       -4*x^2+4*x+8 -8*x^2+13*x-10 35*x^2-31*x-14 22*x^2+21*x-15;\n       -10*x^2+10*x+20 -20*x^2+70*x-25 150*x^2-140*x-85 105*x^2+90*x-50])\n   \nn, N = nullspace(M)"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.hessenberg-Union{Tuple{AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.hessenberg",
+    "category": "Method",
+    "text": "hessenberg(A::AbstractAlgebra.MatElem{T}) where {T <: RingElement}\n\nReturns the Hessenberg form of M, i.e. an upper Hessenberg matrix which is similar to M. The upper Hessenberg form has nonzero entries above and on the diagonal and in the diagonal line immediately below the diagonal.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.ishessenberg-Union{Tuple{AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.ishessenberg",
+    "category": "Method",
+    "text": "ishessenberg{T <: RingElement}(A::AbstractAlgebra.MatElem{T})\n\nReturns true if M is in Hessenberg form, otherwise returns false.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Hessenberg-form-1",
+    "page": "-",
+    "title": "Hessenberg form",
+    "category": "section",
+    "text": "hessenberg{T <: RingElem}(::MatElem{T})ishessenberg{T <: RingElem}(::MatElem{T})ExamplesR = ResidueRing(JuliaZZ, 7)\nS = MatrixSpace(R, 4, 4)\n   \nM = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);\n       R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])\n   \nA = hessenberg(M)\nishessenberg(A) == true"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.charpoly-Union{Tuple{AbstractAlgebra.Ring,AbstractAlgebra.MatElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.charpoly",
+    "category": "Method",
+    "text": "charpoly{T <: RingElement}(V::Ring, Y::AbstractAlgebra.MatElem{T})\n\nReturns the characteristic polynomial p of the matrix M. The polynomial ring R of the resulting polynomial must be supplied and the matrix is assumed to be square.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Characteristic-polynomial-1",
+    "page": "-",
+    "title": "Characteristic polynomial",
+    "category": "section",
+    "text": "charpoly{T <: RingElem}(::Ring, ::MatElem{T})ExamplesR = ResidueRing(JuliaZZ, 7)\nS = MatrixSpace(R, 4, 4)\nT, x = PolynomialRing(R, \"x\")\n\nM = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);\n       R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])\n   \nA = charpoly(T, M)"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.minpoly-Union{Tuple{AbstractAlgebra.Ring,AbstractAlgebra.MatElem{T},Bool}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.minpoly",
+    "category": "Method",
+    "text": "minpoly{T <: RingElement}(S::Ring, M::AbstractAlgebra.MatElem{T}, charpoly_only = false)\n\nReturns the minimal polynomial p of the matrix M. The polynomial ring R of the resulting polynomial must be supplied and the matrix must be square.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.minpoly-Union{Tuple{AbstractAlgebra.Ring,AbstractAlgebra.MatElem{T},Bool}, Tuple{T}} where T<:AbstractAlgebra.FieldElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.minpoly",
+    "category": "Method",
+    "text": "minpoly{T <: FieldElement}(S::Ring, M::AbstractAlgebra.MatElem{T}, charpoly_only = false)\n\nReturns the minimal polynomial p of the matrix M. The polynomial ring R of the resulting polynomial must be supplied and the matrix must be square.\n\n\n\nminpoly{T <: RingElement}(S::Ring, M::AbstractAlgebra.MatElem{T}, charpoly_only = false)\n\nReturns the minimal polynomial p of the matrix M. The polynomial ring R of the resulting polynomial must be supplied and the matrix must be square.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Minimal-polynomial-1",
+    "page": "-",
+    "title": "Minimal polynomial",
+    "category": "section",
+    "text": "minpoly{T <: RingElem}(::Ring, ::MatElem{T}, ::Bool)\nminpoly{T <: FieldElem}(::Ring, ::MatElem{T}, ::Bool)ExamplesR = GF(13)\nT, y = PolynomialRing(R, \"y\")\n   \nM = R[7 6 1;\n      7 7 5;\n      8 12 5]\n\nA = minpoly(T, M)"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.similarity!-Union{Tuple{AbstractAlgebra.MatElem{T},Int64,T}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.similarity!",
+    "category": "Method",
+    "text": "similarity!{T <: RingElement}(A::AbstractAlgebra.MatElem{T}, r::Int, d::T)\n\nApplies a similarity transform to the ntimes n matrix M in-place. Let P be the ntimes n identity matrix that has had all zero entries of row r replaced with d, then the transform applied is equivalent to M = P^-1MP. We require M to be a square matrix. A similarity transform preserves the minimal and characteristic polynomials of a matrix.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Transforms-1",
+    "page": "-",
+    "title": "Transforms",
+    "category": "section",
+    "text": "similarity!{T <: RingElem}(::MatElem{T}, ::Int, ::T)ExamplesR = ResidueRing(JuliaZZ, 7)\nS = MatrixSpace(R, 4, 4)\n   \nM = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);\n       R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])\n   \nsimilarity!(M, 1, R(3))"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.weak_popov-Union{Tuple{AbstractAlgebra.Generic.Mat{T}}, Tuple{T}} where T<:AbstractAlgebra.PolyElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.weak_popov",
+    "category": "Method",
+    "text": "weak_popov{T <: PolyElem}(A::Mat{T})\n\nReturn the weak Popov form of A.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.weak_popov_with_trafo-Union{Tuple{AbstractAlgebra.Generic.Mat{T}}, Tuple{T}} where T<:AbstractAlgebra.PolyElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.weak_popov_with_trafo",
+    "category": "Method",
+    "text": "weak_popov_with_trafo{T <: PolyElem}(A::Mat{T})\n\nCompute a tuple (P U) where P is the weak Popov form of A and U is a transformation matrix so that P = UA.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.popov-Union{Tuple{AbstractAlgebra.Generic.Mat{T}}, Tuple{T}} where T<:AbstractAlgebra.PolyElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.popov",
+    "category": "Method",
+    "text": "popov{T <: PolyElem}(A::Mat{T})\n\nReturn the Popov form of A.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.popov_with_trafo-Union{Tuple{AbstractAlgebra.Generic.Mat{T}}, Tuple{T}} where T<:AbstractAlgebra.PolyElem",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.popov_with_trafo",
+    "category": "Method",
+    "text": "popov_with_trafo{T <: PolyElem}(A::Mat{T})\n\nCompute a tuple (P U) where P is the Popov form of A and U is a transformation matrix so that P = UA.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#(Weak)-Popov-form-1",
+    "page": "-",
+    "title": "(Weak) Popov form",
+    "category": "section",
+    "text": "AbstractAlgebra.jl provides algorithms for computing the (weak) Popov of a matrix with entries in a univariate polynomial ring over a field.weak_popov{T <: PolyElem}(::Generic.Mat{T})\nweak_popov_with_trafo{T <: PolyElem}(::Generic.Mat{T})\npopov{T <: PolyElem}(::Generic.Mat{T})\npopov_with_trafo{T <: PolyElem}(::Generic.Mat{T})"
 },
 
 {
