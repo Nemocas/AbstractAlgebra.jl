@@ -793,6 +793,110 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "mpolynomial_rings.html#",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "Multvariate Polynomial Ring Interface",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "mpolynomial_rings.html#Multvariate-Polynomial-Ring-Interface-1",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "Multvariate Polynomial Ring Interface",
+    "category": "section",
+    "text": "Multivariate polynomial rings are supported in AbstractAlgebra.jl, and in addition to the standard Ring interface, numerous additional functions are provided.Unlike other kinds of rings, even complex operations such as GCD depend heavily on the multivariate representation. Therefore AbstractAlgebra.jl cannot provide much in the way of additional functionality to external multivariate implementations.This means that external libraries are must be able to implement their multivariate formats in whatever way they see fit. The required interface here should be available, even if it is not optimal. But it can be extended, either by implementing one of the optional interfaces, or by extending the required interface in some other way.Naturally, any multivariate polynomial ring implementation provides the full Ring interface, in order to be treated as a ring for the sake of AbstractAlgebra.jl.Considerations which make it impossible for AbstractAlgebra.jl to provide generic functionality on top of an arbitrary multivariate module include:orderings (lexical, degree, weighted, block, arbitrary)\nsparse or dense representation\ndistributed or recursive representation\npacked or unpacked exponents\nexponent bounds (and whether adaptive or not)\nrandom access or iterators\nwhether monomials and polynomials have the same type\nwhether special cache aware data structures such as Geobuckets are used"
+},
+
+{
+    "location": "mpolynomial_rings.html#Types-and-parents-1",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "Types and parents",
+    "category": "section",
+    "text": "AbstractAlgebra.jl provides two abstract types for multivariate polynomial rings and their elements:MPolyRing{T} is the abstract type for multivariate polynomial ring parent types\nMPolyElem{T} is the abstract type for multivariate polynomial typesWe have that MPolyRing{T} <: AbstractAlgebra.Ring and  MPolyElem{T} <: AbstractAlgebra.RingElem.Note that both abstract types are parameterised. The type T should usually be the type of elements of the coefficient ring of the polynomial ring. For example, in the case of mathbbZx y the type T would be the type of an integer, e.g. BigInt.Multivariate polynomial rings should be made unique on the system by caching parent objects (unless an optional cache parameter is set to false). Multivariate polynomial rings should at least be distinguished based on their base (coefficient) ring and number of variables. But if they have the same base ring, symbols (for their variables/generators) and ordering, they should certainly have the same parent object.See src/generic/GenericTypes.jl for an example of how to implement such a cache (which usually makes use of a dictionary)."
+},
+
+{
+    "location": "mpolynomial_rings.html#Required-functionality-for-multivariate-polynomials-1",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "Required functionality for multivariate polynomials",
+    "category": "section",
+    "text": "In addition to the required functionality for the Ring interface, the Multivariate Polynomial interface has the following required functions.We suppose that R is a fictitious base ring (coefficient ring) and that S is a multivariate polynomial ring over R (i.e. S = Rx y ldots) with parent object S of type MyMPolyRing{T}. We also assume the polynomials in the ring have type MyMPoly{T}, where T is the type of elements of the base (coefficient) ring.Of course, in practice these types may not be parameterised, but we use parameterised types here to make the interface clearer.Note that the type T must (transitively) belong to the abstract type RingElem."
+},
+
+{
+    "location": "mpolynomial_rings.html#Data-type-and-parent-object-methods-1",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "Data type and parent object methods",
+    "category": "section",
+    "text": "vars(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn an array of Symbols representing the variables (generators) of the polynomial ring. Note that these are Symbols not Strings, though their string values will usually be used when printing polynomials.gens(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn an array of all the generators (variables) of the given polynomial ring (as polynomials).The first entry in the array will be the variable with most significance with respect to the ordering.ordering(S::MyMPolyRing{T})Return the ordering of the given polynomial ring as a symbol. Supported values currently include :lex, :deglex and :degrevlex.ExamplesS, (x, y) = PolynomialRing(JuliaQQ, [\"x\", \"y\"]; ordering=:deglex)\n\nV = vars(S)\nX = gens(S)\nord = ordering(S)"
+},
+
+{
+    "location": "mpolynomial_rings.html#Basic-manipulation-of-rings-and-elements-1",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "Basic manipulation of rings and elements",
+    "category": "section",
+    "text": "length(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the number of nonzero terms of the given polynomial. The length of the zero polynomial is defined to be 0. The return value should be of type Int.isgen(x::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if x is a generator of the polynomial ring.max_degrees(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturns a tuple (B, b) consisting of an array of Ints specifying the highest power of each variable that appears in the given polynomial and b the largest of the values in B.nvars(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the number of variables of the polynomial ring that f belongs to.isunit(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f is a unit in its parent polynomial ring.isconstant(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f is a constant polynomial. The zero polynomial is considered constant for the purposes of this function.isterm(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f consists of a single term.ismonomial(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f consists of a single term with coefficient 1.ExamplesS, (x, y) = PolynomialRing(JuliaZZ, [\"x\", \"y\"])\n\nf = x^3*y + 3x*y^2 + 1\n\nn = length(f)\nisgen(y) == true\nB, b = max_degrees(f)\nnvars(f) == 2\nisunit(f) == false\nisconstant(f) == false\nisterm(2x*y) == true\nismonomial(x*y) == false"
+},
+
+{
+    "location": "mpolynomial_rings.html#Exact-division-1",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "Exact division",
+    "category": "section",
+    "text": "For any ring that implements exact division, the following can be implemented.divexact(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the exact quotient of f by g if it exists, otherwise throw an error.divides(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn a tuple (flag, q) where flag is true if g divides f, in which case q will be the exact quotient, or flag is false and q is set to zero.remove(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturns a tuple (v q) such that the highest power of g that divides f is g^v and the cofactor is q.valuation(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturns v such that the highest power of g that divides f is g^v.ExamplesR, (x, y) = PolynomialRing(JuliaZZ, [\"x\", \"y\"])\n\nf = 2x^2*y + 2x + y + 1\ng = x^2*y^2 + 1\n\nflag, q = divides(f*g, f)\nd = divexact(f*g, f)\nv, q = remove(f*g^3, g)\nn = valuation(f*g^3, g)"
+},
+
+{
+    "location": "mpolynomial_rings.html#Euclidean-division-1",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "Euclidean division",
+    "category": "section",
+    "text": "Although multivariate polynomial rings are not in general Euclidean, it is possible to define a quotient with remainder function that depends on the polynomial ordering in the case that the quotient ring is a field or a Euclidean domain. In the case that a polynomial g divides a polynomial f, the result no longer depends on the ordering and the remainder is zero, with the quotient agreeing with the exact quotient.divrem(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn a tuple (q r) such that f = qg + r, where the coefficients of terms of r whose monomials are divisible by the leading monomial of g are reduced modulo the leading coefficient of g (according to the Euclidean function on the coefficients).Note that the result of this function depends on the ordering of the polynomial ring.div(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemAs per the divrem function, but returning the quotient only. Especially when the quotient happens to be exact, this function can be exceedingly fast.divrem(f::MyMPoly{T}, G::Array{MyMPoly{T}, 1}) where T <: AbstractAlgebra.RingElemAs per the divrem function above, except that each term of r starting with the most significant term, is reduced modulo the leading terms of each of the polynomials in the array G for which the leading monomial is a divisor.A tuple (Q r) is returned from the function, where Q is an array of polynomials of the same length as G, and such that f = r + sum QiGi.The result is again dependent on the ordering in general, but if the polynomials in G are over a field and the reduced generators of a Groebner basis, then the result is unique.ExamplesR, (x, y) = PolynomialRing(JuliaQQ, [\"x\", \"y\"])\n\nf = 2x^2*y + 2x + y + 1\ng = x + y\nh = y + 1\n\nq = div(f, g)\nq, r = divrem(f, g)\nQ, r = divrem(f, [g, h])"
+},
+
+{
+    "location": "mpolynomial_rings.html#Evaluation-1",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "Evaluation",
+    "category": "section",
+    "text": "evaluate(f::MyMPoly{T}, A::Array{T, 1}) where T <: AbstractAlgebra.RingElemEvaluate the polynomial f at the values specified by the entries of the array A.evaluate(f::MPoly{T}, A::Array{T, 1}) where T <: IntegerEvaluate the polynomial f at the values specified by the entries of the array A.ExamplesR, (x, y) = PolynomialRing(JuliaQQ, [\"x\", \"y\"])\n\nf = 2x^2*y + 2x + y + 1\n\nm = evaluate(f, Rational{BigInt}[2, 3])\nn = evaluate(f, [2, 3])"
+},
+
+{
+    "location": "mpolynomial_rings.html#GCD-1",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "GCD",
+    "category": "section",
+    "text": "In cases where there is a meaningful Euclidean structure on the coefficient ring, it is possible to compute the GCD of multivariate polynomials.gcd(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn a greatest common divisor of f and g.ExamplesR, (x, y) = PolynomialRing(JuliaZZ, [\"x\", \"y\"])\n\nf = 2x^2*y + 2x + y + 1\ng = x^2*y^2 + 1\n\nd = gcd(f*g^2, f^2*g)"
+},
+
+{
+    "location": "mpolynomial_rings.html#Interface-for-sparse-distributed,-random-access-multivariates-1",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "Interface for sparse distributed, random access multivariates",
+    "category": "section",
+    "text": "The following additional functions should be implemented by libraries that provide a sparse distributed polynomial format, stored in a representation for which terms can be accessed in constant time (e.g. where arrays are used to store coefficients and exponent vectors)."
+},
+
+{
+    "location": "mpolynomial_rings.html#Sparse-distributed,-random-access-constructors-1",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "Sparse distributed, random access constructors",
+    "category": "section",
+    "text": "In addition to the standard constructors, the following constructor, taking arrays of coefficients and exponent vectors, should be provided.(S::MyMPolyRing{T})(A::Array{T, 1}, m::Array{UInt, 2}) where T <: AbstractAlgebra.RingEle\nmCreate the polynomial in the given ring with nonzero coefficients specified by the elements of A and corresponding exponent vectors given by the elements of m. For efficiency reason, the exponents of term i are given by the vector m[:, i] since Julia uses column major two dimensional arrays.For maximum compatibility with external libraries, the coefficient (and term) at index 1 correspond to the most significant term with respect to the polynomial ring ordering.Each exponent vector uses a separate word for each exponent field, the first of which should be any degree or weight, and otherwise should be the exponent for the most significant variable with respect to the ordering. The top bit of each word is reserved to detect overflows.If a full word is not used for exponents, a check should be done to ensure there are no overflows before setting the exponents.A library may also optionally provide an interface that makes use of BigInt for exponents instead of UInt.ExamplesS, (x, y) = PolynomialRing(JuliaQQ, [\"x\", \"y\"])\n\nf = S(Rational{BigInt}[2, 3, 1], UInt[3 2 1; 0 1 0])"
+},
+
+{
+    "location": "mpolynomial_rings.html#Sparse-distributed,-random-access-basic-manipulation-1",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "Sparse distributed, random access basic manipulation",
+    "category": "section",
+    "text": "coeff(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemReturn the coefficient of the (n+1)-th term of f. The first term should be the most significant term with respect to the ordering.exponent(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemReturn an array of Ints giving the vector of exponents for the n + 1-th term of f. The first entry of the array should correspond to the exponent of the most significant variable with respect to the ordering.exponent!(A::Array{Int, 1}, f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemAs per exponent, but set the values in the array A rather than allocating an array for this purpose. The array is also returned by the function after being mutated.fit!(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemEnsure that the polynomial f internally has space for n nonzero terms. This function must mutate the function in-place if it is mutable. It does not return the mutated polynomial. Immutable types can still be supported by defining this function to do nothing.ExamplesS, (x, y) = PolynomialRing(JuliaZZ, [\"x\", \"y\"])\n\nf = x^3*y + 3x*y^2 + 1\n\nc = coeff(f, 1)\nfit!(f, 8)"
+},
+
+{
     "location": "series_rings.html#",
     "page": "Series Ring Interface",
     "title": "Series Ring Interface",
