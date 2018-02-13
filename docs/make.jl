@@ -10,6 +10,8 @@ makedocs(
              "euclidean.md",
              "polynomial_rings.md",
              "polynomial.md",
+             "mpolynomial_rings.md",
+             "mpolynomial.md",
              "series_rings.md",
              "series.md",
              "matrix_spaces.md",

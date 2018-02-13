@@ -1,4 +1,4 @@
-# Ring interface
+# Ring Interface
 
 AbstractAlgebra.jl generic code makes use of a standardised set of functions which it
 expects to be implemented for all rings. Here we document this interface. All libraries
