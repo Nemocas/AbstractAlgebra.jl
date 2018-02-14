@@ -1261,7 +1261,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic residue rings",
     "title": "Basic functionality",
     "category": "section",
-    "text": "modulus(::AbstractAlgebra.ResElem)isunit(::AbstractAlgebra.ResElem)ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nr = S(x + 1)\n\na = modulus(S)\nisunit(r) == true"
+    "text": "Generic.modulus(::AbstractAlgebra.ResElem)Generic.isunit(::AbstractAlgebra.ResElem)ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nr = S(x + 1)\n\na = modulus(S)\nisunit(r) == true"
 },
 
 {
