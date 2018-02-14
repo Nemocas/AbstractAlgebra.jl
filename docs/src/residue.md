@@ -1,0 +1,169 @@
+```@meta
+CurrentModule = AbstractAlgebra
+```
+
+# Generic residue rings
+
+AbstractAlgebra.jl provides a module, implemented in `src/generic/Residue.jl` for
+generic residue rings over any Euclidean domain (in practice most of the functionality
+is provided for GCD domains that provide a meaningful GCD function) belonging to the
+AbstractAlgebra.jl abstract type hierarchy.
+
+As well as implementing the ResidueRing interface a number of generic algorithms are
+implemented for residue rings. We describe this generic functionality below.
+
+All of the generic functionality is part of a submodule of AbstractAlgebra called
+`Generic`. This is exported by default so that it is not necessary to qualify the
+function names with the submodule name.
+
+## Types and parent objects
+
+Residues implemented using the AbstractAlgebra generics have type `Generic.Res{T}`
+where `T` is the type of elements of the residue ring. See the file
+`src/generic/GenericTypes.jl` for details.
+
+Parent objects of such residue ring elements have type `Generic.ResRing{T}`.
+
+The defining modulus of the residue ring is stored in the parent object.
+
+The residue element types belong to the abstract type `AbstractAlgebra.ResElem{T}`
+and the residue ring types belong to the abstract type `AbstractAlgebra.ResRing{T}`.
+This enables one to write generic functions that can accept any AbstractAlgebra
+residue type.
+
+Note that both the generic residue ring type `Generic.ResRing{T}` and the abstract
+type it belongs to, `AbstractAlgebra.ResRing{T}` are both called `ResRing`. The 
+former is a (parameterised) concrete type for a residue ring over a given base ring
+whose elements have type `T`. The latter is an abstract type representing all
+residue ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g.
+supplied by a C library).
+
+## Residue ring constructors
+
+In order to construct residues in AbstractAlgebra.jl, one must first construct the
+resiude ring itself. This is accomplished with the following constructor.
+
+```julia
+ResidueRing(R::AbstractAlgebra.Ring, m::AbstractAlgebra.RingElem; cached::Bool = true)
+```
+
+Given a base ring `R` and residue $m$ contained in this ring, return the parent object
+of the residue ring $R/(m)$. By default the parent object `S` will depend only on `R`
+and `m` and will be cached. Setting the optional argument `cached` to `false` will
+prevent the parent object `S` from being cached.
+
+Here are some examples of creating residue rings and making use of the
+resulting parent objects to coerce various elements into the residue ring.
+
+**Examples**
+
+```julia
+R, x = PolynomialRing(JuliaQQ, "x")
+S = ResidueRing(R, x^3 + 3x + 1)
+
+f = S()
+g = S(123)
+h = S(BigInt(1234))
+k = S(x + 1)
+```
+
+All of the examples here are generic residue rings, but specialised implementations
+of residue rings provided by external modules will also usually provide a
+`ResidueRing` constructor to allow creation of their residue rings.
+
+## Basic ring functionality
+
+Residue rings in AbstractAlgebra.jl implement the full Ring interface. Of course
+the entire Residue Ring interface is also implemented.
+
+We give some examples of such functionality.
+
+**Examples**
+
+```julia
+R, x = PolynomialRing(JuliaQQ, "x")
+S = ResidueRing(R, x^3 + 3x + 1)
+
+f = S(x + 1)
+
+h = zero(S)
+k = one(S)
+isone(k) == true
+iszero(f) == false
+m = modulus(S)
+U = base_ring(S)
+V = base_ring(f)
+T = parent(f)
+g == deepcopy(f)
+```
+
+## Residue ring functionality provided by AbstractAlgebra.jl
+
+The functionality listed below is automatically provided by AbstractAlgebra.jl for
+any residue ring module that implements the full Residue Ring interface.
+This includes AbstractAlgebra.jl's own generic residue rings.
+
+But if a C library provides all the functionality documented in the Residue Ring
+interface, then all the functions described here will also be automatically supplied by
+AbstractAlgebra.jl for that residue ring type.
+
+Of course, modules are free to provide specific implementations of the functions
+described here, that override the generic implementation.
+
+### Basic functionality
+
+```@docs
+modulus(::AbstractAlgebra.ResElem)
+```
+
+```@docs
+isunit(::AbstractAlgebra.ResElem)
+```
+
+**Examples**
+
+```julia
+R, x = PolynomialRing(JuliaQQ, "x")
+S = ResidueRing(R, x^3 + 3x + 1)
+
+r = S(x + 1)
+
+a = modulus(S)
+isunit(r) == true
+```
+
+### Inversion
+
+```@docs
+inv(::AbstractAlgebra.ResElem)
+```
+
+**Examples**
+
+```julia
+R, x = PolynomialRing(JuliaQQ, "x")
+S = ResidueRing(R)
+
+f = S(x + 1)
+
+g = inv(f)
+```
+
+### Greatest common divisor
+
+```@docs
+gcd{T <: RingElem}(::ResElem{T}, ::ResElem{T})
+```
+
+**Examples**
+
+```julia
+R, x = PolynomialRing(JuliaQQ, "x")
+S = ResidueRing(R)
+
+f = S(x + 1)
+g = S(x^2 + 2x + 1)
+
+h = gcd(f, g)
+```
+

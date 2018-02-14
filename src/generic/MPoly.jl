@@ -2931,7 +2931,7 @@ end
 ###############################################################################
 
 doc"""
-    PolynomialRing(R::AbstractAlgebra.Ring, s::Array{String, 1}; cached::Bool = true, S::Symbol = :lex)
+    PolynomialRing(R::AbstractAlgebra.Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
 > Given a base ring `R` and an array of strings `s` specifying how the
 > generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
 > representing the new polynomial ring $T = R[x1, x2, ...]$ and the generators
