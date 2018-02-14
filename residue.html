@@ -24,18 +24,7 @@ S = ResidueRing(R, x^3 + 3x + 1)
 r = S(x + 1)
 
 a = modulus(S)
-isunit(r) == true</code></pre><h3><a class="nav-anchor" id="Inversion-1" href="#Inversion-1">Inversion</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.inv-Union{Tuple{AbstractAlgebra.ResElem{T}}, Tuple{T}} where T&lt;:AbstractAlgebra.RingElem" href="#Base.inv-Union{Tuple{AbstractAlgebra.ResElem{T}}, Tuple{T}} where T&lt;:AbstractAlgebra.RingElem"><code>Base.inv</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">inv(M)</code></pre><p>Matrix inverse. Computes matrix <code>N</code> such that <code>M * N = I</code>, where <code>I</code> is the identity matrix. Computed by solving the left-division <code>N = M \ I</code>.</p><p><strong>Example</strong></p><pre><code class="language-julia-repl">julia&gt; M = [2 5; 1 3]
-2×2 Array{Int64,2}:
- 2  5
- 1  3
-
-julia&gt; N = inv(M)
-2×2 Array{Float64,2}:
-  3.0  -5.0
- -1.0   2.0
-
-julia&gt; M*N == N*M == eye(2)
-true</code></pre></div><a class="source-link" target="_blank" href="https://github.com/JuliaLang/julia/blob/903644385b91ed8d95e5e3a5716c089dd1f1b08a/base/linalg/generic.jl#L743-L767">source</a><div><pre><code class="language-none">inv{T &lt;: RingElement}(M::AbstractAlgebra.MatElem{T})</code></pre><blockquote><p>Given a non-singular <span>$n\times n$</span> matrix over a ring the tuple <span>$X, d$</span> consisting of an <span>$n\times n$</span> matrix <span>$X$</span> and a denominator <span>$d$</span> such that <span>$AX = dI_n$</span>, where <span>$I_n$</span> is the <span>$n\times n$</span> identity matrix. The denominator will be the determinant of <span>$A$</span> up to sign. If <span>$A$</span> is singular an exception is raised.</p></blockquote></div><a class="source-link" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/8370b5cd51001ca8cf9e63a48cc1d994a3a5e680/src/generic/Matrix.jl#L1987">source</a></section><p><strong>Examples</strong></p><pre><code class="language-julia">R, x = PolynomialRing(JuliaQQ, &quot;x&quot;)
+isunit(r) == true</code></pre><h3><a class="nav-anchor" id="Inversion-1" href="#Inversion-1">Inversion</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.inv-Tuple{AbstractAlgebra.ResElem}" href="#Base.inv-Tuple{AbstractAlgebra.ResElem}"><code>Base.inv</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">inv(a::AbstractAlgebra.ResElem)</code></pre><blockquote><p>Return the inverse of the element <span>$a$</span> in the residue ring. If an impossible inverse is encountered, an exception is raised.</p></blockquote></div><a class="source-link" target="_blank" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/8370b5cd51001ca8cf9e63a48cc1d994a3a5e680/src/generic/Residue.jl#L387">source</a></section><p><strong>Examples</strong></p><pre><code class="language-julia">R, x = PolynomialRing(JuliaQQ, &quot;x&quot;)
 S = ResidueRing(R)
 
 f = S(x + 1)

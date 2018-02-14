@@ -1281,11 +1281,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "residue.html#Base.inv-Union{Tuple{AbstractAlgebra.ResElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "location": "residue.html#Base.inv-Tuple{AbstractAlgebra.ResElem}",
     "page": "Generic residue rings",
     "title": "Base.inv",
     "category": "Method",
-    "text": "inv(M)\n\nMatrix inverse. Computes matrix N such that M * N = I, where I is the identity matrix. Computed by solving the left-division N = M \\ I.\n\nExample\n\njulia> M = [2 5; 1 3]\n2×2 Array{Int64,2}:\n 2  5\n 1  3\n\njulia> N = inv(M)\n2×2 Array{Float64,2}:\n  3.0  -5.0\n -1.0   2.0\n\njulia> M*N == N*M == eye(2)\ntrue\n\n\n\ninv{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nGiven a non-singular ntimes n matrix over a ring the tuple X d consisting of an ntimes n matrix X and a denominator d such that AX = dI_n, where I_n is the ntimes n identity matrix. The denominator will be the determinant of A up to sign. If A is singular an exception is raised.\n\n\n\n"
+    "text": "inv(a::AbstractAlgebra.ResElem)\n\nReturn the inverse of the element a in the residue ring. If an impossible inverse is encountered, an exception is raised.\n\n\n\n"
 },
 
 {
@@ -1293,7 +1293,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic residue rings",
     "title": "Inversion",
     "category": "section",
-    "text": "inv{T <: RingElem}(::AbstractAlgebra.ResElem{T})ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R)\n\nf = S(x + 1)\n\ng = inv(f)"
+    "text": "inv(::AbstractAlgebra.ResElem)ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R)\n\nf = S(x + 1)\n\ng = inv(f)"
 },
 
 {
