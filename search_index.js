@@ -1257,27 +1257,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "residue.html#AbstractAlgebra.Generic.modulus-Tuple{AbstractAlgebra.ResElem}",
-    "page": "Generic residue rings",
-    "title": "AbstractAlgebra.Generic.modulus",
-    "category": "Method",
-    "text": "modulus(R::AbstractAlgebra.ResElem)\n\nReturn the modulus a of the residue ring S = R(a) that the supplied residue r belongs to.\n\n\n\n"
-},
-
-{
-    "location": "residue.html#AbstractAlgebra.Generic.isunit-Tuple{AbstractAlgebra.ResElem}",
-    "page": "Generic residue rings",
-    "title": "AbstractAlgebra.Generic.isunit",
-    "category": "Method",
-    "text": "isunit(a::AbstractAlgebra.ResElem)\n\nReturn true if the supplied element a is invertible in the residue ring it belongs to, otherwise return false.\n\n\n\n"
-},
-
-{
     "location": "residue.html#Basic-functionality-1",
     "page": "Generic residue rings",
     "title": "Basic functionality",
     "category": "section",
-    "text": "modulus(::ResElem)isunit(::ResElem)ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nr = S(x + 1)\n\na = modulus(S)\nisunit(r) == true"
+    "text": "modulus(::AbstractAlgebra.ResElem)isunit(::AbstractAlgebra.ResElem)ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nr = S(x + 1)\n\na = modulus(S)\nisunit(r) == true"
 },
 
 {
