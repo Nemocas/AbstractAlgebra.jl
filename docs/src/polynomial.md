@@ -264,7 +264,7 @@ g = reverse(f, 7)
 h = reverse(f)
 ```
 
-## Shifting
+### Shifting
 
 ```@docs
 shift_left(::PolyElem, ::Int)

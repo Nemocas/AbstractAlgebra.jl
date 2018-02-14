@@ -72,7 +72,7 @@ function modulus(S::AbstractAlgebra.ResRing)
 end
 
 doc"""
-    modulus(R::AbstractAlgebra.ResRing)
+    modulus(R::AbstractAlgebra.ResElem)
 > Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
 > residue $r$ belongs to.
 """

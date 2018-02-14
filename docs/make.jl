@@ -14,6 +14,8 @@ makedocs(
              "mpolynomial.md",
              "series_rings.md",
              "series.md",
+             "residue_rings.md",
+             "residue.md",
              "matrix_spaces.md",
              "matrix.md",
              "types.md" # Appendix A

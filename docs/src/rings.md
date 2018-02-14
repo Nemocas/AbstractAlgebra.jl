@@ -618,7 +618,7 @@ divexact(a::MyType, b::Integer)
 
 In case $f$ cannot explode in size when powered by a very large integer, and it is
 practical to do so, one may provide this function to support powering with `BigInt`
-exponents.
+exponents (or for external modules, any other big integer type).
 
 ### Optional unsafe operators
 

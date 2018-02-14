@@ -354,8 +354,8 @@ to detect overflows.
 If a full word is not used for exponents, a check should be done to ensure there are
 no overflows before setting the exponents.
 
-A library may also optionally provide an interface that makes use of `BigInt` for
-exponents instead of `UInt`.
+A library may also optionally provide an interface that makes use of `BigInt` (or any
+other big integer type) for exponents instead of `UInt`.
 
 **Examples**
 
