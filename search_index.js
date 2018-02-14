@@ -301,7 +301,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Ring Interface",
     "title": "Optional powering functions",
     "category": "section",
-    "text": "^(f::MyElem, e::BigInt)In case f cannot explode in size when powered by a very large integer, and it is practical to do so, one may provide this function to support powering with BigInt exponents."
+    "text": "^(f::MyElem, e::BigInt)In case f cannot explode in size when powered by a very large integer, and it is practical to do so, one may provide this function to support powering with BigInt exponents (or for external modules, any other big integer type)."
 },
 
 {
@@ -885,7 +885,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multvariate Polynomial Ring Interface",
     "title": "Sparse distributed, random access constructors",
     "category": "section",
-    "text": "In addition to the standard constructors, the following constructor, taking arrays of coefficients and exponent vectors, should be provided.(S::MyMPolyRing{T})(A::Array{T, 1}, m::Array{UInt, 2}) where T <: AbstractAlgebra.RingEle\nmCreate the polynomial in the given ring with nonzero coefficients specified by the elements of A and corresponding exponent vectors given by the elements of m. For efficiency reason, the exponents of term i are given by the vector m[:, i] since Julia uses column major two dimensional arrays.For maximum compatibility with external libraries, the coefficient (and term) at index 1 correspond to the most significant term with respect to the polynomial ring ordering.Each exponent vector uses a separate word for each exponent field, the first of which should be any degree or weight, and otherwise should be the exponent for the most significant variable with respect to the ordering. The top bit of each word is reserved to detect overflows.If a full word is not used for exponents, a check should be done to ensure there are no overflows before setting the exponents.A library may also optionally provide an interface that makes use of BigInt for exponents instead of UInt.ExamplesS, (x, y) = PolynomialRing(JuliaQQ, [\"x\", \"y\"])\n\nf = S(Rational{BigInt}[2, 3, 1], UInt[3 2 1; 0 1 0])"
+    "text": "In addition to the standard constructors, the following constructor, taking arrays of coefficients and exponent vectors, should be provided.(S::MyMPolyRing{T})(A::Array{T, 1}, m::Array{UInt, 2}) where T <: AbstractAlgebra.RingEle\nmCreate the polynomial in the given ring with nonzero coefficients specified by the elements of A and corresponding exponent vectors given by the elements of m. For efficiency reason, the exponents of term i are given by the vector m[:, i] since Julia uses column major two dimensional arrays.For maximum compatibility with external libraries, the coefficient (and term) at index 1 correspond to the most significant term with respect to the polynomial ring ordering.Each exponent vector uses a separate word for each exponent field, the first of which should be any degree or weight, and otherwise should be the exponent for the most significant variable with respect to the ordering. The top bit of each word is reserved to detect overflows.If a full word is not used for exponents, a check should be done to ensure there are no overflows before setting the exponents.A library may also optionally provide an interface that makes use of BigInt (or any other big integer type) for exponents instead of UInt.ExamplesS, (x, y) = PolynomialRing(JuliaQQ, [\"x\", \"y\"])\n\nf = S(Rational{BigInt}[2, 3, 1], UInt[3 2 1; 0 1 0])"
 },
 
 {
@@ -1158,6 +1158,158 @@ var documenterSearchIndex = {"docs": [
     "title": "Special functions",
     "category": "section",
     "text": "Base.exp(a::RelSeriesElem)Base.sqrt(a::RelSeriesElem)ExamplesR, t = PolynomialRing(JuliaQQ, \"t\")\nS, x = PowerSeriesRing(R, 30, \"x\")\nT, z = PowerSeriesRing(JuliaQQ, 30, \"z\")\n\na = 1 + z + 3z^2 + O(z^5)\nb = z + 2z^2 + 5z^3 + O(z^5)\n\nc = exp(x + O(x^40))\nd = divexact(x, exp(x + O(x^40)) - 1)\nf = exp(b)\nh = sqrt(a)"
+},
+
+{
+    "location": "residue_rings.html#",
+    "page": "Residue Ring Interface",
+    "title": "Residue Ring Interface",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "residue_rings.html#Residue-Ring-Interface-1",
+    "page": "Residue Ring Interface",
+    "title": "Residue Ring Interface",
+    "category": "section",
+    "text": "Residue rings (currently a quotient ring modulo a principal ideal) are supported in AbstractAlgebra.jl, at least for Euclidean base rings. In addition to the standard Ring interface, some additional functions are required to be present for residue rings."
+},
+
+{
+    "location": "residue_rings.html#Types-and-parents-1",
+    "page": "Residue Ring Interface",
+    "title": "Types and parents",
+    "category": "section",
+    "text": "AbstractAlgebra provides two abstract types for residue rings and their elements:ResRing{T} is the abstract type for residue ring parent types\nResElem{T} is the abstract type for types of elements of residue rings (residues)We have that ResRing{T} <: AbstractAlgebra.Ring and  ResElem{T} <: AbstractAlgebra.RingElem.Note that both abstract types are parameterised. The type T should usually be the type of elements of the base ring of the residue ring.If the parent object for such a ring has type MyResRing and residues in that ring have type MyRes then one would have:MyResRing <: ResRing{BigInt}\nMyRes <: ResElem{BigInt}Residue rings should be made unique on the system by caching parent objects (unless an optional cache parameter is set to false). Residue rings should at least be distinguished based on their base ring and modulus (the principal ideal one is taking a quotient of the base ring by).See src/generic/GenericTypes.jl for an example of how to implement such a cache (which usually makes use of a dictionary)."
+},
+
+{
+    "location": "residue_rings.html#Required-functionality-for-residue-rings-1",
+    "page": "Residue Ring Interface",
+    "title": "Required functionality for residue rings",
+    "category": "section",
+    "text": "In addition to the required functionality for the Ring interface the Residue Ring interface has the following required functions.We suppose that R is a fictitious base ring, m is an element of that ring, and that S is the residue ring (quotient ring) R(m) with parent object S of type MyResRing{T}. We also assume the residues r pmodm in the residue ring have type MyRes{T}, where T is the type of elements of the base ring.Of course, in practice these types may not be parameterised, but we use parameterised types here to make the interface clearer.Note that the type T must (transitively) belong to the abstract type RingElem."
+},
+
+{
+    "location": "residue_rings.html#Data-type-and-parent-object-methods-1",
+    "page": "Residue Ring Interface",
+    "title": "Data type and parent object methods",
+    "category": "section",
+    "text": "modulus(S::MyResRing{T}) where T <: AbstractAlgebra.RingElemReturn the modulus of the given residue ring, i.e. if the residue ring S was specified to be R(m), return m.ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nm = modulus(S)"
+},
+
+{
+    "location": "residue_rings.html#Basic-manipulation-of-rings-and-elements-1",
+    "page": "Residue Ring Interface",
+    "title": "Basic manipulation of rings and elements",
+    "category": "section",
+    "text": "data(f::MyRes{T}) where T <: AbstractAlgebra.RingElemGiven a residue r pmodm, represented as such, return r.ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nf = S(x^2 + 2)\n\nd = data(f)"
+},
+
+{
+    "location": "residue.html#",
+    "page": "Generic residue rings",
+    "title": "Generic residue rings",
+    "category": "page",
+    "text": "CurrentModule = AbstractAlgebra"
+},
+
+{
+    "location": "residue.html#Generic-residue-rings-1",
+    "page": "Generic residue rings",
+    "title": "Generic residue rings",
+    "category": "section",
+    "text": "AbstractAlgebra.jl provides a module, implemented in src/generic/Residue.jl for generic residue rings over any Euclidean domain (in practice most of the functionality is provided for GCD domains that provide a meaningful GCD function) belonging to the AbstractAlgebra.jl abstract type hierarchy.As well as implementing the ResidueRing interface a number of generic algorithms are implemented for residue rings. We describe this generic functionality below.All of the generic functionality is part of a submodule of AbstractAlgebra called Generic. This is exported by default so that it is not necessary to qualify the function names with the submodule name."
+},
+
+{
+    "location": "residue.html#Types-and-parent-objects-1",
+    "page": "Generic residue rings",
+    "title": "Types and parent objects",
+    "category": "section",
+    "text": "Residues implemented using the AbstractAlgebra generics have type Generic.Res{T} where T is the type of elements of the residue ring. See the file src/generic/GenericTypes.jl for details.Parent objects of such residue ring elements have type Generic.ResRing{T}.The defining modulus of the residue ring is stored in the parent object.The residue element types belong to the abstract type AbstractAlgebra.ResElem{T} and the residue ring types belong to the abstract type AbstractAlgebra.ResRing{T}. This enables one to write generic functions that can accept any AbstractAlgebra residue type.Note that both the generic residue ring type Generic.ResRing{T} and the abstract type it belongs to, AbstractAlgebra.ResRing{T} are both called ResRing. The  former is a (parameterised) concrete type for a residue ring over a given base ring whose elements have type T. The latter is an abstract type representing all residue ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g. supplied by a C library)."
+},
+
+{
+    "location": "residue.html#Residue-ring-constructors-1",
+    "page": "Generic residue rings",
+    "title": "Residue ring constructors",
+    "category": "section",
+    "text": "In order to construct residues in AbstractAlgebra.jl, one must first construct the resiude ring itself. This is accomplished with the following constructor.ResidueRing(R::AbstractAlgebra.Ring, m::AbstractAlgebra.RingElem; cached::Bool = true)Given a base ring R and residue m contained in this ring, return the parent object of the residue ring R(m). By default the parent object S will depend only on R and m and will be cached. Setting the optional argument cached to false will prevent the parent object S from being cached.Here are some examples of creating residue rings and making use of the resulting parent objects to coerce various elements into the residue ring.ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nf = S()\ng = S(123)\nh = S(BigInt(1234))\nk = S(x + 1)All of the examples here are generic residue rings, but specialised implementations of residue rings provided by external modules will also usually provide a ResidueRing constructor to allow creation of their residue rings."
+},
+
+{
+    "location": "residue.html#Basic-ring-functionality-1",
+    "page": "Generic residue rings",
+    "title": "Basic ring functionality",
+    "category": "section",
+    "text": "Residue rings in AbstractAlgebra.jl implement the full Ring interface. Of course the entire Residue Ring interface is also implemented.We give some examples of such functionality.ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nf = S(x + 1)\n\nh = zero(S)\nk = one(S)\nisone(k) == true\niszero(f) == false\nm = modulus(S)\nU = base_ring(S)\nV = base_ring(f)\nT = parent(f)\ng == deepcopy(f)"
+},
+
+{
+    "location": "residue.html#Residue-ring-functionality-provided-by-AbstractAlgebra.jl-1",
+    "page": "Generic residue rings",
+    "title": "Residue ring functionality provided by AbstractAlgebra.jl",
+    "category": "section",
+    "text": "The functionality listed below is automatically provided by AbstractAlgebra.jl for any residue ring module that implements the full Residue Ring interface. This includes AbstractAlgebra.jl's own generic residue rings.But if a C library provides all the functionality documented in the Residue Ring interface, then all the functions described here will also be automatically supplied by AbstractAlgebra.jl for that residue ring type.Of course, modules are free to provide specific implementations of the functions described here, that override the generic implementation."
+},
+
+{
+    "location": "residue.html#AbstractAlgebra.Generic.modulus-Tuple{AbstractAlgebra.ResElem}",
+    "page": "Generic residue rings",
+    "title": "AbstractAlgebra.Generic.modulus",
+    "category": "Method",
+    "text": "modulus(R::AbstractAlgebra.ResElem)\n\nReturn the modulus a of the residue ring S = R(a) that the supplied residue r belongs to.\n\n\n\n"
+},
+
+{
+    "location": "residue.html#AbstractAlgebra.Generic.isunit-Tuple{AbstractAlgebra.ResElem}",
+    "page": "Generic residue rings",
+    "title": "AbstractAlgebra.Generic.isunit",
+    "category": "Method",
+    "text": "isunit(a::AbstractAlgebra.ResElem)\n\nReturn true if the supplied element a is invertible in the residue ring it belongs to, otherwise return false.\n\n\n\n"
+},
+
+{
+    "location": "residue.html#Basic-functionality-1",
+    "page": "Generic residue rings",
+    "title": "Basic functionality",
+    "category": "section",
+    "text": "modulus(::ResElem)isunit(::ResElem)ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nr = S(x + 1)\n\na = modulus(S)\nisunit(r) == true"
+},
+
+{
+    "location": "residue.html#Base.inv-Union{Tuple{AbstractAlgebra.ResElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "Generic residue rings",
+    "title": "Base.inv",
+    "category": "Method",
+    "text": "inv(M)\n\nMatrix inverse. Computes matrix N such that M * N = I, where I is the identity matrix. Computed by solving the left-division N = M \\ I.\n\nExample\n\njulia> M = [2 5; 1 3]\n2×2 Array{Int64,2}:\n 2  5\n 1  3\n\njulia> N = inv(M)\n2×2 Array{Float64,2}:\n  3.0  -5.0\n -1.0   2.0\n\njulia> M*N == N*M == eye(2)\ntrue\n\n\n\ninv{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nGiven a non-singular ntimes n matrix over a ring the tuple X d consisting of an ntimes n matrix X and a denominator d such that AX = dI_n, where I_n is the ntimes n identity matrix. The denominator will be the determinant of A up to sign. If A is singular an exception is raised.\n\n\n\n"
+},
+
+{
+    "location": "residue.html#Inversion-1",
+    "page": "Generic residue rings",
+    "title": "Inversion",
+    "category": "section",
+    "text": "inv{T <: RingElem}(::ResElem{T})ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R)\n\nf = S(x + 1)\n\ng = inv(f)"
+},
+
+{
+    "location": "residue.html#Base.gcd-Union{Tuple{AbstractAlgebra.ResElem{T},AbstractAlgebra.ResElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "Generic residue rings",
+    "title": "Base.gcd",
+    "category": "Method",
+    "text": "gcd{T <: RingElement}(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T})\n\nReturn a greatest common divisor of a and b if one exists. This is done by taking the greatest common divisor of the data associated with the supplied residues and taking its greatest common divisor with the modulus.\n\n\n\n"
+},
+
+{
+    "location": "residue.html#Greatest-common-divisor-1",
+    "page": "Generic residue rings",
+    "title": "Greatest common divisor",
+    "category": "section",
+    "text": "gcd{T <: RingElem}(::ResElem{T}, ::ResElem{T})ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R)\n\nf = S(x + 1)\ng = S(x^2 + 2x + 1)\n\nh = gcd(f, g)"
 },
 
 {
