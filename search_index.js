@@ -357,7 +357,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Integer ring",
     "title": "Integer constructors",
     "category": "section",
-    "text": "In order to construct integers in AbstractAlgebra.jl, one can first construct the integer ring itself. This is accomplished using the following constructor.Integers{BigInt}()This gives the unique object of type Integers{BigInt} representing the ring of integers in AbstractAlgebra.jl.In practice, one simply uses JuliaZZ which is assigned to be the return value of the above constructor. There is no need to call the constructor in practice.Here are some examples of creating the integer ring and making use of the resulting parent object to coerce various elements into the ring.Examples\nf = JuliaZZ()\ng = JuliaZZ(123)\nh = JuliaZZ(BigInt(1234))"
+    "text": "In order to construct integers in AbstractAlgebra.jl, one can first construct the integer ring itself. This is accomplished using the following constructor.Integers{BigInt}()This gives the unique object of type Integers{BigInt} representing the ring of integers in AbstractAlgebra.jl.In practice, one simply uses JuliaZZ which is assigned to be the return value of the above constructor. There is no need to call the constructor in practice.Here are some examples of creating the integer ring and making use of the resulting parent object to coerce various elements into the ring.Examplesf = JuliaZZ()\ng = JuliaZZ(123)\nh = JuliaZZ(BigInt(1234))"
 },
 
 {
@@ -397,7 +397,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Integer ring",
     "title": "AbstractAlgebra.sqrt",
     "category": "Method",
-    "text": "sqrt{T <: Integer}(a::T)\n\nReturn the integer square root of a. If a is not a perfect square an error is thrown.\n\n\n\n"
+    "text": "sqrt{T <: Integer}(a::T)\n\nReturn the integer square root of a. If a is not a perfect square an error is thrown.\n\n\n\nsqrt{T <: Integer}(a::Rational{T})\n\nReturn the square root of a if it is the square of a rational, otherwise throw an error.\n\n\n\n"
 },
 
 {
@@ -405,7 +405,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Integer ring",
     "title": "AbstractAlgebra.exp",
     "category": "Method",
-    "text": "exp{a <: Integer}(a::T)\n\nReturn 1 if a = 0, otherwise throw an exception. This function is not generally of use to the user, but is used internally in AbstractAlgebra.jl.\n\n\n\n"
+    "text": "exp{a <: Integer}(a::T)\n\nReturn 1 if a = 0, otherwise throw an exception. This function is not generally of use to the user, but is used internally in AbstractAlgebra.jl.\n\n\n\nexp{T <: Integer}(a::Rational{T})\n\nReturn 1 if a = 0, otherwise throw an exception.\n\n\n\n"
 },
 
 {
@@ -1614,6 +1614,78 @@ var documenterSearchIndex = {"docs": [
     "title": "Remove and valuation",
     "category": "section",
     "text": "When working over a Euclidean domain, it is convenient to extend valuations to the fraction field. To facilitate this, we define the following functions.remove{T <: RingElem}(::FracElem{T}, ::T)valuation{T <: RingElem}(::FracElem{T}, ::T)ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\n\nf = (x + 1)//(x^3 + 3x + 1)\ng = (x^2 + 1)//(x^2 + x + 1)\n\nv, q = remove(f^3*g, x + 1)\nv = valuation(f^3*g, x + 1)"
+},
+
+{
+    "location": "rational.html#",
+    "page": "Rational field",
+    "title": "Rational field",
+    "category": "page",
+    "text": "CurrentModule = AbstractAlgebra"
+},
+
+{
+    "location": "rational.html#Rational-field-1",
+    "page": "Rational field",
+    "title": "Rational field",
+    "category": "section",
+    "text": "AbstractAlgebra.jl provides a module, implemented in src/julia/Rational.jl for making Julia Rational{BigInt}s conform to the AbstractAlgebra.jl Field interface.In addition to providing a parent object JuliaQQ for Julia Rational{BigInt}s, we implement any additional functionality required by AbstractAlgebra.jl.Because Rational{BigInt} cannot be directly included in the AbstractAlgebra.jl abstract type hierarchy, we achieve integration of Julia Rational{BigInt}s by introducing a type union, called FieldElement, which is a union of AbstractAlgebra.FieldElem and a number of Julia types, including Rational{BigInt}. Everywhere that FieldElem is notionally used in AbstractAlgebra.jl, we are in fact using FieldElement, with additional care being taken to avoid ambiguities.The details of how this is done are technical, and we refer the reader to the implementation for details. For most intents and purposes, one can think of the Julia Rational{BigInt} type as belonging to AbstractAlgebra.FieldElem.One other technicality is that Julia defines certain functions for Rational{BigInt}, such as sqrt and exp differently to what AbstractAlgebra.jl requires. To get around this, we redefine these functions internally to AbstractAlgebra.jl, without redefining them for users of AbstractAlgebra.jl. This allows the internals of AbstractAlgebra.jl to function correctly, without broadcasting pirate definitions of already defined Julia functions to the world.To access the internal definitions, one can use AbstractAlgebra.sqrt and AbstractAlgebra.exp, etc."
+},
+
+{
+    "location": "rational.html#Types-and-parent-objects-1",
+    "page": "Rational field",
+    "title": "Types and parent objects",
+    "category": "section",
+    "text": "Rationals have type Rational{BigInt}, as in Julia itself. We simply supplement the functionality for this type as required for computer algebra.The parent objects of such integers has type Rationals{BigInt}.For convenience, we also make Rational{Int} a part of the AbstractAlgebra.jl type hierarchy and its parent object (accessible as qq) has type Rationals{Int}. But we caution that this type is not particularly useful as a model of the rationals and may not function as expected within AbstractAlgebra.jl."
+},
+
+{
+    "location": "rational.html#Rational-constructors-1",
+    "page": "Rational field",
+    "title": "Rational constructors",
+    "category": "section",
+    "text": "In order to construct rationals in AbstractAlgebra.jl, one can first construct the rational field itself. This is accomplished using either of the following constructors.FractionField(R::Integers{BigInt})Rationals{BigInt}()This gives the unique object of type Rationals{BigInt} representing the field of rationals in AbstractAlgebra.jl.In practice, one simply uses JuliaQQ which is assigned to be the return value of the above constructor. There is no need to call the constructor in practice.Here are some examples of creating the rational field and making use of the resulting parent object to coerce various elements into the field.Examplesf = JuliaQQ()\ng = JuliaQQ(123)\nh = JuliaQQ(BigInt(1234))\nk = JuliaQQ(BigInt(12), BigInt(7))\n\nJuliaQQ == FractionField(JuliaZZ)"
+},
+
+{
+    "location": "rational.html#Basic-field-functionality-1",
+    "page": "Rational field",
+    "title": "Basic field functionality",
+    "category": "section",
+    "text": "The rational field in AbstractAlgebra.jl implements the full Field and Fraction Field interfaces.We give some examples of such functionality.Examplesf = JuliaQQ(12, 7)\n\nh = zero(JuliaQQ)\nk = one(JuliaQQ)\nisone(k) == true\niszero(f) == false\nU = base_ring(JuliaQQ)\nV = base_ring(f)\nT = parent(f)\nf == deepcopy(f)\ng = f + 12\nr = JuliaZZ(12)//JuliaZZ(7)\nn = numerator(r)"
+},
+
+{
+    "location": "rational.html#Rational-functionality-provided-by-AbstractAlgebra.jl-1",
+    "page": "Rational field",
+    "title": "Rational functionality provided by AbstractAlgebra.jl",
+    "category": "section",
+    "text": "The functionality below supplements that provided by Julia itself for its Rational{BigInt} type."
+},
+
+{
+    "location": "rational.html#AbstractAlgebra.sqrt-Tuple{Rational{BigInt}}",
+    "page": "Rational field",
+    "title": "AbstractAlgebra.sqrt",
+    "category": "Method",
+    "text": "sqrt{T <: Integer}(a::Rational{T})\n\nReturn the square root of a if it is the square of a rational, otherwise throw an error.\n\n\n\n"
+},
+
+{
+    "location": "rational.html#AbstractAlgebra.exp-Tuple{Rational{BigInt}}",
+    "page": "Rational field",
+    "title": "AbstractAlgebra.exp",
+    "category": "Method",
+    "text": "exp{T <: Integer}(a::Rational{T})\n\nReturn 1 if a = 0, otherwise throw an exception.\n\n\n\n"
+},
+
+{
+    "location": "rational.html#Square-root-1",
+    "page": "Rational field",
+    "title": "Square root",
+    "category": "section",
+    "text": "AbstractAlgebra.sqrt(a::Rational{BigInt})AbstractAlgebra.exp(a::Rational{BigInt})Examplesd = AbstractAlgebra.sqrt(JuliaZZ(36)//JuliaZZ(25))\nm = AbstractAlgebra.exp(JuliaZZ(0)//JuliaZZ(1))"
 },
 
 {
