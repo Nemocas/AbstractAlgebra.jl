@@ -9,7 +9,7 @@ generic residue rings over any Euclidean domain (in practice most of the functio
 is provided for GCD domains that provide a meaningful GCD function) belonging to the
 AbstractAlgebra.jl abstract type hierarchy.
 
-As well as implementing the ResidueRing interface a number of generic algorithms are
+As well as implementing the Residue Ring interface a number of generic algorithms are
 implemented for residue rings. We describe this generic functionality below.
 
 All of the generic functionality is part of a submodule of AbstractAlgebra called
@@ -19,7 +19,7 @@ function names with the submodule name.
 ## Types and parent objects
 
 Residues implemented using the AbstractAlgebra generics have type `Generic.Res{T}`
-where `T` is the type of elements of the residue ring. See the file
+where `T` is the type of elements of the base ring. See the file
 `src/generic/GenericTypes.jl` for details.
 
 Parent objects of such residue ring elements have type `Generic.ResRing{T}`.
@@ -94,7 +94,7 @@ m = modulus(S)
 U = base_ring(S)
 V = base_ring(f)
 T = parent(f)
-g == deepcopy(f)
+f == deepcopy(f)
 ```
 
 ## Residue ring functionality provided by AbstractAlgebra.jl
