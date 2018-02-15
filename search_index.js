@@ -1413,7 +1413,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Fraction Field Interface",
     "title": "Constructors",
     "category": "section",
-    "text": "We provide the following constructors. Note that these constructors don't require construction of the parent object first. This is easier to achieve if the fraction element type doesn't contain a reference to the parent object, but merely contains a reference to the base ring. The parent object can then be constructed on demand.//(x::T, y::T) where T <: AbstractAlgebra.RingElemReturn the fraction xy.//(x::T, y::AbstractAlgebra.FracElem{T}) where T <: AbstractAlgebra.RingElemReturn xy where x is in the base ring of y.//(x::AbstractAlgebra.FracElem{T}, y::T) where T <: AbstractAlgebra.RingElemReturn xy where y is in the base ring of x.ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\n\nf = (x^2 + x + 1)//(x^3 + 3x + 1)"
+    "text": "We provide the following constructors. Note that these constructors don't require construction of the parent object first. This is easier to achieve if the fraction element type doesn't contain a reference to the parent object, but merely contains a reference to the base ring. The parent object can then be constructed on demand.//(x::T, y::T) where T <: AbstractAlgebra.RingElemReturn the fraction xy.//(x::T, y::AbstractAlgebra.FracElem{T}) where T <: AbstractAlgebra.RingElemReturn xy where x is in the base ring of y.//(x::AbstractAlgebra.FracElem{T}, y::T) where T <: AbstractAlgebra.RingElemReturn xy where y is in the base ring of x.ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\n\nf = (x^2 + x + 1)//(x^3 + 3x + 1)\ng = f//x\nh = x//f"
 },
 
 {
