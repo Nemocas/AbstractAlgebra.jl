@@ -16,6 +16,7 @@ makedocs(
              "series.md",
              "residue_rings.md",
              "residue.md",
+             "fields.md",
              "matrix_spaces.md",
              "matrix.md",
              "types.md" # Appendix A
