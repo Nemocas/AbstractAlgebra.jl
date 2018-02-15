@@ -19,7 +19,8 @@ makedocs(
                           "residue.md"],
              "Fields" => [ "fields.md",
                            "fraction_fields.md",
-                           "fraction.md"],
+                           "fraction.md",
+                           "rational.md"],
              "matrix_spaces.md",
              "matrix.md",
              "types.md" # Appendix A

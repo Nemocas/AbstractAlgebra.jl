@@ -64,7 +64,6 @@ resulting parent object to coerce various elements into the ring.
 **Examples**
 
 ```julia
-
 f = JuliaZZ()
 g = JuliaZZ(123)
 h = JuliaZZ(BigInt(1234))
