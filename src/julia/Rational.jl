@@ -122,6 +122,11 @@ end
 #
 ###############################################################################
 
+doc"""
+   sqrt{T <: Integer}(a::Rational{T})
+> Return the square root of $a$ if it is the square of a rational, otherwise
+> throw an error.
+"""
 function sqrt(a::Rational{T}) where T <: Integer
    return AbstractAlgebra.sqrt(numerator(a))//AbstractAlgebra.sqrt(denominator(a))
 end
@@ -132,6 +137,10 @@ end
 #
 ###############################################################################
 
+doc"""
+   exp{T <: Integer}(a::Rational{T})
+> Return $1$ if $a = 0$, otherwise throw an exception.
+"""
 function exp(a::Rational{T}) where T <: Integer
    a != 0 && throw(DomainError())
    return Rational{T}(1)
