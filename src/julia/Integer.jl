@@ -40,6 +40,10 @@ if VERSION < v"0.7.0-DEV.1144"
 isone(a::Integer) = a == 1
 end
 
+doc"""
+   isunit(a::Integer)
+> Return `true` if $a$ is $1$ or $-1$.
+"""
 isunit(a::Integer) = a == 1 || a == -1
 
 canonical_unit(a::T) where T <: Integer = a < 0 ? T(-1) : T(1)
@@ -129,6 +133,11 @@ end
 #
 ###############################################################################
 
+doc"""
+   sqrt{T <: Integer}(a::T)
+> Return the integer square root of $a$. If $a$ is not a perfect square an
+> error is thrown.
+"""
 function sqrt(a::T) where T <: Integer
    s = isqrt(a)
    s*s != a && error("Not a square in sqrt")
@@ -141,6 +150,11 @@ end
 #
 ###############################################################################
 
+doc"""
+   exp{a <: Integer}(a::T)
+> Return $1$ if $a = 0$, otherwise throw an exception. This function is not
+> generally of use to the user, but is used internally in AbstractAlgebra.jl.
+"""
 function exp(a::T) where T <: Integer
     a != 0 && throw(DomainError())
     return T(1)

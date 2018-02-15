@@ -8,6 +8,7 @@ makedocs(
              "constructors.md",
              "Rings" => [ "rings.md",
                           "euclidean.md",
+                          "integer.md",
                           "polynomial_rings.md",
                           "polynomial.md",
                           "mpolynomial_rings.md",
