@@ -1221,7 +1221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic residue rings",
     "title": "Generic residue rings",
     "category": "section",
-    "text": "AbstractAlgebra.jl provides a module, implemented in src/generic/Residue.jl for generic residue rings over any Euclidean domain (in practice most of the functionality is provided for GCD domains that provide a meaningful GCD function) belonging to the AbstractAlgebra.jl abstract type hierarchy.As well as implementing the ResidueRing interface a number of generic algorithms are implemented for residue rings. We describe this generic functionality below.All of the generic functionality is part of a submodule of AbstractAlgebra called Generic. This is exported by default so that it is not necessary to qualify the function names with the submodule name."
+    "text": "AbstractAlgebra.jl provides a module, implemented in src/generic/Residue.jl for generic residue rings over any Euclidean domain (in practice most of the functionality is provided for GCD domains that provide a meaningful GCD function) belonging to the AbstractAlgebra.jl abstract type hierarchy.As well as implementing the Residue Ring interface a number of generic algorithms are implemented for residue rings. We describe this generic functionality below.All of the generic functionality is part of a submodule of AbstractAlgebra called Generic. This is exported by default so that it is not necessary to qualify the function names with the submodule name."
 },
 
 {
@@ -1229,7 +1229,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic residue rings",
     "title": "Types and parent objects",
     "category": "section",
-    "text": "Residues implemented using the AbstractAlgebra generics have type Generic.Res{T} where T is the type of elements of the residue ring. See the file src/generic/GenericTypes.jl for details.Parent objects of such residue ring elements have type Generic.ResRing{T}.The defining modulus of the residue ring is stored in the parent object.The residue element types belong to the abstract type AbstractAlgebra.ResElem{T} and the residue ring types belong to the abstract type AbstractAlgebra.ResRing{T}. This enables one to write generic functions that can accept any AbstractAlgebra residue type.Note that both the generic residue ring type Generic.ResRing{T} and the abstract type it belongs to, AbstractAlgebra.ResRing{T} are both called ResRing. The  former is a (parameterised) concrete type for a residue ring over a given base ring whose elements have type T. The latter is an abstract type representing all residue ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g. supplied by a C library)."
+    "text": "Residues implemented using the AbstractAlgebra generics have type Generic.Res{T} where T is the type of elements of the base ring. See the file src/generic/GenericTypes.jl for details.Parent objects of such residue ring elements have type Generic.ResRing{T}.The defining modulus of the residue ring is stored in the parent object.The residue element types belong to the abstract type AbstractAlgebra.ResElem{T} and the residue ring types belong to the abstract type AbstractAlgebra.ResRing{T}. This enables one to write generic functions that can accept any AbstractAlgebra residue type.Note that both the generic residue ring type Generic.ResRing{T} and the abstract type it belongs to, AbstractAlgebra.ResRing{T} are both called ResRing. The  former is a (parameterised) concrete type for a residue ring over a given base ring whose elements have type T. The latter is an abstract type representing all residue ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g. supplied by a C library)."
 },
 
 {
@@ -1245,7 +1245,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic residue rings",
     "title": "Basic ring functionality",
     "category": "section",
-    "text": "Residue rings in AbstractAlgebra.jl implement the full Ring interface. Of course the entire Residue Ring interface is also implemented.We give some examples of such functionality.ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nf = S(x + 1)\n\nh = zero(S)\nk = one(S)\nisone(k) == true\niszero(f) == false\nm = modulus(S)\nU = base_ring(S)\nV = base_ring(f)\nT = parent(f)\ng == deepcopy(f)"
+    "text": "Residue rings in AbstractAlgebra.jl implement the full Ring interface. Of course the entire Residue Ring interface is also implemented.We give some examples of such functionality.ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nf = S(x + 1)\n\nh = zero(S)\nk = one(S)\nisone(k) == true\niszero(f) == false\nm = modulus(S)\nU = base_ring(S)\nV = base_ring(f)\nT = parent(f)\nf == deepcopy(f)"
 },
 
 {
@@ -1374,6 +1374,142 @@ var documenterSearchIndex = {"docs": [
     "title": "Inversion",
     "category": "section",
     "text": "inv(f::MyElem)Return the inverse of the given element in the field. If f = 0, an error is thrown."
+},
+
+{
+    "location": "fraction_fields.html#",
+    "page": "Fraction Field Interface",
+    "title": "Fraction Field Interface",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "fraction_fields.html#Fraction-Field-Interface-1",
+    "page": "Fraction Field Interface",
+    "title": "Fraction Field Interface",
+    "category": "section",
+    "text": "Fraction fields are supported in AbstractAlgebra.jl, at least for gcd domains. In addition to the standard Ring interface, some additional functions are required to be present for fraction fields."
+},
+
+{
+    "location": "fraction_fields.html#Types-and-parents-1",
+    "page": "Fraction Field Interface",
+    "title": "Types and parents",
+    "category": "section",
+    "text": "AbstractAlgebra provides two abstract types for fraction fields and their elements:FracField{T} is the abstract type for fraction field parent types\nFracElem{T} is the abstract type for types of fractionsWe have that FracField{T} <: AbstractAlgebra.Field and  FracElem{T} <: AbstractAlgebra.FieldElem.Note that both abstract types are parameterised. The type T should usually be the type of elements of the base ring of the fraction field.Fraction fields should be made unique on the system by caching parent objects (unless an optional cache parameter is set to false). Fraction fields should at least be distinguished based on their base ring.See src/generic/GenericTypes.jl for an example of how to implement such a cache (which usually makes use of a dictionary)."
+},
+
+{
+    "location": "fraction_fields.html#Required-functionality-for-fraction-fields-1",
+    "page": "Fraction Field Interface",
+    "title": "Required functionality for fraction fields",
+    "category": "section",
+    "text": "In addition to the required functionality for the Field interface the Fraction Field interface has the following required functions.We suppose that R is a fictitious base ring, and that S is the fraction field with  parent object S of type MyFracField{T}. We also assume the fractions in the field  have type MyFrac{T}, where T is the type of elements of the base ring.Of course, in practice these types may not be parameterised, but we use parameterised types here to make the interface clearer.Note that the type T must (transitively) belong to the abstract type RingElem."
+},
+
+{
+    "location": "fraction_fields.html#Constructors-1",
+    "page": "Fraction Field Interface",
+    "title": "Constructors",
+    "category": "section",
+    "text": "We provide the following constructors. Note that these constructors don't require construction of the parent object first. This is easier to achieve if the fraction element type doesn't contain a reference to the parent object, but merely contains a reference to the base ring. The parent object can then be constructed on demand.//(x::T, y::T) where T <: RingElemReturn the fraction xy.//(x::T, y::AbstractAlgebra.FracElem{T}) where T <: AbstractAlgebra.RingElemReturn xy where x is in the base ring of y.//(x::AbstractAlgebra.FracElem{T}, y::T) where T <: AbstractAlgebra.RingElemReturn xy where y is in the base ring of x.ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\n\nf = (x^2 + x + 1)//(x^3 + 3x + 1)"
+},
+
+{
+    "location": "fraction_fields.html#Basic-manipulation-of-fields-and-elements-1",
+    "page": "Fraction Field Interface",
+    "title": "Basic manipulation of fields and elements",
+    "category": "section",
+    "text": "numerator(d::MyFrac{T}) where T <: AbstractAlgebra.RingElemGiven a fraction d = ab return a, where ab is in lowest terms with respect to the canonical_unit and gcd functions on the base ring.denominator(d::MyFrac{T}) where T <: AbstractAlgebra.RingElemGiven a fraction d = ab return b, where ab is in lowest terms with respect to the canonical_unit and gcd functions on the base ring.ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\n\nf = (x^2 + x + 1)//(x^3 + 3x + 1)\n\nn = numerator(f)\nd = denominator(f)"
+},
+
+{
+    "location": "fraction.html#",
+    "page": "Generic fraction fields",
+    "title": "Generic fraction fields",
+    "category": "page",
+    "text": "CurrentModule = AbstractAlgebra"
+},
+
+{
+    "location": "fraction.html#Generic-fraction-fields-1",
+    "page": "Generic fraction fields",
+    "title": "Generic fraction fields",
+    "category": "section",
+    "text": "AbstractAlgebra.jl provides a module, implemented in src/generic/Fraction.jl for generic fraction fields over any gcd domain belonging to the AbstractAlgebra.jl abstract type hierarchy.As well as implementing the Fraction Field interface a number of generic algorithms are implemented for fraction fields. We describe this generic functionality below.All of the generic functionality is part of a submodule of AbstractAlgebra called Generic. This is exported by default so that it is not necessary to qualify the function names with the submodule name."
+},
+
+{
+    "location": "fraction.html#Types-and-parent-objects-1",
+    "page": "Generic fraction fields",
+    "title": "Types and parent objects",
+    "category": "section",
+    "text": "Fractions implemented using the AbstractAlgebra generics have type Generic.Frac{T} where T is the type of elements of the base ring. See the file src/generic/GenericTypes.jl for details.Parent objects of such fraction elements have type Generic.FracField{T}.The fraction element types belong to the abstract type AbstractAlgebra.FracElem{T} and the fraction field types belong to the abstract type AbstractAlgebra.FracRing{T}. This enables one to write generic functions that can accept any AbstractAlgebra fraction type.Note that both the generic fraction field type Generic.FracField{T} and the abstract type it belongs to, AbstractAlgebra.FracField{T} are both called FracField. The  former is a (parameterised) concrete type for a fraction field over a given base ring whose elements have type T. The latter is an abstract type representing all fraction field types in AbstractAlgebra.jl, whether generic or very specialised (e.g. supplied by a C library)."
+},
+
+{
+    "location": "fraction.html#Fraction-field-constructors-1",
+    "page": "Generic fraction fields",
+    "title": "Fraction field constructors",
+    "category": "section",
+    "text": "In order to construct fractions in AbstractAlgebra.jl, one can first construct the fraction field itself. This is accomplished with the following constructor.FractionField(R::AbstractAlgebra.Ring; cached::Bool = true)Given a base ring R return the parent object of the fraction field of R. By default the parent object S will depend only on R and will be cached. Setting the optional argument cached to false will prevent the parent object S from being cached.Here are some examples of creating fraction fields and making use of the resulting parent objects to coerce various elements into the fraction field.ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\nS = FractionField(R)\n\nf = S()\ng = S(123)\nh = S(BigInt(1234))\nk = S(x + 1)All of the examples here are generic fraction fields, but specialised implementations of fraction fields provided by external modules will also usually provide a FractionField constructor to allow creation of the fraction fields they provide."
+},
+
+{
+    "location": "fraction.html#Basic-field-functionality-1",
+    "page": "Generic fraction fields",
+    "title": "Basic field functionality",
+    "category": "section",
+    "text": "Fraction fields in AbstractAlgebra.jl implement the full Field interface. Of course the entire Fraction Field interface is also implemented.We give some examples of such functionality.ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = FractionField(R)\n\nf = S(x + 1)\ng = (x^2 + x + 1)//(x^3 + 3x + 1)\n\nh = zero(S)\nk = one(S)\nisone(k) == true\niszero(f) == false\nm = characteristic(S)\nU = base_ring(S)\nV = base_ring(f)\nT = parent(f)\nr = deepcopy(f)\nn = numerator(g)\nd = denominator(g)"
+},
+
+{
+    "location": "fraction.html#Fraction-field-functionality-provided-by-AbstractAlgebra.jl-1",
+    "page": "Generic fraction fields",
+    "title": "Fraction field functionality provided by AbstractAlgebra.jl",
+    "category": "section",
+    "text": "The functionality listed below is automatically provided by AbstractAlgebra.jl for any fraction field module that implements the full Fraction Field interface. This includes AbstractAlgebra.jl's own generic fraction fields.But if a C library provides all the functionality documented in the Fraction Field interface, then all the functions described here will also be automatically supplied by AbstractAlgebra.jl for that fraction field type.Of course, modules are free to provide specific implementations of the functions described here, that override the generic implementation."
+},
+
+{
+    "location": "fraction.html#Base.gcd-Union{Tuple{AbstractAlgebra.FracElem{T},AbstractAlgebra.FracElem{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "Generic fraction fields",
+    "title": "Base.gcd",
+    "category": "Method",
+    "text": "gcd{T <: RingElem}(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T})\n\nReturn a greatest common divisor of a and b if one exists. N.B: we define the GCD of ab and cd to be gcd(ad bc)bd, reduced to lowest terms. This requires the existence of a greatest common divisor function for the base ring.\n\n\n\n"
+},
+
+{
+    "location": "fraction.html#Greatest-common-divisor-1",
+    "page": "Generic fraction fields",
+    "title": "Greatest common divisor",
+    "category": "section",
+    "text": "gcd{T <: RingElem}(::FracElem{T}, ::FracElem{T})ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\n\nf = (x + 1)//(x^3 + 3x + 1)\ng = (x^2 + 2x + 1)//(x^2 + x + 1)\n\nh = gcd(f, g)"
+},
+
+{
+    "location": "fraction.html#AbstractAlgebra.Generic.remove-Union{Tuple{AbstractAlgebra.FracElem{T},T}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "Generic fraction fields",
+    "title": "AbstractAlgebra.Generic.remove",
+    "category": "Method",
+    "text": "remove{T <: RingElem}(z::AbstractAlgebra.FracElem{T}, p::T)\n\nReturn the tuple n x such that z = p^nx where x has valuation 0 at p.\n\n\n\n"
+},
+
+{
+    "location": "fraction.html#AbstractAlgebra.Generic.valuation-Union{Tuple{AbstractAlgebra.FracElem{T},T}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "Generic fraction fields",
+    "title": "AbstractAlgebra.Generic.valuation",
+    "category": "Method",
+    "text": "valuation{T <: RingElem}(z::AbstractAlgebra.FracElem{T}, p::T)\n\nReturn the valuation of z at p.\n\n\n\n"
+},
+
+{
+    "location": "fraction.html#Remove-and-valuation-1",
+    "page": "Generic fraction fields",
+    "title": "Remove and valuation",
+    "category": "section",
+    "text": "When working over a Euclidean domain, it is convenient to extend valuations to the fraction field. To facilitate this, we define the following functions.remove{T <: RingElem}(::FracElem{T}, ::T)valuation{T <: RingElem}(::FracElem{T}, ::T)ExamplesR, x = PolynomialRing(JuliaZZ, \"x\")\n\nf = (x + 1)//(x^3 + 3x + 1)\ng = (x^2 + 1)//(x^2 + x + 1)\n\nv, q = remove(f^3*g, x + 1)\nv = valuation(f^3*g, x + 1)"
 },
 
 {
