@@ -329,6 +329,110 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "integer.html#",
+    "page": "Integer ring",
+    "title": "Integer ring",
+    "category": "page",
+    "text": "CurrentModule = AbstractAlgebra"
+},
+
+{
+    "location": "integer.html#Integer-ring-1",
+    "page": "Integer ring",
+    "title": "Integer ring",
+    "category": "section",
+    "text": "AbstractAlgebra.jl provides a module, implemented in src/julia/Integer.jl for making Julia BigInts conform to the AbstractAlgebra.jl Ring interface.In addition to providing a parent object JuliaZZ for Julia BigInts, we implement any additional functionality required by AbstractAlgebra.jl.Because BigInt cannot be directly included in the AbstractAlgebra.jl abstract type hierarchy, we achieve integration of Julia BigInts by introducing a type union, called RingElement, which is a union of AbstractAlgebra.RingElem and a number of Julia types, including BigInt. Everywhere that RingElem is notionally used in AbstractAlgebra.jl, we are in fact using RingElement, with additional care being taken to avoid ambiguities.The details of how this is done are technical, and we refer the reader to the implementation for details. For most intents and purposes, one can think of the Julia BigInt type as belonging to AbstractAlgebra.RingElem.One other technicality is that Julia defines certain functions for BigInt, such as sqrt and exp differently to what AbstractAlgebra.jl requires. To get around this, we redefine these functions internally to AbstractAlgebra.jl, without redefining them for users of AbstractAlgebra.jl. This allows the internals of AbstractAlgebra.jl to function correctly, without broadcasting pirate definitions of already defined Julia functions to the world.To access the internal definitions, one can use AbstractAlgebra.sqrt and AbstractAlgebra.exp, etc."
+},
+
+{
+    "location": "integer.html#Types-and-parent-objects-1",
+    "page": "Integer ring",
+    "title": "Types and parent objects",
+    "category": "section",
+    "text": "Integers have type BigInt, as in Julia itself. We simply supplement the functionality for this type as required for computer algebra.The parent objects of such integers has type Integers{BigInt}.For convenience, we also make Int a part of the AbstractAlgebra.jl type hierarchy and its parent object (accessible as zz) has type Integers{Int}. But we caution that this type is not particularly useful as a model of the integers and may not function as expected within AbstractAlgebra.jl."
+},
+
+{
+    "location": "integer.html#Integer-constructors-1",
+    "page": "Integer ring",
+    "title": "Integer constructors",
+    "category": "section",
+    "text": "In order to construct integers in AbstractAlgebra.jl, one can first construct the integer ring itself. This is accomplished using the following constructor.Integers{BigInt}()This gives the unique object of type Integers{BigInt} representing the ring of integers in AbstractAlgebra.jl.In practice, one simply uses JuliaZZ which is assigned to be the return value of the above constructor. There is no need to call the constructor in practice.Here are some examples of creating the integer ring and making use of the resulting parent object to coerce various elements into the ring.Examples\nf = JuliaZZ()\ng = JuliaZZ(123)\nh = JuliaZZ(BigInt(1234))"
+},
+
+{
+    "location": "integer.html#Basic-ring-functionality-1",
+    "page": "Integer ring",
+    "title": "Basic ring functionality",
+    "category": "section",
+    "text": "The integer ring in AbstractAlgebra.jl implements the full Ring interface and the  Euclidean Ring interface.We give some examples of such functionality.Examplesf = JuliaZZ(12)\n\nh = zero(JuliaZZ)\nk = one(JuliaZZ)\nisone(k) == true\niszero(f) == false\nU = base_ring(JuliaZZ)\nV = base_ring(f)\nT = parent(f)\nf == deepcopy(f)\ng = f + 12\nh = powmod(f, 12, JuliaZZ(17))\nflag, q = divides(f, JuliaZZ(3))"
+},
+
+{
+    "location": "integer.html#Integer-functionality-provided-by-AbstractAlgebra.jl-1",
+    "page": "Integer ring",
+    "title": "Integer functionality provided by AbstractAlgebra.jl",
+    "category": "section",
+    "text": "The functionality below supplements that provided by Julia itself for its BigInt type."
+},
+
+{
+    "location": "integer.html#AbstractAlgebra.Generic.isunit-Tuple{Integer}",
+    "page": "Integer ring",
+    "title": "AbstractAlgebra.Generic.isunit",
+    "category": "Method",
+    "text": "isunit(a::Integer)\n\nReturn true if a is 1 or -1.\n\n\n\n"
+},
+
+{
+    "location": "integer.html#Basic-functionality-1",
+    "page": "Integer ring",
+    "title": "Basic functionality",
+    "category": "section",
+    "text": "isunit(::Integer)Examplesr = JuliaZZ(-1)\n\nisunit(r) == true"
+},
+
+{
+    "location": "integer.html#AbstractAlgebra.sqrt-Tuple{BigInt}",
+    "page": "Integer ring",
+    "title": "AbstractAlgebra.sqrt",
+    "category": "Method",
+    "text": "sqrt{T <: Integer}(a::T)\n\nReturn the integer square root of a. If a is not a perfect square an error is thrown.\n\n\n\n"
+},
+
+{
+    "location": "integer.html#AbstractAlgebra.exp-Tuple{BigInt}",
+    "page": "Integer ring",
+    "title": "AbstractAlgebra.exp",
+    "category": "Method",
+    "text": "exp{a <: Integer}(a::T)\n\nReturn 1 if a = 0, otherwise throw an exception. This function is not generally of use to the user, but is used internally in AbstractAlgebra.jl.\n\n\n\n"
+},
+
+{
+    "location": "integer.html#Square-root-1",
+    "page": "Integer ring",
+    "title": "Square root",
+    "category": "section",
+    "text": "AbstractAlgebra.sqrt(a::BigInt)AbstractAlgebra.exp(a::BigInt)Examplesd = AbstractAlgebra.sqrt(JuliaZZ(36))\nm = AbstractAlgebra.exp(JuliaZZ(0))"
+},
+
+{
+    "location": "integer.html#AbstractAlgebra.ppio-Tuple{BigInt,BigInt}",
+    "page": "Integer ring",
+    "title": "AbstractAlgebra.ppio",
+    "category": "Method",
+    "text": "ppio(a::T, b::T)\n\nSplit a into c*d where c = gcd(a b^infty).\n\n\n\n"
+},
+
+{
+    "location": "integer.html#Coprime-bases-1",
+    "page": "Integer ring",
+    "title": "Coprime bases",
+    "category": "section",
+    "text": "ppio(a::BigInt, b::BigInt)Examplesc, n = ppio(JuliaZZ(12), JuliaZZ(26))"
+},
+
+{
     "location": "polynomial_rings.html#",
     "page": "Univariate Polynomial Ring Interface",
     "title": "Univariate Polynomial Ring Interface",
