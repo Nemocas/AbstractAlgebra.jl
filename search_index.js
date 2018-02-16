@@ -1769,6 +1769,46 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "real.html#",
+    "page": "Real field",
+    "title": "Real field",
+    "category": "page",
+    "text": "CurrentModule = AbstractAlgebra"
+},
+
+{
+    "location": "real.html#Real-field-1",
+    "page": "Real field",
+    "title": "Real field",
+    "category": "section",
+    "text": "AbstractAlgebra.jl provides a module, implemented in src/julia/Float.jl for making Julia BigFloats conform to the AbstractAlgebra.jl Field interface.In addition to providing a parent object RealField for Julia BigFloats, we implement any additional functionality required by AbstractAlgebra.jl.Because BigFloat cannot be directly included in the AbstractAlgebra.jl abstract type hierarchy, we achieve integration of Julia BigFloats by introducing a type union, called FieldElement, which is a union of AbstractAlgebra.FieldElem and a number of Julia types, including BigFloat. Everywhere that FieldElem is notionally used in AbstractAlgebra.jl, we are in fact using FieldElement, with additional care being taken to avoid ambiguities.The details of how this is done are technical, and we refer the reader to the implementation for details. For most intents and purposes, one can think of the Julia BigFloat type as belonging to AbstractAlgebra.FieldElem."
+},
+
+{
+    "location": "real.html#Types-and-parent-objects-1",
+    "page": "Real field",
+    "title": "Types and parent objects",
+    "category": "section",
+    "text": "Reals have type BigFloat, as in Julia itself. We simply supplement the functionality for this type as required for computer algebra.The parent objects of such integers has type Floats{BigFloat}.For convenience, we also make Float64 a part of the AbstractAlgebra.jl type hierarchy and its parent object (accessible as RDF) has type Floats{Float64}."
+},
+
+{
+    "location": "real.html#Rational-constructors-1",
+    "page": "Real field",
+    "title": "Rational constructors",
+    "category": "section",
+    "text": "In order to construct reals in AbstractAlgebra.jl, one can first construct the real field itself. This is accomplished using the following constructor.Floats{BigFloat}()This gives the unique object of type Floats{BigFloat} representing the field of reals in AbstractAlgebra.jl.In practice, one simply uses RealField which is assigned to be the return value of the above constructor. There is no need to call the constructor in practice.Here are some examples of creating the real field and making use of the resulting parent object to coerce various elements into the field.ExamplesRR = RealField\n\nf = RR()\ng = RR(123)\nh = RR(BigInt(1234))\nk = RR(12//7)\nm = RR(2.3)"
+},
+
+{
+    "location": "real.html#Basic-field-functionality-1",
+    "page": "Real field",
+    "title": "Basic field functionality",
+    "category": "section",
+    "text": "The real field in AbstractAlgebra.jl implements the full Field interface.We give some examples of such functionality.ExamplesRR = RealField\nf = RR(12//7)\n\nh = zero(RR)\nk = one(RR)\nisone(k) == true\niszero(f) == false\nU = base_ring(RR)\nV = base_ring(f)\nT = parent(f)\nf == deepcopy(f)\ng = f + 12\nm = inv(g)"
+},
+
+{
     "location": "numberfield.html#",
     "page": "Number fields",
     "title": "Number fields",
