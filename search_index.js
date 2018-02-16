@@ -1781,7 +1781,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Number fields",
     "title": "Number fields",
     "category": "section",
-    "text": "AbstractAlgebra.jl provides a very naive implementation of number fields. This allows arithmetic in algebraic number fields, which are currently modeled as mathbbZx modulo an irreducible polynomial, i.e. as a residue field.In fact, the definition of the number field constructor is currently given in src/generic/ResidueField.jl and no type is defined for a number field. The definition mainly exists for testing purposes. It may later be added by a more standard implementation. For a more fully fleshed out number field implementation (based on a very high performance C library), see Nemo.jl."
+    "text": "AbstractAlgebra.jl provides a very naive implementation of number fields. This allows arithmetic in algebraic number fields, which are currently modeled as mathbbZx modulo an irreducible polynomial, i.e. as a residue field.In fact, the definition of the number field constructor is currently given in src/generic/ResidueField.jl and no type is defined for a number field. The definition mainly exists for testing purposes. It may later be replaced by a more standard implementation. For a more fully fleshed out number field implementation (based on a very high performance C library), see Nemo.jl."
 },
 
 {
