@@ -1842,23 +1842,23 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "perm.html#",
-    "page": "-",
-    "title": "-",
+    "page": "Permutation groups",
+    "title": "Permutation groups",
     "category": "page",
     "text": "CurrentModule = AbstractAlgebra"
 },
 
 {
-    "location": "perm.html#Introduction-1",
-    "page": "-",
-    "title": "Introduction",
+    "location": "perm.html#Permutation-groups-1",
+    "page": "Permutation groups",
+    "title": "Permutation groups",
     "category": "section",
     "text": "AbstractAlgebra.jl provides rudimentary support for permutation groups. These are mainly used for permutations of rows of matrices.Permutation groups are created using the PermGroup (inner) constructor. However, for convenience we definePermutationGroup = PermGroupso that permutation groups can be created using PermutationGroup instead of PermGroup.The types of permutations in AbstractAlgebra.jl are given by the following table, along with the libraries that provide them and the associated types of the parent objects.Library Group Element type Parent type\nNative S_n perm PermGroupAll the permutation group types belong to the Group abstract type and the corresponding permutation element types belong to the GroupElem abstract type."
 },
 
 {
     "location": "perm.html#Permutation-group-constructors-1",
-    "page": "-",
+    "page": "Permutation groups",
     "title": "Permutation group constructors",
     "category": "section",
     "text": "In order to construct permutations in AbstractAlgebra.jl, one must first construct the permutation group they belong to. This is accomplished with the following constructor.PermGroup(n::Int)Construct the permutation group on n points. The function returns the parent object representing the group.ExamplesG = PermutationGroup(5)\n\np = G()"
@@ -1866,7 +1866,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "perm.html#Permutation-constructors-1",
-    "page": "-",
+    "page": "Permutation groups",
     "title": "Permutation constructors",
     "category": "section",
     "text": "Once a permutation group is constructed, there are various ways to construct permutations in that group.Note that permutations consist of lists of n integers numbered from 1 to n. If the i-th entry of a permuation is j, this corresponds to sending i to j in the permutation.ExamplesG = PermutationGroup(5)\n\np = G()"
@@ -1874,7 +1874,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "perm.html#Basic-functionality-1",
-    "page": "-",
+    "page": "Permutation groups",
     "title": "Basic functionality",
     "category": "section",
     "text": "The following basic functionality is provided by the default permutation group implementation in AbstractAlgebra.jl, to support construction of other generic constructions over permutation groups. Any custom permutation group implementation in AbstractAlgebra.jl should provide these  functions along with the usual group element arithmetic.parent_type(::Type{perm})Gives the type of the parent object of a permutation group element.elem_type(R::PermGroup)Given the parent object for a permutation group, return the type of elements of the group.Base.hash(a::perm, h::UInt)Return a UInt hexadecimal hash of the permutation element a. This should be xor'd with a fixed random hexadecimal specific to the permutation group type. The hash of the entries of the permutation should be xor'd with the supplied parameter h as part of computing the hash.deepcopy(a::perm)Construct a copy of the given permutation group element and return it. This function must recursively construct copies of all of the internal data in the given element. AbstractAlgebra.jl permutation group elements are mutable and so returning shallow copies is not sufficient.getindex(a::perm, n::Int)Allows access to entry n of the given permutation via the syntax a[n]. Note that entries are 1-indexed.setindex!(a::perm, d::Int, n::Int)Set the n-th entry of the given permutation to d. This allows Julia to provide the syntax an = d for setting entries of a permuation. Note that entries are 1-indexed.Given the parent object G for a permutation group, the following coercion functions are provided to coerce various elements into the permutation group. Developers provide these by overloading the call operator for the permutation group parent objects.R()Return the identity permutation.R(A::Array{Int, 1})Return the permutation whose entries are given by the elements of the supplied vector.R(p::perm)Take a permutation that is already in the permutation group and simply return it. A copy of the original is not made.In addition to the above, developers of custom permutation group types must ensure that each permutation element contains a field parent specifying the parent object of the permutation group element, or at least supply the equivalent of the function parent(a::perm) to return the parent object of a permutation group element."
@@ -1882,7 +1882,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "perm.html#Base.parent-Tuple{AbstractAlgebra.Generic.perm}",
-    "page": "-",
+    "page": "Permutation groups",
     "title": "Base.parent",
     "category": "Method",
     "text": "parent(a::perm)\n\nReturn the parent of the given permutation group element.\n\n\n\n"
@@ -1890,7 +1890,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "perm.html#AbstractAlgebra.Generic.parity-Tuple{AbstractAlgebra.Generic.perm}",
-    "page": "-",
+    "page": "Permutation groups",
     "title": "AbstractAlgebra.Generic.parity",
     "category": "Method",
     "text": "parity(a::perm)\n\nReturn the parity of the given permutation, i.e. the parity of the number of transpositions that compose it. The function returns 1 if the parity is odd and 0 otherwise. By default parity will uses the cycle decomposition if it is already available, but will not compute it on demand. If You intend to use parity, or the cycle decomposition of a permutation later You may force parity to compute the cycle structure by calling parity(a, Val{:cycles})`.\n\n\n\n"
@@ -1898,7 +1898,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "perm.html#Basic-manipulation-1",
-    "page": "-",
+    "page": "Permutation groups",
     "title": "Basic manipulation",
     "category": "section",
     "text": "Numerous functions are provided to manipulate permutation group elements. Also see the section on basic functionality above.parent(::perm)parity(::perm)ExamplesG = PermutationGroup(5)\n\np = G([1, 3, 5, 2, 4])\n\nR = parent(p)\na = parity(p)"
@@ -1906,7 +1906,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "perm.html#Base.:*-Tuple{AbstractAlgebra.Generic.perm,AbstractAlgebra.Generic.perm}",
-    "page": "-",
+    "page": "Permutation groups",
     "title": "Base.:*",
     "category": "Method",
     "text": "*(a::perm, b::perm)\n\nReturn the composition of the two permutations, i.e. acirc b. In other words, the permutation corresponding to applying b first, then a, is returned.\n\n\n\n"
@@ -1914,7 +1914,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "perm.html#Arithmetic-operators-1",
-    "page": "-",
+    "page": "Permutation groups",
     "title": "Arithmetic operators",
     "category": "section",
     "text": "*(::perm, ::perm)ExamplesG = PermutationGroup(5)\n\np = G([1, 3, 5, 2, 4])\nq = G([5, 4, 1, 3, 2])\n\na = p*q"
@@ -1922,7 +1922,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "perm.html#Base.:==-Tuple{AbstractAlgebra.Generic.perm,AbstractAlgebra.Generic.perm}",
-    "page": "-",
+    "page": "Permutation groups",
     "title": "Base.:==",
     "category": "Method",
     "text": "==(a::perm, b::perm)\n\nReturn true if the given permutations are equal, otherwise return false.\n\n\n\n"
@@ -1930,7 +1930,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "perm.html#Comparison-1",
-    "page": "-",
+    "page": "Permutation groups",
     "title": "Comparison",
     "category": "section",
     "text": "==(::perm, ::perm)ExamplesG = PermutationGroup(5)\n\np = G([1, 3, 5, 2, 4])\nq = G([5, 4, 1, 3, 2])\n\np == q"
@@ -1938,7 +1938,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "perm.html#Base.inv-Tuple{AbstractAlgebra.Generic.perm}",
-    "page": "-",
+    "page": "Permutation groups",
     "title": "Base.inv",
     "category": "Method",
     "text": "inv(a::perm)\n\nReturn the inverse of the given permutation, i.e. the permuation a^-1 such that acirc a^-1 = a^-1circ a is the identity permutation.\n\n\n\n"
@@ -1946,7 +1946,7 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "perm.html#Inversion-1",
-    "page": "-",
+    "page": "Permutation groups",
     "title": "Inversion",
     "category": "section",
     "text": "inv(::perm)ExamplesG = PermutationGroup(5)\n\np = G([1, 3, 5, 2, 4])\n\na = inv(p)"
