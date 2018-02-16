@@ -1865,19 +1865,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "perm.html#Base.eye-Tuple{AbstractAlgebra.PermGroup}",
-    "page": "-",
-    "title": "Base.eye",
-    "category": "Method",
-    "text": "eye([T::Type=Float64,] m::Integer, n::Integer)\n\nm-by-n identity matrix. The default element type is Float64.\n\n\n\neye(A)\n\nConstructs an identity matrix of the same dimensions and type as A.\n\njulia> A = [1 2 3; 4 5 6; 7 8 9]\n3×3 Array{Int64,2}:\n 1  2  3\n 4  5  6\n 7  8  9\n\njulia> eye(A)\n3×3 Array{Int64,2}:\n 1  0  0\n 0  1  0\n 0  0  1\n\nNote the difference from ones.\n\n\n\n"
-},
-
-{
     "location": "perm.html#Permutation-constructors-1",
     "page": "-",
     "title": "Permutation constructors",
     "category": "section",
-    "text": "Once a permutation group is constructed, there are various ways to construct permutations in that group.Apart from the identity permutation coercion as above, we offer the following functions.eye(::PermGroup)Note that permutations consist of lists of n integers numbered from 1 to n. If the i-th entry of a permuation is j, this corresponds to sending i to j in the permutation.ExamplesG = PermutationGroup(5)\n\np = eye(G)"
+    "text": "Once a permutation group is constructed, there are various ways to construct permutations in that group.Note that permutations consist of lists of n integers numbered from 1 to n. If the i-th entry of a permuation is j, this corresponds to sending i to j in the permutation.ExamplesG = PermutationGroup(5)\n\np = G()"
 },
 
 {
