@@ -19,9 +19,9 @@
 function test_rel_series_constructors()
    print("Generic.RelSeries.constructors...")
 
-   R, x = PowerSeriesRing(JuliaZZ, 30, "x")
+   R, x = PowerSeriesRing(ZZ, 30, "x")
 
-   S, t = PolynomialRing(JuliaQQ, "t")
+   S, t = PolynomialRing(QQ, "t")
    T, y = PowerSeriesRing(S, 30, "y")
 
    @test elem_type(R) == Generic.RelSeries{BigInt}
@@ -55,12 +55,12 @@ function test_rel_series_constructors()
    @test isa(c2, Generic.RelSeries)
 
    g1 = R(1)
-   h1 = R(JuliaZZ(2))
+   h1 = R(ZZ(2))
    k1 = R()
 
    g2 = T(1)
-   h2 = T(JuliaZZ(2))
-   h2 = T(JuliaQQ(2, 3))
+   h2 = T(ZZ(2))
+   h2 = T(QQ(2, 3))
    k2 = T()
 
    @test isa(g1, Generic.RelSeries)
@@ -80,7 +80,7 @@ end
 function test_rel_series_manipulation()
    print("Generic.RelSeries.manipulation...")
 
-   R, t = PolynomialRing(JuliaQQ, "t")
+   R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
    @test max_precision(S) == 30
@@ -113,7 +113,7 @@ function test_rel_series_manipulation()
    @test coeff(a, 1) == 2
    @test coeff(b, 7) == 0
 
-   T = ResidueRing(JuliaZZ, 7)
+   T = ResidueRing(ZZ, 7)
    U, y = PowerSeriesRing(T, 10, "y")
 
    @test modulus(T) == 7
@@ -125,7 +125,7 @@ function test_rel_series_unary_ops()
    print("Generic.RelSeries.unary_ops...")
 
    #  Exact ring
-   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -10:10)
 
@@ -134,7 +134,7 @@ function test_rel_series_unary_ops()
    end
 
    #  Inexact field
-   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   R, x = PowerSeriesRing(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -1:1)
 
@@ -143,7 +143,7 @@ function test_rel_series_unary_ops()
    end
 
    # Non-integral domain
-   T = ResidueRing(JuliaZZ, 6)
+   T = ResidueRing(ZZ, 6)
    R, x = PowerSeriesRing(T, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, 0:5)
@@ -159,7 +159,7 @@ function test_rel_series_binary_ops()
    print("Generic.RelSeries.binary_ops...")
 
    #  Exact ring
-   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:100
       f = rand(R, 0:12, -10:10)
       g = rand(R, 0:12, -10:10)
@@ -175,7 +175,7 @@ function test_rel_series_binary_ops()
    end
 
    #  Inexact field
-   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   R, x = PowerSeriesRing(RealField, 10, "x")
    for iter = 1:100
       f = rand(R, 0:12, -1:1)
       g = rand(R, 0:12, -1:1)
@@ -190,7 +190,7 @@ function test_rel_series_binary_ops()
    end
 
    # Non-integral domain
-   T = ResidueRing(JuliaZZ, 6)
+   T = ResidueRing(ZZ, 6)
    R, x = PowerSeriesRing(T, 10, "x")
    for iter = 1:100
       f = rand(R, 0:12, 0:5)
@@ -212,11 +212,11 @@ function test_rel_series_adhoc_binary_ops()
    print("Generic.RelSeries.adhoc_binary_ops...")
 
    # Exact ring
-   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:500
       f = rand(R, 0:12, -10:10)
-      c1 = rand(JuliaZZ, -10:10)
-      c2 = rand(JuliaZZ, -10:10)
+      c1 = rand(ZZ, -10:10)
+      c2 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
       d2 = rand(zz, -10:10)
 
@@ -232,13 +232,13 @@ function test_rel_series_adhoc_binary_ops()
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   R, x = PowerSeriesRing(RealField, 10, "x")
    for iter = 1:500
       f = rand(R, 0:12, -1:1)
-      c1 = rand(JuliaZZ, -10:10)
-      c2 = rand(JuliaZZ, -10:10)
-      d1 = rand(JuliaRealField, -1:1)
-      d2 = rand(JuliaRealField, -1:1)
+      c1 = rand(ZZ, -10:10)
+      c2 = rand(ZZ, -10:10)
+      d1 = rand(RealField, -1:1)
+      d2 = rand(RealField, -1:1)
 
       @test isapprox(c1*f - c2*f, (c1 - c2)*f)
       @test isapprox(c1*f + c2*f, (c1 + c2)*f)
@@ -252,12 +252,12 @@ function test_rel_series_adhoc_binary_ops()
    end
 
    # Non-integral domain
-   R = ResidueRing(JuliaZZ, 6)
+   R = ResidueRing(ZZ, 6)
    S, x = PowerSeriesRing(R, 10, "x")
    for iter = 1:500
       f = rand(S, 0:12, 0:5)
-      c1 = rand(JuliaZZ, -10:10)
-      c2 = rand(JuliaZZ, -10:10)
+      c1 = rand(ZZ, -10:10)
+      c2 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
       d2 = rand(zz, -10:10)
       a1 = rand(R, 0:5)
@@ -279,12 +279,12 @@ function test_rel_series_adhoc_binary_ops()
    end
 
    # Generic tower
-   R, x = JuliaZZ["x"]
+   R, x = ZZ["x"]
    S, y = PowerSeriesRing(R, 10, "y")
    for iter = 1:100
       f = rand(S, 0:12, 0:5, -10:10)
-      c1 = rand(JuliaZZ, -10:10)
-      c2 = rand(JuliaZZ, -10:10)
+      c1 = rand(ZZ, -10:10)
+      c2 = rand(ZZ, -10:10)
       d1 = rand(R, 0:5, -10:10)
       d2 = rand(R, 0:5, -10:10)
 
@@ -306,7 +306,7 @@ function test_rel_series_comparison()
    print("Generic.RelSeries.comparison...")
 
    # Exact ring
-   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:500
       f = rand(R, 0:12, -10:10)
       g = deepcopy(f)
@@ -322,7 +322,7 @@ function test_rel_series_comparison()
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   R, x = PowerSeriesRing(RealField, 10, "x")
    for iter = 1:500
       f = rand(R, 0:12, -1:1)
       g = deepcopy(f)
@@ -338,7 +338,7 @@ function test_rel_series_comparison()
    end
 
    # Non-integral domain
-   R = ResidueRing(JuliaZZ, 6)
+   R = ResidueRing(ZZ, 6)
    S, x = PowerSeriesRing(R, 10, "x")
    for iter = 1:500
       f = rand(S, 0:12, 0:5)
@@ -361,14 +361,14 @@ function test_rel_series_adhoc_comparison()
    print("Generic.RelSeries.adhoc_comparison...")
 
    # Exact ring
-   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:500
       f = R()
       while f == 0
          f = rand(R, 0:0, -10:10)
       end
       f += rand(R, 1:12, -10:10)
-      c1 = rand(JuliaZZ, -10:10)
+      c1 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
 
       @test R(c1) == c1
@@ -383,15 +383,15 @@ function test_rel_series_adhoc_comparison()
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   R, x = PowerSeriesRing(RealField, 10, "x")
    for iter = 1:500
       f = R()
       while isapprox(f, R())
          f = rand(R, 0:0, -1:1)
       end
       f += rand(R, 1:12, -1:1)
-      c1 = rand(JuliaZZ, -10:10)
-      d1 = rand(JuliaRealField, -1:1)
+      c1 = rand(ZZ, -10:10)
+      d1 = rand(RealField, -1:1)
 
       @test R(c1) == c1
       @test c1 == R(c1)
@@ -405,7 +405,7 @@ function test_rel_series_adhoc_comparison()
    end
 
    # Non-integral domain
-   R = ResidueRing(JuliaZZ, 6)
+   R = ResidueRing(ZZ, 6)
    S, x = PowerSeriesRing(R, 10, "x")
    for iter = 1:500
       f = S()
@@ -413,7 +413,7 @@ function test_rel_series_adhoc_comparison()
          f = rand(S, 0:0, 0:5)
       end
       f += rand(S, 1:12, 0:5)
-      c1 = rand(JuliaZZ, -10:10)
+      c1 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
       a1 = rand(R, 0:5)
 
@@ -433,7 +433,7 @@ function test_rel_series_adhoc_comparison()
    end
 
    # Generic tower
-   R, x = JuliaZZ["x"]
+   R, x = ZZ["x"]
    S, y = PowerSeriesRing(R, 10, "y")
    for iter = 1:100
       f = S()
@@ -441,7 +441,7 @@ function test_rel_series_adhoc_comparison()
          f = rand(S, 0:0, 0:5, -10:10)
       end
       f += rand(S, 1:12, 0:5, -10:10)
-      c1 = rand(JuliaZZ, -10:10)
+      c1 = rand(ZZ, -10:10)
       d1 = rand(R, 0:5, -10:10)
 
       @test S(c1) == c1
@@ -462,7 +462,7 @@ function test_rel_series_powering()
    print("Generic.RelSeries.powering...")
 
    # Exact ring
-   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   R, x = PowerSeriesRing(ZZ, 10, "x")
 
    for iter = 1:100
       f = rand(R, 0:12, -10:10)
@@ -478,7 +478,7 @@ function test_rel_series_powering()
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   R, x = PowerSeriesRing(RealField, 10, "x")
 
    for iter = 1:100
       f = rand(R, 0:12, -1:1)
@@ -497,7 +497,7 @@ function test_rel_series_powering()
    for iter = 1:100
       n = rand(2:26)
 
-      Zn = ResidueRing(JuliaZZ, n)
+      Zn = ResidueRing(ZZ, n)
       R, x = PowerSeriesRing(Zn, 10, "x")
 
       f = rand(R, 0:12, 0:n - 1)
@@ -519,7 +519,7 @@ function test_rel_series_shift()
    print("Generic.RelSeries.shift...")
 
    # Exact ring
-   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -10:10)
       s = rand(0:12)
@@ -533,7 +533,7 @@ function test_rel_series_shift()
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   R, x = PowerSeriesRing(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -1:1)
       s = rand(0:12)
@@ -547,7 +547,7 @@ function test_rel_series_shift()
    end
 
    # Non-integral domain
-   T = ResidueRing(JuliaZZ, 6)
+   T = ResidueRing(ZZ, 6)
    R, x = PowerSeriesRing(T, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, 0:5)
@@ -568,7 +568,7 @@ function test_rel_series_truncation()
    print("Generic.RelSeries.truncation...")
 
    # Exact ring
-   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -10:10)
       s = rand(0:12)
@@ -579,7 +579,7 @@ function test_rel_series_truncation()
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   R, x = PowerSeriesRing(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -1:1)
       s = rand(0:12)
@@ -590,7 +590,7 @@ function test_rel_series_truncation()
    end
 
    # Non-integral domain
-   T = ResidueRing(JuliaZZ, 6)
+   T = ResidueRing(ZZ, 6)
    R, x = PowerSeriesRing(T, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, 0:5)
@@ -608,7 +608,7 @@ function test_rel_series_inversion()
     print("Generic.RelSeries.inversion...")
  
     # Exact ring
-    R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+    R, x = PowerSeriesRing(ZZ, 10, "x")
     for iter = 1:300
        f = R()
        while !isunit(f)
@@ -619,7 +619,7 @@ function test_rel_series_inversion()
     end
  
     # Inexact field
-    R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+    R, x = PowerSeriesRing(RealField, 10, "x")
     for iter = 1:300
        f = R()
        while coeff(f, 0) == 0
@@ -630,7 +630,7 @@ function test_rel_series_inversion()
     end
  
     # Non-integral domain
-    T = ResidueRing(JuliaZZ, 6)
+    T = ResidueRing(ZZ, 6)
     R, x = PowerSeriesRing(T, 10, "x")
     for iter = 1:300
        f = R()
@@ -648,7 +648,7 @@ function test_rel_series_square_root()
     print("Generic.RelSeries.square_root...")
  
     # Exact ring
-    R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+    R, x = PowerSeriesRing(ZZ, 10, "x")
     for iter = 1:300
        f = rand(R, 0:10, -10:10)
        g = f^2
@@ -657,7 +657,7 @@ function test_rel_series_square_root()
     end
  
     # Inexact field
-    R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+    R, x = PowerSeriesRing(RealField, 10, "x")
     for iter = 1:300
        f = rand(R, 0:10, -1:1)
        g = f^2
@@ -672,7 +672,7 @@ function test_rel_series_exact_division()
    print("Generic.RelSeries.exact_division...")
 
    # Exact ring
-   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       s = rand(0:12)
       f = rand(R, s:s, -10:10)
@@ -688,7 +688,7 @@ function test_rel_series_exact_division()
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   R, x = PowerSeriesRing(RealField, 10, "x")
    for iter = 1:300
       s = rand(0:12)
       f = rand(R, s:s, -1:1)
@@ -704,7 +704,7 @@ function test_rel_series_exact_division()
    end
 
    # Non-integral domain
-   T = ResidueRing(JuliaZZ, 6)
+   T = ResidueRing(ZZ, 6)
    R, x = PowerSeriesRing(T, 10, "x")
    for iter = 1:300
       s = rand(0:12)
@@ -727,31 +727,31 @@ function test_rel_series_adhoc_exact_division()
    print("Generic.RelSeries.adhoc_exact_division...")
 
    # Exact field
-   R, x = PowerSeriesRing(JuliaZZ, 10, "x")
+   R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -10:10)
-      c = JuliaZZ()
+      c = ZZ()
       while c == 0
-         c = rand(JuliaZZ, -10:10)
+         c = rand(ZZ, -10:10)
       end
 
       @test isequal(divexact(f*c, c), f)
    end
 
    # Inexact field
-   R, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   R, x = PowerSeriesRing(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, -1:1)
-      c = JuliaRealField()
+      c = RealField()
       while isapprox(c, 0)
-         c = rand(JuliaRealField, -1:1)
+         c = rand(RealField, -1:1)
       end
 
       @test isapprox(divexact(f*c, c), f)
    end
 
    # Non-integral domain
-   T = ResidueRing(JuliaZZ, 6)
+   T = ResidueRing(ZZ, 6)
    R, x = PowerSeriesRing(T, 10, "x")
    for iter = 1:300
       f = rand(R, 0:12, 0:5)
@@ -770,7 +770,7 @@ function test_rel_series_special_functions()
    print("Generic.RelSeries.special_functions...")
 
    # Exact field
-   S, x = PowerSeriesRing(JuliaQQ, 10, "x")
+   S, x = PowerSeriesRing(QQ, 10, "x")
 
    for iter = 1:100
       @test exp(x + O(x^iter)) == exp(x + O(x^(iter - 1)))
@@ -790,7 +790,7 @@ function test_rel_series_special_functions()
    end
 
    # Inexact field
-   S, x = PowerSeriesRing(JuliaRealField, 10, "x")
+   S, x = PowerSeriesRing(RealField, 10, "x")
 
    for iter = 1:100
       @test isapprox(exp(x + O(x^iter)), exp(x + O(x^(iter - 1))))
@@ -810,7 +810,7 @@ function test_rel_series_special_functions()
    end
 
    # Non-integral domain
-   R = ResidueRing(JuliaZZ, 143)
+   R = ResidueRing(ZZ, 143)
    S, x = PowerSeriesRing(R, 10, "x")
 
    for iter = 1:10

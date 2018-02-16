@@ -1,7 +1,7 @@
 function test_gen_mpoly_constructors()
    print("Generic.MPoly.constructors...")
 
-   R, x = JuliaZZ["y"]
+   R, x = ZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -46,7 +46,7 @@ end
 function test_gen_mpoly_manipulation()
    print("Generic.MPoly.manipulation...")
 
-   R, x = JuliaZZ["y"]
+   R, x = ZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -116,7 +116,7 @@ end
 function test_gen_mpoly_unary_ops()
    print("Generic.MPoly.unary_ops...")
 
-   R, x = JuliaZZ["y"]
+   R, x = ZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -137,7 +137,7 @@ end
 function test_gen_mpoly_binary_ops()
    print("Generic.MPoly.binary_ops...")
 
-   R, x = JuliaZZ["y"]
+   R, x = ZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -166,7 +166,7 @@ end
 function test_gen_mpoly_adhoc_binary()
    print("Generic.MPoly.adhoc_binary...")
 
-   R, x = JuliaZZ["y"]
+   R, x = ZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -206,7 +206,7 @@ end
 function test_gen_mpoly_adhoc_comparison()
    print("Generic.MPoly.adhoc_comparison...")
 
-   R, x = JuliaZZ["y"]
+   R, x = ZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -233,7 +233,7 @@ end
 function test_gen_mpoly_powering()
    print("Generic.MPoly.powering...")
 
-   R, x = JuliaZZ["y"]
+   R, x = ZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -261,7 +261,7 @@ end
 function test_gen_mpoly_divides()
    print("Generic.MPoly.divides...")
 
-   R, x = JuliaZZ["y"]
+   R, x = ZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -295,7 +295,7 @@ end
 function test_gen_mpoly_euclidean_division()
    print("Generic.MPoly.euclidean_division...")
 
-   R, x = JuliaQQ["y"]
+   R, x = QQ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -335,7 +335,7 @@ end
 function test_gen_mpoly_ideal_reduction()
    print("Generic.MPoly.ideal_reduction...")
 
-   R, x = JuliaQQ["y"]
+   R, x = QQ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -392,7 +392,7 @@ function test_gen_mpoly_gcd()
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
 
-      S, varlist = PolynomialRing(JuliaZZ, var_names, ordering = ord)
+      S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
 
       for iter = 1:10
          f = rand(S, 0:4, 0:5, -10:10)
@@ -412,7 +412,7 @@ end
 function test_gen_mpoly_evaluation()
    print("Generic.MPoly.evaluation...")
 
-   R, x = JuliaZZ["y"]
+   R, x = ZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -456,7 +456,7 @@ end
 function test_gen_mpoly_valuation()
    print("Generic.MPoly.valuation...")
 
-   R, x = JuliaZZ["y"]
+   R, x = ZZ["y"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]

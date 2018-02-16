@@ -2,7 +2,7 @@ function test_Integers_constructors()
    print("Julia.Integers.constructors...")
 
    R = zz
-   S = JuliaZZ
+   S = ZZ
 
    @test elem_type(R) == Int
    @test elem_type(S) == BigInt
@@ -34,7 +34,7 @@ function test_Integers_manipulation()
    print("Julia.Integers.manipulation...")
 
    R = zz
-   S = JuliaZZ
+   S = ZZ
 
    @test iszero(zero(R))
    @test iszero(zero(S))
@@ -58,7 +58,7 @@ function test_Integers_modular_arithmetic()
    print("Julia.Integers.modular_arithmetic...")
 
    R = zz
-   S = JuliaZZ
+   S = ZZ
 
    for iter = 1:100
       a = R(1)
@@ -85,7 +85,7 @@ function test_Integers_exact_division()
    print("Julia.Integers.exact_division...")
   
    R = zz
-   S = JuliaZZ
+   S = ZZ
 
    for iter = 1:1000
       a1 = rand(R, -100:100)
@@ -118,7 +118,7 @@ function test_Integers_gcd()
    print("Julia.Integers.gcd...")
   
    R = zz
-   S = JuliaZZ
+   S = ZZ
 
    n = 23*31
 
@@ -145,7 +145,7 @@ function test_Integers_square_root()
    print("Julia.Integers.square_root...")
   
    R = zz
-   S = JuliaZZ
+   S = ZZ
 
    for iter = 1:1000
       r = rand(R, 0:1000)

@@ -19,7 +19,7 @@
 function test_gen_poly_constructors()
    print("Generic.Poly.constructors...")
 
-   R, x = JuliaZZ["x"]
+   R, x = ZZ["x"]
    S, y = R["y"]
 
    @test elem_type(S) == Generic.Poly{elem_type(R)}
@@ -31,7 +31,7 @@ function test_gen_poly_constructors()
 
    @test isa(y, PolyElem)
 
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
    @test typeof(S) <: Generic.PolyRing
@@ -72,7 +72,7 @@ function test_gen_poly_constructors()
 
    @test isa(m, PolyElem)
 
-   n = S([JuliaZZ(1), JuliaZZ(2), JuliaZZ(3)])
+   n = S([ZZ(1), ZZ(2), ZZ(3)])
 
    @test isa(n, PolyElem)
 
@@ -82,7 +82,7 @@ end
 function test_gen_poly_manipulation()
    print("Generic.Poly.manipulation...")
 
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
    @test iszero(zero(S))
@@ -126,7 +126,7 @@ function test_gen_poly_binary_ops()
    print("Generic.Poly.binary_ops...")
 
    #  Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
    for iter = 1:100
       f = rand(R, 0:10, -10:10)
       g = rand(R, 0:10, -10:10)
@@ -159,7 +159,7 @@ function test_gen_poly_binary_ops()
    end
 
    #  Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
    for iter = 1:100
       f = rand(R, 0:10, -1:1)
       g = rand(R, 0:10, -1:1)
@@ -173,7 +173,7 @@ function test_gen_poly_binary_ops()
    end
 
    # Non-integral domain
-   T = ResidueRing(JuliaZZ, 6)
+   T = ResidueRing(ZZ, 6)
    R, x = T["x"]
    for iter = 1:100
       f = rand(R, 0:10, 0:5)
@@ -194,11 +194,11 @@ function test_gen_poly_adhoc_binary()
    print("Generic.Poly.adhoc_binary...")
 
    # Exact ring
-   R, x = JuliaZZ["x"]
+   R, x = ZZ["x"]
    for iter = 1:500
       f = rand(R, 0:10, -10:10)
-      c1 = rand(JuliaZZ, -10:10)
-      c2 = rand(JuliaZZ, -10:10)
+      c1 = rand(ZZ, -10:10)
+      c2 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
       d2 = rand(zz, -10:10)
 
@@ -220,8 +220,8 @@ function test_gen_poly_adhoc_binary()
    R, x = PolynomialRing(F, "x")
    for iter = 1:500
       f = rand(R, 0:10, 0:1)
-      c1 = rand(JuliaZZ, -10:10)
-      c2 = rand(JuliaZZ, -10:10)
+      c1 = rand(ZZ, -10:10)
+      c2 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
       d2 = rand(zz, -10:10)
 
@@ -237,13 +237,13 @@ function test_gen_poly_adhoc_binary()
    end
 
    # Inexact field
-   R, x = JuliaRealField["x"]
+   R, x = RealField["x"]
    for iter = 1:500
       f = rand(R, 0:10, -1:1)
-      c1 = rand(JuliaZZ, -10:10)
-      c2 = rand(JuliaZZ, -10:10)
-      d1 = rand(JuliaRealField, -1:1)
-      d2 = rand(JuliaRealField, -1:1)
+      c1 = rand(ZZ, -10:10)
+      c2 = rand(ZZ, -10:10)
+      d1 = rand(RealField, -1:1)
+      d2 = rand(RealField, -1:1)
 
       @test isapprox(c1*f - c2*f, (c1 - c2)*f)
       @test isapprox(c1*f + c2*f, (c1 + c2)*f)
@@ -257,12 +257,12 @@ function test_gen_poly_adhoc_binary()
    end
 
    # Non-integral domain
-   R = ResidueRing(JuliaZZ, 6)
+   R = ResidueRing(ZZ, 6)
    S, x = R["x"]
    for iter = 1:500
       f = rand(S, 0:10, 0:5)
-      c1 = rand(JuliaZZ, -10:10)
-      c2 = rand(JuliaZZ, -10:10)
+      c1 = rand(ZZ, -10:10)
+      c2 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
       d2 = rand(zz, -10:10)
       a1 = rand(R, 0:5)
@@ -284,12 +284,12 @@ function test_gen_poly_adhoc_binary()
    end
 
    # Generic tower
-   R, x = JuliaZZ["x"]
+   R, x = ZZ["x"]
    S, y = R["y"]
    for iter = 1:100
       f = rand(S, 0:10, 0:5, -10:10)
-      c1 = rand(JuliaZZ, -10:10)
-      c2 = rand(JuliaZZ, -10:10)
+      c1 = rand(ZZ, -10:10)
+      c2 = rand(ZZ, -10:10)
       d1 = rand(R, 0:5, -10:10)
       d2 = rand(R, 0:5, -10:10)
 
@@ -311,7 +311,7 @@ function test_gen_poly_comparison()
    print("Generic.Poly.comparison...")
 
    # Exact ring
-   R, x = JuliaZZ["x"]
+   R, x = ZZ["x"]
    for iter = 1:500
       f = rand(R, 0:10, -10:10)
       g = deepcopy(f)
@@ -344,7 +344,7 @@ function test_gen_poly_comparison()
    end
 
    # Inexact field
-   R, x = JuliaRealField["x"]
+   R, x = RealField["x"]
    for iter = 1:500
       f = rand(R, 0:10, -1:1)
       g = deepcopy(f)
@@ -359,7 +359,7 @@ function test_gen_poly_comparison()
    end
 
    # Non-integral domain
-   R = ResidueRing(JuliaZZ, 6)
+   R = ResidueRing(ZZ, 6)
    S, x = R["x"]
    for iter = 1:500
       f = rand(S, 0:10, 0:5)
@@ -381,13 +381,13 @@ function test_gen_poly_adhoc_comparison()
    print("Generic.Poly.adhoc_comparison...")
 
    # Exact ring
-   R, x = JuliaZZ["x"]
+   R, x = ZZ["x"]
    for iter = 1:500
       f = R()
       while iszero(f)
          f = rand(R, 0:10, -10:10)
       end
-      c1 = rand(JuliaZZ, -10:10)
+      c1 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
 
       @test R(c1) == c1
@@ -411,7 +411,7 @@ function test_gen_poly_adhoc_comparison()
       while iszero(f)
          f = rand(R, 0:10, 0:1)
       end
-      c1 = rand(JuliaZZ, -10:10)
+      c1 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
 
       @test R(c1) == c1
@@ -426,14 +426,14 @@ function test_gen_poly_adhoc_comparison()
    end
 
    # Inexact field
-   R, x = JuliaRealField["x"]
+   R, x = RealField["x"]
    for iter = 1:500
       f = R()
       while iszero(f)
          f = rand(R, 0:10, -1:1)
       end
-      c1 = rand(JuliaZZ, -10:10)
-      d1 = rand(JuliaRealField, -1:1)
+      c1 = rand(ZZ, -10:10)
+      d1 = rand(RealField, -1:1)
 
       @test R(c1) == c1
       @test c1 == R(c1)
@@ -447,14 +447,14 @@ function test_gen_poly_adhoc_comparison()
    end
 
    # Non-integral domain
-   R = ResidueRing(JuliaZZ, 6)
+   R = ResidueRing(ZZ, 6)
    S, x = R["x"]
    for iter = 1:500
       f = S()
       while iszero(f)
          f = rand(S, 0:10, 0:5)
       end
-      c1 = rand(JuliaZZ, -10:10)
+      c1 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
       a1 = rand(R, 0:5)
 
@@ -474,14 +474,14 @@ function test_gen_poly_adhoc_comparison()
    end
 
    # Generic tower
-   R, x = JuliaZZ["x"]
+   R, x = ZZ["x"]
    S, y = R["y"]
    for iter = 1:100
       f = S()
       while iszero(f)
          f = rand(S, 0:10, 0:5, -10:10)
       end
-      c1 = rand(JuliaZZ, -10:10)
+      c1 = rand(ZZ, -10:10)
       d1 = rand(R, 0:5, -10:10)
 
       @test S(c1) == c1
@@ -502,7 +502,7 @@ function test_gen_poly_unary_ops()
    print("Generic.Poly.unary_ops...")
 
    #  Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
    for iter = 1:300
       f = rand(R, 0:10, -10:10)
 
@@ -523,7 +523,7 @@ function test_gen_poly_unary_ops()
    end
 
    #  Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
    for iter = 1:300
       f = rand(R, 0:10, -1:1)
 
@@ -532,7 +532,7 @@ function test_gen_poly_unary_ops()
    end
 
    # Non-integral domain
-   T = ResidueRing(JuliaZZ, 6)
+   T = ResidueRing(ZZ, 6)
    R, x = T["x"]
    for iter = 1:300
       f = rand(R, 0:10, 0:5)
@@ -548,7 +548,7 @@ function test_gen_poly_truncation()
    print("Generic.Poly.truncation...")
 
    #  Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
    for iter = 1:300
       f = rand(R, 0:10, -10:10)
       g = rand(R, 0:10, -10:10)
@@ -571,7 +571,7 @@ function test_gen_poly_truncation()
    end
 
    #  Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
    for iter = 1:300
       f = rand(R, 0:10, -1:1)
       g = rand(R, 0:10, -1:1)
@@ -581,7 +581,7 @@ function test_gen_poly_truncation()
    end
 
    # Non-integral domain
-   T = ResidueRing(JuliaZZ, 6)
+   T = ResidueRing(ZZ, 6)
    R, x = T["x"]
    for iter = 1:300
       f = rand(R, 0:10, 0:5)
@@ -601,7 +601,7 @@ function test_gen_poly_reverse()
    print("Generic.Poly.reverse...")
 
    #  Exact ring
-   R, x = JuliaZZ["x"]
+   R, x = ZZ["x"]
    for iter = 1:300
       f = rand(R, 0:10, -10:10)
       len = rand(length(f):12)
@@ -642,7 +642,7 @@ function test_gen_poly_reverse()
    end
 
    #  Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
    for iter = 1:300
       f = rand(R, 0:10, -1:1)
       len = rand(length(f):12)
@@ -661,7 +661,7 @@ function test_gen_poly_reverse()
    end
 
    #  Non-integral domain
-   T = ResidueRing(JuliaZZ, 6)
+   T = ResidueRing(ZZ, 6)
    R, x = T["x"]
    for iter = 1:300
       f = rand(R, 0:10, 0:5)
@@ -687,7 +687,7 @@ function test_gen_poly_shift()
    print("Generic.Poly.shift...")
 
    # Exact ring
-   R, x = JuliaZZ["x"]
+   R, x = ZZ["x"]
    for iter = 1:300
       f = rand(R, 0:10, -10:10)
       s = rand(0:10)
@@ -714,7 +714,7 @@ function test_gen_poly_shift()
    end
 
    # Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
    for iter = 1:300
       f = rand(R, 0:10, -1:1)
       s = rand(0:10)
@@ -726,7 +726,7 @@ function test_gen_poly_shift()
    end
 
    # Non-integral domain
-   T = ResidueRing(JuliaZZ, 6)
+   T = ResidueRing(ZZ, 6)
    R, x = T["x"]
    for iter = 1:300
       f = rand(R, 0:10, 0:5)
@@ -745,7 +745,7 @@ function test_gen_poly_powering()
    print("Generic.Poly.powering...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:10
       f = rand(R, 0:10, -10:10)
@@ -780,7 +780,7 @@ function test_gen_poly_powering()
    end
 
    # Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
 
    for iter = 1:10
       f = rand(R, 0:10, -1:1)
@@ -799,7 +799,7 @@ function test_gen_poly_powering()
    for iter = 1:10
       n = rand(2:26)
 
-      Zn = ResidueRing(JuliaZZ, n)
+      Zn = ResidueRing(ZZ, n)
       R, x = PolynomialRing(Zn, "x")
 
       f = rand(R, 0:10, 0:n - 1)
@@ -821,7 +821,7 @@ function test_gen_poly_modular_arithmetic()
    print("Generic.Poly.modular_arithmetic...")
 
    # Exact ring
-   R = ResidueRing(JuliaZZ, 23)
+   R = ResidueRing(ZZ, 23)
    S, x = PolynomialRing(R, "x")
 
    for iter = 1:100
@@ -911,7 +911,7 @@ function test_gen_poly_modular_arithmetic()
    end
 
    # Inexact field
-   S, x = PolynomialRing(JuliaRealField, "x")
+   S, x = PolynomialRing(RealField, "x")
 
    for iter = 1:100
       f = rand(S, 0:5, -1:1)
@@ -954,7 +954,7 @@ function test_gen_poly_modular_arithmetic()
    end
 
    # Exact field
-   R, x = PolynomialRing(JuliaQQ, "y")
+   R, x = PolynomialRing(QQ, "y")
 
    for iter = 1:10
       f = rand(R, 0:5, -10:10)
@@ -1003,7 +1003,7 @@ function test_gen_poly_exact_division()
    print("Generic.Poly.exact_division...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:100
       f = rand(R, 0:10, -100:100)
@@ -1032,7 +1032,7 @@ function test_gen_poly_exact_division()
    end
 
    # Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
 
    for iter = 1:100
       f = rand(R, 0:10, -1:1)
@@ -1046,7 +1046,7 @@ function test_gen_poly_exact_division()
 
    # Characteristic p ring
    n = 23
-   Zn = ResidueRing(JuliaZZ, n)
+   Zn = ResidueRing(ZZ, n)
    R, x = PolynomialRing(Zn, "x")
 
    for iter = 1:100
@@ -1066,13 +1066,13 @@ function test_gen_poly_adhoc_exact_division()
    print("Generic.Poly.adhoc_exact_division...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:100
       f = rand(R, 0:10, -100:100)
-      g = JuliaZZ()
+      g = ZZ()
       while g == 0
-         g = rand(JuliaZZ, -10:10)
+         g = rand(ZZ, -10:10)
       end
 
       @test divexact(f*g, g) == f
@@ -1093,9 +1093,9 @@ function test_gen_poly_adhoc_exact_division()
 
    for iter = 1:100
       f = rand(R, 0:10, 0:1)
-      g = JuliaZZ()
+      g = ZZ()
       while g == 0
-         g = rand(JuliaZZ, 1:6)
+         g = rand(ZZ, 1:6)
       end
 
       @test divexact(f*g, g) == f
@@ -1109,13 +1109,13 @@ function test_gen_poly_adhoc_exact_division()
    end
 
    # Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
 
    for iter = 1:100
       f = rand(R, 0:10, -1:1)
-      g = JuliaZZ()
+      g = ZZ()
       while g == 0
-         g = rand(JuliaRealField, -1:1)
+         g = rand(RealField, -1:1)
       end
 
       @test isapprox(divexact(f*g, g), f)
@@ -1130,7 +1130,7 @@ function test_gen_poly_adhoc_exact_division()
 
    # Characteristic p ring
    n = 23
-   Zn = ResidueRing(JuliaZZ, n)
+   Zn = ResidueRing(ZZ, n)
    R, x = PolynomialRing(Zn, "x")
 
    for iter = 1:100
@@ -1148,7 +1148,7 @@ function test_gen_poly_adhoc_exact_division()
    end
 
    # Generic tower
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
    for iter = 1:100
@@ -1160,9 +1160,9 @@ function test_gen_poly_adhoc_exact_division()
 
       @test divexact(f*g, g) == f
 
-      h = JuliaZZ()
+      h = ZZ()
       while h == 0
-         h = rand(JuliaZZ, -10:10)
+         h = rand(ZZ, -10:10)
       end
 
       @test divexact(f*h, h) == f
@@ -1175,7 +1175,7 @@ function test_gen_poly_euclidean_division()
    print("Generic.Poly.euclidean_division...")
 
    # Exact ring
-   R = ResidueRing(JuliaZZ, 23)
+   R = ResidueRing(ZZ, 23)
    S, x = PolynomialRing(R, "x")
 
    for iter = 1:100
@@ -1233,7 +1233,7 @@ function test_gen_poly_euclidean_division()
    end
 
    # Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
 
    for iter = 1:100
       f = rand(R, 0:5, -1:1)
@@ -1260,7 +1260,7 @@ function test_gen_poly_euclidean_division()
    end
 
    # Exact field
-   R, x = PolynomialRing(JuliaQQ, "x")
+   R, x = PolynomialRing(QQ, "x")
 
    for iter = 1:100
       f = rand(R, 0:5, -10:10)
@@ -1293,7 +1293,7 @@ function test_gen_poly_pseudodivision()
    print("Generic.Poly.pseudodivision...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:100
       f = rand(R, 0:5, -10:10)
@@ -1314,7 +1314,7 @@ function test_gen_poly_pseudodivision()
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(JuliaZZ, 23)
+   Zn = ResidueRing(ZZ, 23)
    R, x = PolynomialRing(Zn, "x")
 
    for iter = 1:100
@@ -1342,14 +1342,14 @@ function test_gen_poly_content_primpart_gcd()
    print("Generic.Poly.content_primpart_gcd...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:100
       f = rand(R, 0:10, -10:10)
 
       g = R()
       while g == 0
-         g = rand(JuliaZZ, -10:10)
+         g = rand(ZZ, -10:10)
       end
 
       @test content(f*g) == divexact(g, canonical_unit(g))*content(f)
@@ -1371,14 +1371,14 @@ function test_gen_poly_content_primpart_gcd()
    end
 
    # Exact field
-   R, x = PolynomialRing(JuliaQQ, "x")
+   R, x = PolynomialRing(QQ, "x")
 
    for iter = 1:100
       f = rand(R, 0:5, -10:10)
 
-      g = JuliaQQ()
+      g = QQ()
       while g == 0
-         g = rand(JuliaQQ, -10:10)
+         g = rand(QQ, -10:10)
       end
 
       @test content(f*g) == content(f)
@@ -1413,7 +1413,7 @@ function test_gen_poly_content_primpart_gcd()
    end
 
    # Characteristic p ring
-   R = ResidueRing(JuliaZZ, 23)
+   R = ResidueRing(ZZ, 23)
    S, x = PolynomialRing(R, "x")
 
    for iter = 1:100
@@ -1478,13 +1478,13 @@ function test_gen_poly_evaluation()
    print("Generic.Poly.evaluation...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
       f = rand(R, 0:4, -10:10)
       g = rand(R, 0:4, -10:10)
 
-      d = rand(JuliaZZ, -10:10)
+      d = rand(ZZ, -10:10)
 
       @test evaluate(g, evaluate(f, d)) == evaluate(subst(g, f), d)
    end
@@ -1499,13 +1499,13 @@ function test_gen_poly_evaluation()
    end
 
    # Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
 
    for iter in 1:10
       f = rand(R, 0:4, 0:1)
       g = rand(R, 0:4, 0:1)
 
-      d = rand(JuliaRealField, 0:1)
+      d = rand(RealField, 0:1)
 
       @test isapprox(evaluate(g, evaluate(f, d)), evaluate(subst(g, f), d))
    end
@@ -1520,7 +1520,7 @@ function test_gen_poly_evaluation()
    end
 
    # Non-integral domain
-   Zn = ResidueRing(JuliaZZ, 23)
+   Zn = ResidueRing(ZZ, 23)
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
@@ -1548,7 +1548,7 @@ function test_gen_poly_composition()
    print("Generic.Poly.composition...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
       f = rand(R, 0:5, -10:10)
@@ -1559,7 +1559,7 @@ function test_gen_poly_composition()
    end
 
    # Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
 
    for iter in 1:10
       f = rand(R, 0:5, 0:1)
@@ -1570,7 +1570,7 @@ function test_gen_poly_composition()
    end
 
    # Non-integral domain
-   Zn = ResidueRing(JuliaZZ, 6)
+   Zn = ResidueRing(ZZ, 6)
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
@@ -1588,7 +1588,7 @@ function test_gen_poly_derivative()
    print("Generic.Poly.derivative...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
       f = rand(R, 0:4, -100:100)
@@ -1600,7 +1600,7 @@ function test_gen_poly_derivative()
    end
 
    # Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
 
    for iter in 1:10
       f = rand(R, 0:4, 0:1)
@@ -1612,7 +1612,7 @@ function test_gen_poly_derivative()
    end
 
    # Non-integral domain
-   Zn = ResidueRing(JuliaZZ, 6)
+   Zn = ResidueRing(ZZ, 6)
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
@@ -1631,7 +1631,7 @@ function test_gen_poly_integral()
    print("Generic.Poly.integral...")
 
    # Exact field
-   R, x = PolynomialRing(JuliaQQ, "x")
+   R, x = PolynomialRing(QQ, "x")
 
    for iter in 1:10
       f = rand(R, 0:10, -100:100)
@@ -1645,7 +1645,7 @@ function test_gen_poly_integral()
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(JuliaZZ, 23)
+   Zn = ResidueRing(ZZ, 23)
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
@@ -1660,7 +1660,7 @@ function test_gen_poly_integral()
    end
 
    # Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
 
    for iter in 1:10
       f = rand(R, 0:10, 0:1)
@@ -1680,7 +1680,7 @@ function test_gen_poly_resultant()
    print("Generic.Poly.resultant...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
       f = rand(R, 0:5, -10:10)
@@ -1695,7 +1695,7 @@ function test_gen_poly_resultant()
    end
 
    # Exact field
-   R, x = PolynomialRing(JuliaQQ, "x")
+   R, x = PolynomialRing(QQ, "x")
 
    for iter in 1:10
       f = rand(R, 0:5, -10:10)
@@ -1711,7 +1711,7 @@ function test_gen_poly_resultant()
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(JuliaZZ, 23)
+   Zn = ResidueRing(ZZ, 23)
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
@@ -1742,7 +1742,7 @@ function test_gen_poly_resultant()
    end
 
    # Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
 
    for iter in 1:10
       f = rand(R, 0:5, 0:1)
@@ -1756,7 +1756,7 @@ function test_gen_poly_resultant()
    end
 
    # Non-integral domain
-   Zn = ResidueRing(JuliaZZ, 6)
+   Zn = ResidueRing(ZZ, 6)
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
@@ -1775,7 +1775,7 @@ function test_gen_poly_discriminant()
    print("Generic.Poly.discriminant...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:100
       f = R()
@@ -1791,7 +1791,7 @@ function test_gen_poly_discriminant()
    end
 
    # Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
 
    for iter = 1:100
       f = R()
@@ -1808,7 +1808,7 @@ function test_gen_poly_discriminant()
 
 #   TODO: Fix issue #291
 #   # Non-integral domain
-#   Zn = ResidueRing(JuliaZZ, 6)
+#   Zn = ResidueRing(ZZ, 6)
 #   R, x = PolynomialRing(Zn, "x")
 #
 #   for iter = 1:100
@@ -1831,7 +1831,7 @@ function test_gen_poly_resx()
    print("Generic.Poly.resx...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:100
       f = R()
@@ -1852,7 +1852,7 @@ function test_gen_poly_resx()
    end
 
    # Exact field
-   R, x = PolynomialRing(JuliaQQ, "x")
+   R, x = PolynomialRing(QQ, "x")
 
    for iter in 1:100
       f = R()
@@ -1873,7 +1873,7 @@ function test_gen_poly_resx()
    end
 
    # Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
 
    for iter in 1:100
       f = R()
@@ -1894,7 +1894,7 @@ function test_gen_poly_resx()
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(JuliaZZ, 23)
+   Zn = ResidueRing(ZZ, 23)
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:100
@@ -1940,7 +1940,7 @@ function test_gen_poly_resx()
 #   Test will cause impossible inverse in the mean time
 #
 #   # Non-integral domain
-#   Zn = ResidueRing(JuliaZZ, 6)
+#   Zn = ResidueRing(ZZ, 6)
 #   R, x = PolynomialRing(Zn, "x")
 #
 #   for iter in 1:100
@@ -1969,7 +1969,7 @@ function test_gen_poly_gcdx()
    print("Generic.Poly.gcdx...")
 
    # Exact field
-   R, x = PolynomialRing(JuliaQQ, "x")
+   R, x = PolynomialRing(QQ, "x")
 
    for iter in 1:100
       f = R()
@@ -1991,7 +1991,7 @@ function test_gen_poly_gcdx()
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(JuliaZZ, 23)
+   Zn = ResidueRing(ZZ, 23)
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:100
@@ -2064,13 +2064,13 @@ function test_gen_poly_newton_representation()
    print("Generic.Poly.newton_representation...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
       f = rand(R, 0:10, -100:100)
 
       g = deepcopy(f)
-      roots = BigInt[rand(JuliaZZ, -10:10) for i in 1:length(f)]
+      roots = BigInt[rand(ZZ, -10:10) for i in 1:length(f)]
       monomial_to_newton!(g.coeffs, roots)
       newton_to_monomial!(g.coeffs, roots)
 
@@ -2078,13 +2078,13 @@ function test_gen_poly_newton_representation()
    end
 
    # Exact field
-   R, x = PolynomialRing(JuliaQQ, "x")
+   R, x = PolynomialRing(QQ, "x")
 
    for iter in 1:10
       f = rand(R, 0:10, -100:100)
 
       g = deepcopy(f)
-      roots = Rational{BigInt}[rand(JuliaQQ, -10:10) for i in 1:length(f)]
+      roots = Rational{BigInt}[rand(QQ, -10:10) for i in 1:length(f)]
       monomial_to_newton!(g.coeffs, roots)
       newton_to_monomial!(g.coeffs, roots)
 
@@ -2092,13 +2092,13 @@ function test_gen_poly_newton_representation()
    end
 
    # Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
 
    for iter in 1:10
       f = rand(R, 0:10, 0:1)
 
       g = deepcopy(f)
-      roots = BigFloat[rand(JuliaRealField, 0:1) for i in 1:length(f)]
+      roots = BigFloat[rand(RealField, 0:1) for i in 1:length(f)]
       monomial_to_newton!(g.coeffs, roots)
       newton_to_monomial!(g.coeffs, roots)
 
@@ -2106,7 +2106,7 @@ function test_gen_poly_newton_representation()
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(JuliaZZ, 23)
+   Zn = ResidueRing(ZZ, 23)
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
@@ -2136,7 +2136,7 @@ function test_gen_poly_newton_representation()
    end
 
    # Non-integral domain
-   Zn = ResidueRing(JuliaZZ, 6)
+   Zn = ResidueRing(ZZ, 6)
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
@@ -2157,7 +2157,7 @@ function test_gen_poly_interpolation()
    print("Generic.Poly.interpolation...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
       p = R()
@@ -2174,7 +2174,7 @@ function test_gen_poly_interpolation()
    end
 
    # Exact field
-   R, x = PolynomialRing(JuliaQQ, "x")
+   R, x = PolynomialRing(QQ, "x")
 
    for iter in 1:10
       p = R()
@@ -2191,7 +2191,7 @@ function test_gen_poly_interpolation()
    end
 
    # Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
 
    for iter in 1:10
       p = R()
@@ -2208,7 +2208,7 @@ function test_gen_poly_interpolation()
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(JuliaZZ, 23)
+   Zn = ResidueRing(ZZ, 23)
    R, x = PolynomialRing(Zn, "x")
 
    for iter in 1:10
@@ -2245,7 +2245,7 @@ function test_gen_poly_interpolation()
 
 #   TODO: Fix issue #294 (if possible)
 #   # Non-integral domain
-#   Zn = ResidueRing(JuliaZZ, 6)
+#   Zn = ResidueRing(ZZ, 6)
 #   R, x = PolynomialRing(Zn, "x")
 #
 #   for iter in 1:10
@@ -2269,7 +2269,7 @@ function test_gen_poly_special()
    print("Generic.Poly.special...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    for n in 10:20
       T = chebyshev_t(n, x)
@@ -2288,7 +2288,7 @@ function test_gen_poly_special()
    end
 
    # Exact field
-   R, x = PolynomialRing(JuliaQQ, "x")
+   R, x = PolynomialRing(QQ, "x")
 
    for n in 10:20
       T = chebyshev_t(n, x)
@@ -2307,7 +2307,7 @@ function test_gen_poly_special()
    end
 
    # Inexact field
-   R, x = PolynomialRing(JuliaRealField, "x")
+   R, x = PolynomialRing(RealField, "x")
 
    for n in 10:20
       T = chebyshev_t(n, x)
@@ -2326,7 +2326,7 @@ function test_gen_poly_special()
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(JuliaZZ, 23)
+   Zn = ResidueRing(ZZ, 23)
    R, x = PolynomialRing(Zn, "x")
 
    for n in 10:20
@@ -2365,7 +2365,7 @@ function test_gen_poly_special()
    end
 
    # Non-integral domain
-   Zn = ResidueRing(JuliaZZ, 6)
+   Zn = ResidueRing(ZZ, 6)
    R, x = PolynomialRing(Zn, "x")
 
    for n in 10:20
@@ -2391,7 +2391,7 @@ function test_gen_poly_mul_karatsuba()
    print("Generic.Poly.mul_karatsuba...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
    T, z = PolynomialRing(S, "z")
 
@@ -2407,7 +2407,7 @@ function test_gen_poly_mul_ks()
    print("Generic.Poly.mul_ks...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
    T, z = PolynomialRing(S, "z")
 
@@ -2423,7 +2423,7 @@ function test_gen_poly_remove_valuation()
    print("Generic.Poly.remove_valuation...")
 
    # Exact ring
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:10
       d = true
@@ -2461,7 +2461,7 @@ function test_gen_poly_remove_valuation()
    end
 
    # Exact field
-   R, x = PolynomialRing(JuliaQQ, "x")
+   R, x = PolynomialRing(QQ, "x")
 
    for iter = 1:10
       d = true
@@ -2499,7 +2499,7 @@ function test_gen_poly_remove_valuation()
    end
 
    # Characteristic p ring
-   Zn = ResidueRing(JuliaZZ, 23)
+   Zn = ResidueRing(ZZ, 23)
    R, x = PolynomialRing(Zn, "x")
 
    for iter = 1:10
@@ -2581,7 +2581,7 @@ end
 function test_gen_poly_generic_eval()
    print("Generic.Poly.generic_eval...")
 
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
       f = rand(R, 0:2, -100:100)
@@ -2591,10 +2591,10 @@ function test_gen_poly_generic_eval()
       @test f(g(h)) == f(g)(h)
    end
 
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
 
    f = x
-   b = a = JuliaQQ(13)
+   b = a = QQ(13)
    for i in 1:5
       g = x^2 + rand(R, 0:1, -1:1)
       f = g(f)
