@@ -6,19 +6,21 @@ interface, some additional functions are required to be present for residue ring
 
 ## Types and parents
 
-AbstractAlgebra provides two abstract types for residue rings and their elements:
+AbstractAlgebra provides four abstract types for residue rings and their elements:
 
   * `ResRing{T}` is the abstract type for residue ring parent types
+  * `ResField{T}` is the abstract type for residue rings known to be fields
   * `ResElem{T}` is the abstract type for types of elements of residue rings (residues)
+  * `ResFieldElem{T}` is the abstract type for types of elements of residue fields
 
 We have that `ResRing{T} <: AbstractAlgebra.Ring` and 
 `ResElem{T} <: AbstractAlgebra.RingElem`.
 
-Note that both abstract types are parameterised. The type `T` should usually be the type
-of elements of the base ring of the residue ring.
+Note that these abstract types are parameterised. The type `T` should usually be the type
+of elements of the base ring of the residue ring/field.
 
-If the parent object for such a ring has type `MyResRing` and residues in that ring have
-type `MyRes` then one would have:
+If the parent object for a residue ring has type `MyResRing` and residues in that ring
+have type `MyRes` then one would have:
 
   * `MyResRing <: ResRing{BigInt}`
   * `MyRes <: ResElem{BigInt}`

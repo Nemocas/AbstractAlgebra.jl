@@ -21,7 +21,8 @@ makedocs(
                            "fraction_fields.md",
                            "fraction.md",
                            "rational.md",
-                           "finfield.md"],
+                           "finfield.md",
+                           "numberfield.md"],
              "matrix_spaces.md",
              "matrix.md",
              "types.md" # Appendix A
