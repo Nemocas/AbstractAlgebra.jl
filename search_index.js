@@ -1689,6 +1689,86 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "finfield.html#",
+    "page": "Finite fields",
+    "title": "Finite fields",
+    "category": "page",
+    "text": "CurrentModule = AbstractAlgebra"
+},
+
+{
+    "location": "finfield.html#Finite-fields-1",
+    "page": "Finite fields",
+    "title": "Finite fields",
+    "category": "section",
+    "text": "AbstractAlgebra.jl provides a module, implemented in src/julia/GF.jl for finite fields. The module is a naive implementation that supports only fields of degree 1 (prime fields). They are modelled as mathbbZpmathbbZ for p a prime."
+},
+
+{
+    "location": "finfield.html#Types-and-parent-objects-1",
+    "page": "Finite fields",
+    "title": "Types and parent objects",
+    "category": "section",
+    "text": "Finite fields have type GFField{T} where T is either Int or BigInt.Elements of such a finite field have type gfelem{T}."
+},
+
+{
+    "location": "finfield.html#AbstractAlgebra.GF-Union{Tuple{T}, Tuple{T}} where T<:Integer",
+    "page": "Finite fields",
+    "title": "AbstractAlgebra.GF",
+    "category": "Method",
+    "text": "GF{T <: Integer}(p::T)\n\nReturn the finite field mathbbF_p, where p is a prime. The integer p is not checked for primality, but the behaviour of the resulting object is undefined if p is composite.\n\n\n\n"
+},
+
+{
+    "location": "finfield.html#Finite-field-constructors-1",
+    "page": "Finite fields",
+    "title": "Finite field constructors",
+    "category": "section",
+    "text": "In order to construct finite fields in AbstractAlgebra.jl, one must first construct the field itself. This is accomplished with the following constructors.GF(p::T) where T <: IntegerHere are some examples of creating a finite field and making use of the resulting parent object to coerce various elements into the field.ExamplesF = GF(13)\n\ng = F(3)\nh = F(g)"
+},
+
+{
+    "location": "finfield.html#Basic-field-functionality-1",
+    "page": "Finite fields",
+    "title": "Basic field functionality",
+    "category": "section",
+    "text": "The finite field module in AbstractAlgebra.jl implements the full Field interface.We give some examples of such functionality.ExamplesF = GF(13)\n\nh = zero(F)\nk = one(F)\nisone(k) == true\niszero(f) == false\nU = base_ring(F)\nV = base_ring(h)\nT = parent(h)\nh == deepcopy(h)\nh = h + 2\nm = inv(k)"
+},
+
+{
+    "location": "finfield.html#AbstractAlgebra.Generic.gen-Union{Tuple{AbstractAlgebra.GFField{T}}, Tuple{T}} where T<:Integer",
+    "page": "Finite fields",
+    "title": "AbstractAlgebra.Generic.gen",
+    "category": "Method",
+    "text": "gen{T <: Integer}(a::GFField{T})\n\nReturn a generator of the field. Currently this returns 1.\n\n\n\n"
+},
+
+{
+    "location": "finfield.html#AbstractAlgebra.Generic.order-Tuple{AbstractAlgebra.GFField}",
+    "page": "Finite fields",
+    "title": "AbstractAlgebra.Generic.order",
+    "category": "Method",
+    "text": "order(R::GFField)\n\nReturn the order, i.e. the number of element in, the given finite field.\n\n\n\n"
+},
+
+{
+    "location": "finfield.html#AbstractAlgebra.Generic.degree-Tuple{AbstractAlgebra.GFField}",
+    "page": "Finite fields",
+    "title": "AbstractAlgebra.Generic.degree",
+    "category": "Method",
+    "text": "degree(R::GFField)\n\nReturn the degree of the given finite field.\n\n\n\n"
+},
+
+{
+    "location": "finfield.html#Basic-manipulation-of-fields-and-elements-1",
+    "page": "Finite fields",
+    "title": "Basic manipulation of fields and elements",
+    "category": "section",
+    "text": "gen{T <: Integer}(F::GFField{T})order(F::GFField)degree(F::GFField)ExamplesF = GF(13)\n\nd = degree(F)\nn = order(F)\ng = gen(F)"
+},
+
+{
     "location": "matrix_spaces.html#",
     "page": "Matrix Interface",
     "title": "Matrix Interface",
