@@ -1781,7 +1781,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Number fields",
     "title": "Number fields",
     "category": "section",
-    "text": "AbstractAlgebra.jl provides a very naive implementation of number fields. This allows arithmetic in algebraic number fields, which are currently modeled as mathbbZx modulo an irreducible polynomial, i.e. as a residue field.In fact, the definition of the number field constructor is currently given in src/generic/ResidueField.jl and no type is defined for a number field. The definition mainly exists for testing purposes. It may later be replaced by a more standard implementation. For a more fully fleshed out number field implementation (based on a very high performance C library), see Nemo.jl."
+    "text": "AbstractAlgebra.jl provides a very naive implementation of number fields. This allows arithmetic in algebraic number fields, which are currently modeled as mathbbQx modulo an irreducible polynomial, i.e. as a residue field.In fact, the definition of the number field constructor is currently given in src/generic/ResidueField.jl and no type is defined for a number field. The definition mainly exists for testing purposes. It may later be replaced by a more standard implementation. For a more fully fleshed out number field implementation (based on a very high performance C library), see Nemo.jl."
 },
 
 {
@@ -1789,7 +1789,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Number fields",
     "title": "Number field constructors",
     "category": "section",
-    "text": "In order to construct number fields in AbstractAlgebra.jl, one must first construct the field itself. This is accomplished with the following constructor.NumberField(f::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = \"\\$\"; cached = true)Given an irreducible defining polynomial f in mathbbZx, return a tuple (K x) consisting of the number field defined by that polynomial and a generator. The string fields are currently ignored, but are reserved for future use.Currently the generator of the number field prints the same way as the variable in mathbbZx.ExamplesR, x = PolynomialRing(QQ, \"x\")\nK, a = NumberField(R, x^3 + 3x + 1, \"a\")\n\nf = a^2 + 2a + 7"
+    "text": "In order to construct number fields in AbstractAlgebra.jl, one must first construct the field itself. This is accomplished with the following constructor.NumberField(f::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = \"\\$\"; cached = true)Given an irreducible defining polynomial f in mathbbQx, return a tuple (K x) consisting of the number field defined by that polynomial and a generator. The string fields are currently ignored, but are reserved for future use.Currently the generator of the number field prints the same way as the variable in mathbbQx.ExamplesR, x = PolynomialRing(QQ, \"x\")\nK, a = NumberField(R, x^3 + 3x + 1, \"a\")\n\nf = a^2 + 2a + 7"
 },
 
 {
