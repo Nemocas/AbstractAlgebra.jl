@@ -64,7 +64,7 @@ corresponding to the ring $\mathbb{Z}/7\mathbb{Z}$. We then create a new element
 of this ring by calling the parent object `R`.
 
 ```julia
-R = ResidueRing(JuliaZZ, 7)
+R = ResidueRing(ZZ, 7)
 a = R(3)
 ```
 
@@ -80,7 +80,7 @@ various relations between the objects and types.
 ```julia
 using AbstractAlgebra
 
-R, x = JuliaZZ["x"]
+R, x = ZZ["x"]
 
 f = x^2 + 3x + 1
 

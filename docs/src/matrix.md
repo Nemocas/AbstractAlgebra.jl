@@ -60,7 +60,7 @@ resulting parent objects to coerce various elements into the matrix space.
 **Examples**
 
 ```julia
-R, t = PolynomialRing(JuliaQQ, "t")
+R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
 
 A = S()
@@ -112,7 +112,7 @@ entries if the list would otherwise be ambiguous, e.g. `R[1 2 (-3)]'`.
 **Examples**
 
 ```julia
-R, t = PolynomialRing(JuliaQQ, "t")
+R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
 
 M = R[t + 1 1; t^2 0]
@@ -132,7 +132,7 @@ sub(::MatElem, ::Int, ::Int, ::Int, ::Int)
 **Examples**
 
 ```julia
-M = JuliaZZ[1 2 3; 2 3 4]
+M = ZZ[1 2 3; 2 3 4]
 
 N = sub(M, 1, 1, 2, 2)
 ```
@@ -156,7 +156,7 @@ cols(::MatElem)
 **Examples**
 
 ```julia
-R, t = PolynomialRing(JuliaQQ, "t")
+R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
 
 A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -183,7 +183,7 @@ powers(::MatElem, ::Int)
 **Examples**
 
 ```julia
-M = JuliaZZ[1 2 3; 2 3 4; 4 5 5]
+M = ZZ[1 2 3; 2 3 4; 4 5 5]
 
 A = powers(M, 4)
 ```
@@ -197,7 +197,7 @@ gram(::MatElem)
 **Examples**
 
 ```julia
-R, t = PolynomialRing(JuliaQQ, "t")
+R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
 
 A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -214,7 +214,7 @@ trace(::MatElem)
 **Examples**
 
 ```julia
-R, t = PolynomialRing(JuliaQQ, "t")
+R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
 
 A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -231,7 +231,7 @@ content(::MatElem)
 **Examples**
 
 ```julia
-R, t = PolynomialRing(JuliaQQ, "t")
+R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
 
 A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -248,7 +248,7 @@ b = content(A)
 **Examples**
 
 ```julia
-R, t = PolynomialRing(JuliaQQ, "t")
+R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
 G = PermGroup(3)
 
@@ -271,7 +271,7 @@ fflu{T <: RingElem}(::MatElem{T}, ::PermGroup)
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaQQ, "x")
+R, x = PolynomialRing(QQ, "x")
 K, a = NumberField(x^3 + 3x + 1, "a")
 S = MatrixSpace(K, 3, 3)
 
@@ -296,7 +296,7 @@ isrref{T <: FieldElem}(::MatElem{T})
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaQQ, "x")
+R, x = PolynomialRing(QQ, "x")
 K, a = NumberField(x^3 + 3x + 1, "a")
 S = MatrixSpace(K, 3, 3)
    
@@ -305,7 +305,7 @@ M = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 r, A = rref(M)
 isrref(A)
 
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S = MatrixSpace(R, 3, 3)
 
 M = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
@@ -331,7 +331,7 @@ det{T <: FieldElem}(::MatElem{T})
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaQQ, "x")
+R, x = PolynomialRing(QQ, "x")
 K, a = NumberField(x^3 + 3x + 1, "a")
 S = MatrixSpace(K, 3, 3)
    
@@ -350,7 +350,7 @@ rank{T <: FieldElem}(::MatElem{T})
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaQQ, "x")
+R, x = PolynomialRing(QQ, "x")
 K, a = NumberField(x^3 + 3x + 1, "a")
 S = MatrixSpace(K, 3, 3)
    
@@ -376,7 +376,7 @@ solve_triu{T <: FieldElem}(::MatElem{T}, ::MatElem{T}, ::Bool)
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaQQ, "x")
+R, x = PolynomialRing(QQ, "x")
 K, a = NumberField(x^3 + 3x + 1, "a")
 S = MatrixSpace(K, 3, 3)
 U = MatrixSpace(K, 3, 1)
@@ -391,7 +391,7 @@ b = U([2a a + 1 (-a - 1)]')
 
 x = solve_triu(A, b, false)
 
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S = MatrixSpace(R, 3, 3)
 U = MatrixSpace(R, 3, 2)
 
@@ -400,8 +400,8 @@ b = U([2x x + 1 (-x - 1); x + 1 (-x) x^2]')
 
 x, d = solve_rational(A, b)
 
-S = MatrixSpace(JuliaZZ, 3, 3)
-T = MatrixSpace(JuliaZZ, 3, 1)
+S = MatrixSpace(ZZ, 3, 3)
+T = MatrixSpace(ZZ, 3, 1)
 
 A = S([BigInt(2) 3 5; 1 4 7; 9 2 2])   
 B = T([BigInt(4), 5, 7])
@@ -419,7 +419,7 @@ inv{T <: FieldElem}(::MatElem{T})
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaQQ, "x")
+R, x = PolynomialRing(QQ, "x")
 K, a = NumberField(x^3 + 3x + 1, "a")
 S = MatrixSpace(K, 3, 3)
 
@@ -427,7 +427,7 @@ A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 
 X = inv(A)
 
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S = MatrixSpace(R, 3, 3)
 
 A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
@@ -445,7 +445,7 @@ nullspace{T <: FieldElem}(::MatElem{T})
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S = MatrixSpace(R, 4, 4)
    
 M = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;
@@ -469,7 +469,7 @@ ishessenberg{T <: RingElem}(::MatElem{T})
 **Examples**
 
 ```julia
-R = ResidueRing(JuliaZZ, 7)
+R = ResidueRing(ZZ, 7)
 S = MatrixSpace(R, 4, 4)
    
 M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
@@ -488,7 +488,7 @@ charpoly{T <: RingElem}(::Ring, ::MatElem{T})
 **Examples**
 
 ```julia
-R = ResidueRing(JuliaZZ, 7)
+R = ResidueRing(ZZ, 7)
 S = MatrixSpace(R, 4, 4)
 T, x = PolynomialRing(R, "x")
 
@@ -527,7 +527,7 @@ similarity!{T <: RingElem}(::MatElem{T}, ::Int, ::T)
 **Examples**
 
 ```julia
-R = ResidueRing(JuliaZZ, 7)
+R = ResidueRing(ZZ, 7)
 S = MatrixSpace(R, 4, 4)
    
 M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);

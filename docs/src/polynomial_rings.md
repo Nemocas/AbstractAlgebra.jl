@@ -86,7 +86,7 @@ of Julia `Int` values  if this can be done more efficiently.
 **Examples**
 
 ```julia
-S, x = PolynomialRing(JuliaQQ, "x")
+S, x = PolynomialRing(QQ, "x")
 
 f = S(Rational{BigInt}[2, 3, 1])
 g = S(BigInt[1, 0, 4])
@@ -114,7 +114,7 @@ there is more than one variable, and hence an array of symbols.
 **Examples**
 
 ```julia
-S, x = PolynomialRing(JuliaQQ, "x")
+S, x = PolynomialRing(QQ, "x")
 
 vsym = var(S)
 V = vars(S)
@@ -188,7 +188,7 @@ can also be defined to do nothing.
 **Examples**
 
 ```julia
-S, x = PolynomialRing(JuliaZZ, "x")
+S, x = PolynomialRing(ZZ, "x")
 
 f = x^3 + 3x + 1
 g = S(BigInt[1, 2, 0, 1, 0, 0, 0]);

@@ -91,10 +91,10 @@ various elements into those rings.
 **Examples**
 
 ```julia
-R, x = PowerSeriesRing(JuliaZZ, 10, "x")
-S, y = PowerSeriesRing(JuliaZZ, 10, "y"; model=:capped_absolute)
-T, z = LaurentSeriesRing(JuliaZZ, 10, "z")
-U, w = LaurentSeriesField(JuliaQQ, 10, "w")
+R, x = PowerSeriesRing(ZZ, 10, "x")
+S, y = PowerSeriesRing(ZZ, 10, "y"; model=:capped_absolute)
+T, z = LaurentSeriesRing(ZZ, 10, "z")
+U, w = LaurentSeriesField(QQ, 10, "w")
 
 f = R()
 g = S(123)
@@ -114,8 +114,8 @@ O(x::SeriesElem)
 **Examples**
 
 ```julia
-R, x = PowerSeriesRing(JuliaZZ, 10, "x")
-S, y = LaurentSeriesRing(JuliaZZ, 10, "y")
+R, x = PowerSeriesRing(ZZ, 10, "x")
+S, y = LaurentSeriesRing(ZZ, 10, "y")
 
 f = 1 + 2x + O(x^5)
 g = 2y + 7y^2 + O(y^7)
@@ -222,7 +222,7 @@ interfaces.
 **Examples**
 
 ```julia
-S, x = PowerSeriesRing(JuliaZZ, 10, "x")
+S, x = PowerSeriesRing(ZZ, 10, "x")
 
 f = 1 + 3x + x^3 + O(x^10)
 g = 1 + 2x + x^2 + O(x^10)
@@ -284,7 +284,7 @@ isunit(::RelSeriesElem)
 **Examples**
 
 ```julia
-R, t = PowerSeriesRing(JuliaQQ, 10, "t")
+R, t = PowerSeriesRing(QQ, 10, "t")
 S, x = PowerSeriesRing(R, 30, "x")
 
 a = O(x^4)
@@ -310,7 +310,7 @@ shift_right{T <: RingElem}(::RelSeriesElem{T}, ::Int)
 **Examples**
 
 ```julia
-R, t = PolynomialRing(JuliaQQ, "t")
+R, t = PolynomialRing(QQ, "t")
 S, x = PowerSeriesRing(R, 30, "x")
 
 a = 2x + x^3
@@ -333,7 +333,7 @@ truncate{T <: RingElem}(::RelSeriesElem{T}, ::Int)
 **Examples**
 
 ```julia
-R, t = PolynomialRing(JuliaQQ, "t")
+R, t = PolynomialRing(QQ, "t")
 S, x = PowerSeriesRing(R, 30, "x")
 
 a = 2x + x^3
@@ -356,7 +356,7 @@ inv(::RelSeriesElem)
 **Examples**
 
 ```julia
-R, t = PolynomialRing(JuliaQQ, "t")
+R, t = PolynomialRing(QQ, "t")
 S, x = PowerSeriesRing(R, 30, "x")
 
 a = 1 + x + 2x^2 + O(x^5)
@@ -380,9 +380,9 @@ Base.sqrt(a::RelSeriesElem)
 **Examples**
 
 ```julia
-R, t = PolynomialRing(JuliaQQ, "t")
+R, t = PolynomialRing(QQ, "t")
 S, x = PowerSeriesRing(R, 30, "x")
-T, z = PowerSeriesRing(JuliaQQ, 30, "z")
+T, z = PowerSeriesRing(QQ, 30, "z")
 
 a = 1 + z + 3z^2 + O(z^5)
 b = z + 2z^2 + 5z^3 + O(z^5)

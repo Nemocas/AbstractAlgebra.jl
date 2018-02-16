@@ -110,7 +110,7 @@ And here is an example with power series.
 ```julia
 using AbstractAlgebra
 
-R, x = JuliaQQ["x"]
+R, x = QQ["x"]
 
 S, t = PowerSeriesRing(R, 30, "t")
 

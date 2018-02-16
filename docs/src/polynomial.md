@@ -68,9 +68,9 @@ resulting parent objects to coerce various elements into the polynomial ring.
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
-T, z = JuliaQQ["z"]
+T, z = QQ["z"]
 
 f = R()
 g = R(123)
@@ -103,7 +103,7 @@ We give some examples of such functionality.
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
 f = x^3 + 3x + 21
@@ -127,7 +127,7 @@ For polynomials over a field, the Euclidean Ring interface is implemented.
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaQQ, "x")
+R, x = PolynomialRing(QQ, "x")
 S = ResidueRing(R, x^3 + 3x + 1)
 T, y = PolynomialRing(S, "y")
 
@@ -200,10 +200,10 @@ isterm(::PolyElem)
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
-T, z = PolynomialRing(JuliaQQ, "z")
-U = ResidueRing(JuliaZZ, 17)
+T, z = PolynomialRing(QQ, "z")
+U = ResidueRing(ZZ, 17)
 V, w = PolynomialRing(U, "w")
 
 a = zero(S)
@@ -235,7 +235,7 @@ mullow{T <: RingElem}(::PolyElem{T}, ::PolyElem{T}, ::Int)
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
 f = x*y^2 + (x + 1)*y + 3
@@ -255,7 +255,7 @@ reverse(::PolyElem)
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
 f = x*y^2 + (x + 1)*y + 3
@@ -277,7 +277,7 @@ shift_right(::PolyElem, ::Int)
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
 f = x*y^2 + (x + 1)*y + 3
@@ -307,7 +307,7 @@ pseudodivrem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
 f = x*y^2 + (x + 1)*y + 3
@@ -330,7 +330,7 @@ primpart(::PolyElem)
 **Examples**
 
 ```
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
 k = x*y^2 + (x + 1)*y + 3
@@ -360,7 +360,7 @@ evaluated at $a$ by writing $f(a)$.
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
    
 f = x*y^2 + (x + 1)*y + 3
@@ -388,9 +388,9 @@ integral{T <: Union{ResElem, FieldElem}}(::PolyElem{T})
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
-T, z = PolynomialRing(JuliaQQ, "z")
+T, z = PolynomialRing(QQ, "z")
 U = ResidueRing(T, z^3 + 3z + 1)
 V, w = PolynomialRing(U, "w")
 
@@ -418,7 +418,7 @@ discriminant(a::PolyElem)
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
 f = 3x*y^2 + (x + 1)*y + 3
@@ -441,7 +441,7 @@ newton_to_monomial!{T <: RingElem}(::Array{T, 1}, ::Array{T, 1})
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
 f = 3x*y^2 + (x + 1)*y + 3
@@ -461,7 +461,7 @@ interpolate{T <: RingElem}(::PolyRing, ::Array{T, 1}, ::Array{T, 1})
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
 xs = [R(1), R(2), R(3), R(4)]
@@ -487,7 +487,7 @@ chebyshev_u(::Int, ::PolyElem)
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
 f = chebyshev_t(20, y)
