@@ -12,6 +12,10 @@ AbstractAlgebra currently provides:
 * Generic polynomial rings, matrix spaces, fraction fields, residue rings, relative and absolute power series, Laurent series
 * Finite fields, integers, rationals, permutations and characters, number fields
 
+Documentation can be found at the following link:
+
+* [https://nemocas.github.io/AbstractAlgebra.jl/index.html](https://nemocas.github.io/AbstractAlgebra.jl/index.html)
+
 Projects that depend on AbstractAlgebra include:
 
 * Nemo.jl [http://nemocas.org](http://nemocas.org/) (optimised implementations of specific rings provided by the Flint, Arb and Antic C libraries)

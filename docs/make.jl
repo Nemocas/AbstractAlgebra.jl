@@ -24,6 +24,7 @@ makedocs(
                            "finfield.md",
                            "real.md",
                            "numberfield.md"],
+             "Groups" => [ "perm.md"],
              "matrix_spaces.md",
              "matrix.md",
              "types.md" # Appendix A
