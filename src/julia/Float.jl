@@ -20,7 +20,7 @@ elem_type(::Type{Floats{T}}) where T <: AbstractFloat = T
 
 parent_type(::Type{T}) where T <: AbstractFloat = Floats{T}
 
-base_ring(a::AbstractFloat) = Union{}
+base_ring(a::Floats{T}) where T <: AbstractFloat = Union{}
 
 isdomain_type(::Type{T}) where T <: AbstractFloat = true
 

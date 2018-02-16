@@ -22,6 +22,7 @@ makedocs(
                            "fraction.md",
                            "rational.md",
                            "finfield.md",
+                           "real.md",
                            "numberfield.md"],
              "matrix_spaces.md",
              "matrix.md",
