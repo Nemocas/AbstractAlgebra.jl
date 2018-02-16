@@ -35,7 +35,7 @@ M = rand(S, 0:3, -10:10);
 
 @time det(M)</code></pre><p>And here is an example with power series.</p><pre><code class="language-julia">using AbstractAlgebra
 
-R, x = JuliaQQ[&quot;x&quot;]
+R, x = QQ[&quot;x&quot;]
 
 S, t = PowerSeriesRing(R, 30, &quot;t&quot;)
 
