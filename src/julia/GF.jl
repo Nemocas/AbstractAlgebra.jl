@@ -395,6 +395,12 @@ end
 #
 ###############################################################################
 
+doc"""
+   GF{T <: Integer}(p::T)
+> Return the finite field $\mathbb{F}_p$, where $p$ is a prime. The integer
+> $p$ is not checked for primality, but the behaviour of the resulting object
+> is undefined if $p$ is composite.
+"""
 function GF(p::T) where T <: Integer
    p <= 0 && error("Characteristic is not prime in GF(p)")
    return GFField{T}(p)
