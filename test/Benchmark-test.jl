@@ -1,7 +1,7 @@
 function test_benchmark_fateman()
    print("Benchmark.fateman...")
 
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
    T, z = PolynomialRing(S, "z")
    U, t = PolynomialRing(T, "t")
@@ -18,7 +18,7 @@ end
 function test_benchmark_pearce()
    print("Benchmark.pearce...")
 
-   R, x = PolynomialRing(JuliaZZ, "x")
+   R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
    T, z = PolynomialRing(S, "z")
    U, t = PolynomialRing(T, "t")

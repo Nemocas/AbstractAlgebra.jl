@@ -1,7 +1,7 @@
 function test_gen_res_field_constructors()
    print("Generic.ResF.constructors...")
 
-   B = JuliaZZ
+   B = ZZ
 
    R = Generic.ResidueField(B, 16453889)
 
@@ -19,7 +19,7 @@ function test_gen_res_field_constructors()
 
    @test isa(b, Generic.ResF)
 
-   c = R(JuliaZZ(12))
+   c = R(ZZ(12))
 
    @test isa(c, Generic.ResF)
 
@@ -46,7 +46,7 @@ end
 function test_gen_res_field_manipulation()
    print("Generic.ResF.manipulation...")
 
-   R = Generic.ResidueField(JuliaZZ, 16453889)
+   R = Generic.ResidueField(ZZ, 16453889)
 
    @test modulus(R) == 16453889
 
@@ -79,7 +79,7 @@ end
 function test_gen_res_field_unary_ops()
    print("Generic.ResF.unary_ops...")
 
-   R = Generic.ResidueField(JuliaZZ, 16453889)
+   R = Generic.ResidueField(ZZ, 16453889)
 
    @test -R(12345) == R(16441544)
 
@@ -94,7 +94,7 @@ end
 function test_gen_res_field_binary_ops()
    print("Generic.ResF.binary_ops...")
 
-   R = Generic.ResidueField(JuliaZZ, 13)
+   R = Generic.ResidueField(ZZ, 13)
 
    f = R(4)
    g = R(6)
@@ -105,7 +105,7 @@ function test_gen_res_field_binary_ops()
 
    @test f*g == R(11)
 
-   Q = Generic.ResidueField(JuliaZZ, 7)
+   Q = Generic.ResidueField(ZZ, 7)
    S, x = PolynomialRing(Q, "x")
    T = ResidueField(S, x^3 + 3x + 1)
 
@@ -124,14 +124,14 @@ end
 function test_gen_res_field_gcd()
    print("Generic.ResF.gcd...")
 
-   R = Generic.ResidueField(JuliaZZ, 13)
+   R = Generic.ResidueField(ZZ, 13)
 
    f = R(4)
    g = R(6)
 
    @test gcd(f, g) == R(1)
 
-   Q = Generic.ResidueField(JuliaZZ, 7)
+   Q = Generic.ResidueField(ZZ, 7)
    S, x = PolynomialRing(Q, "x")
    T = ResidueField(S, x^3 + 3x + 1)
 
@@ -146,7 +146,7 @@ end
 function test_gen_res_field_adhoc_binary()
    print("Generic.ResF.adhoc_binary...")
 
-   R = Generic.ResidueField(JuliaZZ, 7)
+   R = Generic.ResidueField(ZZ, 7)
 
    a = R(3)
 
@@ -173,7 +173,7 @@ end
 function test_gen_res_field_comparison()
    print("Generic.ResF.comparison...")
 
-   R = Generic.ResidueField(JuliaZZ, 7)
+   R = Generic.ResidueField(ZZ, 7)
 
    a = R(3)
    b = a
@@ -203,7 +203,7 @@ end
 function test_gen_res_field_adhoc_comparison()
    print("Generic.ResF.adhoc_comparison...")
 
-   R = Generic.ResidueField(JuliaZZ, 7)
+   R = Generic.ResidueField(ZZ, 7)
 
    a = R(3)
 
@@ -223,7 +223,7 @@ end
 function test_gen_res_field_powering()
    print("Generic.ResF.powering...")
 
-   R = Generic.ResidueField(JuliaZZ, 7)
+   R = Generic.ResidueField(ZZ, 7)
 
    a = R(3)
 
@@ -242,13 +242,13 @@ end
 function test_gen_res_field_inversion()
    print("Generic.ResF.inversion...")
 
-   R = Generic.ResidueField(JuliaZZ, 47)
+   R = Generic.ResidueField(ZZ, 47)
 
    a = R(5)
 
    @test inv(a) == 19
 
-   R = Generic.ResidueField(JuliaZZ, 41)
+   R = Generic.ResidueField(ZZ, 41)
    S, x = PolynomialRing(R, "x")
    T = ResidueField(S, x^3 + 3x + 1)
 
@@ -262,14 +262,14 @@ end
 function test_gen_res_field_exact_division()
    print("Generic.ResF.exact_division...")
 
-   R = Generic.ResidueField(JuliaZZ, 47)
+   R = Generic.ResidueField(ZZ, 47)
 
    a = R(5)
    b = R(3)
 
    @test divexact(a, b) == 33
 
-   R = Generic.ResidueField(JuliaZZ, 41)
+   R = Generic.ResidueField(ZZ, 41)
    S, x = PolynomialRing(R, "x")
    T = ResidueField(S, x^3 + 3x + 1)
 

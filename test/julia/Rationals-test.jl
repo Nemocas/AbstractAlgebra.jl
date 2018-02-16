@@ -2,10 +2,10 @@ function test_Rationals_constructors()
    print("Julia.Rationals.constructors...")
 
    R = qq
-   S = JuliaQQ
+   S = QQ
 
    @test R == FractionField(zz)
-   @test S == FractionField(JuliaZZ)
+   @test S == FractionField(ZZ)
 
    @test elem_type(R) == Rational{Int}
    @test elem_type(S) == Rational{BigInt}
@@ -43,7 +43,7 @@ function test_Rationals_manipulation()
    print("Julia.Rationals.manipulation...")
 
    R = qq
-   S = JuliaQQ
+   S = QQ
 
    @test iszero(zero(R))
    @test iszero(zero(S))
@@ -63,7 +63,7 @@ function test_Rationals_exact_division()
    print("Julia.Rationals.exact_division...")
   
    R = qq
-   S = JuliaQQ
+   S = QQ
 
    for iter = 1:1000
       a1 = rand(R, -100:100)
@@ -71,7 +71,7 @@ function test_Rationals_exact_division()
       b1 = rand(S, -100:100)
       b2 = rand(S, -100:100)
       c1 = rand(zz, -100:100)
-      c2 = rand(JuliaZZ, -100:100)
+      c2 = rand(ZZ, -100:100)
 
       @test a2 == 0 || divexact(a1, a2)*a2 == a1
       @test b2 == 0 || divexact(b1, b2)*b2 == b1
@@ -104,7 +104,7 @@ function test_Rationals_gcd()
    print("Julia.Rationals.gcd...")
   
    R = qq
-   S = JuliaQQ
+   S = QQ
 
    for iter = 1:1000
       r1 = rand(R, -100:100)
@@ -125,7 +125,7 @@ function test_Rationals_square_root()
    print("Julia.Rationals.square_root...")
   
    R = qq
-   S = JuliaQQ
+   S = QQ
 
    for iter = 1:1000
       r = rand(R, -100:100)

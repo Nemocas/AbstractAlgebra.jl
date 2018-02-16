@@ -1,7 +1,7 @@
 function test_gen_frac_constructors()
    print("Generic.Frac.constructors...")
 
-   S, x = PolynomialRing(JuliaZZ, "x")
+   S, x = PolynomialRing(ZZ, "x")
    T = FractionField(S)
 
    @test elem_type(T) == Generic.Frac{elem_type(S)}
@@ -46,8 +46,8 @@ end
 function test_gen_frac_manipulation()
    print("Generic.Frac.manipulation...")
 
-   R = FractionField(JuliaZZ)
-   S, x = PolynomialRing(JuliaZZ, "x")
+   R = FractionField(ZZ)
+   S, x = PolynomialRing(ZZ, "x")
 
    @test denominator((x + 1)//(-x^2 + 1)) == x - 1
 
@@ -68,7 +68,7 @@ end
 function test_gen_frac_unary_ops()
    print("Generic.Frac.unary_ops...")
 
-   S, x = PolynomialRing(JuliaZZ, "x")
+   S, x = PolynomialRing(ZZ, "x")
 
    @test -((x + 1)//(-x^2 + 1)) == 1//(x - 1)
 
@@ -78,7 +78,7 @@ end
 function test_gen_frac_binary_ops()
    print("Generic.Frac.binary_ops...")
 
-   S, x = PolynomialRing(JuliaZZ, "x")
+   S, x = PolynomialRing(ZZ, "x")
 
    a = -(x + 3)//(x + 1) + (2x + 3)//(x^2 + 4)
    b = (x + 1)//(-x^2 + 1) - x//(2x + 1)
@@ -96,7 +96,7 @@ end
 function test_gen_frac_adhoc_binary()
    print("Generic.Frac.adhoc_binary...")
 
-   S, x = PolynomialRing(JuliaZZ, "x")
+   S, x = PolynomialRing(ZZ, "x")
 
    a = (-x + 1)//(2x^2 + 3)
    b = (x + 1)//(-x^2 + 1)
@@ -119,7 +119,7 @@ end
 function test_gen_frac_comparison()
    print("Generic.Frac.comparison...")
 
-   S, x = PolynomialRing(JuliaZZ, "x")
+   S, x = PolynomialRing(ZZ, "x")
 
    a = -((x + 1)//(-x^2 + 1))
 
@@ -133,7 +133,7 @@ end
 function test_gen_frac_adhoc_comparison()
    print("Generic.Frac.adhoc_comparison...")
 
-   S, x = PolynomialRing(JuliaZZ, "x")
+   S, x = PolynomialRing(ZZ, "x")
 
    a = 1//(x - 1)
 
@@ -151,7 +151,7 @@ end
 function test_gen_frac_powering()
    print("Generic.Frac.powering...")
 
-   S, x = PolynomialRing(JuliaZZ, "x")
+   S, x = PolynomialRing(ZZ, "x")
 
    a = (x + 1)//(-x^2 + 1)
 
@@ -163,7 +163,7 @@ end
 function test_gen_frac_inversion()
    print("Generic.Frac.inversion...")
 
-   S, x = PolynomialRing(JuliaZZ, "x")
+   S, x = PolynomialRing(ZZ, "x")
 
    a = (x + 1)//(-x^2 + 1)
 
@@ -175,7 +175,7 @@ end
 function test_gen_frac_exact_division()
    print("Generic.Frac.exact_division...")
 
-   S, x = PolynomialRing(JuliaZZ, "x")
+   S, x = PolynomialRing(ZZ, "x")
 
    a = -(x + 3)//(x + 1) + (2x + 3)//(x^2 + 4)
    b = ((x^2 + 3x)//(5x))*((x + 1)//(2x^2 + 2))
@@ -188,7 +188,7 @@ end
 function test_gen_frac_adhoc_exact_division()
    print("Generic.Frac.adhoc_exact_division...")
 
-   S, x = PolynomialRing(JuliaZZ, "x")
+   S, x = PolynomialRing(ZZ, "x")
 
    a = (-x + 1)//(2x^2 + 3)
    b = (x + 1)//(-x^2 + 1)
@@ -207,7 +207,7 @@ end
 function test_gen_frac_gcd()
    print("Generic.Frac.gcd...")
 
-   S, x = PolynomialRing(JuliaZZ, "x")
+   S, x = PolynomialRing(ZZ, "x")
 
    a = (x + 1)//(-x^2 + 1) - x//(2x + 1)
 

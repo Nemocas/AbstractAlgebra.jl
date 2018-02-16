@@ -2,7 +2,7 @@ function test_Floats_constructors()
    print("Julia.Floats.constructors...")
 
    R = RDF
-   S = JuliaRealField
+   S = RealField
 
    @test elem_type(R) == Float64
    @test elem_type(S) == BigFloat
@@ -40,7 +40,7 @@ function test_Floats_manipulation()
    print("Julia.Floats.manipulation...")
 
    R = RDF
-   S = JuliaRealField
+   S = RealField
 
    @test iszero(zero(R))
    @test iszero(zero(S))
@@ -60,7 +60,7 @@ function test_Floats_exact_division()
    print("Julia.Floats.exact_division...")
   
    R = RDF
-   S = JuliaRealField
+   S = RealField
 
    for iter = 1:1000
       a1 = rand(R, -10:10)
@@ -68,7 +68,7 @@ function test_Floats_exact_division()
       b1 = rand(S, -10:10)
       b2 = rand(S, -10:10)
       c1 = rand(zz, -10:10)
-      c2 = rand(JuliaZZ, -10:10)
+      c2 = rand(ZZ, -10:10)
 
       @test a2 == 0 || isapprox(divexact(a1*a2, a2), a1)
       @test b2 == 0 || isapprox(divexact(b1*b2, b2), b1)
@@ -87,7 +87,7 @@ function test_Floats_gcd()
    print("Julia.Floats.gcd...")
   
    R = RDF
-   S = JuliaRealField
+   S = RealField
 
    for iter = 1:1000
       r1 = rand(R, -100:100)

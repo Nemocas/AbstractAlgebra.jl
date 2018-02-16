@@ -26,7 +26,7 @@ export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
 export PolyRing, SeriesRing, AbsSeriesRing, ResRing, FracField, MatSpace,
        FinField, MPolyRing
 
-export JuliaZZ, JuliaQQ, zz, qq, JuliaRealField, RDF
+export ZZ, QQ, zz, qq, RealField, RDF
 
 export PermutationGroup
 
@@ -443,9 +443,20 @@ PermutationGroup = PermGroup
 
 ###############################################################################
 #
-#   Set domain for ZZ, QQ, FiniteField
+#   Set domain for ZZ, QQ
 #
 ###############################################################################
+
+ZZ = JuliaZZ
+QQ = JuliaQQ
+
+###############################################################################
+#
+#   Set domain for RealField
+#
+###############################################################################
+
+RealField = JuliaRealField
 
 ###############################################################################
 #
