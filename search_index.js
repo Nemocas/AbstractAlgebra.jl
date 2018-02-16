@@ -1285,7 +1285,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Residue Ring Interface",
     "title": "Types and parents",
     "category": "section",
-    "text": "AbstractAlgebra provides two abstract types for residue rings and their elements:ResRing{T} is the abstract type for residue ring parent types\nResElem{T} is the abstract type for types of elements of residue rings (residues)We have that ResRing{T} <: AbstractAlgebra.Ring and  ResElem{T} <: AbstractAlgebra.RingElem.Note that both abstract types are parameterised. The type T should usually be the type of elements of the base ring of the residue ring.If the parent object for such a ring has type MyResRing and residues in that ring have type MyRes then one would have:MyResRing <: ResRing{BigInt}\nMyRes <: ResElem{BigInt}Residue rings should be made unique on the system by caching parent objects (unless an optional cache parameter is set to false). Residue rings should at least be distinguished based on their base ring and modulus (the principal ideal one is taking a quotient of the base ring by).See src/generic/GenericTypes.jl for an example of how to implement such a cache (which usually makes use of a dictionary)."
+    "text": "AbstractAlgebra provides four abstract types for residue rings and their elements:ResRing{T} is the abstract type for residue ring parent types\nResField{T} is the abstract type for residue rings known to be fields\nResElem{T} is the abstract type for types of elements of residue rings (residues)\nResFieldElem{T} is the abstract type for types of elements of residue fieldsWe have that ResRing{T} <: AbstractAlgebra.Ring and  ResElem{T} <: AbstractAlgebra.RingElem.Note that these abstract types are parameterised. The type T should usually be the type of elements of the base ring of the residue ring/field.If the parent object for a residue ring has type MyResRing and residues in that ring have type MyRes then one would have:MyResRing <: ResRing{BigInt}\nMyRes <: ResElem{BigInt}Residue rings should be made unique on the system by caching parent objects (unless an optional cache parameter is set to false). Residue rings should at least be distinguished based on their base ring and modulus (the principal ideal one is taking a quotient of the base ring by).See src/generic/GenericTypes.jl for an example of how to implement such a cache (which usually makes use of a dictionary)."
 },
 
 {
@@ -1333,7 +1333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic residue rings",
     "title": "Types and parent objects",
     "category": "section",
-    "text": "Residues implemented using the AbstractAlgebra generics have type Generic.Res{T} where T is the type of elements of the base ring. See the file src/generic/GenericTypes.jl for details.Parent objects of such residue ring elements have type Generic.ResRing{T}.The defining modulus of the residue ring is stored in the parent object.The residue element types belong to the abstract type AbstractAlgebra.ResElem{T} and the residue ring types belong to the abstract type AbstractAlgebra.ResRing{T}. This enables one to write generic functions that can accept any AbstractAlgebra residue type.Note that both the generic residue ring type Generic.ResRing{T} and the abstract type it belongs to, AbstractAlgebra.ResRing{T} are both called ResRing. The  former is a (parameterised) concrete type for a residue ring over a given base ring whose elements have type T. The latter is an abstract type representing all residue ring types in AbstractAlgebra.jl, whether generic or very specialised (e.g. supplied by a C library)."
+    "text": "Residues implemented using the AbstractAlgebra generics have type Generic.Res{T} or in the case of residue rings that are known to be fields, Generic.ResF{T}, where T is the type of elements of the base ring. See the file src/generic/GenericTypes.jl for details.Parent objects of residue ring elements have type Generic.ResRing{T} and those of residue fields have type GenericResField{T}.The defining modulus of the residue ring is stored in the parent object.The residue element types belong to the abstract type AbstractAlgebra.ResElem{T} or AbstractAlgebra.ResFieldElem{T} in the case of residue fields, and the residue ring types belong to the abstract type AbstractAlgebra.ResRing{T} or AbstractAlgebra.ResField{T} respectively. This enables one to write generic functions that can accept any AbstractAlgebra residue type.Note that both the generic residue ring type Generic.ResRing{T} and the abstract type it belongs to, AbstractAlgebra.ResRing{T} are both called ResRing, and  similarly for the residue field types. In each case, the  former is a (parameterised) concrete type for a residue ring over a given base ring whose elements have type T. The latter is an abstract type representing all residue ring types in  AbstractAlgebra.jl, whether generic or very specialised (e.g. supplied by a C library)."
 },
 
 {
@@ -1341,7 +1341,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic residue rings",
     "title": "Residue ring constructors",
     "category": "section",
-    "text": "In order to construct residues in AbstractAlgebra.jl, one must first construct the resiude ring itself. This is accomplished with the following constructor.ResidueRing(R::AbstractAlgebra.Ring, m::AbstractAlgebra.RingElem; cached::Bool = true)Given a base ring R and residue m contained in this ring, return the parent object of the residue ring R(m). By default the parent object S will depend only on R and m and will be cached. Setting the optional argument cached to false will prevent the parent object S from being cached.Here are some examples of creating residue rings and making use of the resulting parent objects to coerce various elements into the residue ring.ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nf = S()\ng = S(123)\nh = S(BigInt(1234))\nk = S(x + 1)All of the examples here are generic residue rings, but specialised implementations of residue rings provided by external modules will also usually provide a ResidueRing constructor to allow creation of their residue rings."
+    "text": "In order to construct residues in AbstractAlgebra.jl, one must first construct the resiude ring itself. This is accomplished with one of the following constructors.ResidueRing(R::AbstractAlgebra.Ring, m::AbstractAlgebra.RingElem; cached::Bool = true)ResidueField(R::AbstractAlgebra.Ring, m::AbstractAlgebra.RingElem; cached::Bool = true)Given a base ring R and residue m contained in this ring, return the parent object of the residue ring R(m). By default the parent object S will depend only on R and m and will be cached. Setting the optional argument cached to false will prevent the parent object S from being cached.The ResidueField constructor does the same thing as the ResidueRing constructor, but the resulting object has type belonging to Field rather than Ring, so it can be used anywhere a field is expected in AbstractAlgebra.jl. No check is made for maximality of the ideal generated by m.Here are some examples of creating residue rings and making use of the resulting parent objects to coerce various elements into the residue ring.ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nf = S()\ng = S(123)\nh = S(BigInt(1234))\nk = S(x + 1)All of the examples here are generic residue rings, but specialised implementations of residue rings provided by external modules will also usually provide a ResidueRing constructor to allow creation of their residue rings."
 },
 
 {
@@ -1766,6 +1766,38 @@ var documenterSearchIndex = {"docs": [
     "title": "Basic manipulation of fields and elements",
     "category": "section",
     "text": "gen{T <: Integer}(F::GFField{T})order(F::GFField)degree(F::GFField)ExamplesF = GF(13)\n\nd = degree(F)\nn = order(F)\ng = gen(F)"
+},
+
+{
+    "location": "numberfield.html#",
+    "page": "Number fields",
+    "title": "Number fields",
+    "category": "page",
+    "text": "CurrentModule = AbstractAlgebra"
+},
+
+{
+    "location": "numberfield.html#Number-fields-1",
+    "page": "Number fields",
+    "title": "Number fields",
+    "category": "section",
+    "text": "AbstractAlgebra.jl provides a very naive implementation of number fields. This allows arithmetic in algebraic number fields, which are currently modeled as mathbbZx modulo an irreducible polynomial, i.e. as a residue field.In fact, the definition of the number field constructor is currently given in src/generic/ResidueField.jl and no type is defined for a number field. The definition mainly exists for testing purposes. It may later be added by a more standard implementation. For a more fully fleshed out number field implementation (based on a very high performance C library), see Nemo.jl."
+},
+
+{
+    "location": "numberfield.html#Number-field-constructors-1",
+    "page": "Number fields",
+    "title": "Number field constructors",
+    "category": "section",
+    "text": "In order to construct number fields in AbstractAlgebra.jl, one must first construct the field itself. This is accomplished with the following constructor.NumberField(f::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = \"\\$\"; cached = true)Given an irreducible defining polynomial f in mathbbZx, return a tuple (K x) consisting of the number field defined by that polynomial and a generator. The string fields are currently ignored, but are reserved for future use.Currently the generator of the number field prints the same way as the variable in mathbbZx.ExamplesR, x = PolynomialRing(JuliaQQ, \"x\")\nK, a = NumberField(R, x^3 + 3x + 1, \"a\")\n\nf = a^2 + 2a + 7"
+},
+
+{
+    "location": "numberfield.html#Basic-field-functionality-1",
+    "page": "Number fields",
+    "title": "Basic field functionality",
+    "category": "section",
+    "text": "The number field module in AbstractAlgebra.jl implements the full Field and ResidueRing interfaces."
 },
 
 {
