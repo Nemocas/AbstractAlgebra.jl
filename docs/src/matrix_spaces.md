@@ -78,7 +78,7 @@ elements that can be coerced into the base ring of the matrix.
 **Examples**
 
 ```julia
-S = MatrixSpace(JuliaQQ, 2, 3)
+S = MatrixSpace(QQ, 2, 3)
 
 M1 = S(Rational{BigInt}[2 3 1; 1 0 4])
 M2 = S(BigInt[2 3 1; 1 0 4])
@@ -134,10 +134,10 @@ Construct the $r\times c$ zero matrix with the same base ring as the given matri
 **Examples**
 
 ```julia
-M = matrix(JuliaZZ, BigInt[3 1 2; 2 0 1])
-N = matrix(JuliaZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])
-P = zero_matrix(JuliaZZ, 3, 2)
-Q = identity_matrix(JuliaZZ, 4)
+M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
+N = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])
+P = zero_matrix(ZZ, 3, 2)
+Q = identity_matrix(ZZ, 4)
 C = similar(P)
 D = similar(Q, 4, 5)
 ```
@@ -173,7 +173,7 @@ in place and not returned from the function.
 **Examples**
 
 ```julia
-M = matrix(JuliaZZ, BigInt[2 3 0; 1 1 1])
+M = matrix(ZZ, BigInt[2 3 0; 1 1 1])
 
 m = rows(M)
 n = cols(M)
@@ -193,7 +193,7 @@ The standard Julia tick notation can also be used for transposing a matrix.
 **Examples**
 
 ```julia
-R, t = PolynomialRing(JuliaQQ, "t")
+R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
 
 A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
@@ -227,7 +227,7 @@ Construct the $n\times n$ identity matrix with the same base ring as the given m
 **Examples**
 
 ```julia
-M = matrix(JuliaZZ, BigInt[1 2 3; 4 5 6])
+M = matrix(ZZ, BigInt[1 2 3; 4 5 6])
 
 N = eye(M)
 P = eye(M, 2)
@@ -245,7 +245,7 @@ and columns.
 **Examples**
 
 ```julia
-M = matrix(JuliaZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
+M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
 
 N1 = M[1:2, :]
 N2 = M[:, :]
@@ -264,7 +264,7 @@ matrices are assumed to be mutable in AbstractAlgebra.jl).
 **Examples**
 
 ```julia
-M = identity_matrix(JuliaZZ, 3)
+M = identity_matrix(ZZ, 3)
 
 swap_rows!(M, 1, 2)
 ```
@@ -288,8 +288,8 @@ columns of $M$ and $N$ are the same.
 **Examples**
 
 ```julia
-M = matrix(JuliaZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
-N = matrix(JuliaZZ, BigInt[1 0 1; 0 1 0; 1 0 1])
+M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
+N = matrix(ZZ, BigInt[1 0 1; 0 1 0; 1 0 1])
 
 P = hcat(M, N)
 Q = vcat(M, N)

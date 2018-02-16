@@ -60,7 +60,7 @@ to be $R/(m)$, return $m$.
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaQQ, "x")
+R, x = PolynomialRing(QQ, "x")
 S = ResidueRing(R, x^3 + 3x + 1)
 
 m = modulus(S)
@@ -77,7 +77,7 @@ Given a residue $r \pmod{m}$, represented as such, return $r$.
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaQQ, "x")
+R, x = PolynomialRing(QQ, "x")
 S = ResidueRing(R, x^3 + 3x + 1)
 
 f = S(x^2 + 2)

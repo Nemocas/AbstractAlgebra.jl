@@ -79,9 +79,9 @@ precision minus the valuation is bigger than the length of the array.
 **Examples**
 
 ```julia
-S, x = PowerSeriesRing(JuliaQQ, 10, "x"; model=:capped_relative)
-T, y = LaurentSeriesRing(JuliaZZ, 10, "y")
-U, z = LaurentSeriesField(JuliaQQ, 10, "z")
+S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_relative)
+T, y = LaurentSeriesRing(ZZ, 10, "y")
+U, z = LaurentSeriesField(QQ, 10, "z")
  
 f = S(Rational{BigInt}[2, 3, 1], 3, 6, 2)
 g = T(BigInt[2, 3, 1], 3, 6, 2)
@@ -108,7 +108,7 @@ precision is bigger than the length of the array.
 **Examples**
 
 ```julia
-S, x = PowerSeriesRing(JuliaQQ, 10, "x"; model=:capped_absolute)
+S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_absolute)
 
 f = S(Rational{BigInt}[0, 2, 3, 1], 4, 6)
 ```
@@ -138,7 +138,7 @@ are stored on a per element basis in the actual series elements.
 **Examples**
 
 ```julia
-S, x = PowerSeriesRing(JuliaQQ, 10, "x")
+S, x = PowerSeriesRing(QQ, 10, "x")
 
 vsym = var(S)
 max_precision(S) == 10
@@ -261,7 +261,7 @@ Return the generator `x` of the series ring.
 **Examples**
 
 ```julia
-S, x = PowerSeriesRing(JuliaZZ, 10, "x")
+S, x = PowerSeriesRing(ZZ, 10, "x")
 
 f = 1 + 3x + x^3 + O(x^5)
 g = S(BigInt[1, 2, 0, 1, 0, 0, 0], 4, 10, 3);

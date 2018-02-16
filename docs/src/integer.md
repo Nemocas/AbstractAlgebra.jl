@@ -7,7 +7,7 @@ CurrentModule = AbstractAlgebra
 AbstractAlgebra.jl provides a module, implemented in `src/julia/Integer.jl` for
 making Julia `BigInt`s conform to the AbstractAlgebra.jl Ring interface.
 
-In addition to providing a parent object `JuliaZZ` for Julia `BigInt`s, we implement
+In addition to providing a parent object `ZZ` for Julia `BigInt`s, we implement
 any additional functionality required by AbstractAlgebra.jl.
 
 Because `BigInt` cannot be directly included in the AbstractAlgebra.jl abstract type
@@ -55,7 +55,7 @@ Integers{BigInt}()
 This gives the unique object of type `Integers{BigInt}` representing the ring of
 integers in AbstractAlgebra.jl.
 
-In practice, one simply uses `JuliaZZ` which is assigned to be the return value of the
+In practice, one simply uses `ZZ` which is assigned to be the return value of the
 above constructor. There is no need to call the constructor in practice.
 
 Here are some examples of creating the integer ring and making use of the
@@ -64,9 +64,9 @@ resulting parent object to coerce various elements into the ring.
 **Examples**
 
 ```julia
-f = JuliaZZ()
-g = JuliaZZ(123)
-h = JuliaZZ(BigInt(1234))
+f = ZZ()
+g = ZZ(123)
+h = ZZ(BigInt(1234))
 ```
 
 ## Basic ring functionality
@@ -79,19 +79,19 @@ We give some examples of such functionality.
 **Examples**
 
 ```julia
-f = JuliaZZ(12)
+f = ZZ(12)
 
-h = zero(JuliaZZ)
-k = one(JuliaZZ)
+h = zero(ZZ)
+k = one(ZZ)
 isone(k) == true
 iszero(f) == false
-U = base_ring(JuliaZZ)
+U = base_ring(ZZ)
 V = base_ring(f)
 T = parent(f)
 f == deepcopy(f)
 g = f + 12
-h = powmod(f, 12, JuliaZZ(17))
-flag, q = divides(f, JuliaZZ(3))
+h = powmod(f, 12, ZZ(17))
+flag, q = divides(f, ZZ(3))
 ```
 
 ## Integer functionality provided by AbstractAlgebra.jl
@@ -107,7 +107,7 @@ isunit(::Integer)
 **Examples**
 
 ```julia
-r = JuliaZZ(-1)
+r = ZZ(-1)
 
 isunit(r) == true
 ```
@@ -125,8 +125,8 @@ AbstractAlgebra.exp(a::BigInt)
 **Examples**
 
 ```julia
-d = AbstractAlgebra.sqrt(JuliaZZ(36))
-m = AbstractAlgebra.exp(JuliaZZ(0))
+d = AbstractAlgebra.sqrt(ZZ(36))
+m = AbstractAlgebra.exp(ZZ(0))
 ```
 ### Coprime bases
 
@@ -137,7 +137,7 @@ ppio(a::BigInt, b::BigInt)
 **Examples**
 
 ```julia
-c, n = ppio(JuliaZZ(12), JuliaZZ(26))
+c, n = ppio(ZZ(12), ZZ(26))
 ```
 
 

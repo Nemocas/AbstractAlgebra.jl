@@ -96,7 +96,7 @@ include `:lex`, `:deglex` and `:degrevlex`.
 **Examples**
 
 ```julia
-S, (x, y) = PolynomialRing(JuliaQQ, ["x", "y"]; ordering=:deglex)
+S, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:deglex)
 
 V = vars(S)
 X = gens(S)
@@ -160,7 +160,7 @@ Return `true` if $f$ consists of a single term with coefficient $1$.
 **Examples**
 
 ```julia
-S, (x, y) = PolynomialRing(JuliaZZ, ["x", "y"])
+S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 f = x^3*y + 3x*y^2 + 1
 
@@ -207,7 +207,7 @@ Returns $v$ such that the highest power of $g$ that divides $f$ is $g^v$.
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(JuliaZZ, ["x", "y"])
+R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 f = 2x^2*y + 2x + y + 1
 g = x^2*y^2 + 1
@@ -261,7 +261,7 @@ unique.
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(JuliaQQ, ["x", "y"])
+R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
 f = 2x^2*y + 2x + y + 1
 g = x + y
@@ -290,7 +290,7 @@ Evaluate the polynomial $f$ at the values specified by the entries of the array 
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(JuliaQQ, ["x", "y"])
+R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
 f = 2x^2*y + 2x + y + 1
 
@@ -312,7 +312,7 @@ Return a greatest common divisor of $f$ and $g$.
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(JuliaZZ, ["x", "y"])
+R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 f = 2x^2*y + 2x + y + 1
 g = x^2*y^2 + 1
@@ -360,7 +360,7 @@ other big integer type) for exponents instead of `UInt`.
 **Examples**
 
 ```julia
-S, (x, y) = PolynomialRing(JuliaQQ, ["x", "y"])
+S, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
 f = S(Rational{BigInt}[2, 3, 1], UInt[3 2 1; 0 1 0])
 ```
@@ -401,7 +401,7 @@ nothing.
 **Examples**
 
 ```julia
-S, (x, y) = PolynomialRing(JuliaZZ, ["x", "y"])
+S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 f = x^3*y + 3x*y^2 + 1
 

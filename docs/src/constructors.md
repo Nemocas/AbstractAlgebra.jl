@@ -26,10 +26,10 @@ special objects that we refer to as parent objects. They behave a lot like Julia
 Consider the following simple example, to create a multiprecision integer:
 
 ```julia
-n = JuliaZZ("12345678765456787654567890987654567898765678909876567890")
+n = ZZ("12345678765456787654567890987654567898765678909876567890")
 ```
 
-Here `JuliaZZ` is not a Julia type, but a callable object. However, for most purposes
+Here `ZZ` is not a Julia type, but a callable object. However, for most purposes
 one can think of such a parent object as though it were a type.
 
 ## Constructing parent objects
@@ -42,7 +42,7 @@ For example, to create a parent object for univariate polynomials over the integ
 we use the `PolynomialRing` parent object constructor.
 
 ```julia
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 f = x^3 + 3x + 1
 g = R(12)
 ```
@@ -57,10 +57,10 @@ AbstractAlgebra.jl and explain what mathematical domains they represent.
 
 | Mathematics                      | AbstractAlgebra.jl constructor              |
 |----------------------------------|---------------------------------------------|
-| $R = \mathbb{Z}$                 | `R = JuliaZZ`                               |
-| $R = \mathbb{Q}$                 | `R = JuliaQQ`                               |
+| $R = \mathbb{Z}$                 | `R = ZZ`                                    |
+| $R = \mathbb{Q}$                 | `R = QQ`                                    |
 | $R = \mathbb{F}_{p}$             | `R = GF(p)`                                 |
-| $R = \mathbb{Z}/n\mathbb{Z}$     | `R = ResidueRing(JuliaZZ, n)`               |
+| $R = \mathbb{Z}/n\mathbb{Z}$     | `R = ResidueRing(ZZ, n)`                    |
 | $S = R[x]$                       | `S, x = PolynomialRing(R, "x")`             |
 | $S = R[x, y]$                    | `S, (x, y) = PolynomialRing(R, ["x", "y"])` |
 | $S = R[[x]]$ (to precision $n$)  | `S, x = PowerSeriesRing(R, n, "x")`         |

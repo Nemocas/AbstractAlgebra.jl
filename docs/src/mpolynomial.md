@@ -74,7 +74,7 @@ resulting parent objects to coerce various elements into the polynomial ring.
 **Examples**
 
 ```julia
-R, (x, y) = PolynomialRing(JuliaZZ, ["x", "y"]; ordering=:deglex)
+R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:deglex)
 
 f = R()
 g = R(123)

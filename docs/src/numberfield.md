@@ -5,7 +5,7 @@ CurrentModule = AbstractAlgebra
 # Number fields
 
 AbstractAlgebra.jl provides a very naive implementation of number fields. This allows
-arithmetic in algebraic number fields, which are currently modeled as $\mathbb{Z}[x]$
+arithmetic in algebraic number fields, which are currently modeled as $\mathbb{Q}[x]$
 modulo an irreducible polynomial, i.e. as a residue field.
 
 In fact, the definition of the number field constructor is currently given in
@@ -23,17 +23,17 @@ field itself. This is accomplished with the following constructor.
 NumberField(f::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
 ```
 
-Given an irreducible defining polynomial $f$ in $\mathbb{Z}[x]$, return a tuple $(K, x)$
+Given an irreducible defining polynomial $f$ in $\mathbb{Q}[x]$, return a tuple $(K, x)$
 consisting of the number field defined by that polynomial and a generator. The string
 fields are currently ignored, but are reserved for future use.
 
 Currently the generator of the number field prints the same way as the variable in
-$\mathbb{Z}[x]$.
+$\mathbb{Q}[x]$.
 
 **Examples**
 
 ```julia
-R, x = PolynomialRing(JuliaQQ, "x")
+R, x = PolynomialRing(QQ, "x")
 K, a = NumberField(R, x^3 + 3x + 1, "a")
 
 f = a^2 + 2a + 7

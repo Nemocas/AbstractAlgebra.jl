@@ -7,7 +7,7 @@ CurrentModule = AbstractAlgebra
 AbstractAlgebra.jl provides a module, implemented in `src/julia/Rational.jl` for
 making Julia `Rational{BigInt}`s conform to the AbstractAlgebra.jl Field interface.
 
-In addition to providing a parent object `JuliaQQ` for Julia `Rational{BigInt}`s, we
+In addition to providing a parent object `QQ` for Julia `Rational{BigInt}`s, we
 implement any additional functionality required by AbstractAlgebra.jl.
 
 Because `Rational{BigInt}` cannot be directly included in the AbstractAlgebra.jl
@@ -59,7 +59,7 @@ Rationals{BigInt}()
 This gives the unique object of type `Rationals{BigInt}` representing the field of
 rationals in AbstractAlgebra.jl.
 
-In practice, one simply uses `JuliaQQ` which is assigned to be the return value of the
+In practice, one simply uses `QQ` which is assigned to be the return value of the
 above constructor. There is no need to call the constructor in practice.
 
 Here are some examples of creating the rational field and making use of the
@@ -68,12 +68,12 @@ resulting parent object to coerce various elements into the field.
 **Examples**
 
 ```julia
-f = JuliaQQ()
-g = JuliaQQ(123)
-h = JuliaQQ(BigInt(1234))
-k = JuliaQQ(BigInt(12), BigInt(7))
+f = QQ()
+g = QQ(123)
+h = QQ(BigInt(1234))
+k = QQ(BigInt(12), BigInt(7))
 
-JuliaQQ == FractionField(JuliaZZ)
+QQ == FractionField(ZZ)
 ```
 
 ## Basic field functionality
@@ -86,18 +86,18 @@ We give some examples of such functionality.
 **Examples**
 
 ```julia
-f = JuliaQQ(12, 7)
+f = QQ(12, 7)
 
-h = zero(JuliaQQ)
-k = one(JuliaQQ)
+h = zero(QQ)
+k = one(QQ)
 isone(k) == true
 iszero(f) == false
-U = base_ring(JuliaQQ)
+U = base_ring(QQ)
 V = base_ring(f)
 T = parent(f)
 f == deepcopy(f)
 g = f + 12
-r = JuliaZZ(12)//JuliaZZ(7)
+r = ZZ(12)//ZZ(7)
 n = numerator(r)
 ```
 
@@ -119,8 +119,8 @@ AbstractAlgebra.exp(a::Rational{BigInt})
 **Examples**
 
 ```julia
-d = AbstractAlgebra.sqrt(JuliaZZ(36)//JuliaZZ(25))
-m = AbstractAlgebra.exp(JuliaZZ(0)//JuliaZZ(1))
+d = AbstractAlgebra.sqrt(ZZ(36)//ZZ(25))
+m = AbstractAlgebra.exp(ZZ(0)//ZZ(1))
 ```
 
 
