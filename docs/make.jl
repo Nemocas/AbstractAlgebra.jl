@@ -20,7 +20,8 @@ makedocs(
              "Fields" => [ "fields.md",
                            "fraction_fields.md",
                            "fraction.md",
-                           "rational.md"],
+                           "rational.md",
+                           "finfield.md"],
              "matrix_spaces.md",
              "matrix.md",
              "types.md" # Appendix A
