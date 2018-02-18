@@ -68,6 +68,7 @@ AbstractAlgebra.jl and explain what mathematical domains they represent.
 | $S = K((x))$ (to precision $n$)  | `S, x = LaurentSeriesField(K, n, "x")`      |
 | $S = \mbox{Frac}_R$              | `S = FractionField(R)`                      |
 | $S = R/(f)$                      | `S = ResidueRing(R, f)`                     |
+| $S = R/(f)$ (with $(f)$ maximal) | `S = ResidueField(R, f)                     |
 | $S = \mbox{Mat}_{m\times n}(R)$  | `S = MatrixSpace(R, m, n)`                  |
 | $S = \mathbb{Q}[x]/(f)$          | `S, a = NumberField(f, "a")`                |
 

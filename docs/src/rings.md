@@ -20,7 +20,7 @@ For example, the generic univariate polynomial type in AbstractAlgebra.jl provid
 types in generic/GenericTypes.jl: 
 
   - `Generic.PolyRing{T}` for the parent objects
-  - `Generic.PolyR{T}` for the actual polynomials
+  - `Generic.Poly{T}` for the actual polynomials
 
 The parent type must belong to `AbstractAlgebra.Ring` and the element type must belong
 to `AbstractAlgebra.RingElem`. Of course, the types may belong to these abstract types
