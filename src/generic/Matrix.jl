@@ -1544,7 +1544,7 @@ function det_interpolation(M::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
    bound = n*(maxlen - 1) + 1
    x = Array{elem_type(base_ring(R))}(bound)
    d = Array{elem_type(base_ring(R))}(bound)
-   X = MatrixSpace(base_ring(R), n, n)()
+   X = zero_matrix(base_ring(R), n, n)
    b2 = div(bound, 2)
    pt1 = base_ring(R)(1 - b2)
    for i = 1:bound
