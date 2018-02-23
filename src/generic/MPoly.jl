@@ -1118,7 +1118,7 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
       e2 = Array{UInt}(M, length(b))
       pack_monomials(e1, a.exps, k, exp_bits)
       pack_monomials(e2, b.exps, k, exp_bits)
-      par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
+      par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
       a1 = par(a.coeffs, e1)
       b1 = par(b.coeffs, e2)
       a1.length = a.length
@@ -1466,7 +1466,7 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
          M = div(N + k - 1, k)
          e1 = Array{UInt}(M, length(a))
          pack_monomials(e1, a.exps, k, exp_bits)
-         par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
+         par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
          a1 = par(a.coeffs, e1)
          a1.length = a.length
          r1 = pow_fps(a1, b, exp_bits)
@@ -1642,7 +1642,7 @@ function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
       e2 = Array{UInt}(M, length(b))
       pack_monomials(e1, a.exps, k, exp_bits)
       pack_monomials(e2, b.exps, k, exp_bits)
-      par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
+      par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
       a1 = par(a.coeffs, e1)
       b1 = par(b.coeffs, e2)
       a1.length = a.length
@@ -1856,7 +1856,7 @@ function div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          e2 = Array{UInt}(M, length(b))
          pack_monomials(e1, a.exps, k, exp_bits)
          pack_monomials(e2, b.exps, k, exp_bits)
-         par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
+         par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
          a1 = par(a.coeffs, e1)
          b1 = par(b.coeffs, e2)
          a1.length = a.length
@@ -2078,7 +2078,7 @@ function divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          e2 = Array{UInt}(M, length(b))
          pack_monomials(e1, a.exps, k, exp_bits)
          pack_monomials(e2, b.exps, k, exp_bits)
-         par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
+         par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
          a1 = par(a.coeffs, e1)
          b1 = par(b.coeffs, e2)
          a1.length = a.length
@@ -2315,7 +2315,7 @@ function divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
          for i = 1:len
             pack_monomials(e2[i], b[i].exps, k, exp_bits)
          end
-         par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M)
+         par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
          a1 = par(a.coeffs, e1)
          a1.length = a.length
          b1 = [par(b[i].coeffs, e2[i]) for i in 1:len]
