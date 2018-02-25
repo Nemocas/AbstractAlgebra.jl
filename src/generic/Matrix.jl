@@ -281,7 +281,7 @@ function Base.view(M::AbstractAlgebra.MatElem, rows::UnitRange{Int}, ::Colon)
 end
 
 function Base.view(M::AbstractAlgebra.MatElem, ::Colon, cols::UnitRange{Int})
-  return view(M, 1:rows(x), cols)
+  return view(M, 1:rows(M), cols)
 end
 
 ################################################################################
