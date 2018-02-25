@@ -3635,8 +3635,9 @@ function det_popov(A::Mat{T}) where {T <: PolyElem}
    pivots = zeros(Int, n)
    diag_elems = zeros(Int, n)
    for i = 1:n
-      try pivots[i] = pivots1[i][1]
-      catch
+      if isassigned(pivots1, i) && length(pivots1[i]) > 0
+         pivots[i] = pivots1[i][1]
+      else
          # If there is no pivot in the ith column, A has not full rank.
          return R(0)
       end
@@ -3883,26 +3884,22 @@ function hnf_via_popov!(H::Mat{T}, U::Mat{T}, with_trafo::Bool = false) where {T
    weak_popov_with_pivots!(H, W, U, pivots, false, with_trafo)
    pivots_popov = zeros(Int, n)
    for j = 1:n
-      try pivots_popov[j] = pivots[j][1] end
+      if isassigned(pivots, j) && length(pivots[j]) > 0
+         pivots_popov[j] = pivots[j][1]
+      else
+         error("The rank must be equal to the number of columns.")
+      end
    end
    pivots_hermite = zeros(Int, n)
    for i = n-1:-1:1
       # "Remove" the column i+1 and compute a weak Popov Form of the
       # remaining matrix.
       r1 = pivots_popov[i+1]
-      if r1 == 0
-         continue
-      end
       c = find_pivot_popov(H, r1, i)
       new_pivot = true
       # If the pivot H[r1,c] is zero then the row is zero.
       while !iszero(H[r1,c])
          r2 = pivots_popov[c]
-         if r2 == 0
-            pivots_popov[c] = r1
-            new_pivot = false
-            break
-         end
          if degree(H[r2,c]) > degree(H[r1,c])
             r1, r2 = r2, r1
             pivots_popov[c] = r2
@@ -3930,9 +3927,6 @@ function hnf_via_popov!(H::Mat{T}, U::Mat{T}, with_trafo::Bool = false) where {T
    pivots_hermite[1] = pivots_popov[1]
    kb_sort_rows!(H, U, pivots_hermite, with_trafo)
    for c = 1:n
-      if pivots_hermite[c] == 0
-         continue
-      end
       kb_canonical_row!(H, U, pivots_hermite[c], c, with_trafo)
    end
    return nothing
