@@ -501,6 +501,74 @@ const LaurentSeriesElem{T} = Union{LaurentSeriesRingElem{T}, LaurentSeriesFieldE
 
 ###############################################################################
 #
+#   PuiseuxSeriesRing / PuiseuxSeriesRingElem
+#
+###############################################################################
+
+mutable struct PuiseuxSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
+   laurent_ring::Ring
+
+   function PuiseuxSeriesRing{T}(R::LaurentSeriesRing{T}, cached::Bool = true) where T <: RingElement
+      if haskey(PuiseuxSeriesID, R)
+         return PuiseuxSeriesID[R]::PuiseuxSeriesRing{T}
+      else
+         z = new{T}(R)
+         if cached
+            PuiseuxSeriesID[R] = z
+         end
+         return z
+      end
+   end
+end
+
+const PuiseuxSeriesID = Dict{Ring, Ring}()
+
+mutable struct PuiseuxSeriesRingElem{T <: RingElement} <: AbstractAlgebra.RingElem
+   data::LaurentSeriesRingElem{T}
+   scale::Rational{Int}
+   parent::PuiseuxSeriesRing{T}
+
+   function PuiseuxSeriesRingElem{T}(d::LaurentSeriesRingElem{T}, scale::Rational{Int}) where T <: RingElement
+      new{T}(d, scale)
+   end
+end
+
+###############################################################################
+#
+#   PuiseuxSeriesField / PuiseuxSeriesFieldElem
+#
+###############################################################################
+
+mutable struct PuiseuxSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
+   laurent_ring::Field
+
+   function PuiseuxSeriesField{T}(R::LaurentSeriesField{T}, cached::Bool = true) where T <: FieldElement
+      if haskey(PuiseuxSeriesID, R)
+         return PuiseuxSeriesID[R]::PuiseuxSeriesField{T}
+      else
+         z = new{T}(R)
+         if cached
+            PuiseuxSeriesID[R] = z
+         end
+         return z
+      end
+   end
+end
+
+mutable struct PuiseuxSeriesFieldElem{T <: FieldElement} <: AbstractAlgebra.FieldElem
+   data::LaurentSeriesFieldElem{T}
+   scale::Rational{Int}
+   parent::PuiseuxSeriesField{T}
+
+   function PuiseuxSeriesFieldElem{T}(d::LaurentSeriesFieldElem{T}, scale::Rational{Int}) where T <: FieldElement
+      new{T}(d, scale)
+   end
+end
+
+const PuiseuxSeriesElem{T} = Union{PuiseuxSeriesRingElem{T}, PuiseuxSeriesFieldElem{T}} where T <: RingElement
+
+###############################################################################
+#
 #   FracField / Frac
 #
 ###############################################################################
