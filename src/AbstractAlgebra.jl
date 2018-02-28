@@ -130,7 +130,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  interpolate, inv, inv!, invmod, isconstant, isdegree,
                  isdomain_type, isexact_type, isgen, ishessenberg, ismonomial,
                  isnegative, isone, isreverse, isrimhook, isrref, issquare, isterm,
-                 isunit, lcm, lead, length, leglength, main_variable,
+                 isunit, laurent_ring, lcm, lead, length, leglength, main_variable,
                  main_variable_extract, main_variable_insert, matrix,
                  matrix_repr, max_degrees, max_precision, minpoly, mod,
                  modulus, monomial_iszero, monomial_set!, monomial_to_newton!,
@@ -168,7 +168,7 @@ export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  interpolate, inv, inv!, invmod, isconstant, isdegree,
                  isdomain_type, isexact, isexact_type, isgen, ishessenberg,
                  ismonomial, isnegative, isone, isreverse, isrimhook, isrref, issquare,
-                 isterm, isunit, iszero, lcm, lead, leglength, length,
+                 isterm, isunit, iszero, laurent_ring, lcm, lead, leglength, length,
                  main_variable, main_variable_extract, main_variable_insert,
                  matrix, matrix_repr, max_degrees, max_precision, minpoly, mod,
                  modulus, monomial_iszero, monomial_set!, monomial_to_newton!,
@@ -257,6 +257,18 @@ function LaurentSeriesField(R::Field, prec::Int, s::AbstractString; cached=true)
    Generic.LaurentSeriesField(R, prec, s; cached=cached)
 end
 
+function PuiseuxSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true)
+   Generic.PuiseuxSeriesRing(R, prec, s; cached=cached)
+end
+
+function PuiseuxSeriesRing(R::Field, prec::Int, s::AbstractString; cached=true)
+   Generic.PuiseuxSeriesField(R, prec, s; cached=cached)
+end
+
+function PuiseuxSeriesField(R::Field, prec::Int, s::AbstractString; cached=true)
+   Generic.PuiseuxSeriesField(R, prec, s; cached=cached)
+end
+
 function PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
    Generic.PolynomialRing(R, s; cached=cached)
 end
@@ -303,7 +315,8 @@ end
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        FractionField, ResidueRing, Partition, PermGroup, YoungTableau,
        AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
-       LaurentSeriesField, ResidueField, NumberField
+       LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
+       PuiseuxSeriesField
 
 export Generic
 

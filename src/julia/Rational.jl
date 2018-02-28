@@ -61,8 +61,7 @@ canonical_unit(a::Rational)  = a
 ###############################################################################
 
 function show(io::IO, R::Rationals)
-   print(io, "Rationals over ")
-   show(io, base_ring(R))
+   print(io, "Rationals")
 end
 
 needs_parentheses(::Rational) = false

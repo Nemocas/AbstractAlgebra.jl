@@ -48,6 +48,8 @@ include("generic/AbsSeries.jl")
 
 include("generic/LaurentSeries.jl")
 
+include("generic/PuiseuxSeries.jl")
+
 include("generic/Matrix.jl")
 
 include("generic/Fraction.jl")
