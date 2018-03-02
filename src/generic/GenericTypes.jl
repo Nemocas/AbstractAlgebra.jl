@@ -450,13 +450,12 @@ mutable struct LaurentSeriesRingElem{T <: RingElement} <: AbstractAlgebra.RingEl
    length::Int
    prec::Int
    val::Int
+   scale::Int
    parent::LaurentSeriesRing{T}
 
-   function LaurentSeriesRingElem{T}(a::Array{T, 1}, length::Int, prec::Int, val::Int) where T <: RingElement
-      new{T}(a, length, prec, val)
+   function LaurentSeriesRingElem{T}(a::Array{T, 1}, length::Int, prec::Int, val::Int, scale::Int) where T <: RingElement
+      new{T}(a, length, prec, val, scale)
    end
-
-   LaurentSeriesRingElem{T}(a::LaurentSeriesRingElem{T}) where T <: RingElement = a
 end
 
 ###############################################################################
@@ -488,13 +487,12 @@ mutable struct LaurentSeriesFieldElem{T <: FieldElement} <: AbstractAlgebra.Fiel
    length::Int
    prec::Int
    val::Int
+   scale::Int
    parent::LaurentSeriesField{T}
 
-   function LaurentSeriesFieldElem{T}(a::Array{T, 1}, length::Int, prec::Int, val::Int) where T <: FieldElement
-      new{T}(a, length, prec, val)
+   function LaurentSeriesFieldElem{T}(a::Array{T, 1}, length::Int, prec::Int, val::Int, scale::Int) where T <: FieldElement
+      new{T}(a, length, prec, val, scale)
    end
-
-   LaurentSeriesFieldElem{T}(a::LaurentSeriesFieldElem{T}) where T <: FieldElement = a
 end
 
 const LaurentSeriesElem{T} = Union{LaurentSeriesRingElem{T}, LaurentSeriesFieldElem{T}} where T <: RingElement

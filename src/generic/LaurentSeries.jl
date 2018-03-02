@@ -15,13 +15,13 @@ export exp_gcd, inflate, deflate
 
 doc"""
     O{T <: RingElement}(a::LaurentSeriesElem{T})
-> Returns $0 + O(x^\mbox{deg}(a))$. Usually this function is called with $x^n$
+> Returns $0 + O(x^\mbox{val}(a))$. Usually this function is called with $x^n$
 > as parameter. Then the function returns the power series $0 + O(x^n)$, which
 > can be used to set the precision of a power series when constructing it.
 """
 function O(a::LaurentSeriesElem{T}) where T <: RingElement
-   val = pol_length(a) + valuation(a) - 1
-   return parent(a)(Array{T}(0), 0, val, val)
+   val = valuation(a)
+   return parent(a)(Array{T}(0), 0, val, val, 1)
 end
 
 parent_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesRingElem{S}} = LaurentSeriesRing{S}
@@ -90,9 +90,10 @@ end
 function Base.hash(a::LaurentSeriesElem, h::UInt)
    b = 0xb163af5694734274%UInt
    for i in 0:pol_length(a) - 1
-      b = xor(b, hash(polcoeff(a, i), h), h)
+      b = xor(b, hash(polcoeff(a, i), h))
       b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
    end
+   b = xor(b, hash(scale(a), h))
    return b
 end
 
@@ -118,6 +119,12 @@ doc"""
 valuation(a::LaurentSeriesElem) = a.val
 
 doc"""
+    scale(a::LaurentSeriesElem)
+> Return the scale factor of the polynomial underlying the given power series.
+"""
+scale(a::LaurentSeriesElem) = a.scale
+
+doc"""
     max_precision(R::LaurentSeriesRing)
 > Return the maximum relative precision of power series in the given power
 > series ring.
@@ -133,17 +140,16 @@ max_precision(R::LaurentSeriesField) = R.prec_max
 
 doc"""
    exp_gcd(a::LaurentSeriesElem)
-> Return the GCD of the exponents of the given Laurent series, including the precision.
+> Return the GCD of the exponents of the polynomial underlying the given Laurent series.
 """
 function exp_gcd(a::LaurentSeriesElem)
-   n = precision(a)
-   val = valuation(a)
-   for i = 0:pol_length(a) - 1
+   n = 0
+   for i = 1:pol_length(a) - 1
       if n == 1
          return n
       end
       if polcoeff(a, i) != 0
-         n = gcd(n, val + i)
+         n = gcd(n, i)
       end
    end
    return n
@@ -168,6 +174,14 @@ function set_val!(a::LaurentSeriesElem, val::Int)
    a.val = val
 end
 
+doc"""
+    set_scale!(a::LaurentSeriesElem, scale::Int)
+> Set the scale factor of the polynomial underlying the given series to the given value.
+"""
+function set_scale!(a::LaurentSeriesElem, scale::Int)
+   a.scale = scale
+end
+
 function polcoeff(a::LaurentSeriesElem, n::Int)
    n < 0  && throw(DomainError())
    return n >= pol_length(a) ? zero(base_ring(a)) : a.coeffs[n + 1]
@@ -177,8 +191,33 @@ function coeff(a::LaurentSeriesElem, n::Int)
    if n < valuation(a)
       return base_ring(a)()
    else
-      return polcoeff(a, n - valuation(a))
+      i = n - valuation(a)
+      if mod(i, scale(a)) != 0
+         return base_ring(a)()
+      else
+         return polcoeff(a, div(i, scale(a)))
+      end
    end
+end
+
+doc"""
+    rescale!(a::LaurentSeriesElem)
+> Rescale the polynomial underlying the series so that the GCD of its exponents is 1.
+> This is only used internally, since the result of every user facing function is a
+> rescaled series.
+"""
+function rescale!(a::LaurentSeriesElem)
+   s = exp_gcd(a)
+   if s > 1
+      zlen = div(pol_length(a) - 1, s) + 1
+      for i = 1:zlen - 1
+         t = polcoeff(a, i)
+         a = set_coeff!(a, i, polcoeff(a, i*s))
+         a = set_coeff!(a, i*s, t)
+      end
+      set_length!(a, zlen)
+   end
+   return a
 end
 
 doc"""
@@ -216,7 +255,7 @@ doc"""
 """
 function gen(R::LaurentSeriesRing)
    S = base_ring(R)
-   return R([S(1)], 1, max_precision(R) + 1, 1)
+   return R([S(1)], 1, max_precision(R) + 1, 1, 1)
 end
 
 doc"""
@@ -226,7 +265,7 @@ doc"""
 """
 function gen(R::LaurentSeriesField)
    S = base_ring(R)
-   return R([S(1)], 1, max_precision(R) + 1, 1)
+   return R([S(1)], 1, max_precision(R) + 1, 1, 1)
 end
 
 doc"""
@@ -273,7 +312,7 @@ function deepcopy_internal(a::LaurentSeriesElem{T}, dict::ObjectIdDict) where {T
    for i = 1:pol_length(a)
       coeffs[i] = deepcopy(polcoeff(a, i - 1))
    end
-   return parent(a)(coeffs, pol_length(a), precision(a), valuation(a))
+   return parent(a)(coeffs, pol_length(a), precision(a), valuation(a), scale(a))
 end
 
 function renormalize!(z::LaurentSeriesElem)
@@ -289,7 +328,7 @@ function renormalize!(z::LaurentSeriesElem)
       set_length!(z, 0)
       set_val!(z, zprec)
    else
-      set_val!(z, zval + i)
+      set_val!(z, zval + i*scale(z))
       for j = 1:zlen - i
          z = setcoeff!(z, j - 1, polcoeff(z, j + i - 1))
       end
@@ -310,6 +349,7 @@ function show(io::IO, x::LaurentSeriesElem)
       print(io, zero(base_ring(x)))
    else
       coeff_printed = false
+      sc = scale(x)
       for i = 0:len - 1
          c = polcoeff(x, i)
          bracket = needs_parentheses(c)
@@ -317,7 +357,7 @@ function show(io::IO, x::LaurentSeriesElem)
             if coeff_printed && !isnegative(c)
                print(io, "+")
             end
-            if i + valuation(x) != 0
+            if i*sc + valuation(x) != 0
                if !isone(c) && (c != -1 || show_minus_one(elem_type(base_ring(x))))
                   if bracket
                      print(io, "(")
@@ -326,7 +366,7 @@ function show(io::IO, x::LaurentSeriesElem)
                   if bracket
                      print(io, ")")
                   end
-                  if i + valuation(x) != 0
+                  if i*sc + valuation(x) != 0
                      print(io, "*")
                   end
                end
@@ -334,9 +374,9 @@ function show(io::IO, x::LaurentSeriesElem)
                   print(io, "-")
                end
                print(io, string(var(parent(x))))
-               if i + valuation(x) != 1
+               if i*sc + valuation(x) != 1
                   print(io, "^")
-                  print(io, valuation(x) + i)
+                  print(io, valuation(x) + i*sc)
                end
             else
                print(io, c)
@@ -379,6 +419,7 @@ function -(a::LaurentSeriesElem)
    z = parent(a)()
    set_prec!(z, precision(a))
    set_val!(z, valuation(a))
+   set_scale!(z, scale(a))
    fit!(z, len)
    for i = 1:len
       z = setcoeff!(z, i - 1, -polcoeff(a, i - 1))
@@ -569,6 +610,7 @@ function *(a::T, b::LaurentSeriesElem{T}) where {T <: RingElem}
    fit!(z, len)
    set_prec!(z, precision(b))
    set_val!(z, valuation(b))
+   set_scale!(z, scale(b))
    for i = 1:len
       z = setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
    end
@@ -587,6 +629,7 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::LaurentSeriesElem)
    fit!(z, len)
    set_prec!(z, precision(b))
    set_val!(z, valuation(b))
+   set_scale!(z, scale(b))
    for i = 1:len
       z = setcoeff!(z, i - 1, a*polcoeff(b, i - 1))
    end
@@ -1362,22 +1405,22 @@ function (R::LaurentSeriesField{T})(b::RingElement) where {T <: FieldElement}
 end
 
 function (R::LaurentSeriesRing{T})() where {T <: RingElement}
-   z = LaurentSeriesRingElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max)
+   z = LaurentSeriesRingElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max, 1)
    z.parent = R
    return z
 end
 
 function (R::LaurentSeriesField{T})() where {T <: FieldElement}
-   z = LaurentSeriesFieldElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max)
+   z = LaurentSeriesFieldElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max, 1)
    z.parent = R
    return z
 end
 
 function (R::LaurentSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
    if b == 0
-      z = LaurentSeriesRingElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max)
+      z = LaurentSeriesRingElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max, 1)
    else
-      z = LaurentSeriesRingElem{T}([base_ring(R)(b)], 1, R.prec_max, 0)
+      z = LaurentSeriesRingElem{T}([base_ring(R)(b)], 1, R.prec_max, 0, 1)
    end
    z.parent = R
    return z
@@ -1385,9 +1428,9 @@ end
 
 function (R::LaurentSeriesField{T})(b::Union{Rational, AbstractFloat}) where {T <: FieldElement}
    if b == 0
-      z = LaurentSeriesFieldElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max)
+      z = LaurentSeriesFieldElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max, 1)
    else
-      z = LaurentSeriesFieldElem{T}([base_ring(R)(b)], 1, R.prec_max, 0)
+      z = LaurentSeriesFieldElem{T}([base_ring(R)(b)], 1, R.prec_max, 1)
    end
    z.parent = R
    return z
@@ -1396,9 +1439,9 @@ end
 function (R::LaurentSeriesRing{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(R) && error("Unable to coerce to power series")
    if iszero(b)
-      z = LaurentSeriesRingElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max)
+      z = LaurentSeriesRingElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max, 1)
    else
-      z = LaurentSeriesRingElem{T}([b], 1, R.prec_max, 0)
+      z = LaurentSeriesRingElem{T}([b], 1, R.prec_max, 0, 1)
    end
    z.parent = R
    return z
@@ -1407,9 +1450,9 @@ end
 function (R::LaurentSeriesField{T})(b::T) where {T <: FieldElem}
    parent(b) != base_ring(R) && error("Unable to coerce to power series")
    if iszero(b)
-      z = LaurentSeriesFieldElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max)
+      z = LaurentSeriesFieldElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max, 1)
    else
-      z = LaurentSeriesFieldElem{T}([b], 1, R.prec_max, 0)
+      z = LaurentSeriesFieldElem{T}([b], 1, R.prec_max, 0, 1)
    end
    z.parent = R
    return z
@@ -1425,21 +1468,23 @@ function (R::LaurentSeriesField{T})(b::LaurentSeriesElem{T}) where {T <: FieldEl
    return b
 end
 
-function (R::LaurentSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int) where {T <: RingElement}
+function (R::LaurentSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int, scale::Int) where {T <: RingElement}
    if length(b) > 0
       parent(b[1]) != base_ring(R) && error("Unable to coerce to power series")
    end
-   z = LaurentSeriesRingElem{T}(b, len, prec, val)
+   z = LaurentSeriesRingElem{T}(b, len, prec, val, scale)
    z.parent = R
+   z = rescale!(z)
    return z
 end
 
-function (R::LaurentSeriesField{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int) where {T <: RingElement}
+function (R::LaurentSeriesField{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int, scale::Int) where {T <: RingElement}
    if length(b) > 0
       parent(b[1]) != base_ring(R) && error("Unable to coerce to power series")
    end
-   z = LaurentSeriesFieldElem{T}(b, len, prec, val)
+   z = LaurentSeriesFieldElem{T}(b, len, prec, val, scale)
    z.parent = R
+   z = rescale!(z)
    return z
 end
 
