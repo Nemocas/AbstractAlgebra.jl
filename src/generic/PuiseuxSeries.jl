@@ -204,13 +204,12 @@ doc"""
 function rescale!(a::PuiseuxSeriesElem)
    if !iszero(a)
       d = exp_gcd(a.data)
-      if d == 1
-         return a
+      if d != 1
+         a.data = deflate(a.data, d)
+         a.scale *= d
       end
-      a.data = deflate(a.data, d)
-      a.scale *= d
-      return a
    end
+   return a
 end
 
 function deepcopy_internal(a::PuiseuxSeriesElem{T}, dict::ObjectIdDict) where {T <: RingElement}

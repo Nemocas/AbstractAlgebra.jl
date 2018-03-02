@@ -538,9 +538,12 @@ function *(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
    end
    for i = 1:lena - 1
       if lenz > i
-         for j = 2:min(lenb, lenz - i + 1)
-            t = mul!(t, polcoeff(a, i - 1), polcoeff(b, j - 1))
-            d[i + j - 1] = addeq!(d[i + j - 1], t)
+         ai = polcoeff(a, i - 1)
+         if ai != 0
+            for j = 2:min(lenb, lenz - i + 1)
+               t = mul!(t, ai, polcoeff(b, j - 1))
+               d[i + j - 1] = addeq!(d[i + j - 1], t)
+            end
          end
       end
    end
