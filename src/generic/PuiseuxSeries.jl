@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export laurent_ring
+export laurent_ring, rescale!
 
 ###############################################################################
 #
@@ -195,6 +195,24 @@ doc"""
 """
 modulus(a::PuiseuxSeriesElem{T}) where {T <: ResElem} = modulus(base_ring(a))
 
+doc"""
+    rescale(a::PuiseuxSeriesElem)
+> Rescale the polynomial underlying $a$ so that the greatest common divisor of the
+> exponents of the underlying Laurent series is $1$. This function is mainly used
+> internally, as the output of Puiseux series functions is assumed to be rescaled.
+"""
+function rescale!(a::PuiseuxSeriesElem)
+   if !iszero(a)
+      d = exp_gcd(a.data)
+      if d == 1
+         return a
+      end
+      a.data = deflate(a.data, d)
+      a.scale *= d
+      return a
+   end
+end
+
 function deepcopy_internal(a::PuiseuxSeriesElem{T}, dict::ObjectIdDict) where {T <: RingElement}
     return parent(a)(deepcopy(a.data), a.scale)
 end
@@ -225,6 +243,103 @@ isnegative(x::PuiseuxSeriesElem) = pol_length(x) <= 1 && isnegative(polcoeff(x.d
 
 show_minus_one(::Type{PuiseuxSeriesElem{T}}) where {T <: RingElement} = show_minus_one(T)
 
+###############################################################################
+#
+#   Unary operators
+#
+###############################################################################
+
+function -(a::PuiseuxSeriesElem)
+   R = parent(a)
+   return R(-a.data, a.scale)
+end
+
+###############################################################################
+#
+#   Binary operators
+#
+###############################################################################
+
+function +(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
+    zscale = gcd(a.scale, b.scale)
+    ainf = numerator(a.scale//zscale)
+    binf = numerator(b.scale//zscale)
+    z = parent(a)(inflate(a.data, ainf) + inflate(b.data, binf), zscale)
+    z = rescale!(z)
+    return z
+end
+
+function -(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
+    zscale = gcd(a.scale, b.scale)
+    ainf = numerator(a.scale//zscale)
+    binf = numerator(b.scale//zscale)
+    z = parent(a)(inflate(a.data, ainf) - inflate(b.data, binf), zscale)
+    z = rescale!(z)
+    return z
+end
+
+function *(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
+    zscale = gcd(a.scale, b.scale)
+    ainf = numerator(a.scale//zscale)
+    binf = numerator(b.scale//zscale)
+    z = parent(a)(inflate(a.data, ainf)*inflate(b.data, binf), zscale)
+    z = rescale!(z)
+    return z
+end
+
+###############################################################################
+#
+#   Exact division
+#
+###############################################################################
+
+function divexact(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
+    zscale = gcd(a.scale, b.scale)
+    ainf = numerator(a.scale//zscale)
+    binf = numerator(b.scale//zscale)
+    z = parent(a)(divexact(inflate(a.data, ainf), inflate(b.data, binf)), zscale)
+    z = rescale!(z)
+    return z
+end
+
+###############################################################################
+#
+#   Powering
+#
+###############################################################################
+
+function ^(a::PuiseuxSeriesElem{T}, b::Int) where T <: RingElement
+   # special case powers of x for constructing power series efficiently
+   if pol_length(a.data) == 0
+      return parent(a)(a.data^0, a.scale)
+   elseif b == 0
+      # in fact, the result would be exact 1 if we had exact series
+      return one(parent(a))
+   elseif pol_length(a.data) == 1
+      return parent(a)(a.data^b, a.scale)
+   elseif b == 1
+      return deepcopy(a)
+   elseif b == -1
+      return inv(a)
+   end
+
+   if b < 0
+      a = inv(a)
+      b = -b
+   end
+
+   z = parent(a)(a.data^b, a.scale)
+   z = rescale!(z)
+   return z
+end
+
+function ^(a::PuiseuxSeriesElem{T}, b::Rational{Int}) where T <: RingElement
+   (pol_length(a.data) != 1 || polcoeff(a.data, 0) != 1) && error("Rational power not implemented")
+   z = parent(a)(a.data^numerator(b), a.scale//denominator(b))
+   z = rescale!(z)
+   return z
+end
+   
 ###############################################################################
 #
 #   Promotion rules
