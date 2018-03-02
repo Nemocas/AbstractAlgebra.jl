@@ -614,6 +614,21 @@ function test_laurent_series_truncation()
    println("PASS")
 end
 
+function test_laurent_series_inflation_deflation()
+   print("Generic.LaurentSeries.inflation_deflation...")
+
+   #  Exact ring
+   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   for iter = 1:100
+      f = rand(R, -12:12, -10:10)
+      n = rand(1:20)
+
+      @test isequal(deflate(inflate(f, n), n) f)
+   end
+
+   println("PASS")
+end
+
 function test_laurent_series_inversion()
    print("Generic.LaurentSeries.inversion...")
 
@@ -844,6 +859,7 @@ function test_gen_laurent_series()
    test_laurent_series_powering()
    test_laurent_series_shift()
    test_laurent_series_truncation()
+   test_laurent_series_inflation_deflation()
    test_laurent_series_exact_division()
    test_laurent_series_adhoc_exact_division()
    test_laurent_series_inversion()

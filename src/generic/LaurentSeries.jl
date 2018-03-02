@@ -5,6 +5,8 @@
 #
 ###############################################################################
 
+export exp_gcd, inflate, deflate
+
 ###############################################################################
 #
 #   Data type and parent object methods
@@ -128,6 +130,24 @@ doc"""
 > series ring.
 """
 max_precision(R::LaurentSeriesField) = R.prec_max
+
+doc"""
+   exp_gcd(a::LaurentSeriesElem)
+> Return the GCD of the exponents of the given Laurent series, including the precision.
+"""
+function exp_gcd(a::LaurentSeriesElem)
+   n = precision(a)
+   val = valuation(a)
+   for i = 0:pol_length(a) - 1
+      if n == 1
+         return n
+      end
+      if polcoeff(a, i) != 0
+         n = gcd(n, val + i)
+      end
+   end
+   return n
+end
 
 function normalise(a::LaurentSeriesElem, len::Int)
    while len > 0 && iszero(a.coeffs[len])
@@ -678,6 +698,60 @@ function mullow(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}, n::Int) where 
    z = parent(a)(d, lenz, prec, 0)
    set_length!(z, normalise(z, lenz))
    return z
+end
+
+###############################################################################
+#
+#   Inflate/deflate
+#
+###############################################################################
+
+doc"""
+    inflate{T <: RingElement}(a::LaurentSeriesElem{T}, n::Int)
+> Return the series $a(x^n)$, i.e. the series where every exponent has been multiplied
+> by $n$, including the precision.
+"""
+function inflate(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
+   n <= 0 && throw(DomainError())
+   if n == 1
+      return a
+   end
+   R = base_ring(a)
+   lena = pol_length(a)
+   lenz = lena == 0 ? 0 : (lena - 1)*n + 1
+   d = Array{T}(lenz)
+   j = 0
+   for i = 0:lenz - 1
+      if mod(i, n) == 0
+         d[i + 1] = polcoeff(a, j)
+         j += 1
+      else
+         d[i + 1] = R()
+      end
+   end
+   return parent(a)(d, lenz, precision(a)*n, valuation(a)*n)
+end
+
+doc"""
+    deflate{T <: RingElement}(a::LaurentSeriesElem{T}, n::Int)
+> Return the series $a(x^(1/n))$, i.e. the series where every exponent has been
+> divided by $n$, including the precision. No check is made whether the exponents
+> are divisible by $n$.
+"""
+function deflate(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
+   n <= 0 && throw(DomainError())
+   if n == 1
+      return a
+   end
+   lena = pol_length(a)
+   lenz = lena == 0 ? 0 : div(lena - 1, n) + 1
+   d = Array{T}(lenz)
+   j = 0
+   for i = 0:lenz - 1
+      d[i + 1] = polcoeff(a, j)
+      j += n
+   end
+   return parent(a)(d, lenz, div(precision(a), n), div(valuation(a), n))
 end
 
 ###############################################################################
