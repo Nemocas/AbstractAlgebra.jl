@@ -5,7 +5,7 @@
 #
 ###############################################################################
 
-export exp_gcd, inflate, deflate
+export exp_gcd
 
 ###############################################################################
 #
@@ -1057,22 +1057,26 @@ function inv(a::LaurentSeriesElem)
    iszero(a) && throw(DivideError())
    a1 = polcoeff(a, 0)
    ainv = parent(a)()
-   fit!(ainv, precision(a) - valuation(a))
+   sa = scale(a)
+   lenz = div(precision(a) - valuation(a) + sa - 1, sa)
+   fit!(ainv, lenz)
    set_prec!(ainv, precision(a) - 2*valuation(a))
    set_val!(ainv, -valuation(a))
+   set_scale!(ainv, sa)
    !isunit(a1) && error("Unable to invert power series")
-   if precision(a) - valuation(a) != 0
+   if lenz != 0
       ainv = setcoeff!(ainv, 0, divexact(one(base_ring(a)), a1))
    end
    a1 = -a1
-   for n = 2:precision(a) - valuation(a)
+   for n = 2:lenz
       s = polcoeff(a, 1)*polcoeff(ainv, n - 2)
       for i = 2:min(n, pol_length(a)) - 1
          s += polcoeff(a, i)*polcoeff(ainv, n - i - 1)
       end
       ainv = setcoeff!(ainv, n - 1, divexact(s, a1))
    end
-   set_length!(ainv, normalise(ainv, precision(a) - valuation(a)))
+   set_length!(ainv, normalise(ainv, lenz))
+   ainv = rescale!(ainv)
    return ainv
 end
 
