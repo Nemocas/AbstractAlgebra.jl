@@ -856,21 +856,15 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
    while (UInt(bit) & b) == 0
       bit >>= 1
    end
-   val = valuation(a)
-   a = shift_right(a, val)
-   prec = precision(a)
    z = a
    bit >>= 1
    while bit !=0
-      z = mullow(z, z, prec)
+      z *= z
       if (UInt(bit) & b) != 0
-         z = mullow(z, a, prec)
+         z *= a
       end
       bit >>= 1
    end
-   set_val!(z, b*val)
-   set_prec!(z, b*val + prec)
-   renormalize!(z)
    return z
 end
 
