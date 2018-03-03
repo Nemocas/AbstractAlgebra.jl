@@ -34,8 +34,8 @@ doc"""
 function O(a::PuiseuxSeriesElem{T}) where T <: RingElement
    val = valuation(a)
    par = parent(a)
-   laur = laurent_ring(par)(Array{T}(0), 0, numerator(val), numerator(val))
-   return parent(a)(laur, 1//denominator(val))
+   laur = laurent_ring(par)(Array{T}(0), 0, numerator(val), numerator(val), 1)
+   return parent(a)(laur, denominator(val))
 end
 
 parent_type(::Type{T}) where {S <: RingElement, T <: PuiseuxSeriesRingElem{S}} = PuiseuxSeriesRing{S}
@@ -99,14 +99,14 @@ doc"""
     precision(a::PuiseuxSeriesElem)
 > Return the precision of the given Puiseux series in absolute terms.
 """
-precision(a::PuiseuxSeriesElem) = precision(a.data)*a.scale
+precision(a::PuiseuxSeriesElem) = precision(a.data)//a.scale
 
 doc"""
     valuation(a::PuiseuxSeriesElem)
 > Return the valuation of the given Puiseux series, i.e. the exponent of the first
 > nonzero term (or the precision if it is arithmetically zero).
 """
-valuation(a::PuiseuxSeriesElem) = valuation(a.data)*a.scale
+valuation(a::PuiseuxSeriesElem) = valuation(a.data)//a.scale
 
 doc"""
     zero(R::PuiseuxSeriesRing)
@@ -143,7 +143,7 @@ doc"""
 """
 function gen(R::PuiseuxSeriesRing)
    S = laurent_ring(R)
-   return R(gen(S), 1//1)
+   return R(gen(S), 1)
 end
 
 doc"""
@@ -153,7 +153,7 @@ doc"""
 """
 function gen(R::PuiseuxSeriesField)
    S = laurent_ring(R)
-   return R(gen(S), 1//1)
+   return R(gen(S), 1)
 end
 
 doc"""
@@ -197,16 +197,18 @@ modulus(a::PuiseuxSeriesElem{T}) where {T <: ResElem} = modulus(base_ring(a))
 
 doc"""
     rescale(a::PuiseuxSeriesElem)
-> Rescale the polynomial underlying $a$ so that the greatest common divisor of the
-> exponents of the underlying Laurent series is $1$. This function is mainly used
-> internally, as the output of Puiseux series functions is assumed to be rescaled.
+> Rescale so that the scale of the given Puiseux series and the scale of the underlying
+> Laurent series are coprime. This function is used internally, as all user facing
+> functions are assumed to rescale their output.
 """
 function rescale!(a::PuiseuxSeriesElem)
    if !iszero(a)
-      d = exp_gcd(a.data)
+      d = gcd(a.scale, gcd(scale(a.data), gcd(valuation(a.data), precision(a.data))))
       if d != 1
-         a.data = deflate(a.data, d)
-         a.scale *= d
+         set_scale!(a.data, div(scale(a.data), d))
+         set_prec!(a.data, div(precision(a.data), d))
+         set_val!(a.data, div(valuation(a.data), d))
+         a.scale = div(a.scale, d)
       end
    end
    return a
@@ -260,28 +262,31 @@ end
 ###############################################################################
 
 function +(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
-    zscale = gcd(a.scale, b.scale)
-    ainf = numerator(a.scale//zscale)
-    binf = numerator(b.scale//zscale)
-    z = parent(a)(inflate(a.data, ainf) + inflate(b.data, binf), zscale)
+    s = gcd(a.scale, b.scale)
+    zscale = div(a.scale*b.scale, s)
+    ainf = div(a.scale, s)
+    binf = div(b.scale, s)
+    z = parent(a)(inflate(a.data, binf) + inflate(b.data, ainf), zscale)
     z = rescale!(z)
     return z
 end
 
 function -(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
-    zscale = gcd(a.scale, b.scale)
-    ainf = numerator(a.scale//zscale)
-    binf = numerator(b.scale//zscale)
-    z = parent(a)(inflate(a.data, ainf) - inflate(b.data, binf), zscale)
+    s = gcd(a.scale, b.scale)
+    zscale = div(a.scale*b.scale, s)
+    ainf = div(a.scale, s)
+    binf = div(b.scale, s)
+    z = parent(a)(inflate(a.data, binf) - inflate(b.data, ainf), zscale)
     z = rescale!(z)
     return z
 end
 
 function *(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
-    zscale = gcd(a.scale, b.scale)
-    ainf = numerator(a.scale//zscale)
-    binf = numerator(b.scale//zscale)
-    z = parent(a)(inflate(a.data, ainf)*inflate(b.data, binf), zscale)
+    s = gcd(a.scale, b.scale)
+    zscale = div(a.scale*b.scale, s)
+    ainf = div(a.scale, s)
+    binf = div(b.scale, s)
+    z = parent(a)(inflate(a.data, binf)*inflate(b.data, ainf), zscale)
     z = rescale!(z)
     return z
 end
@@ -293,10 +298,11 @@ end
 ###############################################################################
 
 function divexact(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
-    zscale = gcd(a.scale, b.scale)
-    ainf = numerator(a.scale//zscale)
-    binf = numerator(b.scale//zscale)
-    z = parent(a)(divexact(inflate(a.data, ainf), inflate(b.data, binf)), zscale)
+    s = gcd(a.scale, b.scale)
+    zscale = div(a.scale*b.scale, s)
+    ainf = div(a.scale, s)
+    binf = div(b.scale, s)
+    z = parent(a)(divexact(inflate(a.data, binf), inflate(b.data, ainf)), zscale)
     z = rescale!(z)
     return z
 end
@@ -309,7 +315,7 @@ end
 
 function ^(a::PuiseuxSeriesElem{T}, b::Int) where T <: RingElement
    # special case powers of x for constructing power series efficiently
-   if pol_length(a.data) == 0
+   if iszero(a.data)
       return parent(a)(a.data^0, a.scale)
    elseif b == 0
       # in fact, the result would be exact 1 if we had exact series
@@ -334,7 +340,7 @@ end
 
 function ^(a::PuiseuxSeriesElem{T}, b::Rational{Int}) where T <: RingElement
    (pol_length(a.data) != 1 || polcoeff(a.data, 0) != 1) && error("Rational power not implemented")
-   z = parent(a)(a.data^numerator(b), a.scale//denominator(b))
+   z = parent(a)(a.data^numerator(b), a.scale*denominator(b))
    z = rescale!(z)
    return z
 end
@@ -366,51 +372,51 @@ function (R::PuiseuxSeriesField{T})(b::RingElement) where {T <: FieldElement}
 end
 
 function (R::PuiseuxSeriesRing{T})() where {T <: RingElement}
-   z = PuiseuxSeriesRingElem{T}(laurent_ring(R)(), 1//1)
+   z = PuiseuxSeriesRingElem{T}(laurent_ring(R)(), 1)
    z.parent = R
    return z
 end
 
 function (R::PuiseuxSeriesField{T})() where {T <: FieldElement}
-   z = PuiseuxSeriesFieldElem{T}(laurent_ring(R)(), 1//1)
+   z = PuiseuxSeriesFieldElem{T}(laurent_ring(R)(), 1)
    z.parent = R
    return z
 end
 
-function (R::PuiseuxSeriesRing{T})(b::LaurentSeriesRingElem{T}, scale::Rational{Int}) where T <: RingElement
+function (R::PuiseuxSeriesRing{T})(b::LaurentSeriesRingElem{T}, scale::Int) where T <: RingElement
    z = PuiseuxSeriesRingElem{T}(b, scale)
    z.parent = R
    return z
 end
 
-function (R::PuiseuxSeriesField{T})(b::LaurentSeriesFieldElem{T}, scale::Rational{Int}) where T <: FieldElement
+function (R::PuiseuxSeriesField{T})(b::LaurentSeriesFieldElem{T}, scale::Int) where T <: FieldElement
    z = PuiseuxSeriesFieldElem{T}(b, scale)
    z.parent = R
    return z
 end
 
 function (R::PuiseuxSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where T <: RingElement
-   z = PuiseuxSeriesRingElem{T}(laurent_ring(R)(b), 1//1)
+   z = PuiseuxSeriesRingElem{T}(laurent_ring(R)(b), 1)
    z.parent = R
    return z
 end
 
 function (R::PuiseuxSeriesField{T})(b::Union{Rational, AbstractFloat}) where T <: FieldElement
-   z = PuiseuxSeriesFieldElem{T}(laurent_ring(R)(b), 1//1)
+   z = PuiseuxSeriesFieldElem{T}(laurent_ring(R)(b), 1)
    z.parent = R
    return z
 end
 
 function (R::PuiseuxSeriesRing{T})(b::T) where T <: RingElem
    parent(b) != base_ring(R) && error("Unable to coerce to Puiseux series")
-   z = PuiseuxSeriesRingElem{T}(laurent_ring(R)(b), 1//1)
+   z = PuiseuxSeriesRingElem{T}(laurent_ring(R)(b), 1)
    z.parent = R
    return z
 end
 
 function (R::PuiseuxSeriesField{T})(b::T) where T <: FieldElem
    parent(b) != base_ring(R) && error("Unable to coerce to Puiseux series")
-   z = PuiseuxSeriesFieldElem{T}(laurent_ring(R)(b), 1//1)
+   z = PuiseuxSeriesFieldElem{T}(laurent_ring(R)(b), 1)
    z.parent = R
    return z
 end
