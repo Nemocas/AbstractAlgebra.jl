@@ -223,6 +223,37 @@ function rescale!(a::LaurentSeriesElem)
 end
 
 doc"""
+    downscale{T <: RingElement}(a::LaurentSeriesElem{T}, n::Int)
+> Inflate the underlying polynomial by a factor of $n$. This inserts zero coefficients
+> for padding. It is assumed that the scale factor of $a$ is divisible by $n$.
+"""
+function downscale(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
+   n <= 0 && throw(DomainError())
+   lena = pol_length(a)
+   if n == 1 || lena == 0
+      return a
+   end
+   R = base_ring(a)
+   lenz = (lena - 1)*n + 1
+   d = Array{T}(lenz)
+   j = 0
+   pn = 0
+   for i = 0:lenz - 1
+      if i == pn
+         d[i + 1] = polcoeff(a, j)
+         j += 1
+         pn += n
+      else
+         d[i + 1] = R()
+      end
+   end
+   S = typeof(a)
+   z = S(d, lenz, precision(a), valuation(a), div(scale(a), n))
+   z.parent = parent(a)
+   return z
+end
+
+doc"""
     zero(R::LaurentSeriesRing)
 > Return $0 + O(x^n)$ where $n$ is the maximum precision of the power series
 > ring $R$.
@@ -567,13 +598,27 @@ function *(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
    bval = valuation(b)
    zval = aval + bval
    prec = min(precision(a) - aval, precision(b) - bval)
-   lena = min(lena, prec)
-   lenb = min(lenb, prec)
+   sa = scale(a)
+   sb = scale(b)
+   if lena == 1
+      sa = sb
+   elseif lenb == 1
+      sb = sa
+   end
+   sz = gcd(sa, sb)
+   lena = min(lena*sa, prec)
+   lenb = min(lenb*sb, prec)
    if lena == 0 || lenb == 0
-      return parent(a)(Array{T}(0), 0, prec + zval, zval)
+      return parent(a)(Array{T}(0), 0, prec + zval, zval, 1)
    end
    t = base_ring(a)()
-   lenz = min(lena + lenb - 1, prec)
+   da = div(sa, sz)
+   db = div(sb, sz)
+   a = downscale(a, da)
+   b = downscale(b, db)
+   lena = pol_length(a)
+   lenb = pol_length(b)
+   lenz = min(lena + lenb - 1, div(prec + sz - 1, sz))
    d = Array{T}(lenz)
    for i = 1:min(lena, lenz)
       d[i] = polcoeff(a, i - 1)*polcoeff(b, 0)
@@ -594,9 +639,10 @@ function *(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
          end
       end
    end
-   z = parent(a)(d, lenz, prec + zval, zval)
+   z = parent(a)(d, lenz, prec + zval, zval, sz)
    set_length!(z, normalise(z, lenz))
    renormalize!(z)
+   z = rescale!(z)
    return z
 end
 
@@ -750,60 +796,6 @@ function mullow(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}, n::Int) where 
    z = parent(a)(d, lenz, prec, 0)
    set_length!(z, normalise(z, lenz))
    return z
-end
-
-###############################################################################
-#
-#   Inflate/deflate
-#
-###############################################################################
-
-doc"""
-    inflate{T <: RingElement}(a::LaurentSeriesElem{T}, n::Int)
-> Return the series $a(x^n)$, i.e. the series where every exponent has been multiplied
-> by $n$, including the precision.
-"""
-function inflate(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
-   n <= 0 && throw(DomainError())
-   if n == 1
-      return a
-   end
-   R = base_ring(a)
-   lena = pol_length(a)
-   lenz = lena == 0 ? 0 : (lena - 1)*n + 1
-   d = Array{T}(lenz)
-   j = 0
-   for i = 0:lenz - 1
-      if mod(i, n) == 0
-         d[i + 1] = polcoeff(a, j)
-         j += 1
-      else
-         d[i + 1] = R()
-      end
-   end
-   return parent(a)(d, lenz, precision(a)*n, valuation(a)*n)
-end
-
-doc"""
-    deflate{T <: RingElement}(a::LaurentSeriesElem{T}, n::Int)
-> Return the series $a(x^(1/n))$, i.e. the series where every exponent has been
-> divided by $n$, including the precision. No check is made whether the exponents
-> are divisible by $n$.
-"""
-function deflate(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
-   n <= 0 && throw(DomainError())
-   if n == 1
-      return a
-   end
-   lena = pol_length(a)
-   lenz = lena == 0 ? 0 : div(lena - 1, n) + 1
-   d = Array{T}(lenz)
-   j = 0
-   for i = 0:lenz - 1
-      d[i + 1] = polcoeff(a, j)
-      j += n
-   end
-   return parent(a)(d, lenz, div(precision(a), n), div(valuation(a), n))
 end
 
 ###############################################################################
