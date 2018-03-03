@@ -218,6 +218,8 @@ function rescale!(a::LaurentSeriesElem)
       end
       set_scale!(a, s*scale(a))
       set_length!(a, zlen)
+   elseif pol_length(a) <= 1
+      set_scale!(a, 1)
    end
    return a
 end
@@ -893,15 +895,38 @@ function ==(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T}) where {T <: RingEl
    if xval != yval
       return false
    end
-   xlen = normalise(x, min(pol_length(x), prec - xval))
-   ylen = normalise(y, min(pol_length(y), prec - yval))
-   if xlen != ylen
-      return false
+   sx = scale(x)
+   sy = scale(y)
+   xlen = min(pol_length(x), div(prec - xval + sx - 1, sx))
+   ylen = min(pol_length(y), div(prec - yval + sy - 1, sy))
+   i = 0
+   j = 0
+   while i < xlen && j < ylen
+      while polcoeff(x, i) == 0 && i < xlen
+         i += 1
+      end
+      while polcoeff(y, j) == 0 && j < ylen
+         j += 1
+      end
+      if i < xlen && j < ylen
+         if i*sx != j*sy || polcoeff(x, i) != polcoeff(y, j)
+            return false
+         end
+         i += 1
+         j += 1
+      end
    end
-   for i = 1:xlen
-      if polcoeff(x, i - 1) != polcoeff(y, i - 1)
+   while i < xlen
+      if polcoeff(x, i) != 0
          return false
       end
+      i += 1
+   end
+   while j < ylen
+      if polcoeff(y, j) != 0
+         return false
+      end
+      j += 1
    end
    return true
 end
@@ -917,7 +942,7 @@ function isequal(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T}) where {T <: R
       return false
    end
    if precision(x) != precision(y) || pol_length(x) != pol_length(y) ||
-      valuation(x) != valuation(y)
+      valuation(x) != valuation(y) || scale(x) != scale(y)
       return false
    end
    for i = 1:pol_length(x)
