@@ -596,6 +596,9 @@ function *(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
    check_parent(a, b)
    lena = pol_length(a)
    lenb = pol_length(b)
+   if lena > lenb
+      return b*a
+   end
    aval = valuation(a)
    bval = valuation(b)
    zval = aval + bval
@@ -767,7 +770,7 @@ function truncate(a::LaurentSeriesElem{T}, prec::Int) where {T <: RingElement}
          z = setcoeff!(z, i, polcoeff(a, i))
       end
       set_length!(z, normalise(z, zlen))
-      set_scale(z, sa)
+      set_scale!(z, sa)
       z = rescale!(z)
    end
    return z
@@ -804,6 +807,16 @@ function mullow(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}, n::Int) where 
    z = parent(a)(d, lenz, prec, 0)
    set_length!(z, normalise(z, lenz))
    return z
+end
+
+###############################################################################
+#
+#   Inflation/deflation
+#
+###############################################################################
+
+function inflate(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
+    return parent(a)(a.coeffs, pol_length(a), b*a.prec, b*a.val, b*a.scale)
 end
 
 ###############################################################################

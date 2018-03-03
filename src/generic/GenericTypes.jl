@@ -523,10 +523,10 @@ const PuiseuxSeriesID = Dict{Ring, Ring}()
 
 mutable struct PuiseuxSeriesRingElem{T <: RingElement} <: AbstractAlgebra.RingElem
    data::LaurentSeriesRingElem{T}
-   scale::Rational{Int}
+   scale::Int
    parent::PuiseuxSeriesRing{T}
 
-   function PuiseuxSeriesRingElem{T}(d::LaurentSeriesRingElem{T}, scale::Rational{Int}) where T <: RingElement
+   function PuiseuxSeriesRingElem{T}(d::LaurentSeriesRingElem{T}, scale::Int) where T <: RingElement
       new{T}(d, scale)
    end
 end
@@ -555,10 +555,10 @@ end
 
 mutable struct PuiseuxSeriesFieldElem{T <: FieldElement} <: AbstractAlgebra.FieldElem
    data::LaurentSeriesFieldElem{T}
-   scale::Rational{Int}
+   scale::Int
    parent::PuiseuxSeriesField{T}
 
-   function PuiseuxSeriesFieldElem{T}(d::LaurentSeriesFieldElem{T}, scale::Rational{Int}) where T <: FieldElement
+   function PuiseuxSeriesFieldElem{T}(d::LaurentSeriesFieldElem{T}, scale::Int) where T <: FieldElement
       new{T}(d, scale)
    end
 end
