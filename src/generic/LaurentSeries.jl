@@ -754,13 +754,19 @@ function truncate(a::LaurentSeriesElem{T}, prec::Int) where {T <: RingElement}
    if prec <= aval
       set_length!(z, 0)
       set_val!(z, prec)
+      set_scale!(z, 1)
    else
-      fit!(z, prec - aval)
+      sa = scale(a)
+      zlen = div(prec - aval + sa - 1, sa)
+      zlen = min(zlen, alen)
+      fit!(z, zlen)
       set_val!(z, aval)
-      for i = 1:min(prec - aval, alen)
-         z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
+      for i = 0:zlen - 1
+         z = setcoeff!(z, i, polcoeff(a, i))
       end
-      set_length!(z, normalise(z, prec - aval))
+      set_length!(z, normalise(z, zlen))
+      set_scale(z, sa)
+      z = rescale!(z)
    end
    return z
 end
@@ -994,11 +1000,6 @@ doc"""
 function divexact(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T}) where {T <: RingElement}
    check_parent(x, y)
    iszero(y) && throw(DivideError())
-   v2 = valuation(y)
-   if v2 != 0
-      x = shift_right(x, v2)
-      y = shift_right(y, v2)
-   end
    y = truncate(y, precision(x) - valuation(x) + valuation(y))
    return x*inv(y)
 end
