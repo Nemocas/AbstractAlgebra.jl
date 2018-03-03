@@ -144,6 +144,7 @@ doc"""
 """
 function exp_gcd(a::LaurentSeriesElem)
    n = 0
+   s = scale(a)
    for i = 1:pol_length(a) - 1
       if n == 1
          return n
@@ -212,9 +213,10 @@ function rescale!(a::LaurentSeriesElem)
       zlen = div(pol_length(a) - 1, s) + 1
       for i = 1:zlen - 1
          t = polcoeff(a, i)
-         a = set_coeff!(a, i, polcoeff(a, i*s))
-         a = set_coeff!(a, i*s, t)
+         a = setcoeff!(a, i, polcoeff(a, i*s))
+         a = setcoeff!(a, i*s, t)
       end
+      set_scale!(a, s*scale(a))
       set_length!(a, zlen)
    end
    return a
@@ -445,49 +447,51 @@ function +(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
    valb = valuation(b)
    valz = min(vala, valb)
    prec = min(precision(a), precision(b))
-   mina = min(vala + lena, prec)
-   minb = min(valb + lenb, prec)
+   sa = scale(a)
+   sb = scale(b)
+   if lena == 1
+      sa = sb
+   elseif lenb == 1
+      sb = sa
+   end
+   sz = gcd(gcd(sa, sb), abs(vala - valb))
+   mina = min(vala + lena*sa, prec)
+   minb = min(valb + lenb*sb, prec)
    lenz = max(mina, minb) - valz
+   lenz = div(lenz + sz - 1, sz)
    R = base_ring(a)
    z = parent(a)()
    fit!(z, lenz)
    set_prec!(z, prec)
    set_val!(z, valz)
-   if vala >= valb
-      for i = 1:min(lenb, vala - valb)
-         z = setcoeff!(z, i - 1, polcoeff(b, i - 1))
-      end
-      for i = lenb + 1:min(vala - valb, lenz)
-         z = setcoeff!(z, i - 1, R())
-      end
-      for i = vala - valb + 1:lenb
-         z = setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1) + polcoeff(b, i - 1))
-      end
-      for i = max(lenb, vala - valb) + 1:lena + vala - valb
-         z = setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1))
-      end
-      for i = lena + vala - valb + 1:lenb
-         z = setcoeff!(z, i - 1, polcoeff(b, i - 1))
-      end
-   else
-      for i = 1:min(lena, valb - vala)
-         z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
-      end
-      for i = lena + 1:min(valb - vala, lenz)
-         z = setcoeff!(z, i - 1, R())
-      end
-      for i = valb - vala + 1:lena
-         z = setcoeff!(z, i - 1, polcoeff(a, i - 1) + polcoeff(b, i - valb + vala - 1))
-      end
-      for i = max(lena, valb - vala) + 1:lenb + valb - vala
-         z = setcoeff!(z, i - 1, polcoeff(b, i - valb + vala - 1))
-      end
-      for i = lenb + valb - vala + 1:lena
-         z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
+   set_scale!(z, sz)
+   pa = vala
+   pb = valb
+   j = 0
+   k = 0
+   for i = 0: lenz - 1
+      pi = valz + sz*i
+      if pi == pa && pi < mina
+         if pi == pb && pi < minb
+            z = setcoeff!(z, i, polcoeff(a, j) + polcoeff(b, k)) 
+            pb += sb
+            k += 1
+         else
+            z = setcoeff!(z, i, polcoeff(a, j))
+         end
+         j += 1
+         pa += sa
+      elseif pi == pb && pi < minb
+         z = setcoeff!(z, i, polcoeff(b, k))
+         k += 1
+         pb += sb
+      else
+         z = setcoeff!(z, i, R())
       end
    end
    set_length!(z, normalise(z, lenz))
    renormalize!(z)
+   z = rescale!(z)
    return z
 end
 
@@ -503,49 +507,51 @@ function -(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
    valb = valuation(b)
    valz = min(vala, valb)
    prec = min(precision(a), precision(b))
-   mina = min(vala + lena, prec)
-   minb = min(valb + lenb, prec)
+   sa = scale(a)
+   sb = scale(b)
+   if lena == 1
+      sa = sb
+   elseif lenb == 1
+      sb = sa
+   end
+   sz = gcd(gcd(sa, sb), abs(vala - valb))
+   mina = min(vala + lena*sa, prec)
+   minb = min(valb + lenb*sb, prec)
    lenz = max(mina, minb) - valz
+   lenz = div(lenz + sz - 1, sz)
    R = base_ring(a)
    z = parent(a)()
    fit!(z, lenz)
    set_prec!(z, prec)
    set_val!(z, valz)
-   if vala >= valb
-      for i = 1:min(lenb, vala - valb)
-         z = setcoeff!(z, i - 1, -polcoeff(b, i - 1))
-      end
-      for i = lenb + 1:min(vala - valb, lenz)
-         z = setcoeff!(z, i - 1, R())
-      end
-      for i = vala - valb + 1:lenb
-         z = setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1) - polcoeff(b, i - 1))
-      end
-      for i = max(lenb, vala - valb) + 1:lena + vala - valb
-         z = setcoeff!(z, i - 1, polcoeff(a, i - vala + valb - 1))
-      end
-      for i = lena + vala - valb + 1:lenb
-         z = setcoeff!(z, i - 1, -polcoeff(b, i - 1))
-      end
-   else
-      for i = 1:min(lena, valb - vala)
-         z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
-      end
-      for i = lena + 1:min(valb - vala, lenz)
-         z = setcoeff!(z, i - 1, R())
-      end
-      for i = valb - vala + 1:lena
-         z = setcoeff!(z, i - 1, polcoeff(a, i - 1) - polcoeff(b, i - valb + vala - 1))
-      end
-      for i = max(lena, valb - vala) + 1:lenb + valb - vala
-         z = setcoeff!(z, i - 1, -polcoeff(b, i - valb + vala - 1))
-      end
-      for i = lenb + valb - vala + 1:lena
-         z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
+   set_scale!(z, sz)
+   pa = vala
+   pb = valb
+   j = 0
+   k = 0
+   for i = 0: lenz - 1
+      pi = valz + sz*i
+      if pi == pa && pi < mina
+         if pi == pb && pi < minb
+            z = setcoeff!(z, i, polcoeff(a, j) - polcoeff(b, k))
+            pb += sb
+            k += 1
+         else
+            z = setcoeff!(z, i, polcoeff(a, j))
+         end
+         j += 1
+         pa += sa
+      elseif pi == pb && pi < minb
+         z = setcoeff!(z, i, -polcoeff(b, k))
+         k += 1
+         pb += sb
+      else
+         z = setcoeff!(z, i, R())
       end
    end
    set_length!(z, normalise(z, lenz))
    renormalize!(z)
+   z = rescale!(z)
    return z
 end
 
@@ -816,6 +822,7 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
       z = parent(a)()
       set_prec!(z, b*valuation(a))
       set_val!(z, b*valuation(a))
+      set_scale!(z, 1)
       return z
    elseif b == 0
       # in fact, the result would be exact 1 if we had exact series
@@ -827,12 +834,14 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
       set_prec!(z, b + precision(a) - 1)
       set_val!(z, b)
       z = setcoeff!(z, 0, deepcopy(polcoeff(a, 0)))
+      set_scale!(z, 1)
       set_length!(z, 1)
       return z
    elseif pol_length(a) == 1
       z = parent(a)(polcoeff(a, 0)^b)
       set_prec!(z, (b - 1)*valuation(a) + precision(a))
       set_val!(z, b*valuation(a))
+      set_scale!(z, 1)
       return z
    elseif b == 1
       return deepcopy(a)
