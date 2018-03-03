@@ -1020,6 +1020,7 @@ function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloa
    fit!(z, lenx)
    set_prec!(z, precision(x))
    set_val!(z, valuation(x))
+   set_scale!(z, scale(x))
    for i = 1:lenx
       z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
    end
@@ -1037,6 +1038,7 @@ function divexact(x::LaurentSeriesElem{T}, y::T) where {T <: RingElem}
    fit!(z, lenx)
    set_prec!(z, precision(x))
    set_val!(z, valuation(x))
+   set_scale!(z, scale(x))
    for i = 1:lenx
       z = setcoeff!(z, i - 1, divexact(polcoeff(x, i - 1), y))
    end
