@@ -78,7 +78,7 @@ var(a::LaurentSeriesField) = a.S
 
 function check_parent(a::LaurentSeriesElem, b::LaurentSeriesElem)
    parent(a) != parent(b) &&
-             error("Incompatible power series rings in power series operation")
+             error("Incompatible power series rings in Laurent series operation")
 end
 
 ###############################################################################
@@ -362,7 +362,8 @@ function renormalize!(z::LaurentSeriesElem)
    if i == zlen
       set_length!(z, 0)
       set_val!(z, zprec)
-   else
+      set_scale!(z, 1)
+   elseif i != 0
       set_val!(z, zval + i*scale(z))
       for j = 1:zlen - i
          z = setcoeff!(z, j - 1, polcoeff(z, j + i - 1))
@@ -1424,10 +1425,16 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{LaurentSeriesElem{T}}, ::Type{LaurentSeriesElem{T}}) where T <: RingElement = LaurentSeriesElem{T}
+promote_rule(::Type{LaurentSeriesRingElem{T}}, ::Type{LaurentSeriesRingElem{T}}) where T <: RingElement = LaurentSeriesRingElem{T}
 
-function promote_rule(::Type{LaurentSeriesElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? LaurentSeriesElem{T} : Union{}
+promote_rule(::Type{LaurentSeriesFieldElem{T}}, ::Type{LaurentSeriesFieldElem{T}}) where T <: FieldElement = LaurentSeriesFieldElem{T}
+
+function promote_rule(::Type{LaurentSeriesRingElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   promote_rule(T, U) == T ? LaurentSeriesRingElem{T} : Union{}
+end
+
+function promote_rule(::Type{LaurentSeriesFieldElem{T}}, ::Type{U}) where {T <: FieldElement, U <: RingElement}
+   promote_rule(T, U) == T ? LaurentSeriesFieldElem{T} : Union{}
 end
 
 ###############################################################################
