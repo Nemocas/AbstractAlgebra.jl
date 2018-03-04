@@ -351,10 +351,16 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{PuiseuxSeriesElem{T}}, ::Type{PuiseuxSeriesElem{T}}) where T <: RingElement = PuiseuxSeriesElem{T}
+promote_rule(::Type{PuiseuxSeriesRingElem{T}}, ::Type{PuiseuxSeriesRingElem{T}}) where T <: RingElement = PuiseuxSeriesRingElem{T}
 
-function promote_rule(::Type{PuiseuxSeriesElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? PuiseuxSeriesElem{T} : Union{}
+promote_rule(::Type{PuiseuxSeriesFieldElem{T}}, ::Type{PuiseuxSeriesFieldElem{T}}) where T <: FieldElement = PuiseuxSeriesFieldElem{T}
+
+function promote_rule(::Type{PuiseuxSeriesRingElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
+   promote_rule(T, U) == T ? PuiseuxSeriesRingElem{T} : Union{}
+end
+
+function promote_rule(::Type{PuiseuxSeriesFieldElem{T}}, ::Type{U}) where {T <: FieldElement, U <: RingElement}
+   promote_rule(T, U) == T ? PuiseuxSeriesFieldElem{T} : Union{}
 end
 
 ###############################################################################
