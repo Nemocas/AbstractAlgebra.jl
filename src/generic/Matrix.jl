@@ -4220,10 +4220,14 @@ doc"""
 > Constructs the matrix over $R$ with entries as in `arr`.
 """
 function matrix(R::Ring, arr::Array{T, 2}) where {T}
-   arr_coerce = map(R, arr)
-   z = Mat{elem_type(R)}(arr_coerce)
-   z.base_ring = R
-   return z
+   if elem_type(R) === T
+      z = Mat{elem_type(R)}(arr)
+      z.base_ring = R
+      return z
+   else
+      arr_coerce = map(R, arr)::Array{elem_type(R), 2}
+      return matrix(R, arr_coerce)
+   end
 end
 
 doc"""
@@ -4234,10 +4238,14 @@ doc"""
 """
 function matrix(R::Ring, r::Int, c::Int, arr::Array{T, 1}) where T
    _check_dim(r, c, arr)
-   arr_coerce = map(R, arr)
-   z = Mat{elem_type(R)}(r, c, arr_coerce)
-   z.base_ring = R
-   return z
+   if elem_type(R) === T
+     z = Mat{elem_type(R)}(r, c, arr)
+     z.base_ring = R
+     return z
+   else
+     arr_coerce = map(R, arr)::Array{elem_type(R), 1}
+     return matrix(R, r, c, arr_coerce)
+   end
 end
 
 ################################################################################
