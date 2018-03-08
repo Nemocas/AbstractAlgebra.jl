@@ -1140,6 +1140,8 @@ function Base.sqrt(a::LaurentSeriesElem)
       return asqrt
    end
    asqrt = parent(a)()
+   s = scale(a)
+   zlen = div(prec + s - 1, s)
    fit!(asqrt, prec)
    set_prec!(asqrt, prec + aval2)
    set_val!(asqrt, aval2)
@@ -1149,7 +1151,7 @@ function Base.sqrt(a::LaurentSeriesElem)
       g2 = g + g
    end
    p = R()
-   for n = 1:prec - 1
+   for n = 1:zlen - 1
       c = R()
       for i = 1:div(n - 1, 2)
          j = n - i
@@ -1166,7 +1168,8 @@ function Base.sqrt(a::LaurentSeriesElem)
       c = divexact(c, g2)
       asqrt = setcoeff!(asqrt, n, c)
     end
-    set_length!(asqrt, normalise(asqrt, prec))
+    set_scale!(asqrt, s)
+    set_length!(asqrt, normalise(asqrt, zlen))
     return asqrt
 end
 
