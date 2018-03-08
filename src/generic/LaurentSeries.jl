@@ -1170,6 +1170,7 @@ function Base.sqrt(a::LaurentSeriesElem)
     end
     set_scale!(asqrt, s)
     set_length!(asqrt, normalise(asqrt, zlen))
+    asqrt = rescale!(asqrt)
     return asqrt
 end
 
