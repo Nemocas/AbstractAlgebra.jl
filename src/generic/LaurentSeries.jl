@@ -1137,6 +1137,7 @@ function Base.sqrt(a::LaurentSeriesElem)
       asqrt = parent(a)()
       set_prec!(asqrt, aval2)
       set_val!(asqrt, aval2)
+      set_scale!(asqrt, 1)
       return asqrt
    end
    asqrt = parent(a)()
