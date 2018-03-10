@@ -311,6 +311,9 @@ end
 function show(io::IO, a::AbstractAlgebra.MatElem)
    r = rows(a)
    c = cols(a)
+   if r*c == 0
+      print(io, "$r by $c matrix")
+   end
    for i = 1:r
       print(io, "[")
       for j = 1:c
