@@ -225,7 +225,52 @@ end
 ###############################################################################
 
 function show(io::IO, x::PuiseuxSeriesElem)
-   print(io, x.data, ", ", x.scale)
+   len = pol_length(x.data)
+   if len == 0
+      print(io, zero(base_ring(x)))
+   else
+      coeff_printed = false
+      sc = scale(x.data)
+      den = x.scale
+      for i = 0:len - 1
+         c = polcoeff(x.data, i)
+         bracket = needs_parentheses(c)
+         if !iszero(c)
+            if coeff_printed && !isnegative(c)
+               print(io, "+")
+            end
+            if i*sc + valuation(x.data) != 0
+               if !isone(c) && (c != -1 || show_minus_one(elem_type(base_ring(x))))
+                  if bracket
+                     print(io, "(")
+                  end
+                  print(io, c)
+                  if bracket
+                     print(io, ")")
+                  end
+                  if i*sc + valuation(x.data) != 0
+                     print(io, "*")
+                  end
+               end
+               if c == -1 && !show_minus_one(elem_type(base_ring(x)))
+                  print(io, "-")
+               end
+               print(io, string(var(parent(x.data))))
+               if (i*sc + valuation(x.data))//den != 1
+                  print(io, "^")
+                  q = (valuation(x.data) + i*sc)//den
+                  print(io, denominator(q) == 1 ? numerator(q) : q)
+               end
+            else
+               print(io, c)
+            end
+            coeff_printed = true
+         end
+      end
+   end
+   q =  precision(x.data)//x.scale
+   print(io, "+O(", string(var(parent(x.data))), "^", denominator(q) == 1 ? numerator(q) :
+ q, ")")
 end
 
 function show(io::IO, a::PuiseuxSeriesRing)
