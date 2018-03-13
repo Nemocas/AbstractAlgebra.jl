@@ -344,7 +344,23 @@ function ^(a::PuiseuxSeriesElem{T}, b::Rational{Int}) where T <: RingElement
    z = rescale!(z)
    return z
 end
-   
+
+###############################################################################
+#
+#   Square root
+#
+###############################################################################
+
+function Base.sqrt(a::PuiseuxSeriesElem{T}) where T <: RingElement
+   val = valuation(a.data)
+   S = parent(a)
+   if mod(val, 2) != 0
+      return S(sqrt(inflate(a.data, 2)), a.scale*2)
+   else
+      return S(sqrt(a.data), a.scale)   
+   end
+end
+
 ###############################################################################
 #
 #   Promotion rules
