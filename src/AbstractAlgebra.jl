@@ -35,6 +35,8 @@ export create_accessors, get_handle, package_handle, zeros,
 
 export error_dim_negative, ErrorConstrDimMismatch
 
+export FiniteField, crt, IdealSet
+
 export is_windows64
 
 if VERSION >= v"0.6.0-dev.2024" # julia started exporting iszero (again?)
@@ -285,6 +287,17 @@ end
 
 function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
    Generic.NumberField(a, s, t; cached=cached)
+end
+
+#add empty functions so that Singular, Nemo and Hecke and import and extend.
+function crt(A...)
+  return AbstractAlgebra.crt(A...)
+end
+
+function FiniteField
+end
+
+function IdealSet
 end
 
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
