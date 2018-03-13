@@ -1194,6 +1194,17 @@ function Base.exp(a::LaurentSeriesElem)
    vala = valuation(a)
    preca = precision(a)
    vala < 0 && error("Valuation must be non-negative in exp")
+   sc = scale(a)
+   gs = gcd(sc, gcd(vala, preca))
+   if sc != gs
+      a = downscale(a, div(sc, gs))
+      sc = gs
+   end
+   if sc != 1
+      vala = div(vala, sc)
+      preca = div(preca, sc)
+      a = parent(a)(a.coeffs, pol_length(a), preca, vala, 1, false)
+   end
    z = parent(a)()
    R = base_ring(a)
    fit!(z, preca)
@@ -1212,6 +1223,8 @@ function Base.exp(a::LaurentSeriesElem)
       z = setcoeff!(z, k, divexact(s, k))
    end
    set_length!(z, normalise(z, preca))
+   z = inflate(z, sc)
+   z = rescale!(z)
    return z
 end
 
@@ -1520,23 +1533,27 @@ function (R::LaurentSeriesField{T})(b::LaurentSeriesElem{T}) where {T <: FieldEl
    return b
 end
 
-function (R::LaurentSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int, scale::Int) where {T <: RingElement}
+function (R::LaurentSeriesRing{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool=true) where {T <: RingElement}
    if length(b) > 0
       parent(b[1]) != base_ring(R) && error("Unable to coerce to power series")
    end
    z = LaurentSeriesRingElem{T}(b, len, prec, val, scale)
    z.parent = R
-   z = rescale!(z)
+   if rescale
+      z = rescale!(z)
+   end
    return z
 end
 
-function (R::LaurentSeriesField{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int, scale::Int) where {T <: RingElement}
+function (R::LaurentSeriesField{T})(b::Array{T, 1}, len::Int, prec::Int, val::Int, scale::Int, rescale::Bool=true) where {T <: RingElement}
    if length(b) > 0
       parent(b[1]) != base_ring(R) && error("Unable to coerce to power series")
    end
    z = LaurentSeriesFieldElem{T}(b, len, prec, val, scale)
    z.parent = R
-   z = rescale!(z)
+   if rescale
+      z = rescale!(z)
+   end
    return z
 end
 
