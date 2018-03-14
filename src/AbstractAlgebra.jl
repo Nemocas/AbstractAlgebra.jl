@@ -18,7 +18,8 @@ import Base: Array, abs, acos, acosh, asin, asinh, atan, atan2, atanh, base,
 
 export elem_type, parent_type
 
-export SetElem, GroupElem, RingElem, FieldElem, AccessorNotSetError
+export SetElem, GroupElem, RingElem, FieldElem, RingElement, FieldElement,
+       AccessorNotSetError
 
 export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
        MatElem, FinFieldElem, MPolyElem
@@ -459,7 +460,7 @@ end
 
 ###############################################################################
 #
-#   Set domain for PermutationGroup to Flint
+#   Set domain for PermutationGroup
 #
 ###############################################################################
 
