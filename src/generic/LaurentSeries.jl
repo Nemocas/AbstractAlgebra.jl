@@ -5,7 +5,7 @@
 #
 ###############################################################################
 
-export exp_gcd, inflate, deflate
+export exp_gcd, inflate, deflate, downscale, upscale
 
 ###############################################################################
 #
@@ -251,6 +251,32 @@ function downscale(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
    end
    S = typeof(a)
    z = S(d, lenz, precision(a), valuation(a), div(scale(a), n))
+   z.parent = parent(a)
+   return z
+end
+
+doc"""
+    upscale{T <: RingElement}(a::LaurentSeriesElem{T}, n::Int)
+> Deflate the underlying polynomial by a factor of $n$. This removes zero coefficients
+> that existed for padding. It is assumed that the spacing of nonzero coefficients of
+> $a$ is divisible by $n$.
+"""
+function upscale(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
+   n <= 0 && throw(DomainError())
+   lena = pol_length(a)
+   if n == 1 || lena == 0
+      return a
+   end
+   R = base_ring(a)
+   lenz = div(lena - 1, n) + 1
+   d = Array{T}(lenz)
+   j = 0
+   for i = 1:lenz
+      d[i] = polcoeff(a, j)
+      j += n
+   end
+   S = typeof(a)
+   z = S(d, lenz, precision(a), valuation(a), scale(a)*n)
    z.parent = parent(a)
    return z
 end
