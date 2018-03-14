@@ -23,7 +23,7 @@ export SetElem, GroupElem, RingElem, FieldElem, AccessorNotSetError
 export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
        MatElem, FinFieldElem, MPolyElem
 
-export PolyRing, SeriesRing, AbsSeriesRing, ResRing, FracField, MatSpace,
+export PolyRing, SeriesRing, ResRing, FracField, MatSpace,
        FinField, MPolyRing
 
 export ZZ, QQ, zz, qq, RealField, RDF
@@ -36,8 +36,6 @@ export create_accessors, get_handle, package_handle, zeros,
 export error_dim_negative, ErrorConstrDimMismatch
 
 export FiniteField, crt, IdealSet
-
-export is_windows64
 
 if VERSION >= v"0.6.0-dev.2024" # julia started exporting iszero (again?)
    import Base: iszero
@@ -166,7 +164,7 @@ export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  hnf_with_trafo, hnf_via_popov, hnf_via_popov_with_trafo,
                  hooklength, identity_matrix, inskewdiag, integral,
                  interpolate, inv, inv!, invmod, isconstant, isdegree,
-                 isdomain_type, isexact, isexact_type, isgen, ishessenberg,
+                 isdomain_type, isexact_type, isgen, ishessenberg,
                  ismonomial, isnegative, isone, isreverse, isrimhook, isrref, issquare,
                  isterm, isunit, iszero, laurent_ring, lcm, lead, leglength, length,
                  main_variable, main_variable_extract, main_variable_insert,
