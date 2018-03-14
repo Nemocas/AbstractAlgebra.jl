@@ -65,7 +65,7 @@ include("AbstractTypes.jl")
 
 function __init__()
    println("")
-   println("Welcome to AbstractAlgebra version 0.0.2")
+   println("Welcome to AbstractAlgebra version 0.0.3")
    println("")
    println("AbstractAlgebra comes with absolutely no warranty whatsoever")
    println("")
@@ -78,7 +78,7 @@ end
 ################################################################################
 
 function versioninfo()
-  print("AbstractAlgebra version 0.0.2 \n")
+  print("AbstractAlgebra version 0.0.3 \n")
   abstractalgebrarepo = dirname(dirname(@__FILE__))
 
   print("AbstractAlgebra: ")
@@ -289,7 +289,7 @@ function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::Abstr
    Generic.NumberField(a, s, t; cached=cached)
 end
 
-#add empty functions so that Singular, Nemo and Hecke and import and extend.
+#add empty functions so that Singular, Nemo and Hecke can import and extend.
 function crt(A...)
   return AbstractAlgebra.crt(A...)
 end
