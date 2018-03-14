@@ -338,6 +338,20 @@ end
 
 ###############################################################################
 #
+#   Approximation
+#
+###############################################################################
+
+function isapprox(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
+    s = gcd(a.scale, b.scale)
+    zscale = div(a.scale*b.scale, s)
+    ainf = div(a.scale, s)
+    binf = div(b.scale, s)
+    return isapprox(inflate(a.data, binf), inflate(b.data, ainf))
+end
+
+###############################################################################
+#
 #   Exact division
 #
 ###############################################################################

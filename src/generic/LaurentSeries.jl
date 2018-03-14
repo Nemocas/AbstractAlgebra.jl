@@ -5,7 +5,7 @@
 #
 ###############################################################################
 
-export exp_gcd
+export exp_gcd, inflate, deflate
 
 ###############################################################################
 #
@@ -820,6 +820,10 @@ function inflate(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
     return parent(a)(a.coeffs, pol_length(a), b*a.prec, b*a.val, b*a.scale)
 end
 
+function deflate(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
+    return parent(a)(a.coeffs, pol_length(a), div(a.prec, b), div(a.val, b), div(a.scale, b))
+end
+
 ###############################################################################
 #
 #   Powering
@@ -1009,13 +1013,12 @@ doc"""
 
 function Base.isapprox(f::LaurentSeriesElem, g::LaurentSeriesElem; atol::Real=sqrt(eps()))
    check_parent(f, g)
-   nmin = min(precision(f), precision(g))
-   i = 1
-   while i <= nmin
-      if !isapprox(coeff(f, i - 1), coeff(g, i - 1); atol=atol)
+   pmin = min(precision(f), precision(g))
+   vmin = min(valuation(f), valuation(g))
+   for i = vmin:pmin - 1
+      if !isapprox(coeff(f, i), coeff(g, i); atol=atol)
          return false
       end
-      i += 1
    end
    return true
 end
