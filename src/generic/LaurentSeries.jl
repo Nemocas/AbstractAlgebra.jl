@@ -1495,7 +1495,7 @@ function (R::LaurentSeriesField{T})(b::Union{Rational, AbstractFloat}) where {T 
    if b == 0
       z = LaurentSeriesFieldElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max, 1)
    else
-      z = LaurentSeriesFieldElem{T}([base_ring(R)(b)], 1, R.prec_max, 1)
+      z = LaurentSeriesFieldElem{T}([base_ring(R)(b)], 1, R.prec_max, 0, 1)
    end
    z.parent = R
    return z
