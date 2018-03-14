@@ -420,6 +420,22 @@ end
 
 ###############################################################################
 #
+#   Random elements
+#
+###############################################################################
+
+function rand(S::PuiseuxSeriesRing, val_range::UnitRange{Int}, scale_range::UnitRange{Int}, v...)
+   (first(scale_range) <= 0 || last(scale_range) <= 0) && error("Scale must be positive")
+   return S(rand(laurent_ring(S), val_range, v...), rand(scale_range))
+end
+
+function rand(S::PuiseuxSeriesField, val_range::UnitRange{Int}, scale_range::UnitRange{Int}, v...)
+   (first(scale_range) <= 0 || last(scale_range) <= 0) && error("Scale must be positive")
+   return S(rand(laurent_ring(S), val_range, v...), rand(scale_range))
+end
+
+###############################################################################
+#
 #   Promotion rules
 #
 ###############################################################################
