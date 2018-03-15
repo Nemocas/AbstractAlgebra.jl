@@ -922,6 +922,9 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
    end
    set_val!(z, b*val)
    set_prec!(z, b*val + prec)
+   if pol_length(z) <= 1
+      set_scale!(z, 1)
+   end
    renormalize!(z)
    z = rescale!(z)
    return z
