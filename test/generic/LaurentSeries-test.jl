@@ -58,9 +58,9 @@ function test_laurent_series_constructors()
    @test isa(b2, Generic.LaurentSeriesElem)
    @test isa(b3, Generic.LaurentSeriesElem)
 
-   c1 = R(BigInt[1, 3, 5], 3, 5, 0)
-   c2 = T([t + 1, t, S(1)], 3, 5, 0)
-   c3 = U(Rational{BigInt}[1, 3, 5], 3, 5, 0)
+   c1 = R(BigInt[1, 3, 5], 3, 5, 0, 1)
+   c2 = T([t + 1, t, S(1)], 3, 5, 0, 1)
+   c3 = U(Rational{BigInt}[1, 3, 5], 3, 5, 0, 1)
 
    @test isa(c1, Generic.LaurentSeriesElem)
    @test isa(c2, Generic.LaurentSeriesElem)
@@ -107,7 +107,7 @@ function test_laurent_series_manipulation()
    a = 2x + x^3
    b = O(x^4)
 
-   @test pol_length(a) == 3
+   @test pol_length(a) == 2
    @test pol_length(b) == 0
 
    @test valuation(a) == 1
@@ -127,7 +127,7 @@ function test_laurent_series_manipulation()
    @test isequal(deepcopy(a), a)
    @test isequal(deepcopy(b), b)
 
-   @test normalise(a, 3) == 3
+   @test normalise(a, 2) == 2
 
    @test coeff(a, 1) == 2
    @test coeff(b, 7) == 0
