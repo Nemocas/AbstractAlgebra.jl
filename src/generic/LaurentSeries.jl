@@ -804,34 +804,40 @@ function truncate(a::LaurentSeriesElem{T}, prec::Int) where {T <: RingElement}
 end
 
 # Intended only for internal use, does not renormalize, assumes n >= 0
-# Only efficient if valuation(a) == valuation(b) == 0
+# Requires valuation(a) == valuation(b) == 0 and scale(a) == scale(b)
 function mullow(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
    lena = pol_length(a)
    lenb = pol_length(b)
    if lena == 0 || lenb == 0
-      return zero(parent(a))
+      z = zero(parent(a))
+      zprec = valuation(a) + valuation(b)
+      set_val!(z, zprec)
+      set_prec!(z, zprec)
+      set_scale!(z, scale(a))
+      return z
    end
+   s = scale(a)
    prec = min(precision(a), precision(b))
    t = base_ring(a)()
-   lenz = min(lena + lenb - 1, n)
+   lenz = min(lena + lenb - 1, div(n + s - 1, s))
    d = Array{T}(lenz)
    for i = 1:min(lena, lenz)
-      d[i] = coeff(a, i - 1)*coeff(b, 0)
+      d[i] = polcoeff(a, i - 1)*polcoeff(b, 0)
    end
    if lenz > lena
       for j = 2:min(lenb, lenz - lena + 1)
-          d[lena + j - 1] = coeff(a, lena - 1)*coeff(b, j - 1)
+          d[lena + j - 1] = polcoeff(a, lena - 1)*polcoeff(b, j - 1)
       end
    end
    for i = 1:lena - 1
       if lenz > i
          for j = 2:min(lenb, lenz - i + 1)
-            t = mul!(t, coeff(a, i - 1), coeff(b, j - 1))
+            t = mul!(t, polcoeff(a, i - 1), polcoeff(b, j - 1))
             d[i + j - 1] = addeq!(d[i + j - 1], t)
          end
       end
    end
-   z = parent(a)(d, lenz, prec, 0)
+   z = parent(a)(d, lenz, prec, 0, s)
    set_length!(z, normalise(z, lenz))
    return z
 end
@@ -902,15 +908,22 @@ function ^(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
    while (UInt(bit) & b) == 0
       bit >>= 1
    end
+   val = valuation(a)
+   a = shift_right(a, val)
+   prec = precision(a)
    z = a
    bit >>= 1
    while bit !=0
-      z *= z
+      z = mullow(z, z, prec)
       if (UInt(bit) & b) != 0
-         z *= a
+         z = mullow(z, a, prec)
       end
       bit >>= 1
    end
+   set_val!(z, b*val)
+   set_prec!(z, b*val + prec)
+   renormalize!(z)
+   z = rescale!(z)
    return z
 end
 
