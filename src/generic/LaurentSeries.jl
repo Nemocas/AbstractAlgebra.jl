@@ -700,6 +700,7 @@ function *(a::T, b::LaurentSeriesElem{T}) where {T <: RingElem}
    end
    set_length!(z, normalise(z, len))
    renormalize!(z)
+   z = rescale!(z)
    return z
 end
 
@@ -719,6 +720,7 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::LaurentSeriesElem)
    end
    set_length!(z, normalise(z, len))
    renormalize!(z)
+   z = rescale!(z)
    return z
 end
 
@@ -837,7 +839,7 @@ function mullow(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}, n::Int) where 
          end
       end
    end
-   z = parent(a)(d, lenz, prec, 0, s)
+   z = parent(a)(d, lenz, prec, 0, s, false)
    set_length!(z, normalise(z, lenz))
    return z
 end
