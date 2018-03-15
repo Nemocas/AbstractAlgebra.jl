@@ -418,6 +418,38 @@ end
 
 ###############################################################################
 #
+#   Comparison
+#
+###############################################################################
+
+function ==(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
+    s = gcd(a.scale, b.scale)
+    zscale = div(a.scale*b.scale, s)
+    ainf = div(a.scale, s)
+    binf = div(b.scale, s)
+    return inflate(a.data, binf) == inflate(b.data, ainf)
+end
+
+function isequal(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
+   return a.scale == b.scale && isequal(a.data, b.data)
+end
+
+###############################################################################
+#
+#   Ad hoc comparison
+#
+###############################################################################
+
+==(x::PuiseuxSeriesElem{T}, y::T) where T <: RingElem = x.data == y
+
+==(x::T, y::PuiseuxSeriesElem{T}) where T <: RingElem = y == x
+
+==(x::PuiseuxSeriesElem, y::Union{Integer, Rational, AbstractFloat}) = x.data == y
+
+==(x::Union{Integer, Rational, AbstractFloat}, y::PuiseuxSeriesElem) = y == x
+
+###############################################################################
+#
 #   Square root
 #
 ###############################################################################
