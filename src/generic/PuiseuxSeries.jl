@@ -338,6 +338,28 @@ end
 
 ###############################################################################
 #
+#   Ad hoc binary operators
+#
+###############################################################################
+
+function *(a::PuiseuxSeriesElem{T}, b::T) where T <: RingElem
+   z = parent(a)(a.data*b, a.scale)
+   z = rescale!(z)
+   return z
+end
+
+function *(a::PuiseuxSeriesElem, b::Union{Integer, Rational, AbstractFloat})
+   z = parent(a)(a.data*b, a.scale)
+   z = rescale!(z)
+   return z
+end
+
+*(a::T, b::PuiseuxSeriesElem{T}) where T <: RingElem = b*a
+
+*(a::Union{Integer, Rational, AbstractFloat}, b::PuiseuxSeriesElem) = b*a
+
+###############################################################################
+#
 #   Approximation
 #
 ###############################################################################
