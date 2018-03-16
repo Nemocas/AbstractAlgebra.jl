@@ -1284,6 +1284,8 @@ end
 function zero!(a::LaurentSeriesElem)
    a.length = 0
    a.prec = parent(a).prec_max
+   a.val = a.prec
+   a.scale = 1
    return a
 end
 
@@ -1302,7 +1304,8 @@ function fit!(c::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
 end
 
 function setcoeff!(c::LaurentSeriesElem{T}, n::Int, a::T) where {T <: RingElement}
-   if (a != 0 && precision(c) - valuation(c) > n) || n + 1 <= c.length
+   s = c.scale
+   if (a != 0 && div(precision(c) - valuation(c) + s - 1, s) > n) || n + 1 <= c.length
       fit!(c, n + 1)
       c.coeffs[n + 1] = a
       c.length = max(pol_length(c), n + 1)
@@ -1314,89 +1317,70 @@ end
 function mul!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingElement}
    lena = pol_length(a)
    lenb = pol_length(b)
+   if lena > lenb
+      return mul!(c, b, a)
+   end
    aval = valuation(a)
    bval = valuation(b)
    prec = min(precision(a) - aval, precision(b) - bval)
-   lena = min(lena, prec)
-   lenb = min(lenb, prec)
-   if lena <= 0 || lenb <= 0
+   sa = scale(a)
+   sb = scale(b)
+   if lena == 1
+      sa = sb
+   elseif lenb == 1
+      sb = sa
+   end
+   sz = gcd(sa, sb)
+   lena = min(lena*sa, prec)
+   lenb = min(lenb*sb, prec)
+   if lena == 0 || lenb == 0
       c.length = 0
-   else
-      t = base_ring(a)()
-      lenc = min(lena + lenb - 1, prec)
-      fit!(c, lenc)
-      for i = 1:min(lena, lenc)
-         c.coeffs[i] = mul!(c.coeffs[i], polcoeff(a, i - 1), polcoeff(b, 0))
+      c.prec = prec + aval + bval
+      c.val = aval + bval
+      c.scale = 1
+      return c
+   end
+   t = base_ring(a)()
+   da = div(sa, sz)
+   db = div(sb, sz)
+   a = downscale(a, da)
+   b = downscale(b, db)
+   lena = pol_length(a)
+   lenb = pol_length(b)
+   lenc = min(lena + lenb - 1, div(prec + sz - 1, sz))
+   fit!(c, lenc)
+   for i = 1:min(lena, lenc)
+      c.coeffs[i] = mul!(c.coeffs[i], polcoeff(a, i - 1), polcoeff(b, 0))
+   end
+   if lenc > lena
+      for i = 2:min(lenb, lenc - lena + 1)
+         c.coeffs[lena + i - 1] = mul!(c.coeffs[lena + i - 1], polcoeff(a, lena - 1), polcoeff(b, i - 1))
       end
-      if lenc > lena
-         for i = 2:min(lenb, lenc - lena + 1)
-            c.coeffs[lena + i - 1] = mul!(c.coeffs[lena + i - 1], polcoeff(a, lena - 1), polcoeff(b, i - 1))
-         end
-      end
-      for i = 1:lena - 1
-         if lenc > i
+   end
+   for i = 1:lena - 1
+      if lenc > i
+         ai = polcoeff(a, i - 1)
+         if ai != 0
             for j = 2:min(lenb, lenc - i + 1)
                t = mul!(t, polcoeff(a, i - 1), polcoeff(b, j - 1))
                c.coeffs[i + j - 1] = addeq!(c.coeffs[i + j - 1], t)
             end
          end
       end
-      c.length = normalise(c, lenc)
    end
-   c.val = a.val + b.val
+   c.length = normalise(c, lenc)
+   c.val = aval + bval
    c.prec = prec + c.val
+   c.scale = sz
    renormalize!(c)
+   c = rescale!(c)
    return c
 end
 
 function addeq!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}) where {T <: RingElement}
-   lenc = pol_length(c)
-   lena = pol_length(a)
-   valc = valuation(c)
-   vala = valuation(a)
-   valr = min(vala, valc)
-   precc = precision(c)
-   preca = precision(a)
-   prec = min(precc, preca)
-   mina = min(vala + lena, prec)
-   minc = min(valc + lenc, prec)
-   lenr = max(mina, minc) - valr
-   R = base_ring(c)
-   fit!(c, lenr)
-   if valc >= vala
-      for i = lenc + valc - vala:-1:max(lena, valc - vala) + 1
-         t = c.coeffs[i]
-         c.coeffs[i] = c.coeffs[i - valc + vala]
-         c.coeffs[i - valc + vala] = t
-      end
-      for i = lena:-1:valc - vala + 1
-         c.coeffs[i] = add!(c.coeffs[i], c.coeffs[i - valc + vala], a.coeffs[i])
-      end
-      for i = 1:min(lena, valc - vala)
-         c.coeffs[i] = deepcopy(a.coeffs[i])
-      end
-      for i = lena + 1:min(valc - vala, lenr)
-         c.coeffs[i] = R()
-      end
-      for i = lenc + valc - vala + 1:lena
-         c.coeffs[i] = deepcopy(a.coeffs[i])
-      end
-   else
-      for i = lenc + 1:min(vala - valc, lenr)
-         c.coeffs[i] = R()
-      end
-      for i = vala - valc + 1:lenc
-         c.coeffs[i] = addeq!(c.coeffs[i], a.coeffs[i - vala + valc])
-      end
-      for i = max(lenc, vala - valc) + 1:lena + vala - valc
-         c.coeffs[i] = deepcopy(a.coeffs[i - vala + valc])
-      end
-   end
-   c.length = normalise(c, lenr)
-   c.prec = prec
-   c.val = valr
-   renormalize!(c)
-   return c
+   # TODO: write a version which doesn't make a copy
+   b = deepcopy(c)
+   return add!(c, b, a)
 end
 
 function add!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingElement}
@@ -1413,48 +1397,50 @@ function add!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeries
    precb = precision(b)
    preca = precision(a)
    prec = min(precb, preca)
-   mina = min(vala + lena, prec)
-   minb = min(valb + lenb, prec)
+   sa = scale(a)
+   sb = scale(b)
+   if lena == 1
+      sa = sb
+   elseif lenb == 1
+      sb = sa
+   end
+   sz = gcd(gcd(sa, sb), abs(vala - valb))
+   mina = min(vala + lena*sa, prec)
+   minb = min(valb + lenb*sb, prec)
    lenr = max(mina, minb) - valr
+   lenr = div(lenr + sz - 1, sz)
    R = base_ring(c)
    fit!(c, lenr)
    c.prec = prec
    c.val = valr
-   if vala > valb
-      for i = 1:min(lenb, vala - valb)
-         c.coeffs[i] = deepcopy(b.coeffs[i])
-      end
-      for i = lenb + 1:vala - valb
-         c.coeffs[i] = R()
-      end
-      for i = vala - valb + 1:lenb
-         c.coeffs[i] = add!(c.coeffs[i], a.coeffs[i - vala + valb], b.coeffs[i])
-      end
-      for i = max(lenb, vala - valb) + 1:lena + vala - valb
-         c.coeffs[i] = deepcopy(a.coeffs[i - vala + valb])
-      end
-      for i = lena + vala - valb + 1:lenb
-         c.coeffs[i] = deepcopy(b.coeffs[i])
-      end
-   else
-      for i = 1:min(lena, valb - vala)
-         c.coeffs[i] = deepcopy(a.coeffs[i])
-      end
-      for i = lena + 1:valb - vala
-         c.coeffs[i] = R()
-      end
-      for i = valb - vala + 1:lena
-         c.coeffs[i] = add!(c.coeffs[i], a.coeffs[i], b.coeffs[i - valb + vala])
-      end
-      for i = max(lena, valb - vala) + 1:lenb + valb - vala
-         c.coeffs[i] = deepcopy(b.coeffs[i - valb + vala])
-      end
-      for i = lenb + valb - vala + 1:lena
-         c.coeffs[i] = deepcopy(a.coeffs[i])
+   c.scale = sz
+   pa = vala
+   pb = valb
+   j = 0
+   k = 0
+   for i = 0: lenr - 1
+      pi = valr + sc*i
+      if pi == pa && pi < mina
+         if pi == pb && pi < minb
+            c.coeffs[i + 1] = add!(c.coeffs[i + 1], polcoeff(a, j), polcoeff(b, k))
+            pb += sb
+            k += 1
+         else
+            c.coeffs[i + 1] = deepcopy(polcoeff(a, j))
+         end
+         j += 1
+         pa += sa
+      elseif pi == pb && pi < minb
+         c.coeffs[i + 1] = deepcopy(polcoeff(b, k))
+         k += 1
+         pb += sb
+      else
+         c.coeffs[i + 1] = R()
       end
    end
    set_length!(c, normalise(c, lenr))
    renormalize!(c)
+   c = rescale!(c)
    return c
 end
 
