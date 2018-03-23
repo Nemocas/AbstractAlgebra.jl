@@ -673,12 +673,14 @@ end
 function (R::PuiseuxSeriesRing{T})(b::LaurentSeriesRingElem{T}, scale::Int) where T <: RingElement
    z = PuiseuxSeriesRingElem{T}(b, scale)
    z.parent = R
+   z = rescale!(z)
    return z
 end
 
 function (R::PuiseuxSeriesField{T})(b::LaurentSeriesFieldElem{T}, scale::Int) where T <: FieldElement
    z = PuiseuxSeriesFieldElem{T}(b, scale)
    z.parent = R
+   z = rescale!(z)
    return z
 end
 
