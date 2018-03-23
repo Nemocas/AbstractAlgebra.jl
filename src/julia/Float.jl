@@ -84,6 +84,14 @@ divexact(a::Rational{T}, b::AbstractFloat) where T <: Union{Signed, Unsigned} = 
 
 divexact(a::Rational{BigInt}, b::BigFloat) = a/b
 
+function divides(a::BigFloat, b::BigFloat)
+   if b == 0
+      return false, BigFloat(0)
+   else
+      return true, divexact(a, b)
+   end
+end
+
 ###############################################################################
 #
 #   GCD

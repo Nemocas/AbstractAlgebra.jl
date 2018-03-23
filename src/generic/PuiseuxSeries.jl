@@ -71,6 +71,18 @@ doc"""
 """
 base_ring(a::PuiseuxSeriesElem) = base_ring(parent(a))
 
+doc"""
+    max_precision(R::PuiseuxSeriesRing)
+> Return the maximum precision of the underlying Laurent series ring.
+"""
+max_precision(R::PuiseuxSeriesRing{T}) where T <: RingElement = max_precision(laurent_ring(R))
+
+doc"""
+    max_precision(R::PuiseuxSeriesField)
+> Return the maximum precision of the underlying Laurent series field.
+"""
+max_precision(R::PuiseuxSeriesField{T}) where T <: FieldElement = max_precision(laurent_ring(R))
+
 function isdomain_type(::Type{T}) where {S <: RingElement, T <: PuiseuxSeriesElem{S}}
    return isdomain_type(S)
 end
@@ -107,6 +119,31 @@ doc"""
 > nonzero term (or the precision if it is arithmetically zero).
 """
 valuation(a::PuiseuxSeriesElem) = valuation(a.data)//a.scale
+
+scale(a::PuiseuxSeriesElem) = a.scale
+
+doc"""
+    coeff(a::PuiseuxSeriesElem, n::Int)
+> Return the coefficient of the term of exponent $n$ of the given Puiseux series.
+"""
+function coeff(a::PuiseuxSeriesElem, n::Int)
+   s = scale(a)
+   return coeff(a.data, n*s)
+end
+
+doc"""
+    coeff(a::PuiseuxSeriesElem, r::Rational{Int})
+> Return the coefficient of the term of exponent $r$ of the given Puiseux series.
+"""
+function coeff(a::PuiseuxSeriesElem, r::Rational{Int})
+   s = scale(a)
+   n = numerator(r)
+   d = denominator(r)
+   if mod(s, d) != 0
+      return base_ring(a)()
+   end
+   return coeff(a.data, n*div(s, d))
+end
 
 doc"""
     zero(R::PuiseuxSeriesRing)
@@ -206,6 +243,13 @@ function rescale!(a::PuiseuxSeriesElem)
       d = gcd(a.scale, gcd(scale(a.data), gcd(valuation(a.data), precision(a.data))))
       if d != 1
          set_scale!(a.data, div(scale(a.data), d))
+         set_prec!(a.data, div(precision(a.data), d))
+         set_val!(a.data, div(valuation(a.data), d))
+         a.scale = div(a.scale, d)
+      end
+   else
+      d = gcd(precision(a.data), a.scale)
+      if d != 1
          set_prec!(a.data, div(precision(a.data), d))
          set_val!(a.data, div(valuation(a.data), d))
          a.scale = div(a.scale, d)
@@ -390,6 +434,28 @@ end
 
 ###############################################################################
 #
+#   Ad hoc exact division
+#
+###############################################################################
+
+doc"""
+    divexact(a::LaurentSeriesElem, b::Union{Integer, Rational, AbstractFloat})
+> Return $a/b$ where the quotient is expected to be exact.
+"""
+function divexact(x::PuiseuxSeriesElem, y::Union{Integer, Rational, AbstractFloat})
+   return parent(x)(divexact(x.data, y), x.scale)
+end
+
+doc"""
+    divexact{T <: RingElem}(a::LaurentSeriesElem{T}, b::T)
+> Return $a/b$ where the quotient is expected to be exact.
+"""
+function divexact(x::PuiseuxSeriesElem{T}, y::T) where {T <: RingElem}
+   return parent(x)(divexact(x.data, y), x.scale)
+end
+
+###############################################################################
+#
 #   Inversion
 #
 ###############################################################################
@@ -409,7 +475,7 @@ end
 function ^(a::PuiseuxSeriesElem{T}, b::Int) where T <: RingElement
    # special case powers of x for constructing power series efficiently
    if iszero(a.data)
-      return parent(a)(a.data^0, a.scale)
+      return parent(a)(a.data^b, a.scale)
    elseif b == 0
       # in fact, the result would be exact 1 if we had exact series
       return one(parent(a))
