@@ -1266,8 +1266,9 @@ function Base.exp(a::LaurentSeriesElem)
          c = j >= vala ? polcoeff(a, j - vala) : R()
          s += j * c * polcoeff(z, k - j)
       end
-      !isunit(R(k)) && error("Unable to divide in exp")
-      z = setcoeff!(z, k, divexact(s, k))
+      flag, q = divides(s, parent(s)(k))
+      !flag && error("Unable to divide in exp")
+      z = setcoeff!(z, k, q)
    end
    set_length!(z, normalise(z, preca))
    z = inflate(z, sc)

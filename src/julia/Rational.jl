@@ -92,6 +92,14 @@ divexact(a::Integer, b::Rational) = a//b
 
 divexact(a::Rational, b::Rational) = a//b
 
+function divides(a::T, b::T) where T <: Rational
+   if b == 0
+      return false, T(0)
+   else
+      return true, divexact(a, b)
+   end
+end
+
 ###############################################################################
 #
 #   GCD
