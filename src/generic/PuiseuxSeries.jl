@@ -83,6 +83,18 @@ doc"""
 """
 max_precision(R::PuiseuxSeriesField{T}) where T <: FieldElement = max_precision(laurent_ring(R))
 
+doc"""
+    var(R::PuiseuxSeriesRing)
+> Return a symbol representing the variable of the given Puiseux series ring.
+"""
+var(R::PuiseuxSeriesRing{T}) where T <: RingElement = var(laurent_ring(R))
+
+doc"""
+    var(R::PuiseuxSeriesField)
+> Return a symbol representing the variable of the given Puiseux series field.
+"""
+var(R::PuiseuxSeriesField{T}) where T <: FieldElement = var(laurent_ring(R))
+
 function isdomain_type(::Type{T}) where {S <: RingElement, T <: PuiseuxSeriesElem{S}}
    return isdomain_type(S)
 end
@@ -329,7 +341,7 @@ end
 
 needs_parentheses(x::PuiseuxSeriesElem) = pol_length(x.data) > 1
 
-isnegative(x::PuiseuxSeriesElem) = pol_length(x) <= 1 && isnegative(polcoeff(x.data, 0))
+isnegative(x::PuiseuxSeriesElem) = pol_length(x.data) <= 1 && isnegative(polcoeff(x.data, 0))
 
 show_minus_one(::Type{PuiseuxSeriesElem{T}}) where {T <: RingElement} = show_minus_one(T)
 
@@ -542,6 +554,10 @@ end
 #
 ###############################################################################
 
+doc"""
+   sqrt(a::PuiseuxSeriesElem)
+> Return the square root of the given Puiseux series $a$.
+"""
 function Base.sqrt(a::PuiseuxSeriesElem{T}) where T <: RingElement
    val = valuation(a.data)
    S = parent(a)
@@ -558,6 +574,10 @@ end
 #
 ###############################################################################
 
+doc"""
+   exp(a::PuiseuxSeriesElem)
+> Return the exponential of the given Puiseux series $a$.
+"""
 function Base.exp(a::PuiseuxSeriesElem{T}) where T <: RingElement
    z = parent(a)(exp(a.data), a.scale)
    z = rescale!(z)

@@ -15,6 +15,7 @@ makedocs(
                           "mpolynomial.md",
                           "series_rings.md",
                           "series.md",
+                          "puiseux.md",
                           "residue_rings.md",
                           "residue.md"],
              "Fields" => [ "fields.md",

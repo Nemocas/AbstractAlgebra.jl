@@ -9,7 +9,7 @@ any computable commutative ring $R$.
 
 Capped relative power series are power series of the form
 $a_jx^j + a_{j+1}x^{j+1} + \cdots + a_{k-1}x^{k-1} + O(x^k)$
-where $i \geq 0$, $a_i \in R$ and the relative precision $k - j$ is at most
+where $a_j \in R$ and the relative precision $k - j$ is at most
 equal to some specified precision $n$.
 
 Capped absolute power series are power series of the form
@@ -17,7 +17,8 @@ $a_jx^j + a_{j+1}x^{j+1} + \cdots + a_{n-1}x^{n-1} + O(x^n)$
 where $j \geq 0$, $a_j \in R$ and the precision $n$ is fixed.
 
 There are two implementations of relative series: relative power series, implemented in
-`src/generic/RelSeries.jl` and Laurent series, implemented in `src/generic/Laurent.jl`.
+`src/generic/RelSeries.jl` for which $j > 0$ in the above description, and Laurent
+series where $j$ can be negative, implemented in `src/generic/Laurent.jl`.
 Note that there are two implementations for Laurent series, one over rings and one
 over fields, though in practice most of the implementation uses the same code in both
 cases.
@@ -34,9 +35,9 @@ function names.
 
 ## Types and parent objects
 
-The types of generic polynomials implemented by AbstractAlgebra.jl are
-`Generic.RelSeries{T}`, `Generic.AbsSeries{T}`, `LaurentSeriesRingElem{T}` and
-`LaurentSeriesFieldElem{T}`.
+The types of generic series implemented by AbstractAlgebra.jl are
+`Generic.RelSeries{T}`, `Generic.AbsSeries{T}`, `Generic.LaurentSeriesRingElem{T}` and
+`Generic.LaurentSeriesFieldElem{T}`.
 
 Relative power series elements belong to the abstract type
 `AbstractAlgebra.RelSeriesElem`.
