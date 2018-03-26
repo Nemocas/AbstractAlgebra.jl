@@ -1277,7 +1277,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic Puiseux series",
     "title": "Generic Puiseux series",
     "category": "section",
-    "text": "AbstractAlgebra.jl allows the creation of Puiseux series over any computable commutative ring R.Puiseux series are power series of the form a_jx^jm + a_j+1x^(j+1)m + cdots + a_k-1x^(k-1)m + O(x^(km)) for some integer m  0 where i geq 0, a_i in R and the relative precision k - j is at most equal to some specified precision n.The generic Puiseux series module is implemented in src/generic/PuiseuxSeries.jl.As well as implementing the Series Ring interface, the Puiseux series module in AbstractAlgebra.jl implements the generic algorithms described below.All of the generic functionality is part of the Generic submodule of AbstractAlgebra.jl. This is exported by default so that it is not necessary to qualify function names."
+    "text": "AbstractAlgebra.jl allows the creation of Puiseux series over any computable commutative ring R.Puiseux series are power series of the form a_jx^jm + a_j+1x^(j+1)m + cdots + a_k-1x^(k-1)m + O(x^km) for some integer m  0 where i geq 0, a_i in R and the relative precision k - j is at most equal to some specified precision n.The generic Puiseux series module is implemented in src/generic/PuiseuxSeries.jl.As well as implementing the Series Ring interface, the Puiseux series module in AbstractAlgebra.jl implements the generic algorithms described below.All of the generic functionality is part of the Generic submodule of AbstractAlgebra.jl. This is exported by default so that it is not necessary to qualify function names."
 },
 
 {
@@ -1381,7 +1381,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic Puiseux series",
     "title": "Base.exp",
     "category": "Method",
-    "text": "exp(a::PuiseuxSeriesElem)\n\nReturn the exponential of the power series a.\n\n\n\n"
+    "text": "exp(a::PuiseuxSeriesElem)\n\nReturn the exponential of the given Puiseux series a.\n\n\n\n"
 },
 
 {
@@ -1389,7 +1389,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic Puiseux series",
     "title": "Base.sqrt",
     "category": "Method",
-    "text": "sqrt(a::PuiseuxSeriesElem)\n\nReturn the square root of the power series a.\n\n\n\n"
+    "text": "sqrt(a::PuiseuxSeriesElem)\n\nReturn the square root of the given Puiseux series a.\n\n\n\n"
 },
 
 {
