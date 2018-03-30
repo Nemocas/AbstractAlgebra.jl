@@ -32,7 +32,7 @@ function test_youngtabs()
    Y = YoungTableau(lambda)
 
    for i in 1:sum(lambda)
-       @test Y[findfirst(Y, i)...] == i
+       @test Y[findfirst(Y, i)] == i
    end
 
    @test [hooklength(Y,i,j) for i in 1:size(Y,1), j in 1:size(Y,2)] ==
