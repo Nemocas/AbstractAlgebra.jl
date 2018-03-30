@@ -10,8 +10,8 @@ import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
              prevpow2, rand, rank, Rational, rem, reverse, serialize,
              setindex!, show, similar, sign, sin, sinh, size, string,
              tan, tanh, trace, trailing_zeros, transpose, transpose!, truncate,
-             typed_hvcat, typed_hcat, var, vcat, zero, zeros, +, -, *, ==, ^,
-             &, |, $, <<, >>, ~, <=, >=, <, >, //, /, !=
+             typed_hvcat, typed_hcat, var, vcat, xor, zero, zeros, +, -, *, ==, ^,
+             &, |, <<, >>, ~, <=, >=, <, >, //, /, !=
 
 if VERSION >= v"0.7.0-DEV.1144"
 import Base: isone

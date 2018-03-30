@@ -13,8 +13,8 @@ import Base: Array, abs, acos, acosh, asin, asinh, atan, atan2, atanh, base,
              prevpow2, rand, rank, Rational, rem, reverse, serialize,
              setindex!, show, similar, sign, sin, sinh, sinpi, size, string,
              tan, tanh, trace, trailing_zeros, transpose, transpose!, truncate,
-             typed_hvcat, typed_hcat, var, vcat, zero, zeros, +, -, *, ==, ^,
-             &, |, $, <<, >>, ~, <=, >=, <, >, //, /, !=
+             typed_hvcat, typed_hcat, var, vcat, xor, zero, zeros, +, -, *, ==, ^,
+             &, |, <<, >>, ~, <=, >=, <, >, //, /, !=
 
 export elem_type, parent_type
 
