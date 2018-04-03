@@ -667,7 +667,27 @@ end
 
 ###############################################################################
 #
-#   CompositionMap
+#   MapWithPreimage
+#
+###############################################################################
+
+mutable struct MapWithPreimage{D, C} <: AbstractAlgebra.Map{D, C}
+   map::Map{D, C}
+   preimage_map::Map{C, D}
+
+   function MapWithPreimage(map::Map{D, C}, preimage_map::Map{C, D}) where {D, C}
+      (domain(map) != codomain(preimage_map) || codomain(map) != domain(preimage_map)) && error("Maps not compatible")
+      return new{D, C}(map, preimage_map)
+   end
+
+   function MapWithPreimage(map::Map{D, C}) where {D, C}
+      return new{D, C}(map)
+   end
+end
+
+###############################################################################
+#
+#   CompositeMap
 #
 ###############################################################################
 
