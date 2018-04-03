@@ -302,6 +302,10 @@ function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::Abstr
    Generic.NumberField(a, s, t; cached=cached)
 end
 
+function MapFromFunc(image::Function, domain::D, codomain::C) where {C, D}
+   Generic.MapFromFunc(image, domain, codomain)
+end
+
 #add empty functions so that Singular, Nemo and Hecke can import and extend.
 function crt(A...)
   return AbstractAlgebra.crt(A...)
@@ -317,7 +321,7 @@ export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        FractionField, ResidueRing, Partition, PermGroup, YoungTableau,
        AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
-       PuiseuxSeriesField
+       PuiseuxSeriesField, MapFromFunc
 
 export Generic
 
