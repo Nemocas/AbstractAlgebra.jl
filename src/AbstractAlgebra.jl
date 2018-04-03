@@ -138,8 +138,8 @@ import .Generic: add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  needs_parentheses, newton_to_monomial!, normalise, nvars, numerator,
                  O, one, order, ordering, parent_type, parity, partitionseq,
                  perm, polcoeff, pol_length, powmod, pow_multinomial, popov,
-                 popov_with_trafo, powers,
-                 precision, primpart, pseudodivrem, pseudorem, randmat_triu,
+                 popov_with_trafo, powers, precision,
+                 preimage, primpart, pseudodivrem, pseudorem, randmat_triu,
                  randmat_with_rank, rand_ordering, rank_profile_popov, remove,
                  renormalize!, rescale!, resultant, resultant_ducos, resultant_euclidean,
                  resultant_subresultant, resultant_sylvester, resx, reverse,
@@ -177,7 +177,7 @@ export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  needs_parentheses, newton_to_monomial!, normalise, nvars,
                  numerator, O, one, order, ordering, parent_type, parity,
                  partitionseq, perm, polcoeff, pol_length, powmod, pow_multinomial,
-                 popov, popov_with_trafo, powers, ppio, precision, primpart,
+                 popov, popov_with_trafo, powers, ppio, precision, preimage, primpart,
                  pseudodivrem, pseudorem, randmat_triu, randmat_with_rank,
                  rand_ordering, rank_profile_popov, remove, renormalize!, resultant,
                  resultant_ducos, rescale!, resultant_euclidean, resultant_subresultant,
@@ -306,6 +306,14 @@ function MapFromFunc(image::Function, domain::D, codomain::C) where {C, D}
    Generic.MapFromFunc(image, domain, codomain)
 end
 
+function MapWithPreimageFromFunc(image::Function, preimage::Function, domain::D, codomain::C) where {C, D}
+   Generic.MapWithPreimageFromFunc(image, preimage, domain, codomain)
+end
+
+function MapWithPreimageFromFunc(image::Function, domain::D, codomain::C) where {C, D}
+   Generic.MapWithPreimageFromFunc(image, domain, codomain)
+end
+
 #add empty functions so that Singular, Nemo and Hecke can import and extend.
 function crt(A...)
   return AbstractAlgebra.crt(A...)
@@ -321,7 +329,7 @@ export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        FractionField, ResidueRing, Partition, PermGroup, YoungTableau,
        AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
-       PuiseuxSeriesField, MapFromFunc
+       PuiseuxSeriesField, MapFromFunc, MapWithPreimageFromFunc
 
 export Generic
 
