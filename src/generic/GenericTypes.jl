@@ -642,3 +642,42 @@ mutable struct Mat{T <: RingElement} <: AbstractAlgebra.MatElem{T}
       return new{T}(t)
    end
 end
+
+###############################################################################
+#
+#   FunctionalMap
+#
+###############################################################################
+
+mutable struct FunctionalMap{D, C} <: AbstractAlgebra.FunctionalMap{D, C}
+    domain::D
+    codomain::C
+    image::Function
+end
+
+###############################################################################
+#
+#   IdentityMap
+#
+###############################################################################
+
+struct IdentityMap{D} <: AbstractAlgebra.IdentityMap{D}
+   domain::D
+end
+
+###############################################################################
+#
+#   CompositionMap
+#
+###############################################################################
+
+mutable struct CompositeMap{D, U, C} <: AbstractAlgebra.Map{D, C}
+   map1::AbstractAlgebra.Map{U, C}
+   map2::AbstractAlgebra.Map{D, U}
+   fn_cache::Function
+
+   function CompositeMap(map1::Map{U, C}, map2::Map{D, U}) where {D, U, C}
+      return new{D, U, C}(map1, map2)
+   end
+end
+

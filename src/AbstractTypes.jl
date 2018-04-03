@@ -33,6 +33,8 @@ abstract type Module{T <: RingElem} <: Group end
 
 abstract type ModuleElem{T <: RingElem} <: GroupElem end
 
+abstract type Map{D, C} <: SetElem end
+
 # rings, fields etc, parameterised by an element type
 # these are the type classes of different kinds of
 # mathematical rings/fields/etc, which have a base ring,
@@ -50,6 +52,12 @@ abstract type ResRing{T} <: Ring end
 abstract type ResField{T} <: Field end
 
 abstract type FracField{T} <: Field end
+
+abstract type FunctionalMap{D, C} <: Map{D, C} end
+
+abstract type LinearMap{D, C} <: Map{D, C} end
+
+abstract type IdentityMap{D} <: Map{D, D} end
 
 # not always really mathematical rings
 # later we'll distinguish matrix algebras
@@ -77,8 +85,9 @@ abstract type RelSeriesElem{T} <: SeriesElem{T} end
 
 abstract type AbsSeriesElem{T} <: SeriesElem{T} end
 
-   # not always mathematical ring elements
-   # later we'll maybe distinguish MatAlgebraElem, MatModuleElem
+# not always mathematical ring elements
+# later we'll maybe distinguish MatAlgebraElem, MatModuleElem
+
 abstract type MatElem{T} <: RingElem end
 
 # additional abstract types for parents, added ad hoc to form

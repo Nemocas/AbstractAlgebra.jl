@@ -22,7 +22,7 @@ import Base: floor, ceil, hypot, log, log1p, exp, expm1, sin, cos, sinpi,
              asinh, acosh, gamma, lgamma, sinpi, cospi, atan2
 
 import AbstractAlgebra: Integers, Rationals, Ring, RingElem, RingElement, Field,
-             FieldElement, promote_rule
+             FieldElement, Map, promote_rule
 
 using AbstractAlgebra
 
@@ -53,5 +53,7 @@ include("generic/PuiseuxSeries.jl")
 include("generic/Matrix.jl")
 
 include("generic/Fraction.jl")
+
+include("generic/Map.jl")
 
 end # generic
