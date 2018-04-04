@@ -671,12 +671,12 @@ end
 #
 ###############################################################################
 
-mutable struct FunctionalCompositeMap{D, U, C} <: AbstractAlgebra.Map{D, C}
-   map1::AbstractAlgebra.Map{U, C}
-   map2::AbstractAlgebra.Map{D, U}
+mutable struct FunctionalCompositeMap{D, U, C} <: AbstractAlgebra.FunctionalMap{D, C}
+   map1::AbstractAlgebra.FunctionalMap{U, C}
+   map2::AbstractAlgebra.FunctionalMap{D, U}
    fn_cache::Function
 
-   function FunctionalCompositeMap(map1::Map{U, C}, map2::Map{D, U}) where {D, U, C}
+   function FunctionalCompositeMap(map1::AbstractAlgebra.FunctionalMap{U, C}, map2::AbstractAlgebra.FunctionalMap{D, U}) where {D, U, C}
       return new{D, U, C}(map1, map2)
    end
 end
