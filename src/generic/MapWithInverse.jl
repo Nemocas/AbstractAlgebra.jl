@@ -1,6 +1,6 @@
 ################################################################################
 #
-#  MapWith.jl : Map with preimage, left inverse, right inverse, etc.
+#  MapWithInverse.jl : Map with section, retraction, two-sided inverse, etc.
 #
 ################################################################################
 
