@@ -24,6 +24,8 @@ section_map(f::MapWithSection) = f.section
 
 (f::MapWithSection)(a) = image_fn(f.map)(a)
 
+# These two functions are provided for convenience only. Strictly speaking
+# preimage is not the correct name for this type of construction.
 function map_with_preimage_from_func(image_fn::Function, inverse_fn::Function, domain, codomain)
    return MapWithSection(FunctionalMap(image_fn, domain, codomain),
                           FunctionalMap(inverse_fn, codomain, domain))
