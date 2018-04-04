@@ -702,3 +702,23 @@ error("Maps not compatible")
    end
 end
 
+###############################################################################
+#
+#   MapWithRetraction
+#
+###############################################################################
+
+mutable struct MapWithRetraction{D, C} <: AbstractAlgebra.Map{D, C}
+   map::Map{D, C}
+   retraction::Map{C, D}
+
+   function MapWithRetraction(map::Map{D, C}, retraction::Map{C, D}) where {D, C}
+      (domain(map) != codomain(retraction) || codomain(map) != domain(retraction)) &&
+error("Maps not compatible")
+      return new{D, C}(map, retraction)
+   end
+
+   function MapWithRetraction(map::Map{D, C}) where {D, C}
+      return new{D, C}(map)
+   end
+end
