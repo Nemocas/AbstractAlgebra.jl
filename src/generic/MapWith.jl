@@ -22,12 +22,12 @@ preimage_map(f::MapWithPreimage) = f.preimage_map
 (f::MapWithPreimage)(a) = image_fn(f.image_map)(a)
 
 function MapWithPreimageFromFunc(image_fn::Function, preimage_fn::Function, domain, codomain)
-   return MapWithPreimage(FunctionalMap(domain, codomain, image_fn),
-                          FunctionalMap(codomain, domain, preimage_fn))
+   return MapWithPreimage(FunctionalMap(image_fn, domain, codomain),
+                          FunctionalMap(preimage_fn, codomain, domain))
 end
 
 function MapWithPreimageFromFunc(image_fn::Function, domain, codomain)
-   return MapWithPreimage(FunctionalMap(domain, codomain, image_fn))
+   return MapWithPreimage(FunctionalMap(image_fn, domain, codomain))
 end
 
 function show(io::IO, M::MapWithPreimage)
