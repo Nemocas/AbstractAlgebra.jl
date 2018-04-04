@@ -66,12 +66,12 @@ end
 
 ################################################################################
 #
-#  CompositeMap
+#  FunctionalCompositeMap
 #
 ################################################################################
 
-domain(f::CompositeMap) = domain(f.map1)
-codomain(f::CompositeMap) = codomain(f.map2)
+domain(f::FunctionalCompositeMap) = domain(f.map1)
+codomain(f::FunctionalCompositeMap) = codomain(f.map2)
 
 # This is a device to prevent Julia trying to compute
 # the types of a very long composition of closures
@@ -85,7 +85,7 @@ end
 
 (f::UntypedFunction)(a) = f.fn(a)
 
-function image_fn(f::CompositeMap)
+function image_fn(f::FunctionalCompositeMap)
    if isdefined(f, :fn_cache)
       return f.fn_cache
    else
@@ -97,11 +97,11 @@ function image_fn(f::CompositeMap)
    end
 end
 
-(f::CompositeMap)(a) = image_fn(f)(a)
+(f::FunctionalCompositeMap)(a) = image_fn(f)(a)
 
 function compose(f::AbstractAlgebra.Map{U, C}, g::AbstractAlgebra.Map{D, U}) where {D, U, C}
    check_composable(f, g)
-   return CompositeMap(f, g)
+   return FunctionalCompositeMap(f, g)
 end
 
 function compose(f::AbstractAlgebra.Map{D, C}, g::AbstractAlgebra.IdentityMap{D}) where {D, C}
@@ -123,13 +123,13 @@ function show_short(io::IO, M::AbstractAlgebra.Map)
    println(domain(M), " -> ", codomain(M))
 end
 
-function show_short(io::IO, M::CompositeMap)
+function show_short(io::IO, M::FunctionalCompositeMap)
    show_short(io, M.map2)
    println(io, "then")
    show(io, M.map1)
 end
 
-function show(io::IO, M::CompositeMap)
+function show(io::IO, M::FunctionalCompositeMap)
    println(io, "Composite map consisting of the following")
    println(io, "")
    show_short(io, M.map2)
