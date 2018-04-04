@@ -652,7 +652,7 @@ end
 mutable struct FunctionalMap{D, C} <: AbstractAlgebra.FunctionalMap{D, C}
     domain::D
     codomain::C
-    image::Function
+    image_fn::Function
 end
 
 ###############################################################################
@@ -663,26 +663,6 @@ end
 
 struct IdentityMap{D} <: AbstractAlgebra.IdentityMap{D}
    domain::D
-end
-
-###############################################################################
-#
-#   MapWithPreimage
-#
-###############################################################################
-
-mutable struct MapWithPreimage{D, C} <: AbstractAlgebra.Map{D, C}
-   map::Map{D, C}
-   preimage_map::Map{C, D}
-
-   function MapWithPreimage(map::Map{D, C}, preimage_map::Map{C, D}) where {D, C}
-      (domain(map) != codomain(preimage_map) || codomain(map) != domain(preimage_map)) && error("Maps not compatible")
-      return new{D, C}(map, preimage_map)
-   end
-
-   function MapWithPreimage(map::Map{D, C}) where {D, C}
-      return new{D, C}(map)
-   end
 end
 
 ###############################################################################
@@ -698,6 +678,27 @@ mutable struct CompositeMap{D, U, C} <: AbstractAlgebra.Map{D, C}
 
    function CompositeMap(map1::Map{U, C}, map2::Map{D, U}) where {D, U, C}
       return new{D, U, C}(map1, map2)
+   end
+end
+
+###############################################################################
+#
+#   MapWithPreimage
+#
+###############################################################################
+
+mutable struct MapWithPreimage{D, C} <: AbstractAlgebra.Map{D, C}
+   image_map::Map{D, C}
+   preimage_map::Map{C, D}
+
+   function MapWithPreimage(image_map::Map{D, C}, preimage_map::Map{C, D}) where {D, C}
+      (domain(image_map) != codomain(preimage_map) || codomain(image_map) != domain(preimage_map)) &&
+error("Maps not compatible")
+      return new{D, C}(image_map, preimage_map)
+   end
+
+   function MapWithPreimage(image_map::Map{D, C}) where {D, C}
+      return new{D, C}(image_map)
    end
 end
 
