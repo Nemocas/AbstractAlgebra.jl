@@ -49,7 +49,7 @@ image_fn(f::FunctionalMap) = f.image_fn
 (f::FunctionalMap)(a) = image_fn(f)(a)
 
 function MapFromFunc(image_fn::Function, domain, codomain)
-   return FunctionalMap(domain, codomain, image_fn)
+   return FunctionalMap(image_fn, domain, codomain)
 end
 
 function show(io::IO, M::FunctionalMap)
@@ -110,6 +110,11 @@ function compose(f::AbstractAlgebra.Map{D, C}, g::AbstractAlgebra.IdentityMap{D}
 end
 
 function compose(f::AbstractAlgebra.IdentityMap{C}, g::AbstractAlgebra.Map{D, C}) where {D, C}
+   check_composable(f, g)
+   return g
+end
+
+function compose(f::AbstractAlgebra.IdentityMap{C}, g::AbstractAlgebra.IdentityMap{C}) where C
    check_composable(f, g)
    return g
 end
