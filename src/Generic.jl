@@ -56,4 +56,6 @@ include("generic/Fraction.jl")
 
 include("generic/Map.jl")
 
+include("generic/MapWith.jl")
+
 end # generic
