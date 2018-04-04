@@ -131,7 +131,8 @@ import .Generic: add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  isdomain_type, isexact_type, isgen, ishessenberg, ismonomial,
                  isnegative, isone, isreverse, isrimhook, isrref, issquare, isterm,
                  isunit, laurent_ring, lcm, lead, length, leglength, main_variable,
-                 main_variable_extract, main_variable_insert, matrix,
+                 main_variable_extract, main_variable_insert, map_from_func,
+                 map_with_preimage_from_func, matrix,
                  matrix_repr, max_degrees, max_precision, minpoly, mod,
                  modulus, monomial_iszero, monomial_set!, monomial_to_newton!,
                  mul!, mul_classical, mul_karatsuba, mul_ks, mullow, mulmod,
@@ -171,6 +172,7 @@ export add!, addeq!, addmul!, base_ring, canonical_unit, character,
                  ismonomial, isnegative, isone, isreverse, isrimhook, isrref, issquare,
                  isterm, isunit, iszero, laurent_ring, lcm, lead, leglength, length,
                  main_variable, main_variable_extract, main_variable_insert,
+                 map_from_func, map_with_preimage_from_func, 
                  matrix, matrix_repr, max_degrees, max_precision, minpoly, mod,
                  modulus, monomial_iszero, monomial_set!, monomial_to_newton!,
                  mul!, mul_classical, mul_karatsuba, mul_ks, mullow, mulmod,
@@ -303,18 +305,6 @@ function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::Abstr
    Generic.NumberField(a, s, t; cached=cached)
 end
 
-function MapFromFunc(image::Function, domain::D, codomain::C) where {C, D}
-   Generic.MapFromFunc(image, domain, codomain)
-end
-
-function MapWithPreimageFromFunc(image::Function, preimage::Function, domain::D, codomain::C) where {C, D}
-   Generic.MapWithPreimageFromFunc(image, preimage, domain, codomain)
-end
-
-function MapWithPreimageFromFunc(image::Function, domain::D, codomain::C) where {C, D}
-   Generic.MapWithPreimageFromFunc(image, domain, codomain)
-end
-
 #add empty functions so that Singular, Nemo and Hecke can import and extend.
 function crt(A...)
   return AbstractAlgebra.crt(A...)
@@ -330,7 +320,7 @@ export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        FractionField, ResidueRing, Partition, PermGroup, YoungTableau,
        AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
-       PuiseuxSeriesField, MapFromFunc, MapWithPreimageFromFunc
+       PuiseuxSeriesField
 
 export Generic
 

@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-export MapFromFunc, compose, domain, codomain
+export map_from_func, compose, domain, codomain
 
 ################################################################################
 #
@@ -48,7 +48,7 @@ image_fn(f::FunctionalMap) = f.image_fn
 
 (f::FunctionalMap)(a) = image_fn(f)(a)
 
-function MapFromFunc(image_fn::Function, domain, codomain)
+function map_from_func(image_fn::Function, domain, codomain)
    return FunctionalMap(image_fn, domain, codomain)
 end
 

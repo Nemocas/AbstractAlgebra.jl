@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-export MapWithPreimageFromFunc, preimage_map, image_map
+export map_with_preimage_from_func, preimage_map, image_map
 
 ################################################################################
 #
@@ -21,12 +21,12 @@ preimage_map(f::MapWithPreimage) = f.preimage_map
 
 (f::MapWithPreimage)(a) = image_fn(f.image_map)(a)
 
-function MapWithPreimageFromFunc(image_fn::Function, preimage_fn::Function, domain, codomain)
+function map_with_preimage_from_func(image_fn::Function, preimage_fn::Function, domain, codomain)
    return MapWithPreimage(FunctionalMap(image_fn, domain, codomain),
                           FunctionalMap(preimage_fn, codomain, domain))
 end
 
-function MapWithPreimageFromFunc(image_fn::Function, domain, codomain)
+function map_with_preimage_from_func(image_fn::Function, domain, codomain)
    return MapWithPreimage(FunctionalMap(image_fn, domain, codomain))
 end
 
