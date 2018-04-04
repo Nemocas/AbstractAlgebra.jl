@@ -683,22 +683,22 @@ end
 
 ###############################################################################
 #
-#   MapWithPreimage
+#   MapWithSection
 #
 ###############################################################################
 
-mutable struct MapWithPreimage{D, C} <: AbstractAlgebra.Map{D, C}
-   image_map::Map{D, C}
-   preimage_map::Map{C, D}
+mutable struct MapWithSection{D, C} <: AbstractAlgebra.Map{D, C}
+   map::Map{D, C}
+   section::Map{C, D}
 
-   function MapWithPreimage(image_map::Map{D, C}, preimage_map::Map{C, D}) where {D, C}
-      (domain(image_map) != codomain(preimage_map) || codomain(image_map) != domain(preimage_map)) &&
+   function MapWithSection(map::Map{D, C}, section::Map{C, D}) where {D, C}
+      (domain(map) != codomain(section) || codomain(map) != domain(section)) &&
 error("Maps not compatible")
-      return new{D, C}(image_map, preimage_map)
+      return new{D, C}(map, section)
    end
 
-   function MapWithPreimage(image_map::Map{D, C}) where {D, C}
-      return new{D, C}(image_map)
+   function MapWithSection(map::Map{D, C}) where {D, C}
+      return new{D, C}(map)
    end
 end
 
