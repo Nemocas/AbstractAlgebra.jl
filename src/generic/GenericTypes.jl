@@ -672,12 +672,14 @@ end
 ###############################################################################
 
 mutable struct FunctionalCompositeMap{D, U, C} <: AbstractAlgebra.FunctionalMap{D, C}
+   domain::D
+   codomain::C
    map1::AbstractAlgebra.FunctionalMap{U, C}
    map2::AbstractAlgebra.FunctionalMap{D, U}
    fn_cache::Function
 
    function FunctionalCompositeMap(map1::AbstractAlgebra.FunctionalMap{U, C}, map2::AbstractAlgebra.FunctionalMap{D, U}) where {D, U, C}
-      return new{D, U, C}(map1, map2)
+      return new{D, U, C}(domain(map2), codomain(map1), map1, map2)
    end
 end
 
