@@ -46,7 +46,10 @@ domain(f::FunctionalMap) = f.domain
 codomain(f::FunctionalMap) = f.codomain
 image_fn(f::FunctionalMap) = f.image_fn
 
-(f::FunctionalMap)(a) = image_fn(f)(a)
+function (f::FunctionalMap)(a)
+   parent(a) != domain(f) && error("Element not in image of map")
+   return image_fn(f)(a)
+end
 
 function map_from_func(image_fn::Function, domain, codomain)
    return FunctionalMap(image_fn, domain, codomain)
@@ -97,7 +100,10 @@ function image_fn(f::FunctionalCompositeMap)
    end
 end
 
-(f::FunctionalCompositeMap)(a) = image_fn(f)(a)
+function (f::FunctionalCompositeMap)(a)
+   parent(a) != domain(f) && error("Element is not in domain of map")
+   return image_fn(f)(a)
+end
 
 function compose(f::AbstractAlgebra.FunctionalMap{U, C}, g::AbstractAlgebra.FunctionalMap{D, U}) where {D, U, C}
    check_composable(f, g)
