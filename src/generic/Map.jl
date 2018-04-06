@@ -47,7 +47,7 @@ codomain(f::FunctionalMap) = f.codomain
 image_fn(f::FunctionalMap) = f.image_fn
 
 function (f::FunctionalMap)(a)
-   parent(a) != domain(f) && error("Element not in image of map")
+   parent(a) != domain(f) && throw(DomainError())
    return image_fn(f)(a)
 end
 
@@ -73,8 +73,8 @@ end
 #
 ################################################################################
 
-domain(f::FunctionalCompositeMap) = domain(f.map1)
-codomain(f::FunctionalCompositeMap) = codomain(f.map2)
+domain(f::FunctionalCompositeMap) = f.domain
+codomain(f::FunctionalCompositeMap) = f.codomain
 
 # This is a device to prevent Julia trying to compute
 # the types of a very long composition of closures
@@ -82,8 +82,11 @@ struct UntypedFunction <: Function
    fn::Function
 end
 
-function compose(f::UntypedFunction, g::UntypedFunction)
-   return x -> f.fn(g.fn(x))
+function compose(f::UntypedFunction, g::UntypedFunction, d)
+   return function(x)
+      parent(x) != d && error("Element not in domain of map")
+      return f.fn(g.fn(x))
+   end
 end
 
 (f::UntypedFunction)(a) = f.fn(a)
@@ -94,14 +97,14 @@ function image_fn(f::FunctionalCompositeMap)
    else
       f1 = image_fn(f.map1)
       f2 = image_fn(f.map2)
-      fn = compose(UntypedFunction(f2), UntypedFunction(f1))
+      d = domain(f)
+      fn = compose(UntypedFunction(f2), UntypedFunction(f1), d)
       f.fn_cache = fn
       return fn
    end
 end
 
 function (f::FunctionalCompositeMap)(a)
-   parent(a) != domain(f) && error("Element is not in domain of map")
    return image_fn(f)(a)
 end
 
