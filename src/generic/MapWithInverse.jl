@@ -22,6 +22,11 @@ image_map(f::MapWithSection) = f.map
 preimage_map(f::MapWithSection) = f.section # for convenience only
 section_map(f::MapWithSection) = f.section
 
+inverse_fn(f::MapCache) = inverse_fn(f.map)
+inverse_map(f::MapCache) = inverse_map(f.map)
+preimage_map(f::MapCache) = preimage_map(f.map)
+section_map(f::MapCache) = section_map(f.map)
+
 (f::MapWithSection)(a) = (f.map)(a)
 
 # These two functions are provided for convenience only. Strictly speaking
@@ -79,6 +84,8 @@ image_fn(f::MapWithRetraction) = image_fn(f.map)
 inverse_fn(f::MapWithRetraction) = image_fn(f.retraction)
 image_map(f::MapWithRetraction) = f.map
 retraction_map(f::MapWithSection) = f.retraction
+
+retraction_map(f::MapCache) = retraction_map(f.map)
 
 (f::MapWithRetraction)(a) = (f.map)(a)
 

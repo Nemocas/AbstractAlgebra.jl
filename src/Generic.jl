@@ -58,4 +58,6 @@ include("generic/Map.jl")
 
 include("generic/MapWithInverse.jl")
 
+include("generic/MapCache.jl")
+
 end # generic

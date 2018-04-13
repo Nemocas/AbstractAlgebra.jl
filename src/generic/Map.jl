@@ -12,8 +12,40 @@ export map_from_func, compose, domain, codomain
 #
 ################################################################################
 
-function check_composable(a::AbstractAlgebra.Map{U, C}, b::AbstractAlgebra.Map{D, U}) where {C, U, D}
+function check_composable(a::AbstractAlgebra.Map{S, U, C}, b::AbstractAlgebra.Map{T, D, U}) where {S, T, C, U, D}
    domain(a) != codomain(b) && error("Incompatible maps")
+end
+
+###############################################################################
+#
+#   CompositeMap
+#
+###############################################################################
+
+domain(f::CompositeMap) = f.domain
+codomain(f::CompositeMap) = f.codomain
+
+function (f::CompositeMap)(a)
+   return f.map2(f.map1(a))
+end
+
+function compose(f::AbstractAlgebra.Map{S, U, C}, g::AbstractAlgebra.Map{T, D, U}) where {S, T, D, U, C}
+   check_composable(f, g)
+   return CompositeMap(f, g)
+end
+
+function show_short(io::IO, M::CompositeMap)
+   show_short(io, M.map2)
+   println(io, "then")
+   show(io, M.map1)
+end
+
+function show(io::IO, M::CompositeMap)
+   println(io, "Composite map consisting of the following")
+   println(io, "")
+   show_short(io, M.map2)
+   println(io, "then")
+   show_short(io, M.map1)
 end
 
 ################################################################################
@@ -36,6 +68,21 @@ function show(io::IO, M::IdentityMap)
    println(io, domain(M))
 end
 
+function compose(f::AbstractAlgebra.Map{IdentityMap, C, C}, g::AbstractAlgebra.Map{T, D, C}) where {T, D, C}
+   check_composable(f, g)
+   return g
+end
+
+function compose(f::AbstractAlgebra.Map{T, D, C}, g::AbstractAlgebra.Map{IdentityMap, D, D}) where {T, D, C}
+   check_composable(f, g)
+   return f
+end
+
+function compose(f::AbstractAlgebra.Map{IdentityMap, D, D}, g::AbstractAlgebra.Map{IdentityMap, D, D}) where D
+   check_composable(f, g)
+   return g
+end
+
 ################################################################################
 #
 #  FunctionalMap
@@ -45,6 +92,8 @@ end
 domain(f::FunctionalMap) = f.domain
 codomain(f::FunctionalMap) = f.codomain
 image_fn(f::FunctionalMap) = f.image_fn
+
+image_fn(f::MapCache) = image_fn(f.map)
 
 function (f::FunctionalMap)(a)
    parent(a) != domain(f) && throw(DomainError())
@@ -62,7 +111,7 @@ function show(io::IO, M::FunctionalMap)
    println(io, "=======")
    println(io, domain(M))
    println(io, "")
-   println(io, "Coomain:")
+   println(io, "Codomain:")
    println(io, "========")
    println(io, codomain(M))
 end
@@ -108,24 +157,9 @@ function (f::FunctionalCompositeMap)(a)
    return image_fn(f)(a)
 end
 
-function compose(f::AbstractAlgebra.FunctionalMap{U, C}, g::AbstractAlgebra.FunctionalMap{D, U}) where {D, U, C}
+function compose(f::Map{FunctionalMap, U, C}, g::Map{FunctionalMap, D, U}) where {D, U, C}
    check_composable(f, g)
    return FunctionalCompositeMap(f, g)
-end
-
-function compose(f::AbstractAlgebra.Map{D, C}, g::AbstractAlgebra.IdentityMap{D}) where {D, C}
-   check_composable(f, g)
-   return f
-end
-
-function compose(f::AbstractAlgebra.IdentityMap{C}, g::AbstractAlgebra.Map{D, C}) where {D, C}
-   check_composable(f, g)
-   return g
-end
-
-function compose(f::AbstractAlgebra.IdentityMap{C}, g::AbstractAlgebra.IdentityMap{C}) where C
-   check_composable(f, g)
-   return g
 end
 
 function show_short(io::IO, M::AbstractAlgebra.Map)
@@ -145,3 +179,4 @@ function show(io::IO, M::FunctionalCompositeMap)
    println(io, "then")
    show_short(io, M.map1)
 end
+
