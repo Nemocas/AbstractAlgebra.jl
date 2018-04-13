@@ -35,9 +35,9 @@ abstract type ModuleElem{T <: RingElem} <: GroupElem end
 
 abstract type Map{T, D, C} <: SetElem end
 
-abstract type FunctionalMap{D, C} <: Map{FunctionalMap, D, C} end
+abstract type FunctionalMap <: Map{FunctionalMap, Union{}, Union{}} end
 
-abstract type IdentityMap{D} <: Map{IdentityMap, D, D} end
+abstract type IdentityMap <: Map{IdentityMap, Union{}, Union{}} end
 
 # rings, fields etc, parameterised by an element type
 # these are the type classes of different kinds of
