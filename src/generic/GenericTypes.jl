@@ -652,8 +652,8 @@ end
 mutable struct CompositeMap{D, U, C} <: AbstractAlgebra.Map{CompositeMap, D, C}
    domain::D
    codomain::C
-   map1::AbstractAlgebra.Map{U, C}
-   map2::AbstractAlgebra.Map{D, U}
+   map1::AbstractAlgebra.Map{S1, U, C} where S1
+   map2::AbstractAlgebra.Map{T1, D, U} where T1
 
    function CompositeMap(map1::AbstractAlgebra.Map{S, U, C}, map2::AbstractAlgebra.Map{T, D, U}) where {S, T, D, U, C}
       return new{D, U, C}(domain(map2), codomain(map1), map1, map2)
@@ -666,7 +666,7 @@ end
 #
 ###############################################################################
 
-mutable struct FunctionalMap{D, C} <: AbstractAlgebra.Map{FunctionalMap, D, C}
+mutable struct FunctionalMap{D, C} <: AbstractAlgebra.FunctionalMap{D, C}
     image_fn::Function
     domain::D
     codomain::C
@@ -678,7 +678,7 @@ end
 #
 ###############################################################################
 
-struct IdentityMap{D} <: AbstractAlgebra.Map{IdentityMap, D, D}
+struct IdentityMap{D} <: AbstractAlgebra.IdentityMap{D}
    domain::D
 end
 
@@ -688,7 +688,7 @@ end
 #
 ###############################################################################
 
-mutable struct FunctionalCompositeMap{D, U, C} <: AbstractAlgebra.Map{FunctionalMap, D, C}
+mutable struct FunctionalCompositeMap{D, U, C} <: AbstractAlgebra.FunctionalMap{D, C}
    domain::D
    codomain::C
    map1::AbstractAlgebra.Map{FunctionalMap}
