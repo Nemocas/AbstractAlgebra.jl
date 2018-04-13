@@ -157,7 +157,7 @@ function (f::FunctionalCompositeMap)(a)
    return image_fn(f)(a)
 end
 
-function compose(f::Map{FunctionalMap, U, C}, g::Map{FunctionalMap, D, U}) where {D, U, C}
+function compose(f::Map{S, U, C}, g::Map{T, D, U}) where {S <: FunctionalMap, T <: FunctionalMap, D, U, C}
    check_composable(f, g)
    return FunctionalCompositeMap(f, g)
 end

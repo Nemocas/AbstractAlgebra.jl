@@ -666,7 +666,7 @@ end
 #
 ###############################################################################
 
-mutable struct FunctionalMap{D, C} <: AbstractAlgebra.FunctionalMap{D, C}
+mutable struct FunctionalMap{D, C} <: AbstractAlgebra.Map{AbstractAlgebra.FunctionalMap, D, C}
     image_fn::Function
     domain::D
     codomain::C
@@ -678,7 +678,7 @@ end
 #
 ###############################################################################
 
-struct IdentityMap{D} <: AbstractAlgebra.IdentityMap{D}
+struct IdentityMap{D} <: AbstractAlgebra.Map{AbstractAlgebra.IdentityMap, D, D}
    domain::D
 end
 
@@ -688,7 +688,7 @@ end
 #
 ###############################################################################
 
-mutable struct FunctionalCompositeMap{D, U, C} <: AbstractAlgebra.FunctionalMap{D, C}
+mutable struct FunctionalCompositeMap{D, U, C} <: AbstractAlgebra.Map{AbstractAlgebra.FunctionalMap, D, C}
    domain::D
    codomain::C
    map1::AbstractAlgebra.Map{FunctionalMap}
