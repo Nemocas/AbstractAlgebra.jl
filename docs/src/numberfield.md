@@ -34,7 +34,7 @@ $\mathbb{Q}[x]$.
 
 ```julia
 R, x = PolynomialRing(QQ, "x")
-K, a = NumberField(R, x^3 + 3x + 1, "a")
+K, a = NumberField(x^3 + 3x + 1, "a")
 
 f = a^2 + 2a + 7
 ```
