@@ -667,9 +667,9 @@ end
 ###############################################################################
 
 mutable struct FunctionalMap{D, C} <: AbstractAlgebra.Map{D, C, AbstractAlgebra.FunctionalMap}
-    image_fn::Function
     domain::D
     codomain::C
+    image_fn::Function
 end
 
 ###############################################################################
