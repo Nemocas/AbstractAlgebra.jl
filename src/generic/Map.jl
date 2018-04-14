@@ -12,7 +12,7 @@ export map_from_func, compose, domain, codomain
 #
 ################################################################################
 
-function check_composable(a::AbstractAlgebra.Map{S, U, C}, b::AbstractAlgebra.Map{T, D, U}) where {S, T, C, U, D}
+function check_composable(a::AbstractAlgebra.Map{U, C}, b::AbstractAlgebra.Map{D, U}) where {C, U, D}
    domain(a) != codomain(b) && error("Incompatible maps")
 end
 
@@ -29,7 +29,7 @@ function (f::CompositeMap)(a)
    return f.map2(f.map1(a))
 end
 
-function compose(f::AbstractAlgebra.Map{S, U, C}, g::AbstractAlgebra.Map{T, D, U}) where {S, T, D, U, C}
+function compose(f::AbstractAlgebra.Map{U, C}, g::AbstractAlgebra.Map{D, U}) where {D, U, C}
    check_composable(f, g)
    return CompositeMap(f, g)
 end
@@ -68,17 +68,17 @@ function show(io::IO, M::IdentityMap)
    println(io, domain(M))
 end
 
-function compose(f::AbstractAlgebra.Map{IdentityMap, C, C}, g::AbstractAlgebra.Map{T, D, C}) where {T, D, C}
+function compose(f::AbstractAlgebra.Map{C, C, <:AbstractAlgebra.IdentityMap}, g::AbstractAlgebra.Map{D, C}) where {D, C}
    check_composable(f, g)
    return g
 end
 
-function compose(f::AbstractAlgebra.Map{T, D, C}, g::AbstractAlgebra.Map{IdentityMap, D, D}) where {T, D, C}
+function compose(f::AbstractAlgebra.Map{D, C}, g::AbstractAlgebra.Map{D, D, <:AbstractAlgebra.IdentityMap}) where {D, C}
    check_composable(f, g)
    return f
 end
 
-function compose(f::AbstractAlgebra.Map{IdentityMap, D, D}, g::AbstractAlgebra.Map{IdentityMap, D, D}) where D
+function compose(f::AbstractAlgebra.Map{D, D, <:AbstractAlgebra.IdentityMap}, g::AbstractAlgebra.Map{D, D, <:AbstractAlgebra.IdentityMap}) where D
    check_composable(f, g)
    return g
 end
@@ -157,7 +157,7 @@ function (f::FunctionalCompositeMap)(a)
    return image_fn(f)(a)
 end
 
-function compose(f::Map{S, U, C}, g::Map{T, D, U}) where {S <: FunctionalMap, T <: FunctionalMap, D, U, C}
+function compose(f::Map{U, C, <:AbstractAlgebra.FunctionalMap}, g::Map{D, U, <:AbstractAlgebra.FunctionalMap}) where {D, U, C}
    check_composable(f, g)
    return FunctionalCompositeMap(f, g)
 end

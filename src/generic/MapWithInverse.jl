@@ -110,3 +110,13 @@ function show(io::IO, M::MapWithRetraction)
    println(io, codomain(M))
 end
 
+function compose(f::MapWithRetraction{U, C}, g::MapWithRetraction{D, U}) where {D, U, C}
+   check_composable(f, g)
+   m = compose(f.map, g.map)
+   if isdefined(g, :section) && isdefined(f, :section)
+      p = compose(g.section, f.section)
+      return MapWithRetraction(m, p)
+   else
+      return MapWithRetraction(m)
+   end
+end

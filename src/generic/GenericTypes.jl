@@ -649,14 +649,14 @@ end
 #
 ###############################################################################
 
-mutable struct CompositeMap{D, U, C} <: AbstractAlgebra.Map{CompositeMap, D, C}
+mutable struct CompositeMap{D, C} <: AbstractAlgebra.Map{D, C, CompositeMap}
    domain::D
    codomain::C
-   map1::AbstractAlgebra.Map{S1, U, C} where S1
-   map2::AbstractAlgebra.Map{T1, D, U} where T1
+   map1::AbstractAlgebra.Map
+   map2::AbstractAlgebra.Map
 
-   function CompositeMap(map1::AbstractAlgebra.Map{S, U, C}, map2::AbstractAlgebra.Map{T, D, U}) where {S, T, D, U, C}
-      return new{D, U, C}(domain(map2), codomain(map1), map1, map2)
+   function CompositeMap(map1::AbstractAlgebra.Map{U, C}, map2::AbstractAlgebra.Map{D, U}) where {D, U, C}
+      return new{D, C}(domain(map2), codomain(map1), map1, map2)
    end
 end
 
@@ -666,7 +666,7 @@ end
 #
 ###############################################################################
 
-mutable struct FunctionalMap{D, C} <: AbstractAlgebra.Map{AbstractAlgebra.FunctionalMap, D, C}
+mutable struct FunctionalMap{D, C} <: AbstractAlgebra.Map{D, C, AbstractAlgebra.FunctionalMap}
     image_fn::Function
     domain::D
     codomain::C
@@ -678,7 +678,7 @@ end
 #
 ###############################################################################
 
-struct IdentityMap{D} <: AbstractAlgebra.Map{AbstractAlgebra.IdentityMap, D, D}
+struct IdentityMap{D} <: AbstractAlgebra.Map{D, D, AbstractAlgebra.IdentityMap}
    domain::D
 end
 
@@ -688,15 +688,15 @@ end
 #
 ###############################################################################
 
-mutable struct FunctionalCompositeMap{D, U, C} <: AbstractAlgebra.Map{AbstractAlgebra.FunctionalMap, D, C}
+mutable struct FunctionalCompositeMap{D, C} <: AbstractAlgebra.Map{D, C, AbstractAlgebra.FunctionalMap}
    domain::D
    codomain::C
-   map1::AbstractAlgebra.Map{FunctionalMap}
-   map2::AbstractAlgebra.Map{FunctionalMap}
+   map1::AbstractAlgebra.Map
+   map2::AbstractAlgebra.Map
    fn_cache::Function
 
-   function FunctionalCompositeMap(map1::AbstractAlgebra.Map{FunctionalMap, U, C}, map2::AbstractAlgebra.Map{FunctionalMap, D, U}) where {D, U, C}
-      return new{D, U, C}(domain(map2), codomain(map1), map1, map2)
+   function FunctionalCompositeMap(map1::AbstractAlgebra.Map{U, C, <:AbstractAlgebra.FunctionalMap}, map2::AbstractAlgebra.Map{D, U, <:AbstractAlgebra.FunctionalMap}) where {D, U, C}
+      return new{D, C}(domain(map2), codomain(map1), map1, map2)
    end
 end
 
@@ -706,17 +706,17 @@ end
 #
 ###############################################################################
 
-mutable struct MapWithSection{D, C} <: AbstractAlgebra.Map{MapWithSection, D, C}
-   map::Map{S1, D, C} where S1
-   section::Map{T1, C, D} where T1
+mutable struct MapWithSection{D, C} <: AbstractAlgebra.Map{D, C, MapWithSection}
+   map::AbstractAlgebra.Map
+   section::AbstractAlgebra.Map
 
-   function MapWithSection(map::Map{S, D, C}, section::Map{T, C, D}) where {S, T, D, C}
+   function MapWithSection(map::AbstractAlgebra.Map{D, C}, section::AbstractAlgebra.Map{C, D}) where {D, C}
       (domain(map) != codomain(section) || codomain(map) != domain(section)) &&
 error("Maps not compatible")
       return new{D, C}(map, section)
    end
 
-   function MapWithSection(map::Map{S, D, C}) where {S, D, C}
+   function MapWithSection(map::AbstractAlgebra.Map{D, C}) where {D, C}
       return new{D, C}(map)
    end
 end
@@ -727,17 +727,17 @@ end
 #
 ###############################################################################
 
-mutable struct MapWithRetraction{D, C} <: AbstractAlgebra.Map{MapWithRetraction, D, C}
-   map::Map{S1, D, C} where S1
-   retraction::Map{T1, C, D} where T1
+mutable struct MapWithRetraction{D, C} <: AbstractAlgebra.Map{D, C, MapWithRetraction}
+   map::AbstractAlgebra.Map
+   retraction::AbstractAlgebra.Map
 
-   function MapWithRetraction(map::Map{S, D, C}, retraction::Map{T, C, D}) where {S, T, D, C}
+   function MapWithRetraction(map::AbstractAlgebra.Map{D, C}, retraction::AbstractAlgebra.Map{C, D}) where {D, C}
       (domain(map) != codomain(retraction) || codomain(map) != domain(retraction)) &&
 error("Maps not compatible")
       return new{D, C}(map, retraction)
    end
 
-   function MapWithRetraction(map::Map{S, D, C}) where {S, D, C}
+   function MapWithRetraction(map::AbstractAlgebra.Map{D, C}) where {D, C}
       return new{D, C}(map)
    end
 end
@@ -748,15 +748,15 @@ end
 #
 ###############################################################################
 
-mutable struct MapCache{T, D, C, De, Ce} <: AbstractAlgebra.Map{T, D, C}
-   map::Map{T, D, C}
+mutable struct MapCache{D, C, T, De, Ce} <: AbstractAlgebra.Map{D, C, T}
+   map::AbstractAlgebra.Map{D, C}
    limit::Int
    image_cache::Dict{De, Ce}
 
-   function MapCache(f::Map{T, D, C}, limit::Int, enable::Bool) where {T, D, C}
+   function MapCache(f::AbstractAlgebra.Map{D, C, T}, limit::Int, enable::Bool) where {D, C, T}
       De = elem_type(D)
       Ce = elem_type(C)
-      r = new{T, D, C, De, Ce}(f, limit)
+      r = new{D, C, T, De, Ce}(f, limit)
       if enable
          r.image_cache = Dict{De, Ce}()
       end
