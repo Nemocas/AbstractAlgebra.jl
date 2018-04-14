@@ -31,22 +31,22 @@ section_map(f::MapCache) = section_map(f.map)
 
 # These two functions are provided for convenience only. Strictly speaking
 # preimage is not the correct name for this type of construction.
-function map_with_preimage_from_func(image_fn::Function, inverse_fn::Function, domain, codomain)
-   return MapWithSection(FunctionalMap(image_fn, domain, codomain),
-                          FunctionalMap(inverse_fn, codomain, domain))
+function map_with_preimage_from_func(domain, codomain, image_fn::Function, inverse_fn::Function)
+   return MapWithSection(FunctionalMap(domain, codomain, image_fn),
+                          FunctionalMap(codomain, domain, inverse_fn))
 end
 
-function map_with_preimage_from_func(image_fn::Function, domain, codomain)
-   return MapWithSection(FunctionalMap(image_fn, domain, codomain))
+function map_with_preimage_from_func(domain, codomain, image_fn::Function)
+   return MapWithSection(FunctionalMap(domain, codomain, image_fn))
 end
 
-function map_with_section_from_func(image_fn::Function, inverse_fn::Function, domain, codomain)
-   return MapWithSection(FunctionalMap(image_fn, domain, codomain),
-                          FunctionalMap(inverse_fn, codomain, domain))
+function map_with_section_from_func(domain, codomain, image_fn::Function, inverse_fn::Function)
+   return MapWithSection(FunctionalMap(domain, codomain, image_fn),
+                          FunctionalMap(codomain, domain, inverse_fn))
 end
 
-function map_with_section_from_func(image_fn::Function, domain, codomain)
-   return MapWithSection(FunctionalMap(image_fn, domain, codomain))
+function map_with_section_from_func(domain, codomain, image_fn::Function)
+   return MapWithSection(FunctionalMap(domain, codomain, image_fn))
 end
 
 function show(io::IO, M::MapWithSection)
@@ -89,13 +89,13 @@ retraction_map(f::MapCache) = retraction_map(f.map)
 
 (f::MapWithRetraction)(a) = (f.map)(a)
 
-function map_with_retraction_from_func(image_fn::Function, inverse_fn::Function, domain, codomain)
-   return MapWithRetraction(FunctionalMap(image_fn, domain, codomain),
-                          FunctionalMap(inverse_fn, codomain, domain))
+function map_with_retraction_from_func(domain, codomain, image_fn::Function, inverse_fn::Function)
+   return MapWithRetraction(FunctionalMap(domain, codomain, image_fn),
+                          FunctionalMap(codomain, domain, inverse_fn))
 end
 
-function map_with_retraction_from_func(image_fn::Function, domain, codomain)
-   return MapWithRetraction(FunctionalMap(image_fn, domain, codomain))
+function map_with_retraction_from_func(domain, codomain, image_fn::Function)
+   return MapWithRetraction(FunctionalMap(domain, codomain, image_fn))
 end
 
 function show(io::IO, M::MapWithRetraction)

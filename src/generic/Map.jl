@@ -100,8 +100,8 @@ function (f::FunctionalMap)(a)
    return image_fn(f)(a)
 end
 
-function map_from_func(image_fn::Function, domain, codomain)
-   return FunctionalMap(image_fn, domain, codomain)
+function map_from_func(domain, codomain, image_fn::Function)
+   return FunctionalMap(domain, codomain, image_fn)
 end
 
 function show(io::IO, M::FunctionalMap)
