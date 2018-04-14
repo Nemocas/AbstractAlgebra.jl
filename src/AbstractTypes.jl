@@ -33,11 +33,13 @@ abstract type Module{T <: RingElem} <: Group end
 
 abstract type ModuleElem{T <: RingElem} <: GroupElem end
 
-abstract type Map{T, D, C} <: SetElem end
+abstract type Map{D, C, T} <: SetElem end
 
-abstract type FunctionalMap <: Map{FunctionalMap, Union{}, Union{}} end
+abstract type BaseMap end
 
-abstract type IdentityMap <: Map{IdentityMap, Union{}, Union{}} end
+abstract type FunctionalMap <: BaseMap end
+
+abstract type IdentityMap <: BaseMap end
 
 # rings, fields etc, parameterised by an element type
 # these are the type classes of different kinds of
