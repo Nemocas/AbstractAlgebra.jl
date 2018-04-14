@@ -14,8 +14,8 @@ export map_with_preimage_from_func, map_with_section_from_func,
 #
 ################################################################################
 
-domain(f::MapWithSection) = domain(f.map)
-codomain(f::MapWithSection) = codomain(f.map)
+domain(f::MapWithSection) = get_field(f.map, :domain)
+codomain(f::MapWithSection) = get_field(f.map, :codomain)
 image_fn(f::MapWithSection) = image_fn(f.map)
 inverse_fn(f::MapWithSection) = image_fn(f.section)
 image_map(f::MapWithSection) = f.map
@@ -78,8 +78,8 @@ end
 #
 ################################################################################
 
-domain(f::MapWithRetraction) = domain(f.map)
-codomain(f::MapWithRetraction) = codomain(f.map)
+domain(f::MapWithRetraction) = get_field(f.map, :domain)
+codomain(f::MapWithRetraction) = get_field(f.map, :codomain)
 image_fn(f::MapWithRetraction) = image_fn(f.map)
 inverse_fn(f::MapWithRetraction) = image_fn(f.retraction)
 image_map(f::MapWithRetraction) = f.map

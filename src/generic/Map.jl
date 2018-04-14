@@ -12,6 +12,11 @@ export map_from_func, compose, domain, codomain
 #
 ################################################################################
 
+domain(f::AbstractAlgebra.Map) = get_field(f, :domain)
+codomain(f::AbstractAlgebra.Map) = get_field(f, :codomain)
+
+get_field(M, f) = getfield(M, f) # fall back to Julia builtin
+
 function check_composable(a::AbstractAlgebra.Map{U, C}, b::AbstractAlgebra.Map{D, U}) where {C, U, D}
    domain(a) != codomain(b) && error("Incompatible maps")
 end
@@ -22,8 +27,8 @@ end
 #
 ###############################################################################
 
-domain(f::CompositeMap) = f.domain
-codomain(f::CompositeMap) = f.codomain
+domain(f::CompositeMap) = get_field(f, :domain)
+codomain(f::CompositeMap) = get_field(f, :codomain)
 
 function (f::CompositeMap)(a)
    return f.map2(f.map1(a))
@@ -53,10 +58,6 @@ end
 #  IdentityMap
 #
 ################################################################################
-
-domain(f::IdentityMap) = f.domain
-codomain(f::IdentityMap) = f.codomain
-image_fn(f::IdentityMap) = x -> x
 
 (f::IdentityMap)(a) = a
 
@@ -89,11 +90,7 @@ end
 #
 ################################################################################
 
-domain(f::FunctionalMap) = f.domain
-codomain(f::FunctionalMap) = f.codomain
-image_fn(f::FunctionalMap) = f.image_fn
-
-image_fn(f::MapCache) = image_fn(f.map)
+image_fn(f::AbstractAlgebra.Map{D, C, <:AbstractAlgebra.FunctionalMap}) where {D, C} = get_field(f, :image_fn)
 
 function (f::FunctionalMap)(a)
    parent(a) != domain(f) && throw(DomainError())
@@ -121,9 +118,6 @@ end
 #  FunctionalCompositeMap
 #
 ################################################################################
-
-domain(f::FunctionalCompositeMap) = f.domain
-codomain(f::FunctionalCompositeMap) = f.codomain
 
 # This is a device to prevent Julia trying to compute
 # the types of a very long composition of closures
