@@ -16,6 +16,7 @@ domain(f::AbstractAlgebra.Map) = get_field(f, :domain)
 codomain(f::AbstractAlgebra.Map) = get_field(f, :codomain)
 
 get_field(M, f) = getfield(M, f) # fall back to Julia builtin
+set_field!(M, f) = setfield(M, f) # fall back to Julia builtin
 
 function check_composable(a::AbstractAlgebra.Map{U, C}, b::AbstractAlgebra.Map{D, U}) where {C, U, D}
    domain(a) != codomain(b) && error("Incompatible maps")
