@@ -49,7 +49,7 @@ doc"""
 """
 struct AllPerms{T}
   n::T
-  all::T
+  all::Int
 
   function AllPerms(n::T) where {T<:Integer}
      return new{T}(n, factorial(n))
