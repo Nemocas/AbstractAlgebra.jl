@@ -7,6 +7,7 @@
 export cached, set_limit!
 
 get_field(M::MapCache, f) = getfield(M.map, f) # pass accessors through
+set_field!(M::MapCache, f) = setfield(M.map, f) # pass accessors through
 
 function cached(M::AbstractAlgebra.Map; limit::Int = 100, enable::Bool = true)
    return MapCache(M, limit, enable)
