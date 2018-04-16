@@ -28,8 +28,8 @@ end
 #
 ###############################################################################
 
-domain(f::CompositeMap) = get_field(f, :domain)
-codomain(f::CompositeMap) = get_field(f, :codomain)
+domain(f::CompositeMap) = domain(f.map1)
+codomain(f::CompositeMap) = codomain(f.map2)
 
 function (f::CompositeMap)(a)
    return f.map2(f.map1(a))
@@ -61,6 +61,8 @@ end
 ################################################################################
 
 (f::IdentityMap)(a) = a
+
+codomain(f::AbstractAlgebra.Map{D, C, <:IdentityMap}) where {D, C} = domain(f::IdentityMap)
 
 function show(io::IO, M::IdentityMap)
    println(io, "Identity map with")
