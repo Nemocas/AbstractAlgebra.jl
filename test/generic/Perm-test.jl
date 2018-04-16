@@ -107,6 +107,11 @@ function test_perm_iteration()
    @test length(collect(elements(G))) == 120
    @test length(unique(elements(G))) == 120
 
+   G = PermutationGroup(Int8(6))
+   @test collect(elements(G)) isa Vector{Generic.perm{Int8}}
+   @test length(collect(elements(G))) == 720
+   @test Generic.AllPerms(G.n).all == 720
+
    println("PASS")
 end
 
