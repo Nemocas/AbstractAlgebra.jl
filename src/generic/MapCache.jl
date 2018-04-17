@@ -21,7 +21,7 @@ function set_limit!(M::MapCache, limit::Int)
    M.limit = limit
 end
 
-function (M::MapCache{D, C, T, De, Ce})(a::De) where {D, C, T, De, Ce}
+function (M::MapCache{D, C, S, T, De, Ce})(a::De) where {D, C, S, T, De, Ce}
    if isdefined(M, :image_cache)
       if haskey(M.image_cache, a)
          return M.image_cache[a]::Ce

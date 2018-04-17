@@ -19,7 +19,9 @@ import Base: Array, abs, acos, acosh, asin, asinh, atan, atan2, atanh, base,
 export elem_type, parent_type
 
 export SetElem, GroupElem, RingElem, ModuleElem, FieldElem, RingElement,
-       FieldElement, AccessorNotSetError
+       FieldElement, Map, AccessorNotSetError
+
+export SetMap, FunctionalMap, IdentityMap
 
 export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
        MatElem, FinFieldElem, MPolyElem
