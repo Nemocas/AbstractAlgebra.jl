@@ -56,7 +56,7 @@ function show(io::IO, M::MapWithSection)
    println(io, "=======")
    println(io, domain(M))
    println(io, "")
-   println(io, "Coomain:")
+   println(io, "Codomain:")
    println(io, "========")
    println(io, codomain(M))
 end
@@ -72,6 +72,10 @@ function compose(f::MapWithSection{U, C}, g::MapWithSection{D, U}) where {D, U, 
    end
 end
 
+function inv(f::MapWithSection)
+   return MapWithRetraction(f.section, f.map)
+end
+ 
 ################################################################################
 #
 #  MapWithRetraction
@@ -105,7 +109,7 @@ function show(io::IO, M::MapWithRetraction)
    println(io, "=======")
    println(io, domain(M))
    println(io, "")
-   println(io, "Coomain:")
+   println(io, "Codomain:")
    println(io, "========")
    println(io, codomain(M))
 end
@@ -120,3 +124,8 @@ function compose(f::MapWithRetraction{U, C}, g::MapWithRetraction{D, U}) where {
       return MapWithRetraction(m)
    end
 end
+
+function inv(f::MapWithRetraction)
+   return MapWithSection(f.section, f.map)
+end
+
