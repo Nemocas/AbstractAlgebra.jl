@@ -649,7 +649,10 @@ end
 #
 ###############################################################################
 
-mutable struct CompositeMap{D, C} <: AbstractAlgebra.Map{D, C, CompositeMap}
+Map(::Type{T}) where T <: AbstractAlgebra.Map = supertype(T)
+Map(::Type{S}) where S <: AbstractAlgebra.SetMap = Map{D, C, S, T} where {D, C, T}
+
+mutable struct CompositeMap{D, C} <: AbstractAlgebra.Map{D, C, AbstractAlgebra.SetMap, CompositeMap}
    domain::D
    codomain::C
    map1::AbstractAlgebra.Map
@@ -666,7 +669,7 @@ end
 #
 ###############################################################################
 
-mutable struct FunctionalMap{D, C} <: AbstractAlgebra.Map{D, C, AbstractAlgebra.FunctionalMap}
+mutable struct FunctionalMap{D, C} <: AbstractAlgebra.Map{D, C, AbstractAlgebra.FunctionalMap, FunctionalMap}
     domain::D
     codomain::C
     image_fn::Function
@@ -678,7 +681,7 @@ end
 #
 ###############################################################################
 
-struct IdentityMap{D} <: AbstractAlgebra.Map{D, D, AbstractAlgebra.IdentityMap}
+struct IdentityMap{D} <: AbstractAlgebra.Map{D, D, AbstractAlgebra.IdentityMap, IdentityMap}
    domain::D
 end
 
@@ -688,14 +691,14 @@ end
 #
 ###############################################################################
 
-mutable struct FunctionalCompositeMap{D, C} <: AbstractAlgebra.Map{D, C, AbstractAlgebra.FunctionalMap}
+mutable struct FunctionalCompositeMap{D, C} <: AbstractAlgebra.Map{D, C, AbstractAlgebra.FunctionalMap, FunctionalCompositeMap}
    domain::D
    codomain::C
    map1::AbstractAlgebra.Map
    map2::AbstractAlgebra.Map
    fn_cache::Function
 
-   function FunctionalCompositeMap(map1::AbstractAlgebra.Map{U, C, <:AbstractAlgebra.FunctionalMap}, map2::AbstractAlgebra.Map{D, U, <:AbstractAlgebra.FunctionalMap}) where {D, U, C}
+   function FunctionalCompositeMap(map1::Map(AbstractAlgebra.FunctionalMap){U, C}, map2::Map(AbstractAlgebra.FunctionalMap){D, U}) where {D, U, C}
       return new{D, C}(domain(map2), codomain(map1), map1, map2)
    end
 end
@@ -706,7 +709,7 @@ end
 #
 ###############################################################################
 
-mutable struct MapWithSection{D, C} <: AbstractAlgebra.Map{D, C, MapWithSection}
+mutable struct MapWithSection{D, C} <: AbstractAlgebra.Map{D, C, AbstractAlgebra.SetMap, MapWithSection}
    map::AbstractAlgebra.Map
    section::AbstractAlgebra.Map
 
@@ -727,7 +730,7 @@ end
 #
 ###############################################################################
 
-mutable struct MapWithRetraction{D, C} <: AbstractAlgebra.Map{D, C, MapWithRetraction}
+mutable struct MapWithRetraction{D, C} <: AbstractAlgebra.Map{D, C, AbstractAlgebra.SetMap, MapWithRetraction}
    map::AbstractAlgebra.Map
    retraction::AbstractAlgebra.Map
 
@@ -748,15 +751,15 @@ end
 #
 ###############################################################################
 
-mutable struct MapCache{D, C, T, De, Ce} <: AbstractAlgebra.Map{D, C, T}
+mutable struct MapCache{D, C, S, T, De, Ce} <: AbstractAlgebra.Map{D, C, S, T}
    map::AbstractAlgebra.Map{D, C}
    limit::Int
    image_cache::Dict{De, Ce}
 
-   function MapCache(f::AbstractAlgebra.Map{D, C, T}, limit::Int, enable::Bool) where {D, C, T}
+   function MapCache(f::AbstractAlgebra.Map{D, C, S, T}, limit::Int, enable::Bool) where {D, C, S, T}
       De = elem_type(D)
       Ce = elem_type(C)
-      r = new{D, C, T, De, Ce}(f, limit)
+      r = new{D, C, S, T, De, Ce}(f, limit)
       if enable
          r.image_cache = Dict{De, Ce}()
       end

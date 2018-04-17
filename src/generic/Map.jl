@@ -12,11 +12,11 @@ export map_from_func, compose, domain, codomain
 #
 ################################################################################
 
-domain(f::AbstractAlgebra.Map) = get_field(f, :domain)
-codomain(f::AbstractAlgebra.Map) = get_field(f, :codomain)
-
 get_field(M, f) = getfield(M, f) # fall back to Julia builtin
 set_field!(M, f) = setfield(M, f) # fall back to Julia builtin
+
+domain(f::AbstractAlgebra.Map) = get_field(f, :domain)
+codomain(f::AbstractAlgebra.Map) = get_field(f, :codomain)
 
 function check_composable(a::AbstractAlgebra.Map{U, C}, b::AbstractAlgebra.Map{D, U}) where {C, U, D}
    domain(a) != codomain(b) && error("Incompatible maps")
@@ -62,7 +62,7 @@ end
 
 (f::IdentityMap)(a) = a
 
-codomain(f::AbstractAlgebra.Map{D, C, <:IdentityMap}) where {D, C} = domain(f::IdentityMap)
+codomain(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){D, C}) where {D, C} = domain(f)
 
 function show(io::IO, M::IdentityMap)
    println(io, "Identity map with")
@@ -72,17 +72,17 @@ function show(io::IO, M::IdentityMap)
    println(io, domain(M))
 end
 
-function compose(f::AbstractAlgebra.Map{C, C, <:AbstractAlgebra.IdentityMap}, g::AbstractAlgebra.Map{D, C}) where {D, C}
+function compose(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){C, C}, g::AbstractAlgebra.Map{D, C}) where {D, C}
    check_composable(f, g)
    return g
 end
 
-function compose(f::AbstractAlgebra.Map{D, C}, g::AbstractAlgebra.Map{D, D, <:AbstractAlgebra.IdentityMap}) where {D, C}
+function compose(f::AbstractAlgebra.Map{D, C}, g::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){D, D}) where {D, C}
    check_composable(f, g)
    return f
 end
 
-function compose(f::AbstractAlgebra.Map{D, D, <:AbstractAlgebra.IdentityMap}, g::AbstractAlgebra.Map{D, D, <:AbstractAlgebra.IdentityMap}) where D
+function compose(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){D, D}, g::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){D, D}) where D
    check_composable(f, g)
    return g
 end
@@ -93,7 +93,7 @@ end
 #
 ################################################################################
 
-image_fn(f::AbstractAlgebra.Map{D, C, <:AbstractAlgebra.FunctionalMap}) where {D, C} = get_field(f, :image_fn)
+image_fn(f::AbstractAlgebra.Map(AbstractAlgebra.FunctionalMap)) = get_field(f, :image_fn)
 
 function (f::FunctionalMap)(a)
    parent(a) != domain(f) && throw(DomainError())
@@ -154,7 +154,7 @@ function (f::FunctionalCompositeMap)(a)
    return image_fn(f)(a)
 end
 
-function compose(f::Map{U, C, <:AbstractAlgebra.FunctionalMap}, g::Map{D, U, <:AbstractAlgebra.FunctionalMap}) where {D, U, C}
+function compose(f::Map(AbstractAlgebra.FunctionalMap){U, C}, g::Map(AbstractAlgebra.FunctionalMap){D, U}) where {D, U, C}
    check_composable(f, g)
    return FunctionalCompositeMap(f, g)
 end
