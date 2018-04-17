@@ -22,6 +22,8 @@ function check_composable(a::AbstractAlgebra.Map{U, C}, b::AbstractAlgebra.Map{D
    domain(a) != codomain(b) && error("Incompatible maps")
 end
 
+*(f::Map, g::Map) = compose(f, g)
+
 ###############################################################################
 #
 #   CompositeMap
