@@ -754,15 +754,17 @@ end
 mutable struct MapCache{D, C, S, T, De, Ce} <: AbstractAlgebra.Map{D, C, S, T}
    map::AbstractAlgebra.Map{D, C}
    limit::Int
+   enabled::Bool
    image_cache::Dict{De, Ce}
 
-   function MapCache(f::AbstractAlgebra.Map{D, C, S, T}, limit::Int, enable::Bool) where {D, C, S, T}
+   function MapCache(f::AbstractAlgebra.Map{D, C, S, T}, limit::Int, enabled::Bool) where {D, C, S, T}
       De = elem_type(D)
       Ce = elem_type(C)
       r = new{D, C, S, T, De, Ce}(f, limit)
-      if enable
+      if enabled
          r.image_cache = Dict{De, Ce}()
       end
+      r.enabled = enabled
       return r
    end
 end
