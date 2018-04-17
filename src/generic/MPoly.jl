@@ -2853,7 +2853,8 @@ function rand_ordering()
    end
 end
 
-function rand(S::MPolyRing, term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
+function rand(S::AbstractAlgebra.MPolyRing,
+              term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
    f = S()
    g = gens(S)
    R = base_ring(S)
