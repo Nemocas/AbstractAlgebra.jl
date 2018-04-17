@@ -33,8 +33,8 @@ end
 domain(f::CompositeMap) = domain(f.map1)
 codomain(f::CompositeMap) = codomain(f.map2)
 
-function (f::CompositeMap)(a)
-   return f.map2(f.map1(a))
+function (f::CompositeMap{D, C})(a) where {D, C}
+   return f.map2(f.map1(a))::elem_type(C)
 end
 
 function compose(f::AbstractAlgebra.Map{U, C}, g::AbstractAlgebra.Map{D, U}) where {D, U, C}
@@ -97,9 +97,9 @@ end
 
 image_fn(f::AbstractAlgebra.Map(AbstractAlgebra.FunctionalMap)) = get_field(f, :image_fn)
 
-function (f::FunctionalMap)(a)
+function (f::FunctionalMap{D, C})(a) where {D, C}
    parent(a) != domain(f) && throw(DomainError())
-   return image_fn(f)(a)
+   return image_fn(f)(a)::elem_type(C)
 end
 
 function map_from_func(domain, codomain, image_fn::Function)
@@ -152,8 +152,8 @@ function image_fn(f::FunctionalCompositeMap)
    end
 end
 
-function (f::FunctionalCompositeMap)(a)
-   return image_fn(f)(a)
+function (f::FunctionalCompositeMap{D, C})(a) where {D, C}
+   return image_fn(f)(a)::elem_type(C)
 end
 
 function compose(f::Map(AbstractAlgebra.FunctionalMap){U, C}, g::Map(AbstractAlgebra.FunctionalMap){D, U}) where {D, U, C}
