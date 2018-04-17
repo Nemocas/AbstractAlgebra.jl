@@ -27,7 +27,7 @@ inverse_map(f::MapCache) = inverse_map(f.map)
 preimage_map(f::MapCache) = preimage_map(f.map)
 section_map(f::MapCache) = section_map(f.map)
 
-(f::MapWithSection)(a) = (f.map)(a)
+(f::MapWithSection{D, C})(a) where {D, C} = (f.map)(a)::elem_type(C)
 
 # These two functions are provided for convenience only. Strictly speaking
 # preimage is not the correct name for this type of construction.
@@ -91,7 +91,7 @@ retraction_map(f::MapWithSection) = f.retraction
 
 retraction_map(f::MapCache) = retraction_map(f.map)
 
-(f::MapWithRetraction)(a) = (f.map)(a)
+(f::MapWithRetraction{D, C})(a) where {D, C} = (f.map)(a)::elem_type(C)
 
 function map_with_retraction_from_func(domain, codomain, image_fn::Function, inverse_fn::Function)
    return MapWithRetraction(FunctionalMap(domain, codomain, image_fn),

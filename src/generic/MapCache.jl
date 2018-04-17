@@ -44,10 +44,10 @@ function (M::MapCache{D, C, S, T, De, Ce})(a::De) where {D, C, S, T, De, Ce}
             M.image_cache[a] = b
             M.limit -= 1
          end
-         return b
+         return b::Ce
       end
    else
-      return M.map(a)
+      return M.map(a)::Ce
    end
 end
 
