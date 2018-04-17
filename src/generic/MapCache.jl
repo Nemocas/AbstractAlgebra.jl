@@ -35,7 +35,7 @@ function disable_cache!(M::MapCache)
 end
 
 function (M::MapCache{D, C, S, T, De, Ce})(a::De) where {D, C, S, T, De, Ce}
-   if isdefined(M, :image_cache)
+   if M.enabled
       if haskey(M.image_cache, a)
          return M.image_cache[a]::Ce
       else
