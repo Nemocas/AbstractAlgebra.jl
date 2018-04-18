@@ -467,7 +467,7 @@ function test_gen_mpoly_valuation()
       for iter = 1:100
          f = S()
          g = S()
-         while f == 0 || g == 0
+         while f == 0 || g == 0 || isconstant(g)
             f = rand(S, 0:5, 0:100, 0:0, -100:100)
             g = rand(S, 0:5, 0:100, 0:0, -100:100)
          end
