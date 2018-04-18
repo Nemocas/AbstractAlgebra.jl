@@ -2357,7 +2357,7 @@ doc"""
 >
 > See also `valuation`, which only returns the valuation.
 """
-function remove(z::MPoly{T}, p::MPoly{T}) where {T <: RingElement}
+function remove(z::MPolyElem{T}, p::MPolyElem{T}) where {T <: RingElement}
    check_parent(z, p)
    z == 0 && error("Not yet implemented")
    fl, q = divides(z, p)
@@ -2381,7 +2381,7 @@ doc"""
 >
 > See also `remove`, which also returns $z/p^k$.
 """
-function valuation(z::MPoly{T}, p::MPoly{T}) where {T <: RingElement}
+function valuation(z::MPolyElem{T}, p::MPolyElem{T}) where {T <: RingElement}
   v, _ = remove(z, p)
   return v
 end
