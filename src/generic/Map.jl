@@ -30,8 +30,8 @@ end
 #
 ###############################################################################
 
-domain(f::CompositeMap) = domain(f.map1)
-codomain(f::CompositeMap) = codomain(f.map2)
+domain(f::CompositeMap) = domain(f.map2)
+codomain(f::CompositeMap) = codomain(f.map1)
 
 function (f::CompositeMap{D, C})(a) where {D, C}
    return f.map2(f.map1(a))::elem_type(C)
