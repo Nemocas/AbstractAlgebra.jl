@@ -25,7 +25,7 @@ parent(a::perm) = a.parent
 
 function deepcopy_internal(a::perm, dict::ObjectIdDict)
    G = parent(a)
-   return G(deepcopy(a.d))
+   return G(deepcopy(a.d), false)
 end
 
 function Base.hash(a::perm, h::UInt)
@@ -302,17 +302,17 @@ function ^(a::perm{T}, n::Integer) where T
    end
 end
 
-function power_by_squaring(a::perm, n::Int)
-   if n <0
+function power_by_squaring(a::perm{I}, n::Integer) where {I}
+   if n < 0
       return inv(a)^-n
    elseif n == 0
       return parent(a)()
    elseif n == 1
       return deepcopy(a)
    elseif n == 2
-      return parent(a)(a.d[a.d])
+      return parent(a)(a.d[a.d], false)
    elseif n == 3
-      return parent(a)(a.d[a.d[a.d]])
+      return parent(a)(a.d[a.d[a.d]], false)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & n) == 0
@@ -346,20 +346,20 @@ doc"""
 """
 function inv(a::perm)
    d = similar(a.d)
-   for i in 1:length(a.d)
+   @inbounds for i in 1:length(d)
       d[a[i]] = i
    end
-   G = parent(a)
-   return G(d, false)
+   return parent(a)(d, false)
 end
 
 # TODO: can we do that in place??
 function inv!(a::perm)
    d = similar(a.d)
-   for i in 1:length(a.d)
+   @inbounds for i in 1:length(d)
       d[a[i]] = i
    end
    a.d = d
+   return a
 end
 
 ###############################################################################
@@ -379,7 +379,7 @@ function all_perms(elts, counter, i, c)
       return (copy(elts), (elts, counter+1, i, c))
    end
    n = length(elts)
-   while i <= n
+   @inbounds while i <= n
       if c[i] < i
          if isodd(i)
             elts[1], elts[i] = elts[i], elts[1]
