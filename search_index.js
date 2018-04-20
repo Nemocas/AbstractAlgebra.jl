@@ -2765,13 +2765,13 @@ var documenterSearchIndex = {"docs": [
     "page": "Map interface",
     "title": "Identity maps",
     "category": "section",
-    "text": "There is a map type IdentityMap{D} for the identity map on a given domain. Here D is the type of the object representing that domain.IdentityMap belongs to the supertype Map{D, C, AbstractAlgebra.IdentityMap, IdentityMap}.Note that the map class is also called IdentityMap. It is an abstract type, whereas Generic.IdentityMap is a concrete type in the Generic module.An identity map has the property that when composed with any map whose domain or codomain is compatible, that map will be returned as the composition. Identity maps can therefore serve as a starting point when building up a composition of maps, starting an identity map.We do not cached identity maps in the system, so that if more than one is created on the same domain, there will be more than one such map in the system. This underscores the fact that there is in general no way for the system to know if two maps compose to give an identity map, and therefore the only two maps that can be composed to give an identity map are identity maps on the same domain.To construct an identity map for a given domain, specified by a parent object R, say, we have the following function.identity_map(R::D) where D <: SetReturn an identity map on the domain R.Of course there is nothing stopping a map type or class from implementing its own identity map type, and defining composition of maps of the same kind with such an identity map. In such a case, the class of such an identity map type must belong to AbstractAlgebra.IdentityMap so that composition with other map types still works."
+    "text": "There is a concrete map type Generic.IdentityMap{D} for the identity map on a given domain. Here D is the type of the object representing that domain.Generic.IdentityMap belongs to the supertype Map{D, C, AbstractAlgebra.IdentityMap, IdentityMap}.Note that the map class is also called IdentityMap. It is an abstract type, whereas Generic.IdentityMap is a concrete type in the Generic module.An identity map has the property that when composed with any map whose domain or codomain is compatible, that map will be returned as the composition. Identity maps can therefore serve as a starting point when building up a composition of maps, starting an identity map.We do not cached identity maps in the system, so that if more than one is created on the same domain, there will be more than one such map in the system. This underscores the fact that there is in general no way for the system to know if two maps compose to give an identity map, and therefore the only two maps that can be composed to give an identity map are identity maps on the same domain.To construct an identity map for a given domain, specified by a parent object R, say, we have the following function.identity_map(R::D) where D <: SetReturn an identity map on the domain R.Of course there is nothing stopping a map type or class from implementing its own identity map type, and defining composition of maps of the same kind with such an identity map. In such a case, the class of such an identity map type must belong to AbstractAlgebra.IdentityMap so that composition with other map types still works."
 },
 
 {
-    "location": "map.html#Composition-maps-1",
+    "location": "map.html#Composition-of-maps-1",
     "page": "Map interface",
-    "title": "Composition maps",
+    "title": "Composition of maps",
     "category": "section",
     "text": "Any two compatible maps in AbstractAlgebra can be composed and any composition can be applied.In order to facilitate this, the Generic module provides a type CompositionMap{D, C}, which contains two maps map1 and map2, corresponding to the two maps to be applied in a composition, in the order they should be applied.To construct a composition map from two existing maps, we have the following function:compose(f::Map{D, U}, g::Map{U, C}) where {D, U, C}Compose the two maps f and g, i.e. return the map h such that h(x) = g(f(x)).As a shortcut for this function we have the following operator:*(f::Map{D, U}, g::Map{U, C}) where {D, U, C} = compose(f, g)Note the order of composition. If we have maps f  X to Y, g  Y to Z the correct order of the maps in this operator is f*g, so that (f*g)(x) = g(f(x)).This is chosen so that for left R-module morphisms represented by a matrix, the order of matrix multiplication will match the order of composition of the corresponding morphisms.Of course, a custom map type or class of maps can implement its own composition type and compose function.This is the case with the FunctionalMap class for example, which caches the Julia function/closure corresponding to the composition of two functional maps. As this cached function needs to be stored inside the composition, a special type is necessary for the composition of two functional maps.By default, compose will check that the two maps are composable, i.e. the codomain of the first map matches the domain of the second map. This is implemented by the following function:check_composable(f::Map{D, U}, g::Map{U, C})Raise an exception if the codomain of f doesn\'t match the domain of g.Note that composite maps should keep track of the two maps they were constructed from. To access these maps, the following functions are provided:map1(f::CompositeMap)\nmap2(f::CompositeMap)Any custom composite map type must also provide these functions for that map type, even if there exist fields with those names. This is because there is no common map class for all composite map types. Therefore the Generic system cannot provide fallbacks for all such composite map types."
 },
@@ -2814,6 +2814,38 @@ var documenterSearchIndex = {"docs": [
     "title": "Generic functional maps",
     "category": "section",
     "text": "The Generic module provides a concrete type FunctionalMap which merely keeps track of a Julia function/closure implementing the map.Such maps can be constructed using the following function:map_from_func(R, S, f::Function)Construct the generic functional map with domain and codomain given by the parent objects R and S corresponding to the Julia function f.Examplesf = map_from_func(ZZ, ZZ, x -> x + 1)\n\nf(ZZ(2))"
+},
+
+{
+    "location": "map_cache.html#",
+    "page": "Cached maps",
+    "title": "Cached maps",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "map_cache.html#Cached-maps-1",
+    "page": "Cached maps",
+    "title": "Cached maps",
+    "category": "section",
+    "text": "All basic map (i.e. those not built up from other maps) in AbstractAlgebra can be cached.A cache is a dictionary that can be switched on and off at run time that keeps a cache of previous evaluations of the map. This can be useful if the map is extremely difficult to evaluate, e.g. a discrete logarithm map. Rather than evaluate the map afresh each time, the map first looks up the dictionary of previous known values of the map.To facilitate caching of maps, the Generic module provides a type Generic.MapCache, which can be used to wrap any existing map object with a dictionary.Importantly, the supertype of the resulting MapCache object is identical to that of the map being cached. This means that any functions that would accept the original map will also accept the cached version.Note that caching of maps only works for maps that correctly abstract access to their fields using accessor functions, as described in the map interface."
+},
+
+{
+    "location": "map_cache.html#Cached-map-constructors-1",
+    "page": "Cached maps",
+    "title": "Cached map constructors",
+    "category": "section",
+    "text": "To construct a cached map from an existing map object, we have the following function:cached(M::Map; enabled=true, limit=100)Return a cached map with the same supertype as M, caching up to limit values of the map M in a dictionary, assuming that the cache is enabled.Caches can be disabled by setting the value of the parameter enabled to false. This allows for the user to quickly go through code and completely disable caches of maps that were previously enabled, for testing purposed, etc.Caches can also be turned on and off at run time (see below).Examplesf = map_from_func(ZZ, ZZ, x -> x + 1)\ng = cached(f)\n\nf(ZZ(1)) == g(ZZ(1))"
+},
+
+{
+    "location": "map_cache.html#Functionality-for-cached-maps-1",
+    "page": "Cached maps",
+    "title": "Functionality for cached maps",
+    "category": "section",
+    "text": "The following functions are provided for cached maps.enable_cache!(M::MapCache)\ndisable_cache!(M::MapCache)Temporarily enable or disable the cache for the given map. The values stored in the cache are not lost when it is disabled.set_limit!(M::MapCache, limit::Int)Set the limit on the number of values that can be cached in the dictionary, to the given value. Setting the value to 0 will effectively disable further caching for this map.Examplesf = cached(map_from_func(ZZ, ZZ, x -> x + 1))\n\na = f(ZZ(1))\ndisable_cache!(f)\nb = f(ZZ(1))\nenable_cache!(f)\nc = f(ZZ(1))\n\nset_limit!(f, 200)\nd = f(ZZ(1))"
 },
 
 {
