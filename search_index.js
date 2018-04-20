@@ -2869,7 +2869,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Map with inverse",
     "title": "Map with inverse constructors",
     "category": "section",
-    "text": "To construct a map with retraction/section from a pair of maps, we have the following functions:MapWithRetraction(m::{D, C}, r::Map{C, D}) where {D, C}\nMapWithSection(m::Map{D, C}, s::Map{C, D}) where {D, C}Construct the map with retraction/section given a known retraction/section r or s respectively, of m.For convenience we allow construction of maps with retraction/section from a pair of Julia functions/closures.map_with_retraction_from_func(R, S, f::Function, r::Function)\nmap_with_section_from_func(R, S, f::Function, s::Function)Construct the map with retraction/section such that the map is given by the function f and the retraction/section is given by the function r or s respectively. Here R is the parent object representing the domain and S is the parent object representing the codomain of f."
+    "text": "To construct a map with retraction/section from a pair of maps, we have the following functions:map_with_retraction(m::Map{D, C}, r::Map{C, D}) where {D, C}\nmap_with_section(m::Map{D, C}, s::Map{C, D}) where {D, C}Construct the map with retraction/section given a known retraction/section r or s respectively, of m.For convenience we allow construction of maps with retraction/section from a pair of Julia functions/closures.map_with_retraction_from_func(R, S, f::Function, r::Function)\nmap_with_section_from_func(R, S, f::Function, s::Function)Construct the map with retraction/section such that the map is given by the function f and the retraction/section is given by the function r or s respectively. Here R is the parent object representing the domain and S is the parent object representing the codomain of f.Examplesf = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)\n\na = f(ZZ(1))"
 },
 
 {
@@ -2877,7 +2877,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Map with inverse",
     "title": "Functionality for maps with inverses",
     "category": "section",
-    "text": "The following functionality is provided for maps with inverses.inv(M::MapWithRetraction)\ninv(M::MapWithSection)Return the map with the two maps contained in M swapped. In the first case, a MapWithSection is returned. In the second case a MapWithRetraction is returned.To access the two maps stored in a map with retraction/section, we have the following:image_map(M::MapWithRetraction)\nimage_map(M::MapWithSection)\nretraction_map(M::MapWithRetraction)\nsection_map(M::MapWithSection)The first two of these functions return the first map in a map with retraction/section, the second two functions return the corresponding second maps."
+    "text": "The following functionality is provided for maps with inverses.inv(M::MapWithRetraction)\ninv(M::MapWithSection)Return the map with the two maps contained in M swapped. In the first case, a MapWithSection is returned. In the second case a MapWithRetraction is returned.To access the two maps stored in a map with retraction/section, we have the following:image_map(M::MapWithRetraction)\nimage_map(M::MapWithSection)\nretraction_map(M::MapWithRetraction)\nsection_map(M::MapWithSection)The first two of these functions return the first map in a map with retraction/section, the second two functions return the corresponding second maps.Examplesf = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)\ng = inv(f)\nh = f*g\n\na = h(ZZ(1))"
 },
 
 {
