@@ -6,13 +6,15 @@
 
 export map_with_preimage_from_func, map_with_section_from_func, 
        map_with_retraction_from_func, image_map, preimage_map, section_map,
-       retraction_map
+       retraction_map, map_with_retraction, map_with_section
 
 ################################################################################
 #
 #  MapWithSection
 #
 ################################################################################
+
+map_with_section(f::Map{D, C}, g::Map{C, D}) where {D, C} = MapWithSection{D, C}
 
 domain(f::MapWithSection) = get_field(f.map, :domain)
 codomain(f::MapWithSection) = get_field(f.map, :codomain)
@@ -82,6 +84,8 @@ end
 #
 ################################################################################
 
+map_with_retraction(f::Map{D, C}, g::Map{C, D}) where {D, C} = MapWithRetraction{D, C}
+
 domain(f::MapWithRetraction) = get_field(f.map, :domain)
 codomain(f::MapWithRetraction) = get_field(f.map, :codomain)
 image_fn(f::MapWithRetraction) = image_fn(f.map)
@@ -117,8 +121,8 @@ end
 function compose(f::MapWithRetraction{U, C}, g::MapWithRetraction{D, U}) where {D, U, C}
    check_composable(f, g)
    m = compose(f.map, g.map)
-   if isdefined(g, :section) && isdefined(f, :section)
-      p = compose(g.section, f.section)
+   if isdefined(g, :retraction) && isdefined(f, :retraction)
+      p = compose(g.retraction, f.retraction)
       return MapWithRetraction(m, p)
    else
       return MapWithRetraction(m)
@@ -126,6 +130,6 @@ function compose(f::MapWithRetraction{U, C}, g::MapWithRetraction{D, U}) where {
 end
 
 function inv(f::MapWithRetraction)
-   return MapWithSection(f.section, f.map)
+   return MapWithSection(f.retraction, f.map)
 end
 
