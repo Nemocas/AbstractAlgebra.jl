@@ -66,7 +66,7 @@ include("AbstractTypes.jl")
 
 function __init__()
    println("")
-   println("Welcome to AbstractAlgebra version 0.0.4")
+   println("Welcome to AbstractAlgebra version 0.0.6")
    println("")
    println("AbstractAlgebra comes with absolutely no warranty whatsoever")
    println("")
