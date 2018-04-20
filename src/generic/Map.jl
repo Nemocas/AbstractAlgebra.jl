@@ -18,8 +18,8 @@ set_field!(M, f) = setfield(M, f) # fall back to Julia builtin
 domain(f::AbstractAlgebra.Map) = get_field(f, :domain)
 codomain(f::AbstractAlgebra.Map) = get_field(f, :codomain)
 
-function check_composable(a::AbstractAlgebra.Map{U, C}, b::AbstractAlgebra.Map{D, U}) where {C, U, D}
-   domain(a) != codomain(b) && error("Incompatible maps")
+function check_composable(a::AbstractAlgebra.Map{D, U}, b::AbstractAlgebra.Map{U, C}) where {D, U, C}
+   codomain(a) != domain(b) && error("Incompatible maps")
 end
 
 *(f::Map, g::Map) = compose(f, g)
@@ -37,7 +37,7 @@ function (f::CompositeMap{D, C})(a) where {D, C}
    return f.map2(f.map1(a))::elem_type(C)
 end
 
-function compose(f::AbstractAlgebra.Map{U, C}, g::AbstractAlgebra.Map{D, U}) where {D, U, C}
+function compose(f::AbstractAlgebra.Map{D, U}, g::AbstractAlgebra.Map{U, C}) where {D, U, C}
    check_composable(f, g)
    return CompositeMap(f, g)
 end
@@ -74,12 +74,12 @@ function show(io::IO, M::IdentityMap)
    println(io, domain(M))
 end
 
-function compose(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){C, C}, g::AbstractAlgebra.Map{D, C}) where {D, C}
+function compose(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){D, D}, g::AbstractAlgebra.Map{C, D}) where {D, C}
    check_composable(f, g)
    return g
 end
 
-function compose(f::AbstractAlgebra.Map{D, C}, g::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){D, D}) where {D, C}
+function compose(f::AbstractAlgebra.Map{D, C}, g::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){C, C}) where {D, C}
    check_composable(f, g)
    return f
 end
