@@ -220,7 +220,10 @@ function test_characters()
 
    N = 4
    G = PermutationGroup(N)
+
    ps = Partition.([[1,1,1,1], [2,1,1], [2,2], [3,1], [4]])
+   @test Set(AllParts(N)) == Set(ps)
+
    l = Partition([1,1,1,1])
    @test [character(l, m) for m in ps] == [ 1,-1, 1, 1,-1]
    l = Partition([2,1,1])

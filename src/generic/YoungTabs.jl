@@ -78,10 +78,46 @@ function Base.start(parts::AllParts{T}) where T<:Integer
     end
 end
 
+const _numPartsTable = Dict{Int, Int}(0 => 1, 1 => 1, 2 => 2)
+const _numPartsTableBig = Dict{Int, BigInt}()
+
+doc"""
+    _numpart(n::Integer)
+> Returns the number of all distinct integer partitions of `n`. The function
+> uses Euler pentagonal number theorem for recursive formula. For more details
+> see OEIS sequence [A000041](http://oeis.org/A000041). Note that
+> `_numpart(0) = 1` by convention.
+"""
+function _numpart(n::Integer)
+   if n < 0
+      return 0
+   elseif n < 395
+      n = Int(n)
+      lookuptable = _numPartsTable
+   else
+      n = BigInt(n)
+      lookuptable = _numPartsTableBig
+   end
+   return _numpart(n, lookuptable)
+end
+
+function _numpart(n::T, lookuptable::Dict{Int, T}) where T<:Integer
+   s = zero(T)
+   if !haskey(lookuptable, n)
+      for j in 1:floor(T, (1 + sqrt(1+24n))/6)
+         p1 = _numpart(n - div(j*(3j-1),2))
+         p2 = _numpart(n - div(j*(3j+1),2))
+         s += (-1)^(j-1)*(p1 + p2)
+      end
+      lookuptable[n] = s
+   end
+   return lookuptable[n]
+end
+
 Base.next(parts::AllParts, state) = nextpart_asc(state...)
 Base.done(parts::AllParts, state) = state[2] == 1
 Base.eltype(::Type{AllParts{T}}) where T = Partition{T}
-length(parts::AllParts) = BigInt(numpart(parts.n))
+length(parts::AllParts) = BigInt(_numpart(parts.n))
 
 function nextpart_asc(part, k)
     if k == 0
