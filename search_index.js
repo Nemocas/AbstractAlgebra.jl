@@ -2753,6 +2753,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "map.html#Show-method-1",
+    "page": "Map interface",
+    "title": "Show method",
+    "category": "section",
+    "text": "Custom map types may like to provide a custom show method if the default of displaying the domain and codomain of the map is not sufficient.show(io::IO, M::Map(MyMap))"
+},
+
+{
     "location": "map.html#Identity-maps-1",
     "page": "Map interface",
     "title": "Identity maps",
@@ -2765,7 +2773,47 @@ var documenterSearchIndex = {"docs": [
     "page": "Map interface",
     "title": "Composition maps",
     "category": "section",
-    "text": "Any two compatible maps in AbstractAlgebra can be composed and any composition can be applied.In order to facilitate this, the Generic module provides a type CompositionMap{D, C}, which contains two maps map1 and map2, corresponding to the two maps to be applied in a composition, in the order they should be applied.To construct a composition map from two existing maps, we have the following function:compose(f::Map{D, U}, g::Map{U, C}) where {D, U, C}Compose the two maps f and g, i.e. return the map h such that h(x) = g(f(x)).As a shortcut for this function we have the following operator:*(f::Map{D, U}, g::Map{U, C}) where {D, U, C} = compose(f, g)Note the order of composition. If we have maps f  X to Y, g  Y to Z the correct order of the maps in this operator is f*g, so that (f*g)(x) = g(f(x)).This is chosen so that for left R-module morphisms represented by a matrix, the order of matrix multiplication will match the order of composition of the corresponding morphisms.Of course, a custom map type or class of maps can implement its own composition type and compose function.This is the case with the FunctionalMap class for example, which caches the Julia function/closure corresponding to the composition of two functional maps. As this cached function needs to be stored inside the composition, a special type is necessary for the composition of two functional maps.By default, compose will check that the two maps are composable, i.e. the codomain of the first map matches the domain of the second map. This is implemented by the following function:check_composable(f::Map{D, U}, g::Map{U, C})Raise an exception if the codomain of f doesn\'t match the domain of g.Note that composite maps should keep track of the two maps they were constructed from. To access these maps, the following functions are provided:map1(f::CompositeMap)\nmap2(g::CompositeMap)Any custom composite map type must also provide these functions for that map type, even if there exist fields with those names. This is because there is no common map class for all composite map types. Therefore the Generic system cannot provide fallbacks for all such composite map types."
+    "text": "Any two compatible maps in AbstractAlgebra can be composed and any composition can be applied.In order to facilitate this, the Generic module provides a type CompositionMap{D, C}, which contains two maps map1 and map2, corresponding to the two maps to be applied in a composition, in the order they should be applied.To construct a composition map from two existing maps, we have the following function:compose(f::Map{D, U}, g::Map{U, C}) where {D, U, C}Compose the two maps f and g, i.e. return the map h such that h(x) = g(f(x)).As a shortcut for this function we have the following operator:*(f::Map{D, U}, g::Map{U, C}) where {D, U, C} = compose(f, g)Note the order of composition. If we have maps f  X to Y, g  Y to Z the correct order of the maps in this operator is f*g, so that (f*g)(x) = g(f(x)).This is chosen so that for left R-module morphisms represented by a matrix, the order of matrix multiplication will match the order of composition of the corresponding morphisms.Of course, a custom map type or class of maps can implement its own composition type and compose function.This is the case with the FunctionalMap class for example, which caches the Julia function/closure corresponding to the composition of two functional maps. As this cached function needs to be stored inside the composition, a special type is necessary for the composition of two functional maps.By default, compose will check that the two maps are composable, i.e. the codomain of the first map matches the domain of the second map. This is implemented by the following function:check_composable(f::Map{D, U}, g::Map{U, C})Raise an exception if the codomain of f doesn\'t match the domain of g.Note that composite maps should keep track of the two maps they were constructed from. To access these maps, the following functions are provided:map1(f::CompositeMap)\nmap2(f::CompositeMap)Any custom composite map type must also provide these functions for that map type, even if there exist fields with those names. This is because there is no common map class for all composite map types. Therefore the Generic system cannot provide fallbacks for all such composite map types."
+},
+
+{
+    "location": "functional_map.html#",
+    "page": "Functional maps",
+    "title": "Functional maps",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "functional_map.html#Functional-maps-1",
+    "page": "Functional maps",
+    "title": "Functional maps",
+    "category": "section",
+    "text": "A functional map in AbstractAlgebra is a map which can be applied by evaluating a Julia function or closure. It is represented by a map object that contains such a function/closure, usually in a field called image_fn.All functional maps belong to the map class AbstractAlgebra.FunctionalMap.A generic concrete type Generic.FunctionalMap is provided by the Generic module to implement a generic functional map type. This allows for functional maps that contain no extra data, other than a Julia function/closure.Custom map types can also be defined which have map class AbstractAlgebra.FunctionalMap."
+},
+
+{
+    "location": "functional_map.html#Functional-map-interface-1",
+    "page": "Functional maps",
+    "title": "Functional map interface",
+    "category": "section",
+    "text": "All functional map types must define their supertypes as in the following example:mutable struct MyFunctionalMap{D, C} <: Map{D, C, FunctionalMap, MyFunctionalMap}\n   # some fields\n   image_fn::Function\nendOf course MyFunctionalMap need not be parameterised if the types D and C of the domain and codomain objects are known."
+},
+
+{
+    "location": "functional_map.html#Required-functions-for-functional-maps-1",
+    "page": "Functional maps",
+    "title": "Required functions for functional maps",
+    "category": "section",
+    "text": "The following functions must be defined for all functional map types or classes:image_fn(M::Map(MyFunctionalMap))Return the Julia function or closure that corresponds to application of the map M. This function only needs to be provided if this function is not stored in an image_fn field of the MyFunctionalMap type."
+},
+
+{
+    "location": "functional_map.html#Generic-functional-maps-1",
+    "page": "Functional maps",
+    "title": "Generic functional maps",
+    "category": "section",
+    "text": "The Generic module provides a concrete type FunctionalMap which merely keeps track of a Julia function/closure implementing the map.Such maps can be constructed using the following function:map_from_func(R, S, f::Function)Construct the generic functional map with domain and codomain given by the parent objects R and S corresponding to the Julia function f.Examplesf = map_from_func(ZZ, ZZ, x -> x + 1)\n\nf(ZZ(2))"
 },
 
 {
