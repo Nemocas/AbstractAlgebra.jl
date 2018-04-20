@@ -144,6 +144,22 @@ function test_perm_binary_ops()
    println("PASS")
 end
 
+function test_perm_mixed_binary_ops()
+   print(rpad("perm.mixed_binary_ops...", 30))
+      G = PermutationGroup(6)
+      for T in types
+         print("$T ")
+         H = PermutationGroup(T(6))
+
+         @test G(H()) == G()
+         @test H(G()) == H()
+         @test G() == H()
+         @test rand(G)*rand(H) isa (T == UInt ? perm{UInt}: perm{Int})
+         @test rand(H)*rand(G) isa (T == UInt ? perm{UInt}: perm{Int})
+         @test G(rand(H)) isa perm{Int}
+         @test H(rand(G)) isa perm{T}
+      end
+
    println("PASS")
 end
 
@@ -286,6 +302,7 @@ function test_perm()
    test_perm_basic_manipulation()
    test_perm_iteration()
    test_perm_binary_ops()
+   test_perm_mixed_binary_ops()
    test_perm_inversion()
    test_misc_functions()
    test_characters()
