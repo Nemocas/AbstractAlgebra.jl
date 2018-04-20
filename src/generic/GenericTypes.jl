@@ -6,6 +6,29 @@
 
 ###############################################################################
 #
+#   Cycle Decomposition
+#
+###############################################################################
+
+doc"""
+    CycleDec{T}(ccycles, cptrs)
+> Constructs a cycle decomposition from
+> * `ccycles`: an array of consecutive entries of cycles,
+> * `cptrs`: an array of pointers to the locations where cycles begin
+"""
+struct CycleDec{T}
+   ccycles::Vector{T}
+   cptrs::Vector{Int}
+   n::Int
+
+   function CycleDec(ccycles::Vector{T}, cptrs::Vector{Int}) where T<:Integer
+      push!(cptrs, length(ccycles)+1)
+      return new{T}(ccycles, cptrs, length(cptrs)-1)
+   end
+end
+
+###############################################################################
+#
 #   PermGroup / perm
 #
 ###############################################################################
@@ -30,7 +53,7 @@ end
 
 mutable struct perm{T<:Integer} <: AbstractAlgebra.GroupElem
   d::Array{T, 1}
-  cycles::Vector{Vector{T}}
+  cycles::CycleDec{T}
   parent::PermGroup{T}
 
   function perm(n::T) where T<:Integer
