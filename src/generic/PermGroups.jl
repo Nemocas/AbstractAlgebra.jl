@@ -45,6 +45,11 @@ function setindex!(a::perm{T}, v::T, n::S) where {T<:Integer, S<:Integer}
    a.d[n] = v
 end
 
+Base.promote_rule(::Type{perm{I}}, ::Type{perm{J}}) where {I,J} =
+   perm{promote_type(I,J)}
+
+convert(::Type{perm{I}}, p::perm{J}) where {I,J} = (PermGroup(I(parent(p).n)))(p.d, false)
+
 ###############################################################################
 #
 #   Basic functions
@@ -238,12 +243,10 @@ end
 doc"""
     ==(a::perm, b::perm)
 > Return `true` if the given permutations are equal, otherwise return `false`.
+> Permutations parametrized by different integer types are considered equal if
+> they define the same permutation in the abstract permutation group.
 """
-function ==(a::perm, b::perm)
-   parent(a) == parent(b) || return false
-   a.d == b.d || return false
-   return true
-end
+==(a::perm, b::perm) = a.d == b.d
 
 ###############################################################################
 #
@@ -255,15 +258,18 @@ doc"""
     *(a::perm, b::perm)
 > Return the composition of the two permutations, i.e. $a\circ b$. In other
 > words, the permutation corresponding to applying $b$ first, then $a$, is
-> returned.
+> returned. If `a` and `b` are parametrized by different types, the result is
+> promoted accordingly.
 """
-function *(a::perm, b::perm)
+function *(a::perm{T}, b::perm{T}) where T
    d = similar(a.d)
-   for i in 1:length(d)
+   @inbounds for i in 1:length(d)
       d[i] = a[b[i]]
    end
    return parent(a)(d, false)
 end
+
+*(a::perm{S}, b::perm{T}) where {S,T} = *(promote(a,b)...)
 
 doc"""
     ^(a::perm, n::Int)
@@ -473,9 +479,9 @@ function (G::PermGroup)()
    return z
 end
 
-function (G::PermGroup)(a::Array{T, 1}, check::Bool=true) where T<:Integer
-   length(a) != G.n && error("Unable to coerce to permutation: lengths differ")
+function (G::PermGroup{T})(a::Vector{T}, check::Bool=true) where T<:Integer
    if check
+      length(a) != G.n && error("Unable to coerce to permutation: lengths differ")
       Base.Set(a) != Base.Set(1:length(a)) && error("Unable to coerce to
          permutation: non-unique elements in array")
    end
@@ -484,13 +490,12 @@ function (G::PermGroup)(a::Array{T, 1}, check::Bool=true) where T<:Integer
    return z
 end
 
-function (G::PermGroup{T})(p::perm{S}) where {T<:Integer, S<:Integer}
-   parent(p).n != G.n && error("Unable to coerce permutation: lengths differ")
-   if S<:T
-      return G(Vector{T}(p.d))
-   else
-      error("Unable to coerce to permutation: parents coefficints too narrow")
-   end
+function (G::PermGroup{T})(a::Vector{S}, check::Bool=true) where {S<:Integer,T}
+   return G(convert(Vector{T}, a), check)
+end
+
+function (G::PermGroup{T})(p::perm{S}, check::Bool=true) where {S<:Integer, T}
+   return G(convert(Vector{T}, p.d), check)
 end
 
 ###############################################################################
