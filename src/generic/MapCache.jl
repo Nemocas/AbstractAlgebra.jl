@@ -13,8 +13,8 @@ function cached(M::AbstractAlgebra.Map; limit::Int = 100, enabled::Bool = true)
    return MapCache(M, limit, enabled)
 end
 
-domain(M::MapCache) = domain(M.map)
-codomain(M::MapCache) = codomain(M.map)
+domain(M::MapCache{D, C}) where {D, C} = domain(M.map)::D
+codomain(M::MapCache{D, C}) where {D, C} = codomain(M.map)::C
 
 function set_limit!(M::MapCache, limit::Int)
    limit < 0 && error("Limit must be nonnegative")
