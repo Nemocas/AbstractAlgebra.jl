@@ -81,10 +81,40 @@ function test_gen_map_composite()
    println("PASS")
 end
 
+function test_gen_map_identity()
+   print("Generic.Map.IdentityMap...")
+
+   f = map_from_func(ZZ, QQ, x -> QQ(x + 1))
+   g = identity_map(ZZ)
+   h = identity_map(QQ)
+
+   @test isa(g, Map(IdentityMap))
+   @test isa(h, Map(IdentityMap))
+
+   @test compose(g, f) === f
+   @test compose(f, h) === f
+
+   @test domain(g) == AbstractAlgebra.JuliaZZ
+   @test codomain(g) == AbstractAlgebra.JuliaZZ
+   @test domain(h) == AbstractAlgebra.JuliaQQ
+   @test codomain(h) == AbstractAlgebra.JuliaQQ
+
+   for i = 1:10
+      @test g(ZZ(i)) == ZZ(i)
+      @test h(ZZ(i)//(i + 1)) == ZZ(i)//(i + 1)
+   end
+
+   @test compose(g, g) === g
+   @test compose(h, h) === h
+
+   println("PASS")
+end
+
 function test_gen_map()
    test_gen_map_functional()
    test_gen_map_functional_composite()
    test_gen_map_composite()
+   test_gen_map_identity()
 
    println("")
 end

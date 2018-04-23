@@ -65,7 +65,7 @@ end
 #
 ################################################################################
 
-identity_map(R::D) where D <: Set = IdentityMap{D}()
+identity_map(R::D) where D <: AbstractAlgebra.Set = IdentityMap{D}(R)
 
 (f::IdentityMap)(a) = a
 
@@ -79,7 +79,7 @@ function show(io::IO, M::IdentityMap)
    println(io, domain(M))
 end
 
-function compose(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){D, D}, g::AbstractAlgebra.Map{C, D}) where {D, C}
+function compose(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){D, D}, g::AbstractAlgebra.Map{D, C}) where {D, C}
    check_composable(f, g)
    return g
 end
