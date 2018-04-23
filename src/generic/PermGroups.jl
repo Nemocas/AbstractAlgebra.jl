@@ -37,18 +37,18 @@ function Base.hash(a::perm, h::UInt)
    return b
 end
 
-function getindex(a::perm{T}, n::S) where {T<:Integer, S<:Integer}
+function getindex(a::perm, n::Integer)
    return a.d[n]
 end
 
-function setindex!(a::perm{T}, v::T, n::S) where {T<:Integer, S<:Integer}
+function setindex!(a::perm, v::Integer, n::Integer)
    a.d[n] = v
 end
 
 Base.promote_rule(::Type{perm{I}}, ::Type{perm{J}}) where {I,J} =
    perm{promote_type(I,J)}
 
-convert(::Type{perm{I}}, p::perm{J}) where {I,J} = (PermGroup(I(parent(p).n)))(p.d, false)
+convert(::Type{perm{T}}, p::perm) where {T} = (PermGroup(T(parent(p).n)))(p.d, false)
 
 ###############################################################################
 #
