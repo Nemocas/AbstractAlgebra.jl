@@ -163,7 +163,7 @@ function (f::FunctionalCompositeMap{D, C})(a) where {D, C}
    return image_fn(f)(a)::elem_type(C)
 end
 
-function compose(f::Map(AbstractAlgebra.FunctionalMap){U, C}, g::Map(AbstractAlgebra.FunctionalMap){D, U}) where {D, U, C}
+function compose(f::AbstractAlgebra.Map(AbstractAlgebra.FunctionalMap){D, U}, g::AbstractAlgebra.Map(AbstractAlgebra.FunctionalMap){U, C}) where {D, U, C}
    check_composable(f, g)
    return FunctionalCompositeMap(f, g)
 end
