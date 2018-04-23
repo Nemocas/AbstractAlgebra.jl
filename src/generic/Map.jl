@@ -29,8 +29,8 @@ end
 #
 ###############################################################################
 
-domain(f::CompositeMap) = domain(f.map1)
-codomain(f::CompositeMap) = codomain(f.map2)
+domain(f::CompositeMap{D, C}) where {D, C} = domain(f.map1)::D
+codomain(f::CompositeMap{D, C}) where {D, C} = codomain(f.map2)::C
 map1(f::CompositeMap) = f.map1
 map2(f::CompositeMap) = f.map2
 
