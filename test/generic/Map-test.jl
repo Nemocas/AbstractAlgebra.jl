@@ -38,6 +38,16 @@ function test_gen_map_functional()
       @test t(ZZ(i)) == 2*(i + 2)
    end
 
+   @test domain(f) == AbstractAlgebra.JuliaZZ
+   @test codomain(f) == AbstractAlgebra.JuliaZZ
+   @test domain(g) == AbstractAlgebra.JuliaZZ
+   @test codomain(g) == AbstractAlgebra.JuliaQQ
+   @test domain(t) == AbstractAlgebra.JuliaZZ
+   @test codomain(t) == AbstractAlgebra.JuliaZZ
+
+   @test image_fn(f)(ZZ(1)) == 2
+   @test image_fn(g)(ZZ(2)) == QQ(2)
+
    println("PASS")
 end
 
