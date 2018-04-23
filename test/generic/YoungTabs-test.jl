@@ -10,6 +10,7 @@ function test_partition_type()
    @test size(p) == (3,)
    @test p[1] == 4
    @test p[3] == 1
+   @test_throws BoundsError p[4]
 
    @test length(p) == 3
    @test sum(p) == 8
@@ -110,9 +111,6 @@ function test_skewdiags()
    @test has_bottom_neighbor(xi, 6, 1) == true
    @test has_bottom_neighbor(xi, 7, 1) == false
 
-   xi = Partition([4,3,2,1])/Partition([2,2,2,1])
-   @test isrimhook(xi) == true
-
    println("PASS")
 end
 
@@ -142,6 +140,29 @@ function test_rimhooks()
 
    xi = SkewDiagram([4,3,1], [2])
    @test isrimhook(xi) == true
+
+   xi = Partition([4,3,2,1])/Partition([2,2,2,1])
+   @test isrimhook(xi) == true
+
+   xi = Partition([4,3,2,1])/Partition([3,3,2,1])
+   @test isrimhook(xi) == true
+
+   xi = Partition([4,3,2,1])/Partition([2,2,1,1])
+   @test isrimhook(xi) == false
+
+   xi = Partition([4,3,2,1])/Partition([3,2,2,1])
+   @test isrimhook(xi) == false
+
+   xi = Partition([4,3,2,1])/Partition([3,3,1,1])
+   @test isrimhook(xi) == false
+
+   xi = Partition([4,3,2,1])/Partition([4,3,2,1])
+   @test isrimhook(xi) == true
+
+   lambda = Partition([5,3,2,2,1])
+   mu = Partition([2,2,1])
+
+   @test isrimhook(lambda/mu) == false # is disconnected
 
    println("PASS")
 end
