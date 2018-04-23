@@ -208,9 +208,9 @@ const _perm_display_style = PermDisplayStyle(:array)
 doc"""
     setpermstyle(format::Symbol)
 > Nemo can display (in REPL or in general as string) permutations by either
-> array of integers whose `n`-th position represents value at `n`, or as
-> disjoint cycles, where the value of permutation at `n` is represented as the
-> entry immediately following `n` in the cycle.
+> array of integers whose `n`-th position represents the value at `n`, or as
+> disjoint cycles, where the value of the permutation at `n` is represented as
+> the entry immediately following `n` in a cycle.
 > The style can be switched by calling `setpermstyle` with `:array` or
 > `:cycles` argument.
 """
