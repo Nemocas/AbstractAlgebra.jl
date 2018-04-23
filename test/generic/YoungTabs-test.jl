@@ -25,7 +25,7 @@ function test_partition_type()
    println("PASS")
 end
 
-function test_youngtabs()
+function test_ytabs()
    print("youngtabs.YoungTableau...")
 
    lambda = [4,3,1]
@@ -165,9 +165,9 @@ function test_partitionseqs()
    println("PASS")
 end
 
-function test_ytabs()
+function test_youngtabs()
    test_partition_type()
-   test_youngtabs()
+   test_ytabs()
    test_skewdiags()
    test_rimhooks()
    test_partitionseqs()
