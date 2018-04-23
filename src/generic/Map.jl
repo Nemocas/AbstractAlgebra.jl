@@ -4,7 +4,8 @@
 #
 ################################################################################
 
-export map_from_func, compose, domain, codomain, identity_map, map1, map2
+export map_from_func, compose, domain, codomain, identity_map, map1, map2,
+       image_fn
 
 ################################################################################
 #
