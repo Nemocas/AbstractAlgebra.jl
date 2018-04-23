@@ -91,7 +91,7 @@ function test_perm_iteration(types)
       G = PermutationGroup(T(6))
       @test length(AllPerms(T(6))) == 720
       @test length(unique(AllPerms(T(6)))) == 720
-      @test_skip order(G) isa Int
+      @test order(G) isa (T == BigInt ? BigInt : Int)
       @test order(G) == 720
 
       @test collect(elements(G)) isa Vector{perm{T}}
@@ -154,8 +154,8 @@ function test_perm_mixed_binary_ops(types)
          @test G(H()) == G()
          @test H(G()) == H()
          @test G() == H()
-         @test rand(G)*rand(H) isa (T == UInt ? perm{UInt}: perm{Int})
-         @test rand(H)*rand(G) isa (T == UInt ? perm{UInt}: perm{Int})
+         @test rand(G)*rand(H) isa perm{promote_type(Int, T)}
+         @test rand(H)*rand(G) isa perm{promote_type(Int, T)}
          @test G(rand(H)) isa perm{Int}
          @test H(rand(G)) isa perm{T}
       end
@@ -193,7 +193,7 @@ function test_misc_functions(types)
 
       @test cycles(G()) isa Generic.CycleDec{T}
       @test collect(cycles(G())) == [T[i] for i in 1:10]
-      @test order(G()) isa Int
+      @test order(G()) isa (T == BigInt ? BigInt : Int)
       @test order(G()) == 1
       @test collect(cycles(a)) == [T[1,2,3,5,6,7], T[4], T[8,9,10]]
       @test cycles(a)[1] isa Vector{T}
@@ -202,7 +202,7 @@ function test_misc_functions(types)
       @test cycles(a)[3] == T[8,9,10]
       @test cycles(a)[1:3] == [T[1,2,3,5,6,7], T[4], T[8,9,10]]
 
-      @test order(a) isa Int
+      @test order(a) isa (T == BigInt ? BigInt : Int)
       @test order(a) == 6
       @test a^6 == G()
 
@@ -242,6 +242,9 @@ function test_characters(types)
    G = PermutationGroup(N)
    ps = Partition.([T[1,1,1], T[2,1], T[3]])
    l = Partition(T[1,1,1])
+
+   @test typeof(character(l, ps[1])) == (T == BigInt? BigInt : Int)
+
    @test [character(l, m) for m in ps] == [1,-1, 1]
    l = Partition(T[2,1])
    @test [character(l, m) for m in ps] == [ 2, 0,-1]
@@ -289,7 +292,7 @@ function test_characters(types)
    end
 
    # test for overflow
-   p = Partition(collect(10:-1:1))
+   p = Partition(collect(big(10):-1:1))
    @test character(p, PermutationGroup(55)()) == 44261486084874072183645699204710400
 
    println("PASS")
