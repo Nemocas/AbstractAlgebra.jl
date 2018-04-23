@@ -8,9 +8,7 @@ function test_perm_abstract_types()
    println("PASS")
 end
 
-types = [Int8, Int16, Int32, Int, UInt8, UInt16, UInt32, UInt]
-
-function test_perm_constructors()
+function test_perm_constructors(types)
    print(rpad("perm.constructors...", 30))
 
    for T in types
@@ -40,7 +38,7 @@ function test_perm_constructors()
    println("PASS")
 end
 
-function test_perm_printing()
+function test_perm_printing(types)
    print(rpad("perm.printing...", 30))
 
    for T in types
@@ -59,7 +57,7 @@ function test_perm_printing()
    println("PASS")
 end
 
-function test_perm_basic_manipulation()
+function test_perm_basic_manipulation(types)
    print(rpad("perm.basic_manipulation...", 30))
 
    for T in types
@@ -86,7 +84,7 @@ function test_perm_basic_manipulation()
    println("PASS")
 end
 
-function test_perm_iteration()
+function test_perm_iteration(types)
    print(rpad("perm.iteration...", 30))
    for T in types
       print("$T ")
@@ -96,17 +94,19 @@ function test_perm_iteration()
       @test_skip order(G) isa Int
       @test order(G) == 720
 
-      @test collect(elements(G))[1] == G()
+      @test collect(elements(G)) isa Vector{perm{T}}
 
-      @test length(collect(elements(G))) == 720
-      @test length(unique(elements(G))) == 720
+      elts = collect(elements(G))
 
+      @test collect(elts)[1] == G()
+      @test length(elts) == 720
+      @test length(unique(elts)) == 720
    end
 
    println("PASS")
 end
 
-function test_perm_binary_ops()
+function test_perm_binary_ops(types)
    print(rpad("perm.binary_ops...", 30))
 
    for T in types
@@ -144,7 +144,7 @@ function test_perm_binary_ops()
    println("PASS")
 end
 
-function test_perm_mixed_binary_ops()
+function test_perm_mixed_binary_ops(types)
    print(rpad("perm.mixed_binary_ops...", 30))
       G = PermutationGroup(6)
       for T in types
@@ -163,7 +163,7 @@ function test_perm_mixed_binary_ops()
    println("PASS")
 end
 
-function test_perm_inversion()
+function test_perm_inversion(types)
    print(rpad("perm.inversion...", 30))
    for T in types
       print("$T ")
@@ -183,7 +183,7 @@ function test_perm_inversion()
    println("PASS")
 end
 
-function test_misc_functions()
+function test_misc_functions(types)
    print(rpad("perm.misc...", 30))
 
    for T in types
@@ -227,7 +227,7 @@ function test_misc_functions()
    println("PASS")
 end
 
-function test_characters()
+function test_characters(types)
    print(rpad("perm.characters...",30))
 
    for T in types
@@ -242,7 +242,7 @@ function test_characters()
    G = PermutationGroup(N)
    ps = Partition.([T[1,1,1], T[2,1], T[3]])
    l = Partition(T[1,1,1])
-   @test [character(l, m) for m in ps] == [ 1,-1, 1]
+   @test [character(l, m) for m in ps] == [1,-1, 1]
    l = Partition(T[2,1])
    @test [character(l, m) for m in ps] == [ 2, 0,-1]
    l = Partition(T[3])
@@ -296,15 +296,16 @@ function test_characters()
 end
 
 function test_perm()
+   IntTypes = [Int8, Int16, Int32, Int, UInt8, UInt16, UInt32, UInt, BigInt]
    test_perm_abstract_types()
-   test_perm_constructors()
-   test_perm_printing()
-   test_perm_basic_manipulation()
-   test_perm_iteration()
-   test_perm_binary_ops()
-   test_perm_mixed_binary_ops()
-   test_perm_inversion()
-   test_misc_functions()
-   test_characters()
+   test_perm_constructors(IntTypes)
+   test_perm_printing(IntTypes)
+   test_perm_basic_manipulation(IntTypes)
+   test_perm_iteration(IntTypes)
+   test_perm_binary_ops(IntTypes)
+   test_perm_mixed_binary_ops(IntTypes)
+   test_perm_inversion(IntTypes)
+   test_misc_functions(IntTypes)
+   test_characters(IntTypes)
    println("")
 end
