@@ -434,8 +434,8 @@ doc"""
 > Return the permutation matrix representing `a` via natural embedding of the
 > permutation group into general linear group over ZZ
 """
-function matrix_repr(a::perm)
-   A = eye(Int, parent(a).n)
+function matrix_repr(a::perm{T}) where {T}
+   A = eye(T, parent(a).n)
    return A[a.d,:]
 end
 
