@@ -196,6 +196,8 @@ function test_misc_functions(types)
       @test order(G()) isa (T == BigInt ? BigInt : Int)
       @test order(G()) == 1
       @test collect(cycles(a)) == [T[1,2,3,5,6,7], T[4], T[8,9,10]]
+      @test Generic.permtype(a) isa Vector{Int}
+      @test Generic.permtype(a) == [6,3,1]
       @test cycles(a)[1] isa Vector{T}
       @test cycles(a)[1] == T[1,2,3,5,6,7]
       @test cycles(a)[2] == T[4]
@@ -209,12 +211,16 @@ function test_misc_functions(types)
       p = G([9,5,4,7,3,8,2,10,1,6])
 
       @test collect(cycles(p)) == [T[1,9],T[2,5,3,4,7],T[6,8,10]]
+      @test Generic.permtype(p) == [5, 3, 2]
       @test order(p) == 30
       @test collect(cycles(p^2)) == [T[1], T[2,3,7,5,4], T[6,10,8], T[9]]
+      @test Generic.permtype(p^2) == [5, 3, 1, 1]
       @test order(p^2) == 15
       @test collect(cycles(p^3)) == [T[1,9], T[2,4,5,7,3], T[6], T[8], T[10]]
+      @test Generic.permtype(p^3) == [5, 2, 1, 1, 1]
       @test order(p^3) == 10
       @test collect(cycles(p^5)) == [T[1,9], T[2], T[3], T[4], T[5], T[6,10,8], T[7]]
+      @test Generic.permtype(p^5) == [3, 2, 1, 1, 1, 1, 1]
       @test order(p^5) == 6
 
       @test matrix_repr(a) isa Matrix{T}
