@@ -16,15 +16,13 @@ Base.IndexStyle(::Type{T}) where T<:Partition = Base.IndexLinear()
 
 getindex(p::Partition, i::T) where T<:Integer = p.part[i]
 
-function setindex!(p::Partition{T}, v::T, i::T) where T<:Integer
+function setindex!(p::Partition, v::Integer, i::Int)
    prev = Inf
    nex = 1
-   if i == length(p)
+   if i != 1
       prev = p[i-1]
-   elseif i == 1
-      nex = p[2]
-   elseif 1 < i < length(p)
-      prev = p[i-1]
+   end
+   if i != length(p)
       nex = p[i+1]
    end
    nex <= v <= prev || throw("Partition must be positive and non-increasing")
