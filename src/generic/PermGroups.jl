@@ -99,42 +99,81 @@ function sign(a::perm, ::Type{Val{:cycles}})
    return sign(a)
 end
 
+###############################################################################
+#
+#   Iterator protocol for CycleDec
+#
+###############################################################################
+
+Base.start(cd::CycleDec)= 1
+Base.done(cd::CycleDec, state::Int) = state > cd.n
+
+function Base.next(cd::CycleDec, state::Int)
+   this = cd.cptrs[state]
+   next = cd.cptrs[state+1]
+   return (view(cd.ccycles, this:next-1), state+1)
+end
+
+Base.IndexStyle(::Type{CycleDec}) = IndexLinear()
+
+function Base.getindex(cd::CycleDec, n::Int)
+   1 <= n <= length(cd) || throw(BoundsError([cd.cptrs], n+1))
+   return cd.ccycles[cd.cptrs[n]:cd.cptrs[n+1]-1]
+end
+
+Base.getindex(cd::CycleDec, i::Number) = S[convert(Int, i)]
+Base.getindex(cd::CycleDec, I) = [cd[i] for i in I]
+
+Base.length(cd::CycleDec) = cd.n
+Base.endof(cd::CycleDec) = cd.n
+Base.eltype(::Type{CycleDec{T}}) where T = Vector{T}
+
+function Base.show(io::IO, cd::CycleDec)
+   a = [join(c, ",") for c in cd]
+   print(io, "Cycle Decomposition: ("*join(a, ")(")*")")
+end
+
 doc"""
     cycles(a::perm)
 > Decomposes permutation into disjoint cycles.
 """
 function cycles(a::perm{T}) where T<:Integer
    if !isdefined(a, :cycles)
-      to_visit = trues(a.d)
-      k = one(T)
-      clens = Vector{T}(1) # cumulative lengths of cycles
-      clens[1] = one(T)
-      sizehint!(clens, 5 + ceil(Int, log(length(a.d))))
-      # expected length of cycle - (overestimation of) the harmonic
-
-      scycles = similar(a.d) # consecutive cycles entries
-      # scycles[clens[i], clens[i+1]-1] contains i-th cycle
-      i = one(T)
-
-      @inbounds while any(to_visit)
-         k = findnext(to_visit, k)
-         to_visit[k] = false
-         next = a[k]
-
-         scycles[i] = k
-         i += 1
-
-         while next != k
-            scycles[i] = next
-            to_visit[next] = false
-            next = a[next]
-            i += 1
-         end
-         push!(clens, i)
-      end
-      a.cycles = [scycles[clens[i]:clens[i+1]-1] for i in 1:length(clens)-1]
+      a.cycles = CycleDec(cycledec(a.d)...)
    end
    return a.cycles
+end
+
+function cycledec(v::Vector{T}) where T<:Integer
+   to_visit = trues(v)
+   ccycles = similar(v) # consecutive cycles entries
+   cptrs = Vector{Int}() # pointers to where cycles start
+   # ccycles[cptrs[i], cptrs[i+1]-1] contains i-th cycle
+
+   # expected number of cycles - (overestimation of) the harmonic
+   sizehint!(cptrs, 5 + ceil(Int, log(length(v))))
+   # cptrs[1] = one(T)
+
+   k = 1
+   i = 1
+
+   while any(to_visit)
+      push!(cptrs, i)
+      k = findnext(to_visit, k)
+      to_visit[k] = false
+      next = v[k]
+
+      ccycles[i] = T(k)
+      i += 1
+      while next != k
+         ccycles[i] = next
+         to_visit[next] = false
+         next = v[next]
+         i += one(T)
+      end
+
+   end
+   return ccycles, cptrs
 end
 
 doc"""
@@ -143,7 +182,7 @@ doc"""
 > `a`. This fully determines the conjugacy class of `a`. The lengths are sorted
 > in reverse order by default.
 """
-permtype(a::perm{T}) where T = sort([T(length(c)) for c in cycles(a)], rev=true)
+permtype(a::perm{T}) where T = sort(diff(cycles(a).cptrs), rev=true)
 
 ###############################################################################
 #
@@ -228,35 +267,38 @@ end
 
 doc"""
     ^(a::perm, n::Int)
-> Return the `n`-th power of a permutation `a`. By default Nemo computes powers
-> by cycle decomposition of `a`. `Nemo.power_by_squaring` provides a different
-> method for powering which may or may not be faster, depending on the
-> particuar case. Due to caching of cycle structure repeatedly powering should
-> be faster with the default method. NOTE: cycle structure is not computed
-> for `n<4`.
+> Return the `n`-th power of a permutation `a`. By default `a^n` is computed
+> by cycle decomposition of `a`. `Generic.power_by_squaring` provides a
+> different method for powering which may or may not be faster, depending on the
+> particuar case. Due to caching of the cycle structure, repeated powering of
+> `a` should be faster with the default method. NOTE: cycle structure is not
+> computed for `n<4`.
 """
-function ^(a::perm, n::Int)
-   if n <0
+function ^(a::perm{T}, n::Integer) where T
+   if n < 0
       return inv(a)^-n
    elseif n == 0
       return parent(a)()
    elseif n == 1
       return deepcopy(a)
    elseif n == 2
-      return parent(a)(a.d[a.d])
+      return parent(a)(a.d[a.d], false)
    elseif n == 3
-      return parent(a)(a.d[a.d[a.d]])
+      return parent(a)(a.d[a.d[a.d]], false)
    else
       new_perm = similar(a.d)
-      cyls = cycles(a)
-      for cycle in cyls
-         k = n % length(cycle)
-         shifted = circshift(cycle, -k)
+
+      @inbounds for cycle in cycles(a)
+         l = length(cycle)
+         k = n % l
          for (idx,j) in enumerate(cycle)
-            new_perm[j] = shifted[idx]
+            idx += k
+            idx = (idx > l ? idx%l : idx)
+            new_perm[j] = cycle[idx]
          end
       end
-      return parent(a)(new_perm, false)
+      p = parent(a)(new_perm, false)
+      return p
    end
 end
 
@@ -377,7 +419,7 @@ doc"""
     order(a::perm)
 > Returns the order of permutation `a`.
 """
-order(a::perm) = lcm([length(c) for c in cycles(a)])
+order(a::perm) = lcm(diff(cycles(a).cptrs))
 
 doc"""
     matrix_repr(a::perm)
