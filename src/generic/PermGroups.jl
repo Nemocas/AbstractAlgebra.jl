@@ -419,13 +419,15 @@ doc"""
     order(G::PermGroup)
 > Returns the order of the full permutation group.
 """
-order(G::PermGroup) = factorial(G.n)
+order(G::PermGroup) = order(BigInt, G)
+order(::Type{T}, G::PermGroup) where T = factorial(T(G.n))
 
 doc"""
-    order(a::perm)
-> Returns the order of permutation `a`.
+    order(a::perm, outputType::Type)
+> Returns the order of permutation `a` as `T`, or its widening.
 """
-order(a::perm) = lcm(diff(cycles(a).cptrs))
+order(a::perm) = order(BigInt, a)
+order(::Type{T}, a::perm) where T = reduce(lcm, one(T), diff(cycles(a).cptrs))
 
 doc"""
     matrix_repr(a::perm)
@@ -512,6 +514,9 @@ end
 #
 ##############################################################################
 
+const _charvalsTable = Dict{Tuple{BitVector,Vector{Int}}, Int}()
+const _charvalsTableBig = Dict{Tuple{BitVector,Vector{Int}}, BigInt}()
+
 doc"""
     character(lambda::Partition)
 > Returns the $\lambda$-th irreducible character of permutation group on
@@ -538,7 +543,7 @@ function character(lambda::Partition)
       if check
          lambda.n == length(p.d) || throw("Can't evaluate character on $p : lengths differ.")
       end
-      return MN1inner(R, Partition(permtype(p)), 1, _charvalsTable)
+      return MN1inner(R, Partition(permtype(p)), 1, _charvalsTableBig)
    end
 
    return char
@@ -548,13 +553,18 @@ doc"""
     character(lambda::Partition, p::perm, check::Bool=true)
 > Returns the value of `lambda`-th irreducible character on permutation `p`.
 """
-function character(lambda::Partition, p::perm, check::Bool=true)
+function character(lambda::Partition, p::perm{T}, check::Bool=true) where {T}
    if check
       lambda.n == length(p.d) || throw("lambda-th irreducible character can be evaluated only on permutations of length $(lambda.n).")
    end
 
+   return MN1inner(partitionseq(lambda), Partition(permtype(p)), 1, _charvalsTableBig)
+end
+
+function character(::Type{T}, lambda::Partition, p::perm) where T <: Int
    return MN1inner(partitionseq(lambda), Partition(permtype(p)), 1, _charvalsTable)
 end
+
 
 doc"""
     character(lambda::Partition, mu::Partition)
@@ -562,4 +572,4 @@ doc"""
 > represented by partition `mu`. Values of characters computed by this method
 > are not cached _globally_.
 """
-character(lambda::Partition, mu::Partition) = MN1inner(partitionseq(lambda), mu, 1)
+character(lambda::Partition, mu::Partition) = MN1inner(partitionseq(lambda), mu, 1, Dict{Tuple{BitVector,Vector{Int}}, BigInt}())

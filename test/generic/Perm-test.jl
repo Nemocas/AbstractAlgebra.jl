@@ -231,27 +231,28 @@ function test_characters(types)
    print(rpad("perm.characters...",30))
 
    for T in types
-   print("$T ")
-   N = T(7)
-   G = PermutationGroup(N)
-   @test all(character(p)(G()) == dim(YoungTableau(p)) for p in AllParts(N))
+      print("$T ")
+      N = T(7)
+      G = PermutationGroup(N)
+      @test all(character(p)(G()) == dim(YoungTableau(p)) for p in AllParts(N))
 
-   @test character(Partition(T[2,2,2,2]), Partition(T[8])) == 0
+      @test character(Partition([2,2,2,2]), Partition([8])) == 0
 
-   N = T(3)
-   G = PermutationGroup(N)
-   ps = Partition.([T[1,1,1], T[2,1], T[3]])
-   l = Partition(T[1,1,1])
+      N = T(3)
+      G = PermutationGroup(N)
+      ps = Partition.([[1,1,1], [2,1], [3]])
+      l = Partition(T[1,1,1])
 
-   @test typeof(character(l, ps[1])) == (T == BigInt? BigInt : Int)
+      @test typeof(character(l, ps[1])) == BigInt
 
-   @test [character(l, m) for m in ps] == [1,-1, 1]
-   l = Partition(T[2,1])
-   @test [character(l, m) for m in ps] == [ 2, 0,-1]
-   l = Partition(T[3])
-   @test [character(l, m) for m in ps] == [ 1, 1, 1]
+      @test [character(l, m) for m in ps] == [1,-1, 1]
+      l = Partition([2,1])
+      @test [character(l, m) for m in ps] == [ 2, 0,-1]
+      l = Partition([3])
+      @test [character(l, m) for m in ps] == [ 1, 1, 1]
+   end
 
-   N = T(4)
+   N = 4
    G = PermutationGroup(N)
 
    ps = Partition.([[1,1,1,1], [2,1,1], [2,2], [3,1], [4]])
@@ -260,40 +261,43 @@ function test_characters(types)
    l = Partition([1,1,1,1])
 
    @test [character(l, m) for m in ps] == [ 1,-1, 1, 1,-1]
-   l = Partition(T[2,1,1])
+   l = Partition([2,1,1])
    @test [character(l, m) for m in ps] == [ 3,-1,-1, 0, 1]
-   l = Partition(T[2,2])
+   l = Partition([2,2])
    @test [character(l, m) for m in ps] == [ 2, 0, 2,-1, 0]
-   l = Partition(T[3,1])
+   l = Partition([3,1])
    @test [character(l, m) for m in ps] == [ 3, 1,-1, 0,-1]
-   l = Partition(T[4])
+   l = Partition([4])
    @test [character(l, m) for m in ps] == [ 1, 1, 1, 1, 1]
 
    # values taken from GAP; note that we specify the order of partitions to be
    # compatible with GAP numbering of conjugacy classes. This is NOT the order
    # of partitions given by AllParts.
-   N = T(5)
+   N = 5
    G = PermutationGroup(N)
-   ps = Partition.([T[1,1,1,1,1], T[2,1,1,1], T[2,2,1], T[3,1,1], T[3,2], T[4,1], T[5]])
-   l = Partition(T[1,1,1,1,1])
+   ps = Partition.([[1,1,1,1,1], [2,1,1,1], [2,2,1], [3,1,1], [3,2], [4,1], [5]])
+   @test Set(AllParts(N)) == Set(ps)
+
+   l = Partition([1,1,1,1,1])
    @test [character(l, m) for m in ps] == [   1,  -1,   1,   1,  -1,  -1,   1 ]
-   l = Partition(T[2,1,1,1])
+   l = Partition([2,1,1,1])
    @test [character(l, m) for m in ps] == [   4,  -2,   0,   1,   1,   0,  -1 ]
-   l = Partition(T[2,2,1])
+   l = Partition([2,2,1])
    @test [character(l, m) for m in ps] == [   5,  -1,   1,  -1,  -1,   1,   0 ]
-   l = Partition(T[3,1,1])
+   l = Partition([3,1,1])
    @test [character(l, m) for m in ps] == [   6,   0,  -2,   0,   0,   0,   1 ]
-   l = Partition(T[3,2])
+   l = Partition([3,2])
    @test [character(l, m) for m in ps] == [   5,   1,   1,  -1,   1,  -1,   0 ]
-   l = Partition(T[4,1])
+   l = Partition([4,1])
    @test [character(l, m) for m in ps] == [   4,   2,   0,   1,  -1,   0,  -1 ]
-   l = Partition(T[5])
+   l = Partition([5])
    @test [character(l, m) for m in ps] == [   1,   1,   1,   1,   1,   1,   1 ]
-   end
 
    # test for overflow
-   p = Partition(collect(big(10):-1:1))
-   @test character(p, PermutationGroup(55)()) == 44261486084874072183645699204710400
+
+   p = Partition(collect(10:-1:1))
+   @test character(p, PermutationGroup(big(55))()) == 44261486084874072183645699204710400
+   @test dim(YoungTableau(p)) == 44261486084874072183645699204710400
 
    println("PASS")
 end
