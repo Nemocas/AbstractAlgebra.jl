@@ -38,6 +38,8 @@ function test_youngtabs()
    @test [hooklength(Y,i,j) for i in 1:size(Y,1), j in 1:size(Y,2)] ==
       [6 4 3 1; 4 2 1 0; 1 0 0 0]
 
+   @test dim(Y) isa BigInt
+
    @test dim(Y) == 70
    @test dim(YoungTableau([2,2])) == 2
    @test dim(YoungTableau([3,1])) == 3

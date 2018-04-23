@@ -36,8 +36,6 @@ end
 ==(p::Partition, m::Partition) = p.n ==m.n && p.part == m.part
 hash(p::Partition, h::UInt) = hash(p.part, hash(Partition, h))
 
-convert(::Type{Partition{T}}, p::Vector{T}) where T = Partition(p)
-
 ##############################################################################
 #
 #   IO for Partition
@@ -66,13 +64,13 @@ end
 #    "Generating All Partitions: A Comparison Of Two Encodings"
 # by Jerome Kelleher and Barry O’Sullivan, ArXiv:0909.2331
 
-function Base.start(parts::AllParts{T}) where T<:Integer
+function Base.start(parts::AllParts)
     if parts.n < 1
-        return (T[], 0)
+        return (Int[], 0)
     elseif parts.n == 1
-        return (T[1], 0)
+        return ([1], 0)
     else
-        p = zeros(T, parts.n)
+        p = zeros(Int, parts.n)
         p[2] = parts.n
         return (p, 2)
     end
@@ -116,8 +114,8 @@ end
 
 Base.next(parts::AllParts, state) = nextpart_asc(state...)
 Base.done(parts::AllParts, state) = state[2] == 1
-Base.eltype(::Type{AllParts{T}}) where T = Partition{T}
-length(parts::AllParts) = BigInt(_numpart(parts.n))
+Base.eltype(::Type{AllParts}) = Partition
+length(parts::AllParts) = _numpart(parts.n)
 
 function nextpart_asc(part, k)
     if k == 0
@@ -140,7 +138,7 @@ doc"""
 > Returns the conjugated partition of `part`, i.e. the partition corresponding
 > to the Young tableau of `part` reflected through the main diagonal.
 """
-function conj(part::Partition{T}) where T
+function conj(part::Partition)
     p = T[]
     for i in 1:part.n
         n = sum(part .>= i)
@@ -193,8 +191,6 @@ function isrimhook(R::BitVector, idx::Int, len::Int)
    return (R[idx+len] == false) && (R[idx] == true)
 end
 
-const _charvalsTable = Dict{Tuple{BitVector,Vector{Int}}, BigInt}()
-
 doc"""
     MN1inner(R::BitVector, mu::Partition, t::Int, [charvals])
 > Returns the value of $\lambda$-th irreducible character on conjugacy class of
@@ -208,7 +204,7 @@ doc"""
 >     "The computational complexity of rules for the character table of Sn"
 >     _Journal of Symbolic Computation_, 37(6), 2004, p. 727-748.
 """
-function MN1inner(R::BitVector, mu::Partition, t::Int,
+function MN1inner(R::BitVector, mu::Partition, t::Integer,
    charvals=Dict{Tuple{BitVector,Vector{Int}}, BigInt}())
    if t > length(mu)
       chi = 1
@@ -308,10 +304,12 @@ doc"""
 > Returns the dimension of the irreducible representation of
 > `PermutationGroup(n)` associated to YoungTableau `Y` of a partition of `n`.
 """
-function dim(Y::YoungTableau)
+dim(Y::YoungTableau) = dim(BigInt, Y)
+
+function dim(::Type{T}, Y::YoungTableau) where T<:Integer
    n, m = size(Y)
-   num = factorial(BigInt(maximum(Y)))
-   den = reduce(*, 1, BigInt(hooklength(Y,i,j)) for i in 1:n, j in 1:m if j <= Y.part[i])
+   num = factorial(T(maximum(Y)))
+   den = reduce(*, one(T), hooklength(Y,i,j) for i in 1:n, j in 1:m if j <= Y.part[i])
    return divexact(num, den)
 end
 
