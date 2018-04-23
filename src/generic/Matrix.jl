@@ -2638,8 +2638,11 @@ function minpoly(S::Ring, M::AbstractAlgebra.MatElem{T}, charpoly_only::Bool = f
    p = S(1)
    A = similar(M, n + 1, 2n + 1)
    B = similar(M, n, n)
-   L1 = [n + i for i in 1:n + 1]
-   L2 = [n for i in 1:n]
+   L1 = Vector{Int}(n + 1)
+   for i in 1:n + 1
+      L1[i] = i + n
+   end
+   L2 = fill(n, n)
    P2 = zeros(Int, n)
    P2[1] = 1
    c2 = 1
