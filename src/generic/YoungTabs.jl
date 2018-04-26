@@ -12,7 +12,7 @@ length(p::Partition) = length(p.part)
 
 size(p::Partition) = size(p.part)
 
-Base.IndexStyle(::Type{T}) where T<:Partition = Base.IndexLinear()
+Base.IndexStyle(::Type{Partition}) = Base.IndexLinear()
 
 getindex(p::Partition, i::T) where T<:Integer = p.part[i]
 

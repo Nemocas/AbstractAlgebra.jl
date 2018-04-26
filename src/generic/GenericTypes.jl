@@ -90,18 +90,18 @@ doc"""
 > Partition represents integer partition into numbers in non-increasing order.
 > It is a thin wrapper over `Vector{Int}`
 """
-mutable struct Partition{T} <: AbstractVector{Integer}
-   n::T
-   part::Vector{T}
+mutable struct Partition <: AbstractVector{Int}
+   n::Int
+   part::Vector{Int}
 
-   function Partition(part::Vector{T}, check::Bool=true) where T
+   function Partition(part::Vector{T}, check::Bool=true) where T<:Integer
       if check
          all(diff(part) .<= zero(T)) || throw("Partition must be decreasing!")
          if length(part) > zero(T)
             part[end] >= one(T) || throw("Found non-positive entry in partition!")
          end
       end
-      return new{T}(sum(part), part)
+      return new(sum(part), part)
    end
 end
 
@@ -110,8 +110,8 @@ doc"""
 > Returns an iterator over all integer `Partition`s of `n`. They come in
 > ascending order. See also `Combinatorics.partitions(n)`.
 """
-struct AllParts{T}
-    n::T
+struct AllParts
+    n::Int
 end
 
 ###############################################################################
