@@ -38,7 +38,7 @@ export create_accessors, get_handle, package_handle, zeros,
 
 export error_dim_negative, ErrorConstrDimMismatch
 
-export FiniteField, crt, IdealSet
+export FiniteField, crt
 
 if VERSION >= v"0.6.0-dev.2024" # julia started exporting iszero (again?)
    import Base: iszero
@@ -336,12 +336,6 @@ end
 #add empty functions so that Singular, Nemo and Hecke can import and extend.
 function crt(A...)
   return AbstractAlgebra.crt(A...)
-end
-
-function FiniteField
-end
-
-function IdealSet
 end
 
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
