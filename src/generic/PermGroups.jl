@@ -427,7 +427,10 @@ doc"""
 > Returns the order of permutation `a` as `T`, or its widening.
 """
 order(a::perm) = order(BigInt, a)
-order(::Type{T}, a::perm) where T = reduce(lcm, one(T), diff(cycles(a).cptrs))
+function order(::Type{T}, a::perm) where T
+   TT = promote_type(T, Int)
+   return reduce(lcm, one(TT), diff(cycles(a).cptrs))
+end
 
 doc"""
     matrix_repr(a::perm)
@@ -551,25 +554,36 @@ end
 
 doc"""
     character(lambda::Partition, p::perm, check::Bool=true)
-> Returns the value of `lambda`-th irreducible character on permutation `p`.
+> Returns the value of `lambda`-th irreducible character of the permutation
+> group on permutation `p`.
 """
-function character(lambda::Partition, p::perm{T}, check::Bool=true) where {T}
+function character(lambda::Partition, p::perm, check::Bool=true)
    if check
       lambda.n == length(p.d) || throw("lambda-th irreducible character can be evaluated only on permutations of length $(lambda.n).")
    end
-
-   return MN1inner(partitionseq(lambda), Partition(permtype(p)), 1, _charvalsTableBig)
+   return character(BigInt, lambda, Partition(permtype(p)))
 end
 
-function character(::Type{T}, lambda::Partition, p::perm) where T <: Int
-   return MN1inner(partitionseq(lambda), Partition(permtype(p)), 1, _charvalsTable)
+function character(::Type{T}, lambda::Partition, p::perm) where T <: Integer
+   return character(T, lambda, Partition(permtype(p)))
 end
-
 
 doc"""
     character(lambda::Partition, mu::Partition)
 > Returns the value of `lambda-th` irreducible character on the conjugacy class
-> represented by partition `mu`. Values of characters computed by this method
-> are not cached _globally_.
+> represented by partition `mu`.
 """
-character(lambda::Partition, mu::Partition) = MN1inner(partitionseq(lambda), mu, 1, Dict{Tuple{BitVector,Vector{Int}}, BigInt}())
+function character(lambda::Partition, mu::Partition, check::Bool=true)
+   if check
+      lambda.n == mu.n || throw("Cannot evaluate $lambda on the conjugacy class of $mu: lengths differ.")
+   end
+   return character(BigInt, lambda, mu)
+end
+
+function character(::Type{BigInt}, lambda::Partition, mu::Partition)
+   return MN1inner(partitionseq(lambda), mu, 1, _charvalsTableBig)
+end
+
+function character(::Type{T}, lambda::Partition, mu::Partition) where T<:Union{Signed, Unsigned}
+   return MN1inner(partitionseq(lambda), mu, 1, _charvalsTable)
+end

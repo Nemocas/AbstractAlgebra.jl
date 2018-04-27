@@ -91,7 +91,8 @@ function test_perm_iteration(types)
       G = PermutationGroup(T(6))
       @test length(AllPerms(T(6))) == 720
       @test length(unique(AllPerms(T(6)))) == 720
-      @test order(G) isa (T == BigInt ? BigInt : Int)
+      @test order(G) isa BigInt
+      @test order(T, G) isa promote_type(T, Int)
       @test order(G) == 720
 
       @test collect(elements(G)) isa Vector{perm{T}}
@@ -128,7 +129,7 @@ function test_perm_binary_ops(types)
       @test parity(a) == p
 
       for a in elements(G), b in elements(G)
-            @test parity(a*b) == (parity(b)+parity(a)) % 2
+         @test parity(a*b) == (parity(b)+parity(a)) % 2
       end
 
       G = PermutationGroup(T(10))
@@ -193,8 +194,10 @@ function test_misc_functions(types)
 
       @test cycles(G()) isa Generic.CycleDec{T}
       @test collect(cycles(G())) == [T[i] for i in 1:10]
-      @test order(G()) isa (T == BigInt ? BigInt : Int)
+      @test order(G()) isa BigInt
+      @test order(T, G()) isa promote_type(Int, T)
       @test order(G()) == 1
+
       @test collect(cycles(a)) == [T[1,2,3,5,6,7], T[4], T[8,9,10]]
       @test Generic.permtype(a) isa Vector{Int}
       @test Generic.permtype(a) == [6,3,1]
@@ -204,7 +207,8 @@ function test_misc_functions(types)
       @test cycles(a)[3] == T[8,9,10]
       @test cycles(a)[1:3] == [T[1,2,3,5,6,7], T[4], T[8,9,10]]
 
-      @test order(a) isa (T == BigInt ? BigInt : Int)
+      @test order(a) isa BigInt
+      @test order(T, a) isa promote_type(Int, T)
       @test order(a) == 6
       @test a^6 == G()
 
@@ -240,9 +244,8 @@ function test_characters(types)
       print("$T ")
       N = T(7)
       G = PermutationGroup(N)
-      @test all(character(p)(G()) == dim(YoungTableau(p)) for p in AllParts(N))
 
-      @test character(Partition([2,2,2,2]), Partition([8])) == 0
+      @test all(character(p)(G()) == dim(YoungTableau(p)) for p in AllParts(N))
 
       N = T(3)
       G = PermutationGroup(N)
@@ -250,13 +253,26 @@ function test_characters(types)
       l = Partition(T[1,1,1])
 
       @test typeof(character(l, ps[1])) == BigInt
+      TT = (T<:Union{Unsigned, Signed} ? Int : BigInt)
+      @test typeof(character(T, l, rand(G))) == TT
+      @test typeof(character(T, l, ps[1])) == TT
 
-      @test [character(l, m) for m in ps] == [1,-1, 1]
+      @test [character(l, m) for m in ps] == [ 1,-1, 1]
       l = Partition([2,1])
       @test [character(l, m) for m in ps] == [ 2, 0,-1]
       l = Partition([3])
       @test [character(l, m) for m in ps] == [ 1, 1, 1]
+
+      k_big = character(Partition([1,1,1]), G([2,3,1]))
+      @test typeof(k_big) == BigInt
+
+      k_int = character(Int, Partition([1,1,1]), G([2,3,1]))
+      @test typeof(k_int) == Int
+
+      @test k_big == k_int
    end
+
+   @test character(Partition([2,2,2,2]), Partition([8])) == 0
 
    N = 4
    G = PermutationGroup(N)

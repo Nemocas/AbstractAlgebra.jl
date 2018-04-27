@@ -202,8 +202,7 @@ doc"""
 >     "The computational complexity of rules for the character table of Sn"
 >     _Journal of Symbolic Computation_, 37(6), 2004, p. 727-748.
 """
-function MN1inner(R::BitVector, mu::Partition, t::Integer,
-   charvals=Dict{Tuple{BitVector,Vector{Int}}, BigInt}())
+function MN1inner(R::BitVector, mu::Partition, t::Integer, charvals)
    if t > length(mu)
       chi = 1
    elseif mu[t] > length(R)
