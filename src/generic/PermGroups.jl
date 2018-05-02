@@ -15,7 +15,7 @@ doc"""
     parent(a::perm)
 > Return the parent of the given permutation group element.
 """
-parent(a::perm) = a.parent
+parent(a::perm{T}) where T = PermGroup(T(length(a.d)))
 
 ###############################################################################
 #
