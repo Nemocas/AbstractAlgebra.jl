@@ -6,7 +6,7 @@
 
 export map_with_preimage_from_func, map_with_section_from_func, 
        map_with_retraction_from_func, image_map, preimage_map, section_map,
-       retraction_map
+       retraction_map, map_with_retraction, map_with_section, inverse_fn
 
 ################################################################################
 #
@@ -14,18 +14,15 @@ export map_with_preimage_from_func, map_with_section_from_func,
 #
 ################################################################################
 
-domain(f::MapWithSection) = get_field(f.map, :domain)
-codomain(f::MapWithSection) = get_field(f.map, :codomain)
+map_with_section(f::Map{D, C}, g::Map{C, D}) where {D, C} = MapWithSection(f, g)
+
+domain(f::MapWithSection{D, C}) where {D, C} = get_field(f.map, :domain)::D
+codomain(f::MapWithSection{D, C}) where {D, C} = get_field(f.map, :codomain)::C
 image_fn(f::MapWithSection) = image_fn(f.map)
 inverse_fn(f::MapWithSection) = image_fn(f.section)
 image_map(f::MapWithSection) = f.map
 preimage_map(f::MapWithSection) = f.section # for convenience only
 section_map(f::MapWithSection) = f.section
-
-inverse_fn(f::MapCache) = inverse_fn(f.map)
-inverse_map(f::MapCache) = inverse_map(f.map)
-preimage_map(f::MapCache) = preimage_map(f.map)
-section_map(f::MapCache) = section_map(f.map)
 
 (f::MapWithSection{D, C})(a) where {D, C} = (f.map)(a)::elem_type(C)
 
@@ -82,12 +79,14 @@ end
 #
 ################################################################################
 
-domain(f::MapWithRetraction) = get_field(f.map, :domain)
-codomain(f::MapWithRetraction) = get_field(f.map, :codomain)
+map_with_retraction(f::Map{D, C}, g::Map{C, D}) where {D, C} = MapWithRetraction(f, g)
+
+domain(f::MapWithRetraction{D, C}) where {D, C} = get_field(f.map, :domain)::D
+codomain(f::MapWithRetraction{D, C}) where {D, C} = get_field(f.map, :codomain)::C
 image_fn(f::MapWithRetraction) = image_fn(f.map)
 inverse_fn(f::MapWithRetraction) = image_fn(f.retraction)
 image_map(f::MapWithRetraction) = f.map
-retraction_map(f::MapWithSection) = f.retraction
+retraction_map(f::MapWithRetraction) = f.retraction
 
 retraction_map(f::MapCache) = retraction_map(f.map)
 
@@ -117,8 +116,8 @@ end
 function compose(f::MapWithRetraction{U, C}, g::MapWithRetraction{D, U}) where {D, U, C}
    check_composable(f, g)
    m = compose(f.map, g.map)
-   if isdefined(g, :section) && isdefined(f, :section)
-      p = compose(g.section, f.section)
+   if isdefined(g, :retraction) && isdefined(f, :retraction)
+      p = compose(g.retraction, f.retraction)
       return MapWithRetraction(m, p)
    else
       return MapWithRetraction(m)
@@ -126,6 +125,6 @@ function compose(f::MapWithRetraction{U, C}, g::MapWithRetraction{D, U}) where {
 end
 
 function inv(f::MapWithRetraction)
-   return MapWithSection(f.section, f.map)
+   return MapWithSection(f.retraction, f.map)
 end
 

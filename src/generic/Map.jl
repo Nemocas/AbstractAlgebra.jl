@@ -4,7 +4,8 @@
 #
 ################################################################################
 
-export map_from_func, compose, domain, codomain
+export map_from_func, compose, domain, codomain, identity_map, map1, map2,
+       image_fn
 
 ################################################################################
 #
@@ -22,16 +23,16 @@ function check_composable(a::AbstractAlgebra.Map{D, U}, b::AbstractAlgebra.Map{U
    codomain(a) != domain(b) && error("Incompatible maps")
 end
 
-*(f::Map, g::Map) = compose(f, g)
-
 ###############################################################################
 #
 #   CompositeMap
 #
 ###############################################################################
 
-domain(f::CompositeMap) = domain(f.map1)
-codomain(f::CompositeMap) = codomain(f.map2)
+domain(f::CompositeMap{D, C}) where {D, C} = domain(f.map1)::D
+codomain(f::CompositeMap{D, C}) where {D, C} = codomain(f.map2)::C
+map1(f::CompositeMap) = f.map1
+map2(f::CompositeMap) = f.map2
 
 function (f::CompositeMap{D, C})(a) where {D, C}
    return f.map2(f.map1(a))::elem_type(C)
@@ -42,18 +43,20 @@ function compose(f::AbstractAlgebra.Map{D, U}, g::AbstractAlgebra.Map{U, C}) whe
    return CompositeMap(f, g)
 end
 
+*(f::Map, g::Map) = compose(f, g)
+
 function show_short(io::IO, M::CompositeMap)
-   show_short(io, M.map2)
+   show_short(io, M.map1)
    println(io, "then")
-   show(io, M.map1)
+   show(io, M.map2)
 end
 
 function show(io::IO, M::CompositeMap)
    println(io, "Composite map consisting of the following")
    println(io, "")
-   show_short(io, M.map2)
-   println(io, "then")
    show_short(io, M.map1)
+   println(io, "then")
+   show_short(io, M.map2)
 end
 
 ################################################################################
@@ -61,6 +64,8 @@ end
 #  IdentityMap
 #
 ################################################################################
+
+identity_map(R::D) where D <: AbstractAlgebra.Set = IdentityMap{D}(R)
 
 (f::IdentityMap)(a) = a
 
@@ -74,7 +79,7 @@ function show(io::IO, M::IdentityMap)
    println(io, domain(M))
 end
 
-function compose(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){D, D}, g::AbstractAlgebra.Map{C, D}) where {D, C}
+function compose(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){D, D}, g::AbstractAlgebra.Map{D, C}) where {D, C}
    check_composable(f, g)
    return g
 end
@@ -152,11 +157,14 @@ function image_fn(f::FunctionalCompositeMap)
    end
 end
 
+map1(f::FunctionalCompositeMap) = f.map1
+map2(f::FunctionalCompositeMap) = f.map2
+
 function (f::FunctionalCompositeMap{D, C})(a) where {D, C}
    return image_fn(f)(a)::elem_type(C)
 end
 
-function compose(f::Map(AbstractAlgebra.FunctionalMap){U, C}, g::Map(AbstractAlgebra.FunctionalMap){D, U}) where {D, U, C}
+function compose(f::AbstractAlgebra.Map(AbstractAlgebra.FunctionalMap){D, U}, g::AbstractAlgebra.Map(AbstractAlgebra.FunctionalMap){U, C}) where {D, U, C}
    check_composable(f, g)
    return FunctionalCompositeMap(f, g)
 end
@@ -166,16 +174,16 @@ function show_short(io::IO, M::AbstractAlgebra.Map)
 end
 
 function show_short(io::IO, M::FunctionalCompositeMap)
-   show_short(io, M.map2)
+   show_short(io, M.map1)
    println(io, "then")
-   show(io, M.map1)
+   show(io, M.map2)
 end
 
 function show(io::IO, M::FunctionalCompositeMap)
    println(io, "Composite map consisting of the following")
    println(io, "")
-   show_short(io, M.map2)
-   println(io, "then")
    show_short(io, M.map1)
+   println(io, "then")
+   show_short(io, M.map2)
 end
 

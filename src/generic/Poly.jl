@@ -1544,7 +1544,7 @@ doc"""
 function primpart(a::AbstractAlgebra.PolyElem)
    d = content(a)
    if d == 0
-      return 0
+      return zero(parent(a))
    else
       return divexact(a, d)
    end
