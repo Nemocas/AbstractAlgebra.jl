@@ -33,6 +33,15 @@ function test_perm_constructors(types)
       @test parent_type(typeof(b)) == Generic.PermGroup{T}
       @test parent(b) == R
 
+      @test rand(R) isa Generic.perm{T}
+      g = rand(R)
+      @test parent(g) == R
+      @test parent(g) == PermutationGroup(T(10))
+
+      if T != Int
+         @test parent(g) != PermutationGroup(10)
+      end
+
    end
 
    println("PASS")

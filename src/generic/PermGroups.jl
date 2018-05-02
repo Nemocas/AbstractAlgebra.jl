@@ -247,6 +247,14 @@ doc"""
 """
 ==(a::perm, b::perm) = a.d == b.d
 
+doc"""
+    ==(G::PermGroup, b::PermGroup)
+> Return `true` if the given permutation groups are equal, otherwise return
+> `false`. Permutation groups on the same number of letters, but parametrized
+> by different integer types are considered different.
+"""
+==(G::PermGroup, H::PermGroup) = typeof(G) == typeof(H) && G.n == H.n
+
 ###############################################################################
 #
 #   Binary operators
