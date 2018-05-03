@@ -229,8 +229,8 @@ function sqrt(a::T) where T
   return Base.sqrt(a)
 end
 
-function PermGroup(n::T, cached=true) where T
-  Generic.PermGroup(n, cached)
+function PermGroup(n::T) where T
+  Generic.PermGroup(n)
 end
 
 function AllPerms(n::T) where T

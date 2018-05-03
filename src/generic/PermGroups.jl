@@ -15,7 +15,7 @@ doc"""
     parent(a::perm)
 > Return the parent of the given permutation group element.
 """
-parent(a::perm) = a.parent
+parent(a::perm{T}) where T = PermGroup(T(length(a.d)))
 
 ###############################################################################
 #
@@ -24,8 +24,7 @@ parent(a::perm) = a.parent
 ###############################################################################
 
 function deepcopy_internal(a::perm, dict::ObjectIdDict)
-   G = parent(a)
-   return G(deepcopy(a.d), false)
+   return perm(deepcopy(a.d), false)
 end
 
 function Base.hash(a::perm, h::UInt)
@@ -48,7 +47,7 @@ end
 Base.promote_rule(::Type{perm{I}}, ::Type{perm{J}}) where {I,J} =
    perm{promote_type(I,J)}
 
-convert(::Type{perm{T}}, p::perm) where {T} = (PermGroup(T(parent(p).n)))(p.d, false)
+convert(::Type{perm{T}}, p::perm) where T = perm(convert(Vector{T}, p.d), false)
 
 ###############################################################################
 #
@@ -248,6 +247,14 @@ doc"""
 """
 ==(a::perm, b::perm) = a.d == b.d
 
+doc"""
+    ==(G::PermGroup, b::PermGroup)
+> Return `true` if the given permutation groups are equal, otherwise return
+> `false`. Permutation groups on the same number of letters, but parametrized
+> by different integer types are considered different.
+"""
+==(G::PermGroup, H::PermGroup) = typeof(G) == typeof(H) && G.n == H.n
+
 ###############################################################################
 #
 #   Binary operators
@@ -266,7 +273,7 @@ function *(a::perm{T}, b::perm{T}) where T
    @inbounds for i in 1:length(d)
       d[i] = a[b[i]]
    end
-   return parent(a)(d, false)
+   return perm(d, false)
 end
 
 *(a::perm{S}, b::perm{T}) where {S,T} = *(promote(a,b)...)
@@ -284,13 +291,13 @@ function ^(a::perm{T}, n::Integer) where T
    if n < 0
       return inv(a)^-n
    elseif n == 0
-      return parent(a)()
+      return perm(T(length(a.d)))
    elseif n == 1
       return deepcopy(a)
    elseif n == 2
-      return parent(a)(a.d[a.d], false)
+      return perm(a.d[a.d], false)
    elseif n == 3
-      return parent(a)(a.d[a.d[a.d]], false)
+      return perm(a.d[a.d[a.d]], false)
    else
       new_perm = similar(a.d)
 
@@ -303,7 +310,7 @@ function ^(a::perm{T}, n::Integer) where T
             new_perm[j] = cycle[idx]
          end
       end
-      p = parent(a)(new_perm, false)
+      p = perm(new_perm, false)
       return p
    end
 end
@@ -312,13 +319,13 @@ function power_by_squaring(a::perm{I}, n::Integer) where {I}
    if n < 0
       return inv(a)^-n
    elseif n == 0
-      return parent(a)()
+      return perm(T(length(a.d)))
    elseif n == 1
       return deepcopy(a)
    elseif n == 2
-      return parent(a)(a.d[a.d], false)
+      return perm(a.d[a.d], false)
    elseif n == 3
-      return parent(a)(a.d[a.d[a.d]], false)
+      return perm(a.d[a.d[a.d]], false)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & n) == 0
@@ -335,7 +342,7 @@ function power_by_squaring(a::perm{I}, n::Integer) where {I}
          end
          bit >>= 1
       end
-      return parent(a)(cache1, false)
+      return perm(cache1, false)
    end
 end
 
@@ -355,7 +362,7 @@ function inv(a::perm)
    @inbounds for i in 1:length(d)
       d[a[i]] = i
    end
-   return parent(a)(d, false)
+   return perm(d, false)
 end
 
 # TODO: can we do that in place??
@@ -438,7 +445,7 @@ doc"""
 > permutation group into general linear group over ZZ
 """
 function matrix_repr(a::perm{T}) where {T}
-   A = eye(T, parent(a).n)
+   A = eye(T, length(a.d))
    return A[a.d,:]
 end
 
@@ -470,7 +477,7 @@ doc"""
     rand(G::PermGroup)
 > Returns a random element from group `G`.
 """
-rand(G::PermGroup) = G(randperm(G.n), false)
+rand(G::PermGroup{T}) where T = perm(randperm(G.n), false)
 
 ###############################################################################
 #
@@ -478,21 +485,10 @@ rand(G::PermGroup) = G(randperm(G.n), false)
 #
 ###############################################################################
 
-function (G::PermGroup)()
-   z = perm(G.n)
-   z.parent = G
-   return z
-end
+(G::PermGroup)() = perm(G.n)
 
 function (G::PermGroup{T})(a::Vector{T}, check::Bool=true) where T<:Integer
-   if check
-      length(a) != G.n && error("Unable to coerce to permutation: lengths differ")
-      Base.Set(a) != Base.Set(1:length(a)) && error("Unable to coerce to
-         permutation: non-unique elements in array")
-   end
-   z = perm(a)
-   z.parent = G
-   return z
+   return perm(a, check)
 end
 
 function (G::PermGroup{T})(a::Vector{S}, check::Bool=true) where {S<:Integer,T}
@@ -500,7 +496,7 @@ function (G::PermGroup{T})(a::Vector{S}, check::Bool=true) where {S<:Integer,T}
 end
 
 function (G::PermGroup{T})(p::perm{S}, check::Bool=true) where {S<:Integer, T}
-   return G(convert(Vector{T}, p.d), check)
+   return G(p.d, check)
 end
 
 ###############################################################################

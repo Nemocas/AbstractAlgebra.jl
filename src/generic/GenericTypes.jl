@@ -33,36 +33,25 @@ end
 #
 ###############################################################################
 
-const PermID = ObjectIdDict()
-
 mutable struct PermGroup{T<:Integer} <: AbstractAlgebra.Group
-  n::T
-
-  function PermGroup(n::T, cached=true) where T<:Integer
-     if haskey(PermID, n)
-        return PermID[n]::PermGroup{T}
-     else
-        z = new{T}(n)
-        if cached
-           PermID[n] = z
-        end
-        return z
-     end
-  end
+   n::T
 end
 
 mutable struct perm{T<:Integer} <: AbstractAlgebra.GroupElem
-  d::Array{T, 1}
-  cycles::CycleDec{T}
-  parent::PermGroup{T}
+   d::Array{T, 1}
+   cycles::CycleDec{T}
 
-  function perm(n::T) where T<:Integer
-     return new{T}(collect(1:n))
-  end
+   function perm(n::T) where T<:Integer
+      return new{T}(collect(1:n))
+   end
 
-  function perm(a::Array{T, 1}) where T<:Integer
-     return new{T}(a)
-  end
+   function perm(a::Vector{T}, check::Bool=true) where T<:Integer
+      if check
+         Base.Set(a) != Base.Set(1:length(a)) && error("Unable to coerce to
+            permutation: non-unique elements in array")
+      end
+      return new{T}(a)
+   end
 end
 
 doc"""
