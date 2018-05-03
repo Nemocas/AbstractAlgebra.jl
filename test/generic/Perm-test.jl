@@ -123,13 +123,16 @@ function test_perm_binary_ops(types)
       print("$T ")
       G = PermutationGroup(T(3))
 
-      a = G(T[2,1,3])
-      b = G(T[2,3,1])
+      a = perm(T[2,1,3]) # (1,2)
+      b = perm(T[2,3,1]) # (1,2,3)
 
-      @test a*b == G(T[1,3,2])
-      @test b*a == G(T[3,2,1])
+      @test a*b == G(T[3,2,1]) # (1,2)*(1,2,3) == (1,3)
+      @test b*a == G(T[1,3,2]) # (1,2,3)*(1,2) == (2,3)
       @test a*a == G()
       @test b*b*b == G()
+
+      # (1,2,3)*(2,3,4) == (1,3)(2,4)
+      @test perm(T[2,3,1,4])*perm(T[1,3,4,2]) == perm(T[3,4,1,2])
 
       @test parity(G()) == 0
       p = parity(a)
