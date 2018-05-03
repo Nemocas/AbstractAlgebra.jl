@@ -263,15 +263,24 @@ doc"""
 
 doc"""
     *(a::perm, b::perm)
-> Return the composition of the two permutations, i.e. $a\circ b$. In other
-> words, the permutation corresponding to applying $b$ first, then $a$, is
-> returned. If `a` and `b` are parametrized by different types, the result is
-> promoted accordingly.
+> Return the composition ``b ∘ a`` of two permutations.
+>
+> This corresponds to the action of permutation group on the set `[1..n]` **on
+> the right** and follows the convention of GAP.
+>
+> If `a` and `b` are parametrized by different types, the result is promoted
+> accordingly.
+
+# Examples:
+```jldoctest
+julia> perm([2,3,1,4])*perm([1,3,4,2]) # (1,2,3)*(2,3,4)
+(1,3)(2,4)
+```
 """
 function *(a::perm{T}, b::perm{T}) where T
    d = similar(a.d)
    @inbounds for i in 1:length(d)
-      d[i] = a[b[i]]
+      d[i] = b[a[i]]
    end
    return perm(d, false)
 end
