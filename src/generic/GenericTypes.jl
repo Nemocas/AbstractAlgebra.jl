@@ -60,12 +60,12 @@ doc"""
 > Similar to `Combinatorics.permutations(1:n)`
 """
 struct AllPerms{T}
-  n::T
-  all::Int
+   n::T
+   all::Int
 
-  function AllPerms(n::T) where {T<:Integer}
-     return new{T}(n, factorial(n))
-  end
+   function AllPerms(n::T) where {T<:Integer}
+      return new{T}(n, factorial(n))
+   end
 end
 
 ###############################################################################
