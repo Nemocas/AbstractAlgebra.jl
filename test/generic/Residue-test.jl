@@ -278,6 +278,22 @@ function test_gen_res_exact_division()
 
    @test divexact(f, g) == T(7*x^2+25*x+26)
 
+   for i = 1:100
+      n = rand(1:24)
+      R = ResidueRing(ZZ, n)
+
+      for iter = 1:100
+         a1 = rand(R, 0:n - 1)
+         a2 = rand(R, 0:n - 1)
+         a2 += Int(a2 == 0) # still works mod 1
+         p = a1*a2
+
+         q = divexact(p, a2)
+
+         @test q*a2 == p
+      end
+   end
+
    println("PASS")
 end
 

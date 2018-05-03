@@ -418,7 +418,6 @@ end
 
 function divides(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
    check_parent(a, b)
-   iszero(b) && error("Division by zero in divides")
    if iszero(a)
       return true, a
    end
@@ -432,8 +431,9 @@ function divides(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) w
    if !iszero(r)
      return false, b
    end
-   _, x = ppio(m, ub)
-   rs = R(q*invmod(ub, x))
+   ub = divexact(B, gb)
+   b1 = invmod(ub, divexact(m, gb))
+   rs = R(q)*b1
    return true, rs
 end
 
