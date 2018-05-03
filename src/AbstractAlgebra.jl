@@ -79,7 +79,7 @@ end
 ################################################################################
 
 function versioninfo()
-  print("AbstractAlgebra version 0.0.4\n")
+  print("AbstractAlgebra version 0.0.6\n")
   abstractalgebrarepo = dirname(dirname(@__FILE__))
 
   print("AbstractAlgebra: ")
