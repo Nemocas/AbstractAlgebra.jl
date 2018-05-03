@@ -143,7 +143,8 @@ doc"""
 """
 function cycles(a::perm{T}) where T<:Integer
    if !isdefined(a, :cycles)
-      a.cycles = CycleDec(cycledec(a.d)...)
+      ccycles, cptrs = cycledec(a.d)
+      a.cycles = CycleDec{T}(ccycles, cptrs, length(cptrs)-1)
    end
    return a.cycles
 end
@@ -151,7 +152,7 @@ end
 function cycledec(v::Vector{T}) where T<:Integer
    to_visit = trues(v)
    ccycles = similar(v) # consecutive cycles entries
-   cptrs = Vector{Int}() # pointers to where cycles start
+   cptrs = [1] # pointers to where cycles start
    # ccycles[cptrs[i], cptrs[i+1]-1] contains i-th cycle
 
    # expected number of cycles - (overestimation of) the harmonic
@@ -162,7 +163,6 @@ function cycledec(v::Vector{T}) where T<:Integer
    i = 1
 
    while any(to_visit)
-      push!(cptrs, i)
       k = findnext(to_visit, k)
       to_visit[k] = false
       next = v[k]
@@ -173,9 +173,9 @@ function cycledec(v::Vector{T}) where T<:Integer
          ccycles[i] = next
          to_visit[next] = false
          next = v[next]
-         i += one(T)
+         i += 1
       end
-
+      push!(cptrs, i)
    end
    return ccycles, cptrs
 end

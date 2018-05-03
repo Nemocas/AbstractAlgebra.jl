@@ -11,20 +11,16 @@
 ###############################################################################
 
 doc"""
-    CycleDec{T}(ccycles, cptrs)
-> Constructs a cycle decomposition from
+    CycleDec{T}(ccycles, cptrs, n)
+> A cycle decomposition of a permutation
 > * `ccycles`: an array of consecutive entries of cycles,
 > * `cptrs`: an array of pointers to the locations where cycles begin
+> * `n`: the number of cycles
 """
 struct CycleDec{T}
    ccycles::Vector{T}
    cptrs::Vector{Int}
    n::Int
-
-   function CycleDec(ccycles::Vector{T}, cptrs::Vector{Int}) where T<:Integer
-      push!(cptrs, length(ccycles)+1)
-      return new{T}(ccycles, cptrs, length(cptrs)-1)
-   end
 end
 
 ###############################################################################
