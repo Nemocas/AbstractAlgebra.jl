@@ -450,13 +450,11 @@ end
 
 doc"""
     matrix_repr(a::perm)
-> Return the permutation matrix representing `a` via natural embedding of the
-> permutation group into general linear group over ZZ
+> Return the permutation matrix as sparse matrix representing `a` via natural
+> embedding of the permutation group into general linear group over ZZ
 """
-function matrix_repr(a::perm{T}) where {T}
-   A = eye(T, length(a.d))
-   return A[a.d,:]
-end
+matrix_repr(a::perm{T}) where T = sparse(collect(T, 1:length(a.d)), a.d, ones(T,length(a.d)))
+
 
 doc"""
     emb!(result::perm, p::perm, V::Vector{Int})
