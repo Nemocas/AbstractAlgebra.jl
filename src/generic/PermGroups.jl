@@ -1,6 +1,3 @@
-export PermGroup, perm, parity, elements, cycles, character, setpermstyle,
-       order
-
 ###############################################################################
 #
 #   Type and parent object methods
