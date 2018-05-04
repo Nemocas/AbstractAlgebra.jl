@@ -299,7 +299,8 @@ function test_misc_functions(types)
       @test Generic.permtype(p^5) == [3, 2, 1, 1, 1, 1, 1]
       @test order(p^5) == 6
 
-      @test matrix_repr(a) isa Matrix{T}
+      @test matrix_repr(a) isa AbstractArray{T,2}
+      @test matrix_repr(a) isa SparseMatrixCSC{T,T}
       M = matrix_repr(a)
       for (idx, val) in enumerate(a.d)
          @test M[idx, val] == 1
