@@ -47,6 +47,66 @@ function test_perm_constructors(types)
    println("PASS")
 end
 
+function test_perm_parsingGAP(types)
+   print(rpad("perm.parsingGAP...", 30))
+
+   @test Generic.parse_cycles("()") == (Int[], [1])
+   @test Generic.parse_cycles("(1)(2)(3)") == ([1,2,3], [1,2,3,4])
+   @test Generic.parse_cycles("Cycle decomposition: (1)(2,3)") == ([1,2,3], [1,2,4])
+   @test Generic.parse_cycles("(1)(\n2, 3)") == ([1,2,3], [1,2,4])
+   @test Generic.parse_cycles("(3,2,1)(4,5)") == ([3,2,1,4,5], [1,4,6])
+
+   s = """
+( 1, 22,73,64,78,81,  24 ,89,90,54,51,82,91,53, 18
+ ,38,19,52,44,77,62,95,94,50,43,42,
+10,67,87,60,36,12)(2,57,34,88)(3,92,76,17,99,96,30,55,45,41,98)(4,56,59,97,49,
+21,15,9,26,86,83,29,27,66,6,58,28,5,68,40,72,7,84,93,39,79,23,46,63,32,61,100,
+11)(8,80,71,75,35,14,85,25,20,70,65,16,48,47,37,74,33,13,31,69)
+"""
+
+s2 ="""
+(1,22,73,64,78,81,24,89,90,54,51,82,91,53,18,38,19,52,44,77,62,95,94,50,43,42,\n10,67,87,60,36,12)(2,57,34,88)(3,92,76,17,99,96,30,55,45,41,98)(4,56,59,97,49,\n21,15,9,26,86,83,29,27,66,6,58,28,5,68,40,72,7,84,93,39,79,23,46,63,32,61,100,\n11)(8,80,71,75,35,14,85,25,20,70,65,16,48,47,37,74,33,13,31,69)
+"""
+   @test Generic.parse_cycles(s) == Generic.parse_cycles(s2)
+
+   @test perm"(1,2,3)(5)(10)" isa GroupElem
+   @test perm"(1,2,3)(5)(10)" isa Generic.perm
+   @test perm"(1,2,3)(5)(10)" isa Generic.perm{Int}
+   @test parent(perm"(1,2,3)(5)(10)") == PermGroup(10)
+   @test parent(perm"(1,2,3)(5)(6)") == PermGroup(6)
+   @test perm"(1,2,3,4,5)" == perm([2,3,4,5,1])
+   @test perm"(3,2,1)(4,5)" == perm([3,1,2,5,4])
+
+@test perm"""
+( 1, 22,73,64,78,81,  24 ,89,90,54,51,82,91,53,18,38,19,52,44,77,62,95,94,50,43,42,
+10,67,87,60,36,12)(2,57,34,88)(3,92,76,17,99,96,30,55,45,41,98)(4,56,59,97,49,
+21,15,9,26,86,83,29,27,66,6,58,28,5,68,40,72,7,84,93,39,79,23,46,63,32,61,100,
+11)(8,80,71,75,35,14,85,25,20,70,65,16,48,47,37,74,33,13,31,69)
+""" == PermGroup(100)(s2)
+
+   for T in types
+      print("$T ")
+      G = PermutationGroup(T(5))
+      @test G("()") == G()
+      @test G("()()") == G()
+      @test G("(1)(2,3)") == perm(T[1,3,2,4,5])
+      @test G("(2,3)") == G("(1)(2,3)")
+      @test G("(3,2)") == G("(2,3)")
+      @test G("(3,2,1)") == perm(T[3,1,2,4,5])
+      @test G("(3,2,1)") == G("(1,3,2)") == G("(2,1,3)")
+      @test G("(1,2,3,4,5)") == perm(T[2,3,4,5,1])
+      @test G("(3,2,1)(4,5)") == perm(T[3,1,2,5,4])
+      gg = G("(3,2,1)(4,5)")
+      @test isdefined(gg, :cycles)
+
+      @test_throws String G("(1,2)(3,4,5,6)")
+      @test_throws String G("(1,2)(3,4,5,2)")
+
+      @test all(elt == G(string(cycles(elt))) for elt in elements(G))
+   end
+   println("PASS")
+end
+
 function test_perm_printing(types)
    print(rpad("perm.printing...", 30))
 
@@ -340,6 +400,7 @@ function test_perm()
    IntTypes = [Int8, Int16, Int32, Int, UInt8, UInt16, UInt32, UInt, BigInt]
    test_perm_abstract_types()
    test_perm_constructors(IntTypes)
+   test_perm_parsingGAP(IntTypes)
    test_perm_printing(IntTypes)
    test_perm_basic_manipulation(IntTypes)
    test_perm_iteration(IntTypes)
