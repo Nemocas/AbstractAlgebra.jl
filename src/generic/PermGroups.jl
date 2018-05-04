@@ -508,6 +508,83 @@ function (G::PermGroup{T})(p::perm{S}, check::Bool=true) where {S<:Integer, T}
    return G(p.d, check)
 end
 
+function (G::PermGroup)(str::String, check::Bool=true)
+   return G(cycledec(parse_cycles(str)..., G.n), check)
+end
+
+function (G::PermGroup{T})(cdec::CycleDec{T}, check::Bool=true) where T
+   if check
+      length(cdec.ccycles) == G.n || throw("Can not coerce to $G: lengths differ")
+   end
+
+   elt = perm(G.n)
+   for c in cdec
+      for i in 1:length(c)-1
+         elt[c[i]] = c[i+1]
+      end
+      elt[c[end]] = c[1]
+   end
+
+   elt.cycles = cdec
+   return elt
+end
+
+###############################################################################
+#
+#   Parsing strings/GAP output
+#
+###############################################################################
+
+function parse_cycles(str::AbstractString)
+   ccycles = Int[]
+   cptrs = Int[1]
+   if ismatch(r"\n|\s| ", str)
+      str = replace(str, r"\n|\s| ","")
+   end
+   cycle_regex = r"\(\d+(,\d+)*\)?"
+   for cycle_str in matchall(cycle_regex, str)
+      cycle = [parse(Int, a) for a in split(cycle_str[2:end-1], ",")]
+      append!(ccycles, cycle)
+      push!(cptrs, cptrs[end]+length(cycle))
+   end
+   return ccycles, cptrs
+end
+
+function cycledec(ccycles::Vector{Int}, cptrs::Vector{Int}, n::T,
+   check::Bool=true) where T
+   if check
+      if length(ccycles) != 0
+         maximum(ccycles) <= n || throw("elts in $ccycles larger than $n")
+      end
+      length(Set(ccycles)) == length(ccycles) || throw("Non-unique entries in $ccycles")
+   end
+
+   if length(ccycles) != n
+      sizehint!(ccycles, n)
+      to_append = filter(x -> !(x in ccycles), 1:n)
+      l = length(ccycles)
+      append!(cptrs, l+2:l+length(to_append)+1)
+      append!(ccycles, to_append)
+   end
+
+   return CycleDec{T}(ccycles, cptrs, length(cptrs)-1)
+end
+
+doc"""
+    perm""
+> Parse GAP output as `perm{Int}`. Disjoint cycles in the inptut are assumed.
+"""
+macro perm_str(s)
+   c, p = parse_cycles(s)
+   if length(c) == 0
+      n = 1
+   else
+      n = maximum(c)
+   end
+   cdec = cycledec(c, p, n)
+   return PermGroup(cdec.cptrs[end]-1)(cdec)
+end
+
 ###############################################################################
 #
 #   PermGroup constructor
