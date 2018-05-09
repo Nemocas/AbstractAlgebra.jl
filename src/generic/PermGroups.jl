@@ -46,6 +46,8 @@ Base.promote_rule(::Type{perm{I}}, ::Type{perm{J}}) where {I,J} =
 
 convert(::Type{perm{T}}, p::perm) where T = perm(convert(Vector{T}, p.d), false)
 
+convert(::Type{Vector{T}}, p::perm{T}) where {T} = p.d
+
 ###############################################################################
 #
 #   Basic functions
