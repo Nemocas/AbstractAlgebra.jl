@@ -163,7 +163,7 @@ function test_perm_iteration(types)
       print("$T ")
       G = PermutationGroup(T(6))
       @test length(AllPerms(T(6))) == 720
-      @test length(unique(AllPerms(T(6)))) == 720
+      @test length(unique([deepcopy(p) for p in AllPerms(T(6))])) == 720
       @test order(G) isa BigInt
       @test order(T, G) isa promote_type(T, Int)
       @test order(G) == 720

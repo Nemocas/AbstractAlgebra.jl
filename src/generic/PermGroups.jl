@@ -389,30 +389,34 @@ end
 #
 ###############################################################################
 
-Base.start(A::AllPerms{T}) where T<:Integer = (collect(T, 1:A.n), one(T), one(T), ones(T, A.n))
-Base.next(A::AllPerms, state) = all_perms(state...)
-Base.done(A::AllPerms, state) = state[2] > A.all
-Base.eltype(::Type{AllPerms{T}}) where T<:Integer = Vector{T}
-length(A::AllPerms) = A.all
+Base.start(A::AllPerms{T}) where T<:Integer = 0
 
-function all_perms(elts, counter, i, c)
-   if counter == 1
-      return (copy(elts), (elts, counter+1, i, c))
+function Base.next(A::AllPerms, count)
+    count = nextperm(A, count)
+    return A.elts, count
+end
+
+Base.done(A::AllPerms, count) = count >= A.all
+Base.eltype(::Type{AllPerms{T}}) where T<:Integer = perm{T}
+Base.length(A::AllPerms) = A.all
+
+function nextperm(A::AllPerms{T}, count) where T
+   if count == 0
+        return count+1
    end
-   n = length(elts)
-   @inbounds while i <= n
-      if c[i] < i
-         if isodd(i)
-            elts[1], elts[i] = elts[i], elts[1]
-         else
-            elts[c[i]], elts[i] = elts[i], elts[c[i]]
-         end
-         c[i] += 1
-         i = 1
-         return (copy(elts), (elts, counter+1, i, c))
+
+   k = 0
+   n = 1
+
+   while true
+      if A.c[n] < n
+         k = ifelse(isodd(n), 1, A.c[n])
+         A.elts[k], A.elts[n] = A.elts[n], A.elts[k]
+         A.c[n] += 1
+         return count+1
       else
-         c[i] = 1
-         i += 1
+         A.c[n] = 1
+         n += 1
       end
    end
 end
@@ -421,8 +425,33 @@ doc"""
     elements(G::PermGroup)
 > Returns an iterator over all elements in the group $G$. You may use
 > `collect(elements(G))` to get an array of all elements.
+> Return an iterator over all permutations in `G`.
+>
+> This uses the non-recursive [Heaps algorithm](https://en.wikipedia.org/wiki/Heap's_algorithm).
+> You may use `collect(elements(G))` to get a vector of all elements.
+> A non-allocating version is provided as `elements!(::PermGroup)` for
+> iteration as well, but You need to explicitely `deepcopy` permutations
+> intended to be stored or modified.
+
+# Examples:
+```jldoctest
+julia> elts = elements(PermGroup(5));
+
+julia> length(elts)
+120
+
+julia> G = PermGroup(Int32(3)); collect(elements(G))
+6-element Array{AbstractAlgebra.Generic.perm{Int32},1}:
+ ()
+ (1,2)
+ (1,3,2)
+ (2,3)
+ (1,2,3)
+ (1,3)
+```
 """
-elements(G::PermGroup) = (G(p, false) for p in AllPerms(G.n))
+elements(G::PermGroup) = (perm(copy(p.d), false) for p in AllPerms(G.n))
+elements!(G::PermGroup)= (p for p in AllPerms(G.n))
 
 ###############################################################################
 #

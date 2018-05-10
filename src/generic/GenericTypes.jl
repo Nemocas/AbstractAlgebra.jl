@@ -55,12 +55,13 @@ doc"""
 > Returns an iterator over arrays representing all permutations of `1:n`.
 > Similar to `Combinatorics.permutations(1:n)`
 """
-struct AllPerms{T}
-   n::T
+struct AllPerms{T<:Integer}
    all::Int
+   c::Vector{Int}
+   elts::perm{T}
 
-   function AllPerms(n::T) where {T<:Integer}
-      return new{T}(n, factorial(n))
+   function AllPerms(n::T) where T
+      new{T}(Int(factorial(n)), ones(Int, n), perm(collect(T, 1:n), false))
    end
 end
 
