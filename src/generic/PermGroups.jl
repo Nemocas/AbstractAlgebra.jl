@@ -543,8 +543,6 @@ end
 
 doc"""
     elements(G::PermGroup)
-> Returns an iterator over all elements in the group $G$. You may use
-> `collect(elements(G))` to get an array of all elements.
 > Return an iterator over all permutations in `G`.
 >
 > This uses the non-recursive [Heaps algorithm](https://en.wikipedia.org/wiki/Heap's_algorithm).
@@ -634,7 +632,7 @@ end
 
 doc"""
     rand(G::PermGroup)
-> Returns a random element from group `G`.
+> Return a random element from group `G`.
 """
 rand(G::PermGroup{T}) where T = perm(randperm(G.n), false)
 
