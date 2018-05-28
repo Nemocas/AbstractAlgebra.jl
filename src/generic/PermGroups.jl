@@ -236,12 +236,38 @@ function cycledec(v::Vector{T}) where T<:Integer
 end
 
 doc"""
-    permtype(a::perm, rev=true)
-> Returns the type of permutation `a`, i.e. lengths of disjoint cycles building
-> `a`. This fully determines the conjugacy class of `a`. The lengths are sorted
-> in reverse order by default.
+    permtype(g::perm, rev=true)
+> Return the type of permutation `g`, i.e. lengths of disjoint cycles in cycle
+> decomposition of `g`.
+>
+> The lengths are sorted in reverse order by default. `permtype(g)` fully
+> determines the conjugacy class of `g`.
+
+# Examples:
+```jldoctest
+julia> g = perm([3,4,5,2,1,6])
+(1,3,5)(2,4)
+
+julia> permtype(g)
+3-element Array{Int64,1}:
+ 3
+ 2
+ 1
+
+julia> G = PermGroup(5); e = parent(g)()
+()
+
+julia> permtype(e)
+6-element Array{Int64,1}:
+ 1
+ 1
+ 1
+ 1
+ 1
+ 1
+```
 """
-permtype(a::perm{T}) where T = sort(diff(cycles(a).cptrs), rev=true)
+permtype(g::perm) = sort(diff(cycles(g).cptrs), rev=true)
 
 ###############################################################################
 #
