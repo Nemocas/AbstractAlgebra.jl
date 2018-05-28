@@ -342,17 +342,31 @@ end
 ###############################################################################
 
 doc"""
-    ==(a::perm, b::perm)
-> Return `true` if the given permutations are equal, otherwise return `false`.
+    ==(g::perm, h::perm)
+> Return `true` if permutations are equal, otherwise return `false`.
+>
 > Permutations parametrized by different integer types are considered equal if
 > they define the same permutation in the abstract permutation group.
+
+# Examples:
+```
+julia> g = perm(Int8[2,3,1])
+(1,2,3)
+
+julia> h = perm"(3,1,2)"
+(1,2,3)
+
+julia> g == h
+true
+```
 """
-==(a::perm, b::perm) = a.d == b.d
+==(g::perm, h::perm) = g.d == h.d
 
 doc"""
-    ==(G::PermGroup, b::PermGroup)
-> Return `true` if the given permutation groups are equal, otherwise return
-> `false`. Permutation groups on the same number of letters, but parametrized
+    ==(G::PermGroup, H::PermGroup)
+> Return `true` if permutation groups are equal, otherwise return `false`.
+>
+> Permutation groups on the same number of letters, but parametrized
 > by different integer types are considered different.
 """
 ==(G::PermGroup, H::PermGroup) = typeof(G) == typeof(H) && G.n == H.n
@@ -364,13 +378,13 @@ doc"""
 ###############################################################################
 
 doc"""
-    *(a::perm, b::perm)
-> Return the composition ``b ∘ a`` of two permutations.
+    *(g::perm, h::perm)
+> Return the composition ``h ∘ g`` of two permutations.
 >
-> This corresponds to the action of permutation group on the set `[1..n]` **on
-> the right** and follows the convention of GAP.
+> This corresponds to the action of permutation group on the set `[1..n]`
+> **on the right** and follows the convention of GAP.
 >
-> If `a` and `b` are parametrized by different types, the result is promoted
+> If `g` and `h` are parametrized by different types, the result is promoted
 > accordingly.
 
 # Examples:
@@ -379,24 +393,37 @@ julia> perm([2,3,1,4])*perm([1,3,4,2]) # (1,2,3)*(2,3,4)
 (1,3)(2,4)
 ```
 """
-function *(a::perm{T}, b::perm{T}) where T
-   d = similar(a.d)
+function *(g::perm{T}, h::perm{T}) where T
+   d = similar(g.d)
    @inbounds for i in 1:length(d)
-      d[i] = b[a[i]]
+      d[i] = h[g[i]]
    end
    return perm(d, false)
 end
 
-*(a::perm{S}, b::perm{T}) where {S,T} = *(promote(a,b)...)
+*(g::perm{S}, h::perm{T}) where {S,T} = *(promote(g,h)...)
 
 doc"""
-    ^(a::perm, n::Int)
-> Return the `n`-th power of a permutation `a`. By default `a^n` is computed
-> by cycle decomposition of `a`. `Generic.power_by_squaring` provides a
-> different method for powering which may or may not be faster, depending on the
-> particuar case. Due to caching of the cycle structure, repeated powering of
-> `a` should be faster with the default method. NOTE: cycle structure is not
-> computed for `n<4`.
+    ^(g::perm, n::Int)
+> Return the $n$-th power of a permutation `g`.
+>
+> By default `g^n` is computed by cycle decomposition of `g` if `n > 3`.
+> Generic.power_by_squaring` provides a different method for powering which
+> may or may not be faster, depending on the particuar case. Due to caching of
+> the cycle structure, repeated powering of `g` will be faster with the default
+> method.
+
+# Examples:
+```jldoctest
+julia> g = perm([2,3,4,5,1])
+(1,2,3,4,5)
+
+julia> g^3
+(1,4,2,5,3)
+
+julia> g^5
+()
+```
 """
 function ^(a::perm{T}, n::Integer) where T
    if n < 0
@@ -464,14 +491,14 @@ end
 ###############################################################################
 
 doc"""
-    inv(a::perm)
-> Return the inverse of the given permutation, i.e. the permuation $a^{-1}$
-> such that $a\circ a^{-1} = a^{-1}\circ a$ is the identity permutation.
+    inv(g::perm)
+> Return the inverse of the given permutation, i.e. the permuation $g^{-1}$
+> such that $g ∘ g^{-1} = g^{-1} ∘ g$ is the identity permutation.
 """
-function inv(a::perm)
-   d = similar(a.d)
+function inv(g::perm)
+   d = similar(g.d)
    @inbounds for i in 1:length(d)
-      d[a[i]] = i
+      d[g[i]] = i
    end
    return perm(d, false)
 end
