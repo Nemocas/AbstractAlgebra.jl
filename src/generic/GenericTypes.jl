@@ -29,7 +29,7 @@ end
 #
 ###############################################################################
 
-mutable struct PermGroup{T<:Integer} <: AbstractAlgebra.Group
+struct PermGroup{T<:Integer} <: AbstractAlgebra.Group
    n::T
 end
 
