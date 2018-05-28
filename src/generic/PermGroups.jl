@@ -645,6 +645,9 @@ rand(G::PermGroup{T}) where T = perm(randperm(G.n), false)
 (G::PermGroup)() = perm(G.n)
 
 function (G::PermGroup{T})(a::Vector{T}, check::Bool=true) where T<:Integer
+   if check
+      G.n == length(a) || throw("Cannot coerce to $G: lengths differ")
+   end
    return perm(a, check)
 end
 
@@ -653,7 +656,10 @@ function (G::PermGroup{T})(a::Vector{S}, check::Bool=true) where {S<:Integer,T}
 end
 
 function (G::PermGroup{T})(p::perm{S}, check::Bool=true) where {S<:Integer, T}
-   return G(p.d, check)
+   if parent(p) == G
+      return p
+   end
+   return G(convert(Vector{T}, p.d), check)
 end
 
 function (G::PermGroup)(str::String, check::Bool=true)
