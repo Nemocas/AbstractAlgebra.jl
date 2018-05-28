@@ -39,12 +39,12 @@ parent(g::perm{T}) where T = PermGroup(T(length(g.d)))
 # hash(perm) = 0x0d9939c64ab650ca
 Base.hash(g::perm, h::UInt) = xor(hash(g.d, h), 0x0d9939c64ab650ca)
 
-function getindex(a::perm, n::Integer)
-   return a.d[n]
+function getindex(g::perm, n::Integer)
+   return g.d[n]
 end
 
-function setindex!(a::perm, v::Integer, n::Integer)
-   a.d[n] = v
+function setindex!(g::perm, v::Integer, n::Integer)
+   g.d[n] = v
 end
 
 Base.promote_rule(::Type{perm{I}}, ::Type{perm{J}}) where {I,J} =
@@ -85,22 +85,21 @@ julia> parity(g)
 1
 ```
 """
-# TODO: 2x slower than Flint
-function parity(a::perm{T}) where T
-   if isdefined(a, :cycles)
-      return T(sum([(length(c)+1)%2 for c in cycles(a)])%2)
+function parity(g::perm{T}) where T
+   if isdefined(g, :cycles)
+      return T(sum([(length(c)+1)%2 for c in cycles(g)])%2)
    end
-   to_visit = trues(a.d)
+   to_visit = trues(g.d)
    parity = false
    k = 1
    @inbounds while any(to_visit)
       k = findnext(to_visit, k)
       to_visit[k] = false
-      next = a[k]
+      next = g[k]
       while next != k
          parity = !parity
          to_visit[next] = false
-         next = a[next]
+         next = g[next]
       end
    end
    return T(parity)
@@ -187,12 +186,12 @@ julia> collect(cycles(g))
  [6]
 ```
 """
-function cycles(a::perm{T}) where T<:Integer
-   if !isdefined(a, :cycles)
-      ccycles, cptrs = cycledec(a.d)
-      a.cycles = CycleDec{T}(ccycles, cptrs, length(cptrs)-1)
+function cycles(g::perm{T}) where T<:Integer
+   if !isdefined(g, :cycles)
+      ccycles, cptrs = cycledec(g.d)
+      g.cycles = CycleDec{T}(ccycles, cptrs, length(cptrs)-1)
    end
-   return a.cycles
+   return g.cycles
 end
 
 function cycledec(v::Vector{T}) where T<:Integer
@@ -416,21 +415,21 @@ julia> g^5
 ()
 ```
 """
-function ^(a::perm{T}, n::Integer) where T
+function ^(g::perm{T}, n::Integer) where T
    if n < 0
-      return inv(a)^-n
+      return inv(g)^-n
    elseif n == 0
-      return perm(T(length(a.d)))
+      return perm(T(length(g.d)))
    elseif n == 1
-      return deepcopy(a)
+      return deepcopy(g)
    elseif n == 2
-      return perm(a.d[a.d], false)
+      return perm(g.d[g.d], false)
    elseif n == 3
-      return perm(a.d[a.d[a.d]], false)
+      return perm(g.d[g.d[g.d]], false)
    else
-      new_perm = similar(a.d)
+      new_perm = similar(g.d)
 
-      @inbounds for cycle in cycles(a)
+      @inbounds for cycle in cycles(g)
          l = length(cycle)
          k = n % l
          for (idx,j) in enumerate(cycle)
@@ -444,30 +443,30 @@ function ^(a::perm{T}, n::Integer) where T
    end
 end
 
-function power_by_squaring(a::perm{I}, n::Integer) where {I}
+function power_by_squaring(g::perm{I}, n::Integer) where {I}
    if n < 0
-      return inv(a)^-n
+      return inv(g)^-n
    elseif n == 0
-      return perm(T(length(a.d)))
+      return perm(T(length(g.d)))
    elseif n == 1
-      return deepcopy(a)
+      return deepcopy(g)
    elseif n == 2
-      return perm(a.d[a.d], false)
+      return perm(g.d[g.d], false)
    elseif n == 3
-      return perm(a.d[a.d[a.d]], false)
+      return perm(g.d[g.d[g.d]], false)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & n) == 0
          bit >>= 1
       end
-      cache1 = deepcopy(a.d)
-      cache2 = deepcopy(a.d)
+      cache1 = deepcopy(g.d)
+      cache2 = deepcopy(g.d)
       bit >>= 1
       while bit != 0
          cache2 = cache1[cache1]
          cache1 = cache2
          if (UInt(bit) & n) != 0
-            cache1 = cache1[a.d]
+            cache1 = cache1[g.d]
          end
          bit >>= 1
       end
