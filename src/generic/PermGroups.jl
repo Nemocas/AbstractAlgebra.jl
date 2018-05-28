@@ -617,21 +617,21 @@ doc"""
 """
 matrix_repr(a::perm{T}) where T = sparse(collect(T, 1:length(a.d)), a.d, ones(T,length(a.d)))
 
-
 doc"""
-    emb!(result::perm, p::perm, V::Vector{Int})
-> Embedds permutation `p` into permutation `result` on the indices given by `V`. This
-> corresponds to natural embedding of $S_k$ into $S_n$ as the subgroup
-> permuting points indexed by `V`.
+    emb!(result::perm, p::perm, V)
+> Embed permutation `p` into permutation `result` on the indices given by `V`.
+>
+> This corresponds to the natural embedding of $S_k$ into $S_n$ as the
+> subgroup permuting points indexed by `V`.
 """
-function emb!(result::perm, p::perm, V::Vector{Int})
-    result.d[V] = (result.d[V])[p.d]
-    return result
+function emb!(result::perm, p::perm, V)
+   result.d[V] = (result.d[V])[p.d]
+   return result
 end
 
 doc"""
     emb(G::PermGroup, V::Vector{Int})
-> Returns the natural embedding of a permutation group into `G` as the
+> Return the natural embedding of a permutation group into `G` as the
 > subgroup permuting points indexed by `V`.
 """
 function emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
@@ -639,7 +639,7 @@ function emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
       @assert length(Base.Set(V)) == length(V)
       @assert all(V .<= G.n)
    end
-   return p -> Nemo.emb!(G(), p, V)
+   return p -> Generic.emb!(G(), p, V)
 end
 
 doc"""
@@ -731,8 +731,31 @@ function cycledec(ccycles::Vector{Int}, cptrs::Vector{Int}, n::T,
 end
 
 doc"""
-    perm""
-> Parse GAP output as `perm{Int}`. Disjoint cycles in the inptut are assumed.
+    perm"..."
+> String macro to parse disjoint cycles into `perm{Int}`.
+>
+> Strings for the output of GAP could be copied directly into `perm"..."`.
+> Cycles of length $1$ are not necessary, but could be included. A permutation
+> of the minimal support is constructed, i.e. the maximal $n$ in the
+> decomposition determines the parent group $S_n$.
+
+# Examples:
+```jldoctest
+julia> p = perm"(1,3)(2,4)"
+(1,3)(2,4)
+
+julia> typeof(p)
+AbstractAlgebra.Generic.perm{Int64}
+
+julia> parent(p) == PermutationGroup(4)
+true
+
+julia> p = perm"(1,3)(2,4)(10)"
+(1,3)(2,4)
+
+julia> parent(p) == PermutationGroup(10)
+true
+```
 """
 macro perm_str(s)
    c, p = parse_cycles(s)
