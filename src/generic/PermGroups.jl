@@ -36,10 +36,6 @@ parent(g::perm{T}) where T = PermGroup(T(length(g.d)))
 #
 ###############################################################################
 
-function deepcopy_internal(a::perm, dict::ObjectIdDict)
-   return perm(deepcopy(a.d), false)
-end
-
 function Base.hash(a::perm, h::UInt)
    b = 0x595dee0e71d271d0%UInt
    for i in 1:length(a.d)
