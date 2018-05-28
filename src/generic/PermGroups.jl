@@ -4,15 +4,31 @@
 #
 ###############################################################################
 
+doc"""
+    parent_type(::Type{perm{T}})
+> Return the type of the parent of a permutation.
+"""
 parent_type(::Type{perm{T}}) where T = PermGroup{T}
 
+doc"""
+    elem_type(::Type{PermGroup{T}})
+> Return the type of elements of a permutation group.
+"""
 elem_type(::Type{PermGroup{T}}) where T = perm{T}
 
 doc"""
-    parent(a::perm)
-> Return the parent of the given permutation group element.
+    parent(g::perm)
+> Return the parent of the permutation `g`.
+
+```jldoctest
+julia> G = PermutationGroup(5); g = perm([3,4,5,2,1])
+(1,3,5)(2,4)
+
+julia> parent(g) == G
+true
+```
 """
-parent(a::perm{T}) where T = PermGroup(T(length(a.d)))
+parent(g::perm{T}) where T = PermGroup(T(length(g.d)))
 
 ###############################################################################
 #
