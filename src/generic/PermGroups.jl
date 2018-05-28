@@ -273,7 +273,7 @@ mutable struct PermDisplayStyle
    format::Symbol
 end
 
-const _perm_display_style = PermDisplayStyle(:array)
+const _perm_display_style = PermDisplayStyle(:cycles)
 
 doc"""
     setpermstyle(format)
