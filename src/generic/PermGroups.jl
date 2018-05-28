@@ -591,14 +591,18 @@ elements!(G::PermGroup)= (p for p in AllPerms(G.n))
 
 doc"""
     order(G::PermGroup)
-> Returns the order of the full permutation group.
+> Return the order of the full permutation group as `BigInt`.
 """
 order(G::PermGroup) = order(BigInt, G)
 order(::Type{T}, G::PermGroup) where T = factorial(T(G.n))
 
 doc"""
-    order(a::perm, outputType::Type)
-> Returns the order of permutation `a` as `T`, or its widening.
+    order(a::perm)
+> Return the order of permutation `a` as `BigInt`.
+>
+> If You are sure that computation over `T` (or its `Int` promotion) will not
+> overflow You may use the method `order(T::Type, a::perm)` which bypasses
+> computation with BigInts and returns `promote(T, Int)`.
 """
 order(a::perm) = order(BigInt, a)
 function order(::Type{T}, a::perm) where T
