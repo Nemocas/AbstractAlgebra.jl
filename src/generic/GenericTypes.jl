@@ -12,10 +12,10 @@
 
 doc"""
     CycleDec{T}(ccycles, cptrs, n)
-> A cycle decomposition of a permutation
-> * `ccycles`: an array of consecutive entries of cycles,
-> * `cptrs`: an array of pointers to the locations where cycles begin
-> * `n`: the number of cycles
+> Cycle decomposition of a permutation.
+> * `ccycles`: an array of consecutive entries of cycles;
+> * `cptrs`: an array of pointers to the locations where cycles begin: ```ccycles[cptrs[i], cptrs[i+1]-1]` contains the i-th cycle;
+> * `n`: the number of cycles;
 """
 struct CycleDec{T}
    ccycles::Vector{T}
@@ -29,24 +29,75 @@ end
 #
 ###############################################################################
 
+doc"""
+    PermGroup{T<:Integer}
+> The permutation group singleton type.
+> `PermGroup(n)` constructs the permutation group $S_n$ on $n$-symbols. The type of elements of the group is inferred from the type of `n`.
+
+# Examples:
+```jldoctest
+julia> G = PermGroup(5)
+Permutation group over 5 elements
+
+julia> elem_type(G)
+AbstractAlgebra.Generic.perm{Int64}
+
+julia> H = PermGroup(UInt16(5))
+Permutation group over 5 elements
+
+julia> elem_type(H)
+AbstractAlgebra.Generic.perm{UInt16}
+```
+"""
 struct PermGroup{T<:Integer} <: AbstractAlgebra.Group
    n::T
 end
 
+doc"""
+    perm{T<:Integer}
+> The type of permutations.
+> Fieldnames:
+> * `d::Vector{T}` - vector representing the permutation
+> * `cycles::CycleDec{T}` - (cached) cycle decomposition
+>
+> Permutation $p$ consists of a vector (`p.d`) of $n$ integers from $1$ to $n$.
+> If the $i$-th entry of the vector is $j$, this corresponds to $p$ sending $i \to j$.
+> The cycle decomposition (`p.cycles`) is computed on demand and should never be
+> accessed directly. Use [`cycles(p)`](@ref) instead.
+>
+> There are two inner constructors of `perm`:
+>
+> * `perm(n::T)` constructs the trivial `perm{T}`-permutation of length $n$.
+> * `perm(v::Vector{T<:Integer}[,check=true])` constructs a permutation
+> represented by `v`. By default `perm` constructor checks if the vector
+> constitutes a valid permutation. To skip the check call `perm(v, false)`.
+
+# Examples:
+```jldoctest
+julia> perm([1,2,3])
+()
+
+julia> g = perm(Int32[2,3,1])
+(1,2,3)
+
+julia> typeof(g)
+AbstractAlgebra.Generic.perm{Int32}
+```
+"""
 mutable struct perm{T<:Integer} <: AbstractAlgebra.GroupElem
    d::Array{T, 1}
    cycles::CycleDec{T}
 
    function perm(n::T) where T<:Integer
-      return new{T}(collect(1:n))
+      return new{T}(collect(T, 1:n))
    end
 
-   function perm(a::Vector{T}, check::Bool=true) where T<:Integer
+   function perm(v::Vector{T}, check::Bool=true) where T<:Integer
       if check
-         Base.Set(a) != Base.Set(1:length(a)) && error("Unable to coerce to
-            permutation: non-unique elements in array")
+         Set(v) != Set(1:length(v)) && error("Unable to coerce to permutation:
+         non-unique elements in array")
       end
-      return new{T}(a)
+      return new{T}(v)
    end
 end
 
