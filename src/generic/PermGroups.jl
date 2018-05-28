@@ -61,14 +61,29 @@ convert(::Type{Vector{T}}, p::perm{T}) where {T} = p.d
 ###############################################################################
 
 doc"""
-    parity(a::perm)
+    parity(g::perm)
 > Return the parity of the given permutation, i.e. the parity of the number of
-> transpositions that compose it. The function returns $1$ if the parity is odd
-> and $0$ otherwise. By default `parity` will uses the cycle decomposition if
-> it is already available, but will not compute it on demand. If You intend to
-> use parity, or the cycle decomposition of a permutation later You may force
-> `parity` to compute the cycle structure by calling
-> `parity(a, Val{:cycles})``.
+> transpositions in any decomposition of `g` into transpositions.
+>
+> `parity` returns $1$ if the number is odd and $0$ otherwise. `parity` uses
+> cycle decomposition of `g` if already available, but will not compute
+> it on demand. Since cycle structure is cached in `g` You may call
+> `cycles(g)` before calling `parity`.
+
+# Examples:
+```jldoctest
+julia> g = perm([3,4,1,2,5])
+(1,3)(2,4)
+
+julia> parity(g)
+0
+
+julia> g = perm([3,4,5,2,1,6])
+(1,3,5)(2,4)
+
+julia> parity(g)
+1
+```
 """
 # TODO: 2x slower than Flint
 function parity(a::perm{T}) where T
@@ -97,16 +112,33 @@ function parity(a::perm, ::Type{Val{:cycles}})
 end
 
 doc"""
-    sign(a::perm)
-> Returns the sign of the given permutations, i.e. `1` if `a` is even and `-1`
-> if `a` is odd.
-"""
-sign(a::perm{T}) where T = (-one(T))^parity(a)
+    sign(g::perm)
+> Return the sign of permutation.
+>
+> `sign` returns $1$ if `g` is even and $-1$ if `g` is odd. `sign` represents
+> the homomorphism from the permutation group to the unit group of $\mathbb{Z}$
+> whose kernel is the alternating group.
 
 function sign(a::perm, ::Type{Val{:cycles}})
    cycles(a)
    return sign(a)
 end
+# Examples:
+```jldoctest
+julia> g = perm([3,4,1,2,5])
+(1,3)(2,4)
+
+julia> sign(g)
+1
+
+julia> g = perm([3,4,5,2,1,6])
+(1,3,5)(2,4)
+
+julia> sign(g)
+-1
+```
+"""
+sign(g::perm{T}) where T = (-one(T))^parity(g)
 
 ###############################################################################
 #
@@ -143,8 +175,26 @@ function Base.show(io::IO, cd::CycleDec)
 end
 
 doc"""
-    cycles(a::perm)
-> Decomposes permutation into disjoint cycles.
+    cycles(g::perm)
+> Decompose permutation `g` into disjoint cycles.
+>
+> Returns a `CycleDec` object which iterates over disjoint cycles of `g`. The
+> ordering of cycles is not guaranteed, and the order within each cycle is
+> computed up to a cyclic permutation.
+> The cycle decomposition is cached in `g` and used in future computation of
+> `permtype`, `parity`, `sign`, `order` and `^` (powering).
+
+# Examples:
+```jldoctest
+julia> g = perm([3,4,5,2,1,6])
+(1,3,5)(2,4)
+
+julia> collect(cycles(g))
+3-element Array{Array{Int64,1},1}:
+ [1, 3, 5]
+ [2, 4]
+ [6]
+```
 """
 function cycles(a::perm{T}) where T<:Integer
    if !isdefined(a, :cycles)
