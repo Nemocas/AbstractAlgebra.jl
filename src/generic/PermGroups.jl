@@ -36,14 +36,8 @@ parent(g::perm{T}) where T = PermGroup(T(length(g.d)))
 #
 ###############################################################################
 
-function Base.hash(a::perm, h::UInt)
-   b = 0x595dee0e71d271d0%UInt
-   for i in 1:length(a.d)
-      b = xor(b, xor(hash(a[i], h), h))
-      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
-   end
-   return b
-end
+# hash(perm) = 0x0d9939c64ab650ca
+Base.hash(g::perm, h::UInt) = xor(hash(g.d, h), 0x0d9939c64ab650ca)
 
 function getindex(a::perm, n::Integer)
    return a.d[n]
