@@ -260,30 +260,51 @@ end
 const _perm_display_style = PermDisplayStyle(:array)
 
 doc"""
-    setpermstyle(format::Symbol)
-> Nemo can display (in REPL or in general as string) permutations by either
-> array of integers whose `n`-th position represents the value at `n`, or as
-> disjoint cycles, where the value of the permutation at `n` is represented as
-> the entry immediately following `n` in a cycle.
-> The style can be switched by calling `setpermstyle` with `:array` or
-> `:cycles` argument.
+    setpermstyle(format)
+> AbstractAlgebra can display (in REPL or in general as string) permutations by
+> either vectors of integers whose $n$-th position represents the value at $n$
+> (e.g. `[2, 3, 1, 5, 4]`), or as, more familiar for mathematicians,
+> decomposition into disjoint cycles (e.g. `(1,2,3)(4,5)`), where the value of
+> the permutation at $n$ is represented by the entry immediately following $n$
+> in a cycle. Cycles of length $1$ are omitted in the output.
+> The style can be switched by calling `setpermstyle` with `format=:array` or
+> `format=:cycles` (the default).
+
+# Examples:
+```jldoctest
+julia> setpermstyle(:array)
+:array
+
+julia> perm([2,3,1,5,4])
+[2, 3, 1, 5, 4]
+
+julia> setpermstyle(:cycles)
+:cycles
+
+julia> perm([2,3,1,5,4])
+(1,2,3)(4,5)
+```
 """
+setpermstyle() = _perm_display_style.format
+
 function setpermstyle(format::Symbol)
-   format in (:array, :cycles) || throw("Permutations can be displayed
-   only as :array or :cycles.")
-   _perm_display_style.format = format
+   if format in (:array, :cycles)
+      _perm_display_style.format = format
+   else
+      throw("Permutations can be displayed only as :array or :cycles.")
+   end
    return format
 end
 
-function show(io::IO, a::perm)
+function show(io::IO, g::perm)
    if _perm_display_style.format == :array
-      print(io, "[" * join(a.d, ", ") * "]")
+      print(io, "[" * join(g.d, ", ") * "]")
    elseif _perm_display_style.format == :cycles
-      if a == parent(a)()
+      cd = cycles(g)
+      if g == parent(g)()
          print(io, "()")
       else
-         print(io, join(["("*join(c, ",")*")" for c in cycles(a) if
-            length(c)>1],""))
+         print(io, join(["("*join(c, ",")*")" for c in cd if length(c)>1],""))
       end
    end
 end
