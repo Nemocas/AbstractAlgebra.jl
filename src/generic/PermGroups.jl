@@ -106,11 +106,6 @@ function parity(a::perm{T}) where T
    return T(parity)
 end
 
-function parity(a::perm, ::Type{Val{:cycles}})
-   cycles(a)
-   return parity(a)
-end
-
 doc"""
     sign(g::perm)
 > Return the sign of permutation.
@@ -119,10 +114,6 @@ doc"""
 > the homomorphism from the permutation group to the unit group of $\mathbb{Z}$
 > whose kernel is the alternating group.
 
-function sign(a::perm, ::Type{Val{:cycles}})
-   cycles(a)
-   return sign(a)
-end
 # Examples:
 ```jldoctest
 julia> g = perm([3,4,1,2,5])
