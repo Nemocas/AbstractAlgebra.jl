@@ -359,6 +359,18 @@ doc"""
 >
 > Permutation groups on the same number of letters, but parametrized
 > by different integer types are considered different.
+
+# Examples:
+```
+julia> G = PermGroup(UInt(5))
+Permutation group over 5 elements
+
+julia> H = PermGroup(5)
+Permutation group over 5 elements
+
+julia> G == H
+false
+```
 """
 ==(G::PermGroup, H::PermGroup) = typeof(G) == typeof(H) && G.n == H.n
 
@@ -605,6 +617,24 @@ doc"""
     matrix_repr(a::perm)
 > Return the permutation matrix as sparse matrix representing `a` via natural
 > embedding of the permutation group into general linear group over $\mathbb{Z}$.
+
+# Examples:
+```jldoctest
+julia> p = perm([2,3,1])
+(1,2,3)
+
+julia> matrix_repr(p)
+3×3 SparseMatrixCSC{Int64,Int64} with 3 stored entries:
+  [3, 1]  =  1
+  [1, 2]  =  1
+  [2, 3]  =  1
+
+julia> full(ans)
+3×3 Array{Int64,2}:
+ 0  1  0
+ 0  0  1
+ 1  0  0
+```
 """
 matrix_repr(a::perm{T}) where T = sparse(collect(T, 1:length(a.d)), a.d, ones(T,length(a.d)))
 
@@ -614,6 +644,15 @@ doc"""
 >
 > This corresponds to the natural embedding of $S_k$ into $S_n$ as the
 > subgroup permuting points indexed by `V`.
+
+# Examples:
+```jldoctest
+julia> p = perm([2,1,4,3])
+(1,2)(3,4)
+
+julia> Generic.emb!(perm(collect(1:5)), p, [3,1,4,5])
+(1,3)(4,5)
+```
 """
 function emb!(result::perm, p::perm, V)
    result.d[V] = (result.d[V])[p.d]
@@ -624,6 +663,17 @@ doc"""
     emb(G::PermGroup, V::Vector{Int})
 > Return the natural embedding of a permutation group into `G` as the
 > subgroup permuting points indexed by `V`.
+
+# Examples:
+```jldoctest
+julia> p = perm([2,3,1])
+(1,2,3)
+
+julia> f = Generic.emb(PermGroup(5), [3,2,5]);
+
+julia> f(p)
+(2,5,3)
+```
 """
 function emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
    if check
