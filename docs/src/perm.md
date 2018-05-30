@@ -93,7 +93,10 @@ parent_type(::perm)
 ```
 
 A custom implementation also needs to implement `hash(::perm, ::UInt)` and (possibly) `deepcopy_internal(::perm, ::ObjectIdDict)`.
-Note that permutation group elements are mutable and so returning shallow copies is not sufficient.
+
+!!! note
+
+    Permutation group elements are mutable and so returning shallow copies is not sufficient.
 
 ```julia
 getindex(a::perm, n::Int)
@@ -107,8 +110,10 @@ setindex!(a::perm, d::Int, n::Int)
 ```
 
 Set the $n$-th entry of the given permutation to $d$.
-This allows Julia to provide the syntax `a[n] = d` for setting entries of a permuation.
-Note that entries are $1$-indexed.
+This allows Julia to provide the syntax `a[n] = d` for setting entries of a permutation. Entries are $1$-indexed.
+
+!!! note
+    Using `setindex!` invalidates cycle decomposition cached in a permutation, i.e. it will be computed the next time cycle decomposition is needed.
 
 Given the parent object `G` for a permutation group, the following coercion functions are provided to coerce various arguments into the permutation group.
 Developers provide these by overloading the permutation group parent objects.
@@ -141,10 +146,7 @@ Numerous functions are provided to manipulate permutation group elements.
 cycles(::perm)
 ```
 
-Cycle structure is stored in a permutation, since once available, it provides a convenient shortcut in many other algorithms.
-
-**WARNING:** You should never modify a permutation (e.g. via `setindex`) for which cycle structure has been already computed.
-Cycle decomposition is computed once for the lifetime of a permutation.
+Cycle structure is cached in a permutation, since once available, it provides a convenient shortcut in many other algorithms.
 
 ```@docs
 parity(::perm)
@@ -165,7 +167,7 @@ Iteration over all permutations in the permutation group $S_n$ can be achieved w
 elements(::PermGroup)
 ```
 Iteration in reasonable time (i.e. in terms of minutes) is possible for $S_n$ when $n ≤ 13$.
-You may also use the non-allocating `Generic.elements!(::PermGroup)` for $n = 14$ (or even $15$ if You are patient enough), which is an order of mangitude faster, since all permutations are generated "in-place":
+You may also use the non-allocating `Generic.elements!(::PermGroup)` for $n ≤ 14$ (or even $15$ if you are patient enough), which is an order of mangitude faster. However, since all permutations yielded by `elements!` are aliased (modified "in-place"), `collect(Generic.elements!(PermGroup(n)))` returns a vector of identical permutations:
 
 ```jldoctest
 julia> collect(elements(PermGroup(3)))
@@ -177,33 +179,21 @@ julia> collect(elements(PermGroup(3)))
  (1,2,3)
  (1,3)
 
-julia> for p in Generic.elements!(PermGroup(3)); println(p.d); end
-[1, 2, 3]
-[2, 1, 3]
-[3, 1, 2]
-[1, 3, 2]
-[2, 3, 1]
-[3, 2, 1]
-```
-
-However, `collect(Generic.elements!(PermGroup(n)))` returns a vector of identical permutations:
-
-```jldoctest
-julia> A = collect(Generic.elements!(PermGroup(3))); length(A)
-6
+julia> A = collect(Generic.elements!(PermGroup(3))); A
+6-element Array{AbstractAlgebra.Generic.perm{Int64},1}:
+ (1,3)
+ (1,3)
+ (1,3)
+ (1,3)
+ (1,3)
+ (1,3)
 
 julia> unique(A)
 1-element Array{AbstractAlgebra.Generic.perm{Int64},1}:
  (1,3)
 ```
-If You intend to use or store elements yielded by `elements!` You need to **copy** them explicitely.
-Note be careful not to use `cycles` and `elements!`, as the cycle structue will be computed only for the first element.
-```julia
-for p in Generic.elements!(PermGroup(3))
-   cycles(p)
-end
-```
-will compute cycle decomposition exactly **once**.
+!!! note
+    If you intend to use or store elements yielded by `elements!` you need to **deepcopy** them explicitely.
 
 ## Arithmetic operators
 
