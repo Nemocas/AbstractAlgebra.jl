@@ -45,6 +45,7 @@ end
 
 function setindex!(g::perm, v::Integer, n::Integer)
    g.d[n] = v
+   g.modified = true
 end
 
 Base.promote_rule(::Type{perm{I}}, ::Type{perm{J}}) where {I,J} =
@@ -86,7 +87,7 @@ julia> parity(g)
 ```
 """
 function parity(g::perm{T}) where T
-   if isdefined(g, :cycles)
+   if isdefined(g, :cycles) && !g.modified
       return T(sum([(length(c)+1)%2 for c in cycles(g)])%2)
    end
    to_visit = trues(g.d)
@@ -187,7 +188,7 @@ julia> collect(cycles(g))
 ```
 """
 function cycles(g::perm{T}) where T<:Integer
-   if !isdefined(g, :cycles)
+   if !isdefined(g, :cycles) || g.modified
       ccycles, cptrs = cycledec(g.d)
       g.cycles = CycleDec{T}(ccycles, cptrs, length(cptrs)-1)
    end
@@ -493,13 +494,15 @@ function inv(g::perm)
    return perm(d, false)
 end
 
-# TODO: can we do that in place??
+# TODO: See M. Robertson, Inverting Permutations In Place
+# n+O(log^2 n) space, O(n*log n) time
 function inv!(a::perm)
    d = similar(a.d)
    @inbounds for i in 1:length(d)
       d[a[i]] = i
    end
    a.d = d
+   a.modified = true
    return a
 end
 

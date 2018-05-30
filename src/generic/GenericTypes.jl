@@ -58,6 +58,7 @@ doc"""
 > The type of permutations.
 > Fieldnames:
 > * `d::Vector{T}` - vector representing the permutation
+> * `modified::Bool` - bit to check the validity of cycle decomposition
 > * `cycles::CycleDec{T}` - (cached) cycle decomposition
 >
 > Permutation $p$ consists of a vector (`p.d`) of $n$ integers from $1$ to $n$.
@@ -86,10 +87,11 @@ AbstractAlgebra.Generic.perm{Int32}
 """
 mutable struct perm{T<:Integer} <: AbstractAlgebra.GroupElem
    d::Array{T, 1}
+   modified::Bool
    cycles::CycleDec{T}
 
    function perm(n::T) where T<:Integer
-      return new{T}(collect(T, 1:n))
+      return new{T}(collect(T, 1:n), false)
    end
 
    function perm(v::Vector{T}, check::Bool=true) where T<:Integer
@@ -97,7 +99,7 @@ mutable struct perm{T<:Integer} <: AbstractAlgebra.GroupElem
          Set(v) != Set(1:length(v)) && error("Unable to coerce to permutation:
          non-unique elements in array")
       end
-      return new{T}(v)
+      return new{T}(v, false)
    end
 end
 
