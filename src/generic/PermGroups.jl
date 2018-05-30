@@ -68,7 +68,7 @@ doc"""
 >
 > `parity` returns $1$ if the number is odd and $0$ otherwise. `parity` uses
 > cycle decomposition of `g` if already available, but will not compute
-> it on demand. Since cycle structure is cached in `g` You may call
+> it on demand. Since cycle structure is cached in `g` you may call
 > `cycles(g)` before calling `parity`.
 
 # Examples:
@@ -231,7 +231,7 @@ doc"""
 > Return the type of permutation `g`, i.e. lengths of disjoint cycles in cycle
 > decomposition of `g`.
 >
-> The lengths are sorted in reverse order by default. `permtype(g)` fully
+> The lengths are sorted in decreasing order by default. `permtype(g)` fully
 > determines the conjugacy class of `g`.
 
 # Examples:
@@ -399,7 +399,7 @@ doc"""
 > Return the $n$-th power of a permutation `g`.
 >
 > By default `g^n` is computed by cycle decomposition of `g` if `n > 3`.
-> Generic.power_by_squaring` provides a different method for powering which
+> `Generic.power_by_squaring` provides a different method for powering which
 > may or may not be faster, depending on the particuar case. Due to caching of
 > the cycle structure, repeated powering of `g` will be faster with the default
 > method.
@@ -550,8 +550,8 @@ doc"""
 >
 > This uses the non-recursive [Heaps algorithm](https://en.wikipedia.org/wiki/Heap's_algorithm).
 > You may use `collect(elements(G))` to get a vector of all elements.
-> A non-allocating version is provided as `elements!(::PermGroup)` for
-> iteration as well, but You need to explicitely `deepcopy` permutations
+> A non-allocating version is provided as `Generic.elements!(::PermGroup)` for
+> iteration as well, but you need to explicitely `deepcopy` permutations
 > intended to be stored or modified.
 
 # Examples:
@@ -591,8 +591,8 @@ doc"""
     order(a::perm)
 > Return the order of permutation `a` as `BigInt`.
 >
-> If You are sure that computation over `T` (or its `Int` promotion) will not
-> overflow You may use the method `order(T::Type, a::perm)` which bypasses
+> If you are sure that computation over `T` (or its `Int` promotion) will not
+> overflow you may use the method `order(T::Type, a::perm)` which bypasses
 > computation with BigInts and returns `promote(T, Int)`.
 """
 order(a::perm) = order(BigInt, a)
@@ -604,7 +604,7 @@ end
 doc"""
     matrix_repr(a::perm)
 > Return the permutation matrix as sparse matrix representing `a` via natural
-> embedding of the permutation group into general linear group over ZZ
+> embedding of the permutation group into general linear group over $\mathbb{Z}$.
 """
 matrix_repr(a::perm{T}) where T = sparse(collect(T, 1:length(a.d)), a.d, ones(T,length(a.d)))
 
@@ -635,7 +635,7 @@ end
 
 doc"""
     rand(G::PermGroup)
-> Return a random element from group `G`.
+> Return a random permutation from `G`.
 """
 rand(G::PermGroup{T}) where T = perm(randperm(G.n), false)
 
