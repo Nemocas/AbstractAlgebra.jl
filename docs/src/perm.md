@@ -153,7 +153,7 @@ parity(::perm)
 sign(::perm)
 permtype(::perm)
 order(::perm)
-order(::PermGroup)
+order(::Generic.PermGroup)
 ```
 
 Note that even an `Int64` can be easily overflowd when computing with permutation groups.
@@ -164,7 +164,7 @@ Julias standard promotion rules apply for the returned value.
 Iteration over all permutations in the permutation group $S_n$ can be achieved with
 
 ```@docs
-elements(::PermGroup)
+elements(::Generic.PermGroup)
 ```
 Iteration in reasonable time (i.e. in terms of minutes) is possible for $S_n$ when $n ≤ 13$.
 You may also use the non-allocating `Generic.elements!(::PermGroup)` for $n ≤ 14$ (or even $15$ if you are patient enough), which is an order of mangitude faster. However, since all permutations yielded by `elements!` are aliased (modified "in-place"), `collect(Generic.elements!(PermGroup(n)))` returns a vector of identical permutations:
@@ -254,14 +254,14 @@ turns a cycle decomposition object into a permutation.
 
 ```@docs
 ==(::perm, ::perm)
-==(::PermGroup, ::PermGroup)
+==(::Generic.PermGroup, ::Generic.PermGroup)
 ```
 
 ## Misc
 ```@docs
-rand(::PermGroup)
+rand(::Generic.PermGroup)
 Generic.matrix_repr(::perm)
-Generic.emb(::PermGroup, ::Vector{Int}, ::Bool)
+Generic.emb(::Generic.PermGroup, ::Vector{Int}, ::Bool)
 Generic.emb!(::perm, ::perm, V)
 ```
 
