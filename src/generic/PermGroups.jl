@@ -153,7 +153,7 @@ function Base.getindex(cd::CycleDec, n::Int)
    return cd.ccycles[cd.cptrs[n]:cd.cptrs[n+1]-1]
 end
 
-Base.getindex(cd::CycleDec, i::Number) = S[convert(Int, i)]
+Base.getindex(cd::CycleDec, i::Number) = cd[convert(Int, i)]
 Base.getindex(cd::CycleDec, I) = [cd[i] for i in I]
 
 Base.length(cd::CycleDec) = cd.n
