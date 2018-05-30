@@ -28,9 +28,9 @@ function test_perm_constructors(types)
 
       z = T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8]
 
-      @test R(z) isa GroupElem
-      @test R(z) isa Generic.perm{T}
-      b = R(z)
+      @test G(z) isa GroupElem
+      @test G(z) isa Generic.perm{T}
+      b = G(z)
       @test typeof(b) == Generic.perm{T}
       @test parent_type(typeof(b)) == Generic.PermGroup{T}
       @test parent(b) == G
@@ -40,7 +40,7 @@ function test_perm_constructors(types)
       @test parent(g) == G
       @test parent(g) == PermutationGroup(T(10))
 
-      @test convert(Vector{T}, R(z)) == z
+      @test convert(Vector{T}, G(z)) == z
 
       if T != Int
          @test parent(g) != PermutationGroup(10)
