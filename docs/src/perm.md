@@ -5,11 +5,11 @@ DocTestSetup = quote
 end
 ```
 
-AbstractAlgebra.jl provides rudimentary native support for permutation groups (implemented in `src/generic/PermGroups.jl`) and their characters through Young Tableaux (`src/generic/YoungTabs.jl`).
-
 # Permutations and Permutation groups
 
-Permutations in AbstractAlgebra.jl are represented internally via vector (list) of integers, wrapped in type `perm{T}`, where `T<:Integer` carries the information on the type of elements of a permutation. Permutation groups are singleton parent object of type `PermGroup{T}` and are used mostly to store the length of a permutation, since it is not included in the permutation type.
+AbstractAlgebra.jl provides rudimentary native support for permutation groups (implemented in `src/generic/PermGroups.jl`). All functionality of permutations is accesible in the `Generic` submodule.
+
+Permutations are represented internally via vector of integers, wrapped in type `perm{T}`, where `T<:Integer` carries the information on the type of elements of a permutation. Permutation groups are singleton parent objects of type `PermGroup{T}` and are used mostly to store the length of a permutation, since it is not included in the permutation type.
 
 Permutation groups are created using the `PermGroup` (inner) constructor.
 However, for convenience we define
@@ -18,17 +18,10 @@ PermutationGroup = PermGroup
 ```
 so that permutation groups can be created using `PermutationGroup` instead of `PermGroup`.
 
-The types of permutations in AbstractAlgebra.jl are given by the following table, along with
-the libraries that provide them and the associated types of the parent objects.
-
- Library | Group                          | Element type  | Parent type
----------|--------------------------------|---------------|---------------------
-Native   | $S_n$                          | `perm`        | `PermGroup`
-
 Both `PermGroup` and `perm` and can be parametrized by any type `T<:Integer` .
 By default the parameter is the `Int`-type native to the systems architecture.
-However, if You are sure that Your permutations are small enough to fit into smaller integer type (such as `Int32`, `Uint16`, or even `Int8`), You may choose to change the paramtrizing type accordingly.
-In practice this may result in decreased memory footprint (when storing multiple permutations) and noticable faster performance, if Your workload is heavy in operations on permutations, which e.g. does not fit into cache of Your cpu.
+However, if you are sure that your permutations are small enough to fit into smaller integer type (such as `Int32`, `Uint16`, or even `Int8`), you may choose to change the parametrizing type accordingly.
+In practice this may result in decreased memory footprint (when storing multiple permutations) and noticable faster performance, if your workload is heavy in operations on permutations, which e.g. does not fit into cache of your cpu.
 
 All the permutation group types belong to the `Group` abstract type and the corresponding permutation element types belong to the `GroupElem` abstract type.
 
@@ -40,11 +33,13 @@ setpermstyle
 
 There are several methods to to construct permutations in AbstractAlgebra.jl.
 
-* Since the parent object can be reconstructed from the permutation object, the easiest way is to directly call to `perm` constructor:
+* The easiest way is to directly call to the `perm` (inner) constructor:
 
 ```@docs
 Generic.perm
 ```
+
+  Since the parent object can be reconstructed from the permutation itself, you can work with permutations without explicitely constructing the parent object.
 
 * The other way is to first construct the permutation group they belong to.
   This is accomplished with the inner constructor `PermGroup(n::Integer)` which
