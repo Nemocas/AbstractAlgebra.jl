@@ -156,9 +156,9 @@ order(::perm)
 order(::Generic.PermGroup)
 ```
 
-Note that even an `Int64` can be easily overflowd when computing with permutation groups.
+Note that even an `Int64` can be easily overflowed when computing with permutation groups.
 Thus, by default, `order` returns (always correct) `BigInt`s.
-If You are sure that the computation will not overflow, You may use `order(::Type{T}, ...)` to perform computations with machine integers.
+If you are sure that the computation will not overflow, you may use `order(::Type{T}, ...)` to perform computations with machine integers.
 Julias standard promotion rules apply for the returned value.
 
 Iteration over all permutations in the permutation group $S_n$ can be achieved with
@@ -217,38 +217,38 @@ AbstractAlgebra.Generic.perm{Int64}
 ## Coercion
 
 The following coercions are available for `G::PermGroup` parent objects.
-Each of the method performs basic sanity checks on the input which can be switched off by the second argument.
+Each of the methods perform basic sanity checks on the input which can be switched off by the second argument.
 
 ```julia
 (G::PermGroup)()
 ```
-returns the identity element of `G`.
+> Return the identity element of `G`.
 
 
 ```julia
 (G::PermGrup)(::Vector{<:Integer}[, check=true])
 ```
-turns a vector od integers into a permutation (performing conversion, if necessary).
+> Turn a vector od integers into a permutation (performing conversion, if necessary).
 
 
 ```julia
 (G::PermGroup)(::perm{<:Integer}[, check=true])
 ```
-coerces a permutation `p` into group $G$ (performing the conversion, if necessary).
-If `p` is already an element of `G` no copy is performed.
+> Coerce a permutation `p` into group $G$ (performing the conversion, if necessary).
+> If `p` is already an element of `G` no copy is performed.
 
 ```julia
 (G::PermGroup)(::String[, check=true])
 ```
-parses the string input e.g. copied from the output of GAP.
-The method is the same as `perm"..."` macro.
-The string is sanitized and checked for disjoint cycles.
-Both `string(p)` (if `setpermstyle(:cycles)`) and `string(cycles(p))` are valid input for this method.
+> Parse the string input e.g. copied from the output of GAP.
+> The method uses the same logic as `perm"..."` macro.
+> The string is sanitized and checked for disjoint cycles.
+> Both `string(p::perm)` (if `setpermstyle(:cycles)`) and `string(cycles(p::perm))` are valid input for this method.
 
 ```julia
 (G::PermGroup{T})(::CycleDec{T}[, check=true]) where T
 ```
-turns a cycle decomposition object into a permutation.
+> Turn a cycle decomposition object into a permutation.
 
 ## Comparison
 
