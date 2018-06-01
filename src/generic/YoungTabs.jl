@@ -58,22 +58,6 @@ end
 #
 ##############################################################################
 
-# Implemented following RuleAsc (Algorithm 3.1) from
-#    "Generating All Partitions: A Comparison Of Two Encodings"
-# by Jerome Kelleher and Barry O’Sullivan, ArXiv:0909.2331
-
-function Base.start(parts::AllParts)
-    if parts.n < 1
-        return (Int[], 0)
-    elseif parts.n == 1
-        return ([1], 0)
-    else
-        p = zeros(Int, parts.n)
-        p[2] = parts.n
-        return (p, 2)
-    end
-end
-
 const _numPartsTable = Dict{Int, Int}(0 => 1, 1 => 1, 2 => 2)
 const _numPartsTableBig = Dict{Int, BigInt}()
 
@@ -110,14 +94,31 @@ function _numpart(n::T, lookuptable::Dict{Int, T}) where T<:Integer
    return lookuptable[n]
 end
 
-Base.next(parts::AllParts, state) = nextpart_asc(state...)
-Base.done(parts::AllParts, state) = state[2] == 1
-Base.eltype(::Type{AllParts}) = Partition
-length(parts::AllParts) = _numpart(parts.n)
+# Implemented following RuleAsc (Algorithm 3.1) from
+#    "Generating All Partitions: A Comparison Of Two Encodings"
+# by Jerome Kelleher and Barry O’Sullivan, ArXiv:0909.2331
 
-function nextpart_asc(part, k)
+function Base.start(A::AllParts)
+   if A.n < 1
+      return 0
+   elseif A.n == 1
+      A.part[1] = 1
+      return 0
+   else
+      A.part .= 0
+      A.part[2] = A.n
+      return 2
+   end
+end
+
+Base.next(A::AllParts, state) = nextpart_asc(A.part, state)
+Base.done(A::AllParts, state) = state == 1
+Base.eltype(::Type{AllParts}) = Partition
+length(A::AllParts) = _numpart(A.n)
+
+@inbounds function nextpart_asc(part, k)
     if k == 0
-        return Partition(part, false), (part, 1)
+        return Partition(part, false), 1
     end
     y = part[k] - 1
     k -= 1
@@ -128,7 +129,7 @@ function nextpart_asc(part, k)
         k += 1
     end
     part[k] = x + y
-    return Partition(reverse(part[1:k]), false), (part, k)
+    return Partition(reverse!(part[1:k]), false), k
 end
 
 doc"""

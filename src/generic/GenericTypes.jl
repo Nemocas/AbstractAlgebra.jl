@@ -98,6 +98,8 @@ doc"""
 """
 struct AllParts
     n::Int
+    part::Vector{Int}
+    AllParts(n::Integer) = new(n, zeros(Int,n))
 end
 
 ###############################################################################
