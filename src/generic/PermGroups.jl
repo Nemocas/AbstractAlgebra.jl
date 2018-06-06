@@ -191,6 +191,7 @@ function cycles(g::perm{T}) where T<:Integer
    if !isdefined(g, :cycles) || g.modified
       ccycles, cptrs = cycledec(g.d)
       g.cycles = CycleDec{T}(ccycles, cptrs, length(cptrs)-1)
+      g.modified = false
    end
    return g.cycles
 end
