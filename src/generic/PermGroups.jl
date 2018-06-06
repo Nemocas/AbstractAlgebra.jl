@@ -44,8 +44,9 @@ function getindex(g::perm, n::Integer)
 end
 
 function setindex!(g::perm, v::Integer, n::Integer)
-   g.d[n] = v
    g.modified = true
+   g.d[n] = v
+   return g
 end
 
 Base.promote_rule(::Type{perm{I}}, ::Type{perm{J}}) where {I,J} =

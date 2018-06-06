@@ -151,10 +151,11 @@ function test_perm_basic_manipulation(types)
 
       @test length(unique([c,deepcopy(c)])) == 1
 
+      @test setindex!(a, 5, 2) isa perm
+      @test a[2] == T(5)
+
       a[1] = T(5)
       @test a[1] == T(5)
-      @test setindex!(a, 5, 1) == T(5)
-
    end
 
    println("PASS")
