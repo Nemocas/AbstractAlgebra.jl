@@ -4,15 +4,31 @@
 #
 ###############################################################################
 
+doc"""
+    parent_type(::Type{perm{T}})
+> Return the type of the parent of a permutation.
+"""
 parent_type(::Type{perm{T}}) where T = PermGroup{T}
 
+doc"""
+    elem_type(::Type{PermGroup{T}})
+> Return the type of elements of a permutation group.
+"""
 elem_type(::Type{PermGroup{T}}) where T = perm{T}
 
 doc"""
-    parent(a::perm)
-> Return the parent of the given permutation group element.
+    parent(g::perm)
+> Return the parent of the permutation `g`.
+
+```jldoctest
+julia> G = PermutationGroup(5); g = perm([3,4,5,2,1])
+(1,3,5)(2,4)
+
+julia> parent(g) == G
+true
+```
 """
-parent(a::perm{T}) where T = PermGroup(T(length(a.d)))
+parent(g::perm{T}) where T = PermGroup(T(length(g.d)))
 
 ###############################################################################
 #
@@ -20,25 +36,17 @@ parent(a::perm{T}) where T = PermGroup(T(length(a.d)))
 #
 ###############################################################################
 
-function deepcopy_internal(a::perm, dict::ObjectIdDict)
-   return perm(deepcopy(a.d), false)
+# hash(perm) = 0x0d9939c64ab650ca
+Base.hash(g::perm, h::UInt) = xor(hash(g.d, h), 0x0d9939c64ab650ca)
+
+function getindex(g::perm, n::Integer)
+   return g.d[n]
 end
 
-function Base.hash(a::perm, h::UInt)
-   b = 0x595dee0e71d271d0%UInt
-   for i in 1:length(a.d)
-      b = xor(b, xor(hash(a[i], h), h))
-      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
-   end
-   return b
-end
-
-function getindex(a::perm, n::Integer)
-   return a.d[n]
-end
-
-function setindex!(a::perm, v::Integer, n::Integer)
-   a.d[n] = v
+function setindex!(g::perm, v::Integer, n::Integer)
+   g.modified = true
+   g.d[n] = v
+   return g
 end
 
 Base.promote_rule(::Type{perm{I}}, ::Type{perm{J}}) where {I,J} =
@@ -55,52 +63,74 @@ convert(::Type{Vector{T}}, p::perm{T}) where {T} = p.d
 ###############################################################################
 
 doc"""
-    parity(a::perm)
+    parity(g::perm)
 > Return the parity of the given permutation, i.e. the parity of the number of
-> transpositions that compose it. The function returns $1$ if the parity is odd
-> and $0$ otherwise. By default `parity` will uses the cycle decomposition if
-> it is already available, but will not compute it on demand. If You intend to
-> use parity, or the cycle decomposition of a permutation later You may force
-> `parity` to compute the cycle structure by calling
-> `parity(a, Val{:cycles})``.
+> transpositions in any decomposition of `g` into transpositions.
+>
+> `parity` returns $1$ if the number is odd and $0$ otherwise. `parity` uses
+> cycle decomposition of `g` if already available, but will not compute
+> it on demand. Since cycle structure is cached in `g` you may call
+> `cycles(g)` before calling `parity`.
+
+# Examples:
+```jldoctest
+julia> g = perm([3,4,1,2,5])
+(1,3)(2,4)
+
+julia> parity(g)
+0
+
+julia> g = perm([3,4,5,2,1,6])
+(1,3,5)(2,4)
+
+julia> parity(g)
+1
+```
 """
-# TODO: 2x slower than Flint
-function parity(a::perm{T}) where T
-   if isdefined(a, :cycles)
-      return T(sum([(length(c)+1)%2 for c in cycles(a)])%2)
+function parity(g::perm{T}) where T
+   if isdefined(g, :cycles) && !g.modified
+      return T(sum([(length(c)+1)%2 for c in cycles(g)])%2)
    end
-   to_visit = trues(a.d)
+   to_visit = trues(g.d)
    parity = false
    k = 1
    @inbounds while any(to_visit)
       k = findnext(to_visit, k)
       to_visit[k] = false
-      next = a[k]
+      next = g[k]
       while next != k
          parity = !parity
          to_visit[next] = false
-         next = a[next]
+         next = g[next]
       end
    end
    return T(parity)
 end
 
-function parity(a::perm, ::Type{Val{:cycles}})
-   cycles(a)
-   return parity(a)
-end
-
 doc"""
-    sign(a::perm)
-> Returns the sign of the given permutations, i.e. `1` if `a` is even and `-1`
-> if `a` is odd.
-"""
-sign(a::perm{T}) where T = (-one(T))^parity(a)
+    sign(g::perm)
+> Return the sign of permutation.
+>
+> `sign` returns $1$ if `g` is even and $-1$ if `g` is odd. `sign` represents
+> the homomorphism from the permutation group to the unit group of $\mathbb{Z}$
+> whose kernel is the alternating group.
 
-function sign(a::perm, ::Type{Val{:cycles}})
-   cycles(a)
-   return sign(a)
-end
+# Examples:
+```jldoctest
+julia> g = perm([3,4,1,2,5])
+(1,3)(2,4)
+
+julia> sign(g)
+1
+
+julia> g = perm([3,4,5,2,1,6])
+(1,3,5)(2,4)
+
+julia> sign(g)
+-1
+```
+"""
+sign(g::perm{T}) where T = (-one(T))^parity(g)
 
 ###############################################################################
 #
@@ -124,7 +154,7 @@ function Base.getindex(cd::CycleDec, n::Int)
    return cd.ccycles[cd.cptrs[n]:cd.cptrs[n+1]-1]
 end
 
-Base.getindex(cd::CycleDec, i::Number) = S[convert(Int, i)]
+Base.getindex(cd::CycleDec, i::Number) = cd[convert(Int, i)]
 Base.getindex(cd::CycleDec, I) = [cd[i] for i in I]
 
 Base.length(cd::CycleDec) = cd.n
@@ -137,15 +167,34 @@ function Base.show(io::IO, cd::CycleDec)
 end
 
 doc"""
-    cycles(a::perm)
-> Decomposes permutation into disjoint cycles.
+    cycles(g::perm)
+> Decompose permutation `g` into disjoint cycles.
+>
+> Returns a `CycleDec` object which iterates over disjoint cycles of `g`. The
+> ordering of cycles is not guaranteed, and the order within each cycle is
+> computed up to a cyclic permutation.
+> The cycle decomposition is cached in `g` and used in future computation of
+> `permtype`, `parity`, `sign`, `order` and `^` (powering).
+
+# Examples:
+```jldoctest
+julia> g = perm([3,4,5,2,1,6])
+(1,3,5)(2,4)
+
+julia> collect(cycles(g))
+3-element Array{Array{Int64,1},1}:
+ [1, 3, 5]
+ [2, 4]
+ [6]
+```
 """
-function cycles(a::perm{T}) where T<:Integer
-   if !isdefined(a, :cycles)
-      ccycles, cptrs = cycledec(a.d)
-      a.cycles = CycleDec{T}(ccycles, cptrs, length(cptrs)-1)
+function cycles(g::perm{T}) where T<:Integer
+   if !isdefined(g, :cycles) || g.modified
+      ccycles, cptrs = cycledec(g.d)
+      g.cycles = CycleDec{T}(ccycles, cptrs, length(cptrs)-1)
+      g.modified = false
    end
-   return a.cycles
+   return g.cycles
 end
 
 function cycledec(v::Vector{T}) where T<:Integer
@@ -180,12 +229,38 @@ function cycledec(v::Vector{T}) where T<:Integer
 end
 
 doc"""
-    permtype(a::perm, rev=true)
-> Returns the type of permutation `a`, i.e. lengths of disjoint cycles building
-> `a`. This fully determines the conjugacy class of `a`. The lengths are sorted
-> in reverse order by default.
+    permtype(g::perm, rev=true)
+> Return the type of permutation `g`, i.e. lengths of disjoint cycles in cycle
+> decomposition of `g`.
+>
+> The lengths are sorted in decreasing order by default. `permtype(g)` fully
+> determines the conjugacy class of `g`.
+
+# Examples:
+```jldoctest
+julia> g = perm([3,4,5,2,1,6])
+(1,3,5)(2,4)
+
+julia> permtype(g)
+3-element Array{Int64,1}:
+ 3
+ 2
+ 1
+
+julia> G = PermGroup(5); e = parent(g)()
+()
+
+julia> permtype(e)
+6-element Array{Int64,1}:
+ 1
+ 1
+ 1
+ 1
+ 1
+ 1
+```
 """
-permtype(a::perm{T}) where T = sort(diff(cycles(a).cptrs), rev=true)
+permtype(g::perm) = sort(diff(cycles(g).cptrs), rev=true)
 
 ###############################################################################
 #
@@ -201,33 +276,54 @@ mutable struct PermDisplayStyle
    format::Symbol
 end
 
-const _perm_display_style = PermDisplayStyle(:array)
+const _perm_display_style = PermDisplayStyle(:cycles)
 
 doc"""
-    setpermstyle(format::Symbol)
-> Nemo can display (in REPL or in general as string) permutations by either
-> array of integers whose `n`-th position represents the value at `n`, or as
-> disjoint cycles, where the value of the permutation at `n` is represented as
-> the entry immediately following `n` in a cycle.
-> The style can be switched by calling `setpermstyle` with `:array` or
-> `:cycles` argument.
+    setpermstyle(format)
+> AbstractAlgebra can display (in REPL or in general as string) permutations by
+> either vectors of integers whose $n$-th position represents the value at $n$
+> (e.g. `[2, 3, 1, 5, 4]`), or as, more familiar for mathematicians,
+> decomposition into disjoint cycles (e.g. `(1,2,3)(4,5)`), where the value of
+> the permutation at $n$ is represented by the entry immediately following $n$
+> in a cycle. Cycles of length $1$ are omitted in the output.
+> The style can be switched by calling `setpermstyle` with `format=:array` or
+> `format=:cycles` (the default).
+
+# Examples:
+```jldoctest
+julia> setpermstyle(:array)
+:array
+
+julia> perm([2,3,1,5,4])
+[2, 3, 1, 5, 4]
+
+julia> setpermstyle(:cycles)
+:cycles
+
+julia> perm([2,3,1,5,4])
+(1,2,3)(4,5)
+```
 """
+setpermstyle() = _perm_display_style.format
+
 function setpermstyle(format::Symbol)
-   format in (:array, :cycles) || throw("Permutations can be displayed
-   only as :array or :cycles.")
-   _perm_display_style.format = format
+   if format in (:array, :cycles)
+      _perm_display_style.format = format
+   else
+      throw("Permutations can be displayed only as :array or :cycles.")
+   end
    return format
 end
 
-function show(io::IO, a::perm)
+function show(io::IO, g::perm)
    if _perm_display_style.format == :array
-      print(io, "[" * join(a.d, ", ") * "]")
+      print(io, "[" * join(g.d, ", ") * "]")
    elseif _perm_display_style.format == :cycles
-      if a == parent(a)()
+      cd = cycles(g)
+      if g == parent(g)()
          print(io, "()")
       else
-         print(io, join(["("*join(c, ",")*")" for c in cycles(a) if
-            length(c)>1],""))
+         print(io, join(["("*join(c, ",")*")" for c in cd if length(c)>1],""))
       end
    end
 end
@@ -239,18 +335,44 @@ end
 ###############################################################################
 
 doc"""
-    ==(a::perm, b::perm)
-> Return `true` if the given permutations are equal, otherwise return `false`.
+    ==(g::perm, h::perm)
+> Return `true` if permutations are equal, otherwise return `false`.
+>
 > Permutations parametrized by different integer types are considered equal if
 > they define the same permutation in the abstract permutation group.
+
+# Examples:
+```
+julia> g = perm(Int8[2,3,1])
+(1,2,3)
+
+julia> h = perm"(3,1,2)"
+(1,2,3)
+
+julia> g == h
+true
+```
 """
-==(a::perm, b::perm) = a.d == b.d
+==(g::perm, h::perm) = g.d == h.d
 
 doc"""
-    ==(G::PermGroup, b::PermGroup)
-> Return `true` if the given permutation groups are equal, otherwise return
-> `false`. Permutation groups on the same number of letters, but parametrized
+    ==(G::PermGroup, H::PermGroup)
+> Return `true` if permutation groups are equal, otherwise return `false`.
+>
+> Permutation groups on the same number of letters, but parametrized
 > by different integer types are considered different.
+
+# Examples:
+```
+julia> G = PermGroup(UInt(5))
+Permutation group over 5 elements
+
+julia> H = PermGroup(5)
+Permutation group over 5 elements
+
+julia> G == H
+false
+```
 """
 ==(G::PermGroup, H::PermGroup) = typeof(G) == typeof(H) && G.n == H.n
 
@@ -261,13 +383,13 @@ doc"""
 ###############################################################################
 
 doc"""
-    *(a::perm, b::perm)
-> Return the composition ``b ∘ a`` of two permutations.
+    *(g::perm, h::perm)
+> Return the composition ``h ∘ g`` of two permutations.
 >
-> This corresponds to the action of permutation group on the set `[1..n]` **on
-> the right** and follows the convention of GAP.
+> This corresponds to the action of permutation group on the set `[1..n]`
+> **on the right** and follows the convention of GAP.
 >
-> If `a` and `b` are parametrized by different types, the result is promoted
+> If `g` and `h` are parametrized by different types, the result is promoted
 > accordingly.
 
 # Examples:
@@ -276,40 +398,53 @@ julia> perm([2,3,1,4])*perm([1,3,4,2]) # (1,2,3)*(2,3,4)
 (1,3)(2,4)
 ```
 """
-function *(a::perm{T}, b::perm{T}) where T
-   d = similar(a.d)
+function *(g::perm{T}, h::perm{T}) where T
+   d = similar(g.d)
    @inbounds for i in 1:length(d)
-      d[i] = b[a[i]]
+      d[i] = h[g[i]]
    end
    return perm(d, false)
 end
 
-*(a::perm{S}, b::perm{T}) where {S,T} = *(promote(a,b)...)
+*(g::perm{S}, h::perm{T}) where {S,T} = *(promote(g,h)...)
 
 doc"""
-    ^(a::perm, n::Int)
-> Return the `n`-th power of a permutation `a`. By default `a^n` is computed
-> by cycle decomposition of `a`. `Generic.power_by_squaring` provides a
-> different method for powering which may or may not be faster, depending on the
-> particuar case. Due to caching of the cycle structure, repeated powering of
-> `a` should be faster with the default method. NOTE: cycle structure is not
-> computed for `n<4`.
-"""
-function ^(a::perm{T}, n::Integer) where T
-   if n < 0
-      return inv(a)^-n
-   elseif n == 0
-      return perm(T(length(a.d)))
-   elseif n == 1
-      return deepcopy(a)
-   elseif n == 2
-      return perm(a.d[a.d], false)
-   elseif n == 3
-      return perm(a.d[a.d[a.d]], false)
-   else
-      new_perm = similar(a.d)
+    ^(g::perm, n::Int)
+> Return the $n$-th power of a permutation `g`.
+>
+> By default `g^n` is computed by cycle decomposition of `g` if `n > 3`.
+> `Generic.power_by_squaring` provides a different method for powering which
+> may or may not be faster, depending on the particuar case. Due to caching of
+> the cycle structure, repeated powering of `g` will be faster with the default
+> method.
 
-      @inbounds for cycle in cycles(a)
+# Examples:
+```jldoctest
+julia> g = perm([2,3,4,5,1])
+(1,2,3,4,5)
+
+julia> g^3
+(1,4,2,5,3)
+
+julia> g^5
+()
+```
+"""
+function ^(g::perm{T}, n::Integer) where T
+   if n < 0
+      return inv(g)^-n
+   elseif n == 0
+      return perm(T(length(g.d)))
+   elseif n == 1
+      return deepcopy(g)
+   elseif n == 2
+      return perm(g.d[g.d], false)
+   elseif n == 3
+      return perm(g.d[g.d[g.d]], false)
+   else
+      new_perm = similar(g.d)
+
+      @inbounds for cycle in cycles(g)
          l = length(cycle)
          k = n % l
          for (idx,j) in enumerate(cycle)
@@ -323,30 +458,30 @@ function ^(a::perm{T}, n::Integer) where T
    end
 end
 
-function power_by_squaring(a::perm{I}, n::Integer) where {I}
+function power_by_squaring(g::perm{I}, n::Integer) where {I}
    if n < 0
-      return inv(a)^-n
+      return inv(g)^-n
    elseif n == 0
-      return perm(T(length(a.d)))
+      return perm(T(length(g.d)))
    elseif n == 1
-      return deepcopy(a)
+      return deepcopy(g)
    elseif n == 2
-      return perm(a.d[a.d], false)
+      return perm(g.d[g.d], false)
    elseif n == 3
-      return perm(a.d[a.d[a.d]], false)
+      return perm(g.d[g.d[g.d]], false)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & n) == 0
          bit >>= 1
       end
-      cache1 = deepcopy(a.d)
-      cache2 = deepcopy(a.d)
+      cache1 = deepcopy(g.d)
+      cache2 = deepcopy(g.d)
       bit >>= 1
       while bit != 0
          cache2 = cache1[cache1]
          cache1 = cache2
          if (UInt(bit) & n) != 0
-            cache1 = cache1[a.d]
+            cache1 = cache1[g.d]
          end
          bit >>= 1
       end
@@ -361,25 +496,27 @@ end
 ###############################################################################
 
 doc"""
-    inv(a::perm)
-> Return the inverse of the given permutation, i.e. the permuation $a^{-1}$
-> such that $a\circ a^{-1} = a^{-1}\circ a$ is the identity permutation.
+    inv(g::perm)
+> Return the inverse of the given permutation, i.e. the permuation $g^{-1}$
+> such that $g ∘ g^{-1} = g^{-1} ∘ g$ is the identity permutation.
 """
-function inv(a::perm)
-   d = similar(a.d)
+function inv(g::perm)
+   d = similar(g.d)
    @inbounds for i in 1:length(d)
-      d[a[i]] = i
+      d[g[i]] = i
    end
    return perm(d, false)
 end
 
-# TODO: can we do that in place??
+# TODO: See M. Robertson, Inverting Permutations In Place
+# n+O(log^2 n) space, O(n*log n) time
 function inv!(a::perm)
    d = similar(a.d)
    @inbounds for i in 1:length(d)
       d[a[i]] = i
    end
    a.d = d
+   a.modified = true
    return a
 end
 
@@ -423,14 +560,12 @@ end
 
 doc"""
     elements(G::PermGroup)
-> Returns an iterator over all elements in the group $G$. You may use
-> `collect(elements(G))` to get an array of all elements.
 > Return an iterator over all permutations in `G`.
 >
 > This uses the non-recursive [Heaps algorithm](https://en.wikipedia.org/wiki/Heap's_algorithm).
 > You may use `collect(elements(G))` to get a vector of all elements.
-> A non-allocating version is provided as `elements!(::PermGroup)` for
-> iteration as well, but You need to explicitely `deepcopy` permutations
+> A non-allocating version is provided as `Generic.elements!(::PermGroup)` for
+> iteration as well, but you need to explicitely `deepcopy` permutations
 > intended to be stored or modified.
 
 # Examples:
@@ -461,14 +596,18 @@ elements!(G::PermGroup)= (p for p in AllPerms(G.n))
 
 doc"""
     order(G::PermGroup)
-> Returns the order of the full permutation group.
+> Return the order of the full permutation group as `BigInt`.
 """
 order(G::PermGroup) = order(BigInt, G)
 order(::Type{T}, G::PermGroup) where T = factorial(T(G.n))
 
 doc"""
-    order(a::perm, outputType::Type)
-> Returns the order of permutation `a` as `T`, or its widening.
+    order(a::perm)
+> Return the order of permutation `a` as `BigInt`.
+>
+> If you are sure that computation over `T` (or its `Int` promotion) will not
+> overflow you may use the method `order(T::Type, a::perm)` which bypasses
+> computation with BigInts and returns `promote(T, Int)`.
 """
 order(a::perm) = order(BigInt, a)
 function order(::Type{T}, a::perm) where T
@@ -479,38 +618,76 @@ end
 doc"""
     matrix_repr(a::perm)
 > Return the permutation matrix as sparse matrix representing `a` via natural
-> embedding of the permutation group into general linear group over ZZ
+> embedding of the permutation group into general linear group over $\mathbb{Z}$.
+
+# Examples:
+```jldoctest
+julia> p = perm([2,3,1])
+(1,2,3)
+
+julia> matrix_repr(p)
+3×3 SparseMatrixCSC{Int64,Int64} with 3 stored entries:
+  [3, 1]  =  1
+  [1, 2]  =  1
+  [2, 3]  =  1
+
+julia> full(ans)
+3×3 Array{Int64,2}:
+ 0  1  0
+ 0  0  1
+ 1  0  0
+```
 """
 matrix_repr(a::perm{T}) where T = sparse(collect(T, 1:length(a.d)), a.d, ones(T,length(a.d)))
 
-
 doc"""
-    emb!(result::perm, p::perm, V::Vector{Int})
-> Embedds permutation `p` into permutation `result` on the indices given by `V`. This
-> corresponds to natural embedding of $S_k$ into $S_n$ as the subgroup
-> permuting points indexed by `V`.
+    emb!(result::perm, p::perm, V)
+> Embed permutation `p` into permutation `result` on the indices given by `V`.
+>
+> This corresponds to the natural embedding of $S_k$ into $S_n$ as the
+> subgroup permuting points indexed by `V`.
+
+# Examples:
+```jldoctest
+julia> p = perm([2,1,4,3])
+(1,2)(3,4)
+
+julia> Generic.emb!(perm(collect(1:5)), p, [3,1,4,5])
+(1,3)(4,5)
+```
 """
-function emb!(result::perm, p::perm, V::Vector{Int})
-    result.d[V] = (result.d[V])[p.d]
-    return result
+function emb!(result::perm, p::perm, V)
+   result.d[V] = (result.d[V])[p.d]
+   return result
 end
 
 doc"""
     emb(G::PermGroup, V::Vector{Int})
-> Returns the natural embedding of a permutation group into `G` as the
+> Return the natural embedding of a permutation group into `G` as the
 > subgroup permuting points indexed by `V`.
+
+# Examples:
+```jldoctest
+julia> p = perm([2,3,1])
+(1,2,3)
+
+julia> f = Generic.emb(PermGroup(5), [3,2,5]);
+
+julia> f(p)
+(2,5,3)
+```
 """
 function emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
    if check
       @assert length(Base.Set(V)) == length(V)
       @assert all(V .<= G.n)
    end
-   return p -> Nemo.emb!(G(), p, V)
+   return p -> Generic.emb!(G(), p, V)
 end
 
 doc"""
     rand(G::PermGroup)
-> Returns a random element from group `G`.
+> Return a random permutation from `G`.
 """
 rand(G::PermGroup{T}) where T = perm(randperm(G.n), false)
 
@@ -523,6 +700,9 @@ rand(G::PermGroup{T}) where T = perm(randperm(G.n), false)
 (G::PermGroup)() = perm(G.n)
 
 function (G::PermGroup{T})(a::Vector{T}, check::Bool=true) where T<:Integer
+   if check
+      G.n == length(a) || throw("Cannot coerce to $G: lengths differ")
+   end
    return perm(a, check)
 end
 
@@ -531,7 +711,10 @@ function (G::PermGroup{T})(a::Vector{S}, check::Bool=true) where {S<:Integer,T}
 end
 
 function (G::PermGroup{T})(p::perm{S}, check::Bool=true) where {S<:Integer, T}
-   return G(p.d, check)
+   if parent(p) == G
+      return p
+   end
+   return G(convert(Vector{T}, p.d), check)
 end
 
 function (G::PermGroup)(str::String, check::Bool=true)
@@ -597,8 +780,31 @@ function cycledec(ccycles::Vector{Int}, cptrs::Vector{Int}, n::T,
 end
 
 doc"""
-    perm""
-> Parse GAP output as `perm{Int}`. Disjoint cycles in the inptut are assumed.
+    perm"..."
+> String macro to parse disjoint cycles into `perm{Int}`.
+>
+> Strings for the output of GAP could be copied directly into `perm"..."`.
+> Cycles of length $1$ are not necessary, but could be included. A permutation
+> of the minimal support is constructed, i.e. the maximal $n$ in the
+> decomposition determines the parent group $S_n$.
+
+# Examples:
+```jldoctest
+julia> p = perm"(1,3)(2,4)"
+(1,3)(2,4)
+
+julia> typeof(p)
+AbstractAlgebra.Generic.perm{Int64}
+
+julia> parent(p) == PermutationGroup(4)
+true
+
+julia> p = perm"(1,3)(2,4)(10)"
+(1,3)(2,4)
+
+julia> parent(p) == PermutationGroup(10)
+true
+```
 """
 macro perm_str(s)
    c, p = parse_cycles(s)

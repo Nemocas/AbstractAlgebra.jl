@@ -17,30 +17,30 @@ function test_perm_constructors(types)
       @test parent_type(Generic.perm{T}) == Generic.PermGroup{T}
 
       @test PermutationGroup(T(10)) isa Generic.PermGroup{T}
-      R = PermutationGroup(T(10))
-      @test elem_type(R) == Generic.perm{T}
+      G = PermutationGroup(T(10))
+      @test elem_type(G) == Generic.perm{T}
 
-      @test R() isa GroupElem
-      @test R() isa Generic.perm{T}
-      a = R()
+      @test G() isa GroupElem
+      @test G() isa Generic.perm{T}
+      a = G()
       @test parent_type(typeof(a)) == Generic.PermGroup{T}
-      @test parent(a) == R
+      @test parent(a) == G
 
       z = T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8]
 
-      @test R(z) isa GroupElem
-      @test R(z) isa Generic.perm{T}
-      b = R(z)
+      @test G(z) isa GroupElem
+      @test G(z) isa Generic.perm{T}
+      b = G(z)
       @test typeof(b) == Generic.perm{T}
       @test parent_type(typeof(b)) == Generic.PermGroup{T}
-      @test parent(b) == R
+      @test parent(b) == G
 
-      @test rand(R) isa Generic.perm{T}
-      g = rand(R)
-      @test parent(g) == R
+      @test rand(G) isa Generic.perm{T}
+      g = rand(G)
+      @test parent(g) == G
       @test parent(g) == PermutationGroup(T(10))
 
-      @test convert(Vector{T}, R(z)) == z
+      @test convert(Vector{T}, G(z)) == z
 
       if T != Int
          @test parent(g) != PermutationGroup(10)
@@ -116,15 +116,18 @@ function test_perm_printing(types)
 
    for T in types
       print("$T ")
-      R = PermutationGroup(T(10))
+      G = PermutationGroup(T(10))
 
-      b = R(T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
+      b = G(T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
 
       setpermstyle(:array);
       @test string(b) == "[2, 3, 5, 4, 6, 7, 1, 9, 10, 8]"
 
       setpermstyle(:cycles);
       @test string(b) == "(1,2,3,5,6,7)(8,9,10)"
+
+      @test string(perm(T[1,2,3])) == "()"
+      @test string(perm(T[3,2,1])) == "(1,3)"
    end
 
    println("PASS")
@@ -135,11 +138,11 @@ function test_perm_basic_manipulation(types)
 
    for T in types
       print("$T ")
-      R = PermutationGroup(T(10))
+      G = PermutationGroup(T(10))
 
-      a = R()
+      a = G()
       b = deepcopy(a)
-      c = R(T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
+      c = G(T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
 
       @test a == b
 
@@ -148,10 +151,11 @@ function test_perm_basic_manipulation(types)
 
       @test length(unique([c,deepcopy(c)])) == 1
 
+      @test setindex!(a, 5, 2) isa perm
+      @test a[2] == T(5)
+
       a[1] = T(5)
       @test a[1] == T(5)
-      @test setindex!(a, 5, 1) == T(5)
-
    end
 
    println("PASS")
@@ -244,10 +248,10 @@ function test_perm_inversion(types)
    print(rpad("perm.inversion...", 30))
    for T in types
       print("$T ")
-      R = PermutationGroup(T(10))
+      G = PermutationGroup(T(10))
 
-      a = R()
-      b = R(T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
+      a = G()
+      b = G(T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
 
       @test a == inv(a)
       @test a == b*inv(b)
