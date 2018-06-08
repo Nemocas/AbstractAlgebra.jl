@@ -1190,9 +1190,7 @@ end
 ###############################################################################
 
 function ==(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
-   if a.parent != b.parent
-      error("Cannot compare polynomials belonging to different rings.")
-   end
+   check_parent(a,b)
    if a.length != b.length
       return false
    end
