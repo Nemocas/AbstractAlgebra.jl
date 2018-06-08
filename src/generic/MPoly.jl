@@ -40,6 +40,12 @@ doc"""
 """
 vars(a::MPolyRing) = a.S
 
+doc"""
+    nvars(x::MPolyRing)
+> Returns the number of variables of the polynomial ring.
+"""
+nvars(a::MPolyRing) = a.num_vars
+
 function gens(a::MPolyRing{T}, ::Type{Val{:lex}}) where {T <: RingElement}
    return [a([base_ring(a)(1)], reshape([UInt(i == j) for j = 1:a.num_vars], a.num_vars, 1))
       for i in 1:a.num_vars]
@@ -341,13 +347,6 @@ end
 
 length(x::MPoly) = x.length
 
-doc"""
-    nvars(x::MPoly)
-> Returns the number of variables of the polynomial ring the given polynomial
-> belongs to.
-"""
-nvars(x::MPoly) = parent(x).num_vars
-
 one(R::MPolyRing) = R(1)
 
 zero(R::MPolyRing) = R(0)
@@ -436,7 +435,7 @@ function show(io::IO, x::MPoly, U::Array{<: AbstractString, 1})
           end
         end
         fst = true
-        for j = 1:nvars(x)
+        for j = 1:nvars(parent(x))
           n = reinterpret(Int, X[j + d, 1])
           if n != 0
             if fst
