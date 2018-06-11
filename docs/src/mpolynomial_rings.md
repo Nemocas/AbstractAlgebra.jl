@@ -77,6 +77,13 @@ ring. Note that these are `Symbol`s not `String`s, though their string values wi
 usually be used when printing polynomials.
 
 ```julia
+nvars(f::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElem
+```
+
+Return the number of variables of the polynomial ring.
+
+
+```julia
 gens(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElem
 ```
 
@@ -125,12 +132,6 @@ max_degrees(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 Returns a tuple `(B, b)` consisting of an array of `Int`s specifying the highest power
 of each variable that appears in the given polynomial and `b` the largest of the values
 in `B`.
-
-```julia
-nvars(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
-```
-
-Return the number of variables of the polynomial ring that $f$ belongs to.
 
 ```julia
 isunit(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
