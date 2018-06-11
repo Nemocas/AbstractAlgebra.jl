@@ -94,7 +94,7 @@ function test_gen_mpoly_manipulation()
 
       @test ord == ordering(S)
 
-      @test nvars(f) == num_vars
+      @test nvars(parent(f)) == num_vars
 
       @test isone(one(S))
 
