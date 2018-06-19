@@ -76,12 +76,13 @@ doc"""
 Return the partial derivative of f with respect to x.
 """
 function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
+   gens_parent = gens(f.parent)
+   
    # Check whether x is among the generators of x.parent
-   if ~(x in gens(f.parent))
+   if ~(x in gens_parent)
       error("Can compute the partial derivative only with respect to generators.")
    end
 
-   gens_parent = gens(f.parent)
    n = f.parent.num_vars
    exps = copy(f.exps)
    derivative = zero(f.parent)
