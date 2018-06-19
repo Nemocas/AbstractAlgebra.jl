@@ -85,6 +85,16 @@ function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
 
    n = f.parent.num_vars
    exps = copy(f.exps)
+
+   size_exps = size(f.exps)
+   if (f.parent.ord != :lex)
+      exps = exps[2:size_exps[1],:]
+   end
+
+   if (f.parent.ord == :degrevlex)
+      exps = exps[end:-1:1,:]
+   end
+
    derivative = zero(f.parent)
    coeffs = f.coeffs
    for i=1:length(f)
