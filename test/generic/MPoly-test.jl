@@ -500,8 +500,9 @@ function test_gen_mpoly_derivative()
 
    for num_vars=1:10
       var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
 
-      R, vars = PolynomialRing(ZZ, var_names)
+      R, vars = PolynomialRing(ZZ, var_names; ordering=ord)
 
       for v in vars
          for iter in 1:10
