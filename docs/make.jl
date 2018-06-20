@@ -40,6 +40,7 @@ deploydocs(
    repo   = "github.com/Nemocas/AbstractAlgebra.jl.git",
    target = "build",
    deps = Deps.pip("pygments", "mkdocs", "python-markdown-math"),
-   make   = nothing
+   make   = nothing,
+   julia  = "0.6"
 )
 
