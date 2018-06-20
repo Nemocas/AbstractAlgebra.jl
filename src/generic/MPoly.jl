@@ -72,7 +72,7 @@ function gens(a::MPolyRing{T}) where {T <: RingElement}
 end
 
 doc"""
-    derivative(f::MPoly{T}, x::MPoly{T})
+    derivative{T <: AbstractAlgebra.RingElem}(f::MPoly{T}, x::MPoly{T})
 Return the partial derivative of f with respect to x.
 """
 function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
