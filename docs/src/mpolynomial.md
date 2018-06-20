@@ -83,7 +83,6 @@ k = R(x + 1)
 m = R(x + y + 1)
 derivative(k,x)
 derivative(k,y)
-jacobi(k)
 ```
 
 All of the examples here are generic polynomial rings, but specialised implementations

@@ -7,7 +7,7 @@
 export max_degrees, gens, divides,
        isconstant, isdegree, ismonomial, isreverse, isterm, main_variable,
        main_variable_extract, main_variable_insert, nvars, ordering,
-       rand_ordering, vars, monomial_set!, monomial_iszero, derivative, jacobi
+       rand_ordering, vars, monomial_set!, monomial_iszero, derivative
 
 ###############################################################################
 #
@@ -113,23 +113,6 @@ function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
    end
 
    return(derivative)
-end
-
-doc"""
-    jacobi(f::MPoly{T})::Array{MPoly{T},1}
-Return an array containing the partial derivatives of f with respect to the
-generators of the multivariate polynomial ring f belongs to.
-"""
-function jacobi(f::MPoly{T})::Array{MPoly{T},1} where {T <: RingElement}
-   gens_parent = gens(f.parent)
-
-   jacobi = []
-
-   for g in gens_parent
-      push!(jacobi, derivative(f,g))
-   end
-
-   return(jacobi)
 end
 
 doc"""
