@@ -7,7 +7,7 @@
 export max_degrees, gens, divides,
        isconstant, isdegree, ismonomial, isreverse, isterm, main_variable,
        main_variable_extract, main_variable_insert, nvars, ordering,
-       rand_ordering, vars, monomial_set!, monomial_iszero
+       rand_ordering, vars, monomial_set!, monomial_iszero, derivative
 
 ###############################################################################
 #
@@ -69,6 +69,50 @@ doc"""
 """
 function gens(a::MPolyRing{T}) where {T <: RingElement}
    return gens(a, Val{a.ord})
+end
+
+doc"""
+    derivative{T <: AbstractAlgebra.RingElem}(f::AbstractAlgebra.Generic.MPoly{T}, x::AbstractAlgebra.Generic.MPoly{T})
+> Return the partial derivative of f with respect to x.
+"""
+function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
+   gens_parent = gens(f.parent)
+   
+   # Check whether x is among the generators of x.parent
+   if ~(x in gens_parent)
+      error("Can compute the partial derivative only with respect to generators.")
+   end
+
+   n = f.parent.num_vars
+   exps = copy(f.exps)
+
+   size_exps = size(f.exps)
+   if (f.parent.ord != :lex)
+      exps = exps[2:size_exps[1],:]
+   end
+
+   if (f.parent.ord == :degrevlex)
+      exps = exps[end:-1:1,:]
+   end
+
+   derivative = zero(f.parent)
+   coeffs = f.coeffs
+   for i=1:length(f)
+      prod = one(f.parent)
+      prod = coeffs[i]
+      for j=1:n
+         if (gens_parent[j]==x)
+            prod *= exps[j,i]
+            if (exps[j,i] >= 1)
+               exps[j,i] -= 1
+            end
+         end
+         prod = prod * gens_parent[j]^Int(exps[j,i])
+      end
+      derivative = derivative + prod
+   end
+
+   return(derivative)
 end
 
 doc"""

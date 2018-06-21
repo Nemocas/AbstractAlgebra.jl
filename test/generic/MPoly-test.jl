@@ -495,6 +495,31 @@ function test_gen_mpoly_valuation()
    println("PASS")
 end
 
+function test_gen_mpoly_derivative()
+   print("Generic.MPoly.derivative...")
+
+   for num_vars=1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      R, vars = PolynomialRing(ZZ, var_names; ordering=ord)
+
+      for v in vars
+         for iter in 1:10
+            f = rand(R, 5:10, 1:10, -100:100)
+            g = rand(R, 5:10, 1:10, -100:100)
+
+               @test derivative(f + g, v) == derivative(g, v) + derivative(f, v)
+               @test derivative(g*f, v) == derivative(g, v)*f + derivative(f, v)*g
+         end
+         @test derivative(one(R), v) == zero(R)
+         @test derivative(zero(R), v) == zero(R)
+      end
+   end
+
+   println("PASS")
+end
+
 function test_gen_mpoly()
    test_gen_mpoly_constructors()
    test_gen_mpoly_manipulation()
@@ -509,6 +534,7 @@ function test_gen_mpoly()
    test_gen_mpoly_gcd()
    test_gen_mpoly_evaluation()
    test_gen_mpoly_valuation()
+   test_gen_mpoly_derivative()
 
    println("")
 end

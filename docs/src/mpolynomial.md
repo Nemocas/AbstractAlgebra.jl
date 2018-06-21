@@ -81,9 +81,10 @@ g = R(123)
 h = R(BigInt(1234))
 k = R(x + 1)
 m = R(x + y + 1)
+derivative(k,x)
+derivative(k,y)
 ```
 
 All of the examples here are generic polynomial rings, but specialised implementations
 of polynomial rings provided by external modules will also usually provide a
 `PolynomialRing` constructor to allow creation of their polynomial rings.
-
