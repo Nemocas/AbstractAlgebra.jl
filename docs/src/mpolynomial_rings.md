@@ -1,3 +1,7 @@
+```@meta
+CurrentModule = AbstractAlgebra
+```
+
 # Multvariate Polynomial Ring Interface
 
 Multivariate polynomial rings are supported in AbstractAlgebra.jl, and in addition to
@@ -408,5 +412,22 @@ f = x^3*y + 3x*y^2 + 1
 
 c = coeff(f, 1)
 fit!(f, 8)
+```
+
+### Derivations
+
+The following function allows to compute derivations of multivariate polynomials of type MPoly.
+
+```@docs
+derivative{T <: AbstractAlgebra.RingElem}(f::AbstractAlgebra.Generic.MPoly{T}, x::AbstractAlgebra.Generic.MPoly{T})
+```
+
+**Example**
+
+```julia
+R,(x,y) = AbstractAlgebra.PolynomialRing(ZZ,["x","y"])
+f = x*y + x + y + 1
+derivative(f,x)
+derivative(f,y)
 ```
 
