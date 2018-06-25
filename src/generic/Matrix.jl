@@ -3274,7 +3274,7 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
 end
 
 doc"""
-    hnf{T <: RingElement}(A::Mat{T}) -> Mat{T}
+    hnf{T <: RingElement}(A::Mat{T})
 > Return the upper right row Hermite normal form of $A$.
 """
 function hnf(A::MatElem{T}) where {T <: RingElement}
@@ -3282,9 +3282,9 @@ function hnf(A::MatElem{T}) where {T <: RingElement}
 end
 
 doc"""
-    hnf{T <: RingElement}(A::Mat{T}) -> Mat{T}, Mat{T}
-> Return the upper right row Hermite normal form $H$ of $A$ together with
-> invertible matrix $U$ such that $UA = H$.
+    hnf_with_trafo{T <: RingElement}(A::Mat{T}) -> Mat{T}, Mat{T}
+> Return the tuple $H, U$ consisting of the upper right row Hermite normal
+> form $H$ of $A$ together with invertible matrix $U$ such that $UA = H$.
 """
 function hnf_with_trafo(A)
   return hnf_kb_with_trafo(A)
