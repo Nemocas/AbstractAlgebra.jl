@@ -520,6 +520,25 @@ function test_gen_mpoly_derivative()
    println("PASS")
 end
 
+function test_gen_mpoly_change_base_ring()
+   print("Generic.MPoly.change_base_ring...")
+
+   for num_vars=1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      R, vars = PolynomialRing(ZZ, var_names; ordering=ord)
+
+      for iter in 1:10
+         f = rand(R, 5:10, 1:10, -100:100)
+         @test evaluate( change_base_ring(f, a -> R(a)), [ one(R) for i=1:num_vars] ) == sum( f.coeffs[i] for i=1:f.length )
+         @test evaluate( change_base_ring(f, a -> R(a)), vars ) == f
+      end
+   end
+
+   println("PASS")
+end
+
 function test_gen_mpoly()
    test_gen_mpoly_constructors()
    test_gen_mpoly_manipulation()
@@ -535,6 +554,7 @@ function test_gen_mpoly()
    test_gen_mpoly_evaluation()
    test_gen_mpoly_valuation()
    test_gen_mpoly_derivative()
+   test_gen_mpoly_change_base_ring()
 
    println("")
 end

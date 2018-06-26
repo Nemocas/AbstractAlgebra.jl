@@ -7,7 +7,7 @@
 export max_degrees, gens, divides,
        isconstant, isdegree, ismonomial, isreverse, isterm, main_variable,
        main_variable_extract, main_variable_insert, nvars, ordering,
-       rand_ordering, vars, monomial_set!, monomial_iszero, derivative
+       rand_ordering, vars, monomial_set!, monomial_iszero, derivative, change_base_ring
 
 ###############################################################################
 #
@@ -113,6 +113,41 @@ function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
    end
 
    return(derivative)
+end
+
+
+
+doc"""
+    change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}
+> Returns the polynomial obtained by applying g to the coefficients of p.
+"""
+function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}
+   vars_parent = vars(p.parent)
+
+   n = p.parent.num_vars
+   exps = p.exps
+
+   size_exps = size(p.exps)
+   if (p.parent.ord != :lex)
+      exps = exps[2:size_exps[1],:]
+   end
+   if (p.parent.ord == :degrevlex)
+      exps = exps[end:-1:1,:]
+   end
+
+   new_p = g(zero(p.parent.base_ring))
+   new_base_ring = parent(new_p)
+   new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in vars_parent])
+
+   coeffs = p.coeffs
+   for i=1:length(p)
+      prod = g(coeffs[i])
+      for j=1:n
+         prod = prod * gens_new_polynomial_ring[j]^Int(exps[j,i])
+      end
+      new_p = new_p + prod
+   end
+   return(new_p)
 end
 
 doc"""
