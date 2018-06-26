@@ -114,7 +114,7 @@ include("julia/JuliaTypes.jl")
 
 include("Generic.jl")
 
-import .Generic: add!, addeq!, addmul!, base_ring, cached, canonical_unit,
+import .Generic: add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_ring,
                  character, characteristic, charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
                  chebyshev_u, _check_dim, check_parent, codomain, coeff, cols,
@@ -168,7 +168,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached, canonical_unit,
                  valuation, var, vars, weak_popov, weak_popov_with_trafo, zero,
                  zero!, zero_matrix, kronecker_product
 
-export add!, addeq!, addmul!, base_ring, cached, canonical_unit, character,
+export add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_ring, character,
                  characteristic, charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
                  chebyshev_u, _check_dim, check_parent, codomain, coeff, cols,

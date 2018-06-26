@@ -303,6 +303,27 @@ m = evaluate(f, Rational{BigInt}[2, 3])
 n = evaluate(f, [2, 3])
 ```
 
+In order to substitute the variables of a polynomial $f$ over a ring $T$ by elements in a $T$-algebra $S$,
+you first have to change the base ring of $f$ using the following function, where $g$ is a function
+representing the structure homomorphism of the $T$-algebra $S$.
+
+```@docs
+change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}
+```
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+S, (u, v) = PolynomialRing(ZZ, ["u", "v"])
+
+f = 2x^2*y + 2x + y + 1
+
+evaluate(change_base_ring(f, a->S(a)), [S(1), v])
+evaluate(change_base_ring(f, a->R(a)), [y, x])
+```
+
+
 ### GCD
 
 In cases where there is a meaningful Euclidean structure on the coefficient ring, it is
