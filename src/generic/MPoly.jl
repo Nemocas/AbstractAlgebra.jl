@@ -128,10 +128,10 @@ function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: Ri
    exps = p.exps
 
    size_exps = size(p.exps)
-   if (p.parent.ord != :lex)
+   if p.parent.ord != :lex
       exps = exps[2:size_exps[1],:]
    end
-   if (p.parent.ord == :degrevlex)
+   if p.parent.ord == :degrevlex
       exps = exps[end:-1:1,:]
    end
 
