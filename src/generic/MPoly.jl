@@ -83,7 +83,7 @@ function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
       error("Can compute the partial derivative only with respect to generators.")
    end
 
-   n = f.parent.num_vars
+   n = nvars(f.parent)
    exps = copy(f.exps)
 
    size_exps = size(f.exps)
@@ -124,7 +124,7 @@ doc"""
 function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}
    vars_parent = vars(p.parent)
 
-   n = p.parent.num_vars
+   n = nvars(p.parent)
    exps = p.exps
 
    size_exps = size(p.exps)
@@ -135,7 +135,7 @@ function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: Ri
       exps = exps[end:-1:1,:]
    end
 
-   new_p = g(zero(p.parent.base_ring))
+   new_p = g(zero(base_ring(p.parent)))
    new_base_ring = parent(new_p)
    new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in vars_parent])
 
