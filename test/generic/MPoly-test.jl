@@ -531,8 +531,8 @@ function test_gen_mpoly_change_base_ring()
 
       for iter in 1:10
          f = rand(R, 5:10, 1:10, -100:100)
-         @test evaluate( change_base_ring(f, a -> R(a)), [ one(R) for i=1:num_vars] ) == sum( f.coeffs[i] for i=1:f.length )
-         @test evaluate( change_base_ring(f, a -> R(a)), vars ) == f
+         @test evaluate(change_base_ring(f, a -> R(a)), [one(R) for i=1:num_vars]) == sum(f.coeffs[i] for i=1:f.length)
+         @test evaluate(change_base_ring(f, a -> R(a)), vars) == f
       end
    end
 
