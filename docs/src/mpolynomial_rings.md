@@ -166,6 +166,13 @@ ismonomial(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 
 Return `true` if $f$ consists of a single term with coefficient $1$.
 
+```@docs
+vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
+```
+
+Note that `vars(p::AbstractAlgebra.Generic.MPoly{T})` returns variables, while
+`vars(S::MyMPolyRing{T})` return symbols.
+
 **Examples**
 
 ```julia
