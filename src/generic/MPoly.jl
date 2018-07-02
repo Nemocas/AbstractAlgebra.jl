@@ -150,6 +150,32 @@ function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: Ri
 end
 
 doc"""
+    vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
+> Returns the variables occuring in $p$.
+"""
+function vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
+   vars_in_p = Array{AbstractAlgebra.Generic.MPoly{T}}(0)
+   n = nvars(p.parent)
+   exps = p.exps
+   size_exps = size(exps)
+   if p.parent.ord != :lex
+      exps = exps[2:size_exps[1],:]
+   end
+   if p.parent.ord == :degrevlex
+      exps = exps[end:-1:1,:]
+   end
+   for j=1:n
+      for i=1:length(p)
+         if exps[j,i] > 0
+            push!(vars_in_p, gens(p.parent)[j])
+            break
+         end
+      end
+   end
+   return(vars_in_p)
+end
+
+doc"""
     ordering{T <: RingElement}(a::MPolyRing{T})
 > Return the ordering of the given polynomial ring as a symbol. The options are
 > `:lex`, `:deglex` and `:degrevlex`.
