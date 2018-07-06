@@ -73,7 +73,7 @@ Note that the type `T` must (transitively) belong to the abstract type `RingElem
 ### Data type and parent object methods
 
 ```julia
-vars(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElem
+symbols(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElem
 ```
 
 Return an array of `Symbol`s representing the variables (generators) of the polynomial
@@ -109,7 +109,7 @@ include `:lex`, `:deglex` and `:degrevlex`.
 ```julia
 S, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:deglex)
 
-V = vars(S)
+V = symbols(S)
 X = gens(S)
 ord = ordering(S)
 ```
