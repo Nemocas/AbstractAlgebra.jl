@@ -15,7 +15,7 @@ function test_gen_mpoly_constructors()
 
       @test typeof(S) <: Generic.MPolyRing
 
-      isa(vars(S), Array{Symbol, 1})
+      isa(symbols(S), Array{Symbol, 1})
 
       for j = 1:num_vars
          @test isa(varlist[j], MPolyElem)
