@@ -7,7 +7,7 @@
 export max_degrees, total_degree, gens, divides,
        isconstant, isdegree, ismonomial, isreverse, isterm, main_variable,
        main_variable_extract, main_variable_insert, nvars, ordering,
-       rand_ordering, vars, monomial_set!, monomial_iszero, derivative, change_base_ring
+       rand_ordering, symbols, monomial_set!, monomial_iszero, derivative, change_base_ring
 
 ###############################################################################
 #
@@ -34,11 +34,11 @@ function isexact_type(a::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.
 end
 
 doc"""
-    vars(a::MPolyRing)
+    symbols(a::MPolyRing)
 > Return an array of symbols representing the variable names for the given
 > polynomial ring.
 """
-vars(a::MPolyRing) = a.S
+symbols(a::MPolyRing) = a.S
 
 doc"""
     nvars(x::MPolyRing)
@@ -122,7 +122,7 @@ doc"""
 > Returns the polynomial obtained by applying g to the coefficients of p.
 """
 function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}
-   vars_parent = vars(p.parent)
+   symbols_parent = symbols(p.parent)
 
    n = nvars(p.parent)
    exps = p.exps
@@ -137,7 +137,7 @@ function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: Ri
 
    new_p = g(zero(base_ring(p.parent)))
    new_base_ring = parent(new_p)
-   new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in vars_parent])
+   new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in symbols_parent])
 
    for i=1:length(p)
       prod = g(p.coeffs[i])
@@ -549,7 +549,7 @@ end
 
 function show(io::IO, x::MPoly)
     len = length(x)
-    U = [string(x) for x in vars(parent(x))]
+    U = [string(x) for x in symbols(parent(x))]
     show(io, x, U)
 end
 
