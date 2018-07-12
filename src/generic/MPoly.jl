@@ -1183,6 +1183,42 @@ end
 
 *(n::T, a::MPoly{T}) where {T <: RingElem} = a*n
 
+function divexact(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
+   N = size(a.exps, 1)
+   r = parent(a)()
+   fit!(r, length(a))
+   j = 1
+   for i = 1:length(a)
+     c = divexact(a.coeffs[i], n)
+      if c != 0
+         r.coeffs[j] = c
+         monomial_set!(r.exps, j, a.exps, i, N)
+         j += 1
+      end
+   end
+   r.length = j - 1
+   resize!(r.coeffs, r.length)
+   return r
+end
+
+function divexact(a::MPoly{T}, n::T) where {T <: RingElem}
+   N = size(a.exps, 1)
+   r = parent(a)()
+   fit!(r, length(a))
+   j = 1
+   for i = 1:length(a)
+      c = divexact(a.coeffs[i], n)
+      if c != 0
+         r.coeffs[j] = c
+         monomial_set!(r.exps, j, a.exps, i, N)
+         j += 1
+      end
+   end
+   r.length = j - 1
+   resize!(r.coeffs, r.length)
+   return r
+end
+
 ###############################################################################
 #
 #   Comparison functions
