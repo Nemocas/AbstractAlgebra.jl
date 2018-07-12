@@ -104,7 +104,7 @@ that this is a `Symbol` not a `String`, though its string value will usually be 
 when printing polynomials.
 
 ```julia
-vars(S::MyPolyRing{T}) where T <: AbstractAlgebra.RingElem
+symbols(S::MyPolyRing{T}) where T <: AbstractAlgebra.RingElem
 ```
 
 Return the array `[s]` where `s	 is a `Symbol` representing the variable of the given
@@ -117,7 +117,7 @@ there is more than one variable, and hence an array of symbols.
 S, x = PolynomialRing(QQ, "x")
 
 vsym = var(S)
-V = vars(S)
+V = symbols(S)
 ```
 
 ### Basic manipulation of rings and elements
