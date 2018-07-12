@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export max_degrees, gens, divides,
+export max_degrees, total_degree, gens, divides,
        isconstant, isdegree, ismonomial, isreverse, isterm, main_variable,
        main_variable_extract, main_variable_insert, nvars, ordering,
        rand_ordering, symbols, monomial_set!, monomial_iszero, derivative, change_base_ring
@@ -421,6 +421,22 @@ function max_degrees(f::MPoly{T}) where {T <: RingElement}
       end
    end
    return biggest, b
+end
+
+doc"""
+    total_degree{T <: RingElement}(f::MPoly{T})
+> Returns the total degree of `f`.
+"""
+function total_degree(f::MPoly{T}) where {T <: RingElement}
+   if ordering(parent(f)) == :lex
+      exps = f.exps[1:nvars(parent(f)),1:length(f)]
+      return Int(maximum(sum(exps,1)))
+   elseif ( ordering(parent(f)) == :deglex || ordering(parent(f)) == :degrevlex)
+      exps = f.exps[1:nvars(parent(f))+1,1:length(f)]
+      return Int(maximum(exps[1,:]))
+   else
+      error("total_degree is not implemented for this ordering.")
+   end
 end
 
 length(x::MPoly) = x.length

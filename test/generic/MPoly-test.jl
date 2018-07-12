@@ -113,6 +113,28 @@ function test_gen_mpoly_manipulation()
    println("PASS")
 end
 
+function test_gen_mpoly_total_degree()
+   print("Generic.MPoly.total_degree...")
+   max = 50
+   for nvars=1:10
+      var_names = ["x$j" for j in 1:nvars]
+      for nterms=1:10
+         exps = Array{Int,2}(round.(rand(nvars, nterms) .* max))
+         degrees = []
+         for nord=1:20
+            ord = rand_ordering()
+            S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
+            p = zero(S)
+            for j=1:nterms
+               p += prod( varlist[i]^exps[i,j] for i=1:nvars )
+            end
+            push!(degrees, total_degree(p))
+         end
+         @test length(Set(degrees)) == 1
+      end
+   end
+end
+
 function test_gen_mpoly_unary_ops()
    print("Generic.MPoly.unary_ops...")
 
@@ -555,6 +577,7 @@ function test_gen_mpoly()
    test_gen_mpoly_valuation()
    test_gen_mpoly_derivative()
    test_gen_mpoly_change_base_ring()
+   test_gen_mpoly_total_degree()
 
    println("")
 end

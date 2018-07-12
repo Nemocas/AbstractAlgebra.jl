@@ -137,6 +137,10 @@ Returns a tuple `(B, b)` consisting of an array of `Int`s specifying the highest
 of each variable that appears in the given polynomial and `b` the largest of the values
 in `B`.
 
+```@docs
+total_degree(f::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
+```
+
 ```julia
 isunit(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
