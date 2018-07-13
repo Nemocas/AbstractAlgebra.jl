@@ -219,6 +219,11 @@ function test_gen_mpoly_adhoc_binary()
          @test f + d1 - d1 == f
          @test f + BigInt(d1) - BigInt(d1) == f
          @test f + g1 - g1 == f
+
+         if !iszero(d1)
+           @test divexact(d1 * f, d1) == f
+           @test divexact(d1 * f, BigInt(d1)) == f
+         end
       end
    end
 
