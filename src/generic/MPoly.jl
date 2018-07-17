@@ -6,7 +6,7 @@
 
 export max_degrees, total_degree, gens, divides,
        isconstant, isdegree, ismonomial, isreverse, isterm, main_variable,
-       main_variable_extract, main_variable_insert, nvars, ordering,
+       main_variable_extract, main_variable_insert, nvars, vars, ordering,
        rand_ordering, symbols, monomial_set!, monomial_iszero, derivative, change_base_ring
 
 ###############################################################################

@@ -165,7 +165,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached, canonical_unit, chang
                  similarity!, snf, snf_kb, snf_kb_with_trafo, snf_with_trafo,
                  solve, solve_rational, solve_triu, sub, subst, swap_rows,
                  swap_rows!, symbols, total_degree, trail, truncate, typed_hcat, typed_hvcat, upscale,
-                 valuation, var, weak_popov, weak_popov_with_trafo, zero,
+                 valuation, var, vars, weak_popov, weak_popov_with_trafo, zero,
                  zero!, zero_matrix, kronecker_product
 
 export add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_ring, character,
@@ -218,7 +218,7 @@ export add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_rin
                  snf, snf_kb, snf_kb_with_trafo, snf_with_trafo, solve, symbols,
                  solve_rational, solve_triu, sub, subst, swap_rows, swap_rows!,
                  total_degree, trail, truncate, typed_hcat, typed_hvcat,
-                 upscale, valuation, var,
+                 upscale, valuation, var, vars,
                  weak_popov, weak_popov_with_trafo, zero, zero!,
                  zero_matrix, kronecker_product
 
