@@ -268,6 +268,22 @@ function sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
   return sub(M, r1:r2, c1:c2)
 end
 
+doc"""
+    sub(M::AbstractAlgebra.MatElem, rows::Array{Int,1}, cols::Array{Int,1})
+> Return a copy of the submatrix $A$ of $M$ defined by A[i,j] = M[rows[i], cols[j]]
+> for i=1,...,length(rows) and j=1,...,length(cols)
+"""
+function sub(M::AbstractAlgebra.MatElem, rows::Array{Int,1}, cols::Array{Int,1})
+   z = similar(M, length(rows), length(cols))
+   for i in 1:length(rows)
+      for j in 1:length(cols)
+         Generic._checkbounds(M, rows[i], cols[j])
+         z[i, j] = deepcopy(M[rows[i], cols[j]])
+      end
+   end
+   return z
+end
+
 getindex(x::AbstractAlgebra.MatElem, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
 
 getindex(x::AbstractAlgebra.MatElem, r::UnitRange, ::Colon) = sub(x, r, 1:cols(x))
