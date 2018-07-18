@@ -1628,10 +1628,8 @@ doc""" minors(A::AbstractAlgebra.MatElem, k::Int)
 > Return an array consisting of the k-minors of A
 """
 function minors(A::AbstractAlgebra.MatElem, k::Int)
-   n = rows(A)
-   m = cols(A)
-   row_indices = combinations(n,k)
-   col_indices = combinations(m,k)
+   row_indices = combinations(rows(A),k)
+   col_indices = combinations(cols(A),k)
    mins = Array{elem_type(base_ring(A)),1}(0)
    for ri in row_indices
       for ci in col_indices
