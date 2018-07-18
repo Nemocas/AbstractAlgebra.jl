@@ -16,7 +16,7 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref,
        _check_dim, rows, cols, gram, rref, rref!, swap_rows, swap_rows!,
        hnf_kb, hnf_kb_with_trafo, hnf_cohen, hnf_cohen_with_trafo, snf_kb,
        snf_kb_with_trafo, find_pivot_popov, inv!, zero_matrix,
-       kronecker_product
+       kronecker_product, minors
 
 ###############################################################################
 #
@@ -1599,6 +1599,46 @@ function det(M::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
       # for same reason as det_interpolation
       return det_df(M)
    end
+end
+
+###############################################################################
+#
+#   Minors
+#
+###############################################################################
+
+doc""" combinations(n::Int,k::Int)
+> Return an array consisting of k-combinations of {1,...,n} as arrays.
+"""
+function combinations(n,k)
+   if (k==0)
+      r = Array{Array{Int,1},1}(1)
+      r[1] = []
+      return r
+   elseif k>n
+      return Array{Array{Int,1},1}(0)
+   elseif k==n
+      return [collect(1:k)]
+   else
+      return vcat( combinations(n-1,k), [ append!(l, [n]) for l in combinations(n-1,k-1) ])
+   end
+end
+
+doc""" minors(A::AbstractAlgebra.MatElem, k::Int)
+> Return an array consisting of the k-minors of A
+"""
+function minors(A::AbstractAlgebra.MatElem, k::Int)
+   n = rows(A)
+   m = cols(A)
+   row_indices = combinations(n,k)
+   col_indices = combinations(m,k)
+   mins = Array{elem_type(base_ring(A)),1}(0)
+   for ri in row_indices
+      for ci in col_indices
+         push!(mins, det(AbstractAlgebra.Generic.sub(A, ri, ci)))
+      end
+   end
+   return(mins)
 end
 
 ###############################################################################
