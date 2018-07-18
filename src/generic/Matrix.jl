@@ -1607,7 +1607,8 @@ end
 #
 ###############################################################################
 
-doc""" combinations(n::Int,k::Int)
+doc"""
+    combinations(n::Int,k::Int)
 > Return an array consisting of k-combinations of {1,...,n} as arrays.
 """
 function combinations(n,k)
@@ -1624,7 +1625,8 @@ function combinations(n,k)
    end
 end
 
-doc""" minors(A::AbstractAlgebra.MatElem, k::Int)
+doc"""
+    minors(A::AbstractAlgebra.MatElem, k::Int)
 > Return an array consisting of the k-minors of A
 """
 function minors(A::AbstractAlgebra.MatElem, k::Int)
