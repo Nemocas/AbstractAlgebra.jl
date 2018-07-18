@@ -570,6 +570,27 @@ function test_gen_mat_det()
    println("PASS")
 end
 
+function test_gen_mat_minors()
+   print("Generic.Mat.minors...")
+
+   S,z=PolynomialRing(ZZ,"z")
+   n = 5
+   R = MatrixSpace(S,n,n)
+   for r=0:n
+      M = randmat_with_rank(R, r, 0:3, 0:3)
+      @test [1] == minors(M,0)
+      for i=r+1:n
+         for m in minors(M,i)
+            @test m==0
+         end
+      end
+      @test [det(M)] == minors(M,n)
+      @test [] == minors(M,n+1)
+   end
+
+   println("PASS")
+end
+
 function test_gen_mat_rank()
    print("Generic.Mat.rank...")
 
@@ -1556,6 +1577,7 @@ function test_gen_mat()
    test_gen_mat_snf_kb()
    test_gen_mat_snf()
    test_gen_mat_weak_popov()
+   test_gen_mat_minors()
 
    println("")
 end
