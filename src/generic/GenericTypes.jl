@@ -149,11 +149,11 @@ mutable struct Partition <: AbstractVector{Int}
    n::Int
    part::Vector{Int}
 
-   function Partition(part::Vector{T}, check::Bool=true) where T<:Integer
+   function Partition(part::AbstractVector{T}, check::Bool=true) where T<:Integer
       if check
-         all(diff(part) .<= zero(T)) || throw("Partition must be decreasing!")
-         if length(part) > zero(T)
-            part[end] >= one(T) || throw("Found non-positive entry in partition!")
+         all(diff(part) .<= 0) || sort!(part, rev=true)
+         if length(part) > 0
+            part[end] >= 1 || throw(ArgumentError("Found non-positive entry in partition!"))
          end
       end
       return new(sum(part), part)

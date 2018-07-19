@@ -1,9 +1,10 @@
 function test_partition_type()
    print("youngtabs.partition_type...")
 
-   @test isa(Partition([4,3,1]), Generic.Partition)
-   @test_throws String Partition([3,4,1])
-   @test_throws String Partition([4,3,0])
+   @test Partition([4,3,1]) isa Generic.Partition
+   @test Partition([4,3,1]) isa AbstractVector{Int}
+   @test Partition([3,4,1]) isa Generic.Partition
+   @test_throws ArgumentError Partition([4,3,0])
 
    p = Partition([4,3,1])
 
