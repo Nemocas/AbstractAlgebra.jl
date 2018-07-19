@@ -527,7 +527,12 @@ function divexact(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
 end
 
 function divides(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-   iszero(b) && error("Division by zero in divides")
+   if iszero(a)
+     return true, parent(a)()
+   end
+   if iszero(b)
+     return false, parent(a)()
+   end
    return true, divexact(a, b)
 end
 

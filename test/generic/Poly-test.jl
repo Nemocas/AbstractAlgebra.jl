@@ -2432,12 +2432,13 @@ function test_gen_poly_remove_valuation()
       while d
          f = R()
          g = R()
-         while f == 0 || g == 0
-            f = rand(R, 0:10, -10:10)
-            g = rand(R, 0:10, -10:10)
-         end
+         f = rand(R, 0:10, -10:10)
+         g = rand(R, 0:10, -10:10)
 
          d, q = divides(f, g)
+         if d
+           @test g * q == f
+         end
       end
 
       s = rand(0:10)

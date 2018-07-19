@@ -1307,18 +1307,18 @@ end
 
 doc"""
     divides{T <: RingElement}(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T})
-> Returns a pair consisting of a flag which is set to `true` if $f$ divides
-> $g$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
+> Returns a pair consisting of a flag which is set to `true` if $g$ divides
+> $f$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
 > such a polynomial exists. If not, the value of $h$ is undetermined.
 """
 function divides(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
    check_parent(f, g)
    !isexact_type(T) && error("divides requires an exact ring")
-   if length(g) == 0
-      throw(DivideError())
-   end
    if length(f) == 0
       return true, parent(f)()
+   end
+   if length(g) == 0
+      return false, parent(f)()
    end
    if length(f) < length(g)
       return false, parent(f)()

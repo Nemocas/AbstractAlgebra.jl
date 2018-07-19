@@ -204,6 +204,25 @@ function test_gen_frac_adhoc_exact_division()
    println("PASS")
 end
 
+function test_gen_frac_divides()
+   print("Generic.Frac.divides...")
+
+   S, x = PolynomialRing(ZZ, "x")
+
+   for i in 1:100
+     a = rand(S, 1:5, -10:10)
+     b = rand(S, 1:5, -10:10)
+
+     b, q = divides(a, b)
+
+     if b
+       @test b * a == q
+     end
+   end
+
+   println("PASS")
+end
+
 function test_gen_frac_gcd()
    print("Generic.Frac.gcd...")
 
@@ -242,6 +261,7 @@ function test_gen_frac()
    test_gen_frac_inversion()
    test_gen_frac_exact_division()
    test_gen_frac_adhoc_exact_division()
+   test_gen_frac_divides()
    test_gen_frac_gcd()
 
    println("")

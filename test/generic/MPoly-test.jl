@@ -133,6 +133,7 @@ function test_gen_mpoly_total_degree()
          @test length(Set(degrees)) == 1
       end
    end
+   println("PASS")
 end
 
 function test_gen_mpoly_unary_ops()
@@ -298,21 +299,25 @@ function test_gen_mpoly_divides()
 
       for iter = 1:10
          f = S(0)
-         while iszero(f)
-            f = rand(S, 0:5, 0:100, 0:0, -100:100)
-         end
+         f = rand(S, 0:5, 0:100, 0:0, -100:100)
          g = rand(S, 0:5, 0:100, 0:0, -100:100)
 
          p = f*g
 
          flag, q = divides(p, f)
+         flag2, q2 = divides(f, p)
 
          @test flag == true
-         @test q == g
 
-         q = divexact(p, f)
+         @test q * f == p
 
-         @test q == g
+         q1 = divexact(p, f)
+
+         @test q1 * f == p
+
+         if !iszero(p)
+           @test q1 == g
+         end
       end
    end
 
