@@ -526,7 +526,7 @@ end
 #
 ###############################################################################
 
-Base.start(A::AllPerms{T}) where T<:Integer = 0
+Base.start(A::AllPerms{<:Integer}) = 0
 
 function Base.next(A::AllPerms, count)
     count = nextperm(A, count)
@@ -537,7 +537,7 @@ Base.done(A::AllPerms, count) = count >= A.all
 Base.eltype(::Type{AllPerms{T}}) where T<:Integer = perm{T}
 Base.length(A::AllPerms) = A.all
 
-function nextperm(A::AllPerms{T}, count) where T
+function nextperm(A::AllPerms{<:Integer}, count)
    if count == 0
         return count+1
    end
@@ -689,7 +689,7 @@ doc"""
     rand(G::PermGroup)
 > Return a random permutation from `G`.
 """
-rand(G::PermGroup{T}) where T = perm(randperm(G.n), false)
+rand(G::PermGroup) = perm(randperm(G.n), false)
 
 ###############################################################################
 #

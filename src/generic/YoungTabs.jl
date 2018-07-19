@@ -14,7 +14,7 @@ size(p::Partition) = size(p.part)
 
 Base.IndexStyle(::Type{Partition}) = Base.IndexLinear()
 
-getindex(p::Partition, i::T) where T<:Integer = p.part[i]
+getindex(p::Partition, i::Integer) = p.part[i]
 
 function setindex!(p::Partition, v::Integer, i::Int)
    prev = Inf
