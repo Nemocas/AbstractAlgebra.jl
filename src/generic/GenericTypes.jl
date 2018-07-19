@@ -125,9 +125,25 @@ end
 ###############################################################################
 
 doc"""
-    Partition(part::Vector{Int}, check::Bool=true)
-> Partition represents integer partition into numbers in non-increasing order.
-> It is a thin wrapper over `Vector{Int}`
+    Partition(part::Vector{<:Integer}[, check::Bool=true])
+> Represent integer partition in the non-increasing order.
+>
+> `part` will be sorted, if necessary. Checks for validity of input can be skipped by calling the (inner) constructor with `false` as the second argument.
+>
+> Functionally `Partition` is a thin wrapper over `Vector{Int}`.
+
+> Fieldnames:
+>  * `n::Int` - the partitioned number
+>  * `part::Vector{Int}` - a non-increasing sequence of summands of `n`.
+
+# Examples:
+```jldoctest
+julia> p = Partition([4,2,1,1,1])
+4₁2₁1₃
+
+julia> p.n == sum(p.part)
+true
+```
 """
 mutable struct Partition <: AbstractVector{Int}
    n::Int
@@ -146,8 +162,29 @@ end
 
 doc"""
     AllParts(n::Int)
-> Returns an iterator over all integer `Partition`s of `n`. They come in
-> ascending order. See also `Combinatorics.partitions(n)`.
+> Return an iterator over all integer `Partition`s of `n`.
+> Partitions are produced in ascending order according to RuleAsc (Algorithm 3.1) from
+>
+> Jerome Kelleher and Barry O’Sullivan,
+> *Generating All Partitions: A Comparison Of Two Encodings*
+> ArXiv:0909.2331
+>
+> See also `Combinatorics.partitions(1:n)`.
+
+# Examples
+```jldoctest
+julia> ap = AllParts(5);
+
+julia> collect(ap)
+7-element Array{AbstractAlgebra.Generic.Partition,1}:
+ 1₅
+ 2₁1₃
+ 3₁1₂
+ 2₂1₁
+ 4₁1₁
+ 3₁2₁
+ 5₁
+```
 """
 struct AllParts
     n::Int
