@@ -278,40 +278,80 @@ function PowerSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true, mod
    Generic.PowerSeriesRing(R, prec, s; cached=cached, model=model)
 end
 
+function PowerSeriesRing(R::Ring, prec::Int, s::Char; cached=true, model=:capped_relative)
+   PowerSeriesRing(R, prec, string(s); cached=cached, model=model)
+end
+
 function LaurentSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true)
    Generic.LaurentSeriesRing(R, prec, s; cached=cached)
+end
+
+function LaurentSeriesRing(R::Ring, prec::Int, s::Char; cached=true)
+   LaurentSeriesRing(R, prec, string(s); cached=cached)
 end
 
 function LaurentSeriesRing(R::Field, prec::Int, s::AbstractString; cached=true)
    Generic.LaurentSeriesField(R, prec, s; cached=cached)
 end
 
+function LaurentSeriesRing(R::Field, prec::Int, s::Char; cached=true)
+   LaurentSeriesField(R, prec, string(s); cached=cached)
+end
+
 function LaurentSeriesField(R::Field, prec::Int, s::AbstractString; cached=true)
    Generic.LaurentSeriesField(R, prec, s; cached=cached)
+end
+
+function LaurentSeriesField(R::Field, prec::Int, s::Char; cached=true)
+   LaurentSeriesField(R, prec, string(s); cached=cached)
 end
 
 function PuiseuxSeriesRing(R::Ring, prec::Int, s::AbstractString; cached=true)
    Generic.PuiseuxSeriesRing(R, prec, s; cached=cached)
 end
 
+function PuiseuxSeriesRing(R::Ring, prec::Int, s::Char; cached=true)
+   PuiseuxSeriesRing(R, prec, string(s); cached=cached)
+end
+
 function PuiseuxSeriesRing(R::Field, prec::Int, s::AbstractString; cached=true)
    Generic.PuiseuxSeriesField(R, prec, s; cached=cached)
+end
+
+function PuiseuxSeriesRing(R::Field, prec::Int, s::Char; cached=true)
+   PuiseuxSeriesField(R, prec, string(s); cached=cached)
 end
 
 function PuiseuxSeriesField(R::Field, prec::Int, s::AbstractString; cached=true)
    Generic.PuiseuxSeriesField(R, prec, s; cached=cached)
 end
 
+function PuiseuxSeriesField(R::Field, prec::Int, s::Char; cached=true)
+   PuiseuxSeriesField(R, prec, string(s); cached=cached)
+end
+
 function PolynomialRing(R::Ring, s::AbstractString; cached::Bool = true)
    Generic.PolynomialRing(R, s; cached=cached)
+end
+
+function PolynomialRing(R::Ring, s::Char; cached::Bool = true)
+   PolynomialRing(R, string(s); cached=cached)
 end
 
 function PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
    Generic.PolynomialRing(R, s; cached=cached, ordering=ordering)
 end
 
+function PolynomialRing(R::Ring, s::Array{Char, 1}; cached::Bool = true, ordering::Symbol = :lex)
+   PolynomialRing(R, string.(s); cached=cached, ordering=ordering)
+end
+
 function SparsePolynomialRing(R::Ring, s::String; cached::Bool = true)
    Generic.SparsePolynomialRing(R, s; cached=cached)
+end
+
+function SparsePolynomialRing(R::Ring, s::Char; cached::Bool = true)
+   SparsePolynomialRing(R, string(s); cached=cached)
 end
 
 function MatrixSpace(R::Ring, r::Int, c::Int, cached::Bool = true)
@@ -332,6 +372,10 @@ end
 
 function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = "\$"; cached = true)
    Generic.NumberField(a, s, t; cached=cached)
+end
+
+function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::Char, t = "\$"; cached = true)
+   NumberField(a, string(s), t; cached=cached)
 end
 
 #add empty functions so that Singular, Nemo and Hecke can import and extend.
@@ -355,7 +399,11 @@ export Generic
 
 getindex(R::Ring, s::String) = PolynomialRing(R, s)
 
+getindex(R::Ring, s::Char) = PolynomialRing(R, s)
+
 getindex(R::Tuple{Ring, T}, s::String) where {T} = PolynomialRing(R[1], s)
+
+getindex(R::Tuple{Ring, T}, s::Char) where {T} = PolynomialRing(R[1], s)
 
 ###############################################################################
 #
