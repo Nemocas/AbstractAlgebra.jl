@@ -1647,9 +1647,11 @@ function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <:
    R = base_ring(par)
    m = length(a)
    n = length(b)
-   n == 0 && error("Division by zero in divides_monagan_pearce")
    if m == 0
       return true, par()
+   end
+   if n == 0
+      return false, par()
    end
    drmask = monomial_drmask(bits)
    mask1 = UInt(1) << (bits - 1)
