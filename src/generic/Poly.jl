@@ -14,7 +14,7 @@ export PolynomialRing, hash, coeff, isgen, lead,
        mul_classical, mul_ks, subst, mul_karatsuba, trail,
        pow_multinomial, monomial_to_newton!, newton_to_monomial!, ismonomial,
        base_ring, parent_type, elem_type, check_parent, promote_rule,
-       needs_parentheses, isnegative, show_minus_one, remove, zero!, add!,
+       needs_parentheses, displayed_with_minus_in_front, show_minus_one, remove, zero!, add!,
        interpolate, sylvester_matrix
 
 ###############################################################################
@@ -265,7 +265,7 @@ function show(io::IO, x::AbstractAlgebra.PolyElem)
          c = coeff(x, len - i)
          bracket = needs_parentheses(c)
          if !iszero(c)
-            if i != 1 && !isnegative(c)
+            if i != 1 && !displayed_with_minus_in_front(c)
                print(io, "+")
             end
             if !isone(c) && (c != -1 || show_minus_one(typeof(c)))
@@ -291,7 +291,7 @@ function show(io::IO, x::AbstractAlgebra.PolyElem)
       c = coeff(x, 0)
       bracket = needs_parentheses(c)
       if !iszero(c)
-         if len != 1 && !isnegative(c)
+         if len != 1 && !displayed_with_minus_in_front(c)
             print(io, "+")
          end
          if bracket
@@ -314,7 +314,7 @@ end
 
 needs_parentheses(x::AbstractAlgebra.PolyElem) = length(x) > 1
 
-isnegative(x::AbstractAlgebra.PolyElem) = length(x) <= 1 && isnegative(coeff(x, 0))
+displayed_with_minus_in_front(x::AbstractAlgebra.PolyElem) = length(x) <= 1 && displayed_with_minus_in_front(coeff(x, 0))
 
 show_minus_one(::Type{Poly{T}}) where {T <: RingElement} = show_minus_one(T)
 

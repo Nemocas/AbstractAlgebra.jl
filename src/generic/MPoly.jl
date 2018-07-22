@@ -522,7 +522,7 @@ function show(io::IO, x::MPoly, U::Array{<: AbstractString, 1})
       for i = 1:len
         c = coeff(x, i - 1)
         bracket = needs_parentheses(c)
-        if i != 1 && !isnegative(c)
+        if i != 1 && !displayed_with_minus_in_front(c)
           print(io, "+")
         end
         X = Array{UInt}(N, 1)
@@ -602,7 +602,7 @@ show_minus_one(::Type{MPoly{T}}) where {T <: RingElement} = show_minus_one(T)
 
 needs_parentheses(x::MPoly) = length(x) > 1
 
-isnegative(x::MPoly) = length(x) == 1 && monomial_iszero(x.exps, 1) && isnegative(x.coeffs[1])
+displayed_with_minus_in_front(x::MPoly) = length(x) == 1 && monomial_iszero(x.exps, 1) && displayed_with_minus_in_front(x.coeffs[1])
 
 ###############################################################################
 #

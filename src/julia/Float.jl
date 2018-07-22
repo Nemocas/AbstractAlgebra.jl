@@ -56,7 +56,7 @@ end
 
 needs_parentheses(::AbstractFloat) = false
 
-isnegative(a::AbstractFloat) = a < 0
+displayed_with_minus_in_front(a::AbstractFloat) = a < 0
 
 show_minus_one(::Type{T}) where T <: AbstractFloat = false
 

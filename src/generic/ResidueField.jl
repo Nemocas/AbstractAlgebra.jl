@@ -176,7 +176,7 @@ end
 
 needs_parentheses(x::AbstractAlgebra.ResFieldElem) = needs_parentheses(data(x))
 
-isnegative(x::AbstractAlgebra.ResFieldElem) = isnegative(data(x))
+displayed_with_minus_in_front(x::AbstractAlgebra.ResFieldElem) = displayed_with_minus_in_front(data(x))
 
 show_minus_one(::Type{ResF{T}}) where {T <: RingElement} = true
 
