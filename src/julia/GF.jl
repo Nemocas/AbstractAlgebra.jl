@@ -149,7 +149,7 @@ end
 
 needs_parentheses(x::gfelem) = false
 
-isnegative(x::gfelem) = false
+displayed_with_minus_in_front(x::gfelem) = false
 
 show_minus_one(::Type{gfelem{T}}) where T <: Integer = true
 

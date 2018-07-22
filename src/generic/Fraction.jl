@@ -180,7 +180,7 @@ end
 
 needs_parentheses(x::AbstractAlgebra.FracElem) = isone(denominator(x)) && needs_parentheses(numerator(x))
 
-isnegative(x::AbstractAlgebra.FracElem) = !needs_parentheses(numerator(x)) && isnegative(numerator(x))
+displayed_with_minus_in_front(x::AbstractAlgebra.FracElem) = !needs_parentheses(numerator(x)) && displayed_with_minus_in_front(numerator(x))
 
 show_minus_one(::Type{AbstractAlgebra.FracElem{T}}) where {T <: RingElem} = show_minus_one(T)
 

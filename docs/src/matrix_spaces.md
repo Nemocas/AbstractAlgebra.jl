@@ -5,7 +5,7 @@ matrices over a commutative ring is not itself a commutative ring, not all of th
 interface needs to be implemented for matrices in general.
 
 In particular, the following functions do not need to be implemented: `isdomain_type`,
-`needs_parentheses`, `isnegative`, `show_minus_one` and `divexact`. The `canonical_unit`
+`needs_parentheses`, `displayed_with_minus_in_front`, `show_minus_one` and `divexact`. The `canonical_unit`
 function should be implemented, but simply needs to return the corresponding value for
 entry $1, 1$ (the function is never called on empty matrices).
 

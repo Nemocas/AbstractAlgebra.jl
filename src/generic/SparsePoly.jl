@@ -92,7 +92,7 @@ function show(io::IO, x::SparsePoly)
       for i = 1:len
         c = coeff(x, len - i)
         bracket = needs_parentheses(c)
-        if i != 1 && !isnegative(c)
+        if i != 1 && !displayed_with_minus_in_front(c)
            print(io, "+")
         end
         X = x.exps[len - i + 1]
@@ -140,7 +140,7 @@ show_minus_one(::Type{SparsePoly{T}}) where {T <: RingElement} = show_minus_one(
 
 needs_parentheses(a::SparsePoly{T}) where {T <: RingElement} = length(a) > 1
 
-isnegative(x::SparsePoly) = length(x) <= 1 && isnegative(coeff(x, 0))
+displayed_with_minus_in_front(x::SparsePoly) = length(x) <= 1 && displayed_with_minus_in_front(coeff(x, 0))
 
 ###############################################################################
 #

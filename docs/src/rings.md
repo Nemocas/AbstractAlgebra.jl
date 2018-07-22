@@ -304,18 +304,18 @@ a coefficient of a polynomial. As an example, non-constant polynomials would nee
 parentheses if used as coefficients of another polynomial.
 
 ```julia
-isnegative(f::MyElem)
+displayed_with_minus_in_front(f::MyElem)
 ```
 
 When printing polynomials, a `+` sign is usually inserted automatically between terms of
 the polynomial. However, this is not desirable if the coefficient is negative and that
 negative sign is already printed when the coefficient is printed.
 
-This function must return `true` if a negative sign would already be prepended when $f$
-is printed. This suppresses the automatic printing of a `+` sign by polynomial printing
+This function must return `true` if $f$ is printed starting with a negative sign.
+This suppresses the automatic printing of a `+` sign by polynomial printing
 functions that are printing $f$ as a coefficient of a term.
 
-Note that if `needs_parentheses` returns `true` for $f$, then `isnegative` should always
+Note that if `needs_parentheses` returns `true` for $f$, then `displayed_with_minus_in_front` should always
 return `false` for that $f$, since an automatic `+` will need to be printed in front of
 a coefficient that is printed with parentheses.
 

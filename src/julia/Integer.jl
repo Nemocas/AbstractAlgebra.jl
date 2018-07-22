@@ -60,7 +60,7 @@ end
 
 needs_parentheses(::Integer) = false
 
-isnegative(a::Integer) = a < 0
+displayed_with_minus_in_front(a::Integer) = a < 0
 
 show_minus_one(::Type{T}) where T <: Integer = false
 
