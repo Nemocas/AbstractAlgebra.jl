@@ -317,6 +317,16 @@ end
 
 hash(Y::YoungTableau, h::UInt) = hash(Y.part, hash(Y.fill, hash(YoungTableau, h)))
 
+##############################################################################
+#
+#   String I/O for YoungTableaux
+#
+##############################################################################
+
+function Base.replace_in_print_matrix(Y::YoungTableau, i::Integer, j::Integer, s::AbstractString)
+   inyoungtab((i,j), Y) ? s : Base.replace_with_centered_mark(s, c=' ')
+end
+
 
 doc"""
 """
