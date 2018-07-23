@@ -225,12 +225,24 @@ end
 
 doc"""
     YoungTableau(part::Partition[, fill::Vector{Int}=collect(1:sum(part))])  <: AbstractArray{Int, 2}
-> Returns the Young tableaux of partition `part` of `n`, filled linearly
-> (row-major) by `fill` vector.
+> Returns the Young tableaux of partition `part`, filled linearly
+> by `fill` vector. Note that `fill` vector is inputed in **row-major** format.
+>
+> Fields:
+> * `part` - the partition defining Young diagram
+> * `fill` - the row-major fill vector: the entries of the diagram.
 """
 struct YoungTableau <: AbstractArray{Int, 2}
    part::Partition
-   tab::Array{Int,2}
+   fill::Vector{Int}
+
+   function YoungTableau(part::Partition, fill::Vector{T}=collect(1:sum(part))) where T<:Integer
+      sum(part) == length(fill) || throw(ArgumentError("Can't fill Young digaram of $part with $fill: different number of elemnets."))
+
+      # _, fill = conj(part, fill)
+
+      return new(part, fill)
+   end
 end
 
 ###############################################################################

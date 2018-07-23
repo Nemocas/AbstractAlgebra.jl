@@ -276,36 +276,47 @@ end
 
 ##############################################################################
 #
-#   YoungTableau type, AbstractVector interface
+#   YoungTableau type, AbstractArray interface
 #
 ##############################################################################
 
-function YoungTableau(part::Partition, fill::Vector{Int}=collect(1:part.n))
-   part.n == length(fill) || throw("Can't fill Young digaram of $part with $fill: different number of elemnets.")
-   tab = zeros(Int, length(part), maximum(part))
-   k=1
-   for (idx, p) in enumerate(part)
-      tab[idx, 1:p] = fill[k:k+p-1]
-      k += p
-   end
-   return YoungTableau(part, tab)
-end
-
 YoungTableau(p::Vector{T}, fill=collect(1:sum(p))) where T<:Integer = YoungTableau(Partition(p), fill)
 
-size(Y::YoungTableau) = size(Y.tab)
+size(Y::YoungTableau) = (length(Y.part), Y.part[1])
 
-Base.IndexStyle(::Type{T}) where {T <: YoungTableau} = Base.IndexLinear()
+# length(Y::YoungTableau) = length(Y.part)*Y.part[1]
 
-getindex(Y::YoungTableau, i::Int) = Y.tab[i]
+Base.IndexStyle(::Type{YoungTableau}) = Base.IndexLinear()
 
-function ==(Y1::YoungTableau,Y2::YoungTableau)
-   Y1.part == Y2.part || return false
-   Y1.tab == Y2.tab || return false
+function inyoungtab(t::Tuple{T,T}, Y::YoungTableau) where T<:Integer
+   i,j = t
+   i > length(Y.part) && return false
+   Y.part[i] < j && return false
    return true
 end
 
-hash(Y::YoungTableau, h::UInt) = hash(Y.part, hash(Y.tab, hash(YoungTableau, h)))
+function getindex(Y::YoungTableau, n::Integer)
+   if n < 1 #|| n > length(Y)
+      throw(BoundsError(Y.fill, n))
+   else
+      i, j = ind2sub(Y, n)
+      if inyoungtab((i,j), Y)
+         k = sum(Y.part[1:i-1]) + j
+         return Y.fill[k]
+      else
+         return 0
+      end
+   end
+end
+
+function ==(Y1::YoungTableau,Y2::YoungTableau)
+   Y1.part == Y2.part || return false
+   Y1.fill == Y2.fill || return false
+   return true
+end
+
+hash(Y::YoungTableau, h::UInt) = hash(Y.part, hash(Y.fill, hash(YoungTableau, h)))
+
 
 doc"""
     conj(Y::YoungTableau)
