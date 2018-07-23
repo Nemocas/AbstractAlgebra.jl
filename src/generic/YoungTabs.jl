@@ -714,6 +714,23 @@ SkewDiagram(lambda::Vector{Int}, mu::Vector{Int}) = SkewDiagram(Partition(lambda
 
 /(lambda::Partition, mu::Partition) = SkewDiagram(lambda, mu)
 
+doc"""
+    in(t::Tuple{<:Integer, <:Integer}, xi::SkewDiagram)
+> Checks if box at position `(i,j)` belongs to the skew diagram `xi`.
+"""
+function Base.in(t::Tuple{T, T}, xi::SkewDiagram) where T<:Integer
+   i,j = t
+   if i <= 0 || j <= 0
+      return false
+   elseif i > length(xi.lam) || j > xi.lam[1]
+      return false
+   elseif length(xi.mu) >= i
+      return xi.mu[i] < j <= xi.lam[i]
+   else
+      return j <= xi.lam[i]
+   end
+end
+
 ==(xi::SkewDiagram, psi::SkewDiagram) = xi.lam == psi.lam && xi.mu == psi.mu
 hash(xi::SkewDiagram, h::UInt) = hash(xi.lam, hash(xi.mu, hash(SkewDiagram, h)))
 
