@@ -137,15 +137,53 @@ doc"""
     conj(part::Partition)
 > Returns the conjugated partition of `part`, i.e. the partition corresponding
 > to the Young tableau of `part` reflected through the main diagonal.
+
+# Examples:
+```jldoctest
+julia> p = Partition([4,2,1,1,1])
+4₁2₁1₃
+
+julia> conj(p)
+5₁2₁1₂
+```
 """
-function conj(part::Partition)
-    p = T[]
-    for i in 1:part.n
-        n = sum(part .>= i)
-        n == 0 && break
-        push!(p, n)
-    end
-    return Partition(p, false)
+function Base.conj(part::Partition)
+   p = Vector{Int}(maximum(part))
+   for i in 1:sum(part)
+      for j in length(part):-1:1
+         if part[j] >= i
+            p[i] = j
+            break
+         end
+      end
+   end
+   return Partition(p, false)
+end
+
+doc"""
+    conj(part::Partition, v::Vector)
+> Returns the conjugated partition of `part` together with permuted vector `v`.
+"""
+function Base.conj(part::Partition, v::Vector)
+   w = zeros(Int, size(v))
+
+   acc = Vector{Int}(length(part)+1)
+   acc[1] = 0
+   for i in 1:length(part)
+      acc[i+1] = acc[i] + part[i]
+   end
+
+   new_idx = 1
+   cpart = conj(part)
+
+   for (i, p) in enumerate(cpart)
+      for j in 1:p
+         w[new_idx] = (v[acc[j]+i])
+         new_idx += 1
+      end
+   end
+
+   return cpart, w
 end
 
 ##############################################################################
