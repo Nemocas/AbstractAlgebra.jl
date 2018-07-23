@@ -120,10 +120,10 @@ function test_perm_printing(types)
 
       b = G(T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
 
-      setpermstyle(:array);
+      Generic.setpermstyle(:array);
       @test string(b) == "[2, 3, 5, 4, 6, 7, 1, 9, 10, 8]"
 
-      setpermstyle(:cycles);
+      Generic.setpermstyle(:cycles);
       @test string(b) == "(1,2,3,5,6,7)(8,9,10)"
 
       @test string(perm(T[1,2,3])) == "()"
