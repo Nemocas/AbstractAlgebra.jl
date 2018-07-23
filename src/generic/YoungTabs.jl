@@ -800,7 +800,7 @@ function has_left_neighbor(xi::SkewDiagram, i::Int, j::Int)
    if j == 1
       return false
    else
-      return inskewdiag(xi, i, j) && inskewdiag(xi, i, j-1)
+      return (i,j) in xi && (i,j-1) in xi
    end
 end
 
@@ -812,7 +812,7 @@ function has_bottom_neighbor(xi::SkewDiagram, i::Int, j::Int)
    if i == length(xi.lam)
       return false
    else
-      return inskewdiag(xi, i, j) && inskewdiag(xi, i+1, j)
+      return (i,j) in xi && (i+1,j) in xi
    end
 end
 
