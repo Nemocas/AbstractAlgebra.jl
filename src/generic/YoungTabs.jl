@@ -327,6 +327,76 @@ function Base.replace_in_print_matrix(Y::YoungTableau, i::Integer, j::Integer, s
    inyoungtab((i,j), Y) ? s : Base.replace_with_centered_mark(s, c=' ')
 end
 
+const _border = Dict{Symbol,String}(
+:vertical => "│",
+:horizontal => "─",
+
+:topleft => "┌", # corners
+:topright => "┐",
+:bottomleft => "└",
+:bottomright => "┘",
+
+:downstem => "┬", #top edge
+:upstem => "┴", #bottom edge
+
+:rightstem => "├", # left edge
+:leftstem => "┤", # right edge
+
+:cross => "┼")
+
+function boxed_str(Y::YoungTableau, fill=Y.fill)
+   r,c = size(Y)
+   w = max(length(string(maximum(fill))), 3)
+   horizontal = repeat(_border[:horizontal], w)
+
+   diagram = String[]
+   s = String("")
+
+   counter = 1
+
+   for i in 1:r
+      if i == 1 # top rule:
+         s =_border[:topleft]*
+            join(Iterators.repeated(horizontal, c), _border[:downstem])*
+            _border[:topright]
+
+      else # upper rule:
+         s = _border[:rightstem]
+
+         if Y.part[i-1] - Y.part[i] > 0
+            s *= join(Iterators.repeated(horizontal, Y.part[i]),
+               _border[:cross])
+            s *=_border[:cross]
+
+            s *= join(Iterators.repeated(horizontal,
+                  Y.part[i-1] - Y.part[i]),
+               _border[:upstem])
+            s *= _border[:bottomright]
+         else
+            s *= join(Iterators.repeated(horizontal, Y.part[i]),
+               _border[:cross])
+            s *= _border[:leftstem]
+         end
+      end
+      push!(diagram, s)
+
+      # contents of each row:
+      s = _border[:vertical]
+      for j in 1:Y.part[i]
+         s *= rpad(lpad(fill[counter], div(w,2)+1), w) *_border[:vertical]
+         counter += 1
+      end
+      push!(diagram, s)
+   end
+
+   # bottom rule
+   s = _border[:bottomleft]
+   s *= join(Iterators.repeated(horizontal, Y.part[r]), _border[:upstem])
+   s *= _border[:bottomright]
+   push!(diagram, s)
+
+   return join(diagram, "\n")
+end
 
 doc"""
 """
