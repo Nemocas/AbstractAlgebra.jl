@@ -188,7 +188,7 @@ export add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_rin
                  image_map, image_fn, inflate, inskewdiag, integral,
                  interpolate, inv, inv!, inverse_fn, invmod, isconstant, isdegree,
                  isdomain_type, isexact_type, isgen, ishessenberg,
-                 ismonomial, isone, isreverse,
+                 ismonomial, isnegative, isone, isreverse,
                  isrimhook, isrref, issquare,
                  isterm, isunit, iszero, laurent_ring,
                  lcm, lead, leglength, length,
@@ -453,11 +453,11 @@ include("error.jl")
 
 include("Groups.jl")
 
-###########################################################
+###############################################################################
 #
 #   Package handle creation
 #
-###########################################################
+###############################################################################
 
 const package_handle = [1]
 
@@ -558,6 +558,16 @@ QQ = JuliaQQ
 ###############################################################################
 
 RealField = JuliaRealField
+
+###############################################################################
+#
+#  For backwards compability
+#
+###############################################################################
+
+displayed_with_minus_in_front(x) = isnegative(x)
+
+isnegative(x) = displayed_with_minus_in_front(x) 
 
 ###############################################################################
 #
