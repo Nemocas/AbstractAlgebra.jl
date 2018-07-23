@@ -26,7 +26,7 @@ In practice this may result in decreased memory footprint (when storing multiple
 All the permutation group types belong to the `Group` abstract type and the corresponding permutation element types belong to the `GroupElem` abstract type.
 
 ```@docs
-setpermstyle
+Generic.setpermstyle
 ```
 
 ## Permutations constructors
@@ -219,6 +219,8 @@ AbstractAlgebra.Generic.perm{Int64}
 The following coercions are available for `G::PermGroup` parent objects.
 Each of the methods perform basic sanity checks on the input which can be switched off by the second argument.
 
+**Examples**
+
 ```julia
 (G::PermGroup)()
 ```
@@ -264,5 +266,3 @@ Generic.matrix_repr(::perm)
 Generic.emb(::Generic.PermGroup, ::Vector{Int}, ::Bool)
 Generic.emb!(::perm, ::perm, V)
 ```
-
-# Characters

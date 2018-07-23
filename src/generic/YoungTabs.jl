@@ -242,7 +242,7 @@ partitionseq(seq::BitVector) = seq[findfirst(seq, true):findlast(seq, false)]
 
 doc"""
     isrimhook(R::BitVector, idx::Int, len::Int)
-> `R[idx:idx+len]` forms a rim hook in the Young Diagram of parition
+> `R[idx:idx+len]` forms a rim hook in the Young Diagram of partition
 > corresponding to `R` iff `R[idx] == true` and `R[idx+len] == false`.
 """
 function isrimhook(R::BitVector, idx::Int, len::Int)
@@ -314,8 +314,6 @@ julia> y = YoungTableau([4,3,1]); size(y)
 ```
 """
 size(Y::YoungTableau) = (length(Y.part), Y.part[1])
-
-# length(Y::YoungTableau) = length(Y.part)*Y.part[1]
 
 Base.IndexStyle(::Type{YoungTableau}) = Base.IndexLinear()
 
@@ -711,7 +709,6 @@ end
 ##############################################################################
 
 SkewDiagram(lambda::Vector{Int}, mu::Vector{Int}) = SkewDiagram(Partition(lambda), Partition(mu))
-
 /(lambda::Partition, mu::Partition) = SkewDiagram(lambda, mu)
 
 doc"""
@@ -849,14 +846,14 @@ function isrimhook(xi::SkewDiagram)
 end
 
 doc"""
-    leglength(xi::SkewDiagram, check::Bool=true)
+    leglength(xi::SkewDiagram[, check::Bool=true])
 > Computes the leglength of a rim-hook `xi`, i.e. the number of rows with
 > non-zero entries minus one. If `check` is `false` function will not check
 > whether `xi` is actually a rim-hook.
 """
 function leglength(xi::SkewDiagram, check::Bool=true)
    if check
-      isrimhook(xi) || throw("$xi is not a rimhook. leglength is defined only for rim hooks")
+      isrimhook(xi) || throw(ArgumentError("$xi is not a rimhook. leglength is defined only for rim hooks"))
    end
    m = zeros(length(xi.lam))
    m[1:length(xi.mu)] = xi.mu
