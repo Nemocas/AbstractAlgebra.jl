@@ -17,7 +17,7 @@ Base.IndexStyle(::Type{Partition}) = Base.IndexLinear()
 getindex(p::Partition, i::Integer) = p.part[i]
 
 Base.sum(p::Partition) = p.n
-function setindex!(p::Partition, v::Integer, i::Int)
+function setindex!(p::Partition, v::Integer, i::Integer)
    prev = sum(p)
    nex = 1
    if i != 1
@@ -26,7 +26,7 @@ function setindex!(p::Partition, v::Integer, i::Int)
    if i != length(p)
       nex = p[i+1]
    end
-   nex <= v <= prev || throw("Partition must be positive and non-increasing")
+   nex <= v <= prev || throw(ArgumentError("Partition must be positive and non-increasing"))
    p.n += v - p.part[i]
    p.part[i] = v
    return p
