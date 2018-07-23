@@ -8,15 +8,33 @@ export dim, has_left_neighbor, has_bottom_neighbor, inskewdiag, isrimhook,
 #
 ##############################################################################
 
+doc"""
+    length(p::Partition)
+> Return the number parts in the partition.
+"""
 length(p::Partition) = length(p.part)
 
+doc"""
+    size(p::Partition)
+> Return the size of the vector which represents the partition.
+"""
 size(p::Partition) = size(p.part)
 
 Base.IndexStyle(::Type{Partition}) = Base.IndexLinear()
 
+doc"""
+    getindex(p::Partition, i::Integer)
+> Return the `i`-th number (in decreasing order) of the partition.
+"""
 getindex(p::Partition, i::Integer) = p.part[i]
 
 Base.sum(p::Partition) = p.n
+
+doc"""
+    setindex!(p::Partition, v::Integer, i::Integer)
+> Set the `i`-th entry of partition `p` to `v`.
+> `setindex!` will throw an error if the operation violates the non-increasing assumption.
+"""
 function setindex!(p::Partition, v::Integer, i::Integer)
    prev = sum(p)
    nex = 1
