@@ -850,6 +850,21 @@ doc"""
 >
 > For more details see e.g. Chapter 2.8 of _Group Theory and Physics_ by
 > S.Sternberg.
+
+# Examples
+```jldoctest
+julia> G = PermutationGroup(4)
+Permutation group over 4 elements
+
+julia> chi = character(Partition([3,1])) # character of the regular representation
+(::char) (generic function with 2 methods)
+
+julia> chi(G())
+3
+
+julia> chi(perm"(1,3)(2,4)")
+-1
+```
 """
 function character(lambda::Partition)
    R = partitionseq(lambda)
