@@ -327,8 +327,46 @@ doc"""
 #
 ##############################################################################
 
-rowlen(Y::YoungTableau, i, j) = sum(Y[i, j:end] .> 0)
-collen(Y::YoungTableau, i, j) = sum(Y[i:end, j] .> 0)
+doc"""
+    matrix_repr(Y::YoungTableau)
+> Construct sparse integer matrix representing the tableau.
+
+# Examples:
+```jldoctest
+julia> y = YoungTableau([4,3,1]);
+
+julia> matrix_repr(y)
+3×4 SparseMatrixCSC{Int64,Int64} with 8 stored entries:
+  [1, 1]  =  1
+  [2, 1]  =  5
+  [3, 1]  =  8
+  [1, 2]  =  2
+  [2, 2]  =  6
+  [1, 3]  =  3
+  [2, 3]  =  7
+  [1, 4]  =  4
+```
+"""
+function matrix_repr(Y::YoungTableau)
+   tab = spzeros(Int, length(Y.part), Y.part[1])
+   k=1
+   for (idx, p) in enumerate(Y.part)
+      tab[idx, 1:p] = Y.fill[k:k+p-1]
+      k += p
+   end
+   return tab
+end
+
+doc"""
+    fill!(Y::YoungTableaux, V::Vector{<:Integer})
+> Replace the fill vector `Y.fill` by `V`.
+"""
+function fill!(Y::YoungTableau, V::Vector{T}) where T<:Integer
+   length(V) == Y.part.n || throw(ArgumentError("Length of fill vector must math the partition"))
+   Y.fill .= V
+   return Y
+end
+
 doc"""
     conj(Y::YoungTableau)
 > Returns the conjugated tableau, i.e. the tableau reflected through the main
@@ -337,6 +375,9 @@ doc"""
 """
 Base.conj(Y::YoungTableau) = YoungTableau(conj(Y.part, Y.fill)...)
 
+rowlength(Y::YoungTableau, i, j) = Y.part[i] < j ? 0 : Y.part[i]-j
+
+collength(Y::YoungTableau, i, j) = count(x -> x>=j, view(Y.part, i+1:endof(Y.part)))
 
 doc"""
     hooklength(Y::YoungTableau, i, j)
@@ -344,10 +385,10 @@ doc"""
 > will return `0` for `(i,j)` not in the tableau `Y`.
 """
 function hooklength(Y::YoungTableau, i, j)
-   if Y[i,j] == 0
-      return 0
+   if inyoungtab((i,j), Y)
+      return rowlength(Y, i, j) + collength(Y, i, j) + 1
    else
-      return rowlen(Y, i, j) + collen(Y, i, j) - 1
+      return 0
    end
 end
 
