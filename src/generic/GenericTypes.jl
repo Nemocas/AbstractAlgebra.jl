@@ -202,6 +202,23 @@ doc"""
     SkewDiagram(lambda::Partition, mu::Partition) <: AbstractArray{Int, 2}
 > Implements a skew diagram, i.e. a difference of two Young diagrams
 > represented by partitions `lambda` and `mu`.
+> (below dots symbolise the removed entries)
+
+# Examples
+```jldoctest
+julia> l = Partition([4,3,2])
+4₁3₁2₁
+
+julia> m = Partition([3,1,1])
+3₁1₂
+
+julia> xi = SkewDiagram(l,m)
+3×4 AbstractAlgebra.Generic.SkewDiagram:
+ ⋅  ⋅  ⋅  1
+ ⋅  1  1
+ ⋅  1
+
+```
 """
 struct SkewDiagram <: AbstractArray{Int, 2}
    lam::Partition

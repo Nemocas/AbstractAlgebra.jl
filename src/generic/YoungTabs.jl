@@ -760,6 +760,13 @@ hash(xi::SkewDiagram, h::UInt) = hash(xi.lam, hash(xi.mu, hash(SkewDiagram, h)))
 #
 ###############################################################################
 
+function Base.replace_in_print_matrix(xi::SkewDiagram, i::Integer, j::Integer, s::AbstractString)
+   if j > xi.lam[i]
+      Base.replace_with_centered_mark(s, c=' ')
+   elseif i <= length(xi.mu)
+      j > xi.mu[i] ? s : Base.replace_with_centered_mark(s)
+   else
+      s
    end
 end
 
