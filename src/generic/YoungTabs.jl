@@ -398,8 +398,33 @@ function boxed_str(Y::YoungTableau, fill=Y.fill)
    return join(diagram, "\n")
 end
 
+mutable struct YoungTabDisplayStyle
+   format::Symbol
+end
+
+const _youngtabstyle = YoungTabDisplayStyle(:diagram)
+
 doc"""
+    setyoungtabstyle(format::Symbol)
+> AbstractAlgebra can display (in REPL or in general as string) Young tableaux
+> by either matrices of integers, or as filled Young diagrams (the difference
+> is purely esthetical).
+> The style can be switched by calling `setyoungtabstyle` with `format=:array`
+> or `format=:diagram` (the default).
 """
+function setyoungtabstyle(s::Symbol)
+   @assert s in (:diagram, :array)
+   _youngtabstyle.format = s
+   _youngtabstyle.format
+end
+
+function Base.show(io::IO, ::MIME"text/plain", Y::YoungTableau)
+   if _youngtabstyle.format == :array
+      Base.print_matrix(io, Y)
+   elseif _youngtabstyle.format == :diagram
+      print(io, boxed_str(Y))
+   end
+end
 
 ##############################################################################
 #
