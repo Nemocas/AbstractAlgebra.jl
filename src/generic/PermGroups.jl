@@ -858,7 +858,7 @@ function character(lambda::Partition)
 
    function char(p::perm, check::Bool=true)
       if check
-         lambda.n == length(p.d) || throw("Can't evaluate character on $p : lengths differ.")
+         sum(lambda) == length(p.d) || throw(ArgumentError("Can't evaluate character on $p : lengths differ."))
       end
       return MN1inner(R, Partition(permtype(p)), 1, _charvalsTableBig)
    end
@@ -873,7 +873,7 @@ doc"""
 """
 function character(lambda::Partition, p::perm, check::Bool=true)
    if check
-      lambda.n == length(p.d) || throw("lambda-th irreducible character can be evaluated only on permutations of length $(lambda.n).")
+      sum(lambda) == length(p.d) || throw("lambda-th irreducible character can be evaluated only on permutations of length $(sum(lambda)).")
    end
    return character(BigInt, lambda, Partition(permtype(p)))
 end
@@ -889,7 +889,7 @@ doc"""
 """
 function character(lambda::Partition, mu::Partition, check::Bool=true)
    if check
-      lambda.n == mu.n || throw("Cannot evaluate $lambda on the conjugacy class of $mu: lengths differ.")
+      sum(lambda) == sum(mu) || throw("Cannot evaluate $lambda on the conjugacy class of $mu: lengths differ.")
    end
    return character(BigInt, lambda, mu)
 end
