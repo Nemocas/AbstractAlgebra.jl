@@ -1,6 +1,5 @@
 export Partition, AllParts, YoungTableau, SkewDiagram
-export dim, has_left_neighbor, has_bottom_neighbor, inskewdiag, isrimhook,
-       hooklength, leglength, matrix_repr, partitionseq
+export rowlength, collength, hooklength, dim, isrimhook, leglength
 
 ##############################################################################
 #
