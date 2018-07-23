@@ -498,17 +498,30 @@ function hooklength(Y::YoungTableau, i, j)
 end
 
 doc"""
-    dim(Y::YoungTableau)
+    dim(Y::YoungTableau) -> BigInt
 > Returns the dimension of the irreducible representation of
-> `PermutationGroup(n)` associated to YoungTableau `Y` of a partition of `n`.
+> permutation group $S_n$ associated to YoungTableau `Y` of a partition of `n`.
+>
+> Since the computation overflows easily `BigInt` is returned. You may perform
+> the computation of the dimension in different type by calling `dim(Int, Y)`.
+
+# Examples
+```jldoctest
+julia> dim(YoungTableau([4,3,1]))
+70
+
+julia> dim(YoungTableau([3,1])) # the regular representation of S_4
+3
+```
 """
 dim(Y::YoungTableau) = dim(BigInt, Y)
 
 function dim(::Type{T}, Y::YoungTableau) where T<:Integer
    n, m = size(Y)
-   num = factorial(T(maximum(Y)))
-   den = reduce(*, one(T), hooklength(Y,i,j) for i in 1:n, j in 1:m if j <= Y.part[i])
-   return divexact(num, den)
+   num = factorial(T(sum(Y.part)))
+   den = reduce(*, one(T), hooklength(Y,i,j)
+      for i in 1:n, j in 1:m if j <= Y.part[i])
+   return divexact(num, den)::T
 end
 
 ##############################################################################
