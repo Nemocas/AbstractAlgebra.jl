@@ -760,23 +760,8 @@ hash(xi::SkewDiagram, h::UInt) = hash(xi.lam, hash(xi.mu, hash(SkewDiagram, h)))
 #
 ###############################################################################
 
-doc"""
-    matrix_repr(xi::SkewDiagram)
-> Returns a binary representation of the diagram `xi`, i.e. a binary array `A`
-> where `A[i,j] == 1` if and only if `(i,j)` is in `xi.lam` but not in `xi.mu`.
-"""
-function matrix_repr(xi::SkewDiagram)
-   ydiag = zeros(Int,length(xi.lam), maximum(xi.lam))
-   for i in 1:length(xi.mu)
-      ydiag[i, xi.mu[i]+1:xi.lam[i]] .= 1
    end
-   for i in length(xi.mu)+1:length(xi.lam)
-      ydiag[i,1:xi.lam[i]] .= 1
-   end
-   return ydiag
 end
-
-show(io::IO, xi::SkewDiagram) = show(io, MIME("text/plain"), matrix_repr(xi))
 
 ##############################################################################
 #
@@ -785,19 +770,19 @@ show(io::IO, xi::SkewDiagram) = show(io, MIME("text/plain"), matrix_repr(xi))
 ##############################################################################
 
 doc"""
-    inskewdiag(xi::SkewDiagram, i::Int, j::Int)
-> Checks if box at position `(i,j)` belongs to the skew diagram `xi`.
+    matrix_repr(xi::SkewDiagram)
+> Returns a sparse representation of the diagram `xi`, i.e. a sparse array `A`
+> where `A[i,j] == 1` if and only if `(i,j)` is in `xi.lam` but not in `xi.mu`.
 """
-function inskewdiag(xi::SkewDiagram, i::Int, j::Int)
-   if i <= 0 || j <= 0
-      return false
-   elseif i > length(xi.lam) || j > maximum(xi.lam)
-      return false
-   elseif length(xi.mu) >= i
-      return xi.mu[i] < j ≤ xi.lam[i]
-   else
-      return j ≤ xi.lam[i]
+function matrix_repr(xi::SkewDiagram)
+   skdiag = spzeros(Int, size(xi)...)
+   for i in 1:length(xi.mu)
+      skdiag[i, xi.mu[i]+1:xi.lam[i]] = 1
    end
+   for i in length(xi.mu)+1:length(xi.lam)
+      skdiag[i,1:xi.lam[i]] = 1
+   end
+   return skdiag
 end
 
 doc"""
