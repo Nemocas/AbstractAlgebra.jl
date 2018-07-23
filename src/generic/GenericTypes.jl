@@ -125,7 +125,7 @@ end
 ###############################################################################
 
 doc"""
-    Partition(part::Vector{<:Integer}[, check::Bool=true])
+    Partition(part::Vector{<:Integer}[, check::Bool=true]) <: AbstractVector{Int}
 > Represent integer partition in the non-increasing order.
 >
 > `part` will be sorted, if necessary. Checks for validity of input can be skipped by calling the (inner) constructor with `false` as the second argument.
@@ -199,11 +199,11 @@ end
 ###############################################################################
 
 doc"""
-    SkewDiagram(lambda::Partition, mu::Partition)
+    SkewDiagram(lambda::Partition, mu::Partition) <: AbstractArray{Int, 2}
 > Implements a skew diagram, i.e. a difference of two Young diagrams
 > represented by partitions `lambda` and `mu`.
 """
-struct SkewDiagram
+struct SkewDiagram <: AbstractArray{Int, 2}
    lam::Partition
    mu::Partition
 
@@ -224,7 +224,7 @@ end
 ###############################################################################
 
 doc"""
-    YoungTableau(part::Partition, tab::Array{Int, 2})
+    YoungTableau(part::Partition[, fill::Vector{Int}=collect(1:sum(part))])  <: AbstractArray{Int, 2}
 > Returns the Young tableaux of partition `part` of `n`, filled linearly
 > (row-major) by `fill` vector.
 """
