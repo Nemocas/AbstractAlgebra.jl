@@ -300,6 +300,17 @@ end
 
 YoungTableau(p::Vector{T}, fill=collect(1:sum(p))) where T<:Integer = YoungTableau(Partition(p), fill)
 
+doc"""
+    size(Y::YoungTableau)
+> Return `size` of the smallest array containing `Y`, i.e. tuple of the number
+> of rows and the number of columns of `Y`.
+
+# Examples:
+```jldoctest
+julia> y = YoungTableau([4,3,1]); size(y)
+(3,4)
+```
+"""
 size(Y::YoungTableau) = (length(Y.part), Y.part[1])
 
 # length(Y::YoungTableau) = length(Y.part)*Y.part[1]
@@ -313,6 +324,34 @@ function inyoungtab(t::Tuple{T,T}, Y::YoungTableau) where T<:Integer
    return true
 end
 
+"""
+    getindex(Y::YoungTableau, n::Integer)
+> Return the column-major linear index into the `size(Y)`-array. If a box is
+> outside of the array return `0`.
+
+# Examples
+```jldoctest
+julia> y = YoungTableau([4,3,1])
+┌───┬───┬───┬───┐
+│ 1 │ 2 │ 3 │ 4 │
+├───┼───┼───┼───┘
+│ 5 │ 6 │ 7 │
+├───┼───┴───┘
+│ 8 │
+└───┘
+
+julia> y[1]
+1
+
+julia> y[2]
+5
+
+julia> y[4]
+2
+
+julia> y[6]
+0
+"""
 function getindex(Y::YoungTableau, n::Integer)
    if n < 1 #|| n > length(Y)
       throw(BoundsError(Y.fill, n))
