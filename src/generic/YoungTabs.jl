@@ -468,6 +468,29 @@ doc"""
 > is purely esthetical).
 > The style can be switched by calling `setyoungtabstyle` with `format=:array`
 > or `format=:diagram` (the default).
+
+# Examples:
+```jldoctest
+julia> Generic.setyoungtabstyle(:array)
+:array
+
+julia> p = Partition([4,3,1]); YoungTableau(p)
+ 1  2  3  4
+ 5  6  7
+ 8
+
+julia> Generic.setyoungtabstyle(:diagram)
+:diagram
+
+julia> YoungTableau(p)
+┌───┬───┬───┬───┐
+│ 1 │ 2 │ 3 │ 4 │
+├───┼───┼───┼───┘
+│ 5 │ 6 │ 7 │
+├───┼───┴───┘
+│ 8 │
+└───┘
+```
 """
 function setyoungtabstyle(s::Symbol)
    @assert s in (:diagram, :array)
