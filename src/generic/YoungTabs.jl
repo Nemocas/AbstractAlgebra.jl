@@ -71,6 +71,8 @@ function show(io::IO, p::Partition)
    print(io, str)
 end
 
+show(io::IO, ::MIME"text/plain", p::Partition) = show(io, p)
+
 ##############################################################################
 #
 #   Iterator interface for Integer AllParts
