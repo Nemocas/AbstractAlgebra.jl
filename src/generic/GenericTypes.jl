@@ -231,6 +231,32 @@ doc"""
 > Fields:
 > * `part` - the partition defining Young diagram
 > * `fill` - the row-major fill vector: the entries of the diagram.
+
+# Examples:
+```jldoctest
+julia> p = Partition([4,3,1]); y = YoungTableau(p)
+┌───┬───┬───┬───┐
+│ 1 │ 2 │ 3 │ 4 │
+├───┼───┼───┼───┘
+│ 5 │ 6 │ 7 │
+├───┼───┴───┘
+│ 8 │
+└───┘
+
+julia> y.part
+4₁3₁1₁
+
+julia> y.fill
+8-element Array{Int64,1}:
+ 1
+ 2
+ 3
+ 4
+ 5
+ 6
+ 7
+ 8
+```
 """
 struct YoungTableau <: AbstractArray{Int, 2}
    part::Partition
