@@ -715,6 +715,15 @@ SkewDiagram(lambda::Vector{Int}, mu::Vector{Int}) = SkewDiagram(Partition(lambda
 /(lambda::Partition, mu::Partition) = SkewDiagram(lambda, mu)
 
 doc"""
+    size(xi::SkewDiagram)
+> Return the size of array where `xi` is minimally contained.
+> See `size(Y::YoungTableau)` for more details.
+"""
+Base.size(xi::SkewDiagram) = (length(xi.lam), xi.lam[1])
+
+Base.IndexStyle(::Type{SkewDiagram}) = Base.IndexLinear()
+
+doc"""
     in(t::Tuple{<:Integer, <:Integer}, xi::SkewDiagram)
 > Checks if box at position `(i,j)` belongs to the skew diagram `xi`.
 """
@@ -729,6 +738,17 @@ function Base.in(t::Tuple{T, T}, xi::SkewDiagram) where T<:Integer
    else
       return j <= xi.lam[i]
    end
+end
+
+doc"""
+    getindex(xi::SkewDiagram, n::Integer)
+> Return `1` if linear index `n` corresponds to (column-major) entry in
+> `xi.lam` which is not contained in `xi.mu`
+"""
+function getindex(xi::SkewDiagram, n::Integer)
+   i,j = ind2sub(size(xi), n)
+   (i,j) in xi && return 1
+   return 0
 end
 
 ==(xi::SkewDiagram, psi::SkewDiagram) = xi.lam == psi.lam && xi.mu == psi.mu
