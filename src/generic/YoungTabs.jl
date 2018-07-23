@@ -118,19 +118,19 @@ Base.eltype(::Type{AllParts}) = Partition
 length(A::AllParts) = _numpart(A.n)
 
 @inbounds function nextpart_asc(part, k)
-    if k == 0
-        return Partition(part, false), 1
-    end
-    y = part[k] - 1
-    k -= 1
-    x = part[k] + 1
-    while x <= y
-        part[k] = x
-        y -= x
-        k += 1
-    end
-    part[k] = x + y
-    return Partition(reverse!(part[1:k]), false), k
+   if k == 0
+      return Partition(part, false), 1
+   end
+   y = part[k] - 1
+   k -= 1
+   x = part[k] + 1
+   while x <= y
+      part[k] = x
+      y -= x
+      k += 1
+   end
+   part[k] = x + y
+   return Partition(reverse!(part[1:k]), false), k
 end
 
 doc"""
