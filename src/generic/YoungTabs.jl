@@ -16,8 +16,9 @@ Base.IndexStyle(::Type{Partition}) = Base.IndexLinear()
 
 getindex(p::Partition, i::Integer) = p.part[i]
 
+Base.sum(p::Partition) = p.n
 function setindex!(p::Partition, v::Integer, i::Int)
-   prev = Inf
+   prev = sum(p)
    nex = 1
    if i != 1
       prev = p[i-1]
@@ -31,7 +32,7 @@ function setindex!(p::Partition, v::Integer, i::Int)
    return p
 end
 
-==(p::Partition, m::Partition) = p.n ==m.n && p.part == m.part
+==(p::Partition, m::Partition) = sum(p) == sum(m) && p.part == m.part
 hash(p::Partition, h::UInt) = hash(p.part, hash(Partition, h))
 
 ##############################################################################
@@ -252,7 +253,7 @@ function YoungTableau(part::Partition, fill::Vector{Int}=collect(1:part.n))
    return YoungTableau(part, tab)
 end
 
-YoungTableau(p::Vector{Int}) = YoungTableau(Partition(p))
+YoungTableau(p::Vector{T}, fill=collect(1:sum(p))) where T<:Integer = YoungTableau(Partition(p), fill)
 
 size(Y::YoungTableau) = size(Y.tab)
 
