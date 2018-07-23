@@ -593,14 +593,14 @@ elements!(G::PermGroup)= (p for p in AllPerms(G.n))
 ###############################################################################
 
 doc"""
-    order(G::PermGroup)
+    order(G::PermGroup) -> BigInt
 > Return the order of the full permutation group as `BigInt`.
 """
 order(G::PermGroup) = order(BigInt, G)
 order(::Type{T}, G::PermGroup) where T = factorial(T(G.n))
 
 doc"""
-    order(a::perm)
+    order(a::perm) -> BigInt
 > Return the order of permutation `a` as `BigInt`.
 >
 > If you are sure that computation over `T` (or its `Int` promotion) will not
@@ -835,9 +835,9 @@ const _charvalsTableBig = Dict{Tuple{BitVector,Vector{Int}}, BigInt}()
 doc"""
     character(lambda::Partition)
 > Returns the $\lambda$-th irreducible character of permutation group on
-> `lambda.n` generators. The returned character function
->     `chi(p::perm, check::Bool=true)`
-> can be evaluated on a permutation `p::perm`. Checking in $\chi$ if `p`
+> `sum(lambda)` generators. The returned character function is of the following signature:
+>     `chi(p::perm, check::Bool=true) -> BigInt`
+> The character function checks in $\chi$ if `p`
 > belongs to the appropriate group can be switched off by calling
 > `chi(p, false)`. The values computed by $\chi$ are stored in look-up table.
 >
@@ -865,7 +865,7 @@ function character(lambda::Partition)
 end
 
 doc"""
-    character(lambda::Partition, p::perm, check::Bool=true)
+    character(lambda::Partition, p::perm, check::Bool=true) -> BigInt
 > Returns the value of `lambda`-th irreducible character of the permutation
 > group on permutation `p`.
 """
@@ -881,7 +881,7 @@ function character(::Type{T}, lambda::Partition, p::perm) where T <: Integer
 end
 
 doc"""
-    character(lambda::Partition, mu::Partition)
+    character(lambda::Partition, mu::Partition) -> BigInt
 > Returns the value of `lambda-th` irreducible character on the conjugacy class
 > represented by partition `mu`.
 """
