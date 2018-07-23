@@ -557,17 +557,115 @@ doc"""
 > Returns the conjugated tableau, i.e. the tableau reflected through the main
 > diagonal.
 
+# Examples
+```jldoctest
+julia> y = YoungTableau([4,3,1])
+┌───┬───┬───┬───┐
+│ 1 │ 2 │ 3 │ 4 │
+├───┼───┼───┼───┘
+│ 5 │ 6 │ 7 │
+├───┼───┴───┘
+│ 8 │
+└───┘
+
+julia> conj(y)
+┌───┬───┬───┐
+│ 1 │ 5 │ 8 │
+├───┼───┼───┘
+│ 2 │ 6 │
+├───┼───┤
+│ 3 │ 7 │
+├───┼───┘
+│ 4 │
+└───┘
+```
 """
 Base.conj(Y::YoungTableau) = YoungTableau(conj(Y.part, Y.fill)...)
 
+doc"""
+    rowlength(Y::YoungTableau, i, j)
+> Return the row length of `Y` at box `(i,j)`, i.e. the number of boxes in the
+> `i`-th row of the diagram of `Y` located to the right of the `(i,j)`-th box.
+
+# Examples
+```jldoctest
+julia> y = YoungTableau([4,3,1])
+┌───┬───┬───┬───┐
+│ 1 │ 2 │ 3 │ 4 │
+├───┼───┼───┼───┘
+│ 5 │ 6 │ 7 │
+├───┼───┴───┘
+│ 8 │
+└───┘
+
+julia> Generic.rowlength(y, 1,2)
+2
+
+julia> Generic.rowlength(y, 2,3)
+0
+
+julia> Generic.rowlength(y, 3,3)
+0
+```
+"""
 rowlength(Y::YoungTableau, i, j) = Y.part[i] < j ? 0 : Y.part[i]-j
 
+doc"""
+    collength(Y::YoungTableau, i, j)
+> Return the column length of `Y` at box `(i,j)`, i.e. the number of boxes in
+> the `j`-th column of the diagram of `Y` located below of the `(i,j)`-th box.
+
+# Examples
+```jldoctest
+julia> y = YoungTableau([4,3,1])
+┌───┬───┬───┬───┐
+│ 1 │ 2 │ 3 │ 4 │
+├───┼───┼───┼───┘
+│ 5 │ 6 │ 7 │
+├───┼───┴───┘
+│ 8 │
+└───┘
+
+julia> Generic.collength(y, 1,1)
+2
+
+julia> Generic.collength(y, 1,3)
+1
+
+julia> Generic.collength(y, 2,4)
+0
+```
+"""
 collength(Y::YoungTableau, i, j) = count(x -> x>=j, view(Y.part, i+1:endof(Y.part)))
 
 doc"""
     hooklength(Y::YoungTableau, i, j)
-> Returns the hooklength of an element in `Y` at position `(i,j)`. `hooklength`
-> will return `0` for `(i,j)` not in the tableau `Y`.
+> Return the hook-length of an element in `Y` at position `(i,j)`, i.e the
+> number of cells in the `i`-th row to the rigth of `(i,j)`-th box, plus the
+> number of cells in the `j`-th column below the `(i,j)`-th box, plus `1`.
+>
+> Return `0` for `(i,j)` not in the tableau `Y`.
+
+# Examples
+```jldoctest
+julia> y = YoungTableau([4,3,1])
+┌───┬───┬───┬───┐
+│ 1 │ 2 │ 3 │ 4 │
+├───┼───┼───┼───┘
+│ 5 │ 6 │ 7 │
+├───┼───┴───┘
+│ 8 │
+└───┘
+
+julia> hooklength(y, 1,1)
+6
+
+julia> hooklength(y, 1,3)
+3
+
+julia> hooklength(y, 2,4)
+0
+```
 """
 function hooklength(Y::YoungTableau, i, j)
    if inyoungtab((i,j), Y)
