@@ -276,10 +276,10 @@ mutable struct PermDisplayStyle
    format::Symbol
 end
 
-const _perm_display_style = PermDisplayStyle(:cycles)
+const _permdisplaystyle = PermDisplayStyle(:cycles)
 
 doc"""
-    setpermstyle(format)
+    setpermstyle(format::Symbol)
 > AbstractAlgebra can display (in REPL or in general as string) permutations by
 > either vectors of integers whose $n$-th position represents the value at $n$
 > (e.g. `[2, 3, 1, 5, 4]`), or as, more familiar for mathematicians,
@@ -291,24 +291,22 @@ doc"""
 
 # Examples:
 ```jldoctest
-julia> setpermstyle(:array)
+julia> Generic.setpermstyle(:array)
 :array
 
 julia> perm([2,3,1,5,4])
 [2, 3, 1, 5, 4]
 
-julia> setpermstyle(:cycles)
+julia> Generic.setpermstyle(:cycles)
 :cycles
 
 julia> perm([2,3,1,5,4])
 (1,2,3)(4,5)
 ```
 """
-setpermstyle() = _perm_display_style.format
-
 function setpermstyle(format::Symbol)
    if format in (:array, :cycles)
-      _perm_display_style.format = format
+      _permdisplaystyle.format = format
    else
       throw("Permutations can be displayed only as :array or :cycles.")
    end
@@ -316,9 +314,9 @@ function setpermstyle(format::Symbol)
 end
 
 function show(io::IO, g::perm)
-   if _perm_display_style.format == :array
+   if _permdisplaystyle.format == :array
       print(io, "[" * join(g.d, ", ") * "]")
-   elseif _perm_display_style.format == :cycles
+   elseif _permdisplaystyle.format == :cycles
       cd = cycles(g)
       if g == parent(g)()
          print(io, "()")
