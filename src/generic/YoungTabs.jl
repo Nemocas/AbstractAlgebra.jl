@@ -319,11 +319,7 @@ hash(Y::YoungTableau, h::UInt) = hash(Y.part, hash(Y.fill, hash(YoungTableau, h)
 
 
 doc"""
-    conj(Y::YoungTableau)
-> Returns the conjugated tableau, i.e. the tableau reflected through the main
-> diagonal.
 """
-conj(Y::YoungTableau) = YoungTableau(conj(Y.part), transpose(Y.tab))
 
 ##############################################################################
 #
@@ -333,6 +329,14 @@ conj(Y::YoungTableau) = YoungTableau(conj(Y.part), transpose(Y.tab))
 
 rowlen(Y::YoungTableau, i, j) = sum(Y[i, j:end] .> 0)
 collen(Y::YoungTableau, i, j) = sum(Y[i:end, j] .> 0)
+doc"""
+    conj(Y::YoungTableau)
+> Returns the conjugated tableau, i.e. the tableau reflected through the main
+> diagonal.
+
+"""
+Base.conj(Y::YoungTableau) = YoungTableau(conj(Y.part, Y.fill)...)
+
 
 doc"""
     hooklength(Y::YoungTableau, i, j)
