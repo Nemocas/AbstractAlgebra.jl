@@ -462,11 +462,12 @@ const _youngtabstyle = YoungTabDisplayStyle(:diagram)
 
 doc"""
     setyoungtabstyle(format::Symbol)
-> AbstractAlgebra can display (in REPL or in general as string) Young tableaux
-> by either matrices of integers, or as filled Young diagrams (the difference
-> is purely esthetical).
-> The style can be switched by calling `setyoungtabstyle` with `format=:array`
-> or `format=:diagram` (the default).
+> Select the style in which Young tableaux are displayed (in REPL or in general
+> as string). This can be either
+> * `:array` - as matrices of integers, or
+> * `:diagram` - as filled Young diagrams (the default).
+>
+> The difference is purely esthetical.
 
 # Examples:
 ```jldoctest

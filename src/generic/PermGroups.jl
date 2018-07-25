@@ -280,14 +280,15 @@ const _permdisplaystyle = PermDisplayStyle(:cycles)
 
 doc"""
     setpermstyle(format::Symbol)
-> AbstractAlgebra can display (in REPL or in general as string) permutations by
-> either vectors of integers whose $n$-th position represents the value at $n$
-> (e.g. `[2, 3, 1, 5, 4]`), or as, more familiar for mathematicians,
-> decomposition into disjoint cycles (e.g. `(1,2,3)(4,5)`), where the value of
-> the permutation at $n$ is represented by the entry immediately following $n$
-> in a cycle. Cycles of length $1$ are omitted in the output.
-> The style can be switched by calling `setpermstyle` with `format=:array` or
-> `format=:cycles` (the default).
+> Select the style in which permutations are displayed (in REPL or in general
+> as string). This can be either
+> * `:array` - as vectors of integers whose $n$-th position represents the
+> value at $n$), or
+> * `:cycles` - as, more familiar for mathematicians, decomposition into
+> disjoint cycles, where the value at $n$ is represented by the entry
+> immediately following $n$ in a cycle (the default).
+
+> The difference is purely esthetical.
 
 # Examples:
 ```jldoctest
