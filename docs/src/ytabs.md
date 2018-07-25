@@ -21,13 +21,14 @@ Partitions are printed using the standard notation, i.e. $9 = 4 + 2 + 1 + 1 + 1$
 Generic.Partition
 ```
 
-`Partition` is a concrete subtype of `AbstractVector{Int}` and implements the standard Array interface.
+### Array interface
+
+`Partition` is a concrete subtype of `AbstractVector{Int}` and implements the following standard Array interface:
 
 ```@docs
-length(::Generic.Partition)
 size(::Generic.Partition)
-getindex(::Generic.Partition, i)
-setindex!(::Generic.Partition, v, i)
+getindex(::Generic.Partition, i::Integer)
+setindex!(::Generic.Partition, v::Integer, i::Integer)
 ```
 These functions work on the level of `p.part` vector.
 Additionally `setindex!` will try to prevent uses which result in non-valid (i.e. non-decreasing) partition vectors.
@@ -95,12 +96,13 @@ For convenience there exists an alternative constructor of `YoungTableau`, which
 YoungTableau(p::Vector{Integer}[, fill=collect(1:sum(p))])
 ```
 
-`YoungTableaux` implements AbstractArray interface with the following functions:
+### Array interface
+
+To make `YoungTableaux` array-like we implement the following functions:
 
 ```@docs
-size(::YoungTableau)
-length(::YoungTableau)
-getindex(::YoungTableau, n::Integer)
+size(::Generic.YoungTableau)
+getindex(::Generic.YoungTableau, n::Integer)
 ```
 Also the double-indexing corresponds to `(row, column)` access to an abstract array.
 ```jldoctest
@@ -123,7 +125,9 @@ julia> y[3,2]
 0
 ```
 
-Again, as in the case of `Partition` the meaning of `conj` is altered to reflect the usual meaning for Young tableaux:
+Functions defined for `AbstractArray` type based on those (e.g. `length`) should work.
+Again, as in the case of `Partition` the meaning of `conj` is altered to
+reflect the usual meaning for Young tableaux:
 ```@docs
 conj(::Generic.YoungTableau)
 ```
@@ -138,8 +142,8 @@ Generic.setyoungtabstyle
 
 ### Ulitility functions
 ```@docs
-matrix_repr(::YoungTableau)
-fill!
+matrix_repr(::Generic.YoungTableau)
+fill!(::Generic.YoungTableau, ::AbstractVector{<:Integer})
 ```
 
 ## Characters of permutation grups
@@ -168,26 +172,29 @@ hooklength
 dim(::Generic.YoungTableau)
 ```
 
-The character associated with $Y.part$ can also be used to compute the dimension, but as it is expected the Murnaghan-Nakayama is much slower.
-However due to caching consecutive calls are fast:
+The the character associated with `Y.part` can also be used to compute the dimension, but as it is expected the Murnaghan-Nakayama is much slower even though (due to caching) consecutive calls are fast:
 
 ```jldoctest
-julia> λ = Partition(collect(12:-1:1));
+julia> λ = Partition(collect(12:-1:1))
+12₁11₁10₁9₁8₁7₁6₁5₁4₁3₁2₁1₁
 
 julia> @time dim(YoungTableau(λ))
-  0.284378 seconds (242.96 k allocations: 12.285 MiB)
+  0.224430 seconds (155.77 k allocations: 7.990 MiB)
 9079590132732747656880081324531330222983622187548672000
 
 julia> @time dim(YoungTableau(λ))
-  0.000045 seconds (335 allocations: 10.734 KiB)
+  0.000038 seconds (335 allocations: 10.734 KiB)
 9079590132732747656880081324531330222983622187548672000
 
-julia> @time character(λ, Partition(ones(Int, sum(λ))))
- 28.361988 seconds (58.10 M allocations: 3.908 GiB, 43.39% gc time)
+julia> G = PermutationGroup(sum(λ))
+Permutation group over 78 elements
+
+julia> @time character(λ, G())
+ 24.154105 seconds (58.13 M allocations: 3.909 GiB, 42.84% gc time)
 9079590132732747656880081324531330222983622187548672000
 
-julia> @time character(λ, Partition(ones(Int, sum(λ))))
-  0.000145 seconds (180 allocations: 19.875 KiB)
+julia> @time character(λ, G())
+  0.001439 seconds (195 allocations: 24.453 KiB)
 9079590132732747656880081324531330222983622187548672000
 ```
 
@@ -196,10 +203,9 @@ julia> @time character(λ, Partition(ones(Int, sum(λ))))
 As mentioned above `character` functions use the Murnaghan-Nakayama rule for evaluation.
 The implementation follows
 > Dan Bernstein,
-> "The computational complexity of rules for the character table of Sn"
-> _Journal of Symbolic Computation_, 37(6), 2004, p. 727-748,
-implementing the following functions.
-For precise definitions and meaning please consult the paper cited.
+> The computational complexity of rules for the character table of $S_n$
+> *Journal of Symbolic Computation*, **37** (6), 2004, p. 727-748,
+implementing the following functions. For precise definitions and meaning please consult the paper cited.
 
 ```@docs
 Generic.partitionseq
@@ -218,9 +224,9 @@ Generic.SkewDiagram
 `SkewDiagram` implements array interface with the following functions:
 
 ```@docs
-size(xi::SkewDiagram)
-in(::Tuple{})
-getindex(xi::SkewDiagram, n::Integer)
+size(xi::Generic.SkewDiagram)
+in(t::Tuple{T,T}, xi::Generic.SkewDiagram) where T<:Integer
+getindex(xi::Generic.SkewDiagram, n::Integer)
 ```
 
 The support for skew diagrams is very rudimentary. The following functions are available:

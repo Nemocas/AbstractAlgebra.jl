@@ -243,7 +243,7 @@ end
 doc"""
     YoungTableau(part::Partition[, fill::Vector{Int}=collect(1:sum(part))])  <: AbstractArray{Int, 2}
 > Returns the Young tableaux of partition `part`, filled linearly
-> by `fill` vector. Note that `fill` vector is inputed in **row-major** format.
+> by `fill` vector. Note that `fill` vector is in **row-major** format.
 >
 > Fields:
 > * `part` - the partition defining Young diagram
@@ -924,4 +924,3 @@ mutable struct MapCache{D, C, S, T, De, Ce} <: AbstractAlgebra.Map{D, C, S, T}
       return r
    end
 end
-
