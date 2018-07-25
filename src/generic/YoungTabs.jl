@@ -8,12 +8,6 @@ export rowlength, collength, hooklength, dim, isrimhook, leglength
 ##############################################################################
 
 doc"""
-    length(p::Partition)
-> Return the number parts in the partition.
-"""
-length(p::Partition) = length(p.part)
-
-doc"""
     size(p::Partition)
 > Return the size of the vector which represents the partition.
 """
