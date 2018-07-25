@@ -543,10 +543,32 @@ end
 
 doc"""
     fill!(Y::YoungTableaux, V::Vector{<:Integer})
-> Replace the fill vector `Y.fill` by `V`.
+> Replace the fill vector `Y.fill` by `V`. No check if the resulting tableau is
+> standard (i.e. increasing along rows and columns) is performed.
+
+# Examples:
+```jldoctest
+julia> y = YoungTableau([4,3,1])
+┌───┬───┬───┬───┐
+│ 1 │ 2 │ 3 │ 4 │
+├───┼───┼───┼───┘
+│ 5 │ 6 │ 7 │
+├───┼───┴───┘
+│ 8 │
+└───┘
+
+julia> fill!(y, [2:9...])
+┌───┬───┬───┬───┐
+│ 2 │ 3 │ 4 │ 5 │
+├───┼───┼───┼───┘
+│ 6 │ 7 │ 8 │
+├───┼───┴───┘
+│ 9 │
+└───┘
+```
 """
-function fill!(Y::YoungTableau, V::Vector{T}) where T<:Integer
-   length(V) == Y.part.n || throw(ArgumentError("Length of fill vector must math the partition"))
+function Base.fill!(Y::YoungTableau, V::AbstractVector{<:Integer})
+   length(V) == sum(Y.part) || throw(ArgumentError("Length of fill vector must match the size of partition"))
    Y.fill .= V
    return Y
 end
