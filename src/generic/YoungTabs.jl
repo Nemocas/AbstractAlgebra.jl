@@ -10,6 +10,12 @@ export rowlength, collength, hooklength, dim, isrimhook, leglength
 doc"""
     size(p::Partition)
 > Return the size of the vector which represents the partition.
+
+# Examples:
+```jldoctest
+julia> p = Partition([4,3,1]); size(p)
+(3,)
+```
 """
 size(p::Partition) = size(p.part)
 
@@ -17,7 +23,7 @@ Base.IndexStyle(::Type{Partition}) = Base.IndexLinear()
 
 doc"""
     getindex(p::Partition, i::Integer)
-> Return the `i`-th number (in decreasing order) of the partition.
+> Return the `i`-th part (in decreasing order) of the partition.
 """
 getindex(p::Partition, i::Integer) = p.part[i]
 
@@ -25,7 +31,7 @@ Base.sum(p::Partition) = p.n
 
 doc"""
     setindex!(p::Partition, v::Integer, i::Integer)
-> Set the `i`-th entry of partition `p` to `v`.
+> Set the `i`-th part of partition `p` to `v`.
 > `setindex!` will throw an error if the operation violates the non-increasing assumption.
 """
 function setindex!(p::Partition, v::Integer, i::Integer)
@@ -149,7 +155,7 @@ end
 doc"""
     conj(part::Partition)
 > Returns the conjugated partition of `part`, i.e. the partition corresponding
-> to the Young tableau of `part` reflected through the main diagonal.
+> to the Young diagram of `part` reflected through the main diagonal.
 
 # Examples:
 ```jldoctest
@@ -297,13 +303,13 @@ YoungTableau(p::Vector{T}, fill=collect(1:sum(p))) where T<:Integer = YoungTable
 
 doc"""
     size(Y::YoungTableau)
-> Return `size` of the smallest array containing `Y`, i.e. tuple of the number
-> of rows and the number of columns of `Y`.
+> Return `size` of the smallest array containing `Y`, i.e. the tuple of the
+> number of rows and the number of columns of `Y`.
 
 # Examples:
 ```jldoctest
 julia> y = YoungTableau([4,3,1]); size(y)
-(3,4)
+(3, 4)
 ```
 """
 size(Y::YoungTableau) = (length(Y.part), Y.part[1])
@@ -317,12 +323,12 @@ function inyoungtab(t::Tuple{T,T}, Y::YoungTableau) where T<:Integer
    return true
 end
 
-"""
+doc"""
     getindex(Y::YoungTableau, n::Integer)
 > Return the column-major linear index into the `size(Y)`-array. If a box is
 > outside of the array return `0`.
 
-# Examples
+# Examples:
 ```jldoctest
 julia> y = YoungTableau([4,3,1])
 ┌───┬───┬───┬───┐
@@ -344,6 +350,7 @@ julia> y[4]
 
 julia> y[6]
 0
+```
 """
 function getindex(Y::YoungTableau, n::Integer)
    if n < 1 #|| n > length(Y)
@@ -693,8 +700,8 @@ end
 
 doc"""
     dim(Y::YoungTableau) -> BigInt
-> Returns the dimension of the irreducible representation of
-> permutation group $S_n$ associated to YoungTableau `Y` of a partition of `n`.
+> Returns the dimension (using hook-length formula) of the irreducible
+> representation of permutation group $S_n$ associated the partition `Y.part`.
 >
 > Since the computation overflows easily `BigInt` is returned. You may perform
 > the computation of the dimension in different type by calling `dim(Int, Y)`.
@@ -737,7 +744,7 @@ Base.size(xi::SkewDiagram) = (length(xi.lam), xi.lam[1])
 Base.IndexStyle(::Type{SkewDiagram}) = Base.IndexLinear()
 
 doc"""
-    in(t::Tuple{<:Integer, <:Integer}, xi::SkewDiagram)
+    in(t::Tuple{T,T}, xi::SkewDiagram) where T<:Integer
 > Checks if box at position `(i,j)` belongs to the skew diagram `xi`.
 """
 function Base.in(t::Tuple{T, T}, xi::SkewDiagram) where T<:Integer
@@ -756,7 +763,7 @@ end
 doc"""
     getindex(xi::SkewDiagram, n::Integer)
 > Return `1` if linear index `n` corresponds to (column-major) entry in
-> `xi.lam` which is not contained in `xi.mu`
+> `xi.lam` which is not contained in `xi.mu`. Otherwise return `0`.
 """
 function getindex(xi::SkewDiagram, n::Integer)
    i,j = ind2sub(size(xi), n)
