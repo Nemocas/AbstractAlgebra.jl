@@ -165,9 +165,9 @@ doc"""
 > Return an iterator over all integer `Partition`s of `n`.
 > Partitions are produced in ascending order according to RuleAsc (Algorithm 3.1) from
 >
-> Jerome Kelleher and Barry O’Sullivan,
-> *Generating All Partitions: A Comparison Of Two Encodings*
-> ArXiv:0909.2331
+> > Jerome Kelleher and Barry O’Sullivan,
+> > *Generating All Partitions: A Comparison Of Two Encodings*
+> > ArXiv:0909.2331
 >
 > See also `Combinatorics.partitions(1:n)`.
 
