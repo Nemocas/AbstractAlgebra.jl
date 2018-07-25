@@ -835,21 +835,21 @@ const _charvalsTableBig = Dict{Tuple{BitVector,Vector{Int}}, BigInt}()
 
 doc"""
     character(lambda::Partition)
-> Returns the $\lambda$-th irreducible character of permutation group on
-> `sum(lambda)` generators. The returned character function is of the following signature:
->     `chi(p::perm, check::Bool=true) -> BigInt`
-> The character function checks in $\chi$ if `p`
-> belongs to the appropriate group can be switched off by calling
-> `chi(p, false)`. The values computed by $\chi$ are stored in look-up table.
+> Return the $\lambda$-th irreducible character of permutation group on
+> `sum(lambda)` symbols. The returned character function is of the following signature:
+> > `chi(p::perm[, check::Bool=true]) -> BigInt`
+> The function checks (if `p` belongs to the appropriate group) can be switched
+> off by calling `chi(p, false)`. The values computed by $\chi$ are cached in
+> look-up table.
 >
 > The computation follows the Murnaghan-Nakayama formula:
 > $$\chi_\lambda(\sigma) = \sum_{\text{rimhook }\xi\subset \lambda}(-1)^{ll(\lambda\backslash\xi)} \chi_{\lambda \backslash\xi}(\tilde\sigma)$$
-> where $\lambda\backslash\xi$ denotes partition associated with Young Diagram
-> of $\lambda$ with $\xi$ removed, $ll$ denotes the leg-length (i.e. number of
-> rows - 1) and $\tilde\sigma$ is permutation obtained from $\sigma$ by the
-> removal of the longest cycle.
+> where $\lambda\backslash\xi$ denotes the skew diagram of $\lambda$ with $\xi$
+> removed, $ll$ denotes the leg-length (i.e. number of rows - 1) and
+> $\tilde\sigma$ is permutation obtained from $\sigma$ by the removal of the
+> longest cycle.
 >
-> For more details see e.g. Chapter 2.8 of _Group Theory and Physics_ by
+> For more details see e.g. Chapter 2.8 of *Group Theory and Physics* by
 > S.Sternberg.
 
 # Examples
