@@ -173,7 +173,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Ring Interface",
     "title": "String I/O",
     "category": "section",
-    "text": "show(io::IO, R::MyParent)This should print (to the given IO object), an English description of the parent ring. If the ring is parameterised, it can call the corresponding show function for any rings it depends on.show(io::IO, f::MyElem)This should print a human readable, textual representation of the object (to the given IO object). It can recursively call the corresponding show functions for any of its components.It may be necessary in some cases to print parentheses around components of f or to print signs of components. For these, the following functions will exist for each component or component type.needs_parentheses(f::MyElem)Should returns true if parentheses are needed around this object when printed, e.g. as a coefficient of a polynomial. As an example, non-constant polynomials would need such parentheses if used as coefficients of another polynomial.isnegative(f::MyElem)When printing polynomials, a + sign is usually inserted automatically between terms of the polynomial. However, this is not desirable if the coefficient is negative and that negative sign is already printed when the coefficient is printed.This function must return true if a negative sign would already be prepended when f is printed. This suppresses the automatic printing of a + sign by polynomial printing functions that are printing f as a coefficient of a term.Note that if needs_parentheses returns true for f, then isnegative should always return false for that f, since an automatic + will need to be printed in front of a coefficient that is printed with parentheses.show_minus_one(::Type{MyElem})When printing polynomials, we prefer to print x rather than 1*x if the degree 1 term has coefficient 1. This can be taken care of without any special support.However, we also prefer to print -x rather than -1*x. This requires special support, since -1 in some rings is not printed as -1 (e.g. -1 in mathbbZ3mathbbZ might be printed as 2). In such rings, show_minus_one should return true.If show_minus_one returns true, polynomial printing functions will not print -x for terms of degree 1 with coefficient -1, but will use the printing function of the given type to print the coefficient in that case."
+    "text": "show(io::IO, R::MyParent)This should print (to the given IO object), an English description of the parent ring. If the ring is parameterised, it can call the corresponding show function for any rings it depends on.show(io::IO, f::MyElem)This should print a human readable, textual representation of the object (to the given IO object). It can recursively call the corresponding show functions for any of its components.It may be necessary in some cases to print parentheses around components of f or to print signs of components. For these, the following functions will exist for each component or component type.needs_parentheses(f::MyElem)Should returns true if parentheses are needed around this object when printed, e.g. as a coefficient of a polynomial. As an example, non-constant polynomials would need such parentheses if used as coefficients of another polynomial.displayed_with_minus_in_front(f::MyElem)When printing polynomials, a + sign is usually inserted automatically between terms of the polynomial. However, this is not desirable if the coefficient is negative and that negative sign is already printed when the coefficient is printed.This function must return true if f is printed starting with a negative sign. This suppresses the automatic printing of a + sign by polynomial printing functions that are printing f as a coefficient of a term.Note that if needs_parentheses returns true for f, then displayed_with_minus_in_front should always return false for that f, since an automatic + will need to be printed in front of a coefficient that is printed with parentheses.show_minus_one(::Type{MyElem})When printing polynomials, we prefer to print x rather than 1*x if the degree 1 term has coefficient 1. This can be taken care of without any special support.However, we also prefer to print -x rather than -1*x. This requires special support, since -1 in some rings is not printed as -1 (e.g. -1 in mathbbZ3mathbbZ might be printed as 2). In such rings, show_minus_one should return true.If show_minus_one returns true, polynomial printing functions will not print -x for terms of degree 1 with coefficient -1, but will use the printing function of the given type to print the coefficient in that case."
 },
 
 {
@@ -477,7 +477,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Univariate Polynomial Ring Interface",
     "title": "Data type and parent object methods",
     "category": "section",
-    "text": "var(S::MyPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn a Symbol representing the variable (generator) of the polynomial ring. Note that this is a Symbol not a String, though its string value will usually be used when printing polynomials.vars(S::MyPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn the array [s] where s	 is aSymbol` representing the variable of the given polynomial ring. This is provided for uniformity with the multivariate interface, where there is more than one variable, and hence an array of symbols.ExamplesS, x = PolynomialRing(QQ, \"x\")\n\nvsym = var(S)\nV = vars(S)"
+    "text": "var(S::MyPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn a Symbol representing the variable (generator) of the polynomial ring. Note that this is a Symbol not a String, though its string value will usually be used when printing polynomials.symbols(S::MyPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn the array [s] where s	 is aSymbol` representing the variable of the given polynomial ring. This is provided for uniformity with the multivariate interface, where there is more than one variable, and hence an array of symbols.ExamplesS, x = PolynomialRing(QQ, \"x\")\n\nvsym = var(S)\nV = symbols(S)"
 },
 
 {
@@ -901,7 +901,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multvariate Polynomial Ring Interface",
     "title": "Multvariate Polynomial Ring Interface",
     "category": "page",
-    "text": ""
+    "text": "CurrentModule = AbstractAlgebra"
 },
 
 {
@@ -933,7 +933,23 @@ var documenterSearchIndex = {"docs": [
     "page": "Multvariate Polynomial Ring Interface",
     "title": "Data type and parent object methods",
     "category": "section",
-    "text": "vars(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn an array of Symbols representing the variables (generators) of the polynomial ring. Note that these are Symbols not Strings, though their string values will usually be used when printing polynomials.gens(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn an array of all the generators (variables) of the given polynomial ring (as polynomials).The first entry in the array will be the variable with most significance with respect to the ordering.ordering(S::MyMPolyRing{T})Return the ordering of the given polynomial ring as a symbol. Supported values currently include :lex, :deglex and :degrevlex.ExamplesS, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"]; ordering=:deglex)\n\nV = vars(S)\nX = gens(S)\nord = ordering(S)"
+    "text": "symbols(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn an array of Symbols representing the variables (generators) of the polynomial ring. Note that these are Symbols not Strings, though their string values will usually be used when printing polynomials.nvars(f::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn the number of variables of the polynomial ring.gens(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn an array of all the generators (variables) of the given polynomial ring (as polynomials).The first entry in the array will be the variable with most significance with respect to the ordering.ordering(S::MyMPolyRing{T})Return the ordering of the given polynomial ring as a symbol. Supported values currently include :lex, :deglex and :degrevlex.ExamplesS, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"]; ordering=:deglex)\n\nV = symbols(S)\nX = gens(S)\nord = ordering(S)"
+},
+
+{
+    "location": "mpolynomial_rings.html#AbstractAlgebra.Generic.total_degree-Union{Tuple{AbstractAlgebra.Generic.MPoly{T}}, Tuple{T}} where T<:Union{AbstractAlgebra.RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "AbstractAlgebra.Generic.total_degree",
+    "category": "Method",
+    "text": "total_degree{T <: RingElement}(f::MPoly{T})\n\nReturns the total degree of f.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial_rings.html#AbstractAlgebra.Generic.vars-Union{Tuple{AbstractAlgebra.Generic.MPoly{T}}, Tuple{T}} where T<:Union{AbstractAlgebra.RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "AbstractAlgebra.Generic.vars",
+    "category": "Method",
+    "text": "vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}\n\nReturns the variables occuring in p.\n\n\n\n"
 },
 
 {
@@ -941,7 +957,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multvariate Polynomial Ring Interface",
     "title": "Basic manipulation of rings and elements",
     "category": "section",
-    "text": "length(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the number of nonzero terms of the given polynomial. The length of the zero polynomial is defined to be 0. The return value should be of type Int.isgen(x::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if x is a generator of the polynomial ring.max_degrees(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturns a tuple (B, b) consisting of an array of Ints specifying the highest power of each variable that appears in the given polynomial and b the largest of the values in B.nvars(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the number of variables of the polynomial ring that f belongs to.isunit(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f is a unit in its parent polynomial ring.isconstant(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f is a constant polynomial. The zero polynomial is considered constant for the purposes of this function.isterm(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f consists of a single term.ismonomial(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f consists of a single term with coefficient 1.ExamplesS, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^3*y + 3x*y^2 + 1\n\nn = length(f)\nisgen(y) == true\nB, b = max_degrees(f)\nnvars(f) == 2\nisunit(f) == false\nisconstant(f) == false\nisterm(2x*y) == true\nismonomial(x*y) == false"
+    "text": "length(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the number of nonzero terms of the given polynomial. The length of the zero polynomial is defined to be 0. The return value should be of type Int.isgen(x::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if x is a generator of the polynomial ring.max_degrees(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturns a tuple (B, b) consisting of an array of Ints specifying the highest power of each variable that appears in the given polynomial and b the largest of the values in B.total_degree(f::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}isunit(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f is a unit in its parent polynomial ring.isconstant(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f is a constant polynomial. The zero polynomial is considered constant for the purposes of this function.isterm(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f consists of a single term.ismonomial(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f consists of a single term with coefficient 1.vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}Note that vars(p::AbstractAlgebra.Generic.MPoly{T}) returns variables, while vars(S::MyMPolyRing{T}) return symbols.ExamplesS, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^3*y + 3x*y^2 + 1\n\nn = length(f)\nisgen(y) == true\nB, b = max_degrees(f)\nnvars(f) == 2\nisunit(f) == false\nisconstant(f) == false\nisterm(2x*y) == true\nismonomial(x*y) == false"
 },
 
 {
@@ -961,11 +977,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "mpolynomial_rings.html#AbstractAlgebra.Generic.change_base_ring-Union{Tuple{AbstractAlgebra.Generic.MPoly{T},Any}, Tuple{T}} where T<:Union{AbstractAlgebra.RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "AbstractAlgebra.Generic.change_base_ring",
+    "category": "Method",
+    "text": "change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}\n\nReturns the polynomial obtained by applying g to the coefficients of p.\n\n\n\n"
+},
+
+{
     "location": "mpolynomial_rings.html#Evaluation-1",
     "page": "Multvariate Polynomial Ring Interface",
     "title": "Evaluation",
     "category": "section",
-    "text": "evaluate(f::MyMPoly{T}, A::Array{T, 1}) where T <: AbstractAlgebra.RingElemEvaluate the polynomial f at the values specified by the entries of the array A.evaluate(f::MPoly{T}, A::Array{T, 1}) where T <: IntegerEvaluate the polynomial f at the values specified by the entries of the array A.ExamplesR, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n\nf = 2x^2*y + 2x + y + 1\n\nm = evaluate(f, Rational{BigInt}[2, 3])\nn = evaluate(f, [2, 3])"
+    "text": "evaluate(f::MyMPoly{T}, A::Array{T, 1}) where T <: AbstractAlgebra.RingElemEvaluate the polynomial f at the values specified by the entries of the array A.evaluate(f::MPoly{T}, A::Array{T, 1}) where T <: IntegerEvaluate the polynomial f at the values specified by the entries of the array A.ExamplesR, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n\nf = 2x^2*y + 2x + y + 1\n\nm = evaluate(f, Rational{BigInt}[2, 3])\nn = evaluate(f, [2, 3])In order to substitute the variables of a polynomial f over a ring T by elements in a T-algebra S, you first have to change the base ring of f using the following function, where g is a function representing the structure homomorphism of the T-algebra S.change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}ExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\nS, (u, v) = PolynomialRing(ZZ, [\"u\", \"v\"])\n\nf = 2x^2*y + 2x + y + 1\n\nevaluate(change_base_ring(f, a->S(a)), [S(1), v])\nevaluate(change_base_ring(f, a->R(a)), [y, x])"
 },
 
 {
@@ -1001,6 +1025,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "mpolynomial_rings.html#AbstractAlgebra.Generic.derivative-Union{Tuple{AbstractAlgebra.Generic.MPoly{T},AbstractAlgebra.Generic.MPoly{T}}, Tuple{T}} where T<:AbstractAlgebra.RingElem",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "AbstractAlgebra.Generic.derivative",
+    "category": "Method",
+    "text": "derivative{T <: AbstractAlgebra.RingElem}(f::AbstractAlgebra.Generic.MPoly{T}, x::AbstractAlgebra.Generic.MPoly{T})\n\nReturn the partial derivative of f with respect to x.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial_rings.html#Derivations-1",
+    "page": "Multvariate Polynomial Ring Interface",
+    "title": "Derivations",
+    "category": "section",
+    "text": "The following function allows to compute derivations of multivariate polynomials of type MPoly.derivative{T <: AbstractAlgebra.RingElem}(f::AbstractAlgebra.Generic.MPoly{T}, x::AbstractAlgebra.Generic.MPoly{T})ExampleR,(x,y) = AbstractAlgebra.PolynomialRing(ZZ,[\"x\",\"y\"])\nf = x*y + x + y + 1\nderivative(f,x)\nderivative(f,y)"
+},
+
+{
     "location": "mpolynomial.html#",
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Generic sparse distributed multivariate polynomials",
@@ -1029,7 +1069,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Polynomial ring constructors",
     "category": "section",
-    "text": "In order to construct multivariate polynomials in AbstractAlgebra.jl, one must first construct the polynomial ring itself. This is accomplished with the following constructor.PolynomialRing(R::AbstractAlgebra.Ring, S::Array{String, 1}; cached::Bool = true, ordering::Symbol=:lex)Given a base ring R and and array S of strings specifying how the generators (variables) should be printed, return a tuple S, (x, ...) representing the new polynomial ring S = Rx ldots and a tuple of the generators (x ) of the ring. By default the parent object S will depend only on R and  (x, ...) and will be cached. Setting the optional argument cached to false will prevent the parent object  S from being cached.The optional named argument ordering can be used to specify an ordering. The currently supported options are :lex, :deglex and `:degrevlex	.Here are some examples of creating multivariate polynomial rings and making use of the resulting parent objects to coerce various elements into the polynomial ring.ExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"]; ordering=:deglex)\n\nf = R()\ng = R(123)\nh = R(BigInt(1234))\nk = R(x + 1)\nm = R(x + y + 1)All of the examples here are generic polynomial rings, but specialised implementations of polynomial rings provided by external modules will also usually provide a PolynomialRing constructor to allow creation of their polynomial rings."
+    "text": "In order to construct multivariate polynomials in AbstractAlgebra.jl, one must first construct the polynomial ring itself. This is accomplished with the following constructor.PolynomialRing(R::AbstractAlgebra.Ring, S::Array{String, 1}; cached::Bool = true, ordering::Symbol=:lex)Given a base ring R and and array S of strings specifying how the generators (variables) should be printed, return a tuple S, (x, ...) representing the new polynomial ring S = Rx ldots and a tuple of the generators (x ) of the ring. By default the parent object S will depend only on R and  (x, ...) and will be cached. Setting the optional argument cached to false will prevent the parent object  S from being cached.The optional named argument ordering can be used to specify an ordering. The currently supported options are :lex, :deglex and `:degrevlex	.Here are some examples of creating multivariate polynomial rings and making use of the resulting parent objects to coerce various elements into the polynomial ring.ExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"]; ordering=:deglex)\n\nf = R()\ng = R(123)\nh = R(BigInt(1234))\nk = R(x + 1)\nm = R(x + y + 1)\nderivative(k,x)\nderivative(k,y)All of the examples here are generic polynomial rings, but specialised implementations of polynomial rings provided by external modules will also usually provide a PolynomialRing constructor to allow creation of their polynomial rings."
 },
 
 {
@@ -1978,114 +2018,610 @@ var documenterSearchIndex = {"docs": [
 
 {
     "location": "perm.html#",
-    "page": "Permutation groups",
-    "title": "Permutation groups",
+    "page": "Permutations and Permutation groups",
+    "title": "Permutations and Permutation groups",
     "category": "page",
-    "text": "CurrentModule = AbstractAlgebra"
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
-    "location": "perm.html#Permutation-groups-1",
-    "page": "Permutation groups",
-    "title": "Permutation groups",
-    "category": "section",
-    "text": "AbstractAlgebra.jl provides rudimentary support for permutation groups. These are mainly used for permutations of rows of matrices.Permutation groups are created using the PermGroup (inner) constructor. However, for convenience we definePermutationGroup = PermGroupso that permutation groups can be created using PermutationGroup instead of PermGroup.The types of permutations in AbstractAlgebra.jl are given by the following table, along with the libraries that provide them and the associated types of the parent objects.Library Group Element type Parent type\nNative S_n perm PermGroupAll the permutation group types belong to the Group abstract type and the corresponding permutation element types belong to the GroupElem abstract type."
+    "location": "perm.html#AbstractAlgebra.Generic.setpermstyle",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.setpermstyle",
+    "category": "Function",
+    "text": "setpermstyle(format::Symbol)\n\nSelect the style in which permutations are displayed (in REPL or in general as string). This can be either:array - as vectors of integers whose n-th position represents thevalue at n), or:cycles - as, more familiar for mathematicians, decomposition intodisjoint cycles, where the value at n is represented by the entry immediately following n in a cycle (the default).\n\nThe difference is purely esthetical.\n\nExamples:\n\njulia> Generic.setpermstyle(:array)\n:array\n\njulia> perm([2,3,1,5,4])\n[2, 3, 1, 5, 4]\n\njulia> Generic.setpermstyle(:cycles)\n:cycles\n\njulia> perm([2,3,1,5,4])\n(1,2,3)(4,5)\n\n\n\n"
 },
 
 {
-    "location": "perm.html#Permutation-group-constructors-1",
-    "page": "Permutation groups",
-    "title": "Permutation group constructors",
+    "location": "perm.html#Permutations-and-Permutation-groups-1",
+    "page": "Permutations and Permutation groups",
+    "title": "Permutations and Permutation groups",
     "category": "section",
-    "text": "In order to construct permutations in AbstractAlgebra.jl, one must first construct the permutation group they belong to. This is accomplished with the following constructor.PermGroup(n::Int)Construct the permutation group on n points. The function returns the parent object representing the group.ExamplesG = PermutationGroup(5)\n\np = G()"
+    "text": "AbstractAlgebra.jl provides rudimentary native support for permutation groups (implemented in src/generic/PermGroups.jl). All functionality of permutations is accesible in the Generic submodule.Permutations are represented internally via vector of integers, wrapped in type perm{T}, where T<:Integer carries the information on the type of elements of a permutation. Permutation groups are singleton parent objects of type PermGroup{T} and are used mostly to store the length of a permutation, since it is not included in the permutation type.Permutation groups are created using the PermGroup (inner) constructor. However, for convenience we definePermutationGroup = PermGroupso that permutation groups can be created using PermutationGroup instead of PermGroup.Both PermGroup and perm and can be parametrized by any type T<:Integer . By default the parameter is the Int-type native to the systems architecture. However, if you are sure that your permutations are small enough to fit into smaller integer type (such as Int32, Uint16, or even Int8), you may choose to change the parametrizing type accordingly. In practice this may result in decreased memory footprint (when storing multiple permutations) and noticable faster performance, if your workload is heavy in operations on permutations, which e.g. does not fit into cache of your cpu.All the permutation group types belong to the Group abstract type and the corresponding permutation element types belong to the GroupElem abstract type.Generic.setpermstyle"
 },
 
 {
-    "location": "perm.html#Permutation-constructors-1",
-    "page": "Permutation groups",
-    "title": "Permutation constructors",
-    "category": "section",
-    "text": "Once a permutation group is constructed, there are various ways to construct permutations in that group.Note that permutations consist of lists of n integers numbered from 1 to n. If the i-th entry of a permuation is j, this corresponds to sending i to j in the permutation.ExamplesG = PermutationGroup(5)\n\np = G()"
+    "location": "perm.html#AbstractAlgebra.Generic.perm",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.perm",
+    "category": "Type",
+    "text": "perm{T<:Integer}\n\nThe type of permutations. Fieldnames:d::Vector{T} - vector representing the permutation\nmodified::Bool - bit to check the validity of cycle decomposition\ncycles::CycleDec{T} - (cached) cycle decompositionPermutation p consists of a vector (p.d) of n integers from 1 to n. If the i-th entry of the vector is j, this corresponds to p sending i to j. The cycle decomposition (p.cycles) is computed on demand and should never be accessed directly. Use cycles(p) instead.There are two inner constructors of perm:perm(n::T) constructs the trivial perm{T}-permutation of length n.\nperm(v::Vector{T<:Integer}[,check=true]) constructs a permutationrepresented by v. By default perm constructor checks if the vector constitutes a valid permutation. To skip the check call perm(v, false).\n\nExamples:\n\njulia> perm([1,2,3])\n()\n\njulia> g = perm(Int32[2,3,1])\n(1,2,3)\n\njulia> typeof(g)\nAbstractAlgebra.Generic.perm{Int32}\n\n\n\n"
 },
 
 {
-    "location": "perm.html#Basic-functionality-1",
-    "page": "Permutation groups",
-    "title": "Basic functionality",
+    "location": "perm.html#AbstractAlgebra.Generic.PermGroup",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.PermGroup",
+    "category": "Type",
+    "text": "PermGroup{T<:Integer}\n\nThe permutation group singleton type. PermGroup(n) constructs the permutation group S_n on n-symbols. The type of elements of the group is inferred from the type of n.\n\nExamples:\n\njulia> G = PermGroup(5)\nPermutation group over 5 elements\n\njulia> elem_type(G)\nAbstractAlgebra.Generic.perm{Int64}\n\njulia> H = PermGroup(UInt16(5))\nPermutation group over 5 elements\n\njulia> elem_type(H)\nAbstractAlgebra.Generic.perm{UInt16}\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.@perm_str",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.@perm_str",
+    "category": "Macro",
+    "text": "perm\"...\"\n\nString macro to parse disjoint cycles into perm{Int}.Strings for the output of GAP could be copied directly into perm\"...\". Cycles of length 1 are not necessary, but could be included. A permutation of the minimal support is constructed, i.e. the maximal n in the decomposition determines the parent group S_n.\n\nExamples:\n\njulia> p = perm\"(1,3)(2,4)\"\n(1,3)(2,4)\n\njulia> typeof(p)\nAbstractAlgebra.Generic.perm{Int64}\n\njulia> parent(p) == PermutationGroup(4)\ntrue\n\njulia> p = perm\"(1,3)(2,4)(10)\"\n(1,3)(2,4)\n\njulia> parent(p) == PermutationGroup(10)\ntrue\n\n\n\n"
+},
+
+{
+    "location": "perm.html#Permutations-constructors-1",
+    "page": "Permutations and Permutation groups",
+    "title": "Permutations constructors",
     "category": "section",
-    "text": "The following basic functionality is provided by the default permutation group implementation in AbstractAlgebra.jl, to support construction of other generic constructions over permutation groups. Any custom permutation group implementation in AbstractAlgebra.jl should provide these  functions along with the usual group element arithmetic.parent_type(::Type{perm})Gives the type of the parent object of a permutation group element.elem_type(R::PermGroup)Given the parent object for a permutation group, return the type of elements of the group.Base.hash(a::perm, h::UInt)Return a UInt hexadecimal hash of the permutation element a. This should be xor\'d with a fixed random hexadecimal specific to the permutation group type. The hash of the entries of the permutation should be xor\'d with the supplied parameter h as part of computing the hash.deepcopy(a::perm)Construct a copy of the given permutation group element and return it. This function must recursively construct copies of all of the internal data in the given element. AbstractAlgebra.jl permutation group elements are mutable and so returning shallow copies is not sufficient.getindex(a::perm, n::Int)Allows access to entry n of the given permutation via the syntax a[n]. Note that entries are 1-indexed.setindex!(a::perm, d::Int, n::Int)Set the n-th entry of the given permutation to d. This allows Julia to provide the syntax an = d for setting entries of a permuation. Note that entries are 1-indexed.Given the parent object G for a permutation group, the following coercion functions are provided to coerce various elements into the permutation group. Developers provide these by overloading the call operator for the permutation group parent objects.R()Return the identity permutation.R(A::Array{Int, 1})Return the permutation whose entries are given by the elements of the supplied vector.R(p::perm)Take a permutation that is already in the permutation group and simply return it. A copy of the original is not made.In addition to the above, developers of custom permutation group types must ensure that each permutation element contains a field parent specifying the parent object of the permutation group element, or at least supply the equivalent of the function parent(a::perm) to return the parent object of a permutation group element."
+    "text": "There are several methods to to construct permutations in AbstractAlgebra.jl.The easiest way is to directly call to the perm (inner) constructor:Generic.permSince the parent object can be reconstructed from the permutation itself, you can work with permutations without explicitely constructing the parent object.The other way is to first construct the permutation group they belong to. This is accomplished with the inner constructor PermGroup(n::Integer) which constructs the permutation group on n symbols and returns the parent object representing the group.Generic.PermGroupA vector of integers can be then coerced to a permutation via call to parent. The advantage is that the vector is automatically converted to the integer type fixed at the creation of the parent object.Examples:julia> G = PermutationGroup(BigInt(5)); p = G([2,3,1,5,4])\n(1,2,3)(4,5)\n\njulia> typeof(p)\nAbstractAlgebra.Generic.perm{BigInt}\n\njulia> H = PermutationGroup(UInt16(5)); r = H([2,3,1,5,4])\n(1,2,3)(4,5)\n\njulia> typeof(r)\nAbstractAlgebra.Generic.perm{UInt16}\n\njulia> H()\n()By default the coercion checks for non-unique values in the vector, but this can be switched off with G([2,3,1,5,4], false).Finally there is a perm\"...\" string macro to construct permutation from string input.@perm_str"
 },
 
 {
     "location": "perm.html#Base.parent-Tuple{AbstractAlgebra.Generic.perm}",
-    "page": "Permutation groups",
+    "page": "Permutations and Permutation groups",
     "title": "Base.parent",
     "category": "Method",
-    "text": "parent(a::perm)\n\nReturn the parent of the given permutation group element.\n\n\n\n"
+    "text": "parent(g::perm)\n\nReturn the parent of the permutation g.\n\njulia> G = PermutationGroup(5); g = perm([3,4,5,2,1])\n(1,3,5)(2,4)\n\njulia> parent(g) == G\ntrue\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.elem_type-Tuple{AbstractAlgebra.PermGroup}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.elem_type",
+    "category": "Method",
+    "text": "elem_type(::Type{PermGroup{T}})\n\nReturn the type of elements of a permutation group.\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.parent_type-Tuple{AbstractAlgebra.Generic.perm}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.parent_type",
+    "category": "Method",
+    "text": "parent_type(::Type{perm{T}})\n\nReturn the type of the parent of a permutation.\n\n\n\n"
+},
+
+{
+    "location": "perm.html#Permutation-interface-1",
+    "page": "Permutations and Permutation groups",
+    "title": "Permutation interface",
+    "category": "section",
+    "text": "The following basic functionality is provided by the default permutation group implementation in AbstractAlgebra.jl, to support construction of other generic constructions over permutation groups. Any custom permutation group implementation in AbstractAlgebra.jl should provide these functions along with the usual group element arithmetic and comparison.parent(::perm)\nelem_type(::PermGroup)\nparent_type(::perm)A custom implementation also needs to implement hash(::perm, ::UInt) and (possibly) deepcopy_internal(::perm, ::ObjectIdDict).note: Note\nPermutation group elements are mutable and so returning shallow copies is not sufficient.getindex(a::perm, n::Int)Allows access to entry n of the given permutation via the syntax a[n]. Note that entries are 1-indexed.setindex!(a::perm, d::Int, n::Int)Set the n-th entry of the given permutation to d. This allows Julia to provide the syntax a[n] = d for setting entries of a permutation. Entries are 1-indexed.note: Note\nUsing setindex! invalidates cycle decomposition cached in a permutation, i.e. it will be computed the next time cycle decomposition is needed.Given the parent object G for a permutation group, the following coercion functions are provided to coerce various arguments into the permutation group. Developers provide these by overloading the permutation group parent objects.G()Return the identity permutation.G(A::Vector{<:Integer})Return the permutation whose entries are given by the elements of the supplied vector.G(p::perm)Take a permutation that is already in the permutation group and simply return it. A copy of the original is not made if not necessary."
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.cycles-Tuple{AbstractAlgebra.Generic.perm}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.cycles",
+    "category": "Method",
+    "text": "cycles(g::perm)\n\nDecompose permutation g into disjoint cycles.Returns a CycleDec object which iterates over disjoint cycles of g. The ordering of cycles is not guaranteed, and the order within each cycle is computed up to a cyclic permutation. The cycle decomposition is cached in g and used in future computation of permtype, parity, sign, order and ^ (powering).\n\nExamples:\n\njulia> g = perm([3,4,5,2,1,6])\n(1,3,5)(2,4)\n\njulia> collect(cycles(g))\n3-element Array{Array{Int64,1},1}:\n [1, 3, 5]\n [2, 4]\n [6]\n\n\n\n"
 },
 
 {
     "location": "perm.html#AbstractAlgebra.Generic.parity-Tuple{AbstractAlgebra.Generic.perm}",
-    "page": "Permutation groups",
+    "page": "Permutations and Permutation groups",
     "title": "AbstractAlgebra.Generic.parity",
     "category": "Method",
-    "text": "parity(a::perm)\n\nReturn the parity of the given permutation, i.e. the parity of the number of transpositions that compose it. The function returns 1 if the parity is odd and 0 otherwise. By default parity will uses the cycle decomposition if it is already available, but will not compute it on demand. If You intend to use parity, or the cycle decomposition of a permutation later You may force parity to compute the cycle structure by calling parity(a, Val{:cycles})`.\n\n\n\n"
+    "text": "parity(g::perm)\n\nReturn the parity of the given permutation, i.e. the parity of the number of transpositions in any decomposition of g into transpositions.parity returns 1 if the number is odd and 0 otherwise. parity uses cycle decomposition of g if already available, but will not compute it on demand. Since cycle structure is cached in g you may call cycles(g) before calling parity.\n\nExamples:\n\njulia> g = perm([3,4,1,2,5])\n(1,3)(2,4)\n\njulia> parity(g)\n0\n\njulia> g = perm([3,4,5,2,1,6])\n(1,3,5)(2,4)\n\njulia> parity(g)\n1\n\n\n\n"
+},
+
+{
+    "location": "perm.html#Base.sign-Tuple{AbstractAlgebra.Generic.perm}",
+    "page": "Permutations and Permutation groups",
+    "title": "Base.sign",
+    "category": "Method",
+    "text": "sign(g::perm)\n\nReturn the sign of permutation.sign returns 1 if g is even and -1 if g is odd. sign represents the homomorphism from the permutation group to the unit group of mathbbZ whose kernel is the alternating group.\n\nExamples:\n\njulia> g = perm([3,4,1,2,5])\n(1,3)(2,4)\n\njulia> sign(g)\n1\n\njulia> g = perm([3,4,5,2,1,6])\n(1,3,5)(2,4)\n\njulia> sign(g)\n-1\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.permtype-Tuple{AbstractAlgebra.Generic.perm}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.permtype",
+    "category": "Method",
+    "text": "permtype(g::perm, rev=true)\n\nReturn the type of permutation g, i.e. lengths of disjoint cycles in cycle decomposition of g.The lengths are sorted in decreasing order by default. permtype(g) fully determines the conjugacy class of g.\n\nExamples:\n\njulia> g = perm([3,4,5,2,1,6])\n(1,3,5)(2,4)\n\njulia> permtype(g)\n3-element Array{Int64,1}:\n 3\n 2\n 1\n\njulia> G = PermGroup(5); e = parent(g)()\n()\n\njulia> permtype(e)\n6-element Array{Int64,1}:\n 1\n 1\n 1\n 1\n 1\n 1\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.order-Tuple{AbstractAlgebra.Generic.perm}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.order",
+    "category": "Method",
+    "text": "order(a::perm) -> BigInt\n\nReturn the order of permutation a as BigInt.If you are sure that computation over T (or its Int promotion) will not overflow you may use the method order(T::Type, a::perm) which bypasses computation with BigInts and returns promote(T, Int).\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.order-Tuple{AbstractAlgebra.Generic.PermGroup}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.order",
+    "category": "Method",
+    "text": "order(G::PermGroup) -> BigInt\n\nReturn the order of the full permutation group as BigInt.\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.elements-Tuple{AbstractAlgebra.Generic.PermGroup}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.elements",
+    "category": "Method",
+    "text": "elements(G::PermGroup)\n\nReturn an iterator over all permutations in G.This uses the non-recursive Heaps algorithm. You may use collect(elements(G)) to get a vector of all elements. A non-allocating version is provided as Generic.elements!(::PermGroup) for iteration as well, but you need to explicitely deepcopy permutations intended to be stored or modified.\n\nExamples:\n\njulia> elts = elements(PermGroup(5));\n\njulia> length(elts)\n120\n\njulia> G = PermGroup(Int32(3)); collect(elements(G))\n6-element Array{AbstractAlgebra.Generic.perm{Int32},1}:\n ()\n (1,2)\n (1,3,2)\n (2,3)\n (1,2,3)\n (1,3)\n\n\n\n"
 },
 
 {
     "location": "perm.html#Basic-manipulation-1",
-    "page": "Permutation groups",
+    "page": "Permutations and Permutation groups",
     "title": "Basic manipulation",
     "category": "section",
-    "text": "Numerous functions are provided to manipulate permutation group elements. Also see the section on basic functionality above.parent(::perm)parity(::perm)ExamplesG = PermutationGroup(5)\n\np = G([1, 3, 5, 2, 4])\n\nR = parent(p)\na = parity(p)"
+    "text": "Numerous functions are provided to manipulate permutation group elements.cycles(::perm)Cycle structure is cached in a permutation, since once available, it provides a convenient shortcut in many other algorithms.parity(::perm)\nsign(::perm)\npermtype(::perm)\norder(::perm)\norder(::Generic.PermGroup)Note that even an Int64 can be easily overflowed when computing with permutation groups. Thus, by default, order returns (always correct) BigInts. If you are sure that the computation will not overflow, you may use order(::Type{T}, ...) to perform computations with machine integers. Julias standard promotion rules apply for the returned value.Iteration over all permutations in the permutation group S_n can be achieved withelements(::Generic.PermGroup)Iteration in reasonable time (i.e. in terms of minutes) is possible for S_n when n  13. You may also use the non-allocating Generic.elements!(::PermGroup) for n  14 (or even 15 if you are patient enough), which is an order of mangitude faster. However, since all permutations yielded by elements! are aliased (modified \"in-place\"), collect(Generic.elements!(PermGroup(n))) returns a vector of identical permutations:julia> collect(elements(PermGroup(3)))\n6-element Array{AbstractAlgebra.Generic.perm{Int64},1}:\n ()\n (1,2)\n (1,3,2)\n (2,3)\n (1,2,3)\n (1,3)\n\njulia> A = collect(Generic.elements!(PermGroup(3))); A\n6-element Array{AbstractAlgebra.Generic.perm{Int64},1}:\n (1,3)\n (1,3)\n (1,3)\n (1,3)\n (1,3)\n (1,3)\n\njulia> unique(A)\n1-element Array{AbstractAlgebra.Generic.perm{Int64},1}:\n (1,3)note: Note\nIf you intend to use or store elements yielded by elements! you need to deepcopy them explicitely."
 },
 
 {
     "location": "perm.html#Base.:*-Tuple{AbstractAlgebra.Generic.perm,AbstractAlgebra.Generic.perm}",
-    "page": "Permutation groups",
+    "page": "Permutations and Permutation groups",
     "title": "Base.:*",
     "category": "Method",
-    "text": "*(a::perm, b::perm)\n\nReturn the composition of the two permutations, i.e. acirc b. In other words, the permutation corresponding to applying b first, then a, is returned.\n\n\n\n"
+    "text": "*(x, y...)\n\nMultiplication operator. x*y*z*... calls this function with all arguments, i.e. *(x, y, z, ...).\n\n\n\n"
 },
 
 {
-    "location": "perm.html#Arithmetic-operators-1",
-    "page": "Permutation groups",
-    "title": "Arithmetic operators",
-    "category": "section",
-    "text": "*(::perm, ::perm)ExamplesG = PermutationGroup(5)\n\np = G([1, 3, 5, 2, 4])\nq = G([5, 4, 1, 3, 2])\n\na = p*q"
-},
-
-{
-    "location": "perm.html#Base.:==-Tuple{AbstractAlgebra.Generic.perm,AbstractAlgebra.Generic.perm}",
-    "page": "Permutation groups",
-    "title": "Base.:==",
+    "location": "perm.html#Base.:^-Tuple{AbstractAlgebra.Generic.perm,Integer}",
+    "page": "Permutations and Permutation groups",
+    "title": "Base.:^",
     "category": "Method",
-    "text": "==(a::perm, b::perm)\n\nReturn true if the given permutations are equal, otherwise return false.\n\n\n\n"
-},
-
-{
-    "location": "perm.html#Comparison-1",
-    "page": "Permutation groups",
-    "title": "Comparison",
-    "category": "section",
-    "text": "==(::perm, ::perm)ExamplesG = PermutationGroup(5)\n\np = G([1, 3, 5, 2, 4])\nq = G([5, 4, 1, 3, 2])\n\np == q"
+    "text": "^(g::perm, n::Int)\n\nReturn the n-th power of a permutation g.By default g^n is computed by cycle decomposition of g if n > 3. Generic.power_by_squaring provides a different method for powering which may or may not be faster, depending on the particuar case. Due to caching of the cycle structure, repeated powering of g will be faster with the default method.\n\nExamples:\n\njulia> g = perm([2,3,4,5,1])\n(1,2,3,4,5)\n\njulia> g^3\n(1,4,2,5,3)\n\njulia> g^5\n()\n\n\n\n"
 },
 
 {
     "location": "perm.html#Base.inv-Tuple{AbstractAlgebra.Generic.perm}",
-    "page": "Permutation groups",
+    "page": "Permutations and Permutation groups",
     "title": "Base.inv",
     "category": "Method",
-    "text": "inv(a::perm)\n\nReturn the inverse of the given permutation, i.e. the permuation a^-1 such that acirc a^-1 = a^-1circ a is the identity permutation.\n\n\n\n"
+    "text": "inv(g::perm)\n\nReturn the inverse of the given permutation, i.e. the permuation g^-1 such that g  g^-1 = g^-1  g is the identity permutation.\n\n\n\n"
 },
 
 {
-    "location": "perm.html#Inversion-1",
-    "page": "Permutation groups",
-    "title": "Inversion",
+    "location": "perm.html#Arithmetic-operators-1",
+    "page": "Permutations and Permutation groups",
+    "title": "Arithmetic operators",
     "category": "section",
-    "text": "inv(::perm)ExamplesG = PermutationGroup(5)\n\np = G([1, 3, 5, 2, 4])\n\na = inv(p)"
+    "text": "*(::perm, ::perm)\n^(::perm, n::Integer)\ninv(::perm)Permutations parametrized by different types can be multiplied, and follow the standard julia integer promotion rules:g = rand(PermGroup(Int8(5)));\nh = rand(PermGroup(UInt32(5)));\ntypeof(g*h)\n\n# output\nAbstractAlgebra.Generic.perm{Int64}"
+},
+
+{
+    "location": "perm.html#Coercion-1",
+    "page": "Permutations and Permutation groups",
+    "title": "Coercion",
+    "category": "section",
+    "text": "The following coercions are available for G::PermGroup parent objects. Each of the methods perform basic sanity checks on the input which can be switched off by the second argument.Examples(G::PermGroup)()Return the identity element of G.(G::PermGrup)(::Vector{<:Integer}[, check=true])Turn a vector od integers into a permutation (performing conversion, if necessary).(G::PermGroup)(::perm{<:Integer}[, check=true])Coerce a permutation p into group G (performing the conversion, if necessary). If p is already an element of G no copy is performed.(G::PermGroup)(::String[, check=true])Parse the string input e.g. copied from the output of GAP. The method uses the same logic as perm\"...\" macro. The string is sanitized and checked for disjoint cycles. Both string(p::perm) (if setpermstyle(:cycles)) and string(cycles(p::perm)) are valid input for this method.(G::PermGroup{T})(::CycleDec{T}[, check=true]) where TTurn a cycle decomposition object into a permutation."
+},
+
+{
+    "location": "perm.html#Base.:==-Tuple{AbstractAlgebra.Generic.perm,AbstractAlgebra.Generic.perm}",
+    "page": "Permutations and Permutation groups",
+    "title": "Base.:==",
+    "category": "Method",
+    "text": "==(g::perm, h::perm)\n\nReturn true if permutations are equal, otherwise return false.Permutations parametrized by different integer types are considered equal if they define the same permutation in the abstract permutation group.\n\nExamples:\n\njulia> g = perm(Int8[2,3,1])\n(1,2,3)\n\njulia> h = perm\"(3,1,2)\"\n(1,2,3)\n\njulia> g == h\ntrue\n\n\n\n"
+},
+
+{
+    "location": "perm.html#Base.:==-Tuple{AbstractAlgebra.Generic.PermGroup,AbstractAlgebra.Generic.PermGroup}",
+    "page": "Permutations and Permutation groups",
+    "title": "Base.:==",
+    "category": "Method",
+    "text": "==(G::PermGroup, H::PermGroup)\n\nReturn true if permutation groups are equal, otherwise return false.Permutation groups on the same number of letters, but parametrized by different integer types are considered different.\n\nExamples:\n\njulia> G = PermGroup(UInt(5))\nPermutation group over 5 elements\n\njulia> H = PermGroup(5)\nPermutation group over 5 elements\n\njulia> G == H\nfalse\n\n\n\n"
+},
+
+{
+    "location": "perm.html#Comparison-1",
+    "page": "Permutations and Permutation groups",
+    "title": "Comparison",
+    "category": "section",
+    "text": "==(::perm, ::perm)\n==(::Generic.PermGroup, ::Generic.PermGroup)"
+},
+
+{
+    "location": "perm.html#Base.Random.rand-Tuple{AbstractAlgebra.Generic.PermGroup}",
+    "page": "Permutations and Permutation groups",
+    "title": "Base.Random.rand",
+    "category": "Method",
+    "text": "rand(G::PermGroup)\n\nReturn a random permutation from G.\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.matrix_repr-Tuple{AbstractAlgebra.Generic.perm}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.matrix_repr",
+    "category": "Method",
+    "text": "matrix_repr(a::perm)\n\nReturn the permutation matrix as sparse matrix representing a via natural embedding of the permutation group into general linear group over mathbbZ.\n\nExamples:\n\njulia> p = perm([2,3,1])\n(1,2,3)\n\njulia> matrix_repr(p)\n3×3 SparseMatrixCSC{Int64,Int64} with 3 stored entries:\n  [3, 1]  =  1\n  [1, 2]  =  1\n  [2, 3]  =  1\n\njulia> full(ans)\n3×3 Array{Int64,2}:\n 0  1  0\n 0  0  1\n 1  0  0\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.emb-Tuple{AbstractAlgebra.Generic.PermGroup,Array{Int64,1},Bool}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.emb",
+    "category": "Method",
+    "text": "emb(G::PermGroup, V::Vector{Int})\n\nReturn the natural embedding of a permutation group into G as the subgroup permuting points indexed by V.\n\nExamples:\n\njulia> p = perm([2,3,1])\n(1,2,3)\n\njulia> f = Generic.emb(PermGroup(5), [3,2,5]);\n\njulia> f(p)\n(2,5,3)\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.emb!-Tuple{AbstractAlgebra.Generic.perm,AbstractAlgebra.Generic.perm,Any}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.emb!",
+    "category": "Method",
+    "text": "emb!(result::perm, p::perm, V)\n\nEmbed permutation p into permutation result on the indices given by V.This corresponds to the natural embedding of S_k into S_n as the subgroup permuting points indexed by V.\n\nExamples:\n\njulia> p = perm([2,1,4,3])\n(1,2)(3,4)\n\njulia> Generic.emb!(perm(collect(1:5)), p, [3,1,4,5])\n(1,3)(4,5)\n\n\n\n"
+},
+
+{
+    "location": "perm.html#Misc-1",
+    "page": "Permutations and Permutation groups",
+    "title": "Misc",
+    "category": "section",
+    "text": "rand(::Generic.PermGroup)\nGeneric.matrix_repr(::perm)\nGeneric.emb(::Generic.PermGroup, ::Vector{Int}, ::Bool)\nGeneric.emb!(::perm, ::perm, V)"
+},
+
+{
+    "location": "ytabs.html#",
+    "page": "Partitions and Young tableaux",
+    "title": "Partitions and Young tableaux",
+    "category": "page",
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend\nDocTestFilters = r\"[0-9\\.]+ seconds \\(.*\\)\""
+},
+
+{
+    "location": "ytabs.html#Partitions-and-Young-tableaux-1",
+    "page": "Partitions and Young tableaux",
+    "title": "Partitions and Young tableaux",
+    "category": "section",
+    "text": "AbstractAlgebra.jl provides basic support for computations with Young tableaux, skew diagrams and the characters of permutation groups (implemented src/generic/YoungTabs.jl). All functionality of permutations is accesible in the Generic submodule."
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.Partition",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.Partition",
+    "category": "Type",
+    "text": "Partition(part::Vector{<:Integer}[, check::Bool=true]) <: AbstractVector{Int}\n\nRepresent integer partition in the non-increasing order.part will be sorted, if necessary. Checks for validity of input can be skipped by calling the (inner) constructor with false as the second argument.Functionally Partition is a thin wrapper over Vector{Int}.\n\nFieldnames:n::Int - the partitioned number\npart::Vector{Int} - a non-increasing sequence of summands of n.\n\nExamples:\n\njulia> p = Partition([4,2,1,1,1])\n4₁2₁1₃\n\njulia> p.n == sum(p.part)\ntrue\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Partitions-1",
+    "page": "Partitions and Young tableaux",
+    "title": "Partitions",
+    "category": "section",
+    "text": "The basic underlying object for those concepts is Partition of a number n, i.e. a sequence of positive integers n_1 ldots n_k which sum to n. Partitions in AbstractAlgebra.jl are represented internally by non-increasing Vectors of Ints. Partitions are printed using the standard notation, i.e. 9 = 4 + 2 + 1 + 1 + 1 is shown as 4_1 2_1 1_3 with the subscript indicating the count of a summand in the partition.Generic.Partition"
+},
+
+{
+    "location": "ytabs.html#Base.size-Tuple{AbstractAlgebra.Generic.Partition}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.size",
+    "category": "Method",
+    "text": "size(p::Partition)\n\nReturn the size of the vector which represents the partition.\n\nExamples:\n\njulia> p = Partition([4,3,1]); size(p)\n(3,)\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.getindex-Tuple{AbstractAlgebra.Generic.Partition,Integer}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.getindex",
+    "category": "Method",
+    "text": "getindex(p::Partition, i::Integer)\n\nReturn the i-th part (in decreasing order) of the partition.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.setindex!-Tuple{AbstractAlgebra.Generic.Partition,Integer,Integer}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.setindex!",
+    "category": "Method",
+    "text": "setindex!(p::Partition, v::Integer, i::Integer)\n\nSet the i-th part of partition p to v. setindex! will throw an error if the operation violates the non-increasing assumption.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.AllParts",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.AllParts",
+    "category": "Type",
+    "text": "AllParts(n::Int)\n\nReturn an iterator over all integer Partitions of n. Partitions are produced in ascending order according to RuleAsc (Algorithm 3.1) fromJerome Kelleher and Barry O’Sullivan, Generating All Partitions: A Comparison Of Two Encodings ArXiv:0909.2331See also Combinatorics.partitions(1:n).\n\nExamples\n\njulia> ap = AllParts(5);\n\njulia> collect(ap)\n7-element Array{AbstractAlgebra.Generic.Partition,1}:\n 1₅\n 2₁1₃\n 3₁1₂\n 2₂1₁\n 4₁1₁\n 3₁2₁\n 5₁\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic._numpart",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic._numpart",
+    "category": "Function",
+    "text": "_numpart(n::Integer)\n\nReturns the number of all distinct integer partitions of n. The function uses Euler pentagonal number theorem for recursive formula. For more details see OEIS sequence A000041. Note that _numpart(0) = 1 by convention.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.conj-Tuple{AbstractAlgebra.Generic.Partition}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.conj",
+    "category": "Method",
+    "text": "conj(part::Partition)\n\nReturns the conjugated partition of part, i.e. the partition corresponding to the Young diagram of part reflected through the main diagonal.\n\nExamples:\n\njulia> p = Partition([4,2,1,1,1])\n4₁2₁1₃\n\njulia> conj(p)\n5₁2₁1₂\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.conj-Tuple{AbstractAlgebra.Generic.Partition,Array{T,1} where T}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.conj",
+    "category": "Method",
+    "text": "conj(part::Partition, v::Vector)\n\nReturns the conjugated partition of part together with permuted vector v.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Array-interface-1",
+    "page": "Partitions and Young tableaux",
+    "title": "Array interface",
+    "category": "section",
+    "text": "Partition is a concrete subtype of AbstractVector{Int} and implements the following standard Array interface:size(::Generic.Partition)\ngetindex(::Generic.Partition, i::Integer)\nsetindex!(::Generic.Partition, v::Integer, i::Integer)These functions work on the level of p.part vector. Additionally setindex! will try to prevent uses which result in non-valid (i.e. non-decreasing) partition vectors.One can easily iterate over all partitions of n using the AllParts type:Generic.AllPartsThe number all all partitions can be computed by the hidden function _numpart. Much faster implementation is available in Nemo.jl.Generic._numpartSince Partition is a subtype of AbstractVector generic functions which operate on vectors should work in general. However the meaning of conj has been changed to agree with the traditional understanding of conjugation of Partitions:conj(::Generic.Partition)\nconj(::Generic.Partition, v::Vector)"
+},
+
+{
+    "location": "ytabs.html#Young-Diagrams-and-Young-Tableaux-1",
+    "page": "Partitions and Young tableaux",
+    "title": "Young Diagrams and Young Tableaux",
+    "category": "section",
+    "text": "Mathematicaly speaking Young diagram is a diagram which consists of rows of square boxes such that the number of boxes in each row is no less than the number of boxes in the previous row. For example partition 4_1 3_2 1 represents the following diagram.┌───┬───┬───┬───┐\n│   │   │   │   │\n├───┼───┼───┼───┘\n│   │   │   │\n├───┼───┼───┤\n│   │   │   │\n├───┼───┴───┘\n│   │\n└───┘Young Tableau is formally a bijection between the set of boxes of a Young Diagram and the set 1 ldots n. If a bijection is increasing along rows and columns of the diagram it is referred to as standard. For example┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┼───┤\n│ 8 │ 9 │10 │\n├───┼───┴───┘\n│11 │\n└───┘is a standard Young tableau of 4_1 3_2 1 where the bijection assigns consecutive natural numbers to consecutive (row-major) cells."
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.YoungTableau",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.YoungTableau",
+    "category": "Type",
+    "text": "YoungTableau(part::Partition[, fill::Vector{Int}=collect(1:sum(part))])  <: AbstractArray{Int, 2}\n\nReturns the Young tableaux of partition part, filled linearly by fill vector. Note that fill vector is in row-major format.Fields:part - the partition defining Young diagram\nfill - the row-major fill vector: the entries of the diagram.\n\nExamples:\n\njulia> p = Partition([4,3,1]); y = YoungTableau(p)\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\njulia> y.part\n4₁3₁1₁\n\njulia> y.fill\n8-element Array{Int64,1}:\n 1\n 2\n 3\n 4\n 5\n 6\n 7\n 8\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Constructors-1",
+    "page": "Partitions and Young tableaux",
+    "title": "Constructors",
+    "category": "section",
+    "text": "In AbstractAlgebra.jl Young tableau are implemented as essentially row-major sparse matrices, i.e. YoungTableau <: AbstractArray{Int,2} but only the defining Partition and the (row-major) fill-vector is stored.Generic.YoungTableauFor convenience there exists an alternative constructor of YoungTableau, which accepts a vector of integers and constructs Partition internally.YoungTableau(p::Vector{Integer}[, fill=collect(1:sum(p))])"
+},
+
+{
+    "location": "ytabs.html#Base.size-Tuple{AbstractAlgebra.Generic.YoungTableau}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.size",
+    "category": "Method",
+    "text": "size(Y::YoungTableau)\n\nReturn size of the smallest array containing Y, i.e. the tuple of the number of rows and the number of columns of Y.\n\nExamples:\n\njulia> y = YoungTableau([4,3,1]); size(y)\n(3, 4)\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.getindex-Tuple{AbstractAlgebra.Generic.YoungTableau,Integer}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.getindex",
+    "category": "Method",
+    "text": "getindex(Y::YoungTableau, n::Integer)\n\nReturn the column-major linear index into the size(Y)-array. If a box is outside of the array return 0.\n\nExamples:\n\njulia> y = YoungTableau([4,3,1])\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\njulia> y[1]\n1\n\njulia> y[2]\n5\n\njulia> y[4]\n2\n\njulia> y[6]\n0\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.conj-Tuple{AbstractAlgebra.Generic.YoungTableau}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.conj",
+    "category": "Method",
+    "text": "conj(Y::YoungTableau)\n\nReturns the conjugated tableau, i.e. the tableau reflected through the main diagonal.\n\nExamples\n\njulia> y = YoungTableau([4,3,1])\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\njulia> conj(y)\n┌───┬───┬───┐\n│ 1 │ 5 │ 8 │\n├───┼───┼───┘\n│ 2 │ 6 │\n├───┼───┤\n│ 3 │ 7 │\n├───┼───┘\n│ 4 │\n└───┘\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Array-interface-2",
+    "page": "Partitions and Young tableaux",
+    "title": "Array interface",
+    "category": "section",
+    "text": "To make YoungTableaux array-like we implement the following functions:size(::Generic.YoungTableau)\ngetindex(::Generic.YoungTableau, n::Integer)Also the double-indexing corresponds to (row, column) access to an abstract array.julia> y = YoungTableau([4,3,1])\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\njulia> y[1,2]\n2\n\njulia> y[2,3]\n7\n\njulia> y[3,2]\n0Functions defined for AbstractArray type based on those (e.g. length) should work. Again, as in the case of Partition the meaning of conj is altered to reflect the usual meaning for Young tableaux:conj(::Generic.YoungTableau)"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.setyoungtabstyle",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.setyoungtabstyle",
+    "category": "Function",
+    "text": "setyoungtabstyle(format::Symbol)\n\nSelect the style in which Young tableaux are displayed (in REPL or in general as string). This can be either:array - as matrices of integers, or\n:diagram - as filled Young diagrams (the default).The difference is purely esthetical.\n\nExamples:\n\njulia> Generic.setyoungtabstyle(:array)\n:array\n\njulia> p = Partition([4,3,1]); YoungTableau(p)\n 1  2  3  4\n 5  6  7\n 8\n\njulia> Generic.setyoungtabstyle(:diagram)\n:diagram\n\njulia> YoungTableau(p)\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Pretty-printing-1",
+    "page": "Partitions and Young tableaux",
+    "title": "Pretty-printing",
+    "category": "section",
+    "text": "Similarly to permutations we have two methods of displaying Young Diagrams:Generic.setyoungtabstyle"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.matrix_repr-Tuple{AbstractAlgebra.Generic.YoungTableau}",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.matrix_repr",
+    "category": "Method",
+    "text": "matrix_repr(Y::YoungTableau)\n\nConstruct sparse integer matrix representing the tableau.\n\nExamples:\n\njulia> y = YoungTableau([4,3,1]);\n\njulia> matrix_repr(y)\n3×4 SparseMatrixCSC{Int64,Int64} with 8 stored entries:\n  [1, 1]  =  1\n  [2, 1]  =  5\n  [3, 1]  =  8\n  [1, 2]  =  2\n  [2, 2]  =  6\n  [1, 3]  =  3\n  [2, 3]  =  7\n  [1, 4]  =  4\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.fill!-Tuple{AbstractAlgebra.Generic.YoungTableau,AbstractArray{#s1,1} where #s1<:Integer}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.fill!",
+    "category": "Method",
+    "text": "fill!(Y::YoungTableaux, V::Vector{<:Integer})\n\nReplace the fill vector Y.fill by V. No check if the resulting tableau is standard (i.e. increasing along rows and columns) is performed.\n\nExamples:\n\njulia> y = YoungTableau([4,3,1])\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\njulia> fill!(y, [2:9...])\n┌───┬───┬───┬───┐\n│ 2 │ 3 │ 4 │ 5 │\n├───┼───┼───┼───┘\n│ 6 │ 7 │ 8 │\n├───┼───┴───┘\n│ 9 │\n└───┘\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Ulitility-functions-1",
+    "page": "Partitions and Young tableaux",
+    "title": "Ulitility functions",
+    "category": "section",
+    "text": "matrix_repr(::Generic.YoungTableau)\nfill!(::Generic.YoungTableau, ::AbstractVector{<:Integer})"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.character-Tuple{AbstractAlgebra.Generic.Partition}",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.character",
+    "category": "Method",
+    "text": "character(lambda::Partition)\n\nReturn the lambda-th irreducible character of permutation group on sum(lambda) symbols. The returned character function is of the following signature:chi(p::perm[, check::Bool=true]) -> BigIntThe function checks (if p belongs to the appropriate group) can be switched off by calling chi(p, false). The values computed by chi are cached in look-up table.The computation follows the Murnaghan-Nakayama formula: chi_lambda(sigma) = sum_textrimhook xisubset lambda(-1)^ll(lambdabackslashxi) chi_lambda backslashxi(tildesigma) where lambdabackslashxi denotes the skew diagram of lambda with xi removed, ll denotes the leg-length (i.e. number of rows - 1) and tildesigma is permutation obtained from sigma by the removal of the longest cycle.For more details see e.g. Chapter 2.8 of Group Theory and Physics by S.Sternberg.\n\nExamples\n\njulia> G = PermutationGroup(4)\nPermutation group over 4 elements\n\njulia> chi = character(Partition([3,1])) # character of the regular representation\n(::char) (generic function with 2 methods)\n\njulia> chi(G())\n3\n\njulia> chi(perm\"(1,3)(2,4)\")\n-1\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.character-Tuple{AbstractAlgebra.Generic.Partition,AbstractAlgebra.Generic.perm}",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.character",
+    "category": "Method",
+    "text": "character(lambda::Partition, p::perm, check::Bool=true) -> BigInt\n\nReturns the value of lambda-th irreducible character of the permutation group on permutation p.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.character-Tuple{AbstractAlgebra.Generic.Partition,AbstractAlgebra.Generic.Partition}",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.character",
+    "category": "Method",
+    "text": "character(lambda::Partition, mu::Partition) -> BigInt\n\nReturns the value of lambda-th irreducible character on the conjugacy class represented by partition mu.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.rowlength",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.rowlength",
+    "category": "Function",
+    "text": "rowlength(Y::YoungTableau, i, j)\n\nReturn the row length of Y at box (i,j), i.e. the number of boxes in the i-th row of the diagram of Y located to the right of the (i,j)-th box.\n\nExamples\n\njulia> y = YoungTableau([4,3,1])\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\njulia> Generic.rowlength(y, 1,2)\n2\n\njulia> Generic.rowlength(y, 2,3)\n0\n\njulia> Generic.rowlength(y, 3,3)\n0\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.collength",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.collength",
+    "category": "Function",
+    "text": "collength(Y::YoungTableau, i, j)\n\nReturn the column length of Y at box (i,j), i.e. the number of boxes in the j-th column of the diagram of Y located below of the (i,j)-th box.\n\nExamples\n\njulia> y = YoungTableau([4,3,1])\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\njulia> Generic.collength(y, 1,1)\n2\n\njulia> Generic.collength(y, 1,3)\n1\n\njulia> Generic.collength(y, 2,4)\n0\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.hooklength",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.hooklength",
+    "category": "Function",
+    "text": "hooklength(Y::YoungTableau, i, j)\n\nReturn the hook-length of an element in Y at position (i,j), i.e the number of cells in the i-th row to the rigth of (i,j)-th box, plus the number of cells in the j-th column below the (i,j)-th box, plus 1.Return 0 for (i,j) not in the tableau Y.\n\nExamples\n\njulia> y = YoungTableau([4,3,1])\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\njulia> hooklength(y, 1,1)\n6\n\njulia> hooklength(y, 1,3)\n3\n\njulia> hooklength(y, 2,4)\n0\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.dim-Tuple{AbstractAlgebra.Generic.YoungTableau}",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.dim",
+    "category": "Method",
+    "text": "dim(Y::YoungTableau) -> BigInt\n\nReturns the dimension (using hook-length formula) of the irreducible representation of permutation group S_n associated the partition Y.part.Since the computation overflows easily BigInt is returned. You may perform the computation of the dimension in different type by calling dim(Int, Y).\n\nExamples\n\njulia> dim(YoungTableau([4,3,1]))\n70\n\njulia> dim(YoungTableau([3,1])) # the regular representation of S_4\n3\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Characters-of-permutation-grups-1",
+    "page": "Partitions and Young tableaux",
+    "title": "Characters of permutation grups",
+    "category": "section",
+    "text": "Irreducible characters (at least over field of characteristic 0) of the full group of permutations S_n correspond via Specht modules to partitions of n.character(::Generic.Partition)\ncharacter(lambda::Generic.Partition, p::Generic.perm)\ncharacter(lambda::Generic.Partition, mu::Generic.Partition)The values computed by characters are cached in an internal dictionary Dict{Tuple{BitVector,Vector{Int}}, BigInt}. Note that all of the above functions return BigInts. If you are sure that the computations do not overflow, variants of the last two functions using Int are available:character(::Type{Int}, lambda::Partition, p::perm[, check::Bool=true])\ncharacter(::Type{Int}, lambda::Partition, mu::Partition[, check::Bool=true])The dimension dim lambda of the irreducible module corresponding to partition lambda can be computed using Hook length formulaGeneric.rowlength\nGeneric.collength\nhooklength\ndim(::Generic.YoungTableau)The the character associated with Y.part can also be used to compute the dimension, but as it is expected the Murnaghan-Nakayama is much slower even though (due to caching) consecutive calls are fast:julia> λ = Partition(collect(12:-1:1))\n12₁11₁10₁9₁8₁7₁6₁5₁4₁3₁2₁1₁\n\njulia> @time dim(YoungTableau(λ))\n  0.224430 seconds (155.77 k allocations: 7.990 MiB)\n9079590132732747656880081324531330222983622187548672000\n\njulia> @time dim(YoungTableau(λ))\n  0.000038 seconds (335 allocations: 10.734 KiB)\n9079590132732747656880081324531330222983622187548672000\n\njulia> G = PermutationGroup(sum(λ))\nPermutation group over 78 elements\n\njulia> @time character(λ, G())\n 24.154105 seconds (58.13 M allocations: 3.909 GiB, 42.84% gc time)\n9079590132732747656880081324531330222983622187548672000\n\njulia> @time character(λ, G())\n  0.001439 seconds (195 allocations: 24.453 KiB)\n9079590132732747656880081324531330222983622187548672000"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.partitionseq",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.partitionseq",
+    "category": "Function",
+    "text": "partitionseq(lambda::Partition)\n\nReturns a sequence (as BitVector) of falses and trues constructed from lambda: tracing the lower contour of the Young Diagram associated to lambda from left to right a true is inserted for every horizontal and false for every vertical step. The sequence always starts with true and ends with false.\n\n\n\npartitionseq(seq::BitVector)\n\nReturns the essential part of the sequence seq, i.e. a subsequence starting at first true and ending at last false.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.isrimhook-Tuple{BitArray{1},Int64,Int64}",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.isrimhook",
+    "category": "Method",
+    "text": "isrimhook(R::BitVector, idx::Int, len::Int)\n\nR[idx:idx+len] forms a rim hook in the Young Diagram of partition corresponding to R iff R[idx] == true and R[idx+len] == false.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.MN1inner",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.MN1inner",
+    "category": "Function",
+    "text": "MN1inner(R::BitVector, mu::Partition, t::Int, [charvals])\n\nReturns the value of lambda-th irreducible character on conjugacy class of permutations represented by partition mu, where R is the (binary) partition sequence representing lambda. Values already computed are stored in charvals::Dict{Tuple{BitVector,Vector{Int}}, Int}. This is an implementation (with slight modifications) of the Murnaghan-Nakayama formula as described inDan Bernstein,\n\"The computational complexity of rules for the character table of Sn\"\n_Journal of Symbolic Computation_, 37(6), 2004, p. 727-748.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Low-level-functions-and-characters-1",
+    "page": "Partitions and Young tableaux",
+    "title": "Low-level functions and characters",
+    "category": "section",
+    "text": "As mentioned above character functions use the Murnaghan-Nakayama rule for evaluation. The implementation followsDan Bernstein, The computational complexity of rules for the character table of S_n Journal of Symbolic Computation, 37 (6), 2004, p. 727-748,implementing the following functions. For precise definitions and meaning please consult the paper cited.Generic.partitionseq\nisrimhook(::BitVector, ::Int, ::Int)\nGeneric.MN1inner"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.SkewDiagram",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.SkewDiagram",
+    "category": "Type",
+    "text": "SkewDiagram(lambda::Partition, mu::Partition) <: AbstractArray{Int, 2}\n\nImplements a skew diagram, i.e. a difference of two Young diagrams represented by partitions lambda and mu. (below dots symbolise the removed entries)\n\nExamples\n\njulia> l = Partition([4,3,2])\n4₁3₁2₁\n\njulia> m = Partition([3,1,1])\n3₁1₂\n\njulia> xi = SkewDiagram(l,m)\n3×4 AbstractAlgebra.Generic.SkewDiagram:\n ⋅  ⋅  ⋅  1\n ⋅  1  1\n ⋅  1\n\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.size-Tuple{AbstractAlgebra.Generic.SkewDiagram}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.size",
+    "category": "Method",
+    "text": "size(xi::SkewDiagram)\n\nReturn the size of array where xi is minimally contained. See size(Y::YoungTableau) for more details.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.in-Union{Tuple{T}, Tuple{Tuple{T,T},AbstractAlgebra.Generic.SkewDiagram}} where T<:Integer",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.in",
+    "category": "Method",
+    "text": "in(t::Tuple{T,T}, xi::SkewDiagram) where T<:Integer\n\nChecks if box at position (i,j) belongs to the skew diagram xi.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.getindex-Tuple{AbstractAlgebra.Generic.SkewDiagram,Integer}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.getindex",
+    "category": "Method",
+    "text": "getindex(xi::SkewDiagram, n::Integer)\n\nReturn 1 if linear index n corresponds to (column-major) entry in xi.lam which is not contained in xi.mu. Otherwise return 0.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.isrimhook-Tuple{AbstractAlgebra.Generic.SkewDiagram}",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.isrimhook",
+    "category": "Method",
+    "text": "isrimhook(xi::SkewDiagram)\n\nChecks if xi represents a rim-hook diagram, i.e. its diagram is edge-connected and contains no 2times 2 squares.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.leglength",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.leglength",
+    "category": "Function",
+    "text": "leglength(xi::SkewDiagram[, check::Bool=true])\n\nComputes the leglength of a rim-hook xi, i.e. the number of rows with non-zero entries minus one. If check is false function will not check whether xi is actually a rim-hook.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.matrix_repr-Tuple{AbstractAlgebra.Generic.SkewDiagram}",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.matrix_repr",
+    "category": "Method",
+    "text": "matrix_repr(xi::SkewDiagram)\n\nReturns a sparse representation of the diagram xi, i.e. a sparse array A where A[i,j] == 1 if and only if (i,j) is in xi.lam but not in xi.mu.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Skew-Diagrams-1",
+    "page": "Partitions and Young tableaux",
+    "title": "Skew Diagrams",
+    "category": "section",
+    "text": "Skew diagrams are formally differences of two Young diagrams. Given lambda and mu, two partitions of n+m and m (respectively). Suppose that each of cells of mu is a cell of lambda (i.e. parts of mu are no greater than the corresponding parts of lambda). Then the skew diagram denoted by lambdamu is the set theoretic difference the of sets of boxes, i.e. is a diagram with exactly n boxes:Generic.SkewDiagramSkewDiagram implements array interface with the following functions:size(xi::Generic.SkewDiagram)\nin(t::Tuple{T,T}, xi::Generic.SkewDiagram) where T<:Integer\ngetindex(xi::Generic.SkewDiagram, n::Integer)The support for skew diagrams is very rudimentary. The following functions are available:isrimhook(::Generic.SkewDiagram)\nleglength\nmatrix_repr(::Generic.SkewDiagram)"
 },
 
 {
@@ -2101,7 +2637,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Matrix Interface",
     "category": "section",
-    "text": "Generic matrices are supported in AbstractAlgebra.jl. As the space of mtimes n matrices over a commutative ring is not itself a commutative ring, not all of the Ring interface needs to be implemented for matrices in general.In particular, the following functions do not need to be implemented: isdomain_type, needs_parentheses, isnegative, show_minus_one and divexact. The canonical_unit function should be implemented, but simply needs to return the corresponding value for entry 1 1 (the function is never called on empty matrices).Note that AbstractAlgebra.jl matrices are not the same as Julia matrices. We store a base ring in our matrix and matrices are row major instead of column major in order to support the numerous large C libraries that use this convention.All AbstractAlgebra.jl matrices are assumed to be mutable. This is usually critical to performance."
+    "text": "Generic matrices are supported in AbstractAlgebra.jl. As the space of mtimes n matrices over a commutative ring is not itself a commutative ring, not all of the Ring interface needs to be implemented for matrices in general.In particular, the following functions do not need to be implemented: isdomain_type, needs_parentheses, displayed_with_minus_in_front, show_minus_one and divexact. The canonical_unit function should be implemented, but simply needs to return the corresponding value for entry 1 1 (the function is never called on empty matrices).Note that AbstractAlgebra.jl matrices are not the same as Julia matrices. We store a base ring in our matrix and matrices are row major instead of column major in order to support the numerous large C libraries that use this convention.All AbstractAlgebra.jl matrices are assumed to be mutable. This is usually critical to performance."
 },
 
 {
@@ -2421,7 +2957,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "AbstractAlgebra.Generic.hnf",
     "category": "Method",
-    "text": "hnf{T <: RingElement}(A::Mat{T}) -> Mat{T}\n\nReturn the upper right row Hermite normal form of A.\n\n\n\n"
+    "text": "hnf{T <: RingElement}(A::Mat{T})\n\nReturn the upper right row Hermite normal form of A.\n\n\n\n"
 },
 
 {
@@ -2429,7 +2965,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "AbstractAlgebra.Generic.hnf_with_trafo",
     "category": "Method",
-    "text": "hnf{T <: RingElement}(A::Mat{T}) -> Mat{T}, Mat{T}\n\nReturn the upper right row Hermite normal form H of A together with invertible matrix U such that UA = H.\n\n\n\n"
+    "text": "hnf_with_trafo{T <: RingElement}(A::Mat{T}) -> Mat{T}, Mat{T}\n\nReturn the tuple H U consisting of the upper right row Hermite normal form H of A together with invertible matrix U such that UA = H.\n\n\n\n"
 },
 
 {
@@ -2925,7 +3461,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Appendix A: Types in AbstractAlgebra.jl",
     "title": "Concrete types in AbstractAlgebra.jl",
     "category": "section",
-    "text": "Here we give a list of the concrete types in AbstractAlgebra.jl.In parentheses we put the types of the corresponding parent objects.gfelem{<:Integer} (GFField{<:Integer})We also think of various Julia types as though they were AbstractAlgebra.jl types:BigInt (Integers{BigInt})\nRational{BigInt} (Rationals{BigInt})Then there are various types for generic constructions over a base ring. They are all parameterised by a type T which is the type of the elements of the base ring they are defined over. Generic.Poly{T} (Generic.PolyRing{T})\nGeneric.MPoly{T} (Generic.MPolyRing{T})\nGeneric.RelSeries{T} (Generic.RelSeriesRing{T})\nGeneric.AbsSeries{T} (Generic.AbsSeriesRing{T})\nGeneric.LaurentSeriesRingElem{T} (Generic.LaurentSeriesRing{T})\nGeneric.LaurentSeriesFieldElem{T} (Generic.LaurentSeriesField{T})\nGeneric.Res{T} (Generic.ResRing{T})\nGeneric.Frac{T} (Generic.FracField{T})\nGeneric.Mat{T} (Generic.MatSpace{T})"
+    "text": "Here we give a list of the concrete types in AbstractAlgebra.jl.In parentheses we put the types of the corresponding parent objects.perm{<:Integer} (PermGroup{<:Integer})\ngfelem{<:Integer} (GFField{<:Integer})We also think of various Julia types as though they were AbstractAlgebra.jl types:BigInt (Integers{BigInt})\nRational{BigInt} (Rationals{BigInt})Then there are various types for generic constructions over a base ring. They are all parameterised by a type T which is the type of the elements of the base ring they are defined over. Generic.Poly{T} (Generic.PolyRing{T})\nGeneric.MPoly{T} (Generic.MPolyRing{T})\nGeneric.RelSeries{T} (Generic.RelSeriesRing{T})\nGeneric.AbsSeries{T} (Generic.AbsSeriesRing{T})\nGeneric.LaurentSeriesRingElem{T} (Generic.LaurentSeriesRing{T})\nGeneric.LaurentSeriesFieldElem{T} (Generic.LaurentSeriesField{T})\nGeneric.Res{T} (Generic.ResRing{T})\nGeneric.Frac{T} (Generic.FracField{T})\nGeneric.Mat{T} (Generic.MatSpace{T})"
 },
 
 ]}
