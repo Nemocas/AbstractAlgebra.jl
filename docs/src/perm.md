@@ -99,6 +99,11 @@ A custom implementation also needs to implement `hash(::perm, ::UInt)` and (poss
     Permutation group elements are mutable and so returning shallow copies is not sufficient.
 
 ```julia
+length(a::perm)
+```
+returns the length of permutation, i.e. $n$, where $a\in S_n$.
+
+```julia
 getindex(a::perm, n::Int)
 ```
 
