@@ -450,7 +450,7 @@ function ^(g::perm{T}, n::Integer) where T
          k = n % l
          for (idx,j) in enumerate(cycle)
             idx += k
-            idx = (idx > l ? idx%l : idx)
+            idx = (idx > l ? idx-l : idx)
             new_perm[j] = cycle[idx]
          end
       end
