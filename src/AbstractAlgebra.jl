@@ -132,7 +132,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached, canonical_unit, chang
                  hnf_with_trafo, hnf_via_popov, hnf_via_popov_with_trafo,
                  hooklength, identity_map, identity_matrix,
                  image_map, image_fn, inflate, integral, interpolate, inv,
-                 inv!, inverse_fn, invmod, isconstant, isdegree,
+                 inv!, inverse_fn, invmod, involves_at_most_one_variable, isconstant, isdegree,
                  isdomain_type, isexact_type, isgen, ishessenberg, ismonomial,
                  isone, isreverse, isrimhook,
                  isrref, issquare, isterm,
