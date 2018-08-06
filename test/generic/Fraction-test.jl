@@ -209,14 +209,14 @@ function test_gen_frac_divides()
 
    S, x = PolynomialRing(ZZ, "x")
 
-   for i in 1:100
+   for i in 1:10000
      a = rand(S, 1:5, -10:10)
      b = rand(S, 1:5, -10:10)
 
-     b, q = divides(a, b)
+     d, q = divides(a, b)
 
-     if b
-       @test b * a == q
+     if d
+       @test b * q == a
      end
    end
 
