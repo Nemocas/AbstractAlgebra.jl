@@ -544,7 +544,7 @@ function nextperm(A::AllPerms{<:Integer}, count)
    k = 0
    n = 1
 
-   while true
+   @inbounds while true
       if A.c[n] < n
          k = ifelse(isodd(n), 1, A.c[n])
          A.elts[k], A.elts[n] = A.elts[n], A.elts[k]
