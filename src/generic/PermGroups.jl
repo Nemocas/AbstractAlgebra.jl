@@ -28,7 +28,7 @@ julia> parent(g) == G
 true
 ```
 """
-parent(g::perm{T}) where T = PermGroup(T(length(g.d)))
+parent(g::perm{T}) where T = PermGroup(T(length(g)))
 
 ###############################################################################
 #
@@ -38,6 +38,8 @@ parent(g::perm{T}) where T = PermGroup(T(length(g.d)))
 
 # hash(perm) = 0x0d9939c64ab650ca
 Base.hash(g::perm, h::UInt) = xor(hash(g.d, h), 0x0d9939c64ab650ca)
+
+length(g::perm) = length(g.d)
 
 function getindex(g::perm, n::Integer)
    return g.d[n]
@@ -433,7 +435,7 @@ function ^(g::perm{T}, n::Integer) where T
    if n < 0
       return inv(g)^-n
    elseif n == 0
-      return perm(T(length(g.d)))
+      return perm(T(length(g)))
    elseif n == 1
       return deepcopy(g)
    elseif n == 2
@@ -461,7 +463,7 @@ function power_by_squaring(g::perm{I}, n::Integer) where {I}
    if n < 0
       return inv(g)^-n
    elseif n == 0
-      return perm(T(length(g.d)))
+      return perm(T(length(g)))
    elseif n == 1
       return deepcopy(g)
    elseif n == 2
@@ -615,8 +617,8 @@ function order(::Type{T}, a::perm) where T
 end
 
 doc"""
-    matrix_repr(a::perm)
-> Return the permutation matrix as sparse matrix representing `a` via natural
+    matrix_repr(g::perm)
+> Return the permutation matrix as sparse matrix representing `g` via natural
 > embedding of the permutation group into general linear group over $\mathbb{Z}$.
 
 # Examples:
@@ -637,7 +639,7 @@ julia> full(ans)
  1  0  0
 ```
 """
-matrix_repr(a::perm{T}) where T = sparse(collect(T, 1:length(a.d)), a.d, ones(T,length(a.d)))
+matrix_repr(g::perm{T}) where T = sparse(collect(T, 1:length(g)), g.d, ones(T,length(g)))
 
 doc"""
     emb!(result::perm, p::perm, V)
@@ -872,7 +874,7 @@ function character(lambda::Partition)
 
    function char(p::perm, check::Bool=true)
       if check
-         sum(lambda) == length(p.d) || throw(ArgumentError("Can't evaluate character on $p : lengths differ."))
+         sum(lambda) == length(p) || throw(ArgumentError("Can't evaluate character on $p : lengths differ."))
       end
       return MN1inner(R, Partition(permtype(p)), 1, _charvalsTableBig)
    end
@@ -887,7 +889,7 @@ doc"""
 """
 function character(lambda::Partition, p::perm, check::Bool=true)
    if check
-      sum(lambda) == length(p.d) || throw("lambda-th irreducible character can be evaluated only on permutations of length $(sum(lambda)).")
+      sum(lambda) == length(p) || throw("lambda-th irreducible character can be evaluated only on permutations of length $(sum(lambda)).")
    end
    return character(BigInt, lambda, Partition(permtype(p)))
 end
