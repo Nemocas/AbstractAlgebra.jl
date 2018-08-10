@@ -1,16 +1,27 @@
 module Generic
 
-import Base: Array, abs, asin, asinh, atan, atanh, base, bin, checkbounds,
-             conj, convert, cmp, contains, cos, cosh, dec, deepcopy,
-             deepcopy_internal, denominator, deserialize, det, div, divrem,
-             exp, eye, gcd, gcdx, getindex, hash, hcat, hex, intersect, inv,
+import LinearAlgebra: det, norm,
+                      nullspace, rank, transpose!, hessenberg
+
+if VERSION <= v"0.7.0"
+   import LinearAlgebra: lufact, lufact!
+
+   import Base: atan2, base, contains, nextpow2, prevpow2
+end
+
+using Markdown, Random, InteractiveUtils
+
+import Base: Array, abs, asin, asinh, atan, atanh, bin, checkbounds,
+             conj, convert, cmp, cos, cosh, dec, deepcopy,
+             deepcopy_internal, denominator, div, divrem,
+             exp, gcd, gcdx, getindex, hash, hcat, hex, intersect, inv,
              invmod, isapprox, isequal, isfinite, isless, isqrt, isreal, iszero, lcm,
-             ldexp, length, log, lufact, lufact!, mod, ndigits, nextpow2, norm,
-             nullspace, numerator, oct, one, parent, parse, precision,
-             prevpow2, rand, rank, Rational, rem, reverse, serialize,
+             ldexp, length, log, mod, ndigits,
+             numerator, oct, one, parent, parse, precision,
+             rand, Rational, rem, reverse, 
              setindex!, show, similar, sign, sin, sinh, size, string,
-             tan, tanh, trace, trailing_zeros, transpose, transpose!, truncate,
-             typed_hvcat, typed_hcat, var, vcat, xor, zero, zeros, +, -, *, ==, ^,
+             tan, tanh, trailing_zeros, transpose, truncate,
+             typed_hvcat, typed_hcat, vcat, xor, zero, zeros, +, -, *, ==, ^,
              &, |, <<, >>, ~, <=, >=, <, >, //, /, !=
 
 if VERSION >= v"0.7.0-DEV.1144"
@@ -19,7 +30,7 @@ end
 
 import Base: floor, ceil, hypot, log, log1p, exp, expm1, sin, cos, sinpi,
              cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
-             asinh, acosh, gamma, lgamma, sinpi, cospi, atan2
+             asinh, acosh, sinpi, cospi
 
 import AbstractAlgebra: Integers, Rationals, Ring, RingElem, RingElement, Field,
              FieldElement, Map, promote_rule

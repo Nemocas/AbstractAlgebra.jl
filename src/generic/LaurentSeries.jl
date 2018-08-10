@@ -13,7 +13,7 @@ export exp_gcd, inflate, deflate, downscale, upscale
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     O{T <: RingElement}(a::LaurentSeriesElem{T})
 > Returns $0 + O(x^\mbox{val}(a))$. Usually this function is called with $x^n$
 > as parameter. Then the function returns the power series $0 + O(x^n)$, which
@@ -21,14 +21,14 @@ doc"""
 """
 function O(a::LaurentSeriesElem{T}) where T <: RingElement
    val = valuation(a)
-   return parent(a)(Array{T}(0), 0, val, val, 1)
+   return parent(a)(Array{T}(undef, 0), 0, val, val, 1)
 end
 
 parent_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesRingElem{S}} = LaurentSeriesRing{S}
 
 parent_type(::Type{T}) where {S <: FieldElement, T <: LaurentSeriesFieldElem{S}} = LaurentSeriesField{S}
 
-doc"""
+Markdown.doc"""
     parent(a::LaurentSeriesElem)
 > Return the parent of the given power series.
 """
@@ -38,19 +38,19 @@ elem_type(::Type{T}) where {S <: RingElement, T <: LaurentSeriesRing{S}} = Laure
 
 elem_type(::Type{T}) where {S <: FieldElement, T <: LaurentSeriesField{S}} = LaurentSeriesFieldElem{S}
 
-doc"""
+Markdown.doc"""
     base_ring(R::LaurentSeriesRing)
 > Return the base ring of the given power series ring.
 """
 base_ring(R::LaurentSeriesRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
-doc"""
+Markdown.doc"""
     base_ring(R::LaurentSeriesField)
 > Return the base ring of the given power series ring.
 """
 base_ring(R::LaurentSeriesField{T}) where T <: FieldElement = R.base_ring::parent_type(T)
 
-doc"""
+Markdown.doc"""
     base_ring(a::LaurentSeriesElem)
 > Return the base ring of the power series ring of the given power series.
 """
@@ -62,14 +62,14 @@ end
 
 isexact_type(a::Type{T}) where T <: LaurentSeriesElem = false
 
-doc"""
+Markdown.doc"""
     var(a::LaurentSeriesRing)
 > Return the internal name of the generator of the power series ring. Note that
 > this is returned as a `Symbol` not a `String`.
 """
 var(a::LaurentSeriesRing) = a.S
 
-doc"""
+Markdown.doc"""
     var(a::LaurentSeriesField)
 > Return the internal name of the generator of the power series ring. Note that
 > this is returned as a `Symbol` not a `String`.
@@ -97,48 +97,48 @@ function Base.hash(a::LaurentSeriesElem, h::UInt)
    return b
 end
 
-doc"""
+Markdown.doc"""
     pol_length(a::LaurentSeriesElem)
 > Return the length of the polynomial underlying the given power series. This
 > will be zero if the power series has no nonzero terms.
 """
 pol_length(a::LaurentSeriesElem) = a.length
 
-doc"""
+Markdown.doc"""
     precision(a::LaurentSeriesElem)
 > Return the precision of the given power series in absolute terms. This will
 > be the sum of the valuation and the length of the underlying polynomial.
 """
 precision(a::LaurentSeriesElem) = a.prec
 
-doc"""
+Markdown.doc"""
     valuation(a::LaurentSeriesElem)
 > Return the valuation of the given power series, i.e. the degree of the first
 > nonzero term (or the precision if it is arithmetically zero).
 """
 valuation(a::LaurentSeriesElem) = a.val
 
-doc"""
+Markdown.doc"""
     scale(a::LaurentSeriesElem)
 > Return the scale factor of the polynomial underlying the given power series.
 """
 scale(a::LaurentSeriesElem) = a.scale
 
-doc"""
+Markdown.doc"""
     max_precision(R::LaurentSeriesRing)
 > Return the maximum relative precision of power series in the given power
 > series ring.
 """
 max_precision(R::LaurentSeriesRing) = R.prec_max
 
-doc"""
+Markdown.doc"""
     max_precision(R::LaurentSeriesField)
 > Return the maximum relative precision of power series in the given power
 > series ring.
 """
 max_precision(R::LaurentSeriesField) = R.prec_max
 
-doc"""
+Markdown.doc"""
    exp_gcd(a::LaurentSeriesElem)
 > Return the GCD of the exponents of the polynomial underlying the given Laurent series.
 """
@@ -175,7 +175,7 @@ function set_val!(a::LaurentSeriesElem, val::Int)
    a.val = val
 end
 
-doc"""
+Markdown.doc"""
     set_scale!(a::LaurentSeriesElem, scale::Int)
 > Set the scale factor of the polynomial underlying the given series to the given value.
 """
@@ -201,7 +201,7 @@ function coeff(a::LaurentSeriesElem, n::Int)
    end
 end
 
-doc"""
+Markdown.doc"""
     rescale!(a::LaurentSeriesElem)
 > Rescale the polynomial underlying the series so that the GCD of its exponents is 1.
 > This is only used internally, since the result of every user facing function is a
@@ -224,7 +224,7 @@ function rescale!(a::LaurentSeriesElem)
    return a
 end
 
-doc"""
+Markdown.doc"""
     downscale{T <: RingElement}(a::LaurentSeriesElem{T}, n::Int)
 > Inflate the underlying polynomial by a factor of $n$. This inserts zero coefficients
 > for padding. It is assumed that the scale factor of $a$ is divisible by $n$.
@@ -237,7 +237,7 @@ function downscale(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
    end
    R = base_ring(a)
    lenz = (lena - 1)*n + 1
-   d = Array{T}(lenz)
+   d = Array{T}(undef, lenz)
    j = 0
    pn = 0
    for i = 0:lenz - 1
@@ -255,7 +255,7 @@ function downscale(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
    return z
 end
 
-doc"""
+Markdown.doc"""
     upscale{T <: RingElement}(a::LaurentSeriesElem{T}, n::Int)
 > Deflate the underlying polynomial by a factor of $n$. This removes zero coefficients
 > that existed for padding. It is assumed that the spacing of nonzero coefficients of
@@ -269,7 +269,7 @@ function upscale(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
    end
    R = base_ring(a)
    lenz = div(lena - 1, n) + 1
-   d = Array{T}(lenz)
+   d = Array{T}(undef, lenz)
    j = 0
    for i = 1:lenz
       d[i] = polcoeff(a, j)
@@ -281,35 +281,35 @@ function upscale(a::LaurentSeriesElem{T}, n::Int) where T <: RingElement
    return z
 end
 
-doc"""
+Markdown.doc"""
     zero(R::LaurentSeriesRing)
 > Return $0 + O(x^n)$ where $n$ is the maximum precision of the power series
 > ring $R$.
 """
 zero(R::LaurentSeriesRing) = R(0)
 
-doc"""
+Markdown.doc"""
     zero(R::LaurentSeriesField)
 > Return $0 + O(x^n)$ where $n$ is the maximum precision of the power series
 > ring $R$.
 """
 zero(R::LaurentSeriesField) = R(0)
 
-doc"""
+Markdown.doc"""
     one(R::LaurentSeriesRing)
 > Return $1 + O(x^n)$ where $n$ is the maximum precision of the power series
 > ring $R$.
 """
 one(R::LaurentSeriesField) = R(1)
 
-doc"""
+Markdown.doc"""
     one(R::LaurentSeriesField)
 > Return $1 + O(x^n)$ where $n$ is the maximum precision of the power series
 > ring $R$.
 """
 one(R::LaurentSeriesRing) = R(1)
 
-doc"""
+Markdown.doc"""
     gen(R::LaurentSeriesRing)
 > Return the generator of the power series ring, i.e. $x + O(x^{n + 1})$ where
 > $n$ is the maximum precision of the power series ring $R$.
@@ -319,7 +319,7 @@ function gen(R::LaurentSeriesRing)
    return R([S(1)], 1, max_precision(R) + 1, 1, 1)
 end
 
-doc"""
+Markdown.doc"""
     gen(R::LaurentSeriesField)
 > Return the generator of the power series ring, i.e. $x + O(x^{n + 1})$ where
 > $n$ is the maximum precision of the power series ring $R$.
@@ -329,14 +329,14 @@ function gen(R::LaurentSeriesField)
    return R([S(1)], 1, max_precision(R) + 1, 1, 1)
 end
 
-doc"""
+Markdown.doc"""
     iszero(a::LaurentSeriesElem)
 > Return `true` if the given power series is arithmetically equal to zero to
 > its current precision, otherwise return `false`.
 """
 iszero(a::LaurentSeriesElem) = pol_length(a) == 0
 
-doc"""
+Markdown.doc"""
     isone(a::LaurentSeriesElem)
 > Return `true` if the given power series is arithmetically equal to one to
 > its current precision, otherwise return `false`.
@@ -345,7 +345,7 @@ function isone(a::LaurentSeriesElem)
    return valuation(a) == 0 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
 
-doc"""
+Markdown.doc"""
     isgen(a::LaurentSeriesElem)
 > Return `true` if the given power series is arithmetically equal to the
 > generator of its power series ring to its current precision, otherwise return
@@ -355,21 +355,21 @@ function isgen(a::LaurentSeriesElem)
    return valuation(a) == 1 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
 
-doc"""
+Markdown.doc"""
     isunit(a::LaurentSeriesElem)
 > Return `true` if the given power series is arithmetically equal to a unit,
 > i.e. is invertible, otherwise return `false`.
 """
 isunit(a::LaurentSeriesElem) = valuation(a) == 0 && isunit(polcoeff(a, 0))
 
-doc"""
+Markdown.doc"""
     modulus{T <: ResElem}(a::LaurentSeriesElem{T})
 > Return the modulus of the coefficients of the given power series.
 """
 modulus(a::LaurentSeriesElem{T}) where {T <: ResElem} = modulus(base_ring(a))
 
-function deepcopy_internal(a::LaurentSeriesElem{T}, dict::ObjectIdDict) where {T <: RingElement}
-   coeffs = Array{T}(pol_length(a))
+function deepcopy_internal(a::LaurentSeriesElem{T}, dict::IdDict) where {T <: RingElement}
+   coeffs = Array{T}(undef, pol_length(a))
    for i = 1:pol_length(a)
       coeffs[i] = deepcopy(polcoeff(a, i - 1))
    end
@@ -472,7 +472,7 @@ show_minus_one(::Type{LaurentSeriesElem{T}}) where {T <: RingElement} = show_min
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     -(a::LaurentSeriesElem)
 > Return $-a$.
 """
@@ -495,7 +495,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     +{T <: RingElement}(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T})
 > Return $a + b$.
 """
@@ -555,7 +555,7 @@ function +(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
    return z
 end
 
-doc"""
+Markdown.doc"""
     -{T <: RingElement}(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T})
 > Return $a - b$.
 """
@@ -615,7 +615,7 @@ function -(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
    return z
 end
 
-doc"""
+Markdown.doc"""
     *{T <: RingElement}(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T})
 > Return $a\times b$.
 """
@@ -641,7 +641,7 @@ function *(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
    lena = min(lena*sa, prec)
    lenb = min(lenb*sb, prec)
    if lena == 0 || lenb == 0
-      return parent(a)(Array{T}(0), 0, prec + zval, zval, 1)
+      return parent(a)(Array{T}(undef, 0), 0, prec + zval, zval, 1)
    end
    t = base_ring(a)()
    da = div(sa, sz)
@@ -651,7 +651,7 @@ function *(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}) where {T <: RingEle
    lena = pol_length(a)
    lenb = pol_length(b)
    lenz = min(lena + lenb - 1, div(prec + sz - 1, sz))
-   d = Array{T}(lenz)
+   d = Array{T}(undef, lenz)
    for i = 1:min(lena, lenz)
       d[i] = polcoeff(a, i - 1)*polcoeff(b, 0)
    end
@@ -684,7 +684,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     *{T <: RingElem}(a::T, b::LaurentSeriesElem{T})
 > Return $a\times b$.
 """
@@ -704,7 +704,7 @@ function *(a::T, b::LaurentSeriesElem{T}) where {T <: RingElem}
    return z
 end
 
-doc"""
+Markdown.doc"""
     *(a::Union{Integer, Rational, AbstractFloat}, b::LaurentSeriesElem)
 > Return $a\times b$.
 """
@@ -724,13 +724,13 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::LaurentSeriesElem)
    return z
 end
 
-doc"""
+Markdown.doc"""
     *{T <: RingElem}(a::LaurentSeriesElem{T}, b::T)
 > Return $a\times b$.
 """
 *(a::LaurentSeriesElem{T}, b::T) where {T <: RingElem} = b*a
 
-doc"""
+Markdown.doc"""
     *(a::LaurentSeriesElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a\times b$.
 """
@@ -742,7 +742,7 @@ doc"""
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     shift_left(x::LaurentSeriesElem, n::Int)
 > Return the power series $f$ shifted left by $n$ terms, i.e. multiplied by
 > $x^n$.
@@ -754,7 +754,7 @@ function shift_left(x::LaurentSeriesElem{T}, len::Int) where {T <: RingElement}
    return z
 end
 
-doc"""
+Markdown.doc"""
     shift_right(f::LaurentSeriesElem, n::Int)
 > Return the power series $f$ shifted right by $n$ terms, i.e. divided by
 > $x^n$.
@@ -772,7 +772,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     truncate(a::LaurentSeriesElem, n::Int)
 > Return $a$ truncated to (absolute) precision $n$.
 """
@@ -822,7 +822,7 @@ function mullow(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T}, n::Int) where 
    prec = min(precision(a), precision(b))
    t = base_ring(a)()
    lenz = min(lena + lenb - 1, div(n + s - 1, s))
-   d = Array{T}(lenz)
+   d = Array{T}(undef, lenz)
    for i = 1:min(lena, lenz)
       d[i] = polcoeff(a, i - 1)*polcoeff(b, 0)
    end
@@ -864,7 +864,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     ^{T <: RingElement}(a::LaurentSeriesElem{T}, b::Int)
 > Return $a^b$. We require $b \geq 0$.
 """
@@ -938,7 +938,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     =={T <: RingElement}(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
@@ -993,7 +993,7 @@ function ==(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T}) where {T <: RingEl
    return true
 end
 
-doc"""
+Markdown.doc"""
     isequal{T <: RingElement}(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T})
 > Return `true` if $x == y$ exactly, otherwise return `false`. Only if the
 > power series are precisely the same, to the same precision, are they declared
@@ -1021,7 +1021,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     =={T <: RingElem}(x::LaurentSeriesElem{T}, y::T)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
@@ -1029,13 +1029,13 @@ doc"""
            ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
              valuation(x) == 0 && polcoeff(x, 0) == y))
 
-doc"""
+Markdown.doc"""
     =={T <: RingElem}(x::T, y::LaurentSeriesElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::T, y::LaurentSeriesElem{T}) where {T <: RingElem} = y == x
 
-doc"""
+Markdown.doc"""
     ==(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
@@ -1043,7 +1043,7 @@ doc"""
                   ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
-doc"""
+Markdown.doc"""
     ==(x::Union{Integer, Rational, AbstractFloat}, y::LaurentSeriesElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
@@ -1073,7 +1073,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     divexact{T <: RingElement}(a::LaurentSeriesElem{T}, b::LaurentSeriesElem{T})
 > Return $a/b$. Requires $b$ to be invertible.
 """
@@ -1090,7 +1090,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     divexact(a::LaurentSeriesElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a/b$ where the quotient is expected to be exact.
 """
@@ -1108,7 +1108,7 @@ function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloa
    return z
 end
 
-doc"""
+Markdown.doc"""
     divexact{T <: RingElem}(a::LaurentSeriesElem{T}, b::T)
 > Return $a/b$ where the quotient is expected to be exact.
 """
@@ -1132,7 +1132,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
    inv(a::LaurentSeriesElem)
 > Return the inverse of the power series $a$, i.e. $1/a$.
 """
@@ -1169,7 +1169,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
    sqrt(a::LaurentSeriesElem)
 > Return the square root of the power series $a$.
 """
@@ -1228,7 +1228,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     exp(a::LaurentSeriesElem)
 > Return the exponential of the power series $a$.
 """
@@ -1293,7 +1293,7 @@ end
 function fit!(c::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
    if length(c.coeffs) < n
       t = c.coeffs
-      c.coeffs = Array{T}(n)
+      c.coeffs = Array{T}(undef, n)
       for i = 1:c.length
          c.coeffs[i] = t[i]
       end
@@ -1504,20 +1504,20 @@ function (R::LaurentSeriesField{T})(b::RingElement) where {T <: FieldElement}
 end
 
 function (R::LaurentSeriesRing{T})() where {T <: RingElement}
-   z = LaurentSeriesRingElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max, 1)
+   z = LaurentSeriesRingElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    z.parent = R
    return z
 end
 
 function (R::LaurentSeriesField{T})() where {T <: FieldElement}
-   z = LaurentSeriesFieldElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max, 1)
+   z = LaurentSeriesFieldElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    z.parent = R
    return z
 end
 
 function (R::LaurentSeriesRing{T})(b::Union{Integer, Rational, AbstractFloat}) where {T <: RingElement}
    if b == 0
-      z = LaurentSeriesRingElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max, 1)
+      z = LaurentSeriesRingElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    else
       z = LaurentSeriesRingElem{T}([base_ring(R)(b)], 1, R.prec_max, 0, 1)
    end
@@ -1527,7 +1527,7 @@ end
 
 function (R::LaurentSeriesField{T})(b::Union{Rational, AbstractFloat}) where {T <: FieldElement}
    if b == 0
-      z = LaurentSeriesFieldElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max, 1)
+      z = LaurentSeriesFieldElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    else
       z = LaurentSeriesFieldElem{T}([base_ring(R)(b)], 1, R.prec_max, 0, 1)
    end
@@ -1538,7 +1538,7 @@ end
 function (R::LaurentSeriesRing{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(R) && error("Unable to coerce to power series")
    if iszero(b)
-      z = LaurentSeriesRingElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max, 1)
+      z = LaurentSeriesRingElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    else
       z = LaurentSeriesRingElem{T}([b], 1, R.prec_max, 0, 1)
    end
@@ -1549,7 +1549,7 @@ end
 function (R::LaurentSeriesField{T})(b::T) where {T <: FieldElem}
    parent(b) != base_ring(R) && error("Unable to coerce to power series")
    if iszero(b)
-      z = LaurentSeriesFieldElem{T}(Array{T}(0), 0, R.prec_max, R.prec_max, 1)
+      z = LaurentSeriesFieldElem{T}(Array{T}(undef, 0), 0, R.prec_max, R.prec_max, 1)
    else
       z = LaurentSeriesFieldElem{T}([b], 1, R.prec_max, 0, 1)
    end
@@ -1597,7 +1597,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
    LaurentSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::AbstractString; cached=true)
 > Return a tuple $(S, x)$ consisting of the parent object `S` of a Laurent series
 > ring over the given base ring and a generator `x` for the Laurent series ring.

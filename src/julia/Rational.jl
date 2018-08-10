@@ -129,7 +129,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
    sqrt{T <: Integer}(a::Rational{T})
 > Return the square root of $a$ if it is the square of a rational, otherwise
 > throw an error.
@@ -144,7 +144,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
    exp{T <: Integer}(a::Rational{T})
 > Return $1$ if $a = 0$, otherwise throw an exception.
 """

@@ -68,7 +68,7 @@ base_ring(R::SparsePolyRing{T}) where {T <: RingElement} = R.base_ring::parent_t
 
 parent(a::SparsePoly) = a.parent
 
-function Base.deepcopy_internal(a::SparsePoly{T}, dict::ObjectIdDict) where {T <: RingElement}
+function Base.deepcopy_internal(a::SparsePoly{T}, dict::IdDict) where {T <: RingElement}
    Re = Base.deepcopy_internal(a.exps, dict)
    Rc = Array{T}(a.length)
    for i = 1:a.length
@@ -1472,8 +1472,8 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
       h = gcd(f, g)
       # convert back to sparse polys
       nonzero = 0
-      Ac = Array{T}(0)
-      Ae = Array{UInt}(0)
+      Ac = Array{T}(undef, 0)
+      Ae = zeros(UInt, 0)
       for i = 1:length(h)
          ci = coeff(h, i - 1)
          if ci != 0
@@ -1717,7 +1717,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     SparsePolynomialRing(R::AbstractAlgebra.Ring, s::String; cached::Bool = true)
 > Given a base ring `R` and a string `s` specifying how the generator
 > (variable) should be printed, return a tuple `S, x` representing the new
