@@ -117,7 +117,7 @@ function zero!(a::AbstractFloat)
 end
 
 function zero!(a::BigFloat)
-   ccall((:mpfr_set_si, :libmpfr), Void,
+   ccall((:mpfr_set_si, :libmpfr), Nothing,
          (Ref{BigFloat}, Int, Int32), a, 0, Base.MPFR.ROUNDING_MODE[])
    return a
 end
@@ -127,7 +127,7 @@ function mul!(a::T, b::T, c::T) where T <: AbstractFloat
 end
 
 function mul!(a::BigFloat, b::BigFloat, c::BigFloat)
-   ccall((:mpfr_mul, :libmpfr), Void,
+   ccall((:mpfr_mul, :libmpfr), Nothing,
          (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32),
                  a, b, c, Base.MPFR.ROUNDING_MODE[])
    return a
@@ -138,7 +138,7 @@ function add!(a::T, b::T, c::T) where T <: AbstractFloat
 end
 
 function add!(a::BigFloat, b::BigFloat, c::BigFloat)
-   ccall((:mpfr_add, :libmpfr), Void,
+   ccall((:mpfr_add, :libmpfr), Nothing,
          (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32),
                  a, b, c, Base.MPFR.ROUNDING_MODE[])
    return a
@@ -149,7 +149,7 @@ function addeq!(a::T, b::T) where T <: AbstractFloat
 end
 
 function addeq!(a::BigFloat, b::BigFloat)
-   ccall((:mpfr_add, :libmpfr), Void,
+   ccall((:mpfr_add, :libmpfr), Nothing,
          (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32),
                  a, a, b, Base.MPFR.ROUNDING_MODE[])
    return a
@@ -160,7 +160,7 @@ function addmul!(a::T, b::T, c::T, d::T) where T <: AbstractFloat
 end
 
 function addmul!(a::BigFloat, b::BigFloat, c::BigFloat, d::BigFloat)
-   ccall((:mpfr_fma, :libmpfr), Void,
+   ccall((:mpfr_fma, :libmpfr), Nothing,
          (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32),
                  a, b, c, a, Base.MPFR.ROUNDING_MODE[])
    return a
@@ -171,7 +171,7 @@ function addmul!(a::T, b::T, c::T) where T <: AbstractFloat # special case, no t
 end
 
 function addmul!(a::BigFloat, b::BigFloat, c::BigFloat) # special case, no temporary required
-   ccall((:mpfr_fma, :libmpfr), Void,
+   ccall((:mpfr_fma, :libmpfr), Nothing,
          (Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Ref{BigFloat}, Int32),
                  a, b, c, a, Base.MPFR.ROUNDING_MODE[])
    return a

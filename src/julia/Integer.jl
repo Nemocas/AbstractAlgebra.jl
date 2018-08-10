@@ -40,7 +40,7 @@ if VERSION < v"0.7.0-DEV.1144"
 isone(a::Integer) = a == 1
 end
 
-doc"""
+Markdown.doc"""
    isunit(a::Integer)
 > Return `true` if $a$ is $1$ or $-1$.
 """
@@ -133,7 +133,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
    sqrt{T <: Integer}(a::T)
 > Return the integer square root of $a$. If $a$ is not a perfect square an
 > error is thrown.
@@ -150,7 +150,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
    exp{a <: Integer}(a::T)
 > Return $1$ if $a = 0$, otherwise throw an exception. This function is not
 > generally of use to the user, but is used internally in AbstractAlgebra.jl.
@@ -171,7 +171,7 @@ function exp(a::T) where T <: Integer
 # c*n = a or c = gcd(a, b^infty), n = div(a, c).
 # This is used in various Euclidean domains for Chinese remaindering.
 
-doc"""
+Markdown.doc"""
    ppio(a::T, b::T)
 
 > Split $a$ into $c*d$ where $c = gcd(a, b^\infty)$.
@@ -199,7 +199,7 @@ function zero!(a::Integer)
 end
 
 function zero!(a::BigInt)
-   ccall((:__gmpz_set_si, :libgmp), Void, (Ref{BigInt}, Int), a, 0)
+   ccall((:__gmpz_set_si, :libgmp), Nothing, (Ref{BigInt}, Int), a, 0)
    return a
 end
 
@@ -208,7 +208,7 @@ function mul!(a::T, b::T, c::T) where T <: Integer
 end
 
 function mul!(a::BigInt, b::BigInt, c::BigInt)
-   ccall((:__gmpz_mul, :libgmp), Void, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, b, c)
+   ccall((:__gmpz_mul, :libgmp), Nothing, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, b, c)
    return a
 end
 
@@ -217,7 +217,7 @@ function add!(a::T, b::T, c::T) where T <: Integer
 end
 
 function add!(a::BigInt, b::BigInt, c::BigInt)
-   ccall((:__gmpz_add, :libgmp), Void, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, b, c)
+   ccall((:__gmpz_add, :libgmp), Nothing, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, b, c)
    return a
 end
 
@@ -226,7 +226,7 @@ function addeq!(a::T, b::T) where T <: Integer
 end
 
 function addeq!(a::BigInt, b::BigInt)
-   ccall((:__gmpz_add, :libgmp), Void, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, a, b)
+   ccall((:__gmpz_add, :libgmp), Nothing, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, a, b)
    return a
 end
 
@@ -235,7 +235,7 @@ function addmul!(a::T, b::T, c::T, d::T) where T <: Integer
 end
 
 function addmul!(a::BigInt, b::BigInt, c::BigInt, d::BigInt)
-   ccall((:__gmpz_addmul, :libgmp), Void, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, b, c)
+   ccall((:__gmpz_addmul, :libgmp), Nothing, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, b, c)
    return a
 end
 
@@ -244,7 +244,7 @@ function addmul!(a::T, b::T, c::T) where T <: Integer # special case, no tempora
 end
 
 function addmul!(a::BigInt, b::BigInt, c::BigInt) # special case, no temporary required
-   ccall((:__gmpz_addmul, :libgmp), Void, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, b, c)
+   ccall((:__gmpz_addmul, :libgmp), Nothing, (Ref{BigInt}, Ref{BigInt}, Ref{BigInt}), a, b, c)
    return a
 end
 

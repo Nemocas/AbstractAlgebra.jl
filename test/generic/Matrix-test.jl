@@ -14,7 +14,7 @@ function randprime(n::Int)
    return primes100[rand(1:n)]
 end
 
-function Base.istriu(A::Generic.Mat)
+function istriu(A::Generic.Mat)
    m = rows(A)
    n = cols(A)
    d = 0
@@ -761,7 +761,7 @@ function test_gen_mat_solve_rational()
       @test M*x == d*b
    end
 
-   R, t = PolynomialRing(QQ, "t")
+   R, t = PolynomialRing(AbstractAlgebra.JuliaQQ, "t")
    K, a = NumberField(t^3 + 3t + 1, "a")
    S, y = PolynomialRing(K, "y")
    T = MatrixSpace(S, 3, 3)

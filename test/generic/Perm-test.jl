@@ -334,7 +334,7 @@ function test_characters(types)
       l = Partition(T[1,1,1])
 
       @test typeof(character(l, ps[1])) == BigInt
-      TT = (T<:Union{Unsigned, Signed} ? Int : BigInt)
+      TT = (T !== BigInt ? Int : BigInt)
       @test typeof(character(T, l, rand(G))) == TT
       @test typeof(character(T, l, ps[1])) == TT
 

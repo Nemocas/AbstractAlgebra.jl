@@ -84,7 +84,7 @@ function test_ytabs_type()
    @test_throws BoundsError Y[1,5]
 
    for i in 1:sum(Y.part)
-       @test Y[findfirst(Y, i)] == i
+     @test Y[something(findfirst(isequal(i), Y), 0)] == i
    end
 
    println("PASS")
