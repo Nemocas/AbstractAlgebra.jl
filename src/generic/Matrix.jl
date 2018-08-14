@@ -16,7 +16,7 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref,
        _check_dim, rows, cols, gram, rref, rref!, swap_rows, swap_rows!,
        hnf_kb, hnf_kb_with_trafo, hnf_cohen, hnf_cohen_with_trafo, snf_kb,
        snf_kb_with_trafo, find_pivot_popov, inv!, zero_matrix,
-       kronecker_product, minors, trace
+       kronecker_product, minors, tr, lu, lu!
 
 ###############################################################################
 #
@@ -860,11 +860,11 @@ end
 ###############################################################################
 
 Markdown.doc"""
-    trace(x::AbstractAlgebra.MatElem)
+    tr(x::AbstractAlgebra.MatElem)
 > Return the trace of the matrix $a$, i.e. the sum of the diagonal elements. We
 > require the matrix to be square.
 """
-function trace(x::AbstractAlgebra.MatElem)
+function tr(x::AbstractAlgebra.MatElem)
    rows(x) != cols(x) && error("Not a square matrix in trace")
    d = zero(base_ring(x))
    for i = 1:rows(x)
@@ -925,7 +925,7 @@ end
 #
 ###############################################################################
 
-function lufact!(P::Generic.perm, A::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
+function lu!(P::Generic.perm, A::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    m = rows(A)
    n = cols(A)
    rank = 0
@@ -970,13 +970,13 @@ function lufact!(P::Generic.perm, A::AbstractAlgebra.MatElem{T}) where {T <: Fie
 end
 
 Markdown.doc"""
-    lufact{T <: FieldElement}(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A)))
+    lu{T <: FieldElement}(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A)))
 > Return a tuple $r, p, L, U$ consisting of the rank of $A$, a permutation
 > $p$ of $A$ belonging to $P$, a lower triangular matrix $L$ and an upper
 > triangular matrix $U$ such that $p(A) = LU$, where $p(A)$ stands for the
 > matrix whose rows are the given permutation $p$ of the rows of $A$.
 """
-function lufact(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A))) where {T <: FieldElement}
+function lu(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A))) where {T <: FieldElement}
    m = rows(A)
    n = cols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -984,7 +984,7 @@ function lufact(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A))) where {T 
    R = base_ring(A)
    U = deepcopy(A)
    L = similar(A, m, m)
-   rank = lufact!(p, U)
+   rank = lu!(p, U)
    for i = 1:m
       for j = 1:n
          if i > j
@@ -1227,7 +1227,7 @@ function rref!(A::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    n = cols(A)
    R = base_ring(A)
    P = PermGroup(m)()
-   rnk = lufact!(P, A)
+   rnk = lu!(P, A)
    if rnk == 0
       return 0
    end
@@ -1673,7 +1673,7 @@ function rank(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    end
    A = deepcopy(M)
    P = PermGroup(n)()
-   return lufact!(P, A)
+   return lu!(P, A)
 end
 
 ###############################################################################
@@ -1748,7 +1748,7 @@ function solve_lu(A::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
 
    LU = deepcopy(A)
    p = PermGroup(rows(A))()
-   r = lufact!(p, LU)
+   r = lu!(p, LU)
    r < rows(A) && error("Singular matrix in solve_lu")
    return solve_lu_precomp(p, LU, b)
 end

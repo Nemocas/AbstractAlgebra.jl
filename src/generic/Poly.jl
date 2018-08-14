@@ -1968,6 +1968,7 @@ function resultant_euclidean(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.
       end
       B, A = mod(A, B), B
       s *= lead(A)^(lena - length(B))
+      parent(s) # julia bug
       lena = lenb
       lenb = length(B)
       if lenb == 0

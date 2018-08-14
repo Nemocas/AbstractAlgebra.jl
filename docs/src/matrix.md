@@ -208,7 +208,7 @@ B = gram(A)
 ### Trace
 
 ```@docs
-trace(::MatElem)
+tr(::MatElem)
 ```
 
 **Examples**
@@ -219,7 +219,7 @@ S = MatrixSpace(R, 3, 3)
 
 A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
-b = trace(A)
+b = tr(A)
 ```
 
 ### Content
@@ -261,7 +261,7 @@ B = P*A
 ### LU factorisation
 
 ```@docs
-lufact{T <: FieldElem}(::MatElem{T}, ::PermGroup)
+lu{T <: FieldElem}(::MatElem{T}, ::PermGroup)
 ```
 
 ```@docs
@@ -277,7 +277,7 @@ S = MatrixSpace(K, 3, 3)
 
 A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 - 2 a - 1 2a])
 
-r, P, L, U = lufact(A)
+r, P, L, U = lu(A)
 r, d, P, L, U = fflu(A)
 ```
 

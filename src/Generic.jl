@@ -3,11 +3,11 @@ module Generic
 import LinearAlgebra: det, norm,
                       nullspace, rank, transpose!, hessenberg
 
-if VERSION <= v"0.7.0"
-   import LinearAlgebra: lufact, lufact!
-
+if VERSION < v"1.0.0"
    import Base: atan2, base, contains, nextpow2, prevpow2
 end
+
+import LinearAlgebra: lu, lu!, tr
 
 using Markdown, Random, InteractiveUtils
 
