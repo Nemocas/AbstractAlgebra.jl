@@ -7,11 +7,13 @@ using InteractiveUtils
 import LinearAlgebra: det, norm,
                       nullspace, rank, transpose!, hessenberg
 
-if VERSION <= v"0.7.0"
-   import LinearAlgebra: lufact, lufact!
-
+if VERSION < v"1.0.0"
    import Base: atan2, base, contains, nextpow2, prevpow2
 end
+
+import LinearAlgebra: lu, lu!, tr
+
+export nullspace
 
 import Base: Array, abs, acos, acosh, asin, asinh, atan, atanh,
              bin, ceil, checkbounds, conj, convert, cmp, cos, cosh,
@@ -121,12 +123,6 @@ include("julia/JuliaTypes.jl")
 
 include("Generic.jl")
 
-if VERSION > v"0.7.0"
-   import .Generic: lufact, lufact!
-
-   export lufact, lufact!
-end
-
 import .Generic: add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_ring,
                  character, characteristic, charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
@@ -179,7 +175,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached, canonical_unit, chang
                  solve, solve_rational, solve_triu, sub, subst, swap_rows,
                  swap_rows!, symbols, total_degree, trail, truncate, typed_hcat, typed_hvcat, upscale,
                  valuation, var, vars, weak_popov, weak_popov_with_trafo, zero,
-                 zero!, zero_matrix, kronecker_product, trace
+                 zero!, zero_matrix, kronecker_product
 
 export add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_ring, character,
                  characteristic, charpoly, charpoly_danilevsky!,
@@ -233,7 +229,7 @@ export add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_rin
                  total_degree, trail, truncate, typed_hcat, typed_hvcat,
                  upscale, valuation, var, vars,
                  weak_popov, weak_popov_with_trafo, zero, zero!,
-                 zero_matrix, kronecker_product, trace
+                 zero_matrix, kronecker_product, tr, lu, lu!
 
 function exp(a::T) where T
    return Base.exp(a)
