@@ -75,7 +75,7 @@ include("AbstractTypes.jl")
 
 function __init__()
    println("")
-   println("Welcome to AbstractAlgebra version 0.1.0-dev")
+   println("Welcome to AbstractAlgebra version 0.1.0")
    println("")
    println("AbstractAlgebra comes with absolutely no warranty whatsoever")
    println("")
@@ -88,7 +88,7 @@ end
 ################################################################################
 
 function versioninfo()
-  print("AbstractAlgebra version 0.1.0-dev\n")
+  print("AbstractAlgebra version 0.1.0\n")
   abstractalgebrarepo = dirname(dirname(@__FILE__))
 
   print("AbstractAlgebra: ")
