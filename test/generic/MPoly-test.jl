@@ -119,7 +119,7 @@ function test_gen_mpoly_total_degree()
    for nvars=1:10
       var_names = ["x$j" for j in 1:nvars]
       for nterms=1:10
-         exps = Array{Int,2}(round.(rand(nvars, nterms) .* max))
+         exps = Array{Int,2}(undef, round.(rand(nvars, nterms) .* max))
          degrees = []
          for nord=1:20
             ord = rand_ordering()
