@@ -537,6 +537,10 @@ end
 
 function Base.iterate(A::AllPerms{<: Integer}, count)
    if count >= A.all
+     # Reset the iterator to make it iterable again
+     for i in 1:length(A.c)
+       A.c[i] = 1
+     end
      return nothing
    end
 
@@ -564,7 +568,9 @@ end
 #end
 #
 #Base.done(A::AllPerms, count) = count >= A.all
+
 Base.eltype(::Type{AllPerms{T}}) where T<:Integer = perm{T}
+
 Base.length(A::AllPerms) = A.all
 
 #function nextperm(A::AllPerms{<:Integer}, count)
