@@ -2,7 +2,7 @@
 CurrentModule = AbstractAlgebra
 ```
 
-# Multvariate Polynomial Ring Interface
+# Multivariate Polynomial Ring Interface
 
 Multivariate polynomial rings are supported in AbstractAlgebra.jl, and in addition to
 the standard Ring interface, numerous additional functions are provided.
