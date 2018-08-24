@@ -21,7 +21,7 @@ parent_type(::Type{MPoly{T}}) where T <: RingElement = MPolyRing{T}
 
 elem_type(::Type{MPolyRing{T}}) where T <: RingElement = MPoly{T}
 
-base_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring
+base_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
 base_ring(a::MPoly{T}) where T <: RingElement = base_ring(parent(a))
 
