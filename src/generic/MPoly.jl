@@ -3083,21 +3083,16 @@ function (a::MPolyRing{T})(b::Array{T, 1}, m::Array{UInt, 2}) where {T <: RingEl
    return z
 end
 
-function (R::AbstractAlgebra.Generic.PolyRing{T}){T <: AbstractAlgebra.RingElem}(p::AbstractAlgebra.Generic.MPoly{T}; check_variable_names=true)
+function to_univariate(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: AbstractAlgebra.RingElem}
    if !involves_at_most_one_variable(p)
       error("Can only convert univariate polynomials of type MPoly.")
    end
    
    vars_p = vars(p)
+   R,v = PolynomialRing(base_ring(p), string(vars_p[1]))
    
    if length(vars_p) == 0
       return R(p.coeffs[1])
-   end
-   
-   if check_variable_names
-      if !(string(vars_p[1]) == string(gen(R)))
-         error("The name ", vars_p[1]," of the variable of ", p, " does not coincide with the name of the generator ", gen(R), " of ", R,".")
-      end
    end
    
    return R(coefficients_of_univariate_MPoly(p))
