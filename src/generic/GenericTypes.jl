@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     CycleDec{T}(ccycles, cptrs, n)
 > Cycle decomposition of a permutation.
 > * `ccycles`: an array of consecutive entries of cycles;
@@ -29,7 +29,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     PermGroup{T<:Integer}
 > The permutation group singleton type.
 > `PermGroup(n)` constructs the permutation group $S_n$ on $n$-symbols. The type of elements of the group is inferred from the type of `n`.
@@ -53,7 +53,7 @@ struct PermGroup{T<:Integer} <: AbstractAlgebra.Group
    n::T
 end
 
-doc"""
+Markdown.doc"""
     perm{T<:Integer}
 > The type of permutations.
 > Fieldnames:
@@ -103,7 +103,7 @@ mutable struct perm{T<:Integer} <: AbstractAlgebra.GroupElem
    end
 end
 
-doc"""
+Markdown.doc"""
     AllPerms(n::Int)
 > Returns an iterator over arrays representing all permutations of `1:n`.
 > Similar to `Combinatorics.permutations(1:n)`
@@ -124,7 +124,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     Partition(part::Vector{<:Integer}[, check::Bool=true]) <: AbstractVector{Int}
 > Represent integer partition in the non-increasing order.
 >
@@ -160,7 +160,7 @@ mutable struct Partition <: AbstractVector{Int}
    end
 end
 
-doc"""
+Markdown.doc"""
     AllParts(n::Int)
 > Return an iterator over all integer `Partition`s of `n`.
 > Partitions are produced in ascending order according to RuleAsc (Algorithm 3.1) from
@@ -198,7 +198,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     SkewDiagram(lambda::Partition, mu::Partition) <: AbstractArray{Int, 2}
 > Implements a skew diagram, i.e. a difference of two Young diagrams
 > represented by partitions `lambda` and `mu`.
@@ -240,7 +240,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     YoungTableau(part::Partition[, fill::Vector{Int}=collect(1:sum(part))])  <: AbstractArray{Int, 2}
 > Returns the Young tableaux of partition `part`, filled linearly
 > by `fill` vector. Note that `fill` vector is in **row-major** format.
@@ -318,7 +318,7 @@ mutable struct Poly{T <: RingElement} <: AbstractAlgebra.PolyElem{T}
    length::Int
    parent::PolyRing{T}
 
-   Poly{T}() where T <: RingElement = new{T}(Array{T}(0), 0)
+   Poly{T}() where T <: RingElement = new{T}(Array{T}(undef, 0), 0)
 
    function Poly{T}(b::Array{T, 1}) where T <: RingElement
       z = new{T}(b)
@@ -326,7 +326,7 @@ mutable struct Poly{T <: RingElement} <: AbstractAlgebra.PolyElem{T}
       return z
    end
 
-   Poly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Array{T}(0), 0) : new{T}([a], 1)
+   Poly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Array{T}(undef, 0), 0) : new{T}([a], 1)
 end
 
 ###############################################################################
@@ -375,14 +375,14 @@ mutable struct MPoly{T <: RingElement} <: AbstractAlgebra.MPolyElem{T}
 
    function MPoly{T}(R::MPolyRing) where T <: RingElement
       N = R.N
-      return new{T}(Array{T}(0), Array{UInt}(N, 0), 0, R)
+      return new{T}(Array{T}(undef, 0), Array{UInt}(undef, N, 0), 0, R)
    end
 
    MPoly{T}(R::MPolyRing, a::Array{T, 1}, b::Array{UInt, 2}) where T <: RingElement = new{T}(a, b, length(a), R)
 
    function MPoly{T}(R::MPolyRing, a::T) where T <: RingElement
       N = R.N
-      return iszero(a) ? new{T}(Array{T}(0), Array{UInt}(N, 0), 0, R) :
+      return iszero(a) ? new{T}(Array{T}(undef, 0), Array{UInt}(undef, N, 0), 0, R) :
                                           new{T}([a], zeros(UInt, N, 1), 1, R)
    end
 end
@@ -419,11 +419,11 @@ mutable struct SparsePoly{T <: RingElement} <: AbstractAlgebra.RingElem
    length::Int
    parent::SparsePolyRing{T}
 
-   SparsePoly{T}() where T <: RingElement = new{T}(Array{T}(0), Array{UInt}(0), 0)
+   SparsePoly{T}() where T <: RingElement = new{T}(Array{T}(undef, 0), Array{UInt}(undef, 0), 0)
 
    SparsePoly{T}(a::Array{T, 1}, b::Array{UInt, 1}) where T <: RingElement = new{T}(a, b, length(a))
 
-   SparsePoly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Array{T}(0), Array{UInt}(0), 0) :
+   SparsePoly{T}(a::T) where T <: RingElement = iszero(a) ? new{T}(Array{T}(undef, 0), Array{UInt}(undef, 0), 0) :
                                                new{T}([a], [UInt(0)], 1)
 end
 
@@ -789,7 +789,7 @@ mutable struct Mat{T <: RingElement} <: AbstractAlgebra.MatElem{T}
    end
 
    function Mat{T}(r::Int, c::Int, A::Array{T, 1}) where T <: RingElement
-      t = Array{T}(r, c)
+      t = Array{T}(undef, r, c)
       for i = 1:r
          for j = 1:c
             t[i, j] = A[(i - 1) * c + j]

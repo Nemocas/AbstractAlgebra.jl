@@ -115,7 +115,7 @@ Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, T <: RingElem} = x^p
 function powers(a::T, d::Int) where {T <: RingElement}
    d <= 0 && throw(DomainError())
    S = parent(a)
-   A = Array{T}(d + 1)
+   A = Array{T}(undef, d + 1)
    A[1] = one(S)
    if d > 1
       c = a

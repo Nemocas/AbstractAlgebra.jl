@@ -58,7 +58,7 @@ This example makes use of multivariate polynomials.
 ```julia
 using AbstractAlgebra
 
-R, (x, y, z) = PolynomialRing(JuliaZZ, ["x", "y", "z"])
+R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
 
 f = x + y + z + 1
 
@@ -96,7 +96,7 @@ Here is an example using matrices.
 ```julia
 using AbstractAlgebra
 
-R, x = PolynomialRing(JuliaZZ, "x")
+R, x = PolynomialRing(ZZ, "x")
 
 S = MatrixSpace(R, 10, 10)
 

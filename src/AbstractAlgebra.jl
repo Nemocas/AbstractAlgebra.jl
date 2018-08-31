@@ -1,19 +1,32 @@
-VERSION >= v"0.4.0-dev+6521" && __precompile__()
-
 module AbstractAlgebra
 
-import Base: Array, abs, acos, acosh, asin, asinh, atan, atan2, atanh, base,
-             bin, ceil, checkbounds, conj, convert, cmp, contains, cos, cosh,
-             cospi, cot, coth, dec, deepcopy, deepcopy_internal, deserialize,
-             det, div, divrem, expm1, eye, fill, floor, gamma, gcd, gcdx,
+using Markdown
+
+using InteractiveUtils
+
+import LinearAlgebra: det, norm,
+                      nullspace, rank, transpose!, hessenberg
+
+if VERSION < v"1.0.0"
+   import Base: atan2, base, contains, nextpow2, prevpow2
+end
+
+import LinearAlgebra: lu, lu!, tr
+
+export nullspace
+
+import Base: Array, abs, acos, acosh, asin, asinh, atan, atanh,
+             bin, ceil, checkbounds, conj, convert, cmp, cos, cosh,
+             cospi, cot, coth, dec, deepcopy, deepcopy_internal, 
+             div, divrem, expm1, fill, floor, gcd, gcdx,
              getindex, hash, hcat, hex, hypot, intersect, inv, invmod, isequal,
              isfinite, isless, isqrt, isreal, iszero, lcm, ldexp, length,
-             lgamma, log, log1p, lufact, lufact!, mod, ndigits, nextpow2, norm,
-             nullspace, numerator, oct, one, parent, parse, precision,
-             prevpow2, rand, rank, Rational, rem, reverse, serialize,
+             log, log1p, mod, ndigits, 
+             numerator, oct, one, parent, parse, precision,
+             rand, Rational, rem, reverse, 
              setindex!, show, similar, sign, sin, sinh, sinpi, size, string,
-             tan, tanh, trace, trailing_zeros, transpose, transpose!, truncate,
-             typed_hvcat, typed_hcat, var, vcat, xor, zero, zeros, +, -, *, ==, ^,
+             tan, tanh, trailing_zeros, transpose, truncate,
+             typed_hvcat, typed_hcat, vcat, xor, zero, zeros, +, -, *, ==, ^,
              &, |, <<, >>, ~, <=, >=, <, >, //, /, !=
 
 export elem_type, parent_type
@@ -44,10 +57,6 @@ if VERSION >= v"0.6.0-dev.2024" # julia started exporting iszero (again?)
    import Base: iszero
 end
 
-if VERSION < v"0.6-"
-   import Base: isprime, factor, parity, sub, call
-end
-
 if VERSION >= v"0.7.0-DEV.264" # julia started exporting sincos
    import Base: sincos
 end
@@ -66,7 +75,7 @@ include("AbstractTypes.jl")
 
 function __init__()
    println("")
-   println("Welcome to AbstractAlgebra version 0.0.9")
+   println("Welcome to AbstractAlgebra version 0.1.2-dev")
    println("")
    println("AbstractAlgebra comes with absolutely no warranty whatsoever")
    println("")
@@ -79,7 +88,7 @@ end
 ################################################################################
 
 function versioninfo()
-  print("AbstractAlgebra version 0.0.9\n")
+  print("AbstractAlgebra version 0.1.2-dev\n")
   abstractalgebrarepo = dirname(dirname(@__FILE__))
 
   print("AbstractAlgebra: ")
@@ -127,7 +136,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached, canonical_unit, chang
                  fflu, find_pivot_popov, fit!, gcd, gen,
                  gens, get_field, gcdinv, gcdx,
                  gram, has_left_neighbor, has_bottom_neighbor, hash,
-                 hessenberg!, hessenberg, hnf, hnf_cohen, hnf_cohen_with_trafo,
+                 hessenberg!, hnf, hnf_cohen, hnf_cohen_with_trafo,
                  hnf_kb, hnf_kb_with_trafo, hnf_minors, hnf_minors_with_trafo,
                  hnf_with_trafo, hnf_via_popov, hnf_via_popov_with_trafo,
                  hooklength, identity_map, identity_matrix,
@@ -220,7 +229,7 @@ export add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_rin
                  total_degree, trail, truncate, typed_hcat, typed_hvcat,
                  upscale, valuation, var, vars,
                  weak_popov, weak_popov_with_trafo, zero, zero!,
-                 zero_matrix, kronecker_product, to_univariate
+                 zero_matrix, kronecker_product, to_univariate, tr, lu, lu!
 
 function exp(a::T) where T
    return Base.exp(a)
@@ -415,7 +424,7 @@ function typed_hvcat(R::Ring, dims, d...)
    T = elem_type(R)
    r = length(dims)
    c = dims[1]
-   A = Array{T}(r, c)
+   A = Array{T}(undef, r, c)
    for i = 1:r
       dims[i] != c && throw(ArgumentError("row $i has mismatched number of columns (expected $c, got $(dims[i]))"))
       for j = 1:c
@@ -429,7 +438,7 @@ end
 function typed_hcat(R::Ring, d...)
    T = elem_type(R)
    r = length(d)
-   A = Array{T}(1, r)
+   A = Array{T}(undef, 1, r)
    for i = 1:r
       A[1, i] = R(d[i])
    end
@@ -523,11 +532,11 @@ end # if VERSION
 #
 ###############################################################################
 
-Array(R::Ring, r::Int...) = Array{elem_type(R)}(r)
+Array(R::Ring, r::Int...) = Array{elem_type(R)}(undef, r)
 
 function zeros(R::Ring, r::Int...)
    T = elem_type(R)
-   A = Array{T}(r)
+   A = Array{T}(undef, r)
    for i in eachindex(A)
       A[i] = R()
    end

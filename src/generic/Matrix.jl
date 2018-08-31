@@ -16,7 +16,7 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref,
        _check_dim, rows, cols, gram, rref, rref!, swap_rows, swap_rows!,
        hnf_kb, hnf_kb_with_trafo, hnf_cohen, hnf_cohen_with_trafo, snf_kb,
        snf_kb_with_trafo, find_pivot_popov, inv!, zero_matrix,
-       kronecker_product, minors
+       kronecker_product, minors, tr, lu, lu!
 
 ###############################################################################
 #
@@ -50,7 +50,7 @@ function similar(x::Mat{T}, r::Int, c::Int) where T <: RingElement
    return z
 end
 
-doc"""
+Markdown.doc"""
     eye(x::AbstractAlgebra.MatElem)
 > Return the identity matrix with the same shape as $x$.
 """
@@ -62,7 +62,7 @@ function eye(x::AbstractAlgebra.MatElem)
   return z
 end
 
-doc"""
+Markdown.doc"""
     eye(x::AbstractAlgebra.MatElem, d::Int)
 > Return the $d$-by-$d$ identity matrix with the same base ring as $x$.
 """
@@ -84,20 +84,20 @@ parent_type(::Type{Mat{T}}) where T <: RingElement = MatSpace{T}
 
 elem_type(::Type{MatSpace{T}}) where {T <: RingElement} = Mat{T}
 
-doc"""
+Markdown.doc"""
     base_ring{T <: RingElement}(S::AbstractAlgebra.MatSpace{T})
 > Return the base ring $R$ of the given matrix space.
 """
 base_ring(a::AbstractAlgebra.MatSpace{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
 
-doc"""
+Markdown.doc"""
     base_ring(r::AbstractAlgebra.MatElem)
 > Return the base ring $R$ of the matrix space that the supplied matrix $r$
 > belongs to.
 """
 base_ring(a::AbstractAlgebra.MatElem{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
 
-doc"""
+Markdown.doc"""
     parent(a::AbstractAlgebra.MatElem)
 > Return the parent object of the given matrix.
 """
@@ -149,13 +149,13 @@ function Base.hash(a::AbstractAlgebra.MatElem, h::UInt)
    return b
 end
 
-doc"""
+Markdown.doc"""
     rows(a::AbstractAlgebra.MatElem)
 > Return the number of rows of the given matrix.
 """
 rows(a::AbstractAlgebra.MatElem) = size(a.entries, 1)
 
-doc"""
+Markdown.doc"""
     cols(a::AbstractAlgebra.MatElem)
 > Return the number of columns of the given matrix.
 """
@@ -170,20 +170,20 @@ Base.@propagate_inbounds function setindex!(a::AbstractAlgebra.MatElem, d::T, r:
     a.entries[r, c] = base_ring(a)(d)
 end
 
-doc"""
+Markdown.doc"""
     zero(a::AbstractAlgebra.MatSpace)
 > Construct the zero matrix in the given matrix space.
 """
 zero(a::AbstractAlgebra.MatSpace) = a()
 
-doc"""
+Markdown.doc"""
     one(a::AbstractAlgebra.MatSpace)
 > Construct the matrix in the given matrix space with ones down the diagonal
 > and zeroes elsewhere.
 """
 one(a::AbstractAlgebra.MatSpace) = a(1)
 
-doc"""
+Markdown.doc"""
     iszero(a::AbstractAlgebra.MatElem)
 > Return `true` if the supplied matrix $a$ is the zero matrix, otherwise
 > return `false`.
@@ -199,7 +199,7 @@ function iszero(a::AbstractAlgebra.MatElem)
   return true
 end
 
-doc"""
+Markdown.doc"""
     isone(a::AbstractAlgebra.MatElem)
 > Return `true` if the supplied matrix $a$ is diagonal with ones along the
 > diagonal, otherwise return `false`.
@@ -221,7 +221,7 @@ function isone(a::AbstractAlgebra.MatElem)
   return true
 end
 
-function deepcopy_internal(d::AbstractAlgebra.MatElem, dict::ObjectIdDict)
+function deepcopy_internal(d::AbstractAlgebra.MatElem, dict::IdDict)
    c = similar(d)
    for i = 1:rows(d)
       for j = 1:cols(d)
@@ -249,8 +249,8 @@ function sub(M::AbstractAlgebra.MatElem, rows::UnitRange{Int}, cols::UnitRange{I
   Generic._checkbounds(M, rows.start, cols.start)
   Generic._checkbounds(M, rows.stop, cols.stop)
   z = similar(M, length(rows), length(cols))
-  startr = start(rows)
-  startc = start(cols)
+  startr = first(rows)
+  startc = first(cols)
   for i in rows
     for j in cols
       z[i - startr + 1, j - startc + 1] = deepcopy(M[i, j])
@@ -259,7 +259,7 @@ function sub(M::AbstractAlgebra.MatElem, rows::UnitRange{Int}, cols::UnitRange{I
   return z
 end
 
-doc"""
+Markdown.doc"""
     sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
 > Return a copy of the submatrix of $M$ from $(r1, c1)$ to $(r2, c2)$ inclusive. Note
 > that is the copy is modified, the original matrix is not.
@@ -268,7 +268,7 @@ function sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
   return sub(M, r1:r2, c1:c2)
 end
 
-doc"""
+Markdown.doc"""
     sub(M::AbstractAlgebra.MatElem, rows::Array{Int,1}, cols::Array{Int,1})
 > Return a copy of the submatrix $A$ of $M$ defined by A[i,j] = M[rows[i], cols[j]]
 > for i=1,...,length(rows) and j=1,...,length(cols)
@@ -353,7 +353,7 @@ show_minus_one(::Type{AbstractAlgebra.MatElem{T}}) where {T <: RingElement} = fa
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     -(a::AbstractAlgebra.MatElem)
 > Return $-a$.
 """
@@ -373,7 +373,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     +{T <: RingElement}(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})
 > Return $a + b$.
 """
@@ -388,7 +388,7 @@ function +(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where {
    return r
 end
 
-doc"""
+Markdown.doc"""
     -{T <: RingElement}(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})
 > Return $a - b$.
 """
@@ -403,7 +403,7 @@ function -(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where {
    return r
 end
 
-doc"""
+Markdown.doc"""
     *{T <: RingElement}(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})
 > Return $a\times b$.
 """
@@ -429,7 +429,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     *(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
 > Return $x\times y$.
 """
@@ -443,7 +443,7 @@ function *(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatEle
    return z
 end
 
-doc"""
+Markdown.doc"""
     *{T <: RingElem}(x::T, y::AbstractAlgebra.MatElem{T})
 > Return $x\times y$.
 """
@@ -457,19 +457,19 @@ function *(x::T, y::AbstractAlgebra.MatElem{T}) where {T <: RingElem}
    return z
 end
 
-doc"""
+Markdown.doc"""
     *(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x\times y$.
 """
 *(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat}) = y*x
 
-doc"""
+Markdown.doc"""
     *{T <: RingElem}(x::AbstractAlgebra.MatElem{T}, y::T)
 > Return $x\times y$.
 """
 *(x::AbstractAlgebra.MatElem{T}, y::T) where {T <: RingElem} = y*x
 
-doc"""
+Markdown.doc"""
     +(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
@@ -488,13 +488,13 @@ function +(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatEle
    return z
 end
 
-doc"""
+Markdown.doc"""
     +(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 """
 +(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat}) = y + x
 
-doc"""
+Markdown.doc"""
     +{T <: RingElem}(x::T, y::AbstractAlgebra.MatElem{T})
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
@@ -512,13 +512,13 @@ function +(x::T, y::AbstractAlgebra.MatElem{T}) where {T <: RingElem}
    return z
 end
 
-doc"""
+Markdown.doc"""
     +{T <: RingElem}(x::AbstractAlgebra.MatElem{T}, y::T)
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 """
 +(x::AbstractAlgebra.MatElem{T}, y::T) where {T <: RingElem} = y + x
 
-doc"""
+Markdown.doc"""
     -(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 """
@@ -537,7 +537,7 @@ function -(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatEle
    return z
 end
 
-doc"""
+Markdown.doc"""
     -(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x - S(y)$, where $S$ is the parent of $x$.
 """
@@ -556,7 +556,7 @@ function -(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat
    return z
 end
 
-doc"""
+Markdown.doc"""
     -{T <: RingElem}(x::T, y::AbstractAlgebra.MatElem{T})
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 """
@@ -575,7 +575,7 @@ function -(x::T, y::AbstractAlgebra.MatElem{T}) where {T <: RingElem}
    return z
 end
 
-doc"""
+Markdown.doc"""
     -{T <: RingElem}(x::AbstractAlgebra.MatElem{T}, y::T)
 > Return $x - S(y)$, where $S$ is the parent of $a$.
 """
@@ -600,7 +600,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     ^(a::AbstractAlgebra.MatElem, b::Int)
 > Return $a^b$. We require $b \geq 0$ and that the matrix $a$ is square.
 """
@@ -630,14 +630,14 @@ function ^(a::AbstractAlgebra.MatElem, b::Int)
    end
 end
 
-doc"""
+Markdown.doc"""
     powers{T <: RingElement}(a::AbstractAlgebra.MatElem{T}, d::Int)
 > Return an array of matrices $M$ wher $M[i + 1] = a^i$ for $i = 0..d$
 """
 function powers(a::AbstractAlgebra.MatElem, d::Int)
    rows(a) != cols(a) && error("Dimensions do not match in powers")
    d <= 0 && throw(DomainError())
-   A = Array{typeof(a)}(d + 1)
+   A = Array{typeof(a)}(undef, d + 1)
    A[1] = eye(a)
    if d > 1
       c = a
@@ -656,7 +656,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     =={T <: RingElement}(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
@@ -674,7 +674,7 @@ function ==(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where 
    return true
 end
 
-doc"""
+Markdown.doc"""
     isequal{T <: RingElement}(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T})
 > Return `true` if $x == y$ exactly, otherwise return `false`. This function is
 > useful in cases where the entries of the matrices are inexact, e.g. power
@@ -699,7 +699,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     ==(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 > otherwise return `false`.
@@ -720,14 +720,14 @@ function ==(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloa
    return true
 end
 
-doc"""
+Markdown.doc"""
     ==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 > otherwise return `false`.
 """
 ==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem) = y == x
 
-doc"""
+Markdown.doc"""
     =={T <: RingElem}(x::AbstractAlgebra.MatElem{T}, y::T)
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 > otherwise return `false`.
@@ -748,7 +748,7 @@ function ==(x::AbstractAlgebra.MatElem{T}, y::T) where {T <: RingElem}
    return true
 end
 
-doc"""
+Markdown.doc"""
     =={T <: RingElem}(x::T, y::AbstractAlgebra.MatElem{T})
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 > otherwise return `false`.
@@ -761,7 +761,7 @@ doc"""
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     divexact(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by
 > $y$. Each division is expected to be exact.
@@ -776,7 +776,7 @@ function divexact(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, Abstra
    return z
 end
 
-doc"""
+Markdown.doc"""
     divexact{T <: RingElem}(x::AbstractAlgebra.MatElem{T}, y::T)
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by
 > $y$. Each division is expected to be exact.
@@ -820,7 +820,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     transpose(x::AbstractAlgebra.MatElem)
 > Return the transpose of the given matrix.
 """
@@ -834,7 +834,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     gram(x::AbstractAlgebra.MatElem)
 > Return the Gram matrix of $x$, i.e. if $x$ is an $r\times c$ matrix return
 > the $r\times r$ matrix whose entries $i, j$ are the dot products of the
@@ -859,12 +859,12 @@ end
 #
 ###############################################################################
 
-doc"""
-    trace(x::AbstractAlgebra.MatElem)
+Markdown.doc"""
+    tr(x::AbstractAlgebra.MatElem)
 > Return the trace of the matrix $a$, i.e. the sum of the diagonal elements. We
 > require the matrix to be square.
 """
-function trace(x::AbstractAlgebra.MatElem)
+function tr(x::AbstractAlgebra.MatElem)
    rows(x) != cols(x) && error("Not a square matrix in trace")
    d = zero(base_ring(x))
    for i = 1:rows(x)
@@ -879,7 +879,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     content(x::AbstractAlgebra.MatElem)
 > Return the content of the matrix $a$, i.e. the greatest common divisor of all
 > its entries, assuming it exists.
@@ -903,7 +903,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     *(P::Generic.perm, x::AbstractAlgebra.MatElem)
 > Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 """
@@ -925,7 +925,7 @@ end
 #
 ###############################################################################
 
-function lufact!(P::Generic.perm, A::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
+function lu!(P::Generic.perm, A::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    m = rows(A)
    n = cols(A)
    rank = 0
@@ -969,14 +969,14 @@ function lufact!(P::Generic.perm, A::AbstractAlgebra.MatElem{T}) where {T <: Fie
    return rank
 end
 
-doc"""
-    lufact{T <: FieldElement}(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A)))
+Markdown.doc"""
+    lu{T <: FieldElement}(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A)))
 > Return a tuple $r, p, L, U$ consisting of the rank of $A$, a permutation
 > $p$ of $A$ belonging to $P$, a lower triangular matrix $L$ and an upper
 > triangular matrix $U$ such that $p(A) = LU$, where $p(A)$ stands for the
 > matrix whose rows are the given permutation $p$ of the rows of $A$.
 """
-function lufact(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A))) where {T <: FieldElement}
+function lu(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A))) where {T <: FieldElement}
    m = rows(A)
    n = cols(A)
    P.n != m && error("Permutation does not match matrix")
@@ -984,7 +984,7 @@ function lufact(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A))) where {T 
    R = base_ring(A)
    U = deepcopy(A)
    L = similar(A, m, m)
-   rank = lufact!(p, U)
+   rank = lu!(p, U)
    for i = 1:m
       for j = 1:n
          if i > j
@@ -1108,7 +1108,7 @@ function fflu!(P::Generic.perm, A::AbstractAlgebra.MatElem{T}) where {T <: Field
    return rank, d2
 end
 
-doc"""
+Markdown.doc"""
     fflu{T <: RingElement}(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A)))
 > Return a tuple $r, d, p, L, U$ consisting of the rank of $A$, a
 > denominator $d$, a permutation $p$ of $A$ belonging to $P$, a lower
@@ -1168,7 +1168,7 @@ function rref!(A::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
       t = R()
       q = R()
       d = -d
-      pivots = Array{Int}(n)
+      pivots = zeros(Int, n)
       np = rank
       j = k = 1
       for i = 1:rank
@@ -1209,7 +1209,7 @@ function rref!(A::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    return rank, d
 end
 
-doc"""
+Markdown.doc"""
     rref{T <: RingElement}(M::AbstractAlgebra.MatElem{T})
 > Returns a tuple $(r, d, A)$ consisting of the rank $r$ of $M$ and a
 > denominator $d$ in the base ring of $M$ and a matrix $A$ such that $A/d$ is
@@ -1227,7 +1227,7 @@ function rref!(A::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    n = cols(A)
    R = base_ring(A)
    P = PermGroup(m)()
-   rnk = lufact!(P, A)
+   rnk = lu!(P, A)
    if rnk == 0
       return 0
    end
@@ -1238,7 +1238,7 @@ function rref!(A::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    end
    U = similar(A, rnk, rnk)
    V = similar(A, rnk, n - rnk)
-   pivots = Array{Int}(n)
+   pivots = zeros(Int, n)
    np = rnk
    j = k = 1
    for i = 1:rnk
@@ -1282,7 +1282,7 @@ function rref!(A::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    return rnk
 end
 
-doc"""
+Markdown.doc"""
     rref{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})
 > Returns a tuple $(r, A)$ consisting of the rank $r$ of $M$ and a reduced row
 > echelon form $A$ of $M$.
@@ -1293,7 +1293,7 @@ function rref(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    return r, A
 end
 
-doc"""
+Markdown.doc"""
     isrref{T <: RingElement}(M::AbstractAlgebra.MatElem{T})
 > Return `true` if $M$ is in reduced row echelon form, otherwise return
 > `false`.
@@ -1322,7 +1322,7 @@ function isrref(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    return true
 end
 
-doc"""
+Markdown.doc"""
     isrref(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
 > Return `true` if $M$ is in reduced row echelon form, otherwise return
 > `false`.
@@ -1449,8 +1449,8 @@ function det_clow(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    if n == 0
       return one(R)
    end
-   A = Array{T}(n, n)
-   B = Array{T}(n, n)
+   A = Array{T}(undef, n, n)
+   B = Array{T}(undef, n, n)
    C = R()
    for i = 1:n
       for j = 1:n
@@ -1515,7 +1515,7 @@ function det_fflu(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    return r < n ? base_ring(M)() : (parity(P) == 0 ? d : -d)
 end
 
-doc"""
+Markdown.doc"""
     det{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})
 > Return the determinant of the matrix $M$. We assume $M$ is square.
 """
@@ -1527,7 +1527,7 @@ function det(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    return det_fflu(M)
 end
 
-doc"""
+Markdown.doc"""
     det{T <: RingElement}(M::AbstractAlgebra.MatElem{T})
 > Return the determinant of the matrix $M$. We assume $M$ is square.
 """
@@ -1561,8 +1561,8 @@ function det_interpolation(M::AbstractAlgebra.MatElem{T}) where {T <: PolyElem}
       return R()
    end
    bound = n*(maxlen - 1) + 1
-   x = Array{elem_type(base_ring(R))}(bound)
-   d = Array{elem_type(base_ring(R))}(bound)
+   x = Array{elem_type(base_ring(R))}(undef, bound)
+   d = Array{elem_type(base_ring(R))}(undef, bound)
    X = zero_matrix(base_ring(R), n, n)
    b2 = div(bound, 2)
    pt1 = base_ring(R)(1 - b2)
@@ -1607,17 +1607,17 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     combinations(n::Int,k::Int)
 > Return an array consisting of k-combinations of {1,...,n} as arrays.
 """
 function combinations(n,k)
    if (k==0)
-      r = Array{Array{Int,1},1}(1)
+      r = Array{Array{Int,1},1}(undef, 1)
       r[1] = []
       return r
    elseif k>n
-      return Array{Array{Int,1},1}(0)
+      return Array{Array{Int,1},1}(undef, 0)
    elseif k==n
       return [collect(1:k)]
    else
@@ -1625,14 +1625,14 @@ function combinations(n,k)
    end
 end
 
-doc"""
+Markdown.doc"""
     minors(A::AbstractAlgebra.MatElem, k::Int)
 > Return an array consisting of the k-minors of A
 """
 function minors(A::AbstractAlgebra.MatElem, k::Int)
    row_indices = combinations(rows(A),k)
    col_indices = combinations(cols(A),k)
-   mins = Array{elem_type(base_ring(A)),1}(0)
+   mins = Array{elem_type(base_ring(A)),1}(undef, 0)
    for ri in row_indices
       for ci in col_indices
          push!(mins, det(AbstractAlgebra.Generic.sub(A, ri, ci)))
@@ -1647,7 +1647,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     rank{T <: RingElement}(M::AbstractAlgebra.MatElem{T})
 > Return the rank of the matrix $M$.
 """
@@ -1662,7 +1662,7 @@ function rank(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    return r
 end
 
-doc"""
+Markdown.doc"""
     rank{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})
 > Return the rank of the matrix $M$.
 """
@@ -1673,7 +1673,7 @@ function rank(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    end
    A = deepcopy(M)
    P = PermGroup(n)()
-   return lufact!(P, A)
+   return lu!(P, A)
 end
 
 ###############################################################################
@@ -1748,7 +1748,7 @@ function solve_lu(A::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
 
    LU = deepcopy(A)
    p = PermGroup(rows(A))()
-   r = lufact!(p, LU)
+   r = lu!(p, LU)
    r < rows(A) && error("Singular matrix in solve_lu")
    return solve_lu_precomp(p, LU, b)
 end
@@ -1892,10 +1892,10 @@ function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.M
    # bound from xd = (M*)b where d is the det
    bound = (maxlen - 1)*(m - 1) + max(maxlenb, maxlen)
    tmat = matrix(base_ring(R), 0, 0, elem_type(base_ring(R))[])
-   V = Array{typeof(tmat)}(bound)
-   d = Array{elem_type(base_ring(R))}(bound)
-   y = Array{elem_type(base_ring(R))}(bound)
-   bj = Array{elem_type(base_ring(R))}(bound)
+   V = Array{typeof(tmat)}(undef, bound)
+   d = Array{elem_type(base_ring(R))}(undef, bound)
+   y = Array{elem_type(base_ring(R))}(undef, bound)
+   bj = Array{elem_type(base_ring(R))}(undef, bound)
    X = similar(tmat, m, m)
    Y = similar(tmat, m, h)
    x = similar(b)
@@ -1943,7 +1943,7 @@ function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.M
    return x, interpolate(R, y, d)
 end
 
-doc"""
+Markdown.doc"""
     solve{T <: FieldElement}(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})
 > Given a non-singular $n\times n$ matrix over a field and an $n\times m$
 > matrix over the same field, return $x$ an
@@ -1954,7 +1954,7 @@ function solve(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) whe
     return solve_ringelem(M, b)
 end
 
-doc"""
+Markdown.doc"""
     solve_rational{T <: RingElement}(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})
 > Given a non-singular $n\times n$ matrix over a ring and an $n\times m$
 > matrix over the same ring, return a tuple $x, d$ consisting of an
@@ -1993,7 +1993,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     solve_triu{T <: FieldElement}(U::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, unit=false)
 > Given a non-singular $n\times n$ matrix over a field which is upper
 > triangular, and an $n\times m$ matrix over the same field, return an
@@ -2006,8 +2006,8 @@ function solve_triu(U::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}
    m = cols(b)
    R = base_ring(U)
    X = similar(b)
-   Tinv = Array{elem_type(R)}(n)
-   tmp = Array{elem_type(R)}(n)
+   Tinv = Array{elem_type(R)}(undef, n)
+   tmp = Array{elem_type(R)}(undef, n)
    if unit == false
       for i = 1:n
          Tinv[i] = inv(U[i, i])
@@ -2043,7 +2043,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     inv{T <: RingElement}(M::AbstractAlgebra.MatElem{T})
 > Given a non-singular $n\times n$ matrix over a ring the tuple $X, d$
 > consisting of an $n\times n$ matrix $X$ and a denominator $d$ such that
@@ -2060,7 +2060,7 @@ function inv(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    return X, d
 end
 
-doc"""
+Markdown.doc"""
     inv{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})
 > Given a non-singular $n\times n$ matrix over a field, return an
 > $n\times n$ matrix $X$ such that $AX = I_n$ where $I_n$ is the $n\times n$
@@ -2080,7 +2080,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     nullspace{T <: RingElement}(M::AbstractAlgebra.MatElem{T})
 > Returns a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
 > a basis $N$ (consisting of column vectors) for the right nullspace of $M$,
@@ -2101,8 +2101,8 @@ function nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
          U[i, i] = R(1)
       end
    elseif nullity != 0
-      pivots = Array{Int}(rank)
-      nonpivots = Array{Int}(nullity)
+      pivots = zeros(Int, rank)
+      nonpivots = zeros(Int, nullity)
       j = k = 1
       for i = 1:rank
          while A[i, j] == 0
@@ -2129,7 +2129,7 @@ function nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    return nullity, U
 end
 
-doc"""
+Markdown.doc"""
     nullspace{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})
 > Returns a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
 > a basis $N$ (consisting of column vectors) for the right nullspace of $M$,
@@ -2151,7 +2151,7 @@ function nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
          X[i, i] = R(1)
       end
    elseif nullity != 0
-      pivots = Array{Int}(max(m, n))
+      pivots = zeros(Int, max(m, n))
       np = rank
       j = k = 1
       for i = 1:rank
@@ -2227,7 +2227,7 @@ function hessenberg!(A::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    end
 end
 
-doc"""
+Markdown.doc"""
     hessenberg(A::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
 > Returns the Hessenberg form of $M$, i.e. an upper Hessenberg matrix
 > which is similar to $M$. The upper Hessenberg form has nonzero entries
@@ -2241,7 +2241,7 @@ function hessenberg(A::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    return M
 end
 
-doc"""
+Markdown.doc"""
     ishessenberg{T <: RingElement}(A::AbstractAlgebra.MatElem{T})
 > Returns `true` if $M$ is in Hessenberg form, otherwise returns `false`.
 """
@@ -2275,7 +2275,7 @@ function charpoly_hessenberg!(S::Ring, A::AbstractAlgebra.MatElem{T}) where {T <
       return gen(S) - A[1, 1]
    end
    hessenberg!(A)
-   P = Array{elem_type(S)}(n + 1)
+   P = Array{elem_type(S)}(undef, n + 1)
    P[1] = S(1)
    x = gen(S)
    for m = 1:n
@@ -2302,8 +2302,8 @@ function charpoly_danilevsky_ff!(S::Ring, A::AbstractAlgebra.MatElem{T}) where {
    end
    d = R(1)
    t = R()
-   V = Array{T}(n)
-   W = Array{T}(n)
+   V = Array{T}(undef, n)
+   W = Array{T}(undef, n)
    pol = S(1)
    i = 1
    while i < n
@@ -2317,8 +2317,8 @@ function charpoly_danilevsky_ff!(S::Ring, A::AbstractAlgebra.MatElem{T}) where {
             b = S()
             fit!(b, i + 1)
             b = setcoeff!(b, i, R(1))
-            for k = 1:i
-               b = setcoeff!(b, k - 1, -A[n - i + 1, n - k + 1]*d)
+            for kk = 1:i
+               b = setcoeff!(b, kk - 1, -A[n - i + 1, n - kk + 1]*d)
             end
             pol *= b
             n -= i
@@ -2342,41 +2342,41 @@ function charpoly_danilevsky_ff!(S::Ring, A::AbstractAlgebra.MatElem{T}) where {
          W[j] = deepcopy(A[n - i + 1, j])
       end
       for j = 1:n - i
-         for k = 1:n - i - 1
-            t = mul!(t, A[j, n - i], V[k])
-            A[j, k] = mul!(A[j, k], A[j, k], h)
-            A[j, k] = addeq!(A[j, k], t)
+         for kk = 1:n - i - 1
+            t = mul!(t, A[j, n - i], V[kk])
+            A[j, kk] = mul!(A[j, kk], A[j, kk], h)
+            A[j, kk] = addeq!(A[j, kk], t)
          end
-         for k = n - i + 1:n
-            t = mul!(t, A[j, n - i], V[k])
-            A[j, k] = mul!(A[j, k], A[j, k], h)
-            A[j, k] = addeq!(A[j, k], t)
+         for kk = n - i + 1:n
+            t = mul!(t, A[j, n - i], V[kk])
+            A[j, kk] = mul!(A[j, kk], A[j, kk], h)
+            A[j, kk] = addeq!(A[j, kk], t)
          end
       end
-      for k = 1:n
-         A[n - i + 1, k] = R()
+      for kk = 1:n
+         A[n - i + 1, kk] = R()
       end
       for j = 1:n - i
-         for k = 1:n - i - 1
-            A[j, k] = mul!(A[j, k], A[j, k], d)
+         for kk = 1:n - i - 1
+            A[j, kk] = mul!(A[j, kk], A[j, kk], d)
          end
-         for k = n - i + 1:n
-            A[j, k] = mul!(A[j, k], A[j, k], d)
+         for kk = n - i + 1:n
+            A[j, kk] = mul!(A[j, kk], A[j, kk], d)
          end
       end
       A[n - i + 1, n - i] = deepcopy(h)
       for j = 1:n - i - 1
          s = R()
-         for k = 1:n - i
-            t = mul!(t, A[k, j], W[k])
+         for kk = 1:n - i
+            t = mul!(t, A[kk, j], W[kk])
             s = addeq!(s, t)
          end
          A[n - i, j] = s
       end
       for j = n - i:n - 1
          s = R()
-         for k = 1:n - i
-            t = mul!(t, A[k, j], W[k])
+         for kk = 1:n - i
+            t = mul!(t, A[kk, j], W[kk])
             s = addeq!(s, t)
          end
          t = mul!(t, h, W[j + 1])
@@ -2384,22 +2384,24 @@ function charpoly_danilevsky_ff!(S::Ring, A::AbstractAlgebra.MatElem{T}) where {
          A[n - i, j] = s
       end
       s = R()
-      for k = 1:n - i
-         t = mul!(t, A[k, n], W[k])
+      for kk = 1:n - i
+         t = mul!(t, A[kk, n], W[kk])
          s = addeq!(s, t)
       end
       A[n - i, n] = s
-      for k = 1:n
-         A[n - i, k] = mul!(A[n - i, k], A[n - i, k], d)
+      for kk = 1:n
+         A[n - i, kk] = mul!(A[n - i, kk], A[n - i, kk], d)
       end
       d = inv(h)
+      parent(d) # To work around a bug in julia
       i += 1
    end
    b = S()
    fit!(b, n + 1)
    b = setcoeff!(b, n, R(1))
    for i = 1:n
-      b = setcoeff!(b, i - 1, -A[1, n - i + 1]*d)
+      c = -A[1, n - i + 1]*d
+      b = setcoeff!(b, i - 1, c)
    end
    return pol*b
 end
@@ -2416,8 +2418,8 @@ function charpoly_danilevsky!(S::Ring, A::AbstractAlgebra.MatElem{T}) where {T <
       return gen(S) - A[1, 1]
    end
    t = R()
-   V = Array{T}(n)
-   W = Array{T}(n)
+   V = Array{T}(undef, n)
+   W = Array{T}(undef, n)
    pol = S(1)
    i = 1
    while i < n
@@ -2431,8 +2433,8 @@ function charpoly_danilevsky!(S::Ring, A::AbstractAlgebra.MatElem{T}) where {T <
             b = S()
             fit!(b, i + 1)
             b = setcoeff!(b, i, R(1))
-            for k = 1:i
-               b = setcoeff!(b, k - 1, -A[n - i + 1, n - k + 1])
+            for kk = 1:i
+               b = setcoeff!(b, kk - 1, -A[n - i + 1, n - kk + 1])
             end
             pol *= b
             n -= i
@@ -2502,7 +2504,7 @@ function charpoly_danilevsky!(S::Ring, A::AbstractAlgebra.MatElem{T}) where {T <
    return pol*b
 end
 
-doc"""
+Markdown.doc"""
     charpoly{T <: RingElement}(V::Ring, Y::AbstractAlgebra.MatElem{T})
 > Returns the characteristic polynomial $p$ of the matrix $M$. The
 > polynomial ring $R$ of the resulting polynomial must be supplied
@@ -2516,9 +2518,9 @@ function charpoly(V::Ring, Y::AbstractAlgebra.MatElem{T}) where {T <: RingElemen
    if n == 0
       return V(1)
    end
-   F = Array{elem_type(R)}(n)
-   A = Array{elem_type(R)}(n)
-   M = Array{elem_type(R)}(n - 1, n)
+   F = Array{elem_type(R)}(undef, n)
+   A = Array{elem_type(R)}(undef, n)
+   M = Array{elem_type(R)}(undef, n - 1, n)
    F[1] = -Y[1, 1]
    for i = 2:n
       F[i] = R()
@@ -2583,7 +2585,7 @@ end
 # charpoly iff it has degree n. Otherwise it is meaningless (but it is
 # extremely fast to compute over some fields).
 
-doc"""
+Markdown.doc"""
     minpoly{T <: FieldElement}(S::Ring, M::AbstractAlgebra.MatElem{T}, charpoly_only = false)
 > Returns the minimal polynomial $p$ of the matrix $M$. The polynomial ring $R$
 > of the resulting polynomial must be supplied and the matrix must be square.
@@ -2678,7 +2680,7 @@ function minpoly(S::Ring, M::AbstractAlgebra.MatElem{T}, charpoly_only::Bool = f
    return p
 end
 
-doc"""
+Markdown.doc"""
     minpoly{T <: RingElement}(S::Ring, M::AbstractAlgebra.MatElem{T}, charpoly_only = false)
 > Returns the minimal polynomial $p$ of the matrix $M$. The polynomial ring $R$
 > of the resulting polynomial must be supplied and the matrix must be square.
@@ -2694,7 +2696,7 @@ function minpoly(S::Ring, M::AbstractAlgebra.MatElem{T}, charpoly_only::Bool = f
    p = S(1)
    A = similar(M, n + 1, 2n + 1)
    B = similar(M, n, n)
-   L1 = Vector{Int}(n + 1)
+   L1 = zeros(Int, n + 1)
    for i in 1:n + 1
       L1[i] = i + n
    end
@@ -2871,7 +2873,7 @@ end
 #  the Smith and Hermite normal forms of an integer matrix", Siam J. Comput.,
 #  Vol. 8, No. 4, pp. 499-507.
 
-doc"""
+Markdown.doc"""
     hnf_minors(A::Mat) -> Mat
 > Compute the upper right row Hermite normal form of $A$ using the algorithm
 > of Kannan-Bachem.
@@ -2882,7 +2884,7 @@ function hnf_minors(A::MatElem{T}) where {T <: RingElement}
    return H
 end
 
-doc"""
+Markdown.doc"""
     hnf_minors_with_trafo(A::Mat) -> Mat, Mat
 > Compute the upper right row Hermite normal form $H$ of $A$ and an invertible
 > matrix $U$ with $UA = H$ using the algorithm of Kannan-Bachem.
@@ -3329,7 +3331,7 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
    return nothing
 end
 
-doc"""
+Markdown.doc"""
     hnf{T <: RingElement}(A::Mat{T})
 > Return the upper right row Hermite normal form of $A$.
 """
@@ -3337,7 +3339,7 @@ function hnf(A::MatElem{T}) where {T <: RingElement}
   return hnf_kb(A)
 end
 
-doc"""
+Markdown.doc"""
     hnf_with_trafo{T <: RingElement}(A::Mat{T}) -> Mat{T}, Mat{T}
 > Return the tuple $H, U$ consisting of the upper right row Hermite normal
 > form $H$ of $A$ together with invertible matrix $U$ such that $UA = H$.
@@ -3482,7 +3484,7 @@ end
 #
 ################################################################################
 
-doc"""
+Markdown.doc"""
     weak_popov{T <: PolyElem}(A::Mat{T})
 > Return the weak Popov form of $A$.
 """
@@ -3490,7 +3492,7 @@ function weak_popov(A::Mat{T}) where {T <: PolyElem}
    return _weak_popov(A, Val{false})
 end
 
-doc"""
+Markdown.doc"""
     weak_popov_with_trafo{T <: PolyElem}(A::Mat{T})
 > Compute a tuple $(P, U)$ where $P$ is the weak Popov form of $A$ and $U$
 > is a transformation matrix so that $P = UA$.
@@ -3514,7 +3516,7 @@ function _weak_popov(A::Mat{T}, trafo::Type{Val{S}} = Val{false}) where {T <: Po
    end
 end
 
-doc"""
+Markdown.doc"""
     extended_weak_popov{T <: PolyElem}(A::Mat{T}, V::Mat{T})
 > Compute the weak Popov form $P$ of $A$ by applying simple row transformations
 > on $A$ and a vector $W$ by applying the same transformations on the vector $V$.
@@ -3524,7 +3526,7 @@ function extended_weak_popov(A::Mat{T}, V::Mat{T}) where {T <: PolyElem}
    return _extended_weak_popov(A, V, Val{false})
 end
 
-doc"""
+Markdown.doc"""
     extended_weak_popov_with_trafo{T <: PolyElem}(A::Mat{T}, V::Mat{T})
 > Compute the weak Popov form $P$ of $A$ by applying simple row transformations
 > on $A$, a vector $W$ by applying the same transformations on the vector $V$,
@@ -3565,9 +3567,9 @@ end
 function init_pivots_popov(P::Mat{T}, last_row::Int = 0, last_col::Int = 0) where {T <: PolyElem}
    last_row == 0 ? m = rows(P) : m = last_row
    last_col == 0 ? n = cols(P) : n = last_col
-   pivots = Array{Array{Int,1}}(n)
+   pivots = Array{Array{Int,1}}(undef, n)
    for i = 1:n
-      pivots[i] = Array{Int}(0)
+      pivots[i] = zeros(Int, 0)
    end
    # pivots[i] contains the indices of the rows in which the pivot element is in the ith column.
    for r = 1:m
@@ -3606,7 +3608,7 @@ function weak_popov_with_pivots!(P::Mat{T}, W::Mat{T}, U::Mat{T}, pivots::Array{
          # Reduce with the pivot of minimal degree.
          # TODO: Remove the list comprehension as soon as indmin(f, A) works
          #pivotInd = indmin(degree(P[j, i]) for j in pivots[i])
-         pivotInd = indmin([degree(P[j, i]) for j in pivots[i]])
+         pivotInd = argmin([degree(P[j, i]) for j in pivots[i]])
          pivot = pivots[i][pivotInd]
          for j = 1:length(pivots[i])
             if j == pivotInd
@@ -3642,7 +3644,7 @@ function weak_popov_with_pivots!(P::Mat{T}, W::Mat{T}, U::Mat{T}, pivots::Array{
    return nothing
 end
 
-doc"""
+Markdown.doc"""
     rank_profile_popov{T <: PolyElem}(A::Mat{T})
 > Return an array of $r$ row indices such that these rows of $A$ are linearly
 > independent, where $r$ is the rank of $A$.
@@ -3654,10 +3656,10 @@ function rank_profile_popov(A::Mat{T}) where {T <: PolyElem}
    U = similar(A, 0, 0)
    V = U
    r = 0
-   rank_profile = Array{Int,1}(0)
-   pivots = Array{Array{Int,1}}(n)
+   rank_profile = Array{Int,1}(undef, 0)
+   pivots = Array{Array{Int,1}}(undef, n)
    for i = 1:n
-      pivots[i] = Array{Int}(0)
+      pivots[i] = zeros(Int, 0)
    end
    p = find_pivot_popov(B, 1)
    if !iszero(B[1,p])
@@ -3747,7 +3749,7 @@ function det_popov(A::Mat{T}) where {T <: PolyElem}
    return det
 end
 
-doc"""
+Markdown.doc"""
     popov{T <: PolyElem}(A::Mat{T})
 > Return the Popov form of $A$.
 """
@@ -3755,7 +3757,7 @@ function popov(A::Mat{T}) where {T <: PolyElem}
    return _popov(A, Val{false})
 end
 
-doc"""
+Markdown.doc"""
     popov_with_trafo{T <: PolyElem}(A::Mat{T})
 > Compute a tuple $(P, U)$ where $P$ is the Popov form of $A$ and $U$
 > is a transformation matrix so that $P = UA$.
@@ -3781,7 +3783,7 @@ end
 function asc_order_popov!(P::Mat{T}, U::Mat{T}, pivots::Array{Array{Int,1}}, with_trafo::Bool) where {T <: PolyElem}
    m = rows(P)
    n = cols(P)
-   pivots2 = Array{NTuple{3,Int},1}(m)
+   pivots2 = Array{NTuple{3,Int},1}(undef, m)
    for r = 1:m
       pivots2[r] = (r,n,-1)
    end
@@ -4000,7 +4002,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     similarity!{T <: RingElement}(A::AbstractAlgebra.MatElem{T}, r::Int, d::T)
 > Applies a similarity transform to the $n\times n$ matrix $M$ in-place. Let
 > $P$ be the $n\times n$ identity matrix that has had all zero entries of row
@@ -4040,7 +4042,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     swap_rows(a::AbstractAlgebra.MatElem, i::Int, j::Int)
 > Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
 > row are swapped.
@@ -4052,7 +4054,7 @@ function swap_rows(a::AbstractAlgebra.MatElem, i::Int, j::Int)
    return b
 end
 
-doc"""
+Markdown.doc"""
     swap_rows!(a::AbstractAlgebra.MatElem, i::Int, j::Int)
 > Swap the $i$th and $j$th row of $a$.
 """
@@ -4071,7 +4073,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     hcat(a::AbstractAlgebra.MatElem, b::AbstractAlgebra.MatElem)
 > Return the horizontal concatenation of $a$ and $b$. Assumes that the
 > number of rows is the same in $a$ and $b$.
@@ -4091,7 +4093,7 @@ function hcat(a::AbstractAlgebra.MatElem, b::AbstractAlgebra.MatElem)
    return c
 end
 
-doc"""
+Markdown.doc"""
     vcat(a::AbstractAlgebra.MatElem, b::AbstractAlgebra.MatElem)
 > Return the vertical concatenation of $a$ and $b$. Assumes that the
 > number of columns is the same in $a$ and $b$.
@@ -4202,7 +4204,7 @@ end
 
 function (a::MatSpace{T})() where {T <: RingElement}
    R = base_ring(a)
-   entries = Array{T}(a.rows, a.cols)
+   entries = Array{T}(undef, a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
          entries[i, j] = zero(R)
@@ -4215,7 +4217,7 @@ end
 
 function (a::MatSpace{T})(b::S) where {S <: RingElement, T <: RingElement}
    R = base_ring(a)
-   entries = Array{T}(a.rows, a.cols)
+   entries = Array{T}(undef, a.rows, a.cols)
    rb = R(b)
    for i = 1:a.rows
       for j = 1:a.cols
@@ -4252,7 +4254,7 @@ end
 function (a::MatSpace{T})(b::Array{S, 2}) where {S <: RingElement, T <: RingElement}
    R = base_ring(a)
    _check_dim(a.rows, a.cols, b)
-   entries = Array{T}(a.rows, a.cols)
+   entries = Array{T}(undef, a.rows, a.cols)
    for i = 1:a.rows
       for j = 1:a.cols
          entries[i, j] = R(b[i, j])
@@ -4276,7 +4278,7 @@ end
 #
 ################################################################################
 
-doc"""
+Markdown.doc"""
     matrix(R::Ring, arr::Array{T, 2}) where {T} -> MatElem{T}
 
 > Constructs the matrix over $R$ with entries as in `arr`.
@@ -4292,7 +4294,7 @@ function matrix(R::Ring, arr::Array{T, 2}) where {T}
    end
 end
 
-doc"""
+Markdown.doc"""
     matrix(R::Ring, r::Int, c::Int, arr::Array{T, 1}) where {T} -> MatElem{T}
 
 > Constructs the $r \times c$ matrix over $R$, where the entries are taken
@@ -4316,13 +4318,13 @@ end
 #
 ################################################################################
 
-doc"""
+Markdown.doc"""
     zero_matrix(R::Ring, r::Int, c::Int) -> MatElem
 
 > Return the $r \times c$ zero matrix over $R$.
 """
 function zero_matrix(R::Ring, r::Int, c::Int)
-   arr = Array{elem_type(R)}(r, c)
+   arr = Array{elem_type(R)}(undef, r, c)
    for i in 1:r
       for j in 1:c
          arr[i, j] = zero(R)
@@ -4339,18 +4341,16 @@ end
 #
 ################################################################################
 
-doc"""
+Markdown.doc"""
     identity_matrix(R::Ring, n::Int) -> MatElem
 
 > Return the $n \times n$ identity matrix over $R$.
 """
 function identity_matrix(R::Ring, n::Int)
-   arr = zero_matrix(R, n, n)
+   z = zero_matrix(R, n, n)
    for i in 1:n
-      arr[i, i] = one(R)
+      z[i, i] = one(R)
    end
-   z = Mat{elem_type(R)}(arr)
-   z.base_ring = R
    return z
 end
 
@@ -4360,7 +4360,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     MatrixSpace(R::AbstractAlgebra.Ring, r::Int, c::Int, cached::Bool = true)
 > Return parent object corresponding to the space of $r\times c$ matrices over
 > the ring $R$. If `cached == true` (the default), the returned parent object

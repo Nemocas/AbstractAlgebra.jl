@@ -1,13 +1,15 @@
 export Partition, AllParts, YoungTableau, SkewDiagram
 export rowlength, collength, hooklength, dim, isrimhook, leglength
 
+using SparseArrays
+
 ##############################################################################
 #
 #   Partition type, AbstractVector interface
 #
 ##############################################################################
 
-doc"""
+Markdown.doc"""
     size(p::Partition)
 > Return the size of the vector which represents the partition.
 
@@ -21,7 +23,7 @@ size(p::Partition) = size(p.part)
 
 Base.IndexStyle(::Type{Partition}) = Base.IndexLinear()
 
-doc"""
+Markdown.doc"""
     getindex(p::Partition, i::Integer)
 > Return the `i`-th part (in decreasing order) of the partition.
 """
@@ -29,7 +31,7 @@ getindex(p::Partition, i::Integer) = p.part[i]
 
 Base.sum(p::Partition) = p.n
 
-doc"""
+Markdown.doc"""
     setindex!(p::Partition, v::Integer, i::Integer)
 > Set the `i`-th part of partition `p` to `v`.
 > `setindex!` will throw an error if the operation violates the non-increasing assumption.
@@ -81,7 +83,7 @@ show(io::IO, ::MIME"text/plain", p::Partition) = show(io, p)
 const _numPartsTable = Dict{Int, Int}(0 => 1, 1 => 1, 2 => 2)
 const _numPartsTableBig = Dict{Int, BigInt}()
 
-doc"""
+Markdown.doc"""
     _numpart(n::Integer)
 > Returns the number of all distinct integer partitions of `n`. The function
 > uses Euler pentagonal number theorem for recursive formula. For more details
@@ -118,21 +120,36 @@ end
 #    "Generating All Partitions: A Comparison Of Two Encodings"
 # by Jerome Kelleher and Barry O’Sullivan, ArXiv:0909.2331
 
-function Base.start(A::AllParts)
+function Base.iterate(A::AllParts)
    if A.n < 1
-      return 0
+      return Partition(A.part, false), 1
    elseif A.n == 1
       A.part[1] = 1
-      return 0
+      return Partition(A.part, false), 1
    else
       A.part .= 0
       A.part[2] = A.n
-      return 2
+      k = 2
+      y = A.part[k] - 1
+      k -= 1
+      x = A.part[k] + 1
+      while x <= y
+         A.part[k] = x
+         y -= x
+         k += 1
+      end
+      A.part[k] = x + y
+      return Partition(reverse!(A.part[1:k]), false), k
    end
 end
 
-Base.next(A::AllParts, state) = nextpart_asc(A.part, state)
-Base.done(A::AllParts, state) = state == 1
+function Base.iterate(A::AllParts, k)
+   if k == 1
+      return nothing
+   end
+   return nextpart_asc(A.part, k)
+end
+
 Base.eltype(::Type{AllParts}) = Partition
 length(A::AllParts) = _numpart(A.n)
 
@@ -152,7 +169,7 @@ length(A::AllParts) = _numpart(A.n)
    return Partition(reverse!(part[1:k]), false), k
 end
 
-doc"""
+Markdown.doc"""
     conj(part::Partition)
 > Returns the conjugated partition of `part`, i.e. the partition corresponding
 > to the Young diagram of `part` reflected through the main diagonal.
@@ -167,7 +184,7 @@ julia> conj(p)
 ```
 """
 function Base.conj(part::Partition)
-   p = Vector{Int}(maximum(part))
+   p = Vector{Int}(undef, maximum(part))
    for i in 1:sum(part)
       for j in length(part):-1:1
          if part[j] >= i
@@ -179,14 +196,14 @@ function Base.conj(part::Partition)
    return Partition(p, false)
 end
 
-doc"""
+Markdown.doc"""
     conj(part::Partition, v::Vector)
 > Returns the conjugated partition of `part` together with permuted vector `v`.
 """
 function Base.conj(part::Partition, v::Vector)
    w = zeros(Int, size(v))
 
-   acc = Vector{Int}(length(part)+1)
+   acc = Vector{Int}(undef, length(part)+1)
    acc[1] = 0
    for i in 1:length(part)
       acc[i+1] = acc[i] + part[i]
@@ -211,7 +228,7 @@ end
 #
 ##############################################################################
 
-doc"""
+Markdown.doc"""
     partitionseq(lambda::Partition)
 > Returns a sequence (as `BitVector`) of `false`s and `true`s constructed from
 > `lambda`: tracing the lower contour of the Young Diagram associated to
@@ -232,14 +249,14 @@ end
 
 partitionseq(v::Vector{T}) where T<:Integer = partitionseq(Partition(v))
 
-doc"""
+Markdown.doc"""
     partitionseq(seq::BitVector)
 > Returns the essential part of the sequence `seq`, i.e. a subsequence starting
 > at first `true` and ending at last `false`.
 """
-partitionseq(seq::BitVector) = seq[findfirst(seq, true):findlast(seq, false)]
+partitionseq(seq::BitVector) = seq[something(findfirst(isequal(true), seq), 0):something(findlast(isequal(false), seq), 0)]
 
-doc"""
+Markdown.doc"""
     isrimhook(R::BitVector, idx::Int, len::Int)
 > `R[idx:idx+len]` forms a rim hook in the Young Diagram of partition
 > corresponding to `R` iff `R[idx] == true` and `R[idx+len] == false`.
@@ -248,7 +265,7 @@ function isrimhook(R::BitVector, idx::Int, len::Int)
    return (R[idx+len] == false) && (R[idx] == true)
 end
 
-doc"""
+Markdown.doc"""
     MN1inner(R::BitVector, mu::Partition, t::Int, [charvals])
 > Returns the value of $\lambda$-th irreducible character on conjugacy class of
 > permutations represented by partition `mu`, where `R` is the (binary)
@@ -301,7 +318,7 @@ end
 
 YoungTableau(p::Vector{T}, fill=collect(1:sum(p))) where T<:Integer = YoungTableau(Partition(p), fill)
 
-doc"""
+Markdown.doc"""
     size(Y::YoungTableau)
 > Return `size` of the smallest array containing `Y`, i.e. the tuple of the
 > number of rows and the number of columns of `Y`.
@@ -323,7 +340,7 @@ function inyoungtab(t::Tuple{T,T}, Y::YoungTableau) where T<:Integer
    return true
 end
 
-doc"""
+Markdown.doc"""
     getindex(Y::YoungTableau, n::Integer)
 > Return the column-major linear index into the `size(Y)`-array. If a box is
 > outside of the array return `0`.
@@ -356,7 +373,7 @@ function getindex(Y::YoungTableau, n::Integer)
    if n < 1 #|| n > length(Y)
       throw(BoundsError(Y.fill, n))
    else
-      i, j = ind2sub(Y, n)
+     i, j = Tuple(CartesianIndices(Y)[n])
       if inyoungtab((i,j), Y)
          k = sum(Y.part[1:i-1]) + j
          return Y.fill[k]
@@ -461,7 +478,7 @@ end
 
 const _youngtabstyle = YoungTabDisplayStyle(:diagram)
 
-doc"""
+Markdown.doc"""
     setyoungtabstyle(format::Symbol)
 > Select the style in which Young tableaux are displayed (in REPL or in general
 > as string). This can be either
@@ -513,7 +530,7 @@ end
 #
 ##############################################################################
 
-doc"""
+Markdown.doc"""
     matrix_repr(Y::YoungTableau)
 > Construct sparse integer matrix representing the tableau.
 
@@ -543,7 +560,7 @@ function matrix_repr(Y::YoungTableau)
    return tab
 end
 
-doc"""
+Markdown.doc"""
     fill!(Y::YoungTableaux, V::Vector{<:Integer})
 > Replace the fill vector `Y.fill` by `V`. No check if the resulting tableau is
 > standard (i.e. increasing along rows and columns) is performed.
@@ -575,7 +592,7 @@ function Base.fill!(Y::YoungTableau, V::AbstractVector{<:Integer})
    return Y
 end
 
-doc"""
+Markdown.doc"""
     conj(Y::YoungTableau)
 > Returns the conjugated tableau, i.e. the tableau reflected through the main
 > diagonal.
@@ -605,7 +622,7 @@ julia> conj(y)
 """
 Base.conj(Y::YoungTableau) = YoungTableau(conj(Y.part, Y.fill)...)
 
-doc"""
+Markdown.doc"""
     rowlength(Y::YoungTableau, i, j)
 > Return the row length of `Y` at box `(i,j)`, i.e. the number of boxes in the
 > `i`-th row of the diagram of `Y` located to the right of the `(i,j)`-th box.
@@ -633,7 +650,7 @@ julia> Generic.rowlength(y, 3,3)
 """
 rowlength(Y::YoungTableau, i, j) = Y.part[i] < j ? 0 : Y.part[i]-j
 
-doc"""
+Markdown.doc"""
     collength(Y::YoungTableau, i, j)
 > Return the column length of `Y` at box `(i,j)`, i.e. the number of boxes in
 > the `j`-th column of the diagram of `Y` located below of the `(i,j)`-th box.
@@ -659,9 +676,9 @@ julia> Generic.collength(y, 2,4)
 0
 ```
 """
-collength(Y::YoungTableau, i, j) = count(x -> x>=j, view(Y.part, i+1:endof(Y.part)))
+collength(Y::YoungTableau, i, j) = count(x -> x>=j, view(Y.part, i+1:lastindex(Y.part)))
 
-doc"""
+Markdown.doc"""
     hooklength(Y::YoungTableau, i, j)
 > Return the hook-length of an element in `Y` at position `(i,j)`, i.e the
 > number of cells in the `i`-th row to the rigth of `(i,j)`-th box, plus the
@@ -698,7 +715,7 @@ function hooklength(Y::YoungTableau, i, j)
    end
 end
 
-doc"""
+Markdown.doc"""
     dim(Y::YoungTableau) -> BigInt
 > Returns the dimension (using hook-length formula) of the irreducible
 > representation of permutation group $S_n$ associated the partition `Y.part`.
@@ -720,8 +737,7 @@ dim(Y::YoungTableau) = dim(BigInt, Y)
 function dim(::Type{T}, Y::YoungTableau) where T<:Integer
    n, m = size(Y)
    num = factorial(T(sum(Y.part)))
-   den = reduce(*, one(T), hooklength(Y,i,j)
-      for i in 1:n, j in 1:m if j <= Y.part[i])
+   den = reduce(*, (hooklength(Y,i,j) for i in 1:n, j in 1:m if j <= Y.part[i]), init=one(T))  
    return divexact(num, den)::T
 end
 
@@ -734,7 +750,7 @@ end
 SkewDiagram(lambda::Vector{Int}, mu::Vector{Int}) = SkewDiagram(Partition(lambda), Partition(mu))
 /(lambda::Partition, mu::Partition) = SkewDiagram(lambda, mu)
 
-doc"""
+Markdown.doc"""
     size(xi::SkewDiagram)
 > Return the size of array where `xi` is minimally contained.
 > See `size(Y::YoungTableau)` for more details.
@@ -743,7 +759,7 @@ Base.size(xi::SkewDiagram) = (length(xi.lam), xi.lam[1])
 
 Base.IndexStyle(::Type{SkewDiagram}) = Base.IndexLinear()
 
-doc"""
+Markdown.doc"""
     in(t::Tuple{T,T}, xi::SkewDiagram) where T<:Integer
 > Checks if box at position `(i,j)` belongs to the skew diagram `xi`.
 """
@@ -760,7 +776,7 @@ function Base.in(t::Tuple{T, T}, xi::SkewDiagram) where T<:Integer
    end
 end
 
-doc"""
+Markdown.doc"""
     getindex(xi::SkewDiagram, n::Integer)
 > Return `1` if linear index `n` corresponds to (column-major) entry in
 > `xi.lam` which is not contained in `xi.mu`. Otherwise return `0`.
@@ -796,7 +812,7 @@ end
 #
 ##############################################################################
 
-doc"""
+Markdown.doc"""
     matrix_repr(xi::SkewDiagram)
 > Returns a sparse representation of the diagram `xi`, i.e. a sparse array `A`
 > where `A[i,j] == 1` if and only if `(i,j)` is in `xi.lam` but not in `xi.mu`.
@@ -804,15 +820,15 @@ doc"""
 function matrix_repr(xi::SkewDiagram)
    skdiag = spzeros(Int, size(xi)...)
    for i in 1:length(xi.mu)
-      skdiag[i, xi.mu[i]+1:xi.lam[i]] = 1
+      skdiag[i, xi.mu[i]+1:xi.lam[i]] .= 1
    end
    for i in length(xi.mu)+1:length(xi.lam)
-      skdiag[i,1:xi.lam[i]] = 1
+      skdiag[i,1:xi.lam[i]] .= 1
    end
    return skdiag
 end
 
-doc"""
+Markdown.doc"""
     has_left_neighbor(xi::SkewDiagram, i::Int, j::Int)
 > Checks if box at position `(i,j)` has neighbour in `xi` to the left.
 """
@@ -824,7 +840,7 @@ function has_left_neighbor(xi::SkewDiagram, i::Int, j::Int)
    end
 end
 
-doc"""
+Markdown.doc"""
     has_bottom_neighbor(xi::SkewDiagram, i::Int, j::Int)
 > Checks if box at position `(i,j)` has neighbour in `xi` below.
 """
@@ -836,7 +852,7 @@ function has_bottom_neighbor(xi::SkewDiagram, i::Int, j::Int)
    end
 end
 
-doc"""
+Markdown.doc"""
     isrimhook(xi::SkewDiagram)
 > Checks if `xi` represents a rim-hook diagram, i.e. its diagram is
 > edge-connected and contains no $2\times 2$ squares.
@@ -868,7 +884,7 @@ function isrimhook(xi::SkewDiagram)
    return true
 end
 
-doc"""
+Markdown.doc"""
     leglength(xi::SkewDiagram[, check::Bool=true])
 > Computes the leglength of a rim-hook `xi`, i.e. the number of rows with
 > non-zero entries minus one. If `check` is `false` function will not check

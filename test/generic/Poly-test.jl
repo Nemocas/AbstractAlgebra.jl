@@ -2443,6 +2443,10 @@ function test_gen_poly_remove_valuation()
 
       s = rand(0:10)
 
+      while iszero(g)
+        g = rand(R, 0:10, -10:10)
+      end
+
       v, q = remove(f*g^s, g)
 
       @test valuation(f*g^s, g) == s

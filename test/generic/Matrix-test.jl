@@ -14,7 +14,7 @@ function randprime(n::Int)
    return primes100[rand(1:n)]
 end
 
-function Base.istriu(A::Generic.Mat)
+function istriu(A::Generic.Mat)
    m = rows(A)
    n = cols(A)
    d = 0
@@ -400,15 +400,15 @@ function test_gen_mat_gram()
    println("PASS")
 end
 
-function test_gen_mat_trace()
-   print("Generic.Mat.trace...")
+function test_gen_mat_tr()
+   print("Generic.Mat.tr...")
 
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
-   @test trace(A) == t^2 + 3t + 2
+   @test tr(A) == t^2 + 3t + 2
 
    println("PASS")
 end
@@ -425,8 +425,8 @@ function test_gen_mat_content()
    println("PASS")
 end
 
-function test_gen_mat_lufact()
-   print("Generic.Mat.lufact...")
+function test_gen_mat_lu()
+   print("Generic.Mat.lu...")
 
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
@@ -434,21 +434,21 @@ function test_gen_mat_lufact()
 
    A = S([a + 1 2a + 3 a^2 + 1; 2a^2 - 1 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 
-   r, P, L, U = lufact(A)
+   r, P, L, U = lu(A)
 
    @test r == 3
    @test P*A == L*U
 
    A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 
-   r, P, L, U = lufact(A)
+   r, P, L, U = lu(A)
 
    @test r == 3
    @test P*A == L*U
 
    A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 - 2 a - 1 2a])
 
-   r, P, L, U = lufact(A)
+   r, P, L, U = lu(A)
 
    @test r == 2
    @test P*A == L*U
@@ -458,7 +458,7 @@ function test_gen_mat_lufact()
 
    A = matrix(F, 3, 3, [0, 0, 11, 78*z^3-102*z^2+48*z+12, 92, -16*z^2+80*z-149, -377*z^3+493*z^2-232*z-58, -448, 80*z^2-385*z+719])
 
-   r, P, L, U = lufact(A)
+   r, P, L, U = lu(A)
 
    @test r == 3
    @test P*A == L*U
@@ -761,7 +761,7 @@ function test_gen_mat_solve_rational()
       @test M*x == d*b
    end
 
-   R, t = PolynomialRing(QQ, "t")
+   R, t = PolynomialRing(AbstractAlgebra.JuliaQQ, "t")
    K, a = NumberField(t^3 + 3t + 1, "a")
    S, y = PolynomialRing(K, "y")
    T = MatrixSpace(S, 3, 3)
@@ -1552,9 +1552,9 @@ function test_gen_mat()
    test_gen_mat_adhoc_exact_division()
    test_gen_mat_transpose()
    test_gen_mat_gram()
-   test_gen_mat_trace()
+   test_gen_mat_tr()
    test_gen_mat_content()
-   test_gen_mat_lufact()
+   test_gen_mat_lu()
    test_gen_mat_fflu()
    test_gen_mat_det()
    test_gen_mat_rank()

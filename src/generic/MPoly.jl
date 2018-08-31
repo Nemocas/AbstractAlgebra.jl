@@ -21,7 +21,7 @@ parent_type(::Type{MPoly{T}}) where T <: RingElement = MPolyRing{T}
 
 elem_type(::Type{MPolyRing{T}}) where T <: RingElement = MPoly{T}
 
-base_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring
+base_ring(R::MPolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
 base_ring(a::MPoly{T}) where T <: RingElement = base_ring(parent(a))
 
@@ -33,14 +33,14 @@ function isexact_type(a::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.
    return isexact_type(S)
 end
 
-doc"""
+Markdown.doc"""
     symbols(a::MPolyRing)
 > Return an array of symbols representing the variable names for the given
 > polynomial ring.
 """
 symbols(a::MPolyRing) = a.S
 
-doc"""
+Markdown.doc"""
     nvars(x::MPolyRing)
 > Returns the number of variables of the polynomial ring.
 """
@@ -62,7 +62,7 @@ function gens(a::MPolyRing{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
       for i in 1:a.num_vars]
 end
 
-doc"""
+Markdown.doc"""
     gens{T <: RingElement}(a::MPolyRing{T})
 > Return an array of all the generators (variables) of the given polynomial
 > ring.
@@ -71,7 +71,7 @@ function gens(a::MPolyRing{T}) where {T <: RingElement}
    return gens(a, Val{a.ord})
 end
 
-doc"""
+Markdown.doc"""
     derivative{T <: AbstractAlgebra.RingElem}(f::AbstractAlgebra.Generic.MPoly{T}, x::AbstractAlgebra.Generic.MPoly{T})
 > Return the partial derivative of f with respect to x.
 """
@@ -117,7 +117,7 @@ end
 
 
 
-doc"""
+Markdown.doc"""
     change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}
 > Returns the polynomial obtained by applying g to the coefficients of p.
 """
@@ -149,12 +149,12 @@ function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: Ri
    return(new_p)
 end
 
-doc"""
+Markdown.doc"""
     vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
 > Returns the variables occuring in $p$.
 """
 function vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
-   vars_in_p = Array{AbstractAlgebra.Generic.MPoly{T}}(0)
+   vars_in_p = Array{AbstractAlgebra.Generic.MPoly{T}}(undef, 0)
    n = nvars(p.parent)
    exps = p.exps
    size_exps = size(exps)
@@ -175,7 +175,7 @@ function vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
    return(vars_in_p)
 end
 
-doc"""
+Markdown.doc"""
     ordering{T <: RingElement}(a::MPolyRing{T})
 > Return the ordering of the given polynomial ring as a symbol. The options are
 > `:lex`, `:deglex` and `:degrevlex`.
@@ -360,14 +360,14 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     isdegree(s::Symbol)
 > Return `true` if the given symbol represents a degree ordering (deglex or
 > degrevlex).
 """
 isdegree(s::Symbol) = s == :deglex || s == :degrevlex
 
-doc"""
+Markdown.doc"""
     isdegree(s::Symbol)
 > Return `true` if the given symbol represents a reverse ordering (degrevlex).
 """
@@ -401,7 +401,7 @@ function isgen(x::MPoly{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
    return x.exps[1, 1] == UInt(1)
 end
 
-doc"""
+Markdown.doc"""
     isgen{T <: RingElement}(x::MPoly{T})
 > Return `true` if the given polynomial is a generator (variable) of the
 > polynomial ring it belongs to.
@@ -421,7 +421,7 @@ function coeff(x::MPoly, i::Int)
    return x.coeffs[i + 1]
 end
 
-doc"""
+Markdown.doc"""
     max_degrees{T <: RingElement}(f::MPoly{T})
 > Return a tuple `(degs, biggest)` consisting of an array `degs` of the maximum
 > exponent for each field in the exponent vectors of `f` and an integer which
@@ -449,14 +449,14 @@ function max_degrees(f::MPoly{T}) where {T <: RingElement}
    return biggest, b
 end
 
-doc"""
+Markdown.doc"""
     total_degree{T <: RingElement}(f::MPoly{T})
 > Returns the total degree of `f`.
 """
 function total_degree(f::MPoly{T}) where {T <: RingElement}
    if ordering(parent(f)) == :lex
       exps = f.exps[1:nvars(parent(f)),1:length(f)]
-      return Int(maximum(sum(exps,1)))
+      return Int(maximum(sum(exps, dims = 1)))
    elseif ( ordering(parent(f)) == :deglex || ordering(parent(f)) == :degrevlex)
       exps = f.exps[1:nvars(parent(f))+1,1:length(f)]
       return Int(maximum(exps[1,:]))
@@ -477,29 +477,29 @@ iszero(x::MPoly) = x.length == 0
 
 isunit(x::MPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && isunit(x.coeffs[1])
 
-doc"""
+Markdown.doc"""
     isconstant(x::MPoly)
 > Return `true` if `x` is a degree zero polynomial or the zero polynomial, i.e.
 > a constant polynomial.
 """
 isconstant(x::MPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
 
-doc"""
+Markdown.doc"""
     isterm(x::MPoly)
 > Return `true` if the given polynomial has precisely one term, with
 > coefficient `1`.
 """
 isterm(x::MPoly) = x.length == 1
 
-doc"""
+Markdown.doc"""
     ismonomial(x::MPoly)
 > Return `true` if the given polynomial has precisely one nonzero term.
 """
 ismonomial(x::MPoly) = x.length == 1 && isone(coeff(x, 0))
 
-function Base.deepcopy_internal(a::MPoly{T}, dict::ObjectIdDict) where {T <: RingElement}
+function Base.deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingElement}
    Re = deepcopy_internal(a.exps, dict)
-   Rc = Array{T}(a.length)
+   Rc = Array{T}(undef, a.length)
    for i = 1:a.length
       Rc[i] = deepcopy_internal(a.coeffs[i], dict)
    end
@@ -525,7 +525,7 @@ function show(io::IO, x::MPoly, U::Array{<: AbstractString, 1})
         if i != 1 && !displayed_with_minus_in_front(c)
           print(io, "+")
         end
-        X = Array{UInt}(N, 1)
+        X = zeros(UInt, N, 1)
         if ord == :degrevlex
            monomial_reverse!(X, 1, x.exps, i, N)
         else
@@ -580,7 +580,7 @@ function show(io::IO, x::MPoly)
 end
 
 function show(io::IO, p::MPolyRing)
-   const max_vars = 5 # largest number of variables to print
+   local max_vars = 5 # largest number of variables to print
    n = p.num_vars
    print(io, "Multivariate Polynomial Ring in ")
    if n > max_vars
@@ -782,17 +782,17 @@ function mul_classical(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    end
    a_alloc = max(m, n) + n
    b_alloc = max(m, n) + n
-   Ac = Array{T}(a_alloc)
-   Bc = Array{T}(b_alloc)
+   Ac = Array{T}(undef, a_alloc)
+   Bc = Array{T}(undef, b_alloc)
    N = parent(a).N
-   Ae = Array{UInt}(N, a_alloc)
-   Be = Array{UInt}(N, b_alloc)
-   Am = Array{Int}(64) # 64 is upper bound on max(log m, log n)
-   Bm = Array{Int}(64) # ... num polys merged (power of 2)
-   Ai = Array{Int}(64) # index of polys in A minus 1
-   Bi = Array{Int}(64) # index of polys in B minus 1
-   An = Array{Int}(64) # lengths of polys in A
-   Bn = Array{Int}(64) # lengths of polys in B
+   Ae = zeros(UInt, N, a_alloc)
+   Be = zeros(UInt, N, b_alloc)
+   Am = zeros(Int, 64) # 64 is upper bound on max(log m, log n)
+   Bm = zeros(Int, 64) # ... num polys merged (power of 2)
+   Ai = zeros(Int, 64) # index of polys in A minus 1
+   Bi = zeros(Int, 64) # index of polys in B minus 1
+   An = zeros(Int, 64) # lengths of polys in A
+   Bn = zeros(Int, 64) # lengths of polys in B
    Anum = 0 # number of polys in A
    Bnum = 0 # number of polys in B
    sa = 0 # number of used locations in A
@@ -1090,9 +1090,9 @@ function mul_johnson(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElemen
    end
    drmask = monomial_drmask(bits)
    N = size(a.exps, 1)
-   H = Array{heap_s}(0)
-   I = Array{heap_t}(0)
-   Exps = Array{UInt}(N, m + 1)
+   H = Array{heap_s}(undef, 0)
+   I = Array{heap_t}(undef, 0)
+   Exps = zeros(UInt, N, m + 1)
    Viewn = [i for i in 1:m + 1]
    viewc = m + 1
    # set up heap
@@ -1102,11 +1102,11 @@ function mul_johnson(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElemen
    push!(H, heap_s(vw, 1))
    push!(I, heap_t(1, 1, 0))
    r_alloc = max(m, n) + n
-   Rc = Array{T}(r_alloc)
-   Re = Array{UInt}(N, r_alloc)
+   Rc = Array{T}(undef, r_alloc)
+   Re = zeros(UInt, N, r_alloc)
    k = 0
    c = R()
-   Q = Array{Int}(0)
+   Q = zeros(Int, 0)
    @inbounds while !isempty(H)
       exp = H[1].exp
       k += 1
@@ -1219,7 +1219,7 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          d = v[i]
       end
    end
-   if ndigits(d, 2) >= sizeof(UInt)*8
+   if ndigits(d, base = 2) >= sizeof(UInt)*8
       error("Exponent overflow in mul_johnson")
    end
    exp_bits = 8
@@ -1233,8 +1233,8 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    N = parent(a).N
    if k != 1
       M = div(N + k - 1, k)
-      e1 = Array{UInt}(M, length(a))
-      e2 = Array{UInt}(M, length(b))
+      e1 = zeros(UInt, M, length(a))
+      e2 = zeros(UInt, M, length(b))
       pack_monomials(e1, a.exps, k, exp_bits)
       pack_monomials(e2, b.exps, k, exp_bits)
       par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
@@ -1247,7 +1247,7 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
       else
          r1 = mul_johnson(b1, a1, exp_bits)
       end
-      er = Array{UInt}(N, length(r1))
+      er = zeros(UInt, N, length(r1))
       unpack_monomials(er, r1.exps, k, exp_bits)
    else
       r1 = mul_johnson(a, b, exp_bits)
@@ -1425,24 +1425,24 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
    m = length(f)
    N = parent(f).N
    drmask = monomial_drmask(bits)
-   H = Array{heap_s}(0) # heap
-   I = Array{heap_t}(0) # auxilliary data for heap nodes
+   H = Array{heap_s}(undef, 0) # heap
+   I = Array{heap_t}(undef, 0) # auxilliary data for heap nodes
    # set up output poly coeffs and exponents (corresponds to h in paper)
    r_alloc = k*(m - 1) + 1
-   Rc = Array{T}(r_alloc)
-   Re = Array{UInt}(N, r_alloc)
+   Rc = Array{T}(undef, r_alloc)
+   Re = zeros(UInt, N, r_alloc)
    rnext = 1
    # set up g coeffs and exponents (corresponds to g in paper)
    g_alloc = k*(m - 1) + 1
-   gc = Array{T}(g_alloc)
-   ge = Array{UInt}(N, g_alloc)
+   gc = Array{T}(undef, g_alloc)
+   ge = zeros(UInt, N, g_alloc)
    gnext = 1
    # set up heap
    gc[1] = f.coeffs[1]^(k-1)
    monomial_mul!(ge, 1, f.exps, 1, k - 1, N)
    Rc[1] = f.coeffs[1]*gc[1]
    monomial_mul!(Re, 1, f.exps, 1, k, N)
-   Exps = Array{UInt}(N, m + 1)
+   Exps = zeros(UInt, N, m + 1)
    Viewn = [i for i in 1:m + 1]
    viewc = m + 1
    # set up heap
@@ -1451,21 +1451,21 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
    monomial_add!(Exps, vw, f.exps, 2, ge, 1, N)
    push!(H, heap_s(vw, 1))
    push!(I, heap_t(2, 1, 0))
-   Q = Array{Int}(0) # corresponds to Q in paper
+   Q = zeros(Int, 0) # corresponds to Q in paper
    topbit = -1 << (sizeof(Int)*8 - 1)
    mask = ~topbit
    largest = fill(topbit, m) # largest j s.t. (i, j) has been in heap
    largest[2] = 1
    # precompute some values
-   fik = Array{T}(m)
+   fik = Array{T}(undef, m)
    for i = 1:m
       fik[i] = from_exp(R, f.exps, i, N)*(k - 1)
    end
    kp1f1 = k*from_exp(R, f.exps, 1, N)
-   gi = Array{T}(1)
+   gi = Array{T}(undef, 1)
    gi[1] = -from_exp(R, ge, 1, N)
-   final_exp = Array{UInt}(N, 1)
-   exp_copy = Array{UInt}(N, 1)
+   final_exp = zeros(UInt, N, 1)
+   exp_copy = zeros(UInt, N, 1)
    monomial_set!(final_exp, 1, f.exps, m, N)
    # temporary space
    t1 = R()
@@ -1594,7 +1594,7 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       return parent(a)()
    elseif length(a) == 1
       N = size(a.exps, 1)
-      exps = Array{UInt}(N, 1)
+      exps = zeros(UInt, N, 1)
       monomial_mul!(exps, 1, a.exps, 1, b, N)
       return parent(a)([coeff(a, 0)^b], exps)
    elseif b == 0
@@ -1606,7 +1606,7 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
    else
       v, d = max_degrees(a)
       d *= b
-      if ndigits(d, 2) + ndigits(b, 2) >= sizeof(UInt)*8
+      if ndigits(d, base = 2) + ndigits(b, base = 2) >= sizeof(UInt)*8
          error("Exponent overflow in pow_fps")
       end
       exp_bits = 8
@@ -1620,13 +1620,13 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       N = parent(a).N
       if k != 1
          M = div(N + k - 1, k)
-         e1 = Array{UInt}(M, length(a))
+         e1 = zeros(UInt, M, length(a))
          pack_monomials(e1, a.exps, k, exp_bits)
          par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
          a1 = par(a.coeffs, e1)
          a1.length = a.length
          r1 = pow_fps(a1, b, exp_bits)
-         er = Array{UInt}(N, length(r1))
+         er = zeros(UInt, N, length(r1))
          unpack_monomials(er, r1.exps, k, exp_bits)
       else
          r1 = pow_fps(a, b, exp_bits)
@@ -1660,9 +1660,9 @@ function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <:
       mask = (mask << bits) + mask1
    end
    N = parent(a).N
-   H = Array{heap_s}(0)
-   I = Array{heap_t}(0)
-   Exps = Array{UInt}(N, n + 1)
+   H = Array{heap_s}(undef, 0)
+   I = Array{heap_t}(undef, 0)
+   Exps = zeros(UInt, N, n + 1)
    Viewn = [i for i in 1:n + 1]
    viewc = n + 1
    # set up heap
@@ -1672,16 +1672,16 @@ function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <:
    push!(H, heap_s(vw, 1))
    push!(I, heap_t(0, 1, 0))
    q_alloc = max(m - n, n)
-   Qc = Array{T}(q_alloc)
-   Qe = Array{UInt}(N, q_alloc)
+   Qc = Array{T}(undef, q_alloc)
+   Qe = zeros(UInt, N, q_alloc)
    k = 0
    s = n
    c = R()
    qc = R()
    m1 = -R(1)
    mb = -b.coeffs[1]
-   Q = Array{Int}(0)
-   reuse = Array{Int}(0)
+   Q = zeros(Int, 0)
+   reuse = zeros(Int, 0)
    @inbounds while !isempty(H)
       exp = H[1].exp
       k += 1
@@ -1796,8 +1796,8 @@ function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    N = parent(a).N
    if k != 1
       M = div(N + k - 1, k)
-      e1 = Array{UInt}(M, length(a))
-      e2 = Array{UInt}(M, length(b))
+      e1 = zeros(UInt, M, length(a))
+      e2 = zeros(UInt, M, length(b))
       pack_monomials(e1, a.exps, k, exp_bits)
       pack_monomials(e2, b.exps, k, exp_bits)
       par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
@@ -1806,7 +1806,7 @@ function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
       a1.length = a.length
       b1.length = b.length
       flag, q = divides_monagan_pearce(a1, b1, exp_bits)
-      eq = Array{UInt}(N, length(q))
+      eq = zeros(UInt, N, length(q))
       unpack_monomials(eq, q.exps, k, exp_bits)
    else
       flag, q = divides_monagan_pearce(a, b, exp_bits)
@@ -1844,9 +1844,9 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
       mask = (mask << bits) + mask1
    end
    N = size(a.exps, 1)
-   H = Array{heap_s}(0)
-   I = Array{heap_t}(0)
-   Exps = Array{UInt}(N, n + 1)
+   H = Array{heap_s}(undef, 0)
+   I = Array{heap_t}(undef, 0)
+   Exps = zeros(UInt, N, n + 1)
    Viewn = [i for i in 1:n + 1]
    viewc = n + 1
    # set up heap
@@ -1856,20 +1856,20 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
    push!(H, heap_s(vw, 1))
    push!(I, heap_t(0, 1, 0))
    q_alloc = max(m - n, n)
-   Qc = Array{T}(q_alloc)
-   Qe = Array{UInt}(N, q_alloc)
+   Qc = Array{T}(undef, q_alloc)
+   Qe = zeros(UInt ,N, q_alloc)
    k = 0
    s = n
    c = R()
    qc = R()
    m1 = -R(1)
    mb = -b.coeffs[1]
-   Q = Array{Int}(0)
-   reuse = Array{Int}(0)
-   exp_copy = Array{UInt}(N, 1)
-   temp = Array{UInt}(N, 1)
-   temp2 = Array{UInt}(N, 1)
-   texp = Array{UInt}(N, 1)
+   Q = zeros(Int, 0)
+   reuse = zeros(Int, 0)
+   exp_copy = zeros(UInt, N, 1)
+   temp = zeros(UInt, N, 1)
+   temp2 = zeros(UInt, N, 1)
+   texp = zeros(UInt, N, 1)
    monomial_set!(temp2, 1, b.exps, 1, N)
    while !isempty(H)
       exp = H[1].exp
@@ -2004,14 +2004,14 @@ function div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    N = parent(a).N
    word_bits = sizeof(Int)*8
    q = parent(a)()
-   eq = Array{UInt}(N, 0)
+   eq = zeros(UInt, N, 0)
    flag = false
    while flag == false
       k = div(word_bits, exp_bits)
       if k != 1
          M = div(N + k - 1, k)
-         e1 = Array{UInt}(M, length(a))
-         e2 = Array{UInt}(M, length(b))
+         e1 = zeros(UInt, M, length(a))
+         e2 = zeros(UInt, M, length(b))
          pack_monomials(e1, a.exps, k, exp_bits)
          pack_monomials(e2, b.exps, k, exp_bits)
          par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
@@ -2023,7 +2023,7 @@ function div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          if flag == false
             exp_bits *= 2
          else
-            eq = Array{UInt}(N, length(q))
+            eq = zeros(UInt, N, length(q))
             unpack_monomials(eq, q.exps, k, exp_bits)
          end
       else
@@ -2052,9 +2052,9 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
       mask = (mask << bits) + mask1
    end
    N = size(a.exps, 1)
-   H = Array{heap_s}(0)
-   I = Array{heap_t}(0)
-   Exps = Array{UInt}(N, n + 1)
+   H = Array{heap_s}(undef, 0)
+   I = Array{heap_t}(undef, 0)
+   Exps = zeros(UInt, N, n + 1)
    Viewn = [i for i in 1:n + 1]
    viewc = n + 1
    # set up heap
@@ -2065,10 +2065,10 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
    push!(I, heap_t(0, 1, 0))
    q_alloc = max(m - n, n)
    r_alloc = n
-   Qc = Array{T}(q_alloc)
-   Qe = Array{UInt}(N, q_alloc)
-   Rc = Array{T}(r_alloc)
-   Re = Array{UInt}(N, r_alloc)
+   Qc = Array{T}(undef, q_alloc)
+   Qe = zeros(UInt, N, q_alloc)
+   Rc = Array{T}(undef, r_alloc)
+   Re = zeros(UInt, N, r_alloc)
    k = 0
    l = 0
    s = n
@@ -2076,12 +2076,12 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
    qc = R()
    m1 = -R(1)
    mb = -b.coeffs[1]
-   Q = Array{Int}(0)
-   reuse = Array{Int}(0)
-   exp_copy = Array{UInt}(N, 1)
-   temp = Array{UInt}(N, 1)
-   temp2 = Array{UInt}(N, 1)
-   texp = Array{UInt}(N, 1)
+   Q = zeros(Int, 0)
+   reuse = zeros(Int , 0)
+   exp_copy = zeros(UInt, N, 1)
+   temp = zeros(UInt, N, 1)
+   temp2 = zeros(UInt, N, 1)
+   texp = zeros(UInt, N, 1)
    monomial_set!(temp2, 1, b.exps, 1, N)
    while !isempty(H)
       exp = H[1].exp
@@ -2225,15 +2225,15 @@ function divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    word_bits = sizeof(Int)*8
    q = parent(a)()
    r = parent(a)()
-   eq = Array{UInt}(N, 0)
-   er = Array{UInt}(N, 0)
+   eq = zeros(UInt, N, 0)
+   er = zeros(UInt, N, 0)
    flag = false
    while flag == false
       k = div(word_bits, exp_bits)
       if k != 1
          M = div(N + k - 1, k)
-         e1 = Array{UInt}(M, length(a))
-         e2 = Array{UInt}(M, length(b))
+         e1 = zeros(UInt, M, length(a))
+         e2 = zeros(UInt, M, length(b))
          pack_monomials(e1, a.exps, k, exp_bits)
          pack_monomials(e2, b.exps, k, exp_bits)
          par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
@@ -2245,8 +2245,8 @@ function divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          if flag == false
             exp_bits *= 2
          else
-            eq = Array{UInt}(N, length(q))
-            er = Array{UInt}(N, length(r))
+            eq = zeros(UInt, N, length(q))
+            er = zeros(UInt, N, length(r))
             unpack_monomials(eq, q.exps, k, exp_bits)
             unpack_monomials(er, r.exps, k, exp_bits)
          end
@@ -2280,13 +2280,13 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
       mask = (mask << bits) + mask1
    end
    N = size(a.exps, 1)
-   H = Array{heap_s}(0)
-   I = Array{nheap_t}(0)
+   H = Array{heap_s}(undef, 0)
+   I = Array{nheap_t}(undef, 0)
    heapn = 0
    for i = 1:len
       heapn += n[i]
    end
-   Exps = Array{UInt}(N, heapn + 1)
+   Exps = zeros(UInt, N, heapn + 1)
    Viewn = [i for i in 1:heapn + 1]
    viewc = heapn + 1
    # set up heap
@@ -2297,10 +2297,10 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
    push!(I, nheap_t(0, 1, 0, 0))
    q_alloc = [max(m - n[i], n[i]) for i in 1:len]
    r_alloc = n[1]
-   Qc = [Array{T}(q_alloc[i]) for i in 1:len]
-   Qe = [Array{UInt}(N, q_alloc[i]) for i in 1:len]
-   Rc = Array{T}(r_alloc)
-   Re = Array{UInt}(N, r_alloc)
+   Qc = [Array{T}(undef, q_alloc[i]) for i in 1:len]
+   Qe = [zeros(UInt, N, q_alloc[i]) for i in 1:len]
+   Rc = Array{T}(undef, r_alloc)
+   Re = zeros(UInt, N, r_alloc)
    k = [0 for i in 1:len]
    l = 0
    s = [n[i] for i in 1:len]
@@ -2308,11 +2308,11 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
    qc = R()
    m1 = -R(1)
    mb = [-b[i].coeffs[1] for i in 1:len]
-   Q = Array{Int}(0)
-   reuse = Array{Int}(0)
-   exp_copy = Array{UInt}(N, 1)
-   temp = Array{UInt}(N, 1)
-   texp = Array{UInt}(N, 1)
+   Q = zeros(Int, 0)
+   reuse = zeros(Int, 0)
+   exp_copy = zeros(UInt, N, 1)
+   temp = zeros(UInt, N, 1)
+   texp = zeros(UInt, N, 1)
    while !isempty(H)
       exp = H[1].exp
       monomial_set!(exp_copy, 1, Exps, exp, N)
@@ -2435,7 +2435,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
    return flag, [parent(a)(Qc[i], Qe[i]) for i in 1:len], parent(a)(Rc, Re)
 end
 
-doc"""
+Markdown.doc"""
     divrem{T <: RingElement}(a::MPoly{T}, b::Array{MPoly{T}, 1})
 > Return a tuple `(q, r)` consisting of an array of polynomials `q`, one for
 > each polynomial in `b`, and a polynomial `r` such that `a = sum_i b[i]*q[i]`.
@@ -2459,16 +2459,16 @@ function divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
    end
    word_bits = sizeof(Int)*8
    q = [parent(a)() for i in 1:len]
-   eq = [Array{UInt}(N, 0) for i in 1:len]
+   eq = [zeros(UInt, N, 0) for i in 1:len]
    r = parent(a)()
-   er = Array{UInt}(N, 0)
+   er = zeros(UInt, N, 0)
    flag = false
    while flag == false
       k = div(word_bits, exp_bits)
       if k != 1
          M = div(N + k - 1, k)
-         e1 = Array{UInt}(M, length(a))
-         e2 = [Array{UInt}(M, length(b[i])) for i in 1:len]
+         e1 = zeros(UInt, M, length(a))
+         e2 = [zeros(UInt, M, length(b[i])) for i in 1:len]
          pack_monomials(e1, a.exps, k, exp_bits)
          for i = 1:len
             pack_monomials(e2[i], b[i].exps, k, exp_bits)
@@ -2484,11 +2484,11 @@ function divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
          if flag == false
             exp_bits *= 2
          else
-            eq = [Array{UInt}(N, length(q[i])) for i in 1:len]
+            eq = [zeros(UInt, N, length(q[i])) for i in 1:len]
             for i = 1:len
                unpack_monomials(eq[i], q[i].exps, k, exp_bits)
             end
-            er = Array{UInt}(N, length(r))
+            er = zeros(UInt, N, length(r))
             unpack_monomials(er, r.exps, k, exp_bits)
          end
       else
@@ -2507,7 +2507,7 @@ end
 #
 ################################################################################
 
-doc"""
+Markdown.doc"""
     remove(z::MPoly, p::MPoly)
 > Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$. Additionally, $z/p^k$ is returned as the second return.
@@ -2532,7 +2532,7 @@ function remove(z::MPolyElem{T}, p::MPolyElem{T}) where {T <: RingElement}
    return v, q
 end
 
-doc"""
+Markdown.doc"""
     valuation(z::MPoly, p::MPoly)
 > Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$.
@@ -2696,8 +2696,8 @@ function term_gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    end
    ord = parent(a).ord
    N = parent(a).N
-   Ce = Array{UInt}(N, 1)
-   Cc = Array{T}(1)
+   Ce = zeros(UInt, N, 1)
+   Cc = Array{T}(undef, 1)
    monomial_set!(Ce, 1, a.exps, 1, N)
    monomial_vecmin!(Ce, 1, b.exps, 1, N)
    if ord == :deglex || ord == :degrevlex
@@ -2717,8 +2717,8 @@ function term_content(a::MPoly{T}) where {T <: RingElement}
    end
    ord = parent(a).ord
    N = parent(a).N
-   Ce = Array{UInt}(N, 1)
-   Cc = Array{T}(1)
+   Ce = zeros(UInt, N, 1)
+   Cc = Array{T}(undef, 1)
    monomial_set!(Ce, 1, a.exps, 1, N)
    for i = 2:a.length
       monomial_vecmin!(Ce, 1, a.exps, i, N)
@@ -2765,7 +2765,7 @@ end
 
 # return an array of all the starting positions of terms in the main variable n
 function main_variable_terms(a::MPoly{T}, k::Int) where {T <: RingElement}
-   A = Array{Int}(0)
+   A = zeros(Int, 0)
    current_term = typemax(UInt)
    for i = 1:a.length
       if a.exps[k, i] != current_term
@@ -2781,9 +2781,9 @@ end
 function main_variable_coefficient_lex(a::MPoly{T}, k0::Int, n::Int) where {T <: RingElement}
    exp = a.exps[k0, n]
    N = parent(a).N
-   Ae = Array{UInt}(N, 0)
+   Ae = zeros(UInt, N, 0)
    a_alloc = 0
-   Ac = Array{T}(0)
+   Ac = Array{T}(undef, 0)
    l = 0
    for i = n:a.length
       if a.exps[k0, i] != exp
@@ -2814,9 +2814,9 @@ end
 function main_variable_coefficient_deglex(a::MPoly{T}, k0::Int, n::Int) where {T <: RingElement}
    exp = a.exps[k0, n]
    N = parent(a).N
-   Ae = Array{UInt}(N, 0)
+   Ae = zeros(UInt, N, 0)
    a_alloc = 0
-   Ac = Array{T}(0)
+   Ac = Array{T}(undef, 0)
    l = 0
    for i = n:a.length
       if a.exps[k0, i] != exp
@@ -2855,7 +2855,7 @@ function main_variable_extract(a::MPoly{T}, k::Int) where {T <: RingElement}
    sort!(V)
    N = size(a.exps, 1)
    Rc = [a.coeffs[V[i][2]] for i in 1:length(a)]
-   Re = Array{UInt}(N, length(a))
+   Re = zeros(UInt, N, length(a))
    for i = 1:length(a)
       for j = 1:N
          Re[j, i] = a.exps[j, V[i][2]]
@@ -2863,8 +2863,8 @@ function main_variable_extract(a::MPoly{T}, k::Int) where {T <: RingElement}
    end
    a2 = parent(a)(Rc, Re)
    A = main_variable_terms(a2, k)
-   Pe = Array{UInt}(length(A))
-   Pc = Array{MPoly{T}}(length(A))
+   Pe = zeros(UInt, length(A))
+   Pc = Array{MPoly{T}}(undef, length(A))
    ord = parent(a).ord
    for i = 1:length(A)
       Pe[i] = a2.exps[k, A[i]]
@@ -2881,11 +2881,11 @@ end
 
 function main_variable_insert_lex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
    N = base_ring(a).N
-   V = [(ntuple(i -> i == k ? a.exps[r] : a.coeffs[r].exps[i, s], Val{N}), r, s) for
+   V = [(ntuple(i -> i == k ? a.exps[r] : a.coeffs[r].exps[i, s], Val(N)), r, s) for
        r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]
-   Re = Array{UInt}(N, length(V))
+   Re = zeros(UInt, N, length(V))
    for i = 1:length(V)
       for j = 1:N
          Re[j, length(V) - i + 1] = V[i][1][j]
@@ -2897,10 +2897,10 @@ end
 function main_variable_insert_deglex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
    N = base_ring(a).N
    V = [(ntuple(i -> i == 1 ? a.exps[r] + a.coeffs[r].exps[1, s] : (i == k ? a.exps[r] :
-        a.coeffs[r].exps[i, s]), Val{N}), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
+        a.coeffs[r].exps[i, s]), Val(N)), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]
-   Re = Array{UInt}(N, length(V))
+   Re = zeros(UInt, N, length(V))
    for i = 1:length(V)
       for j = 1:N
          Re[j, length(V) - i + 1] = V[i][1][j]
@@ -2929,10 +2929,10 @@ end
 function main_variable_insert_degrevlex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
    N = base_ring(a).N
    V = [(ntuple(i -> i == 1 ? a.exps[r] + a.coeffs[r].exps[1, s] : (i == k ? a.exps[r] :
-        a.coeffs[r].exps[i, s]), Val{N}), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
+        a.coeffs[r].exps[i, s]), Val(N)), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V, lt = is_less_degrevlex)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]
-   Re = Array{UInt}(N, length(V))
+   Re = zeros(UInt, N, length(V))
    for i = 1:length(V)
       for j = 1:N
          Re[j, length(V) - i + 1] = V[i][1][j]
@@ -3147,7 +3147,7 @@ end
 #
 ###############################################################################
 
-doc"""
+Markdown.doc"""
     PolynomialRing(R::AbstractAlgebra.Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
 > Given a base ring `R` and an array of strings `s` specifying how the
 > generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
