@@ -586,6 +586,7 @@ isnegative(x) = displayed_with_minus_in_front(x)
 
 function test_module(x, y)
    julia_exe = Base.julia_cmd()
+   pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
    test_file = joinpath(pkgdir, "test/$x/")
    test_file = test_file * "$y-test.jl";
    test_function_name = "test_"
@@ -605,8 +606,8 @@ function test_module(x, y)
       test_function_name *= "gen_$(lowercase(y))"
    end
 
-   cmd = "using Base.Test; using AbstractAlgebra; include(\"$test_file\"); $test_function_name();"
-   info("spawning ", `$julia_exe -e \"$cmd\"`)
+   cmd = "using Test; using AbstractAlgebra; include(\"$test_file\"); $test_function_name();"
+   @info("spawning ", `$julia_exe -e \"$cmd\"`)
    run(`$julia_exe -e $cmd`)
 end
 
