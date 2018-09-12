@@ -7,7 +7,8 @@
 export max_degrees, total_degree, gens, divides,
        isconstant, isdegree, ismonomial, isreverse, isterm, main_variable,
        main_variable_extract, main_variable_insert, nvars, vars, ordering,
-       rand_ordering, symbols, monomial_set!, monomial_iszero, derivative, change_base_ring
+       rand_ordering, symbols, monomial_set!, monomial_iszero, derivative,
+       change_base_ring, @PolynomialRing
 
 ###############################################################################
 #
@@ -3139,4 +3140,68 @@ function PolynomialRing(R::AbstractAlgebra.Ring, s::Array{String, 1}; cached::Bo
    parent_obj = MPolyRing{T}(R, U, ordering, N, cached)
 
    return tuple(parent_obj, gens(parent_obj, Val{ordering}))
+end
+
+################################################################################
+#
+#  Fancy macro
+#
+################################################################################
+
+function build_names(prefix, indices...)
+  map(i -> "$(prefix)[$(join(i, ","))]", Iterators.product(indices...))
+end
+
+function build_variable(arg::Symbol)
+  t = gensym()
+  return t, :($(esc(t)) = String[$"$arg"])
+end
+
+function build_variable(arg::Expr)
+  isa(arg, Expr) || error("Expected $var to be a variable name")
+  Base.Meta.isexpr(arg, :ref) || error("Expected $var to be of the form varname[idxset]")
+  (2 ≤ length(arg.args)) || error("Expected $var to have at least one index set")
+  varname = arg.args[1]
+  prefix = string(varname)
+  t = gensym()
+  return t, :($(esc(t)) = build_names($prefix, $(esc.(arg.args[2:end])...)))
+end
+
+function build_variables_strings(args)
+  names = Symbol[]
+  exprs = Expr[]
+  for arg in args
+    name_var, define_names = build_variable(arg)
+    push!(exprs, define_names)
+    #push!(exprs, :(print($(esc(name_var)))))
+    push!(names, name_var)
+  end
+  return names, exprs
+end
+
+macro PolynomialRing(R, args...)
+    names, exprs = build_variables_strings(args)
+    all_names = gensym()
+    push!(exprs, :($(esc(all_names)) = String[]))
+    for t in names
+      push!(exprs, :(append!($(esc(all_names)), reshape($(esc(t)), length($(esc(t)))))))
+    end
+    ring1 = gensym()
+    ring2 = gensym()
+    push!(exprs, :($(Expr(:tuple, esc(ring1), esc(ring2))) = PolynomialRing($(esc(R)), $(esc(all_names)))))
+    vars = Symbol[]
+    k = gensym()
+    push!(exprs, :($(esc(k)) = 0))
+    for (i, t) in enumerate(names)
+      var_sym = gensym()
+      if args[i] isa Symbol
+        push!(exprs, :($(esc(var_sym)) = ($(esc(ring2)))[$(esc(k)) + 1]))
+      else
+        push!(exprs, :($(esc(var_sym)) = elem_type($(esc(ring1)))[($(esc(ring2)))[$(esc(k)) + i] for (i,_) in enumerate($(esc(t)))]))
+      end
+      push!(vars, var_sym)
+      push!(exprs, :($(esc(k)) = $(esc(k)) + length($(esc(t)))))
+    end
+    res = :($(foldl((x,y) -> :($x; $y), exprs, init=:())); $(Expr(:tuple, esc(ring1), esc.(vars)...)))
+    return res
 end

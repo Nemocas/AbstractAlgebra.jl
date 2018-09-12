@@ -175,7 +175,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached, canonical_unit, chang
                  solve, solve_rational, solve_triu, sub, subst, swap_rows,
                  swap_rows!, symbols, total_degree, trail, truncate, typed_hcat, typed_hvcat, upscale,
                  valuation, var, vars, weak_popov, weak_popov_with_trafo, zero,
-                 zero!, zero_matrix, kronecker_product
+                 zero!, zero_matrix, kronecker_product, @PolynomialRing
 
 export add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_ring, character,
                  characteristic, charpoly, charpoly_danilevsky!,
@@ -229,7 +229,7 @@ export add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_rin
                  total_degree, trail, truncate, typed_hcat, typed_hvcat,
                  upscale, valuation, var, vars,
                  weak_popov, weak_popov_with_trafo, zero, zero!,
-                 zero_matrix, kronecker_product, tr, lu, lu!
+                 zero_matrix, kronecker_product, tr, lu, lu!, @PolynomialRing
 
 function exp(a::T) where T
    return Base.exp(a)
