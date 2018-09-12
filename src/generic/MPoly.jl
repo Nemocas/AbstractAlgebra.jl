@@ -566,7 +566,7 @@ show_minus_one(::Type{MPoly{T}}) where {T <: RingElement} = show_minus_one(T)
 
 needs_parentheses(x::MPoly) = length(x) > 1
 
-displayed_with_minus_in_front(x::MPoly) = length(x) == 1 && monomial_iszero(x.exps, 1) && displayed_with_minus_in_front(x.coeffs[1])
+displayed_with_minus_in_front(x::MPoly) = length(x) == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && displayed_with_minus_in_front(x.coeffs[1])
 
 ###############################################################################
 #
