@@ -72,52 +72,6 @@ function gens(a::MPolyRing{T}) where {T <: RingElement}
 end
 
 Markdown.doc"""
-    derivative{T <: AbstractAlgebra.RingElem}(f::AbstractAlgebra.Generic.MPoly{T}, x::AbstractAlgebra.Generic.MPoly{T})
-> Return the partial derivative of f with respect to x.
-"""
-function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
-   gens_parent = gens(f.parent)
-   
-   # Check whether x is among the generators of x.parent
-   if ~(x in gens_parent)
-      error("Can compute the partial derivative only with respect to generators.")
-   end
-
-   n = nvars(f.parent)
-   exps = copy(f.exps)
-
-   size_exps = size(f.exps)
-   if (f.parent.ord != :lex)
-      exps = exps[2:size_exps[1],:]
-   end
-
-   if (f.parent.ord == :degrevlex)
-      exps = exps[end:-1:1,:]
-   end
-
-   derivative = zero(f.parent)
-   coeffs = f.coeffs
-   for i=1:length(f)
-      prod = one(f.parent)
-      prod = coeffs[i]
-      for j=1:n
-         if (gens_parent[j]==x)
-            prod *= exps[j,i]
-            if (exps[j,i] >= 1)
-               exps[j,i] -= 1
-            end
-         end
-         prod = prod * gens_parent[j]^Int(exps[j,i])
-      end
-      derivative = derivative + prod
-   end
-
-   return(derivative)
-end
-
-
-
-Markdown.doc"""
     change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}
 > Returns the polynomial obtained by applying g to the coefficients of p.
 """
@@ -359,6 +313,16 @@ end
 #   Basic manipulation
 #
 ###############################################################################
+
+function Base.hash(x::MPoly{T}, h::UInt) where {T <: RingElement}
+   b = 0x53dd43cd511044d1%UInt
+   b = xor(b, xor(Base.hash(x.exps, h), h))
+   for i in 1:length(x)
+      b = xor(b, xor(hash(x.coeffs[i], h), h))
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+   end
+   return b
+end
 
 Markdown.doc"""
     isdegree(s::Symbol)
@@ -2742,6 +2706,58 @@ function term_content(a::MPoly{T}) where {T <: RingElement}
    end
    return parent(a)(Cc, Ce)
 end
+
+################################################################################
+#
+#  Derivative
+#
+################################################################################
+
+Markdown.doc"""
+    derivative{T <: RingElem}(f::MPoly{T}, x::MPoly{T})
+> Return the partial derivative of `f` with respect to `x`. The value `x` must
+> be a generator of the polynomial ring of `f`.
+"""
+function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
+   R = parent(f)
+   gens_parent = gens(R)
+   
+   # Check whether x is among the generators of x.parent
+   if !(x in gens_parent)
+      error("Can compute the partial derivative only with respect to generators.")
+   end
+
+   n = nvars(R)
+   exps = copy(f.exps)
+
+   size_exps = size(f.exps)
+   if (R.ord != :lex)
+      exps = exps[2:size_exps[1],:]
+   end
+
+   if (R.ord == :degrevlex)
+      exps = exps[end:-1:1,:]
+   end
+
+   derivative = zero(R)
+   coeffs = f.coeffs
+   for i=1:length(f)
+      prod = coeffs[i]
+      for j=1:n
+         if gens_parent[j] == x
+            prod *= exps[j,i]
+            if (exps[j,i] >= 1)
+               exps[j,i] -= 1
+            end
+         end
+         prod = prod * gens_parent[j]^Int(exps[j, i])
+      end
+      derivative = derivative + prod
+   end
+
+   return derivative
+end
+
 
 ###############################################################################
 #
