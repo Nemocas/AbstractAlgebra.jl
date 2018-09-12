@@ -1893,9 +1893,9 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
          v = I[x.n]
          if divides_exp
             if v.i == 0
-               addmul!(qc, a.coeffs[v.j], m1, c)
+               qc = addmul!(qc, a.coeffs[v.j], m1, c)
             else
-               addmul!(qc, b.coeffs[v.i], Qc[v.j], c)
+               qc = addmul!(qc, b.coeffs[v.i], Qc[v.j], c)
             end
          end
          if v.i != 0 || v.j < m
@@ -1907,9 +1907,9 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
             v = I[xn]
             if divides_exp
                if v.i == 0
-                  addmul!(qc, a.coeffs[v.j], m1, c)
+                  qc = addmul!(qc, a.coeffs[v.j], m1, c)
                else
-                  addmul!(qc, b.coeffs[v.i], Qc[v.j], c)
+                  qc = addmul!(qc, b.coeffs[v.i], Qc[v.j], c)
                end
             end
             if v.i != 0 || v.j < m
@@ -2958,6 +2958,14 @@ end
 #
 ###############################################################################
 
+function add!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
+   t = b + c
+   a.coeffs = t.coeffs
+   a.exps = t.exps
+   a.length = t.length
+   return a
+end
+
 function mul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
    t = b*c
    a.coeffs = t.coeffs
@@ -2968,6 +2976,14 @@ end
 
 function addeq!(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    t = a + b
+   a.coeffs = t.coeffs
+   a.exps = t.exps
+   a.length = t.length
+   return a
+end
+
+function addmul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
+   t = a + (b * c)
    a.coeffs = t.coeffs
    a.exps = t.exps
    a.length = t.length
