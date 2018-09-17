@@ -9,8 +9,18 @@ julia:
 matrix:
   allow_failures:
     #- julia: nightly
+env:
+   global:
+      - DOCUMENTER_DEBUG=true
+jobs:
+   include:
+     - stage: "Documentation"
+       julia: 1.0
+       os: linux
+       script:
+         - julia --project=docs/ -e 'using Pkg; Pkg.instantiate(); Pkg.add(PackageSpec(path=pwd()))'
+         - julia --project=docs/ docs/make.jl
+       after_success: skip
+
 notifications:
   - email: false
-after_success:
-  - julia -e 'using Pkg; Pkg.add("Documenter")'
-  - DOCUMENTER_DEBUG=true julia -e 'cd(Pkg.dir("AbstractAlgebra")); include(joinpath("docs", "make.jl"))'

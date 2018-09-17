@@ -3,6 +3,9 @@ using Documenter, AbstractAlgebra
 makedocs(
          format   = :html,
          sitename = "AbstractAlgebra.jl",
+         modules = [AbstractAlgebra],
+         clean = true,
+         doctest = false,
          pages    = [
              "index.md",
              "constructors.md",
@@ -40,8 +43,9 @@ makedocs(
 deploydocs(
    repo   = "github.com/Nemocas/AbstractAlgebra.jl.git",
    target = "build",
-   deps = Deps.pip("pygments", "mkdocs", "python-markdown-math"),
+   deps   = nothing,
    make   = nothing,
-   julia  = "0.6"
+   julia  = "1.0",
+   osname = "linux"
 )
 
