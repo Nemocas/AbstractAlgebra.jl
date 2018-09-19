@@ -54,7 +54,7 @@ Markdown.doc"""
     eye(x::AbstractAlgebra.MatElem)
 > Return the identity matrix with the same shape as $x$.
 """
-function eye(x::AbstractAlgebra.MatElem)
+function eye(x::MatrixElem)
   z = similar(x)
   for i in 1:rows(x)
     z[i, i] = one(base_ring(x))
@@ -95,7 +95,7 @@ Markdown.doc"""
 > Return the base ring $R$ of the matrix space that the supplied matrix $r$
 > belongs to.
 """
-base_ring(a::AbstractAlgebra.MatElem{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
+base_ring(a::MatrixElem{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
 
 Markdown.doc"""
     parent(a::AbstractAlgebra.MatElem)
@@ -153,19 +153,19 @@ Markdown.doc"""
     rows(a::AbstractAlgebra.MatElem)
 > Return the number of rows of the given matrix.
 """
-rows(a::AbstractAlgebra.MatElem) = size(a.entries, 1)
+rows(a::MatrixElem) = size(a.entries, 1)
 
 Markdown.doc"""
     cols(a::AbstractAlgebra.MatElem)
 > Return the number of columns of the given matrix.
 """
-cols(a::AbstractAlgebra.MatElem) = size(a.entries, 2)
+cols(a::MatrixElem) = size(a.entries, 2)
 
-Base.@propagate_inbounds function getindex(a::AbstractAlgebra.MatElem, r::Int, c::Int)
+Base.@propagate_inbounds function getindex(a::MatrixElem, r::Int, c::Int)
    return a.entries[r, c]
 end
 
-Base.@propagate_inbounds function setindex!(a::AbstractAlgebra.MatElem, d::T, r::Int,
+Base.@propagate_inbounds function setindex!(a::MatrixElem, d::T, r::Int,
                                             c::Int) where T <: RingElement
     a.entries[r, c] = base_ring(a)(d)
 end
@@ -188,7 +188,7 @@ Markdown.doc"""
 > Return `true` if the supplied matrix $a$ is the zero matrix, otherwise
 > return `false`.
 """
-function iszero(a::AbstractAlgebra.MatElem)
+function iszero(a::MatrixElem)
    for i = 1:rows(a)
       for j = 1:cols(a)
          if !iszero(a[i, j])
@@ -204,7 +204,7 @@ Markdown.doc"""
 > Return `true` if the supplied matrix $a$ is diagonal with ones along the
 > diagonal, otherwise return `false`.
 """
-function isone(a::AbstractAlgebra.MatElem)
+function isone(a::MatrixElem)
    for i = 1:rows(a)
       for j = 1:cols(a)
          if i == j
@@ -221,7 +221,7 @@ function isone(a::AbstractAlgebra.MatElem)
   return true
 end
 
-function deepcopy_internal(d::AbstractAlgebra.MatElem, dict::IdDict)
+function deepcopy_internal(d::MatrixElem, dict::IdDict)
    c = similar(d)
    for i = 1:rows(d)
       for j = 1:cols(d)
@@ -237,7 +237,7 @@ end
 #
 ###############################################################################
 
-canonical_unit(a::AbstractAlgebra.MatElem) = canonical_unit(a[1, 1])
+canonical_unit(a::MatrixElem) = canonical_unit(a[1, 1])
 
 ###############################################################################
 #
@@ -324,7 +324,7 @@ function show(io::IO, a::AbstractAlgebra.MatSpace)
    print(io, base_ring(a))
 end
 
-function show(io::IO, a::AbstractAlgebra.MatElem)
+function show(io::IO, a::MatrixElem)
    r = rows(a)
    c = cols(a)
    if r*c == 0
@@ -357,7 +357,7 @@ Markdown.doc"""
     -(a::AbstractAlgebra.MatElem)
 > Return $-a$.
 """
-function -(x::AbstractAlgebra.MatElem)
+function -(x::MatrixElem)
    z = similar(x)
    for i in 1:rows(x)
       for j in 1:cols(x)
@@ -377,7 +377,7 @@ Markdown.doc"""
     +{T <: RingElement}(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})
 > Return $a + b$.
 """
-function +(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
+function +(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
    check_parent(x, y)
    r = similar(x)
    for i = 1:rows(x)
@@ -392,7 +392,7 @@ Markdown.doc"""
     -{T <: RingElement}(a::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})
 > Return $a - b$.
 """
-function -(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
+function -(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
    check_parent(x, y)
    r = similar(x)
    for i = 1:rows(x)
@@ -433,7 +433,7 @@ Markdown.doc"""
     *(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
 > Return $x\times y$.
 """
-function *(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
+function *(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
    z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -447,7 +447,7 @@ Markdown.doc"""
     *{T <: RingElem}(x::T, y::AbstractAlgebra.MatElem{T})
 > Return $x\times y$.
 """
-function *(x::T, y::AbstractAlgebra.MatElem{T}) where {T <: RingElem}
+function *(x::T, y::MatrixElem{T}) where {T <: RingElem}
    z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -461,19 +461,19 @@ Markdown.doc"""
     *(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x\times y$.
 """
-*(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat}) = y*x
+*(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat}) = y*x
 
 Markdown.doc"""
     *{T <: RingElem}(x::AbstractAlgebra.MatElem{T}, y::T)
 > Return $x\times y$.
 """
-*(x::AbstractAlgebra.MatElem{T}, y::T) where {T <: RingElem} = y*x
+*(x::MatrixElem{T}, y::T) where {T <: RingElem} = y*x
 
 Markdown.doc"""
     +(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
-function +(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
+function +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
    z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
@@ -492,13 +492,13 @@ Markdown.doc"""
     +(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 """
-+(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat}) = y + x
++(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat}) = y + x
 
 Markdown.doc"""
     +{T <: RingElem}(x::T, y::AbstractAlgebra.MatElem{T})
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
-function +(x::T, y::AbstractAlgebra.MatElem{T}) where {T <: RingElem}
+function +(x::T, y::MatrixElem{T}) where {T <: RingElem}
    z = similar(y)
    for i = 1:rows(y)
       for j = 1:cols(y)
@@ -516,13 +516,13 @@ Markdown.doc"""
     +{T <: RingElem}(x::AbstractAlgebra.MatElem{T}, y::T)
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 """
-+(x::AbstractAlgebra.MatElem{T}, y::T) where {T <: RingElem} = y + x
++(x::MatrixElem{T}, y::T) where {T <: RingElem} = y + x
 
 Markdown.doc"""
     -(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 """
-function -(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem)
+function -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
    z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
@@ -541,7 +541,7 @@ Markdown.doc"""
     -(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x - S(y)$, where $S$ is the parent of $x$.
 """
-function -(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
+function -(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
    z = similar(x)
    R = base_ring(x)
    for i = 1:rows(x)
@@ -560,7 +560,7 @@ Markdown.doc"""
     -{T <: RingElem}(x::T, y::AbstractAlgebra.MatElem{T})
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 """
-function -(x::T, y::AbstractAlgebra.MatElem{T}) where {T <: RingElem}
+function -(x::T, y::MatrixElem{T}) where {T <: RingElem}
    z = similar(y)
    R = base_ring(y)
    for i = 1:rows(y)
@@ -579,7 +579,7 @@ Markdown.doc"""
     -{T <: RingElem}(x::AbstractAlgebra.MatElem{T}, y::T)
 > Return $x - S(y)$, where $S$ is the parent of $a$.
 """
-function -(x::AbstractAlgebra.MatElem{T}, y::T) where {T <: RingElem}
+function -(x::MatrixElem{T}, y::T) where {T <: RingElem}
    z = similar(x)
    R = base_ring(x)
    for i = 1:rows(x)
@@ -604,9 +604,9 @@ Markdown.doc"""
     ^(a::AbstractAlgebra.MatElem, b::Int)
 > Return $a^b$. We require $b \geq 0$ and that the matrix $a$ is square.
 """
-function ^(a::AbstractAlgebra.MatElem, b::Int)
+function ^(a::MatrixElem, b::Int)
    b < 0 && throw(DomainError())
-   rows(a) != cols(a) && error("Incompatible matrix dimensions in power")
+   !issquare(a) && error("Incompatible matrix dimensions in power")
    # special case powers of x for constructing polynomials efficiently
    if b == 0
       return eye(a)
@@ -634,8 +634,8 @@ Markdown.doc"""
     powers{T <: RingElement}(a::AbstractAlgebra.MatElem{T}, d::Int)
 > Return an array of matrices $M$ wher $M[i + 1] = a^i$ for $i = 0..d$
 """
-function powers(a::AbstractAlgebra.MatElem, d::Int)
-   rows(a) != cols(a) && error("Dimensions do not match in powers")
+function powers(a::MatrixElem, d::Int)
+   !issquare(a) && error("Dimensions do not match in powers")
    d <= 0 && throw(DomainError())
    A = Array{typeof(a)}(undef, d + 1)
    A[1] = eye(a)
@@ -662,7 +662,7 @@ Markdown.doc"""
 > that power series to different precisions may still be arithmetically
 > equal to the minimum of the two precisions.
 """
-function ==(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
+function ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
    check_parent(x, y)
    for i = 1:rows(x)
       for j = 1:cols(x)
@@ -681,7 +681,7 @@ Markdown.doc"""
 > series. Only if the power series are precisely the same, to the same precision,
 > are they declared equal by this function.
 """
-function isequal(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
+function isequal(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
    check_parent(x, y)
    for i = 1:rows(x)
       for j = 1:cols(x)
@@ -766,7 +766,7 @@ Markdown.doc"""
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by
 > $y$. Each division is expected to be exact.
 """
-function divexact(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
+function divexact(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
    z = similar(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
@@ -781,7 +781,7 @@ Markdown.doc"""
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by
 > $y$. Each division is expected to be exact.
 """
-function divexact(x::AbstractAlgebra.MatElem{T}, y::T) where {T <: RingElem}
+function divexact(x::MatrixElem{T}, y::T) where {T <: RingElem}
    z = similar(x)
    for i = 1:rows(x)
       for j = 1:cols(x)
@@ -4267,7 +4267,7 @@ end
 
 function (a::MatSpace{T})(b::AbstractArray{S, 1}) where {S <: RingElement, T <: RingElement}
    _check_dim(a.rows, a.cols, b)
-   b = reshape(b, a.cols, a.rows)'
+   b = Array{S, 2}(transpose(reshape(b, a.cols, a.rows)))
    z = a(b)
    return z
 end

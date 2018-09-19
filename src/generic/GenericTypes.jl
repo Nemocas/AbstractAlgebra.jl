@@ -825,7 +825,7 @@ end
 
 const MatAlgDict = Dict{Tuple{Ring, Int}, Ring}()
 
-mutable struct MatAlgElem{T <: RingElement} <: AbstractAlgebra.MatElem{T}
+mutable struct MatAlgElem{T <: RingElement} <: AbstractAlgebra.MatAlgElem{T}
    entries::Array{T, 2}
    base_ring::Ring
 
@@ -843,6 +843,8 @@ mutable struct MatAlgElem{T <: RingElement} <: AbstractAlgebra.MatElem{T}
       return new{T}(t)
    end
 end
+
+const MatrixElem{T} = Union{AbstractAlgebra.MatElem{T}, AbstractAlgebra.MatAlgElem{T}}
 
 ###############################################################################
 #

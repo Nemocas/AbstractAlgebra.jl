@@ -34,7 +34,7 @@ export SetMap, FunctionalMap, IdentityMap
 export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
        MatElem, MatAlgElem, FinFieldElem, MPolyElem
 
-export PolyRing, SeriesRing, ResRing, FracField, MatSpace,
+export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
        FinField, MPolyRing
 
 export ZZ, QQ, zz, qq, RealField, RDF
@@ -362,6 +362,10 @@ function MatrixSpace(R::Ring, r::Int, c::Int, cached::Bool = true)
    Generic.MatrixSpace(R, r, c, cached)
 end
 
+function MatrixAlgebra(R::Ring, n::Int, cached::Bool = true)
+   Generic.MatrixAlgebra(R, n, cached)
+end
+
 function FractionField(R::Ring; cached=true)
    Generic.FractionField(R; cached=cached)
 end
@@ -388,8 +392,8 @@ function crt(A...)
 end
 
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
-       FractionField, ResidueRing, Partition, PermGroup, YoungTableau,
-       AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
+       MatrixAlgebra, FractionField, ResidueRing, Partition, PermGroup,
+       YoungTableau, AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
        PuiseuxSeriesField
 
