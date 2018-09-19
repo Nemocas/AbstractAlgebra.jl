@@ -11,7 +11,9 @@ abstract type Set end
 
 abstract type Group <: Set end
 
-abstract type Ring <: Group end
+abstract type NCRing <: Set end
+
+abstract type Ring <: NCRing end
 
 abstract type Field <: Ring end
 
@@ -21,7 +23,9 @@ abstract type SetElem end
 
 abstract type GroupElem <: SetElem end
 
-abstract type RingElem <: GroupElem end
+abstract type NCRingElem <: SetElem end
+
+abstract type RingElem <: NCRingElem end
 
 abstract type FieldElem <: RingElem end
 
