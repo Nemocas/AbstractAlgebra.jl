@@ -18,27 +18,9 @@ parent_type(::perm)</code></pre><p>A custom implementation also needs to impleme
 sign(::perm)
 permtype(::perm)
 order(::perm)
-order(::Generic.PermGroup)</code></pre><p>Note that even an <code>Int64</code> can be easily overflowed when computing with permutation groups. Thus, by default, <code>order</code> returns (always correct) <code>BigInt</code>s. If you are sure that the computation will not overflow, you may use <code>order(::Type{T}, ...)</code> to perform computations with machine integers. Julias standard promotion rules apply for the returned value.</p><p>Iteration over all permutations in the permutation group <span>$S_n$</span> can be achieved with</p><pre><code class="language-none">elements(::Generic.PermGroup)</code></pre><p>Iteration in reasonable time (i.e. in terms of minutes) is possible for <span>$S_n$</span> when <span>$n ≤ 13$</span>. You may also use the non-allocating <code>Generic.elements!(::PermGroup)</code> for <span>$n ≤ 14$</span> (or even <span>$15$</span> if you are patient enough), which is an order of mangitude faster. However, since all permutations yielded by <code>elements!</code> are aliased (modified &quot;in-place&quot;), <code>collect(Generic.elements!(PermGroup(n)))</code> returns a vector of identical permutations:</p><pre><code class="language-julia-repl">julia&gt; collect(elements(PermGroup(3)))
-6-element Array{AbstractAlgebra.Generic.perm{Int64},1}:
- ()
- (1,2)
- (1,3,2)
- (2,3)
- (1,2,3)
- (1,3)
-
-julia&gt; A = collect(Generic.elements!(PermGroup(3))); A
-6-element Array{AbstractAlgebra.Generic.perm{Int64},1}:
- (1,3)
- (1,3)
- (1,3)
- (1,3)
- (1,3)
- (1,3)
-
-julia&gt; unique(A)
-1-element Array{AbstractAlgebra.Generic.perm{Int64},1}:
- (1,3)</code></pre><div class="admonition note"><div class="admonition-title">Note</div><div class="admonition-text"><p>If you intend to use or store elements yielded by <code>elements!</code> you need to <strong>deepcopy</strong> them explicitely.</p></div></div><h2><a class="nav-anchor" id="Arithmetic-operators-1" href="#Arithmetic-operators-1">Arithmetic operators</a></h2><pre><code class="language-none">*(::perm, ::perm)
+order(::Generic.PermGroup)</code></pre><p>Note that even an <code>Int64</code> can be easily overflowed when computing with permutation groups. Thus, by default, <code>order</code> returns (always correct) <code>BigInt</code>s. If you are sure that the computation will not overflow, you may use <code>order(::Type{T}, ...)</code> to perform computations with machine integers. Julias standard promotion rules apply for the returned value.</p><p>Since <code>PermGroup</code> implements the iterator protocole You may iterate over all permutations via simple</p><pre><code class="language-none">for p in PermutationGroup(n)
+   ...
+end</code></pre><p>Iteration over all permutations in reasonable time, (i.e. in terms of minutes) is possible when <span>$n ≤ 13$</span>.</p><p>You may also use the non-allocating <code>Generic.elements!</code> function for <span>$n ≤ 14$</span> (or even <span>$15$</span> if you are patient enough), which is an order of mangitude faster.</p><pre><code class="language-none">Generic.elements!(::Generic.PermGroup)</code></pre><p>However, since all permutations yielded by <code>elements!</code> are aliased (modified &quot;in-place&quot;), <code>collect(Generic.elements!(PermGroup(n)))</code> returns a vector of identical permutations.</p><div class="admonition note"><div class="admonition-title">Note</div><div class="admonition-text"><p>If you intend to use or store elements yielded by <code>elements!</code> you need to <strong>deepcopy</strong> them explicitely.</p></div></div><h2><a class="nav-anchor" id="Arithmetic-operators-1" href="#Arithmetic-operators-1">Arithmetic operators</a></h2><pre><code class="language-none">*(::perm, ::perm)
 ^(::perm, n::Integer)
 inv(::perm)</code></pre><p>Permutations parametrized by different types can be multiplied, and follow the standard julia integer promotion rules:</p><pre><code class="language-julia">g = rand(PermGroup(Int8(5)));
 h = rand(PermGroup(UInt32(5)));
