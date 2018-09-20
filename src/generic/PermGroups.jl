@@ -594,35 +594,70 @@ Base.length(A::AllPerms) = A.all
 #   end
 #end
 
-Markdown.doc"""
-    elements(G::PermGroup)
-> Return an iterator over all permutations in `G`.
+doc"""
+    Generic.elements!(G::PermGroup)
+> Return an unsafe iterator over all permutations in `G`. Only one permutation
+> is allocated and then modified in-place using the non-recursive
+> [Heaps algorithm](https://en.wikipedia.org/wiki/Heap's_algorithm).
 >
-> This uses the non-recursive [Heaps algorithm](https://en.wikipedia.org/wiki/Heap's_algorithm).
-> You may use `collect(elements(G))` to get a vector of all elements.
-> A non-allocating version is provided as `Generic.elements!(::PermGroup)` for
-> iteration as well, but you need to explicitely `deepcopy` permutations
-> intended to be stored or modified.
+> Note: you need to explicitely copy permutations intended to be stored or
+> modified.
 
 # Examples:
 ```jldoctest
-julia> elts = elements(PermGroup(5));
+julia> elts = Generic.elements!(PermGroup(5));
 
 julia> length(elts)
 120
 
-julia> G = PermGroup(Int32(3)); collect(elements(G))
-6-element Array{AbstractAlgebra.Generic.perm{Int32},1}:
- ()
- (1,2)
- (1,3,2)
- (2,3)
- (1,2,3)
+julia> for p in Generic.elements!(PermGroup(3))
+         println(p)
+       end
+()
+(1,2)
+(1,3,2)
+(2,3)
+(1,2,3)
+(1,3)
+
+julia> A = collect(Generic.elements!(PermGroup(3))); A
+6-element Array{AbstractAlgebra.Generic.perm{Int64},1}:
+ (1,3)
+ (1,3)
+ (1,3)
+ (1,3)
+ (1,3)
+ (1,3)
+
+julia> unique(A)
+1-element Array{AbstractAlgebra.Generic.perm{Int64},1}:
  (1,3)
 ```
 """
-elements(G::PermGroup) = (perm(copy(p.d), false) for p in AllPerms(G.n))
 elements!(G::PermGroup)= (p for p in AllPerms(G.n))
+
+function Base.iterate(G::PermGroup)
+  A = AllPerms(G.n)
+  a, b = iterate(A)
+  return deepcopy(A.elts), (A, b)
+end
+
+function Base.iterate(G::PermGroup, S)
+  A = S[1]
+  c = S[2]
+
+  s = iterate(A, c)
+
+  if s === nothing
+    return nothing
+  end
+
+  return deepcopy(s[1]), (A, s[2])
+end
+
+Base.eltype(::Type{PermGroup{T}}) where T = perm{T}
+
+Base.length(G::PermGroup) = order(G)
 
 ###############################################################################
 #

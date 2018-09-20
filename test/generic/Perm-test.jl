@@ -106,7 +106,7 @@ s2 ="""
       @test_throws String G("(1,2)(3,4,5,6)")
       @test_throws String G("(1,2)(3,4,5,2)")
 
-      @test all(elt == G(string(cycles(elt))) for elt in elements(G))
+      @test all(elt == G(string(cycles(elt))) for elt in G)
    end
    println("PASS")
 end
@@ -172,13 +172,15 @@ function test_perm_iteration(types)
       @test order(T, G) isa promote_type(T, Int)
       @test order(G) == 720
 
-      @test collect(elements(G)) isa Vector{perm{T}}
+      @test collect(G) isa Vector{perm{T}}
 
-      elts = collect(elements(G))
+      elts = collect(G)
 
-      @test collect(elts)[1] == G()
+      @test elts[1] == G()
       @test length(elts) == 720
       @test length(unique(elts)) == 720
+      @test length(G) == 720
+      @test length(unique(collect(G))) == 720
    end
 
    println("PASS")
@@ -208,7 +210,7 @@ function test_perm_binary_ops(types)
       cycles(a)
       @test parity(a) == p
 
-      for a in elements(G), b in elements(G)
+      for a in G, b in G
          @test parity(a*b) == (parity(b)+parity(a)) % 2
       end
 
@@ -257,7 +259,7 @@ function test_perm_inversion(types)
       @test a == b*inv(b)
 
       G = PermutationGroup(3)
-      for a in elements(G), b in elements(G)
+      for a in G, b in G
          @test inv(a*b) == inv(b)*inv(a)
       end
    end

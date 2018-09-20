@@ -161,37 +161,23 @@ Thus, by default, `order` returns (always correct) `BigInt`s.
 If you are sure that the computation will not overflow, you may use `order(::Type{T}, ...)` to perform computations with machine integers.
 Julias standard promotion rules apply for the returned value.
 
-Iteration over all permutations in the permutation group $S_n$ can be achieved with
+Since `PermGroup` implements the iterator protocole You may iterate over all permutations via simple
+
+```
+for p in PermutationGroup(n)
+   ...
+end
+```
+Iteration over all permutations in reasonable time, (i.e. in terms of minutes) is possible when $n ≤ 13$.
+
+You may also use the non-allocating `Generic.elements!` function for $n ≤ 14$ (or even $15$ if you are patient enough), which is an order of mangitude faster.
 
 ```@docs
-elements(::Generic.PermGroup)
+Generic.elements!(::Generic.PermGroup)
 ```
-Iteration in reasonable time (i.e. in terms of minutes) is possible for $S_n$ when $n ≤ 13$.
-You may also use the non-allocating `Generic.elements!(::PermGroup)` for $n ≤ 14$ (or even $15$ if you are patient enough), which is an order of mangitude faster. However, since all permutations yielded by `elements!` are aliased (modified "in-place"), `collect(Generic.elements!(PermGroup(n)))` returns a vector of identical permutations:
 
-```jldoctest
-julia> collect(elements(PermGroup(3)))
-6-element Array{AbstractAlgebra.Generic.perm{Int64},1}:
- ()
- (1,2)
- (1,3,2)
- (2,3)
- (1,2,3)
- (1,3)
+However, since all permutations yielded by `elements!` are aliased (modified "in-place"), `collect(Generic.elements!(PermGroup(n)))` returns a vector of identical permutations.
 
-julia> A = collect(Generic.elements!(PermGroup(3))); A
-6-element Array{AbstractAlgebra.Generic.perm{Int64},1}:
- (1,3)
- (1,3)
- (1,3)
- (1,3)
- (1,3)
- (1,3)
-
-julia> unique(A)
-1-element Array{AbstractAlgebra.Generic.perm{Int64},1}:
- (1,3)
-```
 !!! note
     If you intend to use or store elements yielded by `elements!` you need to **deepcopy** them explicitely.
 
