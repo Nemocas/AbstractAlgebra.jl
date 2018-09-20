@@ -109,7 +109,7 @@ function check_parent(a::AbstractAlgebra.MatElem, b::AbstractAlgebra.MatElem)
                 error("Incompatible matrix spaces in matrix operation")
 end
 
-function _check_dim(r::Int, c::Int, arr::Array{T, 2}, transpose::Bool = false) where {T}
+function _check_dim(r::Int, c::Int, arr::AbstractArray{T, 2}, transpose::Bool = false) where {T}
   if !transpose
     size(arr) != (r, c) && throw(ErrorConstrDimMismatch(r, c, size(arr)...))
   else
@@ -118,7 +118,7 @@ function _check_dim(r::Int, c::Int, arr::Array{T, 2}, transpose::Bool = false) w
   return nothing
 end
 
-function _check_dim(r::Int, c::Int, arr::Array{T, 1}) where {T}
+function _check_dim(r::Int, c::Int, arr::AbstractArray{T, 1}) where {T}
   length(arr) != r*c && throw(ErrorConstrDimMismatch(r, c, length(arr)))
   return nothing
 end
@@ -4238,7 +4238,7 @@ function (a::MatSpace{T})(b::Mat{T}) where {T <: RingElement}
    return b
 end
 
-function (a::MatSpace{T})(b::Array{T, 2}) where T <: RingElement
+function (a::MatSpace{T})(b::AbstractArray{T, 2}) where T <: RingElement
    R = base_ring(a)
    _check_dim(a.rows, a.cols, b)
    for i = 1:a.rows
@@ -4251,7 +4251,7 @@ function (a::MatSpace{T})(b::Array{T, 2}) where T <: RingElement
    return z
 end
 
-function (a::MatSpace{T})(b::Array{S, 2}) where {S <: RingElement, T <: RingElement}
+function (a::MatSpace{T})(b::AbstractArray{S, 2}) where {S <: RingElement, T <: RingElement}
    R = base_ring(a)
    _check_dim(a.rows, a.cols, b)
    entries = Array{T}(undef, a.rows, a.cols)
@@ -4265,7 +4265,7 @@ function (a::MatSpace{T})(b::Array{S, 2}) where {S <: RingElement, T <: RingElem
    return z
 end
 
-function (a::MatSpace{T})(b::Array{S, 1}) where {S <: RingElement, T <: RingElement}
+function (a::MatSpace{T})(b::AbstractArray{S, 1}) where {S <: RingElement, T <: RingElement}
    _check_dim(a.rows, a.cols, b)
    b = reshape(b, a.cols, a.rows)'
    z = a(b)
@@ -4279,23 +4279,23 @@ end
 ################################################################################
 
 Markdown.doc"""
-    matrix(R::Ring, arr::Array{T, 2}) where {T} -> MatElem{T}
+    matrix(R::Ring, arr::AbstractArray{T, 2}) where {T} -> MatElem{T}
 
 > Constructs the matrix over $R$ with entries as in `arr`.
 """
-function matrix(R::Ring, arr::Array{T, 2}) where {T}
+function matrix(R::Ring, arr::AbstractArray{T, 2}) where {T}
    if elem_type(R) === T
       z = Mat{elem_type(R)}(arr)
       z.base_ring = R
       return z
    else
-      arr_coerce = map(R, arr)::Array{elem_type(R), 2}
+      arr_coerce = convert(Array{elem_type(R), 2}, map(R, arr))::Array{elem_type(R), 2}
       return matrix(R, arr_coerce)
    end
 end
 
 Markdown.doc"""
-    matrix(R::Ring, r::Int, c::Int, arr::Array{T, 1}) where {T} -> MatElem{T}
+    matrix(R::Ring, r::Int, c::Int, arr::AbstractArray{T, 1}) where {T} -> MatElem{T}
 
 > Constructs the $r \times c$ matrix over $R$, where the entries are taken
 > row-wise from `arr`.
@@ -4307,7 +4307,7 @@ function matrix(R::Ring, r::Int, c::Int, arr::Array{T, 1}) where T
      z.base_ring = R
      return z
    else
-     arr_coerce = map(R, arr)::Array{elem_type(R), 1}
+     arr_coerce = convert(Array{elem_type(R), 1}, map(R, arr))::Array{elem_type(R), 1}
      return matrix(R, r, c, arr_coerce)
    end
 end
