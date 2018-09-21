@@ -136,6 +136,12 @@ function test_gen_mat_constructors()
       @test_throws ErrorConstrDimMismatch matrix(R, 2, 4, map(T, arr2))
    end
 
+   M = matrix(R, arr')
+   @test isa(M, Generic.Mat{elem_type(R)})
+
+   M = matrix(R, 2, 3, view(arr2', 1:6))
+   @test isa(M, Generic.Mat{elem_type(R)})
+
    M3 = zero_matrix(R, 2, 3)
 
    @test isa(M3, Generic.Mat{elem_type(R)})
