@@ -4,12 +4,7 @@ using Markdown
 
 using InteractiveUtils
 
-import LinearAlgebra: det, norm,
-                      nullspace, rank, transpose!, hessenberg
-
-if VERSION < v"1.0.0"
-   import Base: atan2, base, contains, nextpow2, prevpow2
-end
+import LinearAlgebra: det, norm, nullspace, rank, transpose!, hessenberg
 
 import LinearAlgebra: lu, lu!, tr
 
@@ -75,7 +70,7 @@ include("AbstractTypes.jl")
 
 function __init__()
    println("")
-   println("Welcome to AbstractAlgebra version 0.1.2-dev")
+   println("Welcome to AbstractAlgebra version 0.1.2")
    println("")
    println("AbstractAlgebra comes with absolutely no warranty whatsoever")
    println("")
@@ -88,7 +83,7 @@ end
 ################################################################################
 
 function versioninfo()
-  print("AbstractAlgebra version 0.1.2-dev\n")
+  print("AbstractAlgebra version 0.1.2\n")
   abstractalgebrarepo = dirname(dirname(@__FILE__))
 
   print("AbstractAlgebra: ")
