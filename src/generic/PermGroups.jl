@@ -594,7 +594,7 @@ Base.length(A::AllPerms) = A.all
 #   end
 #end
 
-doc"""
+Markdown.doc"""
     Generic.elements!(G::PermGroup)
 > Return an unsafe iterator over all permutations in `G`. Only one permutation
 > is allocated and then modified in-place using the non-recursive
