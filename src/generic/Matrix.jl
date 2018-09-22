@@ -4300,7 +4300,7 @@ Markdown.doc"""
 > Constructs the $r \times c$ matrix over $R$, where the entries are taken
 > row-wise from `arr`.
 """
-function matrix(R::Ring, r::Int, c::Int, arr::Array{T, 1}) where T
+function matrix(R::Ring, r::Int, c::Int, arr::AbstractArray{T, 1}) where T
    _check_dim(r, c, arr)
    if elem_type(R) === T
      z = Mat{elem_type(R)}(r, c, arr)
