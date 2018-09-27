@@ -299,7 +299,7 @@ mutable struct PolyRing{T <: RingElement} <: AbstractAlgebra.PolyRing{T}
    S::Symbol
 
    function PolyRing{T}(R::Ring, s::Symbol, cached::Bool = true) where T <: RingElement
-      if haskey(PolyID, (R, s))
+      if cached && haskey(PolyID, (R, s))
          return PolyID[R, s]::PolyRing{T}
       else
          z = new{T}(R, s)
@@ -353,7 +353,7 @@ mutable struct MPolyRing{T <: RingElement} <: AbstractAlgebra.MPolyRing{T}
 
    function MPolyRing{T}(R::Ring, s::Array{Symbol, 1}, ord::Symbol, N::Int,
                          cached::Bool = true) where T <: RingElement
-      if haskey(MPolyID, (R, s, ord, N))
+      if cached && haskey(MPolyID, (R, s, ord, N))
          return MPolyID[R, s, ord, N]::MPolyRing{T}
       else
          z = new{T}(R, s, ord, length(s), N)
@@ -399,7 +399,7 @@ mutable struct SparsePolyRing{T <: RingElement} <: AbstractAlgebra.Ring
    num_vars::Int
 
    function SparsePolyRing{T}(R::Ring, s::Symbol, cached::Bool = true) where T <: RingElement
-      if haskey(SparsePolyID, (R, s))
+      if cached && haskey(SparsePolyID, (R, s))
          return SparsePolyID[R, s]::SparsePolyRing{T}
       else
          z = new{T}(R, s)
@@ -442,7 +442,7 @@ mutable struct ResRing{T <: RingElement} <: AbstractAlgebra.ResRing{T}
       if !isone(c)
         modulus = divexact(modulus, c)
       end
-      if haskey(ModulusDict, (parent(modulus), modulus))
+      if cached && haskey(ModulusDict, (parent(modulus), modulus))
          return ModulusDict[parent(modulus), modulus]::ResRing{T}
       else
          z = new{T}(parent(modulus), modulus)
@@ -478,7 +478,7 @@ mutable struct ResField{T <: RingElement} <: AbstractAlgebra.ResField{T}
       if !isone(c)
         modulus = divexact(modulus, c)
       end
-      if haskey(ModulusFieldDict, (parent(modulus), modulus))
+      if cached && haskey(ModulusFieldDict, (parent(modulus), modulus))
          return ModulusFieldDict[parent(modulus), modulus]::ResField{T}
       else
          z = new{T}(parent(modulus), modulus)
@@ -511,7 +511,7 @@ mutable struct RelSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
    S::Symbol
 
    function RelSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
-      if haskey(RelSeriesID, (R, prec, s))
+      if cached && haskey(RelSeriesID, (R, prec, s))
          return RelSeriesID[R, prec, s]::RelSeriesRing{T}
       else
          z = new{T}(R, prec, s)
@@ -551,7 +551,7 @@ mutable struct AbsSeriesRing{T <: RingElement} <: AbstractAlgebra.SeriesRing{T}
    S::Symbol
 
    function AbsSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
-      if haskey(AbsSeriesID, (R, prec, s))
+      if cached && haskey(AbsSeriesID, (R, prec, s))
          return AbsSeriesID[R, prec, s]::AbsSeriesRing{T}
       else
          z = new{T}(R, prec, s)
@@ -587,7 +587,7 @@ mutable struct LaurentSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
    S::Symbol
 
    function LaurentSeriesRing{T}(R::Ring, prec::Int, s::Symbol, cached::Bool = true) where T <: RingElement
-      if haskey(LaurentSeriesID, (R, prec, s))
+      if cached && haskey(LaurentSeriesID, (R, prec, s))
          return LaurentSeriesID[R, prec, s]::LaurentSeriesRing{T}
       else
          z = new{T}(R, prec, s)
@@ -626,7 +626,7 @@ mutable struct LaurentSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
    S::Symbol
 
    function LaurentSeriesField{T}(R::Field, prec::Int, s::Symbol, cached::Bool = true) where T <: FieldElement
-      if haskey(LaurentSeriesID, (R, prec, s))
+      if cached && haskey(LaurentSeriesID, (R, prec, s))
          return LaurentSeriesID[R, prec, s]::LaurentSeriesField{T}
       else
          z = new{T}(R, prec, s)
@@ -663,7 +663,7 @@ mutable struct PuiseuxSeriesRing{T <: RingElement} <: AbstractAlgebra.Ring
    laurent_ring::Ring
 
    function PuiseuxSeriesRing{T}(R::LaurentSeriesRing{T}, cached::Bool = true) where T <: RingElement
-      if haskey(PuiseuxSeriesID, R)
+      if cached && haskey(PuiseuxSeriesID, R)
          return PuiseuxSeriesID[R]::PuiseuxSeriesRing{T}
       else
          z = new{T}(R)
@@ -697,7 +697,7 @@ mutable struct PuiseuxSeriesField{T <: FieldElement} <: AbstractAlgebra.Field
    laurent_ring::Field
 
    function PuiseuxSeriesField{T}(R::LaurentSeriesField{T}, cached::Bool = true) where T <: FieldElement
-      if haskey(PuiseuxSeriesID, R)
+      if cached && haskey(PuiseuxSeriesID, R)
          return PuiseuxSeriesID[R]::PuiseuxSeriesField{T}
       else
          z = new{T}(R)
@@ -731,7 +731,7 @@ mutable struct FracField{T <: RingElem} <: AbstractAlgebra.FracField{T}
    base_ring::Ring
 
    function FracField{T}(R::Ring, cached::Bool = true) where T <: RingElem
-      if haskey(FracDict, R)
+      if cached && haskey(FracDict, R)
          return FracDict[R]::FracField{T}
       else
          z = new{T}(R)
@@ -766,7 +766,7 @@ mutable struct MatSpace{T <: RingElement} <: AbstractAlgebra.MatSpace{T}
    base_ring::Ring
 
    function MatSpace{T}(R::Ring, r::Int, c::Int, cached::Bool = true) where T <: RingElement
-      if haskey(MatDict, (R, r, c))
+      if cached && haskey(MatDict, (R, r, c))
          return MatDict[R, r, c]::MatSpace{T}
       else
          z = new{T}(r, c, R)
