@@ -3357,15 +3357,15 @@ end
 #
 ###############################################################################
 
-function snf_kb(A::Mat{T}) where {T <: RingElement}
+function snf_kb(A::MatrixElem{T}) where {T <: RingElement}
    return _snf_kb(A, Val{false})
 end
 
-function snf_kb_with_trafo(A::Mat{T}) where {T <: RingElement}
+function snf_kb_with_trafo(A::MatrixElem{T}) where {T <: RingElement}
    return _snf_kb(A, Val{true})
 end
 
-function _snf_kb(A::Mat{T}, trafo::Type{Val{V}} = Val{false}) where {V, T <: RingElement}
+function _snf_kb(A::MatrixElem{T}, trafo::Type{Val{V}} = Val{false}) where {V, T <: RingElement}
    S = deepcopy(A)
    m = rows(S)
    n = cols(S)
@@ -3382,7 +3382,7 @@ function _snf_kb(A::Mat{T}, trafo::Type{Val{V}} = Val{false}) where {V, T <: Rin
    end
 end
 
-function kb_clear_row!(S::Mat{T}, K::Mat{T}, i::Int, with_trafo::Bool) where {T <: RingElement}
+function kb_clear_row!(S::MatrixElem{T}, K::MatrixElem{T}, i::Int, with_trafo::Bool) where {T <: RingElement}
    m = rows(S)
    n = cols(S)
    t = base_ring(S)()
@@ -3419,7 +3419,7 @@ function kb_clear_row!(S::Mat{T}, K::Mat{T}, i::Int, with_trafo::Bool) where {T 
    return nothing
 end
 
-function snf_kb!(S::Mat{T}, U::Mat{T}, K::Mat{T}, with_trafo::Bool = false) where {T <: RingElement}
+function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_trafo::Bool = false) where {T <: RingElement}
    m = rows(S)
    n = cols(S)
    l = min(m,n)
@@ -3473,11 +3473,11 @@ function snf_kb!(S::Mat{T}, U::Mat{T}, K::Mat{T}, with_trafo::Bool = false) wher
    return nothing
 end
 
-function snf(a::Mat{T}) where {T <: RingElement}
+function snf(a::MatrixElem{T}) where {T <: RingElement}
   return snf_kb(a)
 end
 
-function snf_with_trafo(a::Mat{T}) where {T <: RingElement}
+function snf_with_trafo(a::MatrixElem{T}) where {T <: RingElement}
   return snf_kb_with_trafo(a)
 end
 
