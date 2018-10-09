@@ -24,6 +24,13 @@ function base_ring(a::AbstractAlgebra.MatAlgebra{T}) where {T <: RingElement}
    a.base_ring::parent_type(T)
 end
 
+Markdown.doc"""
+    parent(a::AbstractAlgebra.MatAlgElem)
+> Return the parent object of the given matrix.
+"""
+parent(a::AbstractAlgebra.MatAlgElem{T}, cached::Bool = true) where T <: RingElement =
+    MatAlgebra{T}(a.base_ring, size(a.entries)[1], cached)
+
 function check_parent(a::AbstractAlgebra.MatAlgElem{T}, b::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement
   (base_ring(a) != base_ring(b) || dimension(a) != dimension(b)) &&
                 error("Incompatible matrix spaces in matrix operation")
@@ -203,8 +210,11 @@ Markdown.doc"""
     transpose(x::AbstractAlgebra.MatAlgElem)
 > Return the transpose of the given matrix.
 """
-function transpose(x::MatAlgElem)
-   return matrix(base_ring(x), permutedims(x.entries, [2, 1]))
+function transpose(x::MatAlgElem{T}) where T <: RingElement
+   arr = permutedims(x.entries, [2, 1])
+   z = MatAlgElem{T}(arr)
+   z.base_ring = base_ring(x)
+   return z
 end
 
 Markdown.doc"""

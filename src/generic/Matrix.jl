@@ -704,7 +704,7 @@ Markdown.doc"""
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 > otherwise return `false`.
 """
-function ==(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
+function ==(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
    for i = 1:min(rows(x), cols(x))
       if x[i, i] != y
          return false
@@ -725,14 +725,14 @@ Markdown.doc"""
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 > otherwise return `false`.
 """
-==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatElem) = y == x
+==(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem) = y == x
 
 Markdown.doc"""
     =={T <: RingElem}(x::AbstractAlgebra.MatElem{T}, y::T)
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 > otherwise return `false`.
 """
-function ==(x::AbstractAlgebra.MatElem{T}, y::T) where {T <: RingElem}
+function ==(x::MatrixElem{T}, y::T) where {T <: RingElem}
    for i = 1:min(rows(x), cols(x))
       if x[i, i] != y
          return false
@@ -753,7 +753,7 @@ Markdown.doc"""
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 > otherwise return `false`.
 """
-==(x::T, y::AbstractAlgebra.MatElem{T}) where {T <: RingElem} = y == x
+==(x::T, y::MatrixElem{T}) where {T <: RingElem} = y == x
 
 ###############################################################################
 #
@@ -1222,7 +1222,7 @@ function rref(M::MatrixElem{T}) where {T <: RingElement}
    return r, d, A
 end
 
-function rref!(A::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
+function rref!(A::MatrixElem{T}) where {T <: FieldElement}
    m = rows(A)
    n = cols(A)
    R = base_ring(A)
@@ -1236,8 +1236,8 @@ function rref!(A::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
          A[i, j] = R()
       end
    end
-   U = similar(A, rnk, rnk)
-   V = similar(A, rnk, n - rnk)
+   U = zero_matrix(R, rnk, rnk)
+   V = zero_matrix(R, rnk, n - rnk)
    pivots = zeros(Int, n)
    np = rnk
    j = k = 1
