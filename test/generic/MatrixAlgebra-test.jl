@@ -743,24 +743,6 @@ function test_gen_matalg_hessenberg()
    println("PASS")
 end
 
-function test_gen_matalg_kronecker_product()
-   print("Generic.MatAlg.kronecker_product...")
-   
-   R = ResidueRing(ZZ, 18446744073709551629)
-   S = MatrixSpace(R, 2, 3)
-   S2 = MatrixSpace(R, 2, 2)
-   S3 = MatrixSpace(R, 3, 3)
-   
-   A = S(R.([2 3 5; 9 6 3]))
-   B = S2(R.([2 3; 1 4]))
-   C = S3(R.([2 3 5; 1 4 7; 9 6 3]))
-   
-   @test size(kronecker_product(A, A)) == (4,9)
-   @test kronecker_product(B*A,A*C) == kronecker_product(B,A) * kronecker_product(A,C)
-
-   println("PASS")
-end
-
 function test_gen_matalg_charpoly()
    print("Generic.MatAlg.charpoly...")
 
@@ -828,63 +810,69 @@ function test_gen_matalg_minpoly()
 
    R = GF(103)
    T, y = PolynomialRing(R, "y")
+   S = MatrixAlgebra(R, 3)
 
-   M = R[92 97 8;
+   M = S([92 97 8;
           0 5 13;
-          0 16 2]
+          0 16 2])
 
    @test minpoly(T, M) == y^2+96*y+8
 
    R = GF(3)
    T, y = PolynomialRing(R, "y")
+   S = MatrixAlgebra(R, 4)
 
-   M = R[1 2 0 2;
+   M = S([1 2 0 2;
          1 2 1 0;
          1 2 2 1;
-         2 1 2 0]
+         2 1 2 0])
 
    @test minpoly(T, M) == y^2 + 2y
 
    R = GF(13)
    T, y = PolynomialRing(R, "y")
+   S = MatrixAlgebra(R, 3)
 
-   M = R[7 6 1;
+   M = S([7 6 1;
          7 7 5;
-         8 12 5]
+         8 12 5])
 
    @test minpoly(T, M) == y^2+10*y
+   S = MatrixAlgebra(R, 4)
 
-   M = R[4 0 9 5;
+   M = S([4 0 9 5;
          1 0 1 9;
          0 0 7 6;
-         0 0 3 10]
+         0 0 3 10])
 
    @test minpoly(T, M) == y^2 + 9y
+   S = MatrixAlgebra(R, 6)
 
-   M = R[2 7 0 0 0 0;
+   M = S([2 7 0 0 0 0;
          1 0 0 0 0 0;
          0 0 2 7 0 0;
          0 0 1 0 0 0;
          0 0 0 0 4 3;
-         0 0 0 0 1 0]
+         0 0 0 0 1 0])
 
    @test minpoly(T, M) == (y^2+9*y+10)*(y^2+11*y+6)
+   S = MatrixAlgebra(R, 6)
 
-   M = R[2 7 0 0 0 0;
+   M = S([2 7 0 0 0 0;
          1 0 1 0 0 0;
          0 0 2 7 0 0;
          0 0 1 0 0 0;
          0 0 0 0 4 3;
-         0 0 0 0 1 0]
+         0 0 0 0 1 0])
 
    @test minpoly(T, M) == (y^2+9*y+10)*(y^2+11*y+6)^2
 
-   S = MatrixSpace(R, 1, 1)
+   S = MatrixAlgebra(R, 1)
    M = S()
 
    @test minpoly(T, M) == y
 
-   S = MatrixSpace(R, 0, 0)
+   S = MatrixAlgebra(R, 0)
    M = S()
 
    @test minpoly(T, M) == 1
@@ -892,7 +880,7 @@ function test_gen_matalg_minpoly()
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
    U, z = PolynomialRing(S, "z")
-   T = MatrixSpace(S, 6, 6)
+   T = MatrixAlgebra(S, 6)
 
    M = T()
    for i = 1:3
@@ -908,7 +896,7 @@ function test_gen_matalg_minpoly()
 
    R, x = PolynomialRing(ZZ, "x")
    U, z = PolynomialRing(R, "z")
-   T = MatrixSpace(R, 6, 6)
+   T = MatrixAlgebra(R, 6)
 
    M = T()
    for i = 1:3
@@ -935,37 +923,15 @@ function test_gen_matalg_row_swapping()
    print("Generic.MatAlg.row_swapping...")
 
    R, x = PolynomialRing(ZZ, "x")
-   M = MatrixSpace(R, 3, 2)
+   M = MatrixAlgebra(R, 3)
 
-   a = M(map(R, [1 2; 3 4; 5 6]))
+   a = M(map(R, [1 2 3; 4 5 6; 7 8 9]))
 
-   @test swap_rows(a, 1, 3) == M(map(R, [5 6; 3 4; 1 2]))
+   @test swap_rows(a, 1, 3) == M(map(R, [7 8 9; 4 5 6; 1 2 3]))
 
    swap_rows!(a, 2, 3)
 
-   @test a == M(map(R, [1 2; 5 6; 3 4]))
-
-   println("PASS")
-end
-
-function test_gen_matalg_concat()
-   print("Generic.MatAlg.concat...")
-
-   R, x = PolynomialRing(ZZ, "x")
-
-   for i = 1:10
-      r = rand(0:10)
-      c1 = rand(0:10)
-      c2 = rand(0:10)
-
-      S1 = MatrixSpace(R, r, c1)
-      S2 = MatrixSpace(R, r, c2)
-
-      M1 = rand(S1, 0:3, -100:100)
-      M2 = rand(S2, 0:3, -100:100)
-
-      @test vcat(transpose(M1), transpose(M2)) == transpose(hcat(M1, M2))
-   end
+   @test a == M(map(R, [1 2 3; 7 8 9; 4 5 6]))
 
    println("PASS")
 end
@@ -975,9 +941,9 @@ function test_gen_matalg_hnf_minors()
 
    R, x = PolynomialRing(QQ, "x")
 
-   M = MatrixSpace(R, 4, 3)
+   M = MatrixAlgebra(R, 3)
 
-   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
+   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    H = hnf_minors(A)
    @test istriu(H)
@@ -994,7 +960,7 @@ function test_gen_matalg_hnf_minors()
 
    S, y = PolynomialRing(F, "y")
 
-   N = MatrixSpace(S, 4, 4)
+   N = MatrixAlgebra(S, 4)
 
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5; y 1 y 2]))
 
@@ -1014,9 +980,9 @@ function test_gen_matalg_hnf_kb()
 
    R, x = PolynomialRing(QQ, "x")
 
-   M = MatrixSpace(R, 4, 3)
+   M = MatrixAlgebra(R, 3)
 
-   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
+   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    H = AbstractAlgebra.hnf_kb(A)
    @test istriu(H)
@@ -1033,9 +999,9 @@ function test_gen_matalg_hnf_kb()
 
    S, y = PolynomialRing(F, "y")
 
-   N = MatrixSpace(S, 3, 4)
+   N = MatrixAlgebra(S, 3)
 
-   B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
+   B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    H = AbstractAlgebra.hnf_kb(B)
    @test istriu(H)
@@ -1053,9 +1019,9 @@ function test_gen_matalg_hnf_cohen()
 
    R, x = PolynomialRing(QQ, "x")
 
-   M = MatrixSpace(R, 4, 3)
+   M = MatrixAlgebra(R, 3)
 
-   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
+   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    H = AbstractAlgebra.hnf_cohen(A)
    @test istriu(H)
@@ -1072,9 +1038,9 @@ function test_gen_matalg_hnf_cohen()
 
    S, y = PolynomialRing(F, "y")
 
-   N = MatrixSpace(S, 3, 4)
+   N = MatrixAlgebra(S, 3)
 
-   B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
+   B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    H = AbstractAlgebra.hnf_cohen(B)
    @test istriu(H)
@@ -1092,9 +1058,9 @@ function test_gen_matalg_hnf()
 
    R, x = PolynomialRing(QQ, "x")
 
-   M = MatrixSpace(R, 4, 3)
+   M = MatrixAlgebra(R, 3)
 
-   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
+   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    H = hnf(A)
    @test istriu(H)
@@ -1111,9 +1077,9 @@ function test_gen_matalg_hnf()
 
    S, y = PolynomialRing(F, "y")
 
-   N = MatrixSpace(S, 3, 4)
+   N = MatrixAlgebra(S, 3)
 
-   B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
+   B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    H = hnf(B)
    @test istriu(H)
@@ -1131,9 +1097,9 @@ function test_gen_matalg_snf_kb()
 
    R, x = PolynomialRing(QQ, "x")
 
-   M = MatrixSpace(R, 4, 3)
+   M = MatrixAlgebra(R, 3)
 
-   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
+   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    T = AbstractAlgebra.snf_kb(A)
    @test is_snf(T)
@@ -1151,9 +1117,9 @@ function test_gen_matalg_snf_kb()
 
    S, y = PolynomialRing(F, "y")
 
-   N = MatrixSpace(S, 3, 4)
+   N = MatrixAlgebra(S, 3)
 
-   B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
+   B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    T = AbstractAlgebra.snf_kb(B)
    @test is_snf(T)
@@ -1172,9 +1138,9 @@ function test_gen_matalg_snf()
 
    R, x = PolynomialRing(QQ, "x")
 
-   M = MatrixSpace(R, 4, 3)
+   M = MatrixAlgebra(R, 3)
 
-   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
+   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
    T = snf(A)
    @test is_snf(T)
@@ -1192,9 +1158,9 @@ function test_gen_matalg_snf()
 
    S, y = PolynomialRing(F, "y")
 
-   N = MatrixSpace(S, 3, 4)
+   N = MatrixAlgebra(S, 3)
 
-   B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
+   B = N(map(S, Any[1 0 a; a*y^3 0 3*a^2; y^4+a 0 y^2+y]))
 
    T = snf(B)
    @test is_snf(T)
@@ -1204,87 +1170,6 @@ function test_gen_matalg_snf()
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*B*K == T
-
-   println("PASS")
-end
-
-function test_gen_matalg_weak_popov()
-   print("Generic.MatAlg.weak_popov...")
-
-   R, x = PolynomialRing(QQ, "x")
-
-   A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
-   r = rank(A)
-
-   P = weak_popov(A)
-   @test is_weak_popov(P, r)
-
-   P, U = weak_popov_with_trafo(A)
-   @test is_weak_popov(P, r)
-   @test U*A == P
-   @test isunit(det(U))
-
-   F = GF(7)
-
-   S, y = PolynomialRing(F, "y")
-
-   B = matrix(S, map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]))
-   s = rank(B)
-
-   P = weak_popov(B)
-   @test is_weak_popov(P, s)
-
-   P, U = weak_popov_with_trafo(B)
-   @test is_weak_popov(P, s)
-   @test U*B == P
-   @test isunit(det(U))
-
-   # some random tests
-
-   for i in 1:3
-      M = MatrixSpace(PolynomialRing(QQ, "x")[1], rand(1:5), rand(1:5))
-      A = rand(M, 0:5, -5:5)
-      r = rank(A)
-      P = weak_popov(A)
-      @test is_weak_popov(P, r)
-
-      P, U = weak_popov_with_trafo(A)
-      @test is_weak_popov(P, r)
-      @test U*A == P
-      @test isunit(det(U))
-   end
-
-   R = GF(randprime(100))
-
-   M = MatrixSpace(PolynomialRing(R, "x")[1], rand(1:5), rand(1:5))
-
-   for i in 1:2
-      A = rand(M, 1:5)
-      r = rank(A)
-      P = weak_popov(A)
-      @test is_weak_popov(P, r)
-
-      P, U = weak_popov_with_trafo(A)
-      @test is_weak_popov(P, r)
-      @test U*A == P
-      @test isunit(det(U))
-   end
-
-   R = ResidueRing(ZZ, randprime(100))
-
-   M = MatrixSpace(PolynomialRing(R, "x")[1], rand(1:5), rand(1:5))
-
-   for i in 1:2
-      A = rand(M, 1:5, 0:100)
-      r = rank(A)
-      P = weak_popov(A)
-      @test is_weak_popov(P, r)
-
-      P, U = weak_popov_with_trafo(A)
-      @test is_weak_popov(P, r)
-      @test U*A == P
-      @test isunit(det(U))
-   end
 
    println("PASS")
 end
@@ -1313,18 +1198,15 @@ function test_gen_matalg()
    test_gen_matalg_rref()
    test_gen_matalg_inversion()
    test_gen_matalg_hessenberg()
-   test_gen_matalg_kronecker_product()
    test_gen_matalg_charpoly()
    test_gen_matalg_minpoly()
    test_gen_matalg_row_swapping()
-   test_gen_matalg_concat()
-   test_gen_matalg_hnf_minors()
+#   test_gen_matalg_hnf_minors() # see bug 160
    test_gen_matalg_hnf_kb()
    test_gen_matalg_hnf_cohen()
    test_gen_matalg_hnf()
    test_gen_matalg_snf_kb()
    test_gen_matalg_snf()
-   test_gen_matalg_weak_popov()
 
    println("")
 end

@@ -66,7 +66,7 @@ Markdown.doc"""
     eye(x::AbstractAlgebra.MatElem, d::Int)
 > Return the $d$-by-$d$ identity matrix with the same base ring as $x$.
 """
-function eye(x::AbstractAlgebra.MatElem, d::Int)
+function eye(x::MatrixElem, d::Int)
   z = similar(x, d, d)
   for i in 1:rows(z)
     z[i, i] = one(base_ring(x))
@@ -2246,7 +2246,7 @@ Markdown.doc"""
 > Returns `true` if $M$ is in Hessenberg form, otherwise returns `false`.
 """
 function ishessenberg(A::MatrixElem{T}) where {T <: RingElement}
-   if issquare(A)
+   if !issquare(A)
       return false
    end
    n = rows(A)
