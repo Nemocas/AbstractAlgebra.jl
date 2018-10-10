@@ -1,13 +1,17 @@
 # Matrix Interface
 
-Generic matrices are supported in AbstractAlgebra.jl. As the space of $m\times n$
-matrices over a commutative ring is not itself a commutative ring, not all of the Ring
-interface needs to be implemented for matrices in general.
+Generic matrices are supported in AbstractAlgebra.jl. Both the space of $m\times n$ 
+matrices and the algebra (ring) of $m\times m$ matrices are supported.
+
+As the space of $m\times n$ matrices over a commutative ring is not itself a commutative
+ring, not all of the Ring interface needs to be implemented for such matrices in.
 
 In particular, the following functions do not need to be implemented: `isdomain_type`,
-`needs_parentheses`, `displayed_with_minus_in_front`, `show_minus_one` and `divexact`. The `canonical_unit`
-function should be implemented, but simply needs to return the corresponding value for
-entry $1, 1$ (the function is never called on empty matrices).
+`needs_parentheses`, `displayed_with_minus_in_front`, `show_minus_one` and `divexact`.
+The `canonical_unit` function should be implemented, but simply needs to return the
+corresponding value for entry $[1, 1]$ (the function is never called on empty matrices).
+
+For matrix algebras, all of the ring interface must be implemented.
 
 Note that AbstractAlgebra.jl matrices are not the same as Julia matrices. We store a
 base ring in our matrix and matrices are row major instead of column major in order to
@@ -21,15 +25,20 @@ performance.
 AbstractAlgebra provides two abstract types for matrix spaces and their elements:
 
   * `MatSpace{T}` is the abstract type for matrix space parent types
-  * `MatElem{T}` is the abstract type for matrix types
+  * `MatElem{T}` is the abstract type for matrix types belonging to a matrix space
 
-Note that both abstract types are parameterised. The type `T` should usually be the type
-of elements of the matrices.
+It also provides two abstract types for matrix algebras and their elements:
 
-Matrix spaces should be made unique on the system by caching parent objects (unless
-an optional `cache` parameter is set to `false`). Matrix spaces should at least be
-distinguished based on their base (coefficient) ring and the dimensions of the matrices
-in the space.
+  * `MatAlgebra{T}` is the abstract type for matrix algebra parent types
+  * `MatAlgElem{T}` is the abstract type for matrix types belonging to a matrix algebra
+
+Note that these abstract types are parameterised. The type `T` should usually be the
+type of elements of the matrices.
+
+Matrix spaces and matrix algebras should be made unique on the system by caching parent
+objects (unless an optional `cache` parameter is set to `false`). Matrix spaces and
+algebras should at least be distinguished based on their base (coefficient) ring and the 
+dimensions of the matrices in the space.
 
 See `src/generic/GenericTypes.jl` for an example of how to implement such a cache (which
 usually makes use of a dictionary).
@@ -40,14 +49,17 @@ In addition to the required (relevant) functionality for the Ring interface (see
 the following functionality is required for the Matrix interface.
 
 We suppose that `R` is a fictitious base ring (coefficient ring) and that `S` is a
-space of $m\times n$ matrices over `R` with parent object `S` of type
-`MyMatSpace{T}`. We also assume the matrices in the space have type `MyMat{T}`, where
-`T` is the type of elements of the base (element) ring.
+space of $m\times n$ matrices over `R`, or algebra of $m\times m$ matrices with parent
+object `S` of type `MyMatSpace{T}` or `MyMatAlgebra{T}`, respectively. We also assume
+the matrices in the space have type `MyMat{T}`, where `T` is the type of elements of
+the base (element) ring.
 
 Of course, in practice these types may not be parameterised, but we use parameterised
 types here to make the interface clearer.
 
 Note that the type `T` must (transitively) belong to the abstract type `RingElem`.
+
+Currently only matrices over commutative rings are supported.
 
 ### Constructors
 
@@ -56,39 +68,48 @@ elements, must be available.
 
 ```julia
 (S::MyMatSpace{T})(A::Array{T, 2}) where T <: AbstractAlgebra.RingElem
+(S::MyMatAlgebra{T})(A::Array{T, 2}) where T <: AbstractAlgebra.RingElem
 ```
 
-Create the matrix in the given space whose $(i, j)$ entry is given by `A[i, j]`.
+Create the matrix in the given space/algebra whose $(i, j)$ entry is given by `A[i, j]`.
 
 ```julia
 (S::MyMatSpace{T})(A::Array{S, 2}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}
+(S::MyMatAlgebra{T})(A::Array{S, 2}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}
 ```
 
-Create the matrix in the given space whose $(i, j)$ entry is given by `A[i, j]`, where
-`S` is the type of elements that can be coerced into the base ring of the matrix.
+Create the matrix in the given space/algebra whose $(i, j)$ entry is given by `A[i, j]`,
+where `S` is the type of elements that can be coerced into the base ring of the matrix.
 
 ```julia
 (S::MyMatSpace{T})(A::Array{S, 1}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}
+(S::MyMatAlgebra{T})(A::Array{S, 1}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}
 ```
 
-Create the matrix in the given space of matrices (with dimensions $m\times n$ say),
-whose $(i, j)$ entry is given by `A[i*(n - 1) + j]` and where `S` is the type of
+Create the matrix in the given space/algebra of matrices (with dimensions $m\times n$
+say), whose $(i, j)$ entry is given by `A[i*(n - 1) + j]` and where `S` is the type of
 elements that can be coerced into the base ring of the matrix.
 
 **Examples**
 
 ```julia
 S = MatrixSpace(QQ, 2, 3)
+T = MatrixAlgebra(QQ, 2)
 
 M1 = S(Rational{BigInt}[2 3 1; 1 0 4])
 M2 = S(BigInt[2 3 1; 1 0 4])
 M3 = S(BigInt[2, 3, 1, 1, 0, 4])
+
+N1 = T(Rational{BigInt}[2 3; 1 0])
+N2 = T(BigInt[2 3; 1 0])
+N3 = T(BigInt[2, 3, 1, 1])
 ```
 
-It is also possible to create matrices directly, without first creating the
-corresponding matrix space (the inner constructor should be called directly). Note that
-to support this, matrix space parent objects don't contain a reference to their parent.
-Instead, parents are constructed on-the-fly if requested.
+It is also possible to create matrices (in a matrix space only) directly, without first
+creating the corresponding matrix space (the inner constructor being called directly).
+Note that to support this, matrix space parent objects don't contain a reference to
+their parent. Instead, parents are constructed on-the-fly if requested. (The same
+strategy is used for matrix algebras.)
 
 ```julia
 matrix(R::Ring, arr::Array{T, 2}) where T <: AbstractAlgebra.RingElem
@@ -119,6 +140,9 @@ identity_matrix(R::Ring, n::Int)
 
 Construct the $n\times n$ AbstractAlgebra.jl identity matrix over the ring `R`.
 
+The following functions are available for matrices in both matrix algebras and matrix
+spaces.
+
 ```julia
 similar(x::MyMat{T}) where T <: AbstractAlgebra.RingElem
 ```
@@ -129,7 +153,8 @@ Construct the zero matrix with the same dimensions and base ring as the given ma
 similar(x::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
 ```
 
-Construct the $r\times c$ zero matrix with the same base ring as the given matrix.
+Construct the $r\times c$ zero matrix with the same base ring as the given matrix. If
+$x$ belongs to a matrix algebra and $r \neq c$, an exception is raised.
 
 **Examples**
 
@@ -140,6 +165,10 @@ P = zero_matrix(ZZ, 3, 2)
 Q = identity_matrix(ZZ, 4)
 C = similar(P)
 D = similar(Q, 4, 5)
+
+R = MatrixAlgebra(ZZ, 2)
+M = R()
+F = similar(M)
 ```
 
 ### Basic manipulation of matrices
@@ -211,6 +240,9 @@ performance reasons.
 
 ### Optional constructors
 
+The following can only be used to construct matrices in a matrix space, not a matrix
+algebra.
+
 ```julia
 eye(M::MyMat{T}) where T <: AbstractAlgebra.RingElem
 ```
@@ -234,6 +266,8 @@ P = eye(M, 2)
 ```
 
 ### Optional submatrices
+
+The following are only available for matrix spaces, not for matrix algebras.
 
 ```julia
 sub(M::MyMat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: AbstractAlgebra.RingElem
@@ -270,6 +304,8 @@ swap_rows!(M, 1, 2)
 ```
 
 ### Optional concatenation
+
+The following are only available for matrix spaces, not for matrix algebras.
 
 ```julia
 hcat(M::MyMat{T}, N::MyMat{T}) where T <: AbstractAlgebra.RingElem
