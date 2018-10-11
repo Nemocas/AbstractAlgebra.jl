@@ -141,6 +141,8 @@ function test_gen_matalg_manipulation()
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
    B = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])
 
+   @test isexact_type(typeof(A))
+
    @test iszero(zero(S))
    @test isone(one(S))
 
@@ -286,6 +288,20 @@ function test_gen_matalg_powering()
    println("PASS")
 end
 
+function test_gen_matalg_exact_division()
+   print("Generic.MatAlg.exact_division...")
+
+   S = MatrixAlgebra(QQ, 3)
+
+   M = rand(S, -20:20)
+   N = randmat_with_rank(S, 3, -20:20)
+
+   @test divexact_right(M*N, N) == M
+   @test divexact_left(N*M, N) == M
+
+   println("PASS")
+end
+   
 function test_gen_matalg_adhoc_exact_division()
    print("Generic.MatAlg.adhoc_exact_division...")
 
@@ -1185,6 +1201,7 @@ function test_gen_matalg()
    test_gen_matalg_comparison()
    test_gen_matalg_adhoc_comparison()
    test_gen_matalg_powering()
+   test_gen_matalg_exact_division()
    test_gen_matalg_adhoc_exact_division()
    test_gen_matalg_transpose()
    test_gen_matalg_gram()

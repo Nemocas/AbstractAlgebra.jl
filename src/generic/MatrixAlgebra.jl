@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export MatrixAlgebra, dimension
+export MatrixAlgebra, dimension, divexact_left, divexact_right
 
 ###############################################################################
 #
@@ -35,6 +35,8 @@ function check_parent(a::AbstractAlgebra.MatAlgElem{T}, b::AbstractAlgebra.MatAl
   (base_ring(a) != base_ring(b) || dimension(a) != dimension(b)) &&
                 error("Incompatible matrix spaces in matrix operation")
 end
+
+isexact_type(::Type{MatAlgElem{T}}) where T <: RingElement = isexact_type(T)
 
 ###############################################################################
 #
@@ -138,7 +140,11 @@ function show(io::IO, a::AbstractAlgebra.MatAlgebra)
    print(io, base_ring(a))
 end
 
-show_minus_one(::Type{AbstractAlgebra.MatAlgElem{T}}) where {T <: RingElement} = false
+show_minus_one(::Type{AbstractAlgebra.MatAlgElem{T}}) where T <: RingElement = false
+
+needs_parentheses(a::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement = true
+
+displayed_with_minus_in_front(a::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement = false
 
 ###############################################################################
 #
@@ -202,6 +208,22 @@ function ==(x::AbstractAlgebra.MatAlgElem{T}, y::T) where {T <: RingElem}
       end
    end
    return true
+end
+
+###############################################################################
+#
+#   Exact division
+#
+###############################################################################
+
+function divexact_left(f::AbstractAlgebra.MatAlgElem{T},
+                       g::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement
+   return inv(g)*f
+end
+
+function divexact_right(f::AbstractAlgebra.MatAlgElem{T},
+                       g::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement
+   return f*inv(g)
 end
 
 ###############################################################################
@@ -360,6 +382,49 @@ function minpoly(S::Ring, M::MatAlgElem{T}, charpoly_only::Bool = false) where {
    MS.base_ring = base_ring(M)
    return minpoly(S, MS, charpoly_only)
 end
+
+###############################################################################
+#
+#   Unsafe operators
+#
+###############################################################################
+
+function zero!(M::MatAlgElem{T}) where T <: RingElement
+   n = dimension(M)
+   R = base_ring(M)
+   for i = 1:n
+      for j = 1:n
+         M.entries[i, j] = R()
+      end
+   end
+   return M
+end
+
+function mul!(A::MatAlgElem{T}, B::MatAlgElem{T},
+                                C::MatAlgElem{T}) where T <: RingElement
+   return B*C
+end
+
+function add!(A::MatAlgElem{T}, B::MatAlgElem{T},
+                                C::MatAlgElem{T}) where T <: RingElement
+   n = dimension(A)
+   for i = 1:n
+      for j = 1:n
+         A.entries[i, j] = B.entries[i, j] + C.entries[i, j]
+      end
+   end
+   return A
+end
+
+function addeq!(A::MatAlgElem{T}, B::MatAlgElem{T}) where T <: RingElement
+   n = dimension(A)
+   for i = 1:n
+      for j = 1:n
+         addeq!(A.entries[i, j], B.entries[i, j])
+      end
+   end
+   return A
+end   
 
 ###############################################################################
 #

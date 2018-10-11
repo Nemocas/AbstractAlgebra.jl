@@ -105,17 +105,6 @@ the type of the elements. For example, this is the case for the ring of integers
 in fact for any ring element type that isn't parameterised or generic in any way.
 
 ```julia
-isdomain_type(::Type{MyElem})
-```
-
-Returns `true` if every element of the given element type (which may be parameterised
-or an abstract type) necessarily has a parent that is an integral domain, otherwise
-if this cannot be guaranteed, the function returns `false`. 
-
-Note that this function depends only on the type of an element and cannot access
-information about the object itself, or its parent.
-
-```julia
 isexact_type(::Type{MyElem})
 ```
 
