@@ -1,31 +1,20 @@
-# Ring Interface
+# Noncommutative ring Interface
 
 AbstractAlgebra.jl generic code makes use of a standardised set of functions which it
-expects to be implemented for all rings. Here we document this interface. All libraries
-which want to make use of the generic capabilities of AbstractAlgebra.jl must supply
-all of the required functionality for their rings.
+expects to be implemented for all noncommutative rings. Here we document this interface. 
 
-In addition to the required functions, there are also optional functions which can be
-provided for certain types of rings, e.g. GCD domains or fields, etc. If implemented,
-these allow the generic code to provide additional functionality for those rings, or in
-some cases, to select more efficient algorithms.
+All libraries which want to make use of the generic capabilities of AbstractAlgebra.jl
+must supply all of the required functionality for their noncommutative rings.
 
 ## Types
 
-Most rings must supply two types:
+Most noncommutative rings must supply two types:
   - a type for the parent object (representing the ring itself)
   - a type for elements of that ring
 
-For example, the generic univariate polynomial type in AbstractAlgebra.jl provides two 
-types in generic/GenericTypes.jl: 
-
-  - `Generic.PolyRing{T}` for the parent objects
-  - `Generic.Poly{T}` for the actual polynomials
-
-The parent type must belong to `AbstractAlgebra.Ring` and the element type must belong
-to `AbstractAlgebra.RingElem`. Of course, the types may belong to these abstract types
-transitively, e.g. `Poly{T}` actually belongs to `AbstractAlgebra.PolyElem{T}` which in
-turn belongs to `AbstractAlgebra.RingElem`.
+The parent type must belong to `AbstractAlgebra.NCRing` and the element type must belong
+to `AbstractAlgebra.NCRingElem`. Of course, the types may belong to these abstract types
+transitively via an intermediate abstract type.
 
 For parameterised rings, we advise that the types of both the parent objects and
 element objects to be parameterised by the types of the elements of the base ring
@@ -61,8 +50,9 @@ construct and handle such caches.
 
 ## Required functions for all rings
 
-In the following, we list all the functions that are required to be provided for rings
-in AbstractAlgebra.jl or by external libraries wanting to use AbstractAlgebra.jl.
+In the following, we list all the functions that are required to be provided for
+noncommutative rings in AbstractAlgebra.jl or by external libraries wanting to use
+AbstractAlgebra.jl.
 
 We give this interface for fictitious types `MyParent` for the type of the ring parent
 object `R` and `MyElem` for the type of the elements of the ring.
@@ -94,16 +84,9 @@ base_ring(R::MyParent)
 ```
 
 Given a parent object `R`, representing a ring, this function returns the parent object
-of any base ring that parameterises this ring. For example, the base ring of the ring
-of polynomials over the integers would be the integer ring.
+of any base ring that parameterises this ring.
 
 If the ring is not parameterised by another ring, this function must return `Union{}`.
-
-Note that there is a distinction between a base ring and other kinds of parameters. For
-example, in the ring $\mathbb{Z}/n\mathbb{Z}$, the modulus $n$ is a parameter, but the
-only base ring is $\mathbb{Z}$. We consider the ring $\mathbb{Z}/n\mathbb{Z}$ to have
-been constructed from the base ring $\mathbb{Z}$ by taking its quotient by a (principal)
-ideal.
 
 ```julia
 parent(f::MyElem)
@@ -129,13 +112,6 @@ Returns `true` if every element of the given element type (which may be paramete
 or an abstract type) necessarily has a parent that is an integral domain, otherwise
 if this cannot be guaranteed, the function returns `false`. 
 
-For example, if `MyElem` was the type of elements of generic residue rings of a
-polynomial ring, the answer to the question would depend on the modulus of the residue 
-ring. Therefore `isdomain_type` would have to return `false`, since we cannot guarantee
-that we are dealing with elements of an integral domain in general. But if the given
-element type was for rational integers, the answer would be `true`, since every rational
-integer has as parent the ring of rational integers, which is an integral domain.
-
 Note that this function depends only on the type of an element and cannot access
 information about the object itself, or its parent.
 
@@ -143,13 +119,7 @@ information about the object itself, or its parent.
 isexact_type(::Type{MyElem})
 ```
 
-Returns `true` if every element of the given type is represented exactly. For example,
-$p$-adic numbers, real and complex floating point numbers and power series are not
-exact, as we can only represent them in general with finite truncations. Similarly
-polynomials and matrices over inexact element types are themselves inexact.
-
-Integers, rationals, finite fields and polynomials and matrices over them are always
-exact.
+Returns `true` if every element of the given type is represented exactly.
 
 Note that `MyElem` may be parameterised or an abstract type, in which case every
 element of every type represented by `MyElem` must be exact, otherwise the function
@@ -249,29 +219,6 @@ isone(f::MyElem)
 
 Return `true` if the given element is the multiplicative identity of the ring it belongs
 to.
-
-### Canonicalisation
-
-```julia
-canonical_unit(f::MyElem)
-```
-
-When fractions are created with two elements of the given type, it is nice to be able
-to represent them in some kind of canonical form. This is of course not always possible.
-But for example, fractions of integers can be canonicalised by first removing any common
-factors of the numerator and denominator, then making the denominator positive.
-
-In AbstractAlgebra.jl, the denominator would be made positive by dividing both the
-numerator and denominator by the canonical unit of the denominator. For a negative
-denominator, this would be $-1$.
-
-For elements of a field, `canonical_unit` simply returns the element itself. In general,
-`canonical_unit` of an invertible element should be that element. Finally, if $a = ub$
-we should have the identity `canonical_unit(a) = canonical_unit(u)*canonical_unit(b)`.
-
-For some rings, it is completely impractical to implement this function, in which case
-it may return $1$ in the given ring. The function must however always exist, and always
-return an element of the ring.
 
 ### String I/O
 
@@ -382,19 +329,20 @@ make sense but are passed to the function.
 ### Exact division
 
 ```julia
-divexact(f::MyElem, g::MyElem)
+divexact_left(f::MyElem, g::MyElem)
+divexact_right(f::MyElem, g::MyElem)
 ```
 
-Returns $f/g$, though note that Julia uses `/` for floating point division. Here we
-mean exact division in the ring, i.e. return $q$ such that $f = gq$. A `DivideError()`
-should be thrown if $g$ is zero. If no exact quotient exists or an impossible inverse
-is unavoidably encountered, an error should be thrown.
+If $f = ga$ for some $a$ in the ring, the function `divexact_left(f, g)` returns `a`. If
+$f = ag$ then `divexact_right(f, g)` returns `a`. A `DivideError()` should be thrown
+if division is by zero. If no exact quotient exists or an impossible inverse is
+unavoidably encountered, an error should be thrown.
 
 ### Unsafe operators
 
-To speed up polynomial and matrix arithmetic, it sometimes makes sense to mutate values
-in place rather than replace them with a newly created object every time they are
-modified.
+To speed up arithmetic of objects built over a given ring, it sometimes makes sense to
+mutate values in place rather than replace them with a newly created object every time
+they are modified.
 
 For this purpose, certain mutating operators are required. In order to support immutable
 types (struct in Julia) and systems that don't have in-place operators, all unsafe
@@ -598,16 +546,6 @@ hoc operators with elements of the base ring.
 
 ```julia
 ==(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem
-```
-
-### Optional ad hoc exact division functions
-
-```julia
-divexact(a::MyType{T}, b::T) where T <: AbstractAlgebra.RingElem
-```
-
-```julia
-divexact(a::MyType, b::Integer)
 ```
 
 ### Optional powering functions

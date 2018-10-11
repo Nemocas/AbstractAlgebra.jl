@@ -10,6 +10,7 @@ makedocs(
              "index.md",
              "constructors.md",
              "Rings" => [ "rings.md",
+                          "ncrings.md",
                           "euclidean.md",
                           "integer.md",
                           "polynomial_rings.md",
