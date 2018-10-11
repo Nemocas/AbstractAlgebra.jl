@@ -805,7 +805,6 @@ end
 #
 ###############################################################################
 
-# not really a mathematical ring
 mutable struct MatAlgebra{T <: RingElement} <: AbstractAlgebra.MatAlgebra{T}
    n::Int
    base_ring::Ring

@@ -42,27 +42,27 @@ The generic matrix algebra matrix types belong to the abstract type
  `AbstractAlgebra.MatAlgebra{T}` Note that both of these require disambiguation from
 the concrete types in `Generic` of the same name.
 
-The dimension and base ring $R$ of a generic matrix are stored in its parent object,
+The degree and base ring $R$ of a generic matrix are stored in its parent object,
 however to allow creation of matrices without first creating the matrix space parent,
 generic matrices in Julia do not contain a reference to their parent. They contain the
-row and column numbers (or dimension, in the case of matrix algebras) and the base ring
+row and column numbers (or degree, in the case of matrix algebras) and the base ring
 on a per matrix basis. The parent object can then be reconstructed from this data on
 demand.
 
 ## Matrix space constructors
 
 A matrix algebra in AbstractAlgebra.jl represents a collection of all matrices with
-given dimension and base ring.
+given degree and base ring.
 
 In order to construct matrices in AbstractAlgebra.jl, one must construct the
 matrix algebra itself. This is accomplished with the following constructor.
 
 ```julia
-MatrixAlgebra(R::Ring, dimension::Int; cache::Bool=true)
+MatrixAlgebra(R::Ring, degree::Int; cache::Bool=true)
 ```
 
-Construct the algebra of matrices with the given dimension over the given base ring. By
-default such matrix spaces are cached based on the base ring and dimension. If the
+Construct the algebra of matrices with the given degree over the given base ring. By
+default such matrix spaces are cached based on the base ring and degree. If the
 optional named parameter `cached` is set to false, no caching occurs.
 
 Here are some examples of creating matrix algebras and making use of the
@@ -99,7 +99,7 @@ As well as the Ring and Matrix interfaces, the following functions are provided 
 manipulate matrices.
 
 ```@docs
-dimension(::MatAlgElem)
+degree(::MatAlgElem)
 ```
 
 **Examples**
@@ -110,6 +110,6 @@ S = MatrixAlgebra(R, 3)
 
 A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
-n = dimension(A)
+n = degree(A)
 ```
 

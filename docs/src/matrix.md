@@ -43,7 +43,7 @@ intended. The same is true for the abstract types for matrix spaces and their el
 The dimensions and base ring $R$ of a generic matrix are stored in its parent object,
 however to allow creation of matrices without first creating the matrix space parent,
 generic matrices in Julia do not contain a reference to their parent. They contain the
-row and column numbers (or dimension, in the case of matrix algebras) and the base ring
+row and column numbers (or degree, in the case of matrix algebras) and the base ring
 on a per matrix basis. The parent object can then be reconstructed from this data on
 demand.
 

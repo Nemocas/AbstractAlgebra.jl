@@ -126,7 +126,7 @@ function test_gen_matalg_size()
    S = MatrixAlgebra(QQ, 3)
    A = S([1 2 3; 4 5 6; 7 8 9])
 
-   @test dimension(A) == 3
+   @test degree(A) == 3
    @test issquare(A)
 
    println("PASS")

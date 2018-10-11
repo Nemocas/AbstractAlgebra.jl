@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export MatrixAlgebra, dimension, divexact_left, divexact_right
+export MatrixAlgebra, divexact_left, divexact_right
 
 ###############################################################################
 #
@@ -32,7 +32,7 @@ parent(a::AbstractAlgebra.MatAlgElem{T}, cached::Bool = true) where T <: RingEle
     MatAlgebra{T}(a.base_ring, size(a.entries)[1], cached)
 
 function check_parent(a::AbstractAlgebra.MatAlgElem{T}, b::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement
-  (base_ring(a) != base_ring(b) || dimension(a) != dimension(b)) &&
+  (base_ring(a) != base_ring(b) || degree(a) != degree(b)) &&
                 error("Incompatible matrix spaces in matrix operation")
 end
 
@@ -55,7 +55,11 @@ function Base.hash(a::MatAlgElem, h::UInt)
    return b
 end
 
-dimension(a::MatAlgElem) = size(a.entries, 1)
+Markdown.doc"""
+    degree(a::MatAlgebra)
+> Return the degree $n$ of the $n\times n$ matrix $a$..
+"""
+degree(a::MatAlgElem) = size(a.entries, 1)
 
 Markdown.doc"""
     zero(a::AbstractAlgebra.MatAlgebra)
@@ -135,7 +139,7 @@ issquare(a::MatAlgElem) = true
 ###############################################################################
 
 function show(io::IO, a::AbstractAlgebra.MatAlgebra)
-   print(io, "Matrix Algebra of dimension ")
+   print(io, "Matrix Algebra of degree ")
    print(io, a.n, " over ")
    print(io, base_ring(a))
 end
@@ -153,7 +157,7 @@ displayed_with_minus_in_front(a::AbstractAlgebra.MatAlgElem{T}) where T <: RingE
 ###############################################################################
 
 function *(x::AbstractAlgebra.MatAlgElem{T}, y::AbstractAlgebra.MatAlgElem{T}) where {T <: RingElement}
-   dimension(x) != dimension(y) && error("Incompatible matrix dimensions")
+   degree(x) != degree(y) && error("Incompatible matrix degrees")
    A = similar(x)
    C = base_ring(x)()
    for i = 1:rows(x)
@@ -175,7 +179,7 @@ end
 ###############################################################################
 
 function ==(x::AbstractAlgebra.MatAlgElem, y::Union{Integer, Rational, AbstractFloat})
-   n = dimension(x)
+   n = degree(x)
    for i = 1:n
       if x[i, i] != y
          return false
@@ -194,7 +198,7 @@ end
 ==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.MatAlgElem) = y == x
 
 function ==(x::AbstractAlgebra.MatAlgElem{T}, y::T) where {T <: RingElem}
-   n = dimension(x)
+   n = degree(x)
    for i = 1:n
       if x[i, i] != y
          return false
@@ -250,7 +254,7 @@ Markdown.doc"""
 > $i$-th and $j$-th rows, respectively.
 """
 function gram(x::AbstractAlgebra.MatAlgElem)
-   n = dimension(x)
+   n = degree(x)
    z = similar(x)
    for i = 1:n
       for j = 1:n
@@ -271,7 +275,7 @@ end
 
 function rand(S::AbstractAlgebra.MatAlgebra, v...)
    M = S()
-   n = dimension(M)
+   n = degree(M)
    R = base_ring(S)
    for i = 1:n
       for j = 1:n
@@ -283,7 +287,7 @@ end
 
 function randmat_triu(S::AbstractAlgebra.MatAlgebra, v...)
    M = S()
-   n = dimension(M)
+   n = degree(M)
    R = base_ring(S)
    for i = 1:n
       for j = 1:i - 1
@@ -301,7 +305,7 @@ end
 
 function randmat_with_rank(S::Generic.MatAlgebra{T}, rank::Int, v...) where {T <: AbstractAlgebra.RingElement}
    M = S()
-   n = dimension(M)
+   n = degree(M)
    R = base_ring(S)
    for i = 1:rank
       for j = 1:i - 1
@@ -390,7 +394,7 @@ end
 ###############################################################################
 
 function zero!(M::MatAlgElem{T}) where T <: RingElement
-   n = dimension(M)
+   n = degree(M)
    R = base_ring(M)
    for i = 1:n
       for j = 1:n
@@ -407,7 +411,7 @@ end
 
 function add!(A::MatAlgElem{T}, B::MatAlgElem{T},
                                 C::MatAlgElem{T}) where T <: RingElement
-   n = dimension(A)
+   n = degree(A)
    for i = 1:n
       for j = 1:n
          A.entries[i, j] = B.entries[i, j] + C.entries[i, j]
@@ -417,7 +421,7 @@ function add!(A::MatAlgElem{T}, B::MatAlgElem{T},
 end
 
 function addeq!(A::MatAlgElem{T}, B::MatAlgElem{T}) where T <: RingElement
-   n = dimension(A)
+   n = degree(A)
    for i = 1:n
       for j = 1:n
          addeq!(A.entries[i, j], B.entries[i, j])
@@ -500,7 +504,7 @@ Markdown.doc"""
 > Return parent object corresponding to the ring of $n\times n$ matrices over
 > the ring $R$. If `cached == true` (the default), the returned parent object
 > is cached so that it can returned by future calls to the constructor with the
-> same dimensions and base ring.
+> same degree and base ring.
 """
 function MatrixAlgebra(R::AbstractAlgebra.Ring, n::Int, cached::Bool = true)
    T = elem_type(R)

@@ -600,6 +600,8 @@ end
 #
 ###############################################################################
 
+Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, T <: MatElem} = x^p
+
 Markdown.doc"""
     ^(a::AbstractAlgebra.MatElem, b::Int)
 > Return $a^b$. We require $b \geq 0$ and that the matrix $a$ is square.
