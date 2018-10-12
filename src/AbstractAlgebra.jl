@@ -26,15 +26,15 @@ import Base: Array, abs, acos, acosh, asin, asinh, atan, atanh,
 
 export elem_type, parent_type
 
-export SetElem, GroupElem, RingElem, ModuleElem, FieldElem, RingElement,
+export SetElem, GroupElem, NCRingElem, RingElem, ModuleElem, FieldElem, RingElement,
        FieldElement, Map, AccessorNotSetError
 
 export SetMap, FunctionalMap, IdentityMap
 
 export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
-       MatElem, FinFieldElem, MPolyElem
+       MatElem, MatAlgElem, FinFieldElem, MPolyElem
 
-export PolyRing, SeriesRing, ResRing, FracField, MatSpace,
+export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
        FinField, MPolyRing
 
 export ZZ, QQ, zz, qq, RealField, RDF
@@ -124,8 +124,10 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached, canonical_unit, chang
                  chebyshev_u, _check_dim, check_parent, codomain, coeff, cols,
                  compose, content, cycles, data, deflate, degree,
                  denominator, derivative, det, det_clow,
-                 det_df, det_fflu, det_popov, dim, disable_cache!, discriminant,
-                 displayed_with_minus_in_front, divexact, divides, divrem, domain, downscale,
+                 det_df, det_fflu, det_popov, dim, disable_cache!, 
+                 discriminant, displayed_with_minus_in_front,
+                 divexact, divexact_left, divexact_right, divides,
+                 divrem, domain, downscale,
                  elem_type, enable_cache!, evaluate, exp_gcd,
                  extended_weak_popov, extended_weak_popov_with_trafo, fflu!,
                  fflu, find_pivot_popov, fit!, gcd, gen,
@@ -156,7 +158,8 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached, canonical_unit, chang
                  perm, permtype, @perm_str, polcoeff, pol_length,
                  powmod, pow_multinomial, popov, popov_with_trafo,
                  powers, precision,
-                 preimage_map, primpart, pseudodivrem, pseudorem, randmat_triu,
+                 preimage_map, primpart, pseudodivrem,
+                 pseudorem, rank, randmat_triu,
                  randmat_with_rank, rand_ordering, rank_profile_popov, remove,
                  renormalize!, rescale!, resultant,
                  resultant_ducos, resultant_euclidean,
@@ -178,8 +181,10 @@ export add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_rin
                  chebyshev_u, _check_dim, check_parent, codomain, coeff, cols,
                  compose, content, cycles, data, deflate, degree,
                  denominator, derivative, det, det_clow,
-                 det_df, det_fflu, det_popov, dim, disable_cache!, discriminant,
-                 displayed_with_minus_in_front, divexact, divides, divrem, domain, downscale,
+                 det_df, det_fflu, det_popov, dim, disable_cache!,
+                 discriminant, displayed_with_minus_in_front,
+                 divexact, divexact_left, divexact_right, divides,
+                 divrem, domain, downscale,
                  elem_type, enable_cache!, evaluate, exp_gcd,
                  extended_weak_popov, extended_weak_popov_with_trafo, fflu!,
                  fflu, find_pivot_popov, fit!, gcd, gen, 
@@ -209,7 +214,7 @@ export add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_rin
                  powmod, pow_multinomial,
                  popov, popov_with_trafo, powers, ppio, 
                  precision, preimage_map, primpart,
-                 pseudodivrem, pseudorem, randmat_triu, randmat_with_rank,
+                 pseudodivrem, pseudorem, rank, randmat_triu, randmat_with_rank,
                  rand_ordering, rank_profile_popov, remove,
                  renormalize!, resultant,
                  resultant_ducos, rescale!, resultant_euclidean,
@@ -362,6 +367,10 @@ function MatrixSpace(R::Ring, r::Int, c::Int, cached::Bool = true)
    Generic.MatrixSpace(R, r, c, cached)
 end
 
+function MatrixAlgebra(R::Ring, n::Int, cached::Bool = true)
+   Generic.MatrixAlgebra(R, n, cached)
+end
+
 function FractionField(R::Ring; cached=true)
    Generic.FractionField(R; cached=cached)
 end
@@ -388,8 +397,8 @@ function crt(A...)
 end
 
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
-       FractionField, ResidueRing, Partition, PermGroup, YoungTableau,
-       AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
+       MatrixAlgebra, FractionField, ResidueRing, Partition, PermGroup,
+       YoungTableau, AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
        PuiseuxSeriesField
 

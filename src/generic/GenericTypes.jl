@@ -778,7 +778,7 @@ mutable struct MatSpace{T <: RingElement} <: AbstractAlgebra.MatSpace{T}
    end
 end
 
-const MatDict = Dict{Tuple{Ring, Int, Int}, Ring}()
+const MatDict = Dict{Tuple{Ring, Int, Int}, MatSpace}()
 
 mutable struct Mat{T <: RingElement} <: AbstractAlgebra.MatElem{T}
    entries::Array{T, 2}
@@ -798,6 +798,52 @@ mutable struct Mat{T <: RingElement} <: AbstractAlgebra.MatElem{T}
       return new{T}(t)
    end
 end
+
+###############################################################################
+#
+#   MatAlgebra / MatAlgElem
+#
+###############################################################################
+
+mutable struct MatAlgebra{T <: RingElement} <: AbstractAlgebra.MatAlgebra{T}
+   n::Int
+   base_ring::Ring
+
+   function MatAlgebra{T}(R::Ring, n::Int, cached::Bool = true) where T <: RingElement     
+      if haskey(MatAlgDict, (R, n))
+         return MatAlgDict[R, n]::MatAlgebra{T}
+      else
+         z = new{T}(n, R)
+         if cached
+            MatAlgDict[R, n] = z
+         end
+         return z
+      end
+   end
+end
+
+const MatAlgDict = Dict{Tuple{Ring, Int}, Ring}()
+
+mutable struct MatAlgElem{T <: RingElement} <: AbstractAlgebra.MatAlgElem{T}
+   entries::Array{T, 2}
+   base_ring::Ring
+
+   function MatAlgElem{T}(A::Array{T, 2}) where T <: RingElement
+      return new{T}(A)
+   end
+
+   function MatAlgElem{T}(n::Int, A::Array{T, 1}) where T <: RingElement
+      t = Array{T}(undef, n, n)
+      for i = 1:n
+         for j = 1:n
+            t[i, j] = A[(i - 1) * c + j]
+         end
+      end
+      return new{T}(t)
+   end
+end
+
+const MatrixElem{T} = Union{AbstractAlgebra.MatElem{T}, AbstractAlgebra.MatAlgElem{T}}
 
 ###############################################################################
 #

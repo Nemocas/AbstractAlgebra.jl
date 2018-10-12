@@ -32,8 +32,8 @@ import Base: floor, ceil, hypot, log, log1p, exp, expm1, sin, cos, sinpi,
              cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
              asinh, acosh, sinpi, cospi
 
-import AbstractAlgebra: Integers, Rationals, Ring, RingElem, RingElement, Field,
-             FieldElement, Map, promote_rule
+import AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring, RingElem,
+       RingElement, Field, FieldElement, Map, promote_rule
 
 using AbstractAlgebra
 
@@ -62,6 +62,8 @@ include("generic/LaurentSeries.jl")
 include("generic/PuiseuxSeries.jl")
 
 include("generic/Matrix.jl")
+
+include("generic/MatrixAlgebra.jl")
 
 include("generic/Fraction.jl")
 
