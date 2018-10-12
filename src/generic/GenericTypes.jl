@@ -331,6 +331,49 @@ end
 
 ###############################################################################
 #
+#   NCPolyRing / NCPoly
+#
+###############################################################################
+
+mutable struct NCPolyRing{T <: NCRingElem} <: AbstractAlgebra.NCPolyRing{T}
+   base_ring::NCRing
+   S::Symbol
+
+   function NCPolyRing{T}(R::NCRing, s::Symbol, cached::Bool = true) where T <: NCRingElem
+      if cached && haskey(NCPolyID, (R, s))
+         return NCPolyID[R, s]::NCPolyRing{T}
+      else
+         z = new{T}(R, s)
+         if cached
+           NCPolyID[R, s] = z
+         end
+         return z
+      end
+   end
+end
+
+const NCPolyID = Dict{Tuple{NCRing, Symbol}, NCRing}()
+
+mutable struct NCPoly{T <: NCRingElem} <: AbstractAlgebra.NCPolyElem{T}
+   coeffs::Array{T, 1}
+   length::Int
+   parent::NCPolyRing{T}
+
+   NCPoly{T}() where T <: NCRingElem = new{T}(Array{T}(undef, 0), 0)
+
+   function NCPoly{T}(b::Array{T, 1}) where T <: NCRingElem
+      z = new{T}(b)
+      z.length = normalise(z, length(b))
+      return z
+   end
+
+   NCPoly{T}(a::T) where T <: NCRingElem = iszero(a) ? new{T}(Array{T}(undef, 0), 0) : new{T}([a], 1)
+end
+
+const PolynomialElem{T} = Union{AbstractAlgebra.PolyElem{T}, AbstractAlgebra.NCPolyElem{T}}
+
+###############################################################################
+#
 #   MPolyRing / MPoly
 #
 ###############################################################################
@@ -822,7 +865,7 @@ mutable struct MatAlgebra{T <: RingElement} <: AbstractAlgebra.MatAlgebra{T}
    end
 end
 
-const MatAlgDict = Dict{Tuple{Ring, Int}, Ring}()
+const MatAlgDict = Dict{Tuple{Ring, Int}, NCRing}()
 
 mutable struct MatAlgElem{T <: RingElement} <: AbstractAlgebra.MatAlgElem{T}
    entries::Array{T, 2}
