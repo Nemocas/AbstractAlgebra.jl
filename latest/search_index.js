@@ -237,7 +237,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Ring Interface",
     "title": "Promotion rules",
     "category": "section",
-    "text": "In order for AbstractAlgebra to be able to automatically coerce up towers of rings, certain promotion rules must be defined. For every ring, one wants to be able to coerce integers into the ring. And for any ring constructed over a base ring, one would like to be able to coerce from the base ring into the ring.The promotion rules look a bit different depending on whether the element type is parameterised or not and whether it is built on a base ring.For ring element types MyElem that are neither parameterised, not built over a base ring, the promotion rules can be defined as follows:promote_rule(::Type{MyElem}, ::Type{T}) where {T <: Integer} = MyElemFor ring element types MyType that aren\'t parameterised, but which have a base ring with concrete element type T the promotion rules can be defined as follows:promote_rule(::Type{MyElem}, ::Type{U}) where U <: Integer = MyElempromote_rule(::Type{MyElem}, ::Type{T}) = MyElemFor ring element types MyElem{T} that are parameterised by the type of elements of the base ring, the promotion rules can be defined as follows:promote_rule(::Type{MyElem{T}}, ::Type{MyElem{T}}) where T <: RingElement = MyElem{T}function promote_rule(::Type{MyElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingEle\nment}\n   promote_rule(T, U) == T ? MyElem{T} : Union{}\nend"
+    "text": "In order for AbstractAlgebra to be able to automatically coerce up towers of rings, certain promotion rules must be defined. For every ring, one wants to be able to coerce integers into the ring. And for any ring constructed over a base ring, one would like to be able to coerce from the base ring into the ring.The promotion rules look a bit different depending on whether the element type is parameterised or not and whether it is built on a base ring.For ring element types MyElem that are neither parameterised nor built over a base ring, the promotion rules can be defined as follows:promote_rule(::Type{MyElem}, ::Type{T}) where {T <: Integer} = MyElemFor ring element types MyType that aren\'t parameterised, but which have a base ring with concrete element type T the promotion rules can be defined as follows:promote_rule(::Type{MyElem}, ::Type{U}) where U <: Integer = MyElempromote_rule(::Type{MyElem}, ::Type{T}) = MyElemFor ring element types MyElem{T} that are parameterised by the type of elements of the base ring, the promotion rules can be defined as follows:promote_rule(::Type{MyElem{T}}, ::Type{MyElem{T}}) where T <: RingElement = MyElem{T}function promote_rule(::Type{MyElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingEle\nment}\n   promote_rule(T, U) == T ? MyElem{T} : Union{}\nend"
 },
 
 {
@@ -307,6 +307,206 @@ var documenterSearchIndex = {"docs": [
 {
     "location": "rings.html#Optional-unsafe-operators-1",
     "page": "Ring Interface",
+    "title": "Optional unsafe operators",
+    "category": "section",
+    "text": "addmul!(c::MyElem, a::MyElem, b::MyElem, t::MyElem)Set c = c + ab in-place. Return the mutated value. The value t should be a temporary of the same type as a, b and c, which can be used arbitrarily by the implementation to speed up the computation. Aliasing between a, b and c is  permitted."
+},
+
+{
+    "location": "ncrings.html#",
+    "page": "Noncommutative ring Interface",
+    "title": "Noncommutative ring Interface",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "ncrings.html#Noncommutative-ring-Interface-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Noncommutative ring Interface",
+    "category": "section",
+    "text": "AbstractAlgebra.jl generic code makes use of a standardised set of functions which it expects to be implemented for all noncommutative rings. Here we document this interface. All libraries which want to make use of the generic capabilities of AbstractAlgebra.jl must supply all of the required functionality for their noncommutative rings."
+},
+
+{
+    "location": "ncrings.html#Types-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Types",
+    "category": "section",
+    "text": "Most noncommutative rings must supply two types:a type for the parent object (representing the ring itself)\na type for elements of that ringThe parent type must belong to AbstractAlgebra.NCRing and the element type must belong to AbstractAlgebra.NCRingElem. Of course, the types may belong to these abstract types transitively via an intermediate abstract type.For parameterised rings, we advise that the types of both the parent objects and element objects to be parameterised by the types of the elements of the base ring (see the function base_ring below for a definition).There can be variations on this theme: e.g. in some areas of mathematics there is a notion of a coefficient domain, in which case it may make sense to parameterise all types by the type of elements of this coefficient domain. But note that this may have implications for the ad hoc operators one might like to explicitly implement."
+},
+
+{
+    "location": "ncrings.html#Parent-object-caches-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Parent object caches",
+    "category": "section",
+    "text": "In many cases, it is desirable to have only one object in the system to represent each ring. This means that if the same ring is constructed twice, elements of the two rings will be compatible as far as arithmetic is concerned.In order to facilitate this, global caches of rings are stored in AbstractAlgebra.jl, usually implemented using dictionaries. For example, the Generic.PolyRing parent objects are looked up in a dictionary PolyID to see if they have been previously defined.Whether these global caches are provided or not, depends on both mathematical and algorithmic considerations. E.g. in the case of number fields, it isn\'t desirable to identify all number fields with the same defining polynomial, as they may be considered with distinct embeddings into one another. In other cases, identifying whether two rings  are the same may be prohibitively expensive. Generally, it may only make sense algorithmically to identify two rings if they were constructed from identical data.If a global cache is provided, it must be optionally possible to construct the parent objects without caching. This is done by passing a boolean value cached to the inner constructor of the parent object. See generic/GenericTypes.jl` for examples of how to construct and handle such caches."
+},
+
+{
+    "location": "ncrings.html#Required-functions-for-all-rings-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Required functions for all rings",
+    "category": "section",
+    "text": "In the following, we list all the functions that are required to be provided for noncommutative rings in AbstractAlgebra.jl or by external libraries wanting to use AbstractAlgebra.jl.We give this interface for fictitious types MyParent for the type of the ring parent object R and MyElem for the type of the elements of the ring.Note that generic functions in AbstractAlgebra.jl may not rely on the existence of functions that are not documented here. If they do, those functions will only be available for rings that implement that additional functionality, and should be documented as such."
+},
+
+{
+    "location": "ncrings.html#Data-type-and-parent-object-methods-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Data type and parent object methods",
+    "category": "section",
+    "text": "parent_type(::Type{MyElem})Returns the type of the corresponding parent object for the given element type. For example, parent_type(Generic.Poly{T}) will return Generic.PolyRing{T}.elem_type(::Type{MyParent})Returns the type of the elements of the ring whose parent object has the given type. This is the inverse of the parent_type function, i.e. elem_type(Generic.PolyRing{T}) will return Generic.Poly{T}.base_ring(R::MyParent)Given a parent object R, representing a ring, this function returns the parent object of any base ring that parameterises this ring.If the ring is not parameterised by another ring, this function must return Union{}.parent(f::MyElem)Return the parent object of the given element, i.e. return the ring to which the given element belongs.This is usually stored in a field parent in each ring element. (If the parent objects have mutable struct types, the internal overhead here is just an additional machine  pointer stored in each element of the ring.)For some element types it isn\'t necessary to append the parent object as a field of every element. This is the case when the parent object can be reconstructed just given the type of the elements. For example, this is the case for the ring of integers and in fact for any ring element type that isn\'t parameterised or generic in any way.isexact_type(::Type{MyElem})Returns true if every element of the given type is represented exactly.Note that MyElem may be parameterised or an abstract type, in which case every element of every type represented by MyElem must be exact, otherwise the function must return false.Base.hash(f::MyElem, h::UInt)Return a hash for the object f of type UInt. This is used as a hopefully cheap way to distinguish objects that differ arithmetically. If the object has components, e.g. the coefficients of a polynomial or elements of a matrix, these should be hashed recursively, passing the same parameter h to all levels. Each component should then be xor\'d with h before combining the individual component hashes to give the final hash.The hash functions in AbstractAlgebra.jl usually start from some fixed 64 bit hexadecimal  value that has been picked at random by the library author for that type. That is then truncated to fit a UInt (in case the latter is not 64 bits). This ensures that objects that are the same arithmetically (or that have the same components), but have different types (or structures), are unlikely to hash to the same value.deepcopy_internal(f::MyElem, dict::ObjectIdDict)Return a copy of the given element, recursively copying all components of the object.Obviously the parent, if it is stored in the element, should not be copied. The new element should have precisely the same parent as the old object.For types that cannot self-reference themselves anywhere internally, the dict argument may be ignored.In the case that internal self-references are possible, please consult the Julia documentation on how to implement deepcopy_internal."
+},
+
+{
+    "location": "ncrings.html#Constructors-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Constructors",
+    "category": "section",
+    "text": "Outer constructors for most AbstractAlgebra types are provided by overloading the call syntax for parent objects. If R is a parent object for a given ring we provide the following constructors.(R::MyParent)()Return the zero object of the given ring.(R::MyParent)(a::Integer)Coerce the given integer into the given ring.(R::MyParent)(a::MyElem)If a belongs to the given ring, the function returns it (without making a copy). Otherwise an error is thrown.For parameterised rings we also require a function to coerce from the base ring into the parent ring.(R::MyParent{T})(a::T) where T <: AbstractAlgebra.RingElemCoerce a into the ring R if a belongs to the base ring of R."
+},
+
+{
+    "location": "ncrings.html#Basic-manipulation-of-rings-and-elements-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Basic manipulation of rings and elements",
+    "category": "section",
+    "text": "zero(R::MyParent)Return the zero element of the given ring.one(R::MyParent)Return the multiplicative identity of the given ring.iszero(f::MyElem)Return true if the given element is the zero element of the ring it belongs to.isone(f::MyElem)Return true if the given element is the multiplicative identity of the ring it belongs to."
+},
+
+{
+    "location": "ncrings.html#String-I/O-1",
+    "page": "Noncommutative ring Interface",
+    "title": "String I/O",
+    "category": "section",
+    "text": "show(io::IO, R::MyParent)This should print (to the given IO object), an English description of the parent ring. If the ring is parameterised, it can call the corresponding show function for any rings it depends on.show(io::IO, f::MyElem)This should print a human readable, textual representation of the object (to the given IO object). It can recursively call the corresponding show functions for any of its components.It may be necessary in some cases to print parentheses around components of f or to print signs of components. For these, the following functions will exist for each component or component type.needs_parentheses(f::MyElem)Should returns true if parentheses are needed around this object when printed, e.g. as a coefficient of a polynomial. As an example, non-constant polynomials would need such parentheses if used as coefficients of another polynomial.displayed_with_minus_in_front(f::MyElem)When printing polynomials, a + sign is usually inserted automatically between terms of the polynomial. However, this is not desirable if the coefficient is negative and that negative sign is already printed when the coefficient is printed.This function must return true if f is printed starting with a negative sign. This suppresses the automatic printing of a + sign by polynomial printing functions that are printing f as a coefficient of a term.Note that if needs_parentheses returns true for f, then displayed_with_minus_in_front should always return false for that f, since an automatic + will need to be printed in front of a coefficient that is printed with parentheses.show_minus_one(::Type{MyElem})When printing polynomials, we prefer to print x rather than 1*x if the degree 1 term has coefficient 1. This can be taken care of without any special support.However, we also prefer to print -x rather than -1*x. This requires special support, since -1 in some rings is not printed as -1 (e.g. -1 in mathbbZ3mathbbZ might be printed as 2). In such rings, show_minus_one should return true.If show_minus_one returns true, polynomial printing functions will not print -x for terms of degree 1 with coefficient -1, but will use the printing function of the given type to print the coefficient in that case."
+},
+
+{
+    "location": "ncrings.html#Unary-operations-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Unary operations",
+    "category": "section",
+    "text": "-(f::MyElem)Returns -f."
+},
+
+{
+    "location": "ncrings.html#Binary-operations-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Binary operations",
+    "category": "section",
+    "text": "+(f::MyElem, g::MyElem)\n-(f::MyElem, g::MyElem)\n*(f::MyElem, g::MyElem)Returns f + g, f - g or fg, respectively."
+},
+
+{
+    "location": "ncrings.html#Comparison-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Comparison",
+    "category": "section",
+    "text": "==(f::MyElem, g::MyElem)Returns true if f and g are arithmetically equal. In the case where the two elements are inexact, the function returns true if they agree to the minimum precision of the two.isequal(f::MyElem, g::MyElem)For exact rings, this should return the same thing as == above. For inexact rings, this returns true only if the two elements are arithmetically equal and have the same precision."
+},
+
+{
+    "location": "ncrings.html#Powering-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Powering",
+    "category": "section",
+    "text": "^(f::MyElem, e::Int)Return f^e. The function should throw a DomainError() if negative exponents don\'t make sense but are passed to the function."
+},
+
+{
+    "location": "ncrings.html#Exact-division-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Exact division",
+    "category": "section",
+    "text": "divexact_left(f::MyElem, g::MyElem)\ndivexact_right(f::MyElem, g::MyElem)If f = ga for some a in the ring, the function divexact_left(f, g) returns a. If f = ag then divexact_right(f, g) returns a. A DivideError() should be thrown if division is by zero. If no exact quotient exists or an impossible inverse is unavoidably encountered, an error should be thrown."
+},
+
+{
+    "location": "ncrings.html#Unsafe-operators-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Unsafe operators",
+    "category": "section",
+    "text": "To speed up arithmetic of objects built over a given ring, it sometimes makes sense to mutate values in place rather than replace them with a newly created object every time they are modified.For this purpose, certain mutating operators are required. In order to support immutable types (struct in Julia) and systems that don\'t have in-place operators, all unsafe operators must return the (ostensibly) mutated value. Only the returned value is used in computations, so this lifts the requirement that the unsafe operators actually mutate the value.Note the exclamation point is a convention, which indicates that the object may be mutated in-place.To make use of these functions, one must be certain that no other references are held to the object being mutated, otherwise those values will also be changed!The results of deepcopy and all arithmetic operations, including powering and division can be assumed to be new objects without other references being held, as can objects returned from constructors.Note that R(a) where R is the ring a belongs to, does not create a new value. For this case, use deepcopy(a).zero!(f::MyElem)Set the value f to zero in place. Return the mutated value.mul!(c::MyElem, a::MyElem, b::MyElem)Set c to the value ab in place. Return the mutated value. Aliasing is permitted.add!(c::MyElem, a::MyElem, b::MyElem)Set c to the value a + b in place. Return the mutated value. Aliasing is permitted.addeq!(a::MyElem, b::MyElem)Set a to a + b in place. Return the mutated value. Aliasing is permitted."
+},
+
+{
+    "location": "ncrings.html#Random-generation-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Random generation",
+    "category": "section",
+    "text": "The random functions are only used for test code to generate test data. They therefore don\'t need to provide any guarantees on uniformity, and in fact, test values that are known to be a good source of corner cases can be supplied.rand(R::MyParent, v...)Returns a random element in the given ring of the specified size.There can be as many arguments as is necessary to specify the size of the test example which is being produced."
+},
+
+{
+    "location": "ncrings.html#Promotion-rules-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Promotion rules",
+    "category": "section",
+    "text": "In order for AbstractAlgebra to be able to automatically coerce up towers of rings, certain promotion rules must be defined. For every ring, one wants to be able to coerce integers into the ring. And for any ring constructed over a base ring, one would like to be able to coerce from the base ring into the ring.The promotion rules look a bit different depending on whether the element type is parameterised or not and whether it is built on a base ring.For ring element types MyElem that are neither parameterised nor built over a base ring, the promotion rules can be defined as follows:promote_rule(::Type{MyElem}, ::Type{T}) where {T <: Integer} = MyElemFor ring element types MyType that aren\'t parameterised, but which have a base ring with concrete element type T the promotion rules can be defined as follows:promote_rule(::Type{MyElem}, ::Type{U}) where U <: Integer = MyElempromote_rule(::Type{MyElem}, ::Type{T}) = MyElemFor ring element types MyElem{T} that are parameterised by the type of elements of the base ring, the promotion rules can be defined as follows:promote_rule(::Type{MyElem{T}}, ::Type{MyElem{T}}) where T <: RingElement = MyElem{T}function promote_rule(::Type{MyElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingEle\nment}\n   promote_rule(T, U) == T ? MyElem{T} : Union{}\nend"
+},
+
+{
+    "location": "ncrings.html#Required-functionality-for-inexact-rings-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Required functionality for inexact rings",
+    "category": "section",
+    "text": ""
+},
+
+{
+    "location": "ncrings.html#Approximation-(floating-point-and-ball-arithmetic-only)-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Approximation (floating point and ball arithmetic only)",
+    "category": "section",
+    "text": "isapprox(f::MyElem, g::MyElem; atol::Real=sqrt(eps()))This is used by test code that uses rings involving floating point or ball arithmetic. The function should return true if all components of f and g are equal to within the square root of the Julia epsilon, since numerical noise may make an exact comparison impossible.For parameterised rings over an inexact ring, we also require the following ad hoc approximation functionality.isapprox(f::MyElem{T}, g::T; atol::Real=sqrt(eps())) where T <: AbstractAlgebra.RingElemisapprox(f::T, g::MyElem{T}; atol::Real=sqrt(eps())) where T <: AbstractAlgebra.RingElemThese notionally coerce the element of the base ring into the parameterised ring and do a full comparison."
+},
+
+{
+    "location": "ncrings.html#Optional-functionality-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Optional functionality",
+    "category": "section",
+    "text": "Some functionality is difficult or impossible to implement for all rings in the system. If it is provided, additional functionality or performance may become available. Here is a list of all functions that are considered optional and can\'t be relied on by generic functions in the AbstractAlgebra Ring interface.It may be that no algorithm, or no efficient algorithm is known to implement these functions. As these functions are optional, they do not need to exist. Julia will already inform the user that the function has not been implemented if it is called but doesn\'t exist."
+},
+
+{
+    "location": "ncrings.html#Optional-basic-manipulation-functionality-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Optional basic manipulation functionality",
+    "category": "section",
+    "text": "isunit(f::MyElem)Return true if the given element is a unit in the ring it belongs to. "
+},
+
+{
+    "location": "ncrings.html#Optional-binary-ad-hoc-operators-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Optional binary ad hoc operators",
+    "category": "section",
+    "text": "By default, ad hoc operations are handled by AbstractAlgebra.jl if they are not defined explicitly, by coercing both operands into the same ring and then performing the required operation.In some cases, e.g. for matrices, this leads to very inefficient behaviour. In such cases, it is advised to implement some of these operators explicitly.It can occasionally be worth adding a separate set of ad hoc binary operators for the type Int, if this can be done more efficiently than for arbitrary Julia Integer types.+(f::MyElem, c::Integer)\n-(f::MyElem, c::Integer)\n*(f::MyElem, c::Integer)+(c::Integer, f::MyElem)\n-(c::Integer, f::MyElem)\n*(c::Integer, f::MyElem)For parameterised types, it is also sometimes more performant to provide explicit ad hoc operators with elements of the base ring.+(f::MyElem{T}, c::T) where T <: AbstractAlgebra.RingElem\n-(f::MyElem{T}, c::T) where T <: AbstractAlgebra.RingElem\n*(f::MyElem{T}, c::T) where T <: AbstractAlgebra.RingElem+(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem\n-(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem\n*(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem"
+},
+
+{
+    "location": "ncrings.html#Optional-ad-hoc-comparisons-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Optional ad hoc comparisons",
+    "category": "section",
+    "text": "==(f::MyElem, c::Integer)==(c::Integer, f::MyElem)==(f::MyElem{T}, c:T) where T <: AbstractAlgebra.RingElem==(c::T, f::MyElem{T}) where T <: AbstractAlgebra.RingElem"
+},
+
+{
+    "location": "ncrings.html#Optional-powering-functions-1",
+    "page": "Noncommutative ring Interface",
+    "title": "Optional powering functions",
+    "category": "section",
+    "text": "^(f::MyElem, e::BigInt)In case f cannot explode in size when powered by a very large integer, and it is practical to do so, one may provide this function to support powering with BigInt exponents (or for external modules, any other big integer type)."
+},
+
+{
+    "location": "ncrings.html#Optional-unsafe-operators-1",
+    "page": "Noncommutative ring Interface",
     "title": "Optional unsafe operators",
     "category": "section",
     "text": "addmul!(c::MyElem, a::MyElem, b::MyElem, t::MyElem)Set c = c + ab in-place. Return the mutated value. The value t should be a temporary of the same type as a, b and c, which can be used arbitrarily by the implementation to speed up the computation. Aliasing between a, b and c is  permitted."
@@ -1653,7 +1853,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Matrix Interface",
     "category": "section",
-    "text": "Generic matrices are supported in AbstractAlgebra.jl. As the space of mtimes n matrices over a commutative ring is not itself a commutative ring, not all of the Ring interface needs to be implemented for matrices in general.In particular, the following functions do not need to be implemented: isdomain_type, needs_parentheses, displayed_with_minus_in_front, show_minus_one and divexact. The canonical_unit function should be implemented, but simply needs to return the corresponding value for entry 1 1 (the function is never called on empty matrices).Note that AbstractAlgebra.jl matrices are not the same as Julia matrices. We store a base ring in our matrix and matrices are row major instead of column major in order to support the numerous large C libraries that use this convention.All AbstractAlgebra.jl matrices are assumed to be mutable. This is usually critical to performance."
+    "text": "Generic matrices are supported in AbstractAlgebra.jl. Both the space of mtimes n  matrices and the algebra (ring) of mtimes m matrices are supported.As the space of mtimes n matrices over a commutative ring is not itself a commutative ring, not all of the Ring interface needs to be implemented for such matrices in.In particular, the following functions do not need to be implemented: isdomain_type, needs_parentheses, displayed_with_minus_in_front, show_minus_one and divexact. The canonical_unit function should be implemented, but simply needs to return the corresponding value for entry 1 1 (the function is never called on empty matrices).For matrix algebras, all of the ring interface must be implemented.Note that AbstractAlgebra.jl matrices are not the same as Julia matrices. We store a base ring in our matrix and matrices are row major instead of column major in order to support the numerous large C libraries that use this convention.All AbstractAlgebra.jl matrices are assumed to be mutable. This is usually critical to performance."
 },
 
 {
@@ -1661,7 +1861,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Types and parents",
     "category": "section",
-    "text": "AbstractAlgebra provides two abstract types for matrix spaces and their elements:MatSpace{T} is the abstract type for matrix space parent types\nMatElem{T} is the abstract type for matrix typesNote that both abstract types are parameterised. The type T should usually be the type of elements of the matrices.Matrix spaces should be made unique on the system by caching parent objects (unless an optional cache parameter is set to false). Matrix spaces should at least be distinguished based on their base (coefficient) ring and the dimensions of the matrices in the space.See src/generic/GenericTypes.jl for an example of how to implement such a cache (which usually makes use of a dictionary)."
+    "text": "AbstractAlgebra provides two abstract types for matrix spaces and their elements:MatSpace{T} is the abstract type for matrix space parent types\nMatElem{T} is the abstract type for matrix types belonging to a matrix spaceIt also provides two abstract types for matrix algebras and their elements:MatAlgebra{T} is the abstract type for matrix algebra parent types\nMatAlgElem{T} is the abstract type for matrix types belonging to a matrix algebraNote that these abstract types are parameterised. The type T should usually be the type of elements of the matrices.Matrix spaces and matrix algebras should be made unique on the system by caching parent objects (unless an optional cache parameter is set to false). Matrix spaces and algebras should at least be distinguished based on their base (coefficient) ring and the  dimensions of the matrices in the space.See src/generic/GenericTypes.jl for an example of how to implement such a cache (which usually makes use of a dictionary)."
 },
 
 {
@@ -1669,7 +1869,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Required functionality for matrices",
     "category": "section",
-    "text": "In addition to the required (relevant) functionality for the Ring interface (see above), the following functionality is required for the Matrix interface.We suppose that R is a fictitious base ring (coefficient ring) and that S is a space of mtimes n matrices over R with parent object S of type MyMatSpace{T}. We also assume the matrices in the space have type MyMat{T}, where T is the type of elements of the base (element) ring.Of course, in practice these types may not be parameterised, but we use parameterised types here to make the interface clearer.Note that the type T must (transitively) belong to the abstract type RingElem."
+    "text": "In addition to the required (relevant) functionality for the Ring interface (see above), the following functionality is required for the Matrix interface.We suppose that R is a fictitious base ring (coefficient ring) and that S is a space of mtimes n matrices over R, or algebra of mtimes m matrices with parent object S of type MyMatSpace{T} or MyMatAlgebra{T}, respectively. We also assume the matrices in the space have type MyMat{T}, where T is the type of elements of the base (element) ring.Of course, in practice these types may not be parameterised, but we use parameterised types here to make the interface clearer.Note that the type T must (transitively) belong to the abstract type RingElem.Currently only matrices over commutative rings are supported."
 },
 
 {
@@ -1677,7 +1877,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Constructors",
     "category": "section",
-    "text": "In addition to the standard constructors, the following constructors, taking an array of elements, must be available.(S::MyMatSpace{T})(A::Array{T, 2}) where T <: AbstractAlgebra.RingElemCreate the matrix in the given space whose (i j) entry is given by A[i, j].(S::MyMatSpace{T})(A::Array{S, 2}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}Create the matrix in the given space whose (i j) entry is given by A[i, j], where S is the type of elements that can be coerced into the base ring of the matrix.(S::MyMatSpace{T})(A::Array{S, 1}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}Create the matrix in the given space of matrices (with dimensions mtimes n say), whose (i j) entry is given by A[i*(n - 1) + j] and where S is the type of elements that can be coerced into the base ring of the matrix.ExamplesS = MatrixSpace(QQ, 2, 3)\n\nM1 = S(Rational{BigInt}[2 3 1; 1 0 4])\nM2 = S(BigInt[2 3 1; 1 0 4])\nM3 = S(BigInt[2, 3, 1, 1, 0, 4])It is also possible to create matrices directly, without first creating the corresponding matrix space (the inner constructor should be called directly). Note that to support this, matrix space parent objects don\'t contain a reference to their parent. Instead, parents are constructed on-the-fly if requested.matrix(R::Ring, arr::Array{T, 2}) where T <: AbstractAlgebra.RingElemGiven an mtimes n Julia matrix of entries, construct the corresponding AbstractAlgebra.jl matrix over the given ring R, assuming all the entries can be coerced into R.matrix(R::Ring, r::Int, c::Int, A::Array{T, 1}) where T <: AbstractAlgebra.RingElemConstruct the given rtimes c AbstractAlgebra.jl matrix over the ring R whose (i j) entry is given by A[c*(i - 1) + j], assuming that all the entries can be coerced into R.zero_matrix(R::Ring, r::Int, c::Int)Construct the rtimes c AbstractAlgebra.jl zero matrix over the ring R.identity_matrix(R::Ring, n::Int)Construct the ntimes n AbstractAlgebra.jl identity matrix over the ring R.similar(x::MyMat{T}) where T <: AbstractAlgebra.RingElemConstruct the zero matrix with the same dimensions and base ring as the given matrix.similar(x::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElemConstruct the rtimes c zero matrix with the same base ring as the given matrix.ExamplesM = matrix(ZZ, BigInt[3 1 2; 2 0 1])\nN = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])\nP = zero_matrix(ZZ, 3, 2)\nQ = identity_matrix(ZZ, 4)\nC = similar(P)\nD = similar(Q, 4, 5)"
+    "text": "In addition to the standard constructors, the following constructors, taking an array of elements, must be available.(S::MyMatSpace{T})(A::Array{T, 2}) where T <: AbstractAlgebra.RingElem\n(S::MyMatAlgebra{T})(A::Array{T, 2}) where T <: AbstractAlgebra.RingElemCreate the matrix in the given space/algebra whose (i j) entry is given by A[i, j].(S::MyMatSpace{T})(A::Array{S, 2}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}\n(S::MyMatAlgebra{T})(A::Array{S, 2}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}Create the matrix in the given space/algebra whose (i j) entry is given by A[i, j], where S is the type of elements that can be coerced into the base ring of the matrix.(S::MyMatSpace{T})(A::Array{S, 1}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}\n(S::MyMatAlgebra{T})(A::Array{S, 1}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}Create the matrix in the given space/algebra of matrices (with dimensions mtimes n say), whose (i j) entry is given by A[i*(n - 1) + j] and where S is the type of elements that can be coerced into the base ring of the matrix.ExamplesS = MatrixSpace(QQ, 2, 3)\nT = MatrixAlgebra(QQ, 2)\n\nM1 = S(Rational{BigInt}[2 3 1; 1 0 4])\nM2 = S(BigInt[2 3 1; 1 0 4])\nM3 = S(BigInt[2, 3, 1, 1, 0, 4])\n\nN1 = T(Rational{BigInt}[2 3; 1 0])\nN2 = T(BigInt[2 3; 1 0])\nN3 = T(BigInt[2, 3, 1, 1])It is also possible to create matrices (in a matrix space only) directly, without first creating the corresponding matrix space (the inner constructor being called directly). Note that to support this, matrix space parent objects don\'t contain a reference to their parent. Instead, parents are constructed on-the-fly if requested. (The same strategy is used for matrix algebras.)matrix(R::Ring, arr::Array{T, 2}) where T <: AbstractAlgebra.RingElemGiven an mtimes n Julia matrix of entries, construct the corresponding AbstractAlgebra.jl matrix over the given ring R, assuming all the entries can be coerced into R.matrix(R::Ring, r::Int, c::Int, A::Array{T, 1}) where T <: AbstractAlgebra.RingElemConstruct the given rtimes c AbstractAlgebra.jl matrix over the ring R whose (i j) entry is given by A[c*(i - 1) + j], assuming that all the entries can be coerced into R.zero_matrix(R::Ring, r::Int, c::Int)Construct the rtimes c AbstractAlgebra.jl zero matrix over the ring R.identity_matrix(R::Ring, n::Int)Construct the ntimes n AbstractAlgebra.jl identity matrix over the ring R.The following functions are available for matrices in both matrix algebras and matrix spaces.similar(x::MyMat{T}) where T <: AbstractAlgebra.RingElemConstruct the zero matrix with the same dimensions and base ring as the given matrix.similar(x::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElemConstruct the rtimes c zero matrix with the same base ring as the given matrix. If x belongs to a matrix algebra and r neq c, an exception is raised.ExamplesM = matrix(ZZ, BigInt[3 1 2; 2 0 1])\nN = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])\nP = zero_matrix(ZZ, 3, 2)\nQ = identity_matrix(ZZ, 4)\nC = similar(P)\nD = similar(Q, 4, 5)\n\nR = MatrixAlgebra(ZZ, 2)\nM = R()\nF = similar(M)"
 },
 
 {
@@ -1709,7 +1909,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Optional constructors",
     "category": "section",
-    "text": "eye(M::MyMat{T}) where T <: AbstractAlgebra.RingElemConstruct the identity matrix with the same dimensions and base ring as the given matrix.eye(M::MyMat{T}, n::Int) where T <: AbstractAlgebra.RingElemConstruct the ntimes n identity matrix with the same base ring as the given matrix.ExamplesM = matrix(ZZ, BigInt[1 2 3; 4 5 6])\n\nN = eye(M)\nP = eye(M, 2)"
+    "text": "The following can only be used to construct matrices in a matrix space, not a matrix algebra.eye(M::MyMat{T}) where T <: AbstractAlgebra.RingElemConstruct the identity matrix with the same dimensions and base ring as the given matrix.eye(M::MyMat{T}, n::Int) where T <: AbstractAlgebra.RingElemConstruct the ntimes n identity matrix with the same base ring as the given matrix.ExamplesM = matrix(ZZ, BigInt[1 2 3; 4 5 6])\n\nN = eye(M)\nP = eye(M, 2)"
 },
 
 {
@@ -1717,7 +1917,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Optional submatrices",
     "category": "section",
-    "text": "sub(M::MyMat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: AbstractAlgebra.RingElemReturn a new matrix with the same entries as the submatrix with the given range of rows and columns.ExamplesM = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])\n\nN1 = M[1:2, :]\nN2 = M[:, :]\nN3 = M[2:3, 2:3]"
+    "text": "The following are only available for matrix spaces, not for matrix algebras.sub(M::MyMat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: AbstractAlgebra.RingElemReturn a new matrix with the same entries as the submatrix with the given range of rows and columns.ExamplesM = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])\n\nN1 = M[1:2, :]\nN2 = M[:, :]\nN3 = M[2:3, 2:3]"
 },
 
 {
@@ -1733,7 +1933,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Optional concatenation",
     "category": "section",
-    "text": "hcat(M::MyMat{T}, N::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the horizontal concatenation of M and N. It is assumed that the number of rows of M and N are the same.vcat(M::MyMat{T}, N::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the vertical concatenation of M and N. It is assumed that the number of columns of M and N are the same.ExamplesM = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])\nN = matrix(ZZ, BigInt[1 0 1; 0 1 0; 1 0 1])\n\nP = hcat(M, N)\nQ = vcat(M, N)"
+    "text": "The following are only available for matrix spaces, not for matrix algebras.hcat(M::MyMat{T}, N::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the horizontal concatenation of M and N. It is assumed that the number of rows of M and N are the same.vcat(M::MyMat{T}, N::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the vertical concatenation of M and N. It is assumed that the number of columns of M and N are the same.ExamplesM = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])\nN = matrix(ZZ, BigInt[1 0 1; 0 1 0; 1 0 1])\n\nP = hcat(M, N)\nQ = vcat(M, N)"
 },
 
 {
@@ -1749,7 +1949,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Generic matrices",
     "category": "section",
-    "text": "AbstractAlgebra.jl allows the creation of dense matrices over any computable commutative ring R. Generic matrices over a commutative ring are implemented in src/generic/Matrix.jl.As well as implementing the entire Matrix interface, including the optional functionality, there are many additional generic algorithms implemented for matrix spaces. We describe this functionality below.All of this generic functionality is part of the Generic submodule of AbstractAlgebra.jl. This is exported by default, so it is not necessary to qualify names of functions."
+    "text": "AbstractAlgebra.jl allows the creation of dense matrices over any computable commutative ring R. Generic matrices over a commutative ring are implemented in src/generic/Matrix.jl. Much of the functionality there covers both matrix spaces and matrix algebras.Functions specific to generic matrix algebras of mtimes m matrices are implemented in  src/generic/MatrixAlgebra.jl.As well as implementing the entire Matrix interface, including the optional functionality, there are many additional generic algorithms implemented for matrix spaces. We describe this functionality below.All of this generic functionality is part of the Generic submodule of AbstractAlgebra.jl. This is exported by default, so it is not necessary to qualify names of functions."
 },
 
 {
@@ -1757,7 +1957,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Types and parent objects",
     "category": "section",
-    "text": "Generic matrices in AbstractAlgebra.jl have type Generic.Mat{T} where T is the type of elements of the matrix. Internally, generic matrices are implemented using an object wrapping a Julia two dimensional array, though they are not themselves Julia arrays. See the file src/generic/GenericTypes.jl for details.Parents of generic matrices (matrix spaces) have type Generic.MatSpace{T}.The generic matrix types belong to the abstract type AbstractAlgebra.MatElem{T} and the matrix space parent types belong to AbstractAlgebra.MatSpace{T}. Note that both the concrete type of a matrix space parent object and the abstract class it belongs to have the name MatElem, therefore disambiguation is required to specify which is intended.The dimensions and base ring R of a generic matrix are stored in its parent object, however to allow creation of matrices without first creating the matrix space parent, generic matrices in Julia do not contain a reference to their parent. They contain the row and column numbers and the base ring on a per matrix basis. The parent object can then be reconstructed from this data on demand."
+    "text": "Generic matrices in AbstractAlgebra.jl have type Generic.Mat{T} for matrices in a matrix space, or Generic.MatAlgElem{T} for matrices in a matrix algebra, where T is the type of elements of the matrix. Internally, generic matrices are implemented using an object wrapping a Julia two dimensional array, though they are not themselves Julia arrays. See the file src/generic/GenericTypes.jl for details.Parents of generic matrices (matrix spaces) have type Generic.MatSpace{T}. Parents of matrices in a matrix algebra have type Generic.MatAlgebra{T}.The generic matrix types (matrix spaces) belong to the abstract type AbstractAlgebra.MatElem{T} and the matrix space parent types belong to AbstractAlgebra.MatSpace{T}. Similarly the generic matrix algebra matrix types belong to the abstract type AbstractAlgebra.MatAlgElem{T} and the parent types belong to  AbstractAlgebra.MatAlgebra{T} Note that both the concrete type of a matrix space parent object and the abstract class it belongs to have the name MatElem, therefore disambiguation is required to specify which is intended. The same is true for the abstract types for matrix spaces and their elements.The dimensions and base ring R of a generic matrix are stored in its parent object, however to allow creation of matrices without first creating the matrix space parent, generic matrices in Julia do not contain a reference to their parent. They contain the row and column numbers (or degree, in the case of matrix algebras) and the base ring on a per matrix basis. The parent object can then be reconstructed from this data on demand."
 },
 
 {
@@ -1765,7 +1965,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Matrix space constructors",
     "category": "section",
-    "text": "A matrix space in AbstractAlgebra.jl represents a collection of all matrices with given dimensions and base ring.In order to construct matrices in AbstractAlgebra.jl, one can first constructs the matrix space itself. This is accomplished with the following constructor.MatrixSpace(R::Ring, rows::Int, cols::Int; cache::Bool=true)Construct the space of matrices with the given number of rows and columns over the given base ring. By default such matrix spaces are cached based on the base ring and numbers of rows and columns. If the optional named parameter cached is set to false, no caching occurs.Here are some examples of creating matrix spaces and making use of the resulting parent objects to coerce various elements into the matrix space.ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S()\nB = S(12)\nC = S(R(11))We also allow matrices over a given base ring to be constructed directly (see the Matrix interface)."
+    "text": "A matrix space in AbstractAlgebra.jl represents a collection of all matrices with given dimensions and base ring.In order to construct matrices in AbstractAlgebra.jl, one can first constructs the matrix space itself. This is accomplished with the following constructor. We discuss creation of matrix algebras separately in a dedicated section elsewhere in the documentation.MatrixSpace(R::Ring, rows::Int, cols::Int; cache::Bool=true)Construct the space of matrices with the given number of rows and columns over the given base ring. By default such matrix spaces are cached based on the base ring and numbers of rows and columns. If the optional named parameter cached is set to false, no caching occurs.Here are some examples of creating matrix spaces and making use of the resulting parent objects to coerce various elements into the matrix space.ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S()\nB = S(12)\nC = S(R(11))We also allow matrices over a given base ring to be constructed directly (see the Matrix interface)."
 },
 
 {
@@ -1789,7 +1989,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Matrix functionality provided by AbstractAlgebra.jl",
     "category": "section",
-    "text": ""
+    "text": "Most of the following generic functionality is available for both matrix spaces and matrix algebras. Exceptions include functions that do not return or accept square matrices or which cannot specify a parent. Such functions include solve and nullspace which can\'t be provided for matrix algebras.For details on functionality that is provided for matrix algebras only, see the dedicated section of the documentation."
 },
 
 {
@@ -1942,6 +2142,54 @@ var documenterSearchIndex = {"docs": [
     "title": "(Weak) Popov form",
     "category": "section",
     "text": "AbstractAlgebra.jl provides algorithms for computing the (weak) Popov of a matrix with entries in a univariate polynomial ring over a field.weak_popov{T <: PolyElem}(::Generic.Mat{T})\nweak_popov_with_trafo{T <: PolyElem}(::Generic.Mat{T})\npopov{T <: PolyElem}(::Generic.Mat{T})\npopov_with_trafo{T <: PolyElem}(::Generic.Mat{T})"
+},
+
+{
+    "location": "matrix_algebras.html#",
+    "page": "Generic matrix algebras",
+    "title": "Generic matrix algebras",
+    "category": "page",
+    "text": "CurrentModule = AbstractAlgebra"
+},
+
+{
+    "location": "matrix_algebras.html#Generic-matrix-algebras-1",
+    "page": "Generic matrix algebras",
+    "title": "Generic matrix algebras",
+    "category": "section",
+    "text": "AbstractAlgebra.jl allows the creation of an algebra (ring) of mtimes m matrices over a computable, commutative ring.Functions specific to generic matrix algebras of mtimes m matrices are implemented in  src/generic/MatrixAlgebra.jl. The remaining functionality is in the file src/generic/Matrix.jl.As well as implementing the entire Matrix interface, including the optional functionality, there are many additional generic algorithms implemented for matrix algebras.Almost all of the functionality specified for generic matrices is available for matrix algebras. The exceptions are functions such as solve and nullspace which may return non-square matrices, or which don\'t accept square matrices.All of the generic functionality is part of the Generic submodule of AbstractAlgebra.jl. This is exported by default, so it is not necessary to qualify names of functions."
+},
+
+{
+    "location": "matrix_algebras.html#Types-and-parent-objects-1",
+    "page": "Generic matrix algebras",
+    "title": "Types and parent objects",
+    "category": "section",
+    "text": "Generic matrices in AbstractAlgebra.jl have type Generic.MatAlgElem{T} for matrices in  a matrix algebra, where T is the type of elements of the matrix. Internally, generic matrices are implemented using an object wrapping a Julia two dimensional array, though they are not themselves Julia arrays. See the file src/generic/GenericTypes.jl for details.Parents of generic matrices in a matrix algebra have type Generic.MatAlgebra{T}.Note that matrix algebras are noncommutative rings. Thus their types belong to NCRing and NCRingElem. They cannot be used in constructions which require a commutative ring (Ring and RingElem respectively).The generic matrix algebra matrix types belong to the abstract type AbstractAlgebra.MatAlgElem{T} and the parent types belong to  AbstractAlgebra.MatAlgebra{T} Note that both of these require disambiguation from the concrete types in Generic of the same name.The degree and base ring R of a generic matrix are stored in its parent object, however to allow creation of matrices without first creating the matrix space parent, generic matrices in Julia do not contain a reference to their parent. They contain the row and column numbers (or degree, in the case of matrix algebras) and the base ring on a per matrix basis. The parent object can then be reconstructed from this data on demand."
+},
+
+{
+    "location": "matrix_algebras.html#Matrix-space-constructors-1",
+    "page": "Generic matrix algebras",
+    "title": "Matrix space constructors",
+    "category": "section",
+    "text": "A matrix algebra in AbstractAlgebra.jl represents a collection of all matrices with given degree and base ring.In order to construct matrices in AbstractAlgebra.jl, one must construct the matrix algebra itself. This is accomplished with the following constructor.MatrixAlgebra(R::Ring, degree::Int; cache::Bool=true)Construct the algebra of matrices with the given degree over the given base ring. By default such matrix spaces are cached based on the base ring and degree. If the optional named parameter cached is set to false, no caching occurs.Here are some examples of creating matrix algebras and making use of the resulting parent objects to coerce various elements into the matrix algebra.ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixAlgebra(R, 3)\n\nA = S()\nB = S(12)\nC = S(R(11))"
+},
+
+{
+    "location": "matrix_algebras.html#Matrix-algebra-functionality-provided-by-AbstractAlgebra.jl-1",
+    "page": "Generic matrix algebras",
+    "title": "Matrix algebra functionality provided by AbstractAlgebra.jl",
+    "category": "section",
+    "text": "Most of the generic matrix functionality described in the generic matrix section of the documentation is available for both matrix spaces and matrix algebras. Exceptions include functions that do not return or accept square matrices or which cannot specify a parent. Such functions include solve and nullspace which can\'t be provided for matrix algebras.In addition to the functionality described for matrix spaces, matrix algebras support all noncommutative ring operations, and matrix algebras can be used as a base ring for other generic constructs that accept a noncommutative base ring (NCRing).In this section we describe functionality provided for matrix algebras only."
+},
+
+{
+    "location": "matrix_algebras.html#Basic-matrix-functionality-1",
+    "page": "Generic matrix algebras",
+    "title": "Basic matrix functionality",
+    "category": "section",
+    "text": "As well as the Ring and Matrix interfaces, the following functions are provided to manipulate matrices.degree(::MatAlgElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixAlgebra(R, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n\nn = degree(A)"
 },
 
 {
