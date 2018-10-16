@@ -693,7 +693,7 @@ end
 promote_rule(::Type{NCPoly{T}}, ::Type{NCPoly{T}}) where T <: NCRingElem = NCPoly{T}
 
 function promote_rule(::Type{NCPoly{T}}, ::Type{U}) where {T <: NCRingElem, U <: NCRingElem}
-   promote_rule(T, U) == T ? Poly{T} : Union{}
+   promote_rule(T, U) == T ? NCPoly{T} : Union{}
 end
 
 ###############################################################################

@@ -6,7 +6,13 @@
 
 elem_type(::T) where {T <: NCRing} = elem_type(T)
 
-include("Rings.jl")
+###############################################################################
+#
+#   Promotion system
+#
+###############################################################################
+
+promote_rule(::Type{T}, ::Type{T}) where T <: NCRingElem = T
 
 ###############################################################################
 #
@@ -86,3 +92,4 @@ end
 
 ==(x::RingElement, y::NCRingElem) = parent(y)(x) == y
 
+include("Rings.jl")

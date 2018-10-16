@@ -100,64 +100,18 @@ function test_gen_ncpoly_binary_ops()
    print("Generic.NCPoly.binary_ops...")
 
    #  Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+
    for iter = 1:100
-      f = rand(R, 0:10, -10:10)
-      g = rand(R, 0:10, -10:10)
-      h = rand(R, 0:10, -10:10)
+      f = rand(S, 0:10, -10:10)
+      g = rand(S, 0:10, -10:10)
+      h = rand(S, 0:10, -10:10)
       @test f + g == g + f
       @test f + (g + h) == (f + g) + h
-      @test f*g == g*f
       @test f*(g + h) == f*g + f*h
       @test (f - h) + (g + h) == f + g
-      @test (f + g)*(f - g) == f*f - g*g
-      @test f - g == -(g - f)
-   end
-
-   # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
-   a = F(y)
-   R, x = PolynomialRing(F, "x")
-   for iter = 1:100
-      f = rand(R, 0:10, 0:1)
-      g = rand(R, 0:10, 0:1)
-      h = rand(R, 0:10, 0:1)
-      @test f + g == g + f
-      @test f + (g + h) == (f + g) + h
-      @test f*g == g*f
-      @test f*(g + h) == f*g + f*h
-      @test (f - h) + (g + h) == f + g
-      @test (f + g)*(f - g) == f*f - g*g
-      @test f - g == -(g - f)
-   end
-
-   #  Inexact field
-   R, x = PolynomialRing(RealField, "x")
-   for iter = 1:100
-      f = rand(R, 0:10, -1:1)
-      g = rand(R, 0:10, -1:1)
-      h = rand(R, 0:10, -1:1)
-      @test isapprox(f + (g + h), (f + g) + h)
-      @test isapprox(f*g, g*f)
-      @test isapprox(f*(g + h), f*g + f*h)
-      @test isapprox((f - h) + (g + h), f + g)
-      @test isapprox((f + g)*(f - g), f*f - g*g)
-      @test isapprox(f - g, -(g - f))
-   end
-
-   # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = T["x"]
-   for iter = 1:100
-      f = rand(R, 0:10, 0:5)
-      g = rand(R, 0:10, 0:5)
-      h = rand(R, 0:10, 0:5)
-      @test f + (g + h) == (f + g) + h
-      @test f*g == g*f
-      @test f*(g + h) == f*g + f*h
-      @test (f - h) + (g + h) == f + g
-      @test (f + g)*(f - g) == f*f - g*g
+      @test (f + g)*(f - g) == f*f + g*f - f*g - g*g
       @test f - g == -(g - f)
    end
 
@@ -168,104 +122,30 @@ function test_gen_ncpoly_adhoc_binary()
    print("Generic.NCPoly.adhoc_binary...")
 
    # Exact ring
-   R, x = ZZ["x"]
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
    for iter = 1:500
-      f = rand(R, 0:10, -10:10)
-      c1 = rand(ZZ, -10:10)
-      c2 = rand(ZZ, -10:10)
-      d1 = rand(zz, -10:10)
-      d2 = rand(zz, -10:10)
+      f = rand(S, 0:10, -10:10)
+      c1 = rand(R, -10:10)
+      c2 = rand(R, -10:10)
 
       @test c1*f - c2*f == (c1 - c2)*f
       @test c1*f + c2*f == (c1 + c2)*f
-      @test d1*f - d2*f == (d1 - d2)*f
-      @test d1*f + d2*f == (d1 + d2)*f
 
       @test f*c1 - f*c2 == f*(c1 - c2)
       @test f*c1 + f*c2 == f*(c1 + c2)
-      @test f*d1 - f*d2 == f*(d1 - d2)
-      @test f*d1 + f*d2 == f*(d1 + d2)
-   end
-
-   # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
-   a = F(y)
-   R, x = PolynomialRing(F, "x")
-   for iter = 1:500
-      f = rand(R, 0:10, 0:1)
-      c1 = rand(ZZ, -10:10)
-      c2 = rand(ZZ, -10:10)
-      d1 = rand(zz, -10:10)
-      d2 = rand(zz, -10:10)
-
-      @test c1*f - c2*f == (c1 - c2)*f
-      @test c1*f + c2*f == (c1 + c2)*f
-      @test d1*f - d2*f == (d1 - d2)*f
-      @test d1*f + d2*f == (d1 + d2)*f
-
-      @test f*c1 - f*c2 == f*(c1 - c2)
-      @test f*c1 + f*c2 == f*(c1 + c2)
-      @test f*d1 - f*d2 == f*(d1 - d2)
-      @test f*d1 + f*d2 == f*(d1 + d2)
-   end
-
-   # Inexact field
-   R, x = RealField["x"]
-   for iter = 1:500
-      f = rand(R, 0:10, -1:1)
-      c1 = rand(ZZ, -10:10)
-      c2 = rand(ZZ, -10:10)
-      d1 = rand(RealField, -1:1)
-      d2 = rand(RealField, -1:1)
-
-      @test isapprox(c1*f - c2*f, (c1 - c2)*f)
-      @test isapprox(c1*f + c2*f, (c1 + c2)*f)
-      @test isapprox(d1*f - d2*f, (d1 - d2)*f)
-      @test isapprox(d1*f + d2*f, (d1 + d2)*f)
-
-      @test isapprox(f*c1 - f*c2, f*(c1 - c2))
-      @test isapprox(f*c1 + f*c2, f*(c1 + c2))
-      @test isapprox(f*d1 - f*d2, f*(d1 - d2))
-      @test isapprox(f*d1 + f*d2, f*(d1 + d2))
-   end
-
-   # Non-integral domain
-   R = ResidueRing(ZZ, 6)
-   S, x = R["x"]
-   for iter = 1:500
-      f = rand(S, 0:10, 0:5)
-      c1 = rand(ZZ, -10:10)
-      c2 = rand(ZZ, -10:10)
-      d1 = rand(zz, -10:10)
-      d2 = rand(zz, -10:10)
-      a1 = rand(R, 0:5)
-      a2 = rand(R, 0:5)
-
-      @test a1*f - a2*f == (a1 - a2)*f
-      @test a1*f + a2*f == (a1 + a2)*f
-      @test c1*f - c2*f == (c1 - c2)*f
-      @test c1*f + c2*f == (c1 + c2)*f
-      @test d1*f - d2*f == (d1 - d2)*f
-      @test d1*f + d2*f == (d1 + d2)*f
-
-      @test f*a1 - f*a2 == f*(a1 - a2)
-      @test f*a1 + f*a2 == f*(a1 + a2)
-      @test f*c1 - f*c2 == f*(c1 - c2)
-      @test f*c1 + f*c2 == f*(c1 + c2)
-      @test f*d1 - f*d2 == f*(d1 - d2)
-      @test f*d1 + f*d2 == f*(d1 + d2)
    end
 
    # Generic tower
-   R, x = ZZ["x"]
-   S, y = R["y"]
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+   T, z = PolynomialRing(S, "z")
    for iter = 1:100
-      f = rand(S, 0:10, 0:5, -10:10)
-      c1 = rand(ZZ, -10:10)
-      c2 = rand(ZZ, -10:10)
-      d1 = rand(R, 0:5, -10:10)
-      d2 = rand(R, 0:5, -10:10)
+      f = rand(T, 0:5, 0:5, -10:10)
+      c1 = rand(R, -10:10)
+      c2 = rand(R, -10:10)
+      d1 = rand(S, 0:5, -10:10)
+      d2 = rand(S, 0:5, -10:10)
 
       @test c1*f - c2*f == (c1 - c2)*f
       @test c1*f + c2*f == (c1 + c2)*f
