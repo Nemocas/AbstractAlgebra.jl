@@ -10,7 +10,7 @@
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     CycleDec{T}(ccycles, cptrs, n)
 > Cycle decomposition of a permutation.
 > * `ccycles`: an array of consecutive entries of cycles;
@@ -29,7 +29,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     PermGroup{T<:Integer}
 > The permutation group singleton type.
 > `PermGroup(n)` constructs the permutation group $S_n$ on $n$-symbols. The type of elements of the group is inferred from the type of `n`.
@@ -53,7 +53,7 @@ struct PermGroup{T<:Integer} <: AbstractAlgebra.Group
    n::T
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     perm{T<:Integer}
 > The type of permutations.
 > Fieldnames:
@@ -103,7 +103,7 @@ mutable struct perm{T<:Integer} <: AbstractAlgebra.GroupElem
    end
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     AllPerms(n::Int)
 > Returns an iterator over arrays representing all permutations of `1:n`.
 > Similar to `Combinatorics.permutations(1:n)`
@@ -124,7 +124,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     Partition(part::Vector{<:Integer}[, check::Bool=true]) <: AbstractVector{Int}
 > Represent integer partition in the non-increasing order.
 >
@@ -160,7 +160,7 @@ mutable struct Partition <: AbstractVector{Int}
    end
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     AllParts(n::Int)
 > Return an iterator over all integer `Partition`s of `n`.
 > Partitions are produced in ascending order according to RuleAsc (Algorithm 3.1) from
@@ -198,7 +198,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     SkewDiagram(lambda::Partition, mu::Partition) <: AbstractArray{Int, 2}
 > Implements a skew diagram, i.e. a difference of two Young diagrams
 > represented by partitions `lambda` and `mu`.
@@ -240,7 +240,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     YoungTableau(part::Partition[, fill::Vector{Int}=collect(1:sum(part))])  <: AbstractArray{Int, 2}
 > Returns the Young tableaux of partition `part`, filled linearly
 > by `fill` vector. Note that `fill` vector is in **row-major** format.

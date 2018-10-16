@@ -34,14 +34,14 @@ function isexact_type(a::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.
    return isexact_type(S)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     symbols(a::MPolyRing)
 > Return an array of symbols representing the variable names for the given
 > polynomial ring.
 """
 symbols(a::MPolyRing) = a.S
 
-Markdown.doc"""
+@doc Markdown.doc"""
     nvars(x::MPolyRing)
 > Returns the number of variables of the polynomial ring.
 """
@@ -63,7 +63,7 @@ function gens(a::MPolyRing{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
       for i in 1:a.num_vars]
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     gens{T <: RingElement}(a::MPolyRing{T})
 > Return an array of all the generators (variables) of the given polynomial
 > ring.
@@ -72,7 +72,7 @@ function gens(a::MPolyRing{T}) where {T <: RingElement}
    return gens(a, Val{a.ord})
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}
 > Returns the polynomial obtained by applying g to the coefficients of p.
 """
@@ -104,7 +104,7 @@ function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: Ri
    return(new_p)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
 > Returns the variables occuring in $p$.
 """
@@ -130,7 +130,7 @@ function vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
    return(vars_in_p)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     ordering{T <: RingElement}(a::MPolyRing{T})
 > Return the ordering of the given polynomial ring as a symbol. The options are
 > `:lex`, `:deglex` and `:degrevlex`.
@@ -325,14 +325,14 @@ function Base.hash(x::MPoly{T}, h::UInt) where {T <: RingElement}
    return b
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isdegree(s::Symbol)
 > Return `true` if the given symbol represents a degree ordering (deglex or
 > degrevlex).
 """
 isdegree(s::Symbol) = s == :deglex || s == :degrevlex
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isdegree(s::Symbol)
 > Return `true` if the given symbol represents a reverse ordering (degrevlex).
 """
@@ -366,7 +366,7 @@ function isgen(x::MPoly{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
    return x.exps[1, 1] == UInt(1)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isgen{T <: RingElement}(x::MPoly{T})
 > Return `true` if the given polynomial is a generator (variable) of the
 > polynomial ring it belongs to.
@@ -386,7 +386,7 @@ function coeff(x::MPoly, i::Int)
    return x.coeffs[i + 1]
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     max_degrees{T <: RingElement}(f::MPoly{T})
 > Return a tuple `(degs, biggest)` consisting of an array `degs` of the maximum
 > exponent for each field in the exponent vectors of `f` and an integer which
@@ -414,7 +414,7 @@ function max_degrees(f::MPoly{T}) where {T <: RingElement}
    return biggest, b
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     total_degree{T <: RingElement}(f::MPoly{T})
 > Returns the total degree of `f`.
 """
@@ -442,21 +442,21 @@ iszero(x::MPoly) = x.length == 0
 
 isunit(x::MPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && isunit(x.coeffs[1])
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isconstant(x::MPoly)
 > Return `true` if `x` is a degree zero polynomial or the zero polynomial, i.e.
 > a constant polynomial.
 """
 isconstant(x::MPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isterm(x::MPoly)
 > Return `true` if the given polynomial has precisely one term, with
 > coefficient `1`.
 """
 isterm(x::MPoly) = x.length == 1
 
-Markdown.doc"""
+@doc Markdown.doc"""
     ismonomial(x::MPoly)
 > Return `true` if the given polynomial has precisely one nonzero term.
 """
@@ -2400,7 +2400,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
    return flag, [parent(a)(Qc[i], Qe[i]) for i in 1:len], parent(a)(Rc, Re)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     divrem{T <: RingElement}(a::MPoly{T}, b::Array{MPoly{T}, 1})
 > Return a tuple `(q, r)` consisting of an array of polynomials `q`, one for
 > each polynomial in `b`, and a polynomial `r` such that `a = sum_i b[i]*q[i]`.
@@ -2472,7 +2472,7 @@ end
 #
 ################################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     remove(z::MPoly, p::MPoly)
 > Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$. Additionally, $z/p^k$ is returned as the second return.
@@ -2497,7 +2497,7 @@ function remove(z::MPolyElem{T}, p::MPolyElem{T}) where {T <: RingElement}
    return v, q
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     valuation(z::MPoly, p::MPoly)
 > Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$.
@@ -3122,7 +3122,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     PolynomialRing(R::AbstractAlgebra.Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
 > Given a base ring `R` and an array of strings `s` specifying how the
 > generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`

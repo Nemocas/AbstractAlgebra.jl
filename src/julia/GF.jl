@@ -16,19 +16,19 @@ parent_type(::Type{gfelem{T}}) where T <: Integer = GFField{T}
 
 elem_type(::Type{GFField{T}}) where T <: Integer = gfelem{T}
 
-Markdown.doc"""
+@doc Markdown.doc"""
     base_ring(a::GFField)
 > Returns `Union{}` as this field is not dependent on another field.
 """
 base_ring(a::GFField) = Union{}
 
-Markdown.doc"""
+@doc Markdown.doc"""
     base_ring(a::gfelem)
 > Returns `Union{}` as this field is not dependent on another field.
 """
 base_ring(a::gfelem) = Union{}
 
-Markdown.doc"""
+@doc Markdown.doc"""
     parent(a::gfelem)
 > Returns the parent of the given finite field element.
 """
@@ -53,7 +53,7 @@ function Base.hash(a::gfelem, h::UInt)
    return xor(xor(hash(a.d), h), b)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     zero{T <: Integer}(a::GFField{T})
 > Return the additive identity, zero, in the given finite field.
 """
@@ -61,7 +61,7 @@ function zero(R::GFField{T}) where T <: Integer
    return gfelem{T}(T(0), R)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     one{T <: Integer}(a::GFField{T})
 > Return the additive identity, zero, in the given finite field.
 """
@@ -69,7 +69,7 @@ function one(R::GFField{T}) where T <: Integer
       return gfelem{T}(T(1), R)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     gen{T <: Integer}(a::GFField{T})
 > Return a generator of the field. Currently this returns 1.
 """
@@ -77,26 +77,26 @@ function gen(R::GFField{T}) where T <: Integer
       return gfelem{T}(T(1), R)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     iszero{T <: Integer}(a::gfelem{T})
 > Returns true if the given element of the finite field is zero.
 """
 iszero(a::gfelem{T}) where T <: Integer = a.d == 0
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isone{T <: Integer}(a::gfelem{T})
 > Returns true if the given element of the finite field is one.
 """
 isone(a::gfelem{T}) where T <: Integer = a.d == 1
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isunit(a::gfelem)
 > Return `true` if the given finite field element is invertible, i.e. nonzero,
 > otherwise return `false`.
 """
 isunit(a::gfelem) = a.d != 0
 
-Markdown.doc"""
+@doc Markdown.doc"""
     characteristic(R::GFField)
 > Return the characteristic of the given finite field.
 """
@@ -104,7 +104,7 @@ function characteristic(R::GFField)
    return R.p
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     order(R::GFField)
 > Return the order, i.e. the number of element in, the given finite field.
 """
@@ -112,7 +112,7 @@ function order(R::GFField)
    return R.p
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     degree(R::GFField)
 > Return the degree of the given finite field.
 """
@@ -395,7 +395,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
    GF{T <: Integer}(p::T)
 > Return the finite field $\mathbb{F}_p$, where $p$ is a prime. The integer
 > $p$ is not checked for primality, but the behaviour of the resulting object

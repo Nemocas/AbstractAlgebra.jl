@@ -13,7 +13,7 @@ export PowerSeriesRing, O, valuation, exp, precision, max_precision, set_prec!,
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     O{T <: RingElement}(a::AbstractAlgebra.RelSeriesElem{T})
 > Returns $0 + O(x^\mbox{deg}(a))$. Usually this function is called with $x^n$
 > as parameter. Then the function returns the power series $0 + O(x^n)$, which
@@ -27,7 +27,7 @@ end
 
 parent_type(::Type{RelSeries{T}}) where T <: RingElement = RelSeriesRing{T}
 
-Markdown.doc"""
+@doc Markdown.doc"""
     parent(a::AbstractAlgebra.SeriesElem)
 > Return the parent of the given power series.
 """
@@ -35,13 +35,13 @@ parent(a::AbstractAlgebra.SeriesElem) = a.parent
 
 elem_type(::Type{RelSeriesRing{T}}) where T <: RingElement = RelSeries{T}
 
-Markdown.doc"""
+@doc Markdown.doc"""
     base_ring(R::SeriesRing)
 > Return the base ring of the given power series ring.
 """
 base_ring(R::SeriesRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
-Markdown.doc"""
+@doc Markdown.doc"""
     base_ring(a::AbstractAlgebra.SeriesElem)
 > Return the base ring of the power series ring of the given power series.
 """
@@ -53,7 +53,7 @@ end
 
 isexact_type(a::Type{T}) where T <: AbstractAlgebra.SeriesElem = false
 
-Markdown.doc"""
+@doc Markdown.doc"""
     var(a::SeriesRing)
 > Return the internal name of the generator of the power series ring. Note that
 > this is returned as a `Symbol` not a `String`.
@@ -80,28 +80,28 @@ function Base.hash(a::AbstractAlgebra.SeriesElem, h::UInt)
    return b
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     pol_length(a::AbstractAlgebra.RelSeriesElem)
 > Return the length of the polynomial underlying the given power series. This
 > will be zero if the power series has no nonzero terms.
 """
 pol_length(a::AbstractAlgebra.RelSeriesElem) = a.length
 
-Markdown.doc"""
+@doc Markdown.doc"""
     precision(a::AbstractAlgebra.RelSeriesElem)
 > Return the precision of the given power series in absolute terms. This will
 > be the sum of the valuation and the length of the underlying polynomial.
 """
 precision(a::AbstractAlgebra.RelSeriesElem) = a.prec
 
-Markdown.doc"""
+@doc Markdown.doc"""
     valuation(a::AbstractAlgebra.RelSeriesElem)
 > Return the valuation of the given power series, i.e. the degree of the first
 > nonzero term (or the precision if it is arithmetically zero).
 """
 valuation(a::AbstractAlgebra.RelSeriesElem) = a.val
 
-Markdown.doc"""
+@doc Markdown.doc"""
     max_precision(R::SeriesRing)
 > Return the maximum relative precision of power series in the given power
 > series ring.
@@ -140,21 +140,21 @@ function coeff(a::AbstractAlgebra.RelSeriesElem, n::Int)
    end
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     zero(R::SeriesRing)
 > Return $0 + O(x^n)$ where $n$ is the maximum precision of the power series
 > ring $R$.
 """
 zero(R::SeriesRing) = R(0)
 
-Markdown.doc"""
+@doc Markdown.doc"""
     one(R::SeriesRing)
 > Return $1 + O(x^n)$ where $n$ is the maximum precision of the power series
 > ring $R$.
 """
 one(R::SeriesRing) = R(1)
 
-Markdown.doc"""
+@doc Markdown.doc"""
     gen{T}(R::RelSeriesRing{T})
 > Return the generator of the power series ring, i.e. $x + O(x^{n + 1})$ where
 > $n$ is the maximum precision of the power series ring $R$.
@@ -164,14 +164,14 @@ function gen(R::RelSeriesRing)
    return R([S(1)], 1, max_precision(R) + 1, 1)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     iszero(a::AbstractAlgebra.RelSeriesElem)
 > Return `true` if the given power series is arithmetically equal to zero to
 > its current precision, otherwise return `false`.
 """
 iszero(a::AbstractAlgebra.RelSeriesElem) = pol_length(a) == 0
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isone(a::AbstractAlgebra.RelSeriesElem)
 > Return `true` if the given power series is arithmetically equal to one to
 > its current precision, otherwise return `false`.
@@ -180,7 +180,7 @@ function isone(a::AbstractAlgebra.RelSeriesElem)
    return valuation(a) == 0 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isgen(a::RelSeriesElem)
 > Return `true` if the given power series is arithmetically equal to the
 > generator of its power series ring to its current precision, otherwise return
@@ -190,14 +190,14 @@ function isgen(a::AbstractAlgebra.RelSeriesElem)
    return valuation(a) == 1 && pol_length(a) == 1 && isone(polcoeff(a, 0))
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isunit(a::AbstractAlgebra.RelSeriesElem)
 > Return `true` if the given power series is arithmetically equal to a unit,
 > i.e. is invertible, otherwise return `false`.
 """
 isunit(a::AbstractAlgebra.RelSeriesElem) = valuation(a) == 0 && isunit(polcoeff(a, 0))
 
-Markdown.doc"""
+@doc Markdown.doc"""
     modulus{T <: ResElem}(a::AbstractAlgebra.SeriesElem{T})
 > Return the modulus of the coefficients of the given power series.
 """
@@ -300,7 +300,7 @@ show_minus_one(::Type{AbstractAlgebra.SeriesElem{T}}) where {T <: RingElement} =
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     -(a::AbstractAlgebra.RelSeriesElem)
 > Return $-a$.
 """
@@ -322,7 +322,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     +{T <: RingElement}(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem{T})
 > Return $a + b$.
 """
@@ -380,7 +380,7 @@ function +(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem
    return z
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     -{T <: RingElement}(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem{T})
 > Return $a - b$.
 """
@@ -438,7 +438,7 @@ function -(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem
    return z
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     *{T <: RingElement}(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem{T})
 > Return $a\times b$.
 """
@@ -486,7 +486,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     *{T <: RingElem}(a::T, b::AbstractAlgebra.RelSeriesElem{T})
 > Return $a\times b$.
 """
@@ -504,7 +504,7 @@ function *(a::T, b::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElem}
    return z
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.RelSeriesElem)
 > Return $a\times b$.
 """
@@ -522,13 +522,13 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.RelSer
    return z
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     *{T <: RingElem}(a::AbstractAlgebra.RelSeriesElem{T}, b::T)
 > Return $a\times b$.
 """
 *(a::AbstractAlgebra.RelSeriesElem{T}, b::T) where {T <: RingElem} = b*a
 
-Markdown.doc"""
+@doc Markdown.doc"""
     *(a::AbstractAlgebra.RelSeriesElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a\times b$.
 """
@@ -540,7 +540,7 @@ Markdown.doc"""
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     shift_left(x::AbstractAlgebra.RelSeriesElem, n::Int)
 > Return the power series $f$ shifted left by $n$ terms, i.e. multiplied by
 > $x^n$.
@@ -564,7 +564,7 @@ function shift_left(x::AbstractAlgebra.RelSeriesElem{T}, len::Int) where {T <: R
    return z
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     shift_right(f::AbstractAlgebra.RelSeriesElem, n::Int)
 > Return the power series $f$ shifted right by $n$ terms, i.e. divided by
 > $x^n$.
@@ -597,7 +597,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     truncate(a::AbstractAlgebra.RelSeriesElem, n::Int)
 > Return $a$ truncated to (absolute) precision $n$.
 """
@@ -664,7 +664,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     ^{T <: RingElement}(a::AbstractAlgebra.RelSeriesElem{T}, b::Int)
 > Return $a^b$. We require $b \geq 0$.
 """
@@ -725,7 +725,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     =={T <: RingElement}(x::AbstractAlgebra.RelSeriesElem{T}, y::AbstractAlgebra.RelSeriesElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
@@ -757,7 +757,7 @@ function ==(x::AbstractAlgebra.RelSeriesElem{T}, y::AbstractAlgebra.RelSeriesEle
    return true
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isequal{T <: RingElement}(x::AbstractAlgebra.RelSeriesElem{T}, y::AbstractAlgebra.RelSeriesElem{T})
 > Return `true` if $x == y$ exactly, otherwise return `false`. Only if the
 > power series are precisely the same, to the same precision, are they declared
@@ -785,7 +785,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     =={T <: RingElem}(x::AbstractAlgebra.RelSeriesElem{T}, y::T)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
@@ -793,13 +793,13 @@ Markdown.doc"""
            ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
              valuation(x) == 0 && polcoeff(x, 0) == y))
 
-Markdown.doc"""
+@doc Markdown.doc"""
     =={T <: RingElem}(x::T, y::AbstractAlgebra.RelSeriesElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::T, y::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElem} = y == x
 
-Markdown.doc"""
+@doc Markdown.doc"""
     ==(x::AbstractAlgebra.RelSeriesElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
@@ -807,7 +807,7 @@ Markdown.doc"""
                   ((pol_length(x) == 0 && iszero(y)) || (pol_length(x) == 1 &&
                     valuation(x) == 0 && polcoeff(x, 0) == y))
 
-Markdown.doc"""
+@doc Markdown.doc"""
     ==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.RelSeriesElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
@@ -838,7 +838,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     divexact{T <: RingElement}(a::AbstractAlgebra.RelSeriesElem{T}, b::AbstractAlgebra.RelSeriesElem{T})
 > Return $a/b$. Requires $b$ to be invertible.
 """
@@ -863,7 +863,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     divexact(a::AbstractAlgebra.RelSeriesElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a/b$ where the quotient is expected to be exact.
 """
@@ -880,7 +880,7 @@ function divexact(x::AbstractAlgebra.RelSeriesElem, y::Union{Integer, Rational, 
    return z
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     divexact{T <: RingElem}(a::AbstractAlgebra.RelSeriesElem{T}, b::T)
 > Return $a/b$ where the quotient is expected to be exact.
 """
@@ -903,7 +903,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
    inv(a::AbstractAlgebra.RelSeriesElem)
 > Return the inverse of the power series $a$, i.e. $1/a$.
 """
@@ -936,7 +936,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
    sqrt(a::AbstractAlgebra.RelSeriesElem)
 > Return the square root of the power series $a$.
 """
@@ -990,7 +990,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     exp(a::AbstractAlgebra.RelSeriesElem)
 > Return the exponential of the power series $a$.
 """
@@ -1291,7 +1291,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
    PowerSeriesRing(R::AbstractAlgebra.Ring, prec::Int, s::AbstractString; cached=true, model=:capped_relative)
 > Return a tuple $(S, x)$ consisting of the parent object `S` of a power series
 > ring over the given base ring and a generator `x` for the power series ring.

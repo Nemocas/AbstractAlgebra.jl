@@ -30,7 +30,7 @@ function Fac(u::T, d::Dict{T, Int}) where {T}
    return f
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     unit(a::Fac{T}) -> T
 
 > Returns the unit of the factorization.
@@ -45,7 +45,7 @@ unit(a::Fac) = a.unit
 #
 ################################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     in(a::T, b::Fac{T})
 
 > Test whether `a` is a factor of `b`.
@@ -54,7 +54,7 @@ function Base.in(a::T, b::Fac{T}) where {T}
    a in keys(b.fac)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     getindex(a::Fac{T}, b::T) -> Int
 
 > If `b` is a factor of `a`, the corresponding exponent is returned. Otherwise
@@ -68,7 +68,7 @@ function getindex(a::Fac{T}, b::T) where {T}
   end
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     setindex!(a::Fac{T}, c::Int, b::T)
 
 > If `b` is a factor of `a`, the corresponding entry is set to c.
@@ -114,7 +114,7 @@ Base.iterate(a::Fac, b) = Base.iterate(a.fac, b)
 
 Base.eltype(::Type{Fac{T}}) where {T} = Base.eltype(Dict{T, Int})
 
-Markdown.doc"""
+@doc Markdown.doc"""
     length(a::Fac) -> Int
 
 > Returns the number of factors of `a`, not including the unit.
