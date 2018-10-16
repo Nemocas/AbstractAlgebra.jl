@@ -146,6 +146,12 @@ function test_gen_matalg_manipulation()
    @test iszero(zero(S))
    @test isone(one(S))
 
+   U = MatrixAlgebra(QQ, 3)
+   C = U([1 2 3; 5 6 7; 9 8 5])
+
+   @test !isunit(A)
+   @test isunit(C)
+
    B[1, 1] = R(3)
    @test B[1, 1] == R(3)
 

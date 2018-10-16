@@ -74,6 +74,10 @@ Markdown.doc"""
 """
 one(a::AbstractAlgebra.MatAlgebra) = a(1)
 
+isunit(a::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement = isunit(det(a))
+
+isunit(a::AbstractAlgebra.MatAlgElem{T}) where T <: FieldElement = rank(a) == degree(a)
+
 ###############################################################################
 #
 #   Similar and eye
@@ -244,11 +248,11 @@ function divexact_right(x::AbstractAlgebra.MatAlgElem{T}, y::T) where {T <: Ring
    return divexact(x, y)
 end
 
-function divexact_left(x::AbstractAlgebra.MatAlgElem, y::Union{Integer, Rational, AbstractFloat})
+function divexact_left(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
    return divexact(x, y)
 end
 
-function divexact_right(x::AbstractAlgebra.MatAlgElem, y::Union{Integer, Rational, AbstractFloat})
+function divexact_right(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
    return divexact(x, y)
 end
 

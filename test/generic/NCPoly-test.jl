@@ -56,7 +56,7 @@ end
 function test_gen_ncpoly_manipulation()
    print("Generic.NCPoly.manipulation...")
 
-   R, x = PolynomialRing(ZZ, "x")
+   R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
 
    @test iszero(zero(S))
@@ -67,31 +67,31 @@ function test_gen_ncpoly_manipulation()
 
    @test isunit(one(S))
 
-   f = 2x*y + x^2 + 1
+   f = 2*y + 1
 
-   @test lead(f) == 2x
+   @test lead(f) == 2
 
-   @test trail(2x*y + x^2) == x^2
+   @test trail(2y^2 + 3y) == 3
 
    @test degree(f) == 1
 
-   h = x*y^2 + (x + 1)*y + 3
+   h = y^2 + 3*y + 3
 
-   @test coeff(h, 2) == x
+   @test coeff(h, 1) == 3
 
    @test length(h) == 3
 
-   @test canonical_unit(-x*y + x + 1) == -1
+   @test canonical_unit(-y + 1) == -1
 
    @test deepcopy(h) == h
 
-   @test isterm(2*x*y^2)
+   @test isterm(rand(R, -10:10)*y^2)
 
-   @test !ismonomial(2*x*y^2)
+   @test !ismonomial(2*y^2)
 
-   @test ismonomial(x*y^2)
+   @test ismonomial(y^2)
 
-   @test !ismonomial(2*x*y^2 + y + 1)
+   @test !ismonomial(y^2 + y + 1)
 
    println("PASS")
 end
