@@ -6,6 +6,8 @@
 
 elem_type(::T) where {T <: NCRing} = elem_type(T)
 
+include("Rings.jl")
+
 ###############################################################################
 #
 #   Promotion system
@@ -92,4 +94,3 @@ end
 
 ==(x::RingElement, y::NCRingElem) = parent(y)(x) == y
 
-include("Rings.jl")

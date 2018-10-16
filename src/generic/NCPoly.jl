@@ -126,7 +126,7 @@ show_minus_one(::Type{NCPoly{T}}) where {T <: NCRingElem} = show_minus_one(T)
 ###############################################################################
 
 Markdown.doc"""
-    +{T <: RingElement}(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T})
+    +{T <: NCRingElem}(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T})
 > Return $a + b$.
 """
 function +(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T}) where {T <: NCRingElem}
@@ -154,7 +154,7 @@ function +(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T}) w
 end
 
 Markdown.doc"""
-    -{T <: RingElement}(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T})
+    -{T <: NCRingElem}(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T})
 > Return $a - b$.
 """
 function -(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T}) where {T <: NCRingElem}
@@ -796,7 +796,7 @@ function (a::NCPolyRing{T})(b::Array{S, 1}) where {S <: NCRingElem, T <: NCRingE
    return z
 end
 
-function (a::NCPolyRing{T})(b::Array{S, 1}) where {S <: RingElement, T <: NCRingElem}
+function (a::NCPolyRing{T})(b::Array{S, 1}) where {S <: NCRingElem, T <: NCRingElem}
    R = base_ring(a)
    len = length(b)
    entries = Array{T}(undef, len)
