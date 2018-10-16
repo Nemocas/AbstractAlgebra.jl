@@ -40,7 +40,7 @@ if VERSION < v"0.7.0-DEV.1144"
 isone(a::Integer) = a == 1
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
    isunit(a::Integer)
 > Return `true` if $a$ is $1$ or $-1$.
 """
@@ -133,7 +133,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
    sqrt{T <: Integer}(a::T)
 > Return the integer square root of $a$. If $a$ is not a perfect square an
 > error is thrown.
@@ -150,7 +150,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
    exp{a <: Integer}(a::T)
 > Return $1$ if $a = 0$, otherwise throw an exception. This function is not
 > generally of use to the user, but is used internally in AbstractAlgebra.jl.
@@ -171,7 +171,7 @@ function exp(a::T) where T <: Integer
 # c*n = a or c = gcd(a, b^infty), n = div(a, c).
 # This is used in various Euclidean domains for Chinese remaindering.
 
-Markdown.doc"""
+@doc Markdown.doc"""
    ppio(a::T, b::T)
 
 > Split $a$ into $c*d$ where $c = gcd(a, b^\infty)$.
