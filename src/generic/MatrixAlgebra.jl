@@ -232,6 +232,28 @@ end
 
 ###############################################################################
 #
+#   Ad hoc exact division
+#
+###############################################################################
+
+function divexact_left(x::AbstractAlgebra.MatAlgElem{T}, y::T) where {T <: RingElem}
+   return divexact(x, y)
+end
+
+function divexact_right(x::AbstractAlgebra.MatAlgElem{T}, y::T) where {T <: RingElem}
+   return divexact(x, y)
+end
+
+function divexact_left(x::AbstractAlgebra.MatAlgElem, y::Union{Integer, Rational, AbstractFloat})
+   return divexact(x, y)
+end
+
+function divexact_right(x::AbstractAlgebra.MatAlgElem, y::Union{Integer, Rational, AbstractFloat})
+   return divexact(x, y)
+end
+
+###############################################################################
+#
 #   Transpose
 #
 ###############################################################################

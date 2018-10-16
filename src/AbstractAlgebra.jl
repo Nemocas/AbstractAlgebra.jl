@@ -333,6 +333,14 @@ function PolynomialRing(R::Ring, s::Char; cached::Bool = true)
    PolynomialRing(R, string(s); cached=cached)
 end
 
+function PolynomialRing(R::NCRing, s::AbstractString; cached::Bool = true)
+   Generic.PolynomialRing(R, s; cached=cached)
+end
+
+function PolynomialRing(R::NCRing, s::Char; cached::Bool = true)
+   PolynomialRing(R, string(s); cached=cached)
+end
+
 function PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
    Generic.PolynomialRing(R, s; cached=cached, ordering=ordering)
 end
