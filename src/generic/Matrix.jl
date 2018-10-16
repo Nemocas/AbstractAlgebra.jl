@@ -8,8 +8,8 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref,
        charpoly_danilevsky!, charpoly_danilevsky_ff!, hessenberg!, hessenberg,
        ishessenberg, identity_matrix, charpoly_hessenberg!, matrix, minpoly,
        typed_hvcat, typed_hcat, powers, randmat_triu, randmat_with_rank,
-       similarity!, solve, solve_rational, hnf, hnf_minors,
-       hnf_minors_with_trafo, hnf_with_trafo, issquare, snf, snf_with_trafo,
+       similarity!, solve, solve_rational, hnf, hnf_kb,
+       hnf_kb_with_trafo, hnf_with_trafo, issquare, snf, snf_with_trafo,
        weak_popov, weak_popov_with_trafo, extended_weak_popov,
        extended_weak_popov_with_trafo, rank, rank_profile_popov, hnf_via_popov,
        hnf_via_popov_with_trafo, popov, popov_with_trafo, det_popov,
@@ -2880,8 +2880,8 @@ end
 
 Markdown.doc"""
     hnf_minors(A::Mat) -> Mat
-> Compute the upper right row Hermite normal form of $A$ using the algorithm
-> of Kannan-Bachem.
+> Compute the upper right row Hermite normal form of $A$ using the algorithm of
+> Kannan-Bachem. The input must have full column rank.
 """
 function hnf_minors(A::MatrixElem{T}) where {T <: RingElement}
    H = deepcopy(A)
@@ -2892,7 +2892,8 @@ end
 Markdown.doc"""
     hnf_minors_with_trafo(A::Mat) -> Mat, Mat
 > Compute the upper right row Hermite normal form $H$ of $A$ and an invertible
-> matrix $U$ with $UA = H$ using the algorithm of Kannan-Bachem.
+> matrix $U$ with $UA = H$ using the algorithm of Kannan-Bachem. The input must
+> have full column rank.
 """
 function hnf_minors_with_trafo(A::MatrixElem{T}) where {T <: RingElement}
    H = deepcopy(A)
@@ -3133,11 +3134,22 @@ end
 #  Hermite normal form for arbitrary matrices via a modification of the
 #  Kannan-Bachem algorithm
 
-function hnf_kb(A::MatrixElem{T}) where {T <: RingElement}
+Markdown.doc"""
+    hnf_kb(A::Mat) -> Mat
+> Compute the upper right row Hermite normal form of $A$ using a modification
+> of the algorithm of Kannan-Bachem.
+"""
+function hnf_kb(A::MatElem{T}) where {T <: RingElement}
    return _hnf_kb(A, Val{false})
 end
 
-function hnf_kb_with_trafo(A::MatrixElem{T}) where {T <: RingElement}
+Markdown.doc"""
+    hnf_kb_with_trafo(A::Mat) -> Mat, Mat
+> Compute the upper right row Hermite normal form $H$ of $A$ and an invertible
+> matrix $U$ with $UA = H$ using a modification of the algorithm of
+> Kannan-Bachem.
+"""
+function hnf_kb_with_trafo(A::MatElem{T}) where {T <: RingElement}
    return _hnf_kb(A, Val{true})
 end
 
