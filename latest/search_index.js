@@ -577,6 +577,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "integer.html#AbstractAlgebra.Generic.isunit-Tuple{Integer}",
+    "page": "Integer ring",
+    "title": "AbstractAlgebra.Generic.isunit",
+    "category": "method",
+    "text": "isunit(a::Integer)\n\nReturn true if a is 1 or -1.\n\n\n\n"
+},
+
+{
     "location": "integer.html#Basic-functionality-1",
     "page": "Integer ring",
     "title": "Basic functionality",
@@ -585,11 +593,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "integer.html#AbstractAlgebra.sqrt-Tuple{BigInt}",
+    "page": "Integer ring",
+    "title": "AbstractAlgebra.sqrt",
+    "category": "method",
+    "text": "sqrt{T <: Integer}(a::T)\n\nReturn the integer square root of a. If a is not a perfect square an error is thrown.\n\n\n\nsqrt{T <: Integer}(a::Rational{T})\n\nReturn the square root of a if it is the square of a rational, otherwise throw an error.\n\n\n\n"
+},
+
+{
+    "location": "integer.html#AbstractAlgebra.exp-Tuple{BigInt}",
+    "page": "Integer ring",
+    "title": "AbstractAlgebra.exp",
+    "category": "method",
+    "text": "exp{a <: Integer}(a::T)\n\nReturn 1 if a = 0, otherwise throw an exception. This function is not generally of use to the user, but is used internally in AbstractAlgebra.jl.\n\n\n\nexp{T <: Integer}(a::Rational{T})\n\nReturn 1 if a = 0, otherwise throw an exception.\n\n\n\n"
+},
+
+{
     "location": "integer.html#Square-root-1",
     "page": "Integer ring",
     "title": "Square root",
     "category": "section",
     "text": "AbstractAlgebra.sqrt(a::BigInt)AbstractAlgebra.exp(a::BigInt)Examplesd = AbstractAlgebra.sqrt(ZZ(36))\nm = AbstractAlgebra.exp(ZZ(0))"
+},
+
+{
+    "location": "integer.html#AbstractAlgebra.ppio-Tuple{BigInt,BigInt}",
+    "page": "Integer ring",
+    "title": "AbstractAlgebra.ppio",
+    "category": "method",
+    "text": "ppio(a::T, b::T)\n\nSplit a into c*d where c = gcd(a b^infty).\n\n\n\n"
 },
 
 {
@@ -713,11 +745,91 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "polynomial.html#AbstractAlgebra.Generic.modulus-Union{Tuple{PolyElem{T}}, Tuple{T}} where T<:ResElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.modulus",
+    "category": "method",
+    "text": "modulus{T <: ResElem}(a::AbstractAlgebra.PolyElem{T})\n\nReturn the modulus of the coefficients of the given polynomial.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.lead-Tuple{PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.lead",
+    "category": "method",
+    "text": "lead(x::AbstractAlgebra.PolyElem)\n\nReturn the leading coefficient of the given polynomial. This will be the nonzero coefficient of the term with highest degree unless the polynomial in the zero polynomial, in which case a zero coefficient is returned.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.trail-Tuple{PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.trail",
+    "category": "method",
+    "text": "trail(x::AbstractAlgebra.PolyElem)\n\nReturn the trailing coefficient of the given polynomial. This will be the nonzero coefficient of the term with lowest degree unless the polynomial in the zero polynomial, in which case a zero coefficient is returned.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.gen-Tuple{PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.gen",
+    "category": "method",
+    "text": "gen{T <: RingElement}(R::AbsSeriesRing{T})\n\nReturn the generator of the power series ring, i.e. x + O(x^n) where n is the precision of the power series ring R.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.isgen-Tuple{PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.isgen",
+    "category": "method",
+    "text": "isgen(a::AbstractAlgebra.PolyElem)\n\nReturn true if the given polynomial is the constant generator of its polynomial ring, otherwise return false.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.isunit-Tuple{PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.isunit",
+    "category": "method",
+    "text": "isunit(a::AbstractAlgebra.PolyElem)\n\nReturn true if the given polynomial is a unit in its polynomial ring, otherwise return false.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.ismonomial-Tuple{PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.ismonomial",
+    "category": "method",
+    "text": "ismonomial(a::AbstractAlgebra.PolyElem)\n\nReturn true if the given polynomial is a monomial.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.isterm-Tuple{PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.isterm",
+    "category": "method",
+    "text": "isterm(a::AbstractAlgebra.PolyElem)\n\nReturn true if the given polynomial is has one term. This function is recursive, with all scalar types returning true.\n\n\n\n"
+},
+
+{
     "location": "polynomial.html#Basic-functionality-1",
     "page": "Generic univariate polynomials",
     "title": "Basic functionality",
     "category": "section",
     "text": "modulus{T <: ResElem}(::PolyElem{T})lead(::PolyElem)\ntrail(::PolyElem)gen(::PolyElem)isgen(::PolyElem)isunit(::PolyElem)ismonomial(::PolyElem)isterm(::PolyElem)ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\nT, z = PolynomialRing(QQ, \"z\")\nU = ResidueRing(ZZ, 17)\nV, w = PolynomialRing(U, \"w\")\n\na = zero(S)\nb = one(S)\n\nc = BigInt(1)//2*z^2 + BigInt(1)//3\nd = x*y^2 + (x + 1)*y + 3\n\nf = lead(d)\ny = gen(S)\ng = isgen(w)\nm = isunit(b)\nn = degree(d)\nr = modulus(w)\nisterm(2y^2) == true\nismonomial(y^2) == true"
+},
+
+{
+    "location": "polynomial.html#Base.truncate-Tuple{PolyElem,Int64}",
+    "page": "Generic univariate polynomials",
+    "title": "Base.truncate",
+    "category": "method",
+    "text": "truncate(a::AbstractAlgebra.PolyElem, n::Int)\n\nReturn a truncated to n terms.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.mullow-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T},Int64}} where T<:RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.mullow",
+    "category": "method",
+    "text": "mullow{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, n::Int)\n\nReturn atimes b truncated to n terms.\n\n\n\n"
 },
 
 {
@@ -729,11 +841,43 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "polynomial.html#Base.reverse-Tuple{PolyElem,Int64}",
+    "page": "Generic univariate polynomials",
+    "title": "Base.reverse",
+    "category": "method",
+    "text": "reverse(x::AbstractAlgebra.PolyElem, len::Int)\n\nReturn the reverse of the polynomial x, thought of as a polynomial of the given length (the polynomial will be notionally truncated or padded with zeroes before the leading term if necessary to match the specified length). The resulting polynomial is normalised. If len is negative we throw a DomainError().\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#Base.reverse-Tuple{PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "Base.reverse",
+    "category": "method",
+    "text": "reverse(x::AbstractAlgebra.PolyElem)\n\nReturn the reverse of the polynomial x, i.e. the leading coefficient of x becomes the constant coefficient of the result, etc. The resulting polynomial is normalised.\n\n\n\n"
+},
+
+{
     "location": "polynomial.html#Reversal-1",
     "page": "Generic univariate polynomials",
     "title": "Reversal",
     "category": "section",
     "text": "reverse(::PolyElem, ::Int)\nreverse(::PolyElem)ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = x*y^2 + (x + 1)*y + 3\n\ng = reverse(f, 7)\nh = reverse(f)"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.shift_left-Tuple{PolyElem,Int64}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.shift_left",
+    "category": "method",
+    "text": "shift_left(x::AbstractAlgebra.PolyElem, n::Int)\n\nReturn the polynomial f shifted left by n terms, i.e. multiplied by x^n.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.shift_right-Tuple{PolyElem,Int64}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.shift_right",
+    "category": "method",
+    "text": "shift_right(f::AbstractAlgebra.PolyElem, n::Int)\n\nReturn the polynomial f shifted right by n terms, i.e. divided by x^n.\n\n\n\n"
 },
 
 {
@@ -745,11 +889,43 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "polynomial.html#AbstractAlgebra.Generic.pseudorem-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T}}} where T<:RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.pseudorem",
+    "category": "method",
+    "text": "pseudorem{T <: RingElement}(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T})\n\nReturn the pseudoremainder of a divided by b. If b = 0 we throw a DivideError().\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.pseudodivrem-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T}}} where T<:RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.pseudodivrem",
+    "category": "method",
+    "text": "pseudodivrem{T <: RingElement}(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T})\n\nReturn a tuple (q r) consisting of the pseudoquotient and pseudoremainder of a divided by b. If b = 0 we throw a DivideError().\n\n\n\n"
+},
+
+{
     "location": "polynomial.html#Pseudodivision-1",
     "page": "Generic univariate polynomials",
     "title": "Pseudodivision",
     "category": "section",
     "text": "Given two polynomials a b, pseudodivision computes polynomials q and r with length(r)  length(b) such that L^d a = bq + r where d = length(a) - length(b) + 1 and L is the leading coefficient of b.We call q the pseudoquotient and r the pseudoremainder.pseudorem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})pseudodivrem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = x*y^2 + (x + 1)*y + 3\ng = (x + 1)*y + (x^3 + 2x + 2)\n\nh = pseudorem(f, g)\nq, r = pseudodivrem(f, g)"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.content-Tuple{PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.content",
+    "category": "method",
+    "text": "content(a::AbstractAlgebra.PolyElem)\n\nReturn the content of a, i.e. the greatest common divisor of its coefficients.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.primpart-Tuple{PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.primpart",
+    "category": "method",
+    "text": "primpart(a::AbstractAlgebra.PolyElem)\n\nReturn the primitive part of a, i.e. the polynomial divided by its content.\n\n\n\n"
 },
 
 {
@@ -761,11 +937,59 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "polynomial.html#AbstractAlgebra.Generic.evaluate-Union{Tuple{T}, Tuple{PolyElem{T},T}} where T<:RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.evaluate",
+    "category": "method",
+    "text": "evaluate{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::T)\n\nEvaluate the polynomial a at the value b and return the result.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.evaluate-Tuple{PolyElem,Integer}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.evaluate",
+    "category": "method",
+    "text": "evaluate{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::T)\n\nEvaluate the polynomial a at the value b and return the result.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.compose-Tuple{PolyElem,PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.compose",
+    "category": "method",
+    "text": "compose(a::AbstractAlgebra.PolyElem, b::AbstractAlgebra.PolyElem)\n\nCompose the polynomial a with the polynomial b and return the result, i.e. return acirc b.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.subst-Union{Tuple{T}, Tuple{PolyElem{T},Any}} where T<:RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.subst",
+    "category": "method",
+    "text": "subst{T <: RingElement}(f::AbstractAlgebra.PolyElem{T}, a::Any)\n\nEvaluate the polynomial f at a. Note that a can be anything, whether a ring element or not.\n\n\n\n"
+},
+
+{
     "location": "polynomial.html#Evaluation,-composition-and-substitution-1",
     "page": "Generic univariate polynomials",
     "title": "Evaluation, composition and substitution",
     "category": "section",
     "text": "evaluate{T <: RingElem}(::PolyElem{T}, ::T)\nevaluate(::PolyElem, ::Integer)compose(::PolyElem, ::PolyElem)subst{T <: RingElem}(::PolyElem{T}, ::Any)We also overload the functional notation so that the polynomial f can be evaluated at a by writing f(a). ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n   \nf = x*y^2 + (x + 1)*y + 3\ng = (x + 1)*y + (x^3 + 2x + 2)\nM = R[x + 1 2x; x - 3 2x - 1]\n\nk = evaluate(f, 3)\nm = evaluate(f, x^2 + 2x + 1)\nn = compose(f, g)\np = subst(f, M)\nq = f(M)\nr = f(23)"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.derivative-Tuple{PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.derivative",
+    "category": "method",
+    "text": "derivative(a::AbstractAlgebra.PolyElem)\n\nReturn the derivative of the polynomial a.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.integral-Union{Tuple{PolyElem{T}}, Tuple{T}} where T<:Union{FieldElem, ResElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.integral",
+    "category": "method",
+    "text": "integral{T <: Union{AbstractAlgebra.ResElem, FieldElement}}(x::AbstractAlgebra.PolyElem{T})\n\nReturn the integral of the polynomial a.\n\n\n\n"
 },
 
 {
@@ -777,11 +1001,51 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "polynomial.html#AbstractAlgebra.Generic.resultant-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T}}} where T<:RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.resultant",
+    "category": "method",
+    "text": "resultant{T <: RingElem}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})\n\nReturn the resultant of the given polynomials.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.resx-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T}}} where T<:RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.resx",
+    "category": "method",
+    "text": "resx{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})\n\nReturn a tuple (r s t) such that r is the resultant of a and b and such that r = atimes s + btimes t.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.discriminant-Tuple{PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.discriminant",
+    "category": "method",
+    "text": "discriminant(a::AbstractAlgebra.PolyElem)\n\nReturn the discrimnant of the given polynomial.\n\n\n\n"
+},
+
+{
     "location": "polynomial.html#Resultant-and-discriminant-1",
     "page": "Generic univariate polynomials",
     "title": "Resultant and discriminant",
     "category": "section",
     "text": "resultant{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})resx{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})discriminant(a::PolyElem)ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = 3x*y^2 + (x + 1)*y + 3\ng = 6(x + 1)*y + (x^3 + 2x + 2)\n\nh = resultant(f, g)\nk = discriminant(f)"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.monomial_to_newton!-Union{Tuple{T}, Tuple{Array{T,1},Array{T,1}}} where T<:RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.monomial_to_newton!",
+    "category": "method",
+    "text": "monomial_to_newton!{T <: RingElement}(P::Array{T, 1}, roots::Array{T, 1})\n\nConverts a polynomial p, given as an array of coefficients, in-place from its coefficients given in the standard monomial basis to the Newton basis for the roots r_0 r_1 ldots r_n-2. In other words, this determines output coefficients c_i such that c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + ldots + c_n-1(x-r_0)(x-r_1)cdots(x-r_n-2) is equal to the input polynomial.\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.newton_to_monomial!-Union{Tuple{T}, Tuple{Array{T,1},Array{T,1}}} where T<:RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.newton_to_monomial!",
+    "category": "method",
+    "text": "newton_to_monomial!{T <: RingElement}(P::Array{T, 1}, roots::Array{T, 1})\n\nConverts a polynomial p, given as an array of coefficients, in-place from its coefficients given in the Newton basis for the roots r_0 r_1 ldots r_n-2 to the standard monomial basis. In other words, this evaluates c_0 + c_1(x-r_0) + c_2(x-r_0)(x-r_1) + ldots + c_n-1(x-r_0)(x-r_1)cdots(x-r_n-2) where c_i are the input coefficients given by p.\n\n\n\n"
 },
 
 {
@@ -793,11 +1057,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "polynomial.html#AbstractAlgebra.Generic.interpolate-Union{Tuple{T}, Tuple{PolyRing,Array{T,1},Array{T,1}}} where T<:RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.interpolate",
+    "category": "method",
+    "text": "interpolate{T <: RingElement}(S::AbstractAlgebra.PolyRing, x::Array{T, 1}, y::Array{T, 1})\n\nGiven two arrays of values xs and ys of the same length n, find the polynomial f in the polynomial ring R of length at most n such that f has the value ys at the points xs. The values in the arrays xs and ys must belong to the base ring of the polynomial ring R. If no such polynomial exists, an exception is raised.\n\n\n\n"
+},
+
+{
     "location": "polynomial.html#Interpolation-1",
     "page": "Generic univariate polynomials",
     "title": "Interpolation",
     "category": "section",
     "text": "interpolate{T <: RingElem}(::PolyRing, ::Array{T, 1}, ::Array{T, 1})ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nxs = [R(1), R(2), R(3), R(4)]\nys = [R(1), R(4), R(9), R(16)]\n\nf = interpolate(S, xs, ys)"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.chebyshev_t-Tuple{Int64,PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.chebyshev_t",
+    "category": "method",
+    "text": "chebyshev_t(n::Int, x::AbstractAlgebra.PolyElem)\n\nReturn the Chebyshev polynomial of the first kind T_n(x), defined by T_n(x) = cos(n cos^-1(x)).\n\n\n\n"
+},
+
+{
+    "location": "polynomial.html#AbstractAlgebra.Generic.chebyshev_u-Tuple{Int64,PolyElem}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.chebyshev_u",
+    "category": "method",
+    "text": "chebyshev_u(n::Int, x::AbstractAlgebra.PolyElem)\n\nReturn the Chebyshev polynomial of the first kind U_n(x), defined by (n+1) U_n(x) = T_n+1(x).\n\n\n\n"
 },
 
 {
@@ -849,6 +1137,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "mpolynomial_rings.html#AbstractAlgebra.Generic.total_degree-Union{Tuple{MPoly{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Multivariate Polynomial Ring Interface",
+    "title": "AbstractAlgebra.Generic.total_degree",
+    "category": "method",
+    "text": "total_degree{T <: RingElement}(f::MPoly{T})\n\nReturns the total degree of f.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial_rings.html#AbstractAlgebra.Generic.vars-Union{Tuple{MPoly{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Multivariate Polynomial Ring Interface",
+    "title": "AbstractAlgebra.Generic.vars",
+    "category": "method",
+    "text": "vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}\n\nReturns the variables occuring in p.\n\n\n\n"
+},
+
+{
     "location": "mpolynomial_rings.html#Basic-manipulation-of-rings-and-elements-1",
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Basic manipulation of rings and elements",
@@ -870,6 +1174,14 @@ var documenterSearchIndex = {"docs": [
     "title": "Euclidean division",
     "category": "section",
     "text": "Although multivariate polynomial rings are not in general Euclidean, it is possible to define a quotient with remainder function that depends on the polynomial ordering in the case that the quotient ring is a field or a Euclidean domain. In the case that a polynomial g divides a polynomial f, the result no longer depends on the ordering and the remainder is zero, with the quotient agreeing with the exact quotient.divrem(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn a tuple (q r) such that f = qg + r, where the coefficients of terms of r whose monomials are divisible by the leading monomial of g are reduced modulo the leading coefficient of g (according to the Euclidean function on the coefficients).Note that the result of this function depends on the ordering of the polynomial ring.div(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemAs per the divrem function, but returning the quotient only. Especially when the quotient happens to be exact, this function can be exceedingly fast.divrem(f::MyMPoly{T}, G::Array{MyMPoly{T}, 1}) where T <: AbstractAlgebra.RingElemAs per the divrem function above, except that each term of r starting with the most significant term, is reduced modulo the leading terms of each of the polynomials in the array G for which the leading monomial is a divisor.A tuple (Q r) is returned from the function, where Q is an array of polynomials of the same length as G, and such that f = r + sum QiGi.The result is again dependent on the ordering in general, but if the polynomials in G are over a field and the reduced generators of a Groebner basis, then the result is unique.ExamplesR, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n\nf = 2x^2*y + 2x + y + 1\ng = x + y\nh = y + 1\n\nq = div(f, g)\nq, r = divrem(f, g)\nQ, r = divrem(f, [g, h])"
+},
+
+{
+    "location": "mpolynomial_rings.html#AbstractAlgebra.Generic.change_base_ring-Union{Tuple{T}, Tuple{MPoly{T},Any}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Multivariate Polynomial Ring Interface",
+    "title": "AbstractAlgebra.Generic.change_base_ring",
+    "category": "method",
+    "text": "change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}\n\nReturns the polynomial obtained by applying g to the coefficients of p.\n\n\n\n"
 },
 
 {
@@ -1073,11 +1385,51 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "series.html#AbstractAlgebra.Generic.modulus-Union{Tuple{SeriesElem{T}}, Tuple{T}} where T<:ResElem",
+    "page": "Generic power series",
+    "title": "AbstractAlgebra.Generic.modulus",
+    "category": "method",
+    "text": "modulus{T <: ResElem}(a::AbstractAlgebra.SeriesElem{T})\n\nReturn the modulus of the coefficients of the given power series.\n\n\n\n"
+},
+
+{
+    "location": "series.html#AbstractAlgebra.Generic.isgen-Tuple{RelSeriesElem}",
+    "page": "Generic power series",
+    "title": "AbstractAlgebra.Generic.isgen",
+    "category": "method",
+    "text": "isgen(a::RelSeriesElem)\n\nReturn true if the given power series is arithmetically equal to the generator of its power series ring to its current precision, otherwise return false.\n\n\n\n"
+},
+
+{
+    "location": "series.html#AbstractAlgebra.Generic.isunit-Tuple{RelSeriesElem}",
+    "page": "Generic power series",
+    "title": "AbstractAlgebra.Generic.isunit",
+    "category": "method",
+    "text": "isunit(a::AbstractAlgebra.RelSeriesElem)\n\nReturn true if the given power series is arithmetically equal to a unit, i.e. is invertible, otherwise return false.\n\n\n\n"
+},
+
+{
     "location": "series.html#Basic-functionality-1",
     "page": "Generic power series",
     "title": "Basic functionality",
     "category": "section",
     "text": "coeff(a::AbstractAlgebra.SeriesElem, n::Int)Return the degree n coefficient of the given power series. Note coefficients are numbered from n = 0 for the constant coefficient. If n exceeds the current precision of the power series, the function returns a zero coefficient.For power series types, n must be non-negative. Laurent series do not have this restriction.modulus{T <: ResElem}(::SeriesElem{T})isgen(::RelSeriesElem)isunit(::RelSeriesElem)ExamplesR, t = PowerSeriesRing(QQ, 10, \"t\")\nS, x = PowerSeriesRing(R, 30, \"x\")\n\na = O(x^4)\nb = (t + 3)*x + (t^2 + 1)*x^2 + O(x^4)\n\nk = isgen(gen(R))\nm = isunit(-1 + x + 2x^2)\nn = valuation(a)\np = valuation(b)\nc = coeff(b, 2)"
+},
+
+{
+    "location": "series.html#AbstractAlgebra.Generic.shift_left-Union{Tuple{T}, Tuple{RelSeriesElem{T},Int64}} where T<:RingElem",
+    "page": "Generic power series",
+    "title": "AbstractAlgebra.Generic.shift_left",
+    "category": "method",
+    "text": "shift_left(x::AbstractAlgebra.RelSeriesElem, n::Int)\n\nReturn the power series f shifted left by n terms, i.e. multiplied by x^n.\n\n\n\n"
+},
+
+{
+    "location": "series.html#AbstractAlgebra.Generic.shift_right-Union{Tuple{T}, Tuple{RelSeriesElem{T},Int64}} where T<:RingElem",
+    "page": "Generic power series",
+    "title": "AbstractAlgebra.Generic.shift_right",
+    "category": "method",
+    "text": "shift_right(f::AbstractAlgebra.RelSeriesElem, n::Int)\n\nReturn the power series f shifted right by n terms, i.e. divided by x^n.\n\n\n\n"
 },
 
 {
@@ -1089,6 +1441,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "series.html#Base.truncate-Union{Tuple{T}, Tuple{RelSeriesElem{T},Int64}} where T<:RingElem",
+    "page": "Generic power series",
+    "title": "Base.truncate",
+    "category": "method",
+    "text": "truncate(a::AbstractAlgebra.RelSeriesElem, n::Int)\n\nReturn a truncated to (absolute) precision n.\n\n\n\n"
+},
+
+{
     "location": "series.html#Truncation-1",
     "page": "Generic power series",
     "title": "Truncation",
@@ -1097,11 +1457,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "series.html#Base.inv-Tuple{RelSeriesElem}",
+    "page": "Generic power series",
+    "title": "Base.inv",
+    "category": "method",
+    "text": "inv(a::AbstractAlgebra.RelSeriesElem)\n\nReturn the inverse of the power series a, i.e. 1a.\n\n\n\n"
+},
+
+{
     "location": "series.html#Division-1",
     "page": "Generic power series",
     "title": "Division",
     "category": "section",
     "text": "inv(::RelSeriesElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS, x = PowerSeriesRing(R, 30, \"x\")\n\na = 1 + x + 2x^2 + O(x^5)\nb = S(-1)\n\nc = inv(a)\nd = inv(b)"
+},
+
+{
+    "location": "series.html#Base.exp-Tuple{RelSeriesElem}",
+    "page": "Generic power series",
+    "title": "Base.exp",
+    "category": "method",
+    "text": "exp(a::AbstractAlgebra.RelSeriesElem)\n\nReturn the exponential of the power series a.\n\n\n\n"
+},
+
+{
+    "location": "series.html#Base.sqrt-Tuple{RelSeriesElem}",
+    "page": "Generic power series",
+    "title": "Base.sqrt",
+    "category": "method",
+    "text": "sqrt(a::AbstractAlgebra.RelSeriesElem)\n\nReturn the square root of the power series a.\n\n\n\n"
 },
 
 {
@@ -1177,6 +1561,30 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "puiseux.html#AbstractAlgebra.Generic.modulus-Union{Tuple{Union{PuiseuxSeriesFieldElem{T}, PuiseuxSeriesRingElem{T}}}, Tuple{T}} where T<:ResElem",
+    "page": "Generic Puiseux series",
+    "title": "AbstractAlgebra.Generic.modulus",
+    "category": "method",
+    "text": "modulus{T <: ResElem}(a::PuiseuxSeriesElem{T})\n\nReturn the modulus of the coefficients of the given Puiseux series.\n\n\n\n"
+},
+
+{
+    "location": "puiseux.html#AbstractAlgebra.Generic.isgen-Tuple{Union{PuiseuxSeriesFieldElem{T}, PuiseuxSeriesRingElem{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}}",
+    "page": "Generic Puiseux series",
+    "title": "AbstractAlgebra.Generic.isgen",
+    "category": "method",
+    "text": "isgen(a::PuiseuxSeriesElem)\n\nReturn true if the given Puiseux series is arithmetically equal to the generator of its Puiseux series ring to its current precision, otherwise return false.\n\n\n\n"
+},
+
+{
+    "location": "puiseux.html#AbstractAlgebra.Generic.isunit-Tuple{Union{PuiseuxSeriesFieldElem{T}, PuiseuxSeriesRingElem{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}}",
+    "page": "Generic Puiseux series",
+    "title": "AbstractAlgebra.Generic.isunit",
+    "category": "method",
+    "text": "isunit(a::PuiseuxSeriesElem)\n\nReturn true if the given Puiseux series is arithmetically equal to a unit, i.e. is invertible, otherwise return false.\n\n\n\n"
+},
+
+{
     "location": "puiseux.html#Basic-functionality-1",
     "page": "Generic Puiseux series",
     "title": "Basic functionality",
@@ -1185,11 +1593,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "puiseux.html#Base.inv-Tuple{Union{PuiseuxSeriesFieldElem{T}, PuiseuxSeriesRingElem{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}}",
+    "page": "Generic Puiseux series",
+    "title": "Base.inv",
+    "category": "method",
+    "text": "inv{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nGiven a non-singular ntimes n matrix over a ring the tuple X d consisting of an ntimes n matrix X and a denominator d such that AX = dI_n, where I_n is the ntimes n identity matrix. The denominator will be the determinant of A up to sign. If A is singular an exception is raised.\n\n\n\n"
+},
+
+{
     "location": "puiseux.html#Division-1",
     "page": "Generic Puiseux series",
     "title": "Division",
     "category": "section",
     "text": "inv(::Generic.PuiseuxSeriesElem)ExamplesR, x = PuiseuxSeriesRing(QQ, 30, \"x\")\n\na = 1 + x + 2x^2 + O(x^5)\nb = R(-1)\n\nc = inv(a)\nd = inv(b)"
+},
+
+{
+    "location": "puiseux.html#Base.exp-Tuple{Union{PuiseuxSeriesFieldElem{T}, PuiseuxSeriesRingElem{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}}",
+    "page": "Generic Puiseux series",
+    "title": "Base.exp",
+    "category": "method",
+    "text": "exp(a::PuiseuxSeriesElem)\n\nReturn the exponential of the given Puiseux series a.\n\n\n\n"
+},
+
+{
+    "location": "puiseux.html#Base.sqrt-Tuple{Union{PuiseuxSeriesFieldElem{T}, PuiseuxSeriesRingElem{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}}",
+    "page": "Generic Puiseux series",
+    "title": "Base.sqrt",
+    "category": "method",
+    "text": "sqrt(a::PuiseuxSeriesElem)\n\nReturn the square root of the given Puiseux series a.\n\n\n\n"
 },
 
 {
@@ -1297,6 +1729,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "residue.html#AbstractAlgebra.Generic.modulus-Tuple{ResElem}",
+    "page": "Generic residue rings",
+    "title": "AbstractAlgebra.Generic.modulus",
+    "category": "method",
+    "text": "modulus(R::AbstractAlgebra.ResElem)\n\nReturn the modulus a of the residue ring S = R(a) that the supplied residue r belongs to.\n\n\n\n"
+},
+
+{
+    "location": "residue.html#AbstractAlgebra.Generic.isunit-Tuple{ResElem}",
+    "page": "Generic residue rings",
+    "title": "AbstractAlgebra.Generic.isunit",
+    "category": "method",
+    "text": "isunit(a::AbstractAlgebra.ResElem)\n\nReturn true if the supplied element a is invertible in the residue ring it belongs to, otherwise return false.\n\n\n\n"
+},
+
+{
     "location": "residue.html#Basic-functionality-1",
     "page": "Generic residue rings",
     "title": "Basic functionality",
@@ -1305,11 +1753,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "residue.html#Base.inv-Tuple{ResElem}",
+    "page": "Generic residue rings",
+    "title": "Base.inv",
+    "category": "method",
+    "text": "inv(a::AbstractAlgebra.ResElem)\n\nReturn the inverse of the element a in the residue ring. If an impossible inverse is encountered, an exception is raised.\n\n\n\n"
+},
+
+{
     "location": "residue.html#Inversion-1",
     "page": "Generic residue rings",
     "title": "Inversion",
     "category": "section",
     "text": "inv(::AbstractAlgebra.ResElem)ExamplesR, x = PolynomialRing(QQ, \"x\")\nS = ResidueRing(R)\n\nf = S(x + 1)\n\ng = inv(f)"
+},
+
+{
+    "location": "residue.html#Base.gcd-Union{Tuple{T}, Tuple{ResElem{T},ResElem{T}}} where T<:RingElem",
+    "page": "Generic residue rings",
+    "title": "Base.gcd",
+    "category": "method",
+    "text": "gcd{T <: RingElement}(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T})\n\nReturn a greatest common divisor of a and b if one exists. This is done by taking the greatest common divisor of the data associated with the supplied residues and taking its greatest common divisor with the modulus.\n\n\n\n"
 },
 
 {
@@ -1481,11 +1945,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "fraction.html#Base.gcd-Union{Tuple{T}, Tuple{FracElem{T},FracElem{T}}} where T<:RingElem",
+    "page": "Generic fraction fields",
+    "title": "Base.gcd",
+    "category": "method",
+    "text": "gcd{T <: RingElem}(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T})\n\nReturn a greatest common divisor of a and b if one exists. N.B: we define the GCD of ab and cd to be gcd(ad bc)bd, reduced to lowest terms. This requires the existence of a greatest common divisor function for the base ring.\n\n\n\n"
+},
+
+{
     "location": "fraction.html#Greatest-common-divisor-1",
     "page": "Generic fraction fields",
     "title": "Greatest common divisor",
     "category": "section",
     "text": "gcd{T <: RingElem}(::FracElem{T}, ::FracElem{T})ExamplesR, x = PolynomialRing(QQ, \"x\")\n\nf = (x + 1)//(x^3 + 3x + 1)\ng = (x^2 + 2x + 1)//(x^2 + x + 1)\n\nh = gcd(f, g)"
+},
+
+{
+    "location": "fraction.html#AbstractAlgebra.Generic.remove-Union{Tuple{T}, Tuple{FracElem{T},T}} where T<:RingElem",
+    "page": "Generic fraction fields",
+    "title": "AbstractAlgebra.Generic.remove",
+    "category": "method",
+    "text": "remove{T <: RingElem}(z::AbstractAlgebra.FracElem{T}, p::T)\n\nReturn the tuple n x such that z = p^nx where x has valuation 0 at p.\n\n\n\n"
+},
+
+{
+    "location": "fraction.html#AbstractAlgebra.Generic.valuation-Union{Tuple{T}, Tuple{FracElem{T},T}} where T<:RingElem",
+    "page": "Generic fraction fields",
+    "title": "AbstractAlgebra.Generic.valuation",
+    "category": "method",
+    "text": "valuation{T <: RingElem}(z::AbstractAlgebra.FracElem{T}, p::T)\n\nReturn the valuation of z at p.\n\n\n\n"
 },
 
 {
@@ -1545,6 +2033,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "rational.html#AbstractAlgebra.sqrt-Tuple{Rational{BigInt}}",
+    "page": "Rational field",
+    "title": "AbstractAlgebra.sqrt",
+    "category": "method",
+    "text": "sqrt{T <: Integer}(a::Rational{T})\n\nReturn the square root of a if it is the square of a rational, otherwise throw an error.\n\n\n\n"
+},
+
+{
+    "location": "rational.html#AbstractAlgebra.exp-Tuple{Rational{BigInt}}",
+    "page": "Rational field",
+    "title": "AbstractAlgebra.exp",
+    "category": "method",
+    "text": "exp{T <: Integer}(a::Rational{T})\n\nReturn 1 if a = 0, otherwise throw an exception.\n\n\n\n"
+},
+
+{
     "location": "rational.html#Square-root-1",
     "page": "Rational field",
     "title": "Square root",
@@ -1577,6 +2081,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "finfield.html#AbstractAlgebra.GF-Union{Tuple{T}, Tuple{T}} where T<:Integer",
+    "page": "Finite fields",
+    "title": "AbstractAlgebra.GF",
+    "category": "method",
+    "text": "GF{T <: Integer}(p::T)\n\nReturn the finite field mathbbF_p, where p is a prime. The integer p is not checked for primality, but the behaviour of the resulting object is undefined if p is composite.\n\n\n\n"
+},
+
+{
     "location": "finfield.html#Finite-field-constructors-1",
     "page": "Finite fields",
     "title": "Finite field constructors",
@@ -1590,6 +2102,30 @@ var documenterSearchIndex = {"docs": [
     "title": "Basic field functionality",
     "category": "section",
     "text": "The finite field module in AbstractAlgebra.jl implements the full Field interface.We give some examples of such functionality.ExamplesF = GF(13)\n\nh = zero(F)\nk = one(F)\nisone(k) == true\niszero(f) == false\nU = base_ring(F)\nV = base_ring(h)\nT = parent(h)\nh == deepcopy(h)\nh = h + 2\nm = inv(k)"
+},
+
+{
+    "location": "finfield.html#AbstractAlgebra.Generic.gen-Union{Tuple{GFField{T}}, Tuple{T}} where T<:Integer",
+    "page": "Finite fields",
+    "title": "AbstractAlgebra.Generic.gen",
+    "category": "method",
+    "text": "gen{T <: Integer}(a::GFField{T})\n\nReturn a generator of the field. Currently this returns 1.\n\n\n\n"
+},
+
+{
+    "location": "finfield.html#AbstractAlgebra.Generic.order-Tuple{AbstractAlgebra.GFField}",
+    "page": "Finite fields",
+    "title": "AbstractAlgebra.Generic.order",
+    "category": "method",
+    "text": "order(R::GFField)\n\nReturn the order, i.e. the number of element in, the given finite field.\n\n\n\n"
+},
+
+{
+    "location": "finfield.html#AbstractAlgebra.Generic.degree-Tuple{AbstractAlgebra.GFField}",
+    "page": "Finite fields",
+    "title": "AbstractAlgebra.Generic.degree",
+    "category": "method",
+    "text": "degree(R::GFField)\n\nReturn the degree of the given finite field.\n\n\n\n"
 },
 
 {
@@ -1681,11 +2217,43 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "perm.html#AbstractAlgebra.Generic.setpermstyle",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.setpermstyle",
+    "category": "function",
+    "text": "setpermstyle(format::Symbol)\n\nSelect the style in which permutations are displayed (in REPL or in general as string). This can be either:array - as vectors of integers whose n-th position represents thevalue at n), or:cycles - as, more familiar for mathematicians, decomposition intodisjoint cycles, where the value at n is represented by the entry immediately following n in a cycle (the default).\n\nThe difference is purely esthetical.\n\nExamples:\n\njulia> Generic.setpermstyle(:array)\n:array\n\njulia> perm([2,3,1,5,4])\n[2, 3, 1, 5, 4]\n\njulia> Generic.setpermstyle(:cycles)\n:cycles\n\njulia> perm([2,3,1,5,4])\n(1,2,3)(4,5)\n\n\n\n"
+},
+
+{
     "location": "perm.html#Permutations-and-Permutation-groups-1",
     "page": "Permutations and Permutation groups",
     "title": "Permutations and Permutation groups",
     "category": "section",
     "text": "AbstractAlgebra.jl provides rudimentary native support for permutation groups (implemented in src/generic/PermGroups.jl). All functionality of permutations is accesible in the Generic submodule.Permutations are represented internally via vector of integers, wrapped in type perm{T}, where T<:Integer carries the information on the type of elements of a permutation. Permutation groups are singleton parent objects of type PermGroup{T} and are used mostly to store the length of a permutation, since it is not included in the permutation type.Permutation groups are created using the PermGroup (inner) constructor. However, for convenience we definePermutationGroup = PermGroupso that permutation groups can be created using PermutationGroup instead of PermGroup.Both PermGroup and perm and can be parametrized by any type T<:Integer . By default the parameter is the Int-type native to the systems architecture. However, if you are sure that your permutations are small enough to fit into smaller integer type (such as Int32, Uint16, or even Int8), you may choose to change the parametrizing type accordingly. In practice this may result in decreased memory footprint (when storing multiple permutations) and noticable faster performance, if your workload is heavy in operations on permutations, which e.g. does not fit into cache of your cpu.All the permutation group types belong to the Group abstract type and the corresponding permutation element types belong to the GroupElem abstract type.Generic.setpermstyle"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.perm",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.perm",
+    "category": "type",
+    "text": "perm{T<:Integer}\n\nThe type of permutations. Fieldnames:d::Vector{T} - vector representing the permutation\nmodified::Bool - bit to check the validity of cycle decomposition\ncycles::CycleDec{T} - (cached) cycle decompositionPermutation p consists of a vector (p.d) of n integers from 1 to n. If the i-th entry of the vector is j, this corresponds to p sending i to j. The cycle decomposition (p.cycles) is computed on demand and should never be accessed directly. Use cycles(p) instead.There are two inner constructors of perm:perm(n::T) constructs the trivial perm{T}-permutation of length n.\nperm(v::Vector{T<:Integer}[,check=true]) constructs a permutationrepresented by v. By default perm constructor checks if the vector constitutes a valid permutation. To skip the check call perm(v, false).\n\nExamples:\n\njulia> perm([1,2,3])\n()\n\njulia> g = perm(Int32[2,3,1])\n(1,2,3)\n\njulia> typeof(g)\nAbstractAlgebra.Generic.perm{Int32}\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.PermGroup",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.PermGroup",
+    "category": "type",
+    "text": "PermGroup{T<:Integer}\n\nThe permutation group singleton type. PermGroup(n) constructs the permutation group S_n on n-symbols. The type of elements of the group is inferred from the type of n.\n\nExamples:\n\njulia> G = PermGroup(5)\nPermutation group over 5 elements\n\njulia> elem_type(G)\nAbstractAlgebra.Generic.perm{Int64}\n\njulia> H = PermGroup(UInt16(5))\nPermutation group over 5 elements\n\njulia> elem_type(H)\nAbstractAlgebra.Generic.perm{UInt16}\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.@perm_str",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.@perm_str",
+    "category": "macro",
+    "text": "perm\"...\"\n\nString macro to parse disjoint cycles into perm{Int}.Strings for the output of GAP could be copied directly into perm\"...\". Cycles of length 1 are not necessary, but could be included. A permutation of the minimal support is constructed, i.e. the maximal n in the decomposition determines the parent group S_n.\n\nExamples:\n\njulia> p = perm\"(1,3)(2,4)\"\n(1,3)(2,4)\n\njulia> typeof(p)\nAbstractAlgebra.Generic.perm{Int64}\n\njulia> parent(p) == PermutationGroup(4)\ntrue\n\njulia> p = perm\"(1,3)(2,4)(10)\"\n(1,3)(2,4)\n\njulia> parent(p) == PermutationGroup(10)\ntrue\n\n\n\n"
 },
 
 {
@@ -1697,11 +2265,91 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "perm.html#Base.parent-Tuple{perm}",
+    "page": "Permutations and Permutation groups",
+    "title": "Base.parent",
+    "category": "method",
+    "text": "parent(g::perm)\n\nReturn the parent of the permutation g.\n\njulia> G = PermutationGroup(5); g = perm([3,4,5,2,1])\n(1,3,5)(2,4)\n\njulia> parent(g) == G\ntrue\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.elem_type-Tuple{AbstractAlgebra.PermGroup}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.elem_type",
+    "category": "method",
+    "text": "elem_type(::Type{PermGroup{T}})\n\nReturn the type of elements of a permutation group.\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.parent_type-Tuple{perm}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.parent_type",
+    "category": "method",
+    "text": "parent_type(::Type{perm{T}})\n\nReturn the type of the parent of a permutation.\n\n\n\n"
+},
+
+{
     "location": "perm.html#Permutation-interface-1",
     "page": "Permutations and Permutation groups",
     "title": "Permutation interface",
     "category": "section",
     "text": "The following basic functionality is provided by the default permutation group implementation in AbstractAlgebra.jl, to support construction of other generic constructions over permutation groups. Any custom permutation group implementation in AbstractAlgebra.jl should provide these functions along with the usual group element arithmetic and comparison.parent(::perm)\nelem_type(::PermGroup)\nparent_type(::perm)A custom implementation also needs to implement hash(::perm, ::UInt) and (possibly) deepcopy_internal(::perm, ::ObjectIdDict).note: Note\nPermutation group elements are mutable and so returning shallow copies is not sufficient.getindex(a::perm, n::Int)Allows access to entry n of the given permutation via the syntax a[n]. Note that entries are 1-indexed.setindex!(a::perm, d::Int, n::Int)Set the n-th entry of the given permutation to d. This allows Julia to provide the syntax a[n] = d for setting entries of a permutation. Entries are 1-indexed.note: Note\nUsing setindex! invalidates cycle decomposition cached in a permutation, i.e. it will be computed the next time cycle decomposition is needed.Given the parent object G for a permutation group, the following coercion functions are provided to coerce various arguments into the permutation group. Developers provide these by overloading the permutation group parent objects.G()Return the identity permutation.G(A::Vector{<:Integer})Return the permutation whose entries are given by the elements of the supplied vector.G(p::perm)Take a permutation that is already in the permutation group and simply return it. A copy of the original is not made if not necessary."
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.cycles-Tuple{perm}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.cycles",
+    "category": "method",
+    "text": "cycles(g::perm)\n\nDecompose permutation g into disjoint cycles.Returns a CycleDec object which iterates over disjoint cycles of g. The ordering of cycles is not guaranteed, and the order within each cycle is computed up to a cyclic permutation. The cycle decomposition is cached in g and used in future computation of permtype, parity, sign, order and ^ (powering).\n\nExamples:\n\njulia> g = perm([3,4,5,2,1,6])\n(1,3,5)(2,4)\n\njulia> collect(cycles(g))\n3-element Array{Array{Int64,1},1}:\n [1, 3, 5]\n [2, 4]\n [6]\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.parity-Tuple{perm}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.parity",
+    "category": "method",
+    "text": "parity(g::perm)\n\nReturn the parity of the given permutation, i.e. the parity of the number of transpositions in any decomposition of g into transpositions.parity returns 1 if the number is odd and 0 otherwise. parity uses cycle decomposition of g if already available, but will not compute it on demand. Since cycle structure is cached in g you may call cycles(g) before calling parity.\n\nExamples:\n\njulia> g = perm([3,4,1,2,5])\n(1,3)(2,4)\n\njulia> parity(g)\n0\n\njulia> g = perm([3,4,5,2,1,6])\n(1,3,5)(2,4)\n\njulia> parity(g)\n1\n\n\n\n"
+},
+
+{
+    "location": "perm.html#Base.sign-Tuple{perm}",
+    "page": "Permutations and Permutation groups",
+    "title": "Base.sign",
+    "category": "method",
+    "text": "sign(g::perm)\n\nReturn the sign of permutation.sign returns 1 if g is even and -1 if g is odd. sign represents the homomorphism from the permutation group to the unit group of mathbbZ whose kernel is the alternating group.\n\nExamples:\n\njulia> g = perm([3,4,1,2,5])\n(1,3)(2,4)\n\njulia> sign(g)\n1\n\njulia> g = perm([3,4,5,2,1,6])\n(1,3,5)(2,4)\n\njulia> sign(g)\n-1\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.permtype-Tuple{perm}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.permtype",
+    "category": "method",
+    "text": "permtype(g::perm, rev=true)\n\nReturn the type of permutation g, i.e. lengths of disjoint cycles in cycle decomposition of g.The lengths are sorted in decreasing order by default. permtype(g) fully determines the conjugacy class of g.\n\nExamples:\n\njulia> g = perm([3,4,5,2,1,6])\n(1,3,5)(2,4)\n\njulia> permtype(g)\n3-element Array{Int64,1}:\n 3\n 2\n 1\n\njulia> G = PermGroup(5); e = parent(g)()\n()\n\njulia> permtype(e)\n6-element Array{Int64,1}:\n 1\n 1\n 1\n 1\n 1\n 1\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.order-Tuple{perm}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.order",
+    "category": "method",
+    "text": "order(a::perm) -> BigInt\n\nReturn the order of permutation a as BigInt.If you are sure that computation over T (or its Int promotion) will not overflow you may use the method order(T::Type, a::perm) which bypasses computation with BigInts and returns promote(T, Int).\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.order-Tuple{AbstractAlgebra.Generic.PermGroup}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.order",
+    "category": "method",
+    "text": "order(G::PermGroup) -> BigInt\n\nReturn the order of the full permutation group as BigInt.\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.elements!-Tuple{AbstractAlgebra.Generic.PermGroup}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.elements!",
+    "category": "method",
+    "text": "Generic.elements!(G::PermGroup)\n\nReturn an unsafe iterator over all permutations in G. Only one permutation is allocated and then modified in-place using the non-recursive Heaps algorithm.Note: you need to explicitely copy permutations intended to be stored or modified.\n\nExamples:\n\njulia> elts = Generic.elements!(PermGroup(5));\n\njulia> length(elts)\n120\n\njulia> for p in Generic.elements!(PermGroup(3))\n         println(p)\n       end\n()\n(1,2)\n(1,3,2)\n(2,3)\n(1,2,3)\n(1,3)\n\njulia> A = collect(Generic.elements!(PermGroup(3))); A\n6-element Array{AbstractAlgebra.Generic.perm{Int64},1}:\n (1,3)\n (1,3)\n (1,3)\n (1,3)\n (1,3)\n (1,3)\n\njulia> unique(A)\n1-element Array{AbstractAlgebra.Generic.perm{Int64},1}:\n (1,3)\n\n\n\n"
 },
 
 {
@@ -1729,11 +2377,59 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "perm.html#Base.:==-Tuple{perm,perm}",
+    "page": "Permutations and Permutation groups",
+    "title": "Base.:==",
+    "category": "method",
+    "text": "==(g::perm, h::perm)\n\nReturn true if permutations are equal, otherwise return false.Permutations parametrized by different integer types are considered equal if they define the same permutation in the abstract permutation group.\n\nExamples:\n\njulia> g = perm(Int8[2,3,1])\n(1,2,3)\n\njulia> h = perm\"(3,1,2)\"\n(1,2,3)\n\njulia> g == h\ntrue\n\n\n\n"
+},
+
+{
+    "location": "perm.html#Base.:==-Tuple{AbstractAlgebra.Generic.PermGroup,AbstractAlgebra.Generic.PermGroup}",
+    "page": "Permutations and Permutation groups",
+    "title": "Base.:==",
+    "category": "method",
+    "text": "==(G::PermGroup, H::PermGroup)\n\nReturn true if permutation groups are equal, otherwise return false.Permutation groups on the same number of letters, but parametrized by different integer types are considered different.\n\nExamples:\n\njulia> G = PermGroup(UInt(5))\nPermutation group over 5 elements\n\njulia> H = PermGroup(5)\nPermutation group over 5 elements\n\njulia> G == H\nfalse\n\n\n\n"
+},
+
+{
     "location": "perm.html#Comparison-1",
     "page": "Permutations and Permutation groups",
     "title": "Comparison",
     "category": "section",
     "text": "==(::perm, ::perm)\n==(::Generic.PermGroup, ::Generic.PermGroup)"
+},
+
+{
+    "location": "perm.html#Base.rand-Tuple{AbstractAlgebra.Generic.PermGroup}",
+    "page": "Permutations and Permutation groups",
+    "title": "Base.rand",
+    "category": "method",
+    "text": "rand(G::PermGroup)\n\nReturn a random permutation from G.\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.matrix_repr-Tuple{perm}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.matrix_repr",
+    "category": "method",
+    "text": "matrix_repr(a::perm)\n\nReturn the permutation matrix as sparse matrix representing a via natural embedding of the permutation group into general linear group over mathbbZ.\n\nExamples:\n\njulia> p = perm([2,3,1])\n(1,2,3)\n\njulia> matrix_repr(p)\n3×3 SparseMatrixCSC{Int64,Int64} with 3 stored entries:\n  [3, 1]  =  1\n  [1, 2]  =  1\n  [2, 3]  =  1\n\njulia> full(ans)\n3×3 Array{Int64,2}:\n 0  1  0\n 0  0  1\n 1  0  0\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.emb-Tuple{AbstractAlgebra.Generic.PermGroup,Array{Int64,1},Bool}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.emb",
+    "category": "method",
+    "text": "emb(G::PermGroup, V::Vector{Int})\n\nReturn the natural embedding of a permutation group into G as the subgroup permuting points indexed by V.\n\nExamples:\n\njulia> p = perm([2,3,1])\n(1,2,3)\n\njulia> f = Generic.emb(PermGroup(5), [3,2,5]);\n\njulia> f(p)\n(2,5,3)\n\n\n\n"
+},
+
+{
+    "location": "perm.html#AbstractAlgebra.Generic.emb!-Tuple{perm,perm,Any}",
+    "page": "Permutations and Permutation groups",
+    "title": "AbstractAlgebra.Generic.emb!",
+    "category": "method",
+    "text": "emb!(result::perm, p::perm, V)\n\nEmbed permutation p into permutation result on the indices given by V.This corresponds to the natural embedding of S_k into S_n as the subgroup permuting points indexed by V.\n\nExamples:\n\njulia> p = perm([2,1,4,3])\n(1,2)(3,4)\n\njulia> Generic.emb!(perm(collect(1:5)), p, [3,1,4,5])\n(1,3)(4,5)\n\n\n\n"
 },
 
 {
@@ -1761,11 +2457,75 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "ytabs.html#AbstractAlgebra.Generic.Partition",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.Partition",
+    "category": "type",
+    "text": "Partition(part::Vector{<:Integer}[, check::Bool=true]) <: AbstractVector{Int}\n\nRepresent integer partition in the non-increasing order.part will be sorted, if necessary. Checks for validity of input can be skipped by calling the (inner) constructor with false as the second argument.Functionally Partition is a thin wrapper over Vector{Int}.\n\nFieldnames:n::Int - the partitioned number\npart::Vector{Int} - a non-increasing sequence of summands of n.\n\nExamples:\n\njulia> p = Partition([4,2,1,1,1])\n4₁2₁1₃\n\njulia> p.n == sum(p.part)\ntrue\n\n\n\n"
+},
+
+{
     "location": "ytabs.html#Partitions-1",
     "page": "Partitions and Young tableaux",
     "title": "Partitions",
     "category": "section",
     "text": "The basic underlying object for those concepts is Partition of a number n, i.e. a sequence of positive integers n_1 ldots n_k which sum to n. Partitions in AbstractAlgebra.jl are represented internally by non-increasing Vectors of Ints. Partitions are printed using the standard notation, i.e. 9 = 4 + 2 + 1 + 1 + 1 is shown as 4_1 2_1 1_3 with the subscript indicating the count of a summand in the partition.Generic.Partition"
+},
+
+{
+    "location": "ytabs.html#Base.size-Tuple{AbstractAlgebra.Generic.Partition}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.size",
+    "category": "method",
+    "text": "size(p::Partition)\n\nReturn the size of the vector which represents the partition.\n\nExamples:\n\njulia> p = Partition([4,3,1]); size(p)\n(3,)\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.getindex-Tuple{AbstractAlgebra.Generic.Partition,Integer}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.getindex",
+    "category": "method",
+    "text": "getindex(p::Partition, i::Integer)\n\nReturn the i-th part (in decreasing order) of the partition.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.setindex!-Tuple{AbstractAlgebra.Generic.Partition,Integer,Integer}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.setindex!",
+    "category": "method",
+    "text": "setindex!(p::Partition, v::Integer, i::Integer)\n\nSet the i-th part of partition p to v. setindex! will throw an error if the operation violates the non-increasing assumption.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.AllParts",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.AllParts",
+    "category": "type",
+    "text": "AllParts(n::Int)\n\nReturn an iterator over all integer Partitions of n. Partitions are produced in ascending order according to RuleAsc (Algorithm 3.1) fromJerome Kelleher and Barry O’Sullivan, Generating All Partitions: A Comparison Of Two Encodings ArXiv:0909.2331See also Combinatorics.partitions(1:n).\n\nExamples\n\njulia> ap = AllParts(5);\n\njulia> collect(ap)\n7-element Array{AbstractAlgebra.Generic.Partition,1}:\n 1₅\n 2₁1₃\n 3₁1₂\n 2₂1₁\n 4₁1₁\n 3₁2₁\n 5₁\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic._numpart",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic._numpart",
+    "category": "function",
+    "text": "_numpart(n::Integer)\n\nReturns the number of all distinct integer partitions of n. The function uses Euler pentagonal number theorem for recursive formula. For more details see OEIS sequence A000041. Note that _numpart(0) = 1 by convention.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.conj-Tuple{AbstractAlgebra.Generic.Partition}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.conj",
+    "category": "method",
+    "text": "conj(part::Partition)\n\nReturns the conjugated partition of part, i.e. the partition corresponding to the Young diagram of part reflected through the main diagonal.\n\nExamples:\n\njulia> p = Partition([4,2,1,1,1])\n4₁2₁1₃\n\njulia> conj(p)\n5₁2₁1₂\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.conj-Tuple{AbstractAlgebra.Generic.Partition,Array{T,1} where T}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.conj",
+    "category": "method",
+    "text": "conj(part::Partition, v::Vector)\n\nReturns the conjugated partition of part together with permuted vector v.\n\n\n\n"
 },
 
 {
@@ -1785,11 +2545,43 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "ytabs.html#AbstractAlgebra.Generic.YoungTableau",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.YoungTableau",
+    "category": "type",
+    "text": "YoungTableau(part::Partition[, fill::Vector{Int}=collect(1:sum(part))])  <: AbstractArray{Int, 2}\n\nReturns the Young tableaux of partition part, filled linearly by fill vector. Note that fill vector is in row-major format.Fields:part - the partition defining Young diagram\nfill - the row-major fill vector: the entries of the diagram.\n\nExamples:\n\njulia> p = Partition([4,3,1]); y = YoungTableau(p)\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\njulia> y.part\n4₁3₁1₁\n\njulia> y.fill\n8-element Array{Int64,1}:\n 1\n 2\n 3\n 4\n 5\n 6\n 7\n 8\n\n\n\n"
+},
+
+{
     "location": "ytabs.html#Constructors-1",
     "page": "Partitions and Young tableaux",
     "title": "Constructors",
     "category": "section",
     "text": "In AbstractAlgebra.jl Young tableau are implemented as essentially row-major sparse matrices, i.e. YoungTableau <: AbstractArray{Int,2} but only the defining Partition and the (row-major) fill-vector is stored.Generic.YoungTableauFor convenience there exists an alternative constructor of YoungTableau, which accepts a vector of integers and constructs Partition internally.YoungTableau(p::Vector{Integer}[, fill=collect(1:sum(p))])"
+},
+
+{
+    "location": "ytabs.html#Base.size-Tuple{AbstractAlgebra.Generic.YoungTableau}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.size",
+    "category": "method",
+    "text": "size(Y::YoungTableau)\n\nReturn size of the smallest array containing Y, i.e. the tuple of the number of rows and the number of columns of Y.\n\nExamples:\n\njulia> y = YoungTableau([4,3,1]); size(y)\n(3, 4)\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.getindex-Tuple{AbstractAlgebra.Generic.YoungTableau,Integer}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.getindex",
+    "category": "method",
+    "text": "getindex(Y::YoungTableau, n::Integer)\n\nReturn the column-major linear index into the size(Y)-array. If a box is outside of the array return 0.\n\nExamples:\n\njulia> y = YoungTableau([4,3,1])\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\njulia> y[1]\n1\n\njulia> y[2]\n5\n\njulia> y[4]\n2\n\njulia> y[6]\n0\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.conj-Tuple{AbstractAlgebra.Generic.YoungTableau}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.conj",
+    "category": "method",
+    "text": "conj(Y::YoungTableau)\n\nReturns the conjugated tableau, i.e. the tableau reflected through the main diagonal.\n\nExamples\n\njulia> y = YoungTableau([4,3,1])\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\njulia> conj(y)\n┌───┬───┬───┐\n│ 1 │ 5 │ 8 │\n├───┼───┼───┘\n│ 2 │ 6 │\n├───┼───┤\n│ 3 │ 7 │\n├───┼───┘\n│ 4 │\n└───┘\n\n\n\n"
 },
 
 {
@@ -1801,11 +2593,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "ytabs.html#AbstractAlgebra.Generic.setyoungtabstyle",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.setyoungtabstyle",
+    "category": "function",
+    "text": "setyoungtabstyle(format::Symbol)\n\nSelect the style in which Young tableaux are displayed (in REPL or in general as string). This can be either:array - as matrices of integers, or\n:diagram - as filled Young diagrams (the default).The difference is purely esthetical.\n\nExamples:\n\njulia> Generic.setyoungtabstyle(:array)\n:array\n\njulia> p = Partition([4,3,1]); YoungTableau(p)\n 1  2  3  4\n 5  6  7\n 8\n\njulia> Generic.setyoungtabstyle(:diagram)\n:diagram\n\njulia> YoungTableau(p)\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\n\n\n"
+},
+
+{
     "location": "ytabs.html#Pretty-printing-1",
     "page": "Partitions and Young tableaux",
     "title": "Pretty-printing",
     "category": "section",
     "text": "Similarly to permutations we have two methods of displaying Young Diagrams:Generic.setyoungtabstyle"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.matrix_repr-Tuple{AbstractAlgebra.Generic.YoungTableau}",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.matrix_repr",
+    "category": "method",
+    "text": "matrix_repr(Y::YoungTableau)\n\nConstruct sparse integer matrix representing the tableau.\n\nExamples:\n\njulia> y = YoungTableau([4,3,1]);\n\njulia> matrix_repr(y)\n3×4 SparseMatrixCSC{Int64,Int64} with 8 stored entries:\n  [1, 1]  =  1\n  [2, 1]  =  5\n  [3, 1]  =  8\n  [1, 2]  =  2\n  [2, 2]  =  6\n  [1, 3]  =  3\n  [2, 3]  =  7\n  [1, 4]  =  4\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.fill!-Tuple{AbstractAlgebra.Generic.YoungTableau,AbstractArray{#s1,1} where #s1<:Integer}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.fill!",
+    "category": "method",
+    "text": "fill!(Y::YoungTableaux, V::Vector{<:Integer})\n\nReplace the fill vector Y.fill by V. No check if the resulting tableau is standard (i.e. increasing along rows and columns) is performed.\n\nExamples:\n\njulia> y = YoungTableau([4,3,1])\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\njulia> fill!(y, [2:9...])\n┌───┬───┬───┬───┐\n│ 2 │ 3 │ 4 │ 5 │\n├───┼───┼───┼───┘\n│ 6 │ 7 │ 8 │\n├───┼───┴───┘\n│ 9 │\n└───┘\n\n\n\n"
 },
 
 {
@@ -1817,6 +2633,62 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "ytabs.html#AbstractAlgebra.Generic.character-Tuple{AbstractAlgebra.Generic.Partition}",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.character",
+    "category": "method",
+    "text": "character(lambda::Partition)\n\nReturn the lambda-th irreducible character of permutation group on sum(lambda) symbols. The returned character function is of the following signature:chi(p::perm[, check::Bool=true]) -> BigIntThe function checks (if p belongs to the appropriate group) can be switched off by calling chi(p, false). The values computed by chi are cached in look-up table.The computation follows the Murnaghan-Nakayama formula: chi_lambda(sigma) = sum_textrimhook xisubset lambda(-1)^ll(lambdabackslashxi) chi_lambda backslashxi(tildesigma) where lambdabackslashxi denotes the skew diagram of lambda with xi removed, ll denotes the leg-length (i.e. number of rows - 1) and tildesigma is permutation obtained from sigma by the removal of the longest cycle.For more details see e.g. Chapter 2.8 of Group Theory and Physics by S.Sternberg.\n\nExamples\n\njulia> G = PermutationGroup(4)\nPermutation group over 4 elements\n\njulia> chi = character(Partition([3,1])) # character of the regular representation\n(::char) (generic function with 2 methods)\n\njulia> chi(G())\n3\n\njulia> chi(perm\"(1,3)(2,4)\")\n-1\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.character-Tuple{AbstractAlgebra.Generic.Partition,perm}",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.character",
+    "category": "method",
+    "text": "character(lambda::Partition, p::perm, check::Bool=true) -> BigInt\n\nReturns the value of lambda-th irreducible character of the permutation group on permutation p.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.character-Tuple{AbstractAlgebra.Generic.Partition,AbstractAlgebra.Generic.Partition}",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.character",
+    "category": "method",
+    "text": "character(lambda::Partition, mu::Partition) -> BigInt\n\nReturns the value of lambda-th irreducible character on the conjugacy class represented by partition mu.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.rowlength",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.rowlength",
+    "category": "function",
+    "text": "rowlength(Y::YoungTableau, i, j)\n\nReturn the row length of Y at box (i,j), i.e. the number of boxes in the i-th row of the diagram of Y located to the right of the (i,j)-th box.\n\nExamples\n\njulia> y = YoungTableau([4,3,1])\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\njulia> Generic.rowlength(y, 1,2)\n2\n\njulia> Generic.rowlength(y, 2,3)\n0\n\njulia> Generic.rowlength(y, 3,3)\n0\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.collength",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.collength",
+    "category": "function",
+    "text": "collength(Y::YoungTableau, i, j)\n\nReturn the column length of Y at box (i,j), i.e. the number of boxes in the j-th column of the diagram of Y located below of the (i,j)-th box.\n\nExamples\n\njulia> y = YoungTableau([4,3,1])\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\njulia> Generic.collength(y, 1,1)\n2\n\njulia> Generic.collength(y, 1,3)\n1\n\njulia> Generic.collength(y, 2,4)\n0\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.hooklength",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.hooklength",
+    "category": "function",
+    "text": "hooklength(Y::YoungTableau, i, j)\n\nReturn the hook-length of an element in Y at position (i,j), i.e the number of cells in the i-th row to the rigth of (i,j)-th box, plus the number of cells in the j-th column below the (i,j)-th box, plus 1.Return 0 for (i,j) not in the tableau Y.\n\nExamples\n\njulia> y = YoungTableau([4,3,1])\n┌───┬───┬───┬───┐\n│ 1 │ 2 │ 3 │ 4 │\n├───┼───┼───┼───┘\n│ 5 │ 6 │ 7 │\n├───┼───┴───┘\n│ 8 │\n└───┘\n\njulia> hooklength(y, 1,1)\n6\n\njulia> hooklength(y, 1,3)\n3\n\njulia> hooklength(y, 2,4)\n0\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.dim-Tuple{AbstractAlgebra.Generic.YoungTableau}",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.dim",
+    "category": "method",
+    "text": "dim(Y::YoungTableau) -> BigInt\n\nReturns the dimension (using hook-length formula) of the irreducible representation of permutation group S_n associated the partition Y.part.Since the computation overflows easily BigInt is returned. You may perform the computation of the dimension in different type by calling dim(Int, Y).\n\nExamples\n\njulia> dim(YoungTableau([4,3,1]))\n70\n\njulia> dim(YoungTableau([3,1])) # the regular representation of S_4\n3\n\n\n\n"
+},
+
+{
     "location": "ytabs.html#Characters-of-permutation-grups-1",
     "page": "Partitions and Young tableaux",
     "title": "Characters of permutation grups",
@@ -1825,11 +2697,91 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "ytabs.html#AbstractAlgebra.Generic.partitionseq",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.partitionseq",
+    "category": "function",
+    "text": "partitionseq(lambda::Partition)\n\nReturns a sequence (as BitVector) of falses and trues constructed from lambda: tracing the lower contour of the Young Diagram associated to lambda from left to right a true is inserted for every horizontal and false for every vertical step. The sequence always starts with true and ends with false.\n\n\n\npartitionseq(seq::BitVector)\n\nReturns the essential part of the sequence seq, i.e. a subsequence starting at first true and ending at last false.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.isrimhook-Tuple{BitArray{1},Int64,Int64}",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.isrimhook",
+    "category": "method",
+    "text": "isrimhook(R::BitVector, idx::Int, len::Int)\n\nR[idx:idx+len] forms a rim hook in the Young Diagram of partition corresponding to R iff R[idx] == true and R[idx+len] == false.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.MN1inner",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.MN1inner",
+    "category": "function",
+    "text": "MN1inner(R::BitVector, mu::Partition, t::Int, [charvals])\n\nReturns the value of lambda-th irreducible character on conjugacy class of permutations represented by partition mu, where R is the (binary) partition sequence representing lambda. Values already computed are stored in charvals::Dict{Tuple{BitVector,Vector{Int}}, Int}. This is an implementation (with slight modifications) of the Murnaghan-Nakayama formula as described inDan Bernstein,\n\"The computational complexity of rules for the character table of Sn\"\n_Journal of Symbolic Computation_, 37(6), 2004, p. 727-748.\n\n\n\n"
+},
+
+{
     "location": "ytabs.html#Low-level-functions-and-characters-1",
     "page": "Partitions and Young tableaux",
     "title": "Low-level functions and characters",
     "category": "section",
     "text": "As mentioned above character functions use the Murnaghan-Nakayama rule for evaluation. The implementation followsDan Bernstein, The computational complexity of rules for the character table of S_n Journal of Symbolic Computation, 37 (6), 2004, p. 727-748,implementing the following functions. For precise definitions and meaning please consult the paper cited.Generic.partitionseq\nisrimhook(::BitVector, ::Int, ::Int)\nGeneric.MN1inner"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.SkewDiagram",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.SkewDiagram",
+    "category": "type",
+    "text": "SkewDiagram(lambda::Partition, mu::Partition) <: AbstractArray{Int, 2}\n\nImplements a skew diagram, i.e. a difference of two Young diagrams represented by partitions lambda and mu. (below dots symbolise the removed entries)\n\nExamples\n\njulia> l = Partition([4,3,2])\n4₁3₁2₁\n\njulia> m = Partition([3,1,1])\n3₁1₂\n\njulia> xi = SkewDiagram(l,m)\n3×4 AbstractAlgebra.Generic.SkewDiagram:\n ⋅  ⋅  ⋅  1\n ⋅  1  1\n ⋅  1\n\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.size-Tuple{AbstractAlgebra.Generic.SkewDiagram}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.size",
+    "category": "method",
+    "text": "size(xi::SkewDiagram)\n\nReturn the size of array where xi is minimally contained. See size(Y::YoungTableau) for more details.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.in-Union{Tuple{T}, Tuple{Tuple{T,T},SkewDiagram}} where T<:Integer",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.in",
+    "category": "method",
+    "text": "in(t::Tuple{T,T}, xi::SkewDiagram) where T<:Integer\n\nChecks if box at position (i,j) belongs to the skew diagram xi.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#Base.getindex-Tuple{AbstractAlgebra.Generic.SkewDiagram,Integer}",
+    "page": "Partitions and Young tableaux",
+    "title": "Base.getindex",
+    "category": "method",
+    "text": "getindex(xi::SkewDiagram, n::Integer)\n\nReturn 1 if linear index n corresponds to (column-major) entry in xi.lam which is not contained in xi.mu. Otherwise return 0.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.isrimhook-Tuple{AbstractAlgebra.Generic.SkewDiagram}",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.isrimhook",
+    "category": "method",
+    "text": "isrimhook(xi::SkewDiagram)\n\nChecks if xi represents a rim-hook diagram, i.e. its diagram is edge-connected and contains no 2times 2 squares.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.leglength",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.leglength",
+    "category": "function",
+    "text": "leglength(xi::SkewDiagram[, check::Bool=true])\n\nComputes the leglength of a rim-hook xi, i.e. the number of rows with non-zero entries minus one. If check is false function will not check whether xi is actually a rim-hook.\n\n\n\n"
+},
+
+{
+    "location": "ytabs.html#AbstractAlgebra.Generic.matrix_repr-Tuple{AbstractAlgebra.Generic.SkewDiagram}",
+    "page": "Partitions and Young tableaux",
+    "title": "AbstractAlgebra.Generic.matrix_repr",
+    "category": "method",
+    "text": "matrix_repr(xi::SkewDiagram)\n\nReturns a sparse representation of the diagram xi, i.e. a sparse array A where A[i,j] == 1 if and only if (i,j) is in xi.lam but not in xi.mu.\n\n\n\n"
 },
 
 {
@@ -1977,6 +2929,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix.html#AbstractAlgebra.Generic.sub-Tuple{MatElem,Int64,Int64,Int64,Int64}",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.sub",
+    "category": "method",
+    "text": "sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)\n\nReturn a copy of the submatrix of M from (r1 c1) to (r2 c2) inclusive. Note that is the copy is modified, the original matrix is not.\n\n\n\n"
+},
+
+{
     "location": "matrix.html#Submatrices-1",
     "page": "Generic matrices",
     "title": "Submatrices",
@@ -1993,11 +2953,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix.html#AbstractAlgebra.Generic.rows-Tuple{MatElem}",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.rows",
+    "category": "method",
+    "text": "rows(a::AbstractAlgebra.MatElem)\n\nReturn the number of rows of the given matrix.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.cols-Tuple{MatElem}",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.cols",
+    "category": "method",
+    "text": "cols(a::AbstractAlgebra.MatElem)\n\nReturn the number of columns of the given matrix.\n\n\n\n"
+},
+
+{
     "location": "matrix.html#Basic-matrix-functionality-1",
     "page": "Generic matrices",
     "title": "Basic matrix functionality",
     "category": "section",
     "text": "As well as the Ring and Matrix interfaces, the following functions are provided to manipulate matrices and to set and retrieve entries and other basic data associated with the matrices.rows(::MatElem)cols(::MatElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\nB = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])\n\nr = rows(B)\nc = cols(B)\nM = A + B\nN = 2 + A\nM1 = deepcopy(A)\nA != B\nisone(one(S)) == true\nV = A[1:2, :]\nW = A^3\nZ = divexact(2*A, 2)"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.powers-Tuple{MatElem,Int64}",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.powers",
+    "category": "method",
+    "text": "powers{T <: RingElement}(a::AbstractAlgebra.MatElem{T}, d::Int)\n\nReturn an array of matrices M wher Mi + 1 = a^i for i = 0d\n\n\n\n"
 },
 
 {
@@ -2009,11 +2993,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix.html#AbstractAlgebra.Generic.gram-Tuple{MatElem}",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.gram",
+    "category": "method",
+    "text": "gram(x::AbstractAlgebra.MatElem)\n\nReturn the Gram matrix of x, i.e. if x is an rtimes c matrix return the rtimes r matrix whose entries i j are the dot products of the i-th and j-th rows, respectively.\n\n\n\n"
+},
+
+{
     "location": "matrix.html#Gram-matrix-1",
     "page": "Generic matrices",
     "title": "Gram matrix",
     "category": "section",
     "text": "gram(::MatElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n\nB = gram(A)"
+},
+
+{
+    "location": "matrix.html#LinearAlgebra.tr-Tuple{MatElem}",
+    "page": "Generic matrices",
+    "title": "LinearAlgebra.tr",
+    "category": "method",
+    "text": "tr(x::AbstractAlgebra.MatElem)\n\nReturn the trace of the matrix a, i.e. the sum of the diagonal elements. We require the matrix to be square.\n\n\n\n"
 },
 
 {
@@ -2025,11 +3025,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix.html#AbstractAlgebra.Generic.content-Tuple{MatElem}",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.content",
+    "category": "method",
+    "text": "content(x::AbstractAlgebra.MatElem)\n\nReturn the content of the matrix a, i.e. the greatest common divisor of all its entries, assuming it exists.\n\n\n\n"
+},
+
+{
     "location": "matrix.html#Content-1",
     "page": "Generic matrices",
     "title": "Content",
     "category": "section",
     "text": "content(::MatElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n\nb = content(A)"
+},
+
+{
+    "location": "matrix.html#Base.:*-Tuple{perm,MatElem}",
+    "page": "Generic matrices",
+    "title": "Base.:*",
+    "category": "method",
+    "text": "*(P::Generic.perm, x::AbstractAlgebra.MatElem)\n\nApply the pemutation P to the rows of the matrix x and return the result.\n\n\n\n"
 },
 
 {
@@ -2041,11 +3057,59 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix.html#LinearAlgebra.lu-Union{Tuple{T}, Tuple{MatElem{T},PermGroup}} where T<:FieldElem",
+    "page": "Generic matrices",
+    "title": "LinearAlgebra.lu",
+    "category": "method",
+    "text": "lu{T <: FieldElement}(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A)))\n\nReturn a tuple r p L U consisting of the rank of A, a permutation p of A belonging to P, a lower triangular matrix L and an upper triangular matrix U such that p(A) = LU, where p(A) stands for the matrix whose rows are the given permutation p of the rows of A.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.fflu-Union{Tuple{T}, Tuple{MatElem{T},PermGroup}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.fflu",
+    "category": "method",
+    "text": "fflu{T <: RingElement}(A::AbstractAlgebra.MatElem{T}, P = PermGroup(rows(A)))\n\nReturn a tuple r d p L U consisting of the rank of A, a denominator d, a permutation p of A belonging to P, a lower triangular matrix L and an upper triangular matrix U such that p(A) = LD^1U, where p(A) stands for the matrix whose rows are the given permutation p of the rows of A and such that D is the diagonal matrix diag(p_1 p_1p_2 ldots p_n-2p_n-1 p_n-1 where the p_i are the inverses of the diagonal entries of U. The denominator d is set to pm mboxdet(S) where S is an appropriate submatrix of A (S = A if A is square) and the sign is decided by the parity of the permutation.\n\n\n\n"
+},
+
+{
     "location": "matrix.html#LU-factorisation-1",
     "page": "Generic matrices",
     "title": "LU factorisation",
     "category": "section",
     "text": "lu{T <: FieldElem}(::MatElem{T}, ::PermGroup)fflu{T <: RingElem}(::MatElem{T}, ::PermGroup)ExamplesR, x = PolynomialRing(QQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\n\nA = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 - 2 a - 1 2a])\n\nr, P, L, U = lu(A)\nr, d, P, L, U = fflu(A)"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.rref-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.rref",
+    "category": "method",
+    "text": "rref{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturns a tuple (r d A) consisting of the rank r of M and a denominator d in the base ring of M and a matrix A such that Ad is the reduced row echelon form of M. Note that the denominator is not usually minimal.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.rref-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:FieldElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.rref",
+    "category": "method",
+    "text": "rref{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturns a tuple (r d A) consisting of the rank r of M and a denominator d in the base ring of M and a matrix A such that Ad is the reduced row echelon form of M. Note that the denominator is not usually minimal.\n\n\n\nrref{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})\n\nReturns a tuple (r A) consisting of the rank r of M and a reduced row echelon form A of M.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.isrref-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.isrref",
+    "category": "method",
+    "text": "isrref{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturn true if M is in reduced row echelon form, otherwise return false.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.isrref-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:FieldElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.isrref",
+    "category": "method",
+    "text": "isrref{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturn true if M is in reduced row echelon form, otherwise return false.\n\n\n\nisrref(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}\n\nReturn true if M is in reduced row echelon form, otherwise return false.\n\n\n\n"
 },
 
 {
@@ -2057,11 +3121,43 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix.html#AbstractAlgebra.Generic.hnf-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.hnf",
+    "category": "method",
+    "text": "hnf{T <: RingElement}(A::Mat{T})\n\nReturn the upper right row Hermite normal form of A.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.hnf_with_trafo-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.hnf_with_trafo",
+    "category": "method",
+    "text": "hnf_with_trafo{T <: RingElement}(A::Mat{T}) -> Mat{T}, Mat{T}\n\nReturn the tuple H U consisting of the upper right row Hermite normal form H of A together with invertible matrix U such that UA = H.\n\n\n\n"
+},
+
+{
     "location": "matrix.html#Hermite-normal-form-1",
     "page": "Generic matrices",
     "title": "Hermite normal form",
     "category": "section",
     "text": "hnf{T <: RingElem}(::MatElem{T})\nhnf_with_trafo{T <: RingElem}(::MatElem{T})"
+},
+
+{
+    "location": "matrix.html#LinearAlgebra.det-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "LinearAlgebra.det",
+    "category": "method",
+    "text": "det{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturn the determinant of the matrix M. We assume M is square.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#LinearAlgebra.det-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:FieldElem",
+    "page": "Generic matrices",
+    "title": "LinearAlgebra.det",
+    "category": "method",
+    "text": "det{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})\n\nReturn the determinant of the matrix M. We assume M is square.\n\n\n\ndet{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturn the determinant of the matrix M. We assume M is square.\n\n\n\n"
 },
 
 {
@@ -2073,11 +3169,51 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix.html#LinearAlgebra.rank-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "LinearAlgebra.rank",
+    "category": "method",
+    "text": "rank{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturn the rank of the matrix M.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#LinearAlgebra.rank-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:FieldElem",
+    "page": "Generic matrices",
+    "title": "LinearAlgebra.rank",
+    "category": "method",
+    "text": "rank{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturn the rank of the matrix M.\n\n\n\nrank{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})\n\nReturn the rank of the matrix M.\n\n\n\n"
+},
+
+{
     "location": "matrix.html#Rank-1",
     "page": "Generic matrices",
     "title": "Rank",
     "category": "section",
     "text": "rank{T <: RingElem}(::MatElem{T})\nrank{T <: FieldElem}(::MatElem{T})ExamplesR, x = PolynomialRing(QQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\n   \nA = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n\nd = rank(A)"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.solve-Union{Tuple{T}, Tuple{MatElem{T},MatElem{T}}} where T<:FieldElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.solve",
+    "category": "method",
+    "text": "solve{T <: FieldElement}(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})\n\nGiven a non-singular ntimes n matrix over a field and an ntimes m matrix over the same field, return x an ntimes m matrix x such that Ax = b. If A is singular an exception is raised.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.solve_rational-Union{Tuple{T}, Tuple{MatElem{T},MatElem{T}}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.solve_rational",
+    "category": "method",
+    "text": "solve_rational{T <: RingElement}(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T})\n\nGiven a non-singular ntimes n matrix over a ring and an ntimes m matrix over the same ring, return a tuple x d consisting of an ntimes m matrix x and a denominator d such that Ax = db. The denominator will be the determinant of A up to sign. If A is singular an exception is raised.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.solve_triu-Union{Tuple{T}, Tuple{MatElem{T},MatElem{T},Bool}} where T<:FieldElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.solve_triu",
+    "category": "method",
+    "text": "solve_triu{T <: FieldElement}(U::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}, unit=false)\n\nGiven a non-singular ntimes n matrix over a field which is upper triangular, and an ntimes m matrix over the same field, return an ntimes m matrix x such that Ax = b. If A is singular an exception is raised. If unit is true then U is assumed to have ones on its diagonal, and the diagonal will not be read.\n\n\n\n"
 },
 
 {
@@ -2089,11 +3225,43 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix.html#Base.inv-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "Base.inv",
+    "category": "method",
+    "text": "inv{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nGiven a non-singular ntimes n matrix over a ring the tuple X d consisting of an ntimes n matrix X and a denominator d such that AX = dI_n, where I_n is the ntimes n identity matrix. The denominator will be the determinant of A up to sign. If A is singular an exception is raised.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#Base.inv-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:FieldElem",
+    "page": "Generic matrices",
+    "title": "Base.inv",
+    "category": "method",
+    "text": "inv{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nGiven a non-singular ntimes n matrix over a ring the tuple X d consisting of an ntimes n matrix X and a denominator d such that AX = dI_n, where I_n is the ntimes n identity matrix. The denominator will be the determinant of A up to sign. If A is singular an exception is raised.\n\n\n\ninv{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})\n\nGiven a non-singular ntimes n matrix over a field, return an ntimes n matrix X such that AX = I_n where I_n is the ntimes n identity matrix. If A is singular an exception is raised.\n\n\n\n"
+},
+
+{
     "location": "matrix.html#Inverse-1",
     "page": "Generic matrices",
     "title": "Inverse",
     "category": "section",
     "text": "inv{T <: RingElem}(::MatElem{T})\ninv{T <: FieldElem}(::MatElem{T})ExamplesR, x = PolynomialRing(QQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\n\nA = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n\nX = inv(A)\n\nR, x = PolynomialRing(ZZ, \"x\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])\n    \nX, d = inv(A)"
+},
+
+{
+    "location": "matrix.html#LinearAlgebra.nullspace-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "LinearAlgebra.nullspace",
+    "category": "method",
+    "text": "nullspace{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturns a tuple (nu N) consisting of the nullity nu of M and a basis N (consisting of column vectors) for the right nullspace of M, i.e. such that MN is the zero matrix. If M is an mtimes n matrix N will be an ntimes nu matrix. Note that the nullspace is taken to be the vector space kernel over the fraction field of the base ring if the latter is not a field. In AbstractAlgebra we use the name ``kernel\'\' for a function to compute an integral kernel.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#LinearAlgebra.nullspace-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:FieldElem",
+    "page": "Generic matrices",
+    "title": "LinearAlgebra.nullspace",
+    "category": "method",
+    "text": "nullspace{T <: RingElement}(M::AbstractAlgebra.MatElem{T})\n\nReturns a tuple (nu N) consisting of the nullity nu of M and a basis N (consisting of column vectors) for the right nullspace of M, i.e. such that MN is the zero matrix. If M is an mtimes n matrix N will be an ntimes nu matrix. Note that the nullspace is taken to be the vector space kernel over the fraction field of the base ring if the latter is not a field. In AbstractAlgebra we use the name ``kernel\'\' for a function to compute an integral kernel.\n\n\n\nnullspace{T <: FieldElement}(M::AbstractAlgebra.MatElem{T})\n\nReturns a tuple (nu N) consisting of the nullity nu of M and a basis N (consisting of column vectors) for the right nullspace of M, i.e. such that MN is the zero matrix. If M is an mtimes n matrix N will be an ntimes nu matrix. Note that the nullspace is taken to be the vector space kernel over the fraction field of the base ring if the latter is not a field. In Nemo we use the name ``kernel\'\' for a function to compute an integral kernel.\n\n\n\n"
 },
 
 {
@@ -2105,11 +3273,35 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix.html#LinearAlgebra.hessenberg-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "LinearAlgebra.hessenberg",
+    "category": "method",
+    "text": "hessenberg(A::AbstractAlgebra.MatElem{T}) where {T <: RingElement}\n\nReturns the Hessenberg form of M, i.e. an upper Hessenberg matrix which is similar to M. The upper Hessenberg form has nonzero entries above and on the diagonal and in the diagonal line immediately below the diagonal.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.ishessenberg-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.ishessenberg",
+    "category": "method",
+    "text": "ishessenberg{T <: RingElement}(A::AbstractAlgebra.MatElem{T})\n\nReturns true if M is in Hessenberg form, otherwise returns false.\n\n\n\n"
+},
+
+{
     "location": "matrix.html#Hessenberg-form-1",
     "page": "Generic matrices",
     "title": "Hessenberg form",
     "category": "section",
     "text": "hessenberg{T <: RingElem}(::MatElem{T})ishessenberg{T <: RingElem}(::MatElem{T})ExamplesR = ResidueRing(ZZ, 7)\nS = MatrixSpace(R, 4, 4)\n   \nM = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);\n       R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])\n   \nA = hessenberg(M)\nishessenberg(A) == true"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.charpoly-Union{Tuple{T}, Tuple{Ring,MatElem{T}}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.charpoly",
+    "category": "method",
+    "text": "charpoly{T <: RingElement}(V::Ring, Y::AbstractAlgebra.MatElem{T})\n\nReturns the characteristic polynomial p of the matrix M. The polynomial ring R of the resulting polynomial must be supplied and the matrix is assumed to be square.\n\n\n\n"
 },
 
 {
@@ -2121,6 +3313,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix.html#AbstractAlgebra.Generic.minpoly-Union{Tuple{T}, Tuple{Ring,MatElem{T},Bool}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.minpoly",
+    "category": "method",
+    "text": "minpoly{T <: RingElement}(S::Ring, M::AbstractAlgebra.MatElem{T}, charpoly_only = false)\n\nReturns the minimal polynomial p of the matrix M. The polynomial ring S of the resulting polynomial must be supplied and the matrix must be square.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.minpoly-Union{Tuple{T}, Tuple{Ring,MatElem{T},Bool}} where T<:FieldElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.minpoly",
+    "category": "method",
+    "text": "minpoly{T <: FieldElement}(S::Ring, M::AbstractAlgebra.MatElem{T}, charpoly_only = false)\n\nReturns the minimal polynomial p of the matrix M. The polynomial ring S of the resulting polynomial must be supplied and the matrix must be square.\n\n\n\nminpoly{T <: RingElement}(S::Ring, M::AbstractAlgebra.MatElem{T}, charpoly_only = false)\n\nReturns the minimal polynomial p of the matrix M. The polynomial ring S of the resulting polynomial must be supplied and the matrix must be square.\n\n\n\n"
+},
+
+{
     "location": "matrix.html#Minimal-polynomial-1",
     "page": "Generic matrices",
     "title": "Minimal polynomial",
@@ -2129,11 +3337,51 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix.html#AbstractAlgebra.Generic.similarity!-Union{Tuple{T}, Tuple{MatElem{T},Int64,T}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.similarity!",
+    "category": "method",
+    "text": "similarity!{T <: RingElement}(A::AbstractAlgebra.MatElem{T}, r::Int, d::T)\n\nApplies a similarity transform to the ntimes n matrix M in-place. Let P be the ntimes n identity matrix that has had all zero entries of row r replaced with d, then the transform applied is equivalent to M = P^-1MP. We require M to be a square matrix. A similarity transform preserves the minimal and characteristic polynomials of a matrix.\n\n\n\n"
+},
+
+{
     "location": "matrix.html#Transforms-1",
     "page": "Generic matrices",
     "title": "Transforms",
     "category": "section",
     "text": "similarity!{T <: RingElem}(::MatElem{T}, ::Int, ::T)ExamplesR = ResidueRing(ZZ, 7)\nS = MatrixSpace(R, 4, 4)\n   \nM = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);\n       R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])\n   \nsimilarity!(M, 1, R(3))"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.weak_popov-Union{Tuple{Mat{T}}, Tuple{T}} where T<:PolyElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.weak_popov",
+    "category": "method",
+    "text": "weak_popov{T <: PolyElem}(A::Mat{T})\n\nReturn the weak Popov form of A.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.weak_popov_with_trafo-Union{Tuple{Mat{T}}, Tuple{T}} where T<:PolyElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.weak_popov_with_trafo",
+    "category": "method",
+    "text": "weak_popov_with_trafo{T <: PolyElem}(A::Mat{T})\n\nCompute a tuple (P U) where P is the weak Popov form of A and U is a transformation matrix so that P = UA.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.popov-Union{Tuple{Mat{T}}, Tuple{T}} where T<:PolyElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.popov",
+    "category": "method",
+    "text": "popov{T <: PolyElem}(A::Mat{T})\n\nReturn the Popov form of A.\n\n\n\n"
+},
+
+{
+    "location": "matrix.html#AbstractAlgebra.Generic.popov_with_trafo-Union{Tuple{Mat{T}}, Tuple{T}} where T<:PolyElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.popov_with_trafo",
+    "category": "method",
+    "text": "popov_with_trafo{T <: PolyElem}(A::Mat{T})\n\nCompute a tuple (P U) where P is the Popov form of A and U is a transformation matrix so that P = UA.\n\n\n\n"
 },
 
 {
