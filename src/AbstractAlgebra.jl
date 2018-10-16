@@ -64,20 +64,6 @@ include("AbstractTypes.jl")
 
 ###############################################################################
 #
-#   Set up environment / load libraries
-#
-###############################################################################
-
-function __init__()
-   println("")
-   println("Welcome to AbstractAlgebra version 0.1.4-dev")
-   println("")
-   println("AbstractAlgebra comes with absolutely no warranty whatsoever")
-   println("")
-end
-
-###############################################################################
-#
 #  Version information
 #
 ################################################################################
