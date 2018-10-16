@@ -4,6 +4,8 @@
 #
 ###############################################################################
 
+export NCPolyRing, NCPoly
+
 ###############################################################################
 #
 #   Data type and parent object methods
@@ -783,6 +785,18 @@ function (a::NCPolyRing{T})(b::Array{T, 1}) where T <: NCRingElem
 end
 
 function (a::NCPolyRing{T})(b::Array{S, 1}) where {S <: NCRingElem, T <: NCRingElem}
+   R = base_ring(a)
+   len = length(b)
+   entries = Array{T}(undef, len)
+   for i = 1:length(b)
+      entries[i] = R(b[i])
+   end
+   z = NCPoly{T}(entries)
+   z.parent = a
+   return z
+end
+
+function (a::NCPolyRing{T})(b::Array{S, 1}) where {S <: RingElement, T <: NCRingElem}
    R = base_ring(a)
    len = length(b)
    entries = Array{T}(undef, len)

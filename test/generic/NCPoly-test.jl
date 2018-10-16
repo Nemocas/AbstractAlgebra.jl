@@ -1,62 +1,54 @@
 function test_gen_ncpoly_constructors()
    print("Generic.NCPoly.constructors...")
 
-   R, x = ZZ["x"]
-   S, y = R["y"]
-
-   @test elem_type(S) == Generic.Poly{elem_type(R)}
-   @test elem_type(Generic.PolyRing{elem_type(R)}) == Generic.Poly{elem_type(R)}
-   @test parent_type(Generic.Poly{elem_type(R)}) == Generic.PolyRing{elem_type(R)}
-
-   @test typeof(R) <: AbstractAlgebra.Ring
-   @test typeof(S) <: Generic.PolyRing
-
-   @test isa(y, PolyElem)
-
-   R, x = PolynomialRing(ZZ, "x")
+   R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
 
-   @test typeof(S) <: Generic.PolyRing
+   @test elem_type(S) == Generic.NCPoly{elem_type(R)}
+   @test elem_type(Generic.NCPolyRing{elem_type(R)}) == Generic.NCPoly{elem_type(R)}
+   @test parent_type(Generic.NCPoly{elem_type(R)}) == Generic.NCPolyRing{elem_type(R)}
 
-   @test isa(y, PolyElem)
+   @test typeof(S) <: Generic.NCPolyRing
+
+   @test isa(y, NCPolyElem)
 
    T, z = PolynomialRing(S, "z")
 
-   @test typeof(T) <: Generic.PolyRing
+   @test typeof(T) <: Generic.NCPolyRing
 
-   @test isa(z, PolyElem)
+   @test isa(z, NCPolyElem)
 
-   f = x^2 + y^3 + z + 1
+   f = one(R) + y^3 + z + 1
 
-   @test isa(f, PolyElem)
+   @test isa(f, NCPolyElem)
 
    g = S(2)
 
-   @test isa(g, PolyElem)
+   @test isa(g, NCPolyElem)
 
-   h = S(x^2 + 2x + 1)
+   h = S(rand(R, -10:10))
 
-   @test isa(h, PolyElem)
+   @test isa(h, NCPolyElem)
 
-   j = T(x + 2)
+   j = T(rand(R, -10:10))
 
-   @test isa(j, PolyElem)
+   @test isa(j, NCPolyElem)
 
-   k = S([x, x + 2, x^2 + 3x + 1])
+   k = S([rand(R, -10:10) for i in 1:3])
 
-   @test isa(k, PolyElem)
+   @test isa(k, NCPolyElem)
 
    l = S(k)
 
-   @test isa(l, PolyElem)
+   @test isa(l, NCPolyElem)
 
    m = S([1, 2, 3])
 
-   @test isa(m, PolyElem)
+   @test isa(m, NCPolyElem)
 
    n = S([ZZ(1), ZZ(2), ZZ(3)])
 
-   @test isa(n, PolyElem)
+   @test isa(n, NCPolyElem)
 
    println("PASS")
 end
