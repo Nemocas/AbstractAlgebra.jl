@@ -165,62 +165,14 @@ function test_gen_ncpoly_comparison()
    print("Generic.NCPoly.comparison...")
 
    # Exact ring
-   R, x = ZZ["x"]
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
    for iter = 1:500
-      f = rand(R, 0:10, -10:10)
+      f = rand(S, 0:10, -10:10)
       g = deepcopy(f)
-      h = R()
+      h = S()
       while iszero(h)
-         h = rand(R, 0:10, -10:10)
-      end
-
-      @test f == g
-      @test isequal(f, g)
-      @test f != g + h
-   end
-
-   # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
-   a = F(y)
-   R, x = PolynomialRing(F, "x")
-   for iter = 1:500
-      f = rand(R, 0:10, 0:1)
-      g = deepcopy(f)
-      h = R()
-      while iszero(h)
-         h = rand(R, 0:10, 0:1)
-      end
-
-      @test f == g
-      @test isequal(f, g)
-      @test f != g + h
-   end
-
-   # Inexact field
-   R, x = RealField["x"]
-   for iter = 1:500
-      f = rand(R, 0:10, -1:1)
-      g = deepcopy(f)
-      h = R()
-      while iszero(h)
-         h = rand(R, 0:10, -1:1)
-      end
-
-      @test f == g
-      @test isequal(f, g)
-      @test f != g + h
-   end
-
-   # Non-integral domain
-   R = ResidueRing(ZZ, 6)
-   S, x = R["x"]
-   for iter = 1:500
-      f = rand(S, 0:10, 0:5)
-      g = deepcopy(f)
-      h = R()
-      while iszero(h)
-         h = rand(S, 0:10, 0:5)
+         h = rand(S, 0:10, -10:10)
       end
 
       @test f == g

@@ -784,7 +784,7 @@ function (a::NCPolyRing{T})(b::Array{T, 1}) where T <: NCRingElem
    return z
 end
 
-function (a::NCPolyRing{T})(b::Array{S, 1}) where {S <: NCRingElem, T <: NCRingElem}
+function (a::NCPolyRing{T})(b::Array{S, 1}) where {S <: RingElement, T <: NCRingElem}
    R = base_ring(a)
    len = length(b)
    entries = Array{T}(undef, len)
