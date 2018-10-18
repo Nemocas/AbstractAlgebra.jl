@@ -339,60 +339,18 @@ function test_gen_ncpoly_exact_division()
    print("Generic.NCPoly.exact_division...")
 
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
 
    for iter = 1:100
-      f = rand(R, 0:10, -100:100)
-      g = R()
+      f = rand(S, 0:10, -100:100)
+      g = S()
       while g == 0
-         g = rand(R, 0:10, -100:100)
+         g = rand(S, 0:10, -100:100)
       end
 
-      @test divexact(f*g, g) == f
-   end
-
-   # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
-   a = F(y)
-   R, x = PolynomialRing(F, "x")
-
-   for iter = 1:100
-      f = rand(R, 0:10, 0:1)
-      g = R()
-      while g == 0
-         g = rand(R, 0:10, 0:1)
-      end
-
-      @test divexact(f*g, g) == f
-   end
-
-   # Inexact field
-   R, x = PolynomialRing(RealField, "x")
-
-   for iter = 1:100
-      f = rand(R, 0:10, -1:1)
-      g = R()
-      while g == 0
-         g = rand(R, 0:10, -1:1)
-      end
-
-      @test isapprox(divexact(f*g, g), f)
-   end
-
-   # Characteristic p ring
-   n = 23
-   Zn = ResidueRing(ZZ, n)
-   R, x = PolynomialRing(Zn, "x")
-
-   for iter = 1:100
-      f = rand(R, 0:10, 0:n - 1)
-      g = R()
-      while g == 0
-         g = rand(R, 0:10, 0:n - 1)
-      end
-
-      @test divexact(f*g, g) == f
+      @test divexact_right(f*g, g) == f
+      @test divexact_left(g*f, g) == f
    end
 
    println("PASS")
@@ -402,106 +360,50 @@ function test_gen_ncpoly_adhoc_exact_division()
    print("Generic.NCPoly.adhoc_exact_division...")
 
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
 
    for iter = 1:100
-      f = rand(R, 0:10, -100:100)
+      f = rand(S, 0:10, -100:100)
       g = ZZ()
       while g == 0
          g = rand(ZZ, -10:10)
       end
 
-      @test divexact(f*g, g) == f
+      @test divexact_right(f*g, g) == f
+      @test divexact_left(g*f, g) == f
 
       h = 0
       while h == 0
          h = rand(-10:10)
       end
 
-      @test divexact(f*h, h) == f
-   end
-
-   # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
-   a = F(y)
-   R, x = PolynomialRing(F, "x")
-
-   for iter = 1:100
-      f = rand(R, 0:10, 0:1)
-      g = ZZ()
-      while g == 0
-         g = rand(ZZ, 1:6)
-      end
-
-      @test divexact(f*g, g) == f
-
-      h = 0
-      while h == 0
-         h = rand(1:6)
-      end
-
-      @test divexact(f*h, h) == f
-   end
-
-   # Inexact field
-   R, x = PolynomialRing(RealField, "x")
-
-   for iter = 1:100
-      f = rand(R, 0:10, -1:1)
-      g = ZZ()
-      while g == 0
-         g = rand(RealField, -1:1)
-      end
-
-      @test isapprox(divexact(f*g, g), f)
-
-      h = 0
-      while h == 0
-         h = rand(-10:10)
-      end
-
-      @test isapprox(divexact(f*h, h), f)
-   end
-
-   # Characteristic p ring
-   n = 23
-   Zn = ResidueRing(ZZ, n)
-   R, x = PolynomialRing(Zn, "x")
-
-   for iter = 1:100
-      f = rand(R, 0:10, 0:22)
-      g = rand(Zn, 1:22)
-
-      @test divexact(f*g, g) == f
-
-      h = 0
-      while (h % n) == 0
-         h = rand(-100:100)
-      end
-
-      @test divexact(f*h, h) == f
+      @test divexact_right(f*h, h) == f
+      @test divexact_left(h*f, h) == f
    end
 
    # Generic tower
-   R, x = PolynomialRing(ZZ, "x")
+   R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
+   T, z = PolynomialRing(S, "z")
 
    for iter = 1:100
-      f = rand(S, 0:10, 0:10, -100:100)
-      g = R()
+      f = rand(T, 0:10, 0:10, -100:100)
+      g = S()
       while g == 0
-         g = rand(R, 0:10, -100:100)
+         g = rand(S, 0:10, -100:100)
       end
 
-      @test divexact(f*g, g) == f
+      @test divexact_right(f*g, g) == f
+      @test divexact_left(g*f, g) == f
 
       h = ZZ()
       while h == 0
          h = rand(ZZ, -10:10)
       end
 
-      @test divexact(f*h, h) == f
+      @test divexact_right(f*h, h) == f
+      @test divexact_left(h*f, h) == f
    end
 
    println("PASS")
