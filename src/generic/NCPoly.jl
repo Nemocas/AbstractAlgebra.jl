@@ -553,6 +553,24 @@ function evaluate(a::AbstractAlgebra.NCPolyElem, b::T) where {T <: NCRingElem}
    return z
 end
 
+function evaluate(a::AbstractAlgebra.NCPolyElem, b::Union{Integer, Rational, AbstractFloat})
+   i = length(a)
+   R = base_ring(a)
+   if i == 0
+       return zero(R)
+   end
+   if i > 25
+      return subst(a, b)
+   end
+   z = R(coeff(a, i - 1))
+   while i > 1
+      i -= 1
+      z = R(coeff(a, i - 1)) + z*b
+      parent(z) # To work around a bug in julia
+   end
+   return z
+end
+
 ###############################################################################
 #
 #   Unsafe functions

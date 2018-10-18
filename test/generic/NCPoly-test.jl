@@ -413,11 +413,12 @@ function test_gen_ncpoly_evaluation()
    print("Generic.NCPoly.evaluation...")
 
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
 
    for iter in 1:10
-      f = rand(R, 0:4, -10:10)
-      g = rand(R, 0:4, -10:10)
+      f = rand(S, 0:4, -10:10)
+      g = rand(S, 0:4, -10:10)
 
       d = rand(ZZ, -10:10)
 
@@ -425,53 +426,19 @@ function test_gen_ncpoly_evaluation()
    end
 
    for iter in 1:10
-      f = rand(R, 0:4, -10:10)
-      g = rand(R, 0:4, -10:10)
+      f = rand(S, 0:4, -10:10)
+      g = rand(S, 0:4, -10:10)
+
+      d = rand(ZZ, -10:10)
+
+      @test evaluate(f + g, d) == evaluate(f, d) + evaluate(g, d)
+   end
+
+   for iter in 1:10
+      f = rand(S, 0:4, -10:10)
+      g = rand(S, 0:4, -10:10)
 
       d = rand(-10:10)
-
-      @test evaluate(g, evaluate(f, d)) == evaluate(subst(g, f), d)
-   end
-
-   # Inexact field
-   R, x = PolynomialRing(RealField, "x")
-
-   for iter in 1:10
-      f = rand(R, 0:4, 0:1)
-      g = rand(R, 0:4, 0:1)
-
-      d = rand(RealField, 0:1)
-
-      @test isapprox(evaluate(g, evaluate(f, d)), evaluate(subst(g, f), d))
-   end
-
-   for iter in 1:10
-      f = rand(R, 0:4, 0:1)
-      g = rand(R, 0:4, 0:1)
-
-      d = rand(-10:10)
-
-      @test isapprox(evaluate(g, evaluate(f, d)), evaluate(subst(g, f), d))
-   end
-
-   # Non-integral domain
-   Zn = ResidueRing(ZZ, 23)
-   R, x = PolynomialRing(Zn, "x")
-
-   for iter in 1:10
-      f = rand(R, 0:4, 0:22)
-      g = rand(R, 0:4, 0:22)
-
-      d = rand(Zn, 0:22)
-
-      @test evaluate(g, evaluate(f, d)) == evaluate(subst(g, f), d)
-   end
-
-   for iter in 1:10
-      f = rand(R, 0:4, 0:22)
-      g = rand(R, 0:4, 0:22)
-
-      d = rand(-100:100)
 
       @test evaluate(g, evaluate(f, d)) == evaluate(subst(g, f), d)
    end
