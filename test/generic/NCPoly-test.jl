@@ -422,65 +422,15 @@ function test_gen_ncpoly_evaluation()
 
       d = rand(ZZ, -10:10)
 
-      @test evaluate(g, evaluate(f, d)) == evaluate(subst(g, f), d)
-   end
-
-   for iter in 1:10
-      f = rand(S, 0:4, -10:10)
-      g = rand(S, 0:4, -10:10)
-
-      d = rand(ZZ, -10:10)
-
       @test evaluate(f + g, d) == evaluate(f, d) + evaluate(g, d)
    end
 
    for iter in 1:10
       f = rand(S, 0:4, -10:10)
-      g = rand(S, 0:4, -10:10)
 
-      d = rand(-10:10)
+      d = rand(ZZ, -10:10)
 
-      @test evaluate(g, evaluate(f, d)) == evaluate(subst(g, f), d)
-   end
-
-   println("PASS")
-end
-
-function test_gen_ncpoly_composition()
-   print("Generic.NCPoly.composition...")
-
-   # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
-
-   for iter in 1:10
-      f = rand(R, 0:5, -10:10)
-      g = rand(R, 0:5, -10:10)
-      h = rand(R, 0:5, -10:10)
-
-      @test compose(f, compose(g, h)) == compose(compose(f, g), h)
-   end
-
-   # Inexact field
-   R, x = PolynomialRing(RealField, "x")
-
-   for iter in 1:10
-      f = rand(R, 0:5, 0:1)
-      g = rand(R, 0:5, 0:1)
-      h = rand(R, 0:5, 0:1)
-
-      @test isapprox(compose(f, compose(g, h)), compose(compose(f, g), h))
-   end
-
-   # Non-integral domain
-   Zn = ResidueRing(ZZ, 6)
-   R, x = PolynomialRing(Zn, "x")
-
-   for iter in 1:10
-      f = rand(R, 0:5, 0:5)
-      g = rand(R, 0:5, 0:5)
-      h = rand(R, 0:5, 0:5)
-
-      @test compose(f, compose(g, h)) == compose(compose(f, g), h)
+      @test evaluate(f^2, d) == evaluate(f, d)^2
    end
 
    println("PASS")
@@ -490,68 +440,16 @@ function test_gen_ncpoly_derivative()
    print("Generic.NCPoly.derivative...")
 
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
 
    for iter in 1:10
-      f = rand(R, 0:4, -100:100)
-      g = rand(R, 0:4, -100:100)
+      f = rand(S, 0:4, -100:100)
+      g = rand(S, 0:4, -100:100)
 
       @test derivative(f + g) == derivative(g) + derivative(f)
 
-      @test derivative(g*f) == derivative(g)*f + derivative(f)*g
-   end
-
-   # Inexact field
-   R, x = PolynomialRing(RealField, "x")
-
-   for iter in 1:10
-      f = rand(R, 0:4, 0:1)
-      g = rand(R, 0:4, 0:1)
-
-      @test isapprox(derivative(f + g), derivative(g) + derivative(f))
-
-      @test isapprox(derivative(g*f), derivative(g)*f + derivative(f)*g)
-   end
-
-   # Non-integral domain
-   Zn = ResidueRing(ZZ, 6)
-   R, x = PolynomialRing(Zn, "x")
-
-   for iter in 1:10
-      f = rand(R, 0:4, 0:5)
-      g = rand(R, 0:4, 0:5)
-
-      @test derivative(f + g) == derivative(g) + derivative(f)
-
-      @test derivative(g*f) == derivative(g)*f + derivative(f)*g
-   end
-
-   println("PASS")
-end
-
-function test_gen_ncpoly_generic_eval()
-   print("Generic.NCPoly.generic_eval...")
-
-   R, x = PolynomialRing(ZZ, "x")
-
-   for iter in 1:10
-      f = rand(R, 0:2, -100:100)
-      g = rand(R, 0:2, -100:100)
-      h = rand(R, 0:2, -100:100)
-
-      @test f(g(h)) == f(g)(h)
-   end
-
-   R, x = PolynomialRing(ZZ, "x")
-
-   f = x
-   b = a = QQ(13)
-   for i in 1:5
-      g = x^2 + rand(R, 0:1, -1:1)
-      f = g(f)
-      b = g(b)
-
-      @test b == f(a)
+      @test derivative(g*f) == derivative(g)*f + g*derivative(f)
    end
 
    println("PASS")
@@ -572,9 +470,7 @@ function test_gen_ncpoly()
    test_gen_ncpoly_exact_division()
    test_gen_ncpoly_adhoc_exact_division()
    test_gen_ncpoly_evaluation()
-   test_gen_ncpoly_composition()
    test_gen_ncpoly_derivative()
-   test_gen_ncpoly_generic_eval()
 
    println("")
 end

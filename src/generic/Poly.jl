@@ -1583,7 +1583,7 @@ end
 > Compose the polynomial $a$ with the polynomial $b$ and return the result,
 > i.e. return $a\circ b$.
 """
-function compose(a::PolynomialElem, b::PolynomialElem)
+function compose(a::AbstractAlgebra.PolyElem, b::AbstractAlgebra.PolyElem)
    i = length(a)
    R = parent(a)
    if i == 0

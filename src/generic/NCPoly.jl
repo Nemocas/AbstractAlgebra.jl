@@ -527,7 +527,7 @@ divexact_left(a::AbstractAlgebra.NCPolyElem, b::Union{Integer, Rational, Abstrac
 
 ###############################################################################
 #
-#   Evaluation/composition
+#   Evaluation
 #
 ###############################################################################
 
@@ -540,9 +540,6 @@ function evaluate(a::AbstractAlgebra.NCPolyElem, b::T) where {T <: NCRingElem}
    R = base_ring(a)
    if i == 0
        return zero(R)
-   end
-   if i > 25
-      return subst(a, b)
    end
    z = R(coeff(a, i - 1))
    while i > 1
@@ -559,9 +556,6 @@ function evaluate(a::AbstractAlgebra.NCPolyElem, b::Union{Integer, Rational, Abs
    if i == 0
        return zero(R)
    end
-   if i > 25
-      return subst(a, b)
-   end
    z = R(coeff(a, i - 1))
    while i > 1
       i -= 1
@@ -570,6 +564,9 @@ function evaluate(a::AbstractAlgebra.NCPolyElem, b::Union{Integer, Rational, Abs
    end
    return z
 end
+
+# Note: composition is not associative, e.g. consider fo(goh) vs (fog)oh
+# for f and g of degree 2 and h of degree 1 -- and recall coeffs don't commute
 
 ###############################################################################
 #
@@ -712,50 +709,6 @@ promote_rule(::Type{NCPoly{T}}, ::Type{NCPoly{T}}) where T <: NCRingElem = NCPol
 
 function promote_rule(::Type{NCPoly{T}}, ::Type{U}) where {T <: NCRingElem, U <: NCRingElem}
    promote_rule(T, U) == T ? NCPoly{T} : Union{}
-end
-
-###############################################################################
-#
-#   Polynomial substitution
-#
-###############################################################################
-
-Markdown.doc"""
-    subst{T <: NCRingElem}(f::NCPolyElem{T}, a::Any)
-> Evaluate the polynomial $f$ at $a$. Note that $a$ can be anything, whether
-> a ring element or not.
-"""
-function subst(f::AbstractAlgebra.NCPolyElem{T}, a::Any) where {T <: NCRingElem}
-   S = parent(a)
-   n = degree(f)
-   if n < 0
-      return S()
-   elseif n == 0
-      return coeff(f, 0)*S(1)
-   elseif n == 1
-      return coeff(f, 0)*S(1) + coeff(f, 1)*a
-   end
-   d1 = isqrt(n)
-   d = div(n, d1)
-   A = powers(a, d)
-   s = coeff(f, d1*d)*A[1]
-   for j = 1:min(n - d1*d, d - 1)
-      c = coeff(f, d1*d + j)
-      if !iszero(c)
-         s += c*A[j + 1]
-      end
-   end
-   for i = 1:d1
-      s *= A[d + 1]
-      s += coeff(f, (d1 - i)*d)*A[1]
-      for j = 1:min(n - (d1 - i)*d, d - 1)
-         c = coeff(f, (d1 - i)*d + j)
-         if !iszero(c)
-            s += c*A[j + 1]
-         end
-      end
-   end
-   return s
 end
 
 ###############################################################################
