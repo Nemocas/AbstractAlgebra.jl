@@ -187,108 +187,38 @@ function test_gen_ncpoly_adhoc_comparison()
    print("Generic.NCPoly.adhoc_comparison...")
 
    # Exact ring
-   R, x = ZZ["x"]
-   for iter = 1:500
-      f = R()
-      while iszero(f)
-         f = rand(R, 0:10, -10:10)
-      end
-      c1 = rand(ZZ, -10:10)
-      d1 = rand(zz, -10:10)
-
-      @test R(c1) == c1
-      @test c1 == R(c1)
-      @test R(d1) == d1
-      @test d1 == R(d1)
-
-      @test R(c1) != c1 + f
-      @test c1 != R(c1) + f
-      @test R(d1) != d1 + f
-      @test d1 != R(d1) + f
-   end
-
-   # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
-   a = F(y)
-   R, x = PolynomialRing(F, "x")
-   for iter = 1:500
-      f = R()
-      while iszero(f)
-         f = rand(R, 0:10, 0:1)
-      end
-      c1 = rand(ZZ, -10:10)
-      d1 = rand(zz, -10:10)
-
-      @test R(c1) == c1
-      @test c1 == R(c1)
-      @test R(d1) == d1
-      @test d1 == R(d1)
-
-      @test R(c1) != c1 + f
-      @test c1 != R(c1) + f
-      @test R(d1) != d1 + f
-      @test d1 != R(d1) + f
-   end
-
-   # Inexact field
-   R, x = RealField["x"]
-   for iter = 1:500
-      f = R()
-      while iszero(f)
-         f = rand(R, 0:10, -1:1)
-      end
-      c1 = rand(ZZ, -10:10)
-      d1 = rand(RealField, -1:1)
-
-      @test R(c1) == c1
-      @test c1 == R(c1)
-      @test R(d1) == d1
-      @test d1 == R(d1)
-
-      @test R(c1) != c1 + f
-      @test c1 != R(c1) + f
-      @test R(d1) != d1 + f
-      @test d1 != R(d1) + f
-   end
-
-   # Non-integral domain
-   R = ResidueRing(ZZ, 6)
-   S, x = R["x"]
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
    for iter = 1:500
       f = S()
       while iszero(f)
-         f = rand(S, 0:10, 0:5)
+         f = rand(S, 0:10, -10:10)
       end
       c1 = rand(ZZ, -10:10)
       d1 = rand(zz, -10:10)
-      a1 = rand(R, 0:5)
 
-      @test S(a1) == a1
-      @test a1 == S(a1)
-      @test S(c1) == c1
-      @test c1 == S(c1)
-      @test S(d1) == d1
-      @test d1 == S(d1)
+      @test R(c1) == c1
+      @test c1 == R(c1)
+      @test R(d1) == d1
+      @test d1 == R(d1)
 
-      @test S(a1) != a1 + f
-      @test a1 != S(a1) + f
-      @test S(c1) != c1 + f
-      @test c1 != S(c1) + f
-      @test S(d1) != d1 + f
-      @test d1 != S(d1) + f
+      @test R(c1) != c1 + f
+      @test c1 != R(c1) + f
+      @test R(d1) != d1 + f
+      @test d1 != R(d1) + f
    end
 
    # Generic tower
-   R, x = ZZ["x"]
-   S, y = R["y"]
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+   T, z = PolynomialRing(S, "z")
    for iter = 1:100
-      f = S()
+      f = T()
       while iszero(f)
-         f = rand(S, 0:10, 0:5, -10:10)
+         f = rand(T, 0:10, 0:5, -10:10)
       end
       c1 = rand(ZZ, -10:10)
-      d1 = rand(R, 0:5, -10:10)
+      d1 = rand(S, 0:5, -10:10)
 
       @test S(c1) == c1
       @test c1 == S(c1)
