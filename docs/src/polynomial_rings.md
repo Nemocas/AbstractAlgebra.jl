@@ -4,6 +4,9 @@ Univariate polynomial rings are supported in AbstractAlgebra, and in addition to
 standard Ring interface, numerous additional functions are required to be present for
 univariate polynomial rings.
 
+Univariate polynomial rings can be built over both commutative and noncommutative
+rings.
+
 Univariate polynomial rings over a field are also Euclidean and therefore such rings
 must implement the Euclidean interface.
 
@@ -14,14 +17,24 @@ use the multivariate interface for sparse univariate types.
 
 ## Types and parents
 
-AbstractAlgebra provides two abstract types for polynomial rings and their elements:
+AbstractAlgebra provides two abstract types for polynomial rings and their elements
+over a commutative ring:
 
   * `PolyRing{T}` is the abstract type for univariate polynomial ring parent types
   * `PolyElem{T}` is the abstract type for univariate polynomial types
 
-We have that `PolyRing{T} <: AbstractAlgebra.Ring` and `PolyElem{T} <: AbstractAlgebra.RingElem`.
+Similarly there are two abstract types for polynomial rings and their elements
+over a noncommutative ring:
 
-Note that both abstract types are parameterised. The type `T` should usually be the type
+  * `NCPolyRing{T}` is the abstract type for univariate polynomial ring parent types
+  * `NCPolyElem{T}` is the abstract type for univariate polynomial types
+
+We have that `PolyRing{T} <: AbstractAlgebra.Ring` and
+`PolyElem{T} <: AbstractAlgebra.RingElem`. Similarly we have that
+`NCPolyRing{T} <: AbstractAlgebra.NCRing` and 
+`NCPolyElem{T} <: AbstractAlgebra.NCRingElem`.
+
+Note that the abstract types are parameterised. The type `T` should usually be the type
 of elements of the coefficient ring of the polynomial ring. For example, in the case of
 $\mathbb{Z}[x]$ the type `T` would be the type of an integer, e.g. `BigInt`.
 
@@ -42,8 +55,8 @@ usually makes use of a dictionary).
 
 ## Required functionality for univariate polynomials
 
-In addition to the required functionality for the Ring interface (and in the case of
-polynomials over a field, the Euclidean Ring interface), the Polynomial Ring interface
+In addition to the required functionality for the Ring/NCRing interface (and in the case
+of polynomials over a field, the Euclidean Ring interface), the Polynomial Ring interface
 has the following required functions.
 
 We suppose that `R` is a fictitious base ring (coefficient ring) and that `S` is a
@@ -54,7 +67,13 @@ univariate polynomial ring over `R` (i.e. $S = R[x]$) with parent object `S` of 
 Of course, in practice these types may not be parameterised, but we use parameterised
 types here to make the interface clearer.
 
-Note that the type `T` must (transitively) belong to the abstract type `RingElem`.
+Note that the type `T` must (transitively) belong to the abstract type `RingElem` or
+`NCRingElem`.
+
+We describe the functionality below for polynomials over commutative rings, i.e. with
+element type belonging to `RingElem`, however similar constructors should be available
+for element types belonging to `NCRingElem` instead, if the coefficient ring is
+noncommutative.
 
 ### Constructors
 

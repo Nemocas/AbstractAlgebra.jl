@@ -408,6 +408,10 @@ getindex(R::Ring, s::String) = PolynomialRing(R, s)
 
 getindex(R::Ring, s::Char) = PolynomialRing(R, s)
 
+getindex(R::NCRing, s::String) = PolynomialRing(R, s)
+
+getindex(R::NCRing, s::Char) = PolynomialRing(R, s)
+
 getindex(R::Tuple{Ring, T}, s::String) where {T} = PolynomialRing(R[1], s)
 
 getindex(R::Tuple{Ring, T}, s::Char) where {T} = PolynomialRing(R[1], s)
