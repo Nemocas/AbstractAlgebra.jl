@@ -271,70 +271,10 @@ function test_gen_ncpoly_reverse()
    print("Generic.NCPoly.reverse...")
 
    #  Exact ring
-   R, x = ZZ["x"]
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
    for iter = 1:300
-      f = rand(R, 0:10, -10:10)
-      len = rand(length(f):12)
-      frev = reverse(f, len)
-
-      shift = 0
-      for i = 1:len
-         if coeff(f, i - 1) != 0
-            break
-         end
-         shift += 1
-      end
-
-      @test length(frev) == len - shift
-      @test f == reverse(frev, len)
-   end
-
-   # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
-   a = F(y)
-   R, x = PolynomialRing(F, "x")
-   for iter = 1:300
-      f = rand(R, 0:10, 0:1)
-      len = rand(length(f):12)
-      frev = reverse(f, len)
-
-      shift = 0
-      for i = 1:len
-         if coeff(f, i - 1) != 0
-            break
-         end
-         shift += 1
-      end
-
-      @test length(frev) == len - shift
-      @test f == reverse(frev, len)
-   end
-
-   #  Inexact field
-   R, x = PolynomialRing(RealField, "x")
-   for iter = 1:300
-      f = rand(R, 0:10, -1:1)
-      len = rand(length(f):12)
-      frev = reverse(f, len)
-
-      shift = 0
-      for i = 1:len
-         if coeff(f, i - 1) != 0
-            break
-         end
-         shift += 1
-      end
-
-      @test length(frev) == len - shift
-      @test f == reverse(frev, len)
-   end
-
-   #  Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = T["x"]
-   for iter = 1:300
-      f = rand(R, 0:10, 0:5)
+      f = rand(S, 0:10, -10:10)
       len = rand(length(f):12)
       frev = reverse(f, len)
 
@@ -357,54 +297,15 @@ function test_gen_ncpoly_shift()
    print("Generic.NCPoly.shift...")
 
    # Exact ring
-   R, x = ZZ["x"]
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
    for iter = 1:300
-      f = rand(R, 0:10, -10:10)
+      f = rand(S, 0:10, -10:10)
       s = rand(0:10)
-      g = s == 0 ? R() : rand(R, 0:s - 1, -10:10)
+      g = s == 0 ? S() : rand(S, 0:s - 1, -10:10)
 
       @test shift_right(shift_left(f, s) + g, s) == f
-      @test shift_left(f, s) == x^s*f
-      @test length(shift_right(f, s)) == max(0, length(f) - s)
-   end
-
-   # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
-   a = F(y)
-   R, x = PolynomialRing(F, "x")
-   for iter = 1:300
-      f = rand(R, 0:10, 0:1)
-      s = rand(0:10)
-      g = s == 0 ? R() : rand(R, 0:s - 1, 0:1)
-
-      @test shift_right(shift_left(f, s) + g, s) == f
-      @test shift_left(f, s) == x^s*f
-      @test length(shift_right(f, s)) == max(0, length(f) - s)
-   end
-
-   # Inexact field
-   R, x = PolynomialRing(RealField, "x")
-   for iter = 1:300
-      f = rand(R, 0:10, -1:1)
-      s = rand(0:10)
-      g = s == 0 ? R() : rand(R, 0:s - 1, -1:1)
-
-      @test shift_right(shift_left(f, s) + g, s) == f
-      @test shift_left(f, s) == x^s*f
-      @test length(shift_right(f, s)) == max(0, length(f) - s)
-   end
-
-   # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = T["x"]
-   for iter = 1:300
-      f = rand(R, 0:10, 0:5)
-      s = rand(0:10)
-      g = s == 0 ? R() : rand(R, 0:s - 1, 0:5)
-
-      @test shift_right(shift_left(f, s) + g, s) == f
-      @test shift_left(f, s) == x^s*f
+      @test shift_left(f, s) == y^s*f
       @test length(shift_right(f, s)) == max(0, length(f) - s)
    end
 
@@ -415,64 +316,11 @@ function test_gen_ncpoly_powering()
    print("Generic.NCPoly.powering...")
 
    # Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
 
    for iter = 1:10
-      f = rand(R, 0:10, -10:10)
-      r2 = R(1)
-
-      for expn = 0:10
-         r1 = f^expn
-
-         @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2
-
-         r2 *= f
-      end
-   end
-
-   # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
-   a = F(y)
-   R, x = PolynomialRing(F, "x")
-
-   for iter = 1:10
-      f = rand(R, 0:10, 0:1)
-      r2 = R(1)
-
-      for expn = 0:10
-         r1 = f^expn
-
-         @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2
-
-         r2 *= f
-      end
-   end
-
-   # Inexact field
-   R, x = PolynomialRing(RealField, "x")
-
-   for iter = 1:10
-      f = rand(R, 0:10, -1:1)
-      r2 = R(1)
-
-      for expn = 0:4 # cannot set high power here
-         r1 = f^expn
-
-         @test (f == 0 && expn == 0 && r1 == 0) || isapprox(r1, r2)
-
-         r2 *= f
-      end
-   end
-
-   # Non-integral domain
-   for iter = 1:10
-      n = rand(2:26)
-
-      Zn = ResidueRing(ZZ, n)
-      R, x = PolynomialRing(Zn, "x")
-
-      f = rand(R, 0:10, 0:n - 1)
+      f = rand(S, 0:10, -10:10)
       r2 = R(1)
 
       for expn = 0:10
