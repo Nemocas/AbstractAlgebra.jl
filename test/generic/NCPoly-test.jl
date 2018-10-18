@@ -238,40 +238,10 @@ function test_gen_ncpoly_unary_ops()
    print("Generic.NCPoly.unary_ops...")
 
    #  Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
    for iter = 1:300
-      f = rand(R, 0:10, -10:10)
-
-      @test -(-f) == f
-      @test iszero(f + (-f))
-   end
-
-   # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
-   a = F(y)
-   R, x = PolynomialRing(F, "x")
-   for iter = 1:300
-      f = rand(R, 0:10, 0:1)
-
-      @test -(-f) == f
-      @test iszero(f + (-f))
-   end
-
-   #  Inexact field
-   R, x = PolynomialRing(RealField, "x")
-   for iter = 1:300
-      f = rand(R, 0:10, -1:1)
-
-      @test -(-f) == f
-      @test iszero(f + (-f))
-   end
-
-   # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = T["x"]
-   for iter = 1:300
-      f = rand(R, 0:10, 0:5)
+      f = rand(S, 0:10, -10:10)
 
       @test -(-f) == f
       @test iszero(f + (-f))
@@ -284,50 +254,14 @@ function test_gen_ncpoly_truncation()
    print("Generic.NCPoly.truncation...")
 
    #  Exact ring
-   R, x = PolynomialRing(ZZ, "x")
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
    for iter = 1:300
-      f = rand(R, 0:10, -10:10)
-      g = rand(R, 0:10, -10:10)
+      f = rand(S, 0:10, -10:10)
+      g = rand(S, 0:10, -10:10)
       n = rand(0:20)
 
       @test truncate(f*g, n) == mullow(f, g, n)
-   end
-
-   # Fake finite field of char 7, degree 2
-   S, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(S, y^2 + 6y + 3)
-   a = F(y)
-   R, x = PolynomialRing(F, "x")
-   for iter = 1:300
-      f = rand(R, 0:10, 0:1)
-      g = rand(R, 0:10, 0:1)
-      n = rand(0:20)
-
-      @test truncate(f*g, n) == mullow(f, g, n)
-   end
-
-   #  Inexact field
-   R, x = PolynomialRing(RealField, "x")
-   for iter = 1:300
-      f = rand(R, 0:10, -1:1)
-      g = rand(R, 0:10, -1:1)
-      n = rand(0:20)
-
-      @test isapprox(truncate(f*g, n), mullow(f, g, n))
-   end
-
-   # Non-integral domain
-   T = ResidueRing(ZZ, 6)
-   R, x = T["x"]
-   for iter = 1:300
-      f = rand(R, 0:10, 0:5)
-      g = rand(R, 0:10, 0:5)
-      n = rand(0:20)
-
-      r = mullow(f, g, n)
-
-      @test truncate(f*g, n) == r
-      @test r == 0 || !iszero(lead(r))
    end
 
    println("PASS")
