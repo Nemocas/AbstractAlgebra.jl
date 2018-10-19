@@ -49,6 +49,8 @@ include("generic/ResidueField.jl")
 
 include("generic/Poly.jl")
 
+include("generic/NCPoly.jl")
+
 include("generic/MPoly.jl")
 
 include("generic/SparsePoly.jl")

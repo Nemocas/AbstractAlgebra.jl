@@ -31,7 +31,7 @@ export SetElem, GroupElem, NCRingElem, RingElem, ModuleElem, FieldElem, RingElem
 
 export SetMap, FunctionalMap, IdentityMap
 
-export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
+export NCPolyElem, PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
        MatElem, MatAlgElem, FinFieldElem, MPolyElem
 
 export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
@@ -333,6 +333,14 @@ function PolynomialRing(R::Ring, s::Char; cached::Bool = true)
    PolynomialRing(R, string(s); cached=cached)
 end
 
+function PolynomialRing(R::NCRing, s::AbstractString; cached::Bool = true)
+   Generic.PolynomialRing(R, s; cached=cached)
+end
+
+function PolynomialRing(R::NCRing, s::Char; cached::Bool = true)
+   PolynomialRing(R, string(s); cached=cached)
+end
+
 function PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
    Generic.PolynomialRing(R, s; cached=cached, ordering=ordering)
 end
@@ -399,6 +407,10 @@ export Generic
 getindex(R::Ring, s::String) = PolynomialRing(R, s)
 
 getindex(R::Ring, s::Char) = PolynomialRing(R, s)
+
+getindex(R::NCRing, s::String) = PolynomialRing(R, s)
+
+getindex(R::NCRing, s::Char) = PolynomialRing(R, s)
 
 getindex(R::Tuple{Ring, T}, s::String) where {T} = PolynomialRing(R[1], s)
 

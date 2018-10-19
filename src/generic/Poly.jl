@@ -37,13 +37,13 @@ base_ring(R::AbstractAlgebra.PolyRing{T}) where T <: RingElement = R.base_ring::
     base_ring(a::AbstractAlgebra.PolyElem)
 > Return the base ring of the polynomial ring of the given polynomial.
 """
-base_ring(a::AbstractAlgebra.PolyElem) = base_ring(parent(a))
+base_ring(a::PolynomialElem) = base_ring(parent(a))
 
 @doc Markdown.doc"""
     parent(a::AbstractAlgebra.PolyElem)
 > Return the parent of the given polynomial.
 """
-parent(a::AbstractAlgebra.PolyElem) = a.parent
+parent(a::PolynomialElem) = a.parent
 
 function isdomain_type(::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.PolyElem{S}}
    return isdomain_type(S)
@@ -67,7 +67,7 @@ var(a::AbstractAlgebra.PolyRing) = a.S
 """
 symbols(a::AbstractAlgebra.PolyRing) = [a.S]
 
-function check_parent(a::AbstractAlgebra.PolyElem, b::AbstractAlgebra.PolyElem)
+function check_parent(a::PolynomialElem, b::PolynomialElem)
    parent(a) != parent(b) &&
                 error("Incompatible polynomial rings in polynomial operation")
 end
@@ -104,14 +104,14 @@ function normalise(a::Poly, n::Int)
    return n
 end
 
-length(a::AbstractAlgebra.PolyElem) = a.length
+length(a::PolynomialElem) = a.length
 
 @doc Markdown.doc"""
     degree(a::AbstractAlgebra.PolyElem)
 > Return the degree of the given polynomial. This is defined to be one less
 > than the length, even for constant polynomials.
 """
-degree(a::AbstractAlgebra.PolyElem) = length(a) - 1
+degree(a::PolynomialElem) = length(a) - 1
 
 @doc Markdown.doc"""
     modulus{T <: ResElem}(a::AbstractAlgebra.PolyElem{T})
@@ -127,7 +127,7 @@ coeff(a::Poly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 > nonzero coefficient of the term with highest degree unless the polynomial
 > in the zero polynomial, in which case a zero coefficient is returned.
 """
-lead(a::AbstractAlgebra.PolyElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
+lead(a::PolynomialElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
 
 @doc Markdown.doc"""
     trail(x::AbstractAlgebra.PolyElem)
@@ -135,7 +135,7 @@ lead(a::AbstractAlgebra.PolyElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, 
 > nonzero coefficient of the term with lowest degree unless the polynomial
 > in the zero polynomial, in which case a zero coefficient is returned.
 """
-function trail(a::AbstractAlgebra.PolyElem)
+function trail(a::PolynomialElem)
    if iszero(a)
       return base_ring(a)(0)
    else
@@ -171,21 +171,21 @@ gen(R::AbstractAlgebra.PolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
     iszero(a::AbstractAlgebra.PolyElem)
 > Return `true` if the given polynomial is zero, otherwise return `false`.
 """
-iszero(a::AbstractAlgebra.PolyElem) = length(a) == 0
+iszero(a::PolynomialElem) = length(a) == 0
 
 @doc Markdown.doc"""
     isone(a::AbstractAlgebra.PolyElem)
 > Return `true` if the given polynomial is the constant polynomial $1$,
 > otherwise return `false`.
 """
-isone(a::AbstractAlgebra.PolyElem) = length(a) == 1 && isone(coeff(a, 0))
+isone(a::PolynomialElem) = length(a) == 1 && isone(coeff(a, 0))
 
 @doc Markdown.doc"""
     isgen(a::AbstractAlgebra.PolyElem)
 > Return `true` if the given polynomial is the constant generator of its
 > polynomial ring, otherwise return `false`.
 """
-function isgen(a::AbstractAlgebra.PolyElem)
+function isgen(a::PolynomialElem)
     return length(a) == 2 && iszero(coeff(a, 0)) && isone(coeff(a, 1))
 end
 
@@ -194,7 +194,7 @@ end
 > Return `true` if the given polynomial is a unit in its polynomial ring,
 > otherwise return `false`.
 """
-isunit(a::AbstractAlgebra.PolyElem) = length(a) == 1 && isunit(coeff(a, 0))
+isunit(a::PolynomialElem) = length(a) == 1 && isunit(coeff(a, 0))
 
 isterm(a::T) where {T <: RingElement} = true
 
@@ -203,7 +203,7 @@ isterm(a::T) where {T <: RingElement} = true
 > Return `true` if the given polynomial is has one term. This function is
 > recursive, with all scalar types returning true.
 """
-function isterm(a::AbstractAlgebra.PolyElem)
+function isterm(a::PolynomialElem)
    if !isterm(lead(a))
       return false
    end
@@ -221,7 +221,7 @@ ismonomial(a::T) where {T <: RingElement} = isone(a)
     ismonomial(a::AbstractAlgebra.PolyElem)
 > Return `true` if the given polynomial is a monomial.
 """
-function ismonomial(a::AbstractAlgebra.PolyElem)
+function ismonomial(a::PolynomialElem)
    if !ismonomial(lead(a))
       return false
    end
@@ -247,7 +247,7 @@ end
 #
 ###############################################################################
 
-canonical_unit(x::AbstractAlgebra.PolyElem) = canonical_unit(lead(x))
+canonical_unit(x::PolynomialElem) = canonical_unit(lead(x))
 
 ###############################################################################
 #
@@ -255,7 +255,7 @@ canonical_unit(x::AbstractAlgebra.PolyElem) = canonical_unit(lead(x))
 #
 ###############################################################################
 
-function show(io::IO, x::AbstractAlgebra.PolyElem)
+function show(io::IO, x::PolynomialElem)
    len = length(x)
    S = var(parent(x))
    if len == 0
@@ -312,9 +312,9 @@ function show(io::IO, p::AbstractAlgebra.PolyRing)
    show(io, base_ring(p))
 end
 
-needs_parentheses(x::AbstractAlgebra.PolyElem) = length(x) > 1
+needs_parentheses(x::PolynomialElem) = length(x) > 1
 
-displayed_with_minus_in_front(x::AbstractAlgebra.PolyElem) = length(x) <= 1 && displayed_with_minus_in_front(coeff(x, 0))
+displayed_with_minus_in_front(x::PolynomialElem) = length(x) <= 1 && displayed_with_minus_in_front(coeff(x, 0))
 
 show_minus_one(::Type{Poly{T}}) where {T <: RingElement} = show_minus_one(T)
 
@@ -328,7 +328,7 @@ show_minus_one(::Type{Poly{T}}) where {T <: RingElement} = show_minus_one(T)
     -(a::AbstractAlgebra.PolyElem)
 > Return $-a$.
 """
-function -(a::AbstractAlgebra.PolyElem)
+function -(a::PolynomialElem)
    len = length(a)
    z = parent(a)()
    fit!(z, len)
@@ -582,7 +582,7 @@ end
     *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.PolyElem)
 > Return $a\times b$.
 """
-function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.PolyElem)
+function *(a::Union{Integer, Rational, AbstractFloat}, b::PolynomialElem)
    len = length(b)
    z = parent(b)()
    fit!(z, len)
@@ -603,7 +603,7 @@ end
     *(a::AbstractAlgebra.PolyElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a\times b$.
 """
-*(a::AbstractAlgebra.PolyElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
+*(a::PolynomialElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
 
 ###############################################################################
 #
@@ -755,7 +755,7 @@ end
     ==(x::AbstractAlgebra.PolyElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::AbstractAlgebra.PolyElem, y::Union{Integer, Rational, AbstractFloat}) = ((length(x) == 0 && base_ring(x)(y) == 0)
+==(x::PolynomialElem, y::Union{Integer, Rational, AbstractFloat}) = ((length(x) == 0 && base_ring(x)(y) == 0)
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 @doc Markdown.doc"""
@@ -776,7 +776,7 @@ end
 #
 ###############################################################################
 
-function Base.isapprox(f::AbstractAlgebra.PolyElem, g::AbstractAlgebra.PolyElem; atol::Real=sqrt(eps()))
+function Base.isapprox(f::PolynomialElem, g::PolynomialElem; atol::Real=sqrt(eps()))
    check_parent(f, g)
    nmin = min(length(f), length(g))
    i = 1
@@ -801,11 +801,11 @@ function Base.isapprox(f::AbstractAlgebra.PolyElem, g::AbstractAlgebra.PolyElem;
    return true
 end
 
-function Base.isapprox(f::AbstractAlgebra.PolyElem{T}, g::T; atol::Real=sqrt(eps())) where T
+function Base.isapprox(f::PolynomialElem{T}, g::T; atol::Real=sqrt(eps())) where T
    return isapprox(f, parent(f)(g); atol=atol)
 end
 
-function Base.isapprox(f::T, g::AbstractAlgebra.PolyElem{T}; atol::Real=sqrt(eps())) where T
+function Base.isapprox(f::T, g::PolynomialElem{T}; atol::Real=sqrt(eps())) where T
    return isapprox(parent(g)(f), g; atol=atol)
 end
 
@@ -819,7 +819,7 @@ end
     truncate(a::AbstractAlgebra.PolyElem, n::Int)
 > Return $a$ truncated to $n$ terms.
 """
-function truncate(a::AbstractAlgebra.PolyElem, n::Int)
+function truncate(a::PolynomialElem, n::Int)
    n < 0 && throw(DomainError())
    lena = length(a)
    if lena <= n
@@ -887,7 +887,7 @@ end
 > The resulting polynomial is normalised. If `len` is negative we throw a
 > `DomainError()`.
 """
-function reverse(x::AbstractAlgebra.PolyElem, len::Int)
+function reverse(x::PolynomialElem, len::Int)
    len < 0 && throw(DomainError())
    r = parent(x)()
    fit!(r, len)
@@ -904,7 +904,7 @@ end
 > of $x$ becomes the constant coefficient of the result, etc. The resulting
 > polynomial is normalised.
 """
-function reverse(x::AbstractAlgebra.PolyElem)
+function reverse(x::PolynomialElem)
    reverse(x, length(x))
 end
 
@@ -919,7 +919,7 @@ end
 > Return the polynomial $f$ shifted left by $n$ terms, i.e. multiplied by
 > $x^n$.
 """
-function shift_left(f::AbstractAlgebra.PolyElem, n::Int)
+function shift_left(f::PolynomialElem, n::Int)
    n < 0 && throw(DomainError())
    if n == 0
       return f
@@ -941,7 +941,7 @@ end
 > Return the polynomial $f$ shifted right by $n$ terms, i.e. divided by
 > $x^n$.
 """
-function shift_right(f::AbstractAlgebra.PolyElem, n::Int)
+function shift_right(f::PolynomialElem, n::Int)
    n < 0 && throw(DomainError())
    flen = length(f)
    if n >= flen
@@ -1610,7 +1610,7 @@ end
     derivative(a::AbstractAlgebra.PolyElem)
 > Return the derivative of the polynomial $a$.
 """
-function derivative(a::AbstractAlgebra.PolyElem)
+function derivative(a::PolynomialElem)
    if a == 0
       return zero(parent(a))
    end

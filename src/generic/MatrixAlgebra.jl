@@ -74,6 +74,10 @@ Markdown.doc"""
 """
 one(a::AbstractAlgebra.MatAlgebra) = a(1)
 
+isunit(a::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement = isunit(det(a))
+
+isunit(a::AbstractAlgebra.MatAlgElem{T}) where T <: FieldElement = rank(a) == degree(a)
+
 ###############################################################################
 #
 #   Similar and eye
@@ -222,12 +226,46 @@ end
 
 function divexact_left(f::AbstractAlgebra.MatAlgElem{T},
                        g::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement
-   return inv(g)*f
+   ginv, d = inv(g)
+   return divexact(ginv*f, d)
 end
 
 function divexact_right(f::AbstractAlgebra.MatAlgElem{T},
                        g::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement
+   ginv, d = inv(g)
+   return divexact(f*ginv, d)
+end
+
+function divexact_left(f::AbstractAlgebra.MatAlgElem{T},
+                       g::AbstractAlgebra.MatAlgElem{T}) where T <: FieldElement
+   return inv(g)*f
+end
+
+function divexact_right(f::AbstractAlgebra.MatAlgElem{T},
+                       g::AbstractAlgebra.MatAlgElem{T}) where T <: FieldElement
    return f*inv(g)
+end
+
+###############################################################################
+#
+#   Ad hoc exact division
+#
+###############################################################################
+
+function divexact_left(x::AbstractAlgebra.MatAlgElem{T}, y::T) where {T <: RingElem}
+   return divexact(x, y)
+end
+
+function divexact_right(x::AbstractAlgebra.MatAlgElem{T}, y::T) where {T <: RingElem}
+   return divexact(x, y)
+end
+
+function divexact_left(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
+   return divexact(x, y)
+end
+
+function divexact_right(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
+   return divexact(x, y)
 end
 
 ###############################################################################

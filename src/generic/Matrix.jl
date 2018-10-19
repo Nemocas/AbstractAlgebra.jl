@@ -763,8 +763,8 @@ end
 #
 ###############################################################################
 
-@doc Markdown.doc"""
-    divexact(x::AbstractAlgebra.MatElem, y::Union{Integer, Rational, AbstractFloat})
+Markdown.doc"""
+    divexact(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by
 > $y$. Each division is expected to be exact.
 """
@@ -778,8 +778,8 @@ function divexact(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
    return z
 end
 
-@doc Markdown.doc"""
-    divexact{T <: RingElem}(x::AbstractAlgebra.MatElem{T}, y::T)
+Markdown.doc"""
+    divexact{T <: RingElem}(x::MatrixElem{T}, y::T)
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by
 > $y$. Each division is expected to be exact.
 """

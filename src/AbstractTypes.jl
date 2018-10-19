@@ -53,6 +53,8 @@ abstract type IdentityMap <: SetMap end
 
 abstract type PolyRing{T} <: Ring end
 
+abstract type NCPolyRing{T} <: NCRing end
+
 abstract type MPolyRing{T} <: Ring end
 
 abstract type SeriesRing{T} <: Ring end
@@ -65,7 +67,7 @@ abstract type FracField{T} <: Field end
 
 abstract type MatSpace{T} <: Module{T} end
 
-abstract type MatAlgebra{T} <: Ring end
+abstract type MatAlgebra{T} <: NCRing end
 
 # mathematical objects parameterised by an element type
 # these are the type classes of mathematical objects
@@ -73,6 +75,8 @@ abstract type MatAlgebra{T} <: Ring end
 # implementation is meaningful over that base ring
 
 abstract type PolyElem{T} <: RingElem end
+
+abstract type NCPolyElem{T} <: NCRingElem end
 
 abstract type MPolyElem{T} <: RingElem end
 
