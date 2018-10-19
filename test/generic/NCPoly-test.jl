@@ -345,7 +345,7 @@ function test_gen_ncpoly_exact_division()
    for iter = 1:100
       f = rand(S, 0:10, -100:100)
       g = S()
-      while g == 0
+      while rank(lead(g)) != 2
          g = rand(S, 0:10, -100:100)
       end
 
@@ -390,7 +390,7 @@ function test_gen_ncpoly_adhoc_exact_division()
    for iter = 1:100
       f = rand(T, 0:10, 0:10, -100:100)
       g = S()
-      while g == 0
+      while rank(lead(g)) != 2
          g = rand(S, 0:10, -100:100)
       end
 
