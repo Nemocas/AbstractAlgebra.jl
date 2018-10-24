@@ -73,7 +73,7 @@ function test_gen_mpoly_manipulation()
          @test isa(coeff(f, rand(1:length(f)) - 1), elem_type(R))
       end
 
-      max_degs, biggest = max_degrees(f)
+      max_degs, biggest = max_fields(f)
       deg = isdegree(ordering(S))
       rev = isreverse(ordering(S))
 
