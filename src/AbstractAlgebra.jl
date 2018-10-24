@@ -124,7 +124,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached, canonical_unit, chang
                  hnf_with_trafo, hnf_via_popov, hnf_via_popov_with_trafo,
                  hooklength, identity_map, identity_matrix,
                  image_map, image_fn, inflate, integral, interpolate, inv,
-                 inv!, inverse_fn, invmod, isconstant, isdegree,
+                 inv!, inverse_fn, invmod, involves_at_most_one_variable, isconstant, isdegree,
                  isdomain_type, isexact_type, isgen, ishessenberg, ismonomial,
                  isone, isreverse, isrimhook,
                  isrref, issquare, isterm,
@@ -157,7 +157,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached, canonical_unit, chang
                  shift_right, show_minus_one,
                  similarity!, snf, snf_kb, snf_kb_with_trafo, snf_with_trafo,
                  solve, solve_rational, solve_triu, sub, subst, swap_rows,
-                 swap_rows!, symbols, total_degree, trail, truncate, typed_hcat, typed_hvcat, upscale,
+                 swap_rows!, symbols, total_degree, to_univariate, trail, truncate, typed_hcat, typed_hvcat, upscale,
                  valuation, var, vars, weak_popov, weak_popov_with_trafo, zero,
                  zero!, zero_matrix, kronecker_product, @PolynomialRing
 
@@ -215,7 +215,7 @@ export add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_rin
                  total_degree, trail, truncate, typed_hcat, typed_hvcat,
                  upscale, valuation, var, vars,
                  weak_popov, weak_popov_with_trafo, zero, zero!,
-                 zero_matrix, kronecker_product, tr, lu, lu!, @PolynomialRing
+                 zero_matrix, kronecker_product, to_univariate, tr, lu, lu!, @PolynomialRing
 
 function exp(a::T) where T
    return Base.exp(a)

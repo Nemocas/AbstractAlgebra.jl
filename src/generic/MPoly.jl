@@ -5,10 +5,11 @@
 ###############################################################################
 
 export max_degrees, total_degree, gens, divides,
-       isconstant, isdegree, ismonomial, isreverse, isterm, main_variable,
+       isconstant, isdegree, ismonomial, isreverse, isterm, involves_at_most_one_variable, main_variable,
        main_variable_extract, main_variable_insert, nvars, vars, ordering,
        rand_ordering, symbols, monomial_set!, monomial_iszero, derivative,
-       change_base_ring, @PolynomialRing
+       rand_ordering, symbols, monomial_set!, monomial_iszero, derivative,
+       change_base_ring,  to_univariate, @PolynomialRing
 
 ###############################################################################
 #
@@ -3114,6 +3115,64 @@ function (a::MPolyRing{T})(b::Array{T, 1}, m::Array{UInt, 2}) where {T <: RingEl
    end
    z = MPoly{T}(a, b, m)
    return z
+end
+
+function to_univariate(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: AbstractAlgebra.RingElem}
+   if !involves_at_most_one_variable(p)
+      error("Can only convert univariate polynomials of type MPoly.")
+   end
+   
+   vars_p = vars(p)
+   R,v = PolynomialRing(base_ring(p), string(vars_p[1]))
+   
+   if length(vars_p) == 0
+      return R(p.coeffs[1])
+   end
+   
+   return R(coefficients_of_univariate_MPoly(p))
+end
+
+doc"""
+    involves_at_most_one_variable(p::AbstractAlgebra.Generic.MPoly)
+> Return true if $p$ contains at most 1 variable and false otherwise.
+"""
+function involves_at_most_one_variable(p::AbstractAlgebra.Generic.MPoly)
+   return length(vars(p)) <= 1
+end
+
+doc"""
+    coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
+> Return the coefficients of p, which is assumed to be univariate, as an array in ascending order.
+"""
+function coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
+   if !involves_at_most_one_variable(p)
+      error("Polynomial is not univariate.")
+   end
+   
+   if length(vars(p)) == 0
+      if length(p) == 0
+         return []
+      end
+      return [ p.coeffs[1] ]
+   end
+   
+   exps = p.exps[:,1:length(p)]
+   size_exps = size(exps)
+   if p.parent.ord != :lex
+      exps = exps[2:size_exps[1],:]
+   end
+   if p.parent.ord == :degrevlex
+      exps = exps[end:-1:1,:]
+   end
+   
+   degs_of_terms = sum(exps,1)
+   order = maximum(degs_of_terms)
+   coeffs = [ zero(base_ring(p)) for i=0:order ]
+   for i=1:p.length
+   	coeffs[degs_of_terms[i]+1] = p.coeffs[i]
+   end
+   
+   return(coeffs)
 end
 
 ###############################################################################
