@@ -156,7 +156,7 @@ end
 # Computes a degrevlex xor mask for the most significant word of an exponent
 # vector. Requires the number of bits per field and the polynomial ring.
 function monomial_drmask(R::MPolyRing{T}, bits::Int) where T <: RingElement
-   vars_per_word = div(sizeof(Int)*8, nvars(R))
+   vars_per_word = div(sizeof(Int)*8, bits)
    n = rem(nvars(R), vars_per_word)
    return reinterpret(UInt, (1 << (bits*n)) - 1)
 end
@@ -342,7 +342,7 @@ end
 # monomials with respect to an ordering.)
 function monomial_cmp(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
    k = N
-   while k >= 1 && A[k, i] == B[k, j]
+   while k > 1 && A[k, i] == B[k, j]
       k -= 1
    end
    if R.ord == :degrevlex
@@ -402,12 +402,12 @@ function isgen(x::MPoly{T}, ::Type{Val{:lex}}) where {T <: RingElement}
 end
 
 function isgen(x::MPoly{T}, ::Type{Val{:deglex}}) where {T <: RingElement}
-   N = size(exps, 1)
+   N = size(x.exps, 1)
    return x.exps[N, 1] == UInt(1)
 end
 
 function isgen(x::MPoly{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
-    N = size(exps, 1)
+    N = size(x.exps, 1)
     return x.exps[N, 1] == UInt(1)
 end
 

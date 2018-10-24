@@ -78,8 +78,8 @@ function test_gen_mpoly_manipulation()
       rev = isreverse(ordering(S))
 
       if deg
-         @test max_degs[1] <= 100*num_vars
-         @test max_degs[1] == biggest
+         @test max_degs[num_vars + 1] <= 100*num_vars
+         @test max_degs[num_vars + 1] == biggest
          @test S.N == num_vars + 1
       else
          @test S.N == num_vars
@@ -89,7 +89,7 @@ function test_gen_mpoly_manipulation()
          @test S.N == num_vars + 1
       end
 
-      for j = Int(deg) + 1:num_vars + Int(deg)
+      for j = 1:num_vars
          @test max_degs[j] <= 100
          @test max_degs[j] <= biggest
       end
