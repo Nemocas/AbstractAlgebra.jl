@@ -6,7 +6,11 @@ CurrentModule = AbstractAlgebra
 
 AbstractAlgebra.jl allows the creation of dense matrices over any computable commutative
 ring $R$. Generic matrices over a commutative ring are implemented in
-`src/generic/Matrix.jl`.
+`src/generic/Matrix.jl`. Much of the functionality there covers both matrix spaces and
+matrix algebras.
+
+Functions specific to generic matrix algebras of $m\times m$ matrices are implemented in 
+`src/generic/MatrixAlgebra.jl`.
 
 As well as implementing the entire Matrix interface, including the optional
 functionality, there are many additional generic algorithms implemented for matrix
@@ -18,24 +22,30 @@ of functions.
 
 ## Types and parent objects
 
-Generic matrices in AbstractAlgebra.jl have type `Generic.Mat{T}` where `T` is the type
-of elements of the matrix. Internally, generic matrices are implemented using an object
-wrapping a Julia two dimensional array, though they are not themselves Julia arrays.
-See the file `src/generic/GenericTypes.jl` for details.
+Generic matrices in AbstractAlgebra.jl have type `Generic.Mat{T}` for matrices in a
+matrix space, or `Generic.MatAlgElem{T}` for matrices in a matrix algebra, where `T` is
+the type of elements of the matrix. Internally, generic matrices are implemented using
+an object wrapping a Julia two dimensional array, though they are not themselves Julia
+arrays. See the file `src/generic/GenericTypes.jl` for details.
 
-Parents of generic matrices (matrix spaces) have type `Generic.MatSpace{T}`.
+Parents of generic matrices (matrix spaces) have type `Generic.MatSpace{T}`. Parents of
+matrices in a matrix algebra have type `Generic.MatAlgebra{T}`.
 
-The generic matrix types belong to the abstract type `AbstractAlgebra.MatElem{T}` and
-the matrix space parent types belong to `AbstractAlgebra.MatSpace{T}`. Note that both
+The generic matrix types (matrix spaces) belong to the abstract type
+`AbstractAlgebra.MatElem{T}` and the matrix space parent types belong to
+`AbstractAlgebra.MatSpace{T}`. Similarly the generic matrix algebra matrix types belong
+to the abstract type `AbstractAlgebra.MatAlgElem{T}` and the parent types belong to
+ `AbstractAlgebra.MatAlgebra{T}` Note that both
 the concrete type of a matrix space parent object and the abstract class it belongs to
 have the name `MatElem`, therefore disambiguation is required to specify which is
-intended.
+intended. The same is true for the abstract types for matrix spaces and their elements.
 
 The dimensions and base ring $R$ of a generic matrix are stored in its parent object,
 however to allow creation of matrices without first creating the matrix space parent,
 generic matrices in Julia do not contain a reference to their parent. They contain the
-row and column numbers and the base ring on a per matrix basis. The parent object can
-then be reconstructed from this data on demand.
+row and column numbers (or degree, in the case of matrix algebras) and the base ring
+on a per matrix basis. The parent object can then be reconstructed from this data on
+demand.
 
 ## Matrix space constructors
 
@@ -43,7 +53,9 @@ A matrix space in AbstractAlgebra.jl represents a collection of all matrices wit
 given dimensions and base ring.
 
 In order to construct matrices in AbstractAlgebra.jl, one can first constructs the
-matrix space itself. This is accomplished with the following constructor.
+matrix space itself. This is accomplished with the following constructor. We discuss
+creation of matrix algebras separately in a dedicated section elsewhere in the
+documentation.
 
 ```julia
 MatrixSpace(R::Ring, rows::Int, cols::Int; cache::Bool=true)
@@ -138,6 +150,14 @@ N = sub(M, 1, 1, 2, 2)
 ```
 
 ## Matrix functionality provided by AbstractAlgebra.jl
+
+Most of the following generic functionality is available for both matrix spaces and
+matrix algebras. Exceptions include functions that do not return or accept square
+matrices or which cannot specify a parent. Such functions include `solve` and `nullspace`
+which can't be provided for matrix algebras.
+
+For details on functionality that is provided for matrix algebras only, see the dedicated
+section of the documentation.
 
 ### Basic matrix functionality
 

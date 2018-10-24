@@ -16,6 +16,12 @@ for T in subtypes(PolyElem)
      end
      return evaluate(f, a)
   end
-
 end
 
+for T in subtypes(NCPolyElem)
+  (f::T)(a::Integer) = evaluate(f, a)
+
+  function (f::T)(a::NCRingElem)
+     return evaluate(f, a)
+  end
+end

@@ -1717,7 +1717,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     SparsePolynomialRing(R::AbstractAlgebra.Ring, s::String; cached::Bool = true)
 > Given a base ring `R` and a string `s` specifying how the generator
 > (variable) should be printed, return a tuple `S, x` representing the new

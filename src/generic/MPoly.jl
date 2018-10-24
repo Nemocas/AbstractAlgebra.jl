@@ -7,7 +7,9 @@
 export max_degrees, total_degree, gens, divides,
        isconstant, isdegree, ismonomial, isreverse, isterm, involves_at_most_one_variable, main_variable,
        main_variable_extract, main_variable_insert, nvars, vars, ordering,
-       rand_ordering, symbols, monomial_set!, monomial_iszero, derivative, change_base_ring, to_univariate
+       rand_ordering, symbols, monomial_set!, monomial_iszero, derivative,
+       rand_ordering, symbols, monomial_set!, monomial_iszero, derivative,
+       change_base_ring,  to_univariate, @PolynomialRing
 
 ###############################################################################
 #
@@ -33,14 +35,14 @@ function isexact_type(a::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.
    return isexact_type(S)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     symbols(a::MPolyRing)
 > Return an array of symbols representing the variable names for the given
 > polynomial ring.
 """
 symbols(a::MPolyRing) = a.S
 
-Markdown.doc"""
+@doc Markdown.doc"""
     nvars(x::MPolyRing)
 > Returns the number of variables of the polynomial ring.
 """
@@ -62,7 +64,7 @@ function gens(a::MPolyRing{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
       for i in 1:a.num_vars]
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     gens{T <: RingElement}(a::MPolyRing{T})
 > Return an array of all the generators (variables) of the given polynomial
 > ring.
@@ -71,53 +73,7 @@ function gens(a::MPolyRing{T}) where {T <: RingElement}
    return gens(a, Val{a.ord})
 end
 
-Markdown.doc"""
-    derivative{T <: AbstractAlgebra.RingElem}(f::AbstractAlgebra.Generic.MPoly{T}, x::AbstractAlgebra.Generic.MPoly{T})
-> Return the partial derivative of f with respect to x.
-"""
-function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
-   gens_parent = gens(f.parent)
-   
-   # Check whether x is among the generators of x.parent
-   if ~(x in gens_parent)
-      error("Can compute the partial derivative only with respect to generators.")
-   end
-
-   n = nvars(f.parent)
-   exps = copy(f.exps)
-
-   size_exps = size(f.exps)
-   if (f.parent.ord != :lex)
-      exps = exps[2:size_exps[1],:]
-   end
-
-   if (f.parent.ord == :degrevlex)
-      exps = exps[end:-1:1,:]
-   end
-
-   derivative = zero(f.parent)
-   coeffs = f.coeffs
-   for i=1:length(f)
-      prod = one(f.parent)
-      prod = coeffs[i]
-      for j=1:n
-         if (gens_parent[j]==x)
-            prod *= exps[j,i]
-            if (exps[j,i] >= 1)
-               exps[j,i] -= 1
-            end
-         end
-         prod = prod * gens_parent[j]^Int(exps[j,i])
-      end
-      derivative = derivative + prod
-   end
-
-   return(derivative)
-end
-
-
-
-Markdown.doc"""
+@doc Markdown.doc"""
     change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}
 > Returns the polynomial obtained by applying g to the coefficients of p.
 """
@@ -149,7 +105,7 @@ function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: Ri
    return(new_p)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
 > Returns the variables occuring in $p$.
 """
@@ -175,7 +131,7 @@ function vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
    return(vars_in_p)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     ordering{T <: RingElement}(a::MPolyRing{T})
 > Return the ordering of the given polynomial ring as a symbol. The options are
 > `:lex`, `:deglex` and `:degrevlex`.
@@ -360,14 +316,24 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+function Base.hash(x::MPoly{T}, h::UInt) where {T <: RingElement}
+   b = 0x53dd43cd511044d1%UInt
+   b = xor(b, xor(Base.hash(x.exps, h), h))
+   for i in 1:length(x)
+      b = xor(b, xor(hash(x.coeffs[i], h), h))
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+   end
+   return b
+end
+
+@doc Markdown.doc"""
     isdegree(s::Symbol)
 > Return `true` if the given symbol represents a degree ordering (deglex or
 > degrevlex).
 """
 isdegree(s::Symbol) = s == :deglex || s == :degrevlex
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isdegree(s::Symbol)
 > Return `true` if the given symbol represents a reverse ordering (degrevlex).
 """
@@ -401,7 +367,7 @@ function isgen(x::MPoly{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
    return x.exps[1, 1] == UInt(1)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isgen{T <: RingElement}(x::MPoly{T})
 > Return `true` if the given polynomial is a generator (variable) of the
 > polynomial ring it belongs to.
@@ -421,7 +387,7 @@ function coeff(x::MPoly, i::Int)
    return x.coeffs[i + 1]
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     max_degrees{T <: RingElement}(f::MPoly{T})
 > Return a tuple `(degs, biggest)` consisting of an array `degs` of the maximum
 > exponent for each field in the exponent vectors of `f` and an integer which
@@ -449,7 +415,7 @@ function max_degrees(f::MPoly{T}) where {T <: RingElement}
    return biggest, b
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     total_degree{T <: RingElement}(f::MPoly{T})
 > Returns the total degree of `f`.
 """
@@ -477,21 +443,21 @@ iszero(x::MPoly) = x.length == 0
 
 isunit(x::MPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && isunit(x.coeffs[1])
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isconstant(x::MPoly)
 > Return `true` if `x` is a degree zero polynomial or the zero polynomial, i.e.
 > a constant polynomial.
 """
 isconstant(x::MPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isterm(x::MPoly)
 > Return `true` if the given polynomial has precisely one term, with
 > coefficient `1`.
 """
 isterm(x::MPoly) = x.length == 1
 
-Markdown.doc"""
+@doc Markdown.doc"""
     ismonomial(x::MPoly)
 > Return `true` if the given polynomial has precisely one nonzero term.
 """
@@ -602,7 +568,7 @@ show_minus_one(::Type{MPoly{T}}) where {T <: RingElement} = show_minus_one(T)
 
 needs_parentheses(x::MPoly) = length(x) > 1
 
-displayed_with_minus_in_front(x::MPoly) = length(x) == 1 && monomial_iszero(x.exps, 1) && displayed_with_minus_in_front(x.coeffs[1])
+displayed_with_minus_in_front(x::MPoly) = length(x) == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && displayed_with_minus_in_front(x.coeffs[1])
 
 ###############################################################################
 #
@@ -1893,9 +1859,9 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
          v = I[x.n]
          if divides_exp
             if v.i == 0
-               addmul!(qc, a.coeffs[v.j], m1, c)
+               qc = addmul!(qc, a.coeffs[v.j], m1, c)
             else
-               addmul!(qc, b.coeffs[v.i], Qc[v.j], c)
+               qc = addmul!(qc, b.coeffs[v.i], Qc[v.j], c)
             end
          end
          if v.i != 0 || v.j < m
@@ -1907,9 +1873,9 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
             v = I[xn]
             if divides_exp
                if v.i == 0
-                  addmul!(qc, a.coeffs[v.j], m1, c)
+                  qc = addmul!(qc, a.coeffs[v.j], m1, c)
                else
-                  addmul!(qc, b.coeffs[v.i], Qc[v.j], c)
+                  qc = addmul!(qc, b.coeffs[v.i], Qc[v.j], c)
                end
             end
             if v.i != 0 || v.j < m
@@ -2435,7 +2401,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
    return flag, [parent(a)(Qc[i], Qe[i]) for i in 1:len], parent(a)(Rc, Re)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     divrem{T <: RingElement}(a::MPoly{T}, b::Array{MPoly{T}, 1})
 > Return a tuple `(q, r)` consisting of an array of polynomials `q`, one for
 > each polynomial in `b`, and a polynomial `r` such that `a = sum_i b[i]*q[i]`.
@@ -2507,7 +2473,7 @@ end
 #
 ################################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     remove(z::MPoly, p::MPoly)
 > Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$. Additionally, $z/p^k$ is returned as the second return.
@@ -2532,7 +2498,7 @@ function remove(z::MPolyElem{T}, p::MPolyElem{T}) where {T <: RingElement}
    return v, q
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     valuation(z::MPoly, p::MPoly)
 > Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$.
@@ -2742,6 +2708,58 @@ function term_content(a::MPoly{T}) where {T <: RingElement}
    end
    return parent(a)(Cc, Ce)
 end
+
+################################################################################
+#
+#  Derivative
+#
+################################################################################
+
+Markdown.doc"""
+    derivative{T <: RingElem}(f::MPoly{T}, x::MPoly{T})
+> Return the partial derivative of `f` with respect to `x`. The value `x` must
+> be a generator of the polynomial ring of `f`.
+"""
+function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
+   R = parent(f)
+   gens_parent = gens(R)
+   
+   # Check whether x is among the generators of x.parent
+   if !(x in gens_parent)
+      error("Can compute the partial derivative only with respect to generators.")
+   end
+
+   n = nvars(R)
+   exps = copy(f.exps)
+
+   size_exps = size(f.exps)
+   if (R.ord != :lex)
+      exps = exps[2:size_exps[1],:]
+   end
+
+   if (R.ord == :degrevlex)
+      exps = exps[end:-1:1,:]
+   end
+
+   derivative = zero(R)
+   coeffs = f.coeffs
+   for i=1:length(f)
+      prod = coeffs[i]
+      for j=1:n
+         if gens_parent[j] == x
+            prod *= exps[j,i]
+            if (exps[j,i] >= 1)
+               exps[j,i] -= 1
+            end
+         end
+         prod = prod * gens_parent[j]^Int(exps[j, i])
+      end
+      derivative = derivative + prod
+   end
+
+   return derivative
+end
+
 
 ###############################################################################
 #
@@ -2958,6 +2976,14 @@ end
 #
 ###############################################################################
 
+function add!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
+   t = b + c
+   a.coeffs = t.coeffs
+   a.exps = t.exps
+   a.length = t.length
+   return a
+end
+
 function mul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
    t = b*c
    a.coeffs = t.coeffs
@@ -2968,6 +2994,14 @@ end
 
 function addeq!(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    t = a + b
+   a.coeffs = t.coeffs
+   a.exps = t.exps
+   a.length = t.length
+   return a
+end
+
+function addmul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
+   t = a + (b * c)
    a.coeffs = t.coeffs
    a.exps = t.exps
    a.length = t.length
@@ -3147,7 +3181,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     PolynomialRing(R::AbstractAlgebra.Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
 > Given a base ring `R` and an array of strings `s` specifying how the
 > generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
@@ -3165,4 +3199,68 @@ function PolynomialRing(R::AbstractAlgebra.Ring, s::Array{String, 1}; cached::Bo
    parent_obj = MPolyRing{T}(R, U, ordering, N, cached)
 
    return tuple(parent_obj, gens(parent_obj, Val{ordering}))
+end
+
+################################################################################
+#
+#  Fancy macro
+#
+################################################################################
+
+function build_names(prefix, indices...)
+  map(i -> "$(prefix)[$(join(i, ","))]", Iterators.product(indices...))
+end
+
+function build_variable(arg::Symbol)
+  t = gensym()
+  return t, :($(esc(t)) = String[$"$arg"])
+end
+
+function build_variable(arg::Expr)
+  isa(arg, Expr) || error("Expected $var to be a variable name")
+  Base.Meta.isexpr(arg, :ref) || error("Expected $var to be of the form varname[idxset]")
+  (2 ≤ length(arg.args)) || error("Expected $var to have at least one index set")
+  varname = arg.args[1]
+  prefix = string(varname)
+  t = gensym()
+  return t, :($(esc(t)) = build_names($prefix, $(esc.(arg.args[2:end])...)))
+end
+
+function build_variables_strings(args)
+  names = Symbol[]
+  exprs = Expr[]
+  for arg in args
+    name_var, define_names = build_variable(arg)
+    push!(exprs, define_names)
+    #push!(exprs, :(print($(esc(name_var)))))
+    push!(names, name_var)
+  end
+  return names, exprs
+end
+
+macro PolynomialRing(R, args...)
+    names, exprs = build_variables_strings(args)
+    all_names = gensym()
+    push!(exprs, :($(esc(all_names)) = String[]))
+    for t in names
+      push!(exprs, :(append!($(esc(all_names)), reshape($(esc(t)), length($(esc(t)))))))
+    end
+    ring1 = gensym()
+    ring2 = gensym()
+    push!(exprs, :($(Expr(:tuple, esc(ring1), esc(ring2))) = PolynomialRing($(esc(R)), $(esc(all_names)))))
+    vars = Symbol[]
+    k = gensym()
+    push!(exprs, :($(esc(k)) = 0))
+    for (i, t) in enumerate(names)
+      var_sym = gensym()
+      if args[i] isa Symbol
+        push!(exprs, :($(esc(var_sym)) = ($(esc(ring2)))[$(esc(k)) + 1]))
+      else
+        push!(exprs, :($(esc(var_sym)) = elem_type($(esc(ring1)))[($(esc(ring2)))[$(esc(k)) + i] for (i,_) in enumerate($(esc(t)))]))
+      end
+      push!(vars, var_sym)
+      push!(exprs, :($(esc(k)) = $(esc(k)) + length($(esc(t)))))
+    end
+    res = :($(foldl((x,y) -> :($x; $y), exprs, init=:())); $(Expr(:tuple, esc(ring1), esc.(vars)...)))
+    return res
 end

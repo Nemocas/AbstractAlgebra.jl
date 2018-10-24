@@ -12,7 +12,7 @@ export O, valuation, exp, precision, max_precision, set_prec!
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     O{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T})
 > Returns $0 + O(x^\mbox{deg}(a))$. Usually this function is called with $x^n$
 > as parameter. Then the function returns the power series $0 + O(x^n)$, which
@@ -41,7 +41,7 @@ length(x::AbstractAlgebra.AbsSeriesElem) = x.length
 
 precision(x::AbstractAlgebra.AbsSeriesElem) = x.prec
 
-Markdown.doc"""
+@doc Markdown.doc"""
     max_precision(R::SeriesRing)
 > Return the maximum absolute precision of power series in the given power
 > series ring.
@@ -60,7 +60,7 @@ function coeff(a::AbsSeries, n::Int)
    return n >= length(a) ? zero(base_ring(a)) : a.coeffs[n + 1]
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     gen{T <: RingElement}(R::AbsSeriesRing{T})
 > Return the generator of the power series ring, i.e. $x + O(x^n)$ where
 > $n$ is the precision of the power series ring $R$.
@@ -70,14 +70,14 @@ function gen(R::AbsSeriesRing{T}) where T <: RingElement
    return R([S(0), S(1)], 2, max_precision(R))
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     iszero(a::SeriesElem)
 > Return `true` if the given power series is arithmetically equal to zero to
 > its current precision, otherwise return `false`.
 """
 iszero(a::SeriesElem) = length(a) == 0
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isone(a::AbsSeries)
 > Return `true` if the given power series is arithmetically equal to one to
 > its current precision, otherwise return `false`.
@@ -86,7 +86,7 @@ function isone(a::AbsSeries)
    return (length(a) == 1 && isone(coeff(a, 0))) || precision(a) == 0
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isgen(a::AbsSeries)
 > Return `true` if the given power series is arithmetically equal to the
 > generator of its power series ring to its current precision, otherwise return
@@ -97,14 +97,14 @@ function isgen(a::AbsSeries)
            precision(a) == 0
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isunit(a::AbstractAlgebra.AbsSeriesElem)
 > Return `true` if the given power series is arithmetically equal to a unit,
 > i.e. is invertible, otherwise return `false`.
 """
 isunit(a::AbstractAlgebra.AbsSeriesElem) = valuation(a) == 0 && isunit(coeff(a, 0))
 
-Markdown.doc"""
+@doc Markdown.doc"""
     valuation(a::AbstractAlgebra.AbsSeriesElem)
 > Return the valuation of the given power series, i.e. the degree of the first
 > nonzero term (or the precision if it is arithmetically zero).
@@ -175,7 +175,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     -(a::AbstractAlgebra.AbsSeriesElem)
 > Return $-a$.
 """
@@ -196,7 +196,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     +{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T})
 > Return $a + b$.
 """
@@ -228,7 +228,7 @@ function +(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem
    return z
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     -{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T})
 > Return $a - b$.
 """
@@ -260,7 +260,7 @@ function -(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem
    return z
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     *{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T})
 > Return $a\times b$.
 """
@@ -312,7 +312,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     *{T <: RingElem}(a::T, b::AbstractAlgebra.AbsSeriesElem{T})
 > Return $a\times b$.
 """
@@ -328,7 +328,7 @@ function *(a::T, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElem}
    return z
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.AbsSeriesElem)
 > Return $a\times b$.
 """
@@ -344,13 +344,13 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.AbsSer
    return z
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     *{T <: RingElem}(a::AbstractAlgebra.AbsSeriesElem{T}, b::T)
 > Return $a\times b$.
 """
 *(a::AbstractAlgebra.AbsSeriesElem{T}, b::T) where {T <: RingElem} = b*a
 
-Markdown.doc"""
+@doc Markdown.doc"""
     *(a::AbstractAlgebra.AbsSeriesElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a\times b$.
 """
@@ -362,7 +362,7 @@ Markdown.doc"""
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     shift_left(x::AbstractAlgebra.AbsSeriesElem, n::Int)
 > Return the power series $f$ shifted left by $n$ terms, i.e. multiplied by
 > $x^n$.
@@ -391,7 +391,7 @@ function shift_left(x::AbstractAlgebra.AbsSeriesElem{T}, len::Int) where {T <: R
    return z
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     shift_right(f::AbstractAlgebra.AbsSeriesElem, n::Int)
 > Return the power series $f$ shifted right by $n$ terms, i.e. divided by
 > $x^n$.
@@ -419,7 +419,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     truncate(a::AbstractAlgebra.AbsSeriesElem, n::Int)
 > Return $a$ truncated to $n$ terms.
 """
@@ -448,7 +448,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     ^{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T}, b::Int)
 > Return $a^b$. We require $b \geq 0$.
 """
@@ -492,7 +492,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     =={T <: RingElement}(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
@@ -526,7 +526,7 @@ function ==(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesEle
    return true
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     isequal{T <: RingElement}(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T})
 > Return `true` if $x == y$ exactly, otherwise return `false`. Only if the
 > power series are precisely the same, to the same precision, are they declared
@@ -572,27 +572,27 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     =={T <: RingElem}(x::AbstractAlgebra.AbsSeriesElem{T}, y::T)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::AbstractAlgebra.AbsSeriesElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
       ((length(x) == 0 && iszero(y)) || (length(x) == 1 && coeff(x, 0) == y))
 
-Markdown.doc"""
+@doc Markdown.doc"""
     =={T <: RingElem}(x::T, y::AbstractAlgebra.AbsSeriesElem{T})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::T, y::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElem} = y == x
 
-Markdown.doc"""
+@doc Markdown.doc"""
     ==(x::AbstractAlgebra.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::AbstractAlgebra.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat}) = precision(x) == 0 || ((length(x) == 0 && iszero(y))
                                        || (length(x) == 1 && coeff(x, 0) == y))
 
-Markdown.doc"""
+@doc Markdown.doc"""
     ==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.AbsSeriesElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
@@ -604,7 +604,7 @@ Markdown.doc"""
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     divexact{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T})
 > Return $a/b$. Requires $b$ to be invertible.
 """
@@ -629,7 +629,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     divexact(a::AbstractAlgebra.AbsSeriesElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a/b$ where the quotient is expected to be exact.
 """
@@ -645,7 +645,7 @@ function divexact(x::AbstractAlgebra.AbsSeriesElem, y::Union{Integer, Rational, 
    return z
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     divexact{T <: RingElem}(a::AbstractAlgebra.AbsSeriesElem{T}, b::T)
 > Return $a/b$ where the quotient is expected to be exact.
 """
@@ -667,7 +667,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
    inv(a::AbstractAlgebra.AbsSeriesElem)
 > Return the inverse of the power series $a$, i.e. $1/a$.
 """
@@ -699,7 +699,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
    sqrt(a::AbstractAlgebra.AbsSeriesElem)
 > Return the square root of the power series $a$.
 """
@@ -757,7 +757,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     exp(a::AbstractAlgebra.AbsSeriesElem)
 > Return the exponential of the power series $a$.
 """

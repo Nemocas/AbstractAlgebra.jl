@@ -4,12 +4,7 @@ using Markdown
 
 using InteractiveUtils
 
-import LinearAlgebra: det, norm,
-                      nullspace, rank, transpose!, hessenberg
-
-if VERSION < v"1.0.0"
-   import Base: atan2, base, contains, nextpow2, prevpow2
-end
+import LinearAlgebra: det, norm, nullspace, rank, transpose!, hessenberg
 
 import LinearAlgebra: lu, lu!, tr
 
@@ -31,15 +26,15 @@ import Base: Array, abs, acos, acosh, asin, asinh, atan, atanh,
 
 export elem_type, parent_type
 
-export SetElem, GroupElem, RingElem, ModuleElem, FieldElem, RingElement,
+export SetElem, GroupElem, NCRingElem, RingElem, ModuleElem, FieldElem, RingElement,
        FieldElement, Map, AccessorNotSetError
 
 export SetMap, FunctionalMap, IdentityMap
 
-export PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
-       MatElem, FinFieldElem, MPolyElem
+export NCPolyElem, PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
+       MatElem, MatAlgElem, FinFieldElem, MPolyElem
 
-export PolyRing, SeriesRing, ResRing, FracField, MatSpace,
+export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
        FinField, MPolyRing
 
 export ZZ, QQ, zz, qq, RealField, RDF
@@ -69,26 +64,12 @@ include("AbstractTypes.jl")
 
 ###############################################################################
 #
-#   Set up environment / load libraries
-#
-###############################################################################
-
-function __init__()
-   println("")
-   println("Welcome to AbstractAlgebra version 0.1.2-dev")
-   println("")
-   println("AbstractAlgebra comes with absolutely no warranty whatsoever")
-   println("")
-end
-
-###############################################################################
-#
 #  Version information
 #
 ################################################################################
 
 function versioninfo()
-  print("AbstractAlgebra version 0.1.2-dev\n")
+  print("AbstractAlgebra version 0.1.4-dev\n")
   abstractalgebrarepo = dirname(dirname(@__FILE__))
 
   print("AbstractAlgebra: ")
@@ -129,9 +110,11 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached, canonical_unit, chang
                  chebyshev_u, _check_dim, check_parent, codomain, coeff, cols,
                  compose, content, cycles, data, deflate, degree,
                  denominator, derivative, det, det_clow,
-                 det_df, det_fflu, det_popov, dim, disable_cache!, discriminant,
-                 displayed_with_minus_in_front, divexact, divides, divrem, domain, downscale,
-                 elem_type, elements, enable_cache!, evaluate, exp_gcd,
+                 det_df, det_fflu, det_popov, dim, disable_cache!, 
+                 discriminant, displayed_with_minus_in_front,
+                 divexact, divexact_left, divexact_right, divides,
+                 divrem, domain, downscale,
+                 elem_type, enable_cache!, evaluate, exp_gcd,
                  extended_weak_popov, extended_weak_popov_with_trafo, fflu!,
                  fflu, find_pivot_popov, fit!, gcd, gen,
                  gens, get_field, gcdinv, gcdx,
@@ -161,7 +144,8 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached, canonical_unit, chang
                  perm, permtype, @perm_str, polcoeff, pol_length,
                  powmod, pow_multinomial, popov, popov_with_trafo,
                  powers, precision,
-                 preimage_map, primpart, pseudodivrem, pseudorem, randmat_triu,
+                 preimage_map, primpart, pseudodivrem,
+                 pseudorem, rank, randmat_triu,
                  randmat_with_rank, rand_ordering, rank_profile_popov, remove,
                  renormalize!, rescale!, resultant,
                  resultant_ducos, resultant_euclidean,
@@ -175,7 +159,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached, canonical_unit, chang
                  solve, solve_rational, solve_triu, sub, subst, swap_rows,
                  swap_rows!, symbols, total_degree, to_univariate, trail, truncate, typed_hcat, typed_hvcat, upscale,
                  valuation, var, vars, weak_popov, weak_popov_with_trafo, zero,
-                 zero!, zero_matrix, kronecker_product
+                 zero!, zero_matrix, kronecker_product, @PolynomialRing
 
 export add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_ring, character,
                  characteristic, charpoly, charpoly_danilevsky!,
@@ -183,9 +167,11 @@ export add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_rin
                  chebyshev_u, _check_dim, check_parent, codomain, coeff, cols,
                  compose, content, cycles, data, deflate, degree,
                  denominator, derivative, det, det_clow,
-                 det_df, det_fflu, det_popov, dim, disable_cache!, discriminant,
-                 displayed_with_minus_in_front, divexact, divides, divrem, domain, downscale,
-                 elem_type, elements, enable_cache!, evaluate, exp_gcd,
+                 det_df, det_fflu, det_popov, dim, disable_cache!,
+                 discriminant, displayed_with_minus_in_front,
+                 divexact, divexact_left, divexact_right, divides,
+                 divrem, domain, downscale,
+                 elem_type, enable_cache!, evaluate, exp_gcd,
                  extended_weak_popov, extended_weak_popov_with_trafo, fflu!,
                  fflu, find_pivot_popov, fit!, gcd, gen, 
                  gens, get_field, gcdinv, gcdx,
@@ -214,7 +200,7 @@ export add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_rin
                  powmod, pow_multinomial,
                  popov, popov_with_trafo, powers, ppio, 
                  precision, preimage_map, primpart,
-                 pseudodivrem, pseudorem, randmat_triu, randmat_with_rank,
+                 pseudodivrem, pseudorem, rank, randmat_triu, randmat_with_rank,
                  rand_ordering, rank_profile_popov, remove,
                  renormalize!, resultant,
                  resultant_ducos, rescale!, resultant_euclidean,
@@ -229,7 +215,7 @@ export add!, addeq!, addmul!, base_ring, cached, canonical_unit, change_base_rin
                  total_degree, trail, truncate, typed_hcat, typed_hvcat,
                  upscale, valuation, var, vars,
                  weak_popov, weak_popov_with_trafo, zero, zero!,
-                 zero_matrix, kronecker_product, to_univariate, tr, lu, lu!
+                 zero_matrix, kronecker_product, to_univariate, tr, lu, lu!, @PolynomialRing
 
 function exp(a::T) where T
    return Base.exp(a)
@@ -347,6 +333,14 @@ function PolynomialRing(R::Ring, s::Char; cached::Bool = true)
    PolynomialRing(R, string(s); cached=cached)
 end
 
+function PolynomialRing(R::NCRing, s::AbstractString; cached::Bool = true)
+   Generic.PolynomialRing(R, s; cached=cached)
+end
+
+function PolynomialRing(R::NCRing, s::Char; cached::Bool = true)
+   PolynomialRing(R, string(s); cached=cached)
+end
+
 function PolynomialRing(R::Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
    Generic.PolynomialRing(R, s; cached=cached, ordering=ordering)
 end
@@ -365,6 +359,10 @@ end
 
 function MatrixSpace(R::Ring, r::Int, c::Int, cached::Bool = true)
    Generic.MatrixSpace(R, r, c, cached)
+end
+
+function MatrixAlgebra(R::Ring, n::Int, cached::Bool = true)
+   Generic.MatrixAlgebra(R, n, cached)
 end
 
 function FractionField(R::Ring; cached=true)
@@ -393,8 +391,8 @@ function crt(A...)
 end
 
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
-       FractionField, ResidueRing, Partition, PermGroup, YoungTableau,
-       AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
+       MatrixAlgebra, FractionField, ResidueRing, Partition, PermGroup,
+       YoungTableau, AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
        PuiseuxSeriesField
 
@@ -409,6 +407,10 @@ export Generic
 getindex(R::Ring, s::String) = PolynomialRing(R, s)
 
 getindex(R::Ring, s::Char) = PolynomialRing(R, s)
+
+getindex(R::NCRing, s::String) = PolynomialRing(R, s)
+
+getindex(R::NCRing, s::Char) = PolynomialRing(R, s)
 
 getindex(R::Tuple{Ring, T}, s::String) where {T} = PolynomialRing(R[1], s)
 
@@ -586,6 +588,7 @@ isnegative(x) = displayed_with_minus_in_front(x)
 
 function test_module(x, y)
    julia_exe = Base.julia_cmd()
+   pkgdir = realpath(joinpath(dirname(@__FILE__), ".."))
    test_file = joinpath(pkgdir, "test/$x/")
    test_file = test_file * "$y-test.jl";
    test_function_name = "test_"
@@ -605,8 +608,8 @@ function test_module(x, y)
       test_function_name *= "gen_$(lowercase(y))"
    end
 
-   cmd = "using Base.Test; using AbstractAlgebra; include(\"$test_file\"); $test_function_name();"
-   info("spawning ", `$julia_exe -e \"$cmd\"`)
+   cmd = "using Test; using AbstractAlgebra; include(\"$test_file\"); $test_function_name();"
+   @info("spawning ", `$julia_exe -e \"$cmd\"`)
    run(`$julia_exe -e $cmd`)
 end
 

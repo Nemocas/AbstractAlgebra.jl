@@ -22,4 +22,5 @@ function test_rings()
    test_gen_puiseux_series()
    test_gen_mat()
    test_gen_mpoly()
+
 end

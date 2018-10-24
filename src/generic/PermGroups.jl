@@ -4,19 +4,19 @@
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     parent_type(::Type{perm{T}})
 > Return the type of the parent of a permutation.
 """
 parent_type(::Type{perm{T}}) where T = PermGroup{T}
 
-Markdown.doc"""
+@doc Markdown.doc"""
     elem_type(::Type{PermGroup{T}})
 > Return the type of elements of a permutation group.
 """
 elem_type(::Type{PermGroup{T}}) where T = perm{T}
 
-Markdown.doc"""
+@doc Markdown.doc"""
     parent(g::perm)
 > Return the parent of the permutation `g`.
 
@@ -62,7 +62,7 @@ convert(::Type{Vector{T}}, p::perm{T}) where {T} = p.d
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     parity(g::perm)
 > Return the parity of the given permutation, i.e. the parity of the number of
 > transpositions in any decomposition of `g` into transpositions.
@@ -107,7 +107,7 @@ function parity(g::perm{T}) where T
    return T(parity)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     sign(g::perm)
 > Return the sign of permutation.
 >
@@ -172,7 +172,7 @@ function Base.show(io::IO, cd::CycleDec)
    print(io, "Cycle Decomposition: ("*join(a, ")(")*")")
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     cycles(g::perm)
 > Decompose permutation `g` into disjoint cycles.
 >
@@ -234,7 +234,7 @@ function cycledec(v::Vector{T}) where T<:Integer
    return ccycles, cptrs
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     permtype(g::perm, rev=true)
 > Return the type of permutation `g`, i.e. lengths of disjoint cycles in cycle
 > decomposition of `g`.
@@ -284,7 +284,7 @@ end
 
 const _permdisplaystyle = PermDisplayStyle(:cycles)
 
-Markdown.doc"""
+@doc Markdown.doc"""
     setpermstyle(format::Symbol)
 > Select the style in which permutations are displayed (in REPL or in general
 > as string). This can be either
@@ -339,7 +339,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     ==(g::perm, h::perm)
 > Return `true` if permutations are equal, otherwise return `false`.
 >
@@ -360,7 +360,7 @@ true
 """
 ==(g::perm, h::perm) = g.d == h.d
 
-Markdown.doc"""
+@doc Markdown.doc"""
     ==(G::PermGroup, H::PermGroup)
 > Return `true` if permutation groups are equal, otherwise return `false`.
 >
@@ -387,7 +387,7 @@ false
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     *(g::perm, h::perm)
 > Return the composition ``h ∘ g`` of two permutations.
 >
@@ -413,7 +413,7 @@ end
 
 *(g::perm{S}, h::perm{T}) where {S,T} = *(promote(g,h)...)
 
-Markdown.doc"""
+@doc Markdown.doc"""
     ^(g::perm, n::Int)
 > Return the $n$-th power of a permutation `g`.
 >
@@ -500,7 +500,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     inv(g::perm)
 > Return the inverse of the given permutation, i.e. the permuation $g^{-1}$
 > such that $g ∘ g^{-1} = g^{-1} ∘ g$ is the identity permutation.
@@ -594,35 +594,70 @@ Base.length(A::AllPerms) = A.all
 #   end
 #end
 
-Markdown.doc"""
-    elements(G::PermGroup)
-> Return an iterator over all permutations in `G`.
+@doc Markdown.doc"""
+    Generic.elements!(G::PermGroup)
+> Return an unsafe iterator over all permutations in `G`. Only one permutation
+> is allocated and then modified in-place using the non-recursive
+> [Heaps algorithm](https://en.wikipedia.org/wiki/Heap's_algorithm).
 >
-> This uses the non-recursive [Heaps algorithm](https://en.wikipedia.org/wiki/Heap's_algorithm).
-> You may use `collect(elements(G))` to get a vector of all elements.
-> A non-allocating version is provided as `Generic.elements!(::PermGroup)` for
-> iteration as well, but you need to explicitely `deepcopy` permutations
-> intended to be stored or modified.
+> Note: you need to explicitely copy permutations intended to be stored or
+> modified.
 
 # Examples:
 ```jldoctest
-julia> elts = elements(PermGroup(5));
+julia> elts = Generic.elements!(PermGroup(5));
 
 julia> length(elts)
 120
 
-julia> G = PermGroup(Int32(3)); collect(elements(G))
-6-element Array{AbstractAlgebra.Generic.perm{Int32},1}:
- ()
- (1,2)
- (1,3,2)
- (2,3)
- (1,2,3)
+julia> for p in Generic.elements!(PermGroup(3))
+         println(p)
+       end
+()
+(1,2)
+(1,3,2)
+(2,3)
+(1,2,3)
+(1,3)
+
+julia> A = collect(Generic.elements!(PermGroup(3))); A
+6-element Array{AbstractAlgebra.Generic.perm{Int64},1}:
+ (1,3)
+ (1,3)
+ (1,3)
+ (1,3)
+ (1,3)
+ (1,3)
+
+julia> unique(A)
+1-element Array{AbstractAlgebra.Generic.perm{Int64},1}:
  (1,3)
 ```
 """
-elements(G::PermGroup) = (perm(copy(p.d), false) for p in AllPerms(G.n))
 elements!(G::PermGroup)= (p for p in AllPerms(G.n))
+
+function Base.iterate(G::PermGroup)
+  A = AllPerms(G.n)
+  a, b = iterate(A)
+  return deepcopy(A.elts), (A, b)
+end
+
+function Base.iterate(G::PermGroup, S)
+  A = S[1]
+  c = S[2]
+
+  s = iterate(A, c)
+
+  if s === nothing
+    return nothing
+  end
+
+  return deepcopy(s[1]), (A, s[2])
+end
+
+Base.eltype(::Type{PermGroup{T}}) where T = perm{T}
+
+Base.length(G::PermGroup) = order(G)
 
 ###############################################################################
 #
@@ -630,14 +665,14 @@ elements!(G::PermGroup)= (p for p in AllPerms(G.n))
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     order(G::PermGroup) -> BigInt
 > Return the order of the full permutation group as `BigInt`.
 """
 order(G::PermGroup) = order(BigInt, G)
 order(::Type{T}, G::PermGroup) where T = factorial(T(G.n))
 
-Markdown.doc"""
+@doc Markdown.doc"""
     order(a::perm) -> BigInt
 > Return the order of permutation `a` as `BigInt`.
 >
@@ -651,7 +686,7 @@ function order(::Type{T}, a::perm) where T
    return reduce(lcm, diff(cycles(a).cptrs), init = one(TT))
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     matrix_repr(a::perm)
 > Return the permutation matrix as sparse matrix representing `a` via natural
 > embedding of the permutation group into general linear group over $\mathbb{Z}$.
@@ -676,7 +711,7 @@ julia> full(ans)
 """
 matrix_repr(a::perm{T}) where T = sparse(collect(T, 1:length(a.d)), a.d, ones(T,length(a.d)))
 
-Markdown.doc"""
+@doc Markdown.doc"""
     emb!(result::perm, p::perm, V)
 > Embed permutation `p` into permutation `result` on the indices given by `V`.
 >
@@ -697,7 +732,7 @@ function emb!(result::perm, p::perm, V)
    return result
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     emb(G::PermGroup, V::Vector{Int})
 > Return the natural embedding of a permutation group into `G` as the
 > subgroup permuting points indexed by `V`.
@@ -721,7 +756,7 @@ function emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
    return p -> Generic.emb!(G(), p, V)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     rand(G::PermGroup)
 > Return a random permutation from `G`.
 """
@@ -815,7 +850,7 @@ function cycledec(ccycles::Vector{Int}, cptrs::Vector{Int}, n::T,
    return CycleDec{T}(ccycles, cptrs, length(cptrs)-1)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     perm"..."
 > String macro to parse disjoint cycles into `perm{Int}`.
 >
@@ -870,7 +905,7 @@ end
 const _charvalsTable = Dict{Tuple{BitVector,Vector{Int}}, Int}()
 const _charvalsTableBig = Dict{Tuple{BitVector,Vector{Int}}, BigInt}()
 
-Markdown.doc"""
+@doc Markdown.doc"""
     character(lambda::Partition)
 > Return the $\lambda$-th irreducible character of permutation group on
 > `sum(lambda)` symbols. The returned character function is of the following signature:
@@ -917,7 +952,7 @@ function character(lambda::Partition)
    return char
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     character(lambda::Partition, p::perm, check::Bool=true) -> BigInt
 > Returns the value of `lambda`-th irreducible character of the permutation
 > group on permutation `p`.
@@ -933,7 +968,7 @@ function character(::Type{T}, lambda::Partition, p::perm) where T <: Integer
    return character(T, lambda, Partition(permtype(p)))
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     character(lambda::Partition, mu::Partition) -> BigInt
 > Returns the value of `lambda-th` irreducible character on the conjugacy class
 > represented by partition `mu`.

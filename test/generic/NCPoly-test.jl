@@ -1,0 +1,476 @@
+function test_gen_ncpoly_constructors()
+   print("Generic.NCPoly.constructors...")
+
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+
+   @test elem_type(S) == Generic.NCPoly{elem_type(R)}
+   @test elem_type(Generic.NCPolyRing{elem_type(R)}) == Generic.NCPoly{elem_type(R)}
+   @test parent_type(Generic.NCPoly{elem_type(R)}) == Generic.NCPolyRing{elem_type(R)}
+
+   @test typeof(S) <: Generic.NCPolyRing
+
+   @test isa(y, NCPolyElem)
+
+   T, z = PolynomialRing(S, "z")
+
+   @test typeof(T) <: Generic.NCPolyRing
+
+   @test isa(z, NCPolyElem)
+
+   f = one(R) + y^3 + z + 1
+
+   @test isa(f, NCPolyElem)
+
+   g = S(2)
+
+   @test isa(g, NCPolyElem)
+
+   h = S(rand(R, -10:10))
+
+   @test isa(h, NCPolyElem)
+
+   j = T(rand(R, -10:10))
+
+   @test isa(j, NCPolyElem)
+
+   k = S([rand(R, -10:10) for i in 1:3])
+
+   @test isa(k, NCPolyElem)
+
+   l = S(k)
+
+   @test isa(l, NCPolyElem)
+
+   m = S([1, 2, 3])
+
+   @test isa(m, NCPolyElem)
+
+   n = S([ZZ(1), ZZ(2), ZZ(3)])
+
+   @test isa(n, NCPolyElem)
+
+   println("PASS")
+end
+
+function test_gen_ncpoly_manipulation()
+   print("Generic.NCPoly.manipulation...")
+
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+
+   @test iszero(zero(S))
+
+   @test isone(one(S))
+
+   @test isgen(gen(S))
+
+   @test isunit(one(S))
+
+   f = 2*y + 1
+
+   @test lead(f) == 2
+
+   @test trail(2y^2 + 3y) == 3
+
+   @test degree(f) == 1
+
+   h = y^2 + 3*y + 3
+
+   @test coeff(h, 1) == 3
+
+   @test length(h) == 3
+
+   @test canonical_unit(-y + 1) == -1
+
+   @test deepcopy(h) == h
+
+   @test isterm(rand(R, -10:10)*y^2)
+
+   @test !ismonomial(2*y^2)
+
+   @test ismonomial(y^2)
+
+   @test !ismonomial(y^2 + y + 1)
+
+   println("PASS")
+end
+
+function test_gen_ncpoly_binary_ops()
+   print("Generic.NCPoly.binary_ops...")
+
+   #  Exact ring
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+
+   for iter = 1:100
+      f = rand(S, 0:10, -10:10)
+      g = rand(S, 0:10, -10:10)
+      h = rand(S, 0:10, -10:10)
+      @test f + g == g + f
+      @test f + (g + h) == (f + g) + h
+      @test f*(g + h) == f*g + f*h
+      @test (f - h) + (g + h) == f + g
+      @test (f + g)*(f - g) == f*f + g*f - f*g - g*g
+      @test f - g == -(g - f)
+   end
+
+   println("PASS")
+end
+
+function test_gen_ncpoly_adhoc_binary()
+   print("Generic.NCPoly.adhoc_binary...")
+
+   # Exact ring
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+   for iter = 1:500
+      f = rand(S, 0:10, -10:10)
+      c1 = rand(R, -10:10)
+      c2 = rand(R, -10:10)
+
+      @test c1*f - c2*f == (c1 - c2)*f
+      @test c1*f + c2*f == (c1 + c2)*f
+
+      @test f*c1 - f*c2 == f*(c1 - c2)
+      @test f*c1 + f*c2 == f*(c1 + c2)
+   end
+
+   # Generic tower
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+   T, z = PolynomialRing(S, "z")
+   for iter = 1:100
+      f = rand(T, 0:5, 0:5, -10:10)
+      c1 = rand(R, -10:10)
+      c2 = rand(R, -10:10)
+      d1 = rand(S, 0:5, -10:10)
+      d2 = rand(S, 0:5, -10:10)
+
+      @test c1*f - c2*f == (c1 - c2)*f
+      @test c1*f + c2*f == (c1 + c2)*f
+      @test d1*f - d2*f == (d1 - d2)*f
+      @test d1*f + d2*f == (d1 + d2)*f
+
+      @test f*c1 - f*c2 == f*(c1 - c2)
+      @test f*c1 + f*c2 == f*(c1 + c2)
+      @test f*d1 - f*d2 == f*(d1 - d2)
+      @test f*d1 + f*d2 == f*(d1 + d2)
+   end
+
+   println("PASS")
+end
+
+function test_gen_ncpoly_comparison()
+   print("Generic.NCPoly.comparison...")
+
+   # Exact ring
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+   for iter = 1:500
+      f = rand(S, 0:10, -10:10)
+      g = deepcopy(f)
+      h = S()
+      while iszero(h)
+         h = rand(S, 0:10, -10:10)
+      end
+
+      @test f == g
+      @test isequal(f, g)
+      @test f != g + h
+   end
+
+   println("PASS")
+end
+
+function test_gen_ncpoly_adhoc_comparison()
+   print("Generic.NCPoly.adhoc_comparison...")
+
+   # Exact ring
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+   for iter = 1:500
+      f = S()
+      while iszero(f)
+         f = rand(S, 0:10, -10:10)
+      end
+      c1 = rand(ZZ, -10:10)
+      d1 = rand(zz, -10:10)
+
+      @test R(c1) == c1
+      @test c1 == R(c1)
+      @test R(d1) == d1
+      @test d1 == R(d1)
+
+      @test R(c1) != c1 + f
+      @test c1 != R(c1) + f
+      @test R(d1) != d1 + f
+      @test d1 != R(d1) + f
+   end
+
+   # Generic tower
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+   T, z = PolynomialRing(S, "z")
+   for iter = 1:100
+      f = T()
+      while iszero(f)
+         f = rand(T, 0:10, 0:5, -10:10)
+      end
+      c1 = rand(ZZ, -10:10)
+      d1 = rand(S, 0:5, -10:10)
+
+      @test S(c1) == c1
+      @test c1 == S(c1)
+      @test S(d1) == d1
+      @test d1 == S(d1)
+
+      @test S(c1) != c1 + f
+      @test c1 != S(c1) + f
+      @test S(d1) != d1 + f
+      @test d1 != S(d1) + f
+   end
+
+   println("PASS")
+end
+
+function test_gen_ncpoly_unary_ops()
+   print("Generic.NCPoly.unary_ops...")
+
+   #  Exact ring
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+   for iter = 1:300
+      f = rand(S, 0:10, -10:10)
+
+      @test -(-f) == f
+      @test iszero(f + (-f))
+   end
+
+   println("PASS")
+end
+
+function test_gen_ncpoly_truncation()
+   print("Generic.NCPoly.truncation...")
+
+   #  Exact ring
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+   for iter = 1:300
+      f = rand(S, 0:10, -10:10)
+      g = rand(S, 0:10, -10:10)
+      n = rand(0:20)
+
+      @test truncate(f*g, n) == mullow(f, g, n)
+   end
+
+   println("PASS")
+end
+
+function test_gen_ncpoly_reverse()
+   print("Generic.NCPoly.reverse...")
+
+   #  Exact ring
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+   for iter = 1:300
+      f = rand(S, 0:10, -10:10)
+      len = rand(length(f):12)
+      frev = reverse(f, len)
+
+      shift = 0
+      for i = 1:len
+         if coeff(f, i - 1) != 0
+            break
+         end
+         shift += 1
+      end
+
+      @test length(frev) == len - shift
+      @test f == reverse(frev, len)
+   end
+
+   println("PASS")
+end
+
+function test_gen_ncpoly_shift()
+   print("Generic.NCPoly.shift...")
+
+   # Exact ring
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+   for iter = 1:300
+      f = rand(S, 0:10, -10:10)
+      s = rand(0:10)
+      g = s == 0 ? S() : rand(S, 0:s - 1, -10:10)
+
+      @test shift_right(shift_left(f, s) + g, s) == f
+      @test shift_left(f, s) == y^s*f
+      @test length(shift_right(f, s)) == max(0, length(f) - s)
+   end
+
+   println("PASS")
+end
+
+function test_gen_ncpoly_powering()
+   print("Generic.NCPoly.powering...")
+
+   # Exact ring
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+
+   for iter = 1:10
+      f = rand(S, 0:10, -10:10)
+      r2 = R(1)
+
+      for expn = 0:10
+         r1 = f^expn
+
+         @test (f == 0 && expn == 0 && r1 == 0) || r1 == r2
+
+         r2 *= f
+      end
+   end
+
+   println("PASS")
+end
+
+function test_gen_ncpoly_exact_division()
+   print("Generic.NCPoly.exact_division...")
+
+   # Exact ring
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+
+   for iter = 1:100
+      f = rand(S, 0:10, -100:100)
+      g = S()
+      while rank(lead(g)) != 2
+         g = rand(S, 0:10, -100:100)
+      end
+
+      @test divexact_right(f*g, g) == f
+      @test divexact_left(g*f, g) == f
+   end
+
+   println("PASS")
+end
+
+function test_gen_ncpoly_adhoc_exact_division()
+   print("Generic.NCPoly.adhoc_exact_division...")
+
+   # Exact ring
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+
+   for iter = 1:100
+      f = rand(S, 0:10, -100:100)
+      g = ZZ()
+      while g == 0
+         g = rand(ZZ, -10:10)
+      end
+
+      @test divexact_right(f*g, g) == f
+      @test divexact_left(g*f, g) == f
+
+      h = 0
+      while h == 0
+         h = rand(-10:10)
+      end
+
+      @test divexact_right(f*h, h) == f
+      @test divexact_left(h*f, h) == f
+   end
+
+   # Generic tower
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+   T, z = PolynomialRing(S, "z")
+
+   for iter = 1:100
+      f = rand(T, 0:10, 0:10, -100:100)
+      g = S()
+      while rank(lead(g)) != 2
+         g = rand(S, 0:10, -100:100)
+      end
+
+      @test divexact_right(f*g, g) == f
+      @test divexact_left(g*f, g) == f
+
+      h = ZZ()
+      while h == 0
+         h = rand(ZZ, -10:10)
+      end
+
+      @test divexact_right(f*h, h) == f
+      @test divexact_left(h*f, h) == f
+   end
+
+   println("PASS")
+end
+
+function test_gen_ncpoly_evaluation()
+   print("Generic.NCPoly.evaluation...")
+
+   # Exact ring
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+
+   for iter in 1:10
+      f = rand(S, 0:4, -10:10)
+      g = rand(S, 0:4, -10:10)
+
+      d = rand(ZZ, -10:10)
+
+      @test evaluate(f + g, d) == evaluate(f, d) + evaluate(g, d)
+   end
+
+   for iter in 1:10
+      f = rand(S, 0:4, -10:10)
+
+      d = rand(ZZ, -10:10)
+
+      @test evaluate(f^2, d) == evaluate(f, d)^2
+   end
+
+   println("PASS")
+end
+
+function test_gen_ncpoly_derivative()
+   print("Generic.NCPoly.derivative...")
+
+   # Exact ring
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+
+   for iter in 1:10
+      f = rand(S, 0:4, -100:100)
+      g = rand(S, 0:4, -100:100)
+
+      @test derivative(f + g) == derivative(g) + derivative(f)
+
+      @test derivative(g*f) == derivative(g)*f + g*derivative(f)
+   end
+
+   println("PASS")
+end
+
+function test_gen_ncpoly()
+   test_gen_ncpoly_constructors()
+   test_gen_ncpoly_manipulation()
+   test_gen_ncpoly_binary_ops()
+   test_gen_ncpoly_adhoc_binary()
+   test_gen_ncpoly_comparison()
+   test_gen_ncpoly_adhoc_comparison()
+   test_gen_ncpoly_unary_ops()
+   test_gen_ncpoly_truncation()
+   test_gen_ncpoly_reverse()
+   test_gen_ncpoly_shift()
+   test_gen_ncpoly_powering()
+   test_gen_ncpoly_exact_division()
+   test_gen_ncpoly_adhoc_exact_division()
+   test_gen_ncpoly_evaluation()
+   test_gen_ncpoly_derivative()
+
+   println("")
+end

@@ -11,7 +11,9 @@ abstract type Set end
 
 abstract type Group <: Set end
 
-abstract type Ring <: Group end
+abstract type NCRing <: Set end
+
+abstract type Ring <: NCRing end
 
 abstract type Field <: Ring end
 
@@ -21,17 +23,19 @@ abstract type SetElem end
 
 abstract type GroupElem <: SetElem end
 
-abstract type RingElem <: GroupElem end
+abstract type NCRingElem <: SetElem end
+
+abstract type RingElem <: NCRingElem end
 
 abstract type FieldElem <: RingElem end
 
 # parameterized domains
 
-abstract type Module{T <: RingElem} <: Group end
+abstract type Module{T} <: Group end
 
 # elements of parameterised domains
 
-abstract type ModuleElem{T <: RingElem} <: GroupElem end
+abstract type ModuleElem{T} <: GroupElem end
 
 abstract type Map{D, C, S, T} <: SetElem end
 
@@ -49,6 +53,8 @@ abstract type IdentityMap <: SetMap end
 
 abstract type PolyRing{T} <: Ring end
 
+abstract type NCPolyRing{T} <: NCRing end
+
 abstract type MPolyRing{T} <: Ring end
 
 abstract type SeriesRing{T} <: Ring end
@@ -59,10 +65,9 @@ abstract type ResField{T} <: Field end
 
 abstract type FracField{T} <: Field end
 
-# not always really mathematical rings
-# later we'll distinguish matrix algebras
-# from the generic case
-abstract type MatSpace{T} <: Ring end
+abstract type MatSpace{T} <: Module{T} end
+
+abstract type MatAlgebra{T} <: NCRing end
 
 # mathematical objects parameterised by an element type
 # these are the type classes of mathematical objects
@@ -70,6 +75,8 @@ abstract type MatSpace{T} <: Ring end
 # implementation is meaningful over that base ring
 
 abstract type PolyElem{T} <: RingElem end
+
+abstract type NCPolyElem{T} <: NCRingElem end
 
 abstract type MPolyElem{T} <: RingElem end
 
@@ -85,10 +92,9 @@ abstract type RelSeriesElem{T} <: SeriesElem{T} end
 
 abstract type AbsSeriesElem{T} <: SeriesElem{T} end
 
-# not always mathematical ring elements
-# later we'll maybe distinguish MatAlgebraElem, MatModuleElem
+abstract type MatElem{T} <: ModuleElem{T} end
 
-abstract type MatElem{T} <: RingElem end
+abstract type MatAlgElem{T} <: NCRingElem end
 
 # additional abstract types for parents, added ad hoc to form
 # collections of types as needed by applications
