@@ -3165,7 +3165,7 @@ function coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
       exps = exps[end:-1:1,:]
    end
    
-   degs_of_terms = sum(exps,1)
+   degs_of_terms = sum(exps,dims=1)
    order = maximum(degs_of_terms)
    coeffs = [ zero(base_ring(p)) for i=0:order ]
    for i=1:p.length
