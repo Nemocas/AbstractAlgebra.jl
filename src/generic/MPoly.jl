@@ -2652,14 +2652,14 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
       return parent(a)(gcd(a.coeffs[1], b.coeffs[1]))
    end
    ord = parent(a).ord
+   N = parent(a).N
    if ord == :lex
-      start_var = 1
+      end_var = N
    else
-      start_var = 2
+      end_var = N - 1
    end
    # check for cases where degree is 0 in one of the variables for one poly
-   N = parent(a).N
-   for k = start_var:N
+   for k = end_var:-1:1
       if v1[k] == 0 && v2[k] != 0
          p2 = main_variable_extract(b, k)
          return gcd(a, content(p2))
@@ -2672,7 +2672,7 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    # count number of terms in lead coefficient, for each variable
    lead1 = zeros(Int, N)
    lead2 = zeros(Int, N)
-   for i = start_var:N
+   for i = end_var:-1:1
       if v1[i] != 0
          for j = 1:length(a)
             if a.exps[i, j] == v1[i]
@@ -2693,7 +2693,7 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    # heavily weights monomial leading term
    k = 0
    m = Inf
-   for i = start_var:N
+   for i = end_var:-1:1
       if v1[i] != 0
          if v1[i] >= v2[i]
             c = max(log(lead2[i])*v1[i]*v2[i], log(2)*v2[i])
@@ -2731,10 +2731,10 @@ function term_gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    monomial_vecmin!(Ce, 1, b.exps, 1, N)
    if ord == :deglex || ord == :degrevlex
       sum = UInt(0)
-      for j = 2:N
+      for j = 1:N - 1
          sum += Ce[j, 1]
       end
-      Ce[1, 1] = sum
+      Ce[N, 1] = sum
    end
    Cc[1] = gcd(a.coeffs[1], b.coeffs[1])
    return parent(a)(Cc, Ce)
@@ -2753,10 +2753,10 @@ function term_content(a::MPoly{T}) where {T <: RingElement}
       monomial_vecmin!(Ce, 1, a.exps, i, N)
       if ord == :deglex || ord == :degrevlex
          sum = UInt(0)
-         for j = 2:N
+         for j = 1:N - 1
             sum += Ce[j, 1]
          end
-         Ce[1, 1] = sum
+         Ce[N, 1] = sum
       end
       if monomial_iszero(Ce, 1, N)
          break
@@ -2823,7 +2823,6 @@ function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
    return derivative
 end
 
-
 ###############################################################################
 #
 #   Conversions
@@ -2834,7 +2833,8 @@ end
 # we start at variable k0
 function main_variable(a::MPoly{T}, k0::Int) where {T <: RingElement}
    N = parent(a).N
-   for k = k0:N
+   last_var = a.ord == :lex ? N : N - 1
+   for k = k0:last_var
       for j = 1:a.length
          if a.exps[k, j] != 0
             return k
@@ -2844,7 +2844,7 @@ function main_variable(a::MPoly{T}, k0::Int) where {T <: RingElement}
    return 0
 end
 
-# return an array of all the starting positions of terms in the main variable n
+# return an array of all the starting positions of terms in the main variable k
 function main_variable_terms(a::MPoly{T}, k::Int) where {T <: RingElement}
    A = zeros(Int, 0)
    current_term = typemax(UInt)
@@ -2909,8 +2909,8 @@ function main_variable_coefficient_deglex(a::MPoly{T}, k0::Int, n::Int) where {T
          Ae = resize_exps!(Ae, a_alloc)
       end
       for k = 1:N
-         if k == 1
-            Ae[k, l] = a.exps[1, i] - a.exps[k0, i]
+         if k == N
+            Ae[k, l] = a.exps[N, i] - a.exps[k0, i]
          elseif k == k0
             Ae[k, l] = UInt(0)
          else
@@ -2931,6 +2931,7 @@ function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Type{Val{:degr
    return main_variable_coefficient_deglex(a, k, n)
 end
 
+# Turn an MPoly into a SparsePoly in the main variable k
 function main_variable_extract(a::MPoly{T}, k::Int) where {T <: RingElement}
    V = [(a.exps[k, i], i) for i in 1:length(a)]
    sort!(V)
@@ -2951,20 +2952,29 @@ function main_variable_extract(a::MPoly{T}, k::Int) where {T <: RingElement}
       Pe[i] = a2.exps[k, A[i]]
       Pc[i] = main_variable_coefficient(a2, k, A[i], Val{ord})
    end
-   if ord == :lex
-      sym = parent(a).S[k]
-   else
-      sym = parent(a).S[k - 1]
-   end
+   sym = parent(a).S[nvars(parent(a)) - k + 1]
    R = SparsePolyRing{MPoly{T}}(parent(a), sym, true)
    return R(Pc, Pe)
 end
 
+function is_less_lex(a::Tuple, b::Tuple)
+   N = length(a[1])
+   for i = N:-1:1
+      if a[1][i] < b[1][i]
+         return true
+      elseif a[1][i] > b[1][i]
+         return false
+      end
+   end
+   return false
+end
+
+# Convert a SparsePoly back into an MPoly in a main variable k
 function main_variable_insert_lex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
    N = base_ring(a).N
    V = [(ntuple(i -> i == k ? a.exps[r] : a.coeffs[r].exps[i, s], Val(N)), r, s) for
        r in 1:length(a) for s in 1:length(a.coeffs[r])]
-   sort!(V)
+   sort!(V, lt = is_less_lex)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]
    Re = zeros(UInt, N, length(V))
    for i = 1:length(V)
@@ -2975,11 +2985,12 @@ function main_variable_insert_lex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: R
    return base_ring(a)(Rc, Re)
 end
 
+# Convert a SparsePoly back into an MPoly in a main variable k
 function main_variable_insert_deglex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
    N = base_ring(a).N
-   V = [(ntuple(i -> i == 1 ? a.exps[r] + a.coeffs[r].exps[1, s] : (i == k ? a.exps[r] :
+   V = [(ntuple(i -> i == N ? a.exps[r] + a.coeffs[r].exps[1, s] : (i == k ? a.exps[r] :
         a.coeffs[r].exps[i, s]), Val(N)), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
-   sort!(V)
+   sort!(V, lt = is_less_lex)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]
    Re = zeros(UInt, N, length(V))
    for i = 1:length(V)
@@ -2992,12 +3003,12 @@ end
 
 function is_less_degrevlex(a::Tuple, b::Tuple)
    N = length(a[1])
-   if a[1][1] < b[1][1]
+   if a[1][N] < b[1][N]
       return true
-   elseif a[1][1] > b[1][1]
+   elseif a[1][N] > b[1][N]
       return false
    end
-   for i = 2:N
+   for i = N - 1:-1:1
       if a[1][i] > b[1][i]
          return true
       elseif a[1][i] < b[1][i]
@@ -3007,9 +3018,10 @@ function is_less_degrevlex(a::Tuple, b::Tuple)
    return false
 end
 
+# Convert a SparsePoly back into an MPoly in a main variable k
 function main_variable_insert_degrevlex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
    N = base_ring(a).N
-   V = [(ntuple(i -> i == 1 ? a.exps[r] + a.coeffs[r].exps[1, s] : (i == k ? a.exps[r] :
+   V = [(ntuple(i -> i == N ? a.exps[r] + a.coeffs[r].exps[1, s] : (i == k ? a.exps[r] :
         a.coeffs[r].exps[i, s]), Val(N)), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V, lt = is_less_degrevlex)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]

@@ -425,7 +425,7 @@ function test_gen_mpoly_gcd()
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
-
+println("ordering = ", ord)
       S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
 
       for iter = 1:10
