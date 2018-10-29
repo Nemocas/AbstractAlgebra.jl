@@ -3117,16 +3117,19 @@ function (a::MPolyRing{T})(b::Array{T, 1}, m::Array{UInt, 2}) where {T <: RingEl
    return z
 end
 
-function to_univariate(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: AbstractAlgebra.RingElem}
+function to_univariate(R::PolyRing{T}, p::MPoly{T}) where {T <: AbstractAlgebra.RingElement}
    if !involves_at_most_one_variable(p)
       error("Can only convert univariate polynomials of type MPoly.")
    end
    
    vars_p = vars(p)
-   R,v = PolynomialRing(base_ring(p), string(vars_p[1]))
    
    if length(vars_p) == 0
-      return R(p.coeffs[1])
+      if iszero(p)
+         return zero(R)
+      else
+         return R(p.coeffs[1])
+      end
    end
    
    return R(coefficients_of_univariate_MPoly(p))
@@ -3165,7 +3168,7 @@ function coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
       exps = exps[end:-1:1,:]
    end
    
-   degs_of_terms = sum(exps,1)
+   degs_of_terms = sum(exps,dims=1)
    order = maximum(degs_of_terms)
    coeffs = [ zero(base_ring(p)) for i=0:order ]
    for i=1:p.length

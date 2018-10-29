@@ -592,6 +592,61 @@ function test_gen_mpoly_vars()
    println("PASS")
 end
 
+function test_gen_mpoly_to_univariate()
+   print("Generic.MPoly.to_univariate...")
+
+   for num_vars=1:10
+      ord = rand_ordering()
+
+      R, vars_R = PolynomialRing(ZZ, ["x"]; ordering=ord)
+      R_univ, x_univ = PolynomialRing(ZZ, "x")
+
+      @test zero(R_univ) == to_univariate(R_univ, zero(R))
+      @test one(R_univ) == to_univariate(R_univ, one(R))
+
+      x = vars_R[1]
+
+      for iter in 1:10
+         f = zero(R)
+         f_univ = zero(R_univ)
+         coeffs = rand(Int, 100)
+         for i in 1:100
+            f = f + coeffs[i] * x^i
+            f_univ = f_univ + coeffs[i] * x_univ^i
+         end
+         @test to_univariate(R_univ, f) == f_univ
+      end
+   end
+
+   println("PASS")
+end
+
+function test_gen_mpoly_coefficients_of_univariate_MPoly()
+   print("Generic.MPoly.coefficients_of_univariate_MPoly...")
+
+   for num_vars=1:10
+      ord = rand_ordering()
+
+      R, vars_R = PolynomialRing(ZZ, ["x"]; ordering=ord)
+
+      @test length(AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(zero(R))) == 0
+      @test AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(one(R)) == [ one(base_ring(R)) ]
+
+      x = vars_R[1]
+
+      for iter in 1:10
+         f = zero(R)
+         coeffs = rand(Int, 100)
+         for i in 1:100
+            f = f + coeffs[i] * x^(i-1)
+         end
+         @test AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(f) == coeffs
+      end
+   end
+
+   println("PASS")
+end
+
 function test_gen_mpoly()
    test_gen_mpoly_constructors()
    test_gen_mpoly_manipulation()
@@ -610,6 +665,8 @@ function test_gen_mpoly()
    test_gen_mpoly_change_base_ring()
    test_gen_mpoly_total_degree()
    test_gen_mpoly_vars()
+   test_gen_mpoly_to_univariate()
+   test_gen_mpoly_coefficients_of_univariate_MPoly()
 
    println("")
 end
