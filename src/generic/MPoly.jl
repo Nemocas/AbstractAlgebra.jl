@@ -3117,7 +3117,7 @@ function (a::MPolyRing{T})(b::Array{T, 1}, m::Array{UInt, 2}) where {T <: RingEl
    return z
 end
 
-function to_univariate(p::MPoly{T}, R::PolyRing{T}) where {T <: AbstractAlgebra.RingElement}
+function to_univariate(R::PolyRing{T}, p::MPoly{T}) where {T <: AbstractAlgebra.RingElement}
    if !involves_at_most_one_variable(p)
       error("Can only convert univariate polynomials of type MPoly.")
    end

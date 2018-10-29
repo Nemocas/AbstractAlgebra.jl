@@ -601,8 +601,8 @@ function test_gen_mpoly_to_univariate()
       R, vars_R = PolynomialRing(ZZ, ["x"]; ordering=ord)
       R_univ, x_univ = PolynomialRing(ZZ, "x")
 
-      @test zero(R_univ) == to_univariate(zero(R), R_univ)
-      @test one(R_univ) == to_univariate(one(R), R_univ)
+      @test zero(R_univ) == to_univariate(R_univ, zero(R))
+      @test one(R_univ) == to_univariate(R_univ, one(R))
 
       x = vars_R[1]
 
@@ -614,7 +614,7 @@ function test_gen_mpoly_to_univariate()
             f = f + coeffs[i] * x^i
             f_univ = f_univ + coeffs[i] * x_univ^i
          end
-         @test to_univariate(f, R_univ) == f_univ
+         @test to_univariate(R_univ, f) == f_univ
       end
    end
 
