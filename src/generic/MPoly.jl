@@ -87,7 +87,7 @@ function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: Ri
 
    size_exps = size(p.exps)
    if p.parent.ord != :lex
-      exps = exps[2:size_exps[1],:]
+      exps = exps[1:size_exps[1] - 1,:]
    end
    if p.parent.ord == :degrevlex
       exps = exps[end:-1:1,:]
@@ -97,10 +97,10 @@ function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: Ri
    new_base_ring = parent(new_p)
    new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in symbols_parent])
 
-   for i=1:length(p)
+   for i = 1:length(p)
       prod = g(p.coeffs[i])
-      for j=1:n
-         prod = prod * gens_new_polynomial_ring[j]^Int(exps[j,i])
+      for j = 1:n
+         prod = prod * gens_new_polynomial_ring[j]^Int(exps[n - j + 1, i])
       end
       new_p = new_p + prod
    end
@@ -129,6 +129,9 @@ function vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
             break
          end
       end
+   end
+   if p.parent.ord == :degrevlex
+      vars_in_p = reverse(vars_in_p)
    end
    return(vars_in_p)
 end
@@ -271,7 +274,7 @@ end
 # degrevlex only.)
 function monomial_reverse!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int)
    for k = 1:N - 1
-      A[N - k + 1, i] = B[k, j]
+      A[N - k, i] = B[k, j]
    end
    nothing
 end
@@ -628,7 +631,7 @@ show_minus_one(::Type{MPoly{T}}) where {T <: RingElement} = show_minus_one(T)
 
 needs_parentheses(x::MPoly) = length(x) > 1
 
-displayed_with_minus_in_front(x::MPoly) = length(x) == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && displayed_with_minus_in_front(x.coeffs[1])
+displayed_with_minus_in_front(x::MPoly) = length(x) == 1 && displayed_with_minus_in_front(x.coeffs[1])
 
 ###############################################################################
 #
@@ -2586,14 +2589,14 @@ function evaluate(a::MPoly{T}, A::Array{T, 1}) where {T <: RingElement}
    N = size(a.exps, 1)
    ord = parent(a).ord
    if ord == :lex
-      start_var = 1
+      start_var = N
    else
-      start_var = 2
+      start_var = N - 1
    end
    while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
       k = main_variable(a, start_var)
       p = main_variable_extract(a, k)
-      a = evaluate(p, A[k - start_var + 1])
+      a = evaluate(p, A[start_var - k + 1])
    end
    if a.length == 0
       return base_ring(a)()
@@ -2609,15 +2612,15 @@ function evaluate(a::MPoly{T}, A::Array{U}) where {T <: RingElement, U <: Intege
    N = size(a.exps, 1)
    ord = parent(a).ord
    if ord == :lex
-      start_var = 1
+      start_var = N
    else
-      start_var = 2
+      start_var = N - 1
    end
    N = size(a.exps, 1)
    while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
       k = main_variable(a, start_var)
       p = main_variable_extract(a, k)
-      a = evaluate(p, A[k - start_var + 1])
+      a = evaluate(p, A[start_var - k + 1])
    end
    if a.length == 0
       return base_ring(a)()
@@ -2810,12 +2813,12 @@ function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
       prod = coeffs[i]
       for j = 1:n
          if gens_parent[j] == x
-            prod *= exps[j, i]
-            if (exps[j, i] >= 1)
+            prod *= exps[n - j + 1, i]
+            if (exps[n - j + 1, i] >= 1)
                exps[j, i] -= 1
             end
          end
-         prod = prod*gens_parent[j]^Int(exps[j, i])
+         prod = prod*gens_parent[j]^Int(exps[n - j + 1, i])
       end
       derivative = derivative + prod
    end
@@ -2833,8 +2836,7 @@ end
 # we start at variable k0
 function main_variable(a::MPoly{T}, k0::Int) where {T <: RingElement}
    N = parent(a).N
-   last_var = a.ord == :lex ? N : N - 1
-   for k = k0:last_var
+   for k = k0:-1:1
       for j = 1:a.length
          if a.exps[k, j] != 0
             return k
@@ -2892,6 +2894,8 @@ function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Type{Val{:lex}
    return main_variable_coefficient_lex(a, k, n)
 end
 
+# return the coefficient as a sparse distributed polynomial, of the term in variable
+# k0 starting at position n
 function main_variable_coefficient_deglex(a::MPoly{T}, k0::Int, n::Int) where {T <: RingElement}
    exp = a.exps[k0, n]
    N = parent(a).N
@@ -2988,7 +2992,7 @@ end
 # Convert a SparsePoly back into an MPoly in a main variable k
 function main_variable_insert_deglex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
    N = base_ring(a).N
-   V = [(ntuple(i -> i == N ? a.exps[r] + a.coeffs[r].exps[1, s] : (i == k ? a.exps[r] :
+   V = [(ntuple(i -> i == N ? a.exps[r] + a.coeffs[r].exps[N, s] : (i == k ? a.exps[r] :
         a.coeffs[r].exps[i, s]), Val(N)), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V, lt = is_less_lex)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]
@@ -3021,7 +3025,7 @@ end
 # Convert a SparsePoly back into an MPoly in a main variable k
 function main_variable_insert_degrevlex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
    N = base_ring(a).N
-   V = [(ntuple(i -> i == N ? a.exps[r] + a.coeffs[r].exps[1, s] : (i == k ? a.exps[r] :
+   V = [(ntuple(i -> i == N ? a.exps[r] + a.coeffs[r].exps[N, s] : (i == k ? a.exps[r] :
         a.coeffs[r].exps[i, s]), Val(N)), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V, lt = is_less_degrevlex)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]
