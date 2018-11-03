@@ -73,13 +73,13 @@ function test_gen_mpoly_manipulation()
          @test isa(coeff(f, rand(1:length(f)) - 1), elem_type(R))
       end
 
-      max_degs, biggest = max_degrees(f)
+      max_degs, biggest = max_fields(f)
       deg = isdegree(ordering(S))
       rev = isreverse(ordering(S))
 
       if deg
-         @test max_degs[1] <= 100*num_vars
-         @test max_degs[1] == biggest
+         @test max_degs[num_vars + 1] <= 100*num_vars
+         @test max_degs[num_vars + 1] == biggest
          @test S.N == num_vars + 1
       else
          @test S.N == num_vars
@@ -89,7 +89,7 @@ function test_gen_mpoly_manipulation()
          @test S.N == num_vars + 1
       end
 
-      for j = Int(deg) + 1:num_vars + Int(deg)
+      for j = 1:num_vars
          @test max_degs[j] <= 100
          @test max_degs[j] <= biggest
       end
@@ -425,7 +425,6 @@ function test_gen_mpoly_gcd()
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
-
       S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
 
       for iter = 1:10

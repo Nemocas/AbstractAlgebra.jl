@@ -130,7 +130,7 @@ isgen(x::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 Return `true` if $x$ is a generator of the polynomial ring.
 
 ```julia
-max_degrees(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+max_fields(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
 
 Returns a tuple `(B, b)` consisting of an array of `Int`s specifying the highest power

@@ -4,12 +4,12 @@
 #
 ###############################################################################
 
-export max_degrees, total_degree, gens, divides,
-       isconstant, isdegree, ismonomial, isreverse, isterm, involves_at_most_one_variable, main_variable,
-       main_variable_extract, main_variable_insert, nvars, vars, ordering,
-       rand_ordering, symbols, monomial_set!, monomial_iszero, derivative,
-       rand_ordering, symbols, monomial_set!, monomial_iszero, derivative,
-       change_base_ring,  to_univariate, @PolynomialRing
+export max_fields, total_degree, gens, divides, isconstant, isdegree,
+       ismonomial, isreverse, isterm, involves_at_most_one_variable,
+       main_variable, main_variable_extract, main_variable_insert, nvars, vars,
+       ordering, rand_ordering, symbols, monomial_set!, monomial_iszero,
+       derivative, rand_ordering, symbols, monomial_set!, monomial_iszero,
+       derivative, change_base_ring,  to_univariate, @PolynomialRing
 
 ###############################################################################
 #
@@ -49,19 +49,21 @@ symbols(a::MPolyRing) = a.S
 nvars(a::MPolyRing) = a.num_vars
 
 function gens(a::MPolyRing{T}, ::Type{Val{:lex}}) where {T <: RingElement}
-   return [a([base_ring(a)(1)], reshape([UInt(i == j) for j = 1:a.num_vars], a.num_vars, 1))
-      for i in 1:a.num_vars]
+    n = a.num_vars
+    return [a([base_ring(a)(1)], reshape([UInt(j == n - i + 1)
+            for j = 1:n], n, 1)) for i in 1:n]
 end
 
 function gens(a::MPolyRing{T}, ::Type{Val{:deglex}}) where {T <: RingElement}
-   return [a([base_ring(a)(1)], reshape([UInt(1), [UInt(i == j) for j in 1:a.num_vars]...], a.num_vars + 1, 1))
-      for i in 1:a.num_vars]
+    n = a.num_vars
+    return [a([base_ring(a)(1)], reshape([[UInt(j == n - i + 1)
+            for j in 1:n]..., UInt(1)], n + 1, 1)) for i in 1:n]
 end
 
 function gens(a::MPolyRing{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
-   N = a.N
-   return [a([base_ring(a)(1)], reshape([UInt(1), [UInt(N - i == j) for j in 1:a.num_vars]...], a.num_vars + 1, 1))
-      for i in 1:a.num_vars]
+    n = a.num_vars
+    return [a([base_ring(a)(1)], reshape([[UInt(j == i)
+            for j in 1:n]..., UInt(1)], n + 1, 1)) for i in 1:n]
 end
 
 @doc Markdown.doc"""
@@ -85,7 +87,7 @@ function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: Ri
 
    size_exps = size(p.exps)
    if p.parent.ord != :lex
-      exps = exps[2:size_exps[1],:]
+      exps = exps[1:size_exps[1] - 1,:]
    end
    if p.parent.ord == :degrevlex
       exps = exps[end:-1:1,:]
@@ -95,10 +97,10 @@ function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: Ri
    new_base_ring = parent(new_p)
    new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in symbols_parent])
 
-   for i=1:length(p)
+   for i = 1:length(p)
       prod = g(p.coeffs[i])
-      for j=1:n
-         prod = prod * gens_new_polynomial_ring[j]^Int(exps[j,i])
+      for j = 1:n
+         prod = prod * gens_new_polynomial_ring[j]^Int(exps[n - j + 1, i])
       end
       new_p = new_p + prod
    end
@@ -107,26 +109,29 @@ end
 
 @doc Markdown.doc"""
     vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
-> Returns the variables occuring in $p$.
+> Returns the variables actually occuring in $p$.
 """
 function vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
    vars_in_p = Array{AbstractAlgebra.Generic.MPoly{T}}(undef, 0)
    n = nvars(p.parent)
    exps = p.exps
    size_exps = size(exps)
-   if p.parent.ord != :lex
-      exps = exps[2:size_exps[1],:]
-   end
-   if p.parent.ord == :degrevlex
-      exps = exps[end:-1:1,:]
-   end
-   for j=1:n
-      for i=1:length(p)
-         if exps[j,i] > 0
-            push!(vars_in_p, gens(p.parent)[j])
+   
+   gen_list = gens(p.parent)
+   for j = 1:n
+      for i = 1:length(p)
+         if exps[j, i] > 0
+            if p.parent.ord == :degrevlex
+               push!(vars_in_p, gen_list[n - j + 1])
+            else
+               push!(vars_in_p, gen_list[j])
+            end
             break
          end
       end
+   end
+   if p.parent.ord == :degrevlex
+      vars_in_p = reverse(vars_in_p)
    end
    return(vars_in_p)
 end
@@ -151,10 +156,15 @@ end
 #
 ###############################################################################
 
-function monomial_drmask(bits::Int)
-   return reinterpret(UInt, ((1 << (sizeof(UInt)*8 - bits)) - 1))
+# Computes a degrevlex xor mask for the most significant word of an exponent
+# vector. Requires the number of bits per field and the polynomial ring.
+function monomial_drmask(R::MPolyRing{T}, bits::Int) where T <: RingElement
+   vars_per_word = div(sizeof(Int)*8, bits)
+   n = rem(nvars(R), vars_per_word)
+   return reinterpret(UInt, (1 << (bits*n)) - 1)
 end
 
+# Sets the i-th exponent vector of the exponent array A to zero
 function monomial_zero!(A::Array{UInt, 2}, i::Int, N::Int)
    for k = 1:N
       A[k, i] = UInt(0)
@@ -162,6 +172,8 @@ function monomial_zero!(A::Array{UInt, 2}, i::Int, N::Int)
    nothing
 end
 
+# Returns true if the i-th exponent vector of the exponent array A is zero
+# For degree orderings, this inefficiently also checks the degree field
 function monomial_iszero(A::Array{UInt, 2}, i::Int, N::Int)
    for k = 1:N
       if A[k, i] != UInt(0)
@@ -171,6 +183,8 @@ function monomial_iszero(A::Array{UInt, 2}, i::Int, N::Int)
    return true
 end
 
+# Returns true if the i-th and j-th exponent vectors of the array A are equal
+# For degree orderings, this inefficiently also checks the degree fields
 function monomial_isequal(A::Array{UInt, 2}, i::Int, j::Int, N::Int)
    for k = 1:N
       if A[k, i] != A[k, j]
@@ -180,14 +194,16 @@ function monomial_isequal(A::Array{UInt, 2}, i::Int, j::Int, N::Int)
    return true
 end
 
+# Returns true if the i-th exponent vector of the array A is less than that of
+# the j-th, according to the ordering of R
 function monomial_isless(A::Array{UInt, 2}, i::Int, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
    if R.ord == :degrevlex
-      if (xor(A[1, i], drmask)) < (xor(A[1, j], drmask))
+      if (xor(A[N, i], drmask)) < (xor(A[N, j], drmask))
          return true
-      elseif (xor(A[1, i], drmask)) > (xor(A[1, j], drmask))
+      elseif (xor(A[N, i], drmask)) > (xor(A[N, j], drmask))
          return false
       end
-      for k = 2:N
+      for k = N-1:-1:1
          if A[k, i] > A[k, j]
             return true
          elseif A[k, i] < A[k, j]
@@ -195,7 +211,7 @@ function monomial_isless(A::Array{UInt, 2}, i::Int, j::Int, N::Int, R::MPolyRing
          end
       end
    else
-      for k = 1:N
+      for k = N:-1:1
          if A[k, i] < A[k, j]
             return true
          elseif A[k, i] > A[k, j]
@@ -206,14 +222,16 @@ function monomial_isless(A::Array{UInt, 2}, i::Int, j::Int, N::Int, R::MPolyRing
    return false
 end
 
+# Return true if the i-th exponent vector of the array A is less than the j-th
+# exponent vector of the array B
 function monomial_isless(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
    if R.ord == :degrevlex
-      if xor(A[1, i], drmask) < xor(B[1, j], drmask)
+      if xor(A[N, i], drmask) < xor(B[N, j], drmask)
          return true
-      elseif xor(A[1, i], drmask) > xor(B[1, j], drmask)
+      elseif xor(A[N, i], drmask) > xor(B[N, j], drmask)
          return false
       end
-      for k = 2:N
+      for k = N-1:-1:1
          if A[k, i] > B[k, j]
             return true
          elseif A[k, i] < B[k, j]
@@ -221,7 +239,7 @@ function monomial_isless(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N
          end
       end
    else
-      for k = 1:N
+      for k = N:-1:1
          if A[k, i] < B[k, j]
             return true
          elseif A[k, i] > B[k, j]
@@ -232,6 +250,8 @@ function monomial_isless(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N
    return false
 end
 
+# Set the i-th exponent vector of the array A to the word by word minimum of
+# itself and the j-th exponent vector of B. Used for lexical orderings only.
 function monomial_vecmin!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int)
    for k = 1:N
       if B[k, j] < A[k, i]
@@ -241,6 +261,7 @@ function monomial_vecmin!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, 
    nothing
 end
 
+# Set the i-th exponent vector of the array A to the j-th exponent vector of B
 function monomial_set!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int)
    for k = 1:N
       A[k, i] = B[k, j]
@@ -248,13 +269,18 @@ function monomial_set!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::
    nothing
 end
 
+# Set the i-th exponent vector of the array A to the word by word reverse of
+# the j-th exponent vector of B, excluding the degree. (Used for printing
+# degrevlex only.)
 function monomial_reverse!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int)
-   for k = 1:N
-      A[N - k + 1, i] = B[k, j]
+   for k = 1:N - 1
+      A[N - k, i] = B[k, j]
    end
    nothing
 end
 
+# Set the i-th exponent vector of the array A to the word by word sum of the
+# j1-th exponent vector of B and the j2-th exponent vector of C
 function monomial_add!(A::Array{UInt, 2}, i::Int,
                 B::Array{UInt, 2}, j1::Int, C::Array{UInt, 2}, j2::Int, N::Int)
    for k = 1:N
@@ -263,6 +289,8 @@ function monomial_add!(A::Array{UInt, 2}, i::Int,
    nothing
 end
 
+# Set the i-th exponent vector of the array A to the word by word difference of
+# the j1-th exponent vector of B and the j2-th exponent vector of C
 function monomial_sub!(A::Array{UInt, 2}, i::Int,
                 B::Array{UInt, 2}, j1::Int, C::Array{UInt, 2}, j2::Int, N::Int)
    for k = 1:N
@@ -271,6 +299,9 @@ function monomial_sub!(A::Array{UInt, 2}, i::Int,
    nothing
 end
 
+# Set the i-th exponent vector of the array A to the scalar product of the j-th
+# exponent vector of the array B with the non-negative integer n. (Used for
+# raising a monomial to a power.)
 function monomial_mul!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, n::Int, N::Int)
    for k = 1:N
       A[k, i] = B[k, j]*reinterpret(UInt, n)
@@ -278,6 +309,12 @@ function monomial_mul!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, n::
    nothing
 end
 
+# Return true if the j1-th exponent vector of the array B has all components
+# greater than or equal to those of the j2-th exponent vector of C. If so, the
+# difference is returned as the i-th exponent vector of the array A. Note that
+# a mask must be supplied which has 1's in all bit positions that correspond to
+# an overflow of the corresponding exponent field. (Used for testing
+# divisibility of monomials, and returning the quotient monomial.)
 function monomial_divides!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j1::Int, C::Array{UInt, 2}, j2::Int, mask::UInt, N::Int)
    flag = true
    for k = 1:N
@@ -289,6 +326,10 @@ function monomial_divides!(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j1::Int
    return flag
 end
 
+# Return true if the i-th exponent vector of the array A is in an overflow
+# condition. Note that a mask must be supplied which has 1's in all bit
+# positions that correspond to an overflow of the corresponding exponent field.
+# Used for overflow detection inside algorithms.
 function monomial_overflows(A::Array{UInt, 2}, i::Int, mask::UInt, N::Int)
    for k = 1:N
       if (A[k, i] & mask) != UInt(0)
@@ -298,13 +339,17 @@ function monomial_overflows(A::Array{UInt, 2}, i::Int, mask::UInt, N::Int)
    return false
 end
 
+# Return a positive integer if the i-th exponent vector of the array A is
+# bigger than the j-th exponent vector of B with respect to the ordering,
+# zero if it is equal and a negative integer if it is less. (Used to compare
+# monomials with respect to an ordering.)
 function monomial_cmp(A::Array{UInt, 2}, i::Int, B::Array{UInt, 2}, j::Int, N::Int, R::MPolyRing{T}, drmask::UInt) where {T <: RingElement}
-   k = 1
-   while k < N && A[k, i] == B[k, j]
-      k += 1
+   k = N
+   while k > 1 && A[k, i] == B[k, j]
+      k -= 1
    end
    if R.ord == :degrevlex
-      return k == 1 ? reinterpret(Int, (xor(drmask,A[k, i])) - (xor(drmask, B[k, j]))) : reinterpret(Int, B[k, j] - A[k, i])
+      return k == N ? reinterpret(Int, (xor(drmask, A[k, i])) - (xor(drmask, B[k, j]))) : reinterpret(Int, B[k, j] - A[k, i])
    else
       return reinterpret(Int, A[k, i] - B[k, j])
    end
@@ -360,11 +405,13 @@ function isgen(x::MPoly{T}, ::Type{Val{:lex}}) where {T <: RingElement}
 end
 
 function isgen(x::MPoly{T}, ::Type{Val{:deglex}}) where {T <: RingElement}
-   return x.exps[1, 1] == UInt(1)
+   N = size(x.exps, 1)
+   return x.exps[N, 1] == UInt(1)
 end
 
 function isgen(x::MPoly{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
-   return x.exps[1, 1] == UInt(1)
+    N = size(x.exps, 1)
+    return x.exps[N, 1] == UInt(1)
 end
 
 @doc Markdown.doc"""
@@ -388,14 +435,16 @@ function coeff(x::MPoly, i::Int)
 end
 
 @doc Markdown.doc"""
-    max_degrees{T <: RingElement}(f::MPoly{T})
+    max_fields{T <: RingElement}(f::MPoly{T})
 > Return a tuple `(degs, biggest)` consisting of an array `degs` of the maximum
 > exponent for each field in the exponent vectors of `f` and an integer which
 > is the largest of the entries in `degs`. The array `degs` will have `n + 1`
 > entries in the case of a degree ordering, or `n` otherwise, where `n` is the
-> number of variables of the polynomial ring `f` belongs to.
+> number of variables of the polynomial ring `f` belongs to. The fields are
+> returned in the order they exist in the internal representation (which is not
+> intended to be specified, and not needed for current applications).
 """
-function max_degrees(f::MPoly{T}) where {T <: RingElement}
+function max_fields(f::MPoly{T}) where {T <: RingElement}
    A = f.exps
    N = size(A, 1)
    biggest = zeros(Int, N)
@@ -420,12 +469,27 @@ end
 > Returns the total degree of `f`.
 """
 function total_degree(f::MPoly{T}) where {T <: RingElement}
-   if ordering(parent(f)) == :lex
-      exps = f.exps[1:nvars(parent(f)),1:length(f)]
-      return Int(maximum(sum(exps, dims = 1)))
-   elseif ( ordering(parent(f)) == :deglex || ordering(parent(f)) == :degrevlex)
-      exps = f.exps[1:nvars(parent(f))+1,1:length(f)]
-      return Int(maximum(exps[1,:]))
+   A = f.exps
+   N = size(A, 1)
+   ord = ordering(parent(f))
+   if ord == :lex
+      if N == 1
+         return length(f) == 0 ? -1 : Int(A[1, N])
+      end
+      max_deg = -1
+      for i = 1:length(f)
+         sum_deg = 0
+         for k = 1:N
+            sum_deg += A[k, i]
+            sum_deg < A[k, i] && error("Integer overflow in total_degree")
+         end
+         if sum_deg > max_deg
+            max_deg = sum_deg
+         end
+      end
+      return Int(max_deg) # Julia already checks this for overflow
+   elseif ord == :deglex || ord == :degrevlex
+      return length(f) == 0 ? -1 : Int(A[N, 1])
    else
       error("total_degree is not implemented for this ordering.")
    end
@@ -452,14 +516,13 @@ isconstant(x::MPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps
 
 @doc Markdown.doc"""
     isterm(x::MPoly)
-> Return `true` if the given polynomial has precisely one term, with
-> coefficient `1`.
+> Return `true` if the given polynomial has precisely one term.
 """
 isterm(x::MPoly) = x.length == 1
 
 @doc Markdown.doc"""
     ismonomial(x::MPoly)
-> Return `true` if the given polynomial has precisely one nonzero term.
+> Return `true` if the given polynomial has precisely one term whose coefficient is one.
 """
 ismonomial(x::MPoly) = x.length == 1 && isone(coeff(x, 0))
 
@@ -512,7 +575,7 @@ function show(io::IO, x::MPoly, U::Array{<: AbstractString, 1})
         if c == -1 && !show_minus_one(typeof(c))
           print(io, "-")
         end
-        d = (ord == :deglex) ? 1 : 0
+        num_vars = nvars(parent(x))
         if monomial_iszero(X, 1, N)
           if c == 1
              print(io, c)
@@ -522,7 +585,7 @@ function show(io::IO, x::MPoly, U::Array{<: AbstractString, 1})
         end
         fst = true
         for j = 1:nvars(parent(x))
-          n = reinterpret(Int, X[j + d, 1])
+          n = reinterpret(Int, X[num_vars - j + 1, 1])
           if n != 0
             if fst
                print(io, U[j])
@@ -568,7 +631,7 @@ show_minus_one(::Type{MPoly{T}}) where {T <: RingElement} = show_minus_one(T)
 
 needs_parentheses(x::MPoly) = length(x) > 1
 
-displayed_with_minus_in_front(x::MPoly) = length(x) == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && displayed_with_minus_in_front(x.coeffs[1])
+displayed_with_minus_in_front(x::MPoly) = length(x) == 1 && displayed_with_minus_in_front(x.coeffs[1])
 
 ###############################################################################
 #
@@ -1054,7 +1117,7 @@ function mul_johnson(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElemen
    if m == 0 || n == 0
       return par()
    end
-   drmask = monomial_drmask(bits)
+   drmask = monomial_drmask(par, bits)
    N = size(a.exps, 1)
    H = Array{heap_s}(undef, 0)
    I = Array{heap_t}(undef, 0)
@@ -1134,50 +1197,53 @@ function mul_johnson(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElemen
    return parent(a)(Rc, Re)
 end
 
+# Pack the monomials from the array b into an array a, with k entries packed
+# into each word, and where each field is the given number of bits
 function pack_monomials(a::Array{UInt, 2}, b::Array{UInt, 2}, k::Int, bits::Int)
    for i = 1:size(a, 2)
       m = 0
       n = 1
       v = UInt(0)
-      for j = 1:size(b, 1)
-         v += b[j, i]
+      N = size(b, 1)
+      for j = 1:N
+         v += (b[j, i] << (bits*m))
          m += 1
          if m == k
             m = 0
             a[n, i] = v
             n += 1
             v = UInt(0)
-         else
-            v <<= bits
          end
       end
       if m != 0
-         a[n, i] = (v << (bits*(k - m - 1)))
+         a[n, i] = v
       end
    end
    nothing
 end
 
+# Unpack the monomials from the array b into the array a, where there are k
+# entries packed into each word, in fields of the given number of bits
 function unpack_monomials(a::Array{UInt, 2}, b::Array{UInt, 2}, k::Int, bits::Int)
    mask = (UInt(1) << bits) - UInt(1)
    for i = 1:size(b, 2)
-      m = 1
+      m = 0
       n = 1
-      for j = 1:size(a, 1)
-         a[j, i] = ((b[n, i] >> ((k - m) * bits)) & mask)
+      N = size(a, 1)
+      for j = 1:N
+         a[j, i] = ((b[n, i] >> (m*bits)) & mask)
+         m += 1
          if m == k
-            m = 1
+            m = 0
             n += 1
-         else
-            m += 1
          end
       end
    end
 end
 
 function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
-   v1, d1 = max_degrees(a)
-   v2, d2 = max_degrees(b)
+   v1, d1 = max_fields(a)
+   v2, d2 = max_fields(b)
    v = v1 + v2
    d = 0
    for i = 1:length(v)
@@ -1390,7 +1456,7 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
    R = base_ring(par)
    m = length(f)
    N = parent(f).N
-   drmask = monomial_drmask(bits)
+   drmask = monomial_drmask(par, bits)
    H = Array{heap_s}(undef, 0) # heap
    I = Array{heap_t}(undef, 0) # auxilliary data for heap nodes
    # set up output poly coeffs and exponents (corresponds to h in paper)
@@ -1570,7 +1636,7 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
    elseif b == 2
       return a*a
    else
-      v, d = max_degrees(a)
+      v, d = max_fields(a)
       d *= b
       if ndigits(d, base = 2) + ndigits(b, base = 2) >= sizeof(UInt)*8
          error("Exponent overflow in pow_fps")
@@ -1619,7 +1685,7 @@ function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <:
    if n == 0
       return false, par()
    end
-   drmask = monomial_drmask(bits)
+   drmask = monomial_drmask(par, bits)
    mask1 = UInt(1) << (bits - 1)
    mask = UInt(0)
    for i = 1:div(sizeof(UInt)*8, bits)
@@ -1748,8 +1814,8 @@ function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <:
 end
 
 function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
-   v1, d1 = max_degrees(a)
-   v2, d2 = max_degrees(b)
+   v1, d1 = max_fields(a)
+   v2, d2 = max_fields(b)
    d = max(d1, d2)
    exp_bits = 8
    max_e = 2^(exp_bits - 1)
@@ -1803,7 +1869,7 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
       return true, par()
    end
    flag = true
-   drmask = monomial_drmask(bits)
+   drmask = monomial_drmask(par, bits)
    mask1 = UInt(1) << (bits - 1)
    mask = UInt(0)
    for i = 1:div(sizeof(UInt)*8, bits)
@@ -1958,8 +2024,8 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
 end
 
 function div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
-   v1, d1 = max_degrees(a)
-   v2, d2 = max_degrees(b)
+   v1, d1 = max_fields(a)
+   v2, d2 = max_fields(b)
    d = max(d1, d2)
    exp_bits = 8
    max_e = 2^(exp_bits - 1)
@@ -2011,7 +2077,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
       return true, par(), par()
    end
    flag = true
-   drmask = monomial_drmask(bits)
+   drmask = monomial_drmask(par, bits)
    mask1 = UInt(1) << (bits - 1)
    mask = UInt(0)
    for i = 1:div(sizeof(UInt)*8, bits)
@@ -2178,8 +2244,8 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
 end
 
 function divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
-   v1, d1 = max_degrees(a)
-   v2, d2 = max_degrees(b)
+   v1, d1 = max_fields(a)
+   v2, d2 = max_fields(b)
    d = max(d1, d2)
    exp_bits = 8
    max_e = 2^(exp_bits - 1)
@@ -2239,7 +2305,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
       return true, [par() for i in 1:len], par()
    end
    flag = true
-   drmask = monomial_drmask(bits)
+   drmask = monomial_drmask(par, bits)
    mask1 = UInt(1) << (bits - 1)
    mask = UInt(0)
    for i = 1:div(sizeof(UInt)*8, bits)
@@ -2407,11 +2473,11 @@ end
 > each polynomial in `b`, and a polynomial `r` such that `a = sum_i b[i]*q[i]`.
 """
 function divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
-   v1, d = max_degrees(a)
+   v1, d = max_fields(a)
    len = length(b)
    N = parent(a).N
    for i = 1:len
-      v2, d2 = max_degrees(b[i])
+      v2, d2 = max_fields(b[i])
       for j = 1:N
          v1[j] = max(v1[j], v2[j])
       end
@@ -2523,14 +2589,14 @@ function evaluate(a::MPoly{T}, A::Array{T, 1}) where {T <: RingElement}
    N = size(a.exps, 1)
    ord = parent(a).ord
    if ord == :lex
-      start_var = 1
+      start_var = N
    else
-      start_var = 2
+      start_var = N - 1
    end
    while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
       k = main_variable(a, start_var)
       p = main_variable_extract(a, k)
-      a = evaluate(p, A[k - start_var + 1])
+      a = evaluate(p, A[start_var - k + 1])
    end
    if a.length == 0
       return base_ring(a)()
@@ -2546,15 +2612,15 @@ function evaluate(a::MPoly{T}, A::Array{U}) where {T <: RingElement, U <: Intege
    N = size(a.exps, 1)
    ord = parent(a).ord
    if ord == :lex
-      start_var = 1
+      start_var = N
    else
-      start_var = 2
+      start_var = N - 1
    end
    N = size(a.exps, 1)
    while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
       k = main_variable(a, start_var)
       p = main_variable_extract(a, k)
-      a = evaluate(p, A[k - start_var + 1])
+      a = evaluate(p, A[start_var - k + 1])
    end
    if a.length == 0
       return base_ring(a)()
@@ -2582,21 +2648,21 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
       return deepcopy(b)
    end
    # get degrees in each variable
-   v1, d1 = max_degrees(a)
-   v2, d2 = max_degrees(b)
+   v1, d1 = max_fields(a)
+   v2, d2 = max_fields(b)
    # check if both polys are constant
    if d1 == 0 && d2 == 0
       return parent(a)(gcd(a.coeffs[1], b.coeffs[1]))
    end
    ord = parent(a).ord
+   N = parent(a).N
    if ord == :lex
-      start_var = 1
+      end_var = N
    else
-      start_var = 2
+      end_var = N - 1
    end
    # check for cases where degree is 0 in one of the variables for one poly
-   N = parent(a).N
-   for k = start_var:N
+   for k = end_var:-1:1
       if v1[k] == 0 && v2[k] != 0
          p2 = main_variable_extract(b, k)
          return gcd(a, content(p2))
@@ -2609,7 +2675,7 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    # count number of terms in lead coefficient, for each variable
    lead1 = zeros(Int, N)
    lead2 = zeros(Int, N)
-   for i = start_var:N
+   for i = end_var:-1:1
       if v1[i] != 0
          for j = 1:length(a)
             if a.exps[i, j] == v1[i]
@@ -2630,7 +2696,7 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    # heavily weights monomial leading term
    k = 0
    m = Inf
-   for i = start_var:N
+   for i = end_var:-1:1
       if v1[i] != 0
          if v1[i] >= v2[i]
             c = max(log(lead2[i])*v1[i]*v2[i], log(2)*v2[i])
@@ -2668,10 +2734,10 @@ function term_gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    monomial_vecmin!(Ce, 1, b.exps, 1, N)
    if ord == :deglex || ord == :degrevlex
       sum = UInt(0)
-      for j = 2:N
+      for j = 1:N - 1
          sum += Ce[j, 1]
       end
-      Ce[1, 1] = sum
+      Ce[N, 1] = sum
    end
    Cc[1] = gcd(a.coeffs[1], b.coeffs[1])
    return parent(a)(Cc, Ce)
@@ -2690,10 +2756,10 @@ function term_content(a::MPoly{T}) where {T <: RingElement}
       monomial_vecmin!(Ce, 1, a.exps, i, N)
       if ord == :deglex || ord == :degrevlex
          sum = UInt(0)
-         for j = 2:N
+         for j = 1:N - 1
             sum += Ce[j, 1]
          end
-         Ce[1, 1] = sum
+         Ce[N, 1] = sum
       end
       if monomial_iszero(Ce, 1, N)
          break
@@ -2734,7 +2800,7 @@ function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
 
    size_exps = size(f.exps)
    if (R.ord != :lex)
-      exps = exps[2:size_exps[1],:]
+      exps = exps[1:size_exps[1] - 1,:]
    end
 
    if (R.ord == :degrevlex)
@@ -2743,23 +2809,22 @@ function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
 
    derivative = zero(R)
    coeffs = f.coeffs
-   for i=1:length(f)
+   for i = 1:length(f)
       prod = coeffs[i]
-      for j=1:n
+      for j = 1:n
          if gens_parent[j] == x
-            prod *= exps[j,i]
-            if (exps[j,i] >= 1)
-               exps[j,i] -= 1
+            prod *= exps[n - j + 1, i]
+            if (exps[n - j + 1, i] >= 1)
+               exps[j, i] -= 1
             end
          end
-         prod = prod * gens_parent[j]^Int(exps[j, i])
+         prod = prod*gens_parent[j]^Int(exps[n - j + 1, i])
       end
       derivative = derivative + prod
    end
 
    return derivative
 end
-
 
 ###############################################################################
 #
@@ -2771,7 +2836,7 @@ end
 # we start at variable k0
 function main_variable(a::MPoly{T}, k0::Int) where {T <: RingElement}
    N = parent(a).N
-   for k = k0:N
+   for k = k0:-1:1
       for j = 1:a.length
          if a.exps[k, j] != 0
             return k
@@ -2781,7 +2846,7 @@ function main_variable(a::MPoly{T}, k0::Int) where {T <: RingElement}
    return 0
 end
 
-# return an array of all the starting positions of terms in the main variable n
+# return an array of all the starting positions of terms in the main variable k
 function main_variable_terms(a::MPoly{T}, k::Int) where {T <: RingElement}
    A = zeros(Int, 0)
    current_term = typemax(UInt)
@@ -2829,6 +2894,8 @@ function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Type{Val{:lex}
    return main_variable_coefficient_lex(a, k, n)
 end
 
+# return the coefficient as a sparse distributed polynomial, of the term in variable
+# k0 starting at position n
 function main_variable_coefficient_deglex(a::MPoly{T}, k0::Int, n::Int) where {T <: RingElement}
    exp = a.exps[k0, n]
    N = parent(a).N
@@ -2846,8 +2913,8 @@ function main_variable_coefficient_deglex(a::MPoly{T}, k0::Int, n::Int) where {T
          Ae = resize_exps!(Ae, a_alloc)
       end
       for k = 1:N
-         if k == 1
-            Ae[k, l] = a.exps[1, i] - a.exps[k0, i]
+         if k == N
+            Ae[k, l] = a.exps[N, i] - a.exps[k0, i]
          elseif k == k0
             Ae[k, l] = UInt(0)
          else
@@ -2868,6 +2935,7 @@ function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Type{Val{:degr
    return main_variable_coefficient_deglex(a, k, n)
 end
 
+# Turn an MPoly into a SparsePoly in the main variable k
 function main_variable_extract(a::MPoly{T}, k::Int) where {T <: RingElement}
    V = [(a.exps[k, i], i) for i in 1:length(a)]
    sort!(V)
@@ -2888,20 +2956,29 @@ function main_variable_extract(a::MPoly{T}, k::Int) where {T <: RingElement}
       Pe[i] = a2.exps[k, A[i]]
       Pc[i] = main_variable_coefficient(a2, k, A[i], Val{ord})
    end
-   if ord == :lex
-      sym = parent(a).S[k]
-   else
-      sym = parent(a).S[k - 1]
-   end
+   sym = parent(a).S[nvars(parent(a)) - k + 1]
    R = SparsePolyRing{MPoly{T}}(parent(a), sym, true)
    return R(Pc, Pe)
 end
 
+function is_less_lex(a::Tuple, b::Tuple)
+   N = length(a[1])
+   for i = N:-1:1
+      if a[1][i] < b[1][i]
+         return true
+      elseif a[1][i] > b[1][i]
+         return false
+      end
+   end
+   return false
+end
+
+# Convert a SparsePoly back into an MPoly in a main variable k
 function main_variable_insert_lex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
    N = base_ring(a).N
    V = [(ntuple(i -> i == k ? a.exps[r] : a.coeffs[r].exps[i, s], Val(N)), r, s) for
        r in 1:length(a) for s in 1:length(a.coeffs[r])]
-   sort!(V)
+   sort!(V, lt = is_less_lex)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]
    Re = zeros(UInt, N, length(V))
    for i = 1:length(V)
@@ -2912,11 +2989,12 @@ function main_variable_insert_lex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: R
    return base_ring(a)(Rc, Re)
 end
 
+# Convert a SparsePoly back into an MPoly in a main variable k
 function main_variable_insert_deglex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
    N = base_ring(a).N
-   V = [(ntuple(i -> i == 1 ? a.exps[r] + a.coeffs[r].exps[1, s] : (i == k ? a.exps[r] :
+   V = [(ntuple(i -> i == N ? a.exps[r] + a.coeffs[r].exps[N, s] : (i == k ? a.exps[r] :
         a.coeffs[r].exps[i, s]), Val(N)), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
-   sort!(V)
+   sort!(V, lt = is_less_lex)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]
    Re = zeros(UInt, N, length(V))
    for i = 1:length(V)
@@ -2929,12 +3007,12 @@ end
 
 function is_less_degrevlex(a::Tuple, b::Tuple)
    N = length(a[1])
-   if a[1][1] < b[1][1]
+   if a[1][N] < b[1][N]
       return true
-   elseif a[1][1] > b[1][1]
+   elseif a[1][N] > b[1][N]
       return false
    end
-   for i = 2:N
+   for i = N - 1:-1:1
       if a[1][i] > b[1][i]
          return true
       elseif a[1][i] < b[1][i]
@@ -2944,9 +3022,10 @@ function is_less_degrevlex(a::Tuple, b::Tuple)
    return false
 end
 
+# Convert a SparsePoly back into an MPoly in a main variable k
 function main_variable_insert_degrevlex(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingElement}
    N = base_ring(a).N
-   V = [(ntuple(i -> i == 1 ? a.exps[r] + a.coeffs[r].exps[1, s] : (i == k ? a.exps[r] :
+   V = [(ntuple(i -> i == N ? a.exps[r] + a.coeffs[r].exps[N, s] : (i == k ? a.exps[r] :
         a.coeffs[r].exps[i, s]), Val(N)), r, s) for r in 1:length(a) for s in 1:length(a.coeffs[r])]
    sort!(V, lt = is_less_degrevlex)
    Rc = [a.coeffs[V[i][2]].coeffs[V[i][3]] for i in length(V):-1:1]
