@@ -135,15 +135,15 @@ function vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
       for i = 1:length(p)
          if exps[j, i] > 0
             if p.parent.ord == :degrevlex
-               push!(vars_in_p, gen_list[n - j + 1])
-            else
                push!(vars_in_p, gen_list[j])
+            else
+               push!(vars_in_p, gen_list[n - j + 1])
             end
             break
          end
       end
    end
-   if p.parent.ord == :degrevlex
+   if p.parent.ord != :degrevlex
       vars_in_p = reverse(vars_in_p)
    end
    return(vars_in_p)
@@ -436,14 +436,14 @@ function isgen(x::MPoly{T}) where {T <: RingElement}
    if length(x) != 1
       return false
    end
-   if coeff(x, 0) != 1
+   if coeff(x, 1) != 1
       return false
    end
    return isgen(x, Val{parent(x).ord})
 end
 
 function coeff(x::MPoly, i::Int)
-   (i < 1 || i > length(x)) && throw(DomainError())
+   (i < 1 || i > length(x)) && throw(DomainError("coeff", "Index out of range"))
    return x.coeffs[i]
 end
 
@@ -3415,16 +3415,15 @@ function (a::MPolyRing{T})(b::Array{T, 1}, m::Array{UInt, 2}) where {T <: RingEl
    return z
 end
 
-function to_univariate(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: AbstractAlgebra.RingElem}
-   if !involves_at_most_one_variable(p)
+function to_univariate(R:: AbstractAlgebra.Generic.PolyRing{T}, p::AbstractAlgebra.Generic.MPoly{T}) where {T <: AbstractAlgebra.RingElement}
+   vars_p = vars(p)
+
+   if length(vars_p) > 1
       error("Can only convert univariate polynomials of type MPoly.")
    end
-   
-   vars_p = vars(p)
-   R,v = PolynomialRing(base_ring(p), string(vars_p[1]))
-   
+
    if length(vars_p) == 0
-      return R(p.coeffs[1])
+      return length(p) == 0 ? R(0) : R(p.coeffs[1])
    end
    
    return R(coefficients_of_univariate_MPoly(p))
@@ -3443,7 +3442,9 @@ doc"""
 > Return the coefficients of p, which is assumed to be univariate, as an array in ascending order.
 """
 function coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
-   if !involves_at_most_one_variable(p)
+   vars_p = vars(p)
+   
+   if length(vars_p) > 1
       error("Polynomial is not univariate.")
    end
    
@@ -3454,20 +3455,19 @@ function coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
       return [ p.coeffs[1] ]
    end
    
-   exps = p.exps[:,1:length(p)]
-   size_exps = size(exps)
+   exps = p.exps[:, :]
    if p.parent.ord != :lex
-      exps = exps[2:size_exps[1],:]
+      exps = exps[1:end - 1,:]
    end
    if p.parent.ord == :degrevlex
       exps = exps[end:-1:1,:]
    end
    
-   degs_of_terms = sum(exps,1)
+   degs_of_terms = sum(exps, dims = 1)
    order = maximum(degs_of_terms)
-   coeffs = [ zero(base_ring(p)) for i=0:order ]
-   for i=1:p.length
-   	coeffs[degs_of_terms[i]+1] = p.coeffs[i]
+   coeffs = [ zero(base_ring(p)) for i = 0:order ]
+   for i = 1:p.length
+   	coeffs[degs_of_terms[i] + 1] = p.coeffs[i]
    end
    
    return(coeffs)

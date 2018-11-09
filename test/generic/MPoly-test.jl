@@ -61,6 +61,24 @@ function test_gen_mpoly_manipulation()
          @test isgen(varlist[i])
          @test isgen(g[i])
          @test !isgen(g[i] + 1)
+         @test gen(S, i) == g[i]
+      end
+
+      nv = rand(1:num_vars)
+      f = S(2)
+
+      @test length(vars(f)) == 0
+
+      f = 3*g[nv] + 2
+
+      @test length(vars(f)) == 1 && vars(f)[1] == g[nv]
+
+      f = 2*g[1]*g[num_vars] + 12
+
+      if num_vars == 1
+         @test length(vars(f)) == 1 && vars(f)[1] == g[1]
+      else
+         @test length(vars(f)) == 2 && vars(f)[1] == g[1] && vars(f)[2] == g[num_vars]
       end
 
       f = rand(S, 0:5, 0:100, 0:0, -100:100)
