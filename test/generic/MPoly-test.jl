@@ -70,7 +70,7 @@ function test_gen_mpoly_manipulation()
       @test hash(f) == hash(deepcopy(f))
 
       if length(f) > 0
-         @test isa(coeff(f, rand(1:length(f)) - 1), elem_type(R))
+         @test isa(coeff(f, rand(1:length(f))), elem_type(R))
       end
 
       max_degs, biggest = max_fields(f)

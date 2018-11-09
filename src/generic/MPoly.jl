@@ -9,7 +9,9 @@ export max_fields, total_degree, gens, divides, isconstant, isdegree,
        main_variable, main_variable_extract, main_variable_insert, nvars, vars,
        ordering, rand_ordering, symbols, monomial_set!, monomial_iszero,
        derivative, rand_ordering, symbols, monomial_set!, monomial_iszero,
-       derivative, change_base_ring,  to_univariate, @PolynomialRing
+       derivative, change_base_ring,  to_univariate, degrees, 
+       combine_like_terms!, exponent_vector, exponent_vectors,
+       set_exponent_vector!, sort_terms!, @PolynomialRing
 
 ###############################################################################
 #
@@ -48,22 +50,22 @@ symbols(a::MPolyRing) = a.S
 """
 nvars(a::MPolyRing) = a.num_vars
 
-function gens(a::MPolyRing{T}, ::Type{Val{:lex}}) where {T <: RingElement}
+function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:lex}}) where {T <: RingElement}
     n = a.num_vars
-    return [a([base_ring(a)(1)], reshape([UInt(j == n - i + 1)
-            for j = 1:n], n, 1)) for i in 1:n]
+    return a([base_ring(a)(1)], reshape([UInt(j == n - i + 1)
+            for j = 1:n], n, 1))
 end
 
-function gens(a::MPolyRing{T}, ::Type{Val{:deglex}}) where {T <: RingElement}
+function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:deglex}}) where {T <: RingElement}
     n = a.num_vars
-    return [a([base_ring(a)(1)], reshape([[UInt(j == n - i + 1)
-            for j in 1:n]..., UInt(1)], n + 1, 1)) for i in 1:n]
+    return a([base_ring(a)(1)], reshape([[UInt(j == n - i + 1)
+            for j in 1:n]..., UInt(1)], n + 1, 1))
 end
 
-function gens(a::MPolyRing{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
+function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:degrevlex}}) where {T <: RingElement}
     n = a.num_vars
-    return [a([base_ring(a)(1)], reshape([[UInt(j == i)
-            for j in 1:n]..., UInt(1)], n + 1, 1)) for i in 1:n]
+    return a([base_ring(a)(1)], reshape([[UInt(j == i)
+            for j in 1:n]..., UInt(1)], n + 1, 1))
 end
 
 @doc Markdown.doc"""
@@ -72,7 +74,17 @@ end
 > ring.
 """
 function gens(a::MPolyRing{T}) where {T <: RingElement}
-   return gens(a, Val{a.ord})
+   n = a.num_vars
+   return [gen(a, i, Val{a.ord}) for i in 1:n]
+end
+
+@doc Markdown.doc"""
+    gen{T <: RingElement}(a::MPolyRing{T})
+> Return the i-th generator (variable) of the given polynomial
+> ring.
+"""
+function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
+   return gen(a, i, Val{a.ord})
 end
 
 @doc Markdown.doc"""
@@ -431,8 +443,8 @@ function isgen(x::MPoly{T}) where {T <: RingElement}
 end
 
 function coeff(x::MPoly, i::Int)
-   i < 0 && throw(DomainError())
-   return x.coeffs[i + 1]
+   (i < 1 || i > length(x)) && throw(DomainError())
+   return x.coeffs[i]
 end
 
 @doc Markdown.doc"""
@@ -463,6 +475,65 @@ function max_fields(f::MPoly{T}) where {T <: RingElement}
       end
    end
    return biggest, b
+end
+
+function degree(f::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: RingElement
+   A = f.exps
+   N = size(A, 1)
+   if i == 1
+      return Int(A[N, 1])
+   else
+      biggest = -1
+      for j = 1:length(f)
+         d = Int(A[N - i + 1, j])
+         if d > biggest
+            biggest = d
+         end
+      end
+      return biggest
+   end
+end
+
+function degree(f::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: RingElement
+   A = f.exps
+   N = size(A, 1)
+   biggest = -1
+   for j = 1:length(f)
+      d = Int(A[N - i, j])
+      if d > biggest
+         biggest = d
+      end
+   end
+   return biggest
+end
+
+function degree(f::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
+   A = f.exps
+   N = size(A, 1)
+   biggest = -1
+   for j = 1:length(f)
+      d = Int(A[i, j])
+      if d > biggest
+         biggest = d
+      end
+   end
+   return biggest
+end
+ 
+@doc Markdown.doc"""
+   degree{T <: RingElement}(f::MPoly{T}, i::Int)
+> Return the degree of the polynomial $f$ in terms of the i-th variable.
+"""
+function degree(f::MPoly{T}, i::Int) where T <: RingElement
+   return degree(f, i, Val{parent(f).ord})
+end
+
+@doc Markdown.doc"""
+   degrees{T <: RingElement}(f::MPoly{T})
+> Return an array of the degrees of the polynomial $f$ in terms of each variable.
+"""
+function degrees(f::MPoly{T}) where T <: RingElement
+   return [degree(f, i) for i in 1:nvars(parent(f))]
 end
 
 @doc Markdown.doc"""
@@ -525,7 +596,7 @@ isterm(x::MPoly) = x.length == 1
     ismonomial(x::MPoly)
 > Return `true` if the given polynomial has precisely one term whose coefficient is one.
 """
-ismonomial(x::MPoly) = x.length == 1 && isone(coeff(x, 0))
+ismonomial(x::MPoly) = x.length == 1 && isone(coeff(x, 1))
 
 function Base.deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingElement}
    Re = deepcopy_internal(a.exps, dict)
@@ -550,7 +621,7 @@ function show(io::IO, x::MPoly, U::Array{<: AbstractString, 1})
       N = parent(x).N
       ord = parent(x).ord
       for i = 1:len
-        c = coeff(x, i - 1)
+        c = coeff(x, i)
         bracket = needs_parentheses(c)
         if i != 1 && !displayed_with_minus_in_front(c)
           print(io, "+")
@@ -1629,7 +1700,7 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       N = size(a.exps, 1)
       exps = zeros(UInt, N, 1)
       monomial_mul!(exps, 1, a.exps, 1, b, N)
-      return parent(a)([coeff(a, 0)^b], exps)
+      return parent(a)([coeff(a, 1)^b], exps)
    elseif b == 0
       return parent(a)(1)
    elseif b == 1
@@ -3108,6 +3179,153 @@ function zero!(a::MPoly{T}) where {T <: RingElement}
    return a
 end
 
+function setcoeff!(a::MPoly{T}, i::Int, c::T) where T <: RingElement
+   a.coeffs[i] = c
+   return a
+end
+
+function setcoeff!(a::MPoly{T}, i::Int, c::U) where {T <: RingElement, U <: Integer}
+    return setcoeff!(a, i, base_ring(a)(c))
+end
+
+# Remove zero terms and combine adjacent terms if they have the same
+# exponent vector
+function combine_like_terms!(a::MPoly{T}) where T <: RingElement
+   A = a.exps
+   N = size(A, 1)
+   i = 1
+   j = 0
+   while i <= length(a)
+      c = a.coeffs[i]
+      while i < length(a) && c == 0
+         i += 1
+         c = a.coeffs[i]
+      end
+      k = i
+      i += 1
+      while i <= length(a) && monomial_isequal(A, k, i, N)
+         c += a.coeffs[i]
+         i += 1
+      end
+      if c != 0
+         j += 1
+         a.coeffs[j] = c
+         monomial_set!(A, j, A, k, N)
+      end
+   end
+   a.length = j
+   return a
+end
+
+###############################################################################
+#
+#   Manipulating terms and monomials
+#
+###############################################################################
+
+function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: RingElement
+   A = a.exps
+   N = size(A, 1)
+   return [Int(A[j, i]) for j in N:-1:1]  
+end
+ 
+function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: RingElement
+   A = a.exps
+   N = size(A, 1)
+   return [Int(A[j, i]) for j in N - 1:-1:1]  
+end
+
+function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
+   A = a.exps
+   N = size(A, 1)
+   return [Int(A[j, i]) for j in 1:N - 1]  
+end
+   
+function exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
+   return exponent_vector(a, i, Val{parent(a).ord})
+end
+
+function exponent_vectors(a::MPoly{T}) where T <: RingElement
+   return [exponent_vector(a, i) for i in 1:length(a)]
+end
+
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:lex}}) where T <: RingElement
+   A = a.exps
+   A[:, i] = exps[end:-1:1]
+   return a 
+end
+ 
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:deglex}}) where T <: RingElement
+   A = a.exps
+   A[1:end - 1, i] = exps[end:-1:1]
+   A[end, i] = sum(exps)
+   return a
+end
+
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:degrevlex}}) where T <: RingElement
+   A = a.exps
+   A[1:end - 1, i] = exps
+   A[end, i] = sum(exps)
+   return a
+end
+
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
+   return set_exponent_vector!(a, i, exps, Val{parent(a).ord})
+end
+
+function coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
+   A = a.exps
+   N = size(A, 1)
+   exp2 = Array{UInt, 1}(undef, N)
+   ord = parent(a).ord
+   if ord == :lex
+      exp2[:] = exps[end:-1:1] 
+   elseif ord == :deglex
+      exp2[:end - 1] = exps[end:-1:1]
+      exp2[end] = sum(exps)
+   else
+      exp2[:end - 1] = exps[1:end]
+      exp2[end] = sum(exps)
+   end
+   exp2 = reshape(exp2, N, 1)
+   lo = 1
+   hi = length(a)
+   n = div(hi - lo + 1, 2)
+   while hi >= lo
+      v = monomial_cmp(A, lo + n, exp2, 1, N, parent(a), UInt(0))
+      if v == 0
+         return a.coeffs[lo + n]
+      elseif v < 0
+         hi = lo + n - 1
+      else
+         lo = lo + n + 1
+      end
+      n = div(hi - lo + 1, 2)
+   end
+   return base_ring(a)() 
+end
+
+function sort_terms!(a::MPoly{T}) where {T <: RingElement}
+   N = parent(a).N
+   V = [(ntuple(i -> a.exps[i, r], Val(N)), r) for r in 1:length(a)]
+   ord = parent(a).ord
+   if ord == :lex || ord == :deglex
+      sort!(V, lt = is_less_lex)
+   else
+    sort!(V, lt = is_less_degrevlex)
+end
+   Rc = [a.coeffs[V[i][2]] for i in length(V):-1:1]
+   Re = zeros(UInt, N, length(V))
+   for i = 1:length(V)
+      for j = 1:N
+         Re[j, length(V) - i + 1] = V[i][1][j]
+      end
+   end
+   a.coeffs = Rc
+   a.exps = Re
+   return a
+end
+
 ###############################################################################
 #
 #   Random elements
@@ -3197,19 +3415,16 @@ function (a::MPolyRing{T})(b::Array{T, 1}, m::Array{UInt, 2}) where {T <: RingEl
    return z
 end
 
-function to_univariate(R::PolyRing{T}, p::MPoly{T}) where {T <: AbstractAlgebra.RingElement}
+function to_univariate(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: AbstractAlgebra.RingElem}
    if !involves_at_most_one_variable(p)
       error("Can only convert univariate polynomials of type MPoly.")
    end
    
    vars_p = vars(p)
+   R,v = PolynomialRing(base_ring(p), string(vars_p[1]))
    
    if length(vars_p) == 0
-      if iszero(p)
-         return zero(R)
-      else
-         return R(p.coeffs[1])
-      end
+      return R(p.coeffs[1])
    end
    
    return R(coefficients_of_univariate_MPoly(p))
@@ -3248,7 +3463,7 @@ function coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
       exps = exps[end:-1:1,:]
    end
    
-   degs_of_terms = sum(exps,dims=1)
+   degs_of_terms = sum(exps,1)
    order = maximum(degs_of_terms)
    coeffs = [ zero(base_ring(p)) for i=0:order ]
    for i=1:p.length
@@ -3281,7 +3496,7 @@ function PolynomialRing(R::AbstractAlgebra.Ring, s::Array{String, 1}; cached::Bo
    N = (ordering == :deglex || ordering == :degrevlex) ? length(U) + 1 : length(U)
    parent_obj = MPolyRing{T}(R, U, ordering, N, cached)
 
-   return tuple(parent_obj, gens(parent_obj, Val{ordering}))
+   return tuple(parent_obj, gens(parent_obj))
 end
 
 ################################################################################
