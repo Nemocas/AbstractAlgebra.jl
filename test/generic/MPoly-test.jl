@@ -547,6 +547,7 @@ function test_gen_mpoly_derivative()
          end
          @test derivative(one(R), v) == zero(R)
          @test derivative(zero(R), v) == zero(R)
+         @test derivative(v, v) == one(R)
       end
    end
 
