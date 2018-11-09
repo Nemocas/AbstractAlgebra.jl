@@ -2904,7 +2904,7 @@ function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
          if gens_parent[j] == x
             prod *= exps[n - j + 1, i]
             if (exps[n - j + 1, i] >= 1)
-               exps[j, i] -= 1
+               exps[n - j + 1, i] -= 1
             end
          end
          prod = prod*gens_parent[j]^Int(exps[n - j + 1, i])
