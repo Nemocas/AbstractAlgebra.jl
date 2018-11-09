@@ -562,6 +562,9 @@ function test_gen_mpoly_change_base_ring()
 
       R, vars = PolynomialRing(ZZ, var_names; ordering=ord)
 
+      @test typeof(AbstractAlgebra.Generic.change_base_ring(R(1), a->ZZ(a))) == AbstractAlgebra.Generic.MPoly{typeof(ZZ(1))}
+      @test typeof(AbstractAlgebra.Generic.change_base_ring(R(0), a->ZZ(a))) == AbstractAlgebra.Generic.MPoly{typeof(ZZ(0))}
+
       for iter in 1:10
          f = rand(R, 5:10, 1:10, -100:100)
          @test evaluate(change_base_ring(f, a -> R(a)), [one(R) for i=1:num_vars]) == sum(f.coeffs[i] for i=1:f.length)
