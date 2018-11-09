@@ -442,8 +442,11 @@ function isgen(x::MPoly{T}) where {T <: RingElement}
    return isgen(x, Val{parent(x).ord})
 end
 
+@doc Markdown.doc"""
+    coeff(x::MPoly, i::Int)
+> Return the coefficient of the i-th term of the polynomial.
+"""
 function coeff(x::MPoly, i::Int)
-   (i < 1 || i > length(x)) && throw(DomainError("coeff", "Index out of range"))
    return x.coeffs[i]
 end
 
@@ -567,6 +570,10 @@ function total_degree(f::MPoly{T}) where {T <: RingElement}
    end
 end
 
+@doc Markdown.doc"""
+    length(a::MPoly)
+> Return the number of terms of the polynomial.
+"""
 length(x::MPoly) = x.length
 
 one(R::MPolyRing) = R(1)
@@ -2654,6 +2661,11 @@ end
 #
 ###############################################################################
 
+@doc Markdown.doc"""
+    evaluate{T <: RingElem}(a::MPoly{T}, A::Array{T, 1})
+> Evaluate the polynomial by substituting in the array of values for each of
+> the variables.
+"""
 function evaluate(a::MPoly{T}, A::Array{T, 1}) where {T <: RingElement}
    if iszero(a)
       return base_ring(a)()
@@ -2677,6 +2689,11 @@ function evaluate(a::MPoly{T}, A::Array{T, 1}) where {T <: RingElement}
    end
 end
 
+@doc Markdown.doc"""
+    evaluate{T <: RingElement, U <: Integer}(a::MPoly{T}, A::Array{U})
+> Evaluate the polynomial by substituting in the array of integers for each of
+> the variables.
+"""
 function evaluate(a::MPoly{T}, A::Array{U}) where {T <: RingElement, U <: Integer}
    if iszero(a)
       return base_ring(a)()
@@ -2904,7 +2921,9 @@ end
 #
 ###############################################################################
 
-# determine the number of the first variable for which there is a nonzero exp
+# These functions are internal and mainly used by the gcd code
+
+# Determine the number of the first variable for which there is a nonzero exp
 # we start at variable k0
 function main_variable(a::MPoly{T}, k0::Int) where {T <: RingElement}
    N = parent(a).N
@@ -2918,7 +2937,7 @@ function main_variable(a::MPoly{T}, k0::Int) where {T <: RingElement}
    return 0
 end
 
-# return an array of all the starting positions of terms in the main variable k
+# Return an array of all the starting positions of terms in the main variable k
 function main_variable_terms(a::MPoly{T}, k::Int) where {T <: RingElement}
    A = zeros(Int, 0)
    current_term = typemax(UInt)
@@ -2931,7 +2950,7 @@ function main_variable_terms(a::MPoly{T}, k::Int) where {T <: RingElement}
    return A
 end
 
-# return the coefficient as a sparse distributed polynomial, of the term in variable
+# Return the coefficient as a sparse distributed polynomial, of the term in variable
 # k0 starting at position n
 function main_variable_coefficient_lex(a::MPoly{T}, k0::Int, n::Int) where {T <: RingElement}
    exp = a.exps[k0, n]
@@ -2966,7 +2985,7 @@ function main_variable_coefficient(a::MPoly{T}, k::Int, n::Int, ::Type{Val{:lex}
    return main_variable_coefficient_lex(a, k, n)
 end
 
-# return the coefficient as a sparse distributed polynomial, of the term in variable
+# Return the coefficient as a sparse distributed polynomial, of the term in variable
 # k0 starting at position n
 function main_variable_coefficient_deglex(a::MPoly{T}, k0::Int, n::Int) where {T <: RingElement}
    exp = a.exps[k0, n]
@@ -3179,17 +3198,28 @@ function zero!(a::MPoly{T}) where {T <: RingElement}
    return a
 end
 
+@doc Markdown.doc"""
+    setcoeff!{T <: RingElem}(a::MPoly{T}, i::Int, c::T)
+> Set the coefficient of the i-th term of the polynomial to $c$.
+"""
 function setcoeff!(a::MPoly{T}, i::Int, c::T) where T <: RingElement
    a.coeffs[i] = c
    return a
 end
 
+@doc Markdown.doc"""
+    setcoeff!{T <: RingElement, U <: Integer}(a::MPoly{T}, i::Int, c::U)
+> Set the coefficient of the i-th term of the polynomial to the integer $c$.
+"""
 function setcoeff!(a::MPoly{T}, i::Int, c::U) where {T <: RingElement, U <: Integer}
     return setcoeff!(a, i, base_ring(a)(c))
 end
 
-# Remove zero terms and combine adjacent terms if they have the same
-# exponent vector
+@doc Markdown.doc"""
+    combine_like_terms!{T <: RingElement}(a::MPoly{T})
+> Remove zero terms and combine adjacent terms if they have the same
+> exponent vector. The modified polynomial is returned.
+"""
 function combine_like_terms!(a::MPoly{T}) where T <: RingElement
    A = a.exps
    N = size(A, 1)
@@ -3241,10 +3271,22 @@ function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <
    return [Int(A[j, i]) for j in 1:N - 1]  
 end
    
+@doc Markdown.doc"""
+    exponent_vector{T <: RingElem}(a::MPoly{T}, i::Int)
+> Return a vector of exponents, corresponding to the exponent vector of the
+> i-th term of the polynomial. Term numbering begins at $1$ and the exponents
+> are given in the order of the variables for the ring, as supplied when the
+> ring was created.
+"""
 function exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
    return exponent_vector(a, i, Val{parent(a).ord})
 end
 
+@doc Markdown.doc"""
+    exponent_vectors{T <: RingElem}(a::MPoly{T})
+> Return an array whose entries are the exponent vectors for each of the terms
+> of the polynomial.
+"""
 function exponent_vectors(a::MPoly{T}) where T <: RingElement
    return [exponent_vector(a, i) for i in 1:length(a)]
 end
@@ -3269,10 +3311,21 @@ function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val
    return a
 end
 
+@doc Markdown.doc"""
+set_exponent_vector!{T <: RingElem}(a::MPoly{T}, i::Int, exps::Vector{Int})
+> Set the i-th exponent vector to the supplied vector, where the entries
+> correspond to the exponents of the variables in the order supplied when
+> the ring was created. The modified polynomial is returned.
+"""
 function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
    return set_exponent_vector!(a, i, exps, Val{parent(a).ord})
 end
 
+@doc Markdown.doc"""
+    coeff{T <: RingElem}(a::MPoly{T}, exps::Vector{Int})
+> Return the coefficient of the term with the given exponent vector, or zero
+> if there is no such term.
+"""
 function coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
    A = a.exps
    N = size(A, 1)
@@ -3281,10 +3334,10 @@ function coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
    if ord == :lex
       exp2[:] = exps[end:-1:1] 
    elseif ord == :deglex
-      exp2[:end - 1] = exps[end:-1:1]
+      exp2[1:end - 1] = exps[end:-1:1]
       exp2[end] = sum(exps)
    else
-      exp2[:end - 1] = exps[1:end]
+      exp2[1:end - 1] = exps[1:end]
       exp2[end] = sum(exps)
    end
    exp2 = reshape(exp2, N, 1)
@@ -3305,6 +3358,12 @@ function coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
    return base_ring(a)() 
 end
 
+@doc Markdown.doc"""
+    sort_terms!{T <: RingElem}(a::MPoly{T})
+> Sort the terms of the given polynomial according to the polynomial ring
+> ordering. Zero terms and duplicate exponents are ignored. To deal with those
+> call `combine_like_terms`. The sorted polynomial is returned.
+"""
 function sort_terms!(a::MPoly{T}) where {T <: RingElement}
    N = parent(a).N
    V = [(ntuple(i -> a.exps[i, r], Val(N)), r) for r in 1:length(a)]
@@ -3312,8 +3371,8 @@ function sort_terms!(a::MPoly{T}) where {T <: RingElement}
    if ord == :lex || ord == :deglex
       sort!(V, lt = is_less_lex)
    else
-    sort!(V, lt = is_less_degrevlex)
-end
+      sort!(V, lt = is_less_degrevlex)
+   end
    Rc = [a.coeffs[V[i][2]] for i in length(V):-1:1]
    Re = zeros(UInt, N, length(V))
    for i = 1:length(V)
@@ -3452,15 +3511,15 @@ function coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
       if length(p) == 0
          return []
       end
-      return [ p.coeffs[1] ]
+      return [p.coeffs[1]]
    end
    
-   exps = p.exps[:, :]
+   exps = p.exps
    if p.parent.ord != :lex
-      exps = exps[1:end - 1,:]
+      exps = exps[1:end - 1, :]
    end
    if p.parent.ord == :degrevlex
-      exps = exps[end:-1:1,:]
+      exps = exps[end:-1:1, :]
    end
    
    degs_of_terms = sum(exps, dims = 1)
