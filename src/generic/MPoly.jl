@@ -96,7 +96,7 @@ function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: Ri
    new_p = g(zero(base_ring(p.parent)))
    new_base_ring = parent(new_p)
    new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in symbols_parent])
-   new_p = new_polynomial_ring(new_p)
+   new_p = zero(new_polynomial_ring)
 
    for i = 1:length(p)
       prod = g(p.coeffs[i])
