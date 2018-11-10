@@ -484,7 +484,7 @@ function degree(f::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: RingElement
    A = f.exps
    N = size(A, 1)
    if i == 1
-      return Int(A[N, 1])
+      return length(f) == 0 ? -1 : Int(A[N, 1])
    else
       biggest = -1
       for j = 1:length(f)
