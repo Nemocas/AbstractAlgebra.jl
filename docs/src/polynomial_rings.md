@@ -186,7 +186,7 @@ normalise(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
 ```
 
 Given a polynomial whose length is currently $n$, including any leading zero
-coefficients, return the length of the normalised polynomial (either zero of the length
+coefficients, return the length of the normalised polynomial (either zero or the length
 of the polynomial with nonzero leading coefficient). Note that the function does not
 actually perform the normalisation.
 
