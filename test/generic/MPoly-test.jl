@@ -38,6 +38,24 @@ function test_gen_mpoly_constructors()
       W = reshape(W0, num_vars, 5)
 
       @test isa(S(V, W), MPolyElem)
+
+      W1 = [[rand(0:100) for i in 1:num_vars] for j in 1:5]
+
+      f1 = S(V, W1)
+
+      @test isa(f1, MPolyElem)
+
+      f2 = S()
+      fit!(f2, 5)
+
+      for i = 1:5
+         f2 = set_exponent_vector!(f2, i, W1[i])
+         f2 = setcoeff!(f2, i, V[i])
+      end
+      f2 = sort_terms!(f2)
+      f2 = combine_like_terms!(f2)
+
+      @test f1 == f2
    end
 
    println("PASS")
@@ -702,7 +720,7 @@ function test_gen_mpoly_exponents()
          f = combine_like_terms!(f)
 
          for i = 1:length(f) - 1
-            @test monomial_cmp(f.exps, i, f.exps, i + 1, R.N, R, UInt(0)) > 0
+            @test AbstractAlgebra.Generic.monomial_cmp(f.exps, i, f.exps, i + 1, R.N, R, UInt(0)) > 0
          end
       end
    end

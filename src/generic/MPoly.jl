@@ -3203,7 +3203,11 @@ end
 > Set the coefficient of the i-th term of the polynomial to $c$.
 """
 function setcoeff!(a::MPoly{T}, i::Int, c::T) where T <: RingElement
+   fit!(a, i)
    a.coeffs[i] = c
+   if i > length(a)
+      a.length = i
+   end
    return a
 end
 
@@ -3292,22 +3296,34 @@ function exponent_vectors(a::MPoly{T}) where T <: RingElement
 end
 
 function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:lex}}) where T <: RingElement
+   fit!(a, i)
    A = a.exps
    A[:, i] = exps[end:-1:1]
+   if i > length(a)
+      a.length = i
+   end
    return a 
 end
  
 function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:deglex}}) where T <: RingElement
+   fit!(a, i)
    A = a.exps
    A[1:end - 1, i] = exps[end:-1:1]
    A[end, i] = sum(exps)
+   if i > length(a)
+    a.length = i
+   end
    return a
 end
 
 function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:degrevlex}}) where T <: RingElement
+   fit!(a, i)
    A = a.exps
    A[1:end - 1, i] = exps
    A[end, i] = sum(exps)
+   if i > length(a)
+    a.length = i
+   end
    return a
 end
 
@@ -3474,6 +3490,50 @@ function (a::MPolyRing{T})(b::Array{T, 1}, m::Array{UInt, 2}) where {T <: RingEl
    return z
 end
 
+# This is the main user interface for efficiently creating a polynomial. It accepts
+# an array of coefficients and an array of exponent vectors. Sorting, coalescing of
+# like terms and removal of zero terms is performed.
+function (a::MPolyRing{T})(b::Array{T, 1}, m::Vector{Vector{Int}}) where {T <: RingElement}
+   if length(b) > 0 && isassigned(b, 1)
+       parent(b[1]) != base_ring(a) && error("Unable to coerce to polynomial")
+   end
+
+   for i in 1:length(m)
+      length(m[i]) != nvars(a) && error("Exponent vector $i has length $(length(m[i])) (expected $(nvars(a)))")
+   end
+   
+   N = a.N
+   ord = ordering(a)
+   Pe = Array{UInt, 2}(undef, N, length(m))
+
+   if ord == :lex
+      for i = 1:length(m)
+         for j = 1:N
+            Pe[j, i] = UInt(m[i][N - j + 1])
+         end
+      end
+   elseif ord == :deglex
+      for i = 1:length(m)
+         for j = 1:N - 1
+            Pe[j, i] = UInt(m[i][N - j])
+         end
+         Pe[N, i] = UInt(sum(m[i]))
+      end      
+   else # degrevlex
+      for i = 1:length(m)
+         for j = 1:N - 1
+            Pe[j, i] = UInt(m[i][j])
+         end
+         Pe[N, i] = UInt(sum(m[i]))
+      end   
+   end
+
+   z = MPoly{T}(a, b, Pe)
+   z = sort_terms!(z)
+   z = combine_like_terms!(z)
+   return z
+end 
+ 
 function to_univariate(R:: AbstractAlgebra.Generic.PolyRing{T}, p::AbstractAlgebra.Generic.MPoly{T}) where {T <: AbstractAlgebra.RingElement}
    vars_p = vars(p)
 
