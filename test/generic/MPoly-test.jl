@@ -38,6 +38,24 @@ function test_gen_mpoly_constructors()
       W = reshape(W0, num_vars, 5)
 
       @test isa(S(V, W), MPolyElem)
+
+      W1 = [[rand(0:100) for i in 1:num_vars] for j in 1:5]
+
+      f1 = S(V, W1)
+
+      @test isa(f1, MPolyElem)
+
+      f2 = S()
+      fit!(f2, 5)
+
+      for i = 1:5
+         f2 = set_exponent_vector!(f2, i, W1[i])
+         f2 = setcoeff!(f2, i, V[i])
+      end
+      f2 = sort_terms!(f2)
+      f2 = combine_like_terms!(f2)
+
+      @test f1 == f2
    end
 
    println("PASS")
@@ -61,6 +79,24 @@ function test_gen_mpoly_manipulation()
          @test isgen(varlist[i])
          @test isgen(g[i])
          @test !isgen(g[i] + 1)
+         @test gen(S, i) == g[i]
+      end
+
+      nv = rand(1:num_vars)
+      f = S(2)
+
+      @test length(vars(f)) == 0
+
+      f = 3*g[nv] + 2
+
+      @test length(vars(f)) == 1 && vars(f)[1] == g[nv]
+
+      f = 2*g[1]*g[num_vars] + 12
+
+      if num_vars == 1
+         @test length(vars(f)) == 1 && vars(f)[1] == g[1]
+      else
+         @test length(vars(f)) == 2 && vars(f)[1] == g[1] && vars(f)[2] == g[num_vars]
       end
 
       f = rand(S, 0:5, 0:100, 0:0, -100:100)
@@ -70,7 +106,7 @@ function test_gen_mpoly_manipulation()
       @test hash(f) == hash(deepcopy(f))
 
       if length(f) > 0
-         @test isa(coeff(f, rand(1:length(f)) - 1), elem_type(R))
+         @test isa(coeff(f, rand(1:length(f))), elem_type(R))
       end
 
       max_degs, biggest = max_fields(f)
@@ -89,8 +125,17 @@ function test_gen_mpoly_manipulation()
          @test S.N == num_vars + 1
       end
 
+      degs = degrees(f)
+
       for j = 1:num_vars
-         @test max_degs[j] <= 100
+         @test degs[j] == degree(f, j)
+         if rev
+            @test max_degs[j] == degs[j] || (degs[j] == -1 && max_degs[j] == 0)
+         else
+            @test max_degs[j] == degs[num_vars - j + 1] ||
+                  (degs[num_vars - j + 1] == -1 && max_degs[j] == 0) 
+         end
+
          @test max_degs[j] <= biggest
       end
 
@@ -101,6 +146,10 @@ function test_gen_mpoly_manipulation()
       @test isone(one(S))
 
       @test iszero(zero(S))
+
+      @test isunit(S(1))
+      @test !isunit(S(0))
+      @test !isunit(gen(S, 1))
 
       @test isconstant(S(rand(-100:100)))
       @test isconstant(S(zero(S)))
@@ -118,17 +167,17 @@ end
 function test_gen_mpoly_total_degree()
    print("Generic.MPoly.total_degree...")
    max = 50
-   for nvars=1:10
+   for nvars = 1:10
       var_names = ["x$j" for j in 1:nvars]
-      for nterms=1:10
+      for nterms = 1:10
          exps = Array{Int,2}(round.(rand(nvars, nterms) .* max))
          degrees = []
-         for nord=1:20
+         for nord = 1:20
             ord = rand_ordering()
             S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
             p = zero(S)
-            for j=1:nterms
-               p += prod( varlist[i]^exps[i,j] for i=1:nvars )
+            for j = 1:nterms
+               p += prod(varlist[i]^exps[i,j] for i = 1:nvars)
             end
             push!(degrees, total_degree(p))
          end
@@ -594,6 +643,118 @@ function test_gen_mpoly_vars()
    println("PASS")
 end
 
+function test_gen_mpoly_combine_like_terms()
+   print("Generic.MPoly.combine_like_terms...")
+
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      R, vars_R = PolynomialRing(ZZ, var_names; ordering=ord)
+
+      for iter in 1:10
+         f = R()
+         while f == 0
+            f = rand(R, 5:10, 1:10, -100:100)
+         end
+
+         lenf = length(f)
+         f = setcoeff!(f, rand(1:lenf), 0)
+         f = combine_like_terms!(f)
+
+         @test length(f) == lenf - 1
+
+         while length(f) < 2
+            f = rand(R, 5:10, 1:10, -100:100)
+         end
+
+         lenf = length(f)
+         nrand = rand(1:lenf - 1)
+         v = exponent_vector(f, nrand)
+         f = set_exponent_vector!(f, nrand + 1, v)
+         terms_cancel = coeff(f, nrand) == -coeff(f, nrand + 1)
+         f = combine_like_terms!(f)
+         @test length(f) == lenf - 1 - terms_cancel
+      end
+   end
+
+   println("PASS")
+end
+
+function test_gen_mpoly_exponents()
+   print("Generic.MPoly.exponents...")
+
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      R, vars_R = PolynomialRing(ZZ, var_names; ordering=ord)
+
+      for iter in 1:10
+         f = R()
+         while f == 0
+            f = rand(R, 5:10, 1:10, -100:100)
+         end
+
+         nrand = rand(1:length(f))
+         v = exponent_vector(f, nrand)
+         c = coeff(f, v)
+
+         @test c == coeff(f, nrand)
+      end
+
+      for iter in 1:10
+         num_vars = nvars(R)
+
+         f = R()
+         rand_len = rand(0:10)
+
+         fit!(f, rand_len)
+
+         for i = 1:rand_len
+            expi = [rand(0:10) for j in 1:num_vars]
+            ci = rand(ZZ, -10:10)
+
+            f = set_exponent_vector!(f, i, expi)
+            f = setcoeff!(f, i, ci)
+         end
+
+         f = sort_terms!(f)
+         f = combine_like_terms!(f)
+
+         for i = 1:length(f) - 1
+            @test AbstractAlgebra.Generic.monomial_cmp(f.exps, i, f.exps, i + 1, R.N, R, UInt(0)) > 0
+         end
+
+         f = R()
+         g = R()
+         h = R()
+
+         exp_arr = unique([[rand(0:10) for j in 1:num_vars] for k in 1:rand_len])
+         for i = 1:length(exp_arr)
+            expi = exp_arr[i]
+            ci = rand(ZZ, -10:10)
+
+            f = set_exponent_vector!(f, i, expi)
+            f = setcoeff!(f, i, ci)
+
+            if ci != 0
+               g = setcoeff!(g, expi, ci)
+               h = setcoeff!(h, expi, Int(ci))
+            end
+         end
+
+         f = sort_terms!(f)
+         f = combine_like_terms!(f)
+
+         @test f == g
+         @test f == h
+      end
+   end
+
+   println("PASS")
+end
+
 function test_gen_mpoly_to_univariate()
    print("Generic.MPoly.to_univariate...")
 
@@ -667,6 +828,8 @@ function test_gen_mpoly()
    test_gen_mpoly_change_base_ring()
    test_gen_mpoly_total_degree()
    test_gen_mpoly_vars()
+   test_gen_mpoly_combine_like_terms()
+   test_gen_mpoly_exponents()
    test_gen_mpoly_to_univariate()
    test_gen_mpoly_coefficients_of_univariate_MPoly()
 
