@@ -3375,6 +3375,60 @@ function coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
+    setcoeff!{S <: RingElem)(a::MPoly, exps::Vector{Int}, c::S)
+> Set the coefficient of the term with the given exponent vector to the given
+> value $c$. This function take $O(\log n)$ operations if a term with the given
+> exponent already exists, or if the term is inserted at the end of the
+> polynomial. Otherwise it can take $O(n)$ operations in the worst case.
+"""
+function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
+   c = base_ring(a)(c)
+   A = a.exps
+   N = size(A, 1)
+   exp2 = Array{UInt, 1}(undef, N)
+   ord = parent(a).ord
+   if ord == :lex
+      exp2[:] = exps[end:-1:1] 
+   elseif ord == :deglex
+      exp2[1:end - 1] = exps[end:-1:1]
+      exp2[end] = sum(exps)
+   else
+      exp2[1:end - 1] = exps[1:end]
+      exp2[end] = sum(exps)
+   end
+   exp2 = reshape(exp2, N, 1)
+   lo = 1
+   hi = length(a)
+   if hi > 0
+      n = div(hi - lo + 1, 2)
+      while hi >= lo
+         v = monomial_cmp(A, lo + n, exp2, 1, N, parent(a), UInt(0))
+         if v == 0
+            a.coeffs[lo + n] = c
+            return a
+         elseif v < 0
+            hi = lo + n - 1
+         else
+            lo = lo + n + 1
+         end
+         n = div(hi - lo + 1, 2)
+      end
+   end
+   # exponent not found, must insert at lo
+   lena = length(a)
+   fit!(a, lena + 1)
+   A = a.exps
+   for i = lena:-1:lo
+      a.coeffs[i + 1] = a.coeffs[i]
+      monomial_set!(A, i + 1, A, i, N)
+   end
+   a.coeffs[lo] = c
+   monomial_set!(A, lo, exp2, 1, N)
+   a.length += 1
+   return a 
+end
+
+@doc Markdown.doc"""
     sort_terms!{T <: RingElem}(a::MPoly{T})
 > Sort the terms of the given polynomial according to the polynomial ring
 > ordering. Zero terms and duplicate exponents are ignored. To deal with those

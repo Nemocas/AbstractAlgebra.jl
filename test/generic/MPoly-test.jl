@@ -712,8 +712,11 @@ function test_gen_mpoly_exponents()
          fit!(f, rand_len)
 
          for i = 1:rand_len
-            f = set_exponent_vector!(f, i, [rand(0:10) for j in 1:num_vars])
-            f = setcoeff!(f, i, rand(ZZ, -10:10))
+            expi = [rand(0:10) for j in 1:num_vars]
+            ci = rand(ZZ, -10:10)
+
+            f = set_exponent_vector!(f, i, expi)
+            f = setcoeff!(f, i, ci)
          end
 
          f = sort_terms!(f)
@@ -722,6 +725,30 @@ function test_gen_mpoly_exponents()
          for i = 1:length(f) - 1
             @test AbstractAlgebra.Generic.monomial_cmp(f.exps, i, f.exps, i + 1, R.N, R, UInt(0)) > 0
          end
+
+         f = R()
+         g = R()
+         h = R()
+
+         exp_arr = unique([[rand(0:10) for j in 1:num_vars] for k in 1:rand_len])
+         for i = 1:length(exp_arr)
+            expi = exp_arr[i]
+            ci = rand(ZZ, -10:10)
+
+            f = set_exponent_vector!(f, i, expi)
+            f = setcoeff!(f, i, ci)
+
+            if ci != 0
+               g = setcoeff!(g, expi, ci)
+               h = setcoeff!(h, expi, Int(ci))
+            end
+         end
+
+         f = sort_terms!(f)
+         f = combine_like_terms!(f)
+
+         @test f == g
+         @test f == h
       end
    end
 
