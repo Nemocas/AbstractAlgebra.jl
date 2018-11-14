@@ -773,7 +773,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "AbstractAlgebra.Generic.gen",
     "category": "method",
-    "text": "gen{T <: RingElement}(R::AbsSeriesRing{T})\n\nReturn the generator of the power series ring, i.e. x + O(x^n) where n is the precision of the power series ring R.\n\n\n\n"
+    "text": "gen{T <: RingElement}(a::MPolyRing{T})\n\nReturn the i-th generator (variable) of the given polynomial ring.\n\n\n\ngen{T <: RingElement}(R::AbsSeriesRing{T})\n\nReturn the generator of the power series ring, i.e. x + O(x^n) where n is the precision of the power series ring R.\n\n\n\n"
 },
 
 {
