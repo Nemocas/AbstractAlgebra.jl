@@ -532,6 +532,17 @@ function test_gen_mpoly_evaluation()
       end
    end
 
+   # Test ordering is correct, see issue #184
+   for iter = 1:10
+      ord = rand_ordering()
+      R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"], ordering = ord)
+
+      f = x*y^2*z^3
+
+      @test evaluate(f, [2, 3, 5]) == 2*9*125
+      @test evaluate(f, BigInt[2, 3, 5]) == 2*9*125
+   end
+
    println("PASS")
 end
 
