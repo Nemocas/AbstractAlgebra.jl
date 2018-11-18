@@ -86,7 +86,7 @@ Markdown.doc"""
 """
 one(R::AbstractAlgebra.NCPolyRing) = R(1)
 
-Markdown.doc"""
+@doc Markdown.doc"""
     gen(R::AbstractAlgebra.NCPolyRing)
 > Return the generator of the given polynomial ring.
 """
