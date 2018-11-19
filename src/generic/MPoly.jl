@@ -92,31 +92,16 @@ end
 > Returns the polynomial obtained by applying g to the coefficients of p.
 """
 function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}
-   symbols_parent = symbols(p.parent)
-
-   n = nvars(p.parent)
-   exps = p.exps
-
-   size_exps = size(p.exps)
-   if p.parent.ord != :lex
-      exps = exps[1:size_exps[1] - 1,:]
-   end
-   if p.parent.ord == :degrevlex
-      exps = exps[end:-1:1,:]
-   end
-
-   new_p = g(zero(base_ring(p.parent)))
-   new_base_ring = parent(new_p)
-   new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in symbols_parent])
+   new_base_ring = parent(g(zero(base_ring(p.parent))))
+   new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in symbols(p.parent)], ordering = p.parent.ord)
    new_p = zero(new_polynomial_ring)
 
    for i = 1:length(p)
-      prod = g(p.coeffs[i])
-      for j = 1:n
-         prod = prod * gens_new_polynomial_ring[j]^Int(exps[n - j + 1, i])
-      end
-      new_p = new_p + prod
+      e = exponent_vector(p,i)
+      set_exponent_vector!(new_p, i, e)
+      setcoeff!(new_p, e, new_base_ring(coeff(p,i)))
    end
+   
    return(new_p)
 end
 
