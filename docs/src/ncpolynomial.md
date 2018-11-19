@@ -146,7 +146,7 @@ trail(::NCPolyElem)
 ```
 
 ```@docs
-gen(::NCPolyElem)
+gen(::NCPolyRing)
 ```
 
 ```@docs
