@@ -17,7 +17,7 @@ parent_type(::Type{MatAlgElem{T}}) where T <: RingElement = MatAlgebra{T}
 elem_type(::Type{MatAlgebra{T}}) where {T <: RingElement} = MatAlgElem{T}
 
 Markdown.doc"""
-    base_ring{T <: RingElement}(S::AbstractAlgebra.MatAlgebra{T})
+    base_ring(a::AbstractAlgebra.MatAlgebra{T}) where {T <: RingElement}
 > Return the base ring $R$ of the given matrix algebra.
 """
 function base_ring(a::AbstractAlgebra.MatAlgebra{T}) where {T <: RingElement}
@@ -25,7 +25,7 @@ function base_ring(a::AbstractAlgebra.MatAlgebra{T}) where {T <: RingElement}
 end
 
 Markdown.doc"""
-    parent(a::AbstractAlgebra.MatAlgElem)
+    parent(a::AbstractAlgebra.MatAlgElem{T}, cached::Bool = true) where T <: RingElement
 > Return the parent object of the given matrix.
 """
 parent(a::AbstractAlgebra.MatAlgElem{T}, cached::Bool = true) where T <: RingElement =
@@ -275,7 +275,7 @@ end
 ###############################################################################
 
 Markdown.doc"""
-    transpose(x::AbstractAlgebra.MatAlgElem)
+    transpose(x::MatAlgElem{T}) where T <: RingElement
 > Return the transpose of the given matrix.
 """
 function transpose(x::MatAlgElem{T}) where T <: RingElement
@@ -286,7 +286,7 @@ function transpose(x::MatAlgElem{T}) where T <: RingElement
 end
 
 Markdown.doc"""
-    gram(x::AbstractAlgebra.MatElem)
+    gram(x::AbstractAlgebra.MatAlgElem)
 > Return the Gram matrix of $x$, i.e. if $x$ is an $r\times c$ matrix return
 > the $r\times r$ matrix whose entries $i, j$ are the dot products of the
 > $i$-th and $j$-th rows, respectively.
@@ -415,7 +415,7 @@ end
 ###############################################################################
 
 Markdown.doc"""
-    minpoly{T <: RingElement}(S::Ring, M::MatAlgElem{T}, charpoly_only = false)
+    minpoly(S::Ring, M::MatAlgElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
 > Returns the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
 > of the resulting polynomial must be supplied and the matrix must be square.
 """
