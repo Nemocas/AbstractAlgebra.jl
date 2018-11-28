@@ -69,7 +69,7 @@ function gen(a::MPolyRing{T}, i::Int, ::Type{Val{:degrevlex}}) where {T <: RingE
 end
 
 @doc Markdown.doc"""
-    gens{T <: RingElement}(a::MPolyRing{T})
+    gens(a::MPolyRing{T}) where {T <: RingElement}
 > Return an array of all the generators (variables) of the given polynomial
 > ring.
 """
@@ -79,7 +79,7 @@ function gens(a::MPolyRing{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    gen{T <: RingElement}(a::MPolyRing{T})
+    gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
 > Return the i-th generator (variable) of the given polynomial
 > ring.
 """
@@ -135,7 +135,7 @@ function vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    ordering{T <: RingElement}(a::MPolyRing{T})
+    ordering(a::MPolyRing{T}) where {T <: RingElement}
 > Return the ordering of the given polynomial ring as a symbol. The options are
 > `:lex`, `:deglex` and `:degrevlex`.
 """
@@ -377,7 +377,7 @@ end
 isdegree(s::Symbol) = s == :deglex || s == :degrevlex
 
 @doc Markdown.doc"""
-    isdegree(s::Symbol)
+    isreverse(s::Symbol)
 > Return `true` if the given symbol represents a reverse ordering (degrevlex).
 """
 isreverse(s::Symbol) = s == :degrevlex
@@ -413,7 +413,7 @@ function isgen(x::MPoly{T}, ::Type{Val{:degrevlex}}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    isgen{T <: RingElement}(x::MPoly{T})
+    isgen(x::MPoly{T}) where {T <: RingElement}
 > Return `true` if the given polynomial is a generator (variable) of the
 > polynomial ring it belongs to.
 """
@@ -436,7 +436,7 @@ function coeff(x::MPoly, i::Int)
 end
 
 @doc Markdown.doc"""
-    max_fields{T <: RingElement}(f::MPoly{T})
+    max_fields(f::MPoly{T}) where {T <: RingElement}
 > Return a tuple `(degs, biggest)` consisting of an array `degs` of the maximum
 > exponent for each field in the exponent vectors of `f` and an integer which
 > is the largest of the entries in `degs`. The array `degs` will have `n + 1`
@@ -509,7 +509,7 @@ function degree(f::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingEle
 end
  
 @doc Markdown.doc"""
-   degree{T <: RingElement}(f::MPoly{T}, i::Int)
+   degree(f::MPoly{T}, i::Int) where T <: RingElement
 > Return the degree of the polynomial $f$ in terms of the i-th variable.
 """
 function degree(f::MPoly{T}, i::Int) where T <: RingElement
@@ -517,7 +517,7 @@ function degree(f::MPoly{T}, i::Int) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-   degrees{T <: RingElement}(f::MPoly{T})
+   degrees(f::MPoly{T}) where T <: RingElement
 > Return an array of the degrees of the polynomial $f$ in terms of each variable.
 """
 function degrees(f::MPoly{T}) where T <: RingElement
@@ -525,7 +525,7 @@ function degrees(f::MPoly{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    total_degree{T <: RingElement}(f::MPoly{T})
+    total_degree(f::MPoly{T}) where {T <: RingElement}
 > Returns the total degree of `f`.
 """
 function total_degree(f::MPoly{T}) where {T <: RingElement}
@@ -556,7 +556,7 @@ function total_degree(f::MPoly{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    length(a::MPoly)
+    length(x::MPoly)
 > Return the number of terms of the polynomial.
 """
 length(x::MPoly) = x.length
@@ -2623,7 +2623,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
 end
 
 @doc Markdown.doc"""
-    divrem{T <: RingElement}(a::MPoly{T}, b::Array{MPoly{T}, 1})
+    divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
 > Return a tuple `(q, r)` consisting of an array of polynomials `q`, one for
 > each polynomial in `b`, and a polynomial `r` such that `a = sum_i b[i]*q[i]`.
 """
@@ -2695,7 +2695,7 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    remove(z::MPoly, p::MPoly)
+    remove(z::MPolyElem{T}, p::MPolyElem{T}) where {T <: RingElement}
 > Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$. Additionally, $z/p^k$ is returned as the second return.
 > value.
@@ -2720,7 +2720,7 @@ function remove(z::MPolyElem{T}, p::MPolyElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    valuation(z::MPoly, p::MPoly)
+    valuation(z::MPolyElem{T}, p::MPolyElem{T}) where {T <: RingElement}
 > Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$.
 >
@@ -2738,7 +2738,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    evaluate{T <: RingElem}(a::MPoly{T}, A::Array{T, 1})
+    evaluate(a::MPoly{T}, A::Array{T, 1}) where {T <: RingElement}
 > Evaluate the polynomial by substituting in the array of values for each of
 > the variables.
 """
@@ -2774,7 +2774,7 @@ function evaluate(a::MPoly{T}, A::Array{T, 1}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    evaluate{T <: RingElement, U <: Integer}(a::MPoly{T}, A::Array{U})
+    evaluate(a::MPoly{T}, A::Array{U}) where {T <: RingElement, U <: Integer}
 > Evaluate the polynomial by substituting in the array of integers for each of
 > the variables.
 """
@@ -2988,7 +2988,7 @@ end
 ################################################################################
 
 Markdown.doc"""
-    derivative{T <: RingElem}(f::MPoly{T}, x::MPoly{T})
+    derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
 > Return the partial derivative of `f` with respect to `x`. The value `x` must
 > be a generator of the polynomial ring of `f`.
 """
@@ -3316,7 +3316,7 @@ function zero!(a::MPoly{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    setcoeff!{T <: RingElem}(a::MPoly{T}, i::Int, c::T)
+    setcoeff!(a::MPoly{T}, i::Int, c::T) where T <: RingElement
 > Set the coefficient of the i-th term of the polynomial to $c$.
 """
 function setcoeff!(a::MPoly{T}, i::Int, c::T) where T <: RingElement
@@ -3329,7 +3329,7 @@ function setcoeff!(a::MPoly{T}, i::Int, c::T) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    setcoeff!{T <: RingElement, U <: Integer}(a::MPoly{T}, i::Int, c::U)
+    setcoeff!(a::MPoly{T}, i::Int, c::U) where {T <: RingElement, U <: Integer}
 > Set the coefficient of the i-th term of the polynomial to the integer $c$.
 """
 function setcoeff!(a::MPoly{T}, i::Int, c::U) where {T <: RingElement, U <: Integer}
@@ -3337,7 +3337,7 @@ function setcoeff!(a::MPoly{T}, i::Int, c::U) where {T <: RingElement, U <: Inte
 end
 
 @doc Markdown.doc"""
-    combine_like_terms!{T <: RingElement}(a::MPoly{T})
+    combine_like_terms!(a::MPoly{T}) where T <: RingElement
 > Remove zero terms and combine adjacent terms if they have the same
 > exponent vector. The modified polynomial is returned.
 """
@@ -3405,7 +3405,7 @@ function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:degrevlex}}) where T 
 end
    
 @doc Markdown.doc"""
-    exponent_vector{T <: RingElem}(a::MPoly{T}, i::Int)
+    exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
 > Return a vector of exponents, corresponding to the exponent vector of the
 > i-th term of the polynomial. Term numbering begins at $1$ and the exponents
 > are given in the order of the variables for the ring, as supplied when the
@@ -3426,7 +3426,7 @@ function exponent(a::MPoly{T}, i::Int, j::Int) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    exponent_vectors{T <: RingElem}(a::MPoly{T})
+    exponent_vectors(a::MPoly{T}) where T <: RingElement
 > Return an array whose entries are the exponent vectors for each of the terms
 > of the polynomial.
 """
@@ -3467,7 +3467,7 @@ function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val
 end
 
 @doc Markdown.doc"""
-set_exponent_vector!{T <: RingElem}(a::MPoly{T}, i::Int, exps::Vector{Int})
+    set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement   
 > Set the i-th exponent vector to the supplied vector, where the entries
 > correspond to the exponents of the variables in the order supplied when
 > the ring was created. The modified polynomial is returned.
@@ -3477,7 +3477,7 @@ function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <:
 end
 
 @doc Markdown.doc"""
-    coeff{T <: RingElem}(a::MPoly{T}, exps::Vector{Int})
+    coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
 > Return the coefficient of the term with the given exponent vector, or zero
 > if there is no such term.
 """
@@ -3514,7 +3514,7 @@ function coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    setcoeff!{S <: RingElem)(a::MPoly, exps::Vector{Int}, c::S)
+    setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
 > Set the coefficient of the term with the given exponent vector to the given
 > value $c$. This function take $O(\log n)$ operations if a term with the given
 > exponent already exists, or if the term is inserted at the end of the
@@ -3568,7 +3568,7 @@ function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
 end
 
 @doc Markdown.doc"""
-    sort_terms!{T <: RingElem}(a::MPoly{T})
+    sort_terms!(a::MPoly{T}) where {T <: RingElement}
 > Sort the terms of the given polynomial according to the polynomial ring
 > ordering. Zero terms and duplicate exponents are ignored. To deal with those
 > call `combine_like_terms`. The sorted polynomial is returned.
