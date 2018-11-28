@@ -820,7 +820,7 @@ end
 > Return $a$ truncated to $n$ terms.
 """
 function truncate(a::PolynomialElem, n::Int)
-   n < 0 && throw(DomainError())
+   
    lena = length(a)
    if lena <= n
       return a
@@ -1203,7 +1203,7 @@ function pseudorem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T
 end
 
 @doc Markdown.doc"""
-    pseudodivrem{T <: RingElement}(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T})
+    pseudodivrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Return a tuple $(q, r)$ consisting of the pseudoquotient and pseudoremainder
 > of $a$ divided by $b$. If $b = 0$ we throw a `DivideError()`.
 """
@@ -1244,7 +1244,7 @@ end
 #CF TODO: use squaring for fast large valuation
 
 @doc Markdown.doc"""
-    remove{T <: RingElement}(z::AbstractAlgebra.PolyElem{T}, p::AbstractAlgebra.PolyElem{T})
+   remove(z::AbstractAlgebra.PolyElem{T}, p::AbstractAlgebra.PolyElem{T}) where T <: RingElement
 > Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
 >
@@ -1269,7 +1269,7 @@ function remove(z::AbstractAlgebra.PolyElem{T}, p::AbstractAlgebra.PolyElem{T}) 
 end
 
 @doc Markdown.doc"""
-    remove{T <: Union{AbstractAlgebra.ResElem, FieldElement}}(z::AbstractAlgebra.PolyElem{T}, p::AbstractAlgebra.PolyElem{T})
+    remove(z::AbstractAlgebra.PolyElem{T}, p::AbstractAlgebra.PolyElem{T}) where T <: Union{AbstractAlgebra.ResElem, FieldElement}
 > Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
 >
@@ -1294,7 +1294,7 @@ function remove(z::AbstractAlgebra.PolyElem{T}, p::AbstractAlgebra.PolyElem{T}) 
 end
 
 @doc Markdown.doc"""
-    valuation{T <: RingElement}(z::AbstractAlgebra.PolyElem{T}, p::AbstractAlgebra.PolyElem{T})
+    valuation(z::AbstractAlgebra.PolyElem{T}, p::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$.
 >
@@ -1306,7 +1306,7 @@ function valuation(z::AbstractAlgebra.PolyElem{T}, p::AbstractAlgebra.PolyElem{T
 end
 
 @doc Markdown.doc"""
-    divides{T <: RingElement}(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T})
+    divides(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Returns a pair consisting of a flag which is set to `true` if $g$ divides
 > $f$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
 > such a polynomial exists. If not, the value of $h$ is undetermined.
@@ -1349,7 +1349,7 @@ function divides(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T})
 end
 
 @doc Markdown.doc"""
-    divides{T <: RingElement}(f::AbstractAlgebra.PolyElem{T}, g::T)
+    divides(z::AbstractAlgebra.PolyElem{T}, x::T) where {T <: RingElement}
 > Returns a pair consisting of a flag which is set to `true` if $g$ divides
 > $f$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
 > such a polynomial exists. If not, the value of $h$ is undetermined.
@@ -1409,7 +1409,7 @@ function term_content(a::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    gcd{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})
+    gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, ignore_content::Bool = false) where {T <: RingElement}
 > Return a greatest common divisor of $a$ and $b$ if it exists.
 """
 function gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, ignore_content::Bool = false) where {T <: RingElement}
@@ -1512,7 +1512,7 @@ function gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) whe
 end
 
 @doc Markdown.doc"""
-    lcm{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})
+    lcm(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Return a least common multiple of $a$ and $b$ if it exists.
 """
 function lcm(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
@@ -1557,7 +1557,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    evaluate{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::T)
+    evaluate(a::AbstractAlgebra.PolyElem, b::T) where {T <: RingElement}
 > Evaluate the polynomial $a$ at the value $b$ and return the result.
 """
 function evaluate(a::AbstractAlgebra.PolyElem, b::T) where {T <: RingElement}
@@ -1607,7 +1607,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    derivative(a::AbstractAlgebra.PolyElem)
+    derivative(a::PolynomialElem)
 > Return the derivative of the polynomial $a$.
 """
 function derivative(a::PolynomialElem)
@@ -1631,7 +1631,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    integral{T <: Union{AbstractAlgebra.ResElem, FieldElement}}(x::AbstractAlgebra.PolyElem{T})
+    integral(x::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
 > Return the integral of the polynomial $a$.
 """
 function integral(x::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
@@ -1710,7 +1710,7 @@ function subresultant_ducos(A::AbstractAlgebra.PolyElem{T}, Sd1::AbstractAlgebra
 end
 
 @doc Markdown.doc"""
-    resultant{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})
+    resultant_ducos(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Return the resultant of the $a$ and $b$.
 """
 # See the paper, "Optimizations of the subresultant algorithm" by Lionel
@@ -1923,7 +1923,7 @@ function resultant_sylvester(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgebra.
 end
 
 @doc Markdown.doc"""
-    resultant{T <: RingElem}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})
+    resultant(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Return the resultant of the given polynomials.
 """
 function resultant(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
@@ -2016,7 +2016,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    resx{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})
+    resx(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Return a tuple $(r, s, t)$ such that $r$ is the resultant of $a$ and $b$ and
 > such that $r = a\times s + b\times t$.
 """
@@ -2102,7 +2102,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    gcdx{T <: Union{AbstractAlgebra.ResElem, FieldElement}}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})
+    gcdx(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
 > Return a tuple $(g, s, t)$ such that $g$ is the greatest common divisor of
 > $a$ and $b$ and such that $r = a\times s + b\times t$.
 """
@@ -2147,7 +2147,7 @@ function gcdx(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) wh
 end
 
 @doc Markdown.doc"""
-    gcdinv{T <: Union{AbstractAlgebra.ResElem, FieldElement}}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})
+    gcdinv(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
 > Return a tuple $(g, s)$ such that $g$ is the greatest common divisor of $a$
 > and $b$ and such that $s = a^{-1} \pmod{b}$. This function is useful for
 > inverting modulo a polynomial and checking that it really was invertible.
@@ -2201,7 +2201,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    monomial_to_newton!{T <: RingElement}(P::Array{T, 1}, roots::Array{T, 1})
+    monomial_to_newton!(P::Array{T, 1}, roots::Array{T, 1}) where {T <: RingElement}
 > Converts a polynomial $p$, given as an array of coefficients, in-place
 > from its coefficients given in the standard monomial basis to the Newton
 > basis for the roots $r_0, r_1, \ldots, r_{n-2}$. In other words, this
@@ -2225,7 +2225,7 @@ function monomial_to_newton!(P::Array{T, 1}, roots::Array{T, 1}) where {T <: Rin
 end
 
 @doc Markdown.doc"""
-    newton_to_monomial!{T <: RingElement}(P::Array{T, 1}, roots::Array{T, 1})
+    newton_to_monomial!(P::Array{T, 1}, roots::Array{T, 1}) where {T <: RingElement}
 > Converts a polynomial $p$, given as an array of coefficients, in-place
 > from its coefficients given in the Newton basis for the roots
 > $r_0, r_1, \ldots, r_{n-2}$ to the standard monomial basis. In other words,
@@ -2256,7 +2256,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    interpolate{T <: RingElement}(S::AbstractAlgebra.PolyRing, x::Array{T, 1}, y::Array{T, 1})
+    interpolate(S::AbstractAlgebra.PolyRing, x::Array{T, 1}, y::Array{T, 1}) where {T <: RingElement}
 > Given two arrays of values $xs$ and $ys$ of the same length $n$, find
 > the polynomial $f$ in the polynomial ring $R$ of length at most $n$ such that
 > $f$ has the value $ys$ at the points $xs$. The values in the arrays $xs$ and
@@ -2558,7 +2558,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    subst{T <: RingElement}(f::AbstractAlgebra.PolyElem{T}, a::Any)
+    subst(f::AbstractAlgebra.PolyElem{T}, a::Any) where {T <: RingElement}
 > Evaluate the polynomial $f$ at $a$. Note that $a$ can be anything, whether
 > a ring element or not.
 """
