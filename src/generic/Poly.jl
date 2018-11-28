@@ -28,19 +28,19 @@ parent_type(::Type{Poly{T}}) where T <: RingElement = PolyRing{T}
 elem_type(::Type{PolyRing{T}}) where T <: RingElement = Poly{T}
 
 @doc Markdown.doc"""
-    base_ring(R::AbstractAlgebra.PolyRing)
+    base_ring(R::AbstractAlgebra.PolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 > Return the base ring of the given polynomial ring.
 """
 base_ring(R::AbstractAlgebra.PolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
 @doc Markdown.doc"""
-    base_ring(a::AbstractAlgebra.PolyElem)
+    base_ring(a::PolynomialElem)
 > Return the base ring of the polynomial ring of the given polynomial.
 """
 base_ring(a::PolynomialElem) = base_ring(parent(a))
 
 @doc Markdown.doc"""
-    parent(a::AbstractAlgebra.PolyElem)
+    parent(a::PolynomialElem)
 > Return the parent of the given polynomial.
 """
 parent(a::PolynomialElem) = a.parent
@@ -107,14 +107,14 @@ end
 length(a::PolynomialElem) = a.length
 
 @doc Markdown.doc"""
-    degree(a::AbstractAlgebra.PolyElem)
+    degree(a::PolynomialElem)
 > Return the degree of the given polynomial. This is defined to be one less
 > than the length, even for constant polynomials.
 """
 degree(a::PolynomialElem) = length(a) - 1
 
 @doc Markdown.doc"""
-    modulus{T <: ResElem}(a::AbstractAlgebra.PolyElem{T})
+    modulus(a::AbstractAlgebra.PolyElem{T}) where {T <: ResElem} = modulus(base_ring(a))
 > Return the modulus of the coefficients of the given polynomial.
 """
 modulus(a::AbstractAlgebra.PolyElem{T}) where {T <: ResElem} = modulus(base_ring(a))
@@ -122,7 +122,7 @@ modulus(a::AbstractAlgebra.PolyElem{T}) where {T <: ResElem} = modulus(base_ring
 coeff(a::Poly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
 @doc Markdown.doc"""
-    lead(x::AbstractAlgebra.PolyElem)
+    lead(a::PolynomialElem)
 > Return the leading coefficient of the given polynomial. This will be the
 > nonzero coefficient of the term with highest degree unless the polynomial
 > in the zero polynomial, in which case a zero coefficient is returned.
@@ -130,7 +130,7 @@ coeff(a::Poly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 lead(a::PolynomialElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
 
 @doc Markdown.doc"""
-    trail(x::AbstractAlgebra.PolyElem)
+    trail(a::PolynomialElem)
 > Return the trailing coefficient of the given polynomial. This will be the
 > nonzero coefficient of the term with lowest degree unless the polynomial
 > in the zero polynomial, in which case a zero coefficient is returned.
@@ -168,20 +168,20 @@ one(R::AbstractAlgebra.PolyRing) = R(1)
 gen(R::AbstractAlgebra.PolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
 @doc Markdown.doc"""
-    iszero(a::AbstractAlgebra.PolyElem)
+    iszero(a::PolynomialElem)
 > Return `true` if the given polynomial is zero, otherwise return `false`.
 """
 iszero(a::PolynomialElem) = length(a) == 0
 
 @doc Markdown.doc"""
-    isone(a::AbstractAlgebra.PolyElem)
+    isone(a::PolynomialElem)
 > Return `true` if the given polynomial is the constant polynomial $1$,
 > otherwise return `false`.
 """
 isone(a::PolynomialElem) = length(a) == 1 && isone(coeff(a, 0))
 
 @doc Markdown.doc"""
-    isgen(a::AbstractAlgebra.PolyElem)
+    isgen(a::PolynomialElem)
 > Return `true` if the given polynomial is the constant generator of its
 > polynomial ring, otherwise return `false`.
 """
@@ -190,7 +190,7 @@ function isgen(a::PolynomialElem)
 end
 
 @doc Markdown.doc"""
-    isunit(a::AbstractAlgebra.PolyElem)
+    isunit(a::PolynomialElem)
 > Return `true` if the given polynomial is a unit in its polynomial ring,
 > otherwise return `false`.
 """
@@ -199,7 +199,7 @@ isunit(a::PolynomialElem) = length(a) == 1 && isunit(coeff(a, 0))
 isterm(a::T) where {T <: RingElement} = true
 
 @doc Markdown.doc"""
-    isterm(a::AbstractAlgebra.PolyElem)
+    isterm(a::PolynomialElem)
 > Return `true` if the given polynomial is has one term. This function is
 > recursive, with all scalar types returning true.
 """
@@ -218,7 +218,7 @@ end
 ismonomial(a::T) where {T <: RingElement} = isone(a)
 
 @doc Markdown.doc"""
-    ismonomial(a::AbstractAlgebra.PolyElem)
+    ismonomial(a::PolynomialElem)
 > Return `true` if the given polynomial is a monomial.
 """
 function ismonomial(a::PolynomialElem)
@@ -325,7 +325,7 @@ show_minus_one(::Type{Poly{T}}) where {T <: RingElement} = show_minus_one(T)
 ###############################################################################
 
 @doc Markdown.doc"""
-    -(a::AbstractAlgebra.PolyElem)
+    -(a::PolynomialElem)
 > Return $-a$.
 """
 function -(a::PolynomialElem)
@@ -346,7 +346,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    +{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})
+    +(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Return $a + b$.
 """
 function +(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
@@ -374,7 +374,7 @@ function +(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where
 end
 
 @doc Markdown.doc"""
-    -{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})
+    -(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Return $a - b$.
 """
 function -(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
@@ -549,7 +549,7 @@ function mul_classical(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyEl
 end
 
 @doc Markdown.doc"""
-    *{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})
+    *(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Return $a\times b$.
 """
 function *(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
@@ -564,7 +564,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    *{T <: RingElem}(a::T, b::AbstractAlgebra.PolyElem{T})
+    *(a::T, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElem}
 > Return $a\times b$.
 """
 function *(a::T, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElem}
@@ -579,7 +579,7 @@ function *(a::T, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElem}
 end
 
 @doc Markdown.doc"""
-    *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.PolyElem)
+    *(a::Union{Integer, Rational, AbstractFloat}, b::PolynomialElem)
 > Return $a\times b$.
 """
 function *(a::Union{Integer, Rational, AbstractFloat}, b::PolynomialElem)
@@ -594,13 +594,13 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::PolynomialElem)
 end
 
 @doc Markdown.doc"""
-    *{T <: RingElem}(a::AbstractAlgebra.PolyElem{T}, b::T)
+    *(a::AbstractAlgebra.PolyElem{T}, b::T) where {T <: RingElem}
 > Return $a\times b$.
 """
 *(a::AbstractAlgebra.PolyElem{T}, b::T) where {T <: RingElem} = b*a
 
 @doc Markdown.doc"""
-    *(a::AbstractAlgebra.PolyElem, b::Union{Integer, Rational, AbstractFloat})
+    *(a::PolynomialElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a\times b$.
 """
 *(a::PolynomialElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
@@ -638,7 +638,7 @@ function pow_multinomial(a::AbstractAlgebra.PolyElem{T}, e::Int) where {T <: Rin
 end
 
 @doc Markdown.doc"""
-    ^{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::Int)
+    ^(a::AbstractAlgebra.PolyElem{T}, b::Int) where {T <: RingElement}
 > Return $a^b$. We require $b \geq 0$.
 """
 function ^(a::AbstractAlgebra.PolyElem{T}, b::Int) where {T <: RingElement}
@@ -697,7 +697,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    =={T <: RingElement}(x::AbstractAlgebra.PolyElem{T}, y::AbstractAlgebra.PolyElem{T})
+    ==(x::AbstractAlgebra.PolyElem{T}, y::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
 > equal to the minimum of the two precisions.
@@ -717,7 +717,7 @@ function ==(x::AbstractAlgebra.PolyElem{T}, y::AbstractAlgebra.PolyElem{T}) wher
 end
 
 @doc Markdown.doc"""
-    isequal{T <: RingElement}(x::AbstractAlgebra.PolyElem{T}, y::AbstractAlgebra.PolyElem{T})
+    isequal(x::AbstractAlgebra.PolyElem{T}, y::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Return `true` if $x == y$ exactly, otherwise return `false`. This function is
 > useful in cases where the coefficients of the polynomial are inexact, e.g.
 > power series. Only if the power series are precisely the same, to the same
@@ -745,21 +745,21 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    =={T <: RingElem}(x::AbstractAlgebra.PolyElem{T}, y::T)
+    ==(x::AbstractAlgebra.PolyElem{T}, y::T) where {T <: RingElem}
 > Return `true` if $x == y$.
 """
 ==(x::AbstractAlgebra.PolyElem{T}, y::T) where T <: RingElem = ((length(x) == 0 && y == 0)
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 @doc Markdown.doc"""
-    ==(x::AbstractAlgebra.PolyElem, y::Union{Integer, Rational, AbstractFloat})
+    ==(x::PolynomialElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::PolynomialElem, y::Union{Integer, Rational, AbstractFloat}) = ((length(x) == 0 && base_ring(x)(y) == 0)
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 @doc Markdown.doc"""
-    =={T <: RingElem}(x::T, y::AbstractAlgebra.PolyElem{T})
+    ==(x::T, y::AbstractAlgebra.PolyElem{T}) where T <: RingElem = y == x
 > Return `true` if $x = y$.
 """
 ==(x::T, y::AbstractAlgebra.PolyElem{T}) where T <: RingElem = y == x
@@ -816,7 +816,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    truncate(a::AbstractAlgebra.PolyElem, n::Int)
+    truncate(a::PolynomialElem, n::Int)
 > Return $a$ truncated to $n$ terms.
 """
 function truncate(a::PolynomialElem, n::Int)
@@ -836,7 +836,7 @@ function truncate(a::PolynomialElem, n::Int)
 end
 
 @doc Markdown.doc"""
-    mullow{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, n::Int)
+    mullow(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, n::Int) where {T <: RingElement}
 > Return $a\times b$ truncated to $n$ terms.
 """
 function mullow(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, n::Int) where {T <: RingElement}
@@ -880,7 +880,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    reverse(x::AbstractAlgebra.PolyElem, len::Int)
+    reverse(x::PolynomialElem, len::Int)
 > Return the reverse of the polynomial $x$, thought of as a polynomial of
 > the given length (the polynomial will be notionally truncated or padded with
 > zeroes before the leading term if necessary to match the specified length).
@@ -899,7 +899,7 @@ function reverse(x::PolynomialElem, len::Int)
 end
 
 @doc Markdown.doc"""
-    reverse(x::AbstractAlgebra.PolyElem)
+    reverse(x::PolynomialElem)
 > Return the reverse of the polynomial $x$, i.e. the leading coefficient
 > of $x$ becomes the constant coefficient of the result, etc. The resulting
 > polynomial is normalised.
@@ -915,7 +915,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    shift_left(x::AbstractAlgebra.PolyElem, n::Int)
+    shift_left(f::PolynomialElem, n::Int)
 > Return the polynomial $f$ shifted left by $n$ terms, i.e. multiplied by
 > $x^n$.
 """
@@ -937,7 +937,7 @@ function shift_left(f::PolynomialElem, n::Int)
 end
 
 @doc Markdown.doc"""
-    shift_right(f::AbstractAlgebra.PolyElem, n::Int)
+    shift_right(f::PolynomialElem, n::Int)
 > Return the polynomial $f$ shifted right by $n$ terms, i.e. divided by
 > $x^n$.
 """
@@ -965,7 +965,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    mulmod{T <: Union{AbstractAlgebra.ResElem, FieldElement}}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, d::AbstractAlgebra.PolyElem{T})
+    mulmod(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, d::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
 > Return $a\times b \pmod{d}$.
 """
 function mulmod(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, d::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
@@ -975,7 +975,7 @@ function mulmod(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, 
 end
 
 @doc Markdown.doc"""
-    powmod{T <: Union{AbstractAlgebra.ResElem, FieldElement}}(a::AbstractAlgebra.PolyElem{T}, b::Int, d::AbstractAlgebra.PolyElem{T})
+    powmod(a::AbstractAlgebra.PolyElem{T}, b::Int, d::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
 > Return $a^b \pmod{d}$. There are no restrictions on $b$.
 """
 function powmod(a::AbstractAlgebra.PolyElem{T}, b::Int, d::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
@@ -1012,7 +1012,7 @@ function powmod(a::AbstractAlgebra.PolyElem{T}, b::Int, d::AbstractAlgebra.PolyE
 end
 
 @doc Markdown.doc"""
-    invmod{T <: Union{AbstractAlgebra.ResElem, FieldElement}}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})
+    invmod(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
 > Return $a^{-1} \pmod{d}$.
 """
 function invmod(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
@@ -1031,7 +1031,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    divexact{T <: RingElement}(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T})
+    divexact(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Return $a/b$ where the quotient is expected to be exact.
 """
 function divexact(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
@@ -1067,7 +1067,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    divexact{T <: RingElem}(a::AbstractAlgebra.PolyElem{T}, b::T)
+    divexact(a::AbstractAlgebra.PolyElem{T}, b::T) where {T <: RingElem}
 > Return $a/b$ where the quotient is expected to be exact.
 """
 function divexact(a::AbstractAlgebra.PolyElem{T}, b::T) where {T <: RingElem}
@@ -1103,7 +1103,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    mod{T <: Union{AbstractAlgebra.ResElem, FieldElement}}(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T})
+    mod(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
 > Return $f \pmod{g}$.
 """
 function mod(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
@@ -1131,7 +1131,7 @@ function mod(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) whe
 end
 
 @doc Markdown.doc"""
-    divrem{T <: Union{AbstractAlgebra.ResElem, FieldElement}}(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T})
+    divrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
 > Return a tuple $(q, r)$ such that $f = qg + r$ where $q$ is the euclidean
 > quotient of $f$ by $g$.
 """
@@ -1166,7 +1166,7 @@ function divrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) 
 end
 
 @doc Markdown.doc"""
-    div{T <: Union{AbstractAlgebra.ResElem, FieldElement}}(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T})
+    div(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
 > Return a tuple $q$ such that $f = qg + r$ where $q$ is the euclidean
 > quotient of $f$ by $g$.
 """
@@ -1182,7 +1182,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    pseudorem{T <: RingElement}(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T})
+    pseudorem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Return the pseudoremainder of $a$ divided by $b$. If $b = 0$ we throw a
 > `DivideError()`.
 """
