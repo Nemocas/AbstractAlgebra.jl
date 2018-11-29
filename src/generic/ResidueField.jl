@@ -17,7 +17,7 @@ parent_type(::Type{ResF{T}}) where T <: RingElement = ResField{T}
 elem_type(::Type{ResField{T}}) where {T <: RingElement} = ResF{T}
 
 @doc Markdown.doc"""
-    base_ring{T <: RingElement}(S::AbstractAlgebra.ResField{T})
+    base_ring(S::AbstractAlgebra.ResField{T}) where {T <: RingElement}
 > Return the base ring $R$ of the given residue ring $S = R/(a)$.
 """
 base_ring(S::AbstractAlgebra.ResField{T}) where {T <: RingElement} = S.base_ring::parent_type(T)
@@ -64,7 +64,7 @@ function Base.hash(a::AbstractAlgebra.ResFieldElem, h::UInt)
 end
 
 @doc Markdown.doc"""
-    modulus(R::AbstractAlgebra.ResField)
+    modulus(S::AbstractAlgebra.ResField)
 > Return the modulus $a$ of the given residue ring $S = R/(a)$.
 """
 function modulus(S::AbstractAlgebra.ResField)
@@ -72,7 +72,7 @@ function modulus(S::AbstractAlgebra.ResField)
 end
 
 @doc Markdown.doc"""
-    modulus(R::AbstractAlgebra.ResFieldElem)
+    modulus(r::AbstractAlgebra.ResFieldElem)
 > Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
 > residue $r$ belongs to.
 """
@@ -81,7 +81,7 @@ function modulus(r::AbstractAlgebra.ResFieldElem)
 end
 
 @doc Markdown.doc"""
-    characteristic(R::AbstractAlgebra.ResField)
+    characteristic(r::AbstractAlgebra.ResField)
 > Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
 > residue $r$ belongs to.
 """
@@ -97,7 +97,7 @@ function characteristic(r::AbstractAlgebra.ResField)
 end
 
 @doc Markdown.doc"""
-    characteristic{T <: Integer}(R::AbstractAlgebra.ResField{T})
+    characteristic(r::AbstractAlgebra.ResField{T}) where T <: Integer
 > Return the modulus $a$ of the residue ring $S = R/(a)$ that the supplied
 > residue $r$ belongs to.
 """
@@ -201,7 +201,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    +{T <: RingElement}(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T})
+    +(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
 > Return $a + b$.
 """
 function +(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
@@ -210,7 +210,7 @@ function +(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T
 end
 
 @doc Markdown.doc"""
-    -{T <: RingElement}(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T})
+    -(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
 > Return $a - b$.
 """
 function -(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
@@ -219,7 +219,7 @@ function -(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T
 end
 
 @doc Markdown.doc"""
-    *{T <: RingElement}(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T})
+    *(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
 > Return $a\times b$.
 """
 function *(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
@@ -240,7 +240,7 @@ end
 *(a::AbstractAlgebra.ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) * b)
 
 @doc Markdown.doc"""
-    *{T <: RingElem}(a::AbstractAlgebra.ResFieldElem{T}, b::T)
+    *(a::AbstractAlgebra.ResFieldElem{T}, b::T) where {T <: RingElem}
 > Return $a\times b$.
 """
 *(a::AbstractAlgebra.ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) * b)
@@ -252,7 +252,7 @@ end
 *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResFieldElem) = parent(b)(a * data(b))
 
 @doc Markdown.doc"""
-    *{T <: RingElem}(a::T, b::AbstractAlgebra.ResFieldElem{T})
+    *(a::T, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElem}
 > Return $a\times b$.
 """
 *(a::T, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElem} = parent(b)(a * data(b))
@@ -264,7 +264,7 @@ end
 +(a::AbstractAlgebra.ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) + b)
 
 @doc Markdown.doc"""
-    +{T <: RingElem}(a::AbstractAlgebra.ResFieldElem{T}, b::T)
+    +(a::AbstractAlgebra.ResFieldElem{T}, b::T) where {T <: RingElem}
 > Return $a + b$.
 """
 +(a::AbstractAlgebra.ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) + b)
@@ -276,7 +276,7 @@ end
 +(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResFieldElem) = parent(b)(a + data(b))
 
 @doc Markdown.doc"""
-    +{T <: RingElem}(a::T, b::AbstractAlgebra.ResFieldElem{T})
+    +(a::T, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElem}
 > Return $a + b$.
 """
 +(a::T, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElem} = parent(b)(a + data(b))
@@ -288,7 +288,7 @@ end
 -(a::AbstractAlgebra.ResFieldElem, b::Union{Integer, Rational, AbstractFloat}) = parent(a)(data(a) - b)
 
 @doc Markdown.doc"""
-    -{T <: RingElem}(a::AbstractAlgebra.ResFieldElem{T}, b::T)
+    -(a::AbstractAlgebra.ResFieldElem{T}, b::T) where {T <: RingElem}
 > Return $a - b$.
 """
 -(a::AbstractAlgebra.ResFieldElem{T}, b::T) where {T <: RingElem} = parent(a)(data(a) - b)
@@ -300,7 +300,7 @@ end
 -(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResFieldElem) = parent(b)(a - data(b))
 
 @doc Markdown.doc"""
-    -{T <: RingElem}(a::T, b::AbstractAlgebra.ResFieldElem{T})
+    -(a::T, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElem}
 > Return $a - b$.
 """
 -(a::T, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElem} = parent(b)(a - data(b))
@@ -326,7 +326,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    =={T <: RingElement}(x::AbstractAlgebra.ResFieldElem{T}, y::AbstractAlgebra.ResFieldElem{T})
+    ==(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
 > equal to the minimum of the two precisions.
@@ -337,7 +337,7 @@ function ==(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{
 end
 
 @doc Markdown.doc"""
-    isequal{T <: RingElement}(x::AbstractAlgebra.ResFieldElem{T}, y::AbstractAlgebra.ResFieldElem{T})
+    isequal(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
 > Return `true` if $x == y$ exactly, otherwise return `false`. This function is
 > useful in cases where the data of the residues are inexact, e.g. power series
 > Only if the power series are precisely the same, to the same precision, are
@@ -355,7 +355,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ==(x::AbstractAlgebra.ResFieldElem, y::Union{Integer, Rational, AbstractFloat})
+    ==(a::AbstractAlgebra.ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 function ==(a::AbstractAlgebra.ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
@@ -364,7 +364,7 @@ function ==(a::AbstractAlgebra.ResFieldElem, b::Union{Integer, Rational, Abstrac
 end
 
 @doc Markdown.doc"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.ResFieldElem)
+    ==(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResFieldElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 function ==(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResFieldElem)
@@ -373,7 +373,7 @@ function ==(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResFi
 end
 
 @doc Markdown.doc"""
-    =={T <: RingElem}(x::AbstractAlgebra.ResFieldElem{T}, y::T)
+    ==(a::AbstractAlgebra.ResFieldElem{T}, b::T) where {T <: RingElem}
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 function ==(a::AbstractAlgebra.ResFieldElem{T}, b::T) where {T <: RingElem}
@@ -382,7 +382,7 @@ function ==(a::AbstractAlgebra.ResFieldElem{T}, b::T) where {T <: RingElem}
 end
 
 @doc Markdown.doc"""
-    =={T <: RingElem}(x::T, y::AbstractAlgebra.ResFieldElem{T})
+    ==(a::T, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElem}
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 function ==(a::T, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElem}
@@ -416,7 +416,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    divexact{T <: RingElement}(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T})
+    divexact(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
 > Return $a/b$ where the quotient is expected to be exact.
 """
 function divexact(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
@@ -441,7 +441,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    gcd{T <: RingElement}(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T})
+    gcd(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
 > Return a greatest common divisor of $a$ and $b$ if one exists. This is done
 > by taking the greatest common divisor of the data associated with the
 > supplied residues and taking its greatest common divisor with the modulus.
@@ -541,7 +541,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ResidueField{T <: RingElement}(R::AbstractAlgebra.Ring, a::RingElement; cached::Bool=true)
+    ResidueField(R::AbstractAlgebra.Ring, a::RingElement; cached::Bool = true)
 > Create the residue ring $R/(a)$ where $a$ is an element of the ring $R$. We
 > require $a \neq 0$. If `cached == true` (the default) then the resulting
 > residue ring parent object is cached and returned for any subsequent calls
