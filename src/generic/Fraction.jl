@@ -210,10 +210,49 @@ end
 """
 function +(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
-   n = numerator(a)*denominator(b) + numerator(b)*denominator(a)
-   d = denominator(a)*denominator(b)
-   g = gcd(n, d)
-   return parent(a)(divexact(n, g), divexact(d, g))
+   d1 = denominator(a)
+   d2 = denominator(b)
+   n1 = numerator(a)
+   n2 = numerator(b)
+   gd = gcd(d1, d2)
+   if d1 == d2
+      rnum = n1 + n2
+      if isone(d1)
+         rden = d1
+      else
+         gd = gcd(rnum, d1)
+         if isone(gd)
+            rden = d1
+         else
+            rnum = divexact(rnum, gd)
+            rden = divexact(d1, gd)
+         end
+      end
+   elseif isone(d1)
+      rnum = n1*d2 + n2
+      rden = d2
+   elseif isone(d2)
+      rnum = n1 + n2*d1
+      rden = d1
+   else
+      if isone(gd)
+         rnum = n1*d2 + n2*d1
+         rden = d1*d2
+      else
+         q1 = divexact(d1, gd)
+         q2 = divexact(d2, gd)
+         rnum = q1*n2 + q2*n1
+         t = gcd(rnum, gd)
+         if isone(t)
+            rden = q2*d1
+         else
+            rnum = divexact(rnum, t)
+            gd = divexact(d1, t)
+            rden = gd*q2
+         end
+      end
+   end
+   return parent(a)(rnum, rden)
 end
 
 @doc Markdown.doc"""
@@ -222,10 +261,49 @@ end
 """
 function -(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
-   n = numerator(a)*denominator(b) - numerator(b)*denominator(a)
-   d = denominator(a)*denominator(b)
-   g = gcd(n, d)
-   return parent(a)(divexact(n, g), divexact(d, g))
+   d1 = denominator(a)
+   d2 = denominator(b)
+   n1 = numerator(a)
+   n2 = numerator(b)
+   if d1 == d2
+      rnum = n1 - n2
+      if isone(d1)
+         rden = d1
+      else
+         gd = gcd(rnum, d1)
+         if isone(gd)
+            rden = d1
+         else
+            rnum = divexact(rnum, gd)
+            rden = divexact(d1, gd)
+         end
+      end
+   elseif isone(d1)
+      rnum = n1*d2 - n2
+      rden = d2
+   elseif isone(d2)
+      rnum = n1 - n2*d1
+      rden = d1
+   else
+      gd = gcd(d1, d2)
+      if isone(gd)
+         rnum = n1*d2 - n2*d1
+         rden = d1*d2
+      else
+         q1 = divexact(d1, gd)
+         q2 = divexact(d2, gd)
+         rnum = q1*n2 - q2*n1
+         t = gcd(rnum, gd)
+         if isone(t)
+            rden = q2*d1
+         else
+            rnum = divexact(rnum, t)
+            gd = divexact(d1, t)
+            rden = gd*q2
+         end
+      end
+   end
+   return parent(a)(rnum, rden)
 end
 
 @doc Markdown.doc"""
