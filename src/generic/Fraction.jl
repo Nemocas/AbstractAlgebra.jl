@@ -214,13 +214,19 @@ function +(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where
    d2 = denominator(b)
    n1 = numerator(a)
    n2 = numerator(b)
+println("one: ", d1, " --- ", d2)
    gd = gcd(d1, d2)
+println("result: ", gd)
+println("")
    if d1 == d2
       rnum = n1 + n2
       if isone(d1)
          rden = d1
       else
+println("two: ", rnum, " --- ", d1)
          gd = gcd(rnum, d1)
+println("result: ", t)
+println("")
          if isone(gd)
             rden = d1
          else
@@ -242,7 +248,10 @@ function +(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where
          q1 = divexact(d1, gd)
          q2 = divexact(d2, gd)
          rnum = q1*n2 + q2*n1
+println("three: ", rnum, " ---- ", gd)
          t = gcd(rnum, gd)
+println("result: ", t)
+println("")
          if isone(t)
             rden = q2*d1
          else
