@@ -312,10 +312,45 @@ end
 """
 function *(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
-   g1 = gcd(numerator(a), denominator(b))
-   g2 = gcd(numerator(b), denominator(a))
-   n = divexact(numerator(a), g1)*divexact(numerator(b), g2)
-   d = divexact(denominator(a), g2)*divexact(denominator(b), g1)
+   n1 = numerator(a)
+   d2 = denominator(b)
+   n2 = numerator(b)
+   d1 = denominator(a)
+   if d1 == d2
+      n = n1*n2
+      d = d1*d2
+   elseif isone(d1)
+      gd = gcd(n1, d2)
+      if isone(gd)
+         n = n1*n2
+         d = d2
+      else
+         n = divexact(n1, gd)*n2
+         d = divexact(d2, gd)
+      end
+   elseif isone(d2)
+      gd = gcd(n2, d1)
+      if isone(gd)
+         n = n2*n1
+         d = d1
+      else
+         n = divexact(n2, gd)*n1
+         d = divexact(d1, gd)
+      end
+   else
+      g1 = gcd(n1, d2)
+      g2 = gcd(n2, d1)
+      if !isone(g1)
+         n1 = divexact(n1, g1)
+         d2 = divexact(d2, g1)
+      end
+      if !isone(g2)
+         n2 = divexact(n2, g2)
+         d1 = divexact(d1, g2)
+      end
+      n = n1*n2
+      d = d1*d2
+   end
    return parent(a)(n, d)
 end
 
