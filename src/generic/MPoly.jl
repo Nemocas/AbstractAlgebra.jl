@@ -3618,6 +3618,13 @@ function (a::MPolyRing{T})(b::Array{T, 1}, m::Vector{Vector{Int}}) where {T <: R
    z = combine_like_terms!(z)
    return z
 end 
+
+###############################################################################
+#
+#   Univariate polynomials
+#
+###############################################################################
+
  
 function to_univariate(R:: AbstractAlgebra.Generic.PolyRing{T}, p::AbstractAlgebra.Generic.MPoly{T}) where {T <: AbstractAlgebra.RingElement}
    vars_p = vars(p)
