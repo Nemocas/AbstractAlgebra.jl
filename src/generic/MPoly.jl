@@ -3663,7 +3663,7 @@ function coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
 
    coeffs = [zero(base_ring(p)) for i = 0:total_degree(p)]
    for i = 1:p.length
-      coeffs[exponent_vector(p,i)[var_index] + 1] = coeff(p,i)
+      coeffs[exponent(p, i, var_index) + 1] = coeff(p,i)
    end
    
    return(coeffs)
