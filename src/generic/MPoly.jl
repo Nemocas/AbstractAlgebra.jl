@@ -3645,21 +3645,25 @@ doc"""
     coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
 > Return the coefficients of p, which is assumed to be univariate, as an array in ascending order.
 """
-function coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
-   vars_p = vars(p)
-   
-   if length(vars_p) > 1
-      error("Polynomial is not univariate.")
+function coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly; check_univariate::Bool=true)
+   if check_univariate
+      vars_p = vars(p)
+      
+      if length(vars_p) > 1
+         error("Polynomial is not univariate.")
+      end
+      
    end
    
-   if length(vars(p)) == 0
-      if length(p) == 0
-         return Array{elem_type(base_ring(parent(p)))}(undef, 0)
-      end
-      return [coeff(p, 1)]
+   if length(p) == 0
+      return Array{elem_type(base_ring(parent(p)))}(undef, 0)
    end
    
    var_index = findfirst(!iszero, exponent_vector(p, 1))
+
+   if var_index == nothing
+      return([coeff(p, 1)])
+   end
 
    coeffs = [zero(base_ring(p)) for i = 0:total_degree(p)]
    for i = 1:p.length
