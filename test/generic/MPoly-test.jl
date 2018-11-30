@@ -807,10 +807,14 @@ function test_gen_mpoly_coefficients_of_univariate_MPoly()
 
       R, vars_R = PolynomialRing(ZZ, var_names; ordering=ord)
 
-      @test length(AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(zero(R))) == 0
-      @test AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(one(R)) == [ one(base_ring(R)) ]
+      @test length(AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(zero(R), check_univariate=true)) == 0
+      @test length(AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(zero(R), check_univariate=false)) == 0
+      @test AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(one(R), check_univariate=true) == [ one(base_ring(R)) ]
       x = rand(vars_R)
-      @test AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(x) == [ zero(base_ring(R)), one(base_ring(R)) ]
+      @test AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(one(R), check_univariate=false) == [ one(base_ring(R)) ]
+      @test AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(x, check_univariate=true) == [ zero(base_ring(R)), one(base_ring(R)) ]
+      x = rand(vars_R)
+      @test AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(x, check_univariate=false) == [ zero(base_ring(R)), one(base_ring(R)) ]
 
       for iter in 1:10
          f = zero(R)
@@ -819,7 +823,8 @@ function test_gen_mpoly_coefficients_of_univariate_MPoly()
          for i in 1:l
             f = f + coeffs[i] * x^(i-1)
          end
-         @test AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(f) == coeffs
+         @test AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(f, check_univariate=true) == coeffs
+         @test AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(f, check_univariate=false) == coeffs
       end
    end
 
