@@ -3271,6 +3271,10 @@ function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: Ring
    N = size(A, 1)
    return [Int(A[j, i]) for j in N:-1:1]  
 end
+
+function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:lex}}) where T <: RingElement
+   return Int(a.exps[size(a.exps, 1)+1-j, i])
+end
  
 function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: RingElement
    A = a.exps
@@ -3278,10 +3282,18 @@ function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: R
    return [Int(A[j, i]) for j in N - 1:-1:1]  
 end
 
+function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:deglex}}) where T <: RingElement
+   return Int(a.exps[size(a.exps, 1)-j, i])
+end
+
 function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
    A = a.exps
    N = size(A, 1)
    return [Int(A[j, i]) for j in 1:N - 1]  
+end
+
+function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
+   return Int(a.exps[j, i])
 end
    
 @doc Markdown.doc"""
@@ -3293,6 +3305,16 @@ end
 """
 function exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
    return exponent_vector(a, i, Val{parent(a).ord})
+end
+
+@doc Markdown.doc"""
+    exponent{T <: RingElem}(a::MPoly{T}, i::Int, j::Int)
+> Return coefficient of the j-th variables in the i-th term of the polynomial.
+> Term and variable numbering begins at $1$ and variables are ordered as
+> during the creation of the ring.
+"""
+function exponent(a::MPoly{T}, i::Int, j::Int) where T <: RingElement
+   return exponent(a, i, j, Val{parent(a).ord})
 end
 
 @doc Markdown.doc"""
