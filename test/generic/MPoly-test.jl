@@ -773,14 +773,16 @@ function test_gen_mpoly_to_univariate()
 
    for num_vars=1:10
       ord = rand_ordering()
+      
+      var_names = ["x$j" for j in 1:num_vars]
 
-      R, vars_R = PolynomialRing(ZZ, ["x"]; ordering=ord)
+      R, vars_R = PolynomialRing(ZZ, var_names; ordering=ord)
+      x = rand(vars_R)
+
       R_univ, x_univ = PolynomialRing(ZZ, "x")
 
       @test zero(R_univ) == to_univariate(R_univ, zero(R))
       @test one(R_univ) == to_univariate(R_univ, one(R))
-
-      x = vars_R[1]
 
       for iter in 1:10
          f = zero(R)
