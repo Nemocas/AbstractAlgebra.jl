@@ -714,7 +714,7 @@ function test_gen_mpoly_exponents()
          c = coeff(f, v)
 
          @test c == coeff(f, nrand)
-         @test v == [AbstractAlgebra.Generic.exponent(f, nrand, i) for i=1:length(vars_R)]
+         @test v == [AbstractAlgebra.Generic.exponent(f, nrand, i) for i = 1:length(vars_R)]
       end
 
       for iter in 1:10
