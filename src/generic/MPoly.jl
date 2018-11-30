@@ -3630,7 +3630,7 @@ function to_univariate(R:: AbstractAlgebra.Generic.PolyRing{T}, p::AbstractAlgeb
       return length(p) == 0 ? R(0) : R(p.coeffs[1])
    end
    
-   return R(coefficients_of_univariate_MPoly(p))
+   return R(coefficients_of_univariate(p))
 end
 
 doc"""
@@ -3642,10 +3642,10 @@ function involves_at_most_one_variable(p::AbstractAlgebra.Generic.MPoly)
 end
 
 doc"""
-    coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
+    coefficients_of_univariate(p::AbstractAlgebra.Generic.MPoly)
 > Return the coefficients of p, which is assumed to be univariate, as an array in ascending order.
 """
-function coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly; check_univariate::Bool=true)
+function coefficients_of_univariate(p::AbstractAlgebra.Generic.MPoly, check_univariate::Bool=true)
    if check_univariate
       vars_p = vars(p)
       
