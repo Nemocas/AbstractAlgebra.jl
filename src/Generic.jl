@@ -14,7 +14,7 @@ using Markdown, Random, InteractiveUtils
 import Base: Array, abs, asin, asinh, atan, atanh, bin, checkbounds,
              conj, convert, cmp, cos, cosh, dec, deepcopy,
              deepcopy_internal, denominator, div, divrem,
-             exp, gcd, gcdx, getindex, hash, hcat, hex, intersect, inv,
+             exp, exponent, gcd, gcdx, getindex, hash, hcat, hex, intersect, inv,
              invmod, isapprox, isequal, isfinite, isless, isqrt, isreal, iszero, lcm,
              ldexp, length, log, mod, ndigits,
              numerator, oct, one, parent, parse, precision,

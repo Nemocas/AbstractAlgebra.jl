@@ -10,7 +10,7 @@ export max_fields, total_degree, gens, divides, isconstant, isdegree,
        ordering, rand_ordering, symbols, monomial_set!, monomial_iszero,
        derivative, rand_ordering, symbols, monomial_set!, monomial_iszero,
        derivative, change_base_ring,  to_univariate, degrees, 
-       combine_like_terms!, exponent_vector, exponent_vectors,
+       combine_like_terms!, exponent, exponent_vector, exponent_vectors,
        set_exponent_vector!, sort_terms!, @PolynomialRing
 
 ###############################################################################
