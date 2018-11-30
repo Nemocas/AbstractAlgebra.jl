@@ -3273,7 +3273,7 @@ function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: Ring
 end
 
 function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:lex}}) where T <: RingElement
-   return Int(a.exps[size(a.exps, 1)+1-j, i])
+   return Int(a.exps[size(a.exps, 1) + 1 - j, i])
 end
  
 function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: RingElement
@@ -3283,7 +3283,7 @@ function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: R
 end
 
 function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:deglex}}) where T <: RingElement
-   return Int(a.exps[size(a.exps, 1)-j, i])
+   return Int(a.exps[size(a.exps, 1) - j, i])
 end
 
 function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
