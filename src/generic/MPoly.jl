@@ -3632,16 +3632,16 @@ function coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
    
    if length(vars(p)) == 0
       if length(p) == 0
-         return Array{elem_type(base_ring(parent(p)))}(undef,0)
+         return Array{elem_type(base_ring(parent(p)))}(undef, 0)
       end
       return [coeff(p,1)]
    end
    
-   degs_of_terms = [ sum(exponent_vector(p,i)) for i=1:length(p) ]
-   coeffs = [ zero(base_ring(p)) for i = 0:maximum(degs_of_terms) ]
-   
+   var_index = findfirst(isequal(vars_p[1]), gens(parent(p)))
+
+   coeffs = [zero(base_ring(p)) for i = 0:total_degree(p)]
    for i = 1:p.length
-      coeffs[degs_of_terms[i] + 1] = coeff(p,i)
+      coeffs[exponent_vector(p,i)[var_index] + 1] = coeff(p,i)
    end
    
    return(coeffs)
