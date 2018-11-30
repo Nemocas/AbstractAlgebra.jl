@@ -3656,7 +3656,7 @@ function coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
       if length(p) == 0
          return Array{elem_type(base_ring(parent(p)))}(undef, 0)
       end
-      return [coeff(p,1)]
+      return [coeff(p, 1)]
    end
    
    var_index = findfirst(isequal(vars_p[1]), gens(parent(p)))
