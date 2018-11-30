@@ -800,21 +800,22 @@ end
 function test_gen_mpoly_coefficients_of_univariate_MPoly()
    print("Generic.MPoly.coefficients_of_univariate_MPoly...")
 
-   for i=1:10
+   for num_vars=1:10
       ord = rand_ordering()
+      var_names = ["x$j" for j in 1:num_vars]
 
-      R, vars_R = PolynomialRing(ZZ, ["x"]; ordering=ord)
+      R, vars_R = PolynomialRing(ZZ, var_names; ordering=ord)
 
       @test length(AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(zero(R))) == 0
       @test AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(one(R)) == [ one(base_ring(R)) ]
-      @test AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(vars_R[1]) == [ zero(base_ring(R)), one(base_ring(R)) ]
-
-      x = vars_R[1]
+      x = rand(vars_R)
+      @test AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(x) == [ zero(base_ring(R)), one(base_ring(R)) ]
 
       for iter in 1:10
          f = zero(R)
-         coeffs = rand(Int, 100)
-         for i in 1:100
+         l = rand(1:1000)
+         coeffs = rand(Int, l)
+         for i in 1:l
             f = f + coeffs[i] * x^(i-1)
          end
          @test AbstractAlgebra.Generic.coefficients_of_univariate_MPoly(f) == coeffs
