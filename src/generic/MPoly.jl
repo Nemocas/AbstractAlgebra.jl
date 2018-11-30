@@ -10,7 +10,7 @@ export max_fields, total_degree, gens, divides, isconstant, isdegree,
        ordering, rand_ordering, symbols, monomial_set!, monomial_iszero,
        derivative, rand_ordering, symbols, monomial_set!, monomial_iszero,
        derivative, change_base_ring,  to_univariate, degrees, 
-       combine_like_terms!, exponent_vector, exponent_vectors,
+       combine_like_terms!, exponent, exponent_vector, exponent_vectors,
        set_exponent_vector!, sort_terms!, @PolynomialRing
 
 ###############################################################################
@@ -3271,6 +3271,10 @@ function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: Ring
    N = size(A, 1)
    return [Int(A[j, i]) for j in N:-1:1]  
 end
+
+function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:lex}}) where T <: RingElement
+   return Int(a.exps[size(a.exps, 1) + 1 - j, i])
+end
  
 function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: RingElement
    A = a.exps
@@ -3278,10 +3282,18 @@ function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: R
    return [Int(A[j, i]) for j in N - 1:-1:1]  
 end
 
+function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:deglex}}) where T <: RingElement
+   return Int(a.exps[size(a.exps, 1) - j, i])
+end
+
 function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
    A = a.exps
    N = size(A, 1)
    return [Int(A[j, i]) for j in 1:N - 1]  
+end
+
+function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
+   return Int(a.exps[j, i])
 end
    
 @doc Markdown.doc"""
@@ -3293,6 +3305,16 @@ end
 """
 function exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
    return exponent_vector(a, i, Val{parent(a).ord})
+end
+
+@doc Markdown.doc"""
+    exponent{T <: RingElem}(a::MPoly{T}, i::Int, j::Int)
+> Return coefficient of the j-th variables in the i-th term of the polynomial.
+> Term and variable numbering begins at $1$ and variables are ordered as
+> during the creation of the ring.
+"""
+function exponent(a::MPoly{T}, i::Int, j::Int) where T <: RingElement
+   return exponent(a, i, j, Val{parent(a).ord})
 end
 
 @doc Markdown.doc"""
@@ -3596,6 +3618,13 @@ function (a::MPolyRing{T})(b::Array{T, 1}, m::Vector{Vector{Int}}) where {T <: R
    z = combine_like_terms!(z)
    return z
 end 
+
+###############################################################################
+#
+#   Univariate polynomials
+#
+###############################################################################
+
  
 function to_univariate(R:: AbstractAlgebra.Generic.PolyRing{T}, p::AbstractAlgebra.Generic.MPoly{T}) where {T <: AbstractAlgebra.RingElement}
    vars_p = vars(p)
@@ -3608,7 +3637,7 @@ function to_univariate(R:: AbstractAlgebra.Generic.PolyRing{T}, p::AbstractAlgeb
       return length(p) == 0 ? R(0) : R(p.coeffs[1])
    end
    
-   return R(coefficients_of_univariate_MPoly(p))
+   return R(coefficients_of_univariate(p))
 end
 
 doc"""
@@ -3620,36 +3649,32 @@ function involves_at_most_one_variable(p::AbstractAlgebra.Generic.MPoly)
 end
 
 doc"""
-    coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
+    coefficients_of_univariate(p::AbstractAlgebra.Generic.MPoly)
 > Return the coefficients of p, which is assumed to be univariate, as an array in ascending order.
 """
-function coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
-   vars_p = vars(p)
-   
-   if length(vars_p) > 1
-      error("Polynomial is not univariate.")
-   end
-   
-   if length(vars(p)) == 0
-      if length(p) == 0
-         return []
+function coefficients_of_univariate(p::AbstractAlgebra.Generic.MPoly, check_univariate::Bool=true)
+   if check_univariate
+      vars_p = vars(p)
+      
+      if length(vars_p) > 1
+         error("Polynomial is not univariate.")
       end
-      return [p.coeffs[1]]
+      
    end
    
-   exps = p.exps
-   if p.parent.ord != :lex
-      exps = exps[1:end - 1, :]
-   end
-   if p.parent.ord == :degrevlex
-      exps = exps[end:-1:1, :]
+   if length(p) == 0
+      return Array{elem_type(base_ring(parent(p)))}(undef, 0)
    end
    
-   degs_of_terms = sum(exps, dims = 1)
-   order = maximum(degs_of_terms)
-   coeffs = [ zero(base_ring(p)) for i = 0:order ]
+   var_index = findfirst(!iszero, exponent_vector(p, 1))
+
+   if var_index == nothing
+      return([coeff(p, 1)])
+   end
+
+   coeffs = [zero(base_ring(p)) for i = 0:total_degree(p)]
    for i = 1:p.length
-   	coeffs[degs_of_terms[i] + 1] = p.coeffs[i]
+      coeffs[exponent(p, i, var_index) + 1] = coeff(p, i)
    end
    
    return(coeffs)
