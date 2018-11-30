@@ -3659,7 +3659,7 @@ function coefficients_of_univariate_MPoly(p::AbstractAlgebra.Generic.MPoly)
       return [coeff(p, 1)]
    end
    
-   var_index = findfirst(isequal(vars_p[1]), gens(parent(p)))
+   var_index = findfirst(!iszero, exponent_vector(p, 1))
 
    coeffs = [zero(base_ring(p)) for i = 0:total_degree(p)]
    for i = 1:p.length
