@@ -194,7 +194,7 @@ truncate(::NCPolyElem, ::Int)
 ```
 
 ```@docs
-mullow{T <: RingElem}(::NCPolyElem{T}, ::NCPolyElem{T}, ::Int)
+mullow(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T}, n::Int) where {T <: NCRingElem}
 ```
 
 **Examples**

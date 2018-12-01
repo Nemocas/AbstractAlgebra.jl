@@ -130,7 +130,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   sqrt{T <: Integer}(a::Rational{T})
+    sqrt(a::Rational{T}) where T <: Integer
 > Return the square root of $a$ if it is the square of a rational, otherwise
 > throw an error.
 """
@@ -145,7 +145,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   exp{T <: Integer}(a::Rational{T})
+    exp(a::Rational{T}) where T <: Integer
 > Return $1$ if $a = 0$, otherwise throw an exception.
 """
 function exp(a::Rational{T}) where T <: Integer

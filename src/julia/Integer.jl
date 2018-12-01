@@ -134,7 +134,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   sqrt{T <: Integer}(a::T)
+    sqrt(a::T) where T <: Integer
 > Return the integer square root of $a$. If $a$ is not a perfect square an
 > error is thrown.
 """
@@ -151,7 +151,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   exp{a <: Integer}(a::T)
+    exp(a::T) where T <: Integer
 > Return $1$ if $a = 0$, otherwise throw an exception. This function is not
 > generally of use to the user, but is used internally in AbstractAlgebra.jl.
 """

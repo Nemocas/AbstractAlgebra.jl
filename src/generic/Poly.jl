@@ -817,10 +817,9 @@ end
 
 @doc Markdown.doc"""
     truncate(a::PolynomialElem, n::Int)
-> Return $a$ truncated to $n$ terms.
+> Return $a$ truncated to $n$ terms. Testing the functionaliy
 """
 function truncate(a::PolynomialElem, n::Int)
-   
    lena = length(a)
    if lena <= n
       return a
