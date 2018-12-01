@@ -55,8 +55,8 @@ function Base.hash(a::MatAlgElem, h::UInt)
    return b
 end
 
-Markdown.doc"""
-    degree(a::MatAlgebra)
+@doc Markdown.doc"""
+    degree(a::MatAlgElem)
 > Return the degree $n$ of the $n\times n$ matrix $a$..
 """
 degree(a::MatAlgElem) = size(a.entries, 1)
