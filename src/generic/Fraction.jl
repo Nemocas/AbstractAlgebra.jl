@@ -292,7 +292,7 @@ function -(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where
       else
          q1 = divexact(d1, gd)
          q2 = divexact(d2, gd)
-         rnum = q1*n2 - q2*n1
+         rnum = q2*n1 - q1*n2
          t = gcd(rnum, gd)
          if isone(t)
             rden = q2*d1
