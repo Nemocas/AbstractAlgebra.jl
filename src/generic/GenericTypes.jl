@@ -161,7 +161,7 @@ mutable struct Partition <: AbstractVector{Int}
 end
 
 @doc Markdown.doc"""
-    AllParts(n::Int)
+    AllParts(n::Integer)
 > Return an iterator over all integer `Partition`s of `n`.
 > Partitions are produced in ascending order according to RuleAsc (Algorithm 3.1) from
 >
