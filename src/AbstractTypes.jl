@@ -33,9 +33,13 @@ abstract type FieldElem <: RingElem end
 
 abstract type Module{T} <: Group end
 
+abstract type Ideal{T} <: Set end
+
 # elements of parameterised domains
 
 abstract type ModuleElem{T} <: GroupElem end
+
+abstract type IdealElem{T} <: SetElem end
 
 abstract type Map{D, C, S, T} <: SetElem end
 
