@@ -79,16 +79,18 @@ function test_gen_frac_binary_ops()
    print("Generic.Frac.binary_ops...")
 
    S, x = PolynomialRing(ZZ, "x")
+   K = FractionField(S)
 
-   a = -(x + 3)//(x + 1) + (2x + 3)//(x^2 + 4)
-   b = (x + 1)//(-x^2 + 1) - x//(2x + 1)
-   c = ((x^2 + 3x)//(5x))*((x + 1)//(2x^2 + 2))
+   for iter = 1:100
+      a = rand(K, 0:3, -3:3)
+      b = rand(K, 0:3, -3:3)
+      c = rand(K, 0:3, -3:3)
 
-   @test a == (-x^3-x^2+x-9)//(x^3+x^2+4*x+4)
-
-   @test b == (-x^2-x-1)//(2*x^2-x-1)
-
-   @test c == (x^2+4*x+3)//(10*x^2+10)
+      @test a + b - b == a
+      @test c*(a + b) == c*a + c*b
+      @test c*(a - b) == c*(a - b)
+      @test a - b == -(b - a)
+   end
 
    println("PASS")
 end
@@ -176,11 +178,24 @@ function test_gen_frac_exact_division()
    print("Generic.Frac.exact_division...")
 
    S, x = PolynomialRing(ZZ, "x")
+   K = FractionField(S)
 
-   a = -(x + 3)//(x + 1) + (2x + 3)//(x^2 + 4)
-   b = ((x^2 + 3x)//(5x))*((x + 1)//(2x^2 + 2))
+   for iter = 1:100
+      a = K(); b = K(); c = K()
 
-   @test a//b == (-10*x^5-10*x^4-100*x^2+10*x-90)//(x^5+5*x^4+11*x^3+23*x^2+28*x+12)
+      while a == 0
+         a = rand(K, 0:3, -3:3)
+      end
+      while b == 0
+         b = rand(K, 0:3, -3:3)
+      end
+      while c == 0
+         c = rand(K, 0:3, -3:3)
+      end
+
+      @test divexact(a*b, b) == a
+      @test divexact((a + b)*c, c) == divexact(a*c, c) + divexact(b*c, c)
+   end
 
    println("PASS")
 end
