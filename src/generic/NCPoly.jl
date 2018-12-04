@@ -17,7 +17,7 @@ parent_type(::Type{NCPoly{T}}) where T <: NCRingElem = NCPolyRing{T}
 elem_type(::Type{NCPolyRing{T}}) where T <: NCRingElem = NCPoly{T}
 
 @doc Markdown.doc"""
-    base_ring(R::AbstractAlgebra.NCPolyRing{T}) where T <: NCRingElem = R.base_ring::parent_type(T)
+    base_ring(R::AbstractAlgebra.NCPolyRing{T}) where T <: NCRingElem
 > Return the base ring of the given polynomial ring.
 """
 base_ring(R::AbstractAlgebra.NCPolyRing{T}) where T <: NCRingElem = R.base_ring::parent_type(T)

@@ -258,7 +258,6 @@ h = shift_right(f, 2)
 
 ```@docs
 evaluate{T <: NCRingElem}(::NCPolyElem{T}, ::T)
-evaluate(::NCPolyElem, ::Integer)
 ```
 
 We also overload the functional notation so that the polynomial $f$ can be
