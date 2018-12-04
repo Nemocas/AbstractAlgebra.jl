@@ -2987,7 +2987,7 @@ end
 #
 ################################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
 > Return the partial derivative of `f` with respect to `x`. The value `x` must
 > be a generator of the polynomial ring of `f`.
