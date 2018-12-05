@@ -413,8 +413,7 @@ end
 function +(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    n = numerator(a) + denominator(a)*b
    d = denominator(a)
-   g = gcd(n, d)
-   return parent(a)(divexact(n, g), divexact(d, g))
+   return parent(a)(n, d)
 end
 
 @doc Markdown.doc"""
@@ -424,8 +423,7 @@ end
 function -(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    n = numerator(a) - denominator(a)*b
    d = denominator(a)
-   g = gcd(n, d)
-   return parent(a)(divexact(n, g), divexact(d, g))
+   return parent(a)(n, d)
 end
 
 @doc Markdown.doc"""
@@ -441,8 +439,7 @@ end
 function -(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
    n = a*denominator(b) - numerator(b)
    d = denominator(b)
-   g = gcd(n, d)
-   return parent(b)(divexact(n, g), divexact(d, g))
+   return parent(b)(n, d)
 end
 
 @doc Markdown.doc"""
@@ -452,8 +449,7 @@ end
 function +(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    n = numerator(a) + denominator(a)*b
    d = denominator(a)
-   g = gcd(n, d)
-   return parent(a)(divexact(n, g), divexact(d, g))
+   return parent(a)(n, d)
 end
 
 @doc Markdown.doc"""
@@ -463,8 +459,7 @@ end
 function -(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    n = numerator(a) - denominator(a)*b
    d = denominator(a)
-   g = gcd(n, d)
-   return parent(a)(divexact(n, g), divexact(d, g))
+   return parent(a)(n, d)
 end
 
 @doc Markdown.doc"""
@@ -480,8 +475,7 @@ end
 function -(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    n = a*denominator(b) - numerator(b)
    d = denominator(b)
-   g = gcd(n, d)
-   return parent(b)(divexact(n, g), divexact(d, g))
+   return parent(b)(n, d)
 end
 
 ###############################################################################
