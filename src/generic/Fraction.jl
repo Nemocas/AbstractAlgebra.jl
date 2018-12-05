@@ -218,11 +218,11 @@ function +(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where
    if d1 == d2
       rnum = n1 + n2
       if isone(d1)
-         rden = d1
+         rden = deepcopy(d1)
       else
          gd = gcd(rnum, d1)
          if isone(gd)
-            rden = d1
+            rden = deepcopy(d1)
          else
             rnum = divexact(rnum, gd)
             rden = divexact(d1, gd)
@@ -230,10 +230,10 @@ function +(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where
       end
    elseif isone(d1)
       rnum = n1*d2 + n2
-      rden = d2
+      rden = deepcopy(d2)
    elseif isone(d2)
       rnum = n1 + n2*d1
-      rden = d1
+      rden = deepcopy(d1)
    else
       if isone(gd)
          rnum = n1*d2 + n2*d1
@@ -268,11 +268,11 @@ function -(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where
    if d1 == d2
       rnum = n1 - n2
       if isone(d1)
-         rden = d1
+         rden = deepcopy(d1)
       else
          gd = gcd(rnum, d1)
          if isone(gd)
-            rden = d1
+            rden = deepcopy(d1)
          else
             rnum = divexact(rnum, gd)
             rden = divexact(d1, gd)
@@ -280,10 +280,10 @@ function -(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where
       end
    elseif isone(d1)
       rnum = n1*d2 - n2
-      rden = d2
+      rden = deepcopy(d2)
    elseif isone(d2)
       rnum = n1 - n2*d1
-      rden = d1
+      rden = deepcopy(d1)
    else
       gd = gcd(d1, d2)
       if isone(gd)
@@ -323,7 +323,7 @@ function *(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where
       gd = gcd(n1, d2)
       if isone(gd)
          n = n1*n2
-         d = d2
+         d = deepcopy(d2)
       else
          n = divexact(n1, gd)*n2
          d = divexact(d2, gd)
@@ -332,7 +332,7 @@ function *(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where
       gd = gcd(n2, d1)
       if isone(gd)
          n = n2*n1
-         d = d1
+         d = deepcopy(d1)
       else
          n = divexact(n2, gd)*n1
          d = divexact(d1, gd)
@@ -413,7 +413,7 @@ end
 function +(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    n = numerator(a) + denominator(a)*b
    d = denominator(a)
-   return parent(a)(n, d)
+   return parent(a)(n, deepcopy(d))
 end
 
 @doc Markdown.doc"""
@@ -423,7 +423,7 @@ end
 function -(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    n = numerator(a) - denominator(a)*b
    d = denominator(a)
-   return parent(a)(n, d)
+   return parent(a)(n, deepcopy(d))
 end
 
 @doc Markdown.doc"""
@@ -439,7 +439,7 @@ end
 function -(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
    n = a*denominator(b) - numerator(b)
    d = denominator(b)
-   return parent(b)(n, d)
+   return parent(b)(n, deepcopy(d))
 end
 
 @doc Markdown.doc"""
@@ -449,7 +449,7 @@ end
 function +(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    n = numerator(a) + denominator(a)*b
    d = denominator(a)
-   return parent(a)(n, d)
+   return parent(a)(n, deepcopy(d))
 end
 
 @doc Markdown.doc"""
@@ -459,7 +459,7 @@ end
 function -(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    n = numerator(a) - denominator(a)*b
    d = denominator(a)
-   return parent(a)(n, d)
+   return parent(a)(n, deepcopy(d))
 end
 
 @doc Markdown.doc"""
@@ -475,7 +475,7 @@ end
 function -(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    n = a*denominator(b) - numerator(b)
    d = denominator(b)
-   return parent(b)(n, d)
+   return parent(b)(n, deepcopy(d))
 end
 
 ###############################################################################
@@ -581,7 +581,7 @@ function divexact(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}
       gd = gcd(n1, n2)
       if isone(gd)
          n = n1*d2
-         d = n2
+         d = deepcopy(n2)
       else
          n = divexact(n1, gd)*d2
          d = divexact(n2, gd)
@@ -590,7 +590,7 @@ function divexact(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}
       gd = gcd(d2, d1)
       if isone(gd)
          n = d2*n1
-         d = d1
+         d = deepcopy(d1)
       else
          n = divexact(d2, gd)*n1
          d = divexact(d1, gd)
@@ -759,37 +759,143 @@ function zero!(c::AbstractAlgebra.FracElem)
 end
 
 function mul!(c::AbstractAlgebra.FracElem{T}, a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-   g1 = gcd(numerator(a), denominator(b))
-   g2 = gcd(numerator(b), denominator(a))
-   c.num = divexact(numerator(a), g1)*divexact(numerator(b), g2)
-   c.den = divexact(denominator(a), g2)*divexact(denominator(b), g1)
+   n1 = numerator(a)
+   d2 = denominator(b)
+   n2 = numerator(b)
+   d1 = denominator(a)
+   if d1 == d2
+      c.num = n1*n2
+      c.den = d1*d2
+   elseif isone(d1)
+      gd = gcd(n1, d2)
+      if isone(gd)
+         c.num = n1*n2
+         c.den = deepcopy(d2)
+      else
+         c.num = divexact(n1, gd)*n2
+         c.den = divexact(d2, gd)
+      end
+   elseif isone(d2)
+      gd = gcd(n2, d1)
+      if isone(gd)
+         c.num = n2*n1
+         c.den = deepcopy(d1)
+      else
+         c.num = divexact(n2, gd)*n1
+         c.den = divexact(d1, gd)
+      end
+   else
+      g1 = gcd(n1, d2)
+      g2 = gcd(n2, d1)
+      if !isone(g1)
+         n1 = divexact(n1, g1)
+         d2 = divexact(d2, g1)
+      end
+      if !isone(g2)
+         n2 = divexact(n2, g2)
+         d1 = divexact(d1, g2)
+      end
+      c.num = n1*n2
+      c.den = d1*d2
+   end
    return c
 end
 
-function addeq!(c::AbstractAlgebra.FracElem{T}, a::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-   n = c.num*denominator(a) + numerator(a)*c.den
-   c.den = mul!(c.den, c.den, denominator(a))
-   g = gcd(n, c.den)
-   c.num = divexact(n, g)
-   c.den = divexact(c.den, g)
-   return c
+function addeq!(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
+   d1 = denominator(a)
+   d2 = denominator(b)
+   n1 = numerator(a)
+   n2 = numerator(b)
+   gd = gcd(d1, d2)
+   if d1 == d2
+      a.num = addeq!(a.num, b.num)
+      if !isone(d1)
+         gd = gcd(a.num, d1)
+         if !isone(gd)
+            a.num = divexact(a.num, gd)
+            a.den = divexact(d1, gd)
+         end
+      end
+   elseif isone(d1)
+      if n1 !== n2
+         a.num = mul!(a.num, a.num, d2)
+         a.num = addeq!(a.num, n2)
+      else
+         a.num = n1*d2 + n2
+      end
+      a.den = deepcopy(d2)
+   elseif isone(d2)
+      a.num = addeq!(a.num, n2*d1)
+      a.den = deepcopy(d1)
+   else
+      if isone(gd)
+         if n1 !== n2
+            a.num = mul!(a.num, a.num, d2)
+            a.num = addeq!(a.num, n2*d1)
+         else
+            a.num = n1*d2 + n2*d1
+         end
+         a.den = d1*d2
+      else
+         q1 = divexact(d1, gd)
+         q2 = divexact(d2, gd)
+         a.num = q1*n2 + q2*n1
+         t = gcd(a.num, gd)
+         if isone(t)
+            a.den = mul!(a.den, a.den, q2)
+         else
+            gd = divexact(d1, t)
+            a.num = divexact(a.num, t)
+            a.den = gd*q2
+         end
+      end
+   end
+   return a
 end
 
 function add!(c::AbstractAlgebra.FracElem{T}, a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-   n = c.num*denominator(a) + numerator(a)*c.den
-   d = c.den*denominator(a)
-   g = gcd(n, d)
-   c.num = divexact(n, g)
-   c.den = divexact(d, g)
-   return c
-end
-
-function addeq!(c::AbstractAlgebra.FracElem{T}, a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-   n = numerator(b)*denominator(a) + numerator(a)*denominator(b)
-   c.den = mul!(c.den, denominator(b), denominator(a))
-   g = gcd(n, d)
-   c.num = divexact(n, g)
-   c.den = divexact(c.den, g)
+   d1 = denominator(a)
+   d2 = denominator(b)
+   n1 = numerator(a)
+   n2 = numerator(b)
+   gd = gcd(d1, d2)
+   if d1 == d2
+      c.num = n1 + n2
+      if isone(d1)
+         c.den = d1
+      else
+         gd = gcd(c.num, d1)
+         if isone(gd)
+            c.den = d1
+         else
+            c.num = divexact(c.num, gd)
+            c.den = divexact(d1, gd)
+         end
+      end
+   elseif isone(d1)
+      c.num = n1*d2 + n2
+      c.den = d2
+   elseif isone(d2)
+      c.num = n1 + n2*d1
+      c.den = d1
+   else
+      if isone(gd)
+         c.num = n1*d2 + n2*d1
+         c.den = d1*d2
+      else
+         q1 = divexact(d1, gd)
+         q2 = divexact(d2, gd)
+         c.num = q1*n2 + q2*n1
+         t = gcd(c.num, gd)
+         if isone(t)
+            c.den = q2*d1
+         else
+            gd = divexact(d1, t)
+            c.num = divexact(c.num, t)
+            c.den = gd*q2
+         end
+      end
+   end
    return c
 end
 
