@@ -54,6 +54,14 @@ isunit(a::Rational) = a != 0
 
 canonical_unit(a::Rational)  = a
 
+function numerator(a::Rational, canonicalise::Bool=true)
+   return Base.numerator(a) # all other types ignore canonicalise
+end
+
+function denominator(a::Rational, canonicalise::Bool=true)
+   return Base.denominator(a) # all other types ignore canonicalise
+end
+
 ###############################################################################
 #
 #   String I/O

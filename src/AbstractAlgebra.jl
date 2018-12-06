@@ -4,12 +4,21 @@ using Markdown
 
 using InteractiveUtils
 
+# A list of all symbols external packages should not import from AbstractAlgebra
+import_exclude = [:import_exclude, :QQ, :ZZ, :RR,
+           :RealField, :FiniteField, :NumberField,
+           :AbstractAlgebra,
+           :exp, :sqrt, :numerator, :denominator,
+           :promote_rule,
+           :Set, :Module, :Ring, :Group, :Field]
+
 import LinearAlgebra: det, norm, nullspace, rank, transpose!, hessenberg
 
 import LinearAlgebra: lu, lu!, tr
 
 export nullspace
 
+# Do not import exp, sqrt, numerator or denominator as we define our own
 import Base: Array, abs, acos, acosh, asin, asinh, atan, atanh,
              bin, ceil, checkbounds, conj, convert, cmp, cos, cosh,
              cospi, cot, coth, dec, deepcopy, deepcopy_internal, 
@@ -17,7 +26,7 @@ import Base: Array, abs, acos, acosh, asin, asinh, atan, atanh,
              getindex, hash, hcat, hex, hypot, intersect, inv, invmod, isequal,
              isfinite, isless, isqrt, isreal, iszero, lcm, ldexp, length,
              log, log1p, mod, ndigits, 
-             numerator, oct, one, parent, parse, precision,
+             oct, one, parent, parse, precision,
              rand, Rational, rem, reverse, 
              setindex!, show, similar, sign, sin, sinh, sinpi, size, string,
              tan, tanh, trailing_zeros, transpose, truncate,
@@ -104,6 +113,7 @@ include("julia/JuliaTypes.jl")
 
 include("Generic.jl")
 
+# Do not import numerator and denominator as we have our own
 import .Generic: add!, addeq!, addmul!, base_ring, cached,
                  canonical_unit, change_base_ring,
                  character, characteristic, charpoly, charpoly_danilevsky!,
@@ -111,7 +121,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached,
                  chebyshev_u, _check_dim, check_parent, codomain, coeff, cols,
                  combine_like_terms!, compose, content, cycles,
                  data, deflate, degree, degrees,
-                 denominator, derivative, det, det_clow,
+                 derivative, det, det_clow,
                  det_df, det_fflu, det_popov, dim, disable_cache!, 
                  discriminant, displayed_with_minus_in_front,
                  divexact, divexact_left, divexact_right, divides,
@@ -143,7 +153,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached,
                  modulus, monomial_iszero, monomial_set!, monomial_to_newton!,
                  mul!, mul_classical, mul_karatsuba, mul_ks, mullow, mulmod,
                  needs_parentheses, newton_to_monomial!,
-                 normalise, nvars, numerator,
+                 normalise, nvars,
                  O, one, order, ordering, parent_type, parity, partitionseq,
                  perm, permtype, @perm_str, polcoeff, pol_length,
                  powmod, pow_multinomial, popov, popov_with_trafo,
@@ -167,6 +177,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached,
                  valuation, var, vars, weak_popov, weak_popov_with_trafo, zero,
                  zero!, zero_matrix, @PolynomialRing
 
+# Do not export exp, sqrt, numerator and denominator as we define our own
 export add!, addeq!, addmul!, base_ring, cached, canonical_unit,
                  change_base_ring, character,
                  characteristic, charpoly, charpoly_danilevsky!,
@@ -174,7 +185,7 @@ export add!, addeq!, addmul!, base_ring, cached, canonical_unit,
                  chebyshev_u, _check_dim, check_parent, codomain, coeff, cols,
                  combine_like_terms!, compose, content, cycles,
                  data, deflate, degree, degrees,
-                 denominator, derivative, det, det_clow,
+                 derivative, det, det_clow,
                  det_df, det_fflu, det_popov, dim, disable_cache!,
                  discriminant, displayed_with_minus_in_front,
                  divexact, divexact_left, divexact_right, divides,
@@ -204,7 +215,7 @@ export add!, addeq!, addmul!, base_ring, cached, canonical_unit,
                  modulus, monomial_iszero, monomial_set!, monomial_to_newton!,
                  mul!, mul_classical, mul_karatsuba, mul_ks, mullow, mulmod,
                  needs_parentheses, newton_to_monomial!, normalise, nvars,
-                 numerator, O, one, order, ordering, parent_type, parity,
+                 O, one, order, ordering, parent_type, parity,
                  partitionseq, perm, permtype, @perm_str, polcoeff, pol_length,
                  powmod, pow_multinomial,
                  popov, popov_with_trafo, powers, ppio, 
@@ -234,6 +245,14 @@ end
 
 function sqrt(a::T) where T
   return Base.sqrt(a)
+end
+
+function numerator(a::T, canonicalise::Bool=true) where T
+  return Base.numerator(a, canonicalise)
+end
+
+function denominator(a::T, canonicalise::Bool=true) where T
+  return Base.denominator(a, canonicalise)
 end
 
 function PermGroup(n::T) where T
