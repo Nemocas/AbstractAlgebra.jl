@@ -1582,11 +1582,8 @@ function content(a::SparsePoly{T}) where {T <: RingElement}
          return z
       end
    end
-   z = coeff(a, 0)
-   for i = 2:length(a)
-      if z == 1
-         break
-      end
+   z = base_ring(a)()
+   for i = 1:length(a)
       z = gcd(coeff(a, i - 1), z)
    end
    return z

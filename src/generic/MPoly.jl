@@ -2735,9 +2735,12 @@ end
 
 function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    if a.length == 0
-      return b
+      if b.length == 0
+         return deepcopy(a)
+      end
+      return divexact(b, canonical_unit(coeff(b, 1)))
    elseif b.length == 0
-      return a
+      return divexact(a, canonical_unit(coeff(a, 1)))
    end
    if a == 1
       return deepcopy(a)
@@ -2750,7 +2753,8 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    v2, d2 = max_fields(b)
    # check if both polys are constant
    if d1 == 0 && d2 == 0
-      return parent(a)(gcd(a.coeffs[1], b.coeffs[1]))
+      r = gcd(coeff(a, 1), coeff(b, 1))
+      return parent(a)(divexact(r, canonical_unit(r)))
    end
    ord = parent(a).ord
    N = parent(a).N
@@ -2815,7 +2819,8 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    p1 = main_variable_extract(a, k)
    p2 = main_variable_extract(b, k)
    g = gcd(p1, p2)
-   return main_variable_insert(g, k)
+   r = main_variable_insert(g, k)
+   return divexact(r, canonical_unit(coeff(r, 1))) # normalise
 end
 
 function term_gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
@@ -2863,12 +2868,9 @@ function term_content(a::MPoly{T}) where {T <: RingElement}
          break
       end
    end
-   Cc[1] = a.coeffs[1]
-   for i = 2:a.length
+   Cc[1] = base_ring(a)()
+   for i = 1:a.length
       Cc[1] = gcd(Cc[1], a.coeffs[i])
-      if isone(Cc[1])
-         break
-      end
    end
    return parent(a)(Cc, Ce)
 end
