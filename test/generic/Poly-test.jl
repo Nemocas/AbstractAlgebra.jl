@@ -1381,9 +1381,9 @@ function test_gen_poly_content_primpart_gcd()
          g = rand(QQ, -10:10)
       end
 
-      @test content(f*g) == content(f)
+      @test content(f*g) == content(f)*gcd(g, QQ()) # must normalise g correctly
 
-      @test primpart(f*g) == primpart(f)*g
+      @test primpart(f*g) == primpart(f)*divexact(g, gcd(g, QQ()))
    end
 
    for iter = 1:20

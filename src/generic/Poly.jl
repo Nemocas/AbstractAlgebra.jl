@@ -1526,15 +1526,11 @@ end
 > coefficients.
 """
 function content(a::AbstractAlgebra.PolyElem)
-   z = coeff(a, 0)
-   for i = 2:length(a)
+   z = base_ring(a)() # normalise first coefficient
+   for i = 1:length(a)
       z = gcd(z, coeff(a, i - 1))
    end
-   if z == 0
-      return z
-   else
-      return divexact(z, canonical_unit(z))
-   end
+   return z
 end
 
 @doc Markdown.doc"""
