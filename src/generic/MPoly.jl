@@ -9,7 +9,7 @@ export max_fields, total_degree, gens, divides, isconstant, isdegree,
        main_variable, main_variable_extract, main_variable_insert, nvars, vars,
        ordering, rand_ordering, symbols, monomial_set!, monomial_iszero,
        derivative, rand_ordering, symbols, monomial_set!, monomial_iszero,
-       derivative, change_base_ring,  to_univariate, degrees, 
+       derivative, change_base_ring,  to_univariate, degrees, deflation,
        combine_like_terms!, exponent, exponent_vector, exponent_vectors,
        set_exponent_vector!, sort_terms!, @PolynomialRing
 
@@ -1742,6 +1742,89 @@ end
 
 ###############################################################################
 #
+#   Inflation/deflation
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+> Computes deflation parameters for the exponents of the polynomial $f$. This
+> is a pair of arrays of integers, the first array of which (the shift) gives
+> the minimum exponent for each variable of the polynomial, and the second of
+> which (the deflation) gives the gcds of all the exponents after subtracting
+> the shift, again per variable. This functionality is used by gcd (and can be
+> used by factorisation algorithms).
+end)
+"""
+function deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   N = nvars(parent(f))
+   if length(f) == 0
+      return [0 for i in 1:N], [0 for i in 1:N]
+   end
+   defl = [0 for i in 1:N]
+   shift = exponent_vector(f, 1)
+   for i = 2:length(f)
+      vcurr = exponent_vector(f, i)
+      for j = 1:N
+         if vcurr[j] < shift[j]
+            defl[j] = gcd(defl[j], shift[j] - vcurr[j])
+            shift[j] = vcurr[j]
+         else
+            defl[j] = gcd(defl[j], vcurr[j] - shift[j])
+         end
+      end
+   end
+   return shift, defl
+end
+
+@doc Markdown.doc"""
+    deflate(f::AbstractAlgebra.MPolyElem{T}, v::Vector{Int}) where T <: RingElement
+> Return a polynomial with the same coefficients as $f$ but whose exponents
+> have been shifted down by the given shifts (supplied as an array of shifts,
+> one for each variable, then deflated (divided) by the given exponents
+> (again supplied as an array of deflation factors, one for each variable).
+> The algorithm automatically replaces a deflation of $0$ by $1$, to avoid
+> division by $0$.  
+"""
+function deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
+   N = nvars(parent(f))
+   for i = 1:N
+      if defl[i] == 0
+         defl[i] = 1
+      end
+   end
+   exps = exponent_vectors(f)
+   for i = 1:length(f)
+      for j = 1:N
+         exps[i][j] = div(exps[i][j] - shift[j], defl[j]) 
+      end
+   end
+   coeffs = [coeff(f, i) for i in 1:length(f)]
+   return parent(f)(coeffs, exps)
+end
+
+@doc Markdown.doc"""
+    inflate(f::AbstractAlgebra.MPolyElem{T}, v::Vector{Int}) where T <: RingElement
+> Return a polynomial with the same coefficients as $f$ but whose exponents
+> have been inflated (multiplied) by the given deflation exponents (supplied
+> as an array of inflation factors, one for each variable) and then shifted
+> by the given shifts (again supplied as an array of shifts, one for each
+> variable).  
+"""
+function inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
+   N = nvars(parent(f))
+   exps = exponent_vectors(f)
+   for i = 1:length(f)
+      for j = 1:N
+         exps[i][j] = exps[i][j]*defl[j] + shift[j]
+      end
+   end
+   coeffs = [coeff(f, i) for i in 1:length(f)]
+   return parent(f)(coeffs, exps)
+end
+
+###############################################################################
+#
 #   Exact division
 #
 ###############################################################################
@@ -2734,12 +2817,12 @@ end
 ###############################################################################
 
 function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
-   if a.length == 0
+   if length(a) == 0
       if b.length == 0
          return deepcopy(a)
       end
       return divexact(b, canonical_unit(coeff(b, 1)))
-   elseif b.length == 0
+   elseif length(b) == 0
       return divexact(a, canonical_unit(coeff(a, 1)))
    end
    if a == 1
@@ -2748,13 +2831,21 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    if b == 1
       return deepcopy(b)
    end
+   # compute deflation and deflate
+   shifta, defla = deflation(a)
+   shiftb, deflb = deflation(b)
+   shiftr = min.(shifta, shiftb)
+   deflr = broadcast(gcd, defla, deflb)
+   a = deflate(a, shifta, deflr)
+   b = deflate(b, shiftb, deflr)
    # get degrees in each variable
    v1, d1 = max_fields(a)
    v2, d2 = max_fields(b)
    # check if both polys are constant
    if d1 == 0 && d2 == 0
       r = gcd(coeff(a, 1), coeff(b, 1))
-      return parent(a)(divexact(r, canonical_unit(r)))
+      r = parent(a)(divexact(r, canonical_unit(r)))
+      return inflate(r, shiftr, deflr)
    end
    ord = parent(a).ord
    N = parent(a).N
@@ -2767,11 +2858,15 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    for k = end_var:-1:1
       if v1[k] == 0 && v2[k] != 0
          p2 = main_variable_extract(b, k)
-         return gcd(a, content(p2))
+         r = gcd(a, content(p2))
+         # perform inflation
+         return inflate(r, shiftr, deflr)
       end
       if v2[k] == 0 && v1[k] != 0
          p1 = main_variable_extract(a, k)
-         return gcd(content(p1), b)
+         r = gcd(content(p1), b)
+         # perform inflation
+         return inflate(r, shiftr, deflr)
       end
    end
    # count number of terms in lead coefficient, for each variable
@@ -2815,12 +2910,15 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          end
       end
    end
-   # write polys in terms of main variable k, do gcd, then convert back
+   # write polys in terms of main variable k, do gcd, then convert back,
+   # then inflate
    p1 = main_variable_extract(a, k)
    p2 = main_variable_extract(b, k)
    g = gcd(p1, p2)
    r = main_variable_insert(g, k)
-   return divexact(r, canonical_unit(coeff(r, 1))) # normalise
+   r = divexact(r, canonical_unit(coeff(r, 1))) # normalise
+   # perform inflation
+   return inflate(r, shiftr, deflr)
 end
 
 function term_gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
@@ -2844,6 +2942,14 @@ function term_gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    end
    Cc[1] = gcd(a.coeffs[1], b.coeffs[1])
    return parent(a)(Cc, Ce)
+end
+
+function content(a::MPoly{T}) where {T <: RingElement}
+   z = base_ring(a)()
+   for i = 1:length(a)
+      z = gcd(z, coeff(a, i))
+   end
+   return z
 end
 
 function term_content(a::MPoly{T}) where {T <: RingElement}
