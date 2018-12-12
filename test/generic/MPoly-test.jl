@@ -468,6 +468,31 @@ function test_gen_mpoly_ideal_reduction()
    println("PASS")
 end
 
+function test_gen_mpoly_deflation()
+   print("Generic.MPoly.deflation...")
+
+   for num_vars = 1:4
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+      S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
+
+      for iter = 1:10
+         f = rand(S, 0:4, 0:5, -10:10)
+         shift = [rand(0:10) for i in 1:num_vars]
+         defl = [rand(1:10) for i in 1:num_vars]
+         f = inflate(f, shift, defl)
+
+         s, d = deflation(f)
+         g = deflate(f, s, d)
+         h = inflate(g, s, d)
+
+         @test h == f
+      end
+   end
+
+   println("PASS")
+end
+
 function test_gen_mpoly_gcd()
    print("Generic.MPoly.gcd...")
 
@@ -844,6 +869,7 @@ function test_gen_mpoly()
    test_gen_mpoly_divides()
    test_gen_mpoly_euclidean_division()
    test_gen_mpoly_ideal_reduction()
+   test_gen_mpoly_deflation()
    test_gen_mpoly_gcd()
    test_gen_mpoly_evaluation()
    test_gen_mpoly_valuation()
