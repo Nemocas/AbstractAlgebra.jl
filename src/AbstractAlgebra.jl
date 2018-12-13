@@ -78,7 +78,7 @@ include("AbstractTypes.jl")
 ################################################################################
 
 function versioninfo()
-  print("AbstractAlgebra version 0.2.1\n")
+  print("AbstractAlgebra version 0.3.0\n")
   abstractalgebrarepo = dirname(dirname(@__FILE__))
 
   print("AbstractAlgebra: ")
