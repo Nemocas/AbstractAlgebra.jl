@@ -415,9 +415,9 @@ function *(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where {
       for j = 1:cols(y)
          A[i, j] = base_ring(x)()
          for k = 1:cols(x)
-            C = mul!(C, x[i, k], y[k, j])
-            A[i, j] = addeq!(A[i, j], C)
+            A[i, j] = addmul_delayed_reduction!(A[i, j], x[i, k], y[k, j], C)
          end
+         A[i, j] = reduce!(A[i, j])
       end
    end
    return A
@@ -1189,11 +1189,11 @@ function rref!(A::MatrixElem{T}) where {T <: RingElement}
       end
       for k = 1:n - rank
          for i = rank - 1:-1:1
-            t = mul!(t, A[i, pivots[np + k]], d)
+            t = mul_red!(t, A[i, pivots[np + k]], d, false)
             for j = i + 1:rank
-               q = mul!(q, A[i, pivots[j]], A[j, pivots[np + k]])
-               t = addeq!(t, q)
+               t = addmul_delayed_reduction!(t, A[i, pivots[j]], A[j, pivots[np + k]], q)
             end
+            t = reduce!(t)
             A[i, pivots[np + k]] = divexact(-t, A[i, pivots[i]])
          end
       end
@@ -1788,10 +1788,11 @@ function solve_lu_precomp(p::Generic.perm, LU::MatElem{T}, b::MatrixElem{T}) whe
       for i in (n - 1):-1:1
          for j in (i + 1):n
             #x[i, k] = x[i, k] - x[j, k] * LU[i, j]
-            t = mul!(t, x[j, k], LU[i, j])
-            t = mul!(t, t, minus_one)
+            t = mul_red!(t, x[j, k], LU[i, j], false)
+            t = mul_red!(t, t, minus_one, false)
             x[i, k] = addeq!(x[i, k], t)
          end
+         x[i, k] = reduce!(x[i, k])
          x[i, k] = divexact(x[i, k], LU[i, i])
       end
    end
@@ -2023,9 +2024,9 @@ function solve_triu(U::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}
       for j = n:-1:1
          s = R()
          for k = j + 1:n
-            t = mul!(t, U[j, k], tmp[k])
-            s = addeq!(s, t)
+            s = addmul_delayed_reduction!(s, U[j, k], tmp[k], t)
          end
+         s = reduce!(s)
          s = b[j, i] - s
          if unit == false
             s = mul!(s, s, Tinv[j])
@@ -2373,26 +2374,25 @@ function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElem
       for j = 1:n - i - 1
          s = R()
          for kk = 1:n - i
-            t = mul!(t, A[kk, j], W[kk])
-            s = addeq!(s, t)
+            s = addmul_delayed_reduction!(s, A[kk, j], W[kk], t)
          end
+         s = reduce!(s)
          A[n - i, j] = s
       end
       for j = n - i:n - 1
          s = R()
          for kk = 1:n - i
-            t = mul!(t, A[kk, j], W[kk])
-            s = addeq!(s, t)
+            s = addmul_delayed_reduction!(s, A[kk, j], W[kk], t)
          end
-         t = mul!(t, h, W[j + 1])
-         s = addeq!(s, t)
+         s = addmul_delayed_reduction!(s, h, W[j + 1], t)
+         s = reduce!(s)
          A[n - i, j] = s
       end
       s = R()
       for kk = 1:n - i
-         t = mul!(t, A[kk, n], W[kk])
-         s = addeq!(s, t)
+         s = addmul_delayed_reduction!(s, A[kk, n], W[kk], t)
       end
+      s = reduce!(s)
       A[n - i, n] = s
       for kk = 1:n
          A[n - i, kk] = mul!(A[n - i, kk], A[n - i, kk], d)
@@ -2478,25 +2478,25 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
       for j = 1:n - i - 1
          s = R()
          for k = 1:n - i
-            t = mul!(t, A[k, j], W[k])
-            s = addeq!(s, t)
+            s = addmul_delayed_reduction!(s, A[k, j], W[k], t)
          end
+         s = reduce!(s)
          A[n - i, j] = s
       end
       for j = n - i:n - 1
          s = R()
          for k = 1:n - i
-            t = mul!(t, A[k, j], W[k])
-            s = addeq!(s, t)
+            s = addmul_delayed_reduction!(s, A[k, j], W[k], t)
          end
          s = addeq!(s, W[j + 1])
+         s = reduce!(s)
          A[n - i, j] = s
       end
       s = R()
       for k = 1:n - i
-         t = mul!(t, A[k, n], W[k])
-         s = addeq!(s, t)
+         s = addmul_delayed_reduction!(s, A[k, n], W[k], t)
       end
+      s = reduce!(s)
       A[n - i, n] = s
       i += 1
    end
@@ -2538,25 +2538,25 @@ function charpoly(V::Ring, Y::MatrixElem{T}) where {T <: RingElement}
          for k = 1:i
             s = R()
             for l = 1:i
-               p = mul!(p, Y[k, l], M[j - 1, l])
-               s = addeq!(s, p)
+               s = addmul_delayed_reduction!(s, Y[k, l], M[j - 1, l], p)
             end
+            s = reduce!(s)
             M[j, k] = s
          end
          A[j] = M[j, i]
       end
       s = R()
       for j = 1:i
-         p = mul!(p, Y[i, j], M[i - 1, j])
-         s = addeq!(s, p)
+         s = addmul_delayed_reduction!(s, Y[i, j], M[i - 1, j], p)
       end
+      s = reduce!(s)
       A[i] = s
       for j = 1:i
          s = -F[j]
          for k = 1:j - 1
-            p = mul!(p, A[k], F[j - k])
-            s = addeq!(s, p)
+            s = addmul_delayed_reduction!(s, A[k], F[j - k], p)
          end
+         s = reduce!(s)
          F[j] = -s - A[j]
      end
    end
@@ -2827,21 +2827,25 @@ function hnf_cohen!(H::MatrixElem{T}, U::MatrixElem{T}) where {T <: RingElement}
          b = -divexact(H[j,i], d)
          for c = i:n
             t = deepcopy(H[j,c])
-            t1 = mul!(t1, a, H[j,c])
-            t2 = mul!(t2, b, H[k,c])
-            H[j,c] = add!(H[j,c], t1, t2)
-            t1 = mul!(t1, u, H[k,c])
-            t2 = mul!(t2, v, t)
-            H[k,c] = add!(H[k,c], t1, t2)
+            t1 = mul_red!(t1, a, H[j, c], false)
+            t2 = mul_red!(t2, b, H[k, c], false)
+            H[j, c] = add!(H[j, c], t1, t2)
+            H[j, c] = reduce!(H[j, c])
+            t1 = mul_red!(t1, u, H[k, c], false)
+            t2 = mul_red!(t2, v, t, false)
+            H[k, c] = add!(H[k, c], t1, t2)
+            H[k, c] = reduce!(H[k, c])
          end
          for c = 1:m
             t = deepcopy(U[j,c])
-            t1 = mul!(t1, a, U[j,c])
-            t2 = mul!(t2, b, U[k,c])
-            U[j,c] = add!(U[j,c], t1, t2)
-            t1 = mul!(t1, u, U[k,c])
-            t2 = mul!(t2, v, t)
-            U[k,c] = add!(U[k,c], t1, t2)
+            t1 = mul_red!(t1, a, U[j, c], false)
+            t2 = mul_red!(t2, b, U[k, c], false)
+            U[j, c] = add!(U[j, c], t1, t2)
+            U[j, c] = reduce!(U[j, c])
+            t1 = mul_red!(t1, u, U[k, c], false)
+            t2 = mul_red!(t2, v, t, false)
+            U[k, c] = add!(U[k, c], t1, t2)
+            U[k, c] = reduce!(U[k, c])
          end
       end
       if iszero(H[k,i])
@@ -2860,11 +2864,11 @@ function hnf_cohen!(H::MatrixElem{T}, U::MatrixElem{T}) where {T <: RingElement}
          q = -div(H[j,i], H[k, i])
          for c = i:n
             t = mul!(t, q, H[k,c])
-            H[j,c] = addeq!(H[j,c], t)
+            H[j, c] = addeq!(H[j,c], t)
          end
          for c = 1:m
             t = mul!(t, q, U[k,c])
-            U[j,c] = addeq!(U[j,c], t)
+            U[j, c] = addeq!(U[j,c], t)
          end
       end
       k += 1
@@ -3189,12 +3193,12 @@ function kb_reduce_row!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Array{Int, 1}
       q = -div(H[r,i], H[p,i])
       for j = i:cols(H)
          t = mul!(t, q, H[p,j])
-         H[r,j] = addeq!(H[r,j], t)
+         H[r, j] = addeq!(H[r,j], t)
       end
       if with_trafo
          for j = 1:cols(U)
             t = mul!(t, q, U[p,j])
-            U[r,j] = addeq!(U[r,j], t)
+            U[r, j] = addeq!(U[r,j], t)
          end
       end
    end
@@ -3212,12 +3216,12 @@ function kb_reduce_column!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Array{Int,
       q = -div(H[p,c],H[r,c])
       for j = c:cols(H)
          t = mul!(t, q, H[r,j])
-         H[p,j] = addeq!(H[p,j], t)
+         H[p, j] = addeq!(H[p,j], t)
       end
       if with_trafo
          for j = 1:cols(U)
             t = mul!(t, q, U[r,j])
-            U[p,j] = addeq!(U[p,j], t)
+            U[p, j] = addeq!(U[p,j], t)
          end
       end
    end
@@ -3302,27 +3306,31 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
             new_pivot = true
          else
             p = pivot[j]
-            d, u, v = gcdx(H[p,j],H[i+1,j])
-            a = divexact(H[p,j],d)
-            b = -divexact(H[i+1,j],d)
+            d, u, v = gcdx(H[p, j], H[i + 1, j])
+            a = divexact(H[p, j], d)
+            b = -divexact(H[i + 1, j], d)
             for c = j:n
-               t = deepcopy(H[i+1,c])
-               t1 = mul!(t1, a, H[i+1,c])
-               t2 = mul!(t2, b, H[p,c])
-               H[i+1,c] = add!(H[i+1,c], t1, t2)
-               t1 = mul!(t1, u, H[p,c])
-               t2 = mul!(t2, v, t)
-               H[p,c] = add!(H[p,c], t1, t2)
+               t = deepcopy(H[i + 1, c])
+               t1 = mul_red!(t1, a, H[i + 1, c], false)
+               t2 = mul_red!(t2, b, H[p, c], false)
+               H[i + 1, c] = add!(H[i + 1, c], t1, t2)
+               H[i + 1, c] = reduce!(H[i + 1, c])
+               t1 = mul_red!(t1, u, H[p, c], false)
+               t2 = mul_red!(t2, v, t, false)
+               H[p, c] = add!(H[p, c], t1, t2)
+               H[p, c] = reduce!(H[p, c])
             end
             if with_trafo
                for c = 1:m
-                  t = deepcopy(U[i+1,c])
-                  t1 = mul!(t1, a, U[i+1,c])
-                  t2 = mul!(t2, b, U[p,c])
-                  U[i+1,c] = add!(U[i+1,c], t1, t2)
-                  t1 = mul!(t1, u, U[p,c])
-                  t2 = mul!(t2, v, t)
-                  U[p,c] = add!(U[p,c], t1, t2)
+                  t = deepcopy(U[i + 1, c])
+                  t1 = mul_red!(t1, a, U[i + 1, c], false)
+                  t2 = mul_red!(t2, b, U[p, c], false)
+                  U[i + 1, c] = add!(U[i + 1, c], t1, t2)
+                  U[i + 1, c] = reduce!(U[i + 1, c])
+                  t1 = mul_red!(t1, u, U[p, c], false)
+                  t2 = mul_red!(t2, v, t, false)
+                  U[p, c] = add!(U[p, c], t1, t2)
+                  U[p, c] = reduce!(U[p, c])
                end
             end
          end
@@ -3403,30 +3411,34 @@ function kb_clear_row!(S::MatrixElem{T}, K::MatrixElem{T}, i::Int, with_trafo::B
    t1 = base_ring(S)()
    t2 = base_ring(S)()
    for j = i+1:n
-      if iszero(S[i,j])
+      if iszero(S[i, j])
          continue
       end
-      d, u, v = gcdx(S[i,i], S[i,j])
-      a = divexact(S[i,i], d)
-      b = -divexact(S[i,j], d)
+      d, u, v = gcdx(S[i, i], S[i, j])
+      a = divexact(S[i ,i], d)
+      b = -divexact(S[i, j], d)
       for r = i:m
-         t = deepcopy(S[r,j])
-         t1 = mul!(t1, a, S[r,j])
-         t2 = mul!(t2, b, S[r,i])
-         S[r,j] = add!(S[r,j], t1, t2)
-         t1 = mul!(t1, u, S[r,i])
-         t2 = mul!(t2, v, t)
-         S[r,i] = add!(S[r,i], t1, t2)
+         t = deepcopy(S[r, j])
+         t1 = mul_red!(t1, a, S[r, j], false)
+         t2 = mul_red!(t2, b, S[r, i], false)
+         S[r, j] = add!(S[r, j], t1, t2)
+         S[r, j] = reduce!(S[r, j])
+         t1 = mul_red!(t1, u, S[r, i], false)
+         t2 = mul_red!(t2, v, t, false)
+         S[r, i] = add!(S[r, i], t1, t2)
+         S[r, i] = reduce!(S[r, i])
       end
       if with_trafo
          for r = 1:n
             t = deepcopy(K[r,j])
-            t1 = mul!(t1, a, K[r,j])
-            t2 = mul!(t2, b, K[r,i])
-            K[r,j] = add!(K[r,j], t1, t2)
-            t1 = mul!(t1, u, K[r,i])
-            t2 = mul!(t2, v, t)
-            K[r,i] = add!(K[r,i], t1, t2)
+            t1 = mul_red!(t1, a, K[r, j], false)
+            t2 = mul_red!(t2, b, K[r, i], false)
+            K[r, j] = add!(K[r, j], t1, t2)
+            K[r, j] = reduce!(K[r, j])
+            t1 = mul_red!(t1, u, K[r, i], false)
+            t2 = mul_red!(t2, v, t, false)
+            K[r, i] = add!(K[r, i], t1, t2)
+            K[r, i] = reduce!(K[r, i])
          end
       end
    end
@@ -3454,35 +3466,37 @@ function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_traf
       i+=1
    end
    for i = 1:l-1
-      if iszero(S[i,i]) && iszero(S[i+1,i+1])
+      if iszero(S[i, i]) && iszero(S[i + 1, i + 1])
          continue
       end
-      d, u, v = gcdx(S[i,i], S[i+1,i+1])
+      d, u, v = gcdx(S[i, i], S[i + 1, i + 1])
       if with_trafo
-         q = -divexact(S[i+1,i+1], d)
+         q = -divexact(S[i + 1, i + 1], d)
          t1 = mul!(t1, q, v)
          for c = 1:m
             t = deepcopy(U[i,c])
-            U[i,c] = addeq!(U[i,c], U[i+1,c])
-            t2 = mul!(t2, t1, U[i+1,c])
-            U[i+1,c] = addeq!(U[i+1,c], t2)
+            U[i, c] = addeq!(U[i, c], U[i + 1,c])
+            t2 = mul!(t2, t1, U[i + 1, c])
+            U[i + 1, c] = addeq!(U[i + 1, c], t2)
             t2 = mul!(t2, t1, t)
-            U[i+1,c] = addeq!(U[i+1,c], t2)
+            U[i + 1, c] = addeq!(U[i + 1, c], t2)
          end
-         q1 = -divexact(S[i+1,i+1], d)
-         q2 = divexact(S[i,i], d)
+         q1 = -divexact(S[i + 1, i + 1], d)
+         q2 = divexact(S[i, i], d)
          for r = 1:n
-            t = deepcopy(K[r,i])
-            t1 = mul!(t1, K[r,i], u)
-            t2 = mul!(t2, K[r,i+1], v)
-            K[r,i] = add!(K[r,i], t1, t2)
-            t1 = mul!(t1, t, q1)
-            t2 = mul!(t2, K[r,i+1], q2)
-            K[r,i+1] = add!(K[r,i+1], t1, t2)
+            t = deepcopy(K[r, i])
+            t1 = mul_red!(t1, K[r, i], u, false)
+            t2 = mul_red!(t2, K[r, i + 1], v, false)
+            K[r, i] = add!(K[r, i], t1, t2)
+            K[r, i] = reduce!(K[r, i])
+            t1 = mul_red!(t1, t, q1, false)
+            t2 = mul_red!(t2, K[r, i + 1], q2, false)
+            K[r, i + 1] = add!(K[r, i + 1], t1, t2)
+            K[r, i + 1] = reduce!(K[r, i + 1])
          end
       end
-      S[i+1,i+1] = divexact(S[i,i]*S[i+1,i+1],d)
-      S[i,i] = d
+      S[i + 1, i + 1] = divexact(S[i, i]*S[i + 1, i + 1],d)
+      S[i, i] = d
    end
    return nothing
 end
@@ -3631,20 +3645,20 @@ function weak_popov_with_pivots!(P::Mat{T}, W::Mat{T}, U::Mat{T}, pivots::Array{
             if j == pivotInd
                continue
             end
-            q = -div(P[pivots[i][j],i], P[pivot,i])
+            q = -div(P[pivots[i][j], i], P[pivot,i])
             for c = 1:n
                t = mul!(t, q, P[pivot,c])
-               P[pivots[i][j],c] = addeq!(P[pivots[i][j],c], t)
+               P[pivots[i][j], c] = addeq!(P[pivots[i][j],c], t)
             end
             if with_trafo
                for c = 1:cols(U)
                   t = mul!(t, q, U[pivot,c])
-                  U[pivots[i][j],c] = addeq!(U[pivots[i][j],c], t)
+                  U[pivots[i][j], c] = addeq!(U[pivots[i][j],c], t)
                end
             end
             if extended
                t = mul!(t, q, W[pivot,1])
-               W[pivots[i][j],1] = addeq!(W[pivots[i][j],1], t)
+               W[pivots[i][j], 1] = addeq!(W[pivots[i][j],1], t)
             end
          end
          old_pivots = pivots[i]
@@ -3738,7 +3752,7 @@ function det_popov(A::Mat{T}) where {T <: PolyElem}
          q = -div(B[r1,c],B[r2,c])
          for j = 1:i+1
             t = mul!(t, q, B[r2,j])
-            B[r1,j] = addeq!(B[r1,j], t)
+            B[r1, j] = addeq!(B[r1,j], t)
          end
          c = find_pivot_popov(B, r1, i)
       end
@@ -3853,12 +3867,12 @@ function popov!(P::Mat{T}, U::Mat{T}, with_trafo::Bool = false) where {T <: Poly
          q = -div(P[r,i],P[pivot,i])
          for c = 1:n
             t = mul!(t, q, P[pivot,c])
-            P[r,c] = addeq!(P[r,c], t)
+            P[r, c] = addeq!(P[r,c], t)
          end
          if with_trafo
             for c = 1:cols(U)
                t = mul!(t, q, U[pivot,c])
-               U[r,c] = addeq!(U[r,c], t)
+               U[r, c] = addeq!(U[r,c], t)
             end
          end
       end
@@ -3916,12 +3930,12 @@ function hnf_via_popov_reduce_row!(H::Mat{T}, U::Mat{T}, pivots_hermite::Array{I
       q = -div(H[r,c],H[pivot,c])
       for j = c:n
          t = mul!(t, q, H[pivot,j])
-         H[r,j] = addeq!(H[r,j], t)
+         H[r, j] = addeq!(H[r,j], t)
       end
       if with_trafo
          for j = 1:cols(U)
             t = mul!(t, q, U[pivot,j])
-            U[r,j] = addeq!(U[r,j], t)
+            U[r, j] = addeq!(U[r,j], t)
          end
       end
    end
@@ -3937,18 +3951,18 @@ function hnf_via_popov_reduce_column!(H::Mat{T}, U::Mat{T}, pivots_hermite::Arra
       if i == r
          continue
       end
-      if degree(H[i,c]) < degree(H[r,c])
+      if degree(H[i, c]) < degree(H[r, c])
          continue
       end
-      q = -div(H[i,c],H[r,c])
+      q = -div(H[i, c], H[r, c])
       for j = 1:n
-         t = mul!(t, q, H[r,j])
-         H[i,j] = addeq!(H[i,j], t)
+         t = mul!(t, q, H[r, j])
+         H[i, j] = addeq!(H[i, j], t)
       end
       if with_trafo
          for j = 1:cols(U)
-            t = mul!(t, q, U[r,j])
-            U[i,j] = addeq!(U[i,j], t)
+            t = mul!(t, q, U[r, j])
+            U[i, j] = addeq!(U[i, j], t)
          end
       end
    end
@@ -3975,25 +3989,25 @@ function hnf_via_popov!(H::Mat{T}, U::Mat{T}, with_trafo::Bool = false) where {T
    for i = n-1:-1:1
       # "Remove" the column i+1 and compute a weak Popov Form of the
       # remaining matrix.
-      r1 = pivots_popov[i+1]
+      r1 = pivots_popov[i + 1]
       c = find_pivot_popov(H, r1, i)
       new_pivot = true
-      # If the pivot H[r1,c] is zero then the row is zero.
-      while !iszero(H[r1,c])
+      # If the pivot H[r1, c] is zero then the row is zero.
+      while !iszero(H[r1, c])
          r2 = pivots_popov[c]
-         if degree(H[r2,c]) > degree(H[r1,c])
+         if degree(H[r2, c]) > degree(H[r1,c])
             r1, r2 = r2, r1
             pivots_popov[c] = r2
          end
-         q = -div(H[r1,c],H[r2,c])
+         q = -div(H[r1, c], H[r2, c])
          for j = 1:n
-            t = mul!(t, q, H[r2,j])
-            H[r1,j] = addeq!(H[r1,j], t)
+            t = mul!(t, q, H[r2, j])
+            H[r1, j] = addeq!(H[r1, j], t)
          end
          if with_trafo
             for j = 1:cols(U)
-               t = mul!(t, q, U[r2,j])
-               U[r1,j] = addeq!(U[r1,j], t)
+               t = mul!(t, q, U[r2, j])
+               U[r1, j] = addeq!(U[r1, j], t)
             end
          end
          hnf_via_popov_reduce_row!(H, U, pivots_hermite, r1, with_trafo)
@@ -4043,13 +4057,12 @@ function similarity!(A::MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
    d = -d
    for i = 1:n
       for j = 1:r - 1
-         t = mul!(t, A[j, i], d)
-         A[r, i] = addeq!(A[r, i], t)
+         A[r, i] = addmul_delayed_reduction!(A[r, i], A[j, i], d, t)
       end
       for j = r + 1:n
-         t = mul!(t, A[j, i], d)
-         A[r, i] = addeq!(A[r, i], t)
+         A[r, i] = addmul_delayed_reduction!(A[r, i], A[j, i], d, t)
       end
+      A[r, i] = reduce!(A[r, i])
    end
 end
 

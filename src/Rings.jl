@@ -121,7 +121,7 @@ end
 
 # Define addmul_delayed_reduction! for all ring elem types
 function addmul_delayed_reduction!(a::T, b::T, c::T, d::T) where T <: RingElement
-   d = mul_red!(d, b, c, true)
+   d = mul_red!(d, b, c, false)
    return addeq!(a, d)
 end
 
