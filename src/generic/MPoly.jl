@@ -1227,19 +1227,20 @@ function mul_johnson(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: RingElemen
             monomial_set!(Re, k, Exps, exp, N)
             first = false
          else
-            Rc[k] = addmul!(Rc[k], a.coeffs[v.i], b.coeffs[v.j], c)
+            Rc[k] = addmul_delayed_reduction!(Rc[k], a.coeffs[v.i], b.coeffs[v.j], c)
          end
          if v.j < n || v.j == 1
             push!(Q, x.n)
          end
          while (xn = v.next) != 0
             v = I[xn]
-            Rc[k] = addmul!(Rc[k], a.coeffs[v.i], b.coeffs[v.j], c)
+            Rc[k] = addmul_delayed_reduction!(Rc[k], a.coeffs[v.i], b.coeffs[v.j], c)
             if v.j < n || v.j == 1
                push!(Q, xn)
             end
          end
       end
+      Rc[k] = reduce!(Rc[k])
       @inbounds while !isempty(Q)
          xn = pop!(Q)
          v = I[xn]
@@ -1606,7 +1607,7 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
          SS = addeq!(SS, t1)
          if !monomial_isless(Exps, exp, final_exp, 1, N, par, drmask)
             temp2 = add!(temp2, fik[v.i], gi[v.j])
-            C = addmul!(C, temp2, t1, temp)
+            C = addmul_delayed_reduction!(C, temp2, t1, temp)
          end
          if first
             monomial_sub!(ge, gnext, Exps, exp, f.exps, 1, N)
@@ -1620,11 +1621,12 @@ function pow_fps(f::MPoly{T}, k::Int, bits::Int) where {T <: RingElement}
             SS = addeq!(SS, t1)
             if !monomial_isless(Exps, exp, final_exp, 1, N, par, drmask)
                temp2 = add!(temp2, fik[v.i], gi[v.j])
-               C = addmul!(C, temp2, t1, temp)
+               C = addmul_delayed_reduction!(C, temp2, t1, temp)
             end
             push!(Q, xn)
          end
       end
+      C = reduce!(C)
       reuse = 0
       while !isempty(Q)
          xn = pop!(Q)
@@ -1889,9 +1891,9 @@ function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <:
             first = false
          end
          if v.i == 0
-            qc = addmul!(qc, a.coeffs[v.j], m1, c)
+            qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
          else
-            qc = addmul!(qc, b.coeffs[v.i], Qc[v.j], c)
+            qc = addmul_delayed_reduction!(qc, b.coeffs[v.i], Qc[v.j], c)
          end
          if v.i != 0 || v.j < m
             push!(Q, x.n)
@@ -1901,9 +1903,9 @@ function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <:
          while (xn = v.next) != 0
             v = I[xn]
             if v.i == 0
-               qc = addmul!(qc, a.coeffs[v.j], m1, c)
+               qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
             else
-               qc = addmul!(qc, b.coeffs[v.i], Qc[v.j], c)
+               qc = addmul_delayed_reduction!(qc, b.coeffs[v.i], Qc[v.j], c)
             end
             if v.i != 0 || v.j < m
                push!(Q, xn)
@@ -1912,6 +1914,7 @@ function divides_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <:
             end
          end
       end
+      qc = reduce!(qc)
       @inbounds while !isempty(Q)
          xn = pop!(Q)
          v = I[xn]
@@ -2080,9 +2083,9 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
          v = I[x.n]
          if divides_exp
             if v.i == 0
-               qc = addmul!(qc, a.coeffs[v.j], m1, c)
+               qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
             else
-               qc = addmul!(qc, b.coeffs[v.i], Qc[v.j], c)
+               qc = addmul_delayed_reduction!(qc, b.coeffs[v.i], Qc[v.j], c)
             end
          end
          if v.i != 0 || v.j < m
@@ -2094,9 +2097,9 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
             v = I[xn]
             if divides_exp
                if v.i == 0
-                  qc = addmul!(qc, a.coeffs[v.j], m1, c)
+                  qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
                else
-                  qc = addmul!(qc, b.coeffs[v.i], Qc[v.j], c)
+                  qc = addmul_delayed_reduction!(qc, b.coeffs[v.i], Qc[v.j], c)
                end
             end
             if v.i != 0 || v.j < m
@@ -2106,6 +2109,7 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
             end
          end
       end
+      qc = reduce!(qc)
       @inbounds while !isempty(Q)
          xn = pop!(Q)
          v = I[xn]
@@ -2291,9 +2295,9 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
          Viewn[viewc] = heappop!(H, Exps, N, par, drmask)
          v = I[x.n]
          if v.i == 0
-            qc = addmul!(qc, a.coeffs[v.j], m1, c)
+            qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
          else
-            qc = addmul!(qc, b.coeffs[v.i], Qc[v.j], c)
+            qc = addmul_delayed_reduction!(qc, b.coeffs[v.i], Qc[v.j], c)
          end
          if v.i != 0 || v.j < m
             push!(Q, x.n)
@@ -2303,9 +2307,9 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
          while (xn = v.next) != 0
             v = I[xn]
             if v.i == 0
-               qc = addmul!(qc, a.coeffs[v.j], m1, c)
+               qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
             else
-               qc = addmul!(qc, b.coeffs[v.i], Qc[v.j], c)
+               qc = addmul_delayed_reduction!(qc, b.coeffs[v.i], Qc[v.j], c)
             end
             if v.i != 0 || v.j < m
                push!(Q, xn)
@@ -2314,6 +2318,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
             end
          end
       end
+      qc = reduce!(qc)
       @inbounds while !isempty(Q)
          xn = pop!(Q)
          v = I[xn]
@@ -2517,9 +2522,9 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
          Viewn[viewc] = heappop!(H, Exps, N, par, drmask)
          v = I[x.n]
          if v.i == 0
-            qc = addmul!(qc, a.coeffs[v.j], m1, c)
+            qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
          else
-            qc = addmul!(qc, b[v.p].coeffs[v.i], Qc[v.p][v.j], c)
+            qc = addmul_delayed_reduction!(qc, b[v.p].coeffs[v.i], Qc[v.p][v.j], c)
          end
          if v.i != 0 || v.j < m
             push!(Q, x.n)
@@ -2529,9 +2534,9 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
          while (xn = v.next) != 0
             v = I[xn]
             if v.i == 0
-               qc = addmul!(qc, a.coeffs[v.j], m1, c)
+               qc = addmul_delayed_reduction!(qc, a.coeffs[v.j], m1, c)
             else
-               qc = addmul!(qc, b[v.p].coeffs[v.i], Qc[v.p][v.j], c)
+               qc = addmul_delayed_reduction!(qc, b[v.p].coeffs[v.i], Qc[v.p][v.j], c)
             end
             if v.i != 0 || v.j < m
                push!(Q, xn)
@@ -2540,6 +2545,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
             end
          end
       end
+      qc = reduce!(qc)
       @inbounds while !isempty(Q)
          xn = pop!(Q)
          v = I[xn]
