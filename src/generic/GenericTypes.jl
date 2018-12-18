@@ -11,7 +11,7 @@
 ###############################################################################
 
 @doc Markdown.doc"""
-    CycleDec(ccycles, cptrs, n){T}
+    CycleDec{T}(ccycles, cptrs, n) where T
 > Cycle decomposition of a permutation.
 > * `ccycles`: an array of consecutive entries of cycles;
 > * `cptrs`: an array of pointers to the locations where cycles begin: ```ccycles[cptrs[i], cptrs[i+1]-1]` contains the i-th cycle;
