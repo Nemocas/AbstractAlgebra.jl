@@ -363,52 +363,52 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    shift_left(x::AbstractAlgebra.AbsSeriesElem{T}, len::Int) where {T <: RingElement}
-> Return the power series $f$ shifted left by $n$ terms, i.e. multiplied by
+    shift_left(x::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingElement}
+> Return the power series $x$ shifted left by $n$ terms, i.e. multiplied by
 > $x^n$.
 """
-function shift_left(x::AbstractAlgebra.AbsSeriesElem{T}, len::Int) where {T <: RingElement}
-   len < 0 && throw(DomainError())
+function shift_left(x::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingElement}
+   n < 0 && throw(DomainError())
    xlen = length(x)
-   prec = precision(x) + len
+   prec = precision(x) + n
    prec = min(prec, max_precision(parent(x)))
    if xlen == 0
       z = zero(parent(x))
       set_prec!(z, prec)
       return z
    end
-   zlen = min(prec, xlen + len)
+   zlen = min(prec, xlen + n)
    z = parent(x)()
    fit!(z, zlen)
    set_prec!(z, prec)
-   for i = 1:len
+   for i = 1:n
       z = setcoeff!(z, i - 1, zero(base_ring(x)))
    end
    for i = 1:xlen
-      z = setcoeff!(z, i + len - 1, coeff(x, i - 1))
+      z = setcoeff!(z, i + n - 1, coeff(x, i - 1))
    end
    set_length!(z, normalise(z, zlen))
    return z
 end
 
 @doc Markdown.doc"""
-    shift_right(x::AbstractAlgebra.AbsSeriesElem{T}, len::Int) where {T <: RingElement}
-> Return the power series $f$ shifted right by $n$ terms, i.e. divided by
+    shift_right(x::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingElement}
+> Return the power series $x$ shifted right by $n$ terms, i.e. divided by
 > $x^n$.
 """
-function shift_right(x::AbstractAlgebra.AbsSeriesElem{T}, len::Int) where {T <: RingElement}
-   len < 0 && throw(DomainError())
+function shift_right(x::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingElement}
+   n < 0 && throw(DomainError())
    xlen = length(x)
-   if len >= xlen
+   if n >= xlen
       z = zero(parent(x))
-      set_prec!(z, max(0, precision(x) - len))
+      set_prec!(z, max(0, precision(x) - n))
       return z
    end
    z = parent(x)()
-   fit!(z, xlen - len)
-   set_prec!(z, precision(x) - len)
-   for i = 1:xlen - len
-      z = setcoeff!(z, i - 1, coeff(x, i + len - 1))
+   fit!(z, xlen - n)
+   set_prec!(z, precision(x) - n)
+   for i = 1:xlen - n
+      z = setcoeff!(z, i - 1, coeff(x, i + n - 1))
    end
    return z
 end
@@ -420,25 +420,25 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    truncate(a::AbstractAlgebra.AbsSeriesElem{T}, prec::Int) where {T <: RingElement}
+    truncate(a::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingElement}
 > Return $a$ truncated to $n$ terms.
 """
-function truncate(a::AbstractAlgebra.AbsSeriesElem{T}, prec::Int) where {T <: RingElement}
-   prec < 0 && throw(DomainError())
+function truncate(a::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingElement}
+   n < 0 && throw(DomainError())
    len = length(a)
-   if precision(a) <= prec
+   if precision(a) <= n 
       return a
    end
    z = parent(a)()
-   fit!(z, prec)
-   set_prec!(z, prec)
-   for i = 1:min(prec, len)
+   fit!(z, n)
+   set_prec!(z, n)
+   for i = 1:min(n, len)
       z = setcoeff!(z, i - 1, coeff(a, i - 1))
    end
-   for i = len + 1:prec
+   for i = len + 1:n
       z = setcoeff!(z, i - 1, zero(base_ring(a)))
    end
-   set_length!(z, normalise(z, prec))
+   set_length!(z, normalise(z, n))
    return z
 end
 
@@ -606,7 +606,7 @@ end
 
 @doc Markdown.doc"""
     divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
-> Return $a/b$. Requires $b$ to be invertible.
+> Return $x/y$. Requires $y$ to be invertible.
 """
 function divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
    check_parent(x, y)
@@ -631,7 +631,7 @@ end
 
 @doc Markdown.doc"""
     divexact(x::AbstractAlgebra.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
-> Return $a/b$ where the quotient is expected to be exact.
+> Return $x/y$ where the quotient is expected to be exact.
 """
 function divexact(x::AbstractAlgebra.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
    y == 0 && throw(DivideError())
@@ -647,7 +647,7 @@ end
 
 @doc Markdown.doc"""
     divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::T) where {T <: RingElem}
-> Return $a/b$ where the quotient is expected to be exact.
+> Return $x/y$ where the quotient is expected to be exact.
 """
 function divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::T) where {T <: RingElem}
    iszero(y) && throw(DivideError())
