@@ -817,7 +817,7 @@ end
 
 @doc Markdown.doc"""
     truncate(a::Generic.PolynomialElem, n::Int)
-> Return $a$ truncated to $n$ terms. Testing the functionaliy
+> Return $a$ truncated to $n$ terms. 
 """
 function truncate(a::PolynomialElem, n::Int)
    lena = length(a)
@@ -1408,7 +1408,7 @@ function term_content(a::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, ignore_content::Bool = false) where {T <: RingElement}
+    gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Return a greatest common divisor of $a$ and $b$ if it exists.
 """
 function gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, ignore_content::Bool = false) where {T <: RingElement}
