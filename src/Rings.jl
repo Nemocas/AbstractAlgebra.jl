@@ -110,6 +110,28 @@ Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, T <: RingElem} = x^p
 
 ###############################################################################
 #
+#   Delayed reduction
+#
+###############################################################################
+
+# Fall back to ordinary multiplication
+function mul_red!(a::T, b::T, c::T, flag::Bool) where T <: RingElement
+   return mul!(a, b, c)
+end
+
+# Define addmul_delayed_reduction! for all ring elem types
+function addmul_delayed_reduction!(a::T, b::T, c::T, d::T) where T <: RingElement
+   d = mul_red!(d, b, c, false)
+   return addeq!(a, d)
+end
+
+# Fall back to nop
+function reduce!(a::RingElement)
+   return a
+end
+
+###############################################################################
+#
 #   Baby-steps giant-steps powering
 #
 ###############################################################################
