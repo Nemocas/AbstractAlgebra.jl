@@ -51,7 +51,7 @@ function similar(x::Mat{T}, r::Int, c::Int) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    eye(x::MatrixElem)
+    eye(x::Generic.MatrixElem)
 > Return the identity matrix with the same shape as $x$.
 """
 function eye(x::MatrixElem)
@@ -63,7 +63,7 @@ function eye(x::MatrixElem)
 end
 
 @doc Markdown.doc"""
-    eye(x::MatrixElem, d::Int)
+    eye(x::Generic.MatrixElem, d::Int)
 > Return the $d$-by-$d$ identity matrix with the same base ring as $x$.
 """
 function eye(x::MatrixElem, d::Int)
@@ -91,7 +91,7 @@ elem_type(::Type{MatSpace{T}}) where {T <: RingElement} = Mat{T}
 base_ring(a::AbstractAlgebra.MatSpace{T}) where {T <: RingElement} = a.base_ring::parent_type(T)
 
 @doc Markdown.doc"""
-    base_ring(a::MatrixElem{T}) where {T <: RingElement}
+    base_ring(a::Generic.MatrixElem{T}) where {T <: RingElement}
 > Return the base ring $R$ of the matrix space that the supplied matrix $r$
 > belongs to.
 """
@@ -150,13 +150,13 @@ function Base.hash(a::AbstractAlgebra.MatElem, h::UInt)
 end
 
 @doc Markdown.doc"""
-    rows(a::MatrixElem)
+    rows(a::Generic.MatrixElem)
 > Return the number of rows of the given matrix.
 """
 rows(a::MatrixElem) = size(a.entries, 1)
 
 @doc Markdown.doc"""
-    cols(a::MatrixElem)
+    cols(a::Generic.MatrixElem)
 > Return the number of columns of the given matrix.
 """
 cols(a::MatrixElem) = size(a.entries, 2)
@@ -184,7 +184,7 @@ zero(a::AbstractAlgebra.MatSpace) = a()
 one(a::AbstractAlgebra.MatSpace) = a(1)
 
 @doc Markdown.doc"""
-    iszero(a::MatrixElem)
+    iszero(a::Generic.MatrixElem)
 > Return `true` if the supplied matrix $a$ is the zero matrix, otherwise
 > return `false`.
 """
@@ -200,7 +200,7 @@ function iszero(a::MatrixElem)
 end
 
 @doc Markdown.doc"""
-    isone(a::MatrixElem)
+    isone(a::Generic.MatrixElem)
 > Return `true` if the supplied matrix $a$ is diagonal with ones along the
 > diagonal, otherwise return `false`.
 """
@@ -354,7 +354,7 @@ show_minus_one(::Type{AbstractAlgebra.MatElem{T}}) where {T <: RingElement} = fa
 ###############################################################################
 
 @doc Markdown.doc"""
-    -(x::MatrixElem)
+    -(x::Generic.MatrixElem)
 > Return $-a$.
 """
 function -(x::MatrixElem)
@@ -374,7 +374,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    +(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
+    +(x::Generic.MatrixElem{T}, y::Generic.MatrixElem{T}) where {T <: RingElement}
 > Return $a + b$.
 """
 function +(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
@@ -389,7 +389,7 @@ function +(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    -(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
+    -(x::Generic.MatrixElem{T}, y::Generic.MatrixElem{T}) where {T <: RingElement}
 > Return $a - b$.
 """
 function -(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
@@ -430,7 +430,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    *(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
+    *(x::Union{Integer, Rational, AbstractFloat}, y::Generic.MatrixElem)
 > Return $x\times y$.
 """
 function *(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
@@ -444,7 +444,7 @@ function *(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
 end
 
 @doc Markdown.doc"""
-    *(x::T, y::MatrixElem{T}) where {T <: RingElem}
+    *(x::T, y::Generic.MatrixElem{T}) where {T <: RingElem}
 > Return $x\times y$.
 """
 function *(x::T, y::MatrixElem{T}) where {T <: RingElem}
@@ -458,19 +458,19 @@ function *(x::T, y::MatrixElem{T}) where {T <: RingElem}
 end
 
 @doc Markdown.doc"""
-    *(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
+    *(x::Generic.MatrixElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x\times y$.
 """
 *(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat}) = y*x
 
 @doc Markdown.doc"""
-    *(x::MatrixElem{T}, y::T) where {T <: RingElem}
+    *(x::Generic.MatrixElem{T}, y::T) where {T <: RingElem}
 > Return $x\times y$.
 """
 *(x::MatrixElem{T}, y::T) where {T <: RingElem} = y*x
 
 @doc Markdown.doc"""
-    +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
+    +(x::Union{Integer, Rational, AbstractFloat}, y::Generic.MatrixElem)
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
 function +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
@@ -489,13 +489,13 @@ function +(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
 end
 
 @doc Markdown.doc"""
-    +(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
+    +(x::Generic.MatrixElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 """
 +(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat}) = y + x
 
 @doc Markdown.doc"""
-    +(x::T, y::MatrixElem{T}) where {T <: RingElem}
+    +(x::T, y::Generic.MatrixElem{T}) where {T <: RingElem}
 > Return $S(x) + y$ where $S$ is the parent of $y$.
 """
 function +(x::T, y::MatrixElem{T}) where {T <: RingElem}
@@ -513,13 +513,13 @@ function +(x::T, y::MatrixElem{T}) where {T <: RingElem}
 end
 
 @doc Markdown.doc"""
-    +(x::MatrixElem{T}, y::T) where {T <: RingElem}
+    +(x::Generic.MatrixElem{T}, y::T) where {T <: RingElem}
 > Return $x + S(y)$ where $S$ is the parent of $x$.
 """
 +(x::MatrixElem{T}, y::T) where {T <: RingElem} = y + x
 
 @doc Markdown.doc"""
-    -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
+    -(x::Union{Integer, Rational, AbstractFloat}, y::Generic.MatrixElem)
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 """
 function -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
@@ -538,7 +538,7 @@ function -(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
 end
 
 @doc Markdown.doc"""
-    -(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
+    -(x::Generic.MatrixElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x - S(y)$, where $S$ is the parent of $x$.
 """
 function -(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
@@ -557,7 +557,7 @@ function -(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
 end
 
 @doc Markdown.doc"""
-    -(x::T, y::MatrixElem{T}) where {T <: RingElem}
+    -(x::T, y::Generic.MatrixElem{T}) where {T <: RingElem}
 > Return $S(x) - y$ where $S$ is the parent of $y$.
 """
 function -(x::T, y::MatrixElem{T}) where {T <: RingElem}
@@ -576,7 +576,7 @@ function -(x::T, y::MatrixElem{T}) where {T <: RingElem}
 end
 
 @doc Markdown.doc"""
-    -(x::MatrixElem{T}, y::T) where {T <: RingElem}
+    -(x::Generic.MatrixElem{T}, y::T) where {T <: RingElem}
 > Return $x - S(y)$, where $S$ is the parent of $a$.
 """
 function -(x::MatrixElem{T}, y::T) where {T <: RingElem}
@@ -603,7 +603,7 @@ end
 Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, T <: MatElem} = x^p
 
 @doc Markdown.doc"""
-    ^(a::MatrixElem, b::Int)
+    ^(a::Generic.MatrixElem, b::Int)
 > Return $a^b$. We require $b \geq 0$ and that the matrix $a$ is square.
 """
 function ^(a::MatrixElem, b::Int)
@@ -633,7 +633,7 @@ function ^(a::MatrixElem, b::Int)
 end
 
 @doc Markdown.doc"""
-    powers(a::MatrixElem, d::Int)
+    powers(a::Generic.MatrixElem, d::Int)
 > Return an array of matrices $M$ wher $M[i + 1] = a^i$ for $i = 0..d$
 """
 function powers(a::MatrixElem, d::Int)
@@ -659,7 +659,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
+    ==(x::Generic.MatrixElem{T}, y::Generic.MatrixElem{T}) where {T <: RingElement}
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
 > equal to the minimum of the two precisions.
@@ -677,7 +677,7 @@ function ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    isequal(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
+    isequal(x::Generic.MatrixElem{T}, y::Generic.MatrixElem{T}) where {T <: RingElement}
 > Return `true` if $x == y$ exactly, otherwise return `false`. This function is
 > useful in cases where the entries of the matrices are inexact, e.g. power
 > series. Only if the power series are precisely the same, to the same precision,
@@ -702,7 +702,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ==(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
+    ==(x::Generic.MatrixElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 > otherwise return `false`.
 """
@@ -723,14 +723,14 @@ function ==(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
 end
 
 @doc Markdown.doc"""
-    ==(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem)
+    ==(x::Union{Integer, Rational, AbstractFloat}, y::Generic.MatrixElem)
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 > otherwise return `false`.
 """
 ==(x::Union{Integer, Rational, AbstractFloat}, y::MatrixElem) = y == x
 
 @doc Markdown.doc"""
-    ==(x::MatrixElem{T}, y::T) where {T <: RingElem}
+    ==(x::Generic.MatrixElem{T}, y::T) where {T <: RingElem}
 > Return `true` if $x == S(y)$ arithmetically, where $S$ is the parent of $x$,
 > otherwise return `false`.
 """
@@ -751,7 +751,7 @@ function ==(x::MatrixElem{T}, y::T) where {T <: RingElem}
 end
 
 @doc Markdown.doc"""
-    ==(x::T, y::MatrixElem{T}) where {T <: RingElem}
+    ==(x::T, y::Generic.MatrixElem{T}) where {T <: RingElem}
 > Return `true` if $S(x) == y$ arithmetically, where $S$ is the parent of $y$,
 > otherwise return `false`.
 """
@@ -764,7 +764,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    divexact(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
+    divexact(x::Generic.MatrixElem, y::Union{Integer, Rational, AbstractFloat})
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by
 > $y$. Each division is expected to be exact.
 """
@@ -779,7 +779,7 @@ function divexact(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
 end
 
 @doc Markdown.doc"""
-    divexact(x::MatrixElem{T}, y::T) where {T <: RingElem}
+    divexact(x::Generic.MatrixElem{T}, y::T) where {T <: RingElem}
 > Return $x/y$, i.e. the matrix where each of the entries has been divided by
 > $y$. Each division is expected to be exact.
 """
@@ -862,7 +862,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    tr(x::MatrixElem)
+    tr(x::Generic.MatrixElem)
 > Return the trace of the matrix $a$, i.e. the sum of the diagonal elements. We
 > require the matrix to be square.
 """
@@ -882,7 +882,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    content(x::MatrixElem)
+    content(x::Generic.MatrixElem)
 > Return the content of the matrix $a$, i.e. the greatest common divisor of all
 > its entries, assuming it exists.
 """
@@ -906,7 +906,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    *(P::Generic.perm, x::MatrixElem)
+    *(P::Generic.perm, x::Generic.MatrixElem)
 > Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 """
 function *(P::Generic.perm, x::MatrixElem)
@@ -972,7 +972,7 @@ function lu!(P::Generic.perm, A::MatrixElem{T}) where {T <: FieldElement}
 end
 
 @doc Markdown.doc"""
-    lu(A::MatrixElem{T}, P = PermGroup(rows(A))) where {T <: FieldElement}
+    lu(A::Generic.MatrixElem{T}, P = PermGroup(rows(A))) where {T <: FieldElement}
 > Return a tuple $r, p, L, U$ consisting of the rank of $A$, a permutation
 > $p$ of $A$ belonging to $P$, a lower triangular matrix $L$ and an upper
 > triangular matrix $U$ such that $p(A) = LU$, where $p(A)$ stands for the
@@ -1111,7 +1111,7 @@ function fflu!(P::Generic.perm, A::MatrixElem{T}) where {T <: FieldElement}
 end
 
 @doc Markdown.doc"""
-    fflu(A::MatrixElem{T}, P = PermGroup(rows(A))) where {T <: RingElement}
+    fflu(A::Generic.MatrixElem{T}, P = PermGroup(rows(A))) where {T <: RingElement}
 > Return a tuple $r, d, p, L, U$ consisting of the rank of $A$, a
 > denominator $d$, a permutation $p$ of $A$ belonging to $P$, a lower
 > triangular matrix $L$ and an upper triangular matrix $U$ such that
@@ -1212,7 +1212,7 @@ function rref!(A::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    rref(M::MatrixElem{T}) where {T <: RingElement}
+    rref(M::Generic.MatrixElem{T}) where {T <: RingElement}
 > Returns a tuple $(r, d, A)$ consisting of the rank $r$ of $M$ and a
 > denominator $d$ in the base ring of $M$ and a matrix $A$ such that $A/d$ is
 > the reduced row echelon form of $M$. Note that the denominator is not usually
@@ -1285,7 +1285,7 @@ function rref!(A::MatrixElem{T}) where {T <: FieldElement}
 end
 
 @doc Markdown.doc"""
-    rref(M::MatrixElem{T}) where {T <: FieldElement}
+    rref(M::Generic.MatrixElem{T}) where {T <: FieldElement}
 > Returns a tuple $(r, A)$ consisting of the rank $r$ of $M$ and a reduced row
 > echelon form $A$ of $M$.
 """
@@ -1296,7 +1296,7 @@ function rref(M::MatrixElem{T}) where {T <: FieldElement}
 end
 
 @doc Markdown.doc"""
-    isrref(M::MatrixElem{T}) where {T <: RingElement}
+    isrref(M::Generic.MatrixElem{T}) where {T <: RingElement}
 > Return `true` if $M$ is in reduced row echelon form, otherwise return
 > `false`.
 """
@@ -1325,7 +1325,7 @@ function isrref(M::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    isrref(M::MatrixElem{T}) where {T <: FieldElement}
+    isrref(M::Generic.MatrixElem{T}) where {T <: FieldElement}
 > Return `true` if $M$ is in reduced row echelon form, otherwise return
 > `false`.
 """
@@ -1518,7 +1518,7 @@ function det_fflu(M::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    det(M::MatrixElem{T}) where {T <: FieldElement}
+    det(M::Generic.MatrixElem{T}) where {T <: FieldElement}
 > Return the determinant of the matrix $M$. We assume $M$ is square.
 """
 function det(M::MatrixElem{T}) where {T <: FieldElement}
@@ -1530,7 +1530,7 @@ function det(M::MatrixElem{T}) where {T <: FieldElement}
 end
 
 @doc Markdown.doc"""
-    det(M::MatrixElem{T}) where {T <: RingElement}
+    det(M::Generic.MatrixElem{T}) where {T <: RingElement}
 > Return the determinant of the matrix $M$. We assume $M$ is square.
 """
 function det(M::MatrixElem{T}) where {T <: RingElement}
@@ -1650,7 +1650,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    rank(M::MatrixElem{T}) where {T <: RingElement}
+    rank(M::Generic.MatrixElem{T}) where {T <: RingElement}
 > Return the rank of the matrix $M$.
 """
 function rank(M::MatrixElem{T}) where {T <: RingElement}
@@ -1665,7 +1665,7 @@ function rank(M::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    rank(M::MatrixElem{T}) where {T <: FieldElement}
+    rank(M::Generic.MatrixElem{T}) where {T <: FieldElement}
 > Return the rank of the matrix $M$.
 """
 function rank(M::MatrixElem{T}) where {T <: FieldElement}
@@ -2046,7 +2046,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    inv(M::MatrixElem{T}) where {T <: RingElement}
+    inv(M::Generic.MatrixElem{T}) where {T <: RingElement}
 > Given a non-singular $n\times n$ matrix over a ring the tuple $X, d$
 > consisting of an $n\times n$ matrix $X$ and a denominator $d$ such that
 > $AX = dI_n$, where $I_n$ is the $n\times n$ identity matrix. The denominator
@@ -2063,7 +2063,7 @@ function inv(M::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    inv(M::MatrixElem{T}) where {T <: FieldElement}
+    inv(M::Generic.MatrixElem{T}) where {T <: FieldElement}
 > Given a non-singular $n\times n$ matrix over a field, return an
 > $n\times n$ matrix $X$ such that $AX = I_n$ where $I_n$ is the $n\times n$
 > identity matrix. If $A$ is singular an exception is raised.
@@ -2230,7 +2230,7 @@ function hessenberg!(A::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    hessenberg(A::MatrixElem{T}) where {T <: RingElement}
+    hessenberg(A::Generic.MatrixElem{T}) where {T <: RingElement}
 > Returns the Hessenberg form of $M$, i.e. an upper Hessenberg matrix
 > which is similar to $M$. The upper Hessenberg form has nonzero entries
 > above and on the diagonal and in the diagonal line immediately below the
@@ -2244,7 +2244,7 @@ function hessenberg(A::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    ishessenberg(A::MatrixElem{T}) where {T <: RingElement}
+    ishessenberg(A::Generic.MatrixElem{T}) where {T <: RingElement}
 > Returns `true` if $M$ is in Hessenberg form, otherwise returns `false`.
 """
 function ishessenberg(A::MatrixElem{T}) where {T <: RingElement}
@@ -2510,7 +2510,7 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
 end
 
 @doc Markdown.doc"""
-    charpoly(V::Ring, Y::MatrixElem{T}) where {T <: RingElement}
+    charpoly(V::Ring, Y::Generic.MatrixElem{T}) where {T <: RingElement}
 > Returns the characteristic polynomial $p$ of the matrix $M$. The
 > polynomial ring $R$ of the resulting polynomial must be supplied
 > and the matrix is assumed to be square.
@@ -2879,7 +2879,7 @@ end
 #  Vol. 8, No. 4, pp. 499-507.
 
 @doc Markdown.doc"""
-    hnf_minors(A::MatrixElem{T}) where {T <: RingElement}
+    hnf_minors(A::Generic.MatrixElem{T}) where {T <: RingElement}
 > Compute the upper right row Hermite normal form of $A$ using the algorithm of
 > Kannan-Bachem. The input must have full column rank.
 """
@@ -2890,7 +2890,7 @@ function hnf_minors(A::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    hnf_minors_with_trafo(A::MatrixElem{T}) where {T <: RingElement}
+    hnf_minors_with_trafo(A::Generic.MatrixElem{T}) where {T <: RingElement}
 > Compute the upper right row Hermite normal form $H$ of $A$ and an invertible
 > matrix $U$ with $UA = H$ using the algorithm of Kannan-Bachem. The input must
 > have full column rank.
@@ -3135,7 +3135,7 @@ end
 #  Kannan-Bachem algorithm
 
 @doc Markdown.doc"""
-    hnf_kb(A::MatrixElem{T}) where {T <: RingElement}
+    hnf_kb(A::Generic.MatrixElem{T}) where {T <: RingElement}
 > Compute the upper right row Hermite normal form of $A$ using a modification
 > of the algorithm of Kannan-Bachem.
 """
@@ -3144,7 +3144,7 @@ function hnf_kb(A::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    hnf_kb_with_trafo(A::MatrixElem{T}) where {T <: RingElement}
+    hnf_kb_with_trafo(A::Generic.MatrixElem{T}) where {T <: RingElement}
 > Compute the upper right row Hermite normal form $H$ of $A$ and an invertible
 > matrix $U$ with $UA = H$ using a modification of the algorithm of
 > Kannan-Bachem.
@@ -3349,7 +3349,7 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
 end
 
 @doc Markdown.doc"""
-    hnf(A::MatrixElem{T}) where {T <: RingElement}
+    hnf(A::Generic.MatrixElem{T}) where {T <: RingElement}
 > Return the upper right row Hermite normal form of $A$.
 """
 function hnf(A::MatrixElem{T}) where {T <: RingElement}
@@ -4020,7 +4020,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    similarity!(A::MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
+    similarity!(A::Generic.MatrixElem{T}, r::Int, d::T) where {T <: RingElement}
 > Applies a similarity transform to the $n\times n$ matrix $M$ in-place. Let
 > $P$ be the $n\times n$ identity matrix that has had all zero entries of row
 > $r$ replaced with $d$, then the transform applied is equivalent to
@@ -4060,7 +4060,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    swap_rows(a::MatrixElem, i::Int, j::Int)
+    swap_rows(a::Generic.MatrixElem, i::Int, j::Int)
 > Return a matrix $b$ with the entries of $a$, where the $i$th and $j$th
 > row are swapped.
 """
@@ -4072,7 +4072,7 @@ function swap_rows(a::MatrixElem, i::Int, j::Int)
 end
 
 @doc Markdown.doc"""
-    swap_rows!(a::MatrixElem, i::Int, j::Int)
+    swap_rows!(a::Generic.MatrixElem, i::Int, j::Int)
 > Swap the $i$th and $j$th row of $a$.
 """
 function swap_rows!(a::MatrixElem, i::Int, j::Int)
