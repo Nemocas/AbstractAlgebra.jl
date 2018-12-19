@@ -528,20 +528,24 @@ function mul_classical(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyEl
    if lena == 0 || lenb == 0
       return parent(a)()
    end
-   t = base_ring(a)()
+   R = base_ring(a)
+   t = R()
    lenz = lena + lenb - 1
    d = Array{T}(undef, lenz)
    for i = 1:lena
-      d[i] = coeff(a, i - 1)*coeff(b, 0)
+      d[i] = mul_red!(R(), coeff(a, i - 1), coeff(b, 0), false)
    end
    for i = 2:lenb
-      d[lena + i - 1] = a.coeffs[lena]*coeff(b, i - 1)
+      d[lena + i - 1] = mul_red!(R(), a.coeffs[lena], coeff(b, i - 1), false)
    end
    for i = 1:lena - 1
       for j = 2:lenb
-         t = mul!(t, coeff(a, i - 1), b.coeffs[j])
+         t = mul_red!(t, coeff(a, i - 1), b.coeffs[j], false)
          d[i + j - 1] = addeq!(d[i + j - 1], t)
       end
+   end
+   for i = 1:lenz
+      d[i] = reduce!(d[i])
    end
    z = parent(a)(d)
    set_length!(z, normalise(z, lenz))
@@ -849,24 +853,28 @@ function mullow(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, 
    if n < 0
       n = 0
    end
-   t = base_ring(a)()
+   R = base_ring(a)
+   t = R()
    lenz = min(lena + lenb - 1, n)
    d = Array{T}(undef, lenz)
    for i = 1:min(lena, lenz)
-      d[i] = coeff(a, i - 1)*coeff(b, 0)
+      d[i] = mul_red!(R(), coeff(a, i - 1), coeff(b, 0), false)
    end
    if lenz > lena
       for j = 2:min(lenb, lenz - lena + 1)
-          d[lena + j - 1] = coeff(a, lena - 1)*coeff(b, j - 1)
+          d[lena + j - 1] = mul_red!(R(), coeff(a, lena - 1), coeff(b, j - 1), false)
       end
    end
    for i = 1:lena - 1
       if lenz > i
          for j = 2:min(lenb, lenz - i + 1)
-            t = mul!(t, coeff(a, i - 1), coeff(b, j - 1))
+            t = mul_red!(t, coeff(a, i - 1), coeff(b, j - 1), false)
             d[i + j - 1] = addeq!(d[i + j - 1], t)
          end
       end
+   end
+   for i = 1:lenz
+      d[i] = reduce!(d[i])
    end
    z = parent(a)(d)
    set_length!(z, normalise(z, lenz))
@@ -2212,9 +2220,12 @@ function monomial_to_newton!(P::Array{T, 1}, roots::Array{T, 1}) where {T <: Rin
       t = R()
       for i = 1:n - 1
          for j = n - 1:-1:i
-            t = mul!(t, P[j + 1], roots[i])
+            t = mul_red!(t, P[j + 1], roots[i], false)
             P[j] = addeq!(P[j], t)
          end
+      end
+      for i = 1:n - 1
+         P[i] = reduce!(P[i])
       end
    end
    return
@@ -2237,9 +2248,12 @@ function newton_to_monomial!(P::Array{T, 1}, roots::Array{T, 1}) where {T <: Rin
       for i = n - 1:-1:1
          d = -roots[i]
          for j = i:n - 1
-            t = mul!(t, P[j + 1], d)
+            t = mul_red!(t, P[j + 1], d, false)
             P[j] = addeq!(P[j], t)
          end
+      end
+      for i = 1:n - 1
+         P[i] = reduce!(P[i])
       end
    end
    return
@@ -2458,20 +2472,23 @@ function mul!(c::AbstractAlgebra.PolyElem{T}, a::AbstractAlgebra.PolyElem{T}, b:
       fit!(c, lenc)
 
       for i = 1:lena
-         c.coeffs[i] = mul!(c.coeffs[i], coeff(a, i - 1), coeff(b, 0))
+         c.coeffs[i] = mul_red!(c.coeffs[i], coeff(a, i - 1), coeff(b, 0), false)
       end
 
       for i = 2:lenb
-         c.coeffs[lena + i - 1] = mul!(c.coeffs[lena + i - 1], coeff(a, lena - 1), coeff(b, i - 1))
+         c.coeffs[lena + i - 1] = mul_red!(c.coeffs[lena + i - 1], coeff(a, lena - 1), coeff(b, i - 1), false)
       end
 
       for i = 1:lena - 1
          for j = 2:lenb
-            t = mul!(t, coeff(a, i - 1), coeff(b, j - 1))
+            t = mul_red!(t, coeff(a, i - 1), coeff(b, j - 1), false)
             c.coeffs[i + j - 1] = addeq!(c.coeffs[i + j - 1], t)
          end
       end
 
+      for i = 1:lenc
+         c.coeffs[i] = reduce!(c.coeffs[i])
+      end
       set_length!(c, normalise(c, lenc))
    end
    return c
