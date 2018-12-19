@@ -34,13 +34,13 @@ elem_type(::Type{PolyRing{T}}) where T <: RingElement = Poly{T}
 base_ring(R::AbstractAlgebra.PolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
 
 @doc Markdown.doc"""
-    base_ring(a::PolynomialElem)
+    base_ring(a::Generic.PolynomialElem)
 > Return the base ring of the polynomial ring of the given polynomial.
 """
 base_ring(a::PolynomialElem) = base_ring(parent(a))
 
 @doc Markdown.doc"""
-    parent(a::PolynomialElem)
+    parent(a::Generic.PolynomialElem)
 > Return the parent of the given polynomial.
 """
 parent(a::PolynomialElem) = a.parent
@@ -107,7 +107,7 @@ end
 length(a::PolynomialElem) = a.length
 
 @doc Markdown.doc"""
-    degree(a::PolynomialElem)
+    degree(a::Generic.PolynomialElem)
 > Return the degree of the given polynomial. This is defined to be one less
 > than the length, even for constant polynomials.
 """
@@ -122,7 +122,7 @@ modulus(a::AbstractAlgebra.PolyElem{T}) where {T <: ResElem} = modulus(base_ring
 coeff(a::Poly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
 @doc Markdown.doc"""
-    lead(a::PolynomialElem)
+    lead(a::Generic.PolynomialElem)
 > Return the leading coefficient of the given polynomial. This will be the
 > nonzero coefficient of the term with highest degree unless the polynomial
 > in the zero polynomial, in which case a zero coefficient is returned.
@@ -130,7 +130,7 @@ coeff(a::Poly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 lead(a::PolynomialElem) = length(a) == 0 ? base_ring(a)(0) : coeff(a, length(a) - 1)
 
 @doc Markdown.doc"""
-    trail(a::PolynomialElem)
+    trail(a::Generic.PolynomialElem)
 > Return the trailing coefficient of the given polynomial. This will be the
 > nonzero coefficient of the term with lowest degree unless the polynomial
 > in the zero polynomial, in which case a zero coefficient is returned.
@@ -168,20 +168,20 @@ one(R::AbstractAlgebra.PolyRing) = R(1)
 gen(R::AbstractAlgebra.PolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
 
 @doc Markdown.doc"""
-    iszero(a::PolynomialElem)
+    iszero(a::Generic.PolynomialElem)
 > Return `true` if the given polynomial is zero, otherwise return `false`.
 """
 iszero(a::PolynomialElem) = length(a) == 0
 
 @doc Markdown.doc"""
-    isone(a::PolynomialElem)
+    isone(a::Generic.PolynomialElem)
 > Return `true` if the given polynomial is the constant polynomial $1$,
 > otherwise return `false`.
 """
 isone(a::PolynomialElem) = length(a) == 1 && isone(coeff(a, 0))
 
 @doc Markdown.doc"""
-    isgen(a::PolynomialElem)
+    isgen(a::Generic.PolynomialElem)
 > Return `true` if the given polynomial is the constant generator of its
 > polynomial ring, otherwise return `false`.
 """
@@ -190,7 +190,7 @@ function isgen(a::PolynomialElem)
 end
 
 @doc Markdown.doc"""
-    isunit(a::PolynomialElem)
+    isunit(a::Generic.PolynomialElem)
 > Return `true` if the given polynomial is a unit in its polynomial ring,
 > otherwise return `false`.
 """
@@ -199,7 +199,7 @@ isunit(a::PolynomialElem) = length(a) == 1 && isunit(coeff(a, 0))
 isterm(a::T) where {T <: RingElement} = true
 
 @doc Markdown.doc"""
-    isterm(a::PolynomialElem)
+    isterm(a::Generic.PolynomialElem)
 > Return `true` if the given polynomial is has one term. This function is
 > recursive, with all scalar types returning true.
 """
@@ -218,7 +218,7 @@ end
 ismonomial(a::T) where {T <: RingElement} = isone(a)
 
 @doc Markdown.doc"""
-    ismonomial(a::PolynomialElem)
+    ismonomial(a::Generic.PolynomialElem)
 > Return `true` if the given polynomial is a monomial.
 """
 function ismonomial(a::PolynomialElem)
@@ -325,7 +325,7 @@ show_minus_one(::Type{Poly{T}}) where {T <: RingElement} = show_minus_one(T)
 ###############################################################################
 
 @doc Markdown.doc"""
-    -(a::PolynomialElem)
+    -(a::Generic.PolynomialElem)
 > Return $-a$.
 """
 function -(a::PolynomialElem)
@@ -579,7 +579,7 @@ function *(a::T, b::AbstractAlgebra.PolyElem{T}) where {T <: RingElem}
 end
 
 @doc Markdown.doc"""
-    *(a::Union{Integer, Rational, AbstractFloat}, b::PolynomialElem)
+    *(a::Union{Integer, Rational, AbstractFloat}, b::Generic.PolynomialElem)
 > Return $a\times b$.
 """
 function *(a::Union{Integer, Rational, AbstractFloat}, b::PolynomialElem)
@@ -600,7 +600,7 @@ end
 *(a::AbstractAlgebra.PolyElem{T}, b::T) where {T <: RingElem} = b*a
 
 @doc Markdown.doc"""
-    *(a::PolynomialElem, b::Union{Integer, Rational, AbstractFloat})
+    *(a::Generic.PolynomialElem, b::Union{Integer, Rational, AbstractFloat})
 > Return $a\times b$.
 """
 *(a::PolynomialElem, b::Union{Integer, Rational, AbstractFloat}) = b*a
@@ -752,7 +752,7 @@ end
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 @doc Markdown.doc"""
-    ==(x::PolynomialElem, y::Union{Integer, Rational, AbstractFloat})
+    ==(x::Generic.PolynomialElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::PolynomialElem, y::Union{Integer, Rational, AbstractFloat}) = ((length(x) == 0 && base_ring(x)(y) == 0)
@@ -816,7 +816,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    truncate(a::PolynomialElem, n::Int)
+    truncate(a::Generic.PolynomialElem, n::Int)
 > Return $a$ truncated to $n$ terms. Testing the functionaliy
 """
 function truncate(a::PolynomialElem, n::Int)
@@ -879,7 +879,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    reverse(x::PolynomialElem, len::Int)
+    reverse(x::Generic.PolynomialElem, len::Int)
 > Return the reverse of the polynomial $x$, thought of as a polynomial of
 > the given length (the polynomial will be notionally truncated or padded with
 > zeroes before the leading term if necessary to match the specified length).
@@ -898,7 +898,7 @@ function reverse(x::PolynomialElem, len::Int)
 end
 
 @doc Markdown.doc"""
-    reverse(x::PolynomialElem)
+    reverse(x::Generic.PolynomialElem)
 > Return the reverse of the polynomial $x$, i.e. the leading coefficient
 > of $x$ becomes the constant coefficient of the result, etc. The resulting
 > polynomial is normalised.
@@ -914,7 +914,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    shift_left(f::PolynomialElem, n::Int)
+    shift_left(f::Generic.PolynomialElem, n::Int)
 > Return the polynomial $f$ shifted left by $n$ terms, i.e. multiplied by
 > $x^n$.
 """
@@ -936,7 +936,7 @@ function shift_left(f::PolynomialElem, n::Int)
 end
 
 @doc Markdown.doc"""
-    shift_right(f::PolynomialElem, n::Int)
+    shift_right(f::Generic.PolynomialElem, n::Int)
 > Return the polynomial $f$ shifted right by $n$ terms, i.e. divided by
 > $x^n$.
 """
@@ -1602,7 +1602,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    derivative(a::PolynomialElem)
+    derivative(a::Generic.PolynomialElem)
 > Return the derivative of the polynomial $a$.
 """
 function derivative(a::PolynomialElem)
