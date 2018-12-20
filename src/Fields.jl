@@ -12,6 +12,10 @@ include("julia/GF.jl")
                                           
 //(x::Union{Integer, Rational}, y::T) where {T <: RingElem} = parent(y)(x)//y
 
+divrem(a::T, b::T) where {T <: FieldElem} = divexact(a, b), zero(parent(a))
+
+div(a::T, b::T) where {T <: FieldElem} = divexact(a, b)
+
 function gcd(x::T, y::T) where {T <: FieldElem}
    check_parent(x, y)
    return iszero(x) && iszero(y) ? zero(parent(y)) : one(parent(y))
