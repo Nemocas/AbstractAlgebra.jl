@@ -24,11 +24,11 @@ import Base: Array, abs, acos, acosh, asin, asinh, atan, atanh,
              cospi, cot, coth, dec, deepcopy, deepcopy_internal, 
              div, divrem, expm1, exponent, fill, floor, gcd, gcdx,
              getindex, hash, hcat, hex, hypot, intersect, inv, invmod, isequal,
-             isfinite, isless, isqrt, isreal, iszero, lcm, ldexp, length,
+             isfinite, isless, isone, isqrt, isreal, iszero, lcm, ldexp, length,
              log, log1p, mod, ndigits, 
              oct, one, parent, parse, precision,
              rand, Rational, rem, reverse, 
-             setindex!, show, similar, sign, sin, sinh, sinpi, size, string,
+             setindex!, show, sincos, similar, sign, sin, sinh, sinpi, size, string,
              tan, tanh, trailing_zeros, transpose, truncate,
              typed_hvcat, typed_hcat, vcat, xor, zero, zeros, +, -, *, ==, ^,
              &, |, <<, >>, ~, <=, >=, <, >, //, /, !=
@@ -56,18 +56,6 @@ export create_accessors, get_handle, package_handle, zeros,
 export error_dim_negative, ErrorConstrDimMismatch
 
 export FiniteField, crt
-
-if VERSION >= v"0.6.0-dev.2024" # julia started exporting iszero (again?)
-   import Base: iszero
-end
-
-if VERSION >= v"0.7.0-DEV.264" # julia started exporting sincos
-   import Base: sincos
-end
-
-if VERSION >= v"0.7.0-DEV.1144"
-    import Base: isone
-end
 
 include("AbstractTypes.jl")
 
