@@ -21,6 +21,19 @@ function gcd(x::T, y::T) where {T <: FieldElem}
    return iszero(x) && iszero(y) ? zero(parent(y)) : one(parent(y))
 end
 
+function gcdx(x::T, y::T) where {T <: FieldElem}
+   check_parent(x, y)
+   R = parent(x)
+   if iszero(x)
+      if iszero(y)
+         return zero(R), one(R), zero(R)
+      end
+      return one(R), zero(R), inv(y)
+   else
+      return one(R), inv(x), zero(R)
+   end
+end
+
 characteristic(R::Field) = 0
 
 
