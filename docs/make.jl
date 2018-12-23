@@ -15,6 +15,7 @@ makedocs(
                           "integer.md",
                           "polynomial_rings.md",
                           "polynomial.md",
+			  "ncpolynomial.md",
                           "mpolynomial_rings.md",
                           "mpolynomial.md",
                           "series_rings.md",

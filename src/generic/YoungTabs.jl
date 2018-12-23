@@ -266,7 +266,7 @@ function isrimhook(R::BitVector, idx::Int, len::Int)
 end
 
 @doc Markdown.doc"""
-    MN1inner(R::BitVector, mu::Partition, t::Int, [charvals])
+    MN1inner(R::BitVector, mu::Partition, t::Integer, charvals)
 > Returns the value of $\lambda$-th irreducible character on conjugacy class of
 > permutations represented by partition `mu`, where `R` is the (binary)
 > partition sequence representing $\lambda$. Values already computed are stored

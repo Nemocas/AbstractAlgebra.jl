@@ -13,7 +13,7 @@ export O, valuation, exp, precision, max_precision, set_prec!
 ###############################################################################
 
 @doc Markdown.doc"""
-    O{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T})
+    O(a::AbstractAlgebra.AbsSeriesElem{T}) where T <: RingElement
 > Returns $0 + O(x^\mbox{deg}(a))$. Usually this function is called with $x^n$
 > as parameter. Then the function returns the power series $0 + O(x^n)$, which
 > can be used to set the precision of a power series when constructing it.
@@ -42,7 +42,7 @@ length(x::AbstractAlgebra.AbsSeriesElem) = x.length
 precision(x::AbstractAlgebra.AbsSeriesElem) = x.prec
 
 @doc Markdown.doc"""
-    max_precision(R::SeriesRing)
+    max_precision(R::AbsSeriesRing)
 > Return the maximum absolute precision of power series in the given power
 > series ring.
 """
@@ -61,7 +61,7 @@ function coeff(a::AbsSeries, n::Int)
 end
 
 @doc Markdown.doc"""
-    gen{T <: RingElement}(R::AbsSeriesRing{T})
+    gen(R::AbsSeriesRing{T}) where T <: RingElement
 > Return the generator of the power series ring, i.e. $x + O(x^n)$ where
 > $n$ is the precision of the power series ring $R$.
 """
@@ -197,7 +197,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    +{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T})
+    +(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
 > Return $a + b$.
 """
 function +(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
@@ -229,7 +229,7 @@ function +(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem
 end
 
 @doc Markdown.doc"""
-    -{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T})
+    -(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
 > Return $a - b$.
 """
 function -(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
@@ -261,7 +261,7 @@ function -(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem
 end
 
 @doc Markdown.doc"""
-    *{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T})
+    *(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
 > Return $a\times b$.
 """
 function *(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
@@ -313,7 +313,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    *{T <: RingElem}(a::T, b::AbstractAlgebra.AbsSeriesElem{T})
+    *(a::T, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElem}
 > Return $a\times b$.
 """
 function *(a::T, b::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElem}
@@ -345,7 +345,7 @@ function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.AbsSer
 end
 
 @doc Markdown.doc"""
-    *{T <: RingElem}(a::AbstractAlgebra.AbsSeriesElem{T}, b::T)
+    *(a::AbstractAlgebra.AbsSeriesElem{T}, b::T) where {T <: RingElem}
 > Return $a\times b$.
 """
 *(a::AbstractAlgebra.AbsSeriesElem{T}, b::T) where {T <: RingElem} = b*a
@@ -363,52 +363,52 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    shift_left(x::AbstractAlgebra.AbsSeriesElem, n::Int)
-> Return the power series $f$ shifted left by $n$ terms, i.e. multiplied by
+    shift_left(x::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingElement}
+> Return the power series $x$ shifted left by $n$ terms, i.e. multiplied by
 > $x^n$.
 """
-function shift_left(x::AbstractAlgebra.AbsSeriesElem{T}, len::Int) where {T <: RingElement}
-   len < 0 && throw(DomainError())
+function shift_left(x::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingElement}
+   n < 0 && throw(DomainError())
    xlen = length(x)
-   prec = precision(x) + len
+   prec = precision(x) + n
    prec = min(prec, max_precision(parent(x)))
    if xlen == 0
       z = zero(parent(x))
       set_prec!(z, prec)
       return z
    end
-   zlen = min(prec, xlen + len)
+   zlen = min(prec, xlen + n)
    z = parent(x)()
    fit!(z, zlen)
    set_prec!(z, prec)
-   for i = 1:len
+   for i = 1:n
       z = setcoeff!(z, i - 1, zero(base_ring(x)))
    end
    for i = 1:xlen
-      z = setcoeff!(z, i + len - 1, coeff(x, i - 1))
+      z = setcoeff!(z, i + n - 1, coeff(x, i - 1))
    end
    set_length!(z, normalise(z, zlen))
    return z
 end
 
 @doc Markdown.doc"""
-    shift_right(f::AbstractAlgebra.AbsSeriesElem, n::Int)
-> Return the power series $f$ shifted right by $n$ terms, i.e. divided by
+    shift_right(x::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingElement}
+> Return the power series $x$ shifted right by $n$ terms, i.e. divided by
 > $x^n$.
 """
-function shift_right(x::AbstractAlgebra.AbsSeriesElem{T}, len::Int) where {T <: RingElement}
-   len < 0 && throw(DomainError())
+function shift_right(x::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingElement}
+   n < 0 && throw(DomainError())
    xlen = length(x)
-   if len >= xlen
+   if n >= xlen
       z = zero(parent(x))
-      set_prec!(z, max(0, precision(x) - len))
+      set_prec!(z, max(0, precision(x) - n))
       return z
    end
    z = parent(x)()
-   fit!(z, xlen - len)
-   set_prec!(z, precision(x) - len)
-   for i = 1:xlen - len
-      z = setcoeff!(z, i - 1, coeff(x, i + len - 1))
+   fit!(z, xlen - n)
+   set_prec!(z, precision(x) - n)
+   for i = 1:xlen - n
+      z = setcoeff!(z, i - 1, coeff(x, i + n - 1))
    end
    return z
 end
@@ -420,25 +420,25 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    truncate(a::AbstractAlgebra.AbsSeriesElem, n::Int)
+    truncate(a::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingElement}
 > Return $a$ truncated to $n$ terms.
 """
-function truncate(a::AbstractAlgebra.AbsSeriesElem{T}, prec::Int) where {T <: RingElement}
-   prec < 0 && throw(DomainError())
+function truncate(a::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingElement}
+   n < 0 && throw(DomainError())
    len = length(a)
-   if precision(a) <= prec
+   if precision(a) <= n 
       return a
    end
    z = parent(a)()
-   fit!(z, prec)
-   set_prec!(z, prec)
-   for i = 1:min(prec, len)
+   fit!(z, n)
+   set_prec!(z, n)
+   for i = 1:min(n, len)
       z = setcoeff!(z, i - 1, coeff(a, i - 1))
    end
-   for i = len + 1:prec
+   for i = len + 1:n
       z = setcoeff!(z, i - 1, zero(base_ring(a)))
    end
-   set_length!(z, normalise(z, prec))
+   set_length!(z, normalise(z, n))
    return z
 end
 
@@ -449,7 +449,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ^{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T}, b::Int)
+    ^(a::AbstractAlgebra.AbsSeriesElem{T}, b::Int) where {T <: RingElement}
 > Return $a^b$. We require $b \geq 0$.
 """
 function ^(a::AbstractAlgebra.AbsSeriesElem{T}, b::Int) where {T <: RingElement}
@@ -493,7 +493,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    =={T <: RingElement}(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T})
+    ==(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
 > equal to the minimum of the two precisions.
@@ -527,7 +527,7 @@ function ==(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesEle
 end
 
 @doc Markdown.doc"""
-    isequal{T <: RingElement}(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T})
+    isequal(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
 > Return `true` if $x == y$ exactly, otherwise return `false`. Only if the
 > power series are precisely the same, to the same precision, are they declared
 > equal by this function.
@@ -573,14 +573,14 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    =={T <: RingElem}(x::AbstractAlgebra.AbsSeriesElem{T}, y::T)
+    ==(x::AbstractAlgebra.AbsSeriesElem{T}, y::T) where {T <: RingElem}
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::AbstractAlgebra.AbsSeriesElem{T}, y::T) where {T <: RingElem} = precision(x) == 0 ||
       ((length(x) == 0 && iszero(y)) || (length(x) == 1 && coeff(x, 0) == y))
 
 @doc Markdown.doc"""
-    =={T <: RingElem}(x::T, y::AbstractAlgebra.AbsSeriesElem{T})
+    ==(x::T, y::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElem}
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 ==(x::T, y::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElem} = y == x
@@ -605,8 +605,8 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    divexact{T <: RingElement}(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem{T})
-> Return $a/b$. Requires $b$ to be invertible.
+    divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
+> Return $x/y$. Requires $y$ to be invertible.
 """
 function divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
    check_parent(x, y)
@@ -630,8 +630,8 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    divexact(a::AbstractAlgebra.AbsSeriesElem, b::Union{Integer, Rational, AbstractFloat})
-> Return $a/b$ where the quotient is expected to be exact.
+    divexact(x::AbstractAlgebra.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
+> Return $x/y$ where the quotient is expected to be exact.
 """
 function divexact(x::AbstractAlgebra.AbsSeriesElem, y::Union{Integer, Rational, AbstractFloat})
    y == 0 && throw(DivideError())
@@ -646,8 +646,8 @@ function divexact(x::AbstractAlgebra.AbsSeriesElem, y::Union{Integer, Rational, 
 end
 
 @doc Markdown.doc"""
-    divexact{T <: RingElem}(a::AbstractAlgebra.AbsSeriesElem{T}, b::T)
-> Return $a/b$ where the quotient is expected to be exact.
+    divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::T) where {T <: RingElem}
+> Return $x/y$ where the quotient is expected to be exact.
 """
 function divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::T) where {T <: RingElem}
    iszero(y) && throw(DivideError())

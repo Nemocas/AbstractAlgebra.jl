@@ -5,19 +5,19 @@
 ###############################################################################
 
 @doc Markdown.doc"""
-    parent_type(::Type{perm{T}})
+    parent_type(::Type{perm{T}}) where T = PermGroup{T}
 > Return the type of the parent of a permutation.
 """
 parent_type(::Type{perm{T}}) where T = PermGroup{T}
 
 @doc Markdown.doc"""
-    elem_type(::Type{PermGroup{T}})
+    elem_type(::Type{PermGroup{T}}) where T = perm{T}
 > Return the type of elements of a permutation group.
 """
 elem_type(::Type{PermGroup{T}}) where T = perm{T}
 
 @doc Markdown.doc"""
-    parent(g::perm)
+    parent(g::perm{T}) where T = PermGroup
 > Return the parent of the permutation `g`.
 
 ```jldoctest
@@ -63,7 +63,7 @@ convert(::Type{Vector{T}}, p::perm{T}) where {T} = p.d
 ###############################################################################
 
 @doc Markdown.doc"""
-    parity(g::perm)
+    parity(g::perm{T}) where T
 > Return the parity of the given permutation, i.e. the parity of the number of
 > transpositions in any decomposition of `g` into transpositions.
 >
@@ -108,7 +108,7 @@ function parity(g::perm{T}) where T
 end
 
 @doc Markdown.doc"""
-    sign(g::perm)
+    sign(g::perm{T}) where T 
 > Return the sign of permutation.
 >
 > `sign` returns $1$ if `g` is even and $-1$ if `g` is odd. `sign` represents
@@ -173,7 +173,7 @@ function Base.show(io::IO, cd::CycleDec)
 end
 
 @doc Markdown.doc"""
-    cycles(g::perm)
+    cycles(g::perm{T}) where T<:Integer
 > Decompose permutation `g` into disjoint cycles.
 >
 > Returns a `CycleDec` object which iterates over disjoint cycles of `g`. The
@@ -235,7 +235,7 @@ function cycledec(v::Vector{T}) where T<:Integer
 end
 
 @doc Markdown.doc"""
-    permtype(g::perm, rev=true)
+    permtype(g::perm)
 > Return the type of permutation `g`, i.e. lengths of disjoint cycles in cycle
 > decomposition of `g`.
 >
@@ -388,7 +388,7 @@ false
 ###############################################################################
 
 @doc Markdown.doc"""
-    *(g::perm, h::perm)
+    *(g::perm{T}, h::perm{T}) where T
 > Return the composition ``h ∘ g`` of two permutations.
 >
 > This corresponds to the action of permutation group on the set `[1..n]`
@@ -414,7 +414,7 @@ end
 *(g::perm{S}, h::perm{T}) where {S,T} = *(promote(g,h)...)
 
 @doc Markdown.doc"""
-    ^(g::perm, n::Int)
+    ^(g::perm{T}, n::Integer) where T
 > Return the $n$-th power of a permutation `g`.
 >
 > By default `g^n` is computed by cycle decomposition of `g` if `n > 3`.
@@ -687,7 +687,7 @@ function order(::Type{T}, a::perm) where T
 end
 
 @doc Markdown.doc"""
-    matrix_repr(a::perm)
+    matrix_repr(a::perm{T}) where T
 > Return the permutation matrix as sparse matrix representing `a` via natural
 > embedding of the permutation group into general linear group over $\mathbb{Z}$.
 
@@ -733,7 +733,7 @@ function emb!(result::perm, p::perm, V)
 end
 
 @doc Markdown.doc"""
-    emb(G::PermGroup, V::Vector{Int})
+    emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
 > Return the natural embedding of a permutation group into `G` as the
 > subgroup permuting points indexed by `V`.
 
@@ -757,7 +757,7 @@ function emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
 end
 
 @doc Markdown.doc"""
-    rand(G::PermGroup)
+    rand(G::PermGroup{T}) where {T}
 > Return a random permutation from `G`.
 """
 rand(G::PermGroup{T}) where {T} = perm(randperm!(Vector{T}(undef, G.n)), false)
@@ -969,7 +969,7 @@ function character(::Type{T}, lambda::Partition, p::perm) where T <: Integer
 end
 
 @doc Markdown.doc"""
-    character(lambda::Partition, mu::Partition) -> BigInt
+    character(lambda::Partition, mu::Partition, check::Bool=true) -> BigInt
 > Returns the value of `lambda-th` irreducible character on the conjugacy class
 > represented by partition `mu`.
 """

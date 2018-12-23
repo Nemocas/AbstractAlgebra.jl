@@ -11,7 +11,7 @@
 ###############################################################################
 
 @doc Markdown.doc"""
-    CycleDec{T}(ccycles, cptrs, n)
+    CycleDec{T}(ccycles, cptrs, n) where T
 > Cycle decomposition of a permutation.
 > * `ccycles`: an array of consecutive entries of cycles;
 > * `cptrs`: an array of pointers to the locations where cycles begin: ```ccycles[cptrs[i], cptrs[i+1]-1]` contains the i-th cycle;
@@ -104,7 +104,7 @@ mutable struct perm{T<:Integer} <: AbstractAlgebra.GroupElem
 end
 
 @doc Markdown.doc"""
-    AllPerms(n::Int)
+    AllPerms(n::T) where T
 > Returns an iterator over arrays representing all permutations of `1:n`.
 > Similar to `Combinatorics.permutations(1:n)`
 """
@@ -161,7 +161,7 @@ mutable struct Partition <: AbstractVector{Int}
 end
 
 @doc Markdown.doc"""
-    AllParts(n::Int)
+    AllParts(n::Integer)
 > Return an iterator over all integer `Partition`s of `n`.
 > Partitions are produced in ascending order according to RuleAsc (Algorithm 3.1) from
 >

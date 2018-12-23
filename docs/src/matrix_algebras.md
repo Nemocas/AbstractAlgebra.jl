@@ -99,7 +99,7 @@ As well as the Ring and Matrix interfaces, the following functions are provided 
 manipulate matrices.
 
 ```@docs
-degree(::MatAlgElem)
+degree(::Generic.MatAlgElem)
 ```
 
 **Examples**

@@ -16,16 +16,16 @@ parent_type(::Type{MatAlgElem{T}}) where T <: RingElement = MatAlgebra{T}
 
 elem_type(::Type{MatAlgebra{T}}) where {T <: RingElement} = MatAlgElem{T}
 
-Markdown.doc"""
-    base_ring{T <: RingElement}(S::AbstractAlgebra.MatAlgebra{T})
+@doc Markdown.doc"""
+    base_ring(a::AbstractAlgebra.MatAlgebra{T}) where {T <: RingElement}
 > Return the base ring $R$ of the given matrix algebra.
 """
 function base_ring(a::AbstractAlgebra.MatAlgebra{T}) where {T <: RingElement}
    a.base_ring::parent_type(T)
 end
 
-Markdown.doc"""
-    parent(a::AbstractAlgebra.MatAlgElem)
+@doc Markdown.doc"""
+    parent(a::AbstractAlgebra.MatAlgElem{T}, cached::Bool = true) where T <: RingElement
 > Return the parent object of the given matrix.
 """
 parent(a::AbstractAlgebra.MatAlgElem{T}, cached::Bool = true) where T <: RingElement =
@@ -55,19 +55,19 @@ function Base.hash(a::MatAlgElem, h::UInt)
    return b
 end
 
-Markdown.doc"""
-    degree(a::MatAlgebra)
+@doc Markdown.doc"""
+    degree(a::Generic.MatAlgElem)
 > Return the degree $n$ of the $n\times n$ matrix $a$..
 """
 degree(a::MatAlgElem) = size(a.entries, 1)
 
-Markdown.doc"""
+@doc Markdown.doc"""
     zero(a::AbstractAlgebra.MatAlgebra)
 > Construct the zero matrix in the given matrix space.
 """
 zero(a::AbstractAlgebra.MatAlgebra) = a()
 
-Markdown.doc"""
+@doc Markdown.doc"""
     one(a::AbstractAlgebra.MatAlgebra)
 > Construct the matrix in the given matrix space with ones down the diagonal
 > and zeroes elsewhere.
@@ -274,8 +274,8 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
-    transpose(x::AbstractAlgebra.MatAlgElem)
+@doc Markdown.doc"""
+    transpose(x::MatAlgElem{T}) where T <: RingElement
 > Return the transpose of the given matrix.
 """
 function transpose(x::MatAlgElem{T}) where T <: RingElement
@@ -285,8 +285,8 @@ function transpose(x::MatAlgElem{T}) where T <: RingElement
    return z
 end
 
-Markdown.doc"""
-    gram(x::AbstractAlgebra.MatElem)
+@doc Markdown.doc"""
+    gram(x::AbstractAlgebra.MatAlgElem)
 > Return the Gram matrix of $x$, i.e. if $x$ is an $r\times c$ matrix return
 > the $r\times r$ matrix whose entries $i, j$ are the dot products of the
 > $i$-th and $j$-th rows, respectively.
@@ -414,8 +414,9 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
-    minpoly{T <: RingElement}(S::Ring, M::MatAlgElem{T}, charpoly_only = false)
+
+@doc Markdown.doc"""
+    minpoly(S::Ring, M::MatAlgElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
 > Returns the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
 > of the resulting polynomial must be supplied and the matrix must be square.
 """
@@ -537,7 +538,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     MatrixAlgebra(R::AbstractAlgebra.Ring, n::Int, cached::Bool = true)
 > Return parent object corresponding to the ring of $n\times n$ matrices over
 > the ring $R$. If `cached == true` (the default), the returned parent object

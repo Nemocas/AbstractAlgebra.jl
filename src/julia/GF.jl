@@ -54,7 +54,7 @@ function Base.hash(a::gfelem, h::UInt)
 end
 
 @doc Markdown.doc"""
-    zero{T <: Integer}(a::GFField{T})
+    zero(R::GFField{T}) where T <: Integer
 > Return the additive identity, zero, in the given finite field.
 """
 function zero(R::GFField{T}) where T <: Integer
@@ -62,7 +62,7 @@ function zero(R::GFField{T}) where T <: Integer
 end
 
 @doc Markdown.doc"""
-    one{T <: Integer}(a::GFField{T})
+    one(R::GFField{T}) where T <: Integer
 > Return the additive identity, zero, in the given finite field.
 """
 function one(R::GFField{T}) where T <: Integer
@@ -70,7 +70,7 @@ function one(R::GFField{T}) where T <: Integer
 end
 
 @doc Markdown.doc"""
-    gen{T <: Integer}(a::GFField{T})
+    gen(R::GFField{T}) where T <: Integer
 > Return a generator of the field. Currently this returns 1.
 """
 function gen(R::GFField{T}) where T <: Integer
@@ -78,13 +78,13 @@ function gen(R::GFField{T}) where T <: Integer
 end
 
 @doc Markdown.doc"""
-    iszero{T <: Integer}(a::gfelem{T})
+    iszero(a::gfelem{T}) where T <: Integer
 > Returns true if the given element of the finite field is zero.
 """
 iszero(a::gfelem{T}) where T <: Integer = a.d == 0
 
 @doc Markdown.doc"""
-    isone{T <: Integer}(a::gfelem{T})
+    isone(a::gfelem{T}) where T <: Integer
 > Returns true if the given element of the finite field is one.
 """
 isone(a::gfelem{T}) where T <: Integer = a.d == 1
@@ -396,7 +396,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-   GF{T <: Integer}(p::T)
+    GF(p::T) where T <: Integer
 > Return the finite field $\mathbb{F}_p$, where $p$ is a prime. The integer
 > $p$ is not checked for primality, but the behaviour of the resulting object
 > is undefined if $p$ is composite.

@@ -184,7 +184,7 @@ However, since all permutations yielded by `elements!` are aliased (modified "in
 ## Arithmetic operators
 
 ```@docs
-*(::perm, ::perm)
+*(::perm{T}, ::perm{T}) where T
 ^(::perm, n::Integer)
 inv(::perm)
 ```

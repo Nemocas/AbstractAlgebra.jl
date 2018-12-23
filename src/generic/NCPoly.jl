@@ -16,8 +16,8 @@ parent_type(::Type{NCPoly{T}}) where T <: NCRingElem = NCPolyRing{T}
 
 elem_type(::Type{NCPolyRing{T}}) where T <: NCRingElem = NCPoly{T}
 
-Markdown.doc"""
-    base_ring(R::AbstractAlgebra.NCPolyRing)
+@doc Markdown.doc"""
+    base_ring(R::AbstractAlgebra.NCPolyRing{T}) where T <: NCRingElem
 > Return the base ring of the given polynomial ring.
 """
 base_ring(R::AbstractAlgebra.NCPolyRing{T}) where T <: NCRingElem = R.base_ring::parent_type(T)
@@ -26,14 +26,14 @@ function isexact_type(a::Type{T}) where {S <: NCRingElem, T <: AbstractAlgebra.N
    return isexact_type(S)
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     var(a::AbstractAlgebra.NCPolyRing)
 > Return the internal name of the generator of the polynomial ring. Note that
 > this is returned as a `Symbol` not a `String`.
 """
 var(a::AbstractAlgebra.NCPolyRing) = a.S
 
-Markdown.doc"""
+@doc Markdown.doc"""
     symbols(a::AbstractAlgebra.NCPolyRing)
 > Return an array of the variable names for the polynomial ring. Note that
 > this is returned as an array of `Symbol` not `String`.
@@ -74,13 +74,13 @@ end
 
 coeff(a::NCPoly, n::Int) = n >= length(a) ? base_ring(a)(0) : a.coeffs[n + 1]
 
-Markdown.doc"""
+@doc Markdown.doc"""
     zero(R::AbstractAlgebra.NCPolyRing)
 > Return the zero polynomial in the given polynomial ring.
 """
 zero(R::AbstractAlgebra.NCPolyRing) = R(0)
 
-Markdown.doc"""
+@doc Markdown.doc"""
     one(R::AbstractAlgebra.NCPolyRing)
 > Return the constant polynomial $1$ in the given polynomial ring.
 """
@@ -125,8 +125,8 @@ show_minus_one(::Type{NCPoly{T}}) where {T <: NCRingElem} = show_minus_one(T)
 #
 ###############################################################################
 
-Markdown.doc"""
-    +{T <: NCRingElem}(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T})
+@doc Markdown.doc"""
+    +(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T}) where {T <: NCRingElem}
 > Return $a + b$.
 """
 function +(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T}) where {T <: NCRingElem}
@@ -153,8 +153,8 @@ function +(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T}) w
    return z
 end
 
-Markdown.doc"""
-    -{T <: NCRingElem}(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T})
+@doc Markdown.doc"""
+    -(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T}) where {T <: NCRingElem}
 > Return $a - b$.
 """
 function -(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T}) where {T <: NCRingElem}
@@ -241,8 +241,8 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
-    ^{T <: NCRingElem}(a::AbstractAlgebra.NCPolyElem{T}, b::Int)
+@doc Markdown.doc"""
+    ^(a::AbstractAlgebra.NCPolyElem{T}, b::Int) where {T <: NCRingElem}
 > Return $a^b$. We require $b \geq 0$.
 """
 function ^(a::AbstractAlgebra.NCPolyElem{T}, b::Int) where {T <: NCRingElem}
@@ -290,8 +290,8 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
-    =={T <: NCRingElem}(x::AbstractAlgebra.NCPolyElem{T}, y::AbstractAlgebra.NCPolyElem{T})
+@doc Markdown.doc"""
+    ==(x::AbstractAlgebra.NCPolyElem{T}, y::AbstractAlgebra.NCPolyElem{T}) where {T <: NCRingElem}
 > Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
 > equal to the minimum of the two precisions.
@@ -310,8 +310,8 @@ function ==(x::AbstractAlgebra.NCPolyElem{T}, y::AbstractAlgebra.NCPolyElem{T}) 
    return true
 end
 
-Markdown.doc"""
-    isequal{T <: NCRingElem}(x::AbstractAlgebra.NCPolyElem{T}, y::AbstractAlgebra.NCPolyElem{T})
+@doc Markdown.doc"""
+    isequal(x::AbstractAlgebra.NCPolyElem{T}, y::AbstractAlgebra.NCPolyElem{T}) where {T <: NCRingElem}
 > Return `true` if $x == y$ exactly, otherwise return `false`. This function is
 > useful in cases where the coefficients of the polynomial are inexact, e.g.
 > power series. Only if the power series are precisely the same, to the same
@@ -338,20 +338,20 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
-    =={T <: NCRingElem}(x::AbstractAlgebra.NCPolyElem{T}, y::T)
+@doc Markdown.doc"""
+    ==(x::AbstractAlgebra.NCPolyElem{T}, y::T) where {T <: NCRingElem}
 > Return `true` if $x == y$.
 """
 ==(x::AbstractAlgebra.NCPolyElem{T}, y::T) where T <: NCRingElem = ((length(x) == 0 && y == 0)
                         || (length(x) == 1 && coeff(x, 0) == y))
 
-Markdown.doc"""
-    =={T <: NCRingElem}(x::T, y::AbstractAlgebra.NCPolyElem{T})
+@doc Markdown.doc"""
+    ==(x::T, y::AbstractAlgebra.NCPolyElem{T}) where {T <: NCRingElem}
 > Return `true` if $x = y$.
 """
 ==(x::T, y::AbstractAlgebra.NCPolyElem{T}) where T <: NCRingElem = y == x
 
-Markdown.doc"""
+@doc Markdown.doc"""
     ==(x::Union{Integer, Rational, AbstractFloat}, y::AbstractAlgebra.NCPolyElem)
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
@@ -363,8 +363,8 @@ Markdown.doc"""
 #
 ###############################################################################
 
-Markdown.doc"""
-    mullow{T <: NCRingElem}(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T}, n::Int)
+@doc Markdown.doc"""
+    mullow(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T}, n::Int) where {T <: NCRingElem}
 > Return $a\times b$ truncated to $n$ terms.
 """
 function mullow(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T}, n::Int) where {T <: NCRingElem}
@@ -407,8 +407,8 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
-    divexact_right{T <: NCRingElem}(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T})
+@doc Markdown.doc"""
+    divexact_right(f::AbstractAlgebra.NCPolyElem{T}, g::AbstractAlgebra.NCPolyElem{T}) where {T <: NCRingElem}
 > Assuming $f = qg$, return $q$.
 """
 function divexact_right(f::AbstractAlgebra.NCPolyElem{T}, g::AbstractAlgebra.NCPolyElem{T}) where {T <: NCRingElem}
@@ -437,8 +437,8 @@ function divexact_right(f::AbstractAlgebra.NCPolyElem{T}, g::AbstractAlgebra.NCP
    return q
 end
 
-Markdown.doc"""
-    divexact_left{T <: NCRingElem}(a::AbstractAlgebra.NCPolyElem{T}, b::AbstractAlgebra.NCPolyElem{T})
+@doc Markdown.doc"""
+    divexact_left(f::AbstractAlgebra.NCPolyElem{T}, g::AbstractAlgebra.NCPolyElem{T}) where {T <: NCRingElem}
 > Assuming $f = gq$, return $q$.
 """
 function divexact_left(f::AbstractAlgebra.NCPolyElem{T}, g::AbstractAlgebra.NCPolyElem{T}) where {T <: NCRingElem}
@@ -473,8 +473,8 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
-    divexact_right{T <: NCRingElem}(a::AbstractAlgebra.NCPolyElem{T}, b::T)
+@doc Markdown.doc"""
+    divexact_right(a::AbstractAlgebra.NCPolyElem{T}, b::T) where {T <: NCRingElem}
 > Assuming $a = qb$, return $q$.
 """
 function divexact_right(a::AbstractAlgebra.NCPolyElem{T}, b::T) where {T <: NCRingElem}
@@ -488,8 +488,8 @@ function divexact_right(a::AbstractAlgebra.NCPolyElem{T}, b::T) where {T <: NCRi
    return z
 end
 
-Markdown.doc"""
-    divexact_left{T <: NCRingElem}(a::AbstractAlgebra.NCPolyElem{T}, b::T)
+@doc Markdown.doc"""
+    divexact_left(a::AbstractAlgebra.NCPolyElem{T}, b::T) where {T <: NCRingElem}
 > Assuming $a = bq$, return $q$.
 """
 function divexact_left(a::AbstractAlgebra.NCPolyElem{T}, b::T) where {T <: NCRingElem}
@@ -503,7 +503,7 @@ function divexact_left(a::AbstractAlgebra.NCPolyElem{T}, b::T) where {T <: NCRin
    return z
 end
 
-Markdown.doc"""
+@doc Markdown.doc"""
     divexact_right(a::AbstractAlgebra.NCPolyElem, b::Union{Integer, Rational, AbstractFloat})
 > Assuming $a = qb$, return $q$.
 """
@@ -518,9 +518,8 @@ function divexact_right(a::AbstractAlgebra.NCPolyElem, b::Union{Integer, Rationa
    return z
 end
 
-Markdown.doc"""
-    divexact_left(a::AbstractAlgebra.NCPolyElem, b::Union{Integer, Rational, AbstractFlo
-at})
+@doc Markdown.doc"""
+    divexact_left(a::AbstractAlgebra.NCPolyElem, b::Union{Integer, Rational, AbstractFloat})
 > Assuming $a = bq$, return $q$.
 """
 divexact_left(a::AbstractAlgebra.NCPolyElem, b::Union{Integer, Rational, AbstractFloat}) = divexact_right(a, b)
@@ -531,8 +530,8 @@ divexact_left(a::AbstractAlgebra.NCPolyElem, b::Union{Integer, Rational, Abstrac
 #
 ###############################################################################
 
-Markdown.doc"""
-    evaluate{T <: NCRingElem}(a::AbstractAlgebra.NCPolyElem{T}, b::T)
+@doc Markdown.doc"""
+    evaluate(a::AbstractAlgebra.NCPolyElem, b::T) where {T <: NCRingElem}
 > Evaluate the polynomial $a$ at the value $b$ and return the result.
 """
 function evaluate(a::AbstractAlgebra.NCPolyElem, b::T) where {T <: NCRingElem}
@@ -807,7 +806,7 @@ end
 #
 ###############################################################################
 
-Markdown.doc"""
+@doc Markdown.doc"""
     PolynomialRing(R::AbstractAlgebra.NCRing, s::AbstractString; cached::Bool = true)
 > Given a base ring `R` and string `s` specifying how the generator (variable)
 > should be printed, return a tuple `S, x` representing the new polynomial
