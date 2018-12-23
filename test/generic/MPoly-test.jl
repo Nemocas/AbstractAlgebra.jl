@@ -123,6 +123,14 @@ function test_gen_mpoly_manipulation()
       end
       @test r == f
 
+      for i = 1:length(f)
+         i1 = rand(1:length(f))
+         i2 = rand(1:length(f))
+         @test (i1 < i2) == (monomial(f, i1) > monomial(f, i2))
+         @test (i1 > i2) == (monomial(f, i1) < monomial(f, i2))
+         @test (i1 == i2) == (monomial(f, i1) == monomial(f, i2))
+      end
+
       max_degs, biggest = max_fields(f)
       deg = isdegree(ordering(S))
       rev = isreverse(ordering(S))

@@ -1535,6 +1535,18 @@ function ==(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    return true
 end
 
+@doc Markdown.doc"""
+    isless(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+> Return `true` if the monomial $a$ is less than the monomial $b$ with respect
+> to the monomial ordering of the parent ring. 
+"""
+function Base.isless(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+   check_parent(a, b)
+   (!ismonomial(a) || !ismonomial(b)) && error("Not monomials in comparison")
+   N = size(a.exps, 1)
+   return monomial_isless(a.exps, 1, b.exps, 1, N, parent(a), UInt(0))
+end
+
 ###############################################################################
 #
 #   Ad hoc comparison functions
