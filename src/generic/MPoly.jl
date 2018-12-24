@@ -91,18 +91,38 @@ end
     change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}
 > Returns the polynomial obtained by applying g to the coefficients of p.
 """
-function change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}
+function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
    new_base_ring = parent(g(zero(base_ring(p.parent))))
    new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in symbols(p.parent)], ordering = p.parent.ord)
    new_p = zero(new_polynomial_ring)
 
    for i = 1:length(p)
-      e = exponent_vector(p,i)
+      e = exponent_vector(p, i)
       set_exponent_vector!(new_p, i, e)
-      setcoeff!(new_p, e, new_base_ring(coeff(p,i)))
+      setcoeff!(new_p, e, new_base_ring(coeff(p, i)))
    end
    
    return(new_p)
+end
+
+function change_base_ring(p::MPoly{T}, g) where {T <: RingElement}
+   new_base_ring = parent(g(zero(base_ring(p.parent))))
+   new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(
+v) for v in symbols(p.parent)], ordering = p.parent.ord)
+
+   if typeof(gens_new_polynomial_ring[1]) <: MPoly
+      exps = deepcopy(p.exps)
+      coeffs = [new_base_ring(p.coeffs[i]) for i in 1:length(p)]
+      return new_polynomial_ring(coeffs, exps)
+   else
+      new_p = zero(new_polynomial_ring)
+      for i = 1:length(p)
+         e = exponent_vector(p, i)
+         set_exponent_vector!(new_p, i, e)
+         setcoeff!(new_p, e, new_base_ring(coeff(p, i)))
+      end
+      return(new_p)
+   end
 end
 
 @doc Markdown.doc"""
@@ -1766,13 +1786,13 @@ function deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    defl = [0 for i in 1:N]
    shift = exponent_vector(f, 1)
    for i = 2:length(f)
-      vcurr = exponent_vector(f, i)
       for j = 1:N
-         if vcurr[j] < shift[j]
-            defl[j] = gcd(defl[j], shift[j] - vcurr[j])
-            shift[j] = vcurr[j]
+         exj = exponent(f, i, j)
+         if exj < shift[j]
+            defl[j] = defl[j] == 1 ? 1 : gcd(defl[j], shift[j] - exj)
+            shift[j] = exj
          else
-            defl[j] = gcd(defl[j], vcurr[j] - shift[j])
+            defl[j] = defl[j] == 1 ? 1 : gcd(defl[j], exj - shift[j])
          end
       end
    end
@@ -1805,6 +1825,35 @@ function deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vect
    return parent(f)(coeffs, exps)
 end
 
+function deflate(f::MPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
+   N = nvars(parent(f))
+   for i = 1:N
+      if defl[i] == 0
+         defl[i] = 1
+      end
+   end
+
+   if parent(f).ord != :lex # sorting is required if ordering is not lex
+      exps = exponent_vectors(f)
+      for i = 1:length(f)
+         for j = 1:N
+            exps[i][j] = div(exps[i][j] - shift[j], defl[j])
+         end
+      end
+      coeffs = [coeff(f, i) for i in 1:length(f)]
+      return parent(f)(coeffs, exps) # performs sorting
+   else
+      r = deepcopy(f)
+      exps = r.exps
+      for i = 1:length(r)
+         for j = 1:N
+            exps[N - j + 1, i] = div(exps[N - j + 1, i] - shift[j], defl[j])
+         end
+      end
+      return r
+   end
+end
+
 @doc Markdown.doc"""
     inflate(f::AbstractAlgebra.MPolyElem{T}, v::Vector{Int}) where T <: RingElement
 > Return a polynomial with the same coefficients as $f$ but whose exponents
@@ -1825,6 +1874,28 @@ function inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vect
    return parent(f)(coeffs, exps)
 end
 
+function inflate(f::MPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
+   N = nvars(parent(f))
+   if parent(f).ord != :lex # sorting is required if ordering is not lex
+      exps = exponent_vectors(f)
+      for i = 1:length(f)
+         for j = 1:N
+            exps[i][j] = exps[i][j]*defl[j] + shift[j]
+         end
+      end
+      coeffs = [coeff(f, i) for i in 1:length(f)]
+      return parent(f)(coeffs, exps)
+   else
+      r = deepcopy(f)
+      exps = r.exps
+      for i = 1:length(r)
+         for j = 1:N
+            exps[N - j + 1, i] = exps[N - j + 1, i]*defl[j] + shift[j]
+         end
+      end
+      return r
+   end
+end
 ###############################################################################
 #
 #   Exact division
@@ -3581,7 +3652,8 @@ end
 """
 function sort_terms!(a::MPoly{T}) where {T <: RingElement}
    N = parent(a).N
-   V = [(ntuple(i -> a.exps[i, r], Val(N)), r) for r in 1:length(a)]
+   # The reverse order is the fastest order if already sorted
+   V = [(ntuple(i -> a.exps[i, r], Val(N)), r) for r in length(a):-1:1]
    ord = parent(a).ord
    if ord == :lex || ord == :deglex
       sort!(V, lt = is_less_lex)
