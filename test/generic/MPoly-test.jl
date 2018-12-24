@@ -109,6 +109,28 @@ function test_gen_mpoly_manipulation()
          @test isa(coeff(f, rand(1:length(f))), elem_type(R))
       end
 
+      @test length(f) == length(coeffs(f))
+      @test length(f) == length(monomials(f))
+      @test length(f) == length(terms(f))
+
+      m = one(S)
+      r = zero(S)
+      for i = 1:length(f)
+         m = monomial!(m, f, i)
+         @test m == monomial(f, i)
+         @test term(f, i) == coeff(f, i)*monomial(f, i)
+         r += coeff(f, i)*monomial(f, i)
+      end
+      @test r == f
+
+      for i = 1:length(f)
+         i1 = rand(1:length(f))
+         i2 = rand(1:length(f))
+         @test (i1 < i2) == (monomial(f, i1) > monomial(f, i2))
+         @test (i1 > i2) == (monomial(f, i1) < monomial(f, i2))
+         @test (i1 == i2) == (monomial(f, i1) == monomial(f, i2))
+      end
+
       max_degs, biggest = max_fields(f)
       deg = isdegree(ordering(S))
       rev = isreverse(ordering(S))

@@ -11,7 +11,8 @@ export max_fields, total_degree, gens, divides, isconstant, isdegree,
        derivative, rand_ordering, symbols, monomial_set!, monomial_iszero,
        derivative, change_base_ring,  to_univariate, degrees, deflation,
        combine_like_terms!, exponent, exponent_vector, exponent_vectors,
-       set_exponent_vector!, sort_terms!, @PolynomialRing
+       set_exponent_vector!, sort_terms!, coeffs, monomial, monomial!,
+       monomials, term, terms, @PolynomialRing
 
 ###############################################################################
 #
@@ -449,10 +450,76 @@ end
 
 @doc Markdown.doc"""
     coeff(x::MPoly, i::Int)
-> Return the coefficient of the i-th term of the polynomial.
+> Return the coefficient of the $i$-th term of the polynomial.
 """
 function coeff(x::MPoly, i::Int)
    return x.coeffs[i]
+end
+
+@doc Markdown.doc"""
+    coeffs(x::MPoly)
+> Return an array of the nonzero coefficients of the given polynomial, starting
+> with the most significant term.
+"""
+function coeffs(x::MPolyElem)
+   return [coeff(x, i) for i = 1:length(x)]
+end
+
+@doc Markdown.doc"""
+    monomial(x::MPoly, i::Int)
+> Return the monomial of the $i$-th term of the polynomial (as a polynomial
+> of length $1$ with coefficient $1$.
+"""
+function monomial(x::MPoly, i::Int)
+   R = base_ring(x)
+   N = size(x.exps, 1)
+   exps = Array{UInt, 2}(undef, N, 1)
+   monomial_set!(exps, 1, x.exps, i, N) 
+   return parent(x)([one(R)], exps)
+end
+
+@doc Markdown.doc"""
+    monomial!(m::Mpoly{T}, x::MPoly{T}, i::Int) where T <: RingElement
+> Set $m$ to the monomial of the $i$-th term of the polynomial (as a
+> polynomial of length $1$ with coefficient $1$.
+"""
+function monomial!(m::MPoly{T}, x::MPoly{T}, i::Int) where T <: RingElement
+   N = size(x.exps, 1)
+   fit!(m, 1)
+   monomial_set!(m.exps, 1, x.exps, i, N)
+   m.coeffs[1] = one(base_ring(x))
+   m.length = 1
+   return m
+end
+
+@doc Markdown.doc"""
+    monomials(x::MPoly)
+> Return an array of the monomials of the nonzero terms of the given
+> polynomial, starting with the most significant term.
+"""
+function monomials(x::MPolyElem)
+   return [monomial(x, i) for i = 1:length(x)]
+end
+
+@doc Markdown.doc"""
+    term(x::MPoly, i::Int)
+> Return the $i$-th nonzero term of the polynomial $x$ (as a polynomial).
+"""
+function term(x::MPoly, i::Int)
+   R = base_ring(x)
+   N = size(x.exps, 1)
+   exps = Array{UInt, 2}(undef, N, 1)
+   monomial_set!(exps, 1, x.exps, i, N)
+   return parent(x)([deepcopy(x.coeffs[i])], exps)
+end
+
+@doc Markdown.doc"""
+    terms(x::MPoly)
+> Return an array of the nonzero terms of the given polynomial, starting with
+> the most significant term.
+"""
+function terms(x::MPolyElem)
+   return [term(x, i) for i = 1:length(x)]
 end
 
 @doc Markdown.doc"""
@@ -1486,6 +1553,18 @@ function ==(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
       end
    end
    return true
+end
+
+@doc Markdown.doc"""
+    isless(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+> Return `true` if the monomial $a$ is less than the monomial $b$ with respect
+> to the monomial ordering of the parent ring. 
+"""
+function Base.isless(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+   check_parent(a, b)
+   (!ismonomial(a) || !ismonomial(b)) && error("Not monomials in comparison")
+   N = size(a.exps, 1)
+   return monomial_isless(a.exps, 1, b.exps, 1, N, parent(a), UInt(0))
 end
 
 ###############################################################################
