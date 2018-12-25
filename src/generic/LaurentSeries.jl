@@ -743,14 +743,14 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    shift_left(x::Generic.LaurentSeriesElem{T}, len::Int) where {T <: RingElement}
-> Return the power series $f$ shifted left by $n$ terms, i.e. multiplied by
+    shift_left(x::Generic.LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
+> Return the power series $x$ shifted left by $n$ terms, i.e. multiplied by
 > $x^n$.
 """
-function shift_left(x::LaurentSeriesElem{T}, len::Int) where {T <: RingElement}
+function shift_left(x::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
    z = deepcopy(x)
-   set_prec!(z, precision(x) + len)
-   set_val!(z, valuation(x) + len)
+   set_prec!(z, precision(x) + n)
+   set_val!(z, valuation(x) + n)
    return z
 end
 
