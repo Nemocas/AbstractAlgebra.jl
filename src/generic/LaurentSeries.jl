@@ -755,14 +755,14 @@ function shift_left(x::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    shift_right(x::Generic.LaurentSeriesElem{T}, len::Int) where {T <: RingElement}
-> Return the power series $f$ shifted right by $n$ terms, i.e. divided by
+    shift_right(x::Generic.LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
+> Return the power series $x$ shifted right by $n$ terms, i.e. divided by
 > $x^n$.
 """
-function shift_right(x::LaurentSeriesElem{T}, len::Int) where {T <: RingElement}
+function shift_right(x::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
    z = deepcopy(x)
-   set_prec!(z, precision(x) - len)
-   set_val!(z, valuation(x) - len)
+   set_prec!(z, precision(x) - n)
+   set_val!(z, valuation(x) - n)
    return z
 end
 
@@ -773,25 +773,25 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    truncate(a::Generic.LaurentSeriesElem{T}, prec::Int) where {T <: RingElement}
+    truncate(a::Generic.LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
 > Return $a$ truncated to (absolute) precision $n$.
 """
-function truncate(a::LaurentSeriesElem{T}, prec::Int) where {T <: RingElement}
+function truncate(a::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
    alen = pol_length(a)
    aprec = precision(a)
    aval = valuation(a)
-   if aprec <= prec
+   if aprec <= n
       return a
    end
    z = parent(a)()
-   set_prec!(z, prec)
-   if prec <= aval
+   set_prec!(z, n)
+   if n <= aval
       set_length!(z, 0)
-      set_val!(z, prec)
+      set_val!(z, n)
       set_scale!(z, 1)
    else
       sa = scale(a)
-      zlen = div(prec - aval + sa - 1, sa)
+      zlen = div(n - aval + sa - 1, sa)
       zlen = min(zlen, alen)
       fit!(z, zlen)
       set_val!(z, aval)
@@ -1075,7 +1075,7 @@ end
 
 @doc Markdown.doc"""
     divexact(x::Generic.LaurentSeriesElem{T}, y::Generic.LaurentSeriesElem{T}) where {T <: RingElement}
-> Return $a/b$. Requires $b$ to be invertible.
+> Return $x/y$. Requires $y$ to be invertible.
 """
 function divexact(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T}) where {T <: RingElement}
    check_parent(x, y)
@@ -1092,7 +1092,7 @@ end
 
 @doc Markdown.doc"""
     divexact(x::Generic.LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat})
-> Return $a/b$ where the quotient is expected to be exact.
+> Return $x/y$ where the quotient is expected to be exact.
 """
 function divexact(x::LaurentSeriesElem, y::Union{Integer, Rational, AbstractFloat})
    y == 0 && throw(DivideError())
@@ -1110,7 +1110,7 @@ end
 
 @doc Markdown.doc"""
     divexact(x::Generic.LaurentSeriesElem{T}, y::T) where {T <: RingElem}
-> Return $a/b$ where the quotient is expected to be exact.
+> Return $x/y$ where the quotient is expected to be exact.
 """
 function divexact(x::LaurentSeriesElem{T}, y::T) where {T <: RingElem}
    iszero(y) && throw(DivideError())
