@@ -375,7 +375,7 @@ end
 
 @doc Markdown.doc"""
     +(x::Generic.MatrixElem{T}, y::Generic.MatrixElem{T}) where {T <: RingElement}
-> Return $a + b$.
+> Return $x + y$.
 """
 function +(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
    check_parent(x, y)
@@ -390,7 +390,7 @@ end
 
 @doc Markdown.doc"""
     -(x::Generic.MatrixElem{T}, y::Generic.MatrixElem{T}) where {T <: RingElement}
-> Return $a - b$.
+> Return $x - y$.
 """
 function -(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
    check_parent(x, y)
@@ -405,7 +405,7 @@ end
 
 @doc Markdown.doc"""
     *(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
-> Return $a\times b$.
+> Return $x\times y$.
 """
 function *(x::AbstractAlgebra.MatElem{T}, y::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    cols(x) != rows(y) && error("Incompatible matrix dimensions")
