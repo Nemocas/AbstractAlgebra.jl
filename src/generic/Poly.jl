@@ -1566,16 +1566,17 @@ end
 function evaluate(a::AbstractAlgebra.PolyElem, b::T) where {T <: RingElement}
    i = length(a)
    R = base_ring(a)
+   S = parent(b)
    if i == 0
-       return zero(R)
+      return zero(R) + zero(S)
    end
    if i > 25
       return subst(a, b)
    end
-   z = R(coeff(a, i - 1))
+   z = coeff(a, i - 1) * one(S)
    while i > 1
       i -= 1
-      z = R(coeff(a, i - 1)) + z*b 
+      z = coeff(a, i - 1) + z*b 
       parent(z) # To work around a bug in julia
    end
    return z
@@ -1588,14 +1589,15 @@ end
 """
 function compose(a::AbstractAlgebra.PolyElem, b::AbstractAlgebra.PolyElem)
    i = length(a)
-   R = parent(a)
+   R = base_ring(a)
+   S = parent(b)
    if i == 0
-       return zero(R)
+      return zero(R) + zero(S)
    end
    if i*length(b) > 25
       return subst(a, b)
    end
-   z = R(coeff(a, i - 1))
+   z = coeff(a, i - 1) * one(S)
    while i > 1
       i -= 1
       z = z*b + coeff(a, i - 1)
