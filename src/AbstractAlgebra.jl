@@ -164,7 +164,8 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached,
                  sort_terms!, sub, subst, swap_rows,
                  swap_rows!, symbols, term, terms, total_degree, to_univariate,
                  trail, truncate, typed_hcat, typed_hvcat, upscale,
-                 valuation, var, vars, weak_popov, weak_popov_with_trafo, zero,
+                 valuation, var, var_index, vars, weak_popov,
+                 weak_popov_with_trafo, zero,
                  zero!, zero_matrix, @PolynomialRing
 
 # Do not export exp, sqrt, numerator and denominator as we define our own
@@ -227,7 +228,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, base_ring, cached,
                  sort_terms!, sub, subst, swap_rows, swap_rows!,
                  term, terms, to_univariate,
                  total_degree, tr, trail, truncate, typed_hcat, typed_hvcat,
-                 upscale, valuation, var, vars,
+                 upscale, valuation, var, var_index, vars,
                  weak_popov, weak_popov_with_trafo, zero, zero!,
                  zero_matrix, @PolynomialRing
 

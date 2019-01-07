@@ -12,7 +12,7 @@ export max_fields, total_degree, gens, divides, isconstant, isdegree,
        derivative, change_base_ring,  to_univariate, degrees, deflation,
        combine_like_terms!, exponent, exponent_vector, exponent_vectors,
        set_exponent_vector!, sort_terms!, coeffs, monomial, monomial!,
-       monomials, term, terms, @PolynomialRing
+       monomials, term, terms, var_index, @PolynomialRing
 
 ###############################################################################
 #
@@ -156,6 +156,29 @@ function vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
+   var_index(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
+> Return the index of the given variable $x$. If $x$ is not a variable
+> in a multivariate polynomial ring, an exception is raised.
+"""
+function var_index(x::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
+   !ismonomial(x) && error("Not a variable in var_index")
+   exps = exponent_vector(x, 1)
+   count = 0
+   index = 0
+   for i = 1:length(exps)
+      if exps[i] > 1
+         error("Not a variable in var_index")
+      end
+      if exps[i] == 1
+         count += 1
+         index = i
+      end
+   end
+   count != 1 && error("Not a variable in var_index")
+   return index
+end
+
+@doc Markdown.doc"""
     ordering(a::MPolyRing{T}) where {T <: RingElement}
 > Return the ordering of the given polynomial ring as a symbol. The options are
 > `:lex`, `:deglex` and `:degrevlex`.
@@ -167,6 +190,67 @@ end
 function check_parent(a::MPoly{T}, b::MPoly{T}) where T <: RingElement
    parent(a) != parent(b) &&
       error("Incompatible polynomial rings in polynomial operation")
+end
+
+###############################################################################
+#
+#   Multivariate coefficients
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    coeff(a::MPoly{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
+> Return the "coefficient" of $a$ (as a multivariate polynomial in the same
+> ring) of the monomial consisting of the product of the variables of the given
+> indices raised to the given exponents (note that not all variables need to
+> appear and the exponents can be zero). E.g. `coeff(f, [1, 3], [0, 2])` returns
+> the coefficient of $x^0*z^2$ in the polynomial $f$ (assuming variables
+> $x, y, z$ in that order).
+"""
+function coeff(a::MPoly{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
+   unique(vars) != vars && error("Variables not unique")
+   length(vars) != length(exps) &&
+       error("Number of variables does not match number of exponents")
+   for i = 1:length(vars)
+      if vars[i] < 1 || vars[i] > nvars(parent(a))
+         error("Variable index not in range")
+      end
+      if exps[i] < 0
+         error("Exponent cannot be negative")
+      end
+   end
+   exp_vecs = Array{Vector{Int}, 1}(undef, 0)
+   coeffs = Array{T, 1}(undef, 0)
+   for i = 1:length(a)
+      v = exponent_vector(a, i)
+      flag = true
+      for j = 1:length(vars)
+         if v[vars[j]] != exps[j]
+            flag = false
+            break
+         else
+            v[vars[j]] = 0
+         end 
+      end
+      if flag
+         push!(exp_vecs, v)
+         push!(coeffs, coeff(a, i))
+      end
+   end
+   return parent(a)(coeffs, exp_vecs)
+end
+
+@doc Markdown.doc"""
+    coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyElem
+> Return the "coefficient" of $a$ (as a multivariate polynomial in the same
+> ring) of the monomial consisting of the product of the given variables
+> to the given exponents (note that not all variables need to appear and the
+> exponents can be zero). E.g. `coeff(f, [x, z], [0, 2])` returns the
+> coefficient of $x^0*z^2$ in the polynomial $f$. 
+"""
+function coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyElem
+   varidx = [var_index(x) for x in vars]
+   return coeff(a, varidx, exps)
 end
 
 ###############################################################################
@@ -493,11 +577,11 @@ function monomial!(m::MPoly{T}, x::MPoly{T}, i::Int) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    monomials(x::MPoly)
+    monomials(x::AbstractAlgebebra.MPolyElem)
 > Return an array of the monomials of the nonzero terms of the given
 > polynomial, starting with the most significant term.
 """
-function monomials(x::MPolyElem)
+function monomials(x::AbstractAlgebra.MPolyElem)
    return [monomial(x, i) for i = 1:length(x)]
 end
 
@@ -514,11 +598,11 @@ function term(x::MPoly, i::Int)
 end
 
 @doc Markdown.doc"""
-    terms(x::MPoly)
+    terms(x::AbstractAlgebra.MPolyElem)
 > Return an array of the nonzero terms of the given polynomial, starting with
 > the most significant term.
 """
-function terms(x::MPolyElem)
+function terms(x::AbstractAlgebra.MPolyElem)
    return [term(x, i) for i = 1:length(x)]
 end
 
