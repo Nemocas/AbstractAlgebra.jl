@@ -577,11 +577,11 @@ function monomial!(m::MPoly{T}, x::MPoly{T}, i::Int) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    monomials(x::MPoly)
+    monomials(x::AbstractAlgebebra.MPolyElem)
 > Return an array of the monomials of the nonzero terms of the given
 > polynomial, starting with the most significant term.
 """
-function monomials(x::MPolyElem)
+function monomials(x::AbstractAlgebra.MPolyElem)
    return [monomial(x, i) for i = 1:length(x)]
 end
 
@@ -598,11 +598,11 @@ function term(x::MPoly, i::Int)
 end
 
 @doc Markdown.doc"""
-    terms(x::MPoly)
+    terms(x::AbstractAlgebra.MPolyElem)
 > Return an array of the nonzero terms of the given polynomial, starting with
 > the most significant term.
 """
-function terms(x::MPolyElem)
+function terms(x::AbstractAlgebra.MPolyElem)
    return [term(x, i) for i = 1:length(x)]
 end
 
