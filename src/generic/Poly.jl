@@ -1039,7 +1039,7 @@ end
 
 @doc Markdown.doc"""
     divexact(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
-> Return $a/b$ where the quotient is expected to be exact.
+> Return $f/g$ where the quotient is expected to be exact.
 """
 function divexact(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
    check_parent(f, g)
@@ -1637,7 +1637,7 @@ end
 
 @doc Markdown.doc"""
     integral(x::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
-> Return the integral of the polynomial $a$.
+> Return the integral of the polynomial $x$.
 """
 function integral(x::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
    len = length(x)
@@ -1716,7 +1716,7 @@ end
 
 @doc Markdown.doc"""
     resultant_ducos(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
-> Return the resultant of the $a$ and $b$.
+> Return the resultant of the $p$ and $q$.
 """
 # See the paper, "Optimizations of the subresultant algorithm" by Lionel
 # Ducos, J. Pure and Appl. Algebra 2000.
