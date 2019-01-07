@@ -241,7 +241,7 @@ function coeff(a::MPoly{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: Rin
 end
 
 @doc Markdown.doc"""
-    coeff(a::fmpz_mpoly, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyElem
+    coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyElem
 > Return the "coefficient" of $a$ (as a multivariate polynomial in the same
 > ring) of the monomial consisting of the product of the given variables
 > to the given exponents (note that not all variables need to appear and the
