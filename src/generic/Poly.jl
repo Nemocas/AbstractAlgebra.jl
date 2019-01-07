@@ -1357,9 +1357,9 @@ end
 
 @doc Markdown.doc"""
     divides(z::AbstractAlgebra.PolyElem{T}, x::T) where {T <: RingElement}
-> Returns a pair consisting of a flag which is set to `true` if $g$ divides
-> $f$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
-> such a polynomial exists. If not, the value of $h$ is undetermined.
+> Returns a pair consisting of a flag which is set to `true` if $x$ divides
+> $z$ and `false` otherwise, and a polynomial $y$ such that $z = xy$ if
+> such a polynomial exists. If not, the value of $y$ is undetermined.
 """
 function divides(z::AbstractAlgebra.PolyElem{T}, x::T) where {T <: RingElement}
    parent(x) != base_ring(z) && error("Wrong parents in divides")
