@@ -355,7 +355,7 @@ show_minus_one(::Type{AbstractAlgebra.MatElem{T}}) where {T <: RingElement} = fa
 
 @doc Markdown.doc"""
     -(x::Generic.MatrixElem)
-> Return $-a$.
+> Return $-x$.
 """
 function -(x::MatrixElem)
    z = similar(x)
