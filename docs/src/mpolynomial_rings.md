@@ -469,15 +469,21 @@ c = coeff(f, 1)
 fit!(f, 8)
 ```
 
+## Optional functionality for multivariate polynomials
+
+The following functions can optionally be implemented for multivariate
+polynomial types.
+
 ### Derivations
 
-The following function allows to compute derivations of multivariate polynomials of type MPoly.
+The following function allows to compute derivations of multivariate polynomials of type
+MPoly.
 
 ```@docs
 derivative(f::MyMPoly{T}, x::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
 
-**Example**
+**Examples**
 
 ```julia
 R,(x,y) = AbstractAlgebra.PolynomialRing(ZZ,["x","y"])
@@ -487,4 +493,3 @@ f = x*y + x + y + 1
 derivative(f,x)
 derivative(f,y)
 ```
-
