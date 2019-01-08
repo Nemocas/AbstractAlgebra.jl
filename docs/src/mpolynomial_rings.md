@@ -68,7 +68,9 @@ multivariate polynomial ring over `R` (i.e. $S = R[x, y, \ldots]$) with parent o
 Of course, in practice these types may not be parameterised, but we use parameterised
 types here to make the interface clearer.
 
-Note that the type `T` must (transitively) belong to the abstract type `RingElem`.
+Note that the type `T` must (transitively) belong to the abstract type `RingElem` or
+more generally the union type `RingElement` which includes the Julia integer, rational
+and floating point types.
 
 ### Data type and parent object methods
 
@@ -86,16 +88,22 @@ nvars(f::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElem
 
 Return the number of variables of the polynomial ring.
 
-
 ```julia
 gens(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElem
 ```
 
-Return an array of all the generators (variables) of the given polynomial ring (as
-polynomials).
+Return an array of all the generators (variables) of the given polynomial ring
+(as polynomials).
 
-The first entry in the array will be the variable with most significance with respect
-to the ordering.
+The first entry in the array will be the variable with most significance with
+respect to the ordering.
+
+```julia
+gen(S::MyMPolyRing{T}, i::Int) where T <: AbstractAlgebra.RingElem
+```
+
+Return the $i$-th generator (variable) of the given polynomial ring (as a
+polynomial).
 
 ```julia
 ordering(S::MyMPolyRing{T})
@@ -130,16 +138,11 @@ isgen(x::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 Return `true` if $x$ is a generator of the polynomial ring.
 
 ```julia
-max_fields(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+total_degree(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
 
-Returns a tuple `(B, b)` consisting of an array of `Int`s specifying the highest power
-of each variable that appears in the given polynomial and `b` the largest of the values
-in `B`.
-
-```@docs
-total_degree(f::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
-```
+Return the total degree of the polynomial $f$, i.e. the highest sum of
+exponents occuring in any term of $f$.
 
 ```julia
 isunit(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
@@ -166,12 +169,37 @@ ismonomial(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 
 Return `true` if $f$ consists of a single term with coefficient $1$.
 
-```@docs
-vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
+```julia
+vars(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
 
-Note that `vars(p::AbstractAlgebra.Generic.MPoly{T})` returns variables, while
-`vars(S::MyMPolyRing{T})` return symbols.
+Return the variables (as polynomials) that actually occur in any term of the
+the polynomial $p$ to degree at least $1$.
+
+```julia
+coeffs(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+```
+
+Return an array of the coefficients of the polynomial $p$, starting with the
+coefficient of the most significant term with respect to the ordering.
+
+```julia
+monomials(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+```
+
+Return an array of the monomials of the polynomial $p$, starting with the
+coefficient of the most significant term with respect to the ordering.
+Monomials in AbstractAlgebra are defined to have coefficient $1$. See the
+function `terms` if you require the coefficients, however note that only
+monomials can be compared.
+
+```julia
+terms(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+```
+
+Return an array of the terms of the polynomial $p$, starting with the
+coefficient of the most significant term with respect to the ordering.
+Terms in AbstractAlgebra include the coefficient.
 
 **Examples**
 
@@ -188,6 +216,11 @@ isunit(f) == false
 isconstant(f) == false
 isterm(2x*y) == true
 ismonomial(x*y) == false
+V = vars(f)
+C = coeffs(f)
+M = monomials(f)
+T = terms(f)
+d = total_degree(f)
 ```
 
 ### Exact division
@@ -298,7 +331,7 @@ Evaluate the polynomial $f$ at the values specified by the entries of the array 
 
 
 ```julia
-evaluate(f::MPoly{T}, A::Array{T, 1}) where T <: Integer
+evaluate(f::MyMPoly{T}, A::Array{U, 1}) where {T <: AbstractAlgebra.RingElem, U <: Integer}
 ```
 
 Evaluate the polynomial $f$ at the values specified by the entries of the array $A$.
@@ -313,27 +346,6 @@ f = 2x^2*y + 2x + y + 1
 m = evaluate(f, Rational{BigInt}[2, 3])
 n = evaluate(f, [2, 3])
 ```
-
-In order to substitute the variables of a polynomial $f$ over a ring $T$ by elements in a $T$-algebra $S$,
-you first have to change the base ring of $f$ using the following function, where $g$ is a function
-representing the structure homomorphism of the $T$-algebra $S$.
-
-```@docs
-change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}
-```
-
-**Examples**
-
-```julia
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
-S, (u, v) = PolynomialRing(ZZ, ["u", "v"])
-
-f = 2x^2*y + 2x + y + 1
-
-evaluate(change_base_ring(f, a->S(a)), [S(1), v])
-evaluate(change_base_ring(f, a->R(a)), [y, x])
-```
-
 
 ### GCD
 
@@ -408,32 +420,43 @@ f = S(Rational{BigInt}[2, 3, 1], UInt[3 2 1; 0 1 0])
 coeff(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
 ```
 
-Return the coefficient of the $(n+1)$-th term of $f$. The first term should be the most
+Return the coefficient of the $n$-th term of $f$. The first term should be the most
 significant term with respect to the ordering.
 
 ```julia
-exponent(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
+monomial(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
+monomial!(m::MyMPoly{T}, f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
 ```
 
-Return an array of `Int`s giving the vector of exponents for the $n + 1$-th term of $f$.
-The first entry of the array should correspond to the exponent of the most significant
-variable with respect to the ordering.
+Return the $n$-th monomial of $f$ or set $m$ to the $n$-th monomial of $f$,
+respectively. The first monomial should be the most significant term with
+respect to the ordering. Monomials have coefficient $1$ in AbstractAlgebra.
+See the function `term` if you also require the coefficient, however, note
+that only monomials can be compared.
 
 ```julia
-exponent!(A::Array{Int, 1}, f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
+term(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
 ```
 
-As per `exponent`, but set the values in the array `A` rather than allocating an array
-for this purpose. The array is also returned by the function after being mutated.
+Return the $n$-th term of $f$. The first term should be the one whose
+monomial is most significant with respect to the ordering.
+
+```julia
+exponent(f::MyMPoly{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElem
+```
+
+Return the exponent of the $j$-th variable in the $n$-th term of the polynomial
+$f$. The first term is the one with whose monomial is most significant with
+respect to the ordering.
 
 ```julia
 fit!(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
 ```
 
-Ensure that the polynomial $f$ internally has space for $n$ nonzero terms. This function
-must mutate the function in-place if it is mutable. It does not return the mutated
-polynomial. Immutable types can still be supported by defining this function to do
-nothing.
+Ensure that the polynomial $f$ internally has space for $n$ nonzero terms. This
+function must mutate the function in-place if it is mutable. It does not return
+the mutated polynomial. Immutable types can still be supported by defining this
+function to do nothing.
 
 **Examples**
 
@@ -451,14 +474,16 @@ fit!(f, 8)
 The following function allows to compute derivations of multivariate polynomials of type MPoly.
 
 ```@docs
-derivative{T <: AbstractAlgebra.RingElem}(f::AbstractAlgebra.Generic.MPoly{T}, x::AbstractAlgebra.Generic.MPoly{T})
+derivative(f::MyMPoly{T}, x::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
 
 **Example**
 
 ```julia
 R,(x,y) = AbstractAlgebra.PolynomialRing(ZZ,["x","y"])
+
 f = x*y + x + y + 1
+
 derivative(f,x)
 derivative(f,y)
 ```
