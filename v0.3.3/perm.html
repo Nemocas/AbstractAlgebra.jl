@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Permutations and Permutation groups · AbstractAlgebra.jl</title><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL="."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="assets/documenter.js"></script><script src="siteinfo.js"></script><script src="../versions.js"></script><link href="assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>AbstractAlgebra.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="search.html"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="index.html">AbstractAlgebra.jl</a></li><li><a class="toctext" href="constructors.html">Constructing mathematical objects in AbstractAlgebra.jl</a></li><li><span class="toctext">Rings</span><ul><li><a class="toctext" href="rings.html">Ring Interface</a></li><li><a class="toctext" href="ncrings.html">Noncommutative ring Interface</a></li><li><a class="toctext" href="euclidean.html">Euclidean Ring Interface</a></li><li><a class="toctext" href="integer.html">Integer ring</a></li><li><a class="toctext" href="polynomial_rings.html">Univariate Polynomial Ring Interface</a></li><li><a class="toctext" href="polynomial.html">Generic univariate polynomials</a></li><li><a class="toctext" href="ncpolynomial.html">Generic univariate polynomials over a noncommutative ring</a></li><li><a class="toctext" href="mpolynomial_rings.html">Multivariate Polynomial Ring Interface</a></li><li><a class="toctext" href="mpolynomial.html">Generic sparse distributed multivariate polynomials</a></li><li><a class="toctext" href="series_rings.html">Series Ring Interface</a></li><li><a class="toctext" href="series.html">Generic power series</a></li><li><a class="toctext" href="puiseux.html">Generic Puiseux series</a></li><li><a class="toctext" href="residue_rings.html">Residue Ring Interface</a></li><li><a class="toctext" href="residue.html">Generic residue rings</a></li></ul></li><li><span class="toctext">Fields</span><ul><li><a class="toctext" href="fields.html">Field Interface</a></li><li><a class="toctext" href="fraction_fields.html">Fraction Field Interface</a></li><li><a class="toctext" href="fraction.html">Generic fraction fields</a></li><li><a class="toctext" href="rational.html">Rational field</a></li><li><a class="toctext" href="finfield.html">Finite fields</a></li><li><a class="toctext" href="real.html">Real field</a></li><li><a class="toctext" href="numberfield.html">Number fields</a></li></ul></li><li><span class="toctext">Groups</span><ul><li class="current"><a class="toctext" href="perm.html">Permutations and Permutation groups</a><ul class="internal"><li><a class="toctext" href="#Permutations-constructors-1">Permutations constructors</a></li><li><a class="toctext" href="#Permutation-interface-1">Permutation interface</a></li><li><a class="toctext" href="#Basic-manipulation-1">Basic manipulation</a></li><li><a class="toctext" href="#Arithmetic-operators-1">Arithmetic operators</a></li><li><a class="toctext" href="#Coercion-1">Coercion</a></li><li><a class="toctext" href="#Comparison-1">Comparison</a></li><li><a class="toctext" href="#Misc-1">Misc</a></li></ul></li><li><a class="toctext" href="ytabs.html">Partitions and Young tableaux</a></li></ul></li><li><span class="toctext">Matrices</span><ul><li><a class="toctext" href="matrix_spaces.html">Matrix Interface</a></li><li><a class="toctext" href="matrix.html">Generic matrices</a></li><li><a class="toctext" href="matrix_algebras.html">Generic matrix algebras</a></li></ul></li><li><span class="toctext">Maps</span><ul><li><a class="toctext" href="map.html">Map interface</a></li><li><a class="toctext" href="functional_map.html">Functional maps</a></li><li><a class="toctext" href="map_cache.html">Cached maps</a></li><li><a class="toctext" href="map_with_inverse.html">Map with inverse</a></li></ul></li><li><a class="toctext" href="types.html">Appendix A: Types in AbstractAlgebra.jl</a></li></ul></nav><article id="docs"><header><nav><ul><li>Groups</li><li><a href="perm.html">Permutations and Permutation groups</a></li></ul><a class="edit-page" href="https://github.com/Nemocas/AbstractAlgebra.jl/blob/master/docs/src/perm.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Permutations and Permutation groups</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Permutations-and-Permutation-groups-1" href="#Permutations-and-Permutation-groups-1">Permutations and Permutation groups</a></h1><p>AbstractAlgebra.jl provides rudimentary native support for permutation groups (implemented in <code>src/generic/PermGroups.jl</code>). All functionality of permutations is accesible in the <code>Generic</code> submodule.</p><p>Permutations are represented internally via vector of integers, wrapped in type <code>perm{T}</code>, where <code>T&lt;:Integer</code> carries the information on the type of elements of a permutation. Permutation groups are singleton parent objects of type <code>PermGroup{T}</code> and are used mostly to store the length of a permutation, since it is not included in the permutation type.</p><p>Permutation groups are created using the <code>PermGroup</code> (inner) constructor. However, for convenience we define</p><pre><code class="language-none">PermutationGroup = PermGroup</code></pre><p>so that permutation groups can be created using <code>PermutationGroup</code> instead of <code>PermGroup</code>.</p><p>Both <code>PermGroup</code> and <code>perm</code> and can be parametrized by any type <code>T&lt;:Integer</code> . By default the parameter is the <code>Int</code>-type native to the systems architecture. However, if you are sure that your permutations are small enough to fit into smaller integer type (such as <code>Int32</code>, <code>Uint16</code>, or even <code>Int8</code>), you may choose to change the parametrizing type accordingly. In practice this may result in decreased memory footprint (when storing multiple permutations) and noticable faster performance, if your workload is heavy in operations on permutations, which e.g. does not fit into cache of your cpu.</p><p>All the permutation group types belong to the <code>Group</code> abstract type and the corresponding permutation element types belong to the <code>GroupElem</code> abstract type.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.setpermstyle" href="#AbstractAlgebra.Generic.setpermstyle"><code>AbstractAlgebra.Generic.setpermstyle</code></a> — <span class="docstring-category">Function</span>.</div><div><pre><code class="language-none">setpermstyle(format::Symbol)</code></pre><blockquote><p>Select the style in which permutations are displayed (in REPL or in general as string). This can be either</p><ul><li><code>:array</code> - as vectors of integers whose <span>$n$</span>-th position represents the</li></ul><p>value at <span>$n$</span>), or</p><ul><li><code>:cycles</code> - as, more familiar for mathematicians, decomposition into</li></ul><p>disjoint cycles, where the value at <span>$n$</span> is represented by the entry immediately following <span>$n$</span> in a cycle (the default).</p></blockquote><blockquote><p>The difference is purely esthetical.</p></blockquote><p><strong>Examples:</strong></p><pre><code class="language-julia-repl">julia&gt; Generic.setpermstyle(:array)
+:array
+
+julia&gt; perm([2,3,1,5,4])
+[2, 3, 1, 5, 4]
+
+julia&gt; Generic.setpermstyle(:cycles)
+:cycles
+
+julia&gt; perm([2,3,1,5,4])
+(1,2,3)(4,5)</code></pre></div></section><h2><a class="nav-anchor" id="Permutations-constructors-1" href="#Permutations-constructors-1">Permutations constructors</a></h2><p>There are several methods to to construct permutations in AbstractAlgebra.jl.</p><ul><li>The easiest way is to directly call to the <code>perm</code> (inner) constructor:</li></ul><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.perm" href="#AbstractAlgebra.Generic.perm"><code>AbstractAlgebra.Generic.perm</code></a> — <span class="docstring-category">Type</span>.</div><div><pre><code class="language-none">perm{T&lt;:Integer}</code></pre><blockquote><p>The type of permutations. Fieldnames:</p><ul><li><code>d::Vector{T}</code> - vector representing the permutation</li><li><code>modified::Bool</code> - bit to check the validity of cycle decomposition</li><li><code>cycles::CycleDec{T}</code> - (cached) cycle decomposition</li></ul><p>Permutation <span>$p$</span> consists of a vector (<code>p.d</code>) of <span>$n$</span> integers from <span>$1$</span> to <span>$n$</span>. If the <span>$i$</span>-th entry of the vector is <span>$j$</span>, this corresponds to <span>$p$</span> sending <span>$i \to j$</span>. The cycle decomposition (<code>p.cycles</code>) is computed on demand and should never be accessed directly. Use <a href="perm.html#AbstractAlgebra.Generic.cycles-Tuple{perm}"><code>cycles(p)</code></a> instead.</p><p>There are two inner constructors of <code>perm</code>:</p><ul><li><code>perm(n::T)</code> constructs the trivial <code>perm{T}</code>-permutation of length <span>$n$</span>.</li><li><code>perm(v::Vector{T&lt;:Integer}[,check=true])</code> constructs a permutation</li></ul><p>represented by <code>v</code>. By default <code>perm</code> constructor checks if the vector constitutes a valid permutation. To skip the check call <code>perm(v, false)</code>.</p></blockquote><p><strong>Examples:</strong></p><pre><code class="language-julia-repl">julia&gt; perm([1,2,3])
+()
+
+julia&gt; g = perm(Int32[2,3,1])
+(1,2,3)
+
+julia&gt; typeof(g)
+AbstractAlgebra.Generic.perm{Int32}</code></pre></div></section><p>Since the parent object can be reconstructed from the permutation itself, you can work with permutations without explicitely constructing the parent object.</p><ul><li>The other way is to first construct the permutation group they belong to. This is accomplished with the inner constructor <code>PermGroup(n::Integer)</code> which constructs the permutation group on <span>$n$</span> symbols and returns the parent object representing the group.</li></ul><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.PermGroup" href="#AbstractAlgebra.Generic.PermGroup"><code>AbstractAlgebra.Generic.PermGroup</code></a> — <span class="docstring-category">Type</span>.</div><div><pre><code class="language-none">PermGroup{T&lt;:Integer}</code></pre><blockquote><p>The permutation group singleton type. <code>PermGroup(n)</code> constructs the permutation group <span>$S_n$</span> on <span>$n$</span>-symbols. The type of elements of the group is inferred from the type of <code>n</code>.</p></blockquote><p><strong>Examples:</strong></p><pre><code class="language-julia-repl">julia&gt; G = PermGroup(5)
+Permutation group over 5 elements
+
+julia&gt; elem_type(G)
+AbstractAlgebra.Generic.perm{Int64}
+
+julia&gt; H = PermGroup(UInt16(5))
+Permutation group over 5 elements
+
+julia&gt; elem_type(H)
+AbstractAlgebra.Generic.perm{UInt16}</code></pre></div></section><p>A vector of integers can be then coerced to a permutation via call to parent. The advantage is that the vector is automatically converted to the integer type fixed at the creation of the parent object.</p><p><strong>Examples:</strong></p><pre><code class="language-julia-repl">julia&gt; G = PermutationGroup(BigInt(5)); p = G([2,3,1,5,4])
+(1,2,3)(4,5)
+
+julia&gt; typeof(p)
+AbstractAlgebra.Generic.perm{BigInt}
+
+julia&gt; H = PermutationGroup(UInt16(5)); r = H([2,3,1,5,4])
+(1,2,3)(4,5)
+
+julia&gt; typeof(r)
+AbstractAlgebra.Generic.perm{UInt16}
+
+julia&gt; H()
+()</code></pre><p>By default the coercion checks for non-unique values in the vector, but this can be switched off with <code>G([2,3,1,5,4], false)</code>.</p><ul><li>Finally there is a <code>perm&quot;...&quot;</code> string macro to construct permutation from string input.</li></ul><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.@perm_str" href="#AbstractAlgebra.Generic.@perm_str"><code>AbstractAlgebra.Generic.@perm_str</code></a> — <span class="docstring-category">Macro</span>.</div><div><pre><code class="language-none">perm&quot;...&quot;</code></pre><blockquote><p>String macro to parse disjoint cycles into <code>perm{Int}</code>.</p><p>Strings for the output of GAP could be copied directly into <code>perm&quot;...&quot;</code>. Cycles of length <span>$1$</span> are not necessary, but could be included. A permutation of the minimal support is constructed, i.e. the maximal <span>$n$</span> in the decomposition determines the parent group <span>$S_n$</span>.</p></blockquote><p><strong>Examples:</strong></p><pre><code class="language-julia-repl">julia&gt; p = perm&quot;(1,3)(2,4)&quot;
+(1,3)(2,4)
+
+julia&gt; typeof(p)
+AbstractAlgebra.Generic.perm{Int64}
+
+julia&gt; parent(p) == PermutationGroup(4)
+true
+
+julia&gt; p = perm&quot;(1,3)(2,4)(10)&quot;
+(1,3)(2,4)
+
+julia&gt; parent(p) == PermutationGroup(10)
+true</code></pre></div></section><h2><a class="nav-anchor" id="Permutation-interface-1" href="#Permutation-interface-1">Permutation interface</a></h2><p>The following basic functionality is provided by the default permutation group implementation in AbstractAlgebra.jl, to support construction of other generic constructions over permutation groups. Any custom permutation group implementation in AbstractAlgebra.jl should provide these functions along with the usual group element arithmetic and comparison.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.parent-Tuple{perm}" href="#Base.parent-Tuple{perm}"><code>Base.parent</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">parent(g::perm{T}) where T = PermGroup</code></pre><blockquote><p>Return the parent of the permutation <code>g</code>.</p></blockquote><pre><code class="language-julia-repl">julia&gt; G = PermutationGroup(5); g = perm([3,4,5,2,1])
+(1,3,5)(2,4)
+
+julia&gt; parent(g) == G
+true</code></pre></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.elem_type-Tuple{AbstractAlgebra.PermGroup}" href="#AbstractAlgebra.Generic.elem_type-Tuple{AbstractAlgebra.PermGroup}"><code>AbstractAlgebra.Generic.elem_type</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">elem_type(::Type{PermGroup{T}}) where T = perm{T}</code></pre><blockquote><p>Return the type of elements of a permutation group.</p></blockquote></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.parent_type-Tuple{perm}" href="#AbstractAlgebra.Generic.parent_type-Tuple{perm}"><code>AbstractAlgebra.Generic.parent_type</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">parent_type(::Type{perm{T}}) where T = PermGroup{T}</code></pre><blockquote><p>Return the type of the parent of a permutation.</p></blockquote></div></section><p>A custom implementation also needs to implement <code>hash(::perm, ::UInt)</code> and (possibly) <code>deepcopy_internal(::perm, ::ObjectIdDict)</code>.</p><div class="admonition note"><div class="admonition-title">Note</div><div class="admonition-text"><p>Permutation group elements are mutable and so returning shallow copies is not sufficient.</p></div></div><pre><code class="language-julia">getindex(a::perm, n::Int)</code></pre><p>Allows access to entry <span>$n$</span> of the given permutation via the syntax <code>a[n]</code>. Note that entries are <span>$1$</span>-indexed.</p><pre><code class="language-julia">setindex!(a::perm, d::Int, n::Int)</code></pre><p>Set the <span>$n$</span>-th entry of the given permutation to <span>$d$</span>. This allows Julia to provide the syntax <code>a[n] = d</code> for setting entries of a permutation. Entries are <span>$1$</span>-indexed.</p><div class="admonition note"><div class="admonition-title">Note</div><div class="admonition-text"><p>Using <code>setindex!</code> invalidates cycle decomposition cached in a permutation, i.e. it will be computed the next time cycle decomposition is needed.</p></div></div><p>Given the parent object <code>G</code> for a permutation group, the following coercion functions are provided to coerce various arguments into the permutation group. Developers provide these by overloading the permutation group parent objects.</p><pre><code class="language-julia">G()</code></pre><p>Return the identity permutation.</p><pre><code class="language-julia">G(A::Vector{&lt;:Integer})</code></pre><p>Return the permutation whose entries are given by the elements of the supplied vector.</p><pre><code class="language-julia">G(p::perm)</code></pre><p>Take a permutation that is already in the permutation group and simply return it. A copy of the original is not made if not necessary.</p><h2><a class="nav-anchor" id="Basic-manipulation-1" href="#Basic-manipulation-1">Basic manipulation</a></h2><p>Numerous functions are provided to manipulate permutation group elements.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.cycles-Tuple{perm}" href="#AbstractAlgebra.Generic.cycles-Tuple{perm}"><code>AbstractAlgebra.Generic.cycles</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">cycles(g::perm{T}) where T&lt;:Integer</code></pre><blockquote><p>Decompose permutation <code>g</code> into disjoint cycles.</p><p>Returns a <code>CycleDec</code> object which iterates over disjoint cycles of <code>g</code>. The ordering of cycles is not guaranteed, and the order within each cycle is computed up to a cyclic permutation. The cycle decomposition is cached in <code>g</code> and used in future computation of <code>permtype</code>, <code>parity</code>, <code>sign</code>, <code>order</code> and <code>^</code> (powering).</p></blockquote><p><strong>Examples:</strong></p><pre><code class="language-julia-repl">julia&gt; g = perm([3,4,5,2,1,6])
+(1,3,5)(2,4)
+
+julia&gt; collect(cycles(g))
+3-element Array{Array{Int64,1},1}:
+ [1, 3, 5]
+ [2, 4]
+ [6]</code></pre></div></section><p>Cycle structure is cached in a permutation, since once available, it provides a convenient shortcut in many other algorithms.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.parity-Tuple{perm}" href="#AbstractAlgebra.Generic.parity-Tuple{perm}"><code>AbstractAlgebra.Generic.parity</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">parity(g::perm{T}) where T</code></pre><blockquote><p>Return the parity of the given permutation, i.e. the parity of the number of transpositions in any decomposition of <code>g</code> into transpositions.</p><p><code>parity</code> returns <span>$1$</span> if the number is odd and <span>$0$</span> otherwise. <code>parity</code> uses cycle decomposition of <code>g</code> if already available, but will not compute it on demand. Since cycle structure is cached in <code>g</code> you may call <code>cycles(g)</code> before calling <code>parity</code>.</p></blockquote><p><strong>Examples:</strong></p><pre><code class="language-julia-repl">julia&gt; g = perm([3,4,1,2,5])
+(1,3)(2,4)
+
+julia&gt; parity(g)
+0
+
+julia&gt; g = perm([3,4,5,2,1,6])
+(1,3,5)(2,4)
+
+julia&gt; parity(g)
+1</code></pre></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.sign-Tuple{perm}" href="#Base.sign-Tuple{perm}"><code>Base.sign</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">sign(g::perm{T}) where T</code></pre><blockquote><p>Return the sign of permutation.</p><p><code>sign</code> returns <span>$1$</span> if <code>g</code> is even and <span>$-1$</span> if <code>g</code> is odd. <code>sign</code> represents the homomorphism from the permutation group to the unit group of <span>$\mathbb{Z}$</span> whose kernel is the alternating group.</p></blockquote><p><strong>Examples:</strong></p><pre><code class="language-julia-repl">julia&gt; g = perm([3,4,1,2,5])
+(1,3)(2,4)
+
+julia&gt; sign(g)
+1
+
+julia&gt; g = perm([3,4,5,2,1,6])
+(1,3,5)(2,4)
+
+julia&gt; sign(g)
+-1</code></pre></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.permtype-Tuple{perm}" href="#AbstractAlgebra.Generic.permtype-Tuple{perm}"><code>AbstractAlgebra.Generic.permtype</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">permtype(g::perm)</code></pre><blockquote><p>Return the type of permutation <code>g</code>, i.e. lengths of disjoint cycles in cycle decomposition of <code>g</code>.</p><p>The lengths are sorted in decreasing order by default. <code>permtype(g)</code> fully determines the conjugacy class of <code>g</code>.</p></blockquote><p><strong>Examples:</strong></p><pre><code class="language-julia-repl">julia&gt; g = perm([3,4,5,2,1,6])
+(1,3,5)(2,4)
+
+julia&gt; permtype(g)
+3-element Array{Int64,1}:
+ 3
+ 2
+ 1
+
+julia&gt; G = PermGroup(5); e = parent(g)()
+()
+
+julia&gt; permtype(e)
+6-element Array{Int64,1}:
+ 1
+ 1
+ 1
+ 1
+ 1
+ 1</code></pre></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.order-Tuple{perm}" href="#AbstractAlgebra.Generic.order-Tuple{perm}"><code>AbstractAlgebra.Generic.order</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">order(a::perm) -&gt; BigInt</code></pre><blockquote><p>Return the order of permutation <code>a</code> as <code>BigInt</code>.</p><p>If you are sure that computation over <code>T</code> (or its <code>Int</code> promotion) will not overflow you may use the method <code>order(T::Type, a::perm)</code> which bypasses computation with BigInts and returns <code>promote(T, Int)</code>.</p></blockquote></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.order-Tuple{AbstractAlgebra.Generic.PermGroup}" href="#AbstractAlgebra.Generic.order-Tuple{AbstractAlgebra.Generic.PermGroup}"><code>AbstractAlgebra.Generic.order</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">order(G::PermGroup) -&gt; BigInt</code></pre><blockquote><p>Return the order of the full permutation group as <code>BigInt</code>.</p></blockquote></div></section><p>Note that even an <code>Int64</code> can be easily overflowed when computing with permutation groups. Thus, by default, <code>order</code> returns (always correct) <code>BigInt</code>s. If you are sure that the computation will not overflow, you may use <code>order(::Type{T}, ...)</code> to perform computations with machine integers. Julias standard promotion rules apply for the returned value.</p><p>Since <code>PermGroup</code> implements the iterator protocole You may iterate over all permutations via simple</p><pre><code class="language-none">for p in PermutationGroup(n)
+   ...
+end</code></pre><p>Iteration over all permutations in reasonable time, (i.e. in terms of minutes) is possible when <span>$n ≤ 13$</span>.</p><p>You may also use the non-allocating <code>Generic.elements!</code> function for <span>$n ≤ 14$</span> (or even <span>$15$</span> if you are patient enough), which is an order of mangitude faster.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.elements!-Tuple{AbstractAlgebra.Generic.PermGroup}" href="#AbstractAlgebra.Generic.elements!-Tuple{AbstractAlgebra.Generic.PermGroup}"><code>AbstractAlgebra.Generic.elements!</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">Generic.elements!(G::PermGroup)</code></pre><blockquote><p>Return an unsafe iterator over all permutations in <code>G</code>. Only one permutation is allocated and then modified in-place using the non-recursive <a href="https://en.wikipedia.org/wiki/Heap&#39;s_algorithm">Heaps algorithm</a>.</p><p>Note: you need to explicitely copy permutations intended to be stored or modified.</p></blockquote><p><strong>Examples:</strong></p><pre><code class="language-julia-repl">julia&gt; elts = Generic.elements!(PermGroup(5));
+
+julia&gt; length(elts)
+120
+
+julia&gt; for p in Generic.elements!(PermGroup(3))
+         println(p)
+       end
+()
+(1,2)
+(1,3,2)
+(2,3)
+(1,2,3)
+(1,3)
+
+julia&gt; A = collect(Generic.elements!(PermGroup(3))); A
+6-element Array{AbstractAlgebra.Generic.perm{Int64},1}:
+ (1,3)
+ (1,3)
+ (1,3)
+ (1,3)
+ (1,3)
+ (1,3)
+
+julia&gt; unique(A)
+1-element Array{AbstractAlgebra.Generic.perm{Int64},1}:
+ (1,3)</code></pre></div></section><p>However, since all permutations yielded by <code>elements!</code> are aliased (modified &quot;in-place&quot;), <code>collect(Generic.elements!(PermGroup(n)))</code> returns a vector of identical permutations.</p><div class="admonition note"><div class="admonition-title">Note</div><div class="admonition-text"><p>If you intend to use or store elements yielded by <code>elements!</code> you need to <strong>deepcopy</strong> them explicitely.</p></div></div><h2><a class="nav-anchor" id="Arithmetic-operators-1" href="#Arithmetic-operators-1">Arithmetic operators</a></h2><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.:*-Union{Tuple{T}, Tuple{perm{T},perm{T}}} where T" href="#Base.:*-Union{Tuple{T}, Tuple{perm{T},perm{T}}} where T"><code>Base.:*</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">*(g::perm{T}, h::perm{T}) where T</code></pre><blockquote><p>Return the composition <span>$h ∘ g$</span> of two permutations.</p><p>This corresponds to the action of permutation group on the set <code>[1..n]</code> <strong>on the right</strong> and follows the convention of GAP.</p><p>If <code>g</code> and <code>h</code> are parametrized by different types, the result is promoted accordingly.</p></blockquote><p><strong>Examples:</strong></p><pre><code class="language-julia-repl">julia&gt; perm([2,3,1,4])*perm([1,3,4,2]) # (1,2,3)*(2,3,4)
+(1,3)(2,4)</code></pre></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.:^-Tuple{perm,Integer}" href="#Base.:^-Tuple{perm,Integer}"><code>Base.:^</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">^(g::perm{T}, n::Integer) where T</code></pre><blockquote><p>Return the <span>$n$</span>-th power of a permutation <code>g</code>.</p><p>By default <code>g^n</code> is computed by cycle decomposition of <code>g</code> if <code>n &gt; 3</code>. <code>Generic.power_by_squaring</code> provides a different method for powering which may or may not be faster, depending on the particuar case. Due to caching of the cycle structure, repeated powering of <code>g</code> will be faster with the default method.</p></blockquote><p><strong>Examples:</strong></p><pre><code class="language-julia-repl">julia&gt; g = perm([2,3,4,5,1])
+(1,2,3,4,5)
+
+julia&gt; g^3
+(1,4,2,5,3)
+
+julia&gt; g^5
+()</code></pre></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.inv-Tuple{perm}" href="#Base.inv-Tuple{perm}"><code>Base.inv</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">inv(g::perm)</code></pre><blockquote><p>Return the inverse of the given permutation, i.e. the permuation <span>$g^{-1}$</span> such that <span>$g ∘ g^{-1} = g^{-1} ∘ g$</span> is the identity permutation.</p></blockquote></div></section><p>Permutations parametrized by different types can be multiplied, and follow the standard julia integer promotion rules:</p><pre><code class="language-julia">g = rand(PermGroup(Int8(5)));
+h = rand(PermGroup(UInt32(5)));
+typeof(g*h)
+
+# output
+AbstractAlgebra.Generic.perm{Int64}</code></pre><h2><a class="nav-anchor" id="Coercion-1" href="#Coercion-1">Coercion</a></h2><p>The following coercions are available for <code>G::PermGroup</code> parent objects. Each of the methods perform basic sanity checks on the input which can be switched off by the second argument.</p><p><strong>Examples</strong></p><pre><code class="language-julia">(G::PermGroup)()</code></pre><blockquote><p>Return the identity element of <code>G</code>.</p></blockquote><pre><code class="language-julia">(G::PermGrup)(::Vector{&lt;:Integer}[, check=true])</code></pre><blockquote><p>Turn a vector od integers into a permutation (performing conversion, if necessary).</p></blockquote><pre><code class="language-julia">(G::PermGroup)(::perm{&lt;:Integer}[, check=true])</code></pre><blockquote><p>Coerce a permutation <code>p</code> into group <span>$G$</span> (performing the conversion, if necessary). If <code>p</code> is already an element of <code>G</code> no copy is performed.</p></blockquote><pre><code class="language-julia">(G::PermGroup)(::String[, check=true])</code></pre><blockquote><p>Parse the string input e.g. copied from the output of GAP. The method uses the same logic as <code>perm&quot;...&quot;</code> macro. The string is sanitized and checked for disjoint cycles. Both <code>string(p::perm)</code> (if <code>setpermstyle(:cycles)</code>) and <code>string(cycles(p::perm))</code> are valid input for this method.</p></blockquote><pre><code class="language-julia">(G::PermGroup{T})(::CycleDec{T}[, check=true]) where T</code></pre><blockquote><p>Turn a cycle decomposition object into a permutation.</p></blockquote><h2><a class="nav-anchor" id="Comparison-1" href="#Comparison-1">Comparison</a></h2><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.:==-Tuple{perm,perm}" href="#Base.:==-Tuple{perm,perm}"><code>Base.:==</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">==(g::perm, h::perm)</code></pre><blockquote><p>Return <code>true</code> if permutations are equal, otherwise return <code>false</code>.</p><p>Permutations parametrized by different integer types are considered equal if they define the same permutation in the abstract permutation group.</p></blockquote><p><strong>Examples:</strong></p><pre><code class="language-none">julia&gt; g = perm(Int8[2,3,1])
+(1,2,3)
+
+julia&gt; h = perm&quot;(3,1,2)&quot;
+(1,2,3)
+
+julia&gt; g == h
+true</code></pre></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.:==-Tuple{AbstractAlgebra.Generic.PermGroup,AbstractAlgebra.Generic.PermGroup}" href="#Base.:==-Tuple{AbstractAlgebra.Generic.PermGroup,AbstractAlgebra.Generic.PermGroup}"><code>Base.:==</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">==(G::PermGroup, H::PermGroup)</code></pre><blockquote><p>Return <code>true</code> if permutation groups are equal, otherwise return <code>false</code>.</p><p>Permutation groups on the same number of letters, but parametrized by different integer types are considered different.</p></blockquote><p><strong>Examples:</strong></p><pre><code class="language-none">julia&gt; G = PermGroup(UInt(5))
+Permutation group over 5 elements
+
+julia&gt; H = PermGroup(5)
+Permutation group over 5 elements
+
+julia&gt; G == H
+false</code></pre></div></section><h2><a class="nav-anchor" id="Misc-1" href="#Misc-1">Misc</a></h2><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.rand-Tuple{AbstractAlgebra.Generic.PermGroup}" href="#Base.rand-Tuple{AbstractAlgebra.Generic.PermGroup}"><code>Base.rand</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">rand(G::PermGroup{T}) where {T}</code></pre><blockquote><p>Return a random permutation from <code>G</code>.</p></blockquote></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.matrix_repr-Tuple{perm}" href="#AbstractAlgebra.Generic.matrix_repr-Tuple{perm}"><code>AbstractAlgebra.Generic.matrix_repr</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">matrix_repr(a::perm{T}) where T</code></pre><blockquote><p>Return the permutation matrix as sparse matrix representing <code>a</code> via natural embedding of the permutation group into general linear group over <span>$\mathbb{Z}$</span>.</p></blockquote><p><strong>Examples:</strong></p><pre><code class="language-julia-repl">julia&gt; p = perm([2,3,1])
+(1,2,3)
+
+julia&gt; matrix_repr(p)
+3×3 SparseMatrixCSC{Int64,Int64} with 3 stored entries:
+  [3, 1]  =  1
+  [1, 2]  =  1
+  [2, 3]  =  1
+
+julia&gt; full(ans)
+3×3 Array{Int64,2}:
+ 0  1  0
+ 0  0  1
+ 1  0  0</code></pre></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.emb-Tuple{AbstractAlgebra.Generic.PermGroup,Array{Int64,1},Bool}" href="#AbstractAlgebra.Generic.emb-Tuple{AbstractAlgebra.Generic.PermGroup,Array{Int64,1},Bool}"><code>AbstractAlgebra.Generic.emb</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">emb(G::PermGroup, V::Vector{Int}, check::Bool=true)</code></pre><blockquote><p>Return the natural embedding of a permutation group into <code>G</code> as the subgroup permuting points indexed by <code>V</code>.</p></blockquote><p><strong>Examples:</strong></p><pre><code class="language-julia-repl">julia&gt; p = perm([2,3,1])
+(1,2,3)
+
+julia&gt; f = Generic.emb(PermGroup(5), [3,2,5]);
+
+julia&gt; f(p)
+(2,5,3)</code></pre></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.emb!-Tuple{perm,perm,Any}" href="#AbstractAlgebra.Generic.emb!-Tuple{perm,perm,Any}"><code>AbstractAlgebra.Generic.emb!</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">emb!(result::perm, p::perm, V)</code></pre><blockquote><p>Embed permutation <code>p</code> into permutation <code>result</code> on the indices given by <code>V</code>.</p><p>This corresponds to the natural embedding of <span>$S_k$</span> into <span>$S_n$</span> as the subgroup permuting points indexed by <code>V</code>.</p></blockquote><p><strong>Examples:</strong></p><pre><code class="language-julia-repl">julia&gt; p = perm([2,1,4,3])
+(1,2)(3,4)
+
+julia&gt; Generic.emb!(perm(collect(1:5)), p, [3,1,4,5])
+(1,3)(4,5)</code></pre></div></section><footer><hr/><a class="previous" href="numberfield.html"><span class="direction">Previous</span><span class="title">Number fields</span></a><a class="next" href="ytabs.html"><span class="direction">Next</span><span class="title">Partitions and Young tableaux</span></a></footer></article></body></html>
