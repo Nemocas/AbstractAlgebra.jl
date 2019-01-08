@@ -28,7 +28,7 @@ parent_type(::Type{Poly{T}}) where T <: RingElement = PolyRing{T}
 elem_type(::Type{PolyRing{T}}) where T <: RingElement = Poly{T}
 
 @doc Markdown.doc"""
-    base_ring(R::AbstractAlgebra.PolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
+    base_ring(R::AbstractAlgebra.PolyRing{T}) where T <: RingElement
 > Return the base ring of the given polynomial ring.
 """
 base_ring(R::AbstractAlgebra.PolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
@@ -114,7 +114,7 @@ length(a::PolynomialElem) = a.length
 degree(a::PolynomialElem) = length(a) - 1
 
 @doc Markdown.doc"""
-    modulus(a::AbstractAlgebra.PolyElem{T}) where {T <: ResElem} = modulus(base_ring(a))
+    modulus(a::AbstractAlgebra.PolyElem{T}) where {T <: ResElem}
 > Return the modulus of the coefficients of the given polynomial.
 """
 modulus(a::AbstractAlgebra.PolyElem{T}) where {T <: ResElem} = modulus(base_ring(a))
