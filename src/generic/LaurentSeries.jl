@@ -1405,16 +1405,16 @@ function add!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeries
    elseif lenb == 1
       sb = sa
    end
-   sz = gcd(gcd(sa, sb), abs(vala - valb))
+   sc = gcd(gcd(sa, sb), abs(vala - valb))
    mina = min(vala + lena*sa, prec)
    minb = min(valb + lenb*sb, prec)
    lenr = max(mina, minb) - valr
-   lenr = div(lenr + sz - 1, sz)
+   lenr = div(lenr + sc - 1, sc)
    R = base_ring(c)
    fit!(c, lenr)
    c.prec = prec
    c.val = valr
-   c.scale = sz
+   c.scale = sc
    pa = vala
    pb = valb
    j = 0
