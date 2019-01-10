@@ -89,7 +89,7 @@ function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}
+    change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
 > Returns the polynomial obtained by applying g to the coefficients of p.
 """
 function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
@@ -127,11 +127,11 @@ v) for v in symbols(p.parent)], ordering = p.parent.ord)
 end
 
 @doc Markdown.doc"""
-    vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
+    vars(p::MPoly{T}) where {T <: RingElement}
 > Returns the variables actually occuring in $p$.
 """
-function vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
-   vars_in_p = Array{AbstractAlgebra.Generic.MPoly{T}}(undef, 0)
+function vars(p::MPoly{T}) where {T <: RingElement}
+   vars_in_p = Array{MPoly{T}}(undef, 0)
    n = nvars(p.parent)
    exps = p.exps
    size_exps = size(exps)
@@ -207,7 +207,7 @@ end
 > the coefficient of $x^0*z^2$ in the polynomial $f$ (assuming variables
 > $x, y, z$ in that order).
 """
-function coeff(a::MPoly{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
+function coeff(a::Generic.MPolyElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
    unique(vars) != vars && error("Variables not unique")
    length(vars) != length(exps) &&
        error("Number of variables does not match number of exponents")
