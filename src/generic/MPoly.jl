@@ -94,7 +94,7 @@ end
 """
 function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
    new_base_ring = parent(g(zero(base_ring(p.parent))))
-   new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in symbols(p.parent)], ordering = p.parent.ord)
+   new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in symbols(p.parent)], ordering = ordering(p.parent))
    new_p = zero(new_polynomial_ring)
 
    for i = 1:length(p)
