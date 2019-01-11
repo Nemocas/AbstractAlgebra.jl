@@ -127,15 +127,30 @@ v) for v in symbols(p.parent)], ordering = p.parent.ord)
 end
 
 @doc Markdown.doc"""
-    vars(p::MPoly{T}) where {T <: RingElement}
+    vars(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
 > Returns the variables actually occuring in $p$.
 """
+function vars(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
+   U = typeof(p)
+   vars_in_p = Array{U}(undef, 0)
+   n = nvars(p.parent)
+   gen_list = gens(p.parent)
+   for j = 1:n
+      for i = 1:length(p)
+         if exponent(p, i, j) > 0
+            push!(vars_in_p, gen_list[j])
+            break
+         end
+      end
+   end
+   return(vars_in_p)
+end
+
 function vars(p::MPoly{T}) where {T <: RingElement}
    vars_in_p = Array{MPoly{T}}(undef, 0)
    n = nvars(p.parent)
    exps = p.exps
    size_exps = size(exps)
-   
    gen_list = gens(p.parent)
    for j = 1:n
       for i = 1:length(p)
@@ -3985,8 +4000,14 @@ end
 #
 ###############################################################################
 
- 
-function to_univariate(R:: AbstractAlgebra.Generic.PolyRing{T}, p::AbstractAlgebra.Generic.MPoly{T}) where {T <: AbstractAlgebra.RingElement}
+@doc Markdown.doc"""
+    to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
+> Assuming the polynomial $p$ is actually a univariate polynomial, convert the
+> polynomial to a univariate polynomial in the given univariate polynomial ring
+> $R$. An exception is raised if the polynomial $p$ involves more than one
+> variable.
+"""
+function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
    vars_p = vars(p)
 
    if length(vars_p) > 1
@@ -4000,19 +4021,19 @@ function to_univariate(R:: AbstractAlgebra.Generic.PolyRing{T}, p::AbstractAlgeb
    return R(coefficients_of_univariate(p))
 end
 
-doc"""
+@doc Markdown.doc"""
     involves_at_most_one_variable(p::AbstractAlgebra.Generic.MPoly)
 > Return true if $p$ contains at most 1 variable and false otherwise.
 """
-function involves_at_most_one_variable(p::AbstractAlgebra.Generic.MPoly)
+function involves_at_most_one_variable(p::AbstractAlgebra.MPolyElem)
    return length(vars(p)) <= 1
 end
 
-doc"""
+@doc Markdown.doc"""
     coefficients_of_univariate(p::AbstractAlgebra.Generic.MPoly)
 > Return the coefficients of p, which is assumed to be univariate, as an array in ascending order.
 """
-function coefficients_of_univariate(p::AbstractAlgebra.Generic.MPoly, check_univariate::Bool=true)
+function coefficients_of_univariate(p::AbstractAlgebra.MPolyElem, check_univariate::Bool=true)
    if check_univariate
       vars_p = vars(p)
       
