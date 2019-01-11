@@ -89,12 +89,12 @@ function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}
+    change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
 > Returns the polynomial obtained by applying g to the coefficients of p.
 """
 function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
    new_base_ring = parent(g(zero(base_ring(p.parent))))
-   new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in symbols(p.parent)], ordering = p.parent.ord)
+   new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in symbols(p.parent)], ordering = ordering(p.parent))
    new_p = zero(new_polynomial_ring)
 
    for i = 1:length(p)
@@ -127,15 +127,30 @@ v) for v in symbols(p.parent)], ordering = p.parent.ord)
 end
 
 @doc Markdown.doc"""
-    vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
+    vars(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
 > Returns the variables actually occuring in $p$.
 """
-function vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
-   vars_in_p = Array{AbstractAlgebra.Generic.MPoly{T}}(undef, 0)
+function vars(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
+   U = typeof(p)
+   vars_in_p = Array{U}(undef, 0)
+   n = nvars(p.parent)
+   gen_list = gens(p.parent)
+   for j = 1:n
+      for i = 1:length(p)
+         if exponent(p, i, j) > 0
+            push!(vars_in_p, gen_list[j])
+            break
+         end
+      end
+   end
+   return(vars_in_p)
+end
+
+function vars(p::MPoly{T}) where {T <: RingElement}
+   vars_in_p = Array{MPoly{T}}(undef, 0)
    n = nvars(p.parent)
    exps = p.exps
    size_exps = size(exps)
-   
    gen_list = gens(p.parent)
    for j = 1:n
       for i = 1:length(p)
@@ -199,7 +214,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    coeff(a::MPoly{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
+    coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
 > Return the "coefficient" of $a$ (as a multivariate polynomial in the same
 > ring) of the monomial consisting of the product of the variables of the given
 > indices raised to the given exponents (note that not all variables need to
@@ -207,7 +222,7 @@ end
 > the coefficient of $x^0*z^2$ in the polynomial $f$ (assuming variables
 > $x, y, z$ in that order).
 """
-function coeff(a::MPoly{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
+function coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
    unique(vars) != vars && error("Variables not unique")
    length(vars) != length(exps) &&
        error("Number of variables does not match number of exponents")
@@ -541,11 +556,11 @@ function coeff(x::MPoly, i::Int)
 end
 
 @doc Markdown.doc"""
-    coeffs(x::MPoly)
+    coeffs(x::AbstractAlgebra.MPolyElem)
 > Return an array of the nonzero coefficients of the given polynomial, starting
 > with the most significant term.
 """
-function coeffs(x::MPolyElem)
+function coeffs(x::MPoly)
    return [coeff(x, i) for i = 1:length(x)]
 end
 
@@ -3756,7 +3771,7 @@ end
 @doc Markdown.doc"""
     setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
 > Set the coefficient of the term with the given exponent vector to the given
-> value $c$. This function take $O(\log n)$ operations if a term with the given
+> value $c$. This function takes $O(\log n)$ operations if a term with the given
 > exponent already exists, or if the term is inserted at the end of the
 > polynomial. Otherwise it can take $O(n)$ operations in the worst case.
 """
@@ -3783,7 +3798,16 @@ function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
       while hi >= lo
          v = monomial_cmp(A, lo + n, exp2, 1, N, parent(a), UInt(0))
          if v == 0
-            a.coeffs[lo + n] = c
+            if c != 0 # just insert the coefficient
+               a.coeffs[lo + n] = c
+            else # coefficient is zero, shift everything
+               for i = lo + n:length(a) - 1
+                  a.coeffs[i] = a.coeffs[i + 1]
+                  monomial_set!(A, i, A, i + 1, N)
+               end
+               a.coeffs[length(a)] = c # zero final coefficient
+               a.length -= 1   
+            end
             return a
          elseif v < 0
             hi = lo + n - 1
@@ -3794,16 +3818,18 @@ function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
       end
    end
    # exponent not found, must insert at lo
-   lena = length(a)
-   fit!(a, lena + 1)
-   A = a.exps
-   for i = lena:-1:lo
-      a.coeffs[i + 1] = a.coeffs[i]
-      monomial_set!(A, i + 1, A, i, N)
+   if c != 0
+      lena = length(a)
+      fit!(a, lena + 1)
+      A = a.exps
+      for i = lena:-1:lo
+         a.coeffs[i + 1] = a.coeffs[i]
+         monomial_set!(A, i + 1, A, i, N)
+      end
+      a.coeffs[lo] = c
+      monomial_set!(A, lo, exp2, 1, N)
+      a.length += 1
    end
-   a.coeffs[lo] = c
-   monomial_set!(A, lo, exp2, 1, N)
-   a.length += 1
    return a 
 end
 
@@ -3974,8 +4000,14 @@ end
 #
 ###############################################################################
 
- 
-function to_univariate(R:: AbstractAlgebra.Generic.PolyRing{T}, p::AbstractAlgebra.Generic.MPoly{T}) where {T <: AbstractAlgebra.RingElement}
+@doc Markdown.doc"""
+    to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
+> Assuming the polynomial $p$ is actually a univariate polynomial, convert the
+> polynomial to a univariate polynomial in the given univariate polynomial ring
+> $R$. An exception is raised if the polynomial $p$ involves more than one
+> variable.
+"""
+function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
    vars_p = vars(p)
 
    if length(vars_p) > 1
@@ -3989,19 +4021,19 @@ function to_univariate(R:: AbstractAlgebra.Generic.PolyRing{T}, p::AbstractAlgeb
    return R(coefficients_of_univariate(p))
 end
 
-doc"""
+@doc Markdown.doc"""
     involves_at_most_one_variable(p::AbstractAlgebra.Generic.MPoly)
 > Return true if $p$ contains at most 1 variable and false otherwise.
 """
-function involves_at_most_one_variable(p::AbstractAlgebra.Generic.MPoly)
+function involves_at_most_one_variable(p::AbstractAlgebra.MPolyElem)
    return length(vars(p)) <= 1
 end
 
-doc"""
+@doc Markdown.doc"""
     coefficients_of_univariate(p::AbstractAlgebra.Generic.MPoly)
 > Return the coefficients of p, which is assumed to be univariate, as an array in ascending order.
 """
-function coefficients_of_univariate(p::AbstractAlgebra.Generic.MPoly, check_univariate::Bool=true)
+function coefficients_of_univariate(p::AbstractAlgebra.MPolyElem, check_univariate::Bool=true)
    if check_univariate
       vars_p = vars(p)
       

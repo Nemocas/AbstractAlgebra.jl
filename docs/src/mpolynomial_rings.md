@@ -68,7 +68,9 @@ multivariate polynomial ring over `R` (i.e. $S = R[x, y, \ldots]$) with parent o
 Of course, in practice these types may not be parameterised, but we use parameterised
 types here to make the interface clearer.
 
-Note that the type `T` must (transitively) belong to the abstract type `RingElem`.
+Note that the type `T` must (transitively) belong to the abstract type `RingElem` or
+more generally the union type `RingElement` which includes the Julia integer, rational
+and floating point types.
 
 ### Data type and parent object methods
 
@@ -86,16 +88,22 @@ nvars(f::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElem
 
 Return the number of variables of the polynomial ring.
 
-
 ```julia
 gens(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElem
 ```
 
-Return an array of all the generators (variables) of the given polynomial ring (as
-polynomials).
+Return an array of all the generators (variables) of the given polynomial ring
+(as polynomials).
 
-The first entry in the array will be the variable with most significance with respect
-to the ordering.
+The first entry in the array will be the variable with most significance with
+respect to the ordering.
+
+```julia
+gen(S::MyMPolyRing{T}, i::Int) where T <: AbstractAlgebra.RingElem
+```
+
+Return the $i$-th generator (variable) of the given polynomial ring (as a
+polynomial).
 
 ```julia
 ordering(S::MyMPolyRing{T})
@@ -124,22 +132,29 @@ Return the number of nonzero terms of the given polynomial. The length of the ze
 polynomial is defined to be $0$. The return value should be of type `Int`.
 
 ```julia
+degree(f::MyMPoly{T}, i::Int) where T <: AbstractAlgebra.RingElem
+```
+
+Return the degree of the polynomial $f$ in the $i$-th variable.
+
+```julia
+degrees(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+```
+
+Return an array of the degrees of the polynomial $f$ in each of the variables.
+
+```julia
+total_degree(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+```
+
+Return the total degree of the polynomial $f$, i.e. the highest sum of
+exponents occuring in any term of $f$.
+
+```julia
 isgen(x::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
 
 Return `true` if $x$ is a generator of the polynomial ring.
-
-```julia
-max_fields(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
-```
-
-Returns a tuple `(B, b)` consisting of an array of `Int`s specifying the highest power
-of each variable that appears in the given polynomial and `b` the largest of the values
-in `B`.
-
-```@docs
-total_degree(f::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
-```
 
 ```julia
 isunit(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
@@ -166,12 +181,30 @@ ismonomial(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 
 Return `true` if $f$ consists of a single term with coefficient $1$.
 
-```@docs
-vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
+```julia
+coeffs(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
 
-Note that `vars(p::AbstractAlgebra.Generic.MPoly{T})` returns variables, while
-`vars(S::MyMPolyRing{T})` return symbols.
+Return an array of the coefficients of the polynomial $p$, starting with the
+coefficient of the most significant term with respect to the ordering.
+
+```julia
+monomials(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+```
+
+Return an array of the monomials of the polynomial $p$, starting with the
+coefficient of the most significant term with respect to the ordering.
+Monomials in AbstractAlgebra are defined to have coefficient $1$. See the
+function `terms` if you require the coefficients, however note that only
+monomials can be compared.
+
+```julia
+terms(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+```
+
+Return an array of the terms of the polynomial $p$, starting with the
+coefficient of the most significant term with respect to the ordering.
+Terms in AbstractAlgebra include the coefficient.
 
 **Examples**
 
@@ -188,6 +221,12 @@ isunit(f) == false
 isconstant(f) == false
 isterm(2x*y) == true
 ismonomial(x*y) == false
+V = vars(f)
+C = coeffs(f)
+M = monomials(f)
+T = terms(f)
+degree(f, 2) == 2
+d = total_degree(f)
 ```
 
 ### Exact division
@@ -232,6 +271,29 @@ flag, q = divides(f*g, f)
 d = divexact(f*g, f)
 v, q = remove(f*g^3, g)
 n = valuation(f*g^3, g)
+```
+
+### Ad hoc exact division
+
+For any ring that implements exact division, the following can be implemented.
+
+```julia
+divexact(f::MyMPoly{T}, c::Integer) where T <: AbstractAlgebra.RingElem
+divexact(f::MyMPoly{T}, c::Rational) where T <: AbstractAlgebra.RingElem
+divexact(f::MyMPoly{T}, c::T) where T <: AbstractAlgebra.RingElem
+```
+
+Divide the polynomial exactly by the constant $c$.
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+f = 3x^2*y^2 + 2x + 1
+
+f1 = divexact(f, 5)
+f2 = divexact(f, QQ(2, 3))
 ```
 
 ### Euclidean division
@@ -298,7 +360,7 @@ Evaluate the polynomial $f$ at the values specified by the entries of the array 
 
 
 ```julia
-evaluate(f::MPoly{T}, A::Array{T, 1}) where T <: Integer
+evaluate(f::MyMPoly{T}, A::Array{U, 1}) where {T <: AbstractAlgebra.RingElem, U <: Integer}
 ```
 
 Evaluate the polynomial $f$ at the values specified by the entries of the array $A$.
@@ -313,27 +375,6 @@ f = 2x^2*y + 2x + y + 1
 m = evaluate(f, Rational{BigInt}[2, 3])
 n = evaluate(f, [2, 3])
 ```
-
-In order to substitute the variables of a polynomial $f$ over a ring $T$ by elements in a $T$-algebra $S$,
-you first have to change the base ring of $f$ using the following function, where $g$ is a function
-representing the structure homomorphism of the $T$-algebra $S$.
-
-```@docs
-change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}
-```
-
-**Examples**
-
-```julia
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
-S, (u, v) = PolynomialRing(ZZ, ["u", "v"])
-
-f = 2x^2*y + 2x + y + 1
-
-evaluate(change_base_ring(f, a->S(a)), [S(1), v])
-evaluate(change_base_ring(f, a->R(a)), [y, x])
-```
-
 
 ### GCD
 
@@ -370,36 +411,30 @@ In addition to the standard constructors, the following constructor, taking arra
 coefficients and exponent vectors, should be provided.
 
 ```julia
-(S::MyMPolyRing{T})(A::Array{T, 1}, m::Array{UInt, 2}) where T <: AbstractAlgebra.RingEle
-m
+(S::MyMPolyRing{T})(A::Vector{T}, m::Vector{Vector{Int}}) where T <: AbstractAlgebra.RingElem
 ```
 
-Create the polynomial in the given ring with nonzero coefficients specified by the
-elements of `A` and corresponding exponent vectors given by the elements of `m`. For
-efficiency reason, the exponents of term $i$ are given by the vector `m[:, i]` since
-Julia uses column major two dimensional arrays.
+Create the polynomial in the given ring with nonzero coefficients specified by
+the elements of $A$ and corresponding exponent vectors given by the elements of
+$m$.
 
-For maximum compatibility with external libraries, the coefficient (and term) at index
-$1$ correspond to the most significant term with respect to the polynomial ring
-ordering.
+There is no assumption about coefficients being nonzero or terms being in order
+or unique. Zero terms are removed by the function, duplicate terms are combined
+(added) and the terms are sorted so that they are in the correct order.
 
-Each exponent vector uses a separate word for each exponent field, the first of which
-should be any degree or weight, and otherwise should be the exponent for the most
-significant variable with respect to the ordering. The top bit of each word is reserved
-to detect overflows.
+Each exponent vector uses a separate integer for each exponent field, the first
+of which should be the exponent for the most significant variable with respect
+to the ordering. All exponents must be non-negative.
 
-If a full word is not used for exponents, a check should be done to ensure there are
-no overflows before setting the exponents.
-
-A library may also optionally provide an interface that makes use of `BigInt` (or any
-other big integer type) for exponents instead of `UInt`.
+A library may also optionally provide an interface that makes use of `BigInt`
+(or any other big integer type) for exponents instead of `Int`.
 
 **Examples**
 
 ```julia
 S, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
-f = S(Rational{BigInt}[2, 3, 1], UInt[3 2 1; 0 1 0])
+f = S(Rational{BigInt}[2, 3, 1], [[3, 2], [1, 0], [0, 1]])
 ```
 
 ### Sparse distributed, random access basic manipulation
@@ -408,32 +443,68 @@ f = S(Rational{BigInt}[2, 3, 1], UInt[3 2 1; 0 1 0])
 coeff(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
 ```
 
-Return the coefficient of the $(n+1)$-th term of $f$. The first term should be the most
+Return the coefficient of the $n$-th term of $f$. The first term should be the most
 significant term with respect to the ordering.
 
 ```julia
-exponent(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
+coeff(a::MyMPoly{T}, exps::Vector{Int}) where T <: RingElement
 ```
 
-Return an array of `Int`s giving the vector of exponents for the $n + 1$-th term of $f$.
-The first entry of the array should correspond to the exponent of the most significant
-variable with respect to the ordering.
+Return the coefficient of the term with the given exponent vector, or zero
+if there is no such term.
 
 ```julia
-exponent!(A::Array{Int, 1}, f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
+monomial(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
+monomial!(m::MyMPoly{T}, f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
 ```
 
-As per `exponent`, but set the values in the array `A` rather than allocating an array
-for this purpose. The array is also returned by the function after being mutated.
+Return the $n$-th monomial of $f$ or set $m$ to the $n$-th monomial of $f$,
+respectively. The first monomial should be the most significant term with
+respect to the ordering. Monomials have coefficient $1$ in AbstractAlgebra.
+See the function `term` if you also require the coefficient, however, note
+that only monomials can be compared.
 
 ```julia
-fit!(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
+term(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
 ```
 
-Ensure that the polynomial $f$ internally has space for $n$ nonzero terms. This function
-must mutate the function in-place if it is mutable. It does not return the mutated
-polynomial. Immutable types can still be supported by defining this function to do
-nothing.
+Return the $n$-th term of $f$. The first term should be the one whose
+monomial is most significant with respect to the ordering.
+
+```julia
+exponent(f::MyMPoly{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElem
+```
+
+Return the exponent of the $j$-th variable in the $n$-th term of the polynomial
+$f$. The first term is the one with whose monomial is most significant with
+respect to the ordering.
+
+```julia
+exponent_vector(a::MyMPoly{T}, i::Int) where T <: RingElement
+```
+
+Return a vector of exponents, corresponding to the exponent vector of the
+i-th term of the polynomial. Term numbering begins at $1$ and the exponents
+are given in the order of the variables for the ring, as supplied when the
+ring was created.
+
+```julia
+exponent_vectors(a::MyMPoly{T}) where T <: RingElement
+```
+
+Return an array whose entries are the exponent vectors for each of the terms
+of the polynomial.
+
+```julia
+setcoeff!(a::MyMPoly, exps::Vector{Int}, c::S) where S <: RingElement
+```
+
+Set the coefficient of the term with the given exponent vector to the given
+value $c$. If no such term exists (and $c \neq 0$), one will be inserted. This
+function takes $O(\log n)$ operations if a term with the given exponent already
+exists and $c \neq 0$, or if the term is inserted at the end of the polynomial.
+Otherwise it can take $O(n)$ operations in the worst case. This function must
+return the modified polynomial.
 
 **Examples**
 
@@ -442,24 +513,97 @@ S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 f = x^3*y + 3x*y^2 + 1
 
-c = coeff(f, 1)
-fit!(f, 8)
+c1 = coeff(f, 1)
+c2 = coeff(f, x^3*y)
+m = monomial(f, 2)
+e1 = exponent(f, 1, 1)
+v1 = exponent_vector(f, 1)
+V = exponent_vectors(f)
+t1 = term(f, 1)
+setcoeff!(f, [3, 1], 12)
 ```
+
+### Unsafe functions
+
+The following functions must be provided, but are considered unsafe, as they
+may leave the polynomials in an inconsistent state and they mutate their
+inputs. As usual, such functions should only be applied on polynomials that
+have no references elsewhere in the system and are mainly intended to be used
+in carefully written library code, rather than by users.
+
+Users should instead build polynomials using the constructors described above.
+
+```julia
+fit!(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem
+```
+
+Ensure that the polynomial $f$ internally has space for $n$ nonzero terms. This
+function must mutate the function in-place if it is mutable. It does not return
+the mutated polynomial. Immutable types can still be supported by defining this
+function to do nothing.
+
+```julia
+setcoeff!(a::MyMPoly{T}, i::Int, c::T) where T <: RingElement
+setcoeff!(a::MyMPoly{T}, i::Int, c::U) where {T <: RingElement, U <: Integer}
+```
+
+Set the $i$-th coefficient of the polynomial $a$ to $c$. No check is performed
+on the index $i$ or for $c = 0$. It may be necessary to call
+`combine_like_terms` after calls to this function, to remove zero terms. The
+function must return the modified polynomial.
+
+```julia
+combine_like_terms!(a::MyMPoly{T}) where T <: RingElement
+```
+
+Remove zero terms and combine any adjacent terms with the same exponent
+vector (by adding them). It is assumed that all the exponent vectors are
+already in the correct order with respect to the ordering. The function
+must return the resulting polynomial.
+
+```julia
+set_exponent_vector!(a::MyMPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement 
+```
+
+Set the $i$-th exponent vector to the given exponent vector. No check is
+performed on the index $i$, which is assumed to be valid (or that the
+polynomial has enough space allocated). No sorting of exponents is performed
+by this function. To sort the terms after setting any number of exponents
+with this function, run the `sort_terms!` function. The function must return
+the modified polynomial.
+
+```julia
+sort_terms!(a::MyMPoly{T}) where {T <: RingElement}
+```
+
+Sort the terms of the given polynomial according to the polynomial ring
+ordering. Zero terms and duplicate exponents are ignored. To deal with those
+call `combine_like_terms`. The sorted polynomial must be returned by the
+function.
+
+## Optional functionality for multivariate polynomials
+
+The following functions can optionally be implemented for multivariate
+polynomial types.
 
 ### Derivations
 
-The following function allows to compute derivations of multivariate polynomials of type MPoly.
-
-```@docs
-derivative{T <: AbstractAlgebra.RingElem}(f::AbstractAlgebra.Generic.MPoly{T}, x::AbstractAlgebra.Generic.MPoly{T})
-```
-
-**Example**
+The following function allows to compute derivations of multivariate
+polynomials of type MPoly.
 
 ```julia
-R,(x,y) = AbstractAlgebra.PolynomialRing(ZZ,["x","y"])
-f = x*y + x + y + 1
-derivative(f,x)
-derivative(f,y)
+derivative(f::MyMPoly{T}, x::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
 
+Compute the derivative of $f$ with respect to the variable $x$.
+
+**Examples**
+
+```julia
+R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
+
+f = x*y + x + y + 1
+
+derivative(f, x)
+derivative(f, y)
+```

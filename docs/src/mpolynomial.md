@@ -88,3 +88,116 @@ derivative(k,y)
 All of the examples here are generic polynomial rings, but specialised implementations
 of polynomial rings provided by external modules will also usually provide a
 `PolynomialRing` constructor to allow creation of their polynomial rings.
+
+## Polynomial functionality provided by AbstractAlgebra.jl
+
+### Basic manipulation
+
+```@docs
+vars(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
+```@docs
+var_index(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+
+f = x^2 + 2x + 1
+
+V = vars(f)
+var_index(y) == 2
+```
+
+### Changing base (coefficient) rings
+
+In order to substitute the variables of a polynomial $f$ over a ring $T$ by
+elements in a $T$-algebra $S$, you first have to change the base ring of $f$
+using the following function, where $g$ is a function representing the
+structure homomorphism of the $T$-algebra $S$.
+
+```@docs
+change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
+```
+
+Note that $g$ can also be a Nemo parent, e.g. `QQ`.
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+
+fz = x^2*y^2 + x + 1
+
+fq = change_base_ring(fz, QQ)
+```
+
+### Multivariate coefficients
+
+In order to return the "coefficient" (as a multivariate polynomial in the same
+ring), of a given monomial (in which some of the variables may not appear and
+others may be required to appear to exponent zero), we can use the following
+function.
+
+```@docs
+coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement
+coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyElem
+```
+
+**Examples**
+
+```julia
+R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
+
+f = x^4*y^2*z^2 - 2x^4*y*z^2 + 4x^4*z^2 + 2x^2*y^2 + x + 1
+
+coeff(f, [1, 3], [4, 2]) == coeff(f, [x, z], [4, 2])
+```
+
+### Inflation/deflation
+
+```@docs
+deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
+```@docs
+deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
+```
+
+```@docs
+inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
+```
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+
+f = x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2
+
+def, shift = deflation(f)
+f1 = deflate(f, def, shift)
+f2 = inflate(f1, def, shift)
+f2 == f
+```
+
+### Conversions
+
+```@docs
+to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
+```
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+S, z = PolynomialRing(ZZ, "z")
+
+f = 2x^5 + 3x^4 - 2x^2 - 1
+
+g = to_univariate(S, f)
+```
+

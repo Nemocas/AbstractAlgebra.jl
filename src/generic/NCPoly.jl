@@ -549,6 +549,10 @@ function evaluate(a::AbstractAlgebra.NCPolyElem, b::T) where {T <: NCRingElem}
    return z
 end
 
+@doc Markdown.doc"""
+    evaluate(a::AbstractAlgebra.NCPolyElem, b::Union{Integer, Rational, AbstractFloat})
+> Evaluate the polynomial $a$ at the value $b$ and return the result.
+"""
 function evaluate(a::AbstractAlgebra.NCPolyElem, b::Union{Integer, Rational, AbstractFloat})
    i = length(a)
    R = base_ring(a)
