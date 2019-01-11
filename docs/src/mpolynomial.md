@@ -94,6 +94,10 @@ of polynomial rings provided by external modules will also usually provide a
 ### Basic manipulation
 
 ```@docs
+vars(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
+```@docs
 var_index(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 
@@ -102,6 +106,9 @@ var_index(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```julia
 R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
+f = x^2 + 2x + 1
+
+V = vars(f)
 var_index(y) == 2
 ```
 
@@ -128,7 +135,7 @@ fz = x^2*y^2 + x + 1
 fq = change_base_ring(fz, QQ)
 ```
 
-## Multivariate coefficients
+### Multivariate coefficients
 
 In order to return the "coefficient" (as a multivariate polynomial in the same
 ring), of a given monomial (in which some of the variables may not appear and
@@ -148,5 +155,49 @@ R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
 f = x^4*y^2*z^2 - 2x^4*y*z^2 + 4x^4*z^2 + 2x^2*y^2 + x + 1
 
 coeff(f, [1, 3], [4, 2]) == coeff(f, [x, z], [4, 2])
+```
+
+### Inflation/deflation
+
+```@docs
+deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
+```@docs
+deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
+```
+
+```@docs
+inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
+```
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+
+f = x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2
+
+def, shift = deflation(f)
+f1 = deflate(f, def, shift)
+f2 = inflate(f1, def, shift)
+f2 == f
+```
+
+### Conversions
+
+```@docs
+to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
+```
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+S, z = PolynomialRing(ZZ, "z")
+
+f = 2x^5 + 3x^4 - 2x^2 - 1
+
+g = to_univariate(S, f)
 ```
 
