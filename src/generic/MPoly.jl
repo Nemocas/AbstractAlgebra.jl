@@ -5,7 +5,7 @@
 ###############################################################################
 
 export max_fields, total_degree, gens, divides, isconstant, isdegree,
-       ismonomial, isreverse, isterm, involves_at_most_one_variable,
+       isless, ismonomial, isreverse, isterm, involves_at_most_one_variable,
        main_variable, main_variable_extract, main_variable_insert, nvars, vars,
        ordering, rand_ordering, symbols, monomial_set!, monomial_iszero,
        derivative, rand_ordering, symbols, monomial_set!, monomial_iszero,
