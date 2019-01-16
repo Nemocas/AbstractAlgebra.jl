@@ -66,7 +66,7 @@ cached. Setting the optional argument `cached` to `false` will prevent the paren
 `S` from being cached.
 
 The optional named argument `ordering` can be used to specify an ordering. The currently
-supported options are `:lex`, `:deglex` and `:degrevlex	.
+supported options are `:lex`, `:deglex` and `:degrevlex`.
 
 Here are some examples of creating multivariate polynomial rings and making use of the
 resulting parent objects to coerce various elements into the polynomial ring.
