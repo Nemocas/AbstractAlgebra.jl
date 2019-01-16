@@ -1281,6 +1281,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "ncpolynomial.html#AbstractAlgebra.Generic.evaluate-Union{Tuple{T}, Tuple{NCPolyElem{T},T}} where T<:NCRingElem",
+    "page": "Generic univariate polynomials over a noncommutative ring",
+    "title": "AbstractAlgebra.Generic.evaluate",
+    "category": "method",
+    "text": "evaluate(a::AbstractAlgebra.NCPolyElem, b::T) where {T <: NCRingElem}\n\nEvaluate the polynomial a at the value b and return the result.\n\n\n\n"
+},
+
+{
+    "location": "ncpolynomial.html#AbstractAlgebra.Generic.evaluate-Tuple{NCPolyElem,Integer}",
+    "page": "Generic univariate polynomials over a noncommutative ring",
+    "title": "AbstractAlgebra.Generic.evaluate",
+    "category": "method",
+    "text": "evaluate(a::AbstractAlgebra.NCPolyElem, b::Union{Integer, Rational, AbstractFloat})\n\nEvaluate the polynomial a at the value b and return the result.\n\n\n\n"
+},
+
+{
     "location": "ncpolynomial.html#Evaluation-1",
     "page": "Generic univariate polynomials over a noncommutative ring",
     "title": "Evaluation",
@@ -1333,7 +1349,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Required functionality for multivariate polynomials",
     "category": "section",
-    "text": "In addition to the required functionality for the Ring interface, the Multivariate Polynomial interface has the following required functions.We suppose that R is a fictitious base ring (coefficient ring) and that S is a multivariate polynomial ring over R (i.e. S = Rx y ldots) with parent object S of type MyMPolyRing{T}. We also assume the polynomials in the ring have type MyMPoly{T}, where T is the type of elements of the base (coefficient) ring.Of course, in practice these types may not be parameterised, but we use parameterised types here to make the interface clearer.Note that the type T must (transitively) belong to the abstract type RingElem."
+    "text": "In addition to the required functionality for the Ring interface, the Multivariate Polynomial interface has the following required functions.We suppose that R is a fictitious base ring (coefficient ring) and that S is a multivariate polynomial ring over R (i.e. S = Rx y ldots) with parent object S of type MyMPolyRing{T}. We also assume the polynomials in the ring have type MyMPoly{T}, where T is the type of elements of the base (coefficient) ring.Of course, in practice these types may not be parameterised, but we use parameterised types here to make the interface clearer.Note that the type T must (transitively) belong to the abstract type RingElem or more generally the union type RingElement which includes the Julia integer, rational and floating point types."
 },
 
 {
@@ -1341,23 +1357,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Data type and parent object methods",
     "category": "section",
-    "text": "symbols(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn an array of Symbols representing the variables (generators) of the polynomial ring. Note that these are Symbols not Strings, though their string values will usually be used when printing polynomials.nvars(f::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn the number of variables of the polynomial ring.gens(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn an array of all the generators (variables) of the given polynomial ring (as polynomials).The first entry in the array will be the variable with most significance with respect to the ordering.ordering(S::MyMPolyRing{T})Return the ordering of the given polynomial ring as a symbol. Supported values currently include :lex, :deglex and :degrevlex.ExamplesS, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"]; ordering=:deglex)\n\nV = symbols(S)\nX = gens(S)\nord = ordering(S)"
-},
-
-{
-    "location": "mpolynomial_rings.html#AbstractAlgebra.Generic.total_degree-Union{Tuple{MPoly{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
-    "page": "Multivariate Polynomial Ring Interface",
-    "title": "AbstractAlgebra.Generic.total_degree",
-    "category": "method",
-    "text": "total_degree(f::MPoly{T}) where {T <: RingElement}\n\nReturns the total degree of f.\n\n\n\n"
-},
-
-{
-    "location": "mpolynomial_rings.html#AbstractAlgebra.Generic.vars-Union{Tuple{MPoly{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
-    "page": "Multivariate Polynomial Ring Interface",
-    "title": "AbstractAlgebra.Generic.vars",
-    "category": "method",
-    "text": "vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}\n\nReturns the variables actually occuring in p.\n\n\n\n"
+    "text": "symbols(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn an array of Symbols representing the variables (generators) of the polynomial ring. Note that these are Symbols not Strings, though their string values will usually be used when printing polynomials.nvars(f::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn the number of variables of the polynomial ring.gens(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn an array of all the generators (variables) of the given polynomial ring (as polynomials).The first entry in the array will be the variable with most significance with respect to the ordering.gen(S::MyMPolyRing{T}, i::Int) where T <: AbstractAlgebra.RingElemReturn the i-th generator (variable) of the given polynomial ring (as a polynomial).ordering(S::MyMPolyRing{T})Return the ordering of the given polynomial ring as a symbol. Supported values currently include :lex, :deglex and :degrevlex.ExamplesS, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"]; ordering=:deglex)\n\nV = symbols(S)\nX = gens(S)\nord = ordering(S)"
 },
 
 {
@@ -1365,7 +1365,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Basic manipulation of rings and elements",
     "category": "section",
-    "text": "length(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the number of nonzero terms of the given polynomial. The length of the zero polynomial is defined to be 0. The return value should be of type Int.isgen(x::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if x is a generator of the polynomial ring.max_fields(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturns a tuple (B, b) consisting of an array of Ints specifying the highest power of each variable that appears in the given polynomial and b the largest of the values in B.total_degree(f::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}isunit(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f is a unit in its parent polynomial ring.isconstant(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f is a constant polynomial. The zero polynomial is considered constant for the purposes of this function.isterm(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f consists of a single term.ismonomial(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f consists of a single term with coefficient 1.vars(p::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}Note that vars(p::AbstractAlgebra.Generic.MPoly{T}) returns variables, while vars(S::MyMPolyRing{T}) return symbols.ExamplesS, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^3*y + 3x*y^2 + 1\n\nn = length(f)\nisgen(y) == true\nB, b = max_degrees(f)\nnvars(f) == 2\nisunit(f) == false\nisconstant(f) == false\nisterm(2x*y) == true\nismonomial(x*y) == false"
+    "text": "length(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the number of nonzero terms of the given polynomial. The length of the zero polynomial is defined to be 0. The return value should be of type Int.degree(f::MyMPoly{T}, i::Int) where T <: AbstractAlgebra.RingElemReturn the degree of the polynomial f in the i-th variable.degrees(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an array of the degrees of the polynomial f in each of the variables.total_degree(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the total degree of the polynomial f, i.e. the highest sum of exponents occuring in any term of f.isgen(x::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if x is a generator of the polynomial ring.isunit(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f is a unit in its parent polynomial ring.isconstant(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f is a constant polynomial. The zero polynomial is considered constant for the purposes of this function.isterm(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f consists of a single term.ismonomial(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f consists of a single term with coefficient 1.coeffs(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an array of the coefficients of the polynomial p, starting with the coefficient of the most significant term with respect to the ordering.monomials(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an array of the monomials of the polynomial p, starting with the coefficient of the most significant term with respect to the ordering. Monomials in AbstractAlgebra are defined to have coefficient 1. See the function terms if you require the coefficients, however note that only monomials can be compared.terms(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an array of the terms of the polynomial p, starting with the coefficient of the most significant term with respect to the ordering. Terms in AbstractAlgebra include the coefficient.ExamplesS, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^3*y + 3x*y^2 + 1\n\nn = length(f)\nisgen(y) == true\nB, b = max_degrees(f)\nnvars(f) == 2\nisunit(f) == false\nisconstant(f) == false\nisterm(2x*y) == true\nismonomial(x*y) == false\nV = vars(f)\nC = coeffs(f)\nM = monomials(f)\nT = terms(f)\ndegree(f, 2) == 2\nd = total_degree(f)"
 },
 
 {
@@ -1377,6 +1377,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "mpolynomial_rings.html#Ad-hoc-exact-division-1",
+    "page": "Multivariate Polynomial Ring Interface",
+    "title": "Ad hoc exact division",
+    "category": "section",
+    "text": "For any ring that implements exact division, the following can be implemented.divexact(f::MyMPoly{T}, c::Integer) where T <: AbstractAlgebra.RingElem\ndivexact(f::MyMPoly{T}, c::Rational) where T <: AbstractAlgebra.RingElem\ndivexact(f::MyMPoly{T}, c::T) where T <: AbstractAlgebra.RingElemDivide the polynomial exactly by the constant c.ExamplesR, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n\nf = 3x^2*y^2 + 2x + 1\n\nf1 = divexact(f, 5)\nf2 = divexact(f, QQ(2, 3))"
+},
+
+{
     "location": "mpolynomial_rings.html#Euclidean-division-1",
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Euclidean division",
@@ -1385,19 +1393,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "mpolynomial_rings.html#AbstractAlgebra.Generic.change_base_ring-Union{Tuple{T}, Tuple{MPoly{T},Any}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
-    "page": "Multivariate Polynomial Ring Interface",
-    "title": "AbstractAlgebra.Generic.change_base_ring",
-    "category": "method",
-    "text": "change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}\n\nReturns the polynomial obtained by applying g to the coefficients of p.\n\n\n\n"
-},
-
-{
     "location": "mpolynomial_rings.html#Evaluation-1",
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Evaluation",
     "category": "section",
-    "text": "evaluate(f::MyMPoly{T}, A::Array{T, 1}) where T <: AbstractAlgebra.RingElemEvaluate the polynomial f at the values specified by the entries of the array A.evaluate(f::MPoly{T}, A::Array{T, 1}) where T <: IntegerEvaluate the polynomial f at the values specified by the entries of the array A.ExamplesR, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n\nf = 2x^2*y + 2x + y + 1\n\nm = evaluate(f, Rational{BigInt}[2, 3])\nn = evaluate(f, [2, 3])In order to substitute the variables of a polynomial f over a ring T by elements in a T-algebra S, you first have to change the base ring of f using the following function, where g is a function representing the structure homomorphism of the T-algebra S.change_base_ring(p::AbstractAlgebra.Generic.MPoly{T}, g) where {T <: RingElement}ExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\nS, (u, v) = PolynomialRing(ZZ, [\"u\", \"v\"])\n\nf = 2x^2*y + 2x + y + 1\n\nevaluate(change_base_ring(f, a->S(a)), [S(1), v])\nevaluate(change_base_ring(f, a->R(a)), [y, x])"
+    "text": "evaluate(f::MyMPoly{T}, A::Array{T, 1}) where T <: AbstractAlgebra.RingElemEvaluate the polynomial f at the values specified by the entries of the array A.evaluate(f::MyMPoly{T}, A::Array{U, 1}) where {T <: AbstractAlgebra.RingElem, U <: Integer}Evaluate the polynomial f at the values specified by the entries of the array A.ExamplesR, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n\nf = 2x^2*y + 2x + y + 1\n\nm = evaluate(f, Rational{BigInt}[2, 3])\nn = evaluate(f, [2, 3])"
 },
 
 {
@@ -1421,7 +1421,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Sparse distributed, random access constructors",
     "category": "section",
-    "text": "In addition to the standard constructors, the following constructor, taking arrays of coefficients and exponent vectors, should be provided.(S::MyMPolyRing{T})(A::Array{T, 1}, m::Array{UInt, 2}) where T <: AbstractAlgebra.RingEle\nmCreate the polynomial in the given ring with nonzero coefficients specified by the elements of A and corresponding exponent vectors given by the elements of m. For efficiency reason, the exponents of term i are given by the vector m[:, i] since Julia uses column major two dimensional arrays.For maximum compatibility with external libraries, the coefficient (and term) at index 1 correspond to the most significant term with respect to the polynomial ring ordering.Each exponent vector uses a separate word for each exponent field, the first of which should be any degree or weight, and otherwise should be the exponent for the most significant variable with respect to the ordering. The top bit of each word is reserved to detect overflows.If a full word is not used for exponents, a check should be done to ensure there are no overflows before setting the exponents.A library may also optionally provide an interface that makes use of BigInt (or any other big integer type) for exponents instead of UInt.ExamplesS, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n\nf = S(Rational{BigInt}[2, 3, 1], UInt[3 2 1; 0 1 0])"
+    "text": "In addition to the standard constructors, the following constructor, taking arrays of coefficients and exponent vectors, should be provided.(S::MyMPolyRing{T})(A::Vector{T}, m::Vector{Vector{Int}}) where T <: AbstractAlgebra.RingElemCreate the polynomial in the given ring with nonzero coefficients specified by the elements of A and corresponding exponent vectors given by the elements of m.There is no assumption about coefficients being nonzero or terms being in order or unique. Zero terms are removed by the function, duplicate terms are combined (added) and the terms are sorted so that they are in the correct order.Each exponent vector uses a separate integer for each exponent field, the first of which should be the exponent for the most significant variable with respect to the ordering. All exponents must be non-negative.A library may also optionally provide an interface that makes use of BigInt (or any other big integer type) for exponents instead of Int.ExamplesS, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n\nf = S(Rational{BigInt}[2, 3, 1], [[3, 2], [1, 0], [0, 1]])"
 },
 
 {
@@ -1429,15 +1429,23 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Sparse distributed, random access basic manipulation",
     "category": "section",
-    "text": "coeff(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemReturn the coefficient of the (n+1)-th term of f. The first term should be the most significant term with respect to the ordering.exponent(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemReturn an array of Ints giving the vector of exponents for the n + 1-th term of f. The first entry of the array should correspond to the exponent of the most significant variable with respect to the ordering.exponent!(A::Array{Int, 1}, f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemAs per exponent, but set the values in the array A rather than allocating an array for this purpose. The array is also returned by the function after being mutated.fit!(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemEnsure that the polynomial f internally has space for n nonzero terms. This function must mutate the function in-place if it is mutable. It does not return the mutated polynomial. Immutable types can still be supported by defining this function to do nothing.ExamplesS, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^3*y + 3x*y^2 + 1\n\nc = coeff(f, 1)\nfit!(f, 8)"
+    "text": "coeff(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemReturn the coefficient of the n-th term of f. The first term should be the most significant term with respect to the ordering.coeff(a::MyMPoly{T}, exps::Vector{Int}) where T <: RingElementReturn the coefficient of the term with the given exponent vector, or zero if there is no such term.monomial(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem\nmonomial!(m::MyMPoly{T}, f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemReturn the n-th monomial of f or set m to the n-th monomial of f, respectively. The first monomial should be the most significant term with respect to the ordering. Monomials have coefficient 1 in AbstractAlgebra. See the function term if you also require the coefficient, however, note that only monomials can be compared.term(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemReturn the n-th term of f. The first term should be the one whose monomial is most significant with respect to the ordering.exponent(f::MyMPoly{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElemReturn the exponent of the j-th variable in the n-th term of the polynomial f. The first term is the one with whose monomial is most significant with respect to the ordering.exponent_vector(a::MyMPoly{T}, i::Int) where T <: RingElementReturn a vector of exponents, corresponding to the exponent vector of the i-th term of the polynomial. Term numbering begins at 1 and the exponents are given in the order of the variables for the ring, as supplied when the ring was created.exponent_vectors(a::MyMPoly{T}) where T <: RingElementReturn an array whose entries are the exponent vectors for each of the terms of the polynomial.setcoeff!(a::MyMPoly, exps::Vector{Int}, c::S) where S <: RingElementSet the coefficient of the term with the given exponent vector to the given value c. If no such term exists (and c neq 0), one will be inserted. This function takes O(log n) operations if a term with the given exponent already exists and c neq 0, or if the term is inserted at the end of the polynomial. Otherwise it can take O(n) operations in the worst case. This function must return the modified polynomial.ExamplesS, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^3*y + 3x*y^2 + 1\n\nc1 = coeff(f, 1)\nc2 = coeff(f, x^3*y)\nm = monomial(f, 2)\ne1 = exponent(f, 1, 1)\nv1 = exponent_vector(f, 1)\nV = exponent_vectors(f)\nt1 = term(f, 1)\nsetcoeff!(f, [3, 1], 12)"
 },
 
 {
-    "location": "mpolynomial_rings.html#AbstractAlgebra.Generic.derivative-Union{Tuple{T}, Tuple{MPoly{T},MPoly{T}}} where T<:RingElem",
+    "location": "mpolynomial_rings.html#Unsafe-functions-1",
     "page": "Multivariate Polynomial Ring Interface",
-    "title": "AbstractAlgebra.Generic.derivative",
-    "category": "method",
-    "text": "derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}\n\nReturn the partial derivative of f with respect to x. The value x must be a generator of the polynomial ring of f.\n\n\n\n"
+    "title": "Unsafe functions",
+    "category": "section",
+    "text": "The following functions must be provided, but are considered unsafe, as they may leave the polynomials in an inconsistent state and they mutate their inputs. As usual, such functions should only be applied on polynomials that have no references elsewhere in the system and are mainly intended to be used in carefully written library code, rather than by users.Users should instead build polynomials using the constructors described above.fit!(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemEnsure that the polynomial f internally has space for n nonzero terms. This function must mutate the function in-place if it is mutable. It does not return the mutated polynomial. Immutable types can still be supported by defining this function to do nothing.setcoeff!(a::MyMPoly{T}, i::Int, c::T) where T <: RingElement\nsetcoeff!(a::MyMPoly{T}, i::Int, c::U) where {T <: RingElement, U <: Integer}Set the i-th coefficient of the polynomial a to c. No check is performed on the index i or for c = 0. It may be necessary to call combine_like_terms after calls to this function, to remove zero terms. The function must return the modified polynomial.combine_like_terms!(a::MyMPoly{T}) where T <: RingElementRemove zero terms and combine any adjacent terms with the same exponent vector (by adding them). It is assumed that all the exponent vectors are already in the correct order with respect to the ordering. The function must return the resulting polynomial.set_exponent_vector!(a::MyMPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement Set the i-th exponent vector to the given exponent vector. No check is performed on the index i, which is assumed to be valid (or that the polynomial has enough space allocated). No sorting of exponents is performed by this function. To sort the terms after setting any number of exponents with this function, run the sort_terms! function. The function must return the modified polynomial.sort_terms!(a::MyMPoly{T}) where {T <: RingElement}Sort the terms of the given polynomial according to the polynomial ring ordering. Zero terms and duplicate exponents are ignored. To deal with those call combine_like_terms. The sorted polynomial must be returned by the function."
+},
+
+{
+    "location": "mpolynomial_rings.html#Optional-functionality-for-multivariate-polynomials-1",
+    "page": "Multivariate Polynomial Ring Interface",
+    "title": "Optional functionality for multivariate polynomials",
+    "category": "section",
+    "text": "The following functions can optionally be implemented for multivariate polynomial types."
 },
 
 {
@@ -1445,7 +1453,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Derivations",
     "category": "section",
-    "text": "The following function allows to compute derivations of multivariate polynomials of type MPoly.derivative{T <: AbstractAlgebra.RingElem}(f::AbstractAlgebra.Generic.MPoly{T}, x::AbstractAlgebra.Generic.MPoly{T})ExampleR,(x,y) = AbstractAlgebra.PolynomialRing(ZZ,[\"x\",\"y\"])\nf = x*y + x + y + 1\nderivative(f,x)\nderivative(f,y)"
+    "text": "The following function allows to compute derivations of multivariate polynomials of type MPoly.derivative(f::MyMPoly{T}, x::MyMPoly{T}) where T <: AbstractAlgebra.RingElemCompute the derivative of f with respect to the variable x.ExamplesR, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x*y + x + y + 1\n\nderivative(f, x)\nderivative(f, y)"
 },
 
 {
@@ -1477,7 +1485,127 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Polynomial ring constructors",
     "category": "section",
-    "text": "In order to construct multivariate polynomials in AbstractAlgebra.jl, one must first construct the polynomial ring itself. This is accomplished with the following constructor.PolynomialRing(R::AbstractAlgebra.Ring, S::Array{String, 1}; cached::Bool = true, ordering::Symbol=:lex)Given a base ring R and and array S of strings specifying how the generators (variables) should be printed, return a tuple S, (x, ...) representing the new polynomial ring S = Rx ldots and a tuple of the generators (x ) of the ring. By default the parent object S will depend only on R and  (x, ...) and will be cached. Setting the optional argument cached to false will prevent the parent object  S from being cached.The optional named argument ordering can be used to specify an ordering. The currently supported options are :lex, :deglex and `:degrevlex	.Here are some examples of creating multivariate polynomial rings and making use of the resulting parent objects to coerce various elements into the polynomial ring.ExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"]; ordering=:deglex)\n\nf = R()\ng = R(123)\nh = R(BigInt(1234))\nk = R(x + 1)\nm = R(x + y + 1)\nderivative(k,x)\nderivative(k,y)All of the examples here are generic polynomial rings, but specialised implementations of polynomial rings provided by external modules will also usually provide a PolynomialRing constructor to allow creation of their polynomial rings."
+    "text": "In order to construct multivariate polynomials in AbstractAlgebra.jl, one must first construct the polynomial ring itself. This is accomplished with the following constructor.PolynomialRing(R::AbstractAlgebra.Ring, S::Array{String, 1}; cached::Bool = true, ordering::Symbol=:lex)Given a base ring R and and array S of strings specifying how the generators (variables) should be printed, return a tuple S, (x, ...) representing the new polynomial ring S = Rx ldots and a tuple of the generators (x ) of the ring. By default the parent object S will depend only on R and  (x, ...) and will be cached. Setting the optional argument cached to false will prevent the parent object  S from being cached.The optional named argument ordering can be used to specify an ordering. The currently supported options are :lex, :deglex and :degrevlex.Here are some examples of creating multivariate polynomial rings and making use of the resulting parent objects to coerce various elements into the polynomial ring.ExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"]; ordering=:deglex)\n\nf = R()\ng = R(123)\nh = R(BigInt(1234))\nk = R(x + 1)\nm = R(x + y + 1)\nderivative(k,x)\nderivative(k,y)All of the examples here are generic polynomial rings, but specialised implementations of polynomial rings provided by external modules will also usually provide a PolynomialRing constructor to allow creation of their polynomial rings."
+},
+
+{
+    "location": "mpolynomial.html#Polynomial-functionality-provided-by-AbstractAlgebra.jl-1",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "Polynomial functionality provided by AbstractAlgebra.jl",
+    "category": "section",
+    "text": ""
+},
+
+{
+    "location": "mpolynomial.html#AbstractAlgebra.Generic.vars-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.vars",
+    "category": "method",
+    "text": "vars(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}\n\nReturns the variables actually occuring in p.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial.html#AbstractAlgebra.Generic.var_index-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.var_index",
+    "category": "method",
+    "text": "var_index(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}\n\nReturn the index of the given variable x. If x is not a variable in a multivariate polynomial ring, an exception is raised.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial.html#Basic-manipulation-1",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "Basic manipulation",
+    "category": "section",
+    "text": "vars(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElementvar_index(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElementExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^2 + 2x + 1\n\nV = vars(f)\nvar_index(y) == 2"
+},
+
+{
+    "location": "mpolynomial.html#AbstractAlgebra.Generic.change_base_ring-Union{Tuple{T}, Tuple{MPolyElem{T},Any}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.change_base_ring",
+    "category": "method",
+    "text": "change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}\n\nReturns the polynomial obtained by applying g to the coefficients of p.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial.html#Changing-base-(coefficient)-rings-1",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "Changing base (coefficient) rings",
+    "category": "section",
+    "text": "In order to substitute the variables of a polynomial f over a ring T by elements in a T-algebra S, you first have to change the base ring of f using the following function, where g is a function representing the structure homomorphism of the T-algebra S.change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}Note that g can also be a Nemo parent, e.g. QQ.ExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nfz = x^2*y^2 + x + 1\n\nfq = change_base_ring(fz, QQ)"
+},
+
+{
+    "location": "mpolynomial.html#AbstractAlgebra.Generic.coeff-Union{Tuple{T}, Tuple{MPolyElem{T},Array{Int64,1},Array{Int64,1}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.coeff",
+    "category": "method",
+    "text": "coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement\n\nReturn the \"coefficient\" of a (as a multivariate polynomial in the same ring) of the monomial consisting of the product of the variables of the given indices raised to the given exponents (note that not all variables need to appear and the exponents can be zero). E.g. coeff(f, [1, 3], [0, 2]) returns the coefficient of x^0*z^2 in the polynomial f (assuming variables x y z in that order).\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial.html#AbstractAlgebra.Generic.coeff-Union{Tuple{T}, Tuple{T,Array{T,1},Array{Int64,1}}} where T<:MPolyElem",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.coeff",
+    "category": "method",
+    "text": "coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyElem\n\nReturn the \"coefficient\" of a (as a multivariate polynomial in the same ring) of the monomial consisting of the product of the given variables to the given exponents (note that not all variables need to appear and the exponents can be zero). E.g. coeff(f, [x, z], [0, 2]) returns the coefficient of x^0*z^2 in the polynomial f. \n\n\n\n"
+},
+
+{
+    "location": "mpolynomial.html#Multivariate-coefficients-1",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "Multivariate coefficients",
+    "category": "section",
+    "text": "In order to return the \"coefficient\" (as a multivariate polynomial in the same ring), of a given monomial (in which some of the variables may not appear and others may be required to appear to exponent zero), we can use the following function.coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement\ncoeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyElemExamplesR, (x, y, z) = PolynomialRing(ZZ, [\"x\", \"y\", \"z\"])\n\nf = x^4*y^2*z^2 - 2x^4*y*z^2 + 4x^4*z^2 + 2x^2*y^2 + x + 1\n\ncoeff(f, [1, 3], [4, 2]) == coeff(f, [x, z], [4, 2])"
+},
+
+{
+    "location": "mpolynomial.html#AbstractAlgebra.Generic.deflation-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.deflation",
+    "category": "method",
+    "text": "deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement\n\nComputes deflation parameters for the exponents of the polynomial f. This is a pair of arrays of integers, the first array of which (the shift) gives the minimum exponent for each variable of the polynomial, and the second of which (the deflation) gives the gcds of all the exponents after subtracting the shift, again per variable. This functionality is used by gcd (and can be used by factorisation algorithms).\n\nend)\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial.html#AbstractAlgebra.Generic.deflate-Union{Tuple{T}, Tuple{MPolyElem{T},Array{Int64,1},Array{Int64,1}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.deflate",
+    "category": "method",
+    "text": "deflate(f::AbstractAlgebra.MPolyElem{T}, v::Vector{Int}) where T <: RingElement\n\nReturn a polynomial with the same coefficients as f but whose exponents have been shifted down by the given shifts (supplied as an array of shifts, one for each variable, then deflated (divided) by the given exponents (again supplied as an array of deflation factors, one for each variable). The algorithm automatically replaces a deflation of 0 by 1, to avoid division by 0.  \n\n\n\n"
+},
+
+{
+    "location": "mpolynomial.html#AbstractAlgebra.Generic.inflate-Union{Tuple{T}, Tuple{MPolyElem{T},Array{Int64,1},Array{Int64,1}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.inflate",
+    "category": "method",
+    "text": "inflate(f::AbstractAlgebra.MPolyElem{T}, v::Vector{Int}) where T <: RingElement\n\nReturn a polynomial with the same coefficients as f but whose exponents have been inflated (multiplied) by the given deflation exponents (supplied as an array of inflation factors, one for each variable) and then shifted by the given shifts (again supplied as an array of shifts, one for each variable).  \n\n\n\n"
+},
+
+{
+    "location": "mpolynomial.html#Inflation/deflation-1",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "Inflation/deflation",
+    "category": "section",
+    "text": "deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdeflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElementinflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElementExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2\n\ndef, shift = deflation(f)\nf1 = deflate(f, def, shift)\nf2 = inflate(f1, def, shift)\nf2 == f"
+},
+
+{
+    "location": "mpolynomial.html#AbstractAlgebra.Generic.to_univariate-Union{Tuple{T}, Tuple{PolyRing{T},MPolyElem{T}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.to_univariate",
+    "category": "method",
+    "text": "to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement\n\nAssuming the polynomial p is actually a univariate polynomial, convert the polynomial to a univariate polynomial in the given univariate polynomial ring R. An exception is raised if the polynomial p involves more than one variable.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial.html#Conversions-1",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "Conversions",
+    "category": "section",
+    "text": "to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElementExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\nS, z = PolynomialRing(ZZ, \"z\")\n\nf = 2x^5 + 3x^4 - 2x^2 - 1\n\ng = to_univariate(S, f)"
 },
 
 {
