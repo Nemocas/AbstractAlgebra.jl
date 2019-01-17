@@ -922,7 +922,7 @@ function test_gen_mpoly_isless()
    @test isless(x*z, x*y) == true
    @test isless(x*y, x^2) == true
 
-   for n_vars=1:maxdeg
+   for n_vars = 1:maxdeg
       A = unique(sortslices(reshape(map(Int,map(round, rand(n_vars * n_mpolys) * maxval)), (n_mpolys, n_vars)), dims=1),dims=1)
       var_names = ["x$j" for j in 1:n_vars]
       R, varsR = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, var_names, ordering=:lex)
@@ -955,7 +955,7 @@ function test_gen_mpoly_isless()
          elseif total_degree(g) < total_degree(f)
             @test isless(g,f)
          else
-            for j=1:n_vars
+            for j = 1:n_vars
                if A[i, j] < A[i+1, j]
                   @test isless(f,g)
                   break
@@ -976,7 +976,7 @@ function test_gen_mpoly_isless()
    @test isless(x*z, y^2) == true
    @test isless(y^2, x*y) == true
    @test isless(x*y, x^2) == true
-   for n_vars=1:maxdeg
+   for n_vars = 1:maxdeg
       A = reshape(map(Int,map(round, rand(n_vars * n_mpolys) * maxval)), (n_mpolys, n_vars))
       var_names = ["x$j" for j in 1:n_vars]
       R, varsR = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, var_names, ordering=:degrevlex)
@@ -988,7 +988,7 @@ function test_gen_mpoly_isless()
          elseif total_degree(g) < total_degree(f)
             @test isless(g,f)
          else
-            for j=n_vars:-1:1
+            for j = n_vars:-1:1
                if A[i, j] > A[i+1, j]
                   @test isless(f,g)
                   break
