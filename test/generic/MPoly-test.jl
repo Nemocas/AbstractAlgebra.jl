@@ -906,6 +906,105 @@ function test_gen_mpoly_coefficients_of_univariate()
    println("PASS")
 end
 
+function test_gen_mpoly_isless()
+   print("Generic.MPoly.isless...")
+   
+   n_mpolys = 100
+   maxval = 10
+   maxdeg = 20
+   
+   # :deglex ordering
+   R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x","y","z"], ordering=:lex)
+   # Monomials of degree 2
+   @test isless(z^2, y*z) == true
+   @test isless(y*z, y^2) == true
+   @test isless(y^2, x*z) == true
+   @test isless(x*z, x*y) == true
+   @test isless(x*y, x^2) == true
+
+   for n_vars = 1:maxdeg
+      A = unique(sortslices(reshape(map(Int,map(round, rand(n_vars * n_mpolys) * maxval)), (n_mpolys, n_vars)), dims=1),dims=1)
+      var_names = ["x$j" for j in 1:n_vars]
+      R, varsR = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, var_names, ordering=:lex)
+      for i in 1:size(A)[1]-1
+         f = R([base_ring(R)(1)], [A[i,:]])
+         g = R([base_ring(R)(1)], [A[i+1,:]])
+         @test isless(f,g)
+      end
+   end
+
+   # :deglex ordering
+   R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x","y","z"], ordering=:deglex)
+   
+   @test isless(z^2, y*z) == true
+   @test isless(y*z, x*z) == true
+   @test isless(y^2, x*z) == true
+   @test isless(y^2, x*y) == true
+   @test isless(x*y, x^2) == true
+   
+   for n_vars=1:maxdeg
+      A = reshape(map(Int,map(round, rand(n_vars * n_mpolys) * maxval)), (n_mpolys, n_vars))
+      var_names = ["x$j" for j in 1:n_vars]
+      R, varsR = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, var_names, ordering=:deglex)
+      
+      for i in 1:size(A)[1]-1
+         f = R([base_ring(R)(1)], [A[i,:]])
+         g = R([base_ring(R)(1)], [A[i+1,:]])
+         if total_degree(f) < total_degree(g)
+            @test isless(f,g)
+         elseif total_degree(g) < total_degree(f)
+            @test isless(g,f)
+         else
+            for j = 1:n_vars
+               if A[i, j] < A[i+1, j]
+                  @test isless(f,g)
+                  break
+               elseif A[i,j] > A[i+1,j]
+                  @test isless(g,f)
+                  break
+               end
+            end
+         end
+      end
+   end
+   
+   # :degrevlex ordering
+   R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x","y","z"], ordering=:degrevlex)
+   # Monomials of degree 2
+   @test isless(z^2, y*z) == true
+   @test isless(y*z, x*z) == true
+   @test isless(x*z, y^2) == true
+   @test isless(y^2, x*y) == true
+   @test isless(x*y, x^2) == true
+   for n_vars = 1:maxdeg
+      A = reshape(map(Int,map(round, rand(n_vars * n_mpolys) * maxval)), (n_mpolys, n_vars))
+      var_names = ["x$j" for j in 1:n_vars]
+      R, varsR = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, var_names, ordering=:degrevlex)
+      for i in 1:size(A)[1]-1
+         f = R([base_ring(R)(1)], [A[i,:]])
+         g = R([base_ring(R)(1)], [A[i+1,:]])
+         if total_degree(f) < total_degree(g)
+            @test isless(f,g)
+         elseif total_degree(g) < total_degree(f)
+            @test isless(g,f)
+         else
+            for j = n_vars:-1:1
+               if A[i, j] > A[i+1, j]
+                  @test isless(f,g)
+                  break
+               elseif A[i, j] == A[i+1, j]
+                  continue
+               elseif A[i,j] < A[i+1,j]
+                  @test isless(g,f)
+                  break
+               end
+            end
+         end
+      end
+   end
+   println("PASS")
+end
+
 function test_gen_mpoly()
    test_gen_mpoly_constructors()
    test_gen_mpoly_manipulation()
@@ -930,6 +1029,7 @@ function test_gen_mpoly()
    test_gen_mpoly_exponents()
    test_gen_mpoly_to_univariate()
    test_gen_mpoly_coefficients_of_univariate()
+   test_gen_mpoly_isless()
 
    println("")
 end
