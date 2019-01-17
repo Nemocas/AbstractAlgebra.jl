@@ -1002,6 +1002,7 @@ function test_gen_mpoly_isless()
          end
       end
    end
+   println("PASS")
 end
 
 function test_gen_mpoly()
