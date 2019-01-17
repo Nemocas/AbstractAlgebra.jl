@@ -877,13 +877,13 @@ function show(io::IO, p::MPolyRing)
    show(io, base_ring(p))
 end
 
-show_minus_one(::Type{MPolyElem{T}}) where {T <: RingElement} = show_minus_one(T)
+show_minus_one(::Type{U}) where U <: AbstractAlgebra.MPolyElem{T} where T <: RingElement = show_minus_one(T)
 
-needs_parentheses(x::MPolyElem) = length(x) > 1
+needs_parentheses(x::AbstractAlgebra.MPolyElem) = length(x) > 1
 
-displayed_with_minus_in_front(x::MPoly) = length(x) == 1 && displayed_with_minus_in_front(x.coeffs[1])
+displayed_with_minus_in_front(x::AbstractAlgebra.MPolyElem) = length(x) == 1 && displayed_with_minus_in_front(coeff(x, 1))
 
-function canonical_unit(x::MPolyElem)
+function canonical_unit(x::AbstractAlgebra.MPolyElem)
    if length(x) == 0
       return base_ring(x)()
    else
