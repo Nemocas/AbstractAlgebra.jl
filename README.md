@@ -14,7 +14,7 @@ AbstractAlgebra currently provides:
 
 Documentation can be found at the following link:
 
-* [https://nemocas.github.io/AbstractAlgebra.jl/index.html](https://nemocas.github.io/AbstractAlgebra.jl/index.html)
+* [https://nemocas.github.io/AbstractAlgebra.jl/latest/index.html](https://nemocas.github.io/AbstractAlgebra.jl/latest/index.html)
 
 Projects that depend on AbstractAlgebra include:
 
