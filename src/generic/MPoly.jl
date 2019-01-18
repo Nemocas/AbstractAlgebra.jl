@@ -3065,49 +3065,33 @@ function evaluate(a::MPoly{T}, A::Vector{U}) where {T <: RingElement, U <: Union
    end
 end
 
-function evaluate(a::MPoly{T}, A::Vector{U}) where {T <: RingElement, U <: RingElement}
-   length(A) != nvars(parent(a)) && error("Incorrect number of values in evaluation")
-   S = parent(A[1])
-   anew = change_base_ring(a, S)
-   return evaluate(anew, A)
-end
-
-function evaluate(a::MPoly{T}, vars::Vector{Int}, vals::Vector{T}) where T <: RingElem
-   unique(vars) != vars && error("Variables not unique")
-   length(vars) != length(vals) &&
-      error("Number of variables does not match number of values")
-   for i = 1:length(vars)
-      if vars[i] < 1 || vars[i] > nvars(parent(a))
-         error("Variable index not in range")
-      end
-   end
-   S = parent(a)
+function evaluate(a::MPoly{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+   length(vals) != nvars(parent(a)) && error("Incorrect number of values in evaluation")
    R = base_ring(a)
    # The best we can do here is to cache previously used powers of the values
    # being substituted, as we cannot assume anything about the relative
    # performance of powering vs multiplication. The function should not try
    # to optimise computing new powers in any way.
-   powers = [Dict{Int, T}() for i in 1:length(vars)]
-   r = S()
+   # Note that this function accepts values in a non-commutative ring, so operations
+   # must be done in a certain order.
+   powers = [Dict{Int, U}() for i in 1:length(vals)]
+   r = R()
    for i = 1:length(a)
       v = exponent_vector(a, i)
       t = one(R)
-      for j = 1:length(vars)
-         varnum = vars[j]
-         exp = v[varnum]
+      for j = 1:length(vals)
+         exp = v[j]
          if !haskey(powers[j], exp)
             powers[j][exp] = vals[j]^exp
          end
-         t *= powers[j][exp]
-         v[varnum] = 0
+         t = t*powers[j][exp]
       end
-      m = S([coeff(a, i)], [v])
-      r += t*m
+      r += coeff(a, i)*t
    end
    return r
 end
 
-function evaluate(a::MPoly{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: Union{Integer, Rational, AbstractFloat}}
+function evaluate(a::MPoly{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
    unique(vars) != vars && error("Variables not unique")
    length(vars) != length(vals) &&
       error("Number of variables does not match number of values")
@@ -3142,12 +3126,7 @@ function evaluate(a::MPoly{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: R
    return r
 end
 
-function evaluate(a::MPoly{T}, vars::Vector{MPoly{T}}, vals::Vector{U}) where {T <: RingElement, U <: Union{Integer, Rational, AbstractFloat}}
-   varidx = [var_index(x) for x in vars]
-   return evaluate(a, varidx, vals)
-end
-
-function evaluate(a::MPoly{T}, vars::Vector{MPoly{T}}, vals::Vector{T}) where T <: RingElem
+function evaluate(a::MPoly{T}, vars::Vector{MPoly{T}}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
    varidx = [var_index(x) for x in vars]
    return evaluate(a, varidx, vals)
 end
@@ -3162,7 +3141,7 @@ function evaluate(a::MPoly{T}, vars::Vector{Int}, vals::Vector{U}, g) where {T <
    return evaluate(anew, vars, vals)
 end
 
-function evaluate(a::MPoly{T}, vars::Vector{MPoly{T}}, vals::Vector{U}, g) where {T <: RingElement, U <: Union{Integer, Rational, AbstractFloat}}
+function evaluate(a::MPoly{T}, vars::Vector{MPoly{T}}, vals::Vector{U}, g) where {T <: RingElement, U <: RingElement}
    anew = change_base_ring(a, g)
    varidx = [var_index(x) for x in vars]
    return evaluate(anew, varidx, vals)
