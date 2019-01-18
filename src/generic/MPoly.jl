@@ -2997,7 +2997,7 @@ end
 > Evaluate the polynomial by substituting in the array of values for each of
 > the variables.
 """
-function evaluate(a::MPoly{T}, A::Array{T, 1}) where {T <: RingElement}
+function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElem
    if iszero(a)
       return base_ring(a)()
    end
@@ -3029,11 +3029,11 @@ function evaluate(a::MPoly{T}, A::Array{T, 1}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    evaluate(a::MPoly{T}, A::Array{U}) where {T <: RingElement, U <: Integer}
+    evaluate(a::MPoly{T}, A::Array{U, 1}) where {T <: RingElement, U <: Integer}
 > Evaluate the polynomial by substituting in the array of integers for each of
 > the variables.
 """
-function evaluate(a::MPoly{T}, A::Array{U}) where {T <: RingElement, U <: Integer}
+function evaluate(a::MPoly{T}, A::Vector{U}) where {T <: RingElement, U <: Union{Integer, Rational, AbstractFloat}}
    if iszero(a)
       return base_ring(a)()
    end
@@ -3063,6 +3063,149 @@ function evaluate(a::MPoly{T}, A::Array{U}) where {T <: RingElement, U <: Intege
    else
       return a.coeffs[1]
    end
+end
+
+function evaluate(a::MPoly{T}, A::Vector{U}) where {T <: RingElement, U <: RingElement}
+   length(A) != nvars(parent(a)) && error("Incorrect number of values in evaluation")
+   S = parent(A[1])
+   anew = change_base_ring(a, S)
+   return evaluate(anew, A)
+end
+
+function evaluate(a::MPoly{T}, vars::Vector{Int}, vals::Vector{T}) where T <: RingElem
+   unique(vars) != vars && error("Variables not unique")
+   length(vars) != length(vals) &&
+      error("Number of variables does not match number of values")
+   for i = 1:length(vars)
+      if vars[i] < 1 || vars[i] > nvars(parent(a))
+         error("Variable index not in range")
+      end
+   end
+   S = parent(a)
+   R = base_ring(a)
+   # The best we can do here is to cache previously used powers of the values
+   # being substituted, as we cannot assume anything about the relative
+   # performance of powering vs multiplication. The function should not try
+   # to optimise computing new powers in any way.
+   powers = [Dict{Int, T}() for i in 1:length(vars)]
+   r = S()
+   for i = 1:length(a)
+      v = exponent_vector(a, i)
+      t = one(R)
+      for j = 1:length(vars)
+         varnum = vars[j]
+         exp = v[varnum]
+         if !haskey(powers[j], exp)
+            powers[j][exp] = vals[j]^exp
+         end
+         t *= powers[j][exp]
+         v[varnum] = 0
+      end
+      m = S([coeff(a, i)], [v])
+      r += t*m
+   end
+   return r
+end
+
+function evaluate(a::MPoly{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: Union{Integer, Rational, AbstractFloat}}
+   unique(vars) != vars && error("Variables not unique")
+   length(vars) != length(vals) &&
+      error("Number of variables does not match number of values")
+   for i = 1:length(vars)
+      if vars[i] < 1 || vars[i] > nvars(parent(a))
+         error("Variable index not in range")
+      end
+   end
+   S = parent(a)
+   R = base_ring(a)
+   # The best we can do here is to cache previously used powers of the values
+   # being substituted, as we cannot assume anything about the relative
+   # performance of powering vs multiplication. The function should not try
+   # to optimise computing new powers in any way.
+   powers = [Dict{Int, U}() for i in 1:length(vars)]
+   r = S()
+   for i = 1:length(a)
+      v = exponent_vector(a, i)
+      t = one(R)
+      for j = 1:length(vars)
+         varnum = vars[j]
+         exp = v[varnum]
+         if !haskey(powers[j], exp)
+            powers[j][exp] = vals[j]^exp
+         end
+         t *= powers[j][exp]
+         v[varnum] = 0
+      end
+      m = S([coeff(a, i)], [v])
+      r += t*m
+   end
+   return r
+end
+
+function evaluate(a::MPoly{T}, vars::Vector{MPoly{T}}, vals::Vector{U}) where {T <: RingElement, U <: Union{Integer, Rational, AbstractFloat}}
+   varidx = [var_index(x) for x in vars]
+   return evaluate(a, varidx, vals)
+end
+
+function evaluate(a::MPoly{T}, vars::Vector{MPoly{T}}, vals::Vector{T}) where T <: RingElem
+   varidx = [var_index(x) for x in vars]
+   return evaluate(a, varidx, vals)
+end
+
+function evaluate(a::MPoly{T}, A::Vector{U}, g) where {T <: RingElement, U <: RingElement}
+   anew = change_base_ring(a, g)
+   return evaluate(anew, A)
+end
+
+function evaluate(a::MPoly{T}, vars::Vector{Int}, vals::Vector{U}, g) where {T <: RingElement, U <: RingElement}
+   anew = change_base_ring(a, g)
+   return evaluate(anew, vars, vals)
+end
+
+function evaluate(a::MPoly{T}, vars::Vector{MPoly{T}}, vals::Vector{U}, g) where {T <: RingElement, U <: Union{Integer, Rational, AbstractFloat}}
+   anew = change_base_ring(a, g)
+   varidx = [var_index(x) for x in vars]
+   return evaluate(anew, varidx, vals)
+end
+
+function (a::MPoly{T})(vals::T...) where T <: RingElement
+   length(vals) != nvars(parent(a)) && error("Not enough values in evaluation")
+   return evaluate(a, [vals...])
+end
+
+function (a::MPoly{T})(vals::U...) where {T <: RingElement, U <: Union{Integer, Rational, AbstractFloat}}
+   length(vals) != nvars(parent(a)) && error("Not enough values in evaluation")
+   return evaluate(a, [vals...])
+end
+
+function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
+   length(vals) != nvars(parent(a)) && error("Not enough values in evaluation")
+   R = base_ring(a)
+   # The best we can do here is to cache previously used powers of the values
+   # being substituted, as we cannot assume anything about the relative
+   # performance of powering vs multiplication. The function should not try
+   # to optimise computing new powers in any way.
+   # Note that this function accepts values in a non-commutative ring, so operations
+   # must be done in a certain order.
+   powers = [Dict{Int, Any}() for i in 1:length(vals)]
+   r = R()
+   for i = 1:length(a)
+      v = exponent_vector(a, i)
+      t = one(R)
+      for j = 1:length(vals)
+         exp = v[j]
+         if !haskey(powers[j], exp)
+            powers[j][exp] = vals[j]^exp
+         end
+         t = t*powers[j][exp]
+      end
+      r += coeff(a, i)*t
+   end
+   return r
+end
+
+function evaluate(a::MPoly{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+   return a(vals...)
 end
 
 ###############################################################################
