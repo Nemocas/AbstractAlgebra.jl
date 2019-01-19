@@ -1351,11 +1351,11 @@ function mul!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeries
    lenc = min(lena + lenb - 1, div(prec + sz - 1, sz))
    fit!(c, lenc)
    for i = 1:min(lena, lenc)
-      c.coeffs[i] = mul!(c.coeffs[i], polcoeff(a, i - 1), polcoeff(b, 0))
+      c.coeffs[i] = polcoeff(a, i - 1) * polcoeff(b, 0)
    end
    if lenc > lena
       for i = 2:min(lenb, lenc - lena + 1)
-         c.coeffs[lena + i - 1] = mul!(c.coeffs[lena + i - 1], polcoeff(a, lena - 1), polcoeff(b, i - 1))
+         c.coeffs[lena + i - 1] = polcoeff(a, lena - 1) * polcoeff(b, i - 1)
       end
    end
    for i = 1:lena - 1
@@ -1405,16 +1405,16 @@ function add!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeries
    elseif lenb == 1
       sb = sa
    end
-   sz = gcd(gcd(sa, sb), abs(vala - valb))
+   sc = gcd(gcd(sa, sb), abs(vala - valb))
    mina = min(vala + lena*sa, prec)
    minb = min(valb + lenb*sb, prec)
    lenr = max(mina, minb) - valr
-   lenr = div(lenr + sz - 1, sz)
+   lenr = div(lenr + sc - 1, sc)
    R = base_ring(c)
    fit!(c, lenr)
    c.prec = prec
    c.val = valr
-   c.scale = sz
+   c.scale = sc
    pa = vala
    pb = valb
    j = 0

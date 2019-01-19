@@ -227,6 +227,52 @@ function test_laurent_series_binary_ops()
    println("PASS")
 end
 
+function test_laurent_series_inplace_binary_ops()
+   print("Generic.LaurentSeries.inplace_binary_ops...")
+
+   #  Exact ring
+   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   for iter = 1:100
+      f = rand(R, -12:12, -10:10)
+      g = rand(R, -12:12, -10:10)
+      h = rand(R, -12:12, -10:10)
+      r = R()
+      add!(r, f, g)
+      @test isequal(r, f + g)
+      mul!(r, f, g)
+      @test isequal(r, f*g)
+   end
+
+   #  Inexact field
+   R, x = LaurentSeriesField(RealField, 10, "x")
+   for iter = 1:100
+      f = rand(R, -12:12, -1:1)
+      g = rand(R, -12:12, -1:1)
+      h = rand(R, -12:12, -1:1)
+      r = R()
+      add!(r, f, g)
+      @test isapprox(r, f + g)
+      mul!(r, f, g)
+      @test isapprox(r, f*g)
+   end
+
+   # Non-integral domain
+   T = ResidueRing(ZZ, 6)
+   R, x = LaurentSeriesRing(T, 10, "x")
+   for iter = 1:100
+      f = rand(R, -12:12, 0:5)
+      g = rand(R, -12:12, 0:5)
+      h = rand(R, -12:12, 0:5)
+      r = R()
+      add!(r, f, g)
+      @test isequal(r, f + g)
+      mul!(r, f, g)
+      @test isequal(r, f*g)
+   end
+
+   println("PASS")
+end
+
 function test_laurent_series_adhoc_binary_ops()
    print("Generic.LaurentSeries.adhoc_binary_ops...")
 
@@ -838,6 +884,7 @@ function test_gen_laurent_series()
    test_laurent_series_manipulation()
    test_laurent_series_unary_ops()
    test_laurent_series_binary_ops()
+   test_laurent_series_inplace_binary_ops
    test_laurent_series_adhoc_binary_ops()
    test_laurent_series_comparison()
    test_laurent_series_adhoc_comparison()
