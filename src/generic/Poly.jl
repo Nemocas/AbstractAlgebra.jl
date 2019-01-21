@@ -658,12 +658,12 @@ function ^(a::AbstractAlgebra.PolyElem{T}, b::Int) where {T <: RingElement}
       end
       set_length!(z, b + 1)
       return z
+   elseif b == 0
+      return one(R)
    elseif length(a) == 0
       return zero(R)
    elseif length(a) == 1
       return R(coeff(a, 0)^b)
-   elseif b == 0
-      return one(R)
    elseif b == 1
       return deepcopy(a)
    else
