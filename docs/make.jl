@@ -1,7 +1,7 @@
 using Documenter, AbstractAlgebra
 
 makedocs(
-         format   = :html,
+         format   = Documenter.HTML(),
          sitename = "AbstractAlgebra.jl",
          modules = [AbstractAlgebra],
          clean = true,
