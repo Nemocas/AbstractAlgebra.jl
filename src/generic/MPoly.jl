@@ -1506,17 +1506,20 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    v = v1 + v2
    d = 0
    for i = 1:length(v)
+      if v[i] < 0
+         error("Exponent overflow in mul_johnson")
+      end
       if v[i] > d
          d = v[i]
       end
-   end
-   if ndigits(d, base = 2) >= sizeof(UInt)*8
-      error("Exponent overflow in mul_johnson")
    end
    exp_bits = 8
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
+      if exp_bits == sizeof(Int)*8
+         error("Exponent overflow in mul_johnson")
+      end
       max_e = 2^(exp_bits - 1)
    end
    word_bits = sizeof(Int)*8
@@ -1900,6 +1903,11 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       N = size(a.exps, 1)
       exps = zeros(UInt, N, 1)
       monomial_mul!(exps, 1, a.exps, 1, b, N)
+      for i = 1:N
+         if ndigits(a.exps[i, 1], base = 2) + ndigits(b, base = 2) >= sizeof(Int)*8
+            error("Exponent overflow in powering")
+         end
+      end
       return parent(a)([coeff(a, 1)^b], exps)
    elseif b == 0
       return parent(a)(1)
@@ -1917,6 +1925,9 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       max_e = 2^(exp_bits - 1)
       while d >= max_e
          exp_bits *= 2
+         if exp_bits == sizeof(Int)*8
+            error("Exponent overflow in pow_fps")
+         end
          max_e = 2^(exp_bits - 1)
       end
       word_bits = sizeof(Int)*8
@@ -2228,6 +2239,9 @@ function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
+      if exp_bits == sizeof(Int)*8
+         error("Exponent overflow in divides")
+      end
       max_e = 2^(exp_bits - 1)
    end
    word_bits = sizeof(Int)*8
@@ -2439,6 +2453,9 @@ function div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
+      if exp_bits == sizeof(Int)*8
+         error("Exponent overflow in div")
+      end
       max_e = 2^(exp_bits - 1)
    end
    N = parent(a).N
@@ -2660,6 +2677,9 @@ function divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
+      if exp_bits == sizeof(Int)*8
+         error("Exponent overflow in divrem")
+      end
       max_e = 2^(exp_bits - 1)
    end
    N = parent(a).N
@@ -2897,6 +2917,9 @@ function divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
+      if exp_bits == sizeof(Int)*8
+         error("Exponent overflow in divrem")
+      end
       max_e = 2^(exp_bits - 1)
    end
    word_bits = sizeof(Int)*8
@@ -2997,7 +3020,7 @@ end
 > Evaluate the polynomial by substituting in the array of values for each of
 > the variables.
 """
-function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElem
+function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElement
    if iszero(a)
       return base_ring(a)()
    end
@@ -3028,53 +3051,28 @@ function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElem
    end
 end
 
-@doc Markdown.doc"""
-    evaluate(a::MPoly{T}, A::Array{U, 1}) where {T <: RingElement, U <: Integer}
-> Evaluate the polynomial by substituting in the array of integers for each of
-> the variables.
-"""
-function evaluate(a::MPoly{T}, A::Vector{U}) where {T <: RingElement, U <: Union{Integer, Rational, AbstractFloat}}
-   if iszero(a)
-      return base_ring(a)()
-   end
-   N = size(a.exps, 1)
-   ord = parent(a).ord
-   if ord == :lex
-      start_var = N
-   else
-      start_var = N - 1
-   end
-   N = size(a.exps, 1)
-   if ord == :degrevlex
-      while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
-         k = main_variable(a, start_var)
-         p = main_variable_extract(a, k)
-         a = evaluate(p, A[k])
-      end
-   else
-      while a.length > 1 || (a.length == 1 && !monomial_iszero(a.exps, a.length, N))
-         k = main_variable(a, start_var)
-         p = main_variable_extract(a, k)
-         a = evaluate(p, A[start_var - k + 1])
-      end
-   end
-   if a.length == 0
-      return base_ring(a)()
-   else
-      return a.coeffs[1]
-   end
-end
-
 function evaluate(a::MPoly{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
    length(vals) != nvars(parent(a)) && error("Incorrect number of values in evaluation")
    R = base_ring(a)
+   if (U <: Integer && U != BigInt) ||
+      (U <: Rational && U != Rational{BigInt})
+      c = zero(R)*zero(U)
+      V = typeof(c)
+      if U != V
+         vals = [parent(c)(v) for v in vals]
+         powers = [Dict{Int, V}() for i in 1:length(vals)]
+      else
+         powers = [Dict{Int, U}() for i in 1:length(vals)]
+      end
+   else
+      powers = [Dict{Int, U}() for i in 1:length(vals)]
+   end
    # The best we can do here is to cache previously used powers of the values
    # being substituted, as we cannot assume anything about the relative
    # performance of powering vs multiplication. The function should not try
    # to optimise computing new powers in any way.
    # Note that this function accepts values in a non-commutative ring, so operations
    # must be done in a certain order.
-   powers = [Dict{Int, U}() for i in 1:length(vals)]
    r = R()
    for i = 1:length(a)
       v = exponent_vector(a, i)
@@ -3102,11 +3100,23 @@ function evaluate(a::MPoly{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: R
    end
    S = parent(a)
    R = base_ring(a)
+   if (U <: Integer && U != BigInt) ||
+      (U <: Rational && U != Rational{BigInt})
+      c = zero(R)*zero(U)
+      V = typeof(c)
+      if U != V
+         vals = [parent(c)(v) for v in vals]
+         powers = [Dict{Int, V}() for i in 1:length(vals)]
+      else
+         powers = [Dict{Int, U}() for i in 1:length(vals)]
+      end
+   else
+      powers = [Dict{Int, U}() for i in 1:length(vals)]
+   end
    # The best we can do here is to cache previously used powers of the values
    # being substituted, as we cannot assume anything about the relative
    # performance of powering vs multiplication. The function should not try
    # to optimise computing new powers in any way.
-   powers = [Dict{Int, U}() for i in 1:length(vars)]
    r = S()
    for i = 1:length(a)
       v = exponent_vector(a, i)
@@ -3167,18 +3177,32 @@ function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingE
    # Note that this function accepts values in a non-commutative ring, so operations
    # must be done in a certain order.
    powers = [Dict{Int, Any}() for i in 1:length(vals)]
+   # First work out types of products
    r = R()
+   c = zero(R)
+   U = Array{Any, 1}(undef, length(vals))
+   for j = 1:length(vals)
+      W = typeof(vals[j])
+      if ((W <: Integer && W != BigInt) ||
+          (W <: Rational && W != Rational{BigInt}))
+         c = c*zero(W)
+         U[j] = parent(c)
+      else
+         U[j] = parent(vals[j])
+         c = c*zero(parent(vals[j]))
+      end
+   end
    for i = 1:length(a)
       v = exponent_vector(a, i)
-      t = one(R)
+      t = coeff(a, i)
       for j = 1:length(vals)
          exp = v[j]
          if !haskey(powers[j], exp)
-            powers[j][exp] = vals[j]^exp
+            powers[j][exp] = (U[j](vals[j]))^exp
          end
          t = t*powers[j][exp]
       end
-      r += coeff(a, i)*t
+      r += t
    end
    return r
 end
