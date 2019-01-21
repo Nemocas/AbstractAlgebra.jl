@@ -1518,9 +1518,10 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    while d >= max_e
       exp_bits *= 2
       if exp_bits == sizeof(Int)*8
-         error("Exponent overflow in mul_johnson")
+         break
+      else
+         max_e = 2^(exp_bits - 1)
       end
-      max_e = 2^(exp_bits - 1)
    end
    word_bits = sizeof(Int)*8
    k = div(word_bits, exp_bits)
@@ -1926,7 +1927,7 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       while d >= max_e
          exp_bits *= 2
          if exp_bits == sizeof(Int)*8
-            error("Exponent overflow in pow_fps")
+            break
          end
          max_e = 2^(exp_bits - 1)
       end
@@ -2240,7 +2241,7 @@ function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    while d >= max_e
       exp_bits *= 2
       if exp_bits == sizeof(Int)*8
-         error("Exponent overflow in divides")
+         break
       end
       max_e = 2^(exp_bits - 1)
    end
@@ -2454,7 +2455,7 @@ function div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    while d >= max_e
       exp_bits *= 2
       if exp_bits == sizeof(Int)*8
-         error("Exponent overflow in div")
+         break
       end
       max_e = 2^(exp_bits - 1)
    end
@@ -2678,7 +2679,7 @@ function divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    while d >= max_e
       exp_bits *= 2
       if exp_bits == sizeof(Int)*8
-         error("Exponent overflow in divrem")
+         break
       end
       max_e = 2^(exp_bits - 1)
    end
@@ -2918,7 +2919,7 @@ function divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
    while d >= max_e
       exp_bits *= 2
       if exp_bits == sizeof(Int)*8
-         error("Exponent overflow in divrem")
+         break
       end
       max_e = 2^(exp_bits - 1)
    end
