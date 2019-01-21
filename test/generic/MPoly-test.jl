@@ -567,7 +567,7 @@ end
 function test_gen_mpoly_evaluation()
    print("Generic.MPoly.evaluation...")
 
-   R, x = ZZ["y"]
+   R, x = ZZ["x"]
 
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -575,7 +575,7 @@ function test_gen_mpoly_evaluation()
 
       S, varlist = PolynomialRing(R, var_names, ordering = ord)
 
-      for iter = 1:100
+      for iter = 1:50
          f = rand(S, 0:5, 0:100, 0:0, -100:100)
          g = rand(S, 0:5, 0:100, 0:0, -100:100)
 
@@ -600,6 +600,171 @@ function test_gen_mpoly_evaluation()
          r1 = evaluate(f, V3)
          r2 = evaluate(g, V3)
          r3 = evaluate(f + g, V3)
+
+         @test r3 == r1 + r2
+      end
+   end
+
+   R1, z = ZZ["z"]
+   R, x = R1["x"]
+
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+
+      for iter = 1:50
+         f = rand(S, 0:5, 0:100, 0:0, 0:0, -100:100)
+         g = rand(S, 0:5, 0:100, 0:0, 0:0, -100:100)
+
+         V1 = [rand(R1, 0:0, -10:10) for i in 1:num_vars]
+
+         r1 = evaluate(f, V1)
+         r2 = evaluate(g, V1)
+         r3 = evaluate(f + g, V1)
+
+         @test r3 == r1 + r2
+      end
+   end
+
+   R, x = ZZ["x"]
+
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+
+      for iter = 1:10
+         eval_num = rand(0:num_vars)
+         V = Int[] # random list of variable indices
+         Vflag = [false for i in 1:num_vars] # whether each variable is in V
+         Vval = Int[] # value substituted for variables in V
+         Vals = [0 for i in 1:num_vars] # value subst. for each variable of pol
+
+         for i = 1:eval_num
+            v = rand(1:num_vars)
+            while Vflag[v]
+               v = rand(1:num_vars)
+            end
+            push!(V, v)
+            Vflag[v] = true
+            c = rand(-10:10)
+            push!(Vval, c)
+            Vals[v] = c
+         end
+
+         W = Int[] # remaining variables
+         Wval = Int[] # values for those variables
+
+         for v = 1:num_vars
+            if !Vflag[v] # no value for this var yet
+               push!(W, v)
+               c = rand(-10:10)
+               push!(Wval, c)
+               Vals[v] = c
+            end
+         end
+
+         f = rand(S, 0:5, 0:100, 0:0, -100:100)
+      
+         f1 = evaluate(f, V, Vval)
+         f2 = evaluate(f1, W, Wval)
+         
+         r = evaluate(f, Vals)
+
+         @test (length(f2) == 0 && r == 0) ||
+               (length(f2) == 1 && r == coeff(f2, 1))
+      end
+
+      for iter = 1:10
+         eval_num = rand(0:num_vars)
+         V = Int[] # random list of variable indices
+         Vflag = [false for i in 1:num_vars] # whether each variable is in V
+         Vval = Array{elem_type(R), 1}(undef, 0) # value substituted for variables in V
+         Vals = [R(0) for i in 1:num_vars] # value subst. for each variable of pol
+
+         for i = 1:eval_num
+            v = rand(1:num_vars)
+            while Vflag[v]
+               v = rand(1:num_vars)
+            end
+            push!(V, v)
+            Vflag[v] = true
+            c = R(rand(-10:10))
+            push!(Vval, c)
+            Vals[v] = c
+         end
+
+         W = Int[] # remaining variables
+         Wval = Array{elem_type(R), 1}(undef, 0) # values for those variables
+
+         for v = 1:num_vars
+            if !Vflag[v] # no value for this var yet
+               push!(W, v)
+               c = R(rand(-10:10))
+               push!(Wval, c)
+               Vals[v] = c
+            end
+         end
+
+         f = rand(S, 0:5, 0:100, 0:0, -100:100)
+
+         f1 = evaluate(f, V, Vval)
+         f2 = evaluate(f1, W, Wval)
+
+         r = evaluate(f, Vals)
+
+         @test (length(f2) == 0 && r == 0) ||
+               (length(f2) == 1 && r == coeff(f2, 1))
+      end
+   end
+
+   R = ZZ
+   T = MatrixAlgebra(R, 2)
+
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+
+      for iter = 1:50
+         f = rand(S, 0:5, 0:100, -100:100)
+         g = rand(S, 0:5, 0:100, -100:100)
+
+         V1 = [rand(-10:10) for i in 1:num_vars]
+
+         r1 = f(V1...)
+         r2 = g(V1...)
+         r3 = (f + g)(V1...)
+
+         @test r3 == r1 + r2
+      end
+
+      for iter = 1:50
+         f = rand(S, 0:5, 0:100, -100:100)
+         g = rand(S, 0:5, 0:100, -100:100)
+
+         V1 = [T(rand(-10:10)) for i in 1:num_vars]
+
+         r1 = f(V1...)
+         r2 = g(V1...)
+         r3 = (f + g)(V1...)
+
+         @test r3 == r1 + r2
+      end
+
+      for iter = 1:50
+         f = rand(S, 0:5, 0:100, -100:100)
+         g = rand(S, 0:5, 0:100, -100:100)
+
+         V4 = [QQ(rand(-10:10)) for i in 1:num_vars]
+
+         r1 = evaluate(f, V4)
+         r2 = evaluate(g, V4)
+         r3 = evaluate(f + g, V4)
 
          @test r3 == r1 + r2
       end
