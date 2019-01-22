@@ -203,13 +203,20 @@ g = to_univariate(S, f)
 
 ### Evaluation
 
-The following allow evaluation of a polynomial at all its variables. The result
-is always in the ring that a product of a coefficient and one of the values
-belongs to.
+The following function allows evaluation of a polynomial at all its variables.
+The result is always in the ring that a product of a coefficient and one of the
+values belongs to, i.e. if all the values are in the coefficient ring, the
+result of the evaluation will be too.
 
 ```@docs
 evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U <: RingElement}
 ```
+
+The following functions allow evaluation of a polynomial at some of its
+variables. Note that the result will be a product of values and an element
+of the polynomial ring, i.e. even if all the values are in the coefficient
+ring and all variables are given values, the result will be a constant
+polynomial, not a coefficient.
 
 ```@docs
 evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{Int}, ::Vector{U}) where {T <: RingElement, U <: RingElement}
@@ -228,11 +235,11 @@ evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}, ::Any) where {T <: RingEle
 ```
 
 ```@docs
-evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{Int}, ::Vector{U}, g) where {T <: RingElement, U <: RingElement}
+evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{Int}, ::Vector{U}, ::Any) where {T <: RingElement, U <: RingElement}
 ```
 
 ```@docs
-evaluate(::S, ::Vector{S}, ::Vector{U}, g) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
+evaluate(::S, ::Vector{S}, ::Vector{U}, ::Any) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
 ```
 
 The following function allows evaluation of a polynomial at values in a
