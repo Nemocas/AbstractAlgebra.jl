@@ -913,6 +913,12 @@ end
 
 function test_gen_mpoly_change_base_ring()
    print("Generic.MPoly.change_base_ring...")
+   
+   F2 = ResidueRing(ZZ, 2)
+   R, varsR = PolynomialRing(F2, ["x"])
+   S, varsS = PolynomialRing(R, ["y"])
+   f = x -> x^2
+   change_base_ring(varsR[1] * varsS[1], f) == f(varsR[1]) * varsS[1]
 
    for num_vars=1:10
       var_names = ["x$j" for j in 1:num_vars]
