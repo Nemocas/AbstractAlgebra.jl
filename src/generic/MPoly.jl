@@ -100,7 +100,7 @@ function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingEl
    for i = 1:length(p)
       e = exponent_vector(p, i)
       set_exponent_vector!(new_p, i, e)
-      setcoeff!(new_p, e, new_base_ring(coeff(p, i)))
+      setcoeff!(new_p, e, g(coeff(p, i)))
    end
    
    return(new_p)
@@ -113,14 +113,17 @@ v) for v in symbols(p.parent)], ordering = p.parent.ord)
 
    if typeof(gens_new_polynomial_ring[1]) <: MPoly
       exps = deepcopy(p.exps)
-      coeffs = [new_base_ring(p.coeffs[i]) for i in 1:length(p)]
+      coeffs = Array{elem_type(new_base_ring),1}(undef, length(p))
+      for i in 1:length(p)
+         coeffs[i] = g(p.coeffs[i])
+      end
       return new_polynomial_ring(coeffs, exps)
    else
       new_p = zero(new_polynomial_ring)
       for i = 1:length(p)
          e = exponent_vector(p, i)
          set_exponent_vector!(new_p, i, e)
-         setcoeff!(new_p, e, new_base_ring(coeff(p, i)))
+         setcoeff!(new_p, e, g(coeff(p, i)))
       end
       return(new_p)
    end
