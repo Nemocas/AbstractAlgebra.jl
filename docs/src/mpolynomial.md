@@ -201,3 +201,83 @@ f = 2x^5 + 3x^4 - 2x^2 - 1
 g = to_univariate(S, f)
 ```
 
+### Evaluation
+
+The following allow evaluation of a polynomial at all its variables. The result
+is always in the ring that a product of a coefficient and one of the values
+belongs to.
+
+```@docs
+evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U <: RingElement}
+```
+
+```@docs
+evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{Int}, ::Vector{U}) where {T <: RingElement, U <: RingElement}
+```
+
+```@docs
+evaluate(::S, ::Vector{S}, ::Vector{U}) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
+```
+
+The following functions allow a map or function to be applied to the
+coefficients of the polynomial before doing the evaluation. Note that one
+can simply supply a `Ring` object for the map (see the examples).
+
+```@docs
+evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}, ::Any) where {T <: RingElement, U <: RingElement}
+```
+
+```@docs
+evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{Int}, ::Vector{U}, g) where {T <: RingElement, U <: RingElement}
+```
+
+```@docs
+evaluate(::S, ::Vector{S}, ::Vector{U}, g) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
+```
+
+The following function allows evaluation of a polynomial at values in a
+not necessarily commutative ring, e.g. elements of a matrix algebra.
+
+```@docs
+evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+```
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+
+f = 2x^2*y^2 + 3x + y + 1
+
+evaluate(f, BigInt[1, 2])
+evaluate(f, [QQ(1), QQ(2)])
+evaluate(f, [1, 2])
+f(1, 2) == 14
+
+evaluate(f, [x + y, 2y - x])
+f(x + y, 2y - x)
+
+R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
+
+f = x^2*y^2 + 2x*z + 3y*z + z + 1
+
+evaluate(f, [1, 3], [3, 4])
+evaluate(f, [x, z], [3, 4])
+
+evaluate(f, [1, 2], [x + z, x - z])
+
+evaluate(f, [2, 4, 6], QQ)
+evaluate(f, [x, z], [2, 4], QQ)
+
+S = MatrixAlgebra(ZZ, 2)
+
+M1 = S([1 2; 3 4])
+M2 = S([2 3; 1 -1])
+M3 = S([-1 1; 1 1])
+
+evaluate(f, [M1, M2, M3])
+f(M1, M2, M3)
+
+f(M1, ZZ(2), M3)
+f(M1, ZZ(2), 3)
+```
