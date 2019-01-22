@@ -781,6 +781,65 @@ function test_gen_mpoly_evaluation()
       @test evaluate(f, BigInt[2, 3, 5]) == 2*9*125
    end
 
+   # Individual tests
+
+   R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+
+   f = 2x^2*y^2 + 3x + y + 1
+
+   @test evaluate(f, BigInt[1, 2]) == ZZ(14)
+   @test evaluate(f, [QQ(1), QQ(2)]) == 14//1
+   @test evaluate(f, [1, 2]) == 14
+   @test f(1, 2) == 14
+   @test f(ZZ(1), ZZ(2)) == ZZ(14)
+   @test f(QQ(1), QQ(2)) == 14//1
+
+   @test evaluate(f, [x + y, 2y - x]) ==
+               2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
+   @test f(x + y, 2y - x) ==
+               2*x^4 - 4*x^3*y - 6*x^2*y^2 + 8*x*y^3 + 2*x + 8*y^4 + 5*y + 1
+
+   S, z = PolynomialRing(R, "z")
+
+   @test evaluate(f, [z + 1, z - 1]) == 2*z^4 - 4*z^2 + 4*z + 5
+   @test f(z + 1, z - 1) == 2*z^4 - 4*z^2 + 4*z + 5
+
+   R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
+
+   f = x^2*y^2 + 2x*z + 3y*z + z + 1
+
+   @test evaluate(f, [1, 3], [3, 4]) == 9*y^2 + 12*y + 29
+   @test evaluate(f, [x, z], [3, 4]) == 9*y^2 + 12*y + 29
+
+   @test evaluate(f, [1, 2], [x + z, x - z]) ==
+                  x^4 - 2*x^2*z^2 + 5*x*z + z^4 - z^2 + z + 1
+   @test evaluate(f, [x, y], [x + z, x - z]) ==
+                  x^4 - 2*x^2*z^2 + 5*x*z + z^4 - z^2 + z + 1
+
+   S, t = PolynomialRing(R, "t")
+   T, (x1, y1, z1) = PolynomialRing(QQ, ["x", "y", "z"])
+
+   @test evaluate(f, [2, 3], [t + 1, t - 1]) ==
+                 (x^2 + 3)*t^2 + (2*x^2 + 2*x + 1)*t + (x^2 - 2*x - 3)
+   @test evaluate(f, [y, z], [t + 1, t - 1]) ==
+                 (x^2 + 3)*t^2 + (2*x^2 + 2*x + 1)*t + (x^2 - 2*x - 3)
+
+   @test evaluate(f, [2, 4, 6], QQ) == 167//1
+   @test evaluate(f, [1, 3], [2, 4], QQ) == 4*y1^2 + 12*y1 + 21
+   @test evaluate(f, [x, z], [2, 4], QQ) == 4*y1^2 + 12*y1 + 21
+
+   S = MatrixAlgebra(ZZ, 2)
+
+   M1 = S([1 2; 3 4])
+   M2 = S([2 3; 1 -1])
+   M3 = S([-1 1; 1 1])
+
+   @test evaluate(f, [M1, M2, M3]) == S([64 83; 124 149])
+   @test f(M1, M2, M3) == S([64 83; 124 149])
+
+   @test f(M1, ZZ(2), M3) == S([24 53; 69 110])
+   @test f(M1, ZZ(2), 3) == S([56 52; 78 134])
+   
    println("PASS")
 end
 
