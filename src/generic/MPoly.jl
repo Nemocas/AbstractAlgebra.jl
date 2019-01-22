@@ -1506,22 +1506,18 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    v = v1 + v2
    d = 0
    for i = 1:length(v)
-      if v[i] < 0
-         error("Exponent overflow in mul_johnson")
-      end
       if v[i] > d
          d = v[i]
       end
+   end
+   if ndigits(d, base = 2) >= sizeof(UInt)*8
+      error("Exponent overflow in mul_johnson")
    end
    exp_bits = 8
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
-      if exp_bits == sizeof(Int)*8
-         break
-      else
-         max_e = 2^(exp_bits - 1)
-      end
+      max_e = 2^(exp_bits - 1)
    end
    word_bits = sizeof(Int)*8
    k = div(word_bits, exp_bits)
@@ -1904,11 +1900,6 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       N = size(a.exps, 1)
       exps = zeros(UInt, N, 1)
       monomial_mul!(exps, 1, a.exps, 1, b, N)
-      for i = 1:N
-         if ndigits(a.exps[i, 1], base = 2) + ndigits(b, base = 2) >= sizeof(Int)*8
-            error("Exponent overflow in powering")
-         end
-      end
       return parent(a)([coeff(a, 1)^b], exps)
    elseif b == 0
       return parent(a)(1)
@@ -1926,9 +1917,6 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       max_e = 2^(exp_bits - 1)
       while d >= max_e
          exp_bits *= 2
-         if exp_bits == sizeof(Int)*8
-            break
-         end
          max_e = 2^(exp_bits - 1)
       end
       word_bits = sizeof(Int)*8
@@ -2240,9 +2228,6 @@ function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
-      if exp_bits == sizeof(Int)*8
-         break
-      end
       max_e = 2^(exp_bits - 1)
    end
    word_bits = sizeof(Int)*8
@@ -2454,9 +2439,6 @@ function div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
-      if exp_bits == sizeof(Int)*8
-         break
-      end
       max_e = 2^(exp_bits - 1)
    end
    N = parent(a).N
@@ -2678,9 +2660,6 @@ function divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
-      if exp_bits == sizeof(Int)*8
-         break
-      end
       max_e = 2^(exp_bits - 1)
    end
    N = parent(a).N
@@ -2918,9 +2897,6 @@ function divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
-      if exp_bits == sizeof(Int)*8
-         break
-      end
       max_e = 2^(exp_bits - 1)
    end
    word_bits = sizeof(Int)*8
@@ -3052,6 +3028,12 @@ function evaluate(a::MPoly{T}, A::Vector{T}) where T <: RingElement
    end
 end
 
+@doc Markdown.doc"""
+    evaluate(a::MPoly{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+> Evaluate the polynomial by substituting in the array of values for each of
+> the variables. The evaluation will succeed if multiplication is defined between elements
+> of the coefficient ring of $a$ and elements of the supplied vector.
+"""
 function evaluate(a::MPoly{T}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
    length(vals) != nvars(parent(a)) && error("Incorrect number of values in evaluation")
    R = base_ring(a)
@@ -3090,6 +3072,13 @@ function evaluate(a::MPoly{T}, vals::Vector{U}) where {T <: RingElement, U <: Ri
    return r
 end
 
+@doc Markdown.doc"""
+   evaluate(a::MPoly{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+> Evaluate the polynomial by substituting in the supplied values in the array `vals` for
+> the corresponding variables with indices given by the array `vars`. The evaluation will
+> succeed if multiplication is defined between elements of the coefficient ring of $a$ and
+> elements of `vals`.
+"""
 function evaluate(a::MPoly{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
    unique(vars) != vars && error("Variables not unique")
    length(vars) != length(vals) &&
@@ -3137,21 +3126,44 @@ function evaluate(a::MPoly{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: R
    return r
 end
 
+@doc Markdown.doc"""
+   evaluate(a::MPoly{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+> Evaluate the polynomial by substituting in the supplied values in the array `vals` for
+> the corresponding variables (supplied as polynomials) given by the array `vars`. The
+> evaluation will succeed if multiplication is defined between elements of the coefficient
+> ring of $a$ and elements of `vals`.
+"""
 function evaluate(a::MPoly{T}, vars::Vector{MPoly{T}}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
    varidx = [var_index(x) for x in vars]
    return evaluate(a, varidx, vals)
 end
 
+@doc Markdown.doc"""
+   evaluate(a::MPoly{T}, A::Vector{U}, g) where {T <: RingElement, U <: RingElement}
+> Evaluate the polynomial at the supplied values after applying the `Map` or `Function`
+> given by $g$ to the coefficients of the polynomial.
+"""
 function evaluate(a::MPoly{T}, A::Vector{U}, g) where {T <: RingElement, U <: RingElement}
    anew = change_base_ring(a, g)
    return evaluate(anew, A)
 end
 
+@doc Markdown.doc"""
+   evaluate(a::MPoly{T}, A::Vector{U}, g) where {T <: RingElement, U <: RingElement}
+> Evaluate the polynomial at the supplied values for the variables with given indices
+> after applying the `Map` or `Function` given by $g$ to the coefficients of the
+> polynomial.
+"""
 function evaluate(a::MPoly{T}, vars::Vector{Int}, vals::Vector{U}, g) where {T <: RingElement, U <: RingElement}
    anew = change_base_ring(a, g)
    return evaluate(anew, vars, vals)
 end
 
+@doc Markdown.doc"""
+   evaluate(a::MPoly{T}, A::Vector{U}, g) where {T <: RingElement, U <: RingElement}
+> Evaluate the polynomial at the supplied values for the given variables after 
+> applying the `Map` or `Function` given by $g$ to the coefficients of the polynomial.
+"""
 function evaluate(a::MPoly{T}, vars::Vector{MPoly{T}}, vals::Vector{U}, g) where {T <: RingElement, U <: RingElement}
    anew = change_base_ring(a, g)
    varidx = [var_index(x) for x in vars]
@@ -3168,6 +3180,16 @@ function (a::MPoly{T})(vals::U...) where {T <: RingElement, U <: Union{Integer, 
    return evaluate(a, [vals...])
 end
 
+@doc Markdown.doc"""
+   (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
+> Evaluate the polynomial at the supplied values, which may be any ring elements,
+> commutative or non-commutative. Evaluation always proceeds in the order of the
+> variables as supplied when creating the polynomial ring to which $a$ belongs. The
+> evaluation will succeed if a product of a coefficient of the polynomial by all
+> of the supplied values in order is defined. Note that this evaluation is more
+> general than those provided by the evaluate function. The values do not need to
+> be in the same ring, just in compatible rings.
+"""
 function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
    length(vals) != nvars(parent(a)) && error("Not enough values in evaluation")
    R = base_ring(a)
