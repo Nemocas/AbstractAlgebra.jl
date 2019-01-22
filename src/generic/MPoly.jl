@@ -3127,7 +3127,7 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vect
 end
 
 @doc Markdown.doc"""
-    evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{MPoly{T}}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+    evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
 > Evaluate the polynomial by substituting in the supplied values in the array `vals` for
 > the corresponding variables (supplied as polynomials) given by the array `vars`. The
 > evaluation will succeed if multiplication is defined between elements of the coefficient
