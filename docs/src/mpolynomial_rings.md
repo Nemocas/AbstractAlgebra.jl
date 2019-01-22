@@ -586,6 +586,58 @@ function.
 The following functions can optionally be implemented for multivariate
 polynomial types.
 
+### Evaluation
+
+```julia
+evaluate(a::MyMPoly{T}, A::Vector{T}) where T <: RingElem
+```
+
+Evaluate the polynomial at the given values in the coefficient ring of the
+polynomial. The result should be an element of the coefficient ring.
+
+```julia
+(a::MyMPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
+```
+
+Evaluate the polynomial at the given arguments. This provides functional
+notation for polynomial evaluation, i.e. $f(a, b, c)$. It must be defined
+for each supported polynomial type (Julia does not allow functional
+notation to be defined for an abstract type).
+
+The code for this function in MPoly.jl can be used when implementing this
+as it provides the most general possible evaluation, which is much more
+general than the case of evaluation at elements of the same ring.
+
+The evaluation should succeed for any set of values for which a
+multiplication is defined with the product of a coefficient and all the
+values before it.
+
+Note that the values may be in non-commutative rings. Products are
+performed in the order of the variables in the polynomial ring that the
+polynomial belongs to, preceded by a multiplication by the coefficient
+on the left.
+
+**Examples**
+
+```julia
+R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
+S = MatrixAlgebra(ZZ, 2)
+
+f = x*y + x + y + 1
+
+evaluate(f, [ZZ(1), ZZ(2)])
+f(1, 2)
+f(ZZ(1), ZZ(2))
+f(x - y, x + y)
+
+M1 = S([1 2; 3 4])
+M2 = S([2 4; 1 -1])
+M3 = S([1 -1; 1 1])
+
+f(M1, M2)
+f(M1, ZZ(2))
+```
+
 ### Derivations
 
 The following function allows to compute derivations of multivariate

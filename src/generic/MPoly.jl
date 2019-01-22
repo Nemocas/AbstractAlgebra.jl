@@ -3073,7 +3073,7 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
 end
 
 @doc Markdown.doc"""
-   evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+    evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
 > Evaluate the polynomial by substituting in the supplied values in the array `vals` for
 > the corresponding variables with indices given by the array `vars`. The evaluation will
 > succeed if multiplication is defined between elements of the coefficient ring of $a$ and
@@ -3127,19 +3127,19 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vect
 end
 
 @doc Markdown.doc"""
-   evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+    evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{MPoly{T}}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
 > Evaluate the polynomial by substituting in the supplied values in the array `vals` for
 > the corresponding variables (supplied as polynomials) given by the array `vars`. The
 > evaluation will succeed if multiplication is defined between elements of the coefficient
 > ring of $a$ and elements of `vals`.
 """
-function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{MPoly{T}}, vals::Vector{U}) where {T <: RingElement, U <: RingElement}
+function evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
    varidx = [var_index(x) for x in vars]
    return evaluate(a, varidx, vals)
 end
 
 @doc Markdown.doc"""
-   evaluate(a::AbstractAlgebra.MPolyElem{T}, A::Vector{U}, g) where {T <: RingElement, U <: RingElement}
+    evaluate(a::AbstractAlgebra.MPolyElem{T}, A::Vector{U}, g) where {T <: RingElement, U <: RingElement}
 > Evaluate the polynomial at the supplied values after applying the `Map` or `Function`
 > given by $g$ to the coefficients of the polynomial.
 """
@@ -3149,7 +3149,7 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, A::Vector{U}, g) where {T <: 
 end
 
 @doc Markdown.doc"""
-   evaluate(a::AbstractAlgebra.MPolyElem{T}, A::Vector{U}, g) where {T <: RingElement, U <: RingElement}
+    evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vector{U}, g) where {T <: RingElement, U <: RingElement}
 > Evaluate the polynomial at the supplied values for the variables with given indices
 > after applying the `Map` or `Function` given by $g$ to the coefficients of the
 > polynomial.
@@ -3160,28 +3160,28 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vect
 end
 
 @doc Markdown.doc"""
-   evaluate(a::AbstractAlgebra.MPolyElem{T}, A::Vector{U}, g) where {T <: RingElement, U <: RingElement}
+    evaluate(a::S, vars::Vector{S}, vals::Vector{U}, g) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
 > Evaluate the polynomial at the supplied values for the given variables after 
 > applying the `Map` or `Function` given by $g$ to the coefficients of the polynomial.
 """
-function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{MPoly{T}}, vals::Vector{U}, g) where {T <: RingElement, U <: RingElement}
+function evaluate(a::S, vars::Vector{S}, vals::Vector{U}, g) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
    anew = change_base_ring(a, g)
    varidx = [var_index(x) for x in vars]
    return evaluate(anew, varidx, vals)
 end
 
 function (a::MPoly{T})(vals::T...) where T <: RingElement
-   length(vals) != nvars(parent(a)) && error("Not enough values in evaluation")
+   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    return evaluate(a, [vals...])
 end
 
 function (a::MPoly{T})(vals::U...) where {T <: RingElement, U <: Union{Integer, Rational, AbstractFloat}}
-   length(vals) != nvars(parent(a)) && error("Not enough values in evaluation")
+   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    return evaluate(a, [vals...])
 end
 
 @doc Markdown.doc"""
-   (a::MPoly)(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
+    (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
 > Evaluate the polynomial at the supplied values, which may be any ring elements,
 > commutative or non-commutative. Evaluation always proceeds in the order of the
 > variables as supplied when creating the polynomial ring to which $a$ belongs. The
@@ -3190,8 +3190,8 @@ end
 > general than those provided by the evaluate function. The values do not need to
 > be in the same ring, just in compatible rings.
 """
-function (a::MPoly)(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
-   length(vals) != nvars(parent(a)) && error("Not enough values in evaluation")
+function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
+   length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    R = base_ring(a)
    # The best we can do here is to cache previously used powers of the values
    # being substituted, as we cannot assume anything about the relative
@@ -3230,6 +3230,14 @@ function (a::MPoly)(vals::Union{NCRingElem, RingElement}...) where T <: RingElem
    return r
 end
 
+@doc Markdown.doc"""
+    evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
+> Evaluate the polynomial at the supplied values, which may be any ring elements,
+> commutative or non-commutative, but in the same ring. Evaluation always proceeds
+> in the order of the variables as supplied when creating the polynomial ring to
+> which $a$ belongs. The evaluation will succeed if a product of a coefficient of
+> the polynomial by one of the values is defined.
+"""
 function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: RingElement, U <: NCRingElem}
    return a(vals...)
 end
