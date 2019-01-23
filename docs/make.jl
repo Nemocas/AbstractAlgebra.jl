@@ -46,9 +46,9 @@ makedocs(
 deploydocs(
    repo   = "github.com/Nemocas/AbstractAlgebra.jl.git",
    target = "build",
-   deps   = nothing,
-   make   = nothing,
-   julia  = "1.0",
-   osname = "linux"
+#   deps   = nothing,
+#   make   = nothing,
+#   julia  = "1.0",
+#   osname = "linux"
 )
 
