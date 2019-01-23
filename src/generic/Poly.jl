@@ -2567,11 +2567,12 @@ end
 > Evaluate the polynomial $f$ at $a$. Note that $a$ can be anything, whether
 > a ring element or not.
 """
-function subst(f::AbstractAlgebra.PolyElem{T}, a::Any) where {T <: RingElement}
+function subst(f::AbstractAlgebra.PolyElem{T}, a::U) where {T <: RingElement, U}
    S = parent(a)
    n = degree(f)
+   R = base_ring(f)
    if n < 0
-      return S()
+      return zero(S) + zero(R)
    elseif n == 0
       return coeff(f, 0)*S(1)
    elseif n == 1
@@ -2579,7 +2580,20 @@ function subst(f::AbstractAlgebra.PolyElem{T}, a::Any) where {T <: RingElement}
    end
    d1 = isqrt(n)
    d = div(n, d1)
-   A = powers(a, d)
+
+   if (U <: Integer && U != BigInt) ||
+      (U <: Rational && U != Rational{BigInt})
+      c = zero(R)*zero(U)
+      V = typeof(c)
+      if U != V
+         A = powers(map(parent(c), a), d)
+      else
+         A = powers(a, d)
+      end
+   else
+      A = powers(a, d)
+   end
+
    s = coeff(f, d1*d)*A[1]
    for j = 1:min(n - d1*d, d - 1)
       c = coeff(f, d1*d + j)
