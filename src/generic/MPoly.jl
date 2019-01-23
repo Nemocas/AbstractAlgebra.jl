@@ -1509,18 +1509,22 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    v = v1 + v2
    d = 0
    for i = 1:length(v)
+      if v[i] < 0	
+         error("Exponent overflow in mul_johnson")	
+      end
       if v[i] > d
          d = v[i]
       end
-   end
-   if ndigits(d, base = 2) >= sizeof(UInt)*8
-      error("Exponent overflow in mul_johnson")
    end
    exp_bits = 8
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
-      max_e = 2^(exp_bits - 1)
+      if exp_bits == sizeof(Int)*8	      max_e = 2^(exp_bits - 1)
+         break	
+      else	
+         max_e = 2^(exp_bits - 1)	
+      end
    end
    word_bits = sizeof(Int)*8
    k = div(word_bits, exp_bits)
@@ -1903,6 +1907,11 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       N = size(a.exps, 1)
       exps = zeros(UInt, N, 1)
       monomial_mul!(exps, 1, a.exps, 1, b, N)
+      for i = 1:N	
+         if ndigits(a.exps[i, 1], base = 2) + ndigits(b, base = 2) >= sizeof(Int)*8	
+            error("Exponent overflow in powering")	
+         end	
+      end
       return parent(a)([coeff(a, 1)^b], exps)
    elseif b == 0
       return parent(a)(1)
@@ -1920,6 +1929,9 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       max_e = 2^(exp_bits - 1)
       while d >= max_e
          exp_bits *= 2
+         if exp_bits == sizeof(Int)*8	
+            break	
+         end
          max_e = 2^(exp_bits - 1)
       end
       word_bits = sizeof(Int)*8
@@ -2231,6 +2243,9 @@ function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
+      if exp_bits == sizeof(Int)*8	
+         break	
+      end
       max_e = 2^(exp_bits - 1)
    end
    word_bits = sizeof(Int)*8
@@ -2442,6 +2457,9 @@ function div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
+      if exp_bits == sizeof(Int)*8	
+         break	
+      end
       max_e = 2^(exp_bits - 1)
    end
    N = parent(a).N
@@ -2663,6 +2681,9 @@ function divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
+      if exp_bits == sizeof(Int)*8	
+         break	
+      end
       max_e = 2^(exp_bits - 1)
    end
    N = parent(a).N
@@ -2900,6 +2921,9 @@ function divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
+      if exp_bits == sizeof(Int)*8	
+         break	
+      end
       max_e = 2^(exp_bits - 1)
    end
    word_bits = sizeof(Int)*8
