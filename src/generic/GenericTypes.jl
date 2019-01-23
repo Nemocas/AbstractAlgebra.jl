@@ -430,6 +430,24 @@ mutable struct MPoly{T <: RingElement} <: AbstractAlgebra.MPolyElem{T}
    end
 end
 
+# Iterators
+
+struct MPolyCoeffs{T <: AbstractAlgebra.MPolyElem}
+   poly::T
+end
+
+struct MPolyExponentVectors{T <: AbstractAlgebra.MPolyElem}
+   poly::T
+end
+
+struct MPolyTerms{T <: AbstractAlgebra.MPolyElem}
+   poly::T
+end
+
+struct MPolyMonomials{T <: AbstractAlgebra.MPolyElem}
+   poly::T
+end
+
 ###############################################################################
 #
 #   SparsePolyRing / SparsePoly
