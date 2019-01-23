@@ -2883,7 +2883,7 @@ end
 @doc Markdown.doc"""
     divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
 > Return a tuple `(q, r)` consisting of an array of polynomials `q`, one for
-> each polynomial in `b`, and a polynomial `r` such that `a = sum_i b[i]*q[i]`.
+> each polynomial in `b`, and a polynomial `r` such that `a = sum_i b[i]*q[i] + r`.
 """
 function divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
    v1, d = max_fields(a)
