@@ -559,15 +559,6 @@ function coeff(x::MPoly, i::Int)
 end
 
 @doc Markdown.doc"""
-    coeffs(x::AbstractAlgebra.MPolyElem)
-> Return an array of the nonzero coefficients of the given polynomial, starting
-> with the most significant term.
-"""
-function coeffs(x::MPoly)
-   return [coeff(x, i) for i = 1:length(x)]
-end
-
-@doc Markdown.doc"""
     monomial(x::MPoly, i::Int)
 > Return the monomial of the $i$-th term of the polynomial (as a polynomial
 > of length $1$ with coefficient $1$.
@@ -595,15 +586,6 @@ function monomial!(m::MPoly{T}, x::MPoly{T}, i::Int) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    monomials(x::AbstractAlgebebra.MPolyElem)
-> Return an array of the monomials of the nonzero terms of the given
-> polynomial, starting with the most significant term.
-"""
-function monomials(x::AbstractAlgebra.MPolyElem)
-   return [monomial(x, i) for i = 1:length(x)]
-end
-
-@doc Markdown.doc"""
     term(x::MPoly, i::Int)
 > Return the $i$-th nonzero term of the polynomial $x$ (as a polynomial).
 """
@@ -613,15 +595,6 @@ function term(x::MPoly, i::Int)
    exps = Array{UInt, 2}(undef, N, 1)
    monomial_set!(exps, 1, x.exps, i, N)
    return parent(x)([deepcopy(x.coeffs[i])], exps)
-end
-
-@doc Markdown.doc"""
-    terms(x::AbstractAlgebra.MPolyElem)
-> Return an array of the nonzero terms of the given polynomial, starting with
-> the most significant term.
-"""
-function terms(x::AbstractAlgebra.MPolyElem)
-   return [term(x, i) for i = 1:length(x)]
 end
 
 @doc Markdown.doc"""
@@ -786,6 +759,137 @@ function Base.deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingEleme
       Rc[i] = deepcopy_internal(a.coeffs[i], dict)
    end
    return parent(a)(Rc, Re)
+end
+
+###############################################################################
+#
+#   Iterators
+#
+###############################################################################
+
+function Base.iterate(x::MPolyCoeffs)
+   if length(x.poly) >= 1
+      return coeff(x.poly, 1), 1
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::MPolyCoeffs, state)
+   state += 1
+   if length(x.poly) >= state
+      return coeff(x.poly, state), state
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::MPolyExponentVectors)
+   if length(x.poly) >= 1
+      return exponent_vector(x.poly, 1), 1
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::MPolyExponentVectors, state)
+   state += 1
+   if length(x.poly) >= state
+      return exponent_vector(x.poly, state), state
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::MPolyTerms)
+   if length(x.poly) >= 1
+      return term(x.poly, 1), 1
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::MPolyTerms, state)
+   state += 1
+   if length(x.poly) >= state
+      return term(x.poly, state), state
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::MPolyMonomials)
+   if length(x.poly) >= 1
+      return monomial(x.poly, 1), 1
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::MPolyMonomials, state)
+   state += 1
+   if length(x.poly) >= state
+      return monomial(x.poly, state), state
+   else
+      return nothing
+   end
+end
+
+function Base.length(x::Union{MPolyCoeffs, MPolyExponentVectors, MPolyTerms, MPolyMonomials})
+   return length(x.poly)
+end
+
+function Base.eltype(x::MPolyCoeffs{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+   return S
+end
+ 
+function Base.eltype(x::MPolyExponentVectors{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+   return Vector{Int}
+end
+
+function Base.eltype(x::MPolyMonomials{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+   return T
+end
+ 
+function Base.eltype(x::MPolyTerms{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+   return T
+end
+ 
+@doc Markdown.doc"""
+    coeffs(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+> Return an iterator for the coefficients of the given polynomial. To retrieve
+> an array of the coefficients, use `collect(coeffs(a))`.
+"""
+function coeffs(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   return MPolyCoeffs(a)
+end
+
+@doc Markdown.doc"""
+    exponent_vectors(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+> Return an iterator for the exponent vectors of the given polynomial. To
+> retrieve an array of the exponent vectors, use
+> `collect(exponent_vectors(a))`.
+"""
+function exponent_vectors(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   return MPolyExponentVectors(a)
+end
+
+@doc Markdown.doc"""
+    monomials(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+> Return an iterator for the monomials of the given polynomial. To retrieve
+> an array of the monomials, use `collect(monomials(a))`.
+"""
+function monomials(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   return MPolyMonomials(a)
+end
+
+@doc Markdown.doc"""
+    terms(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+> Return an iterator for the terms of the given polynomial. To retrieve
+> an array of the terms, use `collect(terms(a))`.
+"""
+function terms(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   return MPolyTerms(a)
 end
 
 ###############################################################################
@@ -3882,15 +3986,6 @@ end
 """
 function exponent(a::MPoly{T}, i::Int, j::Int) where T <: RingElement
    return exponent(a, i, j, Val{parent(a).ord})
-end
-
-@doc Markdown.doc"""
-    exponent_vectors(a::MPoly{T}) where T <: RingElement
-> Return an array whose entries are the exponent vectors for each of the terms
-> of the polynomial.
-"""
-function exponent_vectors(a::MPoly{T}) where T <: RingElement
-   return [exponent_vector(a, i) for i in 1:length(a)]
 end
 
 function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:lex}}) where T <: RingElement
