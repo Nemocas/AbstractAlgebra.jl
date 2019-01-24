@@ -749,7 +749,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "AbstractAlgebra.Generic.modulus",
     "category": "method",
-    "text": "modulus(a::AbstractAlgebra.PolyElem{T}) where {T <: ResElem} = modulus(base_ring(a))\n\nReturn the modulus of the coefficients of the given polynomial.\n\n\n\n"
+    "text": "modulus(a::AbstractAlgebra.PolyElem{T}) where {T <: ResElem}\n\nReturn the modulus of the coefficients of the given polynomial.\n\n\n\n"
 },
 
 {
@@ -989,7 +989,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "AbstractAlgebra.Generic.integral",
     "category": "method",
-    "text": "integral(x::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}\n\nReturn the integral of the polynomial a.\n\n\n\n"
+    "text": "integral(x::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}\n\nReturn the integral of the polynomial x.\n\n\n\n"
 },
 
 {
@@ -1837,7 +1837,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic power series",
     "title": "AbstractAlgebra.Generic.shift_left",
     "category": "method",
-    "text": "shift_left(x::AbstractAlgebra.RelSeriesElem{T}, len::Int) where {T <: RingElement}\n\nReturn the power series f shifted left by n terms, i.e. multiplied by x^n.\n\n\n\n"
+    "text": "shift_left(x::AbstractAlgebra.RelSeriesElem{T}, n::Int) where {T <: RingElement}\n\nReturn the power series x shifted left by n terms, i.e. multiplied by x^n.\n\n\n\n"
 },
 
 {
@@ -1845,7 +1845,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic power series",
     "title": "AbstractAlgebra.Generic.shift_right",
     "category": "method",
-    "text": "shift_right(x::AbstractAlgebra.RelSeriesElem{T}, len::Int) where {T <: RingElement}\n\nReturn the power series f shifted right by n terms, i.e. divided by x^n.\n\n\n\n"
+    "text": "shift_right(x::AbstractAlgebra.RelSeriesElem{T}, n::Int) where {T <: RingElement}\n\nReturn the power series x shifted right by n terms, i.e. divided by x^n.\n\n\n\n"
 },
 
 {
@@ -1861,7 +1861,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic power series",
     "title": "Base.truncate",
     "category": "method",
-    "text": "truncate(a::AbstractAlgebra.RelSeriesElem{T}, prec::Int) where {T <: RingElement}\n\nReturn a truncated to (absolute) precision n.\n\n\n\n"
+    "text": "truncate(a::AbstractAlgebra.RelSeriesElem{T}, n::Int) where {T <: RingElement}\n\nReturn a truncated to (absolute) precision n.\n\n\n\n"
 },
 
 {
