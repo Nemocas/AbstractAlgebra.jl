@@ -575,7 +575,7 @@ function lc(p::MPoly)
    if iszero(p)
       return zero(base_ring(p))
    else
-      return p.coeffs[1]
+      return coeff(p,1)
    end
 end
 
