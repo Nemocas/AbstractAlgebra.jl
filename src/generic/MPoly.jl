@@ -571,7 +571,7 @@ end
     lc(p::MPoly)
 > Return the leading coefficient of the polynomial p.
 """
-function lc(p::MPoly)
+function lc(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
       return zero(base_ring(p))
    else
@@ -596,7 +596,7 @@ end
     lm(p::MPoly)
 > Return the leading monomial of the polynomial p.
 """
-function lm(p::MPoly)
+function lm(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
       return p
    else
@@ -608,7 +608,7 @@ end
     lt(p::MPoly)
 > Return the leading term of the polynomial p.
 """
-function lt(p::MPoly)
+function lt(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
       return p
    else
@@ -3396,7 +3396,7 @@ end
     lcm(a::AbstractAlgebra.MPoly{T}, a::AbstractAlgebra.MPoly{T}) where {T <: RingElement}
     > Return the least common multiple of a and b in parent(a).
 """
-function lcm(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+function lcm(a::MPolyElem{T}, b::MPolyElem{T}) where {T <: RingElement}
    if iszero(a) && iszero(b)
       check_parent(a, b)
       return a
