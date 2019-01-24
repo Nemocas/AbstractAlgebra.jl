@@ -2112,7 +2112,7 @@ function deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vect
          defl[i] = 1
       end
    end
-   exps = exponent_vectors(f)
+   exps = collect(exponent_vectors(f))
    for i = 1:length(f)
       for j = 1:N
          exps[i][j] = div(exps[i][j] - shift[j], defl[j]) 
@@ -2131,7 +2131,7 @@ function deflate(f::MPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: 
    end
 
    if parent(f).ord != :lex # sorting is required if ordering is not lex
-      exps = exponent_vectors(f)
+      exps = collect(exponent_vectors(f))
       for i = 1:length(f)
          for j = 1:N
             exps[i][j] = div(exps[i][j] - shift[j], defl[j])
@@ -2161,7 +2161,7 @@ end
 """
 function inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
    N = nvars(parent(f))
-   exps = exponent_vectors(f)
+   exps = collect(exponent_vectors(f))
    for i = 1:length(f)
       for j = 1:N
          exps[i][j] = exps[i][j]*defl[j] + shift[j]
@@ -2174,7 +2174,7 @@ end
 function inflate(f::MPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
    N = nvars(parent(f))
    if parent(f).ord != :lex # sorting is required if ordering is not lex
-      exps = exponent_vectors(f)
+      exps = collect(exponent_vectors(f))
       for i = 1:length(f)
          for j = 1:N
             exps[i][j] = exps[i][j]*defl[j] + shift[j]
