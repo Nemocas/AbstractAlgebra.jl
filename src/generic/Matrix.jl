@@ -1821,26 +1821,6 @@ function solve_lu_precomp(p::Generic.perm, LU::MatElem{T}, b::MatrixElem{T}) whe
    return x
 end
 
-
-function backsolve!(A::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
-   m = rows(A)
-   h = cols(b)
-   R = base_ring(A)
-   t = R()
-   for i = m:-1:1
-      d = -inv(A[i, i])
-      for k = 1:h
-         b[i, k] = -b[i, k]
-         for j = i + 1:m
-            t = mul_red!(t, A[i, j], b[j, k], false)
-            b[i, k] = addeq!(b[i, k], t)
-         end
-         b[i, k] = reduce!(b[i, k])
-         b[i, k] = mul!(b[i, k], b[i, k], d)
-      end
-   end
-end
-
 function solve_ff(M::MatrixElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
    base_ring(M) != base_ring(b) && error("Base rings don't match in solve")
    !issquare(M) && error("Non-square matrix in solve")
