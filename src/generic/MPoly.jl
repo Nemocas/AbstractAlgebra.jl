@@ -3398,6 +3398,7 @@ end
 """
 function lcm(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    if iszero(a) && iszero(b)
+      check_parent(a, b)
       return a
    else
       return divrem(a * b, gcd(a,b))[1]
