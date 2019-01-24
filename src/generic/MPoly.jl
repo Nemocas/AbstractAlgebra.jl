@@ -81,7 +81,7 @@ end
 
 @doc Markdown.doc"""
     gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
-> Return the i-th generator (variable) of the given polynomial
+> Return the $i$-th generator (variable) of the given polynomial
 > ring.
 """
 function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}

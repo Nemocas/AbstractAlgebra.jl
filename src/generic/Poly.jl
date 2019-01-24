@@ -28,7 +28,7 @@ parent_type(::Type{Poly{T}}) where T <: RingElement = PolyRing{T}
 elem_type(::Type{PolyRing{T}}) where T <: RingElement = Poly{T}
 
 @doc Markdown.doc"""
-    base_ring(R::AbstractAlgebra.PolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
+    base_ring(R::AbstractAlgebra.PolyRing{T}) where T <: RingElement
 > Return the base ring of the given polynomial ring.
 """
 base_ring(R::AbstractAlgebra.PolyRing{T}) where T <: RingElement = R.base_ring::parent_type(T)
@@ -114,7 +114,7 @@ length(a::PolynomialElem) = a.length
 degree(a::PolynomialElem) = length(a) - 1
 
 @doc Markdown.doc"""
-    modulus(a::AbstractAlgebra.PolyElem{T}) where {T <: ResElem} = modulus(base_ring(a))
+    modulus(a::AbstractAlgebra.PolyElem{T}) where {T <: ResElem}
 > Return the modulus of the coefficients of the given polynomial.
 """
 modulus(a::AbstractAlgebra.PolyElem{T}) where {T <: ResElem} = modulus(base_ring(a))
@@ -1039,7 +1039,7 @@ end
 
 @doc Markdown.doc"""
     divexact(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
-> Return $a/b$ where the quotient is expected to be exact.
+> Return $f/g$ where the quotient is expected to be exact.
 """
 function divexact(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
    check_parent(f, g)
@@ -1357,9 +1357,9 @@ end
 
 @doc Markdown.doc"""
     divides(z::AbstractAlgebra.PolyElem{T}, x::T) where {T <: RingElement}
-> Returns a pair consisting of a flag which is set to `true` if $g$ divides
-> $f$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
-> such a polynomial exists. If not, the value of $h$ is undetermined.
+> Returns a pair consisting of a flag which is set to `true` if $x$ divides
+> $z$ and `false` otherwise, and a polynomial $y$ such that $z = xy$ if
+> such a polynomial exists. If not, the value of $y$ is undetermined.
 """
 function divides(z::AbstractAlgebra.PolyElem{T}, x::T) where {T <: RingElement}
    parent(x) != base_ring(z) && error("Wrong parents in divides")
@@ -1637,7 +1637,7 @@ end
 
 @doc Markdown.doc"""
     integral(x::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
-> Return the integral of the polynomial $a$.
+> Return the integral of the polynomial $x$.
 """
 function integral(x::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
    len = length(x)
@@ -1716,7 +1716,7 @@ end
 
 @doc Markdown.doc"""
     resultant_ducos(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
-> Return the resultant of the $a$ and $b$.
+> Return the resultant of the $p$ and $q$.
 """
 # See the paper, "Optimizations of the subresultant algorithm" by Lionel
 # Ducos, J. Pure and Appl. Algebra 2000.

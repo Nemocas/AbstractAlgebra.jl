@@ -327,7 +327,7 @@ end
 
 @doc Markdown.doc"""
     ==(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
-> Return `true` if $x == y$ arithmetically, otherwise return `false`. Recall
+> Return `true` if $a == b$ arithmetically, otherwise return `false`. Recall
 > that power series to different precisions may still be arithmetically
 > equal to the minimum of the two precisions.
 """
@@ -338,7 +338,7 @@ end
 
 @doc Markdown.doc"""
     isequal(a::AbstractAlgebra.ResFieldElem{T}, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElement}
-> Return `true` if $x == y$ exactly, otherwise return `false`. This function is
+> Return `true` if $a == b$ exactly, otherwise return `false`. This function is
 > useful in cases where the data of the residues are inexact, e.g. power series
 > Only if the power series are precisely the same, to the same precision, are
 > they declared equal by this function.
@@ -356,7 +356,7 @@ end
 
 @doc Markdown.doc"""
     ==(a::AbstractAlgebra.ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
+> Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
 function ==(a::AbstractAlgebra.ResFieldElem, b::Union{Integer, Rational, AbstractFloat})
    z = base_ring(a)(b)
@@ -365,7 +365,7 @@ end
 
 @doc Markdown.doc"""
     ==(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResFieldElem)
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
+> Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
 function ==(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.ResFieldElem)
    z = base_ring(b)(a)
@@ -374,7 +374,7 @@ end
 
 @doc Markdown.doc"""
     ==(a::AbstractAlgebra.ResFieldElem{T}, b::T) where {T <: RingElem}
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
+> Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
 function ==(a::AbstractAlgebra.ResFieldElem{T}, b::T) where {T <: RingElem}
    z = base_ring(a)(b)
@@ -383,7 +383,7 @@ end
 
 @doc Markdown.doc"""
     ==(a::T, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElem}
-> Return `true` if $x == y$ arithmetically, otherwise return `false`.
+> Return `true` if $a == b$ arithmetically, otherwise return `false`.
 """
 function ==(a::T, b::AbstractAlgebra.ResFieldElem{T}) where {T <: RingElem}
    z = base_ring(b)(a)
