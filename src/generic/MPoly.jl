@@ -12,7 +12,7 @@ export max_fields, total_degree, gens, divides, isconstant, isdegree,
        derivative, change_base_ring,  to_univariate, degrees, deflation,
        combine_like_terms!, exponent, exponent_vector, exponent_vectors,
        set_exponent_vector!, sort_terms!, coeffs, monomial, monomial!,
-       monomials, term, terms, var_index, @PolynomialRing
+       monomials, term, terms, var_index, @PolynomialRing, lc, lm, lt, lcm
 
 ###############################################################################
 #
@@ -568,6 +568,18 @@ function coeffs(x::MPoly)
 end
 
 @doc Markdown.doc"""
+    lc(p::MPoly)
+> Return the leading coefficient of the polynomial p.
+"""
+function lc(p::MPoly)
+   if iszero(p)
+      return zero(base_ring(p))
+   else
+      return p.coeffs[1]
+   end
+end
+
+@doc Markdown.doc"""
     monomial(x::MPoly, i::Int)
 > Return the monomial of the $i$-th term of the polynomial (as a polynomial
 > of length $1$ with coefficient $1$.
@@ -578,6 +590,30 @@ function monomial(x::MPoly, i::Int)
    exps = Array{UInt, 2}(undef, N, 1)
    monomial_set!(exps, 1, x.exps, i, N) 
    return parent(x)([one(R)], exps)
+end
+
+@doc Markdown.doc"""
+    lm(p::MPoly)
+> Return the leading monomial of the polynomial p.
+"""
+function lm(p::MPoly)
+   if iszero(p)
+      return p
+   else
+      return monomial(p, 1)
+   end
+end
+
+@doc Markdown.doc"""
+    lt(p::MPoly)
+> Return the leading term of the polynomial p.
+"""
+function lt(p::MPoly)
+   if iszero(p)
+      return p
+   else
+      return monomial(p, 1) * coeff(p, 1)
+   end
 end
 
 @doc Markdown.doc"""
@@ -3356,6 +3392,17 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    return inflate(r, shiftr, deflr)
 end
 
+@doc Markdown.doc"""
+    lcm(a::AbstractAlgebra.MPoly{T}, a::AbstractAlgebra.MPoly{T}) where {T <: RingElement}
+    > Return the least common multiple of a and b in parent(a).
+"""
+function lcm(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+   if iszero(a) && iszero(b)
+      return a
+   else
+      return divrem(a * b, gcd(a,b))[1]
+   end
+end
 function term_gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    if a.length < 1
       return b
