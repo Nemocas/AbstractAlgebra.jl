@@ -541,23 +541,23 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    shift_left(x::AbstractAlgebra.RelSeriesElem{T}, len::Int) where {T <: RingElement}
-> Return the power series $f$ shifted left by $n$ terms, i.e. multiplied by
+    shift_left(x::AbstractAlgebra.RelSeriesElem{T}, n::Int) where {T <: RingElement}
+> Return the power series $x$ shifted left by $n$ terms, i.e. multiplied by
 > $x^n$.
 """
-function shift_left(x::AbstractAlgebra.RelSeriesElem{T}, len::Int) where {T <: RingElement}
-   len < 0 && throw(DomainError())
+function shift_left(x::AbstractAlgebra.RelSeriesElem{T}, n::Int) where {T <: RingElement}
+   n < 0 && throw(DomainError())
    xlen = pol_length(x)
    if xlen == 0
       z = zero(parent(x))
-      set_prec!(z, precision(x) + len)
-      set_val!(z, valuation(x) + len)
+      set_prec!(z, precision(x) + n)
+      set_val!(z, valuation(x) + n)
       return z
    end
    z = parent(x)()
    fit!(z, xlen)
-   set_prec!(z, precision(x) + len)
-   set_val!(z, valuation(x) + len)
+   set_prec!(z, precision(x) + n)
+   set_val!(z, valuation(x) + n)
    for i = 1:xlen
       z = setcoeff!(z, i - 1, polcoeff(x, i - 1))
    end
@@ -565,24 +565,24 @@ function shift_left(x::AbstractAlgebra.RelSeriesElem{T}, len::Int) where {T <: R
 end
 
 @doc Markdown.doc"""
-    shift_right(x::AbstractAlgebra.RelSeriesElem{T}, len::Int) where {T <: RingElement}
-> Return the power series $f$ shifted right by $n$ terms, i.e. divided by
+    shift_right(x::AbstractAlgebra.RelSeriesElem{T}, n::Int) where {T <: RingElement}
+> Return the power series $x$ shifted right by $n$ terms, i.e. divided by
 > $x^n$.
 """
-function shift_right(x::AbstractAlgebra.RelSeriesElem{T}, len::Int) where {T <: RingElement}
-   len < 0 && throw(DomainError())
+function shift_right(x::AbstractAlgebra.RelSeriesElem{T}, n::Int) where {T <: RingElement}
+   n < 0 && throw(DomainError())
    xlen = pol_length(x)
    xval = valuation(x)
    xprec = precision(x)
    z = parent(x)()
-   if len >= xlen + xval
-      set_prec!(z, max(0, xprec - len))
-      set_val!(z, max(0, xprec - len))
+   if n >= xlen + xval
+      set_prec!(z, max(0, xprec - n))
+      set_val!(z, max(0, xprec - n))
    else
-      zlen = min(xlen + xval - len, xlen)
+      zlen = min(xlen + xval - n, xlen)
       fit!(z, zlen)
-      set_prec!(z, max(0, xprec - len))
-      set_val!(z, max(0, xval - len))
+      set_prec!(z, max(0, xprec - n))
+      set_val!(z, max(0, xval - n))
       for i = 1:zlen
          z = setcoeff!(z, i - 1, polcoeff(x, i + xlen  - zlen - 1))
       end
@@ -598,29 +598,29 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    truncate(a::AbstractAlgebra.RelSeriesElem{T}, prec::Int) where {T <: RingElement}
+    truncate(a::AbstractAlgebra.RelSeriesElem{T}, n::Int) where {T <: RingElement}
 > Return $a$ truncated to (absolute) precision $n$.
 """
-function truncate(a::AbstractAlgebra.RelSeriesElem{T}, prec::Int) where {T <: RingElement}
-   prec < 0 && throw(DomainError())
+function truncate(a::AbstractAlgebra.RelSeriesElem{T}, n::Int) where {T <: RingElement}
+   n < 0 && throw(DomainError())
    alen = pol_length(a)
    aprec = precision(a)
    aval = valuation(a)
-   if aprec <= prec
+   if aprec <= n
       return a
    end
    z = parent(a)()
-   set_prec!(z, prec)
-   if prec <= aval
+   set_prec!(z, n)
+   if n <= aval
       set_length!(z, 0)
-      set_val!(z, prec)
+      set_val!(z, n)
    else
-      fit!(z, prec - aval)
+      fit!(z, n - aval)
       set_val!(z, aval)
-      for i = 1:min(prec - aval, alen)
+      for i = 1:min(n - aval, alen)
          z = setcoeff!(z, i - 1, polcoeff(a, i - 1))
       end
-      set_length!(z, normalise(z, prec - aval))
+      set_length!(z, normalise(z, n - aval))
    end
    return z
 end
@@ -840,7 +840,7 @@ end
 
 @doc Markdown.doc"""
     divexact(x::AbstractAlgebra.RelSeriesElem{T}, y::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
-> Return $a/b$. Requires $b$ to be invertible.
+> Return $x/y$. Requires $y$ to be invertible.
 """
 function divexact(x::AbstractAlgebra.RelSeriesElem{T}, y::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
    check_parent(x, y)
@@ -865,7 +865,7 @@ end
 
 @doc Markdown.doc"""
     divexact(x::AbstractAlgebra.RelSeriesElem, y::Union{Integer, Rational, AbstractFloat})
-> Return $a/b$ where the quotient is expected to be exact.
+> Return $x/y$ where the quotient is expected to be exact.
 """
 function divexact(x::AbstractAlgebra.RelSeriesElem, y::Union{Integer, Rational, AbstractFloat})
    y == 0 && throw(DivideError())
@@ -882,7 +882,7 @@ end
 
 @doc Markdown.doc"""
     divexact(x::AbstractAlgebra.RelSeriesElem{T}, y::T) where {T <: RingElem}
-> Return $a/b$ where the quotient is expected to be exact.
+> Return $x/y$ where the quotient is expected to be exact.
 """
 function divexact(x::AbstractAlgebra.RelSeriesElem{T}, y::T) where {T <: RingElem}
    iszero(y) && throw(DivideError())

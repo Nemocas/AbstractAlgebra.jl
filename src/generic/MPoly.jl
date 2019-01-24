@@ -81,7 +81,7 @@ end
 
 @doc Markdown.doc"""
     gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
-> Return the i-th generator (variable) of the given polynomial
+> Return the $i$-th generator (variable) of the given polynomial
 > ring.
 """
 function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
@@ -559,15 +559,6 @@ function coeff(x::MPoly, i::Int)
 end
 
 @doc Markdown.doc"""
-    coeffs(x::AbstractAlgebra.MPolyElem)
-> Return an array of the nonzero coefficients of the given polynomial, starting
-> with the most significant term.
-"""
-function coeffs(x::MPoly)
-   return [coeff(x, i) for i = 1:length(x)]
-end
-
-@doc Markdown.doc"""
     lc(p::MPoly)
 > Return the leading coefficient of the polynomial p.
 """
@@ -631,15 +622,6 @@ function monomial!(m::MPoly{T}, x::MPoly{T}, i::Int) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    monomials(x::AbstractAlgebebra.MPolyElem)
-> Return an array of the monomials of the nonzero terms of the given
-> polynomial, starting with the most significant term.
-"""
-function monomials(x::AbstractAlgebra.MPolyElem)
-   return [monomial(x, i) for i = 1:length(x)]
-end
-
-@doc Markdown.doc"""
     term(x::MPoly, i::Int)
 > Return the $i$-th nonzero term of the polynomial $x$ (as a polynomial).
 """
@@ -649,15 +631,6 @@ function term(x::MPoly, i::Int)
    exps = Array{UInt, 2}(undef, N, 1)
    monomial_set!(exps, 1, x.exps, i, N)
    return parent(x)([deepcopy(x.coeffs[i])], exps)
-end
-
-@doc Markdown.doc"""
-    terms(x::AbstractAlgebra.MPolyElem)
-> Return an array of the nonzero terms of the given polynomial, starting with
-> the most significant term.
-"""
-function terms(x::AbstractAlgebra.MPolyElem)
-   return [term(x, i) for i = 1:length(x)]
 end
 
 @doc Markdown.doc"""
@@ -822,6 +795,137 @@ function Base.deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingEleme
       Rc[i] = deepcopy_internal(a.coeffs[i], dict)
    end
    return parent(a)(Rc, Re)
+end
+
+###############################################################################
+#
+#   Iterators
+#
+###############################################################################
+
+function Base.iterate(x::MPolyCoeffs)
+   if length(x.poly) >= 1
+      return coeff(x.poly, 1), 1
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::MPolyCoeffs, state)
+   state += 1
+   if length(x.poly) >= state
+      return coeff(x.poly, state), state
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::MPolyExponentVectors)
+   if length(x.poly) >= 1
+      return exponent_vector(x.poly, 1), 1
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::MPolyExponentVectors, state)
+   state += 1
+   if length(x.poly) >= state
+      return exponent_vector(x.poly, state), state
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::MPolyTerms)
+   if length(x.poly) >= 1
+      return term(x.poly, 1), 1
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::MPolyTerms, state)
+   state += 1
+   if length(x.poly) >= state
+      return term(x.poly, state), state
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::MPolyMonomials)
+   if length(x.poly) >= 1
+      return monomial(x.poly, 1), 1
+   else
+      return nothing
+   end
+end
+
+function Base.iterate(x::MPolyMonomials, state)
+   state += 1
+   if length(x.poly) >= state
+      return monomial(x.poly, state), state
+   else
+      return nothing
+   end
+end
+
+function Base.length(x::Union{MPolyCoeffs, MPolyExponentVectors, MPolyTerms, MPolyMonomials})
+   return length(x.poly)
+end
+
+function Base.eltype(x::MPolyCoeffs{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+   return S
+end
+ 
+function Base.eltype(x::MPolyExponentVectors{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+   return Vector{Int}
+end
+
+function Base.eltype(x::MPolyMonomials{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+   return T
+end
+ 
+function Base.eltype(x::MPolyTerms{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+   return T
+end
+ 
+@doc Markdown.doc"""
+    coeffs(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+> Return an iterator for the coefficients of the given polynomial. To retrieve
+> an array of the coefficients, use `collect(coeffs(a))`.
+"""
+function coeffs(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   return MPolyCoeffs(a)
+end
+
+@doc Markdown.doc"""
+    exponent_vectors(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+> Return an iterator for the exponent vectors of the given polynomial. To
+> retrieve an array of the exponent vectors, use
+> `collect(exponent_vectors(a))`.
+"""
+function exponent_vectors(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   return MPolyExponentVectors(a)
+end
+
+@doc Markdown.doc"""
+    monomials(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+> Return an iterator for the monomials of the given polynomial. To retrieve
+> an array of the monomials, use `collect(monomials(a))`.
+"""
+function monomials(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   return MPolyMonomials(a)
+end
+
+@doc Markdown.doc"""
+    terms(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+> Return an iterator for the terms of the given polynomial. To retrieve
+> an array of the terms, use `collect(terms(a))`.
+"""
+function terms(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   return MPolyTerms(a)
 end
 
 ###############################################################################
@@ -1545,18 +1649,22 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    v = v1 + v2
    d = 0
    for i = 1:length(v)
+      if v[i] < 0	
+         error("Exponent overflow in mul_johnson")	
+      end
       if v[i] > d
          d = v[i]
       end
-   end
-   if ndigits(d, base = 2) >= sizeof(UInt)*8
-      error("Exponent overflow in mul_johnson")
    end
    exp_bits = 8
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
-      max_e = 2^(exp_bits - 1)
+      if exp_bits == sizeof(Int)*8	      max_e = 2^(exp_bits - 1)
+         break	
+      else	
+         max_e = 2^(exp_bits - 1)	
+      end
    end
    word_bits = sizeof(Int)*8
    k = div(word_bits, exp_bits)
@@ -1939,6 +2047,11 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       N = size(a.exps, 1)
       exps = zeros(UInt, N, 1)
       monomial_mul!(exps, 1, a.exps, 1, b, N)
+      for i = 1:N	
+         if ndigits(a.exps[i, 1], base = 2) + ndigits(b, base = 2) >= sizeof(Int)*8	
+            error("Exponent overflow in powering")	
+         end	
+      end
       return parent(a)([coeff(a, 1)^b], exps)
    elseif b == 0
       return parent(a)(1)
@@ -1956,6 +2069,9 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       max_e = 2^(exp_bits - 1)
       while d >= max_e
          exp_bits *= 2
+         if exp_bits == sizeof(Int)*8	
+            break	
+         end
          max_e = 2^(exp_bits - 1)
       end
       word_bits = sizeof(Int)*8
@@ -2032,7 +2148,7 @@ function deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vect
          defl[i] = 1
       end
    end
-   exps = exponent_vectors(f)
+   exps = collect(exponent_vectors(f))
    for i = 1:length(f)
       for j = 1:N
          exps[i][j] = div(exps[i][j] - shift[j], defl[j]) 
@@ -2051,7 +2167,7 @@ function deflate(f::MPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: 
    end
 
    if parent(f).ord != :lex # sorting is required if ordering is not lex
-      exps = exponent_vectors(f)
+      exps = collect(exponent_vectors(f))
       for i = 1:length(f)
          for j = 1:N
             exps[i][j] = div(exps[i][j] - shift[j], defl[j])
@@ -2081,7 +2197,7 @@ end
 """
 function inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
    N = nvars(parent(f))
-   exps = exponent_vectors(f)
+   exps = collect(exponent_vectors(f))
    for i = 1:length(f)
       for j = 1:N
          exps[i][j] = exps[i][j]*defl[j] + shift[j]
@@ -2094,7 +2210,7 @@ end
 function inflate(f::MPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
    N = nvars(parent(f))
    if parent(f).ord != :lex # sorting is required if ordering is not lex
-      exps = exponent_vectors(f)
+      exps = collect(exponent_vectors(f))
       for i = 1:length(f)
          for j = 1:N
             exps[i][j] = exps[i][j]*defl[j] + shift[j]
@@ -2267,6 +2383,9 @@ function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
+      if exp_bits == sizeof(Int)*8	
+         break	
+      end
       max_e = 2^(exp_bits - 1)
    end
    word_bits = sizeof(Int)*8
@@ -2478,6 +2597,9 @@ function div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
+      if exp_bits == sizeof(Int)*8	
+         break	
+      end
       max_e = 2^(exp_bits - 1)
    end
    N = parent(a).N
@@ -2699,6 +2821,9 @@ function divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
+      if exp_bits == sizeof(Int)*8	
+         break	
+      end
       max_e = 2^(exp_bits - 1)
    end
    N = parent(a).N
@@ -2936,6 +3061,9 @@ function divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
+      if exp_bits == sizeof(Int)*8	
+         break	
+      end
       max_e = 2^(exp_bits - 1)
    end
    word_bits = sizeof(Int)*8
@@ -3906,15 +4034,6 @@ end
 """
 function exponent(a::MPoly{T}, i::Int, j::Int) where T <: RingElement
    return exponent(a, i, j, Val{parent(a).ord})
-end
-
-@doc Markdown.doc"""
-    exponent_vectors(a::MPoly{T}) where T <: RingElement
-> Return an array whose entries are the exponent vectors for each of the terms
-> of the polynomial.
-"""
-function exponent_vectors(a::MPoly{T}) where T <: RingElement
-   return [exponent_vector(a, i) for i in 1:length(a)]
 end
 
 function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:lex}}) where T <: RingElement

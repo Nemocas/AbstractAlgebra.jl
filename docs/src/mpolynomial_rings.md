@@ -185,26 +185,43 @@ Return `true` if $f$ consists of a single term with coefficient $1$.
 coeffs(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
 
-Return an array of the coefficients of the polynomial $p$, starting with the
-coefficient of the most significant term with respect to the ordering.
+Return an iterator for the coefficients of the polynomial $p$, starting
+with the coefficient of the most significant term with respect to the
+ordering. Generic code will provide this function automatically for
+random access polynomials that implement the `coeff` function.
 
 ```julia
 monomials(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
 
-Return an array of the monomials of the polynomial $p$, starting with the
-coefficient of the most significant term with respect to the ordering.
+Return an iterator for the monomials of the polynomial $p$, starting with
+the monomial of the most significant term with respect to the ordering.
 Monomials in AbstractAlgebra are defined to have coefficient $1$. See the
-function `terms` if you require the coefficients, however note that only
-monomials can be compared.
+function `terms` if you also require the coefficients, however note that
+only monomials can be compared. Generic code will provide this function
+automatically for random access polynomials that implement the `monomial`
+function.
 
 ```julia
 terms(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
 
-Return an array of the terms of the polynomial $p$, starting with the
-coefficient of the most significant term with respect to the ordering.
-Terms in AbstractAlgebra include the coefficient.
+Return an iterator for the terms of the polynomial $p$, starting with
+the most significant term with respect to the ordering. Terms in
+AbstractAlgebra include the coefficient. Generic code will provide this
+function automatically for random access polynomials that implement the
+`term` function.
+
+```julia
+exponent_vectors(a::MyMPoly{T}) where T <: RingElement
+```
+
+Return an iterator for the exponent vectors for each of the terms of the
+polynomial starting with the most significant term with respect to the
+ordering. Each exponent vector is an array of `Int`s, one for each
+variable, in the order given when the polynomial ring was created.
+Generic code will provide this function automatically for random access
+polynomials that implement the `exponent_vector` function.
 
 **Examples**
 
@@ -222,9 +239,10 @@ isconstant(f) == false
 isterm(2x*y) == true
 ismonomial(x*y) == false
 V = vars(f)
-C = coeffs(f)
-M = monomials(f)
-T = terms(f)
+C = collect(coeffs(f))
+M = collect(monomials(f))
+T = collect(terms(f))
+V = collect(exponent_vectors(f))
 degree(f, 2) == 2
 d = total_degree(f)
 ```
@@ -489,13 +507,6 @@ are given in the order of the variables for the ring, as supplied when the
 ring was created.
 
 ```julia
-exponent_vectors(a::MyMPoly{T}) where T <: RingElement
-```
-
-Return an array whose entries are the exponent vectors for each of the terms
-of the polynomial.
-
-```julia
 setcoeff!(a::MyMPoly, exps::Vector{Int}, c::S) where S <: RingElement
 ```
 
@@ -518,7 +529,6 @@ c2 = coeff(f, x^3*y)
 m = monomial(f, 2)
 e1 = exponent(f, 1, 1)
 v1 = exponent_vector(f, 1)
-V = exponent_vectors(f)
 t1 = term(f, 1)
 setcoeff!(f, [3, 1], 12)
 ```
