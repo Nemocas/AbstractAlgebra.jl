@@ -288,3 +288,57 @@ f(M1, M2, M3)
 f(M1, ZZ(2), M3)
 f(M1, ZZ(2), 3)
 ```
+
+## Leading coefficients, leading monomials and leading terms
+
+The leading coefficient, leading monomial and leading term of a polynomial p are returned by the following functions:
+
+```@docs
+lc(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+```@docs
+lm(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+```@docs
+lt(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
+**Examples**
+
+
+```julia
+using AbstractAlgebra
+R,(x,y) = PolynomialRing(ZZ, ["x", "y"], ordering=:deglex)
+p = 2*x*y + 3*y^3
+lt(p)
+lm(p)
+lc(p)
+lt(p) == lc(p) * lm(p)
+```
+
+## Least common multiple, greatest common divisor
+
+The greated common divisor of two polynomials a and b is returned by
+
+```@docs
+gcd(a::AbstractAlgebra.Generic.MPoly{T}, b::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
+```
+
+The least common multiple of two polynomials a and b is returned by
+
+```@docs
+lcm(a::AbstractAlgebra.MPolyElem{T}, b::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
+```
+
+**Examples**
+
+```julia
+using AbstractAlgebra
+R,(x,y) = PolynomialRing(ZZ, ["x", "y"])
+a = x*y + 2*y
+b = x^3*y + y
+gcd(a,b)
+lcm(a,b)
+lcm(a,b) == a * b // gcd(a,b)
+```
+
