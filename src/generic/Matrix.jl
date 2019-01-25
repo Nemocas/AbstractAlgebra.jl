@@ -1909,9 +1909,10 @@ function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.M
    pt1 = base_ring(R)(1 - b2)
    l = 1
    i = 1
+   pt = 1
    while l <= bound
-      y[l] = base_ring(R)(i - b2)
-      (y[l] == pt1 && i != 1) && error("Not enough interpolation points in ring")
+      y[l] = base_ring(R)(pt - b2)
+      (y[l] == pt1 && pt != 1) && error("Not enough interpolation points in ring")
       for j = 1:m
          for k = 1:m
             X[j, k] = evaluate(M[j, k], y[l])
@@ -1927,16 +1928,18 @@ function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.M
          if !(e isa ErrorException)
             rethrow(e)
          end
+         i = i + 1
       end
 
-      # We tested i values and for each of them it was not solvable.
-      # Thus for i values the matrix X is singular.
+      # We tested bound evaluation points and either an impossible
+      # inverse was encountered, or the matrix was singular for all
+      # the values.
 
-      if i > bound
-         error("Singular matrix in solve_interpolation")
+      if i > bound && l == 1
+         error("Impossible inverse or too many singular matrices in solve_interpolation")
       end
 
-      i = i + 1
+      pt = pt + 1
    end
    for k = 1:h
       for i = 1:m
