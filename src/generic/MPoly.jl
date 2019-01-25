@@ -3415,6 +3415,10 @@ end
 #
 ###############################################################################
 
+@doc Markdown.doc"""
+    gcd(a::AbstractAlgebra.Generic.MPoly{T}, a::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
+> Return the greatest common divisor of a and b in parent(a).
+"""
 function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    if length(a) == 0
       if b.length == 0
