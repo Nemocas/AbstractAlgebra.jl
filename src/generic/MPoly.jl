@@ -559,7 +559,7 @@ function coeff(x::MPoly, i::Int)
 end
 
 @doc Markdown.doc"""
-    lc(p::MPoly)
+    lc(p::MPolyElem)
 > Return the leading coefficient of the polynomial p.
 """
 function lc(p::MPolyElem{T}) where T <: RingElement
@@ -584,7 +584,7 @@ function monomial(x::MPoly, i::Int)
 end
 
 @doc Markdown.doc"""
-    lm(p::MPoly)
+    lm(p::MPolyElem)
 > Return the leading monomial of the polynomial p.
 """
 function lm(p::MPolyElem{T}) where T <: RingElement
@@ -596,7 +596,7 @@ function lm(p::MPolyElem{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    lt(p::MPoly)
+    lt(p::MPolyElem)
 > Return the leading term of the polynomial p.
 """
 function lt(p::MPolyElem{T}) where T <: RingElement
@@ -3521,8 +3521,8 @@ function gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    lcm(a::AbstractAlgebra.MPoly{T}, a::AbstractAlgebra.MPoly{T}) where {T <: RingElement}
-    > Return the least common multiple of a and b in parent(a).
+    lcm(a::AbstractAlgebra.MPolyElem{T}, a::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
+> Return the least common multiple of a and b in parent(a).
 """
 function lcm(a::MPolyElem{T}, b::MPolyElem{T}) where {T <: RingElement}
    if iszero(a) && iszero(b)
