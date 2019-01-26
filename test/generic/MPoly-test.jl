@@ -564,6 +564,34 @@ function test_gen_mpoly_gcd()
    println("PASS")
 end
 
+function test_gen_mpoly_lcm()
+   print("Generic.MPoly.lcm...")
+
+   for num_vars = 1:4
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+      S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
+
+      for iter = 1:10
+         f = rand(S, 0:4, 0:5, -10:10)
+         g = rand(S, 0:4, 0:5, -10:10)
+         h = rand(S, 0:4, 0:5, -10:10)
+
+         l1 = lcm(f, g)
+         l2 = lcm(f*h, g*h)
+
+         @test l2 == l1*h || l2 == -l1*h
+         @test divides(l1, f)[1]
+         @test divides(l1, g)[1]
+         @test divides(l2, f)[1]
+         @test divides(l2, g)[1]
+         @test divides(l2, h)[1]
+      end
+   end
+
+   println("PASS")
+end
+
 function test_gen_mpoly_evaluation()
    print("Generic.MPoly.evaluation...")
 
@@ -1235,6 +1263,89 @@ function test_gen_mpoly_isless()
    println("PASS")
 end
 
+function test_gen_mpoly_lt()
+   for num_vars=1:10
+      ord = rand_ordering()
+      var_names = ["x$j" for j in 1:num_vars]
+
+      R, vars_R = PolynomialRing(ZZ, var_names; ordering=ord)
+      
+      f = rand(R, 5:10, 1:10, -100:100)
+      g = rand(R, 5:10, 1:10, -100:100)
+
+      @test lt(f*g) == lt(f)*lt(g)
+      @test lt(one(R)) == one(R)
+      @test lt(zero(R)) == zero(R)
+
+      for v in vars_R
+         @test lt(v) == v
+      end
+
+      @test parent(lt(f)) == parent(f)
+   end
+end
+
+function test_gen_mpoly_lc()
+   print("Generic.MPoly.lc...")
+
+   for num_vars = 1:4
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+      S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
+
+      for iter = 1:10
+         f = rand(S, 0:4, 0:5, -10:10)
+         g = rand(S, 0:4, 0:5, -10:10)
+
+         @test lc(f*g) == lc(f)*lc(g)
+         @test lc(one(S)) == one(base_ring(S))
+
+         for v in varlist
+            @test lc(v) == one(base_ring(S))
+         end
+
+         @test parent(lc(f)) == base_ring(f)
+      end
+   end
+
+   println("PASS")
+end
+
+function test_gen_mpoly_lm()
+   print("Generic.MPoly.lm...")
+
+   for num_vars = 1:4
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+      S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
+
+      for iter = 1:10
+         f = zero(S)
+         while iszero(f)
+            f = rand(S, 0:4, 0:5, -10:10)
+         end
+         g = zero(S)
+         while iszero(g)
+            g = rand(S, 0:4, 0:5, -10:10)
+         end
+
+         @test lm(f*g) == lm(f)*lm(g)
+         @test lm(one(S)) == one(S)
+         @test lm(zero(S)) == zero(S)
+
+         for v in varlist
+            @test lm(v) == v
+         end
+
+         @test parent(lm(f)) == parent(f)
+      end
+   end
+
+   println("PASS")
+end
+
+
+
 function test_gen_mpoly()
    test_gen_mpoly_constructors()
    test_gen_mpoly_manipulation()
@@ -1260,6 +1371,10 @@ function test_gen_mpoly()
    test_gen_mpoly_to_univariate()
    test_gen_mpoly_coefficients_of_univariate()
    test_gen_mpoly_isless()
+   test_gen_mpoly_lc()
+   test_gen_mpoly_lm()
+   test_gen_mpoly_lt()
+   test_gen_mpoly_lcm()
 
    println("")
 end
