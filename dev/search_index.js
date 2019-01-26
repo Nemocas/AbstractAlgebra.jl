@@ -1681,6 +1681,62 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "mpolynomial/#AbstractAlgebra.Generic.lc-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.lc",
+    "category": "method",
+    "text": "lc(p::MPolyElem)\n\nReturn the leading coefficient of the polynomial p.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial/#AbstractAlgebra.Generic.lm-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.lm",
+    "category": "method",
+    "text": "lm(p::MPolyElem)\n\nReturn the leading monomial of the polynomial p.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial/#AbstractAlgebra.Generic.lt-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.lt",
+    "category": "method",
+    "text": "lt(p::MPolyElem)\n\nReturn the leading term of the polynomial p.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial/#Leading-coefficients,-leading-monomials-and-leading-terms-1",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "Leading coefficients, leading monomials and leading terms",
+    "category": "section",
+    "text": "The leading coefficient, leading monomial and leading term of a polynomial p are returned by the following functions:lc(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElementlm(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElementlt(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElementExamplesusing AbstractAlgebra\nR,(x,y) = PolynomialRing(ZZ, [\"x\", \"y\"], ordering=:deglex)\np = 2*x*y + 3*y^3\nlt(p)\nlm(p)\nlc(p)\nlt(p) == lc(p) * lm(p)"
+},
+
+{
+    "location": "mpolynomial/#Base.gcd-Union{Tuple{T}, Tuple{MPoly{T},MPoly{T}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "Base.gcd",
+    "category": "method",
+    "text": "gcd(a::AbstractAlgebra.Generic.MPoly{T}, a::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}\n\nReturn the greatest common divisor of a and b in parent(a).\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial/#Base.lcm-Union{Tuple{T}, Tuple{MPolyElem{T},MPolyElem{T}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "Base.lcm",
+    "category": "method",
+    "text": "lcm(a::AbstractAlgebra.MPolyElem{T}, a::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}\n\nReturn the least common multiple of a and b in parent(a).\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial/#Least-common-multiple,-greatest-common-divisor-1",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "Least common multiple, greatest common divisor",
+    "category": "section",
+    "text": "The greated common divisor of two polynomials a and b is returned bygcd(a::AbstractAlgebra.Generic.MPoly{T}, b::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}The least common multiple of two polynomials a and b is returned bylcm(a::AbstractAlgebra.MPolyElem{T}, b::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}Examplesusing AbstractAlgebra\nR,(x,y) = PolynomialRing(ZZ, [\"x\", \"y\"])\na = x*y + 2*y\nb = x^3*y + y\ngcd(a,b)\nlcm(a,b)\nlcm(a,b) == a * b // gcd(a,b)"
+},
+
+{
     "location": "series_rings/#",
     "page": "Series Ring Interface",
     "title": "Series Ring Interface",
