@@ -1015,6 +1015,9 @@ function lu(A::MatrixElem{T}, P = PermGroup(rows(A))) where {T <: FieldElement}
 end
 
 function fflu!(P::Generic.perm, A::MatrixElem{T}) where {T <: RingElement}
+   if !isdomain_type(T)
+      error("Not implemented")
+   end
    m = rows(A)
    n = cols(A)
    rank = 0
@@ -1069,7 +1072,7 @@ function fflu!(P::Generic.perm, A::MatrixElem{T}) where {T <: RingElement}
    return rank, d2
 end
 
-function fflu!(P::Generic.perm, A::MatrixElem{T}) where {T <: FieldElement}
+function fflu!(P::Generic.perm, A::MatrixElem{T}) where {T <: Union{FieldElement, ResElem}}
    m = rows(A)
    n = cols(A)
    rank = 0
@@ -1129,9 +1132,9 @@ end
 > Return a tuple $r, d, p, L, U$ consisting of the rank of $A$, a
 > denominator $d$, a permutation $p$ of $A$ belonging to $P$, a lower
 > triangular matrix $L$ and an upper triangular matrix $U$ such that
-> $p(A) = LD^1U$, where $p(A)$ stands for the matrix whose rows are the given
+> $p(A) = LDU$, where $p(A)$ stands for the matrix whose rows are the given
 > permutation $p$ of the rows of $A$ and such that $D$ is the diagonal matrix
-> diag$(p_1, p_1p_2, \ldots, p_{n-2}p_{n-1}, p_{n-1}$ where the $p_i$ are the
+> diag$(p_1, p_1p_2, \ldots, p_{n-2}p_{n-1}, p_{n-1})$ where the $p_i$ are the
 > inverses of the diagonal entries of $U$. The denominator $d$ is set to
 > $\pm \mbox{det}(S)$ where $S$ is an appropriate submatrix of $A$ ($S = A$ if
 > $A$ is square) and the sign is decided by the parity of the permutation.
@@ -4197,6 +4200,9 @@ function randmat_triu(S::AbstractAlgebra.MatSpace, v...)
 end
 
 function randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: AbstractAlgebra.RingElement}
+   if !isdomain_type(T) && !(T <: ResElem)
+      error("Not implemented")
+   end
    M = S()
    R = base_ring(S)
    for i = 1:rank

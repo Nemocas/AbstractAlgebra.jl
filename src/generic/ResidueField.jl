@@ -35,7 +35,7 @@ base_ring(r::AbstractAlgebra.ResFieldElem) = base_ring(parent(r))
 """
 parent(a::AbstractAlgebra.ResFieldElem) = a.parent
 
-isdomain_type(a::Type{T}) where T <: AbstractAlgebra.ResFieldElem = false
+isdomain_type(a::Type{T}) where T <: AbstractAlgebra.ResFieldElem = true
 
 function isexact_type(a::Type{T}) where {S <: RingElement, T <: AbstractAlgebra.ResFieldElem{S}}
    return isexact_type(S)
