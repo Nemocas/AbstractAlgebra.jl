@@ -531,11 +531,11 @@ end
 #
 ###############################################################################
 
-function Base.iterate(A::AllPerms{<: Integer})
+@inline function Base.iterate(A::AllPerms{<: Integer})
    return A.elts, 1
 end
 
-function Base.iterate(A::AllPerms{<: Integer}, count)
+@inline function Base.iterate(A::AllPerms{<: Integer}, count)
    if count >= A.all
      # Reset the iterator to make it iterable again
      for i in 1:length(A.c)
