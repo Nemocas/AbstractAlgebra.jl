@@ -12,7 +12,7 @@ include("julia/GF.jl")
                                           
 //(x::Union{Integer, Rational}, y::T) where {T <: RingElem} = parent(y)(x)//y
 
-divrem(a::T, b::T) where {T <: FieldElem} = divexact(a, b), zero(parent(a))
+divrem(a::T, b::T) where {T <: FieldElement} = divexact(a, b), zero(parent(a))
 
 div(a::T, b::T) where {T <: FieldElem} = divexact(a, b)
 
