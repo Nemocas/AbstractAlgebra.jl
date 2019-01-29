@@ -10,7 +10,7 @@ import_exclude = [:import_exclude, :QQ, :ZZ, :RR,
            :AbstractAlgebra,
            :exp, :sqrt, :numerator, :denominator,
            :promote_rule,
-           :Set, :Module, :Ring, :Group, :Field]
+           :Set, :Module, :Ring, :Group, :Field, :divrem]
 
 import LinearAlgebra: det, norm, nullspace, rank, transpose!, hessenberg
 
@@ -18,11 +18,11 @@ import LinearAlgebra: lu, lu!, tr
 
 export nullspace
 
-# Do not import exp, sqrt, numerator or denominator as we define our own
+# Do not import divrem, exp, sqrt, numerator or denominator as we define our own
 import Base: Array, abs, acos, acosh, asin, asinh, atan, atanh,
              bin, ceil, checkbounds, conj, convert, cmp, cos, cosh,
              cospi, cot, coth, dec, deepcopy, deepcopy_internal, 
-             div, divrem, expm1, exponent, fill, floor, gcd, gcdx,
+             div, expm1, exponent, fill, floor, gcd, gcdx,
              getindex, hash, hcat, hex, hypot, intersect, inv, invmod, isequal,
              isfinite, isless, isone, isqrt, isreal, iszero, lcm, ldexp, length,
              log, log1p, mod, ndigits, 
@@ -114,7 +114,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached,
                  det_df, det_fflu, det_popov, dim, disable_cache!, 
                  discriminant, displayed_with_minus_in_front,
                  divexact, divexact_left, divexact_right, divides,
-                 divrem, domain, downscale,
+                 domain, downscale,
                  elem_type, enable_cache!, evaluate, exp_gcd,
                  exponent, exponent_vector, exponent_vectors,
                  extended_weak_popov, extended_weak_popov_with_trafo, fflu!,
@@ -168,7 +168,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached,
                  weak_popov_with_trafo, zero,
                  zero!, zero_matrix, @PolynomialRing
 
-# Do not export exp, sqrt, numerator and denominator as we define our own
+# Do not export divrem, exp, sqrt, numerator and denominator as we define our own
 export add!, addeq!, addmul!, addmul_delayed_reduction!, base_ring, cached,
                  canonical_unit, change_base_ring, character,
                  characteristic, charpoly, charpoly_danilevsky!,
@@ -181,7 +181,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, base_ring, cached,
                  det_df, det_fflu, det_popov, dim, disable_cache!,
                  discriminant, displayed_with_minus_in_front,
                  divexact, divexact_left, divexact_right, divides,
-                 divrem, domain, downscale,
+                 domain, downscale,
                  elem_type, enable_cache!, evaluate, exp_gcd,
                  exponent, exponent_vector, exponent_vectors,
                  extended_weak_popov, extended_weak_popov_with_trafo, fflu!,
@@ -238,6 +238,10 @@ end
 
 function sqrt(a::T) where T
   return Base.sqrt(a)
+end
+
+function divrem(a::T, b::T) where T
+  return Base.divrem(a, b)
 end
 
 function numerator(a::T, canonicalise::Bool=true) where T

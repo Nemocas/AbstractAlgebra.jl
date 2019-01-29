@@ -2766,7 +2766,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
             monomial_set!(Re, l, exp_copy, 1, N)
             k -= 1
          else
-            tq, tr = divrem(qc, mb)
+            tq, tr = AbstractAlgebra.divrem(qc, mb)
             if tr != 0
                l += 1
                if l >= r_alloc
