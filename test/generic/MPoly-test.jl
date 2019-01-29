@@ -457,7 +457,12 @@ function test_gen_mpoly_euclidean_division()
          @test q3*f + r3 == g
          @test q3 == q4
          @test (r3 == 0 && flag == true && q5 == q3) || (r3 != 0 && flag == false)
+         
       end
+      
+      S, varlist = PolynomialRing(QQ, var_names, ordering = ord)
+      v = varlist[1+Int(round(rand() * (num_vars-1)))]
+      @test divrem(v, 2*v) == (1//2, 0)
    end
 
    println("PASS")
