@@ -1353,6 +1353,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "mpolynomial_rings/#Constructors-1",
+    "page": "Multivariate Polynomial Ring Interface",
+    "title": "Constructors",
+    "category": "section",
+    "text": "To construct a multivariate polynomial ring, there is the following constructor.PolynomialRing(R::Ring, s::Vector{AbstractString}; ordering=:lex, cached=true)Returns a tuple, S, vars consisting of a polynomial ring S and an array of generators (variables) which print according to the strings in the supplied vector s. The ordering can at present be :lex, :deglex or :degrevlex. By default, the polynomial ring is cached, and creating a polynomial ring with the same data will return the same ring object S. If this caching is not desired, it can be switched off by setting cached=false.Polynomials in a given ring can be constructed using the generators and basic polynomial arithmetic. However, this is inefficient and the following build context is provided for building polynomials term-by-term. It assumes the polynomial data type is random access, and so the constructor functions must be reimplemented for all other types of polynomials.MPolyBuildCtx(R::MPolyRing)Return a build context for creating polynomials in the given polynomial ring.push_term!(M::MPolyBuildCtx, c::RingElem, v::Vector{Int})Add the term with coefficient c and exponent vector v to the polynomial under construction in the build context M.finish(M::MPolyBuildCtx)Finish construction of the polynomial, sort the terms, remove duplicate and zero terms and return the created polynomial.ExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nM = MPolyBuildCtx(R)\npush_term!(C, ZZ(3), [1, 2])\npush_term!(C, ZZ(2), [1, 1])\npush_term!(C, ZZ(4), [0, 0])\np = finish(C)"
+},
+
+{
     "location": "mpolynomial_rings/#Data-type-and-parent-object-methods-1",
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Data type and parent object methods",
