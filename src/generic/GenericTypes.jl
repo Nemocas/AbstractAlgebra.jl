@@ -448,6 +448,15 @@ struct MPolyMonomials{T <: AbstractAlgebra.MPolyElem}
    poly::T
 end
 
+mutable struct MPolyBuildCtx{T <: AbstractAlgebra.MPolyElem, S}
+  poly::T
+  state::S
+
+  function MPolyBuildCtx(R::T, s::S) where {S, T <: AbstractAlgebra.MPolyRing}
+    return new{elem_type(T), S}(R())
+  end
+end
+
 ###############################################################################
 #
 #   SparsePolyRing / SparsePoly
