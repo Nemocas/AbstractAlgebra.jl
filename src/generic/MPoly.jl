@@ -2550,7 +2550,7 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
          if !d1
             k -= 1
          else
-            tq, tr = divrem(qc, mb)
+            tq, tr = AbstractAlgebra.divrem(qc, mb)
             if tq != 0
                Qc[k] = tq
                monomial_set!(Qe, k, texp, 1, N)
@@ -2986,7 +2986,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
          for w = 1:len
             d1 = monomial_divides!(texp, 1, exp_copy, 1, b[w].exps, 1, mask, N)
             if d1
-               tq, qc = divrem(qc, mb[w])
+               tq, qc = AbstractAlgebra.divrem(qc, mb[w])
                div_flag = qc == 0
                if tq != 0
                   k[w] += 1
@@ -3536,6 +3536,7 @@ function lcm(a::MPolyElem{T}, b::MPolyElem{T}) where {T <: RingElement}
       return divrem(a * b, gcd(a,b))[1]
    end
 end
+
 function term_gcd(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    if a.length < 1
       return b
