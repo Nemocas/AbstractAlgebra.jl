@@ -60,7 +60,7 @@ function test_gen_mpoly_constructors()
       C = MPolyBuildCtx(S)
 
       for i = 1:5
-         push_term!(C, coeff(f1, i), exponent_vector(f1, i))
+         push_term!(C, V[i], W1[i])
       end
       f3 = finish(C)
 
