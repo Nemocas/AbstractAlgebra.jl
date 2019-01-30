@@ -12,7 +12,8 @@ export max_fields, total_degree, gens, divides, isconstant, isdegree,
        derivative, change_base_ring,  to_univariate, degrees, deflation,
        combine_like_terms!, exponent, exponent_vector, exponent_vectors,
        set_exponent_vector!, sort_terms!, coeffs, monomial, monomial!,
-       monomials, term, terms, var_index, @PolynomialRing, lc, lm, lt, lcm
+       monomials, term, terms, var_index, @PolynomialRing, lc, lm, lt, lcm,
+       MPolyBuildCtx
 
 ###############################################################################
 #
@@ -4410,6 +4411,32 @@ function coefficients_of_univariate(p::AbstractAlgebra.MPolyElem, check_univaria
    end
    
    return(coeffs)
+end
+
+###############################################################################
+#
+#   Build context
+#
+###############################################################################
+
+function MPolyBuildCtx(R::AbstractAlgebra.MPolyRing)
+   return MPolyBuildCtx(R, Nothing)
+end
+
+function show(io::IO, M::MPolyBuildCtx)
+   print(io, "Builder for a polynomial in ", parent(M.poly))
+end
+
+function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+  len = length(M.poly) + 1
+  set_exponent_vector!(M.poly, len, expv)
+  setcoeff!(M.poly, len, c)
+end
+
+function finish(M::MPolyBuildCtx{T}) where T <: AbstractAlgebra.MPolyElem
+  M.poly = sort_terms!(M.poly)
+  M.poly = combine_like_terms!(M.poly)
+  return M.poly
 end
 
 ###############################################################################

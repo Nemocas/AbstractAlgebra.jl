@@ -56,6 +56,15 @@ function test_gen_mpoly_constructors()
       f2 = combine_like_terms!(f2)
 
       @test f1 == f2
+
+      C = MPolyBuildCtx(S)
+
+      for i = 1:5
+         push_term!(C, coeff(f1, i), exponent_vector(f1, i))
+      end
+      f3 = finish(C)
+
+      @test f1 == f3
    end
 
    println("PASS")
