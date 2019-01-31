@@ -83,6 +83,24 @@ function test_Floats_exact_division()
    println("PASS")
 end
 
+function test_Float_divrem()
+   print("Julia.Float.divrem...")
+
+   R = RealField
+
+   for iter = 1:1000
+      r = rand(R, -100:100)
+      s = zero(R)
+      while iszero(s)
+         s = rand(R, -100:100)
+      end
+
+      @test AbstractAlgebra.divrem(r,s) == (r/s,0)
+   end
+
+   println("PASS")
+end
+
 function test_Floats_gcd()
    print("Julia.Floats.gcd...")
   

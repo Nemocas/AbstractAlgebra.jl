@@ -141,6 +141,24 @@ function test_Rationals_square_root()
    println("PASS")
 end
 
+function test_Rationals_divrem()
+   print("Julia.Rationals.divrem...")
+  
+   R = qq
+   S = QQ
+
+   for iter = 1:1000
+      r = rand(R, -100:100)
+      s = zero(R)
+      while iszero(s)
+         s = rand(R, -100:100)
+      end
+      
+      @test AbstractAlgebra.divrem(r,s) == (r/s,0)
+   end
+
+   println("PASS")
+end
 
 function test_Rationals()
    test_Rationals_constructors()
@@ -148,6 +166,7 @@ function test_Rationals()
    test_Rationals_exact_division()
    test_Rationals_gcd()
    test_Rationals_square_root()
+   test_Rationals_divrem()
    
    println("")
 end

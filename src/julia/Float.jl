@@ -92,6 +92,10 @@ function divides(a::BigFloat, b::BigFloat)
    end
 end
 
+function divrem(a::BigFloat, b::BigFloat)
+   return a/b, 0
+end
+
 ###############################################################################
 #
 #   GCD
