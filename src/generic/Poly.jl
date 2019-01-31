@@ -200,7 +200,7 @@ isterm(a::T) where {T <: RingElement} = true
 
 @doc Markdown.doc"""
     isterm(a::Generic.PolynomialElem)
-> Return `true` if the given polynomial is has one term. This function is
+> Return `true` if the given polynomial has one term. This function is
 > recursive, with all scalar types returning true.
 """
 function isterm(a::PolynomialElem)
@@ -1190,7 +1190,7 @@ end
 
 @doc Markdown.doc"""
     pseudorem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
-> Return the pseudoremainder of $a$ divided by $b$. If $b = 0$ we throw a
+> Return the pseudoremainder of $f$ divided by $g$. If $g = 0$ we throw a
 > `DivideError()`.
 """
 function pseudorem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
@@ -1212,7 +1212,7 @@ end
 @doc Markdown.doc"""
     pseudodivrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Return a tuple $(q, r)$ consisting of the pseudoquotient and pseudoremainder
-> of $a$ divided by $b$. If $b = 0$ we throw a `DivideError()`.
+> of $f$ divided by $g$. If $g = 0$ we throw a `DivideError()`.
 """
 function pseudodivrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
    check_parent(f, g)
@@ -2000,7 +2000,7 @@ end
 
 @doc Markdown.doc"""
     discriminant(a::AbstractAlgebra.PolyElem)
-> Return the discrimnant of the given polynomial.
+> Return the discriminant of the given polynomial.
 """
 function discriminant(a::AbstractAlgebra.PolyElem)
    d = derivative(a)
