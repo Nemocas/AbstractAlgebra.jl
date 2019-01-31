@@ -39,7 +39,7 @@ One can easily iterate over all partitions of $n$ using the `AllParts` type:
 Generic.AllParts
 ```
 
-The number all all partitions can be computed by the hidden function `_numpart`.
+The number of all partitions can be computed by the hidden function `_numpart`.
 Much faster implementation is available in [Nemo.jl](http://nemocas.github.io/Nemo.jl/latest/arb.html#Nemo.numpart-Tuple{Int64,ArbField}).
 
 ```@docs
