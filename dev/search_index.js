@@ -3341,7 +3341,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Basic manipulation of matrices",
     "category": "section",
-    "text": "rows(f::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the number of rows of the given matrix.cols(f::MyMat{T}) where T <: AbstractAlgebra.RingElemReturns the number of columns of the given matrix.getindex(M::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElemReturn the (i j)-th entry of the matrix M.setindex!(M::MyMat{T}, d::T, r::Int, c::Int) where T <: AbstractAlgebra.RingElemSet the (i j)-th entry of the matrix M to d, which is assumed to be in the base ring of the matrix. The matrix must have such an entry and the matrix is mutated in place and not returned from the function.ExamplesM = matrix(ZZ, BigInt[2 3 0; 1 1 1])\n\nm = rows(M)\nn = cols(M)\nM[1, 2] = BigInt(4)\nc = M[1, 1]"
+    "text": "nrows(f::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the number of rows of the given matrix.ncols(f::MyMat{T}) where T <: AbstractAlgebra.RingElemReturns the number of columns of the given matrix.getindex(M::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElemReturn the (i j)-th entry of the matrix M.setindex!(M::MyMat{T}, d::T, r::Int, c::Int) where T <: AbstractAlgebra.RingElemSet the (i j)-th entry of the matrix M to d, which is assumed to be in the base ring of the matrix. The matrix must have such an entry and the matrix is mutated in place and not returned from the function.ExamplesM = matrix(ZZ, BigInt[2 3 0; 1 1 1])\n\nm = nrows(M)\nn = ncols(M)\nM[1, 2] = BigInt(4)\nc = M[1, 1]"
 },
 
 {
@@ -3457,19 +3457,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "matrix/#AbstractAlgebra.Generic.rows-Tuple{MatElem}",
+    "location": "matrix/#AbstractAlgebra.Generic.nrows-Tuple{MatElem}",
     "page": "Generic matrices",
-    "title": "AbstractAlgebra.Generic.rows",
+    "title": "AbstractAlgebra.Generic.nrows",
     "category": "method",
-    "text": "rows(a::Generic.MatrixElem)\n\nReturn the number of rows of the given matrix.\n\n\n\n"
+    "text": "nrows(a::Generic.MatrixElem)\n\nReturn the number of nrows of the given matrix.\n\n\n\n"
 },
 
 {
-    "location": "matrix/#AbstractAlgebra.Generic.cols-Tuple{MatElem}",
+    "location": "matrix/#AbstractAlgebra.Generic.ncols-Tuple{MatElem}",
     "page": "Generic matrices",
-    "title": "AbstractAlgebra.Generic.cols",
+    "title": "AbstractAlgebra.Generic.ncols",
     "category": "method",
-    "text": "cols(a::Generic.MatrixElem)\n\nReturn the number of columns of the given matrix.\n\n\n\n"
+    "text": "ncols(a::Generic.MatrixElem)\n\nReturn the number of columns of the given matrix.\n\n\n\n"
 },
 
 {
@@ -3477,7 +3477,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Basic matrix functionality",
     "category": "section",
-    "text": "As well as the Ring and Matrix interfaces, the following functions are provided to manipulate matrices and to set and retrieve entries and other basic data associated with the matrices.rows(::MatElem)cols(::MatElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\nB = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])\n\nr = rows(B)\nc = cols(B)\nM = A + B\nN = 2 + A\nM1 = deepcopy(A)\nA != B\nisone(one(S)) == true\nV = A[1:2, :]\nW = A^3\nZ = divexact(2*A, 2)"
+    "text": "As well as the Ring and Matrix interfaces, the following functions are provided to manipulate matrices and to set and retrieve entries and other basic data associated with the matrices.nrows(::MatElem)ncols(::MatElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\nB = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])\n\nr = nrows(B)\nc = ncols(B)\nM = A + B\nN = 2 + A\nM1 = deepcopy(A)\nA != B\nisone(one(S)) == true\nV = A[1:2, :]\nW = A^3\nZ = divexact(2*A, 2)"
 },
 
 {
@@ -3573,7 +3573,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "AbstractAlgebra.Generic.fflu",
     "category": "method",
-    "text": "fflu(A::Generic.MatrixElem{T}, P = PermGroup(rows(A))) where {T <: RingElement}\n\nReturn a tuple r d p L U consisting of the rank of A, a denominator d, a permutation p of A belonging to P, a lower triangular matrix L and an upper triangular matrix U such that p(A) = LDU, where p(A) stands for the matrix whose rows are the given permutation p of the rows of A and such that D is the diagonal matrix diag(p_1 p_1p_2 ldots p_n-2p_n-1 p_n-1) where the p_i are the inverses of the diagonal entries of U. The denominator d is set to pm mboxdet(S) where S is an appropriate submatrix of A (S = A if A is square) and the sign is decided by the parity of the permutation.\n\n\n\n"
+    "text": "fflu(A::Generic.MatrixElem{T}, P = PermGroup(nrows(A))) where {T <: RingElement}\n\nReturn a tuple r d p L U consisting of the rank of A, a denominator d, a permutation p of A belonging to P, a lower triangular matrix L and an upper triangular matrix U such that p(A) = LDU, where p(A) stands for the matrix whose rows are the given permutation p of the rows of A and such that D is the diagonal matrix diag(p_1 p_1p_2 ldots p_n-2p_n-1 p_n-1) where the p_i are the inverses of the diagonal entries of U. The denominator d is set to pm mboxdet(S) where S is an appropriate submatrix of A (S = A if A is square) and the sign is decided by the parity of the permutation.\n\n\n\n"
 },
 
 {
