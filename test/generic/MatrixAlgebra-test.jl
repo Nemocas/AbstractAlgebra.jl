@@ -15,8 +15,8 @@ function randprime(n::Int)
 end
 
 function istriu(A::Generic.MatAlgElem)
-   m = rows(A)
-   n = cols(A)
+   m = nrows(A)
+   n = ncols(A)
    d = 0
    for c = 1:n
       for r = m:-1:1
@@ -33,8 +33,8 @@ function istriu(A::Generic.MatAlgElem)
 end
 
 function is_snf(A::Generic.MatAlgElem)
-   m = rows(A)
-   n = cols(A)
+   m = nrows(A)
+   n = ncols(A)
    a = A[1,1]
    for i = 2:min(m,n)
       q, r = divrem(A[i,i], a)
@@ -58,8 +58,8 @@ end
 
 function is_weak_popov(P::Generic.MatAlgElem, rank::Int)
    zero_rows = 0
-   pivots = zeros(cols(P))
-   for r = 1:rows(P)
+   pivots = zeros(ncols(P))
+   for r = 1:nrows(P)
       p = AbstractAlgebra.find_pivot_popov(P, r)
       if P[r,p] == 0
          zero_rows += 1
@@ -70,7 +70,7 @@ function is_weak_popov(P::Generic.MatAlgElem, rank::Int)
       end
       pivots[p] = r
    end
-   if zero_rows != rows(P)-rank
+   if zero_rows != nrows(P)-rank
       return false
    end
    return true
@@ -161,8 +161,8 @@ function test_gen_matalg_manipulation()
    B[1, 1] = BigInt(5)
    @test B[1, 1] == R(5)
 
-   @test rows(B) == 3
-   @test cols(B) == 3
+   @test nrows(B) == 3
+   @test ncols(B) == 3
 
    @test deepcopy(A) == A
 
@@ -628,8 +628,8 @@ function test_gen_matalg_solve_lu()
       M = randmat_with_rank(R, dim, 0:5, -100:100)
       b = rand(U, 0:5, -100:100);
 
-      MK = T(elem_type(K)[ K(M[i, j]) for i in 1:rows(M), j in 1:cols(M) ])
-      bK = T(elem_type(K)[ K(b[i, j]) for i in 1:rows(b), j in 1:cols(b) ])
+      MK = T(elem_type(K)[ K(M[i, j]) for i in 1:nrows(M), j in 1:ncols(M) ])
+      bK = T(elem_type(K)[ K(b[i, j]) for i in 1:nrows(b), j in 1:ncols(b) ])
 
       x = Generic.solve_lu(MK, bK)
 

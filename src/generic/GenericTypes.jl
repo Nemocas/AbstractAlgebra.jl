@@ -831,8 +831,8 @@ end
 
 # not really a mathematical ring
 mutable struct MatSpace{T <: RingElement} <: AbstractAlgebra.MatSpace{T}
-   rows::Int
-   cols::Int
+   nrows::Int
+   ncols::Int
    base_ring::Ring
 
    function MatSpace{T}(R::Ring, r::Int, c::Int, cached::Bool = true) where T <: RingElement
