@@ -51,14 +51,14 @@ divides(f::MyElem, g::MyElem)
 ```
 
 Returns a pair, `flag, q`, where `flag` is set to `true` if $g$ divides $f$, in which
-case the quotient is set to the quotient, or `flag` is set to `false` and the quotient
+case the quotient is set to the quotient or `flag` is set to `false` and the quotient
 is set to zero in the same ring as $f$ and $g$.
 
 ```julia
 remove(f::MyElem, p::MyElem)
 ```
 
-Returns a pair `v, q` where $p^v$ is the highest power of $p$ dividing $f$, and $q$ is
+Returns a pair `v, q` where $p^v$ is the highest power of $p$ dividing $f$ and $q$ is
 the cofactor after $f$ is divided by this power.
 
 ```julia

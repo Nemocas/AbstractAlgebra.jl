@@ -39,7 +39,7 @@ There are several methods to to construct permutations in AbstractAlgebra.jl.
 Generic.perm
 ```
 
-  Since the parent object can be reconstructed from the permutation itself, you can work with permutations without explicitely constructing the parent object.
+  Since the parent object can be reconstructed from the permutation itself, you can work with permutations without explicitly constructing the parent object.
 
 * The other way is to first construct the permutation group they belong to.
   This is accomplished with the inner constructor `PermGroup(n::Integer)` which
@@ -161,7 +161,7 @@ Thus, by default, `order` returns (always correct) `BigInt`s.
 If you are sure that the computation will not overflow, you may use `order(::Type{T}, ...)` to perform computations with machine integers.
 Julias standard promotion rules apply for the returned value.
 
-Since `PermGroup` implements the iterator protocole You may iterate over all permutations via simple
+Since `PermGroup` implements the iterator protocol You may iterate over all permutations via simple
 
 ```
 for p in PermutationGroup(n)
@@ -170,7 +170,7 @@ end
 ```
 Iteration over all permutations in reasonable time, (i.e. in terms of minutes) is possible when $n ≤ 13$.
 
-You may also use the non-allocating `Generic.elements!` function for $n ≤ 14$ (or even $15$ if you are patient enough), which is an order of mangitude faster.
+You may also use the non-allocating `Generic.elements!` function for $n ≤ 14$ (or even $15$ if you are patient enough), which is an order of magnitude faster.
 
 ```@docs
 Generic.elements!(::Generic.PermGroup)
@@ -179,7 +179,7 @@ Generic.elements!(::Generic.PermGroup)
 However, since all permutations yielded by `elements!` are aliased (modified "in-place"), `collect(Generic.elements!(PermGroup(n)))` returns a vector of identical permutations.
 
 !!! note
-    If you intend to use or store elements yielded by `elements!` you need to **deepcopy** them explicitely.
+    If you intend to use or store elements yielded by `elements!` you need to **deepcopy** them explicitly.
 
 ## Arithmetic operators
 

@@ -26,7 +26,7 @@ etc. See the file `src/generic/GenericTypes.jl` for details.
 
 Parent objects of such polynomials have type `Generic.PolyRing{T}`.
 
-The string representation of the variable of the polynomial ring, and the
+The string representation of the variable of the polynomial ring and the
 base/coefficient ring $R$ is stored in the parent object. 
 
 The polynomial element types belong to the abstract type `AbstractAlgebra.PolyElem{T}`

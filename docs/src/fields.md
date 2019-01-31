@@ -12,7 +12,7 @@ Most fields must supply two types:
   - a type for elements of that field
 
 For example, the generic fraction field type in AbstractAlgebra.jl provides two 
-types in generic/GenericTypes.jl: 
+types in `generic/GenericTypes.jl`: 
 
   - `Generic.FracField{T}` for the parent objects
   - `Generic.Frac{T}` for the actual fractions

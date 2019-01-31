@@ -39,7 +39,7 @@ One can easily iterate over all partitions of $n$ using the `AllParts` type:
 Generic.AllParts
 ```
 
-The number all all partitions can be computed by the hidden function `_numpart`.
+The number of all partitions can be computed by the hidden function `_numpart`.
 Much faster implementation is available in [Nemo.jl](http://nemocas.github.io/Nemo.jl/latest/arb.html#Nemo.numpart-Tuple{Int64,ArbField}).
 
 ```@docs
@@ -146,7 +146,7 @@ matrix_repr(::Generic.YoungTableau)
 fill!(::Generic.YoungTableau, ::AbstractVector{<:Integer})
 ```
 
-## Characters of permutation grups
+## Characters of permutation groups
 
 Irreducible characters (at least over field of characteristic $0$) of the full group of permutations $S_n$ correspond via [Specht modules](https://en.wikipedia.org/wiki/Specht_module) to partitions of $n$.
 
@@ -172,7 +172,7 @@ hooklength
 dim(::Generic.YoungTableau)
 ```
 
-The the character associated with `Y.part` can also be used to compute the dimension, but as it is expected the Murnaghan-Nakayama is much slower even though (due to caching) consecutive calls are fast:
+The character associated with `Y.part` can also be used to compute the dimension, but as it is expected the Murnaghan-Nakayama is much slower even though (due to caching) consecutive calls are fast:
 
 ```jldoctest
 julia> λ = Partition(collect(12:-1:1))

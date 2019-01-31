@@ -35,7 +35,7 @@ The top bit of each `UInt` is reserved for overflow detection.
 
 Parent objects of such polynomials have type `Generic.MPolyRing{T}`.
 
-The string representation of the variables of the polynomial ring, the
+The string representation of the variables of the polynomial ring and the
 base/coefficient ring $R$ and the ordering are stored in the parent object. 
 
 The polynomial element types belong to the abstract type `AbstractAlgebra.MPolyElem{T}`
