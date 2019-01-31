@@ -128,7 +128,7 @@ symbols(S::MyPolyRing{T}) where T <: AbstractAlgebra.RingElem
 
 Return the array `[s]` where `s	 is a `Symbol` representing the variable of the given
 polynomial ring. This is provided for uniformity with the multivariate interface, where
-there is more than one variable, and hence an array of symbols.
+there is more than one variable and hence an array of symbols.
 
 **Examples**
 
