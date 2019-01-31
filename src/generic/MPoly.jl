@@ -2110,7 +2110,6 @@ end
 > which (the deflation) gives the gcds of all the exponents after subtracting
 > the shift, again per variable. This functionality is used by gcd (and can be
 > used by factorisation algorithms).
-end)
 """
 function deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    N = nvars(parent(f))
