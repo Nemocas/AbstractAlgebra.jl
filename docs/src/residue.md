@@ -44,7 +44,7 @@ AbstractAlgebra.jl, whether generic or very specialised (e.g. supplied by a C li
 ## Residue ring constructors
 
 In order to construct residues in AbstractAlgebra.jl, one must first construct the
-resiude ring itself. This is accomplished with one of the following constructors.
+residue ring itself. This is accomplished with one of the following constructors.
 
 ```julia
 ResidueRing(R::AbstractAlgebra.Ring, m::AbstractAlgebra.RingElem; cached::Bool = true)
