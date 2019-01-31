@@ -147,7 +147,7 @@ domain(M::Map(MyMap))
 codomain(M::Map(MyMap))
 ```
 
-Return the domain and codomain parent objects respectively, for the map $M$. it is only
+Return the domain and codomain parent objects respectively, for the map $M$. It is only
 necessary to define these functions if the map type `MyMap` does not contain fields
 `domain` and `codomain` containing these parent objects.
 
