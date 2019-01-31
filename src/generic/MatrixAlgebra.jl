@@ -46,8 +46,8 @@ isexact_type(::Type{MatAlgElem{T}}) where T <: RingElement = isexact_type(T)
 
 function Base.hash(a::MatAlgElem, h::UInt)
    b = 0x6413942b83a26c65%UInt
-   for i in 1:rows(a)
-      for j in 1:cols(a)
+   for i in 1:nrows(a)
+      for j in 1:ncols(a)
          b = xor(b, xor(hash(a[i, j], h), h))
          b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
       end
@@ -130,7 +130,7 @@ end
 #
 ################################################################################
 
-size(x::MatAlgElem) = tuple(rows(x), cols(x))
+size(x::MatAlgElem) = tuple(nrows(x), ncols(x))
 
 size(t::MatAlgElem, d) = d <= 2 ? size(t)[d] : 1
 
@@ -164,10 +164,10 @@ function *(x::AbstractAlgebra.MatAlgElem{T}, y::AbstractAlgebra.MatAlgElem{T}) w
    degree(x) != degree(y) && error("Incompatible matrix degrees")
    A = similar(x)
    C = base_ring(x)()
-   for i = 1:rows(x)
-      for j = 1:cols(y)
+   for i = 1:nrows(x)
+      for j = 1:ncols(y)
          A[i, j] = base_ring(x)()
-         for k = 1:cols(x)
+         for k = 1:ncols(x)
             C = mul!(C, x[i, k], y[k, j])
             A[i, j] = addeq!(A[i, j], C)
          end

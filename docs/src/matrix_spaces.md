@@ -174,13 +174,13 @@ F = similar(M)
 ### Basic manipulation of matrices
 
 ```julia
-rows(f::MyMat{T}) where T <: AbstractAlgebra.RingElem
+nrows(f::MyMat{T}) where T <: AbstractAlgebra.RingElem
 ```
 
 Return the number of rows of the given matrix.
 
 ```julia
-cols(f::MyMat{T}) where T <: AbstractAlgebra.RingElem
+ncols(f::MyMat{T}) where T <: AbstractAlgebra.RingElem
 ```
 
 Returns the number of columns of the given matrix.
@@ -204,8 +204,8 @@ in place and not returned from the function.
 ```julia
 M = matrix(ZZ, BigInt[2 3 0; 1 1 1])
 
-m = rows(M)
-n = cols(M)
+m = nrows(M)
+n = ncols(M)
 M[1, 2] = BigInt(4)
 c = M[1, 1]
 ```
