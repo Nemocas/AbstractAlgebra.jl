@@ -106,7 +106,7 @@ end
 
 @doc Markdown.doc"""
     order(R::GFField)
-> Return the order, i.e. the number of element in, the given finite field.
+> Return the order, i.e. the number of element in the given finite field.
 """
 function order(R::GFField)
    return R.p
