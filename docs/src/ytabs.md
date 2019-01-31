@@ -146,7 +146,7 @@ matrix_repr(::Generic.YoungTableau)
 fill!(::Generic.YoungTableau, ::AbstractVector{<:Integer})
 ```
 
-## Characters of permutation grups
+## Characters of permutation groups
 
 Irreducible characters (at least over field of characteristic $0$) of the full group of permutations $S_n$ correspond via [Specht modules](https://en.wikipedia.org/wiki/Specht_module) to partitions of $n$.
 
