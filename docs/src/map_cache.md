@@ -31,7 +31,7 @@ map `M` in a dictionary, assuming that the cache is enabled.
 
 Caches can be disabled by setting the value of the parameter `enabled` to `false`. This
 allows for the user to quickly go through code and completely disable caches of maps that
-were previously enabled, for testing purposed, etc.
+were previously enabled, for testing purposes, etc.
 
 Caches can also be turned on and off at run time (see below).
 
