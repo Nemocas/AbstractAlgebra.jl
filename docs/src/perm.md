@@ -39,7 +39,7 @@ There are several methods to to construct permutations in AbstractAlgebra.jl.
 Generic.perm
 ```
 
-  Since the parent object can be reconstructed from the permutation itself, you can work with permutations without explicitely constructing the parent object.
+  Since the parent object can be reconstructed from the permutation itself, you can work with permutations without explicitly constructing the parent object.
 
 * The other way is to first construct the permutation group they belong to.
   This is accomplished with the inner constructor `PermGroup(n::Integer)` which
@@ -179,7 +179,7 @@ Generic.elements!(::Generic.PermGroup)
 However, since all permutations yielded by `elements!` are aliased (modified "in-place"), `collect(Generic.elements!(PermGroup(n)))` returns a vector of identical permutations.
 
 !!! note
-    If you intend to use or store elements yielded by `elements!` you need to **deepcopy** them explicitely.
+    If you intend to use or store elements yielded by `elements!` you need to **deepcopy** them explicitly.
 
 ## Arithmetic operators
 
