@@ -52,7 +52,7 @@ demand.
 A matrix space in AbstractAlgebra.jl represents a collection of all matrices with
 given dimensions and base ring.
 
-In order to construct matrices in AbstractAlgebra.jl, one can first constructs the
+In order to construct matrices in AbstractAlgebra.jl, one can first construct the
 matrix space itself. This is accomplished with the following constructor. We discuss
 creation of matrix algebras separately in a dedicated section elsewhere in the
 documentation.
