@@ -19,6 +19,6 @@ Documentation can be found at the following link:
 Projects that depend on AbstractAlgebra include:
 
 * Nemo.jl [http://nemocas.org](http://nemocas.org/) (optimised implementations of specific rings provided by the Flint, Arb and Antic C libraries)
-* Hecke.jl [http://thofma.github.io/Hecke.jl/latest/](http://thofma.github.io/Hecke.jl/latest/) (algebraic number theory)
+* Hecke.jl [https://github.com/thofma/Hecke.jl](https://github.com/thofma/Hecke.jl) (algebraic number theory)
 * Singular.jl [http://github.com/wbhart/Singular.jl](http://github.com/wbhart/Singular.jl) (polynomial rings and ideals, Groebner bases and computer algebra provided by the Singular C++ library)
 
