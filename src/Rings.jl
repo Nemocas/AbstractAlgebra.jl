@@ -114,6 +114,14 @@ Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, T <: RingElem} = x^p
 #
 ###############################################################################
 
+Base.broadcastable(m::RingElem) = Ref(m)
+
+###############################################################################
+#
+#   Delayed reduction
+#
+###############################################################################
+
 # Fall back to ordinary multiplication
 function mul_red!(a::T, b::T, c::T, flag::Bool) where T <: RingElement
    return mul!(a, b, c)
