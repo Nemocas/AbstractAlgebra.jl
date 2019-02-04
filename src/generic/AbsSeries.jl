@@ -790,6 +790,12 @@ end
 #
 ###############################################################################
 
+function zero!(c::AbsSeries{T}) where T <: RingElement
+   c.length = 0
+   c.prec = parent(c).prec_max
+   return c
+end
+
 function fit!(c::AbsSeries{T}, n::Int) where {T <: RingElement}
    if length(c.coeffs) < n
       t = c.coeffs
