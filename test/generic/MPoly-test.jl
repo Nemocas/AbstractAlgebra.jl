@@ -936,17 +936,20 @@ function test_gen_mpoly_derivative()
 
       R, vars = PolynomialRing(ZZ, var_names; ordering=ord)
 
+      j = 1
       for v in vars
          for iter in 1:10
             f = rand(R, 5:10, 1:10, -100:100)
             g = rand(R, 5:10, 1:10, -100:100)
 
-               @test derivative(f + g, v) == derivative(g, v) + derivative(f, v)
-               @test derivative(g*f, v) == derivative(g, v)*f + derivative(f, v)*g
+            @test derivative(f + g, v) == derivative(g, v) + derivative(f, v)
+            @test derivative(g*f, v) == derivative(g, v)*f + derivative(f, v)*g
+            @test derivative(f, j) == derivative(f, v)
          end
          @test derivative(one(R), v) == zero(R)
          @test derivative(zero(R), v) == zero(R)
          @test derivative(v, v) == one(R)
+         j += 1
       end
    end
 

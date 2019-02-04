@@ -707,10 +707,11 @@ The following function allows to compute derivations of multivariate
 polynomials of type MPoly.
 
 ```julia
-derivative(f::MyMPoly{T}, x::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
+derivative(f::MyMPoly{T}, j::Int) where T <: AbstractAlgebra.RingElem
 ```
 
-Compute the derivative of $f$ with respect to the variable $x$.
+Compute the derivative of $f$ with respect to the $j$-th variable of the
+polynomial ring.
 
 **Examples**
 
@@ -719,6 +720,6 @@ R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
 
 f = x*y + x + y + 1
 
-derivative(f, x)
-derivative(f, y)
+derivative(f, 1)
+derivative(f, 2)
 ```
