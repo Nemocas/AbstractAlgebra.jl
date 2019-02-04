@@ -981,7 +981,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "AbstractAlgebra.Generic.derivative",
     "category": "method",
-    "text": "derivative(a::Generic.PolynomialElem)\n\nReturn the derivative of the polynomial a.\n\n\n\nderivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}\n\nReturn the partial derivative of f with respect to x. The value x must be a generator of the polynomial ring of f.\n\n\n\n"
+    "text": "derivative(a::Generic.PolynomialElem)\n\nReturn the derivative of the polynomial a.\n\n\n\nderivative(f::AbstractAlgebra.MPolyElem{T}, x::Int) where {T <: RingElement}\n\nReturn the partial derivative of f with respect to j-th variable of the polynomial ring.\n\n\n\nderivative(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement\n\nReturn the partial derivative of f with respect to x. The value x must be a generator of the polynomial ring of f.\n\n\n\n"
 },
 
 {
@@ -1469,7 +1469,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Derivations",
     "category": "section",
-    "text": "The following function allows to compute derivations of multivariate polynomials of type MPoly.derivative(f::MyMPoly{T}, x::MyMPoly{T}) where T <: AbstractAlgebra.RingElemCompute the derivative of f with respect to the variable x.ExamplesR, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x*y + x + y + 1\n\nderivative(f, x)\nderivative(f, y)"
+    "text": "The following function allows to compute derivations of multivariate polynomials of type MPoly.derivative(f::MyMPoly{T}, j::Int) where T <: AbstractAlgebra.RingElemCompute the derivative of f with respect to the j-th variable of the polynomial ring.ExamplesR, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x*y + x + y + 1\n\nderivative(f, 1)\nderivative(f, 2)"
 },
 
 {
@@ -1501,7 +1501,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Polynomial ring constructors",
     "category": "section",
-    "text": "In order to construct multivariate polynomials in AbstractAlgebra.jl, one must first construct the polynomial ring itself. This is accomplished with the following constructor.PolynomialRing(R::AbstractAlgebra.Ring, S::Array{String, 1}; cached::Bool = true, ordering::Symbol=:lex)Given a base ring R and and array S of strings specifying how the generators (variables) should be printed, return a tuple S, (x, ...) representing the new polynomial ring S = Rx ldots and a tuple of the generators (x ) of the ring. By default the parent object S will depend only on R and  (x, ...) and will be cached. Setting the optional argument cached to false will prevent the parent object  S from being cached.The optional named argument ordering can be used to specify an ordering. The currently supported options are :lex, :deglex and :degrevlex.Here are some examples of creating multivariate polynomial rings and making use of the resulting parent objects to coerce various elements into the polynomial ring.ExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"]; ordering=:deglex)\n\nf = R()\ng = R(123)\nh = R(BigInt(1234))\nk = R(x + 1)\nm = R(x + y + 1)\nderivative(k,x)\nderivative(k,y)All of the examples here are generic polynomial rings, but specialised implementations of polynomial rings provided by external modules will also usually provide a PolynomialRing constructor to allow creation of their polynomial rings."
+    "text": "In order to construct multivariate polynomials in AbstractAlgebra.jl, one must first construct the polynomial ring itself. This is accomplished with the following constructor.PolynomialRing(R::AbstractAlgebra.Ring, S::Array{String, 1}; cached::Bool = true, ordering::Symbol=:lex)Given a base ring R and and array S of strings specifying how the generators (variables) should be printed, return a tuple S, (x, ...) representing the new polynomial ring S = Rx ldots and a tuple of the generators (x ) of the ring. By default the parent object S will depend only on R and  (x, ...) and will be cached. Setting the optional argument cached to false will prevent the parent object  S from being cached.The optional named argument ordering can be used to specify an ordering. The currently supported options are :lex, :deglex and :degrevlex.Here are some examples of creating multivariate polynomial rings and making use of the resulting parent objects to coerce various elements into the polynomial ring.ExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"]; ordering=:deglex)\n\nf = R()\ng = R(123)\nh = R(BigInt(1234))\nk = R(x + 1)\nm = R(x + y + 1)\nderivative(k, 1)\nderivative(k, 2)All of the examples here are generic polynomial rings, but specialised implementations of polynomial rings provided by external modules will also usually provide a PolynomialRing constructor to allow creation of their polynomial rings."
 },
 
 {
@@ -1742,6 +1742,22 @@ var documenterSearchIndex = {"docs": [
     "title": "Least common multiple, greatest common divisor",
     "category": "section",
     "text": "The greated common divisor of two polynomials a and b is returned bygcd(a::AbstractAlgebra.Generic.MPoly{T}, b::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}The least common multiple of two polynomials a and b is returned bylcm(a::AbstractAlgebra.MPolyElem{T}, b::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}Examplesusing AbstractAlgebra\nR,(x,y) = PolynomialRing(ZZ, [\"x\", \"y\"])\na = x*y + 2*y\nb = x^3*y + y\ngcd(a,b)\nlcm(a,b)\nlcm(a,b) == a * b // gcd(a,b)"
+},
+
+{
+    "location": "mpolynomial/#AbstractAlgebra.Generic.derivative-Union{Tuple{T}, Tuple{MPolyElem{T},MPolyElem{T}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.derivative",
+    "category": "method",
+    "text": "derivative(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement\n\nReturn the partial derivative of f with respect to x. The value x must be a generator of the polynomial ring of f.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial/#Derivations-1",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "Derivations",
+    "category": "section",
+    "text": "derivative(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElementExamplesR, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x*y + x + y + 1\n\nderivative(f, x)\nderivative(f, y)"
 },
 
 {

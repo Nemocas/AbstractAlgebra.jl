@@ -89,9 +89,9 @@ M2 = S([2 4; 1 -1])
 M3 = S([1 -1; 1 1])
 
 f(M1, M2)
-f(M1, ZZ(2))</code></pre><h3><a class="nav-anchor" id="Derivations-1" href="#Derivations-1">Derivations</a></h3><p>The following function allows to compute derivations of multivariate polynomials of type MPoly.</p><pre><code class="language-julia">derivative(f::MyMPoly{T}, x::MyMPoly{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Compute the derivative of <span>$f$</span> with respect to the variable <span>$x$</span>.</p><p><strong>Examples</strong></p><pre><code class="language-julia">R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;])
+f(M1, ZZ(2))</code></pre><h3><a class="nav-anchor" id="Derivations-1" href="#Derivations-1">Derivations</a></h3><p>The following function allows to compute derivations of multivariate polynomials of type MPoly.</p><pre><code class="language-julia">derivative(f::MyMPoly{T}, j::Int) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Compute the derivative of <span>$f$</span> with respect to the <span>$j$</span>-th variable of the polynomial ring.</p><p><strong>Examples</strong></p><pre><code class="language-julia">R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [&quot;x&quot;, &quot;y&quot;])
 
 f = x*y + x + y + 1
 
-derivative(f, x)
-derivative(f, y)</code></pre><footer><hr/><a class="previous" href="../ncpolynomial/"><span class="direction">Previous</span><span class="title">Generic univariate polynomials over a noncommutative ring</span></a><a class="next" href="../mpolynomial/"><span class="direction">Next</span><span class="title">Generic sparse distributed multivariate polynomials</span></a></footer></article></body></html>
+derivative(f, 1)
+derivative(f, 2)</code></pre><footer><hr/><a class="previous" href="../ncpolynomial/"><span class="direction">Previous</span><span class="title">Generic univariate polynomials over a noncommutative ring</span></a><a class="next" href="../mpolynomial/"><span class="direction">Next</span><span class="title">Generic sparse distributed multivariate polynomials</span></a></footer></article></body></html>
