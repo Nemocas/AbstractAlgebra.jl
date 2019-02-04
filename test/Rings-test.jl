@@ -10,6 +10,15 @@ include("generic/PuiseuxSeries-test.jl")
 include("generic/Matrix-test.jl")
 include("generic/MPoly-test.jl")
 
+function test_gen_rings_broadcast()
+   print("Generic.Rings.broadcast...")
+
+   F = GF(3)
+   @test F(2) .* [F(1), F(2)] == [F(2), F(1)]
+ 
+   println("PASS")
+end
+
 function test_rings()
    test_Integers()
 
@@ -23,4 +32,5 @@ function test_rings()
    test_gen_mat()
    test_gen_mpoly()
 
+   test_gen_rings_broadcast()
 end
