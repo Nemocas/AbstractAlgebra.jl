@@ -81,8 +81,8 @@ g = R(123)
 h = R(BigInt(1234))
 k = R(x + 1)
 m = R(x + y + 1)
-derivative(k,x)
-derivative(k,y)
+derivative(k, 1)
+derivative(k, 2)
 ```
 
 All of the examples here are generic polynomial rings, but specialised implementations
@@ -289,7 +289,7 @@ f(M1, ZZ(2), M3)
 f(M1, ZZ(2), 3)
 ```
 
-## Leading coefficients, leading monomials and leading terms
+### Leading coefficients, leading monomials and leading terms
 
 The leading coefficient, leading monomial and leading term of a polynomial p are returned by the following functions:
 
@@ -316,7 +316,7 @@ lc(p)
 lt(p) == lc(p) * lm(p)
 ```
 
-## Least common multiple, greatest common divisor
+### Least common multiple, greatest common divisor
 
 The greated common divisor of two polynomials a and b is returned by
 
@@ -342,3 +342,19 @@ lcm(a,b)
 lcm(a,b) == a * b // gcd(a,b)
 ```
 
+### Derivations
+
+```@docs
+derivative(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
+```
+
+**Examples**
+
+```julia
+R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
+
+f = x*y + x + y + 1
+
+derivative(f, x)
+derivative(f, y)
+```

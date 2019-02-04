@@ -181,7 +181,7 @@ end
 """
 function var_index(x::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
    !ismonomial(x) && error("Not a variable in var_index")
-   exps = exponent_vector(x, 1)
+   exps = first(exponent_vectors(x))
    count = 0
    index = 0
    for i = 1:length(exps)
@@ -787,7 +787,7 @@ isterm(x::MPoly) = x.length == 1
     ismonomial(x::MPoly)
 > Return `true` if the given polynomial has precisely one term whose coefficient is one.
 """
-ismonomial(x::MPoly) = x.length == 1 && isone(coeff(x, 1))
+ismonomial(x::AbstractAlgebra.MPolyElem) = length(x) == 1 && isone(first(coeffs(x)))
 
 function Base.deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingElement}
    Re = deepcopy_internal(a.exps, dict)
@@ -3604,48 +3604,32 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
+    derivative(f::AbstractAlgebra.MPolyElem{T}, x::Int) where {T <: RingElement}
+> Return the partial derivative of `f` with respect to $j$-th variable
+> of the polynomial ring.
+"""
+function derivative(f::AbstractAlgebra.MPolyElem{T}, j::Int) where T <: RingElement
+   R = parent(f)
+   iterz = zip(coeffs(f), exponent_vectors(f))
+   Ctx = MPolyBuildCtx(R)
+   for (c, v) in iterz
+      prod = c*v[j]
+      if v[j] >= 1
+         v[j] -= 1
+      end
+      push_term!(Ctx, prod, v)
+   end
+
+   return finish(Ctx)
+end
+
+@doc Markdown.doc"""
+    derivative(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 > Return the partial derivative of `f` with respect to `x`. The value `x` must
 > be a generator of the polynomial ring of `f`.
 """
-function derivative(f::MPoly{T}, x::MPoly{T}) where {T <: RingElement}
-   R = parent(f)
-   gens_parent = gens(R)
-   
-   # Check whether x is among the generators of x.parent
-   if !(x in gens_parent)
-      error("Can compute the partial derivative only with respect to generators.")
-   end
-
-   n = nvars(R)
-   exps = copy(f.exps)
-
-   size_exps = size(f.exps)
-   if (R.ord != :lex)
-      exps = exps[1:size_exps[1] - 1,:]
-   end
-
-   if (R.ord == :degrevlex)
-      exps = exps[end:-1:1,:]
-   end
-
-   derivative = zero(R)
-   coeffs = f.coeffs
-   for i = 1:length(f)
-      prod = coeffs[i]
-      for j = 1:n
-         if gens_parent[j] == x
-            prod *= exps[n - j + 1, i]
-            if (exps[n - j + 1, i] >= 1)
-               exps[n - j + 1, i] -= 1
-            end
-         end
-         prod = prod*gens_parent[j]^Int(exps[n - j + 1, i])
-      end
-      derivative = derivative + prod
-   end
-
-   return derivative
+function derivative(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   return derivative(f, var_index(x))
 end
 
 ###############################################################################
