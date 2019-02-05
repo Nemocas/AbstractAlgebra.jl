@@ -110,7 +110,7 @@ end
 function change_base_ring(p::MPoly{T}, g) where {T <: RingElement}
    new_base_ring = parent(g(zero(base_ring(p.parent))))
    new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(
-v) for v in symbols(p.parent)], ordering = p.parent.ord)
+v) for v in symbols(p.parent)], ordering = ordering(p.parent))
 
    if typeof(gens_new_polynomial_ring[1]) <: MPoly
       exps = deepcopy(p.exps)
