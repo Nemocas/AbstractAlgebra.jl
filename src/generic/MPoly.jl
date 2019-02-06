@@ -804,28 +804,45 @@ zero(R::MPolyRing) = R(0)
 
 isone(x::MPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && x.coeffs[1] == 1
 
-iszero(x::MPoly) = x.length == 0
+function isone(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   return length(x) == 1 && iszero(first(exponent_vectors(x))) &&
+          first(coeffs(x)) == 1
+end
+
+iszero(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement = length(x) == 0
 
 isunit(x::MPoly) = x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)) && isunit(x.coeffs[1])
 
+function isunit(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   return length(x) == 1 && iszero(first(exponent_vectors(x))) &&
+          isunit(first(coeffs(x)))
+end
+
+isconstant(x::MPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
+
 @doc Markdown.doc"""
-    isconstant(x::MPoly)
+    isconstant(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 > Return `true` if `x` is a degree zero polynomial or the zero polynomial, i.e.
 > a constant polynomial.
 """
-isconstant(x::MPoly) = x.length == 0 || (x.length == 1 && monomial_iszero(x.exps, 1, size(x.exps, 1)))
+function isconstant(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+    return length(x) == 0 || (length(x) == 1 &&
+                        iszero(first(exponent_vectors(x))))
+end
 
 @doc Markdown.doc"""
     isterm(x::MPoly)
 > Return `true` if the given polynomial has precisely one term.
 """
-isterm(x::MPoly) = x.length == 1
+isterm(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement = length(x) == 1
 
 @doc Markdown.doc"""
-    ismonomial(x::MPoly)
+    ismonomial(x::AbstractAlgebra.MPolyElem)
 > Return `true` if the given polynomial has precisely one term whose coefficient is one.
 """
-ismonomial(x::AbstractAlgebra.MPolyElem) = length(x) == 1 && isone(first(coeffs(x)))
+function ismonomial(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   return length(x) == 1 && isone(first(coeffs(x)))
+end
 
 function Base.deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingElement}
    Re = deepcopy_internal(a.exps, dict)
