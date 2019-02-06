@@ -707,19 +707,44 @@ function degree(f::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingEle
    return biggest
 end
  
-@doc Markdown.doc"""
-   degree(f::MPoly{T}, i::Int) where T <: RingElement
-> Return the degree of the polynomial $f$ in terms of the i-th variable.
-"""
 function degree(f::MPoly{T}, i::Int) where T <: RingElement
    return degree(f, i, Val{parent(f).ord})
 end
 
 @doc Markdown.doc"""
-   degrees(f::MPoly{T}) where T <: RingElement
+    degree(f::AbstractAlgebra.MPolyElem{T}, i::Int) where T <: RingElement
+> Return the degree of the polynomial $f$ in terms of the i-th variable.
+"""
+function degree(f::AbstractAlgebra.MPolyElem{T}, i::Int) where T <: RingElement
+   biggest = -1
+   if length(f) != 0
+      R = parent(f)
+      if ordering(R) == :lex && i == 1
+         biggest = first(exponent_vectors(f))[1]
+      else
+         for v in exponent_vectors(f)
+            if v[i] > biggest
+               biggest = v[i]
+            end
+         end
+      end
+   end
+   return biggest
+end
+
+@doc Markdown.doc"""
+   degree(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+> Return the degree of the polynomial $f$ in terms of the variable $x$.
+"""
+function degree(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   return degree(f, var_index(x))
+end
+
+@doc Markdown.doc"""
+   degrees(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 > Return an array of the degrees of the polynomial $f$ in terms of each variable.
 """
-function degrees(f::MPoly{T}) where T <: RingElement
+function degrees(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    return [degree(f, i) for i in 1:nvars(parent(f))]
 end
 
