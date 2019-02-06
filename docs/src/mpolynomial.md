@@ -98,7 +98,19 @@ vars(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-var_index(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+var_index(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
+```@docs
+degree(::AbstractAlgebra.MPolyElem{T}, ::Int) where T <: RingElement
+```
+
+```@docs
+degree(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
+```@docs
+degrees(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -110,6 +122,9 @@ f = x^2 + 2x + 1
 
 V = vars(f)
 var_index(y) == 2
+degree(f, x) == 2
+degree(f, 2) == 0
+d = degrees(f)
 ```
 
 ### Changing base (coefficient) rings
