@@ -113,6 +113,22 @@ degree(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <
 degrees(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 
+```@docs
+isunit(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
+```@docs
+isconstant(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
+```@docs
+isterm(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
+```@docs
+ismonomial(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
 **Examples**
 
 ```julia
@@ -125,6 +141,10 @@ var_index(y) == 2
 degree(f, x) == 2
 degree(f, 2) == 0
 d = degrees(f)
+isconstant(R(1))
+isterm(2x)
+ismonomial(y)
+isunit(R(1))
 ```
 
 ### Changing base (coefficient) rings

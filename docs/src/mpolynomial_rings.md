@@ -200,31 +200,6 @@ isgen(x::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 Return `true` if $x$ is a generator of the polynomial ring.
 
 ```julia
-isunit(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
-```
-
-Return `true` if $f$ is a unit in its parent polynomial ring.
-
-```julia
-isconstant(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
-```
-
-Return `true` if $f$ is a constant polynomial. The zero polynomial is considered
-constant for the purposes of this function.
-
-```julia
-isterm(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
-```
-
-Return `true` if $f$ consists of a single term.
-
-```julia
-ismonomial(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
-```
-
-Return `true` if $f$ consists of a single term with coefficient $1$.
-
-```julia
 coeffs(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
 
@@ -277,10 +252,6 @@ n = length(f)
 isgen(y) == true
 B, b = max_degrees(f)
 nvars(f) == 2
-isunit(f) == false
-isconstant(f) == false
-isterm(2x*y) == true
-ismonomial(x*y) == false
 V = vars(f)
 C = collect(coeffs(f))
 M = collect(monomials(f))
