@@ -745,7 +745,21 @@ end
 > Return an array of the degrees of the polynomial $f$ in terms of each variable.
 """
 function degrees(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-   return [degree(f, i) for i in 1:nvars(parent(f))]
+   R = parent(f)
+   if nvars(R) == 1 && ordering(R) == :lex
+      return first(exponent_vectors(f))
+   else
+      biggest = [-1 for i = 1:nvars(R)]
+      for i = 1:length(f)
+         v = exponent_vector(f, i)
+         for j = 1:nvars(R)
+            if v[j] > biggest[j]
+               biggest[j] = v[j]
+            end
+         end
+      end
+      return biggest
+   end
 end
 
 @doc Markdown.doc"""
