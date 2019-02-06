@@ -750,8 +750,7 @@ function degrees(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
       return first(exponent_vectors(f))
    else
       biggest = [-1 for i = 1:nvars(R)]
-      for i = 1:length(f)
-         v = exponent_vector(f, i)
+      for v in exponent_vectors(f)
          for j = 1:nvars(R)
             if v[j] > biggest[j]
                biggest[j] = v[j]
