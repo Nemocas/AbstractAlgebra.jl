@@ -797,7 +797,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "AbstractAlgebra.Generic.ismonomial",
     "category": "method",
-    "text": "ismonomial(a::Generic.PolynomialElem)\n\nReturn true if the given polynomial is a monomial.\n\n\n\n"
+    "text": "ismonomial(a::Generic.PolynomialElem)\n\nReturn true if the given polynomial is a monomial.\n\n\n\nismonomial(x::AbstractAlgebra.MPolyElem)\n\nReturn true if the given polynomial has precisely one term whose coefficient is one.\n\n\n\n"
 },
 
 {
@@ -805,7 +805,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "AbstractAlgebra.Generic.isterm",
     "category": "method",
-    "text": "isterm(a::Generic.PolynomialElem)\n\nReturn true if the given polynomial has one term. This function is recursive, with all scalar types returning true.\n\n\n\n"
+    "text": "isterm(a::Generic.PolynomialElem)\n\nReturn true if the given polynomial has one term. This function is recursive, with all scalar types returning true.\n\n\n\nisterm(x::MPoly)\n\nReturn true if the given polynomial has precisely one term.\n\n\n\n"
 },
 
 {
@@ -1373,7 +1373,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Basic manipulation of rings and elements",
     "category": "section",
-    "text": "length(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the number of nonzero terms of the given polynomial. The length of the zero polynomial is defined to be 0. The return value should be of type Int.degree(f::MyMPoly{T}, i::Int) where T <: AbstractAlgebra.RingElemReturn the degree of the polynomial f in the i-th variable.degrees(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an array of the degrees of the polynomial f in each of the variables.total_degree(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the total degree of the polynomial f, i.e. the highest sum of exponents occuring in any term of f.isgen(x::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if x is a generator of the polynomial ring.isunit(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f is a unit in its parent polynomial ring.isconstant(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f is a constant polynomial. The zero polynomial is considered constant for the purposes of this function.isterm(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f consists of a single term.ismonomial(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if f consists of a single term with coefficient 1.coeffs(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an iterator for the coefficients of the polynomial p, starting with the coefficient of the most significant term with respect to the ordering. Generic code will provide this function automatically for random access polynomials that implement the coeff function.monomials(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an iterator for the monomials of the polynomial p, starting with the monomial of the most significant term with respect to the ordering. Monomials in AbstractAlgebra are defined to have coefficient 1. See the function terms if you also require the coefficients, however note that only monomials can be compared. Generic code will provide this function automatically for random access polynomials that implement the monomial function.terms(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an iterator for the terms of the polynomial p, starting with the most significant term with respect to the ordering. Terms in AbstractAlgebra include the coefficient. Generic code will provide this function automatically for random access polynomials that implement the term function.exponent_vectors(a::MyMPoly{T}) where T <: RingElementReturn an iterator for the exponent vectors for each of the terms of the polynomial starting with the most significant term with respect to the ordering. Each exponent vector is an array of Ints, one for each variable, in the order given when the polynomial ring was created. Generic code will provide this function automatically for random access polynomials that implement the exponent_vector function.ExamplesS, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^3*y + 3x*y^2 + 1\n\nn = length(f)\nisgen(y) == true\nB, b = max_degrees(f)\nnvars(f) == 2\nisunit(f) == false\nisconstant(f) == false\nisterm(2x*y) == true\nismonomial(x*y) == false\nV = vars(f)\nC = collect(coeffs(f))\nM = collect(monomials(f))\nT = collect(terms(f))\nV = collect(exponent_vectors(f))\ndegree(f, 2) == 2\nd = total_degree(f)"
+    "text": "length(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the number of nonzero terms of the given polynomial. The length of the zero polynomial is defined to be 0. The return value should be of type Int.Return an array of the degrees of the polynomial f in each of the variables.total_degree(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the total degree of the polynomial f, i.e. the highest sum of exponents occuring in any term of f.isgen(x::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if x is a generator of the polynomial ring.coeffs(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an iterator for the coefficients of the polynomial p, starting with the coefficient of the most significant term with respect to the ordering. Generic code will provide this function automatically for random access polynomials that implement the coeff function.monomials(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an iterator for the monomials of the polynomial p, starting with the monomial of the most significant term with respect to the ordering. Monomials in AbstractAlgebra are defined to have coefficient 1. See the function terms if you also require the coefficients, however note that only monomials can be compared. Generic code will provide this function automatically for random access polynomials that implement the monomial function.terms(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an iterator for the terms of the polynomial p, starting with the most significant term with respect to the ordering. Terms in AbstractAlgebra include the coefficient. Generic code will provide this function automatically for random access polynomials that implement the term function.exponent_vectors(a::MyMPoly{T}) where T <: RingElementReturn an iterator for the exponent vectors for each of the terms of the polynomial starting with the most significant term with respect to the ordering. Each exponent vector is an array of Ints, one for each variable, in the order given when the polynomial ring was created. Generic code will provide this function automatically for random access polynomials that implement the exponent_vector function.ExamplesS, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^3*y + 3x*y^2 + 1\n\nn = length(f)\nisgen(y) == true\nB, b = max_degrees(f)\nnvars(f) == 2\nV = vars(f)\nC = collect(coeffs(f))\nM = collect(monomials(f))\nT = collect(terms(f))\nV = collect(exponent_vectors(f))\nd = total_degree(f)"
 },
 
 {
@@ -1529,11 +1529,59 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "mpolynomial/#AbstractAlgebra.Generic.degree-Union{Tuple{T}, Tuple{MPolyElem{T},Int64}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.degree",
+    "category": "method",
+    "text": "degree(f::AbstractAlgebra.MPolyElem{T}, i::Int) where T <: RingElement\n\nReturn the degree of the polynomial f in terms of the i-th variable.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial/#AbstractAlgebra.Generic.degree-Union{Tuple{T}, Tuple{MPolyElem{T},MPolyElem{T}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.degree",
+    "category": "method",
+    "text": "degree(f::AbstractAlgebra.MPolyElem{T}, x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement\n\nReturn the degree of the polynomial f in terms of the variable x.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial/#AbstractAlgebra.Generic.degrees-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.degrees",
+    "category": "method",
+    "text": "degrees(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement\n\nReturn an array of the degrees of the polynomial f in terms of each variable.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial/#AbstractAlgebra.Generic.isconstant-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.isconstant",
+    "category": "method",
+    "text": "isconstant(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement\n\nReturn true if x is a degree zero polynomial or the zero polynomial, i.e. a constant polynomial.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial/#AbstractAlgebra.Generic.isterm-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.isterm",
+    "category": "method",
+    "text": "isterm(x::MPoly)\n\nReturn true if the given polynomial has precisely one term.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial/#AbstractAlgebra.Generic.ismonomial-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.ismonomial",
+    "category": "method",
+    "text": "ismonomial(x::AbstractAlgebra.MPolyElem)\n\nReturn true if the given polynomial has precisely one term whose coefficient is one.\n\n\n\n"
+},
+
+{
     "location": "mpolynomial/#Basic-manipulation-1",
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Basic manipulation",
     "category": "section",
-    "text": "vars(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElementvar_index(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElementExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^2 + 2x + 1\n\nV = vars(f)\nvar_index(y) == 2"
+    "text": "vars(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElementvar_index(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdegree(::AbstractAlgebra.MPolyElem{T}, ::Int) where T <: RingElementdegree(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdegrees(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisunit(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisconstant(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisterm(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementismonomial(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^2 + 2x + 1\n\nV = vars(f)\nvar_index(y) == 2\ndegree(f, x) == 2\ndegree(f, 2) == 0\nd = degrees(f)\nisconstant(R(1))\nisterm(2x)\nismonomial(y)\nisunit(R(1))"
 },
 
 {
