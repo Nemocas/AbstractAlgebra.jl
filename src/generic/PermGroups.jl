@@ -702,7 +702,7 @@ julia> matrix_repr(p)
   [1, 2]  =  1
   [2, 3]  =  1
 
-julia> full(ans)
+julia> Array(ans)
 3×3 Array{Int64,2}:
  0  1  0
  0  0  1
