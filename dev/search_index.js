@@ -2981,7 +2981,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Permutations and Permutation groups",
     "title": "AbstractAlgebra.Generic.matrix_repr",
     "category": "method",
-    "text": "matrix_repr(a::perm{T}) where T\n\nReturn the permutation matrix as sparse matrix representing a via natural embedding of the permutation group into general linear group over mathbbZ.\n\nExamples:\n\njulia> p = perm([2,3,1])\n(1,2,3)\n\njulia> matrix_repr(p)\n3×3 SparseMatrixCSC{Int64,Int64} with 3 stored entries:\n  [3, 1]  =  1\n  [1, 2]  =  1\n  [2, 3]  =  1\n\njulia> full(ans)\n3×3 Array{Int64,2}:\n 0  1  0\n 0  0  1\n 1  0  0\n\n\n\n"
+    "text": "matrix_repr(a::perm{T}) where T\n\nReturn the permutation matrix as sparse matrix representing a via natural embedding of the permutation group into general linear group over mathbbZ.\n\nExamples:\n\njulia> p = perm([2,3,1])\n(1,2,3)\n\njulia> matrix_repr(p)\n3×3 SparseMatrixCSC{Int64,Int64} with 3 stored entries:\n  [3, 1]  =  1\n  [1, 2]  =  1\n  [2, 3]  =  1\n\njulia> Array(ans)\n3×3 Array{Int64,2}:\n 0  1  0\n 0  0  1\n 1  0  0\n\n\n\n"
 },
 
 {
