@@ -2168,10 +2168,10 @@ function deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
       return [0 for i in 1:N], [0 for i in 1:N]
    end
    defl = [0 for i in 1:N]
-   shift = exponent_vector(f, 1)
-   for i = 2:length(f)
+   shift = first(exponent_vectors(f))
+   for v in Iterators.drop(exponent_vectors(f), 1)
       for j = 1:N
-         exj = exponent(f, i, j)
+         exj = v[j]
          if exj < shift[j]
             defl[j] = defl[j] == 1 ? 1 : gcd(defl[j], shift[j] - exj)
             shift[j] = exj
@@ -2193,20 +2193,22 @@ end
 > division by $0$.  
 """
 function deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
-   N = nvars(parent(f))
+   S = parent(f)
+   N = nvars(S)
    for i = 1:N
       if defl[i] == 0
          defl[i] = 1
       end
    end
-   exps = collect(exponent_vectors(f))
-   for i = 1:length(f)
+   M = MPolyBuildCtx(S)
+   cvzip = zip(coeffs(f), exponent_vectors(f))
+   for (c, v) in cvzip
       for j = 1:N
-         exps[i][j] = div(exps[i][j] - shift[j], defl[j]) 
+         v[j] = div(v[j] - shift[j], defl[j]) 
       end
+      push_term!(M, c, v)
    end
-   coeffs = [coeff(f, i) for i in 1:length(f)]
-   return parent(f)(coeffs, exps)
+   return finish(M)
 end
 
 function deflate(f::MPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
@@ -2247,15 +2249,17 @@ end
 > variable).  
 """
 function inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
-   N = nvars(parent(f))
-   exps = collect(exponent_vectors(f))
-   for i = 1:length(f)
+   S = parent(f)
+   N = nvars(S)
+   M = MPolyBuildCtx(S)
+   cvzip = zip(coeffs(f), exponent_vectors(f))
+   for (c, v) in cvzip
       for j = 1:N
-         exps[i][j] = exps[i][j]*defl[j] + shift[j]
+         v[j] = v[j]*defl[j] + shift[j]
       end
+      push_term!(M, c, v)
    end
-   coeffs = [coeff(f, i) for i in 1:length(f)]
-   return parent(f)(coeffs, exps)
+   return finish(M)
 end
 
 function inflate(f::MPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
