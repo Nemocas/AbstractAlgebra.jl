@@ -563,7 +563,7 @@ function lc(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
       return zero(base_ring(p))
    else
-      return coeff(p,1)
+      return first(coeffs(p))
    end
 end
 
@@ -588,7 +588,7 @@ function lm(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
       return p
    else
-      return monomial(p, 1)
+      return first(monomials(p))
    end
 end
 
@@ -600,7 +600,7 @@ function lt(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
       return p
    else
-      return monomial(p, 1) * coeff(p, 1)
+      return first(terms(p))
    end
 end
 
