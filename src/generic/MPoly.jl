@@ -96,15 +96,14 @@ end
 function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
    new_base_ring = parent(g(zero(base_ring(p.parent))))
    new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in symbols(p.parent)], ordering = ordering(p.parent))
-   new_p = zero(new_polynomial_ring)
 
-   for i = 1:length(p)
-      e = exponent_vector(p, i)
-      set_exponent_vector!(new_p, i, e)
-      setcoeff!(new_p, e, g(coeff(p, i)))
+   cvzip = zip(coeffs(p), exponent_vectors(p))
+   M = MPolyBuildCtx(new_polynomial_ring)
+   for (c, v) in cvzip
+      push_term!(M, g(c), v)
    end
    
-   return(new_p)
+   return finish(M)
 end
 
 function change_base_ring(p::MPoly{T}, g) where {T <: RingElement}
@@ -3279,8 +3278,8 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
    # Note that this function accepts values in a non-commutative ring, so operations
    # must be done in a certain order.
    r = R()
-   for i = 1:length(a)
-      v = exponent_vector(a, i)
+   cvzip = zip(coeffs(a), exponent_vectors(a))
+   for (c, v) in cvzip
       t = one(R)
       for j = 1:length(vals)
          exp = v[j]
@@ -3289,7 +3288,7 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
          end
          t = t*powers[j][exp]
       end
-      r += coeff(a, i)*t
+      r += c*t
    end
    return r
 end
@@ -3330,8 +3329,8 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vect
    # performance of powering vs multiplication. The function should not try
    # to optimise computing new powers in any way.
    r = S()
-   for i = 1:length(a)
-      v = exponent_vector(a, i)
+   cvzip = zip(coeffs(a), exponent_vectors(a))
+   for (c, v) in cvzip
       t = one(R)
       for j = 1:length(vars)
          varnum = vars[j]
@@ -3342,8 +3341,9 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vect
          t *= powers[j][exp]
          v[varnum] = 0
       end
-      m = S([coeff(a, i)], [v])
-      r += t*m
+      M = MPolyBuildCtx(S)
+      push_term!(M, c, v)
+      r += t*finish(M)
    end
    return r
 end
@@ -3437,9 +3437,9 @@ function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingE
          c = c*zero(parent(vals[j]))
       end
    end
-   for i = 1:length(a)
-      v = exponent_vector(a, i)
-      t = coeff(a, i)
+   cvzip = zip(coeffs(a), exponent_vectors(a))
+   for (c, v) in cvzip
+      t = c
       for j = 1:length(vals)
          exp = v[j]
          if !haskey(powers[j], exp)
