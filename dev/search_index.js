@@ -3525,7 +3525,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "AbstractAlgebra.Generic.nrows",
     "category": "method",
-    "text": "nrows(a::Generic.MatrixElem)\n\nReturn the number of nrows of the given matrix.\n\n\n\n"
+    "text": "nrows(a::Generic.MatrixElem)\n\nReturn the number of rows of the given matrix.\n\n\n\n"
 },
 
 {
