@@ -85,6 +85,9 @@ function test_gen_mat_constructors()
    @test elem_type(S) == Generic.Mat{elem_type(R)}
    @test elem_type(Generic.MatSpace{elem_type(R)}) == Generic.Mat{elem_type(R)}
    @test parent_type(Generic.Mat{elem_type(R)}) == Generic.MatSpace{elem_type(R)}
+   @test base_ring(S) == R
+   @test nrows(S) == 3
+   @test ncols(S) == 3
 
    @test typeof(S) <: Generic.MatSpace
 
