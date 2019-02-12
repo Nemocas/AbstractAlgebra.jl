@@ -1401,14 +1401,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "mpolynomial_rings/#Evaluation-1",
-    "page": "Multivariate Polynomial Ring Interface",
-    "title": "Evaluation",
-    "category": "section",
-    "text": "evaluate(f::MyMPoly{T}, A::Array{T, 1}) where T <: AbstractAlgebra.RingElemEvaluate the polynomial f at the values specified by the entries of the array A.evaluate(f::MyMPoly{T}, A::Array{U, 1}) where {T <: AbstractAlgebra.RingElem, U <: Integer}Evaluate the polynomial f at the values specified by the entries of the array A.ExamplesR, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n\nf = 2x^2*y + 2x + y + 1\n\nm = evaluate(f, Rational{BigInt}[2, 3])\nn = evaluate(f, [2, 3])"
-},
-
-{
     "location": "mpolynomial_rings/#GCD-1",
     "page": "Multivariate Polynomial Ring Interface",
     "title": "GCD",
@@ -1457,11 +1449,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "mpolynomial_rings/#Evaluation-2",
+    "location": "mpolynomial_rings/#Evaluation-1",
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Evaluation",
     "category": "section",
-    "text": "evaluate(a::MyMPoly{T}, A::Vector{T}) where T <: RingElemEvaluate the polynomial at the given values in the coefficient ring of the polynomial. The result should be an element of the coefficient ring.(a::MyMPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElementEvaluate the polynomial at the given arguments. This provides functional notation for polynomial evaluation, i.e. f(a b c). It must be defined for each supported polynomial type (Julia does not allow functional notation to be defined for an abstract type).The code for this function in MPoly.jl can be used when implementing this as it provides the most general possible evaluation, which is much more general than the case of evaluation at elements of the same ring.The evaluation should succeed for any set of values for which a multiplication is defined with the product of a coefficient and all the values before it.Note that the values may be in non-commutative rings. Products are performed in the order of the variables in the polynomial ring that the polynomial belongs to, preceded by a multiplication by the coefficient on the left.ExamplesR, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [\"x\", \"y\"])\nS = MatrixAlgebra(ZZ, 2)\n\nf = x*y + x + y + 1\n\nevaluate(f, [ZZ(1), ZZ(2)])\nf(1, 2)\nf(ZZ(1), ZZ(2))\nf(x - y, x + y)\n\nM1 = S([1 2; 3 4])\nM2 = S([2 4; 1 -1])\nM3 = S([1 -1; 1 1])\n\nf(M1, M2)\nf(M1, ZZ(2))"
+    "text": "evaluate(a::MyMPoly{T}, A::Vector{T}) where T <: RingElemEvaluate the polynomial at the given values in the coefficient ring of the polynomial. The result should be an element of the coefficient ring.evaluate(f::MyMPoly{T}, A::Vector{U}) where {T <: AbstractAlgebra.RingElem, U <: Intege\nr}Evaluate the polynomial f at the values specified by the entries of the array A.(a::MyMPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElementEvaluate the polynomial at the given arguments. This provides functional notation for polynomial evaluation, i.e. f(a b c). It must be defined for each supported polynomial type (Julia does not allow functional notation to be defined for an abstract type).The code for this function in MPoly.jl can be used when implementing this as it provides the most general possible evaluation, which is much more general than the case of evaluation at elements of the same ring.The evaluation should succeed for any set of values for which a multiplication is defined with the product of a coefficient and all the values before it.Note that the values may be in non-commutative rings. Products are performed in the order of the variables in the polynomial ring that the polynomial belongs to, preceded by a multiplication by the coefficient on the left.ExamplesR, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [\"x\", \"y\"])\nS = MatrixAlgebra(ZZ, 2)\n\nf = x*y + x + y + 1\n\nevaluate(f, [ZZ(1), ZZ(2)])\nevaluate(f, [2, 3])\nf(1, 2)\nf(ZZ(1), ZZ(2))\nf(x - y, x + y)\n\nM1 = S([1 2; 3 4])\nM2 = S([2 4; 1 -1])\nM3 = S([1 -1; 1 1])\n\nf(M1, M2)\nf(M1, ZZ(2))"
 },
 
 {
