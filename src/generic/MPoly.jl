@@ -138,12 +138,10 @@ function vars(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
    vars_in_p = Array{U}(undef, 0)
    n = nvars(p.parent)
    gen_list = gens(p.parent)
-   for j = 1:n
-      for i = 1:length(p)
-         if exponent(p, i, j) > 0
-            push!(vars_in_p, gen_list[j])
-            break
-         end
+   v = maximum.(exponent_vectors(p))
+   for i = 1:n
+      if v[i] != 0
+         push!(vars_in_p, gen_list[i])
       end
    end
    return(vars_in_p)
