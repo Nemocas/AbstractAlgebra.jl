@@ -237,10 +237,10 @@ function coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{
          error("Exponent cannot be negative")
       end
    end
-   exp_vecs = Array{Vector{Int}, 1}(undef, 0)
-   coeffs = Array{T, 1}(undef, 0)
-   for i = 1:length(a)
-      v = exponent_vector(a, i)
+   S = parent(a)
+   M = MPolyBuildCtx(S)
+   cvzip = zip(coeffs(a), exponent_vectors(a))
+   for (c, v) in cvzip
       flag = true
       for j = 1:length(vars)
          if v[vars[j]] != exps[j]
@@ -251,11 +251,10 @@ function coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{
          end 
       end
       if flag
-         push!(exp_vecs, v)
-         push!(coeffs, coeff(a, i))
+         push_term!(M, c, v)
       end
    end
-   return parent(a)(coeffs, exp_vecs)
+   return finish(M)
 end
 
 @doc Markdown.doc"""
@@ -745,7 +744,7 @@ end
 """
 function degrees(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    R = parent(f)
-   if nvars(R) == 1 && ordering(R) == :lex
+   if nvars(R) == 1 && ordering(R) == :lex && length(f) > 0
       return first(exponent_vectors(f))
    else
       biggest = [-1 for i = 1:nvars(R)]
