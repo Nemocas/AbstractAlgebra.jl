@@ -138,6 +138,18 @@ end
 #
 ###############################################################################
 
+@doc Markdown.doc"""
+    nrows(a::Generic.MatrixSpace)
+> Return the number of rows of the given matrix space.
+"""
+nrows(a::MatSpace) = a.nrows
+
+@doc Markdown.doc"""
+    ncols(a::Generic.MatrixSpace)
+> Return the number of columns of the given matrix space.
+"""
+ncols(a::MatSpace) = a.ncols
+
 function Base.hash(a::AbstractAlgebra.MatElem, h::UInt)
    b = 0x3e4ea81eb31d94f4%UInt
    for i in 1:nrows(a)
@@ -151,7 +163,7 @@ end
 
 @doc Markdown.doc"""
     nrows(a::Generic.MatrixElem)
-> Return the number of nrows of the given matrix.
+> Return the number of rows of the given matrix.
 """
 nrows(a::MatrixElem) = size(a.entries, 1)
 
