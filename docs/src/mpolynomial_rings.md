@@ -381,32 +381,6 @@ q, r = divrem(f, g)
 Q, r = divrem(f, [g, h])
 ```
 
-### Evaluation
-
-```julia
-evaluate(f::MyMPoly{T}, A::Array{T, 1}) where T <: AbstractAlgebra.RingElem
-```
-
-Evaluate the polynomial $f$ at the values specified by the entries of the array $A$.
-
-
-```julia
-evaluate(f::MyMPoly{T}, A::Array{U, 1}) where {T <: AbstractAlgebra.RingElem, U <: Integer}
-```
-
-Evaluate the polynomial $f$ at the values specified by the entries of the array $A$.
-
-**Examples**
-
-```julia
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
-
-f = 2x^2*y + 2x + y + 1
-
-m = evaluate(f, Rational{BigInt}[2, 3])
-n = evaluate(f, [2, 3])
-```
-
 ### GCD
 
 In cases where there is a meaningful Euclidean structure on the coefficient ring, it is
@@ -619,6 +593,13 @@ Evaluate the polynomial at the given values in the coefficient ring of the
 polynomial. The result should be an element of the coefficient ring.
 
 ```julia
+evaluate(f::MyMPoly{T}, A::Vector{U}) where {T <: AbstractAlgebra.RingElem, U <: Intege
+r}
+```
+
+Evaluate the polynomial $f$ at the values specified by the entries of the array $A$.
+
+```julia
 (a::MyMPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElement
 ```
 
@@ -649,6 +630,7 @@ S = MatrixAlgebra(ZZ, 2)
 f = x*y + x + y + 1
 
 evaluate(f, [ZZ(1), ZZ(2)])
+evaluate(f, [2, 3])
 f(1, 2)
 f(ZZ(1), ZZ(2))
 f(x - y, x + y)

@@ -96,15 +96,14 @@ end
 function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
    new_base_ring = parent(g(zero(base_ring(p.parent))))
    new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in symbols(p.parent)], ordering = ordering(p.parent))
-   new_p = zero(new_polynomial_ring)
 
-   for i = 1:length(p)
-      e = exponent_vector(p, i)
-      set_exponent_vector!(new_p, i, e)
-      setcoeff!(new_p, e, g(coeff(p, i)))
+   cvzip = zip(coeffs(p), exponent_vectors(p))
+   M = MPolyBuildCtx(new_polynomial_ring)
+   for (c, v) in cvzip
+      push_term!(M, g(c), v)
    end
    
-   return(new_p)
+   return finish(M)
 end
 
 function change_base_ring(p::MPoly{T}, g) where {T <: RingElement}
@@ -139,12 +138,10 @@ function vars(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
    vars_in_p = Array{U}(undef, 0)
    n = nvars(p.parent)
    gen_list = gens(p.parent)
-   for j = 1:n
-      for i = 1:length(p)
-         if exponent(p, i, j) > 0
-            push!(vars_in_p, gen_list[j])
-            break
-         end
+   v = maximum.(exponent_vectors(p))
+   for i = 1:n
+      if v[i] != 0
+         push!(vars_in_p, gen_list[i])
       end
    end
    return(vars_in_p)
@@ -238,10 +235,10 @@ function coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{
          error("Exponent cannot be negative")
       end
    end
-   exp_vecs = Array{Vector{Int}, 1}(undef, 0)
-   coeffs = Array{T, 1}(undef, 0)
-   for i = 1:length(a)
-      v = exponent_vector(a, i)
+   S = parent(a)
+   M = MPolyBuildCtx(S)
+   cvzip = zip(coeffs(a), exponent_vectors(a))
+   for (c, v) in cvzip
       flag = true
       for j = 1:length(vars)
          if v[vars[j]] != exps[j]
@@ -252,11 +249,10 @@ function coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{
          end 
       end
       if flag
-         push!(exp_vecs, v)
-         push!(coeffs, coeff(a, i))
+         push_term!(M, c, v)
       end
    end
-   return parent(a)(coeffs, exp_vecs)
+   return finish(M)
 end
 
 @doc Markdown.doc"""
@@ -567,7 +563,7 @@ function lc(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
       return zero(base_ring(p))
    else
-      return coeff(p,1)
+      return first(coeffs(p))
    end
 end
 
@@ -592,7 +588,7 @@ function lm(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
       return p
    else
-      return monomial(p, 1)
+      return first(monomials(p))
    end
 end
 
@@ -604,7 +600,7 @@ function lt(p::MPolyElem{T}) where T <: RingElement
    if iszero(p)
       return p
    else
-      return monomial(p, 1) * coeff(p, 1)
+      return first(terms(p))
    end
 end
 
@@ -746,7 +742,7 @@ end
 """
 function degrees(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
    R = parent(f)
-   if nvars(R) == 1 && ordering(R) == :lex
+   if nvars(R) == 1 && ordering(R) == :lex && length(f) > 0
       return first(exponent_vectors(f))
    else
       biggest = [-1 for i = 1:nvars(R)]
@@ -2172,10 +2168,10 @@ function deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
       return [0 for i in 1:N], [0 for i in 1:N]
    end
    defl = [0 for i in 1:N]
-   shift = exponent_vector(f, 1)
-   for i = 2:length(f)
+   shift = first(exponent_vectors(f))
+   for v in Iterators.drop(exponent_vectors(f), 1)
       for j = 1:N
-         exj = exponent(f, i, j)
+         exj = v[j]
          if exj < shift[j]
             defl[j] = defl[j] == 1 ? 1 : gcd(defl[j], shift[j] - exj)
             shift[j] = exj
@@ -2197,20 +2193,22 @@ end
 > division by $0$.  
 """
 function deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
-   N = nvars(parent(f))
+   S = parent(f)
+   N = nvars(S)
    for i = 1:N
       if defl[i] == 0
          defl[i] = 1
       end
    end
-   exps = collect(exponent_vectors(f))
-   for i = 1:length(f)
+   M = MPolyBuildCtx(S)
+   cvzip = zip(coeffs(f), exponent_vectors(f))
+   for (c, v) in cvzip
       for j = 1:N
-         exps[i][j] = div(exps[i][j] - shift[j], defl[j]) 
+         v[j] = div(v[j] - shift[j], defl[j]) 
       end
+      push_term!(M, c, v)
    end
-   coeffs = [coeff(f, i) for i in 1:length(f)]
-   return parent(f)(coeffs, exps)
+   return finish(M)
 end
 
 function deflate(f::MPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
@@ -2251,15 +2249,17 @@ end
 > variable).  
 """
 function inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
-   N = nvars(parent(f))
-   exps = collect(exponent_vectors(f))
-   for i = 1:length(f)
+   S = parent(f)
+   N = nvars(S)
+   M = MPolyBuildCtx(S)
+   cvzip = zip(coeffs(f), exponent_vectors(f))
+   for (c, v) in cvzip
       for j = 1:N
-         exps[i][j] = exps[i][j]*defl[j] + shift[j]
+         v[j] = v[j]*defl[j] + shift[j]
       end
+      push_term!(M, c, v)
    end
-   coeffs = [coeff(f, i) for i in 1:length(f)]
-   return parent(f)(coeffs, exps)
+   return finish(M)
 end
 
 function inflate(f::MPoly{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
@@ -3279,8 +3279,8 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
    # Note that this function accepts values in a non-commutative ring, so operations
    # must be done in a certain order.
    r = R()
-   for i = 1:length(a)
-      v = exponent_vector(a, i)
+   cvzip = zip(coeffs(a), exponent_vectors(a))
+   for (c, v) in cvzip
       t = one(R)
       for j = 1:length(vals)
          exp = v[j]
@@ -3289,7 +3289,7 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
          end
          t = t*powers[j][exp]
       end
-      r += coeff(a, i)*t
+      r += c*t
    end
    return r
 end
@@ -3330,8 +3330,8 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vect
    # performance of powering vs multiplication. The function should not try
    # to optimise computing new powers in any way.
    r = S()
-   for i = 1:length(a)
-      v = exponent_vector(a, i)
+   cvzip = zip(coeffs(a), exponent_vectors(a))
+   for (c, v) in cvzip
       t = one(R)
       for j = 1:length(vars)
          varnum = vars[j]
@@ -3342,8 +3342,9 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vect
          t *= powers[j][exp]
          v[varnum] = 0
       end
-      m = S([coeff(a, i)], [v])
-      r += t*m
+      M = MPolyBuildCtx(S)
+      push_term!(M, c, v)
+      r += t*finish(M)
    end
    return r
 end
@@ -3437,9 +3438,9 @@ function (a::MPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingE
          c = c*zero(parent(vals[j]))
       end
    end
-   for i = 1:length(a)
-      v = exponent_vector(a, i)
-      t = coeff(a, i)
+   cvzip = zip(coeffs(a), exponent_vectors(a))
+   for (c, v) in cvzip
+      t = c
       for j = 1:length(vals)
          exp = v[j]
          if !haskey(powers[j], exp)
