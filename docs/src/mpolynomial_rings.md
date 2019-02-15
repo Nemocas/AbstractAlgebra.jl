@@ -352,21 +352,6 @@ div(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 As per the `divrem` function, but returning the quotient only. Especially when the
 quotient happens to be exact, this function can be exceedingly fast.
 
-```julia
-divrem(f::MyMPoly{T}, G::Array{MyMPoly{T}, 1}) where T <: AbstractAlgebra.RingElem
-```
-
-As per the `divrem` function above, except that each term of $r$ starting with the
-most significant term, is reduced modulo the leading terms of each of the polynomials
-in the array $G$ for which the leading monomial is a divisor.
-
-A tuple $(Q, r)$ is returned from the function, where $Q$ is an array of polynomials
-of the same length as $G$, and such that $f = r + \sum Q[i]G[i]$.
-
-The result is again dependent on the ordering in general, but if the polynomials in $G$
-are over a field and the reduced generators of a Groebner basis, then the result is
-unique.
-
 **Examples**
 
 ```julia
@@ -374,11 +359,9 @@ R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
 f = 2x^2*y + 2x + y + 1
 g = x + y
-h = y + 1
 
 q = div(f, g)
 q, r = divrem(f, g)
-Q, r = divrem(f, [g, h])
 ```
 
 ### GCD
@@ -582,6 +565,35 @@ function.
 
 The following functions can optionally be implemented for multivariate
 polynomial types.
+
+### Reduction by an ideal
+
+```julia
+divrem(f::MyMPoly{T}, G::Array{MyMPoly{T}, 1}) where T <: AbstractAlgebra.RingElem
+```
+
+As per the `divrem` function above, except that each term of $r$ starting with the
+most significant term, is reduced modulo the leading terms of each of the polynomials
+in the array $G$ for which the leading monomial is a divisor.
+
+A tuple $(Q, r)$ is returned from the function, where $Q$ is an array of polynomials
+of the same length as $G$, and such that $f = r + \sum Q[i]G[i]$.
+
+The result is again dependent on the ordering in general, but if the polynomials in $G$
+are over a field and the reduced generators of a Groebner basis, then the result is
+unique.
+
+**Examples**
+
+```julia
+R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+
+f = 2x^2*y + 2x + y + 1
+g = x + y
+h = y + 1
+
+Q, r = divrem(f, [g, h])
+```
 
 ### Evaluation
 
