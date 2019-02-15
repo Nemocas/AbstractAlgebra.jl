@@ -359,7 +359,12 @@ The greated common divisor of two polynomials a and b is returned by
 gcd(a::AbstractAlgebra.Generic.MPoly{T}, b::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}
 ```
 
-The least common multiple of two polynomials a and b is returned by
+Note that this functionality is currently only provided for AbstractAlgebra
+generic polynomials. It is not automatically provided for all multivariate
+rings that implement the multivariate interface.
+
+However, if such a gcd is provided, the least common multiple of two
+polynomials a and b is returned by
 
 ```@docs
 lcm(a::AbstractAlgebra.MPolyElem{T}, b::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
