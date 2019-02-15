@@ -252,7 +252,6 @@ n = length(f)
 isgen(y) == true
 B, b = max_degrees(f)
 nvars(f) == 2
-V = vars(f)
 C = collect(coeffs(f))
 M = collect(monomials(f))
 T = collect(terms(f))
