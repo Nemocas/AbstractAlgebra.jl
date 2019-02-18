@@ -1137,6 +1137,10 @@ function mod(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) whe
    return f
 end
 
+function rem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
+  return mod(f, g)
+end
+
 @doc Markdown.doc"""
     divrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
 > Return a tuple $(q, r)$ such that $f = qg + r$ where $q$ is the euclidean
