@@ -416,6 +416,10 @@ function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::Char,
    NumberField(a, string(s), t; cached=cached)
 end
 
+function FreeModule(R::Ring, rank::Int; cached::Bool = true)
+   Generic.FreeModule(R, rank; cached=cached)
+end
+
 #add empty functions so that Singular, Nemo and Hecke can import and extend.
 function crt(A...)
   return AbstractAlgebra.crt(A...)
@@ -425,7 +429,7 @@ export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        MatrixAlgebra, FractionField, ResidueRing, Partition, PermGroup,
        YoungTableau, AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
-       PuiseuxSeriesField
+       PuiseuxSeriesField, FreeModule
 
 export Generic
 

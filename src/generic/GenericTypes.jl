@@ -1040,3 +1040,38 @@ mutable struct MapCache{D, C, S, T, De, Ce} <: AbstractAlgebra.Map{D, C, S, T}
       return r
    end
 end
+
+###############################################################################
+#
+#   Free Module
+#
+###############################################################################
+
+mutable struct FreeModule{T <: RingElement} <: AbstractAlgebra.Module{T}
+   rank::Int
+   base_ring::Ring
+
+   function FreeModule{T}(R::Ring, rank::Int, cached::Bool = true) where T <: RingElement
+      if cached && haskey(FreeModuleDict, (R, rank))
+         return FreeModuleDict[R, rank]::FreeModule{T}
+      else
+         z = new{T}(rank, R)
+         if cached
+            FreeModuleDict[R, rank] = z
+         end
+         return z
+      end
+   end
+end
+
+const FreeModuleDict = Dict{Tuple{Ring, Int}, FreeModule}()
+
+mutable struct free_module_elem{T <: RingElement} <: AbstractAlgebra.ModuleElem{T}
+    v::Vector{T}
+    parent::FreeModule{T}
+
+    function free_module_elem{T}(v::Vector{T}) where T <: RingElement
+       z = new{T}(v)
+    end
+end
+
