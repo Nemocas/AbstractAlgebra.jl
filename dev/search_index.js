@@ -1577,11 +1577,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "mpolynomial/#AbstractAlgebra.Generic.coeff-Union{Tuple{T}, Tuple{MPolyElem{T},MPolyElem{T}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.coeff",
+    "category": "method",
+    "text": "coeff(f::AbstractAlgebra.MPolyElem{T}, m::AbstractAlgebra.MPolyElem{T}) where T <: RingElement\n\nReturn the coefficient of the monomial m of the polynomial f. If there is no such monomial, zero is returned.\n\n\n\n"
+},
+
+{
     "location": "mpolynomial/#Basic-manipulation-1",
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Basic manipulation",
     "category": "section",
-    "text": "vars(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElementvar_index(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdegree(::AbstractAlgebra.MPolyElem{T}, ::Int) where T <: RingElementdegree(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdegrees(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisunit(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisconstant(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisterm(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementismonomial(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^2 + 2x + 1\n\nV = vars(f)\nvar_index(y) == 2\ndegree(f, x) == 2\ndegree(f, 2) == 0\nd = degrees(f)\nisconstant(R(1))\nisterm(2x)\nismonomial(y)\nisunit(R(1))"
+    "text": "vars(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElementvar_index(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdegree(::AbstractAlgebra.MPolyElem{T}, ::Int) where T <: RingElementdegree(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdegrees(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisunit(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisconstant(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisterm(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementismonomial(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementcoeff(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: RingElementExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^2 + 2x + 1\n\nV = vars(f)\nvar_index(y) == 2\ndegree(f, x) == 2\ndegree(f, 2) == 0\nd = degrees(f)\nisconstant(R(1))\nisterm(2x)\nismonomial(y)\nisunit(R(1))\nc = coeff(f, x^2)"
 },
 
 {
