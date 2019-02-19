@@ -19,4 +19,17 @@ cache (which usually makes use of a dictionary).
 
 ## Functionality for free modules
 
+### Basic manipulation
+
+```@docs
+rank{T <: RingElem}(M::FreeModule{T})
+```
+
+**Examples**
+
+```julia
+M = FreeModule(ZZ, 3)
+
+rank(M)
+```
 
