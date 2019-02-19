@@ -33,3 +33,28 @@ M = FreeModule(ZZ, 3)
 rank(M)
 ```
 
+### Morphisms
+
+Morphisms of free modules, $f : R^s \to R^t$, can be represented by $s\times t$
+matrices over $R$. Note that elements of a free module are interpreted as row
+vectors in this context and if $f_1$ and $f_2$ are composable morphisms then
+$f_1(f_2(v))$ corresponds to multiplying the row vector $v$ on the right by 
+$M_1\times M_2$ where $M_i$ is the matrix corresponding to the morphism $f_i$.
+
+```@docs
+FreeModuleMorphism(M1::FreeModule{T}, M2::FreeModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
+```
+
+**Examples**
+
+```julia
+M = FreeModule(ZZ, 2)
+f = FreeModuleMorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
+
+m = M([ZZ(1), ZZ(2)])
+
+f(m)
+```
+ 
+
+

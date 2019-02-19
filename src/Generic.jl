@@ -71,6 +71,8 @@ include("generic/Fraction.jl")
 
 include("generic/FreeModule.jl")
 
+include("generic/FreeModuleMorphism.jl")
+
 include("generic/Map.jl")
 
 include("generic/MapWithInverse.jl")

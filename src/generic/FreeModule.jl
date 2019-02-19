@@ -48,14 +48,21 @@ rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.rank
 
 function show(io::IO, M::FreeModule)
    print(io, "Free module of rank ")
-   print(io, M.rank)
+   print(io, rank(M))
    print(" over ")
    show(io, base_ring(M))
 end
 
 function show(io::IO, a::free_module_elem)
    print(io, "(")
-   print(io, join(string.(a.v), ", "))
+   M = parent(a)
+   for i = 1:rank(M) - 1
+      print(io, a.v[1, i])
+      print(", ")
+   end
+   if rank(M) > 0
+      print(io, a.v[1, rank(M)])
+   end
    print(io, ")")
 end
 
@@ -97,23 +104,23 @@ end
 function *(m::free_module_elem{T}, c::T) where T <: Union{RingElement, NCRingElem}
    parent(c) != base_ring(m) && error("Incompatible scalar")
    M = parent(m)
-   return M([r*c for r in m.v])
+   return M(m.v*c)
 end
 
 function *(c::T, m::free_module_elem{T}) where T <: Union{RingElement, NCRingElem}
    parent(c) != base_ring(m) && error("Incompatible scalar")
    M = parent(m)
-   return M([c*r for r in m.v])
+   return M(c*m.v)
 end
 
 function *(m::free_module_elem{T}, c::U) where {T <: Union{RingElement, NCRingElem}, U <: Integer}
    M = parent(m)
-   return M([r*c for r in m.v])
+   return M(m.v*c)
 end
 
 function *(c::U, m::free_module_elem{T}) where {T <: Union{RingElement, NCRingElem}, U <: Integer}
    M = parent(m)
-   return M([c*r for r in m.v])
+   return M(c*m.v)
 end
 
 ###############################################################################
@@ -135,6 +142,16 @@ end
 
 function (M::FreeModule{T})(a::Vector{T}) where T <: Union{RingElement, NCRingElem}
    length(a) != rank(M) && error("Number of elements does not equal rank")
+   R = base_ring(M)
+   v = matrix(R, 1, length(a), a)
+   z = free_module_elem{T}(v)
+   z.parent = M
+   return z
+end
+
+function (M::FreeModule{T})(a::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
+   ncols(a) != rank(M) && error("Number of elements does not equal rank")
+   nrows(a) != 1 && error("Matrix should have single row")
    z = free_module_elem{T}(a)
    z.parent = M
    return z

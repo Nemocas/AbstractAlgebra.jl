@@ -1043,7 +1043,7 @@ end
 
 ###############################################################################
 #
-#   Free Module
+#   FreeModule/free_module_elem
 #
 ###############################################################################
 
@@ -1067,11 +1067,28 @@ end
 const FreeModuleDict = Dict{Tuple{NCRing, Int}, FreeModule}()
 
 mutable struct free_module_elem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.ModuleElem{T}
-    v::Vector{T}
+    v::AbstractAlgebra.MatElem{T}
     parent::FreeModule{T}
 
-    function free_module_elem{T}(v::Vector{T}) where T <: Union{RingElement, NCRingElem}
+    function free_module_elem{T}(v::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
        z = new{T}(v)
     end
 end
 
+###############################################################################
+#
+#   FreeModuleMorphism
+#
+###############################################################################
+
+mutable struct FreeModuleMorphism{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.Map{FreeModule{T}, FreeModule{T}, AbstractAlgebra.FunctionalMap, FreeModuleMorphism}
+
+   domain::FreeModule{T}
+   codomain::FreeModule{T}
+   matrix::AbstractAlgebra.MatElem{T}
+   image_fn::Function
+
+   function FreeModuleMorphism{T}(D::FreeModule{T}, C::FreeModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
+      z = new(D, C, m, x::free_module_elem{T} -> C(x.v*m))
+   end
+end

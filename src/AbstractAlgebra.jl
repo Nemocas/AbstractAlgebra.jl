@@ -420,6 +420,10 @@ function FreeModule(R::NCRing, rank::Int; cached::Bool = true)
    Generic.FreeModule(R, rank; cached=cached)
 end
 
+function FreeModuleMorphism(M1::AbstractAlgebra.Generic.FreeModule, M2::AbstractAlgebra.Generic.FreeModule, m::MatElem)
+   Generic.FreeModuleMorphism(M1, M2, m)
+end
+
 #add empty functions so that Singular, Nemo and Hecke can import and extend.
 function crt(A...)
   return AbstractAlgebra.crt(A...)
@@ -429,7 +433,7 @@ export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        MatrixAlgebra, FractionField, ResidueRing, Partition, PermGroup,
        YoungTableau, AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
-       PuiseuxSeriesField, FreeModule
+       PuiseuxSeriesField, FreeModule, FreeModuleMorphism
 
 export Generic
 
