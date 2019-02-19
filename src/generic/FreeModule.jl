@@ -12,25 +12,25 @@ export FreeModule, free_module_elem
 #
 ###############################################################################
 
-parent_type(::Type{free_module_elem{T}}) where T <: RingElement = FreeModule{T}
+parent_type(::Type{free_module_elem{T}}) where T <: Union{RingElement, NCRingElem} = FreeModule{T}
 
-base_ring(M::FreeModule{T}) where T <: RingElement = M.base_ring::parent_type(T)
+base_ring(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.base_ring::parent_type(T)
 
-base_ring(v::free_module_elem{T}) where T <: RingElement = base_ring(parent(v))
+base_ring(v::free_module_elem{T}) where T <: Union{RingElement, NCRingElem} = base_ring(parent(v))
 
-elem_type(::Type{FreeModule{T}}) where T <: RingElement = free_module_elem{T}
+elem_type(::Type{FreeModule{T}}) where T <: Union{RingElement, NCRingElem} = free_module_elem{T}
 
-parent(m::free_module_elem{T}) where T <: RingElement = m.parent
+parent(m::free_module_elem{T}) where T <: Union{RingElement, NCRingElem} = m.parent
 
-function check_parent(m1::free_module_elem{T}, m2::free_module_elem{T}) where T <: RingElement
+function check_parent(m1::free_module_elem{T}, m2::free_module_elem{T}) where T <: Union{RingElement, NCRingElem}
     parent(m1) != parent(m2) && ("Incompatible free modules")
 end
 
-function isdomain_type(::Type{free_module_elem{T}}) where T <: RingElement
+function isdomain_type(::Type{free_module_elem{T}}) where T <: Union{RingElement, NCRingElem}
    return isdomain_type(T)
 end
 
-function isexact_type(a::Type{free_module_elem{T}}) where T <: RingElement
+function isexact_type(a::Type{free_module_elem{T}}) where T <: Union{RingElement, NCRingElem}
    return isexact_type(T)
 end
 
@@ -38,7 +38,7 @@ end
     rank(M::FreeModule{T}) where T <: RingElement
 > Return the rank of the given free module.
 """
-rank(M::FreeModule{T}) where T <: RingElement = M.rank
+rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.rank
 
 ###############################################################################
 #
@@ -76,13 +76,13 @@ end
 #
 ###############################################################################
 
-function +(m1::free_module_elem{T}, m2::free_module_elem{T}) where T <: RingElement
+function +(m1::free_module_elem{T}, m2::free_module_elem{T}) where T <: Union{RingElement, NCRingElem}
    check_parent(m1, m2)
    M = parent(m1)
    return M(m1.v + m2.v)
 end
 
-function -(m1::free_module_elem{T}, m2::free_module_elem{T}) where T <: RingElement
+function -(m1::free_module_elem{T}, m2::free_module_elem{T}) where T <: Union{RingElement, NCRingElem}
    check_parent(m1, m2)
    M = parent(m1)
    return M(m1.v - m2.v)
@@ -94,24 +94,24 @@ end
 #
 ###############################################################################
 
-function *(m::free_module_elem{T}, c::T) where T <: RingElement
+function *(m::free_module_elem{T}, c::T) where T <: Union{RingElement, NCRingElem}
    parent(c) != base_ring(m) && error("Incompatible scalar")
    M = parent(m)
    return M([r*c for r in m.v])
 end
 
-function *(c::T, m::free_module_elem{T}) where T <: RingElement
+function *(c::T, m::free_module_elem{T}) where T <: Union{RingElement, NCRingElem}
    parent(c) != base_ring(m) && error("Incompatible scalar")
    M = parent(m)
    return M([c*r for r in m.v])
 end
 
-function *(m::free_module_elem{T}, c::U) where {T <: RingElement, U <: Integer}
+function *(m::free_module_elem{T}, c::U) where {T <: Union{RingElement, NCRingElem}, U <: Integer}
    M = parent(m)
    return M([r*c for r in m.v])
 end
 
-function *(c::U, m::free_module_elem{T}) where {T <: RingElement, U <: Integer}
+function *(c::U, m::free_module_elem{T}) where {T <: Union{RingElement, NCRingElem}, U <: Integer}
    M = parent(m)
    return M([c*r for r in m.v])
 end
@@ -122,7 +122,7 @@ end
 #
 ###############################################################################
 
-function ==(m1::free_module_elem{T}, m2::free_module_elem{T}) where T <: RingElement
+function ==(m1::free_module_elem{T}, m2::free_module_elem{T}) where T <: Union{RingElement, NCRingElem}
    check_parent(m1, m2)
    return m1.v == m2.v
 end
@@ -133,7 +133,7 @@ end
 #
 ###############################################################################
 
-function (M::FreeModule{T})(a::Vector{T}) where T <: RingElement
+function (M::FreeModule{T})(a::Vector{T}) where T <: Union{RingElement, NCRingElem}
    length(a) != rank(M) && error("Number of elements does not equal rank")
    z = free_module_elem{T}(a)
    z.parent = M
@@ -146,7 +146,7 @@ end
 #
 ###############################################################################
 
-function FreeModule(R::Ring, rank::Int; cached::Bool = true)
+function FreeModule(R::NCRing, rank::Int; cached::Bool = true)
    T = elem_type(R)
    return FreeModule{T}(R, rank, cached)
 end

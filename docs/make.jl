@@ -32,6 +32,8 @@ makedocs(
                            "numberfield.md"],
              "Groups" => [ "perm.md",
                            "ytabs.md"],
+             "Modules" => [ "module.md",
+                            "free_module.md"],
              "Matrices" => [ "matrix_spaces.md",
                              "matrix.md",
                              "matrix_algebras.md"],

@@ -1047,11 +1047,11 @@ end
 #
 ###############################################################################
 
-mutable struct FreeModule{T <: RingElement} <: AbstractAlgebra.Module{T}
+mutable struct FreeModule{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.Module{T}
    rank::Int
-   base_ring::Ring
+   base_ring::NCRing
 
-   function FreeModule{T}(R::Ring, rank::Int, cached::Bool = true) where T <: RingElement
+   function FreeModule{T}(R::NCRing, rank::Int, cached::Bool = true) where T <: Union{RingElement, NCRingElem}
       if cached && haskey(FreeModuleDict, (R, rank))
          return FreeModuleDict[R, rank]::FreeModule{T}
       else
@@ -1064,13 +1064,13 @@ mutable struct FreeModule{T <: RingElement} <: AbstractAlgebra.Module{T}
    end
 end
 
-const FreeModuleDict = Dict{Tuple{Ring, Int}, FreeModule}()
+const FreeModuleDict = Dict{Tuple{NCRing, Int}, FreeModule}()
 
-mutable struct free_module_elem{T <: RingElement} <: AbstractAlgebra.ModuleElem{T}
+mutable struct free_module_elem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.ModuleElem{T}
     v::Vector{T}
     parent::FreeModule{T}
 
-    function free_module_elem{T}(v::Vector{T}) where T <: RingElement
+    function free_module_elem{T}(v::Vector{T}) where T <: Union{RingElement, NCRingElem}
        z = new{T}(v)
     end
 end
