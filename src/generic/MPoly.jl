@@ -563,6 +563,23 @@ function coeff(x::MPoly, i::Int)
 end
 
 @doc Markdown.doc"""
+    coeff(f::AbstractAlgebra.MPolyElem{T}, m::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+> Return the coefficient of the monomial $m$ of the polynomial $f$. If there
+> is no such monomial, zero is returned.
+"""
+function coeff(f::AbstractAlgebra.MPolyElem{T}, m::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+    !ismonomial(m) && error("Not a monomial in coeff")
+    v1 = first(exponent_vectors(m))
+    cvzip = zip(coeffs(f), exponent_vectors(f))
+    for (c, v) in cvzip
+        if v == v1
+            return c
+        end
+    end
+    return zero(base_ring(f))
+end
+
+@doc Markdown.doc"""
     lc(p::MPolyElem)
 > Return the leading coefficient of the polynomial p.
 """

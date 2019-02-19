@@ -125,13 +125,16 @@ function test_gen_mpoly_manipulation()
 
       m = one(S)
       r = zero(S)
+      r2 = zero(S)
       for i = 1:length(f)
          m = monomial!(m, f, i)
          @test m == monomial(f, i)
          @test term(f, i) == coeff(f, i)*monomial(f, i)
          r += coeff(f, i)*monomial(f, i)
+         r2 += coeff(f, monomial(f, i))*monomial(f, i)
       end
       @test r == f
+      @test r2 == f
 
       for i = 1:length(f)
          i1 = rand(1:length(f))

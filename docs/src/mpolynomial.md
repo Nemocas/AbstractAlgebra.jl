@@ -129,6 +129,10 @@ isterm(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ismonomial(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 
+```@docs
+coeff(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
 **Examples**
 
 ```julia
@@ -145,6 +149,7 @@ isconstant(R(1))
 isterm(2x)
 ismonomial(y)
 isunit(R(1))
+c = coeff(f, x^2)
 ```
 
 ### Changing base (coefficient) rings
