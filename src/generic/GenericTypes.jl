@@ -1085,6 +1085,7 @@ mutable struct Submodule{T <: RingElement} <: AbstractAlgebra.Module{T}
    m::AbstractAlgebra.Module{T}
    gens::Vector{AbstractAlgebra.ModuleElem{T}}
    base_ring::NCRing
+   map::FunctionalMap{Submodule{T}, <:AbstractAlgebra.Module}
 
    function Submodule{T}(M::AbstractAlgebra.Module{T}, gens::Vector{<:AbstractAlgebra.ModuleElem{T}}) where T <: RingElement
       z = new{T}(M, gens, base_ring(M))

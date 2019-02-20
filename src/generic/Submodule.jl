@@ -187,6 +187,7 @@ function Submodule(m::AbstractAlgebra.Module{T}, gens::Vector{<:AbstractAlgebra.
    gens = [m([mat[i, j] for j = 1:s]) for i = 1:num]
    M = Submodule{T}(m, gens)
    f = map_from_func(M, m, x -> sum(x.v[1, i]*gens[i] for i in 1:ncols(x.v)))
+   M.map = f
    return M, f
 end
 
