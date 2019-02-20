@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export Submodule, submodule_elem, ngens
+export Submodule, submodule_elem, ngens, supermodule
 
 ###############################################################################
 #
@@ -30,6 +30,8 @@ function gen(N::Submodule{T}, i::Int) where T <: RingElement
    R = base_ring(N)
    return N([(j == i ? one(R) : zero(R)) for j = 1:ngens(N)])
 end
+
+supermodule(M::Submodule{T}) where T <: RingElement = M.m
 
 function check_parent(v1::submodule_elem{T}, v2::submodule_elem{T}) where T <: RingElement
    parent(v1) != parent(v2) && error("Incompatible module elements")
@@ -123,6 +125,17 @@ end
 function *(c::U, v::submodule_elem{T}) where {T <: RingElement, U <: Union{Rational, Integer}}
    N = parent(v)
    return N(c*v.v)
+end
+
+###############################################################################
+#
+#   Comparison
+#
+###############################################################################
+
+function ==(m::submodule_elem{T}, n::submodule_elem{T}) where T <: RingElement
+   check_parent(m, n)
+   return m.v == n.v
 end
 
 ###############################################################################

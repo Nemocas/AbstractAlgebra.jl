@@ -20,10 +20,6 @@ of elements of the ring the module is over.
 
 ## Required functionality for modules
 
-In addition to the required functionality for the Ring/NCRing interface (and in the case
-of polynomials over a field, the Euclidean Ring interface), the Polynomial Ring interface
-has the following required functions.
-
 We suppose that `R` is a fictitious base ring and that `S` is a module over `R` with
 parent object `S` of type `MyModule{T}`. We also assume the elements in the module have
 type `MyModuleElem{T}`, where `T` is the type of elements of the ring the module is

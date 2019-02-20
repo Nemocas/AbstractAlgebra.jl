@@ -11,6 +11,14 @@ function test_module_morphism_constructors()
 
    @test f(m) == M([ZZ(7), ZZ(10)])
 
+   N, nmap = Submodule(M, [m])
+
+   g = ModuleMorphism(N, N, matrix(ZZ, 1, 1, [3]))
+
+   m2 = N([ZZ(4)])
+
+   @test g(m2) == N([ZZ(12)])
+
    println("PASS")
 end
 

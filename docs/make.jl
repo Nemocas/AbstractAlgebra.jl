@@ -34,6 +34,7 @@ makedocs(
                            "ytabs.md"],
              "Modules" => [ "module.md",
                             "free_module.md",
+                            "submodule.md",
                             "module_morphism.md"],
              "Matrices" => [ "matrix_spaces.md",
                              "matrix.md",
