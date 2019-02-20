@@ -1,14 +1,17 @@
-# Free Modules
+# Free Modules and Vector Spaces
 
 AbstractAlgebra allows the construction of the free module of any rank over any
-ring. By default the system considers the free module of a given rank over a
-given ring to be unique.
+Euclidean ring and the vector space of any dimension over a field. By default
+the system considers the free module of a given rank over a given ring or
+vector space of given dimension over a field to be unique.
 
 ## Types and parents
 
 AbstractAlgebra provides the type `FreeModule{T}` for free modules, where `T`
 is the type of the elements of the ring $R$ over which the module is built.
 The type `FreeModule{T}` belongs to `AbstractAlgebra.Module{T}`.
+
+Vector spaces are simply free modules over a field.
 
 The free module of a given rank over a given ring is made unique on the
 system by caching them (unless an optional `cache` parameter is set to
@@ -19,42 +22,40 @@ cache (which usually makes use of a dictionary).
 
 ## Functionality for free modules
 
+As well as implementing the entire module interface, free modules provide the
+following functionality.
+
+### Constructors
+
+```julia
+FreeModule(R::Ring, rank::Int)
+VectorSpace(F::Field, dim::Int)
+```
+
+Construct the free module/vector space of given rank/dimension.
+
+**Examples**
+
+```julia
+M = FreeModule(ZZ, 3)
+V = VectorSpace(QQ, 2)
+```
+
 ### Basic manipulation
 
 ```@docs
 rank{T <: RingElem}(M::FreeModule{T})
+dim{T <: FieldElem}(V::FreeModule{T})
 ```
 
 **Examples**
 
 ```julia
 M = FreeModule(ZZ, 3)
+V = VectorSpace(QQ, 2)
 
 rank(M)
+dim(V)
 ```
-
-### Morphisms
-
-Morphisms of free modules, $f : R^s \to R^t$, can be represented by $s\times t$
-matrices over $R$. Note that elements of a free module are interpreted as row
-vectors in this context and if $f_1$ and $f_2$ are composable morphisms then
-$f_1(f_2(v))$ corresponds to multiplying the row vector $v$ on the right by 
-$M_1\times M_2$ where $M_i$ is the matrix corresponding to the morphism $f_i$.
-
-```@docs
-FreeModuleMorphism(M1::FreeModule{T}, M2::FreeModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
-```
-
-**Examples**
-
-```julia
-M = FreeModule(ZZ, 2)
-f = FreeModuleMorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
-
-m = M([ZZ(1), ZZ(2)])
-
-f(m)
-```
- 
 
 

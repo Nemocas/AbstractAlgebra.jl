@@ -1,8 +1,12 @@
 # Module Interface
 
+AbstractAlgebra allows the construction of finitely presented modules (i.e.
+with finitely many generators and relations), starting from free modules.
+
 All module types in AbstractAlgebra follow the following interface.
 
-Modules can be built over both commutative and noncommutative rings.
+Free modules can be built over both commutative and noncommutative rings. Other
+types of module are restricted to fields and euclidean rings.
 
 ## Types and parents
 
@@ -28,10 +32,62 @@ over.
 Of course, in practice these types may not be parameterised, but we use parameterised
 types here to make the interface clearer.
 
-Note that the type `T` must (transitively) belong to the abstract type `RingElem` or
-`NCRingElem`.
+Note that the type `T` must (transitively) belong to the abstract type `RingElement`
+or `NCRingElem`.
 
 We describe the functionality below for modules over commutative rings, i.e. with
-element type belonging to `RingElem`, however similar constructors should be available
-for element types belonging to `NCRingElem` instead, if the basse ring is
-noncommutative.
+element type belonging to `RingElement`, however similar constructors should be
+available for element types belonging to `NCRingElem` instead, for free modules over
+a noncommutative ring.
+
+### Basic manipulation
+
+```julia
+ngens(M::MyModule{T}) where T <: RingElement
+```
+
+Return the number of generators of the module $M$.
+
+```julia
+gen(M::MyModule{T}, i::Int) where T <: RingElement
+```
+
+Return the $i$-th generator (indexed from $1$) of the module $M$.
+
+```julia
+gens(M::MyModule{T}) where T <: RingElement
+```
+
+Return an array of the generators of the module $M$.
+
+**Examples**
+
+```julia
+M = FreeModule(QQ, 2)
+
+n = ngens(M)
+G = gens(M)
+g1 = gen(M, 1)
+```
+
+### Element constructors
+
+We can construct elements of a module $M$ by specifying linear combinations
+of the generators of $M$. This is done by passing a vector of ring elements.
+
+```julia
+(M::AbstractAlgebra.Module{T})(v::Vector{T})
+```
+
+Construct the element of the module $M$ corrsponding to $\sum_i g[i]*v[i]$
+where $g[i]$ are the generators of the module $M$. The resulting element
+will lie in the module $M$.
+
+### Arithmetic operators
+
+Elements of a module can be added, subtracted or multiplied by an element of
+the ring the module is defined over.
+
+In the case of a noncommutative ring, both left and right scalar multiplication
+are defined.
+
