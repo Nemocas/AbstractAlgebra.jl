@@ -1077,18 +1077,43 @@ end
 
 ###############################################################################
 #
-#   FreeModuleMorphism
+#   Submodule/submodule_elem
 #
 ###############################################################################
 
-mutable struct FreeModuleMorphism{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.Map{FreeModule{T}, FreeModule{T}, AbstractAlgebra.FunctionalMap, FreeModuleMorphism}
+mutable struct Submodule{T <: RingElement} <: AbstractAlgebra.Module{T}
+   m::AbstractAlgebra.Module{T}
+   gens::Vector{AbstractAlgebra.ModuleElem{T}}
+   base_ring::NCRing
 
-   domain::FreeModule{T}
-   codomain::FreeModule{T}
+   function Submodule{T}(M::AbstractAlgebra.Module{T}, gens::Vector{<:AbstractAlgebra.ModuleElem{T}}) where T <: RingElement
+      z = new{T}(M, gens, base_ring(M))
+   end
+end
+
+mutable struct submodule_elem{T <: RingElement} <: AbstractAlgebra.ModuleElem{T}
+   v::AbstractAlgebra.MatElem{T}
+   parent::AbstractAlgebra.Module{T}
+
+   function submodule_elem{T}(m::AbstractAlgebra.Module{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
+      z = new{T}(v, m)
+   end
+end
+
+###############################################################################
+#
+#   ModuleMorphism
+#
+###############################################################################
+
+mutable struct ModuleMorphism{T <: RingElement} <: AbstractAlgebra.Map{AbstractAlgebra.Module{T}, AbstractAlgebra.Module{T}, AbstractAlgebra.FunctionalMap, ModuleMorphism}
+
+   domain::AbstractAlgebra.Module{T}
+   codomain::AbstractAlgebra.Module{T}
    matrix::AbstractAlgebra.MatElem{T}
    image_fn::Function
 
-   function FreeModuleMorphism{T}(D::FreeModule{T}, C::FreeModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
-      z = new(D, C, m, x::free_module_elem{T} -> C(x.v*m))
+   function ModuleMorphism{T}(D::AbstractAlgebra.Module{T}, C::AbstractAlgebra.Module{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
+      z = new(D, C, m, x::AbstractAlgebra.ModuleElem{T} -> C(x.v*m))
    end
 end

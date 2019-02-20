@@ -144,7 +144,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached,
                  monomial_iszero, monomial_set!, monomial_to_newton!,
                  MPolyBuildCtx, mul!, mul_classical, 
                  mul_karatsuba, mul_ks, mullow, mulmod,
-                 needs_parentheses, newton_to_monomial!,
+                 needs_parentheses, newton_to_monomial!, ngens,
                  normalise, nvars,
                  O, one, order, ordering, parent_type, parity, partitionseq,
                  perm, permtype, @perm_str, polcoeff, pol_length,
@@ -205,12 +205,14 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, base_ring, cached,
                  map1, map2, map_from_func, map_with_preimage_from_func,
                  map_with_retraction, map_with_retraction_from_func,
                  map_with_section, map_with_section_from_func,
-                 matrix, matrix_repr, max_fields, max_precision, minors, minpoly, mod,
+                 matrix, matrix_repr, max_fields,
+                 max_precision, minors, minpoly, mod,
                  modulus, monomial, monomial!, monomials,
                  monomial_iszero, monomial_set!, monomial_to_newton!,
                  MPolyBuildCtx, mul!, mul_classical,
                  mul_karatsuba, mul_ks, mul_red!, mullow, mulmod,
-                 needs_parentheses, newton_to_monomial!, normalise, nvars,
+                 needs_parentheses, newton_to_monomial!,
+                 ngens, normalise, nvars,
                  O, one, order, ordering, parent_type, parity,
                  partitionseq, perm, permtype, @perm_str, polcoeff, pol_length,
                  powmod, pow_multinomial,
@@ -420,8 +422,20 @@ function FreeModule(R::NCRing, rank::Int; cached::Bool = true)
    Generic.FreeModule(R, rank; cached=cached)
 end
 
-function FreeModuleMorphism(M1::AbstractAlgebra.Generic.FreeModule, M2::AbstractAlgebra.Generic.FreeModule, m::MatElem)
-   Generic.FreeModuleMorphism(M1, M2, m)
+function Submodule(m::Module{T}, gens::Vector{<:ModuleElem{T}}) where T <: RingElement
+   Generic.Submodule(m, gens)
+end
+
+function Subspace(m::Module{T}, gens::Vector{<:ModuleElem{T}}) where T <: FieldElement
+   Generic.Submodule(m, gens)
+end
+
+function VectorSpace(R::Field, dim::Int; cached::Bool = true)
+   Generic.FreeModule(R, dim)
+end
+
+function ModuleMorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
+   Generic.ModuleMorphism(M1, M2, m)
 end
 
 #add empty functions so that Singular, Nemo and Hecke can import and extend.
@@ -433,7 +447,8 @@ export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        MatrixAlgebra, FractionField, ResidueRing, Partition, PermGroup,
        YoungTableau, AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
-       PuiseuxSeriesField, FreeModule, FreeModuleMorphism
+       PuiseuxSeriesField, FreeModule, ModuleMorphism, Submodule, Subspace,
+       VectorSpace
 
 export Generic
 

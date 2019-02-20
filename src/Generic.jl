@@ -71,7 +71,9 @@ include("generic/Fraction.jl")
 
 include("generic/FreeModule.jl")
 
-include("generic/FreeModuleMorphism.jl")
+include("generic/Submodule.jl")
+
+include("generic/ModuleMorphism.jl")
 
 include("generic/Map.jl")
 

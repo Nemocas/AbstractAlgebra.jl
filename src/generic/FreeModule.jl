@@ -35,10 +35,27 @@ function isexact_type(a::Type{free_module_elem{T}}) where T <: Union{RingElement
 end
 
 @doc Markdown.doc"""
-    rank(M::FreeModule{T}) where T <: RingElement
+    rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem}
 > Return the rank of the given free module.
 """
 rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.rank
+
+@doc Markdown.doc"""
+    dim(M::FreeModule{T}) where T <: FieldElement
+> Return the dimension of the given vector space.
+"""
+dim(M::FreeModule{T}) where T <: FieldElement = M.rank
+
+ngens(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.rank
+
+function gens(N::FreeModule{T}) where T <: Union{RingElement, NCRingElem}
+   return [gen(N, i) for i = 1:ngens(N)]
+end
+
+function gen(N::FreeModule{T}, i::Int) where T <: Union{RingElement, NCRingElem}
+   R = base_ring(N)
+   return N([(j == i ? one(R) : zero(R)) for j = 1:ngens(N)])
+end
 
 ###############################################################################
 #
@@ -46,10 +63,17 @@ rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.rank
 #
 ###############################################################################
 
-function show(io::IO, M::FreeModule)
+function show(io::IO, M::FreeModule{T}) where T <: Union{RingElement, NCRingElem}
    print(io, "Free module of rank ")
    print(io, rank(M))
-   print(" over ")
+   print(io, " over ")
+   show(io, base_ring(M))
+end
+
+function show(io::IO, M::FreeModule{T}) where T <: FieldElement
+   print(io, "Vector space of dimension ")
+   print(io, dim(M))
+   print(io, " over ")
    show(io, base_ring(M))
 end
 
@@ -58,7 +82,7 @@ function show(io::IO, a::free_module_elem)
    M = parent(a)
    for i = 1:rank(M) - 1
       print(io, a.v[1, i])
-      print(", ")
+      print(io, ", ")
    end
    if rank(M) > 0
       print(io, a.v[1, rank(M)])
@@ -101,24 +125,24 @@ end
 #
 ###############################################################################
 
-function *(m::free_module_elem{T}, c::T) where T <: Union{RingElement, NCRingElem}
+function *(m::free_module_elem{T}, c::T) where T <: Union{RingElem, NCRingElem}
    parent(c) != base_ring(m) && error("Incompatible scalar")
    M = parent(m)
    return M(m.v*c)
 end
 
-function *(c::T, m::free_module_elem{T}) where T <: Union{RingElement, NCRingElem}
+function *(c::T, m::free_module_elem{T}) where T <: Union{RingElem, NCRingElem}
    parent(c) != base_ring(m) && error("Incompatible scalar")
    M = parent(m)
    return M(c*m.v)
 end
 
-function *(m::free_module_elem{T}, c::U) where {T <: Union{RingElement, NCRingElem}, U <: Integer}
+function *(m::free_module_elem{T}, c::U) where {T <: Union{RingElement, NCRingElem}, U <: Union{Rational, Integer}}
    M = parent(m)
    return M(m.v*c)
 end
 
-function *(c::U, m::free_module_elem{T}) where {T <: Union{RingElement, NCRingElem}, U <: Integer}
+function *(c::U, m::free_module_elem{T}) where {T <: Union{RingElement, NCRingElem}, U <: Union{Rational, Integer}}
    M = parent(m)
    return M(c*m.v)
 end
