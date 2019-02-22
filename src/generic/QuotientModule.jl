@@ -161,18 +161,18 @@ function reduce_mod_rels(v::AbstractAlgebra.MatElem{T}, N::QuotientModule{T}) wh
    for i in 1:length(culled) # for each culled relation
       culli = culled[i] # index of culled relation in rels vector
       w = rels[culli].v # get next culled row as vector w
-      col = pivots[row] # column of pivot in culled row
-      d = w[col] # ring element in pivot column of culled row
-      q, v.v[col] = divrem(v.v[col], d) # reduce entry in v by pivot
-      # find index in gens of next relevant column after pivot column
-      while gens[geni] <= col
+      col = pivots[i] # column of pivot in culled row
+      # find index in gens of pivot column
+      while gens[geni] < col
          geni += 1
       end
+      d = w[1, col] # ring element in pivot column of culled row
+      q, v[1, geni] = divrem(v[1, geni], d) # reduce entry in v by pivot
       # v = v - q*rels[culli], skipping zero cols
       q = -q
-      for j = geni:length(gens)
-         t = mul!(t, q, w[gens[j]])
-         v.v[j] = addeq!(v.v[j], t)
+      for j = geni + 1:length(gens)
+         t = mul!(t, q, w[1, gens[j]])
+         v[1, j] = addeq!(v[1, j], t)
       end
    end
    return v 

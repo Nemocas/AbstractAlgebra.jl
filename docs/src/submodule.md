@@ -32,10 +32,10 @@ v2 = f(v)
 
 V = VectorSpace(QQ, 2)
 
-m = M([QQ(1), QQ(2)])
-n = M([QQ(2), QQ(-1)])
+m = V([QQ(1), QQ(2)])
+n = V([QQ(2), QQ(-1)])
 
-N, f = Subspace(M, [m, n])
+N, f = Subspace(V, [m, n])
 ```
 
 ## Functionality for submodules
