@@ -422,6 +422,10 @@ function FreeModule(R::NCRing, rank::Int; cached::Bool = true)
    Generic.FreeModule(R, rank; cached=cached)
 end
 
+function VectorSpace(R::Field, dim::Int; cached::Bool = true)
+   Generic.FreeModule(R, dim)
+end
+
 function Submodule(m::Module{T}, gens::Vector{<:ModuleElem{T}}) where T <: RingElement
    Generic.Submodule(m, gens)
 end
@@ -430,8 +434,12 @@ function Subspace(m::Module{T}, gens::Vector{<:ModuleElem{T}}) where T <: FieldE
    Generic.Submodule(m, gens)
 end
 
-function VectorSpace(R::Field, dim::Int; cached::Bool = true)
-   Generic.FreeModule(R, dim)
+function QuotientModule(m::Module{T}, N::Generic.Submodule{T}) where T <: RingElement
+   Generic.QuotientModule(m, N)
+end
+
+function QuotientSpace(m::Module{T}, N::Generic.Submodule{T}) where T <: FieldElement
+   Generic.QuotientModule(m, N)
 end
 
 function ModuleMorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
@@ -447,8 +455,8 @@ export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        MatrixAlgebra, FractionField, ResidueRing, Partition, PermGroup,
        YoungTableau, AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
-       PuiseuxSeriesField, FreeModule, ModuleMorphism, Submodule, Subspace,
-       VectorSpace
+       PuiseuxSeriesField, FreeModule, VectorSpace, ModuleMorphism, Submodule,
+       Subspace, QuotientModule, QuotientSpace
 
 export Generic
 

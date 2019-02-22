@@ -152,6 +152,7 @@ end
 
 function (N::Submodule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingElement
    ncols(v) != ngens(N) && error("Length of vector does not match number of generators")
+   nrows(v) != 1 && ("Not a vector in submodule_elem constructor")
    return submodule_elem{T}(N, v)
 end
 

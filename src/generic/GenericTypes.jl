@@ -1084,7 +1084,7 @@ end
 mutable struct Submodule{T <: RingElement} <: AbstractAlgebra.Module{T}
    m::AbstractAlgebra.Module{T}
    gens::Vector{AbstractAlgebra.ModuleElem{T}}
-   base_ring::NCRing
+   base_ring::Ring
    map::FunctionalMap{Submodule{T}, <:AbstractAlgebra.Module}
 
    function Submodule{T}(M::AbstractAlgebra.Module{T}, gens::Vector{<:AbstractAlgebra.ModuleElem{T}}) where T <: RingElement
@@ -1097,6 +1097,59 @@ mutable struct submodule_elem{T <: RingElement} <: AbstractAlgebra.ModuleElem{T}
    parent::AbstractAlgebra.Module{T}
 
    function submodule_elem{T}(m::AbstractAlgebra.Module{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
+      z = new{T}(v, m)
+   end
+end
+
+###############################################################################
+#
+#   QuotientModule/quotient_module_elem
+#
+###############################################################################
+
+mutable struct QuotientModule{T <: RingElement} <: AbstractAlgebra.Module{T}
+   m::AbstractAlgebra.Module{T}
+   rels::Vector{AbstractAlgebra.ModuleElem{T}}
+   gens::Vector{Int} # which columns correspond to gens
+   culled::Vector{Int} # which relations have non unit pivot
+   pivots::Vector{Int} # pivot column of each culled relation
+   base_ring::Ring
+   map::FunctionalMap{QuotientModule{T}, <:AbstractAlgebra.Module}
+
+   function QuotientModule{T}(M::AbstractAlgebra.Module{T}, rels::Vector{S}) where S <:AbstractAlgebra.ModuleElem{T} where T <: RingElement
+      gens = Vector{Int}(undef, 0)
+      pivots = Vector{Int}(undef, 0)
+      culled = Vector{Int}(undef, 0)
+      # compute rels without unit pivot
+      col = 1
+      row = 1
+      for v in rels
+         while v.v[1, col] == 0
+            push!(gens, col)
+            col += 1
+         end
+         if !isunit(v.v[1, col])
+            push!(gens, col)
+            push!(culled, row)
+            push!(pivots, col)
+         end
+         col += 1
+         row += 1
+      end
+      while col <= ngens(M)
+         push!(gens, col)
+         col += 1
+      end
+      z = new{T}(M, rels, gens, culled, pivots, base_ring(M))
+   end
+end
+
+mutable struct quotient_module_elem{T <: RingElement} <: AbstractAlgebra.ModuleElem{T}
+   v::AbstractAlgebra.MatElem{T}
+   parent::AbstractAlgebra.Module{T}
+
+   function quotient_module_elem{T}(m::AbstractAlgebra.Module{T}, v::AbstractAlgebra.MatElem{T}
+) where T <: RingElement
       z = new{T}(v, m)
    end
 end

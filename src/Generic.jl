@@ -73,6 +73,8 @@ include("generic/FreeModule.jl")
 
 include("generic/Submodule.jl")
 
+include("generic/QuotientModule.jl")
+
 include("generic/ModuleMorphism.jl")
 
 include("generic/Map.jl")
