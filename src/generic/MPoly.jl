@@ -13,7 +13,7 @@ export max_fields, total_degree, gens, divides, isconstant, isdegree,
        combine_like_terms!, exponent, exponent_vector, exponent_vectors,
        set_exponent_vector!, sort_terms!, coeffs, monomial, monomial!,
        monomials, term, terms, var_index, @PolynomialRing, lc, lm, lt, lcm,
-       MPolyBuildCtx
+       MPolyBuildCtx, ishomogeneous
 
 ###############################################################################
 #
@@ -552,6 +552,19 @@ function isgen(x::MPoly{T}) where {T <: RingElement}
       return false
    end
    return isgen(x, Val{parent(x).ord})
+end
+
+@doc Markdown.doc"""
+    ishomogeneous(x::MPoly{T}) where {T <: RingElement}
+> Return `true` if the given polynomial is homogeneous and `false` otherwise.
+"""
+function ishomogeneous(x::MPoly{T}) where {T <: RingElement}
+   degs = Set([sum(i) for i in exponent_vectors(x)])
+   if length(degs) <= 1
+      return true
+   else
+      return false
+   end
 end
 
 @doc Markdown.doc"""
