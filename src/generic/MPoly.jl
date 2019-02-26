@@ -559,12 +559,23 @@ end
 > Return `true` if the given polynomial is homogeneous and `false` otherwise.
 """
 function ishomogeneous(x::MPoly{T}) where {T <: RingElement}
-   degs = Set([sum(i) for i in exponent_vectors(x)])
-   if length(degs) <= 1
-      return true
-   else
-      return false
+   last_deg = 0
+   is_first = true
+
+   for e in exponent_vectors(x)
+      d = sum(e)
+      if !is_first
+         if d != last_deg
+            return false
+         else
+            last_deg = d
+         end
+      else
+         is_first = false
+         last_deg = d
+      end
    end
+   return true
 end
 
 @doc Markdown.doc"""
