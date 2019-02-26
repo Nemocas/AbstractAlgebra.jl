@@ -556,7 +556,7 @@ end
 
 @doc Markdown.doc"""
     ishomogeneous(x::MPoly{T}) where {T <: RingElement}
-> Return `true` if the given polynomial is homogeneous and `false` otherwise.
+> Return `true` if the given polynomial is homogeneous with respect to the standard grading and `false` otherwise.
 """
 function ishomogeneous(x::MPoly{T}) where {T <: RingElement}
    last_deg = 0
