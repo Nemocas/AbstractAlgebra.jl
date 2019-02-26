@@ -403,3 +403,12 @@ f = x*y + x + y + 1
 derivative(f, x)
 derivative(f, y)
 ```
+
+### Homogeneous polynomials
+
+It is possible to test whether a polynomial is homogeneous with respect to the standard grading using the function
+
+```@docs
+ishomogeneous(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+```
+
