@@ -27,9 +27,9 @@ following functionality.
 
 ### Constructors
 
-```julia
-FreeModule(R::Ring, rank::Int)
-VectorSpace(F::Field, dim::Int)
+```@docs
+FreeModule(R::AbstractAlgebra.Ring, rank::Int)
+VectorSpace(F::AbstractAlgebra.Field, dim::Int)
 ```
 
 Construct the free module/vector space of given rank/dimension.
@@ -43,9 +43,9 @@ V = VectorSpace(QQ, 2)
 
 ### Basic manipulation
 
-```@docs
-rank{T <: RingElem}(M::FreeModule{T})
-dim{T <: FieldElem}(V::FreeModule{T})
+```julia
+rank(M::Generic.FreeModule{T}) where T <: AbstractAlgebra.RingElem
+dim(V::Generic.FreeModule{T}) where T <: AbstractAlgebra.FieldElem
 ```
 
 **Examples**

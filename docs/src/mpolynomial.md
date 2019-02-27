@@ -114,10 +114,6 @@ degrees(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 
 ```@docs
-isunit(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-```
-
-```@docs
 isconstant(::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
 

@@ -14,7 +14,8 @@ QuotientModule(M::AbstractAlgebra.Module{T}, v::Generic.Submodule{T}) where T <:
 ```
 
 ```@docs
-QuotientSpace(M::AbstractAlgebra.Module{T}, v::Generic.Submodule{T}}) where T <: FieldElement
+QuotientSpace(M::AbstractAlgebra.Module{T}, v::Generic.Submodule{T}) where T <: FieldElement
+
 ```
 
 **Examples**

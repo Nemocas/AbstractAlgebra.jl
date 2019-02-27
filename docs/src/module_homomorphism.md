@@ -4,8 +4,7 @@ Homomorphisms of AbstractAlgebra modules, $f : R^s \to R^t$, can be represented 
 $s\times t$ matrices over $R$.
 
 ```@docs
-ModuleHomomorphism(M1::AbstractAlgebra.Module{T}, M2::AbstractAlgebra.Module{T}, m::AbstractA
-lgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
+Generic.ModuleHomomorphism(M1::AbstractAlgebra.Module{T}, M2::AbstractAlgebra.Module{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
 ```
 
 **Examples**

@@ -418,10 +418,18 @@ function NumberField(a::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::Char,
    NumberField(a, string(s), t; cached=cached)
 end
 
+@doc Markdown.doc"""
+    FreeModule(R::NCRing, rank::Int; cached::Bool = true)
+> Return the free module over the ring $R$ with the given rank.
+"""
 function FreeModule(R::NCRing, rank::Int; cached::Bool = true)
    Generic.FreeModule(R, rank; cached=cached)
 end
 
+@doc Markdown.doc"""
+    VectorSpace(R::Field, dim::Int; cached::Bool = true)
+> Return the vector space over the field $R$ with the given dimension.
+"""
 function VectorSpace(R::Field, dim::Int; cached::Bool = true)
    Generic.FreeModule(R, dim)
 end
