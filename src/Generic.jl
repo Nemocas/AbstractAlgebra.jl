@@ -75,7 +75,7 @@ include("generic/Submodule.jl")
 
 include("generic/QuotientModule.jl")
 
-include("generic/ModuleMorphism.jl")
+include("generic/ModuleHomomorphism.jl")
 
 include("generic/Map.jl")
 

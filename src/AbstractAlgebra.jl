@@ -464,8 +464,8 @@ function QuotientSpace(m::Module{T}, N::Generic.Submodule{T}) where T <: FieldEl
    Generic.QuotientModule(m, N)
 end
 
-function ModuleMorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
-   Generic.ModuleMorphism(M1, M2, m)
+function ModuleHomomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
+   Generic.ModuleHomomorphism(M1, M2, m)
 end
 
 #add empty functions so that Singular, Nemo and Hecke can import and extend.
@@ -477,7 +477,7 @@ export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        MatrixAlgebra, FractionField, ResidueRing, Partition, PermGroup,
        YoungTableau, AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
-       PuiseuxSeriesField, FreeModule, VectorSpace, ModuleMorphism, Submodule,
+       PuiseuxSeriesField, FreeModule, VectorSpace, ModuleHomomorphism, Submodule,
        Subspace, QuotientModule, QuotientSpace
 
 export Generic

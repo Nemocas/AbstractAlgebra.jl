@@ -1156,18 +1156,18 @@ end
 
 ###############################################################################
 #
-#   ModuleMorphism
+#   ModuleHomomorphism
 #
 ###############################################################################
 
-mutable struct ModuleMorphism{T <: RingElement} <: AbstractAlgebra.Map{AbstractAlgebra.Module{T}, AbstractAlgebra.Module{T}, AbstractAlgebra.FunctionalMap, ModuleMorphism}
+mutable struct ModuleHomomorphism{T <: RingElement} <: AbstractAlgebra.Map{AbstractAlgebra.Module{T}, AbstractAlgebra.Module{T}, AbstractAlgebra.FunctionalMap, ModuleHomomorphism}
 
    domain::AbstractAlgebra.Module{T}
    codomain::AbstractAlgebra.Module{T}
    matrix::AbstractAlgebra.MatElem{T}
    image_fn::Function
 
-   function ModuleMorphism{T}(D::AbstractAlgebra.Module{T}, C::AbstractAlgebra.Module{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
+   function ModuleHomomorphism{T}(D::AbstractAlgebra.Module{T}, C::AbstractAlgebra.Module{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
       z = new(D, C, m, x::AbstractAlgebra.ModuleElem{T} -> C(x.v*m))
    end
 end
