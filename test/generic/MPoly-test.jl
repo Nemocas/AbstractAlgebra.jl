@@ -1364,6 +1364,26 @@ function test_gen_mpoly_lm()
    println("PASS")
 end
 
+function test_gen_mpoly_ishomogeneous()
+   print("Generic.MPoly.ishomogenous...")
+
+   for num_vars = 1:4
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+      S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
+
+      for iter = 1:10
+         @test ishomogeneous(zero(S))
+         @test ishomogeneous(one(S))
+         for v in varlist
+            @test ishomogeneous(v)
+            @test !ishomogeneous(v+one(S))
+         end
+      end
+   end
+
+   println("PASS")
+end
 
 
 function test_gen_mpoly()
@@ -1395,6 +1415,7 @@ function test_gen_mpoly()
    test_gen_mpoly_lm()
    test_gen_mpoly_lt()
    test_gen_mpoly_lcm()
+   test_gen_mpoly_ishomogeneous()
 
    println("")
 end
