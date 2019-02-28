@@ -1817,6 +1817,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "mpolynomial/#AbstractAlgebra.Generic.ishomogeneous-Union{Tuple{MPolyElem{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "AbstractAlgebra.Generic.ishomogeneous",
+    "category": "method",
+    "text": "ishomogeneous(x::MPoly{T}) where {T <: RingElement}\n\nReturn true if the given polynomial is homogeneous with respect to the standard grading and false otherwise.\n\n\n\n"
+},
+
+{
+    "location": "mpolynomial/#Homogeneous-polynomials-1",
+    "page": "Generic sparse distributed multivariate polynomials",
+    "title": "Homogeneous polynomials",
+    "category": "section",
+    "text": "It is possible to test whether a polynomial is homogeneous with respect to the standard grading using the functionishomogeneous(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement"
+},
+
+{
     "location": "series_rings/#",
     "page": "Series Ring Interface",
     "title": "Series Ring Interface",
