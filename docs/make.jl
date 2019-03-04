@@ -32,13 +32,18 @@ makedocs(
                            "numberfield.md"],
              "Groups" => [ "perm.md",
                            "ytabs.md"],
+             "Modules" => [ "module.md",
+                            "free_module.md",
+                            "submodule.md",
+                            "quotient_module.md",
+                            "module_homomorphism.md"],
              "Matrices" => [ "matrix_spaces.md",
                              "matrix.md",
                              "matrix_algebras.md"],
-             "Maps" => ["map.md",
-                        "functional_map.md",
-                        "map_cache.md",
-                        "map_with_inverse.md"],
+             "Maps" => [ "map.md",
+                         "functional_map.md",
+                         "map_cache.md",
+                         "map_with_inverse.md"],
              "types.md" # Appendix A
          ]
 )

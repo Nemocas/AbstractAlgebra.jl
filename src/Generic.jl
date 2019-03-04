@@ -69,6 +69,14 @@ include("generic/MatrixAlgebra.jl")
 
 include("generic/Fraction.jl")
 
+include("generic/FreeModule.jl")
+
+include("generic/Submodule.jl")
+
+include("generic/QuotientModule.jl")
+
+include("generic/ModuleHomomorphism.jl")
+
 include("generic/Map.jl")
 
 include("generic/MapWithInverse.jl")

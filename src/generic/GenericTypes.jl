@@ -1040,3 +1040,134 @@ mutable struct MapCache{D, C, S, T, De, Ce} <: AbstractAlgebra.Map{D, C, S, T}
       return r
    end
 end
+
+###############################################################################
+#
+#   FreeModule/free_module_elem
+#
+###############################################################################
+
+mutable struct FreeModule{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.Module{T}
+   rank::Int
+   base_ring::NCRing
+
+   function FreeModule{T}(R::NCRing, rank::Int, cached::Bool = true) where T <: Union{RingElement, NCRingElem}
+      if cached && haskey(FreeModuleDict, (R, rank))
+         return FreeModuleDict[R, rank]::FreeModule{T}
+      else
+         z = new{T}(rank, R)
+         if cached
+            FreeModuleDict[R, rank] = z
+         end
+         return z
+      end
+   end
+end
+
+const FreeModuleDict = Dict{Tuple{NCRing, Int}, FreeModule}()
+
+mutable struct free_module_elem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.ModuleElem{T}
+    v::AbstractAlgebra.MatElem{T}
+    parent::FreeModule{T}
+
+    function free_module_elem{T}(v::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
+       z = new{T}(v)
+    end
+end
+
+###############################################################################
+#
+#   Submodule/submodule_elem
+#
+###############################################################################
+
+mutable struct Submodule{T <: RingElement} <: AbstractAlgebra.Module{T}
+   m::AbstractAlgebra.Module{T}
+   gens::Vector{AbstractAlgebra.ModuleElem{T}}
+   base_ring::Ring
+   map::FunctionalMap{Submodule{T}, <:AbstractAlgebra.Module}
+
+   function Submodule{T}(M::AbstractAlgebra.Module{T}, gens::Vector{<:AbstractAlgebra.ModuleElem{T}}) where T <: RingElement
+      z = new{T}(M, gens, base_ring(M))
+   end
+end
+
+mutable struct submodule_elem{T <: RingElement} <: AbstractAlgebra.ModuleElem{T}
+   v::AbstractAlgebra.MatElem{T}
+   parent::AbstractAlgebra.Module{T}
+
+   function submodule_elem{T}(m::AbstractAlgebra.Module{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
+      z = new{T}(v, m)
+   end
+end
+
+###############################################################################
+#
+#   QuotientModule/quotient_module_elem
+#
+###############################################################################
+
+mutable struct QuotientModule{T <: RingElement} <: AbstractAlgebra.Module{T}
+   m::AbstractAlgebra.Module{T}
+   rels::Vector{AbstractAlgebra.ModuleElem{T}}
+   gens::Vector{Int} # which columns correspond to gens
+   culled::Vector{Int} # which relations have non unit pivot
+   pivots::Vector{Int} # pivot column of each culled relation
+   base_ring::Ring
+   map::FunctionalMap{QuotientModule{T}, <:AbstractAlgebra.Module}
+
+   function QuotientModule{T}(M::AbstractAlgebra.Module{T}, rels::Vector{S}) where S <:AbstractAlgebra.ModuleElem{T} where T <: RingElement
+      gens = Vector{Int}(undef, 0)
+      pivots = Vector{Int}(undef, 0)
+      culled = Vector{Int}(undef, 0)
+      # compute rels without unit pivot
+      col = 1
+      row = 1
+      for v in rels
+         while v.v[1, col] == 0
+            push!(gens, col)
+            col += 1
+         end
+         if !isunit(v.v[1, col])
+            push!(gens, col)
+            push!(culled, row)
+            push!(pivots, col)
+         end
+         col += 1
+         row += 1
+      end
+      while col <= ngens(M)
+         push!(gens, col)
+         col += 1
+      end
+      z = new{T}(M, rels, gens, culled, pivots, base_ring(M))
+   end
+end
+
+mutable struct quotient_module_elem{T <: RingElement} <: AbstractAlgebra.ModuleElem{T}
+   v::AbstractAlgebra.MatElem{T}
+   parent::AbstractAlgebra.Module{T}
+
+   function quotient_module_elem{T}(m::AbstractAlgebra.Module{T}, v::AbstractAlgebra.MatElem{T}
+) where T <: RingElement
+      z = new{T}(v, m)
+   end
+end
+
+###############################################################################
+#
+#   ModuleHomomorphism
+#
+###############################################################################
+
+mutable struct ModuleHomomorphism{T <: RingElement} <: AbstractAlgebra.Map{AbstractAlgebra.Module{T}, AbstractAlgebra.Module{T}, AbstractAlgebra.FunctionalMap, ModuleHomomorphism}
+
+   domain::AbstractAlgebra.Module{T}
+   codomain::AbstractAlgebra.Module{T}
+   matrix::AbstractAlgebra.MatElem{T}
+   image_fn::Function
+
+   function ModuleHomomorphism{T}(D::AbstractAlgebra.Module{T}, C::AbstractAlgebra.Module{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
+      z = new(D, C, m, x::AbstractAlgebra.ModuleElem{T} -> C(x.v*m))
+   end
+end
