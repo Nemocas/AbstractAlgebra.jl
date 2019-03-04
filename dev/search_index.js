@@ -1589,7 +1589,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Basic manipulation",
     "category": "section",
-    "text": "vars(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElementvar_index(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdegree(::AbstractAlgebra.MPolyElem{T}, ::Int) where T <: RingElementdegree(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdegrees(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisunit(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisconstant(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisterm(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementismonomial(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementcoeff(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: RingElementExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^2 + 2x + 1\n\nV = vars(f)\nvar_index(y) == 2\ndegree(f, x) == 2\ndegree(f, 2) == 0\nd = degrees(f)\nisconstant(R(1))\nisterm(2x)\nismonomial(y)\nisunit(R(1))\nc = coeff(f, x^2)"
+    "text": "vars(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElementvar_index(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdegree(::AbstractAlgebra.MPolyElem{T}, ::Int) where T <: RingElementdegree(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdegrees(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisconstant(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisterm(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementismonomial(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementcoeff(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: RingElementExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^2 + 2x + 1\n\nV = vars(f)\nvar_index(y) == 2\ndegree(f, x) == 2\ndegree(f, 2) == 0\nd = degrees(f)\nisconstant(R(1))\nisterm(2x)\nismonomial(y)\nisunit(R(1))\nc = coeff(f, x^2)"
 },
 
 {
@@ -3382,6 +3382,278 @@ var documenterSearchIndex = {"docs": [
     "title": "Skew Diagrams",
     "category": "section",
     "text": "Skew diagrams are formally differences of two Young diagrams. Given lambda and mu, two partitions of n+m and m (respectively). Suppose that each of cells of mu is a cell of lambda (i.e. parts of mu are no greater than the corresponding parts of lambda). Then the skew diagram denoted by lambdamu is the set theoretic difference the of sets of boxes, i.e. is a diagram with exactly n boxes:Generic.SkewDiagramSkewDiagram implements array interface with the following functions:size(xi::Generic.SkewDiagram)\nin(t::Tuple{T,T}, xi::Generic.SkewDiagram) where T<:Integer\ngetindex(xi::Generic.SkewDiagram, n::Integer)The support for skew diagrams is very rudimentary. The following functions are available:isrimhook(::Generic.SkewDiagram)\nleglength\nmatrix_repr(::Generic.SkewDiagram)"
+},
+
+{
+    "location": "module/#",
+    "page": "Module Interface",
+    "title": "Module Interface",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "module/#Module-Interface-1",
+    "page": "Module Interface",
+    "title": "Module Interface",
+    "category": "section",
+    "text": "AbstractAlgebra allows the construction of finitely presented modules (i.e. with finitely many generators and relations), starting from free modules.All module types in AbstractAlgebra follow the following interface.Free modules can be built over both commutative and noncommutative rings. Other types of module are restricted to fields and euclidean rings."
+},
+
+{
+    "location": "module/#Types-and-parents-1",
+    "page": "Module Interface",
+    "title": "Types and parents",
+    "category": "section",
+    "text": "AbstractAlgebra provides two abstract types for modules and their elements:Module{T} is the abstract type for module parent types\nModuleElem{T} is the abstract type for module element typesNote that the abstract types are parameterised. The type T should usually be the type of elements of the ring the module is over."
+},
+
+{
+    "location": "module/#Required-functionality-for-modules-1",
+    "page": "Module Interface",
+    "title": "Required functionality for modules",
+    "category": "section",
+    "text": "We suppose that R is a fictitious base ring and that S is a module over R with parent object S of type MyModule{T}. We also assume the elements in the module have type MyModuleElem{T}, where T is the type of elements of the ring the module is over.Of course, in practice these types may not be parameterised, but we use parameterised types here to make the interface clearer.Note that the type T must (transitively) belong to the abstract type RingElement or NCRingElem.We describe the functionality below for modules over commutative rings, i.e. with element type belonging to RingElement, however similar constructors should be available for element types belonging to NCRingElem instead, for free modules over a noncommutative ring."
+},
+
+{
+    "location": "module/#Basic-manipulation-1",
+    "page": "Module Interface",
+    "title": "Basic manipulation",
+    "category": "section",
+    "text": "ngens(M::MyModule{T}) where T <: RingElementReturn the number of generators of the module M.gen(M::MyModule{T}, i::Int) where T <: RingElementReturn the i-th generator (indexed from 1) of the module M.gens(M::MyModule{T}) where T <: RingElementReturn an array of the generators of the module M.ExamplesM = FreeModule(QQ, 2)\n\nn = ngens(M)\nG = gens(M)\ng1 = gen(M, 1)"
+},
+
+{
+    "location": "module/#Element-constructors-1",
+    "page": "Module Interface",
+    "title": "Element constructors",
+    "category": "section",
+    "text": "We can construct elements of a module M by specifying linear combinations of the generators of M. This is done by passing a vector of ring elements.(M::AbstractAlgebra.Module{T})(v::Vector{T})Construct the element of the module M corrsponding to sum_i gi*vi where gi are the generators of the module M. The resulting element will lie in the module M."
+},
+
+{
+    "location": "module/#Arithmetic-operators-1",
+    "page": "Module Interface",
+    "title": "Arithmetic operators",
+    "category": "section",
+    "text": "Elements of a module can be added, subtracted or multiplied by an element of the ring the module is defined over.In the case of a noncommutative ring, both left and right scalar multiplication are defined."
+},
+
+{
+    "location": "free_module/#",
+    "page": "Free Modules and Vector Spaces",
+    "title": "Free Modules and Vector Spaces",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "free_module/#Free-Modules-and-Vector-Spaces-1",
+    "page": "Free Modules and Vector Spaces",
+    "title": "Free Modules and Vector Spaces",
+    "category": "section",
+    "text": "AbstractAlgebra allows the construction of the free module of any rank over any Euclidean ring and the vector space of any dimension over a field. By default the system considers the free module of a given rank over a given ring or vector space of given dimension over a field to be unique."
+},
+
+{
+    "location": "free_module/#Types-and-parents-1",
+    "page": "Free Modules and Vector Spaces",
+    "title": "Types and parents",
+    "category": "section",
+    "text": "AbstractAlgebra provides the type FreeModule{T} for free modules, where T is the type of the elements of the ring R over which the module is built. The type FreeModule{T} belongs to AbstractAlgebra.Module{T}.Vector spaces are simply free modules over a field.The free module of a given rank over a given ring is made unique on the system by caching them (unless an optional cache parameter is set to false).See src/generic/GenericTypes.jl for an example of how to implement such a cache (which usually makes use of a dictionary)."
+},
+
+{
+    "location": "free_module/#Functionality-for-free-modules-1",
+    "page": "Free Modules and Vector Spaces",
+    "title": "Functionality for free modules",
+    "category": "section",
+    "text": "As well as implementing the entire module interface, free modules provide the following functionality."
+},
+
+{
+    "location": "free_module/#AbstractAlgebra.FreeModule-Tuple{AbstractAlgebra.Ring,Int64}",
+    "page": "Free Modules and Vector Spaces",
+    "title": "AbstractAlgebra.FreeModule",
+    "category": "method",
+    "text": "FreeModule(R::NCRing, rank::Int; cached::Bool = true)\n\nReturn the free module over the ring R with the given rank.\n\n\n\n"
+},
+
+{
+    "location": "free_module/#AbstractAlgebra.VectorSpace-Tuple{AbstractAlgebra.Field,Int64}",
+    "page": "Free Modules and Vector Spaces",
+    "title": "AbstractAlgebra.VectorSpace",
+    "category": "method",
+    "text": "VectorSpace(R::Field, dim::Int; cached::Bool = true)\n\nReturn the vector space over the field R with the given dimension.\n\n\n\n"
+},
+
+{
+    "location": "free_module/#Constructors-1",
+    "page": "Free Modules and Vector Spaces",
+    "title": "Constructors",
+    "category": "section",
+    "text": "FreeModule(R::AbstractAlgebra.Ring, rank::Int)\nVectorSpace(F::AbstractAlgebra.Field, dim::Int)Construct the free module/vector space of given rank/dimension.ExamplesM = FreeModule(ZZ, 3)\nV = VectorSpace(QQ, 2)"
+},
+
+{
+    "location": "free_module/#Basic-manipulation-1",
+    "page": "Free Modules and Vector Spaces",
+    "title": "Basic manipulation",
+    "category": "section",
+    "text": "rank(M::Generic.FreeModule{T}) where T <: AbstractAlgebra.RingElem\ndim(V::Generic.FreeModule{T}) where T <: AbstractAlgebra.FieldElemExamplesM = FreeModule(ZZ, 3)\nV = VectorSpace(QQ, 2)\n\nrank(M)\ndim(V)"
+},
+
+{
+    "location": "submodule/#",
+    "page": "Submodules",
+    "title": "Submodules",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "submodule/#Submodules-1",
+    "page": "Submodules",
+    "title": "Submodules",
+    "category": "section",
+    "text": "AbstractAlgebra allows the construction of submodules/subvector spaces of AbstractAlgebra modules. These are given as the submodule generated by a finite list of elements in the original module.As well as implementing the entire Module interface, AbstractAlgebra submodules also provide the following interface."
+},
+
+{
+    "location": "submodule/#AbstractAlgebra.Submodule-Union{Tuple{T}, Tuple{Module{T},Array{ModuleElem{T},1}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Submodules",
+    "title": "AbstractAlgebra.Submodule",
+    "category": "method",
+    "text": "Submodule(m::Module{T}, gens::Vector{ModuleElem{T}}) where T <: RingElement\n\nReturn the submodule S of the module m generated by the given generators, given as elements of m, and a map which is the canonical injection from S to m.\n\n\n\n"
+},
+
+{
+    "location": "submodule/#AbstractAlgebra.Subspace-Union{Tuple{T}, Tuple{Module{T},Array{ModuleElem{T},1}}} where T<:Union{FieldElem, AbstractFloat, Rational}",
+    "page": "Submodules",
+    "title": "AbstractAlgebra.Subspace",
+    "category": "method",
+    "text": "Subspace(m::Module{T}, gens::Vector{ModuleElem{T}}) where T <: FieldElement\n\nReturn the subspace of the vector space m generated by the given generators, given as elements of m, and a map which is the canonical injection from S to m.\n\n\n\n"
+},
+
+{
+    "location": "submodule/#Constructors-1",
+    "page": "Submodules",
+    "title": "Constructors",
+    "category": "section",
+    "text": "Submodule(M::AbstractAlgebra.Module{T}, v::Vector{AbstractAlgebra.ModuleElem{T}}) where T <: RingElementSubspace(M::AbstractAlgebra.Module{T}, v::Vector{AbstractAlgebra.ModuleElem{T}}) where T <: FieldElementExamplesM = FreeModule(ZZ, 2)\n\nm = M([ZZ(1), ZZ(2)])\nn = M([ZZ(2), ZZ(-1)])\n\nN, f = Submodule(M, [m, n])\n\nv = N([ZZ(3), ZZ(4)])\nv2 = f(v)\n\nV = VectorSpace(QQ, 2)\n\nm = V([QQ(1), QQ(2)])\nn = V([QQ(2), QQ(-1)])\n\nN, f = Subspace(V, [m, n])"
+},
+
+{
+    "location": "submodule/#Functionality-for-submodules-1",
+    "page": "Submodules",
+    "title": "Functionality for submodules",
+    "category": "section",
+    "text": "In addition to the Module interface, AbstractAlgebra submodules implement the following functionality."
+},
+
+{
+    "location": "submodule/#AbstractAlgebra.Generic.supermodule-Union{Tuple{Submodule{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Submodules",
+    "title": "AbstractAlgebra.Generic.supermodule",
+    "category": "method",
+    "text": "supermodule(M::Submodule{T}) where T <: RingElement\n\nReturn the module that this module is a submodule of.\n\n\n\n"
+},
+
+{
+    "location": "submodule/#Basic-manipulation-1",
+    "page": "Submodules",
+    "title": "Basic manipulation",
+    "category": "section",
+    "text": "supermodule(M::AbstractAlgebra.Generic.Submodule{T}) where T <: RingElementExamplesM = FreeModule(ZZ, 2)\nm = M([ZZ(2), ZZ(3)])\nn = M([ZZ(1), ZZ(4)])\nN = Submodule(M, [m, n])\n\nsupermodule(N) == M"
+},
+
+{
+    "location": "quotient_module/#",
+    "page": "Submodules",
+    "title": "Submodules",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "quotient_module/#Submodules-1",
+    "page": "Submodules",
+    "title": "Submodules",
+    "category": "section",
+    "text": "AbstractAlgebra allows the construction of quotient modules/spaces of AbstractAlgebra modules. These are given as the quotient of a module and a submodule of that module.As well as implementing the entire Module interface, AbstractAlgebra submodules also provide the following interface."
+},
+
+{
+    "location": "quotient_module/#AbstractAlgebra.QuotientModule-Union{Tuple{T}, Tuple{Module{T},Submodule{T}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Submodules",
+    "title": "AbstractAlgebra.QuotientModule",
+    "category": "method",
+    "text": "QuotientModule(m::Module{T}, gens::Vector{ModuleElem{T}}) where T <: RingElement\n\nReturn the quotient Q of the module m by the submodule N of m, and a map which is a lift of elements of Q to m.\n\n\n\n"
+},
+
+{
+    "location": "quotient_module/#AbstractAlgebra.QuotientSpace-Union{Tuple{T}, Tuple{Module{T},Submodule{T}}} where T<:Union{FieldElem, AbstractFloat, Rational}",
+    "page": "Submodules",
+    "title": "AbstractAlgebra.QuotientSpace",
+    "category": "method",
+    "text": "QuotientSpace(m::Module{T}, gens::Vector{ModuleElem{T}}) where T <: RingElement\n\nReturn the quotient Q of the vector space m by the subvector space N of m, and a map which is a lift of elements of Q to m.\n\n\n\n"
+},
+
+{
+    "location": "quotient_module/#Constructors-1",
+    "page": "Submodules",
+    "title": "Constructors",
+    "category": "section",
+    "text": "QuotientModule(M::AbstractAlgebra.Module{T}, v::Generic.Submodule{T}) where T <: RingElementQuotientSpace(M::AbstractAlgebra.Module{T}, v::Generic.Submodule{T}) where T <: FieldElement\nExamplesM = FreeModule(ZZ, 2)\n\nm = M([ZZ(1), ZZ(2)])\n\nN, f = Submodule(M, [m])\nQ, g = QuotientModule(M, N)\n\np = Q([ZZ(3)])\nv2 = g(p)\n\nV = VectorSpace(QQ, 2)\n\nm = V([QQ(1), QQ(2)])\n\nN, f = Subspace(V, [m])\nQ, g = QuotientSpace(V, N)"
+},
+
+{
+    "location": "quotient_module/#Functionality-for-submodules-1",
+    "page": "Submodules",
+    "title": "Functionality for submodules",
+    "category": "section",
+    "text": "In addition to the Module interface, AbstractAlgebra submodules implement the following functionality."
+},
+
+{
+    "location": "quotient_module/#AbstractAlgebra.Generic.supermodule-Union{Tuple{QuotientModule{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Submodules",
+    "title": "AbstractAlgebra.Generic.supermodule",
+    "category": "method",
+    "text": "supermodule(M::QuotientModule{T}) where T <: RingElement\n\nReturn the module that this module is a quotient of.\n\n\n\n"
+},
+
+{
+    "location": "quotient_module/#Basic-manipulation-1",
+    "page": "Submodules",
+    "title": "Basic manipulation",
+    "category": "section",
+    "text": "supermodule(M::AbstractAlgebra.Generic.QuotientModule{T}) where T <: RingElementExamplesM = FreeModule(ZZ, 2)\nm = M([ZZ(2), ZZ(3)])\nN, g = Submodule(M, [m])\nQ, h = QuotientModule(M, N)\n\nsupermodule(Q) == M"
+},
+
+{
+    "location": "module_homomorphism/#",
+    "page": "-",
+    "title": "-",
+    "category": "page",
+    "text": ""
+},
+
+{
+    "location": "module_homomorphism/#AbstractAlgebra.Generic.ModuleHomomorphism-Union{Tuple{T}, Tuple{Module{T},Module{T},MatElem{T}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "-",
+    "title": "AbstractAlgebra.Generic.ModuleHomomorphism",
+    "category": "method",
+    "text": "ModuleHomomorphism(M1::AbstractAlgebra.Module{T}, M2::AbstractAlgebra.Module{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement\n\nCreate the homomorphism f  M_1 to M_2 represented by the matrix m.\n\n\n\n"
+},
+
+{
+    "location": "module_homomorphism/#Module-Homomorphisms-1",
+    "page": "-",
+    "title": "Module Homomorphisms",
+    "category": "section",
+    "text": "Homomorphisms of AbstractAlgebra modules, f  R^s to R^t, can be represented by stimes t matrices over R.Generic.ModuleHomomorphism(M1::AbstractAlgebra.Module{T}, M2::AbstractAlgebra.Module{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElementExamplesM = FreeModule(ZZ, 2)\nf = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))\n\nm = M([ZZ(1), ZZ(2)])\n\nf(m)"
 },
 
 {
