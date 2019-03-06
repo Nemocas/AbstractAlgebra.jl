@@ -334,7 +334,7 @@ function randmat_triu(S::AbstractAlgebra.MatAlgebra, v...)
       for j = i:n
          M[i, j] = rand(R, v...)
       end
-      while M[i, i] == 0
+      while iszero(M[i, i])
          M[i, i] = rand(R, v...)
       end
    end
@@ -350,7 +350,7 @@ function randmat_with_rank(S::Generic.MatAlgebra{T}, rank::Int, v...) where {T <
          M[i, j] = R()
       end
       M[i, i] = rand(R, v...)
-      while M[i, i] == 0
+      while iszero(M[i, i])
          M[i, i] = rand(R, v...)
       end
       for j = i + 1:n
@@ -467,7 +467,7 @@ function addeq!(A::MatAlgElem{T}, B::MatAlgElem{T}) where T <: RingElement
       end
    end
    return A
-end   
+end
 
 ###############################################################################
 #
@@ -549,4 +549,3 @@ function MatrixAlgebra(R::AbstractAlgebra.Ring, n::Int, cached::Bool = true)
    T = elem_type(R)
    return MatAlgebra{T}(R, n, cached)
 end
-

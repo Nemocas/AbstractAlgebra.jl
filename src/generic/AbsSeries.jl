@@ -426,7 +426,7 @@ end
 function truncate(a::AbstractAlgebra.AbsSeriesElem{T}, n::Int) where {T <: RingElement}
    n < 0 && throw(DomainError())
    len = length(a)
-   if precision(a) <= n 
+   if precision(a) <= n
       return a
    end
    z = parent(a)()
@@ -713,7 +713,7 @@ function Base.sqrt(a::AbstractAlgebra.AbsSeriesElem)
    !iseven(aval) && error("Not a square in sqrt")
    R = base_ring(a)
    !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
-   if a == 0
+   if iszero(a)
       return deepcopy(a)
    end
    aval2 = div(aval, 2)
@@ -925,7 +925,7 @@ end
 
 function (a::AbsSeriesRing{T})(b::T) where {T <: RingElem}
    parent(b) != base_ring(a) && error("Unable to coerce to power series")
-   if b == 0
+   if iszero(b)
       z = AbsSeries{T}(Array{T}(undef, 0), 0, a.prec_max)
    else
       z = AbsSeries{T}([b], 1, a.prec_max)

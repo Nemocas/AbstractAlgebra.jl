@@ -827,7 +827,7 @@ function kronecker_product(x::MatElem{T}, y::MatElem{T}) where {T <: RingElement
     end
     return z
 end
- 
+
 ###############################################################################
 #
 #   Transpose
@@ -954,7 +954,7 @@ function lu!(P::Generic.perm, A::MatrixElem{T}) where {T <: FieldElement}
             A[i, c] = reduce!(A[i, c])
          end
       end
-      if A[r, c] == 0
+      if iszero(A[r, c])
          i = r + 1
          while i <= m
             if !iszero(A[i, c])
@@ -1043,7 +1043,7 @@ function fflu!(P::Generic.perm, A::MatrixElem{T}) where {T <: RingElement}
    end
    t = R()
    while r <= m && c <= n
-      if A[r, c] == 0
+      if iszero(A[r, c])
          i = r + 1
          while i <= m
             if !iszero(A[i, c])
@@ -1098,7 +1098,7 @@ function fflu!(P::Generic.perm, A::MatrixElem{T}) where {T <: Union{FieldElement
    end
    t = R()
    while r <= m && c <= n
-      if A[r, c] == 0
+      if iszero(A[r, c])
          i = r + 1
          while i <= m
             if !iszero(A[i, c])
@@ -1203,7 +1203,7 @@ function rref!(A::MatrixElem{T}) where {T <: RingElement}
       np = rank
       j = k = 1
       for i = 1:rank
-         while A[i, j] == 0
+         while iszero(A[i, j])
             pivots[np + k] = j
             j += 1
             k += 1
@@ -1273,7 +1273,7 @@ function rref!(A::MatrixElem{T}) where {T <: FieldElement}
    np = rnk
    j = k = 1
    for i = 1:rnk
-      while A[i, j] == 0
+      while iszero(A[i, j])
          pivots[np + k] = j
          j += 1
          k += 1
@@ -1339,7 +1339,7 @@ function isrref(M::MatrixElem{T}) where {T <: RingElement}
             return false
          end
       end
-      while c <= n && M[r, c] == 0
+      while c <= n && iszero(M[r, c])
          c += 1
       end
       if c <= n
@@ -1368,7 +1368,7 @@ function isrref(M::MatrixElem{T}) where {T <: FieldElement}
             return false
          end
       end
-      while c <= n && M[r, c] == 0
+      while c <= n && iszero(M[r, c])
          c += 1
       end
       if c <= n
@@ -1802,7 +1802,7 @@ function solve_lu_precomp(p::Generic.perm, LU::MatElem{T}, b::MatrixElem{T}) whe
 
    t = base_ring(b)()
    s = base_ring(b)()
-   
+
    for k in 1:m
       x[1, k] = deepcopy(x[1, k])
       for i in 2:n
@@ -2129,7 +2129,7 @@ function nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
       nonpivots = zeros(Int, nullity)
       j = k = 1
       for i = 1:rank
-         while A[i, j] == 0
+         while iszero(A[i, j])
             nonpivots[k] = j
             j += 1
             k += 1
@@ -2179,7 +2179,7 @@ function nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
       np = rank
       j = k = 1
       for i = 1:rank
-         while A[i, j] == 0
+         while iszero(A[i, j])
             pivots[np + k] = j
             j += 1
             k += 1
@@ -2216,7 +2216,7 @@ function hessenberg!(A::MatrixElem{T}) where {T <: RingElement}
    t = R()
    for m = 2:n - 1
       i = m + 1
-      while i <= n && A[i, m - 1] == 0
+      while i <= n && iszero(A[i, m - 1])
          i += 1
       end
       if i != n + 1
@@ -2335,9 +2335,9 @@ function charpoly_danilevsky_ff!(S::Ring, A::MatrixElem{T}) where {T <: RingElem
    i = 1
    while i < n
       h = A[n - i + 1, n - i]
-      while h == 0
+      while iszero(h)
          k = 1
-         while k < n - i && A[n - i + 1, n - i - k] == 0
+         while k < n - i && iszero(A[n - i + 1, n - i - k])
             k += 1
          end
          if k == n - i
@@ -2452,9 +2452,9 @@ function charpoly_danilevsky!(S::Ring, A::MatrixElem{T}) where {T <: RingElement
    i = 1
    while i < n
       h = A[n - i + 1, n - i]
-      while h == 0
+      while iszero(h)
          k = 1
-         while k < n - i && A[n - i + 1, n - i - k] == 0
+         while k < n - i && iszero(A[n - i + 1, n - i - k])
             k += 1
          end
          if k == n - i
@@ -4204,7 +4204,7 @@ function randmat_triu(S::AbstractAlgebra.MatSpace, v...)
       for j = i:ncols(M)
          M[i, j] = rand(R, v...)
       end
-      while M[i, i] == 0
+      while iszero(M[i, i])
          M[i, i] = rand(R, v...)
       end
    end
@@ -4222,7 +4222,7 @@ function randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: 
          M[i, j] = R()
       end
       M[i, i] = rand(R, v...)
-      while M[i, i] == 0
+      while iszero(M[i, i]) 
          M[i, i] = rand(R, v...)
       end
       for j = i + 1:ncols(M)

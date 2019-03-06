@@ -45,7 +45,7 @@ one(R::SparsePolyRing) = R(1)
 
 zero(R::SparsePolyRing) = R(0)
 
-iszero(x::SparsePoly) = length(x) = 0
+iszero(x::SparsePoly) = length(x) == 0
 
 isone(x::SparsePoly) = x == 1
 
@@ -376,7 +376,7 @@ function mul_johnson(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement
             heapinsert!(H, I, xn, a.exps[v.i] + b.exps[v.j + 1]) # either chain or insert v into heap
          end
       end
-      if Rc[k] == 0
+      if iszero(Rc[k])
          k -= 1
       end
    end
@@ -490,7 +490,7 @@ function divrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
             push!(reuse, xn)
          end
       end
-      if qc == 0
+      if iszero(qc)
          k -= 1
       else
          d1 = maxn - b.exps[n] >= exp
@@ -623,7 +623,7 @@ end
 ==(a::Union{Integer, Rational, AbstractFloat}, b::SparsePoly) = b == a
 
 function ==(a::SparsePoly{T}, b::T) where T <: RingElem
-   return length(a) == 0 ? b == 0 : a.length == 1 &
+   return length(a) == 0 ? iszero(b) : a.length == 1 &
           a.exps[1] == 0 && a.coeffs[1] == b
 end
 
@@ -893,7 +893,7 @@ function divides_monagan_pearce(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: 
             push!(reuse, xn)
          end
       end
-      if qc == 0
+      if iszero(qc)
          k -= 1
       else
          d2, Qc[k] = divides(qc, mb)
@@ -1117,7 +1117,7 @@ function pseudodivrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElemen
             push!(reuse, xn)
          end
       end
-      if qc == 0
+      if iszero(qc)
          k -= 1
          p -= 1
       else
@@ -1293,7 +1293,7 @@ function pseudorem_monagan_pearce(a::SparsePoly{T}, b::SparsePoly{T}) where {T <
             push!(reuse, xn)
          end
       end
-      if qc == 0
+      if iszero(qc)
          k -= 1
          p -= 1
       else
@@ -1424,10 +1424,10 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
    if b.exps[b.length] > a.exps[a.length]
       (a, b) = (b, a)
    end
-   if b == 0
+   if iszero(b)
       return deepcopy(a)
    end
-   if b == 1
+   if isone(b)
       return deepcopy(b)
    end
    # compute gcd of contents and divide content out
@@ -1512,7 +1512,7 @@ function gcd(a::SparsePoly{T}, b::SparsePoly{T}, ignore_content::Bool = false) w
       d = reinterpret(Int, adeg - bdeg)
       r = pseudorem(a, b)
       # zero remainder
-      if r == 0
+      if iszero(r)
          break
       end
       # constant remainder
