@@ -821,7 +821,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "Base.truncate",
     "category": "method",
-    "text": "truncate(a::Generic.PolynomialElem, n::Int)\n\nReturn a truncated to n terms. \n\n\n\n"
+    "text": "truncate(a::Generic.PolynomialElem, n::Int)\n\nReturn a truncated to n terms.\n\n\n\n"
 },
 
 {
@@ -1213,7 +1213,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials over a noncommutative ring",
     "title": "Base.truncate",
     "category": "method",
-    "text": "truncate(a::Generic.PolynomialElem, n::Int)\n\nReturn a truncated to n terms. \n\n\n\n"
+    "text": "truncate(a::Generic.PolynomialElem, n::Int)\n\nReturn a truncated to n terms.\n\n\n\n"
 },
 
 {
@@ -1621,7 +1621,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "AbstractAlgebra.Generic.coeff",
     "category": "method",
-    "text": "coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyElem\n\nReturn the \"coefficient\" of a (as a multivariate polynomial in the same ring) of the monomial consisting of the product of the given variables to the given exponents (note that not all variables need to appear and the exponents can be zero). E.g. coeff(f, [x, z], [0, 2]) returns the coefficient of x^0*z^2 in the polynomial f. \n\n\n\n"
+    "text": "coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyElem\n\nReturn the \"coefficient\" of a (as a multivariate polynomial in the same ring) of the monomial consisting of the product of the given variables to the given exponents (note that not all variables need to appear and the exponents can be zero). E.g. coeff(f, [x, z], [0, 2]) returns the coefficient of x^0*z^2 in the polynomial f.\n\n\n\n"
 },
 
 {
@@ -1645,7 +1645,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "AbstractAlgebra.Generic.deflate",
     "category": "method",
-    "text": "deflate(f::AbstractAlgebra.MPolyElem{T}, v::Vector{Int}) where T <: RingElement\n\nReturn a polynomial with the same coefficients as f but whose exponents have been shifted down by the given shifts (supplied as an array of shifts, one for each variable, then deflated (divided) by the given exponents (again supplied as an array of deflation factors, one for each variable). The algorithm automatically replaces a deflation of 0 by 1, to avoid division by 0.  \n\n\n\n"
+    "text": "deflate(f::AbstractAlgebra.MPolyElem{T}, v::Vector{Int}) where T <: RingElement\n\nReturn a polynomial with the same coefficients as f but whose exponents have been shifted down by the given shifts (supplied as an array of shifts, one for each variable, then deflated (divided) by the given exponents (again supplied as an array of deflation factors, one for each variable). The algorithm automatically replaces a deflation of 0 by 1, to avoid division by 0.\n\n\n\n"
 },
 
 {
@@ -1653,7 +1653,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "AbstractAlgebra.Generic.inflate",
     "category": "method",
-    "text": "inflate(f::AbstractAlgebra.MPolyElem{T}, v::Vector{Int}) where T <: RingElement\n\nReturn a polynomial with the same coefficients as f but whose exponents have been inflated (multiplied) by the given deflation exponents (supplied as an array of inflation factors, one for each variable) and then shifted by the given shifts (again supplied as an array of shifts, one for each variable).  \n\n\n\n"
+    "text": "inflate(f::AbstractAlgebra.MPolyElem{T}, v::Vector{Int}) where T <: RingElement\n\nReturn a polynomial with the same coefficients as f but whose exponents have been inflated (multiplied) by the given deflation exponents (supplied as an array of inflation factors, one for each variable) and then shifted by the given shifts (again supplied as an array of shifts, one for each variable).\n\n\n\n"
 },
 
 {
@@ -1725,7 +1725,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "AbstractAlgebra.Generic.evaluate",
     "category": "method",
-    "text": "evaluate(a::S, vars::Vector{S}, vals::Vector{U}, g) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement\n\nEvaluate the polynomial at the supplied values for the given variables after  applying the Map or Function given by g to the coefficients of the polynomial.\n\n\n\n"
+    "text": "evaluate(a::S, vars::Vector{S}, vals::Vector{U}, g) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement\n\nEvaluate the polynomial at the supplied values for the given variables after applying the Map or Function given by g to the coefficients of the polynomial.\n\n\n\n"
 },
 
 {
