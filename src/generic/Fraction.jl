@@ -197,7 +197,7 @@ end
 needs_parentheses(x::AbstractAlgebra.FracElem) = isone(AbstractAlgebra.denominator(x, true)) &&
                                      needs_parentheses(AbstractAlgebra.numerator(x, true))
 
-function displayed_with_minus_in_front(x::AbstractAlgebra.FracElem) 
+function displayed_with_minus_in_front(x::AbstractAlgebra.FracElem)
    n = AbstractAlgebra.numerator(x, true)
    return !needs_parentheses(n) && displayed_with_minus_in_front(n)
 end
@@ -944,7 +944,7 @@ function rand(S::AbstractAlgebra.FracField{T}, v...) where {T <: RingElem}
    R = base_ring(S)
    n = rand(R, v...)
    d = R()
-   while d == 0
+   while iszero(d)
       d = rand(R, v...)
    end
    return S(n, d)

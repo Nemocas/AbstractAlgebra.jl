@@ -102,7 +102,7 @@ function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingEl
    for (c, v) in cvzip
       push_term!(M, g(c), v)
    end
-   
+
    return finish(M)
 end
 
@@ -253,7 +253,7 @@ function coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{
             break
          else
             v[vars[j]] = 0
-         end 
+         end
       end
       if flag
          push_term!(M, c, v)
@@ -268,7 +268,7 @@ end
 > ring) of the monomial consisting of the product of the given variables
 > to the given exponents (note that not all variables need to appear and the
 > exponents can be zero). E.g. `coeff(f, [x, z], [0, 2])` returns the
-> coefficient of $x^0*z^2$ in the polynomial $f$. 
+> coefficient of $x^0*z^2$ in the polynomial $f$.
 """
 function coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyElem
    varidx = [var_index(x) for x in vars]
@@ -624,7 +624,7 @@ function monomial(x::MPoly, i::Int)
    R = base_ring(x)
    N = size(x.exps, 1)
    exps = Array{UInt, 2}(undef, N, 1)
-   monomial_set!(exps, 1, x.exps, i, N) 
+   monomial_set!(exps, 1, x.exps, i, N)
    return parent(x)([one(R)], exps)
 end
 
@@ -750,7 +750,7 @@ function degree(f::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingEle
    end
    return biggest
 end
- 
+
 function degree(f::MPoly{T}, i::Int) where T <: RingElement
    return degree(f, i, Val{parent(f).ord})
 end
@@ -978,7 +978,7 @@ end
 function Base.eltype(x::MPolyCoeffs{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
    return S
 end
- 
+
 function Base.eltype(x::MPolyExponentVectors{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
    return Vector{Int}
 end
@@ -986,11 +986,11 @@ end
 function Base.eltype(x::MPolyMonomials{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
    return T
 end
- 
+
 function Base.eltype(x::MPolyTerms{T}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
    return T
 end
- 
+
 @doc Markdown.doc"""
     coeffs(a::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 > Return an iterator for the coefficients of the given polynomial. To retrieve
@@ -1749,8 +1749,8 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    v = v1 + v2
    d = 0
    for i = 1:length(v)
-      if v[i] < 0	
-         error("Exponent overflow in mul_johnson")	
+      if v[i] < 0
+         error("Exponent overflow in mul_johnson")
       end
       if v[i] > d
          d = v[i]
@@ -1761,9 +1761,9 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    while d >= max_e
       exp_bits *= 2
       if exp_bits == sizeof(Int)*8	      max_e = 2^(exp_bits - 1)
-         break	
-      else	
-         max_e = 2^(exp_bits - 1)	
+         break
+      else
+         max_e = 2^(exp_bits - 1)
       end
    end
    word_bits = sizeof(Int)*8
@@ -1904,7 +1904,7 @@ end
 @doc Markdown.doc"""
     isless(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
 > Return `true` if the monomial $a$ is less than the monomial $b$ with respect
-> to the monomial ordering of the parent ring. 
+> to the monomial ordering of the parent ring.
 """
 function Base.isless(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    check_parent(a, b)
@@ -2147,10 +2147,10 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       N = size(a.exps, 1)
       exps = zeros(UInt, N, 1)
       monomial_mul!(exps, 1, a.exps, 1, b, N)
-      for i = 1:N	
-         if ndigits(a.exps[i, 1], base = 2) + ndigits(b, base = 2) >= sizeof(Int)*8	
-            error("Exponent overflow in powering")	
-         end	
+      for i = 1:N
+         if ndigits(a.exps[i, 1], base = 2) + ndigits(b, base = 2) >= sizeof(Int)*8
+            error("Exponent overflow in powering")
+         end
       end
       return parent(a)([coeff(a, 1)^b], exps)
    elseif b == 0
@@ -2169,8 +2169,8 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       max_e = 2^(exp_bits - 1)
       while d >= max_e
          exp_bits *= 2
-         if exp_bits == sizeof(Int)*8	
-            break	
+         if exp_bits == sizeof(Int)*8
+            break
          end
          max_e = 2^(exp_bits - 1)
       end
@@ -2238,7 +2238,7 @@ end
 > one for each variable, then deflated (divided) by the given exponents
 > (again supplied as an array of deflation factors, one for each variable).
 > The algorithm automatically replaces a deflation of $0$ by $1$, to avoid
-> division by $0$.  
+> division by $0$.
 """
 function deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
    S = parent(f)
@@ -2252,7 +2252,7 @@ function deflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vect
    cvzip = zip(coeffs(f), exponent_vectors(f))
    for (c, v) in cvzip
       for j = 1:N
-         v[j] = div(v[j] - shift[j], defl[j]) 
+         v[j] = div(v[j] - shift[j], defl[j])
       end
       push_term!(M, c, v)
    end
@@ -2294,7 +2294,7 @@ end
 > have been inflated (multiplied) by the given deflation exponents (supplied
 > as an array of inflation factors, one for each variable) and then shifted
 > by the given shifts (again supplied as an array of shifts, one for each
-> variable).  
+> variable).
 """
 function inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElement
    S = parent(f)
@@ -2486,8 +2486,8 @@ function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
-      if exp_bits == sizeof(Int)*8	
-         break	
+      if exp_bits == sizeof(Int)*8
+         break
       end
       max_e = 2^(exp_bits - 1)
    end
@@ -2700,8 +2700,8 @@ function div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
-      if exp_bits == sizeof(Int)*8	
-         break	
+      if exp_bits == sizeof(Int)*8
+         break
       end
       max_e = 2^(exp_bits - 1)
    end
@@ -2924,8 +2924,8 @@ function divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
-      if exp_bits == sizeof(Int)*8	
-         break	
+      if exp_bits == sizeof(Int)*8
+         break
       end
       max_e = 2^(exp_bits - 1)
    end
@@ -3164,8 +3164,8 @@ function divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
    max_e = 2^(exp_bits - 1)
    while d >= max_e
       exp_bits *= 2
-      if exp_bits == sizeof(Int)*8	
-         break	
+      if exp_bits == sizeof(Int)*8
+         break
       end
       max_e = 2^(exp_bits - 1)
    end
@@ -3229,7 +3229,7 @@ end
 """
 function remove(z::MPolyElem{T}, p::MPolyElem{T}) where {T <: RingElement}
    check_parent(z, p)
-   z == 0 && error("Not yet implemented")
+   iszero(z) && error("Not yet implemented")
    fl, q = divides(z, p)
    if !fl
       return 0, z
@@ -3432,7 +3432,7 @@ end
 
 @doc Markdown.doc"""
     evaluate(a::S, vars::Vector{S}, vals::Vector{U}, g) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
-> Evaluate the polynomial at the supplied values for the given variables after 
+> Evaluate the polynomial at the supplied values for the given variables after
 > applying the `Map` or `Function` given by $g$ to the coefficients of the polynomial.
 """
 function evaluate(a::S, vars::Vector{S}, vals::Vector{U}, g) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
@@ -4052,7 +4052,7 @@ function combine_like_terms!(a::MPoly{T}) where T <: RingElement
    j = 0
    while i <= length(a)
       c = a.coeffs[i]
-      while i < length(a) && c == 0
+      while i < length(a) && iszero(c)
          i += 1
          c = a.coeffs[i]
       end
@@ -4081,17 +4081,17 @@ end
 function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: RingElement
    A = a.exps
    N = size(A, 1)
-   return [Int(A[j, i]) for j in N:-1:1]  
+   return [Int(A[j, i]) for j in N:-1:1]
 end
 
 function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:lex}}) where T <: RingElement
    return Int(a.exps[size(a.exps, 1) + 1 - j, i])
 end
- 
+
 function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: RingElement
    A = a.exps
    N = size(A, 1)
-   return [Int(A[j, i]) for j in N - 1:-1:1]  
+   return [Int(A[j, i]) for j in N - 1:-1:1]
 end
 
 function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:deglex}}) where T <: RingElement
@@ -4101,13 +4101,13 @@ end
 function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
    A = a.exps
    N = size(A, 1)
-   return [Int(A[j, i]) for j in 1:N - 1]  
+   return [Int(A[j, i]) for j in 1:N - 1]
 end
 
 function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
    return Int(a.exps[j, i])
 end
-   
+
 @doc Markdown.doc"""
     exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
 > Return a vector of exponents, corresponding to the exponent vector of the
@@ -4136,9 +4136,9 @@ function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val
    if i > length(a)
       a.length = i
    end
-   return a 
+   return a
 end
- 
+
 function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:deglex}}) where T <: RingElement
    fit!(a, i)
    A = a.exps
@@ -4162,7 +4162,7 @@ function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val
 end
 
 @doc Markdown.doc"""
-    set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement   
+    set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
 > Set the i-th exponent vector to the supplied vector, where the entries
 > correspond to the exponents of the variables in the order supplied when
 > the ring was created. The modified polynomial is returned.
@@ -4182,7 +4182,7 @@ function coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
    exp2 = Array{UInt, 1}(undef, N)
    ord = parent(a).ord
    if ord == :lex
-      exp2[:] = exps[end:-1:1] 
+      exp2[:] = exps[end:-1:1]
    elseif ord == :deglex
       exp2[1:end - 1] = exps[end:-1:1]
       exp2[end] = sum(exps)
@@ -4205,7 +4205,7 @@ function coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
       end
       n = div(hi - lo + 1, 2)
    end
-   return base_ring(a)() 
+   return base_ring(a)()
 end
 
 @doc Markdown.doc"""
@@ -4222,7 +4222,7 @@ function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
    exp2 = Array{UInt, 1}(undef, N)
    ord = parent(a).ord
    if ord == :lex
-      exp2[:] = exps[end:-1:1] 
+      exp2[:] = exps[end:-1:1]
    elseif ord == :deglex
       exp2[1:end - 1] = exps[end:-1:1]
       exp2[end] = sum(exps)
@@ -4246,7 +4246,7 @@ function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
                   monomial_set!(A, i, A, i + 1, N)
                end
                a.coeffs[length(a)] = c # zero final coefficient
-               a.length -= 1   
+               a.length -= 1
             end
             return a
          elseif v < 0
@@ -4270,7 +4270,7 @@ function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
       monomial_set!(A, lo, exp2, 1, N)
       a.length += 1
    end
-   return a 
+   return a
 end
 
 @doc Markdown.doc"""
@@ -4401,7 +4401,7 @@ function (a::MPolyRing{T})(b::Array{T, 1}, m::Vector{Vector{Int}}) where {T <: R
    for i in 1:length(m)
       length(m[i]) != nvars(a) && error("Exponent vector $i has length $(length(m[i])) (expected $(nvars(a)))")
    end
-   
+
    N = a.N
    ord = ordering(a)
    Pe = Array{UInt, 2}(undef, N, length(m))
@@ -4418,21 +4418,21 @@ function (a::MPolyRing{T})(b::Array{T, 1}, m::Vector{Vector{Int}}) where {T <: R
             Pe[j, i] = UInt(m[i][N - j])
          end
          Pe[N, i] = UInt(sum(m[i]))
-      end      
+      end
    else # degrevlex
       for i = 1:length(m)
          for j = 1:N - 1
             Pe[j, i] = UInt(m[i][j])
          end
          Pe[N, i] = UInt(sum(m[i]))
-      end   
+      end
    end
 
    z = MPoly{T}(a, b, Pe)
    z = sort_terms!(z)
    z = combine_like_terms!(z)
    return z
-end 
+end
 
 ###############################################################################
 #
@@ -4457,7 +4457,7 @@ function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyE
    if length(vars_p) == 0
       return length(p) == 0 ? R(0) : R(p.coeffs[1])
    end
-   
+
    return R(coefficients_of_univariate(p))
 end
 
@@ -4476,17 +4476,17 @@ end
 function coefficients_of_univariate(p::AbstractAlgebra.MPolyElem, check_univariate::Bool=true)
    if check_univariate
       vars_p = vars(p)
-      
+
       if length(vars_p) > 1
          error("Polynomial is not univariate.")
       end
-      
+
    end
-   
+
    if length(p) == 0
       return Array{elem_type(base_ring(parent(p)))}(undef, 0)
    end
-   
+
    var_index = findfirst(!iszero, exponent_vector(p, 1))
 
    if var_index == nothing
@@ -4497,7 +4497,7 @@ function coefficients_of_univariate(p::AbstractAlgebra.MPolyElem, check_univaria
    for i = 1:p.length
       coeffs[exponent(p, i, var_index) + 1] = coeff(p, i)
    end
-   
+
    return(coeffs)
 end
 

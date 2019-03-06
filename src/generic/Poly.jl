@@ -752,14 +752,14 @@ end
     ==(x::AbstractAlgebra.PolyElem{T}, y::T) where {T <: RingElem}
 > Return `true` if $x == y$.
 """
-==(x::AbstractAlgebra.PolyElem{T}, y::T) where T <: RingElem = ((length(x) == 0 && y == 0)
+==(x::AbstractAlgebra.PolyElem{T}, y::T) where T <: RingElem = ((length(x) == 0 && iszero(y))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 @doc Markdown.doc"""
     ==(x::Generic.PolynomialElem, y::Union{Integer, Rational, AbstractFloat})
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
-==(x::PolynomialElem, y::Union{Integer, Rational, AbstractFloat}) = ((length(x) == 0 && base_ring(x)(y) == 0)
+==(x::PolynomialElem, y::Union{Integer, Rational, AbstractFloat}) = ((length(x) == 0 && iszero(base_ring(x)(y)))
                         || (length(x) == 1 && coeff(x, 0) == y))
 
 @doc Markdown.doc"""
@@ -821,7 +821,7 @@ end
 
 @doc Markdown.doc"""
     truncate(a::Generic.PolynomialElem, n::Int)
-> Return $a$ truncated to $n$ terms. 
+> Return $a$ truncated to $n$ terms.
 """
 function truncate(a::PolynomialElem, n::Int)
    lena = length(a)
@@ -1199,7 +1199,7 @@ end
 """
 function pseudorem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
    check_parent(f, g)
-   g == 0 && throw(DivideError())
+   iszero(g) && throw(DivideError())
    if length(f) < length(g)
       return f
    end
@@ -1220,7 +1220,7 @@ end
 """
 function pseudodivrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
    check_parent(f, g)
-   g == 0 && throw(DivideError())
+   iszero(g) && throw(DivideError())
    if length(f) < length(g)
       return zero(parent(f)), f
    end
@@ -1238,7 +1238,7 @@ function pseudodivrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyEle
       f = f*b - shift_left(coeff(f, length(f) - 1)*g, length(f) - length(g))
       k -= 1
    end
-   while lenq > 0 && coeff(q, lenq - 1) == 0
+   while lenq > 0 && iszero(coeff(q, lenq - 1))
       lenq -= 1
    end
    set_length!(q, lenq)
@@ -1264,7 +1264,7 @@ end
 function remove(z::AbstractAlgebra.PolyElem{T}, p::AbstractAlgebra.PolyElem{T}) where T <: RingElement
   check_parent(z, p)
   !isexact_type(T) && error("remove requires an exact ring")
-  z == 0 && error("Not yet implemented")
+  iszero(z) && error("Not yet implemented")
   flag, q = divides(z, p)
   if !flag
     return 0, z
@@ -1289,7 +1289,7 @@ end
 function remove(z::AbstractAlgebra.PolyElem{T}, p::AbstractAlgebra.PolyElem{T}) where T <: Union{AbstractAlgebra.ResElem, FieldElement}
   check_parent(z, p)
   !isexact_type(T) && error("remove requires an exact ring")
-  z == 0 && error("Not yet implemented")
+  iszero(z) && error("Not yet implemented")
   q, r = divrem(z, p)
   if !iszero(r)
     return 0, z
@@ -1356,7 +1356,7 @@ function divides(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T})
       end
       set_length!(f, normalise(f, length(f)))
    end
-   return f == 0, q
+   return iszero(f), q
 end
 
 @doc Markdown.doc"""
@@ -1429,7 +1429,7 @@ function gcd(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.PolyElem{T}, ign
       (a, b) = (b, a)
    end
    if iszero(b)
-      if a == 0
+      if iszero(a)
          return a
       else
          return divexact(a, canonical_unit(lead(a)))
@@ -1550,7 +1550,7 @@ end
 """
 function primpart(a::AbstractAlgebra.PolyElem)
    d = content(a)
-   if d == 0
+   if iszero(d)
       return zero(parent(a))
    else
       return divexact(a, d)
@@ -1580,7 +1580,7 @@ function evaluate(a::AbstractAlgebra.PolyElem, b::T) where {T <: RingElement}
    z = coeff(a, i - 1) * one(S)
    while i > 1
       i -= 1
-      z = coeff(a, i - 1) + z*b 
+      z = coeff(a, i - 1) + z*b
       parent(z) # To work around a bug in julia
    end
    return z
@@ -1620,7 +1620,7 @@ end
 > Return the derivative of the polynomial $a$.
 """
 function derivative(a::PolynomialElem)
-   if a == 0
+   if iszero(a)
       return zero(parent(a))
    end
    len = length(a)
@@ -1652,7 +1652,7 @@ function integral(x::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlge
       p = setcoeff!(p, i, divexact(coeff(x, i - 1), base_ring(x)(i)))
    end
    len += 1
-   while len > 0 && coeff(p, len - 1) == 0 # FIXME: cannot use normalise here
+   while len > 0 && iszero(coeff(p, len - 1)) # FIXME: cannot use normalise here
       len -= 1
    end
    set_length!(p, len)
