@@ -579,10 +579,14 @@ mutable struct AccessorNotSetError <: Exception
 end
 
 function create_accessors(T, S, handle)
-   get = function(a)
+   get = function(a, error::Bool = true)
       if handle > length(a.auxilliary_data) ||
          !isassigned(a.auxilliary_data, handle)
-        throw(AccessorNotSetError())
+        if error
+          throw(AccessorNotSetError())
+        else
+          return nothing
+        end
       end
       return a.auxilliary_data[handle]
    end
