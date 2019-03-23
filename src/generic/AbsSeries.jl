@@ -703,12 +703,12 @@ end
    sqrt(a::AbstractAlgebra.AbsSeriesElem)
 > Return the square root of the power series $a$.
 """
-# Given a power series f = f0 + f1*x + f2*x^2 + ..., compute the square root
-# g = g0 + g1*x + g2*x^2 + ... using the relations g0^2 = f0, 2g0*g1 = f1
-# 2g0*g2 = f2 - g1^2, 2g0*g3 = f3 - 2g1*g2, 2g0*g4 = f4 - (2g1*g3 + g2^2), etc.
-# where the terms being subtracted are those contributing to the i-th
-# coefficient of the square of g
 function Base.sqrt(a::AbstractAlgebra.AbsSeriesElem)
+   # Given a power series f = f0 + f1*x + f2*x^2 + ..., compute the square root
+   # g = g0 + g1*x + g2*x^2 + ... using the relations g0^2 = f0, 2g0*g1 = f1
+   # 2g0*g2 = f2 - g1^2, 2g0*g3 = f3 - 2g1*g2, 2g0*g4 = f4 - (2g1*g3 + g2^2), etc.
+   # where the terms being subtracted are those contributing to the i-th
+   # coefficient of the square of g
    aval = valuation(a)
    !iseven(aval) && error("Not a square in sqrt")
    R = base_ring(a)
