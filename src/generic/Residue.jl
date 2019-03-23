@@ -45,11 +45,15 @@ function check_parent_type(a::AbstractAlgebra.ResRing{T}, b::AbstractAlgebra.Res
    # exists only to check types of parents agree
 end
 
-function check_parent(a::AbstractAlgebra.ResElem, b::AbstractAlgebra.ResElem)
+function check_parent(a::AbstractAlgebra.ResElem, b::AbstractAlgebra.ResElem, throw::Bool = true)
    if parent(a) != parent(b)
       check_parent_type(parent(a), parent(b))
-      modulus(parent(a)) != modulus(parent(b)) && error("Incompatible moduli in residue operation") #CF: maybe extend to divisibility?
+      fl = modulus(parent(a)) != modulus(parent(b))
+      fl && throw && error("Incompatible moduli in residue operation")
+      return !fl
+      #CF: maybe extend to divisibility?
    end
+   return true
 end
 
 ###############################################################################
@@ -320,7 +324,8 @@ end
 > equal to the minimum of the two precisions.
 """
 function ==(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
-   check_parent(a, b)
+   fl = check_parent(a, b, false)
+   !fl && return false
    return data(a) == data(b)
 end
 
@@ -332,7 +337,8 @@ end
 > they declared equal by this function.
 """
 function isequal(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) where {T <: RingElement}
-   check_parent(a, b)
+   fl = check_parent(a, b, false)
+   !fl && return false
    return isequal(data(a), data(b))
 end
 

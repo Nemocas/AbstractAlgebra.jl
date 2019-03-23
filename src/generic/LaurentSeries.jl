@@ -76,9 +76,10 @@ var(a::LaurentSeriesRing) = a.S
 """
 var(a::LaurentSeriesField) = a.S
 
-function check_parent(a::LaurentSeriesElem, b::LaurentSeriesElem)
-   parent(a) != parent(b) &&
-             error("Incompatible power series rings in Laurent series operation")
+function check_parent(a::LaurentSeriesElem, b::LaurentSeriesElem, throw::Bool = true)
+   b = parent(a) != parent(b)
+   b && throw && error("Incompatible power series rings in Laurent series operation")
+   return !b
 end
 
 ###############################################################################
@@ -945,7 +946,8 @@ end
 > equal to the minimum of the two precisions.
 """
 function ==(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T}) where {T <: RingElement}
-   check_parent(x, y)
+   b = check_parent(x, y, false)
+   !b && return false
    xval = valuation(x)
    xprec = precision(x)
    yval = valuation(y)

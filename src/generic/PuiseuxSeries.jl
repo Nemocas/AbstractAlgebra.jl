@@ -101,9 +101,10 @@ end
 
 isexact_type(a::Type{T}) where T <: PuiseuxSeriesElem = false
 
-function check_parent(a::PuiseuxSeriesElem, b::PuiseuxSeriesElem)
-   parent(a) != parent(b) &&
-             error("Incompatible Puiseux series rings in Puiseux series operation")
+function check_parent(a::PuiseuxSeriesElem, b::PuiseuxSeriesElem, throw::Bool = true)
+   fl = parent(a) != parent(b)
+   fl && throw && error("Incompatible Puiseux series rings in Puiseux series operation")
+   return !fl
 end
 
 ###############################################################################
@@ -523,11 +524,13 @@ end
 ###############################################################################
 
 function ==(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
-    s = gcd(a.scale, b.scale)
-    zscale = div(a.scale*b.scale, s)
-    ainf = div(a.scale, s)
-    binf = div(b.scale, s)
-    return inflate(a.data, binf) == inflate(b.data, ainf)
+   fl = check_parent(a, b, false)
+   !fl && return false
+   s = gcd(a.scale, b.scale)
+   zscale = div(a.scale*b.scale, s)
+   ainf = div(a.scale, s)
+   binf = div(b.scale, s)
+   return inflate(a.data, binf) == inflate(b.data, ainf)
 end
 
 function isequal(a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement

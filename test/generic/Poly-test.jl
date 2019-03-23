@@ -76,6 +76,13 @@ function test_gen_poly_constructors()
 
    @test isa(n, PolyElem)
 
+   @test x in [x, y]
+   @test x in [y, x]
+   @test !(x in [y])
+
+   @test x in keys(Dict(x => 1))
+   @test !(y in keys(Dict(x => 1)))
+
    println("PASS")
 end
 

@@ -210,9 +210,10 @@ function ordering(a::MPolyRing{T}) where {T <: RingElement}
    return a.ord
 end
 
-function check_parent(a::MPoly{T}, b::MPoly{T}) where T <: RingElement
-   parent(a) != parent(b) &&
-      error("Incompatible polynomial rings in polynomial operation")
+function check_parent(a::MPoly{T}, b::MPoly{T}, throw::Bool = true) where T <: RingElement
+   b = parent(a) != parent(b)
+   b & throw && error("Incompatible polynomial rings in polynomial operation")
+   return !b
 end
 
 ###############################################################################
@@ -1883,7 +1884,8 @@ end
 ###############################################################################
 
 function ==(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
-   check_parent(a,b)
+   fl = check_parent(a, b, false)
+   !fl && return false
    if a.length != b.length
       return false
    end
@@ -1929,6 +1931,8 @@ function ==(a::MPoly, n::Union{Integer, Rational, AbstractFloat})
    return false
 end
 
+==(n::Union{Integer, Rational, AbstractFloat}, a::MPoly) = a == n
+
 function ==(a::MPoly{T}, n::T) where {T <: RingElem}
    N = size(a.exps, 1)
    if n == 0
@@ -1938,6 +1942,8 @@ function ==(a::MPoly{T}, n::T) where {T <: RingElem}
    end
    return false
 end
+
+==(n::T, a::MPoly{T}) where {T <: RingElem} = a == n
 
 ###############################################################################
 #
@@ -4345,6 +4351,10 @@ promote_rule(::Type{MPoly{T}}, ::Type{MPoly{T}}) where T <: RingElement = MPoly{
 function promote_rule(::Type{MPoly{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
    promote_rule(T, U) == T ? MPoly{T} : Union{}
 end
+
+#function promote_rule(::Type{T}, ::Type{MPoly{T}}) where {T <: RingElement}
+#   return MPoly{T}
+#end
 
 ###############################################################################
 #

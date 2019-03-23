@@ -51,8 +51,10 @@ function characteristic(R::AbstractAlgebra.FracField{T}) where T <: RingElem
    return characteristic(base_ring(R))
 end
 
-function check_parent(a::AbstractAlgebra.FracElem, b::AbstractAlgebra.FracElem)
-   parent(a) != parent(b) && error("Incompatible rings in fraction field operation")
+function check_parent(a::AbstractAlgebra.FracElem, b::AbstractAlgebra.FracElem, throw::Bool = true)
+   fl = parent(a) != parent(b)
+   fl && throw && error("Incompatible rings in fraction field operation")
+   return !fl
 end
 
 ###############################################################################
@@ -513,7 +515,9 @@ end
 > equal to the minimum of the two precisions.
 """
 function ==(x::AbstractAlgebra.FracElem{T}, y::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-   check_parent(x, y)
+   b  = check_parent(x, y, false)
+   !b && return false
+
    return (AbstractAlgebra.denominator(x, false) == AbstractAlgebra.denominator(y, false) &&
            AbstractAlgebra.numerator(x, false) == AbstractAlgebra.numerator(y, false)) ||
           (AbstractAlgebra.denominator(x, true) == AbstractAlgebra.denominator(y, true) &&
