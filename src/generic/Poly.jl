@@ -1722,9 +1722,9 @@ end
     resultant_ducos(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
 > Return the resultant of the $p$ and $q$.
 """
-# See the paper, "Optimizations of the subresultant algorithm" by Lionel
-# Ducos, J. Pure and Appl. Algebra 2000.
 function resultant_ducos(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
+   # See the paper, "Optimizations of the subresultant algorithm" by Lionel
+   # Ducos, J. Pure and Appl. Algebra 2000.
    check_parent(p, q)
    if length(p) == 0 || length(q) == 0
       return zero(base_ring(p))
