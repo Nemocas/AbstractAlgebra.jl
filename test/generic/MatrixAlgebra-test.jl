@@ -117,6 +117,16 @@ function test_gen_matalg_constructors()
    @test_throws ErrorConstrDimMismatch S([t, t^2])
    @test_throws ErrorConstrDimMismatch S([t, t^2, t^3, t^4, t^5, t^6, t^7, t^8, t^9, t^10])
 
+   x = zero_matrix(R, 2, 2)
+   y = zero_matrix(ZZ, 2, 3)
+
+   @test x in [x, y]
+   @test x in [y, x]
+   @test !(x in [y])
+
+   @test x in keys(Dict(x => 1))
+   @test !(y in keys(Dict(x => 1)))
+
    println("PASS")
 end
 

@@ -65,6 +65,14 @@ function test_gen_mpoly_constructors()
       f3 = finish(C)
 
       @test f1 == f3
+
+      _, varlist = PolynomialRing(QQ, var_names)
+      y = varlist[1]
+      @test x in [x, y]
+      @test x in [y, x]
+      @test !(x in [y])
+      @test x in keys(Dict(x => 1))
+      @test !(y in keys(Dict(x => 1)))
    end
 
    println("PASS")

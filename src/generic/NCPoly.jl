@@ -297,7 +297,8 @@ end
 > equal to the minimum of the two precisions.
 """
 function ==(x::AbstractAlgebra.NCPolyElem{T}, y::AbstractAlgebra.NCPolyElem{T}) where {T <: NCRingElem}
-   check_parent(x, y)
+   b = check_parent(x, y, false)
+   !b && return false
    if length(x) != length(y)
       return false
    else

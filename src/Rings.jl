@@ -89,10 +89,13 @@ function divides(x::T, y::T) where {T <: RingElem}
 end
 
 function ==(x::S, y::T) where {S <: RingElem, T <: RingElem}
-   if S == promote_rule(S, T)
+   R = promote_rule(S, T)
+   if S == R
       ==(x, parent(x)(y))
-   else
+   elseif T == R
       ==(parent(y)(x), y)
+   else
+      false
    end
 end
 

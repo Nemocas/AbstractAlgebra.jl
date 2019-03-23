@@ -60,9 +60,10 @@ isexact_type(a::Type{T}) where T <: AbstractAlgebra.SeriesElem = false
 """
 var(a::SeriesRing) = a.S
 
-function check_parent(a::AbstractAlgebra.SeriesElem, b::AbstractAlgebra.SeriesElem)
-   parent(a) != parent(b) &&
-             error("Incompatible power series rings in power series operation")
+function check_parent(a::AbstractAlgebra.SeriesElem, b::AbstractAlgebra.SeriesElem, throw::Bool = true)
+   b = parent(a) != parent(b)
+   b && throw && error("Incompatible power series rings in power series operation")
+   return !b
 end
 
 ###############################################################################
@@ -71,7 +72,7 @@ end
 #
 ###############################################################################
 
-function Base.hash(a::AbstractAlgebra.SeriesElem, h::UInt)
+function Base.hash(a::AbstractAlgebra.RelSeriesElem, h::UInt)
    b = 0xb44d6896204881f3%UInt
    for i in 0:pol_length(a) - 1
       b = xor(b, hash(polcoeff(a, i), h), h)
@@ -732,7 +733,9 @@ end
 > equal to the minimum of the two precisions.
 """
 function ==(x::AbstractAlgebra.RelSeriesElem{T}, y::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
-   check_parent(x, y)
+   b = check_parent(x, y, false)
+   !b && return false
+
    xval = valuation(x)
    xprec = precision(x)
    yval = valuation(y)

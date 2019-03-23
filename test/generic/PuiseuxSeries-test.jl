@@ -85,6 +85,13 @@ function test_puiseux_series_constructors()
 
    @test isa(l, Generic.PuiseuxSeriesElem)
 
+   @test x in [x, y]
+   @test x in [y, x]
+   @test !(x in [y])
+
+   @test x in keys(Dict(x => 1))
+   @test !(y in keys(Dict(x => 1)))
+
    println("PASS")
 end
 

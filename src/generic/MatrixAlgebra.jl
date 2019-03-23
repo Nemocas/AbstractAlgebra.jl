@@ -31,9 +31,10 @@ end
 parent(a::AbstractAlgebra.MatAlgElem{T}, cached::Bool = true) where T <: RingElement =
     MatAlgebra{T}(a.base_ring, size(a.entries)[1], cached)
 
-function check_parent(a::AbstractAlgebra.MatAlgElem{T}, b::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement
-  (base_ring(a) != base_ring(b) || degree(a) != degree(b)) &&
-                error("Incompatible matrix spaces in matrix operation")
+function check_parent(a::AbstractAlgebra.MatAlgElem{T}, b::AbstractAlgebra.MatAlgElem{T}, throw::Bool = true) where T <: RingElement
+  fl = (base_ring(a) != base_ring(b) || degree(a) != degree(b)) 
+  fl && throw && error("Incompatible matrix spaces in matrix operation")
+  return !fl
 end
 
 isexact_type(::Type{MatAlgElem{T}}) where T <: RingElement = isexact_type(T)

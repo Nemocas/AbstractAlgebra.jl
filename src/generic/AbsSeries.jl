@@ -126,6 +126,15 @@ function deepcopy_internal(a::AbsSeries{T}, dict::IdDict) where {T <: RingElemen
    return parent(a)(coeffs, length(a), precision(a))
 end
 
+function Base.hash(a::AbstractAlgebra.AbsSeriesElem, h::UInt)
+   b = 0xb44d6896204881f3%UInt
+   for i in 0:length(a) - 1
+      b = xor(b, hash(coeff(a, i), h), h)
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+   end
+   return b
+end
+
 ###############################################################################
 #
 #   AbstractString I/O
@@ -499,7 +508,9 @@ end
 > equal to the minimum of the two precisions.
 """
 function ==(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSeriesElem{T}) where {T <: RingElement}
-   check_parent(x, y)
+   b = check_parent(x, y, false)
+   !b && return false
+
    prec = min(precision(x), precision(y))
    m1 = min(length(x), length(y))
    m2 = max(length(x), length(y))

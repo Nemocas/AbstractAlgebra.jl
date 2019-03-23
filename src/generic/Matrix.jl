@@ -104,9 +104,10 @@ base_ring(a::MatrixElem{T}) where {T <: RingElement} = a.base_ring::parent_type(
 parent(a::AbstractAlgebra.MatElem{T}, cached::Bool = true) where T <: RingElement =
     MatSpace{T}(a.base_ring, size(a.entries)..., cached)
 
-function check_parent(a::AbstractAlgebra.MatElem, b::AbstractAlgebra.MatElem)
-  (base_ring(a) != base_ring(b) || nrows(a) != nrows(b) || ncols(a) != ncols(b)) &&
-                error("Incompatible matrix spaces in matrix operation")
+function check_parent(a::AbstractAlgebra.MatElem, b::AbstractAlgebra.MatElem, throw::Bool = true)
+  fl = (base_ring(a) != base_ring(b) || nrows(a) != nrows(b) || ncols(a) != ncols(b))
+  fl && throw && error("Incompatible matrix spaces in matrix operation")
+  return !fl
 end
 
 function _check_dim(r::Int, c::Int, arr::AbstractArray{T, 2}, transpose::Bool = false) where {T}
@@ -677,7 +678,8 @@ end
 > equal to the minimum of the two precisions.
 """
 function ==(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
-   check_parent(x, y)
+   b = check_parent(x, y, false)
+   !b && return false
    for i = 1:nrows(x)
       for j = 1:ncols(x)
          if x[i, j] != y[i, j]
@@ -696,7 +698,8 @@ end
 > are they declared equal by this function.
 """
 function isequal(x::MatrixElem{T}, y::MatrixElem{T}) where {T <: RingElement}
-   check_parent(x, y)
+   b = check_parent(x, y, false)
+   !b && return false
    for i = 1:nrows(x)
       for j = 1:ncols(x)
          if !isequal(x[i, j], y[i, j])
