@@ -854,10 +854,29 @@ function divexact(x::AbstractAlgebra.RelSeriesElem{T}, y::AbstractAlgebra.RelSer
       if v1 >= v2
          x = shift_right(x, v2)
          y = shift_right(y, v2)
+      else
+         x = deepcopy(x)
       end
+   else
+      x = deepcopy(x)
    end
    y = truncate(y, precision(x))
-   return x*inv(y)
+   res = parent(x)()
+   set_prec!(res, precision(x))
+   set_val!(res, valuation(x))
+   lc = coeff(y, 0)
+   lc == 0 && error("Not an exact division")
+   lenr = precision(x) - valuation(x)
+   for i = 0:lenr - 1
+      flag, q = divides(polcoeff(x, i), lc)
+      !flag && error("Not an exact division")
+      res = setcoeff!(res, i, q)
+      for j = 0:min(precision(y) - 1, lenr - i - 1)
+         x = setcoeff!(x, i + j, polcoeff(x, i + j) - polcoeff(y, j)*q)
+      end
+   end
+   set_length!(res, normalise(res, pol_length(res)))
+   return res
 end
 
 ###############################################################################
