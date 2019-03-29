@@ -1077,13 +1077,44 @@ end
 
 @doc Markdown.doc"""
     divexact(x::Generic.LaurentSeriesElem{T}, y::Generic.LaurentSeriesElem{T}) where {T <: RingElement}
-> Return $x/y$. Requires $y$ to be invertible.
+> Return $x/y$.
 """
 function divexact(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T}) where {T <: RingElement}
    check_parent(x, y)
    iszero(y) && throw(DivideError())
-   y = truncate(y, precision(x) - valuation(x) + valuation(y))
-   return x*inv(y)
+   v2 = valuation(y)
+   if v2 != 0
+      x = shift_right(x, v2)
+      y = shift_right(y, v2)
+   else
+      x = deepcopy(x)
+   end
+   res = parent(x)()
+   y = truncate(y, precision(x) - valuation(x))
+   set_prec!(res, min(precision(x), valuation(x) + precision(y)))
+   set_val!(res, valuation(x))
+   sx = scale(x)
+   sy = scale(y)
+   sr = gcd(sx, sy)
+   dx = div(sx, sr)
+   dy = div(sy, sr)
+   x = downscale(x, dx)
+   y = downscale(y, dy)
+   set_scale!(res, sr)
+   lc = coeff(y, 0)
+   lenr = div(precision(res) - valuation(res) + sr - 1, sr)
+   leny = div(precision(y) + sr - 1, sr)
+   for i = 0:lenr - 1
+      flag, q = divides(polcoeff(x, i), lc)
+      !flag && error("Not an exact division")
+      res = setcoeff!(res, i, q)
+      for j = 0:min(leny - 1, lenr - i - 1)
+         x = setcoeff!(x, i + j, polcoeff(x, i + j) - polcoeff(y, j)*q)
+      end
+   end
+   set_length!(res, normalise(res, pol_length(res)))
+   res = rescale!(res)
+   return res
 end
 
 ###############################################################################

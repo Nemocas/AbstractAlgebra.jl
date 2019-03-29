@@ -761,9 +761,8 @@ function test_laurent_series_exact_division()
 
    # Non-integral domain
    T = ResidueRing(ZZ, 6)
-   R, x = LaurentSeriesRing(T, 10, "x")
-   for iter = 1:300
-      s = rand(0:12)
+   R, x = LaurentSeriesRing(T, 3, "x")
+   for iter = 1:3000
       f = rand(R, -12:12, 0:5)
       g = rand(R, -12:12, 0:5)
       while iszero(g) || !isunit(polcoeff(g, 0))
