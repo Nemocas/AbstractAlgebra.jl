@@ -893,7 +893,7 @@ function Base.deepcopy_internal(a::MPoly{T}, dict::IdDict) where {T <: RingEleme
    Re = deepcopy_internal(a.exps, dict)
    Rc = Array{T}(undef, a.length)
    for i = 1:a.length
-      Rc[i] = deepcopy_internal(a.coeffs[i], dict)
+      Rc[i] = deepcopy(a.coeffs[i])
    end
    return parent(a)(Rc, Re)
 end
