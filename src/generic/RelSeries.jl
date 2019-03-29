@@ -843,7 +843,7 @@ end
 
 @doc Markdown.doc"""
     divexact(x::AbstractAlgebra.RelSeriesElem{T}, y::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
-> Return $x/y$. Requires $y$ to be invertible.
+> Return $x/y$.
 """
 function divexact(x::AbstractAlgebra.RelSeriesElem{T}, y::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
    check_parent(x, y)
@@ -855,14 +855,14 @@ function divexact(x::AbstractAlgebra.RelSeriesElem{T}, y::AbstractAlgebra.RelSer
          x = shift_right(x, v2)
          y = shift_right(y, v2)
       else
-         x = deepcopy(x)
+         error("Not an exact division")
       end
    else
       x = deepcopy(x)
    end
    y = truncate(y, precision(x))
    res = parent(x)()
-   set_prec!(res, precision(x))
+   set_prec!(res, min(precision(x), valuation(x) + precision(y)))
    set_val!(res, valuation(x))
    lc = coeff(y, 0)
    lc == 0 && error("Not an exact division")
