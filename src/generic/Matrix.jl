@@ -238,7 +238,7 @@ function deepcopy_internal(d::MatrixElem, dict::IdDict)
    c = similar(d)
    for i = 1:nrows(d)
       for j = 1:ncols(d)
-         c[i, j] = deepcopy_internal(d[i, j], dict)
+         c[i, j] = deepcopy(d[i, j])
       end
    end
    return c
