@@ -629,7 +629,7 @@ function divexact(x::AbstractAlgebra.AbsSeriesElem{T}, y::AbstractAlgebra.AbsSer
          x = shift_right(x, v2)
          y = shift_right(y, v2)
       else
-         x = deepcopy(x)
+         error("Not an exact division")
       end
    else
       x = deepcopy(x)
