@@ -4286,12 +4286,13 @@ end
 function (a::MatSpace{T})(b::S) where {S <: RingElement, T <: RingElement}
    R = base_ring(a)
    entries = Array{T}(undef, a.nrows, a.ncols)
+   rb = R(b)
    for i = 1:a.nrows
       for j = 1:a.ncols
          if i != j
             entries[i, j] = zero(R)
          else
-            entries[i, j] = R(b)
+            entries[i, j] = deepcopy(rb)
          end
       end
    end
