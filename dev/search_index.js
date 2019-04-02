@@ -3741,7 +3741,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Optional row swapping",
     "category": "section",
-    "text": "swap_rows!(M::MyMat{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElemSwap the rows of M in place. The function does not return the mutated matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).ExamplesM = identity_matrix(ZZ, 3)\n\nswap_rows!(M, 1, 2)"
+    "text": "swap_rows!(M::MyMat{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElemSwap the rows of M in place. The function returns the mutated matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).ExamplesM = identity_matrix(ZZ, 3)\n\nswap_rows!(M, 1, 2)"
 },
 
 {
