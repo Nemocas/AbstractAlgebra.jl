@@ -292,7 +292,7 @@ N3 = M[2:3, 2:3]
 swap_rows!(M::MyMat{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElem
 ```
 
-Swap the rows of `M` in place. The function does not return the mutated matrix (since
+Swap the rows of `M` in place. The function returns the mutated matrix (since
 matrices are assumed to be mutable in AbstractAlgebra.jl).
 
 **Examples**

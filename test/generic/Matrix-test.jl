@@ -1256,8 +1256,8 @@ function test_gen_mat_minpoly()
    println("PASS")
 end
 
-function test_gen_mat_row_swapping()
-   print("Generic.Mat.row_swapping...")
+function test_gen_mat_row_col_swapping()
+   print("Generic.Mat.row_col_swapping...")
 
    R, x = PolynomialRing(ZZ, "x")
    M = MatrixSpace(R, 3, 2)
@@ -1269,6 +1269,33 @@ function test_gen_mat_row_swapping()
    swap_rows!(a, 2, 3)
 
    @test a == M(map(R, [1 2; 5 6; 3 4]))
+
+   @test swap_cols(a, 1, 2) == matrix(R, [2 1; 6 5; 4 3])
+
+   swap_cols!(a, 2, 1)
+
+   @test a == matrix(R, [2 1; 6 5; 4 3])
+
+   a = matrix(R, [1 2; 3 4])
+   @test invert_rows(a) == matrix(R, [3 4; 1 2])
+   invert_rows!(a)
+   @test a == matrix(R, [3 4; 1 2])
+
+   a = matrix(R, [1 2; 3 4])
+   @test invert_cols(a) == matrix(R, [2 1; 4 3])
+   invert_cols!(a)
+   @test a == matrix(R, [2 1; 4 3])
+
+   a = matrix(R, [1 2 3; 3 4 5; 5 6 7])
+
+   @test invert_rows(a) == matrix(R, [5 6 7; 3 4 5; 1 2 3])
+   invert_rows!(a)
+   @test a == matrix(R, [5 6 7; 3 4 5; 1 2 3])
+
+   a = matrix(R, [1 2 3; 3 4 5; 5 6 7])
+   @test invert_cols(a) == matrix(R, [3 2 1; 5 4 3; 7 6 5])
+   invert_cols!(a)
+   @test a == matrix(R, [3 2 1; 5 4 3; 7 6 5])
 
    println("PASS")
 end
@@ -1645,7 +1672,7 @@ function test_gen_mat()
    test_gen_mat_kronecker_product()
    test_gen_mat_charpoly()
    test_gen_mat_minpoly()
-   test_gen_mat_row_swapping()
+   test_gen_mat_row_col_swapping()
    test_gen_mat_concat()
    test_gen_mat_hnf_minors()
    test_gen_mat_hnf_kb()

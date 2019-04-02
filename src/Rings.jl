@@ -152,7 +152,7 @@ function powers(a::T, d::Int) where {T <: RingElement}
    S = parent(a)
    A = Array{T}(undef, d + 1)
    A[1] = one(S)
-   if d > 1
+   if d > 0
       c = a
       A[2] = a
       for i = 2:d
