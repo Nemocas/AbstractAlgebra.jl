@@ -981,6 +981,28 @@ end
 function test_gen_mat_inversion()
    print("Generic.Mat.inversion...")
 
+   for dim = 2:5
+      R = MatrixSpace(ZZ, dim, dim)
+      M = R(1)
+      i = rand(1:dim-1)
+      j = rand(i+1:dim)
+      M[i,j] = 1 # E_{i,j} elementary matrix
+
+      N, c = inv(M)
+      @test N isa elem_type(R)
+      @test c isa eltype(M)
+      @test N[i,j] == -1
+      @test M*N == N*M == c*R(1)
+
+      M[j,i] = -1
+      NN, cc = inv(M)
+      @test cc == 2
+      @test NN[i,j] == -1
+      @test NN[j,i] == 1
+
+      @test M*NN == NN*M == cc*R(1)
+   end   
+   
    S = ResidueRing(ZZ, 20011*10007)
 
    for dim = 1:5
