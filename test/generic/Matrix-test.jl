@@ -916,7 +916,7 @@ function test_gen_mat_nullspace()
       n = 0
       N = M
       r = 0
-      
+
       try
          n, N = nullspace(M)
          r = rank(N)
@@ -988,21 +988,23 @@ function test_gen_mat_inversion()
       j = rand(i+1:dim)
       M[i,j] = 1 # E_{i,j} elementary matrix
 
-      N, c = inv(M)
+      N, c = pseudo_inv(M)
       @test N isa elem_type(R)
       @test c isa eltype(M)
+
+      @test isunit(c)
+      @test inv(c) isa eltype(M)
       @test N[i,j] == -1
       @test M*N == N*M == c*R(1)
 
       M[j,i] = -1
-      NN, cc = inv(M)
-      @test cc == 2
+      NN, cc = pseudo_inv(M)
       @test NN[i,j] == -1
       @test NN[j,i] == 1
 
       @test M*NN == NN*M == cc*R(1)
-   end   
-   
+   end
+
    S = ResidueRing(ZZ, 20011*10007)
 
    for dim = 1:5
@@ -1015,7 +1017,7 @@ function test_gen_mat_inversion()
       d = R(0)
 
       try
-          X, d = inv(M)
+          X, d = pseudo_inv(M)
           do_test = true
       catch e
          if !(e isa ErrorException)
@@ -1035,7 +1037,7 @@ function test_gen_mat_inversion()
 
       M = randmat_with_rank(R, dim, 0:3, -20:20)
 
-      X, d = inv(M)
+      X, d = pseudo_inv(M)
 
       @test M*X == d*one(R)
    end
@@ -1048,9 +1050,9 @@ function test_gen_mat_inversion()
 
       M = randmat_with_rank(S, dim, 0:2, -100:100)
 
-      X = inv(M)
+      X, d = pseudo_inv(M)
 
-      @test isone(M*X)
+      @test M*X == d*one(S)
    end
 
    R, x = PolynomialRing(ZZ, "x")
@@ -1061,7 +1063,7 @@ function test_gen_mat_inversion()
 
       M = randmat_with_rank(T, dim, 0:2, 0:2, -20:20)
 
-      X, d = inv(M)
+      X, d = pseudo_inv(M)
 
       @test M*X == d*one(T)
    end
@@ -1092,16 +1094,16 @@ end
 
 function test_gen_mat_kronecker_product()
    print("Generic.Mat.kronecker_product...")
-   
+
    R = ResidueRing(ZZ, 18446744073709551629)
    S = MatrixSpace(R, 2, 3)
    S2 = MatrixSpace(R, 2, 2)
    S3 = MatrixSpace(R, 3, 3)
-   
+
    A = S(R.([2 3 5; 9 6 3]))
    B = S2(R.([2 3; 1 4]))
    C = S3(R.([2 3 5; 1 4 7; 9 6 3]))
-   
+
    @test size(kronecker_product(A, A)) == (4,9)
    @test kronecker_product(B*A,A*C) == kronecker_product(B,A) * kronecker_product(A,C)
 
