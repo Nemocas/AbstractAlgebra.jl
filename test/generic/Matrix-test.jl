@@ -916,7 +916,7 @@ function test_gen_mat_nullspace()
       n = 0
       N = M
       r = 0
-      
+
       try
          n, N = nullspace(M)
          r = rank(N)
@@ -981,6 +981,30 @@ end
 function test_gen_mat_inversion()
    print("Generic.Mat.inversion...")
 
+   for dim = 2:5
+      R = MatrixSpace(ZZ, dim, dim)
+      M = R(1)
+      i = rand(1:dim-1)
+      j = rand(i+1:dim)
+      M[i,j] = 1 # E_{i,j} elementary matrix
+
+      N, c = pseudo_inv(M)
+      @test N isa elem_type(R)
+      @test c isa eltype(M)
+
+      @test isunit(c)
+      @test inv(c) isa eltype(M)
+      @test N[i,j] == -1
+      @test M*N == N*M == c*R(1)
+
+      M[j,i] = -1
+      NN, cc = pseudo_inv(M)
+      @test NN[i,j] == -1
+      @test NN[j,i] == 1
+
+      @test M*NN == NN*M == cc*R(1)
+   end
+
    S = ResidueRing(ZZ, 20011*10007)
 
    for dim = 1:5
@@ -1028,7 +1052,7 @@ function test_gen_mat_inversion()
 
       X, d = pseudo_inv(M)
 
-      @test M*X == d*one(M)
+      @test M*X == d*one(S)
    end
 
    R, x = PolynomialRing(ZZ, "x")
@@ -1070,16 +1094,16 @@ end
 
 function test_gen_mat_kronecker_product()
    print("Generic.Mat.kronecker_product...")
-   
+
    R = ResidueRing(ZZ, 18446744073709551629)
    S = MatrixSpace(R, 2, 3)
    S2 = MatrixSpace(R, 2, 2)
    S3 = MatrixSpace(R, 3, 3)
-   
+
    A = S(R.([2 3 5; 9 6 3]))
    B = S2(R.([2 3; 1 4]))
    C = S3(R.([2 3 5; 1 4 7; 9 6 3]))
-   
+
    @test size(kronecker_product(A, A)) == (4,9)
    @test kronecker_product(B*A,A*C) == kronecker_product(B,A) * kronecker_product(A,C)
 
@@ -1256,8 +1280,8 @@ function test_gen_mat_minpoly()
    println("PASS")
 end
 
-function test_gen_mat_row_swapping()
-   print("Generic.Mat.row_swapping...")
+function test_gen_mat_row_col_swapping()
+   print("Generic.Mat.row_col_swapping...")
 
    R, x = PolynomialRing(ZZ, "x")
    M = MatrixSpace(R, 3, 2)
@@ -1269,6 +1293,33 @@ function test_gen_mat_row_swapping()
    swap_rows!(a, 2, 3)
 
    @test a == M(map(R, [1 2; 5 6; 3 4]))
+
+   @test swap_cols(a, 1, 2) == matrix(R, [2 1; 6 5; 4 3])
+
+   swap_cols!(a, 2, 1)
+
+   @test a == matrix(R, [2 1; 6 5; 4 3])
+
+   a = matrix(R, [1 2; 3 4])
+   @test invert_rows(a) == matrix(R, [3 4; 1 2])
+   invert_rows!(a)
+   @test a == matrix(R, [3 4; 1 2])
+
+   a = matrix(R, [1 2; 3 4])
+   @test invert_cols(a) == matrix(R, [2 1; 4 3])
+   invert_cols!(a)
+   @test a == matrix(R, [2 1; 4 3])
+
+   a = matrix(R, [1 2 3; 3 4 5; 5 6 7])
+
+   @test invert_rows(a) == matrix(R, [5 6 7; 3 4 5; 1 2 3])
+   invert_rows!(a)
+   @test a == matrix(R, [5 6 7; 3 4 5; 1 2 3])
+
+   a = matrix(R, [1 2 3; 3 4 5; 5 6 7])
+   @test invert_cols(a) == matrix(R, [3 2 1; 5 4 3; 7 6 5])
+   invert_cols!(a)
+   @test a == matrix(R, [3 2 1; 5 4 3; 7 6 5])
 
    println("PASS")
 end
@@ -1645,7 +1696,7 @@ function test_gen_mat()
    test_gen_mat_kronecker_product()
    test_gen_mat_charpoly()
    test_gen_mat_minpoly()
-   test_gen_mat_row_swapping()
+   test_gen_mat_row_col_swapping()
    test_gen_mat_concat()
    test_gen_mat_hnf_minors()
    test_gen_mat_hnf_kb()
