@@ -16,7 +16,7 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref,
        _check_dim, nrows, ncols, gram, rref, rref!, swap_rows, swap_rows!,
        hnf_kb, hnf_kb_with_trafo, hnf_cohen, hnf_cohen_with_trafo, snf_kb,
        snf_kb_with_trafo, find_pivot_popov, inv!, zero_matrix,
-       kronecker_product, minors, tr, lu, lu!
+       kronecker_product, minors, tr, lu, lu!, pseudo_inv
 
 ###############################################################################
 #
@@ -2071,19 +2071,16 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    inv(M::Generic.MatrixElem{T}) where {T <: RingElement}
-> Given a non-singular $n\times n$ matrix over a ring the tuple $X, d$
+    pseudo_inv(M::Generic.MatrixElem{T}) where {T <: RingElement}
+> Given a non-singular $n\times n$ matrix $M$ over a ring return a tuple $X, d$
 > consisting of an $n\times n$ matrix $X$ and a denominator $d$ such that
-> $AX = dI_n$, where $I_n$ is the $n\times n$ identity matrix. The denominator
-> will be the determinant of $A$ up to sign. If $A$ is singular an exception
+> $MX = dI_n$, where $I_n$ is the $n\times n$ identity matrix. The denominator
+> will be the determinant of $M$ up to sign. If $M$ is singular an exception
 > is raised.
 """
-function inv(M::MatrixElem{T}) where {T <: RingElement}
-   !issquare(M) && error("Matrix not square in invert")
-   n = ncols(M)
-   X = eye(M)
-   A = deepcopy(M)
-   X, d = solve_fflu(A, X)
+function pseudo_inv(M::MatrixElem{T}) where {T <: RingElement}
+   issquare(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
+   X, d = solve_fflu(M, eye(M))
    return X, d
 end
 

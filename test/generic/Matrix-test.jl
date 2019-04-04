@@ -993,7 +993,7 @@ function test_gen_mat_inversion()
       d = R(0)
 
       try
-          X, d = inv(M)
+          X, d = pseudo_inv(M)
           do_test = true
       catch e
          if !(e isa ErrorException)
@@ -1013,7 +1013,7 @@ function test_gen_mat_inversion()
 
       M = randmat_with_rank(R, dim, 0:3, -20:20)
 
-      X, d = inv(M)
+      X, d = pseudo_inv(M)
 
       @test M*X == d*one(R)
    end
@@ -1026,9 +1026,9 @@ function test_gen_mat_inversion()
 
       M = randmat_with_rank(S, dim, 0:2, -100:100)
 
-      X = inv(M)
+      X, d = pseudo_inv(M)
 
-      @test isone(M*X)
+      @test M*X == d*one(M)
    end
 
    R, x = PolynomialRing(ZZ, "x")
@@ -1039,7 +1039,7 @@ function test_gen_mat_inversion()
 
       M = randmat_with_rank(T, dim, 0:2, 0:2, -20:20)
 
-      X, d = inv(M)
+      X, d = pseudo_inv(M)
 
       @test M*X == d*one(T)
    end

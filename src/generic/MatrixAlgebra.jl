@@ -227,13 +227,13 @@ end
 
 function divexact_left(f::AbstractAlgebra.MatAlgElem{T},
                        g::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement
-   ginv, d = inv(g)
+   ginv, d = pseudo_inv(g)
    return divexact(ginv*f, d)
 end
 
 function divexact_right(f::AbstractAlgebra.MatAlgElem{T},
                        g::AbstractAlgebra.MatAlgElem{T}) where T <: RingElement
-   ginv, d = inv(g)
+   ginv, d = pseudo_inv(g)
    return divexact(f*ginv, d)
 end
 
