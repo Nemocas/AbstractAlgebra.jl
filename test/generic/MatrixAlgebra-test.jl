@@ -718,14 +718,14 @@ function test_gen_matalg_rref()
 end
 
 function test_gen_matalg_inversion()
+@testset "Generic.MatAlg.inversion..." begin
 
    indexing(n) = [(i,j) for i in 1:n for j in 1:n if i !=j ]
    E(R,i,j, val=1) = (M=one(R); M[i,j] = val; return M)
    E(R::MatAlgebra; vals=[1,-1]) = [E(R, i,j,val) for (i,j) in indexing(R.n) for val in vals]
    random_product(S::Vector{<:NCRingElem}, len=10) = prod(i->S[i], rand(1:length(S), len))
 
-   print("Generic.MatAlg.inversion...")
-
+   @testset "Matrix Algebra over ZZ" begin
    S = ZZ
 
    for dim = 2:5
@@ -755,7 +755,9 @@ function test_gen_matalg_inversion()
 
       @test all(isone(m*inv(m)) for m in random_matrices)
    end
+   end
 
+   @testset "Matrix Algebra over ResidueRing" begin
    S = ResidueRing(ZZ, 20011*10007)
 
    for dim = 1:5
@@ -775,7 +777,9 @@ function test_gen_matalg_inversion()
 
       do_test && @test isone(M*X)
    end
+   end
 
+   @testset "Matrix Algebra over ZZ[x]" begin
    S, x = PolynomialRing(ZZ, "x")
 
    for dim = 2:5
@@ -801,7 +805,9 @@ function test_gen_matalg_inversion()
 
       @test all(isone(m*inv(m)) for m in random_matrices)
    end
+   end
 
+   @testset "Matrix Algebra over NumberField over QQ" begin
    R, x = PolynomialRing(QQ, "x")
    S, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -814,7 +820,9 @@ function test_gen_matalg_inversion()
 
       @test isone(M*X)
    end
+   end
 
+   @testset "Matrix Algebra over (ZZ[x])[y]" begin
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
@@ -845,7 +853,8 @@ function test_gen_matalg_inversion()
 
       @test all(isone(m*inv(m)) for m in random_matrices)
    end
-   println("PASS")
+   end
+end # of @testset "Generic.MatAlg.inversion..."
 end
 
 function test_gen_matalg_hessenberg()
