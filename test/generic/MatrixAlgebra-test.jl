@@ -317,7 +317,7 @@ function test_gen_matalg_exact_division()
 
    println("PASS")
 end
-   
+
 function test_gen_matalg_adhoc_exact_division()
    print("Generic.MatAlg.adhoc_exact_division...")
 
@@ -718,7 +718,43 @@ function test_gen_matalg_rref()
 end
 
 function test_gen_matalg_inversion()
+
+   indexing(n) = [(i,j) for i in 1:n for j in 1:n if i !=j ]
+   E(R,i,j, val=1) = (M=one(R); M[i,j] = val; return M)
+   E(R::MatAlgebra; vals=[1,-1]) = [E(R, i,j,val) for (i,j) in indexing(R.n) for val in vals]
+   random_product(S::Vector{<:NCRingElem}, len=10) = prod(i->S[i], rand(1:length(S), len))
+
    print("Generic.MatAlg.inversion...")
+
+   S = ZZ
+
+   for dim = 2:5
+      R = MatrixAlgebra(S, dim)
+      M = R(1)
+      i = rand(1:dim-1)
+      j = rand(i+1:dim)
+      M[i,j] = 1 # E_{i,j} elementary matrix
+
+      @test inv(M) isa MatAlgElem
+      N = inv(M)
+      @test N[i,j] == -1
+      @test M*N == N*M == R(1)
+
+      M[j,i] = -1
+      @test_throws DomainError inv(M) # we would need to invert 2
+      M[i,i] = 0
+      @test inv(M) isa MatAlgElem
+      NN = inv(M)
+      @test NN[i,j] == -1
+      @test NN[j,i] == 1
+
+      @test M*NN == NN*M == one(R)
+
+      gens = E(R)
+      random_matrices = [random_product(gens) for _ in 1:10]
+
+      @test all(isone(m*inv(m)) for m in random_matrices)
+   end
 
    S = ResidueRing(ZZ, 20011*10007)
 
@@ -729,41 +765,50 @@ function test_gen_matalg_inversion()
 
       do_test = false
       X = M
-      d = 0
 
       try
-         X, d = inv(M)
+         X = inv(M)
          do_test = true
       catch e
-         if !(e isa ErrorException)
-            rethrow(e)
-         end
+         e isa DomainError ? nothing : rethrow(e)
       end
 
-      if do_test
-         @test M*X == d*one(R)
-      end
+      do_test && @test isone(M*X)
    end
 
-   S, z = PolynomialRing(ZZ, "z")
+   S, x = PolynomialRing(ZZ, "x")
+
+   for dim = 2:5
+      R = MatrixAlgebra(S, dim)
+      M = one(R)
+      i = rand(1:dim-1)
+      j = rand(i+1:dim)
+      M[i,j] = 1
+      @test inv(M) isa MatAlgElem
+      X = inv(M)
+      @test isone(M*X)
+
+      M[i,j] = x
+      @test inv(M) isa MatAlgElem
+      X = inv(M)
+      @test isone(M*X)
+
+      M[j,i] = 1
+      @test_throws DomainError inv(M)
+
+      gens = E(R, vals=[1, x, -x^2])
+      random_matrices = [random_product(gens) for _ in 1:10]
+
+      @test all(isone(m*inv(m)) for m in random_matrices)
+   end
+
+   R, x = PolynomialRing(QQ, "x")
+   S, a = NumberField(x^3 + 3x + 1, "a")
 
    for dim = 1:5
       R = MatrixAlgebra(S, dim)
 
-      M = randmat_with_rank(R, dim, 0:3, -20:20)
-
-      X, d = inv(M)
-
-      @test M*X == d*one(R)
-   end
-
-   R, x = PolynomialRing(QQ, "x")
-   K, a = NumberField(x^3 + 3x + 1, "a")
-
-   for dim = 1:5
-      S = MatrixAlgebra(K, dim)
-
-      M = randmat_with_rank(S, dim, 0:2, -100:100)
+      M = randmat_with_rank(R, dim, 0:2, -100:100)
 
       X = inv(M)
 
@@ -773,16 +818,33 @@ function test_gen_matalg_inversion()
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
-   for dim = 1:5
+   for dim = 2:5
       T = MatrixAlgebra(S, dim)
+      M = one(T)
+      i = rand(1:dim-1)
+      j = rand(i+1:dim)
+      M[i,j] = R(1)
 
-      M = randmat_with_rank(T, dim, 0:2, 0:2, -20:20)
+      @test inv(M) isa MatAlgElem
+      @test isone(M*inv(M))
 
-      X, d = inv(M)
+      M[i,j] = x
+      @test isone(M*inv(M))
 
-      @test M*X == d*one(T)
+      M[j,i] = 1
+      @test_throws DomainError inv(M)
+      M[j,i] = 0
+
+      M[i,j] = y
+      @test isone(M*inv(M))
+      M[j,i] = x
+      @test_throws DomainError inv(M)
+
+      gens = E(T, vals=[1,x,y])
+      random_matrices = [random_product(gens) for _ in 1:10]
+
+      @test all(isone(m*inv(m)) for m in random_matrices)
    end
-
    println("PASS")
 end
 
