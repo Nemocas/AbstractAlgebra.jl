@@ -184,6 +184,7 @@ function Submodule(m::AbstractAlgebra.Module{T}, gens::Vector{<:AbstractAlgebra.
       f = map_from_func(M, m, x -> nothing)
       return M, f
    end
+   # Make generators rows of a matrix
    r = length(gens)
    s = ngens(m)
    mat = matrix(base_ring(m), r, s, [0 for i in 1:r*s])
@@ -193,7 +194,9 @@ function Submodule(m::AbstractAlgebra.Module{T}, gens::Vector{<:AbstractAlgebra.
          mat[i, j] = gens[i].v[1, j]
       end
    end
+   # Reduce matrix (hnf/rref)
    mat = reduced_form(mat)
+   # Remove zero rows
    num = r
    while num > 0
       rowzero = true
@@ -207,8 +210,10 @@ function Submodule(m::AbstractAlgebra.Module{T}, gens::Vector{<:AbstractAlgebra.
       end
       num -= 1
    end
+   # Make submodule whose generators are the nonzero rows
    gens = [m([mat[i, j] for j = 1:s]) for i = 1:num]
    M = Submodule{T}(m, gens)
+   # Compute map from elements of submodule into original module
    f = map_from_func(M, m, x -> sum(x.v[1, i]*gens[i] for i in 1:ncols(x.v)))
    M.map = f
    return M, f
