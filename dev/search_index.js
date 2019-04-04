@@ -2165,7 +2165,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic Puiseux series",
     "title": "Base.inv",
     "category": "method",
-    "text": "inv(M::Generic.MatrixElem{T}) where {T <: RingElement}\n\nGiven a non-singular ntimes n matrix over a ring the tuple X d consisting of an ntimes n matrix X and a denominator d such that AX = dI_n, where I_n is the ntimes n identity matrix. The denominator will be the determinant of A up to sign. If A is singular an exception is raised.\n\n\n\n"
+    "text": "inv(M::Generic.MatrixElem{T}) where {T <: RingElement}\n\nGiven a non-singular ntimes n matrix over a ring, return an ntimes n matrix X such that MX = I_n, where I_n is the ntimes n identity matrix. If M is not invertible over the base ring an exception is raised.\n\n\n\n"
 },
 
 {
@@ -4093,7 +4093,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Base.inv",
     "category": "method",
-    "text": "inv(M::Generic.MatrixElem{T}) where {T <: RingElement}\n\nGiven a non-singular ntimes n matrix over a ring the tuple X d consisting of an ntimes n matrix X and a denominator d such that AX = dI_n, where I_n is the ntimes n identity matrix. The denominator will be the determinant of A up to sign. If A is singular an exception is raised.\n\n\n\n"
+    "text": "inv(M::Generic.MatrixElem{T}) where {T <: RingElement}\n\nGiven a non-singular ntimes n matrix over a ring, return an ntimes n matrix X such that MX = I_n, where I_n is the ntimes n identity matrix. If M is not invertible over the base ring an exception is raised.\n\n\n\n"
 },
 
 {
@@ -4101,7 +4101,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Base.inv",
     "category": "method",
-    "text": "inv(M::Generic.MatrixElem{T}) where {T <: RingElement}\n\nGiven a non-singular ntimes n matrix over a ring the tuple X d consisting of an ntimes n matrix X and a denominator d such that AX = dI_n, where I_n is the ntimes n identity matrix. The denominator will be the determinant of A up to sign. If A is singular an exception is raised.\n\n\n\ninv(M::Generic.MatrixElem{T}) where {T <: FieldElement}\n\nGiven a non-singular ntimes n matrix over a field, return an ntimes n matrix X such that AX = I_n where I_n is the ntimes n identity matrix. If A is singular an exception is raised.\n\n\n\n"
+    "text": "inv(M::Generic.MatrixElem{T}) where {T <: FieldElement}\n\nGiven a non-singular ntimes n matrix over a field, return an ntimes n matrix X such that MX = I_n where I_n is the ntimes n identity matrix. If M is singular an exception is raised.\n\n\n\ninv(M::Generic.MatrixElem{T}) where {T <: RingElement}\n\nGiven a non-singular ntimes n matrix over a ring, return an ntimes n matrix X such that MX = I_n, where I_n is the ntimes n identity matrix. If M is not invertible over the base ring an exception is raised.\n\n\n\n"
 },
 
 {
