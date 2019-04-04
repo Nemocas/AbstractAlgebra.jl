@@ -2087,15 +2087,27 @@ end
 @doc Markdown.doc"""
     inv(M::Generic.MatrixElem{T}) where {T <: FieldElement}
 > Given a non-singular $n\times n$ matrix over a field, return an
-> $n\times n$ matrix $X$ such that $AX = I_n$ where $I_n$ is the $n\times n$
-> identity matrix. If $A$ is singular an exception is raised.
+> $n\times n$ matrix $X$ such that $MX = I_n$ where $I_n$ is the $n\times n$
+> identity matrix. If $M$ is singular an exception is raised.
 """
 function inv(M::MatrixElem{T}) where {T <: FieldElement}
-   !issquare(M) && error("Matrix not square in invert")
-   n = ncols(M)
-   X = eye(M)
-   A = solve_lu(M, X)
+   issquare(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
+   A = solve_lu(M, eye(M))
    return A
+end
+
+@doc Markdown.doc"""
+    inv(M::Generic.MatrixElem{T}) where {T <: RingElement}
+> Given a non-singular $n\times n$ matrix over a ring, return an
+> $n\times n$ matrix $X$ such that $MX = I_n$, where $I_n$ is the $n\times n$
+> identity matrix. If $M$ is not invertible over the base ring an exception is
+> raised.
+"""
+function inv(M::MatrixElem{T}) where {T <: RingElement}
+   issquare(M) || throw(DomainError(M, "Can not invert non-square Matrix"))
+   X, d = pseudo_inv(M)
+   isunit(d) || throw(DomainError(M, "Matrix is not invertible."))
+   return divexact(X, d)
 end
 
 ###############################################################################
