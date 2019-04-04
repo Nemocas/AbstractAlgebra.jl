@@ -77,6 +77,8 @@ include("generic/QuotientModule.jl")
 
 include("generic/ModuleHomomorphism.jl")
 
+include("generic/Module.jl")
+
 include("generic/Map.jl")
 
 include("generic/MapWithInverse.jl")
