@@ -114,7 +114,7 @@ function show(io::IO, p::AbstractAlgebra.NCPolyRing)
    print(io, "Univariate Polynomial Ring in ")
    print(io, string(var(p)))
    print(io, " over ")
-   show(io, base_ring(p))
+   print(IOContext(io, :compact => true), base_ring(p))
 end
 
 show_minus_one(::Type{NCPoly{T}}) where {T <: NCRingElem} = show_minus_one(T)

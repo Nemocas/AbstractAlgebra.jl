@@ -157,7 +157,7 @@ function show(io::IO, x::AbstractAlgebra.AbsSeriesElem)
             if i != 0
                if !isone(c)
                   print(io, "(")
-                  print(io, c)
+                  print(IOContext(io, :compact => true), c)
                   print(io, ")")
                   if i != 0
                      print(io, "*")
@@ -169,7 +169,7 @@ function show(io::IO, x::AbstractAlgebra.AbsSeriesElem)
                   print(io, i)
                end
             else
-               print(io, c)
+               print(IOContext(io, :compact => true), c)
             end
             coeff_printed = true
          end

@@ -1058,7 +1058,7 @@ function show(io::IO, x::MPoly, U::Array{<: AbstractString, 1})
           if bracket
             print(io, "(")
           end
-          show(io, c)
+          print(io, c)
           if bracket
             print(io, ")")
           end
@@ -1099,7 +1099,7 @@ end
 function show(io::IO, x::MPoly)
     len = length(x)
     U = [string(x) for x in symbols(parent(x))]
-    show(io, x, U)
+    print(IOContext(io, :compact => true), x, U)
 end
 
 function show(io::IO, p::MPolyRing)
@@ -1118,7 +1118,7 @@ function show(io::IO, p::MPolyRing)
    end
    print(io, string(p.S[n]))
    print(io, " over ")
-   show(io, base_ring(p))
+   print(IOContext(io, :compact => true), base_ring(p))
 end
 
 show_minus_one(::Type{U}) where U <: AbstractAlgebra.MPolyElem{T} where T <: RingElement = show_minus_one(T)
@@ -4522,7 +4522,8 @@ function MPolyBuildCtx(R::AbstractAlgebra.MPolyRing)
 end
 
 function show(io::IO, M::MPolyBuildCtx)
-   print(io, "Builder for a polynomial in ", parent(M.poly))
+   iocomp = IOContext(io, :compact => true)
+   print(iocomp, "Builder for a polynomial in ", parent(M.poly))
 end
 
 function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement

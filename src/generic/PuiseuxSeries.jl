@@ -284,7 +284,7 @@ end
 function show(io::IO, x::PuiseuxSeriesElem)
    len = pol_length(x.data)
    if len == 0
-      print(io, zero(base_ring(x)))
+      print(IOContext(io, :compact => true), zero(base_ring(x)))
    else
       coeff_printed = false
       sc = scale(x.data)
@@ -301,7 +301,7 @@ function show(io::IO, x::PuiseuxSeriesElem)
                   if bracket
                      print(io, "(")
                   end
-                  print(io, c)
+                  print(IOContext(io, :compact => true), c)
                   if bracket
                      print(io, ")")
                   end
@@ -316,28 +316,28 @@ function show(io::IO, x::PuiseuxSeriesElem)
                if (i*sc + valuation(x.data))//den != 1
                   print(io, "^")
                   q = (valuation(x.data) + i*sc)//den
-                  print(io, denominator(q) == 1 ? numerator(q) : q)
+                  print(IOContext(io, :compact => true), denominator(q) == 1 ? numerator(q) : q)
                end
             else
-               print(io, c)
+               print(IOContext(io, :compact => true), c)
             end
             coeff_printed = true
          end
       end
    end
-   q =  precision(x.data)//x.scale
-   print(io, "+O(", string(var(parent(x.data))), "^", denominator(q) == 1 ? numerator(q) :
+   q = precision(x.data)//x.scale
+   print(IOContext(io, :compact => true), "+O(", string(var(parent(x.data))), "^", denominator(q) == 1 ? numerator(q) :
  q, ")")
 end
 
 function show(io::IO, a::PuiseuxSeriesRing)
    print(io, "Puiseux series ring in ", var(laurent_ring(a)), " over ")
-   show(io, base_ring(a))
+   print(IOContext(io, :compact => true), base_ring(a))
 end
 
 function show(io::IO, a::PuiseuxSeriesField)
    print(io, "Puiseux series field in ", var(laurent_ring(a)), " over ")
-   show(io, base_ring(a))
+   print(IOContext(io, :compact => true), base_ring(a))
 end
 
 needs_parentheses(x::PuiseuxSeriesElem) = pol_length(x.data) > 1

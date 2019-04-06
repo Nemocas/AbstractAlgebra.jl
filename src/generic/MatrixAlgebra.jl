@@ -146,7 +146,7 @@ issquare(a::MatAlgElem) = true
 function show(io::IO, a::AbstractAlgebra.MatAlgebra)
    print(io, "Matrix Algebra of degree ")
    print(io, a.n, " over ")
-   print(io, base_ring(a))
+   print(IOContext(io, :compact => true), base_ring(a))
 end
 
 show_minus_one(::Type{AbstractAlgebra.MatAlgElem{T}}) where T <: RingElement = false

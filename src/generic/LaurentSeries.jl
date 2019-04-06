@@ -409,7 +409,7 @@ end
 function show(io::IO, x::LaurentSeriesElem)
    len = pol_length(x)
    if len == 0
-      print(io, zero(base_ring(x)))
+      print(IOContext(io, :compact => true), zero(base_ring(x)))
    else
       coeff_printed = false
       sc = scale(x)
@@ -425,7 +425,7 @@ function show(io::IO, x::LaurentSeriesElem)
                   if bracket
                      print(io, "(")
                   end
-                  print(io, c)
+                  print(IOContext(io, :compact => true), c)
                   if bracket
                      print(io, ")")
                   end
@@ -442,7 +442,7 @@ function show(io::IO, x::LaurentSeriesElem)
                   print(io, valuation(x) + i*sc)
                end
             else
-               print(io, c)
+               print(IOContext(io, :compact => true), c)
             end
             coeff_printed = true
          end
@@ -453,12 +453,12 @@ end
 
 function show(io::IO, a::LaurentSeriesRing)
    print(io, "Laurent series ring in ", var(a), " over ")
-   show(io, base_ring(a))
+   print(IOContext(io, :compact => true), base_ring(a))
 end
 
 function show(io::IO, a::LaurentSeriesField)
    print(io, "Laurent series field in ", var(a), " over ")
-   show(io, base_ring(a))
+   print(IOContext(io, :compact => true), base_ring(a))
 end
 
 needs_parentheses(x::LaurentSeriesElem) = pol_length(x) > 1

@@ -67,25 +67,25 @@ function show(io::IO, M::FreeModule{T}) where T <: Union{RingElement, NCRingElem
    print(io, "Free module of rank ")
    print(io, rank(M))
    print(io, " over ")
-   show(io, base_ring(M))
+   show(IOContext(io, :compact => true), base_ring(M))
 end
 
 function show(io::IO, M::FreeModule{T}) where T <: FieldElement
    print(io, "Vector space of dimension ")
    print(io, dim(M))
    print(io, " over ")
-   show(io, base_ring(M))
+   show(IOContext(io, :compact => true), base_ring(M))
 end
 
 function show(io::IO, a::free_module_elem)
    print(io, "(")
    M = parent(a)
    for i = 1:rank(M) - 1
-      print(io, a.v[1, i])
+      print(IOContext(io, :compact => true), a.v[1, i])
       print(io, ", ")
    end
    if rank(M) > 0
-      print(io, a.v[1, rank(M)])
+      print(IOContext(io, :compact => true), a.v[1, rank(M)])
    end
    print(io, ")")
 end

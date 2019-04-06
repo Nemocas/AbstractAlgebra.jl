@@ -49,29 +49,29 @@ end
 
 function show(io::IO, N::Submodule{T}) where T <: RingElement
    println(io, "Submodule of:")
-   show(io, N.m)
+   print(IOContext(io, :compact => true), N.m)
    println(io, "")
    println(io, " with generators:")
-   show(io, N.gens)
+   print(IOContext(io, :compact => true), N.gens)
 end
 
 function show(io::IO, N::Submodule{T}) where T <: FieldElement
    println(io, "Subspace of:")
-   show(io, N.m)
+   print(IOContext(io, :compact => true), N.m)
    println(io, "")
    println(io, " with generators:")
-   show(io, N.gens)
+   print(IOContext(io, :compact => true), N.gens)
 end
 
 function show(io::IO, v::submodule_elem)
    print(io, "(")
    len = ngens(parent(v))
    for i = 1:len - 1
-      print(io, v.v[1, i])
+      print(IOContext(io, :compact => true), v.v[1, i])
       print(io, ", ")
    end
    if len > 0
-      print(io, v.v[1, len])
+      print(IOContext(io, :compact => true), v.v[1, len])
    end
    print(io, ")")
 end
