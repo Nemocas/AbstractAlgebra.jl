@@ -335,7 +335,7 @@ issquare(a::MatElem) = (nrows(a) == ncols(a))
 function show(io::IO, a::AbstractAlgebra.MatSpace)
    print(io, "Matrix Space of ")
    print(io, a.nrows, " rows and ", a.ncols, " columns over ")
-   print(io, base_ring(a))
+   print(IOContext(io, :compact => true), base_ring(a))
 end
 
 function show(io::IO, a::MatrixElem)
@@ -347,7 +347,7 @@ function show(io::IO, a::MatrixElem)
    for i = 1:r
       print(io, "[")
       for j = 1:c
-         print(io, a[i, j])
+         print(IOContext(io, :compact => true), a[i, j])
          if j != c
             print(io, " ")
          end

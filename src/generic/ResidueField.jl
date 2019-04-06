@@ -170,11 +170,11 @@ end
 ###############################################################################
 
 function show(io::IO, x::AbstractAlgebra.ResFieldElem)
-   print(io, data(x))
+   print(IOContext(io, :compact => true), data(x))
 end
 
 function show(io::IO, a::AbstractAlgebra.ResField)
-   print(io, "Residue field of ", base_ring(a), " modulo ", modulus(a))
+   print(IOContext(io, :compact => true), "Residue field of ", base_ring(a), " modulo ", modulus(a))
 end
 
 needs_parentheses(x::AbstractAlgebra.ResFieldElem) = needs_parentheses(data(x))

@@ -260,7 +260,7 @@ function show(io::IO, x::PolynomialElem)
    len = length(x)
    S = var(parent(x))
    if len == 0
-      print(io, base_ring(x)(0))
+      print(IOContext(io, :compact => true), base_ring(x)(0))
    else
       for i = 1:len - 1
          c = coeff(x, len - i)
@@ -273,7 +273,7 @@ function show(io::IO, x::PolynomialElem)
                if bracket
                   print(io, "(")
                end
-               show(io, c)
+               print(IOContext(io, :compact => true), c)
                if bracket
                   print(io, ")")
                end
@@ -298,7 +298,7 @@ function show(io::IO, x::PolynomialElem)
          if bracket
             print(io, "(")
          end
-         show(io, c)
+         print(IOContext(io, :compact => true), c)
          if bracket
             print(io, ")")
          end
@@ -310,7 +310,7 @@ function show(io::IO, p::AbstractAlgebra.PolyRing)
    print(io, "Univariate Polynomial Ring in ")
    print(io, string(var(p)))
    print(io, " over ")
-   show(io, base_ring(p))
+   print(IOContext(io, :compact => true), base_ring(p))
 end
 
 needs_parentheses(x::PolynomialElem) = length(x) > 1

@@ -51,29 +51,29 @@ end
 
 function show(io::IO, N::QuotientModule{T}) where T <: RingElement
    println(io, "Quotient module of:")
-   show(io, N.m)
+   print(IOContext(io, :compact => true), N.m)
    println(io, "")
    println(io, " with relations:")
-   show(io, N.rels)
+   print(IOContext(io, :compact => true), N.rels)
 end
 
 function show(io::IO, N::QuotientModule{T}) where T <: FieldElement
    println(io, "Quotient space of:")
-   show(io, N.m)
+   print(IOContext(io, :compact => true), N.m)
    println(io, "")
    println(io, " with relations:")
-   show(io, N.rels)
+   print(IOContext(io, :compact => true), N.rels)
 end
 
 function show(io::IO, v::quotient_module_elem)
    print(io, "(")
    len = ngens(parent(v))
    for i = 1:len - 1
-      print(io, v.v[1, i])
+      print(IOContext(io, :compact => true), v.v[1, i])
       print(io, ", ")
    end
    if len > 0
-      print(io, v.v[1, len])
+      print(IOContext(io, :compact => true), v.v[1, len])
    end
    print(io, ")")
 end

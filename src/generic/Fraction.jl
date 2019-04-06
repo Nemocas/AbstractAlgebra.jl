@@ -176,23 +176,23 @@ function show(io::IO, x::AbstractAlgebra.FracElem)
    # Canonicalise for display
    n = AbstractAlgebra.numerator(x, true)
    d = AbstractAlgebra.denominator(x, true)
-   if d != 1 && needs_parentheses(n)
+   if !isone(d) && needs_parentheses(n)
       print(io, "(")
    end
-   print(io, n)
-   if d != 1
+   print(IOContext(io, :compact => true), n)
+   if !isone(d)
       if needs_parentheses(n)
          print(io, ")")
       end
       print(io, "//")
       print(io, "(") # always print parentheses for denoninators e.g. x//(x*y*z)
-      print(io, d)
+      print(IOContext(io, :compact => true), d)
       print(io, ")")
    end
 end
 
 function show(io::IO, a::AbstractAlgebra.FracField)
-   print(io, "Fraction field of ", base_ring(a))
+   print(IOContext(io, compact => true), "Fraction field of ", base_ring(a))
 end
 
 # Parentheses are only needed for fractions if we didn't print them already

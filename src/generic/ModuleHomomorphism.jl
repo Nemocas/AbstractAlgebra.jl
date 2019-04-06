@@ -15,10 +15,10 @@ export ModuleHomomorphism
 function show(io::IO, f::ModuleHomomorphism)
    println(io, "Module homomorphism with")
    print(io, "Domain: ")
-   show(io, domain(f))
+   print(IOContext(io, :compact => true), domain(f))
    println(io, "")
    print(io, "Codomain: ")
-   show(io, codomain(f))
+   print(IOContext(io, :compact => true), codomain(f))
 end
 
 ###############################################################################

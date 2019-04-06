@@ -170,7 +170,7 @@ function compose(f::AbstractAlgebra.Map(AbstractAlgebra.FunctionalMap){D, U}, g:
 end
 
 function show_short(io::IO, M::AbstractAlgebra.Map)
-   println(domain(M), " -> ", codomain(M))
+   println(IOContext(io, :compact => true), domain(M), " -> ", codomain(M))
 end
 
 function show_short(io::IO, M::FunctionalCompositeMap)
@@ -186,4 +186,3 @@ function show(io::IO, M::FunctionalCompositeMap)
    println(io, "then")
    show_short(io, M.map2)
 end
-
