@@ -176,6 +176,13 @@ function test_gen_matalg_manipulation()
 
    @test deepcopy(A) == A
 
+   C = S([t + 1 R(0) R(1); t^2 R(0) t; R(0) R(0) R(0)])
+
+   @test iszero_row(C, 3)
+   @test !iszero_row(C, 1)
+   @test iszero_column(C, 2)
+   @test !iszero_column(C, 1)
+
    println("PASS")
 end
 
