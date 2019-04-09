@@ -153,8 +153,8 @@ N = sub(M, 1, 1, 2, 2)
 
 Most of the following generic functionality is available for both matrix spaces and
 matrix algebras. Exceptions include functions that do not return or accept square
-matrices or which cannot specify a parent. Such functions include `solve` and `nullspace`
-which can't be provided for matrix algebras.
+matrices or which cannot specify a parent. Such functions include `solve`, `kernel`,
+and `nullspace` which can't be provided for matrix algebras.
 
 For details on functionality that is provided for matrix algebras only, see the dedicated
 section of the documentation.
