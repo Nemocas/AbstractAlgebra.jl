@@ -987,6 +987,69 @@ function test_gen_mat_nullspace()
    println("PASS")
 end
 
+function test_gen_mat_kernel()
+   print("Generic.Mat.kernel...")
+
+   R = MatrixSpace(ZZ, 5, 5)
+
+   for i = 0:5
+      M = randmat_with_rank(R, i, -20:20)
+
+      n, N = kernel(M)
+
+      @test n == 5 - i
+      @test rank(N) == n
+      @test iszero(M*N)
+
+      n, N = left_kernel(M)
+
+      @test n == 5 - i
+      @test rank(N) == n
+      @test iszero(N*M)
+   end
+
+   R, x = PolynomialRing(QQ, "x")
+   K, a = NumberField(x^3 + 3x + 1, "a")
+   S = MatrixSpace(K, 5, 5)
+
+   for i = 0:5
+      M = randmat_with_rank(S, i, 0:2, -100:100)
+
+      n, N = kernel(M)
+
+      @test n == 5 - i
+      @test rank(N) == n
+      @test iszero(M*N)
+
+      n, N = left_kernel(M)
+
+      @test n == 5 - i
+      @test rank(N) == n
+      @test iszero(N*M)
+   end
+
+   R, x = PolynomialRing(QQ, "x")
+   T = MatrixSpace(R, 5, 5)
+
+   for i = 0:5
+      M = randmat_with_rank(T, i, 0:2, -20:20)
+
+      n, N = kernel(M)
+
+      @test n == 5 - i
+      @test rank(N) == n
+      @test iszero(M*N)
+ 
+      n, N = left_kernel(M)
+
+      @test n == 5 - i
+      @test rank(N) == n
+      @test iszero(N*M)
+   end
+
+   println("PASS")
+end
+
 function test_gen_mat_inversion()
    print("Generic.Mat.inversion...")
 
@@ -1700,6 +1763,7 @@ function test_gen_mat()
    test_gen_mat_solve_triu()
    test_gen_mat_rref()
    test_gen_mat_nullspace()
+   test_gen_mat_kernel()
    test_gen_mat_inversion()
    test_gen_mat_hessenberg()
    test_gen_mat_kronecker_product()

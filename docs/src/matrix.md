@@ -481,6 +481,28 @@ M = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;
 n, N = nullspace(M)
 ```
 
+### Kernel
+
+```@docs
+kernel{T <: RingElem}(::MatElem{T})
+left_kernel{T <: RingElem}(::MatElem{T})
+right_kernel{T <: RingElem}(::MatElem{T})
+```
+
+**Examples**
+
+```julia
+S = MatrixSpace(ZZ, 4, 4)
+
+M = S([1 2 0 4;
+       2 0 1 1;
+       0 1 1 -1;
+       2 -1 0 2])
+
+nr, Nr = kernel(M)
+nl, Nl = left_kernel(M)
+```
+
 ### Hessenberg form
 
 ```@docs
