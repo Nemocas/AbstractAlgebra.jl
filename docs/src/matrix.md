@@ -343,7 +343,7 @@ isrref(A)
 
 ```@docs
 hnf{T <: RingElem}(::MatElem{T})
-hnf_with_trafo{T <: RingElem}(::MatElem{T})
+hnf_with_transform{T <: RingElem}(::MatElem{T})
 ```
 
 ### Determinant
@@ -568,8 +568,8 @@ entries in a univariate polynomial ring over a field.
 
 ```@docs
 weak_popov{T <: PolyElem}(::Generic.Mat{T})
-weak_popov_with_trafo{T <: PolyElem}(::Generic.Mat{T})
+weak_popov_with_transform{T <: PolyElem}(::Generic.Mat{T})
 popov{T <: PolyElem}(::Generic.Mat{T})
-popov_with_trafo{T <: PolyElem}(::Generic.Mat{T})
+popov_with_transform{T <: PolyElem}(::Generic.Mat{T})
 ```
 
