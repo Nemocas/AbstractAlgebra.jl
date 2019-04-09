@@ -246,10 +246,10 @@ function isone(a::MatrixElem)
 end
 
 @doc Markdown.doc"""
-    iszero_row(M::AbstractAlgebra.MatElem{T}, i::Int) where T <: RingElement
+    iszero_row(M::MatrixElem{T}, i::Int) where T <: RingElement
 > Returns `true` if the $i$-th row of the matrix $M$ is zero.
 """
-function iszero_row(M::AbstractAlgebra.MatElem{T}, i::Int) where T <: RingElement
+function iszero_row(M::MatrixElem{T}, i::Int) where T <: RingElement
   for j in 1:ncols(M)
     if !iszero(M[i, j])
       return false
@@ -259,10 +259,10 @@ function iszero_row(M::AbstractAlgebra.MatElem{T}, i::Int) where T <: RingElemen
 end
 
 @doc Markdown.doc"""
-    iszero_column(M::AbstractAlgebra.MatElem{T}, i::Int) where T <: RingElement
+    iszero_column(M::MatrixElem{T}, i::Int) where T <: RingElement
 > Returns `true` if the $i$-th column of the matrix $M$ is zero.
 """
-function iszero_column(M::AbstractAlgebra.MatElem{T}, i::Int) where T <: RingElement
+function iszero_column(M::MatrixElem{T}, i::Int) where T <: RingElement
   for j in 1:nrows(M)
     if !iszero(M[j, i])
       return false
@@ -2260,20 +2260,20 @@ end
 > of $M$ and $n$ is the rank of the kernel.
 """
 function left_kernel(x::AbstractAlgebra.MatElem{T}) where T <: RingElement
-  !isdomain_type(elem_type(base_ring(x))) && error("Not implemented")
-  R = base_ring(x)
-  H, U = hnf_with_transform(x)
-  i = 1
-  for outer i in 1:nrows(H)
-    if iszero_row(H, i)
-      break
-    end
-  end
-  if iszero_row(H, i)
-    return nrows(U) - i + 1, view(U, i:nrows(U), 1:ncols(U))
-  else
-    return 0, zero_matrix(R, 0, ncols(U))
-  end
+   !isdomain_type(elem_type(base_ring(x))) && error("Not implemented")
+   R = base_ring(x)
+   H, U = hnf_with_transform(x)
+   i = nrows(H)
+   zero_rows = false
+   while i > 0 && iszero_row(H, i)
+      zero_rows = true
+      i -= 1
+   end
+   if zero_rows
+      return nrows(U) - i, U[i + 1:nrows(U), 1:ncols(U)]
+   else
+      return 0, zero_matrix(R, 0, ncols(U))
+   end
 end
 
 function left_kernel(M::AbstractAlgebra.MatElem{T}) where T <: FieldElement 
@@ -2287,12 +2287,12 @@ end
 > kernel of $M$ and $n$ is the rank of the kernel.
 """
 function right_kernel(x::AbstractAlgebra.MatElem{T}) where T <: RingElement
-  n, M = left_kernel(transpose(x))
-  return n, transpose(M)
+   n, M = left_kernel(transpose(x))
+   return n, transpose(M)
 end
 
 function right_kernel(M::AbstractAlgebra.MatElem{T}) where T <: FieldElement
-  return nullspace(M)
+   return nullspace(M)
 end
 
 @doc Markdown.doc"""
@@ -2304,13 +2304,13 @@ end
 > of rows whose span is the left kernel space.
 """
 function kernel(A::AbstractAlgebra.MatElem{T}; side::Symbol = :right) where T <: RingElement
-  if side == :right
-    return right_kernel(A)
-  elseif side == :left
-    return left_kernel(A)
-  else
-    error("Unsupported argument: :$side for side: Must be :left or :right")
-  end
+   if side == :right
+      return right_kernel(A)
+   elseif side == :left
+      return left_kernel(A)
+   else
+      error("Unsupported argument: :$side for side: Must be :left or :right")
+   end
 end
 
 ###############################################################################
