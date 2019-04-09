@@ -182,6 +182,7 @@ function Submodule(m::AbstractAlgebra.Module{T}, gens::Vector{<:AbstractAlgebra.
    if length(gens) == 0
       M = Submodule{T}(m, gens)
       f = map_from_func(M, m, x -> nothing)
+      M.map = f
       return M, f
    end
    # Make generators rows of a matrix

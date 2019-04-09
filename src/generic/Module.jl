@@ -55,23 +55,21 @@ function Base.intersect(M::AbstractAlgebra.Module{T}, N::AbstractAlgebra.Module{
    r1 = ngens(M)
    r2 = ngens(N)
    c = ngens(P)
-   mat = matrix(base_ring(M), c, r1 + r2, [0 for i in 1:c*(r1 + r2)])
+   mat = matrix(base_ring(M), r1 + r2, c, [0 for i in 1:(r1 + r2)*c])
    for i = 1:r1
       for j = 1:c
-         mat[j, i] = G1[i].v[1, j]
+         mat[i, j] = G1[i].v[1, j]
       end
    end
    for i = 1:r2
       for j = 1:c
-         mat[j, i + r1] = G2[i].v[1, j]
+         mat[i + r1, j] = G2[i].v[1, j]
       end
    end
    # Find the left kernel space of the matrix
-   # z = matrix(base_ring(M), r1 + r2, 1, [0 for i in 1:r1 + r2])
-   # K = solve(mat, z) # generators of kernel space are columns
-   nc, K = nullspace(mat)
-   # First r1 elements of a column correspond to a generators of intersection
-   I = [M([K[i, j] for i in 1:r1]) for j in 1:nc]
+   nc, K = left_kernel(mat)
+   # First r1 elements of a row correspond to a generators of intersection
+   I = [M([K[j, i] for i in 1:r1]) for j in 1:nc]
    return Submodule(M, I)
 end
 

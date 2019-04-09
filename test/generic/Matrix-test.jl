@@ -1360,7 +1360,7 @@ function test_gen_mat_hnf_minors()
    H = hnf_minors(A)
    @test istriu(H)
 
-   H, U = hnf_minors_with_trafo(A)
+   H, U = hnf_minors_with_transform(A)
    @test istriu(H)
    @test isunit(det(U))
    @test U*A == H
@@ -1379,7 +1379,7 @@ function test_gen_mat_hnf_minors()
    H = hnf_minors(B)
    @test istriu(H)
 
-   H, U = hnf_minors_with_trafo(B)
+   H, U = hnf_minors_with_transform(B)
    @test istriu(H)
    @test isunit(det(U))
    @test U*B == H
@@ -1399,7 +1399,7 @@ function test_gen_mat_hnf_kb()
    H = AbstractAlgebra.hnf_kb(A)
    @test istriu(H)
 
-   H, U = AbstractAlgebra.hnf_kb_with_trafo(A)
+   H, U = AbstractAlgebra.hnf_kb_with_transform(A)
    @test istriu(H)
    @test isunit(det(U))
    @test U*A == H
@@ -1418,7 +1418,7 @@ function test_gen_mat_hnf_kb()
    H = AbstractAlgebra.hnf_kb(B)
    @test istriu(H)
 
-   H, U = AbstractAlgebra.hnf_kb_with_trafo(B)
+   H, U = AbstractAlgebra.hnf_kb_with_transform(B)
    @test istriu(H)
    @test isunit(det(U))
    @test U*B == H
@@ -1438,7 +1438,7 @@ function test_gen_mat_hnf_cohen()
    H = AbstractAlgebra.hnf_cohen(A)
    @test istriu(H)
 
-   H, U = AbstractAlgebra.hnf_cohen_with_trafo(A)
+   H, U = AbstractAlgebra.hnf_cohen_with_transform(A)
    @test istriu(H)
    @test isunit(det(U))
    @test U*A == H
@@ -1457,7 +1457,7 @@ function test_gen_mat_hnf_cohen()
    H = AbstractAlgebra.hnf_cohen(B)
    @test istriu(H)
 
-   H, U = AbstractAlgebra.hnf_cohen_with_trafo(B)
+   H, U = AbstractAlgebra.hnf_cohen_with_transform(B)
    @test istriu(H)
    @test isunit(det(U))
    @test U*B == H
@@ -1477,7 +1477,7 @@ function test_gen_mat_hnf()
    H = hnf(A)
    @test istriu(H)
 
-   H, U = hnf_with_trafo(A)
+   H, U = hnf_with_transform(A)
    @test istriu(H)
    @test isunit(det(U))
    @test U*A == H
@@ -1496,7 +1496,7 @@ function test_gen_mat_hnf()
    H = hnf(B)
    @test istriu(H)
 
-   H, U = hnf_with_trafo(B)
+   H, U = hnf_with_transform(B)
    @test istriu(H)
    @test isunit(det(U))
    @test U*B == H
@@ -1516,7 +1516,7 @@ function test_gen_mat_snf_kb()
    T = AbstractAlgebra.snf_kb(A)
    @test is_snf(T)
 
-   T, U, K = AbstractAlgebra.snf_kb_with_trafo(A)
+   T, U, K = AbstractAlgebra.snf_kb_with_transform(A)
    @test is_snf(T)
    @test isunit(det(U))
    @test isunit(det(K))
@@ -1536,7 +1536,7 @@ function test_gen_mat_snf_kb()
    T = AbstractAlgebra.snf_kb(B)
    @test is_snf(T)
 
-   T, U, K = AbstractAlgebra.snf_kb_with_trafo(B)
+   T, U, K = AbstractAlgebra.snf_kb_with_transform(B)
    @test is_snf(T)
    @test isunit(det(U))
    @test isunit(det(K))
@@ -1557,7 +1557,7 @@ function test_gen_mat_snf()
    T = snf(A)
    @test is_snf(T)
 
-   T, U, K = snf_with_trafo(A)
+   T, U, K = snf_with_transform(A)
    @test is_snf(T)
    @test isunit(det(U))
    @test isunit(det(K))
@@ -1577,7 +1577,7 @@ function test_gen_mat_snf()
    T = snf(B)
    @test is_snf(T)
 
-   T, U, K = snf_with_trafo(B)
+   T, U, K = snf_with_transform(B)
    @test is_snf(T)
    @test isunit(det(U))
    @test isunit(det(K))
@@ -1597,7 +1597,7 @@ function test_gen_mat_weak_popov()
    P = weak_popov(A)
    @test is_weak_popov(P, r)
 
-   P, U = weak_popov_with_trafo(A)
+   P, U = weak_popov_with_transform(A)
    @test is_weak_popov(P, r)
    @test U*A == P
    @test isunit(det(U))
@@ -1612,7 +1612,7 @@ function test_gen_mat_weak_popov()
    P = weak_popov(B)
    @test is_weak_popov(P, s)
 
-   P, U = weak_popov_with_trafo(B)
+   P, U = weak_popov_with_transform(B)
    @test is_weak_popov(P, s)
    @test U*B == P
    @test isunit(det(U))
@@ -1626,7 +1626,7 @@ function test_gen_mat_weak_popov()
       P = weak_popov(A)
       @test is_weak_popov(P, r)
 
-      P, U = weak_popov_with_trafo(A)
+      P, U = weak_popov_with_transform(A)
       @test is_weak_popov(P, r)
       @test U*A == P
       @test isunit(det(U))
@@ -1642,7 +1642,7 @@ function test_gen_mat_weak_popov()
       P = weak_popov(A)
       @test is_weak_popov(P, r)
 
-      P, U = weak_popov_with_trafo(A)
+      P, U = weak_popov_with_transform(A)
       @test is_weak_popov(P, r)
       @test U*A == P
       @test isunit(det(U))
@@ -1658,7 +1658,7 @@ function test_gen_mat_weak_popov()
       P = weak_popov(A)
       @test is_weak_popov(P, r)
 
-      P, U = weak_popov_with_trafo(A)
+      P, U = weak_popov_with_transform(A)
       @test is_weak_popov(P, r)
       @test U*A == P
       @test isunit(det(U))

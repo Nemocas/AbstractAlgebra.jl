@@ -9,15 +9,17 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
        identity_matrix, charpoly_hessenberg!, invert_cols, invert_cols!,
        invert_rows, invert_rows!, matrix, minpoly, typed_hvcat, typed_hcat,
        powers, randmat_triu, randmat_with_rank, similarity!, solve,
-       solve_rational, hnf, hnf_kb, hnf_kb_with_trafo, hnf_with_trafo,
-       issquare, snf, snf_with_trafo, weak_popov, weak_popov_with_trafo,
-       extended_weak_popov, extended_weak_popov_with_trafo, rank,
-       rank_profile_popov, hnf_via_popov, hnf_via_popov_with_trafo, popov,
-       popov_with_trafo, det_popov, _check_dim, nrows, ncols, gram, rref,
+       solve_rational, hnf, hnf_kb, hnf_kb_with_transform, hnf_with_transform,
+       issquare, snf, snf_with_transform, weak_popov,
+       weak_popov_with_transform,
+       extended_weak_popov, extended_weak_popov_with_transform, rank,
+       rank_profile_popov, hnf_via_popov, hnf_via_popov_with_transform, popov,
+       popov_with_transform, det_popov, _check_dim, nrows, ncols, gram, rref,
        rref!, swap_cols, swap_cols!, swap_rows, swap_rows!, hnf_kb,
-       hnf_kb_with_trafo, hnf_cohen, hnf_cohen_with_trafo, snf_kb,
-       snf_kb_with_trafo, find_pivot_popov, inv!, zero_matrix,
-       kronecker_product, minors, tr, lu, lu!, pseudo_inv, dense_matrix_type
+       hnf_kb_with_transform, hnf_cohen, hnf_cohen_with_transform, snf_kb,
+       snf_kb_with_transform, find_pivot_popov, inv!, zero_matrix,
+       kronecker_product, minors, tr, lu, lu!, pseudo_inv, dense_matrix_type,
+       kernel, iszero_row, iszero_column, left_kernel, right_kernel
 
 ###############################################################################
 #
@@ -239,6 +241,32 @@ function isone(a::MatrixElem)
             end
          end
       end
+  end
+  return true
+end
+
+@doc Markdown.doc"""
+    iszero_row(M::AbstractAlgebra.MatElem{T}, i::Int) where T <: RingElement
+> Returns `true` if the $i$-th row of the matrix $M$ is zero.
+"""
+function iszero_row(M::AbstractAlgebra.MatElem{T}, i::Int) where T <: RingElement
+  for j in 1:ncols(M)
+    if !iszero(M[i, j])
+      return false
+    end
+  end
+  return true
+end
+
+@doc Markdown.doc"""
+    iszero_column(M::AbstractAlgebra.MatElem{T}, i::Int) where T <: RingElement
+> Returns `true` if the $i$-th column of the matrix $M$ is zero.
+"""
+function iszero_column(M::AbstractAlgebra.MatElem{T}, i::Int) where T <: RingElement
+  for j in 1:nrows(M)
+    if !iszero(M[j, i])
+      return false
+    end
   end
   return true
 end
@@ -2179,10 +2207,7 @@ end
 > Returns a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
 > a basis $N$ (consisting of column vectors) for the right nullspace of $M$,
 > i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix
-> $N$ will be an $n\times \nu$ matrix. Note that the nullspace is taken to be
-> the vector space kernel over the fraction field of the base ring if the
-> latter is not a field. In Nemo we use the name ``kernel'' for a function to
-> compute an integral kernel.
+> $N$ will be an $n\times \nu$ matrix.
 """
 function nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    m = nrows(M)
@@ -2221,6 +2246,71 @@ function nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
       end
    end
    return nullity, X
+end
+
+###############################################################################
+#
+#   Kernel
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    left_kernel(a::AbstractAlgebra.MatElem{T}) where T <: RingElement
+> Returns a tuple `n, M` where $M$ is a matrix whose rows generate the kernel
+> of $M$ and $n$ is the rank of the kernel.
+"""
+function left_kernel(x::AbstractAlgebra.MatElem{T}) where T <: RingElement
+  !isdomain_type(elem_type(base_ring(x))) && error("Not implemented")
+  R = base_ring(x)
+  H, U = hnf_with_transform(x)
+  i = 1
+  for outer i in 1:nrows(H)
+    if iszero_row(H, i)
+      break
+    end
+  end
+  if iszero_row(H, i)
+    return nrows(U) - i + 1, view(U, i:nrows(U), 1:ncols(U))
+  else
+    return 0, zero_matrix(R, 0, ncols(U))
+  end
+end
+
+function left_kernel(M::AbstractAlgebra.MatElem{T}) where T <: FieldElement 
+  n, N = nullspace(transpose(M))
+  return n, transpose(N)
+end
+
+@doc Markdown.doc"""
+    right_kernel(a::AbstractAlgebra.MatElem{T}) where T <: RingElement
+> Returns a tuple `n, M` where $M$ is a matrix whose columns generate the
+> kernel of $M$ and $n$ is the rank of the kernel.
+"""
+function right_kernel(x::AbstractAlgebra.MatElem{T}) where T <: RingElement
+  n, M = left_kernel(transpose(x))
+  return n, transpose(M)
+end
+
+function right_kernel(M::AbstractAlgebra.MatElem{T}) where T <: FieldElement
+  return nullspace(M)
+end
+
+@doc Markdown.doc"""
+    kernel(a::MatElem{T}; side::Symbol = :right) where T <: RingElement
+> Returns a tuple $(n, M)$, where n is the rank of the kernel and $M$ is a
+> basis for it. If side is $:right$ or not specified, the right kernel is
+> computed, i.e. the matrix of columns whose span gives the right kernel
+> space. If side is $:left$, the left kernel is computed, i.e. the matrix
+> of rows whose span is the left kernel space.
+"""
+function kernel(A::AbstractAlgebra.MatElem{T}; side::Symbol = :right) where T <: RingElement
+  if side == :right
+    return right_kernel(A)
+  elseif side == :left
+    return left_kernel(A)
+  else
+    error("Unsupported argument: :$side for side: Must be :left or :right")
+  end
 end
 
 ###############################################################################
@@ -2841,11 +2931,11 @@ end
 ###############################################################################
 
 function hnf_cohen(A::MatrixElem{T}) where {T <: RingElement}
-   H, U = hnf_cohen_with_trafo(A)
+   H, U = hnf_cohen_with_transform(A)
    return H
 end
 
-function hnf_cohen_with_trafo(A::MatrixElem{T}) where {T <: RingElement}
+function hnf_cohen_with_transform(A::MatrixElem{T}) where {T <: RingElement}
    H = deepcopy(A)
    m = nrows(H)
    U = eye(A, m)
@@ -2938,12 +3028,12 @@ function hnf_minors(A::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    hnf_minors_with_trafo(A::Generic.MatrixElem{T}) where {T <: RingElement}
+    hnf_minors_with_transform(A::Generic.MatrixElem{T}) where {T <: RingElement}
 > Compute the upper right row Hermite normal form $H$ of $A$ and an invertible
 > matrix $U$ with $UA = H$ using the algorithm of Kannan-Bachem. The input must
 > have full column rank.
 """
-function hnf_minors_with_trafo(A::MatrixElem{T}) where {T <: RingElement}
+function hnf_minors_with_transform(A::MatrixElem{T}) where {T <: RingElement}
    H = deepcopy(A)
    U = similar(A, nrows(A), nrows(A))
    _hnf_minors!(H, U, Val{true})
@@ -3200,12 +3290,12 @@ function hnf_kb(A::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    hnf_kb_with_trafo(A::Generic.MatrixElem{T}) where {T <: RingElement}
+    hnf_kb_with_transform(A::Generic.MatrixElem{T}) where {T <: RingElement}
 > Compute the upper right row Hermite normal form $H$ of $A$ and an invertible
 > matrix $U$ with $UA = H$ using a modification of the algorithm of
 > Kannan-Bachem.
 """
-function hnf_kb_with_trafo(A::MatrixElem{T}) where {T <: RingElement}
+function hnf_kb_with_transform(A::MatrixElem{T}) where {T <: RingElement}
    return _hnf_kb(A, Val{true})
 end
 
@@ -3417,12 +3507,12 @@ function hnf(A::MatrixElem{T}) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    hnf_with_trafo(A)
+    hnf_with_transform(A)
 > Return the tuple $H, U$ consisting of the upper right row Hermite normal
 > form $H$ of $A$ together with invertible matrix $U$ such that $UA = H$.
 """
-function hnf_with_trafo(A)
-  return hnf_kb_with_trafo(A)
+function hnf_with_transform(A)
+  return hnf_kb_with_transform(A)
 end
 
 ###############################################################################
@@ -3435,7 +3525,7 @@ function snf_kb(A::MatrixElem{T}) where {T <: RingElement}
    return _snf_kb(A, Val{false})
 end
 
-function snf_kb_with_trafo(A::MatrixElem{T}) where {T <: RingElement}
+function snf_kb_with_transform(A::MatrixElem{T}) where {T <: RingElement}
    return _snf_kb(A, Val{true})
 end
 
@@ -3558,8 +3648,8 @@ function snf(a::MatrixElem{T}) where {T <: RingElement}
   return snf_kb(a)
 end
 
-function snf_with_trafo(a::MatrixElem{T}) where {T <: RingElement}
-  return snf_kb_with_trafo(a)
+function snf_with_transform(a::MatrixElem{T}) where {T <: RingElement}
+  return snf_kb_with_transform(a)
 end
 
 ################################################################################
@@ -3577,11 +3667,11 @@ function weak_popov(A::Mat{T}) where {T <: PolyElem}
 end
 
 @doc Markdown.doc"""
-    weak_popov_with_trafo(A::Mat{T}) where {T <: PolyElem}
+    weak_popov_with_transform(A::Mat{T}) where {T <: PolyElem}
 > Compute a tuple $(P, U)$ where $P$ is the weak Popov form of $A$ and $U$
 > is a transformation matrix so that $P = UA$.
 """
-function weak_popov_with_trafo(A::Mat{T}) where {T <: PolyElem}
+function weak_popov_with_transform(A::Mat{T}) where {T <: PolyElem}
    return _weak_popov(A, Val{true})
 end
 
@@ -3611,13 +3701,13 @@ function extended_weak_popov(A::Mat{T}, V::Mat{T}) where {T <: PolyElem}
 end
 
 @doc Markdown.doc"""
-    extended_weak_popov_with_trafo(A::Mat{T}, V::Mat{T}) where {T <: PolyElem}
+    extended_weak_popov_with_transform(A::Mat{T}, V::Mat{T}) where {T <: PolyElem}
 > Compute the weak Popov form $P$ of $A$ by applying simple row transformations
 > on $A$, a vector $W$ by applying the same transformations on the vector $V$,
 > and a transformation matrix $U$ so that $P = UA$.
 > Return the tuple $(P, W, U)$.
 """
-function extended_weak_popov_with_trafo(A::Mat{T}, V::Mat{T}) where {T <: PolyElem}
+function extended_weak_popov_with_transform(A::Mat{T}, V::Mat{T}) where {T <: PolyElem}
    return _extended_weak_popov(A, V, Val{true})
 end
 
@@ -3842,11 +3932,11 @@ function popov(A::Mat{T}) where {T <: PolyElem}
 end
 
 @doc Markdown.doc"""
-    popov_with_trafo(A::Mat{T}) where {T <: PolyElem}
+    popov_with_transform(A::Mat{T}) where {T <: PolyElem}
 > Compute a tuple $(P, U)$ where $P$ is the Popov form of $A$ and $U$
 > is a transformation matrix so that $P = UA$.
 """
-function popov_with_trafo(A::Mat{T}) where {T <: PolyElem}
+function popov_with_transform(A::Mat{T}) where {T <: PolyElem}
    return _popov(A, Val{true})
 end
 
@@ -3954,7 +4044,7 @@ function hnf_via_popov(A::Mat{T}) where {T <: PolyElem}
    return _hnf_via_popov(A, Val{false})
 end
 
-function hnf_via_popov_with_trafo(A::Mat{T}) where {T <: PolyElem}
+function hnf_via_popov_with_transform(A::Mat{T}) where {T <: PolyElem}
    return _hnf_via_popov(A, Val{true})
 end
 
