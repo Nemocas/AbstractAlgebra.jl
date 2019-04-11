@@ -70,6 +70,18 @@ show_minus_one(::Type{T}) where T <: Integer = false
 #
 ###############################################################################
 
+function divrem(a::S, b::T) where {S <: Integer, T <: Integer}
+   r = mod(a, b)
+   q = Base.div(a - r, b)
+   return q, r
+end
+
+function div(a::S, b::T) where {S <: Integer, T <: Integer}
+   r = mod(a, b)
+   q = Base.div(a - r, b)
+   return q
+end
+
 function powmod(a::T, b::Int, c::T) where T <: Integer
    b < 0 && throw(DomainError())
    # special cases

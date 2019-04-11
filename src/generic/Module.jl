@@ -7,11 +7,11 @@
 export iscompatible
 
 @doc Markdown.doc"""
-    iscompatible(M::AbstractAlgebra.Module{T}, N::AbstractAlgebra.Module{T}) where T <: RingElement
+    iscompatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
 > Return `true, P` if the given modules are compatible, i.e. that they are
 > (transitively) submodules of the same module, P. Otherwise return `false, M`.
 """
-function iscompatible(M::AbstractAlgebra.Module{T}, N::AbstractAlgebra.Module{T}) where T <: RingElement
+function iscompatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
    M1 = M
    M2 = N
    while isa(M1, Submodule)
@@ -33,21 +33,21 @@ function iscompatible(M::AbstractAlgebra.Module{T}, N::AbstractAlgebra.Module{T}
    return false, M
 end
 
-function Base.intersect(M::AbstractAlgebra.Module{T}, N::AbstractAlgebra.Module{T}) where T <: RingElement
+function Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
    # Compute the common supermodule P of M and N
    flag, P = iscompatible(M, N)
    !flag && error("Modules not compatible")
    # Compute the generators of M as elements of P
    G1 = gens(M)
    M1 = M
-   while M1 != P
+   while M1 !== P
       G1 = [M1.map(v) for v in G1]
       M1 = supermodule(M1)
    end
    # Compute the generators of N as elements of P
    G2 = gens(N)
    M2 = N
-   while M2 != P
+   while M2 !== P
       G2 = [M2.map(v) for v in G2]
       M2 = supermodule(M2)
    end
@@ -73,3 +73,61 @@ function Base.intersect(M::AbstractAlgebra.Module{T}, N::AbstractAlgebra.Module{
    return Submodule(M, I)
 end
 
+function ==(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+   # Compute the common supermodule P of M and N
+   flag, P = iscompatible(M, N)
+   !flag && error("Modules not compatible")
+   # Compute the generators of M as elements of P
+   G1 = gens(M)
+   M1 = M
+   while M1 !== P
+      G1 = [M1.map(v) for v in G1]
+      M1 = supermodule(M1)
+   end
+   # Compute the generators of N as elements of P
+   G2 = gens(N)
+   M2 = N
+   while M2 !== P
+      G2 = [M2.map(v) for v in G2]
+      M2 = supermodule(M2)
+   end
+   # Put the generators of M and N into matrices
+   c = ngens(P)
+   r1 = ngens(M)
+   r2 = ngens(N)
+   mat1 = matrix(base_ring(M), r1, c, [0 for i in 1:r1*c])
+   for i = 1:r1
+      for j = 1:c
+         mat1[i, j] = G1[i].v[1, j]
+      end
+   end
+   mat2 = matrix(base_ring(M), r2, c, [0 for i in 1:r2*c])
+   for i = 1:r2
+      for j = 1:c
+         mat2[i, j] = G2[i].v[1, j]
+      end
+   end
+   # Put the matrices into reduced form
+   mat1 = reduced_form(mat1)
+   mat2 = reduced_form(mat2)
+   # Compare
+   i1 = nrows(mat1)
+   while i1 > 0 && iszero_row(mat1, i1)
+      i1 -= 1
+   end
+   i2 = nrows(mat2)
+   while i2 > 0 && iszero_row(mat2, i2)
+      i2 -= 1
+   end
+   if i1 != i2
+      return false
+   end
+   for i = 1:i1
+      for j = 1:ncols(mat1)
+         if mat1[i, j] != mat2[i, j]
+            return false
+         end
+      end
+   end
+   return true
+end
