@@ -106,10 +106,10 @@ end
 function _numpart(n::T, lookuptable::Dict{Int, T}) where T<:Integer
    s = zero(T)
    if !haskey(lookuptable, n)
-      for j in 1:floor(T, (1 + sqrt(1+24n))/6)
-         p1 = _numpart(n - div(j*(3j-1),2))
-         p2 = _numpart(n - div(j*(3j+1),2))
-         s += (-1)^(j-1)*(p1 + p2)
+      for j in 1:floor(T, (1 + sqrt(1 + 24n))/6)
+         p1 = _numpart(n - div(j*(3j - 1), 2))
+         p2 = _numpart(n - div(j*(3j + 1), 2))
+         s += (-1)^(j - 1)*(p1 + p2)
       end
       lookuptable[n] = s
    end
@@ -457,7 +457,7 @@ function boxed_str(Y::YoungTableau, fill=Y.fill)
       # contents of each row:
       s = _border[:vertical]
       for j in 1:Y.part[i]
-         s *= rpad(lpad(fill[counter], div(w,2)+1), w) *_border[:vertical]
+         s *= rpad(lpad(fill[counter], div(w, 2) + 1), w) *_border[:vertical]
          counter += 1
       end
       push!(diagram, s)
