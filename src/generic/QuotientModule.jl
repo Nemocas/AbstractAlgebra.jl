@@ -40,7 +40,7 @@ end
 supermodule(M::QuotientModule{T}) where T <: RingElement = M.m
 
 function check_parent(v1::quotient_module_elem{T}, v2::quotient_module_elem{T}) where T <: RingElement
-   parent(v1) != parent(v2) && error("Incompatible module elements")
+   parent(v1) !== parent(v2) && error("Incompatible module elements")
 end
 
 ###############################################################################
@@ -199,11 +199,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    QuotientModule(m::AbstractAlgebra.Module{T}, sub::Submodule{T}) where T <: RingElement
+    QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where T <: RingElement
 > Return the quotient of the module `m` by the module `sub`, which must have
 > been constructed as a submodule of `m`.
 """
-function QuotientModule(m::AbstractAlgebra.Module{T}, sub::Submodule{T}) where T <: RingElement
+function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where T <: RingElement
    supermodule(sub) !== m && error("Not a submodule in QuotientModule constructor") 
    M = QuotientModule{T}(m, sub.gens)
    G = gens(m)

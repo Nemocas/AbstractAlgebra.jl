@@ -8,9 +8,9 @@ using InteractiveUtils
 import_exclude = [:import_exclude, :QQ, :ZZ, :RR,
            :RealField, :FiniteField, :NumberField,
            :AbstractAlgebra,
-           :exp, :sqrt, :numerator, :denominator,
+           :exp, :sqrt, :div, :divrem, :numerator, :denominator,
            :promote_rule,
-           :Set, :Module, :Ring, :Group, :Field, :divrem]
+           :Set, :Module, :Ring, :Group, :Field]
 
 import LinearAlgebra: det, norm, nullspace, rank, transpose!, hessenberg
 
@@ -18,11 +18,11 @@ import LinearAlgebra: lu, lu!, tr
 
 export nullspace
 
-# Do not import divrem, exp, sqrt, numerator or denominator as we define our own
+# Do not import div, divrem, exp, sqrt, numerator or denominator as we define our own
 import Base: Array, abs, acos, acosh, asin, asinh, atan, atanh,
              bin, ceil, checkbounds, conj, convert, cmp, cos, cosh,
              cospi, cot, coth, dec, deepcopy, deepcopy_internal, 
-             div, expm1, exponent, fill, floor, gcd, gcdx,
+             expm1, exponent, fill, floor, gcd, gcdx,
              getindex, hash, hcat, hex, hypot, intersect, inv, invmod, isequal,
              isfinite, isless, isone, isqrt, isreal, iszero, lcm, ldexp, length,
              log, log1p, mod, ndigits, 
@@ -269,6 +269,10 @@ end
 
 function divrem(a::T, b::T) where T
   return Base.divrem(a, b)
+end
+
+function div(a::T, b::T) where T
+  return Base.div(a, b)
 end
 
 function numerator(a::T, canonicalise::Bool=true) where T
