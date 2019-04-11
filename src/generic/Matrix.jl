@@ -1644,7 +1644,7 @@ function det_interpolation(M::MatrixElem{T}) where {T <: PolyElem}
    x = Array{elem_type(base_ring(R))}(undef, bound)
    d = Array{elem_type(base_ring(R))}(undef, bound)
    X = zero_matrix(base_ring(R), n, n)
-   b2 = div(bound, 2)
+   b2 = AbstractAlgebra.div(bound, 2)
    pt1 = base_ring(R)(1 - b2)
    for i = 1:bound
       x[i] = base_ring(R)(i - b2)
@@ -1960,7 +1960,7 @@ function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.M
    X = similar(tmat, m, m)
    Y = similar(tmat, m, h)
    x = similar(b)
-   b2 = div(bound, 2)
+   b2 = AbstractAlgebra.div(bound, 2)
    pt1 = base_ring(R)(1 - b2)
    l = 1
    i = 1
@@ -2995,7 +2995,7 @@ function hnf_cohen!(H::MatrixElem{T}, U::MatrixElem{T}) where {T <: RingElement}
          end
       end
       for j = 1:k-1
-         q = -div(H[j,i], H[k, i])
+         q = -AbstractAlgebra.div(H[j,i], H[k, i])
          for c = i:n
             t = mul!(t, q, H[k, c])
             H[j, c] = addeq!(H[j, c], t)
@@ -3171,7 +3171,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
 
       for i in (k - 1):-1:1
          for j in (i + 1):k
-            q = div(H[i, j], H[j, j])
+            q = AbstractAlgebra.div(H[i, j], H[j, j])
             if iszero(q)
               continue
             end
@@ -3256,7 +3256,7 @@ function _hnf_minors!(H::MatrixElem{T}, U::MatrixElem{T}, with_transform::Type{V
       end
       for i in n:-1:1
          for j in (i + 1):n
-            q = div(H[i, j], H[j, j])
+            q = AbstractAlgebra.div(H[i, j], H[j, j])
             if iszero(q)
               continue
             end
@@ -3332,7 +3332,7 @@ function kb_reduce_row!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Array{Int, 1}
       if p == 0
          continue
       end
-      q = -div(H[r,i], H[p,i])
+      q = -AbstractAlgebra.div(H[r,i], H[p,i])
       for j = i:ncols(H)
          t = mul!(t, q, H[p,j])
          H[r, j] = addeq!(H[r,j], t)
@@ -3355,7 +3355,7 @@ function kb_reduce_column!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Array{Int,
       if p == 0
          continue
       end
-      q = -div(H[p,c],H[r,c])
+      q = -AbstractAlgebra.div(H[p,c],H[r,c])
       for j = c:ncols(H)
          t = mul!(t, q, H[r,j])
          H[p, j] = addeq!(H[p,j], t)
@@ -3788,7 +3788,7 @@ function weak_popov_with_pivots!(P::Mat{T}, W::Mat{T}, U::Mat{T}, pivots::Array{
             if j == pivotInd
                continue
             end
-            q = -div(P[pivots[i][j], i], P[pivot, i])
+            q = -AbstractAlgebra.div(P[pivots[i][j], i], P[pivot, i])
             for c = 1:n
                t = mul!(t, q, P[pivot, c])
                P[pivots[i][j], c] = addeq!(P[pivots[i][j], c], t)
@@ -3892,7 +3892,7 @@ function det_popov(A::Mat{T}) where {T <: PolyElem}
             r1, r2 = r2, r1
             pivots[c] = r2
          end
-         q = -div(B[r1, c], B[r2, c])
+         q = -AbstractAlgebra.div(B[r1, c], B[r2, c])
          for j = 1:i + 1
             t = mul!(t, q, B[r2, j])
             B[r1, j] = addeq!(B[r1, j], t)
@@ -4007,7 +4007,7 @@ function popov!(P::Mat{T}, U::Mat{T}, with_trafo::Bool = false) where {T <: Poly
          if degree(P[r,i]) < d
             continue
          end
-         q = -div(P[r,i],P[pivot,i])
+         q = -AbstractAlgebra.div(P[r,i],P[pivot,i])
          for c = 1:n
             t = mul!(t, q, P[pivot,c])
             P[r, c] = addeq!(P[r,c], t)
@@ -4070,7 +4070,7 @@ function hnf_via_popov_reduce_row!(H::Mat{T}, U::Mat{T}, pivots_hermite::Array{I
          continue
       end
       pivot = pivots_hermite[c]
-      q = -div(H[r, c], H[pivot, c])
+      q = -AbstractAlgebra.div(H[r, c], H[pivot, c])
       for j = c:n
          t = mul!(t, q, H[pivot, j])
          H[r, j] = addeq!(H[r, j], t)
@@ -4097,7 +4097,7 @@ function hnf_via_popov_reduce_column!(H::Mat{T}, U::Mat{T}, pivots_hermite::Arra
       if degree(H[i, c]) < degree(H[r, c])
          continue
       end
-      q = -div(H[i, c], H[r, c])
+      q = -AbstractAlgebra.div(H[i, c], H[r, c])
       for j = 1:n
          t = mul!(t, q, H[r, j])
          H[i, j] = addeq!(H[i, j], t)
@@ -4142,7 +4142,7 @@ function hnf_via_popov!(H::Mat{T}, U::Mat{T}, with_trafo::Bool = false) where {T
             r1, r2 = r2, r1
             pivots_popov[c] = r2
          end
-         q = -div(H[r1, c], H[r2, c])
+         q = -AbstractAlgebra.div(H[r1, c], H[r2, c])
          for j = 1:n
             t = mul!(t, q, H[r2, j])
             H[r1, j] = addeq!(H[r1, j], t)
@@ -4276,7 +4276,7 @@ end
 > where $r$ is the number of rows of $a$.
 """
 function invert_rows!(a::MatrixElem)
-   k = div(nrows(a), 2)
+   k = AbstractAlgebra.div(nrows(a), 2)
    for i in 1:k
       swap_rows!(a, i, nrows(a) - i + 1)
    end
@@ -4300,7 +4300,7 @@ end
 > where $c$ is the number of columns of $a$.
 """
 function invert_cols!(a::MatrixElem)
-   k = div(ncols(a), 2)
+   k = AbstractAlgebra.div(ncols(a), 2)
    for i in 1:k
       swap_cols!(a, i, ncols(a) - i + 1)
    end

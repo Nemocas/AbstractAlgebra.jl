@@ -197,7 +197,7 @@ function coeff(a::LaurentSeriesElem, n::Int)
       if mod(i, scale(a)) != 0
          return base_ring(a)()
       else
-         return polcoeff(a, div(i, scale(a)))
+         return polcoeff(a, AbstractAlgebra.div(i, scale(a)))
       end
    end
 end
@@ -792,7 +792,7 @@ function truncate(a::LaurentSeriesElem{T}, n::Int) where {T <: RingElement}
       set_scale!(z, 1)
    else
       sa = scale(a)
-      zlen = div(n - aval + sa - 1, sa)
+      zlen = AbstractAlgebra.div(n - aval + sa - 1, sa)
       zlen = min(zlen, alen)
       fit!(z, zlen)
       set_val!(z, aval)
@@ -961,8 +961,8 @@ function ==(x::LaurentSeriesElem{T}, y::LaurentSeriesElem{T}) where {T <: RingEl
    end
    sx = scale(x)
    sy = scale(y)
-   xlen = min(pol_length(x), div(prec - xval + sx - 1, sx))
-   ylen = min(pol_length(y), div(prec - yval + sy - 1, sy))
+   xlen = min(pol_length(x), AbstractAlgebra.div(prec - xval + sx - 1, sx))
+   ylen = min(pol_length(y), AbstractAlgebra.div(prec - yval + sy - 1, sy))
    i = 0
    j = 0
    while i < xlen && j < ylen
@@ -1211,7 +1211,7 @@ function Base.sqrt(a::LaurentSeriesElem)
    !iseven(aval) && error("Not a square in sqrt")
    R = base_ring(a)
    !isdomain_type(elem_type(R)) && error("Sqrt not implemented over non-integral domains")
-   aval2 = div(aval, 2)
+   aval2 = AbstractAlgebra.div(aval, 2)
    prec = precision(a) - aval
    if prec == 0
       asqrt = parent(a)()
@@ -1222,7 +1222,7 @@ function Base.sqrt(a::LaurentSeriesElem)
    end
    asqrt = parent(a)()
    s = scale(a)
-   zlen = div(prec + s - 1, s)
+   zlen = AbstractAlgebra.div(prec + s - 1, s)
    fit!(asqrt, prec)
    set_prec!(asqrt, prec + aval2)
    set_val!(asqrt, aval2)
@@ -1281,8 +1281,8 @@ function Base.exp(a::LaurentSeriesElem)
       sc = gs
    end
    if sc != 1
-      vala = div(vala, sc)
-      preca = div(preca, sc)
+      vala = AbstractAlgebra.div(vala, sc)
+      preca = AbstractAlgebra.div(preca, sc)
       a = parent(a)(a.coeffs, pol_length(a), preca, vala, 1, false)
    end
    z = parent(a)()
@@ -1381,7 +1381,7 @@ function mul!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeries
    b = downscale(b, db)
    lena = pol_length(a)
    lenb = pol_length(b)
-   lenc = min(lena + lenb - 1, div(prec + sz - 1, sz))
+   lenc = min(lena + lenb - 1, AbstractAlgebra.div(prec + sz - 1, sz))
    fit!(c, lenc)
    for i = 1:min(lena, lenc)
       c.coeffs[i] = polcoeff(a, i - 1) * polcoeff(b, 0)
@@ -1442,7 +1442,7 @@ function add!(c::LaurentSeriesElem{T}, a::LaurentSeriesElem{T}, b::LaurentSeries
    mina = min(vala + lena*sa, prec)
    minb = min(valb + lenb*sb, prec)
    lenr = max(mina, minb) - valr
-   lenr = div(lenr + sc - 1, sc)
+   lenr = AbstractAlgebra.div(lenr + sc - 1, sc)
    R = base_ring(c)
    fit!(c, lenr)
    c.prec = prec

@@ -433,7 +433,7 @@ function divides(a::AbstractAlgebra.ResElem{T}, b::AbstractAlgebra.ResElem{T}) w
    m = modulus(R)
    gb = gcd(B, m)
    ub = divexact(B, gb)
-   q, r = divrem(A, gb)
+   q, r = AbstractAlgebra.divrem(A, gb)
    if !iszero(r)
      return false, b
    end
