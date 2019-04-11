@@ -131,3 +131,16 @@ function ==(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) wher
    end
    return true
 end
+
+###############################################################################
+#
+#   Random generation
+#
+###############################################################################
+
+function rand(M::AbstractAlgebra.FPModule{T}, vals...) where T <: RingElement
+   R = base_ring(M)
+   v = [rand(R, vals...) for i in 1:ngens(M)]
+   return M(v)
+end
+
