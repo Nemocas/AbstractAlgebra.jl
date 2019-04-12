@@ -50,14 +50,16 @@ function test_submodule_unary_ops()
    print("Generic.Submodule.unary_ops...")
 
    R = ZZ
-   M = FreeModule(R, 2)
-   m = M([R(1), R(3)])
-   n = M([R(2), R(-1)])
-   N, f = Submodule(M, [m, n])
+   for iter = 1:20
+      M = rand_module(R, -10:10)
+      ngens = rand(1:5)
+      S = [rand(M, -10:10) for i in 1:ngens]
+      N, f = Submodule(M, S)
 
-   m = N([ZZ(2), ZZ(5)])
+      m = rand(N, -10:10)
    
-   @test -m == N([-ZZ(2), -ZZ(5)])
+      @test -(-m) == m 
+   end
 
    println("PASS")
 end
@@ -66,14 +68,19 @@ function test_submodule_binary_ops()
    print("Generic.Submodule.binary_ops...")
 
    R = ZZ
-   M = FreeModule(R, 2)
-   m = M([R(1), R(3)])
-   n = M([R(2), R(-1)])
-   N, f = Submodule(M, [m, n])
 
-   m = N([ZZ(2), ZZ(5)])
+   for iter = 1:40
+      M = rand_module(R, -10:10)
+      ngens = rand(1:5)
+      S = [rand(M, -10:10) for i in 1:ngens]
+      N, f = Submodule(M, S)
 
-   @test m + m - m == m
+      m = rand(N, -10:10)
+      n = rand(N, -10:10)
+
+      @test m + n - n == m
+      @test m - n == m + (-n)
+   end
 
    println("PASS")
 end
@@ -82,15 +89,18 @@ function test_submodule_adhoc_binary()
    print("Generic.Submodule.adhoc_binary...")
 
    R = ZZ
-   M = FreeModule(R, 2)
-   m = M([R(1), R(3)])
-   n = M([R(2), R(-1)])
-   N, f = Submodule(M, [m, n])
 
-   m = N([ZZ(2), ZZ(5)])
+   for iter = 1:40
+      M = rand_module(R, -10:10)
+      ngens = rand(1:5)
+      S = [rand(M, -10:10) for i in 1:ngens]
+      N, f = Submodule(M, S)
 
-   @test 2*m == N([ZZ(4), ZZ(10)])
-   @test m*2 == 2*m
+      m = rand(N, -10:10)
+
+      @test 2*m == m + m
+      @test m*2 == 2*m
+   end
 
    println("PASS")
 end

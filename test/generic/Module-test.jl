@@ -3,6 +3,9 @@ function rand_module(R::AbstractAlgebra.Ring, vals...)
    M = FreeModule(R, rk)
    levels = rand(0:3)
    for i = 1:levels
+      if ngens(M) == 0
+         break
+      end
       G = [rand(M, vals...) for i in 1:rand(1:ngens(M))]
       S, f = Submodule(M, G)
       if rand(1:2) == 1
