@@ -462,7 +462,7 @@ end
 > Return $a^b$. We require $b \geq 0$.
 """
 function ^(a::AbstractAlgebra.AbsSeriesElem{T}, b::Int) where {T <: RingElement}
-   b < 0 && throw(DomainError())
+   b < 0 && throw(DomainError("Can't take negative power"))
    # special case powers of x for constructing power series efficiently
    if b == 0
       z = one(parent(a))
