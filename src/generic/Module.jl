@@ -6,6 +6,20 @@
 
 export iscompatible
 
+###############################################################################
+#
+#   Basic manipulation
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    relations(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
+> Return all relations between generators of the given module, where each
+> relation is given as an element of `M`. The relation matrix whose rows
+> are the returned relations will be in Hermite normal form.
+"""
+relations(M::AbstractAlgebra.FPModule{T}) where T <: RingElement = M.rels
+
 @doc Markdown.doc"""
     iscompatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
 > Return `true, P` if the given modules are compatible, i.e. that they are

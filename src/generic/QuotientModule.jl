@@ -150,30 +150,22 @@ end
 #
 ###############################################################################
 
-function reduce_mod_rels(v::AbstractAlgebra.MatElem{T}, N::QuotientModule{T}) where T <: RingElement
-   rels = N.rels # relation vectors (in terms of supermodule generators)
-   gens = N.gens # columns of rels corresponding to gens of N
-   culled = N.culled # list of indices of relations with non-unit pivot
-   pivots = N.pivots # index of pivot in culled relations
+function reduce_mod_rels(v::AbstractAlgebra.MatElem{T}, rels::Vector{<:AbstractAlgebra.ModuleElem{T}}) where T <: RingElement
+   R = base_ring(v)
    v = deepcopy(v) # don't destroy input
-   geni = 1
-   t = base_ring(N)()
-   for i in 1:length(culled) # for each culled relation
-      culli = culled[i] # index of culled relation in rels vector
-      w = rels[culli].v # get next culled row as vector w
-      col = pivots[i] # column of pivot in culled row
-      # find index in gens of pivot column
-      while gens[geni] < col
-         geni += 1
+   i = 1
+   t1 = R()
+   for rel in rels # for each relation
+      while iszero(rel.v[1, i])
+         i += 1
       end
-      d = w[1, col] # ring element in pivot column of culled row
-      q, v[1, geni] = divrem(v[1, geni], d) # reduce entry in v by pivot
-      # v = v - q*rels[culli], skipping zero cols
+      q, v[1, i] = AbstractAlgebra.divrem(v[1, i], rel.v[1, i])
       q = -q
-      for j = geni + 1:length(gens)
-         t = mul!(t, q, w[1, gens[j]])
-         v[1, j] = addeq!(v[1, j], t)
+      for j = i + 1:ncols(v)
+         t1 = mul!(t1, q, rel.v[1, j])
+         v[1, j] = addeq!(v[1, j], t1)
       end
+      i += 1
    end
    return v 
 end
@@ -181,14 +173,14 @@ end
 function (N::QuotientModule{T})(v::Vector{T}) where T <: RingElement
    length(v) != ngens(N) && error("Length of vector does not match number of generators")
    mat = matrix(base_ring(N), 1, length(v), v)
-   mat = reduce_mod_rels(mat, N)
+   mat = reduce_mod_rels(mat, N.rels)
    return quotient_module_elem{T}(N, mat)
 end
 
 function (N::QuotientModule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingElement
    ncols(v) != ngens(N) && error("Length of vector does not match number of generators")
    nrows(v) != 1 && ("Not a vector in quotient_module_elem constructor")
-   v = reduce_mod_rels(v, N)
+   v = reduce_mod_rels(v, N.rels)
    return quotient_module_elem{T}(N, v)
 end
 
@@ -198,16 +190,29 @@ end
 #
 ###############################################################################
 
+function projection(v::AbstractAlgebra.MatElem{T}, rels::Vector{<:AbstractAlgebra.FPModuleElem{T}}, N::QuotientModule{T}) where T <: RingElement
+   R = base_ring(N)
+   # reduce mod relations
+   v = reduce_mod_rels(v, rels)
+   # project down to quotient module
+   r = zero_matrix(R, 1, ngens(N))
+   for i = 1:ngens(N)
+      r[1, i] = v[1, N.gens[i]]
+   end
+   return quotient_module_elem{T}(N, r)
+end
+
 @doc Markdown.doc"""
     QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where T <: RingElement
-> Return the quotient of the module `m` by the module `sub`, which must have
-> been constructed as a submodule of `m`.
+> Return the quotient `M` of the module `m` by the module `sub` (which must
+> have been constructed as a submodule of `m`) along with the canonical
+> quotient map from `m` to `M`.
 """
 function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where T <: RingElement
    supermodule(sub) !== m && error("Not a submodule in QuotientModule constructor") 
    M = QuotientModule{T}(m, sub.gens)
    G = gens(m)
-   f = map_from_func(M, m, x -> sum(x.v[1, i]*G[M.gens[i]] for i in 1:ncols(x.v)))
+   f = map_from_func(m, M, x -> projection(x.v, sub.gens, M))
    M.map = f
    return M, f
 end

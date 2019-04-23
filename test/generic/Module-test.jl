@@ -1,7 +1,7 @@
 function rand_module(R::AbstractAlgebra.Ring, vals...)
    rk = rand(1:5)
    M = FreeModule(R, rk)
-   levels = rand(0:3)
+   levels = rand(0:1)
    for i = 1:levels
       if ngens(M) == 0
          break
@@ -24,17 +24,16 @@ function test_module_intersection()
 
    for iter = 1:100
       M = rand_module(R, -10:10)
-      rk = ngens(M)
 
-      ngens1 = rand(1:rk)
+      ngens1 = rand(1:5)
       gens1 = [rand(M, -10:10) for j in 1:ngens1]
       M1, f1 = Submodule(M, gens1)
 
-      ngens2 = rand(1:rk)
+      ngens2 = rand(1:5)
       gens2 = [rand(M, -10:10) for j in 1:ngens2]
       M2, f2 = Submodule(M, gens2)
 
-      ngens3 = rand(1:rk)
+      ngens3 = rand(1:5)
       gens3 = [rand(M, -10:10) for j in 1:ngens3]
       M3, f3 = Submodule(M, gens3)
       
