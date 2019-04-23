@@ -22,6 +22,11 @@ elem_type(::Type{FreeModule{T}}) where T <: Union{RingElement, NCRingElem} = fre
 
 parent(m::free_module_elem{T}) where T <: Union{RingElement, NCRingElem} = m.parent
 
+function relations(M::FreeModule{T}) where T <: RingElement
+   # there are no relations in a free module
+   return Vector{free_module_elem{T}}(undef, 0)
+end
+
 function check_parent(m1::free_module_elem{T}, m2::free_module_elem{T}) where T <: Union{RingElement, NCRingElem}
     parent(m1) !== parent(m2) && ("Incompatible free modules")
 end

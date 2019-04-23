@@ -97,9 +97,13 @@ function test_submodule_adhoc_binary()
       N, f = Submodule(M, S)
 
       m = rand(N, -10:10)
+      n = rand(N, -10:10)
+      c = rand(-10:10)
 
       @test 2*m == m + m
-      @test m*2 == 2*m
+      @test m*c == c*m
+      @test c*(m + n) == c*m + c*n
+      @test c*(m - n) == c*m - c*n
    end
 
    println("PASS")
