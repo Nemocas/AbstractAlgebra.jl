@@ -1035,7 +1035,7 @@ end
 #
 ###############################################################################
 
-function show(io::IO, x::MPoly, U::Array{<: AbstractString, 1})
+function _show(io::IO, x::MPoly, U::Array{<: AbstractString, 1})
     len = length(x)
     if len == 0
       print(io, base_ring(x)(0))
@@ -1097,9 +1097,9 @@ function show(io::IO, x::MPoly, U::Array{<: AbstractString, 1})
 end
 
 function show(io::IO, x::MPoly)
-    len = length(x)
-    U = [string(x) for x in symbols(parent(x))]
-    print(IOContext(io, :compact => true), x, U)
+   len = length(x)
+   U = [string(x) for x in symbols(parent(x))]
+   _show(IOContext(io, :compact => true), x, U)
 end
 
 function show(io::IO, p::MPolyRing)
