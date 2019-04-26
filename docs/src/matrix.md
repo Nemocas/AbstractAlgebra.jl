@@ -398,6 +398,10 @@ solve_rational{T <: RingElem}(::MatElem{T}, ::MatElem{T})
 solve_triu{T <: FieldElem}(::MatElem{T}, ::MatElem{T}, ::Bool)
 ```
 
+```@docs
+can_solve_left_row_hnf{T <: RingElement}(::MatElem{T}, ::MatElem{T})
+```
+
 **Examples**
 
 ```julia

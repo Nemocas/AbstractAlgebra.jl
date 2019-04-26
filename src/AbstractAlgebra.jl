@@ -103,7 +103,7 @@ include("Generic.jl")
 
 # Do not import numerator and denominator as we have our own
 import .Generic: add!, addeq!, addmul!, base_ring, cached,
-                 canonical_unit, change_base_ring,
+                 canonical_unit, can_solve_left_row_hnf, change_base_ring,
                  character, characteristic, charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
                  chebyshev_u, _check_dim, check_parent,
@@ -181,7 +181,8 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached,
 
 # Do not export divrem, exp, sqrt, numerator and denominator as we define our own
 export add!, addeq!, addmul!, addmul_delayed_reduction!, base_ring, cached,
-                 canonical_unit, change_base_ring, character,
+                 canonical_unit, can_solve_left_row_hnf,
+                 change_base_ring, character,
                  characteristic, charpoly, charpoly_danilevsky!,
                  charpoly_danilevsky_ff!, charpoly_hessenberg!, chebyshev_t,
                  chebyshev_u, _check_dim, check_parent,

@@ -842,6 +842,28 @@ function test_gen_mat_solve_triu()
    println("PASS")
 end
 
+function test_gen_mat_can_solve_left_row_hnf()
+   print("Generic.Mat.solve_left_row_hnf...")
+
+   for iter = 1:40
+      n = rand(1:6)
+      m = rand(1:n)
+      S = MatrixSpace(ZZ, m, n)
+      U = MatrixSpace(ZZ, 1, n)
+
+      M = randmat_with_rank(S, m, -20:20)
+      r = rand(U, -20:20)
+
+      M = hnf(M)
+
+      flag, x = can_solve_left_row_hnf(r, M)
+
+      @test flag == false || x*M == r
+   end
+
+   println("PASS")
+end
+
 function test_gen_mat_rref()
    print("Generic.Mat.rref...")
 
@@ -1761,6 +1783,7 @@ function test_gen_mat()
    test_gen_mat_solve_lu()
    test_gen_mat_solve_rational()
    test_gen_mat_solve_triu()
+   test_gen_mat_can_solve_left_row_hnf()
    test_gen_mat_rref()
    test_gen_mat_nullspace()
    test_gen_mat_kernel()
