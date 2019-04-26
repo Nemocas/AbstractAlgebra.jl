@@ -1109,25 +1109,25 @@ end
 
 mutable struct QuotientModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    m::AbstractAlgebra.FPModule{T}
-   rels::Vector{<:AbstractAlgebra.FPModuleElem{T}}
+   rels::Vector{<:AbstractAlgebra.MatElem{T}}
    gens::Vector{Int} # which original columns correspond to gens of quotient
    pivots::Vector{Int} # pivot column of each culled relation in new rels matrix
    base_ring::Ring
    map::FunctionalMap{<:AbstractAlgebra.FPModule{T}, QuotientModule{T}}
 
-   function QuotientModule{T}(M::AbstractAlgebra.FPModule{T}, rels::Vector{S}) where S <:AbstractAlgebra.FPModuleElem{T} where T <: RingElement
+   function QuotientModule{T}(M::AbstractAlgebra.FPModule{T}, rels::Vector{S}) where S <:AbstractAlgebra.MatElem{T} where T <: RingElement
       # concatenate relations in M and new rels
       R = base_ring(M)
       old_rels = relations(M)
       combined_rels = zero_matrix(R, length(old_rels) + length(rels), ngens(M))
       for i = 1:length(old_rels)
          for j = 1:ngens(M)
-            combined_rels[i, j] = old_rels[i][j]
+            combined_rels[i, j] = old_rels[i][1, j]
          end
       end
       for i = 1:length(rels)
          for j = 1:ngens(M)
-            combined_rels[i + length(old_rels), j] = rels[i].v[1, j]
+            combined_rels[i + length(old_rels), j] = rels[i][1, j]
          end
       end
       # compute the hnf of the combined relations
@@ -1165,16 +1165,11 @@ mutable struct QuotientModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
       end
       # create quotient module
       new_rels = Vector{quotient_module_elem{T}}(undef, length(culled))
-      z = new{T}(M, new_rels, gens, pivots, base_ring(M))
       # put all the culled relations into new relations
-      for i = 1:length(culled)
-         mat = matrix(R, 1, length(gens),
-               [combined_rels[culled[i], gens[j]]
-                   for j in 1:length(gens)])
-         new_rels[i] = quotient_module_elem{T}(z, mat)
-      end
-      # put new relations into module
-      z.rels = new_rels
+      new_rels = [matrix(R, 1, length(gens),
+                    [combined_rels[culled[i], gens[j]]
+                       for j in 1:length(gens)]) for i = 1:length(culled)]
+      z = new{T}(M, new_rels, gens, pivots, base_ring(M))
       return z
    end
 end
