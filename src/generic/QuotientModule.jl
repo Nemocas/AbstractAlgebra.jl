@@ -150,19 +150,19 @@ end
 #
 ###############################################################################
 
-function reduce_mod_rels(v::AbstractAlgebra.MatElem{T}, rels::Vector{<:AbstractAlgebra.ModuleElem{T}}) where T <: RingElement
+function reduce_mod_rels(v::AbstractAlgebra.MatElem{T}, rels::Vector{<:AbstractAlgebra.MatElem{T}}) where T <: RingElement
    R = base_ring(v)
    v = deepcopy(v) # don't destroy input
    i = 1
    t1 = R()
    for rel in rels # for each relation
-      while iszero(rel.v[1, i])
+      while iszero(rel[1, i])
          i += 1
       end
-      q, v[1, i] = AbstractAlgebra.divrem(v[1, i], rel.v[1, i])
+      q, v[1, i] = AbstractAlgebra.divrem(v[1, i], rel[1, i])
       q = -q
       for j = i + 1:ncols(v)
-         t1 = mul!(t1, q, rel.v[1, j])
+         t1 = mul!(t1, q, rel[1, j])
          v[1, j] = addeq!(v[1, j], t1)
       end
       i += 1
@@ -190,7 +190,7 @@ end
 #
 ###############################################################################
 
-function projection(v::AbstractAlgebra.MatElem{T}, rels::Vector{<:AbstractAlgebra.FPModuleElem{T}}, N::QuotientModule{T}) where T <: RingElement
+function projection(v::AbstractAlgebra.MatElem{T}, rels::Vector{<:AbstractAlgebra.MatElem{T}}, N::QuotientModule{T}) where T <: RingElement
    R = base_ring(N)
    # reduce mod relations
    v = reduce_mod_rels(v, rels)
@@ -210,9 +210,10 @@ end
 """
 function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where T <: RingElement
    supermodule(sub) !== m && error("Not a submodule in QuotientModule constructor") 
-   M = QuotientModule{T}(m, sub.gens)
+   rels = [v.v for v in sub.gens]
+   M = QuotientModule{T}(m, rels)
    G = gens(m)
-   f = map_from_func(m, M, x -> projection(x.v, sub.gens, M))
+   f = map_from_func(m, M, x -> projection(x.v, rels, M))
    M.map = f
    return M, f
 end
