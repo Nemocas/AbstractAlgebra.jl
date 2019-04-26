@@ -1132,37 +1132,8 @@ mutable struct QuotientModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
       end
       # compute the hnf of the combined relations
       combined_rels = hnf(combined_rels)
-      # count the nonzero rows
-      nrels = nrows(combined_rels)
-      while nrels > 0 && iszero_row(combined_rels, nrels)
-         nrels -= 1
-      end
-      # find relations with non-unit pivot
-      gens = Vector{Int}(undef, 0)
-      culled = Vector{Int}(undef, 0)
-      pivots = Vector{Int}(undef, 0)
-      col = 1
-      row = 1
-      new_col = 1
-      for i in 1:nrels
-         while combined_rels[i, col] == 0
-            push!(gens, col)
-            col += 1
-            new_col += 1
-         end
-         if !isunit(combined_rels[i, col])
-            push!(culled, row)
-            push!(gens, col)
-            push!(pivots, new_col)
-            new_col += 1
-         end
-         col += 1
-         row += 1
-      end
-      while col <= ngens(M)
-         push!(gens, col)
-         col += 1
-      end
+      # remove zero rows and all rows/cols corresponding to unit pivots
+      gens, culled, pivots = cull_matrix(combined_rels)
       # create quotient module
       new_rels = Vector{quotient_module_elem{T}}(undef, length(culled))
       # put all the culled relations into new relations

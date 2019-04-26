@@ -158,3 +158,48 @@ function rand(M::AbstractAlgebra.FPModule{T}, vals...) where T <: RingElement
    return M(v)
 end
 
+###############################################################################
+#
+#   Helper functions
+#
+###############################################################################
+
+# Assumes M is in hnf. Removes zero rows. Returns a tuple
+# gens, culled, pivots where all rows and columns corresponding to unit
+# pivots have been removed, gens is a list of columns without unit pivots,
+# culled is an array of row (indices) that have not been removed and pivots
+# 
+function cull_matrix(M::AbstractAlgebra.MatElem{T}) where T <: RingElement
+   # count the nonzero rows
+   nrels = nrows(M)
+   while nrels > 0 && iszero_row(M, nrels)
+      nrels -= 1
+   end
+   # find relations with non-unit pivot
+   gens = Vector{Int}(undef, 0)
+   culled = Vector{Int}(undef, 0)
+   pivots = Vector{Int}(undef, 0)
+   col = 1
+   row = 1
+   new_col = 1
+   for i in 1:nrels
+      while M[i, col] == 0
+         push!(gens, col)
+         col += 1
+         new_col += 1
+      end
+      if !isunit(M[i, col])
+         push!(culled, row)
+         push!(gens, col)
+         push!(pivots, new_col)
+         new_col += 1
+      end
+      col += 1
+      row += 1
+   end
+   while col <= ncols(M)
+      push!(gens, col)
+      col += 1
+   end
+   return gens, culled, pivots
+end
