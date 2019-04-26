@@ -11,7 +11,7 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
        powers, randmat_triu, randmat_with_rank, similarity!, solve,
        solve_rational, hnf, hnf_kb, hnf_kb_with_transform, hnf_with_transform,
        issquare, snf, snf_with_transform, weak_popov,
-       weak_popov_with_transform,
+       weak_popov_with_transform, can_solve_left_row_hnf,
        extended_weak_popov, extended_weak_popov_with_transform, rank,
        rank_profile_popov, hnf_via_popov, hnf_via_popov_with_transform, popov,
        popov_with_transform, det_popov, _check_dim, nrows, ncols, gram, rref,
@@ -2099,6 +2099,60 @@ function solve_triu(U::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}
       end
    end
    return X
+end
+
+###############################################################################
+#
+#   Can solve with hnf
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    can_solve_left_row_hnf(r::AbstractAlgebra.MatElem{T},
+                          M::AbstractAlgebra.MatElem{T}) where T <: RingElement
+> Returns a tuple `flag, x` where `flag` is set to true if $xM = r$ has a
+> solution, where $M$ is an $m\times n$ matrix in Hermite normal form with no
+> zero rows and $r$ and $x$ are row vectors with $m$ columns. If there is no
+> solution, flag is set to `false` and $x$ is set to the zero row.
+"""
+function can_solve_left_row_hnf(r::AbstractAlgebra.MatElem{T},
+                          M::AbstractAlgebra.MatElem{T}) where T <: RingElement
+   ncols(r) != ncols(M) && error("Incompatible matrices")
+   r = deepcopy(r) # do not destroy input
+   m = ncols(r)
+   n = nrows(M)
+   R = base_ring(r)
+   x = zero_matrix(R, 1, n)
+   j = 1 # row in M
+   k = 1 # column in M
+   t = R()
+   for i = 1:m # column in r
+      if iszero(r[1, i])
+         continue
+      end
+      while k <= i && j <= n
+         if iszero(M[j, k])
+            k += 1
+         elseif k < i
+            j += 1
+         else
+            break
+         end
+      end
+      if k != i
+         return false, x
+      end
+      x[1, j], r[1, i] = AbstractAlgebra.divrem(r[1, i], M[j, k])
+      if !iszero(r[1, i])
+         return false, x
+      end
+      q = -x[1, j]
+      for l = i + 1:m
+         t = mul!(t, q, M[j, l])
+         r[1, l] = addeq!(r[1, l], t)
+      end
+   end
+   return true, x
 end
 
 ###############################################################################
