@@ -73,6 +73,14 @@ abstract type MatSpace{T} <: Module{T} end
 
 abstract type MatAlgebra{T} <: NCRing end
 
+# Abstract types for number fields, parmeterised by the element type of
+# the base field.
+abstract type NumField{T} <: Field end
+
+# A type for number fields, which are represented using a primitive element.
+# (simple number fields)
+abstract type SimpleNumField{T} <: NumField{T} end
+
 # mathematical objects parameterised by an element type
 # these are the type classes of mathematical objects
 # that have some kind of base ring, and a generic
@@ -99,6 +107,10 @@ abstract type AbsSeriesElem{T} <: SeriesElem{T} end
 abstract type MatElem{T} <: ModuleElem{T} end
 
 abstract type MatAlgElem{T} <: NCRingElem end
+
+abstract type NumFieldElem{T} <: FieldElem end
+
+abstract type SimpleNumFieldElem{T} <: NumFieldElem{T} end
 
 # additional abstract types for parents, added ad hoc to form
 # collections of types as needed by applications

@@ -41,10 +41,10 @@ export SetElem, GroupElem, NCRingElem, RingElem, ModuleElem, FieldElem, RingElem
 export SetMap, FunctionalMap, IdentityMap
 
 export NCPolyElem, PolyElem, SeriesElem, AbsSeriesElem, RelSeriesElem, ResElem, FracElem,
-       MatElem, MatAlgElem, FinFieldElem, MPolyElem
+       MatElem, MatAlgElem, FinFieldElem, MPolyElem, NumFieldElem, SimpleNumFieldElem
 
 export PolyRing, SeriesRing, ResRing, FracField, MatSpace, MatAlgebra,
-       FinField, MPolyRing
+       FinField, MPolyRing, NumField, SimpleNumField
 
 export ZZ, QQ, zz, qq, RealField, RDF
 
