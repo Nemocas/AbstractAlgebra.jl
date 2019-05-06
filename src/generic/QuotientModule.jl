@@ -210,7 +210,12 @@ end
 """
 function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where T <: RingElement
    supermodule(sub) !== m && error("Not a submodule in QuotientModule constructor") 
-   rels = [v.v for v in sub.gens]
+   A = matrix(base_ring(m), 0, 0, []) # needed only for its type
+   T1 = typeof(A)
+   rels = Vector{T1}(undef, length(sub.gens))
+   for i = 1:length(sub.gens)
+      rels[i] = sub.gens[i].v
+   end
    M = QuotientModule{T}(m, rels)
    G = gens(m)
    f = map_from_func(m, M, x -> projection(x.v, rels, M))

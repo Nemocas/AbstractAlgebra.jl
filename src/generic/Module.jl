@@ -13,6 +13,15 @@ export iscompatible
 ###############################################################################
 
 @doc Markdown.doc"""
+    zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
+> Return the zero element of the module $M$.
+"""
+function zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
+   R = base_ring(M)
+   return M([zero(R) for i in 1:ngens(M)])
+end
+
+@doc Markdown.doc"""
     relations(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
 > Return all relations between generators of the given module, where each
 > relation is given as an element of `M`. The relation matrix whose rows
@@ -165,14 +174,53 @@ end
 ###############################################################################
 
 # Assumes M is in hnf. Removes zero rows. Returns a tuple
-# gens, culled, pivots where all rows and columns corresponding to unit
-# pivots have been removed, gens is a list of columns without unit pivots,
-# culled is an array of row (indices) that have not been removed and pivots
-# 
+# gen_cols, culled, pivots where all rows and columns corresponding to unit
+# pivots have been removed, gen_cols is a list of columns without unit pivots,
+# culled is an array of row (indices) that have not been removed and pivots[i]
+# is the pivot column of the $i$-th row of the matrix
 function cull_matrix(M::AbstractAlgebra.MatElem{T}) where T <: RingElement
    # count the nonzero rows
    nrels = nrows(M)
    while nrels > 0 && iszero_row(M, nrels)
+      nrels -= 1
+   end
+   # find relations with non-unit pivot
+   gen_cols = Vector{Int}(undef, 0)
+   culled = Vector{Int}(undef, 0)
+   pivots = Vector{Int}(undef, 0)
+   col = 1
+   row = 1
+   new_col = 1
+   for i in 1:nrels
+      while M[i, col] == 0
+         push!(gen_cols, col)
+         col += 1
+         new_col += 1
+      end
+      if !isunit(M[i, col])
+         push!(culled, row)
+         push!(gen_cols, col)
+         push!(pivots, new_col)
+         new_col += 1
+      end
+      col += 1
+      row += 1
+   end
+   while col <= ncols(M)
+      push!(gen_cols, col)
+      col += 1
+   end
+   return gen_cols, culled, pivots
+end
+
+# As per the previous function but operates on a vector of rows.
+# The duplication is unavoidable until we get views. The parameter
+# ngens is just the number of columns of the matrix (which cannot
+# otherwise be determined if the vector M is empty).
+function cull_matrix_rows(M::Vector{<:AbstractAlgebra.MatElem{T}}, ngens::Int) where T <: RingElement
+   # count the nonzero rows
+   nrels = length(M)
+   while nrels > 0 && iszero(M[nrels])
       nrels -= 1
    end
    # find relations with non-unit pivot
@@ -183,12 +231,12 @@ function cull_matrix(M::AbstractAlgebra.MatElem{T}) where T <: RingElement
    row = 1
    new_col = 1
    for i in 1:nrels
-      while M[i, col] == 0
+      while M[i][col] == 0
          push!(gens, col)
          col += 1
          new_col += 1
       end
-      if !isunit(M[i, col])
+      if !isunit(M[i][col])
          push!(culled, row)
          push!(gens, col)
          push!(pivots, new_col)
@@ -197,7 +245,7 @@ function cull_matrix(M::AbstractAlgebra.MatElem{T}) where T <: RingElement
       col += 1
       row += 1
    end
-   while col <= ncols(M)
+   while col <= ngens
       push!(gens, col)
       col += 1
    end
