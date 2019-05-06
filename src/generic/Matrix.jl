@@ -2121,6 +2121,9 @@ function can_solve_left_row_hnf(r::AbstractAlgebra.MatElem{T},
    r = deepcopy(r) # do not destroy input
    m = ncols(r)
    n = nrows(M)
+   if n == 0
+      return true, r
+   end
    R = base_ring(r)
    x = zero_matrix(R, 1, n)
    j = 1 # row in M
