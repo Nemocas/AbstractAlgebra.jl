@@ -74,11 +74,13 @@ function Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPMod
       G2 = [M2.map(v) for v in G2]
       M2 = supermodule(M2)
    end
-   # Make matrix containing all generators as columns
+   # Make matrix containing all generators and relations as rows
    r1 = ngens(M)
    r2 = ngens(N)
+   rels = relations(P)
+   r3 = length(rels)
    c = ngens(P)
-   mat = matrix(base_ring(M), r1 + r2, c, [0 for i in 1:(r1 + r2)*c])
+   mat = matrix(base_ring(M), r1 + r2 + r3, c, [0 for i in 1:(r1 + r2 + r3)*c])
    for i = 1:r1
       for j = 1:c
          mat[i, j] = G1[i].v[1, j]
@@ -87,6 +89,11 @@ function Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPMod
    for i = 1:r2
       for j = 1:c
          mat[i + r1, j] = G2[i].v[1, j]
+      end
+   end
+   for i = 1:r3
+      for j = 1:c
+         mat[i + r1 + r2, j] = rels[i][1, j]
       end
    end
    # Find the left kernel space of the matrix
@@ -114,42 +121,46 @@ function ==(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) wher
       G2 = [M2.map(v) for v in G2]
       M2 = supermodule(M2)
    end
-   # Put the generators of M and N into matrices
+   # Put (rewritten) gens of M and N into matrices with relations of P
+   rels = relations(P)
    c = ngens(P)
    r1 = ngens(M)
    r2 = ngens(N)
-   mat1 = matrix(base_ring(M), r1, c, [0 for i in 1:r1*c])
+   mat1 = matrix(base_ring(M), r1 + length(rels), c,
+                 [0 for i in 1:(r1 + length(rels))*c])
    for i = 1:r1
       for j = 1:c
          mat1[i, j] = G1[i].v[1, j]
       end
    end
-   mat2 = matrix(base_ring(M), r2, c, [0 for i in 1:r2*c])
+   mat2 = matrix(base_ring(M), r2 + length(rels), c,
+                 [0 for i in 1:(r2 + length(rels))*c])
    for i = 1:r2
       for j = 1:c
          mat2[i, j] = G2[i].v[1, j]
       end
    end
+   for i = 1:length(rels)
+      for j = 1:c
+         mat1[i + r1, j] = rels[i][1, j]
+         mat2[i + r2, j] = rels[i][1, j]
+      end
+   end
    # Put the matrices into reduced form
    mat1 = reduced_form(mat1)
    mat2 = reduced_form(mat2)
-   # Compare
-   i1 = nrows(mat1)
-   while i1 > 0 && iszero_row(mat1, i1)
-      i1 -= 1
+   # Check containment of rewritten gens of M in row space of mat2
+   for v in G1
+      flag, r = can_solve_left_row_hnf(v.v, mat2)
+      if !flag
+         return false
+      end
    end
-   i2 = nrows(mat2)
-   while i2 > 0 && iszero_row(mat2, i2)
-      i2 -= 1
-   end
-   if i1 != i2
-      return false
-   end
-   for i = 1:i1
-      for j = 1:ncols(mat1)
-         if mat1[i, j] != mat2[i, j]
-            return false
-         end
+   # Check containment of rewritten gens of N in row space of mat1
+   for v in G2
+      flag, r = can_solve_left_row_hnf(v.v, mat1)
+      if !flag
+         return false
       end
    end
    return true
