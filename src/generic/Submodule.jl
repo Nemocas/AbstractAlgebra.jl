@@ -181,15 +181,21 @@ end
 > given as elements of `m`.
 """
 function Submodule(m::AbstractAlgebra.FPModule{T}, gens::Vector{<:AbstractAlgebra.FPModuleElem{T}}) where T <: RingElement
-   if length(gens) == 0
-      M = Submodule{T}(m, gens)
+   R = base_ring(m)
+   r = length(gens)
+   while r > 0 && iszero_row(gens[r].v, 1) # check that not all gens are zero
+      r -= 1
+   end
+   if r == 0
+      A = matrix(R, 0, 0, []) # needed only for its type
+      T1 = typeof(A)
+      M = Submodule{T}(m, gens, Vector{T1}(undef, 0),
+                       Vector{Int}(undef, 0), Vector{Int}(undef, 0))
       f = map_from_func(M, m, x -> zero(m))
       M.map = f
       return M, f
    end
-   R = base_ring(m)
    # Make generators rows of a matrix
-   r = length(gens)
    s = ngens(m)
    mat = matrix(base_ring(m), r, s, [0 for i in 1:r*s])
    for i = 1:r
@@ -214,35 +220,34 @@ function Submodule(m::AbstractAlgebra.FPModule{T}, gens::Vector{<:AbstractAlgebr
       end
       num -= 1
    end
-   # Rewrite matrix without zero rows (should use views, if we had them)
-   if num != r
-      new_mat = matrix(base_ring(m), num, s, [0 for i in 1:num*s])
+   # Rewrite matrix without zero rows and add old relations as rows
+   old_rels = relations(m)
+   if num != r || length(old_rels) != 0
+      new_mat = matrix(base_ring(m), num + length(old_rels), s,
+                                  [0 for i in 1:(num + length(old_rels))*s])
       for i = 1:num
          for j = 1:s
             new_mat[i, j] = mat[i, j]
          end
       end
+      for i = 1:length(old_rels)
+         for j = 1:s
+            new_mat[i + num, j] = old_rels[i][1, j]
+         end
+      end
       mat = new_mat
    end
    # Rewrite old relations in terms of generators of new submodule
-   old_rels = relations(m)
-   rewritten_rels = [can_solve_left_row_hnf(v, mat) for v in old_rels]
-   num_rels = 0
-   for i = 1:length(rewritten_rels) # count rels that could be rewritten
-      if rewritten_rels[i][1]
-         num_rels += 1
-      end
-   end
-   j = 1
+   num_rels, K = left_kernel(mat)
    new_rels = matrix(base_ring(m), num_rels, num, [0 for i in 1:num_rels*num])
-   for i = 1:length(rewritten_rels)
-      if rewritten_rels[i][1]
-         for k = 1:num
-            new_rels[j, k] = rewritten_rels[i][2][1, k]
-         end
-         j += 1
+   for j = 1:num_rels
+      for k = 1:num
+         new_rels[j, k] = K[j, k]
       end
    end
+   # Compute reduced form of new rels
+   new_rels = reduced_form(new_rels)
+   # remove rows and columns corresponding to unit pivots
    gen_cols, culled, pivots = cull_matrix(new_rels)
    # put all the culled relations into new relations
    T1 = typeof(new_rels)
@@ -256,7 +261,7 @@ function Submodule(m::AbstractAlgebra.FPModule{T}, gens::Vector{<:AbstractAlgebr
    nonzero_gens = [m([mat[i, j] for j = 1:s]) for i = 1:num]
    M = Submodule{T}(m, nonzero_gens, rels, gen_cols, pivots)
    # Compute map from elements of submodule into original module
-   f = map_from_func(M, m, x -> sum(x.v[1, i]*gens[gen_cols[i]] for i in 1:ncols(x.v)))
+   f = map_from_func(M, m, x -> sum(x.v[1, i]*nonzero_gens[gen_cols[i]] for i in 1:ncols(x.v)))
    M.map = f
    return M, f
 end
