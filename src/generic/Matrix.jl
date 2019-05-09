@@ -2315,7 +2315,9 @@ end
 @doc Markdown.doc"""
     left_kernel(a::AbstractAlgebra.MatElem{T}) where T <: RingElement
 > Returns a tuple `n, M` where $M$ is a matrix whose rows generate the kernel
-> of $M$ and $n$ is the rank of the kernel.
+> of $M$ and $n$ is the rank of the kernel. The transpose of the output of this
+> function is guaranteed to be in flipped upper triangular format (i.e. upper
+> triangular format if columns and rows are reversed).
 """
 function left_kernel(x::AbstractAlgebra.MatElem{T}) where T <: RingElement
    !isdomain_type(elem_type(base_ring(x))) && error("Not implemented")

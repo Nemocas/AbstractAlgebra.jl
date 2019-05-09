@@ -81,25 +81,31 @@ function Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPMod
    r3 = length(rels)
    c = ngens(P)
    mat = matrix(base_ring(M), r1 + r2 + r3, c, [0 for i in 1:(r1 + r2 + r3)*c])
+   # We flip the rows of the matrix so the input to Submodule is in upper
+   # triangular form
+   rn = r1 + r2 + r3
    for i = 1:r1
       for j = 1:c
-         mat[i, j] = G1[i].v[1, j]
+         mat[rn - i + 1, j] = G1[i].v[1, j]
       end
    end
    for i = 1:r2
       for j = 1:c
-         mat[i + r1, j] = G2[i].v[1, j]
+         mat[rn - i - r1 + 1, j] = G2[i].v[1, j]
       end
    end
    for i = 1:r3
       for j = 1:c
-         mat[i + r1 + r2, j] = rels[i][1, j]
+         mat[rn - i - r1 - r2 + 1, j] = rels[i][1, j]
       end
    end
    # Find the left kernel space of the matrix
    nc, K = left_kernel(mat)
-   # First r1 elements of a row correspond to a generators of intersection
-   I = [M([K[j, i] for i in 1:r1]) for j in 1:nc]
+   # Last r1 elements of a row correspond to a generators of intersection
+   # We flip the rows of K so the input to Submodule is upper triangular
+   # and the columns so that they correspond to the original order before
+   # flipping above
+   I = [M([K[nc - j + 1, rn - i + 1] for i in 1:r1]) for j in 1:nc]
    return Submodule(M, I)
 end
 
