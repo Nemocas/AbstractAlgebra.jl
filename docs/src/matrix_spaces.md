@@ -174,6 +174,14 @@ F = similar(M)
 ### Basic manipulation of matrices
 
 ```julia
+dense_matrix_type(::Type{T}) where T <: AbstractAlgebra.RingElem
+```
+
+Returns the type of dense matrices whose entries have the given type. E.g.
+in Nemo, which depends on AbstractAlgebra, we define
+`dense_matrix_type(::Type{fmpz}) = fmpz_mat`.
+
+```julia
 nrows(f::MyMat{T}) where T <: AbstractAlgebra.RingElem
 ```
 
