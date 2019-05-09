@@ -107,6 +107,10 @@ parent(a::AbstractAlgebra.MatElem{T}, cached::Bool = true) where T <: RingElemen
 
 dense_matrix_type(::Type{T}) where T <: RingElement = Mat{T}
 
+@doc Markdown.doc"""
+    dense_matrix_type(R::Ring)
+> Return the type of matrices over the given ring.
+"""
 dense_matrix_type(R::Ring) = dense_matrix_type(elem_type(R))
 
 function check_parent(a::AbstractAlgebra.MatElem, b::AbstractAlgebra.MatElem, throw::Bool = true)

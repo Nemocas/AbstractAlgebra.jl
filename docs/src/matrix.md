@@ -166,6 +166,10 @@ manipulate matrices and to set and retrieve entries and other basic data associa
 with the matrices.
 
 ```@docs
+dense_matrix_type(::Ring)
+```
+
+```@docs
 nrows(::MatElem)
 ```
 
@@ -182,6 +186,7 @@ S = MatrixSpace(R, 3, 3)
 A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 B = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])
 
+T = dense_matrix_type(R)
 r = nrows(B)
 c = ncols(B)
 M = A + B
