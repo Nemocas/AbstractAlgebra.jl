@@ -2108,14 +2108,15 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    can_solve_left_row_hnf(r::AbstractAlgebra.MatElem{T},
+    can_solve_left_reduced_triu(r::AbstractAlgebra.MatElem{T},
                           M::AbstractAlgebra.MatElem{T}) where T <: RingElement
 > Returns a tuple `flag, x` where `flag` is set to true if $xM = r$ has a
-> solution, where $M$ is an $m\times n$ matrix in Hermite normal form with no
-> zero rows and $r$ and $x$ are row vectors with $m$ columns. If there is no
-> solution, flag is set to `false` and $x$ is set to the zero row.
+> solution, where $M$ is an $m\times n$ matrix in (upper triangular) Hermite
+> normal form or reduced row echelon form and $r$ and $x$ are row vectors with
+> $m$ columns. If there is no solution, flag is set to `false` and $x$ is set
+> to the zero row.
 """
-function can_solve_left_row_hnf(r::AbstractAlgebra.MatElem{T},
+function can_solve_left_reduced_triu(r::AbstractAlgebra.MatElem{T},
                           M::AbstractAlgebra.MatElem{T}) where T <: RingElement
    ncols(r) != ncols(M) && error("Incompatible matrices")
    r = deepcopy(r) # do not destroy input

@@ -151,14 +151,14 @@ function ==(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) wher
    mat2 = reduced_form(mat2)
    # Check containment of rewritten gens of M in row space of mat2
    for v in G1
-      flag, r = can_solve_left_row_hnf(v.v, mat2)
+      flag, r = can_solve_left_reduced_triu(v.v, mat2)
       if !flag
          return false
       end
    end
    # Check containment of rewritten gens of N in row space of mat1
    for v in G2
-      flag, r = can_solve_left_row_hnf(v.v, mat1)
+      flag, r = can_solve_left_reduced_triu(v.v, mat1)
       if !flag
          return false
       end
