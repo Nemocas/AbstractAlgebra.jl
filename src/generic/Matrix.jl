@@ -17,7 +17,7 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
        rref!, swap_cols, swap_cols!, swap_rows, swap_rows!, hnf_kb,
        hnf_kb_with_trafo, hnf_cohen, hnf_cohen_with_trafo, snf_kb,
        snf_kb_with_trafo, find_pivot_popov, inv!, zero_matrix,
-       kronecker_product, minors, tr, lu, lu!, pseudo_inv
+       kronecker_product, minors, tr, lu, lu!, pseudo_inv, dense_matrix_type
 
 ###############################################################################
 #
@@ -104,6 +104,10 @@ base_ring(a::MatrixElem{T}) where {T <: RingElement} = a.base_ring::parent_type(
 """
 parent(a::AbstractAlgebra.MatElem{T}, cached::Bool = true) where T <: RingElement =
     MatSpace{T}(a.base_ring, size(a.entries)..., cached)
+
+dense_matrix_type(::Type{T}) where T <: RingElement = Mat{T}
+
+dense_matrix_type(R::Ring) = dense_matrix_type(elem_type(R))
 
 function check_parent(a::AbstractAlgebra.MatElem, b::AbstractAlgebra.MatElem, throw::Bool = true)
   fl = (base_ring(a) != base_ring(b) || nrows(a) != nrows(b) || ncols(a) != ncols(b))
