@@ -3701,7 +3701,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Basic manipulation of matrices",
     "category": "section",
-    "text": "nrows(f::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the number of rows of the given matrix.ncols(f::MyMat{T}) where T <: AbstractAlgebra.RingElemReturns the number of columns of the given matrix.getindex(M::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElemReturn the (i j)-th entry of the matrix M.setindex!(M::MyMat{T}, d::T, r::Int, c::Int) where T <: AbstractAlgebra.RingElemSet the (i j)-th entry of the matrix M to d, which is assumed to be in the base ring of the matrix. The matrix must have such an entry and the matrix is mutated in place and not returned from the function.ExamplesM = matrix(ZZ, BigInt[2 3 0; 1 1 1])\n\nm = nrows(M)\nn = ncols(M)\nM[1, 2] = BigInt(4)\nc = M[1, 1]"
+    "text": "dense_matrix_type(::Type{T}) where T <: AbstractAlgebra.RingElemReturns the type of dense matrices whose entries have the given type. E.g. in Nemo, which depends on AbstractAlgebra, we define dense_matrix_type(::Type{fmpz}) = fmpz_mat.nrows(f::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the number of rows of the given matrix.ncols(f::MyMat{T}) where T <: AbstractAlgebra.RingElemReturns the number of columns of the given matrix.getindex(M::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElemReturn the (i j)-th entry of the matrix M.setindex!(M::MyMat{T}, d::T, r::Int, c::Int) where T <: AbstractAlgebra.RingElemSet the (i j)-th entry of the matrix M to d, which is assumed to be in the base ring of the matrix. The matrix must have such an entry and the matrix is mutated in place and not returned from the function.ExamplesM = matrix(ZZ, BigInt[2 3 0; 1 1 1])\n\nm = nrows(M)\nn = ncols(M)\nM[1, 2] = BigInt(4)\nc = M[1, 1]"
 },
 
 {
@@ -3817,6 +3817,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix/#AbstractAlgebra.Generic.dense_matrix_type-Tuple{AbstractAlgebra.Ring}",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.dense_matrix_type",
+    "category": "method",
+    "text": "dense_matrix_type(R::Ring)\n\nReturn the type of matrices over the given ring.\n\n\n\n"
+},
+
+{
     "location": "matrix/#AbstractAlgebra.Generic.nrows-Tuple{MatElem}",
     "page": "Generic matrices",
     "title": "AbstractAlgebra.Generic.nrows",
@@ -3837,7 +3845,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Basic matrix functionality",
     "category": "section",
-    "text": "As well as the Ring and Matrix interfaces, the following functions are provided to manipulate matrices and to set and retrieve entries and other basic data associated with the matrices.nrows(::MatElem)ncols(::MatElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\nB = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])\n\nr = nrows(B)\nc = ncols(B)\nM = A + B\nN = 2 + A\nM1 = deepcopy(A)\nA != B\nisone(one(S)) == true\nV = A[1:2, :]\nW = A^3\nZ = divexact(2*A, 2)"
+    "text": "As well as the Ring and Matrix interfaces, the following functions are provided to manipulate matrices and to set and retrieve entries and other basic data associated with the matrices.dense_matrix_type(::Ring)nrows(::MatElem)ncols(::MatElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\nB = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])\n\nT = dense_matrix_type(R)\nr = nrows(B)\nc = ncols(B)\nM = A + B\nN = 2 + A\nM1 = deepcopy(A)\nA != B\nisone(one(S)) == true\nV = A[1:2, :]\nW = A^3\nZ = divexact(2*A, 2)"
 },
 
 {
