@@ -190,11 +190,11 @@ end
 #
 ###############################################################################
 
-# Assumes M is in hnf. Removes zero rows. Returns a tuple
+# Assumes M is in reduced form (hnf/rref). Removes zero rows. Returns a tuple
 # gen_cols, culled, pivots where all rows and columns corresponding to unit
 # pivots have been removed, gen_cols is a list of columns without unit pivots,
 # culled is an array of row (indices) that have not been removed and pivots[i]
-# is the pivot column of the $i$-th row of the matrix
+# is the pivot column of the $i$-th row of the culled matrix
 function cull_matrix(M::AbstractAlgebra.MatElem{T}) where T <: RingElement
    # count the nonzero rows
    nrels = nrows(M)
