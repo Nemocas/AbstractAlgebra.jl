@@ -1083,7 +1083,7 @@ end
 
 mutable struct Submodule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    m::AbstractAlgebra.FPModule{T}
-   gens::Vector{AbstractAlgebra.FPModuleElem{T}}
+   gens::Vector{<:AbstractAlgebra.FPModuleElem{T}}
    rels::Vector{<:AbstractAlgebra.MatElem{T}}
    gen_cols::Vector{Int}
    pivots::Vector{Int}
@@ -1113,7 +1113,7 @@ end
 mutable struct QuotientModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    m::AbstractAlgebra.FPModule{T}
    rels::Vector{<:AbstractAlgebra.MatElem{T}}
-   gens::Vector{Int} # which original columns correspond to gens of quotient
+   gen_cols::Vector{Int} # which original columns correspond to gens of quotient
    pivots::Vector{Int} # pivot column of each culled relation in new rels matrix
    base_ring::Ring
    map::FunctionalMap{<:AbstractAlgebra.FPModule{T}, QuotientModule{T}}
@@ -1136,13 +1136,13 @@ mutable struct QuotientModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
       # compute the hnf/rref of the combined relations
       combined_rels = reduced_form(combined_rels)
       # remove zero rows and all rows/cols corresponding to unit pivots
-      gens, culled, pivots = cull_matrix(combined_rels)
+      gen_cols, culled, pivots = cull_matrix(combined_rels)
       # put all the culled relations into new relations
-      new_rels = [matrix(R, 1, length(gens),
-                    [combined_rels[culled[i], gens[j]]
-                       for j in 1:length(gens)]) for i = 1:length(culled)]
+      new_rels = [matrix(R, 1, length(gen_cols),
+                    [combined_rels[culled[i], gen_cols[j]]
+                       for j in 1:length(gen_cols)]) for i = 1:length(culled)]
       # create quotient module
-      z = new{T}(M, new_rels, gens, pivots, base_ring(M))
+      z = new{T}(M, new_rels, gen_cols, pivots, base_ring(M))
       return z
    end
 end
