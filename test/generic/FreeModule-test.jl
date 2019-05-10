@@ -32,11 +32,26 @@ function test_free_module_unary_ops()
    print("Generic.FreeModule.unary_ops...")
 
    R, x = PolynomialRing(ZZ, "x")
-   M = FreeModule(R, 3)
 
-   m = M([x, x, x])
+   for iter = 1:10
+      M = FreeModule(R, 3)
+
+      v = [rand(R, 0:2, -10:10) for i in 1:3]
+      w = [-c for c in v]
    
-   @test -m == M([-x, -x, -x])
+      @test -M(v) == M(w)
+   end
+
+   R = QQ
+
+   for iter = 1:10
+      M = FreeModule(R, 3)
+
+      v = [rand(R, -10:10) for i in 1:3]
+      w = [-c for c in v]
+
+      @test -M(v) == M(w)
+   end
 
    println("PASS")
 end
@@ -45,12 +60,27 @@ function test_free_module_binary_ops()
    print("Generic.FreeModule.binary_ops...")
 
    R, x = PolynomialRing(ZZ, "x")
-   M = FreeModule(R, 3)
 
-   m = M([x, x, x])
+   for iter = 1:10
+      M = FreeModule(R, 3)
 
-   @test m + m - m == m
+      m = rand(M, 0:2, -10:10)
+      n = rand(M, 0:2, -10:10)
 
+      @test m + n - n == m
+   end
+
+   R = QQ
+
+   for iter = 1:10
+      M = FreeModule(R, 3)
+
+      m = rand(M, -10:10)
+      n = rand(M, -10:10)
+
+      @test m + n - n == m
+   end
+   
    println("PASS")
 end
 
@@ -58,14 +88,33 @@ function test_free_module_adhoc_binary()
    print("Generic.FreeModule.adhoc_binary...")
 
    R, x = PolynomialRing(ZZ, "x")
-   M = FreeModule(R, 3)
 
-   m = M([x, x, x])
+   for iter = 1:10
+      M = FreeModule(R, 3)
+      c = rand(1:10)
 
-   @test 2*m == M([2x, 2x, 2x])
-   @test m*2 == 2*m
-   @test x*m == M([x^2, x^2, x^2])
-   @test m*x == x*m
+      m = rand(M, 0:2, -10:10)
+
+      v = [rand(R, 0:2, -10:10) for i in 1:3]
+      w = [x*c for c in v]
+
+      @test 2*m == m + m
+      @test m*c == c*m
+      @test x*M(v) == M(w)
+      @test m*x == x*m
+   end
+
+   R = QQ
+
+   for iter = 1:10
+      M = FreeModule(R, 3)
+      c = rand(1:10)
+
+      m = rand(M, -10:10)
+
+      @test 2*m == m + m
+      @test m*c == c*m
+   end
 
    println("PASS")
 end

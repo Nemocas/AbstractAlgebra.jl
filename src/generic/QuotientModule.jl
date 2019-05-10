@@ -52,14 +52,14 @@ end
 function show(io::IO, N::QuotientModule{T}) where T <: RingElement
    print(io, "Quotient module over ")
    print(IOContext(io, :compact => true), base_ring(N))
-   println(io, " with ", ngens(N), "generators and relations:")
+   println(io, " with ", ngens(N), " generators and relations:")
    print(IOContext(io, :compact => true), relations(N))
 end
 
 function show(io::IO, N::QuotientModule{T}) where T <: FieldElement
    println(io, "Quotient space over:")
    print(IOContext(io, :compact => true), base_ring(N))
-   println(io, " with ", ngens(N), "generators and relations:")
+   println(io, " with ", ngens(N), " generators and relations:")
    print(IOContext(io, :compact => true), relations(N))
 end
 

@@ -49,16 +49,17 @@ end
 function test_submodule_unary_ops()
    print("Generic.Submodule.unary_ops...")
 
-   R = ZZ
-   for iter = 1:20
-      M = rand_module(R, -10:10)
-      ngens = rand(1:5)
-      S = [rand(M, -10:10) for i in 1:ngens]
-      N, f = Submodule(M, S)
+   for R in [ZZ, QQ]
+      for iter = 1:20
+         M = rand_module(R, -10:10)
+         ngens = rand(1:5)
+         S = [rand(M, -10:10) for i in 1:ngens]
+         N, f = Submodule(M, S)
 
-      m = rand(N, -10:10)
+         m = rand(N, -10:10)
    
-      @test -(-m) == m 
+         @test -(-m) == m
+      end
    end
 
    println("PASS")
@@ -67,19 +68,19 @@ end
 function test_submodule_binary_ops()
    print("Generic.Submodule.binary_ops...")
 
-   R = ZZ
+   for R in [ZZ, QQ]
+      for iter = 1:40
+         M = rand_module(R, -10:10)
+         ngens = rand(1:5)
+         S = [rand(M, -10:10) for i in 1:ngens]
+         N, f = Submodule(M, S)
 
-   for iter = 1:40
-      M = rand_module(R, -10:10)
-      ngens = rand(1:5)
-      S = [rand(M, -10:10) for i in 1:ngens]
-      N, f = Submodule(M, S)
+         m = rand(N, -10:10)
+         n = rand(N, -10:10)
 
-      m = rand(N, -10:10)
-      n = rand(N, -10:10)
-
-      @test m + n - n == m
-      @test m - n == m + (-n)
+         @test m + n - n == m
+         @test m - n == m + (-n)
+      end
    end
 
    println("PASS")
@@ -88,22 +89,22 @@ end
 function test_submodule_adhoc_binary()
    print("Generic.Submodule.adhoc_binary...")
 
-   R = ZZ
+   for R in [ZZ, QQ]
+      for iter = 1:40
+         M = rand_module(R, -10:10)
+         ngens = rand(1:5)
+         S = [rand(M, -10:10) for i in 1:ngens]
+         N, f = Submodule(M, S)
 
-   for iter = 1:40
-      M = rand_module(R, -10:10)
-      ngens = rand(1:5)
-      S = [rand(M, -10:10) for i in 1:ngens]
-      N, f = Submodule(M, S)
+         m = rand(N, -10:10)
+         n = rand(N, -10:10)
+         c = rand(-10:10)
 
-      m = rand(N, -10:10)
-      n = rand(N, -10:10)
-      c = rand(-10:10)
-
-      @test 2*m == m + m
-      @test m*c == c*m
-      @test c*(m + n) == c*m + c*n
-      @test c*(m - n) == c*m - c*n
+         @test 2*m == m + m
+         @test m*c == c*m
+         @test c*(m + n) == c*m + c*n
+         @test c*(m - n) == c*m - c*n
+      end
    end
 
    println("PASS")

@@ -22,7 +22,7 @@ base_ring(N::Submodule{T}) where T <: RingElement = N.base_ring
 
 base_ring(v::submodule_elem{T}) where T <: RingElement = base_ring(v.parent)
 
-ngens(N::Submodule{T}) where T <: RingElement = length(N.gen_cols)
+ngens(N::Submodule{T}) where T <: RingElement = length(N.gens)
 
 gens(N::Submodule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
 
@@ -172,7 +172,7 @@ reduced_form(mat::AbstractAlgebra.MatElem{T}) where T <: RingElement = hnf(mat)
 
 function reduced_form(mat::AbstractAlgebra.MatElem{T}) where T <: FieldElement
   r, m = rref(mat)
-  return mat
+  return m
 end
 
 @doc Markdown.doc"""
