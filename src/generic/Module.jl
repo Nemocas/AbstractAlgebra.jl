@@ -27,7 +27,7 @@ end
 > relation is given as an element of `M`. The relation matrix whose rows
 > are the returned relations will be in Hermite normal form.
 """
-relations(M::AbstractAlgebra.FPModule{T}) where T <: RingElement = M.rels
+relations(M::AbstractAlgebra.FPModule{T}) where T <: RingElement = M.rels::Vector{dense_matrix_type(T)}
 
 @doc Markdown.doc"""
     iscompatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
@@ -241,7 +241,7 @@ function cull_matrix_rows(M::Vector{<:AbstractAlgebra.MatElem{T}}, ngens::Int) w
       nrels -= 1
    end
    # find relations with non-unit pivot
-   gens = Vector{Int}(undef, 0)
+   gen_cols = Vector{Int}(undef, 0)
    culled = Vector{Int}(undef, 0)
    pivots = Vector{Int}(undef, 0)
    col = 1
@@ -249,13 +249,13 @@ function cull_matrix_rows(M::Vector{<:AbstractAlgebra.MatElem{T}}, ngens::Int) w
    new_col = 1
    for i in 1:nrels
       while M[i][col] == 0
-         push!(gens, col)
+         push!(gen_cols, col)
          col += 1
          new_col += 1
       end
       if !isunit(M[i][col])
          push!(culled, row)
-         push!(gens, col)
+         push!(gen_cols, col)
          push!(pivots, new_col)
          new_col += 1
       end
@@ -263,8 +263,8 @@ function cull_matrix_rows(M::Vector{<:AbstractAlgebra.MatElem{T}}, ngens::Int) w
       row += 1
    end
    while col <= ngens
-      push!(gens, col)
+      push!(gen_cols, col)
       col += 1
    end
-   return gens, culled, pivots
+   return gen_cols, culled, pivots
 end

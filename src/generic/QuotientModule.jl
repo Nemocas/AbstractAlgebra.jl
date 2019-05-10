@@ -22,7 +22,7 @@ base_ring(N::QuotientModule{T}) where T <: RingElement = N.base_ring
 
 base_ring(v::quotient_module_elem{T}) where T <: RingElement = base_ring(v.parent)
 
-ngens(N::QuotientModule{T}) where T <: RingElement = length(N.gens)
+ngens(N::QuotientModule{T}) where T <: RingElement = length(N.gen_cols)
 
 gens(N::QuotientModule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
 
@@ -50,19 +50,17 @@ end
 ###############################################################################
 
 function show(io::IO, N::QuotientModule{T}) where T <: RingElement
-   println(io, "Quotient module of:")
-   print(IOContext(io, :compact => true), N.m)
-   println(io, "")
-   println(io, " with relations:")
-   print(IOContext(io, :compact => true), N.rels)
+   print(io, "Quotient module over ")
+   print(IOContext(io, :compact => true), base_ring(N))
+   println(io, " with ", ngens(N), "generators and relations:")
+   print(IOContext(io, :compact => true), relations(N))
 end
 
 function show(io::IO, N::QuotientModule{T}) where T <: FieldElement
-   println(io, "Quotient space of:")
-   print(IOContext(io, :compact => true), N.m)
-   println(io, "")
-   println(io, " with relations:")
-   print(IOContext(io, :compact => true), N.rels)
+   println(io, "Quotient space over:")
+   print(IOContext(io, :compact => true), base_ring(N))
+   println(io, " with ", ngens(N), "generators and relations:")
+   print(IOContext(io, :compact => true), relations(N))
 end
 
 function show(io::IO, v::quotient_module_elem)
@@ -173,14 +171,14 @@ end
 function (N::QuotientModule{T})(v::Vector{T}) where T <: RingElement
    length(v) != ngens(N) && error("Length of vector does not match number of generators")
    mat = matrix(base_ring(N), 1, length(v), v)
-   mat = reduce_mod_rels(mat, N.rels)
+   mat = reduce_mod_rels(mat, relations(N))
    return quotient_module_elem{T}(N, mat)
 end
 
 function (N::QuotientModule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingElement
    ncols(v) != ngens(N) && error("Length of vector does not match number of generators")
    nrows(v) != 1 && ("Not a vector in quotient_module_elem constructor")
-   v = reduce_mod_rels(v, N.rels)
+   v = reduce_mod_rels(v, relations(N))
    return quotient_module_elem{T}(N, v)
 end
 
@@ -197,7 +195,7 @@ function projection(v::AbstractAlgebra.MatElem{T}, rels::Vector{<:AbstractAlgebr
    # project down to quotient module
    r = zero_matrix(R, 1, ngens(N))
    for i = 1:ngens(N)
-      r[1, i] = v[1, N.gens[i]]
+      r[1, i] = v[1, N.gen_cols[i]]
    end
    return quotient_module_elem{T}(N, r)
 end
@@ -209,15 +207,14 @@ end
 > quotient map from `m` to `M`.
 """
 function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where T <: RingElement
-   supermodule(sub) !== m && error("Not a submodule in QuotientModule constructor") 
-   A = matrix(base_ring(m), 0, 0, []) # needed only for its type
-   T1 = typeof(A)
-   rels = Vector{T1}(undef, length(sub.gens))
-   for i = 1:length(sub.gens)
-      rels[i] = sub.gens[i].v
+   supermodule(sub) !== m && error("Not a submodule in QuotientModule constructor")
+   nrels = ngens(sub)
+   rels = Vector{dense_matrix_type(T)}(undef, nrels)
+   gens = generators(sub)
+   for i = 1:nrels
+      rels[i] = gens[i].v
    end
    M = QuotientModule{T}(m, rels)
-   G = gens(m)
    f = map_from_func(m, M, x -> projection(x.v, rels, M))
    M.map = f
    return M, f

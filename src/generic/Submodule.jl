@@ -31,6 +31,8 @@ function gen(N::Submodule{T}, i::Int) where T <: RingElement
    return N([(j == i ? one(R) : zero(R)) for j = 1:ngens(N)])
 end
 
+generators(N::Submodule{T}) where T <: RingElement = N.gens::elem_type(N.m)
+
 @doc Markdown.doc"""
     supermodule(M::Submodule{T}) where T <: RingElement
 > Return the module that this module is a submodule of.
@@ -48,19 +50,17 @@ end
 ###############################################################################
 
 function show(io::IO, N::Submodule{T}) where T <: RingElement
-   println(io, "Submodule of:")
-   print(IOContext(io, :compact => true), N.m)
-   println(io, "")
-   println(io, " with generators:")
-   print(IOContext(io, :compact => true), N.gens)
+   print(io, "Submodule over ")
+   print(IOContext(io, :compact => true), base_ring(N))
+   println(io, " with ", ngens(N), " generators and relations:")
+   print(IOContext(io, :compact => true), relations(N))
 end
 
 function show(io::IO, N::Submodule{T}) where T <: FieldElement
-   println(io, "Subspace of:")
-   print(IOContext(io, :compact => true), N.m)
-   println(io, "")
-   println(io, " with generators:")
-   print(IOContext(io, :compact => true), N.gens)
+   print(io, "Subspace over ")
+   print(IOContext(io, :compact => true), base_ring(N))
+   println(io, " with ", ngens(N), " generators and relations:")
+   print(IOContext(io, :compact => true), relations(N))
 end
 
 function show(io::IO, v::submodule_elem)
@@ -187,9 +187,7 @@ function Submodule(m::AbstractAlgebra.FPModule{T}, gens::Vector{<:AbstractAlgebr
       r -= 1
    end
    if r == 0
-      A = matrix(R, 0, 0, []) # needed only for its type
-      T1 = typeof(A)
-      M = Submodule{T}(m, gens, Vector{T1}(undef, 0),
+      M = Submodule{T}(m, gens, Vector{dense_matrix_type(T)}(undef, 0),
                        Vector{Int}(undef, 0), Vector{Int}(undef, 0))
       f = map_from_func(M, m, x -> zero(m))
       M.map = f
