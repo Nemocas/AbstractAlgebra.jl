@@ -52,15 +52,13 @@ end
 function show(io::IO, N::Submodule{T}) where T <: RingElement
    print(io, "Submodule over ")
    print(IOContext(io, :compact => true), base_ring(N))
-   println(io, " with ", ngens(N), " generators and relations:")
-   print(IOContext(io, :compact => true), relations(N))
+   show_gens_rels(io, N)
 end
 
 function show(io::IO, N::Submodule{T}) where T <: FieldElement
    print(io, "Subspace over ")
    print(IOContext(io, :compact => true), base_ring(N))
-   println(io, " with ", ngens(N), " generators and relations:")
-   print(IOContext(io, :compact => true), relations(N))
+   show_gens_rels(io, N)
 end
 
 function show(io::IO, v::submodule_elem)

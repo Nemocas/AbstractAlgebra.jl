@@ -49,18 +49,32 @@ end
 #
 ###############################################################################
 
+function show_gens_rels(io::IO, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+   print(io, " with ", ngens(N), " generator")
+   if ngens(N) == 1
+      print(io, " and ")
+   else
+      print(io, "s and ")
+   end
+   if length(relations(N)) == 0
+      println("no relations")
+   else
+      println(io, "relations:")
+      rels = [string(v) for v in relations(N)]
+      print(IOContext(io, :compact => true), join(rels, ", "))
+   end
+end
+
 function show(io::IO, N::QuotientModule{T}) where T <: RingElement
    print(io, "Quotient module over ")
    print(IOContext(io, :compact => true), base_ring(N))
-   println(io, " with ", ngens(N), " generators and relations:")
-   print(IOContext(io, :compact => true), relations(N))
+   show_gens_rels(io, N)
 end
 
 function show(io::IO, N::QuotientModule{T}) where T <: FieldElement
    println(io, "Quotient space over:")
    print(IOContext(io, :compact => true), base_ring(N))
-   println(io, " with ", ngens(N), " generators and relations:")
-   print(IOContext(io, :compact => true), relations(N))
+   show_gens_rels(io, N)
 end
 
 function show(io::IO, v::quotient_module_elem)
