@@ -281,6 +281,10 @@ function deepcopy_internal(d::MatrixElem, dict::IdDict)
    return c
 end
 
+function deepcopy_internal(d::MatSpaceView{T}, dict::IdDict) where T <: RingElement
+   return MatSpaceView(deepcopy(d.entries), d.base_ring)
+end
+
 ###############################################################################
 #
 #   Canonicalisation
