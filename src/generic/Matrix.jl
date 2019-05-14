@@ -342,12 +342,20 @@ getindex(x::AbstractAlgebra.MatElem, ::Colon, c::UnitRange{Int}) = sub(x, 1:nrow
 
 getindex(x::AbstractAlgebra.MatElem, ::Colon, ::Colon) = sub(x, 1:nrows(x), 1:ncols(x))
 
-function Base.view(M::AbstractAlgebra.MatElem, rows::UnitRange{Int}, ::Colon)
-  return view(M, rows, 1:ncols(M))
+function Base.view(M::Mat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: RingElement
+   return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
 end
 
-function Base.view(M::AbstractAlgebra.MatElem, ::Colon, cols::UnitRange{Int})
-  return view(M, 1:nrows(M), cols)
+function Base.view(M::AbstractAlgebra.MatElem{T}, rows::Colon, cols::UnitRange{Int64}) where T <: RingElement
+   return view(M, 1:nrows(M), cols)
+end
+
+function Base.view(M::AbstractAlgebra.MatElem{T}, rows::UnitRange{Int64}, cols::Colon) where T <: RingElement
+   return view(M, rows, 1:ncols(M))
+end
+
+function Base.view(M::AbstractAlgebra.MatElem{T}, rows::Colon, cols::Colon) where T <: RingElement
+   return view(M, 1:nrows(M), 1:ncols(M))
 end
 
 ################################################################################
