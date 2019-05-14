@@ -171,6 +171,42 @@ M = R()
 F = similar(M)
 ```
 
+### Views
+
+Just as Julia supports views of matrices, AbstractAlgebra requires all matrix
+types to support views. These allow one to work with a submatrix of a given
+matrix. Modifying the submatrix also modifies the original matrix.
+
+Note that `deepcopy` of a view type must return the same type, but it should
+return a view into a `deepcopy` of the original matrix. Julia enforces this
+for consistency.
+
+To support views, generic matrices in AbstractAlgebra of type
+`Generic.MatSpaceElem` have an associated `Generic.MatSpaceView` type. Both
+belong to the `Generic.Mat` abstract type, so that one can work with that in
+functions that can accept both views and actual matrices.
+
+The syntax for views is as for Julia's own views.
+
+Note that the parent of a view will be the same as the parent of the original
+matrix. The `parent_type` function also returns the same type for a view as
+for the original matrix type. This could potentially cause a problem if the
+`elem_type` function is applied to the return value of `parent_type` and then
+used in a type assertion. For this reason, there may be some limitations on
+the use of views.
+
+The `similar` function also returns a matrix of type `MatSpaceElem` when
+applied to a view, rather than another view.
+
+```julia
+M = matrix(ZZ, 3, 3, BigInt[1, 2, 3, 2, 3, 4, 3, 4, 5])
+
+N1 = @view M[1:2, :]
+N2 = @view M[:, 1:2]
+
+R = N1*N2
+```
+
 ### Basic manipulation of matrices
 
 ```julia
