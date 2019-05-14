@@ -35,7 +35,7 @@ function test_module_intersection()
          ngens3 = rand(1:5)
          gens3 = [rand(M, -10:10) for j in 1:ngens3]
          M3, f3 = Submodule(M, gens3)
-      
+
          I1, g1 = intersect(M1, M2)
          I2, g2 = intersect(I1, M3)
 
