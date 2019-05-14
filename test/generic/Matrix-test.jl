@@ -1759,6 +1759,29 @@ function test_gen_mat_weak_popov()
    println("PASS")
 end
 
+function test_gen_mat_views()
+   print("Generic.Mat.views...")
+
+   M = matrix(ZZ, 3, 3, BigInt[1, 2, 3, 2, 3, 4, 3, 4, 5])
+   M2 = deepcopy(M)
+
+   N1 = @view M[:,1:2]
+   N2 = @view M[1:2, :]
+   N3 = @view M[:,:]
+
+   @test isa(N1, Generic.MatSpaceView)
+   @test isa(N2, Generic.MatSpaceView)
+   @test isa(N3, Generic.MatSpaceView)
+
+   @test N2*N1 == matrix(ZZ, 2, 2, BigInt[14, 20, 20, 29])
+   @test N3*N3 == M*M
+
+   @test fflu(N3) == fflu(M) # tests that deepcopy is correct
+   @test M2 == M
+
+   println("PASS")
+end
+
 function test_gen_mat()
    test_gen_mat_constructors()
    test_gen_mat_size()
@@ -1802,6 +1825,7 @@ function test_gen_mat()
    test_gen_mat_snf()
    test_gen_mat_weak_popov()
    test_gen_mat_minors()
+   test_gen_mat_views()
 
    println("")
 end
