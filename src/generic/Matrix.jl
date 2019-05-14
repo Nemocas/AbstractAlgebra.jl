@@ -35,7 +35,7 @@ function similar(x::Mat{T}) where T <: RingElement
          M[i, j] = zero(R)
       end
    end
-   z = Mat{T}(M)
+   z = MatSpaceElem{T}(M)
    z.base_ring = R
    return z
 end
@@ -48,7 +48,7 @@ function similar(x::Mat{T}, r::Int, c::Int) where T <: RingElement
          M[i, j] = zero(R)
       end
    end
-   z = Mat{T}(M)
+   z = MatSpaceElem{T}(M)
    z.base_ring = R
    return z
 end
@@ -83,9 +83,9 @@ end
 #
 ###############################################################################
 
-parent_type(::Type{Mat{T}}) where T <: RingElement = MatSpace{T}
+parent_type(::Type{S}) where {T <: RingElement, S <: Mat{T}} = MatSpace{T}
 
-elem_type(::Type{MatSpace{T}}) where {T <: RingElement} = Mat{T}
+elem_type(::Type{MatSpace{T}}) where {T <: RingElement} = MatSpaceElem{T}
 
 @doc Markdown.doc"""
     base_ring(a::AbstractAlgebra.MatSpace{T}) where {T <: RingElement}
@@ -107,7 +107,7 @@ base_ring(a::MatrixElem{T}) where {T <: RingElement} = a.base_ring::parent_type(
 parent(a::AbstractAlgebra.MatElem{T}, cached::Bool = true) where T <: RingElement =
     MatSpace{T}(a.base_ring, size(a.entries)..., cached)
 
-dense_matrix_type(::Type{T}) where T <: RingElement = Mat{T}
+dense_matrix_type(::Type{T}) where T <: RingElement = MatSpaceElem{T}
 
 @doc Markdown.doc"""
     dense_matrix_type(R::Ring)
@@ -4504,10 +4504,10 @@ end
 #
 ###############################################################################
 
-promote_rule(::Type{Mat{T}}, ::Type{Mat{T}}) where T <: RingElement = Mat{T}
+promote_rule(::Type{S}, ::Type{S}) where {T <: RingElement, S <: Mat{T}} = MatSpaceElem{T}
 
-function promote_rule(::Type{Mat{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
-   promote_rule(T, U) == T ? Mat{T} : Union{}
+function promote_rule(::Type{S}, ::Type{U}) where {T <: RingElement, S <: Mat{T}, U <: RingElement}
+   promote_rule(T, U) == T ? MatSpaceElem{T} : Union{}
 end
 
 ###############################################################################
@@ -4524,7 +4524,7 @@ function (a::MatSpace{T})() where {T <: RingElement}
          entries[i, j] = zero(R)
       end
    end
-   z = Mat{T}(entries)
+   z = MatSpaceElem{T}(entries)
    z.base_ring = R
    return z
 end
@@ -4542,7 +4542,7 @@ function (a::MatSpace{T})(b::S) where {S <: RingElement, T <: RingElement}
          end
       end
    end
-   z = Mat{T}(entries)
+   z = MatSpaceElem{T}(entries)
    z.base_ring = R
    return z
 end
@@ -4560,7 +4560,7 @@ function (a::MatSpace{T})(b::AbstractArray{T, 2}) where T <: RingElement
          b[i, j] = R(b[i, j])
       end
    end
-   z = Mat{T}(b)
+   z = MatSpaceElem{T}(b)
    z.base_ring = R
    return z
 end
@@ -4574,7 +4574,7 @@ function (a::MatSpace{T})(b::AbstractArray{S, 2}) where {S <: RingElement, T <: 
          entries[i, j] = R(b[i, j])
       end
    end
-   z = Mat{T}(entries)
+   z = MatSpaceElem{T}(entries)
    z.base_ring = R
    return z
 end
@@ -4599,7 +4599,7 @@ end
 """
 function matrix(R::Ring, arr::AbstractArray{T, 2}) where {T}
    if elem_type(R) === T
-      z = Mat{elem_type(R)}(arr)
+      z = MatSpaceElem{elem_type(R)}(arr)
       z.base_ring = R
       return z
    else
@@ -4617,7 +4617,7 @@ end
 function matrix(R::Ring, r::Int, c::Int, arr::AbstractArray{T, 1}) where T
    _check_dim(r, c, arr)
    if elem_type(R) === T
-     z = Mat{elem_type(R)}(r, c, arr)
+     z = MatSpaceElem{elem_type(R)}(r, c, arr)
      z.base_ring = R
      return z
    else
@@ -4644,7 +4644,7 @@ function zero_matrix(R::Ring, r::Int, c::Int)
          arr[i, j] = zero(R)
       end
    end
-   z = Mat{elem_type(R)}(arr)
+   z = MatSpaceElem{elem_type(R)}(arr)
    z.base_ring = R
    return z
 end
