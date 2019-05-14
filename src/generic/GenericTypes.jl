@@ -872,6 +872,10 @@ mutable struct MatSpaceElem{T <: RingElement} <: Mat{T}
    end
 end
 
+mutable struct MatSpaceView{T <: RingElement, V, W} <: Mat{T}
+   entries::SubArray{T, 2, Array{T, 2}, V, W}
+   base_ring::Ring
+end
 ###############################################################################
 #
 #   MatAlgebra / MatAlgElem
