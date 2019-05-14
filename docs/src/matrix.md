@@ -22,11 +22,15 @@ of functions.
 
 ## Types and parent objects
 
-Generic matrices in AbstractAlgebra.jl have type `Generic.Mat{T}` for matrices in a
-matrix space, or `Generic.MatAlgElem{T}` for matrices in a matrix algebra, where `T` is
-the type of elements of the matrix. Internally, generic matrices are implemented using
-an object wrapping a Julia two dimensional array, though they are not themselves Julia
-arrays. See the file `src/generic/GenericTypes.jl` for details.
+Generic matrices in AbstractAlgebra.jl have type `Generic.MatSpaceElem{T}` for matrices
+in a matrix space, or `Generic.MatAlgElem{T}` for matrices in a matrix algebra, where
+`T` is the type of elements of the matrix. Internally, generic matrices are implemented
+using an object wrapping a Julia two dimensional array, though they are not themselves
+Julia arrays. See the file `src/generic/GenericTypes.jl` for details.
+
+For the most part, one doesn't want to work directly with the `MatSpaceElem` type though,
+but with an abstract type called `Generic.Mat` which includes `MatSpaceElem` and views
+thereof.
 
 Parents of generic matrices (matrix spaces) have type `Generic.MatSpace{T}`. Parents of
 matrices in a matrix algebra have type `Generic.MatAlgebra{T}`.
