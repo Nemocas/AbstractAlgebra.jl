@@ -82,9 +82,9 @@ function test_gen_mat_constructors()
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
-   @test elem_type(S) == Generic.Mat{elem_type(R)}
-   @test elem_type(Generic.MatSpace{elem_type(R)}) == Generic.Mat{elem_type(R)}
-   @test parent_type(Generic.Mat{elem_type(R)}) == Generic.MatSpace{elem_type(R)}
+   @test elem_type(S) == Generic.MatSpaceElem{elem_type(R)}
+   @test elem_type(Generic.MatSpace{elem_type(R)}) == Generic.MatSpaceElem{elem_type(R)}
+   @test parent_type(Generic.MatSpaceElem{elem_type(R)}) == Generic.MatSpace{elem_type(R)}
    @test base_ring(S) == R
    @test nrows(S) == 3
    @test ncols(S) == 3
@@ -125,13 +125,13 @@ function test_gen_mat_constructors()
 
    for T in [R, Int, BigInt, Rational{Int}, Rational{BigInt}]
       M = matrix(R, map(T, arr))
-      @test isa(M, Generic.Mat{elem_type(R)})
+      @test isa(M, Generic.MatSpaceElem{elem_type(R)})
       @test M.base_ring == R
       @test nrows(M) == 2
       @test ncols(M) == 2
 
       M2 = matrix(R, 2, 3, map(T, arr2))
-      @test isa(M2, Generic.Mat{elem_type(R)})
+      @test isa(M2, Generic.MatSpaceElem{elem_type(R)})
       @test M2.base_ring == R
       @test nrows(M2) == 2
       @test ncols(M2) == 3
@@ -140,19 +140,19 @@ function test_gen_mat_constructors()
    end
 
    M = matrix(R, arr')
-   @test isa(M, Generic.Mat{elem_type(R)})
+   @test isa(M, Generic.MatSpaceElem{elem_type(R)})
 
    M = matrix(R, 2, 3, view(arr2', 1:6))
-   @test isa(M, Generic.Mat{elem_type(R)})
+   @test isa(M, Generic.MatSpaceElem{elem_type(R)})
 
    M3 = zero_matrix(R, 2, 3)
 
-   @test isa(M3, Generic.Mat{elem_type(R)})
+   @test isa(M3, Generic.MatSpaceElem{elem_type(R)})
    @test M3.base_ring == R
 
    M4 = identity_matrix(R, 3)
 
-   @test isa(M4, Generic.Mat{elem_type(R)})
+   @test isa(M4, Generic.MatSpaceElem{elem_type(R)})
    @test M4.base_ring == R
 
    x = zero_matrix(R, 2, 2)

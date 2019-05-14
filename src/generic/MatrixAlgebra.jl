@@ -386,9 +386,9 @@ end
 function solve_lu(M::MatAlgElem{T}, B::MatAlgElem{T}) where {T <: RingElement}
    check_parent(M, B)
    R = base_ring(M)
-   MS = Mat{T}(M.entries) # convert to ordinary matrix
+   MS = MatSpaceElem{T}(M.entries) # convert to ordinary matrix
    MS.base_ring = R
-   BS = Mat{T}(B.entries)
+   BS = MatSpaceElem{T}(B.entries)
    BS.base_ring = R
    S = solve_lu(MS, BS)
    SA = MatAlgElem{T}(S.entries)
@@ -399,9 +399,9 @@ end
 function solve_fflu(M::MatAlgElem{T}, B::MatAlgElem{T}) where {T <: RingElement}
    check_parent(M, B)
    R = base_ring(M)
-   MS = Mat{T}(M.entries) # convert to ordinary matrix
+   MS = MatSpaceElem{T}(M.entries) # convert to ordinary matrix
    MS.base_ring = R
-   BS = Mat{T}(B.entries)
+   BS = MatSpaceElem{T}(B.entries)
    BS.base_ring = R
    S, d = solve_fflu(MS, BS)
    SA = MatAlgElem{T}(S.entries)
@@ -422,7 +422,7 @@ end
 > of the resulting polynomial must be supplied and the matrix must be square.
 """
 function minpoly(S::Ring, M::MatAlgElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
-   MS = Mat{T}(M.entries) # convert to ordinary matrix
+   MS = MatSpaceElem{T}(M.entries) # convert to ordinary matrix
    MS.base_ring = base_ring(M)
    return minpoly(S, MS, charpoly_only)
 end

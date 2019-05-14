@@ -829,6 +829,9 @@ end
 #
 ###############################################################################
 
+# All MatSpaceElem's and views thereof
+abstract type Mat{T} <: MatElem{T} end
+
 # not really a mathematical ring
 mutable struct MatSpace{T <: RingElement} <: AbstractAlgebra.MatSpace{T}
    nrows::Int
@@ -850,15 +853,15 @@ end
 
 const MatDict = Dict{Tuple{Ring, Int, Int}, MatSpace}()
 
-mutable struct Mat{T <: RingElement} <: AbstractAlgebra.MatElem{T}
+mutable struct MatSpaceElem{T <: RingElement} <: Mat{T}
    entries::Array{T, 2}
    base_ring::Ring
 
-   function Mat{T}(A::Array{T, 2}) where T <: RingElement
+   function MatSpaceElem{T}(A::Array{T, 2}) where T <: RingElement
       return new{T}(A)
    end
 
-   function Mat{T}(r::Int, c::Int, A::Array{T, 1}) where T <: RingElement
+   function MatSpaceElem{T}(r::Int, c::Int, A::Array{T, 1}) where T <: RingElement
       t = Array{T}(undef, r, c)
       for i = 1:r
          for j = 1:c
