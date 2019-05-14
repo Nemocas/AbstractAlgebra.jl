@@ -3641,14 +3641,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "module_homomorphism/#AbstractAlgebra.Generic.ModuleHomomorphism-Union{Tuple{T}, Tuple{Module{T},Module{T},MatElem{T}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
-    "page": "-",
-    "title": "AbstractAlgebra.Generic.ModuleHomomorphism",
-    "category": "method",
-    "text": "ModuleHomomorphism(M1::AbstractAlgebra.Module{T}, M2::AbstractAlgebra.Module{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement\n\nCreate the homomorphism f  M_1 to M_2 represented by the matrix m.\n\n\n\n"
-},
-
-{
     "location": "module_homomorphism/#Module-Homomorphisms-1",
     "page": "-",
     "title": "Module Homomorphisms",
@@ -3694,6 +3686,14 @@ var documenterSearchIndex = {"docs": [
     "title": "Constructors",
     "category": "section",
     "text": "In addition to the standard constructors, the following constructors, taking an array of elements, must be available.(S::MyMatSpace{T})(A::Array{T, 2}) where T <: AbstractAlgebra.RingElem\n(S::MyMatAlgebra{T})(A::Array{T, 2}) where T <: AbstractAlgebra.RingElemCreate the matrix in the given space/algebra whose (i j) entry is given by A[i, j].(S::MyMatSpace{T})(A::Array{S, 2}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}\n(S::MyMatAlgebra{T})(A::Array{S, 2}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}Create the matrix in the given space/algebra whose (i j) entry is given by A[i, j], where S is the type of elements that can be coerced into the base ring of the matrix.(S::MyMatSpace{T})(A::Array{S, 1}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}\n(S::MyMatAlgebra{T})(A::Array{S, 1}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}Create the matrix in the given space/algebra of matrices (with dimensions mtimes n say), whose (i j) entry is given by A[i*(n - 1) + j] and where S is the type of elements that can be coerced into the base ring of the matrix.ExamplesS = MatrixSpace(QQ, 2, 3)\nT = MatrixAlgebra(QQ, 2)\n\nM1 = S(Rational{BigInt}[2 3 1; 1 0 4])\nM2 = S(BigInt[2 3 1; 1 0 4])\nM3 = S(BigInt[2, 3, 1, 1, 0, 4])\n\nN1 = T(Rational{BigInt}[2 3; 1 0])\nN2 = T(BigInt[2 3; 1 0])\nN3 = T(BigInt[2, 3, 1, 1])It is also possible to create matrices (in a matrix space only) directly, without first creating the corresponding matrix space (the inner constructor being called directly). Note that to support this, matrix space parent objects don\'t contain a reference to their parent. Instead, parents are constructed on-the-fly if requested. (The same strategy is used for matrix algebras.)matrix(R::Ring, arr::Array{T, 2}) where T <: AbstractAlgebra.RingElemGiven an mtimes n Julia matrix of entries, construct the corresponding AbstractAlgebra.jl matrix over the given ring R, assuming all the entries can be coerced into R.matrix(R::Ring, r::Int, c::Int, A::Array{T, 1}) where T <: AbstractAlgebra.RingElemConstruct the given rtimes c AbstractAlgebra.jl matrix over the ring R whose (i j) entry is given by A[c*(i - 1) + j], assuming that all the entries can be coerced into R.zero_matrix(R::Ring, r::Int, c::Int)Construct the rtimes c AbstractAlgebra.jl zero matrix over the ring R.identity_matrix(R::Ring, n::Int)Construct the ntimes n AbstractAlgebra.jl identity matrix over the ring R.The following functions are available for matrices in both matrix algebras and matrix spaces.similar(x::MyMat{T}) where T <: AbstractAlgebra.RingElemConstruct the zero matrix with the same dimensions and base ring as the given matrix.similar(x::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElemConstruct the rtimes c zero matrix with the same base ring as the given matrix. If x belongs to a matrix algebra and r neq c, an exception is raised.ExamplesM = matrix(ZZ, BigInt[3 1 2; 2 0 1])\nN = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])\nP = zero_matrix(ZZ, 3, 2)\nQ = identity_matrix(ZZ, 4)\nC = similar(P)\nD = similar(Q, 4, 5)\n\nR = MatrixAlgebra(ZZ, 2)\nM = R()\nF = similar(M)"
+},
+
+{
+    "location": "matrix_spaces/#Views-1",
+    "page": "Matrix Interface",
+    "title": "Views",
+    "category": "section",
+    "text": "Just as Julia supports views of matrices, AbstractAlgebra requires all matrix types to support views. These allow one to work with a submatrix of a given matrix. Modifying the submatrix also modifies the original matrix.Note that deepcopy of a view type must return the same type, but it should return a view into a deepcopy of the original matrix. Julia enforces this for consistency.To support views, generic matrices in AbstractAlgebra of type Generic.MatSpaceElem have an associated Generic.MatSpaceView type. Both belong to the Generic.Mat abstract type, so that one can work with that in functions that can accept both views and actual matrices.The syntax for views is as for Julia\'s own views.Note that the parent of a view will be the same as the parent of the original matrix. The parent_type function also returns the same type for a view as for the original matrix type. This could potentially cause a problem if the elem_type function is applied to the return value of parent_type and then used in a type assertion. For this reason, there may be some limitations on the use of views.The similar function also returns a matrix of type MatSpaceElem when applied to a view, rather than another view.M = matrix(ZZ, 3, 3, BigInt[1, 2, 3, 2, 3, 4, 3, 4, 5])\n\nN1 = @view M[1:2, :]\nN2 = @view M[:, 1:2]\n\nR = N1*N2"
 },
 
 {
@@ -3773,7 +3773,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Types and parent objects",
     "category": "section",
-    "text": "Generic matrices in AbstractAlgebra.jl have type Generic.Mat{T} for matrices in a matrix space, or Generic.MatAlgElem{T} for matrices in a matrix algebra, where T is the type of elements of the matrix. Internally, generic matrices are implemented using an object wrapping a Julia two dimensional array, though they are not themselves Julia arrays. See the file src/generic/GenericTypes.jl for details.Parents of generic matrices (matrix spaces) have type Generic.MatSpace{T}. Parents of matrices in a matrix algebra have type Generic.MatAlgebra{T}.The generic matrix types (matrix spaces) belong to the abstract type AbstractAlgebra.MatElem{T} and the matrix space parent types belong to AbstractAlgebra.MatSpace{T}. Similarly the generic matrix algebra matrix types belong to the abstract type AbstractAlgebra.MatAlgElem{T} and the parent types belong to  AbstractAlgebra.MatAlgebra{T} Note that both the concrete type of a matrix space parent object and the abstract class it belongs to have the name MatElem, therefore disambiguation is required to specify which is intended. The same is true for the abstract types for matrix spaces and their elements.The dimensions and base ring R of a generic matrix are stored in its parent object, however to allow creation of matrices without first creating the matrix space parent, generic matrices in Julia do not contain a reference to their parent. They contain the row and column numbers (or degree, in the case of matrix algebras) and the base ring on a per matrix basis. The parent object can then be reconstructed from this data on demand."
+    "text": "Generic matrices in AbstractAlgebra.jl have type Generic.MatSpaceElem{T} for matrices in a matrix space, or Generic.MatAlgElem{T} for matrices in a matrix algebra, where T is the type of elements of the matrix. Internally, generic matrices are implemented using an object wrapping a Julia two dimensional array, though they are not themselves Julia arrays. See the file src/generic/GenericTypes.jl for details.For the most part, one doesn\'t want to work directly with the MatSpaceElem type though, but with an abstract type called Generic.Mat which includes MatSpaceElem and views thereof.Parents of generic matrices (matrix spaces) have type Generic.MatSpace{T}. Parents of matrices in a matrix algebra have type Generic.MatAlgebra{T}.The generic matrix types (matrix spaces) belong to the abstract type AbstractAlgebra.MatElem{T} and the matrix space parent types belong to AbstractAlgebra.MatSpace{T}. Similarly the generic matrix algebra matrix types belong to the abstract type AbstractAlgebra.MatAlgElem{T} and the parent types belong to  AbstractAlgebra.MatAlgebra{T} Note that both the concrete type of a matrix space parent object and the abstract class it belongs to have the name MatElem, therefore disambiguation is required to specify which is intended. The same is true for the abstract types for matrix spaces and their elements.The dimensions and base ring R of a generic matrix are stored in its parent object, however to allow creation of matrices without first creating the matrix space parent, generic matrices in Julia do not contain a reference to their parent. They contain the row and column numbers (or degree, in the case of matrix algebras) and the base ring on a per matrix basis. The parent object can then be reconstructed from this data on demand."
 },
 
 {
@@ -3813,7 +3813,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Matrix functionality provided by AbstractAlgebra.jl",
     "category": "section",
-    "text": "Most of the following generic functionality is available for both matrix spaces and matrix algebras. Exceptions include functions that do not return or accept square matrices or which cannot specify a parent. Such functions include solve and nullspace which can\'t be provided for matrix algebras.For details on functionality that is provided for matrix algebras only, see the dedicated section of the documentation."
+    "text": "Most of the following generic functionality is available for both matrix spaces and matrix algebras. Exceptions include functions that do not return or accept square matrices or which cannot specify a parent. Such functions include solve, kernel, and nullspace which can\'t be provided for matrix algebras.For details on functionality that is provided for matrix algebras only, see the dedicated section of the documentation."
 },
 
 {
@@ -4001,11 +4001,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "matrix/#AbstractAlgebra.Generic.hnf_with_trafo-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:RingElem",
+    "location": "matrix/#AbstractAlgebra.Generic.hnf_with_transform-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:RingElem",
     "page": "Generic matrices",
-    "title": "AbstractAlgebra.Generic.hnf_with_trafo",
+    "title": "AbstractAlgebra.Generic.hnf_with_transform",
     "category": "method",
-    "text": "hnf_with_trafo(A)\n\nReturn the tuple H U consisting of the upper right row Hermite normal form H of A together with invertible matrix U such that UA = H.\n\n\n\n"
+    "text": "hnf_with_transform(A)\n\nReturn the tuple H U consisting of the upper right row Hermite normal form H of A together with invertible matrix U such that UA = H.\n\n\n\n"
 },
 
 {
@@ -4013,7 +4013,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Hermite normal form",
     "category": "section",
-    "text": "hnf{T <: RingElem}(::MatElem{T})\nhnf_with_trafo{T <: RingElem}(::MatElem{T})"
+    "text": "hnf{T <: RingElem}(::MatElem{T})\nhnf_with_transform{T <: RingElem}(::MatElem{T})"
 },
 
 {
@@ -4089,11 +4089,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix/#AbstractAlgebra.Generic.can_solve_left_reduced_triu-Union{Tuple{T}, Tuple{MatElem{T},MatElem{T}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.can_solve_left_reduced_triu",
+    "category": "method",
+    "text": "can_solve_left_reduced_triu(r::AbstractAlgebra.MatElem{T},\n                      M::AbstractAlgebra.MatElem{T}) where T <: RingElement\n\nReturns a tuple flag, x where flag is set to true if xM = r has a solution, where M is an mtimes n matrix in (upper triangular) Hermite normal form or reduced row echelon form and r and x are row vectors with m columns. If there is no solution, flag is set to false and x is set to the zero row.\n\n\n\n"
+},
+
+{
     "location": "matrix/#Linear-solving-1",
     "page": "Generic matrices",
     "title": "Linear solving",
     "category": "section",
-    "text": "solve{T <: FieldElem}(::MatElem{T}, ::MatElem{T})solve_rational{T <: RingElem}(::MatElem{T}, ::MatElem{T})solve_triu{T <: FieldElem}(::MatElem{T}, ::MatElem{T}, ::Bool)ExamplesR, x = PolynomialRing(QQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\nU = MatrixSpace(K, 3, 1)\n\nA = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\nb = U([2a a + 1 (-a - 1)]\')\n\nx = solve(A, b)\n\nA = S([a + 1 2a + 3 a^2 + 1; K(0) a^2 - 1 2a; K(0) K(0) a])\nb = U([2a a + 1 (-a - 1)]\')\n\nx = solve_triu(A, b, false)\n\nR, x = PolynomialRing(ZZ, \"x\")\nS = MatrixSpace(R, 3, 3)\nU = MatrixSpace(R, 3, 2)\n\nA = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])\nb = U([2x x + 1 (-x - 1); x + 1 (-x) x^2]\')\n\nx, d = solve_rational(A, b)\n\nS = MatrixSpace(ZZ, 3, 3)\nT = MatrixSpace(ZZ, 3, 1)\n\nA = S([BigInt(2) 3 5; 1 4 7; 9 2 2])   \nB = T([BigInt(4), 5, 7])\n\nX, d = solve_rational(A, B)"
+    "text": "solve{T <: FieldElem}(::MatElem{T}, ::MatElem{T})solve_rational{T <: RingElem}(::MatElem{T}, ::MatElem{T})solve_triu{T <: FieldElem}(::MatElem{T}, ::MatElem{T}, ::Bool)can_solve_left_reduced_triu{T <: RingElement}(::MatElem{T}, ::MatElem{T})ExamplesR, x = PolynomialRing(QQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\nU = MatrixSpace(K, 3, 1)\n\nA = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\nb = U([2a a + 1 (-a - 1)]\')\n\nx = solve(A, b)\n\nA = S([a + 1 2a + 3 a^2 + 1; K(0) a^2 - 1 2a; K(0) K(0) a])\nb = U([2a a + 1 (-a - 1)]\')\n\nx = solve_triu(A, b, false)\n\nR, x = PolynomialRing(ZZ, \"x\")\nS = MatrixSpace(R, 3, 3)\nU = MatrixSpace(R, 3, 2)\n\nA = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])\nb = U([2x x + 1 (-x - 1); x + 1 (-x) x^2]\')\n\nx, d = solve_rational(A, b)\n\nS = MatrixSpace(ZZ, 3, 3)\nT = MatrixSpace(ZZ, 3, 1)\n\nA = S([BigInt(2) 3 5; 1 4 7; 9 2 2])   \nB = T([BigInt(4), 5, 7])\n\nX, d = solve_rational(A, B)"
 },
 
 {
@@ -4133,7 +4141,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "LinearAlgebra.nullspace",
     "category": "method",
-    "text": "nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}\n\nReturns a tuple (nu N) consisting of the nullity nu of M and a basis N (consisting of column vectors) for the right nullspace of M, i.e. such that MN is the zero matrix. If M is an mtimes n matrix N will be an ntimes nu matrix. Note that the nullspace is taken to be the vector space kernel over the fraction field of the base ring if the latter is not a field. In AbstractAlgebra we use the name ``kernel\'\' for a function to compute an integral kernel.\n\n\n\nnullspace(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}\n\nReturns a tuple (nu N) consisting of the nullity nu of M and a basis N (consisting of column vectors) for the right nullspace of M, i.e. such that MN is the zero matrix. If M is an mtimes n matrix N will be an ntimes nu matrix. Note that the nullspace is taken to be the vector space kernel over the fraction field of the base ring if the latter is not a field. In Nemo we use the name ``kernel\'\' for a function to compute an integral kernel.\n\n\n\n"
+    "text": "nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}\n\nReturns a tuple (nu N) consisting of the nullity nu of M and a basis N (consisting of column vectors) for the right nullspace of M, i.e. such that MN is the zero matrix. If M is an mtimes n matrix N will be an ntimes nu matrix. Note that the nullspace is taken to be the vector space kernel over the fraction field of the base ring if the latter is not a field. In AbstractAlgebra we use the name ``kernel\'\' for a function to compute an integral kernel.\n\n\n\nnullspace(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}\n\nReturns a tuple (nu N) consisting of the nullity nu of M and a basis N (consisting of column vectors) for the right nullspace of M, i.e. such that MN is the zero matrix. If M is an mtimes n matrix N will be an ntimes nu matrix.\n\n\n\n"
 },
 
 {
@@ -4142,6 +4150,38 @@ var documenterSearchIndex = {"docs": [
     "title": "Nullspace",
     "category": "section",
     "text": "nullspace{T <: RingElem}(::MatElem{T})\nnullspace{T <: FieldElem}(::MatElem{T})ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS = MatrixSpace(R, 4, 4)\n   \nM = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;\n       -8*x^2+8*x+16 -16*x^2+38*x-20 90*x^2-82*x-44 60*x^2+54*x-34;\n       -4*x^2+4*x+8 -8*x^2+13*x-10 35*x^2-31*x-14 22*x^2+21*x-15;\n       -10*x^2+10*x+20 -20*x^2+70*x-25 150*x^2-140*x-85 105*x^2+90*x-50])\n   \nn, N = nullspace(M)"
+},
+
+{
+    "location": "matrix/#AbstractAlgebra.Generic.kernel-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.kernel",
+    "category": "method",
+    "text": "kernel(a::MatElem{T}; side::Symbol = :right) where T <: RingElement\n\nReturns a tuple (n M), where n is the rank of the kernel and M is a basis for it. If side is right or not specified, the right kernel is computed, i.e. the matrix of columns whose span gives the right kernel space. If side is left, the left kernel is computed, i.e. the matrix of rows whose span is the left kernel space.\n\n\n\n"
+},
+
+{
+    "location": "matrix/#AbstractAlgebra.Generic.left_kernel-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.left_kernel",
+    "category": "method",
+    "text": "left_kernel(a::AbstractAlgebra.MatElem{T}) where T <: RingElement\n\nReturns a tuple n, M where M is a matrix whose rows generate the kernel of M and n is the rank of the kernel. The transpose of the output of this function is guaranteed to be in flipped upper triangular format (i.e. upper triangular format if columns and rows are reversed).\n\n\n\n"
+},
+
+{
+    "location": "matrix/#AbstractAlgebra.Generic.right_kernel-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.right_kernel",
+    "category": "method",
+    "text": "right_kernel(a::AbstractAlgebra.MatElem{T}) where T <: RingElement\n\nReturns a tuple n, M where M is a matrix whose columns generate the kernel of M and n is the rank of the kernel.\n\n\n\n"
+},
+
+{
+    "location": "matrix/#Kernel-1",
+    "page": "Generic matrices",
+    "title": "Kernel",
+    "category": "section",
+    "text": "kernel{T <: RingElem}(::MatElem{T})\nleft_kernel{T <: RingElem}(::MatElem{T})\nright_kernel{T <: RingElem}(::MatElem{T})ExamplesS = MatrixSpace(ZZ, 4, 4)\n\nM = S([1 2 0 4;\n       2 0 1 1;\n       0 1 1 -1;\n       2 -1 0 2])\n\nnr, Nr = kernel(M)\nnl, Nl = left_kernel(M)"
 },
 
 {
@@ -4233,11 +4273,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "matrix/#AbstractAlgebra.Generic.weak_popov_with_trafo-Union{Tuple{Mat{T}}, Tuple{T}} where T<:PolyElem",
+    "location": "matrix/#AbstractAlgebra.Generic.weak_popov_with_transform-Union{Tuple{Mat{T}}, Tuple{T}} where T<:PolyElem",
     "page": "Generic matrices",
-    "title": "AbstractAlgebra.Generic.weak_popov_with_trafo",
+    "title": "AbstractAlgebra.Generic.weak_popov_with_transform",
     "category": "method",
-    "text": "weak_popov_with_trafo(A::Mat{T}) where {T <: PolyElem}\n\nCompute a tuple (P U) where P is the weak Popov form of A and U is a transformation matrix so that P = UA.\n\n\n\n"
+    "text": "weak_popov_with_transform(A::Mat{T}) where {T <: PolyElem}\n\nCompute a tuple (P U) where P is the weak Popov form of A and U is a transformation matrix so that P = UA.\n\n\n\n"
 },
 
 {
@@ -4249,11 +4289,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "matrix/#AbstractAlgebra.Generic.popov_with_trafo-Union{Tuple{Mat{T}}, Tuple{T}} where T<:PolyElem",
+    "location": "matrix/#AbstractAlgebra.Generic.popov_with_transform-Union{Tuple{Mat{T}}, Tuple{T}} where T<:PolyElem",
     "page": "Generic matrices",
-    "title": "AbstractAlgebra.Generic.popov_with_trafo",
+    "title": "AbstractAlgebra.Generic.popov_with_transform",
     "category": "method",
-    "text": "popov_with_trafo(A::Mat{T}) where {T <: PolyElem}\n\nCompute a tuple (P U) where P is the Popov form of A and U is a transformation matrix so that P = UA.\n\n\n\n"
+    "text": "popov_with_transform(A::Mat{T}) where {T <: PolyElem}\n\nCompute a tuple (P U) where P is the Popov form of A and U is a transformation matrix so that P = UA.\n\n\n\n"
 },
 
 {
@@ -4261,7 +4301,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "(Weak) Popov form",
     "category": "section",
-    "text": "AbstractAlgebra.jl provides algorithms for computing the (weak) Popov of a matrix with entries in a univariate polynomial ring over a field.weak_popov{T <: PolyElem}(::Generic.Mat{T})\nweak_popov_with_trafo{T <: PolyElem}(::Generic.Mat{T})\npopov{T <: PolyElem}(::Generic.Mat{T})\npopov_with_trafo{T <: PolyElem}(::Generic.Mat{T})"
+    "text": "AbstractAlgebra.jl provides algorithms for computing the (weak) Popov of a matrix with entries in a univariate polynomial ring over a field.weak_popov{T <: PolyElem}(::Generic.Mat{T})\nweak_popov_with_transform{T <: PolyElem}(::Generic.Mat{T})\npopov{T <: PolyElem}(::Generic.Mat{T})\npopov_with_transform{T <: PolyElem}(::Generic.Mat{T})"
 },
 
 {
