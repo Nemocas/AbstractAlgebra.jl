@@ -206,7 +206,6 @@ function cull_matrix(M::AbstractAlgebra.MatElem{T}) where T <: RingElement
    culled = Vector{Int}(undef, 0)
    pivots = Vector{Int}(undef, 0)
    col = 1
-   row = 1
    new_col = 1
    for i in 1:nrels
       while M[i, col] == 0
@@ -215,17 +214,27 @@ function cull_matrix(M::AbstractAlgebra.MatElem{T}) where T <: RingElement
          new_col += 1
       end
       if !isunit(M[i, col])
-         push!(culled, row)
+         push!(culled, i)
          push!(gen_cols, col)
          push!(pivots, new_col)
          new_col += 1
       end
       col += 1
-      row += 1
    end
    while col <= ncols(M)
       push!(gen_cols, col)
       col += 1
+   end
+   # if there is only one row left, can remove it if *any* column is a unit
+   if length(culled) == 1
+      for i = pivots[1]:length(gen_cols)
+         if isunit(M[culled[1], gen_cols[i]])
+            pop!(culled) # remove row
+            pop!(pivots) # remove pivot for row
+            deleteat!(gen_cols, i) # remove column corresponding to unit entry
+            break
+         end
+      end
    end
    return gen_cols, culled, pivots
 end
