@@ -42,7 +42,21 @@ function test_module_intersection()
          J1, h1 = intersect(M2, M3)
          J2, h2 = intersect(M1, J1)
 
-         @test I2 == J2
+         @test I2 == J2 # test associativity
+
+         I3, g3 = intersect(M2, M1)
+
+         @test I1 == I3 # test commutativity
+
+         I4, g4 = intersect(M1, M1)
+
+         @test I4 == M1 # test reflexivity
+
+         I5, g5 = intersect(I1, M2)
+         I6, g6 = intersect(I1, M1)
+
+         @test I1 == I5 # test absorption
+         @test I1 == I6
       end
    end
    
