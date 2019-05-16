@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export iscompatible
+export iscompatible, issubmodule
 
 ###############################################################################
 #
@@ -54,6 +54,26 @@ function iscompatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModul
       return true, M1
    end
    return false, M
+end
+
+@doc Markdown.doc"""
+    issubmodule(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+> Return `true` if $N$ was constructed as a submodule of $M$. The relation
+> is taken transitively (i.e. subsubmodules are submodules for the purposes
+> of this relation, etc). The module $M$ is also considered a submodule of
+> itself for this relation.
+"""
+function issubmodule(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+   if M === N
+      return true
+   end
+   while isa(N, Submodule)
+      N = supermodule(N)
+      if M === N
+         return true
+      end
+   end
+   return false
 end
 
 function Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
