@@ -17,6 +17,71 @@ function rand_module(R::AbstractAlgebra.Ring, vals...)
    return M
 end
 
+function test_module_manipulation()
+   print("Generic.Module.manipulation...")
+
+   for R in [ZZ, QQ]
+      for iter = 1:100
+         F = FreeModule(R, 3)
+         M = rand_module(R, -10:10)
+
+         ngens1 = rand(1:5)
+         gens1 = [rand(M, -10:10) for j in 1:ngens1]
+         M1, f1 = Submodule(M, gens1)
+
+         ngens2 = rand(1:5)
+         gens2 = [rand(M1, -10:10) for j in 1:ngens2]
+         M2, f2 = Submodule(M1, gens2)
+
+         Q, g = QuotientModule(M, M1)
+
+         @test issubmodule(M, M)
+         @test issubmodule(M, M1)
+         @test issubmodule(M, M2)
+         @test !issubmodule(M, Q)
+         @test !issubmodule(M1, F)
+         @test !issubmodule(M1, M)
+
+         ngens3 = rand(1:5)
+         gens3 = [rand(M, -10:10) for j in 1:ngens3]
+         M3, f3 = Submodule(M, gens3)
+
+         ngens4 = rand(1:5)
+         gens4 = [rand(M3, -10:10) for j in 1:ngens4]
+         M4, f4 = Submodule(M3, gens4)
+
+         flag, U = iscompatible(M1, M3)
+         @test flag == true && U == M
+
+         flag, U = iscompatible(M1, M4)
+         @test flag == true && U == M
+
+         flag, U = iscompatible(M2, M3)
+         @test flag == true && U == M
+
+         flag, U = iscompatible(M2, M4)
+         @test flag == true && U == M
+
+         flag, U = iscompatible(M, M)
+         @test flag == true && U == M
+
+         flag, U = iscompatible(M1, Q) 
+         @test flag == false
+
+         flag, U = iscompatible(M2, Q)
+         @test flag == false
+
+         flag, U = iscompatible(Q, M1)
+         @test flag == false
+
+         flag, U = iscompatible(Q, M2)
+         @test flag == false
+      end
+   end
+
+   println("PASS")
+end
+
 function test_module_intersection()
    print("Generic.Module.intersection...")
 
@@ -64,6 +129,7 @@ function test_module_intersection()
 end
 
 function test_module()
+   test_module_manipulation()
    test_module_intersection()
 
    println("")

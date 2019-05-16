@@ -7,6 +7,11 @@ function test_submodule_constructors()
    n = M([R(2), R(-1)])
    N, f = Submodule(M, [m, n])
 
+   V = gens(N)
+   for v in V
+      @test parent(f(v)) == M
+   end
+
    @test isa(N, Generic.Submodule)
 
    @test elem_type(N) == Generic.submodule_elem{elem_type(R)}
@@ -22,6 +27,11 @@ function test_submodule_constructors()
    N, f = Subspace(M, [m, n])
 
    @test isa(N, Generic.Submodule)
+   
+   V = gens(N)
+   for v in V
+      @test parent(f(v)) == M
+   end
 
    println("PASS")
 end
