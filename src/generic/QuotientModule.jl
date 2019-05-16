@@ -151,6 +151,10 @@ end
 #
 ###############################################################################
 
+function ==(M::QuotientModule{T}, N::QuotientModule{T}) where T <: RingElement
+   return M.m == N.m && M.rels == N.rels
+end
+
 function ==(m::quotient_module_elem{T}, n::quotient_module_elem{T}) where T <: RingElement
    check_parent(m, n)
    return m.v == n.v
@@ -214,23 +218,44 @@ function projection(v::AbstractAlgebra.MatElem{T}, rels::Vector{<:AbstractAlgebr
    return quotient_module_elem{T}(N, r)
 end
 
-@doc Markdown.doc"""
-    QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where T <: RingElement
-> Return the quotient `M` of the module `m` by the module `sub` (which must
-> have been constructed as a submodule of `m`) along with the canonical
-> quotient map from `m` to `M`.
-"""
 function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where T <: RingElement
-   supermodule(sub) !== m && error("Not a submodule in QuotientModule constructor")
-   nrels = ngens(sub)
-   rels = Vector{dense_matrix_type(T)}(undef, nrels)
-   gens = generators(sub)
-   for i = 1:nrels
-      rels[i] = gens[i].v
+   !issubmodule(m, sub) && error("Not a submodule in QuotientModule constructor")
+   if sub === m # quotient of submodule by itself
+      rels = [v.v for v in gens(sub)]
+      M = QuotientModule{T}(m, rels)
+      f = map_from_func(m, M, x -> zero(M))
+   else
+      nrels = ngens(sub)
+      rels = Vector{dense_matrix_type(T)}(undef, nrels)
+      G = generators(sub)
+      S = sub
+      while supermodule(S) !== m
+         G = [S.m.map(v) for v in G]
+         S = supermodule(S)
+      end
+      for i = 1:nrels
+         rels[i] = G[i].v
+      end
+      M = QuotientModule{T}(m, rels)
+      f = map_from_func(m, M, x -> projection(x.v, rels, M))
    end
-   M = QuotientModule{T}(m, rels)
-   f = map_from_func(m, M, x -> projection(x.v, rels, M))
    M.map = f
    return M, f
 end
 
+@doc Markdown.doc"""
+    QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::AbstractAlgebra.FPModule{T}) where T <: RingElement
+> Return the quotient `M` of the module `m` by the module `sub` (which must
+> have been (transitively) constructed as a submodule of `m` or be `m` itself)
+> along with the canonical quotient map from `m` to `M`.
+"""
+function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::AbstractAlgebra.FPModule{T}) where T <: RingElement
+   # The only case we need to deal with here is where `m == sub`. In all other
+   # cases, sub will be of type Submodule.
+   m !== sub && error("Not a submodule in QuotientModule constructor")
+   rels = [v.v for v in gens(sub)]
+   M = QuotientModule{T}(m, rels)
+   f = map_from_func(m, M, x -> zero(M))
+   M.map = f
+   return M, f   
+   end
