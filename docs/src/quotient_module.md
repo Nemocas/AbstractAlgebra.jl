@@ -1,4 +1,4 @@
-# Submodules
+# Quotient modules
 
 AbstractAlgebra allows the construction of quotient modules/spaces of
 AbstractAlgebra modules. These are given as the quotient of a module and
