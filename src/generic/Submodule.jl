@@ -189,7 +189,7 @@ function Submodule(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: 
       gens = Vector{S}(undef, 0) # original may have generators that are zero
       M = Submodule{T}(m, gens, Vector{dense_matrix_type(T)}(undef, 0),
                        Vector{Int}(undef, 0), Vector{Int}(undef, 0))
-      f = map_from_func(M, m, x -> zero(m))
+      f = ModuleHomomorphism(M, m, matrix(R, 0, 0, []))
       M.map = f
       return M, f
    end
@@ -261,7 +261,8 @@ function Submodule(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: 
    nonzero_gens = [m([mat[i, j] for j = 1:s]) for i = 1:num]
    M = Submodule{T}(m, nonzero_gens, srels, gen_cols, pivots)
    # Compute map from elements of submodule into original module
-   f = map_from_func(M, m, x -> sum(x.v[1, i]*nonzero_gens[gen_cols[i]] for i in 1:ncols(x.v)))
+   hmat = [nonzero_gens[gen_cols[i]].v[1, j] for i in 1:ngens(M) for j in 1:ngens(m)]
+   f = ModuleHomomorphism(M, m, matrix(R, ngens(M), ngens(m), hmat))
    M.map = f
    return M, f
 end
