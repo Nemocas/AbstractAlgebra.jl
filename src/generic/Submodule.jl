@@ -149,14 +149,14 @@ end
 function (N::Submodule{T})(v::Vector{T}) where T <: RingElement
    length(v) != ngens(N) && error("Length of vector does not match number of generators")
    mat = matrix(base_ring(N), 1, length(v), v)
-   mat = reduce_mod_rels(mat, relations(N))
+   mat = reduce_mod_rels(mat, rels(N))
    return submodule_elem{T}(N, mat)
 end
 
 function (N::Submodule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingElement
    ncols(v) != ngens(N) && error("Length of vector does not match number of generators")
    nrows(v) != 1 && ("Not a vector in submodule_elem constructor")
-   v = reduce_mod_rels(v, relations(N))
+   v = reduce_mod_rels(v, rels(N))
    return submodule_elem{T}(N, v)
 end
 
@@ -220,7 +220,7 @@ function Submodule(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: 
    # Rewrite matrix without zero rows and add old relations as rows
    # We flip the rows so the output of kernel is upper triangular with
    # respect to the original data, which saves time in reduced_form
-   old_rels = relations(m)
+   old_rels = rels(m)
    nr = num + length(old_rels)
    new_mat = matrix(base_ring(m), nr, s,
                                   [0 for i in 1:nr*s])
@@ -250,15 +250,15 @@ function Submodule(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: 
    gen_cols, culled, pivots = cull_matrix(new_rels)
    # put all the culled relations into new relations
    T1 = typeof(new_rels)
-   rels = Vector{T1}(undef, length(culled))
+   srels = Vector{T1}(undef, length(culled))
    for i = 1:length(culled)
-      rels[i] = matrix(R, 1, length(gen_cols),
+      srels[i] = matrix(R, 1, length(gen_cols),
                     [new_rels[culled[i], gen_cols[j]]
                        for j in 1:length(gen_cols)])
    end
    # Make submodule whose generators are the nonzero rows of mat
    nonzero_gens = [m([mat[i, j] for j = 1:s]) for i = 1:num]
-   M = Submodule{T}(m, nonzero_gens, rels, gen_cols, pivots)
+   M = Submodule{T}(m, nonzero_gens, srels, gen_cols, pivots)
    # Compute map from elements of submodule into original module
    f = map_from_func(M, m, x -> sum(x.v[1, i]*nonzero_gens[gen_cols[i]] for i in 1:ncols(x.v)))
    M.map = f

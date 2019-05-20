@@ -22,12 +22,12 @@ function zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
-    relations(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
-> Return all relations between generators of the given module, where each
-> relation is given as an element of `M`. The relation matrix whose rows
-> are the returned relations will be in reduced form (hnf/rref).
+    rels(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
+> Return a vector of all the relations between generators of the given
+> module, where each relation is given as row matrix. The relation matrix
+> whose rows are the returned relations will be in reduced form (hnf/rref).
 """
-relations(M::AbstractAlgebra.FPModule{T}) where T <: RingElement = M.rels::Vector{dense_matrix_type(T)}
+rels(M::AbstractAlgebra.FPModule{T}) where T <: RingElement = M.rels::Vector{dense_matrix_type(T)}
 
 @doc Markdown.doc"""
     iscompatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
@@ -97,8 +97,8 @@ function Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPMod
    # Make matrix containing all generators and relations as rows
    r1 = ngens(M)
    r2 = ngens(N)
-   rels = relations(P)
-   r3 = length(rels)
+   prels = rels(P)
+   r3 = length(prels)
    c = ngens(P)
    mat = matrix(base_ring(M), r1 + r2 + r3, c, [0 for i in 1:(r1 + r2 + r3)*c])
    # We flip the rows of the matrix so the input to Submodule is in upper
@@ -116,7 +116,7 @@ function Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPMod
    end
    for i = 1:r3
       for j = 1:c
-         mat[rn - i - r1 - r2 + 1, j] = rels[i][1, j]
+         mat[rn - i - r1 - r2 + 1, j] = prels[i][1, j]
       end
    end
    # Find the left kernel space of the matrix
@@ -148,28 +148,28 @@ function ==(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) wher
       M2 = supermodule(M2)
    end
    # Put (rewritten) gens of M and N into matrices with relations of P
-   rels = relations(P)
+   prels = rels(P)
    c = ngens(P)
    r1 = ngens(M)
    r2 = ngens(N)
-   mat1 = matrix(base_ring(M), r1 + length(rels), c,
-                 [0 for i in 1:(r1 + length(rels))*c])
+   mat1 = matrix(base_ring(M), r1 + length(prels), c,
+                 [0 for i in 1:(r1 + length(prels))*c])
    for i = 1:r1
       for j = 1:c
          mat1[i, j] = G1[i].v[1, j]
       end
    end
-   mat2 = matrix(base_ring(M), r2 + length(rels), c,
-                 [0 for i in 1:(r2 + length(rels))*c])
+   mat2 = matrix(base_ring(M), r2 + length(prels), c,
+                 [0 for i in 1:(r2 + length(prels))*c])
    for i = 1:r2
       for j = 1:c
          mat2[i, j] = G2[i].v[1, j]
       end
    end
-   for i = 1:length(rels)
+   for i = 1:length(prels)
       for j = 1:c
-         mat1[i + r1, j] = rels[i][1, j]
-         mat2[i + r2, j] = rels[i][1, j]
+         mat1[i + r1, j] = prels[i][1, j]
+         mat2[i + r2, j] = prels[i][1, j]
       end
    end
    # Put the matrices into reduced form

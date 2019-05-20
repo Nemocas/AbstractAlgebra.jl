@@ -22,7 +22,7 @@ elem_type(::Type{FreeModule{T}}) where T <: Union{RingElement, NCRingElem} = fre
 
 parent(m::free_module_elem{T}) where T <: Union{RingElement, NCRingElem} = m.parent
 
-function relations(M::FreeModule{T}) where T <: RingElement
+function rels(M::FreeModule{T}) where T <: RingElement
    # there are no relations in a free module
    return Vector{free_module_elem{T}}(undef, 0)
 end

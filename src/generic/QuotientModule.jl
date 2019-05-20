@@ -56,12 +56,12 @@ function show_gens_rels(io::IO, N::AbstractAlgebra.FPModule{T}) where T <: RingE
    else
       print(io, "s and ")
    end
-   if length(relations(N)) == 0
+   if length(rels(N)) == 0
       println(io, "no relations")
    else
       println(io, "relations:")
-      rels = [string(v) for v in relations(N)]
-      print(IOContext(io, :compact => true), join(rels, ", "))
+      Nrels = [string(v) for v in rels(N)]
+      print(IOContext(io, :compact => true), join(Nrels, ", "))
    end
 end
 
@@ -166,12 +166,12 @@ end
 #
 ###############################################################################
 
-function reduce_mod_rels(v::AbstractAlgebra.MatElem{T}, rels::Vector{<:AbstractAlgebra.MatElem{T}}) where T <: RingElement
+function reduce_mod_rels(v::AbstractAlgebra.MatElem{T}, vrels::Vector{<:AbstractAlgebra.MatElem{T}}) where T <: RingElement
    R = base_ring(v)
    v = deepcopy(v) # don't destroy input
    i = 1
    t1 = R()
-   for rel in rels # for each relation
+   for rel in vrels # for each relation
       while iszero(rel[1, i])
          i += 1
       end
@@ -189,14 +189,14 @@ end
 function (N::QuotientModule{T})(v::Vector{T}) where T <: RingElement
    length(v) != ngens(N) && error("Length of vector does not match number of generators")
    mat = matrix(base_ring(N), 1, length(v), v)
-   mat = reduce_mod_rels(mat, relations(N))
+   mat = reduce_mod_rels(mat, rels(N))
    return quotient_module_elem{T}(N, mat)
 end
 
 function (N::QuotientModule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingElement
    ncols(v) != ngens(N) && error("Length of vector does not match number of generators")
    nrows(v) != 1 && ("Not a vector in quotient_module_elem constructor")
-   v = reduce_mod_rels(v, relations(N))
+   v = reduce_mod_rels(v, rels(N))
    return quotient_module_elem{T}(N, v)
 end
 
@@ -206,10 +206,10 @@ end
 #
 ###############################################################################
 
-function projection(v::AbstractAlgebra.MatElem{T}, rels::Vector{<:AbstractAlgebra.MatElem{T}}, N::QuotientModule{T}) where T <: RingElement
+function projection(v::AbstractAlgebra.MatElem{T}, vrels::Vector{<:AbstractAlgebra.MatElem{T}}, N::QuotientModule{T}) where T <: RingElement
    R = base_ring(N)
    # reduce mod relations
-   v = reduce_mod_rels(v, rels)
+   v = reduce_mod_rels(v, vrels)
    # project down to quotient module
    r = zero_matrix(R, 1, ngens(N))
    for i = 1:ngens(N)
@@ -221,12 +221,12 @@ end
 function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where T <: RingElement
    !issubmodule(m, sub) && error("Not a submodule in QuotientModule constructor")
    if sub === m # quotient of submodule by itself
-      rels = [v.v for v in gens(sub)]
-      M = QuotientModule{T}(m, rels)
+      srels = [v.v for v in gens(sub)]
+      M = QuotientModule{T}(m, srels)
       f = map_from_func(m, M, x -> zero(M))
    else
       nrels = ngens(sub)
-      rels = Vector{dense_matrix_type(T)}(undef, nrels)
+      srels = Vector{dense_matrix_type(T)}(undef, nrels)
       G = generators(sub)
       S = sub
       while supermodule(S) !== m
@@ -234,10 +234,10 @@ function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where
          S = supermodule(S)
       end
       for i = 1:nrels
-         rels[i] = G[i].v
+         srels[i] = G[i].v
       end
-      M = QuotientModule{T}(m, rels)
-      f = map_from_func(m, M, x -> projection(x.v, rels, M))
+      M = QuotientModule{T}(m, srels)
+      f = map_from_func(m, M, x -> projection(x.v, srels, M))
    end
    M.map = f
    return M, f
@@ -253,8 +253,8 @@ function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::AbstractAlgebra.FPM
    # The only case we need to deal with here is where `m == sub`. In all other
    # cases, sub will be of type Submodule.
    m !== sub && error("Not a submodule in QuotientModule constructor")
-   rels = [v.v for v in gens(sub)]
-   M = QuotientModule{T}(m, rels)
+   srels = [v.v for v in gens(sub)]
+   M = QuotientModule{T}(m, srels)
    f = map_from_func(m, M, x -> zero(M))
    M.map = f
    return M, f   

@@ -1125,19 +1125,19 @@ mutable struct QuotientModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    base_ring::Ring
    map::FunctionalMap{<:AbstractAlgebra.FPModule{T}, QuotientModule{T}}
 
-   function QuotientModule{T}(M::AbstractAlgebra.FPModule{T}, rels::Vector{S}) where S <:AbstractAlgebra.MatElem{T} where T <: RingElement
+   function QuotientModule{T}(M::AbstractAlgebra.FPModule{T}, qrels::Vector{S}) where S <:AbstractAlgebra.MatElem{T} where T <: RingElement
       # concatenate relations in M and new rels
       R = base_ring(M)
-      old_rels = relations(M)
-      combined_rels = zero_matrix(R, length(old_rels) + length(rels), ngens(M))
+      old_rels = rels(M)
+      combined_rels = zero_matrix(R, length(old_rels) + length(qrels), ngens(M))
       for i = 1:length(old_rels)
          for j = 1:ngens(M)
             combined_rels[i, j] = old_rels[i][1, j]
          end
       end
-      for i = 1:length(rels)
+      for i = 1:length(qrels)
          for j = 1:ngens(M)
-            combined_rels[i + length(old_rels), j] = rels[i][1, j]
+            combined_rels[i + length(old_rels), j] = qrels[i][1, j]
          end
       end
       # compute the hnf/rref of the combined relations
