@@ -1,7 +1,10 @@
 # Module Interface
 
 AbstractAlgebra allows the construction of finitely presented modules (i.e.
-with finitely many generators and relations), starting from free modules.
+with finitely many generators and relations), starting from free modules. The
+generic code provided by AbstractAlgebra will only work for modules over
+euclidean domains, however there is nothing preventing a library from
+implementing more general modules using the same interface.
 
 All finitely presented module types in AbstractAlgebra follow the following
 interface.
