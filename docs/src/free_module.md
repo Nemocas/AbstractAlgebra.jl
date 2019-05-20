@@ -9,7 +9,7 @@ vector space of given dimension over a field to be unique.
 
 AbstractAlgebra provides the type `FreeModule{T}` for free modules, where `T`
 is the type of the elements of the ring $R$ over which the module is built.
-The type `FreeModule{T}` belongs to `AbstractAlgebra.Module{T}`.
+The type `FreeModule{T}` belongs to `AbstractAlgebra.FPModule{T}`.
 
 Vector spaces are simply free modules over a field.
 
