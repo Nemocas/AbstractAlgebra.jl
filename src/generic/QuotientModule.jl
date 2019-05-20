@@ -215,15 +215,16 @@ function projection(v::AbstractAlgebra.MatElem{T}, vrels::Vector{<:AbstractAlgeb
    for i = 1:ngens(N)
       r[1, i] = v[1, N.gen_cols[i]]
    end
-   return quotient_module_elem{T}(N, r)
+   return r
 end
 
 function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where T <: RingElement
    !issubmodule(m, sub) && error("Not a submodule in QuotientModule constructor")
+   R = base_ring(m)
    if sub === m # quotient of submodule by itself
       srels = [v.v for v in gens(sub)]
       M = QuotientModule{T}(m, srels)
-      f = map_from_func(m, M, x -> zero(M))
+      f = ModuleHomomorphism(m, M, matrix(R, 0, ngens(M), []))
    else
       nrels = ngens(sub)
       srels = Vector{dense_matrix_type(T)}(undef, nrels)
@@ -237,7 +238,9 @@ function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where
          srels[i] = G[i].v
       end
       M = QuotientModule{T}(m, srels)
-      f = map_from_func(m, M, x -> projection(x.v, srels, M))
+      hvecs = [projection(x.v, srels, M) for x in gens(m)]
+      hmat = [hvecs[i][1, j] for i in 1:ngens(m) for j in 1:ngens(M)]
+      f = ModuleHomomorphism(m, M, matrix(R, ngens(m), ngens(M), hmat))
    end
    M.map = f
    return M, f
@@ -255,7 +258,7 @@ function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::AbstractAlgebra.FPM
    m !== sub && error("Not a submodule in QuotientModule constructor")
    srels = [v.v for v in gens(sub)]
    M = QuotientModule{T}(m, srels)
-   f = map_from_func(m, M, x -> zero(M))
+   f = ModuleHomomorphism(m, M, matrix(R, 0, ngens(M), []))
    M.map = f
    return M, f   
    end
