@@ -1141,7 +1141,7 @@ mutable struct QuotientModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    gen_cols::Vector{Int} # which original columns correspond to gens of quotient
    pivots::Vector{Int} # pivot column of each culled relation in new rels matrix
    base_ring::Ring
-   map::FunctionalMap{<:AbstractAlgebra.FPModule{T}, QuotientModule{T}}
+   map::ModuleHomomorphism{T}
 
    function QuotientModule{T}(M::AbstractAlgebra.FPModule{T}, qrels::Vector{S}) where S <:AbstractAlgebra.MatElem{T} where T <: RingElement
       # concatenate relations in M and new rels
