@@ -31,14 +31,6 @@ function check_parent(m1::free_module_elem{T}, m2::free_module_elem{T}) where T 
     parent(m1) !== parent(m2) && ("Incompatible free modules")
 end
 
-function isdomain_type(::Type{free_module_elem{T}}) where T <: Union{RingElement, NCRingElem}
-   return isdomain_type(T)
-end
-
-function isexact_type(a::Type{free_module_elem{T}}) where T <: Union{RingElement, NCRingElem}
-   return isexact_type(T)
-end
-
 @doc Markdown.doc"""
     rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem}
 > Return the rank of the given free module.

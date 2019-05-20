@@ -31,6 +31,7 @@ function gen(N::Submodule{T}, i::Int) where T <: RingElement
    return N([(j == i ? one(R) : zero(R)) for j = 1:ngens(N)])
 end
 
+# Generators as elements of supermodule. Used internally.
 generators(N::Submodule{T}) where T <: RingElement = N.gens::Vector{elem_type(N.m)}
 
 @doc Markdown.doc"""
