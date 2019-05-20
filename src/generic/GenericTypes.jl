@@ -1084,6 +1084,24 @@ end
 
 ###############################################################################
 #
+#   ModuleHomomorphism
+#
+###############################################################################
+
+mutable struct ModuleHomomorphism{T <: RingElement} <: AbstractAlgebra.Map{AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModule{T}, AbstractAlgebra.FunctionalMap, ModuleHomomorphism}
+
+   domain::AbstractAlgebra.FPModule{T}
+   codomain::AbstractAlgebra.FPModule{T}
+   matrix::AbstractAlgebra.MatElem{T}
+   image_fn::Function
+
+   function ModuleHomomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
+      z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m))
+   end
+end
+
+###############################################################################
+#
 #   Submodule/submodule_elem
 #
 ###############################################################################
@@ -1095,7 +1113,7 @@ mutable struct Submodule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    gen_cols::Vector{Int}
    pivots::Vector{Int}
    base_ring::Ring
-   map::FunctionalMap{Submodule{T}, <:AbstractAlgebra.FPModule}
+   map::ModuleHomomorphism{T}
 
    function Submodule{T}(M::AbstractAlgebra.FPModule{T}, gens::Vector{<:AbstractAlgebra.FPModuleElem{T}}, rels::Vector{<:AbstractAlgebra.MatElem{T}}, gen_cols::Vector{Int}, pivots::Vector{Int}) where T <: RingElement
       z = new{T}(M, gens, rels, gen_cols, pivots, base_ring(M))
@@ -1164,20 +1182,3 @@ mutable struct quotient_module_elem{T <: RingElement} <: AbstractAlgebra.FPModul
    end
 end
 
-###############################################################################
-#
-#   ModuleHomomorphism
-#
-###############################################################################
-
-mutable struct ModuleHomomorphism{T <: RingElement} <: AbstractAlgebra.Map{AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModule{T}, AbstractAlgebra.FunctionalMap, ModuleHomomorphism}
-
-   domain::AbstractAlgebra.FPModule{T}
-   codomain::AbstractAlgebra.FPModule{T}
-   matrix::AbstractAlgebra.MatElem{T}
-   image_fn::Function
-
-   function ModuleHomomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
-      z = new(D, C, m, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m))
-   end
-end
