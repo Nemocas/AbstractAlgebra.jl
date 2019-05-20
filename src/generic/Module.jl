@@ -35,6 +35,7 @@ rels(M::AbstractAlgebra.FPModule{T}) where T <: RingElement = M.rels::Vector{den
 > (transitively) submodules of the same module, P. Otherwise return `false, M`.
 """
 function iscompatible(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+   check_parent(M, N)
    M1 = M
    M2 = N
    while isa(M1, Submodule)
@@ -64,6 +65,7 @@ end
 > itself for this relation.
 """
 function issubmodule(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+   check_parent(M, N)
    if M === N
       return true
    end
@@ -74,6 +76,14 @@ function issubmodule(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule
       end
    end
    return false
+end
+
+function check_parent(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+   base_ring(M) !== base_ring(N) && error("Incompatible modules")
+end
+
+function check_parent(M::AbstractAlgebra.FPModuleElem{T}, N::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+   parent(M) !== parent(N) && error("Incompatible modules")
 end
 
 ###############################################################################
@@ -89,6 +99,7 @@ end
 > module $P$.
 """
 function Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+   check_parent(M, N)
    # Compute the common supermodule P of M and N
    flag, P = iscompatible(M, N)
    !flag && error("Modules not compatible")
@@ -155,6 +166,7 @@ end
 > etc.) must extend this notion of equality to the modules they create.
 """
 function ==(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+   check_parent(M, N)
    # Compute the common supermodule P of M and N
    flag, P = iscompatible(M, N)
    !flag && error("Modules not compatible")
