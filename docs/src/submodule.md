@@ -10,11 +10,11 @@ submodules also provide the following interface.
 ## Constructors
 
 ```@docs
-Submodule(M::AbstractAlgebra.Module{T}, v::Vector{AbstractAlgebra.ModuleElem{T}}) where T <: RingElement
+Submodule(M::AbstractAlgebra.FPModule{T}, v::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: RingElement
 ```
 
 ```@docs
-Subspace(M::AbstractAlgebra.Module{T}, v::Vector{AbstractAlgebra.ModuleElem{T}}) where T <: FieldElement
+Subspace(M::AbstractAlgebra.FPModule{T}, v::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: FieldElement
 ```
 
 **Examples**

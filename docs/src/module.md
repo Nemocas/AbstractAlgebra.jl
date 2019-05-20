@@ -10,13 +10,16 @@ types of module are restricted to fields and euclidean rings.
 
 ## Types and parents
 
-AbstractAlgebra provides two abstract types for modules and their elements:
+AbstractAlgebra provides two abstract types for finitely presented modules and
+their elements:
 
-  * `Module{T}` is the abstract type for module parent types
-  * `ModuleElem{T}` is the abstract type for module element types
+  * `FPModule{T}` is the abstract type for finitely presented module parent
+types
+  * `FPModuleElem{T}` is the abstract type for finitely presented module
+element types
 
-Note that the abstract types are parameterised. The type `T` should usually be the type
-of elements of the ring the module is over.
+Note that the abstract types are parameterised. The type `T` should usually be
+the type of elements of the ring the module is over.
 
 ## Required functionality for modules
 

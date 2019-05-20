@@ -10,11 +10,11 @@ submodules also provide the following interface.
 ## Constructors
 
 ```@docs
-QuotientModule(M::AbstractAlgebra.Module{T}, v::Generic.Submodule{T}) where T <: RingElement
+QuotientModule(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: RingElement
 ```
 
 ```@docs
-QuotientSpace(M::AbstractAlgebra.Module{T}, v::Generic.Submodule{T}) where T <: FieldElement
+QuotientSpace(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: FieldElement
 
 ```
 
