@@ -94,7 +94,7 @@ will lie in the module $M$.
 ### Arithmetic operators
 
 Elements of a module can be added, subtracted or multiplied by an element of
-the ring the module is defined over.
+the ring the module is defined over and compared for equality.
 
 In the case of a noncommutative ring, both left and right scalar multiplication
 are defined.
@@ -105,8 +105,10 @@ AbstractAlgebra provides the following functionality for all module types
 that implement the interface above. Of course, this functionality can also
 be provided by special implementations if desired.
 
+### Basic manipulation
+
 ```@docs
-zero(M::FPModule{T}) where T <: RingElement
+zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -115,5 +117,18 @@ zero(M::FPModule{T}) where T <: RingElement
 M = FreeModule(QQ, 2)
 
 z = zero(M)
+```
+### Comparison
+
+```@docs
+==(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElement
+```
+
+**Examples**
+
+```julia
+M = FreeModule(QQ, 2)
+
+M == M
 ```
 

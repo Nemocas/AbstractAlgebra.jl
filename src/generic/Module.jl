@@ -76,6 +76,18 @@ function issubmodule(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule
    return false
 end
 
+###############################################################################
+#
+#   Intersection
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+> Return the intersection of the modules $M$ as a submodule of $M$. Note that
+> $M$ and $N$ must be (constructed as) submodules (transitively) of some common
+> module $P$.
+"""
 function Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
    # Compute the common supermodule P of M and N
    flag, P = iscompatible(M, N)
@@ -129,6 +141,19 @@ function Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPMod
    return Submodule(M, I)
 end
 
+###############################################################################
+#
+#   Comparison
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    ==(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
+> Return `true` if the modules are (constructed to be) the same module
+> elementwise. This is not object equality and it is not isomorphism. In fact,
+> each method of constructing modules (submodules, quotient modules, products,
+> etc.) must extend this notion of equality to the modules they create.
+"""
 function ==(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
    # Compute the common supermodule P of M and N
    flag, P = iscompatible(M, N)
