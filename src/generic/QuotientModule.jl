@@ -223,16 +223,21 @@ function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where
    if sub === m # quotient of submodule by itself
       srels = [v.v for v in gens(sub)]
       M = QuotientModule{T}(m, srels)
-      f = ModuleHomomorphism(m, M, matrix(R, 0, ngens(M), []))
+      f = ModuleHomomorphism(m, M,
+          matrix(R, ngens(m), 0, []))
    else
-      nrels = ngens(sub)
-      srels = Vector{dense_matrix_type(T)}(undef, nrels)
       G = generators(sub)
       S = sub
-      while supermodule(S) !== m
-         G = [S.m.map(v) for v in G]
-         S = supermodule(S)
+      if supermodule(S) !== m
+         while supermodule(S) !== m
+            G = elem_type(typeof(supermodule(S.m)))[S.m.map(v) for v in G]
+            S = supermodule(S)
+         end
+         sub, v = Submodule(m, G)
+         G = generators(sub)
       end
+      nrels = ngens(sub)
+      srels = Vector{dense_matrix_type(T)}(undef, nrels)
       for i = 1:nrels
          srels[i] = G[i].v
       end
@@ -257,7 +262,7 @@ function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::AbstractAlgebra.FPM
    m !== sub && error("Not a submodule in QuotientModule constructor")
    srels = [v.v for v in gens(sub)]
    M = QuotientModule{T}(m, srels)
-   f = ModuleHomomorphism(m, M, matrix(R, 0, ngens(M), []))
+   f = ModuleHomomorphism(m, M, matrix(R, ngens(m), 0, []))
    M.map = f
    return M, f   
 end
