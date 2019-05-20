@@ -39,10 +39,6 @@ end
 """
 supermodule(M::QuotientModule{T}) where T <: RingElement = M.m
 
-function check_parent(v1::quotient_module_elem{T}, v2::quotient_module_elem{T}) where T <: RingElement
-   parent(v1) !== parent(v2) && error("Incompatible module elements")
-end
-
 ###############################################################################
 #
 #   String I/O
@@ -126,6 +122,7 @@ end
 ###############################################################################
 
 function *(v::quotient_module_elem{T}, c::T) where T <: RingElem
+   base_ring(v) != parent(c) && error("Incompatible rings")
    N = parent(v)
    return N(v.v*c)
 end
@@ -136,6 +133,7 @@ function *(v::quotient_module_elem{T}, c::U) where {T <: RingElement, U <: Union
 end
 
 function *(c::T, v::quotient_module_elem{T}) where T <: RingElem
+   base_ring(v) != parent(c) && error("Incompatible rings")
    N = parent(v)
    return N(c*v.v)
 end
@@ -152,6 +150,7 @@ end
 ###############################################################################
 
 function ==(M::QuotientModule{T}, N::QuotientModule{T}) where T <: RingElement
+   check_parent(M, N)
    return M.m == N.m && M.rels == N.rels
 end
 
@@ -261,4 +260,4 @@ function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::AbstractAlgebra.FPM
    f = ModuleHomomorphism(m, M, matrix(R, 0, ngens(M), []))
    M.map = f
    return M, f   
-   end
+end

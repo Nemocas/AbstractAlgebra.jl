@@ -40,10 +40,6 @@ generators(N::Submodule{T}) where T <: RingElement = N.gens::Vector{elem_type(N.
 """
 supermodule(M::Submodule{T}) where T <: RingElement = M.m
 
-function check_parent(v1::submodule_elem{T}, v2::submodule_elem{T}) where T <: RingElement
-   parent(v1) !== parent(v2) && error("Incompatible module elements")
-end
-
 ###############################################################################
 #
 #   String I/O
@@ -111,6 +107,7 @@ end
 ###############################################################################
 
 function *(v::submodule_elem{T}, c::T) where T <: RingElem
+   base_ring(v) != parent(c) && error("Incompatible rings")
    N = parent(v)
    return N(v.v*c)
 end
@@ -121,6 +118,7 @@ function *(v::submodule_elem{T}, c::U) where {T <: RingElement, U <: Union{Ratio
 end
 
 function *(c::T, v::submodule_elem{T}) where T <: RingElem
+   base_ring(v) != parent(c) && error("Incompatible rings")
    N = parent(v)
    return N(c*v.v)
 end
