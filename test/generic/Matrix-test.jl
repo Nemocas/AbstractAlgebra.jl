@@ -1450,10 +1450,10 @@ function test_gen_mat_hnf_minors()
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    H = hnf_minors(A)
-   @test istriu(H)
+   @test ishnf(H)
 
    H, U = hnf_minors_with_transform(A)
-   @test istriu(H)
+   @test ishnf(H)
    @test isunit(det(U))
    @test U*A == H
 
@@ -1469,10 +1469,10 @@ function test_gen_mat_hnf_minors()
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5; y 1 y 2]))
 
    H = hnf_minors(B)
-   @test istriu(H)
+   @test ishnf(H)
 
    H, U = hnf_minors_with_transform(B)
-   @test istriu(H)
+   @test ishnf(H)
    @test isunit(det(U))
    @test U*B == H
 
@@ -1489,10 +1489,10 @@ function test_gen_mat_hnf_kb()
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    H = AbstractAlgebra.hnf_kb(A)
-   @test istriu(H)
+   @test ishnf(H)
 
    H, U = AbstractAlgebra.hnf_kb_with_transform(A)
-   @test istriu(H)
+   @test ishnf(H)
    @test isunit(det(U))
    @test U*A == H
 
@@ -1508,10 +1508,10 @@ function test_gen_mat_hnf_kb()
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
    H = AbstractAlgebra.hnf_kb(B)
-   @test istriu(H)
+   @test ishnf(H)
 
    H, U = AbstractAlgebra.hnf_kb_with_transform(B)
-   @test istriu(H)
+   @test ishnf(H)
    @test isunit(det(U))
    @test U*B == H
 
@@ -1528,10 +1528,10 @@ function test_gen_mat_hnf_cohen()
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    H = AbstractAlgebra.hnf_cohen(A)
-   @test istriu(H)
+   @test ishnf(H)
 
    H, U = AbstractAlgebra.hnf_cohen_with_transform(A)
-   @test istriu(H)
+   @test ishnf(H)
    @test isunit(det(U))
    @test U*A == H
 
@@ -1547,10 +1547,10 @@ function test_gen_mat_hnf_cohen()
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
    H = AbstractAlgebra.hnf_cohen(B)
-   @test istriu(H)
+   @test ishnf(H)
 
    H, U = AbstractAlgebra.hnf_cohen_with_transform(B)
-   @test istriu(H)
+   @test ishnf(H)
    @test isunit(det(U))
    @test U*B == H
 
@@ -1567,10 +1567,10 @@ function test_gen_mat_hnf()
    A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5; x^4+1 x^2 x^5+x^3]))
 
    H = hnf(A)
-   @test istriu(H)
+   @test ishnf(H)
 
    H, U = hnf_with_transform(A)
-   @test istriu(H)
+   @test ishnf(H)
    @test isunit(det(U))
    @test U*A == H
 
@@ -1586,10 +1586,10 @@ function test_gen_mat_hnf()
    B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5]))
 
    H = hnf(B)
-   @test istriu(H)
+   @test ishnf(H)
 
    H, U = hnf_with_transform(B)
-   @test istriu(H)
+   @test ishnf(H)
    @test isunit(det(U))
    @test U*B == H
 
