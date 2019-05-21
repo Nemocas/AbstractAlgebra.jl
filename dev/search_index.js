@@ -3801,14 +3801,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "matrix_spaces/#Optional-constructors-1",
-    "page": "Matrix Interface",
-    "title": "Optional constructors",
-    "category": "section",
-    "text": "The following can only be used to construct matrices in a matrix space, not a matrix algebra.eye(M::MyMat{T}) where T <: AbstractAlgebra.RingElemConstruct the identity matrix with the same dimensions and base ring as the given matrix.eye(M::MyMat{T}, n::Int) where T <: AbstractAlgebra.RingElemConstruct the ntimes n identity matrix with the same base ring as the given matrix.ExamplesM = matrix(ZZ, BigInt[1 2 3; 4 5 6])\n\nN = eye(M)\nP = eye(M, 2)"
-},
-
-{
     "location": "matrix_spaces/#Optional-submatrices-1",
     "page": "Matrix Interface",
     "title": "Optional submatrices",
@@ -4089,11 +4081,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix/#AbstractAlgebra.Generic.ishnf-Union{Tuple{MatElem{T}}, Tuple{T}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.ishnf",
+    "category": "method",
+    "text": "ishnf(M::Generic.MatrixElem{T}) where T <: RingElement\n\nReturn true if the matrix is in Hermite normal form.\n\n\n\n"
+},
+
+{
     "location": "matrix/#Hermite-normal-form-1",
     "page": "Generic matrices",
     "title": "Hermite normal form",
     "category": "section",
-    "text": "hnf{T <: RingElem}(::MatElem{T})\nhnf_with_transform{T <: RingElem}(::MatElem{T})"
+    "text": "hnf{T <: RingElem}(::MatElem{T})\nhnf_with_transform{T <: RingElem}(::MatElem{T})ishnf{T <: RingElem}(::MatElem{T})"
 },
 
 {
