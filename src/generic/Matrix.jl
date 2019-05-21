@@ -19,7 +19,7 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
        hnf_kb_with_transform, hnf_cohen, hnf_cohen_with_transform, snf_kb,
        snf_kb_with_transform, find_pivot_popov, inv!, zero_matrix,
        kronecker_product, minors, tr, lu, lu!, pseudo_inv, dense_matrix_type,
-       kernel, iszero_row, iszero_column, left_kernel, right_kernel
+       kernel, iszero_row, iszero_column, left_kernel, right_kernel, ishnf
 
 ###############################################################################
 #
@@ -3585,6 +3585,53 @@ end
 """
 function hnf_with_transform(A)
   return hnf_kb_with_transform(A)
+end
+
+@doc Markdown.doc"""
+    ishnf(M::Generic.MatrixElem{T}) where T <: RingElement
+> Return `true` if the matrix is in Hermite normal form.
+"""
+function ishnf(M::Generic.MatrixElem{T}) where T <: RingElement
+   r = nrows(M)
+   c = ncols(M)
+   row = 1
+   col = 1
+   pivots = zeros(Int, r)
+   # first check the staircase, since it is cheap to do
+   while row <= r
+      while col <= c && M[row, col] == 0
+         for i = row + 1:r
+            if M[i, col] != 0
+               return false
+            end
+         end
+         col += 1
+      end
+      if col <= c # found pivot
+         pivots[row] = col
+         for i = row + 1:r
+            if M[i, col] != 0
+               return false
+            end
+         end
+      end
+      row += 1
+      col += 1
+   end
+   # now check everything above pivots is reduced (expensive)
+   row = 1
+   while row <= r && pivots[row] != 0
+      col = pivots[row]
+      p = M[row, col]
+      for i = 1:row - 1
+         qq, rr = divrem(M[i, col], p)
+         if rr != M[i, col]
+            return false
+         end
+      end
+      row += 1
+   end
+   return true
 end
 
 ###############################################################################

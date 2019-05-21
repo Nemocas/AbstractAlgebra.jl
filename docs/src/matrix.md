@@ -350,6 +350,10 @@ hnf{T <: RingElem}(::MatElem{T})
 hnf_with_transform{T <: RingElem}(::MatElem{T})
 ```
 
+```@docs
+ishnf{T <: RingElem}(::MatElem{T})
+```
+
 ### Determinant
 
 ```@docs
