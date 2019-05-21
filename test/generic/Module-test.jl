@@ -79,6 +79,25 @@ function test_module_manipulation()
       end
    end
 
+   # Regression test: triggers crash if Submodule
+   # doesn't doesn't reduce generators mod relations
+   # and put in hnf
+
+   F = FreeModule(ZZ, 3)
+
+   m = F(BigInt[-10, -5, -1])
+   n = F(BigInt[0, -2, -9])
+   S, f = Submodule(F, [m, n])
+
+   Q, g = QuotientModule(F, S)
+
+   b = Q(BigInt[2, 0, 4])
+   c = Q(BigInt[7, 1, -59])
+   d = Q(BigInt[4, 0, 23])
+   T, h = Submodule(Q, [b, c, d])
+
+   U, k = QuotientModule(Q, T)
+
    println("PASS")
 end
 
