@@ -282,33 +282,6 @@ rather than relying on the generic functionality. The following are all provided
 the AbstractAlgebra.jl generic code, but can optionally be implemented directly for
 performance reasons.
 
-### Optional constructors
-
-The following can only be used to construct matrices in a matrix space, not a matrix
-algebra.
-
-```julia
-eye(M::MyMat{T}) where T <: AbstractAlgebra.RingElem
-```
-
-Construct the identity matrix with the same dimensions and base ring as the given
-matrix.
-
-```julia
-eye(M::MyMat{T}, n::Int) where T <: AbstractAlgebra.RingElem
-```
-
-Construct the $n\times n$ identity matrix with the same base ring as the given matrix.
-
-**Examples**
-
-```julia
-M = matrix(ZZ, BigInt[1 2 3; 4 5 6])
-
-N = eye(M)
-P = eye(M, 2)
-```
-
 ### Optional submatrices
 
 The following are only available for matrix spaces, not for matrix algebras.
