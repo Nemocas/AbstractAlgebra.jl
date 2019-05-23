@@ -22,6 +22,14 @@ function zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
+    iszero(v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+> Return true if $v$ is the zero element of the module $M$.
+"""
+function iszero(v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+   return iszero(v.v)
+end
+
+@doc Markdown.doc"""
     rels(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
 > Return a vector of all the relations between generators of the given
 > module, where each relation is given as row matrix. The relation matrix
@@ -123,7 +131,7 @@ function Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPMod
    prels = rels(P)
    r3 = length(prels)
    c = ngens(P)
-   mat = matrix(base_ring(M), r1 + r2 + r3, c, [0 for i in 1:(r1 + r2 + r3)*c])
+   mat = zero_matrix(base_ring(M), r1 + r2 + r3, c)
    # We flip the rows of the matrix so the input to Submodule is in upper
    # triangular form
    rn = r1 + r2 + r3
@@ -189,15 +197,13 @@ function ==(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) wher
    c = ngens(P)
    r1 = ngens(M)
    r2 = ngens(N)
-   mat1 = matrix(base_ring(M), r1 + length(prels), c,
-                 [0 for i in 1:(r1 + length(prels))*c])
+   mat1 = zero_matrix(base_ring(M), r1 + length(prels), c)
    for i = 1:r1
       for j = 1:c
          mat1[i, j] = G1[i].v[1, j]
       end
    end
-   mat2 = matrix(base_ring(M), r2 + length(prels), c,
-                 [0 for i in 1:(r2 + length(prels))*c])
+   mat2 = zero_matrix(base_ring(M), r2 + length(prels), c)
    for i = 1:r2
       for j = 1:c
          mat2[i, j] = G2[i].v[1, j]
@@ -251,7 +257,7 @@ end
 # gen_cols, culled, pivots where all rows and columns corresponding to unit
 # pivots have been removed, gen_cols is a list of columns without unit pivots,
 # culled is an array of row (indices) that have not been removed and pivots[i]
-# is the pivot column of the $i$-th row of the culled matrix
+# is the pivot column of the $i$-th row of the culled matrix.
 function cull_matrix(M::AbstractAlgebra.MatElem{T}) where T <: RingElement
    # count the nonzero rows
    nrels = nrows(M)
@@ -281,17 +287,6 @@ function cull_matrix(M::AbstractAlgebra.MatElem{T}) where T <: RingElement
    while col <= ncols(M)
       push!(gen_cols, col)
       col += 1
-   end
-   # if there is only one row left, can remove it if *any* column is a unit
-   if length(culled) == 1
-      for i = pivots[1]:length(gen_cols)
-         if isunit(M[culled[1], gen_cols[i]])
-            pop!(culled) # remove row
-            pop!(pivots) # remove pivot for row
-            deleteat!(gen_cols, i) # remove column corresponding to unit entry
-            break
-         end
-      end
    end
    return gen_cols, culled, pivots
 end

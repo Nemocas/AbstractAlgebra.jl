@@ -11,7 +11,7 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
        powers, randmat_triu, randmat_with_rank, similarity!, solve,
        solve_rational, hnf, hnf_kb, hnf_kb_with_transform, hnf_with_transform,
        issquare, snf, snf_with_transform, weak_popov,
-       weak_popov_with_transform, can_solve_left_row_hnf,
+       weak_popov_with_transform, can_solve_left_reduced_triu,
        extended_weak_popov, extended_weak_popov_with_transform, rank,
        rank_profile_popov, hnf_via_popov, hnf_via_popov_with_transform, popov,
        popov_with_transform, det_popov, _check_dim, nrows, ncols, gram, rref,
@@ -2115,7 +2115,7 @@ end
 
 ###############################################################################
 #
-#   Can solve with hnf
+#   Can solve
 #
 ###############################################################################
 
@@ -3626,7 +3626,7 @@ function ishnf(M::Generic.MatrixElem{T}) where T <: RingElement
       col = pivots[row]
       p = M[row, col]
       for i = 1:row - 1
-         qq, rr = divrem(M[i, col], p)
+         qq, rr = AbstractAlgebra.divrem(M[i, col], p)
          if rr != M[i, col]
             return false
          end

@@ -8,6 +8,14 @@ export ModuleHomomorphism
 
 ###############################################################################
 #
+#   Basic manipulation
+#
+###############################################################################
+
+mat(f::ModuleHomomorphism{T}) where T <: RingElement = f.matrix
+
+###############################################################################
+#
 #   String I/O
 #
 ###############################################################################
@@ -19,6 +27,50 @@ function show(io::IO, f::ModuleHomomorphism)
    println(io, "")
    print(io, "Codomain: ")
    print(IOContext(io, :compact => true), codomain(f))
+end
+
+###############################################################################
+#
+#   Kernel
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    kernel(f::ModuleHomomorphism{T}) where T <: RingElement
+> Returns a pair `K, f` consisting of the kernel object $K$ of the given module
+> homomorphism $f$ (as a submodule of its domain) and the canonical injection
+> from the kernel into the domain of $f$
+"""
+function kernel(f::ModuleHomomorphism{T}) where T <: RingElement
+   D = domain(f)
+   C = codomain(f)
+   R = base_ring(D)
+   crels = rels(C)
+   M = mat(f)
+   # put domain relations and M in a big matrix
+   # swap rows so we can get upper triangular wrt original data
+   nr = nrows(M) + length(crels)
+   N = zero_matrix(R, nr, ncols(M))
+   for i = 1:nrows(M)
+      for j = 1:ncols(M)
+         N[nr - i + 1, j] = M[i, j]
+      end
+   end
+   for i = 1:length(crels)
+      for j = 1:ncols(M)
+         N[nr - i - nrows(M) + 1, j] = crels[i][1, j]
+      end
+   end
+   # compute the kernel
+   num_gens, K = left_kernel(N)
+   # Construct generators of kernel submodule, reversing rows
+   # and columns so they're correct wrt to original data and
+   # in upper triangular form
+   V = Vector{elem_type(D)}(undef, num_gens)
+   for j = 1:num_gens
+      V[j] = D([K[num_gens - j + 1, nr - k + 1] for k = 1:nrows(M)])
+   end
+   return Submodule(D, V)
 end
 
 ###############################################################################

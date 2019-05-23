@@ -197,7 +197,7 @@ function Submodule(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: 
    end
    # Make generators rows of a matrix
    s = ngens(m)
-   mat = matrix(base_ring(m), r, s, [0 for i in 1:r*s])
+   mat = zero_matrix(base_ring(m), r, s)
    for i = 1:r
       parent(gens[i]) !== m && error("Incompatible module elements")
       for j = 1:s
@@ -232,8 +232,7 @@ function Submodule(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: 
    # We flip the rows so the output of kernel is upper triangular with
    # respect to the original data, which saves time in reduced_form
    nr = num + length(old_rels)
-   new_mat = matrix(base_ring(m), nr, s,
-                                  [0 for i in 1:nr*s])
+   new_mat = zero_matrix(base_ring(m), nr, s)
    for i = 1:num
       for j = 1:s
          new_mat[nr - i + 1, j] = mat[i, j]
@@ -246,7 +245,7 @@ function Submodule(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: 
    end
    # Rewrite old relations in terms of generators of new submodule
    num_rels, K = left_kernel(new_mat)
-   new_rels = matrix(base_ring(m), num_rels, num, [0 for i in 1:num_rels*num])
+   new_rels = zero_matrix(base_ring(m), num_rels, num)
    # we flip rows and columns so that input is in terms of original data and
    # in upper triangular form, to save time in reduced_form below
    for j = 1:num_rels

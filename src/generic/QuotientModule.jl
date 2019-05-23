@@ -170,9 +170,16 @@ function reduce_mod_rels(v::AbstractAlgebra.MatElem{T}, vrels::Vector{<:Abstract
    v = deepcopy(v) # don't destroy input
    i = 1
    t1 = R()
-   for rel in vrels # for each relation
+   nurel = 0
+   nunum = 0
+   for k = 1:length(vrels) # for each relation
+      rel = vrels[k]
       while iszero(rel[1, i])
          i += 1
+      end
+      if !isunit(rel[1, i])
+         nunum += 1
+         nurel = k
       end
       q, v[1, i] = AbstractAlgebra.divrem(v[1, i], rel[1, i])
       q = -q
@@ -205,8 +212,18 @@ end
 #
 ###############################################################################
 
-function projection(v::AbstractAlgebra.MatElem{T}, vrels::Vector{<:AbstractAlgebra.MatElem{T}}, N::QuotientModule{T}) where T <: RingElement
+function projection(v::AbstractAlgebra.MatElem{T}, crels::AbstractAlgebra.MatElem{T}, N::QuotientModule{T}) where {T <: RingElement}
    R = base_ring(N)
+   # remove zero rows
+   nr = nrows(crels)
+   while nr > 0 && iszero_row(crels, nr)
+      nr -= 1
+   end
+   # put into row vectors
+   vrels = Vector{dense_matrix_type(T)}(undef, nr)
+   for i = 1:nr
+      vrels[i] = matrix(R, 1, ncols(crels), [crels[i, j] for j in 1:ncols(crels)])
+   end
    # reduce mod relations
    v = reduce_mod_rels(v, vrels)
    # project down to quotient module
@@ -217,12 +234,35 @@ function projection(v::AbstractAlgebra.MatElem{T}, vrels::Vector{<:AbstractAlgeb
    return r
 end
 
+function compute_combined_rels(m::AbstractAlgebra.FPModule{T}, srels::Vector{S}) where {T <: RingElement, S <: AbstractAlgebra.MatElem{T}}
+   # concatenate relations in m and new rels
+   R = base_ring(m)
+   old_rels = rels(m)
+   combined_rels = zero_matrix(R, length(old_rels) + length(srels), ngens(m))
+   for i = 1:length(old_rels)
+      for j = 1:ngens(m)
+         combined_rels[i, j] = old_rels[i][1, j]
+      end
+   end
+   for i = 1:length(srels)
+      for j = 1:ngens(m)
+         combined_rels[i + length(old_rels), j] = srels[i][1, j]
+      end
+   end
+   # compute the hnf/rref of the combined relations
+println("combined_rels1 = ", combined_rels)
+   combined_rels = reduced_form(combined_rels)
+println("combined_rels2 = ", combined_rels)
+   return combined_rels
+end
+
 function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where T <: RingElement
    !issubmodule(m, sub) && error("Not a submodule in QuotientModule constructor")
    R = base_ring(m)
    if sub === m # quotient of submodule by itself
       srels = [v.v for v in gens(sub)]
-      M = QuotientModule{T}(m, srels)
+      combined_rels = compute_combined_rels(m, srels)
+      M = QuotientModule{T}(m, combined_rels)
       f = ModuleHomomorphism(m, M,
           matrix(R, ngens(m), 0, []))
    else
@@ -241,8 +281,10 @@ function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where
       for i = 1:nrels
          srels[i] = G[i].v
       end
-      M = QuotientModule{T}(m, srels)
-      hvecs = [projection(x.v, srels, M) for x in gens(m)]
+      combined_rels = compute_combined_rels(m, srels)
+println("combined_rels = ", combined_rels)
+      M = QuotientModule{T}(m, combined_rels)
+      hvecs = [projection(x.v, combined_rels, M) for x in gens(m)]
       hmat = [hvecs[i][1, j] for i in 1:ngens(m) for j in 1:ngens(M)]
       f = ModuleHomomorphism(m, M, matrix(R, ngens(m), ngens(M), hmat))
    end
@@ -261,7 +303,8 @@ function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::AbstractAlgebra.FPM
    # cases, sub will be of type Submodule.
    m !== sub && error("Not a submodule in QuotientModule constructor")
    srels = [v.v for v in gens(sub)]
-   M = QuotientModule{T}(m, srels)
+   combined_rels = compute_combined_rels(m, srels)
+   M = QuotientModule{T}(m, combined_rels)
    f = ModuleHomomorphism(m, M, matrix(R, ngens(m), 0, []))
    M.map = f
    return M, f   
