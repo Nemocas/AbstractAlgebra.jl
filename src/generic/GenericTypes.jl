@@ -1143,23 +1143,9 @@ mutable struct QuotientModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    base_ring::Ring
    map::ModuleHomomorphism{T}
 
-   function QuotientModule{T}(M::AbstractAlgebra.FPModule{T}, qrels::Vector{S}) where S <:AbstractAlgebra.MatElem{T} where T <: RingElement
+   function QuotientModule{T}(M::AbstractAlgebra.FPModule{T}, combined_rels::AbstractAlgebra.MatElem{T}) where T <: RingElement
       # concatenate relations in M and new rels
       R = base_ring(M)
-      old_rels = rels(M)
-      combined_rels = zero_matrix(R, length(old_rels) + length(qrels), ngens(M))
-      for i = 1:length(old_rels)
-         for j = 1:ngens(M)
-            combined_rels[i, j] = old_rels[i][1, j]
-         end
-      end
-      for i = 1:length(qrels)
-         for j = 1:ngens(M)
-            combined_rels[i + length(old_rels), j] = qrels[i][1, j]
-         end
-      end
-      # compute the hnf/rref of the combined relations
-      combined_rels = reduced_form(combined_rels)
       # remove zero rows and all rows/cols corresponding to unit pivots
       gen_cols, culled, pivots = cull_matrix(combined_rels)
       # put all the culled relations into new relations
