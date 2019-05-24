@@ -250,9 +250,7 @@ function compute_combined_rels(m::AbstractAlgebra.FPModule{T}, srels::Vector{S})
       end
    end
    # compute the hnf/rref of the combined relations
-println("combined_rels1 = ", combined_rels)
    combined_rels = reduced_form(combined_rels)
-println("combined_rels2 = ", combined_rels)
    return combined_rels
 end
 
@@ -282,7 +280,6 @@ function QuotientModule(m::AbstractAlgebra.FPModule{T}, sub::Submodule{T}) where
          srels[i] = G[i].v
       end
       combined_rels = compute_combined_rels(m, srels)
-println("combined_rels = ", combined_rels)
       M = QuotientModule{T}(m, combined_rels)
       hvecs = [projection(x.v, combined_rels, M) for x in gens(m)]
       hmat = [hvecs[i][1, j] for i in 1:ngens(m) for j in 1:ngens(M)]

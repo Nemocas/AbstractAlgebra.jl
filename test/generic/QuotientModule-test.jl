@@ -36,7 +36,7 @@ function test_quotient_module_constructors()
    @test isa(Q, Generic.QuotientModule)
 
    for R in [ZZ, QQ]
-      for iter = 1:40000
+      for iter = 1:40
          M = rand_module(R, -10:10)
          ngens1 = rand(1:5)
          S = [rand(M, -10:10) for i in 1:ngens1]

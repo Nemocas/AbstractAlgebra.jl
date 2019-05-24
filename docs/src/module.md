@@ -46,6 +46,12 @@ a noncommutative ring.
 ### Basic manipulation
 
 ```julia
+iszero(m::MyModuleElem{T}) where T <: RingElement
+```
+
+Return `true` if the given module element is zero.
+
+```julia
 ngens(M::MyModule{T}) where T <: RingElement
 ```
 
@@ -79,6 +85,7 @@ n = ngens(M)
 G = gens(M)
 R = rels(M)
 g1 = gen(M, 1)
+!iszero(g1)
 ```
 
 ### Element constructors
