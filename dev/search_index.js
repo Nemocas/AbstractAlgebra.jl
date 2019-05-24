@@ -3421,7 +3421,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Interface",
     "title": "Basic manipulation",
     "category": "section",
-    "text": "ngens(M::MyModule{T}) where T <: RingElementReturn the number of generators of the module M in its current representation.gen(M::MyModule{T}, i::Int) where T <: RingElementReturn the i-th generator (indexed from 1) of the module M.gens(M::MyModule{T}) where T <: RingElementReturn a Julia array of the generators of the module M.rels(M::MyModule{T}) where T <: RingElementReturn a Julia vector of all the relations between the generators of M. Each relation is given as an AbstractAlgebra row matrix.ExamplesM = FreeModule(QQ, 2)\n\nn = ngens(M)\nG = gens(M)\nR = rels(M)\ng1 = gen(M, 1)"
+    "text": "iszero(m::MyModuleElem{T}) where T <: RingElementReturn true if the given module element is zero.ngens(M::MyModule{T}) where T <: RingElementReturn the number of generators of the module M in its current representation.gen(M::MyModule{T}, i::Int) where T <: RingElementReturn the i-th generator (indexed from 1) of the module M.gens(M::MyModule{T}) where T <: RingElementReturn a Julia array of the generators of the module M.rels(M::MyModule{T}) where T <: RingElementReturn a Julia vector of all the relations between the generators of M. Each relation is given as an AbstractAlgebra row matrix.ExamplesM = FreeModule(QQ, 2)\n\nn = ngens(M)\nG = gens(M)\nR = rels(M)\ng1 = gen(M, 1)\n!iszero(g1)"
 },
 
 {
@@ -3713,6 +3713,22 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "module_homomorphism/#Module-Homomorphisms-1",
+    "page": "Module Homomorphisms",
+    "title": "Module Homomorphisms",
+    "category": "section",
+    "text": "Abstract Algebra provides homomorphisms of finitely presented modules."
+},
+
+{
+    "location": "module_homomorphism/#Generic-functionality-1",
+    "page": "Module Homomorphisms",
+    "title": "Generic functionality",
+    "category": "section",
+    "text": "The following generic functionality is provided for module homomorphisms."
+},
+
+{
     "location": "module_homomorphism/#AbstractAlgebra.Generic.ModuleHomomorphism-Union{Tuple{T}, Tuple{FPModule{T},FPModule{T},MatElem{T}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
     "page": "Module Homomorphisms",
     "title": "AbstractAlgebra.Generic.ModuleHomomorphism",
@@ -3721,11 +3737,27 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "module_homomorphism/#Module-Homomorphisms-1",
+    "location": "module_homomorphism/#Constructors-1",
     "page": "Module Homomorphisms",
-    "title": "Module Homomorphisms",
+    "title": "Constructors",
     "category": "section",
     "text": "Homomorphisms of AbstractAlgebra modules, f  R^s to R^t, can be represented by stimes t matrices over R.Generic.ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElementExamplesM = FreeModule(ZZ, 2)\nf = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))\n\nm = M([ZZ(1), ZZ(2)])\n\nf(m)"
+},
+
+{
+    "location": "module_homomorphism/#AbstractAlgebra.Generic.kernel-Union{Tuple{ModuleHomomorphism{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Module Homomorphisms",
+    "title": "AbstractAlgebra.Generic.kernel",
+    "category": "method",
+    "text": "kernel(f::ModuleHomomorphism{T}) where T <: RingElement\n\nReturns a pair K, f consisting of the kernel object K of the given module homomorphism f (as a submodule of its domain) and the canonical injection from the kernel into the domain of f\n\n\n\n"
+},
+
+{
+    "location": "module_homomorphism/#Kernels-1",
+    "page": "Module Homomorphisms",
+    "title": "Kernels",
+    "category": "section",
+    "text": "kernel(f::Generic.ModuleHomomorphism{T}) where T <: RingElementExamplesM = FreeModule(ZZ, 3)\n\nm = M([ZZ(1), ZZ(2), ZZ(3)])\n\nS, f = Submodule(M, [m])\nQ, g = QuotientModule(M, S)\n\nkernel(g)"
 },
 
 {
