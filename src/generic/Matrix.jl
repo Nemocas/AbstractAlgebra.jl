@@ -3515,6 +3515,8 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
          end
          if pivot[j] == 0
             pivot[j] = i+1
+            kb_canonical_row!(H, U, pivot[j], j, with_trafo)
+            kb_reduce_column!(H, U, pivot, j, with_trafo, start_element)
             kb_reduce_row!(H, U, pivot, j, with_trafo)
             pivot_max = max(pivot_max, j)
             new_pivot = true
@@ -3547,9 +3549,9 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
                   U[p, c] = reduce!(U[p, c])
                end
             end
+            kb_canonical_row!(H, U, pivot[j], j, with_trafo)
+            kb_reduce_column!(H, U, pivot, j, with_trafo, start_element)
          end
-         kb_canonical_row!(H, U, pivot[j], j, with_trafo)
-         kb_reduce_column!(H, U, pivot, j, with_trafo, start_element)
          if new_pivot
             break
          end
