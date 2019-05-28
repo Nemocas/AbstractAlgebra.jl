@@ -45,3 +45,20 @@ Q, g = QuotientModule(M, S)
 kernel(g)
 ```
 
+### Images
+
+```@docs
+image(f::Generic.ModuleHomomorphism{T}) where T <: RingElement
+```
+
+```julia
+M = FreeModule(ZZ, 3)
+
+m = M([ZZ(1), ZZ(2), ZZ(3)])
+
+S, f = Submodule(M, [m])
+Q, g = QuotientModule(M, S)
+K, k = kernel(g)
+
+image(compose(k, g))
+```
