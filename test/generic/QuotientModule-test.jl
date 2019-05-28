@@ -147,12 +147,33 @@ function test_quotient_module_adhoc_binary()
    println("PASS")
 end
 
+function test_quotient_module_canonical_projection()
+   print("Generic.QuotientModule.canonical_projection...")
+
+   for R in [ZZ, QQ]
+      for iter = 1:40
+         M = rand_module(R, -10:10)
+         ngens = rand(1:5)
+         S = [rand(M, -10:10) for i in 1:ngens]
+         N, f = Submodule(M, S)
+         Q, h = QuotientModule(M, N)
+
+         I, g = image(h)
+
+         @test I == Q
+      end
+   end
+
+   println("PASS")
+end
+
 function test_quotient_module()
    test_quotient_module_constructors()
    test_quotient_module_manipulation()
    test_quotient_module_unary_ops()
    test_quotient_module_binary_ops()
    test_quotient_module_adhoc_binary()
+   test_quotient_module_canonical_projection()
 
    println("")
 end

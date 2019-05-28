@@ -73,9 +73,36 @@ function test_module_homomorphism_kernel()
    println("PASS")
 end
 
+function test_module_homomorphism_image()
+   print("Generic.ModuleHomomorphism.image...")
+
+   for R in [ZZ, QQ]
+      for iter = 1:100
+         # test image of composition of canonical injection and projection
+         M = rand_module(R, -10:10)
+         ngens1 = rand(1:5)
+         gens1 = [rand(M, -10:10) for j in 1:ngens1]
+         M1, f1 = Submodule(M, gens1)
+
+         Q, g = QuotientModule(M, M1)
+         k1, h1 = kernel(g)
+
+         k = compose(h1, g)
+         I, f = image(k)
+
+         T, t = Submodule(Q, elem_type(Q)[])
+
+         @test I == T
+      end
+   end
+
+   println("PASS")
+end
+
 function test_module_homomorphism()
    test_module_homomorphism_constructors()
    test_module_homomorphism_kernel()
+   test_module_homomorphism_image()
 
    println("")
 end
