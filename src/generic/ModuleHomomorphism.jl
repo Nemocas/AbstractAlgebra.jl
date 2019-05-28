@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export ModuleHomomorphism
+export ModuleHomomorphism, image
 
 ###############################################################################
 #
@@ -31,13 +31,24 @@ end
 
 ###############################################################################
 #
+#   Composition
+#
+###############################################################################
+
+function compose(f::ModuleHomomorphism{T}, g::ModuleHomomorphism{T}) where T <: RingElement
+   check_composable(f, g)
+   return ModuleHomomorphism(domain(f), codomain(g), f.matrix*g.matrix)
+end
+ 
+###############################################################################
+#
 #   Kernel
 #
 ###############################################################################
 
 @doc Markdown.doc"""
     kernel(f::ModuleHomomorphism{T}) where T <: RingElement
-> Returns a pair `K, f` consisting of the kernel object $K$ of the given module
+> Returns a pair `K, g` consisting of the kernel object $K$ of the given module
 > homomorphism $f$ (as a submodule of its domain) and the canonical injection
 > from the kernel into the domain of $f$
 """
@@ -71,6 +82,27 @@ function kernel(f::ModuleHomomorphism{T}) where T <: RingElement
       V[j] = D([K[num_gens - j + 1, nr - k + 1] for k = 1:nrows(M)])
    end
    return Submodule(D, V)
+end
+
+###############################################################################
+#
+#   Image
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    image(f::ModuleHomomorphism{T}) where T <: RingElement
+> Returns a pair `I, g` consisting of the image object $I$ of the given module
+> homomorphism $f$ (as a submodule of its codomain) and the canonical injection
+> from the image into the codomain of $f$
+"""
+function image(f::ModuleHomomorphism{T}) where T <: RingElement
+   D = domain(f)
+   C = codomain(f)
+   R = base_ring(D)
+   G = gens(D)
+   V = elem_type(C)[f(v) for v in G]
+   return Submodule(C, V)
 end
 
 ###############################################################################

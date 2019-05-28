@@ -120,12 +120,32 @@ function test_submodule_adhoc_binary()
    println("PASS")
 end
 
+function test_submodule_canonical_injection()
+   print("Generic.Submodule.canonical_injection...")
+
+   for R in [ZZ, QQ]
+      for iter = 1:40
+         M = rand_module(R, -10:10)
+         ngens = rand(1:5)
+         S = [rand(M, -10:10) for i in 1:ngens]
+         N, f = Submodule(M, S)
+
+         I, g = image(f)
+
+         @test I == N
+      end
+   end
+
+   println("PASS")
+end
+
 function test_submodule()
    test_submodule_constructors()
    test_submodule_manipulation()
    test_submodule_unary_ops()
    test_submodule_binary_ops()
    test_submodule_adhoc_binary()
+   test_submodule_canonical_injection()
 
    println("")
 end
