@@ -76,27 +76,38 @@ end
 function test_module_homomorphism_image()
    print("Generic.ModuleHomomorphism.image...")
 
-   for R in [ZZ, QQ]
-      for iter = 1:100
-         # test image of composition of canonical injection and projection
-         M = rand_module(R, -10:10)
-         ngens1 = rand(1:5)
-         gens1 = [rand(M, -10:10) for j in 1:ngens1]
-         M1, f1 = Submodule(M, gens1)
+   # To make it work on julia nightlies
 
-         Q, g = QuotientModule(M, M1)
-         k1, h1 = kernel(g)
+   R = AbstractAlgebra.JuliaZZ
+   for iter = 1:100
+      # test image of composition of canonical injection and projection
+      M = rand_module(R, -10:10)::AbstractAlgebra.FPModule{elem_type(R)}
+      _test_module_homomorphism_image(M)
+   end
 
-         k = compose(h1, g)
-         I, f = image(k)
-
-         T, t = Submodule(Q, elem_type(Q)[])
-
-         @test I == T
-      end
+   S = AbstractAlgebra.JuliaQQ
+   for iter = 1:100
+      # test image of composition of canonical injection and projection
+      N = rand_module(S, -10:10)::AbstractAlgebra.FPModule{elem_type(S)}
+      _test_module_homomorphism_image(N)
    end
 
    println("PASS")
+end
+
+@noinline function _test_module_homomorphism_image(M)
+   ngens1 = rand(1:5)
+   gens1 = [rand(M, -10:10) for j in 1:ngens1]
+   M1, f1 = Submodule(M, gens1)
+
+   Q, g = QuotientModule(M, M1)
+   k1, h1 = kernel(g)
+
+   k = compose(h1, g)
+   I, f = image(k)
+   T, t = Submodule(Q, elem_type(Q)[])
+
+   @test I == T
 end
 
 function test_module_homomorphism()

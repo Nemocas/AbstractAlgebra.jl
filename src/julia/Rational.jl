@@ -10,9 +10,9 @@
 #
 ###############################################################################
 
-JuliaQQ = Rationals{BigInt}()
+const JuliaQQ = Rationals{BigInt}()
 
-qq = Rationals{Int}()
+const qq = Rationals{Int}()
 
 parent(a::Rational{T}) where T <: Integer = Rationals{T}()
 

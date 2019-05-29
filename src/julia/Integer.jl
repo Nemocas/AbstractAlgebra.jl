@@ -10,9 +10,9 @@
 #
 ###############################################################################
 
-JuliaZZ = Integers{BigInt}()
+const JuliaZZ = Integers{BigInt}()
 
-zz = Integers{Int}()
+const zz = Integers{Int}()
 
 parent(a::T) where T <: Integer = Integers{T}()
 
