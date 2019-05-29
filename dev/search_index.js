@@ -3749,7 +3749,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Homomorphisms",
     "title": "AbstractAlgebra.Generic.kernel",
     "category": "method",
-    "text": "kernel(f::ModuleHomomorphism{T}) where T <: RingElement\n\nReturns a pair K, f consisting of the kernel object K of the given module homomorphism f (as a submodule of its domain) and the canonical injection from the kernel into the domain of f\n\n\n\n"
+    "text": "kernel(f::ModuleHomomorphism{T}) where T <: RingElement\n\nReturns a pair K, g consisting of the kernel object K of the given module homomorphism f (as a submodule of its domain) and the canonical injection from the kernel into the domain of f\n\n\n\n"
 },
 
 {
@@ -3758,6 +3758,22 @@ var documenterSearchIndex = {"docs": [
     "title": "Kernels",
     "category": "section",
     "text": "kernel(f::Generic.ModuleHomomorphism{T}) where T <: RingElementExamplesM = FreeModule(ZZ, 3)\n\nm = M([ZZ(1), ZZ(2), ZZ(3)])\n\nS, f = Submodule(M, [m])\nQ, g = QuotientModule(M, S)\n\nkernel(g)"
+},
+
+{
+    "location": "module_homomorphism/#AbstractAlgebra.Generic.image-Union{Tuple{ModuleHomomorphism{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Module Homomorphisms",
+    "title": "AbstractAlgebra.Generic.image",
+    "category": "method",
+    "text": "image(f::ModuleHomomorphism{T}) where T <: RingElement\n\nReturns a pair I, g consisting of the image object I of the given module homomorphism f (as a submodule of its codomain) and the canonical injection from the image into the codomain of f\n\n\n\n"
+},
+
+{
+    "location": "module_homomorphism/#Images-1",
+    "page": "Module Homomorphisms",
+    "title": "Images",
+    "category": "section",
+    "text": "image(f::Generic.ModuleHomomorphism{T}) where T <: RingElementM = FreeModule(ZZ, 3)\n\nm = M([ZZ(1), ZZ(2), ZZ(3)])\n\nS, f = Submodule(M, [m])\nQ, g = QuotientModule(M, S)\nK, k = kernel(g)\n\nimage(compose(k, g))"
 },
 
 {

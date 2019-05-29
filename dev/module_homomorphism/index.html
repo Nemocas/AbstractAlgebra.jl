@@ -4,11 +4,19 @@ f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
 
 m = M([ZZ(1), ZZ(2)])
 
-f(m)</code></pre><h3><a class="nav-anchor" id="Kernels-1" href="#Kernels-1">Kernels</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.kernel-Union{Tuple{ModuleHomomorphism{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.kernel-Union{Tuple{ModuleHomomorphism{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.kernel</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">kernel(f::ModuleHomomorphism{T}) where T &lt;: RingElement</code></pre><blockquote><p>Returns a pair <code>K, f</code> consisting of the kernel object <span>$K$</span> of the given module homomorphism <span>$f$</span> (as a submodule of its domain) and the canonical injection from the kernel into the domain of <span>$f$</span></p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia">M = FreeModule(ZZ, 3)
+f(m)</code></pre><h3><a class="nav-anchor" id="Kernels-1" href="#Kernels-1">Kernels</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.kernel-Union{Tuple{ModuleHomomorphism{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.kernel-Union{Tuple{ModuleHomomorphism{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.kernel</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">kernel(f::ModuleHomomorphism{T}) where T &lt;: RingElement</code></pre><blockquote><p>Returns a pair <code>K, g</code> consisting of the kernel object <span>$K$</span> of the given module homomorphism <span>$f$</span> (as a submodule of its domain) and the canonical injection from the kernel into the domain of <span>$f$</span></p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia">M = FreeModule(ZZ, 3)
 
 m = M([ZZ(1), ZZ(2), ZZ(3)])
 
 S, f = Submodule(M, [m])
 Q, g = QuotientModule(M, S)
 
-kernel(g)</code></pre><footer><hr/><a class="previous" href="../quotient_module/"><span class="direction">Previous</span><span class="title">Quotient modules</span></a><a class="next" href="../matrix_spaces/"><span class="direction">Next</span><span class="title">Matrix Interface</span></a></footer></article></body></html>
+kernel(g)</code></pre><h3><a class="nav-anchor" id="Images-1" href="#Images-1">Images</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.image-Union{Tuple{ModuleHomomorphism{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.image-Union{Tuple{ModuleHomomorphism{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.image</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">image(f::ModuleHomomorphism{T}) where T &lt;: RingElement</code></pre><blockquote><p>Returns a pair <code>I, g</code> consisting of the image object <span>$I$</span> of the given module homomorphism <span>$f$</span> (as a submodule of its codomain) and the canonical injection from the image into the codomain of <span>$f$</span></p></blockquote></div></section><pre><code class="language-julia">M = FreeModule(ZZ, 3)
+
+m = M([ZZ(1), ZZ(2), ZZ(3)])
+
+S, f = Submodule(M, [m])
+Q, g = QuotientModule(M, S)
+K, k = kernel(g)
+
+image(compose(k, g))</code></pre><footer><hr/><a class="previous" href="../quotient_module/"><span class="direction">Previous</span><span class="title">Quotient modules</span></a><a class="next" href="../matrix_spaces/"><span class="direction">Next</span><span class="title">Matrix Interface</span></a></footer></article></body></html>
