@@ -1168,3 +1168,30 @@ mutable struct quotient_module_elem{T <: RingElement} <: AbstractAlgebra.FPModul
    end
 end
 
+###############################################################################
+#
+#   InvariantFactorDecomposition/invariant_factor_decomposition_elem
+#
+###############################################################################
+
+mutable struct InvariantFactorDecomposition{T <: RingElement} <: AbstractAlgebra.FPModule{T}
+   m::AbstractAlgebra.FPModule{T}
+   gens::Vector{<:AbstractAlgebra.FPModuleElem{T}}
+   invariant_factors::AbstractAlgebra.MatElem{T}
+   base_ring::Ring
+   map::ModuleHomomorphism{T}
+
+   function InvariantFactorDecomposition{T}(M::AbstractAlgebra.FPModule{T}, gens::Vector{<:AbstractAlgebra.FPModuleElem{T}}, invariant_factors::AbstractAlgebra.MatElem{T}) where T <: RingElement
+      return new{T}(M, gens, invariant_factors, base_ring(M))
+   end
+end
+
+mutable struct invariant_factor_decomposition_elem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
+   v::AbstractAlgebra.MatElem{T}
+   parent::AbstractAlgebra.Module{T}
+
+   function invariant_factor_decomposition_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
+      z = new{T}(v, m)
+   end
+end
+

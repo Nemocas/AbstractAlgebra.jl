@@ -79,6 +79,8 @@ include("generic/ModuleHomomorphism.jl")
 
 include("generic/Module.jl")
 
+include("generic/InvariantFactorDecomposition.jl")
+
 include("generic/Map.jl")
 
 include("generic/MapWithInverse.jl")
