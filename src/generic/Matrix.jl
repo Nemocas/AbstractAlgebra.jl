@@ -669,7 +669,7 @@ Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, T <: MatElem} = x^p
 > Return $a^b$. We require $b \geq 0$ and that the matrix $a$ is square.
 """
 function ^(a::MatrixElem, b::Int)
-   b < 0 && throw(DomainError())
+   b < 0 && throw(DomainError(b, "Negative exponent in power"))
    !issquare(a) && error("Incompatible matrix dimensions in power")
    # special case powers of x for constructing polynomials efficiently
    if b == 0
@@ -700,7 +700,7 @@ end
 """
 function powers(a::MatrixElem, d::Int)
    !issquare(a) && error("Dimensions do not match in powers")
-   d <= 0 && throw(DomainError())
+   d <= 0 && throw(DomainError(d, "Negative dimension in powers"))
    A = Array{typeof(a)}(undef, d + 1)
    A[1] = eye(a)
    if d > 1
