@@ -3,6 +3,7 @@ include("generic/ModuleHomomorphism-test.jl")
 include("generic/Submodule-test.jl")
 include("generic/QuotientModule-test.jl")
 include("generic/Module-test.jl")
+include("generic/InvariantFactorDecomposition-test.jl")
 
 function test_modules()
    test_free_module()
@@ -10,4 +11,5 @@ function test_modules()
    test_submodule()
    test_quotient_module()
    test_module()
+   test_invariant_factor_decomposition()
 end

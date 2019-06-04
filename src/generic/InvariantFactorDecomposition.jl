@@ -4,7 +4,8 @@
 #
 ###############################################################################
 
-export InvariantFactorDecomposition, invariant_factor_decomposition_elem
+export InvariantFactorDecomposition, invariant_factor_decomposition_elem,
+       invariant_factors
 
 ###############################################################################
 #
@@ -32,6 +33,23 @@ function gen(N::InvariantFactorDecomposition{T}, i::Int) where T <: RingElement
 end
 
 invariant_factors(N::InvariantFactorDecomposition{T}) where T <: RingElement = N.invariant_factors
+
+function rels(N::InvariantFactorDecomposition{T}) where T <: RingElement
+   T1 = dense_matrix_type(T)
+   R = base_ring(N)
+   invs = invariant_factors(N)
+   # count nonzero invariant factors
+   num = ncols(invs)
+   while num > 0
+      if !iszero(invs[1, num])
+         break
+      end
+      num -= 1
+   end
+   n = ncols(invs)
+   r = T1[matrix(R, 1, n, T[i == j ? invs[1, i] : zero(R) for j in 1:n]) for i in 1:num]
+   return r 
+end
 
 ###############################################################################
 #
@@ -226,5 +244,36 @@ end
 
 function InvariantFactorDecomposition(m::InvariantFactorDecomposition{T}) where T <: RingElement
    return m
+end
+
+@doc Markdown.doc"""
+    invariant_factors(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
+> Return a vector of the invariant factors of the module $M$.
+"""
+function invariant_factors(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
+   R = base_ring(m)
+   old_rels = rels(m)
+   # put the relations into a matrix
+   r = length(old_rels)
+   s = ngens(m)
+   A = matrix(R, r, s, T[old_rels[i][1, j] for i in 1:r for j in 1:s])
+   # compute the snf
+   S = snf(A)
+   # count unit invariant factors
+   nunits = 0
+   while nunits < min(nrows(S), ncols(S))
+      nunits += 1
+      if !isunit(S[nunits, nunits])
+         nunits -= 1
+         break
+      end
+   end
+   num_gens = nrows(S) - nunits
+   # extract invariant factors from S
+   invariant_factors = zero_matrix(R, 1, ncols(A) - nunits)
+   for i = 1:num_gens
+      invariant_factors[1, i] = S[i + nunits, i + nunits]
+   end
+   return invariant_factors
 end
 
