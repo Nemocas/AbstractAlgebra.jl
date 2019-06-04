@@ -180,6 +180,21 @@ function test_module_isisomorphic()
       end
    end
 
+   # Test submodules are isomorphic to their image
+   for R in [ZZ, QQ]
+      for iter = 1:100
+         M = rand_module(R, -10:10)
+
+         ngens1 = rand(1:5)
+         gens1 = [rand(M, -10:10) for j in 1:ngens1]
+         M1, f1 = Submodule(M, gens1)
+
+         I, g = image(f1)
+
+         @test isisomorphic(I, M1)
+      end
+   end
+     
    println("PASS")
 end
 
