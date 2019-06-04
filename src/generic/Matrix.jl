@@ -3729,38 +3729,43 @@ function snf_kb!(S::MatrixElem{T}, U::MatrixElem{T}, K::MatrixElem{T}, with_traf
       i+=1
    end
    for i = 1:l-1
-      if iszero(S[i, i]) && iszero(S[i + 1, i + 1])
-         continue
-      end
-      d, u, v = gcdx(S[i, i], S[i + 1, i + 1])
-      if with_trafo
-         q = -divexact(S[i + 1, i + 1], d)
-         t1 = mul!(t1, q, v)
-         for c = 1:m
-            t = deepcopy(U[i,c])
-            U[i, c] = addeq!(U[i, c], U[i + 1,c])
-            t2 = mul_red!(t2, t1, U[i + 1, c], false)
-            U[i + 1, c] = addeq!(U[i + 1, c], t2)
-            t2 = mul_red!(t2, t1, t, false)
-            U[i + 1, c] = addeq!(U[i + 1, c], t2)
-            U[i + 1, c] = reduce!(U[i + 1, c])
+      for j = i + 1:l
+         if isone(S[i, i])
+           break
          end
-         q1 = -divexact(S[i + 1, i + 1], d)
-         q2 = divexact(S[i, i], d)
-         for r = 1:n
-            t = deepcopy(K[r, i])
-            t1 = mul_red!(t1, K[r, i], u, false)
-            t2 = mul_red!(t2, K[r, i + 1], v, false)
-            K[r, i] = add!(K[r, i], t1, t2)
-            K[r, i] = reduce!(K[r, i])
-            t1 = mul_red!(t1, t, q1, false)
-            t2 = mul_red!(t2, K[r, i + 1], q2, false)
-            K[r, i + 1] = add!(K[r, i + 1], t1, t2)
-            K[r, i + 1] = reduce!(K[r, i + 1])
+         if iszero(S[i, i]) && iszero(S[j, j])
+            continue
          end
+         d, u, v = gcdx(S[i, i], S[j, j])
+         if with_trafo
+            q = -divexact(S[j, j], d)
+            t1 = mul!(t1, q, v)
+            for c = 1:m
+               t = deepcopy(U[i,c])
+               U[i, c] = addeq!(U[i, c], U[j,c])
+               t2 = mul_red!(t2, t1, U[j, c], false)
+               U[j, c] = addeq!(U[j, c], t2)
+               t2 = mul_red!(t2, t1, t, false)
+               U[j, c] = addeq!(U[j, c], t2)
+               U[j, c] = reduce!(U[j, c])
+            end
+            q1 = -divexact(S[j, j], d)
+            q2 = divexact(S[i, i], d)
+            for r = 1:n
+               t = deepcopy(K[r, i])
+               t1 = mul_red!(t1, K[r, i], u, false)
+               t2 = mul_red!(t2, K[r, j], v, false)
+               K[r, i] = add!(K[r, i], t1, t2)
+               K[r, i] = reduce!(K[r, i])
+               t1 = mul_red!(t1, t, q1, false)
+               t2 = mul_red!(t2, K[r, j], q2, false)
+               K[r, j] = add!(K[r, j], t1, t2)
+               K[r, j] = reduce!(K[r, j])
+            end
+         end
+         S[j, j] = divexact(S[i, i]*S[j, j],d)
+         S[i, i] = d
       end
-      S[i + 1, i + 1] = divexact(S[i, i]*S[i + 1, i + 1],d)
-      S[i, i] = d
    end
    return nothing
 end
