@@ -220,14 +220,10 @@ function InvariantFactorDecomposition(m::AbstractAlgebra.FPModule{T}) where T <:
    # throwing away ones corresponding to unit invariant factors
    T2 = elem_type(m)
    gens = Vector{T2}(undef, ncols(A) - nunits)
-   for i = 1:num_gens
+   for i = 1:ncols(A) - nunits
       gens[i] = m(matrix(R, 1, ncols(K),
                     T[K[i + nunits, j]
                        for j in 1:ncols(K)]))
-   end
-   for i = num_gens + 1:ncols(A) - nunits
-      gens[i] = m(matrix(R, 1, ncols(K),
-                    T[T(Int(j == i)) for j in 1:ncols(K)]))
    end
    # extract invariant factors from S
    invariant_factors = zero_matrix(R, 1, ncols(A) - nunits)
@@ -235,7 +231,8 @@ function InvariantFactorDecomposition(m::AbstractAlgebra.FPModule{T}) where T <:
       invariant_factors[1, i] = S[i + nunits, i + nunits]
    end
    # make matrix from gens
-   mat = matrix(R, ncols(A) - nunits, ncols(K), T[gens[i].v[1, j] for i in 1:ncols(A) - nunits for j in 1:ncols(K)])
+   mat = matrix(R, ncols(A) - nunits, ncols(K),
+        T[gens[i].v[1, j] for i in 1:ncols(A) - nunits for j in 1:ncols(K)])
    M = InvariantFactorDecomposition{T}(m, gens, invariant_factors)
    f = ModuleHomomorphism(M, m, mat)
    M.map = f 
