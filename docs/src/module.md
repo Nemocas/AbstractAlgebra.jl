@@ -142,3 +142,45 @@ M = FreeModule(QQ, 2)
 M == M
 ```
 
+### Isomorphism
+
+```@docs
+isisomorphic(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElement
+```
+
+**Examples**
+
+```julia
+M = FreeModule(ZZ, 3)
+m1 = rand(M, -10:10)
+m2 = rand(M, -10:10)
+S, f = Submodule(M, [m1, m2])
+I, g = image(f)
+
+isisomorphic(S, I)
+```
+
+### Invariant Factor Decomposition
+
+For modules over a euclidean domain one can take the invariant factor
+decomposition to determine the structure of the module. The invariant factors
+are unique up to multiplication by a unit, and even unique if a 
+`canonical_unit` is available for the ring.
+
+```@docs
+InvariantFactorDecomposition(::AbstractAlgebra.FPModule{T}) where T <: RingElement
+invariant_factors(::AbstractAlgebra.FPModule{T}) where T <: RingElement
+```
+
+**Examples**
+
+```julia
+M = FreeModule(ZZ, 3)
+m1 = rand(M, -10:10)
+m2 = rand(M, -10:10)
+S, f = Submodule(M, [m1, m2])
+Q, g = QuotientModule(M, S)
+
+I, f = InvariantFactorDecomposition(Q)
+invs = invariant_factors(Q)
+```

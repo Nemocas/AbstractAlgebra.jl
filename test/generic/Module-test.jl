@@ -17,6 +17,21 @@ function rand_module(R::AbstractAlgebra.Ring, vals...)
    return M
 end
 
+function rand_homomorphism(M::AbstractAlgebra.FPModule{T}, vals...) where T <: RingElement
+   rk = rand(1:5)
+   m = ngens(M)
+   R = base_ring(M)
+   F = FreeModule(R, rk)
+   S = MatrixSpace(R, rk, m)
+   mat = rand(S, vals...)
+   f = ModuleHomomorphism(F, M, mat)
+   ngens1 = rand(1:3)
+   gens1 = [rand(F, vals...) for j in 1:ngens1]
+   S, g = Submodule(F, gens1)
+   hom1 = compose(g, f)
+   return S, hom1
+end
+
 function test_module_manipulation()
    print("Generic.Module.manipulation...")
 
@@ -147,9 +162,46 @@ function test_module_intersection()
    println("PASS")
 end
 
+function test_module_isisomorphic()
+   print("Generic.Module.IsIsomorphic...")
+
+   # Test the first isomorphism theorem
+   for R in [ZZ, QQ]
+      for iter = 1:100
+         M = rand_module(R, -10:10)
+         S, f = rand_homomorphism(M, -10:10)
+
+         K, g = kernel(f)
+         Q, h = QuotientModule(S, K)
+
+         I, k = image(f)
+
+         @test isisomorphic(Q, I)
+      end
+   end
+
+   # Test submodules are isomorphic to their image
+   for R in [ZZ, QQ]
+      for iter = 1:100
+         M = rand_module(R, -10:10)
+
+         ngens1 = rand(1:5)
+         gens1 = [rand(M, -10:10) for j in 1:ngens1]
+         M1, f1 = Submodule(M, gens1)
+
+         I, g = image(f1)
+
+         @test isisomorphic(I, M1)
+      end
+   end
+     
+   println("PASS")
+end
+
 function test_module()
    test_module_manipulation()
    test_module_intersection()
+   test_module_isisomorphic()
 
    println("")
 end

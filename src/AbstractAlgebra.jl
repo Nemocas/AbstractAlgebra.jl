@@ -129,12 +129,13 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached,
                  hnf_via_popov_with_transform,
                  hooklength, identity_map, identity_matrix, image,
                  image_map, image_fn, inflate, integral, interpolate, inv,
-                 inv!, inverse_fn, invert_rows, invert_rows!,
+                 inv!, invariant_factors,
+                 inverse_fn, invert_rows, invert_rows!,
                  invert_cols, invert_cols!,
                  invmod, involves_at_most_one_variable,
                  iscompatible, isconstant, isdegree,
                  isdomain_type, isexact_type, isgen, ishessenberg,
-                 ishnf, ishomogeneous, ismonomial,
+                 ishnf, ishomogeneous, isisomorphic, ismonomial,
                  isone, isreverse, isrimhook,
                  isrref, issquare, issubmodule, isterm,
                  isunit, iszero_row, iszero_column,
@@ -209,11 +210,12 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, base_ring, cached,
                  hnf_via_popov_with_transform,
                  hooklength, identity_map, identity_matrix, image,
                  image_map, image_fn, inflate, integral, interpolate, inv,
-                 inv!, inverse_fn, invmod, invert_rows,
+                 inv!, invariant_factors,
+                 inverse_fn, invmod, invert_rows,
                  invert_rows!, invert_cols, invert_cols!,
                  iscompatible, isconstant, isdegree,
                  isdomain_type, isexact_type, isgen, ishessenberg,
-                 ishnf, ishomogeneous, ismonomial,
+                 ishnf, ishomogeneous, isisomorphic, ismonomial,
                  isnegative, isone, isreverse,
                  isrimhook, isrref, issquare, issubmodule,
                  isterm, isunit, iszero,
@@ -499,6 +501,10 @@ function QuotientSpace(m::Module{T}, N::Module{T}) where T <: FieldElement
    Generic.QuotientModule(m, N)
 end
 
+function InvariantFactorDecomposition(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
+   Generic.InvariantFactorDecomposition(m)
+end
+
 function ModuleHomomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
    Generic.ModuleHomomorphism(M1, M2, m)
 end
@@ -513,7 +519,7 @@ export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        YoungTableau, AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
        PuiseuxSeriesField, FreeModule, VectorSpace, ModuleHomomorphism, Submodule,
-       Subspace, QuotientModule, QuotientSpace
+       Subspace, QuotientModule, QuotientSpace, InvariantFactorDecomposition
 
 export Generic
 
