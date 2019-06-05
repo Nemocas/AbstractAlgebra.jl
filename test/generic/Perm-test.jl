@@ -210,8 +210,11 @@ function test_perm_binary_ops(types)
       cycles(a)
       @test parity(a) == p
 
+      z = G()
+
       for a in G, b in G
          @test parity(a*b) == (parity(b)+parity(a)) % 2
+         @test AbstractAlgebra.mul!(z, a, b) == a*b
       end
 
       G = PermutationGroup(T(10))

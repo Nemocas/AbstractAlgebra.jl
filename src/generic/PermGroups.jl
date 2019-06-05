@@ -108,7 +108,7 @@ function parity(g::perm{T}) where T
 end
 
 @doc Markdown.doc"""
-    sign(g::perm{T}) where T 
+    sign(g::perm{T}) where T
 > Return the sign of permutation.
 >
 > `sign` returns $1$ if `g` is even and $-1$ if `g` is odd. `sign` represents
@@ -386,6 +386,12 @@ false
 #   Binary operators
 #
 ###############################################################################
+function mul!(out::perm, g::perm, h::perm)
+   @inbounds for i in eachindex(out.d)
+      out[i] = h[g[i]]
+   end
+   return out
+end
 
 @doc Markdown.doc"""
     *(g::perm{T}, h::perm{T}) where T
@@ -404,11 +410,8 @@ julia> perm([2,3,1,4])*perm([1,3,4,2]) # (1,2,3)*(2,3,4)
 ```
 """
 function *(g::perm{T}, h::perm{T}) where T
-   d = similar(g.d)
-   @inbounds for i in 1:length(d)
-      d[i] = h[g[i]]
-   end
-   return perm(d, false)
+   res = perm(similar(g.d), false)
+   return mul!(res, g, h)
 end
 
 *(g::perm{S}, h::perm{T}) where {S,T} = *(promote(g,h)...)
