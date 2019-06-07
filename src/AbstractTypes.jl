@@ -144,3 +144,6 @@ abstract type FinFieldElem <: FieldElem end # for fq, fq_nmod, etc
 ################################################################################
 
 promote_rule(T, U) = Union{}
+
+promote_rule(a::Type{S}, b::Type{T}) where {S <: Real, T <: Real} = Base.promote_rule(a, b)
+
