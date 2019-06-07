@@ -1177,11 +1177,11 @@ end
 mutable struct InvariantFactorDecomposition{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    m::AbstractAlgebra.FPModule{T}
    gens::Vector{<:AbstractAlgebra.FPModuleElem{T}}
-   invariant_factors::AbstractAlgebra.MatElem{T}
+   invariant_factors::Vector{T}
    base_ring::Ring
    map::ModuleHomomorphism{T}
 
-   function InvariantFactorDecomposition{T}(M::AbstractAlgebra.FPModule{T}, gens::Vector{<:AbstractAlgebra.FPModuleElem{T}}, invariant_factors::AbstractAlgebra.MatElem{T}) where T <: RingElement
+   function InvariantFactorDecomposition{T}(M::AbstractAlgebra.FPModule{T}, gens::Vector{<:AbstractAlgebra.FPModuleElem{T}}, invariant_factors::Vector{T}) where T <: RingElement
       return new{T}(M, gens, invariant_factors, base_ring(M))
    end
 end

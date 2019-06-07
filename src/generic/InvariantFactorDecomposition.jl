@@ -23,7 +23,7 @@ base_ring(N::InvariantFactorDecomposition{T}) where T <: RingElement = N.base_ri
 
 base_ring(v::invariant_factor_decomposition_elem{T}) where T <: RingElement = base_ring(v.parent)
 
-ngens(N::InvariantFactorDecomposition{T}) where T <: RingElement = ncols(N.invariant_factors)
+ngens(N::InvariantFactorDecomposition{T}) where T <: RingElement = length(N.invariant_factors)
 
 gens(N::InvariantFactorDecomposition{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N)]
 
@@ -39,15 +39,15 @@ function rels(N::InvariantFactorDecomposition{T}) where T <: RingElement
    R = base_ring(N)
    invs = invariant_factors(N)
    # count nonzero invariant factors
-   num = ncols(invs)
+   num = length(invs)
    while num > 0
-      if !iszero(invs[1, num])
+      if !iszero(invs[num])
          break
       end
       num -= 1
    end
-   n = ncols(invs)
-   r = T1[matrix(R, 1, n, T[i == j ? invs[1, i] : zero(R) for j in 1:n]) for i in 1:num]
+   n = length(invs)
+   r = T1[matrix(R, 1, n, T[i == j ? invs[i] : zero(R) for j in 1:n]) for i in 1:num]
    return r 
 end
 
@@ -158,11 +158,11 @@ end
 #
 ###############################################################################
 
-function reduce_mod_invariants(v::AbstractAlgebra.MatElem{T}, invars::AbstractAlgebra.MatElem{T}) where T <: RingElement
+function reduce_mod_invariants(v::AbstractAlgebra.MatElem{T}, invars::Vector{T}) where T <: RingElement
    v = deepcopy(v) # don't modify input
-   for i = 1:ncols(invars)
-      if !iszero(invars[1, i])
-         q, v[1, i] = AbstractAlgebra.divrem(v[1, i], invars[1, i])
+   for i = 1:length(invars)
+      if !iszero(invars[i])
+         q, v[1, i] = AbstractAlgebra.divrem(v[1, i], invars[i])
       end
    end
    return v
@@ -226,9 +226,9 @@ function InvariantFactorDecomposition(m::AbstractAlgebra.FPModule{T}) where T <:
                        for j in 1:ncols(K)]))
    end
    # extract invariant factors from S
-   invariant_factors = zero_matrix(R, 1, ncols(A) - nunits)
-   for i = 1:num_gens
-      invariant_factors[1, i] = S[i + nunits, i + nunits]
+   invariant_factors = T[S[i + nunits, i + nunits] for i in 1:num_gens]
+   for i = num_gens + 1:ncols(A) - nunits
+      push!(invariant_factors, zero(R))
    end
    # make matrix from gens
    mat = matrix(R, ncols(A) - nunits, ncols(K),
@@ -267,9 +267,9 @@ function invariant_factors(m::AbstractAlgebra.FPModule{T}) where T <: RingElemen
    end
    num_gens = nrows(S) - nunits
    # extract invariant factors from S
-   invariant_factors = zero_matrix(R, 1, ncols(A) - nunits)
-   for i = 1:num_gens
-      invariant_factors[1, i] = S[i + nunits, i + nunits]
+   invariant_factors = T[S[i + nunits, i + nunits] for i in 1:num_gens]
+   for i = num_gens + 1:ncols(A) - nunits
+      push!(invariant_factors, zero(R))
    end
    return invariant_factors
 end

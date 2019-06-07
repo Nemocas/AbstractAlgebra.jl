@@ -26,7 +26,7 @@ function test_isomorphism()
 
          K, g = kernel(f)
 
-         @test ncols(invariant_factors(K)) == 0
+         @test length(invariant_factors(K)) == 0
       end
    end
    
