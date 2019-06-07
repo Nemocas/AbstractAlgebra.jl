@@ -501,10 +501,6 @@ function QuotientSpace(m::Module{T}, N::Module{T}) where T <: FieldElement
    Generic.QuotientModule(m, N)
 end
 
-function InvariantFactorDecomposition(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
-   Generic.InvariantFactorDecomposition(m)
-end
-
 function ModuleHomomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
    Generic.ModuleHomomorphism(M1, M2, m)
 end
@@ -519,7 +515,7 @@ export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        YoungTableau, AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
        PuiseuxSeriesField, FreeModule, VectorSpace, ModuleHomomorphism, Submodule,
-       Subspace, QuotientModule, QuotientSpace, InvariantFactorDecomposition
+       Subspace, QuotientModule, QuotientSpace, SNFModule
 
 export Generic
 

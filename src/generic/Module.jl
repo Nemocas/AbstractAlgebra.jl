@@ -246,10 +246,7 @@ end
 > Return `true` if the modules $M$ and $N$ are isomorphic.
 """
 function isisomorphic(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement
-   I1 = invariant_factors(M)
-   I2 = invariant_factors(N)
-
-   return ncols(I1) == ncols(I2) && I1 == I2
+   return invariant_factors(M) == invariant_factors(N)
 end
 
 ###############################################################################

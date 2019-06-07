@@ -5,7 +5,7 @@ function test_invariant_factors()
       for iter = 1:100
          M = rand_module(R, -10:10)
 
-         I, f = InvariantFactorDecomposition(M)
+         I, f = snf(M)
          invs = invariant_factors(M)
 
          @test invariant_factors(I) == invs
@@ -22,11 +22,11 @@ function test_isomorphism()
       for iter = 1:100
          M = rand_module(R, -10:10)
 
-         I, f = InvariantFactorDecomposition(M)
+         I, f = snf(M)
 
          K, g = kernel(f)
 
-         @test ncols(invariant_factors(K)) == 0
+         @test length(invariant_factors(K)) == 0
       end
    end
    
