@@ -168,7 +168,7 @@ are unique up to multiplication by a unit, and even unique if a
 `canonical_unit` is available for the ring.
 
 ```@docs
-InvariantFactorDecomposition(::AbstractAlgebra.FPModule{T}) where T <: RingElement
+snf(::AbstractAlgebra.FPModule{T}) where T <: RingElement
 invariant_factors(::AbstractAlgebra.FPModule{T}) where T <: RingElement
 ```
 
@@ -181,6 +181,6 @@ m2 = rand(M, -10:10)
 S, f = Submodule(M, [m1, m2])
 Q, g = QuotientModule(M, S)
 
-I, f = InvariantFactorDecomposition(Q)
+I, f = snf(Q)
 invs = invariant_factors(Q)
 ```
