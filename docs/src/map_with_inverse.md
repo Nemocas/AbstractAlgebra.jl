@@ -7,7 +7,7 @@ Recall that as map composition is not commutative, there is a notion of a left i
 and a right inverse for maps.
 
 To keep track of such inverse maps, AbstractAlgebra provides data types
-`Generic.MapWithRetraction` and `GenericMapWithSection`.
+`Generic.MapWithRetraction` and `Generic.MapWithSection`.
 
 Given a map $f : X \to Y$, a retraction of $f$ is a map $g : Y \to X$ such that
 $g(f(x)) = x$ for all $x \in X$.
