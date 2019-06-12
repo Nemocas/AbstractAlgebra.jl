@@ -515,7 +515,7 @@ export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        YoungTableau, AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
        PuiseuxSeriesField, FreeModule, VectorSpace, ModuleHomomorphism, Submodule,
-       Subspace, QuotientModule, QuotientSpace, SNFModule
+       Subspace, QuotientModule, QuotientSpace
 
 export Generic
 
