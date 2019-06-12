@@ -1782,6 +1782,22 @@ function test_gen_mat_views()
    println("PASS")
 end
 
+function test_gen_mat_change_base_ring()
+   print("Generic.Mat.change_base_ring...")
+   P = MatrixSpace(ZZ, 2, 3)
+   Q = MatrixSpace(ZZ, 3, 2)
+   M = rand(P, -10:10)
+   N = rand(Q, -10:10)
+   for R in [QQ, ZZ, GF(2), GF(5)]
+      MQ = change_base_ring(M, R)
+      NQ = change_base_ring(N, R)
+      MNQ = change_base_ring(M * N, R)
+      @test MQ * NQ == MNQ
+   end
+
+   println("PASS")
+end
+
 function test_gen_mat()
    test_gen_mat_constructors()
    test_gen_mat_size()
@@ -1826,6 +1842,7 @@ function test_gen_mat()
    test_gen_mat_weak_popov()
    test_gen_mat_minors()
    test_gen_mat_views()
+   test_gen_mat_change_base_ring()
 
    println("")
 end

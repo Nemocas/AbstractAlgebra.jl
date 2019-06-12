@@ -4751,3 +4751,19 @@ function MatrixSpace(R::AbstractAlgebra.Ring, r::Int, c::Int, cached::Bool = tru
    T = elem_type(R)
    return MatSpace{T}(R, r, c, cached)
 end
+
+@doc Markdown.doc"""
+    change_base_ring(M::AbstractAlgebra.MatElem, R::AbstractAlgebra.Ring)
+> Return the matrix obtained by coercing each entry into `R`.
+"""
+function change_base_ring(M::AbstractAlgebra.MatElem, R::AbstractAlgebra.Ring)
+   r = nrows(M)
+   c = ncols(M)
+   N = zero_matrix(R, r, c)
+   for i in 1:r
+      for j in 1:c
+         N[i,j] = R(M[i,j])
+      end
+   end
+   return N
+end

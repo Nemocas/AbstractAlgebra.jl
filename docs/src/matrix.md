@@ -181,6 +181,10 @@ nrows(::MatElem)
 ncols(::MatElem)
 ```
 
+```@docs
+change_base_ring(::AbstractAlgebra.MatElem, ::AbstractAlgebra.Ring)
+```
+
 **Examples**
 
 ```julia
