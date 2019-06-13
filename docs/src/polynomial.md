@@ -292,6 +292,16 @@ h = shift_right(f, 2)
 change_base_ring(::Poly{T}, ::any)
 ```
 
+**Examples**
+
+```julia
+R, x = PolynomialRing(ZZ, "x")
+g = x^3+6*x + 1
+change_base_ring(g, GF(2))
+
+change_base_ring(g,sqrt)
+```
+
 ### Pseudodivision
 
 Given two polynomials $a, b$, pseudodivision computes polynomials $q$ and $r$
