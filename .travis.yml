@@ -8,7 +8,7 @@ julia:
   - nightly
 matrix:
   allow_failures:
-    #- julia: nightly
+    - julia: nightly
 env:
    global:
       - DOCUMENTER_DEBUG=true
