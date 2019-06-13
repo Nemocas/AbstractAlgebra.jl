@@ -23,7 +23,8 @@ QuotientSpace(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = FreeModule(ZZ, 2)
 
 m = M([ZZ(1), ZZ(2)])
@@ -55,7 +56,8 @@ supermodule(M::AbstractAlgebra.Generic.QuotientModule{T}) where T <: RingElement
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = FreeModule(ZZ, 2)
 m = M([ZZ(2), ZZ(3)])
 N, g = Submodule(M, [m])

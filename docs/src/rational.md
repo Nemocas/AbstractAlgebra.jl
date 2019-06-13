@@ -67,7 +67,8 @@ resulting parent object to coerce various elements into the field.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 f = QQ()
 g = QQ(123)
 h = QQ(BigInt(1234))
@@ -85,7 +86,8 @@ We give some examples of such functionality.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 f = QQ(12, 7)
 
 h = zero(QQ)
@@ -118,7 +120,8 @@ AbstractAlgebra.exp(a::Rational{BigInt})
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 d = AbstractAlgebra.sqrt(ZZ(36)//ZZ(25))
 m = AbstractAlgebra.exp(ZZ(0)//ZZ(1))
 ```

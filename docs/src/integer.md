@@ -63,7 +63,8 @@ resulting parent object to coerce various elements into the ring.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 f = ZZ()
 g = ZZ(123)
 h = ZZ(BigInt(1234))
@@ -78,7 +79,8 @@ We give some examples of such functionality.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 f = ZZ(12)
 
 h = zero(ZZ)
@@ -106,7 +108,8 @@ isunit(::Integer)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 r = ZZ(-1)
 
 isunit(r) == true
@@ -124,7 +127,8 @@ AbstractAlgebra.exp(a::BigInt)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 d = AbstractAlgebra.sqrt(ZZ(36))
 m = AbstractAlgebra.exp(ZZ(0))
 ```
@@ -136,7 +140,8 @@ ppio(a::BigInt, b::BigInt)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 c, n = ppio(ZZ(12), ZZ(26))
 ```
 

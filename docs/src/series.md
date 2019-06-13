@@ -91,7 +91,8 @@ various elements into those rings.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PowerSeriesRing(ZZ, 10, "x")
 S, y = PowerSeriesRing(ZZ, 10, "y"; model=:capped_absolute)
 T, z = LaurentSeriesRing(ZZ, 10, "z")
@@ -114,7 +115,8 @@ O(x::SeriesElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PowerSeriesRing(ZZ, 10, "x")
 S, y = LaurentSeriesRing(ZZ, 10, "y")
 
@@ -222,7 +224,8 @@ interfaces.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 S, x = PowerSeriesRing(ZZ, 10, "x")
 
 f = 1 + 3x + x^3 + O(x^10)
@@ -284,7 +287,8 @@ isunit(::RelSeriesElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PowerSeriesRing(QQ, 10, "t")
 S, x = PowerSeriesRing(R, 30, "x")
 
@@ -310,7 +314,8 @@ shift_right{T <: RingElem}(::RelSeriesElem{T}, ::Int)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PolynomialRing(QQ, "t")
 S, x = PowerSeriesRing(R, 30, "x")
 
@@ -333,7 +338,8 @@ truncate{T <: RingElem}(::RelSeriesElem{T}, ::Int)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PolynomialRing(QQ, "t")
 S, x = PowerSeriesRing(R, 30, "x")
 
@@ -356,7 +362,8 @@ inv(::RelSeriesElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PolynomialRing(QQ, "t")
 S, x = PowerSeriesRing(R, 30, "x")
 
@@ -380,7 +387,8 @@ Base.sqrt(a::RelSeriesElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PolynomialRing(QQ, "t")
 S, x = PowerSeriesRing(R, 30, "x")
 T, z = PowerSeriesRing(QQ, 30, "z")

@@ -59,7 +59,8 @@ to be $R/(m)$, return $m$.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 S = ResidueRing(R, x^3 + 3x + 1)
 
@@ -76,7 +77,8 @@ Given a residue $r \pmod{m}$, represented as such, return $r$.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 S = ResidueRing(R, x^3 + 3x + 1)
 

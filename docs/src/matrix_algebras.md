@@ -70,7 +70,8 @@ resulting parent objects to coerce various elements into the matrix algebra.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PolynomialRing(QQ, "t")
 S = MatrixAlgebra(R, 3)
 
@@ -104,7 +105,8 @@ degree(::Generic.MatAlgElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PolynomialRing(QQ, "t")
 S = MatrixAlgebra(R, 3)
 

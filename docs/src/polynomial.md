@@ -67,7 +67,8 @@ resulting parent objects to coerce various elements into the polynomial ring.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 T, z = QQ["z"]
@@ -102,7 +103,8 @@ We give some examples of such functionality.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
@@ -126,7 +128,8 @@ For polynomials over a field, the Euclidean Ring interface is implemented.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 S = ResidueRing(R, x^3 + 3x + 1)
 T, y = PolynomialRing(S, "y")
@@ -204,7 +207,7 @@ isterm(::PolyElem)
 **Examples**
 
 ```@repl
-using AbstractAlgebra
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 T, z = PolynomialRing(QQ, "z")
@@ -239,7 +242,8 @@ mullow{T <: RingElem}(::PolyElem{T}, ::PolyElem{T}, ::Int)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
@@ -259,7 +263,8 @@ reverse(::PolyElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
@@ -281,7 +286,8 @@ shift_right(::PolyElem, ::Int)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
@@ -311,7 +317,8 @@ pseudodivrem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
@@ -364,7 +371,8 @@ evaluated at $a$ by writing $f(a)$.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
    
@@ -392,7 +400,8 @@ integral{T <: Union{ResElem, FieldElem}}(::PolyElem{T})
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 T, z = PolynomialRing(QQ, "z")
@@ -422,7 +431,8 @@ discriminant(a::PolyElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
@@ -445,7 +455,8 @@ newton_to_monomial!{T <: RingElem}(::Array{T, 1}, ::Array{T, 1})
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
@@ -465,7 +476,8 @@ interpolate{T <: RingElem}(::PolyRing, ::Array{T, 1}, ::Array{T, 1})
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 
@@ -491,7 +503,8 @@ chebyshev_u(::Int, ::PolyElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 

@@ -28,7 +28,8 @@ parent object to coerce various elements into the field.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 F = GF(13)
 
 g = F(3)
@@ -43,7 +44,8 @@ We give some examples of such functionality.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 F = GF(13)
 
 h = zero(F)
@@ -74,7 +76,8 @@ degree(F::GFField)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 F = GF(13)
 
 d = degree(F)

@@ -32,7 +32,8 @@ $\mathbb{Q}[x]$.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 K, a = NumberField(x^3 + 3x + 1, "a")
 

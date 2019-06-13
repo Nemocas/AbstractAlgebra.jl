@@ -53,7 +53,8 @@ resulting parent objects to coerce various elements into the fraction field.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 S = FractionField(R)
 
@@ -76,7 +77,8 @@ We give some examples of such functionality.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 S = FractionField(R)
 
@@ -117,7 +119,8 @@ gcd{T <: RingElem}(::FracElem{T}, ::FracElem{T})
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 
 f = (x + 1)//(x^3 + 3x + 1)
@@ -141,7 +144,8 @@ valuation{T <: RingElem}(::FracElem{T}, ::T)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 
 f = (x + 1)//(x^3 + 3x + 1)

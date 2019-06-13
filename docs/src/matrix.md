@@ -75,7 +75,8 @@ resulting parent objects to coerce various elements into the matrix space.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
 
@@ -127,7 +128,8 @@ entries if the list would otherwise be ambiguous, e.g. `R[1 2 (-3)]'`.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
 
@@ -147,7 +149,8 @@ sub(::MatElem, ::Int, ::Int, ::Int, ::Int)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = ZZ[1 2 3; 2 3 4]
 
 N = sub(M, 1, 1, 2, 2)
@@ -187,7 +190,8 @@ change_base_ring(::AbstractAlgebra.MatElem, ::AbstractAlgebra.Ring)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
 
@@ -215,7 +219,8 @@ powers(::MatElem, ::Int)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = ZZ[1 2 3; 2 3 4; 4 5 5]
 
 A = powers(M, 4)
@@ -229,7 +234,8 @@ gram(::MatElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
 
@@ -246,7 +252,8 @@ tr(::MatElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
 
@@ -263,7 +270,8 @@ content(::MatElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
 
@@ -280,7 +288,8 @@ b = content(A)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
 G = PermGroup(3)
@@ -303,7 +312,8 @@ fflu{T <: RingElem}(::MatElem{T}, ::PermGroup)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 K, a = NumberField(x^3 + 3x + 1, "a")
 S = MatrixSpace(K, 3, 3)
@@ -328,7 +338,8 @@ isrref{T <: FieldElem}(::MatElem{T})
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 K, a = NumberField(x^3 + 3x + 1, "a")
 S = MatrixSpace(K, 3, 3)
@@ -367,7 +378,8 @@ det{T <: FieldElem}(::MatElem{T})
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 K, a = NumberField(x^3 + 3x + 1, "a")
 S = MatrixSpace(K, 3, 3)
@@ -386,7 +398,8 @@ rank{T <: FieldElem}(::MatElem{T})
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 K, a = NumberField(x^3 + 3x + 1, "a")
 S = MatrixSpace(K, 3, 3)
@@ -416,7 +429,8 @@ can_solve_left_reduced_triu{T <: RingElement}(::MatElem{T}, ::MatElem{T})
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 K, a = NumberField(x^3 + 3x + 1, "a")
 S = MatrixSpace(K, 3, 3)
@@ -459,7 +473,8 @@ inv{T <: FieldElem}(::MatElem{T})
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 K, a = NumberField(x^3 + 3x + 1, "a")
 S = MatrixSpace(K, 3, 3)
@@ -485,7 +500,8 @@ nullspace{T <: FieldElem}(::MatElem{T})
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 S = MatrixSpace(R, 4, 4)
    
@@ -507,7 +523,8 @@ right_kernel{T <: RingElem}(::MatElem{T})
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 S = MatrixSpace(ZZ, 4, 4)
 
 M = S([1 2 0 4;
@@ -531,7 +548,8 @@ ishessenberg{T <: RingElem}(::MatElem{T})
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R = ResidueRing(ZZ, 7)
 S = MatrixSpace(R, 4, 4)
    
@@ -550,7 +568,8 @@ charpoly{T <: RingElem}(::Ring, ::MatElem{T})
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R = ResidueRing(ZZ, 7)
 S = MatrixSpace(R, 4, 4)
 T, x = PolynomialRing(R, "x")
@@ -570,7 +589,8 @@ minpoly{T <: FieldElem}(::Ring, ::MatElem{T}, ::Bool)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R = GF(13)
 T, y = PolynomialRing(R, "y")
    
@@ -589,7 +609,8 @@ similarity!{T <: RingElem}(::MatElem{T}, ::Int, ::T)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R = ResidueRing(ZZ, 7)
 S = MatrixSpace(R, 4, 4)
    

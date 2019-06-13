@@ -51,7 +51,8 @@ resulting parent object to coerce various elements into the field.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 RR = RealField
 
 f = RR()
@@ -69,7 +70,8 @@ We give some examples of such functionality.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 RR = RealField
 f = RR(12//7)
 

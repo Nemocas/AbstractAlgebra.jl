@@ -104,7 +104,8 @@ of Julia `Int` values  if this can be done more efficiently.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 S, x = PolynomialRing(QQ, "x")
 
 f = S(Rational{BigInt}[2, 3, 1])
@@ -132,7 +133,8 @@ there is more than one variable and hence an array of symbols.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 S, x = PolynomialRing(QQ, "x")
 
 vsym = var(S)
@@ -206,7 +208,8 @@ can also be defined to do nothing.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 S, x = PolynomialRing(ZZ, "x")
 
 f = x^3 + 3x + 1

@@ -22,7 +22,8 @@ Subspace(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = FreeModule(ZZ, 2)
 
 m = M([ZZ(1), ZZ(2)])
@@ -62,7 +63,8 @@ iscompatible(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = FreeModule(ZZ, 2)
 m = M([ZZ(2), ZZ(3)])
 n = M([ZZ(1), ZZ(4)])
@@ -83,7 +85,8 @@ T <: RingElement
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = FreeModule(ZZ, 2)
 m = M([ZZ(2), ZZ(3)])
 n = M([ZZ(1), ZZ(4)])

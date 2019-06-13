@@ -50,7 +50,8 @@ codomain of $f$.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 f = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
 
 a = f(ZZ(1))
@@ -82,7 +83,8 @@ the second two functions return the corresponding second maps.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 f = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
 g = inv(f)
 h = f*g

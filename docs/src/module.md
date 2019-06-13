@@ -78,7 +78,8 @@ relation is given as an AbstractAlgebra row matrix.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = FreeModule(QQ, 2)
 
 n = ngens(M)
@@ -123,7 +124,8 @@ zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = FreeModule(QQ, 2)
 
 z = zero(M)
@@ -136,7 +138,8 @@ z = zero(M)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = FreeModule(QQ, 2)
 
 M == M
@@ -150,7 +153,8 @@ isisomorphic(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = FreeModule(ZZ, 3)
 m1 = rand(M, -10:10)
 m2 = rand(M, -10:10)
@@ -174,7 +178,8 @@ invariant_factors(::AbstractAlgebra.FPModule{T}) where T <: RingElement
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = FreeModule(ZZ, 3)
 m1 = rand(M, -10:10)
 m2 = rand(M, -10:10)

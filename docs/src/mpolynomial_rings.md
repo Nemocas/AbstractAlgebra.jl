@@ -115,7 +115,8 @@ zero terms and return the created polynomial.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 M = MPolyBuildCtx(R)
@@ -167,7 +168,8 @@ include `:lex`, `:deglex` and `:degrevlex`.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 S, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:deglex)
 
 V = symbols(S)
@@ -243,7 +245,8 @@ polynomials that implement the `exponent_vector` function.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 f = x^3*y + 3x*y^2 + 1
@@ -291,7 +294,8 @@ Returns $v$ such that the highest power of $g$ that divides $f$ is $g^v$.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 f = 2x^2*y + 2x + y + 1
@@ -317,7 +321,8 @@ Divide the polynomial exactly by the constant $c$.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
 f = 3x^2*y^2 + 2x + 1
@@ -353,7 +358,8 @@ quotient happens to be exact, this function can be exceedingly fast.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
 f = 2x^2*y + 2x + y + 1
@@ -376,7 +382,8 @@ Return a greatest common divisor of $f$ and $g$.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 f = 2x^2*y + 2x + y + 1
@@ -418,7 +425,8 @@ A library may also optionally provide an interface that makes use of `BigInt`
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 S, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
 f = S(Rational{BigInt}[2, 3, 1], [[3, 2], [1, 0], [0, 1]])
@@ -488,7 +496,8 @@ return the modified polynomial.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 f = x^3*y + 3x*y^2 + 1
@@ -584,7 +593,8 @@ unique.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
 f = 2x^2*y + 2x + y + 1
@@ -634,7 +644,8 @@ on the left.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
 S = MatrixAlgebra(ZZ, 2)
 
@@ -668,7 +679,8 @@ polynomial ring.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
 
 f = x*y + x + y + 1

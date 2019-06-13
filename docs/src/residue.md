@@ -68,7 +68,8 @@ resulting parent objects to coerce various elements into the residue ring.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 S = ResidueRing(R, x^3 + 3x + 1)
 
@@ -91,7 +92,8 @@ We give some examples of such functionality.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 S = ResidueRing(R, x^3 + 3x + 1)
 
@@ -133,7 +135,8 @@ isunit(::AbstractAlgebra.ResElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 S = ResidueRing(R, x^3 + 3x + 1)
 
@@ -151,7 +154,8 @@ inv(::AbstractAlgebra.ResElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 S = ResidueRing(R)
 
@@ -168,7 +172,8 @@ gcd{T <: RingElem}(::ResElem{T}, ::ResElem{T})
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 S = ResidueRing(R)
 
