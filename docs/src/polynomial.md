@@ -190,6 +190,10 @@ isunit(::PolyElem)
 ```
 
 ```@docs
+degree(::Generic.PolynomialElem)
+```
+
+```@docs
 ismonomial(::PolyElem)
 ```
 
@@ -199,7 +203,8 @@ isterm(::PolyElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra
 R, x = PolynomialRing(ZZ, "x")
 S, y = PolynomialRing(R, "y")
 T, z = PolynomialRing(QQ, "z")
