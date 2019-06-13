@@ -67,7 +67,8 @@ resulting parent objects to coerce various elements into the polynomial ring.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R = MatrixAlgebra(ZZ, 2)
 S, x = PolynomialRing(R, "x")
 T, y = PolynomialRing(T, "y")
@@ -103,7 +104,8 @@ We give some examples of such functionality.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R = MatrixAlgebra(ZZ, 2)
 S, x = PolynomialRing(R, "x")
 T, y = PolynomialRing(T, "y")
@@ -167,7 +169,8 @@ isterm(::NCPolyElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R = MatrixAlgebra(ZZ, 2)
 S, x = PolynomialRing(R, "x")
 T, y = PolynomialRing(S, "y")
@@ -199,7 +202,8 @@ mullow(::NCPolyElem{T}, ::NCPolyElem{T}, ::Int) where T <: NCRingElem
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R = MatrixAlgebra(ZZ, 2)
 S, x = PolynomialRing(R, "x")
 T, y = PolynomialRing(S, "y")
@@ -220,7 +224,8 @@ reverse(::NCPolyElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R = MatrixAlgebra(ZZ, 2)
 S, x = PolynomialRing(R, "x")
 T, y = PolynomialRing(S, "y")
@@ -243,7 +248,8 @@ shift_right(::NCPolyElem, ::Int)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R = MatrixAlgebra(ZZ, 2)
 S, x = PolynomialRing(R, "x")
 T, y = PolynomialRing(S, "y")
@@ -266,7 +272,8 @@ evaluated at $a$ by writing $f(a)$.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R = MatrixAlgebra(ZZ, 2)
 S, x = PolynomialRing(R, "x")
 T, y = PolynomialRing(S, "y")
@@ -286,7 +293,8 @@ derivative(::NCPolyElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R = MatrixAlgebra(ZZ, 2)
 S, x = PolynomialRing(R, "x")
 T, y = PolynomialRing(S, "y")

@@ -73,7 +73,8 @@ resulting parent objects to coerce various elements into the polynomial ring.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:deglex)
 
 f = R()
@@ -131,7 +132,8 @@ coeff(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <:
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 f = x^2 + 2x + 1
@@ -163,7 +165,8 @@ Note that $g$ can also be a Nemo parent, e.g. `QQ`.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 fz = x^2*y^2 + x + 1
@@ -185,7 +188,8 @@ coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPoly
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
 
 f = x^4*y^2*z^2 - 2x^4*y*z^2 + 4x^4*z^2 + 2x^2*y^2 + x + 1
@@ -209,7 +213,8 @@ inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) 
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 f = x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2
@@ -228,7 +233,8 @@ to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) w
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 S, z = PolynomialRing(ZZ, "z")
 
@@ -287,7 +293,8 @@ evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
 f = 2x^2*y^2 + 3x + y + 1
@@ -373,7 +380,8 @@ lcm(a::AbstractAlgebra.MPolyElem{T}, b::AbstractAlgebra.MPolyElem{T}) where {T <
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 using AbstractAlgebra
 R,(x,y) = PolynomialRing(ZZ, ["x", "y"])
 a = x*y + 2*y
@@ -391,7 +399,8 @@ derivative(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
 
 f = x*y + x + y + 1

@@ -37,7 +37,8 @@ Caches can also be turned on and off at run time (see below).
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 f = map_from_func(ZZ, ZZ, x -> x + 1)
 g = cached(f)
 
@@ -65,7 +66,8 @@ value. Setting the value to 0 will effectively disable further caching for this 
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 f = cached(map_from_func(ZZ, ZZ, x -> x + 1))
 
 a = f(ZZ(1))

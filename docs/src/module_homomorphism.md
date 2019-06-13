@@ -17,7 +17,8 @@ Generic.ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = FreeModule(ZZ, 2)
 f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
 
@@ -34,7 +35,8 @@ kernel(f::Generic.ModuleHomomorphism{T}) where T <: RingElement
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = FreeModule(ZZ, 3)
 
 m = M([ZZ(1), ZZ(2), ZZ(3)])

@@ -69,7 +69,8 @@ various elements into those rings.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PuiseuxSeriesRing(ZZ, 10, "x")
 S, y = PuiseuxSeriesField(QQ, 10, "y")
 
@@ -90,7 +91,8 @@ O(x::SeriesElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PuiseuxSeriesRing(ZZ, 10, "x")
 
 f = 1 + 2x + O(x^5)
@@ -146,7 +148,8 @@ interfaces with the exception of the `pol_length` and `polcoeff` functions.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 S, x = PuiseuxSeriesRing(ZZ, 10, "x")
 
 f = 1 + 3x + x^3 + O(x^10)
@@ -200,7 +203,8 @@ isunit(::Generic.PuiseuxSeriesElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PuiseuxSeriesRing(QQ, 10, "t")
 S, x = PuiseuxSeriesRing(R, 30, "x")
 
@@ -222,7 +226,8 @@ inv(::Generic.PuiseuxSeriesElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PuiseuxSeriesRing(QQ, 30, "x")
 
 a = 1 + x + 2x^2 + O(x^5)
@@ -245,7 +250,8 @@ Base.sqrt(a::Generic.PuiseuxSeriesElem)
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PolynomialRing(QQ, "t")
 S, x = PuiseuxSeriesRing(R, 30, "x")
 T, z = PuiseuxSeriesRing(QQ, 30, "z")

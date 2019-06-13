@@ -92,7 +92,8 @@ elements that can be coerced into the base ring of the matrix.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 S = MatrixSpace(QQ, 2, 3)
 T = MatrixAlgebra(QQ, 2)
 
@@ -158,7 +159,8 @@ $x$ belongs to a matrix algebra and $r \neq c$, an exception is raised.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
 N = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])
 P = zero_matrix(ZZ, 3, 2)
@@ -245,7 +247,8 @@ in place and not returned from the function.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = matrix(ZZ, BigInt[2 3 0; 1 1 1])
 
 m = nrows(M)
@@ -265,7 +268,8 @@ The standard Julia tick notation can also be used for transposing a matrix.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, t = PolynomialRing(QQ, "t")
 S = MatrixSpace(R, 3, 3)
 
@@ -295,7 +299,8 @@ and columns.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
 
 N1 = M[1:2, :]
@@ -314,7 +319,8 @@ matrices are assumed to be mutable in AbstractAlgebra.jl).
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = identity_matrix(ZZ, 3)
 
 swap_rows!(M, 1, 2)
@@ -340,7 +346,8 @@ columns of $M$ and $N$ are the same.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
 N = matrix(ZZ, BigInt[1 0 1; 0 1 0; 1 0 1])
 

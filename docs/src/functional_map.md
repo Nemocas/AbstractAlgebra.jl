@@ -53,7 +53,8 @@ $R$ and $S$ corresponding to the Julia function $f$.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 f = map_from_func(ZZ, ZZ, x -> x + 1)
 
 f(ZZ(2))

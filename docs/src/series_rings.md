@@ -78,7 +78,8 @@ precision minus the valuation is bigger than the length of the array.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_relative)
 T, y = LaurentSeriesRing(ZZ, 10, "y")
 U, z = LaurentSeriesField(QQ, 10, "z")
@@ -107,7 +108,8 @@ precision is bigger than the length of the array.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_absolute)
 
 f = S(Rational{BigInt}[0, 2, 3, 1], 4, 6)
@@ -137,7 +139,8 @@ are stored on a per element basis in the actual series elements.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 S, x = PowerSeriesRing(QQ, 10, "x")
 
 vsym = var(S)
@@ -260,7 +263,8 @@ Return the generator `x` of the series ring.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 S, x = PowerSeriesRing(ZZ, 10, "x")
 
 f = 1 + 3x + x^3 + O(x^5)

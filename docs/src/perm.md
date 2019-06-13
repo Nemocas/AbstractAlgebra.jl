@@ -207,7 +207,8 @@ Each of the methods perform basic sanity checks on the input which can be switch
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 (G::PermGroup)()
 ```
 > Return the identity element of `G`.

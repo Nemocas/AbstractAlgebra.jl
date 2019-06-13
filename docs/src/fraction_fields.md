@@ -65,7 +65,8 @@ Return $x/y$ where $y$ is in the base ring of $x$.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(ZZ, "x")
 
 f = (x^2 + x + 1)//(x^3 + 3x + 1)
@@ -91,7 +92,8 @@ the `canonical_unit` and `gcd` functions on the base ring.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 R, x = PolynomialRing(QQ, "x")
 
 f = (x^2 + x + 1)//(x^3 + 3x + 1)

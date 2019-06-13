@@ -36,7 +36,8 @@ Construct the free module/vector space of given rank/dimension.
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = FreeModule(ZZ, 3)
 V = VectorSpace(QQ, 2)
 ```
@@ -50,7 +51,8 @@ dim(V::Generic.FreeModule{T}) where T <: AbstractAlgebra.FieldElem
 
 **Examples**
 
-```julia
+```@repl
+using AbstractAlgebra # hide
 M = FreeModule(ZZ, 3)
 V = VectorSpace(QQ, 2)
 
