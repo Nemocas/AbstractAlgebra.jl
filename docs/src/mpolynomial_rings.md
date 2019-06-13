@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
 ```
 
 # Multivariate Polynomial Ring Interface
@@ -115,15 +118,19 @@ zero terms and return the created polynomial.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
-M = MPolyBuildCtx(R)
-push_term!(C, ZZ(3), [1, 2])
-push_term!(C, ZZ(2), [1, 1])
-push_term!(C, ZZ(4), [0, 0])
-p = finish(C)
+julia> M = MPolyBuildCtx(R)
+
+julia> push_term!(C, ZZ(3), [1, 2])
+
+julia> push_term!(C, ZZ(2), [1, 1])
+
+julia> push_term!(C, ZZ(4), [0, 0])
+
+julia> p = finish(C)
+
 ```
 
 ### Data type and parent object methods
@@ -168,13 +175,15 @@ include `:lex`, `:deglex` and `:degrevlex`.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-S, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:deglex)
+```jldoctest
+julia> S, (x, y) = PolynomialRing(QQ, ["x", "y"]; ordering=:deglex)
 
-V = symbols(S)
-X = gens(S)
-ord = ordering(S)
+julia> V = symbols(S)
+
+julia> X = gens(S)
+
+julia> ord = ordering(S)
+
 ```
 
 ### Basic manipulation of rings and elements
@@ -245,21 +254,29 @@ polynomials that implement the `exponent_vector` function.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+```jldoctest
+julia> S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
-f = x^3*y + 3x*y^2 + 1
+julia> f = x^3*y + 3x*y^2 + 1
 
-n = length(f)
-isgen(y) == true
-B, b = max_degrees(f)
-nvars(f) == 2
-C = collect(coeffs(f))
-M = collect(monomials(f))
-T = collect(terms(f))
-V = collect(exponent_vectors(f))
-d = total_degree(f)
+julia> n = length(f)
+
+julia> isgen(y) == true
+
+julia> B, b = max_degrees(f)
+
+julia> nvars(f) == 2
+
+julia> C = collect(coeffs(f))
+
+julia> M = collect(monomials(f))
+
+julia> T = collect(terms(f))
+
+julia> V = collect(exponent_vectors(f))
+
+julia> d = total_degree(f)
+
 ```
 
 ### Exact division
@@ -294,17 +311,21 @@ Returns $v$ such that the highest power of $g$ that divides $f$ is $g^v$.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
-f = 2x^2*y + 2x + y + 1
-g = x^2*y^2 + 1
+julia> f = 2x^2*y + 2x + y + 1
 
-flag, q = divides(f*g, f)
-d = divexact(f*g, f)
-v, q = remove(f*g^3, g)
-n = valuation(f*g^3, g)
+julia> g = x^2*y^2 + 1
+
+julia> flag, q = divides(f*g, f)
+
+julia> d = divexact(f*g, f)
+
+julia> v, q = remove(f*g^3, g)
+
+julia> n = valuation(f*g^3, g)
+
 ```
 
 ### Ad hoc exact division
@@ -321,14 +342,15 @@ Divide the polynomial exactly by the constant $c$.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
-f = 3x^2*y^2 + 2x + 1
+julia> f = 3x^2*y^2 + 2x + 1
 
-f1 = divexact(f, 5)
-f2 = divexact(f, QQ(2, 3))
+julia> f1 = divexact(f, 5)
+
+julia> f2 = divexact(f, QQ(2, 3))
+
 ```
 
 ### Euclidean division
@@ -358,15 +380,17 @@ quotient happens to be exact, this function can be exceedingly fast.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
-f = 2x^2*y + 2x + y + 1
-g = x + y
+julia> f = 2x^2*y + 2x + y + 1
 
-q = div(f, g)
-q, r = divrem(f, g)
+julia> g = x + y
+
+julia> q = div(f, g)
+
+julia> q, r = divrem(f, g)
+
 ```
 
 ### GCD
@@ -382,14 +406,15 @@ Return a greatest common divisor of $f$ and $g$.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
-f = 2x^2*y + 2x + y + 1
-g = x^2*y^2 + 1
+julia> f = 2x^2*y + 2x + y + 1
 
-d = gcd(f*g^2, f^2*g)
+julia> g = x^2*y^2 + 1
+
+julia> d = gcd(f*g^2, f^2*g)
+
 ```
 
 ## Interface for sparse distributed, random access multivariates
@@ -425,11 +450,11 @@ A library may also optionally provide an interface that makes use of `BigInt`
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-S, (x, y) = PolynomialRing(QQ, ["x", "y"])
+```jldoctest
+julia> S, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
-f = S(Rational{BigInt}[2, 3, 1], [[3, 2], [1, 0], [0, 1]])
+julia> f = S(Rational{BigInt}[2, 3, 1], [[3, 2], [1, 0], [0, 1]])
+
 ```
 
 ### Sparse distributed, random access basic manipulation
@@ -496,19 +521,25 @@ return the modified polynomial.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+```jldoctest
+julia> S, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
-f = x^3*y + 3x*y^2 + 1
+julia> f = x^3*y + 3x*y^2 + 1
 
-c1 = coeff(f, 1)
-c2 = coeff(f, x^3*y)
-m = monomial(f, 2)
-e1 = exponent(f, 1, 1)
-v1 = exponent_vector(f, 1)
-t1 = term(f, 1)
-setcoeff!(f, [3, 1], 12)
+julia> c1 = coeff(f, 1)
+
+julia> c2 = coeff(f, x^3*y)
+
+julia> m = monomial(f, 2)
+
+julia> e1 = exponent(f, 1, 1)
+
+julia> v1 = exponent_vector(f, 1)
+
+julia> t1 = term(f, 1)
+
+julia> setcoeff!(f, [3, 1], 12)
+
 ```
 
 ### Unsafe functions
@@ -593,15 +624,17 @@ unique.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y) = PolynomialRing(QQ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = PolynomialRing(QQ, ["x", "y"])
 
-f = 2x^2*y + 2x + y + 1
-g = x + y
-h = y + 1
+julia> f = 2x^2*y + 2x + y + 1
 
-Q, r = divrem(f, [g, h])
+julia> g = x + y
+
+julia> h = y + 1
+
+julia> Q, r = divrem(f, [g, h])
+
 ```
 
 ### Evaluation
@@ -644,25 +677,33 @@ on the left.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
-S = MatrixAlgebra(ZZ, 2)
+```jldoctest
+julia> R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
 
-f = x*y + x + y + 1
+julia> S = MatrixAlgebra(ZZ, 2)
 
-evaluate(f, [ZZ(1), ZZ(2)])
-evaluate(f, [2, 3])
-f(1, 2)
-f(ZZ(1), ZZ(2))
-f(x - y, x + y)
+julia> f = x*y + x + y + 1
 
-M1 = S([1 2; 3 4])
-M2 = S([2 4; 1 -1])
-M3 = S([1 -1; 1 1])
+julia> evaluate(f, [ZZ(1), ZZ(2)])
 
-f(M1, M2)
-f(M1, ZZ(2))
+julia> evaluate(f, [2, 3])
+
+julia> f(1, 2)
+
+julia> f(ZZ(1), ZZ(2))
+
+julia> f(x - y, x + y)
+
+julia> M1 = S([1 2; 3 4])
+
+julia> M2 = S([2 4; 1 -1])
+
+julia> M3 = S([1 -1; 1 1])
+
+julia> f(M1, M2)
+
+julia> f(M1, ZZ(2))
+
 ```
 
 ### Derivations
@@ -679,12 +720,13 @@ polynomial ring.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
 
-f = x*y + x + y + 1
+julia> f = x*y + x + y + 1
 
-derivative(f, 1)
-derivative(f, 2)
+julia> derivative(f, 1)
+
+julia> derivative(f, 2)
+
 ```

@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
 ```
 
 # Generic matrix algebras
@@ -70,14 +73,17 @@ resulting parent objects to coerce various elements into the matrix algebra.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PolynomialRing(QQ, "t")
-S = MatrixAlgebra(R, 3)
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
 
-A = S()
-B = S(12)
-C = S(R(11))
+julia> S = MatrixAlgebra(R, 3)
+
+julia> A = S()
+
+julia> B = S(12)
+
+julia> C = S(R(11))
+
 ```
 
 ## Matrix algebra functionality provided by AbstractAlgebra.jl
@@ -105,13 +111,14 @@ degree(::Generic.MatAlgElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PolynomialRing(QQ, "t")
-S = MatrixAlgebra(R, 3)
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
 
-A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+julia> S = MatrixAlgebra(R, 3)
 
-n = degree(A)
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+julia> n = degree(A)
+
 ```
 

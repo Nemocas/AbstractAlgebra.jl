@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
 ```
 
 # Generic matrices
@@ -75,14 +78,17 @@ resulting parent objects to coerce various elements into the matrix space.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PolynomialRing(QQ, "t")
-S = MatrixSpace(R, 3, 3)
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
 
-A = S()
-B = S(12)
-C = S(R(11))
+julia> S = MatrixSpace(R, 3, 3)
+
+julia> A = S()
+
+julia> B = S(12)
+
+julia> C = S(R(11))
+
 ```
 
 We also allow matrices over a given base ring to be constructed directly (see the
@@ -128,14 +134,17 @@ entries if the list would otherwise be ambiguous, e.g. `R[1 2 (-3)]'`.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PolynomialRing(QQ, "t")
-S = MatrixSpace(R, 3, 3)
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
 
-M = R[t + 1 1; t^2 0]
-N = R[t + 1 2 t]
-P = R[1 2 t]'
+julia> S = MatrixSpace(R, 3, 3)
+
+julia> M = R[t + 1 1; t^2 0]
+
+julia> N = R[t + 1 2 t]
+
+julia> P = R[1 2 t]'
+
 ```
 
 ## Submatrices
@@ -149,11 +158,11 @@ sub(::MatElem, ::Int, ::Int, ::Int, ::Int)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = ZZ[1 2 3; 2 3 4]
+```jldoctest
+julia> M = ZZ[1 2 3; 2 3 4]
 
-N = sub(M, 1, 1, 2, 2)
+julia> N = sub(M, 1, 1, 2, 2)
+
 ```
 
 ## Matrix functionality provided by AbstractAlgebra.jl
@@ -190,25 +199,37 @@ change_base_ring(::AbstractAlgebra.MatElem, ::AbstractAlgebra.Ring)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PolynomialRing(QQ, "t")
-S = MatrixSpace(R, 3, 3)
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
 
-A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-B = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])
+julia> S = MatrixSpace(R, 3, 3)
 
-T = dense_matrix_type(R)
-r = nrows(B)
-c = ncols(B)
-M = A + B
-N = 2 + A
-M1 = deepcopy(A)
-A != B
-isone(one(S)) == true
-V = A[1:2, :]
-W = A^3
-Z = divexact(2*A, 2)
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+julia> B = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])
+
+julia> T = dense_matrix_type(R)
+
+julia> r = nrows(B)
+
+julia> c = ncols(B)
+
+julia> M = A + B
+
+julia> N = 2 + A
+
+julia> M1 = deepcopy(A)
+
+julia> A != B
+
+julia> isone(one(S)) == true
+
+julia> V = A[1:2, :]
+
+julia> W = A^3
+
+julia> Z = divexact(2*A, 2)
+
 ```
 
 ### Powering
@@ -219,11 +240,11 @@ powers(::MatElem, ::Int)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = ZZ[1 2 3; 2 3 4; 4 5 5]
+```jldoctest
+julia> M = ZZ[1 2 3; 2 3 4; 4 5 5]
 
-A = powers(M, 4)
+julia> A = powers(M, 4)
+
 ```
 
 ### Gram matrix
@@ -234,14 +255,15 @@ gram(::MatElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PolynomialRing(QQ, "t")
-S = MatrixSpace(R, 3, 3)
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
 
-A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+julia> S = MatrixSpace(R, 3, 3)
 
-B = gram(A)
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+julia> B = gram(A)
+
 ```
 
 ### Trace
@@ -252,14 +274,15 @@ tr(::MatElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PolynomialRing(QQ, "t")
-S = MatrixSpace(R, 3, 3)
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
 
-A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+julia> S = MatrixSpace(R, 3, 3)
 
-b = tr(A)
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+julia> b = tr(A)
+
 ```
 
 ### Content
@@ -270,14 +293,15 @@ content(::MatElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PolynomialRing(QQ, "t")
-S = MatrixSpace(R, 3, 3)
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
 
-A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+julia> S = MatrixSpace(R, 3, 3)
 
-b = content(A)
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+julia> b = content(A)
+
 ```
 
 ### Permutation
@@ -288,16 +312,19 @@ b = content(A)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PolynomialRing(QQ, "t")
-S = MatrixSpace(R, 3, 3)
-G = PermGroup(3)
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
 
-A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-P = G([1, 3, 2])
+julia> S = MatrixSpace(R, 3, 3)
 
-B = P*A
+julia> G = PermGroup(3)
+
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+julia> P = G([1, 3, 2])
+
+julia> B = P*A
+
 ```
 
 ### LU factorisation
@@ -312,16 +339,19 @@ fflu{T <: RingElem}(::MatElem{T}, ::PermGroup)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(QQ, "x")
-K, a = NumberField(x^3 + 3x + 1, "a")
-S = MatrixSpace(K, 3, 3)
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
 
-A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 - 2 a - 1 2a])
+julia> K, a = NumberField(x^3 + 3x + 1, "a")
 
-r, P, L, U = lu(A)
-r, d, P, L, U = fflu(A)
+julia> S = MatrixSpace(K, 3, 3)
+
+julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 - 2 a - 1 2a])
+
+julia> r, P, L, U = lu(A)
+
+julia> r, d, P, L, U = fflu(A)
+
 ```
 
 ### Reduced row-echelon form
@@ -338,24 +368,29 @@ isrref{T <: FieldElem}(::MatElem{T})
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(QQ, "x")
-K, a = NumberField(x^3 + 3x + 1, "a")
-S = MatrixSpace(K, 3, 3)
-   
-M = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
-   
-r, A = rref(M)
-isrref(A)
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
 
-R, x = PolynomialRing(ZZ, "x")
-S = MatrixSpace(R, 3, 3)
+julia> K, a = NumberField(x^3 + 3x + 1, "a")
 
-M = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
+julia> S = MatrixSpace(K, 3, 3)
 
-r, d, A = rref(M)
-isrref(A)
+julia> M = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+
+julia> r, A = rref(M)
+
+julia> isrref(A)
+
+julia> R, x = PolynomialRing(ZZ, "x")
+
+julia> S = MatrixSpace(R, 3, 3)
+
+julia> M = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
+
+julia> r, d, A = rref(M)
+
+julia> isrref(A)
+
 ```
 
 ### Hermite normal form
@@ -378,15 +413,17 @@ det{T <: FieldElem}(::MatElem{T})
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(QQ, "x")
-K, a = NumberField(x^3 + 3x + 1, "a")
-S = MatrixSpace(K, 3, 3)
-   
-A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
 
-d = det(A)
+julia> K, a = NumberField(x^3 + 3x + 1, "a")
+
+julia> S = MatrixSpace(K, 3, 3)
+
+julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+
+julia> d = det(A)
+
 ```
 
 ### Rank
@@ -398,15 +435,17 @@ rank{T <: FieldElem}(::MatElem{T})
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(QQ, "x")
-K, a = NumberField(x^3 + 3x + 1, "a")
-S = MatrixSpace(K, 3, 3)
-   
-A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
 
-d = rank(A)
+julia> K, a = NumberField(x^3 + 3x + 1, "a")
+
+julia> S = MatrixSpace(K, 3, 3)
+
+julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+
+julia> d = rank(A)
+
 ```
 
 ### Linear solving
@@ -429,37 +468,46 @@ can_solve_left_reduced_triu{T <: RingElement}(::MatElem{T}, ::MatElem{T})
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(QQ, "x")
-K, a = NumberField(x^3 + 3x + 1, "a")
-S = MatrixSpace(K, 3, 3)
-U = MatrixSpace(K, 3, 1)
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
 
-A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
-b = U([2a a + 1 (-a - 1)]')
+julia> K, a = NumberField(x^3 + 3x + 1, "a")
 
-x = solve(A, b)
+julia> S = MatrixSpace(K, 3, 3)
 
-A = S([a + 1 2a + 3 a^2 + 1; K(0) a^2 - 1 2a; K(0) K(0) a])
-b = U([2a a + 1 (-a - 1)]')
+julia> U = MatrixSpace(K, 3, 1)
 
-x = solve_triu(A, b, false)
+julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 
-R, x = PolynomialRing(ZZ, "x")
-S = MatrixSpace(R, 3, 3)
-U = MatrixSpace(R, 3, 2)
+julia> b = U([2a a + 1 (-a - 1)]')
 
-A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
-b = U([2x x + 1 (-x - 1); x + 1 (-x) x^2]')
+julia> x = solve(A, b)
 
-x, d = solve_rational(A, b)
+julia> A = S([a + 1 2a + 3 a^2 + 1; K(0) a^2 - 1 2a; K(0) K(0) a])
 
-S = MatrixSpace(ZZ, 3, 3)
-T = MatrixSpace(ZZ, 3, 1)
+julia> b = U([2a a + 1 (-a - 1)]')
 
-A = S([BigInt(2) 3 5; 1 4 7; 9 2 2])   
-B = T([BigInt(4), 5, 7])
+julia> x = solve_triu(A, b, false)
+
+julia> R, x = PolynomialRing(ZZ, "x")
+
+julia> S = MatrixSpace(R, 3, 3)
+
+julia> U = MatrixSpace(R, 3, 2)
+
+julia> A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
+
+julia> b = U([2x x + 1 (-x - 1); x + 1 (-x) x^2]')
+
+julia> x, d = solve_rational(A, b)
+
+julia> S = MatrixSpace(ZZ, 3, 3)
+
+julia> T = MatrixSpace(ZZ, 3, 1)
+
+julia> A = S([BigInt(2) 3 5; 1 4 7; 9 2 2])   
+
+julia> B = T([BigInt(4), 5, 7])
 
 X, d = solve_rational(A, B)
 ```
@@ -473,22 +521,25 @@ inv{T <: FieldElem}(::MatElem{T})
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(QQ, "x")
-K, a = NumberField(x^3 + 3x + 1, "a")
-S = MatrixSpace(K, 3, 3)
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
 
-A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
+julia> K, a = NumberField(x^3 + 3x + 1, "a")
 
-X = inv(A)
+julia> S = MatrixSpace(K, 3, 3)
 
-R, x = PolynomialRing(ZZ, "x")
-S = MatrixSpace(R, 3, 3)
+julia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])
 
-A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
-    
-X, d = inv(A)
+julia> X = inv(A)
+
+julia> R, x = PolynomialRing(ZZ, "x")
+
+julia> S = MatrixSpace(R, 3, 3)
+
+julia> A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])
+
+julia> X, d = inv(A)
+
 ```
 
 ### Nullspace
@@ -500,17 +551,17 @@ nullspace{T <: FieldElem}(::MatElem{T})
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(ZZ, "x")
-S = MatrixSpace(R, 4, 4)
-   
-M = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;
-       -8*x^2+8*x+16 -16*x^2+38*x-20 90*x^2-82*x-44 60*x^2+54*x-34;
-       -4*x^2+4*x+8 -8*x^2+13*x-10 35*x^2-31*x-14 22*x^2+21*x-15;
-       -10*x^2+10*x+20 -20*x^2+70*x-25 150*x^2-140*x-85 105*x^2+90*x-50])
-   
-n, N = nullspace(M)
+```jldoctest
+julia> R, x = PolynomialRing(ZZ, "x")
+
+julia> S = MatrixSpace(R, 4, 4)
+
+julia> M = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;
+              -8*x^2+8*x+16 -16*x^2+38*x-20 90*x^2-82*x-44 60*x^2+54*x-34;
+              -4*x^2+4*x+8 -8*x^2+13*x-10 35*x^2-31*x-14 22*x^2+21*x-15;
+              -10*x^2+10*x+20 -20*x^2+70*x-25 150*x^2-140*x-85 105*x^2+90*x-50])
+julia> n, N = nullspace(M)
+
 ```
 
 ### Kernel
@@ -523,17 +574,18 @@ right_kernel{T <: RingElem}(::MatElem{T})
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-S = MatrixSpace(ZZ, 4, 4)
+```jldoctest
+julia> S = MatrixSpace(ZZ, 4, 4)
 
-M = S([1 2 0 4;
-       2 0 1 1;
-       0 1 1 -1;
-       2 -1 0 2])
+julia> M = S([1 2 0 4;
+              2 0 1 1;
+              0 1 1 -1;
+              2 -1 0 2])
 
-nr, Nr = kernel(M)
-nl, Nl = left_kernel(M)
+julia> nr, Nr = kernel(M)
+
+julia> nl, Nl = left_kernel(M)
+
 ```
 
 ### Hessenberg form
@@ -548,16 +600,18 @@ ishessenberg{T <: RingElem}(::MatElem{T})
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R = ResidueRing(ZZ, 7)
-S = MatrixSpace(R, 4, 4)
-   
-M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
-       R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
-   
-A = hessenberg(M)
-ishessenberg(A) == true
+```jldoctest
+julia> R = ResidueRing(ZZ, 7)
+
+julia> S = MatrixSpace(R, 4, 4)
+
+julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
+              R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
+
+julia> A = hessenberg(M)
+
+julia> ishessenberg(A) == true
+
 ```
 
 ### Characteristic polynomial
@@ -568,16 +622,18 @@ charpoly{T <: RingElem}(::Ring, ::MatElem{T})
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R = ResidueRing(ZZ, 7)
-S = MatrixSpace(R, 4, 4)
-T, x = PolynomialRing(R, "x")
+```jldoctest
+julia> R = ResidueRing(ZZ, 7)
 
-M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
-       R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
-   
-A = charpoly(T, M)
+julia> S = MatrixSpace(R, 4, 4)
+
+julia> T, x = PolynomialRing(R, "x")
+
+julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
+              R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
+
+julia> A = charpoly(T, M)
+
 ```
 
 ### Minimal polynomial
@@ -589,16 +645,17 @@ minpoly{T <: FieldElem}(::Ring, ::MatElem{T}, ::Bool)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R = GF(13)
-T, y = PolynomialRing(R, "y")
-   
-M = R[7 6 1;
-      7 7 5;
-      8 12 5]
+```jldoctest
+julia> R = GF(13)
 
-A = minpoly(T, M)
+julia> T, y = PolynomialRing(R, "y")
+
+julia> M = R[7 6 1;
+             7 7 5;
+             8 12 5]
+
+julia> A = minpoly(T, M)
+
 ```
 
 ### Transforms
@@ -609,15 +666,16 @@ similarity!{T <: RingElem}(::MatElem{T}, ::Int, ::T)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R = ResidueRing(ZZ, 7)
-S = MatrixSpace(R, 4, 4)
-   
-M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
-       R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
-   
-similarity!(M, 1, R(3))
+```jldoctest
+julia> R = ResidueRing(ZZ, 7)
+
+julia> S = MatrixSpace(R, 4, 4)
+
+julia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);
+              R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])
+
+julia> similarity!(M, 1, R(3))
+
 ```
 
 ### (Weak) Popov form
@@ -631,4 +689,3 @@ weak_popov_with_transform{T <: PolyElem}(::Generic.Mat{T})
 popov{T <: PolyElem}(::Generic.Mat{T})
 popov_with_transform{T <: PolyElem}(::Generic.Mat{T})
 ```
-

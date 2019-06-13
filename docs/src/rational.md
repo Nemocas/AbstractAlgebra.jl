@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
 ```
 
 # Rational field
@@ -67,14 +70,17 @@ resulting parent object to coerce various elements into the field.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-f = QQ()
-g = QQ(123)
-h = QQ(BigInt(1234))
-k = QQ(BigInt(12), BigInt(7))
+```jldoctest
+julia> f = QQ()
 
-QQ == FractionField(ZZ)
+julia> g = QQ(123)
+
+julia> h = QQ(BigInt(1234))
+
+julia> k = QQ(BigInt(12), BigInt(7))
+
+julia> QQ == FractionField(ZZ)
+
 ```
 
 ## Basic field functionality
@@ -86,21 +92,31 @@ We give some examples of such functionality.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-f = QQ(12, 7)
+```jldoctest
+julia> f = QQ(12, 7)
 
-h = zero(QQ)
-k = one(QQ)
-isone(k) == true
-iszero(f) == false
-U = base_ring(QQ)
-V = base_ring(f)
-T = parent(f)
-f == deepcopy(f)
-g = f + 12
-r = ZZ(12)//ZZ(7)
-n = numerator(r)
+julia> h = zero(QQ)
+
+julia> k = one(QQ)
+
+julia> isone(k) == true
+
+julia> iszero(f) == false
+
+julia> U = base_ring(QQ)
+
+julia> V = base_ring(f)
+
+julia> T = parent(f)
+
+julia> f == deepcopy(f)
+
+julia> g = f + 12
+
+julia> r = ZZ(12)//ZZ(7)
+
+julia> n = numerator(r)
+
 ```
 
 ## Rational functionality provided by AbstractAlgebra.jl
@@ -120,10 +136,11 @@ AbstractAlgebra.exp(a::Rational{BigInt})
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-d = AbstractAlgebra.sqrt(ZZ(36)//ZZ(25))
-m = AbstractAlgebra.exp(ZZ(0)//ZZ(1))
+```jldoctest
+julia> d = AbstractAlgebra.sqrt(ZZ(36)//ZZ(25))
+
+julia> m = AbstractAlgebra.exp(ZZ(0)//ZZ(1))
+
 ```
 
 

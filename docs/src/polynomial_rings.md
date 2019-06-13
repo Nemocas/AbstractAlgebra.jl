@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
+```
+
 # Univariate Polynomial Ring Interface
 
 Univariate polynomial rings are supported in AbstractAlgebra, and in addition to the
@@ -104,13 +111,15 @@ of Julia `Int` values  if this can be done more efficiently.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-S, x = PolynomialRing(QQ, "x")
+```jldoctest
+julia> S, x = PolynomialRing(QQ, "x")
 
-f = S(Rational{BigInt}[2, 3, 1])
-g = S(BigInt[1, 0, 4])
-h = S([4, 7, 2, 9])
+julia> f = S(Rational{BigInt}[2, 3, 1])
+
+julia> g = S(BigInt[1, 0, 4])
+
+julia> h = S([4, 7, 2, 9])
+
 ```
 
 ### Data type and parent object methods
@@ -133,12 +142,13 @@ there is more than one variable and hence an array of symbols.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-S, x = PolynomialRing(QQ, "x")
+```jldoctest
+julia> S, x = PolynomialRing(QQ, "x")
 
-vsym = var(S)
-V = symbols(S)
+julia> vsym = var(S)
+
+julia> V = symbols(S)
+
 ```
 
 ### Basic manipulation of rings and elements
@@ -208,20 +218,26 @@ can also be defined to do nothing.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-S, x = PolynomialRing(ZZ, "x")
+```jldoctest
+julia> S, x = PolynomialRing(ZZ, "x")
 
-f = x^3 + 3x + 1
-g = S(BigInt[1, 2, 0, 1, 0, 0, 0]);
+julia> f = x^3 + 3x + 1
 
-n = length(f)
-c = coeff(f, 1)
-set_length!(g, normalise(g, 7))
-g = setcoeff!(g, 2, BigInt(11))
-fit!(g, 8)
-g = setcoeff!(g, 7, BigInt(4))
+julia> g = S(BigInt[1, 2, 0, 1, 0, 0, 0]);
 
+julia> n = length(f)
+
+julia> c = coeff(f, 1)
+
+julia> set_length!(g, normalise(g, 7))
+
+julia> g = setcoeff!(g, 2, BigInt(11))
+
+julia> fit!(g, 8)
+
+julia> g = setcoeff!(g, 7, BigInt(4))
+
+julia> 
 ```
 
 ## Optional functionality for polynomial rings

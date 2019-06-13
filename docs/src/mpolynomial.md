@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
 ```
 
 # Generic sparse distributed multivariate polynomials
@@ -73,17 +76,23 @@ resulting parent objects to coerce various elements into the polynomial ring.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:deglex)
+```jldoctest
+julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:deglex)
 
-f = R()
-g = R(123)
-h = R(BigInt(1234))
-k = R(x + 1)
-m = R(x + y + 1)
-derivative(k, 1)
-derivative(k, 2)
+julia> f = R()
+
+julia> g = R(123)
+
+julia> h = R(BigInt(1234))
+
+julia> k = R(x + 1)
+
+julia> m = R(x + y + 1)
+
+julia> derivative(k, 1)
+
+julia> derivative(k, 2)
+
 ```
 
 All of the examples here are generic polynomial rings, but specialised implementations
@@ -132,22 +141,31 @@ coeff(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <:
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
-f = x^2 + 2x + 1
+julia> f = x^2 + 2x + 1
 
-V = vars(f)
-var_index(y) == 2
-degree(f, x) == 2
-degree(f, 2) == 0
-d = degrees(f)
-isconstant(R(1))
-isterm(2x)
-ismonomial(y)
-isunit(R(1))
-c = coeff(f, x^2)
+julia> V = vars(f)
+
+julia> var_index(y) == 2
+
+julia> degree(f, x) == 2
+
+julia> degree(f, 2) == 0
+
+julia> d = degrees(f)
+
+julia> isconstant(R(1))
+
+julia> isterm(2x)
+
+julia> ismonomial(y)
+
+julia> isunit(R(1))
+
+julia> c = coeff(f, x^2)
+
 ```
 
 ### Changing base (coefficient) rings
@@ -165,13 +183,13 @@ Note that $g$ can also be a Nemo parent, e.g. `QQ`.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
-fz = x^2*y^2 + x + 1
+julia> fz = x^2*y^2 + x + 1
 
-fq = change_base_ring(fz, QQ)
+julia> fq = change_base_ring(fz, QQ)
+
 ```
 
 ### Multivariate coefficients
@@ -188,13 +206,13 @@ coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPoly
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
+```jldoctest
+julia> R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
 
-f = x^4*y^2*z^2 - 2x^4*y*z^2 + 4x^4*z^2 + 2x^2*y^2 + x + 1
+julia> f = x^4*y^2*z^2 - 2x^4*y*z^2 + 4x^4*z^2 + 2x^2*y^2 + x + 1
 
-coeff(f, [1, 3], [4, 2]) == coeff(f, [x, z], [4, 2])
+julia> coeff(f, [1, 3], [4, 2]) == coeff(f, [x, z], [4, 2])
+
 ```
 
 ### Inflation/deflation
@@ -213,16 +231,19 @@ inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) 
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
-f = x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2
+julia> f = x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2
 
-def, shift = deflation(f)
-f1 = deflate(f, def, shift)
-f2 = inflate(f1, def, shift)
-f2 == f
+julia> def, shift = deflation(f)
+
+julia> f1 = deflate(f, def, shift)
+
+julia> f2 = inflate(f1, def, shift)
+
+julia> f2 == f
+
 ```
 
 ### Conversions
@@ -233,14 +254,15 @@ to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) w
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
-S, z = PolynomialRing(ZZ, "z")
+```jldoctest
+julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
-f = 2x^5 + 3x^4 - 2x^2 - 1
+julia> S, z = PolynomialRing(ZZ, "z")
 
-g = to_univariate(S, f)
+julia> f = 2x^5 + 3x^4 - 2x^2 - 1
+
+julia> g = to_univariate(S, f)
+
 ```
 
 ### Evaluation
@@ -293,39 +315,46 @@ evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 
-f = 2x^2*y^2 + 3x + y + 1
+julia> f = 2x^2*y^2 + 3x + y + 1
 
-evaluate(f, BigInt[1, 2])
-evaluate(f, [QQ(1), QQ(2)])
-evaluate(f, [1, 2])
-f(1, 2) == 14
+julia> evaluate(f, BigInt[1, 2])
 
-evaluate(f, [x + y, 2y - x])
-f(x + y, 2y - x)
+julia> evaluate(f, [QQ(1), QQ(2)])
 
-R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
+julia> evaluate(f, [1, 2])
 
-f = x^2*y^2 + 2x*z + 3y*z + z + 1
+julia> f(1, 2) == 14
 
-evaluate(f, [1, 3], [3, 4])
-evaluate(f, [x, z], [3, 4])
+julia> evaluate(f, [x + y, 2y - x])
 
-evaluate(f, [1, 2], [x + z, x - z])
+julia> f(x + y, 2y - x)
 
-evaluate(f, [2, 4, 6], QQ)
-evaluate(f, [x, z], [2, 4], QQ)
+julia> R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
 
-S = MatrixAlgebra(ZZ, 2)
+julia> f = x^2*y^2 + 2x*z + 3y*z + z + 1
 
-M1 = S([1 2; 3 4])
-M2 = S([2 3; 1 -1])
-M3 = S([-1 1; 1 1])
+julia> evaluate(f, [1, 3], [3, 4])
 
-evaluate(f, [M1, M2, M3])
+julia> evaluate(f, [x, z], [3, 4])
+
+julia> evaluate(f, [1, 2], [x + z, x - z])
+
+julia> evaluate(f, [2, 4, 6], QQ)
+
+julia> evaluate(f, [x, z], [2, 4], QQ)
+
+julia> S = MatrixAlgebra(ZZ, 2)
+
+julia> M1 = S([1 2; 3 4])
+
+julia> M2 = S([2 3; 1 -1])
+
+julia> M3 = S([-1 1; 1 1])
+
+julia> evaluate(f, [M1, M2, M3])
 f(M1, M2, M3)
 
 f(M1, ZZ(2), M3)
@@ -380,15 +409,21 @@ lcm(a::AbstractAlgebra.MPolyElem{T}, b::AbstractAlgebra.MPolyElem{T}) where {T <
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-using AbstractAlgebra
-R,(x,y) = PolynomialRing(ZZ, ["x", "y"])
-a = x*y + 2*y
-b = x^3*y + y
-gcd(a,b)
-lcm(a,b)
-lcm(a,b) == a * b // gcd(a,b)
+```jldoctest
+julia> using AbstractAlgebra
+
+julia> R,(x,y) = PolynomialRing(ZZ, ["x", "y"])
+
+julia> a = x*y + 2*y
+
+julia> b = x^3*y + y
+
+julia> gcd(a,b)
+
+julia> lcm(a,b)
+
+julia> lcm(a,b) == a * b // gcd(a,b)
+
 ```
 
 ### Derivations
@@ -399,14 +434,15 @@ derivative(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
+```jldoctest
+julia> R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
 
-f = x*y + x + y + 1
+julia> f = x*y + x + y + 1
 
-derivative(f, x)
-derivative(f, y)
+julia> derivative(f, x)
+
+julia> derivative(f, y)
+
 ```
 
 ### Homogeneous polynomials

@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
+```
+
 # Submodules
 
 AbstractAlgebra allows the construction of submodules/subvector spaces of
@@ -22,24 +29,45 @@ Subspace(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = FreeModule(ZZ, 2)
+```jldoctest
+julia> M = FreeModule(ZZ, 2)
+Free module of rank 2 over Integers
 
-m = M([ZZ(1), ZZ(2)])
-n = M([ZZ(2), ZZ(-1)])
+julia> m = M([ZZ(1), ZZ(2)])
+(1, 2)
 
-N, f = Submodule(M, [m, n])
+julia> n = M([ZZ(2), ZZ(-1)])
+(2, -1)
 
-v = N([ZZ(3), ZZ(4)])
-v2 = f(v)
+julia> N, f = Submodule(M, [m, n])
+(Submodule over Integers with 2 generators and no relations
+, Module homomorphism with
+Domain: Submodule over Integers with 2 generators and no relations
 
-V = VectorSpace(QQ, 2)
+Codomain: Free module of rank 2 over Integers)
 
-m = V([QQ(1), QQ(2)])
-n = V([QQ(2), QQ(-1)])
+julia> v = N([ZZ(3), ZZ(4)])
+(3, 4)
 
-N, f = Subspace(V, [m, n])
+julia> v2 = f(v)
+(3, 26)
+
+julia> V = VectorSpace(QQ, 2)
+Vector space of dimension 2 over Rationals
+
+julia> m = V([QQ(1), QQ(2)])
+(1//1, 2//1)
+
+julia> n = V([QQ(2), QQ(-1)])
+(2//1, -1//1)
+
+julia> N, f = Subspace(V, [m, n])
+(Subspace over Rationals with 2 generators and no relations
+, Module homomorphism with
+Domain: Subspace over Rationals with 2 generators and no relations
+
+Codomain: Vector space of dimension 2 over Rationals)
+
 ```
 
 ## Functionality for submodules
@@ -63,17 +91,45 @@ iscompatible(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = FreeModule(ZZ, 2)
-m = M([ZZ(2), ZZ(3)])
-n = M([ZZ(1), ZZ(4)])
-N1 = Submodule(M, [m, n])
-N2 = Submodule(M, [m])
+```jldoctest
+julia> M = FreeModule(ZZ, 2)
+Free module of rank 2 over Integers
 
-supermodule(N1) == M
-iscompatible(N1, N2)
-issubmodule(M, N)
+julia> m = M([ZZ(2), ZZ(3)])
+(2, 3)
+
+julia> n = M([ZZ(1), ZZ(4)])
+(1, 4)
+
+julia> N1 = Submodule(M, [m, n])
+(Submodule over Integers with 2 generators and no relations
+, Module homomorphism with
+Domain: Submodule over Integers with 2 generators and no relations
+
+Codomain: Free module of rank 2 over Integers)
+
+julia> N2 = Submodule(M, [m])
+(Submodule over Integers with 1 generator and no relations
+, Module homomorphism with
+Domain: Submodule over Integers with 1 generator and no relations
+
+Codomain: Free module of rank 2 over Integers)
+
+julia> supermodule(N1) == M
+ERROR: MethodError: no method matching supermodule(::Tuple{AbstractAlgebra.Generic.Submodule{BigInt},AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}})
+Stacktrace:
+ [1] top-level scope at none:0
+
+julia> iscompatible(N1, N2)
+ERROR: MethodError: no method matching iscompatible(::Tuple{AbstractAlgebra.Generic.Submodule{BigInt},AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}}, ::Tuple{AbstractAlgebra.Generic.Submodule{BigInt},AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}})
+Stacktrace:
+ [1] top-level scope at none:0
+
+julia> issubmodule(M, N)
+ERROR: UndefVarError: N not defined
+Stacktrace:
+ [1] top-level scope at none:0
+
 ```
 
 ### Intersection
@@ -85,15 +141,33 @@ T <: RingElement
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = FreeModule(ZZ, 2)
-m = M([ZZ(2), ZZ(3)])
-n = M([ZZ(1), ZZ(4)])
-N1 = Submodule(M, [m, n])
-N2 = Submodule(M, [m])
+```jldoctest
+julia> M = FreeModule(ZZ, 2)
+Free module of rank 2 over Integers
 
-I = intersect(N1, N2)
+julia> m = M([ZZ(2), ZZ(3)])
+(2, 3)
+
+julia> n = M([ZZ(1), ZZ(4)])
+(1, 4)
+
+julia> N1 = Submodule(M, [m, n])
+(Submodule over Integers with 2 generators and no relations
+, Module homomorphism with
+Domain: Submodule over Integers with 2 generators and no relations
+
+Codomain: Free module of rank 2 over Integers)
+
+julia> N2 = Submodule(M, [m])
+(Submodule over Integers with 1 generator and no relations
+, Module homomorphism with
+Domain: Submodule over Integers with 1 generator and no relations
+
+Codomain: Free module of rank 2 over Integers)
+
+julia> I = intersect(N1, N2)
+0-element Array{Union{ModuleHomomorphism{BigInt}, Submodule{BigInt}},1}
+
 ```
 
 

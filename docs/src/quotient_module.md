@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
+```
+
 # Quotient modules
 
 AbstractAlgebra allows the construction of quotient modules/spaces of
@@ -23,24 +30,27 @@ QuotientSpace(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = FreeModule(ZZ, 2)
+```jldoctest
+julia> M = FreeModule(ZZ, 2)
 
-m = M([ZZ(1), ZZ(2)])
+julia> m = M([ZZ(1), ZZ(2)])
 
-N, f = Submodule(M, [m])
-Q, g = QuotientModule(M, N)
+julia> N, f = Submodule(M, [m])
 
-p = Q([ZZ(3)])
-v2 = g(p)
+julia> Q, g = QuotientModule(M, N)
 
-V = VectorSpace(QQ, 2)
+julia> p = Q([ZZ(3)])
 
-m = V([QQ(1), QQ(2)])
+julia> v2 = g(p)
 
-N, f = Subspace(V, [m])
-Q, g = QuotientSpace(V, N)
+julia> V = VectorSpace(QQ, 2)
+
+julia> m = V([QQ(1), QQ(2)])
+
+julia> N, f = Subspace(V, [m])
+
+julia> Q, g = QuotientSpace(V, N)
+
 ```
 
 ## Functionality for submodules
@@ -56,13 +66,16 @@ supermodule(M::AbstractAlgebra.Generic.QuotientModule{T}) where T <: RingElement
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = FreeModule(ZZ, 2)
-m = M([ZZ(2), ZZ(3)])
-N, g = Submodule(M, [m])
-Q, h = QuotientModule(M, N)
+```jldoctest
+julia> M = FreeModule(ZZ, 2)
 
-supermodule(Q) == M
+julia> m = M([ZZ(2), ZZ(3)])
+
+julia> N, g = Submodule(M, [m])
+
+julia> Q, h = QuotientModule(M, N)
+
+julia> supermodule(Q) == M
+
 ```
 

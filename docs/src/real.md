@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
 ```
 
 # Real field
@@ -51,15 +54,25 @@ resulting parent object to coerce various elements into the field.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-RR = RealField
+```jldoctest
+julia> RR = RealField
+Floats
 
-f = RR()
-g = RR(123)
-h = RR(BigInt(1234))
-k = RR(12//7)
-m = RR(2.3)
+julia> f = RR()
+0.0
+
+julia> g = RR(123)
+123.0
+
+julia> h = RR(BigInt(1234))
+1234.0
+
+julia> k = RR(12//7)
+1.714285714285714285714285714285714285714285714285714285714285714285714285714291
+
+julia> m = RR(2.3)
+2.29999999999999982236431605997495353221893310546875
+
 ```
 
 ## Basic field functionality
@@ -70,19 +83,41 @@ We give some examples of such functionality.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-RR = RealField
-f = RR(12//7)
+```jldoctest
+julia> RR = RealField
+Floats
 
-h = zero(RR)
-k = one(RR)
-isone(k) == true
-iszero(f) == false
-U = base_ring(RR)
-V = base_ring(f)
-T = parent(f)
-f == deepcopy(f)
-g = f + 12
-m = inv(g)
+julia> f = RR(12//7)
+1.714285714285714285714285714285714285714285714285714285714285714285714285714291
+
+julia> h = zero(RR)
+0.0
+
+julia> k = one(RR)
+1.0
+
+julia> isone(k) == true
+true
+
+julia> iszero(f) == false
+true
+
+julia> U = base_ring(RR)
+Union{}
+
+julia> V = base_ring(f)
+ERROR: MethodError: no method matching base_ring(::BigFloat)
+
+julia> T = parent(f)
+Floats
+
+julia> f == deepcopy(f)
+true
+
+julia> g = f + 12
+13.71428571428571428571428571428571428571428571428571428571428571428571428571433
+
+julia> m = inv(g)
+0.07291666666666666666666666666666666666666666666666666666666666666666666666666631
+
 ```

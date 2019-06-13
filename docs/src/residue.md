@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
 ```
 
 # Generic residue rings
@@ -68,15 +71,25 @@ resulting parent objects to coerce various elements into the residue ring.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(QQ, "x")
-S = ResidueRing(R, x^3 + 3x + 1)
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
 
-f = S()
-g = S(123)
-h = S(BigInt(1234))
-k = S(x + 1)
+julia> S = ResidueRing(R, x^3 + 3x + 1)
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+
+julia> f = S()
+0//1
+
+julia> g = S(123)
+123//1
+
+julia> h = S(BigInt(1234))
+1234//1
+
+julia> k = S(x + 1)
+x+1//1
+
 ```
 
 All of the examples here are generic residue rings, but specialised implementations
@@ -92,22 +105,43 @@ We give some examples of such functionality.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(QQ, "x")
-S = ResidueRing(R, x^3 + 3x + 1)
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
 
-f = S(x + 1)
+julia> S = ResidueRing(R, x^3 + 3x + 1)
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
 
-h = zero(S)
-k = one(S)
-isone(k) == true
-iszero(f) == false
-m = modulus(S)
-U = base_ring(S)
-V = base_ring(f)
-T = parent(f)
-f == deepcopy(f)
+julia> f = S(x + 1)
+x+1//1
+
+julia> h = zero(S)
+0//1
+
+julia> k = one(S)
+1//1
+
+julia> isone(k) == true
+true
+
+julia> iszero(f) == false
+true
+
+julia> m = modulus(S)
+x^3+3//1*x+1//1
+
+julia> U = base_ring(S)
+Univariate Polynomial Ring in x over Rationals
+
+julia> V = base_ring(f)
+Univariate Polynomial Ring in x over Rationals
+
+julia> T = parent(f)
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
+
+julia> f == deepcopy(f)
+true
+
 ```
 
 ## Residue ring functionality provided by AbstractAlgebra.jl
@@ -135,15 +169,22 @@ isunit(::AbstractAlgebra.ResElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(QQ, "x")
-S = ResidueRing(R, x^3 + 3x + 1)
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
 
-r = S(x + 1)
+julia> S = ResidueRing(R, x^3 + 3x + 1)
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
 
-a = modulus(S)
-isunit(r) == true
+julia> r = S(x + 1)
+x+1//1
+
+julia> a = modulus(S)
+x^3+3//1*x+1//1
+
+julia> isunit(r) == true
+true
+
 ```
 
 ### Inversion
@@ -154,14 +195,23 @@ inv(::AbstractAlgebra.ResElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(QQ, "x")
-S = ResidueRing(R)
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
 
-f = S(x + 1)
+julia> S = ResidueRing(R)
+ERROR: MethodError: no method matching ResidueRing(::AbstractAlgebra.Generic.PolyRing{Rational{BigInt}})
 
-g = inv(f)
+julia> f = S(x + 1)
+ERROR: UndefVarError: S not defined
+Stacktrace:
+ [1] top-level scope at none:0
+
+julia> g = inv(f)
+ERROR: UndefVarError: f not defined
+Stacktrace:
+ [1] top-level scope at none:0
+
 ```
 
 ### Greatest common divisor
@@ -172,14 +222,27 @@ gcd{T <: RingElem}(::ResElem{T}, ::ResElem{T})
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(QQ, "x")
-S = ResidueRing(R)
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
 
-f = S(x + 1)
-g = S(x^2 + 2x + 1)
+julia> S = ResidueRing(R)
+ERROR: MethodError: no method matching ResidueRing(::AbstractAlgebra.Generic.PolyRing{Rational{BigInt}})
 
-h = gcd(f, g)
+julia> f = S(x + 1)
+ERROR: UndefVarError: S not defined
+Stacktrace:
+ [1] top-level scope at none:0
+
+julia> g = S(x^2 + 2x + 1)
+ERROR: UndefVarError: S not defined
+Stacktrace:
+ [1] top-level scope at none:0
+
+julia> h = gcd(f, g)
+ERROR: UndefVarError: f not defined
+Stacktrace:
+ [1] top-level scope at none:0
+
 ```
 

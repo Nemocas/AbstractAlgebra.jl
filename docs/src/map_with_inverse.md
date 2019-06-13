@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
+```
+
 # Map with inverse
 
 It is not possible to provide generic functionality to invert a map. However, sometimes
@@ -50,11 +57,11 @@ codomain of $f$.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-f = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
+```jldoctest
+julia> f = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
 
-a = f(ZZ(1))
+julia> a = f(ZZ(1))
+
 ```
 
 ## Functionality for maps with inverses
@@ -83,12 +90,14 @@ the second two functions return the corresponding second maps.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-f = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
-g = inv(f)
-h = f*g
+```jldoctest
+julia> f = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
 
-a = h(ZZ(1))
+julia> g = inv(f)
+
+julia> h = f*g
+
+julia> a = h(ZZ(1))
+
 ```
 

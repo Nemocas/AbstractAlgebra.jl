@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
 ```
 
 # Integer ring
@@ -63,11 +66,13 @@ resulting parent object to coerce various elements into the ring.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-f = ZZ()
-g = ZZ(123)
-h = ZZ(BigInt(1234))
+```jldoctest
+julia> f = ZZ()
+
+julia> g = ZZ(123)
+
+julia> h = ZZ(BigInt(1234))
+
 ```
 
 ## Basic ring functionality
@@ -79,21 +84,31 @@ We give some examples of such functionality.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-f = ZZ(12)
+```jldoctest
+julia> f = ZZ(12)
 
-h = zero(ZZ)
-k = one(ZZ)
-isone(k) == true
-iszero(f) == false
-U = base_ring(ZZ)
-V = base_ring(f)
-T = parent(f)
-f == deepcopy(f)
-g = f + 12
-h = powmod(f, 12, ZZ(17))
-flag, q = divides(f, ZZ(3))
+julia> h = zero(ZZ)
+
+julia> k = one(ZZ)
+
+julia> isone(k) == true
+
+julia> iszero(f) == false
+
+julia> U = base_ring(ZZ)
+
+julia> V = base_ring(f)
+
+julia> T = parent(f)
+
+julia> f == deepcopy(f)
+
+julia> g = f + 12
+
+julia> h = powmod(f, 12, ZZ(17))
+
+julia> flag, q = divides(f, ZZ(3))
+
 ```
 
 ## Integer functionality provided by AbstractAlgebra.jl
@@ -108,11 +123,11 @@ isunit(::Integer)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-r = ZZ(-1)
+```jldoctest
+julia> r = ZZ(-1)
 
-isunit(r) == true
+julia> isunit(r) == true
+
 ```
 
 ### Square root
@@ -127,10 +142,11 @@ AbstractAlgebra.exp(a::BigInt)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-d = AbstractAlgebra.sqrt(ZZ(36))
-m = AbstractAlgebra.exp(ZZ(0))
+```jldoctest
+julia> d = AbstractAlgebra.sqrt(ZZ(36))
+
+julia> m = AbstractAlgebra.exp(ZZ(0))
+
 ```
 ### Coprime bases
 
@@ -140,9 +156,9 @@ ppio(a::BigInt, b::BigInt)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-c, n = ppio(ZZ(12), ZZ(26))
+```jldoctest
+julia> c, n = ppio(ZZ(12), ZZ(26))
+
 ```
 
 
