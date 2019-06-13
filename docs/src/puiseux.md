@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
 ```
 
 # Generic Puiseux series
@@ -69,15 +72,19 @@ various elements into those rings.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PuiseuxSeriesRing(ZZ, 10, "x")
-S, y = PuiseuxSeriesField(QQ, 10, "y")
+```jldoctest
+julia> R, x = PuiseuxSeriesRing(ZZ, 10, "x")
 
-f = R()
-g = S(123)
-h = R(BigInt(1234))
-k = S(y + 1)
+julia> S, y = PuiseuxSeriesField(QQ, 10, "y")
+
+julia> f = R()
+
+julia> g = S(123)
+
+julia> h = R(BigInt(1234))
+
+julia> k = S(y + 1)
+
 ```
 
 ## Big-oh notation
@@ -91,12 +98,13 @@ O(x::SeriesElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+```jldoctest
+julia> R, x = PuiseuxSeriesRing(ZZ, 10, "x")
 
-f = 1 + 2x + O(x^5)
-g = 2x^(1//3) + 7y^(2//3) + O(y^(7//3))
+julia> f = 1 + 2x + O(x^5)
+
+julia> g = 2x^(1//3) + 7y^(2//3) + O(y^(7//3))
+
 ```
 
 What is happening here in practice is that `O(x^n)` is creating the series `0 + O(x^n)`
@@ -148,23 +156,33 @@ interfaces with the exception of the `pol_length` and `polcoeff` functions.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-S, x = PuiseuxSeriesRing(ZZ, 10, "x")
+```jldoctest
+julia> S, x = PuiseuxSeriesRing(ZZ, 10, "x")
 
-f = 1 + 3x + x^3 + O(x^10)
-g = 1 + 2x^(1//3) + x^(2//3) + O(x^(7//3))
+julia> f = 1 + 3x + x^3 + O(x^10)
 
-h = zero(S)
-k = one(S)
-isone(k) == true
-iszero(f) == false
-U = base_ring(S)
-v = var(S)
-T = parent(x + 1)
-g == deepcopy(g)
-t = divexact(2g, 2)
-p = precision(f)
+julia> g = 1 + 2x^(1//3) + x^(2//3) + O(x^(7//3))
+
+julia> h = zero(S)
+
+julia> k = one(S)
+
+julia> isone(k) == true
+
+julia> iszero(f) == false
+
+julia> U = base_ring(S)
+
+julia> v = var(S)
+
+julia> T = parent(x + 1)
+
+julia> g == deepcopy(g)
+
+julia> t = divexact(2g, 2)
+
+julia> p = precision(f)
+
 ```
 
 ## Puiseux series functionality provided by AbstractAlgebra.jl
@@ -203,19 +221,25 @@ isunit(::Generic.PuiseuxSeriesElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PuiseuxSeriesRing(QQ, 10, "t")
-S, x = PuiseuxSeriesRing(R, 30, "x")
+```jldoctest
+julia> R, t = PuiseuxSeriesRing(QQ, 10, "t")
 
-a = O(x^4)
-b = (t + 3)*x + (t^2 + 1)*x^2 + O(x^4)
+julia> S, x = PuiseuxSeriesRing(R, 30, "x")
 
-k = isgen(gen(R))
-m = isunit(-1 + x^(1//3) + 2x^2)
-n = valuation(a)
-p = valuation(b)
-c = coeff(b, 2)
+julia> a = O(x^4)
+
+julia> b = (t + 3)*x + (t^2 + 1)*x^2 + O(x^4)
+
+julia> k = isgen(gen(R))
+
+julia> m = isunit(-1 + x^(1//3) + 2x^2)
+
+julia> n = valuation(a)
+
+julia> p = valuation(b)
+
+julia> c = coeff(b, 2)
+
 ```
 
 ### Division
@@ -226,15 +250,17 @@ inv(::Generic.PuiseuxSeriesElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PuiseuxSeriesRing(QQ, 30, "x")
+```jldoctest
+julia> R, x = PuiseuxSeriesRing(QQ, 30, "x")
 
-a = 1 + x + 2x^2 + O(x^5)
-b = R(-1)
+julia> a = 1 + x + 2x^2 + O(x^5)
 
-c = inv(a)
-d = inv(b)
+julia> b = R(-1)
+
+julia> c = inv(a)
+
+julia> d = inv(b)
+
 ```
 
 ### Special functions
@@ -250,17 +276,23 @@ Base.sqrt(a::Generic.PuiseuxSeriesElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PolynomialRing(QQ, "t")
-S, x = PuiseuxSeriesRing(R, 30, "x")
-T, z = PuiseuxSeriesRing(QQ, 30, "z")
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
 
-a = 1 + z + 3z^2 + O(z^5)
-b = z + 2z^2 + 5z^3 + O(z^5)
+julia> S, x = PuiseuxSeriesRing(R, 30, "x")
 
-c = exp(x + O(x^40))
-d = divexact(x, exp(x + O(x^40)) - 1)
-f = exp(b)
-h = sqrt(a)
+julia> T, z = PuiseuxSeriesRing(QQ, 30, "z")
+
+julia> a = 1 + z + 3z^2 + O(z^5)
+
+julia> b = z + 2z^2 + 5z^3 + O(z^5)
+
+julia> c = exp(x + O(x^40))
+
+julia> d = divexact(x, exp(x + O(x^40)) - 1)
+
+julia> f = exp(b)
+
+julia> h = sqrt(a)
+
 ```

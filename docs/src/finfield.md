@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
 ```
 
 # Finite fields
@@ -28,12 +31,13 @@ parent object to coerce various elements into the field.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-F = GF(13)
+```jldoctest
+julia> F = GF(13)
 
-g = F(3)
-h = F(g)
+julia> g = F(3)
+
+julia> h = F(g)
+
 ```
 
 ## Basic field functionality
@@ -44,20 +48,29 @@ We give some examples of such functionality.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-F = GF(13)
+```jldoctest
+julia> F = GF(13)
 
-h = zero(F)
-k = one(F)
-isone(k) == true
-iszero(f) == false
-U = base_ring(F)
-V = base_ring(h)
-T = parent(h)
-h == deepcopy(h)
-h = h + 2
-m = inv(k)
+julia> h = zero(F)
+
+julia> k = one(F)
+
+julia> isone(k) == true
+
+julia> iszero(f) == false
+
+julia> U = base_ring(F)
+
+julia> V = base_ring(h)
+
+julia> T = parent(h)
+
+julia> h == deepcopy(h)
+
+julia> h = h + 2
+
+julia> m = inv(k)
+
 ```
 
 ## Basic manipulation of fields and elements
@@ -76,13 +89,15 @@ degree(F::GFField)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-F = GF(13)
+```jldoctest
+julia> F = GF(13)
 
-d = degree(F)
-n = order(F)
-g = gen(F)
+julia> d = degree(F)
+
+julia> n = order(F)
+
+julia> g = gen(F)
+
 ```
 
 

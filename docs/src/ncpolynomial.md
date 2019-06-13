@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
 ```
 
 # Generic univariate polynomials over a noncommutative ring
@@ -67,18 +70,25 @@ resulting parent objects to coerce various elements into the polynomial ring.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R = MatrixAlgebra(ZZ, 2)
-S, x = PolynomialRing(R, "x")
-T, y = PolynomialRing(T, "y")
-U, z = R["z"]
+```jldoctest
+julia> R = MatrixAlgebra(ZZ, 2)
 
-f = S()
-g = S(123)
-h = T(BigInt(1234))
-k = T(x + 1)
-m = U(z + 1)
+julia> S, x = PolynomialRing(R, "x")
+
+julia> T, y = PolynomialRing(T, "y")
+
+julia> U, z = R["z"]
+
+julia> f = S()
+
+julia> g = S(123)
+
+julia> h = T(BigInt(1234))
+
+julia> k = T(x + 1)
+
+julia> m = U(z + 1)
+
 ```
 
 All of the examples here are generic polynomial rings, but specialised implementations
@@ -104,26 +114,39 @@ We give some examples of such functionality.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R = MatrixAlgebra(ZZ, 2)
-S, x = PolynomialRing(R, "x")
-T, y = PolynomialRing(T, "y")
+```jldoctest
+julia> R = MatrixAlgebra(ZZ, 2)
 
-f = x^3 + 3x + 21
-g = (x + 1)*y^2 + 2x + 1
+julia> S, x = PolynomialRing(R, "x")
 
-h = zero(T)
-k = one(S)
-isone(k) == true
-iszero(f) == false
-n = length(g)
-U = base_ring(T)
-V = base_ring(y + 1)
-v = var(T)
-U = parent(y + 1)
-g == deepcopy(g)
-t = divexact(2g, 2)
+julia> T, y = PolynomialRing(T, "y")
+
+julia> f = x^3 + 3x + 21
+
+julia> g = (x + 1)*y^2 + 2x + 1
+
+julia> h = zero(T)
+
+julia> k = one(S)
+
+julia> isone(k) == true
+
+julia> iszero(f) == false
+
+julia> n = length(g)
+
+julia> U = base_ring(T)
+
+julia> V = base_ring(y + 1)
+
+julia> v = var(T)
+
+julia> U = parent(y + 1)
+
+julia> g == deepcopy(g)
+
+julia> t = divexact(2g, 2)
+
 ```
 
 ## Polynomial functionality provided by AbstractAlgebra.jl
@@ -169,25 +192,35 @@ isterm(::NCPolyElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R = MatrixAlgebra(ZZ, 2)
-S, x = PolynomialRing(R, "x")
-T, y = PolynomialRing(S, "y")
+```jldoctest
+julia> R = MatrixAlgebra(ZZ, 2)
 
-a = zero(T)
-b = one(T)
+julia> S, x = PolynomialRing(R, "x")
 
-c = BigInt(1)*z^2 + BigInt(1)
-d = x*y^2 + (x + 1)*y + 3
+julia> T, y = PolynomialRing(S, "y")
 
-f = lead(d)
-y = gen(T)
-g = isgen(y)
-m = isunit(b)
-n = degree(d)
-isterm(2y^2) == true
-ismonomial(y^2) == true
+julia> a = zero(T)
+
+julia> b = one(T)
+
+julia> c = BigInt(1)*z^2 + BigInt(1)
+
+julia> d = x*y^2 + (x + 1)*y + 3
+
+julia> f = lead(d)
+
+julia> y = gen(T)
+
+julia> g = isgen(y)
+
+julia> m = isunit(b)
+
+julia> n = degree(d)
+
+julia> isterm(2y^2) == true
+
+julia> ismonomial(y^2) == true
+
 ```
 
 ### Truncation
@@ -202,17 +235,21 @@ mullow(::NCPolyElem{T}, ::NCPolyElem{T}, ::Int) where T <: NCRingElem
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R = MatrixAlgebra(ZZ, 2)
-S, x = PolynomialRing(R, "x")
-T, y = PolynomialRing(S, "y")
+```jldoctest
+julia> R = MatrixAlgebra(ZZ, 2)
 
-f = x*y^2 + (x + 1)*y + 3
-g = (x + 1)*y + (x^3 + 2x + 2)
+julia> S, x = PolynomialRing(R, "x")
 
-h = truncate(f, 1)
-k = mullow(f, g, 4)
+julia> T, y = PolynomialRing(S, "y")
+
+julia> f = x*y^2 + (x + 1)*y + 3
+
+julia> g = (x + 1)*y + (x^3 + 2x + 2)
+
+julia> h = truncate(f, 1)
+
+julia> k = mullow(f, g, 4)
+
 ```
 
 ### Reversal
@@ -224,16 +261,19 @@ reverse(::NCPolyElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R = MatrixAlgebra(ZZ, 2)
-S, x = PolynomialRing(R, "x")
-T, y = PolynomialRing(S, "y")
+```jldoctest
+julia> R = MatrixAlgebra(ZZ, 2)
 
-f = x*y^2 + (x + 1)*y + 3
+julia> S, x = PolynomialRing(R, "x")
 
-g = reverse(f, 7)
-h = reverse(f)
+julia> T, y = PolynomialRing(S, "y")
+
+julia> f = x*y^2 + (x + 1)*y + 3
+
+julia> g = reverse(f, 7)
+
+julia> h = reverse(f)
+
 ```
 
 ### Shifting
@@ -248,16 +288,19 @@ shift_right(::NCPolyElem, ::Int)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R = MatrixAlgebra(ZZ, 2)
-S, x = PolynomialRing(R, "x")
-T, y = PolynomialRing(S, "y")
+```jldoctest
+julia> R = MatrixAlgebra(ZZ, 2)
 
-f = x*y^2 + (x + 1)*y + 3
+julia> S, x = PolynomialRing(R, "x")
 
-g = shift_left(f, 7)
-h = shift_right(f, 2)
+julia> T, y = PolynomialRing(S, "y")
+
+julia> f = x*y^2 + (x + 1)*y + 3
+
+julia> g = shift_left(f, 7)
+
+julia> h = shift_right(f, 2)
+
 ```
 
 ### Evaluation
@@ -272,17 +315,22 @@ evaluated at $a$ by writing $f(a)$.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R = MatrixAlgebra(ZZ, 2)
-S, x = PolynomialRing(R, "x")
-T, y = PolynomialRing(S, "y")
-   
-f = x*y^2 + (x + 1)*y + 3
+```jldoctest
+julia> R = MatrixAlgebra(ZZ, 2)
 
-k = evaluate(f, 3)
-m = evaluate(f, x^2 + 2x + 1)
-r = f(23)
+julia> S, x = PolynomialRing(R, "x")
+
+julia> T, y = PolynomialRing(S, "y")
+
+
+julia> f = x*y^2 + (x + 1)*y + 3
+
+julia> k = evaluate(f, 3)
+
+julia> m = evaluate(f, x^2 + 2x + 1)
+
+julia> r = f(23)
+
 ```
 
 ### Derivative
@@ -293,14 +341,16 @@ derivative(::NCPolyElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R = MatrixAlgebra(ZZ, 2)
-S, x = PolynomialRing(R, "x")
-T, y = PolynomialRing(S, "y")
+```jldoctest
+julia> R = MatrixAlgebra(ZZ, 2)
 
-f = x*y^2 + (x + 1)*y + 3
+julia> S, x = PolynomialRing(R, "x")
 
-h = derivative(f)
+julia> T, y = PolynomialRing(S, "y")
+
+julia> f = x*y^2 + (x + 1)*y + 3
+
+julia> h = derivative(f)
+
 ```
 

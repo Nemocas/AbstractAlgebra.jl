@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
+```
+
 # Cached maps
 
 All basic map (i.e. those not built up from other maps) in AbstractAlgebra can be
@@ -37,12 +44,13 @@ Caches can also be turned on and off at run time (see below).
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-f = map_from_func(ZZ, ZZ, x -> x + 1)
-g = cached(f)
+```jldoctest
+julia> f = map_from_func(ZZ, ZZ, x -> x + 1)
 
-f(ZZ(1)) == g(ZZ(1))
+julia> g = cached(f)
+
+julia> f(ZZ(1)) == g(ZZ(1))
+
 ```
 
 ## Functionality for cached maps
@@ -66,18 +74,23 @@ value. Setting the value to 0 will effectively disable further caching for this 
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-f = cached(map_from_func(ZZ, ZZ, x -> x + 1))
+```jldoctest
+julia> f = cached(map_from_func(ZZ, ZZ, x -> x + 1))
 
-a = f(ZZ(1))
-disable_cache!(f)
-b = f(ZZ(1))
-enable_cache!(f)
-c = f(ZZ(1))
+julia> a = f(ZZ(1))
 
-set_limit!(f, 200)
-d = f(ZZ(1))
+julia> disable_cache!(f)
+
+julia> b = f(ZZ(1))
+
+julia> enable_cache!(f)
+
+julia> c = f(ZZ(1))
+
+julia> set_limit!(f, 200)
+
+julia> d = f(ZZ(1))
+
 ```
 
 

@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
+```
+
 # Residue Ring Interface
 
 Residue rings (currently a quotient ring modulo a principal ideal) are supported in
@@ -59,12 +66,13 @@ to be $R/(m)$, return $m$.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(QQ, "x")
-S = ResidueRing(R, x^3 + 3x + 1)
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
 
-m = modulus(S)
+julia> S = ResidueRing(R, x^3 + 3x + 1)
+
+julia> m = modulus(S)
+
 ```
 
 ### Basic manipulation of rings and elements
@@ -77,13 +85,14 @@ Given a residue $r \pmod{m}$, represented as such, return $r$.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(QQ, "x")
-S = ResidueRing(R, x^3 + 3x + 1)
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
 
-f = S(x^2 + 2)
+julia> S = ResidueRing(R, x^3 + 3x + 1)
 
-d = data(f)
+julia> f = S(x^2 + 2)
+
+julia> d = data(f)
+
 ```
 

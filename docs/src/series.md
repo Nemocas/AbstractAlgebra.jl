@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
 ```
 
 # Generic power series
@@ -91,17 +94,23 @@ various elements into those rings.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PowerSeriesRing(ZZ, 10, "x")
-S, y = PowerSeriesRing(ZZ, 10, "y"; model=:capped_absolute)
-T, z = LaurentSeriesRing(ZZ, 10, "z")
-U, w = LaurentSeriesField(QQ, 10, "w")
+```jldoctest
+julia> R, x = PowerSeriesRing(ZZ, 10, "x")
 
-f = R()
-g = S(123)
-h = U(BigInt(1234))
-k = T(z + 1)
+julia> S, y = PowerSeriesRing(ZZ, 10, "y"; model=:capped_absolute)
+
+julia> T, z = LaurentSeriesRing(ZZ, 10, "z")
+
+julia> U, w = LaurentSeriesField(QQ, 10, "w")
+
+julia> f = R()
+
+julia> g = S(123)
+
+julia> h = U(BigInt(1234))
+
+julia> k = T(z + 1)
+
 ```
 
 ## Big-oh notation
@@ -115,13 +124,15 @@ O(x::SeriesElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PowerSeriesRing(ZZ, 10, "x")
-S, y = LaurentSeriesRing(ZZ, 10, "y")
+```jldoctest
+julia> R, x = PowerSeriesRing(ZZ, 10, "x")
 
-f = 1 + 2x + O(x^5)
-g = 2y + 7y^2 + O(y^7)
+julia> S, y = LaurentSeriesRing(ZZ, 10, "y")
+
+julia> f = 1 + 2x + O(x^5)
+
+julia> g = 2y + 7y^2 + O(y^7)
+
 ```
 
 What is happening here in practice is that `O(x^n)` is creating the series `0 + O(x^n)`
@@ -224,25 +235,37 @@ interfaces.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-S, x = PowerSeriesRing(ZZ, 10, "x")
+```jldoctest
+julia> S, x = PowerSeriesRing(ZZ, 10, "x")
 
-f = 1 + 3x + x^3 + O(x^10)
-g = 1 + 2x + x^2 + O(x^10)
+julia> f = 1 + 3x + x^3 + O(x^10)
 
-h = zero(S)
-k = one(S)
-isone(k) == true
-iszero(f) == false
-n = pol_length(f)
-c = polcoeff(f, 3)
-U = base_ring(S)
-v = var(S)
-T = parent(x + 1)
-g == deepcopy(g)
-t = divexact(2g, 2)
-p = precision(f)
+julia> g = 1 + 2x + x^2 + O(x^10)
+
+julia> h = zero(S)
+
+julia> k = one(S)
+
+julia> isone(k) == true
+
+julia> iszero(f) == false
+
+julia> n = pol_length(f)
+
+julia> c = polcoeff(f, 3)
+
+julia> U = base_ring(S)
+
+julia> v = var(S)
+
+julia> T = parent(x + 1)
+
+julia> g == deepcopy(g)
+
+julia> t = divexact(2g, 2)
+
+julia> p = precision(f)
+
 ```
 
 ## Series functionality provided by AbstractAlgebra.jl
@@ -287,19 +310,25 @@ isunit(::RelSeriesElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PowerSeriesRing(QQ, 10, "t")
-S, x = PowerSeriesRing(R, 30, "x")
+```jldoctest
+julia> R, t = PowerSeriesRing(QQ, 10, "t")
 
-a = O(x^4)
-b = (t + 3)*x + (t^2 + 1)*x^2 + O(x^4)
+julia> S, x = PowerSeriesRing(R, 30, "x")
 
-k = isgen(gen(R))
-m = isunit(-1 + x + 2x^2)
-n = valuation(a)
-p = valuation(b)
-c = coeff(b, 2)
+julia> a = O(x^4)
+
+julia> b = (t + 3)*x + (t^2 + 1)*x^2 + O(x^4)
+
+julia> k = isgen(gen(R))
+
+julia> m = isunit(-1 + x + 2x^2)
+
+julia> n = valuation(a)
+
+julia> p = valuation(b)
+
+julia> c = coeff(b, 2)
+
 ```
 
 ### Shifting
@@ -314,20 +343,27 @@ shift_right{T <: RingElem}(::RelSeriesElem{T}, ::Int)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PolynomialRing(QQ, "t")
-S, x = PowerSeriesRing(R, 30, "x")
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
 
-a = 2x + x^3
-b = O(x^4)
-c = 1 + x + 2x^2 + O(x^5)
-d = 2x + x^3 + O(x^4)
+julia> S, x = PowerSeriesRing(R, 30, "x")
 
-f = shift_left(a, 2)
-g = shift_left(b, 2)
-h = shift_right(c, 1)
-k = shift_right(d, 3)
+julia> a = 2x + x^3
+
+julia> b = O(x^4)
+
+julia> c = 1 + x + 2x^2 + O(x^5)
+
+julia> d = 2x + x^3 + O(x^4)
+
+julia> f = shift_left(a, 2)
+
+julia> g = shift_left(b, 2)
+
+julia> h = shift_right(c, 1)
+
+julia> k = shift_right(d, 3)
+
 ```
 
 ### Truncation
@@ -338,20 +374,27 @@ truncate{T <: RingElem}(::RelSeriesElem{T}, ::Int)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PolynomialRing(QQ, "t")
-S, x = PowerSeriesRing(R, 30, "x")
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
 
-a = 2x + x^3
-b = O(x^4)
-c = 1 + x + 2x^2 + O(x^5)
-d = 2x + x^3 + O(x^4)
+julia> S, x = PowerSeriesRing(R, 30, "x")
 
-f = truncate(a, 3)
-g = truncate(b, 2)
-h = truncate(c, 7)
-k = truncate(d, 5)
+julia> a = 2x + x^3
+
+julia> b = O(x^4)
+
+julia> c = 1 + x + 2x^2 + O(x^5)
+
+julia> d = 2x + x^3 + O(x^4)
+
+julia> f = truncate(a, 3)
+
+julia> g = truncate(b, 2)
+
+julia> h = truncate(c, 7)
+
+julia> k = truncate(d, 5)
+
 ```
 
 ### Division
@@ -362,16 +405,19 @@ inv(::RelSeriesElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PolynomialRing(QQ, "t")
-S, x = PowerSeriesRing(R, 30, "x")
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
 
-a = 1 + x + 2x^2 + O(x^5)
-b = S(-1)
+julia> S, x = PowerSeriesRing(R, 30, "x")
 
-c = inv(a)
-d = inv(b)
+julia> a = 1 + x + 2x^2 + O(x^5)
+
+julia> b = S(-1)
+
+julia> c = inv(a)
+
+julia> d = inv(b)
+
 ```
 
 ### Special functions
@@ -387,17 +433,23 @@ Base.sqrt(a::RelSeriesElem)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PolynomialRing(QQ, "t")
-S, x = PowerSeriesRing(R, 30, "x")
-T, z = PowerSeriesRing(QQ, 30, "z")
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
 
-a = 1 + z + 3z^2 + O(z^5)
-b = z + 2z^2 + 5z^3 + O(z^5)
+julia> S, x = PowerSeriesRing(R, 30, "x")
 
-c = exp(x + O(x^40))
-d = divexact(x, exp(x + O(x^40)) - 1)
-f = exp(b)
-h = sqrt(a)
+julia> T, z = PowerSeriesRing(QQ, 30, "z")
+
+julia> a = 1 + z + 3z^2 + O(z^5)
+
+julia> b = z + 2z^2 + 5z^3 + O(z^5)
+
+julia> c = exp(x + O(x^40))
+
+julia> d = divexact(x, exp(x + O(x^40)) - 1)
+
+julia> f = exp(b)
+
+julia> h = sqrt(a)
+
 ```

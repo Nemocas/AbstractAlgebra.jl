@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
 ```
 
 # Generic fraction fields
@@ -53,15 +56,19 @@ resulting parent objects to coerce various elements into the fraction field.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(ZZ, "x")
-S = FractionField(R)
+```jldoctest
+julia> R, x = PolynomialRing(ZZ, "x")
 
-f = S()
-g = S(123)
-h = S(BigInt(1234))
-k = S(x + 1)
+julia> S = FractionField(R)
+
+julia> f = S()
+
+julia> g = S(123)
+
+julia> h = S(BigInt(1234))
+
+julia> k = S(x + 1)
+
 ```
 
 All of the examples here are generic fraction fields, but specialised implementations
@@ -77,25 +84,37 @@ We give some examples of such functionality.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(QQ, "x")
-S = FractionField(R)
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
 
-f = S(x + 1)
-g = (x^2 + x + 1)//(x^3 + 3x + 1)
+julia> S = FractionField(R)
 
-h = zero(S)
-k = one(S)
-isone(k) == true
-iszero(f) == false
-m = characteristic(S)
-U = base_ring(S)
-V = base_ring(f)
-T = parent(f)
-r = deepcopy(f)
-n = numerator(g)
-d = denominator(g)
+julia> f = S(x + 1)
+
+julia> g = (x^2 + x + 1)//(x^3 + 3x + 1)
+
+julia> h = zero(S)
+
+julia> k = one(S)
+
+julia> isone(k) == true
+
+julia> iszero(f) == false
+
+julia> m = characteristic(S)
+
+julia> U = base_ring(S)
+
+julia> V = base_ring(f)
+
+julia> T = parent(f)
+
+julia> r = deepcopy(f)
+
+julia> n = numerator(g)
+
+julia> d = denominator(g)
+
 ```
 
 ## Fraction field functionality provided by AbstractAlgebra.jl
@@ -119,14 +138,15 @@ gcd{T <: RingElem}(::FracElem{T}, ::FracElem{T})
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(QQ, "x")
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
 
-f = (x + 1)//(x^3 + 3x + 1)
-g = (x^2 + 2x + 1)//(x^2 + x + 1)
+julia> f = (x + 1)//(x^3 + 3x + 1)
 
-h = gcd(f, g)
+julia> g = (x^2 + 2x + 1)//(x^2 + x + 1)
+
+julia> h = gcd(f, g)
+
 ```
 
 ### Remove and valuation
@@ -144,14 +164,16 @@ valuation{T <: RingElem}(::FracElem{T}, ::T)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(ZZ, "x")
+```jldoctest
+julia> R, x = PolynomialRing(ZZ, "x")
 
-f = (x + 1)//(x^3 + 3x + 1)
-g = (x^2 + 1)//(x^2 + x + 1)
+julia> f = (x + 1)//(x^3 + 3x + 1)
 
-v, q = remove(f^3*g, x + 1)
-v = valuation(f^3*g, x + 1)
+julia> g = (x^2 + 1)//(x^2 + x + 1)
+
+julia> v, q = remove(f^3*g, x + 1)
+
+julia> v = valuation(f^3*g, x + 1)
+
 ```
 

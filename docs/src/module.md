@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
+```
+
 # Module Interface
 
 AbstractAlgebra allows the construction of finitely presented modules (i.e.
@@ -78,15 +85,19 @@ relation is given as an AbstractAlgebra row matrix.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = FreeModule(QQ, 2)
+```jldoctest
+julia> M = FreeModule(QQ, 2)
 
-n = ngens(M)
-G = gens(M)
-R = rels(M)
-g1 = gen(M, 1)
-!iszero(g1)
+julia> n = ngens(M)
+
+julia> G = gens(M)
+
+julia> R = rels(M)
+
+julia> g1 = gen(M, 1)
+
+julia> !iszero(g1)
+
 ```
 
 ### Element constructors
@@ -124,11 +135,11 @@ zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = FreeModule(QQ, 2)
+```jldoctest
+julia> M = FreeModule(QQ, 2)
 
-z = zero(M)
+julia> z = zero(M)
+
 ```
 ### Comparison
 
@@ -138,11 +149,11 @@ z = zero(M)
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = FreeModule(QQ, 2)
+```jldoctest
+julia> M = FreeModule(QQ, 2)
 
-M == M
+julia> M == M
+
 ```
 
 ### Isomorphism
@@ -153,15 +164,19 @@ isisomorphic(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = FreeModule(ZZ, 3)
-m1 = rand(M, -10:10)
-m2 = rand(M, -10:10)
-S, f = Submodule(M, [m1, m2])
-I, g = image(f)
+```jldoctest
+julia> M = FreeModule(ZZ, 3)
 
-isisomorphic(S, I)
+julia> m1 = rand(M, -10:10)
+
+julia> m2 = rand(M, -10:10)
+
+julia> S, f = Submodule(M, [m1, m2])
+
+julia> I, g = image(f)
+
+julia> isisomorphic(S, I)
+
 ```
 
 ### Invariant Factor Decomposition
@@ -178,14 +193,19 @@ invariant_factors(::AbstractAlgebra.FPModule{T}) where T <: RingElement
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = FreeModule(ZZ, 3)
-m1 = rand(M, -10:10)
-m2 = rand(M, -10:10)
-S, f = Submodule(M, [m1, m2])
-Q, g = QuotientModule(M, S)
+```jldoctest
+julia> M = FreeModule(ZZ, 3)
 
-I, f = snf(Q)
-invs = invariant_factors(Q)
+julia> m1 = rand(M, -10:10)
+
+julia> m2 = rand(M, -10:10)
+
+julia> S, f = Submodule(M, [m1, m2])
+
+julia> Q, g = QuotientModule(M, S)
+
+julia> I, f = snf(Q)
+
+julia> invs = invariant_factors(Q)
+
 ```

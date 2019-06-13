@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
+```
+
 # Matrix Interface
 
 Generic matrices are supported in AbstractAlgebra.jl. Both the space of $m\times n$ 
@@ -92,18 +99,23 @@ elements that can be coerced into the base ring of the matrix.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-S = MatrixSpace(QQ, 2, 3)
-T = MatrixAlgebra(QQ, 2)
+```jldoctest
+julia> S = MatrixSpace(QQ, 2, 3)
 
-M1 = S(Rational{BigInt}[2 3 1; 1 0 4])
-M2 = S(BigInt[2 3 1; 1 0 4])
-M3 = S(BigInt[2, 3, 1, 1, 0, 4])
+julia> T = MatrixAlgebra(QQ, 2)
 
-N1 = T(Rational{BigInt}[2 3; 1 0])
-N2 = T(BigInt[2 3; 1 0])
-N3 = T(BigInt[2, 3, 1, 1])
+julia> M1 = S(Rational{BigInt}[2 3 1; 1 0 4])
+
+julia> M2 = S(BigInt[2 3 1; 1 0 4])
+
+julia> M3 = S(BigInt[2, 3, 1, 1, 0, 4])
+
+julia> N1 = T(Rational{BigInt}[2 3; 1 0])
+
+julia> N2 = T(BigInt[2 3; 1 0])
+
+julia> N3 = T(BigInt[2, 3, 1, 1])
+
 ```
 
 It is also possible to create matrices (in a matrix space only) directly, without first
@@ -159,18 +171,25 @@ $x$ belongs to a matrix algebra and $r \neq c$, an exception is raised.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
-N = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])
-P = zero_matrix(ZZ, 3, 2)
-Q = identity_matrix(ZZ, 4)
-C = similar(P)
-D = similar(Q, 4, 5)
+```jldoctest
+julia> M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
 
-R = MatrixAlgebra(ZZ, 2)
-M = R()
-F = similar(M)
+julia> N = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])
+
+julia> P = zero_matrix(ZZ, 3, 2)
+
+julia> Q = identity_matrix(ZZ, 4)
+
+julia> C = similar(P)
+
+julia> D = similar(Q, 4, 5)
+
+julia> R = MatrixAlgebra(ZZ, 2)
+
+julia> M = R()
+
+julia> F = similar(M)
+
 ```
 
 ### Views
@@ -247,14 +266,17 @@ in place and not returned from the function.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = matrix(ZZ, BigInt[2 3 0; 1 1 1])
+```jldoctest
+julia> M = matrix(ZZ, BigInt[2 3 0; 1 1 1])
 
-m = nrows(M)
-n = ncols(M)
-M[1, 2] = BigInt(4)
-c = M[1, 1]
+julia> m = nrows(M)
+
+julia> n = ncols(M)
+
+julia> M[1, 2] = BigInt(4)
+
+julia> c = M[1, 1]
+
 ```
 ### Transpose
 
@@ -268,15 +290,17 @@ The standard Julia tick notation can also be used for transposing a matrix.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, t = PolynomialRing(QQ, "t")
-S = MatrixSpace(R, 3, 3)
+```jldoctest
+julia> R, t = PolynomialRing(QQ, "t")
 
-A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+julia> S = MatrixSpace(R, 3, 3)
 
-B = transpose(A)
-C = A'
+julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+
+julia> B = transpose(A)
+
+julia> C = A'
+
 ```
 
 ## Optional functionality for matrices
@@ -299,13 +323,15 @@ and columns.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
+```jldoctest
+julia> M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
 
-N1 = M[1:2, :]
-N2 = M[:, :]
-N3 = M[2:3, 2:3]
+julia> N1 = M[1:2, :]
+
+julia> N2 = M[:, :]
+
+julia> N3 = M[2:3, 2:3]
+
 ```
 
 ### Optional row swapping
@@ -319,11 +345,11 @@ matrices are assumed to be mutable in AbstractAlgebra.jl).
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = identity_matrix(ZZ, 3)
+```jldoctest
+julia> M = identity_matrix(ZZ, 3)
 
-swap_rows!(M, 1, 2)
+julia> swap_rows!(M, 1, 2)
+
 ```
 
 ### Optional concatenation
@@ -346,11 +372,13 @@ columns of $M$ and $N$ are the same.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
-N = matrix(ZZ, BigInt[1 0 1; 0 1 0; 1 0 1])
+```jldoctest
+julia> M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
 
-P = hcat(M, N)
-Q = vcat(M, N)
+julia> N = matrix(ZZ, BigInt[1 0 1; 0 1 0; 1 0 1])
+
+julia> P = hcat(M, N)
+
+julia> Q = vcat(M, N)
+
 ```

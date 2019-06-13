@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
+```
+
 # Module Homomorphisms
 
 Abstract Algebra provides homomorphisms of finitely presented modules.
@@ -17,14 +24,15 @@ Generic.ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = FreeModule(ZZ, 2)
-f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
+```jldoctest
+julia> M = FreeModule(ZZ, 2)
 
-m = M([ZZ(1), ZZ(2)])
+julia> f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
 
-f(m)
+julia> m = M([ZZ(1), ZZ(2)])
+
+julia> f(m)
+
 ```
 
 ### Kernels
@@ -35,16 +43,17 @@ kernel(f::Generic.ModuleHomomorphism{T}) where T <: RingElement
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-M = FreeModule(ZZ, 3)
+```jldoctest
+julia> M = FreeModule(ZZ, 3)
 
-m = M([ZZ(1), ZZ(2), ZZ(3)])
+julia> m = M([ZZ(1), ZZ(2), ZZ(3)])
 
-S, f = Submodule(M, [m])
-Q, g = QuotientModule(M, S)
+julia> S, f = Submodule(M, [m])
 
-kernel(g)
+julia> Q, g = QuotientModule(M, S)
+
+julia> kernel(g)
+
 ```
 
 ### Images

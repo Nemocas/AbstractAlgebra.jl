@@ -1,3 +1,10 @@
+```@meta
+CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
+```
+
 # Series Ring Interface
 
 Univariate power series rings are supported in AbstractAlgebra in a variety of different
@@ -78,15 +85,15 @@ precision minus the valuation is bigger than the length of the array.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_relative)
-T, y = LaurentSeriesRing(ZZ, 10, "y")
-U, z = LaurentSeriesField(QQ, 10, "z")
- 
-f = S(Rational{BigInt}[2, 3, 1], 3, 6, 2)
-g = T(BigInt[2, 3, 1], 3, 6, 2)
-h = U(Rational{BigInt}[2, 3, 1], 3, 6, 2)
+```jldoctest
+julia> S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_relative)
+(Univariate power series ring in x over Rationals, x+O(x^11))
+
+julia> T, y = LaurentSeriesRing(ZZ, 10, "y")
+(Laurent series ring in y over Integers, y+O(y^11))
+
+julia> U, z = LaurentSeriesField(QQ, 10, "z")
+(Laurent series field in z over Rationals, z+O(z^11))
 ```
 
 For absolute power series we have:
@@ -108,11 +115,13 @@ precision is bigger than the length of the array.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_absolute)
+```jldoctest
+julia> S, x = PowerSeriesRing(QQ, 10, "x"; model=:capped_absolute)
+(Univariate power series ring in x over Rationals, x+O(x^10))
 
-f = S(Rational{BigInt}[0, 2, 3, 1], 4, 6)
+julia> f = S(Rational{BigInt}[0, 2, 3, 1], 4, 6)
+(2//1)*x+(3//1)*x^2+x^3+O(x^6)
+
 ```
 
 ### Data type and parent object methods
@@ -139,12 +148,16 @@ are stored on a per element basis in the actual series elements.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-S, x = PowerSeriesRing(QQ, 10, "x")
+```jldoctest
+julia> S, x = PowerSeriesRing(QQ, 10, "x")
+(Univariate power series ring in x over Rationals, x+O(x^11))
 
-vsym = var(S)
-max_precision(S) == 10
+julia> vsym = var(S)
+:x
+
+julia> max_precision(S) == 10
+true
+
 ```
 
 ### Basic manipulation of rings and elements
@@ -263,20 +276,37 @@ Return the generator `x` of the series ring.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-S, x = PowerSeriesRing(ZZ, 10, "x")
+```jldoctest
+julia> S, x = PowerSeriesRing(ZZ, 10, "x")
+(Univariate power series ring in x over Integers, x+O(x^11))
 
-f = 1 + 3x + x^3 + O(x^5)
-g = S(BigInt[1, 2, 0, 1, 0, 0, 0], 4, 10, 3);
+julia> f = 1 + 3x + x^3 + O(x^5)
+1+3*x+x^3+O(x^5)
 
-n = pol_length(f)
-c = polcoeff(f, 1)
-set_length!(g, 3)
-g = setcoeff!(g, 2, BigInt(11))
-fit!(g, 8)
-g = setcoeff!(g, 7, BigInt(4))
-w = gen(S)
-isgen(w) == true
+julia> g = S(BigInt[1, 2, 0, 1, 0, 0, 0], 4, 10, 3);
+
+julia> n = pol_length(f)
+4
+
+julia> c = polcoeff(f, 1)
+3
+
+julia> set_length!(g, 3)
+3
+
+julia> g = setcoeff!(g, 2, BigInt(11))
+x^3+2*x^4+11*x^5+O(x^10)
+
+julia> fit!(g, 8)
+
+julia> g = setcoeff!(g, 7, BigInt(4))
+x^3+2*x^4+11*x^5+O(x^10)
+
+julia> w = gen(S)
+x+O(x^11)
+
+julia> isgen(w) == true
+true
+
 ```
 

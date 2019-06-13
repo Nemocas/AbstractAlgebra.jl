@@ -1,5 +1,8 @@
 ```@meta
 CurrentModule = AbstractAlgebra
+DocTestSetup = quote
+    using AbstractAlgebra
+end
 ```
 
 # Number fields
@@ -32,12 +35,13 @@ $\mathbb{Q}[x]$.
 
 **Examples**
 
-```@repl
-using AbstractAlgebra # hide
-R, x = PolynomialRing(QQ, "x")
-K, a = NumberField(x^3 + 3x + 1, "a")
+```jldoctest
+julia> R, x = PolynomialRing(QQ, "x")
 
-f = a^2 + 2a + 7
+julia> K, a = NumberField(x^3 + 3x + 1, "a")
+
+julia> f = a^2 + 2a + 7
+
 ```
 
 ## Basic field functionality

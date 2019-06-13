@@ -47,6 +47,7 @@ At the Julia prompt simply type
 
 ```
 julia> Pkg.add("AbstractAlgebra")
+
 ```
 
 ## Quick start
