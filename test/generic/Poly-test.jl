@@ -2622,13 +2622,13 @@ function test_gen_poly_change_base_ring()
    print("Generic.Poly.change_base_ring...")
    Zx, x = PolynomialRing(ZZ,'x')
    @test 1 == change_base_ring(x^0, sqrt)
-   p = Zx(1:10)
-   q = Zx(10:-1:1)
-   pq = p + q
+   p = Zx([i for i in 1:10])
+   q = Zx([i for i in 10:-1:1])
+   pq = p * q
    for R in [QQ,GF(2),GF(13),ZZ]
-      pR = change_base_ring(p)
-      qR = change_base_ring(q)
-      pqR = change_base_ring(pq)
+      pR = change_base_ring(p, R)
+      qR = change_base_ring(q, R)
+      pqR = change_base_ring(pq, R)
       @test pR * qR == pqR
    end
 
