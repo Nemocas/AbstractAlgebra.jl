@@ -190,6 +190,10 @@ isunit(::PolyElem)
 ```
 
 ```@docs
+degree(::Generic.PolynomialElem)
+```
+
+```@docs
 ismonomial(::PolyElem)
 ```
 
