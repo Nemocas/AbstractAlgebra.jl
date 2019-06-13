@@ -40,6 +40,19 @@ base_ring(R::AbstractAlgebra.PolyRing{T}) where T <: RingElement = R.base_ring::
 base_ring(a::PolynomialElem) = base_ring(parent(a))
 
 @doc Markdown.doc"""
+    change_base_ring(::Poly{T}, g::Any)
+> Return the polynomial obtained by applying `g` to the coefficients. The new base ring is defined by the image of `0`.
+"""
+function change_base_ring(p::Poly{T}, g) where T <: RingElement
+   z = zero(base_ring(parent(p)))
+   new_base_ring = parent(g(z))
+   new_var_name = string(var(parent(p)))
+   P, _ = PolynomialRing(new_base_ring, new_var_name)
+   new_coefficients = [g(coeff(p,i)) for i in 0:degree(p)]
+   return P(new_coefficients)
+end
+
+@doc Markdown.doc"""
     parent(a::Generic.PolynomialElem)
 > Return the parent of the given polynomial.
 """
