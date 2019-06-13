@@ -286,6 +286,12 @@ g = shift_left(f, 7)
 h = shift_right(f, 2)
 ```
 
+### Change of base ring
+
+```@docs
+change_base_ring(::Poly{T}, ::any)
+```
+
 ### Pseudodivision
 
 Given two polynomials $a, b$, pseudodivision computes polynomials $q$ and $r$
