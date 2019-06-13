@@ -192,7 +192,7 @@ function show(io::IO, x::AbstractAlgebra.FracElem)
 end
 
 function show(io::IO, a::AbstractAlgebra.FracField)
-   print(IOContext(io, compact => true), "Fraction field of ", base_ring(a))
+   print(IOContext(io, :compact => true), "Fraction field of ", base_ring(a))
 end
 
 # Parentheses are only needed for fractions if we didn't print them already
