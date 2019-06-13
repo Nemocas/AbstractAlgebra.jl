@@ -5,7 +5,7 @@ have no real limitations except that elements of the codomain and domain be repr
 by element objects in the system..
 
 Maps $f : D \to C$ in AbstractAlgebra are modeled by Julia objects that are able to be
-called on a single element $c \in C$ of the domain to yield an element $f(c)$ of the
+called on a single element $d \in D$ of the domain to yield an element $f(d) \in C$ of the
 codomain. We say that the map is being applied.
 
 Maps can be constructed from Julia functions, or they can be represented by some other
@@ -123,7 +123,7 @@ In general, setters should be used rarely for map types.
 Note that by providing getter and setter functions, map types need not even contain
 fields with the given name. For example, for a `MyMap` map type for maps between integers, one does not wish to explicitly store the domain and codomain in `MyMap`. Instead, we
 can define the getter functions `domain` and `codomain` to return `JuliaZZ` for any
-`MyMap` object. 
+`MyMap` object.
 
 ```julia
 domain(M::Map(MyMap)) = JuliaZZ
@@ -276,5 +276,3 @@ Any custom composite map type must also provide these functions for that map typ
 if there exist fields with those names. This is because there is no common map class for
 all composite map types. Therefore the Generic system cannot provide fallbacks for all
 such composite map types.
-
-
