@@ -19,7 +19,7 @@ import LinearAlgebra: lu, lu!, tr
 export nullspace
 
 # Do not import div, divrem, exp, sqrt, numerator or denominator as we define our own
-import Base: Array, abs, acos, acosh, asin, asinh, atan, atanh,
+import Base: Array, abs, acos, acosh, adjoint, asin, asinh, atan, atanh,
              bin, ceil, checkbounds, conj, convert, cmp, cos, cosh,
              cospi, cot, coth, dec, deepcopy, deepcopy_internal, 
              expm1, exponent, fill, floor, gcd, gcdx,

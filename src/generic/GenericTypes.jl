@@ -859,6 +859,10 @@ mutable struct MatSpaceElem{T <: RingElement} <: Mat{T}
 
    function MatSpaceElem{T}(A::Array{T, 2}) where T <: RingElement
       return new{T}(A)
+    end
+
+   function MatSpaceElem{T}(A::AbstractArray{T, 2}) where T <: RingElement
+      return new{T}(Array(A))
    end
 
    function MatSpaceElem{T}(r::Int, c::Int, A::Array{T, 1}) where T <: RingElement
@@ -876,6 +880,7 @@ mutable struct MatSpaceView{T <: RingElement, V, W} <: Mat{T}
    entries::SubArray{T, 2, Array{T, 2}, V, W}
    base_ring::Ring
 end
+
 ###############################################################################
 #
 #   MatAlgebra / MatAlgElem

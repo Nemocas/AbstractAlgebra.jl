@@ -86,6 +86,8 @@ function check_parent(a::PolynomialElem, b::PolynomialElem, throw::Bool = true)
    return !b
 end
 
+characteristic(a::AbstractAlgebra.PolyRing) = characteristic(base_ring(a))
+
 ###############################################################################
 #
 #   Basic manipulation
