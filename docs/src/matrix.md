@@ -266,7 +266,7 @@ julia> M1 = deepcopy(A)
 julia> A != B
 true
 
-julia> isone(one(S)) == true
+julia> isone(one(S))
 true
 
 julia> V = A[1:2, :]
@@ -847,7 +847,7 @@ julia> A = hessenberg(M)
 [0 1 3 2]
 [0 0 2 2]
 
-julia> ishessenberg(A) == true
+julia> ishessenberg(A)
 true
 
 ```

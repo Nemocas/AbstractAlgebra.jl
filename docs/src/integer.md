@@ -97,11 +97,11 @@ julia> h = zero(ZZ)
 julia> k = one(ZZ)
 1
 
-julia> isone(k) == true
+julia> isone(k)
 true
 
-julia> iszero(f) == false
-true
+julia> iszero(f)
+false
 
 julia> T = parent(f)
 Integers
@@ -136,7 +136,7 @@ isunit(::Integer)
 julia> r = ZZ(-1)
 -1
 
-julia> isunit(r) == true
+julia> isunit(r)
 true
 
 ```

@@ -278,7 +278,7 @@ x^3*y+3*x*y^2+1
 julia> n = length(f)
 3
 
-julia> isgen(y) == true
+julia> isgen(y)
 true
 
 julia> nvars(S) == 2

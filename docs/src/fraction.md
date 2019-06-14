@@ -109,11 +109,11 @@ julia> h = zero(S)
 julia> k = one(S)
 1//1
 
-julia> isone(k) == true
+julia> isone(k)
 true
 
-julia> iszero(f) == false
-true
+julia> iszero(f)
+false
 
 julia> m = characteristic(S)
 0

@@ -157,11 +157,11 @@ julia> k = one(S)
 ([1 0]
 [0 1])
 
-julia> isone(k) == true
+julia> isone(k)
 true
 
-julia> iszero(f) == false
-true
+julia> iszero(f)
+false
 
 julia> n = length(g)
 3
@@ -267,10 +267,10 @@ true
 julia> n = degree(d)
 2
 
-julia> isterm(2y^2) == true
+julia> isterm(2y^2)
 true
 
-julia> ismonomial(y^2) == true
+julia> ismonomial(y^2)
 true
 
 ```

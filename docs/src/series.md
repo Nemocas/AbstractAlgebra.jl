@@ -263,11 +263,11 @@ julia> h = zero(S)
 julia> k = one(S)
 1+O(x^10)
 
-julia> isone(k) == true
+julia> isone(k)
 true
 
-julia> iszero(f) == false
-true
+julia> iszero(f)
+false
 
 julia> n = pol_length(f)
 4

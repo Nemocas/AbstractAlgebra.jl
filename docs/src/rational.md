@@ -107,11 +107,11 @@ julia> h = zero(QQ)
 julia> k = one(QQ)
 1//1
 
-julia> isone(k) == true
+julia> isone(k)
 true
 
-julia> iszero(f) == false
-true
+julia> iszero(f)
+false
 
 julia> U = base_ring(QQ)
 Integers
