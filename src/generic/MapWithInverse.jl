@@ -55,7 +55,7 @@ function show(io::IO, M::MapWithSection)
    println(io, "")
    println(io, "Codomain:")
    println(io, "========")
-   println(io, codomain(M))
+   print(io, codomain(M))
 end
 
 function compose(f::MapWithSection{U, C}, g::MapWithSection{D, U}) where {D, U, C}

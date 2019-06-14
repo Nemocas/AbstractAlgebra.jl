@@ -55,6 +55,9 @@ We give some examples of such functionality.
 julia> F = GF(13)
 Finite field F_13
 
+julia> f = F(7)
+7
+
 julia> h = zero(F)
 0
 
