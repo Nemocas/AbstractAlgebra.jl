@@ -100,7 +100,7 @@ function show(io::IO, x::SparsePoly)
           if bracket
             print(io, "(")
           end
-          show(io, c)
+          print(io, c)
           if bracket
             print(io, ")")
           end
@@ -133,7 +133,7 @@ function show(io::IO, p::SparsePolyRing)
    print(io, "Sparse Univariate Polynomial Ring in ")
    print(io, string(p.S))
    print(io, " over ")
-   show(io, base_ring(p))
+   print(IOContext(io, :compact => true), base_ring(p))
 end
 
 show_minus_one(::Type{SparsePoly{T}}) where {T <: RingElement} = show_minus_one(T)

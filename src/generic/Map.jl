@@ -48,7 +48,7 @@ end
 function show_short(io::IO, M::CompositeMap)
    show_short(io, M.map1)
    println(io, "then")
-   show(io, M.map2)
+   print(io, M.map2)
 end
 
 function show(io::IO, M::CompositeMap)
@@ -76,7 +76,7 @@ function show(io::IO, M::IdentityMap)
    println(io, "")
    println(io, "Domain:")
    println(io, "=======")
-   println(io, domain(M))
+   print(io, domain(M))
 end
 
 function compose(f::AbstractAlgebra.Map(AbstractAlgebra.IdentityMap){D, D}, g::AbstractAlgebra.Map{D, C}) where {D, C}
@@ -176,7 +176,7 @@ end
 function show_short(io::IO, M::FunctionalCompositeMap)
    show_short(io, M.map1)
    println(io, "then")
-   show(io, M.map2)
+   print(io, M.map2)
 end
 
 function show(io::IO, M::FunctionalCompositeMap)
