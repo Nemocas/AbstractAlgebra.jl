@@ -305,7 +305,7 @@ x^3+2*x^4+11*x^5+O(x^10)
 julia> w = gen(S)
 x+O(x^11)
 
-julia> isgen(w) == true
+julia> isgen(w)
 true
 
 ```

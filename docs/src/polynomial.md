@@ -139,11 +139,11 @@ julia> h = zero(S)
 julia> k = one(R)
 1
 
-julia> isone(k) == true
+julia> isone(k)
 true
 
-julia> iszero(f) == false
-true
+julia> iszero(f)
+false
 
 julia> n = length(g)
 3
@@ -329,10 +329,10 @@ julia> n = degree(d)
 julia> r = modulus(w)
 17
 
-julia> isterm(2y^2) == true
+julia> isterm(2y^2)
 true
 
-julia> ismonomial(y^2) == true
+julia> ismonomial(y^2)
 true
 
 ```

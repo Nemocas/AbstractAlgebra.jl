@@ -61,11 +61,11 @@ julia> h = zero(F)
 julia> k = one(F)
 1
 
-julia> isone(k) == true
+julia> isone(k)
 true
 
-julia> iszero(h) == false
-false
+julia> iszero(h)
+true
 
 julia> T = parent(h)
 Finite field F_13

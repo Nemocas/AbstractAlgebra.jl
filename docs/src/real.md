@@ -96,11 +96,11 @@ julia> h = zero(RR)
 julia> k = one(RR)
 1.0
 
-julia> isone(k) == true
+julia> isone(k)
 true
 
-julia> iszero(f) == false
-true
+julia> iszero(f)
+false
 
 julia> U = base_ring(RR)
 Union{}

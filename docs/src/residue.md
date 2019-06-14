@@ -121,11 +121,11 @@ julia> h = zero(S)
 julia> k = one(S)
 1//1
 
-julia> isone(k) == true
+julia> isone(k)
 true
 
-julia> iszero(f) == false
-true
+julia> iszero(f)
+false
 
 julia> m = modulus(S)
 x^3+3//1*x+1//1
@@ -182,7 +182,7 @@ x+1//1
 julia> a = modulus(S)
 x^3+3//1*x+1//1
 
-julia> isunit(r) == true
+julia> isunit(r)
 true
 
 ```
