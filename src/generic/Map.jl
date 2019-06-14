@@ -120,7 +120,7 @@ function show(io::IO, M::FunctionalMap)
    println(io, "")
    println(io, "Codomain:")
    println(io, "========")
-   println(io, codomain(M))
+   print(io, codomain(M))
 end
 
 ################################################################################
