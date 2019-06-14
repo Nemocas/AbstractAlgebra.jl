@@ -430,7 +430,7 @@ julia> h = shift_right(f, 2)
 ### Change of base ring
 
 ```@docs
-change_base_ring(::Poly{T}, ::any)
+change_base_ring(::PolyElem, g)
 ```
 
 **Examples**

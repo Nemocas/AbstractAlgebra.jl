@@ -33,10 +33,13 @@ parent object to coerce various elements into the field.
 
 ```jldoctest
 julia> F = GF(13)
+Finite field F_13
 
 julia> g = F(3)
+3
 
 julia> h = F(g)
+3
 
 ```
 
@@ -50,26 +53,31 @@ We give some examples of such functionality.
 
 ```jldoctest
 julia> F = GF(13)
+Finite field F_13
 
 julia> h = zero(F)
+0
 
 julia> k = one(F)
+1
 
 julia> isone(k) == true
+true
 
-julia> iszero(f) == false
-
-julia> U = base_ring(F)
-
-julia> V = base_ring(h)
+julia> iszero(h) == false
+false
 
 julia> T = parent(h)
+Finite field F_13
 
 julia> h == deepcopy(h)
+true
 
 julia> h = h + 2
+2
 
 julia> m = inv(k)
+1
 
 ```
 
@@ -91,12 +99,16 @@ degree(F::GFField)
 
 ```jldoctest
 julia> F = GF(13)
+Finite field F_13
 
 julia> d = degree(F)
+1
 
 julia> n = order(F)
+13
 
 julia> g = gen(F)
+1
 
 ```
 

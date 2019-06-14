@@ -72,14 +72,19 @@ resulting parent object to coerce various elements into the field.
 
 ```jldoctest
 julia> f = QQ()
+0//1
 
 julia> g = QQ(123)
+123//1
 
 julia> h = QQ(BigInt(1234))
+1234//1
 
 julia> k = QQ(BigInt(12), BigInt(7))
+12//7
 
 julia> QQ == FractionField(ZZ)
+true
 
 ```
 
@@ -94,28 +99,40 @@ We give some examples of such functionality.
 
 ```jldoctest
 julia> f = QQ(12, 7)
+12//7
 
 julia> h = zero(QQ)
+0//1
 
 julia> k = one(QQ)
+1//1
 
 julia> isone(k) == true
+true
 
 julia> iszero(f) == false
+true
 
 julia> U = base_ring(QQ)
+Integers
 
 julia> V = base_ring(f)
+Integers
 
 julia> T = parent(f)
+Rationals
 
 julia> f == deepcopy(f)
+true
 
 julia> g = f + 12
+96//7
 
 julia> r = ZZ(12)//ZZ(7)
+12//7
 
 julia> n = numerator(r)
+12
 
 ```
 
@@ -138,8 +155,10 @@ AbstractAlgebra.exp(a::Rational{BigInt})
 
 ```jldoctest
 julia> d = AbstractAlgebra.sqrt(ZZ(36)//ZZ(25))
+6//5
 
 julia> m = AbstractAlgebra.exp(ZZ(0)//ZZ(1))
+1//1
 
 ```
 

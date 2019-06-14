@@ -101,20 +101,34 @@ elements that can be coerced into the base ring of the matrix.
 
 ```jldoctest
 julia> S = MatrixSpace(QQ, 2, 3)
+Matrix Space of 2 rows and 3 columns over Rationals
 
 julia> T = MatrixAlgebra(QQ, 2)
+Matrix Algebra of degree 2 over Rationals
 
 julia> M1 = S(Rational{BigInt}[2 3 1; 1 0 4])
+[2//1 3//1 1//1]
+[1//1 0//1 4//1]
 
 julia> M2 = S(BigInt[2 3 1; 1 0 4])
+[2//1 3//1 1//1]
+[1//1 0//1 4//1]
 
 julia> M3 = S(BigInt[2, 3, 1, 1, 0, 4])
+[2//1 3//1 1//1]
+[1//1 0//1 4//1]
 
 julia> N1 = T(Rational{BigInt}[2 3; 1 0])
+[2//1 3//1]
+[1//1 0//1]
 
 julia> N2 = T(BigInt[2 3; 1 0])
+[2//1 3//1]
+[1//1 0//1]
 
 julia> N3 = T(BigInt[2, 3, 1, 1])
+[2//1 3//1]
+[1//1 1//1]
 
 ```
 
@@ -173,22 +187,46 @@ $x$ belongs to a matrix algebra and $r \neq c$, an exception is raised.
 
 ```jldoctest
 julia> M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
+[3 1 2]
+[2 0 1]
 
 julia> N = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])
+[3 1]
+[2 2]
+[0 1]
 
 julia> P = zero_matrix(ZZ, 3, 2)
+[0 0]
+[0 0]
+[0 0]
 
 julia> Q = identity_matrix(ZZ, 4)
+[1 0 0 0]
+[0 1 0 0]
+[0 0 1 0]
+[0 0 0 1]
 
 julia> C = similar(P)
+[0 0]
+[0 0]
+[0 0]
 
 julia> D = similar(Q, 4, 5)
+[0 0 0 0 0]
+[0 0 0 0 0]
+[0 0 0 0 0]
+[0 0 0 0 0]
 
 julia> R = MatrixAlgebra(ZZ, 2)
+Matrix Algebra of degree 2 over Integers
 
 julia> M = R()
+[0 0]
+[0 0]
 
 julia> F = similar(M)
+[0 0]
+[0 0]
 
 ```
 
@@ -268,14 +306,20 @@ in place and not returned from the function.
 
 ```jldoctest
 julia> M = matrix(ZZ, BigInt[2 3 0; 1 1 1])
+[2 3 0]
+[1 1 1]
 
 julia> m = nrows(M)
+2
 
 julia> n = ncols(M)
+3
 
 julia> M[1, 2] = BigInt(4)
+4
 
 julia> c = M[1, 1]
+2
 
 ```
 ### Transpose
@@ -292,14 +336,25 @@ The standard Julia tick notation can also be used for transposing a matrix.
 
 ```jldoctest
 julia> R, t = PolynomialRing(QQ, "t")
+(Univariate Polynomial Ring in t over Rationals, t)
 
 julia> S = MatrixSpace(R, 3, 3)
+Matrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+[t+1//1 t 1//1]
+[t^2 t t]
+[-2//1 t+2//1 t^2+t+1//1]
 
 julia> B = transpose(A)
+[t+1//1 t^2 -2//1]
+[t t t+2//1]
+[1//1 t t^2+t+1//1]
 
 julia> C = A'
+[t+1//1 t^2 -2//1]
+[t t t+2//1]
+[1//1 t t^2+t+1//1]
 
 ```
 
@@ -325,12 +380,22 @@ and columns.
 
 ```jldoctest
 julia> M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
+[1 2 3]
+[2 3 4]
+[3 4 5]
 
 julia> N1 = M[1:2, :]
+[1 2 3]
+[2 3 4]
 
 julia> N2 = M[:, :]
+[1 2 3]
+[2 3 4]
+[3 4 5]
 
 julia> N3 = M[2:3, 2:3]
+[3 4]
+[4 5]
 
 ```
 
@@ -347,8 +412,14 @@ matrices are assumed to be mutable in AbstractAlgebra.jl).
 
 ```jldoctest
 julia> M = identity_matrix(ZZ, 3)
+[1 0 0]
+[0 1 0]
+[0 0 1]
 
 julia> swap_rows!(M, 1, 2)
+[0 1 0]
+[1 0 0]
+[0 0 1]
 
 ```
 
@@ -374,11 +445,26 @@ columns of $M$ and $N$ are the same.
 
 ```jldoctest
 julia> M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])
+[1 2 3]
+[2 3 4]
+[3 4 5]
 
 julia> N = matrix(ZZ, BigInt[1 0 1; 0 1 0; 1 0 1])
+[1 0 1]
+[0 1 0]
+[1 0 1]
 
 julia> P = hcat(M, N)
+[1 2 3 1 0 1]
+[2 3 4 0 1 0]
+[3 4 5 1 0 1]
 
 julia> Q = vcat(M, N)
+[1 2 3]
+[2 3 4]
+[3 4 5]
+[1 0 1]
+[0 1 0]
+[1 0 1]
 
 ```

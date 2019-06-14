@@ -54,7 +54,7 @@ resulting parent object to coerce various elements into the field.
 
 **Examples**
 
-```jldoctest
+```repl
 julia> RR = RealField
 Floats
 
@@ -83,7 +83,7 @@ We give some examples of such functionality.
 
 **Examples**
 
-```jldoctest
+```repl
 julia> RR = RealField
 Floats
 
@@ -104,9 +104,6 @@ true
 
 julia> U = base_ring(RR)
 Union{}
-
-julia> V = base_ring(f)
-ERROR: MethodError: no method matching base_ring(::BigFloat)
 
 julia> T = parent(f)
 Floats

@@ -75,14 +75,25 @@ resulting parent objects to coerce various elements into the matrix algebra.
 
 ```jldoctest
 julia> R, t = PolynomialRing(QQ, "t")
+(Univariate Polynomial Ring in t over Rationals, t)
 
 julia> S = MatrixAlgebra(R, 3)
+Matrix Algebra of degree 3 over Univariate Polynomial Ring in t over Rationals
 
 julia> A = S()
+[0//1 0//1 0//1]
+[0//1 0//1 0//1]
+[0//1 0//1 0//1]
 
 julia> B = S(12)
+[12//1 0//1 0//1]
+[0//1 12//1 0//1]
+[0//1 0//1 12//1]
 
 julia> C = S(R(11))
+[11//1 0//1 0//1]
+[0//1 11//1 0//1]
+[0//1 0//1 11//1]
 
 ```
 
@@ -113,12 +124,18 @@ degree(::Generic.MatAlgElem)
 
 ```jldoctest
 julia> R, t = PolynomialRing(QQ, "t")
+(Univariate Polynomial Ring in t over Rationals, t)
 
 julia> S = MatrixAlgebra(R, 3)
+Matrix Algebra of degree 3 over Univariate Polynomial Ring in t over Rationals
 
 julia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
+[t+1//1 t 1//1]
+[t^2 t t]
+[-2//1 t+2//1 t^2+t+1//1]
 
 julia> n = degree(A)
+3
 
 ```
 
