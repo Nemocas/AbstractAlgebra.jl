@@ -533,7 +533,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Integer ring",
     "title": "Integer ring",
     "category": "page",
-    "text": "CurrentModule = AbstractAlgebra"
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -557,7 +557,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Integer ring",
     "title": "Integer constructors",
     "category": "section",
-    "text": "In order to construct integers in AbstractAlgebra.jl, one can first construct the integer ring itself. This is accomplished using the following constructor.Integers{BigInt}()This gives the unique object of type Integers{BigInt} representing the ring of integers in AbstractAlgebra.jl.In practice, one simply uses ZZ which is assigned to be the return value of the above constructor. There is no need to call the constructor in practice.Here are some examples of creating the integer ring and making use of the resulting parent object to coerce various elements into the ring.Examplesf = ZZ()\ng = ZZ(123)\nh = ZZ(BigInt(1234))"
+    "text": "In order to construct integers in AbstractAlgebra.jl, one can first construct the integer ring itself. This is accomplished using the following constructor.Integers{BigInt}()This gives the unique object of type Integers{BigInt} representing the ring of integers in AbstractAlgebra.jl.In practice, one simply uses ZZ which is assigned to be the return value of the above constructor. There is no need to call the constructor in practice.Here are some examples of creating the integer ring and making use of the resulting parent object to coerce various elements into the ring.Examplesjulia> f = ZZ()\n0\n\njulia> g = ZZ(123)\n123\n\njulia> h = ZZ(BigInt(1234))\n1234\n"
 },
 
 {
@@ -565,7 +565,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Integer ring",
     "title": "Basic ring functionality",
     "category": "section",
-    "text": "The integer ring in AbstractAlgebra.jl implements the full Ring interface and the  Euclidean Ring interface.We give some examples of such functionality.Examplesf = ZZ(12)\n\nh = zero(ZZ)\nk = one(ZZ)\nisone(k) == true\niszero(f) == false\nU = base_ring(ZZ)\nV = base_ring(f)\nT = parent(f)\nf == deepcopy(f)\ng = f + 12\nh = powmod(f, 12, ZZ(17))\nflag, q = divides(f, ZZ(3))"
+    "text": "The integer ring in AbstractAlgebra.jl implements the full Ring interface and the  Euclidean Ring interface.We give some examples of such functionality.Examplesjulia> f = ZZ(12)\n12\n\njulia> h = zero(ZZ)\n0\n\njulia> k = one(ZZ)\n1\n\njulia> isone(k)\ntrue\n\njulia> iszero(f)\nfalse\n\njulia> T = parent(f)\nIntegers\n\njulia> f == deepcopy(f)\ntrue\n\njulia> g = f + 12\n24\n\njulia> h = powmod(f, 12, ZZ(17))\n4\n\njulia> flag, q = divides(f, ZZ(3))\n(true, 4)\n"
 },
 
 {
@@ -589,7 +589,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Integer ring",
     "title": "Basic functionality",
     "category": "section",
-    "text": "isunit(::Integer)Examplesr = ZZ(-1)\n\nisunit(r) == true"
+    "text": "isunit(::Integer)Examplesjulia> r = ZZ(-1)\n-1\n\njulia> isunit(r)\ntrue\n"
 },
 
 {
@@ -613,7 +613,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Integer ring",
     "title": "Square root",
     "category": "section",
-    "text": "AbstractAlgebra.sqrt(a::BigInt)AbstractAlgebra.exp(a::BigInt)Examplesd = AbstractAlgebra.sqrt(ZZ(36))\nm = AbstractAlgebra.exp(ZZ(0))"
+    "text": "AbstractAlgebra.sqrt(a::BigInt)AbstractAlgebra.exp(a::BigInt)Examplesjulia> d = AbstractAlgebra.sqrt(ZZ(36))\n6\n\njulia> m = AbstractAlgebra.exp(ZZ(0))\n1\n"
 },
 
 {
@@ -629,7 +629,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Integer ring",
     "title": "Coprime bases",
     "category": "section",
-    "text": "ppio(a::BigInt, b::BigInt)Examplesc, n = ppio(ZZ(12), ZZ(26))"
+    "text": "ppio(a::BigInt, b::BigInt)Examplesjulia> c, n = ppio(ZZ(12), ZZ(26))\n(4, 3)\n"
 },
 
 {
@@ -637,7 +637,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Univariate Polynomial Ring Interface",
     "title": "Univariate Polynomial Ring Interface",
     "category": "page",
-    "text": ""
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -669,7 +669,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Univariate Polynomial Ring Interface",
     "title": "Constructors",
     "category": "section",
-    "text": "In addition to the standard constructors, the following constructors, taking an array of coefficients, must be available.(S::MyPolyRing{T})(A::Array{T, 1}) where T <: AbstractAlgebra.RingElemCreate the polynomial in the given ring whose degree i coefficient is given by A[i].(S::MyPolyRing{T})(A::Array{U, 1}) where T <: AbstractAlgebra.RingElem, U <: AbstractAlgebra.RingElemCreate the polynomial in the given ring whose degree i coefficient is given by A[i]. The elements of the array are assumed to be able to be coerced into the base ring R.(S::MyPolyRing{T})(A::Array{U, 1}) where T <: AbstractAlgebra.RingElem, U <: IntegerCreate the polynomial in the given ring whose degree i coefficient is given by A[i].It may be desirable to have a additional version of the function that accepts an array of Julia Int values  if this can be done more efficiently.ExamplesS, x = PolynomialRing(QQ, \"x\")\n\nf = S(Rational{BigInt}[2, 3, 1])\ng = S(BigInt[1, 0, 4])\nh = S([4, 7, 2, 9])"
+    "text": "In addition to the standard constructors, the following constructors, taking an array of coefficients, must be available.(S::MyPolyRing{T})(A::Array{T, 1}) where T <: AbstractAlgebra.RingElemCreate the polynomial in the given ring whose degree i coefficient is given by A[i].(S::MyPolyRing{T})(A::Array{U, 1}) where T <: AbstractAlgebra.RingElem, U <: AbstractAlgebra.RingElemCreate the polynomial in the given ring whose degree i coefficient is given by A[i]. The elements of the array are assumed to be able to be coerced into the base ring R.(S::MyPolyRing{T})(A::Array{U, 1}) where T <: AbstractAlgebra.RingElem, U <: IntegerCreate the polynomial in the given ring whose degree i coefficient is given by A[i].It may be desirable to have a additional version of the function that accepts an array of Julia Int values  if this can be done more efficiently.Examplesjulia> S, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> f = S(Rational{BigInt}[2, 3, 1])\nx^2+3//1*x+2//1\n\njulia> g = S(BigInt[1, 0, 4])\n4//1*x^2+1//1\n\njulia> h = S([4, 7, 2, 9])\n9//1*x^3+2//1*x^2+7//1*x+4//1\n"
 },
 
 {
@@ -677,7 +677,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Univariate Polynomial Ring Interface",
     "title": "Data type and parent object methods",
     "category": "section",
-    "text": "var(S::MyPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn a Symbol representing the variable (generator) of the polynomial ring. Note that this is a Symbol not a String, though its string value will usually be used when printing polynomials.symbols(S::MyPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn the array [s] where s	 is aSymbol` representing the variable of the given polynomial ring. This is provided for uniformity with the multivariate interface, where there is more than one variable and hence an array of symbols.ExamplesS, x = PolynomialRing(QQ, \"x\")\n\nvsym = var(S)\nV = symbols(S)"
+    "text": "var(S::MyPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn a Symbol representing the variable (generator) of the polynomial ring. Note that this is a Symbol not a String, though its string value will usually be used when printing polynomials.symbols(S::MyPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn the array [s] where s	 is aSymbol` representing the variable of the given polynomial ring. This is provided for uniformity with the multivariate interface, where there is more than one variable and hence an array of symbols.Examplesjulia> S, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> vsym = var(S)\n:x\n\njulia> V = symbols(S)\n1-element Array{Symbol,1}:\n :x\n"
 },
 
 {
@@ -685,7 +685,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Univariate Polynomial Ring Interface",
     "title": "Basic manipulation of rings and elements",
     "category": "section",
-    "text": "length(f::MyPoly{T}) where T <: AbstractAlgebra.RingElemReturn the length of the given polynomial. The length of the zero polynomial is defined to be 0, otherwise the length is the degree plus 1. The return value should be of type Int.set_length!(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemThis function must zero any coefficients beyond the requested length n and then set the length of the polynomial to n. This function does not need to normalise the polynomial and is not useful to the user, but is used extensively by the AbstractAlgebra generic functionality.This function mutates the existing polynomial in-place, but does not return the polynomial.coeff(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemReturn the coefficient of the polynomial f of degree n. If n is larger than the degree of the polynomial, it should return zero in the coefficient ring. setcoeff!(f::MyPoly{T}, n::Int, a::T) where T <: AbstractAlgebra.RingElemSet the degree n coefficient of f to a. This mutates the polynomial in-place if possible and returns the mutated polynomial (so that immutable types can also be supported). The function must not assume that the polynomial already has space for n + 1 coefficients. The polynomial must be resized if this is not the case.Note that this function is not required to normalise the polynomial and is not necessarily useful to the user, but is used extensively by the generic functionality in AbstractAlgebra.jl. It is for setting raw coefficients in the representation.normalise(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemGiven a polynomial whose length is currently n, including any leading zero coefficients, return the length of the normalised polynomial (either zero or the length of the polynomial with nonzero leading coefficient). Note that the function does not actually perform the normalisation.fit!(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemEnsure that the polynomial f internally has space for n coefficients. This function must mutate the function in-place if it is mutable. It does not return the mutated polynomial. Immutable types can still be supported by defining this function to do nothing.Some interfaces for C polynomial types automatically manage the internal allocation of polynomials in every function that can be called on them. Explicit adjustment by the generic code in AbstractAlgebra.jl is not required. In such cases, this function can also be defined to do nothing.ExamplesS, x = PolynomialRing(ZZ, \"x\")\n\nf = x^3 + 3x + 1\ng = S(BigInt[1, 2, 0, 1, 0, 0, 0]);\n\nn = length(f)\nc = coeff(f, 1)\nset_length!(g, normalise(g, 7))\ng = setcoeff!(g, 2, BigInt(11))\nfit!(g, 8)\ng = setcoeff!(g, 7, BigInt(4))\n"
+    "text": "length(f::MyPoly{T}) where T <: AbstractAlgebra.RingElemReturn the length of the given polynomial. The length of the zero polynomial is defined to be 0, otherwise the length is the degree plus 1. The return value should be of type Int.set_length!(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemThis function must zero any coefficients beyond the requested length n and then set the length of the polynomial to n. This function does not need to normalise the polynomial and is not useful to the user, but is used extensively by the AbstractAlgebra generic functionality.This function mutates the existing polynomial in-place, but does not return the polynomial.coeff(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemReturn the coefficient of the polynomial f of degree n. If n is larger than the degree of the polynomial, it should return zero in the coefficient ring. setcoeff!(f::MyPoly{T}, n::Int, a::T) where T <: AbstractAlgebra.RingElemSet the degree n coefficient of f to a. This mutates the polynomial in-place if possible and returns the mutated polynomial (so that immutable types can also be supported). The function must not assume that the polynomial already has space for n + 1 coefficients. The polynomial must be resized if this is not the case.Note that this function is not required to normalise the polynomial and is not necessarily useful to the user, but is used extensively by the generic functionality in AbstractAlgebra.jl. It is for setting raw coefficients in the representation.normalise(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemGiven a polynomial whose length is currently n, including any leading zero coefficients, return the length of the normalised polynomial (either zero or the length of the polynomial with nonzero leading coefficient). Note that the function does not actually perform the normalisation.fit!(f::MyPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemEnsure that the polynomial f internally has space for n coefficients. This function must mutate the function in-place if it is mutable. It does not return the mutated polynomial. Immutable types can still be supported by defining this function to do nothing.Some interfaces for C polynomial types automatically manage the internal allocation of polynomials in every function that can be called on them. Explicit adjustment by the generic code in AbstractAlgebra.jl is not required. In such cases, this function can also be defined to do nothing.Examplesjulia> S, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> f = x^3 + 3x + 1\nx^3+3*x+1\n\njulia> g = S(BigInt[1, 2, 0, 1, 0, 0, 0]);\n\njulia> n = length(f)\n4\n\njulia> c = coeff(f, 1)\n3\n\njulia> set_length!(g, normalise(g, 7))\n4\n\njulia> g = setcoeff!(g, 2, BigInt(11))\nx^3+11*x^2+2*x+1\n\njulia> fit!(g, 8)\n\njulia> g = setcoeff!(g, 7, BigInt(4))\n4*x^7+x^3+11*x^2+2*x+1\n\njulia> "
 },
 
 {
@@ -701,7 +701,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "Generic univariate polynomials",
     "category": "page",
-    "text": "CurrentModule = AbstractAlgebra"
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -725,7 +725,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "Polynomial ring constructors",
     "category": "section",
-    "text": "In order to construct polynomials in AbstractAlgebra.jl, one must first construct the polynomial ring itself. This is accomplished with the following constructor.PolynomialRing(R::AbstractAlgebra.Ring, s::AbstractString; cached::Bool = true)Given a base ring R and string s specifying how the generator (variable) should be printed, return a tuple S, x representing the new polynomial ring S = Rx and the generator x of the ring. By default the parent object S will depend only on R and  x and will be cached. Setting the optional argument cached to false will prevent the parent object S from being cached.A shorthand version of this function is provided: given a base ring R, we abbreviate the constructor as follows.R[\"x\"]Here are some examples of creating polynomial rings and making use of the resulting parent objects to coerce various elements into the polynomial ring.ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\nT, z = QQ[\"z\"]\n\nf = R()\ng = R(123)\nh = S(BigInt(1234))\nk = S(x + 1)\nm = T(z + 1)All of the examples here are generic polynomial rings, but specialised implementations of polynomial rings provided by external modules will also usually provide a PolynomialRing constructor to allow creation of their polynomial rings."
+    "text": "In order to construct polynomials in AbstractAlgebra.jl, one must first construct the polynomial ring itself. This is accomplished with the following constructor.PolynomialRing(R::AbstractAlgebra.Ring, s::AbstractString; cached::Bool = true)Given a base ring R and string s specifying how the generator (variable) should be printed, return a tuple S, x representing the new polynomial ring S = Rx and the generator x of the ring. By default the parent object S will depend only on R and  x and will be cached. Setting the optional argument cached to false will prevent the parent object S from being cached.A shorthand version of this function is provided: given a base ring R, we abbreviate the constructor as follows.R[\"x\"]Here are some examples of creating polynomial rings and making use of the resulting parent objects to coerce various elements into the polynomial ring.Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)\n\njulia> T, z = QQ[\"z\"]\n(Univariate Polynomial Ring in z over Rationals, z)\n\njulia> f = R()\n0\n\njulia> g = R(123)\n123\n\njulia> h = S(BigInt(1234))\n1234\n\njulia> k = S(x + 1)\n(x+1)\n\njulia> m = T(z + 1)\nz+1//1\nAll of the examples here are generic polynomial rings, but specialised implementations of polynomial rings provided by external modules will also usually provide a PolynomialRing constructor to allow creation of their polynomial rings."
 },
 
 {
@@ -733,7 +733,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "Basic ring functionality",
     "category": "section",
-    "text": "Once a polynomial ring is constructed, there are various ways to construct polynomials in that ring.The easiest way is simply using the generator returned by the PolynomialRing constructor and build up the polynomial using basic arithmetic, as described in the Ring interface. The Julia language also has special syntax for the construction of polynomials in terms of a generator, e.g. we can write 2x instead of 2*x.The polynomial rings in AbstractAlgebra.jl implement the full Ring interface. Of course the entire Univariate Polynomial Ring interface is also implemented.We give some examples of such functionality.ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = x^3 + 3x + 21\ng = (x + 1)*y^2 + 2x + 1\n\nh = zero(S)\nk = one(R)\nisone(k) == true\niszero(f) == false\nn = length(g)\nU = base_ring(S)\nV = base_ring(y + 1)\nv = var(S)\nT = parent(y + 1)\ng == deepcopy(g)\nt = divexact(2g, 2)For polynomials over a field, the Euclidean Ring interface is implemented.ExamplesR, x = PolynomialRing(QQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\nT, y = PolynomialRing(S, \"y\")\n\nf = (3*x^2 + x + 2)*y + x^2 + 1\ng = (5*x^2 + 2*x + 1)*y^2 + 2x*y + x + 1\nh = (3*x^3 + 2*x^2 + x + 7)*y^5 + 2x*y + 1\n\ninvmod(f, g)\nmulmod(f, g, h)\npowmod(f, 3, h)\nh = mod(f, g)\nq, r = divrem(f, g)\nd = gcd(f*h, g*h)\nk = gcdinv(f, h)\nm = lcm(f, h)\nflag, q = divides(g^2, g)\nvaluation(3g^3, g) == 3\nval, q = remove(5g^3, g)\nr, s, t = gcdx(g, h)Functions in the Euclidean Ring interface are supported over residue rings that are not fields, except that if an impossible inverse is encountered during the computation an error is thrown."
+    "text": "Once a polynomial ring is constructed, there are various ways to construct polynomials in that ring.The easiest way is simply using the generator returned by the PolynomialRing constructor and build up the polynomial using basic arithmetic, as described in the Ring interface. The Julia language also has special syntax for the construction of polynomials in terms of a generator, e.g. we can write 2x instead of 2*x.The polynomial rings in AbstractAlgebra.jl implement the full Ring interface. Of course the entire Univariate Polynomial Ring interface is also implemented.We give some examples of such functionality.Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)\n\njulia> f = x^3 + 3x + 21\nx^3+3*x+21\n\njulia> g = (x + 1)*y^2 + 2x + 1\n(x+1)*y^2+(2*x+1)\n\njulia> h = zero(S)\n0\n\njulia> k = one(R)\n1\n\njulia> isone(k)\ntrue\n\njulia> iszero(f)\nfalse\n\njulia> n = length(g)\n3\n\njulia> U = base_ring(S)\nUnivariate Polynomial Ring in x over Integers\n\njulia> V = base_ring(y + 1)\nUnivariate Polynomial Ring in x over Integers\n\njulia> v = var(S)\n:y\n\njulia> T = parent(y + 1)\nUnivariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers\n\njulia> g == deepcopy(g)\ntrue\n\njulia> t = divexact(2g, 2)\n(x+1)*y^2+(2*x+1)\nFor polynomials over a field, the Euclidean Ring interface is implemented.Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> S = ResidueRing(R, x^3 + 3x + 1)\nResidue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> T, y = PolynomialRing(S, \"y\")\n(Univariate Polynomial Ring in y over Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1, y)\n\njulia> f = (3*x^2 + x + 2)*y + x^2 + 1\n(3//1*x^2+x+2//1)*y+(x^2+1//1)\n\njulia> g = (5*x^2 + 2*x + 1)*y^2 + 2x*y + x + 1\n(5//1*x^2+2//1*x+1//1)*y^2+(2//1*x)*y+(x+1//1)\n\njulia> h = (3*x^3 + 2*x^2 + x + 7)*y^5 + 2x*y + 1\n(2//1*x^2-8//1*x+4//1)*y^5+(2//1*x)*y+1//1\n\njulia> invmod(f, g)\n(707//3530*x^2+2151//1765*x+123//3530)*y+(-178//1765*x^2-551//3530*x+698//1765)\n\njulia> mulmod(f, g, h)\n(-30//1*x^2-43//1*x-9//1)*y^3+(-7//1*x^2-23//1*x-7//1)*y^2+(4//1*x^2-10//1*x-3//1)*y+(x^2-2//1*x)\n\njulia> powmod(f, 3, h)\n(69//1*x^2+243//1*x+79//1)*y^3+(78//1*x^2+180//1*x+63//1)*y^2+(27//1*x^2+42//1*x+18//1)*y+(3//1*x^2+3//1*x+2//1)\n\njulia> h = mod(f, g)\n(3//1*x^2+x+2//1)*y+(x^2+1//1)\n\njulia> q, r = divrem(f, g)\n(0//1, (3//1*x^2+x+2//1)*y+(x^2+1//1))\n\njulia> d = gcd(f*h, g*h)\ny+(1//11*x^2+6//11)\n\njulia> k = gcdinv(f, h)\n(y+(1//11*x^2+6//11), 0//1)\n\njulia> m = lcm(f, h)\n(-14//1*x^2-23//1*x-2//1)*y+(-4//1*x^2-5//1*x+1//1)\n\njulia> flag, q = divides(g^2, g)\n(true, (5//1*x^2+2//1*x+1//1)*y^2+(2//1*x)*y+(x+1//1))\n\njulia> valuation(3g^3, g) == 3\ntrue\n\njulia> val, q = remove(5g^3, g)\n(3, 5//1)\n\njulia> r, s, t = gcdx(g, h)\n(1//1, (311//3530*x^2-2419//3530*x+947//1765), (707//3530*x^2+2151//1765*x+123//3530)*y+(-178//1765*x^2-551//3530*x+698//1765))\nFunctions in the Euclidean Ring interface are supported over residue rings that are not fields, except that if an impossible inverse is encountered during the computation an error is thrown."
 },
 
 {
@@ -793,6 +793,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "polynomial/#AbstractAlgebra.Generic.degree-Tuple{Union{NCPolyElem{T}, PolyElem{T}} where T}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.degree",
+    "category": "method",
+    "text": "degree(a::Generic.PolynomialElem)\n\nReturn the degree of the given polynomial. This is defined to be one less than the length, even for constant polynomials.\n\n\n\n"
+},
+
+{
     "location": "polynomial/#AbstractAlgebra.Generic.ismonomial-Tuple{PolyElem}",
     "page": "Generic univariate polynomials",
     "title": "AbstractAlgebra.Generic.ismonomial",
@@ -813,7 +821,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "Basic functionality",
     "category": "section",
-    "text": "modulus{T <: ResElem}(::PolyElem{T})lead(::PolyElem)\ntrail(::PolyElem)gen(::PolyElem)isgen(::PolyElem)isunit(::PolyElem)ismonomial(::PolyElem)isterm(::PolyElem)ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\nT, z = PolynomialRing(QQ, \"z\")\nU = ResidueRing(ZZ, 17)\nV, w = PolynomialRing(U, \"w\")\n\na = zero(S)\nb = one(S)\n\nc = BigInt(1)//2*z^2 + BigInt(1)//3\nd = x*y^2 + (x + 1)*y + 3\n\nf = lead(d)\ny = gen(S)\ng = isgen(w)\nm = isunit(b)\nn = degree(d)\nr = modulus(w)\nisterm(2y^2) == true\nismonomial(y^2) == true"
+    "text": "modulus{T <: ResElem}(::PolyElem{T})lead(::PolyElem)\ntrail(::PolyElem)gen(::PolyElem)isgen(::PolyElem)isunit(::PolyElem)degree(::Generic.PolynomialElem)ismonomial(::PolyElem)isterm(::PolyElem)Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)\n\njulia> T, z = PolynomialRing(QQ, \"z\")\n(Univariate Polynomial Ring in z over Rationals, z)\n\njulia> U = ResidueRing(ZZ, 17)\nResidue ring of Integers modulo 17\n\njulia> V, w = PolynomialRing(U, \"w\")\n(Univariate Polynomial Ring in w over Residue ring of Integers modulo 17, w)\n\njulia> a = zero(S)\n0\n\njulia> b = one(S)\n1\n\njulia> c = BigInt(1)//2*z^2 + BigInt(1)//3\n1//2*z^2+1//3\n\njulia> d = x*y^2 + (x + 1)*y + 3\n(x)*y^2+(x+1)*y+3\n\njulia> f = lead(d)\nx\n\njulia> y = gen(S)\ny\n\njulia> g = isgen(w)\ntrue\n\njulia> m = isunit(b)\ntrue\n\njulia> n = degree(d)\n2\n\njulia> r = modulus(w)\n17\n\njulia> isterm(2y^2)\ntrue\n\njulia> ismonomial(y^2)\ntrue\n"
 },
 
 {
@@ -837,7 +845,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "Truncation",
     "category": "section",
-    "text": "truncate(::PolyElem, ::Int)mullow{T <: RingElem}(::PolyElem{T}, ::PolyElem{T}, ::Int)ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = x*y^2 + (x + 1)*y + 3\ng = (x + 1)*y + (x^3 + 2x + 2)\n\nh = truncate(f, 1)\nk = mullow(f, g, 4)"
+    "text": "truncate(::PolyElem, ::Int)mullow{T <: RingElem}(::PolyElem{T}, ::PolyElem{T}, ::Int)Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)\n\njulia> f = x*y^2 + (x + 1)*y + 3\n(x)*y^2+(x+1)*y+3\n\njulia> g = (x + 1)*y + (x^3 + 2x + 2)\n(x+1)*y+(x^3+2*x+2)\n\njulia> h = truncate(f, 1)\n3\n\njulia> k = mullow(f, g, 4)\n(x^2+x)*y^3+(x^4+3*x^2+4*x+1)*y^2+(x^4+x^3+2*x^2+7*x+5)*y+(3*x^3+6*x+6)\n"
 },
 
 {
@@ -861,7 +869,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "Reversal",
     "category": "section",
-    "text": "reverse(::PolyElem, ::Int)\nreverse(::PolyElem)ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = x*y^2 + (x + 1)*y + 3\n\ng = reverse(f, 7)\nh = reverse(f)"
+    "text": "reverse(::PolyElem, ::Int)\nreverse(::PolyElem)Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)\n\njulia> f = x*y^2 + (x + 1)*y + 3\n(x)*y^2+(x+1)*y+3\n\njulia> g = reverse(f, 7)\n3*y^6+(x+1)*y^5+(x)*y^4\n\njulia> h = reverse(f)\n3*y^2+(x+1)*y+(x)\n"
 },
 
 {
@@ -885,7 +893,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "Shifting",
     "category": "section",
-    "text": "shift_left(::PolyElem, ::Int)shift_right(::PolyElem, ::Int)ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = x*y^2 + (x + 1)*y + 3\n\ng = shift_left(f, 7)\nh = shift_right(f, 2)"
+    "text": "shift_left(::PolyElem, ::Int)shift_right(::PolyElem, ::Int)Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)\n\njulia> f = x*y^2 + (x + 1)*y + 3\n(x)*y^2+(x+1)*y+3\n\njulia> g = shift_left(f, 7)\n(x)*y^9+(x+1)*y^8+3*y^7\n\njulia> h = shift_right(f, 2)\n(x)\n"
+},
+
+{
+    "location": "polynomial/#Change-of-base-ring-1",
+    "page": "Generic univariate polynomials",
+    "title": "Change of base ring",
+    "category": "section",
+    "text": "change_base_ring(::PolyElem, g)ExamplesR, x = PolynomialRing(ZZ, \"x\")\ng = x^3+6*x + 1\nchange_base_ring(g, GF(2))"
 },
 
 {
@@ -909,7 +925,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "Pseudodivision",
     "category": "section",
-    "text": "Given two polynomials a b, pseudodivision computes polynomials q and r with length(r)  length(b) such that L^d a = bq + r where d = length(a) - length(b) + 1 and L is the leading coefficient of b.We call q the pseudoquotient and r the pseudoremainder.pseudorem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})pseudodivrem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = x*y^2 + (x + 1)*y + 3\ng = (x + 1)*y + (x^3 + 2x + 2)\n\nh = pseudorem(f, g)\nq, r = pseudodivrem(f, g)"
+    "text": "Given two polynomials a b, pseudodivision computes polynomials q and r with length(r)  length(b) such that L^d a = bq + r where d = length(a) - length(b) + 1 and L is the leading coefficient of b.We call q the pseudoquotient and r the pseudoremainder.pseudorem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})pseudodivrem{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)\n\njulia> f = x*y^2 + (x + 1)*y + 3\n(x)*y^2+(x+1)*y+3\n\njulia> g = (x + 1)*y + (x^3 + 2x + 2)\n(x+1)*y+(x^3+2*x+2)\n\njulia> h = pseudorem(f, g)\n(x^7+3*x^5+2*x^4+x^3+5*x^2+4*x+1)\n\njulia> q, r = pseudodivrem(f, g)\n((x^2+x)*y+(-x^4-x^2+1), (x^7+3*x^5+2*x^4+x^3+5*x^2+4*x+1))\n"
 },
 
 {
@@ -973,7 +989,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "Evaluation, composition and substitution",
     "category": "section",
-    "text": "evaluate{T <: RingElem}(::PolyElem{T}, ::T)\nevaluate(::PolyElem, ::Integer)compose(::PolyElem, ::PolyElem)subst{T <: RingElem}(::PolyElem{T}, ::Any)We also overload the functional notation so that the polynomial f can be evaluated at a by writing f(a). ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n   \nf = x*y^2 + (x + 1)*y + 3\ng = (x + 1)*y + (x^3 + 2x + 2)\nM = R[x + 1 2x; x - 3 2x - 1]\n\nk = evaluate(f, 3)\nm = evaluate(f, x^2 + 2x + 1)\nn = compose(f, g)\np = subst(f, M)\nq = f(M)\nr = f(23)"
+    "text": "evaluate{T <: RingElem}(::PolyElem{T}, ::T)\nevaluate(::PolyElem, ::Integer)compose(::PolyElem, ::PolyElem)subst{T <: RingElem}(::PolyElem{T}, ::Any)We also overload the functional notation so that the polynomial f can be evaluated at a by writing f(a). Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)\n\n\njulia> f = x*y^2 + (x + 1)*y + 3\n(x)*y^2+(x+1)*y+3\n\njulia> g = (x + 1)*y + (x^3 + 2x + 2)\n(x+1)*y+(x^3+2*x+2)\n\njulia> M = R[x + 1 2x; x - 3 2x - 1]\n[x+1 2*x]\n[x-3 2*x-1]\n\njulia> k = evaluate(f, 3)\n12*x+6\n\njulia> m = evaluate(f, x^2 + 2x + 1)\nx^5+4*x^4+7*x^3+7*x^2+4*x+4\n\njulia> n = compose(f, g)\n(x^3+2*x^2+x)*y^2+(2*x^5+2*x^4+4*x^3+9*x^2+6*x+1)*y+(x^7+4*x^5+5*x^4+5*x^3+10*x^2+8*x+5)\n\njulia> p = subst(f, M)\n[3*x^3-3*x^2+3*x+4 6*x^3+2*x^2+2*x]\n[3*x^3-8*x^2-2*x-3 6*x^3-8*x^2+2*x+2]\n\njulia> q = f(M)\n[3*x^3-3*x^2+3*x+4 6*x^3+2*x^2+2*x]\n[3*x^3-8*x^2-2*x-3 6*x^3-8*x^2+2*x+2]\n\njulia> r = f(23)\n552*x+26\n"
 },
 
 {
@@ -997,7 +1013,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "Derivative and integral",
     "category": "section",
-    "text": "derivative(::PolyElem)integral{T <: Union{ResElem, FieldElem}}(::PolyElem{T})ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\nT, z = PolynomialRing(QQ, \"z\")\nU = ResidueRing(T, z^3 + 3z + 1)\nV, w = PolynomialRing(U, \"w\")\n\nf = x*y^2 + (x + 1)*y + 3\ng = (z^2 + 2z + 1)*w^2 + (z + 1)*w - 2z + 4\n\nh = derivative(f)\nk = integral(g)   "
+    "text": "derivative(::PolyElem)integral{T <: Union{ResElem, FieldElem}}(::PolyElem{T})Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)\n\njulia> T, z = PolynomialRing(QQ, \"z\")\n(Univariate Polynomial Ring in z over Rationals, z)\n\njulia> U = ResidueRing(T, z^3 + 3z + 1)\nResidue ring of Univariate Polynomial Ring in z over Rationals modulo z^3+3//1*z+1//1\n\njulia> V, w = PolynomialRing(U, \"w\")\n(Univariate Polynomial Ring in w over Residue ring of Univariate Polynomial Ring in z over Rationals modulo z^3+3//1*z+1//1, w)\n\njulia> f = x*y^2 + (x + 1)*y + 3\n(x)*y^2+(x+1)*y+3\n\njulia> g = (z^2 + 2z + 1)*w^2 + (z + 1)*w - 2z + 4\n(z^2+2//1*z+1//1)*w^2+(z+1//1)*w+(-2//1*z+4//1)\n\njulia> h = derivative(f)\n(2*x)*y+(x+1)\n\njulia> k = integral(g)\n(1//3*z^2+2//3*z+1//3)*w^3+(1//2*z+1//2)*w^2+(-2//1*z+4//1)*w\n"
 },
 
 {
@@ -1029,7 +1045,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "Resultant and discriminant",
     "category": "section",
-    "text": "resultant{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})resx{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})discriminant(a::PolyElem)ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = 3x*y^2 + (x + 1)*y + 3\ng = 6(x + 1)*y + (x^3 + 2x + 2)\n\nh = resultant(f, g)\nk = discriminant(f)"
+    "text": "resultant{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})resx{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})discriminant(a::PolyElem)Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)\n\njulia> f = 3x*y^2 + (x + 1)*y + 3\n(3*x)*y^2+(x+1)*y+3\n\njulia> g = 6(x + 1)*y + (x^3 + 2x + 2)\n(6*x+6)*y+(x^3+2*x+2)\n\njulia> h = resultant(f, g)\n3*x^7+6*x^5-6*x^3+96*x^2+192*x+96\n\njulia> k = discriminant(f)\nx^2-34*x+1\n"
 },
 
 {
@@ -1053,7 +1069,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "Newton representation",
     "category": "section",
-    "text": "monomial_to_newton!{T <: RingElem}(::Array{T, 1}, ::Array{T, 1})newton_to_monomial!{T <: RingElem}(::Array{T, 1}, ::Array{T, 1})ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = 3x*y^2 + (x + 1)*y + 3\ng = deepcopy(f)\nroots = [R(1), R(2), R(3)]\n\nmonomial_to_newton!(g.coeffs, roots)\nnewton_to_monomial!(g.coeffs, roots)"
+    "text": "monomial_to_newton!{T <: RingElem}(::Array{T, 1}, ::Array{T, 1})newton_to_monomial!{T <: RingElem}(::Array{T, 1}, ::Array{T, 1})Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)\n\njulia> f = 3x*y^2 + (x + 1)*y + 3\n(3*x)*y^2+(x+1)*y+3\n\njulia> g = deepcopy(f)\n(3*x)*y^2+(x+1)*y+3\n\njulia> roots = [R(1), R(2), R(3)]\n3-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:\n 1\n 2\n 3\n\njulia> monomial_to_newton!(g.coeffs, roots)\n\njulia> newton_to_monomial!(g.coeffs, roots)\n"
 },
 
 {
@@ -1069,7 +1085,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "Interpolation",
     "category": "section",
-    "text": "interpolate{T <: RingElem}(::PolyRing, ::Array{T, 1}, ::Array{T, 1})ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nxs = [R(1), R(2), R(3), R(4)]\nys = [R(1), R(4), R(9), R(16)]\n\nf = interpolate(S, xs, ys)"
+    "text": "interpolate{T <: RingElem}(::PolyRing, ::Array{T, 1}, ::Array{T, 1})Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)\n\njulia> xs = [R(1), R(2), R(3), R(4)]\n4-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:\n 1\n 2\n 3\n 4\n\njulia> ys = [R(1), R(4), R(9), R(16)]\n4-element Array{AbstractAlgebra.Generic.Poly{BigInt},1}:\n 1\n 4\n 9\n 16\n\njulia> f = interpolate(S, xs, ys)\ny^2\n"
 },
 
 {
@@ -1093,7 +1109,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "Special functions",
     "category": "section",
-    "text": "The following special functions can be computed for any polynomial ring. Typically one uses the generator x of a polynomial ring to get the respective special polynomials expressed in terms of that generator.chebyshev_t(::Int, ::PolyElem)chebyshev_u(::Int, ::PolyElem)ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS, y = PolynomialRing(R, \"y\")\n\nf = chebyshev_t(20, y)\ng = chebyshev_u(15, y)"
+    "text": "The following special functions can be computed for any polynomial ring. Typically one uses the generator x of a polynomial ring to get the respective special polynomials expressed in terms of that generator.chebyshev_t(::Int, ::PolyElem)chebyshev_u(::Int, ::PolyElem)Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)\n\njulia> f = chebyshev_t(20, y)\n524288*y^20-2621440*y^18+5570560*y^16-6553600*y^14+4659200*y^12-2050048*y^10+549120*y^8-84480*y^6+6600*y^4-200*y^2+1\n\njulia> g = chebyshev_u(15, y)\n32768*y^15-114688*y^13+159744*y^11-112640*y^9+42240*y^7-8064*y^5+672*y^3-16*y\n"
 },
 
 {
@@ -1101,7 +1117,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials over a noncommutative ring",
     "title": "Generic univariate polynomials over a noncommutative ring",
     "category": "page",
-    "text": "CurrentModule = AbstractAlgebra"
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -1125,7 +1141,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials over a noncommutative ring",
     "title": "Polynomial ring constructors",
     "category": "section",
-    "text": "In order to construct polynomials in AbstractAlgebra.jl, one must first construct the polynomial ring itself. This is accomplished with the following constructor.PolynomialRing(R::AbstractAlgebra.NCRing, s::AbstractString; cached::Bool = true)Given a base ring R and string s specifying how the generator (variable) should be printed, return a tuple S, x representing the new polynomial ring S = Rx and the generator x of the ring. By default the parent object S will depend only on R and  x and will be cached. Setting the optional argument cached to false will prevent the parent object S from being cached.A shorthand version of this function is provided: given a base ring R, we abbreviate the constructor as follows.R[\"x\"]Here are some examples of creating polynomial rings and making use of the resulting parent objects to coerce various elements into the polynomial ring.ExamplesR = MatrixAlgebra(ZZ, 2)\nS, x = PolynomialRing(R, \"x\")\nT, y = PolynomialRing(T, \"y\")\nU, z = R[\"z\"]\n\nf = S()\ng = S(123)\nh = T(BigInt(1234))\nk = T(x + 1)\nm = U(z + 1)All of the examples here are generic polynomial rings, but specialised implementations of polynomial rings provided by external modules will also usually provide a PolynomialRing constructor to allow creation of their polynomial rings."
+    "text": "In order to construct polynomials in AbstractAlgebra.jl, one must first construct the polynomial ring itself. This is accomplished with the following constructor.PolynomialRing(R::AbstractAlgebra.NCRing, s::AbstractString; cached::Bool = true)Given a base ring R and string s specifying how the generator (variable) should be printed, return a tuple S, x representing the new polynomial ring S = Rx and the generator x of the ring. By default the parent object S will depend only on R and  x and will be cached. Setting the optional argument cached to false will prevent the parent object S from being cached.A shorthand version of this function is provided: given a base ring R, we abbreviate the constructor as follows.R[\"x\"]Here are some examples of creating polynomial rings and making use of the resulting parent objects to coerce various elements into the polynomial ring.Examplesjulia> R = MatrixAlgebra(ZZ, 2)\nMatrix Algebra of degree 2 over Integers\n\njulia> S, x = PolynomialRing(R, \"x\")\n(Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)\n\njulia> T, y = PolynomialRing(S, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)\n\njulia> U, z = R[\"z\"]\n(Univariate Polynomial Ring in z over Matrix Algebra of degree 2 over Integers, z)\n\njulia> f = S()\n[0 0]\n[0 0]\n\njulia> g = S(123)\n([123 0]\n[0 123])\n\njulia> h = T(BigInt(1234))\n([1234 0]\n[0 1234])\n\njulia> k = T(x + 1)\n(x+([1 0]\n[0 1]))\n\njulia> m = U(z + 1)\nz+([1 0]\n[0 1])\nAll of the examples here are generic polynomial rings, but specialised implementations of polynomial rings provided by external modules will also usually provide a PolynomialRing constructor to allow creation of their polynomial rings."
 },
 
 {
@@ -1133,7 +1149,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials over a noncommutative ring",
     "title": "Basic ring functionality",
     "category": "section",
-    "text": "Once a polynomial ring is constructed, there are various ways to construct polynomials in that ring.The easiest way is simply using the generator returned by the PolynomialRing constructor and build up the polynomial using basic arithmetic, as described in the Ring interface. The Julia language also has special syntax for the construction of polynomials in terms of a generator, e.g. we can write 2x instead of 2*x.The polynomial rings in AbstractAlgebra.jl implement the full Ring interface. Of course the entire Univariate Polynomial Ring interface is also implemented.We give some examples of such functionality.ExamplesR = MatrixAlgebra(ZZ, 2)\nS, x = PolynomialRing(R, \"x\")\nT, y = PolynomialRing(T, \"y\")\n\nf = x^3 + 3x + 21\ng = (x + 1)*y^2 + 2x + 1\n\nh = zero(T)\nk = one(S)\nisone(k) == true\niszero(f) == false\nn = length(g)\nU = base_ring(T)\nV = base_ring(y + 1)\nv = var(T)\nU = parent(y + 1)\ng == deepcopy(g)\nt = divexact(2g, 2)"
+    "text": "Once a polynomial ring is constructed, there are various ways to construct polynomials in that ring.The easiest way is simply using the generator returned by the PolynomialRing constructor and build up the polynomial using basic arithmetic, as described in the Ring interface. The Julia language also has special syntax for the construction of polynomials in terms of a generator, e.g. we can write 2x instead of 2*x.The polynomial rings in AbstractAlgebra.jl implement the full Ring interface. Of course the entire Univariate Polynomial Ring interface is also implemented.We give some examples of such functionality.Examplesjulia> R = MatrixAlgebra(ZZ, 2)\nMatrix Algebra of degree 2 over Integers\n\njulia> S, x = PolynomialRing(R, \"x\")\n(Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)\n\njulia> T, y = PolynomialRing(S, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)\n\njulia> f = x^3 + 3x + 21\nx^3+([3 0]\n[0 3])*x+([21 0]\n[0 21])\n\njulia> g = (x + 1)*y^2 + 2x + 1\n(x+([1 0]\n[0 1]))*y^2+(([2 0]\n[0 2])*x+([1 0]\n[0 1]))\n\njulia> h = zero(T)\n[0 0]\n[0 0]\n\njulia> k = one(S)\n([1 0]\n[0 1])\n\njulia> isone(k)\ntrue\n\njulia> iszero(f)\nfalse\n\njulia> n = length(g)\n3\n\njulia> U = base_ring(T)\nUnivariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers\n\njulia> V = base_ring(y + 1)\nUnivariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers\n\njulia> v = var(T)\n:y\n\njulia> U = parent(y + 1)\nUnivariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers\n\njulia> g == deepcopy(g)\ntrue"
 },
 
 {
@@ -1205,7 +1221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials over a noncommutative ring",
     "title": "Basic functionality",
     "category": "section",
-    "text": "lead(::NCPolyElem)\ntrail(::NCPolyElem)gen(::NCPolyRing)isgen(::NCPolyElem)isunit(::NCPolyElem)ismonomial(::NCPolyElem)isterm(::NCPolyElem)ExamplesR = MatrixAlgebra(ZZ, 2)\nS, x = PolynomialRing(R, \"x\")\nT, y = PolynomialRing(S, \"y\")\n\na = zero(T)\nb = one(T)\n\nc = BigInt(1)*z^2 + BigInt(1)\nd = x*y^2 + (x + 1)*y + 3\n\nf = lead(d)\ny = gen(T)\ng = isgen(y)\nm = isunit(b)\nn = degree(d)\nisterm(2y^2) == true\nismonomial(y^2) == true"
+    "text": "lead(::NCPolyElem)\ntrail(::NCPolyElem)gen(::NCPolyRing)isgen(::NCPolyElem)isunit(::NCPolyElem)ismonomial(::NCPolyElem)isterm(::NCPolyElem)Examplesjulia> R = MatrixAlgebra(ZZ, 2)\nMatrix Algebra of degree 2 over Integers\n\njulia> S, x = PolynomialRing(R, \"x\")\n(Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)\n\njulia> T, y = PolynomialRing(S, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)\n\njulia> a = zero(T)\n[0 0]\n[0 0]\n\njulia> b = one(T)\n([1 0]\n[0 1])\n\njulia> c = BigInt(1)*y^2 + BigInt(1)\ny^2+([1 0]\n[0 1])\n\njulia> d = x*y^2 + (x + 1)*y + 3\n(x)*y^2+(x+([1 0]\n[0 1]))*y+([3 0]\n[0 3])\n\njulia> f = lead(d)\nx\n\njulia> y = gen(T)\ny\n\njulia> g = isgen(y)\ntrue\n\njulia> m = isunit(b)\ntrue\n\njulia> n = degree(d)\n2\n\njulia> isterm(2y^2)\ntrue\n\njulia> ismonomial(y^2)\ntrue\n"
 },
 
 {
@@ -1229,7 +1245,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials over a noncommutative ring",
     "title": "Truncation",
     "category": "section",
-    "text": "truncate(::NCPolyElem, ::Int)mullow(::NCPolyElem{T}, ::NCPolyElem{T}, ::Int) where T <: NCRingElemExamplesR = MatrixAlgebra(ZZ, 2)\nS, x = PolynomialRing(R, \"x\")\nT, y = PolynomialRing(S, \"y\")\n\nf = x*y^2 + (x + 1)*y + 3\ng = (x + 1)*y + (x^3 + 2x + 2)\n\nh = truncate(f, 1)\nk = mullow(f, g, 4)"
+    "text": "truncate(::NCPolyElem, ::Int)mullow(::NCPolyElem{T}, ::NCPolyElem{T}, ::Int) where T <: NCRingElemExamplesjulia> R = MatrixAlgebra(ZZ, 2)\nMatrix Algebra of degree 2 over Integers\n\njulia> S, x = PolynomialRing(R, \"x\")\n(Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)\n\njulia> T, y = PolynomialRing(S, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)\n\njulia> f = x*y^2 + (x + 1)*y + 3\n(x)*y^2+(x+([1 0]\n[0 1]))*y+([3 0]\n[0 3])\n\njulia> g = (x + 1)*y + (x^3 + 2x + 2)\n(x+([1 0]\n[0 1]))*y+(x^3+([2 0]\n[0 2])*x+([2 0]\n[0 2]))\n\njulia> h = truncate(f, 1)\n([3 0]\n[0 3])\n\njulia> k = mullow(f, g, 4)\n(x^2+x)*y^3+(x^4+([3 0]\n[0 3])*x^2+([4 0]\n[0 4])*x+([1 0]\n[0 1]))*y^2+(x^4+x^3+([2 0]\n[0 2])*x^2+([7 0]\n[0 7])*x+([5 0]\n[0 5]))*y+(([3 0]\n[0 3])*x^3+([6 0]\n[0 6])*x+([6 0]\n[0 6]))\n"
 },
 
 {
@@ -1253,7 +1269,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials over a noncommutative ring",
     "title": "Reversal",
     "category": "section",
-    "text": "reverse(::NCPolyElem, ::Int)\nreverse(::NCPolyElem)ExamplesR = MatrixAlgebra(ZZ, 2)\nS, x = PolynomialRing(R, \"x\")\nT, y = PolynomialRing(S, \"y\")\n\nf = x*y^2 + (x + 1)*y + 3\n\ng = reverse(f, 7)\nh = reverse(f)"
+    "text": "reverse(::NCPolyElem, ::Int)\nreverse(::NCPolyElem)Examplesjulia> R = MatrixAlgebra(ZZ, 2)\nMatrix Algebra of degree 2 over Integers\n\njulia> S, x = PolynomialRing(R, \"x\")\n(Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)\n\njulia> T, y = PolynomialRing(S, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)\n\njulia> f = x*y^2 + (x + 1)*y + 3\n(x)*y^2+(x+([1 0]\n[0 1]))*y+([3 0]\n[0 3])\n\njulia> g = reverse(f, 7)\n([3 0]\n[0 3])*y^6+(x+([1 0]\n[0 1]))*y^5+(x)*y^4\n\njulia> h = reverse(f)\n([3 0]\n[0 3])*y^2+(x+([1 0]\n[0 1]))*y+(x)\n"
 },
 
 {
@@ -1277,7 +1293,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials over a noncommutative ring",
     "title": "Shifting",
     "category": "section",
-    "text": "shift_left(::NCPolyElem, ::Int)shift_right(::NCPolyElem, ::Int)ExamplesR = MatrixAlgebra(ZZ, 2)\nS, x = PolynomialRing(R, \"x\")\nT, y = PolynomialRing(S, \"y\")\n\nf = x*y^2 + (x + 1)*y + 3\n\ng = shift_left(f, 7)\nh = shift_right(f, 2)"
+    "text": "shift_left(::NCPolyElem, ::Int)shift_right(::NCPolyElem, ::Int)Examplesjulia> R = MatrixAlgebra(ZZ, 2)\nMatrix Algebra of degree 2 over Integers\n\njulia> S, x = PolynomialRing(R, \"x\")\n(Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)\n\njulia> T, y = PolynomialRing(S, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)\n\njulia> f = x*y^2 + (x + 1)*y + 3\n(x)*y^2+(x+([1 0]\n[0 1]))*y+([3 0]\n[0 3])\n\njulia> g = shift_left(f, 7)\n(x)*y^9+(x+([1 0]\n[0 1]))*y^8+([3 0]\n[0 3])*y^7\n\njulia> h = shift_right(f, 2)\n(x)\n"
 },
 
 {
@@ -1301,7 +1317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials over a noncommutative ring",
     "title": "Evaluation",
     "category": "section",
-    "text": "evaluate{T <: NCRingElem}(::NCPolyElem{T}, ::T)\nevaluate(::NCPolyElem, ::Integer)We also overload the functional notation so that the polynomial f can be evaluated at a by writing f(a). ExamplesR = MatrixAlgebra(ZZ, 2)\nS, x = PolynomialRing(R, \"x\")\nT, y = PolynomialRing(S, \"y\")\n   \nf = x*y^2 + (x + 1)*y + 3\n\nk = evaluate(f, 3)\nm = evaluate(f, x^2 + 2x + 1)\nr = f(23)"
+    "text": "evaluate{T <: NCRingElem}(::NCPolyElem{T}, ::T)\nevaluate(::NCPolyElem, ::Integer)We also overload the functional notation so that the polynomial f can be evaluated at a by writing f(a). Examplesjulia> R = MatrixAlgebra(ZZ, 2)\nMatrix Algebra of degree 2 over Integers\n\njulia> S, x = PolynomialRing(R, \"x\")\n(Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)\n\njulia> T, y = PolynomialRing(S, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)\n\n\njulia> f = x*y^2 + (x + 1)*y + 3\n(x)*y^2+(x+([1 0]\n[0 1]))*y+([3 0]\n[0 3])\n\njulia> k = evaluate(f, 3)\n([12 0]\n[0 12])*x+([6 0]\n[0 6])\n\njulia> m = evaluate(f, x^2 + 2x + 1)\nx^5+([4 0]\n[0 4])*x^4+([7 0]\n[0 7])*x^3+([7 0]\n[0 7])*x^2+([4 0]\n[0 4])*x+([4 0]\n[0 4])\n\njulia> r = f(23)\n([552 0]\n[0 552])*x+([26 0]\n[0 26])\n"
 },
 
 {
@@ -1317,7 +1333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials over a noncommutative ring",
     "title": "Derivative",
     "category": "section",
-    "text": "derivative(::NCPolyElem)ExamplesR = MatrixAlgebra(ZZ, 2)\nS, x = PolynomialRing(R, \"x\")\nT, y = PolynomialRing(S, \"y\")\n\nf = x*y^2 + (x + 1)*y + 3\n\nh = derivative(f)"
+    "text": "derivative(::NCPolyElem)Examplesjulia> R = MatrixAlgebra(ZZ, 2)\nMatrix Algebra of degree 2 over Integers\n\njulia> S, x = PolynomialRing(R, \"x\")\n(Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)\n\njulia> T, y = PolynomialRing(S, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)\n\njulia> f = x*y^2 + (x + 1)*y + 3\n(x)*y^2+(x+([1 0]\n[0 1]))*y+([3 0]\n[0 3])\n\njulia> h = derivative(f)\n(([2 0]\n[0 2])*x)*y+(x+([1 0]\n[0 1]))\n"
 },
 
 {
@@ -1325,7 +1341,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Multivariate Polynomial Ring Interface",
     "category": "page",
-    "text": "CurrentModule = AbstractAlgebra"
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -1357,7 +1373,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Constructors",
     "category": "section",
-    "text": "To construct a multivariate polynomial ring, there is the following constructor.PolynomialRing(R::Ring, s::Vector{AbstractString}; ordering=:lex, cached=true)Returns a tuple, S, vars consisting of a polynomial ring S and an array of generators (variables) which print according to the strings in the supplied vector s. The ordering can at present be :lex, :deglex or :degrevlex. By default, the polynomial ring is cached, and creating a polynomial ring with the same data will return the same ring object S. If this caching is not desired, it can be switched off by setting cached=false.Polynomials in a given ring can be constructed using the generators and basic polynomial arithmetic. However, this is inefficient and the following build context is provided for building polynomials term-by-term. It assumes the polynomial data type is random access, and so the constructor functions must be reimplemented for all other types of polynomials.MPolyBuildCtx(R::MPolyRing)Return a build context for creating polynomials in the given polynomial ring.push_term!(M::MPolyBuildCtx, c::RingElem, v::Vector{Int})Add the term with coefficient c and exponent vector v to the polynomial under construction in the build context M.finish(M::MPolyBuildCtx)Finish construction of the polynomial, sort the terms, remove duplicate and zero terms and return the created polynomial.ExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nM = MPolyBuildCtx(R)\npush_term!(C, ZZ(3), [1, 2])\npush_term!(C, ZZ(2), [1, 1])\npush_term!(C, ZZ(4), [0, 0])\np = finish(C)"
+    "text": "To construct a multivariate polynomial ring, there is the following constructor.PolynomialRing(R::Ring, s::Vector{AbstractString}; ordering=:lex, cached=true)Returns a tuple, S, vars consisting of a polynomial ring S and an array of generators (variables) which print according to the strings in the supplied vector s. The ordering can at present be :lex, :deglex or :degrevlex. By default, the polynomial ring is cached, and creating a polynomial ring with the same data will return the same ring object S. If this caching is not desired, it can be switched off by setting cached=false.Polynomials in a given ring can be constructed using the generators and basic polynomial arithmetic. However, this is inefficient and the following build context is provided for building polynomials term-by-term. It assumes the polynomial data type is random access, and so the constructor functions must be reimplemented for all other types of polynomials.MPolyBuildCtx(R::MPolyRing)Return a build context for creating polynomials in the given polynomial ring.push_term!(M::MPolyBuildCtx, c::RingElem, v::Vector{Int})Add the term with coefficient c and exponent vector v to the polynomial under construction in the build context M.finish(M::MPolyBuildCtx)Finish construction of the polynomial, sort the terms, remove duplicate and zero terms and return the created polynomial.Examplesjulia> R, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])\n\njulia> C = MPolyBuildCtx(R)\nBuilder for a polynomial in Multivariate Polynomial Ring in x, y over Integers\n\njulia> push_term!(C, ZZ(3), [1, 2])\n3*x*y^2\n\njulia> push_term!(C, ZZ(2), [1, 1])\n3*x*y^2+2*x*y\n\njulia> push_term!(C, ZZ(4), [0, 0])\n3*x*y^2+2*x*y+4\n\njulia> p = finish(C)\n3*x*y^2+2*x*y+4\n"
 },
 
 {
@@ -1365,7 +1381,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Data type and parent object methods",
     "category": "section",
-    "text": "symbols(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn an array of Symbols representing the variables (generators) of the polynomial ring. Note that these are Symbols not Strings, though their string values will usually be used when printing polynomials.nvars(f::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn the number of variables of the polynomial ring.gens(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn an array of all the generators (variables) of the given polynomial ring (as polynomials).The first entry in the array will be the variable with most significance with respect to the ordering.gen(S::MyMPolyRing{T}, i::Int) where T <: AbstractAlgebra.RingElemReturn the i-th generator (variable) of the given polynomial ring (as a polynomial).ordering(S::MyMPolyRing{T})Return the ordering of the given polynomial ring as a symbol. Supported values currently include :lex, :deglex and :degrevlex.ExamplesS, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"]; ordering=:deglex)\n\nV = symbols(S)\nX = gens(S)\nord = ordering(S)"
+    "text": "symbols(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn an array of Symbols representing the variables (generators) of the polynomial ring. Note that these are Symbols not Strings, though their string values will usually be used when printing polynomials.nvars(f::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn the number of variables of the polynomial ring.gens(S::MyMPolyRing{T}) where T <: AbstractAlgebra.RingElemReturn an array of all the generators (variables) of the given polynomial ring (as polynomials).The first entry in the array will be the variable with most significance with respect to the ordering.gen(S::MyMPolyRing{T}, i::Int) where T <: AbstractAlgebra.RingElemReturn the i-th generator (variable) of the given polynomial ring (as a polynomial).ordering(S::MyMPolyRing{T})Return the ordering of the given polynomial ring as a symbol. Supported values currently include :lex, :deglex and :degrevlex.Examplesjulia> S, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"]; ordering=:deglex)\n(Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])\n\njulia> V = symbols(S)\n2-element Array{Symbol,1}:\n :x\n :y\n\njulia> X = gens(S)\n2-element Array{AbstractAlgebra.Generic.MPoly{Rational{BigInt}},1}:\n x\n y\n\njulia> ord = ordering(S)\n:deglex\n"
 },
 
 {
@@ -1373,7 +1389,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Basic manipulation of rings and elements",
     "category": "section",
-    "text": "length(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the number of nonzero terms of the given polynomial. The length of the zero polynomial is defined to be 0. The return value should be of type Int.Return an array of the degrees of the polynomial f in each of the variables.total_degree(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the total degree of the polynomial f, i.e. the highest sum of exponents occuring in any term of f.isgen(x::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if x is a generator of the polynomial ring.coeffs(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an iterator for the coefficients of the polynomial p, starting with the coefficient of the most significant term with respect to the ordering. Generic code will provide this function automatically for random access polynomials that implement the coeff function.monomials(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an iterator for the monomials of the polynomial p, starting with the monomial of the most significant term with respect to the ordering. Monomials in AbstractAlgebra are defined to have coefficient 1. See the function terms if you also require the coefficients, however note that only monomials can be compared. Generic code will provide this function automatically for random access polynomials that implement the monomial function.terms(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an iterator for the terms of the polynomial p, starting with the most significant term with respect to the ordering. Terms in AbstractAlgebra include the coefficient. Generic code will provide this function automatically for random access polynomials that implement the term function.exponent_vectors(a::MyMPoly{T}) where T <: RingElementReturn an iterator for the exponent vectors for each of the terms of the polynomial starting with the most significant term with respect to the ordering. Each exponent vector is an array of Ints, one for each variable, in the order given when the polynomial ring was created. Generic code will provide this function automatically for random access polynomials that implement the exponent_vector function.ExamplesS, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^3*y + 3x*y^2 + 1\n\nn = length(f)\nisgen(y) == true\nB, b = max_degrees(f)\nnvars(f) == 2\nC = collect(coeffs(f))\nM = collect(monomials(f))\nT = collect(terms(f))\nV = collect(exponent_vectors(f))\nd = total_degree(f)"
+    "text": "length(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the number of nonzero terms of the given polynomial. The length of the zero polynomial is defined to be 0. The return value should be of type Int.Return an array of the degrees of the polynomial f in each of the variables.total_degree(f::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the total degree of the polynomial f, i.e. the highest sum of exponents occuring in any term of f.isgen(x::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn true if x is a generator of the polynomial ring.coeffs(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an iterator for the coefficients of the polynomial p, starting with the coefficient of the most significant term with respect to the ordering. Generic code will provide this function automatically for random access polynomials that implement the coeff function.monomials(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an iterator for the monomials of the polynomial p, starting with the monomial of the most significant term with respect to the ordering. Monomials in AbstractAlgebra are defined to have coefficient 1. See the function terms if you also require the coefficients, however note that only monomials can be compared. Generic code will provide this function automatically for random access polynomials that implement the monomial function.terms(p::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn an iterator for the terms of the polynomial p, starting with the most significant term with respect to the ordering. Terms in AbstractAlgebra include the coefficient. Generic code will provide this function automatically for random access polynomials that implement the term function.exponent_vectors(a::MyMPoly{T}) where T <: RingElementReturn an iterator for the exponent vectors for each of the terms of the polynomial starting with the most significant term with respect to the ordering. Each exponent vector is an array of Ints, one for each variable, in the order given when the polynomial ring was created. Generic code will provide this function automatically for random access polynomials that implement the exponent_vector function.Examplesjulia> S, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])\n\njulia> f = x^3*y + 3x*y^2 + 1\nx^3*y+3*x*y^2+1\n\njulia> n = length(f)\n3\n\njulia> isgen(y)\ntrue\n\njulia> nvars(S) == 2\ntrue\n\njulia> C = collect(coeffs(f))\n3-element Array{BigInt,1}:\n 1\n 3\n 1\n\njulia> M = collect(monomials(f))\n3-element Array{AbstractAlgebra.Generic.MPoly{BigInt},1}:\n x^3*y\n x*y^2\n 1\n\njulia> T = collect(terms(f))\n3-element Array{AbstractAlgebra.Generic.MPoly{BigInt},1}:\n x^3*y\n 3*x*y^2\n 1\n\njulia> V = collect(exponent_vectors(f))\n3-element Array{Array{Int64,1},1}:\n [3, 1]\n [1, 2]\n [0, 0]\n\njulia> d = total_degree(f)\n4\n"
 },
 
 {
@@ -1381,7 +1397,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Exact division",
     "category": "section",
-    "text": "For any ring that implements exact division, the following can be implemented.divexact(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the exact quotient of f by g if it exists, otherwise throw an error.divides(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn a tuple (flag, q) where flag is true if g divides f, in which case q will be the exact quotient, or flag is false and q is set to zero.remove(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturns a tuple (v q) such that the highest power of g that divides f is g^v and the cofactor is q.valuation(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturns v such that the highest power of g that divides f is g^v.ExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = 2x^2*y + 2x + y + 1\ng = x^2*y^2 + 1\n\nflag, q = divides(f*g, f)\nd = divexact(f*g, f)\nv, q = remove(f*g^3, g)\nn = valuation(f*g^3, g)"
+    "text": "For any ring that implements exact division, the following can be implemented.divexact(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn the exact quotient of f by g if it exists, otherwise throw an error.divides(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn a tuple (flag, q) where flag is true if g divides f, in which case q will be the exact quotient, or flag is false and q is set to zero.remove(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturns a tuple (v q) such that the highest power of g that divides f is g^v and the cofactor is q.valuation(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturns v such that the highest power of g that divides f is g^v.Examplesjulia> R, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])\n\njulia> f = 2x^2*y + 2x + y + 1\n2*x^2*y+2*x+y+1\n\njulia> g = x^2*y^2 + 1\nx^2*y^2+1\n\njulia> flag, q = divides(f*g, f)\n(true, x^2*y^2+1)\n\njulia> d = divexact(f*g, f)\nx^2*y^2+1\n\njulia> v, q = remove(f*g^3, g)\n(3, 2*x^2*y+2*x+y+1)\n\njulia> n = valuation(f*g^3, g)\n3\n"
 },
 
 {
@@ -1389,7 +1405,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Ad hoc exact division",
     "category": "section",
-    "text": "For any ring that implements exact division, the following can be implemented.divexact(f::MyMPoly{T}, c::Integer) where T <: AbstractAlgebra.RingElem\ndivexact(f::MyMPoly{T}, c::Rational) where T <: AbstractAlgebra.RingElem\ndivexact(f::MyMPoly{T}, c::T) where T <: AbstractAlgebra.RingElemDivide the polynomial exactly by the constant c.ExamplesR, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n\nf = 3x^2*y^2 + 2x + 1\n\nf1 = divexact(f, 5)\nf2 = divexact(f, QQ(2, 3))"
+    "text": "For any ring that implements exact division, the following can be implemented.divexact(f::MyMPoly{T}, c::Integer) where T <: AbstractAlgebra.RingElem\ndivexact(f::MyMPoly{T}, c::Rational) where T <: AbstractAlgebra.RingElem\ndivexact(f::MyMPoly{T}, c::T) where T <: AbstractAlgebra.RingElemDivide the polynomial exactly by the constant c.Examplesjulia> R, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])\n\njulia> f = 3x^2*y^2 + 2x + 1\n3//1*x^2*y^2+2//1*x+1//1\n\njulia> f1 = divexact(f, 5)\n3//5*x^2*y^2+2//5*x+1//5\n\njulia> f2 = divexact(f, QQ(2, 3))\n9//2*x^2*y^2+3//1*x+3//2\n"
 },
 
 {
@@ -1397,7 +1413,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Euclidean division",
     "category": "section",
-    "text": "Although multivariate polynomial rings are not in general Euclidean, it is possible to define a quotient with remainder function that depends on the polynomial ordering in the case that the quotient ring is a field or a Euclidean domain. In the case that a polynomial g divides a polynomial f, the result no longer depends on the ordering and the remainder is zero, with the quotient agreeing with the exact quotient.divrem(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn a tuple (q r) such that f = qg + r, where the coefficients of terms of r whose monomials are divisible by the leading monomial of g are reduced modulo the leading coefficient of g (according to the Euclidean function on the coefficients).Note that the result of this function depends on the ordering of the polynomial ring.div(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemAs per the divrem function, but returning the quotient only. Especially when the quotient happens to be exact, this function can be exceedingly fast.ExamplesR, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n\nf = 2x^2*y + 2x + y + 1\ng = x + y\n\nq = div(f, g)\nq, r = divrem(f, g)"
+    "text": "Although multivariate polynomial rings are not in general Euclidean, it is possible to define a quotient with remainder function that depends on the polynomial ordering in the case that the quotient ring is a field or a Euclidean domain. In the case that a polynomial g divides a polynomial f, the result no longer depends on the ordering and the remainder is zero, with the quotient agreeing with the exact quotient.divrem(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn a tuple (q r) such that f = qg + r, where the coefficients of terms of r whose monomials are divisible by the leading monomial of g are reduced modulo the leading coefficient of g (according to the Euclidean function on the coefficients).Note that the result of this function depends on the ordering of the polynomial ring.div(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemAs per the divrem function, but returning the quotient only. Especially when the quotient happens to be exact, this function can be exceedingly fast.Examplesjulia> R, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])\n\njulia> f = 2x^2*y + 2x + y + 1\n2//1*x^2*y+2//1*x+y+1//1\n\njulia> g = x + y\nx+y\n\njulia> q = div(f, g)\n2//1*x*y-2//1*y^2+2//1\n\njulia> q, r = divrem(f, g)\n(2//1*x*y-2//1*y^2+2//1, 2//1*y^3-y+1//1)\n"
 },
 
 {
@@ -1405,7 +1421,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "GCD",
     "category": "section",
-    "text": "In cases where there is a meaningful Euclidean structure on the coefficient ring, it is possible to compute the GCD of multivariate polynomials.gcd(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn a greatest common divisor of f and g.ExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = 2x^2*y + 2x + y + 1\ng = x^2*y^2 + 1\n\nd = gcd(f*g^2, f^2*g)"
+    "text": "In cases where there is a meaningful Euclidean structure on the coefficient ring, it is possible to compute the GCD of multivariate polynomials.gcd(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElemReturn a greatest common divisor of f and g.Examplesjulia> R, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])\n\njulia> f = 2x^2*y + 2x + y + 1\n2*x^2*y+2*x+y+1\n\njulia> g = x^2*y^2 + 1\nx^2*y^2+1\n\njulia> d = gcd(f*g^2, f^2*g)\n2*x^4*y^3+2*x^3*y^2+x^2*y^3+x^2*y^2+2*x^2*y+2*x+y+1\n"
 },
 
 {
@@ -1421,7 +1437,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Sparse distributed, random access constructors",
     "category": "section",
-    "text": "In addition to the standard constructors, the following constructor, taking arrays of coefficients and exponent vectors, should be provided.(S::MyMPolyRing{T})(A::Vector{T}, m::Vector{Vector{Int}}) where T <: AbstractAlgebra.RingElemCreate the polynomial in the given ring with nonzero coefficients specified by the elements of A and corresponding exponent vectors given by the elements of m.There is no assumption about coefficients being nonzero or terms being in order or unique. Zero terms are removed by the function, duplicate terms are combined (added) and the terms are sorted so that they are in the correct order.Each exponent vector uses a separate integer for each exponent field, the first of which should be the exponent for the most significant variable with respect to the ordering. All exponents must be non-negative.A library may also optionally provide an interface that makes use of BigInt (or any other big integer type) for exponents instead of Int.ExamplesS, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n\nf = S(Rational{BigInt}[2, 3, 1], [[3, 2], [1, 0], [0, 1]])"
+    "text": "In addition to the standard constructors, the following constructor, taking arrays of coefficients and exponent vectors, should be provided.(S::MyMPolyRing{T})(A::Vector{T}, m::Vector{Vector{Int}}) where T <: AbstractAlgebra.RingElemCreate the polynomial in the given ring with nonzero coefficients specified by the elements of A and corresponding exponent vectors given by the elements of m.There is no assumption about coefficients being nonzero or terms being in order or unique. Zero terms are removed by the function, duplicate terms are combined (added) and the terms are sorted so that they are in the correct order.Each exponent vector uses a separate integer for each exponent field, the first of which should be the exponent for the most significant variable with respect to the ordering. All exponents must be non-negative.A library may also optionally provide an interface that makes use of BigInt (or any other big integer type) for exponents instead of Int.Examplesjulia> S, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])\n\njulia> f = S(Rational{BigInt}[2, 3, 1], [[3, 2], [1, 0], [0, 1]])\n2//1*x^3*y^2+3//1*x+y\n"
 },
 
 {
@@ -1429,7 +1445,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Sparse distributed, random access basic manipulation",
     "category": "section",
-    "text": "coeff(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemReturn the coefficient of the n-th term of f. The first term should be the most significant term with respect to the ordering.coeff(a::MyMPoly{T}, exps::Vector{Int}) where T <: RingElementReturn the coefficient of the term with the given exponent vector, or zero if there is no such term.monomial(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem\nmonomial!(m::MyMPoly{T}, f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemReturn the n-th monomial of f or set m to the n-th monomial of f, respectively. The first monomial should be the most significant term with respect to the ordering. Monomials have coefficient 1 in AbstractAlgebra. See the function term if you also require the coefficient, however, note that only monomials can be compared.term(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemReturn the n-th term of f. The first term should be the one whose monomial is most significant with respect to the ordering.exponent(f::MyMPoly{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElemReturn the exponent of the j-th variable in the n-th term of the polynomial f. The first term is the one with whose monomial is most significant with respect to the ordering.exponent_vector(a::MyMPoly{T}, i::Int) where T <: RingElementReturn a vector of exponents, corresponding to the exponent vector of the i-th term of the polynomial. Term numbering begins at 1 and the exponents are given in the order of the variables for the ring, as supplied when the ring was created.setcoeff!(a::MyMPoly, exps::Vector{Int}, c::S) where S <: RingElementSet the coefficient of the term with the given exponent vector to the given value c. If no such term exists (and c neq 0), one will be inserted. This function takes O(log n) operations if a term with the given exponent already exists and c neq 0, or if the term is inserted at the end of the polynomial. Otherwise it can take O(n) operations in the worst case. This function must return the modified polynomial.ExamplesS, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^3*y + 3x*y^2 + 1\n\nc1 = coeff(f, 1)\nc2 = coeff(f, x^3*y)\nm = monomial(f, 2)\ne1 = exponent(f, 1, 1)\nv1 = exponent_vector(f, 1)\nt1 = term(f, 1)\nsetcoeff!(f, [3, 1], 12)"
+    "text": "coeff(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemReturn the coefficient of the n-th term of f. The first term should be the most significant term with respect to the ordering.coeff(a::MyMPoly{T}, exps::Vector{Int}) where T <: RingElementReturn the coefficient of the term with the given exponent vector, or zero if there is no such term.monomial(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElem\nmonomial!(m::MyMPoly{T}, f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemReturn the n-th monomial of f or set m to the n-th monomial of f, respectively. The first monomial should be the most significant term with respect to the ordering. Monomials have coefficient 1 in AbstractAlgebra. See the function term if you also require the coefficient, however, note that only monomials can be compared.term(f::MyMPoly{T}, n::Int) where T <: AbstractAlgebra.RingElemReturn the n-th term of f. The first term should be the one whose monomial is most significant with respect to the ordering.exponent(f::MyMPoly{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElemReturn the exponent of the j-th variable in the n-th term of the polynomial f. The first term is the one with whose monomial is most significant with respect to the ordering.exponent_vector(a::MyMPoly{T}, i::Int) where T <: RingElementReturn a vector of exponents, corresponding to the exponent vector of the i-th term of the polynomial. Term numbering begins at 1 and the exponents are given in the order of the variables for the ring, as supplied when the ring was created.setcoeff!(a::MyMPoly, exps::Vector{Int}, c::S) where S <: RingElementSet the coefficient of the term with the given exponent vector to the given value c. If no such term exists (and c neq 0), one will be inserted. This function takes O(log n) operations if a term with the given exponent already exists and c neq 0, or if the term is inserted at the end of the polynomial. Otherwise it can take O(n) operations in the worst case. This function must return the modified polynomial.Examplesjulia> S, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])\n\njulia> f = x^3*y + 3x*y^2 + 1\nx^3*y+3*x*y^2+1\n\njulia> c1 = coeff(f, 1)\n1\n\njulia> c2 = coeff(f, x^3*y)\n1\n\njulia> m = monomial(f, 2)\nx*y^2\n\njulia> e1 = exponent(f, 1, 1)\n3\n\njulia> v1 = exponent_vector(f, 1)\n2-element Array{Int64,1}:\n 3\n 1\n\njulia> t1 = term(f, 1)\nx^3*y\n\njulia> setcoeff!(f, [3, 1], 12)\n12*x^3*y+3*x*y^2+1\n"
 },
 
 {
@@ -1453,7 +1469,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Reduction by an ideal",
     "category": "section",
-    "text": "divrem(f::MyMPoly{T}, G::Array{MyMPoly{T}, 1}) where T <: AbstractAlgebra.RingElemAs per the divrem function above, except that each term of r starting with the most significant term, is reduced modulo the leading terms of each of the polynomials in the array G for which the leading monomial is a divisor.A tuple (Q r) is returned from the function, where Q is an array of polynomials of the same length as G, and such that f = r + sum QiGi.The result is again dependent on the ordering in general, but if the polynomials in G are over a field and the reduced generators of a Groebner basis, then the result is unique.ExamplesR, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n\nf = 2x^2*y + 2x + y + 1\ng = x + y\nh = y + 1\n\nQ, r = divrem(f, [g, h])"
+    "text": "divrem(f::MyMPoly{T}, G::Array{MyMPoly{T}, 1}) where T <: AbstractAlgebra.RingElemAs per the divrem function above, except that each term of r starting with the most significant term, is reduced modulo the leading terms of each of the polynomials in the array G for which the leading monomial is a divisor.A tuple (Q r) is returned from the function, where Q is an array of polynomials of the same length as G, and such that f = r + sum QiGi.The result is again dependent on the ordering in general, but if the polynomials in G are over a field and the reduced generators of a Groebner basis, then the result is unique.Examplesjulia> R, (x, y) = PolynomialRing(QQ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])\n\njulia> f = 2x^2*y + 2x + y + 1\n2//1*x^2*y+2//1*x+y+1//1\n\njulia> g = x + y\nx+y\n\njulia> h = y + 1\ny+1//1\n\njulia> Q, r = divrem(f, [g, h])\n(AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[2//1*x*y-2//1*y^2+2//1, 2//1*y^2-2//1*y+1//1], 0//1)\n"
 },
 
 {
@@ -1461,7 +1477,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Evaluation",
     "category": "section",
-    "text": "evaluate(a::MyMPoly{T}, A::Vector{T}) where T <: RingElemEvaluate the polynomial at the given values in the coefficient ring of the polynomial. The result should be an element of the coefficient ring.evaluate(f::MyMPoly{T}, A::Vector{U}) where {T <: AbstractAlgebra.RingElem, U <: Intege\nr}Evaluate the polynomial f at the values specified by the entries of the array A.(a::MyMPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElementEvaluate the polynomial at the given arguments. This provides functional notation for polynomial evaluation, i.e. f(a b c). It must be defined for each supported polynomial type (Julia does not allow functional notation to be defined for an abstract type).The code for this function in MPoly.jl can be used when implementing this as it provides the most general possible evaluation, which is much more general than the case of evaluation at elements of the same ring.The evaluation should succeed for any set of values for which a multiplication is defined with the product of a coefficient and all the values before it.Note that the values may be in non-commutative rings. Products are performed in the order of the variables in the polynomial ring that the polynomial belongs to, preceded by a multiplication by the coefficient on the left.ExamplesR, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [\"x\", \"y\"])\nS = MatrixAlgebra(ZZ, 2)\n\nf = x*y + x + y + 1\n\nevaluate(f, [ZZ(1), ZZ(2)])\nevaluate(f, [2, 3])\nf(1, 2)\nf(ZZ(1), ZZ(2))\nf(x - y, x + y)\n\nM1 = S([1 2; 3 4])\nM2 = S([2 4; 1 -1])\nM3 = S([1 -1; 1 1])\n\nf(M1, M2)\nf(M1, ZZ(2))"
+    "text": "evaluate(a::MyMPoly{T}, A::Vector{T}) where T <: RingElemEvaluate the polynomial at the given values in the coefficient ring of the polynomial. The result should be an element of the coefficient ring.evaluate(f::MyMPoly{T}, A::Vector{U}) where {T <: AbstractAlgebra.RingElem, U <: Intege\nr}Evaluate the polynomial f at the values specified by the entries of the array A.(a::MyMPoly{T})(vals::Union{NCRingElem, RingElement}...) where T <: RingElementEvaluate the polynomial at the given arguments. This provides functional notation for polynomial evaluation, i.e. f(a b c). It must be defined for each supported polynomial type (Julia does not allow functional notation to be defined for an abstract type).The code for this function in MPoly.jl can be used when implementing this as it provides the most general possible evaluation, which is much more general than the case of evaluation at elements of the same ring.The evaluation should succeed for any set of values for which a multiplication is defined with the product of a coefficient and all the values before it.Note that the values may be in non-commutative rings. Products are performed in the order of the variables in the polynomial ring that the polynomial belongs to, preceded by a multiplication by the coefficient on the left.Examplesjulia> R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])\n\njulia> S = MatrixAlgebra(ZZ, 2)\nMatrix Algebra of degree 2 over Integers\n\njulia> f = x*y + x + y + 1\nx*y+x+y+1\n\njulia> evaluate(f, [ZZ(1), ZZ(2)])\n6\n\njulia> evaluate(f, [2, 3])\n12\n\njulia> f(1, 2)\n6\n\njulia> f(ZZ(1), ZZ(2))\n6\n\njulia> f(x - y, x + y)\nx^2+2*x-y^2+1\n\njulia> M1 = S([1 2; 3 4])\n[1 2]\n[3 4]\n\njulia> M2 = S([2 4; 1 -1])\n[2 4]\n[1 -1]\n\njulia> M3 = S([1 -1; 1 1])\n[1 -1]\n[1 1]\n\njulia> f(M1, M2)\n[8 8]\n[14 12]\n\njulia> f(M1, ZZ(2))\n[6 6]\n[9 15]\n"
 },
 
 {
@@ -1469,7 +1485,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Multivariate Polynomial Ring Interface",
     "title": "Derivations",
     "category": "section",
-    "text": "The following function allows to compute derivations of multivariate polynomials of type MPoly.derivative(f::MyMPoly{T}, j::Int) where T <: AbstractAlgebra.RingElemCompute the derivative of f with respect to the j-th variable of the polynomial ring.ExamplesR, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x*y + x + y + 1\n\nderivative(f, 1)\nderivative(f, 2)"
+    "text": "The following function allows to compute derivations of multivariate polynomials of type MPoly.derivative(f::MyMPoly{T}, j::Int) where T <: AbstractAlgebra.RingElemCompute the derivative of f with respect to the j-th variable of the polynomial ring.Examplesjulia> R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])\n\njulia> f = x*y + x + y + 1\nx*y+x+y+1\n\njulia> derivative(f, 1)\ny+1\n\njulia> derivative(f, 2)\nx+1\n"
 },
 
 {
@@ -1477,7 +1493,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Generic sparse distributed multivariate polynomials",
     "category": "page",
-    "text": "CurrentModule = AbstractAlgebra"
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -1501,7 +1517,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Polynomial ring constructors",
     "category": "section",
-    "text": "In order to construct multivariate polynomials in AbstractAlgebra.jl, one must first construct the polynomial ring itself. This is accomplished with the following constructor.PolynomialRing(R::AbstractAlgebra.Ring, S::Array{String, 1}; cached::Bool = true, ordering::Symbol=:lex)Given a base ring R and and array S of strings specifying how the generators (variables) should be printed, return a tuple S, (x, ...) representing the new polynomial ring S = Rx ldots and a tuple of the generators (x ) of the ring. By default the parent object S will depend only on R and  (x, ...) and will be cached. Setting the optional argument cached to false will prevent the parent object  S from being cached.The optional named argument ordering can be used to specify an ordering. The currently supported options are :lex, :deglex and :degrevlex.Here are some examples of creating multivariate polynomial rings and making use of the resulting parent objects to coerce various elements into the polynomial ring.ExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"]; ordering=:deglex)\n\nf = R()\ng = R(123)\nh = R(BigInt(1234))\nk = R(x + 1)\nm = R(x + y + 1)\nderivative(k, 1)\nderivative(k, 2)All of the examples here are generic polynomial rings, but specialised implementations of polynomial rings provided by external modules will also usually provide a PolynomialRing constructor to allow creation of their polynomial rings."
+    "text": "In order to construct multivariate polynomials in AbstractAlgebra.jl, one must first construct the polynomial ring itself. This is accomplished with the following constructor.PolynomialRing(R::AbstractAlgebra.Ring, S::Array{String, 1}; cached::Bool = true, ordering::Symbol=:lex)Given a base ring R and and array S of strings specifying how the generators (variables) should be printed, return a tuple S, (x, ...) representing the new polynomial ring S = Rx ldots and a tuple of the generators (x ) of the ring. By default the parent object S will depend only on R and  (x, ...) and will be cached. Setting the optional argument cached to false will prevent the parent object  S from being cached.The optional named argument ordering can be used to specify an ordering. The currently supported options are :lex, :deglex and :degrevlex.Here are some examples of creating multivariate polynomial rings and making use of the resulting parent objects to coerce various elements into the polynomial ring.Examplesjulia> R, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"]; ordering=:deglex)\n(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])\n\njulia> f = R()\n0\n\njulia> g = R(123)\n123\n\njulia> h = R(BigInt(1234))\n1234\n\njulia> k = R(x + 1)\nx+1\n\njulia> m = R(x + y + 1)\nx+y+1\n\njulia> derivative(k, 1)\n1\n\njulia> derivative(k, 2)\n0\nAll of the examples here are generic polynomial rings, but specialised implementations of polynomial rings provided by external modules will also usually provide a PolynomialRing constructor to allow creation of their polynomial rings."
 },
 
 {
@@ -1589,7 +1605,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Basic manipulation",
     "category": "section",
-    "text": "vars(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElementvar_index(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdegree(::AbstractAlgebra.MPolyElem{T}, ::Int) where T <: RingElementdegree(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdegrees(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisconstant(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisterm(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementismonomial(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementcoeff(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: RingElementExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^2 + 2x + 1\n\nV = vars(f)\nvar_index(y) == 2\ndegree(f, x) == 2\ndegree(f, 2) == 0\nd = degrees(f)\nisconstant(R(1))\nisterm(2x)\nismonomial(y)\nisunit(R(1))\nc = coeff(f, x^2)"
+    "text": "vars(p::AbstractAlgebra.MPolyElem{T}) where T <: RingElementvar_index(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdegree(::AbstractAlgebra.MPolyElem{T}, ::Int) where T <: RingElementdegree(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdegrees(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisconstant(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementisterm(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementismonomial(::AbstractAlgebra.MPolyElem{T}) where T <: RingElementcoeff(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: RingElementExamplesjulia> R, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])\n\njulia> f = x^2 + 2x + 1\nx^2+2*x+1\n\njulia> V = vars(f)\n1-element Array{AbstractAlgebra.Generic.MPoly{BigInt},1}:\n x\n\njulia> var_index(y) == 2\ntrue\n\njulia> degree(f, x) == 2\ntrue\n\njulia> degree(f, 2) == 0\ntrue\n\njulia> d = degrees(f)\n2-element Array{Int64,1}:\n 2\n 0\n\njulia> isconstant(R(1))\ntrue\n\njulia> isterm(2x)\ntrue\n\njulia> ismonomial(y)\ntrue\n\njulia> isunit(R(1))\ntrue\n\njulia> c = coeff(f, x^2)\n1\n"
 },
 
 {
@@ -1605,7 +1621,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Changing base (coefficient) rings",
     "category": "section",
-    "text": "In order to substitute the variables of a polynomial f over a ring T by elements in a T-algebra S, you first have to change the base ring of f using the following function, where g is a function representing the structure homomorphism of the T-algebra S.change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}Note that g can also be a Nemo parent, e.g. QQ.ExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nfz = x^2*y^2 + x + 1\n\nfq = change_base_ring(fz, QQ)"
+    "text": "In order to substitute the variables of a polynomial f over a ring T by elements in a T-algebra S, you first have to change the base ring of f using the following function, where g is a function representing the structure homomorphism of the T-algebra S.change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}Note that g can also be a Nemo parent, e.g. QQ.Examplesjulia> R, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])\n\njulia> fz = x^2*y^2 + x + 1\nx^2*y^2+x+1\n\njulia> fq = change_base_ring(fz, QQ)\nx^2*y^2+x+1//1\n"
 },
 
 {
@@ -1629,7 +1645,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Multivariate coefficients",
     "category": "section",
-    "text": "In order to return the \"coefficient\" (as a multivariate polynomial in the same ring), of a given monomial (in which some of the variables may not appear and others may be required to appear to exponent zero), we can use the following function.coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement\ncoeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyElemExamplesR, (x, y, z) = PolynomialRing(ZZ, [\"x\", \"y\", \"z\"])\n\nf = x^4*y^2*z^2 - 2x^4*y*z^2 + 4x^4*z^2 + 2x^2*y^2 + x + 1\n\ncoeff(f, [1, 3], [4, 2]) == coeff(f, [x, z], [4, 2])"
+    "text": "In order to return the \"coefficient\" (as a multivariate polynomial in the same ring), of a given monomial (in which some of the variables may not appear and others may be required to appear to exponent zero), we can use the following function.coeff(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, exps::Vector{Int}) where T <: RingElement\ncoeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPolyElemExamplesjulia> R, (x, y, z) = PolynomialRing(ZZ, [\"x\", \"y\", \"z\"])\n(Multivariate Polynomial Ring in x, y, z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])\n\njulia> f = x^4*y^2*z^2 - 2x^4*y*z^2 + 4x^4*z^2 + 2x^2*y^2 + x + 1\nx^4*y^2*z^2-2*x^4*y*z^2+4*x^4*z^2+2*x^2*y^2+x+1\n\njulia> coeff(f, [1, 3], [4, 2]) == coeff(f, [x, z], [4, 2])\ntrue\n"
 },
 
 {
@@ -1661,7 +1677,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Inflation/deflation",
     "category": "section",
-    "text": "deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdeflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElementinflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElementExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2\n\ndef, shift = deflation(f)\nf1 = deflate(f, def, shift)\nf2 = inflate(f1, def, shift)\nf2 == f"
+    "text": "deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElementdeflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElementinflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) where T <: RingElementExamplesjulia> R, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])\n\njulia> f = x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2\nx^7*y^8+3*x^4*y^8-x^4*y^2+5*x*y^5-x*y^2\n\njulia> def, shift = deflation(f)\n([1, 2], [3, 3])\n\njulia> f1 = deflate(f, def, shift)\nx^2*y^2+3*x*y^2-x+5*y-1\n\njulia> f2 = inflate(f1, def, shift)\nx^7*y^8+3*x^4*y^8-x^4*y^2+5*x*y^5-x*y^2\n\njulia> f2 == f\ntrue\n"
 },
 
 {
@@ -1677,7 +1693,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Conversions",
     "category": "section",
-    "text": "to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElementExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\nS, z = PolynomialRing(ZZ, \"z\")\n\nf = 2x^5 + 3x^4 - 2x^2 - 1\n\ng = to_univariate(S, f)"
+    "text": "to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElementExamplesjulia> R, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])\n\njulia> S, z = PolynomialRing(ZZ, \"z\")\n(Univariate Polynomial Ring in z over Integers, z)\n\njulia> f = 2x^5 + 3x^4 - 2x^2 - 1\n2*x^5+3*x^4-2*x^2-1\n\njulia> g = to_univariate(S, f)\n2*z^5+3*z^4-2*z^2-1\n"
 },
 
 {
@@ -1741,7 +1757,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Evaluation",
     "category": "section",
-    "text": "The following function allows evaluation of a polynomial at all its variables. The result is always in the ring that a product of a coefficient and one of the values belongs to, i.e. if all the values are in the coefficient ring, the result of the evaluation will be too.evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U <: RingElement}The following functions allow evaluation of a polynomial at some of its variables. Note that the result will be a product of values and an element of the polynomial ring, i.e. even if all the values are in the coefficient ring and all variables are given values, the result will be a constant polynomial, not a coefficient.evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{Int}, ::Vector{U}) where {T <: RingElement, U <: RingElement}evaluate(::S, ::Vector{S}, ::Vector{U}) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElementThe following functions allow a map or function to be applied to the coefficients of the polynomial before doing the evaluation. Note that one can simply supply a Ring object for the map (see the examples).evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}, ::Any) where {T <: RingElement, U <: RingElement}evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{Int}, ::Vector{U}, ::Any) where {T <: RingElement, U <: RingElement}evaluate(::S, ::Vector{S}, ::Vector{U}, ::Any) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElementThe following function allows evaluation of a polynomial at values in a not necessarily commutative ring, e.g. elements of a matrix algebra.evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U <: NCRingElem}ExamplesR, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = 2x^2*y^2 + 3x + y + 1\n\nevaluate(f, BigInt[1, 2])\nevaluate(f, [QQ(1), QQ(2)])\nevaluate(f, [1, 2])\nf(1, 2) == 14\n\nevaluate(f, [x + y, 2y - x])\nf(x + y, 2y - x)\n\nR, (x, y, z) = PolynomialRing(ZZ, [\"x\", \"y\", \"z\"])\n\nf = x^2*y^2 + 2x*z + 3y*z + z + 1\n\nevaluate(f, [1, 3], [3, 4])\nevaluate(f, [x, z], [3, 4])\n\nevaluate(f, [1, 2], [x + z, x - z])\n\nevaluate(f, [2, 4, 6], QQ)\nevaluate(f, [x, z], [2, 4], QQ)\n\nS = MatrixAlgebra(ZZ, 2)\n\nM1 = S([1 2; 3 4])\nM2 = S([2 3; 1 -1])\nM3 = S([-1 1; 1 1])\n\nevaluate(f, [M1, M2, M3])\nf(M1, M2, M3)\n\nf(M1, ZZ(2), M3)\nf(M1, ZZ(2), 3)"
+    "text": "The following function allows evaluation of a polynomial at all its variables. The result is always in the ring that a product of a coefficient and one of the values belongs to, i.e. if all the values are in the coefficient ring, the result of the evaluation will be too.evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U <: RingElement}The following functions allow evaluation of a polynomial at some of its variables. Note that the result will be a product of values and an element of the polynomial ring, i.e. even if all the values are in the coefficient ring and all variables are given values, the result will be a constant polynomial, not a coefficient.evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{Int}, ::Vector{U}) where {T <: RingElement, U <: RingElement}evaluate(::S, ::Vector{S}, ::Vector{U}) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElementThe following functions allow a map or function to be applied to the coefficients of the polynomial before doing the evaluation. Note that one can simply supply a Ring object for the map (see the examples).evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}, ::Any) where {T <: RingElement, U <: RingElement}evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{Int}, ::Vector{U}, ::Any) where {T <: RingElement, U <: RingElement}evaluate(::S, ::Vector{S}, ::Vector{U}, ::Any) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElementThe following function allows evaluation of a polynomial at values in a not necessarily commutative ring, e.g. elements of a matrix algebra.evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U <: NCRingElem}Examplesjulia> R, (x, y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])\n\njulia> f = 2x^2*y^2 + 3x + y + 1\n2*x^2*y^2+3*x+y+1\n\njulia> evaluate(f, BigInt[1, 2])\n14\n\njulia> evaluate(f, [QQ(1), QQ(2)])\n14//1\n\njulia> evaluate(f, [1, 2])\n14\n\njulia> f(1, 2) == 14\ntrue\n\njulia> evaluate(f, [x + y, 2y - x])\n2*x^4-4*x^3*y-6*x^2*y^2+8*x*y^3+2*x+8*y^4+5*y+1\n\njulia> f(x + y, 2y - x)\n2*x^4-4*x^3*y-6*x^2*y^2+8*x*y^3+2*x+8*y^4+5*y+1\n\njulia> R, (x, y, z) = PolynomialRing(ZZ, [\"x\", \"y\", \"z\"])\n(Multivariate Polynomial Ring in x, y, z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])\n\njulia> f = x^2*y^2 + 2x*z + 3y*z + z + 1\nx^2*y^2+2*x*z+3*y*z+z+1\n\njulia> evaluate(f, [1, 3], [3, 4])\n9*y^2+12*y+29\n\njulia> evaluate(f, [x, z], [3, 4])\n9*y^2+12*y+29\n\njulia> evaluate(f, [1, 2], [x + z, x - z])\nx^4-2*x^2*z^2+5*x*z+z^4-z^2+z+1\n\njulia> evaluate(f, [2, 4, 6], QQ)\n167//1\n\njulia> evaluate(f, [x, z], [2, 4], QQ)\n4//1*y^2+12//1*y+21//1\n\njulia> S = MatrixAlgebra(ZZ, 2)\nMatrix Algebra of degree 2 over Integers\n\njulia> M1 = S([1 2; 3 4])\n[1 2]\n[3 4]\n\njulia> M2 = S([2 3; 1 -1])\n[2 3]\n[1 -1]\n\njulia> M3 = S([-1 1; 1 1])\n[-1 1]\n[1 1]\n\njulia> evaluate(f, [M1, M2, M3])\n[64 83]\n[124 149]"
 },
 
 {
@@ -1797,7 +1813,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Least common multiple, greatest common divisor",
     "category": "section",
-    "text": "The greated common divisor of two polynomials a and b is returned bygcd(a::AbstractAlgebra.Generic.MPoly{T}, b::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}Note that this functionality is currently only provided for AbstractAlgebra generic polynomials. It is not automatically provided for all multivariate rings that implement the multivariate interface.However, if such a gcd is provided, the least common multiple of two polynomials a and b is returned bylcm(a::AbstractAlgebra.MPolyElem{T}, b::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}Examplesusing AbstractAlgebra\nR,(x,y) = PolynomialRing(ZZ, [\"x\", \"y\"])\na = x*y + 2*y\nb = x^3*y + y\ngcd(a,b)\nlcm(a,b)\nlcm(a,b) == a * b // gcd(a,b)"
+    "text": "The greated common divisor of two polynomials a and b is returned bygcd(a::AbstractAlgebra.Generic.MPoly{T}, b::AbstractAlgebra.Generic.MPoly{T}) where {T <: RingElement}Note that this functionality is currently only provided for AbstractAlgebra generic polynomials. It is not automatically provided for all multivariate rings that implement the multivariate interface.However, if such a gcd is provided, the least common multiple of two polynomials a and b is returned bylcm(a::AbstractAlgebra.MPolyElem{T}, b::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}Examplesjulia> using AbstractAlgebra\n\njulia> R,(x,y) = PolynomialRing(ZZ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])\n\njulia> a = x*y + 2*y\nx*y+2*y\n\njulia> b = x^3*y + y\nx^3*y+y\n\njulia> gcd(a,b)\ny\n\njulia> lcm(a,b)\nx^4*y+2*x^3*y+x*y+2*y\n\njulia> lcm(a,b) == a * b // gcd(a,b)\ntrue\n"
 },
 
 {
@@ -1813,7 +1829,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic sparse distributed multivariate polynomials",
     "title": "Derivations",
     "category": "section",
-    "text": "derivative(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElementExamplesR, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [\"x\", \"y\"])\n\nf = x*y + x + y + 1\n\nderivative(f, x)\nderivative(f, y)"
+    "text": "derivative(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElementExamplesjulia> R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, [\"x\", \"y\"])\n(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])\n\njulia> f = x*y + x + y + 1\nx*y+x+y+1\n\njulia> derivative(f, x)\ny+1\n\njulia> derivative(f, y)\nx+1\n"
 },
 
 {
@@ -1837,7 +1853,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series Ring Interface",
     "title": "Series Ring Interface",
     "category": "page",
-    "text": ""
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -1869,7 +1885,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series Ring Interface",
     "title": "Constructors",
     "category": "section",
-    "text": "In addition to the standard constructors, the following constructors, taking an array of coefficients, must be available.For relative power series and Laurent series we have:(S::MySeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int, val::Int) where T <: AbstractAlgebra.RingElemCreate the series in the given ring whose valuation is val, whose absolute precision is given by prec and the coefficients of which are given by A, starting from the first nonzero term. Only len terms of the array are used, the remaining terms being ignored. The value len cannot exceed the length of the supplied array.It is permitted to have trailing zeros in the array, but it is not needed, even if the precision minus the valuation is bigger than the length of the array.ExamplesS, x = PowerSeriesRing(QQ, 10, \"x\"; model=:capped_relative)\nT, y = LaurentSeriesRing(ZZ, 10, \"y\")\nU, z = LaurentSeriesField(QQ, 10, \"z\")\n \nf = S(Rational{BigInt}[2, 3, 1], 3, 6, 2)\ng = T(BigInt[2, 3, 1], 3, 6, 2)\nh = U(Rational{BigInt}[2, 3, 1], 3, 6, 2)For absolute power series we have:(S::MySeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int) where T <: AbstractAlgebra.RingElemCreate the series in the given ring whose absolute precision is given by prec and the coefficients of which are given by A, starting from the constant term. Only len terms of the array are used, the remaining terms being ignored.Note that len is usually maintained separately of any polynomial that is underlying the power series. This allows for easy trucation of a power series without actually modifying the polynomial underlying it.It is permitted to have trailing zeros in the array, but it is not needed, even if the precision is bigger than the length of the array.ExamplesS, x = PowerSeriesRing(QQ, 10, \"x\"; model=:capped_absolute)\n\nf = S(Rational{BigInt}[0, 2, 3, 1], 4, 6)"
+    "text": "In addition to the standard constructors, the following constructors, taking an array of coefficients, must be available.For relative power series and Laurent series we have:(S::MySeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int, val::Int) where T <: AbstractAlgebra.RingElemCreate the series in the given ring whose valuation is val, whose absolute precision is given by prec and the coefficients of which are given by A, starting from the first nonzero term. Only len terms of the array are used, the remaining terms being ignored. The value len cannot exceed the length of the supplied array.It is permitted to have trailing zeros in the array, but it is not needed, even if the precision minus the valuation is bigger than the length of the array.Examplesjulia> S, x = PowerSeriesRing(QQ, 10, \"x\"; model=:capped_relative)\n(Univariate power series ring in x over Rationals, x+O(x^11))\n\njulia> T, y = LaurentSeriesRing(ZZ, 10, \"y\")\n(Laurent series ring in y over Integers, y+O(y^11))\n\njulia> U, z = LaurentSeriesField(QQ, 10, \"z\")\n(Laurent series field in z over Rationals, z+O(z^11))For absolute power series we have:(S::MySeriesRing{T})(A::Array{T, 1}, len::Int, prec::Int) where T <: AbstractAlgebra.RingElemCreate the series in the given ring whose absolute precision is given by prec and the coefficients of which are given by A, starting from the constant term. Only len terms of the array are used, the remaining terms being ignored.Note that len is usually maintained separately of any polynomial that is underlying the power series. This allows for easy trucation of a power series without actually modifying the polynomial underlying it.It is permitted to have trailing zeros in the array, but it is not needed, even if the precision is bigger than the length of the array.Examplesjulia> S, x = PowerSeriesRing(QQ, 10, \"x\"; model=:capped_absolute)\n(Univariate power series ring in x over Rationals, x+O(x^10))\n\njulia> f = S(Rational{BigInt}[0, 2, 3, 1], 4, 6)\n(2//1)*x+(3//1)*x^2+x^3+O(x^6)\n"
 },
 
 {
@@ -1877,7 +1893,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series Ring Interface",
     "title": "Data type and parent object methods",
     "category": "section",
-    "text": "var(S::MySeriesRing{T}) where T <: AbstractAlgebra.RingElemReturn a Symbol representing the variable (generator) of the series ring. Note that this is a Symbol not a String, though its string value will usually be used when printing series.max_precision(S::MySeriesRing{T}) where T <: AbstractAlgebra.RingElemReturn the (default) maximum precision of the power series ring. This is the precision that the output of an operation will be if it cannot be represented to full precision (e.g. because it mathematically has infinite precision).This value is usually supplied upon creation of the series ring and stored in the ring. It is independent of the precision which each series in the ring actually has. Those are stored on a per element basis in the actual series elements.ExamplesS, x = PowerSeriesRing(QQ, 10, \"x\")\n\nvsym = var(S)\nmax_precision(S) == 10"
+    "text": "var(S::MySeriesRing{T}) where T <: AbstractAlgebra.RingElemReturn a Symbol representing the variable (generator) of the series ring. Note that this is a Symbol not a String, though its string value will usually be used when printing series.max_precision(S::MySeriesRing{T}) where T <: AbstractAlgebra.RingElemReturn the (default) maximum precision of the power series ring. This is the precision that the output of an operation will be if it cannot be represented to full precision (e.g. because it mathematically has infinite precision).This value is usually supplied upon creation of the series ring and stored in the ring. It is independent of the precision which each series in the ring actually has. Those are stored on a per element basis in the actual series elements.Examplesjulia> S, x = PowerSeriesRing(QQ, 10, \"x\")\n(Univariate power series ring in x over Rationals, x+O(x^11))\n\njulia> vsym = var(S)\n:x\n\njulia> max_precision(S) == 10\ntrue\n"
 },
 
 {
@@ -1885,7 +1901,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Series Ring Interface",
     "title": "Basic manipulation of rings and elements",
     "category": "section",
-    "text": "pol_length(f::MySeries{T}) where T <: AbstractAlgebra.RingElemReturn the length of the polynomial underlying the given power series. This is not generally useful to the user, but is used internally.set_length!(f::MySeries{T}, n::Int) where T <: AbstractAlgebra.RingElemThis function sets the effective length of the polynomial underlying the given series. The function doesn\'t modify the actual polynomial, but simply changes the number of terms of the polynomial which are considered to belong to the power series. The remaining terms are ignored.This function cannot set the length to a value greater than the length of any underlying polynomial.The function mutates the series in-place but does not return the mutated series.precision(f::MySeries{T})Returns the absolute precision of f.set_prec!(f::MySeries{T}, prec::Int)Set the absolute precision of the given series to the given value.This function mutates the series in-place but does not return the mutated series.valuation(f::MySeries{T})Return the valuation of the given series.set_val!(f::MySeries{T}, val::Int)For relative series and Laurent series only, this function alters the valuation of the given series to the given value.The series is mutated in-place but does not return the mutated series.polcoeff(f::MySeries{T}, n::Int) Return the coefficient of degree n of the polynomial underlying the series. If n is larger than the degree of this polynomial, zero is returned. This function is not generally of use to the user but is used internally.setcoeff!(f::MySeries{T}, n::Int, a::T) where T <: AbstractAlgebra.RingElemSet the degree n coefficient of the polynomial underlying f to a. This mutates the polynomial in-place if possible and returns the mutated series (so that immutable types can also be supported). The function must not assume that the polynomial already has space for n + 1 coefficients. The polynomial must be resized if this is not the case.Note that this function is not required to normalise the polynomial and is not necessarily useful to the user, but is used extensively by the generic functionality in AbstractAlgebra.jl. It is for setting raw coefficients in the representation.normalise(f::MySeries{T}, n::Int)Given a series f represented by a polynomial of at least the given length, return the normalised length of the underlying polynomial assuming it has length at most n. This function does not actually normalise the polynomial and is not particularly useful to the user. It is used internally.renormalize!(f::MySeries{T}) where T <: AbstractAlgebra.RingElemGiven a relative series or Laurent series whose underlying polynomial has zero constant term, say as the result of some internal computation, renormalise the series so that the  polynomial has nonzero constant term. The precision and valuation of the series are adjusted to compensate. This function is not intended to be useful to the user, but is  used internally.fit!(f::MySeries{T}, n::Int) where T <: AbstractAlgebra.RingElemEnsure that the polynomial underlying f internally has space for n coefficients. This function must mutate the series in-place if it is mutable. It does not return the mutated series. Immutable types can still be supported by defining this function to do nothing.Some interfaces for C polynomial types automatically manage the internal allocation of polynomials in every function that can be called on them. Explicit adjustment by the generic code in AbstractAlgebra.jl is not required. In such cases, this function can also be defined to do nothing.gen(R::MySeriesRing{T}) where T <: AbstractAlgebra.RingElemReturn the generator x of the series ring.ExamplesS, x = PowerSeriesRing(ZZ, 10, \"x\")\n\nf = 1 + 3x + x^3 + O(x^5)\ng = S(BigInt[1, 2, 0, 1, 0, 0, 0], 4, 10, 3);\n\nn = pol_length(f)\nc = polcoeff(f, 1)\nset_length!(g, 3)\ng = setcoeff!(g, 2, BigInt(11))\nfit!(g, 8)\ng = setcoeff!(g, 7, BigInt(4))\nw = gen(S)\nisgen(w) == true"
+    "text": "pol_length(f::MySeries{T}) where T <: AbstractAlgebra.RingElemReturn the length of the polynomial underlying the given power series. This is not generally useful to the user, but is used internally.set_length!(f::MySeries{T}, n::Int) where T <: AbstractAlgebra.RingElemThis function sets the effective length of the polynomial underlying the given series. The function doesn\'t modify the actual polynomial, but simply changes the number of terms of the polynomial which are considered to belong to the power series. The remaining terms are ignored.This function cannot set the length to a value greater than the length of any underlying polynomial.The function mutates the series in-place but does not return the mutated series.precision(f::MySeries{T})Returns the absolute precision of f.set_prec!(f::MySeries{T}, prec::Int)Set the absolute precision of the given series to the given value.This function mutates the series in-place but does not return the mutated series.valuation(f::MySeries{T})Return the valuation of the given series.set_val!(f::MySeries{T}, val::Int)For relative series and Laurent series only, this function alters the valuation of the given series to the given value.The series is mutated in-place but does not return the mutated series.polcoeff(f::MySeries{T}, n::Int) Return the coefficient of degree n of the polynomial underlying the series. If n is larger than the degree of this polynomial, zero is returned. This function is not generally of use to the user but is used internally.setcoeff!(f::MySeries{T}, n::Int, a::T) where T <: AbstractAlgebra.RingElemSet the degree n coefficient of the polynomial underlying f to a. This mutates the polynomial in-place if possible and returns the mutated series (so that immutable types can also be supported). The function must not assume that the polynomial already has space for n + 1 coefficients. The polynomial must be resized if this is not the case.Note that this function is not required to normalise the polynomial and is not necessarily useful to the user, but is used extensively by the generic functionality in AbstractAlgebra.jl. It is for setting raw coefficients in the representation.normalise(f::MySeries{T}, n::Int)Given a series f represented by a polynomial of at least the given length, return the normalised length of the underlying polynomial assuming it has length at most n. This function does not actually normalise the polynomial and is not particularly useful to the user. It is used internally.renormalize!(f::MySeries{T}) where T <: AbstractAlgebra.RingElemGiven a relative series or Laurent series whose underlying polynomial has zero constant term, say as the result of some internal computation, renormalise the series so that the  polynomial has nonzero constant term. The precision and valuation of the series are adjusted to compensate. This function is not intended to be useful to the user, but is  used internally.fit!(f::MySeries{T}, n::Int) where T <: AbstractAlgebra.RingElemEnsure that the polynomial underlying f internally has space for n coefficients. This function must mutate the series in-place if it is mutable. It does not return the mutated series. Immutable types can still be supported by defining this function to do nothing.Some interfaces for C polynomial types automatically manage the internal allocation of polynomials in every function that can be called on them. Explicit adjustment by the generic code in AbstractAlgebra.jl is not required. In such cases, this function can also be defined to do nothing.gen(R::MySeriesRing{T}) where T <: AbstractAlgebra.RingElemReturn the generator x of the series ring.Examplesjulia> S, x = PowerSeriesRing(ZZ, 10, \"x\")\n(Univariate power series ring in x over Integers, x+O(x^11))\n\njulia> f = 1 + 3x + x^3 + O(x^5)\n1+3*x+x^3+O(x^5)\n\njulia> g = S(BigInt[1, 2, 0, 1, 0, 0, 0], 4, 10, 3);\n\njulia> n = pol_length(f)\n4\n\njulia> c = polcoeff(f, 1)\n3\n\njulia> set_length!(g, 3)\n3\n\njulia> g = setcoeff!(g, 2, BigInt(11))\nx^3+2*x^4+11*x^5+O(x^10)\n\njulia> fit!(g, 8)\n\njulia> g = setcoeff!(g, 7, BigInt(4))\nx^3+2*x^4+11*x^5+O(x^10)\n\njulia> w = gen(S)\nx+O(x^11)\n\njulia> isgen(w)\ntrue\n"
 },
 
 {
@@ -1893,7 +1909,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic power series",
     "title": "Generic power series",
     "category": "page",
-    "text": "CurrentModule = AbstractAlgebra"
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -1917,7 +1933,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic power series",
     "title": "Series ring constructors",
     "category": "section",
-    "text": "In order to construct series in AbstractAlgebra.jl, one must first construct the ring itself. This is accomplished with any of the following constructors.PowerSeriesRing(R::AbstractAlgebra.Ring, prec_max::Int, s::AbstractString; cached::Bool = true, model=:capped_relative)LaurentSeriesRing(R::AbstractAlgebra.Ring, prec_max::Int, s::AbstractString; cached::Bool = true)LaurentSeriesRing(R::AbstractAlgebra.Field, prec_max::Int, s::AbstractString; cached::Bool = true)Given a base ring R, a maximum precision (relative or absolute, depending on the model) and a string s specifying how the generator (variable) should be printed, return a typle S, x representing the series ring and its generator.By default, S will depend only on S, x and the maximum precision and will be cached. Setting the optional argument cached to false will prevent this.In the case of power series, the optional argument model can be set to either :capped_absolute or capped_relative, depending on which power series model is required.Here are some examples of constructing various kinds of series rings and coercing various elements into those rings.ExamplesR, x = PowerSeriesRing(ZZ, 10, \"x\")\nS, y = PowerSeriesRing(ZZ, 10, \"y\"; model=:capped_absolute)\nT, z = LaurentSeriesRing(ZZ, 10, \"z\")\nU, w = LaurentSeriesField(QQ, 10, \"w\")\n\nf = R()\ng = S(123)\nh = U(BigInt(1234))\nk = T(z + 1)"
+    "text": "In order to construct series in AbstractAlgebra.jl, one must first construct the ring itself. This is accomplished with any of the following constructors.PowerSeriesRing(R::AbstractAlgebra.Ring, prec_max::Int, s::AbstractString; cached::Bool = true, model=:capped_relative)LaurentSeriesRing(R::AbstractAlgebra.Ring, prec_max::Int, s::AbstractString; cached::Bool = true)LaurentSeriesRing(R::AbstractAlgebra.Field, prec_max::Int, s::AbstractString; cached::Bool = true)Given a base ring R, a maximum precision (relative or absolute, depending on the model) and a string s specifying how the generator (variable) should be printed, return a typle S, x representing the series ring and its generator.By default, S will depend only on S, x and the maximum precision and will be cached. Setting the optional argument cached to false will prevent this.In the case of power series, the optional argument model can be set to either :capped_absolute or capped_relative, depending on which power series model is required.Here are some examples of constructing various kinds of series rings and coercing various elements into those rings.Examplesjulia> R, x = PowerSeriesRing(ZZ, 10, \"x\")\n(Univariate power series ring in x over Integers, x+O(x^11))\n\njulia> S, y = PowerSeriesRing(ZZ, 10, \"y\"; model=:capped_absolute)\n(Univariate power series ring in y over Integers, y+O(y^10))\n\njulia> T, z = LaurentSeriesRing(ZZ, 10, \"z\")\n(Laurent series ring in z over Integers, z+O(z^11))\n\njulia> U, w = LaurentSeriesField(QQ, 10, \"w\")\n(Laurent series field in w over Rationals, w+O(w^11))\n\njulia> f = R()\n0+O(x^10)\n\njulia> g = S(123)\n123+O(y^10)\n\njulia> h = U(BigInt(1234))\n1234//1+O(w^10)\n\njulia> k = T(z + 1)\n1+z+O(z^10)\n"
 },
 
 {
@@ -1925,7 +1941,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic power series",
     "title": "Big-oh notation",
     "category": "section",
-    "text": "Series elements can be given a precision using the big-oh notation. This is provided by a function of the following form, (or something equivalent for Laurent series):O(x::SeriesElem)ExamplesR, x = PowerSeriesRing(ZZ, 10, \"x\")\nS, y = LaurentSeriesRing(ZZ, 10, \"y\")\n\nf = 1 + 2x + O(x^5)\ng = 2y + 7y^2 + O(y^7)What is happening here in practice is that O(x^n) is creating the series 0 + O(x^n) and the rules for addition of series dictate that if this is added to a series of  greater precision, then the lower of the two precisions must be used.Of course it may be that the precision of the series that O(x^n) is added to is already lower than n, in which case adding O(x^n) has no effect. This is the case if the default precision is too low, since x on its own has the default precision."
+    "text": "Series elements can be given a precision using the big-oh notation. This is provided by a function of the following form, (or something equivalent for Laurent series):O(x::SeriesElem)Examplesjulia> R, x = PowerSeriesRing(ZZ, 10, \"x\")\n(Univariate power series ring in x over Integers, x+O(x^11))\n\njulia> S, y = LaurentSeriesRing(ZZ, 10, \"y\")\n(Laurent series ring in y over Integers, y+O(y^11))\n\njulia> f = 1 + 2x + O(x^5)\n1+2*x+O(x^5)\n\njulia> g = 2y + 7y^2 + O(y^7)\n2*y+7*y^2+O(y^7)\nWhat is happening here in practice is that O(x^n) is creating the series 0 + O(x^n) and the rules for addition of series dictate that if this is added to a series of  greater precision, then the lower of the two precisions must be used.Of course it may be that the precision of the series that O(x^n) is added to is already lower than n, in which case adding O(x^n) has no effect. This is the case if the default precision is too low, since x on its own has the default precision."
 },
 
 {
@@ -1941,7 +1957,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic power series",
     "title": "Basic ring functionality",
     "category": "section",
-    "text": "All power series models provide the functionality described in the Ring and Series Ring interfaces.ExamplesS, x = PowerSeriesRing(ZZ, 10, \"x\")\n\nf = 1 + 3x + x^3 + O(x^10)\ng = 1 + 2x + x^2 + O(x^10)\n\nh = zero(S)\nk = one(S)\nisone(k) == true\niszero(f) == false\nn = pol_length(f)\nc = polcoeff(f, 3)\nU = base_ring(S)\nv = var(S)\nT = parent(x + 1)\ng == deepcopy(g)\nt = divexact(2g, 2)\np = precision(f)"
+    "text": "All power series models provide the functionality described in the Ring and Series Ring interfaces.Examplesjulia> S, x = PowerSeriesRing(ZZ, 10, \"x\")\n(Univariate power series ring in x over Integers, x+O(x^11))\n\njulia> f = 1 + 3x + x^3 + O(x^10)\n1+3*x+x^3+O(x^10)\n\njulia> g = 1 + 2x + x^2 + O(x^10)\n1+2*x+x^2+O(x^10)\n\njulia> h = zero(S)\n0+O(x^10)\n\njulia> k = one(S)\n1+O(x^10)\n\njulia> isone(k)\ntrue\n\njulia> iszero(f)\nfalse\n\njulia> n = pol_length(f)\n4\n\njulia> c = polcoeff(f, 3)\n1\n\njulia> U = base_ring(S)\nIntegers\n\njulia> v = var(S)\n:x\n\njulia> T = parent(x + 1)\nUnivariate power series ring in x over Integers\n\njulia> g == deepcopy(g)\ntrue\n\njulia> t = divexact(2g, 2)\n1+2*x+x^2+O(x^10)\n\njulia> p = precision(f)\n10\n"
 },
 
 {
@@ -1981,7 +1997,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic power series",
     "title": "Basic functionality",
     "category": "section",
-    "text": "coeff(a::AbstractAlgebra.SeriesElem, n::Int)Return the degree n coefficient of the given power series. Note coefficients are numbered from n = 0 for the constant coefficient. If n exceeds the current precision of the power series, the function returns a zero coefficient.For power series types, n must be non-negative. Laurent series do not have this restriction.modulus{T <: ResElem}(::SeriesElem{T})isgen(::RelSeriesElem)isunit(::RelSeriesElem)ExamplesR, t = PowerSeriesRing(QQ, 10, \"t\")\nS, x = PowerSeriesRing(R, 30, \"x\")\n\na = O(x^4)\nb = (t + 3)*x + (t^2 + 1)*x^2 + O(x^4)\n\nk = isgen(gen(R))\nm = isunit(-1 + x + 2x^2)\nn = valuation(a)\np = valuation(b)\nc = coeff(b, 2)"
+    "text": "coeff(a::AbstractAlgebra.SeriesElem, n::Int)Return the degree n coefficient of the given power series. Note coefficients are numbered from n = 0 for the constant coefficient. If n exceeds the current precision of the power series, the function returns a zero coefficient.For power series types, n must be non-negative. Laurent series do not have this restriction.modulus{T <: ResElem}(::SeriesElem{T})isgen(::RelSeriesElem)isunit(::RelSeriesElem)Examplesjulia> R, t = PowerSeriesRing(QQ, 10, \"t\")\n(Univariate power series ring in t over Rationals, t+O(t^11))\n\njulia> S, x = PowerSeriesRing(R, 30, \"x\")\n(Univariate power series ring in x over Univariate power series ring in t over Rationals, x+O(x^31))\n\njulia> a = O(x^4)\n0//1+O(t^10)+O(x^4)\n\njulia> b = (t + 3)*x + (t^2 + 1)*x^2 + O(x^4)\n(3//1+t+O(t^10))*x+(1//1+t^2+O(t^10))*x^2+O(x^4)\n\njulia> k = isgen(gen(R))\ntrue\n\njulia> m = isunit(-1 + x + 2x^2)\ntrue\n\njulia> n = valuation(a)\n4\n\njulia> p = valuation(b)\n1\n\njulia> c = coeff(b, 2)\n1//1+t^2+O(t^10)\n"
 },
 
 {
@@ -2005,7 +2021,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic power series",
     "title": "Shifting",
     "category": "section",
-    "text": "shift_left{T <: RingElem}(::RelSeriesElem{T}, ::Int)shift_right{T <: RingElem}(::RelSeriesElem{T}, ::Int)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS, x = PowerSeriesRing(R, 30, \"x\")\n\na = 2x + x^3\nb = O(x^4)\nc = 1 + x + 2x^2 + O(x^5)\nd = 2x + x^3 + O(x^4)\n\nf = shift_left(a, 2)\ng = shift_left(b, 2)\nh = shift_right(c, 1)\nk = shift_right(d, 3)"
+    "text": "shift_left{T <: RingElem}(::RelSeriesElem{T}, ::Int)shift_right{T <: RingElem}(::RelSeriesElem{T}, ::Int)Examplesjulia> R, t = PolynomialRing(QQ, \"t\")\n(Univariate Polynomial Ring in t over Rationals, t)\n\njulia> S, x = PowerSeriesRing(R, 30, \"x\")\n(Univariate power series ring in x over Univariate Polynomial Ring in t over Rationals, x+O(x^31))\n\njulia> a = 2x + x^3\n2//1*x+x^3+O(x^31)\n\njulia> b = O(x^4)\n0//1+O(x^4)\n\njulia> c = 1 + x + 2x^2 + O(x^5)\n1//1+x+2//1*x^2+O(x^5)\n\njulia> d = 2x + x^3 + O(x^4)\n2//1*x+x^3+O(x^4)\n\njulia> f = shift_left(a, 2)\n2//1*x^3+x^5+O(x^33)\n\njulia> g = shift_left(b, 2)\n0//1+O(x^6)\n\njulia> h = shift_right(c, 1)\n1//1+2//1*x+O(x^4)\n\njulia> k = shift_right(d, 3)\n1//1+O(x^1)\n"
 },
 
 {
@@ -2021,7 +2037,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic power series",
     "title": "Truncation",
     "category": "section",
-    "text": "truncate{T <: RingElem}(::RelSeriesElem{T}, ::Int)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS, x = PowerSeriesRing(R, 30, \"x\")\n\na = 2x + x^3\nb = O(x^4)\nc = 1 + x + 2x^2 + O(x^5)\nd = 2x + x^3 + O(x^4)\n\nf = truncate(a, 3)\ng = truncate(b, 2)\nh = truncate(c, 7)\nk = truncate(d, 5)"
+    "text": "truncate{T <: RingElem}(::RelSeriesElem{T}, ::Int)Examplesjulia> R, t = PolynomialRing(QQ, \"t\")\n(Univariate Polynomial Ring in t over Rationals, t)\n\njulia> S, x = PowerSeriesRing(R, 30, \"x\")\n(Univariate power series ring in x over Univariate Polynomial Ring in t over Rationals, x+O(x^31))\n\njulia> a = 2x + x^3\n2//1*x+x^3+O(x^31)\n\njulia> b = O(x^4)\n0//1+O(x^4)\n\njulia> c = 1 + x + 2x^2 + O(x^5)\n1//1+x+2//1*x^2+O(x^5)\n\njulia> d = 2x + x^3 + O(x^4)\n2//1*x+x^3+O(x^4)\n\njulia> f = truncate(a, 3)\n2//1*x+O(x^3)\n\njulia> g = truncate(b, 2)\n0//1+O(x^2)\n\njulia> h = truncate(c, 7)\n1//1+x+2//1*x^2+O(x^5)\n\njulia> k = truncate(d, 5)\n2//1*x+x^3+O(x^4)\n"
 },
 
 {
@@ -2037,7 +2053,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic power series",
     "title": "Division",
     "category": "section",
-    "text": "inv(::RelSeriesElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS, x = PowerSeriesRing(R, 30, \"x\")\n\na = 1 + x + 2x^2 + O(x^5)\nb = S(-1)\n\nc = inv(a)\nd = inv(b)"
+    "text": "inv(::RelSeriesElem)Examplesjulia> R, t = PolynomialRing(QQ, \"t\")\n(Univariate Polynomial Ring in t over Rationals, t)\n\njulia> S, x = PowerSeriesRing(R, 30, \"x\")\n(Univariate power series ring in x over Univariate Polynomial Ring in t over Rationals, x+O(x^31))\n\njulia> a = 1 + x + 2x^2 + O(x^5)\n1//1+x+2//1*x^2+O(x^5)\n\njulia> b = S(-1)\n-1//1+O(x^30)\n\njulia> c = inv(a)\n1//1-x-x^2+3//1*x^3-x^4+O(x^5)\n\njulia> d = inv(b)\n-1//1+O(x^30)\n"
 },
 
 {
@@ -2061,7 +2077,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic power series",
     "title": "Special functions",
     "category": "section",
-    "text": "Base.exp(a::RelSeriesElem)Base.sqrt(a::RelSeriesElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS, x = PowerSeriesRing(R, 30, \"x\")\nT, z = PowerSeriesRing(QQ, 30, \"z\")\n\na = 1 + z + 3z^2 + O(z^5)\nb = z + 2z^2 + 5z^3 + O(z^5)\n\nc = exp(x + O(x^40))\nd = divexact(x, exp(x + O(x^40)) - 1)\nf = exp(b)\nh = sqrt(a)"
+    "text": "Base.exp(a::RelSeriesElem)Base.sqrt(a::RelSeriesElem)Examplesjulia> R, t = PolynomialRing(QQ, \"t\")\n(Univariate Polynomial Ring in t over Rationals, t)\n\njulia> S, x = PowerSeriesRing(R, 30, \"x\")\n(Univariate power series ring in x over Univariate Polynomial Ring in t over Rationals, x+O(x^31))\n\njulia> T, z = PowerSeriesRing(QQ, 30, \"z\")\n(Univariate power series ring in z over Rationals, z+O(z^31))\n\njulia> a = 1 + z + 3z^2 + O(z^5)\n1//1+z+3//1*z^2+O(z^5)\n\njulia> b = z + 2z^2 + 5z^3 + O(z^5)\nz+2//1*z^2+5//1*z^3+O(z^5)\n\njulia> c = exp(x + O(x^40))\n1//1+x+1//2*x^2+1//6*x^3+1//24*x^4+1//120*x^5+1//720*x^6+1//5040*x^7+1//40320*x^8+1//362880*x^9+1//3628800*x^10+1//39916800*x^11+1//479001600*x^12+1//6227020800*x^13+1//87178291200*x^14+1//1307674368000*x^15+1//20922789888000*x^16+1//355687428096000*x^17+1//6402373705728000*x^18+1//121645100408832000*x^19+1//2432902008176640000*x^20+1//51090942171709440000*x^21+1//1124000727777607680000*x^22+1//25852016738884976640000*x^23+1//620448401733239439360000*x^24+1//15511210043330985984000000*x^25+1//403291461126605635584000000*x^26+1//10888869450418352160768000000*x^27+1//304888344611713860501504000000*x^28+1//8841761993739701954543616000000*x^29+1//265252859812191058636308480000000*x^30+O(x^31)\n\njulia> d = divexact(x, exp(x + O(x^40)) - 1)\n1//1-1//2*x+1//12*x^2-1//720*x^4+1//30240*x^6-1//1209600*x^8+1//47900160*x^10-691//1307674368000*x^12+1//74724249600*x^14-3617//10670622842880000*x^16+43867//5109094217170944000*x^18-174611//802857662698291200000*x^20+77683//14101100039391805440000*x^22-236364091//1693824136731743669452800000*x^24+657931//186134520519971831808000000*x^26-3392780147//37893265687455865519472640000000*x^28+O(x^29)\n\njulia> f = exp(b)\n1//1+z+5//2*z^2+43//6*z^3+193//24*z^4+O(z^5)\n\njulia> h = sqrt(a)\n1//1+1//2*z+11//8*z^2-11//16*z^3-77//128*z^4+O(z^5)\n"
 },
 
 {
@@ -2069,7 +2085,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic Puiseux series",
     "title": "Generic Puiseux series",
     "category": "page",
-    "text": "CurrentModule = AbstractAlgebra"
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -2093,7 +2109,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic Puiseux series",
     "title": "Puisuex series ring constructors",
     "category": "section",
-    "text": "In order to construct Puiseux series in AbstractAlgebra.jl, one must first construct the ring itself. This is accomplished with any of the following constructors.PuiseuxSeriesRing(R::AbstractAlgebra.Ring, prec_max::Int, s::AbstractString; cached::Bool = true)PuiseuxSeriesRing(R::AbstractAlgebra.Field, prec_max::Int, s::AbstractString; cached::Bool = true)PuiseuxSeriesField(R::AbstractAlgebra.Field, prec_max::Int, s::AbstractString; cached::Bool = true)Given a base ring R, a maximum relative precision and a string s specifying how the generator (variable) should be printed, return a typle S, x representing the Puiseux series ring and its generator.By default, S will depend only on S, x and the maximum precision and will be cached. Setting the optional argument cached to false will prevent this.Here are some examples of constructing various kinds of Puiseux series rings and coercing various elements into those rings.ExamplesR, x = PuiseuxSeriesRing(ZZ, 10, \"x\")\nS, y = PuiseuxSeriesField(QQ, 10, \"y\")\n\nf = R()\ng = S(123)\nh = R(BigInt(1234))\nk = S(y + 1)"
+    "text": "In order to construct Puiseux series in AbstractAlgebra.jl, one must first construct the ring itself. This is accomplished with any of the following constructors.PuiseuxSeriesRing(R::AbstractAlgebra.Ring, prec_max::Int, s::AbstractString; cached::Bool = true)PuiseuxSeriesRing(R::AbstractAlgebra.Field, prec_max::Int, s::AbstractString; cached::Bool = true)PuiseuxSeriesField(R::AbstractAlgebra.Field, prec_max::Int, s::AbstractString; cached::Bool = true)Given a base ring R, a maximum relative precision and a string s specifying how the generator (variable) should be printed, return a typle S, x representing the Puiseux series ring and its generator.By default, S will depend only on S, x and the maximum precision and will be cached. Setting the optional argument cached to false will prevent this.Here are some examples of constructing various kinds of Puiseux series rings and coercing various elements into those rings.Examplesjulia> R, x = PuiseuxSeriesRing(ZZ, 10, \"x\")\n(Puiseux series ring in x over Integers, x+O(x^11))\n\njulia> S, y = PuiseuxSeriesField(QQ, 10, \"y\")\n(Puiseux series field in y over Rationals, y+O(y^11))\n\njulia> f = R()\n0+O(x^10)\n\njulia> g = S(123)\n123//1+O(y^10)\n\njulia> h = R(BigInt(1234))\n1234+O(x^10)\n\njulia> k = S(y + 1)\n1//1+y+O(y^10)\n"
 },
 
 {
@@ -2101,7 +2117,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic Puiseux series",
     "title": "Big-oh notation",
     "category": "section",
-    "text": "Series elements can be given a precision using the big-oh notation. This is provided by a function of the following form, (or something equivalent for Laurent series):O(x::SeriesElem)ExamplesR, x = PuiseuxSeriesRing(ZZ, 10, \"x\")\n\nf = 1 + 2x + O(x^5)\ng = 2x^(1//3) + 7y^(2//3) + O(y^(7//3))What is happening here in practice is that O(x^n) is creating the series 0 + O(x^n) and the rules for addition of series dictate that if this is added to a series of  greater precision, then the lower of the two precisions must be used.Of course it may be that the precision of the series that O(x^n) is added to is already lower than n, in which case adding O(x^n) has no effect. This is the case if the default precision is too low, since x on its own has the default precision."
+    "text": "Series elements can be given a precision using the big-oh notation. This is provided by a function of the following form, (or something equivalent for Laurent series):O(x::SeriesElem)Examplesjulia> R, x = PuiseuxSeriesRing(ZZ, 10, \"x\")\n(Puiseux series ring in x over Integers, x+O(x^11))\n\njulia> f = 1 + 2x + O(x^5)\n1+2*x+O(x^5)\n\njulia> g = 2x^(1//3) + 7x^(2//3) + O(x^(7//3))\n2*x^1//3+7*x^2//3+O(x^7//3)What is happening here in practice is that O(x^n) is creating the series 0 + O(x^n) and the rules for addition of series dictate that if this is added to a series of  greater precision, then the lower of the two precisions must be used.Of course it may be that the precision of the series that O(x^n) is added to is already lower than n, in which case adding O(x^n) has no effect. This is the case if the default precision is too low, since x on its own has the default precision."
 },
 
 {
@@ -2117,7 +2133,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic Puiseux series",
     "title": "Basic ring functionality",
     "category": "section",
-    "text": "All Puiseux series provide the functionality described in the Ring and Series Ring interfaces with the exception of the pol_length and polcoeff functions.ExamplesS, x = PuiseuxSeriesRing(ZZ, 10, \"x\")\n\nf = 1 + 3x + x^3 + O(x^10)\ng = 1 + 2x^(1//3) + x^(2//3) + O(x^(7//3))\n\nh = zero(S)\nk = one(S)\nisone(k) == true\niszero(f) == false\nU = base_ring(S)\nv = var(S)\nT = parent(x + 1)\ng == deepcopy(g)\nt = divexact(2g, 2)\np = precision(f)"
+    "text": "All Puiseux series provide the functionality described in the Ring and Series Ring interfaces with the exception of the pol_length and polcoeff functions.Examplesjulia> S, x = PuiseuxSeriesRing(ZZ, 10, \"x\")\n(Puiseux series ring in x over Integers, x+O(x^11))\n\njulia> f = 1 + 3x + x^3 + O(x^10)\n1+3*x+x^3+O(x^10)\n\njulia> g = 1 + 2x^(1//3) + x^(2//3) + O(x^(7//3))\n1+2*x^1//3+x^2//3+O(x^7//3)\n\njulia> h = zero(S)\n0+O(x^10)\n\njulia> k = one(S)\n1+O(x^10)\n\njulia> isone(k)\ntrue\n\njulia> iszero(f)\nfalse\n\njulia> U = base_ring(S)\nIntegers\n\njulia> v = var(S)\n:x\n\njulia> T = parent(x + 1)\nPuiseux series ring in x over Integers\n\njulia> g == deepcopy(g)\ntrue\n\njulia> t = divexact(2g, 2)\n1+2*x^1//3+x^2//3+O(x^7//3)\n\njulia> p = precision(f)\n10//1\n"
 },
 
 {
@@ -2157,7 +2173,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic Puiseux series",
     "title": "Basic functionality",
     "category": "section",
-    "text": "coeff(a::Generic.PuiseuxSeriesElem, n::Int)coeff(a::Generic.PuiseuxSeriesElem, n::Rational{Int})Return the coefficient of the term of exponent n of the given power series. If n exceeds the current precision of the power series or does not correspond to a nonzero term of the Puiseux series, the function returns a zero coefficient.modulus{T <: ResElem}(::Generic.PuiseuxSeriesElem{T})isgen(::Generic.PuiseuxSeriesElem)isunit(::Generic.PuiseuxSeriesElem)ExamplesR, t = PuiseuxSeriesRing(QQ, 10, \"t\")\nS, x = PuiseuxSeriesRing(R, 30, \"x\")\n\na = O(x^4)\nb = (t + 3)*x + (t^2 + 1)*x^2 + O(x^4)\n\nk = isgen(gen(R))\nm = isunit(-1 + x^(1//3) + 2x^2)\nn = valuation(a)\np = valuation(b)\nc = coeff(b, 2)"
+    "text": "coeff(a::Generic.PuiseuxSeriesElem, n::Int)coeff(a::Generic.PuiseuxSeriesElem, n::Rational{Int})Return the coefficient of the term of exponent n of the given power series. If n exceeds the current precision of the power series or does not correspond to a nonzero term of the Puiseux series, the function returns a zero coefficient.modulus{T <: ResElem}(::Generic.PuiseuxSeriesElem{T})isgen(::Generic.PuiseuxSeriesElem)isunit(::Generic.PuiseuxSeriesElem)Examplesjulia> R, t = PuiseuxSeriesRing(QQ, 10, \"t\")\n(Puiseux series field in t over Rationals, t+O(t^11))\n\njulia> S, x = PuiseuxSeriesRing(R, 30, \"x\")\n(Puiseux series field in x over Puiseux series field in t over Rationals, x+O(x^31))\n\njulia> a = O(x^4)\n0//1+O(t^10)+O(x^4)\n\njulia> b = (t + 3)*x + (t^2 + 1)*x^2 + O(x^4)\n(3//1+t+O(t^10))*x+(1//1+t^2+O(t^10))*x^2+O(x^4)\n\njulia> k = isgen(gen(R))\ntrue\n\njulia> m = isunit(-1 + x^(1//3) + 2x^2)\ntrue\n\njulia> n = valuation(a)\n4//1\n\njulia> p = valuation(b)\n1//1\n\njulia> c = coeff(b, 2)\n1//1+t^2+O(t^10)\n"
 },
 
 {
@@ -2173,7 +2189,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic Puiseux series",
     "title": "Division",
     "category": "section",
-    "text": "inv(::Generic.PuiseuxSeriesElem)ExamplesR, x = PuiseuxSeriesRing(QQ, 30, \"x\")\n\na = 1 + x + 2x^2 + O(x^5)\nb = R(-1)\n\nc = inv(a)\nd = inv(b)"
+    "text": "inv(::Generic.PuiseuxSeriesElem)Examplesjulia> R, x = PuiseuxSeriesRing(QQ, 30, \"x\")\n(Puiseux series field in x over Rationals, x+O(x^31))\n\njulia> a = 1 + x + 2x^2 + O(x^5)\n1//1+x+2//1*x^2+O(x^5)\n\njulia> b = R(-1)\n-1//1+O(x^30)\n\njulia> c = inv(a)\n1//1-x-x^2+3//1*x^3-x^4+O(x^5)\n\njulia> d = inv(b)\n-1//1+O(x^30)\n"
 },
 
 {
@@ -2197,7 +2213,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic Puiseux series",
     "title": "Special functions",
     "category": "section",
-    "text": "Base.exp(a::Generic.PuiseuxSeriesElem)Base.sqrt(a::Generic.PuiseuxSeriesElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS, x = PuiseuxSeriesRing(R, 30, \"x\")\nT, z = PuiseuxSeriesRing(QQ, 30, \"z\")\n\na = 1 + z + 3z^2 + O(z^5)\nb = z + 2z^2 + 5z^3 + O(z^5)\n\nc = exp(x + O(x^40))\nd = divexact(x, exp(x + O(x^40)) - 1)\nf = exp(b)\nh = sqrt(a)"
+    "text": "Base.exp(a::Generic.PuiseuxSeriesElem)Base.sqrt(a::Generic.PuiseuxSeriesElem)Examplesjulia> R, t = PolynomialRing(QQ, \"t\")\n(Univariate Polynomial Ring in t over Rationals, t)\n\njulia> S, x = PuiseuxSeriesRing(R, 30, \"x\")\n(Puiseux series ring in x over Univariate Polynomial Ring in t over Rationals, x+O(x^31))\n\njulia> T, z = PuiseuxSeriesRing(QQ, 30, \"z\")\n(Puiseux series field in z over Rationals, z+O(z^31))\n\njulia> a = 1 + z + 3z^2 + O(z^5)\n1//1+z+3//1*z^2+O(z^5)\n\njulia> b = z + 2z^2 + 5z^3 + O(z^5)\nz+2//1*z^2+5//1*z^3+O(z^5)\n\njulia> c = exp(x + O(x^40))\n1//1+x+1//2*x^2+1//6*x^3+1//24*x^4+1//120*x^5+1//720*x^6+1//5040*x^7+1//40320*x^8+1//362880*x^9+1//3628800*x^10+1//39916800*x^11+1//479001600*x^12+1//6227020800*x^13+1//87178291200*x^14+1//1307674368000*x^15+1//20922789888000*x^16+1//355687428096000*x^17+1//6402373705728000*x^18+1//121645100408832000*x^19+1//2432902008176640000*x^20+1//51090942171709440000*x^21+1//1124000727777607680000*x^22+1//25852016738884976640000*x^23+1//620448401733239439360000*x^24+1//15511210043330985984000000*x^25+1//403291461126605635584000000*x^26+1//10888869450418352160768000000*x^27+1//304888344611713860501504000000*x^28+1//8841761993739701954543616000000*x^29+1//265252859812191058636308480000000*x^30+O(x^31)\n\njulia> d = divexact(x, exp(x + O(x^40)) - 1)\n1//1-1//2*x+1//12*x^2-1//720*x^4+1//30240*x^6-1//1209600*x^8+1//47900160*x^10-691//1307674368000*x^12+1//74724249600*x^14-3617//10670622842880000*x^16+43867//5109094217170944000*x^18-174611//802857662698291200000*x^20+77683//14101100039391805440000*x^22-236364091//1693824136731743669452800000*x^24+657931//186134520519971831808000000*x^26-3392780147//37893265687455865519472640000000*x^28+O(x^29)\n\njulia> f = exp(b)\n1//1+z+5//2*z^2+43//6*z^3+193//24*z^4+O(z^5)\n\njulia> h = sqrt(a)\n1//1+1//2*z+11//8*z^2-11//16*z^3-77//128*z^4+O(z^5)\n"
 },
 
 {
@@ -2205,7 +2221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Residue Ring Interface",
     "title": "Residue Ring Interface",
     "category": "page",
-    "text": ""
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -2237,7 +2253,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Residue Ring Interface",
     "title": "Data type and parent object methods",
     "category": "section",
-    "text": "modulus(S::MyResRing{T}) where T <: AbstractAlgebra.RingElemReturn the modulus of the given residue ring, i.e. if the residue ring S was specified to be R(m), return m.ExamplesR, x = PolynomialRing(QQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nm = modulus(S)"
+    "text": "modulus(S::MyResRing{T}) where T <: AbstractAlgebra.RingElemReturn the modulus of the given residue ring, i.e. if the residue ring S was specified to be R(m), return m.Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> S = ResidueRing(R, x^3 + 3x + 1)\nResidue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> m = modulus(S)\nx^3+3//1*x+1//1\n"
 },
 
 {
@@ -2245,7 +2261,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Residue Ring Interface",
     "title": "Basic manipulation of rings and elements",
     "category": "section",
-    "text": "data(f::MyRes{T}) where T <: AbstractAlgebra.RingElemGiven a residue r pmodm, represented as such, return r.ExamplesR, x = PolynomialRing(QQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nf = S(x^2 + 2)\n\nd = data(f)"
+    "text": "data(f::MyRes{T}) where T <: AbstractAlgebra.RingElemGiven a residue r pmodm, represented as such, return r.Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> S = ResidueRing(R, x^3 + 3x + 1)\nResidue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> f = S(x^2 + 2)\nx^2+2//1\n\njulia> d = data(f)\nx^2+2//1\n"
 },
 
 {
@@ -2253,7 +2269,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic residue rings",
     "title": "Generic residue rings",
     "category": "page",
-    "text": "CurrentModule = AbstractAlgebra"
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -2277,7 +2293,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic residue rings",
     "title": "Residue ring constructors",
     "category": "section",
-    "text": "In order to construct residues in AbstractAlgebra.jl, one must first construct the residue ring itself. This is accomplished with one of the following constructors.ResidueRing(R::AbstractAlgebra.Ring, m::AbstractAlgebra.RingElem; cached::Bool = true)ResidueField(R::AbstractAlgebra.Ring, m::AbstractAlgebra.RingElem; cached::Bool = true)Given a base ring R and residue m contained in this ring, return the parent object of the residue ring R(m). By default the parent object S will depend only on R and m and will be cached. Setting the optional argument cached to false will prevent the parent object S from being cached.The ResidueField constructor does the same thing as the ResidueRing constructor, but the resulting object has type belonging to Field rather than Ring, so it can be used anywhere a field is expected in AbstractAlgebra.jl. No check is made for maximality of the ideal generated by m.Here are some examples of creating residue rings and making use of the resulting parent objects to coerce various elements into the residue ring.ExamplesR, x = PolynomialRing(QQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nf = S()\ng = S(123)\nh = S(BigInt(1234))\nk = S(x + 1)All of the examples here are generic residue rings, but specialised implementations of residue rings provided by external modules will also usually provide a ResidueRing constructor to allow creation of their residue rings."
+    "text": "In order to construct residues in AbstractAlgebra.jl, one must first construct the residue ring itself. This is accomplished with one of the following constructors.ResidueRing(R::AbstractAlgebra.Ring, m::AbstractAlgebra.RingElem; cached::Bool = true)ResidueField(R::AbstractAlgebra.Ring, m::AbstractAlgebra.RingElem; cached::Bool = true)Given a base ring R and residue m contained in this ring, return the parent object of the residue ring R(m). By default the parent object S will depend only on R and m and will be cached. Setting the optional argument cached to false will prevent the parent object S from being cached.The ResidueField constructor does the same thing as the ResidueRing constructor, but the resulting object has type belonging to Field rather than Ring, so it can be used anywhere a field is expected in AbstractAlgebra.jl. No check is made for maximality of the ideal generated by m.Here are some examples of creating residue rings and making use of the resulting parent objects to coerce various elements into the residue ring.Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> S = ResidueRing(R, x^3 + 3x + 1)\nResidue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> f = S()\n0//1\n\njulia> g = S(123)\n123//1\n\njulia> h = S(BigInt(1234))\n1234//1\n\njulia> k = S(x + 1)\nx+1//1\nAll of the examples here are generic residue rings, but specialised implementations of residue rings provided by external modules will also usually provide a ResidueRing constructor to allow creation of their residue rings."
 },
 
 {
@@ -2285,7 +2301,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic residue rings",
     "title": "Basic ring functionality",
     "category": "section",
-    "text": "Residue rings in AbstractAlgebra.jl implement the full Ring interface. Of course the entire Residue Ring interface is also implemented.We give some examples of such functionality.ExamplesR, x = PolynomialRing(QQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nf = S(x + 1)\n\nh = zero(S)\nk = one(S)\nisone(k) == true\niszero(f) == false\nm = modulus(S)\nU = base_ring(S)\nV = base_ring(f)\nT = parent(f)\nf == deepcopy(f)"
+    "text": "Residue rings in AbstractAlgebra.jl implement the full Ring interface. Of course the entire Residue Ring interface is also implemented.We give some examples of such functionality.Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> S = ResidueRing(R, x^3 + 3x + 1)\nResidue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> f = S(x + 1)\nx+1//1\n\njulia> h = zero(S)\n0//1\n\njulia> k = one(S)\n1//1\n\njulia> isone(k)\ntrue\n\njulia> iszero(f)\nfalse\n\njulia> m = modulus(S)\nx^3+3//1*x+1//1\n\njulia> U = base_ring(S)\nUnivariate Polynomial Ring in x over Rationals\n\njulia> V = base_ring(f)\nUnivariate Polynomial Ring in x over Rationals\n\njulia> T = parent(f)\nResidue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> f == deepcopy(f)\ntrue\n"
 },
 
 {
@@ -2317,7 +2333,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic residue rings",
     "title": "Basic functionality",
     "category": "section",
-    "text": "modulus(::AbstractAlgebra.ResElem)isunit(::AbstractAlgebra.ResElem)ExamplesR, x = PolynomialRing(QQ, \"x\")\nS = ResidueRing(R, x^3 + 3x + 1)\n\nr = S(x + 1)\n\na = modulus(S)\nisunit(r) == true"
+    "text": "modulus(::AbstractAlgebra.ResElem)isunit(::AbstractAlgebra.ResElem)Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> S = ResidueRing(R, x^3 + 3x + 1)\nResidue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> r = S(x + 1)\nx+1//1\n\njulia> a = modulus(S)\nx^3+3//1*x+1//1\n\njulia> isunit(r)\ntrue\n"
 },
 
 {
@@ -2333,7 +2349,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic residue rings",
     "title": "Inversion",
     "category": "section",
-    "text": "inv(::AbstractAlgebra.ResElem)ExamplesR, x = PolynomialRing(QQ, \"x\")\nS = ResidueRing(R)\n\nf = S(x + 1)\n\ng = inv(f)"
+    "text": "inv(::AbstractAlgebra.ResElem)Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> S = ResidueRing(R, x^3 + 3x + 1)\nResidue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> f = S(x + 1)\nx+1//1\n\njulia> g = inv(f)\n1//3*x^2-1//3*x+4//3\n"
 },
 
 {
@@ -2349,7 +2365,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic residue rings",
     "title": "Greatest common divisor",
     "category": "section",
-    "text": "gcd{T <: RingElem}(::ResElem{T}, ::ResElem{T})ExamplesR, x = PolynomialRing(QQ, \"x\")\nS = ResidueRing(R)\n\nf = S(x + 1)\ng = S(x^2 + 2x + 1)\n\nh = gcd(f, g)"
+    "text": "gcd{T <: RingElem}(::ResElem{T}, ::ResElem{T})Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> S = ResidueRing(R, x^3 + 3x + 1)\nResidue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> f = S(x + 1)\nx+1//1\n\njulia> g = S(x^2 + 2x + 1)\nx^2+2//1*x+1//1\n\njulia> h = gcd(f, g)\n1//1\n"
 },
 
 {
@@ -2421,7 +2437,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Fraction Field Interface",
     "title": "Fraction Field Interface",
     "category": "page",
-    "text": ""
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -2453,7 +2469,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Fraction Field Interface",
     "title": "Constructors",
     "category": "section",
-    "text": "We provide the following constructors. Note that these constructors don\'t require construction of the parent object first. This is easier to achieve if the fraction element type doesn\'t contain a reference to the parent object, but merely contains a reference to the base ring. The parent object can then be constructed on demand.//(x::T, y::T) where T <: AbstractAlgebra.RingElemReturn the fraction xy.//(x::T, y::AbstractAlgebra.FracElem{T}) where T <: AbstractAlgebra.RingElemReturn xy where x is in the base ring of y.//(x::AbstractAlgebra.FracElem{T}, y::T) where T <: AbstractAlgebra.RingElemReturn xy where y is in the base ring of x.ExamplesR, x = PolynomialRing(ZZ, \"x\")\n\nf = (x^2 + x + 1)//(x^3 + 3x + 1)\ng = f//x\nh = x//f"
+    "text": "We provide the following constructors. Note that these constructors don\'t require construction of the parent object first. This is easier to achieve if the fraction element type doesn\'t contain a reference to the parent object, but merely contains a reference to the base ring. The parent object can then be constructed on demand.//(x::T, y::T) where T <: AbstractAlgebra.RingElemReturn the fraction xy.//(x::T, y::AbstractAlgebra.FracElem{T}) where T <: AbstractAlgebra.RingElemReturn xy where x is in the base ring of y.//(x::AbstractAlgebra.FracElem{T}, y::T) where T <: AbstractAlgebra.RingElemReturn xy where y is in the base ring of x.Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> f = (x^2 + x + 1)//(x^3 + 3x + 1)\n(x^2+x+1)//(x^3+3*x+1)\n\njulia> g = f//x\n(x^2+x+1)//(x^4+3*x^2+x)\n\njulia> h = x//f\n(x^4+3*x^2+x)//(x^2+x+1)\n"
 },
 
 {
@@ -2461,7 +2477,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Fraction Field Interface",
     "title": "Basic manipulation of fields and elements",
     "category": "section",
-    "text": "numerator(d::MyFrac{T}) where T <: AbstractAlgebra.RingElemGiven a fraction d = ab return a, where ab is in lowest terms with respect to the canonical_unit and gcd functions on the base ring.denominator(d::MyFrac{T}) where T <: AbstractAlgebra.RingElemGiven a fraction d = ab return b, where ab is in lowest terms with respect to the canonical_unit and gcd functions on the base ring.ExamplesR, x = PolynomialRing(QQ, \"x\")\n\nf = (x^2 + x + 1)//(x^3 + 3x + 1)\n\nn = numerator(f)\nd = denominator(f)"
+    "text": "numerator(d::MyFrac{T}) where T <: AbstractAlgebra.RingElemGiven a fraction d = ab return a, where ab is in lowest terms with respect to the canonical_unit and gcd functions on the base ring.denominator(d::MyFrac{T}) where T <: AbstractAlgebra.RingElemGiven a fraction d = ab return b, where ab is in lowest terms with respect to the canonical_unit and gcd functions on the base ring.Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> f = (x^2 + x + 1)//(x^3 + 3x + 1)\n(x^2+x+1//1)//(x^3+3//1*x+1//1)\n\njulia> n = numerator(f)\nx^2+x+1//1\n\njulia> d = denominator(f)\nx^3+3//1*x+1//1\n"
 },
 
 {
@@ -2469,7 +2485,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic fraction fields",
     "title": "Generic fraction fields",
     "category": "page",
-    "text": "CurrentModule = AbstractAlgebra"
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -2493,7 +2509,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic fraction fields",
     "title": "Fraction field constructors",
     "category": "section",
-    "text": "In order to construct fractions in AbstractAlgebra.jl, one can first construct the fraction field itself. This is accomplished with the following constructor.FractionField(R::AbstractAlgebra.Ring; cached::Bool = true)Given a base ring R return the parent object of the fraction field of R. By default the parent object S will depend only on R and will be cached. Setting the optional argument cached to false will prevent the parent object S from being cached.Here are some examples of creating fraction fields and making use of the resulting parent objects to coerce various elements into the fraction field.ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS = FractionField(R)\n\nf = S()\ng = S(123)\nh = S(BigInt(1234))\nk = S(x + 1)All of the examples here are generic fraction fields, but specialised implementations of fraction fields provided by external modules will also usually provide a FractionField constructor to allow creation of the fraction fields they provide."
+    "text": "In order to construct fractions in AbstractAlgebra.jl, one can first construct the fraction field itself. This is accomplished with the following constructor.FractionField(R::AbstractAlgebra.Ring; cached::Bool = true)Given a base ring R return the parent object of the fraction field of R. By default the parent object S will depend only on R and will be cached. Setting the optional argument cached to false will prevent the parent object S from being cached.Here are some examples of creating fraction fields and making use of the resulting parent objects to coerce various elements into the fraction field.Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S = FractionField(R)\nFraction field of Univariate Polynomial Ring in x over Integers\n\njulia> f = S()\n0\n\njulia> g = S(123)\n123\n\njulia> h = S(BigInt(1234))\n1234\n\njulia> k = S(x + 1)\nx+1\nAll of the examples here are generic fraction fields, but specialised implementations of fraction fields provided by external modules will also usually provide a FractionField constructor to allow creation of the fraction fields they provide."
 },
 
 {
@@ -2501,7 +2517,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic fraction fields",
     "title": "Basic field functionality",
     "category": "section",
-    "text": "Fraction fields in AbstractAlgebra.jl implement the full Field interface. Of course the entire Fraction Field interface is also implemented.We give some examples of such functionality.ExamplesR, x = PolynomialRing(QQ, \"x\")\nS = FractionField(R)\n\nf = S(x + 1)\ng = (x^2 + x + 1)//(x^3 + 3x + 1)\n\nh = zero(S)\nk = one(S)\nisone(k) == true\niszero(f) == false\nm = characteristic(S)\nU = base_ring(S)\nV = base_ring(f)\nT = parent(f)\nr = deepcopy(f)\nn = numerator(g)\nd = denominator(g)"
+    "text": "Fraction fields in AbstractAlgebra.jl implement the full Field interface. Of course the entire Fraction Field interface is also implemented.We give some examples of such functionality.Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> S = FractionField(R)\nFraction field of Univariate Polynomial Ring in x over Rationals\n\njulia> f = S(x + 1)\nx+1//1\n\njulia> g = (x^2 + x + 1)//(x^3 + 3x + 1)\n(x^2+x+1//1)//(x^3+3//1*x+1//1)\n\njulia> h = zero(S)\n0//1\n\njulia> k = one(S)\n1//1\n\njulia> isone(k)\ntrue\n\njulia> iszero(f)\nfalse\n\njulia> m = characteristic(S)\n0\n\njulia> U = base_ring(S)\nUnivariate Polynomial Ring in x over Rationals\n\njulia> V = base_ring(f)\nUnivariate Polynomial Ring in x over Rationals\n\njulia> T = parent(f)\nFraction field of Univariate Polynomial Ring in x over Rationals\n\njulia> r = deepcopy(f)\nx+1//1\n\njulia> n = numerator(g)\nx^2+x+1//1\n\njulia> d = denominator(g)\nx^3+3//1*x+1//1\n"
 },
 
 {
@@ -2525,7 +2541,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic fraction fields",
     "title": "Greatest common divisor",
     "category": "section",
-    "text": "gcd{T <: RingElem}(::FracElem{T}, ::FracElem{T})ExamplesR, x = PolynomialRing(QQ, \"x\")\n\nf = (x + 1)//(x^3 + 3x + 1)\ng = (x^2 + 2x + 1)//(x^2 + x + 1)\n\nh = gcd(f, g)"
+    "text": "gcd{T <: RingElem}(::FracElem{T}, ::FracElem{T})Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> f = (x + 1)//(x^3 + 3x + 1)\n(x+1//1)//(x^3+3//1*x+1//1)\n\njulia> g = (x^2 + 2x + 1)//(x^2 + x + 1)\n(x^2+2//1*x+1//1)//(x^2+x+1//1)\n\njulia> h = gcd(f, g)\n(x+1//1)//(x^5+x^4+4//1*x^3+4//1*x^2+4//1*x+1//1)\n"
 },
 
 {
@@ -2549,7 +2565,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic fraction fields",
     "title": "Remove and valuation",
     "category": "section",
-    "text": "When working over a Euclidean domain, it is convenient to extend valuations to the fraction field. To facilitate this, we define the following functions.remove{T <: RingElem}(::FracElem{T}, ::T)valuation{T <: RingElem}(::FracElem{T}, ::T)ExamplesR, x = PolynomialRing(ZZ, \"x\")\n\nf = (x + 1)//(x^3 + 3x + 1)\ng = (x^2 + 1)//(x^2 + x + 1)\n\nv, q = remove(f^3*g, x + 1)\nv = valuation(f^3*g, x + 1)"
+    "text": "When working over a Euclidean domain, it is convenient to extend valuations to the fraction field. To facilitate this, we define the following functions.remove{T <: RingElem}(::FracElem{T}, ::T)valuation{T <: RingElem}(::FracElem{T}, ::T)Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> f = (x + 1)//(x^3 + 3x + 1)\n(x+1)//(x^3+3*x+1)\n\njulia> g = (x^2 + 1)//(x^2 + x + 1)\n(x^2+1)//(x^2+x+1)\n\njulia> v, q = remove(f^3*g, x + 1)\n(3, (x^2+1)//(x^11+x^10+10*x^9+12*x^8+39*x^7+48*x^6+75*x^5+75*x^4+66*x^3+37*x^2+10*x+1))\n\njulia> v = valuation(f^3*g, x + 1)\n3\n"
 },
 
 {
@@ -2557,7 +2573,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Rational field",
     "title": "Rational field",
     "category": "page",
-    "text": "CurrentModule = AbstractAlgebra"
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -2581,7 +2597,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Rational field",
     "title": "Rational constructors",
     "category": "section",
-    "text": "In order to construct rationals in AbstractAlgebra.jl, one can first construct the rational field itself. This is accomplished using either of the following constructors.FractionField(R::Integers{BigInt})Rationals{BigInt}()This gives the unique object of type Rationals{BigInt} representing the field of rationals in AbstractAlgebra.jl.In practice, one simply uses QQ which is assigned to be the return value of the above constructor. There is no need to call the constructor in practice.Here are some examples of creating the rational field and making use of the resulting parent object to coerce various elements into the field.Examplesf = QQ()\ng = QQ(123)\nh = QQ(BigInt(1234))\nk = QQ(BigInt(12), BigInt(7))\n\nQQ == FractionField(ZZ)"
+    "text": "In order to construct rationals in AbstractAlgebra.jl, one can first construct the rational field itself. This is accomplished using either of the following constructors.FractionField(R::Integers{BigInt})Rationals{BigInt}()This gives the unique object of type Rationals{BigInt} representing the field of rationals in AbstractAlgebra.jl.In practice, one simply uses QQ which is assigned to be the return value of the above constructor. There is no need to call the constructor in practice.Here are some examples of creating the rational field and making use of the resulting parent object to coerce various elements into the field.Examplesjulia> f = QQ()\n0//1\n\njulia> g = QQ(123)\n123//1\n\njulia> h = QQ(BigInt(1234))\n1234//1\n\njulia> k = QQ(BigInt(12), BigInt(7))\n12//7\n\njulia> QQ == FractionField(ZZ)\ntrue\n"
 },
 
 {
@@ -2589,7 +2605,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Rational field",
     "title": "Basic field functionality",
     "category": "section",
-    "text": "The rational field in AbstractAlgebra.jl implements the full Field and Fraction Field interfaces.We give some examples of such functionality.Examplesf = QQ(12, 7)\n\nh = zero(QQ)\nk = one(QQ)\nisone(k) == true\niszero(f) == false\nU = base_ring(QQ)\nV = base_ring(f)\nT = parent(f)\nf == deepcopy(f)\ng = f + 12\nr = ZZ(12)//ZZ(7)\nn = numerator(r)"
+    "text": "The rational field in AbstractAlgebra.jl implements the full Field and Fraction Field interfaces.We give some examples of such functionality.Examplesjulia> f = QQ(12, 7)\n12//7\n\njulia> h = zero(QQ)\n0//1\n\njulia> k = one(QQ)\n1//1\n\njulia> isone(k)\ntrue\n\njulia> iszero(f)\nfalse\n\njulia> U = base_ring(QQ)\nIntegers\n\njulia> V = base_ring(f)\nIntegers\n\njulia> T = parent(f)\nRationals\n\njulia> f == deepcopy(f)\ntrue\n\njulia> g = f + 12\n96//7\n\njulia> r = ZZ(12)//ZZ(7)\n12//7\n\njulia> n = numerator(r)\n12\n"
 },
 
 {
@@ -2621,7 +2637,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Rational field",
     "title": "Square root",
     "category": "section",
-    "text": "AbstractAlgebra.sqrt(a::Rational{BigInt})AbstractAlgebra.exp(a::Rational{BigInt})Examplesd = AbstractAlgebra.sqrt(ZZ(36)//ZZ(25))\nm = AbstractAlgebra.exp(ZZ(0)//ZZ(1))"
+    "text": "AbstractAlgebra.sqrt(a::Rational{BigInt})AbstractAlgebra.exp(a::Rational{BigInt})Examplesjulia> d = AbstractAlgebra.sqrt(ZZ(36)//ZZ(25))\n6//5\n\njulia> m = AbstractAlgebra.exp(ZZ(0)//ZZ(1))\n1//1\n"
 },
 
 {
@@ -2629,7 +2645,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Finite fields",
     "title": "Finite fields",
     "category": "page",
-    "text": "CurrentModule = AbstractAlgebra"
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -2661,7 +2677,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Finite fields",
     "title": "Finite field constructors",
     "category": "section",
-    "text": "In order to construct finite fields in AbstractAlgebra.jl, one must first construct the field itself. This is accomplished with the following constructors.GF(p::T) where T <: IntegerHere are some examples of creating a finite field and making use of the resulting parent object to coerce various elements into the field.ExamplesF = GF(13)\n\ng = F(3)\nh = F(g)"
+    "text": "In order to construct finite fields in AbstractAlgebra.jl, one must first construct the field itself. This is accomplished with the following constructors.GF(p::T) where T <: IntegerHere are some examples of creating a finite field and making use of the resulting parent object to coerce various elements into the field.Examplesjulia> F = GF(13)\nFinite field F_13\n\njulia> g = F(3)\n3\n\njulia> h = F(g)\n3\n"
 },
 
 {
@@ -2669,7 +2685,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Finite fields",
     "title": "Basic field functionality",
     "category": "section",
-    "text": "The finite field module in AbstractAlgebra.jl implements the full Field interface.We give some examples of such functionality.ExamplesF = GF(13)\n\nh = zero(F)\nk = one(F)\nisone(k) == true\niszero(f) == false\nU = base_ring(F)\nV = base_ring(h)\nT = parent(h)\nh == deepcopy(h)\nh = h + 2\nm = inv(k)"
+    "text": "The finite field module in AbstractAlgebra.jl implements the full Field interface.We give some examples of such functionality.Examplesjulia> F = GF(13)\nFinite field F_13\n\njulia> f = F(7)\n7\n\njulia> h = zero(F)\n0\n\njulia> k = one(F)\n1\n\njulia> isone(k)\ntrue\n\njulia> iszero(h)\ntrue\n\njulia> T = parent(h)\nFinite field F_13\n\njulia> h == deepcopy(h)\ntrue\n\njulia> h = h + 2\n2\n\njulia> m = inv(k)\n1\n"
 },
 
 {
@@ -2701,7 +2717,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Finite fields",
     "title": "Basic manipulation of fields and elements",
     "category": "section",
-    "text": "gen{T <: Integer}(F::GFField{T})order(F::GFField)degree(F::GFField)ExamplesF = GF(13)\n\nd = degree(F)\nn = order(F)\ng = gen(F)"
+    "text": "gen{T <: Integer}(F::GFField{T})order(F::GFField)degree(F::GFField)Examplesjulia> F = GF(13)\nFinite field F_13\n\njulia> d = degree(F)\n1\n\njulia> n = order(F)\n13\n\njulia> g = gen(F)\n1\n"
 },
 
 {
@@ -2709,7 +2725,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Real field",
     "title": "Real field",
     "category": "page",
-    "text": "CurrentModule = AbstractAlgebra"
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -2733,7 +2749,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Real field",
     "title": "Rational constructors",
     "category": "section",
-    "text": "In order to construct reals in AbstractAlgebra.jl, one can first construct the real field itself. This is accomplished using the following constructor.Floats{BigFloat}()This gives the unique object of type Floats{BigFloat} representing the field of reals in AbstractAlgebra.jl.In practice, one simply uses RealField which is assigned to be the return value of the above constructor. There is no need to call the constructor in practice.Here are some examples of creating the real field and making use of the resulting parent object to coerce various elements into the field.ExamplesRR = RealField\n\nf = RR()\ng = RR(123)\nh = RR(BigInt(1234))\nk = RR(12//7)\nm = RR(2.3)"
+    "text": "In order to construct reals in AbstractAlgebra.jl, one can first construct the real field itself. This is accomplished using the following constructor.Floats{BigFloat}()This gives the unique object of type Floats{BigFloat} representing the field of reals in AbstractAlgebra.jl.In practice, one simply uses RealField which is assigned to be the return value of the above constructor. There is no need to call the constructor in practice.Here are some examples of creating the real field and making use of the resulting parent object to coerce various elements into the field.Examplesjulia> RR = RealField\nFloats\n\njulia> f = RR()\n0.0\n\njulia> g = RR(123)\n123.0\n\njulia> h = RR(BigInt(1234))\n1234.0\n\njulia> k = RR(12//7)\n1.714285714285714285714285714285714285714285714285714285714285714285714285714291\n\njulia> m = RR(2.3)\n2.29999999999999982236431605997495353221893310546875\n"
 },
 
 {
@@ -2741,7 +2757,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Real field",
     "title": "Basic field functionality",
     "category": "section",
-    "text": "The real field in AbstractAlgebra.jl implements the full Field interface.We give some examples of such functionality.ExamplesRR = RealField\nf = RR(12//7)\n\nh = zero(RR)\nk = one(RR)\nisone(k) == true\niszero(f) == false\nU = base_ring(RR)\nV = base_ring(f)\nT = parent(f)\nf == deepcopy(f)\ng = f + 12\nm = inv(g)"
+    "text": "The real field in AbstractAlgebra.jl implements the full Field interface.We give some examples of such functionality.Examplesjulia> RR = RealField\nFloats\n\njulia> f = RR(12//7)\n1.714285714285714285714285714285714285714285714285714285714285714285714285714291\n\njulia> h = zero(RR)\n0.0\n\njulia> k = one(RR)\n1.0\n\njulia> isone(k)\ntrue\n\njulia> iszero(f)\nfalse\n\njulia> U = base_ring(RR)\nUnion{}\n\njulia> T = parent(f)\nFloats\n\njulia> f == deepcopy(f)\ntrue\n\njulia> g = f + 12\n13.71428571428571428571428571428571428571428571428571428571428571428571428571433\n\njulia> m = inv(g)\n0.07291666666666666666666666666666666666666666666666666666666666666666666666666631\n"
 },
 
 {
@@ -2749,7 +2765,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Number fields",
     "title": "Number fields",
     "category": "page",
-    "text": "CurrentModule = AbstractAlgebra"
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -2765,7 +2781,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Number fields",
     "title": "Number field constructors",
     "category": "section",
-    "text": "In order to construct number fields in AbstractAlgebra.jl, one must first construct the field itself. This is accomplished with the following constructor.NumberField(f::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = \"\\$\"; cached = true)Given an irreducible defining polynomial f in mathbbQx, return a tuple (K x) consisting of the number field defined by that polynomial and a generator. The string fields are currently ignored, but are reserved for future use.Currently the generator of the number field prints the same way as the variable in mathbbQx.ExamplesR, x = PolynomialRing(QQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\n\nf = a^2 + 2a + 7"
+    "text": "In order to construct number fields in AbstractAlgebra.jl, one must first construct the field itself. This is accomplished with the following constructor.NumberField(f::AbstractAlgebra.Generic.Poly{Rational{BigInt}}, s::AbstractString, t = \"\\$\"; cached = true)Given an irreducible defining polynomial f in mathbbQx, return a tuple (K x) consisting of the number field defined by that polynomial and a generator. The string fields are currently ignored, but are reserved for future use.Currently the generator of the number field prints the same way as the variable in mathbbQx.Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> K, a = NumberField(x^3 + 3x + 1, \"a\")\n(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1, x)\n\njulia> f = a^2 + 2a + 7\nx^2+2//1*x+7//1\n"
 },
 
 {
@@ -2805,7 +2821,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Permutations and Permutation groups",
     "title": "AbstractAlgebra.Generic.perm",
     "category": "type",
-    "text": "perm{T<:Integer}\n\nThe type of permutations. Fieldnames:d::Vector{T} - vector representing the permutation\nmodified::Bool - bit to check the validity of cycle decomposition\ncycles::CycleDec{T} - (cached) cycle decompositionPermutation p consists of a vector (p.d) of n integers from 1 to n. If the i-th entry of the vector is j, this corresponds to p sending i to j. The cycle decomposition (p.cycles) is computed on demand and should never be accessed directly. Use cycles(p) instead.There are two inner constructors of perm:perm(n::T) constructs the trivial perm{T}-permutation of length n.\nperm(v::Vector{T<:Integer}[,check=true]) constructs a permutationrepresented by v. By default perm constructor checks if the vector constitutes a valid permutation. To skip the check call perm(v, false).\n\nExamples:\n\njulia> perm([1,2,3])\n()\n\njulia> g = perm(Int32[2,3,1])\n(1,2,3)\n\njulia> typeof(g)\nAbstractAlgebra.Generic.perm{Int32}\n\n\n\n"
+    "text": "perm{T<:Integer}\n\nThe type of permutations. Fieldnames:d::Vector{T} - vector representing the permutation\nmodified::Bool - bit to check the validity of cycle decomposition\ncycles::CycleDec{T} - (cached) cycle decompositionPermutation p consists of a vector (p.d) of n integers from 1 to n. If the i-th entry of the vector is j, this corresponds to p sending i to j. The cycle decomposition (p.cycles) is computed on demand and should never be accessed directly. Use cycles(p) instead.There are two inner constructors of perm:perm(n::T) constructs the trivial perm{T}-permutation of length n.\nperm(v::Vector{T<:Integer}[,check=true]) constructs a permutationrepresented by v. By default perm constructor checks if the vector constitutes a valid permutation. To skip the check call perm(v, false).\n\nExamples:\n\njulia> perm([1,2,3])\n()\n\njulia> g = perm(Int32[2,3,1])\n(1,2,3)\n\njulia> typeof(g)\nperm{Int32}\n\n\n\n"
 },
 
 {
@@ -2813,7 +2829,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Permutations and Permutation groups",
     "title": "AbstractAlgebra.Generic.PermGroup",
     "category": "type",
-    "text": "PermGroup{T<:Integer}\n\nThe permutation group singleton type. PermGroup(n) constructs the permutation group S_n on n-symbols. The type of elements of the group is inferred from the type of n.\n\nExamples:\n\njulia> G = PermGroup(5)\nPermutation group over 5 elements\n\njulia> elem_type(G)\nAbstractAlgebra.Generic.perm{Int64}\n\njulia> H = PermGroup(UInt16(5))\nPermutation group over 5 elements\n\njulia> elem_type(H)\nAbstractAlgebra.Generic.perm{UInt16}\n\n\n\n"
+    "text": "PermGroup{T<:Integer}\n\nThe permutation group singleton type. PermGroup(n) constructs the permutation group S_n on n-symbols. The type of elements of the group is inferred from the type of n.\n\nExamples:\n\njulia> G = PermGroup(5)\nPermutation group over 5 elements\n\njulia> elem_type(G)\nperm{Int64}\n\njulia> H = PermGroup(UInt16(5))\nPermutation group over 5 elements\n\njulia> elem_type(H)\nperm{UInt16}\n\n\n\n"
 },
 
 {
@@ -2821,7 +2837,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Permutations and Permutation groups",
     "title": "AbstractAlgebra.Generic.@perm_str",
     "category": "macro",
-    "text": "perm\"...\"\n\nString macro to parse disjoint cycles into perm{Int}.Strings for the output of GAP could be copied directly into perm\"...\". Cycles of length 1 are not necessary, but could be included. A permutation of the minimal support is constructed, i.e. the maximal n in the decomposition determines the parent group S_n.\n\nExamples:\n\njulia> p = perm\"(1,3)(2,4)\"\n(1,3)(2,4)\n\njulia> typeof(p)\nAbstractAlgebra.Generic.perm{Int64}\n\njulia> parent(p) == PermutationGroup(4)\ntrue\n\njulia> p = perm\"(1,3)(2,4)(10)\"\n(1,3)(2,4)\n\njulia> parent(p) == PermutationGroup(10)\ntrue\n\n\n\n"
+    "text": "perm\"...\"\n\nString macro to parse disjoint cycles into perm{Int}.Strings for the output of GAP could be copied directly into perm\"...\". Cycles of length 1 are not necessary, but could be included. A permutation of the minimal support is constructed, i.e. the maximal n in the decomposition determines the parent group S_n.\n\nExamples:\n\njulia> p = perm\"(1,3)(2,4)\"\n(1,3)(2,4)\n\njulia> typeof(p)\nperm{Int64}\n\njulia> parent(p) == PermutationGroup(4)\ntrue\n\njulia> p = perm\"(1,3)(2,4)(10)\"\n(1,3)(2,4)\n\njulia> parent(p) == PermutationGroup(10)\ntrue\n\n\n\n"
 },
 
 {
@@ -2829,7 +2845,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Permutations and Permutation groups",
     "title": "Permutations constructors",
     "category": "section",
-    "text": "There are several methods to to construct permutations in AbstractAlgebra.jl.The easiest way is to directly call to the perm (inner) constructor:Generic.permSince the parent object can be reconstructed from the permutation itself, you can work with permutations without explicitly constructing the parent object.The other way is to first construct the permutation group they belong to. This is accomplished with the inner constructor PermGroup(n::Integer) which constructs the permutation group on n symbols and returns the parent object representing the group.Generic.PermGroupA vector of integers can be then coerced to a permutation via call to parent. The advantage is that the vector is automatically converted to the integer type fixed at the creation of the parent object.Examples:julia> G = PermutationGroup(BigInt(5)); p = G([2,3,1,5,4])\n(1,2,3)(4,5)\n\njulia> typeof(p)\nAbstractAlgebra.Generic.perm{BigInt}\n\njulia> H = PermutationGroup(UInt16(5)); r = H([2,3,1,5,4])\n(1,2,3)(4,5)\n\njulia> typeof(r)\nAbstractAlgebra.Generic.perm{UInt16}\n\njulia> H()\n()By default the coercion checks for non-unique values in the vector, but this can be switched off with G([2,3,1,5,4], false).Finally there is a perm\"...\" string macro to construct permutation from string input.@perm_str"
+    "text": "There are several methods to to construct permutations in AbstractAlgebra.jl.The easiest way is to directly call to the perm (inner) constructor:Generic.permSince the parent object can be reconstructed from the permutation itself, you can work with permutations without explicitly constructing the parent object.The other way is to first construct the permutation group they belong to. This is accomplished with the inner constructor PermGroup(n::Integer) which constructs the permutation group on n symbols and returns the parent object representing the group.Generic.PermGroupA vector of integers can be then coerced to a permutation via call to parent. The advantage is that the vector is automatically converted to the integer type fixed at the creation of the parent object.Examples:julia> G = PermutationGroup(BigInt(5)); p = G([2,3,1,5,4])\n(1,2,3)(4,5)\n\njulia> typeof(p)\nperm{BigInt}\n\njulia> H = PermutationGroup(UInt16(5)); r = H([2,3,1,5,4])\n(1,2,3)(4,5)\n\njulia> typeof(r)\nperm{UInt16}\n\njulia> H()\n()By default the coercion checks for non-unique values in the vector, but this can be switched off with G([2,3,1,5,4], false).Finally there is a perm\"...\" string macro to construct permutation from string input.@perm_str"
 },
 
 {
@@ -2917,7 +2933,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Permutations and Permutation groups",
     "title": "AbstractAlgebra.Generic.elements!",
     "category": "method",
-    "text": "Generic.elements!(G::PermGroup)\n\nReturn an unsafe iterator over all permutations in G. Only one permutation is allocated and then modified in-place using the non-recursive Heaps algorithm.Note: you need to explicitely copy permutations intended to be stored or modified.\n\nExamples:\n\njulia> elts = Generic.elements!(PermGroup(5));\n\njulia> length(elts)\n120\n\njulia> for p in Generic.elements!(PermGroup(3))\n         println(p)\n       end\n()\n(1,2)\n(1,3,2)\n(2,3)\n(1,2,3)\n(1,3)\n\njulia> A = collect(Generic.elements!(PermGroup(3))); A\n6-element Array{AbstractAlgebra.Generic.perm{Int64},1}:\n (1,3)\n (1,3)\n (1,3)\n (1,3)\n (1,3)\n (1,3)\n\njulia> unique(A)\n1-element Array{AbstractAlgebra.Generic.perm{Int64},1}:\n (1,3)\n\n\n\n"
+    "text": "Generic.elements!(G::PermGroup)\n\nReturn an unsafe iterator over all permutations in G. Only one permutation is allocated and then modified in-place using the non-recursive Heaps algorithm.Note: you need to explicitely copy permutations intended to be stored or modified.\n\nExamples:\n\njulia> elts = Generic.elements!(PermGroup(5));\n\njulia> length(elts)\n120\n\njulia> for p in Generic.elements!(PermGroup(3))\n         println(p)\n       end\n()\n(1,2)\n(1,3,2)\n(2,3)\n(1,2,3)\n(1,3)\n\njulia> A = collect(Generic.elements!(PermGroup(3))); A\n6-element Array{perm{Int64},1}:\n (1,3)\n (1,3)\n (1,3)\n (1,3)\n (1,3)\n (1,3)\n\njulia> unique(A)\n1-element Array{perm{Int64},1}:\n (1,3)\n\n\n\n"
 },
 
 {
@@ -2957,7 +2973,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Permutations and Permutation groups",
     "title": "Arithmetic operators",
     "category": "section",
-    "text": "*(::perm{T}, ::perm{T}) where T\n^(::perm, n::Integer)\ninv(::perm)Permutations parametrized by different types can be multiplied, and follow the standard julia integer promotion rules:g = rand(PermGroup(Int8(5)));\nh = rand(PermGroup(UInt32(5)));\ntypeof(g*h)\n\n# output\nAbstractAlgebra.Generic.perm{Int64}"
+    "text": "*(::perm{T}, ::perm{T}) where T\n^(::perm, n::Integer)\ninv(::perm)Permutations parametrized by different types can be multiplied, and follow the standard julia integer promotion rules:g = rand(PermGroup(Int8(5)));\nh = rand(PermGroup(UInt32(5)));\ntypeof(g*h)\n\n# output\nperm{UInt32}"
 },
 
 {
@@ -2965,7 +2981,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Permutations and Permutation groups",
     "title": "Coercion",
     "category": "section",
-    "text": "The following coercions are available for G::PermGroup parent objects. Each of the methods perform basic sanity checks on the input which can be switched off by the second argument.Examples(G::PermGroup)()Return the identity element of G.(G::PermGrup)(::Vector{<:Integer}[, check=true])Turn a vector od integers into a permutation (performing conversion, if necessary).(G::PermGroup)(::perm{<:Integer}[, check=true])Coerce a permutation p into group G (performing the conversion, if necessary). If p is already an element of G no copy is performed.(G::PermGroup)(::String[, check=true])Parse the string input e.g. copied from the output of GAP. The method uses the same logic as perm\"...\" macro. The string is sanitized and checked for disjoint cycles. Both string(p::perm) (if setpermstyle(:cycles)) and string(cycles(p::perm)) are valid input for this method.(G::PermGroup{T})(::CycleDec{T}[, check=true]) where TTurn a cycle decomposition object into a permutation."
+    "text": "The following coercions are available for G::PermGroup parent objects. Each of the methods perform basic sanity checks on the input which can be switched off by the second argument.Examplesjulia> PermutationGroup(4)()\n()Return the identity element of G.(G::PermGrup)(::Vector{<:Integer}[, check=true])Turn a vector od integers into a permutation (performing conversion, if necessary).(G::PermGroup)(::perm{<:Integer}[, check=true])Coerce a permutation p into group G (performing the conversion, if necessary). If p is already an element of G no copy is performed.(G::PermGroup)(::String[, check=true])Parse the string input e.g. copied from the output of GAP. The method uses the same logic as perm\"...\" macro. The string is sanitized and checked for disjoint cycles. Both string(p::perm) (if setpermstyle(:cycles)) and string(cycles(p::perm)) are valid input for this method.(G::PermGroup{T})(::CycleDec{T}[, check=true]) where TTurn a cycle decomposition object into a permutation."
 },
 
 {
@@ -3005,7 +3021,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Permutations and Permutation groups",
     "title": "AbstractAlgebra.Generic.matrix_repr",
     "category": "method",
-    "text": "matrix_repr(a::perm{T}) where T\n\nReturn the permutation matrix as sparse matrix representing a via natural embedding of the permutation group into general linear group over mathbbZ.\n\nExamples:\n\njulia> p = perm([2,3,1])\n(1,2,3)\n\njulia> matrix_repr(p)\n3×3 SparseMatrixCSC{Int64,Int64} with 3 stored entries:\n  [3, 1]  =  1\n  [1, 2]  =  1\n  [2, 3]  =  1\n\njulia> Array(ans)\n3×3 Array{Int64,2}:\n 0  1  0\n 0  0  1\n 1  0  0\n\n\n\n"
+    "text": "matrix_repr(a::perm{T}) where T\n\nReturn the permutation matrix as sparse matrix representing a via natural embedding of the permutation group into general linear group over mathbbZ.\n\nExamples:\n\njulia> p = perm([2,3,1])\n(1,2,3)\n\njulia> matrix_repr(p)\n3×3 SparseArrays.SparseMatrixCSC{Int64,Int64} with 3 stored entries:\n  [3, 1]  =  1\n  [1, 2]  =  1\n  [2, 3]  =  1\n\njulia> Array(ans)\n3×3 Array{Int64,2}:\n 0  1  0\n 0  0  1\n 1  0  0\n\n\n\n"
 },
 
 {
@@ -3205,7 +3221,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Partitions and Young tableaux",
     "title": "AbstractAlgebra.Generic.matrix_repr",
     "category": "method",
-    "text": "matrix_repr(Y::YoungTableau)\n\nConstruct sparse integer matrix representing the tableau.\n\nExamples:\n\njulia> y = YoungTableau([4,3,1]);\n\njulia> matrix_repr(y)\n3×4 SparseMatrixCSC{Int64,Int64} with 8 stored entries:\n  [1, 1]  =  1\n  [2, 1]  =  5\n  [3, 1]  =  8\n  [1, 2]  =  2\n  [2, 2]  =  6\n  [1, 3]  =  3\n  [2, 3]  =  7\n  [1, 4]  =  4\n\n\n\n"
+    "text": "matrix_repr(Y::YoungTableau)\n\nConstruct sparse integer matrix representing the tableau.\n\nExamples:\n\njulia> y = YoungTableau([4,3,1]);\n\njulia> matrix_repr(y)\n3×4 SparseArrays.SparseMatrixCSC{Int64,Int64} with 8 stored entries:\n  [1, 1]  =  1\n  [2, 1]  =  5\n  [3, 1]  =  8\n  [1, 2]  =  2\n  [2, 2]  =  6\n  [1, 3]  =  3\n  [2, 3]  =  7\n  [1, 4]  =  4\n\n\n\n"
 },
 
 {
@@ -3229,7 +3245,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Partitions and Young tableaux",
     "title": "AbstractAlgebra.Generic.character",
     "category": "method",
-    "text": "character(lambda::Partition)\n\nReturn the lambda-th irreducible character of permutation group on sum(lambda) symbols. The returned character function is of the following signature:chi(p::perm[, check::Bool=true]) -> BigIntThe function checks (if p belongs to the appropriate group) can be switched off by calling chi(p, false). The values computed by chi are cached in look-up table.The computation follows the Murnaghan-Nakayama formula: chi_lambda(sigma) = sum_textrimhook xisubset lambda(-1)^ll(lambdabackslashxi) chi_lambda backslashxi(tildesigma) where lambdabackslashxi denotes the skew diagram of lambda with xi removed, ll denotes the leg-length (i.e. number of rows - 1) and tildesigma is permutation obtained from sigma by the removal of the longest cycle.For more details see e.g. Chapter 2.8 of Group Theory and Physics by S.Sternberg.\n\nExamples\n\njulia> G = PermutationGroup(4)\nPermutation group over 4 elements\n\njulia> chi = character(Partition([3,1])) # character of the regular representation\n(::char) (generic function with 2 methods)\n\njulia> chi(G())\n3\n\njulia> chi(perm\"(1,3)(2,4)\")\n-1\n\n\n\n"
+    "text": "character(lambda::Partition)\n\nReturn the lambda-th irreducible character of permutation group on sum(lambda) symbols. The returned character function is of the following signature:chi(p::perm[, check::Bool=true]) -> BigIntThe function checks (if p belongs to the appropriate group) can be switched off by calling chi(p, false). The values computed by chi are cached in look-up table.The computation follows the Murnaghan-Nakayama formula: chi_lambda(sigma) = sum_textrimhook xisubset lambda(-1)^ll(lambdabackslashxi) chi_lambda backslashxi(tildesigma) where lambdabackslashxi denotes the skew diagram of lambda with xi removed, ll denotes the leg-length (i.e. number of rows - 1) and tildesigma is permutation obtained from sigma by the removal of the longest cycle.For more details see e.g. Chapter 2.8 of Group Theory and Physics by S.Sternberg.\n\nExamples\n\njulia> G = PermutationGroup(4)\nPermutation group over 4 elements\n\njulia> chi = character(Partition([3,1])) # character of the regular representation\n#27 (generic function with 2 methods)\n\njulia> chi(G())\n3\n\njulia> chi(perm\"(1,3)(2,4)\")\n-1\n\n\n\n"
 },
 
 {
@@ -3389,7 +3405,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Interface",
     "title": "Module Interface",
     "category": "page",
-    "text": ""
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -3421,7 +3437,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Interface",
     "title": "Basic manipulation",
     "category": "section",
-    "text": "iszero(m::MyModuleElem{T}) where T <: RingElementReturn true if the given module element is zero.ngens(M::MyModule{T}) where T <: RingElementReturn the number of generators of the module M in its current representation.gen(M::MyModule{T}, i::Int) where T <: RingElementReturn the i-th generator (indexed from 1) of the module M.gens(M::MyModule{T}) where T <: RingElementReturn a Julia array of the generators of the module M.rels(M::MyModule{T}) where T <: RingElementReturn a Julia vector of all the relations between the generators of M. Each relation is given as an AbstractAlgebra row matrix.ExamplesM = FreeModule(QQ, 2)\n\nn = ngens(M)\nG = gens(M)\nR = rels(M)\ng1 = gen(M, 1)\n!iszero(g1)"
+    "text": "iszero(m::MyModuleElem{T}) where T <: RingElementReturn true if the given module element is zero.ngens(M::MyModule{T}) where T <: RingElementReturn the number of generators of the module M in its current representation.gen(M::MyModule{T}, i::Int) where T <: RingElementReturn the i-th generator (indexed from 1) of the module M.gens(M::MyModule{T}) where T <: RingElementReturn a Julia array of the generators of the module M.rels(M::MyModule{T}) where T <: RingElementReturn a Julia vector of all the relations between the generators of M. Each relation is given as an AbstractAlgebra row matrix.Examplesjulia> M = FreeModule(QQ, 2)\nVector space of dimension 2 over Rationals\n\njulia> n = ngens(M)\n2\n\njulia> G = gens(M)\n2-element Array{AbstractAlgebra.Generic.free_module_elem{Rational{BigInt}},1}:\n (1//1, 0//1)\n (0//1, 1//1)\n\njulia> R = rels(M)\n0-element Array{AbstractAlgebra.Generic.MatSpaceElem{Rational{BigInt}},1}\n\njulia> g1 = gen(M, 1)\n(1//1, 0//1)\n\njulia> !iszero(g1)\ntrue\n"
 },
 
 {
@@ -3461,7 +3477,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Interface",
     "title": "Basic manipulation",
     "category": "section",
-    "text": "zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElementExamplesM = FreeModule(QQ, 2)\n\nz = zero(M)"
+    "text": "zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElementExamplesjulia> M = FreeModule(QQ, 2)\nVector space of dimension 2 over Rationals\n\njulia> z = zero(M)\n(0//1, 0//1)\n"
 },
 
 {
@@ -3477,7 +3493,47 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Interface",
     "title": "Comparison",
     "category": "section",
-    "text": "==(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElementExamplesM = FreeModule(QQ, 2)\n\nM == M"
+    "text": "==(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElementExamplesjulia> M = FreeModule(QQ, 2)\nVector space of dimension 2 over Rationals\n\njulia> M == M\ntrue\n"
+},
+
+{
+    "location": "module/#AbstractAlgebra.Generic.isisomorphic-Union{Tuple{T}, Tuple{FPModule{T},FPModule{T}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Module Interface",
+    "title": "AbstractAlgebra.Generic.isisomorphic",
+    "category": "method",
+    "text": "isisomorphic(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where T <: RingElement\n\nReturn true if the modules M and N are isomorphic.\n\n\n\n"
+},
+
+{
+    "location": "module/#Isomorphism-1",
+    "page": "Module Interface",
+    "title": "Isomorphism",
+    "category": "section",
+    "text": "isisomorphic(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 3)\nFree module of rank 3 over Integers\n\njulia> m1 = rand(M, -10:10)\n(0, -8, -8)\n\njulia> m2 = rand(M, -10:10)\n(-7, -5, -10)\n\njulia> S, f = Submodule(M, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 3 over Integers)\n\njulia> I, g = image(f)\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 3 over Integers)\n\njulia> isisomorphic(S, I)\ntrue\n"
+},
+
+{
+    "location": "module/#AbstractAlgebra.Generic.snf-Union{Tuple{FPModule{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Module Interface",
+    "title": "AbstractAlgebra.Generic.snf",
+    "category": "method",
+    "text": "SNFModule(m::AbstractAlgebra.FPModule{T}) where T <: RingElement\n\nReturn a pair M, f consisting of the invariant factor decomposition M of the module m and a module homomorphism (isomorphisms) f  M to m. The module M is itself a module which can be manipulated as any other module in the system.\n\n\n\n"
+},
+
+{
+    "location": "module/#AbstractAlgebra.Generic.invariant_factors-Union{Tuple{FPModule{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Module Interface",
+    "title": "AbstractAlgebra.Generic.invariant_factors",
+    "category": "method",
+    "text": "invariant_factors(m::AbstractAlgebra.FPModule{T}) where T <: RingElement\n\nReturn a vector of the invariant factors of the module M.\n\n\n\n"
+},
+
+{
+    "location": "module/#Invariant-Factor-Decomposition-1",
+    "page": "Module Interface",
+    "title": "Invariant Factor Decomposition",
+    "category": "section",
+    "text": "For modules over a euclidean domain one can take the invariant factor decomposition to determine the structure of the module. The invariant factors are unique up to multiplication by a unit, and even unique if a  canonical_unit is available for the ring.snf(::AbstractAlgebra.FPModule{T}) where T <: RingElement\ninvariant_factors(::AbstractAlgebra.FPModule{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 3)\nFree module of rank 3 over Integers\n\njulia> m1 = rand(M, -10:10)\n(9, 7, 7)\n\njulia> m2 = rand(M, -10:10)\n(-6, 2, -8)\n\njulia> S, f = Submodule(M, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 3 over Integers)\n\njulia> Q, g = QuotientModule(M, S)\n(Quotient module over Integers with 3 generators and relations:\n[3 9 -1], [0 20 -10], Module homomorphism with\nDomain: Free module of rank 3 over Integers\nCodomain: Quotient module over Integers with 3 generators and relations:\n[3 9 -1], [0 20 -10])\n\njulia> I, f = snf(Q)\n(Invariant factor decomposed module over Integers with invariant factors BigInt[10, 0], Module homomorphism with\nDomain: Invariant factor decomposed module over Integers with invariant factors BigInt[10, 0]\nCodomain: Quotient module over Integers with 3 generators and relations:\n[3 9 -1], [0 20 -10])\n\njulia> invs = invariant_factors(Q)\n2-element Array{BigInt,1}:\n 10\n  0\n"
 },
 
 {
@@ -3485,7 +3541,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Free Modules and Vector Spaces",
     "title": "Free Modules and Vector Spaces",
     "category": "page",
-    "text": ""
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -3533,7 +3589,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Free Modules and Vector Spaces",
     "title": "Constructors",
     "category": "section",
-    "text": "FreeModule(R::AbstractAlgebra.Ring, rank::Int)\nVectorSpace(F::AbstractAlgebra.Field, dim::Int)Construct the free module/vector space of given rank/dimension.ExamplesM = FreeModule(ZZ, 3)\nV = VectorSpace(QQ, 2)"
+    "text": "FreeModule(R::AbstractAlgebra.Ring, rank::Int)\nVectorSpace(F::AbstractAlgebra.Field, dim::Int)Construct the free module/vector space of given rank/dimension.Examplesjulia> M = FreeModule(ZZ, 3)\nFree module of rank 3 over Integers\n\njulia> V = VectorSpace(QQ, 2)\nVector space of dimension 2 over Rationals\n"
 },
 
 {
@@ -3541,7 +3597,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Free Modules and Vector Spaces",
     "title": "Basic manipulation",
     "category": "section",
-    "text": "rank(M::Generic.FreeModule{T}) where T <: AbstractAlgebra.RingElem\ndim(V::Generic.FreeModule{T}) where T <: AbstractAlgebra.FieldElemExamplesM = FreeModule(ZZ, 3)\nV = VectorSpace(QQ, 2)\n\nrank(M)\ndim(V)"
+    "text": "rank(M::Generic.FreeModule{T}) where T <: AbstractAlgebra.RingElem\ndim(V::Generic.FreeModule{T}) where T <: AbstractAlgebra.FieldElemExamplesjulia> M = FreeModule(ZZ, 3)\nFree module of rank 3 over Integers\n\njulia> V = VectorSpace(QQ, 2)\nVector space of dimension 2 over Rationals\n\njulia> rank(M)\n3\n\njulia> dim(V)\n2\n"
 },
 
 {
@@ -3549,7 +3605,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Submodules",
     "title": "Submodules",
     "category": "page",
-    "text": ""
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -3581,7 +3637,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Submodules",
     "title": "Constructors",
     "category": "section",
-    "text": "Submodule(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: RingElementSubspace(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: FieldElementExamplesM = FreeModule(ZZ, 2)\n\nm = M([ZZ(1), ZZ(2)])\nn = M([ZZ(2), ZZ(-1)])\n\nN, f = Submodule(M, [m, n])\n\nv = N([ZZ(3), ZZ(4)])\nv2 = f(v)\n\nV = VectorSpace(QQ, 2)\n\nm = V([QQ(1), QQ(2)])\nn = V([QQ(2), QQ(-1)])\n\nN, f = Subspace(V, [m, n])"
+    "text": "Submodule(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: RingElementSubspace(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: FieldElementExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(1), ZZ(2)])\n(1, 2)\n\njulia> n = M([ZZ(2), ZZ(-1)])\n(2, -1)\n\njulia> N, f = Submodule(M, [m, n])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> v = N([ZZ(3), ZZ(4)])\n(3, 4)\n\njulia> v2 = f(v)\n(3, 26)\n\njulia> V = VectorSpace(QQ, 2)\nVector space of dimension 2 over Rationals\n\njulia> m = V([QQ(1), QQ(2)])\n(1//1, 2//1)\n\njulia> n = V([QQ(2), QQ(-1)])\n(2//1, -1//1)\n\njulia> N, f = Subspace(V, [m, n])\n(Subspace over Rationals with 2 generators and no relations\n, Module homomorphism with\nDomain: Subspace over Rationals with 2 generators and no relations\n\nCodomain: Vector space of dimension 2 over Rationals)\n"
 },
 
 {
@@ -3621,7 +3677,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Submodules",
     "title": "Basic manipulation",
     "category": "section",
-    "text": "supermodule(::AbstractAlgebra.Generic.Submodule{T}) where T <: RingElementissubmodule(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElementiscompatible(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElementExamplesM = FreeModule(ZZ, 2)\nm = M([ZZ(2), ZZ(3)])\nn = M([ZZ(1), ZZ(4)])\nN1 = Submodule(M, [m, n])\nN2 = Submodule(M, [m])\n\nsupermodule(N1) == M\niscompatible(N1, N2)\nissubmodule(M, N)"
+    "text": "supermodule(::AbstractAlgebra.Generic.Submodule{T}) where T <: RingElementissubmodule(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElementiscompatible(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(2), ZZ(3)])\n(2, 3)\n\njulia> n = M([ZZ(1), ZZ(4)])\n(1, 4)\n\njulia> N1, = Submodule(M, [m, n])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> N2, = Submodule(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> supermodule(N1) == M\ntrue\n\njulia> iscompatible(N1, N2)\n(true, Free module of rank 2 over Integers)\n\njulia> issubmodule(N1, M)\nfalse\n"
 },
 
 {
@@ -3637,7 +3693,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Submodules",
     "title": "Intersection",
     "category": "section",
-    "text": "Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where\nT <: RingElementExamplesM = FreeModule(ZZ, 2)\nm = M([ZZ(2), ZZ(3)])\nn = M([ZZ(1), ZZ(4)])\nN1 = Submodule(M, [m, n])\nN2 = Submodule(M, [m])\n\nI = intersect(N1, N2)"
+    "text": "Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where\nT <: RingElementExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(2), ZZ(3)])\n(2, 3)\n\njulia> n = M([ZZ(1), ZZ(4)])\n(1, 4)\n\njulia> N1 = Submodule(M, [m, n])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> N2 = Submodule(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> I = intersect(N1, N2)\n0-element Array{Union{ModuleHomomorphism{BigInt}, Submodule{BigInt}},1}\n"
 },
 
 {
@@ -3645,7 +3701,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Quotient modules",
     "title": "Quotient modules",
     "category": "page",
-    "text": ""
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -3677,7 +3733,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Quotient modules",
     "title": "Constructors",
     "category": "section",
-    "text": "QuotientModule(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: RingElementQuotientSpace(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: FieldElement\nExamplesM = FreeModule(ZZ, 2)\n\nm = M([ZZ(1), ZZ(2)])\n\nN, f = Submodule(M, [m])\nQ, g = QuotientModule(M, N)\n\np = Q([ZZ(3)])\nv2 = g(p)\n\nV = VectorSpace(QQ, 2)\n\nm = V([QQ(1), QQ(2)])\n\nN, f = Subspace(V, [m])\nQ, g = QuotientSpace(V, N)"
+    "text": "QuotientModule(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: RingElementQuotientSpace(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: FieldElement\nExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(1), ZZ(2)])\n(1, 2)\n\njulia> N, f = Submodule(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> Q, g = QuotientModule(M, N)\n(Quotient module over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Free module of rank 2 over Integers\nCodomain: Quotient module over Integers with 1 generator and no relations\n)\n\njulia> p = M([ZZ(3), ZZ(1)])\n(3, 1)\n\njulia> v2 = g(p)\n(-5)\n\njulia> V = VectorSpace(QQ, 2)\nVector space of dimension 2 over Rationals\n\njulia> m = V([QQ(1), QQ(2)])\n(1//1, 2//1)\n\njulia> N, f = Subspace(V, [m])\n(Subspace over Rationals with 1 generator and no relations\n, Module homomorphism with\nDomain: Subspace over Rationals with 1 generator and no relations\n\nCodomain: Vector space of dimension 2 over Rationals)\n\njulia> Q, g = QuotientSpace(V, N)\n(Quotient space over:\nRationals with 1 generator and no relations\n, Module homomorphism with\nDomain: Vector space of dimension 2 over Rationals\nCodomain: Quotient space over:\nRationals with 1 generator and no relations\n)\n"
 },
 
 {
@@ -3701,7 +3757,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Quotient modules",
     "title": "Basic manipulation",
     "category": "section",
-    "text": "supermodule(M::AbstractAlgebra.Generic.QuotientModule{T}) where T <: RingElementExamplesM = FreeModule(ZZ, 2)\nm = M([ZZ(2), ZZ(3)])\nN, g = Submodule(M, [m])\nQ, h = QuotientModule(M, N)\n\nsupermodule(Q) == M"
+    "text": "supermodule(M::AbstractAlgebra.Generic.QuotientModule{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(2), ZZ(3)])\n(2, 3)\n\njulia> N, g = Submodule(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> Q, h = QuotientModule(M, N)\n(Quotient module over Integers with 2 generators and relations:\n[2 3], Module homomorphism with\nDomain: Free module of rank 2 over Integers\nCodomain: Quotient module over Integers with 2 generators and relations:\n[2 3])\n\njulia> supermodule(Q) == M\ntrue\n"
 },
 
 {
@@ -3709,7 +3765,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Homomorphisms",
     "title": "Module Homomorphisms",
     "category": "page",
-    "text": ""
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -3741,7 +3797,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Homomorphisms",
     "title": "Constructors",
     "category": "section",
-    "text": "Homomorphisms of AbstractAlgebra modules, f  R^s to R^t, can be represented by stimes t matrices over R.Generic.ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElementExamplesM = FreeModule(ZZ, 2)\nf = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))\n\nm = M([ZZ(1), ZZ(2)])\n\nf(m)"
+    "text": "Homomorphisms of AbstractAlgebra modules, f  R^s to R^t, can be represented by stimes t matrices over R.Generic.ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))\nModule homomorphism with\nDomain: Free module of rank 2 over Integers\nCodomain: Free module of rank 2 over Integers\n\njulia> m = M([ZZ(1), ZZ(2)])\n(1, 2)\n\njulia> f(m)\n(7, 10)\n"
 },
 
 {
@@ -3757,7 +3813,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Homomorphisms",
     "title": "Kernels",
     "category": "section",
-    "text": "kernel(f::Generic.ModuleHomomorphism{T}) where T <: RingElementExamplesM = FreeModule(ZZ, 3)\n\nm = M([ZZ(1), ZZ(2), ZZ(3)])\n\nS, f = Submodule(M, [m])\nQ, g = QuotientModule(M, S)\n\nkernel(g)"
+    "text": "kernel(f::Generic.ModuleHomomorphism{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 3)\nFree module of rank 3 over Integers\n\njulia> m = M([ZZ(1), ZZ(2), ZZ(3)])\n(1, 2, 3)\n\njulia> S, f = Submodule(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 3 over Integers)\n\njulia> Q, g = QuotientModule(M, S)\n(Quotient module over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Free module of rank 3 over Integers\nCodomain: Quotient module over Integers with 2 generators and no relations\n)\n\njulia> kernel(g)\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 3 over Integers)\n"
 },
 
 {
@@ -3781,7 +3837,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Matrix Interface",
     "category": "page",
-    "text": ""
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -3813,7 +3869,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Constructors",
     "category": "section",
-    "text": "In addition to the standard constructors, the following constructors, taking an array of elements, must be available.(S::MyMatSpace{T})(A::Array{T, 2}) where T <: AbstractAlgebra.RingElem\n(S::MyMatAlgebra{T})(A::Array{T, 2}) where T <: AbstractAlgebra.RingElemCreate the matrix in the given space/algebra whose (i j) entry is given by A[i, j].(S::MyMatSpace{T})(A::Array{S, 2}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}\n(S::MyMatAlgebra{T})(A::Array{S, 2}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}Create the matrix in the given space/algebra whose (i j) entry is given by A[i, j], where S is the type of elements that can be coerced into the base ring of the matrix.(S::MyMatSpace{T})(A::Array{S, 1}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}\n(S::MyMatAlgebra{T})(A::Array{S, 1}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}Create the matrix in the given space/algebra of matrices (with dimensions mtimes n say), whose (i j) entry is given by A[i*(n - 1) + j] and where S is the type of elements that can be coerced into the base ring of the matrix.ExamplesS = MatrixSpace(QQ, 2, 3)\nT = MatrixAlgebra(QQ, 2)\n\nM1 = S(Rational{BigInt}[2 3 1; 1 0 4])\nM2 = S(BigInt[2 3 1; 1 0 4])\nM3 = S(BigInt[2, 3, 1, 1, 0, 4])\n\nN1 = T(Rational{BigInt}[2 3; 1 0])\nN2 = T(BigInt[2 3; 1 0])\nN3 = T(BigInt[2, 3, 1, 1])It is also possible to create matrices (in a matrix space only) directly, without first creating the corresponding matrix space (the inner constructor being called directly). Note that to support this, matrix space parent objects don\'t contain a reference to their parent. Instead, parents are constructed on-the-fly if requested. (The same strategy is used for matrix algebras.)matrix(R::Ring, arr::Array{T, 2}) where T <: AbstractAlgebra.RingElemGiven an mtimes n Julia matrix of entries, construct the corresponding AbstractAlgebra.jl matrix over the given ring R, assuming all the entries can be coerced into R.matrix(R::Ring, r::Int, c::Int, A::Array{T, 1}) where T <: AbstractAlgebra.RingElemConstruct the given rtimes c AbstractAlgebra.jl matrix over the ring R whose (i j) entry is given by A[c*(i - 1) + j], assuming that all the entries can be coerced into R.zero_matrix(R::Ring, r::Int, c::Int)Construct the rtimes c AbstractAlgebra.jl zero matrix over the ring R.identity_matrix(R::Ring, n::Int)Construct the ntimes n AbstractAlgebra.jl identity matrix over the ring R.The following functions are available for matrices in both matrix algebras and matrix spaces.similar(x::MyMat{T}) where T <: AbstractAlgebra.RingElemConstruct the zero matrix with the same dimensions and base ring as the given matrix.similar(x::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElemConstruct the rtimes c zero matrix with the same base ring as the given matrix. If x belongs to a matrix algebra and r neq c, an exception is raised.ExamplesM = matrix(ZZ, BigInt[3 1 2; 2 0 1])\nN = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])\nP = zero_matrix(ZZ, 3, 2)\nQ = identity_matrix(ZZ, 4)\nC = similar(P)\nD = similar(Q, 4, 5)\n\nR = MatrixAlgebra(ZZ, 2)\nM = R()\nF = similar(M)"
+    "text": "In addition to the standard constructors, the following constructors, taking an array of elements, must be available.(S::MyMatSpace{T})(A::Array{T, 2}) where T <: AbstractAlgebra.RingElem\n(S::MyMatAlgebra{T})(A::Array{T, 2}) where T <: AbstractAlgebra.RingElemCreate the matrix in the given space/algebra whose (i j) entry is given by A[i, j].(S::MyMatSpace{T})(A::Array{S, 2}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}\n(S::MyMatAlgebra{T})(A::Array{S, 2}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}Create the matrix in the given space/algebra whose (i j) entry is given by A[i, j], where S is the type of elements that can be coerced into the base ring of the matrix.(S::MyMatSpace{T})(A::Array{S, 1}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}\n(S::MyMatAlgebra{T})(A::Array{S, 1}) where {S <: AbstractAlgebra.RingElem, T <: AbstractAlgebra.RingElem}Create the matrix in the given space/algebra of matrices (with dimensions mtimes n say), whose (i j) entry is given by A[i*(n - 1) + j] and where S is the type of elements that can be coerced into the base ring of the matrix.Examplesjulia> S = MatrixSpace(QQ, 2, 3)\nMatrix Space of 2 rows and 3 columns over Rationals\n\njulia> T = MatrixAlgebra(QQ, 2)\nMatrix Algebra of degree 2 over Rationals\n\njulia> M1 = S(Rational{BigInt}[2 3 1; 1 0 4])\n[2//1 3//1 1//1]\n[1//1 0//1 4//1]\n\njulia> M2 = S(BigInt[2 3 1; 1 0 4])\n[2//1 3//1 1//1]\n[1//1 0//1 4//1]\n\njulia> M3 = S(BigInt[2, 3, 1, 1, 0, 4])\n[2//1 3//1 1//1]\n[1//1 0//1 4//1]\n\njulia> N1 = T(Rational{BigInt}[2 3; 1 0])\n[2//1 3//1]\n[1//1 0//1]\n\njulia> N2 = T(BigInt[2 3; 1 0])\n[2//1 3//1]\n[1//1 0//1]\n\njulia> N3 = T(BigInt[2, 3, 1, 1])\n[2//1 3//1]\n[1//1 1//1]\nIt is also possible to create matrices (in a matrix space only) directly, without first creating the corresponding matrix space (the inner constructor being called directly). Note that to support this, matrix space parent objects don\'t contain a reference to their parent. Instead, parents are constructed on-the-fly if requested. (The same strategy is used for matrix algebras.)matrix(R::Ring, arr::Array{T, 2}) where T <: AbstractAlgebra.RingElemGiven an mtimes n Julia matrix of entries, construct the corresponding AbstractAlgebra.jl matrix over the given ring R, assuming all the entries can be coerced into R.matrix(R::Ring, r::Int, c::Int, A::Array{T, 1}) where T <: AbstractAlgebra.RingElemConstruct the given rtimes c AbstractAlgebra.jl matrix over the ring R whose (i j) entry is given by A[c*(i - 1) + j], assuming that all the entries can be coerced into R.zero_matrix(R::Ring, r::Int, c::Int)Construct the rtimes c AbstractAlgebra.jl zero matrix over the ring R.identity_matrix(R::Ring, n::Int)Construct the ntimes n AbstractAlgebra.jl identity matrix over the ring R.The following functions are available for matrices in both matrix algebras and matrix spaces.similar(x::MyMat{T}) where T <: AbstractAlgebra.RingElemConstruct the zero matrix with the same dimensions and base ring as the given matrix.similar(x::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElemConstruct the rtimes c zero matrix with the same base ring as the given matrix. If x belongs to a matrix algebra and r neq c, an exception is raised.Examplesjulia> M = matrix(ZZ, BigInt[3 1 2; 2 0 1])\n[3 1 2]\n[2 0 1]\n\njulia> N = matrix(ZZ, 3, 2, BigInt[3, 1, 2, 2, 0, 1])\n[3 1]\n[2 2]\n[0 1]\n\njulia> P = zero_matrix(ZZ, 3, 2)\n[0 0]\n[0 0]\n[0 0]\n\njulia> Q = identity_matrix(ZZ, 4)\n[1 0 0 0]\n[0 1 0 0]\n[0 0 1 0]\n[0 0 0 1]\n\njulia> C = similar(P)\n[0 0]\n[0 0]\n[0 0]\n\njulia> D = similar(Q, 4, 5)\n[0 0 0 0 0]\n[0 0 0 0 0]\n[0 0 0 0 0]\n[0 0 0 0 0]\n\njulia> R = MatrixAlgebra(ZZ, 2)\nMatrix Algebra of degree 2 over Integers\n\njulia> M = R()\n[0 0]\n[0 0]\n\njulia> F = similar(M)\n[0 0]\n[0 0]\n"
 },
 
 {
@@ -3829,7 +3885,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Basic manipulation of matrices",
     "category": "section",
-    "text": "dense_matrix_type(::Type{T}) where T <: AbstractAlgebra.RingElemReturns the type of dense matrices whose entries have the given type. E.g. in Nemo, which depends on AbstractAlgebra, we define dense_matrix_type(::Type{fmpz}) = fmpz_mat.nrows(f::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the number of rows of the given matrix.ncols(f::MyMat{T}) where T <: AbstractAlgebra.RingElemReturns the number of columns of the given matrix.getindex(M::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElemReturn the (i j)-th entry of the matrix M.setindex!(M::MyMat{T}, d::T, r::Int, c::Int) where T <: AbstractAlgebra.RingElemSet the (i j)-th entry of the matrix M to d, which is assumed to be in the base ring of the matrix. The matrix must have such an entry and the matrix is mutated in place and not returned from the function.ExamplesM = matrix(ZZ, BigInt[2 3 0; 1 1 1])\n\nm = nrows(M)\nn = ncols(M)\nM[1, 2] = BigInt(4)\nc = M[1, 1]"
+    "text": "dense_matrix_type(::Type{T}) where T <: AbstractAlgebra.RingElemReturns the type of dense matrices whose entries have the given type. E.g. in Nemo, which depends on AbstractAlgebra, we define dense_matrix_type(::Type{fmpz}) = fmpz_mat.nrows(f::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the number of rows of the given matrix.ncols(f::MyMat{T}) where T <: AbstractAlgebra.RingElemReturns the number of columns of the given matrix.getindex(M::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElemReturn the (i j)-th entry of the matrix M.setindex!(M::MyMat{T}, d::T, r::Int, c::Int) where T <: AbstractAlgebra.RingElemSet the (i j)-th entry of the matrix M to d, which is assumed to be in the base ring of the matrix. The matrix must have such an entry and the matrix is mutated in place and not returned from the function.Examplesjulia> M = matrix(ZZ, BigInt[2 3 0; 1 1 1])\n[2 3 0]\n[1 1 1]\n\njulia> m = nrows(M)\n2\n\njulia> n = ncols(M)\n3\n\njulia> M[1, 2] = BigInt(4)\n4\n\njulia> c = M[1, 1]\n2\n"
 },
 
 {
@@ -3837,7 +3893,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Transpose",
     "category": "section",
-    "text": "transpose(::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the transpose of the given matrix.The standard Julia tick notation can also be used for transposing a matrix.ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n\nB = transpose(A)\nC = A\'"
+    "text": "transpose(::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the transpose of the given matrix.The standard Julia tick notation can also be used for transposing a matrix.Examplesjulia> R, t = PolynomialRing(QQ, \"t\")\n(Univariate Polynomial Ring in t over Rationals, t)\n\njulia> S = MatrixSpace(R, 3, 3)\nMatrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals\n\njulia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n[t+1//1 t 1//1]\n[t^2 t t]\n[-2//1 t+2//1 t^2+t+1//1]\n\njulia> B = transpose(A)\n[t+1//1 t^2 -2//1]\n[t t t+2//1]\n[1//1 t t^2+t+1//1]\n\njulia> C = A\'\n[t+1//1 t^2 -2//1]\n[t t t+2//1]\n[1//1 t t^2+t+1//1]\n"
 },
 
 {
@@ -3853,7 +3909,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Optional submatrices",
     "category": "section",
-    "text": "The following are only available for matrix spaces, not for matrix algebras.sub(M::MyMat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: AbstractAlgebra.RingElemReturn a new matrix with the same entries as the submatrix with the given range of rows and columns.ExamplesM = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])\n\nN1 = M[1:2, :]\nN2 = M[:, :]\nN3 = M[2:3, 2:3]"
+    "text": "The following are only available for matrix spaces, not for matrix algebras.sub(M::MyMat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: AbstractAlgebra.RingElemReturn a new matrix with the same entries as the submatrix with the given range of rows and columns.Examplesjulia> M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])\n[1 2 3]\n[2 3 4]\n[3 4 5]\n\njulia> N1 = M[1:2, :]\n[1 2 3]\n[2 3 4]\n\njulia> N2 = M[:, :]\n[1 2 3]\n[2 3 4]\n[3 4 5]\n\njulia> N3 = M[2:3, 2:3]\n[3 4]\n[4 5]\n"
 },
 
 {
@@ -3861,7 +3917,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Optional row swapping",
     "category": "section",
-    "text": "swap_rows!(M::MyMat{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElemSwap the rows of M in place. The function returns the mutated matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).ExamplesM = identity_matrix(ZZ, 3)\n\nswap_rows!(M, 1, 2)"
+    "text": "swap_rows!(M::MyMat{T}, i::Int, j::Int) where T <: AbstractAlgebra.RingElemSwap the rows of M in place. The function returns the mutated matrix (since matrices are assumed to be mutable in AbstractAlgebra.jl).Examplesjulia> M = identity_matrix(ZZ, 3)\n[1 0 0]\n[0 1 0]\n[0 0 1]\n\njulia> swap_rows!(M, 1, 2)\n[0 1 0]\n[1 0 0]\n[0 0 1]\n"
 },
 
 {
@@ -3869,7 +3925,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Matrix Interface",
     "title": "Optional concatenation",
     "category": "section",
-    "text": "The following are only available for matrix spaces, not for matrix algebras.hcat(M::MyMat{T}, N::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the horizontal concatenation of M and N. It is assumed that the number of rows of M and N are the same.vcat(M::MyMat{T}, N::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the vertical concatenation of M and N. It is assumed that the number of columns of M and N are the same.ExamplesM = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])\nN = matrix(ZZ, BigInt[1 0 1; 0 1 0; 1 0 1])\n\nP = hcat(M, N)\nQ = vcat(M, N)"
+    "text": "The following are only available for matrix spaces, not for matrix algebras.hcat(M::MyMat{T}, N::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the horizontal concatenation of M and N. It is assumed that the number of rows of M and N are the same.vcat(M::MyMat{T}, N::MyMat{T}) where T <: AbstractAlgebra.RingElemReturn the vertical concatenation of M and N. It is assumed that the number of columns of M and N are the same.Examplesjulia> M = matrix(ZZ, BigInt[1 2 3; 2 3 4; 3 4 5])\n[1 2 3]\n[2 3 4]\n[3 4 5]\n\njulia> N = matrix(ZZ, BigInt[1 0 1; 0 1 0; 1 0 1])\n[1 0 1]\n[0 1 0]\n[1 0 1]\n\njulia> P = hcat(M, N)\n[1 2 3 1 0 1]\n[2 3 4 0 1 0]\n[3 4 5 1 0 1]\n\njulia> Q = vcat(M, N)\n[1 2 3]\n[2 3 4]\n[3 4 5]\n[1 0 1]\n[0 1 0]\n[1 0 1]\n"
 },
 
 {
@@ -3877,7 +3933,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Generic matrices",
     "category": "page",
-    "text": "CurrentModule = AbstractAlgebra"
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -3901,7 +3957,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Matrix space constructors",
     "category": "section",
-    "text": "A matrix space in AbstractAlgebra.jl represents a collection of all matrices with given dimensions and base ring.In order to construct matrices in AbstractAlgebra.jl, one can first construct the matrix space itself. This is accomplished with the following constructor. We discuss creation of matrix algebras separately in a dedicated section elsewhere in the documentation.MatrixSpace(R::Ring, rows::Int, cols::Int; cache::Bool=true)Construct the space of matrices with the given number of rows and columns over the given base ring. By default such matrix spaces are cached based on the base ring and numbers of rows and columns. If the optional named parameter cached is set to false, no caching occurs.Here are some examples of creating matrix spaces and making use of the resulting parent objects to coerce various elements into the matrix space.ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S()\nB = S(12)\nC = S(R(11))We also allow matrices over a given base ring to be constructed directly (see the Matrix interface)."
+    "text": "A matrix space in AbstractAlgebra.jl represents a collection of all matrices with given dimensions and base ring.In order to construct matrices in AbstractAlgebra.jl, one can first construct the matrix space itself. This is accomplished with the following constructor. We discuss creation of matrix algebras separately in a dedicated section elsewhere in the documentation.MatrixSpace(R::Ring, rows::Int, cols::Int; cache::Bool=true)Construct the space of matrices with the given number of rows and columns over the given base ring. By default such matrix spaces are cached based on the base ring and numbers of rows and columns. If the optional named parameter cached is set to false, no caching occurs.Here are some examples of creating matrix spaces and making use of the resulting parent objects to coerce various elements into the matrix space.Examplesjulia> R, t = PolynomialRing(QQ, \"t\")\n(Univariate Polynomial Ring in t over Rationals, t)\n\njulia> S = MatrixSpace(R, 3, 3)\nMatrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals\n\njulia> A = S()\n[0//1 0//1 0//1]\n[0//1 0//1 0//1]\n[0//1 0//1 0//1]\n\njulia> B = S(12)\n[12//1 0//1 0//1]\n[0//1 12//1 0//1]\n[0//1 0//1 12//1]\n\njulia> C = S(R(11))\n[11//1 0//1 0//1]\n[0//1 11//1 0//1]\n[0//1 0//1 11//1]\nWe also allow matrices over a given base ring to be constructed directly (see the Matrix interface)."
 },
 
 {
@@ -3909,7 +3965,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Matrix element constructors",
     "category": "section",
-    "text": "In addition to coercing elements into a matrix space as above, we provide the following functions for constructing explicit matrices.Also see the Matrix interface for a list of other ways to create matrices.R[a b c...;...]Create the matrix over the base ring R consisting of the given rows (separated by semicolons). Each entry is coerced into R  automatically. Note that parentheses may be placed around individual entries if the lists would otherwise be ambiguous, e.g.  R[1 2; 2 (-3)].Beware that this syntax does not support the creation of column vectors. See the notation below for creating those.R[a b c...]Create the row vector with entries in R consisting of the given entries (separated by spaces). Each entry is coerced into R automatically. Note that parentheses may be placed around individual entries if the list would otherwise be ambiguous, e.g. R[1 2 (-3)].R[a b c...]\'Create the column vector with entries in R consisting of the given entries (separated by spaces). Each entry is coerced into R automatically. Observe the dash that is used to transpose the row vector notation (for free) to turn it into a column vector. Note that parentheses may be placed around individual entries if the list would otherwise be ambiguous, e.g. R[1 2 (-3)]\'.ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nM = R[t + 1 1; t^2 0]\nN = R[t + 1 2 t]\nP = R[1 2 t]\'"
+    "text": "In addition to coercing elements into a matrix space as above, we provide the following functions for constructing explicit matrices.Also see the Matrix interface for a list of other ways to create matrices.R[a b c...;...]Create the matrix over the base ring R consisting of the given rows (separated by semicolons). Each entry is coerced into R  automatically. Note that parentheses may be placed around individual entries if the lists would otherwise be ambiguous, e.g.  R[1 2; 2 (-3)].Beware that this syntax does not support the creation of column vectors. See the notation below for creating those.R[a b c...]Create the row vector with entries in R consisting of the given entries (separated by spaces). Each entry is coerced into R automatically. Note that parentheses may be placed around individual entries if the list would otherwise be ambiguous, e.g. R[1 2 (-3)].R[a b c...]\'Create the column vector with entries in R consisting of the given entries (separated by spaces). Each entry is coerced into R automatically. Observe the dash that is used to transpose the row vector notation (for free) to turn it into a column vector. Note that parentheses may be placed around individual entries if the list would otherwise be ambiguous, e.g. R[1 2 (-3)]\'.Examplesjulia> R, t = PolynomialRing(QQ, \"t\")\n(Univariate Polynomial Ring in t over Rationals, t)\n\njulia> S = MatrixSpace(R, 3, 3)\nMatrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals\n\njulia> M = R[t + 1 1; t^2 0]\n[t+1//1 1//1]\n[t^2 0//1]\n\njulia> N = R[t + 1 2 t]\n[t+1//1 2//1 t]\n\njulia> P = R[1 2 t]\'\n[1//1]\n[2//1]\n[t]\n"
 },
 
 {
@@ -3925,7 +3981,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Submatrices",
     "category": "section",
-    "text": "In addition to the functionality described in the Matrix interface for taking submatrices of a matrix, the following function variant is also available.sub(::MatElem, ::Int, ::Int, ::Int, ::Int)ExamplesM = ZZ[1 2 3; 2 3 4]\n\nN = sub(M, 1, 1, 2, 2)"
+    "text": "In addition to the functionality described in the Matrix interface for taking submatrices of a matrix, the following function variant is also available.sub(::MatElem, ::Int, ::Int, ::Int, ::Int)Examplesjulia> M = ZZ[1 2 3; 2 3 4]\n[1 2 3]\n[2 3 4]\n\njulia> N = sub(M, 1, 1, 2, 2)\n[1 2]\n[2 3]\n"
 },
 
 {
@@ -3961,11 +4017,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix/#AbstractAlgebra.Generic.change_base_ring-Tuple{MatElem,AbstractAlgebra.Ring}",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.change_base_ring",
+    "category": "method",
+    "text": "change_base_ring(M::AbstractAlgebra.MatElem, R::AbstractAlgebra.Ring)\n\nReturn the matrix obtained by coercing each entry into R.\n\n\n\n"
+},
+
+{
     "location": "matrix/#Basic-matrix-functionality-1",
     "page": "Generic matrices",
     "title": "Basic matrix functionality",
     "category": "section",
-    "text": "As well as the Ring and Matrix interfaces, the following functions are provided to manipulate matrices and to set and retrieve entries and other basic data associated with the matrices.dense_matrix_type(::Ring)nrows(::MatElem)ncols(::MatElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\nB = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])\n\nT = dense_matrix_type(R)\nr = nrows(B)\nc = ncols(B)\nM = A + B\nN = 2 + A\nM1 = deepcopy(A)\nA != B\nisone(one(S)) == true\nV = A[1:2, :]\nW = A^3\nZ = divexact(2*A, 2)"
+    "text": "As well as the Ring and Matrix interfaces, the following functions are provided to manipulate matrices and to set and retrieve entries and other basic data associated with the matrices.dense_matrix_type(::Ring)nrows(::MatElem)ncols(::MatElem)change_base_ring(::AbstractAlgebra.MatElem, ::AbstractAlgebra.Ring)Examplesjulia> R, t = PolynomialRing(QQ, \"t\")\n(Univariate Polynomial Ring in t over Rationals, t)\n\njulia> S = MatrixSpace(R, 3, 3)\nMatrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals\n\njulia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n[t+1//1 t 1//1]\n[t^2 t t]\n[-2//1 t+2//1 t^2+t+1//1]\n\njulia> B = S([R(2) R(3) R(1); t t + 1 t + 2; R(-1) t^2 t^3])\n[2//1 3//1 1//1]\n[t t+1//1 t+2//1]\n[-1//1 t^2 t^3]\n\njulia> T = dense_matrix_type(R)\nAbstractAlgebra.Generic.MatSpaceElem{AbstractAlgebra.Generic.Poly{Rational{BigInt}}}\n\njulia> r = nrows(B)\n3\n\njulia> c = ncols(B)\n3\n\njulia> M = A + B\n[t+3//1 t+3//1 2//1]\n[t^2+t 2//1*t+1//1 2//1*t+2//1]\n[-3//1 t^2+t+2//1 t^3+t^2+t+1//1]\n\njulia> N = 2 + A\n[t+3//1 t 1//1]\n[t^2 t+2//1 t]\n[-2//1 t+2//1 t^2+t+3//1]\n\njulia> M1 = deepcopy(A)\n[t+1//1 t 1//1]\n[t^2 t t]\n[-2//1 t+2//1 t^2+t+1//1]\n\njulia> A != B\ntrue\n\njulia> isone(one(S))\ntrue\n\njulia> V = A[1:2, :]\n[t+1//1 t 1//1]\n[t^2 t t]\n\njulia> W = A^3\n[3//1*t^4+4//1*t^3+t^2-3//1*t-5//1 t^4+5//1*t^3+10//1*t^2+7//1*t+4//1 2//1*t^4+7//1*t^3+9//1*t^2+8//1*t+1//1]\n[t^5+4//1*t^4+3//1*t^3-7//1*t^2-4//1*t 4//1*t^4+8//1*t^3+7//1*t^2+2//1*t t^5+5//1*t^4+9//1*t^3+7//1*t^2-t]\n[t^5+3//1*t^4-10//1*t^2-16//1*t-2//1 t^5+6//1*t^4+12//1*t^3+11//1*t^2+5//1*t-2//1 t^6+3//1*t^5+8//1*t^4+15//1*t^3+10//1*t^2+t-5//1]\n\njulia> Z = divexact(2*A, 2)\n[t+1//1 t 1//1]\n[t^2 t t]\n[-2//1 t+2//1 t^2+t+1//1]\n"
 },
 
 {
@@ -3981,7 +4045,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Powering",
     "category": "section",
-    "text": "powers(::MatElem, ::Int)ExamplesM = ZZ[1 2 3; 2 3 4; 4 5 5]\n\nA = powers(M, 4)"
+    "text": "powers(::MatElem, ::Int)Examplesjulia> M = ZZ[1 2 3; 2 3 4; 4 5 5]\n[1 2 3]\n[2 3 4]\n[4 5 5]\n\njulia> A = powers(M, 4)\n5-element Array{AbstractAlgebra.Generic.MatSpaceElem{BigInt},1}:\n [1 0 0]\n[0 1 0]\n[0 0 1]\n [1 2 3]\n[2 3 4]\n[4 5 5]\n [17 23 26]\n[24 33 38]\n[34 48 57]\n [167 233 273]\n[242 337 394]\n[358 497 579]\n [1725 2398 2798]\n[2492 3465 4044]\n[3668 5102 5957]\n"
 },
 
 {
@@ -3997,7 +4061,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Gram matrix",
     "category": "section",
-    "text": "gram(::MatElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n\nB = gram(A)"
+    "text": "gram(::MatElem)Examplesjulia> R, t = PolynomialRing(QQ, \"t\")\n(Univariate Polynomial Ring in t over Rationals, t)\n\njulia> S = MatrixSpace(R, 3, 3)\nMatrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals\n\njulia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n[t+1//1 t 1//1]\n[t^2 t t]\n[-2//1 t+2//1 t^2+t+1//1]\n\njulia> B = gram(A)\n[2//1*t^2+2//1*t+2//1 t^3+2//1*t^2+t 2//1*t^2+t-1//1]\n[t^3+2//1*t^2+t t^4+2//1*t^2 t^3+3//1*t]\n[2//1*t^2+t-1//1 t^3+3//1*t t^4+2//1*t^3+4//1*t^2+6//1*t+9//1]\n"
 },
 
 {
@@ -4013,7 +4077,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Trace",
     "category": "section",
-    "text": "tr(::MatElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n\nb = tr(A)"
+    "text": "tr(::MatElem)Examplesjulia> R, t = PolynomialRing(QQ, \"t\")\n(Univariate Polynomial Ring in t over Rationals, t)\n\njulia> S = MatrixSpace(R, 3, 3)\nMatrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals\n\njulia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n[t+1//1 t 1//1]\n[t^2 t t]\n[-2//1 t+2//1 t^2+t+1//1]\n\njulia> b = tr(A)\nt^2+3//1*t+2//1\n"
 },
 
 {
@@ -4029,7 +4093,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Content",
     "category": "section",
-    "text": "content(::MatElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n\nb = content(A)"
+    "text": "content(::MatElem)Examplesjulia> R, t = PolynomialRing(QQ, \"t\")\n(Univariate Polynomial Ring in t over Rationals, t)\n\njulia> S = MatrixSpace(R, 3, 3)\nMatrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals\n\njulia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n[t+1//1 t 1//1]\n[t^2 t t]\n[-2//1 t+2//1 t^2+t+1//1]\n\njulia> b = content(A)\n1//1\n"
 },
 
 {
@@ -4045,7 +4109,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Permutation",
     "category": "section",
-    "text": "*(::perm, ::MatElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixSpace(R, 3, 3)\nG = PermGroup(3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\nP = G([1, 3, 2])\n\nB = P*A"
+    "text": "*(::perm, ::MatElem)Examplesjulia> R, t = PolynomialRing(QQ, \"t\")\n(Univariate Polynomial Ring in t over Rationals, t)\n\njulia> S = MatrixSpace(R, 3, 3)\nMatrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in t over Rationals\n\njulia> G = PermGroup(3)\nPermutation group over 3 elements\n\njulia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n[t+1//1 t 1//1]\n[t^2 t t]\n[-2//1 t+2//1 t^2+t+1//1]\n\njulia> P = G([1, 3, 2])\n(2,3)\n\njulia> B = P*A\n[t+1//1 t 1//1]\n[-2//1 t+2//1 t^2+t+1//1]\n[t^2 t t]\n"
 },
 
 {
@@ -4069,7 +4133,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "LU factorisation",
     "category": "section",
-    "text": "lu{T <: FieldElem}(::MatElem{T}, ::PermGroup)fflu{T <: RingElem}(::MatElem{T}, ::PermGroup)ExamplesR, x = PolynomialRing(QQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\n\nA = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 - 2 a - 1 2a])\n\nr, P, L, U = lu(A)\nr, d, P, L, U = fflu(A)"
+    "text": "lu{T <: FieldElem}(::MatElem{T}, ::PermGroup)fflu{T <: RingElem}(::MatElem{T}, ::PermGroup)Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> K, a = NumberField(x^3 + 3x + 1, \"a\")\n(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1, x)\n\njulia> S = MatrixSpace(K, 3, 3)\nMatrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 - 2 a - 1 2a])\n[0//1 2//1*x+3//1 x^2+1//1]\n[x^2-2//1 x-1//1 2//1*x]\n[x^2-2//1 x-1//1 2//1*x]\n\njulia> r, P, L, U = lu(A)\n(2, (1,2), [1//1 0//1 0//1]\n[0//1 1//1 0//1]\n[1//1 0//1 1//1], [x^2-2//1 x-1//1 2//1*x]\n[0//1 2//1*x+3//1 x^2+1//1]\n[0//1 0//1 0//1])\n\njulia> r, d, P, L, U = fflu(A)\n(2, 3//1*x^2-10//1*x-8//1, (1,2), [x^2-2//1 0//1 0//1]\n[0//1 3//1*x^2-10//1*x-8//1 0//1]\n[x^2-2//1 0//1 1//1], [x^2-2//1 x-1//1 2//1*x]\n[0//1 3//1*x^2-10//1*x-8//1 -4//1*x^2-x-2//1]\n[0//1 0//1 0//1])\n"
 },
 
 {
@@ -4109,7 +4173,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Reduced row-echelon form",
     "category": "section",
-    "text": "rref{T <: RingElem}(::MatElem{T})\nrref{T <: FieldElem}(::MatElem{T})isrref{T <: RingElem}(::MatElem{T})\nisrref{T <: FieldElem}(::MatElem{T})ExamplesR, x = PolynomialRing(QQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\n   \nM = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n   \nr, A = rref(M)\nisrref(A)\n\nR, x = PolynomialRing(ZZ, \"x\")\nS = MatrixSpace(R, 3, 3)\n\nM = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])\n\nr, d, A = rref(M)\nisrref(A)"
+    "text": "rref{T <: RingElem}(::MatElem{T})\nrref{T <: FieldElem}(::MatElem{T})isrref{T <: RingElem}(::MatElem{T})\nisrref{T <: FieldElem}(::MatElem{T})Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> K, a = NumberField(x^3 + 3x + 1, \"a\")\n(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1, x)\n\njulia> S = MatrixSpace(K, 3, 3)\nMatrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> M = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n[0//1 2//1*x+3//1 x^2+1//1]\n[x^2-2//1 x-1//1 2//1*x]\n[x^2+3//1*x+1//1 2//1*x 1//1]\n\njulia> r, A = rref(M)\n(3, [1//1 0//1 0//1]\n[0//1 1//1 0//1]\n[0//1 0//1 1//1])\n\njulia> isrref(A)\ntrue\n\njulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S = MatrixSpace(R, 3, 3)\nMatrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in x over Integers\n\njulia> M = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])\n[0 2*x+3 x^2+1]\n[x^2-2 x-1 2*x]\n[x^2+3*x+1 2*x 1]\n\njulia> r, d, A = rref(M)\n(3, -x^5-2*x^4-15*x^3-18*x^2-8*x-7, [-x^5-2*x^4-15*x^3-18*x^2-8*x-7 0 0]\n[0 -x^5-2*x^4-15*x^3-18*x^2-8*x-7 0]\n[0 0 -x^5-2*x^4-15*x^3-18*x^2-8*x-7])\n\njulia> isrref(A)\ntrue"
 },
 
 {
@@ -4165,7 +4229,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Determinant",
     "category": "section",
-    "text": "det{T <: RingElem}(::MatElem{T})\ndet{T <: FieldElem}(::MatElem{T})ExamplesR, x = PolynomialRing(QQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\n   \nA = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n\nd = det(A)"
+    "text": "det{T <: RingElem}(::MatElem{T})\ndet{T <: FieldElem}(::MatElem{T})Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> K, a = NumberField(x^3 + 3x + 1, \"a\")\n(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1, x)\n\njulia> S = MatrixSpace(K, 3, 3)\nMatrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n[0//1 2//1*x+3//1 x^2+1//1]\n[x^2-2//1 x-1//1 2//1*x]\n[x^2+3//1*x+1//1 2//1*x 1//1]\n\njulia> d = det(A)\n11//1*x^2-30//1*x-5//1\n"
 },
 
 {
@@ -4189,7 +4253,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Rank",
     "category": "section",
-    "text": "rank{T <: RingElem}(::MatElem{T})\nrank{T <: FieldElem}(::MatElem{T})ExamplesR, x = PolynomialRing(QQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\n   \nA = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n\nd = rank(A)"
+    "text": "rank{T <: RingElem}(::MatElem{T})\nrank{T <: FieldElem}(::MatElem{T})Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> K, a = NumberField(x^3 + 3x + 1, \"a\")\n(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1, x)\n\njulia> S = MatrixSpace(K, 3, 3)\nMatrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n[0//1 2//1*x+3//1 x^2+1//1]\n[x^2-2//1 x-1//1 2//1*x]\n[x^2+3//1*x+1//1 2//1*x 1//1]\n\njulia> d = rank(A)\n3\n"
 },
 
 {
@@ -4229,7 +4293,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Linear solving",
     "category": "section",
-    "text": "solve{T <: FieldElem}(::MatElem{T}, ::MatElem{T})solve_rational{T <: RingElem}(::MatElem{T}, ::MatElem{T})solve_triu{T <: FieldElem}(::MatElem{T}, ::MatElem{T}, ::Bool)can_solve_left_reduced_triu{T <: RingElement}(::MatElem{T}, ::MatElem{T})ExamplesR, x = PolynomialRing(QQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\nU = MatrixSpace(K, 3, 1)\n\nA = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\nb = U([2a a + 1 (-a - 1)]\')\n\nx = solve(A, b)\n\nA = S([a + 1 2a + 3 a^2 + 1; K(0) a^2 - 1 2a; K(0) K(0) a])\nb = U([2a a + 1 (-a - 1)]\')\n\nx = solve_triu(A, b, false)\n\nR, x = PolynomialRing(ZZ, \"x\")\nS = MatrixSpace(R, 3, 3)\nU = MatrixSpace(R, 3, 2)\n\nA = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])\nb = U([2x x + 1 (-x - 1); x + 1 (-x) x^2]\')\n\nx, d = solve_rational(A, b)\n\nS = MatrixSpace(ZZ, 3, 3)\nT = MatrixSpace(ZZ, 3, 1)\n\nA = S([BigInt(2) 3 5; 1 4 7; 9 2 2])   \nB = T([BigInt(4), 5, 7])\n\nX, d = solve_rational(A, B)"
+    "text": "solve{T <: FieldElem}(::MatElem{T}, ::MatElem{T})solve_rational{T <: RingElem}(::MatElem{T}, ::MatElem{T})solve_triu{T <: FieldElem}(::MatElem{T}, ::MatElem{T}, ::Bool)can_solve_left_reduced_triu{T <: RingElement}(::MatElem{T}, ::MatElem{T})Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> K, a = NumberField(x^3 + 3x + 1, \"a\")\n(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1, x)\n\njulia> S = MatrixSpace(K, 3, 3)\nMatrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> U = MatrixSpace(K, 3, 1)\nMatrix Space of 3 rows and 1 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n[0//1 2//1*x+3//1 x^2+1//1]\n[x^2-2//1 x-1//1 2//1*x]\n[x^2+3//1*x+1//1 2//1*x 1//1]\n\njulia> b = U([2a a + 1 (-a - 1)]\')\n[2//1*x]\n[x+1//1]\n[-x-1//1]\n\njulia> x = solve(A, b)\n[1984//7817*x^2+1573//7817*x-937//7817]\n[-2085//7817*x^2+1692//7817*x+965//7817]\n[-3198//7817*x^2+3540//7817*x-3525//7817]\n\njulia> A = S([a + 1 2a + 3 a^2 + 1; K(0) a^2 - 1 2a; K(0) K(0) a])\n[x+1//1 2//1*x+3//1 x^2+1//1]\n[0//1 x^2-1//1 2//1*x]\n[0//1 0//1 x]\n\njulia> bb = U([2a a + 1 (-a - 1)]\')\n[2//1*x]\n[x+1//1]\n[-x-1//1]\n\njulia> x = solve_triu(A, bb, false)\n[1//3*x^2+8//3*x+13//3]\n[-3//5*x^2-3//5*x-12//5]\n[x^2+2//1]\n\njulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S = MatrixSpace(R, 3, 3)\nMatrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in x over Integers\n\njulia> U = MatrixSpace(R, 3, 2)\nMatrix Space of 3 rows and 2 columns over Univariate Polynomial Ring in x over Integers\n\njulia> A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])\n[0 2*x+3 x^2+1]\n[x^2-2 x-1 2*x]\n[x^2+3*x+1 2*x 1]\n\njulia> bbb = U([2x x + 1 (-x - 1); x + 1 (-x) x^2]\')\n[2*x x+1]\n[x+1 -x]\n[-x-1 x^2]\n\njulia> x, d = solve_rational(A, bbb)\n([3*x^4-10*x^3-8*x^2-11*x-4 -x^5+3*x^4+x^3-2*x^2+3*x-1]\n[-2*x^5-x^4+6*x^3+2*x+1 x^6+x^5+4*x^4+9*x^3+8*x^2+5*x+2]\n[6*x^4+12*x^3+15*x^2+6*x-3 -2*x^5-4*x^4-6*x^3-9*x^2-4*x+1], x^5+2*x^4+15*x^3+18*x^2+8*x+7)\n\njulia> S = MatrixSpace(ZZ, 3, 3)\nMatrix Space of 3 rows and 3 columns over Integers\n\njulia> T = MatrixSpace(ZZ, 3, 1)\nMatrix Space of 3 rows and 1 columns over Integers\n\njulia> A = S([BigInt(2) 3 5; 1 4 7; 9 2 2])\n[2 3 5]\n[1 4 7]\n[9 2 2]   \n\njulia> B = T([BigInt(4), 5, 7])\n[4]\n[5]\n[7]"
 },
 
 {
@@ -4253,7 +4317,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Inverse",
     "category": "section",
-    "text": "inv{T <: RingElem}(::MatElem{T})\ninv{T <: FieldElem}(::MatElem{T})ExamplesR, x = PolynomialRing(QQ, \"x\")\nK, a = NumberField(x^3 + 3x + 1, \"a\")\nS = MatrixSpace(K, 3, 3)\n\nA = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n\nX = inv(A)\n\nR, x = PolynomialRing(ZZ, \"x\")\nS = MatrixSpace(R, 3, 3)\n\nA = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])\n    \nX, d = inv(A)"
+    "text": "inv{T <: RingElem}(::MatElem{T})\ninv{T <: FieldElem}(::MatElem{T})Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> K, a = NumberField(x^3 + 3x + 1, \"a\")\n(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1, x)\n\njulia> S = MatrixSpace(K, 3, 3)\nMatrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n[0//1 2//1*x+3//1 x^2+1//1]\n[x^2-2//1 x-1//1 2//1*x]\n[x^2+3//1*x+1//1 2//1*x 1//1]\n\njulia> X = inv(A)\n[-343//7817*x^2+717//7817*x-2072//7817 -4964//23451*x^2+2195//23451*x-11162//23451 -232//23451*x^2-4187//23451*x-1561//23451]\n[128//7817*x^2-655//7817*x+2209//7817 599//23451*x^2-2027//23451*x-1327//23451 -1805//23451*x^2+2702//23451*x-7394//23451]\n[545//7817*x^2+570//7817*x+2016//7817 -1297//23451*x^2-5516//23451*x-337//23451 8254//23451*x^2-2053//23451*x+16519//23451]\n\njulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S = MatrixSpace(R, 3, 3)\nMatrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in x over Integers\n\njulia> A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])\n[0 2*x+3 x^2+1]\n[x^2-2 x-1 2*x]\n[x^2+3*x+1 2*x 1]\n\njulia> X, d = pseudo_inv(A)\n([4*x^2-x+1 -2*x^3+3 x^3-5*x^2-5*x-1]\n[-2*x^3-5*x^2-2*x-2 x^4+3*x^3+2*x^2+3*x+1 -x^4+x^2+2]\n[-x^3+2*x^2+2*x-1 -2*x^3-9*x^2-11*x-3 2*x^3+3*x^2-4*x-6], -x^5-2*x^4-15*x^3-18*x^2-8*x-7)\n"
 },
 
 {
@@ -4277,7 +4341,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Nullspace",
     "category": "section",
-    "text": "nullspace{T <: RingElem}(::MatElem{T})\nnullspace{T <: FieldElem}(::MatElem{T})ExamplesR, x = PolynomialRing(ZZ, \"x\")\nS = MatrixSpace(R, 4, 4)\n   \nM = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;\n       -8*x^2+8*x+16 -16*x^2+38*x-20 90*x^2-82*x-44 60*x^2+54*x-34;\n       -4*x^2+4*x+8 -8*x^2+13*x-10 35*x^2-31*x-14 22*x^2+21*x-15;\n       -10*x^2+10*x+20 -20*x^2+70*x-25 150*x^2-140*x-85 105*x^2+90*x-50])\n   \nn, N = nullspace(M)"
+    "text": "nullspace{T <: RingElem}(::MatElem{T})\nnullspace{T <: FieldElem}(::MatElem{T})Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S = MatrixSpace(R, 4, 4)\nMatrix Space of 4 rows and 4 columns over Univariate Polynomial Ring in x over Integers\n\njulia> M = S([-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9;\n              -8*x^2+8*x+16 -16*x^2+38*x-20 90*x^2-82*x-44 60*x^2+54*x-34;\n              -4*x^2+4*x+8 -8*x^2+13*x-10 35*x^2-31*x-14 22*x^2+21*x-15;\n              -10*x^2+10*x+20 -20*x^2+70*x-25 150*x^2-140*x-85 105*x^2+90*x-50])\n[-6*x^2+6*x+12 -12*x^2-21*x-15 -15*x^2+21*x+33 -21*x^2-9*x-9]\n[-8*x^2+8*x+16 -16*x^2+38*x-20 90*x^2-82*x-44 60*x^2+54*x-34]\n[-4*x^2+4*x+8 -8*x^2+13*x-10 35*x^2-31*x-14 22*x^2+21*x-15]\n[-10*x^2+10*x+20 -20*x^2+70*x-25 150*x^2-140*x-85 105*x^2+90*x-50]\n\njulia> n, N = nullspace(M)\n(2, [1320*x^4-330*x^2-1320*x-1320 1056*x^4+1254*x^3+1848*x^2-66*x-330]\n[-660*x^4+1320*x^3+1188*x^2-1848*x-1056 -528*x^4+132*x^3+1584*x^2+660*x-264]\n[396*x^3-396*x^2-792*x 0]\n[0 396*x^3-396*x^2-792*x])"
 },
 
 {
@@ -4309,7 +4373,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Kernel",
     "category": "section",
-    "text": "kernel{T <: RingElem}(::MatElem{T})\nleft_kernel{T <: RingElem}(::MatElem{T})\nright_kernel{T <: RingElem}(::MatElem{T})ExamplesS = MatrixSpace(ZZ, 4, 4)\n\nM = S([1 2 0 4;\n       2 0 1 1;\n       0 1 1 -1;\n       2 -1 0 2])\n\nnr, Nr = kernel(M)\nnl, Nl = left_kernel(M)"
+    "text": "kernel{T <: RingElem}(::MatElem{T})\nleft_kernel{T <: RingElem}(::MatElem{T})\nright_kernel{T <: RingElem}(::MatElem{T})Examplesjulia> S = MatrixSpace(ZZ, 4, 4)\nMatrix Space of 4 rows and 4 columns over Integers\n\njulia> M = S([1 2 0 4;\n              2 0 1 1;\n              0 1 1 -1;\n              2 -1 0 2])\n[1 2 0 4]\n[2 0 1 1]\n[0 1 1 -1]\n[2 -1 0 2]\n\njulia> nr, Nr = kernel(M)\n(1, [-8]\n[-6]\n[11]\n[5])\n\njulia> nl, Nl = left_kernel(M)\n(1, [0 -1 1 1])\n"
 },
 
 {
@@ -4333,7 +4397,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Hessenberg form",
     "category": "section",
-    "text": "hessenberg{T <: RingElem}(::MatElem{T})ishessenberg{T <: RingElem}(::MatElem{T})ExamplesR = ResidueRing(ZZ, 7)\nS = MatrixSpace(R, 4, 4)\n   \nM = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);\n       R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])\n   \nA = hessenberg(M)\nishessenberg(A) == true"
+    "text": "hessenberg{T <: RingElem}(::MatElem{T})ishessenberg{T <: RingElem}(::MatElem{T})Examplesjulia> R = ResidueRing(ZZ, 7)\nResidue ring of Integers modulo 7\n\njulia> S = MatrixSpace(R, 4, 4)\nMatrix Space of 4 rows and 4 columns over Residue ring of Integers modulo 7\n\njulia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);\n              R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])\n[1 2 4 3]\n[2 5 1 0]\n[6 1 3 2]\n[1 1 3 5]\n\njulia> A = hessenberg(M)\n[1 5 5 3]\n[2 1 1 0]\n[0 1 3 2]\n[0 0 2 2]\n\njulia> ishessenberg(A)\ntrue\n"
 },
 
 {
@@ -4349,7 +4413,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Characteristic polynomial",
     "category": "section",
-    "text": "charpoly{T <: RingElem}(::Ring, ::MatElem{T})ExamplesR = ResidueRing(ZZ, 7)\nS = MatrixSpace(R, 4, 4)\nT, x = PolynomialRing(R, \"x\")\n\nM = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);\n       R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])\n   \nA = charpoly(T, M)"
+    "text": "charpoly{T <: RingElem}(::Ring, ::MatElem{T})Examplesjulia> R = ResidueRing(ZZ, 7)\nResidue ring of Integers modulo 7\n\njulia> S = MatrixSpace(R, 4, 4)\nMatrix Space of 4 rows and 4 columns over Residue ring of Integers modulo 7\n\njulia> T, x = PolynomialRing(R, \"x\")\n(Univariate Polynomial Ring in x over Residue ring of Integers modulo 7, x)\n\njulia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);\n              R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])\n[1 2 4 3]\n[2 5 1 0]\n[6 1 3 2]\n[1 1 3 5]\n\njulia> A = charpoly(T, M)\nx^4+2*x^2+6*x+2\n"
 },
 
 {
@@ -4373,7 +4437,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Minimal polynomial",
     "category": "section",
-    "text": "minpoly{T <: RingElem}(::Ring, ::MatElem{T}, ::Bool)\nminpoly{T <: FieldElem}(::Ring, ::MatElem{T}, ::Bool)ExamplesR = GF(13)\nT, y = PolynomialRing(R, \"y\")\n   \nM = R[7 6 1;\n      7 7 5;\n      8 12 5]\n\nA = minpoly(T, M)"
+    "text": "minpoly{T <: RingElem}(::Ring, ::MatElem{T}, ::Bool)\nminpoly{T <: FieldElem}(::Ring, ::MatElem{T}, ::Bool)Examplesjulia> R = GF(13)\nFinite field F_13\n\njulia> T, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Finite field F_13, y)\n\njulia> M = R[7 6 1;\n             7 7 5;\n             8 12 5]\n[7 6 1]\n[7 7 5]\n[8 12 5]\n\njulia> A = minpoly(T, M)\ny^2+10*y\n"
 },
 
 {
@@ -4389,7 +4453,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Transforms",
     "category": "section",
-    "text": "similarity!{T <: RingElem}(::MatElem{T}, ::Int, ::T)ExamplesR = ResidueRing(ZZ, 7)\nS = MatrixSpace(R, 4, 4)\n   \nM = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);\n       R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])\n   \nsimilarity!(M, 1, R(3))"
+    "text": "similarity!{T <: RingElem}(::MatElem{T}, ::Int, ::T)Examplesjulia> R = ResidueRing(ZZ, 7)\nResidue ring of Integers modulo 7\n\njulia> S = MatrixSpace(R, 4, 4)\nMatrix Space of 4 rows and 4 columns over Residue ring of Integers modulo 7\n\njulia> M = S([R(1) R(2) R(4) R(3); R(2) R(5) R(1) R(0);\n              R(6) R(1) R(3) R(2); R(1) R(1) R(3) R(5)])\n[1 2 4 3]\n[2 5 1 0]\n[6 1 3 2]\n[1 1 3 5]\n\njulia> similarity!(M, 1, R(3))\n"
 },
 
 {
@@ -4437,7 +4501,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrix algebras",
     "title": "Generic matrix algebras",
     "category": "page",
-    "text": "CurrentModule = AbstractAlgebra"
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -4461,7 +4525,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrix algebras",
     "title": "Matrix space constructors",
     "category": "section",
-    "text": "A matrix algebra in AbstractAlgebra.jl represents a collection of all matrices with given degree and base ring.In order to construct matrices in AbstractAlgebra.jl, one must construct the matrix algebra itself. This is accomplished with the following constructor.MatrixAlgebra(R::Ring, degree::Int; cache::Bool=true)Construct the algebra of matrices with the given degree over the given base ring. By default such matrix spaces are cached based on the base ring and degree. If the optional named parameter cached is set to false, no caching occurs.Here are some examples of creating matrix algebras and making use of the resulting parent objects to coerce various elements into the matrix algebra.ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixAlgebra(R, 3)\n\nA = S()\nB = S(12)\nC = S(R(11))"
+    "text": "A matrix algebra in AbstractAlgebra.jl represents a collection of all matrices with given degree and base ring.In order to construct matrices in AbstractAlgebra.jl, one must construct the matrix algebra itself. This is accomplished with the following constructor.MatrixAlgebra(R::Ring, degree::Int; cache::Bool=true)Construct the algebra of matrices with the given degree over the given base ring. By default such matrix spaces are cached based on the base ring and degree. If the optional named parameter cached is set to false, no caching occurs.Here are some examples of creating matrix algebras and making use of the resulting parent objects to coerce various elements into the matrix algebra.Examplesjulia> R, t = PolynomialRing(QQ, \"t\")\n(Univariate Polynomial Ring in t over Rationals, t)\n\njulia> S = MatrixAlgebra(R, 3)\nMatrix Algebra of degree 3 over Univariate Polynomial Ring in t over Rationals\n\njulia> A = S()\n[0//1 0//1 0//1]\n[0//1 0//1 0//1]\n[0//1 0//1 0//1]\n\njulia> B = S(12)\n[12//1 0//1 0//1]\n[0//1 12//1 0//1]\n[0//1 0//1 12//1]\n\njulia> C = S(R(11))\n[11//1 0//1 0//1]\n[0//1 11//1 0//1]\n[0//1 0//1 11//1]\n"
 },
 
 {
@@ -4485,7 +4549,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrix algebras",
     "title": "Basic matrix functionality",
     "category": "section",
-    "text": "As well as the Ring and Matrix interfaces, the following functions are provided to manipulate matrices.degree(::Generic.MatAlgElem)ExamplesR, t = PolynomialRing(QQ, \"t\")\nS = MatrixAlgebra(R, 3)\n\nA = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n\nn = degree(A)"
+    "text": "As well as the Ring and Matrix interfaces, the following functions are provided to manipulate matrices.degree(::Generic.MatAlgElem)Examplesjulia> R, t = PolynomialRing(QQ, \"t\")\n(Univariate Polynomial Ring in t over Rationals, t)\n\njulia> S = MatrixAlgebra(R, 3)\nMatrix Algebra of degree 3 over Univariate Polynomial Ring in t over Rationals\n\njulia> A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])\n[t+1//1 t 1//1]\n[t^2 t t]\n[-2//1 t+2//1 t^2+t+1//1]\n\njulia> n = degree(A)\n3\n"
 },
 
 {
@@ -4501,7 +4565,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Map interface",
     "title": "Map interface",
     "category": "section",
-    "text": "Maps in Nemo model maps on sets f  D to C for some domain D and codomain C, which have no real limitations except that elements of the codomain and domain be represented by element objects in the system..Maps f  D to C in AbstractAlgebra are modeled by Julia objects that are able to be called on a single element c in C of the domain to yield an element f(c) of the codomain. We say that the map is being applied.Maps can be constructed from Julia functions, or they can be represented by some other kind of data, e.g. a matrix, or built up from other maps.In the following, we will always use the word \"function\" to mean a Julia function, and reserve the word \"map\" for a map on sets, whether mathematically, or as an object in the system..Maps in AbstractAlgebra have a domain and codomain, can be applied, composed and composed with the identity map (assuming its domain is compatible). Various special kinds of map provide more functionality."
+    "text": "Maps in Nemo model maps on sets f  D to C for some domain D and codomain C, which have no real limitations except that elements of the codomain and domain be represented by element objects in the system..Maps f  D to C in AbstractAlgebra are modeled by Julia objects that are able to be called on a single element d in D of the domain to yield an element f(d) in C of the codomain. We say that the map is being applied.Maps can be constructed from Julia functions, or they can be represented by some other kind of data, e.g. a matrix, or built up from other maps.In the following, we will always use the word \"function\" to mean a Julia function, and reserve the word \"map\" for a map on sets, whether mathematically, or as an object in the system..Maps in AbstractAlgebra have a domain and codomain, can be applied, composed and composed with the identity map (assuming its domain is compatible). Various special kinds of map provide more functionality."
 },
 
 {
@@ -4533,7 +4597,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Map interface",
     "title": "Getters and setters",
     "category": "section",
-    "text": "When writing new map types, it is very important to define getters and setters of the fields of the new map type, rather than to access them directly.Let us suppose that the MyMap type has a field called foo. Rather than access this field by writing M.foo, one must access it using foo(M) (at least until Julia 1.1).If such a getter only needs to access the field foo of M, there is a standard way of defining such a getter and setter when defining a new map type.foo(M::Map(MyMap)) = get_field(M, :foo)To set a field of a map, one needs a setter, which can be implemented as follows:set_foo!(M::Map(MyMap), a) = set_field(M, :foo, a)In general, setters should be used rarely for map types.Note that by providing getter and setter functions, map types need not even contain fields with the given name. For example, for a MyMap map type for maps between integers, one does not wish to explicitly store the domain and codomain in MyMap. Instead, we can define the getter functions domain and codomain to return JuliaZZ for any MyMap object. domain(M::Map(MyMap)) = JuliaZZ\ncodomain(M::Map(MyMap)) = JuliaZZ"
+    "text": "When writing new map types, it is very important to define getters and setters of the fields of the new map type, rather than to access them directly.Let us suppose that the MyMap type has a field called foo. Rather than access this field by writing M.foo, one must access it using foo(M) (at least until Julia 1.1).If such a getter only needs to access the field foo of M, there is a standard way of defining such a getter and setter when defining a new map type.foo(M::Map(MyMap)) = get_field(M, :foo)To set a field of a map, one needs a setter, which can be implemented as follows:set_foo!(M::Map(MyMap), a) = set_field(M, :foo, a)In general, setters should be used rarely for map types.Note that by providing getter and setter functions, map types need not even contain fields with the given name. For example, for a MyMap map type for maps between integers, one does not wish to explicitly store the domain and codomain in MyMap. Instead, we can define the getter functions domain and codomain to return JuliaZZ for any MyMap object.domain(M::Map(MyMap)) = JuliaZZ\ncodomain(M::Map(MyMap)) = JuliaZZ"
 },
 
 {
@@ -4581,7 +4645,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functional maps",
     "title": "Functional maps",
     "category": "page",
-    "text": ""
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -4613,7 +4677,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Functional maps",
     "title": "Generic functional maps",
     "category": "section",
-    "text": "The Generic module provides a concrete type FunctionalMap which merely keeps track of a Julia function/closure implementing the map.Such maps can be constructed using the following function:map_from_func(R, S, f::Function)Construct the generic functional map with domain and codomain given by the parent objects R and S corresponding to the Julia function f.Examplesf = map_from_func(ZZ, ZZ, x -> x + 1)\n\nf(ZZ(2))"
+    "text": "The Generic module provides a concrete type FunctionalMap which merely keeps track of a Julia function/closure implementing the map.Such maps can be constructed using the following function:map_from_func(R, S, f::Function)Construct the generic functional map with domain and codomain given by the parent objects R and S corresponding to the Julia function f.Examplesjulia> f = map_from_func(ZZ, ZZ, x -> x + 1)\nMap with the following data\n\nDomain:\n=======\nIntegers\n\nCodomain:\n========\nIntegers\n\n\njulia> f(ZZ(2))\n3\n"
 },
 
 {
@@ -4621,7 +4685,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Cached maps",
     "title": "Cached maps",
     "category": "page",
-    "text": ""
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -4637,7 +4701,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Cached maps",
     "title": "Cached map constructors",
     "category": "section",
-    "text": "To construct a cached map from an existing map object, we have the following function:cached(M::Map; enabled=true, limit=100)Return a cached map with the same supertype as M, caching up to limit values of the map M in a dictionary, assuming that the cache is enabled.Caches can be disabled by setting the value of the parameter enabled to false. This allows for the user to quickly go through code and completely disable caches of maps that were previously enabled, for testing purposes, etc.Caches can also be turned on and off at run time (see below).Examplesf = map_from_func(ZZ, ZZ, x -> x + 1)\ng = cached(f)\n\nf(ZZ(1)) == g(ZZ(1))"
+    "text": "To construct a cached map from an existing map object, we have the following function:cached(M::Map; enabled=true, limit=100)Return a cached map with the same supertype as M, caching up to limit values of the map M in a dictionary, assuming that the cache is enabled.Caches can be disabled by setting the value of the parameter enabled to false. This allows for the user to quickly go through code and completely disable caches of maps that were previously enabled, for testing purposes, etc.Caches can also be turned on and off at run time (see below).Examplesjulia> f = map_from_func(ZZ, ZZ, x -> x + 1)\nMap with the following data\n\nDomain:\n=======\nIntegers\n\nCodomain:\n========\nIntegers\n\n\njulia> g = cached(f)\n\njulia> f(ZZ(1)) == g(ZZ(1))\ntrue\n"
 },
 
 {
@@ -4645,7 +4709,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Cached maps",
     "title": "Functionality for cached maps",
     "category": "section",
-    "text": "The following functions are provided for cached maps.enable_cache!(M::MapCache)\ndisable_cache!(M::MapCache)Temporarily enable or disable the cache for the given map. The values stored in the cache are not lost when it is disabled.set_limit!(M::MapCache, limit::Int)Set the limit on the number of values that can be cached in the dictionary, to the given value. Setting the value to 0 will effectively disable further caching for this map.Examplesf = cached(map_from_func(ZZ, ZZ, x -> x + 1))\n\na = f(ZZ(1))\ndisable_cache!(f)\nb = f(ZZ(1))\nenable_cache!(f)\nc = f(ZZ(1))\n\nset_limit!(f, 200)\nd = f(ZZ(1))"
+    "text": "The following functions are provided for cached maps.enable_cache!(M::MapCache)\ndisable_cache!(M::MapCache)Temporarily enable or disable the cache for the given map. The values stored in the cache are not lost when it is disabled.set_limit!(M::MapCache, limit::Int)Set the limit on the number of values that can be cached in the dictionary, to the given value. Setting the value to 0 will effectively disable further caching for this map.Examplesjulia> f = cached(map_from_func(ZZ, ZZ, x -> x + 1))\n\njulia> a = f(ZZ(1))\n2\n\njulia> disable_cache!(f)\n\njulia> b = f(ZZ(1))\n2\n\njulia> enable_cache!(f)\n\njulia> c = f(ZZ(1))\n2\n\njulia> set_limit!(f, 200)\n200\n\njulia> d = f(ZZ(1))\n2\n"
 },
 
 {
@@ -4653,7 +4717,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Map with inverse",
     "title": "Map with inverse",
     "category": "page",
-    "text": ""
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
 },
 
 {
@@ -4661,7 +4725,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Map with inverse",
     "title": "Map with inverse",
     "category": "section",
-    "text": "It is not possible to provide generic functionality to invert a map. However, sometimes one knows an inverse map explicitly and would like to keep track of this.Recall that as map composition is not commutative, there is a notion of a left inverse and a right inverse for maps.To keep track of such inverse maps, AbstractAlgebra provides data types Generic.MapWithRetraction and GenericMapWithSection.Given a map f  X to Y, a retraction of f is a map g  Y to X such that g(f(x)) = x for all x in X.Given a map f  X to Y, a section of f is a map g  Y to X such that f(g(x)) = x for all y in Y.In AbstractAlgebra, a map with retraction/section is an object containing a pair of maps, the second of which is a retraction/section of the first.Maps with retraction/section can be composed, and we also define the inverse of such a pair to be the map with the pair swapped. Thus the inverse of a map with retraction is a map with section. "
+    "text": "It is not possible to provide generic functionality to invert a map. However, sometimes one knows an inverse map explicitly and would like to keep track of this.Recall that as map composition is not commutative, there is a notion of a left inverse and a right inverse for maps.To keep track of such inverse maps, AbstractAlgebra provides data types Generic.MapWithRetraction and Generic.MapWithSection.Given a map f  X to Y, a retraction of f is a map g  Y to X such that g(f(x)) = x for all x in X.Given a map f  X to Y, a section of f is a map g  Y to X such that f(g(x)) = x for all y in Y.In AbstractAlgebra, a map with retraction/section is an object containing a pair of maps, the second of which is a retraction/section of the first.Maps with retraction/section can be composed, and we also define the inverse of such a pair to be the map with the pair swapped. Thus the inverse of a map with retraction is a map with section. "
 },
 
 {
@@ -4669,7 +4733,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Map with inverse",
     "title": "Map with inverse constructors",
     "category": "section",
-    "text": "To construct a map with retraction/section from a pair of maps, we have the following functions:map_with_retraction(m::Map{D, C}, r::Map{C, D}) where {D, C}\nmap_with_section(m::Map{D, C}, s::Map{C, D}) where {D, C}Construct the map with retraction/section given a known retraction/section r or s respectively, of m.For convenience we allow construction of maps with retraction/section from a pair of Julia functions/closures.map_with_retraction_from_func(R, S, f::Function, r::Function)\nmap_with_section_from_func(R, S, f::Function, s::Function)Construct the map with retraction/section such that the map is given by the function f and the retraction/section is given by the function r or s respectively. Here R is the parent object representing the domain and S is the parent object representing the codomain of f.Examplesf = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)\n\na = f(ZZ(1))"
+    "text": "To construct a map with retraction/section from a pair of maps, we have the following functions:map_with_retraction(m::Map{D, C}, r::Map{C, D}) where {D, C}\nmap_with_section(m::Map{D, C}, s::Map{C, D}) where {D, C}Construct the map with retraction/section given a known retraction/section r or s respectively, of m.For convenience we allow construction of maps with retraction/section from a pair of Julia functions/closures.map_with_retraction_from_func(R, S, f::Function, r::Function)\nmap_with_section_from_func(R, S, f::Function, s::Function)Construct the map with retraction/section such that the map is given by the function f and the retraction/section is given by the function r or s respectively. Here R is the parent object representing the domain and S is the parent object representing the codomain of f.Examplesjulia> f = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)\nMap with retraction with the following data\n\nDomain:\n=======\nIntegers\n\nCodomain:\n========\nIntegers\n\njulia> a = f(ZZ(1))\n2\n"
 },
 
 {
@@ -4677,7 +4741,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Map with inverse",
     "title": "Functionality for maps with inverses",
     "category": "section",
-    "text": "The following functionality is provided for maps with inverses.inv(M::MapWithRetraction)\ninv(M::MapWithSection)Return the map with the two maps contained in M swapped. In the first case, a MapWithSection is returned. In the second case a MapWithRetraction is returned.To access the two maps stored in a map with retraction/section, we have the following:image_map(M::MapWithRetraction)\nimage_map(M::MapWithSection)\nretraction_map(M::MapWithRetraction)\nsection_map(M::MapWithSection)The first two of these functions return the first map in a map with retraction/section, the second two functions return the corresponding second maps.Examplesf = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)\ng = inv(f)\nh = f*g\n\na = h(ZZ(1))"
+    "text": "The following functionality is provided for maps with inverses.inv(M::MapWithRetraction)\ninv(M::MapWithSection)Return the map with the two maps contained in M swapped. In the first case, a MapWithSection is returned. In the second case a MapWithRetraction is returned.To access the two maps stored in a map with retraction/section, we have the following:image_map(M::MapWithRetraction)\nimage_map(M::MapWithSection)\nretraction_map(M::MapWithRetraction)\nsection_map(M::MapWithSection)The first two of these functions return the first map in a map with retraction/section, the second two functions return the corresponding second maps.Examplesjulia> f = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)\nMap with retraction with the following data\n\nDomain:\n=======\nIntegers\n\nCodomain:\n========\nIntegers\n\njulia> g = inv(f)\nMap with section with the following data\n\nDomain:\n=======\nIntegers\n\nCodomain:\n========\nIntegers\n\njulia> h = f*g\nComposite map consisting of the following\n\nIntegers -> Integers\nthen\nIntegers -> Integers\n\njulia> a = h(ZZ(1))\n1\n"
 },
 
 {
