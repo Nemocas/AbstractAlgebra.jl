@@ -56,6 +56,7 @@ Codomain:
 ========
 Integers
 
+
 julia> g = cached(f)
 
 julia> f(ZZ(1)) == g(ZZ(1))
