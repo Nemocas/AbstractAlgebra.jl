@@ -62,8 +62,18 @@ $R$ and $S$ corresponding to the Julia function $f$.
 
 ```jldoctest
 julia> f = map_from_func(ZZ, ZZ, x -> x + 1)
+Map with the following data
+
+Domain:
+=======
+Integers
+
+Codomain:
+========
+Integers
 
 julia> f(ZZ(2))
+3
 
 ```
 

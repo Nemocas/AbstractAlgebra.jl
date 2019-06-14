@@ -68,10 +68,13 @@ resulting parent object to coerce various elements into the ring.
 
 ```jldoctest
 julia> f = ZZ()
+0
 
 julia> g = ZZ(123)
+123
 
 julia> h = ZZ(BigInt(1234))
+1234
 
 ```
 
@@ -86,28 +89,34 @@ We give some examples of such functionality.
 
 ```jldoctest
 julia> f = ZZ(12)
+12
 
 julia> h = zero(ZZ)
+0
 
 julia> k = one(ZZ)
+1
 
 julia> isone(k) == true
+true
 
 julia> iszero(f) == false
-
-julia> U = base_ring(ZZ)
-
-julia> V = base_ring(f)
+true
 
 julia> T = parent(f)
+Integers
 
 julia> f == deepcopy(f)
+true
 
 julia> g = f + 12
+24
 
 julia> h = powmod(f, 12, ZZ(17))
+4
 
 julia> flag, q = divides(f, ZZ(3))
+(true, 4)
 
 ```
 
@@ -125,8 +134,10 @@ isunit(::Integer)
 
 ```jldoctest
 julia> r = ZZ(-1)
+-1
 
 julia> isunit(r) == true
+true
 
 ```
 
@@ -144,8 +155,10 @@ AbstractAlgebra.exp(a::BigInt)
 
 ```jldoctest
 julia> d = AbstractAlgebra.sqrt(ZZ(36))
+6
 
 julia> m = AbstractAlgebra.exp(ZZ(0))
+1
 
 ```
 ### Coprime bases
@@ -158,6 +171,7 @@ ppio(a::BigInt, b::BigInt)
 
 ```jldoctest
 julia> c, n = ppio(ZZ(12), ZZ(26))
+(4, 3)
 
 ```
 

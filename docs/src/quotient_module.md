@@ -32,24 +32,52 @@ QuotientSpace(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <
 
 ```jldoctest
 julia> M = FreeModule(ZZ, 2)
+Free module of rank 2 over Integers
 
 julia> m = M([ZZ(1), ZZ(2)])
+(1, 2)
 
 julia> N, f = Submodule(M, [m])
+(Submodule over Integers with 1 generator and no relations
+, Module homomorphism with
+Domain: Submodule over Integers with 1 generator and no relations
+
+Codomain: Free module of rank 2 over Integers)
 
 julia> Q, g = QuotientModule(M, N)
+(Quotient module over Integers with 1 generator and no relations
+, Module homomorphism with
+Domain: Free module of rank 2 over Integers
+Codomain: Quotient module over Integers with 1 generator and no relations
+)
 
-julia> p = Q([ZZ(3)])
+julia> p = M([ZZ(3), ZZ(1)])
+(3, 1)
 
 julia> v2 = g(p)
+(-5)
 
 julia> V = VectorSpace(QQ, 2)
+Vector space of dimension 2 over Rationals
 
 julia> m = V([QQ(1), QQ(2)])
+(1//1, 2//1)
 
 julia> N, f = Subspace(V, [m])
+(Subspace over Rationals with 1 generator and no relations
+, Module homomorphism with
+Domain: Subspace over Rationals with 1 generator and no relations
+
+Codomain: Vector space of dimension 2 over Rationals)
 
 julia> Q, g = QuotientSpace(V, N)
+(Quotient space over:
+Rationals with 1 generator and no relations
+, Module homomorphism with
+Domain: Vector space of dimension 2 over Rationals
+Codomain: Quotient space over:
+Rationals with 1 generator and no relations
+)
 
 ```
 
@@ -68,14 +96,27 @@ supermodule(M::AbstractAlgebra.Generic.QuotientModule{T}) where T <: RingElement
 
 ```jldoctest
 julia> M = FreeModule(ZZ, 2)
+Free module of rank 2 over Integers
 
 julia> m = M([ZZ(2), ZZ(3)])
+(2, 3)
 
 julia> N, g = Submodule(M, [m])
+(Submodule over Integers with 1 generator and no relations
+, Module homomorphism with
+Domain: Submodule over Integers with 1 generator and no relations
+
+Codomain: Free module of rank 2 over Integers)
 
 julia> Q, h = QuotientModule(M, N)
+(Quotient module over Integers with 2 generators and relations:
+[2 3], Module homomorphism with
+Domain: Free module of rank 2 over Integers
+Codomain: Quotient module over Integers with 2 generators and relations:
+[2 3])
 
 julia> supermodule(Q) == M
+true
 
 ```
 

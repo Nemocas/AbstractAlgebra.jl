@@ -59,8 +59,18 @@ codomain of $f$.
 
 ```jldoctest
 julia> f = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
+Map with retraction with the following data
+
+Domain:
+=======
+Integers
+
+Codomain:
+========
+Integers
 
 julia> a = f(ZZ(1))
+2
 
 ```
 
@@ -92,12 +102,36 @@ the second two functions return the corresponding second maps.
 
 ```jldoctest
 julia> f = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
+Map with retraction with the following data
+
+Domain:
+=======
+Integers
+
+Codomain:
+========
+Integers
 
 julia> g = inv(f)
+Map with section with the following data
+
+Domain:
+=======
+Integers
+
+Codomain:
+========
+Integers
 
 julia> h = f*g
+Composite map consisting of the following
+
+Integers -> Integers
+then
+Integers -> Integers
 
 julia> a = h(ZZ(1))
+1
 
 ```
 

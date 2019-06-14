@@ -5,7 +5,8 @@ makedocs(
          sitename = "AbstractAlgebra.jl",
          modules = [AbstractAlgebra],
          clean = true,
-         doctest = false,
+         doctest = true,
+         strict = true,
          pages    = [
              "index.md",
              "constructors.md",
@@ -15,7 +16,7 @@ makedocs(
                           "integer.md",
                           "polynomial_rings.md",
                           "polynomial.md",
-			  "ncpolynomial.md",
+                          "ncpolynomial.md",
                           "mpolynomial_rings.md",
                           "mpolynomial.md",
                           "series_rings.md",

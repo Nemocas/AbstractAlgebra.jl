@@ -199,18 +199,14 @@ inv(::AbstractAlgebra.ResElem)
 julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
-julia> S = ResidueRing(R)
-ERROR: MethodError: no method matching ResidueRing(::AbstractAlgebra.Generic.PolyRing{Rational{BigInt}})
+julia> S = ResidueRing(R, x^3 + 3x + 1)
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
 
 julia> f = S(x + 1)
-ERROR: UndefVarError: S not defined
-Stacktrace:
- [1] top-level scope at none:0
+x+1//1
 
 julia> g = inv(f)
-ERROR: UndefVarError: f not defined
-Stacktrace:
- [1] top-level scope at none:0
+1//3*x^2-1//3*x+4//3
 
 ```
 
@@ -226,23 +222,17 @@ gcd{T <: RingElem}(::ResElem{T}, ::ResElem{T})
 julia> R, x = PolynomialRing(QQ, "x")
 (Univariate Polynomial Ring in x over Rationals, x)
 
-julia> S = ResidueRing(R)
-ERROR: MethodError: no method matching ResidueRing(::AbstractAlgebra.Generic.PolyRing{Rational{BigInt}})
+julia> S = ResidueRing(R, x^3 + 3x + 1)
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
 
 julia> f = S(x + 1)
-ERROR: UndefVarError: S not defined
-Stacktrace:
- [1] top-level scope at none:0
+x+1//1
 
 julia> g = S(x^2 + 2x + 1)
-ERROR: UndefVarError: S not defined
-Stacktrace:
- [1] top-level scope at none:0
+x^2+2//1*x+1//1
 
 julia> h = gcd(f, g)
-ERROR: UndefVarError: f not defined
-Stacktrace:
- [1] top-level scope at none:0
+1//1
 
 ```
 

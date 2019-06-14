@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export iscompatible, issubmodule, isisomorphic
+export iscompatible, issubmodule, isisomorphic, rels
 
 ###############################################################################
 #

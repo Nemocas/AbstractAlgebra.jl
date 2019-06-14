@@ -72,22 +72,36 @@ resulting parent objects to coerce various elements into the polynomial ring.
 
 ```jldoctest
 julia> R = MatrixAlgebra(ZZ, 2)
+Matrix Algebra of degree 2 over Integers
 
 julia> S, x = PolynomialRing(R, "x")
+(Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)
 
-julia> T, y = PolynomialRing(T, "y")
+julia> T, y = PolynomialRing(S, "y")
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia> U, z = R["z"]
+(Univariate Polynomial Ring in z over Matrix Algebra of degree 2 over Integers, z)
 
 julia> f = S()
+[0 0]
+[0 0]
 
 julia> g = S(123)
+([123 0]
+[0 123])
 
 julia> h = T(BigInt(1234))
+([1234 0]
+[0 1234])
 
 julia> k = T(x + 1)
+(x+([1 0]
+[0 1]))
 
 julia> m = U(z + 1)
+z+([1 0]
+[0 1])
 
 ```
 
@@ -116,37 +130,56 @@ We give some examples of such functionality.
 
 ```jldoctest
 julia> R = MatrixAlgebra(ZZ, 2)
+Matrix Algebra of degree 2 over Integers
 
 julia> S, x = PolynomialRing(R, "x")
+(Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)
 
-julia> T, y = PolynomialRing(T, "y")
+julia> T, y = PolynomialRing(S, "y")
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia> f = x^3 + 3x + 21
+x^3+([3 0]
+[0 3])*x+([21 0]
+[0 21])
 
 julia> g = (x + 1)*y^2 + 2x + 1
+(x+([1 0]
+[0 1]))*y^2+(([2 0]
+[0 2])*x+([1 0]
+[0 1]))
 
 julia> h = zero(T)
+[0 0]
+[0 0]
 
 julia> k = one(S)
+([1 0]
+[0 1])
 
 julia> isone(k) == true
+true
 
 julia> iszero(f) == false
+true
 
 julia> n = length(g)
+3
 
 julia> U = base_ring(T)
+Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers
 
 julia> V = base_ring(y + 1)
+Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers
 
 julia> v = var(T)
+:y
 
 julia> U = parent(y + 1)
+Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers
 
 julia> g == deepcopy(g)
-
-julia> t = divexact(2g, 2)
-
+true
 ```
 
 ## Polynomial functionality provided by AbstractAlgebra.jl
@@ -194,32 +227,51 @@ isterm(::NCPolyElem)
 
 ```jldoctest
 julia> R = MatrixAlgebra(ZZ, 2)
+Matrix Algebra of degree 2 over Integers
 
 julia> S, x = PolynomialRing(R, "x")
+(Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)
 
 julia> T, y = PolynomialRing(S, "y")
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia> a = zero(T)
+[0 0]
+[0 0]
 
 julia> b = one(T)
+([1 0]
+[0 1])
 
-julia> c = BigInt(1)*z^2 + BigInt(1)
+julia> c = BigInt(1)*y^2 + BigInt(1)
+y^2+([1 0]
+[0 1])
 
 julia> d = x*y^2 + (x + 1)*y + 3
+(x)*y^2+(x+([1 0]
+[0 1]))*y+([3 0]
+[0 3])
 
 julia> f = lead(d)
+x
 
 julia> y = gen(T)
+y
 
 julia> g = isgen(y)
+true
 
 julia> m = isunit(b)
+true
 
 julia> n = degree(d)
+2
 
 julia> isterm(2y^2) == true
+true
 
 julia> ismonomial(y^2) == true
+true
 
 ```
 
@@ -237,18 +289,40 @@ mullow(::NCPolyElem{T}, ::NCPolyElem{T}, ::Int) where T <: NCRingElem
 
 ```jldoctest
 julia> R = MatrixAlgebra(ZZ, 2)
+Matrix Algebra of degree 2 over Integers
 
 julia> S, x = PolynomialRing(R, "x")
+(Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)
 
 julia> T, y = PolynomialRing(S, "y")
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
+(x)*y^2+(x+([1 0]
+[0 1]))*y+([3 0]
+[0 3])
 
 julia> g = (x + 1)*y + (x^3 + 2x + 2)
+(x+([1 0]
+[0 1]))*y+(x^3+([2 0]
+[0 2])*x+([2 0]
+[0 2]))
 
 julia> h = truncate(f, 1)
+([3 0]
+[0 3])
 
 julia> k = mullow(f, g, 4)
+(x^2+x)*y^3+(x^4+([3 0]
+[0 3])*x^2+([4 0]
+[0 4])*x+([1 0]
+[0 1]))*y^2+(x^4+x^3+([2 0]
+[0 2])*x^2+([7 0]
+[0 7])*x+([5 0]
+[0 5]))*y+(([3 0]
+[0 3])*x^3+([6 0]
+[0 6])*x+([6 0]
+[0 6]))
 
 ```
 
@@ -263,16 +337,28 @@ reverse(::NCPolyElem)
 
 ```jldoctest
 julia> R = MatrixAlgebra(ZZ, 2)
+Matrix Algebra of degree 2 over Integers
 
 julia> S, x = PolynomialRing(R, "x")
+(Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)
 
 julia> T, y = PolynomialRing(S, "y")
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
+(x)*y^2+(x+([1 0]
+[0 1]))*y+([3 0]
+[0 3])
 
 julia> g = reverse(f, 7)
+([3 0]
+[0 3])*y^6+(x+([1 0]
+[0 1]))*y^5+(x)*y^4
 
 julia> h = reverse(f)
+([3 0]
+[0 3])*y^2+(x+([1 0]
+[0 1]))*y+(x)
 
 ```
 
@@ -290,16 +376,26 @@ shift_right(::NCPolyElem, ::Int)
 
 ```jldoctest
 julia> R = MatrixAlgebra(ZZ, 2)
+Matrix Algebra of degree 2 over Integers
 
 julia> S, x = PolynomialRing(R, "x")
+(Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)
 
 julia> T, y = PolynomialRing(S, "y")
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
+(x)*y^2+(x+([1 0]
+[0 1]))*y+([3 0]
+[0 3])
 
 julia> g = shift_left(f, 7)
+(x)*y^9+(x+([1 0]
+[0 1]))*y^8+([3 0]
+[0 3])*y^7
 
 julia> h = shift_right(f, 2)
+(x)
 
 ```
 
@@ -317,19 +413,37 @@ evaluated at $a$ by writing $f(a)$.
 
 ```jldoctest
 julia> R = MatrixAlgebra(ZZ, 2)
+Matrix Algebra of degree 2 over Integers
 
 julia> S, x = PolynomialRing(R, "x")
+(Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)
 
 julia> T, y = PolynomialRing(S, "y")
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 
 julia> f = x*y^2 + (x + 1)*y + 3
+(x)*y^2+(x+([1 0]
+[0 1]))*y+([3 0]
+[0 3])
 
 julia> k = evaluate(f, 3)
+([12 0]
+[0 12])*x+([6 0]
+[0 6])
 
 julia> m = evaluate(f, x^2 + 2x + 1)
+x^5+([4 0]
+[0 4])*x^4+([7 0]
+[0 7])*x^3+([7 0]
+[0 7])*x^2+([4 0]
+[0 4])*x+([4 0]
+[0 4])
 
 julia> r = f(23)
+([552 0]
+[0 552])*x+([26 0]
+[0 26])
 
 ```
 
@@ -343,14 +457,23 @@ derivative(::NCPolyElem)
 
 ```jldoctest
 julia> R = MatrixAlgebra(ZZ, 2)
+Matrix Algebra of degree 2 over Integers
 
 julia> S, x = PolynomialRing(R, "x")
+(Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, x)
 
 julia> T, y = PolynomialRing(S, "y")
+(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Matrix Algebra of degree 2 over Integers, y)
 
 julia> f = x*y^2 + (x + 1)*y + 3
+(x)*y^2+(x+([1 0]
+[0 1]))*y+([3 0]
+[0 3])
 
 julia> h = derivative(f)
+(([2 0]
+[0 2])*x)*y+(x+([1 0]
+[0 1]))
 
 ```
 

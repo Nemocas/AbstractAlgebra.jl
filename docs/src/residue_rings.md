@@ -68,10 +68,13 @@ to be $R/(m)$, return $m$.
 
 ```jldoctest
 julia> R, x = PolynomialRing(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = ResidueRing(R, x^3 + 3x + 1)
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
 
 julia> m = modulus(S)
+x^3+3//1*x+1//1
 
 ```
 
@@ -87,12 +90,16 @@ Given a residue $r \pmod{m}$, represented as such, return $r$.
 
 ```jldoctest
 julia> R, x = PolynomialRing(QQ, "x")
+(Univariate Polynomial Ring in x over Rationals, x)
 
 julia> S = ResidueRing(R, x^3 + 3x + 1)
+Residue ring of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1
 
 julia> f = S(x^2 + 2)
+x^2+2//1
 
 julia> d = data(f)
+x^2+2//1
 
 ```
 

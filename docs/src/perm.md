@@ -59,13 +59,13 @@ julia> G = PermutationGroup(BigInt(5)); p = G([2,3,1,5,4])
 (1,2,3)(4,5)
 
 julia> typeof(p)
-AbstractAlgebra.Generic.perm{BigInt}
+perm{BigInt}
 
 julia> H = PermutationGroup(UInt16(5)); r = H([2,3,1,5,4])
 (1,2,3)(4,5)
 
 julia> typeof(r)
-AbstractAlgebra.Generic.perm{UInt16}
+perm{UInt16}
 
 julia> H()
 ()
@@ -197,7 +197,7 @@ h = rand(PermGroup(UInt32(5)));
 typeof(g*h)
 
 # output
-AbstractAlgebra.Generic.perm{Int64}
+perm{UInt32}
 ```
 
 ## Coercion
@@ -208,8 +208,8 @@ Each of the methods perform basic sanity checks on the input which can be switch
 **Examples**
 
 ```jldoctest
-julia> (G::PermGroup)()
-
+julia> PermutationGroup(4)()
+()
 ```
 > Return the identity element of `G`.
 

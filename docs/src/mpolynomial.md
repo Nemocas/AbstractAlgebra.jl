@@ -78,20 +78,28 @@ resulting parent objects to coerce various elements into the polynomial ring.
 
 ```jldoctest
 julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"]; ordering=:deglex)
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = R()
+0
 
 julia> g = R(123)
+123
 
 julia> h = R(BigInt(1234))
+1234
 
 julia> k = R(x + 1)
+x+1
 
 julia> m = R(x + y + 1)
+x+y+1
 
 julia> derivative(k, 1)
+1
 
 julia> derivative(k, 2)
+0
 
 ```
 
@@ -143,28 +151,43 @@ coeff(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where T <:
 
 ```jldoctest
 julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = x^2 + 2x + 1
+x^2+2*x+1
 
 julia> V = vars(f)
+1-element Array{AbstractAlgebra.Generic.MPoly{BigInt},1}:
+ x
 
 julia> var_index(y) == 2
+true
 
 julia> degree(f, x) == 2
+true
 
 julia> degree(f, 2) == 0
+true
 
 julia> d = degrees(f)
+2-element Array{Int64,1}:
+ 2
+ 0
 
 julia> isconstant(R(1))
+true
 
 julia> isterm(2x)
+true
 
 julia> ismonomial(y)
+true
 
 julia> isunit(R(1))
+true
 
 julia> c = coeff(f, x^2)
+1
 
 ```
 
@@ -185,10 +208,13 @@ Note that $g$ can also be a Nemo parent, e.g. `QQ`.
 
 ```jldoctest
 julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> fz = x^2*y^2 + x + 1
+x^2*y^2+x+1
 
 julia> fq = change_base_ring(fz, QQ)
+x^2*y^2+x+1//1
 
 ```
 
@@ -208,10 +234,13 @@ coeff(a::T, vars::Vector{T}, exps::Vector{Int}) where T <: AbstractAlgebra.MPoly
 
 ```jldoctest
 julia> R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
+(Multivariate Polynomial Ring in x, y, z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
 
 julia> f = x^4*y^2*z^2 - 2x^4*y*z^2 + 4x^4*z^2 + 2x^2*y^2 + x + 1
+x^4*y^2*z^2-2*x^4*y*z^2+4*x^4*z^2+2*x^2*y^2+x+1
 
 julia> coeff(f, [1, 3], [4, 2]) == coeff(f, [x, z], [4, 2])
+true
 
 ```
 
@@ -233,16 +262,22 @@ inflate(f::AbstractAlgebra.MPolyElem{T}, shift::Vector{Int}, defl::Vector{Int}) 
 
 ```jldoctest
 julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = x^7*y^8 + 3*x^4*y^8 - x^4*y^2 + 5x*y^5 - x*y^2
+x^7*y^8+3*x^4*y^8-x^4*y^2+5*x*y^5-x*y^2
 
 julia> def, shift = deflation(f)
+([1, 2], [3, 3])
 
 julia> f1 = deflate(f, def, shift)
+x^2*y^2+3*x*y^2-x+5*y-1
 
 julia> f2 = inflate(f1, def, shift)
+x^7*y^8+3*x^4*y^8-x^4*y^2+5*x*y^5-x*y^2
 
 julia> f2 == f
+true
 
 ```
 
@@ -256,12 +291,16 @@ to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) w
 
 ```jldoctest
 julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> S, z = PolynomialRing(ZZ, "z")
+(Univariate Polynomial Ring in z over Integers, z)
 
 julia> f = 2x^5 + 3x^4 - 2x^2 - 1
+2*x^5+3*x^4-2*x^2-1
 
 julia> g = to_univariate(S, f)
+2*z^5+3*z^4-2*z^2-1
 
 ```
 
@@ -317,48 +356,68 @@ evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}) where {T <: RingElement, U
 
 ```jldoctest
 julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = 2x^2*y^2 + 3x + y + 1
+2*x^2*y^2+3*x+y+1
 
 julia> evaluate(f, BigInt[1, 2])
+14
 
 julia> evaluate(f, [QQ(1), QQ(2)])
+14//1
 
 julia> evaluate(f, [1, 2])
+14
 
 julia> f(1, 2) == 14
+true
 
 julia> evaluate(f, [x + y, 2y - x])
+2*x^4-4*x^3*y-6*x^2*y^2+8*x*y^3+2*x+8*y^4+5*y+1
 
 julia> f(x + y, 2y - x)
+2*x^4-4*x^3*y-6*x^2*y^2+8*x*y^3+2*x+8*y^4+5*y+1
 
 julia> R, (x, y, z) = PolynomialRing(ZZ, ["x", "y", "z"])
+(Multivariate Polynomial Ring in x, y, z over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y, z])
 
 julia> f = x^2*y^2 + 2x*z + 3y*z + z + 1
+x^2*y^2+2*x*z+3*y*z+z+1
 
 julia> evaluate(f, [1, 3], [3, 4])
+9*y^2+12*y+29
 
 julia> evaluate(f, [x, z], [3, 4])
+9*y^2+12*y+29
 
 julia> evaluate(f, [1, 2], [x + z, x - z])
+x^4-2*x^2*z^2+5*x*z+z^4-z^2+z+1
 
 julia> evaluate(f, [2, 4, 6], QQ)
+167//1
 
 julia> evaluate(f, [x, z], [2, 4], QQ)
+4//1*y^2+12//1*y+21//1
 
 julia> S = MatrixAlgebra(ZZ, 2)
+Matrix Algebra of degree 2 over Integers
 
 julia> M1 = S([1 2; 3 4])
+[1 2]
+[3 4]
 
 julia> M2 = S([2 3; 1 -1])
+[2 3]
+[1 -1]
 
 julia> M3 = S([-1 1; 1 1])
+[-1 1]
+[1 1]
 
 julia> evaluate(f, [M1, M2, M3])
-f(M1, M2, M3)
-
-f(M1, ZZ(2), M3)
-f(M1, ZZ(2), 3)
+[64 83]
+[124 149]
 ```
 
 ### Leading coefficients, leading monomials and leading terms
@@ -413,16 +472,22 @@ lcm(a::AbstractAlgebra.MPolyElem{T}, b::AbstractAlgebra.MPolyElem{T}) where {T <
 julia> using AbstractAlgebra
 
 julia> R,(x,y) = PolynomialRing(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> a = x*y + 2*y
+x*y+2*y
 
 julia> b = x^3*y + y
+x^3*y+y
 
 julia> gcd(a,b)
+y
 
 julia> lcm(a,b)
+x^4*y+2*x^3*y+x*y+2*y
 
 julia> lcm(a,b) == a * b // gcd(a,b)
+true
 
 ```
 
@@ -436,12 +501,16 @@ derivative(::AbstractAlgebra.MPolyElem{T}, ::AbstractAlgebra.MPolyElem{T}) where
 
 ```jldoctest
 julia> R, (x, y) = AbstractAlgebra.PolynomialRing(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
 
 julia> f = x*y + x + y + 1
+x*y+x+y+1
 
 julia> derivative(f, x)
+y+1
 
 julia> derivative(f, y)
+x+1
 
 ```
 

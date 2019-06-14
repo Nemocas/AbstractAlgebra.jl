@@ -782,7 +782,7 @@ end
 > `xi.lam` which is not contained in `xi.mu`. Otherwise return `0`.
 """
 function getindex(xi::SkewDiagram, n::Integer)
-   i,j = ind2sub(size(xi), n)
+   i, j = Tuple(CartesianIndices(xi)[n])
    (i,j) in xi && return 1
    return 0
 end

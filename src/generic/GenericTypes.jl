@@ -40,13 +40,13 @@ julia> G = PermGroup(5)
 Permutation group over 5 elements
 
 julia> elem_type(G)
-AbstractAlgebra.Generic.perm{Int64}
+perm{Int64}
 
 julia> H = PermGroup(UInt16(5))
 Permutation group over 5 elements
 
 julia> elem_type(H)
-AbstractAlgebra.Generic.perm{UInt16}
+perm{UInt16}
 ```
 """
 struct PermGroup{T<:Integer} <: AbstractAlgebra.Group
@@ -82,7 +82,7 @@ julia> g = perm(Int32[2,3,1])
 (1,2,3)
 
 julia> typeof(g)
-AbstractAlgebra.Generic.perm{Int32}
+perm{Int32}
 ```
 """
 mutable struct perm{T<:Integer} <: AbstractAlgebra.GroupElem

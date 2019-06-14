@@ -101,14 +101,14 @@ julia> m = M([ZZ(2), ZZ(3)])
 julia> n = M([ZZ(1), ZZ(4)])
 (1, 4)
 
-julia> N1 = Submodule(M, [m, n])
+julia> N1, = Submodule(M, [m, n])
 (Submodule over Integers with 2 generators and no relations
 , Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
 
 Codomain: Free module of rank 2 over Integers)
 
-julia> N2 = Submodule(M, [m])
+julia> N2, = Submodule(M, [m])
 (Submodule over Integers with 1 generator and no relations
 , Module homomorphism with
 Domain: Submodule over Integers with 1 generator and no relations
@@ -116,19 +116,13 @@ Domain: Submodule over Integers with 1 generator and no relations
 Codomain: Free module of rank 2 over Integers)
 
 julia> supermodule(N1) == M
-ERROR: MethodError: no method matching supermodule(::Tuple{AbstractAlgebra.Generic.Submodule{BigInt},AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}})
-Stacktrace:
- [1] top-level scope at none:0
+true
 
 julia> iscompatible(N1, N2)
-ERROR: MethodError: no method matching iscompatible(::Tuple{AbstractAlgebra.Generic.Submodule{BigInt},AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}}, ::Tuple{AbstractAlgebra.Generic.Submodule{BigInt},AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}})
-Stacktrace:
- [1] top-level scope at none:0
+(true, Free module of rank 2 over Integers)
 
-julia> issubmodule(M, N)
-ERROR: UndefVarError: N not defined
-Stacktrace:
- [1] top-level scope at none:0
+julia> issubmodule(N1, M)
+false
 
 ```
 

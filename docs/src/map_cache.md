@@ -46,10 +46,20 @@ Caches can also be turned on and off at run time (see below).
 
 ```jldoctest
 julia> f = map_from_func(ZZ, ZZ, x -> x + 1)
+Map with the following data
+
+Domain:
+=======
+Integers
+
+Codomain:
+========
+Integers
 
 julia> g = cached(f)
 
 julia> f(ZZ(1)) == g(ZZ(1))
+true
 
 ```
 
@@ -78,18 +88,23 @@ value. Setting the value to 0 will effectively disable further caching for this 
 julia> f = cached(map_from_func(ZZ, ZZ, x -> x + 1))
 
 julia> a = f(ZZ(1))
+2
 
 julia> disable_cache!(f)
 
 julia> b = f(ZZ(1))
+2
 
 julia> enable_cache!(f)
 
 julia> c = f(ZZ(1))
+2
 
 julia> set_limit!(f, 200)
+200
 
 julia> d = f(ZZ(1))
+2
 
 ```
 

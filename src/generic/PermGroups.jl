@@ -624,7 +624,7 @@ julia> for p in Generic.elements!(PermGroup(3))
 (1,3)
 
 julia> A = collect(Generic.elements!(PermGroup(3))); A
-6-element Array{AbstractAlgebra.Generic.perm{Int64},1}:
+6-element Array{perm{Int64},1}:
  (1,3)
  (1,3)
  (1,3)
@@ -633,7 +633,7 @@ julia> A = collect(Generic.elements!(PermGroup(3))); A
  (1,3)
 
 julia> unique(A)
-1-element Array{AbstractAlgebra.Generic.perm{Int64},1}:
+1-element Array{perm{Int64},1}:
  (1,3)
 ```
 """
@@ -700,7 +700,7 @@ julia> p = perm([2,3,1])
 (1,2,3)
 
 julia> matrix_repr(p)
-3×3 SparseMatrixCSC{Int64,Int64} with 3 stored entries:
+3×3 SparseArrays.SparseMatrixCSC{Int64,Int64} with 3 stored entries:
   [3, 1]  =  1
   [1, 2]  =  1
   [2, 3]  =  1
@@ -868,7 +868,7 @@ julia> p = perm"(1,3)(2,4)"
 (1,3)(2,4)
 
 julia> typeof(p)
-AbstractAlgebra.Generic.perm{Int64}
+perm{Int64}
 
 julia> parent(p) == PermutationGroup(4)
 true
@@ -933,7 +933,7 @@ julia> G = PermutationGroup(4)
 Permutation group over 4 elements
 
 julia> chi = character(Partition([3,1])) # character of the regular representation
-(::char) (generic function with 2 methods)
+#27 (generic function with 2 methods)
 
 julia> chi(G())
 3
@@ -945,7 +945,7 @@ julia> chi(perm"(1,3)(2,4)")
 function character(lambda::Partition)
    R = partitionseq(lambda)
 
-   function char(p::perm, check::Bool=true)
+   char = function(p::perm, check::Bool=true)
       if check
          sum(lambda) == length(p.d) || throw(ArgumentError("Can't evaluate character on $p : lengths differ."))
       end
