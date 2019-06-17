@@ -1137,6 +1137,47 @@ end
 
 ###############################################################################
 #
+#   Geobuckets
+#
+###############################################################################
+
+mutable struct geobucket{T <: AbstractAlgebra.MPolyElem}
+   len::Int
+   buckets::Vector{T}
+
+   function geobucket(R::Ring)
+      return new{elem_type(R)}(1, [R(), R()])
+   end
+end
+
+function Base.push!(G::geobucket{T}, p::T) where T <: AbstractAlgebra.MPolyElem
+   R = parent(p)
+   i = max(1, ndigits(length(p), base=4))
+   G.buckets[i] = addeq!(G.buckets[i], p)
+   while i <= G.len
+      if length(G.buckets[i]) >= 4^i
+         G.buckets[i + 1] = addeq!(G.buckets[i + 1], G.buckets[i])
+         G.buckets[i] = R()
+         i += 1
+      end
+      break
+   end
+   if i == G.len + 1
+      Base.push!(G.buckets, R())
+      G.len += 1
+   end
+end
+
+function finish(G::geobucket{T}) where T <: RingElement
+   p = G.buckets[1]
+   for i = 2:length(G.buckets)
+      p = addeq!(p, G.buckets[i])
+   end
+   return p::T
+end
+
+###############################################################################
+#
 #   Arithmetic functions
 #
 ###############################################################################
@@ -1702,8 +1743,8 @@ end
 
 # Pack the monomials from the array b into an array a, with k entries packed
 # into each word, and where each field is the given number of bits
-function pack_monomials(a::Array{UInt, 2}, b::Array{UInt, 2}, k::Int, bits::Int)
-   for i = 1:size(a, 2)
+function pack_monomials(a::Array{UInt, 2}, b::Array{UInt, 2}, k::Int, bits::Int, len::Int)
+   for i = 1:len
       m = 0
       n = 1
       v = UInt(0)
@@ -1727,9 +1768,9 @@ end
 
 # Unpack the monomials from the array b into the array a, where there are k
 # entries packed into each word, in fields of the given number of bits
-function unpack_monomials(a::Array{UInt, 2}, b::Array{UInt, 2}, k::Int, bits::Int)
+function unpack_monomials(a::Array{UInt, 2}, b::Array{UInt, 2}, k::Int, bits::Int, len::Int)
    mask = (UInt(1) << bits) - UInt(1)
-   for i = 1:size(b, 2)
+   for i = 1:len
       m = 0
       n = 1
       N = size(a, 1)
@@ -1774,8 +1815,8 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
       M = div(N + k - 1, k)
       e1 = zeros(UInt, M, length(a))
       e2 = zeros(UInt, M, length(b))
-      pack_monomials(e1, a.exps, k, exp_bits)
-      pack_monomials(e2, b.exps, k, exp_bits)
+      pack_monomials(e1, a.exps, k, exp_bits, length(a))
+      pack_monomials(e2, b.exps, k, exp_bits, length(b))
       par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
       a1 = par(a.coeffs, e1)
       b1 = par(b.coeffs, e2)
@@ -1787,7 +1828,7 @@ function *(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          r1 = mul_johnson(b1, a1, exp_bits)
       end
       er = zeros(UInt, N, length(r1))
-      unpack_monomials(er, r1.exps, k, exp_bits)
+      unpack_monomials(er, r1.exps, k, exp_bits, length(r1))
    else
       r1 = mul_johnson(a, b, exp_bits)
       er = r1.exps
@@ -2186,13 +2227,13 @@ function ^(a::MPoly{T}, b::Int) where {T <: RingElement}
       if k != 1
          M = div(N + k - 1, k)
          e1 = zeros(UInt, M, length(a))
-         pack_monomials(e1, a.exps, k, exp_bits)
+         pack_monomials(e1, a.exps, k, exp_bits, length(a))
          par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
          a1 = par(a.coeffs, e1)
          a1.length = a.length
          r1 = pow_fps(a1, b, exp_bits)
          er = zeros(UInt, N, length(r1))
-         unpack_monomials(er, r1.exps, k, exp_bits)
+         unpack_monomials(er, r1.exps, k, exp_bits, length(r1))
       else
          r1 = pow_fps(a, b, exp_bits)
          er = r1.exps
@@ -2504,8 +2545,8 @@ function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
       M = div(N + k - 1, k)
       e1 = zeros(UInt, M, length(a))
       e2 = zeros(UInt, M, length(b))
-      pack_monomials(e1, a.exps, k, exp_bits)
-      pack_monomials(e2, b.exps, k, exp_bits)
+      pack_monomials(e1, a.exps, k, exp_bits, length(a))
+      pack_monomials(e2, b.exps, k, exp_bits, length(b))
       par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
       a1 = par(a.coeffs, e1)
       b1 = par(b.coeffs, e2)
@@ -2513,7 +2554,7 @@ function divides(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
       b1.length = b.length
       flag, q = divides_monagan_pearce(a1, b1, exp_bits)
       eq = zeros(UInt, N, length(q))
-      unpack_monomials(eq, q.exps, k, exp_bits)
+      unpack_monomials(eq, q.exps, k, exp_bits, length(q))
    else
       flag, q = divides_monagan_pearce(a, b, exp_bits)
       eq = q.exps
@@ -2722,8 +2763,8 @@ function div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          M = div(N + k - 1, k)
          e1 = zeros(UInt, M, length(a))
          e2 = zeros(UInt, M, length(b))
-         pack_monomials(e1, a.exps, k, exp_bits)
-         pack_monomials(e2, b.exps, k, exp_bits)
+         pack_monomials(e1, a.exps, k, exp_bits, length(a))
+         pack_monomials(e2, b.exps, k, exp_bits, length(b))
          par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
          a1 = par(a.coeffs, e1)
          b1 = par(b.coeffs, e2)
@@ -2734,7 +2775,7 @@ function div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
             exp_bits *= 2
          else
             eq = zeros(UInt, N, length(q))
-            unpack_monomials(eq, q.exps, k, exp_bits)
+            unpack_monomials(eq, q.exps, k, exp_bits, length(q))
          end
       else
          flag, q = div_monagan_pearce(a, b, exp_bits)
@@ -2948,8 +2989,8 @@ function divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          M = div(N + k - 1, k)
          e1 = zeros(UInt, M, length(a))
          e2 = zeros(UInt, M, length(b))
-         pack_monomials(e1, a.exps, k, exp_bits)
-         pack_monomials(e2, b.exps, k, exp_bits)
+         pack_monomials(e1, a.exps, k, exp_bits, length(a))
+         pack_monomials(e2, b.exps, k, exp_bits, length(b))
          par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
          a1 = par(a.coeffs, e1)
          b1 = par(b.coeffs, e2)
@@ -2961,8 +3002,8 @@ function divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
          else
             eq = zeros(UInt, N, length(q))
             er = zeros(UInt, N, length(r))
-            unpack_monomials(eq, q.exps, k, exp_bits)
-            unpack_monomials(er, r.exps, k, exp_bits)
+            unpack_monomials(eq, q.exps, k, exp_bits, length(q))
+            unpack_monomials(er, r.exps, k, exp_bits, length(r))
          end
       else
          flag, q, r = divrem_monagan_pearce(a, b, exp_bits)
@@ -3187,9 +3228,9 @@ function divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
          M = div(N + k - 1, k)
          e1 = zeros(UInt, M, length(a))
          e2 = [zeros(UInt, M, length(b[i])) for i in 1:len]
-         pack_monomials(e1, a.exps, k, exp_bits)
+         pack_monomials(e1, a.exps, k, exp_bits, length(a))
          for i = 1:len
-            pack_monomials(e2[i], b[i].exps, k, exp_bits)
+            pack_monomials(e2[i], b[i].exps, k, exp_bits, length(b[i]))
          end
          par = MPolyRing{T}(base_ring(a), parent(a).S, parent(a).ord, M, false)
          a1 = par(a.coeffs, e1)
@@ -3204,10 +3245,10 @@ function divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
          else
             eq = [zeros(UInt, N, length(q[i])) for i in 1:len]
             for i = 1:len
-               unpack_monomials(eq[i], q[i].exps, k, exp_bits)
+               unpack_monomials(eq[i], q[i].exps, k, exp_bits, length(q[i]))
             end
             er = zeros(UInt, N, length(r))
-            unpack_monomials(er, r.exps, k, exp_bits)
+            unpack_monomials(er, r.exps, k, exp_bits, length(r))
          end
       else
          flag, q, r = divrem_monagan_pearce(a, b, exp_bits)
@@ -3332,7 +3373,8 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
    # to optimise computing new powers in any way.
    # Note that this function accepts values in a non-commutative ring, so operations
    # must be done in a certain order.
-   r = R()
+   S = parent(one(R)*one(parent(vals[1])))
+   r = geobucket(S)
    cvzip = zip(coeffs(a), exponent_vectors(a))
    for (c, v) in cvzip
       t = one(R)
@@ -3343,9 +3385,9 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
          end
          t = t*powers[j][exp]
       end
-      r += c*t
+      push!(r, c*t)
    end
-   return r
+   return finish(r)
 end
 
 @doc Markdown.doc"""
@@ -3383,7 +3425,7 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vect
    # being substituted, as we cannot assume anything about the relative
    # performance of powering vs multiplication. The function should not try
    # to optimise computing new powers in any way.
-   r = S()
+   r = geobucket(S)
    cvzip = zip(coeffs(a), exponent_vectors(a))
    for (c, v) in cvzip
       t = one(R)
@@ -3398,9 +3440,9 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vect
       end
       M = MPolyBuildCtx(S)
       push_term!(M, c, v)
-      r += t*finish(M)
+      push!(r, t*finish(M))
    end
-   return r
+   return finish(r)
 end
 
 @doc Markdown.doc"""
@@ -4006,10 +4048,14 @@ function addmul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
 end
 
 function resize_exps!(a::Array{UInt, 2}, n::Int)
-   N = size(a, 1)
-   A = reshape(a, size(a, 2)*N)
-   resize!(A, n*N)
-   return reshape(A, N, n)
+   if n > size(a, 2)
+      N = size(a, 1)
+      A = reshape(a, size(a, 2)*N)
+      new_size = max(n, 2*size(a, 2))
+      resize!(A, new_size*N)
+      return reshape(A, N, new_size)
+   end
+   return a
 end
 
 function fit!(a::MPoly{T}, n::Int) where {T <: RingElement}
