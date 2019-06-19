@@ -172,7 +172,7 @@ import .Generic: add!, addeq!, addmul!, base_ring, cached,
                  similarity!, snf, snf_kb,
                  snf_kb_with_transform, snf_with_transform,
                  solve, solve_rational, solve_triu,
-                 sort_terms!, sub, subst, supermodule,
+                 sort_terms!, sub, subst, summands, supermodule,
                  swap_cols, swap_cols!, swap_rows,
                  swap_rows!, symbols, term, terms, total_degree, to_univariate,
                  trail, truncate, typed_hcat, typed_hvcat, upscale,
@@ -255,7 +255,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, base_ring, cached,
                  snf, snf_kb, snf_kb_with_transform,
                  snf_with_transform, solve, symbols,
                  solve_rational, solve_triu,
-                 sort_terms!, sub, subst, supermodule,
+                 sort_terms!, sub, subst, summands, supermodule,
                  swap_rows, swap_rows!, swap_cols, swap_cols!,
                  term, terms, to_univariate,
                  total_degree, tr, trail, truncate, typed_hcat, typed_hvcat,
@@ -493,6 +493,27 @@ function QuotientModule(m::Module{T}, N::Module{T}) where T <: RingElement
 end
 
 @doc Markdown.doc"""
+    DirectSum(m::Vector{<:Module{T}}) where T <: RingElement
+> Return a tuple $M, f, g$ consisting of $M$ the direct sum of the modules `m`
+> (supplied as a vector of modules), a vector $f$ of the canonical injections
+> of the $m[i]$ into $M$ and a vector $g$ of the canonical projections from
+> $M$ onto the $m[i]$.
+"""
+function DirectSum(m::Vector{<:Module{T}}) where T <: RingElement
+   Generic.DirectSum(m)
+end
+
+@doc Markdown.doc"""
+    DirectSum(m::Module{T}...) where T <: RingElement
+> Return a tuple $M, f, g$ consisting of $M$ the direct sum of the given
+> modules, a vector $f$ of the canonical injections of the $m[i]$ into $M$
+> and a vector $g$ of the canonical projections from $M$ onto the $m[i]$.
+"""
+function DirectSum(m::Module{T}...) where T <: RingElement
+   Generic.DirectSum(m...)
+end
+
+@doc Markdown.doc"""
     QuotientSpace(m::Module{T}, N::Module{T}) where T <: RingElement
 > Return the quotient `Q` of the vector space `m` by the subvector space `N` of
 > `m`, and a map which is a lift of elements of `Q` to `m`.
@@ -515,7 +536,7 @@ export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        YoungTableau, AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
        PuiseuxSeriesField, FreeModule, VectorSpace, ModuleHomomorphism, Submodule,
-       Subspace, QuotientModule, QuotientSpace
+       Subspace, QuotientModule, QuotientSpace, DirectSum
 
 export Generic
 

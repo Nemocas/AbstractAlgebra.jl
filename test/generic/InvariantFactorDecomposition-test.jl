@@ -15,7 +15,7 @@ function test_invariant_factors()
    println("PASS")
 end
 
-function test_isomorphism()
+function test_invariant_factors_isomorphism()
    print("Generic.InvariantFactorDecomposition.isomorphism...")
 
    for R in [ZZ, QQ]
@@ -35,7 +35,7 @@ end
 
 function test_invariant_factor_decomposition()
    test_invariant_factors()
-   test_isomorphism()
+   test_invariant_factors_isomorphism()
 
    println("")
 end
