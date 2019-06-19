@@ -165,27 +165,22 @@ end
 #
 ###############################################################################
 
-function reduce_mod_rels(v::AbstractAlgebra.MatElem{T}, vrels::Vector{<:AbstractAlgebra.MatElem{T}}) where T <: RingElement
+# Reduce the vector v by the relations vrels starting at column start of v
+function reduce_mod_rels(v::AbstractAlgebra.MatElem{T}, vrels::Vector{<:AbstractAlgebra.MatElem{T}}, start::Int) where T <: RingElement
    R = base_ring(v)
    v = deepcopy(v) # don't destroy input
    i = 1
    t1 = R()
-   nurel = 0
-   nunum = 0
    for k = 1:length(vrels) # for each relation
       rel = vrels[k]
       while iszero(rel[1, i])
          i += 1
       end
-      if !isunit(rel[1, i])
-         nunum += 1
-         nurel = k
-      end
-      q, v[1, i] = AbstractAlgebra.divrem(v[1, i], rel[1, i])
+      q, v[1, start + i - 1] = AbstractAlgebra.divrem(v[1, start + i - 1], rel[1, i])
       q = -q
-      for j = i + 1:ncols(v)
+      for j = i + 1:ncols(rel)
          t1 = mul!(t1, q, rel[1, j])
-         v[1, j] = addeq!(v[1, j], t1)
+         v[1, start + j - 1] = addeq!(v[1, start + j - 1], t1)
       end
       i += 1
    end
@@ -195,14 +190,14 @@ end
 function (N::QuotientModule{T})(v::Vector{T}) where T <: RingElement
    length(v) != ngens(N) && error("Length of vector does not match number of generators")
    mat = matrix(base_ring(N), 1, length(v), v)
-   mat = reduce_mod_rels(mat, rels(N))
+   mat = reduce_mod_rels(mat, rels(N), 1)
    return quotient_module_elem{T}(N, mat)
 end
 
 function (N::QuotientModule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingElement
    ncols(v) != ngens(N) && error("Length of vector does not match number of generators")
    nrows(v) != 1 && ("Not a vector in quotient_module_elem constructor")
-   v = reduce_mod_rels(v, rels(N))
+   v = reduce_mod_rels(v, rels(N), 1)
    return quotient_module_elem{T}(N, v)
 end
 
@@ -225,7 +220,7 @@ function projection(v::AbstractAlgebra.MatElem{T}, crels::AbstractAlgebra.MatEle
       vrels[i] = matrix(R, 1, ncols(crels), [crels[i, j] for j in 1:ncols(crels)])
    end
    # reduce mod relations
-   v = reduce_mod_rels(v, vrels)
+   v = reduce_mod_rels(v, vrels, 1)
    # project down to quotient module
    r = zero_matrix(R, 1, ngens(N))
    for i = 1:ngens(N)

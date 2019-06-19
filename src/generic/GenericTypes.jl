@@ -1127,7 +1127,7 @@ end
 
 mutable struct submodule_elem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
    v::AbstractAlgebra.MatElem{T}
-   parent::AbstractAlgebra.Module{T}
+   parent::Submodule{T}
 
    function submodule_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
       z = new{T}(v, m)
@@ -1165,10 +1165,9 @@ end
 
 mutable struct quotient_module_elem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
    v::AbstractAlgebra.MatElem{T}
-   parent::AbstractAlgebra.Module{T}
+   parent::QuotientModule{T}
 
-   function quotient_module_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}
-) where T <: RingElement
+   function quotient_module_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
       z = new{T}(v, m)
    end
 end
@@ -1193,10 +1192,35 @@ end
 
 mutable struct snf_module_elem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
    v::AbstractAlgebra.MatElem{T}
-   parent::AbstractAlgebra.FPModule{T}
+   parent::SNFModule{T}
 
    function snf_module_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
       z = new{T}(v, m)
    end
 end
 
+###############################################################################
+#
+#   DirectSumModule/direct_sum_module_elem
+#
+###############################################################################
+
+mutable struct DirectSumModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
+   m::Vector{<:AbstractAlgebra.FPModule{T}}
+   rels::Vector{<:AbstractAlgebra.MatElem{T}}
+   inj::Vector{<:ModuleHomomorphism{T}}
+   pro::Vector{<:ModuleHomomorphism{T}}
+
+   function DirectSumModule{T}(m::Vector{<:AbstractAlgebra.FPModule{T}}, rels::Vector{<:AbstractAlgebra.MatElem{T}}) where T <: RingElement
+      return new{T}(m, rels)
+   end
+end
+
+mutable struct direct_sum_module_elem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
+   v::AbstractAlgebra.MatElem{T}
+   parent::DirectSumModule{T}
+
+   function direct_sum_module_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
+      z = new{T}(v, m)
+   end
+end

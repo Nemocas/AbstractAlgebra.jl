@@ -75,6 +75,8 @@ include("generic/Submodule.jl")
 
 include("generic/QuotientModule.jl")
 
+include("generic/DirectSum.jl")
+
 include("generic/ModuleHomomorphism.jl")
 
 include("generic/Module.jl")

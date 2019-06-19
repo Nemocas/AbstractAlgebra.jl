@@ -37,6 +37,7 @@ makedocs(
                             "free_module.md",
                             "submodule.md",
                             "quotient_module.md",
+                            "direct_sum.md",
                             "module_homomorphism.md"],
              "Matrices" => [ "matrix_spaces.md",
                              "matrix.md",
