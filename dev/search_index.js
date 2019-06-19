@@ -897,11 +897,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "polynomial/#AbstractAlgebra.Generic.change_base_ring-Union{Tuple{T}, Tuple{PolyElem{T},Any}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.change_base_ring",
+    "category": "method",
+    "text": "change_base_ring(::PolyElem{T}, g::Any) where T <: RingElement\n\nReturn the polynomial obtained by applying g to the coefficients. The new base ring is defined by the image of 0.\n\n\n\n"
+},
+
+{
     "location": "polynomial/#Change-of-base-ring-1",
     "page": "Generic univariate polynomials",
     "title": "Change of base ring",
     "category": "section",
-    "text": "change_base_ring(::PolyElem, g)ExamplesR, x = PolynomialRing(ZZ, \"x\")\ng = x^3+6*x + 1\nchange_base_ring(g, GF(2))"
+    "text": "change_base_ring(::PolyElem{T}, ::Any) where T <: RingElementExamplesR, x = PolynomialRing(ZZ, \"x\")\ng = x^3+6*x + 1\nchange_base_ring(g, GF(2))"
 },
 
 {
@@ -3517,7 +3525,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Interface",
     "title": "AbstractAlgebra.Generic.snf",
     "category": "method",
-    "text": "SNFModule(m::AbstractAlgebra.FPModule{T}) where T <: RingElement\n\nReturn a pair M, f consisting of the invariant factor decomposition M of the module m and a module homomorphism (isomorphisms) f  M to m. The module M is itself a module which can be manipulated as any other module in the system.\n\n\n\n"
+    "text": "snf(m::AbstractAlgebra.FPModule{T}) where T <: RingElement\n\nReturn a pair M, f consisting of the invariant factor decomposition M of the module m and a module homomorphism (isomorphisms) f  M to m. The module M is itself a module which can be manipulated as any other module in the system.\n\n\n\n"
 },
 
 {
@@ -3758,6 +3766,70 @@ var documenterSearchIndex = {"docs": [
     "title": "Basic manipulation",
     "category": "section",
     "text": "supermodule(M::AbstractAlgebra.Generic.QuotientModule{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(2), ZZ(3)])\n(2, 3)\n\njulia> N, g = Submodule(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> Q, h = QuotientModule(M, N)\n(Quotient module over Integers with 2 generators and relations:\n[2 3], Module homomorphism with\nDomain: Free module of rank 2 over Integers\nCodomain: Quotient module over Integers with 2 generators and relations:\n[2 3])\n\njulia> supermodule(Q) == M\ntrue\n"
+},
+
+{
+    "location": "direct_sum/#",
+    "page": "Direct Sums",
+    "title": "Direct Sums",
+    "category": "page",
+    "text": "CurrentModule = AbstractAlgebra\nDocTestSetup = quote\n    using AbstractAlgebra\nend"
+},
+
+{
+    "location": "direct_sum/#Direct-Sums-1",
+    "page": "Direct Sums",
+    "title": "Direct Sums",
+    "category": "section",
+    "text": "AbstractAlgebra allows the construction of the direct sum of any nonempty vector of finitely presented modules.As well as implementing the entire Module interface, AbstractAlgebra direct sums also provide the following interface."
+},
+
+{
+    "location": "direct_sum/#AbstractAlgebra.DirectSum-Union{Tuple{Array{#s1,1} where #s1<:FPModule{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Direct Sums",
+    "title": "AbstractAlgebra.DirectSum",
+    "category": "method",
+    "text": "DirectSum(m::Vector{<:Module{T}}) where T <: RingElement\n\nReturn a tuple M f g consisting of M the direct sum of the modules m (supplied as a vector of modules), a vector f of the canonical injections of the mi into M and a vector g of the canonical projections from M onto the mi.\n\n\n\n"
+},
+
+{
+    "location": "direct_sum/#AbstractAlgebra.DirectSum-Union{Tuple{Vararg{FPModule{T},N} where N}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Direct Sums",
+    "title": "AbstractAlgebra.DirectSum",
+    "category": "method",
+    "text": "DirectSum(m::Module{T}...) where T <: RingElement\n\nReturn a tuple M f g consisting of M the direct sum of the given modules, a vector f of the canonical injections of the mi into M and a vector g of the canonical projections from M onto the mi.\n\n\n\n"
+},
+
+{
+    "location": "direct_sum/#Constructors-1",
+    "page": "Direct Sums",
+    "title": "Constructors",
+    "category": "section",
+    "text": "DirectSum(::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement\nDirectSum(::AbstractAlgebra.FPModule{T}...) where T <: RingElementExamplesjulia> F = FreeModule(ZZ, 5)\nFree module of rank 5 over Integers\n\njulia> m1 = F(BigInt[4, 7, 8, 2, 6])\n(4, 7, 8, 2, 6)\n\njulia> m2 = F(BigInt[9, 7, -2, 2, -4])\n(9, 7, -2, 2, -4)\n\njulia> S1, f1 = Submodule(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> m1 = F(BigInt[3, 1, 7, 7, -7])\n(3, 1, 7, 7, -7)\n\njulia> m2 = F(BigInt[-8, 6, 10, -1, 1])\n(-8, 6, 10, -1, 1)\n\njulia> S2, f2 = Submodule(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> m1 = F(BigInt[2, 4, 2, -3, -10])\n(2, 4, 2, -3, -10)\n\njulia> m2 = F(BigInt[5, 7, -6, 9, -5])\n(5, 7, -6, 9, -5)\n\njulia> S3, f3 = Submodule(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> D, f = DirectSum(S1, S2, S3)\n(DirectSumModule over Integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n])"
+},
+
+{
+    "location": "direct_sum/#Functionality-for-direct-sums-1",
+    "page": "Direct Sums",
+    "title": "Functionality for direct sums",
+    "category": "section",
+    "text": "In addition to the Module interface, AbstractAlgebra direct sums implement the following functionality."
+},
+
+{
+    "location": "direct_sum/#AbstractAlgebra.Generic.summands-Union{Tuple{DirectSumModule{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Direct Sums",
+    "title": "AbstractAlgebra.Generic.summands",
+    "category": "method",
+    "text": "summands(M::DirectSumModule{T}) where T <: RingElement\n\nReturn the modules that this module is a direct sum of.\n\n\n\n"
+},
+
+{
+    "location": "direct_sum/#Basic-manipulation-1",
+    "page": "Direct Sums",
+    "title": "Basic manipulation",
+    "category": "section",
+    "text": "summands(::AbstractAlgebra.Generic.DirectSumModule{T}) where T <: RingElementExamplesjulia> F = FreeModule(ZZ, 5)\nFree module of rank 5 over Integers\n\njulia> m1 = F(BigInt[4, 7, 8, 2, 6])\n(4, 7, 8, 2, 6)\n\njulia> m2 = F(BigInt[9, 7, -2, 2, -4])\n(9, 7, -2, 2, -4)\n\njulia> S1, f1 = Submodule(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> m1 = F(BigInt[3, 1, 7, 7, -7])\n(3, 1, 7, 7, -7)\n\njulia> m2 = F(BigInt[-8, 6, 10, -1, 1])\n(-8, 6, 10, -1, 1)\n\njulia> S2, f2 = Submodule(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> m1 = F(BigInt[2, 4, 2, -3, -10])\n(2, 4, 2, -3, -10)\n\njulia> m2 = F(BigInt[5, 7, -6, 9, -5])\n(5, 7, -6, 9, -5)\n\njulia> S3, f3 = Submodule(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> D, f = DirectSum(S1, S2, S3)\n(DirectSumModule over Integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n])\n\njulia> summands(D)\n3-element Array{AbstractAlgebra.Generic.Submodule{BigInt},1}:\n Submodule over Integers with 2 generators and no relations\n\n Submodule over Integers with 2 generators and no relations\n\n Submodule over Integers with 2 generators and no relations"
 },
 
 {
