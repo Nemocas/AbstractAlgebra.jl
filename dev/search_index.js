@@ -3485,7 +3485,23 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Interface",
     "title": "Basic manipulation",
     "category": "section",
-    "text": "zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElementExamplesjulia> M = FreeModule(QQ, 2)\nVector space of dimension 2 over Rationals\n\njulia> z = zero(M)\n(0//1, 0//1)\n"
+    "text": "zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElementExamplesjulia> M = FreeModule(QQ, 2)\nVector space of dimension 2 over Rationals\n\njulia> z = zero(M)\n(0//1, 0//1)"
+},
+
+{
+    "location": "module/#Base.getindex-Union{Tuple{FPModuleElem{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Module Interface",
+    "title": "Base.getindex",
+    "category": "method",
+    "text": "getindex(a::Fac{T}, b::T) -> Int\n\nIf b is a factor of a, the corresponding exponent is returned. Otherwise an error is thrown.\n\n\n\n"
+},
+
+{
+    "location": "module/#Element-indexing-1",
+    "page": "Module Interface",
+    "title": "Element indexing",
+    "category": "section",
+    "text": "Base.getindex(m::AbstractAlgebra.FPModuleElem{T}) where T <: RingElementExamplesjulia> F = FreeModule(ZZ, 3)\nFree module of rank 3 over Integers\n\njulia> m = F(BigInt[2, -5, 4])\n(2, -5, 4)\n\njulia> m[1]\n2"
 },
 
 {
