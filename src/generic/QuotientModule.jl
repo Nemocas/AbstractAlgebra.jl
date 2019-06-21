@@ -194,6 +194,11 @@ function (N::QuotientModule{T})(v::Vector{T}) where T <: RingElement
    return quotient_module_elem{T}(N, mat)
 end
 
+function (M::QuotientModule{T})(a::Vector{Any}) where T <: Union{RingElement, NCRingElem}
+   length(a) != 0 && error("Incompatible element")
+   return M(T[])
+end
+
 function (N::QuotientModule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingElement
    ncols(v) != ngens(N) && error("Length of vector does not match number of generators")
    nrows(v) != 1 && ("Not a vector in quotient_module_elem constructor")

@@ -149,8 +149,27 @@ Vector space of dimension 2 over Rationals
 
 julia> z = zero(M)
 (0//1, 0//1)
-
 ```
+
+### Element indexing
+
+```@docs
+Base.getindex(m::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+```
+
+**Examples**
+
+```jldoctest
+julia> F = FreeModule(ZZ, 3)
+Free module of rank 3 over Integers
+
+julia> m = F(BigInt[2, -5, 4])
+(2, -5, 4)
+
+julia> m[1]
+2
+```
+
 ### Comparison
 
 ```@docs

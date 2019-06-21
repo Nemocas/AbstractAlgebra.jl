@@ -151,6 +151,11 @@ function (N::DirectSumModule{T})(v::Vector{T}) where T <: RingElement
    return direct_sum_module_elem{T}(N, mat)
 end
 
+function (M::DirectSumModule{T})(a::Vector{Any}) where T <: RingElement
+   length(a) != 0 && error("Incompatible element")
+   return M(T[])
+end
+
 function (N::DirectSumModule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingElement
    ncols(v) != ngens(N) && error("Length of vector does not match number of generators")
    nrows(v) != 1 && ("Not a vector in direct_sum_module_elem constructor")

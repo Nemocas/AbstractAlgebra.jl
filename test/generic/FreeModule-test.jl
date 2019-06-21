@@ -14,6 +14,10 @@ function test_free_module_constructors()
 
    @test isa(M([x, x, x, x, x]), Generic.free_module_elem)
 
+   F = FreeModule(ZZ, 0)
+
+   @test isa(F([]), Generic.free_module_elem)
+
    println("PASS")
 end
 
