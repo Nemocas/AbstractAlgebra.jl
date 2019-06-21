@@ -251,6 +251,20 @@ end
 
 ###############################################################################
 #
+#   Module element access
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    getindex(v::AbstractAlgebra.FPModuleElem{T}, i::Int) where T <: RingElement
+> Return the $i$-th coefficient of the module element $v$.
+"""
+function getindex(v::AbstractAlgebra.FPModuleElem{T}, i::Int) where T <: RingElement
+   return v.v[1, i]
+end
+
+###############################################################################
+#
 #   Random generation
 #
 ###############################################################################

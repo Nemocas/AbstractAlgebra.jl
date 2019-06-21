@@ -116,6 +116,29 @@ function test_module_manipulation()
    println("PASS")
 end
 
+function test_module_elem_getindex()
+   print("Generic.Module.elem_getindex...")
+
+   for R in [ZZ, QQ]
+      for iter = 1:100
+         F = FreeModule(R, 3)
+         M = rand_module(R, -10:10)
+
+         m1 = rand(M, -10:10)
+
+         m2 = zero(M)
+
+         if ngens(M) != 0
+            m2 = sum(m1[i]*gen(M, i) for i in 1:ngens(M))
+         end
+
+         @test m1 == m2
+      end
+   end
+
+   println("PASS")
+end
+
 function test_module_intersection()
    print("Generic.Module.intersection...")
 
@@ -200,6 +223,7 @@ end
 
 function test_module()
    test_module_manipulation()
+   test_module_elem_getindex()
    test_module_intersection()
    test_module_isisomorphic()
 

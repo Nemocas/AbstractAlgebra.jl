@@ -55,6 +55,15 @@ function test_quotient_module_constructors()
       end
    end
 
+   F = FreeModule(ZZ, 2)
+   m = F(BigInt[1, 0])
+   n = F(BigInt[0, 1])
+   S, f = Submodule(F, [m, n])
+   Q, g = QuotientModule(F, S)
+   m = Q([])
+
+   @test isa(m, Generic.quotient_module_elem)
+
    println("PASS")
 end
 

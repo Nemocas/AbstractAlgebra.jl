@@ -152,6 +152,11 @@ function (N::Submodule{T})(v::Vector{T}) where T <: RingElement
    return submodule_elem{T}(N, mat)
 end
 
+function (N::Submodule{T})(v::Vector{Any}) where T <: RingElement
+   length(v) != 0 && error("Incompatible element")
+   return N(T[])
+end
+
 function (N::Submodule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingElement
    ncols(v) != ngens(N) && error("Length of vector does not match number of generators")
    nrows(v) != 1 && ("Not a vector in submodule_elem constructor")
@@ -275,3 +280,7 @@ function Submodule(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: 
    return M, f
 end
 
+function Submodule(m::AbstractAlgebra.FPModule{T}, gens::Vector{Any}) where T <: RingElement
+   length(gens) != 0 && error("Incompatible module elements")
+   return Submodule(m, elem_type(m)[])
+end

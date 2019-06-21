@@ -33,6 +33,13 @@ function test_submodule_constructors()
       @test parent(f(v)) == M
    end
 
+   F = FreeModule(ZZ, 2)
+   S, f = Submodule(F, [])
+   m = S([])
+
+   @test isa(S, Generic.Submodule)
+   @test isa(m, Generic.submodule_elem)
+
    println("PASS")
 end
 

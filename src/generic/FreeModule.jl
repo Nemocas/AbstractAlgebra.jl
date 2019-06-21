@@ -170,6 +170,11 @@ function (M::FreeModule{T})(a::Vector{T}) where T <: Union{RingElement, NCRingEl
    return z
 end
 
+function (M::FreeModule{T})(a::Vector{Any}) where T <: Union{RingElement, NCRingElem}
+   length(a) != 0 && error("Incompatible element")
+   return M(T[])
+end
+
 function (M::FreeModule{T})(a::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
    ncols(a) != rank(M) && error("Number of elements does not equal rank")
    nrows(a) != 1 && error("Matrix should have single row")
