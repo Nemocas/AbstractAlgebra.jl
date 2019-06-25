@@ -1025,6 +1025,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "polynomial/#AbstractAlgebra.Generic.sylvester_matrix-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T}}} where T<:RingElem",
+    "page": "Generic univariate polynomials",
+    "title": "AbstractAlgebra.Generic.sylvester_matrix",
+    "category": "method",
+    "text": "sylvester_matrix(p::PolyElem, q::PolyElem)\n\nReturn the sylvester matrix of the given polynomials.\n\n\n\n"
+},
+
+{
     "location": "polynomial/#AbstractAlgebra.Generic.resultant-Union{Tuple{T}, Tuple{PolyElem{T},PolyElem{T}}} where T<:RingElem",
     "page": "Generic univariate polynomials",
     "title": "AbstractAlgebra.Generic.resultant",
@@ -1053,7 +1061,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "Resultant and discriminant",
     "category": "section",
-    "text": "resultant{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})resx{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})discriminant(a::PolyElem)Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)\n\njulia> f = 3x*y^2 + (x + 1)*y + 3\n(3*x)*y^2+(x+1)*y+3\n\njulia> g = 6(x + 1)*y + (x^3 + 2x + 2)\n(6*x+6)*y+(x^3+2*x+2)\n\njulia> h = resultant(f, g)\n3*x^7+6*x^5-6*x^3+96*x^2+192*x+96\n\njulia> k = discriminant(f)\nx^2-34*x+1\n"
+    "text": "sylvester_matrix{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})resultant{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})resx{T <: RingElem}(::PolyElem{T}, ::PolyElem{T})discriminant(a::PolyElem)Examplesjulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S, y = PolynomialRing(R, \"y\")\n(Univariate Polynomial Ring in y over Univariate Polynomial Ring in x over Integers, y)\n\njulia> f = 3x*y^2 + (x + 1)*y + 3\n(3*x)*y^2+(x+1)*y+3\n\njulia> g = 6(x + 1)*y + (x^3 + 2x + 2)\n(6*x+6)*y+(x^3+2*x+2)\n\njulia> S = sylvester_matrix(f, g)\n[3*x x+1 3]\n[6*x+6 x^3+2*x+2 0]\n[0 6*x+6 x^3+2*x+2]\n\njulia> h = resultant(f, g)\n3*x^7+6*x^5-6*x^3+96*x^2+192*x+96\n\njulia> k = discriminant(f)\nx^2-34*x+1\n"
 },
 
 {
