@@ -1683,6 +1683,38 @@ function test_gen_poly_integral()
    println("PASS")
 end
 
+function test_gen_poly_sylvester_matrix()
+   print("Generic.Poly.sylester_matrix...")
+
+   R, x = PolynomialRing(ZZ, "x")
+
+   for iter in 1:10
+      f = rand(R, 1:5, -10:10)
+      g = rand(R, 1:5, -10:10)
+      while degree(f) <= 0 || degree(g) <= 0
+         f = rand(R, 1:5, -10:10)
+         g = rand(R, 1:5, -10:10)
+      end
+
+      d1 = degree(f)
+      d2 = degree(g)
+
+      f1 = rand(R, 0:d2-1, -10:10)
+      g1 = rand(R, 0:d1-1, -10:10)
+
+      w = matrix(ZZ, 1, d2, [coeff(f1, d2 - i) for i in 1:d2])
+      w = hcat(w, matrix(ZZ, 1, d1, [coeff(g1, d1 - i) for i in 1:d1]))
+
+      h = f1 * f + g1 * g
+
+      v = matrix(ZZ, 1, d1 + d2, [coeff(h, d1 + d2 - i) for i in 1:d1 + d2])
+      M = sylvester_matrix(f, g)
+      @test v == w * M
+   end
+
+   println("PASS")
+end
+
 function test_gen_poly_resultant()
    print("Generic.Poly.resultant...")
 
@@ -2657,6 +2689,7 @@ function test_gen_poly()
    test_gen_poly_composition()
    test_gen_poly_derivative()
    test_gen_poly_integral()
+   test_gen_poly_sylvester_matrix()
    test_gen_poly_resultant()
    test_gen_poly_discriminant()
    test_gen_poly_resx()
