@@ -14,8 +14,8 @@ export PolynomialRing, hash, coeff, isgen, lead,
        mul_classical, mul_ks, subst, mul_karatsuba, trail,
        pow_multinomial, monomial_to_newton!, newton_to_monomial!, ismonomial,
        base_ring, parent_type, elem_type, check_parent, promote_rule,
-       needs_parentheses, displayed_with_minus_in_front, show_minus_one, remove, zero!, add!,
-       interpolate, sylvester_matrix
+       needs_parentheses, displayed_with_minus_in_front, show_minus_one,
+       remove, zero!, add!, interpolate, sylvester_matrix
 
 ###############################################################################
 #
@@ -1916,6 +1916,10 @@ function resultant_lehmer(a::AbstractAlgebra.PolyElem{T}, b::AbstractAlgebra.Pol
    return c1^(lB - 1)*c2^(lA - 1)*s*sgn
 end
 
+@doc Markdown.doc"""
+    sylvester_matrix(p::PolyElem, q::PolyElem)
+> Return the sylvester matrix of the given polynomials.
+"""
 function sylvester_matrix(p::AbstractAlgebra.PolyElem{T}, q::AbstractAlgebra.PolyElem{T}) where T <: RingElement
    check_parent(p, q)
    R = base_ring(p)
