@@ -1141,7 +1141,7 @@ end
 #
 ###############################################################################
 
-mutable struct geobucket{T <: AbstractAlgebra.MPolyElem}
+mutable struct geobucket{T}
    len::Int
    buckets::Vector{T}
 
@@ -1150,7 +1150,7 @@ mutable struct geobucket{T <: AbstractAlgebra.MPolyElem}
    end
 end
 
-function Base.push!(G::geobucket{T}, p::T) where T <: AbstractAlgebra.MPolyElem
+function Base.push!(G::geobucket{T}, p::T) where T
    R = parent(p)
    i = max(1, ndigits(length(p), base=4))
    G.buckets[i] = addeq!(G.buckets[i], p)
@@ -3408,19 +3408,52 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vect
    end
    S = parent(a)
    R = base_ring(a)
-   if (U <: Integer && U != BigInt) ||
-      (U <: Rational && U != Rational{BigInt})
-      c = zero(R)*zero(U)
-      V = typeof(c)
-      if U != V
-         vals = [parent(c)(v) for v in vals]
-         powers = [Dict{Int, V}() for i in 1:length(vals)]
-      else
-         powers = [Dict{Int, U}() for i in 1:length(vals)]
-      end
-   else
-      powers = [Dict{Int, U}() for i in 1:length(vals)]
-   end
+   return _evaluate(a, S, R, vars, vals)
+end
+
+function _evaluate(a, S, R, vars, vals::Vector{U}) where {U <: Integer}
+  c = zero(R) * zero(U)
+  V = typeof(c)
+  if V === U
+     powers = Dict{Int, U}[Dict{Int, U}() for i in 1:length(vals)]
+     return __evaluate(a, vars, vals, powers)
+  else
+     vals2 = V[parent(c)(v) for v in vals]
+     powers = Dict{Int, V}[Dict{Int, V}() for i in 1:length(vals)]
+     return __evaluate(a, vars, vals2, powers)
+  end
+end
+
+function _evaluate(a, S, R, vars, vals::Vector{U}) where {U <: Rational}
+  c = zero(R) * zero(U)
+  V = typeof(c)
+  if V === U
+     powers = Dict{Int, U}[Dict{Int, U}() for i in 1:length(vals)]
+     return __evaluate(a, vars, vals, powers)
+  else
+     vals2 = V[parent(c)(v) for v in vals]
+     powers = Dict{Int, V}[Dict{Int, V}() for i in 1:length(vals)]
+     return __evaluate(a, vars, vals2, powers)
+  end
+end
+function _evaluate(a, S, R, vars, vals::Vector{U}) where {U <: RingElement}
+  powers = Dict{Int, U}[Dict{Int, U}() for i in 1:length(vals)]
+  return __evaluate(a, vars, vals, powers)
+end
+
+function _evaluate(a, S, R, vars, vals::Vector{BigInt})
+  powers = Dict{Int, BigInt}[Dict{Int, BigInt}() for i in 1:length(vals)]
+  return __evaluate(a, vars, vals, powers)
+end
+
+function _evaluate(a, S, R, vars, vals::Vector{Rational{BigInt}})
+  powers = Dict{Int, Rational{BigInt}}[Dict{Int, Rational{BigInt}}() for i in 1:length(vals)]
+  return __evaluate(a, vars, vals, powers)
+end
+
+function __evaluate(a, vars, vals, powers)
+   R = base_ring(a)
+   S = parent(a)
    # The best we can do here is to cache previously used powers of the values
    # being substituted, as we cannot assume anything about the relative
    # performance of powering vs multiplication. The function should not try
@@ -3453,7 +3486,7 @@ end
 > ring of $a$ and elements of `vals`.
 """
 function evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
-   varidx = [var_index(x) for x in vars]
+   varidx = Int[var_index(x) for x in vars]
    return evaluate(a, varidx, vals)
 end
 
