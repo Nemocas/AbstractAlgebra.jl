@@ -284,3 +284,18 @@ function Submodule(m::AbstractAlgebra.FPModule{T}, gens::Vector{Any}) where T <:
    length(gens) != 0 && error("Incompatible module elements")
    return Submodule(m, elem_type(m)[])
 end
+
+function Submodule(m::AbstractAlgebra.FPModule{T}, subs::Vector{Submodule{T}}) where T <: RingElement
+   for N in subs
+      flag, P = iscompatible(m, N)
+      (!flag || P !== m) && error("Incompatible submodules")
+   end
+   gens = vcat((generators(s) for s in subs)...)
+   return Submodule(m, gens)
+end
+
+function Submodule(m::AbstractAlgebra.FPModule{T}, subs::Vector{Submodule{U}}) where {T <: RingElement, U <: Any}
+   length(gens) != 0 && error("Incompatible modules")
+   return Submodule(m, elem_type(m)[])
+end
+
