@@ -56,21 +56,30 @@ function Base.hash(a::MatAlgElem, h::UInt)
    return b
 end
 
+nrows(a::AbstractAlgebra.MatAlgebra) = a.n
+ncols(a::AbstractAlgebra.MatAlgebra) = nrows(a)
+
 @doc Markdown.doc"""
     degree(a::Generic.MatAlgElem)
 > Return the degree $n$ of the $n\times n$ matrix $a$..
 """
-degree(a::MatAlgElem) = size(a.entries, 1)
+degree(a::MatAlgElem) = nrows(a)
+
+@doc Markdown.doc"""
+    degree(a::AbstractAlgebra.MatAlgebra)
+> Return the degree $n$ of the given matrix algebra.
+"""
+degree(a::AbstractAlgebra.MatAlgebra) = nrows(a)
 
 @doc Markdown.doc"""
     zero(a::AbstractAlgebra.MatAlgebra)
-> Construct the zero matrix in the given matrix space.
+> Construct the zero matrix in the given matrix algebra.
 """
 zero(a::AbstractAlgebra.MatAlgebra) = a()
 
 @doc Markdown.doc"""
     one(a::AbstractAlgebra.MatAlgebra)
-> Construct the matrix in the given matrix space with ones down the diagonal
+> Construct the matrix in the given matrix algebra with ones down the diagonal
 > and zeroes elsewhere.
 """
 one(a::AbstractAlgebra.MatAlgebra) = a(1)
