@@ -901,7 +901,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic univariate polynomials",
     "title": "AbstractAlgebra.Generic.change_base_ring",
     "category": "method",
-    "text": "change_base_ring(::PolyElem{T}, g::Any) where T <: RingElement\n\nReturn the polynomial obtained by applying g to the coefficients. The new base ring is defined by the image of 0.\n\n\n\n"
+    "text": "change_base_ring(::PolyElem{T}, g::Any) where T <: RingElement\n\nReturn the polynomial obtained by applying g to the coefficients. The new base ring is defined by the image of 0. \n\n\n\n"
 },
 
 {
