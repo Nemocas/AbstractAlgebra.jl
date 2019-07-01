@@ -96,6 +96,74 @@ end
 
 ###############################################################################
 #
+#   Unary operators
+#
+###############################################################################
+
+function -(v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+   N = parent(v)
+   return N(-v.v)
+end
+
+###############################################################################
+#
+#   Binary operators
+#
+###############################################################################
+
+function +(v1::AbstractAlgebra.FPModuleElem{T}, v2::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+   check_parent(v1, v2)
+   N = parent(v1)
+   return N(v1.v + v2.v)
+end
+
+function -(v1::AbstractAlgebra.FPModuleElem{T}, v2::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+   check_parent(v1, v2)
+   N = parent(v1)
+   return N(v1.v - v2.v)
+end
+
+###############################################################################
+#
+#   Ad hoc binary operators
+#
+###############################################################################
+
+function *(v::AbstractAlgebra.FPModuleElem{T}, c::T) where T <: RingElem
+   base_ring(v) != parent(c) && error("Incompatible rings")
+   N = parent(v)
+   return N(v.v*c)
+end
+
+function *(v::AbstractAlgebra.FPModuleElem{T}, c::U) where {T <: RingElement, U <: Union{Rational, Integer}}
+   N = parent(v)
+   return N(v.v*c)
+end
+
+function *(c::T, v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElem
+   base_ring(v) != parent(c) && error("Incompatible rings")
+   N = parent(v)
+   return N(c*v.v)
+end
+
+function *(c::U, v::AbstractAlgebra.FPModuleElem{T}) where {T <: RingElement, U <: Union{Rational, Integer}}
+   N = parent(v)
+   return N(c*v.v)
+end
+
+###############################################################################
+#
+#   Comparison
+#
+###############################################################################
+
+function ==(m::AbstractAlgebra.FPModuleElem{T}, n::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+   check_parent(m, n)
+   return m.v == n.v
+end
+
+###############################################################################
+#
 #   Intersection
 #
 ###############################################################################
