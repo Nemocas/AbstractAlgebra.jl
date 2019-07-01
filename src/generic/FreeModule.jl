@@ -93,10 +93,12 @@ end
 #
 ###############################################################################
 
+#=
 function -(m::free_module_elem)
    M = parent(m)
    return M(-m.v)
 end
+=#
 
 ###############################################################################
 #
@@ -104,6 +106,7 @@ end
 #
 ###############################################################################
 
+#=
 function +(m1::free_module_elem{T}, m2::free_module_elem{T}) where T <: Union{RingElement, NCRingElem}
    check_parent(m1, m2)
    M = parent(m1)
@@ -115,6 +118,7 @@ function -(m1::free_module_elem{T}, m2::free_module_elem{T}) where T <: Union{Ri
    M = parent(m1)
    return M(m1.v - m2.v)
 end
+=#
 
 ###############################################################################
 #
@@ -122,6 +126,7 @@ end
 #
 ###############################################################################
 
+#=
 function *(m::free_module_elem{T}, c::T) where T <: Union{RingElem, NCRingElem}
    parent(c) != base_ring(m) && error("Incompatible scalar")
    M = parent(m)
@@ -143,6 +148,7 @@ function *(c::U, m::free_module_elem{T}) where {T <: Union{RingElement, NCRingEl
    M = parent(m)
    return M(c*m.v)
 end
+=#
 
 ###############################################################################
 #
@@ -150,10 +156,12 @@ end
 #
 ###############################################################################
 
+#=
 function ==(m1::free_module_elem{T}, m2::free_module_elem{T}) where T <: Union{RingElement, NCRingElem}
    check_parent(m1, m2)
    return m1.v == m2.v
 end
+=#
 
 ###############################################################################
 #
