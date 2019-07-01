@@ -3374,7 +3374,7 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
    # Note that this function accepts values in a non-commutative ring, so operations
    # must be done in a certain order.
    S = parent(one(R)*one(parent(vals[1])))
-   r = geobucket(S)
+   r = zero(S)
    cvzip = zip(coeffs(a), exponent_vectors(a))
    for (c, v) in cvzip
       t = one(R)
@@ -3385,9 +3385,9 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vals::Vector{U}) where {T <: 
          end
          t = t*powers[j][exp]
       end
-      push!(r, c*t)
+      r = addeq!(r, c*t)
    end
-   return finish(r)
+   return r
 end
 
 @doc Markdown.doc"""
