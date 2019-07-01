@@ -1141,7 +1141,7 @@ end
 #
 ###############################################################################
 
-mutable struct geobucket{T}
+mutable struct geobucket{T <: AbstractAlgebra.MPolyElem}
    len::Int
    buckets::Vector{T}
 
@@ -1150,7 +1150,7 @@ mutable struct geobucket{T}
    end
 end
 
-function Base.push!(G::geobucket{T}, p::T) where T
+function Base.push!(G::geobucket{T}, p::T) where {T <: AbstractAlgebra.MPolyElem}
    R = parent(p)
    i = max(1, ndigits(length(p), base=4))
    G.buckets[i] = addeq!(G.buckets[i], p)
@@ -1168,7 +1168,7 @@ function Base.push!(G::geobucket{T}, p::T) where T
    end
 end
 
-function finish(G::geobucket{T}) where T <: RingElement
+function finish(G::geobucket{T})  where {T <: AbstractAlgebra.MPolyElem}
    p = G.buckets[1]
    for i = 2:length(G.buckets)
       p = addeq!(p, G.buckets[i])
@@ -3406,6 +3406,11 @@ function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vect
          error("Variable index not in range")
       end
    end
+
+   if length(vars) == 0
+     return a
+   end
+
    S = parent(a)
    R = base_ring(a)
    return _evaluate(a, S, R, vars, vals)
@@ -3436,6 +3441,7 @@ function _evaluate(a, S, R, vars, vals::Vector{U}) where {U <: Rational}
      return __evaluate(a, vars, vals2, powers)
   end
 end
+
 function _evaluate(a, S, R, vars, vals::Vector{U}) where {U <: RingElement}
   powers = Dict{Int, U}[Dict{Int, U}() for i in 1:length(vals)]
   return __evaluate(a, vars, vals, powers)
@@ -3458,24 +3464,48 @@ function __evaluate(a, vars, vals, powers)
    # being substituted, as we cannot assume anything about the relative
    # performance of powering vs multiplication. The function should not try
    # to optimise computing new powers in any way.
-   r = geobucket(S)
-   cvzip = zip(coeffs(a), exponent_vectors(a))
-   for (c, v) in cvzip
-      t = one(R)
-      for j = 1:length(vars)
-         varnum = vars[j]
-         exp = v[varnum]
-         if !haskey(powers[j], exp)
-            powers[j][exp] = vals[j]^exp
-         end
-         t *= powers[j][exp]
-         v[varnum] = 0
-      end
-      M = MPolyBuildCtx(S)
-      push_term!(M, c, v)
-      push!(r, t*finish(M))
+
+   # We use a geobucket if the result will be an element in the same ring as a
+   if parent(vals[1] * one(S)) == S
+     r = geobucket(S)
+     cvzip = zip(coeffs(a), exponent_vectors(a))
+     for (c, v) in cvzip
+        t = one(R)
+        for j = 1:length(vars)
+           varnum = vars[j]
+           exp = v[varnum]
+           if !haskey(powers[j], exp)
+              powers[j][exp] = vals[j]^exp
+           end
+           t *= powers[j][exp]
+           v[varnum] = 0
+        end
+        M = MPolyBuildCtx(S)
+        push_term!(M, c, v)
+        push!(r, t*finish(M))
+     end
+     return finish(r)
+   else
+     K = parent(one(S) * vals[1])
+     r = zero(K)
+     cvzip = zip(coeffs(a), exponent_vectors(a))
+     for (c, v) in cvzip
+        t = one(R)
+        for j = 1:length(vars)
+           varnum = vars[j]
+           exp = v[varnum]
+           if !haskey(powers[j], exp)
+              powers[j][exp] = vals[j]^exp
+           end
+           t *= powers[j][exp]
+           v[varnum] = 0
+        end
+        M = MPolyBuildCtx(S)
+        push_term!(M, c, v)
+        addeq!(r, t*finish(M))
+     end
+     return r
    end
-   return finish(r)
 end
 
 @doc Markdown.doc"""
