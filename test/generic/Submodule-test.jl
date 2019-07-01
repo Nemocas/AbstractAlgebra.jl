@@ -20,6 +20,13 @@ function test_submodule_constructors()
 
    @test isa(N([R(2), R(7)]), Generic.submodule_elem)
 
+   M = FreeModule(R, 5)
+   nsubs = rand(0:5)
+   subs = [Submodule(M, [rand(M, -10:10)])[1] for i in 1:nsubs]
+   N, h = Submodule(M, subs)
+
+   @test isa(N, Generic.Submodule)
+
    R = QQ
    M = VectorSpace(R, 2)
    m = M([R(1), R(3)])
@@ -32,6 +39,13 @@ function test_submodule_constructors()
    for v in V
       @test parent(f(v)) == M
    end
+
+   M = VectorSpace(R, 5)
+   nsubs = rand(0:5)
+   subs = [Submodule(M, [rand(M, -10:10)])[1] for i in 1:nsubs]
+   N, h = Subspace(M, subs)
+
+   @test isa(N, Generic.Submodule)
 
    F = FreeModule(ZZ, 2)
    S, f = Submodule(F, [])

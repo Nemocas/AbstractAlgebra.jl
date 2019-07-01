@@ -27,6 +27,14 @@ Submodule(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T
 Subspace(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: FieldElement
 ```
 
+```@docs
+Submodule(::AbstractAlgebra.FPModule{T}, ::Vector{Generic.Submodule{T}}) where T <: RingElement
+```
+
+```@docs
+Subspace(::AbstractAlgebra.FPModule{T}, ::Vector{Generic.Submodule{T}}) where T <: FieldElement
+```
+
 **Examples**
 
 ```jldoctest
