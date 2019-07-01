@@ -186,7 +186,7 @@ function test_module_intersection()
 end
 
 function test_module_isisomorphic()
-   print("Generic.Module.IsIsomorphic...")
+   print("Generic.Module.is_isomorphic...")
 
    # Test the first isomorphism theorem
    for R in [ZZ, QQ]
