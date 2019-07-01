@@ -46,6 +46,9 @@ function test_perm_constructors(types)
          @test parent(g) != PermutationGroup(10)
       end
 
+      @test similar(g) isa perm{T}
+      @test similar(g, Int) isa perm{Int}
+
    end
 
    println("PASS")
@@ -216,6 +219,10 @@ function test_perm_binary_ops(types)
          @test parity(a*b) == (parity(b)+parity(a)) % 2
          @test AbstractAlgebra.mul!(z, a, b) == a*b
       end
+
+      a_copy = deepcopy(a)
+      @test a_copy^2 == AbstractAlgebra.mul!(a,a,a)
+      @test a_copy == a
 
       G = PermutationGroup(T(10))
       p = G(T[9,5,4,7,3,8,2,10,1,6]) # (1,9)(2,5,3,4,7)(6,8,10)
