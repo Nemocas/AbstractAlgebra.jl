@@ -1,5 +1,5 @@
 function rand_module(R::AbstractAlgebra.Ring, vals...)
-   rk = rand(1:5)
+   rk = rand(0:5)
    M = FreeModule(R, rk)
    levels = rand(0:3)
    for i = 1:levels
