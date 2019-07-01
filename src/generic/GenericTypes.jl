@@ -94,7 +94,7 @@ mutable struct perm{T<:Integer} <: AbstractAlgebra.GroupElem
       return new{T}(collect(T, 1:n), false)
    end
 
-   function perm(v::Vector{T}, check::Bool=true) where T<:Integer
+   function perm(v::AbstractVector{T}, check::Bool=true) where T<:Integer
       if check
          Set(v) != Set(1:length(v)) && error("Unable to coerce to permutation:
          non-unique elements in array")
