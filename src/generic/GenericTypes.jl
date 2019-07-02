@@ -934,7 +934,7 @@ const MatrixElem{T} = Union{AbstractAlgebra.MatElem{T}, AbstractAlgebra.MatAlgEl
 ###############################################################################
 
 Map(::Type{T}) where T <: AbstractAlgebra.Map = supertype(T)
-Map(::Type{S}) where S <: AbstractAlgebra.SetMap = Map{D, C, S, T} where {D, C, T}
+Map(::Type{S}) where S <: AbstractAlgebra.SetMap = Map{D, C, <:S, T} where {D, C, T}
 
 mutable struct CompositeMap{D, C} <: AbstractAlgebra.Map{D, C, AbstractAlgebra.SetMap, CompositeMap}
    domain::D
@@ -1093,7 +1093,7 @@ end
 #
 ###############################################################################
 
-mutable struct ModuleHomomorphism{T <: RingElement} <: AbstractAlgebra.Map{AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModule{T}, AbstractAlgebra.FunctionalMap, ModuleHomomorphism}
+mutable struct ModuleHomomorphism{T <: RingElement} <: AbstractAlgebra.Map{AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModuleHomomorphism, ModuleHomomorphism}
 
    domain::AbstractAlgebra.FPModule{T}
    codomain::AbstractAlgebra.FPModule{T}

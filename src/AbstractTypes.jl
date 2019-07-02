@@ -53,6 +53,8 @@ abstract type FunctionalMap <: SetMap end
 
 abstract type IdentityMap <: SetMap end
 
+abstract type FPModuleHomomorphism <: FunctionalMap end
+
 # rings, fields etc, parameterised by an element type
 # these are the type classes of different kinds of
 # mathematical rings/fields/etc, which have a base ring,
