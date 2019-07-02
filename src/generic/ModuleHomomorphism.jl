@@ -12,7 +12,7 @@ export ModuleHomomorphism, image
 #
 ###############################################################################
 
-mat(f::ModuleHomomorphism{T}) where T <: RingElement = f.matrix
+mat(f::Map(AbstractAlgebra.FPModuleHomomorphism)) = f.matrix
 
 ###############################################################################
 #
@@ -20,7 +20,7 @@ mat(f::ModuleHomomorphism{T}) where T <: RingElement = f.matrix
 #
 ###############################################################################
 
-function show(io::IO, f::ModuleHomomorphism)
+function show(io::IO, f::Map(AbstractAlgebra.FPModuleHomomorphism))
    println(io, "Module homomorphism with")
    print(io, "Domain: ")
    print(IOContext(io, :compact => true), domain(f))
@@ -35,7 +35,7 @@ end
 #
 ###############################################################################
 
-function compose(f::ModuleHomomorphism{T}, g::ModuleHomomorphism{T}) where T <: RingElement
+function compose(f::Map(AbstractAlgebra.FPModuleHomomorphism), g::Map(AbstractAlgebra.FPModuleHomomorphism))
    check_composable(f, g)
    return ModuleHomomorphism(domain(f), codomain(g), f.matrix*g.matrix)
 end
@@ -52,7 +52,7 @@ end
 > homomorphism $f$ (as a submodule of its domain) and the canonical injection
 > from the kernel into the domain of $f$
 """
-function kernel(f::ModuleHomomorphism{T}) where T <: RingElement
+function kernel(f::Map(AbstractAlgebra.FPModuleHomomorphism))
    D = domain(f)
    C = codomain(f)
    R = base_ring(D)
@@ -91,12 +91,12 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    image(f::ModuleHomomorphism{T}) where T <: RingElement
+    image(f::Map(AbstractAlgebra.FPModuleHomomorphism))
 > Returns a pair `I, g` consisting of the image object $I$ of the given module
 > homomorphism $f$ (as a submodule of its codomain) and the canonical injection
 > from the image into the codomain of $f$
 """
-function image(f::ModuleHomomorphism{T}) where T <: RingElement
+function image(f::Map(AbstractAlgebra.FPModuleHomomorphism))
    D = domain(f)
    C = codomain(f)
    R = base_ring(D)
