@@ -20,10 +20,10 @@ function test_submodule_constructors()
 
    @test isa(N([R(2), R(7)]), Generic.submodule_elem)
 
-   M = FreeModule(R, 5)
+   F = FreeModule(R, 5)
    nsubs = rand(0:5)
-   subs = [Submodule(M, [rand(M, -10:10)])[1] for i in 1:nsubs]
-   N, h = Submodule(M, subs)
+   subs = Generic.Submodule{elem_type(R)}[Submodule(F, [rand(F, -10:10)])[1] for i in 1:nsubs]
+   N, h = Submodule(F, subs)
 
    @test isa(N, Generic.Submodule)
 

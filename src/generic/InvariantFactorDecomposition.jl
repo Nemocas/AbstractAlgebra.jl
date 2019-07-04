@@ -4,8 +4,7 @@
 #
 ###############################################################################
 
-export SNFModule, snf_module_elem,
-       invariant_factors
+export SNFModule, snf_module_elem, invariant_factors
 
 ###############################################################################
 #
@@ -141,8 +140,6 @@ function snf(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
    A = matrix(R, r, s, T[old_rels[i][1, j] for i in 1:r for j in 1:s])
    # compute the snf
    S, U, K = snf_with_transform(A)
-   # compute K^-1
-   K = inv(K)
    # count unit invariant factors
    nunits = 0
    while nunits < min(nrows(S), ncols(S))
@@ -153,6 +150,11 @@ function snf(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
       end
    end
    num_gens = nrows(S) - nunits
+   # Make matrix for inverse isomorphism
+   mat_inv = matrix(R, nrows(K), ncols(A) - nunits,
+        T[K[i, j + nunits] for i in 1:nrows(K) for j in 1:ncols(A) - nunits])
+   # compute K^-1
+   K = inv(K)
    # Make generators out of cols of matrix K
    # throwing away ones corresponding to unit invariant factors
    T2 = elem_type(m)
@@ -171,7 +173,7 @@ function snf(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
    mat = matrix(R, ncols(A) - nunits, ncols(K),
         T[gens[i].v[1, j] for i in 1:ncols(A) - nunits for j in 1:ncols(K)])
    M = SNFModule{T}(m, gens, invariant_factors)
-   f = ModuleHomomorphism(M, m, mat)
+   f = ModuleIsomorphism{T}(M, m, mat, mat_inv)
    M.map = f 
    return M, f
 end

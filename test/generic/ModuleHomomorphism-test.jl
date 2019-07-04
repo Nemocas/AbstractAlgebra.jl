@@ -110,10 +110,42 @@ end
    @test I == T
 end
 
+function test_module_isomorphism()
+   print("Generic.ModuleIsomorphism...")
+
+   R = AbstractAlgebra.JuliaQQ
+   for iter = 1:100
+      # test image of composition of canonical injection and projection
+      M = rand_module(R, -10:10)::AbstractAlgebra.FPModule{elem_type(R)}
+      _test_module_isomorphism(M)
+   end
+   
+   println("PASS")
+end
+
+@noinline function _test_module_isomorphism(M)
+   n = ngens(M)
+   R = base_ring(M)
+   S = MatrixSpace(R, n, n)
+   N = randmat_with_rank(S, n, -10:10)
+   f = ModuleIsomorphism(M, M, N)
+   
+   @test mat(f) == N
+   @test N*inverse_mat(f) == 1
+
+   m = rand(M, -10:10)
+
+   @test inv(f)(f(m)) == m
+
+   @test isa(image_fn(f), Function)
+   @test isa(inverse_image_fn(f), Function)
+end
+
 function test_module_homomorphism()
    test_module_homomorphism_constructors()
    test_module_homomorphism_kernel()
    test_module_homomorphism_image()
+   test_module_isomorphism()
 
    println("")
 end

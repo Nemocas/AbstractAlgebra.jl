@@ -932,8 +932,7 @@ const _charvalsTableBig = Dict{Tuple{BitVector,Vector{Int}}, BigInt}()
 julia> G = PermutationGroup(4)
 Permutation group over 4 elements
 
-julia> chi = character(Partition([3,1])) # character of the regular representation
-#27 (generic function with 2 methods)
+julia> chi = character(Partition([3,1])); # character of the regular representation
 
 julia> chi(G())
 3

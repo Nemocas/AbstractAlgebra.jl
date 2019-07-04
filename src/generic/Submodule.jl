@@ -226,8 +226,3 @@ function Submodule(m::AbstractAlgebra.FPModule{T}, subs::Vector{Submodule{T}}) w
    return Submodule(m, gens)
 end
 
-function Submodule(m::AbstractAlgebra.FPModule{T}, subs::Vector{Submodule{U}}) where {T <: RingElement, U <: Any}
-   length(gens) != 0 && error("Incompatible modules")
-   return Submodule(m, elem_type(m)[])
-end
-

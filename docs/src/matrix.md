@@ -609,6 +609,10 @@ solve_rational{T <: RingElem}(::MatElem{T}, ::MatElem{T})
 ```
 
 ```@docs
+solve_left{T <: RingElem}(::MatElem{T}, ::MatElem{T})
+```
+
+```@docs
 solve_triu{T <: FieldElem}(::MatElem{T}, ::MatElem{T}, ::Bool)
 ```
 
