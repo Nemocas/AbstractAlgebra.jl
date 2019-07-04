@@ -41,7 +41,7 @@ function test_submodule_constructors()
    end
 
    M = VectorSpace(R, 5)
-   nsubs = rand(0:5)
+   nsubs = rand(1:5)
    subs = [Submodule(M, [rand(M, -10:10)])[1] for i in 1:nsubs]
    N, h = Subspace(M, subs)
 
