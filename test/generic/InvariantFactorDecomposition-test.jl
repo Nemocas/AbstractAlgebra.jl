@@ -49,6 +49,10 @@ function test_invariant_factors_isomorphism()
          K, g = kernel(f)
 
          @test length(invariant_factors(K)) == 0
+
+         m = rand(I, -10:10)
+
+         @test m == inv(f)(f(m))
       end
    end
    

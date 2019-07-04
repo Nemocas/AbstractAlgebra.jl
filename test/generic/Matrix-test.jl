@@ -601,19 +601,19 @@ end
 function test_gen_mat_minors()
    print("Generic.Mat.minors...")
 
-   S,z=PolynomialRing(ZZ,"z")
+   S, z=PolynomialRing(ZZ,"z")
    n = 5
    R = MatrixSpace(S,n,n)
-   for r=0:n
+   for r = 0:n
       M = randmat_with_rank(R, r, 0:3, 0:3)
-      @test [1] == minors(M,0)
-      for i=r+1:n
-         for m in minors(M,i)
-            @test m==0
+      @test [1] == minors(M, 0)
+      for i = r + 1:n
+         for m in minors(M, i)
+            @test m == 0
          end
       end
-      @test [det(M)] == minors(M,n)
-      @test [] == minors(M,n+1)
+      @test [det(M)] == minors(M, n)
+      @test [] == minors(M, n + 1)
    end
 
    println("PASS")
@@ -817,6 +817,54 @@ function test_gen_mat_solve_rational()
    x, d = solve_rational(M, b)
 
    @test M*x == d*b
+
+   println("PASS")
+end
+
+function test_gen_mat_solve_left()
+   print("Generic.Mat.solve_left...")
+
+   for R in [ZZ, QQ]
+      for iter = 1:40
+         for dim = 0:5
+            r = rand(1:5)
+            n = rand(1:5)
+            c = rand(1:5)
+
+            S = MatrixSpace(R, r, n)
+            U = MatrixSpace(R, n, c)
+
+            X1 = rand(S, -20:20)
+            M = rand(U, -20:20)
+
+            B = X1*M
+            X = solve_left(M, X1*M)
+
+            @test X*M == B
+         end
+      end
+   end
+
+   R, x = PolynomialRing(QQ, "x")
+
+   for iter = 1:4
+      for dim = 0:5
+         r = rand(1:5)
+         n = rand(1:5)
+         c = rand(1:5)
+
+         S = MatrixSpace(R, r, n)
+         U = MatrixSpace(R, n, c)
+
+         X1 = rand(S, 1:2, -10:10)
+         M = rand(U, 1:2, -10:10)
+
+         B = X1*M
+         X = solve_left(M, X1*M)
+
+         @test X*M == B
+      end
+   end
 
    println("PASS")
 end
@@ -1821,6 +1869,7 @@ function test_gen_mat()
    test_gen_mat_rank()
    test_gen_mat_solve_lu()
    test_gen_mat_solve_rational()
+   test_gen_mat_solve_left()
    test_gen_mat_solve_triu()
    test_gen_mat_can_solve_left_reduced_triu()
    test_gen_mat_rref()

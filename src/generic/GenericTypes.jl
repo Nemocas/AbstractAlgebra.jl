@@ -1105,6 +1105,20 @@ mutable struct ModuleHomomorphism{T <: RingElement} <: AbstractAlgebra.Map{Abstr
    end
 end
 
+mutable struct ModuleIsomorphism{T <: RingElement} <: AbstractAlgebra.Map{AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModule{T}, AbstractAlgebra.FPModuleHomomorphism, ModuleIsomorphism}
+
+   domain::AbstractAlgebra.FPModule{T}
+   codomain::AbstractAlgebra.FPModule{T}
+   matrix::AbstractAlgebra.MatElem{T}
+   inverse_matrix::AbstractAlgebra.MatElem{T}
+   image_fn::Function
+   inverse_image_fn::Function
+
+   function ModuleIsomorphism{T}(D::AbstractAlgebra.FPModule{T}, C::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}, minv::AbstractAlgebra.MatElem{T}) where T <: RingElement
+      z = new(D, C, m, minv, x::AbstractAlgebra.FPModuleElem{T} -> C(x.v*m), y::AbstractAlgebra.FPModuleElem{T} -> D(y.v*minv))
+   end
+end
+
 ###############################################################################
 #
 #   Submodule/submodule_elem
@@ -1183,7 +1197,7 @@ mutable struct SNFModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    gens::Vector{<:AbstractAlgebra.FPModuleElem{T}}
    invariant_factors::Vector{T}
    base_ring::Ring
-   map::ModuleHomomorphism{T}
+   map::ModuleIsomorphism{T}
 
    function SNFModule{T}(M::AbstractAlgebra.FPModule{T}, gens::Vector{<:AbstractAlgebra.FPModuleElem{T}}, invariant_factors::Vector{T}) where T <: RingElement
       return new{T}(M, gens, invariant_factors, base_ring(M))

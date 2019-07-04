@@ -22,6 +22,11 @@ $s\times t$ matrices over $R$.
 Generic.ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
 ```
 
+```@docs
+Generic.ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{
+T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
+```
+
 **Examples**
 
 ```jldoctest
@@ -44,7 +49,7 @@ julia> f(m)
 ### Kernels
 
 ```@docs
-kernel(f::Generic.ModuleHomomorphism{T}) where T <: RingElement
+kernel(f::Map(AbstractAlgebra.FPModuleHomomorphism))
 ```
 
 **Examples**
@@ -82,7 +87,7 @@ Codomain: Free module of rank 3 over Integers)
 ### Images
 
 ```@docs
-image(f::Generic.ModuleHomomorphism{T}) where T <: RingElement
+image(f::Map(AbstractAlgebra.FPModuleHomomorphism))
 ```
 
 ```julia
@@ -95,4 +100,20 @@ Q, g = QuotientModule(M, S)
 K, k = kernel(g)
 
 image(compose(k, g))
+```
+
+### Inverses
+
+Module isomorphisms can be cheaply inverted.
+
+```@docs
+inv(::Map(Generic.ModuleIsomorphism))
+```
+
+```julia
+M = FreeModule(ZZ, 2)
+N = matrix(ZZ, 2, 2, BigInt[1, 0, 0, 1])
+f = ModuleIsomorphism(M, M, N)
+
+g = inv(f)
 ```
