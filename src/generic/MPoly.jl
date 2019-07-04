@@ -93,7 +93,7 @@ end
     change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
 > Returns the polynomial obtained by applying g to the coefficients of p.
 """
-function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
+function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g::Function) where {T <: RingElement}
    new_base_ring = parent(g(zero(base_ring(p.parent))))
    new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in symbols(p.parent)], ordering = ordering(p.parent))
 
@@ -106,7 +106,7 @@ function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingEl
    return finish(M)
 end
 
-function change_base_ring(p::MPoly{T}, g) where {T <: RingElement}
+function change_base_ring(p::MPoly{T}, g::Function) where {T <: RingElement}
    new_base_ring = parent(g(zero(base_ring(p.parent))))
    new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(
 v) for v in symbols(p.parent)], ordering = ordering(p.parent))
@@ -3521,11 +3521,11 @@ function evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: AbstractAl
 end
 
 @doc Markdown.doc"""
-    evaluate(a::AbstractAlgebra.MPolyElem{T}, A::Vector{U}, g) where {T <: RingElement, U <: RingElement}
-> Evaluate the polynomial at the supplied values after applying the `Map` or `Function`
+    evaluate(a::AbstractAlgebra.MPolyElem{T}, A::Vector{U}, g::Function) where {T <: RingElement, U <: RingElement}
+> Evaluate the polynomial $a$ at the supplied values after applying the `Map` or `Function`
 > given by $g$ to the coefficients of the polynomial.
 """
-function evaluate(a::AbstractAlgebra.MPolyElem{T}, A::Vector{U}, g) where {T <: RingElement, U <: RingElement}
+function evaluate(a::AbstractAlgebra.MPolyElem{T}, A::Vector{U}, g::Function) where {T <: RingElement, U <: RingElement}
    anew = change_base_ring(a, g)
    return evaluate(anew, A)
 end

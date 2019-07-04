@@ -877,9 +877,9 @@ function test_gen_mpoly_evaluation()
    @test evaluate(f, [y, z], [t + 1, t - 1]) ==
                  (x^2 + 3)*t^2 + (2*x^2 + 2*x + 1)*t + (x^2 - 2*x - 3)
 
-   @test evaluate(f, [2, 4, 6], QQ) == 167//1
-   @test evaluate(f, [1, 3], [2, 4], QQ) == 4*y1^2 + 12*y1 + 21
-   @test evaluate(f, [x, z], [2, 4], QQ) == 4*y1^2 + 12*y1 + 21
+   @test evaluate(f, [2, 4, 6], x -> QQ(x)) == 167//1
+   @test evaluate(f, [1, 3], [2, 4], x -> QQ(x)) == 4*y1^2 + 12*y1 + 21
+   @test evaluate(f, [x, z], [2, 4], x -> QQ(x)) == 4*y1^2 + 12*y1 + 21
 
    S = MatrixAlgebra(ZZ, 2)
 

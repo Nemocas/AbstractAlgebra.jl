@@ -2658,9 +2658,9 @@ function test_gen_poly_change_base_ring()
    q = Zx([i for i in 10:-1:1])
    pq = p * q
    for R in [QQ,GF(2),GF(13),ZZ]
-      pR = change_base_ring(p, R)
-      qR = change_base_ring(q, R)
-      pqR = change_base_ring(pq, R)
+      pR = change_base_ring(p, x -> R(x))
+      qR = change_base_ring(q, x -> R(x))
+      pqR = change_base_ring(pq, x -> R(x))
       @test pR * qR == pqR
    end
 

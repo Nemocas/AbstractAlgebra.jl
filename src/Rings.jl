@@ -244,7 +244,7 @@ end
 > Return the polynomial obtained by applying `g` to the coefficients. The new
 > base ring is defined by the image of `0`. 
 """
-function change_base_ring(p::PolyElem{T}, g) where T <: RingElement
+function change_base_ring(p::PolyElem{T}, g::Function) where T <: RingElement
    z = zero(base_ring(parent(p)))
    new_base_ring = parent(g(z))
    new_var_name = string(var(parent(p)))
@@ -257,7 +257,7 @@ end
 > Return the polynomial obtained by applying `g` to the coefficients. The result
 > will have parent `Rx`.
 """
-function change_base_ring(p::PolyElem{T}, g, Rx::PolyRing) where T <: RingElement
+function change_base_ring(p::PolyElem{T}, g::Function, Rx::PolyRing) where T <: RingElement
    new_coefficients = [g(coeff(p, i)) for i in 0:degree(p)]
    return Rx(new_coefficients)
 end
