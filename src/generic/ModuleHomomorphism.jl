@@ -190,6 +190,7 @@ function ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.
    if m == 0 || n == 0
        M_inv = matrix(R, n, m, T[])
    else
+      # Put matrix M and target relations in a matrix
       mat = zero_matrix(R, m + q, n)
       for i = 1:m
          for j = 1:n
