@@ -97,7 +97,7 @@ function (M::FreeModule{T})(a::Vector{T}) where T <: Union{RingElement, NCRingEl
    length(a) != rank(M) && error("Number of elements does not equal rank")
    R = base_ring(M)
    v = matrix(R, 1, length(a), a)
-   z = free_module_elem{T}(v)
+   z = free_module_elem{T}(M, v)
    z.parent = M
    return z
 end
@@ -110,7 +110,7 @@ end
 function (M::FreeModule{T})(a::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
    ncols(a) != rank(M) && error("Number of elements does not equal rank")
    nrows(a) != 1 && error("Matrix should have single row")
-   z = free_module_elem{T}(a)
+   z = free_module_elem{T}(M, a)
    z.parent = M
    return z
 end
