@@ -25,8 +25,12 @@ QuotientModule(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T 
 
 ```@docs
 QuotientSpace(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: FieldElement
-
 ```
+
+Note that a preimage of the canonical projection can be obtained using the
+preimage function described in the section on module homomorphisms. Note that
+a preimage element of the canonical projection is not unique and has no special
+properties.
 
 **Examples**
 

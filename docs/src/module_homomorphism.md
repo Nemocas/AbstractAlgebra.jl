@@ -87,7 +87,7 @@ Codomain: Free module of rank 3 over Integers)
 ### Images
 
 ```@docs
-image(f::Map(AbstractAlgebra.FPModuleHomomorphism))
+image(::Map(AbstractAlgebra.FPModuleHomomorphism))
 ```
 
 ```julia
@@ -100,6 +100,26 @@ Q, g = QuotientModule(M, S)
 K, k = kernel(g)
 
 image(compose(k, g))
+```
+
+### Preimages
+
+```@docs
+preimage(::Map(AbstractAlgebra.FPModuleHomomorphism), ::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+```
+
+```julia
+M = FreeModule(ZZ, 3)
+
+m = M([ZZ(1), ZZ(2), ZZ(3)])
+
+S, f = Submodule(M, [m])
+Q, g = QuotientModule(M, S)
+
+m = rand(M, -10:10)
+n = g(m)
+
+p = preimage(g, n)
 ```
 
 ### Inverses

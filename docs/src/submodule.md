@@ -35,6 +35,10 @@ Submodule(::AbstractAlgebra.FPModule{T}, ::Vector{Generic.Submodule{T}}) where T
 Subspace(::AbstractAlgebra.FPModule{T}, ::Vector{Generic.Submodule{T}}) where T <: FieldElement
 ```
 
+Note that the preimage of the canonical injection can be obtained using the
+preimage function described in the section on module homomorphisms. As the
+canonical injection is injective, this is unique.
+
 **Examples**
 
 ```jldoctest

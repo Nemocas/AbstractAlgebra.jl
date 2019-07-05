@@ -170,6 +170,11 @@ function test_quotient_module_canonical_projection()
          I, g = image(h)
 
          @test I == Q
+
+         m = rand(M, -10:10)
+         n = h(m)
+
+         @test h(preimage(h, n)) == n
       end
    end
 

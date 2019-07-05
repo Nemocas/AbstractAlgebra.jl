@@ -4,7 +4,8 @@
 #
 ###############################################################################
 
-export ModuleHomomorphism, image, inverse_image_fn, mat, inverse_mat
+export ModuleHomomorphism, image, inverse_image_fn, mat, inverse_mat, mat,
+       preimage
 
 ###############################################################################
 #
@@ -139,6 +140,58 @@ function image(f::Map(AbstractAlgebra.FPModuleHomomorphism))
    G = gens(D)
    V = elem_type(C)[f(v) for v in G]
    return Submodule(C, V)
+end
+
+###############################################################################
+#
+#   Preimage
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    preimage(f::Map(AbstractAlgebra.FPModuleHomomorphism), v::AbstractAlgebra.FPModu
+leElem{T}) where T <: RingElement
+> Returns a preimage of $v$ under the homomorphism $f$, i.e. an element of the
+> domain of $f$ that maps to $v$ under $f$. Note that this has no special
+> mathematical properties. It is an element of the set theoretical preimage of
+> the map $f$ as a map of sets, if one exists. The preimage is neither
+> unique nor chosen in a canonical way in general. When no such element exists,
+> an exception is raised.
+"""
+function preimage(f::Map(AbstractAlgebra.FPModuleHomomorphism), v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+   D = domain(f)
+   C = codomain(f)
+   R = base_ring(C)
+   parent(v) !== C && error("Incompatible element")
+   M = mat(f)
+   trels = rels(C)
+   # Put rows of M and target relations into a matrix
+   q = length(trels)
+   m = nrows(M)
+   n = ncols(M)
+   ncols(v.v) != n && error("Incompatible element")
+   if m == 0 || n == 0
+       return D(zero_matrix(R, 1, m))
+   else
+      # Put matrix M and target relations in a matrix
+      matr = zero_matrix(R, m + q, n)
+      for i = 1:m
+         for j = 1:n
+            matr[i, j] = M[i, j]
+         end
+      end
+      for i = 1:q
+         for j = 1:n
+            matr[m + i, j] = trels[i][1, j]
+         end
+      end
+      # Find left inverse of mat
+      x = solve_left(matr, v.v)
+      if q != 0
+         x = matrix(R, 1, m, T[x[1, i] for i in 1:m])
+      end
+      return D(x)
+   end
 end
 
 ###############################################################################
