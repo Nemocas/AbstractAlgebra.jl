@@ -3685,7 +3685,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Submodules",
     "title": "Constructors",
     "category": "section",
-    "text": "Submodule(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: RingElementSubspace(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: FieldElementSubmodule(::AbstractAlgebra.FPModule{T}, ::Vector{Generic.Submodule{T}}) where T <: RingElementSubspace(::AbstractAlgebra.FPModule{T}, ::Vector{Generic.Submodule{T}}) where T <: FieldElementExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(1), ZZ(2)])\n(1, 2)\n\njulia> n = M([ZZ(2), ZZ(-1)])\n(2, -1)\n\njulia> N, f = Submodule(M, [m, n])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> v = N([ZZ(3), ZZ(4)])\n(3, 4)\n\njulia> v2 = f(v)\n(3, 26)\n\njulia> V = VectorSpace(QQ, 2)\nVector space of dimension 2 over Rationals\n\njulia> m = V([QQ(1), QQ(2)])\n(1//1, 2//1)\n\njulia> n = V([QQ(2), QQ(-1)])\n(2//1, -1//1)\n\njulia> N, f = Subspace(V, [m, n])\n(Subspace over Rationals with 2 generators and no relations\n, Module homomorphism with\nDomain: Subspace over Rationals with 2 generators and no relations\n\nCodomain: Vector space of dimension 2 over Rationals)\n"
+    "text": "Submodule(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: RingElementSubspace(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: FieldElementSubmodule(::AbstractAlgebra.FPModule{T}, ::Vector{Generic.Submodule{T}}) where T <: RingElementSubspace(::AbstractAlgebra.FPModule{T}, ::Vector{Generic.Submodule{T}}) where T <: FieldElementNote that the preimage of the canonical injection can be obtained using the preimage function described in the section on module homomorphisms. As the canonical injection is injective, this is unique.Examplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(1), ZZ(2)])\n(1, 2)\n\njulia> n = M([ZZ(2), ZZ(-1)])\n(2, -1)\n\njulia> N, f = Submodule(M, [m, n])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> v = N([ZZ(3), ZZ(4)])\n(3, 4)\n\njulia> v2 = f(v)\n(3, 26)\n\njulia> V = VectorSpace(QQ, 2)\nVector space of dimension 2 over Rationals\n\njulia> m = V([QQ(1), QQ(2)])\n(1//1, 2//1)\n\njulia> n = V([QQ(2), QQ(-1)])\n(2//1, -1//1)\n\njulia> N, f = Subspace(V, [m, n])\n(Subspace over Rationals with 2 generators and no relations\n, Module homomorphism with\nDomain: Subspace over Rationals with 2 generators and no relations\n\nCodomain: Vector space of dimension 2 over Rationals)\n"
 },
 
 {
@@ -3781,7 +3781,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Quotient modules",
     "title": "Constructors",
     "category": "section",
-    "text": "QuotientModule(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: RingElementQuotientSpace(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: FieldElement\nExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(1), ZZ(2)])\n(1, 2)\n\njulia> N, f = Submodule(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> Q, g = QuotientModule(M, N)\n(Quotient module over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Free module of rank 2 over Integers\nCodomain: Quotient module over Integers with 1 generator and no relations\n)\n\njulia> p = M([ZZ(3), ZZ(1)])\n(3, 1)\n\njulia> v2 = g(p)\n(-5)\n\njulia> V = VectorSpace(QQ, 2)\nVector space of dimension 2 over Rationals\n\njulia> m = V([QQ(1), QQ(2)])\n(1//1, 2//1)\n\njulia> N, f = Subspace(V, [m])\n(Subspace over Rationals with 1 generator and no relations\n, Module homomorphism with\nDomain: Subspace over Rationals with 1 generator and no relations\n\nCodomain: Vector space of dimension 2 over Rationals)\n\njulia> Q, g = QuotientSpace(V, N)\n(Quotient space over:\nRationals with 1 generator and no relations\n, Module homomorphism with\nDomain: Vector space of dimension 2 over Rationals\nCodomain: Quotient space over:\nRationals with 1 generator and no relations\n)\n"
+    "text": "QuotientModule(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: RingElementQuotientSpace(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: FieldElementNote that a preimage of the canonical projection can be obtained using the preimage function described in the section on module homomorphisms. Note that a preimage element of the canonical projection is not unique and has no special properties.Examplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(1), ZZ(2)])\n(1, 2)\n\njulia> N, f = Submodule(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> Q, g = QuotientModule(M, N)\n(Quotient module over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Free module of rank 2 over Integers\nCodomain: Quotient module over Integers with 1 generator and no relations\n)\n\njulia> p = M([ZZ(3), ZZ(1)])\n(3, 1)\n\njulia> v2 = g(p)\n(-5)\n\njulia> V = VectorSpace(QQ, 2)\nVector space of dimension 2 over Rationals\n\njulia> m = V([QQ(1), QQ(2)])\n(1//1, 2//1)\n\njulia> N, f = Subspace(V, [m])\n(Subspace over Rationals with 1 generator and no relations\n, Module homomorphism with\nDomain: Subspace over Rationals with 1 generator and no relations\n\nCodomain: Vector space of dimension 2 over Rationals)\n\njulia> Q, g = QuotientSpace(V, N)\n(Quotient space over:\nRationals with 1 generator and no relations\n, Module homomorphism with\nDomain: Vector space of dimension 2 over Rationals\nCodomain: Quotient space over:\nRationals with 1 generator and no relations\n)\n"
 },
 
 {
@@ -3949,7 +3949,23 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Homomorphisms",
     "title": "Images",
     "category": "section",
-    "text": "image(f::Map(AbstractAlgebra.FPModuleHomomorphism))M = FreeModule(ZZ, 3)\n\nm = M([ZZ(1), ZZ(2), ZZ(3)])\n\nS, f = Submodule(M, [m])\nQ, g = QuotientModule(M, S)\nK, k = kernel(g)\n\nimage(compose(k, g))"
+    "text": "image(::Map(AbstractAlgebra.FPModuleHomomorphism))M = FreeModule(ZZ, 3)\n\nm = M([ZZ(1), ZZ(2), ZZ(3)])\n\nS, f = Submodule(M, [m])\nQ, g = QuotientModule(M, S)\nK, k = kernel(g)\n\nimage(compose(k, g))"
+},
+
+{
+    "location": "module_homomorphism/#AbstractAlgebra.Generic.preimage-Union{Tuple{T}, Tuple{Map{D,C,#s13,T} where #s13<:FPModuleHomomorphism where T where C where D,FPModuleElem{T}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Module Homomorphisms",
+    "title": "AbstractAlgebra.Generic.preimage",
+    "category": "method",
+    "text": "preimage(f::Map(AbstractAlgebra.FPModuleHomomorphism), v::AbstractAlgebra.FPModu\n\nleElem{T}) where T <: RingElement\n\nReturns a preimage of v under the homomorphism f, i.e. an element of the domain of f that maps to v under f. Note that this has no special mathematical properties. It is an element of the set theoretical preimage of the map f as a map of sets, if one exists. The preimage is neither unique nor chosen in a canonical way in general. When no such element exists, an exception is raised.\n\n\n\n"
+},
+
+{
+    "location": "module_homomorphism/#Preimages-1",
+    "page": "Module Homomorphisms",
+    "title": "Preimages",
+    "category": "section",
+    "text": "preimage(::Map(AbstractAlgebra.FPModuleHomomorphism), ::AbstractAlgebra.FPModuleElem{T}) where T <: RingElementM = FreeModule(ZZ, 3)\n\nm = M([ZZ(1), ZZ(2), ZZ(3)])\n\nS, f = Submodule(M, [m])\nQ, g = QuotientModule(M, S)\n\nm = rand(M, -10:10)\nn = g(m)\n\np = preimage(g, n)"
 },
 
 {

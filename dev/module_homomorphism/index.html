@@ -46,7 +46,17 @@ S, f = Submodule(M, [m])
 Q, g = QuotientModule(M, S)
 K, k = kernel(g)
 
-image(compose(k, g))</code></pre><h3><a class="nav-anchor" id="Inverses-1" href="#Inverses-1">Inverses</a></h3><p>Module isomorphisms can be cheaply inverted.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.inv-Tuple{Map{AbstractAlgebra.FPModule{T},AbstractAlgebra.FPModule{T},AbstractAlgebra.FPModuleHomomorphism,AbstractAlgebra.Generic.ModuleIsomorphism} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}}" href="#Base.inv-Tuple{Map{AbstractAlgebra.FPModule{T},AbstractAlgebra.FPModule{T},AbstractAlgebra.FPModuleHomomorphism,AbstractAlgebra.Generic.ModuleIsomorphism} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}}"><code>Base.inv</code></a> — <span class="docstring-category">Method</span>.</div><div><p>inv(f::Map(ModuleIsomorphism))</p><blockquote><p>Returns the inverse map of the given module isomorphism. This is computed cheaply.</p></blockquote></div></section><pre><code class="language-julia">M = FreeModule(ZZ, 2)
+image(compose(k, g))</code></pre><h3><a class="nav-anchor" id="Preimages-1" href="#Preimages-1">Preimages</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.preimage-Union{Tuple{T}, Tuple{Map{D,C,#s13,T} where #s13&lt;:FPModuleHomomorphism where T where C where D,FPModuleElem{T}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.preimage-Union{Tuple{T}, Tuple{Map{D,C,#s13,T} where #s13&lt;:FPModuleHomomorphism where T where C where D,FPModuleElem{T}}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.preimage</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">preimage(f::Map(AbstractAlgebra.FPModuleHomomorphism), v::AbstractAlgebra.FPModu</code></pre><p>leElem{T}) where T &lt;: RingElement</p><blockquote><p>Returns a preimage of <span>$v$</span> under the homomorphism <span>$f$</span>, i.e. an element of the domain of <span>$f$</span> that maps to <span>$v$</span> under <span>$f$</span>. Note that this has no special mathematical properties. It is an element of the set theoretical preimage of the map <span>$f$</span> as a map of sets, if one exists. The preimage is neither unique nor chosen in a canonical way in general. When no such element exists, an exception is raised.</p></blockquote></div></section><pre><code class="language-julia">M = FreeModule(ZZ, 3)
+
+m = M([ZZ(1), ZZ(2), ZZ(3)])
+
+S, f = Submodule(M, [m])
+Q, g = QuotientModule(M, S)
+
+m = rand(M, -10:10)
+n = g(m)
+
+p = preimage(g, n)</code></pre><h3><a class="nav-anchor" id="Inverses-1" href="#Inverses-1">Inverses</a></h3><p>Module isomorphisms can be cheaply inverted.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="Base.inv-Tuple{Map{AbstractAlgebra.FPModule{T},AbstractAlgebra.FPModule{T},AbstractAlgebra.FPModuleHomomorphism,AbstractAlgebra.Generic.ModuleIsomorphism} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}}" href="#Base.inv-Tuple{Map{AbstractAlgebra.FPModule{T},AbstractAlgebra.FPModule{T},AbstractAlgebra.FPModuleHomomorphism,AbstractAlgebra.Generic.ModuleIsomorphism} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}}"><code>Base.inv</code></a> — <span class="docstring-category">Method</span>.</div><div><p>inv(f::Map(ModuleIsomorphism))</p><blockquote><p>Returns the inverse map of the given module isomorphism. This is computed cheaply.</p></blockquote></div></section><pre><code class="language-julia">M = FreeModule(ZZ, 2)
 N = matrix(ZZ, 2, 2, BigInt[1, 0, 0, 1])
 f = ModuleIsomorphism(M, M, N)
 
