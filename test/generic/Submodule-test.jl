@@ -154,6 +154,13 @@ function test_submodule_canonical_injection()
          I, g = image(f)
 
          @test I == N
+
+         m = rand(N, -10:10)
+
+         n = f(m)
+         pre = preimage(f, n)
+
+         @test pre == m
       end
    end
 
