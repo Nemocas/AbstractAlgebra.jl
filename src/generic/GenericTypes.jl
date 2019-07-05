@@ -1082,8 +1082,8 @@ mutable struct free_module_elem{T <: Union{RingElement, NCRingElem}} <: Abstract
     v::AbstractAlgebra.MatElem{T}
     parent::FreeModule{T}
 
-    function free_module_elem{T}(v::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
-       z = new{T}(v)
+    function free_module_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
+       z = new{T}(v, m)
     end
 end
 
