@@ -1684,7 +1684,7 @@ function test_gen_poly_integral()
 end
 
 function test_gen_poly_sylvester_matrix()
-   print("Generic.Poly.sylester_matrix...")
+   print("Generic.Poly.sylvester_matrix...")
 
    R, x = PolynomialRing(ZZ, "x")
 
