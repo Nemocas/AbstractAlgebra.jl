@@ -3261,7 +3261,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Partitions and Young tableaux",
     "title": "AbstractAlgebra.Generic.character",
     "category": "method",
-    "text": "character(lambda::Partition)\n\nReturn the lambda-th irreducible character of permutation group on sum(lambda) symbols. The returned character function is of the following signature:chi(p::perm[, check::Bool=true]) -> BigIntThe function checks (if p belongs to the appropriate group) can be switched off by calling chi(p, false). The values computed by chi are cached in look-up table.The computation follows the Murnaghan-Nakayama formula: chi_lambda(sigma) = sum_textrimhook xisubset lambda(-1)^ll(lambdabackslashxi) chi_lambda backslashxi(tildesigma) where lambdabackslashxi denotes the skew diagram of lambda with xi removed, ll denotes the leg-length (i.e. number of rows - 1) and tildesigma is permutation obtained from sigma by the removal of the longest cycle.For more details see e.g. Chapter 2.8 of Group Theory and Physics by S.Sternberg.\n\nExamples\n\njulia> G = PermutationGroup(4)\nPermutation group over 4 elements\n\njulia> chi = character(Partition([3,1])) # character of the regular representation\n#27 (generic function with 2 methods)\n\njulia> chi(G())\n3\n\njulia> chi(perm\"(1,3)(2,4)\")\n-1\n\n\n\n"
+    "text": "character(lambda::Partition)\n\nReturn the lambda-th irreducible character of permutation group on sum(lambda) symbols. The returned character function is of the following signature:chi(p::perm[, check::Bool=true]) -> BigIntThe function checks (if p belongs to the appropriate group) can be switched off by calling chi(p, false). The values computed by chi are cached in look-up table.The computation follows the Murnaghan-Nakayama formula: chi_lambda(sigma) = sum_textrimhook xisubset lambda(-1)^ll(lambdabackslashxi) chi_lambda backslashxi(tildesigma) where lambdabackslashxi denotes the skew diagram of lambda with xi removed, ll denotes the leg-length (i.e. number of rows - 1) and tildesigma is permutation obtained from sigma by the removal of the longest cycle.For more details see e.g. Chapter 2.8 of Group Theory and Physics by S.Sternberg.\n\nExamples\n\njulia> G = PermutationGroup(4)\nPermutation group over 4 elements\n\njulia> chi = character(Partition([3,1])); # character of the regular representation\n\njulia> chi(G())\n3\n\njulia> chi(perm\"(1,3)(2,4)\")\n-1\n\n\n\n"
 },
 
 {
@@ -3905,15 +3905,23 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "module_homomorphism/#AbstractAlgebra.Generic.ModuleIsomorphism-Union{Tuple{T}, Tuple{FPModule{T},FPModule{T},MatElem{T}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "page": "Module Homomorphisms",
+    "title": "AbstractAlgebra.Generic.ModuleIsomorphism",
+    "category": "method",
+    "text": "ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T},\n\nM::AbstractAlgebra.MatElem{T}, minv::AbstractAlgebra.MatElem{T}) where T <: RingElement\n\nCreate the isomorphism f  M_1 to M_2 represented by the matrix M. The inverse morphism is automatically computed.\n\n\n\n"
+},
+
+{
     "location": "module_homomorphism/#Constructors-1",
     "page": "Module Homomorphisms",
     "title": "Constructors",
     "category": "section",
-    "text": "Homomorphisms of AbstractAlgebra modules, f  R^s to R^t, can be represented by stimes t matrices over R.Generic.ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))\nModule homomorphism with\nDomain: Free module of rank 2 over Integers\nCodomain: Free module of rank 2 over Integers\n\njulia> m = M([ZZ(1), ZZ(2)])\n(1, 2)\n\njulia> f(m)\n(7, 10)\n"
+    "text": "Homomorphisms of AbstractAlgebra modules, f  R^s to R^t, can be represented by stimes t matrices over R.Generic.ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElementGeneric.ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{\nT}, m::AbstractAlgebra.MatElem{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))\nModule homomorphism with\nDomain: Free module of rank 2 over Integers\nCodomain: Free module of rank 2 over Integers\n\njulia> m = M([ZZ(1), ZZ(2)])\n(1, 2)\n\njulia> f(m)\n(7, 10)\n"
 },
 
 {
-    "location": "module_homomorphism/#AbstractAlgebra.Generic.kernel-Union{Tuple{ModuleHomomorphism{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "location": "module_homomorphism/#AbstractAlgebra.Generic.kernel-Tuple{Map{D,C,#s13,T} where #s13<:AbstractAlgebra.FPModuleHomomorphism where T where C where D}",
     "page": "Module Homomorphisms",
     "title": "AbstractAlgebra.Generic.kernel",
     "category": "method",
@@ -3925,15 +3933,15 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Homomorphisms",
     "title": "Kernels",
     "category": "section",
-    "text": "kernel(f::Generic.ModuleHomomorphism{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 3)\nFree module of rank 3 over Integers\n\njulia> m = M([ZZ(1), ZZ(2), ZZ(3)])\n(1, 2, 3)\n\njulia> S, f = Submodule(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 3 over Integers)\n\njulia> Q, g = QuotientModule(M, S)\n(Quotient module over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Free module of rank 3 over Integers\nCodomain: Quotient module over Integers with 2 generators and no relations\n)\n\njulia> kernel(g)\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 3 over Integers)\n"
+    "text": "kernel(f::Map(AbstractAlgebra.FPModuleHomomorphism))Examplesjulia> M = FreeModule(ZZ, 3)\nFree module of rank 3 over Integers\n\njulia> m = M([ZZ(1), ZZ(2), ZZ(3)])\n(1, 2, 3)\n\njulia> S, f = Submodule(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 3 over Integers)\n\njulia> Q, g = QuotientModule(M, S)\n(Quotient module over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Free module of rank 3 over Integers\nCodomain: Quotient module over Integers with 2 generators and no relations\n)\n\njulia> kernel(g)\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 3 over Integers)\n"
 },
 
 {
-    "location": "module_homomorphism/#AbstractAlgebra.Generic.image-Union{Tuple{ModuleHomomorphism{T}}, Tuple{T}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "location": "module_homomorphism/#AbstractAlgebra.Generic.image-Tuple{Map{D,C,#s13,T} where #s13<:AbstractAlgebra.FPModuleHomomorphism where T where C where D}",
     "page": "Module Homomorphisms",
     "title": "AbstractAlgebra.Generic.image",
     "category": "method",
-    "text": "image(f::ModuleHomomorphism{T}) where T <: RingElement\n\nReturns a pair I, g consisting of the image object I of the given module homomorphism f (as a submodule of its codomain) and the canonical injection from the image into the codomain of f\n\n\n\n"
+    "text": "image(f::Map(AbstractAlgebra.FPModuleHomomorphism))\n\nReturns a pair I, g consisting of the image object I of the given module homomorphism f (as a submodule of its codomain) and the canonical injection from the image into the codomain of f\n\n\n\n"
 },
 
 {
@@ -3941,7 +3949,23 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Homomorphisms",
     "title": "Images",
     "category": "section",
-    "text": "image(f::Generic.ModuleHomomorphism{T}) where T <: RingElementM = FreeModule(ZZ, 3)\n\nm = M([ZZ(1), ZZ(2), ZZ(3)])\n\nS, f = Submodule(M, [m])\nQ, g = QuotientModule(M, S)\nK, k = kernel(g)\n\nimage(compose(k, g))"
+    "text": "image(f::Map(AbstractAlgebra.FPModuleHomomorphism))M = FreeModule(ZZ, 3)\n\nm = M([ZZ(1), ZZ(2), ZZ(3)])\n\nS, f = Submodule(M, [m])\nQ, g = QuotientModule(M, S)\nK, k = kernel(g)\n\nimage(compose(k, g))"
+},
+
+{
+    "location": "module_homomorphism/#Base.inv-Tuple{Map{AbstractAlgebra.FPModule{T},AbstractAlgebra.FPModule{T},AbstractAlgebra.FPModuleHomomorphism,AbstractAlgebra.Generic.ModuleIsomorphism} where T<:Union{RingElem, AbstractFloat, Integer, Rational}}",
+    "page": "Module Homomorphisms",
+    "title": "Base.inv",
+    "category": "method",
+    "text": "inv(f::Map(ModuleIsomorphism))\n\nReturns the inverse map of the given module isomorphism. This is computed cheaply.\n\n\n\n"
+},
+
+{
+    "location": "module_homomorphism/#Inverses-1",
+    "page": "Module Homomorphisms",
+    "title": "Inverses",
+    "category": "section",
+    "text": "Module isomorphisms can be cheaply inverted.inv(::Map(Generic.ModuleIsomorphism))M = FreeModule(ZZ, 2)\nN = matrix(ZZ, 2, 2, BigInt[1, 0, 0, 1])\nf = ModuleIsomorphism(M, M, N)\n\ng = inv(f)"
 },
 
 {
@@ -4385,6 +4409,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "matrix/#AbstractAlgebra.Generic.solve_left-Union{Tuple{T}, Tuple{MatElem{T},MatElem{T}}} where T<:RingElem",
+    "page": "Generic matrices",
+    "title": "AbstractAlgebra.Generic.solve_left",
+    "category": "method",
+    "text": "solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: RingElement\n\nGiven an rtimes n matrix a over a ring and an mtimes n matrix b over the same ring, return an mtimes r matrix x such that xa = b. If no such matrix exists, an exception is raised.\n\n\n\n"
+},
+
+{
     "location": "matrix/#AbstractAlgebra.Generic.solve_triu-Union{Tuple{T}, Tuple{MatElem{T},MatElem{T},Bool}} where T<:FieldElem",
     "page": "Generic matrices",
     "title": "AbstractAlgebra.Generic.solve_triu",
@@ -4405,7 +4437,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Generic matrices",
     "title": "Linear solving",
     "category": "section",
-    "text": "solve{T <: FieldElem}(::MatElem{T}, ::MatElem{T})solve_rational{T <: RingElem}(::MatElem{T}, ::MatElem{T})solve_triu{T <: FieldElem}(::MatElem{T}, ::MatElem{T}, ::Bool)can_solve_left_reduced_triu{T <: RingElement}(::MatElem{T}, ::MatElem{T})Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> K, a = NumberField(x^3 + 3x + 1, \"a\")\n(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1, x)\n\njulia> S = MatrixSpace(K, 3, 3)\nMatrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> U = MatrixSpace(K, 3, 1)\nMatrix Space of 3 rows and 1 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n[0//1 2//1*x+3//1 x^2+1//1]\n[x^2-2//1 x-1//1 2//1*x]\n[x^2+3//1*x+1//1 2//1*x 1//1]\n\njulia> b = U([2a a + 1 (-a - 1)]\')\n[2//1*x]\n[x+1//1]\n[-x-1//1]\n\njulia> x = solve(A, b)\n[1984//7817*x^2+1573//7817*x-937//7817]\n[-2085//7817*x^2+1692//7817*x+965//7817]\n[-3198//7817*x^2+3540//7817*x-3525//7817]\n\njulia> A = S([a + 1 2a + 3 a^2 + 1; K(0) a^2 - 1 2a; K(0) K(0) a])\n[x+1//1 2//1*x+3//1 x^2+1//1]\n[0//1 x^2-1//1 2//1*x]\n[0//1 0//1 x]\n\njulia> bb = U([2a a + 1 (-a - 1)]\')\n[2//1*x]\n[x+1//1]\n[-x-1//1]\n\njulia> x = solve_triu(A, bb, false)\n[1//3*x^2+8//3*x+13//3]\n[-3//5*x^2-3//5*x-12//5]\n[x^2+2//1]\n\njulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S = MatrixSpace(R, 3, 3)\nMatrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in x over Integers\n\njulia> U = MatrixSpace(R, 3, 2)\nMatrix Space of 3 rows and 2 columns over Univariate Polynomial Ring in x over Integers\n\njulia> A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])\n[0 2*x+3 x^2+1]\n[x^2-2 x-1 2*x]\n[x^2+3*x+1 2*x 1]\n\njulia> bbb = U([2x x + 1 (-x - 1); x + 1 (-x) x^2]\')\n[2*x x+1]\n[x+1 -x]\n[-x-1 x^2]\n\njulia> x, d = solve_rational(A, bbb)\n([3*x^4-10*x^3-8*x^2-11*x-4 -x^5+3*x^4+x^3-2*x^2+3*x-1]\n[-2*x^5-x^4+6*x^3+2*x+1 x^6+x^5+4*x^4+9*x^3+8*x^2+5*x+2]\n[6*x^4+12*x^3+15*x^2+6*x-3 -2*x^5-4*x^4-6*x^3-9*x^2-4*x+1], x^5+2*x^4+15*x^3+18*x^2+8*x+7)\n\njulia> S = MatrixSpace(ZZ, 3, 3)\nMatrix Space of 3 rows and 3 columns over Integers\n\njulia> T = MatrixSpace(ZZ, 3, 1)\nMatrix Space of 3 rows and 1 columns over Integers\n\njulia> A = S([BigInt(2) 3 5; 1 4 7; 9 2 2])\n[2 3 5]\n[1 4 7]\n[9 2 2]   \n\njulia> B = T([BigInt(4), 5, 7])\n[4]\n[5]\n[7]"
+    "text": "solve{T <: FieldElem}(::MatElem{T}, ::MatElem{T})solve_rational{T <: RingElem}(::MatElem{T}, ::MatElem{T})solve_left{T <: RingElem}(::MatElem{T}, ::MatElem{T})solve_triu{T <: FieldElem}(::MatElem{T}, ::MatElem{T}, ::Bool)can_solve_left_reduced_triu{T <: RingElement}(::MatElem{T}, ::MatElem{T})Examplesjulia> R, x = PolynomialRing(QQ, \"x\")\n(Univariate Polynomial Ring in x over Rationals, x)\n\njulia> K, a = NumberField(x^3 + 3x + 1, \"a\")\n(Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1, x)\n\njulia> S = MatrixSpace(K, 3, 3)\nMatrix Space of 3 rows and 3 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> U = MatrixSpace(K, 3, 1)\nMatrix Space of 3 rows and 1 columns over Residue field of Univariate Polynomial Ring in x over Rationals modulo x^3+3//1*x+1//1\n\njulia> A = S([K(0) 2a + 3 a^2 + 1; a^2 - 2 a - 1 2a; a^2 + 3a + 1 2a K(1)])\n[0//1 2//1*x+3//1 x^2+1//1]\n[x^2-2//1 x-1//1 2//1*x]\n[x^2+3//1*x+1//1 2//1*x 1//1]\n\njulia> b = U([2a a + 1 (-a - 1)]\')\n[2//1*x]\n[x+1//1]\n[-x-1//1]\n\njulia> x = solve(A, b)\n[1984//7817*x^2+1573//7817*x-937//7817]\n[-2085//7817*x^2+1692//7817*x+965//7817]\n[-3198//7817*x^2+3540//7817*x-3525//7817]\n\njulia> A = S([a + 1 2a + 3 a^2 + 1; K(0) a^2 - 1 2a; K(0) K(0) a])\n[x+1//1 2//1*x+3//1 x^2+1//1]\n[0//1 x^2-1//1 2//1*x]\n[0//1 0//1 x]\n\njulia> bb = U([2a a + 1 (-a - 1)]\')\n[2//1*x]\n[x+1//1]\n[-x-1//1]\n\njulia> x = solve_triu(A, bb, false)\n[1//3*x^2+8//3*x+13//3]\n[-3//5*x^2-3//5*x-12//5]\n[x^2+2//1]\n\njulia> R, x = PolynomialRing(ZZ, \"x\")\n(Univariate Polynomial Ring in x over Integers, x)\n\njulia> S = MatrixSpace(R, 3, 3)\nMatrix Space of 3 rows and 3 columns over Univariate Polynomial Ring in x over Integers\n\njulia> U = MatrixSpace(R, 3, 2)\nMatrix Space of 3 rows and 2 columns over Univariate Polynomial Ring in x over Integers\n\njulia> A = S([R(0) 2x + 3 x^2 + 1; x^2 - 2 x - 1 2x; x^2 + 3x + 1 2x R(1)])\n[0 2*x+3 x^2+1]\n[x^2-2 x-1 2*x]\n[x^2+3*x+1 2*x 1]\n\njulia> bbb = U([2x x + 1 (-x - 1); x + 1 (-x) x^2]\')\n[2*x x+1]\n[x+1 -x]\n[-x-1 x^2]\n\njulia> x, d = solve_rational(A, bbb)\n([3*x^4-10*x^3-8*x^2-11*x-4 -x^5+3*x^4+x^3-2*x^2+3*x-1]\n[-2*x^5-x^4+6*x^3+2*x+1 x^6+x^5+4*x^4+9*x^3+8*x^2+5*x+2]\n[6*x^4+12*x^3+15*x^2+6*x-3 -2*x^5-4*x^4-6*x^3-9*x^2-4*x+1], x^5+2*x^4+15*x^3+18*x^2+8*x+7)\n\njulia> S = MatrixSpace(ZZ, 3, 3)\nMatrix Space of 3 rows and 3 columns over Integers\n\njulia> T = MatrixSpace(ZZ, 3, 1)\nMatrix Space of 3 rows and 1 columns over Integers\n\njulia> A = S([BigInt(2) 3 5; 1 4 7; 9 2 2])\n[2 3 5]\n[1 4 7]\n[9 2 2]   \n\njulia> B = T([BigInt(4), 5, 7])\n[4]\n[5]\n[7]"
 },
 
 {
