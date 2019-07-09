@@ -122,7 +122,7 @@ end
 #
 ###############################################################################
 
-function direct_sum_canonical_injection(m::AbstractAlgebra.FPModule{T}, D::DirectSumModule{T}, v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+function direct_sum_injection(m::AbstractAlgebra.FPModule{T}, D::DirectSumModule{T}, v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
    R = base_ring(m)
    # Find starting point of the given module in the large vectors
    start = 0
@@ -141,7 +141,7 @@ function direct_sum_canonical_injection(m::AbstractAlgebra.FPModule{T}, D::Direc
    return direct_sum_module_elem{T}(D, matv)
 end
 
-function direct_sum_canonical_projection(D::DirectSumModule{T}, m::U, v::AbstractAlgebra.FPModuleElem{T}) where {T <: RingElement, U <: AbstractAlgebra.FPModule{T}}
+function direct_sum_projection(D::DirectSumModule{T}, m::U, v::AbstractAlgebra.FPModuleElem{T}) where {T <: RingElement, U <: AbstractAlgebra.FPModule{T}}
    # Find starting point of the given module in the large vectors
    R = base_ring(m)
    start = 0
@@ -160,8 +160,8 @@ end
 @doc Markdown.doc"""
     DirectSum(m::Vector{AbstractAlgebra.FPModule{T}}) where T <: RingElement
 > Return a tuple $M, f, g$ consisting of $M$ the direct sum of the modules `m`
-> (supplied as a vector of modules), a vector $f$ of the canonical injections
-> of the $m[i]$ into $M$ and a vector $g$ of the canonical projections from
+> (supplied as a vector of modules), a vector $f$ of the injections
+> of the $m[i]$ into $M$ and a vector $g$ of the projections from
 > $M$ onto the $m[i]$.
 """
 function DirectSum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement
@@ -190,7 +190,7 @@ function DirectSum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElem
    end
    # Construct DirectSumModule object
    M = DirectSumModule{T}(m, new_rels)
-   # construct canonical injections and projections
+   # construct injections and projections
    inj = Vector{ModuleHomomorphism{T}}(undef, length(m))
    pro = Vector{ModuleHomomorphism{T}}(undef, length(m))
    start = 0
@@ -204,8 +204,8 @@ function DirectSum(m::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElem
       mat2 = transpose(mat1)
       pro[i] = ModuleHomomorphism(M, m[i], mat2)
       # Override image_fns with fast versions that don't do matrix-vector mul
-      inj[i].image_fn  = x -> direct_sum_canonical_injection(m[i], M, x)
-      pro[i].image_fn = x -> direct_sum_canonical_projection(M, m[i], x)
+      inj[i].image_fn  = x -> direct_sum_injection(m[i], M, x)
+      pro[i].image_fn = x -> direct_sum_projection(M, m[i], x)
       start += ngens(m[i])
    end
    M.inj = inj
