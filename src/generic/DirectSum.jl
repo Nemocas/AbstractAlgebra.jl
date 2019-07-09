@@ -99,6 +99,23 @@ function (N::DirectSumModule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingE
    return direct_sum_module_elem{T}(N, v)
 end
 
+function (M::DirectSumModule{T})(a::submodule_elem{T}) where T <: RingElement
+   R = parent(a)
+   base_ring(R) != base_ring(M) && error("Incompatible modules")
+   return M(R.map(a))
+end
+
+function (M::DirectSumModule{T})(a::direct_sum_module_elem{T}) where T <: RingElement
+   R = parent(a)
+   R != M && error("Incompatible modules")
+   return a
+end
+
+# Fallback for all other kinds of modules
+function (M::DirectSumModule{T})(a::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+   error("Unable to coerce into given module")
+end
+
 ###############################################################################
 #
 #   DirectSum constructor

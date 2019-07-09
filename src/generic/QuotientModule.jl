@@ -144,6 +144,26 @@ function (N::QuotientModule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingEl
    return quotient_module_elem{T}(N, v)
 end
 
+function (M::QuotientModule{T})(a::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+   N = parent(a)
+   R = base_ring(N)
+   base_ring(M) != R && error("Incompatible modules")
+   if M === N
+      return a
+   else
+      flag, P = iscompatible(M, N)
+      if flag && P === M
+         while N !== M
+            a = N.map(a)
+            N = parent(a)
+         end
+         return a
+      end
+      Q = supermodule(M)
+      return M.map(Q(a))
+   end
+end
+
 ###############################################################################
 #
 #   QuotientModule constructor

@@ -221,11 +221,81 @@ function test_module_isisomorphic()
    println("PASS")
 end
 
+function test_module_coercions()
+   print("Generic.Module.coercions...")
+
+   # Test the first isomorphism theorem
+   for R in [ZZ, QQ]
+      for iter = 1:20
+         M = rand_module(R, -10:10)
+
+         S2, f2 = Submodule(M, [rand(M, -10:10)])
+         S1, f1 = Submodule(S2, [rand(S2, -10:10)])
+
+         SQ1, g1 = Submodule(M, [rand(M, -10:10)])
+         Q1, h1 = QuotientModule(M, SQ1)
+         SQ2, g2 = Submodule(Q1, [rand(Q1, -10:10)])
+         Q2, h2 = QuotientModule(Q1, SQ2)
+         SQ3, g3 = Submodule(Q2, [rand(Q2, -10:10)])
+         Q3, h3 = QuotientModule(Q2, SQ3)
+
+         Sa, k1 = Submodule(Q2, [rand(Q2, -10:10)])
+         Sb, k2 = Submodule(Sa, [rand(Sa, -10:10)])
+
+         m1 = rand(M, -10:10)
+         @test parent(M(m1)) === M
+         @test parent(Q1(m1)) === Q1
+         @test parent(Q2(m1)) === Q2
+
+         m2 = rand(Q1, -10:10)
+         @test parent(Q1(m2)) == Q1
+         @test parent(Q2(m2)) == Q2
+
+         m3 = rand(S2, -10:10)
+         @test parent(M(m3)) === M
+         @test parent(Q1(m3)) === Q1
+         @test parent(Q2(m3)) === Q2
+
+         m4 = rand(S1, -10:10)
+         @test parent(M(m4)) === M
+         @test parent(Q1(m4)) === Q1
+         @test parent(Q2(m4)) === Q2
+
+         m5 = rand(Sa, -10:10)
+         @test parent(Sa(m5)) === Sa
+         @test parent(Q2(m5)) === Q2
+         @test parent(Q3(m5)) === Q3
+
+         m6 = rand(Sb, -10:10)
+         @test parent(Sa(m6)) === Sa
+         @test parent(Q2(m6)) === Q2
+         @test parent(Q3(m6)) === Q3
+
+         m7 = rand(S2, -10:10)
+         @test parent(M(m7)) === M
+         @test parent(Q1(m7)) === Q1
+         @test parent(Q2(m7)) === Q2
+
+         m8 = rand(S1, -10:10)
+         @test parent(M(m7)) === M
+         @test parent(Q1(m7)) === Q1
+         @test parent(Q2(m7)) === Q2
+
+         D, v = DirectSum(S1, Sa)
+         m9 = rand(D, -10:10)
+         @test parent(D(m9)) === D
+      end
+   end
+
+   println("PASS")
+end
+
 function test_module()
    test_module_manipulation()
    test_module_elem_getindex()
    test_module_intersection()
    test_module_isisomorphic()
+   test_module_coercions()
 
    println("")
 end
