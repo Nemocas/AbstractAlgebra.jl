@@ -216,6 +216,11 @@ true
 isisomorphic(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElement
 ```
 
+Note that this function relies on the Smith normal form over the base ring of
+the modules being able to be made unique. This is true for Euclidean domains
+for which `divrem` has a fixed choice of quotient and remainder, but it will
+not in general be true for Euclidean rings that are not domains.
+
 **Examples**
 
 ```repl
@@ -252,7 +257,7 @@ true
 For modules over a euclidean domain one can take the invariant factor
 decomposition to determine the structure of the module. The invariant factors
 are unique up to multiplication by a unit, and even unique if a 
-`canonical_unit` is available for the ring.
+`canonical_unit` is available for the ring that canonicalises elements.
 
 ```@docs
 snf(::AbstractAlgebra.FPModule{T}) where T <: RingElement
