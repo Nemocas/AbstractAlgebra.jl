@@ -11,7 +11,7 @@ function test_module_homomorphism_constructors()
 
    @test f(m) == M([ZZ(7), ZZ(10)])
 
-   N, nmap = Submodule(M, [m])
+   N, nmap = sub(M, [m])
 
    g = ModuleHomomorphism(N, N, matrix(ZZ, 1, 1, [3]))
 
@@ -31,9 +31,9 @@ function test_module_homomorphism_kernel()
          M = rand_module(R, -10:10)
          ngens1 = rand(1:5)
          gens1 = [rand(M, -10:10) for j in 1:ngens1]
-         M1, f1 = Submodule(M, gens1)
+         M1, f1 = sub(M, gens1)
 
-         Q, g = QuotientModule(M, M1)
+         Q, g = quo(M, M1)
          k1, h1 = kernel(f1)
          
          @test ngens(k1) == 0
@@ -98,14 +98,14 @@ end
 @noinline function _test_module_homomorphism_image(M)
    ngens1 = rand(1:5)
    gens1 = [rand(M, -10:10) for j in 1:ngens1]
-   M1, f1 = Submodule(M, gens1)
+   M1, f1 = sub(M, gens1)
 
-   Q, g = QuotientModule(M, M1)
+   Q, g = quo(M, M1)
    k1, h1 = kernel(g)
 
    k = compose(h1, g)
    I, f = image(k)
-   T, t = Submodule(Q, elem_type(Q)[])
+   T, t = sub(Q, elem_type(Q)[])
 
    @test I == T
 end

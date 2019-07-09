@@ -20,11 +20,7 @@ submodules also provide the following interface.
 ## Constructors
 
 ```@docs
-QuotientModule(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: RingElement
-```
-
-```@docs
-QuotientSpace(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: FieldElement
+quo(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: RingElement
 ```
 
 Note that a preimage of the canonical projection can be obtained using the
@@ -41,14 +37,14 @@ Free module of rank 2 over Integers
 julia> m = M([ZZ(1), ZZ(2)])
 (1, 2)
 
-julia> N, f = Submodule(M, [m])
+julia> N, f = sub(M, [m])
 (Submodule over Integers with 1 generator and no relations
 , Module homomorphism with
 Domain: Submodule over Integers with 1 generator and no relations
 
 Codomain: Free module of rank 2 over Integers)
 
-julia> Q, g = QuotientModule(M, N)
+julia> Q, g = quo(M, N)
 (Quotient module over Integers with 1 generator and no relations
 , Module homomorphism with
 Domain: Free module of rank 2 over Integers
@@ -67,14 +63,14 @@ Vector space of dimension 2 over Rationals
 julia> m = V([QQ(1), QQ(2)])
 (1//1, 2//1)
 
-julia> N, f = Subspace(V, [m])
+julia> N, f = sub(V, [m])
 (Subspace over Rationals with 1 generator and no relations
 , Module homomorphism with
 Domain: Subspace over Rationals with 1 generator and no relations
 
 Codomain: Vector space of dimension 2 over Rationals)
 
-julia> Q, g = QuotientSpace(V, N)
+julia> Q, g = quo(V, N)
 (Quotient space over:
 Rationals with 1 generator and no relations
 , Module homomorphism with
@@ -105,14 +101,14 @@ Free module of rank 2 over Integers
 julia> m = M([ZZ(2), ZZ(3)])
 (2, 3)
 
-julia> N, g = Submodule(M, [m])
+julia> N, g = sub(M, [m])
 (Submodule over Integers with 1 generator and no relations
 , Module homomorphism with
 Domain: Submodule over Integers with 1 generator and no relations
 
 Codomain: Free module of rank 2 over Integers)
 
-julia> Q, h = QuotientModule(M, N)
+julia> Q, h = quo(M, N)
 (Quotient module over Integers with 2 generators and relations:
 [2 3], Module homomorphism with
 Domain: Free module of rank 2 over Integers
