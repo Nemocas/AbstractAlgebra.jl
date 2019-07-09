@@ -121,6 +121,29 @@ Construct the element of the module $M$ corrsponding to $\sum_i g[i]v[i]$
 where $g[i]$ are the generators of the module $M$. The resulting element
 will lie in the module $M$.
 
+### Coercions
+
+Given a module $M$ and an element $n$ of a module $N$, it is possible to
+coerce $n$ into $M$ using the notation $M(n)$ in certain circumstances.
+
+In particular the element $n$ will be automatically coerced along any canonical
+injection of a submodule map and along any canonical projection of a quotient
+map. There must be a path from $N$ to $M$ along such maps.
+
+**Examples**
+
+```julia
+F = FreeModule(ZZ, 3)
+
+S1, f = Submodule(F, [rand(F, -10:10)])
+
+S, g = Submodule(F, [rand(F, -10:10)])
+Q, h = QuotientModule(F, S)
+
+m = rand(S1, -10:10)
+n = Q(m)
+```
+
 ### Arithmetic operators
 
 Elements of a module can be added, subtracted or multiplied by an element of

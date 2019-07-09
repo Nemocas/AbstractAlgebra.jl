@@ -118,6 +118,23 @@ function (N::SNFModule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingElement
    return snf_module_elem{T}(N, v)
 end
 
+function (M::SNFModule{T})(a::submodule_elem{T}) where T <: RingElement
+   R = parent(a)
+   base_ring(R) != base_ring(M) && error("Incompatible modules")
+   return M(R.map(a))
+end
+
+function (M::SNFModule{T})(a::snf_module_elem{T}) where T <: RingElement
+   R = parent(a)
+   R != M && error("Incompatible modules")
+   return a
+end
+
+# Fallback for all other kinds of modules
+function (M::SNFModule{T})(a::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+   error("Unable to coerce into given module")
+end
+
 ###############################################################################
 #
 #   SNFModule constructor

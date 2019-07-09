@@ -96,6 +96,21 @@ function (N::Submodule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingElement
    return submodule_elem{T}(N, v)
 end
 
+function (M::Submodule{T})(a::submodule_elem{T}) where T <: RingElement
+   R = parent(a)
+   base_ring(R) != base_ring(M) && error("Incompatible modules")
+   if R === M
+      return a
+   else
+      return M(R.map(a))
+   end
+end
+
+# Fallback for all other kinds of modules
+function (M::Submodule{T})(a::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+   error("Unable to coerce into given module")
+end
+
 ###############################################################################
 #
 #   Submodule constructor

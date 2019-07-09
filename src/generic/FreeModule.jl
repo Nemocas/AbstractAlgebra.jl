@@ -115,6 +115,23 @@ function (M::FreeModule{T})(a::AbstractAlgebra.MatElem{T}) where T <: Union{Ring
    return z
 end
 
+function (M::FreeModule{T})(a::submodule_elem{T}) where T <: RingElement
+   R = parent(a)
+   base_ring(R) !== base_ring(M) && error("Incompatible modules")
+   return M(R.map(a))
+end
+
+function (M::FreeModule{T})(a::free_module_elem{T}) where T <: RingElement
+   R = parent(a)
+   R !== M && error("Incompatible modules")
+   return a
+end
+
+# Fallback for all other kinds of modules
+function (M::FreeModule{T})(a::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
+   error("Unable to coerce into given module")
+end
+
 ###############################################################################
 #
 #   FreeModule constructor

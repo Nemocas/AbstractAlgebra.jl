@@ -7,11 +7,14 @@ end
 
 # Direct Sums
 
-AbstractAlgebra allows the construction of the direct sum of any nonempty vector
-of finitely presented modules.
+AbstractAlgebra allows the construction of the external direct sum of any
+nonempty vector of finitely presented modules.
 
 As well as implementing the entire Module interface, AbstractAlgebra
 direct sums also provide the following interface.
+
+Note that external direct sums are considered equal iff they are the same
+object.
 
 ## Constructors
 
