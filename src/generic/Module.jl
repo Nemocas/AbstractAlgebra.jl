@@ -225,7 +225,7 @@ function Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPMod
    # and the columns so that they correspond to the original order before
    # flipping above
    I = [M([K[nc - j + 1, rn - i + 1] for i in 1:r1]) for j in 1:nc]
-   return Submodule(M, I)
+   return sub(M, I)
 end
 
 ###############################################################################

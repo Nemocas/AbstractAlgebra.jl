@@ -6,8 +6,8 @@ function test_quotient_module_constructors()
 
    m = M([R(1), R(2)])
 
-   N, f = Submodule(M, [m])
-   Q, g = QuotientModule(M, N)
+   N, f = sub(M, [m])
+   Q, g = quo(M, N)
 
    V = gens(M)
    for v in V
@@ -25,8 +25,8 @@ function test_quotient_module_constructors()
    R = QQ
    M = VectorSpace(R, 2)
    m = M([R(1), R(3)])
-   N, f = Subspace(M, [m])
-   Q, g = QuotientSpace(M, N)
+   N, f = sub(M, [m])
+   Q, g = quo(M, N)
 
    V = gens(M)
    for v in V
@@ -40,16 +40,16 @@ function test_quotient_module_constructors()
          M = rand_module(R, -10:10)
          ngens1 = rand(1:5)
          S = [rand(M, -10:10) for i in 1:ngens1]
-         N, f = Submodule(M, S)
+         N, f = sub(M, S)
          ngens2 = rand(1:5)
          T = [rand(N, -10:10) for i in 1:ngens2]
-         P, g = Submodule(N, T)
-         Q1, h1 = QuotientModule(M, P)
+         P, g = sub(N, T)
+         Q1, h1 = quo(M, P)
          
          U = [f(v) for v in T]
-         V, k = Submodule(M, U)
+         V, k = sub(M, U)
 
-         Q2, h2 = QuotientModule(M, V)
+         Q2, h2 = quo(M, V)
 
          @test Q2 == Q1
       end
@@ -58,8 +58,8 @@ function test_quotient_module_constructors()
    F = FreeModule(ZZ, 2)
    m = F(BigInt[1, 0])
    n = F(BigInt[0, 1])
-   S, f = Submodule(F, [m, n])
-   Q, g = QuotientModule(F, S)
+   S, f = sub(F, [m, n])
+   Q, g = quo(F, S)
    m = Q([])
 
    @test isa(m, Generic.quotient_module_elem)
@@ -75,8 +75,8 @@ function test_quotient_module_manipulation()
 
    m = M([R(1), R(2)])
 
-   N, f = Submodule(M, [m])
-   Q, g = QuotientModule(M, N)
+   N, f = sub(M, [m])
+   Q, g = quo(M, N)
 
    @test ngens(Q) == 1
    G = gens(Q)
@@ -97,8 +97,8 @@ function test_quotient_module_unary_ops()
          M = rand_module(R, -10:10)
          ngens = rand(1:5)
          S = [rand(M, -10:10) for i in 1:ngens]
-         N, f = Submodule(M, S)
-         Q, g = QuotientModule(M, N)
+         N, f = sub(M, S)
+         Q, g = quo(M, N)
 
          m = rand(Q, -10:10)
    
@@ -117,8 +117,8 @@ function test_quotient_module_binary_ops()
          M = rand_module(R, -10:10)
          ngens = rand(1:5)
          S = [rand(M, -10:10) for i in 1:ngens]
-         N, f = Submodule(M, S)
-         Q, g = QuotientModule(M, N)
+         N, f = sub(M, S)
+         Q, g = quo(M, N)
 
          m = rand(Q, -10:10)
          n = rand(Q, -10:10)
@@ -139,8 +139,8 @@ function test_quotient_module_adhoc_binary()
          M = rand_module(R, -10:10)
          ngens = rand(1:5)
          S = [rand(M, -10:10) for i in 1:ngens]
-         N, f = Submodule(M, S)
-         Q, g = QuotientModule(M, N)
+         N, f = sub(M, S)
+         Q, g = quo(M, N)
 
          m = rand(Q, -10:10)
          n = rand(Q, -10:10)
@@ -164,8 +164,8 @@ function test_quotient_module_canonical_projection()
          M = rand_module(R, -10:10)
          ngens = rand(1:5)
          S = [rand(M, -10:10) for i in 1:ngens]
-         N, f = Submodule(M, S)
-         Q, h = QuotientModule(M, N)
+         N, f = sub(M, S)
+         Q, h = quo(M, N)
 
          I, g = image(h)
 

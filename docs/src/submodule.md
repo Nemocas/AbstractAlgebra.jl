@@ -20,19 +20,11 @@ submodules also provide the following interface.
 ## Constructors
 
 ```@docs
-Submodule(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: RingElement
+sub(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: RingElement
 ```
 
 ```@docs
-Subspace(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: FieldElement
-```
-
-```@docs
-Submodule(::AbstractAlgebra.FPModule{T}, ::Vector{Generic.Submodule{T}}) where T <: RingElement
-```
-
-```@docs
-Subspace(::AbstractAlgebra.FPModule{T}, ::Vector{Generic.Submodule{T}}) where T <: FieldElement
+sub(::AbstractAlgebra.FPModule{T}, ::Vector{Generic.Submodule{T}}) where T <: RingElement
 ```
 
 Note that the preimage of the canonical injection can be obtained using the
@@ -51,7 +43,7 @@ julia> m = M([ZZ(1), ZZ(2)])
 julia> n = M([ZZ(2), ZZ(-1)])
 (2, -1)
 
-julia> N, f = Submodule(M, [m, n])
+julia> N, f = sub(M, [m, n])
 (Submodule over Integers with 2 generators and no relations
 , Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
@@ -73,7 +65,7 @@ julia> m = V([QQ(1), QQ(2)])
 julia> n = V([QQ(2), QQ(-1)])
 (2//1, -1//1)
 
-julia> N, f = Subspace(V, [m, n])
+julia> N, f = sub(V, [m, n])
 (Subspace over Rationals with 2 generators and no relations
 , Module homomorphism with
 Domain: Subspace over Rationals with 2 generators and no relations
@@ -113,14 +105,14 @@ julia> m = M([ZZ(2), ZZ(3)])
 julia> n = M([ZZ(1), ZZ(4)])
 (1, 4)
 
-julia> N1, = Submodule(M, [m, n])
+julia> N1, = sub(M, [m, n])
 (Submodule over Integers with 2 generators and no relations
 , Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
 
 Codomain: Free module of rank 2 over Integers)
 
-julia> N2, = Submodule(M, [m])
+julia> N2, = sub(M, [m])
 (Submodule over Integers with 1 generator and no relations
 , Module homomorphism with
 Domain: Submodule over Integers with 1 generator and no relations
@@ -157,14 +149,14 @@ julia> m = M([ZZ(2), ZZ(3)])
 julia> n = M([ZZ(1), ZZ(4)])
 (1, 4)
 
-julia> N1 = Submodule(M, [m, n])
+julia> N1 = sub(M, [m, n])
 (Submodule over Integers with 2 generators and no relations
 , Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
 
 Codomain: Free module of rank 2 over Integers)
 
-julia> N2 = Submodule(M, [m])
+julia> N2 = sub(M, [m])
 (Submodule over Integers with 1 generator and no relations
 , Module homomorphism with
 Domain: Submodule over Integers with 1 generator and no relations

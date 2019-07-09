@@ -118,7 +118,7 @@ function kernel(f::Map(AbstractAlgebra.FPModuleHomomorphism))
    for j = 1:num_gens
       V[j] = D([K[num_gens - j + 1, nr - k + 1] for k = 1:nrows(M)])
    end
-   return Submodule(D, V)
+   return sub(D, V)
 end
 
 ###############################################################################
@@ -139,7 +139,7 @@ function image(f::Map(AbstractAlgebra.FPModuleHomomorphism))
    R = base_ring(D)
    G = gens(D)
    V = elem_type(C)[f(v) for v in G]
-   return Submodule(C, V)
+   return sub(C, V)
 end
 
 ###############################################################################
