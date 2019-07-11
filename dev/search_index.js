@@ -3465,6 +3465,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "module/#Coercions-1",
+    "page": "Module Interface",
+    "title": "Coercions",
+    "category": "section",
+    "text": "Given a module M and an element n of a module N, it is possible to coerce n into M using the notation M(n) in certain circumstances.In particular the element n will be automatically coerced along any canonical injection of a submodule map and along any canonical projection of a quotient map. There must be a path from N to M along such maps.ExamplesF = FreeModule(ZZ, 3)\n\nS1, f = sub(F, [rand(F, -10:10)])\n\nS, g = sub(F, [rand(F, -10:10)])\nQ, h = quo(F, S)\n\nm = rand(S1, -10:10)\nn = Q(m)"
+},
+
+{
     "location": "module/#Arithmetic-operators-1",
     "page": "Module Interface",
     "title": "Arithmetic operators",
@@ -3541,7 +3549,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Interface",
     "title": "Isomorphism",
     "category": "section",
-    "text": "isisomorphic(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 3)\nFree module of rank 3 over Integers\n\njulia> m1 = rand(M, -10:10)\n(0, -8, -8)\n\njulia> m2 = rand(M, -10:10)\n(-7, -5, -10)\n\njulia> S, f = Submodule(M, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 3 over Integers)\n\njulia> I, g = image(f)\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 3 over Integers)\n\njulia> isisomorphic(S, I)\ntrue\n"
+    "text": "isisomorphic(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElementNote that this function relies on the Smith normal form over the base ring of the modules being able to be made unique. This is true for Euclidean domains for which divrem has a fixed choice of quotient and remainder, but it will not in general be true for Euclidean rings that are not domains.Examplesjulia> M = FreeModule(ZZ, 3)\nFree module of rank 3 over Integers\n\njulia> m1 = rand(M, -10:10)\n(0, -8, -8)\n\njulia> m2 = rand(M, -10:10)\n(-7, -5, -10)\n\njulia> S, f = sub(M, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 3 over Integers)\n\njulia> I, g = image(f)\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 3 over Integers)\n\njulia> isisomorphic(S, I)\ntrue\n"
 },
 
 {
@@ -3565,7 +3573,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Interface",
     "title": "Invariant Factor Decomposition",
     "category": "section",
-    "text": "For modules over a euclidean domain one can take the invariant factor decomposition to determine the structure of the module. The invariant factors are unique up to multiplication by a unit, and even unique if a  canonical_unit is available for the ring.snf(::AbstractAlgebra.FPModule{T}) where T <: RingElement\ninvariant_factors(::AbstractAlgebra.FPModule{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 3)\nFree module of rank 3 over Integers\n\njulia> m1 = rand(M, -10:10)\n(9, 7, 7)\n\njulia> m2 = rand(M, -10:10)\n(-6, 2, -8)\n\njulia> S, f = Submodule(M, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 3 over Integers)\n\njulia> Q, g = QuotientModule(M, S)\n(Quotient module over Integers with 3 generators and relations:\n[3 9 -1], [0 20 -10], Module homomorphism with\nDomain: Free module of rank 3 over Integers\nCodomain: Quotient module over Integers with 3 generators and relations:\n[3 9 -1], [0 20 -10])\n\njulia> I, f = snf(Q)\n(Invariant factor decomposed module over Integers with invariant factors BigInt[10, 0], Module homomorphism with\nDomain: Invariant factor decomposed module over Integers with invariant factors BigInt[10, 0]\nCodomain: Quotient module over Integers with 3 generators and relations:\n[3 9 -1], [0 20 -10])\n\njulia> invs = invariant_factors(Q)\n2-element Array{BigInt,1}:\n 10\n  0\n"
+    "text": "For modules over a euclidean domain one can take the invariant factor decomposition to determine the structure of the module. The invariant factors are unique up to multiplication by a unit, and even unique if a  canonical_unit is available for the ring that canonicalises elements.snf(::AbstractAlgebra.FPModule{T}) where T <: RingElement\ninvariant_factors(::AbstractAlgebra.FPModule{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 3)\nFree module of rank 3 over Integers\n\njulia> m1 = rand(M, -10:10)\n(9, 7, 7)\n\njulia> m2 = rand(M, -10:10)\n(-6, 2, -8)\n\njulia> S, f = sub(M, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 3 over Integers)\n\njulia> Q, g = quo(M, S)\n(Quotient module over Integers with 3 generators and relations:\n[3 9 -1], [0 20 -10], Module homomorphism with\nDomain: Free module of rank 3 over Integers\nCodomain: Quotient module over Integers with 3 generators and relations:\n[3 9 -1], [0 20 -10])\n\njulia> I, f = snf(Q)\n(Invariant factor decomposed module over Integers with invariant factors BigInt[10, 0], Module homomorphism with\nDomain: Invariant factor decomposed module over Integers with invariant factors BigInt[10, 0]\nCodomain: Quotient module over Integers with 3 generators and relations:\n[3 9 -1], [0 20 -10])\n\njulia> invs = invariant_factors(Q)\n2-element Array{BigInt,1}:\n 10\n  0\n"
 },
 
 {
@@ -3649,35 +3657,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "submodule/#AbstractAlgebra.Submodule-Union{Tuple{T}, Tuple{FPModule{T},Array{FPModuleElem{T},1}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "location": "submodule/#AbstractAlgebra.Generic.sub-Union{Tuple{T}, Tuple{FPModule{T},Array{FPModuleElem{T},1}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
     "page": "Submodules",
-    "title": "AbstractAlgebra.Submodule",
+    "title": "AbstractAlgebra.Generic.sub",
     "category": "method",
-    "text": "Submodule(m::Module{T}, gens::Vector{<:ModuleElem{T}}) where T <: RingElement\n\nReturn the submodule S of the module m generated by the given generators, given as elements of m, and a map which is the canonical injection from S to m.\n\n\n\n"
+    "text": "sub(m::Module{T}, gens::Vector{<:ModuleElem{T}}) where T <: RingElement\n\nReturn the submodule S of the module m generated by the given generators, given as elements of m, and a map which is the canonical injection from S to m.\n\n\n\nsub(m::AbstractAlgebra.FPModule{T}, gens::Vector{<:AbstractAlgebra.FPModuleElem{T}}) where T <: RingElement\n\nReturn the submodule of the module m generated by the given generators, given as elements of m.\n\n\n\n"
 },
 
 {
-    "location": "submodule/#AbstractAlgebra.Subspace-Union{Tuple{T}, Tuple{FPModule{T},Array{FPModuleElem{T},1}}} where T<:Union{FieldElem, AbstractFloat, Rational}",
+    "location": "submodule/#AbstractAlgebra.Generic.sub-Union{Tuple{T}, Tuple{FPModule{T},Array{Submodule{T},1}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
     "page": "Submodules",
-    "title": "AbstractAlgebra.Subspace",
+    "title": "AbstractAlgebra.Generic.sub",
     "category": "method",
-    "text": "Subspace(m::Module{T}, gens::Vector{<:ModuleElem{T}}) where T <: FieldElement\n\nReturn the subspace of the vector space m generated by the given generators, given as elements of m, and a map which is the canonical injection from S to m.\n\n\n\n"
-},
-
-{
-    "location": "submodule/#AbstractAlgebra.Submodule-Union{Tuple{T}, Tuple{FPModule{T},Array{Submodule{T},1}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
-    "page": "Submodules",
-    "title": "AbstractAlgebra.Submodule",
-    "category": "method",
-    "text": "Submodule(m::Module{T}, subs::Vector{<:Generic.Submodule{T}}) where T <: RingElement\n\nReturn the submodule S of the module m generated by the union of the given submodules of m, and a map which is the canonical injection from S to m.\n\n\n\n"
-},
-
-{
-    "location": "submodule/#AbstractAlgebra.Subspace-Union{Tuple{T}, Tuple{FPModule{T},Array{Submodule{T},1}}} where T<:Union{FieldElem, AbstractFloat, Rational}",
-    "page": "Submodules",
-    "title": "AbstractAlgebra.Subspace",
-    "category": "method",
-    "text": "Subspace(m::Module{T}, subs::Vector{<:Generic.Submodule{T}}) where T <: FieldElement\n\nReturn the subspace S of the vector space m generated by the union of the given subspaces of m, and a map which is the canonical injection from S to m.\n\n\n\n"
+    "text": "sub(m::Module{T}, subs::Vector{<:Generic.Submodule{T}}) where T <: RingElement\n\nReturn the submodule S of the module m generated by the union of the given submodules of m, and a map which is the canonical injection from S to m.\n\n\n\n"
 },
 
 {
@@ -3685,7 +3677,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Submodules",
     "title": "Constructors",
     "category": "section",
-    "text": "Submodule(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: RingElementSubspace(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: FieldElementSubmodule(::AbstractAlgebra.FPModule{T}, ::Vector{Generic.Submodule{T}}) where T <: RingElementSubspace(::AbstractAlgebra.FPModule{T}, ::Vector{Generic.Submodule{T}}) where T <: FieldElementNote that the preimage of the canonical injection can be obtained using the preimage function described in the section on module homomorphisms. As the canonical injection is injective, this is unique.Examplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(1), ZZ(2)])\n(1, 2)\n\njulia> n = M([ZZ(2), ZZ(-1)])\n(2, -1)\n\njulia> N, f = Submodule(M, [m, n])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> v = N([ZZ(3), ZZ(4)])\n(3, 4)\n\njulia> v2 = f(v)\n(3, 26)\n\njulia> V = VectorSpace(QQ, 2)\nVector space of dimension 2 over Rationals\n\njulia> m = V([QQ(1), QQ(2)])\n(1//1, 2//1)\n\njulia> n = V([QQ(2), QQ(-1)])\n(2//1, -1//1)\n\njulia> N, f = Subspace(V, [m, n])\n(Subspace over Rationals with 2 generators and no relations\n, Module homomorphism with\nDomain: Subspace over Rationals with 2 generators and no relations\n\nCodomain: Vector space of dimension 2 over Rationals)\n"
+    "text": "sub(::AbstractAlgebra.FPModule{T}, ::Vector{AbstractAlgebra.FPModuleElem{T}}) where T <: RingElementsub(::AbstractAlgebra.FPModule{T}, ::Vector{Generic.Submodule{T}}) where T <: RingElementNote that the preimage of the canonical injection can be obtained using the preimage function described in the section on module homomorphisms. As the canonical injection is injective, this is unique.Examplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(1), ZZ(2)])\n(1, 2)\n\njulia> n = M([ZZ(2), ZZ(-1)])\n(2, -1)\n\njulia> N, f = sub(M, [m, n])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> v = N([ZZ(3), ZZ(4)])\n(3, 4)\n\njulia> v2 = f(v)\n(3, 26)\n\njulia> V = VectorSpace(QQ, 2)\nVector space of dimension 2 over Rationals\n\njulia> m = V([QQ(1), QQ(2)])\n(1//1, 2//1)\n\njulia> n = V([QQ(2), QQ(-1)])\n(2//1, -1//1)\n\njulia> N, f = sub(V, [m, n])\n(Subspace over Rationals with 2 generators and no relations\n, Module homomorphism with\nDomain: Subspace over Rationals with 2 generators and no relations\n\nCodomain: Vector space of dimension 2 over Rationals)\n"
 },
 
 {
@@ -3725,7 +3717,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Submodules",
     "title": "Basic manipulation",
     "category": "section",
-    "text": "supermodule(::AbstractAlgebra.Generic.Submodule{T}) where T <: RingElementissubmodule(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElementiscompatible(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(2), ZZ(3)])\n(2, 3)\n\njulia> n = M([ZZ(1), ZZ(4)])\n(1, 4)\n\njulia> N1, = Submodule(M, [m, n])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> N2, = Submodule(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> supermodule(N1) == M\ntrue\n\njulia> iscompatible(N1, N2)\n(true, Free module of rank 2 over Integers)\n\njulia> issubmodule(N1, M)\nfalse\n"
+    "text": "supermodule(::AbstractAlgebra.Generic.Submodule{T}) where T <: RingElementissubmodule(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElementiscompatible(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(2), ZZ(3)])\n(2, 3)\n\njulia> n = M([ZZ(1), ZZ(4)])\n(1, 4)\n\njulia> N1, = sub(M, [m, n])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> N2, = sub(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> supermodule(N1) == M\ntrue\n\njulia> iscompatible(N1, N2)\n(true, Free module of rank 2 over Integers)\n\njulia> issubmodule(N1, M)\nfalse\n"
 },
 
 {
@@ -3741,7 +3733,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Submodules",
     "title": "Intersection",
     "category": "section",
-    "text": "Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where\nT <: RingElementExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(2), ZZ(3)])\n(2, 3)\n\njulia> n = M([ZZ(1), ZZ(4)])\n(1, 4)\n\njulia> N1 = Submodule(M, [m, n])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> N2 = Submodule(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> I = intersect(N1, N2)\n0-element Array{Union{ModuleHomomorphism{BigInt}, Submodule{BigInt}},1}\n"
+    "text": "Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPModule{T}) where\nT <: RingElementExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(2), ZZ(3)])\n(2, 3)\n\njulia> n = M([ZZ(1), ZZ(4)])\n(1, 4)\n\njulia> N1 = sub(M, [m, n])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> N2 = sub(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> I = intersect(N1, N2)\n0-element Array{Union{ModuleHomomorphism{BigInt}, Submodule{BigInt}},1}\n"
 },
 
 {
@@ -3761,19 +3753,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "quotient_module/#AbstractAlgebra.QuotientModule-Union{Tuple{T}, Tuple{FPModule{T},Submodule{T}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
+    "location": "quotient_module/#AbstractAlgebra.quo-Union{Tuple{T}, Tuple{FPModule{T},Submodule{T}}} where T<:Union{RingElem, AbstractFloat, Integer, Rational}",
     "page": "Quotient modules",
-    "title": "AbstractAlgebra.QuotientModule",
+    "title": "AbstractAlgebra.quo",
     "category": "method",
-    "text": "QuotientModule(m::Module{T}, N::Module{T}) where T <: RingElement\n\nReturn the quotient Q of the module m by the submodule N of m, and a map which is a lift of elements of Q to m.\n\n\n\n"
-},
-
-{
-    "location": "quotient_module/#AbstractAlgebra.QuotientSpace-Union{Tuple{T}, Tuple{FPModule{T},Submodule{T}}} where T<:Union{FieldElem, AbstractFloat, Rational}",
-    "page": "Quotient modules",
-    "title": "AbstractAlgebra.QuotientSpace",
-    "category": "method",
-    "text": "QuotientSpace(m::Module{T}, N::Module{T}) where T <: RingElement\n\nReturn the quotient Q of the vector space m by the subvector space N of m, and a map which is a lift of elements of Q to m.\n\n\n\n"
+    "text": "quo(m::Module{T}, N::Module{T}) where T <: RingElement\n\nReturn the quotient Q of the module m by the submodule N of m, and a map which is a lift of elements of Q to m.\n\n\n\n"
 },
 
 {
@@ -3781,7 +3765,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Quotient modules",
     "title": "Constructors",
     "category": "section",
-    "text": "QuotientModule(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: RingElementQuotientSpace(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: FieldElementNote that a preimage of the canonical projection can be obtained using the preimage function described in the section on module homomorphisms. Note that a preimage element of the canonical projection is not unique and has no special properties.Examplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(1), ZZ(2)])\n(1, 2)\n\njulia> N, f = Submodule(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> Q, g = QuotientModule(M, N)\n(Quotient module over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Free module of rank 2 over Integers\nCodomain: Quotient module over Integers with 1 generator and no relations\n)\n\njulia> p = M([ZZ(3), ZZ(1)])\n(3, 1)\n\njulia> v2 = g(p)\n(-5)\n\njulia> V = VectorSpace(QQ, 2)\nVector space of dimension 2 over Rationals\n\njulia> m = V([QQ(1), QQ(2)])\n(1//1, 2//1)\n\njulia> N, f = Subspace(V, [m])\n(Subspace over Rationals with 1 generator and no relations\n, Module homomorphism with\nDomain: Subspace over Rationals with 1 generator and no relations\n\nCodomain: Vector space of dimension 2 over Rationals)\n\njulia> Q, g = QuotientSpace(V, N)\n(Quotient space over:\nRationals with 1 generator and no relations\n, Module homomorphism with\nDomain: Vector space of dimension 2 over Rationals\nCodomain: Quotient space over:\nRationals with 1 generator and no relations\n)\n"
+    "text": "quo(M::AbstractAlgebra.FPModule{T}, v::Generic.Submodule{T}) where T <: RingElementNote that a preimage of the canonical projection can be obtained using the preimage function described in the section on module homomorphisms. Note that a preimage element of the canonical projection is not unique and has no special properties.Examplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(1), ZZ(2)])\n(1, 2)\n\njulia> N, f = sub(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> Q, g = quo(M, N)\n(Quotient module over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Free module of rank 2 over Integers\nCodomain: Quotient module over Integers with 1 generator and no relations\n)\n\njulia> p = M([ZZ(3), ZZ(1)])\n(3, 1)\n\njulia> v2 = g(p)\n(-5)\n\njulia> V = VectorSpace(QQ, 2)\nVector space of dimension 2 over Rationals\n\njulia> m = V([QQ(1), QQ(2)])\n(1//1, 2//1)\n\njulia> N, f = sub(V, [m])\n(Subspace over Rationals with 1 generator and no relations\n, Module homomorphism with\nDomain: Subspace over Rationals with 1 generator and no relations\n\nCodomain: Vector space of dimension 2 over Rationals)\n\njulia> Q, g = quo(V, N)\n(Quotient space over:\nRationals with 1 generator and no relations\n, Module homomorphism with\nDomain: Vector space of dimension 2 over Rationals\nCodomain: Quotient space over:\nRationals with 1 generator and no relations\n)\n"
 },
 
 {
@@ -3805,7 +3789,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Quotient modules",
     "title": "Basic manipulation",
     "category": "section",
-    "text": "supermodule(M::AbstractAlgebra.Generic.QuotientModule{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(2), ZZ(3)])\n(2, 3)\n\njulia> N, g = Submodule(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> Q, h = QuotientModule(M, N)\n(Quotient module over Integers with 2 generators and relations:\n[2 3], Module homomorphism with\nDomain: Free module of rank 2 over Integers\nCodomain: Quotient module over Integers with 2 generators and relations:\n[2 3])\n\njulia> supermodule(Q) == M\ntrue\n"
+    "text": "supermodule(M::AbstractAlgebra.Generic.QuotientModule{T}) where T <: RingElementExamplesjulia> M = FreeModule(ZZ, 2)\nFree module of rank 2 over Integers\n\njulia> m = M([ZZ(2), ZZ(3)])\n(2, 3)\n\njulia> N, g = sub(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 2 over Integers)\n\njulia> Q, h = quo(M, N)\n(Quotient module over Integers with 2 generators and relations:\n[2 3], Module homomorphism with\nDomain: Free module of rank 2 over Integers\nCodomain: Quotient module over Integers with 2 generators and relations:\n[2 3])\n\njulia> supermodule(Q) == M\ntrue\n"
 },
 
 {
@@ -3821,7 +3805,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Direct Sums",
     "title": "Direct Sums",
     "category": "section",
-    "text": "AbstractAlgebra allows the construction of the direct sum of any nonempty vector of finitely presented modules.As well as implementing the entire Module interface, AbstractAlgebra direct sums also provide the following interface."
+    "text": "AbstractAlgebra allows the construction of the external direct sum of any nonempty vector of finitely presented modules.As well as implementing the entire Module interface, AbstractAlgebra direct sums also provide the following interface.Note that external direct sums are considered equal iff they are the same object."
 },
 
 {
@@ -3845,7 +3829,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Direct Sums",
     "title": "Constructors",
     "category": "section",
-    "text": "DirectSum(::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement\nDirectSum(::AbstractAlgebra.FPModule{T}...) where T <: RingElementExamplesjulia> F = FreeModule(ZZ, 5)\nFree module of rank 5 over Integers\n\njulia> m1 = F(BigInt[4, 7, 8, 2, 6])\n(4, 7, 8, 2, 6)\n\njulia> m2 = F(BigInt[9, 7, -2, 2, -4])\n(9, 7, -2, 2, -4)\n\njulia> S1, f1 = Submodule(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> m1 = F(BigInt[3, 1, 7, 7, -7])\n(3, 1, 7, 7, -7)\n\njulia> m2 = F(BigInt[-8, 6, 10, -1, 1])\n(-8, 6, 10, -1, 1)\n\njulia> S2, f2 = Submodule(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> m1 = F(BigInt[2, 4, 2, -3, -10])\n(2, 4, 2, -3, -10)\n\njulia> m2 = F(BigInt[5, 7, -6, 9, -5])\n(5, 7, -6, 9, -5)\n\njulia> S3, f3 = Submodule(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> D, f = DirectSum(S1, S2, S3)\n(DirectSumModule over Integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n])"
+    "text": "DirectSum(::Vector{<:AbstractAlgebra.FPModule{T}}) where T <: RingElement\nDirectSum(::AbstractAlgebra.FPModule{T}...) where T <: RingElementExamplesjulia> F = FreeModule(ZZ, 5)\nFree module of rank 5 over Integers\n\njulia> m1 = F(BigInt[4, 7, 8, 2, 6])\n(4, 7, 8, 2, 6)\n\njulia> m2 = F(BigInt[9, 7, -2, 2, -4])\n(9, 7, -2, 2, -4)\n\njulia> S1, f1 = sub(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> m1 = F(BigInt[3, 1, 7, 7, -7])\n(3, 1, 7, 7, -7)\n\njulia> m2 = F(BigInt[-8, 6, 10, -1, 1])\n(-8, 6, 10, -1, 1)\n\njulia> S2, f2 = sub(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> m1 = F(BigInt[2, 4, 2, -3, -10])\n(2, 4, 2, -3, -10)\n\njulia> m2 = F(BigInt[5, 7, -6, 9, -5])\n(5, 7, -6, 9, -5)\n\njulia> S3, f3 = sub(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> D, f = DirectSum(S1, S2, S3)\n(DirectSumModule over Integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n])"
 },
 
 {
@@ -3869,7 +3853,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Direct Sums",
     "title": "Basic manipulation",
     "category": "section",
-    "text": "summands(::AbstractAlgebra.Generic.DirectSumModule{T}) where T <: RingElementExamplesjulia> F = FreeModule(ZZ, 5)\nFree module of rank 5 over Integers\n\njulia> m1 = F(BigInt[4, 7, 8, 2, 6])\n(4, 7, 8, 2, 6)\n\njulia> m2 = F(BigInt[9, 7, -2, 2, -4])\n(9, 7, -2, 2, -4)\n\njulia> S1, f1 = Submodule(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> m1 = F(BigInt[3, 1, 7, 7, -7])\n(3, 1, 7, 7, -7)\n\njulia> m2 = F(BigInt[-8, 6, 10, -1, 1])\n(-8, 6, 10, -1, 1)\n\njulia> S2, f2 = Submodule(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> m1 = F(BigInt[2, 4, 2, -3, -10])\n(2, 4, 2, -3, -10)\n\njulia> m2 = F(BigInt[5, 7, -6, 9, -5])\n(5, 7, -6, 9, -5)\n\njulia> S3, f3 = Submodule(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> D, f = DirectSum(S1, S2, S3)\n(DirectSumModule over Integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n])\n\njulia> summands(D)\n3-element Array{AbstractAlgebra.Generic.Submodule{BigInt},1}:\n Submodule over Integers with 2 generators and no relations\n\n Submodule over Integers with 2 generators and no relations\n\n Submodule over Integers with 2 generators and no relations"
+    "text": "summands(::AbstractAlgebra.Generic.DirectSumModule{T}) where T <: RingElementExamplesjulia> F = FreeModule(ZZ, 5)\nFree module of rank 5 over Integers\n\njulia> m1 = F(BigInt[4, 7, 8, 2, 6])\n(4, 7, 8, 2, 6)\n\njulia> m2 = F(BigInt[9, 7, -2, 2, -4])\n(9, 7, -2, 2, -4)\n\njulia> S1, f1 = sub(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> m1 = F(BigInt[3, 1, 7, 7, -7])\n(3, 1, 7, 7, -7)\n\njulia> m2 = F(BigInt[-8, 6, 10, -1, 1])\n(-8, 6, 10, -1, 1)\n\njulia> S2, f2 = sub(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> m1 = F(BigInt[2, 4, 2, -3, -10])\n(2, 4, 2, -3, -10)\n\njulia> m2 = F(BigInt[5, 7, -6, 9, -5])\n(5, 7, -6, 9, -5)\n\njulia> S3, f3 = sub(F, [m1, m2])\n(Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: Free module of rank 5 over Integers)\n\njulia> D, f = DirectSum(S1, S2, S3)\n(DirectSumModule over Integers, AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers, Module homomorphism with\nDomain: Submodule over Integers with 2 generators and no relations\n\nCodomain: DirectSumModule over Integers], AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}[Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: DirectSumModule over Integers\nCodomain: Submodule over Integers with 2 generators and no relations\n])\n\njulia> summands(D)\n3-element Array{AbstractAlgebra.Generic.Submodule{BigInt},1}:\n Submodule over Integers with 2 generators and no relations\n\n Submodule over Integers with 2 generators and no relations\n\n Submodule over Integers with 2 generators and no relations"
 },
 
 {
@@ -3933,7 +3917,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Homomorphisms",
     "title": "Kernels",
     "category": "section",
-    "text": "kernel(f::Map(AbstractAlgebra.FPModuleHomomorphism))Examplesjulia> M = FreeModule(ZZ, 3)\nFree module of rank 3 over Integers\n\njulia> m = M([ZZ(1), ZZ(2), ZZ(3)])\n(1, 2, 3)\n\njulia> S, f = Submodule(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 3 over Integers)\n\njulia> Q, g = QuotientModule(M, S)\n(Quotient module over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Free module of rank 3 over Integers\nCodomain: Quotient module over Integers with 2 generators and no relations\n)\n\njulia> kernel(g)\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 3 over Integers)\n"
+    "text": "kernel(f::Map(AbstractAlgebra.FPModuleHomomorphism))Examplesjulia> M = FreeModule(ZZ, 3)\nFree module of rank 3 over Integers\n\njulia> m = M([ZZ(1), ZZ(2), ZZ(3)])\n(1, 2, 3)\n\njulia> S, f = sub(M, [m])\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 3 over Integers)\n\njulia> Q, g = quo(M, S)\n(Quotient module over Integers with 2 generators and no relations\n, Module homomorphism with\nDomain: Free module of rank 3 over Integers\nCodomain: Quotient module over Integers with 2 generators and no relations\n)\n\njulia> kernel(g)\n(Submodule over Integers with 1 generator and no relations\n, Module homomorphism with\nDomain: Submodule over Integers with 1 generator and no relations\n\nCodomain: Free module of rank 3 over Integers)\n"
 },
 
 {
@@ -3949,7 +3933,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Homomorphisms",
     "title": "Images",
     "category": "section",
-    "text": "image(::Map(AbstractAlgebra.FPModuleHomomorphism))M = FreeModule(ZZ, 3)\n\nm = M([ZZ(1), ZZ(2), ZZ(3)])\n\nS, f = Submodule(M, [m])\nQ, g = QuotientModule(M, S)\nK, k = kernel(g)\n\nimage(compose(k, g))"
+    "text": "image(::Map(AbstractAlgebra.FPModuleHomomorphism))M = FreeModule(ZZ, 3)\n\nm = M([ZZ(1), ZZ(2), ZZ(3)])\n\nS, f = sub(M, [m])\nQ, g = quo(M, S)\nK, k = kernel(g)\n\nimage(compose(k, g))"
 },
 
 {
@@ -3965,7 +3949,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Module Homomorphisms",
     "title": "Preimages",
     "category": "section",
-    "text": "preimage(::Map(AbstractAlgebra.FPModuleHomomorphism), ::AbstractAlgebra.FPModuleElem{T}) where T <: RingElementM = FreeModule(ZZ, 3)\n\nm = M([ZZ(1), ZZ(2), ZZ(3)])\n\nS, f = Submodule(M, [m])\nQ, g = QuotientModule(M, S)\n\nm = rand(M, -10:10)\nn = g(m)\n\np = preimage(g, n)"
+    "text": "preimage(::Map(AbstractAlgebra.FPModuleHomomorphism), ::AbstractAlgebra.FPModuleElem{T}) where T <: RingElementM = FreeModule(ZZ, 3)\n\nm = M([ZZ(1), ZZ(2), ZZ(3)])\n\nS, f = sub(M, [m])\nQ, g = quo(M, S)\n\nm = rand(M, -10:10)\nn = g(m)\n\np = preimage(g, n)"
 },
 
 {
