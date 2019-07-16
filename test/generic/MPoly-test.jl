@@ -892,7 +892,11 @@ function test_gen_mpoly_evaluation()
 
    @test f(M1, ZZ(2), M3) == S([24 53; 69 110])
    @test f(M1, ZZ(2), 3) == S([56 52; 78 134])
-   
+
+   K = RealField
+   R, (x, y) = PolynomialRing(K, ["x", "y"])
+   @test evaluate(x + y, [K(1), K(1)]) isa BigFloat
+
    println("PASS")
 end
 
