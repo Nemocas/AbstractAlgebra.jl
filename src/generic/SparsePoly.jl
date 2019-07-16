@@ -1367,7 +1367,7 @@ end
 #
 ###############################################################################
 
-function evaluate(a::SparsePoly{T}, b::S) where {S <: RingElem, T <: RingElement}
+function evaluate(a::SparsePoly{T}, b::S) where {S <: RingElement, T <: RingElement}
    if a.length == 0
       return base_ring(a)()
    end
