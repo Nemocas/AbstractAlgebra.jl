@@ -56,6 +56,12 @@ convert(::Type{perm{T}}, p::perm) where T = perm(convert(Vector{T}, p.d), false)
 
 convert(::Type{Vector{T}}, p::perm{T}) where {T} = p.d
 
+function Base.similar(p::perm{T}, ::Type{S}=T) where {T, S<:Integer}
+   p = perm(similar(p.d, S), false)
+   p.modified = true
+   return p
+end
+
 ###############################################################################
 #
 #   Basic functions
@@ -387,6 +393,7 @@ false
 #
 ###############################################################################
 function mul!(out::perm, g::perm, h::perm)
+   out = (out === g || out === h ? similar(out) : out)
    @inbounds for i in eachindex(out.d)
       out[i] = h[g[i]]
    end
@@ -409,11 +416,7 @@ julia> perm([2,3,1,4])*perm([1,3,4,2]) # (1,2,3)*(2,3,4)
 (1,3)(2,4)
 ```
 """
-function *(g::perm{T}, h::perm{T}) where T
-   res = perm(similar(g.d), false)
-   return mul!(res, g, h)
-end
-
+*(g::perm{T}, h::perm{T}) where T = mul!(similar(g), g, h)
 *(g::perm{S}, h::perm{T}) where {S,T} = *(promote(g,h)...)
 
 @doc Markdown.doc"""
@@ -450,7 +453,7 @@ function ^(g::perm{T}, n::Integer) where T
    elseif n == 3
       return perm(g.d[g.d[g.d]], false)
    else
-      new_perm = similar(g.d)
+      new_perm = similar(g)
 
       @inbounds for cycle in cycles(g)
          l = length(cycle)
@@ -461,8 +464,7 @@ function ^(g::perm{T}, n::Integer) where T
             new_perm[j] = cycle[idx]
          end
       end
-      p = perm(new_perm, false)
-      return p
+      return new_perm
    end
 end
 
@@ -509,11 +511,11 @@ end
 > such that $g ∘ g^{-1} = g^{-1} ∘ g$ is the identity permutation.
 """
 function inv(g::perm)
-   d = similar(g.d)
-   @inbounds for i in 1:length(d)
-      d[g[i]] = i
+   res = similar(g)
+   @inbounds for i in 1:length(res.d)
+      res[g[i]] = i
    end
-   return perm(d, false)
+   return res
 end
 
 # TODO: See M. Robertson, Inverting Permutations In Place
@@ -563,39 +565,9 @@ end
    end
 end
 
-#Base.start(A::AllPerms{<:Integer}) = 0
-#
-#function Base.next(A::AllPerms, count)
-#    count = nextperm(A, count)
-#    return A.elts, count
-#end
-#
-#Base.done(A::AllPerms, count) = count >= A.all
-
 Base.eltype(::Type{AllPerms{T}}) where T<:Integer = perm{T}
 
 Base.length(A::AllPerms) = A.all
-
-#function nextperm(A::AllPerms{<:Integer}, count)
-#   if count == 0
-#        return count+1
-#   end
-#
-#   k = 0
-#   n = 1
-#
-#   while true
-#      if A.c[n] < n
-#         k = ifelse(isodd(n), 1, A.c[n])
-#         A.elts[k], A.elts[n] = A.elts[n], A.elts[k]
-#         A.c[n] += 1
-#         return count+1
-#      else
-#         A.c[n] = 1
-#         n += 1
-#      end
-#   end
-#end
 
 @doc Markdown.doc"""
     Generic.elements!(G::PermGroup)

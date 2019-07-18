@@ -304,11 +304,11 @@ function perm(n::T) where T
   Generic.perm(n)
 end
 
-function perm(a::Array{T, 1}) where T
-  Generic.perm(a)
+function perm(a::AbstractVector{T}, check::Bool=true) where T
+  Generic.perm(a, check)
 end
 
-function Partition(part::Vector{T}, check::Bool=true) where T
+function Partition(part::AbstractVector{T}, check::Bool=true) where T
   Generic.Partition(part, check)
 end
 
