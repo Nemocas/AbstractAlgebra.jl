@@ -40,12 +40,14 @@ function test_submodule_constructors()
       @test parent(f(v)) == M
    end
 
-   M = VectorSpace(R, 5)
-   nsubs = rand(1:5)
-   subs = [sub(M, [rand(M, -10:10)])[1] for i in 1:nsubs]
-   N, h = sub(M, subs)
+   for iter = 1:20
+      M = VectorSpace(R, 5)
+      nsubs = rand(0:5)
+      subs = [sub(M, [rand(M, -10:10)])[1] for i in 1:nsubs]
+      N, h = sub(M, subs)
 
-   @test isa(N, Generic.Submodule)
+      @test isa(N, Generic.Submodule)
+   end
 
    F = FreeModule(ZZ, 2)
    S, f = sub(F, [])
