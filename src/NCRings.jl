@@ -6,7 +6,7 @@
 
 elem_type(::T) where {T <: NCRing} = elem_type(T)
 
-include("Rings.jl")
+# include("Rings.jl")
 
 ###############################################################################
 #
@@ -116,3 +116,4 @@ function powers(a::T, d::Int) where {T <: NCRingElem}
    return A
 end
 
+include("Rings.jl")
