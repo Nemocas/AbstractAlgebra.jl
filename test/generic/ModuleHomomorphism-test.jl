@@ -82,14 +82,40 @@ function test_module_homomorphism_image()
    for iter = 1:100
       # test image of composition of canonical injection and projection
       M = rand_module(R, -10:10)::AbstractAlgebra.FPModule{elem_type(R)}
-      _test_module_homomorphism_image(M)
+      # _test_module_homomorphism_image(M)
+
+      ngens1 = rand(1:5)
+      gens1 = [rand(M, -10:10) for j in 1:ngens1]
+      M1, f1 = sub(M, gens1)
+
+      Q, g = quo(M, M1)
+      k1, h1 = kernel(g)
+
+      k = compose(h1, g)
+      I, f = image(k)
+      T, t = sub(Q, elem_type(Q)[])
+
+      @test I == T
    end
 
    S = AbstractAlgebra.JuliaQQ
    for iter = 1:100
       # test image of composition of canonical injection and projection
       N = rand_module(S, -10:10)::AbstractAlgebra.FPModule{elem_type(S)}
-      _test_module_homomorphism_image(N)
+      # _test_module_homomorphism_image(N)
+
+      ngens1 = rand(1:5)
+      gens1 = [rand(N, -10:10) for j in 1:ngens1]
+      M1, f1 = sub(N, gens1)
+
+      Q, g = quo(N, M1)
+      k1, h1 = kernel(g)
+
+      k = compose(h1, g)
+      I, f = image(k)
+      T, t = sub(Q, elem_type(Q)[])
+
+      @test I == T
    end
 
    println("PASS")
