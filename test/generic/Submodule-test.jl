@@ -43,8 +43,8 @@ function test_submodule_constructors()
    for iter = 1:20
       M = VectorSpace(R, 5)
       nsubs = rand(0:5)
-      subs = [sub(M, [rand(M, -10:10)])[1] for i in 1:nsubs]
-      N, h = sub(M, subs)
+      subs = [Submodule(M, [rand(M, -10:10)])[1] for i in 1:nsubs]
+      N, h = Submodule(M, subs)
 
       @test isa(N, Generic.Submodule)
    end
