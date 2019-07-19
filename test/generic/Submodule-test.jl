@@ -5,7 +5,7 @@ function test_submodule_constructors()
    M = FreeModule(R, 2)
    m = M([R(1), R(3)])
    n = M([R(2), R(-1)])
-   N, f = sub(M, [m, n])
+   N, f = Submodule(M, [m, n])
 
    V = gens(N)
    for v in V
@@ -22,8 +22,8 @@ function test_submodule_constructors()
 
    F = FreeModule(R, 5)
    nsubs = rand(0:5)
-   subs = Generic.Submodule{elem_type(R)}[sub(F, [rand(F, -10:10)])[1] for i in 1:nsubs]
-   N, h = sub(F, subs)
+   subs = Generic.Submodule{elem_type(R)}[Submodule(F, [rand(F, -10:10)])[1] for i in 1:nsubs]
+   N, h = Submodule(F, subs)
 
    @test isa(N, Generic.Submodule)
 
@@ -31,7 +31,7 @@ function test_submodule_constructors()
    M = VectorSpace(R, 2)
    m = M([R(1), R(3)])
    n = M([R(2), R(-1)])
-   N, f = sub(M, [m, n])
+   N, f = Subspace(M, [m, n])
 
    @test isa(N, Generic.Submodule)
    
@@ -50,7 +50,7 @@ function test_submodule_constructors()
    end
 
    F = FreeModule(ZZ, 2)
-   S, f = sub(F, [])
+   S, f = Submodule(F, [])
    m = S([])
 
    @test isa(S, Generic.Submodule)
@@ -66,7 +66,7 @@ function test_submodule_manipulation()
    M = FreeModule(R, 2)
    m = M([R(1), R(3)])
    n = M([R(2), R(-1)])
-   N, f = sub(M, [m, n])
+   N, f = Submodule(M, [m, n])
 
    @test ngens(N) == 2
    G = gens(N)
@@ -87,7 +87,7 @@ function test_submodule_unary_ops()
          M = rand_module(R, -10:10)
          ngens = rand(1:5)
          S = [rand(M, -10:10) for i in 1:ngens]
-         N, f = sub(M, S)
+         N, f = Submodule(M, S)
 
          m = rand(N, -10:10)
    
@@ -106,7 +106,7 @@ function test_submodule_binary_ops()
          M = rand_module(R, -10:10)
          ngens = rand(1:5)
          S = [rand(M, -10:10) for i in 1:ngens]
-         N, f = sub(M, S)
+         N, f = Submodule(M, S)
 
          m = rand(N, -10:10)
          n = rand(N, -10:10)
@@ -127,7 +127,7 @@ function test_submodule_adhoc_binary()
          M = rand_module(R, -10:10)
          ngens = rand(1:5)
          S = [rand(M, -10:10) for i in 1:ngens]
-         N, f = sub(M, S)
+         N, f = Submodule(M, S)
 
          m = rand(N, -10:10)
          n = rand(N, -10:10)
@@ -151,7 +151,7 @@ function test_submodule_canonical_injection()
          M = rand_module(R, -10:10)
          ngens = rand(1:5)
          S = [rand(M, -10:10) for i in 1:ngens]
-         N, f = sub(M, S)
+         N, f = Submodule(M, S)
 
          I, g = image(f)
 

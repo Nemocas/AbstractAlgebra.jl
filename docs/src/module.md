@@ -135,10 +135,10 @@ map. There must be a path from $N$ to $M$ along such maps.
 ```julia
 F = FreeModule(ZZ, 3)
 
-S1, f = sub(F, [rand(F, -10:10)])
+S1, f = Submodule(F, [rand(F, -10:10)])
 
-S, g = sub(F, [rand(F, -10:10)])
-Q, h = quo(F, S)
+S, g = Submodule(F, [rand(F, -10:10)])
+Q, h = QuotientModule(F, S)
 
 m = rand(S1, -10:10)
 n = Q(m)
@@ -233,7 +233,7 @@ julia> m1 = rand(M, -10:10)
 julia> m2 = rand(M, -10:10)
 (-7, -5, -10)
 
-julia> S, f = sub(M, [m1, m2])
+julia> S, f = Submodule(M, [m1, m2])
 (Submodule over Integers with 2 generators and no relations
 , Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
@@ -276,14 +276,14 @@ julia> m1 = rand(M, -10:10)
 julia> m2 = rand(M, -10:10)
 (-6, 2, -8)
 
-julia> S, f = sub(M, [m1, m2])
+julia> S, f = Submodule(M, [m1, m2])
 (Submodule over Integers with 2 generators and no relations
 , Module homomorphism with
 Domain: Submodule over Integers with 2 generators and no relations
 
 Codomain: Free module of rank 3 over Integers)
 
-julia> Q, g = quo(M, S)
+julia> Q, g = QuotientModule(M, S)
 (Quotient module over Integers with 3 generators and relations:
 [3 9 -1], [0 20 -10], Module homomorphism with
 Domain: Free module of rank 3 over Integers
