@@ -117,7 +117,23 @@ function test_module_isomorphism()
    for iter = 1:100
       # test image of composition of canonical injection and projection
       M = rand_module(R, -10:10)::AbstractAlgebra.FPModule{elem_type(R)}
-      _test_module_isomorphism(M)
+      # _test_module_isomorphism(M)
+
+      n = ngens(M)
+      R = base_ring(M)
+      S = MatrixSpace(R, n, n)
+      N = randmat_with_rank(S, n, -10:10)
+      f = ModuleIsomorphism(M, M, N)
+
+      @test mat(f) == N
+      @test N*inverse_mat(f) == 1
+
+      m = rand(M, -10:10)
+
+      @test inv(f)(f(m)) == m
+
+      @test isa(image_fn(f), Function)
+      @test isa(inverse_image_fn(f), Function)
    end
    
    println("PASS")
