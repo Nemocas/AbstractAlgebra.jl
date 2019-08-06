@@ -1,62 +1,33 @@
 module AbstractAlgebra
 
-export QQ, FreeModule, VectorSpace, Submodule, Generic, test_submodule
+export ZZ, FreeModule, Submodule, Generic, test_submodule
 
-abstract type NCRingElem end
-
-abstract type RingElem <: NCRingElem end
-
-abstract type FieldElem <: RingElem end
-
-abstract type NCRing end
-
-abstract type Ring <: NCRing end
-
-abstract type Field <: Ring end
-
-abstract type Group end
-
-abstract type Module{T} <: Group end
-
-abstract type FPModule{T} <: Module{T} end
-
-abstract type ModuleElem{T} end
-
-abstract type FPModuleElem{T} <: ModuleElem{T} end
+abstract type RingElem end
+abstract type Ring end
+abstract type FPModule{T} end
+abstract type FPModuleElem{T} end
 
 mutable struct Integers{T <: Integer} <: Ring
 end
 
-mutable struct Rationals{T <: Integer} <: Field
-end
-
 const RingElement = Union{RingElem, Integer, Rational, AbstractFloat}
 
-const FieldElement = Union{FieldElem, Rational, AbstractFloat}
-
-###############################################################################
-#
-#   Generic submodule
-#
-###############################################################################
+#### Generic submodule ####
 
 module Generic
 
-import Base: rand
-
-import AbstractAlgebra: Rationals, NCRing, NCRingElem, Ring, RingElem,
-       RingElement
+import AbstractAlgebra: Ring, RingElem, RingElement
 
 using AbstractAlgebra
 
-export Submodule, submodule_elem, ngens, FreeModule, free_module_elem
+export Submodule, FreeModule, free_module_elem
 
-mutable struct FreeModule{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModule{T}
-   base_ring::NCRing
+mutable struct FreeModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
+   base_ring::Ring
    rank::Int
 end
 
-mutable struct free_module_elem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModuleElem{T}
+mutable struct free_module_elem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
     parent::FreeModule{T}
     v::Vector{T}
 end
@@ -66,26 +37,16 @@ mutable struct Submodule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    gens::Vector{<:AbstractAlgebra.FPModuleElem{T}}
 end
 
-parent_type(::Type{free_module_elem{T}}) where T <: RingElement = FreeModule{T}
+elem_type(::FreeModule{T}) where T <: RingElement = free_module_elem{T}
 
-base_ring(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.base_ring::parent_type(T)
-
-elem_type(::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = free_module_elem{T}
-
-rank(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.rank
-
-ngens(M::FreeModule{T}) where T <: Union{RingElement, NCRingElem} = M.rank
-
-function (M::FreeModule{T})(a::Vector{T}) where T <: Union{RingElement, NCRingElem}
+function (M::FreeModule{T})(a::Vector{T}) where T <: RingElement
    return free_module_elem{T}(M, a)
 end
 
-function FreeModule(R::NCRing, rank::Int)
+function FreeModule(R::Ring, rank::Int)
    T = elem_type(R)
    return FreeModule{T}(R, rank)
 end
-
-base_ring(N::Submodule{T}) where T <: RingElement = N.base_ring
 
 generators(N::Submodule{T}) where T <: RingElement = N.gens::Vector{elem_type(N.m)}
 
@@ -98,34 +59,32 @@ function Submodule(m::AbstractAlgebra.FPModule{T}, subs::Vector{Submodule{T}}) w
    return Submodule(m, gens)
 end
 
-end # generic
+end #### Generic submodule ####
 
-import .Generic: elem_type, parent_type
+import .Generic: elem_type
 
-function FreeModule(R::NCRing, rank::Int; cached::Bool = true)
+function FreeModule(R::Ring, rank::Int)
    Generic.FreeModule(R, rank)
 end
 
-function Submodule(m::Module{T}, gens::Vector{<:ModuleElem{T}}) where T <: RingElement
+function Submodule(m::FPModule{T}, gens::Vector{<:FPModuleElem{T}}) where T <: RingElement
    Generic.Submodule(m, gens)
 end
 
-function Submodule(m::Module{T}, subs::Vector{<:Generic.Submodule{T}}) where T <: RingElement
+function Submodule(m::FPModule{T}, subs::Vector{<:Generic.Submodule{T}}) where T <: RingElement
    Generic.Submodule(m, subs)
 end
 
-elem_type(::Rationals{T}) where T <: Integer = Rational{T}
+elem_type(::Integers{T}) where T <: Integer = T
 
-parent_type(::Type{Rational{T}}) where T <: Integer = Rationals{T}
-
-QQ = Rationals{BigInt}()
+ZZ = Integers{BigInt}()
 
 function test_submodule()
-#   M = FreeModule(QQ, 2)
+   M = FreeModule(ZZ, 2)  # <-----------------
 
-   M = FreeModule(QQ, 5)
+   M = FreeModule(ZZ, 3)
    nsubs = 0
-   subs = [Submodule(M, [M(BigInt[1, 2, 3, 4, 5])]) for i in 1:nsubs]
+   subs = [Submodule(M, [M(BigInt[1, 2, 3])]) for i in 1:nsubs]
    N = Submodule(M, subs)
 end
 
