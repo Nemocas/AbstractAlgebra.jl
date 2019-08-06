@@ -272,11 +272,11 @@ include("julia/Integer.jl")
 
 include("julia/Rational.jl")
 
-include("julia/Float.jl")
+# include("julia/Float.jl")
 
 include("Fields.jl")
 
-include("Factor.jl")
+# include("Factor.jl")
 
 ###############################################################################
 #
@@ -284,4 +284,4 @@ include("Factor.jl")
 #
 ###############################################################################
 
-include("polysubst.jl")
+# include("polysubst.jl")

@@ -4,7 +4,7 @@
 #
 ################################################################################
 
-include("julia/GF.jl")
+#include("julia/GF.jl")
 
 //(a::T, b::T) where {T <: FieldElem} = divexact(a, b)
 
