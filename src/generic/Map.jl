@@ -104,7 +104,7 @@ image_fn(f::AbstractAlgebra.Map(AbstractAlgebra.FunctionalMap)) = get_field(f, :
 
 function (f::FunctionalMap{D, C})(a) where {D, C}
    parent(a) != domain(f) && throw(DomainError(f))
-   return image_fn(f)(a)::elem_type(C)
+   return image_fn(f)(a)::elem_type(codomain(f))
 end
 
 function map_from_func(domain, codomain, image_fn::Function)
