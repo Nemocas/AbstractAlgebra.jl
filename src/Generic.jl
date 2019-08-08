@@ -32,10 +32,10 @@ import Base: floor, ceil, hypot, log, log1p, exp, expm1, sin, cos, sinpi,
              cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
              asinh, acosh, sinpi, cospi
 
-import AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring, RingElem,
+import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring, RingElem,
        RingElement, Field, FieldElement, Map, promote_rule
 
-using AbstractAlgebra
+using ..AbstractAlgebra
 
 include("generic/GenericTypes.jl")
 
