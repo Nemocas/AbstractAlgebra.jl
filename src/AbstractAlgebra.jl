@@ -75,12 +75,16 @@ function Submodule(m::FPModule{T}, subs::Vector{<:Generic.Submodule{T}}) where T
    Generic.Submodule(m, subs)
 end
 
+function Submodule(m::FPModule{T}, subs::Vector{S}) where {T <: RingElement, S}
+   return Submodule(m, elem_type(m)[])
+end
+
 elem_type(::Integers{T}) where T <: Integer = T
 
 ZZ = Integers{BigInt}()
 
 function test_submodule()
-   M = FreeModule(ZZ, 2)  # <-----------------
+#   M = FreeModule(ZZ, 2)  # <-----------------
 
    M = FreeModule(ZZ, 3)
    nsubs = 0
