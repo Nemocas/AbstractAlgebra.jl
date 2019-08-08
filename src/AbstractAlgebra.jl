@@ -16,9 +16,9 @@ const RingElement = Union{RingElem, Integer, Rational, AbstractFloat}
 
 module Generic
 
-import AbstractAlgebra: Ring, RingElem, RingElement
+import ..AbstractAlgebra: Ring, RingElem, RingElement
 
-using AbstractAlgebra
+using ..AbstractAlgebra
 
 export Submodule, FreeModule, free_module_elem
 
