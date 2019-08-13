@@ -238,7 +238,6 @@ function +(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where
    d2 = AbstractAlgebra.denominator(b, false)
    n1 = AbstractAlgebra.numerator(a, false)
    n2 = AbstractAlgebra.numerator(b, false)
-   gd = gcd(d1, d2)
    if d1 == d2
       rnum = n1 + n2
       if isone(d1)
@@ -259,6 +258,7 @@ function +(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where
       rnum = n1 + n2*d1
       rden = deepcopy(d1)
    else
+      gd = gcd(d1, d2)
       if isone(gd)
          rnum = n1*d2 + n2*d1
          rden = d1*d2
