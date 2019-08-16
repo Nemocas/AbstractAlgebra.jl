@@ -4,8 +4,8 @@
 #
 ################################################################################
 
-export map_from_func, compose, domain, codomain, identity_map, map1, map2,
-       image_fn
+export map_from_func, check_composable, codomain, compose, domain,
+       identity_map, get_field, map1, map2, image_fn, set_field!
 
 ################################################################################
 #
@@ -14,7 +14,7 @@ export map_from_func, compose, domain, codomain, identity_map, map1, map2,
 ################################################################################
 
 get_field(M, f) = getfield(M, f) # fall back to Julia builtin
-set_field!(M, f) = setfield(M, f) # fall back to Julia builtin
+set_field!(M, f, g) = setfield!(M, f, g) # fall back to Julia builtin
 
 domain(f::AbstractAlgebra.Map) = get_field(f, :domain)
 codomain(f::AbstractAlgebra.Map) = get_field(f, :codomain)
