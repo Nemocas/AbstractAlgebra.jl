@@ -4689,9 +4689,9 @@ function build_variable(arg::Symbol)
 end
 
 function build_variable(arg::Expr)
-  isa(arg, Expr) || error("Expected $var to be a variable name")
-  Base.Meta.isexpr(arg, :ref) || error("Expected $var to be of the form varname[idxset]")
-  (2 ≤ length(arg.args)) || error("Expected $var to have at least one index set")
+  isa(arg, Expr) || error("Expected $arg to be a variable name")
+  Base.Meta.isexpr(arg, :ref) || error("Expected $arg to be of the form varname[idxset]")
+  (2 ≤ length(arg.args)) || error("Expected $arg to have at least one index set")
   varname = arg.args[1]
   prefix = string(varname)
   t = gensym()
