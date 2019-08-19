@@ -4138,13 +4138,19 @@ end
     setcoeff!(a::MPoly{T}, i::Int, c::T) where T <: RingElement
 > Set the coefficient of the i-th term of the polynomial to $c$.
 """
-function setcoeff!(a::MPoly{T}, i::Int, c::T) where T <: RingElement
-   fit!(a, i)
-   a.coeffs[i] = c
-   if i > length(a)
-      a.length = i
-   end
-   return a
+setcoeff!(a::MPoly{<: RingElement}, i::Int, c::RingElement)
+
+for T in [RingElem, Integer, Rational, AbstractFloat]
+  @eval begin
+    function setcoeff!(a::MPoly{S}, i::Int, c::S) where {S <: $T}
+       fit!(a, i)
+       a.coeffs[i] = c
+       if i > length(a)
+          a.length = i
+       end
+       return a
+    end
+  end
 end
 
 @doc Markdown.doc"""
