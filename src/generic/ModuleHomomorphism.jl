@@ -149,8 +149,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    preimage(f::Map(AbstractAlgebra.FPModuleHomomorphism), v::AbstractAlgebra.FPModu
-leElem{T}) where T <: RingElement
+    preimage(f::Map(AbstractAlgebra.FPModuleHomomorphism), v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
 > Returns a preimage of $v$ under the homomorphism $f$, i.e. an element of the
 > domain of $f$ that maps to $v$ under $f$. Note that this has no special
 > mathematical properties. It is an element of the set theoretical preimage of
@@ -225,8 +224,7 @@ function ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra
 end
 
 @doc Markdown.doc"""
-    ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T},
-M::AbstractAlgebra.MatElem{T}, minv::AbstractAlgebra.MatElem{T}) where T <: RingElement
+    ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, M::AbstractAlgebra.MatElem{T}, minv::AbstractAlgebra.MatElem{T}) where T <: RingElement
 > Create the isomorphism $f : M_1 \to M_2$ represented by the matrix $M$. The
 > inverse morphism is automatically computed.
 """
