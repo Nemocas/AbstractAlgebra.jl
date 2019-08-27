@@ -23,8 +23,7 @@ Generic.ModuleHomomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.
 ```
 
 ```@docs
-Generic.ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{
-T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
+Generic.ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.FPModule{T}, m::AbstractAlgebra.MatElem{T}) where T <: RingElement
 ```
 
 **Examples**
