@@ -7,6 +7,10 @@ end
 
 # Module Interface
 
+Note: the module infrastructure in AbstractAlgebra should be considered
+experimental at this stage. This means that the interface may change in
+the future.
+
 AbstractAlgebra allows the construction of finitely presented modules (i.e.
 with finitely many generators and relations), starting from free modules. The
 generic code provided by AbstractAlgebra will only work for modules over
@@ -49,6 +53,11 @@ We describe the functionality below for modules over commutative rings, i.e. wit
 element type belonging to `RingElement`, however similar constructors should be
 available for element types belonging to `NCRingElem` instead, for free modules over
 a noncommutative ring.
+
+Although not part of the module interface, implementations of modules that wish to
+follow our interface should use the same function names for submodules, quotient
+modules, direct sums and module homomorphisms if they wish to remain compatible
+with our module generics in the future.
 
 ### Basic manipulation
 
