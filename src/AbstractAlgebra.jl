@@ -460,11 +460,19 @@ function FreeModule(R::NCRing, rank::Int; cached::Bool = true)
    Generic.FreeModule(R, rank; cached=cached)
 end
 
+function free_module(R::NCRing, rank::Int; cached::Bool = true)
+   Generic.FreeModule(R, rank; cached=cached)
+end
+
 @doc Markdown.doc"""
     VectorSpace(R::Field, dim::Int; cached::Bool = true)
 > Return the vector space over the field $R$ with the given dimension.
 """
 function VectorSpace(R::Field, dim::Int; cached::Bool = true)
+   Generic.FreeModule(R, dim)
+end
+
+function vector_space(R::Field, dim::Int; cached::Bool = true)
    Generic.FreeModule(R, dim)
 end
 
@@ -517,6 +525,10 @@ function DirectSum(m::Vector{<:Module{T}}) where T <: RingElement
    Generic.DirectSum(m)
 end
 
+function direct_sum(m::Vector{<:Module{T}}) where T <: RingElement
+   Generic.DirectSum(m)
+end
+
 @doc Markdown.doc"""
     DirectSum(m::Module{T}...) where T <: RingElement
 > Return a tuple $M, f, g$ consisting of $M$ the direct sum of the given
@@ -527,11 +539,23 @@ function DirectSum(m::Module{T}...) where T <: RingElement
    Generic.DirectSum(m...)
 end
 
+function direct_sum(m::Module{T}...) where T <: RingElement
+   Generic.DirectSum(m...)
+end
+
 function ModuleHomomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
    Generic.ModuleHomomorphism(M1, M2, m)
 end
 
+function module_homomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
+   Generic.ModuleHomomorphism(M1, M2, m)
+end
+
 function ModuleIsomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
+   Generic.ModuleIsomorphism(M1, M2, m)
+end
+
+function module_isomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Module, m::MatElem)
    Generic.ModuleIsomorphism(M1, M2, m)
 end
 
@@ -545,7 +569,8 @@ export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        YoungTableau, AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
        PuiseuxSeriesField, FreeModule, VectorSpace, ModuleHomomorphism, sub,
-       quo, DirectSum, ModuleIsomorphism
+       quo, DirectSum, ModuleIsomorphism, free_module, vector_space,
+       module_homomorphism, direct_sum, module_isomorphism
 
 export Generic
 
