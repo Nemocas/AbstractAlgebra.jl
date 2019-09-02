@@ -709,28 +709,28 @@ end
 
 function test_laurent_series_square_root()
    print("Generic.LaurentSeries.square_root...")
- 
+
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -10:10)
       g = f^2
- 
+
       @test isequal(sqrt(g)^2, g)
    end
- 
+
    # Inexact field
    R, x = LaurentSeriesField(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, -1:1)
       g = f^2
- 
+
       @test isapprox(sqrt(g)^2, g)
    end
- 
+
    println("PASS")
 end
- 
+
 function test_laurent_series_exact_division()
    print("Generic.LaurentSeries.exact_division...")
 
@@ -890,7 +890,7 @@ function test_gen_laurent_series()
    test_laurent_series_manipulation()
    test_laurent_series_unary_ops()
    test_laurent_series_binary_ops()
-   test_laurent_series_inplace_binary_ops
+   test_laurent_series_inplace_binary_ops()
    test_laurent_series_adhoc_binary_ops()
    test_laurent_series_comparison()
    test_laurent_series_adhoc_comparison()
