@@ -1,6 +1,4 @@
-function test_partition_type()
-   print("youngtabs.partition_type...")
-
+@testset "youngtabs.partition_type..." begin
    @test Partition([4,3,1]) isa Generic.Partition
    @test Partition([4,3,1]) isa AbstractVector{Int}
    @test Partition([3,4,1]) isa Generic.Partition
@@ -31,13 +29,9 @@ function test_partition_type()
 
    @test p == Partition([4,3,2])
    @test p != r
-
-   println("PASS")
 end
 
-function test_partition_iter()
-   print("youngtabs.partition_iter...")
-
+@testset "youngtabs.partition_iter..." begin
    @test [Generic._numpart(i) for i in 0:10] == [1,1,2,3,5,7,11,15,22,30,42]
    @test Generic._numpart(100) == 190_569_292
    @test Generic._numpart(1000) == 24_061_467_864_032_622_473_692_149_727_991
@@ -45,13 +39,9 @@ function test_partition_iter()
    @test collect(AllParts(2)) == [Partition([1,1]), Partition([2])]
    @test collect(AllParts(1)) == [Partition([1])]
    @test collect(AllParts(0)) == [Partition(Int[])]
-
-   println("PASS")
 end
 
-function test_ytabs_type()
-   print("youngtabs.youngtableau_type...")
-
+@testset "youngtabs.youngtableau_type..." begin
    lambda = [4,3,1]
    @test YoungTableau(Partition(lambda)) isa Generic.YoungTableau
    @test YoungTableau(Partition(lambda)) isa AbstractArray{Int, 2}
@@ -86,13 +76,9 @@ function test_ytabs_type()
    for i in 1:sum(Y.part)
      @test Y[something(findfirst(isequal(i), Y), 0)] == i
    end
-
-   println("PASS")
 end
 
-function test_conjugation()
-   print("youngtabs.conjugation...")
-
+@testset "youngtabs.conjugation..." begin
    @test conj(Partition([1,1,1,1])) == Partition([4])
    @test conj(Partition([2,1,1])) == Partition([3,1])
 
@@ -114,14 +100,10 @@ function test_conjugation()
    @test Y[2,2] == conj(Y)[2,2]
 
    @test Y[3,1] == conj(Y)[1,3]
-
-   println("PASS")
 end
 
 
-function test_ytabs_dim()
-   print("youngtabs.dim...")
-
+@testset "youngtabs.dim..." begin
    y = YoungTableau([5,4,3,3,1,1])
    # ┌───┬───┬───┬───┬───┐
    # │ 1 │ 2 │ 3 │ 4 │ 5 │
@@ -186,13 +168,9 @@ function test_ytabs_dim()
    @test dim(YoungTableau([4,3,1,1])) == 216
 
    @test dim(YoungTableau(collect(10:-1:1))) == 44261486084874072183645699204710400
-
-   println("PASS")
 end
 
-function test_skewdiags()
-   print("youngtabs.skewdiags...")
-
+@testset "youngtabs.skewdiags..." begin
    l = Partition([5,3,2,2,2,1,1])
    m = Partition([2,2,1])
    xi = l/m
@@ -244,13 +222,9 @@ function test_skewdiags()
    @test has_bottom_neighbor(xi, 5, 2) == false
    @test has_bottom_neighbor(xi, 6, 1) == true
    @test has_bottom_neighbor(xi, 7, 1) == false
-
-   println("PASS")
 end
 
-function test_rimhooks()
-   print("youngtabs.rimhooks...")
-
+@testset "youngtabs.rimhooks..." begin
    xi = Partition([2,1])/Partition(Int[], false)
    @test isrimhook(xi) == true
 
@@ -297,12 +271,9 @@ function test_rimhooks()
    mu = Partition([2,2,1])
 
    @test isrimhook(lambda/mu) == false # is disconnected
-
-   println("PASS")
 end
 
-function test_partitionseqs()
-   print("youngtabs.partitionseqs...")
+@testset "youngtabs.partitionseqs..." begin
    @test partitionseq(Partition([1])) == BitVector([true, false])
    @test partitionseq([1]) == BitVector([true, false])
    @test partitionseq(Partition([1,1])) == BitVector([true, false, false])
@@ -316,19 +287,4 @@ function test_partitionseqs()
    R[1] = false
    R[end] = true
    @test partitionseq(R) == BitVector([true,false,true,true,false])
-
-   println("PASS")
-end
-
-function test_youngtabs()
-   test_partition_type()
-   test_partition_iter()
-   test_ytabs_type()
-   test_conjugation()
-   test_ytabs_dim()
-   test_skewdiags()
-   test_rimhooks()
-   test_partitionseqs()
-
-   println("")
 end

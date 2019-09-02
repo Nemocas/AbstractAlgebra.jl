@@ -87,9 +87,7 @@ Base.getindex(a::MyTestMatrix{T}, r::Int, c::Int) where T = a.d
 
 Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
 
-function test_gen_mat_constructors()
-   print("Generic.Mat.constructors...")
-
+@testset "Generic.Mat.constructors..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -181,7 +179,7 @@ function test_gen_mat_constructors()
    S = MatrixSpace(ZZ, 2, 2)
 
    @test isa(S(A), Generic.MatSpaceElem{BigInt})
-  
+
    # Test original matrix not modified
    S = MatrixSpace(QQ, 2, 2)
    a = Rational{BigInt}(1)
@@ -195,13 +193,9 @@ function test_gen_mat_constructors()
    M = S(A)
 
    @test A[1, 1] === a
-
-   println("PASS")
 end
 
-function test_gen_mat_size()
-   print("Generic.Mat.size...")
-
+@testset "Generic.Mat.size..." begin
    A = matrix(QQ, [1 2 3; 4 5 6; 7 8 9])
    B = matrix(QQ, [1 2 3 4; 5 6 7 8])
 
@@ -210,13 +204,9 @@ function test_gen_mat_size()
 
    @test size(B) == (2,4)
    @test !issquare(B)
-
-   println("PASS")
 end
 
-function test_gen_mat_manipulation()
-   print("Generic.Mat.manipulation...")
-
+@testset "Generic.Mat.manipulation..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -300,13 +290,9 @@ function test_gen_mat_manipulation()
       @test m45 isa Generic.MatSpaceElem
       @test parent(m45) == M45
    end
-
-   println("PASS")
 end
 
-function test_gen_mat_unary_ops()
-   print("Generic.Mat.unary_ops...")
-
+@testset "Generic.Mat.unary_ops..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -314,13 +300,9 @@ function test_gen_mat_unary_ops()
    B = S([-t - 1 (-t) -R(1); -t^2 (-t) (-t); -R(-2) (-t - 2) (-t^2 - t - 1)])
 
    @test -A == B
-
-   println("PASS")
 end
 
-function test_gen_mat_sub()
-   print("Generic.Mat.sub...")
-
+@testset "Generic.Mat.sub..." begin
    S = MatrixSpace(ZZ, 3, 3)
 
    A = S([1 2 3; 4 5 6; 7 8 9])
@@ -350,13 +332,9 @@ function test_gen_mat_sub()
    @test B == @inferred B[:, :]
    @test C == @inferred C[:, :]
    @test D == @inferred D[:, :]
-
-   println("PASS")
 end
 
-function test_gen_mat_binary_ops()
-   print("Generic.Mat.binary_ops...")
-
+@testset "Generic.Mat.binary_ops..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -368,13 +346,9 @@ function test_gen_mat_binary_ops()
    @test A - B == S([t-1 t-3 R(0); t^2 - t R(-1) R(-2); R(-1) (-t^2 + t + 2) (-t^3 + t^2 + t + 1)])
 
    @test A*B == S([t^2 + 2*t + 1 2*t^2 + 4*t + 3 t^3 + t^2 + 3*t + 1; 3*t^2 - t (t^3 + 4*t^2 + t) t^4 + 2*t^2 + 2*t; t-5 t^4 + t^3 + 2*t^2 + 3*t - 4 t^5 + 1*t^4 + t^3 + t^2 + 4*t + 2])
-
-   println("PASS")
 end
 
-function test_gen_mat_adhoc_binary()
-   print("Generic.Mat.adhoc_binary...")
-
+@testset "Generic.Mat.adhoc_binary..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -392,13 +366,9 @@ function test_gen_mat_adhoc_binary()
    @test BigInt(3)*A == A*BigInt(3)
    @test Rational{BigInt}(3)*A == A*Rational{BigInt}(3)
    @test (t - 1)*A == A*(t - 1)
-
-   println("PASS")
 end
 
-function test_gen_mat_permutation()
-   print("Generic.Mat.permutation...")
-
+@testset "Generic.Mat.permutation..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -408,13 +378,9 @@ function test_gen_mat_permutation()
    P = T([2, 3, 1])
 
    @test A == inv(P)*(P*A)
-
-   println("PASS")
 end
 
-function test_gen_mat_comparison()
-   print("Generic.Mat.comparison...")
-
+@testset "Generic.Mat.comparison..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -424,13 +390,9 @@ function test_gen_mat_comparison()
    @test A == B
 
    @test A != one(S)
-
-   println("PASS")
 end
 
-function test_gen_mat_adhoc_comparison()
-   print("Generic.Mat.adhoc_comparison...")
-
+@testset "Generic.Mat.adhoc_comparison..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -446,13 +408,9 @@ function test_gen_mat_adhoc_comparison()
    @test t + 1 == S(t + 1)
    @test A != one(S)
    @test one(S) == one(S)
-
-   println("PASS")
 end
 
-function test_gen_mat_powering()
-   print("Generic.Mat.powering...")
-
+@testset "Generic.Mat.powering..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -467,13 +425,9 @@ function test_gen_mat_powering()
    A = S(Rational{BigInt}[2 3; 7 -4])
 
    @test A^-1 == inv(A)
-
-   println("PASS")
 end
 
-function test_gen_mat_adhoc_exact_division()
-   print("Generic.Mat.adhoc_exact_division...")
-
+@testset "Generic.Mat.adhoc_exact_division..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
@@ -483,13 +437,9 @@ function test_gen_mat_adhoc_exact_division()
    @test divexact(12*A, BigInt(12)) == A
    @test divexact(12*A, Rational{BigInt}(12)) == A
    @test divexact((1 + t)*A, 1 + t) == A
-
-   println("PASS")
 end
 
-function test_gen_mat_transpose()
-   print("Generic.Mat.transpose...")
-
+@testset "Generic.Mat.transpose..." begin
    R, t = PolynomialRing(QQ, "t")
    arr = [t + 1 t R(1); t^2 t t]
    A = matrix(R, arr)
@@ -500,51 +450,36 @@ function test_gen_mat_transpose()
    A = matrix(R, arr)
    B = matrix(R, permutedims(arr, [2, 1]))
    @test transpose(A) == B
-
-   println("PASS")
 end
 
-function test_gen_mat_gram()
-   print("Generic.Mat.gram...")
-
+@testset "Generic.Mat.gram..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
    @test gram(A) == S([2*t^2 + 2*t + 2 t^3 + 2*t^2 + t 2*t^2 + t - 1; t^3 + 2*t^2 + t t^4 + 2*t^2 t^3 + 3*t; 2*t^2 + t - 1 t^3 + 3*t t^4 + 2*t^3 + 4*t^2 + 6*t + 9])
-
-   println("PASS")
 end
 
-function test_gen_mat_tr()
-   print("Generic.Mat.tr...")
-
+@testset "Generic.Mat.tr..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
    @test tr(A) == t^2 + 3t + 2
-
-   println("PASS")
 end
 
-function test_gen_mat_content()
-   print("Generic.Mat.content...")
-
+@testset "Generic.Mat.content..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixSpace(R, 3, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
    @test content((1 + t)*A) == 1 + t
-   println("PASS")
 end
 
-function test_gen_mat_lu()
-   print("Generic.Mat.lu...")
-
+@testset "Generic.Mat.lu..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixSpace(K, 3, 3)
@@ -579,13 +514,9 @@ function test_gen_mat_lu()
 
    @test r == 3
    @test P*A == L*U
-
-   println("PASS")
 end
 
-function test_gen_mat_fflu()
-   print("Generic.Mat.fflu...")
-
+@testset "Generic.Mat.fflu..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixSpace(K, 3, 3)
@@ -636,13 +567,9 @@ function test_gen_mat_fflu()
    D[3, 3] = inv(U[2, 2])
    @test r == 3
    @test P*A == L*D*U
-
-   println("PASS")
 end
 
-function test_gen_mat_det()
-   print("Generic.Mat.det...")
-
+@testset "Generic.Mat.det..." begin
    S, x = PolynomialRing(ResidueRing(ZZ, 1009*2003), "x")
 
    for dim = 0:5
@@ -683,14 +610,10 @@ function test_gen_mat_det()
 
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
-
-   println("PASS")
 end
 
-function test_gen_mat_minors()
-   print("Generic.Mat.minors...")
-
-   S, z=PolynomialRing(ZZ,"z")
+@testset "Generic.Mat.minors..." begin
+   S, z = PolynomialRing(ZZ,"z")
    n = 5
    R = MatrixSpace(S,n,n)
    for r = 0:n
@@ -704,13 +627,9 @@ function test_gen_mat_minors()
       @test [det(M)] == minors(M, n)
       @test [] == minors(M, n + 1)
    end
-
-   println("PASS")
 end
 
-function test_gen_mat_rank()
-   print("Generic.Mat.rank...")
-
+@testset "Generic.Mat.rank..." begin
    S = ResidueRing(ZZ, 20011*10007)
    R = MatrixSpace(S, 5, 5)
 
@@ -781,13 +700,9 @@ function test_gen_mat_rank()
 
       @test rank(M) == i
    end
-
-   println("PASS")
 end
 
-function test_gen_mat_solve_lu()
-   print("Generic.Mat.solve_lu...")
-
+@testset "Generic.Mat.solve_lu..." begin
    S = QQ
 
    for dim = 0:5
@@ -819,13 +734,9 @@ function test_gen_mat_solve_lu()
 
       @test MK*x == bK
    end
-
-   println("PASS")
 end
 
-function test_gen_mat_solve_rational()
-   print("Generic.Mat.solve_rational...")
-
+@testset "Generic.Mat.solve_rational..." begin
    S = ResidueRing(ZZ, 20011*10007)
 
    for dim = 0:5
@@ -906,13 +817,9 @@ function test_gen_mat_solve_rational()
    x, d = solve_rational(M, b)
 
    @test M*x == d*b
-
-   println("PASS")
 end
 
-function test_gen_mat_solve_left()
-   print("Generic.Mat.solve_left...")
-
+@testset "Generic.Mat.solve_left..." begin
    for R in [ZZ, QQ]
       for iter = 1:40
          for dim = 0:5
@@ -954,13 +861,9 @@ function test_gen_mat_solve_left()
          @test X*M == B
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mat_solve_triu()
-   print("Generic.Mat.solve_triu...")
-
+@testset "Generic.Mat.solve_triu..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
 
@@ -975,13 +878,9 @@ function test_gen_mat_solve_triu()
 
       @test M*x == b
    end
-
-   println("PASS")
 end
 
-function test_gen_mat_can_solve_left_reduced_triu()
-   print("Generic.Mat.solve_left_reduced_triu...")
-
+@testset "Generic.Mat.solve_left_reduced_triu..." begin
    for iter = 1:40
       n = rand(1:6)
       m = rand(1:n)
@@ -997,13 +896,9 @@ function test_gen_mat_can_solve_left_reduced_triu()
 
       @test flag == false || x*M == r
    end
-
-   println("PASS")
 end
 
-function test_gen_mat_rref()
-   print("Generic.Mat.rref...")
-
+@testset "Generic.Mat.rref..." begin
    S = ResidueRing(ZZ, 20011*10007)
    R = MatrixSpace(S, 5, 5)
 
@@ -1067,13 +962,9 @@ function test_gen_mat_rref()
       @test r == i
       @test isrref(A)
    end
-
-   println("PASS")
 end
 
-function test_gen_mat_nullspace()
-   print("Generic.Mat.nullspace...")
-
+@testset "Generic.Mat.nullspace..." begin
    S = ResidueRing(ZZ, 20011*10007)
    R = MatrixSpace(S, 5, 5)
 
@@ -1142,13 +1033,9 @@ function test_gen_mat_nullspace()
       @test rank(N) == n
       @test iszero(M*N)
    end
-
-   println("PASS")
 end
 
-function test_gen_mat_kernel()
-   print("Generic.Mat.kernel...")
-
+@testset "Generic.Mat.kernel..." begin
    R = MatrixSpace(ZZ, 5, 5)
 
    for i = 0:5
@@ -1205,13 +1092,9 @@ function test_gen_mat_kernel()
       @test rank(N) == n
       @test iszero(N*M)
    end
-
-   println("PASS")
 end
 
-function test_gen_mat_inversion()
-   print("Generic.Mat.inversion...")
-
+@testset "Generic.Mat.inversion..." begin
    for dim = 2:5
       R = MatrixSpace(ZZ, dim, dim)
       M = R(1)
@@ -1298,13 +1181,9 @@ function test_gen_mat_inversion()
 
       @test M*X == d*one(T)
    end
-
-   println("PASS")
 end
 
-function test_gen_mat_hessenberg()
-   print("Generic.Mat.hessenberg...")
-
+@testset "Generic.Mat.hessenberg..." begin
    R = ResidueRing(ZZ, 18446744073709551629)
 
    for dim = 0:5
@@ -1319,13 +1198,9 @@ function test_gen_mat_hessenberg()
          @test ishessenberg(A)
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mat_kronecker_product()
-   print("Generic.Mat.kronecker_product...")
-
+@testset "Generic.Mat.kronecker_product..." begin
    R = ResidueRing(ZZ, 18446744073709551629)
    S = MatrixSpace(R, 2, 3)
    S2 = MatrixSpace(R, 2, 2)
@@ -1337,13 +1212,9 @@ function test_gen_mat_kronecker_product()
 
    @test size(kronecker_product(A, A)) == (4,9)
    @test kronecker_product(B*A,A*C) == kronecker_product(B,A) * kronecker_product(A,C)
-
-   println("PASS")
 end
 
-function test_gen_mat_charpoly()
-   print("Generic.Mat.charpoly...")
-
+@testset "Generic.Mat.charpoly..." begin
    R = ResidueRing(ZZ, 18446744073709551629)
 
    for dim = 0:5
@@ -1399,13 +1270,9 @@ function test_gen_mat_charpoly()
    p2 = charpoly(U, M)
 
    @test p1 == p2
-
-   println("PASS")
 end
 
-function test_gen_mat_minpoly()
-   print("Generic.Mat.minpoly...")
-
+@testset "Generic.Mat.minpoly..." begin
    R = GF(103)
    T, y = PolynomialRing(R, "y")
 
@@ -1507,13 +1374,9 @@ function test_gen_mat_minpoly()
    p2 = minpoly(U, M)
 
    @test p1 == p2
-
-   println("PASS")
 end
 
-function test_gen_mat_row_col_swapping()
-   print("Generic.Mat.row_col_swapping...")
-
+@testset "Generic.Mat.row_col_swapping..." begin
    R, x = PolynomialRing(ZZ, "x")
    M = MatrixSpace(R, 3, 2)
 
@@ -1551,13 +1414,9 @@ function test_gen_mat_row_col_swapping()
    @test reverse_cols(a) == matrix(R, [3 2 1; 5 4 3; 7 6 5])
    reverse_cols!(a)
    @test a == matrix(R, [3 2 1; 5 4 3; 7 6 5])
-
-   println("PASS")
 end
 
-function test_gen_mat_elem_op()
-   print("Generic.Mat.gen_mat_elem_op...")
-
+@testset "Generic.Mat.gen_mat_elem_op..." begin
    R, x = PolynomialRing(ZZ, "x")
    for i in 1:10
       r = rand(1:50)
@@ -1678,12 +1537,9 @@ function test_gen_mat_elem_op()
 
       @test multiply_row(multiply_row(M, -one(R), r1), -one(R), r1) == M
    end
-   println("PASS")
 end
 
-function test_gen_mat_concat()
-   print("Generic.Mat.concat...")
-
+@testset "Generic.Mat.concat..." begin
    R, x = PolynomialRing(ZZ, "x")
 
    for i = 1:10
@@ -1737,12 +1593,9 @@ function test_gen_mat_concat()
                                     3 4 3 4 1;
                                     0 1 0 1 0;
                                     0 1 0 1 2;])
-   println("PASS")
 end
 
-function test_gen_mat_hnf_minors()
-  print("Generic.Mat.hnf_minors...")
-
+@testset "Generic.Mat.hnf_minors..." begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixSpace(R, 4, 3)
@@ -1775,13 +1628,9 @@ function test_gen_mat_hnf_minors()
    @test ishnf(H)
    @test isunit(det(U))
    @test U*B == H
-
-   println("PASS")
 end
 
-function test_gen_mat_hnf_kb()
-   print("Generic.Mat.hnf_kb...")
-
+@testset "Generic.Mat.hnf_kb..." begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixSpace(R, 4, 3)
@@ -1814,13 +1663,9 @@ function test_gen_mat_hnf_kb()
    @test ishnf(H)
    @test isunit(det(U))
    @test U*B == H
-
-   println("PASS")
 end
 
-function test_gen_mat_hnf_cohen()
-   print("Generic.Mat.hnf_cohen...")
-
+@testset "Generic.Mat.hnf_cohen..." begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixSpace(R, 4, 3)
@@ -1853,13 +1698,9 @@ function test_gen_mat_hnf_cohen()
    @test ishnf(H)
    @test isunit(det(U))
    @test U*B == H
-
-   println("PASS")
 end
 
-function test_gen_mat_hnf()
-   print("Generic.Mat.hnf...")
-
+@testset "Generic.Mat.hnf..." begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixSpace(R, 4, 3)
@@ -1892,13 +1733,9 @@ function test_gen_mat_hnf()
    @test ishnf(H)
    @test isunit(det(U))
    @test U*B == H
-
-   println("PASS")
 end
 
-function test_gen_mat_snf_kb()
-   print("Generic.Mat.snf_kb...")
-
+@testset "Generic.Mat.snf_kb..." begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixSpace(R, 4, 3)
@@ -1933,13 +1770,9 @@ function test_gen_mat_snf_kb()
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*B*K == T
-
-   println("PASS")
 end
 
-function test_gen_mat_snf()
-   print("Generic.Mat.snf...")
-
+@testset "Generic.Mat.snf..." begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixSpace(R, 4, 3)
@@ -1974,13 +1807,9 @@ function test_gen_mat_snf()
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*B*K == T
-
-   println("PASS")
 end
 
-function test_gen_mat_weak_popov()
-   print("Generic.Mat.weak_popov...")
-
+@testset "Generic.Mat.weak_popov..." begin
    R, x = PolynomialRing(QQ, "x")
 
    A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
@@ -2055,13 +1884,9 @@ function test_gen_mat_weak_popov()
       @test U*A == P
       @test isunit(det(U))
    end
-
-   println("PASS")
 end
 
-function test_gen_mat_views()
-   print("Generic.Mat.views...")
-
+@testset "Generic.Mat.views..." begin
    M = matrix(ZZ, 3, 3, BigInt[1, 2, 3, 2, 3, 4, 3, 4, 5])
    M2 = deepcopy(M)
 
@@ -2078,13 +1903,9 @@ function test_gen_mat_views()
 
    @test fflu(N3) == fflu(M) # tests that deepcopy is correct
    @test M2 == M
-
-   println("PASS")
 end
 
-function test_gen_mat_change_base_ring()
-   print("Generic.Mat.change_base_ring...")
-
+@testset "Generic.Mat.change_base_ring..." begin
    for (P, Q, T) in ((MatrixSpace(ZZ, 2, 3), MatrixSpace(ZZ, 3, 2), MatElem),
                      (MatrixAlgebra(ZZ, 3), MatrixAlgebra(ZZ, 3), MatAlgElem))
       M = rand(P, -10:10)
@@ -2102,12 +1923,9 @@ function test_gen_mat_change_base_ring()
          @test MQ * NQ == MNQ
       end
    end
-   println("PASS")
 end
 
-function test_gen_mat_map()
-   print("Generic.Mat.map...")
-
+@testset "Generic.Mat.map..." begin
    u, v = rand(0:9, 2)
    for (mat, algebra) = ((rand(1:9, u, v), false),
                          (rand(1:9, u, u), true))
@@ -2139,11 +1957,9 @@ function test_gen_mat_map()
          end
       end
    end
-   println("PASS")
 end
 
-function test_gen_mat_similar_zero()
-   print("Generic.Mat.similar/zero...")
+@testset "Generic.Mat.similar/zero..." begin
    for sim_zero in (similar, zero)
       test_zero = sim_zero === zero
       for R = (ZZ, GF(11))
@@ -2171,12 +1987,9 @@ function test_gen_mat_similar_zero()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mat_show()
-   print("Generic.Mat.show...")
+@testset "Generic.Mat.show..." begin
    @test string(matrix(ZZ, [3 1 2; 2 0 1])) == "[3  1  2]\n[2  0  1]"
    @test string(matrix(ZZ, [3 1 2; 2 0 1])) == "[3  1  2]\n[2  0  1]"
    @test string(matrix(ZZ, 2, 0, [])) == "2 by 0 matrix"
@@ -2187,58 +2000,4 @@ function test_gen_mat_show()
    @test string(MatrixAlgebra(QQ, 0)()) == "0 by 0 matrix"
    @test string(similar(matrix(ZZ, [3 1 2; 2 0 1]))) ==
       "[#undef  #undef  #undef]\n[#undef  #undef  #undef]"
-   println("PASS")
-end
-
-function test_gen_mat()
-   test_gen_mat_constructors()
-   test_gen_mat_size()
-   test_gen_mat_manipulation()
-   test_gen_mat_sub()
-   test_gen_mat_unary_ops()
-   test_gen_mat_binary_ops()
-   test_gen_mat_adhoc_binary()
-   test_gen_mat_permutation()
-   test_gen_mat_comparison()
-   test_gen_mat_adhoc_comparison()
-   test_gen_mat_powering()
-   test_gen_mat_adhoc_exact_division()
-   test_gen_mat_transpose()
-   test_gen_mat_gram()
-   test_gen_mat_tr()
-   test_gen_mat_content()
-   test_gen_mat_lu()
-   test_gen_mat_fflu()
-   test_gen_mat_det()
-   test_gen_mat_rank()
-   test_gen_mat_solve_lu()
-   test_gen_mat_solve_rational()
-   test_gen_mat_solve_left()
-   test_gen_mat_solve_triu()
-   test_gen_mat_can_solve_left_reduced_triu()
-   test_gen_mat_rref()
-   test_gen_mat_nullspace()
-   test_gen_mat_kernel()
-   test_gen_mat_inversion()
-   test_gen_mat_hessenberg()
-   test_gen_mat_kronecker_product()
-   test_gen_mat_charpoly()
-   test_gen_mat_minpoly()
-   test_gen_mat_row_col_swapping()
-   test_gen_mat_elem_op()
-   test_gen_mat_concat()
-   test_gen_mat_hnf_minors()
-   test_gen_mat_hnf_kb()
-   test_gen_mat_hnf_cohen()
-   test_gen_mat_hnf()
-   test_gen_mat_snf_kb()
-   test_gen_mat_snf()
-   test_gen_mat_weak_popov()
-   test_gen_mat_minors()
-   test_gen_mat_views()
-   test_gen_mat_change_base_ring()
-   test_gen_mat_map()
-   test_gen_mat_similar_zero()
-
-   println("")
 end

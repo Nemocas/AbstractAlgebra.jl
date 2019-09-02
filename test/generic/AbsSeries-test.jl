@@ -16,9 +16,7 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
-function test_abs_series_constructors()
-   print("Generic.AbsSeries.constructors...")
-
+@testset "Generic.AbsSeries.constructors..." begin
    R, x = PowerSeriesRing(ZZ, 30, "x", model=:capped_absolute)
 
    S, t = PolynomialRing(QQ, "t")
@@ -80,13 +78,9 @@ function test_abs_series_constructors()
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
-
-   println("PASS")
 end
 
-function test_abs_series_manipulation()
-   print("Generic.AbsSeries.manipulation...")
-
+@testset "Generic.AbsSeries.manipulation..." begin
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x", model=:capped_absolute)
 
@@ -121,13 +115,9 @@ function test_abs_series_manipulation()
    U, y = PowerSeriesRing(T, 10, "y", model=:capped_absolute)
 
    @test modulus(T) == 7
-
-   println("PASS")
 end
 
-function test_abs_series_unary_ops()
-   print("Generic.AbsSeries.unary_ops...")
-
+@testset "Generic.AbsSeries.unary_ops..." begin
    #  Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:300
@@ -155,13 +145,9 @@ function test_abs_series_unary_ops()
       @test isequal(-(-f), f)
       @test iszero(f + (-f))
    end
-
-   println("PASS")
 end
 
-function test_abs_series_binary_ops()
-   print("Generic.AbsSeries.binary_ops...")
-
+@testset "Generic.AbsSeries.binary_ops..." begin
    #  Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:100
@@ -208,13 +194,9 @@ function test_abs_series_binary_ops()
       @test isequal(f*(g + h), f*g + f*h)
       @test isequal(f*(g - h), f*g - f*h)
    end
-
-   println("PASS")
 end
 
-function test_abs_series_adhoc_binary_ops()
-   print("Generic.AbsSeries.adhoc_binary_ops...")
-
+@testset "Generic.AbsSeries.adhoc_binary_ops..." begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:500
@@ -302,13 +284,9 @@ function test_abs_series_adhoc_binary_ops()
       @test isequal(f*d1 - f*d2, f*(d1 - d2))
       @test isequal(f*d1 + f*d2, f*(d1 + d2))
    end
-
-   println("PASS")
 end
 
-function test_abs_series_comparison()
-   print("Generic.AbsSeries.comparison...")
-
+@testset "Generic.AbsSeries.comparison..." begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:500
@@ -357,13 +335,9 @@ function test_abs_series_comparison()
       @test (precision(h) > min(precision(f), precision(g)) || f != g + h)
       @test (precision(h) > min(precision(f), precision(g)) || !isequal(f, g + h))
    end
-
-   println("PASS")
 end
 
-function test_abs_series_adhoc_comparison()
-   print("Generic.AbsSeries.adhoc_comparison...")
-
+@testset "Generic.AbsSeries.adhoc_comparison..." begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:500
@@ -458,13 +432,9 @@ function test_abs_series_adhoc_comparison()
       @test S(d1) != d1 + f
       @test d1 != S(d1) + f
    end
-
-   println("PASS")
 end
 
-function test_abs_series_powering()
-   print("Generic.AbsSeries.powering...")
-
+@testset "Generic.AbsSeries.powering..." begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
 
@@ -515,13 +485,9 @@ function test_abs_series_powering()
          r2 *= f
       end
    end
-
-   println("PASS")
 end
 
-function test_abs_series_shift()
-   print("Generic.AbsSeries.shift...")
-
+@testset "Generic.AbsSeries.shift..." begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:300
@@ -564,13 +530,9 @@ function test_abs_series_shift()
       @test isequal(shift_left(f, s), x^s*f)
       @test precision(shift_right(f, s)) == max(0, precision(f) - s)
    end
-
-   println("PASS")
 end
 
-function test_abs_series_truncation()
-   print("Generic.AbsSeries.truncation...")
-
+@testset "Generic.AbsSeries.truncation..." begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:300
@@ -604,13 +566,10 @@ function test_abs_series_truncation()
       @test isequal(truncate(f, s), f + O(x^s))
       @test precision(truncate(f, s)) == min(precision(f), s)
    end
-
-   println("PASS")
 end
 
-function test_abs_series_inversion()
-    print("Generic.AbsSeries.inversion...")
- 
+@testset "Generic.AbsSeries.inversion..." begin
+
     # Exact ring
     R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
     for iter = 1:300
@@ -618,10 +577,10 @@ function test_abs_series_inversion()
        while !isunit(f)
           f = rand(R, 0:0, -10:10)
        end
- 
+
        @test f*inv(f) == 1
     end
- 
+
     # Inexact field
     R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
     for iter = 1:300
@@ -629,10 +588,10 @@ function test_abs_series_inversion()
        while coeff(f, 0) == 0
           f = rand(R, 0:0, -1:1)
        end
- 
+
        @test isapprox(f*inv(f), R(1))
     end
- 
+
     # Non-integral domain
     T = ResidueRing(ZZ, 6)
     R, x = PowerSeriesRing(T, 10, "x", model=:capped_absolute)
@@ -641,16 +600,12 @@ function test_abs_series_inversion()
        while !isunit(f)
           f = rand(R, 0:0, 0:5)
        end
- 
+
        @test f*inv(f) == 1
     end
- 
-    println("PASS")
  end
- 
-function test_abs_series_square_root()
-    print("Generic.AbsSeries.square_root...")
- 
+
+@testset "Generic.AbsSeries.square_root..." begin
     # Exact ring
     R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
     for iter = 1:300
@@ -659,22 +614,18 @@ function test_abs_series_square_root()
 
        @test isequal(sqrt(g)^2, g)
     end
- 
+
     # Inexact field
     R, x = PowerSeriesRing(RealField, 10, "x", model=:capped_absolute)
     for iter = 1:300
        f = rand(R, 0:10, -1:1)
        g = f^2
- 
+
        @test isapprox(sqrt(g)^2, g)
     end
- 
-    println("PASS")
 end
- 
-function test_abs_series_exact_division()
-   print("Generic.AbsSeries.exact_division...")
 
+@testset "Generic.AbsSeries.exact_division..." begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:300
@@ -723,13 +674,9 @@ function test_abs_series_exact_division()
 
       @test divexact(f, g)*g == f
    end
-
-   println("PASS")
 end
 
-function test_abs_series_adhoc_exact_division()
-   print("Generic.AbsSeries.adhoc_exact_division...")
-
+@testset "Generic.AbsSeries.adhoc_exact_division..." begin
    # Exact field
    R, x = PowerSeriesRing(ZZ, 10, "x", model=:capped_absolute)
    for iter = 1:300
@@ -766,13 +713,9 @@ function test_abs_series_adhoc_exact_division()
 
       @test isequal(divexact(f*c, c), f)
    end
-
-   println("PASS")
 end
 
-function test_abs_series_special_functions()
-   print("Generic.AbsSeries.special_functions...")
-
+@testset "Generic.AbsSeries.special_functions..." begin
    # Exact field
    S, x = PowerSeriesRing(QQ, 10, "x", model=:capped_absolute)
 
@@ -833,26 +776,4 @@ function test_abs_series_special_functions()
 
       @test isequal(exp(f)*exp(g), exp(f + g))
    end
-
-   println("PASS")
-end
-
-function test_gen_abs_series()
-   test_abs_series_constructors()
-   test_abs_series_manipulation()
-   test_abs_series_unary_ops()
-   test_abs_series_binary_ops()
-   test_abs_series_adhoc_binary_ops()
-   test_abs_series_comparison()
-   test_abs_series_adhoc_comparison()
-   test_abs_series_powering()
-   test_abs_series_shift()
-   test_abs_series_truncation()
-   test_abs_series_exact_division()
-   test_abs_series_adhoc_exact_division()
-   test_abs_series_inversion()
-   test_abs_series_square_root()
-   test_abs_series_special_functions()
-
-   println("")
 end
