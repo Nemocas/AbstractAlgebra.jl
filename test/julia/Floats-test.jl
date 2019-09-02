@@ -10,7 +10,7 @@ function test_Floats_constructors()
    @test elem_type(AbstractAlgebra.Floats{BigFloat}) == BigFloat
    @test parent_type(Float64) == AbstractAlgebra.Floats{Float64}
    @test parent_type(BigFloat) == AbstractAlgebra.Floats{BigFloat}
-   
+
    @test isa(R, AbstractAlgebra.Floats)
    @test isa(S, AbstractAlgebra.Floats)
 
@@ -26,7 +26,7 @@ function test_Floats_constructors()
    @test isa(S(BigInt(11)//BigInt(3)), BigFloat)
    @test isa(S(Rational{BigInt}(11)), BigFloat)
    @test isa(S(11), BigFloat)
-   
+
    a = R(11)
    b = S(11)
 
@@ -58,7 +58,7 @@ end
 
 function test_Floats_exact_division()
    print("Julia.Floats.exact_division...")
-  
+
    R = RDF
    S = RealField
 
@@ -83,7 +83,7 @@ function test_Floats_exact_division()
    println("PASS")
 end
 
-function test_Float_divrem()
+function test_Floats_divrem()
    print("Julia.Float.divrem...")
 
    R = RealField
@@ -103,7 +103,7 @@ end
 
 function test_Floats_gcd()
    print("Julia.Floats.gcd...")
-  
+
    R = RDF
    S = RealField
 
@@ -125,7 +125,8 @@ function test_Floats()
    test_Floats_constructors()
    test_Floats_manipulation()
    test_Floats_exact_division()
+   test_Floats_divrem()
    test_Floats_gcd()
-   
+
    println("")
 end
