@@ -269,7 +269,7 @@ function test_gen_frac_remove_valuation()
    @test valuation(a, BigInt(2)) == 1
 
    @test remove(a, BigInt(3)) == (-1, fmpq(2, 1))
-   @test valuation(a, BigInt(3)) == 1
+   @test valuation(a, BigInt(3)) == -1
 
    println("PASS")
 end
