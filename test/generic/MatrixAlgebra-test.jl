@@ -1321,6 +1321,41 @@ function test_gen_matalg_snf()
    println("PASS")
 end
 
+function test_gen_matalg_similar()
+   print("Generic.MatAlg.similar...")
+   for R = (ZZ, GF(11))
+      M = MatrixAlgebra(R, rand(0:9))
+      m = R == ZZ ? rand(M, -10:10) : rand(M)
+      n = similar(m)
+      @test parent(n) == M
+      @test size(n) == (nrows(M), ncols(M))
+      r = rand(0:9)
+      n = similar(m, r)
+      @test parent(n) == MatrixAlgebra(R, r)
+      @test size(n) == (r, r)
+      nn = similar(m, r, r)
+      @test nn == n
+      @test parent(nn) == MatrixAlgebra(R, r)
+      @test size(nn) == (r, r)
+      @test_throws ErrorException similar(m, r, r+1)
+      for S = [QQ, ZZ, GF(2), GF(5)]
+         n = similar(m, S)
+         @test parent(n) == MatrixAlgebra(S, size(n)[1])
+         @test size(n) == (nrows(M), ncols(M))
+         r = rand(0:9)
+         n = similar(m, S, r)
+         @test parent(n) == MatrixAlgebra(S, r)
+         @test size(n) == (r, r)
+         n = similar(m, S, r, r)
+         @test parent(n) == MatrixAlgebra(S, r)
+         @test size(n) == (r, r)
+         @test_throws ErrorException similar(m, S, r, r+2)
+      end
+   end
+
+   println("PASS")
+end
+
 function test_gen_matalg()
    test_gen_matalg_constructors()
    test_gen_matalg_size()
@@ -1355,6 +1390,7 @@ function test_gen_matalg()
    test_gen_matalg_hnf()
    test_gen_matalg_snf_kb()
    test_gen_matalg_snf()
+   test_gen_matalg_similar()
 
    println("")
 end

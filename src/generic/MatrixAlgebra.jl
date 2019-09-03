@@ -32,7 +32,7 @@ parent(a::AbstractAlgebra.MatAlgElem{T}, cached::Bool = true) where T <: RingEle
     MatAlgebra{T}(a.base_ring, size(a.entries)[1], cached)
 
 function check_parent(a::AbstractAlgebra.MatAlgElem{T}, b::AbstractAlgebra.MatAlgElem{T}, throw::Bool = true) where T <: RingElement
-  fl = (base_ring(a) != base_ring(b) || degree(a) != degree(b)) 
+  fl = (base_ring(a) != base_ring(b) || degree(a) != degree(b))
   fl && throw && error("Incompatible matrix spaces in matrix operation")
   return !fl
 end
@@ -94,45 +94,60 @@ isunit(a::AbstractAlgebra.MatAlgElem{T}) where T <: FieldElement = rank(a) == de
 #
 ###############################################################################
 
-function similar(x::MatAlgElem{T}) where T <: RingElement
-   R = base_ring(x)
-   M = similar(x.entries)
+
+@doc Markdown.doc"""
+    similar(x::Generic.MatrixElem, R::Ring=base_ring(x))
+    similar(x::Generic.MatrixElem, R::Ring, r::Int, c::Int)
+    similar(x::Generic.MatrixElem, r::Int, c::Int)
+    similar(x::MatAlgElem, R::Ring, n::Int)
+    similar(x::MatAlgElem, n::Int)
+
+> Create a matrix over the given ring and dimensions,
+> with defaults based upon the given source matrix `x`.
+"""
+function similar(x::MatAlgElem{T}, R::Ring=base_ring(x)) where T <: RingElement
+   TT = elem_type(R)
+   M = similar(x.entries, TT)
    for i in 1:size(M, 1)
       for j in 1:size(M, 2)
          M[i, j] = zero(R)
       end
    end
-   z = MatAlgElem{T}(M)
+   z = MatAlgElem{TT}(M)
    z.base_ring = R
    return z
 end
 
-function similar(x::MatAlgElem{T}, n::Int) where T <: RingElement
-   R = base_ring(x)
-   M = similar(x.entries, n, n)
+function similar(x::MatAlgElem{T}, R::Ring, n::Int) where T <: RingElement
+   TT = elem_type(R)
+   M = similar(x.entries, TT, n, n)
    for i in 1:size(M, 1)
       for j in 1:size(M, 2)
          M[i, j] = zero(R)
       end
    end
-   z = MatAlgElem{T}(M)
+   z = MatAlgElem{TT}(M)
    z.base_ring = R
    return z
 end
 
-function similar(x::MatAlgElem{T}, m::Int, n::Int) where T <: RingElement
+similar(x::MatAlgElem, n::Int) = similar(x, base_ring(x), n)
+
+function similar(x::MatAlgElem{T}, R::Ring, m::Int, n::Int) where T <: RingElement
    m != n && error("Dimensions don't match in similar")
-   R = base_ring(x)
-   M = similar(x.entries, n, n)
+   TT = elem_type(R)
+   M = similar(x.entries, TT, n, n)
    for i in 1:size(M, 1)
       for j in 1:size(M, 2)
          M[i, j] = zero(R)
       end
    end
-   z = MatAlgElem{T}(M)
+   z = MatAlgElem{TT}(M)
    z.base_ring = R
    return z
 end
+
+similar(x::MatAlgElem, m::Int, n::Int) = similar(x, base_ring(x), m, n)
 
 ################################################################################
 #
