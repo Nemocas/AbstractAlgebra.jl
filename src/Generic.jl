@@ -12,13 +12,13 @@ import LinearAlgebra: lu, lu!, tr
 using Markdown, Random, InteractiveUtils
 
 import Base: Array, abs, asin, asinh, atan, atanh, bin, checkbounds,
-             conj, convert, cmp, cos, cosh, dec, deepcopy,
+             cmp, conj, convert, copy, cos, cosh, dec, deepcopy,
              deepcopy_internal, div, divrem,
              exp, exponent, gcd, gcdx, getindex, hash, hcat, hex, intersect, inv,
              invmod, isapprox, isequal, isfinite, isless, isqrt, isreal, iszero, lcm,
              ldexp, length, log, mod, ndigits,
              oct, one, parent, parse, precision,
-             rand, Rational, rem, reverse, 
+             rand, Rational, rem, reverse,
              setindex!, show, similar, sign, sin, sinh, size, string,
              tan, tanh, trailing_zeros, transpose, truncate,
              typed_hvcat, typed_hcat, vcat, xor, zero, zeros, +, -, *, ==, ^,
