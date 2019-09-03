@@ -209,7 +209,15 @@ function test_gen_mat_manipulation()
    @test nrows(B) == 3
    @test ncols(B) == 3
 
-   @test deepcopy(A) == A
+   let AA = deepcopy(A)
+      @test AA == A
+      @test AA[1,1] !== A[1,1]
+   end
+
+   let AA = copy(A)
+      @test AA == A
+      @test AA[1,1] === A[1,1]
+   end
 
    C = S([t + 1 R(0) R(1); t^2 R(0) t; R(0) R(0) R(0)])
 
@@ -1109,7 +1117,7 @@ function test_gen_mat_kernel()
       @test n == 5 - i
       @test rank(N) == n
       @test iszero(M*N)
- 
+
       n, N = left_kernel(M)
 
       @test n == 5 - i

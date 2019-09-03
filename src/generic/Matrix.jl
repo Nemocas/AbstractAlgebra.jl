@@ -272,6 +272,16 @@ function iszero_column(M::MatrixElem{T}, i::Int) where T <: RingElement
   return true
 end
 
+function copy(d::MatrixElem)
+   c = similar(d)
+   for i = 1:nrows(d)
+      for j = 1:ncols(d)
+         c[i, j] = d[i, j]
+      end
+   end
+   return c
+end
+
 function deepcopy_internal(d::MatrixElem, dict::IdDict)
    c = similar(d)
    for i = 1:nrows(d)
@@ -2431,7 +2441,7 @@ function left_kernel(x::AbstractAlgebra.MatElem{T}) where T <: RingElement
    end
 end
 
-function left_kernel(M::AbstractAlgebra.MatElem{T}) where T <: FieldElement 
+function left_kernel(M::AbstractAlgebra.MatElem{T}) where T <: FieldElement
   n, N = nullspace(transpose(M))
   return n, transpose(N)
 end
@@ -4620,7 +4630,7 @@ function randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: 
          M[i, j] = R()
       end
       M[i, i] = rand(R, v...)
-      while iszero(M[i, i]) 
+      while iszero(M[i, i])
          M[i, i] = rand(R, v...)
       end
       for j = i + 1:ncols(M)
