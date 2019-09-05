@@ -7,7 +7,7 @@ end
 
 # Matrix Interface
 
-Generic matrices are supported in AbstractAlgebra.jl. Both the space of $m\times n$ 
+Generic matrices are supported in AbstractAlgebra.jl. Both the space of $m\times n$
 matrices and the algebra (ring) of $m\times m$ matrices are supported.
 
 As the space of $m\times n$ matrices over a commutative ring is not itself a commutative
@@ -44,7 +44,7 @@ type of elements of the matrices.
 
 Matrix spaces and matrix algebras should be made unique on the system by caching parent
 objects (unless an optional `cache` parameter is set to `false`). Matrix spaces and
-algebras should at least be distinguished based on their base (coefficient) ring and the 
+algebras should at least be distinguished based on their base (coefficient) ring and the
 dimensions of the matrices in the space.
 
 See `src/generic/GenericTypes.jl` for an example of how to implement such a cache (which
@@ -171,17 +171,21 @@ The following functions are available for matrices in both matrix algebras and m
 spaces.
 
 ```julia
-similar(x::MyMat{T}) where T <: AbstractAlgebra.RingElem
+similar(x::MyMat{T}, R::Ring=base_ring(x)) where T <: AbstractAlgebra.RingElem
 ```
 
-Construct the zero matrix with the same dimensions and base ring as the given matrix.
+Construct the zero matrix with the same dimensions as the given matrix, and the
+same base ring unless explicitly specified.
 
 ```julia
+similar(x::MyMat{T}, R::Ring, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
 similar(x::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
 ```
 
-Construct the $r\times c$ zero matrix with the same base ring as the given matrix. If
-$x$ belongs to a matrix algebra and $r \neq c$, an exception is raised.
+Construct the $r\times c$ zero matrix with `R` as base ring (which defaults to the
+base ring of the the given matrix).
+If $x$ belongs to a matrix algebra and $r \neq c$, an exception is raised, and it's
+also possible to specify only one `Int` as the order (e.g. `similar(x, n)`).
 
 **Examples**
 
@@ -228,6 +232,9 @@ julia> F = similar(M)
 [0 0]
 [0 0]
 
+julia> similar(M, QQ)
+[0//1 0//1]
+[0//1 0//1]
 ```
 
 ### Views

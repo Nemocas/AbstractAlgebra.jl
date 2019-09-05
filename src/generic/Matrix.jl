@@ -28,31 +28,33 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
 #
 ###############################################################################
 
-function similar(x::Mat{T}) where T <: RingElement
-   R = base_ring(x)
-   M = similar(x.entries)
+function similar(x::Mat{T}, R::Ring=base_ring(x)) where T <: RingElement
+   TT = elem_type(R)
+   M = similar(x.entries, TT)
    for i in 1:size(M, 1)
       for j in 1:size(M, 2)
          M[i, j] = zero(R)
       end
    end
-   z = MatSpaceElem{T}(M)
+   z = MatSpaceElem{TT}(M)
    z.base_ring = R
    return z
 end
 
-function similar(x::Mat{T}, r::Int, c::Int) where T <: RingElement
-   R = base_ring(x)
-   M = similar(x.entries, r, c)
+function similar(x::Mat{T}, R::Ring, r::Int, c::Int) where T <: RingElement
+   TT = elem_type(R)
+   M = similar(x.entries, TT, r, c)
    for i in 1:size(M, 1)
       for j in 1:size(M, 2)
          M[i, j] = zero(R)
       end
    end
-   z = MatSpaceElem{T}(M)
+   z = MatSpaceElem{TT}(M)
    z.base_ring = R
    return z
 end
+
+similar(x::Mat, r::Int, c::Int) = similar(x, base_ring(x), r, c)
 
 @doc Markdown.doc"""
     eye(x::Generic.MatrixElem)
