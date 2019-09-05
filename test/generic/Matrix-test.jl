@@ -226,6 +226,28 @@ function test_gen_mat_manipulation()
    @test iszero_column(C, 2)
    @test !iszero_column(C, 1)
 
+   @test length(A) == length(B) == length(C) == 9
+   @test !any(isempty, (A, B, C))
+
+   @test length(matrix(R, zeros(Int, 2, 3))) == 6
+   @test length(matrix(R, zeros(Int, 3, 2))) == 6
+
+   for n = (matrix(R, zeros(Int, 2, 0)),
+            matrix(R, zeros(Int, 0, 2)))
+      @test length(n) == 0
+      @test isempty(n)
+   end
+
+   M3 = MatrixAlgebra(R, 3)
+   m3 = rand(M3, 0:9, -9:9)
+   @test length(m3) == 9
+   @test !isempty(m3)
+
+   M0 = MatrixAlgebra(R, 0)
+   m0 = rand(M0, 0:9, -9, 9)
+   @test length(m0) == 0
+   @test isempty(m0)
+
    println("PASS")
 end
 

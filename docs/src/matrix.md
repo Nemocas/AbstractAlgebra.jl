@@ -12,7 +12,7 @@ ring $R$. Generic matrices over a commutative ring are implemented in
 `src/generic/Matrix.jl`. Much of the functionality there covers both matrix spaces and
 matrix algebras.
 
-Functions specific to generic matrix algebras of $m\times m$ matrices are implemented in 
+Functions specific to generic matrix algebras of $m\times m$ matrices are implemented in
 `src/generic/MatrixAlgebra.jl`.
 
 As well as implementing the entire Matrix interface, including the optional
@@ -118,7 +118,7 @@ R[a b c...;...]
 
 Create the matrix over the base ring $R$ consisting of the given rows (separated by
 semicolons). Each entry is coerced into $R$  automatically. Note that parentheses may
-be placed around individual entries if the lists would otherwise be ambiguous, e.g. 
+be placed around individual entries if the lists would otherwise be ambiguous, e.g.
 `R[1 2; 2 (-3)]`.
 
 Beware that this syntax does not support the creation of column vectors. See
@@ -217,6 +217,14 @@ ncols(::MatElem)
 ```
 
 ```@docs
+length(::MatElem)
+```
+
+```@docs
+isempty(::MatElem)
+```
+
+```@docs
 change_base_ring(::AbstractAlgebra.MatElem, ::AbstractAlgebra.Ring)
 ```
 
@@ -247,6 +255,12 @@ julia> r = nrows(B)
 
 julia> c = ncols(B)
 3
+
+julia> length(B)
+9
+
+julia> isempty(B)
+false
 
 julia> M = A + B
 [t+3//1 t+3//1 2//1]
@@ -698,7 +712,7 @@ Matrix Space of 3 rows and 1 columns over Integers
 julia> A = S([BigInt(2) 3 5; 1 4 7; 9 2 2])
 [2 3 5]
 [1 4 7]
-[9 2 2]   
+[9 2 2]
 
 julia> B = T([BigInt(4), 5, 7])
 [4]
