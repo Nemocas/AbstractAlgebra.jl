@@ -182,7 +182,7 @@ end
     cycles(g::perm{T}) where T<:Integer
 > Decompose permutation `g` into disjoint cycles.
 >
-> Returns a `CycleDec` object which iterates over disjoint cycles of `g`. The
+> Return a `CycleDec` object which iterates over disjoint cycles of `g`. The
 > ordering of cycles is not guaranteed, and the order within each cycle is
 > computed up to a cyclic permutation.
 > The cycle decomposition is cached in `g` and used in future computation of
@@ -928,7 +928,7 @@ end
 
 @doc Markdown.doc"""
     character(lambda::Partition, p::perm, check::Bool=true) -> BigInt
-> Returns the value of `lambda`-th irreducible character of the permutation
+> Return the value of `lambda`-th irreducible character of the permutation
 > group on permutation `p`.
 """
 function character(lambda::Partition, p::perm, check::Bool=true)
@@ -944,7 +944,7 @@ end
 
 @doc Markdown.doc"""
     character(lambda::Partition, mu::Partition, check::Bool=true) -> BigInt
-> Returns the value of `lambda-th` irreducible character on the conjugacy class
+> Return the value of `lambda-th` irreducible character on the conjugacy class
 > represented by partition `mu`.
 """
 function character(lambda::Partition, mu::Partition, check::Bool=true)

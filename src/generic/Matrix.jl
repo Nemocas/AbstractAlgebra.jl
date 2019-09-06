@@ -250,7 +250,7 @@ end
 
 @doc Markdown.doc"""
     iszero_row(M::MatrixElem{T}, i::Int) where T <: RingElement
-> Returns `true` if the $i$-th row of the matrix $M$ is zero.
+> Return `true` if the $i$-th row of the matrix $M$ is zero.
 """
 function iszero_row(M::MatrixElem{T}, i::Int) where T <: RingElement
   for j in 1:ncols(M)
@@ -263,7 +263,7 @@ end
 
 @doc Markdown.doc"""
     iszero_column(M::MatrixElem{T}, i::Int) where T <: RingElement
-> Returns `true` if the $i$-th column of the matrix $M$ is zero.
+> Return `true` if the $i$-th column of the matrix $M$ is zero.
 """
 function iszero_column(M::MatrixElem{T}, i::Int) where T <: RingElement
   for j in 1:nrows(M)
@@ -1307,7 +1307,7 @@ end
 
 @doc Markdown.doc"""
     rref(M::Generic.MatrixElem{T}) where {T <: RingElement}
-> Returns a tuple $(r, d, A)$ consisting of the rank $r$ of $M$ and a
+> Return a tuple $(r, d, A)$ consisting of the rank $r$ of $M$ and a
 > denominator $d$ in the base ring of $M$ and a matrix $A$ such that $A/d$ is
 > the reduced row echelon form of $M$. Note that the denominator is not usually
 > minimal.
@@ -1380,7 +1380,7 @@ end
 
 @doc Markdown.doc"""
     rref(M::Generic.MatrixElem{T}) where {T <: FieldElement}
-> Returns a tuple $(r, A)$ consisting of the rank $r$ of $M$ and a reduced row
+> Return a tuple $(r, A)$ consisting of the rank $r$ of $M$ and a reduced row
 > echelon form $A$ of $M$.
 """
 function rref(M::MatrixElem{T}) where {T <: FieldElement}
@@ -2217,7 +2217,7 @@ end
 @doc Markdown.doc"""
     can_solve_left_reduced_triu(r::AbstractAlgebra.MatElem{T},
                           M::AbstractAlgebra.MatElem{T}) where T <: RingElement
-> Returns a tuple `flag, x` where `flag` is set to true if $xM = r$ has a
+> Return a tuple `flag, x` where `flag` is set to true if $xM = r$ has a
 > solution, where $M$ is an $m\times n$ matrix in (upper triangular) Hermite
 > normal form or reduced row echelon form and $r$ and $x$ are row vectors with
 > $m$ columns. If there is no solution, flag is set to `false` and $x$ is set
@@ -2320,7 +2320,7 @@ end
 
 @doc Markdown.doc"""
     nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
-> Returns a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
+> Return a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
 > a basis $N$ (consisting of column vectors) for the right nullspace of $M$,
 > i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix
 > $N$ will be an $n\times \nu$ matrix. Note that the nullspace is taken to be
@@ -2369,7 +2369,7 @@ end
 
 @doc Markdown.doc"""
     nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
-> Returns a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
+> Return a tuple $(\nu, N)$ consisting of the nullity $\nu$ of $M$ and
 > a basis $N$ (consisting of column vectors) for the right nullspace of $M$,
 > i.e. such that $MN$ is the zero matrix. If $M$ is an $m\times n$ matrix
 > $N$ will be an $n\times \nu$ matrix.
@@ -2421,7 +2421,7 @@ end
 
 @doc Markdown.doc"""
     left_kernel(a::AbstractAlgebra.MatElem{T}) where T <: RingElement
-> Returns a tuple `n, M` where $M$ is a matrix whose rows generate the kernel
+> Return a tuple `n, M` where $M$ is a matrix whose rows generate the kernel
 > of $M$ and $n$ is the rank of the kernel. The transpose of the output of this
 > function is guaranteed to be in flipped upper triangular format (i.e. upper
 > triangular format if columns and rows are reversed).
@@ -2450,7 +2450,7 @@ end
 
 @doc Markdown.doc"""
     right_kernel(a::AbstractAlgebra.MatElem{T}) where T <: RingElement
-> Returns a tuple `n, M` where $M$ is a matrix whose columns generate the
+> Return a tuple `n, M` where $M$ is a matrix whose columns generate the
 > kernel of $M$ and $n$ is the rank of the kernel.
 """
 function right_kernel(x::AbstractAlgebra.MatElem{T}) where T <: RingElement
@@ -2464,7 +2464,7 @@ end
 
 @doc Markdown.doc"""
     kernel(a::MatElem{T}; side::Symbol = :right) where T <: RingElement
-> Returns a tuple $(n, M)$, where n is the rank of the kernel and $M$ is a
+> Return a tuple $(n, M)$, where n is the rank of the kernel and $M$ is a
 > basis for it. If side is $:right$ or not specified, the right kernel is
 > computed, i.e. the matrix of columns whose span gives the right kernel
 > space. If side is $:left$, the left kernel is computed, i.e. the matrix
@@ -2531,7 +2531,7 @@ end
 
 @doc Markdown.doc"""
     hessenberg(A::Generic.MatrixElem{T}) where {T <: RingElement}
-> Returns the Hessenberg form of $M$, i.e. an upper Hessenberg matrix
+> Return the Hessenberg form of $M$, i.e. an upper Hessenberg matrix
 > which is similar to $M$. The upper Hessenberg form has nonzero entries
 > above and on the diagonal and in the diagonal line immediately below the
 > diagonal.
@@ -2545,7 +2545,7 @@ end
 
 @doc Markdown.doc"""
     ishessenberg(A::Generic.MatrixElem{T}) where {T <: RingElement}
-> Returns `true` if $M$ is in Hessenberg form, otherwise returns `false`.
+> Return `true` if $M$ is in Hessenberg form, otherwise returns `false`.
 """
 function ishessenberg(A::MatrixElem{T}) where {T <: RingElement}
    if !issquare(A)
@@ -2812,7 +2812,7 @@ end
 
 @doc Markdown.doc"""
     charpoly(V::Ring, Y::Generic.MatrixElem{T}) where {T <: RingElement}
-> Returns the characteristic polynomial $p$ of the matrix $M$. The
+> Return the characteristic polynomial $p$ of the matrix $M$. The
 > polynomial ring $R$ of the resulting polynomial must be supplied
 > and the matrix is assumed to be square.
 """
@@ -2893,7 +2893,7 @@ end
 
 @doc Markdown.doc"""
     minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: FieldElement}
-> Returns the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
+> Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
 > of the resulting polynomial must be supplied and the matrix must be square.
 """
 function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: FieldElement}
@@ -2988,7 +2988,7 @@ end
 
 @doc Markdown.doc"""
     minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
-> Returns the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
+> Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
 > of the resulting polynomial must be supplied and the matrix must be square.
 """
 function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <: RingElement}

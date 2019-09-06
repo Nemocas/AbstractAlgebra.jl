@@ -48,7 +48,7 @@ symbols(a::MPolyRing) = a.S
 
 @doc Markdown.doc"""
     nvars(x::MPolyRing)
-> Returns the number of variables of the polynomial ring.
+> Return the number of variables of the polynomial ring.
 """
 nvars(a::MPolyRing) = a.num_vars
 
@@ -91,7 +91,7 @@ end
 
 @doc Markdown.doc"""
     change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
-> Returns the polynomial obtained by applying g to the coefficients of p.
+> Return the polynomial obtained by applying g to the coefficients of p.
 """
 function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
    new_base_ring = parent(g(zero(base_ring(p.parent))))
@@ -131,7 +131,7 @@ end
 
 @doc Markdown.doc"""
     vars(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
-> Returns the variables actually occuring in $p$.
+> Return the variables actually occuring in $p$.
 """
 function vars(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
    U = typeof(p)
@@ -808,7 +808,7 @@ end
 
 @doc Markdown.doc"""
     total_degree(f::MPoly{T}) where {T <: RingElement}
-> Returns the total degree of `f`.
+> Return the total degree of `f`.
 """
 function total_degree(f::MPoly{T}) where {T <: RingElement}
    A = f.exps
@@ -2250,7 +2250,7 @@ end
 
 @doc Markdown.doc"""
     deflation(f::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
-> Computes deflation parameters for the exponents of the polynomial $f$. This
+> Compute deflation parameters for the exponents of the polynomial $f$. This
 > is a pair of arrays of integers, the first array of which (the shift) gives
 > the minimum exponent for each variable of the polynomial, and the second of
 > which (the deflation) gives the gcds of all the exponents after subtracting
@@ -3268,7 +3268,7 @@ end
 
 @doc Markdown.doc"""
     remove(z::MPolyElem{T}, p::MPolyElem{T}) where {T <: RingElement}
-> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> Compute the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$. Additionally, $z/p^k$ is returned as the second return.
 > value.
 >
@@ -3293,7 +3293,7 @@ end
 
 @doc Markdown.doc"""
     valuation(z::MPolyElem{T}, p::MPolyElem{T}) where {T <: RingElement}
-> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> Compute the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$.
 >
 > See also `remove`, which also returns $z/p^k$.

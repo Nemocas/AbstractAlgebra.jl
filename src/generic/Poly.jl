@@ -1259,7 +1259,7 @@ end
 
 @doc Markdown.doc"""
    remove(z::AbstractAlgebra.PolyElem{T}, p::AbstractAlgebra.PolyElem{T}) where T <: RingElement
-> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> Compute the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
 >
 > See also `valuation`, which only returns the valuation.
@@ -1284,7 +1284,7 @@ end
 
 @doc Markdown.doc"""
     remove(z::AbstractAlgebra.PolyElem{T}, p::AbstractAlgebra.PolyElem{T}) where T <: Union{AbstractAlgebra.ResElem, FieldElement}
-> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> Compute the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$. Additionally, $z/p^k$ is returned as well.
 >
 > See also `valuation`, which only returns the valuation.
@@ -1309,7 +1309,7 @@ end
 
 @doc Markdown.doc"""
     valuation(z::AbstractAlgebra.PolyElem{T}, p::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
-> Computes the valuation of $z$ at $p$, that is, the largest $k$ such that
+> Compute the valuation of $z$ at $p$, that is, the largest $k$ such that
 > $p^k$ divides $z$.
 >
 > See also `remove`, which also returns $z/p^k$.
@@ -1321,7 +1321,7 @@ end
 
 @doc Markdown.doc"""
     divides(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: RingElement}
-> Returns a pair consisting of a flag which is set to `true` if $g$ divides
+> Return a pair consisting of a flag which is set to `true` if $g$ divides
 > $f$ and `false` otherwise, and a polynomial $h$ such that $f = gh$ if
 > such a polynomial exists. If not, the value of $h$ is undetermined.
 """
@@ -1364,7 +1364,7 @@ end
 
 @doc Markdown.doc"""
     divides(z::AbstractAlgebra.PolyElem{T}, x::T) where {T <: RingElement}
-> Returns a pair consisting of a flag which is set to `true` if $x$ divides
+> Return a pair consisting of a flag which is set to `true` if $x$ divides
 > $z$ and `false` otherwise, and a polynomial $y$ such that $z = xy$ if
 > such a polynomial exists. If not, the value of $y$ is undetermined.
 """

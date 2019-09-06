@@ -42,7 +42,7 @@ their elements:
   * `MPolyRing{T}` is the abstract type for multivariate polynomial ring parent types
   * `MPolyElem{T}` is the abstract type for multivariate polynomial types
 
-We have that `MPolyRing{T} <: AbstractAlgebra.Ring` and 
+We have that `MPolyRing{T} <: AbstractAlgebra.Ring` and
 `MPolyElem{T} <: AbstractAlgebra.RingElem`.
 
 Note that both abstract types are parameterised. The type `T` should usually be the type
@@ -83,7 +83,7 @@ To construct a multivariate polynomial ring, there is the following constructor.
 PolynomialRing(R::Ring, s::Vector{AbstractString}; ordering=:lex, cached=true)
 ```
 
-Returns a tuple, `S, vars` consisting of a polynomial ring $S$ and an array of
+Return a tuple, `S, vars` consisting of a polynomial ring $S$ and an array of
 generators (variables) which print according to the strings in the supplied
 vector $s$. The ordering can at present be `:lex`, `:deglex` or `:degrevlex`.
 By default, the polynomial ring is cached, and creating a polynomial ring with
@@ -334,14 +334,14 @@ $q$ will be the exact quotient, or `flag` is false and $q$ is set to zero.
 remove(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
 
-Returns a tuple $(v, q)$ such that the highest power of $g$ that divides $f$ is $g^v$
+Return a tuple $(v, q)$ such that the highest power of $g$ that divides $f$ is $g^v$
 and the cofactor is $q$.
 
 ```julia
 valuation(f::MyMPoly{T}, g::MyMPoly{T}) where T <: AbstractAlgebra.RingElem
 ```
 
-Returns $v$ such that the highest power of $g$ that divides $f$ is $g^v$.
+Return $v$ such that the highest power of $g$ that divides $f$ is $g^v$.
 
 **Examples**
 
@@ -648,7 +648,7 @@ already in the correct order with respect to the ordering. The function
 must return the resulting polynomial.
 
 ```julia
-set_exponent_vector!(a::MyMPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement 
+set_exponent_vector!(a::MyMPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
 ```
 
 Set the $i$-th exponent vector to the given exponent vector. No check is
