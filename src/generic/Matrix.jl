@@ -416,6 +416,7 @@ function show(io::IO, a::MatrixElem)
    c = ncols(a)
    if r*c == 0
       print(io, "$r by $c matrix")
+      return
    end
    for i = 1:r
       print(io, "[")
