@@ -69,7 +69,7 @@ end
 
 @doc Markdown.doc"""
    inv(f::Map(ModuleIsomorphism))
-> Returns the inverse map of the given module isomorphism. This is computed
+> Return the inverse map of the given module isomorphism. This is computed
 > cheaply.
 """
 function inv(f::Map(ModuleIsomorphism))
@@ -85,7 +85,7 @@ end
 
 @doc Markdown.doc"""
     kernel(f::ModuleHomomorphism{T}) where T <: RingElement
-> Returns a pair `K, g` consisting of the kernel object $K$ of the given module
+> Return a pair `K, g` consisting of the kernel object $K$ of the given module
 > homomorphism $f$ (as a submodule of its domain) and the canonical injection
 > from the kernel into the domain of $f$
 """
@@ -129,7 +129,7 @@ end
 
 @doc Markdown.doc"""
     image(f::Map(AbstractAlgebra.FPModuleHomomorphism))
-> Returns a pair `I, g` consisting of the image object $I$ of the given module
+> Return a pair `I, g` consisting of the image object $I$ of the given module
 > homomorphism $f$ (as a submodule of its codomain) and the canonical injection
 > from the image into the codomain of $f$
 """
@@ -150,7 +150,7 @@ end
 
 @doc Markdown.doc"""
     preimage(f::Map(AbstractAlgebra.FPModuleHomomorphism), v::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement
-> Returns a preimage of $v$ under the homomorphism $f$, i.e. an element of the
+> Return a preimage of $v$ under the homomorphism $f$, i.e. an element of the
 > domain of $f$ that maps to $v$ under $f$. Note that this has no special
 > mathematical properties. It is an element of the set theoretical preimage of
 > the map $f$ as a map of sets, if one exists. The preimage is neither

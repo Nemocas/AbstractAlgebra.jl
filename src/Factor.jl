@@ -33,7 +33,7 @@ end
 @doc Markdown.doc"""
     unit(a::Fac{T}) -> T
 
-> Returns the unit of the factorization.
+> Return the unit of the factorization.
 """
 unit(a::Fac) = a.unit
 
@@ -117,6 +117,6 @@ Base.eltype(::Type{Fac{T}}) where {T} = Base.eltype(Dict{T, Int})
 @doc Markdown.doc"""
     length(a::Fac) -> Int
 
-> Returns the number of factors of `a`, not including the unit.
+> Return the number of factors of `a`, not including the unit.
 """
 Base.length(a::Fac) = Base.length(a.fac)

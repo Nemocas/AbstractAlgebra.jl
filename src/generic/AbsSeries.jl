@@ -14,7 +14,7 @@ export O, valuation, exp, precision, max_precision, set_prec!
 
 @doc Markdown.doc"""
     O(a::AbstractAlgebra.AbsSeriesElem{T}) where T <: RingElement
-> Returns $0 + O(x^\mbox{deg}(a))$. Usually this function is called with $x^n$
+> Return $0 + O(x^\mbox{deg}(a))$. Usually this function is called with $x^n$
 > as parameter. Then the function returns the power series $0 + O(x^n)$, which
 > can be used to set the precision of a power series when constructing it.
 """

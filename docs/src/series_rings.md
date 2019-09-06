@@ -20,7 +20,7 @@ AbstractAlgebra provides two abstract types for power series rings and their ele
   * `SeriesRing{T}` is the abstract type for all power series ring parent types
   * `SeriesElem{T}` is the abstract type for all power series types
 
-We have that `SeriesRing{T} <: AbstractAlgebra.Ring` and 
+We have that `SeriesRing{T} <: AbstractAlgebra.Ring` and
 `SeriesElem{T} <: AbstractAlgebra.RingElem`.
 
 Note that both abstract types are parameterised. The type `T` should usually be the type
@@ -56,7 +56,7 @@ interface has the following required functions.
 
 We suppose that `R` is a fictitious base ring (coefficient ring) and that `S` is a
 series ring over `R` (e.g. $S = R[[x]]$) with parent object `S` of type
-`MySeriesRing{T}`. We also assume the series in the ring have type `MySeries{T}`, where 
+`MySeriesRing{T}`. We also assume the series in the ring have type `MySeries{T}`, where
 `T` is the type of elements of the base (coefficient) ring.
 
 Of course, in practice these types may not be parameterised, but we use parameterised
@@ -187,7 +187,7 @@ The function mutates the series in-place but does not return the mutated series.
 precision(f::MySeries{T})
 ```
 
-Returns the absolute precision of $f$.
+Return the absolute precision of $f$.
 
 ```julia
 set_prec!(f::MySeries{T}, prec::Int)
@@ -213,7 +213,7 @@ given series to the given value.
 The series is mutated in-place but does not return the mutated series.
 
 ```julia
-polcoeff(f::MySeries{T}, n::Int) 
+polcoeff(f::MySeries{T}, n::Int)
 ```
 
 Return the coefficient of degree `n` of the polynomial underlying the series. If `n`
@@ -249,9 +249,9 @@ renormalize!(f::MySeries{T}) where T <: AbstractAlgebra.RingElem
 ```
 
 Given a relative series or Laurent series whose underlying polynomial has zero constant
-term, say as the result of some internal computation, renormalise the series so that the 
+term, say as the result of some internal computation, renormalise the series so that the
 polynomial has nonzero constant term. The precision and valuation of the series are
-adjusted to compensate. This function is not intended to be useful to the user, but is 
+adjusted to compensate. This function is not intended to be useful to the user, but is
 used internally.
 
 ```julia
@@ -309,4 +309,3 @@ julia> isgen(w)
 true
 
 ```
-

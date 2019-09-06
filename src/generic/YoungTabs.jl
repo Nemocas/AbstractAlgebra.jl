@@ -85,7 +85,7 @@ const _numPartsTableBig = Dict{Int, BigInt}()
 
 @doc Markdown.doc"""
     _numpart(n::Integer)
-> Returns the number of all distinct integer partitions of `n`. The function
+> Return the number of all distinct integer partitions of `n`. The function
 > uses Euler pentagonal number theorem for recursive formula. For more details
 > see OEIS sequence [A000041](http://oeis.org/A000041). Note that
 > `_numpart(0) = 1` by convention.
@@ -171,7 +171,7 @@ end
 
 @doc Markdown.doc"""
     conj(part::Partition)
-> Returns the conjugated partition of `part`, i.e. the partition corresponding
+> Return the conjugated partition of `part`, i.e. the partition corresponding
 > to the Young diagram of `part` reflected through the main diagonal.
 
 # Examples:
@@ -198,7 +198,7 @@ end
 
 @doc Markdown.doc"""
     conj(part::Partition, v::Vector)
-> Returns the conjugated partition of `part` together with permuted vector `v`.
+> Return the conjugated partition of `part` together with permuted vector `v`.
 """
 function Base.conj(part::Partition, v::Vector)
    w = zeros(Int, size(v))
@@ -230,7 +230,7 @@ end
 
 @doc Markdown.doc"""
     partitionseq(lambda::Partition)
-> Returns a sequence (as `BitVector`) of `false`s and `true`s constructed from
+> Return a sequence (as `BitVector`) of `false`s and `true`s constructed from
 > `lambda`: tracing the lower contour of the Young Diagram associated to
 > `lambda` from left to right a `true` is inserted for every horizontal and
 > `false` for every vertical step. The sequence always starts with `true` and
@@ -251,7 +251,7 @@ partitionseq(v::Vector{T}) where T<:Integer = partitionseq(Partition(v))
 
 @doc Markdown.doc"""
     partitionseq(seq::BitVector)
-> Returns the essential part of the sequence `seq`, i.e. a subsequence starting
+> Return the essential part of the sequence `seq`, i.e. a subsequence starting
 > at first `true` and ending at last `false`.
 """
 partitionseq(seq::BitVector) = seq[something(findfirst(isequal(true), seq), 0):something(findlast(isequal(false), seq), 0)]
@@ -267,7 +267,7 @@ end
 
 @doc Markdown.doc"""
     MN1inner(R::BitVector, mu::Partition, t::Integer, charvals)
-> Returns the value of $\lambda$-th irreducible character on conjugacy class of
+> Return the value of $\lambda$-th irreducible character on conjugacy class of
 > permutations represented by partition `mu`, where `R` is the (binary)
 > partition sequence representing $\lambda$. Values already computed are stored
 > in `charvals::Dict{Tuple{BitVector,Vector{Int}}, Int}`.
@@ -594,7 +594,7 @@ end
 
 @doc Markdown.doc"""
     conj(Y::YoungTableau)
-> Returns the conjugated tableau, i.e. the tableau reflected through the main
+> Return the conjugated tableau, i.e. the tableau reflected through the main
 > diagonal.
 
 # Examples
@@ -717,7 +717,7 @@ end
 
 @doc Markdown.doc"""
     dim(Y::YoungTableau) -> BigInt
-> Returns the dimension (using hook-length formula) of the irreducible
+> Return the dimension (using hook-length formula) of the irreducible
 > representation of permutation group $S_n$ associated the partition `Y.part`.
 >
 > Since the computation overflows easily `BigInt` is returned. You may perform
@@ -737,7 +737,7 @@ dim(Y::YoungTableau) = dim(BigInt, Y)
 function dim(::Type{T}, Y::YoungTableau) where T<:Integer
    n, m = size(Y)
    num = factorial(T(sum(Y.part)))
-   den = reduce(*, (hooklength(Y,i,j) for i in 1:n, j in 1:m if j <= Y.part[i]), init=one(T))  
+   den = reduce(*, (hooklength(Y,i,j) for i in 1:n, j in 1:m if j <= Y.part[i]), init=one(T))
    return divexact(num, den)::T
 end
 
@@ -761,7 +761,7 @@ Base.IndexStyle(::Type{SkewDiagram}) = Base.IndexLinear()
 
 @doc Markdown.doc"""
     in(t::Tuple{T,T}, xi::SkewDiagram) where T<:Integer
-> Checks if box at position `(i,j)` belongs to the skew diagram `xi`.
+> Check if box at position `(i,j)` belongs to the skew diagram `xi`.
 """
 function Base.in(t::Tuple{T, T}, xi::SkewDiagram) where T<:Integer
    i,j = t
@@ -814,7 +814,7 @@ end
 
 @doc Markdown.doc"""
     matrix_repr(xi::SkewDiagram)
-> Returns a sparse representation of the diagram `xi`, i.e. a sparse array `A`
+> Return a sparse representation of the diagram `xi`, i.e. a sparse array `A`
 > where `A[i,j] == 1` if and only if `(i,j)` is in `xi.lam` but not in `xi.mu`.
 """
 function matrix_repr(xi::SkewDiagram)
@@ -830,7 +830,7 @@ end
 
 @doc Markdown.doc"""
     has_left_neighbor(xi::SkewDiagram, i::Int, j::Int)
-> Checks if box at position `(i,j)` has neighbour in `xi` to the left.
+> Check if box at position `(i,j)` has neighbour in `xi` to the left.
 """
 function has_left_neighbor(xi::SkewDiagram, i::Int, j::Int)
    if j == 1
@@ -842,7 +842,7 @@ end
 
 @doc Markdown.doc"""
     has_bottom_neighbor(xi::SkewDiagram, i::Int, j::Int)
-> Checks if box at position `(i,j)` has neighbour in `xi` below.
+> Check if box at position `(i,j)` has neighbour in `xi` below.
 """
 function has_bottom_neighbor(xi::SkewDiagram, i::Int, j::Int)
    if i == length(xi.lam)
@@ -854,7 +854,7 @@ end
 
 @doc Markdown.doc"""
     isrimhook(xi::SkewDiagram)
-> Checks if `xi` represents a rim-hook diagram, i.e. its diagram is
+> Check if `xi` represents a rim-hook diagram, i.e. its diagram is
 > edge-connected and contains no $2\times 2$ squares.
 """
 function isrimhook(xi::SkewDiagram)
@@ -886,7 +886,7 @@ end
 
 @doc Markdown.doc"""
     leglength(xi::SkewDiagram[, check::Bool=true])
-> Computes the leglength of a rim-hook `xi`, i.e. the number of rows with
+> Compute the leglength of a rim-hook `xi`, i.e. the number of rows with
 > non-zero entries minus one. If `check` is `false` function will not check
 > whether `xi` is actually a rim-hook.
 """

@@ -105,7 +105,7 @@ end
 
 @doc Markdown.doc"""
     AllPerms(n::T) where T
-> Returns an iterator over arrays representing all permutations of `1:n`.
+> Return an iterator over arrays representing all permutations of `1:n`.
 > Similar to `Combinatorics.permutations(1:n)`
 """
 struct AllPerms{T<:Integer}
@@ -242,7 +242,7 @@ end
 
 @doc Markdown.doc"""
     YoungTableau(part::Partition[, fill::Vector{Int}=collect(1:sum(part))])  <: AbstractArray{Int, 2}
-> Returns the Young tableaux of partition `part`, filled linearly
+> Return the Young tableaux of partition `part`, filled linearly
 > by `fill` vector. Note that `fill` vector is in **row-major** format.
 >
 > Fields:
@@ -891,7 +891,7 @@ mutable struct MatAlgebra{T <: RingElement} <: AbstractAlgebra.MatAlgebra{T}
    n::Int
    base_ring::Ring
 
-   function MatAlgebra{T}(R::Ring, n::Int, cached::Bool = true) where T <: RingElement     
+   function MatAlgebra{T}(R::Ring, n::Int, cached::Bool = true) where T <: RingElement
       if haskey(MatAlgDict, (R, n))
          return MatAlgDict[R, n]::MatAlgebra{T}
       else

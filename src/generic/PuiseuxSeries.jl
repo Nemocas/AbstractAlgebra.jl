@@ -15,7 +15,7 @@ export laurent_ring, rescale!
 @doc Markdown.doc"""
     laurent_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement
 > Return the `LaurentSeriesRing` underlying the given `PuiseuxSeriesRing`.
-""" 
+"""
 laurent_ring(R::PuiseuxSeriesRing{T}) where T <: RingElement = R.laurent_ring::LaurentSeriesRing{T}
 
 @doc Markdown.doc"""
@@ -26,7 +26,7 @@ laurent_ring(R::PuiseuxSeriesField{T}) where T <: FieldElement = R.laurent_ring:
 
 @doc Markdown.doc"""
     O(a::Generic.PuiseuxSeriesElem{T}) where T <: RingElement
-> Returns $0 + O(x^\mbox{val}(a))$. Usually this function is called with $x^n$
+> Return $0 + O(x^\mbox{val}(a))$. Usually this function is called with $x^n$
 > as parameter for some rational $n$. Then the function returns the Puiseux series
 > $0 + O(x^n)$, which can be used to set the precision of a Puiseux series when
 > constructing it.
@@ -567,7 +567,7 @@ function Base.sqrt(a::PuiseuxSeriesElem{T}) where T <: RingElement
    if mod(val, 2) != 0
       return S(sqrt(inflate(a.data, 2)), a.scale*2)
    else
-      return S(sqrt(a.data), a.scale)   
+      return S(sqrt(a.data), a.scale)
    end
 end
 
@@ -623,7 +623,7 @@ function mul!(c::PuiseuxSeriesElem{T}, a::PuiseuxSeriesElem{T}, b::PuiseuxSeries
     c.data = mul!(c.data, inflate(a.data, binf), inflate(b.data, ainf))
     c.scale = zscale
     c = rescale!(c)
-    return c  
+    return c
 end
 
 function add!(c::PuiseuxSeriesElem{T}, a::PuiseuxSeriesElem{T}, b::PuiseuxSeriesElem{T}) where T <: RingElement
@@ -787,4 +787,3 @@ function PuiseuxSeriesField(R::AbstractAlgebra.Field, prec::Int, s::AbstractStri
 
    return parent_obj, gen(parent_obj)
 end
-

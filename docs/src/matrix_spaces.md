@@ -279,7 +279,7 @@ R = N1*N2
 dense_matrix_type(::Type{T}) where T <: AbstractAlgebra.RingElem
 ```
 
-Returns the type of dense matrices whose entries have the given type. E.g.
+Return the type of dense matrices whose entries have the given type. E.g.
 in Nemo, which depends on AbstractAlgebra, we define
 `dense_matrix_type(::Type{fmpz}) = fmpz_mat`.
 
@@ -293,7 +293,7 @@ Return the number of rows of the given matrix.
 ncols(f::MyMat{T}) where T <: AbstractAlgebra.RingElem
 ```
 
-Returns the number of columns of the given matrix.
+Return the number of columns of the given matrix.
 
 ```julia
 getindex(M::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElem

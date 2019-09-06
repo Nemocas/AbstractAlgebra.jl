@@ -16,8 +16,8 @@ Most rings must supply two types:
   - a type for the parent object (representing the ring itself)
   - a type for elements of that ring
 
-For example, the generic univariate polynomial type in AbstractAlgebra.jl provides two 
-types in generic/GenericTypes.jl: 
+For example, the generic univariate polynomial type in AbstractAlgebra.jl provides two
+types in generic/GenericTypes.jl:
 
   - `Generic.PolyRing{T}` for the parent objects
   - `Generic.Poly{T}` for the actual polynomials
@@ -50,7 +50,7 @@ defined.
 Whether these global caches are provided or not, depends on both mathematical and
 algorithmic considerations. E.g. in the case of number fields, it isn't desirable to
 identify all number fields with the same defining polynomial, as they may be considered
-with distinct embeddings into one another. In other cases, identifying whether two rings 
+with distinct embeddings into one another. In other cases, identifying whether two rings
 are the same may be prohibitively expensive. Generally, it may only make sense
 algorithmically to identify two rings if they were constructed from identical data.
 
@@ -78,14 +78,14 @@ documented as such.
 parent_type(::Type{MyElem})
 ```
 
-Returns the type of the corresponding parent object for the given element type. For
+Return the type of the corresponding parent object for the given element type. For
 example, `parent_type(Generic.Poly{T})` will return `Generic.PolyRing{T}`.
 
 ```julia
 elem_type(::Type{MyParent})
 ```
 
-Returns the type of the elements of the ring whose parent object has the given type.
+Return the type of the elements of the ring whose parent object has the given type.
 This is the inverse of the `parent_type` function, i.e. `elem_type(Generic.PolyRing{T})`
 will return `Generic.Poly{T}`.
 
@@ -113,7 +113,7 @@ Return the parent object of the given element, i.e. return the ring to which the
 element belongs.
 
 This is usually stored in a field `parent` in each ring element. (If the parent objects
-have `mutable struct` types, the internal overhead here is just an additional machine 
+have `mutable struct` types, the internal overhead here is just an additional machine
 pointer stored in each element of the ring.)
 
 For some element types it isn't necessary to append the parent object as a field of
@@ -125,12 +125,12 @@ in fact for any ring element type that isn't parameterised or generic in any way
 isdomain_type(::Type{MyElem})
 ```
 
-Returns `true` if every element of the given element type (which may be parameterised
+Return `true` if every element of the given element type (which may be parameterised
 or an abstract type) necessarily has a parent that is an integral domain, otherwise
-if this cannot be guaranteed, the function returns `false`. 
+if this cannot be guaranteed, the function returns `false`.
 
 For example, if `MyElem` was the type of elements of generic residue rings of a
-polynomial ring, the answer to the question would depend on the modulus of the residue 
+polynomial ring, the answer to the question would depend on the modulus of the residue
 ring. Therefore `isdomain_type` would have to return `false`, since we cannot guarantee
 that we are dealing with elements of an integral domain in general. But if the given
 element type was for rational integers, the answer would be `true`, since every rational
@@ -143,7 +143,7 @@ information about the object itself, or its parent.
 isexact_type(::Type{MyElem})
 ```
 
-Returns `true` if every element of the given type is represented exactly. For example,
+Return `true` if every element of the given type is represented exactly. For example,
 $p$-adic numbers, real and complex floating point numbers and power series are not
 exact, as we can only represent them in general with finite truncations. Similarly
 polynomials and matrices over inexact element types are themselves inexact.
@@ -160,7 +160,7 @@ Base.hash(f::MyElem, h::UInt)
 ```
 
 Return a hash for the object $f$ of type `UInt`. This is used as a hopefully cheap way
-to distinguish objects that differ arithmetically. 
+to distinguish objects that differ arithmetically.
 
 If the object has components, e.g. the coefficients of a polynomial or elements of a
 matrix, these should be hashed recursively, passing the same parameter `h` to all
@@ -191,7 +191,7 @@ documentation on how to implement `deepcopy_internal`.
 ### Constructors
 
 Outer constructors for most AbstractAlgebra types are provided by overloading the call
-syntax for parent objects. 
+syntax for parent objects.
 
 If `R` is a parent object for a given ring we provide the following constructors.
 
@@ -340,7 +340,7 @@ given type to print the coefficient in that case.
 -(f::MyElem)
 ```
 
-Returns $-f$.
+Return $-f$.
 
 ### Binary operations
 
@@ -350,7 +350,7 @@ Returns $-f$.
 *(f::MyElem, g::MyElem)
 ```
 
-Returns $f + g$, $f - g$ or $fg$, respectively.
+Return $f + g$, $f - g$ or $fg$, respectively.
 
 ### Comparison
 
@@ -358,7 +358,7 @@ Returns $f + g$, $f - g$ or $fg$, respectively.
 ==(f::MyElem, g::MyElem)
 ```
 
-Returns `true` if $f$ and $g$ are arithmetically equal. In the case where the two
+Return `true` if $f$ and $g$ are arithmetically equal. In the case where the two
 elements are inexact, the function returns `true` if they agree to the minimum precision
 of the two.
 
@@ -385,7 +385,7 @@ make sense but are passed to the function.
 divexact(f::MyElem, g::MyElem)
 ```
 
-Returns $f/g$, though note that Julia uses `/` for floating point division. Here we
+Return $f/g$, though note that Julia uses `/` for floating point division. Here we
 mean exact division in the ring, i.e. return $q$ such that $f = gq$. A `DivideError()`
 should be thrown if $g$ is zero. If no exact quotient exists or an impossible inverse
 is unavoidably encountered, an error should be thrown.
@@ -449,7 +449,7 @@ known to be a good source of corner cases can be supplied.
 rand(R::MyParent, v...)
 ```
 
-Returns a random element in the given ring of the specified size.
+Return a random element in the given ring of the specified size.
 
 There can be as many arguments as is necessary to specify the size of the test example
 which is being produced.
@@ -541,8 +541,8 @@ doesn't exist.
 isunit(f::MyElem)
 ```
 
-Return `true` if the given element is a unit in the ring it belongs to. 
- 
+Return `true` if the given element is a unit in the ring it belongs to.
+
 ### Optional binary ad hoc operators
 
 By default, ad hoc operations are handled by AbstractAlgebra.jl if they are not defined
@@ -628,7 +628,5 @@ addmul!(c::MyElem, a::MyElem, b::MyElem, t::MyElem)
 
 Set $c = c + ab$ in-place. Return the mutated value. The value $t$ should be a temporary
 of the same type as $a$, $b$ and $c$, which can be used arbitrarily by the
-implementation to speed up the computation. Aliasing between $a$, $b$ and $c$ is 
+implementation to speed up the computation. Aliasing between $a$, $b$ and $c$ is
 permitted.
-
-

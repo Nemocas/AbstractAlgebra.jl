@@ -442,7 +442,7 @@ end
 
 @doc Markdown.doc"""
     minpoly(S::Ring, M::MatAlgElem{T}, charpoly_only::Bool = false) where {T <: RingElement}
-> Returns the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
+> Return the minimal polynomial $p$ of the matrix $M$. The polynomial ring $S$
 > of the resulting polynomial must be supplied and the matrix must be square.
 """
 function minpoly(S::Ring, M::MatAlgElem{T}, charpoly_only::Bool = false) where {T <: RingElement}

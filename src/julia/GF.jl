@@ -18,19 +18,19 @@ elem_type(::Type{GFField{T}}) where T <: Integer = gfelem{T}
 
 @doc Markdown.doc"""
     base_ring(a::GFField)
-> Returns `Union{}` as this field is not dependent on another field.
+> Return `Union{}` as this field is not dependent on another field.
 """
 base_ring(a::GFField) = Union{}
 
 @doc Markdown.doc"""
     base_ring(a::gfelem)
-> Returns `Union{}` as this field is not dependent on another field.
+> Return `Union{}` as this field is not dependent on another field.
 """
 base_ring(a::gfelem) = Union{}
 
 @doc Markdown.doc"""
     parent(a::gfelem)
-> Returns the parent of the given finite field element.
+> Return the parent of the given finite field element.
 """
 parent(a::gfelem) = a.parent
 
@@ -79,13 +79,13 @@ end
 
 @doc Markdown.doc"""
     iszero(a::gfelem{T}) where T <: Integer
-> Returns true if the given element of the finite field is zero.
+> Return true if the given element of the finite field is zero.
 """
 iszero(a::gfelem{T}) where T <: Integer = a.d == 0
 
 @doc Markdown.doc"""
     isone(a::gfelem{T}) where T <: Integer
-> Returns true if the given element of the finite field is one.
+> Return true if the given element of the finite field is one.
 """
 isone(a::gfelem{T}) where T <: Integer = a.d == 1
 
