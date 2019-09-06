@@ -1898,6 +1898,8 @@ function test_gen_mat_similar()
          @test size(n) == (r, c)
       end
    end
+
+   println("PASS")
 end
 
 function test_gen_mat()

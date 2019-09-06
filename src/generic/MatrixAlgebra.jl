@@ -105,46 +105,15 @@ isunit(a::AbstractAlgebra.MatAlgElem{T}) where T <: FieldElement = rank(a) == de
 > Create a matrix over the given ring and dimensions,
 > with defaults based upon the given source matrix `x`.
 """
-function similar(x::MatAlgElem{T}, R::Ring=base_ring(x)) where T <: RingElement
-   TT = elem_type(R)
-   M = similar(x.entries, TT)
-   for i in 1:size(M, 1)
-      for j in 1:size(M, 2)
-         M[i, j] = zero(R)
-      end
-   end
-   z = MatAlgElem{TT}(M)
-   z.base_ring = R
-   return z
-end
+similar(x::MatAlgElem, R::Ring, n::Int) = _similar(x, R, n, n)
 
-function similar(x::MatAlgElem{T}, R::Ring, n::Int) where T <: RingElement
-   TT = elem_type(R)
-   M = similar(x.entries, TT, n, n)
-   for i in 1:size(M, 1)
-      for j in 1:size(M, 2)
-         M[i, j] = zero(R)
-      end
-   end
-   z = MatAlgElem{TT}(M)
-   z.base_ring = R
-   return z
-end
+similar(x::MatAlgElem, R::Ring=base_ring(x)) = similar(x, R, degree(x))
 
 similar(x::MatAlgElem, n::Int) = similar(x, base_ring(x), n)
 
 function similar(x::MatAlgElem{T}, R::Ring, m::Int, n::Int) where T <: RingElement
    m != n && error("Dimensions don't match in similar")
-   TT = elem_type(R)
-   M = similar(x.entries, TT, n, n)
-   for i in 1:size(M, 1)
-      for j in 1:size(M, 2)
-         M[i, j] = zero(R)
-      end
-   end
-   z = MatAlgElem{TT}(M)
-   z.base_ring = R
-   return z
+   return similar(x, R, n)
 end
 
 similar(x::MatAlgElem, m::Int, n::Int) = similar(x, base_ring(x), m, n)
