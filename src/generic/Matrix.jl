@@ -188,6 +188,18 @@ nrows(a::MatrixElem) = size(a.entries, 1)
 """
 ncols(a::MatrixElem) = size(a.entries, 2)
 
+@doc Markdown.doc"""
+    length(a::Generic.MatrixElem)
+> Return the number of entries in the given matrix.
+"""
+length(a::MatrixElem) = nrows(a) * ncols(a)
+
+@doc Markdown.doc"""
+    isempty(a::Generic.MatrixElem)
+> Return `true` if `a` does not contain any entry (i.e. `length(a) == 0`), and `false` otherwise.
+"""
+isempty(a::MatrixElem) = (nrows(a) == 0) | (ncols(a) == 0)
+
 Base.@propagate_inbounds function getindex(a::MatrixElem, r::Int, c::Int)
    return a.entries[r, c]
 end
