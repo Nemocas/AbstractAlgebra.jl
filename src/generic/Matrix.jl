@@ -32,11 +32,6 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
 function _similar(x::MatrixElem{T}, R::Ring, r::Int, c::Int) where T <: RingElement
    TT = elem_type(R)
    M = Matrix{TT}(undef, (r, c))
-   for i in 1:size(M, 1)
-      for j in 1:size(M, 2)
-         M[i, j] = zero(R)
-      end
-   end
    z = x isa AbstractAlgebra.MatElem ? MatSpaceElem{TT}(M) : MatAlgElem{TT}(M)
    z.base_ring = R
    return z
@@ -53,7 +48,7 @@ similar(x::AbstractAlgebra.MatElem, r::Int, c::Int) = similar(x, base_ring(x), r
 > Return the identity matrix with the same shape as $x$.
 """
 function eye(x::MatrixElem)
-  z = similar(x)
+  z = zero(x)
   for i in 1:nrows(x)
     z[i, i] = one(base_ring(x))
   end
@@ -65,11 +60,11 @@ end
 > Return the $d$-by-$d$ identity matrix with the same base ring as $x$.
 """
 function eye(x::MatrixElem, d::Int)
-  z = similar(x, d, d)
-  for i in 1:nrows(z)
-    z[i, i] = one(base_ring(x))
-  end
-  return z
+   z = zero(x, d, d)
+   for i in 1:nrows(z)
+      z[i, i] = one(base_ring(x))
+   end
+   return z
 end
 
 ###############################################################################
@@ -199,6 +194,21 @@ end
 Base.@propagate_inbounds function setindex!(a::MatrixElem, d::T, r::Int,
                                             c::Int) where T <: RingElement
     a.entries[r, c] = base_ring(a)(d)
+end
+
+Base.isassigned(a::Union{Mat,MatAlgElem}, i, j) = isassigned(a.entries, i, j)
+
+function Base.isassigned(a::MatrixElem, i, j)
+    try
+        a[i, j]
+        true
+    catch e
+        if isa(e, BoundsError) || isa(e, UndefRefError)
+            return false
+        else
+            rethrow()
+        end
+    end
 end
 
 @doc Markdown.doc"""
@@ -421,7 +431,8 @@ function show(io::IO, a::MatrixElem)
    isempty(a) && return print(io, "$r by $c matrix")
 
    # preprint each element to know the widths so as to align the columns
-   strings = String[sprint(print, a[i,j], context = :compact => true) for i=1:r, j=1:c]
+   strings = String[sprint(print, isassigned(a, i, j) ? a[i, j] : Base.undef_ref_str,
+                           context = :compact => true) for i=1:r, j=1:c]
    maxs = maximum(length, strings, dims=1)
 
    for i = 1:r
@@ -2104,33 +2115,33 @@ end
 > no such matrix exists, an exception is raised.
 """
 function solve_left(a::AbstractAlgebra.MatElem{S}, b::AbstractAlgebra.MatElem{S}) where S <: RingElement
-  @assert ncols(a) == ncols(b)
-  H, T = hnf_with_transform(a)
-  b = deepcopy(b)
-  z = similar(a, nrows(b), nrows(a))
-  l = min(ncols(a), nrows(a))
-  t = base_ring(a)()
-  for i = 1:nrows(b)
-    for j = 1:l
-      k = 1
-      while k <= ncols(H) && iszero(H[j, k])
-        k += 1
+   @assert ncols(a) == ncols(b)
+   H, T = hnf_with_transform(a)
+   b = deepcopy(b)
+   z = zero(a, nrows(b), nrows(a))
+   l = min(ncols(a), nrows(a))
+   t = base_ring(a)()
+   for i = 1:nrows(b)
+      for j = 1:l
+         k = 1
+         while k <= ncols(H) && iszero(H[j, k])
+            k += 1
+         end
+         if k > ncols(H)
+            continue
+         end
+         q, r = AbstractAlgebra.divrem(b[i, k], H[j, k])
+         r != 0 && error("Unable to solve linear system")
+         z[i, j] = q
+         q = -q
+         for h = k:ncols(H)
+            t = mul!(t, q, H[j, h])
+            b[i, h] = addeq!(b[i, h], t)
+         end
       end
-      if k > ncols(H)
-        continue
-      end
-      q, r = AbstractAlgebra.divrem(b[i, k], H[j, k])
-      r != 0 && error("Unable to solve linear system")
-      z[i, j] = q
-      q = -q
-      for h = k:ncols(H)
-        t = mul!(t, q, H[j, h])
-        b[i, h] = addeq!(b[i, h], t)
-      end
-    end
-  end
-  b != 0 && error("Unable to solve linear system")
-  return z*T
+   end
+   b != 0 && error("Unable to solve linear system")
+   return z*T
 end
 
 # Find the pivot columns of an rref matrix
@@ -2197,7 +2208,7 @@ function solve_triu(U::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.MatElem{T}
    n = nrows(U)
    m = ncols(b)
    R = base_ring(U)
-   X = similar(b)
+   X = zero(b)
    Tinv = Array{elem_type(R)}(undef, n)
    tmp = Array{elem_type(R)}(undef, n)
    if unit == false
@@ -2354,7 +2365,7 @@ function nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: RingElement}
    rank, d, A = rref(M)
    nullity = n - rank
    R = base_ring(M)
-   U = similar(M, n, nullity)
+   U = zero(M, n, nullity)
    if rank == 0
       for i = 1:nullity
          U[i, i] = R(1)
@@ -2401,7 +2412,7 @@ function nullspace(M::AbstractAlgebra.MatElem{T}) where {T <: FieldElement}
    rank, A = rref(M)
    nullity = n - rank
    R = base_ring(M)
-   X = similar(M, n, nullity)
+   X = zero(M, n, nullity)
    if rank == 0
       for i = 1:nullity
          X[i, i] = R(1)
@@ -2937,7 +2948,7 @@ function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <
    first_poly = true
    while r2 <= n
       P1 = [0 for i in 1:2n + 1]
-      v = similar(M, n, 1)
+      v = zero(M, n, 1)
       for j = 1:n
          B[r2, j] = v[j, 1]
          A[1, j] = R()
@@ -3035,7 +3046,7 @@ function minpoly(S::Ring, M::MatElem{T}, charpoly_only::Bool = false) where {T <
    first_poly = true
    while r2 <= n
       P1 = [0 for i in 1:2n + 1]
-      v = similar(M, n, 1)
+      v = zero(M, n, 1)
       for j = 1:n
          B[r2, j] = v[j, 1]
          A[1, j] = R()

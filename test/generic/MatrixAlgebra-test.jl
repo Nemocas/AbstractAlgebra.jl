@@ -1339,7 +1339,6 @@ function test_gen_matalg_similar_zero()
          @test size(n) == (r, r)
          nn = sim_zero(m, r, r)
          @test !test_zero || iszero(nn)
-         @test nn == n
          @test parent(nn) == MatrixAlgebra(R, r)
          @test size(nn) == (r, r)
          @test_throws ErrorException sim_zero(m, r, r+1)

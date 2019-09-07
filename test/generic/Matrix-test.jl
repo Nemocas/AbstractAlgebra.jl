@@ -2045,7 +2045,8 @@ function test_gen_mat_show()
    @test string(S([1 2 3; 4 5 6; 7 8 9])) ==
       "[1//1  2//1  3//1]\n[4//1  5//1  6//1]\n[7//1  8//1  9//1]"
    @test string(MatrixAlgebra(QQ, 0)()) == "0 by 0 matrix"
-
+   @test string(similar(matrix(ZZ, [3 1 2; 2 0 1]))) ==
+      "[#undef  #undef  #undef]\n[#undef  #undef  #undef]"
    println("PASS")
 end
 

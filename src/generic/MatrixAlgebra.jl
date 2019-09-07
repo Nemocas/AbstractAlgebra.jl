@@ -102,7 +102,7 @@ isunit(a::AbstractAlgebra.MatAlgElem{T}) where T <: FieldElement = rank(a) == de
     similar(x::MatAlgElem, R::Ring, n::Int)
     similar(x::MatAlgElem, n::Int)
 
-> Create a matrix over the given ring and dimensions,
+> Create an uninitialized matrix over the given ring and dimensions,
 > with defaults based upon the given source matrix `x`.
 """
 similar(x::AbstractAlgebra.MatAlgElem, R::Ring, n::Int) = _similar(x, R, n, n)

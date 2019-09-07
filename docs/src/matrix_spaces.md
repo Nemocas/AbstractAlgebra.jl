@@ -437,31 +437,44 @@ julia> Q = vcat(M, N)
 
 ```
 
-### Optional similar
+### Optional similar and zero
 
 The following functions are available for matrices in both matrix algebras and matrix
-spaces.
+spaces. Both `similar` and `zero` construct new matrices, with the same methods, but
+the entries are either undefined with `similar` or zero-initialized with `zero`.
 
 ```julia
 similar(x::MyMat{T}, R::Ring=base_ring(x)) where T <: AbstractAlgebra.RingElem
+zero(x::MyMat{T}, R::Ring=base_ring(x)) where T <: AbstractAlgebra.RingElem
 ```
 
-Construct the zero matrix with the same dimensions as the given matrix, and the
+Construct the matrix with the same dimensions as the given matrix, and the
 same base ring unless explicitly specified.
 
 ```julia
 similar(x::MyMat{T}, R::Ring, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
 similar(x::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
+zero(x::MyMat{T}, R::Ring, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
+zero(x::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
 ```
 
-Construct the $r\times c$ zero matrix with `R` as base ring (which defaults to the
+Construct the $r\times c$ matrix with `R` as base ring (which defaults to the
 base ring of the the given matrix).
 If $x$ belongs to a matrix algebra and $r \neq c$, an exception is raised, and it's
 also possible to specify only one `Int` as the order (e.g. `similar(x, n)`).
 
 Custom matrices may choose which specific matrix type is best-suited to return for the
-given ring and dimensionality. If they do not specialize this method, the default is a
+given ring and dimensionality. If they do not specialize these functions, the default is a
 `Generic.MatSpaceElem` matrix, or `Generic.MatAlgElem` for matrix algebras.
+The default implementation of `zero` calls out to `similar`, so it's generally
+sufficient to specialize only `similar`.
+
+```julia
+Base.isassigned(M::MyMat, i, j)
+```
+
+Test whether the given matrix has a value associated with indices `i` and `j`.
+It is recommended to overload this method for custom matrices.
 
 **Examples**
 
@@ -470,17 +483,36 @@ julia> M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
 [3  1  2]
 [2  0  1]
 
+julia> isassigned(M, 1, 2)
+true
+
+julia> isassigned(M, 4, 4)
+false
+
 julia> A = similar(M)
+[#undef  #undef  #undef]
+[#undef  #undef  #undef]
+
+julia> isassigned(A, 1, 2)
+false
+
+julia> B = zero(M)
 [0  0  0]
 [0  0  0]
 
-julia> B = similar(M, 4, 5)
-[0  0  0  0  0]
-[0  0  0  0  0]
-[0  0  0  0  0]
-[0  0  0  0  0]
+julia> C = similar(M, 4, 5)
+[#undef  #undef  #undef  #undef  #undef]
+[#undef  #undef  #undef  #undef  #undef]
+[#undef  #undef  #undef  #undef  #undef]
+[#undef  #undef  #undef  #undef  #undef]
 
-julia> C = similar(M, QQ, 2, 2)
+julia> base_ring(B)
+Integers
+
+julia> D = zero(M, QQ, 2, 2)
 [0//1  0//1]
 [0//1  0//1]
+
+julia> base_ring(D)
+Rationals
 ```
