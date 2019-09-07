@@ -403,18 +403,23 @@ function show(io::IO, a::AbstractAlgebra.MatSpace)
 end
 
 function show(io::IO, a::MatrixElem)
+   isempty(a) && return print(io, "$r by $c matrix")
+
    r = nrows(a)
    c = ncols(a)
-   if r*c == 0
-      print(io, "$r by $c matrix")
-      return
-   end
+
+   # preprint each element to know the widths so as to align the columns
+   strings = String[sprint(print, a[i,j], context = :compact => true) for i=1:r, j=1:c]
+   maxs = maximum(length, strings, dims=1)
+
    for i = 1:r
       print(io, "[")
       for j = 1:c
-         print(IOContext(io, :compact => true), a[i, j])
+         s = strings[i, j]
+         s = ' '^(maxs[j] - length(s)) * s
+         print(io, s)
          if j != c
-            print(io, " ")
+            print(io, "  ")
          end
       end
       print(io, "]")
