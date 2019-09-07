@@ -167,26 +167,6 @@ identity_matrix(R::Ring, n::Int)
 
 Construct the $n\times n$ AbstractAlgebra.jl identity matrix over the ring `R`.
 
-The following functions are available for matrices in both matrix algebras and matrix
-spaces.
-
-```julia
-similar(x::MyMat{T}, R::Ring=base_ring(x)) where T <: AbstractAlgebra.RingElem
-```
-
-Construct the zero matrix with the same dimensions as the given matrix, and the
-same base ring unless explicitly specified.
-
-```julia
-similar(x::MyMat{T}, R::Ring, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
-similar(x::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
-```
-
-Construct the $r\times c$ zero matrix with `R` as base ring (which defaults to the
-base ring of the the given matrix).
-If $x$ belongs to a matrix algebra and $r \neq c$, an exception is raised, and it's
-also possible to specify only one `Int` as the order (e.g. `similar(x, n)`).
-
 **Examples**
 
 ```jldoctest
@@ -210,31 +190,12 @@ julia> Q = identity_matrix(ZZ, 4)
 [0 0 1 0]
 [0 0 0 1]
 
-julia> C = similar(P)
-[0 0]
-[0 0]
-[0 0]
-
-julia> D = similar(Q, 4, 5)
-[0 0 0 0 0]
-[0 0 0 0 0]
-[0 0 0 0 0]
-[0 0 0 0 0]
-
 julia> R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
 julia> M = R()
 [0 0]
 [0 0]
-
-julia> F = similar(M)
-[0 0]
-[0 0]
-
-julia> similar(M, QQ)
-[0//1 0//1]
-[0//1 0//1]
 ```
 
 ### Views
@@ -474,4 +435,52 @@ julia> Q = vcat(M, N)
 [0 1 0]
 [1 0 1]
 
+```
+
+### Optional similar
+
+The following functions are available for matrices in both matrix algebras and matrix
+spaces.
+
+```julia
+similar(x::MyMat{T}, R::Ring=base_ring(x)) where T <: AbstractAlgebra.RingElem
+```
+
+Construct the zero matrix with the same dimensions as the given matrix, and the
+same base ring unless explicitly specified.
+
+```julia
+similar(x::MyMat{T}, R::Ring, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
+similar(x::MyMat{T}, r::Int, c::Int) where T <: AbstractAlgebra.RingElem
+```
+
+Construct the $r\times c$ zero matrix with `R` as base ring (which defaults to the
+base ring of the the given matrix).
+If $x$ belongs to a matrix algebra and $r \neq c$, an exception is raised, and it's
+also possible to specify only one `Int` as the order (e.g. `similar(x, n)`).
+
+Custom matrices may choose which specific matrix type is best-suited to return for the
+given ring and dimensionality. If they do not specialize this method, the default is a
+`Generic.MatSpaceElem` matrix, or `Generic.MatAlgElem` for matrix algebras.
+
+**Examples**
+
+```jldoctest
+julia> M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
+[3 1 2]
+[2 0 1]
+
+julia> A = similar(M)
+[0 0 0]
+[0 0 0]
+
+julia> B = similar(M, 4, 5)
+[0 0 0 0 0]
+[0 0 0 0 0]
+[0 0 0 0 0]
+[0 0 0 0 0]
+
+julia> C = similar(M, QQ, 2, 2)
+[0//1 0//1]
+[0//1 0//1]
 ```

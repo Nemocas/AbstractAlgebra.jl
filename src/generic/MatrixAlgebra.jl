@@ -105,18 +105,18 @@ isunit(a::AbstractAlgebra.MatAlgElem{T}) where T <: FieldElement = rank(a) == de
 > Create a matrix over the given ring and dimensions,
 > with defaults based upon the given source matrix `x`.
 """
-similar(x::MatAlgElem, R::Ring, n::Int) = _similar(x, R, n, n)
+similar(x::AbstractAlgebra.MatAlgElem, R::Ring, n::Int) = _similar(x, R, n, n)
 
-similar(x::MatAlgElem, R::Ring=base_ring(x)) = similar(x, R, degree(x))
+similar(x::AbstractAlgebra.MatAlgElem, R::Ring=base_ring(x)) = similar(x, R, degree(x))
 
-similar(x::MatAlgElem, n::Int) = similar(x, base_ring(x), n)
+similar(x::AbstractAlgebra.MatAlgElem, n::Int) = similar(x, base_ring(x), n)
 
-function similar(x::MatAlgElem{T}, R::Ring, m::Int, n::Int) where T <: RingElement
+function similar(x::AbstractAlgebra.MatAlgElem{T}, R::Ring, m::Int, n::Int) where T <: RingElement
    m != n && error("Dimensions don't match in similar")
    return similar(x, R, n)
 end
 
-similar(x::MatAlgElem, m::Int, n::Int) = similar(x, base_ring(x), m, n)
+similar(x::AbstractAlgebra.MatAlgElem, m::Int, n::Int) = similar(x, base_ring(x), m, n)
 
 ################################################################################
 #
