@@ -475,7 +475,7 @@ function show(io::IO, a::MatrixElem)
    maxs = maximum(length, strings, dims=1)
 
    for i = 1:r
-      print(io, "[")
+      print(io, i == 1 ? '⎛' : i == r ? '⎝' : '⎜')
       for j = 1:c
          s = strings[i, j]
          s = ' '^(maxs[j] - length(s)) * s
@@ -484,10 +484,8 @@ function show(io::IO, a::MatrixElem)
             print(io, "  ")
          end
       end
-      print(io, "]")
-      if i != r
-         println(io, "")
-      end
+      print(io,  i == 1 ? '⎞' : i == r ? '⎠' : '⎟')
+      i != r && println(io)
    end
 end
 
