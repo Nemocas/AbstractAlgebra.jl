@@ -28,24 +28,24 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
 #
 ###############################################################################
 
-function _similar(x::Union{Mat{T}, MatAlgElem{T}}, R::Ring, r::Int, c::Int) where T <: RingElement
+function _similar(x::MatrixElem{T}, R::Ring, r::Int, c::Int) where T <: RingElement
    TT = elem_type(R)
-   M = similar(x.entries, TT, r, c)
+   M = Matrix{TT}(undef, (r, c))
    for i in 1:size(M, 1)
       for j in 1:size(M, 2)
          M[i, j] = zero(R)
       end
    end
-   z = x isa Mat ? MatSpaceElem{TT}(M) : MatAlgElem{TT}(M)
+   z = x isa AbstractAlgebra.MatElem ? MatSpaceElem{TT}(M) : MatAlgElem{TT}(M)
    z.base_ring = R
    return z
 end
 
-similar(x::Mat, R::Ring, r::Int, c::Int) = _similar(x, R, r, c)
+similar(x::AbstractAlgebra.MatElem, R::Ring, r::Int, c::Int) = _similar(x, R, r, c)
 
-similar(x::Mat, R::Ring=base_ring(x))= similar(x, R, nrows(x), ncols(x))
+similar(x::AbstractAlgebra.MatElem, R::Ring=base_ring(x)) = similar(x, R, nrows(x), ncols(x))
 
-similar(x::Mat, r::Int, c::Int) = similar(x, base_ring(x), r, c)
+similar(x::AbstractAlgebra.MatElem, r::Int, c::Int) = similar(x, base_ring(x), r, c)
 
 @doc Markdown.doc"""
     eye(x::Generic.MatrixElem)
