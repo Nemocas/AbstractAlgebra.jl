@@ -3192,7 +3192,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
 end
 
 @doc Markdown.doc"""
-    divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
+    divrem(a::MPoly{T}, b::Vector{MPoly{T}}) where {T <: RingElement}
 > Return a tuple `(q, r)` consisting of an array of polynomials `q`, one for
 > each polynomial in `b`, and a polynomial `r` such that `a = sum_i b[i]*q[i] + r`.
 """
@@ -3310,7 +3310,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    evaluate(a::MPoly{T}, A::Array{T, 1}) where {T <: RingElement}
+    evaluate(a::MPoly{T}, A::Vector{T}) where {T <: RingElement}
 > Evaluate the polynomial by substituting in the array of values for each of
 > the variables.
 """
@@ -4660,7 +4660,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    PolynomialRing(R::AbstractAlgebra.Ring, s::Array{String, 1}; cached::Bool = true, ordering::Symbol = :lex)
+    PolynomialRing(R::AbstractAlgebra.Ring, s::Vector{String}; cached::Bool = true, ordering::Symbol = :lex)
 > Given a base ring `R` and an array of strings `s` specifying how the
 > generators (variables) should be printed, return a tuple `T, (x1, x2, ...)`
 > representing the new polynomial ring $T = R[x1, x2, ...]$ and the generators
