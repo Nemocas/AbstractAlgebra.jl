@@ -403,10 +403,9 @@ function show(io::IO, a::AbstractAlgebra.MatSpace)
 end
 
 function show(io::IO, a::MatrixElem)
-   isempty(a) && return print(io, "$r by $c matrix")
-
    r = nrows(a)
    c = ncols(a)
+   isempty(a) && return print(io, "$r by $c matrix")
 
    # preprint each element to know the widths so as to align the columns
    strings = String[sprint(print, a[i,j], context = :compact => true) for i=1:r, j=1:c]
