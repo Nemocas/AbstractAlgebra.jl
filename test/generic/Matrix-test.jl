@@ -1902,6 +1902,20 @@ function test_gen_mat_similar()
    println("PASS")
 end
 
+function test_gen_mat_show()
+   print("Generic.Mat.show...")
+   @test string(matrix(ZZ, [3 1 2; 2 0 1])) == "[3  1  2]\n[2  0  1]"
+   @test string(matrix(ZZ, [3 1 2; 2 0 1])) == "[3  1  2]\n[2  0  1]"
+   @test string(matrix(ZZ, 2, 0, [])) == "2 by 0 matrix"
+   @test string(matrix(ZZ, 0, 3, [])) == "0 by 3 matrix"
+   S = MatrixAlgebra(QQ, 3)
+   @test string(S([1 2 3; 4 5 6; 7 8 9])) ==
+      "[1//1  2//1  3//1]\n[4//1  5//1  6//1]\n[7//1  8//1  9//1]"
+   @test string(MatrixAlgebra(QQ, 0)()) == "0 by 0 matrix"
+
+   println("PASS")
+end
+
 function test_gen_mat()
    test_gen_mat_constructors()
    test_gen_mat_size()
