@@ -67,6 +67,12 @@ var(a::AbstractAlgebra.PolyRing) = a.S
 """
 symbols(a::AbstractAlgebra.PolyRing) = [a.S]
 
+@doc Markdown.doc"""
+    nvars(a::AbstractAlgebra.PolyRing)
+> Return the number of variables of the polynomial ring, which is 1.
+"""
+nvars(a::AbstractAlgebra.PolyRing) = 1
+
 function check_parent(a::PolynomialElem, b::PolynomialElem, throw::Bool = true)
    b = parent(a) != parent(b)
    b && throw && error("Incompatible polynomial rings in polynomial operation")
@@ -169,6 +175,12 @@ one(R::AbstractAlgebra.PolyRing) = R(1)
 > Return the generator of the given polynomial ring.
 """
 gen(R::AbstractAlgebra.PolyRing) = R([zero(base_ring(R)), one(base_ring(R))])
+
+@doc Markdown.doc"""
+    gens(R::AbstractAlgebra.PolyRing)
+> Return an array containing the generator of the given polynomial ring.
+"""
+gens(R::AbstractAlgebra.PolyRing) = [gen(R)]
 
 @doc Markdown.doc"""
     iszero(a::Generic.PolynomialElem)
