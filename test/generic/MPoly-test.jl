@@ -78,6 +78,26 @@ function test_gen_mpoly_constructors()
    println("PASS")
 end
 
+function test_gen_mpoly_geobuckets()
+   print("Generic.MPoly.geobuckets...")
+
+   R, x = ZZ["y"]
+   for num_vars = 1:10
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+
+      S, varlist = PolynomialRing(R, var_names, ordering = ord)
+      g = gens(S)
+
+      C = Generic.geobucket(S)
+      for j in 1:num_vars
+        push!(C, sum(g[j]^i for i in 1:64))
+      end
+      @test finish(C) == sum(sum(g[j]^i for i in 1:64) for j in 1:num_vars)
+   end
+   println("PASS")
+end
+
 function test_gen_mpoly_manipulation()
    print("Generic.MPoly.manipulation...")
 
@@ -1400,6 +1420,7 @@ end
 
 function test_gen_mpoly()
    test_gen_mpoly_constructors()
+   test_gen_mpoly_geobuckets()
    test_gen_mpoly_manipulation()
    test_gen_mpoly_multivariate_coeff()
    test_gen_mpoly_unary_ops()
