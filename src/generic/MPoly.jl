@@ -1153,6 +1153,13 @@ end
 function Base.push!(G::geobucket{T}, p::T) where {T <: AbstractAlgebra.MPolyElem}
    R = parent(p)
    i = max(1, ndigits(length(p), base=4))
+   l = length(G.buckets)
+   if length(G.buckets) < i
+     resize!(G.buckets, i)
+     for j in (l + 1):i
+       G.buckets[j] = zero(R)
+     end
+   end
    G.buckets[i] = addeq!(G.buckets[i], p)
    while i <= G.len
       if length(G.buckets[i]) >= 4^i
