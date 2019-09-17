@@ -2611,7 +2611,7 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
    push!(I, heap_t(0, 1, 0))
    q_alloc = max(m - n, n)
    Qc = Array{T}(undef, q_alloc)
-   Qe = zeros(UInt ,N, q_alloc)
+   Qe = zeros(UInt, N, q_alloc)
    k = 0
    s = n
    c = R()
@@ -2739,7 +2739,7 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
             end
          end
       end
-      zero!(qc)
+      qc = zero!(qc)
    end
    resize!(Qc, k)
    Qe = resize_exps!(Qe, k)
