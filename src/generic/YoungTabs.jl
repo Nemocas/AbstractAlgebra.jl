@@ -14,7 +14,7 @@ using SparseArrays
 > Return the size of the vector which represents the partition.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = Partition([4,3,1]); size(p)
 (3,)
 ```
@@ -175,7 +175,7 @@ end
 > to the Young diagram of `part` reflected through the main diagonal.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = Partition([4,2,1,1,1])
 4₁2₁1₃
 
@@ -324,7 +324,7 @@ YoungTableau(p::Vector{T}, fill=collect(1:sum(p))) where T<:Integer = YoungTable
 > number of rows and the number of columns of `Y`.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> y = YoungTableau([4,3,1]); size(y)
 (3, 4)
 ```
@@ -346,7 +346,7 @@ end
 > outside of the array return `0`.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> y = YoungTableau([4,3,1])
 ┌───┬───┬───┬───┐
 │ 1 │ 2 │ 3 │ 4 │
@@ -488,7 +488,7 @@ const _youngtabstyle = YoungTabDisplayStyle(:diagram)
 > The difference is purely esthetical.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> Generic.setyoungtabstyle(:array)
 :array
 
@@ -535,8 +535,9 @@ end
 > Construct sparse integer matrix representing the tableau.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> y = YoungTableau([4,3,1]);
+
 
 julia> matrix_repr(y)
 3×4 SparseArrays.SparseMatrixCSC{Int64,Int64} with 8 stored entries:
@@ -566,7 +567,7 @@ end
 > standard (i.e. increasing along rows and columns) is performed.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> y = YoungTableau([4,3,1])
 ┌───┬───┬───┬───┐
 │ 1 │ 2 │ 3 │ 4 │
@@ -598,7 +599,7 @@ end
 > diagonal.
 
 # Examples
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> y = YoungTableau([4,3,1])
 ┌───┬───┬───┬───┐
 │ 1 │ 2 │ 3 │ 4 │
@@ -628,7 +629,7 @@ Base.conj(Y::YoungTableau) = YoungTableau(conj(Y.part, Y.fill)...)
 > `i`-th row of the diagram of `Y` located to the right of the `(i,j)`-th box.
 
 # Examples
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> y = YoungTableau([4,3,1])
 ┌───┬───┬───┬───┐
 │ 1 │ 2 │ 3 │ 4 │
@@ -656,7 +657,7 @@ rowlength(Y::YoungTableau, i, j) = Y.part[i] < j ? 0 : Y.part[i]-j
 > the `j`-th column of the diagram of `Y` located below of the `(i,j)`-th box.
 
 # Examples
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> y = YoungTableau([4,3,1])
 ┌───┬───┬───┬───┐
 │ 1 │ 2 │ 3 │ 4 │
@@ -687,7 +688,7 @@ collength(Y::YoungTableau, i, j) = count(x -> x>=j, view(Y.part, i+1:lastindex(Y
 > Return `0` for `(i,j)` not in the tableau `Y`.
 
 # Examples
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> y = YoungTableau([4,3,1])
 ┌───┬───┬───┬───┐
 │ 1 │ 2 │ 3 │ 4 │
@@ -724,7 +725,7 @@ end
 > the computation of the dimension in different type by calling `dim(Int, Y)`.
 
 # Examples
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> dim(YoungTableau([4,3,1]))
 70
 

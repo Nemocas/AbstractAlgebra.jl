@@ -1496,6 +1496,132 @@ function test_gen_mat_row_col_swapping()
    println("PASS")
 end
 
+function test_gen_mat_elem_op()
+   print("Generic.Mat.gen_mat_elem_op...")
+
+   R, x = PolynomialRing(ZZ, "x")
+   for i in 1:10
+      r = rand(1:50)
+      c = rand(1:50)
+      S = MatrixSpace(R, r, c)
+      M = rand(S, 0:3, -100:100)
+      c1, c2 = rand(1:c), rand(1:c)
+      s = rand(-100:100)
+      r1 = rand(1:r)
+      r2 = rand(r1:r)
+
+      # add column
+
+      N = add_column(M, s, c1, c2, r1:r2)
+      for ci in 1:c
+         if ci == c2
+            @test all(N[k, c2] == M[k, c2] + s * M[k, c1] for k in r1:r2)
+            @test all(N[k, c2] == M[k, c2] for k in 1:r if !(k in r1:r2))
+         else
+            @test all(N[k, ci] == M[k, ci] for k in 1:r)
+         end
+      end
+
+      MM = deepcopy(M)
+      add_column!(MM, s, c1, c2, r1:r2)
+      for ci in 1:c
+         if ci == c2
+            @test all(MM[k, c2] == M[k, c2] + s * M[k, c1] for k in r1:r2)
+            @test all(MM[k, c2] == M[k, c2] for k in 1:r if !(k in r1:r2))
+         else
+            @test all(MM[k, ci] == M[k, ci] for k in 1:r)
+         end
+      end
+
+      if c1 != c2
+         @test add_column(add_column(M, s, c1, c2), -s, c1, c2) == M
+      end
+
+      # multiply column
+
+      N = multiply_column(M, s, c1, r1:r2)
+      for ci in 1:c
+         if ci == c1
+            @test all(N[k, c1] == s * M[k, c1] for k in r1:r2)
+            @test all(N[k, c1] == M[k, c1] for k in 1:r if !(k in r1:r2))
+         else
+            @test all(N[k, ci] == M[k, ci] for k in 1:r)
+         end
+      end
+
+      MM = deepcopy(M)
+      multiply_column!(MM, s, c1, r1:r2)
+      for ci in 1:c
+         if ci == c1
+            @test all(MM[k, c1] == s * M[k, c1] for k in r1:r2)
+            @test all(MM[k, c1] == M[k, c1] for k in 1:r if !(k in r1:r2))
+         else
+            @test all(MM[k, ci] == M[k, ci] for k in 1:r)
+         end
+      end
+
+      @test multiply_column(multiply_column(M, -one(R), c1), -one(R), c1) == M
+
+      # add row
+
+      r1, r2 = rand(1:r), rand(1:r)
+      s = rand(-100:100)
+      c1 = rand(1:c)
+      c2 = rand(c1:c)
+
+      N = add_row(M, s, r1, r2, c1:c2)
+      for ci in 1:r
+         if ci == r2
+            @test all(N[r2, k] == M[r2, k] + s * M[r1, k] for k in c1:c2)
+            @test all(N[r2, k] == M[r2, k] for k in 1:c if !(k in c1:c2))
+         else
+            @test all(N[ci, k] == M[ci, k] for k in 1:c)
+         end
+      end
+
+      MM = deepcopy(M)
+      add_row!(MM, s, r1, r2, c1:c2)
+      for ci in 1:r
+         if ci == r2
+            @test all(MM[r2, k] == M[r2, k] + s * M[r1, k] for k in c1:c2)
+            @test all(MM[r2, k] == M[r2, k] for k in 1:c if !(k in c1:c2))
+         else
+            @test all(MM[ci, k] == M[ci, k] for k in 1:c)
+         end
+      end
+
+      if r1 != r2
+         @test add_row(add_row(M, s, r1, r2), -s, r1, r2) == M
+      end
+
+      # multiply row
+
+      N = multiply_row(M, s, r1, c1:c2)
+      for ci in 1:r
+         if ci == r1
+            @test all(N[r1, k] == s * M[r1, k] for k in c1:c2)
+            @test all(N[r1, k] == M[r1, k] for k in 1:c if !(k in c1:c2))
+         else
+            @test all(N[ci, k] == M[ci, k] for k in 1:c)
+         end
+      end
+
+      MM = deepcopy(M)
+      multiply_row!(MM, s, r1, c1:c2)
+      for ci in 1:r
+         if ci == r1
+            @test all(MM[r1, k] == s * M[r1, k] for k in c1:c2)
+            @test all(MM[r1, k] == M[r1, k] for k in 1:c if !(k in c1:c2))
+         else
+            @test all(MM[ci, k] == M[ci, k] for k in 1:c)
+         end
+      end
+
+      @test multiply_row(multiply_row(M, -one(R), r1), -one(R), r1) == M
+   end
+   println("PASS")
+end
+
 function test_gen_mat_concat()
    print("Generic.Mat.concat...")
 
@@ -1951,6 +2077,7 @@ function test_gen_mat()
    test_gen_mat_charpoly()
    test_gen_mat_minpoly()
    test_gen_mat_row_col_swapping()
+   test_gen_mat_elem_op()
    test_gen_mat_concat()
    test_gen_mat_hnf_minors()
    test_gen_mat_hnf_kb()
