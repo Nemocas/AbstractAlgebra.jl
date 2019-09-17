@@ -4649,9 +4649,13 @@ function show(io::IO, M::MPolyBuildCtx)
 end
 
 function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+  if iszero(c)
+    return M
+  end
   len = length(M.poly) + 1
   set_exponent_vector!(M.poly, len, expv)
   setcoeff!(M.poly, len, c)
+  return M
 end
 
 function finish(M::MPolyBuildCtx{T}) where T <: AbstractAlgebra.MPolyElem
