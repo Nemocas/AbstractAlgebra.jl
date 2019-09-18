@@ -90,20 +90,33 @@ function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
-> Return the polynomial obtained by applying g to the coefficients of p.
+    change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g, R::MPolyRing)
+       where T <: RingElement
+> Return the polynomial in R obtained by applying g to the coefficients of p.
 """
-function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
-   new_base_ring = parent(g(zero(base_ring(p.parent))))
-   new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in symbols(p.parent)], ordering = ordering(p.parent))
+function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g, R::AbstractAlgebra.MPolyRing) where {T <: RingElement}
+
+   z = g(zero(base_ring(p.parent)))
+   base_ring(R) != parent(z) && error("Base rings do not match.")
 
    cvzip = zip(coeffs(p), exponent_vectors(p))
-   M = MPolyBuildCtx(new_polynomial_ring)
+   M = MPolyBuildCtx(R)
    for (c, v) in cvzip
       push_term!(M, g(c), v)
    end
 
    return finish(M)
+end
+
+@doc Markdown.doc"""
+    change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
+> Return the polynomial obtained by applying g to the coefficients of p.
+"""
+function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where T <: RingElement
+   new_base_ring = parent(g(zero(base_ring(p.parent))))
+   new_polynomial_ring, gens_new_polynomial_ring = AbstractAlgebra.PolynomialRing(new_base_ring, [string(v) for v in symbols(p.parent)], ordering = ordering(p.parent))
+   
+   return change_base_ring(p, g, new_polynomial_ring)
 end
 
 function change_base_ring(p::MPoly{T}, g) where {T <: RingElement}
