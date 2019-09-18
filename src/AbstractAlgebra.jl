@@ -6,7 +6,7 @@ using InteractiveUtils
 
 # A list of all symbols external packages should not import from AbstractAlgebra
 import_exclude = [:import_exclude, :QQ, :ZZ, :RR,
-           :RealField, :FiniteField, :NumberField,
+           :RealField, :NumberField,
            :AbstractAlgebra,
            :exp, :sqrt, :div, :divrem, :numerator, :denominator,
            :promote_rule,
@@ -55,7 +55,7 @@ export create_accessors, get_handle, package_handle, zeros,
 
 export error_dim_negative, ErrorConstrDimMismatch
 
-export FiniteField, crt
+export crt
 
 include("AbstractTypes.jl")
 
