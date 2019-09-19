@@ -357,7 +357,7 @@ end
 
 getindex(x::AbstractAlgebra.MatElem, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
 
-getindex(x::AbstractAlgebra.MatElem, r::UnitRange, ::Colon) = sub(x, r, 1:ncols(x))
+getindex(x::AbstractAlgebra.MatElem, r::UnitRange{Int}, ::Colon) = sub(x, r, 1:ncols(x))
 
 getindex(x::AbstractAlgebra.MatElem, ::Colon, c::UnitRange{Int}) = sub(x, 1:nrows(x), c)
 
