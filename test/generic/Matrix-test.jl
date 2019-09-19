@@ -2002,26 +2002,33 @@ function test_gen_mat_change_base_ring()
    println("PASS")
 end
 
-function test_gen_mat_similar()
-   print("Generic.Mat.similar...")
-   for R = (ZZ, GF(11))
-      M = MatrixSpace(R, rand(0:9), rand(0:9))
-      m = R == ZZ ? rand(M, -10:10) : rand(M)
-      n = similar(m)
-      @test parent(n) == M
-      @test size(n) == (nrows(M), ncols(M))
-      r, c = rand(0:9, 2)
-      n = similar(m, r, c)
-      @test parent(n) == MatrixSpace(R, r, c)
-      @test size(n) == (r, c)
-      for S = [QQ, ZZ, GF(2), GF(5)]
-         n = similar(m, S)
-         @test parent(n) == MatrixSpace(S, size(n)...)
+function test_gen_mat_similar_zero()
+   print("Generic.Mat.similar/zero...")
+   for sim_zero in (similar, zero)
+      test_zero = sim_zero === zero
+      for R = (ZZ, GF(11))
+         M = MatrixSpace(R, rand(0:9), rand(0:9))
+         m = R == ZZ ? rand(M, -10:10) : rand(M)
+         n = sim_zero(m)
+         @test !test_zero || iszero(n)
+         @test parent(n) == M
          @test size(n) == (nrows(M), ncols(M))
          r, c = rand(0:9, 2)
-         n = similar(m, S, r, c)
-         @test parent(n) == MatrixSpace(S, r, c)
+         n = sim_zero(m, r, c)
+         @test !test_zero || iszero(n)
+         @test parent(n) == MatrixSpace(R, r, c)
          @test size(n) == (r, c)
+         for S = [QQ, ZZ, GF(2), GF(5)]
+            n = sim_zero(m, S)
+            @test !test_zero || iszero(n)
+            @test parent(n) == MatrixSpace(S, size(n)...)
+            @test size(n) == (nrows(M), ncols(M))
+            r, c = rand(0:9, 2)
+            n = sim_zero(m, S, r, c)
+            @test !test_zero || iszero(n)
+            @test parent(n) == MatrixSpace(S, r, c)
+            @test size(n) == (r, c)
+         end
       end
    end
 
@@ -2089,7 +2096,7 @@ function test_gen_mat()
    test_gen_mat_minors()
    test_gen_mat_views()
    test_gen_mat_change_base_ring()
-   test_gen_mat_similar()
+   test_gen_mat_similar_zero()
 
    println("")
 end

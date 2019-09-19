@@ -207,6 +207,18 @@ end
 """
 zero(a::AbstractAlgebra.MatSpace) = a()
 
+zero(x::MatrixElem, R::Ring=base_ring(x)) = zero!(similar(x, R))
+zero(x::MatrixElem, R::Ring, r::Int, c::Int) = zero!(similar(x, R, r, c))
+zero(x::MatrixElem, r::Int, c::Int) = zero!(similar(x, r, c))
+
+function zero!(x::MatrixElem)
+   R = base_ring(x)
+   for i=1:nrows(x), j=1:ncols(x)
+      x[i, j] = zero(R)
+   end
+   x
+end
+
 @doc Markdown.doc"""
     one(a::AbstractAlgebra.MatSpace)
 > Construct the matrix in the given matrix space with ones down the diagonal
