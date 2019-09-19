@@ -110,10 +110,10 @@ Codomain: Free module of rank 2 over Integers)
 
 julia> Q, h = quo(M, N)
 (Quotient module over Integers with 2 generators and relations:
-[2 3], Module homomorphism with
+[2  3], Module homomorphism with
 Domain: Free module of rank 2 over Integers
 Codomain: Quotient module over Integers with 2 generators and relations:
-[2 3])
+[2  3])
 
 julia> supermodule(Q) == M
 true

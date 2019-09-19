@@ -218,6 +218,30 @@ x^2*y^2+x+1//1
 
 ```
 
+Incase a specific parent ring is constructed, it can also be passed to the function.
+
+```@docs
+change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g, R::AbstractAlgebra.MPolyRing) where {T <: RingElement}
+```
+
+**Examples**
+
+```jldoctest
+julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Integers, AbstractAlgebra.Generic.MPoly{BigInt}[x, y])
+
+julia> S,  = PolynomialRing(QQ, ["x", "y"])
+(Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
+
+julia> fz = x^5 + y^3
+x^5+y^3+1
+
+julia> fq = change_base_ring(fz, QQ, S)
+x^5+y^3+1//1
+
+
+```
+
 ### Multivariate coefficients
 
 In order to return the "coefficient" (as a multivariate polynomial in the same
@@ -404,20 +428,20 @@ julia> S = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
 
 julia> M1 = S([1 2; 3 4])
-[1 2]
-[3 4]
+[1  2]
+[3  4]
 
 julia> M2 = S([2 3; 1 -1])
-[2 3]
-[1 -1]
+[2   3]
+[1  -1]
 
 julia> M3 = S([-1 1; 1 1])
-[-1 1]
-[1 1]
+[-1  1]
+[ 1  1]
 
 julia> evaluate(f, [M1, M2, M3])
-[64 83]
-[124 149]
+[ 64   83]
+[124  149]
 ```
 
 ### Leading coefficients, leading monomials and leading terms

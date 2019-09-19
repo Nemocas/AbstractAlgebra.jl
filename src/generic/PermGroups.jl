@@ -20,7 +20,7 @@ elem_type(::Type{PermGroup{T}}) where T = perm{T}
     parent(g::perm{T}) where T = PermGroup
 > Return the parent of the permutation `g`.
 
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> G = PermutationGroup(5); g = perm([3,4,5,2,1])
 (1,3,5)(2,4)
 
@@ -79,7 +79,7 @@ end
 > `cycles(g)` before calling `parity`.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> g = perm([3,4,1,2,5])
 (1,3)(2,4)
 
@@ -122,7 +122,7 @@ end
 > whose kernel is the alternating group.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> g = perm([3,4,1,2,5])
 (1,3)(2,4)
 
@@ -189,7 +189,7 @@ end
 > `permtype`, `parity`, `sign`, `order` and `^` (powering).
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> g = perm([3,4,5,2,1,6])
 (1,3,5)(2,4)
 
@@ -249,7 +249,7 @@ end
 > determines the conjugacy class of `g`.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> g = perm([3,4,5,2,1,6])
 (1,3,5)(2,4)
 
@@ -303,7 +303,7 @@ const _permdisplaystyle = PermDisplayStyle(:cycles)
 > The difference is purely esthetical.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> Generic.setpermstyle(:array)
 :array
 
@@ -411,7 +411,7 @@ end
 > accordingly.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> perm([2,3,1,4])*perm([1,3,4,2]) # (1,2,3)*(2,3,4)
 (1,3)(2,4)
 ```
@@ -430,7 +430,7 @@ julia> perm([2,3,1,4])*perm([1,3,4,2]) # (1,2,3)*(2,3,4)
 > method.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> g = perm([2,3,4,5,1])
 (1,2,3,4,5)
 
@@ -579,8 +579,9 @@ Base.length(A::AllPerms) = A.all
 > modified.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> elts = Generic.elements!(PermGroup(5));
+
 
 julia> length(elts)
 120
@@ -667,7 +668,7 @@ end
 > embedding of the permutation group into general linear group over $\mathbb{Z}$.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = perm([2,3,1])
 (1,2,3)
 
@@ -694,7 +695,7 @@ matrix_repr(a::perm{T}) where T = sparse(collect(T, 1:length(a.d)), a.d, ones(T,
 > subgroup permuting points indexed by `V`.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = perm([2,1,4,3])
 (1,2)(3,4)
 
@@ -713,11 +714,12 @@ end
 > subgroup permuting points indexed by `V`.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = perm([2,3,1])
 (1,2,3)
 
 julia> f = Generic.emb(PermGroup(5), [3,2,5]);
+
 
 julia> f(p)
 (2,5,3)
@@ -835,7 +837,7 @@ end
 > decomposition determines the parent group $S_n$.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = perm"(1,3)(2,4)"
 (1,3)(2,4)
 
@@ -900,11 +902,12 @@ const _charvalsTableBig = Dict{Tuple{BitVector,Vector{Int}}, BigInt}()
 > S.Sternberg.
 
 # Examples
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> G = PermutationGroup(4)
 Permutation group over 4 elements
 
 julia> chi = character(Partition([3,1])); # character of the regular representation
+
 
 julia> chi(G())
 3

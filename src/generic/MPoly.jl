@@ -90,20 +90,33 @@ function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
-> Return the polynomial obtained by applying g to the coefficients of p.
+    change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g, R::MPolyRing)
+       where T <: RingElement
+> Return the polynomial in R obtained by applying g to the coefficients of p.
 """
-function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
-   new_base_ring = parent(g(zero(base_ring(p.parent))))
-   new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(v) for v in symbols(p.parent)], ordering = ordering(p.parent))
+function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g, R::AbstractAlgebra.MPolyRing) where {T <: RingElement}
+
+   z = g(zero(base_ring(p.parent)))
+   base_ring(R) != parent(z) && error("Base rings do not match.")
 
    cvzip = zip(coeffs(p), exponent_vectors(p))
-   M = MPolyBuildCtx(new_polynomial_ring)
+   M = MPolyBuildCtx(R)
    for (c, v) in cvzip
       push_term!(M, g(c), v)
    end
 
    return finish(M)
+end
+
+@doc Markdown.doc"""
+    change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
+> Return the polynomial obtained by applying g to the coefficients of p.
+"""
+function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where T <: RingElement
+   new_base_ring = parent(g(zero(base_ring(p.parent))))
+   new_polynomial_ring, gens_new_polynomial_ring = AbstractAlgebra.PolynomialRing(new_base_ring, [string(v) for v in symbols(p.parent)], ordering = ordering(p.parent))
+   
+   return change_base_ring(p, g, new_polynomial_ring)
 end
 
 function change_base_ring(p::MPoly{T}, g) where {T <: RingElement}
@@ -1153,6 +1166,13 @@ end
 function Base.push!(G::geobucket{T}, p::T) where {T <: AbstractAlgebra.MPolyElem}
    R = parent(p)
    i = max(1, ndigits(length(p), base=4))
+   l = length(G.buckets)
+   if length(G.buckets) < i
+     resize!(G.buckets, i)
+     for j in (l + 1):i
+       G.buckets[j] = zero(R)
+     end
+   end
    G.buckets[i] = addeq!(G.buckets[i], p)
    while i <= G.len
       if length(G.buckets[i]) >= 4^i
@@ -2604,7 +2624,7 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
    push!(I, heap_t(0, 1, 0))
    q_alloc = max(m - n, n)
    Qc = Array{T}(undef, q_alloc)
-   Qe = zeros(UInt ,N, q_alloc)
+   Qe = zeros(UInt, N, q_alloc)
    k = 0
    s = n
    c = R()
@@ -2732,7 +2752,7 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
             end
          end
       end
-      zero!(qc)
+      qc = zero!(qc)
    end
    resize!(Qc, k)
    Qe = resize_exps!(Qe, k)
@@ -4642,9 +4662,13 @@ function show(io::IO, M::MPolyBuildCtx)
 end
 
 function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+  if iszero(c)
+    return M
+  end
   len = length(M.poly) + 1
   set_exponent_vector!(M.poly, len, expv)
   setcoeff!(M.poly, len, c)
+  return M
 end
 
 function finish(M::MPolyBuildCtx{T}) where T <: AbstractAlgebra.MPolyElem

@@ -35,7 +35,7 @@ end
 > `PermGroup(n)` constructs the permutation group $S_n$ on $n$-symbols. The type of elements of the group is inferred from the type of `n`.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> G = PermGroup(5)
 Permutation group over 5 elements
 
@@ -74,7 +74,7 @@ end
 > constitutes a valid permutation. To skip the check call `perm(v, false)`.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> perm([1,2,3])
 ()
 
@@ -137,7 +137,7 @@ end
 >  * `part::Vector{Int}` - a non-increasing sequence of summands of `n`.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = Partition([4,2,1,1,1])
 4₁2₁1₃
 
@@ -172,8 +172,9 @@ end
 > See also `Combinatorics.partitions(1:n)`.
 
 # Examples
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> ap = AllParts(5);
+
 
 julia> collect(ap)
 7-element Array{AbstractAlgebra.Generic.Partition,1}:
@@ -205,7 +206,7 @@ end
 > (below dots symbolise the removed entries)
 
 # Examples
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> l = Partition([4,3,2])
 4₁3₁2₁
 
@@ -250,7 +251,7 @@ end
 > * `fill` - the row-major fill vector: the entries of the diagram.
 
 # Examples:
-```jldoctest
+```jldoctest; setup = :(using AbstractAlgebra)
 julia> p = Partition([4,3,1]); y = YoungTableau(p)
 ┌───┬───┬───┬───┐
 │ 1 │ 2 │ 3 │ 4 │
