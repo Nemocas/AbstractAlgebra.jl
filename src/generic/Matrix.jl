@@ -363,6 +363,14 @@ getindex(x::AbstractAlgebra.MatElem, ::Colon, c::UnitRange{Int}) = sub(x, 1:nrow
 
 getindex(x::AbstractAlgebra.MatElem, ::Colon, ::Colon) = sub(x, 1:nrows(x), 1:ncols(x))
 
+getindex(x::AbstractAlgebra.MatElem, r::Int, c::UnitRange{Int}) = sub(x, r:r, c)
+
+getindex(x::AbstractAlgebra.MatElem, r::UnitRange{Int}, c::Int) = sub(x, r, c:c)
+
+getindex(x::AbstractAlgebra.MatElem, r::Int, ::Colon) = sub(x, r:r, 1:ncols(x))
+
+getindex(x::AbstractAlgebra.MatElem, ::Colon, c::Int) = sub(x, 1:nrows(x), c:c)
+
 function Base.view(M::Mat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: RingElement
    return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
 end
