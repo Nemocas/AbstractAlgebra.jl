@@ -6,8 +6,8 @@
 
 export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
        charpoly_danilevsky_ff!, hessenberg!, hessenberg, ishessenberg,
-       identity_matrix, charpoly_hessenberg!, invert_cols, invert_cols!,
-       invert_rows, invert_rows!, matrix, minpoly, typed_hvcat, typed_hcat,
+       identity_matrix, charpoly_hessenberg!, reverse_cols, reverse_cols!,
+       reverse_rows, reverse_rows!, matrix, minpoly, typed_hvcat, typed_hcat,
        powers, randmat_triu, randmat_with_rank, similarity!, solve,
        solve_rational, hnf, hnf_kb, hnf_kb_with_transform, hnf_with_transform,
        issquare, snf, snf_with_transform, weak_popov,
@@ -4509,11 +4509,11 @@ function swap_cols!(a::MatrixElem, i::Int, j::Int)
 end
 
 @doc Markdown.doc"""
-    invert_rows!(a::MatrixElem)
+    reverse_rows!(a::MatrixElem)
 > Swap the $i$th and $r - i$th row of $a$ for $1 \leq i \leq r/2$,
 > where $r$ is the number of rows of $a$.
 """
-function invert_rows!(a::MatrixElem)
+function reverse_rows!(a::MatrixElem)
    k = AbstractAlgebra.div(nrows(a), 2)
    for i in 1:k
       swap_rows!(a, i, nrows(a) - i + 1)
@@ -4522,22 +4522,22 @@ function invert_rows!(a::MatrixElem)
 end
 
 @doc Markdown.doc"""
-    invert_rows(a::MatrixElem)
+    reverse_rows(a::MatrixElem)
 > Return a matrix $b$ with the entries of $a$, where the $i$th and $r - i$th
 > row is swapped for $1 \leq i \leq r/2$. Here $r$ is the number of rows of
 > $a$.
 """
-function invert_rows(a::MatrixElem)
+function reverse_rows(a::MatrixElem)
    b = deepcopy(a)
-   return invert_rows!(b)
+   return reverse_rows!(b)
 end
 
 @doc Markdown.doc"""
-    invert_cols!(a::MatrixElem)
+    reverse_cols!(a::MatrixElem)
 > Swap the $i$th and $r - i$th column of $a$ for $1 \leq i \leq c/2$,
 > where $c$ is the number of columns of $a$.
 """
-function invert_cols!(a::MatrixElem)
+function reverse_cols!(a::MatrixElem)
    k = AbstractAlgebra.div(ncols(a), 2)
    for i in 1:k
       swap_cols!(a, i, ncols(a) - i + 1)
@@ -4546,14 +4546,14 @@ function invert_cols!(a::MatrixElem)
 end
 
 @doc Markdown.doc"""
-    invert_cols(a::MatrixElem)
+    reverse_cols(a::MatrixElem)
 > Return a matrix $b$ with the entries of $a$, where the $i$th and $r - i$th
 > column is swapped for $1 \leq i \leq c/2$. Here $c$ is the number of columns
 > of$a$.
 """
-function invert_cols(a::MatrixElem)
+function reverse_cols(a::MatrixElem)
    b = deepcopy(a)
-   return invert_cols!(b)
+   return reverse_cols!(b)
 end
 
 ################################################################################
