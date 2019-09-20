@@ -510,6 +510,18 @@ function Base.hash(x::MPoly{T}, h::UInt) where {T <: RingElement}
    return b
 end
 
+# Fallback hash function for multivariate polynomials implemeting the
+# iterators
+function Base.hash(x::MPolyElem{T}, h::UInt) where {T <: RingElement}
+   b = 0x53dd43cd511044d1%UInt
+   for (e, c) in zip(exponent_vectors(x), coeffs(x))
+      b = xor(b, hash(c, h), h)
+      b = xor(b, hash(e, h), h)
+      b = (b << 1) | (b >> (sizeof(Int)*8 - 1))
+   end
+   return b
+end
+
 @doc Markdown.doc"""
     isdegree(s::Symbol)
 > Return `true` if the given symbol represents a degree ordering (deglex or
