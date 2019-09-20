@@ -18,7 +18,7 @@ export iscompatible, issubmodule, isisomorphic, rels
 """
 function zero(M::AbstractAlgebra.FPModule{T}) where T <: RingElement
    R = base_ring(M)
-   return M([zero(R) for i in 1:ngens(M)])
+   return M(T[zero(R) for i in 1:ngens(M)])
 end
 
 @doc Markdown.doc"""
@@ -224,7 +224,7 @@ function Base.intersect(M::AbstractAlgebra.FPModule{T}, N::AbstractAlgebra.FPMod
    # We flip the rows of K so the input to Submodule is upper triangular
    # and the columns so that they correspond to the original order before
    # flipping above
-   I = [M([K[nc - j + 1, rn - i + 1] for i in 1:r1]) for j in 1:nc]
+   I = [M(T[K[nc - j + 1, rn - i + 1] for i in 1:r1]) for j in 1:nc]
    return sub(M, I)
 end
 
