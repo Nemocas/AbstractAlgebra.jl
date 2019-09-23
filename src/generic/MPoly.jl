@@ -115,7 +115,7 @@ end
 function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where T <: RingElement
    new_base_ring = parent(g(zero(base_ring(p.parent))))
    new_polynomial_ring, gens_new_polynomial_ring = AbstractAlgebra.PolynomialRing(new_base_ring, [string(v) for v in symbols(p.parent)], ordering = ordering(p.parent))
-   
+
    return change_base_ring(p, g, new_polynomial_ring)
 end
 
@@ -4460,8 +4460,8 @@ end
 #
 ###############################################################################
 
-function rand_ordering()
-   i = rand(1:3)
+function rand_ordering(rng::AbstractRNG=Random.GLOBAL_RNG)
+   i = rand(rng, 1:3)
    if i == 1
       return :lex
    elseif i == 2
@@ -4471,7 +4471,7 @@ function rand_ordering()
    end
 end
 
-function rand(S::AbstractAlgebra.MPolyRing,
+function rand(rng::AbstractRNG, S::AbstractAlgebra.MPolyRing,
               term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
    f = S()
    g = gens(S)
@@ -4479,9 +4479,9 @@ function rand(S::AbstractAlgebra.MPolyRing,
    for i = 1:rand(term_range)
       term = S(1)
       for j = 1:length(g)
-         term *= g[j]^rand(exp_bound)
+         term *= g[j]^rand(rng, exp_bound)
       end
-      term *= rand(R, v...)
+      term *= rand(rng, R, v...)
       f += term
    end
    return f

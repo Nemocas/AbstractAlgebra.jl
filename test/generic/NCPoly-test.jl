@@ -96,6 +96,20 @@ function test_gen_ncpoly_manipulation()
    println("PASS")
 end
 
+function test_gen_ncpoly_rand()
+   print("Generic.NCPoly.rand...")
+
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
+
+   f = rand(S, 0:10, -10:10)
+   @test f isa Generic.NCPoly
+   f = rand(rng, S, 0:10, -10:10)
+   @test f isa Generic.NCPoly
+
+   println("PASS")
+end
+
 function test_gen_ncpoly_binary_ops()
    print("Generic.NCPoly.binary_ops...")
 
@@ -457,6 +471,7 @@ end
 
 function test_gen_ncpoly()
    test_gen_ncpoly_constructors()
+   test_gen_ncpoly_rand()
    test_gen_ncpoly_manipulation()
    test_gen_ncpoly_binary_ops()
    test_gen_ncpoly_adhoc_binary()

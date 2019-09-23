@@ -239,14 +239,36 @@ function test_gen_mat_manipulation()
    end
 
    M3 = MatrixAlgebra(R, 3)
-   m3 = rand(M3, 0:9, -9:9)
-   @test length(m3) == 9
-   @test !isempty(m3)
+   for m3 in [rand(M3, 0:9, -9:9),
+              rand(rng, M3, 0:9, -9:9),
+              randmat_triu(M3, 0:9, -9:9),
+              randmat_triu(rng, M3, 0:9, -9:9),
+              randmat_with_rank(M3, 2, 0:9, -9:9),
+              randmat_with_rank(rng, M3, 2, 0:9, -9:9)]
+      @test length(m3) == 9
+      @test !isempty(m3)
+      @test !iszero(m3)
+      @test m3 isa Generic.MatAlgElem
+      @test parent(m3) == M3
+   end
 
    M0 = MatrixAlgebra(R, 0)
    m0 = rand(M0, 0:9, -9, 9)
    @test length(m0) == 0
    @test isempty(m0)
+
+   M45 = MatrixSpace(R, 4, 5)
+   for m45 in [rand(M45, 0:9, -9:9),
+               rand(rng, M45, 0:9, -9:9),
+               randmat_triu(M45, 0:9, -9:9),
+               randmat_triu(rng, M45, 0:9, -9:9),
+               randmat_with_rank(M45, 3, 0:9, -9:9),
+               randmat_with_rank(rng, M45, 3, 0:9, -9:9)]
+      @test length(m45) == 20
+      @test !iszero(m45)
+      @test m45 isa Generic.MatSpaceElem
+      @test parent(m45) == M45
+   end
 
    println("PASS")
 end

@@ -33,6 +33,8 @@ import Base: Array, abs, acos, acosh, adjoint, asin, asinh, atan, atanh,
              typed_hvcat, typed_hcat, vcat, xor, zero, zeros, +, -, *, ==, ^,
              &, |, <<, >>, ~, <=, >=, <, >, //, /, !=
 
+using Random: Random, AbstractRNG
+
 export elem_type, parent_type
 
 export SetElem, GroupElem, NCRingElem, RingElem, ModuleElem, FieldElem, RingElement,
@@ -627,6 +629,14 @@ include("error.jl")
 ###############################################################################
 
 include("Groups.jl")
+
+###############################################################################
+#
+#   Load methods with the same implementation for different types
+#
+###############################################################################
+
+include("common.jl")
 
 ###############################################################################
 #

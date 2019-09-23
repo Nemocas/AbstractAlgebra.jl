@@ -10,7 +10,7 @@ function test_gfelem_constructors()
    @test elem_type(AbstractAlgebra.GFField{BigInt}) == AbstractAlgebra.gfelem{BigInt}
    @test parent_type(AbstractAlgebra.gfelem{Int}) == AbstractAlgebra.GFField{Int}
    @test parent_type(AbstractAlgebra.gfelem{BigInt}) == AbstractAlgebra.GFField{BigInt}
-   
+
    @test isa(R, AbstractAlgebra.GFField)
    @test isa(S, AbstractAlgebra.GFField)
 
@@ -79,6 +79,18 @@ function test_gfelem_manipulation()
 
    @test R === R1
    @test S === S1
+
+   println("PASS")
+end
+
+function test_gfelem_rand()
+   print("Julia.gfelem.rand...")
+
+   R = GF(13)
+   f = rand(R)
+   @test f isa AbstractAlgebra.gfelem
+   f = rand(rng, R)
+   @test f isa AbstractAlgebra.gfelem
 
    println("PASS")
 end
@@ -194,7 +206,7 @@ function test_gfelem_powering()
 
          a *= r
          b *= s
-      end   
+      end
    end
 
    for iter = 1:100
@@ -213,7 +225,7 @@ function test_gfelem_powering()
 
          a *= rinv
          b *= sinv
-      end   
+      end
    end
 
    println("PASS")
@@ -221,7 +233,7 @@ end
 
 function test_gfelem_comparison()
    print("Julia.gfelem.comparison...")
-  
+
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -246,7 +258,7 @@ end
 
 function test_gfelem_adhoc_comparison()
    print("Julia.gfelem.adhoc_comparison...")
-  
+
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -270,7 +282,7 @@ end
 
 function test_gfelem_inversion()
    print("Julia.gfelem.inversion...")
-  
+
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -290,7 +302,7 @@ end
 
 function test_gfelem_exact_division()
    print("Julia.gfelem.exact_division...")
-  
+
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -309,6 +321,7 @@ end
 
 function test_gfelem()
    test_gfelem_constructors()
+   test_gfelem_rand()
    test_gfelem_printing()
    test_gfelem_manipulation()
    test_gfelem_unary_ops()
@@ -319,6 +332,6 @@ function test_gfelem()
    test_gfelem_adhoc_comparison()
    test_gfelem_inversion()
    test_gfelem_exact_division()
-   
+
    println("")
 end

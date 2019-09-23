@@ -53,6 +53,18 @@ function test_gen_res_constructors()
    println("PASS")
 end
 
+function test_gen_res_rand()
+   print("Generic.Res.rand...")
+
+   R = Generic.ResidueRing(ZZ, 49)
+   f = rand(R, 1:9)
+   @test f isa Generic.Res
+   f = rand(rng, R, 1:9)
+   @test f isa Generic.Res
+
+   println("PASS")
+end
+
 function test_gen_res_manipulation()
    print("Generic.Res.manipulation...")
 
@@ -309,6 +321,7 @@ end
 
 function test_gen_res()
    test_gen_res_constructors()
+   test_gen_res_rand()
    test_gen_res_manipulation()
    test_gen_res_unary_ops()
    test_gen_res_binary_ops()

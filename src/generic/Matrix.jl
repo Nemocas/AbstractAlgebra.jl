@@ -4747,18 +4747,18 @@ end
 #
 ###############################################################################
 
-function rand(S::AbstractAlgebra.MatSpace, v...)
+function rand(rng::AbstractRNG, S::AbstractAlgebra.MatSpace, v...)
    M = S()
    R = base_ring(S)
    for i = 1:nrows(M)
       for j = 1:ncols(M)
-         M[i, j] = rand(R, v...)
+         M[i, j] = rand(rng, R, v...)
       end
    end
    return M
 end
 
-function randmat_triu(S::AbstractAlgebra.MatSpace, v...)
+function randmat_triu(rng::AbstractRNG, S::AbstractAlgebra.MatSpace, v...)
    M = S()
    R = base_ring(S)
    for i = 1:nrows(M)
@@ -4766,16 +4766,18 @@ function randmat_triu(S::AbstractAlgebra.MatSpace, v...)
          M[i, j] = R()
       end
       for j = i:ncols(M)
-         M[i, j] = rand(R, v...)
+         M[i, j] = rand(rng, R, v...)
       end
       while iszero(M[i, i])
-         M[i, i] = rand(R, v...)
+         M[i, i] = rand(rng, R, v...)
       end
    end
    return M
 end
 
-function randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: AbstractAlgebra.RingElement}
+randmat_triu(S::AbstractAlgebra.MatSpace, v...) = randmat_triu(Random.GLOBAL_RNG, S, v...)
+
+function randmat_with_rank(rng::AbstractRNG, S::Generic.MatSpace{T}, rank::Int, v...) where {T <: AbstractAlgebra.RingElement}
    if !isdomain_type(T) && !(T <: ResElem)
       error("Not implemented")
    end
@@ -4785,12 +4787,12 @@ function randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: 
       for j = 1:i - 1
          M[i, j] = R()
       end
-      M[i, i] = rand(R, v...)
+      M[i, i] = rand(rng, R, v...)
       while iszero(M[i, i])
-         M[i, i] = rand(R, v...)
+         M[i, i] = rand(rng, R, v...)
       end
       for j = i + 1:ncols(M)
-         M[i, j] = rand(R, v...)
+         M[i, j] = rand(rng, R, v...)
       end
    end
    for i = rank + 1:nrows(M)
@@ -4801,10 +4803,10 @@ function randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: 
    m = nrows(M)
    if m > 1
       for i = 1:4*m
-         r1 = rand(1:m)
-         r2 = rand(1:m - 1)
+         r1 = rand(rng, 1:m)
+         r2 = rand(rng, 1:m - 1)
          r2 = r2 >= r1 ? r2 + 1 : r2
-         d = rand(-5:5)
+         d = rand(rng, -5:5)
          for j = 1:ncols(M)
             M[r1, j] = M[r1, j] + d*M[r2, j]
          end
@@ -4812,6 +4814,9 @@ function randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: 
    end
    return M
 end
+
+randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: AbstractAlgebra.RingElement} =
+   randmat_with_rank(Random.GLOBAL_RNG, S, rank, v...)
 
 ###############################################################################
 #

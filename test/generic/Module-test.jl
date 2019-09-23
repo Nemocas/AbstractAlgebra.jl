@@ -32,6 +32,18 @@ function rand_homomorphism(M::AbstractAlgebra.FPModule{T}, vals...) where T <: R
    return S, hom1
 end
 
+function test_module_rand()
+   print("Generic.Module.rand...")
+
+   F = FreeModule(ZZ, 3)
+   f = rand(F, 1:9)
+   @test f isa Generic.free_module_elem
+   f = rand(rng, F, 1:9)
+   @test f isa Generic.free_module_elem
+
+   println("PASS")
+end
+
 function test_module_manipulation()
    print("Generic.Module.manipulation...")
 
@@ -80,7 +92,7 @@ function test_module_manipulation()
          flag, U = iscompatible(M, M)
          @test flag == true && U == M
 
-         flag, U = iscompatible(M1, Q) 
+         flag, U = iscompatible(M1, Q)
          @test flag == false
 
          flag, U = iscompatible(M2, Q)
@@ -181,7 +193,7 @@ function test_module_intersection()
          @test I1 == I6
       end
    end
-   
+
    println("PASS")
 end
 
@@ -217,7 +229,7 @@ function test_module_isisomorphic()
          @test isisomorphic(I, M1)
       end
    end
-     
+
    println("PASS")
 end
 
@@ -291,6 +303,7 @@ function test_module_coercions()
 end
 
 function test_module()
+   test_module_rand()
    test_module_manipulation()
    test_module_elem_getindex()
    test_module_intersection()

@@ -2557,12 +2557,12 @@ end
 #
 ###############################################################################
 
-function rand(S::AbstractAlgebra.PolyRing, deg_range::UnitRange{Int}, v...)
+function rand(rng::AbstractRNG, S::AbstractAlgebra.PolyRing, deg_range::UnitRange{Int}, v...)
    R = base_ring(S)
    f = S()
    x = gen(S)
-   for i = 0:rand(deg_range)
-      f += rand(R, v...)*x^i
+   for i = 0:rand(rng, deg_range)
+      f += rand(rng, R, v...)*x^i
    end
    return f
 end

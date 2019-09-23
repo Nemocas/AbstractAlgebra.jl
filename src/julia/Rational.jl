@@ -266,12 +266,12 @@ end
 #
 ###############################################################################
 
-function rand(R::Rationals{T}, n::UnitRange{Int}) where T <: Integer
+function rand(rng::AbstractRNG, R::Rationals{T}, n::UnitRange{Int}) where T <: Integer
    d = T(0)
    while d == 0
-      d = T(rand(n))
+      d = T(rand(rng, n))
    end
-   n = T(rand(n))
+   n = T(rand(rng, n))
    return R(n, d)
 end
 

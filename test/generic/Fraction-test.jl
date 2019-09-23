@@ -53,6 +53,19 @@ function test_gen_frac_constructors()
    println("PASS")
 end
 
+function test_gen_frac_rand()
+   print("Generic.Frac.rand...")
+
+   S, x = PolynomialRing(ZZ, "x")
+   K = FractionField(S)
+   f = rand(K, 0:3, -3:3)
+   @test f isa Generic.Frac
+   f = rand(rng, K, 0:3, -3:3)
+   @test f isa Generic.Frac
+
+   println("PASS")
+end
+
 function test_gen_frac_manipulation()
    print("Generic.Frac.manipulation...")
 
@@ -276,6 +289,7 @@ end
 
 function test_gen_frac()
    test_gen_frac_constructors()
+   test_gen_frac_rand()
    test_gen_frac_manipulation()
    test_gen_frac_unary_ops()
    test_gen_frac_binary_ops()

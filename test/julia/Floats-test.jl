@@ -36,6 +36,22 @@ function test_Floats_constructors()
    println("PASS")
 end
 
+function test_Floats_rand()
+   print("Julia.Floats.rand...")
+
+   R = RealField
+   f = rand(R, 1:9)
+   @test f isa elem_type(R)
+   f = rand(R, UnitRange{AbstractFloat}(1.0, 9.0))
+   @test f isa elem_type(R)
+   f = rand(rng, R, 1:9)
+   @test f isa elem_type(R)
+   f = rand(rng, R, UnitRange{AbstractFloat}(1.0, 9.0))
+   @test f isa elem_type(R)
+
+   println("PASS")
+end
+
 function test_Floats_manipulation()
    print("Julia.Floats.manipulation...")
 
@@ -123,6 +139,7 @@ end
 
 function test_Floats()
    test_Floats_constructors()
+   test_Floats_rand()
    test_Floats_manipulation()
    test_Floats_exact_division()
    test_Floats_divrem()

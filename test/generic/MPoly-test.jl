@@ -98,6 +98,27 @@ function test_gen_mpoly_geobuckets()
    println("PASS")
 end
 
+function test_gen_mpoly_rand()
+   print("Generic.MPoly.rand...")
+
+   R, x = ZZ["y"]
+   num_vars = 5
+   var_names = ["x$j" for j in 1:num_vars]
+
+   ord = rand_ordering()
+   @test ord in [:lex, :deglex, :degrevlex]
+   ord = rand_ordering(rng)
+   @test ord in [:lex, :deglex, :degrevlex]
+
+   S, varlist = PolynomialRing(R, var_names, ordering = ord)
+   f = rand(S, 0:5, 0:100, 0:0, -100:100)
+   @test f isa Generic.MPoly
+   f = rand(rng, S, 0:5, 0:100, 0:0, -100:100)
+   @test f isa Generic.MPoly
+
+   println("PASS")
+end
+
 function test_gen_mpoly_manipulation()
    print("Generic.MPoly.manipulation...")
 
@@ -196,7 +217,7 @@ function test_gen_mpoly_manipulation()
             @test max_degs[j] == degs[j] || (degs[j] == -1 && max_degs[j] == 0)
          else
             @test max_degs[j] == degs[num_vars - j + 1] ||
-                  (degs[num_vars - j + 1] == -1 && max_degs[j] == 0) 
+                  (degs[num_vars - j + 1] == -1 && max_degs[j] == 0)
          end
 
          @test max_degs[j] <= biggest
@@ -497,9 +518,9 @@ function test_gen_mpoly_euclidean_division()
          @test q3*f + r3 == g
          @test q3 == q4
          @test (r3 == 0 && flag == true && q5 == q3) || (r3 != 0 && flag == false)
-         
+
       end
-      
+
       S, varlist = PolynomialRing(QQ, var_names, ordering = ord)
       v = varlist[1+Int(round(rand() * (num_vars-1)))]
       @test divrem(v, 2*v) == (1//2, 0)
@@ -741,10 +762,10 @@ function test_gen_mpoly_evaluation()
          end
 
          f = rand(S, 0:5, 0:100, 0:0, -100:100)
-      
+
          f1 = evaluate(f, V, Vval)
          f2 = evaluate(f1, W, Wval)
-         
+
          r = evaluate(f, Vals)
 
          @test (length(f2) == 0 && r == 0) ||
@@ -993,7 +1014,7 @@ end
 
 function test_gen_mpoly_change_base_ring()
    print("Generic.MPoly.change_base_ring...")
-   
+
    F2 = ResidueRing(ZZ, 2)
    R, varsR = PolynomialRing(F2, ["x"])
    S, varsS = PolynomialRing(R, ["y"])
@@ -1157,7 +1178,7 @@ function test_gen_mpoly_to_univariate()
 
    for num_vars=1:10
       ord = rand_ordering()
-      
+
       var_names = ["x$j" for j in 1:num_vars]
 
       R, vars_R = PolynomialRing(ZZ, var_names; ordering=ord)
@@ -1218,11 +1239,11 @@ end
 
 function test_gen_mpoly_isless()
    print("Generic.MPoly.isless...")
-   
+
    n_mpolys = 100
    maxval = 10
    maxdeg = 20
-   
+
    # :deglex ordering
    R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x","y","z"], ordering=:lex)
    # Monomials of degree 2
@@ -1245,18 +1266,18 @@ function test_gen_mpoly_isless()
 
    # :deglex ordering
    R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x","y","z"], ordering=:deglex)
-   
+
    @test isless(z^2, y*z) == true
    @test isless(y*z, x*z) == true
    @test isless(y^2, x*z) == true
    @test isless(y^2, x*y) == true
    @test isless(x*y, x^2) == true
-   
+
    for n_vars=1:maxdeg
       A = reshape(map(Int,map(round, rand(n_vars * n_mpolys) * maxval)), (n_mpolys, n_vars))
       var_names = ["x$j" for j in 1:n_vars]
       R, varsR = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, var_names, ordering=:deglex)
-      
+
       for i in 1:size(A)[1]-1
          f = R([base_ring(R)(1)], [A[i,:]])
          g = R([base_ring(R)(1)], [A[i+1,:]])
@@ -1277,7 +1298,7 @@ function test_gen_mpoly_isless()
          end
       end
    end
-   
+
    # :degrevlex ordering
    R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x","y","z"], ordering=:degrevlex)
    # Monomials of degree 2
@@ -1321,7 +1342,7 @@ function test_gen_mpoly_lt()
       var_names = ["x$j" for j in 1:num_vars]
 
       R, vars_R = PolynomialRing(ZZ, var_names; ordering=ord)
-      
+
       f = rand(R, 5:10, 1:10, -100:100)
       g = rand(R, 5:10, 1:10, -100:100)
 
@@ -1421,6 +1442,7 @@ end
 function test_gen_mpoly()
    test_gen_mpoly_constructors()
    test_gen_mpoly_geobuckets()
+   test_gen_mpoly_rand()
    test_gen_mpoly_manipulation()
    test_gen_mpoly_multivariate_coeff()
    test_gen_mpoly_unary_ops()

@@ -54,6 +54,20 @@ function test_gen_res_field_constructors()
    println("PASS")
 end
 
+
+function test_gen_res_field_rand()
+   print("Generic.ResF.rand...")
+
+   R = Generic.ResidueField(ZZ, 16453889)
+   f = rand(R, 1:9)
+   @test f isa Generic.ResF
+   f = rand(rng, R, 1:9)
+   @test f isa Generic.ResF
+
+   println("PASS")
+end
+
+
 function test_gen_res_field_manipulation()
    print("Generic.ResF.manipulation...")
 
@@ -294,6 +308,7 @@ end
 
 function test_gen_res_field()
    test_gen_res_field_constructors()
+   test_gen_res_field_rand()
    test_gen_res_field_manipulation()
    test_gen_res_field_unary_ops()
    test_gen_res_field_binary_ops()

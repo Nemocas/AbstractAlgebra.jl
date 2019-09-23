@@ -10,7 +10,7 @@ function test_Integers_constructors()
    @test elem_type(AbstractAlgebra.Integers{BigInt}) == BigInt
    @test parent_type(Int) == AbstractAlgebra.Integers{Int}
    @test parent_type(BigInt) == AbstractAlgebra.Integers{BigInt}
-   
+
    @test isa(R, AbstractAlgebra.Integers)
    @test isa(S, AbstractAlgebra.Integers)
 
@@ -54,6 +54,18 @@ function test_Integers_manipulation()
    println("PASS")
 end
 
+function test_Integers_rand()
+   print("Julia.Integers.modular_arithmetic...")
+
+   R = ZZ
+   f = rand(R, 0:22)
+   @test f isa elem_type(R)
+   f = rand(rng, R, 0:22)
+   @test f isa elem_type(R)
+
+   println("PASS")
+end
+
 function test_Integers_modular_arithmetic()
    print("Julia.Integers.modular_arithmetic...")
 
@@ -75,7 +87,7 @@ function test_Integers_modular_arithmetic()
 
          a = mod(a*r, modR)
          b = mod(b*s, modS)
-      end   
+      end
    end
 
    println("PASS")
@@ -83,7 +95,7 @@ end
 
 function test_Integers_exact_division()
    print("Julia.Integers.exact_division...")
-  
+
    R = zz
    S = ZZ
 
@@ -98,7 +110,7 @@ function test_Integers_exact_division()
 
       if a1 != 0
          flagR, qR = divides(a1*a2, a1)
-      
+
          @test flagR
          @test qR == a2
       end
@@ -108,7 +120,7 @@ function test_Integers_exact_division()
 
          @test flagS
          @test qS == b2
-      end   
+      end
    end
 
    println("PASS")
@@ -116,7 +128,7 @@ end
 
 function test_Integers_gcd()
    print("Julia.Integers.gcd...")
-  
+
    R = zz
    S = ZZ
 
@@ -143,7 +155,7 @@ end
 
 function test_Integers_square_root()
    print("Julia.Integers.square_root...")
-  
+
    R = zz
    S = ZZ
 
@@ -163,11 +175,12 @@ end
 
 function test_Integers()
    test_Integers_constructors()
+   test_Integers_rand()
    test_Integers_manipulation()
    test_Integers_modular_arithmetic()
    test_Integers_exact_division()
    test_Integers_gcd()
    test_Integers_square_root()
-   
+
    println("")
 end

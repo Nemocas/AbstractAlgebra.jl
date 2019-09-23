@@ -86,6 +86,18 @@ function test_gen_poly_constructors()
    println("PASS")
 end
 
+function test_gen_poly_rand()
+   print("Generic.Poly.rand...")
+
+   R, x = PolynomialRing(ZZ, "x")
+   f = rand(R, 0:10, -10:10)
+   @test f isa Generic.Poly
+   f = rand(rng, R, 0:10, -10:10)
+   @test f isa Generic.Poly
+
+   println("PASS")
+end
+
 function test_gen_poly_manipulation()
    print("Generic.Poly.manipulation...")
 
@@ -2095,7 +2107,7 @@ function test_gen_poly_gcdx()
 
       @test (u*f + v*g)*h == r
    end
-   
+
    println("PASS")
 end
 
@@ -2669,6 +2681,7 @@ end
 
 function test_gen_poly()
    test_gen_poly_constructors()
+   test_gen_poly_rand()
    test_gen_poly_manipulation()
    test_gen_poly_binary_ops()
    test_gen_poly_adhoc_binary()
