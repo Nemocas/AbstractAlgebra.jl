@@ -1641,6 +1641,34 @@ function test_gen_mat_concat()
       @test vcat(transpose(M1), transpose(M2)) == transpose(hcat(M1, M2))
    end
 
+   A = matrix(R, 2, 2, [1, 2, 3, 4])
+   B = matrix(R, 4, 2, [1, 2, 3, 4, 0, 1, 0, 1])
+   C = matrix(R, 4, 1, [0, 1, 0, 2])
+   D = matrix(R, 2, 3, [1, 2, 3, 4, 5, 6])
+
+   @test hcat(B, C) == matrix(R, [1 2 0;
+                                  3 4 1;
+                                  0 1 0;
+                                  0 1 2;])
+   @test hcat(B, C) == [B C]
+   @test hcat([B, C]) == [B C]
+
+   @test vcat(A, B) == matrix(R, [1 2;
+                                  3 4;
+                                  1 2;
+                                  3 4;
+                                  0 1;
+                                  0 1;])
+
+   @test vcat(A, B) == [A; B]
+   @test vcat(A, B) == vcat([A, B])
+
+   @test [A D; B B C] == matrix(R, [1 2 1 2 3;
+                                    3 4 4 5 6;
+                                    1 2 1 2 0;
+                                    3 4 3 4 1;
+                                    0 1 0 1 0;
+                                    0 1 0 1 2;])
    println("PASS")
 end
 

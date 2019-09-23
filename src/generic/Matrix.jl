@@ -4764,6 +4764,139 @@ function vcat(a::AbstractAlgebra.MatElem, b::AbstractAlgebra.MatElem)
    return c
 end
 
+@doc Markdown.doc"""
+    vcat(A::Vector{<: MatrixElem}) -> MatrixElem
+> Return the horizontal concatenation of the matrices in $A$.
+> All component matrices need to have the same base ring and number of columns.
+"""
+function vcat(A::Vector{<: MatrixElem})
+  return _vcat(A)
+end
+
+function Base.vcat(A::MatrixElem...)
+  return _vcat(A)
+end
+
+function _vcat(A)
+  if length(A) == 0
+    error("Number of matrices to concatenate must be positive")
+  end
+
+  if any(x -> ncols(x) != ncols(A[1]), A)
+    error("Matrices must have the same number of columns")
+  end
+  
+  if any(x -> base_ring(x) != base_ring(A[1]), A)
+    error("Matrices must have the same base ring")
+  end
+
+  M = similar(A[1], sum(nrows, A), ncols(A[1]))
+  s = 0
+  for N in A
+    for j in 1:nrows(N)
+      for k in 1:ncols(N)
+        M[s+j, k] = N[j,k]
+      end
+    end
+    s += nrows(N)
+  end
+  return M
+end
+
+@doc Markdown.doc"""
+    hcat(A::Vector{<: MatrixElem}) -> MatrixElem
+> Return the horizontal concatenating of the matrices in $A$.
+> All component matrices need to have the same base ring and number of rows.
+"""
+function hcat(A::Vector{<: MatrixElem})
+  return _hcat(A)
+end
+
+function _hcat(A)
+  if length(A) == 0
+    error("Number of matrices to concatenate must be positive")
+  end
+  
+  if any(x -> nrows(x) != nrows(A[1]), A)
+    error("Matrices must have the same number of rows")
+  end
+  
+  if any(x -> base_ring(x) != base_ring(A[1]), A)
+    error("Matrices must have the same base ring")
+  end
+
+  M = similar(A[1], nrows(A[1]), sum(ncols, A))
+  s = 0
+  for N in A
+    for j in 1:ncols(N)
+      for k in 1:nrows(N)
+        M[k, s + j] = N[k, j]
+      end
+    end
+    s += ncols(N)
+  end
+  return M
+end
+
+function Base.hcat(A::MatrixElem...)
+  return _hcat(A)
+end
+
+function Base.cat(A::MatrixElem...;dims) 
+  @assert dims == (1,2) || isa(dims, Int)
+
+  if isa(dims, Int) 
+    if dims == 1
+      return hcat(A...)
+    elseif dims == 2
+      return vcat(A...)
+    else
+      error("dims must be 1, 2, or (1,2)")
+    end
+  end
+
+  local X
+  for i in 1:length(A)
+    if i == 1
+      X = hcat(A[1], zero(A[1], nrows(A[1]), sum(Int[ncols(A[j]) for j=2:length(A)])))
+    else
+      X = vcat(X, hcat(zero(A[1], nrows(A[i]), sum(ncols(A[j]) for j=1:i-1)), A[i], zero(A[1], nrows(A[i]), sum(Int[ncols(A[j]) for j in (i+1):length(A)]))))
+    end
+  end
+  return X
+end
+
+function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatrixElem...)
+  nr = 0
+  k = 1
+  for i in 1:length(rows)
+    nr += nrows(A[k])
+    k += rows[i]
+  end
+
+  nc = sum(ncols(A[i]) for i in 1:rows[1])
+
+  M = similar(A[1], nr, nc)
+  mat_offset = 0
+  row_offset = 0
+  for j in 1:length(rows)
+    s = 0
+    for i in 1:rows[j]
+      N = A[mat_offset + i]
+      for l in 1:ncols(N)
+        for k in 1:nrows(N)
+          M[row_offset + k, s + l] = N[k, l]
+        end
+      end
+      s += ncols(N)
+    end
+    row_offset += nrows(A[1+ mat_offset])
+    mat_offset += rows[j]
+  end
+
+  return M
+end
+
 ###############################################################################
 #
 #   Random generation
