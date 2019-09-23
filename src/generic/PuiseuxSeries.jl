@@ -593,14 +593,14 @@ end
 #
 ###############################################################################
 
-function rand(S::PuiseuxSeriesRing, val_range::UnitRange{Int}, scale_range::UnitRange{Int}, v...)
+function rand(rng::AbstractRNG, S::PuiseuxSeriesRing, val_range::UnitRange{Int}, scale_range::UnitRange{Int}, v...)
    (first(scale_range) <= 0 || last(scale_range) <= 0) && error("Scale must be positive")
-   return S(rand(laurent_ring(S), val_range, v...), rand(scale_range))
+   return S(rand(rng, laurent_ring(S), val_range, v...), rand(rng, scale_range))
 end
 
-function rand(S::PuiseuxSeriesField, val_range::UnitRange{Int}, scale_range::UnitRange{Int}, v...)
+function rand(rng::AbstractRNG, S::PuiseuxSeriesField, val_range::UnitRange{Int}, scale_range::UnitRange{Int}, v...)
    (first(scale_range) <= 0 || last(scale_range) <= 0) && error("Scale must be positive")
-   return S(rand(laurent_ring(S), val_range, v...), rand(scale_range))
+   return S(rand(rng, laurent_ring(S), val_range, v...), rand(rng, scale_range))
 end
 
 ###############################################################################

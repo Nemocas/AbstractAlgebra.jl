@@ -13,7 +13,7 @@ function test_Rationals_constructors()
    @test elem_type(AbstractAlgebra.Rationals{BigInt}) == Rational{BigInt}
    @test parent_type(Rational{Int}) == AbstractAlgebra.Rationals{Int}
    @test parent_type(Rational{BigInt}) == AbstractAlgebra.Rationals{BigInt}
-   
+
    @test isa(R, AbstractAlgebra.Rationals)
    @test isa(S, AbstractAlgebra.Rationals)
 
@@ -35,6 +35,18 @@ function test_Rationals_constructors()
 
    @test isa(R(a), Rational{Int})
    @test isa(S(b), Rational{BigInt})
+
+   println("PASS")
+end
+
+function test_Rationals_rand()
+   print("Julia.Rationals.rand...")
+
+   R = QQ
+   f = rand(R, 1:9)
+   @test f isa elem_type(R)
+   f = rand(rng, R, 1:9)
+   @test f isa elem_type(R)
 
    println("PASS")
 end
@@ -61,7 +73,7 @@ end
 
 function test_Rationals_exact_division()
    print("Julia.Rationals.exact_division...")
-  
+
    R = qq
    S = QQ
 
@@ -78,7 +90,7 @@ function test_Rationals_exact_division()
 
       if a1 != 0
          flagR, qR = divides(a2, a1)
-      
+
          @test flagR
          @test qR*a1 == a2
       end
@@ -88,7 +100,7 @@ function test_Rationals_exact_division()
 
          @test flagS
          @test qS*b1 == b2
-      end   
+      end
 
       @test c1 == 0 || divexact(a1, c1)*c1 == a1
       @test c2 == 0 || divexact(b1, c2)*c2 == b1
@@ -102,7 +114,7 @@ end
 
 function test_Rationals_gcd()
    print("Julia.Rationals.gcd...")
-  
+
    R = qq
    S = QQ
 
@@ -123,14 +135,14 @@ end
 
 function test_Rationals_square_root()
    print("Julia.Rationals.square_root...")
-  
+
    R = qq
    S = QQ
 
    for iter = 1:1000
       r = rand(R, -100:100)
       s = rand(R, -100:100)
-      
+
       f = r^2
       g = s^2
 
@@ -143,7 +155,7 @@ end
 
 function test_Rationals_divrem()
    print("Julia.Rationals.divrem...")
-  
+
    R = qq
    S = QQ
 
@@ -153,7 +165,7 @@ function test_Rationals_divrem()
       while iszero(s)
          s = rand(R, -100:100)
       end
-      
+
       @test AbstractAlgebra.divrem(r,s) == (r/s,0)
    end
 
@@ -162,11 +174,12 @@ end
 
 function test_Rationals()
    test_Rationals_constructors()
+   test_Rationals_rand()
    test_Rationals_manipulation()
    test_Rationals_exact_division()
    test_Rationals_gcd()
    test_Rationals_square_root()
    test_Rationals_divrem()
-   
+
    println("")
 end

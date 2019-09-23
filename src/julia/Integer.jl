@@ -171,9 +171,9 @@ end
 function sqrt(a::T) where T <: Integer
    s = isqrt(a)
    s*s != a && error("Not a square in sqrt")
-   return s 
+   return s
 end
- 
+
 ###############################################################################
 #
 #   Exponential
@@ -189,7 +189,7 @@ function exp(a::T) where T <: Integer
     a != 0 && throw(DomainError())
     return T(1)
  end
- 
+
 ###############################################################################
 #
 #   Coprime bases
@@ -284,8 +284,8 @@ end
 #
 ###############################################################################
 
-function rand(R::Integers, n::UnitRange{Int})
-   return R(rand(n))
+function rand(rng::AbstractRNG, R::Integers, n::UnitRange{Int})
+   return R(rand(rng, n))
 end
 
 ###############################################################################

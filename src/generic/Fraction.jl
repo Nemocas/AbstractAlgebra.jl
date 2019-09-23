@@ -944,12 +944,12 @@ end
 #
 ###############################################################################
 
-function rand(S::AbstractAlgebra.FracField{T}, v...) where {T <: RingElem}
+function rand(rng::AbstractRNG, S::AbstractAlgebra.FracField{T}, v...) where {T <: RingElem}
    R = base_ring(S)
-   n = rand(R, v...)
+   n = rand(rng, R, v...)
    d = R()
    while iszero(d)
-      d = rand(R, v...)
+      d = rand(rng, R, v...)
    end
    return S(n, d)
 end

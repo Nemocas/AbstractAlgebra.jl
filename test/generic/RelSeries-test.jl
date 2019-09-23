@@ -84,6 +84,18 @@ function test_rel_series_constructors()
    println("PASS")
 end
 
+function test_rel_series_rand()
+   print("Generic.RelSeries.rand...")
+
+   R, x = PowerSeriesRing(ZZ, 10, "x")
+   f = rand(R, 0:12, -10:10)
+   @test f isa Generic.RelSeries
+   f = rand(rng, R, 0:12, -10:10)
+   @test f isa Generic.RelSeries
+
+   println("PASS")
+end
+
 function test_rel_series_manipulation()
    print("Generic.RelSeries.manipulation...")
 
@@ -613,7 +625,7 @@ end
 
 function test_rel_series_inversion()
     print("Generic.RelSeries.inversion...")
- 
+
     # Exact ring
     R, x = PowerSeriesRing(ZZ, 10, "x")
     for iter = 1:300
@@ -621,10 +633,10 @@ function test_rel_series_inversion()
        while !isunit(f)
           f = rand(R, 0:0, -10:10)
        end
- 
+
        @test f*inv(f) == 1
     end
- 
+
     # Inexact field
     R, x = PowerSeriesRing(RealField, 10, "x")
     for iter = 1:300
@@ -632,10 +644,10 @@ function test_rel_series_inversion()
        while coeff(f, 0) == 0
           f = rand(R, 0:0, -1:1)
        end
- 
+
        @test isapprox(f*inv(f), R(1))
     end
- 
+
     # Non-integral domain
     T = ResidueRing(ZZ, 6)
     R, x = PowerSeriesRing(T, 10, "x")
@@ -644,37 +656,37 @@ function test_rel_series_inversion()
        while !isunit(f)
           f = rand(R, 0:0, 0:5)
        end
- 
+
        @test f*inv(f) == 1
     end
- 
+
     println("PASS")
  end
- 
+
 function test_rel_series_square_root()
     print("Generic.RelSeries.square_root...")
- 
+
     # Exact ring
     R, x = PowerSeriesRing(ZZ, 10, "x")
     for iter = 1:300
        f = rand(R, 0:10, -10:10)
        g = f^2
 
-       @test isequal(sqrt(g)^2, g) 
+       @test isequal(sqrt(g)^2, g)
     end
- 
+
     # Inexact field
     R, x = PowerSeriesRing(RealField, 10, "x")
     for iter = 1:300
        f = rand(R, 0:10, -1:1)
        g = f^2
- 
+
        @test isapprox(sqrt(g)^2, g)
     end
- 
+
     println("PASS")
 end
- 
+
 function test_rel_series_exact_division()
    print("Generic.RelSeries.exact_division...")
 
@@ -842,6 +854,7 @@ end
 
 function test_gen_rel_series()
    test_rel_series_constructors()
+   test_rel_series_rand()
    test_rel_series_manipulation()
    test_rel_series_unary_ops()
    test_rel_series_binary_ops()

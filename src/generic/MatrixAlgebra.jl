@@ -318,19 +318,19 @@ end
 #
 ###############################################################################
 
-function rand(S::AbstractAlgebra.MatAlgebra, v...)
+function rand(rng::AbstractRNG, S::AbstractAlgebra.MatAlgebra, v...)
    M = S()
    n = degree(M)
    R = base_ring(S)
    for i = 1:n
       for j = 1:n
-         M[i, j] = rand(R, v...)
+         M[i, j] = rand(rng, R, v...)
       end
    end
    return M
 end
 
-function randmat_triu(S::AbstractAlgebra.MatAlgebra, v...)
+function randmat_triu(rng::AbstractRNG, S::AbstractAlgebra.MatAlgebra, v...)
    M = S()
    n = degree(M)
    R = base_ring(S)
@@ -339,16 +339,18 @@ function randmat_triu(S::AbstractAlgebra.MatAlgebra, v...)
          M[i, j] = R()
       end
       for j = i:n
-         M[i, j] = rand(R, v...)
+         M[i, j] = rand(rng, R, v...)
       end
       while iszero(M[i, i])
-         M[i, i] = rand(R, v...)
+         M[i, i] = rand(rng, R, v...)
       end
    end
    return M
 end
 
-function randmat_with_rank(S::Generic.MatAlgebra{T}, rank::Int, v...) where {T <: AbstractAlgebra.RingElement}
+randmat_triu(S::AbstractAlgebra.MatAlgebra, v...) = randmat_triu(Random.GLOBAL_RNG, S, v...)
+
+function randmat_with_rank(rng::AbstractRNG, S::Generic.MatAlgebra{T}, rank::Int, v...) where {T <: AbstractAlgebra.RingElement}
    M = S()
    n = degree(M)
    R = base_ring(S)
@@ -356,12 +358,12 @@ function randmat_with_rank(S::Generic.MatAlgebra{T}, rank::Int, v...) where {T <
       for j = 1:i - 1
          M[i, j] = R()
       end
-      M[i, i] = rand(R, v...)
+      M[i, i] = rand(rng, R, v...)
       while iszero(M[i, i])
-         M[i, i] = rand(R, v...)
+         M[i, i] = rand(rng, R, v...)
       end
       for j = i + 1:n
-         M[i, j] = rand(R, v...)
+         M[i, j] = rand(rng, R, v...)
       end
    end
    for i = rank + 1:n
@@ -371,10 +373,10 @@ function randmat_with_rank(S::Generic.MatAlgebra{T}, rank::Int, v...) where {T <
    end
    if n > 1
       for i = 1:4*n
-         r1 = rand(1:n)
-         r2 = rand(1:n - 1)
+         r1 = rand(rng, 1:n)
+         r2 = rand(rng, 1:n - 1)
          r2 = r2 >= r1 ? r2 + 1 : r2
-         d = rand(-5:5)
+         d = rand(rng, -5:5)
          for j = 1:n
             M[r1, j] = M[r1, j] + d*M[r2, j]
          end
@@ -382,6 +384,9 @@ function randmat_with_rank(S::Generic.MatAlgebra{T}, rank::Int, v...) where {T <
    end
    return M
 end
+
+randmat_with_rank(S::Generic.MatAlgebra{T}, rank::Int, v...) where {T <: AbstractAlgebra.RingElement} =
+   randmat_with_rank(Random.GLOBAL_RNG, S, rank, v...)
 
 ###############################################################################
 #

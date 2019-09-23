@@ -95,6 +95,24 @@ function test_puiseux_series_constructors()
    println("PASS")
 end
 
+function test_puiseux_series_rand()
+   print("Generic.PuiseuxSeries.rand...")
+
+   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   f = rand(R, -12:12, 1:6, -10:10)
+   @test f isa Generic.PuiseuxSeriesRingElem
+   f = rand(rng, R, -12:12, 1:6, -10:10)
+   @test f isa Generic.PuiseuxSeriesRingElem
+
+   R, x = PuiseuxSeriesField(RealField, 10, "x")
+   f = rand(R, -12:12, 1:6, -1:1)
+   @test f isa Generic.PuiseuxSeriesFieldElem
+   f = rand(rng, R, -12:12, 1:6, -1:1)
+   @test f isa Generic.PuiseuxSeriesFieldElem
+
+   println("PASS")
+end
+
 function test_puiseux_series_manipulation()
    print("Generic.PuiseuxSeries.manipulation...")
 
@@ -572,28 +590,28 @@ end
 
 function test_puiseux_series_square_root()
    print("Generic.PuiseuxSeries.square_root...")
- 
+
    # Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -10:10)
       g = f^2
- 
+
       @test isequal(sqrt(g)^2, g)
    end
- 
+
    # Inexact field
    R, x = PuiseuxSeriesField(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -1:1)
       g = f^2
- 
+
       @test isapprox(sqrt(g)^2, g)
    end
- 
+
    println("PASS")
 end
- 
+
 function test_puiseux_series_exact_division()
    print("Generic.PuiseuxSeries.exact_division...")
 
@@ -751,6 +769,7 @@ end
 
 function test_gen_puiseux_series()
    test_puiseux_series_constructors()
+   test_puiseux_series_rand()
    test_puiseux_series_manipulation()
    test_puiseux_series_unary_ops()
    test_puiseux_series_binary_ops()

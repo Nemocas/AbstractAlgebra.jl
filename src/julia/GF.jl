@@ -351,11 +351,13 @@ end
 #
 ###############################################################################
 
-function rand(R::GFField{T}) where T <: Integer
+function rand(rng::AbstractRNG, R::GFField{T}) where T <: Integer
    p = R.p::T
-   d = rand(0:p - 1)
+   d = rand(rng, 0:p - 1)
    return gfelem{T}(d, R)
 end
+
+rand(x::GFField) = rand(Random.GLOBAL_RNG, x)
 
 ###############################################################################
 #

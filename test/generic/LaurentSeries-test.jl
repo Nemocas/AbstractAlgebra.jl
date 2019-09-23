@@ -103,6 +103,24 @@ function test_laurent_series_constructors()
    println("PASS")
 end
 
+function test_laurent_series_rand()
+   print("Generic.LaurentSeries.rand...")
+
+   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   f = rand(R, -12:12, -10:10)
+   @test f isa Generic.LaurentSeriesRingElem
+   f = rand(rng, R, -12:12, -10:10)
+   @test f isa Generic.LaurentSeriesRingElem
+
+   R, x = LaurentSeriesField(RealField, 10, "x")
+   f = rand(R, -12:12, -1:1)
+   @test f isa Generic.LaurentSeriesFieldElem
+   f = rand(rng, R, -12:12, -1:1)
+   @test f isa Generic.LaurentSeriesFieldElem
+
+   println("PASS")
+end
+
 function test_laurent_series_manipulation()
    print("Generic.LaurentSeries.manipulation...")
 
@@ -887,6 +905,7 @@ end
 
 function test_gen_laurent_series()
    test_laurent_series_constructors()
+   test_laurent_series_rand()
    test_laurent_series_manipulation()
    test_laurent_series_unary_ops()
    test_laurent_series_binary_ops()
