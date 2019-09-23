@@ -90,7 +90,7 @@ isunit(a::AbstractAlgebra.MatAlgElem{T}) where T <: FieldElement = rank(a) == de
 
 ###############################################################################
 #
-#   Similar and eye
+#   Similar and zero
 #
 ###############################################################################
 
@@ -102,7 +102,7 @@ isunit(a::AbstractAlgebra.MatAlgElem{T}) where T <: FieldElement = rank(a) == de
     similar(x::MatAlgElem, R::Ring, n::Int)
     similar(x::MatAlgElem, n::Int)
 
-> Create a matrix over the given ring and dimensions,
+> Create an uninitialized matrix over the given ring and dimensions,
 > with defaults based upon the given source matrix `x`.
 """
 similar(x::AbstractAlgebra.MatAlgElem, R::Ring, n::Int) = _similar(x, R, n, n)
@@ -117,6 +117,19 @@ function similar(x::AbstractAlgebra.MatAlgElem{T}, R::Ring, m::Int, n::Int) wher
 end
 
 similar(x::AbstractAlgebra.MatAlgElem, m::Int, n::Int) = similar(x, base_ring(x), m, n)
+
+@doc Markdown.doc"""
+    zero(x::Generic.MatrixElem, R::Ring=base_ring(x))
+    zero(x::Generic.MatrixElem, R::Ring, r::Int, c::Int)
+    zero(x::Generic.MatrixElem, r::Int, c::Int)
+    zero(x::MatAlgElem, R::Ring, n::Int)
+    zero(x::MatAlgElem, n::Int)
+
+> Create a zero matrix over the given ring and dimensions,
+> with defaults based upon the given source matrix `x`.
+"""
+zero(x::AbstractAlgebra.MatAlgElem, R::Ring, n::Int) = zero!(similar(x, R, n))
+zero(x::AbstractAlgebra.MatAlgElem, n::Int) = zero!(similar(x, n))
 
 ################################################################################
 #
