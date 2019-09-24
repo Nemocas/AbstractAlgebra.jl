@@ -4765,14 +4765,10 @@ function vcat(a::AbstractAlgebra.MatElem, b::AbstractAlgebra.MatElem)
 end
 
 @doc Markdown.doc"""
-    vcat(A::Vector{<: MatrixElem}) -> MatrixElem
-> Return the horizontal concatenation of the matrices in $A$.
+    vcat(A::MatrixElem...) -> MatrixElem
+> Return the horizontal concatenation of the matrices $A$.
 > All component matrices need to have the same base ring and number of columns.
 """
-function vcat(A::Vector{<: MatrixElem})
-  return _vcat(A)
-end
-
 function Base.vcat(A::MatrixElem...)
   return _vcat(A)
 end
@@ -4785,7 +4781,7 @@ function _vcat(A)
   if any(x -> ncols(x) != ncols(A[1]), A)
     error("Matrices must have the same number of columns")
   end
-  
+
   if any(x -> base_ring(x) != base_ring(A[1]), A)
     error("Matrices must have the same base ring")
   end
@@ -4804,11 +4800,11 @@ function _vcat(A)
 end
 
 @doc Markdown.doc"""
-    hcat(A::Vector{<: MatrixElem}) -> MatrixElem
-> Return the horizontal concatenating of the matrices in $A$.
+    hcat(A::MatrixElem...) -> MatrixElem
+> Return the horizontal concatenating of the matrices $A$.
 > All component matrices need to have the same base ring and number of rows.
 """
-function hcat(A::Vector{<: MatrixElem})
+function Base.hcat(A::MatrixElem...)
   return _hcat(A)
 end
 
@@ -4816,11 +4812,11 @@ function _hcat(A)
   if length(A) == 0
     error("Number of matrices to concatenate must be positive")
   end
-  
+
   if any(x -> nrows(x) != nrows(A[1]), A)
     error("Matrices must have the same number of rows")
   end
-  
+
   if any(x -> base_ring(x) != base_ring(A[1]), A)
     error("Matrices must have the same base ring")
   end
@@ -4838,14 +4834,10 @@ function _hcat(A)
   return M
 end
 
-function Base.hcat(A::MatrixElem...)
-  return _hcat(A)
-end
-
-function Base.cat(A::MatrixElem...;dims) 
+function Base.cat(A::MatrixElem...;dims)
   @assert dims == (1,2) || isa(dims, Int)
 
-  if isa(dims, Int) 
+  if isa(dims, Int)
     if dims == 1
       return hcat(A...)
     elseif dims == 2
