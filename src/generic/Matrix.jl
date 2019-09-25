@@ -355,7 +355,7 @@ end
 @doc Markdown.doc"""
     sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
 > Return a copy of the submatrix of $M$ from $(r1, c1)$ to $(r2, c2)$ inclusive. Note
-> that is the copy is modified, the original matrix is not.
+> that if the copy is modified, the original matrix is not.
 """
 function sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
   return sub(M, r1:r2, c1:c2)
