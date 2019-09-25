@@ -5157,17 +5157,13 @@ function MatrixSpace(R::AbstractAlgebra.Ring, r::Int, c::Int, cached::Bool = tru
 end
 
 @doc Markdown.doc"""
-    change_base_ring(M::AbstractAlgebra.MatElem, R::AbstractAlgebra.Ring)
+    change_base_ring(M::Generic.MatrixElem, R::AbstractAlgebra.Ring)
 > Return the matrix obtained by coercing each entry into `R`.
 """
-function change_base_ring(M::AbstractAlgebra.MatElem, R::AbstractAlgebra.Ring)
-   r = nrows(M)
-   c = ncols(M)
-   N = zero_matrix(R, r, c)
-   for i in 1:r
-      for j in 1:c
-         N[i,j] = R(M[i,j])
-      end
+function change_base_ring(M::MatrixElem, R::AbstractAlgebra.Ring)
+   N = similar(M, R)
+   for i=1:nrows(M), j=1:ncols(M)
+      N[i,j] = R(M[i,j])
    end
    return N
 end
