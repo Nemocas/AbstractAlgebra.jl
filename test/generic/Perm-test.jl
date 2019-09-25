@@ -36,6 +36,9 @@ function test_perm_constructors(types)
       @test parent(b) == G
 
       @test rand(G) isa Generic.perm{T}
+      @test rand(G, 3) isa Vector{Generic.perm{T}}
+      @test rand(rng, G) isa Generic.perm{T}
+      @test rand(rng, G, 2,3) isa Matrix{Generic.perm{T}}
       g = rand(G)
       @test parent(g) == G
       @test parent(g) == PermutationGroup(T(10))

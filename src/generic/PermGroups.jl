@@ -734,10 +734,10 @@ function emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
 end
 
 @doc Markdown.doc"""
-    rand(G::PermGroup{T}) where {T}
+    rand([rng=GLOBAL_RNG,] G::PermGroup{T}) where {T}
 > Return a random permutation from `G`.
 """
-rand(G::PermGroup{T}) where {T} = perm(randperm!(Vector{T}(undef, G.n)), false)
+rand(rng::AbstractRNG, rs::Random.SamplerTrivial{PermGroup{T}}) where {T} = perm(randperm!(rng, Vector{T}(undef, rs[].n)), false)
 
 ###############################################################################
 #
