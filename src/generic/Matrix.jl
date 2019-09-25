@@ -5018,7 +5018,7 @@ end
 function (a::MatSpace{T})(b::Array{T, 2}) where T <: RingElement
    R = base_ring(a)
    _check_dim(a.nrows, a.ncols, b)
-   if (a.nrows != 0 || a.ncols != 0)
+   if !isempty(b)
       R != parent(b[1, 1]) && error("Unable to coerce matrix")
    end
    z = MatSpaceElem{T}(b)
