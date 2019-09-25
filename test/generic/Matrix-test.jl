@@ -2071,6 +2071,43 @@ function test_gen_mat_change_base_ring()
    println("PASS")
 end
 
+function test_gen_mat_map()
+   print("Generic.Mat.map...")
+
+   u, v = rand(0:9, 2)
+   for (mat, algebra) = ((rand(1:9, u, v), false),
+                         (rand(1:9, u, u), true))
+      for R = [QQ, ZZ, GF(2), GF(7), PolynomialRing(GF(5), 'x')[1]]
+         M = algebra ? MatrixAlgebra(R, u) : MatrixSpace(R, u, v)
+         m0 = M(mat)
+         for f0 = (x -> x+1, x -> x*2, x -> one(R), x -> zero(R))
+            for f = (f0, map_from_func(R, R, f0))
+               m = deepcopy(m0)
+               n0 = similar(m)
+               n = map!(f, n0, m)
+               @test n === n0 # map! must return its argument
+               @test n == M(map(f isa Function ? f : f.image_fn, mat))
+            end
+         end
+      end
+      m0 = algebra ? MatrixAlgebra(ZZ, u)(mat) : MatrixSpace(ZZ, u, v)(mat)
+      m = deepcopy(m0)
+      for S = [QQ, ZZ, GF(2), GF(7), PolynomialRing(GF(5), 'x')[1]]
+         for f0 = (x -> S(x), x -> S(x+1))
+            for f = (f0, map_from_func(ZZ, S, f0))
+               n = map(f, m)
+               @test n !== m
+               @test m == m0 # map's input must not be mutated
+               M = algebra ? MatrixAlgebra(S, u) : MatrixSpace(S, u, v)
+               @test n == M(map(f isa Function ? f : f.image_fn, mat))
+               @test n isa (algebra ? MatAlgElem : MatElem)
+            end
+         end
+      end
+   end
+   println("PASS")
+end
+
 function test_gen_mat_similar_zero()
    print("Generic.Mat.similar/zero...")
    for sim_zero in (similar, zero)
@@ -2166,6 +2203,7 @@ function test_gen_mat()
    test_gen_mat_minors()
    test_gen_mat_views()
    test_gen_mat_change_base_ring()
+   test_gen_mat_map()
    test_gen_mat_similar_zero()
 
    println("")

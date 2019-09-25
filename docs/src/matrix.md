@@ -228,6 +228,14 @@ isempty(::MatElem)
 change_base_ring(::AbstractAlgebra.MatElem, ::AbstractAlgebra.Ring)
 ```
 
+```@docs
+Base.map!(f, ::Generic.MatrixElem, ::Generic.MatrixElem)
+```
+
+```@docs
+Base.map(f, ::Generic.MatrixElem)
+```
+
 **Examples**
 
 ```jldoctest
