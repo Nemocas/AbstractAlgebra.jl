@@ -5022,13 +5022,11 @@ function (a::MatSpace{T})(b::Mat{T}) where {T <: RingElement}
    return b
 end
 
-function (a::MatSpace{T})(b::AbstractArray{T, 2}) where T <: RingElement
+function (a::MatSpace{T})(b::Array{T, 2}) where T <: RingElement
    R = base_ring(a)
    _check_dim(a.nrows, a.ncols, b)
-   for i = 1:a.nrows
-      for j = 1:a.ncols
-         b[i, j] = R(b[i, j])
-      end
+   if !isempty(b)
+      R != parent(b[1, 1]) && error("Unable to coerce matrix")
    end
    z = MatSpaceElem{T}(b)
    z.base_ring = R
