@@ -178,11 +178,12 @@ function test_gen_mat_constructors()
 
    # Test creation from AbstractArray without setindex!
    A = MyTestMatrix(BigInt(3), 2)
-   S = MatrixSpace(QQ, 2, 2)
+   S = MatrixSpace(ZZ, 2, 2)
 
    @test isa(S(A), Generic.MatSpaceElem{Rational{BigInt}})
   
    # Test original matrix not modified
+   S = MatrixSpace(QQ, 2, 2)
    a = Rational{BigInt}(1)
    A = [a a; a a]
    M = S(A)
