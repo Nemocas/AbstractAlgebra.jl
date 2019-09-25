@@ -76,6 +76,17 @@ function is_weak_popov(P::Generic.Mat, rank::Int)
    return true
 end
 
+# Simulate user matrix type belonging to AbstractArray
+# with getindex but no setindex!
+struct MyTestMatrix{T} <: AbstractArray{T, 2}
+   d::T
+   dim::Int
+end
+
+Base.getindex(a::MyTestMatrix{T}, r::Int, c::Int) where T = a.d
+
+Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
+
 function test_gen_mat_constructors()
    print("Generic.Mat.constructors...")
 
@@ -164,6 +175,25 @@ function test_gen_mat_constructors()
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
+
+   # Test creation from AbstractArray without setindex!
+   A = MyTestMatrix(BigInt(3), 2)
+   S = MatrixSpace(QQ, 2, 2)
+
+   @test isa(S(A), Generic.MatSpaceElem{Rational{BigInt}})
+  
+   # Test original matrix not modified
+   a = Rational{BigInt}(1)
+   A = [a a; a a]
+   M = S(A)
+
+   @test A[1, 1] === a
+
+   a = BigInt(1)
+   A = [a a; a a]
+   M = S(A)
+
+   @test A[1, 1] === a
 
    println("PASS")
 end
