@@ -2085,16 +2085,19 @@ end
 function test_gen_mat_change_base_ring()
    print("Generic.Mat.change_base_ring...")
 
-   for (P, Q) in ((MatrixSpace(ZZ, 2, 3), MatrixSpace(ZZ, 3, 2)),
-                  (MatrixAlgebra(ZZ, 3), MatrixAlgebra(ZZ, 3)))
+   for (P, Q, T) in ((MatrixSpace(ZZ, 2, 3), MatrixSpace(ZZ, 3, 2), MatElem),
+                     (MatrixAlgebra(ZZ, 3), MatrixAlgebra(ZZ, 3), MatAlgElem))
       M = rand(P, -10:10)
       N = rand(Q, -10:10)
       for R in [QQ, ZZ, GF(2), GF(5)]
          MQ = change_base_ring(M, R)
+         @test MQ isa T
          @test base_ring(MQ) == R
          NQ = change_base_ring(N, R)
+         @test NQ isa T
          @test base_ring(NQ) == R
          MNQ = change_base_ring(M * N, R)
+         @test MNQ isa T
          @test base_ring(MNQ) == R
          @test MQ * NQ == MNQ
       end
