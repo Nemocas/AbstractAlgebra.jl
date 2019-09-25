@@ -431,6 +431,12 @@ function test_gen_mat_powering()
 
    @test A^0 == one(S)
 
+   S = MatrixSpace(QQ, 2, 2)
+
+   A = S(Rational{BigInt}[2 3; 7 -4])
+
+   @test A^-1 == inv(A)
+
    println("PASS")
 end
 
