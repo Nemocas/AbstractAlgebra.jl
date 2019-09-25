@@ -215,8 +215,7 @@ functions that can accept both views and actual matrices.
 
 The syntax for views is as for Julia's own views.
 
-Note that the parent of a view will be the same as the parent of the original
-matrix. The `parent_type` function also returns the same type for a view as
+Note that the `parent_type` function returns the same type for a view as
 for the original matrix type. This could potentially cause a problem if the
 `elem_type` function is applied to the return value of `parent_type` and then
 used in a type assertion. For this reason, there may be some limitations on
