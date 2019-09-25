@@ -5180,7 +5180,7 @@ end
 > Like `map`, but stores the result in `dst` rather than a new matrix.
 """
 function Base.map!(f, dst::MatrixElem, src::MatrixElem)
-   for i=1:nrows(src), j=1:ncols(src)
+   for i = 1:nrows(src), j = 1:ncols(src)
       dst[i, j] = f(src[i, j])
    end
    dst
@@ -5196,7 +5196,7 @@ function Base.map(f, a::MatrixElem)
    b11 = f(a[1, 1])
    b = similar(a, parent(b11))
    b[1, 1] = b11
-   for i=1:nrows(a), j=1:ncols(a)
+   for i = 1:nrows(a), j = 1:ncols(a)
       i == j == 1 && continue
       b[i, j] = f(a[i, j])
    end

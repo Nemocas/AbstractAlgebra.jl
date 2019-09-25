@@ -2080,7 +2080,7 @@ function test_gen_mat_map()
       for R = [QQ, ZZ, GF(2), GF(7), PolynomialRing(GF(5), 'x')[1]]
          M = algebra ? MatrixAlgebra(R, u) : MatrixSpace(R, u, v)
          m0 = M(mat)
-         for f0 = (x -> x+1, x -> x*2, x -> one(R), x -> zero(R))
+         for f0 = (x -> x + 1, x -> x*2, x -> one(R), x -> zero(R))
             for f = (f0, map_from_func(R, R, f0))
                m = deepcopy(m0)
                n0 = similar(m)
@@ -2093,7 +2093,7 @@ function test_gen_mat_map()
       m0 = algebra ? MatrixAlgebra(ZZ, u)(mat) : MatrixSpace(ZZ, u, v)(mat)
       m = deepcopy(m0)
       for S = [QQ, ZZ, GF(2), GF(7), PolynomialRing(GF(5), 'x')[1]]
-         for f0 = (x -> S(x), x -> S(x+1))
+         for f0 = (x -> S(x), x -> S(x + 1))
             for f = (f0, map_from_func(ZZ, S, f0))
                n = map(f, m)
                @test n !== m

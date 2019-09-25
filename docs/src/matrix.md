@@ -229,11 +229,11 @@ change_base_ring(::AbstractAlgebra.MatElem, ::AbstractAlgebra.Ring)
 ```
 
 ```@docs
-Base.map!(f, ::Generic.MatrixElem, ::Generic.MatrixElem)
+Base.map(f, ::Generic.MatrixElem)
 ```
 
 ```@docs
-Base.map(f, ::Generic.MatrixElem)
+Base.map!(f, ::Generic.MatrixElem, ::Generic.MatrixElem)
 ```
 
 **Examples**
