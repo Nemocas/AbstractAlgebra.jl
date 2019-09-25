@@ -55,7 +55,7 @@ function test_Integers_manipulation()
 end
 
 function test_Integers_rand()
-   print("Julia.Integers.modular_arithmetic...")
+   print("Julia.Integers.rand...")
 
    R = ZZ
    f = rand(R, 0:22)
