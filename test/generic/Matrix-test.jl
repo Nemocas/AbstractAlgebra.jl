@@ -180,7 +180,7 @@ function test_gen_mat_constructors()
    A = MyTestMatrix(BigInt(3), 2)
    S = MatrixSpace(ZZ, 2, 2)
 
-   @test isa(S(A), Generic.MatSpaceElem{Rational{BigInt}})
+   @test isa(S(A), Generic.MatSpaceElem{BigInt})
   
    # Test original matrix not modified
    S = MatrixSpace(QQ, 2, 2)
