@@ -1938,7 +1938,11 @@ end
                n0 = similar(m)
                n = map!(f, n0, m)
                @test n === n0 # map! must return its argument
-               @test n == M(map(f isa Function ? f : f.image_fn, mat))
+               if !isempty(mat)
+                  # when empty, it may happen that the result of map below has Any
+                  # as eltype, and calling M on it fails, cf. issue #423
+                  @test n == M(map(f isa Function ? f : f.image_fn, mat))
+               end
             end
          end
       end
@@ -1951,7 +1955,9 @@ end
                @test n !== m
                @test m == m0 # map's input must not be mutated
                M = algebra ? MatrixAlgebra(S, u) : MatrixSpace(S, u, v)
-               @test n == M(map(f isa Function ? f : f.image_fn, mat))
+               if !isempty(mat)
+                  @test n == M(map(f isa Function ? f : f.image_fn, mat))
+               end
                @test n isa (algebra ? MatAlgElem : MatElem)
             end
          end
