@@ -293,7 +293,7 @@ needs_parentheses(x::AbstractAlgebra.SeriesElem) = (!iszero(x))
 
 displayed_with_minus_in_front(x::AbstractAlgebra.SeriesElem) = false
 
-show_minus_one(::Type{AbstractAlgebra.SeriesElem{T}}) where {T <: RingElement} = false
+show_minus_one(::Type{<:AbstractAlgebra.SeriesElem{T}}) where {T <: RingElement} = show_minus_one(T)
 
 ###############################################################################
 #
