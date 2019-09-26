@@ -1,6 +1,4 @@
-function test_gen_map_with_inverse_constructors()
-   print("Generic.MapWithInverse.constructors...")
-
+@testset "Generic.MapWithInverse.constructors..." begin
    f = map_from_func(ZZ, ZZ, x -> x + 1)
    g = map_from_func(ZZ, ZZ, x -> x - 1)
 
@@ -37,13 +35,9 @@ function test_gen_map_with_inverse_constructors()
    v = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
 
    @test u(ZZ(1)) == 2
-
-   println("PASS")
 end
 
-function test_gen_map_with_inverse_composition()
-   print("Generic.MapWithInverse.composition...")
-
+@testset "Generic.MapWithInverse.composition..." begin
    f = map_from_func(ZZ, ZZ, x -> x + 1)
    g = map_from_func(ZZ, ZZ, x -> x - 1)
    h = map_from_func(ZZ, ZZ, x -> x + 2)
@@ -62,13 +56,9 @@ function test_gen_map_with_inverse_composition()
    u = compose(s, t)
 
    @test u(ZZ(1)) == 4
-
-   println("PASS")
 end
 
-function test_gen_map_with_inverse_inv()
-   print("Generic.MapWithInverse.inv...")
-
+@testset "Generic.MapWithInverse.inv..." begin
    f = map_from_func(ZZ, ZZ, x -> x + 1)
    g = map_from_func(ZZ, ZZ, x -> x - 1)
    h = map_from_func(ZZ, ZZ, x -> x + 2)
@@ -95,15 +85,4 @@ function test_gen_map_with_inverse_inv()
 
    @test v(ZZ(1)) == -2
    @test w(ZZ(1)) == 0
-
-   println("PASS")
 end
-
-function test_gen_map_with_inverse()
-   test_gen_map_with_inverse_constructors()
-   test_gen_map_with_inverse_composition()
-   test_gen_map_with_inverse_inv()
-
-   println("")
-end
-

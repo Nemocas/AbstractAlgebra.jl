@@ -1,6 +1,4 @@
-function test_Integers_constructors()
-   print("Julia.Integers.constructors...")
-
+@testset "Julia.Integers.constructors..." begin
    R = zz
    S = ZZ
 
@@ -26,13 +24,9 @@ function test_Integers_constructors()
 
    @test isa(R(a), Int)
    @test isa(S(b), BigInt)
-
-   println("PASS")
 end
 
-function test_Integers_manipulation()
-   print("Julia.Integers.manipulation...")
-
+@testset "Julia.Integers.manipulation..." begin
    R = zz
    S = ZZ
 
@@ -50,25 +44,17 @@ function test_Integers_manipulation()
    @test isunit(S(1))
    @test isunit(R(-1))
    @test isunit(S(-1))
-
-   println("PASS")
 end
 
-function test_Integers_rand()
-   print("Julia.Integers.rand...")
-
+@testset "Julia.Integers.rand..." begin
    R = ZZ
    f = rand(R, 0:22)
    @test f isa elem_type(R)
    f = rand(rng, R, 0:22)
    @test f isa elem_type(R)
-
-   println("PASS")
 end
 
-function test_Integers_modular_arithmetic()
-   print("Julia.Integers.modular_arithmetic...")
-
+@testset "Julia.Integers.modular_arithmetic..." begin
    R = zz
    S = ZZ
 
@@ -89,13 +75,9 @@ function test_Integers_modular_arithmetic()
          b = mod(b*s, modS)
       end
    end
-
-   println("PASS")
 end
 
-function test_Integers_exact_division()
-   print("Julia.Integers.exact_division...")
-
+@testset "Julia.Integers.exact_division..." begin
    R = zz
    S = ZZ
 
@@ -122,13 +104,9 @@ function test_Integers_exact_division()
          @test qS == b2
       end
    end
-
-   println("PASS")
 end
 
-function test_Integers_gcd()
-   print("Julia.Integers.gcd...")
-
+@testset "Julia.Integers.gcd..." begin
    R = zz
    S = ZZ
 
@@ -149,13 +127,9 @@ function test_Integers_gcd()
       @test gS == gcd(s, modS)
       @test gS != 1 || mod(sS*s, modS) == 1
    end
-
-   println("PASS")
 end
 
-function test_Integers_square_root()
-   print("Julia.Integers.square_root...")
-
+@testset "Julia.Integers.square_root..." begin
    R = zz
    S = ZZ
 
@@ -169,18 +143,4 @@ function test_Integers_square_root()
       @test AbstractAlgebra.sqrt(f)^2 == f
       @test AbstractAlgebra.sqrt(g)^2 == g
    end
-
-   println("PASS")
-end
-
-function test_Integers()
-   test_Integers_constructors()
-   test_Integers_rand()
-   test_Integers_manipulation()
-   test_Integers_modular_arithmetic()
-   test_Integers_exact_division()
-   test_Integers_gcd()
-   test_Integers_square_root()
-
-   println("")
 end

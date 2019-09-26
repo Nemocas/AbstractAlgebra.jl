@@ -1,6 +1,4 @@
-function test_free_module_constructors()
-   print("Generic.FreeModule.constructors...")
-
+@testset "Generic.FreeModule.constructors..." begin
    R, x = PolynomialRing(ZZ, "x")
    M = FreeModule(R, 5)
 
@@ -17,24 +15,16 @@ function test_free_module_constructors()
    F = FreeModule(ZZ, 0)
 
    @test isa(F([]), Generic.free_module_elem)
-
-   println("PASS")
 end
 
-function test_free_module_manipulation()
-   print("Generic.FreeModule.manipulation...")
-
+@testset "Generic.FreeModule.manipulation..." begin
    R, x = PolynomialRing(ZZ, "x")
    M = FreeModule(R, 5)
 
    @test rank(M) == 5
-
-   println("PASS")
 end
 
-function test_free_module_unary_ops()
-   print("Generic.FreeModule.unary_ops...")
-
+@testset "Generic.FreeModule.unary_ops..." begin
    R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:10
@@ -42,7 +32,7 @@ function test_free_module_unary_ops()
 
       v = [rand(R, 0:2, -10:10) for i in 1:3]
       w = [-c for c in v]
-   
+
       @test -M(v) == M(w)
    end
 
@@ -56,13 +46,9 @@ function test_free_module_unary_ops()
 
       @test -M(v) == M(w)
    end
-
-   println("PASS")
 end
 
-function test_free_module_binary_ops()
-   print("Generic.FreeModule.binary_ops...")
-
+@testset "Generic.FreeModule.binary_ops..." begin
    R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:10
@@ -84,13 +70,9 @@ function test_free_module_binary_ops()
 
       @test m + n - n == m
    end
-   
-   println("PASS")
 end
 
-function test_free_module_adhoc_binary()
-   print("Generic.FreeModule.adhoc_binary...")
-
+@testset "Generic.FreeModule.adhoc_binary..." begin
    R, x = PolynomialRing(ZZ, "x")
 
    for iter = 1:10
@@ -119,16 +101,4 @@ function test_free_module_adhoc_binary()
       @test 2*m == m + m
       @test m*c == c*m
    end
-
-   println("PASS")
-end
-
-function test_free_module()
-   test_free_module_constructors()
-   test_free_module_manipulation()
-   test_free_module_unary_ops()
-   test_free_module_binary_ops()
-   test_free_module_adhoc_binary()
-
-   println("")
 end

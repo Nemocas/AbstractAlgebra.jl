@@ -9,6 +9,4 @@ else
    using Test
 end
 
-include("../test/AbstractAlgebra-test.jl")
-
-test_all()
+include("AbstractAlgebra-test.jl")

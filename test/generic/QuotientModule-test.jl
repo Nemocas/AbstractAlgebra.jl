@@ -1,6 +1,4 @@
-function test_quotient_module_constructors()
-   print("Generic.QuotientModule.constructors...")
-
+@testset "Generic.QuotientModule.constructors..." begin
    R = ZZ
    M = FreeModule(R, 2)
 
@@ -45,7 +43,7 @@ function test_quotient_module_constructors()
          T = [rand(N, -10:10) for i in 1:ngens2]
          P, g = sub(N, T)
          Q1, h1 = quo(M, P)
-         
+
          U = [f(v) for v in T]
          V, k = sub(M, U)
 
@@ -63,13 +61,9 @@ function test_quotient_module_constructors()
    m = Q([])
 
    @test isa(m, Generic.quotient_module_elem)
-
-   println("PASS")
 end
 
-function test_quotient_module_manipulation()
-   print("Generic.QuotientModule.manipulation...")
-
+@testset "Generic.QuotientModule.manipulation..." begin
    R = ZZ
    M = FreeModule(R, 2)
 
@@ -85,13 +79,9 @@ function test_quotient_module_manipulation()
    end
 
    @test supermodule(Q) == M
-
-   println("PASS")
 end
 
-function test_quotient_module_unary_ops()
-   print("Generic.QuotientModule.unary_ops...")
-
+@testset "Generic.QuotientModule.unary_ops..." begin
    for R in [ZZ, QQ]
       for iter = 1:40
          M = rand_module(R, -10:10)
@@ -101,17 +91,13 @@ function test_quotient_module_unary_ops()
          Q, g = quo(M, N)
 
          m = rand(Q, -10:10)
-   
+
          @test -(-m) == m
       end
    end
-
-   println("PASS")
 end
 
-function test_quotient_module_binary_ops()
-   print("Generic.QuotientModule.binary_ops...")
-
+@testset "Generic.QuotientModule.binary_ops..." begin
    for R in [ZZ, QQ]
       for iter = 1:40
          M = rand_module(R, -10:10)
@@ -127,13 +113,9 @@ function test_quotient_module_binary_ops()
          @test m - n == m + (-n)
       end
    end
-
-   println("PASS")
 end
 
-function test_quotient_module_adhoc_binary()
-   print("Generic.QuotientModule.adhoc_binary...")
-
+@testset "Generic.QuotientModule.adhoc_binary..." begin
    for R in [ZZ, QQ]
       for iter = 1:40
          M = rand_module(R, -10:10)
@@ -152,13 +134,9 @@ function test_quotient_module_adhoc_binary()
          @test c*(m - n) == c*m - c*n
       end
    end
-
-   println("PASS")
 end
 
-function test_quotient_module_canonical_projection()
-   print("Generic.QuotientModule.canonical_projection...")
-
+@testset "Generic.QuotientModule.canonical_projection..." begin
    for R in [ZZ, QQ]
       for iter = 1:40
          M = rand_module(R, -10:10)
@@ -177,17 +155,4 @@ function test_quotient_module_canonical_projection()
          @test h(preimage(h, n)) == n
       end
    end
-
-   println("PASS")
-end
-
-function test_quotient_module()
-   test_quotient_module_constructors()
-   test_quotient_module_manipulation()
-   test_quotient_module_unary_ops()
-   test_quotient_module_binary_ops()
-   test_quotient_module_adhoc_binary()
-   test_quotient_module_canonical_projection()
-
-   println("")
 end

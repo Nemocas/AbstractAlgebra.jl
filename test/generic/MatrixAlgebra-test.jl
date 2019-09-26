@@ -76,9 +76,7 @@ function is_weak_popov(P::Generic.MatAlgElem, rank::Int)
    return true
 end
 
-function test_gen_matalg_constructors()
-   print("Generic.MatAlg.constructors...")
-
+@testset "Generic.MatAlg.constructors..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -126,13 +124,9 @@ function test_gen_matalg_constructors()
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
-
-   println("PASS")
 end
 
-function test_gen_matalg_size()
-   print("Generic.MatAlg.size...")
-
+@testset "Generic.MatAlg.size..." begin
    S = MatrixAlgebra(QQ, 3)
    A = S([1 2 3; 4 5 6; 7 8 9])
 
@@ -143,13 +137,9 @@ function test_gen_matalg_size()
    @test degree(A) == 3
 
    @test issquare(A)
-
-   println("PASS")
 end
 
-function test_gen_matalg_manipulation()
-   print("Generic.MatAlg.manipulation...")
-
+@testset "Generic.MatAlg.manipulation..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -187,13 +177,9 @@ function test_gen_matalg_manipulation()
    @test !iszero_row(C, 1)
    @test iszero_column(C, 2)
    @test !iszero_column(C, 1)
-
-   println("PASS")
 end
 
-function test_gen_matalg_unary_ops()
-   print("Generic.MatAlg.unary_ops...")
-
+@testset "Generic.MatAlg.unary_ops..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -201,13 +187,9 @@ function test_gen_matalg_unary_ops()
    B = S([-t - 1 (-t) -R(1); -t^2 (-t) (-t); -R(-2) (-t - 2) (-t^2 - t - 1)])
 
    @test -A == B
-
-   println("PASS")
 end
 
-function test_gen_matalg_binary_ops()
-   print("Generic.MatAlg.binary_ops...")
-
+@testset "Generic.MatAlg.binary_ops..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -219,13 +201,9 @@ function test_gen_matalg_binary_ops()
    @test A - B == S([t-1 t-3 R(0); t^2 - t R(-1) R(-2); R(-1) (-t^2 + t + 2) (-t^3 + t^2 + t + 1)])
 
    @test A*B == S([t^2 + 2*t + 1 2*t^2 + 4*t + 3 t^3 + t^2 + 3*t + 1; 3*t^2 - t (t^3 + 4*t^2 + t) t^4 + 2*t^2 + 2*t; t-5 t^4 + t^3 + 2*t^2 + 3*t - 4 t^5 + 1*t^4 + t^3 + t^2 + 4*t + 2])
-
-   println("PASS")
 end
 
-function test_gen_matalg_adhoc_binary()
-   print("Generic.MatAlg.adhoc_binary...")
-
+@testset "Generic.MatAlg.adhoc_binary..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -243,13 +221,9 @@ function test_gen_matalg_adhoc_binary()
    @test BigInt(3)*A == A*BigInt(3)
    @test Rational{BigInt}(3)*A == A*Rational{BigInt}(3)
    @test (t - 1)*A == A*(t - 1)
-
-   println("PASS")
 end
 
-function test_gen_matalg_permutation()
-   print("Generic.MatAlg.permutation...")
-
+@testset "Generic.MatAlg.permutation..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -259,13 +233,9 @@ function test_gen_matalg_permutation()
    P = T([2, 3, 1])
 
    @test A == inv(P)*(P*A)
-
-   println("PASS")
 end
 
-function test_gen_matalg_comparison()
-   print("Generic.MatAlg.comparison...")
-
+@testset "Generic.MatAlg.comparison..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -275,13 +245,9 @@ function test_gen_matalg_comparison()
    @test A == B
 
    @test A != one(S)
-
-   println("PASS")
 end
 
-function test_gen_matalg_adhoc_comparison()
-   print("Generic.MatAlg.adhoc_comparison...")
-
+@testset "Generic.MatAlg.adhoc_comparison..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -297,13 +263,9 @@ function test_gen_matalg_adhoc_comparison()
    @test t + 1 == S(t + 1)
    @test A != one(S)
    @test one(S) == one(S)
-
-   println("PASS")
 end
 
-function test_gen_matalg_powering()
-   print("Generic.MatAlg.powering...")
-
+@testset "Generic.MatAlg.powering..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -312,13 +274,9 @@ function test_gen_matalg_powering()
    @test A^5 == A^2*A^3
 
    @test A^0 == one(S)
-
-   println("PASS")
 end
 
-function test_gen_matalg_exact_division()
-   print("Generic.MatAlg.exact_division...")
-
+@testset "Generic.MatAlg.exact_division..." begin
    S = MatrixAlgebra(QQ, 3)
 
    M = rand(S, -20:20)
@@ -326,13 +284,9 @@ function test_gen_matalg_exact_division()
 
    @test divexact_right(M*N, N) == M
    @test divexact_left(N*M, N) == M
-
-   println("PASS")
 end
 
-function test_gen_matalg_adhoc_exact_division()
-   print("Generic.MatAlg.adhoc_exact_division...")
-
+@testset "Generic.MatAlg.adhoc_exact_division..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
@@ -342,64 +296,45 @@ function test_gen_matalg_adhoc_exact_division()
    @test divexact(12*A, BigInt(12)) == A
    @test divexact(12*A, Rational{BigInt}(12)) == A
    @test divexact((1 + t)*A, 1 + t) == A
-
-   println("PASS")
 end
 
-function test_gen_matalg_transpose()
-   print("Generic.MatAlg.transpose...")
-
+@testset "Generic.MatAlg.transpose..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
    arr = [t + 1 t R(1); t^2 t t; t+1 t^2 R(-1)]
    A = S(arr)
    B = S(permutedims(arr, [2, 1]))
    @test transpose(A) == B
-
-   println("PASS")
 end
 
-function test_gen_matalg_gram()
-   print("Generic.MatAlg.gram...")
-
+@testset "Generic.MatAlg.gram..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
    @test gram(A) == S([2*t^2 + 2*t + 2 t^3 + 2*t^2 + t 2*t^2 + t - 1; t^3 + 2*t^2 + t t^4 + 2*t^2 t^3 + 3*t; 2*t^2 + t - 1 t^3 + 3*t t^4 + 2*t^3 + 4*t^2 + 6*t + 9])
-
-   println("PASS")
 end
 
-function test_gen_matalg_tr()
-   print("Generic.MatAlg.tr...")
-
+@testset "Generic.MatAlg.tr..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
    @test tr(A) == t^2 + 3t + 2
-
-   println("PASS")
 end
 
-function test_gen_matalg_content()
-   print("Generic.MatAlg.content...")
-
+@testset "Generic.MatAlg.content..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
 
    A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
 
    @test content((1 + t)*A) == 1 + t
-   println("PASS")
 end
 
-function test_gen_matalg_lu()
-   print("Generic.MatAlg.lu...")
-
+@testset "Generic.MatAlg.lu..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixAlgebra(K, 3)
@@ -435,13 +370,9 @@ function test_gen_matalg_lu()
 
    @test r == 3
    @test P*A == L*U
-
-   println("PASS")
 end
 
-function test_gen_matalg_fflu()
-   print("Generic.MatAlg.fflu...")
-
+@testset "Generic.MatAlg.fflu..." begin
    R, x = PolynomialRing(QQ, "x")
    K, a = NumberField(x^3 + 3x + 1, "a")
    S = MatrixAlgebra(K, 3)
@@ -493,13 +424,9 @@ function test_gen_matalg_fflu()
    D[3, 3] = inv(U[2, 2])
    @test r == 3
    @test P*A == L*D*U
-
-   println("PASS")
 end
 
-function test_gen_matalg_det()
-   print("Generic.MatAlg.det...")
-
+@testset "Generic.MatAlg.det..." begin
    S, x = PolynomialRing(ResidueRing(ZZ, 1009*2003), "x")
 
    for dim = 0:5
@@ -540,13 +467,9 @@ function test_gen_matalg_det()
 
       @test det(M) == AbstractAlgebra.det_clow(M)
    end
-
-   println("PASS")
 end
 
-function test_gen_matalg_rank()
-   print("Generic.MatAlg.rank...")
-
+@testset "Generic.MatAlg.rank..." begin
    S = ResidueRing(ZZ, 20011*10007)
    R = MatrixAlgebra(S, 5)
 
@@ -618,13 +541,9 @@ function test_gen_matalg_rank()
 
       @test rank(M) == i
    end
-
-   println("PASS")
 end
 
-function test_gen_matalg_solve_lu()
-   print("Generic.MatAlg.solve_lu...")
-
+@testset "Generic.MatAlg.solve_lu..." begin
    S = QQ
 
    for dim = 0:5
@@ -657,13 +576,9 @@ function test_gen_matalg_solve_lu()
 
       @test MK*x == bK
    end
-
-   println("PASS")
 end
 
-function test_gen_matalg_rref()
-   print("Generic.MatAlg.rref...")
-
+@testset "Generic.MatAlg.rref..." begin
    S = ResidueRing(ZZ, 20011*10007)
    R = MatrixAlgebra(S, 5)
 
@@ -725,13 +640,9 @@ function test_gen_matalg_rref()
       @test r == i
       @test isrref(A)
    end
-
-   println("PASS")
 end
 
-function test_gen_matalg_inversion()
 @testset "Generic.MatAlg.inversion..." begin
-
    indexing(n) = [(i,j) for i in 1:n for j in 1:n if i !=j ]
    E(R,i,j, val=1) = (M=one(R); M[i,j] = val; return M)
    E(R::MatAlgebra; vals=[1,-1]) = [E(R, i,j,val) for (i,j) in indexing(R.n) for val in vals]
@@ -867,11 +778,8 @@ function test_gen_matalg_inversion()
    end
    end
 end # of @testset "Generic.MatAlg.inversion..."
-end
 
-function test_gen_matalg_hessenberg()
-   print("Generic.MatAlg.hessenberg...")
-
+@testset "Generic.MatAlg.hessenberg..." begin
    R = ResidueRing(ZZ, 18446744073709551629)
 
    for dim = 0:5
@@ -886,13 +794,9 @@ function test_gen_matalg_hessenberg()
          @test ishessenberg(A)
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_matalg_charpoly()
-   print("Generic.MatAlg.charpoly...")
-
+@testset "Generic.MatAlg.charpoly..." begin
    R = ResidueRing(ZZ, 18446744073709551629)
 
    for dim = 0:5
@@ -948,13 +852,9 @@ function test_gen_matalg_charpoly()
    p2 = charpoly(U, M)
 
    @test p1 == p2
-
-   println("PASS")
 end
 
-function test_gen_matalg_minpoly()
-   print("Generic.MatAlg.minpoly...")
-
+@testset "Generic.MatAlg.minpoly..." begin
    R = GF(103)
    T, y = PolynomialRing(R, "y")
    S = MatrixAlgebra(R, 3)
@@ -1062,13 +962,9 @@ function test_gen_matalg_minpoly()
    p2 = minpoly(U, M)
 
    @test p1 == p2
-
-   println("PASS")
 end
 
-function test_gen_matalg_row_swapping()
-   print("Generic.MatAlg.row_swapping...")
-
+@testset "Generic.MatAlg.row_swapping..." begin
    R, x = PolynomialRing(ZZ, "x")
    M = MatrixAlgebra(R, 3)
 
@@ -1079,52 +975,46 @@ function test_gen_matalg_row_swapping()
    swap_rows!(a, 2, 3)
 
    @test a == M(map(R, [1 2 3; 7 8 9; 4 5 6]))
-
-   println("PASS")
 end
 
-function test_gen_matalg_hnf_minors()
-  print("Generic.MatAlg.hnf_minors...")
+if false # see bug 160
+    @testset "Generic.MatAlg.hnf_minors..." begin
+        R, x = PolynomialRing(QQ, "x")
 
-   R, x = PolynomialRing(QQ, "x")
+        M = MatrixAlgebra(R, 3)
 
-   M = MatrixAlgebra(R, 3)
+        A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
 
-   A = M(map(R, Any[0 0 0; x^3+1 x^2 0; 0 x^2 x^5]))
+        H = hnf_minors(A)
+        @test istriu(H)
 
-   H = hnf_minors(A)
-   @test istriu(H)
+        H, U = hnf_minors_with_transform(A)
+        @test istriu(H)
+        @test isunit(det(U))
+        @test U*A == H
 
-   H, U = hnf_minors_with_transform(A)
-   @test istriu(H)
-   @test isunit(det(U))
-   @test U*A == H
+        # Fake up finite field of char 7, degree 2
+        R, x = PolynomialRing(GF(7), "x")
+        F = ResidueField(R, x^2 + 6x + 3)
+        a = F(x)
 
-   # Fake up finite field of char 7, degree 2
-   R, x = PolynomialRing(GF(7), "x")
-   F = ResidueField(R, x^2 + 6x + 3)
-   a = F(x)
+        S, y = PolynomialRing(F, "y")
 
-   S, y = PolynomialRing(F, "y")
+        N = MatrixAlgebra(S, 4)
 
-   N = MatrixAlgebra(S, 4)
+        B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5; y 1 y 2]))
 
-   B = N(map(S, Any[1 0 a 0; a*y^3 0 3*a^2 0; y^4+a 0 y^2+y 5; y 1 y 2]))
+        H = hnf_minors(B)
+        @test istriu(H)
 
-   H = hnf_minors(B)
-   @test istriu(H)
-
-   H, U = hnf_minors_with_transform(B)
-   @test istriu(H)
-   @test isunit(det(U))
-   @test U*B == H
-
-   println("PASS")
+        H, U = hnf_minors_with_transform(B)
+        @test istriu(H)
+        @test isunit(det(U))
+        @test U*B == H
+    end
 end
 
-function test_gen_matalg_hnf_kb()
-   print("Generic.MatAlg.hnf_kb...")
-
+@testset "Generic.MatAlg.hnf_kb..." begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixAlgebra(R, 3)
@@ -1157,13 +1047,9 @@ function test_gen_matalg_hnf_kb()
    @test istriu(H)
    @test isunit(det(U))
    @test U*B == H
-
-   println("PASS")
 end
 
-function test_gen_matalg_hnf_cohen()
-   print("Generic.MatAlg.hnf_cohen...")
-
+@testset "Generic.MatAlg.hnf_cohen..." begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixAlgebra(R, 3)
@@ -1196,13 +1082,9 @@ function test_gen_matalg_hnf_cohen()
    @test istriu(H)
    @test isunit(det(U))
    @test U*B == H
-
-   println("PASS")
 end
 
-function test_gen_matalg_hnf()
-   print("Generic.MatAlg.hnf...")
-
+@testset "Generic.MatAlg.hnf..." begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixAlgebra(R, 3)
@@ -1235,13 +1117,9 @@ function test_gen_matalg_hnf()
    @test istriu(H)
    @test isunit(det(U))
    @test U*B == H
-
-   println("PASS")
 end
 
-function test_gen_matalg_snf_kb()
-   print("Generic.MatAlg.snf_kb...")
-
+@testset "Generic.MatAlg.snf_kb..." begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixAlgebra(R, 3)
@@ -1276,13 +1154,9 @@ function test_gen_matalg_snf_kb()
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*B*K == T
-
-   println("PASS")
 end
 
-function test_gen_matalg_snf()
-   print("Generic.MatAlg.snf...")
-
+@testset "Generic.MatAlg.snf..." begin
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixAlgebra(R, 3)
@@ -1317,88 +1191,42 @@ function test_gen_matalg_snf()
    @test isunit(det(U))
    @test isunit(det(K))
    @test U*B*K == T
-
-   println("PASS")
 end
 
-function test_gen_matalg_similar_zero()
-   print("Generic.MatAlg.similar/zero...")
-   for sim_zero in (similar, zero)
-      test_zero = sim_zero === zero
-      for R = (ZZ, GF(11))
-         M = MatrixAlgebra(R, rand(0:9))
-         m = R == ZZ ? rand(M, -10:10) : rand(M)
-         n = sim_zero(m)
+@testset "Generic.MatAlg.$sim_zero..." for sim_zero in (similar, zero)
+   test_zero = sim_zero === zero
+   for R = (ZZ, GF(11))
+      M = MatrixAlgebra(R, rand(0:9))
+      m = R == ZZ ? rand(M, -10:10) : rand(M)
+      n = sim_zero(m)
+      @test !test_zero || iszero(n)
+      @test parent(n) == M
+      @test size(n) == (nrows(M), ncols(M))
+      r = rand(0:9)
+      n = sim_zero(m, r)
+      @test !test_zero || iszero(n)
+      @test parent(n) == MatrixAlgebra(R, r)
+      @test size(n) == (r, r)
+      nn = sim_zero(m, r, r)
+      @test !test_zero || iszero(nn)
+      @test parent(nn) == MatrixAlgebra(R, r)
+      @test size(nn) == (r, r)
+      @test_throws ErrorException sim_zero(m, r, r+1)
+      for S = [QQ, ZZ, GF(2), GF(5)]
+         n = sim_zero(m, S)
          @test !test_zero || iszero(n)
-         @test parent(n) == M
+         @test parent(n) == MatrixAlgebra(S, size(n)[1])
          @test size(n) == (nrows(M), ncols(M))
          r = rand(0:9)
-         n = sim_zero(m, r)
+         n = sim_zero(m, S, r)
          @test !test_zero || iszero(n)
-         @test parent(n) == MatrixAlgebra(R, r)
+         @test parent(n) == MatrixAlgebra(S, r)
          @test size(n) == (r, r)
-         nn = sim_zero(m, r, r)
-         @test !test_zero || iszero(nn)
-         @test parent(nn) == MatrixAlgebra(R, r)
-         @test size(nn) == (r, r)
-         @test_throws ErrorException sim_zero(m, r, r+1)
-         for S = [QQ, ZZ, GF(2), GF(5)]
-            n = sim_zero(m, S)
-            @test !test_zero || iszero(n)
-            @test parent(n) == MatrixAlgebra(S, size(n)[1])
-            @test size(n) == (nrows(M), ncols(M))
-            r = rand(0:9)
-            n = sim_zero(m, S, r)
-            @test !test_zero || iszero(n)
-            @test parent(n) == MatrixAlgebra(S, r)
-            @test size(n) == (r, r)
-            n = sim_zero(m, S, r, r)
-            @test !test_zero || iszero(n)
-            @test parent(n) == MatrixAlgebra(S, r)
-            @test size(n) == (r, r)
-            @test_throws ErrorException sim_zero(m, S, r, r+2)
-         end
+         n = sim_zero(m, S, r, r)
+         @test !test_zero || iszero(n)
+         @test parent(n) == MatrixAlgebra(S, r)
+         @test size(n) == (r, r)
+         @test_throws ErrorException sim_zero(m, S, r, r+2)
       end
    end
-
-   println("PASS")
-end
-
-function test_gen_matalg()
-   test_gen_matalg_constructors()
-   test_gen_matalg_size()
-   test_gen_matalg_manipulation()
-   test_gen_matalg_unary_ops()
-   test_gen_matalg_binary_ops()
-   test_gen_matalg_adhoc_binary()
-   test_gen_matalg_permutation()
-   test_gen_matalg_comparison()
-   test_gen_matalg_adhoc_comparison()
-   test_gen_matalg_powering()
-   test_gen_matalg_exact_division()
-   test_gen_matalg_adhoc_exact_division()
-   test_gen_matalg_transpose()
-   test_gen_matalg_gram()
-   test_gen_matalg_tr()
-   test_gen_matalg_content()
-   test_gen_matalg_lu()
-   test_gen_matalg_fflu()
-   test_gen_matalg_det()
-   test_gen_matalg_rank()
-   test_gen_matalg_solve_lu()
-   test_gen_matalg_rref()
-   test_gen_matalg_inversion()
-   test_gen_matalg_hessenberg()
-   test_gen_matalg_charpoly()
-   test_gen_matalg_minpoly()
-   test_gen_matalg_row_swapping()
-#   test_gen_matalg_hnf_minors() # see bug 160
-   test_gen_matalg_hnf_kb()
-   test_gen_matalg_hnf_cohen()
-   test_gen_matalg_hnf()
-   test_gen_matalg_snf_kb()
-   test_gen_matalg_snf()
-   test_gen_matalg_similar_zero()
-
-   println("")
 end
