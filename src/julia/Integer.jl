@@ -112,7 +112,7 @@ function powmod(a::T, b::Int, c::T) where T <: Integer
       while (UInt(bit) & b) == 0
          bit >>= 1
       end
-      z = a
+      z = mod(a, c)
       bit >>= 1
       while bit != 0
          z = mod(z*z, c)

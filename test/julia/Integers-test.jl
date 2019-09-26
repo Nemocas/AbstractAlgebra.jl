@@ -75,6 +75,8 @@ end
          b = mod(b*s, modS)
       end
    end
+
+   @test powmod(123, 1, 5) == 3
 end
 
 @testset "Julia.Integers.exact_division..." begin
