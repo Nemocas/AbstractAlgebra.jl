@@ -6,29 +6,29 @@ julia&gt; S = MatrixAlgebra(R, 3)
 Matrix Algebra of degree 3 over Univariate Polynomial Ring in t over Rationals
 
 julia&gt; A = S()
-[0//1 0//1 0//1]
-[0//1 0//1 0//1]
-[0//1 0//1 0//1]
+[0//1  0//1  0//1]
+[0//1  0//1  0//1]
+[0//1  0//1  0//1]
 
 julia&gt; B = S(12)
-[12//1 0//1 0//1]
-[0//1 12//1 0//1]
-[0//1 0//1 12//1]
+[12//1   0//1   0//1]
+[ 0//1  12//1   0//1]
+[ 0//1   0//1  12//1]
 
 julia&gt; C = S(R(11))
-[11//1 0//1 0//1]
-[0//1 11//1 0//1]
-[0//1 0//1 11//1]
-</code></pre><h2><a class="nav-anchor" id="Matrix-algebra-functionality-provided-by-AbstractAlgebra.jl-1" href="#Matrix-algebra-functionality-provided-by-AbstractAlgebra.jl-1">Matrix algebra functionality provided by AbstractAlgebra.jl</a></h2><p>Most of the generic matrix functionality described in the generic matrix section of the documentation is available for both matrix spaces and matrix algebras. Exceptions include functions that do not return or accept square matrices or which cannot specify a parent. Such functions include <code>solve</code> and <code>nullspace</code> which can&#39;t be provided for matrix algebras.</p><p>In addition to the functionality described for matrix spaces, matrix algebras support all noncommutative ring operations, and matrix algebras can be used as a base ring for other generic constructs that accept a <em>noncommutative</em> base ring (<code>NCRing</code>).</p><p>In this section we describe functionality provided for matrix algebras only.</p><h3><a class="nav-anchor" id="Basic-matrix-functionality-1" href="#Basic-matrix-functionality-1">Basic matrix functionality</a></h3><p>As well as the Ring and Matrix interfaces, the following functions are provided to manipulate matrices.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.degree-Tuple{AbstractAlgebra.Generic.MatAlgElem}" href="#AbstractAlgebra.Generic.degree-Tuple{AbstractAlgebra.Generic.MatAlgElem}"><code>AbstractAlgebra.Generic.degree</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-none">degree(a::Generic.MatAlgElem)</code></pre><blockquote><p>Return the degree <span>$n$</span> of the <span>$n\times n$</span> matrix <span>$a$</span>..</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, t = PolynomialRing(QQ, &quot;t&quot;)
+[11//1   0//1   0//1]
+[ 0//1  11//1   0//1]
+[ 0//1   0//1  11//1]
+</code></pre><h2><a class="nav-anchor" id="Matrix-algebra-functionality-provided-by-AbstractAlgebra.jl-1" href="#Matrix-algebra-functionality-provided-by-AbstractAlgebra.jl-1">Matrix algebra functionality provided by AbstractAlgebra.jl</a></h2><p>Most of the generic matrix functionality described in the generic matrix section of the documentation is available for both matrix spaces and matrix algebras. Exceptions include functions that do not return or accept square matrices or which cannot specify a parent. Such functions include <code>solve</code> and <code>nullspace</code> which can&#39;t be provided for matrix algebras.</p><p>In addition to the functionality described for matrix spaces, matrix algebras support all noncommutative ring operations, and matrix algebras can be used as a base ring for other generic constructs that accept a <em>noncommutative</em> base ring (<code>NCRing</code>).</p><p>In this section we describe functionality provided for matrix algebras only.</p><h3><a class="nav-anchor" id="Basic-matrix-functionality-1" href="#Basic-matrix-functionality-1">Basic matrix functionality</a></h3><p>As well as the Ring and Matrix interfaces, the following functions are provided to manipulate matrices.</p><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.degree-Tuple{AbstractAlgebra.Generic.MatAlgElem}" href="#AbstractAlgebra.Generic.degree-Tuple{AbstractAlgebra.Generic.MatAlgElem}"><code>AbstractAlgebra.Generic.degree</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">degree(a::Generic.MatAlgElem)</code></pre><blockquote><p>Return the degree <span>$n$</span> of the <span>$n\times n$</span> matrix <span>$a$</span>..</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; R, t = PolynomialRing(QQ, &quot;t&quot;)
 (Univariate Polynomial Ring in t over Rationals, t)
 
 julia&gt; S = MatrixAlgebra(R, 3)
 Matrix Algebra of degree 3 over Univariate Polynomial Ring in t over Rationals
 
 julia&gt; A = S([t + 1 t R(1); t^2 t t; R(-2) t + 2 t^2 + t + 1])
-[t+1//1 t 1//1]
-[t^2 t t]
-[-2//1 t+2//1 t^2+t+1//1]
+[t+1//1       t        1//1]
+[   t^2       t           t]
+[ -2//1  t+2//1  t^2+t+1//1]
 
 julia&gt; n = degree(A)
 3
