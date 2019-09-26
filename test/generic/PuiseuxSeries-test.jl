@@ -219,6 +219,17 @@ end
       @test f*(g + h) == f*g + f*h
       @test f*(g - h) == f*g - f*h
    end
+
+   # Regression test for Nemo issue 319
+   R,x = PuiseuxSeriesRing(ZZ, 4, "x");
+   cs = [one(ZZ), zero(ZZ), one(ZZ), zero(ZZ)];
+   f = R(R.laurent_ring(cs, 4, 4, 0, 1, false), 2);
+   f = deepcopy(f) # triggers rescale
+   g = deepcopy(f)
+
+   ff = f*f;
+
+   @test isequal(g, f)
 end
 
 @testset "Generic.PuiseuxSeries.adhoc_binary_ops..." begin
