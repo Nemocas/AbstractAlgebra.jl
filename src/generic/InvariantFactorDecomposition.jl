@@ -118,7 +118,7 @@ function (N::SNFModule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingElement
    return SNFModuleElem{T}(N, v)
 end
 
-function (M::SNFModule{T})(a::submodule_elem{T}) where T <: RingElement
+function (M::SNFModule{T})(a::SubmoduleElem{T}) where T <: RingElement
    R = parent(a)
    base_ring(R) != base_ring(M) && error("Incompatible modules")
    return M(R.map(a))

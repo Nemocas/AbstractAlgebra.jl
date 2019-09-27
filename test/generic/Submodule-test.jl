@@ -12,11 +12,11 @@
 
    @test isa(N, Generic.Submodule)
 
-   @test elem_type(N) == Generic.submodule_elem{elem_type(R)}
-   @test elem_type(Generic.Submodule{elem_type(R)}) == Generic.submodule_elem{elem_type(R)}
-   @test parent_type(Generic.submodule_elem{elem_type(R)}) == Generic.Submodule{elem_type(R)}
+   @test elem_type(N) == Generic.SubmoduleElem{elem_type(R)}
+   @test elem_type(Generic.Submodule{elem_type(R)}) == Generic.SubmoduleElem{elem_type(R)}
+   @test parent_type(Generic.SubmoduleElem{elem_type(R)}) == Generic.Submodule{elem_type(R)}
 
-   @test isa(N([R(2), R(7)]), Generic.submodule_elem)
+   @test isa(N([R(2), R(7)]), Generic.SubmoduleElem)
 
    F = FreeModule(R, 5)
    nsubs = rand(0:5)
@@ -50,7 +50,7 @@
    m = S([])
 
    @test isa(S, Generic.Submodule)
-   @test isa(m, Generic.submodule_elem)
+   @test isa(m, Generic.SubmoduleElem)
 end
 
 @testset "Generic.Submodule.manipulation..." begin

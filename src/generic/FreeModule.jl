@@ -115,7 +115,7 @@ function (M::FreeModule{T})(a::AbstractAlgebra.MatElem{T}) where T <: Union{Ring
    return z
 end
 
-function (M::FreeModule{T})(a::submodule_elem{T}) where T <: RingElement
+function (M::FreeModule{T})(a::SubmoduleElem{T}) where T <: RingElement
    R = parent(a)
    base_ring(R) !== base_ring(M) && error("Incompatible modules")
    return M(R.map(a))

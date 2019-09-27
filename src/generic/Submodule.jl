@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export Submodule, submodule_elem, ngens, gens, supermodule, sub
+export Submodule, SubmoduleElem, ngens, gens, supermodule, sub
 
 ###############################################################################
 #
@@ -12,15 +12,15 @@ export Submodule, submodule_elem, ngens, gens, supermodule, sub
 #
 ###############################################################################
 
-parent_type(::Type{submodule_elem{T}}) where T <: RingElement = Submodule{T}
+parent_type(::Type{SubmoduleElem{T}}) where T <: RingElement = Submodule{T}
 
-elem_type(::Type{Submodule{T}}) where T <: RingElement = submodule_elem{T}
+elem_type(::Type{Submodule{T}}) where T <: RingElement = SubmoduleElem{T}
 
-parent(v::submodule_elem) = v.parent
+parent(v::SubmoduleElem) = v.parent
 
 base_ring(N::Submodule{T}) where T <: RingElement = N.base_ring
 
-base_ring(v::submodule_elem{T}) where T <: RingElement = base_ring(v.parent)
+base_ring(v::SubmoduleElem{T}) where T <: RingElement = base_ring(v.parent)
 
 ngens(N::Submodule{T}) where T <: RingElement = length(N.gen_cols)
 
@@ -58,7 +58,7 @@ function show(io::IO, N::Submodule{T}) where T <: FieldElement
    show_gens_rels(io, N)
 end
 
-function show(io::IO, v::submodule_elem)
+function show(io::IO, v::SubmoduleElem)
    print(io, "(")
    len = ngens(parent(v))
    for i = 1:len - 1
@@ -81,7 +81,7 @@ function (N::Submodule{T})(v::Vector{T}) where T <: RingElement
    length(v) != ngens(N) && error("Length of vector does not match number of generators")
    mat = matrix(base_ring(N), 1, length(v), v)
    mat = reduce_mod_rels(mat, rels(N), 1)
-   return submodule_elem{T}(N, mat)
+   return SubmoduleElem{T}(N, mat)
 end
 
 function (N::Submodule{T})(v::Vector{Any}) where T <: RingElement
@@ -91,12 +91,12 @@ end
 
 function (N::Submodule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingElement
    ncols(v) != ngens(N) && error("Length of vector does not match number of generators")
-   nrows(v) != 1 && ("Not a vector in submodule_elem constructor")
+   nrows(v) != 1 && ("Not a vector in SubmoduleElem constructor")
    v = reduce_mod_rels(v, rels(N), 1)
-   return submodule_elem{T}(N, v)
+   return SubmoduleElem{T}(N, v)
 end
 
-function (M::Submodule{T})(a::submodule_elem{T}) where T <: RingElement
+function (M::Submodule{T})(a::SubmoduleElem{T}) where T <: RingElement
    R = parent(a)
    base_ring(R) != base_ring(M) && error("Incompatible modules")
    if R === M

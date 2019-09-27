@@ -99,7 +99,7 @@ function (N::DirectSumModule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingE
    return DirectSumModuleElem{T}(N, v)
 end
 
-function (M::DirectSumModule{T})(a::submodule_elem{T}) where T <: RingElement
+function (M::DirectSumModule{T})(a::SubmoduleElem{T}) where T <: RingElement
    R = parent(a)
    base_ring(R) != base_ring(M) && error("Incompatible modules")
    return M(R.map(a))

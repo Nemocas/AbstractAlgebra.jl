@@ -1122,7 +1122,7 @@ end
 
 ###############################################################################
 #
-#   Submodule/submodule_elem
+#   Submodule/SubmoduleElem
 #
 ###############################################################################
 
@@ -1140,11 +1140,11 @@ mutable struct Submodule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    end
 end
 
-mutable struct submodule_elem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
+mutable struct SubmoduleElem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
    v::AbstractAlgebra.MatElem{T}
    parent::Submodule{T}
 
-   function submodule_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
+   function SubmoduleElem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
       z = new{T}(v, m)
    end
 end
