@@ -1189,7 +1189,7 @@ end
 
 ###############################################################################
 #
-#   SNFModule/snf_module_elem
+#   SNFModule/SNFModuleElem
 #
 ###############################################################################
 
@@ -1205,11 +1205,11 @@ mutable struct SNFModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    end
 end
 
-mutable struct snf_module_elem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
+mutable struct SNFModuleElem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
    v::AbstractAlgebra.MatElem{T}
    parent::SNFModule{T}
 
-   function snf_module_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
+   function SNFModuleElem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
       z = new{T}(v, m)
    end
 end

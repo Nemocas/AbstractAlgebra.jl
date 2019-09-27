@@ -13,7 +13,7 @@
    D, f = snf(F)
    m = D([])
 
-   @test isa(m, Generic.snf_module_elem)
+   @test isa(m, Generic.SNFModuleElem)
 end
 
 @testset "Generic.InvariantFactorDecomposition.invariant_factors..." begin
