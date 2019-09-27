@@ -19,7 +19,7 @@ using Random
    D, h = DirectSum(Q)
    m = D([])
 
-   @test isa(m, Generic.direct_sum_module_elem)
+   @test isa(m, Generic.DirectSumModuleElem)
 end
 
 @testset "Generic.DirectSum.basic_manipulation..." begin

@@ -1216,7 +1216,7 @@ end
 
 ###############################################################################
 #
-#   DirectSumModule/direct_sum_module_elem
+#   DirectSumModule/DirectSumModuleElem
 #
 ###############################################################################
 
@@ -1231,11 +1231,11 @@ mutable struct DirectSumModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    end
 end
 
-mutable struct direct_sum_module_elem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
+mutable struct DirectSumModuleElem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
    v::AbstractAlgebra.MatElem{T}
    parent::DirectSumModule{T}
 
-   function direct_sum_module_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
+   function DirectSumModuleElem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
       z = new{T}(v, m)
    end
 end
