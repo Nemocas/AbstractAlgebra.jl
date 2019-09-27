@@ -852,11 +852,11 @@ end
 ###############################################################################
 
 function inflate(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
-    return parent(a)(a.coeffs, pol_length(a), b*a.prec, b*a.val, b*a.scale)
+    return parent(a)(deepcopy(a.coeffs), pol_length(a), b*a.prec, b*a.val, b*a.scale)
 end
 
 function deflate(a::LaurentSeriesElem{T}, b::Int) where {T <: RingElement}
-    return parent(a)(a.coeffs, pol_length(a), div(a.prec, b), div(a.val, b), div(a.scale, b))
+    return parent(a)(deepcopy(a.coeffs), pol_length(a), div(a.prec, b), div(a.val, b), div(a.scale, b))
 end
 
 ###############################################################################
