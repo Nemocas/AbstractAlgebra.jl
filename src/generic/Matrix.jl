@@ -397,11 +397,11 @@ function Base.view(M::Mat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where 
    return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
 end
 
-function Base.view(M::AbstractAlgebra.MatElem{T}, rows::Colon, cols::UnitRange{Int64}) where T <: RingElement
+function Base.view(M::AbstractAlgebra.MatElem{T}, rows::Colon, cols::UnitRange{Int}) where T <: RingElement
    return view(M, 1:nrows(M), cols)
 end
 
-function Base.view(M::AbstractAlgebra.MatElem{T}, rows::UnitRange{Int64}, cols::Colon) where T <: RingElement
+function Base.view(M::AbstractAlgebra.MatElem{T}, rows::UnitRange{Int}, cols::Colon) where T <: RingElement
    return view(M, rows, 1:ncols(M))
 end
 
