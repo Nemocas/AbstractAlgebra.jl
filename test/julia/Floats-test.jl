@@ -36,11 +36,15 @@ end
    R = RealField
    f = rand(R, 1:9)
    @test f isa elem_type(R)
-   f = rand(R, UnitRange{AbstractFloat}(1.0, 9.0))
+   f = rand(R, UnitRange(1.0, 9.0))
+   @test f isa elem_type(R)
+   f = rand(R, UnitRange(big(1.0), big(9.0)))
    @test f isa elem_type(R)
    f = rand(rng, R, 1:9)
    @test f isa elem_type(R)
-   f = rand(rng, R, UnitRange{AbstractFloat}(1.0, 9.0))
+   f = rand(rng, R, UnitRange(1.0, 9.0))
+   @test f isa elem_type(R)
+   f = rand(rng, R, UnitRange(big(1.0), big(9.0)))
    @test f isa elem_type(R)
 end
 

@@ -187,7 +187,7 @@ end
 #
 ###############################################################################
 
-function rand(rng::AbstractRNG, R::Floats, n::UnitRange{AbstractFloat})
+function rand(rng::AbstractRNG, R::Floats, n::UnitRange{<:AbstractFloat})
    return R(n.start + rand(rng, Float64)*(n.stop - n.start))
 end
 
