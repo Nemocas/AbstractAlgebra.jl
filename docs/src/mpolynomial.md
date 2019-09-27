@@ -221,7 +221,10 @@ x^2*y^2+x+1//1
 Incase a specific parent ring is constructed, it can also be passed to the function.
 
 ```@docs
-change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g, R::AbstractAlgebra.MPolyRing) where {T <: RingElement}
+change_base_ring(R::Ring, p::AbstractAlgebra.MPolyElem{T}, Rx::AbstractAlgebra.MPolyRing) where {T <: RingElement}
+change_base_ring(R::Ring, p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
+map(g, p::AbstractAlgebra.MPolyElem{T}, Rx::AbstractAlgebra.MPolyRing) where {T <: RingElement}
+map(g, p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
 ```
 
 **Examples**
@@ -236,7 +239,7 @@ julia> S,  = PolynomialRing(QQ, ["x", "y"])
 julia> fz = x^5 + y^3
 x^5+y^3+1
 
-julia> fq = change_base_ring(fz, QQ, S)
+julia> fq = change_base_ring(QQ, fz, S)
 x^5+y^3+1//1
 
 

@@ -1911,13 +1911,13 @@ end
       M = rand(P, -10:10)
       N = rand(Q, -10:10)
       for R in [QQ, ZZ, GF(2), GF(5)]
-         MQ = change_base_ring(M, R)
+         MQ = change_base_ring(R, M)
          @test MQ isa T
          @test base_ring(MQ) == R
-         NQ = change_base_ring(N, R)
+         NQ = change_base_ring(R, N)
          @test NQ isa T
          @test base_ring(NQ) == R
-         MNQ = change_base_ring(M * N, R)
+         MNQ = change_base_ring(R, M * N)
          @test MNQ isa T
          @test base_ring(MNQ) == R
          @test MQ * NQ == MNQ

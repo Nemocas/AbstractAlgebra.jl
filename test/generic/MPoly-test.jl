@@ -940,7 +940,7 @@ end
    R, varsR = PolynomialRing(F2, ["x"])
    S, varsS = PolynomialRing(R, ["y"])
    f = x -> x^2
-   change_base_ring(varsR[1] * varsS[1], f) == f(varsR[1]) * varsS[1]
+   map(f, varsR[1] * varsS[1]) == f(varsR[1]) * varsS[1]
 
    for num_vars=1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -948,14 +948,23 @@ end
 
       R, vars = PolynomialRing(ZZ, var_names; ordering=ord)
 
-      @test typeof(AbstractAlgebra.Generic.change_base_ring(R(1), a->ZZ(a))) == AbstractAlgebra.Generic.MPoly{typeof(ZZ(1))}
-      @test typeof(AbstractAlgebra.Generic.change_base_ring(R(0), a->ZZ(a))) == AbstractAlgebra.Generic.MPoly{typeof(ZZ(0))}
+      F2x, varss = PolynomialRing(F2, var_names; ordering = ord)
+
+      @test typeof(AbstractAlgebra.Generic.change_base_ring(ZZ, R(1))) == AbstractAlgebra.Generic.MPoly{typeof(ZZ(1))}
+      @test typeof(AbstractAlgebra.Generic.change_base_ring(ZZ, R(0))) == AbstractAlgebra.Generic.MPoly{typeof(ZZ(0))}
 
       for iter in 1:10
          f = rand(R, 5:10, 1:10, -100:100)
-         @test evaluate(change_base_ring(f, a -> R(a)), [one(R) for i=1:num_vars]) == sum(f.coeffs[i] for i=1:f.length)
-         @test evaluate(change_base_ring(f, a -> R(a)), vars) == f
-         @test parent(change_base_ring(f, a -> R(a))).ord == parent(f).ord
+         @test evaluate(change_base_ring(R, f), [one(R) for i=1:num_vars]) == sum(f.coeffs[i] for i=1:f.length)
+         @test evaluate(change_base_ring(R, f), vars) == f
+         @test ordering(parent(change_base_ring(R, f))) == ordering(parent(f))
+
+         g = change_base_ring(F2, f, F2x)
+         @test base_ring(g) === F2
+         @test parent(g) === F2x
+
+         g = map(z -> z + 1, f, R)
+         @test parent(g) === R
       end
    end
 end
@@ -969,8 +978,7 @@ end
 
       for iter in 1:10
          f = rand(R, 5:10, 1:10, -100:100)
-         @test length(vars(R(evaluate(change_base_ring(f, a -> R(a)), [one(R) for i=1:num_vars])))) == 0
-         # @test issubset(vars(f), Set(gens(parent(f)))) # This fails, probably due to https://github.com/Nemocas/AbstractAlgebra.jl/issues/111
+         @test length(vars(R(evaluate(map(R, f), [one(R) for i=1:num_vars])))) == 0
       end
    end
 end
