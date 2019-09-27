@@ -14,11 +14,11 @@
 
    @test isa(Q, Generic.QuotientModule)
 
-   @test elem_type(Q) == Generic.quotient_module_elem{elem_type(R)}
-   @test elem_type(Generic.QuotientModule{elem_type(R)}) == Generic.quotient_module_elem{elem_type(R)}
-   @test parent_type(Generic.quotient_module_elem{elem_type(R)}) == Generic.QuotientModule{elem_type(R)}
+   @test elem_type(Q) == Generic.QuotientModuleElem{elem_type(R)}
+   @test elem_type(Generic.QuotientModule{elem_type(R)}) == Generic.QuotientModuleElem{elem_type(R)}
+   @test parent_type(Generic.QuotientModuleElem{elem_type(R)}) == Generic.QuotientModule{elem_type(R)}
 
-   @test isa(Q([R(2)]), Generic.quotient_module_elem)
+   @test isa(Q([R(2)]), Generic.QuotientModuleElem)
 
    R = QQ
    M = VectorSpace(R, 2)
@@ -60,7 +60,7 @@
    Q, g = quo(F, S)
    m = Q([])
 
-   @test isa(m, Generic.quotient_module_elem)
+   @test isa(m, Generic.QuotientModuleElem)
 end
 
 @testset "Generic.QuotientModule.manipulation..." begin

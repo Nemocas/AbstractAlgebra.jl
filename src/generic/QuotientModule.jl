@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export QuotientModule, quotient_module_elem, quo
+export QuotientModule, QuotientModuleElem, quo
 
 ###############################################################################
 #
@@ -12,15 +12,15 @@ export QuotientModule, quotient_module_elem, quo
 #
 ###############################################################################
 
-parent_type(::Type{quotient_module_elem{T}}) where T <: RingElement = QuotientModule{T}
+parent_type(::Type{QuotientModuleElem{T}}) where T <: RingElement = QuotientModule{T}
 
-elem_type(::Type{QuotientModule{T}}) where T <: RingElement = quotient_module_elem{T}
+elem_type(::Type{QuotientModule{T}}) where T <: RingElement = QuotientModuleElem{T}
 
-parent(v::quotient_module_elem) = v.parent
+parent(v::QuotientModuleElem) = v.parent
 
 base_ring(N::QuotientModule{T}) where T <: RingElement = N.base_ring
 
-base_ring(v::quotient_module_elem{T}) where T <: RingElement = base_ring(v.parent)
+base_ring(v::QuotientModuleElem{T}) where T <: RingElement = base_ring(v.parent)
 
 ngens(N::QuotientModule{T}) where T <: RingElement = length(N.gen_cols)
 
@@ -30,7 +30,7 @@ function gen(N::QuotientModule{T}, i::Int) where T <: RingElement
    R = base_ring(N)
    mat = matrix(R, 1, ngens(N),
                 [(j == i ? one(R) : zero(R)) for j = 1:ngens(N)])
-   return quotient_module_elem{T}(N, mat)
+   return QuotientModuleElem{T}(N, mat)
 end
 
 @doc Markdown.doc"""
@@ -73,7 +73,7 @@ function show(io::IO, N::QuotientModule{T}) where T <: FieldElement
    show_gens_rels(io, N)
 end
 
-function show(io::IO, v::quotient_module_elem)
+function show(io::IO, v::QuotientModuleElem)
    print(io, "(")
    len = ngens(parent(v))
    for i = 1:len - 1
@@ -129,7 +129,7 @@ function (N::QuotientModule{T})(v::Vector{T}) where T <: RingElement
    length(v) != ngens(N) && error("Length of vector does not match number of generators")
    mat = matrix(base_ring(N), 1, length(v), v)
    mat = reduce_mod_rels(mat, rels(N), 1)
-   return quotient_module_elem{T}(N, mat)
+   return QuotientModuleElem{T}(N, mat)
 end
 
 function (M::QuotientModule{T})(a::Vector{Any}) where T <: Union{RingElement, NCRingElem}
@@ -139,9 +139,9 @@ end
 
 function (N::QuotientModule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingElement
    ncols(v) != ngens(N) && error("Length of vector does not match number of generators")
-   nrows(v) != 1 && ("Not a vector in quotient_module_elem constructor")
+   nrows(v) != 1 && ("Not a vector in QuotientModuleElem constructor")
    v = reduce_mod_rels(v, rels(N), 1)
-   return quotient_module_elem{T}(N, v)
+   return QuotientModuleElem{T}(N, v)
 end
 
 function (M::QuotientModule{T})(a::AbstractAlgebra.FPModuleElem{T}) where T <: RingElement

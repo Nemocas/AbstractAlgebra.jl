@@ -1151,7 +1151,7 @@ end
 
 ###############################################################################
 #
-#   QuotientModule/quotient_module_elem
+#   QuotientModule/QuotientModuleElem
 #
 ###############################################################################
 
@@ -1178,11 +1178,11 @@ mutable struct QuotientModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    end
 end
 
-mutable struct quotient_module_elem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
+mutable struct QuotientModuleElem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
    v::AbstractAlgebra.MatElem{T}
    parent::QuotientModule{T}
 
-   function quotient_module_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
+   function QuotientModuleElem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
       z = new{T}(v, m)
    end
 end
