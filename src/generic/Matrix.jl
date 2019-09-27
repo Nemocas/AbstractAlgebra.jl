@@ -217,9 +217,9 @@ end
 """
 zero(a::AbstractAlgebra.MatSpace) = a()
 
-zero(x::MatrixElem, R::Ring=base_ring(x)) = zero!(similar(x, R))
 zero(x::MatrixElem, R::Ring, r::Int, c::Int) = zero!(similar(x, R, r, c))
-zero(x::MatrixElem, r::Int, c::Int) = zero!(similar(x, r, c))
+zero(x::MatrixElem, R::Ring=base_ring(x)) = zero(x, R, nrows(x), ncols(x))
+zero(x::MatrixElem, r::Int, c::Int) = zero(x, base_ring(x), r, c)
 
 function zero!(x::MatrixElem)
    R = base_ring(x)
