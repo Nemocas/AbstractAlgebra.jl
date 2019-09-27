@@ -98,7 +98,7 @@ Here we give a list of the concrete types in AbstractAlgebra.jl.
 In parentheses we put the types of the corresponding parent objects.
 
   - `Perm{<:Integer}` (`PermGroup{<:Integer}`)
-  - `gfelem{<:Integer}` (`GFField{<:Integer}`)
+  - `GFElem{<:Integer}` (`GFField{<:Integer}`)
 
 We also think of various Julia types as though they were AbstractAlgebra.jl types:
 

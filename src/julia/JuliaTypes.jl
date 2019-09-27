@@ -61,7 +61,7 @@ const FloatsID = Dict{DataType, Field}()
 
 ###############################################################################
 #
-#   GFField/gfelem
+#   GFField/GFElem
 #
 ###############################################################################
 
@@ -81,7 +81,7 @@ end
 
 const GFFieldID = Dict{Tuple{DataType, Integer}, Field}()
 
-struct gfelem{T <: Integer} <: FinFieldElem
+struct GFElem{T <: Integer} <: FinFieldElem
    d::T
    parent::GFField{T}
 end

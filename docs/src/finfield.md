@@ -15,7 +15,7 @@ $1$ (prime fields). They are modelled as $\mathbb{Z}/p\mathbb{Z}$ for $p$ a prim
 
 Finite fields have type `GFField{T}` where `T` is either `Int` or `BigInt`.
 
-Elements of such a finite field have type `gfelem{T}`.
+Elements of such a finite field have type `GFElem{T}`.
 
 ## Finite field constructors
 
