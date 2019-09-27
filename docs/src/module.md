@@ -102,7 +102,7 @@ julia> n = ngens(M)
 2
 
 julia> G = gens(M)
-2-element Array{AbstractAlgebra.Generic.free_module_elem{Rational{BigInt}},1}:
+2-element Array{AbstractAlgebra.Generic.FreeModuleElem{Rational{BigInt}},1}:
  (1//1, 0//1)
  (0//1, 1//1)
 

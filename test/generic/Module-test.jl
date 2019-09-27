@@ -16,9 +16,9 @@ end
 @testset "Generic.Module.rand..." begin
    F = FreeModule(ZZ, 3)
    f = rand(F, 1:9)
-   @test f isa Generic.free_module_elem
+   @test f isa Generic.FreeModuleElem
    f = rand(rng, F, 1:9)
-   @test f isa Generic.free_module_elem
+   @test f isa Generic.FreeModuleElem
 end
 
 @testset "Generic.Module.manipulation..." begin

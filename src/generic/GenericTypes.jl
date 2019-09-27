@@ -1056,7 +1056,7 @@ end
 
 ###############################################################################
 #
-#   FreeModule/free_module_elem
+#   FreeModule/FreeModuleElem
 #
 ###############################################################################
 
@@ -1079,11 +1079,11 @@ end
 
 const FreeModuleDict = Dict{Tuple{NCRing, Int}, FreeModule}()
 
-mutable struct free_module_elem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModuleElem{T}
+mutable struct FreeModuleElem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModuleElem{T}
     v::AbstractAlgebra.MatElem{T}
     parent::FreeModule{T}
 
-    function free_module_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
+    function FreeModuleElem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
        z = new{T}(v, m)
     end
 end
