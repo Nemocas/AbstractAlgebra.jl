@@ -9,7 +9,7 @@ end
 
 AbstractAlgebra.jl provides rudimentary native support for permutation groups (implemented in `src/generic/PermGroups.jl`). All functionality of permutations is accesible in the `Generic` submodule.
 
-Permutations are represented internally via vector of integers, wrapped in type `perm{T}`, where `T<:Integer` carries the information on the type of elements of a permutation. Permutation groups are singleton parent objects of type `PermGroup{T}` and are used mostly to store the length of a permutation, since it is not included in the permutation type.
+Permutations are represented internally via vector of integers, wrapped in type `Perm{T}`, where `T<:Integer` carries the information on the type of elements of a permutation. Permutation groups are singleton parent objects of type `PermGroup{T}` and are used mostly to store the length of a permutation, since it is not included in the permutation type.
 
 Permutation groups are created using the `PermGroup` (inner) constructor.
 However, for convenience we define
@@ -18,7 +18,7 @@ PermutationGroup = PermGroup
 ```
 so that permutation groups can be created using `PermutationGroup` instead of `PermGroup`.
 
-Both `PermGroup` and `perm` and can be parametrized by any type `T<:Integer` .
+Both `PermGroup` and `Perm` and can be parametrized by any type `T<:Integer` .
 By default the parameter is the `Int`-type native to the systems architecture.
 However, if you are sure that your permutations are small enough to fit into smaller integer type (such as `Int32`, `Uint16`, or even `Int8`), you may choose to change the parametrizing type accordingly.
 In practice this may result in decreased memory footprint (when storing multiple permutations) and noticable faster performance, if your workload is heavy in operations on permutations, which e.g. does not fit into cache of your cpu.
@@ -33,10 +33,10 @@ Generic.setpermstyle
 
 There are several methods to to construct permutations in AbstractAlgebra.jl.
 
-* The easiest way is to directly call to the `perm` (inner) constructor:
+* The easiest way is to directly call to the `Perm` (inner) constructor:
 
 ```@docs
-Generic.perm
+Generic.Perm
 ```
 
   Since the parent object can be reconstructed from the permutation itself, you can work with permutations without explicitly constructing the parent object.
@@ -59,13 +59,13 @@ julia> G = PermutationGroup(BigInt(5)); p = G([2,3,1,5,4])
 (1,2,3)(4,5)
 
 julia> typeof(p)
-perm{BigInt}
+Perm{BigInt}
 
 julia> H = PermutationGroup(UInt16(5)); r = H([2,3,1,5,4])
 (1,2,3)(4,5)
 
 julia> typeof(r)
-perm{UInt16}
+Perm{UInt16}
 
 julia> H()
 ()
@@ -87,26 +87,26 @@ constructions over permutation groups.
 Any custom permutation group implementation in AbstractAlgebra.jl should provide these functions along with the usual group element arithmetic and comparison.
 
 ```@docs
-parent(::perm)
+parent(::Perm)
 elem_type(::PermGroup)
-parent_type(::perm)
+parent_type(::Perm)
 ```
 
-A custom implementation also needs to implement `hash(::perm, ::UInt)` and (possibly) `deepcopy_internal(::perm, ::ObjectIdDict)`.
+A custom implementation also needs to implement `hash(::Perm, ::UInt)` and (possibly) `deepcopy_internal(::Perm, ::ObjectIdDict)`.
 
 !!! note
 
     Permutation group elements are mutable and so returning shallow copies is not sufficient.
 
 ```julia
-getindex(a::perm, n::Int)
+getindex(a::Perm, n::Int)
 ```
 
 Allows access to entry $n$ of the given permutation via the syntax `a[n]`.
 Note that entries are $1$-indexed.
 
 ```julia
-setindex!(a::perm, d::Int, n::Int)
+setindex!(a::Perm, d::Int, n::Int)
 ```
 
 Set the $n$-th entry of the given permutation to $d$.
@@ -132,7 +132,7 @@ Return the permutation whose entries are given by the elements of the supplied
 vector.
 
 ```julia
-G(p::perm)
+G(p::Perm)
 ```
 
 Take a permutation that is already in the permutation group and simply return
@@ -143,16 +143,16 @@ it. A copy of the original is not made if not necessary.
 Numerous functions are provided to manipulate permutation group elements.
 
 ```@docs
-cycles(::perm)
+cycles(::Perm)
 ```
 
 Cycle structure is cached in a permutation, since once available, it provides a convenient shortcut in many other algorithms.
 
 ```@docs
-parity(::perm)
-sign(::perm)
-permtype(::perm)
-order(::perm)
+parity(::Perm)
+sign(::Perm)
+permtype(::Perm)
+order(::Perm)
 order(::Generic.PermGroup)
 ```
 
@@ -184,9 +184,9 @@ However, since all permutations yielded by `elements!` are aliased (modified "in
 ## Arithmetic operators
 
 ```@docs
-*(::perm{T}, ::perm{T}) where T
-^(::perm, n::Integer)
-inv(::perm)
+*(::Perm{T}, ::Perm{T}) where T
+^(::Perm, n::Integer)
+inv(::Perm)
 ```
 
 Permutations parametrized by different types can be multiplied, and follow the standard julia integer promotion rules:
@@ -197,7 +197,7 @@ h = rand(PermGroup(UInt32(5)));
 typeof(g*h)
 
 # output
-perm{UInt32}
+Perm{UInt32}
 ```
 
 ## Coercion
@@ -221,7 +221,7 @@ julia> PermutationGroup(4)()
 
 
 ```julia
-(G::PermGroup)(::perm{<:Integer}[, check=true])
+(G::PermGroup)(::Perm{<:Integer}[, check=true])
 ```
 > Coerce a permutation `p` into group $G$ (performing the conversion, if necessary).
 > If `p` is already an element of `G` no copy is performed.
@@ -232,7 +232,7 @@ julia> PermutationGroup(4)()
 > Parse the string input e.g. copied from the output of GAP.
 > The method uses the same logic as `perm"..."` macro.
 > The string is sanitized and checked for disjoint cycles.
-> Both `string(p::perm)` (if `setpermstyle(:cycles)`) and `string(cycles(p::perm))` are valid input for this method.
+> Both `string(p::Perm)` (if `setpermstyle(:cycles)`) and `string(cycles(p::Perm))` are valid input for this method.
 
 ```julia
 (G::PermGroup{T})(::CycleDec{T}[, check=true]) where T
@@ -242,14 +242,14 @@ julia> PermutationGroup(4)()
 ## Comparison
 
 ```@docs
-==(::perm, ::perm)
+==(::Perm, ::Perm)
 ==(::Generic.PermGroup, ::Generic.PermGroup)
 ```
 
 ## Misc
 ```@docs
 rand(::Generic.PermGroup)
-Generic.matrix_repr(::perm)
+Generic.matrix_repr(::Perm)
 Generic.emb(::Generic.PermGroup, ::Vector{Int}, ::Bool)
-Generic.emb!(::perm, ::perm, V)
+Generic.emb!(::Perm, ::Perm, V)
 ```

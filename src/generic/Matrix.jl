@@ -1028,7 +1028,7 @@ end
     *(P::Generic.perm, x::Generic.MatrixElem)
 > Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 """
-function *(P::Generic.perm, x::MatrixElem)
+function *(P::Generic.Perm, x::MatrixElem)
    z = similar(x)
    m = nrows(x)
    n = ncols(x)
@@ -1046,7 +1046,7 @@ end
 #
 ###############################################################################
 
-function lu!(P::Generic.perm, A::MatrixElem{T}) where {T <: FieldElement}
+function lu!(P::Generic.Perm, A::MatrixElem{T}) where {T <: FieldElement}
    m = nrows(A)
    n = ncols(A)
    rank = 0
@@ -1133,7 +1133,7 @@ function lu(A::MatrixElem{T}, P = PermGroup(nrows(A))) where {T <: FieldElement}
    return rank, p, L, U
 end
 
-function fflu!(P::Generic.perm, A::MatrixElem{T}) where {T <: RingElement}
+function fflu!(P::Generic.Perm, A::MatrixElem{T}) where {T <: RingElement}
    if !isdomain_type(T)
       error("Not implemented")
    end
@@ -1191,7 +1191,7 @@ function fflu!(P::Generic.perm, A::MatrixElem{T}) where {T <: RingElement}
    return rank, d2
 end
 
-function fflu!(P::Generic.perm, A::MatrixElem{T}) where {T <: Union{FieldElement, ResElem}}
+function fflu!(P::Generic.Perm, A::MatrixElem{T}) where {T <: Union{FieldElement, ResElem}}
    m = nrows(A)
    n = ncols(A)
    rank = 0
@@ -1840,7 +1840,7 @@ function solve_fflu(A::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    return solve_fflu_precomp(p, FFLU, b), d
 end
 
-function solve_fflu_precomp(p::Generic.perm, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+function solve_fflu_precomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    x = p * b
    n = nrows(x)
    m = ncols(x)
@@ -1901,7 +1901,7 @@ function solve_lu(A::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
    return solve_lu_precomp(p, LU, b)
 end
 
-function solve_lu_precomp(p::Generic.perm, LU::MatElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
+function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
    x = p * b
    n = nrows(x)
    m = ncols(x)

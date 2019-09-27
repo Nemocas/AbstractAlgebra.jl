@@ -463,7 +463,7 @@ julia> b = content(A)
 ### Permutation
 
 ```@docs
-*(::perm, ::MatElem)
+*(::Perm, ::MatElem)
 ```
 
 **Examples**

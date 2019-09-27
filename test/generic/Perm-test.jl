@@ -1,21 +1,21 @@
 IntTypes = [Int8, Int16, Int32, Int, UInt8, UInt16, UInt32, UInt, BigInt]
 
-@testset "perm.abstract_types..." begin
-   @test Generic.perm <: GroupElem
+@testset "Perm.abstract_types..." begin
+   @test Generic.Perm <: GroupElem
 
    @test Generic.PermGroup <: AbstractAlgebra.Group
 end
 
-@testset "perm.constructors ($T)..." for T in IntTypes
-   @test elem_type(Generic.PermGroup{T}) == Generic.perm{T}
-   @test parent_type(Generic.perm{T}) == Generic.PermGroup{T}
+@testset "Perm.constructors ($T)..." for T in IntTypes
+   @test elem_type(Generic.PermGroup{T}) == Generic.Perm{T}
+   @test parent_type(Generic.Perm{T}) == Generic.PermGroup{T}
 
    @test PermutationGroup(T(10)) isa Generic.PermGroup{T}
    G = PermutationGroup(T(10))
-   @test elem_type(G) == Generic.perm{T}
+   @test elem_type(G) == Generic.Perm{T}
 
    @test G() isa GroupElem
-   @test G() isa Generic.perm{T}
+   @test G() isa Generic.Perm{T}
    a = G()
    @test parent_type(typeof(a)) == Generic.PermGroup{T}
    @test parent(a) == G
@@ -23,16 +23,16 @@ end
    z = T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8]
 
    @test G(z) isa GroupElem
-   @test G(z) isa Generic.perm{T}
+   @test G(z) isa Generic.Perm{T}
    b = G(z)
-   @test typeof(b) == Generic.perm{T}
+   @test typeof(b) == Generic.Perm{T}
    @test parent_type(typeof(b)) == Generic.PermGroup{T}
    @test parent(b) == G
 
-   @test rand(G) isa Generic.perm{T}
-   @test rand(G, 3) isa Vector{Generic.perm{T}}
-   @test rand(rng, G) isa Generic.perm{T}
-   @test rand(rng, G, 2, 3) isa Matrix{Generic.perm{T}}
+   @test rand(G) isa Generic.Perm{T}
+   @test rand(G, 3) isa Vector{Generic.Perm{T}}
+   @test rand(rng, G) isa Generic.Perm{T}
+   @test rand(rng, G, 2, 3) isa Matrix{Generic.Perm{T}}
    g = rand(G)
    @test parent(g) == G
    @test parent(g) == PermutationGroup(T(10))
@@ -43,11 +43,11 @@ end
       @test parent(g) != PermutationGroup(10)
    end
 
-   @test similar(g) isa perm{T}
-   @test similar(g, Int) isa perm{Int}
+   @test similar(g) isa Perm{T}
+   @test similar(g, Int) isa Perm{Int}
 end
 
-@testset "perm.parsingGAP..." begin
+@testset "Perm.parsingGAP..." begin
    @test Generic.parse_cycles("()") == (Int[], [1])
    @test Generic.parse_cycles("(1)(2)(3)") == ([1,2,3], [1,2,3,4])
    @test Generic.parse_cycles("Cycle decomposition: (1)(2,3)") == ([1,2,3], [1,2,4])
@@ -68,12 +68,12 @@ end
    @test Generic.parse_cycles(s) == Generic.parse_cycles(s2)
 
    @test perm"(1,2,3)(5)(10)" isa GroupElem
-   @test perm"(1,2,3)(5)(10)" isa Generic.perm
-   @test perm"(1,2,3)(5)(10)" isa Generic.perm{Int}
+   @test perm"(1,2,3)(5)(10)" isa Generic.Perm
+   @test perm"(1,2,3)(5)(10)" isa Generic.Perm{Int}
    @test parent(perm"(1,2,3)(5)(10)") == PermGroup(10)
    @test parent(perm"(1,2,3)(5)(6)") == PermGroup(6)
-   @test perm"(1,2,3,4,5)" == perm([2,3,4,5,1])
-   @test perm"(3,2,1)(4,5)" == perm([3,1,2,5,4])
+   @test perm"(1,2,3,4,5)" == Perm([2,3,4,5,1])
+   @test perm"(3,2,1)(4,5)" == Perm([3,1,2,5,4])
 
    @test perm"""
 ( 1, 22,73,64,78,81,  24 ,89,90,54,51,82,91,53,18,38,19,52,44,77,62,95,94,50,43,42,
@@ -86,13 +86,13 @@ end
       G = PermutationGroup(T(5))
       @test G("()") == G()
       @test G("()()") == G()
-      @test G("(1)(2,3)") == perm(T[1,3,2,4,5])
+      @test G("(1)(2,3)") == Perm(T[1,3,2,4,5])
       @test G("(2,3)") == G("(1)(2,3)")
       @test G("(3,2)") == G("(2,3)")
-      @test G("(3,2,1)") == perm(T[3,1,2,4,5])
+      @test G("(3,2,1)") == Perm(T[3,1,2,4,5])
       @test G("(3,2,1)") == G("(1,3,2)") == G("(2,1,3)")
-      @test G("(1,2,3,4,5)") == perm(T[2,3,4,5,1])
-      @test G("(3,2,1)(4,5)") == perm(T[3,1,2,5,4])
+      @test G("(1,2,3,4,5)") == Perm(T[2,3,4,5,1])
+      @test G("(3,2,1)(4,5)") == Perm(T[3,1,2,5,4])
       gg = G("(3,2,1)(4,5)")
       @test isdefined(gg, :cycles)
 
@@ -103,7 +103,7 @@ end
    end
 end
 
-@testset "perm.printing ($T)..." for T in IntTypes
+@testset "Perm.printing ($T)..." for T in IntTypes
    G = PermutationGroup(T(10))
 
    b = G(T[2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
@@ -114,11 +114,11 @@ end
    Generic.setpermstyle(:cycles);
    @test string(b) == "(1,2,3,5,6,7)(8,9,10)"
 
-   @test string(perm(T[1,2,3])) == "()"
-   @test string(perm(T[3,2,1])) == "(1,3)"
+   @test string(Perm(T[1,2,3])) == "()"
+   @test string(Perm(T[3,2,1])) == "(1,3)"
 end
 
-@testset "perm.basic_manipulation ($T)..." for T in IntTypes
+@testset "Perm.basic_manipulation ($T)..." for T in IntTypes
    G = PermutationGroup(T(10))
 
    a = G()
@@ -132,14 +132,14 @@ end
 
    @test length(unique([c,deepcopy(c)])) == 1
 
-   @test setindex!(a, 5, 2) isa perm
+   @test setindex!(a, 5, 2) isa Perm
    @test a[2] == T(5)
 
    a[1] = T(5)
    @test a[1] == T(5)
 end
 
-@testset "perm.iteration ($T)..." for T in IntTypes
+@testset "Perm.iteration ($T)..." for T in IntTypes
    G = PermutationGroup(T(6))
    @test length(AllPerms(T(6))) == 720
    @test length(unique([deepcopy(p) for p in AllPerms(T(6))])) == 720
@@ -147,7 +147,7 @@ end
    @test order(T, G) isa promote_type(T, Int)
    @test order(G) == 720
 
-   @test collect(G) isa Vector{perm{T}}
+   @test collect(G) isa Vector{Perm{T}}
 
    elts = collect(G)
 
@@ -158,11 +158,11 @@ end
    @test length(unique(collect(G))) == 720
 end
 
-@testset "perm.binary_ops ($T)..." for T in IntTypes
+@testset "Perm.binary_ops ($T)..." for T in IntTypes
    G = PermutationGroup(T(3))
 
-   a = perm(T[2,1,3]) # (1,2)
-   b = perm(T[2,3,1]) # (1,2,3)
+   a = Perm(T[2,1,3]) # (1,2)
+   b = Perm(T[2,3,1]) # (1,2,3)
 
    @test a*b == G(T[3,2,1]) # (1,2)*(1,2,3) == (1,3)
    @test b*a == G(T[1,3,2]) # (1,2,3)*(1,2) == (2,3)
@@ -170,7 +170,7 @@ end
    @test b*b*b == G()
 
    # (1,2,3)*(2,3,4) == (1,3)(2,4)
-   @test perm(T[2,3,1,4])*perm(T[1,3,4,2]) == perm(T[3,4,1,2])
+   @test Perm(T[2,3,1,4])*Perm(T[1,3,4,2]) == Perm(T[3,4,1,2])
 
    @test parity(G()) == 0
    p = parity(a)
@@ -199,7 +199,7 @@ end
    @test p^2 * p^-2 == G()
 end
 
-@testset "perm.mixed_binary_ops..." begin
+@testset "Perm.mixed_binary_ops..." begin
    G = PermutationGroup(6)
    for T in IntTypes
       H = PermutationGroup(T(6))
@@ -207,14 +207,14 @@ end
       @test G(H()) == G()
       @test H(G()) == H()
       @test G() == H()
-      @test rand(G)*rand(H) isa perm{promote_type(Int, T)}
-      @test rand(H)*rand(G) isa perm{promote_type(Int, T)}
-      @test G(rand(H)) isa perm{Int}
-      @test H(rand(G)) isa perm{T}
+      @test rand(G)*rand(H) isa Perm{promote_type(Int, T)}
+      @test rand(H)*rand(G) isa Perm{promote_type(Int, T)}
+      @test G(rand(H)) isa Perm{Int}
+      @test H(rand(G)) isa Perm{T}
    end
 end
 
-@testset "perm.inversion ($T)..." for T in IntTypes
+@testset "Perm.inversion ($T)..." for T in IntTypes
    G = PermutationGroup(T(10))
 
    a = G()
@@ -229,7 +229,7 @@ end
    end
 end
 
-@testset "perm.misc ($T)..." for T in IntTypes
+@testset "Perm.misc ($T)..." for T in IntTypes
    G = PermutationGroup(T(10))
    a = G([2, 3, 5, 4, 6, 7, 1, 9, 10, 8])
 
@@ -278,7 +278,7 @@ end
    end
 end
 
-@testset "perm.characters..." begin
+@testset "Perm.characters..." begin
    for T in IntTypes
       N = T(7)
       G = PermutationGroup(N)
