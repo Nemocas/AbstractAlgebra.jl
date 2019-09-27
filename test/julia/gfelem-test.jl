@@ -73,10 +73,10 @@ end
 
 @testset "Julia.gfelem.rand..." begin
    R = GF(13)
-   f = rand(R)
-   @test f isa AbstractAlgebra.gfelem
-   f = rand(rng, R)
-   @test f isa AbstractAlgebra.gfelem
+   @test rand(R) isa AbstractAlgebra.gfelem
+   @test rand(rng, R) isa AbstractAlgebra.gfelem
+   @test rand(R, 2, 3) isa Matrix{<:AbstractAlgebra.gfelem}
+   @test rand(rng, R, 2, 3) isa Matrix{<:AbstractAlgebra.gfelem}
 end
 
 @testset "Julia.gfelem.unary_ops..." begin
