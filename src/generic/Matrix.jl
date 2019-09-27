@@ -5161,10 +5161,10 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    change_base_ring(M::Generic.MatrixElem, R::AbstractAlgebra.Ring)
+    change_base_ring(R::Ring, M::Generic.MatrixElem)
 > Return the matrix obtained by coercing each entry into `R`.
 """
-function change_base_ring(M::MatrixElem, R::AbstractAlgebra.Ring)
+function change_base_ring(R::Ring, M::MatrixElem)
    N = similar(M, R)
    for i=1:nrows(M), j=1:ncols(M)
       N[i,j] = R(M[i,j])

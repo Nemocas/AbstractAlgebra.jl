@@ -225,7 +225,7 @@ isempty(::MatElem)
 ```
 
 ```@docs
-change_base_ring(::AbstractAlgebra.MatElem, ::AbstractAlgebra.Ring)
+change_base_ring(::AbstractAlgebra.Ring, ::AbstractAlgebra.MatElem)
 ```
 
 ```@docs

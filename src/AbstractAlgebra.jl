@@ -177,7 +177,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row, add_ro
                  to_univariate, trail, truncate, typed_hcat, typed_hvcat,
                  upscale, valuation, var, var_index, vars, weak_popov,
                  weak_popov_with_transform, zero, zero!, zero_matrix,
-                 @PolynomialRing
+                 @PolynomialRing, MatrixElem
 
 # Do not export divrem, exp, sqrt, numerator and denominator as we define our own
 export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, add_column!, add_row, add_row!, base_ring, cached,
@@ -256,7 +256,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  total_degree, tr, trail, truncate, typed_hcat, typed_hvcat,
                  upscale, valuation, var, var_index, vars, weak_popov,
                  weak_popov_with_transform, zero, zero!, zero_matrix,
-                 @PolynomialRing
+                 @PolynomialRing, MatrixElem
 
 function exp(a::T) where T
    return Base.exp(a)
