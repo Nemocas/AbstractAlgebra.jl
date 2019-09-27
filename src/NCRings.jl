@@ -116,3 +116,20 @@ function powers(a::T, d::Int) where {T <: NCRingElem}
    return A
 end
 
+###############################################################################
+#
+#   oftype
+#
+################################################################################
+
+# This is a useful fallback when applying methods from Base to our matrices,
+# see https://github.com/Nemocas/Nemo.jl/pull/637
+Base.oftype(x::NCRingElem, y::NCRingElem) = parent(x)(y)
+
+Base.oftype(x::NCRingElem, y::AbstractFloat) = parent(x)(y)
+
+Base.oftype(x::NCRingElem, y::Integer) = parent(x)(y)
+
+Base.oftype(x::NCRingElem, y::Rational) = parent(x)(y)
+
+
