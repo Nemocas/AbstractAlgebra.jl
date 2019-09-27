@@ -5,30 +5,30 @@
 ###############################################################################
 
 @doc Markdown.doc"""
-    parent_type(::Type{perm{T}}) where T = PermGroup{T}
+    parent_type(::Type{Perm{T}}) where T = PermGroup{T}
 > Return the type of the parent of a permutation.
 """
-parent_type(::Type{perm{T}}) where T = PermGroup{T}
+parent_type(::Type{Perm{T}}) where T = PermGroup{T}
 
 @doc Markdown.doc"""
-    elem_type(::Type{PermGroup{T}}) where T = perm{T}
+    elem_type(::Type{PermGroup{T}}) where T = Perm{T}
 > Return the type of elements of a permutation group.
 """
-elem_type(::Type{PermGroup{T}}) where T = perm{T}
+elem_type(::Type{PermGroup{T}}) where T = Perm{T}
 
 @doc Markdown.doc"""
-    parent(g::perm{T}) where T = PermGroup
+    parent(g::Perm{T}) where T = PermGroup
 > Return the parent of the permutation `g`.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> G = PermutationGroup(5); g = perm([3,4,5,2,1])
+julia> G = PermutationGroup(5); g = Perm([3,4,5,2,1])
 (1,3,5)(2,4)
 
 julia> parent(g) == G
 true
 ```
 """
-parent(g::perm{T}) where T = PermGroup(T(length(g.d)))
+parent(g::Perm{T}) where T = PermGroup(T(length(g.d)))
 
 ###############################################################################
 #
@@ -36,28 +36,28 @@ parent(g::perm{T}) where T = PermGroup(T(length(g.d)))
 #
 ###############################################################################
 
-# hash(perm) = 0x0d9939c64ab650ca
-Base.hash(g::perm, h::UInt) = xor(hash(g.d, h), 0x0d9939c64ab650ca)
+# hash(Perm) = 0x0d9939c64ab650ca
+Base.hash(g::Perm, h::UInt) = xor(hash(g.d, h), 0x0d9939c64ab650ca)
 
-function getindex(g::perm, n::Integer)
+function getindex(g::Perm, n::Integer)
    return g.d[n]
 end
 
-function setindex!(g::perm, v::Integer, n::Integer)
+function setindex!(g::Perm, v::Integer, n::Integer)
    g.modified = true
    g.d[n] = v
    return g
 end
 
-Base.promote_rule(::Type{perm{I}}, ::Type{perm{J}}) where {I,J} =
-   perm{promote_type(I,J)}
+Base.promote_rule(::Type{Perm{I}}, ::Type{Perm{J}}) where {I,J} =
+   Perm{promote_type(I,J)}
 
-convert(::Type{perm{T}}, p::perm) where T = perm(convert(Vector{T}, p.d), false)
+convert(::Type{Perm{T}}, p::Perm) where T = Perm(convert(Vector{T}, p.d), false)
 
-convert(::Type{Vector{T}}, p::perm{T}) where {T} = p.d
+convert(::Type{Vector{T}}, p::Perm{T}) where {T} = p.d
 
-function Base.similar(p::perm{T}, ::Type{S}=T) where {T, S<:Integer}
-   p = perm(similar(p.d, S), false)
+function Base.similar(p::Perm{T}, ::Type{S}=T) where {T, S<:Integer}
+   p = Perm(similar(p.d, S), false)
    p.modified = true
    return p
 end
@@ -69,7 +69,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    parity(g::perm{T}) where T
+    parity(g::Perm{T}) where T
 > Return the parity of the given permutation, i.e. the parity of the number of
 > transpositions in any decomposition of `g` into transpositions.
 >
@@ -80,20 +80,20 @@ end
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> g = perm([3,4,1,2,5])
+julia> g = Perm([3,4,1,2,5])
 (1,3)(2,4)
 
 julia> parity(g)
 0
 
-julia> g = perm([3,4,5,2,1,6])
+julia> g = Perm([3,4,5,2,1,6])
 (1,3,5)(2,4)
 
 julia> parity(g)
 1
 ```
 """
-function parity(g::perm{T}) where T
+function parity(g::Perm{T}) where T
    if isdefined(g, :cycles) && !g.modified
       return T(sum([(length(c)+1)%2 for c in cycles(g)])%2)
    end
@@ -114,7 +114,7 @@ function parity(g::perm{T}) where T
 end
 
 @doc Markdown.doc"""
-    sign(g::perm{T}) where T
+    sign(g::Perm{T}) where T
 > Return the sign of permutation.
 >
 > `sign` returns $1$ if `g` is even and $-1$ if `g` is odd. `sign` represents
@@ -123,20 +123,20 @@ end
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> g = perm([3,4,1,2,5])
+julia> g = Perm([3,4,1,2,5])
 (1,3)(2,4)
 
 julia> sign(g)
 1
 
-julia> g = perm([3,4,5,2,1,6])
+julia> g = Perm([3,4,5,2,1,6])
 (1,3,5)(2,4)
 
 julia> sign(g)
 -1
 ```
 """
-sign(g::perm{T}) where T = (-one(T))^parity(g)
+sign(g::Perm{T}) where T = (-one(T))^parity(g)
 
 ###############################################################################
 #
@@ -179,7 +179,7 @@ function Base.show(io::IO, cd::CycleDec)
 end
 
 @doc Markdown.doc"""
-    cycles(g::perm{T}) where T<:Integer
+    cycles(g::Perm{T}) where T<:Integer
 > Decompose permutation `g` into disjoint cycles.
 >
 > Return a `CycleDec` object which iterates over disjoint cycles of `g`. The
@@ -190,7 +190,7 @@ end
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> g = perm([3,4,5,2,1,6])
+julia> g = Perm([3,4,5,2,1,6])
 (1,3,5)(2,4)
 
 julia> collect(cycles(g))
@@ -200,7 +200,7 @@ julia> collect(cycles(g))
  [6]
 ```
 """
-function cycles(g::perm{T}) where T<:Integer
+function cycles(g::Perm{T}) where T<:Integer
    if !isdefined(g, :cycles) || g.modified
       ccycles, cptrs = cycledec(g.d)
       g.cycles = CycleDec{T}(ccycles, cptrs, length(cptrs)-1)
@@ -241,7 +241,7 @@ function cycledec(v::Vector{T}) where T<:Integer
 end
 
 @doc Markdown.doc"""
-    permtype(g::perm)
+    permtype(g::Perm)
 > Return the type of permutation `g`, i.e. lengths of disjoint cycles in cycle
 > decomposition of `g`.
 >
@@ -250,7 +250,7 @@ end
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> g = perm([3,4,5,2,1,6])
+julia> g = Perm([3,4,5,2,1,6])
 (1,3,5)(2,4)
 
 julia> permtype(g)
@@ -272,7 +272,7 @@ julia> permtype(e)
  1
 ```
 """
-permtype(g::perm) = sort(diff(cycles(g).cptrs), rev=true)
+permtype(g::Perm) = sort(diff(cycles(g).cptrs), rev=true)
 
 ###############################################################################
 #
@@ -307,13 +307,13 @@ const _permdisplaystyle = PermDisplayStyle(:cycles)
 julia> Generic.setpermstyle(:array)
 :array
 
-julia> perm([2,3,1,5,4])
+julia> Perm([2,3,1,5,4])
 [2, 3, 1, 5, 4]
 
 julia> Generic.setpermstyle(:cycles)
 :cycles
 
-julia> perm([2,3,1,5,4])
+julia> Perm([2,3,1,5,4])
 (1,2,3)(4,5)
 ```
 """
@@ -326,7 +326,7 @@ function setpermstyle(format::Symbol)
    return format
 end
 
-function show(io::IO, g::perm)
+function show(io::IO, g::Perm)
    if _permdisplaystyle.format == :array
       print(io, "[" * join(g.d, ", ") * "]")
    elseif _permdisplaystyle.format == :cycles
@@ -346,7 +346,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    ==(g::perm, h::perm)
+    ==(g::Perm, h::Perm)
 > Return `true` if permutations are equal, otherwise return `false`.
 >
 > Permutations parametrized by different integer types are considered equal if
@@ -354,17 +354,17 @@ end
 
 # Examples:
 ```
-julia> g = perm(Int8[2,3,1])
+julia> g = Perm(Int8[2,3,1])
 (1,2,3)
 
-julia> h = perm"(3,1,2)"
+julia> h = Perm"(3,1,2)"
 (1,2,3)
 
 julia> g == h
 true
 ```
 """
-==(g::perm, h::perm) = g.d == h.d
+==(g::Perm, h::Perm) = g.d == h.d
 
 @doc Markdown.doc"""
     ==(G::PermGroup, H::PermGroup)
@@ -392,7 +392,7 @@ false
 #   Binary operators
 #
 ###############################################################################
-function mul!(out::perm, g::perm, h::perm)
+function mul!(out::Perm, g::Perm, h::Perm)
    out = (out === g || out === h ? similar(out) : out)
    @inbounds for i in eachindex(out.d)
       out[i] = h[g[i]]
@@ -401,7 +401,7 @@ function mul!(out::perm, g::perm, h::perm)
 end
 
 @doc Markdown.doc"""
-    *(g::perm{T}, h::perm{T}) where T
+    *(g::Perm{T}, h::Perm{T}) where T
 > Return the composition ``h ∘ g`` of two permutations.
 >
 > This corresponds to the action of permutation group on the set `[1..n]`
@@ -412,15 +412,15 @@ end
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> perm([2,3,1,4])*perm([1,3,4,2]) # (1,2,3)*(2,3,4)
+julia> Perm([2,3,1,4])*Perm([1,3,4,2]) # (1,2,3)*(2,3,4)
 (1,3)(2,4)
 ```
 """
-*(g::perm{T}, h::perm{T}) where T = mul!(similar(g), g, h)
-*(g::perm{S}, h::perm{T}) where {S,T} = *(promote(g,h)...)
+*(g::Perm{T}, h::Perm{T}) where T = mul!(similar(g), g, h)
+*(g::Perm{S}, h::Perm{T}) where {S,T} = *(promote(g,h)...)
 
 @doc Markdown.doc"""
-    ^(g::perm{T}, n::Integer) where T
+    ^(g::Perm{T}, n::Integer) where T
 > Return the $n$-th power of a permutation `g`.
 >
 > By default `g^n` is computed by cycle decomposition of `g` if `n > 3`.
@@ -431,7 +431,7 @@ julia> perm([2,3,1,4])*perm([1,3,4,2]) # (1,2,3)*(2,3,4)
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> g = perm([2,3,4,5,1])
+julia> g = Perm([2,3,4,5,1])
 (1,2,3,4,5)
 
 julia> g^3
@@ -441,17 +441,17 @@ julia> g^5
 ()
 ```
 """
-function ^(g::perm{T}, n::Integer) where T
+function ^(g::Perm{T}, n::Integer) where T
    if n < 0
       return inv(g)^-n
    elseif n == 0
-      return perm(T(length(g.d)))
+      return Perm(T(length(g.d)))
    elseif n == 1
       return deepcopy(g)
    elseif n == 2
-      return perm(g.d[g.d], false)
+      return Perm(g.d[g.d], false)
    elseif n == 3
-      return perm(g.d[g.d[g.d]], false)
+      return Perm(g.d[g.d[g.d]], false)
    else
       new_perm = similar(g)
 
@@ -468,17 +468,17 @@ function ^(g::perm{T}, n::Integer) where T
    end
 end
 
-function power_by_squaring(g::perm{I}, n::Integer) where {I}
+function power_by_squaring(g::Perm{I}, n::Integer) where {I}
    if n < 0
       return inv(g)^-n
    elseif n == 0
-      return perm(T(length(g.d)))
+      return Perm(T(length(g.d)))
    elseif n == 1
       return deepcopy(g)
    elseif n == 2
-      return perm(g.d[g.d], false)
+      return Perm(g.d[g.d], false)
    elseif n == 3
-      return perm(g.d[g.d[g.d]], false)
+      return Perm(g.d[g.d[g.d]], false)
    else
       bit = ~((~UInt(0)) >> 1)
       while (UInt(bit) & n) == 0
@@ -495,7 +495,7 @@ function power_by_squaring(g::perm{I}, n::Integer) where {I}
          end
          bit >>= 1
       end
-      return perm(cache1, false)
+      return Perm(cache1, false)
    end
 end
 
@@ -506,11 +506,11 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    inv(g::perm)
+    inv(g::Perm)
 > Return the inverse of the given permutation, i.e. the permuation $g^{-1}$
 > such that $g ∘ g^{-1} = g^{-1} ∘ g$ is the identity permutation.
 """
-function inv(g::perm)
+function inv(g::Perm)
    res = similar(g)
    @inbounds for i in 1:length(res.d)
       res[g[i]] = i
@@ -520,7 +520,7 @@ end
 
 # TODO: See M. Robertson, Inverting Permutations In Place
 # n+O(log^2 n) space, O(n*log n) time
-function inv!(a::perm)
+function inv!(a::Perm)
    d = similar(a.d)
    @inbounds for i in 1:length(d)
       d[a[i]] = i
@@ -565,7 +565,7 @@ end
    end
 end
 
-Base.eltype(::Type{AllPerms{T}}) where T<:Integer = perm{T}
+Base.eltype(::Type{AllPerms{T}}) where T<:Integer = Perm{T}
 
 Base.length(A::AllPerms) = A.all
 
@@ -597,7 +597,7 @@ julia> for p in Generic.elements!(PermGroup(3))
 (1,3)
 
 julia> A = collect(Generic.elements!(PermGroup(3))); A
-6-element Array{perm{Int64},1}:
+6-element Array{Perm{Int64},1}:
  (1,3)
  (1,3)
  (1,3)
@@ -606,7 +606,7 @@ julia> A = collect(Generic.elements!(PermGroup(3))); A
  (1,3)
 
 julia> unique(A)
-1-element Array{perm{Int64},1}:
+1-element Array{Perm{Int64},1}:
  (1,3)
 ```
 """
@@ -631,7 +631,7 @@ function Base.iterate(G::PermGroup, S)
   return deepcopy(s[1]), (A, s[2])
 end
 
-Base.eltype(::Type{PermGroup{T}}) where T = perm{T}
+Base.eltype(::Type{PermGroup{T}}) where T = Perm{T}
 
 Base.length(G::PermGroup) = order(G)
 
@@ -649,27 +649,27 @@ order(G::PermGroup) = order(BigInt, G)
 order(::Type{T}, G::PermGroup) where T = factorial(T(G.n))
 
 @doc Markdown.doc"""
-    order(a::perm) -> BigInt
+    order(a::Perm) -> BigInt
 > Return the order of permutation `a` as `BigInt`.
 >
 > If you are sure that computation over `T` (or its `Int` promotion) will not
-> overflow you may use the method `order(T::Type, a::perm)` which bypasses
+> overflow you may use the method `order(T::Type, a::Perm)` which bypasses
 > computation with BigInts and returns `promote(T, Int)`.
 """
-order(a::perm) = order(BigInt, a)
-function order(::Type{T}, a::perm) where T
+order(a::Perm) = order(BigInt, a)
+function order(::Type{T}, a::Perm) where T
    TT = promote_type(T, Int)
    return reduce(lcm, diff(cycles(a).cptrs), init = one(TT))
 end
 
 @doc Markdown.doc"""
-    matrix_repr(a::perm{T}) where T
+    matrix_repr(a::Perm{T}) where T
 > Return the permutation matrix as sparse matrix representing `a` via natural
 > embedding of the permutation group into general linear group over $\mathbb{Z}$.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> p = perm([2,3,1])
+julia> p = Perm([2,3,1])
 (1,2,3)
 
 julia> matrix_repr(p)
@@ -685,10 +685,10 @@ julia> Array(ans)
  1  0  0
 ```
 """
-matrix_repr(a::perm{T}) where T = sparse(collect(T, 1:length(a.d)), a.d, ones(T,length(a.d)))
+matrix_repr(a::Perm{T}) where T = sparse(collect(T, 1:length(a.d)), a.d, ones(T,length(a.d)))
 
 @doc Markdown.doc"""
-    emb!(result::perm, p::perm, V)
+    emb!(result::Perm, p::Perm, V)
 > Embed permutation `p` into permutation `result` on the indices given by `V`.
 >
 > This corresponds to the natural embedding of $S_k$ into $S_n$ as the
@@ -696,14 +696,14 @@ matrix_repr(a::perm{T}) where T = sparse(collect(T, 1:length(a.d)), a.d, ones(T,
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> p = perm([2,1,4,3])
+julia> p = Perm([2,1,4,3])
 (1,2)(3,4)
 
-julia> Generic.emb!(perm(collect(1:5)), p, [3,1,4,5])
+julia> Generic.emb!(Perm(collect(1:5)), p, [3,1,4,5])
 (1,3)(4,5)
 ```
 """
-function emb!(result::perm, p::perm, V)
+function emb!(result::Perm, p::Perm, V)
    result.d[V] = (result.d[V])[p.d]
    return result
 end
@@ -715,7 +715,7 @@ end
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> p = perm([2,3,1])
+julia> p = Perm([2,3,1])
 (1,2,3)
 
 julia> f = Generic.emb(PermGroup(5), [3,2,5]);
@@ -737,7 +737,7 @@ end
     rand([rng=GLOBAL_RNG,] G::PermGroup{T}) where {T}
 > Return a random permutation from `G`.
 """
-rand(rng::AbstractRNG, rs::Random.SamplerTrivial{PermGroup{T}}) where {T} = perm(randperm!(rng, Vector{T}(undef, rs[].n)), false)
+rand(rng::AbstractRNG, rs::Random.SamplerTrivial{PermGroup{T}}) where {T} = Perm(randperm!(rng, Vector{T}(undef, rs[].n)), false)
 
 ###############################################################################
 #
@@ -745,20 +745,20 @@ rand(rng::AbstractRNG, rs::Random.SamplerTrivial{PermGroup{T}}) where {T} = perm
 #
 ###############################################################################
 
-(G::PermGroup)() = perm(G.n)
+(G::PermGroup)() = Perm(G.n)
 
 function (G::PermGroup{T})(a::Vector{T}, check::Bool=true) where T<:Integer
    if check
       G.n == length(a) || throw("Cannot coerce to $G: lengths differ")
    end
-   return perm(a, check)
+   return Perm(a, check)
 end
 
 function (G::PermGroup{T})(a::Vector{S}, check::Bool=true) where {S<:Integer,T}
    return G(convert(Vector{T}, a), check)
 end
 
-function (G::PermGroup{T})(p::perm{S}, check::Bool=true) where {S<:Integer, T}
+function (G::PermGroup{T})(p::Perm{S}, check::Bool=true) where {S<:Integer, T}
    if parent(p) == G
       return p
    end
@@ -774,7 +774,7 @@ function (G::PermGroup{T})(cdec::CycleDec{T}, check::Bool=true) where T
       length(cdec.ccycles) == G.n || throw("Can not coerce to $G: lengths differ")
    end
 
-   elt = perm(G.n)
+   elt = Perm(G.n)
    for c in cdec
       for i in 1:length(c)-1
          elt[c[i]] = c[i+1]
@@ -829,7 +829,7 @@ end
 
 @doc Markdown.doc"""
     perm"..."
-> String macro to parse disjoint cycles into `perm{Int}`.
+> String macro to parse disjoint cycles into `Perm{Int}`.
 >
 > Strings for the output of GAP could be copied directly into `perm"..."`.
 > Cycles of length $1$ are not necessary, but could be included. A permutation
@@ -842,7 +842,7 @@ julia> p = perm"(1,3)(2,4)"
 (1,3)(2,4)
 
 julia> typeof(p)
-perm{Int64}
+Perm{Int64}
 
 julia> parent(p) == PermutationGroup(4)
 true
@@ -886,7 +886,7 @@ const _charvalsTableBig = Dict{Tuple{BitVector,Vector{Int}}, BigInt}()
     character(lambda::Partition)
 > Return the $\lambda$-th irreducible character of permutation group on
 > `sum(lambda)` symbols. The returned character function is of the following signature:
-> > `chi(p::perm[, check::Bool=true]) -> BigInt`
+> > `chi(p::Perm[, check::Bool=true]) -> BigInt`
 > The function checks (if `p` belongs to the appropriate group) can be switched
 > off by calling `chi(p, false)`. The values computed by $\chi$ are cached in
 > look-up table.
@@ -919,7 +919,7 @@ julia> chi(perm"(1,3)(2,4)")
 function character(lambda::Partition)
    R = partitionseq(lambda)
 
-   char = function(p::perm, check::Bool=true)
+   char = function(p::Perm, check::Bool=true)
       if check
          sum(lambda) == length(p.d) || throw(ArgumentError("Can't evaluate character on $p : lengths differ."))
       end
@@ -930,18 +930,18 @@ function character(lambda::Partition)
 end
 
 @doc Markdown.doc"""
-    character(lambda::Partition, p::perm, check::Bool=true) -> BigInt
+    character(lambda::Partition, p::Perm, check::Bool=true) -> BigInt
 > Return the value of `lambda`-th irreducible character of the permutation
 > group on permutation `p`.
 """
-function character(lambda::Partition, p::perm, check::Bool=true)
+function character(lambda::Partition, p::Perm, check::Bool=true)
    if check
       sum(lambda) == length(p.d) || throw("lambda-th irreducible character can be evaluated only on permutations of length $(sum(lambda)).")
    end
    return character(BigInt, lambda, Partition(permtype(p)))
 end
 
-function character(::Type{T}, lambda::Partition, p::perm) where T <: Integer
+function character(::Type{T}, lambda::Partition, p::Perm) where T <: Integer
    return character(T, lambda, Partition(permtype(p)))
 end
 
