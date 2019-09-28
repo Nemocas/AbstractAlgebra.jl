@@ -1,6 +1,4 @@
-function test_gen_res_constructors()
-   print("Generic.Res.constructors...")
-
+@testset "Generic.Res.constructors..." begin
    B = ZZ
 
    R = Generic.ResidueRing(B, 16453889)
@@ -49,13 +47,17 @@ function test_gen_res_constructors()
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
-
-   println("PASS")
 end
 
-function test_gen_res_manipulation()
-   print("Generic.Res.manipulation...")
+@testset "Generic.Res.rand..." begin
+   R = Generic.ResidueRing(ZZ, 49)
+   f = rand(R, 1:9)
+   @test f isa Generic.Res
+   f = rand(rng, R, 1:9)
+   @test f isa Generic.Res
+end
 
+@testset "Generic.Res.manipulation..." begin
    R = Generic.ResidueRing(ZZ, 16453889)
 
    @test modulus(R) == 16453889
@@ -82,13 +84,9 @@ function test_gen_res_manipulation()
    @test canonical_unit(T(x + 1)) == T(x + 1)
 
    @test deepcopy(h) == h
-
-   println("PASS")
 end
 
-function test_gen_res_unary_ops()
-   print("Generic.Res.unary_ops...")
-
+@testset "Generic.Res.unary_ops..." begin
    R = Generic.ResidueRing(ZZ, 16453889)
 
    @test -R(12345) == R(16441544)
@@ -97,13 +95,9 @@ function test_gen_res_unary_ops()
    T = ResidueRing(S, x^3 + 3x + 1)
 
    @test -T(x^5 + 1) == T(x^2+16453880*x+16453885)
-
-   println("PASS")
 end
 
-function test_gen_res_binary_ops()
-   print("Generic.Res.binary_ops...")
-
+@testset "Generic.Res.binary_ops..." begin
    R = Generic.ResidueRing(ZZ, 12)
 
    f = R(4)
@@ -127,13 +121,9 @@ function test_gen_res_binary_ops()
    @test n - p == T(5x^2 + 3)
 
    @test n*p == T(3x^2 + 4x + 4)
-
-   println("PASS")
 end
 
-function test_gen_res_gcd()
-   print("Generic.Res.gcd...")
-
+@testset "Generic.Res.gcd..." begin
    R = Generic.ResidueRing(ZZ, 12)
 
    f = R(4)
@@ -149,13 +139,9 @@ function test_gen_res_gcd()
    p = T(x^2 + 2x + 1)
 
    @test gcd(n, p) == 1
-
-   println("PASS")
 end
 
-function test_gen_res_adhoc_binary()
-   print("Generic.Res.adhoc_binary...")
-
+@testset "Generic.Res.adhoc_binary..." begin
    R = Generic.ResidueRing(ZZ, 7)
 
    a = R(3)
@@ -176,13 +162,9 @@ function test_gen_res_adhoc_binary()
    @test 4 - f == T(x^2+5*x)
 
    @test f*5 == T(2*x^2+3*x+6)
-
-   println("PASS")
 end
 
-function test_gen_res_comparison()
-   print("Generic.Res.comparison...")
-
+@testset "Generic.Res.comparison..." begin
    R = Generic.ResidueRing(ZZ, 7)
 
    a = R(3)
@@ -206,13 +188,9 @@ function test_gen_res_comparison()
    @test h != g
 
    @test isequal(f, g)
-
-   println("PASS")
 end
 
-function test_gen_res_adhoc_comparison()
-   print("Generic.Res.adhoc_comparison...")
-
+@testset "Generic.Res.adhoc_comparison..." begin
    R = Generic.ResidueRing(ZZ, 7)
 
    a = R(3)
@@ -226,13 +204,9 @@ function test_gen_res_adhoc_comparison()
    f = T(x^5 + 1)
 
    @test f != 5
-
-   println("PASS")
 end
 
-function test_gen_res_powering()
-   print("Generic.Res.powering...")
-
+@testset "Generic.Res.powering..." begin
    R = Generic.ResidueRing(ZZ, 7)
 
    a = R(3)
@@ -245,13 +219,9 @@ function test_gen_res_powering()
    f = T(x^5 + 1)
 
    @test f^100 == T(x^2 + 2x + 1)
-
-   println("PASS")
 end
 
-function test_gen_res_inversion()
-   print("Generic.Res.inversion...")
-
+@testset "Generic.Res.inversion..." begin
    R = Generic.ResidueRing(ZZ, 49)
 
    a = R(5)
@@ -265,13 +235,9 @@ function test_gen_res_inversion()
    f = T(x^5 + 1)
 
    @test inv(f) == T(26*x^2+31*x+10)
-
-   println("PASS")
 end
 
-function test_gen_res_exact_division()
-   print("Generic.Res.exact_division...")
-
+@testset "Generic.Res.exact_division..." begin
    R = Generic.ResidueRing(ZZ, 49)
 
    a = R(5)
@@ -303,22 +269,4 @@ function test_gen_res_exact_division()
          @test q*a2 == p
       end
    end
-
-   println("PASS")
-end
-
-function test_gen_res()
-   test_gen_res_constructors()
-   test_gen_res_manipulation()
-   test_gen_res_unary_ops()
-   test_gen_res_binary_ops()
-   test_gen_res_gcd()
-   test_gen_res_adhoc_binary()
-   test_gen_res_comparison()
-   test_gen_res_adhoc_comparison()
-   test_gen_res_powering()
-   test_gen_res_inversion()
-   test_gen_res_exact_division()
-
-   println("")
 end

@@ -1,6 +1,4 @@
-function test_gen_frac_constructors()
-   print("Generic.Frac.constructors...")
-
+@testset "Generic.Frac.constructors..." begin
    S, x = PolynomialRing(ZZ, "x")
    T = FractionField(S)
 
@@ -49,13 +47,18 @@ function test_gen_frac_constructors()
    @test !(a in [b])
    @test a in keys(Dict(a => 1))
    @test !(b in keys(Dict(a => 1)))
-
-   println("PASS")
 end
 
-function test_gen_frac_manipulation()
-   print("Generic.Frac.manipulation...")
+@testset "Generic.Frac.rand..." begin
+   S, x = PolynomialRing(ZZ, "x")
+   K = FractionField(S)
+   f = rand(K, 0:3, -3:3)
+   @test f isa Generic.Frac
+   f = rand(rng, K, 0:3, -3:3)
+   @test f isa Generic.Frac
+end
 
+@testset "Generic.Frac.manipulation..." begin
    R = FractionField(ZZ)
    S, x = PolynomialRing(ZZ, "x")
 
@@ -72,22 +75,15 @@ function test_gen_frac_manipulation()
    @test isunit((x + 1)//(-x^2 + 1))
 
    @test deepcopy((x + 1)//(-x^2 + 1)) == (x + 1)//(-x^2 + 1)
-   println("PASS")
 end
 
-function test_gen_frac_unary_ops()
-   print("Generic.Frac.unary_ops...")
-
+@testset "Generic.Frac.unary_ops..." begin
    S, x = PolynomialRing(ZZ, "x")
 
    @test -((x + 1)//(-x^2 + 1)) == 1//(x - 1)
-
-   println("PASS")
 end
 
-function test_gen_frac_binary_ops()
-   print("Generic.Frac.binary_ops...")
-
+@testset "Generic.Frac.binary_ops..." begin
    S, x = PolynomialRing(ZZ, "x")
    K = FractionField(S)
 
@@ -101,13 +97,9 @@ function test_gen_frac_binary_ops()
       @test c*(a - b) == c*(a - b)
       @test a - b == -(b - a)
    end
-
-   println("PASS")
 end
 
-function test_gen_frac_adhoc_binary()
-   print("Generic.Frac.adhoc_binary...")
-
+@testset "Generic.Frac.adhoc_binary..." begin
    S, x = PolynomialRing(ZZ, "x")
 
    a = (-x + 1)//(2x^2 + 3)
@@ -124,13 +116,9 @@ function test_gen_frac_adhoc_binary()
    @test b*(x + 1) == (-x-1)//(x-1)
 
    @test (x + 1)*b == (-x-1)//(x-1)
-
-   println("PASS")
 end
 
-function test_gen_frac_comparison()
-   print("Generic.Frac.comparison...")
-
+@testset "Generic.Frac.comparison..." begin
    S, x = PolynomialRing(ZZ, "x")
 
    a = -((x + 1)//(-x^2 + 1))
@@ -138,13 +126,9 @@ function test_gen_frac_comparison()
    @test a == 1//(x - 1)
 
    @test isequal(a, 1//(x - 1))
-
-   println("PASS")
 end
 
-function test_gen_frac_adhoc_comparison()
-   print("Generic.Frac.adhoc_comparison...")
-
+@testset "Generic.Frac.adhoc_comparison..." begin
    S, x = PolynomialRing(ZZ, "x")
 
    a = 1//(x - 1)
@@ -156,37 +140,25 @@ function test_gen_frac_adhoc_comparison()
    @test one(S) == 1
 
    @test 1 == one(S)
-
-   println("PASS")
 end
 
-function test_gen_frac_powering()
-   print("Generic.Frac.powering...")
-
+@testset "Generic.Frac.powering..." begin
    S, x = PolynomialRing(ZZ, "x")
 
    a = (x + 1)//(-x^2 + 1)
 
    @test a^-12 == x^12-12*x^11+66*x^10-220*x^9+495*x^8-792*x^7+924*x^6-792*x^5+495*x^4-220*x^3+66*x^2-12*x+1
-
-   println("PASS")
 end
 
-function test_gen_frac_inversion()
-   print("Generic.Frac.inversion...")
-
+@testset "Generic.Frac.inversion..." begin
    S, x = PolynomialRing(ZZ, "x")
 
    a = (x + 1)//(-x^2 + 1)
 
    @test inv(a) == -x + 1
-
-   println("PASS")
 end
 
-function test_gen_frac_exact_division()
-   print("Generic.Frac.exact_division...")
-
+@testset "Generic.Frac.exact_division..." begin
    S, x = PolynomialRing(ZZ, "x")
    K = FractionField(S)
 
@@ -206,13 +178,9 @@ function test_gen_frac_exact_division()
       @test divexact(a*b, b) == a
       @test divexact((a + b)*c, c) == divexact(a*c, c) + divexact(b*c, c)
    end
-
-   println("PASS")
 end
 
-function test_gen_frac_adhoc_exact_division()
-   print("Generic.Frac.adhoc_exact_division...")
-
+@testset "Generic.Frac.adhoc_exact_division..." begin
    S, x = PolynomialRing(ZZ, "x")
 
    a = (-x + 1)//(2x^2 + 3)
@@ -225,13 +193,9 @@ function test_gen_frac_adhoc_exact_division()
    @test (x + 1)//b == -x^2+1
 
    @test 5//a == (-10*x^2-15)//(x-1)
-
-   println("PASS")
 end
 
-function test_gen_frac_divides()
-   print("Generic.Frac.divides...")
-
+@testset "Generic.Frac.divides..." begin
    S, x = PolynomialRing(ZZ, "x")
 
    for i in 1:10000
@@ -244,50 +208,24 @@ function test_gen_frac_divides()
        @test b * q == a
      end
    end
-
-   println("PASS")
 end
 
-function test_gen_frac_gcd()
-   print("Generic.Frac.gcd...")
-
+@testset "Generic.Frac.gcd..." begin
    S, x = PolynomialRing(ZZ, "x")
 
    a = (x + 1)//(-x^2 + 1) - x//(2x + 1)
 
    @test gcd(a, (x + 1)//(x - 1)) == 1//(2*x^2-x-1)
-
-   println("PASS")
 end
 
-function test_gen_frac_remove_valuation()
-   print("Generic.Frac.remove_valuation...")
+if @isdefined fmpq
+    @testset "Generic.Frac.remove_valuation..." begin
+        a = fmpq(2, 3)
 
-   a = fmpq(2, 3)
+        @test remove(a, BigInt(2)) == (1, fmpq(1, 3))
+        @test valuation(a, BigInt(2)) == 1
 
-   @test remove(a, BigInt(2)) == (1, fmpq(1, 3))
-   @test valuation(a, BigInt(2)) == 1
-
-   @test remove(a, BigInt(3)) == (-1, fmpq(2, 1))
-   @test valuation(a, BigInt(3)) == -1
-
-   println("PASS")
-end
-
-function test_gen_frac()
-   test_gen_frac_constructors()
-   test_gen_frac_manipulation()
-   test_gen_frac_unary_ops()
-   test_gen_frac_binary_ops()
-   test_gen_frac_adhoc_binary()
-   test_gen_frac_comparison()
-   test_gen_frac_adhoc_comparison()
-   test_gen_frac_powering()
-   test_gen_frac_inversion()
-   test_gen_frac_exact_division()
-   test_gen_frac_adhoc_exact_division()
-   test_gen_frac_divides()
-   test_gen_frac_gcd()
-
-   println("")
+        @test remove(a, BigInt(3)) == (-1, fmpq(2, 1))
+        @test valuation(a, BigInt(3)) == -1
+    end
 end

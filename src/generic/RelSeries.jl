@@ -293,7 +293,7 @@ needs_parentheses(x::AbstractAlgebra.SeriesElem) = (!iszero(x))
 
 displayed_with_minus_in_front(x::AbstractAlgebra.SeriesElem) = false
 
-show_minus_one(::Type{AbstractAlgebra.SeriesElem{T}}) where {T <: RingElement} = false
+show_minus_one(::Type{<:AbstractAlgebra.SeriesElem{T}}) where {T <: RingElement} = show_minus_one(T)
 
 ###############################################################################
 #
@@ -1234,14 +1234,14 @@ end
 #
 ###############################################################################
 
-function rand(S::SeriesRing, val_range::UnitRange{Int}, v...)
+function rand(rng::AbstractRNG, S::SeriesRing, val_range::UnitRange{Int}, v...)
    R = base_ring(S)
    f = S()
    x = gen(S)
    for i = 0:S.prec_max - 1
-      f += rand(R, v...)*x^i
+      f += rand(rng, R, v...)*x^i
    end
-   return shift_left(f, rand(val_range))
+   return shift_left(f, rand(rng, val_range))
 end
 
 ###############################################################################

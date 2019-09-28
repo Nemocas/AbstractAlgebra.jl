@@ -9,7 +9,7 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
        identity_matrix, charpoly_hessenberg!, reverse_cols, reverse_cols!,
        reverse_rows, reverse_rows!, matrix, minpoly, typed_hvcat, typed_hcat,
        powers, randmat_triu, randmat_with_rank, similarity!, solve,
-       solve_rational, hnf, hnf_kb, hnf_kb_with_transform, hnf_with_transform,
+       solve_rational, hnf, hnf_with_transform,
        issquare, snf, snf_with_transform, weak_popov,
        weak_popov_with_transform, can_solve_left_reduced_triu,
        extended_weak_popov, extended_weak_popov_with_transform, rank,
@@ -217,9 +217,9 @@ end
 """
 zero(a::AbstractAlgebra.MatSpace) = a()
 
-zero(x::MatrixElem, R::Ring=base_ring(x)) = zero!(similar(x, R))
 zero(x::MatrixElem, R::Ring, r::Int, c::Int) = zero!(similar(x, R, r, c))
-zero(x::MatrixElem, r::Int, c::Int) = zero!(similar(x, r, c))
+zero(x::MatrixElem, R::Ring=base_ring(x)) = zero(x, R, nrows(x), ncols(x))
+zero(x::MatrixElem, r::Int, c::Int) = zero(x, base_ring(x), r, c)
 
 function zero!(x::MatrixElem)
    R = base_ring(x)
@@ -355,7 +355,7 @@ end
 @doc Markdown.doc"""
     sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
 > Return a copy of the submatrix of $M$ from $(r1, c1)$ to $(r2, c2)$ inclusive. Note
-> that is the copy is modified, the original matrix is not.
+> that if the copy is modified, the original matrix is not.
 """
 function sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
   return sub(M, r1:r2, c1:c2)
@@ -397,11 +397,11 @@ function Base.view(M::Mat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where 
    return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
 end
 
-function Base.view(M::AbstractAlgebra.MatElem{T}, rows::Colon, cols::UnitRange{Int64}) where T <: RingElement
+function Base.view(M::AbstractAlgebra.MatElem{T}, rows::Colon, cols::UnitRange{Int}) where T <: RingElement
    return view(M, 1:nrows(M), cols)
 end
 
-function Base.view(M::AbstractAlgebra.MatElem{T}, rows::UnitRange{Int64}, cols::Colon) where T <: RingElement
+function Base.view(M::AbstractAlgebra.MatElem{T}, rows::UnitRange{Int}, cols::Colon) where T <: RingElement
    return view(M, rows, 1:ncols(M))
 end
 
@@ -719,11 +719,13 @@ Base.literal_pow(::typeof(^), x::T, ::Val{p}) where {p, T <: MatElem} = x^p
 
 @doc Markdown.doc"""
     ^(a::Generic.MatrixElem, b::Int)
-> Return $a^b$. We require $b \geq 0$ and that the matrix $a$ is square.
+> Return $a^b$. We require that the matrix $a$ is square.
 """
 function ^(a::MatrixElem, b::Int)
-   b < 0 && throw(DomainError(b, "Negative exponent in power"))
    !issquare(a) && error("Incompatible matrix dimensions in power")
+   if b < 0
+      return inv(a)^(-b)
+   end
    # special case powers of x for constructing polynomials efficiently
    if b == 0
       return eye(a)
@@ -1026,7 +1028,7 @@ end
     *(P::Generic.perm, x::Generic.MatrixElem)
 > Apply the pemutation $P$ to the rows of the matrix $x$ and return the result.
 """
-function *(P::Generic.perm, x::MatrixElem)
+function *(P::Generic.Perm, x::MatrixElem)
    z = similar(x)
    m = nrows(x)
    n = ncols(x)
@@ -1044,7 +1046,7 @@ end
 #
 ###############################################################################
 
-function lu!(P::Generic.perm, A::MatrixElem{T}) where {T <: FieldElement}
+function lu!(P::Generic.Perm, A::MatrixElem{T}) where {T <: FieldElement}
    m = nrows(A)
    n = ncols(A)
    rank = 0
@@ -1131,7 +1133,7 @@ function lu(A::MatrixElem{T}, P = PermGroup(nrows(A))) where {T <: FieldElement}
    return rank, p, L, U
 end
 
-function fflu!(P::Generic.perm, A::MatrixElem{T}) where {T <: RingElement}
+function fflu!(P::Generic.Perm, A::MatrixElem{T}) where {T <: RingElement}
    if !isdomain_type(T)
       error("Not implemented")
    end
@@ -1189,7 +1191,7 @@ function fflu!(P::Generic.perm, A::MatrixElem{T}) where {T <: RingElement}
    return rank, d2
 end
 
-function fflu!(P::Generic.perm, A::MatrixElem{T}) where {T <: Union{FieldElement, ResElem}}
+function fflu!(P::Generic.Perm, A::MatrixElem{T}) where {T <: Union{FieldElement, ResElem}}
    m = nrows(A)
    n = ncols(A)
    rank = 0
@@ -1838,7 +1840,7 @@ function solve_fflu(A::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    return solve_fflu_precomp(p, FFLU, b), d
 end
 
-function solve_fflu_precomp(p::Generic.perm, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
+function solve_fflu_precomp(p::Generic.Perm, FFLU::MatElem{T}, b::MatElem{T}) where {T <: RingElement}
    x = p * b
    n = nrows(x)
    m = ncols(x)
@@ -1899,7 +1901,7 @@ function solve_lu(A::MatElem{T}, b::MatElem{T}) where {T <: FieldElement}
    return solve_lu_precomp(p, LU, b)
 end
 
-function solve_lu_precomp(p::Generic.perm, LU::MatElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
+function solve_lu_precomp(p::Generic.Perm, LU::MatElem{T}, b::MatrixElem{T}) where {T <: FieldElement}
    x = p * b
    n = nrows(x)
    m = ncols(x)
@@ -3531,61 +3533,55 @@ function kb_search_first_pivot(H, start_element::Int = 1)
    return 0, 0
 end
 
-function kb_reduce_row!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool) where {T <: RingElement}
-   r = pivot[c]
-   t = base_ring(H)()
-   for i = c+1:ncols(H)
-      p = pivot[i]
-      if p == 0
-         continue
-      end
-      q = -AbstractAlgebra.div(H[r,i], H[p,i])
-      for j = i:ncols(H)
-         t = mul!(t, q, H[p,j])
-         H[r, j] = addeq!(H[r,j], t)
-      end
-      if with_trafo
-         for j = 1:ncols(U)
-            t = mul!(t, q, U[p,j])
-            U[r, j] = addeq!(U[r,j], t)
-         end
-      end
-   end
-   return nothing
-end
-
+# Reduces the entries above H[pivot[c], c]
 function kb_reduce_column!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool, start_element::Int = 1) where {T <: RingElement}
+
+   # Let c = 4 and pivot[c] = 4. H could look like this:
+   # ( 0 . * # * )
+   # ( . * * # * )
+   # ( 0 0 0 0 . )
+   # ( 0 0 0 . * )
+   # ( * * * * * )
+   #
+   # (. are pivots, we want to reduce the entries marked with #)
+   # The #'s are in rows whose pivot is in a column left of column c.
+
    r = pivot[c]
    t = base_ring(H)()
-   for i = start_element:c-1
+   for i = start_element:c - 1
       p = pivot[i]
       if p == 0
          continue
       end
-      q = -AbstractAlgebra.div(H[p,c],H[r,c])
+      # So, the pivot in row p is in a column left of c.
+      if iszero(H[p, c])
+         continue
+      end
+      q = -AbstractAlgebra.div(H[p, c], H[r, c])
       for j = c:ncols(H)
-         t = mul!(t, q, H[r,j])
-         H[p, j] = addeq!(H[p,j], t)
+         t = mul!(t, q, H[r, j])
+         H[p, j] = addeq!(H[p, j], t)
       end
       if with_trafo
          for j = 1:ncols(U)
-            t = mul!(t, q, U[r,j])
-            U[p, j] = addeq!(U[p,j], t)
+            t = mul!(t, q, U[r, j])
+            U[p, j] = addeq!(U[p, j], t)
          end
       end
    end
    return nothing
 end
 
+# Multiplies row r by a unit such that the entry H[r, c] is "canonical"
 function kb_canonical_row!(H, U, r::Int, c::Int, with_trafo::Bool)
-   cu = canonical_unit(H[r,c])
+   cu = canonical_unit(H[r, c])
    if cu != 1
       for j = c:ncols(H)
-         H[r,j] = divexact(H[r,j],cu)
+         H[r, j] = divexact(H[r, j], cu)
       end
       if with_trafo
          for j = 1:ncols(U)
-            U[r,j] = divexact(U[r,j],cu)
+            U[r, j] = divexact(U[r, j], cu)
          end
       end
    end
@@ -3631,7 +3627,9 @@ end
 function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
    m = nrows(H)
    n = ncols(H)
-   pivot = zeros(Int, n)
+   pivot = zeros(Int, n) # pivot[j] == i if the pivot of column j is in row i
+
+   # Find the first non-zero entry of H
    row1, col1 = kb_search_first_pivot(H, start_element)
    if row1 == 0
       return nothing
@@ -3642,30 +3640,30 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
    t = base_ring(H)()
    t1 = base_ring(H)()
    t2 = base_ring(H)()
-   for i=row1:m-1
+   for i = row1 + 1:m
       new_pivot = false
-      for j = start_element:pivot_max
-         if iszero(H[i+1,j])
+      for j = start_element:n
+         if iszero(H[i, j])
             continue
          end
          if pivot[j] == 0
-            pivot[j] = i+1
-            kb_canonical_row!(H, U, pivot[j], j, with_trafo)
-            kb_reduce_column!(H, U, pivot, j, with_trafo, start_element)
-            kb_reduce_row!(H, U, pivot, j, with_trafo)
+            # We found a non-zero entry in a column without a pivot: This is a
+            # new pivot
+            pivot[j] = i
             pivot_max = max(pivot_max, j)
             new_pivot = true
          else
+            # We have a pivot for this column: Use it to write 0 in H[i, j]
             p = pivot[j]
-            d, u, v = gcdx(H[p, j], H[i + 1, j])
+            d, u, v = gcdx(H[p, j], H[i, j])
             a = divexact(H[p, j], d)
-            b = -divexact(H[i + 1, j], d)
+            b = -divexact(H[i, j], d)
             for c = j:n
-               t = deepcopy(H[i + 1, c])
-               t1 = mul_red!(t1, a, H[i + 1, c], false)
+               t = deepcopy(H[i, c])
+               t1 = mul_red!(t1, a, H[i, c], false)
                t2 = mul_red!(t2, b, H[p, c], false)
-               H[i + 1, c] = add!(H[i + 1, c], t1, t2)
-               H[i + 1, c] = reduce!(H[i + 1, c])
+               H[i, c] = add!(H[i, c], t1, t2)
+               H[i, c] = reduce!(H[i, c])
                t1 = mul_red!(t1, u, H[p, c], false)
                t2 = mul_red!(t2, v, t, false)
                H[p, c] = add!(H[p, c], t1, t2)
@@ -3673,33 +3671,37 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
             end
             if with_trafo
                for c = 1:m
-                  t = deepcopy(U[i + 1, c])
-                  t1 = mul_red!(t1, a, U[i + 1, c], false)
+                  t = deepcopy(U[i, c])
+                  t1 = mul_red!(t1, a, U[i, c], false)
                   t2 = mul_red!(t2, b, U[p, c], false)
-                  U[i + 1, c] = add!(U[i + 1, c], t1, t2)
-                  U[i + 1, c] = reduce!(U[i + 1, c])
+                  U[i, c] = add!(U[i, c], t1, t2)
+                  U[i, c] = reduce!(U[i, c])
                   t1 = mul_red!(t1, u, U[p, c], false)
                   t2 = mul_red!(t2, v, t, false)
                   U[p, c] = add!(U[p, c], t1, t2)
                   U[p, c] = reduce!(U[p, c])
                end
             end
-            kb_canonical_row!(H, U, pivot[j], j, with_trafo)
-            kb_reduce_column!(H, U, pivot, j, with_trafo, start_element)
+         end
+
+         # We changed the pivot of column j (or found a new one).
+         # We have do reduce the entries marked with # in
+         # ( 0 0 0 . * )
+         # ( . # # * * )
+         # ( 0 0 . * * )
+         # ( 0 . # * * )
+         # ( * * * * * )
+         # where . are pivots and i = 4, j = 2. (This example is for the
+         # "new pivot" case.)
+         kb_canonical_row!(H, U, pivot[j], j, with_trafo)
+         for c = j:pivot_max
+            if pivot[c] == 0
+               continue
+            end
+            kb_reduce_column!(H, U, pivot, c, with_trafo, start_element)
          end
          if new_pivot
             break
-         end
-      end
-      if !new_pivot
-         for c = pivot_max+1:n
-            if !iszero(H[i+1,c])
-               pivot[c] = i+1
-               kb_canonical_row!(H, U, pivot[c], c, with_trafo)
-               kb_reduce_column!(H, U, pivot, c, with_trafo, start_element)
-               pivot_max = max(pivot_max, c)
-               break
-            end
          end
       end
    end
@@ -4895,18 +4897,18 @@ end
 #
 ###############################################################################
 
-function rand(S::AbstractAlgebra.MatSpace, v...)
+function rand(rng::AbstractRNG, S::AbstractAlgebra.MatSpace, v...)
    M = S()
    R = base_ring(S)
    for i = 1:nrows(M)
       for j = 1:ncols(M)
-         M[i, j] = rand(R, v...)
+         M[i, j] = rand(rng, R, v...)
       end
    end
    return M
 end
 
-function randmat_triu(S::AbstractAlgebra.MatSpace, v...)
+function randmat_triu(rng::AbstractRNG, S::AbstractAlgebra.MatSpace, v...)
    M = S()
    R = base_ring(S)
    for i = 1:nrows(M)
@@ -4914,16 +4916,18 @@ function randmat_triu(S::AbstractAlgebra.MatSpace, v...)
          M[i, j] = R()
       end
       for j = i:ncols(M)
-         M[i, j] = rand(R, v...)
+         M[i, j] = rand(rng, R, v...)
       end
       while iszero(M[i, i])
-         M[i, i] = rand(R, v...)
+         M[i, i] = rand(rng, R, v...)
       end
    end
    return M
 end
 
-function randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: AbstractAlgebra.RingElement}
+randmat_triu(S::AbstractAlgebra.MatSpace, v...) = randmat_triu(Random.GLOBAL_RNG, S, v...)
+
+function randmat_with_rank(rng::AbstractRNG, S::Generic.MatSpace{T}, rank::Int, v...) where {T <: AbstractAlgebra.RingElement}
    if !isdomain_type(T) && !(T <: ResElem)
       error("Not implemented")
    end
@@ -4933,12 +4937,12 @@ function randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: 
       for j = 1:i - 1
          M[i, j] = R()
       end
-      M[i, i] = rand(R, v...)
+      M[i, i] = rand(rng, R, v...)
       while iszero(M[i, i])
-         M[i, i] = rand(R, v...)
+         M[i, i] = rand(rng, R, v...)
       end
       for j = i + 1:ncols(M)
-         M[i, j] = rand(R, v...)
+         M[i, j] = rand(rng, R, v...)
       end
    end
    for i = rank + 1:nrows(M)
@@ -4949,10 +4953,10 @@ function randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: 
    m = nrows(M)
    if m > 1
       for i = 1:4*m
-         r1 = rand(1:m)
-         r2 = rand(1:m - 1)
+         r1 = rand(rng, 1:m)
+         r2 = rand(rng, 1:m - 1)
          r2 = r2 >= r1 ? r2 + 1 : r2
-         d = rand(-5:5)
+         d = rand(rng, -5:5)
          for j = 1:ncols(M)
             M[r1, j] = M[r1, j] + d*M[r2, j]
          end
@@ -4960,6 +4964,9 @@ function randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: 
    end
    return M
 end
+
+randmat_with_rank(S::Generic.MatSpace{T}, rank::Int, v...) where {T <: AbstractAlgebra.RingElement} =
+   randmat_with_rank(Random.GLOBAL_RNG, S, rank, v...)
 
 ###############################################################################
 #
@@ -5015,13 +5022,11 @@ function (a::MatSpace{T})(b::Mat{T}) where {T <: RingElement}
    return b
 end
 
-function (a::MatSpace{T})(b::AbstractArray{T, 2}) where T <: RingElement
+function (a::MatSpace{T})(b::Array{T, 2}) where T <: RingElement
    R = base_ring(a)
    _check_dim(a.nrows, a.ncols, b)
-   for i = 1:a.nrows
-      for j = 1:a.ncols
-         b[i, j] = R(b[i, j])
-      end
+   if !isempty(b)
+      R != parent(b[1, 1]) && error("Unable to coerce matrix")
    end
    z = MatSpaceElem{T}(b)
    z.base_ring = R
@@ -5149,18 +5154,49 @@ function MatrixSpace(R::AbstractAlgebra.Ring, r::Int, c::Int, cached::Bool = tru
    return MatSpace{T}(R, r, c, cached)
 end
 
+###############################################################################
+#
+#   change_base_ring, Base.map! and Base.map
+#
+###############################################################################
+
 @doc Markdown.doc"""
-    change_base_ring(M::AbstractAlgebra.MatElem, R::AbstractAlgebra.Ring)
+    change_base_ring(R::Ring, M::Generic.MatrixElem)
 > Return the matrix obtained by coercing each entry into `R`.
 """
-function change_base_ring(M::AbstractAlgebra.MatElem, R::AbstractAlgebra.Ring)
-   r = nrows(M)
-   c = ncols(M)
-   N = zero_matrix(R, r, c)
-   for i in 1:r
-      for j in 1:c
-         N[i,j] = R(M[i,j])
-      end
+function change_base_ring(R::Ring, M::MatrixElem)
+   N = similar(M, R)
+   for i=1:nrows(M), j=1:ncols(M)
+      N[i,j] = R(M[i,j])
    end
    return N
+end
+
+@doc Markdown.doc"""
+    map!(f, dst::Generic.MatrixElem, src::Generic.MatrixElem)
+
+> Like `map`, but stores the result in `dst` rather than a new matrix.
+"""
+function Base.map!(f, dst::MatrixElem, src::MatrixElem)
+   for i = 1:nrows(src), j = 1:ncols(src)
+      dst[i, j] = f(src[i, j])
+   end
+   dst
+end
+
+@doc Markdown.doc"""
+    map(f, a::Generic.MatrixElem)
+
+> Transform matrix `a` by applying `f` on each element.
+"""
+function Base.map(f, a::MatrixElem)
+   isempty(a) && return similar(a, parent(f(zero(base_ring(a)))))
+   b11 = f(a[1, 1])
+   b = similar(a, parent(b11))
+   b[1, 1] = b11
+   for i = 1:nrows(a), j = 1:ncols(a)
+      i == j == 1 && continue
+      b[i, j] = f(a[i, j])
+   end
+   b
 end

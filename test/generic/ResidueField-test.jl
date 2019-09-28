@@ -1,6 +1,4 @@
-function test_gen_res_field_constructors()
-   print("Generic.ResF.constructors...")
-
+@testset "Generic.ResF.constructors..." begin
    B = ZZ
 
    R = Generic.ResidueField(B, 16453889)
@@ -49,14 +47,17 @@ function test_gen_res_field_constructors()
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
-
-
-   println("PASS")
 end
 
-function test_gen_res_field_manipulation()
-   print("Generic.ResF.manipulation...")
+@testset "Generic.ResF.rand..." begin
+   R = Generic.ResidueField(ZZ, 16453889)
+   f = rand(R, 1:9)
+   @test f isa Generic.ResF
+   f = rand(rng, R, 1:9)
+   @test f isa Generic.ResF
+end
 
+@testset "Generic.ResF.manipulation..." begin
    R = Generic.ResidueField(ZZ, 16453889)
 
    @test modulus(R) == 16453889
@@ -83,13 +84,9 @@ function test_gen_res_field_manipulation()
    @test canonical_unit(T(x + 1)) == T(x + 1)
 
    @test deepcopy(h) == h
-
-   println("PASS")
 end
 
-function test_gen_res_field_unary_ops()
-   print("Generic.ResF.unary_ops...")
-
+@testset "Generic.ResF.unary_ops..." begin
    R = Generic.ResidueField(ZZ, 16453889)
 
    @test -R(12345) == R(16441544)
@@ -98,13 +95,9 @@ function test_gen_res_field_unary_ops()
    T = ResidueField(S, x^3 + 3x + 1)
 
    @test -T(x^5 + 1) == T(x^2+16453880*x+16453885)
-
-   println("PASS")
 end
 
-function test_gen_res_field_binary_ops()
-   print("Generic.ResF.binary_ops...")
-
+@testset "Generic.ResF.binary_ops..." begin
    R = Generic.ResidueField(ZZ, 13)
 
    f = R(4)
@@ -128,13 +121,9 @@ function test_gen_res_field_binary_ops()
    @test n - p == T(5x^2 + 3)
 
    @test n*p == T(3x^2 + 4x + 4)
-
-   println("PASS")
 end
 
-function test_gen_res_field_gcd()
-   print("Generic.ResF.gcd...")
-
+@testset "Generic.ResF.gcd..." begin
    R = Generic.ResidueField(ZZ, 13)
 
    f = R(4)
@@ -150,13 +139,9 @@ function test_gen_res_field_gcd()
    p = T(x^2 + 2x + 1)
 
    @test gcd(n, p) == 1
-
-   println("PASS")
 end
 
-function test_gen_res_field_adhoc_binary()
-   print("Generic.ResF.adhoc_binary...")
-
+@testset "Generic.ResF.adhoc_binary..." begin
    R = Generic.ResidueField(ZZ, 7)
 
    a = R(3)
@@ -177,13 +162,9 @@ function test_gen_res_field_adhoc_binary()
    @test 4 - f == T(x^2+5*x)
 
    @test f*5 == T(2*x^2+3*x+6)
-
-   println("PASS")
 end
 
-function test_gen_res_field_comparison()
-   print("Generic.ResF.comparison...")
-
+@testset "Generic.ResF.comparison..." begin
    R = Generic.ResidueField(ZZ, 7)
 
    a = R(3)
@@ -207,13 +188,9 @@ function test_gen_res_field_comparison()
    @test h != g
 
    @test isequal(f, g)
-
-   println("PASS")
 end
 
-function test_gen_res_field_adhoc_comparison()
-   print("Generic.ResF.adhoc_comparison...")
-
+@testset "Generic.ResF.adhoc_comparison..." begin
    R = Generic.ResidueField(ZZ, 7)
 
    a = R(3)
@@ -227,13 +204,9 @@ function test_gen_res_field_adhoc_comparison()
    f = T(x^5 + 1)
 
    @test f != 5
-
-   println("PASS")
 end
 
-function test_gen_res_field_powering()
-   print("Generic.ResF.powering...")
-
+@testset "Generic.ResF.powering..." begin
    R = Generic.ResidueField(ZZ, 7)
 
    a = R(3)
@@ -246,13 +219,9 @@ function test_gen_res_field_powering()
    f = T(x^5 + 1)
 
    @test f^100 == T(x^2 + 2x + 1)
-
-   println("PASS")
 end
 
-function test_gen_res_field_inversion()
-   print("Generic.ResF.inversion...")
-
+@testset "Generic.ResF.inversion..." begin
    R = Generic.ResidueField(ZZ, 47)
 
    a = R(5)
@@ -266,13 +235,9 @@ function test_gen_res_field_inversion()
    f = T(x^5 + 1)
 
    @test inv(f) == T(26*x^2+31*x+10)
-
-   println("PASS")
 end
 
-function test_gen_res_field_exact_division()
-   print("Generic.ResF.exact_division...")
-
+@testset "Generic.ResF.exact_division..." begin
    R = Generic.ResidueField(ZZ, 47)
 
    a = R(5)
@@ -288,22 +253,4 @@ function test_gen_res_field_exact_division()
    g = T(x^4 + x + 2)
 
    @test divexact(f, g) == T(7*x^2+25*x+26)
-
-   println("PASS")
-end
-
-function test_gen_res_field()
-   test_gen_res_field_constructors()
-   test_gen_res_field_manipulation()
-   test_gen_res_field_unary_ops()
-   test_gen_res_field_binary_ops()
-   test_gen_res_field_gcd()
-   test_gen_res_field_adhoc_binary()
-   test_gen_res_field_comparison()
-   test_gen_res_field_adhoc_comparison()
-   test_gen_res_field_powering()
-   test_gen_res_field_inversion()
-   test_gen_res_field_exact_division()
-
-   println("")
 end

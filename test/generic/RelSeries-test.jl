@@ -16,9 +16,7 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
-function test_rel_series_constructors()
-   print("Generic.RelSeries.constructors...")
-
+@testset "Generic.RelSeries.constructors..." begin
    R, x = PowerSeriesRing(ZZ, 30, "x")
 
    S, t = PolynomialRing(QQ, "t")
@@ -80,13 +78,17 @@ function test_rel_series_constructors()
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
-
-   println("PASS")
 end
 
-function test_rel_series_manipulation()
-   print("Generic.RelSeries.manipulation...")
+@testset "Generic.RelSeries.rand..." begin
+   R, x = PowerSeriesRing(ZZ, 10, "x")
+   f = rand(R, 0:12, -10:10)
+   @test f isa Generic.RelSeries
+   f = rand(rng, R, 0:12, -10:10)
+   @test f isa Generic.RelSeries
+end
 
+@testset "Generic.RelSeries.manipulation..." begin
    R, t = PolynomialRing(QQ, "t")
    S, x = PowerSeriesRing(R, 30, "x")
 
@@ -124,13 +126,9 @@ function test_rel_series_manipulation()
    U, y = PowerSeriesRing(T, 10, "y")
 
    @test modulus(T) == 7
-
-   println("PASS")
 end
 
-function test_rel_series_unary_ops()
-   print("Generic.RelSeries.unary_ops...")
-
+@testset "Generic.RelSeries.unary_ops..." begin
    #  Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -158,13 +156,9 @@ function test_rel_series_unary_ops()
       @test isequal(-(-f), f)
       @test iszero(f + (-f))
    end
-
-   println("PASS")
 end
 
-function test_rel_series_binary_ops()
-   print("Generic.RelSeries.binary_ops...")
-
+@testset "Generic.RelSeries.binary_ops..." begin
    #  Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:100
@@ -211,13 +205,9 @@ function test_rel_series_binary_ops()
       @test f*(g + h) == f*g + f*h
       @test f*(g - h) == f*g - f*h
    end
-
-   println("PASS")
 end
 
-function test_rel_series_adhoc_binary_ops()
-   print("Generic.RelSeries.adhoc_binary_ops...")
-
+@testset "Generic.RelSeries.adhoc_binary_ops..." begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -305,13 +295,9 @@ function test_rel_series_adhoc_binary_ops()
       @test isequal(f*d1 - f*d2, f*(d1 - d2))
       @test isequal(f*d1 + f*d2, f*(d1 + d2))
    end
-
-   println("PASS")
 end
 
-function test_rel_series_comparison()
-   print("Generic.RelSeries.comparison...")
-
+@testset "Generic.RelSeries.comparison..." begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -360,13 +346,9 @@ function test_rel_series_comparison()
       @test (precision(h) > min(precision(f), precision(g)) || f != g + h)
       @test (precision(h) > min(precision(f), precision(g)) || !isequal(f, g + h))
    end
-
-   println("PASS")
 end
 
-function test_rel_series_adhoc_comparison()
-   print("Generic.RelSeries.adhoc_comparison...")
-
+@testset "Generic.RelSeries.adhoc_comparison..." begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -461,13 +443,9 @@ function test_rel_series_adhoc_comparison()
       @test S(d1) != d1 + f
       @test d1 != S(d1) + f
    end
-
-   println("PASS")
 end
 
-function test_rel_series_powering()
-   print("Generic.RelSeries.powering...")
-
+@testset "Generic.RelSeries.powering..." begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
 
@@ -518,13 +496,9 @@ function test_rel_series_powering()
          r2 *= f
       end
    end
-
-   println("PASS")
 end
 
-function test_rel_series_shift()
-   print("Generic.RelSeries.shift...")
-
+@testset "Generic.RelSeries.shift..." begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -567,13 +541,9 @@ function test_rel_series_shift()
       @test isequal(shift_left(f, s), x^s*f)
       @test precision(shift_right(f, s)) == max(0, precision(f) - s)
    end
-
-   println("PASS")
 end
 
-function test_rel_series_truncation()
-   print("Generic.RelSeries.truncation...")
-
+@testset "Generic.RelSeries.truncation..." begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -607,13 +577,9 @@ function test_rel_series_truncation()
       @test isequal(truncate(f, s), f + O(x^s))
       @test precision(truncate(f, s)) == min(precision(f), s)
    end
-
-   println("PASS")
 end
 
-function test_rel_series_inversion()
-    print("Generic.RelSeries.inversion...")
- 
+@testset "Generic.RelSeries.inversion..." begin
     # Exact ring
     R, x = PowerSeriesRing(ZZ, 10, "x")
     for iter = 1:300
@@ -621,10 +587,10 @@ function test_rel_series_inversion()
        while !isunit(f)
           f = rand(R, 0:0, -10:10)
        end
- 
+
        @test f*inv(f) == 1
     end
- 
+
     # Inexact field
     R, x = PowerSeriesRing(RealField, 10, "x")
     for iter = 1:300
@@ -632,10 +598,10 @@ function test_rel_series_inversion()
        while coeff(f, 0) == 0
           f = rand(R, 0:0, -1:1)
        end
- 
+
        @test isapprox(f*inv(f), R(1))
     end
- 
+
     # Non-integral domain
     T = ResidueRing(ZZ, 6)
     R, x = PowerSeriesRing(T, 10, "x")
@@ -644,40 +610,32 @@ function test_rel_series_inversion()
        while !isunit(f)
           f = rand(R, 0:0, 0:5)
        end
- 
+
        @test f*inv(f) == 1
     end
- 
-    println("PASS")
- end
- 
-function test_rel_series_square_root()
-    print("Generic.RelSeries.square_root...")
- 
+end
+
+@testset "Generic.RelSeries.square_root..." begin
     # Exact ring
     R, x = PowerSeriesRing(ZZ, 10, "x")
     for iter = 1:300
        f = rand(R, 0:10, -10:10)
        g = f^2
 
-       @test isequal(sqrt(g)^2, g) 
+       @test isequal(sqrt(g)^2, g)
     end
- 
+
     # Inexact field
     R, x = PowerSeriesRing(RealField, 10, "x")
     for iter = 1:300
        f = rand(R, 0:10, -1:1)
        g = f^2
- 
+
        @test isapprox(sqrt(g)^2, g)
     end
- 
-    println("PASS")
 end
- 
-function test_rel_series_exact_division()
-   print("Generic.RelSeries.exact_division...")
 
+@testset "Generic.RelSeries.exact_division..." begin
    # Exact ring
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -726,13 +684,9 @@ function test_rel_series_exact_division()
 
       @test divexact(f, g)*g == f
    end
-
-   println("PASS")
 end
 
-function test_rel_series_adhoc_exact_division()
-   print("Generic.RelSeries.adhoc_exact_division...")
-
+@testset "Generic.RelSeries.adhoc_exact_division..." begin
    # Exact field
    R, x = PowerSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -769,13 +723,9 @@ function test_rel_series_adhoc_exact_division()
 
       @test isequal(divexact(f*c, c), f)
    end
-
-   println("PASS")
 end
 
-function test_rel_series_special_functions()
-   print("Generic.RelSeries.special_functions...")
-
+@testset "Generic.RelSeries.special_functions..." begin
    # Exact field
    S, x = PowerSeriesRing(QQ, 10, "x")
 
@@ -836,26 +786,4 @@ function test_rel_series_special_functions()
 
       @test isequal(exp(f)*exp(g), exp(f + g))
    end
-
-   println("PASS")
-end
-
-function test_gen_rel_series()
-   test_rel_series_constructors()
-   test_rel_series_manipulation()
-   test_rel_series_unary_ops()
-   test_rel_series_binary_ops()
-   test_rel_series_adhoc_binary_ops()
-   test_rel_series_comparison()
-   test_rel_series_adhoc_comparison()
-   test_rel_series_powering()
-   test_rel_series_shift()
-   test_rel_series_truncation()
-   test_rel_series_exact_division()
-   test_rel_series_adhoc_exact_division()
-   test_rel_series_inversion()
-   test_rel_series_square_root()
-   test_rel_series_special_functions()
-
-   println("")
 end

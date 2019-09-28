@@ -112,7 +112,7 @@ function powmod(a::T, b::Int, c::T) where T <: Integer
       while (UInt(bit) & b) == 0
          bit >>= 1
       end
-      z = a
+      z = mod(a, c)
       bit >>= 1
       while bit != 0
          z = mod(z*z, c)
@@ -171,9 +171,9 @@ end
 function sqrt(a::T) where T <: Integer
    s = isqrt(a)
    s*s != a && error("Not a square in sqrt")
-   return s 
+   return s
 end
- 
+
 ###############################################################################
 #
 #   Exponential
@@ -189,7 +189,7 @@ function exp(a::T) where T <: Integer
     a != 0 && throw(DomainError())
     return T(1)
  end
- 
+
 ###############################################################################
 #
 #   Coprime bases
@@ -284,8 +284,8 @@ end
 #
 ###############################################################################
 
-function rand(R::Integers, n::UnitRange{Int})
-   return R(rand(n))
+function rand(rng::AbstractRNG, R::Integers, n::UnitRange{Int})
+   return R(rand(rng, n))
 end
 
 ###############################################################################

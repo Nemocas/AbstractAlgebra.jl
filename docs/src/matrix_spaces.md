@@ -215,8 +215,7 @@ functions that can accept both views and actual matrices.
 
 The syntax for views is as for Julia's own views.
 
-Note that the parent of a view will be the same as the parent of the original
-matrix. The `parent_type` function also returns the same type for a view as
+Note that the `parent_type` function returns the same type for a view as
 for the original matrix type. This could potentially cause a problem if the
 `elem_type` function is applied to the return value of `parent_type` and then
 used in a type assertion. For this reason, there may be some limitations on
@@ -463,11 +462,14 @@ base ring of the the given matrix).
 If $x$ belongs to a matrix algebra and $r \neq c$, an exception is raised, and it's
 also possible to specify only one `Int` as the order (e.g. `similar(x, n)`).
 
-Custom matrices may choose which specific matrix type is best-suited to return for the
+Custom matrices and rings may choose which specific matrix type is best-suited to return for the
 given ring and dimensionality. If they do not specialize these functions, the default is a
 `Generic.MatSpaceElem` matrix, or `Generic.MatAlgElem` for matrix algebras.
 The default implementation of `zero` calls out to `similar`, so it's generally
 sufficient to specialize only `similar`.
+For both `similar` and `zero`, only the most general method has to be implemented
+(e.g. `similar(x::MyMat, R::Ring, r::Int, c::Int)`, as all other methods (which have
+defaults) call out to this more general method.
 
 ```julia
 Base.isassigned(M::MyMat, i, j)

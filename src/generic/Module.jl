@@ -337,9 +337,9 @@ end
 #
 ###############################################################################
 
-function rand(M::AbstractAlgebra.FPModule{T}, vals...) where T <: RingElement
+function rand(rng::AbstractRNG, M::AbstractAlgebra.FPModule{T}, vals...) where T <: RingElement
    R = base_ring(M)
-   v = [rand(R, vals...) for i in 1:ngens(M)]
+   v = [rand(rng, R, vals...) for i in 1:ngens(M)]
    return M(v)
 end
 
@@ -386,4 +386,3 @@ function cull_matrix(M::AbstractAlgebra.MatElem{T}) where T <: RingElement
    end
    return gen_cols, culled, pivots
 end
-

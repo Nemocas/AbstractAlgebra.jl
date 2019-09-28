@@ -1,6 +1,4 @@
-function test_gen_map_cache_constructors()
-   print("Generic.MapCache.constructors...")
-
+@testset "Generic.MapCache.constructors..." begin
    f = cached(map_from_func(ZZ, ZZ, x -> x + 1))
    g = cached(map_from_func(ZZ, QQ, x -> QQ(x)), limit=2)
    h = cached(map_from_func(ZZ, ZZ, x -> x + 2), enabled=false)
@@ -10,7 +8,7 @@ function test_gen_map_cache_constructors()
    @test isa(h, Map(Generic.MapCache))
 
    @test f(ZZ(1)) == 2
-   
+
    for i = 1:10
       @test g(ZZ(i)) == QQ(i)
    end
@@ -22,19 +20,15 @@ function test_gen_map_cache_constructors()
    @test domain(h) == AbstractAlgebra.JuliaZZ
 
    @test image_fn(f)(ZZ(1)) == 2
-
-   println("PASS")
 end
 
-function test_gen_map_cache_enable_disable()
-   print("Generic.MapCache.enable_disable...")
-
+@testset "Generic.MapCache.enable_disable..." begin
    f = cached(map_from_func(ZZ, ZZ, x -> x + 1))
 
    @test f(ZZ(1)) == 2
-   
+
    disable_cache!(f)
-   
+
    @test f(ZZ(1)) == 2
    @test f(ZZ(2)) == 3
 
@@ -56,13 +50,9 @@ function test_gen_map_cache_enable_disable()
 
    @test g(ZZ(1)) == 2
    @test g(ZZ(3)) == 4
-   
-   println("PASS")
 end
 
-function test_gen_map_cache_limit()
-   print("Generic.MapCache.limit...")
-
+@testset "Generic.MapCache.limit..." begin
    g = cached(map_from_func(ZZ, QQ, x -> QQ(x)), limit=2)
 
    set_limit!(g, 3)
@@ -70,15 +60,4 @@ function test_gen_map_cache_limit()
    for i = 1:10
       @test g(ZZ(i)) == QQ(i)
    end
-
-   println("PASS")
 end
-
-function test_gen_map_cache()
-   test_gen_map_cache_constructors()
-   test_gen_map_cache_enable_disable()
-   test_gen_map_cache_limit()
-
-   println("")
-end
-

@@ -1,6 +1,4 @@
-function test_Floats_constructors()
-   print("Julia.Floats.constructors...")
-
+@testset "Julia.Floats.constructors..." begin
    R = RDF
    S = RealField
 
@@ -32,13 +30,25 @@ function test_Floats_constructors()
 
    @test isa(R(a), Float64)
    @test isa(S(b), BigFloat)
-
-   println("PASS")
 end
 
-function test_Floats_manipulation()
-   print("Julia.Floats.manipulation...")
+@testset "Julia.Floats.rand..." begin
+   R = RealField
+   f = rand(R, 1:9)
+   @test f isa elem_type(R)
+   f = rand(R, UnitRange(1.0, 9.0))
+   @test f isa elem_type(R)
+   f = rand(R, UnitRange(big(1.0), big(9.0)))
+   @test f isa elem_type(R)
+   f = rand(rng, R, 1:9)
+   @test f isa elem_type(R)
+   f = rand(rng, R, UnitRange(1.0, 9.0))
+   @test f isa elem_type(R)
+   f = rand(rng, R, UnitRange(big(1.0), big(9.0)))
+   @test f isa elem_type(R)
+end
 
+@testset "Julia.Floats.manipulation..." begin
    R = RDF
    S = RealField
 
@@ -52,13 +62,9 @@ function test_Floats_manipulation()
    @test !isunit(S())
    @test isunit(R(3))
    @test isunit(S(3))
-
-   println("PASS")
 end
 
-function test_Floats_exact_division()
-   print("Julia.Floats.exact_division...")
-
+@testset "Julia.Floats.exact_division..." begin
    R = RDF
    S = RealField
 
@@ -79,13 +85,9 @@ function test_Floats_exact_division()
       @test c1 == 0 || isapprox(divexact(c1, R(1)*c1), R(1))
       @test c2 == 0 || isapprox(divexact(c2, S(1)*c2), S(1))
    end
-
-   println("PASS")
 end
 
-function test_Floats_divrem()
-   print("Julia.Float.divrem...")
-
+@testset "Julia.Floats.divrem..." begin
    R = RealField
 
    for iter = 1:1000
@@ -97,13 +99,9 @@ function test_Floats_divrem()
 
       @test AbstractAlgebra.divrem(r,s) == (r/s,0)
    end
-
-   println("PASS")
 end
 
-function test_Floats_gcd()
-   print("Julia.Floats.gcd...")
-
+@testset "Julia.Floats.gcd..." begin
    R = RDF
    S = RealField
 
@@ -116,17 +114,4 @@ function test_Floats_gcd()
       @test (r1 == 0 && r2 == 0) || gcd(r1, r2) == 1
       @test (s1 == 0 && s2 == 0) || gcd(s1, s2) == 1
    end
-
-   println("PASS")
-end
-
-
-function test_Floats()
-   test_Floats_constructors()
-   test_Floats_manipulation()
-   test_Floats_exact_division()
-   test_Floats_divrem()
-   test_Floats_gcd()
-
-   println("")
 end

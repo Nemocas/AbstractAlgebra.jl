@@ -1,9 +1,10 @@
 include("generic/MatrixAlgebra-test.jl")
 include("generic/NCPoly-test.jl")
 
-function test_ncrings()
-   test_gen_matalg()
-   test_gen_ncpoly()
-
+@testset "Rings.oftype..." begin
+   F = GF(3)
+   Fx, x = PolynomialRing(F, "x")
+   z = oftype(x, 3)
+   @test z == Fx(3)
+   @test parent(z) === Fx
 end
-

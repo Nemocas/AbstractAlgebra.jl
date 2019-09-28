@@ -1,6 +1,4 @@
-function test_gfelem_constructors()
-   print("Julia.gfelem.constructors...")
-
+@testset "Julia.gfelem.constructors..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -10,7 +8,7 @@ function test_gfelem_constructors()
    @test elem_type(AbstractAlgebra.GFField{BigInt}) == AbstractAlgebra.gfelem{BigInt}
    @test parent_type(AbstractAlgebra.gfelem{Int}) == AbstractAlgebra.GFField{Int}
    @test parent_type(AbstractAlgebra.gfelem{BigInt}) == AbstractAlgebra.GFField{BigInt}
-   
+
    @test isa(R, AbstractAlgebra.GFField)
    @test isa(S, AbstractAlgebra.GFField)
 
@@ -27,13 +25,9 @@ function test_gfelem_constructors()
 
    @test isa(R(a), AbstractAlgebra.gfelem)
    @test isa(S(b), AbstractAlgebra.gfelem)
-
-   println("PASS")
 end
 
-function test_gfelem_printing()
-   print("Julia.gfelem.printing...")
-
+@testset "Julia.gfelem.printing..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -41,13 +35,9 @@ function test_gfelem_printing()
    @test string(R()) == "0"
    @test string(S(3)) == "3"
    @test string(S()) == "0"
-
-   println("PASS")
 end
 
-function test_gfelem_manipulation()
-   print("Julia.gfelem.manipulation...")
-
+@testset "Julia.gfelem.manipulation..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -79,13 +69,17 @@ function test_gfelem_manipulation()
 
    @test R === R1
    @test S === S1
-
-   println("PASS")
 end
 
-function test_gfelem_unary_ops()
-   print("Julia.gfelem.unary_ops...")
+@testset "Julia.gfelem.rand..." begin
+   R = GF(13)
+   @test rand(R) isa AbstractAlgebra.gfelem
+   @test rand(rng, R) isa AbstractAlgebra.gfelem
+   @test rand(R, 2, 3) isa Matrix{<:AbstractAlgebra.gfelem}
+   @test rand(rng, R, 2, 3) isa Matrix{<:AbstractAlgebra.gfelem}
+end
 
+@testset "Julia.gfelem.unary_ops..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -96,13 +90,9 @@ function test_gfelem_unary_ops()
       @test a == -(-a)
       @test b == -(-b)
    end
-
-   println("PASS")
 end
 
-function test_gfelem_binary_ops()
-   print("Julia.gfelem.binary_ops...")
-
+@testset "Julia.gfelem.binary_ops..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -133,13 +123,9 @@ function test_gfelem_binary_ops()
       @test b1*S(1) == b1
       @test S(1)*b1 == b1
    end
-
-   println("PASS")
 end
 
-function test_gfelem_adhoc_binary()
-   print("Julia.gfelem.adhoc_binary...")
-
+@testset "Julia.gfelem.adhoc_binary..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -171,13 +157,9 @@ function test_gfelem_adhoc_binary()
       @test b*c1 + b*c2 == b*(c1 + c2)
       @test b*d1 + b*d2 == b*(d1 + d2)
    end
-
-   println("PASS")
 end
 
-function test_gfelem_powering()
-   print("Julia.gfelem.powering...")
-
+@testset "Julia.gfelem.powering..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -194,7 +176,7 @@ function test_gfelem_powering()
 
          a *= r
          b *= s
-      end   
+      end
    end
 
    for iter = 1:100
@@ -213,15 +195,11 @@ function test_gfelem_powering()
 
          a *= rinv
          b *= sinv
-      end   
+      end
    end
-
-   println("PASS")
 end
 
-function test_gfelem_comparison()
-   print("Julia.gfelem.comparison...")
-  
+@testset "Julia.gfelem.comparison..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -240,13 +218,9 @@ function test_gfelem_comparison()
       @test R(d) == R(d)
       @test S(d) == S(d)
    end
-
-   println("PASS")
 end
 
-function test_gfelem_adhoc_comparison()
-   print("Julia.gfelem.adhoc_comparison...")
-  
+@testset "Julia.gfelem.adhoc_comparison..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -264,13 +238,9 @@ function test_gfelem_adhoc_comparison()
       @test S(d) == d
       @test d == S(d)
    end
-
-   println("PASS")
 end
 
-function test_gfelem_inversion()
-   print("Julia.gfelem.inversion...")
-  
+@testset "Julia.gfelem.inversion..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -284,13 +254,9 @@ function test_gfelem_inversion()
       @test a == 0 || a*inv(a) == one(R)
       @test b == 0 || b*inv(b) == one(S)
    end
-
-   println("PASS")
 end
 
-function test_gfelem_exact_division()
-   print("Julia.gfelem.exact_division...")
-  
+@testset "Julia.gfelem.exact_division..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -303,22 +269,4 @@ function test_gfelem_exact_division()
       @test a2 == 0 || divexact(a1, a2)*a2 == a1
       @test b2 == 0 || divexact(b1, b2)*b2 == b1
    end
-
-   println("PASS")
-end
-
-function test_gfelem()
-   test_gfelem_constructors()
-   test_gfelem_printing()
-   test_gfelem_manipulation()
-   test_gfelem_unary_ops()
-   test_gfelem_binary_ops()
-   test_gfelem_adhoc_binary()
-   test_gfelem_powering()
-   test_gfelem_comparison()
-   test_gfelem_adhoc_comparison()
-   test_gfelem_inversion()
-   test_gfelem_exact_division()
-   
-   println("")
 end

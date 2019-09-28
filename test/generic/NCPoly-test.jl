@@ -1,6 +1,4 @@
-function test_gen_ncpoly_constructors()
-   print("Generic.NCPoly.constructors...")
-
+@testset "Generic.NCPoly.constructors..." begin
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
 
@@ -49,13 +47,9 @@ function test_gen_ncpoly_constructors()
    n = S([ZZ(1), ZZ(2), ZZ(3)])
 
    @test isa(n, NCPolyElem)
-
-   println("PASS")
 end
 
-function test_gen_ncpoly_manipulation()
-   print("Generic.NCPoly.manipulation...")
-
+@testset "Generic.NCPoly.manipulation..." begin
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
 
@@ -92,13 +86,19 @@ function test_gen_ncpoly_manipulation()
    @test ismonomial(y^2)
 
    @test !ismonomial(y^2 + y + 1)
-
-   println("PASS")
 end
 
-function test_gen_ncpoly_binary_ops()
-   print("Generic.NCPoly.binary_ops...")
+@testset "Generic.NCPoly.rand..." begin
+   R = MatrixAlgebra(ZZ, 2)
+   S, y = PolynomialRing(R, "y")
 
+   f = rand(S, 0:10, -10:10)
+   @test f isa Generic.NCPoly
+   f = rand(rng, S, 0:10, -10:10)
+   @test f isa Generic.NCPoly
+end
+
+@testset "Generic.NCPoly.binary_ops..." begin
    #  Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -114,13 +114,9 @@ function test_gen_ncpoly_binary_ops()
       @test (f + g)*(f - g) == f*f + g*f - f*g - g*g
       @test f - g == -(g - f)
    end
-
-   println("PASS")
 end
 
-function test_gen_ncpoly_adhoc_binary()
-   print("Generic.NCPoly.adhoc_binary...")
-
+@testset "Generic.NCPoly.adhoc_binary..." begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -157,13 +153,9 @@ function test_gen_ncpoly_adhoc_binary()
       @test f*d1 - f*d2 == f*(d1 - d2)
       @test f*d1 + f*d2 == f*(d1 + d2)
    end
-
-   println("PASS")
 end
 
-function test_gen_ncpoly_comparison()
-   print("Generic.NCPoly.comparison...")
-
+@testset "Generic.NCPoly.comparison..." begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -179,13 +171,9 @@ function test_gen_ncpoly_comparison()
       @test isequal(f, g)
       @test f != g + h
    end
-
-   println("PASS")
 end
 
-function test_gen_ncpoly_adhoc_comparison()
-   print("Generic.NCPoly.adhoc_comparison...")
-
+@testset "Generic.NCPoly.adhoc_comparison..." begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -230,13 +218,9 @@ function test_gen_ncpoly_adhoc_comparison()
       @test S(d1) != d1 + f
       @test d1 != S(d1) + f
    end
-
-   println("PASS")
 end
 
-function test_gen_ncpoly_unary_ops()
-   print("Generic.NCPoly.unary_ops...")
-
+@testset "Generic.NCPoly.unary_ops..." begin
    #  Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -246,13 +230,9 @@ function test_gen_ncpoly_unary_ops()
       @test -(-f) == f
       @test iszero(f + (-f))
    end
-
-   println("PASS")
 end
 
-function test_gen_ncpoly_truncation()
-   print("Generic.NCPoly.truncation...")
-
+@testset "Generic.NCPoly.truncation..." begin
    #  Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -263,13 +243,9 @@ function test_gen_ncpoly_truncation()
 
       @test truncate(f*g, n) == mullow(f, g, n)
    end
-
-   println("PASS")
 end
 
-function test_gen_ncpoly_reverse()
-   print("Generic.NCPoly.reverse...")
-
+@testset "Generic.NCPoly.reverse..." begin
    #  Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -289,13 +265,9 @@ function test_gen_ncpoly_reverse()
       @test length(frev) == len - shift
       @test f == reverse(frev, len)
    end
-
-   println("PASS")
 end
 
-function test_gen_ncpoly_shift()
-   print("Generic.NCPoly.shift...")
-
+@testset "Generic.NCPoly.shift..." begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -308,13 +280,9 @@ function test_gen_ncpoly_shift()
       @test shift_left(f, s) == y^s*f
       @test length(shift_right(f, s)) == max(0, length(f) - s)
    end
-
-   println("PASS")
 end
 
-function test_gen_ncpoly_powering()
-   print("Generic.NCPoly.powering...")
-
+@testset "Generic.NCPoly.powering..." begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -331,13 +299,9 @@ function test_gen_ncpoly_powering()
          r2 *= f
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_ncpoly_exact_division()
-   print("Generic.NCPoly.exact_division...")
-
+@testset "Generic.NCPoly.exact_division..." begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -352,13 +316,9 @@ function test_gen_ncpoly_exact_division()
       @test divexact_right(f*g, g) == f
       @test divexact_left(g*f, g) == f
    end
-
-   println("PASS")
 end
 
-function test_gen_ncpoly_adhoc_exact_division()
-   print("Generic.NCPoly.adhoc_exact_division...")
-
+@testset "Generic.NCPoly.adhoc_exact_division..." begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -405,13 +365,9 @@ function test_gen_ncpoly_adhoc_exact_division()
       @test divexact_right(f*h, h) == f
       @test divexact_left(h*f, h) == f
    end
-
-   println("PASS")
 end
 
-function test_gen_ncpoly_evaluation()
-   print("Generic.NCPoly.evaluation...")
-
+@testset "Generic.NCPoly.evaluation..." begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -432,13 +388,9 @@ function test_gen_ncpoly_evaluation()
 
       @test evaluate(f^2, d) == evaluate(f, d)^2
    end
-
-   println("PASS")
 end
 
-function test_gen_ncpoly_derivative()
-   print("Generic.NCPoly.derivative...")
-
+@testset "Generic.NCPoly.derivative..." begin
    # Exact ring
    R = MatrixAlgebra(ZZ, 2)
    S, y = PolynomialRing(R, "y")
@@ -451,26 +403,4 @@ function test_gen_ncpoly_derivative()
 
       @test derivative(g*f) == derivative(g)*f + g*derivative(f)
    end
-
-   println("PASS")
-end
-
-function test_gen_ncpoly()
-   test_gen_ncpoly_constructors()
-   test_gen_ncpoly_manipulation()
-   test_gen_ncpoly_binary_ops()
-   test_gen_ncpoly_adhoc_binary()
-   test_gen_ncpoly_comparison()
-   test_gen_ncpoly_adhoc_comparison()
-   test_gen_ncpoly_unary_ops()
-   test_gen_ncpoly_truncation()
-   test_gen_ncpoly_reverse()
-   test_gen_ncpoly_shift()
-   test_gen_ncpoly_powering()
-   test_gen_ncpoly_exact_division()
-   test_gen_ncpoly_adhoc_exact_division()
-   test_gen_ncpoly_evaluation()
-   test_gen_ncpoly_derivative()
-
-   println("")
 end

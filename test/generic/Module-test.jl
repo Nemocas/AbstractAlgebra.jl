@@ -1,22 +1,3 @@
-function rand_module(R::AbstractAlgebra.Ring, vals...)
-   rk = rand(0:5)
-   M = FreeModule(R, rk)
-   levels = rand(0:3)
-   for i = 1:levels
-      if ngens(M) == 0
-         break
-      end
-      G = [rand(M, vals...) for i in 1:rand(1:ngens(M))]
-      S, f = sub(M, G)
-      if rand(1:2) == 1
-         M, f = quo(M, S)
-      else
-         M = S
-      end
-   end
-   return M
-end
-
 function rand_homomorphism(M::AbstractAlgebra.FPModule{T}, vals...) where T <: RingElement
    rk = rand(1:5)
    m = ngens(M)
@@ -32,9 +13,15 @@ function rand_homomorphism(M::AbstractAlgebra.FPModule{T}, vals...) where T <: R
    return S, hom1
 end
 
-function test_module_manipulation()
-   print("Generic.Module.manipulation...")
+@testset "Generic.Module.rand..." begin
+   F = FreeModule(ZZ, 3)
+   f = rand(F, 1:9)
+   @test f isa Generic.free_module_elem
+   f = rand(rng, F, 1:9)
+   @test f isa Generic.free_module_elem
+end
 
+@testset "Generic.Module.manipulation..." begin
    for R in [ZZ, QQ]
       for iter = 1:100
          F = FreeModule(R, 3)
@@ -80,7 +67,7 @@ function test_module_manipulation()
          flag, U = iscompatible(M, M)
          @test flag == true && U == M
 
-         flag, U = iscompatible(M1, Q) 
+         flag, U = iscompatible(M1, Q)
          @test flag == false
 
          flag, U = iscompatible(M2, Q)
@@ -112,12 +99,9 @@ function test_module_manipulation()
    T, h = sub(Q, [b, c, d])
 
    U, k = quo(Q, T)
-
-   println("PASS")
 end
 
-function test_module_elem_getindex()
-   print("Generic.Module.elem_getindex...")
+@testset "Generic.Module.elem_getindex..." begin
 
    for R in [ZZ, QQ]
       for iter = 1:100
@@ -135,13 +119,9 @@ function test_module_elem_getindex()
          @test m1 == m2
       end
    end
-
-   println("PASS")
 end
 
-function test_module_intersection()
-   print("Generic.Module.intersection...")
-
+@testset "Generic.Module.intersection..." begin
    for R in [ZZ, QQ]
       for iter = 1:100
          M = rand_module(R, -10:10)
@@ -181,13 +161,9 @@ function test_module_intersection()
          @test I1 == I6
       end
    end
-   
-   println("PASS")
 end
 
-function test_module_isisomorphic()
-   print("Generic.Module.is_isomorphic...")
-
+@testset "Generic.Module.is_isomorphic..." begin
    # Test the first isomorphism theorem
    for R in [ZZ, QQ]
       for iter = 1:100
@@ -217,13 +193,9 @@ function test_module_isisomorphic()
          @test isisomorphic(I, M1)
       end
    end
-     
-   println("PASS")
 end
 
-function test_module_coercions()
-   print("Generic.Module.coercions...")
-
+@testset "Generic.Module.coercions..." begin
    # Test the first isomorphism theorem
    for R in [ZZ, QQ]
       for iter = 1:20
@@ -286,16 +258,4 @@ function test_module_coercions()
          @test parent(D(m9)) === D
       end
    end
-
-   println("PASS")
-end
-
-function test_module()
-   test_module_manipulation()
-   test_module_elem_getindex()
-   test_module_intersection()
-   test_module_isisomorphic()
-   test_module_coercions()
-
-   println("")
 end

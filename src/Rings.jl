@@ -4,7 +4,8 @@
 #
 ###############################################################################
 
-elem_type(::T) where {T <: Ring} = elem_type(T)
+elem_type(::T)   where {T <: Ring}     = elem_type(T)
+parent_type(::T) where {T <: RingElem} = parent_type(T)
 
 function isequal(a::RingElem, b::RingElem)
    return parent(a) == parent(b) && a == b
@@ -242,7 +243,7 @@ end
 @doc Markdown.doc"""
     change_base_ring(::PolyElem{T}, g::Any) where T <: RingElement
 > Return the polynomial obtained by applying `g` to the coefficients. The new
-> base ring is defined by the image of `0`. 
+> base ring is defined by the image of `0`.
 """
 function change_base_ring(p::PolyElem{T}, g) where T <: RingElement
    z = zero(base_ring(parent(p)))

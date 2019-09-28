@@ -487,9 +487,9 @@ end
 #
 ###############################################################################
 
-function rand(S::AbstractAlgebra.ResField{T}, v...) where {T <: RingElement}
+function rand(rng::AbstractRNG, S::AbstractAlgebra.ResField{T}, v...) where {T <: RingElement}
    R = base_ring(S)
-   return S(rand(R, v...))
+   return S(rand(rng, R, v...))
 end
 
 ###############################################################################

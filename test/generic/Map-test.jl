@@ -9,9 +9,7 @@ a(f::Map(MyMap)) = Generic.get_field(f, :a)
 
 (f::MyMap)(x) =  a(f)*(x + 1)
 
-function test_gen_map_functional()
-   print("Generic.Map.FunctionalMap...")
-
+@testset "Generic.Map.FunctionalMap..." begin
    f = map_from_func(ZZ, ZZ, x -> x + 1)
    g = map_from_func(ZZ, QQ, x -> QQ(x))
 
@@ -25,13 +23,9 @@ function test_gen_map_functional()
 
    @test image_fn(f)(ZZ(1)) == 2
    @test image_fn(g)(ZZ(2)) == QQ(2)
-
-   println("PASS")
 end
 
-function test_gen_map_functional_composite()
-   print("Generic.Map.FunctionalCompositeMap...")
-
+@testset "Generic.Map.FunctionalCompositeMap..." begin
    f = map_from_func(ZZ, ZZ, x -> x + 1)
    g = map_from_func(ZZ, QQ, x -> QQ(x))
 
@@ -53,20 +47,16 @@ function test_gen_map_functional_composite()
 
    @test map1(h) === f
    @test map2(h) === g
-
-   println("PASS")
 end
 
-function test_gen_map_composite()
-   print("Generic.Map.CompositeMap...")
-
+@testset "Generic.Map.CompositeMap..." begin
    f = map_from_func(ZZ, ZZ, x -> x + 1)
 
    s = MyMap(2)
 
    t = compose(f, s)
 
-   @test isa(t, Map(Generic.CompositeMap))     
+   @test isa(t, Map(Generic.CompositeMap))
 
    for i in 1:10
       @test t(ZZ(i)) == 2*(i + 2)
@@ -77,13 +67,9 @@ function test_gen_map_composite()
 
    @test map1(t) === f
    @test map2(t) === s
-
-   println("PASS")
 end
 
-function test_gen_map_identity()
-   print("Generic.Map.IdentityMap...")
-
+@testset "Generic.Map.IdentityMap..." begin
    f = map_from_func(ZZ, QQ, x -> QQ(x + 1))
    g = identity_map(ZZ)
    h = identity_map(QQ)
@@ -106,16 +92,4 @@ function test_gen_map_identity()
 
    @test compose(g, g) === g
    @test compose(h, h) === h
-
-   println("PASS")
 end
-
-function test_gen_map()
-   test_gen_map_functional()
-   test_gen_map_functional_composite()
-   test_gen_map_composite()
-   test_gen_map_identity()
-
-   println("")
-end
-

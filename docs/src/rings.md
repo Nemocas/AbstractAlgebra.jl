@@ -56,7 +56,7 @@ algorithmically to identify two rings if they were constructed from identical da
 
 If a global cache is provided, it must be optionally possible to construct the parent
 objects without caching. This is done by passing a boolean value `cached` to the inner
-constructor of the parent object. See generic/GenericTypes.jl` for examples of how to
+constructor of the parent object. See `generic/GenericTypes.jl` for examples of how to
 construct and handle such caches.
 
 ## Required functions for all rings
@@ -279,7 +279,7 @@ return an element of the ring.
 show(io::IO, R::MyParent)
 ```
 
-This should print (to the given IO object), an English description of the parent ring.
+This should print an English description of the parent ring (to the given IO object).
 If the ring is parameterised, it can call the corresponding `show` function for any
 rings it depends on.
 
@@ -299,7 +299,7 @@ component or component type.
 needs_parentheses(f::MyElem)
 ```
 
-Should returns `true` if parentheses are needed around this object when printed, e.g. as
+Should return `true` if parentheses are needed around this object when printed, e.g. as
 a coefficient of a polynomial. As an example, non-constant polynomials would need such
 parentheses if used as coefficients of another polynomial.
 
@@ -471,7 +471,7 @@ ring, the promotion rules can be defined as follows:
 promote_rule(::Type{MyElem}, ::Type{T}) where {T <: Integer} = MyElem
 ```
 
-For ring element types `MyType` that aren't parameterised, but which have a base ring
+For ring element types `MyElem` that aren't parameterised, but which have a base ring
 with concrete element type `T` the promotion rules can be defined as follows:
 
 ```julia
@@ -490,8 +490,7 @@ promote_rule(::Type{MyElem{T}}, ::Type{MyElem{T}}) where T <: RingElement = MyEl
 ```
 
 ```julia
-function promote_rule(::Type{MyElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingEle
-ment}
+function promote_rule(::Type{MyElem{T}}, ::Type{U}) where {T <: RingElement, U <: RingElement}
    promote_rule(T, U) == T ? MyElem{T} : Union{}
 end
 ```
@@ -603,11 +602,11 @@ hoc operators with elements of the base ring.
 ### Optional ad hoc exact division functions
 
 ```julia
-divexact(a::MyType{T}, b::T) where T <: AbstractAlgebra.RingElem
+divexact(a::MyElem{T}, b::T) where T <: AbstractAlgebra.RingElem
 ```
 
 ```julia
-divexact(a::MyType, b::Integer)
+divexact(a::MyElem, b::Integer)
 ```
 
 ### Optional powering functions

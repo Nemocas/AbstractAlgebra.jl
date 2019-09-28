@@ -1,6 +1,4 @@
-function test_gen_mpoly_constructors()
-   print("Generic.MPoly.constructors...")
-
+@testset "Generic.MPoly.constructors..." begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -74,13 +72,9 @@ function test_gen_mpoly_constructors()
       @test x in keys(Dict(x => 1))
       @test !(y in keys(Dict(x => 1)))
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_geobuckets()
-   print("Generic.MPoly.geobuckets...")
-
+@testset "Generic.MPoly.geobuckets..." begin
    R, x = ZZ["y"]
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -95,12 +89,26 @@ function test_gen_mpoly_geobuckets()
       end
       @test finish(C) == sum(sum(g[j]^i for i in 1:64) for j in 1:num_vars)
    end
-   println("PASS")
 end
 
-function test_gen_mpoly_manipulation()
-   print("Generic.MPoly.manipulation...")
+@testset "Generic.MPoly.rand..." begin
+   R, x = ZZ["y"]
+   num_vars = 5
+   var_names = ["x$j" for j in 1:num_vars]
 
+   ord = rand_ordering()
+   @test ord in [:lex, :deglex, :degrevlex]
+   ord = rand_ordering(rng)
+   @test ord in [:lex, :deglex, :degrevlex]
+
+   S, varlist = PolynomialRing(R, var_names, ordering = ord)
+   f = rand(S, 0:5, 0:100, 0:0, -100:100)
+   @test f isa Generic.MPoly
+   f = rand(rng, S, 0:5, 0:100, 0:0, -100:100)
+   @test f isa Generic.MPoly
+end
+
+@testset "Generic.MPoly.manipulation..." begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -196,7 +204,7 @@ function test_gen_mpoly_manipulation()
             @test max_degs[j] == degs[j] || (degs[j] == -1 && max_degs[j] == 0)
          else
             @test max_degs[j] == degs[num_vars - j + 1] ||
-                  (degs[num_vars - j + 1] == -1 && max_degs[j] == 0) 
+                  (degs[num_vars - j + 1] == -1 && max_degs[j] == 0)
          end
 
          @test max_degs[j] <= biggest
@@ -223,13 +231,9 @@ function test_gen_mpoly_manipulation()
       @test isterm(g)
       @test ismonomial(h)
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_multivariate_coeff()
-   print("Generic.MPoly.multivariate_coeff...")
-
+@testset "Generic.MPoly.multivariate_coeff..." begin
    R = ZZ
 
    for iter = 1:5
@@ -248,12 +252,9 @@ z^4-4*x*y-10*x*z^2+8*y^2*z^5-9*y^2*z^3
       @test coeff(f, [y, z], [3, 2]) == -10*x^4
       @test coeff(f, [x, z], [4, 5]) == 0
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_total_degree()
-   print("Generic.MPoly.total_degree...")
+@testset "Generic.MPoly.total_degree..." begin
    max = 50
    for nvars = 1:10
       var_names = ["x$j" for j in 1:nvars]
@@ -272,12 +273,9 @@ function test_gen_mpoly_total_degree()
          @test length(Set(degrees)) == 1
       end
    end
-   println("PASS")
 end
 
-function test_gen_mpoly_unary_ops()
-   print("Generic.MPoly.unary_ops...")
-
+@testset "Generic.MPoly.unary_ops..." begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -292,13 +290,9 @@ function test_gen_mpoly_unary_ops()
          @test f == -(-f)
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_binary_ops()
-   print("Generic.MPoly.binary_ops...")
-
+@testset "Generic.MPoly.binary_ops..." begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -321,13 +315,9 @@ function test_gen_mpoly_binary_ops()
          @test f*g == AbstractAlgebra.mul_classical(f, g)
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_adhoc_binary()
-   print("Generic.MPoly.adhoc_binary...")
-
+@testset "Generic.MPoly.adhoc_binary..." begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -366,13 +356,9 @@ function test_gen_mpoly_adhoc_binary()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_adhoc_comparison()
-   print("Generic.MPoly.adhoc_comparison...")
-
+@testset "Generic.MPoly.adhoc_comparison..." begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -393,13 +379,9 @@ function test_gen_mpoly_adhoc_comparison()
          @test g == S(g)
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_powering()
-   print("Generic.MPoly.powering...")
-
+@testset "Generic.MPoly.powering..." begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -421,13 +403,9 @@ function test_gen_mpoly_powering()
          @test (f == 0 && expn == 0 && f^expn == 0) || f^expn == r
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_divides()
-   print("Generic.MPoly.divides...")
-
+@testset "Generic.MPoly.divides..." begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -459,13 +437,9 @@ function test_gen_mpoly_divides()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_euclidean_division()
-   print("Generic.MPoly.euclidean_division...")
-
+@testset "Generic.MPoly.euclidean_division..." begin
    R, x = QQ["y"]
 
    for num_vars = 1:10
@@ -497,20 +471,16 @@ function test_gen_mpoly_euclidean_division()
          @test q3*f + r3 == g
          @test q3 == q4
          @test (r3 == 0 && flag == true && q5 == q3) || (r3 != 0 && flag == false)
-         
+
       end
-      
+
       S, varlist = PolynomialRing(QQ, var_names, ordering = ord)
       v = varlist[1+Int(round(rand() * (num_vars-1)))]
       @test divrem(v, 2*v) == (1//2, 0)
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_ideal_reduction()
-   print("Generic.MPoly.ideal_reduction...")
-
+@testset "Generic.MPoly.ideal_reduction..." begin
    R, x = QQ["y"]
 
    for num_vars = 1:10
@@ -557,13 +527,9 @@ function test_gen_mpoly_ideal_reduction()
          @test p == g
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_deflation()
-   print("Generic.MPoly.deflation...")
-
+@testset "Generic.MPoly.deflation..." begin
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -582,13 +548,9 @@ function test_gen_mpoly_deflation()
          @test h == f
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_gcd()
-   print("Generic.MPoly.gcd...")
-
+@testset "Generic.MPoly.gcd..." begin
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -605,13 +567,9 @@ function test_gen_mpoly_gcd()
          @test g2 == g1*h || g2 == -g1*h
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_lcm()
-   print("Generic.MPoly.lcm...")
-
+@testset "Generic.MPoly.lcm..." begin
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -633,13 +591,9 @@ function test_gen_mpoly_lcm()
          @test divides(l2, h)[1]
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_evaluation()
-   print("Generic.MPoly.evaluation...")
-
+@testset "Generic.MPoly.evaluation..." begin
    R, x = ZZ["x"]
 
    for num_vars = 1:10
@@ -741,10 +695,10 @@ function test_gen_mpoly_evaluation()
          end
 
          f = rand(S, 0:5, 0:100, 0:0, -100:100)
-      
+
          f1 = evaluate(f, V, Vval)
          f2 = evaluate(f1, W, Wval)
-         
+
          r = evaluate(f, Vals)
 
          @test (length(f2) == 0 && r == 0) ||
@@ -916,13 +870,9 @@ function test_gen_mpoly_evaluation()
    K = RealField
    R, (x, y) = PolynomialRing(K, ["x", "y"])
    @test evaluate(x + y, [K(1), K(1)]) isa BigFloat
-
-   println("PASS")
 end
 
-function test_gen_mpoly_valuation()
-   print("Generic.MPoly.valuation...")
-
+@testset "Generic.MPoly.valuation..." begin
    R, x = ZZ["y"]
 
    for num_vars = 1:10
@@ -958,13 +908,9 @@ function test_gen_mpoly_valuation()
          @test q4 == q3
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_derivative()
-   print("Generic.MPoly.derivative...")
-
+@testset "Generic.MPoly.derivative..." begin
    for num_vars=1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -987,18 +933,14 @@ function test_gen_mpoly_derivative()
          j += 1
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_change_base_ring()
-   print("Generic.MPoly.change_base_ring...")
-   
+@testset "Generic.MPoly.change_base_ring..." begin
    F2 = ResidueRing(ZZ, 2)
    R, varsR = PolynomialRing(F2, ["x"])
    S, varsS = PolynomialRing(R, ["y"])
    f = x -> x^2
-   change_base_ring(varsR[1] * varsS[1], f) == f(varsR[1]) * varsS[1]
+   map(f, varsR[1] * varsS[1]) == f(varsR[1]) * varsS[1]
 
    for num_vars=1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -1006,23 +948,28 @@ function test_gen_mpoly_change_base_ring()
 
       R, vars = PolynomialRing(ZZ, var_names; ordering=ord)
 
-      @test typeof(AbstractAlgebra.Generic.change_base_ring(R(1), a->ZZ(a))) == AbstractAlgebra.Generic.MPoly{typeof(ZZ(1))}
-      @test typeof(AbstractAlgebra.Generic.change_base_ring(R(0), a->ZZ(a))) == AbstractAlgebra.Generic.MPoly{typeof(ZZ(0))}
+      F2x, varss = PolynomialRing(F2, var_names; ordering = ord)
+
+      @test typeof(AbstractAlgebra.Generic.change_base_ring(ZZ, R(1))) == AbstractAlgebra.Generic.MPoly{typeof(ZZ(1))}
+      @test typeof(AbstractAlgebra.Generic.change_base_ring(ZZ, R(0))) == AbstractAlgebra.Generic.MPoly{typeof(ZZ(0))}
 
       for iter in 1:10
          f = rand(R, 5:10, 1:10, -100:100)
-         @test evaluate(change_base_ring(f, a -> R(a)), [one(R) for i=1:num_vars]) == sum(f.coeffs[i] for i=1:f.length)
-         @test evaluate(change_base_ring(f, a -> R(a)), vars) == f
-         @test parent(change_base_ring(f, a -> R(a))).ord == parent(f).ord
+         @test evaluate(change_base_ring(R, f), [one(R) for i=1:num_vars]) == sum(f.coeffs[i] for i=1:f.length)
+         @test evaluate(change_base_ring(R, f), vars) == f
+         @test ordering(parent(change_base_ring(R, f))) == ordering(parent(f))
+
+         g = change_base_ring(F2, f, F2x)
+         @test base_ring(g) === F2
+         @test parent(g) === F2x
+
+         g = map(z -> z + 1, f, R)
+         @test parent(g) === R
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_vars()
-   print("Generic.MPoly.vars...")
-
+@testset "Generic.MPoly.vars..." begin
    for num_vars=1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -1031,17 +978,12 @@ function test_gen_mpoly_vars()
 
       for iter in 1:10
          f = rand(R, 5:10, 1:10, -100:100)
-         @test length(vars(R(evaluate(change_base_ring(f, a -> R(a)), [one(R) for i=1:num_vars])))) == 0
-         # @test issubset(vars(f), Set(gens(parent(f)))) # This fails, probably due to https://github.com/Nemocas/AbstractAlgebra.jl/issues/111
+         @test length(vars(R(evaluate(map(R, f), [one(R) for i=1:num_vars])))) == 0
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_combine_like_terms()
-   print("Generic.MPoly.combine_like_terms...")
-
+@testset "Generic.MPoly.combine_like_terms..." begin
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -1073,13 +1015,9 @@ function test_gen_mpoly_combine_like_terms()
          @test length(f) == lenf - 1 - terms_cancel
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_exponents()
-   print("Generic.MPoly.exponents...")
-
+@testset "Generic.MPoly.exponents..." begin
    for num_vars = 1:10
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -1148,16 +1086,12 @@ function test_gen_mpoly_exponents()
          @test f == h
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_to_univariate()
-   print("Generic.MPoly.to_univariate...")
-
+@testset "Generic.MPoly.to_univariate..." begin
    for num_vars=1:10
       ord = rand_ordering()
-      
+
       var_names = ["x$j" for j in 1:num_vars]
 
       R, vars_R = PolynomialRing(ZZ, var_names; ordering=ord)
@@ -1179,13 +1113,9 @@ function test_gen_mpoly_to_univariate()
          @test to_univariate(R_univ, f) == f_univ
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_coefficients_of_univariate()
-   print("Generic.MPoly.coefficients_of_univariate...")
-
+@testset "Generic.MPoly.coefficients_of_univariate..." begin
    for num_vars=1:10
       ord = rand_ordering()
       var_names = ["x$j" for j in 1:num_vars]
@@ -1212,17 +1142,13 @@ function test_gen_mpoly_coefficients_of_univariate()
          @test AbstractAlgebra.Generic.coefficients_of_univariate(f, false) == coeffs
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_isless()
-   print("Generic.MPoly.isless...")
-   
+@testset "Generic.MPoly.isless..." begin
    n_mpolys = 100
    maxval = 10
    maxdeg = 20
-   
+
    # :deglex ordering
    R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x","y","z"], ordering=:lex)
    # Monomials of degree 2
@@ -1245,18 +1171,18 @@ function test_gen_mpoly_isless()
 
    # :deglex ordering
    R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x","y","z"], ordering=:deglex)
-   
+
    @test isless(z^2, y*z) == true
    @test isless(y*z, x*z) == true
    @test isless(y^2, x*z) == true
    @test isless(y^2, x*y) == true
    @test isless(x*y, x^2) == true
-   
+
    for n_vars=1:maxdeg
       A = reshape(map(Int,map(round, rand(n_vars * n_mpolys) * maxval)), (n_mpolys, n_vars))
       var_names = ["x$j" for j in 1:n_vars]
       R, varsR = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, var_names, ordering=:deglex)
-      
+
       for i in 1:size(A)[1]-1
          f = R([base_ring(R)(1)], [A[i,:]])
          g = R([base_ring(R)(1)], [A[i+1,:]])
@@ -1277,7 +1203,7 @@ function test_gen_mpoly_isless()
          end
       end
    end
-   
+
    # :degrevlex ordering
    R, (x,y,z) = AbstractAlgebra.Generic.PolynomialRing(AbstractAlgebra.Generic.ZZ, ["x","y","z"], ordering=:degrevlex)
    # Monomials of degree 2
@@ -1312,16 +1238,15 @@ function test_gen_mpoly_isless()
          end
       end
    end
-   println("PASS")
 end
 
-function test_gen_mpoly_lt()
+@testset "Generic.MPoly.lt..." begin
    for num_vars=1:10
       ord = rand_ordering()
       var_names = ["x$j" for j in 1:num_vars]
 
       R, vars_R = PolynomialRing(ZZ, var_names; ordering=ord)
-      
+
       f = rand(R, 5:10, 1:10, -100:100)
       g = rand(R, 5:10, 1:10, -100:100)
 
@@ -1337,9 +1262,7 @@ function test_gen_mpoly_lt()
    end
 end
 
-function test_gen_mpoly_lc()
-   print("Generic.MPoly.lc...")
-
+@testset "Generic.MPoly.lc..." begin
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -1359,13 +1282,9 @@ function test_gen_mpoly_lc()
          @test parent(lc(f)) == base_ring(f)
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_lm()
-   print("Generic.MPoly.lm...")
-
+@testset "Generic.MPoly.lm..." begin
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -1392,13 +1311,9 @@ function test_gen_mpoly_lm()
          @test parent(lm(f)) == parent(f)
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_mpoly_ishomogeneous()
-   print("Generic.MPoly.ishomogenous...")
-
+@testset "Generic.MPoly.ishomogenous..." begin
    for num_vars = 1:4
       var_names = ["x$j" for j in 1:num_vars]
       ord = rand_ordering()
@@ -1413,42 +1328,4 @@ function test_gen_mpoly_ishomogeneous()
          end
       end
    end
-
-   println("PASS")
-end
-
-
-function test_gen_mpoly()
-   test_gen_mpoly_constructors()
-   test_gen_mpoly_geobuckets()
-   test_gen_mpoly_manipulation()
-   test_gen_mpoly_multivariate_coeff()
-   test_gen_mpoly_unary_ops()
-   test_gen_mpoly_binary_ops()
-   test_gen_mpoly_adhoc_binary()
-   test_gen_mpoly_adhoc_comparison()
-   test_gen_mpoly_powering()
-   test_gen_mpoly_divides()
-   test_gen_mpoly_euclidean_division()
-   test_gen_mpoly_ideal_reduction()
-   test_gen_mpoly_deflation()
-   test_gen_mpoly_gcd()
-   test_gen_mpoly_evaluation()
-   test_gen_mpoly_valuation()
-   test_gen_mpoly_derivative()
-   test_gen_mpoly_change_base_ring()
-   test_gen_mpoly_total_degree()
-   test_gen_mpoly_vars()
-   test_gen_mpoly_combine_like_terms()
-   test_gen_mpoly_exponents()
-   test_gen_mpoly_to_univariate()
-   test_gen_mpoly_coefficients_of_univariate()
-   test_gen_mpoly_isless()
-   test_gen_mpoly_lc()
-   test_gen_mpoly_lm()
-   test_gen_mpoly_lt()
-   test_gen_mpoly_lcm()
-   test_gen_mpoly_ishomogeneous()
-
-   println("")
 end

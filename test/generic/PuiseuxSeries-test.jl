@@ -16,9 +16,7 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
-function test_puiseux_series_constructors()
-   print("Generic.PuiseuxSeries.constructors...")
-
+@testset "Generic.PuiseuxSeries.constructors..." begin
    R, x = PuiseuxSeriesRing(ZZ, 30, "x")
 
    S, t = PolynomialRing(QQ, "t")
@@ -91,13 +89,23 @@ function test_puiseux_series_constructors()
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
-
-   println("PASS")
 end
 
-function test_puiseux_series_manipulation()
-   print("Generic.PuiseuxSeries.manipulation...")
+@testset "Generic.PuiseuxSeries.rand..." begin
+   R, x = PuiseuxSeriesRing(ZZ, 10, "x")
+   f = rand(R, -12:12, 1:6, -10:10)
+   @test f isa Generic.PuiseuxSeriesRingElem
+   f = rand(rng, R, -12:12, 1:6, -10:10)
+   @test f isa Generic.PuiseuxSeriesRingElem
 
+   R, x = PuiseuxSeriesField(RealField, 10, "x")
+   f = rand(R, -12:12, 1:6, -1:1)
+   @test f isa Generic.PuiseuxSeriesFieldElem
+   f = rand(rng, R, -12:12, 1:6, -1:1)
+   @test f isa Generic.PuiseuxSeriesFieldElem
+end
+
+@testset "Generic.PuiseuxSeries.manipulation..." begin
    R, t = PolynomialRing(QQ, "t")
    S, x = PuiseuxSeriesRing(R, 30, "x")
 
@@ -132,13 +140,9 @@ function test_puiseux_series_manipulation()
    U, y = PuiseuxSeriesRing(T, 10, "y")
 
    @test modulus(T) == 7
-
-   println("PASS")
 end
 
-function test_puiseux_series_unary_ops()
-   print("Generic.PuiseuxSeries.unary_ops...")
-
+@testset "Generic.PuiseuxSeries.unary_ops..." begin
    #  Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -166,13 +170,9 @@ function test_puiseux_series_unary_ops()
       @test isequal(-(-f), f)
       @test iszero(f + (-f))
    end
-
-   println("PASS")
 end
 
-function test_puiseux_series_binary_ops()
-   print("Generic.PuiseuxSeries.binary_ops...")
-
+@testset "Generic.PuiseuxSeries.binary_ops..." begin
    #  Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:100
@@ -220,12 +220,19 @@ function test_puiseux_series_binary_ops()
       @test f*(g - h) == f*g - f*h
    end
 
-   println("PASS")
+   # Regression test for Nemo issue 319
+   R, x = PuiseuxSeriesRing(ZZ, 4, "x")
+   cs = [one(ZZ), zero(ZZ), one(ZZ), zero(ZZ)]
+   f = R(R.laurent_ring(cs, 4, 4, 0, 1, false), 2)
+   f = deepcopy(f) # triggers rescale
+   g = deepcopy(f)
+
+   ff = f*f;
+
+   @test isequal(g, f)
 end
 
-function test_puiseux_series_adhoc_binary_ops()
-   print("Generic.PuiseuxSeries.adhoc_binary_ops...")
-
+@testset "Generic.PuiseuxSeries.adhoc_binary_ops..." begin
    # Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -313,13 +320,9 @@ function test_puiseux_series_adhoc_binary_ops()
       @test isequal(f*d1 - f*d2, f*(d1 - d2))
       @test isequal(f*d1 + f*d2, f*(d1 + d2))
    end
-
-   println("PASS")
 end
 
-function test_puiseux_series_comparison()
-   print("Generic.PuiseuxSeries.comparison...")
-
+@testset "Generic.PuiseuxSeries.comparison..." begin
    # Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -368,13 +371,9 @@ function test_puiseux_series_comparison()
       @test (precision(h) > min(precision(f), precision(g)) || f != g + h)
       @test (precision(h) > min(precision(f), precision(g)) || !isequal(f, g + h))
    end
-
-   println("PASS")
 end
 
-function test_puiseux_series_adhoc_comparison()
-   print("Generic.PuiseuxSeries.adhoc_comparison...")
-
+@testset "Generic.PuiseuxSeries.adhoc_comparison..." begin
    # Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -469,13 +468,9 @@ function test_puiseux_series_adhoc_comparison()
       @test S(d1) != d1 + f
       @test d1 != S(d1) + f
    end
-
-   println("PASS")
 end
 
-function test_puiseux_series_powering()
-   print("Generic.PuiseuxSeries.powering...")
-
+@testset "Generic.PuiseuxSeries.powering..." begin
    # Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
 
@@ -526,13 +521,9 @@ function test_puiseux_series_powering()
          r2 *= f
       end
    end
-
-   println("PASS")
 end
 
-function test_puiseux_series_inversion()
-   print("Generic.PuiseuxSeries.inversion...")
-
+@testset "Generic.PuiseuxSeries.inversion..." begin
    # Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -566,37 +557,29 @@ function test_puiseux_series_inversion()
 
       @test f*inv(f) == 1
    end
-
-   println("PASS")
 end
 
-function test_puiseux_series_square_root()
-   print("Generic.PuiseuxSeries.square_root...")
- 
+@testset "Generic.PuiseuxSeries.square_root..." begin
    # Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -10:10)
       g = f^2
- 
+
       @test isequal(sqrt(g)^2, g)
    end
- 
+
    # Inexact field
    R, x = PuiseuxSeriesField(RealField, 10, "x")
    for iter = 1:300
       f = rand(R, -12:12, 1:6, -1:1)
       g = f^2
- 
+
       @test isapprox(sqrt(g)^2, g)
    end
- 
-   println("PASS")
 end
- 
-function test_puiseux_series_exact_division()
-   print("Generic.PuiseuxSeries.exact_division...")
 
+@testset "Generic.PuiseuxSeries.exact_division..." begin
    # Exact ring
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -635,13 +618,9 @@ function test_puiseux_series_exact_division()
 
       @test divexact(f, g)*g == f
    end
-
-   println("PASS")
 end
 
-function test_puiseux_series_adhoc_exact_division()
-   print("Generic.PuiseuxSeries.adhoc_exact_division...")
-
+@testset "Generic.PuiseuxSeries.adhoc_exact_division..." begin
    # Exact field
    R, x = PuiseuxSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -678,13 +657,9 @@ function test_puiseux_series_adhoc_exact_division()
 
       @test isequal(divexact(f*c, c), f)
    end
-
-   println("PASS")
 end
 
-function test_puiseux_series_special_functions()
-   print("Generic.PuiseuxSeries.special_functions...")
-
+@testset "Generic.PuiseuxSeries.special_functions..." begin
    # Exact field
    S, x = PuiseuxSeriesRing(QQ, 10, "x")
 
@@ -745,24 +720,4 @@ function test_puiseux_series_special_functions()
 
       @test isequal(exp(f)*exp(g), exp(f + g))
    end
-
-   println("PASS")
-end
-
-function test_gen_puiseux_series()
-   test_puiseux_series_constructors()
-   test_puiseux_series_manipulation()
-   test_puiseux_series_unary_ops()
-   test_puiseux_series_binary_ops()
-   test_puiseux_series_adhoc_binary_ops()
-   test_puiseux_series_comparison()
-   test_puiseux_series_adhoc_comparison()
-   test_puiseux_series_powering()
-   test_puiseux_series_exact_division()
-   test_puiseux_series_adhoc_exact_division()
-   test_puiseux_series_inversion()
-   test_puiseux_series_square_root()
-   test_puiseux_series_special_functions()
-
-   println("")
 end

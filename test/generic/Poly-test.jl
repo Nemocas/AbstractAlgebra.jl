@@ -16,9 +16,7 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
-function test_gen_poly_constructors()
-   print("Generic.Poly.constructors...")
-
+@testset "Generic.Poly.constructors..." begin
    R, x = ZZ["x"]
    S, y = R["y"]
 
@@ -82,13 +80,17 @@ function test_gen_poly_constructors()
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
-
-   println("PASS")
 end
 
-function test_gen_poly_manipulation()
-   print("Generic.Poly.manipulation...")
+@testset "Generic.Poly.rand..." begin
+   R, x = PolynomialRing(ZZ, "x")
+   f = rand(R, 0:10, -10:10)
+   @test f isa Generic.Poly
+   f = rand(rng, R, 0:10, -10:10)
+   @test f isa Generic.Poly
+end
 
+@testset "Generic.Poly.manipulation..." begin
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
 
@@ -125,13 +127,9 @@ function test_gen_poly_manipulation()
    @test ismonomial(x*y^2)
 
    @test !ismonomial(2*x*y^2 + y + 1)
-
-   println("PASS")
 end
 
-function test_gen_poly_binary_ops()
-   print("Generic.Poly.binary_ops...")
-
+@testset "Generic.Poly.binary_ops..." begin
    #  Exact ring
    R, x = PolynomialRing(ZZ, "x")
    for iter = 1:100
@@ -193,13 +191,9 @@ function test_gen_poly_binary_ops()
       @test (f + g)*(f - g) == f*f - g*g
       @test f - g == -(g - f)
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_adhoc_binary()
-   print("Generic.Poly.adhoc_binary...")
-
+@testset "Generic.Poly.adhoc_binary..." begin
    # Exact ring
    R, x = ZZ["x"]
    for iter = 1:500
@@ -310,13 +304,9 @@ function test_gen_poly_adhoc_binary()
       @test f*d1 - f*d2 == f*(d1 - d2)
       @test f*d1 + f*d2 == f*(d1 + d2)
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_comparison()
-   print("Generic.Poly.comparison...")
-
+@testset "Generic.Poly.comparison..." begin
    # Exact ring
    R, x = ZZ["x"]
    for iter = 1:500
@@ -380,13 +370,9 @@ function test_gen_poly_comparison()
       @test isequal(f, g)
       @test f != g + h
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_adhoc_comparison()
-   print("Generic.Poly.adhoc_comparison...")
-
+@testset "Generic.Poly.adhoc_comparison..." begin
    # Exact ring
    R, x = ZZ["x"]
    for iter = 1:500
@@ -501,13 +487,9 @@ function test_gen_poly_adhoc_comparison()
       @test S(d1) != d1 + f
       @test d1 != S(d1) + f
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_unary_ops()
-   print("Generic.Poly.unary_ops...")
-
+@testset "Generic.Poly.unary_ops..." begin
    #  Exact ring
    R, x = PolynomialRing(ZZ, "x")
    for iter = 1:300
@@ -547,13 +529,9 @@ function test_gen_poly_unary_ops()
       @test -(-f) == f
       @test iszero(f + (-f))
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_truncation()
-   print("Generic.Poly.truncation...")
-
+@testset "Generic.Poly.truncation..." begin
    #  Exact ring
    R, x = PolynomialRing(ZZ, "x")
    for iter = 1:300
@@ -600,13 +578,9 @@ function test_gen_poly_truncation()
       @test truncate(f*g, n) == r
       @test r == 0 || !iszero(lead(r))
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_reverse()
-   print("Generic.Poly.reverse...")
-
+@testset "Generic.Poly.reverse..." begin
    #  Exact ring
    R, x = ZZ["x"]
    for iter = 1:300
@@ -686,13 +660,9 @@ function test_gen_poly_reverse()
       @test length(frev) == len - shift
       @test f == reverse(frev, len)
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_shift()
-   print("Generic.Poly.shift...")
-
+@testset "Generic.Poly.shift..." begin
    # Exact ring
    R, x = ZZ["x"]
    for iter = 1:300
@@ -744,13 +714,9 @@ function test_gen_poly_shift()
       @test shift_left(f, s) == x^s*f
       @test length(shift_right(f, s)) == max(0, length(f) - s)
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_powering()
-   print("Generic.Poly.powering...")
-
+@testset "Generic.Poly.powering..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -820,195 +786,189 @@ function test_gen_poly_powering()
          r2 *= f
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_modular_arithmetic()
-   print("Generic.Poly.modular_arithmetic...")
+if false
+   @testset "Generic.Poly.modular_arithmetic..." begin
+      # Exact ring
+      R = ResidueRing(ZZ, 23)
+      S, x = PolynomialRing(R, "x")
 
-   # Exact ring
-   R = ResidueRing(ZZ, 23)
-   S, x = PolynomialRing(R, "x")
-
-   for iter = 1:100
-      f = rand(S, 0:5, 0:22)
-      g = rand(S, 0:5, 0:22)
-      h = rand(S, 0:5, 0:22)
-      k = S()
-      while k == 0
-         k = rand(S, 0:5, 0:22)
-      end
-
-      @test mulmod(mulmod(f, g, k), h, k) == mulmod(f, mulmod(g, h, k), k)
-   end
-
-   for iter = 1:100
-      f = S()
-      g = S()
-      while f == 0 || g == 0 || gcd(f, g) != 1
+      for iter = 1:100
          f = rand(S, 0:5, 0:22)
          g = rand(S, 0:5, 0:22)
+         h = rand(S, 0:5, 0:22)
+         k = S()
+         while k == 0
+            k = rand(S, 0:5, 0:22)
+         end
+
+         @test mulmod(mulmod(f, g, k), h, k) == mulmod(f, mulmod(g, h, k), k)
       end
 
-      @test mulmod(invmod(f, g), f, g) == mod(S(1), g)
-   end
+      for iter = 1:100
+         f = S()
+         g = S()
+         while f == 0 || g == 0 || gcd(f, g) != 1
+            f = rand(S, 0:5, 0:22)
+            g = rand(S, 0:5, 0:22)
+         end
 
-   for iter = 1:100
-      f = rand(S, 0:5, 0:22)
-      g = S()
-      while g == 0
-         g = rand(S, 0:5, 0:22)
-      end
-      p = mod(S(1), g)
-
-      for expn = 0:5
-         r = powmod(f, expn, g)
-
-         @test (f == 0 && expn == 0 && r == 0) || r == p
-
-         p = mulmod(p, f, g)
-      end
-   end
-
-   # Fake finite field of char 7, degree 2
-   R, y = PolynomialRing(GF(7), "y")
-   F = ResidueField(R, y^2 + 6y + 3)
-   a = F(y)
-   S, x = PolynomialRing(F, "x")
-
-   for iter = 1:100
-      f = rand(S, 0:5, 0:1)
-      g = rand(S, 0:5, 0:1)
-      h = rand(S, 0:5, 0:1)
-      k = S()
-      while k == 0
-         k = rand(S, 0:5, 0:1)
+         @test mulmod(invmod(f, g), f, g) == mod(S(1), g)
       end
 
-      @test mulmod(mulmod(f, g, k), h, k) == mulmod(f, mulmod(g, h, k), k)
-   end
+      for iter = 1:100
+         f = rand(S, 0:5, 0:22)
+         g = S()
+         while g == 0
+            g = rand(S, 0:5, 0:22)
+         end
+         p = mod(S(1), g)
 
-   for iter = 1:100
-      f = S()
-      g = S()
-      while f == 0 || g == 0 || gcd(f, g) != 1
+         for expn = 0:5
+            r = powmod(f, expn, g)
+
+            @test (f == 0 && expn == 0 && r == 0) || r == p
+
+            p = mulmod(p, f, g)
+         end
+      end
+
+      # Fake finite field of char 7, degree 2
+      R, y = PolynomialRing(GF(7), "y")
+      F = ResidueField(R, y^2 + 6y + 3)
+      a = F(y)
+      S, x = PolynomialRing(F, "x")
+
+      for iter = 1:100
          f = rand(S, 0:5, 0:1)
          g = rand(S, 0:5, 0:1)
+         h = rand(S, 0:5, 0:1)
+         k = S()
+         while k == 0
+            k = rand(S, 0:5, 0:1)
+         end
+
+         @test mulmod(mulmod(f, g, k), h, k) == mulmod(f, mulmod(g, h, k), k)
       end
 
-      @test mulmod(invmod(f, g), f, g) == mod(S(1), g)
-   end
+      for iter = 1:100
+         f = S()
+         g = S()
+         while f == 0 || g == 0 || gcd(f, g) != 1
+            f = rand(S, 0:5, 0:1)
+            g = rand(S, 0:5, 0:1)
+         end
 
-   for iter = 1:100
-      f = rand(S, 0:5, 0:1)
-      g = S()
-      while g == 0
-         g = rand(S, 0:5, 0:1)
-      end
-      p = mod(S(1), g)
-
-      for expn = 0:5
-         r = powmod(f, expn, g)
-
-         @test (f == 0 && expn == 0 && r == 0) || r == p
-
-         p = mulmod(p, f, g)
-      end
-   end
-
-   # Inexact field
-   S, x = PolynomialRing(RealField, "x")
-
-   for iter = 1:100
-      f = rand(S, 0:5, -1:1)
-      g = rand(S, 0:5, -1:1)
-      h = rand(S, 0:5, -1:1)
-      k = R()
-      while k == 0
-         k = rand(S, 0:5, -1:1)
+         @test mulmod(invmod(f, g), f, g) == mod(S(1), g)
       end
 
-      @test isapprox(mulmod(mulmod(f, g, k), h, k), mulmod(f, mulmod(g, h, k), k))
-   end
+      for iter = 1:100
+         f = rand(S, 0:5, 0:1)
+         g = S()
+         while g == 0
+            g = rand(S, 0:5, 0:1)
+         end
+         p = mod(S(1), g)
 
-   for iter = 1:100
-      f = S()
-      g = S()
-      while f == 0 || g == 0 || gcd(f, g) != 1
+         for expn = 0:5
+            r = powmod(f, expn, g)
+
+            @test (f == 0 && expn == 0 && r == 0) || r == p
+
+            p = mulmod(p, f, g)
+         end
+      end
+
+      # Inexact field
+      S, x = PolynomialRing(RealField, "x")
+
+      for iter = 1:100
          f = rand(S, 0:5, -1:1)
          g = rand(S, 0:5, -1:1)
+         h = rand(S, 0:5, -1:1)
+         k = R()
+         while k == 0
+            k = rand(S, 0:5, -1:1)
+         end
+
+         @test isapprox(mulmod(mulmod(f, g, k), h, k), mulmod(f, mulmod(g, h, k), k))
       end
 
-      @test isapprox(mulmod(invmod(f, g), f, g), mod(S(1), g))
-   end
+      for iter = 1:100
+         f = S()
+         g = S()
+         while f == 0 || g == 0 || gcd(f, g) != 1
+            f = rand(S, 0:5, -1:1)
+            g = rand(S, 0:5, -1:1)
+         end
 
-   for iter = 1:100
-      f = rand(S, 0:5, -1:1)
-      g = S()
-      while g == 0
-         g = rand(S, 0:5, -1:1)
-      end
-      p = mod(S(1), g)
-
-      for expn = 0:5
-         r = powmod(f, expn, g)
-
-         @test (f == 0 && expn == 0 && r == 0) || isapprox(r, p)
-
-         p = mulmod(p, f, g)
-      end
-   end
-
-   # Exact field
-   R, x = PolynomialRing(QQ, "y")
-
-   for iter = 1:10
-      f = rand(R, 0:5, -10:10)
-      g = rand(R, 0:5, -10:10)
-      h = rand(R, 0:5, -10:10)
-      k = R()
-      while k == 0
-         k = rand(R, 0:5, -10:10)
+         @test isapprox(mulmod(invmod(f, g), f, g), mod(S(1), g))
       end
 
-      @test mulmod(mulmod(f, g, k), h, k) == mulmod(f, mulmod(g, h, k), k)
-   end
+      for iter = 1:100
+         f = rand(S, 0:5, -1:1)
+         g = S()
+         while g == 0
+            g = rand(S, 0:5, -1:1)
+         end
+         p = mod(S(1), g)
 
-   for iter = 1:10
-      f = R()
-      g = R()
-      while f == 0 || g == 0 || gcd(f, g) != 1
+         for expn = 0:5
+            r = powmod(f, expn, g)
+
+            @test (f == 0 && expn == 0 && r == 0) || isapprox(r, p)
+
+            p = mulmod(p, f, g)
+         end
+      end
+
+      # Exact field
+      R, x = PolynomialRing(QQ, "y")
+
+      for iter = 1:10
          f = rand(R, 0:5, -10:10)
          g = rand(R, 0:5, -10:10)
+         h = rand(R, 0:5, -10:10)
+         k = R()
+         while k == 0
+            k = rand(R, 0:5, -10:10)
+         end
+
+         @test mulmod(mulmod(f, g, k), h, k) == mulmod(f, mulmod(g, h, k), k)
       end
 
-      @test mulmod(invmod(f, g), f, g) == mod(R(1), g)
+      for iter = 1:10
+         f = R()
+         g = R()
+         while f == 0 || g == 0 || gcd(f, g) != 1
+            f = rand(R, 0:5, -10:10)
+            g = rand(R, 0:5, -10:10)
+         end
+
+         @test mulmod(invmod(f, g), f, g) == mod(R(1), g)
+      end
+
+      for iter = 1:10
+         f = rand(R, 0:5, -10:10)
+         g = R()
+         while g == 0
+            g = rand(R, 0:5, -10:10)
+         end
+         p = mod(R(1), g)
+
+         for expn = 0:5
+            r = powmod(f, expn, g)
+
+            @test (f == 0 && expn == 0 && r == 0) || r == p
+
+            p = mulmod(p, f, g)
+         end
+      end
    end
-
-   for iter = 1:10
-      f = rand(R, 0:5, -10:10)
-      g = R()
-      while g == 0
-         g = rand(R, 0:5, -10:10)
-      end
-      p = mod(R(1), g)
-
-      for expn = 0:5
-         r = powmod(f, expn, g)
-
-         @test (f == 0 && expn == 0 && r == 0) || r == p
-
-         p = mulmod(p, f, g)
-      end
-   end
-
-   println("PASS")
 end
 
-function test_gen_poly_exact_division()
-   print("Generic.Poly.exact_division...")
-
+@testset "Generic.Poly.exact_division..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1065,13 +1025,9 @@ function test_gen_poly_exact_division()
 
       @test divexact(f*g, g) == f
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_adhoc_exact_division()
-   print("Generic.Poly.adhoc_exact_division...")
-
+@testset "Generic.Poly.adhoc_exact_division..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1174,13 +1130,9 @@ function test_gen_poly_adhoc_exact_division()
 
       @test divexact(f*h, h) == f
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_euclidean_division()
-   print("Generic.Poly.euclidean_division...")
-
+@testset "Generic.Poly.euclidean_division..." begin
    # Exact ring
    R = ResidueRing(ZZ, 23)
    S, x = PolynomialRing(R, "x")
@@ -1292,13 +1244,9 @@ function test_gen_poly_euclidean_division()
 
       @test mod(f, g) == r
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_pseudodivision()
-   print("Generic.Poly.pseudodivision...")
-
+@testset "Generic.Poly.pseudodivision..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1341,13 +1289,9 @@ function test_gen_poly_pseudodivision()
 
       @test pseudorem(f, g) == r
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_content_primpart_gcd()
-   print("Generic.Poly.content_primpart_gcd...")
-
+@testset "Generic.Poly.content_primpart_gcd..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1477,13 +1421,9 @@ function test_gen_poly_content_primpart_gcd()
 
       @test mod(f*inv, g) == mod(S(1), g)
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_evaluation()
-   print("Generic.Poly.evaluation...")
-
+@testset "Generic.Poly.evaluation..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1547,13 +1487,9 @@ function test_gen_poly_evaluation()
 
       @test evaluate(g, evaluate(f, d)) == evaluate(subst(g, f), d)
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_composition()
-   print("Generic.Poly.composition...")
-
+@testset "Generic.Poly.composition..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1587,13 +1523,9 @@ function test_gen_poly_composition()
 
       @test compose(f, compose(g, h)) == compose(compose(f, g), h)
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_derivative()
-   print("Generic.Poly.derivative...")
-
+@testset "Generic.Poly.derivative..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1630,13 +1562,9 @@ function test_gen_poly_derivative()
 
       @test derivative(g*f) == derivative(g)*f + derivative(f)*g
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_integral()
-   print("Generic.Poly.integral...")
-
+@testset "Generic.Poly.integral..." begin
    # Exact field
    R, x = PolynomialRing(QQ, "x")
 
@@ -1679,13 +1607,9 @@ function test_gen_poly_integral()
       @test isapprox(integral(f + g), integral(g) + integral(f))
       @test isapprox(integral(f)*integral(g), integral(integral(f)*g + integral(g)*f))
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_sylvester_matrix()
-   print("Generic.Poly.sylvester_matrix...")
-
+@testset "Generic.Poly.sylvester_matrix..." begin
    R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
@@ -1711,13 +1635,9 @@ function test_gen_poly_sylvester_matrix()
       M = sylvester_matrix(f, g)
       @test v == w * M
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_resultant()
-   print("Generic.Poly.resultant...")
-
+@testset "Generic.Poly.resultant..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1806,13 +1726,9 @@ function test_gen_poly_resultant()
       @test lead(f)*lead(g) == 0 || resultant(f*g, h) == resultant(f, h)*resultant(g, h)
       @test lead(g)*lead(h) == 0 || resultant(f, g*h) == resultant(f, g)*resultant(f, h)
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_discriminant()
-   print("Generic.Poly.discriminant...")
-
+@testset "Generic.Poly.discriminant..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -1862,13 +1778,9 @@ function test_gen_poly_discriminant()
 #      # The identity on Wikipedia is incorrect as of 07.10.2017
 #      @test discriminant(f*g) == discriminant(f)*discriminant(g)*resultant(g, f)^2
 #   end
-
-   println("PASS")
 end
 
-function test_gen_poly_resx()
-   print("Generic.Poly.resx...")
-
+@testset "Generic.Poly.resx..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -2000,13 +1912,9 @@ function test_gen_poly_resx()
 #
 #      @test (u*f + v*g)*h == r
 #   end
-
-   println("PASS")
 end
 
-function test_gen_poly_gcdx()
-   print("Generic.Poly.gcdx...")
-
+@testset "Generic.Poly.gcdx..." begin
    # Exact field
    R, x = PolynomialRing(QQ, "x")
 
@@ -2095,13 +2003,9 @@ function test_gen_poly_gcdx()
 
       @test (u*f + v*g)*h == r
    end
-   
-   println("PASS")
 end
 
-function test_gen_poly_newton_representation()
-   print("Generic.Poly.newton_representation...")
-
+@testset "Generic.Poly.newton_representation..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -2188,13 +2092,9 @@ function test_gen_poly_newton_representation()
 
       @test f == g
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_interpolation()
-   print("Generic.Poly.interpolation...")
-
+@testset "Generic.Poly.interpolation..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -2300,13 +2200,9 @@ function test_gen_poly_interpolation()
 #
 #      @test f == p
 #   end
-
-   println("PASS")
 end
 
-function test_gen_poly_special()
-   print("Generic.Poly.special...")
-
+@testset "Generic.Poly.special..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -2422,13 +2318,9 @@ function test_gen_poly_special()
 
       @test T^2 == 1 + (x^2 - 1)*U^2
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_mul_karatsuba()
-   print("Generic.Poly.mul_karatsuba...")
-
+@testset "Generic.Poly.mul_karatsuba..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
@@ -2438,13 +2330,9 @@ function test_gen_poly_mul_karatsuba()
 
    @test mul_karatsuba(f^10, f^10) == mul_classical(f^10, f^10)
    @test mul_karatsuba(f^10, f^30) == mul_classical(f^10, f^30)
-
-   println("PASS")
 end
 
-function test_gen_poly_mul_ks()
-   print("Generic.Poly.mul_ks...")
-
+@testset "Generic.Poly.mul_ks..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
@@ -2454,13 +2342,9 @@ function test_gen_poly_mul_ks()
 
    @test mul_ks(f^10, f^10) == mul_classical(f^10, f^10)
    @test mul_ks(f^10, f^30) == mul_classical(f^10, f^30)
-
-   println("PASS")
 end
 
-function test_gen_poly_remove_valuation()
-   print("Generic.Poly.remove_valuation...")
-
+@testset "Generic.Poly.remove_valuation..." begin
    # Exact ring
    R, x = PolynomialRing(ZZ, "x")
 
@@ -2618,13 +2502,9 @@ function test_gen_poly_remove_valuation()
          @test !v
       end
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_generic_eval()
-   print("Generic.Poly.generic_eval...")
-
+@testset "Generic.Poly.generic_eval..." begin
    R, x = PolynomialRing(ZZ, "x")
 
    for iter in 1:10
@@ -2646,12 +2526,9 @@ function test_gen_poly_generic_eval()
 
       @test b == f(a)
    end
-
-   println("PASS")
 end
 
-function test_gen_poly_change_base_ring()
-   print("Generic.Poly.change_base_ring...")
+@testset "Generic.Poly.change_base_ring..." begin
    Zx, x = PolynomialRing(ZZ,'x')
    @test 1 == change_base_ring(x^0, sqrt)
    p = Zx([i for i in 1:10])
@@ -2663,44 +2540,4 @@ function test_gen_poly_change_base_ring()
       pqR = change_base_ring(pq, R)
       @test pR * qR == pqR
    end
-
-   println("PASS")
-end
-
-function test_gen_poly()
-   test_gen_poly_constructors()
-   test_gen_poly_manipulation()
-   test_gen_poly_binary_ops()
-   test_gen_poly_adhoc_binary()
-   test_gen_poly_comparison()
-   test_gen_poly_adhoc_comparison()
-   test_gen_poly_unary_ops()
-   test_gen_poly_truncation()
-   test_gen_poly_reverse()
-   test_gen_poly_shift()
-   test_gen_poly_powering()
-   #test_gen_poly_modular_arithmetic()
-   test_gen_poly_exact_division()
-   test_gen_poly_adhoc_exact_division()
-   test_gen_poly_euclidean_division()
-   test_gen_poly_pseudodivision()
-   test_gen_poly_content_primpart_gcd()
-   test_gen_poly_evaluation()
-   test_gen_poly_composition()
-   test_gen_poly_derivative()
-   test_gen_poly_integral()
-   test_gen_poly_sylvester_matrix()
-   test_gen_poly_resultant()
-   test_gen_poly_discriminant()
-   test_gen_poly_resx()
-   test_gen_poly_gcdx()
-   test_gen_poly_newton_representation()
-   test_gen_poly_interpolation()
-   test_gen_poly_special()
-   test_gen_poly_mul_karatsuba()
-   test_gen_poly_mul_ks()
-   test_gen_poly_generic_eval()
-   test_gen_poly_remove_valuation()
-   test_gen_poly_change_base_ring()
-   println("")
 end

@@ -25,7 +25,7 @@ end
 
 ###############################################################################
 #
-#   PermGroup / perm
+#   PermGroup / Perm
 #
 ###############################################################################
 
@@ -40,13 +40,13 @@ julia> G = PermGroup(5)
 Permutation group over 5 elements
 
 julia> elem_type(G)
-perm{Int64}
+Perm{Int64}
 
 julia> H = PermGroup(UInt16(5))
 Permutation group over 5 elements
 
 julia> elem_type(H)
-perm{UInt16}
+Perm{UInt16}
 ```
 """
 struct PermGroup{T<:Integer} <: AbstractAlgebra.Group
@@ -54,7 +54,7 @@ struct PermGroup{T<:Integer} <: AbstractAlgebra.Group
 end
 
 @doc Markdown.doc"""
-    perm{T<:Integer}
+    Perm{T<:Integer}
 > The type of permutations.
 > Fieldnames:
 > * `d::Vector{T}` - vector representing the permutation
@@ -66,35 +66,35 @@ end
 > The cycle decomposition (`p.cycles`) is computed on demand and should never be
 > accessed directly. Use [`cycles(p)`](@ref) instead.
 >
-> There are two inner constructors of `perm`:
+> There are two inner constructors of `Perm`:
 >
-> * `perm(n::T)` constructs the trivial `perm{T}`-permutation of length $n$.
-> * `perm(v::Vector{T<:Integer}[,check=true])` constructs a permutation
-> represented by `v`. By default `perm` constructor checks if the vector
-> constitutes a valid permutation. To skip the check call `perm(v, false)`.
+> * `Perm(n::T)` constructs the trivial `Perm{T}`-permutation of length $n$.
+> * `Perm(v::Vector{T<:Integer}[,check=true])` constructs a permutation
+> represented by `v`. By default `Perm` constructor checks if the vector
+> constitutes a valid permutation. To skip the check call `Perm(v, false)`.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> perm([1,2,3])
+julia> Perm([1,2,3])
 ()
 
-julia> g = perm(Int32[2,3,1])
+julia> g = Perm(Int32[2,3,1])
 (1,2,3)
 
 julia> typeof(g)
-perm{Int32}
+Perm{Int32}
 ```
 """
-mutable struct perm{T<:Integer} <: AbstractAlgebra.GroupElem
+mutable struct Perm{T<:Integer} <: AbstractAlgebra.GroupElem
    d::Array{T, 1}
    modified::Bool
    cycles::CycleDec{T}
 
-   function perm(n::T) where T<:Integer
+   function Perm(n::T) where T<:Integer
       return new{T}(collect(T, 1:n), false)
    end
 
-   function perm(v::AbstractVector{T}, check::Bool=true) where T<:Integer
+   function Perm(v::AbstractVector{T}, check::Bool=true) where T<:Integer
       if check
          Set(v) != Set(1:length(v)) && error("Unable to coerce to permutation:
          non-unique elements in array")
@@ -111,10 +111,10 @@ end
 struct AllPerms{T<:Integer}
    all::Int
    c::Vector{Int}
-   elts::perm{T}
+   elts::Perm{T}
 
    function AllPerms(n::T) where T
-      new{T}(Int(factorial(n)), ones(Int, n), perm(collect(T, 1:n), false))
+      new{T}(Int(factorial(n)), ones(Int, n), Perm(collect(T, 1:n), false))
    end
 end
 

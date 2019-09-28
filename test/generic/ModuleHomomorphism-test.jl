@@ -1,8 +1,6 @@
-function test_module_homomorphism_constructors()
-   print("Generic.ModuleHomomorphism.constructors...")
-
+@testset "Generic.ModuleHomomorphism.constructors..." begin
    M = FreeModule(ZZ, 2)
- 
+
    f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
 
    @test isa(f, Generic.Map(FunctionalMap))
@@ -18,13 +16,9 @@ function test_module_homomorphism_constructors()
    m2 = N([ZZ(4)])
 
    @test g(m2) == N([ZZ(12)])
-
-   println("PASS")
 end
 
-function test_module_homomorphism_kernel()
-   print("Generic.ModuleHomomorphism.kernel...")
-
+@testset "Generic.ModuleHomomorphism.kernel..." begin
    for R in [ZZ, QQ]
       for iter = 1:100
          # test kernels of canonical injection and projection
@@ -35,7 +29,7 @@ function test_module_homomorphism_kernel()
 
          Q, g = quo(M, M1)
          k1, h1 = kernel(f1)
-         
+
          @test ngens(k1) == 0
 
          k2, h2 = kernel(g)
@@ -56,10 +50,10 @@ function test_module_homomorphism_kernel()
 
          m = rand(1:5)
          F = FreeModule(R, m)
- 
+
          S = MatrixSpace(R, m, ngens(M))
          f = ModuleHomomorphism(F, M, rand(S, -10:10))
- 
+
          k, h = kernel(f)
 
          for i = 1:3
@@ -69,13 +63,9 @@ function test_module_homomorphism_kernel()
          end
       end
    end
-
-   println("PASS")
 end
 
-function test_module_homomorphism_image()
-   print("Generic.ModuleHomomorphism.image...")
-
+@testset "Generic.ModuleHomomorphism.image..." begin
    # To make it work on julia nightlies
 
    R = AbstractAlgebra.JuliaZZ
@@ -115,13 +105,9 @@ function test_module_homomorphism_image()
 
       @test I == T
    end
-
-   println("PASS")
 end
 
-function test_module_isomorphism()
-   print("Generic.ModuleIsomorphism...")
-
+@testset "Generic.ModuleIsomorphism..." begin
    R = AbstractAlgebra.JuliaQQ
    for iter = 1:100
       # test image of composition of canonical injection and projection
@@ -143,15 +129,4 @@ function test_module_isomorphism()
       @test isa(image_fn(f), Function)
       @test isa(inverse_image_fn(f), Function)
    end
-   
-   println("PASS")
-end
-
-function test_module_homomorphism()
-   test_module_homomorphism_constructors()
-   test_module_homomorphism_kernel()
-   test_module_homomorphism_image()
-   test_module_isomorphism()
-
-   println("")
 end

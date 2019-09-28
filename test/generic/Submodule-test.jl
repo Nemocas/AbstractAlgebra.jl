@@ -1,6 +1,4 @@
-function test_submodule_constructors()
-   print("Generic.Submodule.constructors...")
-
+@testset "Generic.Submodule.constructors..." begin
    R = ZZ
    M = FreeModule(R, 2)
    m = M([R(1), R(3)])
@@ -34,7 +32,7 @@ function test_submodule_constructors()
    N, f = sub(M, [m, n])
 
    @test isa(N, Generic.Submodule)
-   
+
    V = gens(N)
    for v in V
       @test parent(f(v)) == M
@@ -53,13 +51,9 @@ function test_submodule_constructors()
 
    @test isa(S, Generic.Submodule)
    @test isa(m, Generic.submodule_elem)
-
-   println("PASS")
 end
 
-function test_submodule_manipulation()
-   print("Generic.Submodule.manipulation...")
-
+@testset "Generic.Submodule.manipulation..." begin
    R = ZZ
    M = FreeModule(R, 2)
    m = M([R(1), R(3)])
@@ -85,9 +79,7 @@ function test_submodule_manipulation()
    println("PASS")
 end
 
-function test_submodule_unary_ops()
-   print("Generic.Submodule.unary_ops...")
-
+@testset "Generic.Submodule.unary_ops..." begin
    for R in [ZZ, QQ]
       for iter = 1:20
          M = rand_module(R, -10:10)
@@ -96,17 +88,13 @@ function test_submodule_unary_ops()
          N, f = sub(M, S)
 
          m = rand(N, -10:10)
-   
+
          @test -(-m) == m
       end
    end
-
-   println("PASS")
 end
 
-function test_submodule_binary_ops()
-   print("Generic.Submodule.binary_ops...")
-
+@testset "Generic.Submodule.binary_ops..." begin
    for R in [ZZ, QQ]
       for iter = 1:40
          M = rand_module(R, -10:10)
@@ -121,13 +109,9 @@ function test_submodule_binary_ops()
          @test m - n == m + (-n)
       end
    end
-
-   println("PASS")
 end
 
-function test_submodule_adhoc_binary()
-   print("Generic.Submodule.adhoc_binary...")
-
+@testset "Generic.Submodule.adhoc_binary..." begin
    for R in [ZZ, QQ]
       for iter = 1:40
          M = rand_module(R, -10:10)
@@ -145,13 +129,9 @@ function test_submodule_adhoc_binary()
          @test c*(m - n) == c*m - c*n
       end
    end
-
-   println("PASS")
 end
 
-function test_submodule_canonical_injection()
-   print("Generic.Submodule.canonical_injection...")
-
+@testset "Generic.Submodule.canonical_injection..." begin
    for R in [ZZ, QQ]
       for iter = 1:40
          M = rand_module(R, -10:10)
@@ -171,17 +151,4 @@ function test_submodule_canonical_injection()
          @test pre == m
       end
    end
-
-   println("PASS")
-end
-
-function test_submodule()
-   test_submodule_constructors()
-   test_submodule_manipulation()
-   test_submodule_unary_ops()
-   test_submodule_binary_ops()
-   test_submodule_adhoc_binary()
-   test_submodule_canonical_injection()
-
-   println("")
 end

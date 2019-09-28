@@ -225,7 +225,15 @@ isempty(::MatElem)
 ```
 
 ```@docs
-change_base_ring(::AbstractAlgebra.MatElem, ::AbstractAlgebra.Ring)
+change_base_ring(::AbstractAlgebra.Ring, ::AbstractAlgebra.MatElem)
+```
+
+```@docs
+Base.map(f, ::Generic.MatrixElem)
+```
+
+```@docs
+Base.map!(f, ::Generic.MatrixElem, ::Generic.MatrixElem)
 ```
 
 **Examples**
@@ -455,7 +463,7 @@ julia> b = content(A)
 ### Permutation
 
 ```@docs
-*(::perm, ::MatElem)
+*(::Perm, ::MatElem)
 ```
 
 **Examples**

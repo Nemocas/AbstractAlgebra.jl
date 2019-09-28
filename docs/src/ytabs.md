@@ -152,14 +152,14 @@ Irreducible characters (at least over field of characteristic $0$) of the full g
 
 ```@docs
 character(::Generic.Partition)
-character(lambda::Generic.Partition, p::Generic.perm)
+character(lambda::Generic.Partition, p::Generic.Perm)
 character(lambda::Generic.Partition, mu::Generic.Partition)
 ```
 The values computed by characters are cached in an internal dictionary `Dict{Tuple{BitVector,Vector{Int}}, BigInt}`.
 Note that all of the above functions return `BigInts`.
 If you are sure that the computations do not overflow, variants of the last two functions using `Int` are available:
 ```
-character(::Type{Int}, lambda::Partition, p::perm[, check::Bool=true])
+character(::Type{Int}, lambda::Partition, p::Perm[, check::Bool=true])
 character(::Type{Int}, lambda::Partition, mu::Partition[, check::Bool=true])
 ```
 

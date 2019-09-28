@@ -33,6 +33,8 @@ import Base: Array, abs, acos, acosh, adjoint, asin, asinh, atan, atanh,
              typed_hvcat, typed_hcat, vcat, xor, zero, zeros, +, -, *, ==, ^,
              &, |, <<, >>, ~, <=, >=, <, >, //, /, !=
 
+using Random: Random, AbstractRNG
+
 export elem_type, parent_type
 
 export SetElem, GroupElem, NCRingElem, RingElem, ModuleElem, FieldElem, RingElement,
@@ -155,7 +157,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row, add_ro
                  mullow, mulmod, multiply_column, multiply_column!,
                  multiply_row, multiply_row!, needs_parentheses,
                  newton_to_monomial!, ngens, normalise, nrows, nvars, O, one,
-                 order, ordering, parent_type, parity, partitionseq, perm,
+                 order, ordering, parent_type, parity, partitionseq, Perm,
                  permtype, @perm_str, polcoeff, pol_length, powmod,
                  pow_multinomial, popov, popov_with_transform, powers,
                  precision, preimage, preimage_map, primpart, pseudodivrem,
@@ -175,7 +177,7 @@ import .Generic: add!, addeq!, addmul!, add_column, add_column!, add_row, add_ro
                  to_univariate, trail, truncate, typed_hcat, typed_hvcat,
                  upscale, valuation, var, var_index, vars, weak_popov,
                  weak_popov_with_transform, zero, zero!, zero_matrix,
-                 @PolynomialRing
+                 @PolynomialRing, MatrixElem
 
 # Do not export divrem, exp, sqrt, numerator and denominator as we define our own
 export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, add_column!, add_row, add_row!, base_ring, cached,
@@ -234,7 +236,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  multiply_column, multiply_column!, multiply_row,
                  multiply_row!, needs_parentheses, newton_to_monomial!, ngens,
                  normalise, nrows, nvars, O, one, order, ordering, parent_type,
-                 parity, partitionseq, perm, permtype, @perm_str, polcoeff,
+                 parity, partitionseq, Perm, permtype, @perm_str, polcoeff,
                  pol_length, powmod, pow_multinomial, popov,
                  popov_with_transform, powers, ppio, precision, preimage,
                  preimage_map, primpart, pseudo_inv, pseudodivrem, pseudorem,
@@ -254,7 +256,7 @@ export add!, addeq!, addmul!, addmul_delayed_reduction!, addmul!, add_column, ad
                  total_degree, tr, trail, truncate, typed_hcat, typed_hvcat,
                  upscale, valuation, var, var_index, vars, weak_popov,
                  weak_popov_with_transform, zero, zero!, zero_matrix,
-                 @PolynomialRing
+                 @PolynomialRing, MatrixElem
 
 function exp(a::T) where T
    return Base.exp(a)
@@ -288,12 +290,12 @@ function AllPerms(n::T) where T
   Generic.AllPerms(n)
 end
 
-function perm(n::T) where T
-  Generic.perm(n)
+function Perm(n::T) where T
+  Generic.Perm(n)
 end
 
-function perm(a::AbstractVector{T}, check::Bool=true) where T
-  Generic.perm(a, check)
+function Perm(a::AbstractVector{T}, check::Bool=true) where T
+  Generic.Perm(a, check)
 end
 
 function Partition(part::AbstractVector{T}, check::Bool=true) where T
@@ -554,7 +556,7 @@ end
 
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        MatrixAlgebra, FractionField, ResidueRing, Partition, PermGroup,
-       YoungTableau, AllParts, SkewDiagram, AllPerms, perm, LaurentSeriesRing,
+       YoungTableau, AllParts, SkewDiagram, AllPerms, Perm, LaurentSeriesRing,
        LaurentSeriesField, ResidueField, NumberField, PuiseuxSeriesRing,
        PuiseuxSeriesField, FreeModule, VectorSpace, ModuleHomomorphism, sub,
        quo, DirectSum, ModuleIsomorphism, free_module, vector_space,
@@ -627,6 +629,14 @@ include("error.jl")
 ###############################################################################
 
 include("Groups.jl")
+
+###############################################################################
+#
+#   Load methods with the same implementation for different types
+#
+###############################################################################
+
+include("common.jl")
 
 ###############################################################################
 #

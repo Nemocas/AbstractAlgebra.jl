@@ -187,12 +187,12 @@ end
 #
 ###############################################################################
 
-function rand(R::Floats, n::UnitRange{AbstractFloat})
-   return R(n.start + rand(Float64)*(n.stop - n.start))
+function rand(rng::AbstractRNG, R::Floats, n::UnitRange{<:AbstractFloat})
+   return R(n.start + rand(rng, Float64)*(n.stop - n.start))
 end
 
-function rand(R::Floats, n::UnitRange{Int})
-   return R(n.start + rand(Float64)*(n.stop - n.start))
+function rand(rng::AbstractRNG, R::Floats, n::UnitRange{Int})
+   return R(n.start + rand(rng, Float64)*(n.stop - n.start))
 end
 
 ###############################################################################

@@ -1,6 +1,4 @@
-function test_Rationals_constructors()
-   print("Julia.Rationals.constructors...")
-
+@testset "Julia.Rationals.constructors..." begin
    R = qq
    S = QQ
 
@@ -13,7 +11,7 @@ function test_Rationals_constructors()
    @test elem_type(AbstractAlgebra.Rationals{BigInt}) == Rational{BigInt}
    @test parent_type(Rational{Int}) == AbstractAlgebra.Rationals{Int}
    @test parent_type(Rational{BigInt}) == AbstractAlgebra.Rationals{BigInt}
-   
+
    @test isa(R, AbstractAlgebra.Rationals)
    @test isa(S, AbstractAlgebra.Rationals)
 
@@ -35,13 +33,17 @@ function test_Rationals_constructors()
 
    @test isa(R(a), Rational{Int})
    @test isa(S(b), Rational{BigInt})
-
-   println("PASS")
 end
 
-function test_Rationals_manipulation()
-   print("Julia.Rationals.manipulation...")
+@testset "Julia.Rationals.rand..." begin
+   R = QQ
+   f = rand(R, 1:9)
+   @test f isa elem_type(R)
+   f = rand(rng, R, 1:9)
+   @test f isa elem_type(R)
+end
 
+@testset "Julia.Rationals.manipulation..." begin
    R = qq
    S = QQ
 
@@ -55,13 +57,9 @@ function test_Rationals_manipulation()
    @test !isunit(S())
    @test isunit(R(3))
    @test isunit(S(3))
-
-   println("PASS")
 end
 
-function test_Rationals_exact_division()
-   print("Julia.Rationals.exact_division...")
-  
+@testset "Julia.Rationals.exact_division..." begin
    R = qq
    S = QQ
 
@@ -78,7 +76,7 @@ function test_Rationals_exact_division()
 
       if a1 != 0
          flagR, qR = divides(a2, a1)
-      
+
          @test flagR
          @test qR*a1 == a2
       end
@@ -88,7 +86,7 @@ function test_Rationals_exact_division()
 
          @test flagS
          @test qS*b1 == b2
-      end   
+      end
 
       @test c1 == 0 || divexact(a1, c1)*c1 == a1
       @test c2 == 0 || divexact(b1, c2)*c2 == b1
@@ -96,13 +94,9 @@ function test_Rationals_exact_division()
       @test a1 == 0 || divexact(c1, a1)*a1 == c1
       @test b1 == 0 || divexact(c2, b1)*b1 == c2
    end
-
-   println("PASS")
 end
 
-function test_Rationals_gcd()
-   print("Julia.Rationals.gcd...")
-  
+@testset "Julia.Rationals.gcd..." begin
    R = qq
    S = QQ
 
@@ -117,33 +111,25 @@ function test_Rationals_gcd()
       @test gcd(r1, gcd(r2, r3)) == gcd(gcd(r1, r2), r3)
       @test gcd(s1, gcd(s2, s3)) == gcd(gcd(s1, s2), s3)
    end
-
-   println("PASS")
 end
 
-function test_Rationals_square_root()
-   print("Julia.Rationals.square_root...")
-  
+@testset "Julia.Rationals.square_root..." begin
    R = qq
    S = QQ
 
    for iter = 1:1000
       r = rand(R, -100:100)
       s = rand(R, -100:100)
-      
+
       f = r^2
       g = s^2
 
       @test AbstractAlgebra.sqrt(f)^2 == f
       @test AbstractAlgebra.sqrt(g)^2 == g
    end
-
-   println("PASS")
 end
 
-function test_Rationals_divrem()
-   print("Julia.Rationals.divrem...")
-  
+@testset "Julia.Rationals.divrem..." begin
    R = qq
    S = QQ
 
@@ -153,20 +139,7 @@ function test_Rationals_divrem()
       while iszero(s)
          s = rand(R, -100:100)
       end
-      
+
       @test AbstractAlgebra.divrem(r,s) == (r/s,0)
    end
-
-   println("PASS")
-end
-
-function test_Rationals()
-   test_Rationals_constructors()
-   test_Rationals_manipulation()
-   test_Rationals_exact_division()
-   test_Rationals_gcd()
-   test_Rationals_square_root()
-   test_Rationals_divrem()
-   
-   println("")
 end

@@ -335,7 +335,7 @@ end
 
 ###############################################################################
 #
-#   Ad hoc comparison 
+#   Ad hoc comparison
 #
 ###############################################################################
 
@@ -544,7 +544,7 @@ function evaluate(a::AbstractAlgebra.NCPolyElem, b::T) where {T <: NCRingElem}
    z = R(coeff(a, i - 1))
    while i > 1
       i -= 1
-      z = R(coeff(a, i - 1)) + z*b 
+      z = R(coeff(a, i - 1)) + z*b
       parent(z) # To work around a bug in julia
    end
    return z
@@ -693,12 +693,12 @@ end
 #
 ###############################################################################
 
-function rand(S::AbstractAlgebra.NCPolyRing, deg_range::UnitRange{Int}, v...)
+function rand(rng::AbstractRNG, S::AbstractAlgebra.NCPolyRing, deg_range::UnitRange{Int}, v...)
    R = base_ring(S)
    f = S()
    x = gen(S)
-   for i = 0:rand(deg_range)
-      f += rand(R, v...)*x^i
+   for i = 0:rand(rng, deg_range)
+      f += rand(rng, R, v...)*x^i
    end
    return f
 end

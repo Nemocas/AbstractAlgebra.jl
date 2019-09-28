@@ -16,9 +16,7 @@
 # Note: only useful to distinguish rings and fields for 1/2, 3/4, 5/6 if the
 # algos differ, and 7 can often stand in for 5/6 if the algorithm supports it.
 
-function test_laurent_series_constructors()
-   print("Generic.LaurentSeries.constructors...")
-
+@testset "Generic.LaurentSeries.constructors..." begin
    R, x = LaurentSeriesRing(ZZ, 30, "x")
 
    S, t = PolynomialRing(QQ, "t")
@@ -99,13 +97,23 @@ function test_laurent_series_constructors()
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
-
-   println("PASS")
 end
 
-function test_laurent_series_manipulation()
-   print("Generic.LaurentSeries.manipulation...")
+@testset "Generic.LaurentSeries.rand..." begin
+   R, x = LaurentSeriesRing(ZZ, 10, "x")
+   f = rand(R, -12:12, -10:10)
+   @test f isa Generic.LaurentSeriesRingElem
+   f = rand(rng, R, -12:12, -10:10)
+   @test f isa Generic.LaurentSeriesRingElem
 
+   R, x = LaurentSeriesField(RealField, 10, "x")
+   f = rand(R, -12:12, -1:1)
+   @test f isa Generic.LaurentSeriesFieldElem
+   f = rand(rng, R, -12:12, -1:1)
+   @test f isa Generic.LaurentSeriesFieldElem
+end
+
+@testset "Generic.LaurentSeries.manipulation..." begin
    R, t = PolynomialRing(QQ, "t")
    S, x = LaurentSeriesRing(R, 30, "x")
 
@@ -143,13 +151,9 @@ function test_laurent_series_manipulation()
    U, y = LaurentSeriesRing(T, 10, "y")
 
    @test modulus(T) == 7
-
-   println("PASS")
 end
 
-function test_laurent_series_unary_ops()
-   print("Generic.LaurentSeries.unary_ops...")
-
+@testset "Generic.LaurentSeries.unary_ops..." begin
    #  Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -177,13 +181,9 @@ function test_laurent_series_unary_ops()
       @test isequal(-(-f), f)
       @test iszero(f + (-f))
    end
-
-   println("PASS")
 end
 
-function test_laurent_series_binary_ops()
-   print("Generic.LaurentSeries.binary_ops...")
-
+@testset "Generic.LaurentSeries.binary_ops..." begin
    #  Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:100
@@ -230,13 +230,9 @@ function test_laurent_series_binary_ops()
       @test f*(g + h) == f*g + f*h
       @test f*(g - h) == f*g - f*h
    end
-
-   println("PASS")
 end
 
-function test_laurent_series_inplace_binary_ops()
-   print("Generic.LaurentSeries.inplace_binary_ops...")
-
+@testset "Generic.LaurentSeries.inplace_binary_ops..." begin
    #  Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:100
@@ -276,13 +272,9 @@ function test_laurent_series_inplace_binary_ops()
       mul!(r, f, g)
       @test isequal(r, f*g)
    end
-
-   println("PASS")
 end
 
-function test_laurent_series_adhoc_binary_ops()
-   print("Generic.LaurentSeries.adhoc_binary_ops...")
-
+@testset "Generic.LaurentSeries.adhoc_binary_ops..." begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -370,13 +362,9 @@ function test_laurent_series_adhoc_binary_ops()
       @test isequal(f*d1 - f*d2, f*(d1 - d2))
       @test isequal(f*d1 + f*d2, f*(d1 + d2))
    end
-
-   println("PASS")
 end
 
-function test_laurent_series_comparison()
-   print("Generic.LaurentSeries.comparison...")
-
+@testset "Generic.LaurentSeries.comparison..." begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -425,13 +413,9 @@ function test_laurent_series_comparison()
       @test (precision(h) > min(precision(f), precision(g)) || f != g + h)
       @test (precision(h) > min(precision(f), precision(g)) || !isequal(f, g + h))
    end
-
-   println("PASS")
 end
 
-function test_laurent_series_adhoc_comparison()
-   print("Generic.LaurentSeries.adhoc_comparison...")
-
+@testset "Generic.LaurentSeries.adhoc_comparison..." begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:500
@@ -526,13 +510,9 @@ function test_laurent_series_adhoc_comparison()
       @test S(d1) != d1 + f
       @test d1 != S(d1) + f
    end
-
-   println("PASS")
 end
 
-function test_laurent_series_powering()
-   print("Generic.LaurentSeries.powering...")
-
+@testset "Generic.LaurentSeries.powering..." begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
 
@@ -583,13 +563,9 @@ function test_laurent_series_powering()
          r2 *= f
       end
    end
-
-   println("PASS")
 end
 
-function test_laurent_series_shift()
-   print("Generic.LaurentSeries.shift...")
-
+@testset "Generic.LaurentSeries.shift..." begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -623,13 +599,9 @@ function test_laurent_series_shift()
       @test isequal(shift_left(f, s), x^s*f)
       @test precision(shift_right(f, s)) == precision(f) - s
    end
-
-   println("PASS")
 end
 
-function test_laurent_series_truncation()
-   print("Generic.LaurentSeries.truncation...")
-
+@testset "Generic.LaurentSeries.truncation..." begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -663,13 +635,9 @@ function test_laurent_series_truncation()
       @test isequal(truncate(f, s), f + O(x^s))
       @test precision(truncate(f, s)) == min(precision(f), s)
    end
-
-   println("PASS")
 end
 
-function test_laurent_series_inversion()
-   print("Generic.LaurentSeries.inversion...")
-
+@testset "Generic.LaurentSeries.inversion..." begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -703,13 +671,9 @@ function test_laurent_series_inversion()
 
       @test f*inv(f) == 1
    end
-
-   println("PASS")
 end
 
-function test_laurent_series_square_root()
-   print("Generic.LaurentSeries.square_root...")
-
+@testset "Generic.LaurentSeries.square_root..." begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -727,13 +691,9 @@ function test_laurent_series_square_root()
 
       @test isapprox(sqrt(g)^2, g)
    end
-
-   println("PASS")
 end
 
-function test_laurent_series_exact_division()
-   print("Generic.LaurentSeries.exact_division...")
-
+@testset "Generic.LaurentSeries.exact_division..." begin
    # Exact ring
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -771,13 +731,9 @@ function test_laurent_series_exact_division()
 
       @test divexact(f, g)*g == f
    end
-
-   println("PASS")
 end
 
-function test_laurent_series_adhoc_exact_division()
-   print("Generic.LaurentSeries.adhoc_exact_division...")
-
+@testset "Generic.LaurentSeries.adhoc_exact_division..." begin
    # Exact field
    R, x = LaurentSeriesRing(ZZ, 10, "x")
    for iter = 1:300
@@ -814,13 +770,9 @@ function test_laurent_series_adhoc_exact_division()
 
       @test isequal(divexact(f*c, c), f)
    end
-
-   println("PASS")
 end
 
-function test_laurent_series_special_functions()
-   print("Generic.LaurentSeries.special_functions...")
-
+@testset "Generic.LaurentSeries.special_functions..." begin
    # Exact field
    S, x = LaurentSeriesRing(QQ, 10, "x")
 
@@ -881,27 +833,4 @@ function test_laurent_series_special_functions()
 
       @test isequal(exp(f)*exp(g), exp(f + g))
    end
-
-   println("PASS")
-end
-
-function test_gen_laurent_series()
-   test_laurent_series_constructors()
-   test_laurent_series_manipulation()
-   test_laurent_series_unary_ops()
-   test_laurent_series_binary_ops()
-   test_laurent_series_inplace_binary_ops()
-   test_laurent_series_adhoc_binary_ops()
-   test_laurent_series_comparison()
-   test_laurent_series_adhoc_comparison()
-   test_laurent_series_powering()
-   test_laurent_series_shift()
-   test_laurent_series_truncation()
-   test_laurent_series_exact_division()
-   test_laurent_series_adhoc_exact_division()
-   test_laurent_series_inversion()
-   test_laurent_series_square_root()
-   test_laurent_series_special_functions()
-
-   println("")
 end

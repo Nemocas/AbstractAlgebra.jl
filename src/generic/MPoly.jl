@@ -90,59 +90,6 @@ function gen(a::MPolyRing{T}, i::Int) where {T <: RingElement}
 end
 
 @doc Markdown.doc"""
-    change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g, R::MPolyRing)
-       where T <: RingElement
-> Return the polynomial in R obtained by applying g to the coefficients of p.
-"""
-function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g, R::AbstractAlgebra.MPolyRing) where {T <: RingElement}
-
-   z = g(zero(base_ring(p.parent)))
-   base_ring(R) != parent(z) && error("Base rings do not match.")
-
-   cvzip = zip(coeffs(p), exponent_vectors(p))
-   M = MPolyBuildCtx(R)
-   for (c, v) in cvzip
-      push_term!(M, g(c), v)
-   end
-
-   return finish(M)
-end
-
-@doc Markdown.doc"""
-    change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
-> Return the polynomial obtained by applying g to the coefficients of p.
-"""
-function change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where T <: RingElement
-   new_base_ring = parent(g(zero(base_ring(p.parent))))
-   new_polynomial_ring, gens_new_polynomial_ring = AbstractAlgebra.PolynomialRing(new_base_ring, [string(v) for v in symbols(p.parent)], ordering = ordering(p.parent))
-   
-   return change_base_ring(p, g, new_polynomial_ring)
-end
-
-function change_base_ring(p::MPoly{T}, g) where {T <: RingElement}
-   new_base_ring = parent(g(zero(base_ring(p.parent))))
-   new_polynomial_ring, gens_new_polynomial_ring = PolynomialRing(new_base_ring, [string(
-v) for v in symbols(p.parent)], ordering = ordering(p.parent))
-
-   if typeof(gens_new_polynomial_ring[1]) <: MPoly
-      exps = deepcopy(p.exps)
-      coeffs = Array{elem_type(new_base_ring),1}(undef, length(p))
-      for i in 1:length(p)
-         coeffs[i] = g(p.coeffs[i])
-      end
-      return new_polynomial_ring(coeffs, exps)
-   else
-      new_p = zero(new_polynomial_ring)
-      for i = 1:length(p)
-         e = exponent_vector(p, i)
-         set_exponent_vector!(new_p, i, e)
-         setcoeff!(new_p, e, g(coeff(p, i)))
-      end
-      return(new_p)
-   end
-end
-
-@doc Markdown.doc"""
     vars(p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
 > Return the variables actually occuring in $p$.
 """
@@ -3558,7 +3505,7 @@ end
 > given by $g$ to the coefficients of the polynomial.
 """
 function evaluate(a::AbstractAlgebra.MPolyElem{T}, A::Vector{U}, g) where {T <: RingElement, U <: RingElement}
-   anew = change_base_ring(a, g)
+   anew = change_base_ring(g, a)
    return evaluate(anew, A)
 end
 
@@ -3569,7 +3516,7 @@ end
 > polynomial.
 """
 function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vector{U}, g) where {T <: RingElement, U <: RingElement}
-   anew = change_base_ring(a, g)
+   anew = change_base_ring(g, a)
    return evaluate(anew, vars, vals)
 end
 
@@ -3579,7 +3526,7 @@ end
 > applying the `Map` or `Function` given by $g$ to the coefficients of the polynomial.
 """
 function evaluate(a::S, vars::Vector{S}, vals::Vector{U}, g) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
-   anew = change_base_ring(a, g)
+   anew = change_base_ring(g, a)
    varidx = [var_index(x) for x in vars]
    return evaluate(anew, varidx, vals)
 end
@@ -4460,8 +4407,8 @@ end
 #
 ###############################################################################
 
-function rand_ordering()
-   i = rand(1:3)
+function rand_ordering(rng::AbstractRNG=Random.GLOBAL_RNG)
+   i = rand(rng, 1:3)
    if i == 1
       return :lex
    elseif i == 2
@@ -4471,7 +4418,7 @@ function rand_ordering()
    end
 end
 
-function rand(S::AbstractAlgebra.MPolyRing,
+function rand(rng::AbstractRNG, S::AbstractAlgebra.MPolyRing,
               term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
    f = S()
    g = gens(S)
@@ -4479,9 +4426,9 @@ function rand(S::AbstractAlgebra.MPolyRing,
    for i = 1:rand(term_range)
       term = S(1)
       for j = 1:length(g)
-         term *= g[j]^rand(exp_bound)
+         term *= g[j]^rand(rng, exp_bound)
       end
-      term *= rand(R, v...)
+      term *= rand(rng, R, v...)
       f += term
    end
    return f
@@ -4687,6 +4634,69 @@ function finish(M::MPolyBuildCtx{T}) where T <: AbstractAlgebra.MPolyElem
   M.poly = sort_terms!(M.poly)
   M.poly = combine_like_terms!(M.poly)
   return M.poly
+end
+
+################################################################################
+#
+#  Change base ring and map
+#
+################################################################################
+
+@doc Markdown.doc"""
+    change_base_ring(R::Ring, p::MPolyElem{<: RingElement}, Rx::MPolyRing)
+
+> Return the polynomial of `Rx` obtained by coercing the coefficients of `p`
+> into `R`.
+"""
+function change_base_ring(R::Ring, p::AbstractAlgebra.MPolyElem{T}, Rx::AbstractAlgebra.MPolyRing) where {T <: RingElement}
+   base_ring(Rx) != R && error("Base rings do not match.")
+
+   return _map(R, p, Rx)
+end
+
+@doc Markdown.doc"""
+    change_base_ring(R::Ring, p::MPolyElem{<: RingElement})
+
+> Return the polynomial obtained by coercing the coefficients of `p` into `R`.
+"""
+function change_base_ring(R::Ring, p::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
+   new_polynomial_ring, gens_new_polynomial_ring = AbstractAlgebra.PolynomialRing(R, map(string, symbols(parent(p))), ordering = ordering(parent(p)))
+
+   return _map(R, p, new_polynomial_ring)
+end
+
+@doc Markdown.doc"""
+    map(f, p::MPolyElem{<: RingElement})
+
+> Transform the polynomial `p` by applying `f` on each coefficient.
+"""
+function Base.map(f, p::MPolyElem)
+   R = parent(f(zero(base_ring(p))))
+   new_poly_ring, gens_new_poly_ring = AbstractAlgebra.PolynomialRing(R, map(string, symbols(parent(p))), ordering = ordering(parent(p)))
+   return _map(f, p, new_poly_ring)
+end
+
+@doc Markdown.doc"""
+    map(f, p::MPolyElem{<: RingElement}, Rx::MPolyRing)
+
+> Transform the polynomial `p` into a polynomial of `Rx` by applying `f` on
+> each coefficient.
+"""
+function Base.map(f, p::MPolyElem, Rx::MPolyRing)
+   z = f(zero(base_ring(parent(p))))
+   base_ring(Rx) != parent(z) && error("Base rings do not match.")
+
+   return _map(f, p, Rx)
+end
+
+function _map(g, p, Rx)
+   cvzip = zip(coeffs(p), exponent_vectors(p))
+   M = MPolyBuildCtx(Rx)
+   for (c, v) in cvzip
+      push_term!(M, g(c), v)
+   end
+
+   return finish(M)
 end
 
 ###############################################################################

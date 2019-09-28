@@ -351,11 +351,13 @@ end
 #
 ###############################################################################
 
-function rand(R::GFField{T}) where T <: Integer
-   p = R.p::T
-   d = rand(0:p - 1)
-   return gfelem{T}(d, R)
-end
+Random.Sampler(RNG::Type{<:AbstractRNG}, R::GFField, n::Random.Repetition) =
+   Random.SamplerSimple(R, Random.Sampler(RNG, 0:R.p - 1, n))
+
+rand(rng::AbstractRNG, R::Random.SamplerSimple{GFField{T}}) where T =
+   gfelem{T}(rand(rng, R.data), R[])
+
+Random.gentype(T::Type{<:GFField}) = elem_type(T)
 
 ###############################################################################
 #
