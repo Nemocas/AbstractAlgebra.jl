@@ -9,7 +9,7 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
        identity_matrix, charpoly_hessenberg!, reverse_cols, reverse_cols!,
        reverse_rows, reverse_rows!, matrix, minpoly, typed_hvcat, typed_hcat,
        powers, randmat_triu, randmat_with_rank, similarity!, solve,
-       solve_rational, hnf, hnf_kb, hnf_kb_with_transform, hnf_with_transform,
+       solve_rational, hnf, hnf_with_transform,
        issquare, snf, snf_with_transform, weak_popov,
        weak_popov_with_transform, can_solve_left_reduced_triu,
        extended_weak_popov, extended_weak_popov_with_transform, rank,
@@ -3533,61 +3533,55 @@ function kb_search_first_pivot(H, start_element::Int = 1)
    return 0, 0
 end
 
-function kb_reduce_row!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool) where {T <: RingElement}
-   r = pivot[c]
-   t = base_ring(H)()
-   for i = c+1:ncols(H)
-      p = pivot[i]
-      if p == 0
-         continue
-      end
-      q = -AbstractAlgebra.div(H[r,i], H[p,i])
-      for j = i:ncols(H)
-         t = mul!(t, q, H[p,j])
-         H[r, j] = addeq!(H[r,j], t)
-      end
-      if with_trafo
-         for j = 1:ncols(U)
-            t = mul!(t, q, U[p,j])
-            U[r, j] = addeq!(U[r,j], t)
-         end
-      end
-   end
-   return nothing
-end
-
+# Reduces the entries above H[pivot[c], c]
 function kb_reduce_column!(H::MatrixElem{T}, U::MatrixElem{T}, pivot::Array{Int, 1}, c::Int, with_trafo::Bool, start_element::Int = 1) where {T <: RingElement}
+
+   # Let c = 4 and pivot[c] = 4. H could look like this:
+   # ( 0 . * # * )
+   # ( . * * # * )
+   # ( 0 0 0 0 . )
+   # ( 0 0 0 . * )
+   # ( * * * * * )
+   #
+   # (. are pivots, we want to reduce the entries marked with #)
+   # The #'s are in rows whose pivot is in a column left of column c.
+
    r = pivot[c]
    t = base_ring(H)()
-   for i = start_element:c-1
+   for i = start_element:c - 1
       p = pivot[i]
       if p == 0
          continue
       end
-      q = -AbstractAlgebra.div(H[p,c],H[r,c])
+      # So, the pivot in row p is in a column left of c.
+      if iszero(H[p, c])
+         continue
+      end
+      q = -AbstractAlgebra.div(H[p, c], H[r, c])
       for j = c:ncols(H)
-         t = mul!(t, q, H[r,j])
-         H[p, j] = addeq!(H[p,j], t)
+         t = mul!(t, q, H[r, j])
+         H[p, j] = addeq!(H[p, j], t)
       end
       if with_trafo
          for j = 1:ncols(U)
-            t = mul!(t, q, U[r,j])
-            U[p, j] = addeq!(U[p,j], t)
+            t = mul!(t, q, U[r, j])
+            U[p, j] = addeq!(U[p, j], t)
          end
       end
    end
    return nothing
 end
 
+# Multiplies row r by a unit such that the entry H[r, c] is "canonical"
 function kb_canonical_row!(H, U, r::Int, c::Int, with_trafo::Bool)
-   cu = canonical_unit(H[r,c])
+   cu = canonical_unit(H[r, c])
    if cu != 1
       for j = c:ncols(H)
-         H[r,j] = divexact(H[r,j],cu)
+         H[r, j] = divexact(H[r, j], cu)
       end
       if with_trafo
          for j = 1:ncols(U)
-            U[r,j] = divexact(U[r,j],cu)
+            U[r, j] = divexact(U[r, j], cu)
          end
       end
    end
@@ -3633,7 +3627,9 @@ end
 function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
    m = nrows(H)
    n = ncols(H)
-   pivot = zeros(Int, n)
+   pivot = zeros(Int, n) # pivot[j] == i if the pivot of column j is in row i
+
+   # Find the first non-zero entry of H
    row1, col1 = kb_search_first_pivot(H, start_element)
    if row1 == 0
       return nothing
@@ -3644,30 +3640,30 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
    t = base_ring(H)()
    t1 = base_ring(H)()
    t2 = base_ring(H)()
-   for i=row1:m-1
+   for i = row1 + 1:m
       new_pivot = false
-      for j = start_element:pivot_max
-         if iszero(H[i+1,j])
+      for j = start_element:n
+         if iszero(H[i, j])
             continue
          end
          if pivot[j] == 0
-            pivot[j] = i+1
-            kb_canonical_row!(H, U, pivot[j], j, with_trafo)
-            kb_reduce_column!(H, U, pivot, j, with_trafo, start_element)
-            kb_reduce_row!(H, U, pivot, j, with_trafo)
+            # We found a non-zero entry in a column without a pivot: This is a
+            # new pivot
+            pivot[j] = i
             pivot_max = max(pivot_max, j)
             new_pivot = true
          else
+            # We have a pivot for this column: Use it to write 0 in H[i, j]
             p = pivot[j]
-            d, u, v = gcdx(H[p, j], H[i + 1, j])
+            d, u, v = gcdx(H[p, j], H[i, j])
             a = divexact(H[p, j], d)
-            b = -divexact(H[i + 1, j], d)
+            b = -divexact(H[i, j], d)
             for c = j:n
-               t = deepcopy(H[i + 1, c])
-               t1 = mul_red!(t1, a, H[i + 1, c], false)
+               t = deepcopy(H[i, c])
+               t1 = mul_red!(t1, a, H[i, c], false)
                t2 = mul_red!(t2, b, H[p, c], false)
-               H[i + 1, c] = add!(H[i + 1, c], t1, t2)
-               H[i + 1, c] = reduce!(H[i + 1, c])
+               H[i, c] = add!(H[i, c], t1, t2)
+               H[i, c] = reduce!(H[i, c])
                t1 = mul_red!(t1, u, H[p, c], false)
                t2 = mul_red!(t2, v, t, false)
                H[p, c] = add!(H[p, c], t1, t2)
@@ -3675,33 +3671,37 @@ function hnf_kb!(H, U, with_trafo::Bool = false, start_element::Int = 1)
             end
             if with_trafo
                for c = 1:m
-                  t = deepcopy(U[i + 1, c])
-                  t1 = mul_red!(t1, a, U[i + 1, c], false)
+                  t = deepcopy(U[i, c])
+                  t1 = mul_red!(t1, a, U[i, c], false)
                   t2 = mul_red!(t2, b, U[p, c], false)
-                  U[i + 1, c] = add!(U[i + 1, c], t1, t2)
-                  U[i + 1, c] = reduce!(U[i + 1, c])
+                  U[i, c] = add!(U[i, c], t1, t2)
+                  U[i, c] = reduce!(U[i, c])
                   t1 = mul_red!(t1, u, U[p, c], false)
                   t2 = mul_red!(t2, v, t, false)
                   U[p, c] = add!(U[p, c], t1, t2)
                   U[p, c] = reduce!(U[p, c])
                end
             end
-            kb_canonical_row!(H, U, pivot[j], j, with_trafo)
-            kb_reduce_column!(H, U, pivot, j, with_trafo, start_element)
+         end
+
+         # We changed the pivot of column j (or found a new one).
+         # We have do reduce the entries marked with # in
+         # ( 0 0 0 . * )
+         # ( . # # * * )
+         # ( 0 0 . * * )
+         # ( 0 . # * * )
+         # ( * * * * * )
+         # where . are pivots and i = 4, j = 2. (This example is for the
+         # "new pivot" case.)
+         kb_canonical_row!(H, U, pivot[j], j, with_trafo)
+         for c = j:pivot_max
+            if pivot[c] == 0
+               continue
+            end
+            kb_reduce_column!(H, U, pivot, c, with_trafo, start_element)
          end
          if new_pivot
             break
-         end
-      end
-      if !new_pivot
-         for c = pivot_max+1:n
-            if !iszero(H[i+1,c])
-               pivot[c] = i+1
-               kb_canonical_row!(H, U, pivot[c], c, with_trafo)
-               kb_reduce_column!(H, U, pivot, c, with_trafo, start_element)
-               pivot_max = max(pivot_max, c)
-               break
-            end
          end
       end
    end
