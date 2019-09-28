@@ -1631,6 +1631,14 @@ end
 end
 
 @testset "Generic.Mat.hnf_kb..." begin
+   M = matrix(ZZ, BigInt[4 6 2; 0 0 10; 0 5 3])
+
+   H, U = AbstractAlgebra.hnf_kb_with_transform(M)
+
+   @test H == matrix(ZZ, BigInt[4 1 9; 0 5 3; 0 0 10])
+   @test isunit(det(U))
+   @test U*M == H
+
    R, x = PolynomialRing(QQ, "x")
 
    M = MatrixSpace(R, 4, 3)
