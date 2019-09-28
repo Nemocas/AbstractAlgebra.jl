@@ -74,6 +74,14 @@ function test_submodule_manipulation()
 
    @test supermodule(N) == M
 
+   R = QQ
+   M = VectorSpace(R, 2)
+   m = M([R(1), R(3)])
+   n = M([R(2), R(-1)])
+   N, f = sub(M, [m, n])
+
+   @test dim(N) == 2
+
    println("PASS")
 end
 
