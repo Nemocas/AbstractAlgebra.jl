@@ -741,9 +741,13 @@ rand(rng::AbstractRNG, rs::Random.SamplerTrivial{PermGroup{T}}) where {T} = Perm
 
 ###############################################################################
 #
-#   Parent object call overloads
+#   Constructor and Parent object call overloads
 #
 ###############################################################################
+
+function perm(a::Vector{<: Integer}, check::Bool = true)
+  return Perm(a, check)
+end
 
 (G::PermGroup)() = Perm(G.n)
 
