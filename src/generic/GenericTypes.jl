@@ -1056,7 +1056,7 @@ end
 
 ###############################################################################
 #
-#   FreeModule/free_module_elem
+#   FreeModule/FreeModuleElem
 #
 ###############################################################################
 
@@ -1079,11 +1079,11 @@ end
 
 const FreeModuleDict = Dict{Tuple{NCRing, Int}, FreeModule}()
 
-mutable struct free_module_elem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModuleElem{T}
+mutable struct FreeModuleElem{T <: Union{RingElement, NCRingElem}} <: AbstractAlgebra.FPModuleElem{T}
     v::AbstractAlgebra.MatElem{T}
     parent::FreeModule{T}
 
-    function free_module_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
+    function FreeModuleElem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: Union{RingElement, NCRingElem}
        z = new{T}(v, m)
     end
 end
@@ -1122,7 +1122,7 @@ end
 
 ###############################################################################
 #
-#   Submodule/submodule_elem
+#   Submodule/SubmoduleElem
 #
 ###############################################################################
 
@@ -1140,18 +1140,18 @@ mutable struct Submodule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    end
 end
 
-mutable struct submodule_elem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
+mutable struct SubmoduleElem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
    v::AbstractAlgebra.MatElem{T}
    parent::Submodule{T}
 
-   function submodule_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
+   function SubmoduleElem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
       z = new{T}(v, m)
    end
 end
 
 ###############################################################################
 #
-#   QuotientModule/quotient_module_elem
+#   QuotientModule/QuotientModuleElem
 #
 ###############################################################################
 
@@ -1178,18 +1178,18 @@ mutable struct QuotientModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    end
 end
 
-mutable struct quotient_module_elem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
+mutable struct QuotientModuleElem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
    v::AbstractAlgebra.MatElem{T}
    parent::QuotientModule{T}
 
-   function quotient_module_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
+   function QuotientModuleElem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
       z = new{T}(v, m)
    end
 end
 
 ###############################################################################
 #
-#   SNFModule/snf_module_elem
+#   SNFModule/SNFModuleElem
 #
 ###############################################################################
 
@@ -1205,18 +1205,18 @@ mutable struct SNFModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    end
 end
 
-mutable struct snf_module_elem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
+mutable struct SNFModuleElem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
    v::AbstractAlgebra.MatElem{T}
    parent::SNFModule{T}
 
-   function snf_module_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
+   function SNFModuleElem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
       z = new{T}(v, m)
    end
 end
 
 ###############################################################################
 #
-#   DirectSumModule/direct_sum_module_elem
+#   DirectSumModule/DirectSumModuleElem
 #
 ###############################################################################
 
@@ -1231,11 +1231,11 @@ mutable struct DirectSumModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
    end
 end
 
-mutable struct direct_sum_module_elem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
+mutable struct DirectSumModuleElem{T <: RingElement} <: AbstractAlgebra.FPModuleElem{T}
    v::AbstractAlgebra.MatElem{T}
    parent::DirectSumModule{T}
 
-   function direct_sum_module_elem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
+   function DirectSumModuleElem{T}(m::AbstractAlgebra.FPModule{T}, v::AbstractAlgebra.MatElem{T}) where T <: RingElement
       z = new{T}(v, m)
    end
 end

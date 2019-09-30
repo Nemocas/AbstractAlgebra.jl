@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export SNFModule, snf_module_elem, invariant_factors
+export SNFModule, SNFModuleElem, invariant_factors
 
 ###############################################################################
 #
@@ -12,15 +12,15 @@ export SNFModule, snf_module_elem, invariant_factors
 #
 ###############################################################################
 
-parent_type(::Type{snf_module_elem{T}}) where T <: RingElement = SNFModule{T}
+parent_type(::Type{SNFModuleElem{T}}) where T <: RingElement = SNFModule{T}
 
-elem_type(::Type{SNFModule{T}}) where T <: RingElement = snf_module_elem{T}
+elem_type(::Type{SNFModule{T}}) where T <: RingElement = SNFModuleElem{T}
 
-parent(v::snf_module_elem) = v.parent
+parent(v::SNFModuleElem) = v.parent
 
 base_ring(N::SNFModule{T}) where T <: RingElement = N.base_ring
 
-base_ring(v::snf_module_elem{T}) where T <: RingElement = base_ring(v.parent)
+base_ring(v::SNFModuleElem{T}) where T <: RingElement = base_ring(v.parent)
 
 ngens(N::SNFModule{T}) where T <: RingElement = length(N.invariant_factors)
 
@@ -70,7 +70,7 @@ function show(io::IO, N::SNFModule{T}) where T <: FieldElement
    print(io, ngens(N))
 end
 
-function show(io::IO, v::snf_module_elem)
+function show(io::IO, v::SNFModuleElem)
    print(io, "(")
    len = ngens(parent(v))
    for i = 1:len - 1
@@ -103,7 +103,7 @@ function (N::SNFModule{T})(v::Vector{T}) where T <: RingElement
    length(v) != ngens(N) && error("Length of vector does not match number of generators")
    mat = matrix(base_ring(N), 1, length(v), v)
    mat = reduce_mod_invariants(mat, invariant_factors(N))
-   return snf_module_elem{T}(N, mat)
+   return SNFModuleElem{T}(N, mat)
 end
 
 function (M::SNFModule{T})(a::Vector{Any}) where T <: RingElement
@@ -113,18 +113,18 @@ end
 
 function (N::SNFModule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingElement
    ncols(v) != ngens(N) && error("Length of vector does not match number of generators")
-   nrows(v) != 1 && ("Not a vector in snf_module_elem constructor")
+   nrows(v) != 1 && ("Not a vector in SNFModuleElem constructor")
    v = reduce_mod_invariants(v, invariant_factors(N))
-   return snf_module_elem{T}(N, v)
+   return SNFModuleElem{T}(N, v)
 end
 
-function (M::SNFModule{T})(a::submodule_elem{T}) where T <: RingElement
+function (M::SNFModule{T})(a::SubmoduleElem{T}) where T <: RingElement
    R = parent(a)
    base_ring(R) != base_ring(M) && error("Incompatible modules")
    return M(R.map(a))
 end
 
-function (M::SNFModule{T})(a::snf_module_elem{T}) where T <: RingElement
+function (M::SNFModule{T})(a::SNFModuleElem{T}) where T <: RingElement
    R = parent(a)
    R != M && error("Incompatible modules")
    return a

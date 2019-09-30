@@ -4,17 +4,17 @@
 
    @test isa(M, Generic.FreeModule)
 
-   @test elem_type(M) == Generic.free_module_elem{elem_type(R)}
-   @test elem_type(Generic.FreeModule{elem_type(R)}) == Generic.free_module_elem{elem_type(R)}
-   @test parent_type(Generic.free_module_elem{elem_type(R)}) == Generic.FreeModule{elem_type(R)}
+   @test elem_type(M) == Generic.FreeModuleElem{elem_type(R)}
+   @test elem_type(Generic.FreeModule{elem_type(R)}) == Generic.FreeModuleElem{elem_type(R)}
+   @test parent_type(Generic.FreeModuleElem{elem_type(R)}) == Generic.FreeModule{elem_type(R)}
 
    @test isa(M, Generic.FreeModule)
 
-   @test isa(M([x, x, x, x, x]), Generic.free_module_elem)
+   @test isa(M([x, x, x, x, x]), Generic.FreeModuleElem)
 
    F = FreeModule(ZZ, 0)
 
-   @test isa(F([]), Generic.free_module_elem)
+   @test isa(F([]), Generic.FreeModuleElem)
 end
 
 @testset "Generic.FreeModule.manipulation..." begin

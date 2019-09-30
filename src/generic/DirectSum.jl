@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export DirectSumModule, direct_sum_module_elem, summands
+export DirectSumModule, DirectSumModuleElem, summands
 
 ###############################################################################
 #
@@ -12,15 +12,15 @@ export DirectSumModule, direct_sum_module_elem, summands
 #
 ###############################################################################
 
-parent_type(::Type{direct_sum_module_elem{T}}) where T <: RingElement = DirectSumModule{T}
+parent_type(::Type{DirectSumModuleElem{T}}) where T <: RingElement = DirectSumModule{T}
 
-elem_type(::Type{DirectSumModule{T}}) where T <: RingElement = direct_sum_module_elem{T}
+elem_type(::Type{DirectSumModule{T}}) where T <: RingElement = DirectSumModuleElem{T}
 
-parent(v::direct_sum_module_elem) = v.parent
+parent(v::DirectSumModuleElem) = v.parent
 
 base_ring(N::DirectSumModule{T}) where T <: RingElement = base_ring(N.m[1])
 
-base_ring(v::direct_sum_module_elem{T}) where T <: RingElement = base_ring(v.parent)
+base_ring(v::DirectSumModuleElem{T}) where T <: RingElement = base_ring(v.parent)
 
 ngens(N::DirectSumModule{T}) where T <: RingElement = sum(ngens(M) for M in N.m)
 
@@ -53,7 +53,7 @@ function show(io::IO, N::DirectSumModule{T}) where T <: FieldElement
    print(IOContext(io, :compact => true), base_ring(N))
 end
 
-function show(io::IO, v::direct_sum_module_elem)
+function show(io::IO, v::DirectSumModuleElem)
    print(io, "(")
    len = ngens(parent(v))
    for i = 1:len - 1
@@ -80,7 +80,7 @@ function (N::DirectSumModule{T})(v::Vector{T}) where T <: RingElement
       mat = reduce_mod_rels(mat, rels(N.m[i]), start)
       start += ngens(N.m[i])
    end
-   return direct_sum_module_elem{T}(N, mat)
+   return DirectSumModuleElem{T}(N, mat)
 end
 
 function (M::DirectSumModule{T})(a::Vector{Any}) where T <: RingElement
@@ -90,22 +90,22 @@ end
 
 function (N::DirectSumModule{T})(v::AbstractAlgebra.MatElem{T}) where T <: RingElement
    ncols(v) != ngens(N) && error("Length of vector does not match number of generators")
-   nrows(v) != 1 && ("Not a vector in direct_sum_module_elem constructor")
+   nrows(v) != 1 && ("Not a vector in DirectSumModuleElem constructor")
    start = 1
    for i = 1:length(N.m)
       v = reduce_mod_rels(v, rels(N.m[i]), start)
       start += ngens(N.m[i])
    end
-   return direct_sum_module_elem{T}(N, v)
+   return DirectSumModuleElem{T}(N, v)
 end
 
-function (M::DirectSumModule{T})(a::submodule_elem{T}) where T <: RingElement
+function (M::DirectSumModule{T})(a::SubmoduleElem{T}) where T <: RingElement
    R = parent(a)
    base_ring(R) != base_ring(M) && error("Incompatible modules")
    return M(R.map(a))
 end
 
-function (M::DirectSumModule{T})(a::direct_sum_module_elem{T}) where T <: RingElement
+function (M::DirectSumModule{T})(a::DirectSumModuleElem{T}) where T <: RingElement
    R = parent(a)
    R != M && error("Incompatible modules")
    return a
@@ -138,7 +138,7 @@ function direct_sum_injection(m::AbstractAlgebra.FPModule{T}, D::DirectSumModule
       newv[i + start] = v[i]
    end
    matv = matrix(R, 1, length(newv), newv)
-   return direct_sum_module_elem{T}(D, matv)
+   return DirectSumModuleElem{T}(D, matv)
 end
 
 function direct_sum_projection(D::DirectSumModule{T}, m::U, v::AbstractAlgebra.FPModuleElem{T}) where {T <: RingElement, U <: AbstractAlgebra.FPModule{T}}

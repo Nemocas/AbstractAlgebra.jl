@@ -12,9 +12,9 @@ export GF
 #
 ###############################################################################
 
-parent_type(::Type{gfelem{T}}) where T <: Integer = GFField{T}
+parent_type(::Type{GFElem{T}}) where T <: Integer = GFField{T}
 
-elem_type(::Type{GFField{T}}) where T <: Integer = gfelem{T}
+elem_type(::Type{GFField{T}}) where T <: Integer = GFElem{T}
 
 @doc Markdown.doc"""
     base_ring(a::GFField)
@@ -23,22 +23,22 @@ elem_type(::Type{GFField{T}}) where T <: Integer = gfelem{T}
 base_ring(a::GFField) = Union{}
 
 @doc Markdown.doc"""
-    base_ring(a::gfelem)
+    base_ring(a::GFElem)
 > Return `Union{}` as this field is not dependent on another field.
 """
-base_ring(a::gfelem) = Union{}
+base_ring(a::GFElem) = Union{}
 
 @doc Markdown.doc"""
-    parent(a::gfelem)
+    parent(a::GFElem)
 > Return the parent of the given finite field element.
 """
-parent(a::gfelem) = a.parent
+parent(a::GFElem) = a.parent
 
-isexact_type(::Type{gfelem{T}}) where T <: Integer = true
+isexact_type(::Type{GFElem{T}}) where T <: Integer = true
 
-isdomain_type(::Type{gfelem{T}}) where T <: Integer = true
+isdomain_type(::Type{GFElem{T}}) where T <: Integer = true
 
-function check_parent(a::gfelem, b::gfelem)
+function check_parent(a::GFElem, b::GFElem)
    a.parent != b.parent && error("Operations on distinct finite fields not supported")
 end
 
@@ -48,7 +48,7 @@ end
 #
 ###############################################################################
 
-function Base.hash(a::gfelem, h::UInt)
+function Base.hash(a::GFElem, h::UInt)
    b = 0xe08f2b4ea1cd2a13%UInt
    return xor(xor(hash(a.d), h), b)
 end
@@ -58,7 +58,7 @@ end
 > Return the additive identity, zero, in the given finite field.
 """
 function zero(R::GFField{T}) where T <: Integer
-   return gfelem{T}(T(0), R)
+   return GFElem{T}(T(0), R)
 end
 
 @doc Markdown.doc"""
@@ -66,7 +66,7 @@ end
 > Return the additive identity, zero, in the given finite field.
 """
 function one(R::GFField{T}) where T <: Integer
-      return gfelem{T}(T(1), R)
+      return GFElem{T}(T(1), R)
 end
 
 @doc Markdown.doc"""
@@ -74,27 +74,27 @@ end
 > Return a generator of the field. Currently this returns 1.
 """
 function gen(R::GFField{T}) where T <: Integer
-      return gfelem{T}(T(1), R)
+      return GFElem{T}(T(1), R)
 end
 
 @doc Markdown.doc"""
-    iszero(a::gfelem{T}) where T <: Integer
+    iszero(a::GFElem{T}) where T <: Integer
 > Return true if the given element of the finite field is zero.
 """
-iszero(a::gfelem{T}) where T <: Integer = a.d == 0
+iszero(a::GFElem{T}) where T <: Integer = a.d == 0
 
 @doc Markdown.doc"""
-    isone(a::gfelem{T}) where T <: Integer
+    isone(a::GFElem{T}) where T <: Integer
 > Return true if the given element of the finite field is one.
 """
-isone(a::gfelem{T}) where T <: Integer = a.d == 1
+isone(a::GFElem{T}) where T <: Integer = a.d == 1
 
 @doc Markdown.doc"""
-    isunit(a::gfelem)
+    isunit(a::GFElem)
 > Return `true` if the given finite field element is invertible, i.e. nonzero,
 > otherwise return `false`.
 """
-isunit(a::gfelem) = a.d != 0
+isunit(a::GFElem) = a.d != 0
 
 @doc Markdown.doc"""
     characteristic(R::GFField)
@@ -120,9 +120,9 @@ function degree(R::GFField)
    return 1
 end
 
-function deepcopy_internal(a::gfelem{T}, dict::IdDict) where T <: Integer
+function deepcopy_internal(a::GFElem{T}, dict::IdDict) where T <: Integer
    R = parent(a)
-   return gfelem{T}(deepcopy(a.d), R)
+   return GFElem{T}(deepcopy(a.d), R)
 end
 
 ###############################################################################
@@ -131,7 +131,7 @@ end
 #
 ###############################################################################
 
-canonical_unit(x::gfelem) = x
+canonical_unit(x::GFElem) = x
 
 ###############################################################################
 #
@@ -139,7 +139,7 @@ canonical_unit(x::gfelem) = x
 #
 ###############################################################################
 
-function show(io::IO, x::gfelem)
+function show(io::IO, x::GFElem)
    print(io, x.d)
 end
 
@@ -147,11 +147,11 @@ function show(io::IO, R::GFField)
    print(io, "Finite field F_", R.p)
 end
 
-needs_parentheses(x::gfelem) = false
+needs_parentheses(x::GFElem) = false
 
-displayed_with_minus_in_front(x::gfelem) = false
+displayed_with_minus_in_front(x::GFElem) = false
 
-show_minus_one(::Type{gfelem{T}}) where T <: Integer = true
+show_minus_one(::Type{GFElem{T}}) where T <: Integer = true
 
 ###############################################################################
 #
@@ -159,12 +159,12 @@ show_minus_one(::Type{gfelem{T}}) where T <: Integer = true
 #
 ###############################################################################
 
-function -(x::gfelem{T}) where T <: Integer
+function -(x::GFElem{T}) where T <: Integer
    if x.d == 0
       return deepcopy(x)
    else
       R = parent(x)
-      return gfelem{T}(R.p - x.d, R)
+      return GFElem{T}(R.p - x.d, R)
    end
 end
 
@@ -174,31 +174,31 @@ end
 #
 ###############################################################################
 
-function +(x::gfelem{T}, y::gfelem{T}) where T <: Integer
+function +(x::GFElem{T}, y::GFElem{T}) where T <: Integer
    check_parent(x, y)
    R = parent(x)
    p = characteristic(R)::T
    d = x.d + y.d - p
    if d < 0
-      return gfelem{T}(d + p, R)
+      return GFElem{T}(d + p, R)
    else
-      return gfelem{T}(d, R)
+      return GFElem{T}(d, R)
    end
 end
 
-function -(x::gfelem{T}, y::gfelem{T}) where T <: Integer
+function -(x::GFElem{T}, y::GFElem{T}) where T <: Integer
    check_parent(x, y)
    R = parent(x)
    p = characteristic(R)::T
    d = x.d - y.d
    if d < 0
-      return gfelem{T}(d + p, R)
+      return GFElem{T}(d + p, R)
    else
-      return gfelem{T}(d, R)
+      return GFElem{T}(d, R)
    end
 end
 
-function *(x::gfelem{T}, y::gfelem{T}) where T <: Integer
+function *(x::GFElem{T}, y::GFElem{T}) where T <: Integer
    check_parent(x, y)
    R = parent(x)
    return R(widen(x.d)*widen(y.d))
@@ -210,12 +210,12 @@ end
 #
 ###############################################################################
 
-function *(x::Integer, y::gfelem{T}) where T <: Integer
+function *(x::Integer, y::GFElem{T}) where T <: Integer
    R = parent(y)
    return R(widen(x)*widen(y.d))
 end
 
-*(x::gfelem{T}, y::Integer) where T <: Integer = y*x
+*(x::GFElem{T}, y::Integer) where T <: Integer = y*x
 
 ###############################################################################
 #
@@ -223,7 +223,7 @@ end
 #
 ###############################################################################
 
-function ^(x::gfelem{T}, y::Integer) where T <: Integer
+function ^(x::GFElem{T}, y::Integer) where T <: Integer
    R = parent(x)
    p = R.p::T
    if x.d == 0
@@ -263,7 +263,7 @@ end
 #
 ###############################################################################
 
-function ==(x::gfelem{T}, y::gfelem{T}) where T <: Integer
+function ==(x::GFElem{T}, y::GFElem{T}) where T <: Integer
    check_parent(x, y)
    return x.d == y.d
 end
@@ -274,7 +274,7 @@ end
 #
 ###############################################################################
 
-function inv(x::gfelem{T}) where T <: Integer
+function inv(x::GFElem{T}) where T <: Integer
    x == 0 && throw(DivideError())
    R = parent(x)
    p = R.p::T
@@ -289,12 +289,12 @@ end
 #
 ###############################################################################
 
-function divexact(x::gfelem{T}, y::gfelem{T}) where T <: Integer
+function divexact(x::GFElem{T}, y::GFElem{T}) where T <: Integer
    check_parent(x, y)
    return x*inv(y)
 end
 
-divides(a::gfelem{T}, b::gfelem{T}) where T <: Integer = true, divexact(a, b)
+divides(a::GFElem{T}, b::GFElem{T}) where T <: Integer = true, divexact(a, b)
 
 ###############################################################################
 #
@@ -302,46 +302,46 @@ divides(a::gfelem{T}, b::gfelem{T}) where T <: Integer = true, divexact(a, b)
 #
 ###############################################################################
 
-function zero!(z::gfelem{T}) where T <: Integer
+function zero!(z::GFElem{T}) where T <: Integer
    R = parent(z)
    d = zero!(z.d)
-   return gfelem{T}(d, R)
+   return GFElem{T}(d, R)
 end
 
-function mul!(z::gfelem{T}, x::gfelem{T}, y::gfelem{T}) where T <: Integer
+function mul!(z::GFElem{T}, x::GFElem{T}, y::GFElem{T}) where T <: Integer
    return x*y
 end
 
-function mul!(z::gfelem{BigInt}, x::gfelem{BigInt}, y::gfelem{BigInt})
+function mul!(z::GFElem{BigInt}, x::GFElem{BigInt}, y::GFElem{BigInt})
    R = parent(x)
    p = R.p::BigInt
    d = mul!(z.d, x.d, y.d)
    if d >= p
-      return gfelem{BigInt}(d%p, R)
+      return GFElem{BigInt}(d%p, R)
    else
-      return gfelem{BigInt}(d, R)
+      return GFElem{BigInt}(d, R)
    end
 end
 
-function addeq!(z::gfelem{T}, x::gfelem{T}) where T <: Integer
+function addeq!(z::GFElem{T}, x::GFElem{T}) where T <: Integer
    R = parent(x)
    p = R.p::T
    d = addeq!(z.d, x.d)
    if d < p
-      return gfelem{T}(d, R)
+      return GFElem{T}(d, R)
    else
-      return gfelem{T}(d - p, R)
+      return GFElem{T}(d - p, R)
    end
 end
 
-function add!(z::gfelem{T}, x::gfelem{T}, y::gfelem{T}) where T <: Integer
+function add!(z::GFElem{T}, x::GFElem{T}, y::GFElem{T}) where T <: Integer
    R = parent(x)
    p = R.p::T
    d = add!(z.d, x.d, y.d)
    if d < p
-      return gfelem{T}(d, R)
+      return GFElem{T}(d, R)
    else
-      return gfelem{T}(d - p, R)
+      return GFElem{T}(d - p, R)
    end
 end
 
@@ -355,7 +355,7 @@ Random.Sampler(RNG::Type{<:AbstractRNG}, R::GFField, n::Random.Repetition) =
    Random.SamplerSimple(R, Random.Sampler(RNG, 0:R.p - 1, n))
 
 rand(rng::AbstractRNG, R::Random.SamplerSimple{GFField{T}}) where T =
-   gfelem{T}(rand(rng, R.data), R[])
+   GFElem{T}(rand(rng, R.data), R[])
 
 Random.gentype(T::Type{<:GFField}) = elem_type(T)
 
@@ -365,7 +365,7 @@ Random.gentype(T::Type{<:GFField}) = elem_type(T)
 #
 ###############################################################################
 
-promote_rule(::Type{gfelem{S}}, ::Type{T}) where {S <: Integer, T <: Integer} = gfelem{S}
+promote_rule(::Type{GFElem{S}}, ::Type{T}) where {S <: Integer, T <: Integer} = GFElem{S}
 
 ###############################################################################
 #
@@ -374,7 +374,7 @@ promote_rule(::Type{gfelem{S}}, ::Type{T}) where {S <: Integer, T <: Integer} = 
 ###############################################################################
 
 function (R::GFField{T})() where T <: Integer
-   return gfelem{T}(T(0), R)
+   return GFElem{T}(T(0), R)
 end
 
 function (R::GFField{T})(a::Integer) where T <: Integer
@@ -383,10 +383,10 @@ function (R::GFField{T})(a::Integer) where T <: Integer
    if d < 0
       d += p
    end
-   return gfelem{T}(d, R)
+   return GFElem{T}(d, R)
 end
 
-function (R::GFField{T})(a::gfelem{T}) where T <: Integer
+function (R::GFField{T})(a::GFElem{T}) where T <: Integer
    parent(a) != R && error("Coercion between finite fields not implemented")
    return a
 end

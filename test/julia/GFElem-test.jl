@@ -1,33 +1,33 @@
-@testset "Julia.gfelem.constructors..." begin
+@testset "Julia.GFElem.constructors..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
-   @test elem_type(R) == AbstractAlgebra.gfelem{Int}
-   @test elem_type(S) == AbstractAlgebra.gfelem{BigInt}
-   @test elem_type(AbstractAlgebra.GFField{Int}) == AbstractAlgebra.gfelem{Int}
-   @test elem_type(AbstractAlgebra.GFField{BigInt}) == AbstractAlgebra.gfelem{BigInt}
-   @test parent_type(AbstractAlgebra.gfelem{Int}) == AbstractAlgebra.GFField{Int}
-   @test parent_type(AbstractAlgebra.gfelem{BigInt}) == AbstractAlgebra.GFField{BigInt}
+   @test elem_type(R) == AbstractAlgebra.GFElem{Int}
+   @test elem_type(S) == AbstractAlgebra.GFElem{BigInt}
+   @test elem_type(AbstractAlgebra.GFField{Int}) == AbstractAlgebra.GFElem{Int}
+   @test elem_type(AbstractAlgebra.GFField{BigInt}) == AbstractAlgebra.GFElem{BigInt}
+   @test parent_type(AbstractAlgebra.GFElem{Int}) == AbstractAlgebra.GFField{Int}
+   @test parent_type(AbstractAlgebra.GFElem{BigInt}) == AbstractAlgebra.GFField{BigInt}
 
    @test isa(R, AbstractAlgebra.GFField)
    @test isa(S, AbstractAlgebra.GFField)
 
-   @test isa(R(), AbstractAlgebra.gfelem)
-   @test isa(S(), AbstractAlgebra.gfelem)
+   @test isa(R(), AbstractAlgebra.GFElem)
+   @test isa(S(), AbstractAlgebra.GFElem)
 
-   @test isa(R(11), AbstractAlgebra.gfelem)
-   @test isa(S(BigInt(11)), AbstractAlgebra.gfelem)
-   @test isa(S(11), AbstractAlgebra.gfelem)
-   @test isa(S(BigInt(11)), AbstractAlgebra.gfelem)
+   @test isa(R(11), AbstractAlgebra.GFElem)
+   @test isa(S(BigInt(11)), AbstractAlgebra.GFElem)
+   @test isa(S(11), AbstractAlgebra.GFElem)
+   @test isa(S(BigInt(11)), AbstractAlgebra.GFElem)
 
    a = R(11)
    b = S(11)
 
-   @test isa(R(a), AbstractAlgebra.gfelem)
-   @test isa(S(b), AbstractAlgebra.gfelem)
+   @test isa(R(a), AbstractAlgebra.GFElem)
+   @test isa(S(b), AbstractAlgebra.GFElem)
 end
 
-@testset "Julia.gfelem.printing..." begin
+@testset "Julia.GFElem.printing..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -37,7 +37,7 @@ end
    @test string(S()) == "0"
 end
 
-@testset "Julia.gfelem.manipulation..." begin
+@testset "Julia.GFElem.manipulation..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -71,15 +71,15 @@ end
    @test S === S1
 end
 
-@testset "Julia.gfelem.rand..." begin
+@testset "Julia.GFElem.rand..." begin
    R = GF(13)
-   @test rand(R) isa AbstractAlgebra.gfelem
-   @test rand(rng, R) isa AbstractAlgebra.gfelem
-   @test rand(R, 2, 3) isa Matrix{<:AbstractAlgebra.gfelem}
-   @test rand(rng, R, 2, 3) isa Matrix{<:AbstractAlgebra.gfelem}
+   @test rand(R) isa AbstractAlgebra.GFElem
+   @test rand(rng, R) isa AbstractAlgebra.GFElem
+   @test rand(R, 2, 3) isa Matrix{<:AbstractAlgebra.GFElem}
+   @test rand(rng, R, 2, 3) isa Matrix{<:AbstractAlgebra.GFElem}
 end
 
-@testset "Julia.gfelem.unary_ops..." begin
+@testset "Julia.GFElem.unary_ops..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -92,7 +92,7 @@ end
    end
 end
 
-@testset "Julia.gfelem.binary_ops..." begin
+@testset "Julia.GFElem.binary_ops..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -125,7 +125,7 @@ end
    end
 end
 
-@testset "Julia.gfelem.adhoc_binary..." begin
+@testset "Julia.GFElem.adhoc_binary..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -159,7 +159,7 @@ end
    end
 end
 
-@testset "Julia.gfelem.powering..." begin
+@testset "Julia.GFElem.powering..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -199,7 +199,7 @@ end
    end
 end
 
-@testset "Julia.gfelem.comparison..." begin
+@testset "Julia.GFElem.comparison..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -220,7 +220,7 @@ end
    end
 end
 
-@testset "Julia.gfelem.adhoc_comparison..." begin
+@testset "Julia.GFElem.adhoc_comparison..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -240,7 +240,7 @@ end
    end
 end
 
-@testset "Julia.gfelem.inversion..." begin
+@testset "Julia.GFElem.inversion..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
@@ -256,7 +256,7 @@ end
    end
 end
 
-@testset "Julia.gfelem.exact_division..." begin
+@testset "Julia.GFElem.exact_division..." begin
    R = GF(13)
    S = GF(BigInt(13))
 
