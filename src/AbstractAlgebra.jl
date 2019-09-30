@@ -730,6 +730,9 @@ PermutationGroup = PermGroup
 ZZ = JuliaZZ
 QQ = JuliaQQ
 
+setZZ(newZZ::Ring) = global ZZ = newZZ
+setQQ(newQQ::Ring) = global QQ = newQQ
+
 ###############################################################################
 #
 #   Set domain for RealField
@@ -737,6 +740,8 @@ QQ = JuliaQQ
 ###############################################################################
 
 RealField = JuliaRealField
+
+setRealField(newRealField::Ring) = global RealField = newRealField
 
 ###############################################################################
 #
