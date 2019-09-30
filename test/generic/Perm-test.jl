@@ -50,9 +50,11 @@ end
 @testset "Perm.parsingGAP..." begin
    @test Generic.parse_cycles("()") == (Int[], [1])
    @test Generic.parse_cycles("(1)(2)(3)") == ([1,2,3], [1,2,3,4])
-   @test Generic.parse_cycles("Cycle decomposition: (1)(2,3)") == ([1,2,3], [1,2,4])
+   @test Generic.parse_cycles("Cycle Decomposition: (1)(2,3)") == ([1,2,3], [1,2,4])
    @test Generic.parse_cycles("(1)(\n2, 3)") == ([1,2,3], [1,2,4])
    @test Generic.parse_cycles("(3,2,1)(4,5)") == ([3,2,1,4,5], [1,4,6])
+   @test_throws ArgumentError Generic.parse_cycles("(a,b)")
+   @test_throws ArgumentError Generic.parse_cycles("(1 2)")
 
    s = """
 ( 1, 22,73,64,78,81,  24 ,89,90,54,51,82,91,53, 18
