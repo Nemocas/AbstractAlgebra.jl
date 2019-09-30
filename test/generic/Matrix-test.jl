@@ -133,25 +133,25 @@ Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
    arr2 = [1, 2, 3, 4, 5, 6]
 
    for T in [R, Int, BigInt, Rational{Int}, Rational{BigInt}]
-      M = matrix(R, map(T, arr))
+      M = matrix(map(T, arr), R)
       @test isa(M, Generic.MatSpaceElem{elem_type(R)})
       @test M.base_ring == R
       @test nrows(M) == 2
       @test ncols(M) == 2
 
-      M2 = matrix(R, 2, 3, map(T, arr2))
+      M2 = matrix(map(T, arr2), R, 2, 3)
       @test isa(M2, Generic.MatSpaceElem{elem_type(R)})
       @test M2.base_ring == R
       @test nrows(M2) == 2
       @test ncols(M2) == 3
-      @test_throws ErrorConstrDimMismatch matrix(R, 2, 2, map(T, arr2))
-      @test_throws ErrorConstrDimMismatch matrix(R, 2, 4, map(T, arr2))
+      @test_throws ErrorConstrDimMismatch matrix(map(T, arr2), R, 2, 2)
+      @test_throws ErrorConstrDimMismatch matrix(map(T, arr2), R, 2, 4)
    end
 
-   M = matrix(R, arr')
+   M = matrix(arr', R)
    @test isa(M, Generic.MatSpaceElem{elem_type(R)})
 
-   M = matrix(R, 2, 3, view(arr2', 1:6))
+   M = matrix(view(arr2', 1:6), R, 2, 3)
    @test isa(M, Generic.MatSpaceElem{elem_type(R)})
 
    M3 = zero_matrix(R, 2, 3)
@@ -196,8 +196,8 @@ Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
 end
 
 @testset "Generic.Mat.size..." begin
-   A = matrix(QQ, [1 2 3; 4 5 6; 7 8 9])
-   B = matrix(QQ, [1 2 3 4; 5 6 7 8])
+   A = matrix([1 2 3; 4 5 6; 7 8 9], QQ)
+   B = matrix([1 2 3 4; 5 6 7 8], QQ)
 
    @test size(A) == (3,3)
    @test issquare(A)
@@ -250,11 +250,11 @@ end
    @test length(A) == length(B) == length(C) == 9
    @test !any(isempty, (A, B, C))
 
-   @test length(matrix(R, zeros(Int, 2, 3))) == 6
-   @test length(matrix(R, zeros(Int, 3, 2))) == 6
+   @test length(matrix(zeros(Int, 2, 3), R)) == 6
+   @test length(matrix(zeros(Int, 3, 2), R)) == 6
 
-   for n = (matrix(R, zeros(Int, 2, 0)),
-            matrix(R, zeros(Int, 0, 2)))
+   for n = (matrix(zeros(Int, 2, 0), R),
+            matrix(zeros(Int, 0, 2), R))
       @test length(n) == 0
       @test isempty(n)
    end
@@ -326,7 +326,7 @@ end
 
    D = @inferred A[:, 2:3]
 
-   @test D == matrix(ZZ, 3, 2, [2, 3, 5, 6, 8, 9])
+   @test D == matrix([2, 3, 5, 6, 8, 9], ZZ, 3, 2)
 
    @test A == @inferred A[:, :]
    @test B == @inferred B[:, :]
@@ -442,13 +442,13 @@ end
 @testset "Generic.Mat.transpose..." begin
    R, t = PolynomialRing(QQ, "t")
    arr = [t + 1 t R(1); t^2 t t]
-   A = matrix(R, arr)
-   B = matrix(R, permutedims(arr, [2, 1]))
+   A = matrix(arr, R)
+   B = matrix(permutedims(arr, [2, 1]), R)
    @test transpose(A) == B
 
    arr = [t + 1 t; t^2 t]
-   A = matrix(R, arr)
-   B = matrix(R, permutedims(arr, [2, 1]))
+   A = matrix(arr, R)
+   B = matrix(permutedims(arr, [2, 1]), R)
    @test transpose(A) == B
 end
 
@@ -508,7 +508,7 @@ end
    R, z = PolynomialRing(ZZ, "z")
    F = FractionField(R)
 
-   A = matrix(F, 3, 3, [0, 0, 11, 78*z^3-102*z^2+48*z+12, 92, -16*z^2+80*z-149, -377*z^3+493*z^2-232*z-58, -448, 80*z^2-385*z+719])
+   A = matrix([0, 0, 11, 78*z^3-102*z^2+48*z+12, 92, -16*z^2+80*z-149, -377*z^3+493*z^2-232*z-58, -448, 80*z^2-385*z+719], F, 3, 3)
 
    r, P, L, U = lu(A)
 
@@ -557,7 +557,7 @@ end
    @test r == 2
    @test P*A == L*D*U
 
-   A = matrix(QQ, 3, 3, [0, 0, 1, 12, 1, 11, 1, 0, 1])
+   A = matrix([0, 0, 1, 12, 1, 11, 1, 0, 1], QQ, 3, 3)
 
    r, d, P, L, U, = fflu(A)
 
@@ -727,8 +727,8 @@ end
       M = randmat_with_rank(R, dim, 0:5, -100:100)
       b = rand(U, 0:5, -100:100);
 
-      MK = matrix(K, elem_type(K)[ K(M[i, j]) for i in 1:nrows(M), j in 1:ncols(M) ])
-      bK = matrix(K, elem_type(K)[ K(b[i, j]) for i in 1:nrows(b), j in 1:ncols(b) ])
+      MK = matrix(elem_type(K)[ K(M[i, j]) for i in 1:nrows(M), j in 1:ncols(M) ], K)
+      bK = matrix(elem_type(K)[ K(b[i, j]) for i in 1:nrows(b), j in 1:ncols(b) ], K)
 
       x = Generic.solve_lu(MK, bK)
 
@@ -1388,32 +1388,32 @@ end
 
    @test a == M(map(R, [1 2; 5 6; 3 4]))
 
-   @test swap_cols(a, 1, 2) == matrix(R, [2 1; 6 5; 4 3])
+   @test swap_cols(a, 1, 2) == matrix([2 1; 6 5; 4 3], R)
 
    swap_cols!(a, 2, 1)
 
-   @test a == matrix(R, [2 1; 6 5; 4 3])
+   @test a == matrix([2 1; 6 5; 4 3], R)
 
-   a = matrix(R, [1 2; 3 4])
-   @test reverse_rows(a) == matrix(R, [3 4; 1 2])
+   a = matrix([1 2; 3 4], R)
+   @test reverse_rows(a) == matrix([3 4; 1 2], R)
    reverse_rows!(a)
-   @test a == matrix(R, [3 4; 1 2])
+   @test a == matrix([3 4; 1 2], R)
 
-   a = matrix(R, [1 2; 3 4])
-   @test reverse_cols(a) == matrix(R, [2 1; 4 3])
+   a = matrix([1 2; 3 4], R)
+   @test reverse_cols(a) == matrix([2 1; 4 3], R)
    reverse_cols!(a)
-   @test a == matrix(R, [2 1; 4 3])
+   @test a == matrix([2 1; 4 3], R)
 
-   a = matrix(R, [1 2 3; 3 4 5; 5 6 7])
+   a = matrix([1 2 3; 3 4 5; 5 6 7], R)
 
-   @test reverse_rows(a) == matrix(R, [5 6 7; 3 4 5; 1 2 3])
+   @test reverse_rows(a) == matrix([5 6 7; 3 4 5; 1 2 3], R)
    reverse_rows!(a)
-   @test a == matrix(R, [5 6 7; 3 4 5; 1 2 3])
+   @test a == matrix([5 6 7; 3 4 5; 1 2 3], R)
 
-   a = matrix(R, [1 2 3; 3 4 5; 5 6 7])
-   @test reverse_cols(a) == matrix(R, [3 2 1; 5 4 3; 7 6 5])
+   a = matrix([1 2 3; 3 4 5; 5 6 7], R)
+   @test reverse_cols(a) == matrix([3 2 1; 5 4 3; 7 6 5], R)
    reverse_cols!(a)
-   @test a == matrix(R, [3 2 1; 5 4 3; 7 6 5])
+   @test a == matrix([3 2 1; 5 4 3; 7 6 5], R)
 end
 
 @testset "Generic.Mat.gen_mat_elem_op..." begin
@@ -1556,15 +1556,15 @@ end
       @test vcat(transpose(M1), transpose(M2)) == transpose(hcat(M1, M2))
    end
 
-   A = matrix(R, 2, 2, [1, 2, 3, 4])
-   B = matrix(R, 4, 2, [1, 2, 3, 4, 0, 1, 0, 1])
-   C = matrix(R, 4, 1, [0, 1, 0, 2])
-   D = matrix(R, 2, 3, [1, 2, 3, 4, 5, 6])
+   A = matrix([1, 2, 3, 4], R, 2, 2)
+   B = matrix([1, 2, 3, 4, 0, 1, 0, 1], R, 4, 2)
+   C = matrix([0, 1, 0, 2], R, 4, 1)
+   D = matrix([1, 2, 3, 4, 5, 6], R, 2, 3)
 
-   @test hcat(B, C) == matrix(R, [1 2 0;
-                                  3 4 1;
-                                  0 1 0;
-                                  0 1 2;])
+   @test hcat(B, C) == matrix([1 2 0;
+                               3 4 1;
+                               0 1 0;
+                               0 1 2;], R)
    @test hcat(B, C) == [B C]
    let BC = hcat([B, C])
       @test size(BC) == (2, 1)
@@ -1572,12 +1572,12 @@ end
       @test BC[2] == C
    end
 
-   @test vcat(A, B) == matrix(R, [1 2;
-                                  3 4;
-                                  1 2;
-                                  3 4;
-                                  0 1;
-                                  0 1;])
+   @test vcat(A, B) == matrix([1 2;
+                               3 4;
+                               1 2;
+                               3 4;
+                               0 1;
+                               0 1;], R)
 
    @test vcat(A, B) == [A; B]
    let AB = vcat([A, B])
@@ -1587,12 +1587,12 @@ end
    end
 
 
-   @test [A D; B B C] == matrix(R, [1 2 1 2 3;
-                                    3 4 4 5 6;
-                                    1 2 1 2 0;
-                                    3 4 3 4 1;
-                                    0 1 0 1 0;
-                                    0 1 0 1 2;])
+   @test [A D; B B C] == matrix([1 2 1 2 3;
+                                 3 4 4 5 6;
+                                 1 2 1 2 0;
+                                 3 4 3 4 1;
+                                 0 1 0 1 0;
+                                 0 1 0 1 2;], R)
 end
 
 @testset "Generic.Mat.hnf_minors..." begin
@@ -1631,11 +1631,11 @@ end
 end
 
 @testset "Generic.Mat.hnf_kb..." begin
-   M = matrix(ZZ, BigInt[4 6 2; 0 0 10; 0 5 3])
+   M = matrix(BigInt[4 6 2; 0 0 10; 0 5 3], ZZ)
 
    H, U = AbstractAlgebra.hnf_kb_with_transform(M)
 
-   @test H == matrix(ZZ, BigInt[4 1 9; 0 5 3; 0 0 10])
+   @test H == matrix(BigInt[4 1 9; 0 5 3; 0 0 10], ZZ)
    @test isunit(det(U))
    @test U*M == H
 
@@ -1820,7 +1820,7 @@ end
 @testset "Generic.Mat.weak_popov..." begin
    R, x = PolynomialRing(QQ, "x")
 
-   A = matrix(R, map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]))
+   A = matrix(map(R, Any[1 2 3 x; x 2*x 3*x x^2; x x^2+1 x^3+x^2 x^4+x^2+1]), R)
    r = rank(A)
 
    P = weak_popov(A)
@@ -1835,7 +1835,7 @@ end
 
    S, y = PolynomialRing(F, "y")
 
-   B = matrix(S, map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]))
+   B = matrix(map(S, Any[ 4*y^2+3*y+5 4*y^2+3*y+4 6*y^2+1; 3*y+6 3*y+5 y+3; 6*y^2+4*y+2 6*y^2 2*y^2+y]), S)
    s = rank(B)
 
    P = weak_popov(B)
@@ -1895,7 +1895,7 @@ end
 end
 
 @testset "Generic.Mat.views..." begin
-   M = matrix(ZZ, 3, 3, BigInt[1, 2, 3, 2, 3, 4, 3, 4, 5])
+   M = matrix(BigInt[1, 2, 3, 2, 3, 4, 3, 4, 5], ZZ, 3, 3)
    M2 = deepcopy(M)
 
    N1 = @view M[:,1:2]
@@ -1906,7 +1906,7 @@ end
    @test isa(N2, Generic.MatSpaceView)
    @test isa(N3, Generic.MatSpaceView)
 
-   @test N2*N1 == matrix(ZZ, 2, 2, BigInt[14, 20, 20, 29])
+   @test N2*N1 == matrix(BigInt[14, 20, 20, 29], ZZ, 2, 2)
    @test N3*N3 == M*M
 
    @test fflu(N3) == fflu(M) # tests that deepcopy is correct
@@ -2004,14 +2004,14 @@ end
 end
 
 @testset "Generic.Mat.show..." begin
-   @test string(matrix(ZZ, [3 1 2; 2 0 1])) == "[3  1  2]\n[2  0  1]"
-   @test string(matrix(ZZ, [3 1 2; 2 0 1])) == "[3  1  2]\n[2  0  1]"
-   @test string(matrix(ZZ, 2, 0, [])) == "2 by 0 matrix"
-   @test string(matrix(ZZ, 0, 3, [])) == "0 by 3 matrix"
+   @test string(matrix([3 1 2; 2 0 1], ZZ)) == "[3  1  2]\n[2  0  1]"
+   @test string(matrix([3 1 2; 2 0 1], ZZ)) == "[3  1  2]\n[2  0  1]"
+   @test string(matrix([], ZZ, 2, 0)) == "2 by 0 matrix"
+   @test string(matrix([], ZZ, 0, 3)) == "0 by 3 matrix"
    S = MatrixAlgebra(QQ, 3)
    @test string(S([1 2 3; 4 5 6; 7 8 9])) ==
       "[1//1  2//1  3//1]\n[4//1  5//1  6//1]\n[7//1  8//1  9//1]"
    @test string(MatrixAlgebra(QQ, 0)()) == "0 by 0 matrix"
-   @test string(similar(matrix(ZZ, [3 1 2; 2 0 1]))) ==
+   @test string(similar(matrix([3 1 2; 2 0 1], ZZ))) ==
       "[#undef  #undef  #undef]\n[#undef  #undef  #undef]"
 end

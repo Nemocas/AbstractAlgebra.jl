@@ -946,7 +946,7 @@ end
 > Return the transpose of the given matrix.
 """
 function transpose(x::Mat)
-   return matrix(base_ring(x), permutedims(x.entries, [2, 1]))
+   return matrix(permutedims(x.entries, [2, 1]), base_ring(x))
 end
 
 ###############################################################################
@@ -2019,7 +2019,7 @@ function solve_interpolation(M::AbstractAlgebra.MatElem{T}, b::AbstractAlgebra.M
    end
    # bound from xd = (M*)b where d is the det
    bound = (maxlen - 1)*(m - 1) + max(maxlenb, maxlen)
-   tmat = matrix(base_ring(R), 0, 0, elem_type(base_ring(R))[])
+   tmat = matrix(elem_type(base_ring(R))[], base_ring(R), 0, 0)
    V = Array{typeof(tmat)}(undef, bound)
    d = Array{elem_type(base_ring(R))}(undef, bound)
    y = Array{elem_type(base_ring(R))}(undef, bound)
@@ -5061,28 +5061,28 @@ end
 ################################################################################
 
 @doc Markdown.doc"""
-    matrix(R::Ring, arr::AbstractArray{T, 2}) where {T} -> MatElem{T}
+    matrix(arr::AbstractArray{T, 2}, R::Ring) where {T} -> MatElem{T}
 
 > Constructs the matrix over $R$ with entries as in `arr`.
 """
-function matrix(R::Ring, arr::AbstractArray{T, 2}) where {T}
+function matrix(arr::AbstractArray{T, 2}, R::Ring) where {T}
    if elem_type(R) === T
       z = MatSpaceElem{elem_type(R)}(arr)
       z.base_ring = R
       return z
    else
       arr_coerce = convert(Array{elem_type(R), 2}, map(R, arr))::Array{elem_type(R), 2}
-      return matrix(R, arr_coerce)
+      return matrix(arr_coerce, R)
    end
 end
 
 @doc Markdown.doc"""
-    matrix(R::Ring, r::Int, c::Int, arr::AbstractArray{T, 1}) where {T} -> MatElem{T}
+    matrix(arr::AbstractArray{T, 1}, R::Ring, r::Int, c::Int) where {T} -> MatElem{T}
 
 > Constructs the $r \times c$ matrix over $R$, where the entries are taken
 > row-wise from `arr`.
 """
-function matrix(R::Ring, r::Int, c::Int, arr::AbstractArray{T, 1}) where T
+function matrix(arr::AbstractArray{T, 1}, R::Ring, r::Int, c::Int) where T
    _check_dim(r, c, arr)
    if elem_type(R) === T
      z = MatSpaceElem{elem_type(R)}(r, c, arr)
@@ -5090,7 +5090,7 @@ function matrix(R::Ring, r::Int, c::Int, arr::AbstractArray{T, 1}) where T
      return z
    else
      arr_coerce = convert(Array{elem_type(R), 1}, map(R, arr))::Array{elem_type(R), 1}
-     return matrix(R, r, c, arr_coerce)
+     return matrix(arr_coerce, R, r, c)
    end
 end
 

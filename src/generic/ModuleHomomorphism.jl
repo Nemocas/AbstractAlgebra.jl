@@ -188,7 +188,7 @@ function preimage(f::Map(AbstractAlgebra.FPModuleHomomorphism), v::AbstractAlgeb
       # Find left inverse of mat
       x = solve_left(matr, v.v)
       if q != 0
-         x = matrix(R, 1, m, T[x[1, i] for i in 1:m])
+         x = matrix(T[x[1, i] for i in 1:m], R, 1, m)
       end
       return D(x)
    end
@@ -244,7 +244,7 @@ function ModuleIsomorphism(M1::AbstractAlgebra.FPModule{T}, M2::AbstractAlgebra.
    (ngens(M1) != m || ngens(M2) != n) &&
                                         error("Matrix of the wrong dimensions")
    if m == 0 || n == 0
-       M_inv = matrix(R, n, m, T[])
+       M_inv = matrix(T[], R, n, m)
    else
       # Put matrix M and target relations in a matrix
       mat = zero_matrix(R, m + q, n)

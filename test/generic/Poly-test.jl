@@ -1626,12 +1626,12 @@ end
       f1 = rand(R, 0:d2-1, -10:10)
       g1 = rand(R, 0:d1-1, -10:10)
 
-      w = matrix(ZZ, 1, d2, [coeff(f1, d2 - i) for i in 1:d2])
-      w = hcat(w, matrix(ZZ, 1, d1, [coeff(g1, d1 - i) for i in 1:d1]))
+      w = matrix([coeff(f1, d2 - i) for i in 1:d2], ZZ, 1, d2)
+      w = hcat(w, matrix([coeff(g1, d1 - i) for i in 1:d1], ZZ, 1, d1))
 
       h = f1 * f + g1 * g
 
-      v = matrix(ZZ, 1, d1 + d2, [coeff(h, d1 + d2 - i) for i in 1:d1 + d2])
+      v = matrix([coeff(h, d1 + d2 - i) for i in 1:d1 + d2], ZZ, 1, d1 + d2)
       M = sylvester_matrix(f, g)
       @test v == w * M
    end

@@ -599,7 +599,7 @@ function typed_hvcat(R::Ring, dims, d...)
          A[i, j] = R(d[(i - 1)*c + j])
       end
    end
-   S = matrix(R, A)
+   S = matrix(A, R)
    return S
 end
 
@@ -610,7 +610,7 @@ function typed_hcat(R::Ring, d...)
    for i = 1:r
       A[1, i] = R(d[i])
    end
-   S = matrix(R, A)
+   S = matrix(A, R)
    return S
 end
 

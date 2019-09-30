@@ -79,7 +79,7 @@ end
 
 function (N::Submodule{T})(v::Vector{T}) where T <: RingElement
    length(v) != ngens(N) && error("Length of vector does not match number of generators")
-   mat = matrix(base_ring(N), 1, length(v), v)
+   mat = matrix(v, base_ring(N), 1, length(v))
    mat = reduce_mod_rels(mat, rels(N), 1)
    return SubmoduleElem{T}(N, mat)
 end
@@ -143,7 +143,7 @@ function sub(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: RingEl
       gens = Vector{S}(undef, 0) # original may have generators that are zero
       M = Submodule{T}(m, gens, Vector{dense_matrix_type(T)}(undef, 0),
                        Vector{Int}(undef, 0), Vector{Int}(undef, 0))
-      f = ModuleHomomorphism(M, m, matrix(R, 0, ngens(m), []))
+      f = ModuleHomomorphism(M, m, matrix([], R, 0, ngens(m)))
       M.map = f
       return M, f
    end
@@ -173,7 +173,7 @@ function sub(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: RingEl
          for j = 1:ncols(Mi)
             Mi[1, j] = g[1, j]
          end
-      end 
+      end
    end
    # Remove zero rows
    num = r
@@ -213,16 +213,16 @@ function sub(m::AbstractAlgebra.FPModule{T}, gens::Vector{S}) where {T <: RingEl
    T1 = typeof(new_rels)
    srels = Vector{T1}(undef, length(culled))
    for i = 1:length(culled)
-      srels[i] = matrix(R, 1, length(gen_cols),
-                    [new_rels[culled[i], gen_cols[j]]
-                       for j in 1:length(gen_cols)])
+      srels[i] = matrix([new_rels[culled[i], gen_cols[j]]
+                         for j in 1:length(gen_cols)],
+                        R, 1, length(gen_cols))
    end
    # Make submodule whose generators are the nonzero rows of mat
    nonzero_gens = [m([mat[i, j] for j = 1:s]) for i = 1:num]
    M = Submodule{T}(m, nonzero_gens, srels, gen_cols, pivots)
    # Compute map from elements of submodule into original module
    hmat = [nonzero_gens[gen_cols[i]].v[1, j] for i in 1:ngens(M) for j in 1:ngens(m)]
-   f = ModuleHomomorphism(M, m, matrix(R, ngens(M), ngens(m), hmat))
+   f = ModuleHomomorphism(M, m, matrix(hmat, R, ngens(M), ngens(m)))
    M.map = f
    return M, f
 end
@@ -240,4 +240,3 @@ function sub(m::AbstractAlgebra.FPModule{T}, subs::Vector{Submodule{T}}) where T
    gens = vcat((generators(s) for s in subs)...)
    return sub(m, gens)
 end
-

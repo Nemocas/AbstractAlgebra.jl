@@ -96,7 +96,7 @@ end
 function (M::FreeModule{T})(a::Vector{T}) where T <: Union{RingElement, NCRingElem}
    length(a) != rank(M) && error("Number of elements does not equal rank")
    R = base_ring(M)
-   v = matrix(R, 1, length(a), a)
+   v = matrix(a, R, 1, length(a))
    z = FreeModuleElem{T}(M, v)
    z.parent = M
    return z
@@ -142,4 +142,3 @@ function FreeModule(R::NCRing, rank::Int; cached::Bool = true)
    T = elem_type(R)
    return FreeModule{T}(R, rank, cached)
 end
-

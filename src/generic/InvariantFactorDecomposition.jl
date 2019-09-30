@@ -46,8 +46,8 @@ function rels(N::SNFModule{T}) where T <: RingElement
       num -= 1
    end
    n = length(invs)
-   r = T1[matrix(R, 1, n, T[i == j ? invs[i] : zero(R) for j in 1:n]) for i in 1:num]
-   return r 
+   r = T1[matrix(T[i == j ? invs[i] : zero(R) for j in 1:n], R, 1, n) for i in 1:num]
+   return r
 end
 
 ###############################################################################
@@ -101,7 +101,7 @@ end
 
 function (N::SNFModule{T})(v::Vector{T}) where T <: RingElement
    length(v) != ngens(N) && error("Length of vector does not match number of generators")
-   mat = matrix(base_ring(N), 1, length(v), v)
+   mat = matrix(v, base_ring(N), 1, length(v))
    mat = reduce_mod_invariants(mat, invariant_factors(N))
    return SNFModuleElem{T}(N, mat)
 end
@@ -154,7 +154,7 @@ function snf(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
    # put the relations into a matrix
    r = length(old_rels)
    s = ngens(m)
-   A = matrix(R, r, s, T[old_rels[i][1, j] for i in 1:r for j in 1:s])
+   A = matrix(T[old_rels[i][1, j] for i in 1:r for j in 1:s], R, r, s)
    # compute the snf
    S, U, K = snf_with_transform(A)
    # count unit invariant factors
@@ -168,8 +168,8 @@ function snf(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
    end
    num_gens = nrows(S) - nunits
    # Make matrix for inverse isomorphism
-   mat_inv = matrix(R, nrows(K), ncols(A) - nunits,
-        T[K[i, j + nunits] for i in 1:nrows(K) for j in 1:ncols(A) - nunits])
+   mat_inv = matrix(T[K[i, j + nunits] for i in 1:nrows(K) for j in 1:ncols(A) - nunits],
+                    R, nrows(K), ncols(A) - nunits)
    # compute K^-1
    K = inv(K)
    # Make generators out of cols of matrix K
@@ -177,9 +177,9 @@ function snf(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
    T2 = elem_type(m)
    gens = Vector{T2}(undef, ncols(A) - nunits)
    for i = 1:ncols(A) - nunits
-      gens[i] = m(matrix(R, 1, ncols(K),
-                    T[K[i + nunits, j]
-                       for j in 1:ncols(K)]))
+      gens[i] = m(matrix(T[K[i + nunits, j]
+                           for j in 1:ncols(K)],
+                         R, 1, ncols(K)))
    end
    # extract invariant factors from S
    invariant_factors = T[S[i + nunits, i + nunits] for i in 1:num_gens]
@@ -187,11 +187,11 @@ function snf(m::AbstractAlgebra.FPModule{T}) where T <: RingElement
       push!(invariant_factors, zero(R))
    end
    # make matrix from gens
-   mat = matrix(R, ncols(A) - nunits, ncols(K),
-        T[gens[i].v[1, j] for i in 1:ncols(A) - nunits for j in 1:ncols(K)])
+   mat = matrix(T[gens[i].v[1, j] for i in 1:ncols(A) - nunits for j in 1:ncols(K)],
+                R, ncols(A) - nunits, ncols(K))
    M = SNFModule{T}(m, gens, invariant_factors)
    f = ModuleIsomorphism{T}(M, m, mat, mat_inv)
-   M.map = f 
+   M.map = f
    return M, f
 end
 
@@ -209,7 +209,7 @@ function invariant_factors(m::AbstractAlgebra.FPModule{T}) where T <: RingElemen
    # put the relations into a matrix
    r = length(old_rels)
    s = ngens(m)
-   A = matrix(R, r, s, T[old_rels[i][1, j] for i in 1:r for j in 1:s])
+   A = matrix(T[old_rels[i][1, j] for i in 1:r for j in 1:s], R, r, s)
    # compute the snf
    S = snf(A)
    # count unit invariant factors
@@ -229,4 +229,3 @@ function invariant_factors(m::AbstractAlgebra.FPModule{T}) where T <: RingElemen
    end
    return invariant_factors
 end
-

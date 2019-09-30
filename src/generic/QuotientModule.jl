@@ -28,8 +28,8 @@ gens(N::QuotientModule{T}) where T <: RingElement = [gen(N, i) for i = 1:ngens(N
 
 function gen(N::QuotientModule{T}, i::Int) where T <: RingElement
    R = base_ring(N)
-   mat = matrix(R, 1, ngens(N),
-                [(j == i ? one(R) : zero(R)) for j = 1:ngens(N)])
+   mat = matrix([(j == i ? one(R) : zero(R)) for j = 1:ngens(N)],
+                R, 1, ngens(N))
    return QuotientModuleElem{T}(N, mat)
 end
 
@@ -122,12 +122,12 @@ function reduce_mod_rels(v::AbstractAlgebra.MatElem{T}, vrels::Vector{<:Abstract
       end
       i += 1
    end
-   return v 
+   return v
 end
 
 function (N::QuotientModule{T})(v::Vector{T}) where T <: RingElement
    length(v) != ngens(N) && error("Length of vector does not match number of generators")
-   mat = matrix(base_ring(N), 1, length(v), v)
+   mat = matrix(v, base_ring(N), 1, length(v))
    mat = reduce_mod_rels(mat, rels(N), 1)
    return QuotientModuleElem{T}(N, mat)
 end
@@ -180,7 +180,7 @@ function projection(v::AbstractAlgebra.MatElem{T}, crels::AbstractAlgebra.MatEle
    # put into row vectors
    vrels = Vector{dense_matrix_type(T)}(undef, nr)
    for i = 1:nr
-      vrels[i] = matrix(R, 1, ncols(crels), [crels[i, j] for j in 1:ncols(crels)])
+      vrels[i] = matrix([crels[i, j] for j in 1:ncols(crels)], R, 1, ncols(crels))
    end
    # reduce mod relations
    v = reduce_mod_rels(v, vrels, 1)
@@ -220,7 +220,7 @@ function quo(m::AbstractAlgebra.FPModule{T}, subm::Submodule{T}) where T <: Ring
       combined_rels = compute_combined_rels(m, srels)
       M = QuotientModule{T}(m, combined_rels)
       f = ModuleHomomorphism(m, M,
-          matrix(R, ngens(m), 0, []))
+          matrix([], R, ngens(m), 0))
    else
       G = generators(subm)
       S = subm
@@ -241,7 +241,7 @@ function quo(m::AbstractAlgebra.FPModule{T}, subm::Submodule{T}) where T <: Ring
       M = QuotientModule{T}(m, combined_rels)
       hvecs = [projection(x.v, combined_rels, M) for x in gens(m)]
       hmat = [hvecs[i][1, j] for i in 1:ngens(m) for j in 1:ngens(M)]
-      f = ModuleHomomorphism(m, M, matrix(R, ngens(m), ngens(M), hmat))
+      f = ModuleHomomorphism(m, M, matrix(hmat, R, ngens(m), ngens(M)))
    end
    M.map = f
    return M, f
@@ -260,7 +260,7 @@ function quo(m::AbstractAlgebra.FPModule{T}, subm::AbstractAlgebra.FPModule{T}) 
    srels = [v.v for v in gens(subm)]
    combined_rels = compute_combined_rels(m, srels)
    M = QuotientModule{T}(m, combined_rels)
-   f = ModuleHomomorphism(m, M, matrix(R, ngens(m), 0, []))
+   f = ModuleHomomorphism(m, M, matrix([], R, ngens(m), 0))
    M.map = f
-   return M, f   
+   return M, f
 end

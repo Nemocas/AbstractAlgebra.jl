@@ -74,7 +74,7 @@ end
 
 function (N::DirectSumModule{T})(v::Vector{T}) where T <: RingElement
    length(v) != ngens(N) && error("Length of vector does not match number of generators")
-   mat = matrix(base_ring(N), 1, length(v), v)
+   mat = matrix(v, base_ring(N), 1, length(v))
    start = 1
    for i = 1:length(N.m)
       mat = reduce_mod_rels(mat, rels(N.m[i]), start)
@@ -137,7 +137,7 @@ function direct_sum_injection(m::AbstractAlgebra.FPModule{T}, D::DirectSumModule
    for i = 1:ngens(m)
       newv[i + start] = v[i]
    end
-   matv = matrix(R, 1, length(newv), newv)
+   matv = matrix(newv, R, 1, length(newv))
    return DirectSumModuleElem{T}(D, matv)
 end
 
@@ -153,7 +153,7 @@ function direct_sum_projection(D::DirectSumModule{T}, m::U, v::AbstractAlgebra.F
    end
    # create projected value
    newv = T[v[i + start] for i in 1:ngens(m)]
-   matv = matrix(R, 1, length(newv), newv)
+   matv = matrix(newv, R, 1, length(newv))
    return elem_type(U)(m, matv)
 end
 
@@ -216,4 +216,3 @@ end
 function DirectSum(vals::AbstractAlgebra.FPModule{T}...) where T <: RingElement
    return DirectSum([vals...])
 end
-

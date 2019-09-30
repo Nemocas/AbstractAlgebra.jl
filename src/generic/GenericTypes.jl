@@ -1169,9 +1169,10 @@ mutable struct QuotientModule{T <: RingElement} <: AbstractAlgebra.FPModule{T}
       # remove zero rows and all rows/cols corresponding to unit pivots
       gen_cols, culled, pivots = cull_matrix(combined_rels)
       # put all the culled relations into new relations
-      new_rels = [matrix(R, 1, length(gen_cols),
-                    [combined_rels[culled[i], gen_cols[j]]
-                       for j in 1:length(gen_cols)]) for i = 1:length(culled)]
+      new_rels = [matrix([combined_rels[culled[i], gen_cols[j]]
+                          for j in 1:length(gen_cols)],
+                         R, 1, length(gen_cols))
+                  for i = 1:length(culled)]
       # create quotient module
       z = new{T}(M, new_rels, gen_cols, pivots, base_ring(M))
       return z

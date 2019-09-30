@@ -1,7 +1,7 @@
 @testset "Generic.ModuleHomomorphism.constructors..." begin
    M = FreeModule(ZZ, 2)
 
-   f = ModuleHomomorphism(M, M, matrix(ZZ, 2, 2, [1, 2, 3, 4]))
+   f = ModuleHomomorphism(M, M, matrix([1, 2, 3, 4], ZZ, 2, 2))
 
    @test isa(f, Generic.Map(FunctionalMap))
 
@@ -11,7 +11,7 @@
 
    N, nmap = sub(M, [m])
 
-   g = ModuleHomomorphism(N, N, matrix(ZZ, 1, 1, [3]))
+   g = ModuleHomomorphism(N, N, matrix([3], ZZ, 1, 1))
 
    m2 = N([ZZ(4)])
 
