@@ -88,7 +88,7 @@ end
 function Base.hash(a::AbstractAlgebra.FracElem, h::UInt)
    b = 0x8a30b0d963237dd5%UInt
    # We canonicalise before hashing
-   return xor(b, hash(AbstractAlgebra.numerator(a, true), h), hash(AbstractAlgebra.denominator(a, true), h), h)
+   return xor(b, hash(numerator(a, true), h), hash(denominator(a, true), h), h)
 end
 
 function Base.numerator(a::Frac, canonicalise::Bool=true)
@@ -136,24 +136,24 @@ one(R::AbstractAlgebra.FracField) = R(1)
 > Return `true` if the supplied element $a$ is zero in the fraction field it
 > belongs to, otherwise return `false`.
 """
-iszero(a::AbstractAlgebra.FracElem) = iszero(AbstractAlgebra.numerator(a, false))
+iszero(a::AbstractAlgebra.FracElem) = iszero(numerator(a, false))
 
 @doc Markdown.doc"""
     isone(a::AbstractAlgebra.FracElem)
 > Return `true` if the supplied element $a$ is one in the fraction field it
 > belongs to, otherwise return `false`.
 """
-isone(a::AbstractAlgebra.FracElem) = AbstractAlgebra.numerator(a, false) == AbstractAlgebra.denominator(a, false)
+isone(a::AbstractAlgebra.FracElem) = numerator(a, false) == denominator(a, false)
 
 @doc Markdown.doc"""
     isunit(a::AbstractAlgebra.FracElem)
 > Return `true` if the supplied element $a$ is invertible in the fraction field
-> it belongs to, i.e. the AbstractAlgebra.numerator is nonzero, otherwise return `false`.
+> it belongs to, i.e. the numerator is nonzero, otherwise return `false`.
 """
-isunit(a::AbstractAlgebra.FracElem) = !iszero(AbstractAlgebra.numerator(a, false))
+isunit(a::AbstractAlgebra.FracElem) = !iszero(numerator(a, false))
 
 function deepcopy_internal(a::Frac{T}, dict::IdDict) where {T <: RingElem}
-   v = Frac{T}(deepcopy(AbstractAlgebra.numerator(a, false)), deepcopy(AbstractAlgebra.denominator(a, false)))
+   v = Frac{T}(deepcopy(numerator(a, false)), deepcopy(denominator(a, false)))
    v.parent = parent(a)
    return v
 end
@@ -174,8 +174,8 @@ canonical_unit(a::AbstractAlgebra.FracElem) = a
 
 function show(io::IO, x::AbstractAlgebra.FracElem)
    # Canonicalise for display
-   n = AbstractAlgebra.numerator(x, true)
-   d = AbstractAlgebra.denominator(x, true)
+   n = numerator(x, true)
+   d = denominator(x, true)
    if !isone(d) && needs_parentheses(n)
       print(io, "(")
    end
@@ -196,11 +196,11 @@ function show(io::IO, a::AbstractAlgebra.FracField)
 end
 
 # Parentheses are only needed for fractions if we didn't print them already
-needs_parentheses(x::AbstractAlgebra.FracElem) = isone(AbstractAlgebra.denominator(x, true)) &&
-                                     needs_parentheses(AbstractAlgebra.numerator(x, true))
+needs_parentheses(x::AbstractAlgebra.FracElem) = isone(denominator(x, true)) &&
+                                     needs_parentheses(numerator(x, true))
 
 function displayed_with_minus_in_front(x::AbstractAlgebra.FracElem)
-   n = AbstractAlgebra.numerator(x, true)
+   n = numerator(x, true)
    return !needs_parentheses(n) && displayed_with_minus_in_front(n)
 end
 
@@ -219,7 +219,7 @@ end
 > Return $-a$.
 """
 function -(a::AbstractAlgebra.FracElem)
-   return parent(a)(-AbstractAlgebra.numerator(a, false), deepcopy(AbstractAlgebra.denominator(a, false)))
+   return parent(a)(-numerator(a, false), deepcopy(denominator(a, false)))
 end
 
 ###############################################################################
@@ -234,10 +234,10 @@ end
 """
 function +(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
-   d1 = AbstractAlgebra.denominator(a, false)
-   d2 = AbstractAlgebra.denominator(b, false)
-   n1 = AbstractAlgebra.numerator(a, false)
-   n2 = AbstractAlgebra.numerator(b, false)
+   d1 = denominator(a, false)
+   d2 = denominator(b, false)
+   n1 = numerator(a, false)
+   n2 = numerator(b, false)
    if d1 == d2
       rnum = n1 + n2
       if isone(d1)
@@ -285,10 +285,10 @@ end
 """
 function -(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
-   d1 = AbstractAlgebra.denominator(a, false)
-   d2 = AbstractAlgebra.denominator(b, false)
-   n1 = AbstractAlgebra.numerator(a, false)
-   n2 = AbstractAlgebra.numerator(b, false)
+   d1 = denominator(a, false)
+   d2 = denominator(b, false)
+   n1 = numerator(a, false)
+   n2 = numerator(b, false)
    if d1 == d2
       rnum = n1 - n2
       if isone(d1)
@@ -336,10 +336,10 @@ end
 """
 function *(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
-   n1 = AbstractAlgebra.numerator(a, false)
-   d2 = AbstractAlgebra.denominator(b, false)
-   n2 = AbstractAlgebra.numerator(b, false)
-   d1 = AbstractAlgebra.denominator(a, false)
+   n1 = numerator(a, false)
+   d2 = denominator(b, false)
+   n2 = numerator(b, false)
+   d1 = denominator(a, false)
    if d1 == d2
       n = n1*n2
       d = d1*d2
@@ -390,9 +390,9 @@ end
 """
 function *(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    c = base_ring(a)(b)
-   g = gcd(AbstractAlgebra.denominator(a, false), c)
-   n = AbstractAlgebra.numerator(a, false)*divexact(c, g)
-   d = divexact(AbstractAlgebra.denominator(a, false), g)
+   g = gcd(denominator(a, false), c)
+   n = numerator(a, false)*divexact(c, g)
+   d = divexact(denominator(a, false), g)
    return parent(a)(n, d)
 end
 
@@ -402,9 +402,9 @@ end
 """
 function *(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
    c = base_ring(b)(a)
-   g = gcd(AbstractAlgebra.denominator(b, false), c)
-   n = AbstractAlgebra.numerator(b, false)*divexact(c, g)
-   d = divexact(AbstractAlgebra.denominator(b, false), g)
+   g = gcd(denominator(b, false), c)
+   n = numerator(b, false)*divexact(c, g)
+   d = divexact(denominator(b, false), g)
    return parent(b)(n, d)
 end
 
@@ -413,9 +413,9 @@ end
 > Return $a\times b$.
 """
 function *(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
-   g = gcd(AbstractAlgebra.denominator(a, false), b)
-   n = AbstractAlgebra.numerator(a, false)*divexact(b, g)
-   d = divexact(AbstractAlgebra.denominator(a, false), g)
+   g = gcd(denominator(a, false), b)
+   n = numerator(a, false)*divexact(b, g)
+   d = divexact(denominator(a, false), g)
    return parent(a)(n, d)
 end
 
@@ -424,9 +424,9 @@ end
 > Return $a\times b$.
 """
 function *(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-   g = gcd(AbstractAlgebra.denominator(b, false), a)
-   n = AbstractAlgebra.numerator(b, false)*divexact(a, g)
-   d = divexact(AbstractAlgebra.denominator(b, false), g)
+   g = gcd(denominator(b, false), a)
+   n = numerator(b, false)*divexact(a, g)
+   d = divexact(denominator(b, false), g)
    return parent(b)(n, d)
 end
 
@@ -435,8 +435,8 @@ end
 > Return $a + b$.
 """
 function +(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
-   n = AbstractAlgebra.numerator(a, false) + AbstractAlgebra.denominator(a, false)*b
-   d = AbstractAlgebra.denominator(a, false)
+   n = numerator(a, false) + denominator(a, false)*b
+   d = denominator(a, false)
    return parent(a)(n, deepcopy(d))
 end
 
@@ -445,8 +445,8 @@ end
 > Return $a - b$.
 """
 function -(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
-   n = AbstractAlgebra.numerator(a, false) - AbstractAlgebra.denominator(a, false)*b
-   d = AbstractAlgebra.denominator(a, false)
+   n = numerator(a, false) - denominator(a, false)*b
+   d = denominator(a, false)
    return parent(a)(n, deepcopy(d))
 end
 
@@ -461,8 +461,8 @@ end
 > Return $a - b$.
 """
 function -(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
-   n = a*AbstractAlgebra.denominator(b, false) - AbstractAlgebra.numerator(b, false)
-   d = AbstractAlgebra.denominator(b, false)
+   n = a*denominator(b, false) - numerator(b, false)
+   d = denominator(b, false)
    return parent(b)(n, deepcopy(d))
 end
 
@@ -471,8 +471,8 @@ end
 > Return $a + b$.
 """
 function +(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
-   n = AbstractAlgebra.numerator(a, false) + AbstractAlgebra.denominator(a, false)*b
-   d = AbstractAlgebra.denominator(a, false)
+   n = numerator(a, false) + denominator(a, false)*b
+   d = denominator(a, false)
    return parent(a)(n, deepcopy(d))
 end
 
@@ -481,8 +481,8 @@ end
 > Return $a - b$.
 """
 function -(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
-   n = AbstractAlgebra.numerator(a, false) - AbstractAlgebra.denominator(a, false)*b
-   d = AbstractAlgebra.denominator(a, false)
+   n = numerator(a, false) - denominator(a, false)*b
+   d = denominator(a, false)
    return parent(a)(n, deepcopy(d))
 end
 
@@ -497,8 +497,8 @@ end
 > Return $a - b$.
 """
 function -(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-   n = a*AbstractAlgebra.denominator(b, false) - AbstractAlgebra.numerator(b, false)
-   d = AbstractAlgebra.denominator(b, false)
+   n = a*denominator(b, false) - numerator(b, false)
+   d = denominator(b, false)
    return parent(b)(n, deepcopy(d))
 end
 
@@ -518,18 +518,18 @@ function ==(x::AbstractAlgebra.FracElem{T}, y::AbstractAlgebra.FracElem{T}) wher
    b  = check_parent(x, y, false)
    !b && return false
 
-   return (AbstractAlgebra.denominator(x, false) == AbstractAlgebra.denominator(y, false) &&
-           AbstractAlgebra.numerator(x, false) == AbstractAlgebra.numerator(y, false)) ||
-          (AbstractAlgebra.denominator(x, true) == AbstractAlgebra.denominator(y, true) &&
-           AbstractAlgebra.numerator(x, true) == AbstractAlgebra.numerator(y, true)) ||
-          (AbstractAlgebra.numerator(x, false)*AbstractAlgebra.denominator(y, false) ==
-           AbstractAlgebra.denominator(x, false)*AbstractAlgebra.numerator(y, false))
+   return (denominator(x, false) == denominator(y, false) &&
+           numerator(x, false) == numerator(y, false)) ||
+          (denominator(x, true) == denominator(y, true) &&
+           numerator(x, true) == numerator(y, true)) ||
+          (numerator(x, false)*denominator(y, false) ==
+           denominator(x, false)*numerator(y, false))
 end
 
 @doc Markdown.doc"""
     isequal(x::AbstractAlgebra.FracElem{T}, y::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
 > Return `true` if $x == y$ exactly, otherwise return `false`. This function is
-> useful in cases where the AbstractAlgebra.numerators and AbstractAlgebra.denominators of the fractions are
+> useful in cases where the numerators and denominators of the fractions are
 > inexact, e.g. power series. Only if the power series are precisely the same,
 > to the same precision, are they declared equal by this function.
 """
@@ -537,8 +537,8 @@ function isequal(x::AbstractAlgebra.FracElem{T}, y::AbstractAlgebra.FracElem{T})
    if parent(x) != parent(y)
       return false
    end
-   return isequal(AbstractAlgebra.numerator(x, false)*AbstractAlgebra.denominator(y, false),
-                  AbstractAlgebra.denominator(x, false)*AbstractAlgebra.numerator(y, false))
+   return isequal(numerator(x, false)*denominator(y, false),
+                  denominator(x, false)*numerator(y, false))
 end
 
 ###############################################################################
@@ -552,9 +552,9 @@ end
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 function ==(x::AbstractAlgebra.FracElem, y::Union{Integer, Rational, AbstractFloat})
-   return (isone(AbstractAlgebra.denominator(x, false)) && AbstractAlgebra.numerator(x, false) == y) ||
-          (isone(AbstractAlgebra.denominator(x, true)) && AbstractAlgebra.numerator(x, true) == y) ||
-          (AbstractAlgebra.numerator(x, false) == AbstractAlgebra.denominator(x, false)*y)
+   return (isone(denominator(x, false)) && numerator(x, false) == y) ||
+          (isone(denominator(x, true)) && numerator(x, true) == y) ||
+          (numerator(x, false) == denominator(x, false)*y)
 end
 
 @doc Markdown.doc"""
@@ -568,9 +568,9 @@ end
 > Return `true` if $x == y$ arithmetically, otherwise return `false`.
 """
 function ==(x::AbstractAlgebra.FracElem{T}, y::T) where {T <: RingElem}
-   return (isone(AbstractAlgebra.denominator(x, false)) && AbstractAlgebra.numerator(x, false) == y) ||
-          (isone(AbstractAlgebra.denominator(x, true)) && AbstractAlgebra.numerator(x, true) == y) ||
-          (AbstractAlgebra.numerator(x, false) == AbstractAlgebra.denominator(x, false)*y)
+   return (isone(denominator(x, false)) && numerator(x, false) == y) ||
+          (isone(denominator(x, true)) && numerator(x, true) == y) ||
+          (numerator(x, false) == denominator(x, false)*y)
 end
 
 @doc Markdown.doc"""
@@ -590,9 +590,9 @@ end
 > Return the inverse of the fraction $a$.
 """
 function inv(a::AbstractAlgebra.FracElem)
-   iszero(AbstractAlgebra.numerator(a, false)) && throw(DivideError())
-   return parent(a)(deepcopy(AbstractAlgebra.denominator(a, false)),
-                    deepcopy(AbstractAlgebra.numerator(a, false)))
+   iszero(numerator(a, false)) && throw(DivideError())
+   return parent(a)(deepcopy(denominator(a, false)),
+                    deepcopy(numerator(a, false)))
 end
 
 ###############################################################################
@@ -607,10 +607,10 @@ end
 """
 function divexact(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
-   n1 = AbstractAlgebra.numerator(a, false)
-   d2 = AbstractAlgebra.denominator(b, false)
-   n2 = AbstractAlgebra.numerator(b, false)
-   d1 = AbstractAlgebra.denominator(a, false)
+   n1 = numerator(a, false)
+   d2 = denominator(b, false)
+   n2 = numerator(b, false)
+   d1 = denominator(a, false)
    if d1 == n2
       n = n1*d2
       d = d1*n2
@@ -662,9 +662,9 @@ end
 function divexact(a::AbstractAlgebra.FracElem, b::Union{Integer, Rational, AbstractFloat})
    b == 0 && throw(DivideError())
    c = base_ring(a)(b)
-   g = gcd(AbstractAlgebra.numerator(a, false), c)
-   n = divexact(AbstractAlgebra.numerator(a, false), g)
-   d = AbstractAlgebra.denominator(a, false)*divexact(c, g)
+   g = gcd(numerator(a, false), c)
+   n = divexact(numerator(a, false), g)
+   d = denominator(a, false)*divexact(c, g)
    return parent(a)(n, d)
 end
 
@@ -675,9 +675,9 @@ end
 function divexact(a::Union{Integer, Rational, AbstractFloat}, b::AbstractAlgebra.FracElem)
    iszero(b) && throw(DivideError())
    c = base_ring(b)(a)
-   g = gcd(AbstractAlgebra.numerator(b, false), c)
-   n = AbstractAlgebra.denominator(b, false)*divexact(c, g)
-   d = divexact(AbstractAlgebra.numerator(b, false), g)
+   g = gcd(numerator(b, false), c)
+   n = denominator(b, false)*divexact(c, g)
+   d = divexact(numerator(b, false), g)
    return parent(b)(n, d)
 end
 
@@ -687,9 +687,9 @@ end
 """
 function divexact(a::AbstractAlgebra.FracElem{T}, b::T) where {T <: RingElem}
    iszero(b) && throw(DivideError())
-   g = gcd(AbstractAlgebra.numerator(a, false), b)
-   n = divexact(AbstractAlgebra.numerator(a, false), g)
-   d = AbstractAlgebra.denominator(a, false)*divexact(b, g)
+   g = gcd(numerator(a, false), b)
+   n = divexact(numerator(a, false), g)
+   d = denominator(a, false)*divexact(b, g)
    return parent(a)(n, d)
 end
 
@@ -699,9 +699,9 @@ end
 """
 function divexact(a::T, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    iszero(b) && throw(DivideError())
-   g = gcd(AbstractAlgebra.numerator(b, false), a)
-   n = AbstractAlgebra.denominator(b, false)*divexact(a, g)
-   d = divexact(AbstractAlgebra.numerator(b, false), g)
+   g = gcd(numerator(b, false), a)
+   n = denominator(b, false)*divexact(a, g)
+   d = divexact(numerator(b, false), g)
    return parent(b)(n, d)
 end
 
@@ -730,7 +730,7 @@ function ^(a::AbstractAlgebra.FracElem{T}, b::Int) where {T <: RingElem}
       a = inv(a)
       b = -b
    end
-   return parent(a)(AbstractAlgebra.numerator(a)^b, AbstractAlgebra.denominator(a)^b)
+   return parent(a)(numerator(a)^b, denominator(a)^b)
 end
 
 ###############################################################################
@@ -748,9 +748,9 @@ end
 """
 function gcd(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
    check_parent(a, b)
-   gbd = gcd(AbstractAlgebra.denominator(a, false), AbstractAlgebra.denominator(b, false))
-   n = gcd(AbstractAlgebra.numerator(a, false), AbstractAlgebra.numerator(b, false))
-   d = divexact(AbstractAlgebra.denominator(a, false), gbd)*AbstractAlgebra.denominator(b, false)
+   gbd = gcd(denominator(a, false), denominator(b, false))
+   n = gcd(numerator(a, false), numerator(b, false))
+   d = divexact(denominator(a, false), gbd)*denominator(b, false)
    n = divexact(n, canonical_unit(n))
    d = divexact(d, canonical_unit(d))
    return parent(a)(n, d)
@@ -769,8 +769,8 @@ end
 """
 function remove(z::AbstractAlgebra.FracElem{T}, p::T) where {T <: RingElem}
    iszero(z) && error("Not yet implemented")
-   v, d = remove(AbstractAlgebra.denominator(z, false), p)
-   w, n = remove(AbstractAlgebra.numerator(z, false), p)
+   v, d = remove(denominator(z, false), p)
+   w, n = remove(numerator(z, false), p)
    return w-v, parent(z)(deepcopy(n), deepcopy(d))
 end
 
@@ -798,10 +798,10 @@ function zero!(c::AbstractAlgebra.FracElem)
 end
 
 function mul!(c::AbstractAlgebra.FracElem{T}, a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-   n1 = AbstractAlgebra.numerator(a, false)
-   d2 = AbstractAlgebra.denominator(b, false)
-   n2 = AbstractAlgebra.numerator(b, false)
-   d1 = AbstractAlgebra.denominator(a, false)
+   n1 = numerator(a, false)
+   d2 = denominator(b, false)
+   n2 = numerator(b, false)
+   d1 = denominator(a, false)
    if d1 == d2
       c.num = n1*n2
       c.den = d1*d2
@@ -841,10 +841,10 @@ function mul!(c::AbstractAlgebra.FracElem{T}, a::AbstractAlgebra.FracElem{T}, b:
 end
 
 function addeq!(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-   d1 = AbstractAlgebra.denominator(a, false)
-   d2 = AbstractAlgebra.denominator(b, false)
-   n1 = AbstractAlgebra.numerator(a, false)
-   n2 = AbstractAlgebra.numerator(b, false)
+   d1 = denominator(a, false)
+   d2 = denominator(b, false)
+   n1 = numerator(a, false)
+   n2 = numerator(b, false)
    gd = gcd(d1, d2)
    if d1 == d2
       a.num = addeq!(a.num, b.num)
@@ -893,10 +893,10 @@ function addeq!(a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) 
 end
 
 function add!(c::AbstractAlgebra.FracElem{T}, a::AbstractAlgebra.FracElem{T}, b::AbstractAlgebra.FracElem{T}) where {T <: RingElem}
-   d1 = AbstractAlgebra.denominator(a, false)
-   d2 = AbstractAlgebra.denominator(b, false)
-   n1 = AbstractAlgebra.numerator(a, false)
-   n2 = AbstractAlgebra.numerator(b, false)
+   d1 = denominator(a, false)
+   d2 = denominator(b, false)
+   n1 = numerator(a, false)
+   n2 = numerator(b, false)
    gd = gcd(d1, d2)
    if d1 == d2
       c.num = n1 + n2

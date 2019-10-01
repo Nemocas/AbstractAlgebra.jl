@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export O, valuation, exp, precision, max_precision, set_prec!
+export O, valuation, precision, max_precision, set_prec!
 
 ###############################################################################
 #
@@ -754,7 +754,7 @@ function Base.sqrt(a::AbstractAlgebra.AbsSeriesElem)
       asqrt = setcoeff!(asqrt, n - 1, R())
    end
    if prec > aval2
-      g = AbstractAlgebra.sqrt(coeff(a, aval))
+      g = sqrt(coeff(a, aval))
       setcoeff!(asqrt, aval2, g)
       g2 = g + g
    end
@@ -799,7 +799,7 @@ function Base.exp(a::AbstractAlgebra.AbsSeriesElem)
    z = parent(a)()
    fit!(z, precision(a))
    set_prec!(z, precision(a))
-   z = setcoeff!(z, 0, AbstractAlgebra.exp(coeff(a, 0)))
+   z = setcoeff!(z, 0, exp(coeff(a, 0)))
    len = length(a)
    for k = 1 : precision(a) - 1
       s = zero(base_ring(a))

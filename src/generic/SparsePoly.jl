@@ -506,7 +506,7 @@ function divrem(a::SparsePoly{T}, b::SparsePoly{T}) where {T <: RingElement}
             Re[l] = maxn - exp
             k -= 1
          else
-            tq, tr = AbstractAlgebra.divrem(qc, mb)
+            tq, tr = divrem(qc, mb)
             if tr != 0
                l += 1
                if l >= r_alloc

@@ -1162,7 +1162,7 @@ end
 > Return a tuple $(q, r)$ such that $f = qg + r$ where $q$ is the euclidean
 > quotient of $f$ by $g$.
 """
-function divrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
+function Base.divrem(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
    check_parent(f, g)
    if length(g) == 0
       throw(DivideError())
@@ -1196,7 +1196,7 @@ end
     div(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
 > Return the euclidean quotient of $f$ by $g$.
 """
-function div(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
+function Base.div(f::AbstractAlgebra.PolyElem{T}, g::AbstractAlgebra.PolyElem{T}) where {T <: Union{AbstractAlgebra.ResElem, FieldElement}}
    q, r = divrem(f, g)
    return q
 end

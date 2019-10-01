@@ -98,6 +98,10 @@ function divrem(a::Rational{T}, b::Rational{T}) where T <: Integer
    return a//b, zero(Rational{T})
 end
 
+function div(a::Rational{T}, b::Rational{T}) where T <: Integer
+   return a//b
+end
+
 ###############################################################################
 #
 #   Exact division
@@ -141,6 +145,19 @@ function gcd(p::Rational{T}, q::Rational{T}) where T <: Integer
    end
 end
 
+function gcdx(p::Rational{T}, q::Rational{T}) where {T <: Integer}
+   g = gcd(p, q)
+   if !iszero(p)
+      return (g, g//p, zero(q))
+   elseif !iszero(q)
+      return (g, zero(p), g//q)
+   else
+      @assert iszero(g)
+      return (g, zero(p), zero(p))
+   end
+end
+
+
 ###############################################################################
 #
 #   Square root
@@ -153,7 +170,7 @@ end
 > throw an error.
 """
 function sqrt(a::Rational{T}) where T <: Integer
-   return AbstractAlgebra.sqrt(numerator(a))//AbstractAlgebra.sqrt(denominator(a))
+   return sqrt(numerator(a))//sqrt(denominator(a))
 end
 
 ###############################################################################

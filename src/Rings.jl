@@ -184,7 +184,7 @@ isdomain_type(R::Type{T}) where T <: RingElem = false
 #
 ###############################################################################
 
-function exp(a::T) where {T <: RingElem}
+function Base.exp(a::RingElem)
    a != 0 && error("Exponential of nonzero element")
    return one(parent(a))
 end

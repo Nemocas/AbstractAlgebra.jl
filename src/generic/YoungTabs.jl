@@ -106,7 +106,7 @@ end
 function _numpart(n::T, lookuptable::Dict{Int, T}) where T<:Integer
    s = zero(T)
    if !haskey(lookuptable, n)
-      for j in 1:floor(T, (1 + sqrt(1 + 24n))/6)
+      for j in 1:floor(T, (1 + Base.sqrt(1 + 24n))/6)
          p1 = _numpart(n - div(j*(3j - 1), 2))
          p2 = _numpart(n - div(j*(3j + 1), 2))
          s += (-1)^(j - 1)*(p1 + p2)
