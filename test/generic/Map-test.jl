@@ -10,8 +10,8 @@ a(f::Map(MyMap)) = Generic.get_field(f, :a)
 (f::MyMap)(x) =  a(f)*(x + 1)
 
 @testset "Generic.Map.FunctionalMap..." begin
-   f = map_from_func(ZZ, ZZ, x -> x + 1)
-   g = map_from_func(ZZ, QQ, x -> QQ(x))
+   f = map_from_func(x -> x + 1, ZZ, ZZ)
+   g = map_from_func(x -> QQ(x), ZZ, QQ)
 
    @test isa(f, Map(FunctionalMap))
    @test isa(g, Map(FunctionalMap))
@@ -26,8 +26,8 @@ a(f::Map(MyMap)) = Generic.get_field(f, :a)
 end
 
 @testset "Generic.Map.FunctionalCompositeMap..." begin
-   f = map_from_func(ZZ, ZZ, x -> x + 1)
-   g = map_from_func(ZZ, QQ, x -> QQ(x))
+   f = map_from_func(x -> x + 1, ZZ, ZZ)
+   g = map_from_func(x -> QQ(x), ZZ, QQ)
 
    h = compose(f, g)
 
@@ -50,7 +50,7 @@ end
 end
 
 @testset "Generic.Map.CompositeMap..." begin
-   f = map_from_func(ZZ, ZZ, x -> x + 1)
+   f = map_from_func(x -> x + 1, ZZ, ZZ)
 
    s = MyMap(2)
 
@@ -70,7 +70,7 @@ end
 end
 
 @testset "Generic.Map.IdentityMap..." begin
-   f = map_from_func(ZZ, QQ, x -> QQ(x + 1))
+   f = map_from_func(x -> QQ(x + 1), ZZ, QQ)
    g = identity_map(ZZ)
    h = identity_map(QQ)
 

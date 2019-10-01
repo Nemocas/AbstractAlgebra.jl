@@ -107,7 +107,7 @@ function (f::FunctionalMap{D, C})(a) where {D, C}
    return image_fn(f)(a)::elem_type(C)
 end
 
-function map_from_func(domain, codomain, image_fn::Function)
+function map_from_func(image_fn::Function, domain, codomain)
    return FunctionalMap(domain, codomain, image_fn)
 end
 

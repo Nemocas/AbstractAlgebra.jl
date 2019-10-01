@@ -2530,14 +2530,18 @@ end
 
 @testset "Generic.Poly.change_base_ring..." begin
    Zx, x = PolynomialRing(ZZ,'x')
-   @test 1 == change_base_ring(x^0, sqrt)
+   @test 1 == map_coeffs(sqrt, x^0)
    p = Zx([i for i in 1:10])
    q = Zx([i for i in 10:-1:1])
    pq = p * q
    for R in [QQ,GF(2),GF(13),ZZ]
-      pR = change_base_ring(p, R)
-      qR = change_base_ring(q, R)
-      pqR = change_base_ring(pq, R)
+      pR = change_base_ring(R, p)
+      qR = change_base_ring(R, q, parent = parent(pR))
+      @test parent(qR) === parent(pR)
+      pqR = change_base_ring(R, pq, parent = parent(pR))
       @test pR * qR == pqR
    end
+
+   ps = map_coeffs(z -> z^2, p)
+   @test ps == Zx([i^2 for i in 1:10])
 end

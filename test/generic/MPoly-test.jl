@@ -845,15 +845,16 @@ end
 
    S, t = PolynomialRing(R, "t")
    T, (x1, y1, z1) = PolynomialRing(QQ, ["x", "y", "z"])
+   f1 = x1^2*y1^2 + 2x1*z1 + 3y1*z1 + z1 + 1
 
    @test evaluate(f, [2, 3], [t + 1, t - 1]) ==
                  (x^2 + 3)*t^2 + (2*x^2 + 2*x + 1)*t + (x^2 - 2*x - 3)
    @test evaluate(f, [y, z], [t + 1, t - 1]) ==
                  (x^2 + 3)*t^2 + (2*x^2 + 2*x + 1)*t + (x^2 - 2*x - 3)
 
-   @test evaluate(f, [2, 4, 6], QQ) == 167//1
-   @test evaluate(f, [1, 3], [2, 4], QQ) == 4*y1^2 + 12*y1 + 21
-   @test evaluate(f, [x, z], [2, 4], QQ) == 4*y1^2 + 12*y1 + 21
+   @test evaluate(f1, [2, 4, 6], QQ) == 167//1
+   @test evaluate(f1, [1, 3], [2, 4]) == 4*y1^2 + 12*y1 + 21
+   @test evaluate(f1, [x1, z1], [2, 4]) == 4*y1^2 + 12*y1 + 21
 
    S = MatrixAlgebra(ZZ, 2)
 
@@ -940,7 +941,7 @@ end
    R, varsR = PolynomialRing(F2, ["x"])
    S, varsS = PolynomialRing(R, ["y"])
    f = x -> x^2
-   map(f, varsR[1] * varsS[1]) == f(varsR[1]) * varsS[1]
+   map_coeffs(f, varsR[1] * varsS[1]) == f(varsR[1]) * varsS[1]
 
    for num_vars=1:10
       var_names = ["x$j" for j in 1:num_vars]
@@ -959,11 +960,11 @@ end
          @test evaluate(change_base_ring(R, f), vars) == f
          @test ordering(parent(change_base_ring(R, f))) == ordering(parent(f))
 
-         g = change_base_ring(F2, f, F2x)
+         g = change_base_ring(F2, f, parent = F2x)
          @test base_ring(g) === F2
          @test parent(g) === F2x
 
-         g = map(z -> z + 1, f, R)
+         g = map_coeffs(z -> z + 1, f, parent = R)
          @test parent(g) === R
       end
    end
@@ -978,7 +979,7 @@ end
 
       for iter in 1:10
          f = rand(R, 5:10, 1:10, -100:100)
-         @test length(vars(R(evaluate(map(R, f), [one(R) for i=1:num_vars])))) == 0
+         @test length(vars(R(evaluate(f, [one(R) for i=1:num_vars])))) == 0
       end
    end
 end

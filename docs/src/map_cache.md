@@ -45,7 +45,7 @@ Caches can also be turned on and off at run time (see below).
 **Examples**
 
 ```jldoctest
-julia> f = map_from_func(ZZ, ZZ, x -> x + 1)
+julia> f = map_from_func(x -> x + 1, ZZ, ZZ)
 Map with the following data
 
 Domain:
@@ -86,7 +86,7 @@ value. Setting the value to 0 will effectively disable further caching for this 
 **Examples**
 
 ```jldoctest
-julia> f = cached(map_from_func(ZZ, ZZ, x -> x + 1))
+julia> f = cached(map_from_func(x -> x + 1, ZZ, ZZ))
 
 julia> a = f(ZZ(1))
 2

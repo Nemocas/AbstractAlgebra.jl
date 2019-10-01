@@ -21,7 +21,7 @@ export MatrixSpace, fflu!, fflu, solve_triu, isrref, charpoly_danilevsky!,
        kronecker_product, minors, tr, lu, lu!, pseudo_inv, dense_matrix_type,
        kernel, iszero_row, iszero_column, left_kernel, right_kernel, ishnf,
        solve_left, add_column, add_column!, add_row, add_row!, multiply_column,
-       multiply_column!, multiply_row, multiply_row!
+       multiply_column!, multiply_row, multiply_row!, map_entries, map_entries!
 
 ###############################################################################
 #
@@ -5156,12 +5156,13 @@ end
 
 ###############################################################################
 #
-#   change_base_ring, Base.map! and Base.map
+#   change_base_ring, map_entries, map_entries!, Base.map! and Base.map
 #
 ###############################################################################
 
 @doc Markdown.doc"""
-    change_base_ring(R::Ring, M::Generic.MatrixElem)
+    change_base_ring(R::Ring, M::MatrixElem)
+
 > Return the matrix obtained by coercing each entry into `R`.
 """
 function change_base_ring(R::Ring, M::MatrixElem)
@@ -5173,23 +5174,25 @@ function change_base_ring(R::Ring, M::MatrixElem)
 end
 
 @doc Markdown.doc"""
-    map!(f, dst::Generic.MatrixElem, src::Generic.MatrixElem)
+    map_entries!(f, dst::MatrixElem, src::MatrixElem)
 
 > Like `map`, but stores the result in `dst` rather than a new matrix.
 """
-function Base.map!(f, dst::MatrixElem, src::MatrixElem)
+function map_entries!(f, dst::MatrixElem, src::MatrixElem)
    for i = 1:nrows(src), j = 1:ncols(src)
       dst[i, j] = f(src[i, j])
    end
    dst
 end
 
+Base.map!(f, dst::MatrixElem, src::MatrixElem) = map_entries!(f, dst, src)
+
 @doc Markdown.doc"""
-    map(f, a::Generic.MatrixElem)
+    map_entries(f, a::MatrixElem)
 
 > Transform matrix `a` by applying `f` on each element.
 """
-function Base.map(f, a::MatrixElem)
+function map_entries(f, a::MatrixElem)
    isempty(a) && return similar(a, parent(f(zero(base_ring(a)))))
    b11 = f(a[1, 1])
    b = similar(a, parent(b11))
@@ -5200,3 +5203,5 @@ function Base.map(f, a::MatrixElem)
    end
    b
 end
+
+Base.map(f, a::MatrixElem) = map_entries(f, a)

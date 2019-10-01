@@ -199,10 +199,9 @@ using the following function, where $g$ is a function representing the
 structure homomorphism of the $T$-algebra $S$.
 
 ```@docs
-change_base_ring(p::AbstractAlgebra.MPolyElem{T}, g) where {T <: RingElement}
+change_base_ring(::Ring, p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
+map_coeffs(::Any, p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
 ```
-
-Note that $g$ can also be a Nemo parent, e.g. `QQ`.
 
 **Examples**
 
@@ -213,18 +212,13 @@ julia> R, (x, y) = PolynomialRing(ZZ, ["x", "y"])
 julia> fz = x^2*y^2 + x + 1
 x^2*y^2+x+1
 
-julia> fq = change_base_ring(fz, QQ)
+julia> fq = change_base_ring(QQ, fz)
 x^2*y^2+x+1//1
 
 ```
 
 Incase a specific parent ring is constructed, it can also be passed to the function.
 
-```@docs
-change_base_ring(R::Ring, p::AbstractAlgebra.MPolyElem{T}, Rx::AbstractAlgebra.MPolyRing) where {T <: RingElement}
-change_base_ring(R::Ring, p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
-map(g, p::AbstractAlgebra.MPolyElem{T}, Rx::AbstractAlgebra.MPolyRing) where {T <: RingElement}
-map(g, p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
 ```
 
 **Examples**

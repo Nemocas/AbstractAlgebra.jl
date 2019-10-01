@@ -28,21 +28,21 @@ section_map(f::MapWithSection) = f.section
 
 # These two functions are provided for convenience only. Strictly speaking
 # preimage is not the correct name for this type of construction.
-function map_with_preimage_from_func(domain, codomain, image_fn::Function, inverse_fn::Function)
+function map_with_preimage_from_func(image_fn::Function, inverse_fn::Function, domain, codomain)
    return MapWithSection(FunctionalMap(domain, codomain, image_fn),
                           FunctionalMap(codomain, domain, inverse_fn))
 end
 
-function map_with_preimage_from_func(domain, codomain, image_fn::Function)
+function map_with_preimage_from_func(image_fn::Function, domain, codomain)
    return MapWithSection(FunctionalMap(domain, codomain, image_fn))
 end
 
-function map_with_section_from_func(domain, codomain, image_fn::Function, inverse_fn::Function)
+function map_with_section_from_func(image_fn::Function, inverse_fn::Function, domain, codomain)
    return MapWithSection(FunctionalMap(domain, codomain, image_fn),
                           FunctionalMap(codomain, domain, inverse_fn))
 end
 
-function map_with_section_from_func(domain, codomain, image_fn::Function)
+function map_with_section_from_func(image_fn::Function, domain, codomain)
    return MapWithSection(FunctionalMap(domain, codomain, image_fn))
 end
 
@@ -92,12 +92,12 @@ retraction_map(f::MapCache) = retraction_map(f.map)
 
 (f::MapWithRetraction{D, C})(a) where {D, C} = (f.map)(a)::elem_type(C)
 
-function map_with_retraction_from_func(domain, codomain, image_fn::Function, inverse_fn::Function)
+function map_with_retraction_from_func(image_fn::Function, inverse_fn::Function, domain, codomain)
    return MapWithRetraction(FunctionalMap(domain, codomain, image_fn),
                           FunctionalMap(codomain, domain, inverse_fn))
 end
 
-function map_with_retraction_from_func(domain, codomain, image_fn::Function)
+function map_with_retraction_from_func(image_fn::Function, domain, codomain)
    return MapWithRetraction(FunctionalMap(domain, codomain, image_fn))
 end
 
