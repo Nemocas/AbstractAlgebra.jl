@@ -430,7 +430,8 @@ julia> h = shift_right(f, 2)
 ### Change of base ring
 
 ```@docs
-change_base_ring(::PolyElem{T}, ::Any) where T <: RingElement
+change_base_ring(::Ring, ::PolyElem{T}) where T <: RingElement
+map_coeffs(::Any, ::PolyElem{T}) where T <: RingElement
 ```
 
 **Examples**
@@ -438,7 +439,7 @@ change_base_ring(::PolyElem{T}, ::Any) where T <: RingElement
 ```julia
 R, x = PolynomialRing(ZZ, "x")
 g = x^3+6*x + 1
-change_base_ring(g, GF(2))
+change_base_ring(GF(2), g)
 ```
 
 ### Pseudodivision

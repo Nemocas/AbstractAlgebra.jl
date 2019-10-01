@@ -1,6 +1,6 @@
 @testset "Generic.MapWithInverse.constructors..." begin
-   f = map_from_func(ZZ, ZZ, x -> x + 1)
-   g = map_from_func(ZZ, ZZ, x -> x - 1)
+   f = map_from_func(x -> x + 1, ZZ, ZZ)
+   g = map_from_func(x -> x - 1, ZZ, ZZ)
 
    s = map_with_section(f, g)
 
@@ -28,20 +28,20 @@
 
    @test isa(t, Map(Generic.MapWithRetraction))
 
-   u = map_with_section_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
+   u = map_with_section_from_func(x -> x + 1, x -> x - 1, ZZ, ZZ)
 
    @test u(ZZ(1)) == 2
 
-   v = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
+   v = map_with_section_from_func(x -> x + 1, x -> x - 1, ZZ, ZZ)
 
    @test u(ZZ(1)) == 2
 end
 
 @testset "Generic.MapWithInverse.composition..." begin
-   f = map_from_func(ZZ, ZZ, x -> x + 1)
-   g = map_from_func(ZZ, ZZ, x -> x - 1)
-   h = map_from_func(ZZ, ZZ, x -> x + 2)
-   k = map_from_func(ZZ, ZZ, x -> x - 2)
+   f = map_from_func(x -> x + 1, ZZ, ZZ)
+   g = map_from_func(x -> x - 1, ZZ, ZZ)
+   h = map_from_func(x -> x + 2, ZZ, ZZ)
+   k = map_from_func(x -> x - 2, ZZ, ZZ)
 
    s = map_with_section(f, g)
    t = map_with_section(h, k)
@@ -59,10 +59,10 @@ end
 end
 
 @testset "Generic.MapWithInverse.inv..." begin
-   f = map_from_func(ZZ, ZZ, x -> x + 1)
-   g = map_from_func(ZZ, ZZ, x -> x - 1)
-   h = map_from_func(ZZ, ZZ, x -> x + 2)
-   k = map_from_func(ZZ, ZZ, x -> x - 2)
+   f = map_from_func(x -> x + 1, ZZ, ZZ)
+   g = map_from_func(x -> x - 1, ZZ, ZZ)
+   h = map_from_func(x -> x + 2, ZZ, ZZ)
+   k = map_from_func(x -> x - 2, ZZ, ZZ)
 
    s = map_with_section(f, g)
    t = map_with_section(h, k)
