@@ -350,22 +350,6 @@ evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{Int}, ::Vector{U}) where {T <:
 evaluate(::S, ::Vector{S}, ::Vector{U}) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
 ```
 
-The following functions allow a map or function to be applied to the
-coefficients of the polynomial before doing the evaluation. Note that one
-can simply supply a `Ring` object for the map (see the examples).
-
-```@docs
-evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{U}, ::Any) where {T <: RingElement, U <: RingElement}
-```
-
-```@docs
-evaluate(::AbstractAlgebra.MPolyElem{T}, ::Vector{Int}, ::Vector{U}, ::Any) where {T <: RingElement, U <: RingElement}
-```
-
-```@docs
-evaluate(::S, ::Vector{S}, ::Vector{U}, ::Any) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
-```
-
 The following function allows evaluation of a polynomial at values in a
 not necessarily commutative ring, e.g. elements of a matrix algebra.
 

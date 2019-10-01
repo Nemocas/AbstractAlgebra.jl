@@ -3499,38 +3499,6 @@ function evaluate(a::S, vars::Vector{S}, vals::Vector{U}) where {S <: AbstractAl
    return evaluate(a, varidx, vals)
 end
 
-@doc Markdown.doc"""
-    evaluate(a::AbstractAlgebra.MPolyElem{T}, A::Vector{U}, g) where {T <: RingElement, U <: RingElement}
-> Evaluate the polynomial at the supplied values after applying the `Map` or `Function`
-> given by $g$ to the coefficients of the polynomial.
-"""
-function evaluate(a::AbstractAlgebra.MPolyElem{T}, A::Vector{U}, g) where {T <: RingElement, U <: RingElement}
-   anew = map_coeffs(g, a)
-   return evaluate(anew, A)
-end
-
-@doc Markdown.doc"""
-    evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vector{U}, g) where {T <: RingElement, U <: RingElement}
-> Evaluate the polynomial at the supplied values for the variables with given indices
-> after applying the `Map` or `Function` given by $g$ to the coefficients of the
-> polynomial.
-"""
-function evaluate(a::AbstractAlgebra.MPolyElem{T}, vars::Vector{Int}, vals::Vector{U}, g) where {T <: RingElement, U <: RingElement}
-   anew = map_coeffs(g, a)
-   return evaluate(anew, vars, vals)
-end
-
-@doc Markdown.doc"""
-    evaluate(a::S, vars::Vector{S}, vals::Vector{U}, g) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
-> Evaluate the polynomial at the supplied values for the given variables after
-> applying the `Map` or `Function` given by $g$ to the coefficients of the polynomial.
-"""
-function evaluate(a::S, vars::Vector{S}, vals::Vector{U}, g) where {S <: AbstractAlgebra.MPolyElem{T}, U <: RingElement} where T <: RingElement
-   anew = map_coeffs(g, a)
-   varidx = [var_index(x) for x in vars]
-   return evaluate(anew, varidx, vals)
-end
-
 function (a::MPoly{T})(vals::T...) where T <: RingElement
    length(vals) != nvars(parent(a)) && error("Number of variables does not match number of values")
    return evaluate(a, [vals...])
