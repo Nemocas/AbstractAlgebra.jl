@@ -93,7 +93,7 @@ function reduce_mod_invariants(v::AbstractAlgebra.MatElem{T}, invars::Vector{T})
    v = deepcopy(v) # don't modify input
    for i = 1:length(invars)
       if !iszero(invars[i])
-         q, v[1, i] = AbstractAlgebra.divrem(v[1, i], invars[i])
+         q, v[1, i] = divrem(v[1, i], invars[i])
       end
    end
    return v

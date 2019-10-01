@@ -11,29 +11,30 @@ import LinearAlgebra: lu, lu!, tr
 
 using Markdown, Random, InteractiveUtils
 
-import Base: Array, abs, asin, asinh, atan, atanh, bin, checkbounds,
-             cmp, conj, convert, copy, cos, cosh, dec, deepcopy,
-             deepcopy_internal, div, divrem,
-             exp, exponent, gcd, gcdx, getindex, hash, hcat, hex, intersect, inv,
-             invmod, isapprox, isempty, isequal, isfinite, isless, isqrt, isreal, iszero,
-             lcm, ldexp, length, log, mod, ndigits,
-             oct, one, parent, parse, precision,
-             rand, Rational, rem, reverse,
-             setindex!, show, similar, sign, sin, sinh, size, string,
-             tan, tanh, trailing_zeros, transpose, truncate,
-             typed_hvcat, typed_hcat, vcat, xor, zero, zeros, +, -, *, ==, ^,
-             &, |, <<, >>, ~, <=, >=, <, >, //, /, !=
+import Base: Array, abs, asin, asinh, atan, atanh, bin, checkbounds, cmp, conj,
+             convert, copy, cos, cosh, dec, deepcopy, deepcopy_internal,
+             exponent, gcd, gcdx, getindex, hash, hcat, hex, intersect, inv,
+             invmod, isapprox, isempty, isequal, isfinite, isless, isqrt,
+             isreal, iszero, lcm, ldexp, length, log, mod, ndigits, oct, one,
+             parent, parse, precision, rand, Rational, rem, reverse, setindex!,
+             show, similar, sign, sin, sinh, size, string, tan, tanh,
+             trailing_zeros, transpose, truncate, typed_hvcat, typed_hcat,
+             vcat, xor, zero, zeros, +, -, *, ==, ^, &, |, <<, >>, ~, <=, >=,
+             <, >, //, /, !=
 
 if VERSION >= v"0.7.0-DEV.1144"
-import Base: isone
+  import Base: isone
 end
 
-import Base: floor, ceil, hypot, log, log1p, exp, expm1, sin, cos, sinpi,
-             cospi, tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh,
-             asinh, acosh, sinpi, cospi
+import Base: floor, ceil, hypot, log, log1p, expm1, sin, cos, sinpi, cospi,
+             tan, cot, sinh, cosh, tanh, coth, atan, asin, acos, atanh, asinh,
+             acosh, sinpi, cospi
 
-import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring, RingElem,
-       RingElement, Field, FieldElement, Map, promote_rule
+import ..AbstractAlgebra: Integers, Rationals, NCRing, NCRingElem, Ring,
+                          RingElem, RingElement, Field, FieldElement, Map,
+                          promote_rule
+
+import ..AbstractAlgebra: exp, sqrt, div, divrem, numerator, denominator
 
 using ..AbstractAlgebra
 

@@ -2679,7 +2679,7 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
          if !d1
             k -= 1
          else
-            tq, tr = AbstractAlgebra.divrem(qc, mb)
+            tq, tr = divrem(qc, mb)
             if tq != 0
                Qc[k] = tq
                monomial_set!(Qe, k, texp, 1, N)
@@ -2718,7 +2718,7 @@ function div_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: Rin
    return flag, parent(a)(Qc, Qe)
 end
 
-function div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+function Base.div(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    v1, d1 = max_fields(a)
    v2, d2 = max_fields(b)
    d = max(d1, d2)
@@ -2895,7 +2895,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
             monomial_set!(Re, l, exp_copy, 1, N)
             k -= 1
          else
-            tq, tr = AbstractAlgebra.divrem(qc, mb)
+            tq, tr = divrem(qc, mb)
             if tr != 0
                l += 1
                if l >= r_alloc
@@ -2942,7 +2942,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::MPoly{T}, bits::Int) where {T <: 
    return flag, parent(a)(Qc, Qe), parent(a)(Rc, Re)
 end
 
-function divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+function Base.divrem(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
    v1, d1 = max_fields(a)
    v2, d2 = max_fields(b)
    d = max(d1, d2)
@@ -3115,7 +3115,7 @@ function divrem_monagan_pearce(a::MPoly{T}, b::Array{MPoly{T}, 1}, bits::Int) wh
          for w = 1:len
             d1 = monomial_divides!(texp, 1, exp_copy, 1, b[w].exps, 1, mask, N)
             if d1
-               tq, qc = AbstractAlgebra.divrem(qc, mb[w])
+               tq, qc = divrem(qc, mb[w])
                div_flag = qc == 0
                if tq != 0
                   k[w] += 1
@@ -3175,7 +3175,7 @@ end
 > Return a tuple `(q, r)` consisting of an array of polynomials `q`, one for
 > each polynomial in `b`, and a polynomial `r` such that `a = sum_i b[i]*q[i] + r`.
 """
-function divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
+function Base.divrem(a::MPoly{T}, b::Array{MPoly{T}, 1}) where {T <: RingElement}
    v1, d = max_fields(a)
    len = length(b)
    N = parent(a).N

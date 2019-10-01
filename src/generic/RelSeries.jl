@@ -4,7 +4,7 @@
 #
 ###############################################################################
 
-export PowerSeriesRing, O, valuation, exp, precision, max_precision, set_prec!,
+export PowerSeriesRing, O, valuation, precision, max_precision, set_prec!,
        polcoeff, set_val!, pol_length, renormalize!
 
 ###############################################################################
@@ -980,7 +980,7 @@ function Base.sqrt(a::AbstractAlgebra.RelSeriesElem)
    set_prec!(asqrt, prec + aval2)
    set_val!(asqrt, aval2)
    if prec > 0
-      g = AbstractAlgebra.sqrt(polcoeff(a, 0))
+      g = sqrt(polcoeff(a, 0))
       asqrt = setcoeff!(asqrt, 0, g)
       g2 = g + g
    end
@@ -1016,7 +1016,7 @@ end
     exp(a::AbstractAlgebra.RelSeriesElem)
 > Return the exponential of the power series $a$.
 """
-function Base.exp(a::AbstractAlgebra.RelSeriesElem)
+function Base.exp(a::AbstractAlgebra.RelSeriesElem{T}) where {T <: RingElement}
    if iszero(a)
       z = one(parent(a))
       set_prec!(z, precision(a))
@@ -1030,7 +1030,7 @@ function Base.exp(a::AbstractAlgebra.RelSeriesElem)
    set_prec!(z, preca)
    set_val!(z, 0)
    c = vala == 0 ? polcoeff(a, 0) : R()
-   z = setcoeff!(z, 0, AbstractAlgebra.exp(c))
+   z = setcoeff!(z, 0, exp(c))
    len = pol_length(a) + vala
    for k = 1 : preca - 1
       s = R()

@@ -114,7 +114,7 @@ function reduce_mod_rels(v::AbstractAlgebra.MatElem{T}, vrels::Vector{<:Abstract
       while iszero(rel[1, i])
          i += 1
       end
-      q, v[1, start + i - 1] = AbstractAlgebra.divrem(v[1, start + i - 1], rel[1, i])
+      q, v[1, start + i - 1] = divrem(v[1, start + i - 1], rel[1, i])
       q = -q
       for j = i + 1:ncols(rel)
          t1 = mul!(t1, q, rel[1, j])
