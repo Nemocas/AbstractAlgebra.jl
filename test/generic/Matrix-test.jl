@@ -133,11 +133,14 @@ Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
    arr2 = [1, 2, 3, 4, 5, 6]
 
    for T in [R, Int, BigInt, Rational{Int}, Rational{BigInt}]
-      M = matrix(R, map(T, arr))
-      @test isa(M, Generic.MatSpaceElem{elem_type(R)})
-      @test M.base_ring == R
-      @test nrows(M) == 2
-      @test ncols(M) == 2
+      for M in (matrix(R, map(T, arr)),
+                matrix(R, 2, 2, map(T, arr)))
+         @test isa(M, Generic.MatSpaceElem{elem_type(R)})
+         @test M.base_ring == R
+         @test nrows(M) == 2
+         @test ncols(M) == 2
+      end
+      @test_throws ErrorConstrDimMismatch matrix(R, 2, 3, map(T, arr))
 
       M2 = matrix(R, 2, 3, map(T, arr2))
       @test isa(M2, Generic.MatSpaceElem{elem_type(R)})
