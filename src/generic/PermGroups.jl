@@ -799,14 +799,24 @@ end
 function parse_cycles(str::AbstractString)
    ccycles = Int[]
    cptrs = Int[1]
-   if occursin(r"\n|\s| ", str)
-      str = replace(str, r"\n|\s| " => "")
+   if startswith(str, "Cycle Decomposition: ")
+      str = str[22:end]
    end
+   if occursin(r"\d\s+\d", str)
+      throw(ArgumentError("could not parse string as cycles: $str"))
+   end
+   str = replace(str, r"\s+" => "")
+   str = replace(str, "()" => "")
    cycle_regex = r"\(\d+(,\d+)*\)?"
+   parsed_size = 0
    for cycle_str in (m.match for m = eachmatch(cycle_regex, str))
+      parsed_size += sizeof(cycle_str)
       cycle = [parse(Int, a) for a in split(cycle_str[2:end-1], ",")]
       append!(ccycles, cycle)
       push!(cptrs, cptrs[end]+length(cycle))
+   end
+   if parsed_size != sizeof(str)
+      throw(ArgumentError("could not parse string as cycles: $str"))
    end
    return ccycles, cptrs
 end
