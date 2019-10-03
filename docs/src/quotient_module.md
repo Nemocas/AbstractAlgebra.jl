@@ -90,6 +90,8 @@ following functionality.
 
 ```@docs
 supermodule(M::AbstractAlgebra.Generic.QuotientModule{T}) where T <: RingElement
+
+dim(N::AbstractAlgebra.Generic.Submodule{T}) where T <: FieldElement
 ```
 
 **Examples**
@@ -117,6 +119,11 @@ Codomain: Quotient module over Integers with 2 generators and relations:
 
 julia> supermodule(Q) == M
 true
+
+julia> dim(M)
+
+julia> dim(Q)
+1
 
 ```
 

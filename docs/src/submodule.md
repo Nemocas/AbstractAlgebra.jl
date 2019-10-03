@@ -93,6 +93,10 @@ issubmodule(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where 
 iscompatible(::AbstractAlgebra.FPModule{T}, ::AbstractAlgebra.FPModule{T}) where T <: RingElement
 ```
 
+```@docs
+dim(N::AbstractAlgebra.Generic.Submodule{T}) where T <: FieldElement
+```
+
 **Examples**
 
 ```jldoctest
@@ -127,6 +131,12 @@ julia> iscompatible(N1, N2)
 
 julia> issubmodule(N1, M)
 false
+
+julia> dim(M)
+2
+
+julia> dim(N1)
+1
 
 ```
 
