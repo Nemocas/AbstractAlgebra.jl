@@ -68,13 +68,14 @@ end
 
    @test supermodule(N) == M
 
-   R = QQ
-   M = VectorSpace(R, 2)
-   m = M([R(1), R(3)])
-   n = M([R(2), R(-1)])
-   N, f = sub(M, [m, n])
+   for iter in 1:20
+     M = rand_module(QQ, -10:10)
+     ngens = rand(1:5)
+     S = [rand(M, -10:10) for i in 1:ngens]
+     N, f = sub(M, S)
 
-   @test dim(N) == 2
+     @test dim(N) == rank(matrix(QQ, [s[ix] for s in S, ix in 1:dim(M)]))
+   end
 
    println("PASS")
 end
