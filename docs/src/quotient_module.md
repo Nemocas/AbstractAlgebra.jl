@@ -91,7 +91,7 @@ following functionality.
 ```@docs
 supermodule(M::AbstractAlgebra.Generic.QuotientModule{T}) where T <: RingElement
 
-dim(N::AbstractAlgebra.Generic.Submodule{T}) where T <: FieldElement
+dim(N::AbstractAlgebra.Generic.QuotientModule{T}) where T <: FieldElement
 ```
 
 **Examples**
@@ -121,6 +121,7 @@ julia> supermodule(Q) == M
 true
 
 julia> dim(M)
+2
 
 julia> dim(Q)
 1
