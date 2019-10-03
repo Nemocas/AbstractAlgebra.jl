@@ -5,12 +5,12 @@ using Markdown
 using InteractiveUtils
 
 # A list of all symbols external packages should not import from AbstractAlgebra
-import_exclude = [:import_exclude, :QQ, :ZZ, :RR,
-           :RealField, :NumberField,
-           :AbstractAlgebra,
-           :exp, :sqrt, :div, :divrem, :numerator, :denominator,
-           :promote_rule,
-           :Set, :Module, :Ring, :Group, :Field]
+import_exclude = [:import_exclude, :QQ, :ZZ,
+                  :RealField, :NumberField,
+                  :AbstractAlgebra,
+                  :exp, :sqrt, :div, :divrem, :numerator, :denominator,
+                  :promote_rule,
+                  :Set, :Module, :Ring, :Group, :Field]
 
 import LinearAlgebra: det, norm, nullspace, rank, transpose!, hessenberg
 
