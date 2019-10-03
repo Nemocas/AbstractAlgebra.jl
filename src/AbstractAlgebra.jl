@@ -604,17 +604,10 @@ export Generic
 #
 ###############################################################################
 
-getindex(R::Ring, s::String) = PolynomialRing(R, s)
+getindex(R::NCRing, s::Union{String, Char}) = PolynomialRing(R, s)
 
-getindex(R::Ring, s::Char) = PolynomialRing(R, s)
-
-getindex(R::NCRing, s::String) = PolynomialRing(R, s)
-
-getindex(R::NCRing, s::Char) = PolynomialRing(R, s)
-
-getindex(R::Tuple{Ring, T}, s::String) where {T} = PolynomialRing(R[1], s)
-
-getindex(R::Tuple{Ring, T}, s::Char) where {T} = PolynomialRing(R[1], s)
+# syntax x = R["x"]["y"]
+getindex(R::Tuple{Union{Ring, NCRing}, Union{PolyElem, NCPolyElem}}, s::Union{String, Char}) = PolynomialRing(R[1], s)
 
 ###############################################################################
 #

@@ -18,16 +18,19 @@
 
 @testset "Generic.Poly.constructors..." begin
    R, x = ZZ["x"]
-   S, y = R["y"]
+   S1 = R["y"]
+   S2 = ZZ["x"]["y"]
 
-   @test elem_type(S) == Generic.Poly{elem_type(R)}
-   @test elem_type(Generic.PolyRing{elem_type(R)}) == Generic.Poly{elem_type(R)}
-   @test parent_type(Generic.Poly{elem_type(R)}) == Generic.PolyRing{elem_type(R)}
+   for (S, y) in (S1, S2)
+      @test elem_type(S) == Generic.Poly{elem_type(R)}
+      @test elem_type(Generic.PolyRing{elem_type(R)}) == Generic.Poly{elem_type(R)}
+      @test parent_type(Generic.Poly{elem_type(R)}) == Generic.PolyRing{elem_type(R)}
 
-   @test typeof(R) <: AbstractAlgebra.Ring
-   @test typeof(S) <: Generic.PolyRing
+      @test typeof(R) <: AbstractAlgebra.Ring
+      @test typeof(S) <: Generic.PolyRing
 
-   @test isa(y, PolyElem)
+      @test isa(y, PolyElem)
+   end
 
    R, x = PolynomialRing(ZZ, "x")
    S, y = PolynomialRing(R, "y")
