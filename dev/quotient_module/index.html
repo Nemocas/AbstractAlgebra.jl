@@ -46,7 +46,7 @@ Domain: Vector space of dimension 2 over Rationals
 Codomain: Quotient space over:
 Rationals with 1 generator and no relations
 )
-</code></pre><h2><a class="nav-anchor" id="Functionality-for-submodules-1" href="#Functionality-for-submodules-1">Functionality for submodules</a></h2><p>In addition to the Module interface, AbstractAlgebra submodules implement the following functionality.</p><h3><a class="nav-anchor" id="Basic-manipulation-1" href="#Basic-manipulation-1">Basic manipulation</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.supermodule-Union{Tuple{QuotientModule{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.supermodule-Union{Tuple{QuotientModule{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.supermodule</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">supermodule(M::QuotientModule{T}) where T &lt;: RingElement</code></pre><blockquote><p>Return the module that this module is a quotient of.</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = FreeModule(ZZ, 2)
+</code></pre><h2><a class="nav-anchor" id="Functionality-for-submodules-1" href="#Functionality-for-submodules-1">Functionality for submodules</a></h2><p>In addition to the Module interface, AbstractAlgebra submodules implement the following functionality.</p><h3><a class="nav-anchor" id="Basic-manipulation-1" href="#Basic-manipulation-1">Basic manipulation</a></h3><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.supermodule-Union{Tuple{QuotientModule{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}" href="#AbstractAlgebra.Generic.supermodule-Union{Tuple{QuotientModule{T}}, Tuple{T}} where T&lt;:Union{RingElem, AbstractFloat, Integer, Rational}"><code>AbstractAlgebra.Generic.supermodule</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">supermodule(M::QuotientModule{T}) where T &lt;: RingElement</code></pre><blockquote><p>Return the module that this module is a quotient of.</p></blockquote></div></section><section class="docstring"><div class="docstring-header"><a class="docstring-binding" id="AbstractAlgebra.Generic.dim-Union{Tuple{QuotientModule{T}}, Tuple{T}} where T&lt;:Union{FieldElem, AbstractFloat, Rational}" href="#AbstractAlgebra.Generic.dim-Union{Tuple{QuotientModule{T}}, Tuple{T}} where T&lt;:Union{FieldElem, AbstractFloat, Rational}"><code>AbstractAlgebra.Generic.dim</code></a> — <span class="docstring-category">Method</span>.</div><div><pre><code class="language-julia">dim(N::AbstractAlgebra.Generic.QuotientModule{T}) where T &lt;: FieldElement</code></pre><blockquote><p>Return the dimension of the given vector quotient space.</p></blockquote></div></section><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = FreeModule(ZZ, 2)
 Free module of rank 2 over Integers
 
 julia&gt; m = M([ZZ(2), ZZ(3)])
@@ -68,4 +68,32 @@ Codomain: Quotient module over Integers with 2 generators and relations:
 
 julia&gt; supermodule(Q) == M
 true
+
+julia&gt; V = VectorSpace(QQ, 2)
+Vector space of dimension 2 over Rationals
+
+julia&gt; m = V([QQ(1), QQ(2)])
+(1//1, 2//1)
+
+julia&gt; N, f = sub(V, [m])
+(Subspace over Rationals with 1 generator and no relations
+, Module homomorphism with
+Domain: Subspace over Rationals with 1 generator and no relations
+
+Codomain: Vector space of dimension 2 over Rationals)
+
+julia&gt; Q, g = quo(V, N)
+(Quotient space over:
+Rationals with 1 generator and no relations
+, Module homomorphism with
+Domain: Vector space of dimension 2 over Rationals
+Codomain: Quotient space over:
+Rationals with 1 generator and no relations
+)
+
+julia&gt; dim(V)
+2
+
+julia&gt; dim(Q)
+1
 </code></pre><footer><hr/><a class="previous" href="../submodule/"><span class="direction">Previous</span><span class="title">Submodules</span></a><a class="next" href="../direct_sum/"><span class="direction">Next</span><span class="title">Direct Sums</span></a></footer></article></body></html>
