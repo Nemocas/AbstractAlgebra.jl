@@ -120,7 +120,29 @@ Codomain: Quotient module over Integers with 2 generators and relations:
 julia> supermodule(Q) == M
 true
 
-julia> dim(M)
+julia> V = VectorSpace(QQ, 2)
+Vector space of dimension 2 over Rationals
+
+julia> m = V([QQ(1), QQ(2)])
+(1//1, 2//1)
+
+julia> N, f = sub(V, [m])
+(Subspace over Rationals with 1 generator and no relations
+, Module homomorphism with
+Domain: Subspace over Rationals with 1 generator and no relations
+
+Codomain: Vector space of dimension 2 over Rationals)
+
+julia> Q, g = quo(V, N)
+(Quotient space over:
+Rationals with 1 generator and no relations
+, Module homomorphism with
+Domain: Vector space of dimension 2 over Rationals
+Codomain: Quotient space over:
+Rationals with 1 generator and no relations
+)
+
+julia> dim(V)
 2
 
 julia> dim(Q)

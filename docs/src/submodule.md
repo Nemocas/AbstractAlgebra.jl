@@ -132,10 +132,24 @@ julia> iscompatible(N1, N2)
 julia> issubmodule(N1, M)
 false
 
-julia> dim(M)
+
+julia> V = VectorSpace(QQ, 2)
+Vector space of dimension 2 over Rationals
+
+julia> m = V([QQ(2), QQ(3)])
+(2//1, 3//1)
+
+julia> N, = sub(V, [m])
+(Subspace over Rationals with 1 generator and no relations
+, Module homomorphism with
+Domain: Subspace over Rationals with 1 generator and no relations
+
+Codomain: Vector space of dimension 2 over Rationals)
+
+julia> dim(V)
 2
 
-julia> dim(N1)
+julia> dim(N)
 1
 
 ```
