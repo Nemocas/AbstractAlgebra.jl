@@ -79,6 +79,16 @@ end
    end
 
    @test supermodule(Q) == M
+
+   for iter in 1:20
+     M = rand_module(QQ, -10:10)
+     ngens = rand(1:5)
+     S = [rand(M, -10:10) for i in 1:ngens]
+     N, f = sub(M, S)
+     Q, g = quo(M, N)
+
+     @test dim(Q) == dim(M) - rank(matrix(QQ, [s[ix] for s in S, ix in 1:dim(M)]))
+   end
 end
 
 @testset "Generic.QuotientModule.unary_ops..." begin

@@ -34,6 +34,12 @@ function gen(N::QuotientModule{T}, i::Int) where T <: RingElement
 end
 
 @doc Markdown.doc"""
+    dim(N::AbstractAlgebra.Generic.QuotientModule{T}) where T <: FieldElement
+> Return the dimension of the given vector quotient space.
+"""
+dim(N::AbstractAlgebra.Generic.QuotientModule{T}) where T <: FieldElement = length(N.gen_cols)
+
+@doc Markdown.doc"""
     supermodule(M::QuotientModule{T}) where T <: RingElement
 > Return the module that this module is a quotient of.
 """

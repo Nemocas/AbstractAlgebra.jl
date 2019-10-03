@@ -67,6 +67,17 @@ end
    end
 
    @test supermodule(N) == M
+
+   for iter in 1:20
+     M = rand_module(QQ, -10:10)
+     ngens = rand(1:5)
+     S = [rand(M, -10:10) for i in 1:ngens]
+     N, f = sub(M, S)
+
+     @test dim(N) == rank(matrix(QQ, [s[ix] for s in S, ix in 1:dim(M)]))
+   end
+
+   println("PASS")
 end
 
 @testset "Generic.Submodule.unary_ops..." begin
