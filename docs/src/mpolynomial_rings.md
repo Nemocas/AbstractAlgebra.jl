@@ -126,17 +126,16 @@ julia> C = MPolyBuildCtx(R)
 Builder for a polynomial in Multivariate Polynomial Ring in x, y over Integers
 
 julia> push_term!(C, ZZ(3), [1, 2])
+Builder for a polynomial in Multivariate Polynomial Ring in x, y over Integers
+
+julia> finish(C)
 3*x*y^2
 
-julia> push_term!(C, ZZ(2), [1, 1])
+julia> push_term!(C, ZZ(2), [1, 1]); finish(C)
 3*x*y^2+2*x*y
 
-julia> push_term!(C, ZZ(4), [0, 0])
+julia> push_term!(C, ZZ(4), [0, 0]); finish(C)
 3*x*y^2+2*x*y+4
-
-julia> p = finish(C)
-3*x*y^2+2*x*y+4
-
 ```
 
 ### Data type and parent object methods

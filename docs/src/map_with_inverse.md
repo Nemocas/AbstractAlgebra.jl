@@ -27,7 +27,7 @@ the second of which is a retraction/section of the first.
 
 Maps with retraction/section can be composed, and we also define the inverse of such a
 pair to be the map with the pair swapped. Thus the inverse of a map with retraction is
-a map with section. 
+a map with section.
 
 ## Map with inverse constructors
 
@@ -46,8 +46,8 @@ For convenience we allow construction of maps with retraction/section from a pai
 Julia functions/closures.
 
 ```julia
-map_with_retraction_from_func(R, S, f::Function, r::Function)
-map_with_section_from_func(R, S, f::Function, s::Function)
+map_with_retraction_from_func(f::Function, r::Function, R, S)
+map_with_section_from_func(f::Function, s::Function, R, S)
 ```
 
 Construct the map with retraction/section such that the map is given by the function $f$
@@ -58,7 +58,7 @@ codomain of $f$.
 **Examples**
 
 ```jldoctest
-julia> f = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
+julia> f = map_with_retraction_from_func(x -> x + 1, x -> x - 1, ZZ, ZZ)
 Map with retraction with the following data
 
 Domain:
@@ -71,7 +71,6 @@ Integers
 
 julia> a = f(ZZ(1))
 2
-
 ```
 
 ## Functionality for maps with inverses
@@ -101,7 +100,7 @@ the second two functions return the corresponding second maps.
 **Examples**
 
 ```jldoctest
-julia> f = map_with_retraction_from_func(ZZ, ZZ, x -> x + 1, x -> x - 1)
+julia> f = map_with_retraction_from_func(x -> x + 1, x -> x - 1, ZZ, ZZ)
 Map with retraction with the following data
 
 Domain:
@@ -134,4 +133,3 @@ julia> a = h(ZZ(1))
 1
 
 ```
-
