@@ -5175,7 +5175,7 @@ end
 @doc Markdown.doc"""
     map_entries!(f, dst::MatrixElem, src::MatrixElem)
 
-> Like `map`, but stores the result in `dst` rather than a new matrix.
+> Like `map_entries`, but stores the result in `dst` rather than a new matrix.
 """
 function map_entries!(f, dst::MatrixElem, src::MatrixElem)
    for i = 1:nrows(src), j = 1:ncols(src)
@@ -5184,6 +5184,12 @@ function map_entries!(f, dst::MatrixElem, src::MatrixElem)
    dst
 end
 
+@doc Markdown.doc"""
+    map!(f, dst::MatrixElem, src::MatrixElem)
+
+> Like `map`, but stores the result in `dst` rather than a new matrix.
+> This is equivalent to `map_entries!(f, dst, src)`.
+"""
 Base.map!(f, dst::MatrixElem, src::MatrixElem) = map_entries!(f, dst, src)
 
 @doc Markdown.doc"""
@@ -5203,4 +5209,10 @@ function map_entries(f, a::MatrixElem)
    b
 end
 
+@doc Markdown.doc"""
+    map(f, a::MatrixElem)
+
+> Transform matrix `a` by applying `f` on each element.
+This is equivalent to `map_entries(f, a)`.
+"""
 Base.map(f, a::MatrixElem) = map_entries(f, a)
