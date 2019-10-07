@@ -103,6 +103,7 @@ Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
    f = S(t^2 + 1)
 
    @test isa(f, MatElem)
+   @test parent_type(f) == typeof(S)
 
    g = S(2)
 
