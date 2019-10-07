@@ -300,24 +300,30 @@ function iszero_column(M::MatrixElem{T}, i::Int) where T <: RingElement
   return true
 end
 
-function copy(d::MatrixElem)
-   c = similar(d)
+################################################################################
+#
+#  Copy and deepcopy
+#
+################################################################################
+
+function copy(d::MatSpaceElem{T}) where T <: RingElement
+   z = _similar(d, base_ring(d), nrows(d), ncols(d))
    for i = 1:nrows(d)
       for j = 1:ncols(d)
-         c[i, j] = d[i, j]
+         z[i, j] = d[i, j]
       end
    end
-   return c
+   return z
 end
 
-function deepcopy_internal(d::MatrixElem, dict::IdDict)
-   c = similar(d)
+function deepcopy_internal(d::MatSpaceElem{T}, dict::IdDict) where T <: RingElement
+   z = _similar(d, base_ring(d), nrows(d), ncols(d))
    for i = 1:nrows(d)
       for j = 1:ncols(d)
-         c[i, j] = deepcopy(d[i, j])
+         z[i, j] = deepcopy(d[i, j])
       end
    end
-   return c
+   return z
 end
 
 function deepcopy_internal(d::MatSpaceView{T}, dict::IdDict) where T <: RingElement
