@@ -460,8 +460,6 @@ function show(io::IO, a::MatrixElem)
    end
 end
 
-show_minus_one(::Type{AbstractAlgebra.MatElem{T}}) where {T <: RingElement} = false
-
 ###############################################################################
 #
 #   Unary operations
