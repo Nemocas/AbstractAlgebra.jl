@@ -52,7 +52,7 @@ row and column numbers (or degree, in the case of matrix algebras) and the base 
 on a per matrix basis. The parent object can then be reconstructed from this data on
 demand.
 
-## Matrix space constructors
+## Matrix algebra constructors
 
 A matrix algebra in AbstractAlgebra.jl represents a collection of all matrices with
 given degree and base ring.
@@ -95,6 +95,28 @@ julia> C = S(R(11))
 [ 0//1  11//1   0//1]
 [ 0//1   0//1  11//1]
 
+```
+
+## Matrix algebra element constructors
+
+The following additional constructors are provided for constructing various
+kinds of matrices in a matrix algebra.
+
+```@docs
+zero_matrix(::MatAlgElem{T}) where T <: RingElement
+```
+
+```@docs
+identity_matrix(::MatAlgElem{T}) where T <: RingElement                                  ```
+
+*Examples*
+
+```julia
+S = MatrixAlgebra(ZZ, 2)
+M = zero(S)
+
+N = zero_matrix(M)
+P = identity_matrix(M)
 ```
 
 ## Matrix algebra functionality provided by AbstractAlgebra.jl
