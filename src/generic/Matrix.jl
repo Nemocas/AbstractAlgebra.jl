@@ -5092,19 +5092,6 @@ function zero_matrix(R::Ring, r::Int, c::Int)
    return z
 end
 
-@doc Markdown.doc"""
-    zero_matrix(M::MatElem{T}) where T <: RingElement
-> Return the zero matrix over the same base ring as $M$ and with the
-> same dimensions.
-"""
-function zero_matrix(M::MatElem{T}) where T <: RingElement
-   return zero_matrix(base_ring(M), nrows(M), ncols(M))
-end
-
-function zero_matrix(M::MatElem{T}, n::Int) where T <: RingElement
-   return zero_matrix(base_ring(M), n, n)
-end
-
 ################################################################################
 #
 #   Identity matrix

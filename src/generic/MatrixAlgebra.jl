@@ -483,34 +483,6 @@ end
 
 ###############################################################################
 #
-#   Zero matrix
-#
-###############################################################################
-
-function zero_matrix(M::MatAlgElem{T}, n::Int) where T <: RingElement
-   R = base_ring(M)
-   arr = Array{T}(undef, n, n)
-   for i in 1:n
-      for j in 1:n
-         arr[i, j] = zero(R)
-      end
-   end
-   z = MatAlgElem{T}(arr)
-   z.base_ring = R
-   return z
-end
-
-@doc Markdown.doc"""
-    zero_matrix(M::MatAlgElem{T}) where T <: RingElement
-> Return the zero matrix over the same base ring as $M$ and with the
-> same dimensions.
-"""
-function zero_matrix(M::MatAlgElem{T}) where T <: RingElement
-   return zero_matrix(M, nrows(M))
-end
-
-###############################################################################
-#
 #   Identity matrix
 #
 ###############################################################################

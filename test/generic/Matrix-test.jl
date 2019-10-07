@@ -183,7 +183,6 @@ Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
 
    x = zero_matrix(R, 2, 2)
    y = zero_matrix(ZZ, 2, 3)
-   z = zero_matrix(x)
 
    @test x in [x, y]
    @test x in [y, x]
@@ -191,8 +190,6 @@ Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
-
-   @test z == x
 
    # Test creation from AbstractArray without setindex!
    A = MyTestMatrix(BigInt(3), 2)
