@@ -225,6 +225,10 @@ isempty(::MatElem)
 ```
 
 ```@docs
+identity_matrix(::Ring, ::Int, ::Int)
+```
+
+```@docs
 change_base_ring(::AbstractAlgebra.Ring, ::AbstractAlgebra.MatElem)
 ```
 

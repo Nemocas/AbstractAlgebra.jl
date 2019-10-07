@@ -5135,6 +5135,19 @@ function identity_matrix(R::Ring, n::Int)
    return z
 end
 
+@doc Markdown.doc"""
+    identity_matrix(R::Ring, m::Int, n::Int) -> MatElem
+> Return the $m \times n$ matrix over $R$ with ones down the diagonal and
+> zeroes elsewhere.
+"""
+function identity_matrix(R::Ring, m::Int, n::Int)
+   z = zero_matrix(R, m, n)
+   for i in 1:min(m, n)
+      z[i, i] = one(R)
+   end
+   return z
+end
+
 ###############################################################################
 #
 #   MatrixSpace constructor

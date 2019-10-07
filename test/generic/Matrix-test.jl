@@ -167,6 +167,16 @@ Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
    @test isa(M4, Generic.MatSpaceElem{elem_type(R)})
    @test M4.base_ring == R
 
+   M5 = identity_matrix(R, 2, 3)
+
+   @test isa(M5, Generic.MatSpaceElem{elem_type(R)})
+   @test M5.base_ring == R
+
+   M6 = identity_matrix(R, 3, 2)
+
+   @test isa(M6, Generic.MatSpaceElem{elem_type(R)})
+   @test M6.base_ring == R                                                               
+
    x = zero_matrix(R, 2, 2)
    y = zero_matrix(ZZ, 2, 3)
 
