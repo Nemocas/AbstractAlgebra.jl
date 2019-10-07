@@ -41,6 +41,11 @@ julia> g = F(3)
 julia> h = F(g)
 3
 
+julia> GF(4)
+ERROR: DomainError with 4:
+Characteristic is not prime in GF(p)
+Stacktrace:
+[...]
 ```
 
 ## Basic field functionality
@@ -114,5 +119,3 @@ julia> g = gen(F)
 1
 
 ```
-
-

@@ -398,12 +398,13 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    GF(p::T) where T <: Integer
-> Return the finite field $\mathbb{F}_p$, where $p$ is a prime. The integer
-> $p$ is not checked for primality, but the behaviour of the resulting object
+    GF(p::T; check::Bool=true) where T <: Integer
+> Return the finite field $\mathbb{F}_p$, where $p$ is a prime.
+> By default, the integer $p$ is checked with a probabilistic algorithm for primality.
+> When `check == false`, no check is made, but the behaviour of the resulting object
 > is undefined if $p$ is composite.
 """
-function GF(p::T) where T <: Integer
-   p <= 0 && error("Characteristic is not prime in GF(p)")
+function GF(p::T; check::Bool=true) where T <: Integer
+   check && !isprobable_prime(p) && throw(DomainError(p, "Characteristic is not prime in GF(p)"))
    return GFField{T}(p)
 end
