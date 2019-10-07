@@ -5116,6 +5116,15 @@ function zero_matrix(R::Ring, r::Int, c::Int)
    return z
 end
 
+@doc Markdown.doc"""
+    zero_matrix(M::MatElem{T}) where T <: RingElement
+> Return the zero matrix over the same base ring as $M$ and with the
+> same dimensions.
+"""
+function zero_matrix(M::MatElem{T}) where T <: RingElement
+   return zero_matrix(base_ring(M), nrows(M), ncols(M))
+end
+
 ################################################################################
 #
 #   Identity matrix
@@ -5136,7 +5145,7 @@ function identity_matrix(R::Ring, n::Int)
 end
 
 @doc Markdown.doc"""
-    identity_matrix(R::Ring, m::Int, n::Int) -> MatElem
+    identity_matrix(R::Ring, m::Int, n::Int)
 > Return the $m \times n$ matrix over $R$ with ones down the diagonal and
 > zeroes elsewhere.
 """
@@ -5146,6 +5155,15 @@ function identity_matrix(R::Ring, m::Int, n::Int)
       z[i, i] = one(R)
    end
    return z
+end
+
+@doc Markdown.doc"""
+    identity_matrix(M::MatElem{T}) where T <: RingElement
+> Return the matrix over the same base ring as $M$ and with the same
+> dimensions with ones down the diagonal and zeroes elsewhere.
+"""
+function identity_matrix(M::MatElem{T}) where T <: RingElement
+   return identity_matrix(base_ring(M), nrows(M), ncols(M))
 end
 
 ###############################################################################

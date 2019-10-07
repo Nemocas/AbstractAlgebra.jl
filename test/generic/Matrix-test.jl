@@ -168,17 +168,22 @@ Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
    @test M4.base_ring == R
 
    M5 = identity_matrix(R, 2, 3)
+   M6 = identity_matrix(M5)
 
    @test isa(M5, Generic.MatSpaceElem{elem_type(R)})
    @test M5.base_ring == R
+   @test M5 == M6
 
-   M6 = identity_matrix(R, 3, 2)
+   M7 = identity_matrix(R, 3, 2)
+   M8 = identity_matrix(M7)
 
-   @test isa(M6, Generic.MatSpaceElem{elem_type(R)})
-   @test M6.base_ring == R                                                               
+   @test isa(M7, Generic.MatSpaceElem{elem_type(R)})
+   @test M7.base_ring == R                                                               
+   @test M7 == M8
 
    x = zero_matrix(R, 2, 2)
    y = zero_matrix(ZZ, 2, 3)
+   z = zero_matrix(x)
 
    @test x in [x, y]
    @test x in [y, x]
@@ -186,6 +191,8 @@ Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
 
    @test x in keys(Dict(x => 1))
    @test !(y in keys(Dict(x => 1)))
+
+   @test z == x
 
    # Test creation from AbstractArray without setindex!
    A = MyTestMatrix(BigInt(3), 2)

@@ -483,6 +483,56 @@ end
 
 ###############################################################################
 #
+#   Zero matrix
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    zero_matrix(M::MatAlgElem{T}) where T <: RingElement
+> Return the zero matrix over the same base ring as $M$ and with the
+> same dimensions.
+"""
+function zero_matrix(M::MatAlgElem{T}) where T <: RingElement
+   R = base_ring(M)
+   n = degree(M)
+   arr = Array{T}(undef, n, n)
+   for i in 1:n
+      for j in 1:n
+         arr[i, j] = zero(R)
+      end
+   end
+   z = MatAlgElem{T}(arr)
+   z.base_ring = R
+   return z
+end
+
+###############################################################################
+#
+#   Identity matrix
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    identity_matrix(M::MatAlgElem{T}) where T <: RingElement
+> Return the identity matrix over the same base ring as $M$ and with the
+> same dimensions.
+"""
+function identity_matrix(M::MatAlgElem{T}) where T <: RingElement
+   R = base_ring(M)
+   n = degree(M)
+   arr = Array{T}(undef, n, n)
+   for i in 1:n
+      for j in 1:n
+         arr[i, j] = i == j ? one(R) : zero(R)
+      end
+   end
+   z = MatAlgElem{T}(arr)
+   z.base_ring = R
+   return z
+end
+
+###############################################################################
+#
 #   Parent object call overload
 #
 ###############################################################################

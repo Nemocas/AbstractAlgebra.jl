@@ -161,12 +161,6 @@ zero_matrix(R::Ring, r::Int, c::Int)
 
 Construct the $r\times c$ AbstractAlgebra.jl zero matrix over the ring `R`.
 
-```julia
-identity_matrix(R::Ring, n::Int)
-```
-
-Construct the $n\times n$ AbstractAlgebra.jl identity matrix over the ring `R`.
-
 **Examples**
 
 ```jldoctest
@@ -183,12 +177,6 @@ julia> P = zero_matrix(ZZ, 3, 2)
 [0  0]
 [0  0]
 [0  0]
-
-julia> Q = identity_matrix(ZZ, 4)
-[1  0  0  0]
-[0  1  0  0]
-[0  0  1  0]
-[0  0  0  1]
 
 julia> R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
