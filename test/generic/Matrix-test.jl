@@ -232,6 +232,11 @@ end
 
    @test dense_matrix_type(R) == elem_type(S)
 
+   let ET = AbstractAlgebra.Generic.Poly{Rational{BigInt}}
+      @test eltype(typeof(A)) == eltype(A) == elem_type(base_ring(A)) == ET
+      @test eltype(typeof(B)) == eltype(B) == elem_type(base_ring(B)) == ET
+   end
+
    @test iszero(zero(S))
    @test isone(one(S))
 
@@ -268,7 +273,14 @@ end
    @test !any(isempty, (A, B, C))
 
    @test length(matrix(R, zeros(Int, 2, 3))) == 6
-   @test length(matrix(R, zeros(Int, 3, 2))) == 6
+
+   n = matrix(R, zeros(Int, 3, 2))
+   @test length(n) == 6
+   let ET = AbstractAlgebra.Generic.Poly{Rational{BigInt}}
+      @test eltype(typeof(n)) == ET
+      @test eltype(n) == ET
+      @test elem_type(base_ring(n)) == ET
+   end
 
    for n = (matrix(R, zeros(Int, 2, 0)),
             matrix(R, zeros(Int, 0, 2)))
@@ -284,6 +296,10 @@ end
               randmat_with_rank(M3, 2, 0:9, -9:9),
               randmat_with_rank(rng, M3, 2, 0:9, -9:9)]
       @test length(m3) == 9
+      ET = AbstractAlgebra.Generic.Poly{Rational{BigInt}}
+      @test eltype(typeof(m3)) == ET
+      @test eltype(m3) == ET
+      @test elem_type(base_ring(m3)) == ET
       @test !isempty(m3)
       @test !iszero(m3)
       @test m3 isa Generic.MatAlgElem

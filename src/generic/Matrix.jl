@@ -172,6 +172,8 @@ Base.@propagate_inbounds function setindex!(a::MatrixElem, d::T, r::Int,
     a.entries[r, c] = base_ring(a)(d)
 end
 
+Base.eltype(::Type{<:MatrixElem{T}}) where T <: RingElem = T
+
 Base.isassigned(a::Union{Mat,MatAlgElem}, i, j) = isassigned(a.entries, i, j)
 
 function Base.isassigned(a::MatrixElem, i, j)
