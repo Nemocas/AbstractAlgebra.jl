@@ -2350,6 +2350,53 @@ function interpolate(S::AbstractAlgebra.PolyRing, x::Array{T, 1}, y::Array{T, 1}
    return r
 end
 
+################################################################################
+#                                                                                       
+#  Change base ring
+#                                                                                        ################################################################################
+                                                                                         function _change_poly_ring(R, Rx, cached)
+   P, _ = AbstractAlgebra.PolynomialRing(R, string(var(Rx)), cached = cached)
+   return P
+end   
+                                                                                   
+@doc Markdown.doc"""
+    change_base_ring(R::Ring, p::PolyElem{<: RingElement}; parent::PolyRing)
+
+> Return the polynomial obtained by coercing the non-zero coefficients of `p`
+> into `R`.
+>
+> If the optional `parent` keyword is provided, the polynomial will be an
+> element of `parent`. The caching of the parent object can be controlled
+> via the `cached` keyword argument.
+"""
+function change_base_ring(R::Ring, p::PolyElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: RingElement
+   return _map(R, p, parent)
+end
+
+################################################################################
+#                                                             
+#  Map
+#
+################################################################################
+
+@doc Markdown.doc"""
+    map_coeffs(f, p::PolyElem{<: RingElement}; parent::PolyRing)
+
+> Transform the polynomial `p` by applying `f` on each non-zero coefficient.
+>
+> If the optional `parent` keyword is provided, the polynomial will be an
+> element of `parent`. The caching of the parent object can be controlled
+> via the `cached` keyword argument.
+"""
+function map_coeffs(g, p::PolyElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(AbstractAlgebra.parent(g(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached)) where T <: RingElement
+   return _map(g, p, parent)
+end
+
+function _map(g, p::PolyElem, Rx)
+   new_coefficients = [g(coeff(p, i)) for i in 0:degree(p)]
+   return Rx(new_coefficients)
+end
+
 ###############################################################################
 #
 #   Special functions
