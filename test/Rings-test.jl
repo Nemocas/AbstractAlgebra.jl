@@ -24,4 +24,11 @@ end
       @test parent_type(x) == par
       @test parent_type(typeof(x)) == par
    end
+
+   @test_throws MethodError parent_type('c')
+   @test_throws MethodError parent_type(Char)
+   @test parent_type(big(1)) == AbstractAlgebra.Integers{BigInt}
+
+   @test_throws MethodError elem_type('c')
+   @test_throws MethodError elem_type(Char)
 end
