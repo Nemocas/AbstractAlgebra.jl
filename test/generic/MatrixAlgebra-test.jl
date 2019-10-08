@@ -181,6 +181,7 @@ end
    @test degree(A) == 3
 
    @test issquare(A)
+end
 
 @testset "Generic.MatAlg.unary_ops..." begin
    R, t = PolynomialRing(QQ, "t")
