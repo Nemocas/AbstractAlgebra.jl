@@ -31,7 +31,7 @@ julia&gt; N2 = T(BigInt[2 3; 1 0])
 julia&gt; N3 = T(BigInt[2, 3, 1, 1])
 [2//1  3//1]
 [1//1  1//1]
-</code></pre><p>It is also possible to create matrices (in a matrix space only) directly, without first creating the corresponding matrix space (the inner constructor being called directly). Note that to support this, matrix space parent objects don&#39;t contain a reference to their parent. Instead, parents are constructed on-the-fly if requested. (The same strategy is used for matrix algebras.)</p><pre><code class="language-julia">matrix(R::Ring, arr::Array{T, 2}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Given an <span>$m\times n$</span> Julia matrix of entries, construct the corresponding AbstractAlgebra.jl matrix over the given ring <code>R</code>, assuming all the entries can be coerced into <code>R</code>.</p><pre><code class="language-julia">matrix(R::Ring, r::Int, c::Int, A::Array{T, 1}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Construct the given <span>$r\times c$</span> AbstractAlgebra.jl matrix over the ring <code>R</code> whose <span>$(i, j)$</span> entry is given by <code>A[c*(i - 1) + j]</code>, assuming that all the entries can be coerced into <code>R</code>.</p><pre><code class="language-julia">zero_matrix(R::Ring, r::Int, c::Int)</code></pre><p>Construct the <span>$r\times c$</span> AbstractAlgebra.jl zero matrix over the ring <code>R</code>.</p><pre><code class="language-julia">identity_matrix(R::Ring, n::Int)</code></pre><p>Construct the <span>$n\times n$</span> AbstractAlgebra.jl identity matrix over the ring <code>R</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
+</code></pre><p>It is also possible to create matrices (in a matrix space only) directly, without first creating the corresponding matrix space (the inner constructor being called directly). Note that to support this, matrix space parent objects don&#39;t contain a reference to their parent. Instead, parents are constructed on-the-fly if requested. (The same strategy is used for matrix algebras.)</p><pre><code class="language-julia">matrix(R::Ring, arr::Array{T, 2}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Given an <span>$m\times n$</span> Julia matrix of entries, construct the corresponding AbstractAlgebra.jl matrix over the given ring <code>R</code>, assuming all the entries can be coerced into <code>R</code>.</p><pre><code class="language-julia">matrix(R::Ring, r::Int, c::Int, A::Array{T, 1}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Construct the given <span>$r\times c$</span> AbstractAlgebra.jl matrix over the ring <code>R</code> whose <span>$(i, j)$</span> entry is given by <code>A[c*(i - 1) + j]</code>, assuming that all the entries can be coerced into <code>R</code>.</p><pre><code class="language-julia">zero_matrix(R::Ring, r::Int, c::Int)</code></pre><p>Construct the <span>$r\times c$</span> AbstractAlgebra.jl zero matrix over the ring <code>R</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; M = matrix(ZZ, BigInt[3 1 2; 2 0 1])
 [3  1  2]
 [2  0  1]
 
@@ -44,12 +44,6 @@ julia&gt; P = zero_matrix(ZZ, 3, 2)
 [0  0]
 [0  0]
 [0  0]
-
-julia&gt; Q = identity_matrix(ZZ, 4)
-[1  0  0  0]
-[0  1  0  0]
-[0  0  1  0]
-[0  0  0  1]
 
 julia&gt; R = MatrixAlgebra(ZZ, 2)
 Matrix Algebra of degree 2 over Integers
