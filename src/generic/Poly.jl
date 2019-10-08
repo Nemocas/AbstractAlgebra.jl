@@ -2353,15 +2353,16 @@ end
 ################################################################################
 #                                                                                       
 #  Change base ring
-#                                                                                        ################################################################################
-                                                                                         function _change_poly_ring(R, Rx, cached)
+#
+################################################################################
+
+function _change_poly_ring(R, Rx, cached)
    P, _ = AbstractAlgebra.PolynomialRing(R, string(var(Rx)), cached = cached)
    return P
 end   
                                                                                    
 @doc Markdown.doc"""
     change_base_ring(R::Ring, p::PolyElem{<: RingElement}; parent::PolyRing)
-
 > Return the polynomial obtained by coercing the non-zero coefficients of `p`
 > into `R`.
 >
@@ -2381,7 +2382,6 @@ end
 
 @doc Markdown.doc"""
     map_coeffs(f, p::PolyElem{<: RingElement}; parent::PolyRing)
-
 > Transform the polynomial `p` by applying `f` on each non-zero coefficient.
 >
 > If the optional `parent` keyword is provided, the polynomial will be an
