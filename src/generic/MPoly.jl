@@ -178,6 +178,235 @@ end
 
 ###############################################################################
 #
+#   Manipulating terms and monomials
+#
+###############################################################################
+
+function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: RingElement
+   A = a.exps
+   N = size(A, 1)
+   return [Int(A[j, i]) for j in N:-1:1]
+end
+
+function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:lex}}) where T <: RingElement
+   return Int(a.exps[size(a.exps, 1) + 1 - j, i])
+end
+
+function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: RingElement
+   A = a.exps
+   N = size(A, 1)
+   return [Int(A[j, i]) for j in N - 1:-1:1]
+end
+
+function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:deglex}}) where T <: RingElement
+   return Int(a.exps[size(a.exps, 1) - j, i])
+end
+
+function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
+   A = a.exps
+   N = size(A, 1)
+   return [Int(A[j, i]) for j in 1:N - 1]
+end
+
+function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
+   return Int(a.exps[j, i])
+end
+
+@doc Markdown.doc"""
+    exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
+> Return a vector of exponents, corresponding to the exponent vector of the
+> i-th term of the polynomial. Term numbering begins at $1$ and the exponents
+> are given in the order of the variables for the ring, as supplied when the
+> ring was created.
+"""
+function exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
+   return exponent_vector(a, i, Val{parent(a).ord})
+end
+
+@doc Markdown.doc"""
+    exponent{T <: RingElem}(a::MPoly{T}, i::Int, j::Int)
+> Return coefficient of the j-th variables in the i-th term of the polynomial.
+> Term and variable numbering begins at $1$ and variables are ordered as
+> during the creation of the ring.
+"""
+function exponent(a::MPoly{T}, i::Int, j::Int) where T <: RingElement
+   return exponent(a, i, j, Val{parent(a).ord})
+end
+
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:lex}}) where T <: RingElement
+   fit!(a, i)
+   A = a.exps
+   A[:, i] = exps[end:-1:1]
+   if i > length(a)
+      a.length = i
+   end
+   return a
+end
+
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:deglex}}) where T <: RingElement
+   fit!(a, i)
+   A = a.exps
+   A[1:end - 1, i] = exps[end:-1:1]
+   A[end, i] = sum(exps)
+   if i > length(a)
+    a.length = i
+   end
+   return a
+end
+
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:degrevlex}}) where T <: RingElement
+   fit!(a, i)
+   A = a.exps
+   A[1:end - 1, i] = exps
+   A[end, i] = sum(exps)
+   if i > length(a)
+    a.length = i
+   end
+   return a
+end
+
+@doc Markdown.doc"""
+    set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
+> Set the i-th exponent vector to the supplied vector, where the entries
+> correspond to the exponents of the variables in the order supplied when
+> the ring was created. The modified polynomial is returned.
+"""
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
+   return set_exponent_vector!(a, i, exps, Val{parent(a).ord})
+end
+
+@doc Markdown.doc"""
+    coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
+> Return the coefficient of the term with the given exponent vector, or zero
+> if there is no such term.
+"""
+function coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
+   A = a.exps
+   N = size(A, 1)
+   exp2 = Array{UInt, 1}(undef, N)
+   ord = parent(a).ord
+   if ord == :lex
+      exp2[:] = exps[end:-1:1]
+   elseif ord == :deglex
+      exp2[1:end - 1] = exps[end:-1:1]
+      exp2[end] = sum(exps)
+   else
+      exp2[1:end - 1] = exps[1:end]
+      exp2[end] = sum(exps)
+   end
+   exp2 = reshape(exp2, N, 1)
+   lo = 1
+   hi = length(a)
+   n = div(hi - lo + 1, 2)
+   while hi >= lo
+      v = monomial_cmp(A, lo + n, exp2, 1, N, parent(a), UInt(0))
+      if v == 0
+         return a.coeffs[lo + n]
+      elseif v < 0
+         hi = lo + n - 1
+      else
+         lo = lo + n + 1
+      end
+      n = div(hi - lo + 1, 2)
+   end
+   return base_ring(a)()
+end
+
+@doc Markdown.doc"""
+    setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
+> Set the coefficient of the term with the given exponent vector to the given
+> value $c$. This function takes $O(\log n)$ operations if a term with the given
+> exponent already exists, or if the term is inserted at the end of the
+> polynomial. Otherwise it can take $O(n)$ operations in the worst case.
+"""
+function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
+   c = base_ring(a)(c)
+   A = a.exps
+   N = size(A, 1)
+   exp2 = Array{UInt, 1}(undef, N)
+   ord = parent(a).ord
+   if ord == :lex
+      exp2[:] = exps[end:-1:1]
+   elseif ord == :deglex
+      exp2[1:end - 1] = exps[end:-1:1]
+      exp2[end] = sum(exps)
+   else
+      exp2[1:end - 1] = exps[1:end]
+      exp2[end] = sum(exps)
+   end
+   exp2 = reshape(exp2, N, 1)
+   lo = 1
+   hi = length(a)
+   if hi > 0
+      n = div(hi - lo + 1, 2)
+      while hi >= lo
+         v = monomial_cmp(A, lo + n, exp2, 1, N, parent(a), UInt(0))
+         if v == 0
+            if c != 0 # just insert the coefficient
+               a.coeffs[lo + n] = c
+            else # coefficient is zero, shift everything
+               for i = lo + n:length(a) - 1
+                  a.coeffs[i] = a.coeffs[i + 1]
+                  monomial_set!(A, i, A, i + 1, N)
+               end
+               a.coeffs[length(a)] = c # zero final coefficient
+               a.length -= 1
+            end
+            return a
+         elseif v < 0
+            hi = lo + n - 1
+         else
+            lo = lo + n + 1
+         end
+         n = div(hi - lo + 1, 2)
+      end
+   end
+   # exponent not found, must insert at lo
+   if c != 0
+      lena = length(a)
+      fit!(a, lena + 1)
+      A = a.exps
+      for i = lena:-1:lo
+         a.coeffs[i + 1] = a.coeffs[i]
+         monomial_set!(A, i + 1, A, i, N)
+      end
+      a.coeffs[lo] = c
+      monomial_set!(A, lo, exp2, 1, N)
+      a.length += 1
+   end
+   return a
+end
+
+@doc Markdown.doc"""
+    sort_terms!(a::MPoly{T}) where {T <: RingElement}
+> Sort the terms of the given polynomial according to the polynomial ring
+> ordering. Zero terms and duplicate exponents are ignored. To deal with those
+> call `combine_like_terms`. The sorted polynomial is returned.
+"""
+function sort_terms!(a::MPoly{T}) where {T <: RingElement}
+   N = parent(a).N
+   # The reverse order is the fastest order if already sorted
+   V = [(ntuple(i -> a.exps[i, r], Val(N)), r) for r in length(a):-1:1]
+   ord = parent(a).ord
+   if ord == :lex || ord == :deglex
+      sort!(V, lt = is_less_lex)
+   else
+      sort!(V, lt = is_less_degrevlex)
+   end
+   Rc = [a.coeffs[V[i][2]] for i in length(V):-1:1]
+   Re = zeros(UInt, N, length(V))
+   for i = 1:length(V)
+      for j = 1:N
+         Re[j, length(V) - i + 1] = V[i][1][j]
+      end
+   end
+   a.coeffs = Rc
+   a.exps = Re
+   return a
+end
+
+###############################################################################
+#
 #   Multivariate coefficients
 #
 ###############################################################################
@@ -4139,235 +4368,6 @@ function _map(g, p::MPolyElem, Rx)
    end
 
    return finish(M)
-end
-
-###############################################################################
-#
-#   Manipulating terms and monomials
-#
-###############################################################################
-
-function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: RingElement
-   A = a.exps
-   N = size(A, 1)
-   return [Int(A[j, i]) for j in N:-1:1]
-end
-
-function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:lex}}) where T <: RingElement
-   return Int(a.exps[size(a.exps, 1) + 1 - j, i])
-end
-
-function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: RingElement
-   A = a.exps
-   N = size(A, 1)
-   return [Int(A[j, i]) for j in N - 1:-1:1]
-end
-
-function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:deglex}}) where T <: RingElement
-   return Int(a.exps[size(a.exps, 1) - j, i])
-end
-
-function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
-   A = a.exps
-   N = size(A, 1)
-   return [Int(A[j, i]) for j in 1:N - 1]
-end
-
-function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
-   return Int(a.exps[j, i])
-end
-
-@doc Markdown.doc"""
-    exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
-> Return a vector of exponents, corresponding to the exponent vector of the
-> i-th term of the polynomial. Term numbering begins at $1$ and the exponents
-> are given in the order of the variables for the ring, as supplied when the
-> ring was created.
-"""
-function exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
-   return exponent_vector(a, i, Val{parent(a).ord})
-end
-
-@doc Markdown.doc"""
-    exponent{T <: RingElem}(a::MPoly{T}, i::Int, j::Int)
-> Return coefficient of the j-th variables in the i-th term of the polynomial.
-> Term and variable numbering begins at $1$ and variables are ordered as
-> during the creation of the ring.
-"""
-function exponent(a::MPoly{T}, i::Int, j::Int) where T <: RingElement
-   return exponent(a, i, j, Val{parent(a).ord})
-end
-
-function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:lex}}) where T <: RingElement
-   fit!(a, i)
-   A = a.exps
-   A[:, i] = exps[end:-1:1]
-   if i > length(a)
-      a.length = i
-   end
-   return a
-end
-
-function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:deglex}}) where T <: RingElement
-   fit!(a, i)
-   A = a.exps
-   A[1:end - 1, i] = exps[end:-1:1]
-   A[end, i] = sum(exps)
-   if i > length(a)
-    a.length = i
-   end
-   return a
-end
-
-function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:degrevlex}}) where T <: RingElement
-   fit!(a, i)
-   A = a.exps
-   A[1:end - 1, i] = exps
-   A[end, i] = sum(exps)
-   if i > length(a)
-    a.length = i
-   end
-   return a
-end
-
-@doc Markdown.doc"""
-    set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
-> Set the i-th exponent vector to the supplied vector, where the entries
-> correspond to the exponents of the variables in the order supplied when
-> the ring was created. The modified polynomial is returned.
-"""
-function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
-   return set_exponent_vector!(a, i, exps, Val{parent(a).ord})
-end
-
-@doc Markdown.doc"""
-    coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
-> Return the coefficient of the term with the given exponent vector, or zero
-> if there is no such term.
-"""
-function coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
-   A = a.exps
-   N = size(A, 1)
-   exp2 = Array{UInt, 1}(undef, N)
-   ord = parent(a).ord
-   if ord == :lex
-      exp2[:] = exps[end:-1:1]
-   elseif ord == :deglex
-      exp2[1:end - 1] = exps[end:-1:1]
-      exp2[end] = sum(exps)
-   else
-      exp2[1:end - 1] = exps[1:end]
-      exp2[end] = sum(exps)
-   end
-   exp2 = reshape(exp2, N, 1)
-   lo = 1
-   hi = length(a)
-   n = div(hi - lo + 1, 2)
-   while hi >= lo
-      v = monomial_cmp(A, lo + n, exp2, 1, N, parent(a), UInt(0))
-      if v == 0
-         return a.coeffs[lo + n]
-      elseif v < 0
-         hi = lo + n - 1
-      else
-         lo = lo + n + 1
-      end
-      n = div(hi - lo + 1, 2)
-   end
-   return base_ring(a)()
-end
-
-@doc Markdown.doc"""
-    setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
-> Set the coefficient of the term with the given exponent vector to the given
-> value $c$. This function takes $O(\log n)$ operations if a term with the given
-> exponent already exists, or if the term is inserted at the end of the
-> polynomial. Otherwise it can take $O(n)$ operations in the worst case.
-"""
-function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
-   c = base_ring(a)(c)
-   A = a.exps
-   N = size(A, 1)
-   exp2 = Array{UInt, 1}(undef, N)
-   ord = parent(a).ord
-   if ord == :lex
-      exp2[:] = exps[end:-1:1]
-   elseif ord == :deglex
-      exp2[1:end - 1] = exps[end:-1:1]
-      exp2[end] = sum(exps)
-   else
-      exp2[1:end - 1] = exps[1:end]
-      exp2[end] = sum(exps)
-   end
-   exp2 = reshape(exp2, N, 1)
-   lo = 1
-   hi = length(a)
-   if hi > 0
-      n = div(hi - lo + 1, 2)
-      while hi >= lo
-         v = monomial_cmp(A, lo + n, exp2, 1, N, parent(a), UInt(0))
-         if v == 0
-            if c != 0 # just insert the coefficient
-               a.coeffs[lo + n] = c
-            else # coefficient is zero, shift everything
-               for i = lo + n:length(a) - 1
-                  a.coeffs[i] = a.coeffs[i + 1]
-                  monomial_set!(A, i, A, i + 1, N)
-               end
-               a.coeffs[length(a)] = c # zero final coefficient
-               a.length -= 1
-            end
-            return a
-         elseif v < 0
-            hi = lo + n - 1
-         else
-            lo = lo + n + 1
-         end
-         n = div(hi - lo + 1, 2)
-      end
-   end
-   # exponent not found, must insert at lo
-   if c != 0
-      lena = length(a)
-      fit!(a, lena + 1)
-      A = a.exps
-      for i = lena:-1:lo
-         a.coeffs[i + 1] = a.coeffs[i]
-         monomial_set!(A, i + 1, A, i, N)
-      end
-      a.coeffs[lo] = c
-      monomial_set!(A, lo, exp2, 1, N)
-      a.length += 1
-   end
-   return a
-end
-
-@doc Markdown.doc"""
-    sort_terms!(a::MPoly{T}) where {T <: RingElement}
-> Sort the terms of the given polynomial according to the polynomial ring
-> ordering. Zero terms and duplicate exponents are ignored. To deal with those
-> call `combine_like_terms`. The sorted polynomial is returned.
-"""
-function sort_terms!(a::MPoly{T}) where {T <: RingElement}
-   N = parent(a).N
-   # The reverse order is the fastest order if already sorted
-   V = [(ntuple(i -> a.exps[i, r], Val(N)), r) for r in length(a):-1:1]
-   ord = parent(a).ord
-   if ord == :lex || ord == :deglex
-      sort!(V, lt = is_less_lex)
-   else
-      sort!(V, lt = is_less_degrevlex)
-   end
-   Rc = [a.coeffs[V[i][2]] for i in length(V):-1:1]
-   Re = zeros(UInt, N, length(V))
-   for i = 1:length(V)
-      for j = 1:N
-         Re[j, length(V) - i + 1] = V[i][1][j]
-      end
-   end
-   a.coeffs = Rc
-   a.exps = Re
-   return a
 end
 
 ###############################################################################
