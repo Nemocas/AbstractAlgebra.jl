@@ -1,15 +1,23 @@
 @testset "Generic.NCPoly.constructors..." begin
    R = MatrixAlgebra(ZZ, 2)
-   S, y = PolynomialRing(R, "y")
+   S1 = PolynomialRing(R, "y")
+   S2 = R["y"]
 
-   @test elem_type(S) == Generic.NCPoly{elem_type(R)}
-   @test elem_type(Generic.NCPolyRing{elem_type(R)}) == Generic.NCPoly{elem_type(R)}
-   @test parent_type(Generic.NCPoly{elem_type(R)}) == Generic.NCPolyRing{elem_type(R)}
+   for (S, y) in (S1, S2)
+      @test elem_type(S) == Generic.NCPoly{elem_type(R)}
+      @test elem_type(Generic.NCPolyRing{elem_type(R)}) == Generic.NCPoly{elem_type(R)}
+      @test parent_type(Generic.NCPoly{elem_type(R)}) == Generic.NCPolyRing{elem_type(R)}
 
-   @test typeof(S) <: Generic.NCPolyRing
+      @test typeof(S) <: Generic.NCPolyRing
 
-   @test isa(y, NCPolyElem)
+      @test isa(y, NCPolyElem)
+   end
 
+   S3, _ = R["x"]["y"]
+   @test elem_type(S3) == Generic.NCPoly{Generic.NCPoly{Generic.MatAlgElem{BigInt}}}
+   @test typeof(S3) == Generic.NCPolyRing{Generic.NCPoly{Generic.MatAlgElem{BigInt}}}
+
+   S, y = S1
    T, z = PolynomialRing(S, "z")
 
    @test typeof(T) <: Generic.NCPolyRing
