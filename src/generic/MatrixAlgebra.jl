@@ -133,6 +133,32 @@ zero(x::AbstractAlgebra.MatAlgElem, n::Int) = zero!(similar(x, n))
 
 ################################################################################
 #
+#  Copy and deepcopy
+#
+################################################################################
+
+function copy(d::MatAlgElem{T}) where T <: RingElement
+   z = _similar(d, base_ring(d), nrows(d), ncols(d))
+   for i = 1:nrows(d)
+      for j = 1:ncols(d)
+         z[i, j] = d[i, j]
+      end
+   end
+   return z
+end
+
+function deepcopy_internal(d::MatAlgElem{T}, dict::IdDict) where T <: RingElement
+   z = _similar(d, base_ring(d), nrows(d), ncols(d))
+   for i = 1:nrows(d)
+      for j = 1:ncols(d)
+         z[i, j] = deepcopy(d[i, j])
+      end
+   end
+   return z
+end
+
+################################################################################
+#
 #   Size
 #
 ################################################################################
