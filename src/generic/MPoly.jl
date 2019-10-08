@@ -4086,125 +4086,59 @@ function main_variable_insert(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingE
    end
 end
 
-###############################################################################
+################################################################################
 #
-#   Unsafe functions
+#  Change base ring
 #
-###############################################################################
+################################################################################
 
-function add!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
-   t = b + c
-   a.coeffs = t.coeffs
-   a.exps = t.exps
-   a.length = t.length
-   return a
-end
-
-function mul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
-   t = b*c
-   a.coeffs = t.coeffs
-   a.exps = t.exps
-   a.length = t.length
-   return a
-end
-
-function addeq!(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
-   t = a + b
-   a.coeffs = t.coeffs
-   a.exps = t.exps
-   a.length = t.length
-   return a
-end
-
-function addmul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
-   t = a + (b * c)
-   a.coeffs = t.coeffs
-   a.exps = t.exps
-   a.length = t.length
-   return a
-end
-
-function resize_exps!(a::Array{UInt, 2}, n::Int)
-   if n > size(a, 2)
-      N = size(a, 1)
-      A = reshape(a, size(a, 2)*N)
-      new_size = max(n, 2*size(a, 2))
-      resize!(A, new_size*N)
-      return reshape(A, N, new_size)
-   end
-   return a
-end
-
-function fit!(a::MPoly{T}, n::Int) where {T <: RingElement}
-   if length(a.coeffs) < n
-      resize!(a.coeffs, n)
-      a.exps = resize_exps!(a.exps, n)
-   end
-   return nothing
-end
-
-function zero!(a::MPoly{T}) where {T <: RingElement}
-   a.length = 0
-   return a
+function _change_mpoly_ring(R, Rx, cached)
+   P, _ = AbstractAlgebra.PolynomialRing(R, map(string, symbols(Rx)), ordering = ordering(Rx), cached = cached)
+   return P
 end
 
 @doc Markdown.doc"""
-    setcoeff!(a::MPoly{T}, i::Int, c::T) where T <: RingElement
-> Set the coefficient of the i-th term of the polynomial to $c$.
-"""
-setcoeff!(a::MPoly{<: RingElement}, i::Int, c::RingElement)
+    change_base_ring(R::Ring, p::MPolyElem{<: RingElement}; parent::MPolyRing, cached::Bool)
 
-for T in [RingElem, Integer, Rational, AbstractFloat]
-  @eval begin
-    function setcoeff!(a::MPoly{S}, i::Int, c::S) where {S <: $T}
-       fit!(a, i)
-       a.coeffs[i] = c
-       if i > length(a)
-          a.length = i
-       end
-       return a
-    end
-  end
+> Return the polynomial obtained by coercing the non-zero coefficients of `p`
+> into `R`.
+>
+> If the optional `parent` keyword is provided, the polynomial will be an
+> element of `parent`. The caching of the parent object can be controlled
+> via the `cached` keyword argument.
+"""
+function change_base_ring(R::Ring, p::MPolyElem{T}; cached = true, parent::MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
+   base_ring(parent) != R && error("Base rings do not match.")
+   return _map(R, p, parent)
 end
 
-@doc Markdown.doc"""
-    setcoeff!(a::MPoly{T}, i::Int, c::U) where {T <: RingElement, U <: Integer}
-> Set the coefficient of the i-th term of the polynomial to the integer $c$.
-"""
-function setcoeff!(a::MPoly{T}, i::Int, c::U) where {T <: RingElement, U <: Integer}
-    return setcoeff!(a, i, base_ring(a)(c))
-end
+################################################################################
+#
+#  Map                                                                      
+#
+################################################################################
 
 @doc Markdown.doc"""
-    combine_like_terms!(a::MPoly{T}) where T <: RingElement
-> Remove zero terms and combine adjacent terms if they have the same
-> exponent vector. The modified polynomial is returned.
+    map_coeffs(f, p::MPolyElem{<: RingElement}; parent::MPolyRing)
+
+> Transform the polynomial `p` by applying `f` on each non-zero coefficient.
+>
+> If the optional `parent` keyword is provided, the polynomial will be an
+> element of `parent`. The caching of the parent object can be controlled
+> via the `cached` keyword argument.
 """
-function combine_like_terms!(a::MPoly{T}) where T <: RingElement
-   A = a.exps
-   N = size(A, 1)
-   i = 1
-   j = 0
-   while i <= length(a)
-      c = a.coeffs[i]
-      while i < length(a) && iszero(c)
-         i += 1
-         c = a.coeffs[i]
-      end
-      k = i
-      i += 1
-      while i <= length(a) && monomial_isequal(A, k, i, N)
-         c += a.coeffs[i]
-         i += 1
-      end
-      if c != 0
-         j += 1
-         a.coeffs[j] = c
-         monomial_set!(A, j, A, k, N)
-      end
+function map_coeffs(f, p::MPolyElem; cached = true, parent::MPolyRing = _change_mpoly_ring(AbstractAlgebra.parent(f(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached))
+   return _map(f, p, parent)
+end
+
+function _map(g, p::MPolyElem, Rx)
+   cvzip = zip(coeffs(p), exponent_vectors(p))
+   M = MPolyBuildCtx(Rx)
+   for (c, v) in cvzip
+      push_term!(M, g(c), v)
    end
-   a.length = j
-   return a
+
+   return finish(M)
 end
 
 ###############################################################################
@@ -4471,6 +4405,158 @@ end
 
 ###############################################################################
 #
+#   Build context
+#
+###############################################################################
+
+function MPolyBuildCtx(R::AbstractAlgebra.MPolyRing)
+   return MPolyBuildCtx(R, Nothing)
+end
+
+function show(io::IO, M::MPolyBuildCtx)
+   iocomp = IOContext(io, :compact => true)
+   print(iocomp, "Builder for a polynomial in ", parent(M.poly))
+end
+
+function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+  if iszero(c)
+    return M
+  end
+  len = length(M.poly) + 1
+  set_exponent_vector!(M.poly, len, expv)
+  setcoeff!(M.poly, len, c)
+  return M
+end
+
+function finish(M::MPolyBuildCtx{T}) where T <: AbstractAlgebra.MPolyElem
+  M.poly = sort_terms!(M.poly)
+  M.poly = combine_like_terms!(M.poly)
+  return M.poly
+end
+
+###############################################################################
+#
+#   Unsafe functions
+#
+###############################################################################
+
+function add!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
+   t = b + c
+   a.coeffs = t.coeffs
+   a.exps = t.exps
+   a.length = t.length
+   return a
+end
+
+function mul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
+   t = b*c
+   a.coeffs = t.coeffs
+   a.exps = t.exps
+   a.length = t.length
+   return a
+end
+
+function addeq!(a::MPoly{T}, b::MPoly{T}) where {T <: RingElement}
+   t = a + b
+   a.coeffs = t.coeffs
+   a.exps = t.exps
+   a.length = t.length
+   return a
+end
+
+function addmul!(a::MPoly{T}, b::MPoly{T}, c::MPoly{T}) where {T <: RingElement}
+   t = a + (b * c)
+   a.coeffs = t.coeffs
+   a.exps = t.exps
+   a.length = t.length
+   return a
+end
+
+function resize_exps!(a::Array{UInt, 2}, n::Int)
+   if n > size(a, 2)
+      N = size(a, 1)
+      A = reshape(a, size(a, 2)*N)
+      new_size = max(n, 2*size(a, 2))
+      resize!(A, new_size*N)
+      return reshape(A, N, new_size)
+   end
+   return a
+end
+
+function fit!(a::MPoly{T}, n::Int) where {T <: RingElement}
+   if length(a.coeffs) < n
+      resize!(a.coeffs, n)
+      a.exps = resize_exps!(a.exps, n)
+   end
+   return nothing
+end
+
+function zero!(a::MPoly{T}) where {T <: RingElement}
+   a.length = 0
+   return a
+end
+
+@doc Markdown.doc"""
+    setcoeff!(a::MPoly{T}, i::Int, c::T) where T <: RingElement
+> Set the coefficient of the i-th term of the polynomial to $c$.
+"""
+setcoeff!(a::MPoly{<: RingElement}, i::Int, c::RingElement)
+
+for T in [RingElem, Integer, Rational, AbstractFloat]
+  @eval begin
+    function setcoeff!(a::MPoly{S}, i::Int, c::S) where {S <: $T}
+       fit!(a, i)
+       a.coeffs[i] = c
+       if i > length(a)
+          a.length = i
+       end
+       return a
+    end
+  end
+end
+
+@doc Markdown.doc"""
+    setcoeff!(a::MPoly{T}, i::Int, c::U) where {T <: RingElement, U <: Integer}
+> Set the coefficient of the i-th term of the polynomial to the integer $c$.
+"""
+function setcoeff!(a::MPoly{T}, i::Int, c::U) where {T <: RingElement, U <: Integer}
+    return setcoeff!(a, i, base_ring(a)(c))
+end
+
+@doc Markdown.doc"""
+    combine_like_terms!(a::MPoly{T}) where T <: RingElement
+> Remove zero terms and combine adjacent terms if they have the same
+> exponent vector. The modified polynomial is returned.
+"""
+function combine_like_terms!(a::MPoly{T}) where T <: RingElement
+   A = a.exps
+   N = size(A, 1)
+   i = 1
+   j = 0
+   while i <= length(a)
+      c = a.coeffs[i]
+      while i < length(a) && iszero(c)
+         i += 1
+         c = a.coeffs[i]
+      end
+      k = i
+      i += 1
+      while i <= length(a) && monomial_isequal(A, k, i, N)
+         c += a.coeffs[i]
+         i += 1
+      end
+      if c != 0
+         j += 1
+         a.coeffs[j] = c
+         monomial_set!(A, j, A, k, N)
+      end
+   end
+   a.length = j
+   return a
+end
+
+###############################################################################
+#
 #   Promotion rules
 #
 ###############################################################################
@@ -4571,86 +4657,6 @@ function (a::MPolyRing{T})(b::Array{T, 1}, m::Vector{Vector{Int}}) where {T <: R
    z = sort_terms!(z)
    z = combine_like_terms!(z)
    return z
-end
-
-###############################################################################
-#
-#   Build context
-#
-###############################################################################
-
-function MPolyBuildCtx(R::AbstractAlgebra.MPolyRing)
-   return MPolyBuildCtx(R, Nothing)
-end
-
-function show(io::IO, M::MPolyBuildCtx)
-   iocomp = IOContext(io, :compact => true)
-   print(iocomp, "Builder for a polynomial in ", parent(M.poly))
-end
-
-function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
-  if iszero(c)
-    return M
-  end
-  len = length(M.poly) + 1
-  set_exponent_vector!(M.poly, len, expv)
-  setcoeff!(M.poly, len, c)
-  return M
-end
-
-function finish(M::MPolyBuildCtx{T}) where T <: AbstractAlgebra.MPolyElem
-  M.poly = sort_terms!(M.poly)
-  M.poly = combine_like_terms!(M.poly)
-  return M.poly
-end
-
-################################################################################
-#
-#  Change base ring and map
-#
-################################################################################
-
-function _change_mpoly_ring(R, Rx, cached)
-   P, _ = AbstractAlgebra.PolynomialRing(R, map(string, symbols(Rx)), ordering = ordering(Rx), cached = cached)
-   return P
-end
-
-@doc Markdown.doc"""
-    change_base_ring(R::Ring, p::MPolyElem{<: RingElement}; parent::MPolyRing, cached::Bool)
-
-> Return the polynomial obtained by coercing the non-zero coefficients of `p`
-> into `R`.
->
-> If the optional `parent` keyword is provided, the polynomial will be an
-> element of `parent`. The caching of the parent object can be controlled
-> via the `cached` keyword argument.
-"""
-function change_base_ring(R::Ring, p::MPolyElem{T}; cached = true, parent::MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
-   base_ring(parent) != R && error("Base rings do not match.")
-   return _map(R, p, parent)
-end
-
-@doc Markdown.doc"""
-    map_coeffs(f, p::MPolyElem{<: RingElement}; parent::MPolyRing)
-
-> Transform the polynomial `p` by applying `f` on each non-zero coefficient.
->
-> If the optional `parent` keyword is provided, the polynomial will be an
-> element of `parent`. The caching of the parent object can be controlled
-> via the `cached` keyword argument.
-"""
-function map_coeffs(f, p::MPolyElem; cached = true, parent::MPolyRing = _change_mpoly_ring(AbstractAlgebra.parent(f(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached))
-   return _map(f, p, parent)
-end
-
-function _map(g, p::MPolyElem, Rx)
-   cvzip = zip(coeffs(p), exponent_vectors(p))
-   M = MPolyBuildCtx(Rx)
-   for (c, v) in cvzip
-      push_term!(M, g(c), v)
-   end
-
-   return finish(M)
 end
 
 ###############################################################################
