@@ -4,8 +4,6 @@
 #
 ###############################################################################
 
-elem_type(::T) where {T <: NCRing} = elem_type(T)
-
 include("Rings.jl")
 
 ###############################################################################
@@ -131,5 +129,3 @@ Base.oftype(x::NCRingElem, y::AbstractFloat) = parent(x)(y)
 Base.oftype(x::NCRingElem, y::Integer) = parent(x)(y)
 
 Base.oftype(x::NCRingElem, y::Rational) = parent(x)(y)
-
-

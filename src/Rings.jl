@@ -4,9 +4,6 @@
 #
 ###############################################################################
 
-elem_type(::T)   where {T <: Ring}     = elem_type(T)
-parent_type(::T) where {T <: RingElem} = parent_type(T)
-
 function isequal(a::RingElem, b::RingElem)
    return parent(a) == parent(b) && a == b
 end
