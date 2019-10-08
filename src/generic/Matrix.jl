@@ -407,76 +407,6 @@ issquare(a::MatElem) = (nrows(a) == ncols(a))
 
 ###############################################################################
 #
-#   change_base_ring
-#
-###############################################################################
-
-@doc Markdown.doc"""
-    change_base_ring(R::Ring, M::MatrixElem)
-
-> Return the matrix obtained by coercing each entry into `R`.
-"""
-function change_base_ring(R::Ring, M::MatrixElem)
-   N = similar(M, R)
-   for i=1:nrows(M), j=1:ncols(M)
-      N[i,j] = R(M[i,j])
-   end
-   return N
-end
-
-###############################################################################
-#
-#   map
-#
-###############################################################################
-
-@doc Markdown.doc"""
-    map_entries!(f, dst::MatrixElem, src::MatrixElem)
-
-> Like `map_entries`, but stores the result in `dst` rather than a new matrix.
-"""
-function map_entries!(f, dst::MatrixElem, src::MatrixElem)
-   for i = 1:nrows(src), j = 1:ncols(src)
-      dst[i, j] = f(src[i, j])
-   end
-   dst
-end
-
-@doc Markdown.doc"""
-    map!(f, dst::MatrixElem, src::MatrixElem)
-
-> Like `map`, but stores the result in `dst` rather than a new matrix.
-> This is equivalent to `map_entries!(f, dst, src)`.
-"""
-Base.map!(f, dst::MatrixElem, src::MatrixElem) = map_entries!(f, dst, src)
-
-@doc Markdown.doc"""
-    map_entries(f, a::MatrixElem)
-
-> Transform matrix `a` by applying `f` on each element.
-"""
-function map_entries(f, a::MatrixElem)
-   isempty(a) && return similar(a, parent(f(zero(base_ring(a)))))
-   b11 = f(a[1, 1])
-   b = similar(a, parent(b11))
-   b[1, 1] = b11
-   for i = 1:nrows(a), j = 1:ncols(a)
-      i == j == 1 && continue
-      b[i, j] = f(a[i, j])
-   end
-   b
-end
-
-@doc Markdown.doc"""
-    map(f, a::MatrixElem)
-
-> Transform matrix `a` by applying `f` on each element.
-This is equivalent to `map_entries(f, a)`.
-"""
-Base.map(f, a::MatrixElem) = map_entries(f, a)
-
-###############################################################################
-#
 #   String I/O
 #
 ###############################################################################
@@ -4942,6 +4872,76 @@ function Base.hvcat(rows::Tuple{Vararg{Int}}, A::MatrixElem...)
 
   return M
 end
+
+###############################################################################
+#
+#   Change Base Ring
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    change_base_ring(R::Ring, M::MatrixElem)
+
+> Return the matrix obtained by coercing each entry into `R`.
+"""
+function change_base_ring(R::Ring, M::MatrixElem)
+   N = similar(M, R)
+   for i=1:nrows(M), j=1:ncols(M)
+      N[i,j] = R(M[i,j])
+   end
+   return N
+end
+
+###############################################################################
+#
+#   Map
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    map_entries!(f, dst::MatrixElem, src::MatrixElem)
+
+> Like `map_entries`, but stores the result in `dst` rather than a new matrix.
+"""
+function map_entries!(f, dst::MatrixElem, src::MatrixElem)
+   for i = 1:nrows(src), j = 1:ncols(src)
+      dst[i, j] = f(src[i, j])
+   end
+   dst
+end
+
+@doc Markdown.doc"""
+    map!(f, dst::MatrixElem, src::MatrixElem)
+
+> Like `map`, but stores the result in `dst` rather than a new matrix.
+> This is equivalent to `map_entries!(f, dst, src)`.
+"""
+Base.map!(f, dst::MatrixElem, src::MatrixElem) = map_entries!(f, dst, src)
+
+@doc Markdown.doc"""
+    map_entries(f, a::MatrixElem)
+
+> Transform matrix `a` by applying `f` on each element.
+"""
+function map_entries(f, a::MatrixElem)
+   isempty(a) && return similar(a, parent(f(zero(base_ring(a)))))
+   b11 = f(a[1, 1])
+   b = similar(a, parent(b11))
+   b[1, 1] = b11
+   for i = 1:nrows(a), j = 1:ncols(a)
+      i == j == 1 && continue
+      b[i, j] = f(a[i, j])
+   end
+   b
+end
+
+@doc Markdown.doc"""
+    map(f, a::MatrixElem)
+
+> Transform matrix `a` by applying `f` on each element.
+This is equivalent to `map_entries(f, a)`.
+"""
+Base.map(f, a::MatrixElem) = map_entries(f, a)
 
 ###############################################################################
 #
