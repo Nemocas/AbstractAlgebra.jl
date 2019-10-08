@@ -224,8 +224,10 @@ end
 #
 ###############################################################################
 
-isprobable_prime(x::Integer, reps::Integer=25) =
-   0 != ccall((:__gmpz_probab_prime_p, :libgmp), Cint, (Ref{BigInt}, Cint), x, reps)
+function isprobable_prime(x::Integer, reps::Integer=25)
+   return ccall((:__gmpz_probab_prime_p, :libgmp), Cint,
+                (Ref{BigInt}, Cint), x, reps) != 0
+end
 
 ###############################################################################
 #
