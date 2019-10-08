@@ -25,6 +25,11 @@
 
    @test isa(R(a), AbstractAlgebra.GFElem)
    @test isa(S(b), AbstractAlgebra.GFElem)
+
+   @test_throws DomainError GF(4)
+   @test_throws DomainError GF(4, check=true)
+   F = GF(4, check=false)
+   @test F isa AbstractAlgebra.GFField{Int64}
 end
 
 @testset "Julia.GFElem.printing..." begin
