@@ -3796,6 +3796,73 @@ end
 
 ###############################################################################
 #
+#   Univariate polynomials
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
+> Assuming the polynomial $p$ is actually a univariate polynomial, convert the
+> polynomial to a univariate polynomial in the given univariate polynomial ring
+> $R$. An exception is raised if the polynomial $p$ involves more than one
+> variable.
+"""
+function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
+   vars_p = vars(p)
+
+   if length(vars_p) > 1
+      error("Can only convert univariate polynomials of type MPoly.")
+   end
+
+   if length(vars_p) == 0
+      return length(p) == 0 ? R(0) : R(p.coeffs[1])
+   end
+
+   return R(coefficients_of_univariate(p))
+end
+
+@doc Markdown.doc"""
+    involves_at_most_one_variable(p::AbstractAlgebra.Generic.MPoly)
+> Return true if $p$ contains at most 1 variable and false otherwise.
+"""
+function involves_at_most_one_variable(p::AbstractAlgebra.MPolyElem)
+   return length(vars(p)) <= 1
+end
+
+@doc Markdown.doc"""
+    coefficients_of_univariate(p::AbstractAlgebra.Generic.MPoly)
+> Return the coefficients of p, which is assumed to be univariate, as an array in ascending order.
+"""
+function coefficients_of_univariate(p::AbstractAlgebra.MPolyElem, check_univariate::Bool=true)
+   if check_univariate
+      vars_p = vars(p)
+
+      if length(vars_p) > 1
+         error("Polynomial is not univariate.")
+      end
+
+   end
+
+   if length(p) == 0
+      return Array{elem_type(base_ring(parent(p)))}(undef, 0)
+   end
+
+   var_index = findfirst(!iszero, exponent_vector(p, 1))
+
+   if var_index == nothing
+      return([coeff(p, 1)])
+   end
+
+   coeffs = [zero(base_ring(p)) for i = 0:total_degree(p)]
+   for i = 1:p.length
+      coeffs[exponent(p, i, var_index) + 1] = coeff(p, i)
+   end
+
+   return(coeffs)
+end
+
+###############################################################################
+#
 #   Conversions
 #
 ###############################################################################
@@ -4504,73 +4571,6 @@ function (a::MPolyRing{T})(b::Array{T, 1}, m::Vector{Vector{Int}}) where {T <: R
    z = sort_terms!(z)
    z = combine_like_terms!(z)
    return z
-end
-
-###############################################################################
-#
-#   Univariate polynomials
-#
-###############################################################################
-
-@doc Markdown.doc"""
-    to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
-> Assuming the polynomial $p$ is actually a univariate polynomial, convert the
-> polynomial to a univariate polynomial in the given univariate polynomial ring
-> $R$. An exception is raised if the polynomial $p$ involves more than one
-> variable.
-"""
-function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
-   vars_p = vars(p)
-
-   if length(vars_p) > 1
-      error("Can only convert univariate polynomials of type MPoly.")
-   end
-
-   if length(vars_p) == 0
-      return length(p) == 0 ? R(0) : R(p.coeffs[1])
-   end
-
-   return R(coefficients_of_univariate(p))
-end
-
-@doc Markdown.doc"""
-    involves_at_most_one_variable(p::AbstractAlgebra.Generic.MPoly)
-> Return true if $p$ contains at most 1 variable and false otherwise.
-"""
-function involves_at_most_one_variable(p::AbstractAlgebra.MPolyElem)
-   return length(vars(p)) <= 1
-end
-
-@doc Markdown.doc"""
-    coefficients_of_univariate(p::AbstractAlgebra.Generic.MPoly)
-> Return the coefficients of p, which is assumed to be univariate, as an array in ascending order.
-"""
-function coefficients_of_univariate(p::AbstractAlgebra.MPolyElem, check_univariate::Bool=true)
-   if check_univariate
-      vars_p = vars(p)
-
-      if length(vars_p) > 1
-         error("Polynomial is not univariate.")
-      end
-
-   end
-
-   if length(p) == 0
-      return Array{elem_type(base_ring(parent(p)))}(undef, 0)
-   end
-
-   var_index = findfirst(!iszero, exponent_vector(p, 1))
-
-   if var_index == nothing
-      return([coeff(p, 1)])
-   end
-
-   coeffs = [zero(base_ring(p)) for i = 0:total_degree(p)]
-   for i = 1:p.length
-      coeffs[exponent(p, i, var_index) + 1] = coeff(p, i)
-   end
-
-   return(coeffs)
 end
 
 ###############################################################################
