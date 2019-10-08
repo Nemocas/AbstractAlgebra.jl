@@ -6,17 +6,16 @@ julia&gt; C = MPolyBuildCtx(R)
 Builder for a polynomial in Multivariate Polynomial Ring in x, y over Integers
 
 julia&gt; push_term!(C, ZZ(3), [1, 2])
+Builder for a polynomial in Multivariate Polynomial Ring in x, y over Integers
+
+julia&gt; finish(C)
 3*x*y^2
 
-julia&gt; push_term!(C, ZZ(2), [1, 1])
+julia&gt; push_term!(C, ZZ(2), [1, 1]); finish(C)
 3*x*y^2+2*x*y
 
-julia&gt; push_term!(C, ZZ(4), [0, 0])
-3*x*y^2+2*x*y+4
-
-julia&gt; p = finish(C)
-3*x*y^2+2*x*y+4
-</code></pre><h3><a class="nav-anchor" id="Data-type-and-parent-object-methods-1" href="#Data-type-and-parent-object-methods-1">Data type and parent object methods</a></h3><pre><code class="language-julia">symbols(S::MyMPolyRing{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return an array of <code>Symbol</code>s representing the variables (generators) of the polynomial ring. Note that these are <code>Symbol</code>s not <code>String</code>s, though their string values will usually be used when printing polynomials.</p><pre><code class="language-julia">nvars(f::MyMPolyRing{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the number of variables of the polynomial ring.</p><pre><code class="language-julia">gens(S::MyMPolyRing{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return an array of all the generators (variables) of the given polynomial ring (as polynomials).</p><p>The first entry in the array will be the variable with most significance with respect to the ordering.</p><pre><code class="language-julia">gen(S::MyMPolyRing{T}, i::Int) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the <span>$i$</span>-th generator (variable) of the given polynomial ring (as a polynomial).</p><pre><code class="language-julia">ordering(S::MyMPolyRing{T})</code></pre><p>Return the ordering of the given polynomial ring as a symbol. Supported values currently include <code>:lex</code>, <code>:deglex</code> and <code>:degrevlex</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; S, (x, y) = PolynomialRing(QQ, [&quot;x&quot;, &quot;y&quot;]; ordering=:deglex)
+julia&gt; push_term!(C, ZZ(4), [0, 0]); finish(C)
+3*x*y^2+2*x*y+4</code></pre><h3><a class="nav-anchor" id="Data-type-and-parent-object-methods-1" href="#Data-type-and-parent-object-methods-1">Data type and parent object methods</a></h3><pre><code class="language-julia">symbols(S::MyMPolyRing{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return an array of <code>Symbol</code>s representing the variables (generators) of the polynomial ring. Note that these are <code>Symbol</code>s not <code>String</code>s, though their string values will usually be used when printing polynomials.</p><pre><code class="language-julia">nvars(f::MyMPolyRing{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the number of variables of the polynomial ring.</p><pre><code class="language-julia">gens(S::MyMPolyRing{T}) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return an array of all the generators (variables) of the given polynomial ring (as polynomials).</p><p>The first entry in the array will be the variable with most significance with respect to the ordering.</p><pre><code class="language-julia">gen(S::MyMPolyRing{T}, i::Int) where T &lt;: AbstractAlgebra.RingElem</code></pre><p>Return the <span>$i$</span>-th generator (variable) of the given polynomial ring (as a polynomial).</p><pre><code class="language-julia">ordering(S::MyMPolyRing{T})</code></pre><p>Return the ordering of the given polynomial ring as a symbol. Supported values currently include <code>:lex</code>, <code>:deglex</code> and <code>:degrevlex</code>.</p><p><strong>Examples</strong></p><pre><code class="language-julia-repl">julia&gt; S, (x, y) = PolynomialRing(QQ, [&quot;x&quot;, &quot;y&quot;]; ordering=:deglex)
 (Multivariate Polynomial Ring in x, y over Rationals, AbstractAlgebra.Generic.MPoly{Rational{BigInt}}[x, y])
 
 julia&gt; V = symbols(S)
