@@ -188,8 +188,5 @@ Domain: Submodule over Integers with 1 generator and no relations
 Codomain: Free module of rank 2 over Integers)
 
 julia> I = intersect(N1, N2)
-0-element Array{Union{ModuleHomomorphism{BigInt}, Submodule{BigInt}},1}
-
+0-element Array{Union{AbstractAlgebra.Generic.ModuleHomomorphism{BigInt}, AbstractAlgebra.Generic.Submodule{BigInt}},1}
 ```
-
-
