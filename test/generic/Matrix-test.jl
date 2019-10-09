@@ -2037,7 +2037,7 @@ end
    end
 end
 
-@testset "Generic.Mat.show..." begin
+@testset "Generic.Mat.printing..." begin
    @test string(matrix(ZZ, [3 1 2; 2 0 1])) == "[3  1  2]\n[2  0  1]"
    @test string(matrix(ZZ, [3 1 2; 2 0 1])) == "[3  1  2]\n[2  0  1]"
    @test string(matrix(ZZ, 2, 0, [])) == "2 by 0 matrix"

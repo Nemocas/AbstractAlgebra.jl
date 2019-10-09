@@ -132,19 +132,6 @@ end
    @test !(y in keys(Dict(x => 1)))
 end
 
-@testset "Generic.MatAlg.size..." begin
-   S = MatrixAlgebra(QQ, 3)
-   A = S([1 2 3; 4 5 6; 7 8 9])
-
-   @test nrows(S) == ncols(S) == 3
-   @test degree(S) == 3
-
-   @test nrows(A) == ncols(A) == 3
-   @test degree(A) == 3
-
-   @test issquare(A)
-end
-
 @testset "Generic.MatAlg.manipulation..." begin
    R, t = PolynomialRing(QQ, "t")
    S = MatrixAlgebra(R, 3)
@@ -183,6 +170,17 @@ end
    @test !iszero_row(C, 1)
    @test iszero_column(C, 2)
    @test !iszero_column(C, 1)
+
+   S = MatrixAlgebra(QQ, 3)
+   A = S([1 2 3; 4 5 6; 7 8 9])
+
+   @test nrows(S) == ncols(S) == 3
+   @test degree(S) == 3
+
+   @test nrows(A) == ncols(A) == 3
+   @test degree(A) == 3
+
+   @test issquare(A)
 end
 
 @testset "Generic.MatAlg.unary_ops..." begin

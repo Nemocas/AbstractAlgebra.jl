@@ -2549,7 +2549,7 @@ end
    @test ps == Zx([i^2 for i in 1:10])
 end
 
-@testset "Generic.Poly.show..." begin
+@testset "Generic.Poly.printing..." begin
    M = MatrixAlgebra(ZZ, 3)
    _, x = M['x']
    @test string(M(-1)*x) == "-x"

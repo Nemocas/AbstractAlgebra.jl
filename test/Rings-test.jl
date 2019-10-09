@@ -15,7 +15,7 @@ include("generic/MPoly-test.jl")
    @test F(2) .* [F(1), F(2)] == [F(2), F(1)]
 end
 
-@testset "Generic.Rings.{elem,parent}_type" begin
+@testset "Generic.Rings.elem/parent_type" begin
    for (R, el, par) in [(GF(3), AbstractAlgebra.GFElem{Int}, AbstractAlgebra.GFField{Int}),
                         (ZZ["x"][1], Generic.Poly{BigInt}, Generic.PolyRing{BigInt})]
       x = R(2)
@@ -24,4 +24,11 @@ end
       @test parent_type(x) == par
       @test parent_type(typeof(x)) == par
    end
+
+   @test_throws MethodError parent_type('c')
+   @test_throws MethodError parent_type(Char)
+   @test parent_type(big(1)) == AbstractAlgebra.Integers{BigInt}
+
+   @test_throws MethodError elem_type('c')
+   @test_throws MethodError elem_type(Char)
 end

@@ -231,6 +231,21 @@ end
       @test isterm(g)
       @test ismonomial(h)
    end
+
+   for num_vars = 1:4
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+      S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
+
+      for iter = 1:10
+         @test ishomogeneous(zero(S))
+         @test ishomogeneous(one(S))
+         for v in varlist
+            @test ishomogeneous(v)
+            @test !ishomogeneous(v + one(S))
+         end
+      end
+   end
 end
 
 @testset "Generic.MPoly.multivariate_coeff..." begin
@@ -251,6 +266,75 @@ z^4-4*x*y-10*x*z^2+8*y^2*z^5-9*y^2*z^3
       @test coeff(f, [x], [1]) == -10*y^3*z^4-4*y-10*z^2
       @test coeff(f, [y, z], [3, 2]) == -10*x^4
       @test coeff(f, [x, z], [4, 5]) == 0
+   end
+end
+
+@testset "Generic.MPoly.leading_term" begin
+   for num_vars=1:10
+      ord = rand_ordering()
+      var_names = ["x$j" for j in 1:num_vars]
+
+      R, vars_R = PolynomialRing(ZZ, var_names; ordering=ord)
+
+      f = rand(R, 5:10, 1:10, -100:100)
+      g = rand(R, 5:10, 1:10, -100:100)
+
+      @test lt(f*g) == lt(f)*lt(g)
+      @test lt(one(R)) == one(R)
+      @test lt(zero(R)) == zero(R)
+
+      for v in vars_R
+         @test lt(v) == v
+      end
+
+      @test parent(lt(f)) == parent(f)
+   end
+
+   for num_vars = 1:4
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+      S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
+
+      for iter = 1:10
+         f = rand(S, 0:4, 0:5, -10:10)
+         g = rand(S, 0:4, 0:5, -10:10)
+
+         @test lc(f*g) == lc(f)*lc(g)
+         @test lc(one(S)) == one(base_ring(S))
+
+         for v in varlist
+            @test lc(v) == one(base_ring(S))
+         end
+
+         @test parent(lc(f)) == base_ring(f)
+      end
+   end
+
+   for num_vars = 1:4
+      var_names = ["x$j" for j in 1:num_vars]
+      ord = rand_ordering()
+      S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
+
+      for iter = 1:10
+         f = zero(S)
+         while iszero(f)
+            f = rand(S, 0:4, 0:5, -10:10)
+         end
+         g = zero(S)
+         while iszero(g)
+            g = rand(S, 0:4, 0:5, -10:10)
+         end
+
+         @test lm(f*g) == lm(f)*lm(g)
+         @test lm(one(S)) == one(S)
+         @test lm(zero(S)) == zero(S)
+
+         for v in varlist
+            @test lm(v) == v
+         end
+
+         @test parent(lm(f)) == parent(f)
+      end
    end
 end
 
@@ -1145,7 +1229,7 @@ end
    end
 end
 
-@testset "Generic.MPoly.isless..." begin
+@testset "Generic.MPoly.ordering..." begin
    n_mpolys = 100
    maxval = 10
    maxdeg = 20
@@ -1241,92 +1325,3 @@ end
    end
 end
 
-@testset "Generic.MPoly.lt..." begin
-   for num_vars=1:10
-      ord = rand_ordering()
-      var_names = ["x$j" for j in 1:num_vars]
-
-      R, vars_R = PolynomialRing(ZZ, var_names; ordering=ord)
-
-      f = rand(R, 5:10, 1:10, -100:100)
-      g = rand(R, 5:10, 1:10, -100:100)
-
-      @test lt(f*g) == lt(f)*lt(g)
-      @test lt(one(R)) == one(R)
-      @test lt(zero(R)) == zero(R)
-
-      for v in vars_R
-         @test lt(v) == v
-      end
-
-      @test parent(lt(f)) == parent(f)
-   end
-end
-
-@testset "Generic.MPoly.lc..." begin
-   for num_vars = 1:4
-      var_names = ["x$j" for j in 1:num_vars]
-      ord = rand_ordering()
-      S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
-
-      for iter = 1:10
-         f = rand(S, 0:4, 0:5, -10:10)
-         g = rand(S, 0:4, 0:5, -10:10)
-
-         @test lc(f*g) == lc(f)*lc(g)
-         @test lc(one(S)) == one(base_ring(S))
-
-         for v in varlist
-            @test lc(v) == one(base_ring(S))
-         end
-
-         @test parent(lc(f)) == base_ring(f)
-      end
-   end
-end
-
-@testset "Generic.MPoly.lm..." begin
-   for num_vars = 1:4
-      var_names = ["x$j" for j in 1:num_vars]
-      ord = rand_ordering()
-      S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
-
-      for iter = 1:10
-         f = zero(S)
-         while iszero(f)
-            f = rand(S, 0:4, 0:5, -10:10)
-         end
-         g = zero(S)
-         while iszero(g)
-            g = rand(S, 0:4, 0:5, -10:10)
-         end
-
-         @test lm(f*g) == lm(f)*lm(g)
-         @test lm(one(S)) == one(S)
-         @test lm(zero(S)) == zero(S)
-
-         for v in varlist
-            @test lm(v) == v
-         end
-
-         @test parent(lm(f)) == parent(f)
-      end
-   end
-end
-
-@testset "Generic.MPoly.ishomogenous..." begin
-   for num_vars = 1:4
-      var_names = ["x$j" for j in 1:num_vars]
-      ord = rand_ordering()
-      S, varlist = PolynomialRing(ZZ, var_names, ordering = ord)
-
-      for iter = 1:10
-         @test ishomogeneous(zero(S))
-         @test ishomogeneous(one(S))
-         for v in varlist
-            @test ishomogeneous(v)
-            @test !ishomogeneous(v+one(S))
-         end
-      end
-   end
-end
