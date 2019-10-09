@@ -293,11 +293,11 @@ function divexact_right(x::AbstractAlgebra.MatAlgElem{T}, y::T) where {T <: Ring
    return divexact(x, y)
 end
 
-function divexact_left(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
+function divexact_left(x::MatAlgElem, y::Union{Integer, Rational, AbstractFloat})
    return divexact(x, y)
 end
 
-function divexact_right(x::MatrixElem, y::Union{Integer, Rational, AbstractFloat})
+function divexact_right(x::MatAlgElem, y::Union{Integer, Rational, AbstractFloat})
    return divexact(x, y)
 end
 
