@@ -179,7 +179,7 @@ Base.size(a::MyTestMatrix{T}) where T = a.dim, a.dim
    M8 = identity_matrix(M7)
 
    @test isa(M7, Generic.MatSpaceElem{elem_type(R)})
-   @test M7.base_ring == R                                                               
+   @test M7.base_ring == R
    @test M7 == M8
 
    x = zero_matrix(R, 2, 2)
@@ -323,6 +323,12 @@ end
       @test !iszero(m45)
       @test m45 isa Generic.MatSpaceElem
       @test parent(m45) == M45
+   end
+
+   let m = matrix(ZZ, 2, 3, 1:6)
+      @test typeof(m[1, 1]) == BigInt # not in AbstractAlgebra's hierarchy
+      @test eltype(m) == BigInt
+      @test eltype(typeof(m)) == BigInt
    end
 end
 
