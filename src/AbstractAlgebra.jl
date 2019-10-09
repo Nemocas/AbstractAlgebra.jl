@@ -583,10 +583,8 @@ function module_isomorphism(M1::AbstractAlgebra.Module, M2::AbstractAlgebra.Modu
    Generic.ModuleIsomorphism(M1, M2, m)
 end
 
-#add empty functions so that Singular, Nemo and Hecke can import and extend.
-function crt(A...)
-  return AbstractAlgebra.crt(A...)
-end
+# add empty functions so that Singular, Nemo and Hecke can import and extend.
+function crt end
 
 export PowerSeriesRing, PolynomialRing, SparsePolynomialRing, MatrixSpace,
        MatrixAlgebra, FractionField, ResidueRing, Partition, PermGroup,
