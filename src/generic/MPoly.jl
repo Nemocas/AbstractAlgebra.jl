@@ -178,6 +178,235 @@ end
 
 ###############################################################################
 #
+#   Manipulating terms and monomials
+#
+###############################################################################
+
+function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: RingElement
+   A = a.exps
+   N = size(A, 1)
+   return [Int(A[j, i]) for j in N:-1:1]
+end
+
+function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:lex}}) where T <: RingElement
+   return Int(a.exps[size(a.exps, 1) + 1 - j, i])
+end
+
+function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: RingElement
+   A = a.exps
+   N = size(A, 1)
+   return [Int(A[j, i]) for j in N - 1:-1:1]
+end
+
+function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:deglex}}) where T <: RingElement
+   return Int(a.exps[size(a.exps, 1) - j, i])
+end
+
+function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
+   A = a.exps
+   N = size(A, 1)
+   return [Int(A[j, i]) for j in 1:N - 1]
+end
+
+function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
+   return Int(a.exps[j, i])
+end
+
+@doc Markdown.doc"""
+    exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
+> Return a vector of exponents, corresponding to the exponent vector of the
+> i-th term of the polynomial. Term numbering begins at $1$ and the exponents
+> are given in the order of the variables for the ring, as supplied when the
+> ring was created.
+"""
+function exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
+   return exponent_vector(a, i, Val{parent(a).ord})
+end
+
+@doc Markdown.doc"""
+    exponent{T <: RingElem}(a::MPoly{T}, i::Int, j::Int)
+> Return coefficient of the j-th variables in the i-th term of the polynomial.
+> Term and variable numbering begins at $1$ and variables are ordered as
+> during the creation of the ring.
+"""
+function exponent(a::MPoly{T}, i::Int, j::Int) where T <: RingElement
+   return exponent(a, i, j, Val{parent(a).ord})
+end
+
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:lex}}) where T <: RingElement
+   fit!(a, i)
+   A = a.exps
+   A[:, i] = exps[end:-1:1]
+   if i > length(a)
+      a.length = i
+   end
+   return a
+end
+
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:deglex}}) where T <: RingElement
+   fit!(a, i)
+   A = a.exps
+   A[1:end - 1, i] = exps[end:-1:1]
+   A[end, i] = sum(exps)
+   if i > length(a)
+    a.length = i
+   end
+   return a
+end
+
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:degrevlex}}) where T <: RingElement
+   fit!(a, i)
+   A = a.exps
+   A[1:end - 1, i] = exps
+   A[end, i] = sum(exps)
+   if i > length(a)
+    a.length = i
+   end
+   return a
+end
+
+@doc Markdown.doc"""
+    set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
+> Set the i-th exponent vector to the supplied vector, where the entries
+> correspond to the exponents of the variables in the order supplied when
+> the ring was created. The modified polynomial is returned.
+"""
+function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
+   return set_exponent_vector!(a, i, exps, Val{parent(a).ord})
+end
+
+@doc Markdown.doc"""
+    coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
+> Return the coefficient of the term with the given exponent vector, or zero
+> if there is no such term.
+"""
+function coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
+   A = a.exps
+   N = size(A, 1)
+   exp2 = Array{UInt, 1}(undef, N)
+   ord = parent(a).ord
+   if ord == :lex
+      exp2[:] = exps[end:-1:1]
+   elseif ord == :deglex
+      exp2[1:end - 1] = exps[end:-1:1]
+      exp2[end] = sum(exps)
+   else
+      exp2[1:end - 1] = exps[1:end]
+      exp2[end] = sum(exps)
+   end
+   exp2 = reshape(exp2, N, 1)
+   lo = 1
+   hi = length(a)
+   n = div(hi - lo + 1, 2)
+   while hi >= lo
+      v = monomial_cmp(A, lo + n, exp2, 1, N, parent(a), UInt(0))
+      if v == 0
+         return a.coeffs[lo + n]
+      elseif v < 0
+         hi = lo + n - 1
+      else
+         lo = lo + n + 1
+      end
+      n = div(hi - lo + 1, 2)
+   end
+   return base_ring(a)()
+end
+
+@doc Markdown.doc"""
+    setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
+> Set the coefficient of the term with the given exponent vector to the given
+> value $c$. This function takes $O(\log n)$ operations if a term with the given
+> exponent already exists, or if the term is inserted at the end of the
+> polynomial. Otherwise it can take $O(n)$ operations in the worst case.
+"""
+function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
+   c = base_ring(a)(c)
+   A = a.exps
+   N = size(A, 1)
+   exp2 = Array{UInt, 1}(undef, N)
+   ord = parent(a).ord
+   if ord == :lex
+      exp2[:] = exps[end:-1:1]
+   elseif ord == :deglex
+      exp2[1:end - 1] = exps[end:-1:1]
+      exp2[end] = sum(exps)
+   else
+      exp2[1:end - 1] = exps[1:end]
+      exp2[end] = sum(exps)
+   end
+   exp2 = reshape(exp2, N, 1)
+   lo = 1
+   hi = length(a)
+   if hi > 0
+      n = div(hi - lo + 1, 2)
+      while hi >= lo
+         v = monomial_cmp(A, lo + n, exp2, 1, N, parent(a), UInt(0))
+         if v == 0
+            if c != 0 # just insert the coefficient
+               a.coeffs[lo + n] = c
+            else # coefficient is zero, shift everything
+               for i = lo + n:length(a) - 1
+                  a.coeffs[i] = a.coeffs[i + 1]
+                  monomial_set!(A, i, A, i + 1, N)
+               end
+               a.coeffs[length(a)] = c # zero final coefficient
+               a.length -= 1
+            end
+            return a
+         elseif v < 0
+            hi = lo + n - 1
+         else
+            lo = lo + n + 1
+         end
+         n = div(hi - lo + 1, 2)
+      end
+   end
+   # exponent not found, must insert at lo
+   if c != 0
+      lena = length(a)
+      fit!(a, lena + 1)
+      A = a.exps
+      for i = lena:-1:lo
+         a.coeffs[i + 1] = a.coeffs[i]
+         monomial_set!(A, i + 1, A, i, N)
+      end
+      a.coeffs[lo] = c
+      monomial_set!(A, lo, exp2, 1, N)
+      a.length += 1
+   end
+   return a
+end
+
+@doc Markdown.doc"""
+    sort_terms!(a::MPoly{T}) where {T <: RingElement}
+> Sort the terms of the given polynomial according to the polynomial ring
+> ordering. Zero terms and duplicate exponents are ignored. To deal with those
+> call `combine_like_terms`. The sorted polynomial is returned.
+"""
+function sort_terms!(a::MPoly{T}) where {T <: RingElement}
+   N = parent(a).N
+   # The reverse order is the fastest order if already sorted
+   V = [(ntuple(i -> a.exps[i, r], Val(N)), r) for r in length(a):-1:1]
+   ord = parent(a).ord
+   if ord == :lex || ord == :deglex
+      sort!(V, lt = is_less_lex)
+   else
+      sort!(V, lt = is_less_degrevlex)
+   end
+   Rc = [a.coeffs[V[i][2]] for i in length(V):-1:1]
+   Re = zeros(UInt, N, length(V))
+   for i = 1:length(V)
+      for j = 1:N
+         Re[j, length(V) - i + 1] = V[i][1][j]
+      end
+   end
+   a.coeffs = Rc
+   a.exps = Re
+   return a
+end
+
+###############################################################################
+#
 #   Multivariate coefficients
 #
 ###############################################################################
@@ -3796,6 +4025,73 @@ end
 
 ###############################################################################
 #
+#   Univariate polynomials
+#
+###############################################################################
+
+@doc Markdown.doc"""
+    to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
+> Assuming the polynomial $p$ is actually a univariate polynomial, convert the
+> polynomial to a univariate polynomial in the given univariate polynomial ring
+> $R$. An exception is raised if the polynomial $p$ involves more than one
+> variable.
+"""
+function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
+   vars_p = vars(p)
+
+   if length(vars_p) > 1
+      error("Can only convert univariate polynomials of type MPoly.")
+   end
+
+   if length(vars_p) == 0
+      return length(p) == 0 ? R(0) : R(p.coeffs[1])
+   end
+
+   return R(coefficients_of_univariate(p))
+end
+
+@doc Markdown.doc"""
+    involves_at_most_one_variable(p::AbstractAlgebra.Generic.MPoly)
+> Return true if $p$ contains at most 1 variable and false otherwise.
+"""
+function involves_at_most_one_variable(p::AbstractAlgebra.MPolyElem)
+   return length(vars(p)) <= 1
+end
+
+@doc Markdown.doc"""
+    coefficients_of_univariate(p::AbstractAlgebra.Generic.MPoly)
+> Return the coefficients of p, which is assumed to be univariate, as an array in ascending order.
+"""
+function coefficients_of_univariate(p::AbstractAlgebra.MPolyElem, check_univariate::Bool=true)
+   if check_univariate
+      vars_p = vars(p)
+
+      if length(vars_p) > 1
+         error("Polynomial is not univariate.")
+      end
+
+   end
+
+   if length(p) == 0
+      return Array{elem_type(base_ring(parent(p)))}(undef, 0)
+   end
+
+   var_index = findfirst(!iszero, exponent_vector(p, 1))
+
+   if var_index == nothing
+      return([coeff(p, 1)])
+   end
+
+   coeffs = [zero(base_ring(p)) for i = 0:total_degree(p)]
+   for i = 1:p.length
+      coeffs[exponent(p, i, var_index) + 1] = coeff(p, i)
+   end
+
+   return(coeffs)
+end
+
+###############################################################################
+#
 #   Conversions
 #
 ###############################################################################
@@ -4019,6 +4315,125 @@ function main_variable_insert(a::SparsePoly{MPoly{T}}, k::Int) where {T <: RingE
    end
 end
 
+################################################################################
+#
+#  Change base ring
+#
+################################################################################
+
+function _change_mpoly_ring(R, Rx, cached)
+   P, _ = AbstractAlgebra.PolynomialRing(R, map(string, symbols(Rx)), ordering = ordering(Rx), cached = cached)
+   return P
+end
+
+@doc Markdown.doc"""
+    change_base_ring(R::Ring, p::MPolyElem{<: RingElement}; parent::MPolyRing, cached::Bool)
+
+> Return the polynomial obtained by coercing the non-zero coefficients of `p`
+> into `R`.
+>
+> If the optional `parent` keyword is provided, the polynomial will be an
+> element of `parent`. The caching of the parent object can be controlled
+> via the `cached` keyword argument.
+"""
+function change_base_ring(R::Ring, p::MPolyElem{T}; cached = true, parent::MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
+   base_ring(parent) != R && error("Base rings do not match.")
+   return _map(R, p, parent)
+end
+
+################################################################################
+#
+#  Map                                                                      
+#
+################################################################################
+
+@doc Markdown.doc"""
+    map_coeffs(f, p::MPolyElem{<: RingElement}; parent::MPolyRing)
+
+> Transform the polynomial `p` by applying `f` on each non-zero coefficient.
+>
+> If the optional `parent` keyword is provided, the polynomial will be an
+> element of `parent`. The caching of the parent object can be controlled
+> via the `cached` keyword argument.
+"""
+function map_coeffs(f, p::MPolyElem; cached = true, parent::MPolyRing = _change_mpoly_ring(AbstractAlgebra.parent(f(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached))
+   return _map(f, p, parent)
+end
+
+function _map(g, p::MPolyElem, Rx)
+   cvzip = zip(coeffs(p), exponent_vectors(p))
+   M = MPolyBuildCtx(Rx)
+   for (c, v) in cvzip
+      push_term!(M, g(c), v)
+   end
+
+   return finish(M)
+end
+
+###############################################################################
+#
+#   Random elements
+#
+###############################################################################
+
+function rand_ordering(rng::AbstractRNG=Random.GLOBAL_RNG)
+   i = rand(rng, 1:3)
+   if i == 1
+      return :lex
+   elseif i == 2
+      return :deglex
+   else
+      return :degrevlex
+   end
+end
+
+function rand(rng::AbstractRNG, S::AbstractAlgebra.MPolyRing,
+              term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
+   f = S()
+   g = gens(S)
+   R = base_ring(S)
+   for i = 1:rand(term_range)
+      term = S(1)
+      for j = 1:length(g)
+         term *= g[j]^rand(rng, exp_bound)
+      end
+      term *= rand(rng, R, v...)
+      f += term
+   end
+   return f
+end
+
+###############################################################################
+#
+#   Build context
+#
+###############################################################################
+
+function MPolyBuildCtx(R::AbstractAlgebra.MPolyRing)
+   return MPolyBuildCtx(R, Nothing)
+end
+
+function show(io::IO, M::MPolyBuildCtx)
+   iocomp = IOContext(io, :compact => true)
+   print(iocomp, "Builder for a polynomial in ", parent(M.poly))
+end
+
+function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
+  if iszero(c)
+    return M
+  end
+  len = length(M.poly) + 1
+  set_exponent_vector!(M.poly, len, expv)
+  setcoeff!(M.poly, len, c)
+  return M
+end
+
+function finish(M::MPolyBuildCtx{T}) where T <: AbstractAlgebra.MPolyElem
+  M.poly = sort_terms!(M.poly)
+  M.poly = combine_like_terms!(M.poly)
+  return M.poly
+end
+
 ###############################################################################
 #
 #   Unsafe functions
@@ -4142,268 +4557,6 @@ end
 
 ###############################################################################
 #
-#   Manipulating terms and monomials
-#
-###############################################################################
-
-function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:lex}}) where T <: RingElement
-   A = a.exps
-   N = size(A, 1)
-   return [Int(A[j, i]) for j in N:-1:1]
-end
-
-function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:lex}}) where T <: RingElement
-   return Int(a.exps[size(a.exps, 1) + 1 - j, i])
-end
-
-function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:deglex}}) where T <: RingElement
-   A = a.exps
-   N = size(A, 1)
-   return [Int(A[j, i]) for j in N - 1:-1:1]
-end
-
-function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:deglex}}) where T <: RingElement
-   return Int(a.exps[size(a.exps, 1) - j, i])
-end
-
-function exponent_vector(a::MPoly{T}, i::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
-   A = a.exps
-   N = size(A, 1)
-   return [Int(A[j, i]) for j in 1:N - 1]
-end
-
-function exponent(a::MPoly{T}, i::Int, j::Int, ::Type{Val{:degrevlex}}) where T <: RingElement
-   return Int(a.exps[j, i])
-end
-
-@doc Markdown.doc"""
-    exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
-> Return a vector of exponents, corresponding to the exponent vector of the
-> i-th term of the polynomial. Term numbering begins at $1$ and the exponents
-> are given in the order of the variables for the ring, as supplied when the
-> ring was created.
-"""
-function exponent_vector(a::MPoly{T}, i::Int) where T <: RingElement
-   return exponent_vector(a, i, Val{parent(a).ord})
-end
-
-@doc Markdown.doc"""
-    exponent{T <: RingElem}(a::MPoly{T}, i::Int, j::Int)
-> Return coefficient of the j-th variables in the i-th term of the polynomial.
-> Term and variable numbering begins at $1$ and variables are ordered as
-> during the creation of the ring.
-"""
-function exponent(a::MPoly{T}, i::Int, j::Int) where T <: RingElement
-   return exponent(a, i, j, Val{parent(a).ord})
-end
-
-function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:lex}}) where T <: RingElement
-   fit!(a, i)
-   A = a.exps
-   A[:, i] = exps[end:-1:1]
-   if i > length(a)
-      a.length = i
-   end
-   return a
-end
-
-function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:deglex}}) where T <: RingElement
-   fit!(a, i)
-   A = a.exps
-   A[1:end - 1, i] = exps[end:-1:1]
-   A[end, i] = sum(exps)
-   if i > length(a)
-    a.length = i
-   end
-   return a
-end
-
-function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}, ::Type{Val{:degrevlex}}) where T <: RingElement
-   fit!(a, i)
-   A = a.exps
-   A[1:end - 1, i] = exps
-   A[end, i] = sum(exps)
-   if i > length(a)
-    a.length = i
-   end
-   return a
-end
-
-@doc Markdown.doc"""
-    set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
-> Set the i-th exponent vector to the supplied vector, where the entries
-> correspond to the exponents of the variables in the order supplied when
-> the ring was created. The modified polynomial is returned.
-"""
-function set_exponent_vector!(a::MPoly{T}, i::Int, exps::Vector{Int}) where T <: RingElement
-   return set_exponent_vector!(a, i, exps, Val{parent(a).ord})
-end
-
-@doc Markdown.doc"""
-    coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
-> Return the coefficient of the term with the given exponent vector, or zero
-> if there is no such term.
-"""
-function coeff(a::MPoly{T}, exps::Vector{Int}) where T <: RingElement
-   A = a.exps
-   N = size(A, 1)
-   exp2 = Array{UInt, 1}(undef, N)
-   ord = parent(a).ord
-   if ord == :lex
-      exp2[:] = exps[end:-1:1]
-   elseif ord == :deglex
-      exp2[1:end - 1] = exps[end:-1:1]
-      exp2[end] = sum(exps)
-   else
-      exp2[1:end - 1] = exps[1:end]
-      exp2[end] = sum(exps)
-   end
-   exp2 = reshape(exp2, N, 1)
-   lo = 1
-   hi = length(a)
-   n = div(hi - lo + 1, 2)
-   while hi >= lo
-      v = monomial_cmp(A, lo + n, exp2, 1, N, parent(a), UInt(0))
-      if v == 0
-         return a.coeffs[lo + n]
-      elseif v < 0
-         hi = lo + n - 1
-      else
-         lo = lo + n + 1
-      end
-      n = div(hi - lo + 1, 2)
-   end
-   return base_ring(a)()
-end
-
-@doc Markdown.doc"""
-    setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
-> Set the coefficient of the term with the given exponent vector to the given
-> value $c$. This function takes $O(\log n)$ operations if a term with the given
-> exponent already exists, or if the term is inserted at the end of the
-> polynomial. Otherwise it can take $O(n)$ operations in the worst case.
-"""
-function setcoeff!(a::MPoly, exps::Vector{Int}, c::S) where S <: RingElement
-   c = base_ring(a)(c)
-   A = a.exps
-   N = size(A, 1)
-   exp2 = Array{UInt, 1}(undef, N)
-   ord = parent(a).ord
-   if ord == :lex
-      exp2[:] = exps[end:-1:1]
-   elseif ord == :deglex
-      exp2[1:end - 1] = exps[end:-1:1]
-      exp2[end] = sum(exps)
-   else
-      exp2[1:end - 1] = exps[1:end]
-      exp2[end] = sum(exps)
-   end
-   exp2 = reshape(exp2, N, 1)
-   lo = 1
-   hi = length(a)
-   if hi > 0
-      n = div(hi - lo + 1, 2)
-      while hi >= lo
-         v = monomial_cmp(A, lo + n, exp2, 1, N, parent(a), UInt(0))
-         if v == 0
-            if c != 0 # just insert the coefficient
-               a.coeffs[lo + n] = c
-            else # coefficient is zero, shift everything
-               for i = lo + n:length(a) - 1
-                  a.coeffs[i] = a.coeffs[i + 1]
-                  monomial_set!(A, i, A, i + 1, N)
-               end
-               a.coeffs[length(a)] = c # zero final coefficient
-               a.length -= 1
-            end
-            return a
-         elseif v < 0
-            hi = lo + n - 1
-         else
-            lo = lo + n + 1
-         end
-         n = div(hi - lo + 1, 2)
-      end
-   end
-   # exponent not found, must insert at lo
-   if c != 0
-      lena = length(a)
-      fit!(a, lena + 1)
-      A = a.exps
-      for i = lena:-1:lo
-         a.coeffs[i + 1] = a.coeffs[i]
-         monomial_set!(A, i + 1, A, i, N)
-      end
-      a.coeffs[lo] = c
-      monomial_set!(A, lo, exp2, 1, N)
-      a.length += 1
-   end
-   return a
-end
-
-@doc Markdown.doc"""
-    sort_terms!(a::MPoly{T}) where {T <: RingElement}
-> Sort the terms of the given polynomial according to the polynomial ring
-> ordering. Zero terms and duplicate exponents are ignored. To deal with those
-> call `combine_like_terms`. The sorted polynomial is returned.
-"""
-function sort_terms!(a::MPoly{T}) where {T <: RingElement}
-   N = parent(a).N
-   # The reverse order is the fastest order if already sorted
-   V = [(ntuple(i -> a.exps[i, r], Val(N)), r) for r in length(a):-1:1]
-   ord = parent(a).ord
-   if ord == :lex || ord == :deglex
-      sort!(V, lt = is_less_lex)
-   else
-      sort!(V, lt = is_less_degrevlex)
-   end
-   Rc = [a.coeffs[V[i][2]] for i in length(V):-1:1]
-   Re = zeros(UInt, N, length(V))
-   for i = 1:length(V)
-      for j = 1:N
-         Re[j, length(V) - i + 1] = V[i][1][j]
-      end
-   end
-   a.coeffs = Rc
-   a.exps = Re
-   return a
-end
-
-###############################################################################
-#
-#   Random elements
-#
-###############################################################################
-
-function rand_ordering(rng::AbstractRNG=Random.GLOBAL_RNG)
-   i = rand(rng, 1:3)
-   if i == 1
-      return :lex
-   elseif i == 2
-      return :deglex
-   else
-      return :degrevlex
-   end
-end
-
-function rand(rng::AbstractRNG, S::AbstractAlgebra.MPolyRing,
-              term_range::UnitRange{Int}, exp_bound::UnitRange{Int}, v...)
-   f = S()
-   g = gens(S)
-   R = base_ring(S)
-   for i = 1:rand(term_range)
-      term = S(1)
-      for j = 1:length(g)
-         term *= g[j]^rand(rng, exp_bound)
-      end
-      term *= rand(rng, R, v...)
-      f += term
-   end
-   return f
-end
-
-###############################################################################
-#
 #   Promotion rules
 #
 ###############################################################################
@@ -4504,153 +4657,6 @@ function (a::MPolyRing{T})(b::Array{T, 1}, m::Vector{Vector{Int}}) where {T <: R
    z = sort_terms!(z)
    z = combine_like_terms!(z)
    return z
-end
-
-###############################################################################
-#
-#   Univariate polynomials
-#
-###############################################################################
-
-@doc Markdown.doc"""
-    to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
-> Assuming the polynomial $p$ is actually a univariate polynomial, convert the
-> polynomial to a univariate polynomial in the given univariate polynomial ring
-> $R$. An exception is raised if the polynomial $p$ involves more than one
-> variable.
-"""
-function to_univariate(R::AbstractAlgebra.PolyRing{T}, p::AbstractAlgebra.MPolyElem{T}) where T <: AbstractAlgebra.RingElement
-   vars_p = vars(p)
-
-   if length(vars_p) > 1
-      error("Can only convert univariate polynomials of type MPoly.")
-   end
-
-   if length(vars_p) == 0
-      return length(p) == 0 ? R(0) : R(p.coeffs[1])
-   end
-
-   return R(coefficients_of_univariate(p))
-end
-
-@doc Markdown.doc"""
-    involves_at_most_one_variable(p::AbstractAlgebra.Generic.MPoly)
-> Return true if $p$ contains at most 1 variable and false otherwise.
-"""
-function involves_at_most_one_variable(p::AbstractAlgebra.MPolyElem)
-   return length(vars(p)) <= 1
-end
-
-@doc Markdown.doc"""
-    coefficients_of_univariate(p::AbstractAlgebra.Generic.MPoly)
-> Return the coefficients of p, which is assumed to be univariate, as an array in ascending order.
-"""
-function coefficients_of_univariate(p::AbstractAlgebra.MPolyElem, check_univariate::Bool=true)
-   if check_univariate
-      vars_p = vars(p)
-
-      if length(vars_p) > 1
-         error("Polynomial is not univariate.")
-      end
-
-   end
-
-   if length(p) == 0
-      return Array{elem_type(base_ring(parent(p)))}(undef, 0)
-   end
-
-   var_index = findfirst(!iszero, exponent_vector(p, 1))
-
-   if var_index == nothing
-      return([coeff(p, 1)])
-   end
-
-   coeffs = [zero(base_ring(p)) for i = 0:total_degree(p)]
-   for i = 1:p.length
-      coeffs[exponent(p, i, var_index) + 1] = coeff(p, i)
-   end
-
-   return(coeffs)
-end
-
-###############################################################################
-#
-#   Build context
-#
-###############################################################################
-
-function MPolyBuildCtx(R::AbstractAlgebra.MPolyRing)
-   return MPolyBuildCtx(R, Nothing)
-end
-
-function show(io::IO, M::MPolyBuildCtx)
-   iocomp = IOContext(io, :compact => true)
-   print(iocomp, "Builder for a polynomial in ", parent(M.poly))
-end
-
-function push_term!(M::MPolyBuildCtx{T}, c::S, expv::Vector{Int}) where T <: AbstractAlgebra.MPolyElem{S} where S <: RingElement
-  if iszero(c)
-    return M
-  end
-  len = length(M.poly) + 1
-  set_exponent_vector!(M.poly, len, expv)
-  setcoeff!(M.poly, len, c)
-  return M
-end
-
-function finish(M::MPolyBuildCtx{T}) where T <: AbstractAlgebra.MPolyElem
-  M.poly = sort_terms!(M.poly)
-  M.poly = combine_like_terms!(M.poly)
-  return M.poly
-end
-
-################################################################################
-#
-#  Change base ring and map
-#
-################################################################################
-
-function _change_mpoly_ring(R, Rx, cached)
-   P, _ = AbstractAlgebra.PolynomialRing(R, map(string, symbols(Rx)), ordering = ordering(Rx), cached = cached)
-   return P
-end
-
-@doc Markdown.doc"""
-    change_base_ring(R::Ring, p::MPolyElem{<: RingElement}; parent::MPolyRing, cached::Bool)
-
-> Return the polynomial obtained by coercing the non-zero coefficients of `p`
-> into `R`.
->
-> If the optional `parent` keyword is provided, the polynomial will be an
-> element of `parent`. The caching of the parent object can be controlled
-> via the `cached` keyword argument.
-"""
-function change_base_ring(R::Ring, p::MPolyElem{T}; cached = true, parent::MPolyRing = _change_mpoly_ring(R, parent(p), cached)) where {T <: RingElement}
-   base_ring(parent) != R && error("Base rings do not match.")
-   return _map(R, p, parent)
-end
-
-@doc Markdown.doc"""
-    map_coeffs(f, p::MPolyElem{<: RingElement}; parent::MPolyRing)
-
-> Transform the polynomial `p` by applying `f` on each non-zero coefficient.
->
-> If the optional `parent` keyword is provided, the polynomial will be an
-> element of `parent`. The caching of the parent object can be controlled
-> via the `cached` keyword argument.
-"""
-function map_coeffs(f, p::MPolyElem; cached = true, parent::MPolyRing = _change_mpoly_ring(AbstractAlgebra.parent(f(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached))
-   return _map(f, p, parent)
-end
-
-function _map(g, p::MPolyElem, Rx)
-   cvzip = zip(coeffs(p), exponent_vectors(p))
-   M = MPolyBuildCtx(Rx)
-   for (c, v) in cvzip
-      push_term!(M, g(c), v)
-   end
-
-   return finish(M)
 end
 
 ###############################################################################
