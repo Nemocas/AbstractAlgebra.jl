@@ -2370,7 +2370,7 @@ end
 > element of `parent`. The caching of the parent object can be controlled
 > via the `cached` keyword argument.
 """
-function change_base_ring(R::Ring, p::PolyElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: RingElement
+function change_base_ring(R::Ring, p::PolyElem{T}; cached::Bool = true, parent::AbstractAlgebra.PolyRing = _change_poly_ring(R, parent(p), cached)) where T <: RingElement
    return _map(R, p, parent)
 end
 
@@ -2388,7 +2388,7 @@ end
 > element of `parent`. The caching of the parent object can be controlled
 > via the `cached` keyword argument.
 """
-function map_coeffs(g, p::PolyElem{T}; cached::Bool = true, parent::PolyRing = _change_poly_ring(AbstractAlgebra.parent(g(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached)) where T <: RingElement
+function map_coeffs(g, p::PolyElem{T}; cached::Bool = true, parent::AbstractAlgebra.PolyRing = _change_poly_ring(AbstractAlgebra.parent(g(zero(base_ring(p)))), AbstractAlgebra.parent(p), cached)) where T <: RingElement
    return _map(g, p, parent)
 end
 
