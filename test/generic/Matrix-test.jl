@@ -1147,7 +1147,6 @@ end
       @test c isa eltype(M)
 
       @test isunit(c)
-      @test inv(c) isa eltype(M)
       @test N[i,j] == -1
       @test M*N == N*M == c*R(1)
 
