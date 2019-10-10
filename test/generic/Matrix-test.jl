@@ -76,6 +76,16 @@ function is_weak_popov(P::Generic.Mat, rank::Int)
    return true
 end
 
+# some rings which can be tested, together with the parameters to rand to get a random matrix
+const RINGS = Dict(
+   "exact ring"          => (ZZ,                 (-1000:1000,)),
+   "exact field"         => (GF(7),              ()),
+   "inexact ring"        => (RealField["t"][1],  (0:200, -1000:1000)),
+   "inexact field"       => (RealField,          (-1000:1000,)),
+   "non-integral domain" => (ResidueRing(ZZ, 6), (0:5,)),
+   "fraction field"      => (QQ,                 (-1000:1000,)),
+)
+
 # Simulate user matrix type belonging to AbstractArray
 # with getindex but no setindex!
 struct MyTestMatrix{T} <: AbstractArray{T, 2}
@@ -366,6 +376,14 @@ end
    B = S([-t - 1 (-t) -R(1); -t^2 (-t) (-t); -R(-2) (-t - 2) (-t^2 - t - 1)])
 
    @test -A == B
+
+   R, randparams = rand(RINGS)[2]
+   S = MatrixSpace(R, rand(0:9), rand(0:9))
+
+   A = rand(S, randparams...)
+
+   @test iszero(A + (-A))
+   @test A == -(-A)
 end
 
 @testset "Generic.Mat.sub..." begin
@@ -422,6 +440,20 @@ end
    # A[:, :] must be a valid indexing
    @test size(A[:, :]) == (0, 0)
    @test_throws BoundsError A[2:3, 1:10]
+
+   R, randparams = rand(RINGS)[2]
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, randparams...)
+   ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
+
+   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
+   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
+   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+
+   rows, cols = randsubseq.(axes(A), rand(2))
+   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
 end
 
 @testset "Generic.Mat.binary_ops..." begin

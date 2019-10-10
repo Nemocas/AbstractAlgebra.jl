@@ -1,4 +1,4 @@
-using Random: MersenneTwister
+using Random: MersenneTwister, randsubseq
 
 const rng = MersenneTwister()
 
@@ -9,4 +9,3 @@ include("Fields-test.jl")
 include("Modules-test.jl")
 include("Maps-test.jl")
 include("Benchmark-test.jl")
-
