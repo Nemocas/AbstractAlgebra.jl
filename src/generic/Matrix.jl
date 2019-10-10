@@ -344,19 +344,6 @@ canonical_unit(a::MatrixElem) = canonical_unit(a[1, 1])
 #
 ###############################################################################
 
-function sub(M::AbstractAlgebra.MatElem, rows::UnitRange{Int}, cols::UnitRange{Int})
-  _checkbounds(M, rows, cols)
-  z = similar(M, length(rows), length(cols))
-  startr = first(rows)
-  startc = first(cols)
-  for i in rows
-    for j in cols
-      z[i - startr + 1, j - startc + 1] = deepcopy(M[i, j])
-    end
-  end
-  return z
-end
-
 @doc Markdown.doc"""
     sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
 > Return a copy of the submatrix of $M$ from $(r1, c1)$ to $(r2, c2)$ inclusive. Note
@@ -367,15 +354,15 @@ function sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
 end
 
 @doc Markdown.doc"""
-    sub(M::AbstractAlgebra.MatElem, rows::Array{Int,1}, cols::Array{Int,1})
+    sub(M::AbstractAlgebra.MatElem, rows::AbstractVector{Int}, cols::AbstractVector{Int})
 > Return a copy of the submatrix $A$ of $M$ defined by A[i,j] = M[rows[i], cols[j]]
 > for i=1,...,length(rows) and j=1,...,length(cols)
 """
-function sub(M::AbstractAlgebra.MatElem, rows::Array{Int,1}, cols::Array{Int,1})
+function sub(M::AbstractAlgebra.MatElem, rows::AbstractVector{Int}, cols::AbstractVector{Int})
+   Base.require_one_based_indexing(rows, cols)
    z = similar(M, length(rows), length(cols))
    for i in 1:length(rows)
       for j in 1:length(cols)
-         Generic._checkbounds(M, rows[i], cols[j])
          z[i, j] = deepcopy(M[rows[i], cols[j]])
       end
    end
