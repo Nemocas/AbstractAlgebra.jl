@@ -37,11 +37,11 @@ function _similar(x::MatrixElem{T}, R::Ring, r::Int, c::Int) where T <: RingElem
    return z
 end
 
-similar(x::AbstractAlgebra.MatElem, R::Ring, r::Int, c::Int) = _similar(x, R, r, c)
+similar(x::AbstractAlgebra.MatElem, R::Ring, r::Integer, c::Integer) = _similar(x, R, Int(r), Int(c))
 
 similar(x::AbstractAlgebra.MatElem, R::Ring=base_ring(x)) = similar(x, R, nrows(x), ncols(x))
 
-similar(x::AbstractAlgebra.MatElem, r::Int, c::Int) = similar(x, base_ring(x), r, c)
+similar(x::AbstractAlgebra.MatElem, r::Integer, c::Integer) = similar(x, base_ring(x), r, c)
 
 ###############################################################################
 #
@@ -101,11 +101,11 @@ function _check_dim(r::Int, c::Int, arr::AbstractArray{T, 1}) where {T}
   return nothing
 end
 
-function _checkbounds(i::Int, j::Int)
+function _checkbounds(i::Integer, j::Integer)
    j >= 1 && j <= i
 end
 
-function _checkbounds(A, i::Int, j::Int)
+function _checkbounds(A, i::Integer, j::Integer)
   (_checkbounds(nrows(A), i) && _checkbounds(ncols(A), j)) ||
             Base.throw_boundserror(A, (i, j))
 end
@@ -163,12 +163,12 @@ length(a::MatrixElem) = nrows(a) * ncols(a)
 """
 isempty(a::MatrixElem) = (nrows(a) == 0) | (ncols(a) == 0)
 
-Base.@propagate_inbounds function getindex(a::MatrixElem, r::Int, c::Int)
+Base.@propagate_inbounds function getindex(a::MatrixElem, r::Integer, c::Integer)
    return a.entries[r, c]
 end
 
-Base.@propagate_inbounds function setindex!(a::MatrixElem, d::T, r::Int,
-                                            c::Int) where T <: RingElement
+Base.@propagate_inbounds function setindex!(a::MatrixElem, d::RingElement,
+                                            r::Integer, c::Integer)
     a.entries[r, c] = base_ring(a)(d)
 end
 
@@ -322,7 +322,7 @@ canonical_unit(a::MatrixElem) = canonical_unit(a[1, 1])
 #
 ###############################################################################
 
-function sub(M::AbstractAlgebra.MatElem, rows::UnitRange{Int}, cols::UnitRange{Int})
+function sub(M::AbstractAlgebra.MatElem, rows::UnitRange{<:Integer}, cols::UnitRange{<:Integer})
   Generic._checkbounds(M, rows.start, cols.start)
   Generic._checkbounds(M, rows.stop, cols.stop)
   z = similar(M, length(rows), length(cols))
@@ -341,7 +341,7 @@ end
 > Return a copy of the submatrix of $M$ from $(r1, c1)$ to $(r2, c2)$ inclusive. Note
 > that if the copy is modified, the original matrix is not.
 """
-function sub(M::AbstractAlgebra.MatElem, r1::Int, c1::Int, r2::Int, c2::Int)
+function sub(M::AbstractAlgebra.MatElem, r1::Integer, c1::Integer, r2::Integer, c2::Integer)
   return sub(M, r1:r2, c1:c2)
 end
 
@@ -350,7 +350,7 @@ end
 > Return a copy of the submatrix $A$ of $M$ defined by A[i,j] = M[rows[i], cols[j]]
 > for i=1,...,length(rows) and j=1,...,length(cols)
 """
-function sub(M::AbstractAlgebra.MatElem, rows::Array{Int,1}, cols::Array{Int,1})
+function sub(M::AbstractAlgebra.MatElem, rows::Array{<:Integer,1}, cols::Array{<:Integer,1})
    z = similar(M, length(rows), length(cols))
    for i in 1:length(rows)
       for j in 1:length(cols)
@@ -361,21 +361,21 @@ function sub(M::AbstractAlgebra.MatElem, rows::Array{Int,1}, cols::Array{Int,1})
    return z
 end
 
-getindex(x::AbstractAlgebra.MatElem, r::UnitRange{Int}, c::UnitRange{Int}) = sub(x, r, c)
+getindex(x::AbstractAlgebra.MatElem, r::UnitRange{<:Integer}, c::UnitRange{<:Integer}) = sub(x, r, c)
 
-getindex(x::AbstractAlgebra.MatElem, r::UnitRange{Int}, ::Colon) = sub(x, r, 1:ncols(x))
+getindex(x::AbstractAlgebra.MatElem, r::UnitRange{<:Integer}, ::Colon) = sub(x, r, 1:ncols(x))
 
-getindex(x::AbstractAlgebra.MatElem, ::Colon, c::UnitRange{Int}) = sub(x, 1:nrows(x), c)
+getindex(x::AbstractAlgebra.MatElem, ::Colon, c::UnitRange{<:Integer}) = sub(x, 1:nrows(x), c)
 
 getindex(x::AbstractAlgebra.MatElem, ::Colon, ::Colon) = sub(x, 1:nrows(x), 1:ncols(x))
 
-getindex(x::AbstractAlgebra.MatElem, r::Int, c::UnitRange{Int}) = sub(x, r:r, c)
+getindex(x::AbstractAlgebra.MatElem, r::Integer, c::UnitRange{<:Integer}) = sub(x, r:r, c)
 
-getindex(x::AbstractAlgebra.MatElem, r::UnitRange{Int}, c::Int) = sub(x, r, c:c)
+getindex(x::AbstractAlgebra.MatElem, r::UnitRange{<:Integer}, c::Integer) = sub(x, r, c:c)
 
-getindex(x::AbstractAlgebra.MatElem, r::Int, ::Colon) = sub(x, r:r, 1:ncols(x))
+getindex(x::AbstractAlgebra.MatElem, r::Integer, ::Colon) = sub(x, r:r, 1:ncols(x))
 
-getindex(x::AbstractAlgebra.MatElem, ::Colon, c::Int) = sub(x, 1:nrows(x), c:c)
+getindex(x::AbstractAlgebra.MatElem, ::Colon, c::Integer) = sub(x, 1:nrows(x), c:c)
 
 function Base.view(M::Mat{T}, rows::UnitRange{Int}, cols::UnitRange{Int}) where T <: RingElement
    return MatSpaceView(view(M.entries, rows, cols), M.base_ring)
@@ -5232,4 +5232,3 @@ function MatrixSpace(R::AbstractAlgebra.Ring, r::Int, c::Int, cached::Bool = tru
    T = elem_type(R)
    return MatSpace{T}(R, r, c, cached)
 end
-
