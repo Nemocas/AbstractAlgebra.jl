@@ -172,7 +172,7 @@ Base.@propagate_inbounds function setindex!(a::MatrixElem, d::T, r::Int,
     a.entries[r, c] = base_ring(a)(d)
 end
 
-Base.eltype(::Type{<:MatrixElem{T}}) where T <: RingElem = T
+Base.eltype(::Type{<:MatrixElem{T}}) where {T} = T
 
 Base.isassigned(a::Union{Mat,MatAlgElem}, i, j) = isassigned(a.entries, i, j)
 
@@ -5232,4 +5232,3 @@ function MatrixSpace(R::AbstractAlgebra.Ring, r::Int, c::Int, cached::Bool = tru
    T = elem_type(R)
    return MatSpace{T}(R, r, c, cached)
 end
-
