@@ -226,11 +226,11 @@ function +(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem
       i += 1
    end
    while i <= lena
-      z = setcoeff!(z, i - 1, coeff(a, i - 1))
+      z = setcoeff!(z, i - 1, deepcopy(coeff(a, i - 1)))
       i += 1
    end
    while i <= lenb
-      z = setcoeff!(z, i - 1, coeff(b, i - 1))
+      z = setcoeff!(z, i - 1, deepcopy(coeff(b, i - 1)))
       i += 1
    end
    set_length!(z, normalise(z, i - 1))
@@ -258,7 +258,7 @@ function -(a::AbstractAlgebra.AbsSeriesElem{T}, b::AbstractAlgebra.AbsSeriesElem
       i += 1
    end
    while i <= lena
-      z = setcoeff!(z, i - 1, coeff(a, i - 1))
+      z = setcoeff!(z, i - 1, deepcopy(coeff(a, i - 1)))
       i += 1
    end
    while i <= lenb
