@@ -377,10 +377,37 @@ end
 
    @test -A == B
 
-   R, randparams = rand(RINGS)[2]
-   S = MatrixSpace(R, rand(0:9), rand(0:9))
+   # Exact ring
+   S = MatrixSpace(ZZ, rand(0:9), rand(0:9))
+   A = rand(S, -1000:1000)
 
-   A = rand(S, randparams...)
+   @test iszero(A + (-A))
+   @test A == -(-A)
+
+   # Exact field
+   S = MatrixSpace(GF(7), rand(0:9), rand(0:9))
+   A = rand(S)
+
+   @test iszero(A + (-A))
+   @test A == -(-A)
+
+   # Inexact ring
+   S = MatrixSpace(RealField["t"][1], rand(0:9), rand(0:9))
+   A = rand(S, 0:200, -1000:1000)
+
+   @test iszero(A + (-A))
+   @test A == -(-A)
+
+   # Inexact field
+   S = MatrixSpace(RealField, rand(0:9), rand(0:9))
+   A = rand(S, -1000:1000)
+
+   @test iszero(A + (-A))
+   @test A == -(-A)
+
+   # Non-integral domain
+   S = MatrixSpace(ResidueRing(ZZ, 6), rand(0:9), rand(0:9))
+   A = rand(S, 0:5)
 
    @test iszero(A + (-A))
    @test A == -(-A)
@@ -441,7 +468,92 @@ end
    @test size(A[:, :]) == (0, 0)
    @test_throws BoundsError A[2:3, 1:10]
 
-   R, randparams = rand(RINGS)[2]
+   R, randparams = RINGS[]
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, randparams...)
+   ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
+
+   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
+   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
+   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+
+   rows, cols = randsubseq.(axes(A), rand(2))
+   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+
+   R, randparams = RINGS["exact ring"]
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, randparams...)
+   ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
+
+   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
+   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
+   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+
+   rows, cols = randsubseq.(axes(A), rand(2))
+   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+
+   R, randparams = RINGS["exact field"]
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, randparams...)
+   ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
+
+   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
+   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
+   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+
+   rows, cols = randsubseq.(axes(A), rand(2))
+   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+
+   R, randparams = RINGS["inexact ring"]
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, randparams...)
+   ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
+
+   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
+   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
+   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+
+   rows, cols = randsubseq.(axes(A), rand(2))
+   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+
+   R, randparams = RINGS["inexact field"]
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, randparams...)
+   ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
+
+   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
+   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
+   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+
+   rows, cols = randsubseq.(axes(A), rand(2))
+   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+
+   R, randparams = RINGS["non-integral domain"]
+   S = MatrixSpace(R, rand(1:9), rand(1:9))
+
+   A = rand(S, randparams...)
+   ((i, j), (k, l)) = extrema.(rand.(axes(A), 2))
+
+   @test sub(A, i, k, j, l) == sub(A, i:j, k:l) == A[i:j, k:l]
+   @test sub(A, i, k, j, l) == matrix(R, A.entries[i:j, k:l])
+   @test sub(A, 1:nrows(A), k:l) == A[:, k:l] == matrix(R, A.entries[:, k:l])
+   @test sub(A, i:j, 1:ncols(A)) == A[i:j, :] == matrix(R, A.entries[i:j, :])
+
+   rows, cols = randsubseq.(axes(A), rand(2))
+   @test sub(A, rows, cols) == matrix(R, A.entries[rows, cols])
+
+   R, randparams = RINGS["fraction field"]
+>>>>>>> test "all" rings
    S = MatrixSpace(R, rand(1:9), rand(1:9))
 
    A = rand(S, randparams...)
