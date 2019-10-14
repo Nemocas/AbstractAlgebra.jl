@@ -134,6 +134,8 @@ end
 
    @test string(Perm(T[1,2,3])) == "()"
    @test string(Perm(T[3,2,1])) == "(1,3)"
+
+   @test string(Perm(Int[])) == "()"
 end
 
 @testset "Perm.basic_manipulation ($T)..." for T in IntTypes

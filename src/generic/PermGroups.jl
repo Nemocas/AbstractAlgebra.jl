@@ -216,7 +216,7 @@ function cycledec(v::Vector{T}) where T<:Integer
    # ccycles[cptrs[i], cptrs[i+1]-1] contains i-th cycle
 
    # expected number of cycles - (overestimation of) the harmonic
-   sizehint!(cptrs, 5 + ceil(Int, log(length(v))))
+   sizehint!(cptrs, 5 + ceil(Int, log(length(v) + 1))) # +1 to account for an empty v
    # cptrs[1] = one(T)
 
    k = 1
