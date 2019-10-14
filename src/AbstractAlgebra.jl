@@ -712,8 +712,6 @@ end
 #
 ###############################################################################
 
-if VERSION >= v"0.5.0-dev+3171"
-
 function sig_exists(T::Type{Tuple{U, V, W}}, sig_table::Array{X, 1}) where {U, V, W, X}
    for s in sig_table
       if s === T
@@ -722,14 +720,6 @@ function sig_exists(T::Type{Tuple{U, V, W}}, sig_table::Array{X, 1}) where {U, V
    end
    return false
 end
-
-else
-
-function sig_exists(T::Type{Tuple{U, V, W}}, sig_table::Array{X, 1}) where {U, V, W, X}
-   return false
-end
-
-end # if VERSION
 
 ###############################################################################
 #

@@ -36,10 +36,6 @@ zero(::Floats{T}) where T <: AbstractFloat = T(0)
 
 one(::Floats{T}) where T <: AbstractFloat = T(1)
 
-if VERSION < v"0.7.0-DEV.1144"
-isone(a::AbstractFloat) = a == 1
-end
-
 isunit(a::AbstractFloat) = a != 0
 
 canonical_unit(a::AbstractFloat) = a
