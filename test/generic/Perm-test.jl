@@ -45,6 +45,9 @@ end
 
    @test similar(g) isa Perm{T}
    @test similar(g, Int) isa Perm{Int}
+
+   @test_throws MethodError Perm("error")
+   @test_throws MethodError Perm(Any[])
 end
 
 @testset "Perm.parsingGAP..." begin
