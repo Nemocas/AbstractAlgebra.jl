@@ -61,7 +61,7 @@ end
 > * `modified::Bool` - bit to check the validity of cycle decomposition
 > * `cycles::CycleDec{T}` - (cached) cycle decomposition
 >
-> Permutation $p$ consists of a vector (`p.d`) of $n$ integers from $1$ to $n$.
+> A permutation $p$ consists of a vector (`p.d`) of $n$ integers from $1$ to $n$.
 > If the $i$-th entry of the vector is $j$, this corresponds to $p$ sending $i \to j$.
 > The cycle decomposition (`p.cycles`) is computed on demand and should never be
 > accessed directly. Use [`cycles(p)`](@ref) instead.
@@ -70,8 +70,8 @@ end
 >
 > * `Perm(n::T)` constructs the trivial `Perm{T}`-permutation of length $n$.
 > * `Perm(v::Vector{T<:Integer}[,check=true])` constructs a permutation
-> represented by `v`. By default `Perm` constructor checks if the vector
-> constitutes a valid permutation. To skip the check call `Perm(v, false)`.
+>   represented by `v`. By default `Perm` constructor checks if the vector
+>   constitutes a valid permutation. To skip the check call `Perm(v, false)`.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
