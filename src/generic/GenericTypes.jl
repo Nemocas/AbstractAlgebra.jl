@@ -51,7 +51,14 @@ Perm{UInt16}
 """
 struct PermGroup{T<:Integer} <: AbstractAlgebra.Group
    n::T
+
+   function PermGroup{T}(n::Integer) where T<:Integer
+      n < 0 && throw(DomainError(n, "PermGroup constructor requires a non-negative integer"))
+      new{T}(n)
+   end
 end
+
+PermGroup(n::Integer) = PermGroup{typeof(n)}(n)
 
 @doc Markdown.doc"""
     Perm{T<:Integer}
