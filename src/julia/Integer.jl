@@ -36,10 +36,6 @@ zero(::Integers{T}) where T <: Integer = T(0)
 
 one(::Integers{T}) where T <: Integer = T(1)
 
-if VERSION < v"0.7.0-DEV.1144"
-isone(a::Integer) = a == 1
-end
-
 @doc Markdown.doc"""
    isunit(a::Integer)
 > Return `true` if $a$ is $1$ or $-1$.
