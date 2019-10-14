@@ -39,13 +39,13 @@ The top bit of each `UInt` is reserved for overflow detection.
 Parent objects of such polynomials have type `Generic.MPolyRing{T}`.
 
 The string representation of the variables of the polynomial ring and the
-base/coefficient ring $R$ and the ordering are stored in the parent object. 
+base/coefficient ring $R$ and the ordering are stored in the parent object.
 
 The polynomial element types belong to the abstract type `AbstractAlgebra.MPolyElem{T}`
 and the polynomial ring types belong to the abstract type `AbstractAlgebra.MPolyRing{T}`.
 
 Note that both the generic polynomial ring type `Generic.MPolyRing{T}` and the abstract
-type it belongs to, `AbstractAlgebra.MPolyRing{T}` are both called `MPolyRing`. The 
+type it belongs to, `AbstractAlgebra.MPolyRing{T}` are both called `MPolyRing`. The
 former is a (parameterised) concrete type for a polynomial ring over a given base ring
 whose elements have type `T`. The latter is an abstract type representing all
 multivariate polynomial ring types in AbstractAlgebra.jl, whether generic or very
@@ -65,7 +65,7 @@ Given a base ring `R` and and array `S` of strings specifying how the generators
 (variables) should be printed, return a tuple `S, (x, ...)` representing the new
 polynomial ring $S = R[x, \ldots]$ and a tuple of the generators $(x, ...)$ of the ring.
 By default the parent object `S` will depend only on `R` and  `(x, ...)` and will be
-cached. Setting the optional argument `cached` to `false` will prevent the parent object 
+cached. Setting the optional argument `cached` to `false` will prevent the parent object
 `S` from being cached.
 
 The optional named argument `ordering` can be used to specify an ordering. The currently
@@ -200,7 +200,7 @@ structure homomorphism of the $T$-algebra $S$.
 
 ```@docs
 change_base_ring(::Ring, p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
-map_coeffs(::Any, p::AbstractAlgebra.MPolyElem{T}) where {T <: RingElement}
+map_coeffs(::Any, p::AbstractAlgebra.MPolyElem)
 ```
 
 **Examples**
@@ -526,4 +526,3 @@ It is possible to test whether a polynomial is homogeneous with respect to the s
 ```@docs
 ishomogeneous(x::AbstractAlgebra.MPolyElem{T}) where T <: RingElement
 ```
-

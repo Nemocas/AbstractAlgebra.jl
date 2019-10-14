@@ -10,7 +10,7 @@ end
 AbstractAlgebra.jl allows the creation of an algebra (ring) of $m\times m$ matrices over
 a computable, commutative ring.
 
-Functions specific to generic matrix algebras of $m\times m$ matrices are implemented in 
+Functions specific to generic matrix algebras of $m\times m$ matrices are implemented in
 `src/generic/MatrixAlgebra.jl`. The remaining functionality is in the file
 `src/generic/Matrix.jl`.
 
@@ -28,7 +28,7 @@ of functions.
 
 ## Types and parent objects
 
-Generic matrices in AbstractAlgebra.jl have type `Generic.MatAlgElem{T}` for matrices in 
+Generic matrices in AbstractAlgebra.jl have type `Generic.MatAlgElem{T}` for matrices in
 a matrix algebra, where `T` is the type of elements of the matrix. Internally, generic
 matrices are implemented using an object wrapping a Julia two dimensional array, though
 they are not themselves Julia arrays. See the file `src/generic/GenericTypes.jl` for
@@ -103,7 +103,7 @@ The following additional constructors are provided for constructing various
 kinds of matrices in a matrix algebra.
 
 ```@docs
-zero_matrix(::MatAlgElem{T}) where T <: RingElement
+zero(::MatAlgebra)
 ```
 
 ```@docs
@@ -115,7 +115,6 @@ identity_matrix(::MatAlgElem{T}) where T <: RingElement                         
 S = MatrixAlgebra(ZZ, 2)
 M = zero(S)
 
-N = zero_matrix(M)
 P = identity_matrix(M)
 ```
 
@@ -160,4 +159,3 @@ julia> n = degree(A)
 3
 
 ```
-
