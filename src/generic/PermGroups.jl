@@ -5,19 +5,19 @@
 ###############################################################################
 
 @doc Markdown.doc"""
-    parent_type(::Type{Perm{T}}) where T = PermGroup{T}
+    parent_type(::Type{<:Perm})
 > Return the type of the parent of a permutation.
 """
 parent_type(::Type{Perm{T}}) where T = PermGroup{T}
 
 @doc Markdown.doc"""
-    elem_type(::Type{PermGroup{T}}) where T = Perm{T}
+    elem_type(::Type{<:PermGroup})
 > Return the type of elements of a permutation group.
 """
 elem_type(::Type{PermGroup{T}}) where T = Perm{T}
 
 @doc Markdown.doc"""
-    parent(g::Perm{T}) where T = PermGroup
+    parent(g::Perm)
 > Return the parent of the permutation `g`.
 
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -69,7 +69,7 @@ end
 ###############################################################################
 
 @doc Markdown.doc"""
-    parity(g::Perm{T}) where T
+    parity(g::Perm)
 > Return the parity of the given permutation, i.e. the parity of the number of
 > transpositions in any decomposition of `g` into transpositions.
 >
@@ -114,8 +114,8 @@ function parity(g::Perm{T}) where T
 end
 
 @doc Markdown.doc"""
-    sign(g::Perm{T}) where T
-> Return the sign of permutation.
+    sign(g::Perm)
+> Return the sign of a permutation.
 >
 > `sign` returns $1$ if `g` is even and $-1$ if `g` is odd. `sign` represents
 > the homomorphism from the permutation group to the unit group of $\mathbb{Z}$
@@ -179,7 +179,7 @@ function Base.show(io::IO, cd::CycleDec)
 end
 
 @doc Markdown.doc"""
-    cycles(g::Perm{T}) where T<:Integer
+    cycles(g::Perm)
 > Decompose permutation `g` into disjoint cycles.
 >
 > Return a `CycleDec` object which iterates over disjoint cycles of `g`. The
@@ -292,25 +292,25 @@ const _permdisplaystyle = PermDisplayStyle(:cycles)
 
 @doc Markdown.doc"""
     setpermstyle(format::Symbol)
-> Select the style in which permutations are displayed (in REPL or in general
-> as string). This can be either
-> * `:array` - as vectors of integers whose $n$-th position represents the
-> value at $n$), or
+> Select the style in which permutations are displayed (in the REPL or in general
+> as strings). This can be either
+> * `:array` - as vector of integers whose $n$-th position represents the
+>   value at $n$), or
 > * `:cycles` - as, more familiar for mathematicians, decomposition into
-> disjoint cycles, where the value at $n$ is represented by the entry
-> immediately following $n$ in a cycle (the default).
-
+>   disjoint cycles, where the value at $n$ is represented by the entry
+>   immediately following $n$ in a cycle (the default).
+>
 > The difference is purely esthetical.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
-julia> Generic.setpermstyle(:array)
+julia> setpermstyle(:array)
 :array
 
 julia> Perm([2,3,1,5,4])
 [2, 3, 1, 5, 4]
 
-julia> Generic.setpermstyle(:cycles)
+julia> setpermstyle(:cycles)
 :cycles
 
 julia> Perm([2,3,1,5,4])
@@ -357,7 +357,7 @@ end
 julia> g = Perm(Int8[2,3,1])
 (1,2,3)
 
-julia> h = Perm"(3,1,2)"
+julia> h = perm"(3,1,2)"
 (1,2,3)
 
 julia> g == h
@@ -401,7 +401,7 @@ function mul!(out::Perm, g::Perm, h::Perm)
 end
 
 @doc Markdown.doc"""
-    *(g::Perm{T}, h::Perm{T}) where T
+    *(g::Perm, h::Perm)
 > Return the composition ``h ∘ g`` of two permutations.
 >
 > This corresponds to the action of permutation group on the set `[1..n]`
@@ -420,12 +420,12 @@ julia> Perm([2,3,1,4])*Perm([1,3,4,2]) # (1,2,3)*(2,3,4)
 *(g::Perm{S}, h::Perm{T}) where {S,T} = *(promote(g,h)...)
 
 @doc Markdown.doc"""
-    ^(g::Perm{T}, n::Integer) where T
+    ^(g::Perm, n::Integer)
 > Return the $n$-th power of a permutation `g`.
 >
 > By default `g^n` is computed by cycle decomposition of `g` if `n > 3`.
 > `Generic.power_by_squaring` provides a different method for powering which
-> may or may not be faster, depending on the particuar case. Due to caching of
+> may or may not be faster, depending on the particular case. Due to caching of
 > the cycle structure, repeated powering of `g` will be faster with the default
 > method.
 
@@ -654,7 +654,7 @@ order(::Type{T}, G::PermGroup) where T = factorial(T(G.n))
 >
 > If you are sure that computation over `T` (or its `Int` promotion) will not
 > overflow you may use the method `order(T::Type, a::Perm)` which bypasses
-> computation with BigInts and returns `promote(T, Int)`.
+> computation with `BigInt`s and returns `promote(T, Int)`.
 """
 order(a::Perm) = order(BigInt, a)
 function order(::Type{T}, a::Perm) where T
@@ -663,9 +663,9 @@ function order(::Type{T}, a::Perm) where T
 end
 
 @doc Markdown.doc"""
-    matrix_repr(a::Perm{T}) where T
-> Return the permutation matrix as sparse matrix representing `a` via natural
-> embedding of the permutation group into general linear group over $\mathbb{Z}$.
+    matrix_repr(a::Perm)
+> Return the permutation matrix as a sparse matrix representing `a` via natural
+> embedding of the permutation group into the general linear group over $\mathbb{Z}$.
 
 # Examples:
 ```jldoctest; setup = :(using AbstractAlgebra)
@@ -734,7 +734,7 @@ function emb(G::PermGroup, V::Vector{Int}, check::Bool=true)
 end
 
 @doc Markdown.doc"""
-    rand([rng=GLOBAL_RNG,] G::PermGroup{T}) where {T}
+    rand([rng=GLOBAL_RNG,] G::PermGroup)
 > Return a random permutation from `G`.
 """
 rand(rng::AbstractRNG, rs::Random.SamplerTrivial{PermGroup{T}}) where {T} = Perm(randperm!(rng, Vector{T}(undef, rs[].n)), false)
@@ -846,7 +846,7 @@ end
 > String macro to parse disjoint cycles into `Perm{Int}`.
 >
 > Strings for the output of GAP could be copied directly into `perm"..."`.
-> Cycles of length $1$ are not necessary, but could be included. A permutation
+> Cycles of length $1$ are not necessary, but can be included. A permutation
 > of the minimal support is constructed, i.e. the maximal $n$ in the
 > decomposition determines the parent group $S_n$.
 

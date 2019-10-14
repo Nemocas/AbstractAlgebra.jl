@@ -20,7 +20,7 @@ so that permutation groups can be created using `PermutationGroup` instead of `P
 
 Both `PermGroup` and `Perm` and can be parametrized by any type `T<:Integer` .
 By default the parameter is the `Int`-type native to the systems architecture.
-However, if you are sure that your permutations are small enough to fit into smaller integer type (such as `Int32`, `Uint16`, or even `Int8`), you may choose to change the parametrizing type accordingly.
+However, if you are sure that your permutations are small enough to fit into smaller integer type (such as `Int32`, `UInt16`, or even `Int8`), you may choose to change the parametrizing type accordingly.
 In practice this may result in decreased memory footprint (when storing multiple permutations) and noticable faster performance, if your workload is heavy in operations on permutations, which e.g. does not fit into cache of your cpu.
 
 All the permutation group types belong to the `Group` abstract type and the corresponding permutation element types belong to the `GroupElem` abstract type.
@@ -31,7 +31,7 @@ Generic.setpermstyle
 
 ## Permutations constructors
 
-There are several methods to to construct permutations in AbstractAlgebra.jl.
+There are several methods to construct permutations in AbstractAlgebra.jl.
 
 * The easiest way is to directly call to the `Perm` (inner) constructor:
 
@@ -50,7 +50,8 @@ Generic.Perm
 Generic.PermGroup
 ```
 
-  A vector of integers can be then coerced to a permutation via call to parent. The advantage is that the vector is automatically converted to the integer type fixed at the creation of the parent object.
+  A vector of integers can be then coerced to a permutation by calling a parent permutation group on it.
+  The advantage is that the vector is automatically converted to the integer type fixed at the creation of the parent object.
 
   **Examples:**
 
@@ -73,7 +74,7 @@ julia> H()
 
   By default the coercion checks for non-unique values in the vector, but this can be switched off with `G([2,3,1,5,4], false)`.
 
-* Finally there is a `perm"..."` string macro to construct permutation from string input.
+* Finally there is a `perm"..."` string macro to construct a permutation from a string input.
 
 ```@docs
 @perm_str
@@ -99,21 +100,21 @@ A custom implementation also needs to implement `hash(::Perm, ::UInt)` and (poss
     Permutation group elements are mutable and so returning shallow copies is not sufficient.
 
 ```julia
-getindex(a::Perm, n::Int)
+getindex(a::Perm, n::Integer)
 ```
 
-Allows access to entry $n$ of the given permutation via the syntax `a[n]`.
+Allow access to entry $n$ of the given permutation via the syntax `a[n]`.
 Note that entries are $1$-indexed.
 
 ```julia
-setindex!(a::Perm, d::Int, n::Int)
+setindex!(a::Perm, d::Integer, n::Integer)
 ```
 
 Set the $n$-th entry of the given permutation to $d$.
 This allows Julia to provide the syntax `a[n] = d` for setting entries of a permutation. Entries are $1$-indexed.
 
 !!! note
-    Using `setindex!` invalidates cycle decomposition cached in a permutation, i.e. it will be computed the next time cycle decomposition is needed.
+    Using `setindex!` invalidates the cycle decomposition cached in a permutation, which will be computed the next time it is needed.
 
 Given the parent object `G` for a permutation group, the following coercion functions are provided to coerce various arguments into the permutation group.
 Developers provide these by overloading the permutation group parent objects.
@@ -159,9 +160,9 @@ order(::Generic.PermGroup)
 Note that even an `Int64` can be easily overflowed when computing with permutation groups.
 Thus, by default, `order` returns (always correct) `BigInt`s.
 If you are sure that the computation will not overflow, you may use `order(::Type{T}, ...)` to perform computations with machine integers.
-Julias standard promotion rules apply for the returned value.
+Julia's standard promotion rules apply for the returned value.
 
-Since `PermGroup` implements the iterator protocol You may iterate over all permutations via simple
+Since `PermGroup` implements the iterator protocol, you may iterate over all permutations via a simple loop:
 
 ```
 for p in PermutationGroup(n)
@@ -215,22 +216,22 @@ julia> PermutationGroup(4)()
 
 
 ```julia
-(G::PermGrup)(::Vector{<:Integer}[, check=true])
+(G::PermGroup)(::Vector{<:Integer}[, check=true])
 ```
-> Turn a vector od integers into a permutation (performing conversion, if necessary).
+> Turn a vector of integers into a permutation (performing conversion, if necessary).
 
 
 ```julia
-(G::PermGroup)(::Perm{<:Integer}[, check=true])
+(G::PermGroup)(::Perm[, check=true])
 ```
-> Coerce a permutation `p` into group $G$ (performing the conversion, if necessary).
+> Coerce a permutation `p` into group `G` (performing the conversion, if necessary).
 > If `p` is already an element of `G` no copy is performed.
 
 ```julia
 (G::PermGroup)(::String[, check=true])
 ```
 > Parse the string input e.g. copied from the output of GAP.
-> The method uses the same logic as `perm"..."` macro.
+> The method uses the same logic as the `perm"..."` macro.
 > The string is sanitized and checked for disjoint cycles.
 > Both `string(p::Perm)` (if `setpermstyle(:cycles)`) and `string(cycles(p::Perm))` are valid input for this method.
 
