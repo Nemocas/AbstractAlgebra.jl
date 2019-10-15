@@ -140,7 +140,7 @@ when printing polynomials.
 symbols(S::MyPolyRing{T}) where T <: AbstractAlgebra.RingElem
 ```
 
-Return the array `[s]` where `s	 is a `Symbol` representing the variable of the given
+Return the array `[s]` where `s` is a `Symbol` representing the variable of the given
 polynomial ring. This is provided for uniformity with the multivariate interface, where
 there is more than one variable and hence an array of symbols.
 
@@ -251,8 +251,6 @@ julia> fit!(g, 8)
 
 julia> g = setcoeff!(g, 7, BigInt(4))
 4*x^7+x^3+11*x^2+2*x+1
-
-julia> 
 ```
 
 ## Optional functionality for polynomial rings

@@ -54,7 +54,7 @@ their type, since the type no longer contains the modulus $n$.
 
 Instead, the way we get around this in AbstractAlgebra.jl is to have special (singleton)
 objects that act like types, but are really just ordinary Julia objects. These objects,
-called *parent* objects can contain extra information, such as the modulus $n$.
+called *parent* objects, can contain extra information, such as the modulus $n$.
 
 In order to create new elements of $\mathbb{Z}/n\mathbb{Z}$ as above, we overload the
 `call` operator for the parent object.
